@@ -1148,6 +1148,8 @@
       "recordingEnabled": "Ενεργοποίηση βιντεοσκόπησης",
       "agendaEnabled": "Ζωντανές σημειώσεις / λίστα ελέγχου (ατζέντα)",
       "agendaEnabledDesc": "Μια λίστα ελέγχου με τα θέματα προς συζήτηση, την οποία οι συντονιστές σημειώνουν κατά τη διάρκεια της εκδήλωσης. Τροφοδοτεί την αυτόματη σύνοψη. Προαιρετική και μπορεί να ενεργοποιηθεί ακόμη και κατά τη διάρκεια της εκδήλωσης.",
+      "wordCloudEnabled": "Live word cloud",
+      "wordCloudEnabledDesc": "Participants send a word and the cloud updates live. Useful to open a discussion or gather a feeling in a few seconds.",
       "whiteboardEnabled": "Κοινόχρηστος πίνακας",
       "whiteboardEnabledDesc": "Ενεργοποιεί τον ενσωματωμένο συνεργατικό πίνακα (Excalidraw): οι συντονιστές μπορούν να τον ανοίξουν από τη γραμμή εργαλείων κατά τη διάρκεια της εκδήλωσης. Πάντα ενεργός στις άμεσες κλήσεις.",
       "autoStartRecording": "Αυτόματη έναρξη εγγραφής",

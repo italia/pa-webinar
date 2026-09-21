@@ -34,6 +34,7 @@ interface TemplatePreset {
   recordingEnabled: boolean;
   autoStartRecording: boolean;
   agendaEnabled?: boolean;
+  wordCloudEnabled?: boolean;
   whiteboardEnabled?: boolean;
   waitingRoomEngine?: 'GARDEN' | 'GAME' | 'CLASSIC' | null;
   participantsCanUnmute: boolean;

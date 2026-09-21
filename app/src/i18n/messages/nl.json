@@ -1148,6 +1148,8 @@
       "recordingEnabled": "Video-opname inschakelen",
       "agendaEnabled": "Live notities / checklist (agenda)",
       "agendaEnabledDesc": "Een checklist met de te behandelen punten die de moderatoren tijdens het evenement afvinken. Wordt meegenomen in de automatische samenvatting. Optioneel en ook tijdens het evenement in te schakelen.",
+      "wordCloudEnabled": "Live word cloud",
+      "wordCloudEnabledDesc": "Participants send a word and the cloud updates live. Useful to open a discussion or gather a feeling in a few seconds.",
       "whiteboardEnabled": "Gedeeld whiteboard",
       "whiteboardEnabledDesc": "Schakelt het ingebouwde samenwerkingswhiteboard (Excalidraw) in: de moderatoren kunnen het tijdens het evenement openen via de werkbalk. Altijd actief bij directe calls.",
       "autoStartRecording": "Opname automatisch starten",

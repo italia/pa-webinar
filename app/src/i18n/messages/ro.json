@@ -1148,6 +1148,8 @@
       "recordingEnabled": "Activați înregistrarea video",
       "agendaEnabled": "Notițe / Listă de verificare (agendă) live",
       "agendaEnabledDesc": "O listă a punctelor de tratat, pe care moderatorii le bifează în timpul evenimentului. Este preluată în rezumatul automat. Opțională și activabilă și în timpul evenimentului.",
+      "wordCloudEnabled": "Live word cloud",
+      "wordCloudEnabledDesc": "Participants send a word and the cloud updates live. Useful to open a discussion or gather a feeling in a few seconds.",
       "whiteboardEnabled": "Tablă partajată",
       "whiteboardEnabledDesc": "Activează tabla colaborativă nativă (Excalidraw): moderatorii o pot deschide din bara de instrumente în timpul evenimentului. Întotdeauna activă în apelurile instantanee.",
       "autoStartRecording": "Porniți înregistrarea automat",

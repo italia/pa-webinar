@@ -1148,6 +1148,8 @@
       "recordingEnabled": "Videofelvétel engedélyezése",
       "agendaEnabled": "Élő jegyzetek / ellenőrzőlista (napirend)",
       "agendaEnabledDesc": "A megtárgyalandó pontok ellenőrzőlistája, amelyet a moderátorok az esemény során kipipálnak. Beépül az automatikus összefoglalóba. Nem kötelező, és az esemény közben is bekapcsolható.",
+      "wordCloudEnabled": "Live word cloud",
+      "wordCloudEnabledDesc": "Participants send a word and the cloud updates live. Useful to open a discussion or gather a feeling in a few seconds.",
       "whiteboardEnabled": "Megosztott tábla",
       "whiteboardEnabledDesc": "Bekapcsolja a beépített, együttműködésre szolgáló táblát (Excalidraw): a moderátorok az esemény alatt az eszköztárból nyithatják meg. Az azonnali hívásokban mindig aktív.",
       "autoStartRecording": "Felvétel automatikus indítása",

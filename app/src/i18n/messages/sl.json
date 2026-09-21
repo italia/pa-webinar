@@ -1148,6 +1148,8 @@
       "recordingEnabled": "Omogoči video snemanje",
       "agendaEnabled": "Zapiski / kontrolni seznam (agenda) v živo",
       "agendaEnabledDesc": "Kontrolni seznam tem za obravnavo, ki jih moderatorji med dogodkom odkljukajo. Vključi se v samodejni povzetek. Neobvezno; vklopiti ga je mogoče tudi med dogodkom.",
+      "wordCloudEnabled": "Live word cloud",
+      "wordCloudEnabledDesc": "Participants send a word and the cloud updates live. Useful to open a discussion or gather a feeling in a few seconds.",
       "whiteboardEnabled": "Deljena tabla",
       "whiteboardEnabledDesc": "Omogoči vgrajeno sodelovalno tablo (Excalidraw): moderatorji jo lahko med dogodkom odprejo iz orodne vrstice. Pri takojšnjih klicih je vedno vklopljena.",
       "autoStartRecording": "Samodejno začni snemanje",

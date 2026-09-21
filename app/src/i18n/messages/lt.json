@@ -1148,6 +1148,8 @@
       "recordingEnabled": "Įjungti vaizdo įrašymą",
       "agendaEnabled": "Tiesioginiai užrašai / kontrolinis sąrašas (darbotvarkė)",
       "agendaEnabledDesc": "Aptartinų temų sąrašas, kurį moderatoriai žymi renginio metu. Įtraukiamas į automatinę santrauką. Neprivalomas ir gali būti įjungtas net renginio metu.",
+      "wordCloudEnabled": "Live word cloud",
+      "wordCloudEnabledDesc": "Participants send a word and the cloud updates live. Useful to open a discussion or gather a feeling in a few seconds.",
       "whiteboardEnabled": "Bendra lenta",
       "whiteboardEnabledDesc": "Įjungia integruotą bendradarbiavimo lentą (Excalidraw): moderatoriai gali ją atverti iš įrankių juostos renginio metu. Momentiniuose skambučiuose visada įjungta.",
       "autoStartRecording": "Pradėti įrašymą automatiškai",

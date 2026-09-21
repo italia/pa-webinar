@@ -1148,6 +1148,8 @@
       "recordingEnabled": "Cumasaigh taifeadadh físe",
       "agendaEnabled": "Nótaí / Seicliosta beo (clár oibre)",
       "agendaEnabledDesc": "Seicliosta de na topaicí atá le plé a thiceálann na modhnóirí le linn an imeachta. Cuirtear san áireamh san achoimre uathoibríoch é. Roghnach, agus is féidir é a chur ar siúl le linn an imeachta freisin.",
+      "wordCloudEnabled": "Live word cloud",
+      "wordCloudEnabledDesc": "Participants send a word and the cloud updates live. Useful to open a discussion or gather a feeling in a few seconds.",
       "whiteboardEnabled": "Clár bán comhroinnte",
       "whiteboardEnabledDesc": "Cumasaíonn sé an clár bán comhoibríoch dúchasach (Excalidraw): is féidir le modhnóirí é a oscailt ón mbarra uirlisí le linn an imeachta. Ar siúl i gcónaí i nglaonna láithreacha.",
       "autoStartRecording": "Tosaigh an taifeadadh go huathoibríoch",

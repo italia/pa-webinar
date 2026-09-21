@@ -1148,6 +1148,8 @@
       "recordingEnabled": "Omogući video snimanje",
       "agendaEnabled": "Bilješke / Kontrolna lista (agenda) uživo",
       "agendaEnabledDesc": "Kontrolna lista tema koje treba obraditi, a koje moderatori označavaju tijekom događaja. Ulazi u automatski sažetak. Nije obvezna i može se uključiti i tijekom događaja.",
+      "wordCloudEnabled": "Live word cloud",
+      "wordCloudEnabledDesc": "Participants send a word and the cloud updates live. Useful to open a discussion or gather a feeling in a few seconds.",
       "whiteboardEnabled": "Zajednička ploča",
       "whiteboardEnabledDesc": "Omogućuje ugrađenu zajedničku ploču (Excalidraw): moderatori je tijekom događaja mogu otvoriti s alatne trake. Uvijek je uključena u trenutačnim pozivima.",
       "autoStartRecording": "Automatski pokreni snimanje",

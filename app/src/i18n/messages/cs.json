@@ -1148,6 +1148,8 @@
       "recordingEnabled": "Povolit videozáznam",
       "agendaEnabled": "Živé poznámky / kontrolní seznam (agenda)",
       "agendaEnabledDesc": "Kontrolní seznam témat k projednání, který moderátoři během události odškrtávají. Promítá se do automatického shrnutí. Nepovinné, lze zapnout i v průběhu události.",
+      "wordCloudEnabled": "Live word cloud",
+      "wordCloudEnabledDesc": "Participants send a word and the cloud updates live. Useful to open a discussion or gather a feeling in a few seconds.",
       "whiteboardEnabled": "Sdílená tabule",
       "whiteboardEnabledDesc": "Zapne nativní společnou tabuli (Excalidraw): moderátoři ji mohou během události otevřít z panelu nástrojů. U okamžitých hovorů je vždy zapnutá.",
       "autoStartRecording": "Automaticky spustit záznam",

@@ -1148,6 +1148,8 @@
       "recordingEnabled": "Ativar gravação de vídeo",
       "agendaEnabled": "Notas / Lista de verificação (agenda) em direto",
       "agendaEnabledDesc": "Uma lista de verificação dos pontos a tratar que os moderadores assinalam durante o evento. Alimenta o resumo automático. Opcional e também ativável durante o evento.",
+      "wordCloudEnabled": "Live word cloud",
+      "wordCloudEnabledDesc": "Participants send a word and the cloud updates live. Useful to open a discussion or gather a feeling in a few seconds.",
       "whiteboardEnabled": "Quadro branco partilhado",
       "whiteboardEnabledDesc": "Ativa o quadro branco colaborativo nativo (Excalidraw): os moderadores podem abri-lo a partir da barra de ferramentas durante o evento. Sempre ativo nas chamadas instantâneas.",
       "autoStartRecording": "Iniciar a gravação automaticamente",

@@ -1148,6 +1148,8 @@
       "recordingEnabled": "Activer l'enregistrement vidéo",
       "agendaEnabled": "Notes / Check-list (ordre du jour) en direct",
       "agendaEnabledDesc": "Une check-list des points à aborder que les modérateurs cochent pendant l'événement. Elle alimente la synthèse automatique. Facultative et activable aussi pendant l'événement.",
+      "wordCloudEnabled": "Live word cloud",
+      "wordCloudEnabledDesc": "Participants send a word and the cloud updates live. Useful to open a discussion or gather a feeling in a few seconds.",
       "whiteboardEnabled": "Tableau blanc partagé",
       "whiteboardEnabledDesc": "Active le tableau blanc collaboratif natif (Excalidraw) : les modérateurs peuvent l'ouvrir depuis la barre d'outils pendant l'événement. Toujours actif dans les appels instantanés.",
       "autoStartRecording": "Démarrer l'enregistrement automatiquement",

@@ -4,7 +4,7 @@ import { z } from 'zod';
 
 const localizedStringField = z.record(z.string(), z.string());
 
-const eventBaseSchema = z.object({
+export const eventBaseSchema = z.object({
   title: localizedStringField.refine(
     (obj) => typeof obj.it === 'string' && obj.it.length >= 3,
     { message: 'title.it is required and must be at least 3 characters' },

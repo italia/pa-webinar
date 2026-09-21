@@ -1148,6 +1148,8 @@
       "recordingEnabled": "Włącz nagrywanie wideo",
       "agendaEnabled": "Notatki / Lista kontrolna (agenda) na żywo",
       "agendaEnabledDesc": "Lista kontrolna tematów do omówienia, którą moderatorzy odhaczają podczas wydarzenia. Zasila automatyczne podsumowanie. Opcjonalna, można ją włączyć także w trakcie wydarzenia.",
+      "wordCloudEnabled": "Live word cloud",
+      "wordCloudEnabledDesc": "Participants send a word and the cloud updates live. Useful to open a discussion or gather a feeling in a few seconds.",
       "whiteboardEnabled": "Tablica współdzielona",
       "whiteboardEnabledDesc": "Włącza natywną tablicę do pracy zespołowej (Excalidraw): moderatorzy mogą ją otworzyć z paska narzędzi podczas wydarzenia. Zawsze aktywna w połączeniach natychmiastowych.",
       "autoStartRecording": "Uruchom nagrywanie automatycznie",

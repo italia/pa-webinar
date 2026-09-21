@@ -1148,6 +1148,8 @@
       "recordingEnabled": "Ippermetti r-reġistrazzjoni bil-vidjo",
       "agendaEnabled": "Noti / Lista ta' kontroll (aġenda) live",
       "agendaEnabledDesc": "Lista ta' kontroll tat-temi li għandhom jiġu koperti, li l-moderaturi jimmarkaw matul l-avveniment. Tidħol fis-sommarju awtomatiku. Mhijiex obbligatorja u tista' tiġi attivata anke matul l-avveniment.",
+      "wordCloudEnabled": "Live word cloud",
+      "wordCloudEnabledDesc": "Participants send a word and the cloud updates live. Useful to open a discussion or gather a feeling in a few seconds.",
       "whiteboardEnabled": "Whiteboard kondiviża",
       "whiteboardEnabledDesc": "Tattiva l-whiteboard kollaborattiva nattiva (Excalidraw): il-moderaturi jistgħu jiftħuha mit-toolbar matul l-avveniment. Dejjem attiva fis-sejħiet istantanji.",
       "autoStartRecording": "Ibda la reġistrazzjoni awtomatikament",

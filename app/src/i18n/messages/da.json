@@ -1148,6 +1148,8 @@
       "recordingEnabled": "Aktivér videooptagelse",
       "agendaEnabled": "Live-noter / tjekliste (dagsorden)",
       "agendaEnabledDesc": "En tjekliste over de emner, der skal behandles, som moderatorerne krydser af under arrangementet. Indgår i det automatiske resumé. Valgfri og kan også slås til under arrangementet.",
+      "wordCloudEnabled": "Live word cloud",
+      "wordCloudEnabledDesc": "Participants send a word and the cloud updates live. Useful to open a discussion or gather a feeling in a few seconds.",
       "whiteboardEnabled": "Delt whiteboard",
       "whiteboardEnabledDesc": "Aktiverer det indbyggede whiteboard til samarbejde (Excalidraw): moderatorerne kan åbne det fra værktøjslinjen under arrangementet. Altid slået til ved øjeblikkelige opkald.",
       "autoStartRecording": "Start optagelsen automatisk",

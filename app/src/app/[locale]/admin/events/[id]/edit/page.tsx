@@ -184,6 +184,7 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
       participantsCanShareScreen: event.participantsCanShareScreen,
       recordingEnabled: event.recordingEnabled,
       agendaEnabled: event.agendaEnabled,
+      wordCloudEnabled: event.wordCloudEnabled,
       whiteboardEnabled: event.whiteboardEnabled,
       autoStartRecording: event.autoStartRecording,
       aiTranscriptEnabled: event.aiTranscriptEnabled,

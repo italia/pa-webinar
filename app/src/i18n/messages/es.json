@@ -1148,6 +1148,8 @@
       "recordingEnabled": "Activar grabación de vídeo",
       "agendaEnabled": "Notas / Lista de comprobación (agenda) en directo",
       "agendaEnabledDesc": "Una lista de los puntos que hay que tratar y que los moderadores van marcando durante el evento. Se incorpora al resumen automático. Es opcional y también se puede activar durante el evento.",
+      "wordCloudEnabled": "Live word cloud",
+      "wordCloudEnabledDesc": "Participants send a word and the cloud updates live. Useful to open a discussion or gather a feeling in a few seconds.",
       "whiteboardEnabled": "Pizarra compartida",
       "whiteboardEnabledDesc": "Activa la pizarra colaborativa nativa (Excalidraw): los moderadores pueden abrirla desde la barra de herramientas durante el evento. Siempre activa en las llamadas instantáneas.",
       "autoStartRecording": "Iniciar la grabación automáticamente",

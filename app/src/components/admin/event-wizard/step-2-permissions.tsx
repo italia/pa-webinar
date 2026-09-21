@@ -28,6 +28,8 @@ export interface Step2Value {
   autoStartRecording: boolean;
   /** Agenda/note live (checklist opt-in). */
   agendaEnabled: boolean;
+  /** Nuvola di parole live (opt-in). */
+  wordCloudEnabled: boolean;
   /** Lavagna condivisa (whiteboard Excalidraw nativa) opt-in. */
   whiteboardEnabled: boolean;
   // ── Post-produzione AI (subordinata a recordingEnabled) ──
@@ -201,6 +203,22 @@ export default function Step2Permissions({ value, onChange, fieldErrors = {} }: 
             ariaLabel={tAdmin('form.agendaEnabled')}
             checked={value.agendaEnabled}
             onChange={() => onChange({ agendaEnabled: !value.agendaEnabled })}
+          />
+        </div>
+        <div className="py-2 d-flex justify-content-between align-items-start">
+          <div className="me-3">
+            <div className="fw-semibold" style={{ color: 'var(--app-text)' }}>
+              {tAdmin('form.wordCloudEnabled')}
+            </div>
+            <div className="text-secondary" style={{ fontSize: '0.85rem' }}>
+              {tAdmin('form.wordCloudEnabledDesc')}
+            </div>
+          </div>
+          <ToggleSwitch
+            label=""
+            ariaLabel={tAdmin('form.wordCloudEnabled')}
+            checked={value.wordCloudEnabled}
+            onChange={() => onChange({ wordCloudEnabled: !value.wordCloudEnabled })}
           />
         </div>
         <div className="py-2 d-flex justify-content-between align-items-start">

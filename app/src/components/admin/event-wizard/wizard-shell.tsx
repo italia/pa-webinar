@@ -51,6 +51,7 @@ export interface WizardTemplatePreset {
   recordingEnabled: boolean;
   autoStartRecording: boolean;
   agendaEnabled?: boolean;
+  wordCloudEnabled?: boolean;
   whiteboardEnabled?: boolean;
   waitingRoomEngine?: 'GARDEN' | 'GAME' | 'CLASSIC' | null;
   participantsCanUnmute: boolean;
@@ -132,6 +133,7 @@ export interface InitialEventShape {
     participantsCanShareScreen: boolean;
     recordingEnabled: boolean;
     agendaEnabled?: boolean | null;
+    wordCloudEnabled?: boolean | null;
     whiteboardEnabled?: boolean | null;
     autoStartRecording: boolean;
     aiTranscriptEnabled?: boolean | null;
@@ -265,6 +267,7 @@ export default function EventWizard(props: WizardProps) {
         permissionMatrix: matrix,
         recordingEnabled: ev.recordingEnabled,
         agendaEnabled: ev.agendaEnabled ?? false,
+        wordCloudEnabled: ev.wordCloudEnabled ?? false,
         whiteboardEnabled: ev.whiteboardEnabled ?? false,
         autoStartRecording: ev.autoStartRecording,
         aiTranscriptEnabled: ev.aiTranscriptEnabled ?? false,
@@ -381,6 +384,7 @@ export default function EventWizard(props: WizardProps) {
       permissionMatrix: matrix,
       recordingEnabled: tpl?.recordingEnabled ?? false,
       agendaEnabled: tpl?.agendaEnabled ?? false,
+      wordCloudEnabled: tpl?.wordCloudEnabled ?? false,
       whiteboardEnabled: tpl?.whiteboardEnabled ?? false,
       autoStartRecording: tpl?.autoStartRecording ?? false,
       // Default AI dal template (semplificazione): un template "registrato"
@@ -615,6 +619,7 @@ export default function EventWizard(props: WizardProps) {
           participantsCanShareScreen: toggles.participantsCanShareScreen,
           recordingEnabled: form.recordingEnabled,
           agendaEnabled: form.agendaEnabled,
+          wordCloudEnabled: form.wordCloudEnabled,
           whiteboardEnabled: form.whiteboardEnabled,
           autoStartRecording: form.recordingEnabled && form.autoStartRecording,
 

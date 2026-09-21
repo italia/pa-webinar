@@ -20,6 +20,7 @@ const templateSchema = z.object({
   recordingEnabled: z.boolean().optional(),
   autoStartRecording: z.boolean().optional(),
   agendaEnabled: z.boolean().optional(),
+  wordCloudEnabled: z.boolean().optional(),
   whiteboardEnabled: z.boolean().optional(),
   // Motore sala d'attesa pre-popolato nel wizard. null = default sito.
   waitingRoomEngine: z.enum(['GARDEN', 'GAME', 'CLASSIC']).nullish(),

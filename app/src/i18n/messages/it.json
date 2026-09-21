@@ -1218,6 +1218,8 @@
       "recordingEnabled": "Abilita registrazione video",
       "agendaEnabled": "Note / Checklist (agenda) live",
       "agendaEnabledDesc": "Una checklist dei punti da trattare che i moderatori spuntano durante l'evento. Confluisce nella sintesi automatica. Opzionale e attivabile anche durante l'evento.",
+      "wordCloudEnabled": "Nuvola di parole live",
+      "wordCloudEnabledDesc": "Chi partecipa manda una parola e la nuvola si aggiorna in diretta. Utile per aprire un confronto o raccogliere un sentimento in pochi secondi.",
       "whiteboardEnabled": "Lavagna condivisa",
       "whiteboardEnabledDesc": "Abilita la lavagna collaborativa (Excalidraw) nativa: i moderatori possono aprirla dalla toolbar durante l'evento. Sempre attiva nelle chiamate istantanee.",
       "autoStartRecording": "Avvia la registrazione automaticamente",

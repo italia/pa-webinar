@@ -1148,6 +1148,8 @@
       "recordingEnabled": "Iespējot video ierakstīšanu",
       "agendaEnabled": "Piezīmes / kontrolsaraksts (darba kārtība) tiešraidē",
       "agendaEnabledDesc": "Apspriežamo tēmu kontrolsaraksts, ko moderatori atzīmē pasākuma laikā. Tas tiek iekļauts automātiskajā kopsavilkumā. Nav obligāts, un to var ieslēgt arī pasākuma laikā.",
+      "wordCloudEnabled": "Live word cloud",
+      "wordCloudEnabledDesc": "Participants send a word and the cloud updates live. Useful to open a discussion or gather a feeling in a few seconds.",
       "whiteboardEnabled": "Koplietojamā tāfele",
       "whiteboardEnabledDesc": "Iespējo iebūvēto sadarbības tāfeli (Excalidraw): moderatori to pasākuma laikā var atvērt no rīkjoslas. Tūlītējos zvanos tā ir vienmēr ieslēgta.",
       "autoStartRecording": "Sākt ierakstīšanu automātiski",

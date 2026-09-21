@@ -26,6 +26,7 @@ interface SerializedTemplate {
   icon: string;
   qaEnabled: boolean;
   chatEnabled: boolean;
+  wordCloudEnabled: boolean;
   whiteboardEnabled: boolean;
   waitingRoomEngine: 'GARDEN' | 'GAME' | 'CLASSIC' | null;
   recordingEnabled: boolean;
@@ -59,6 +60,7 @@ interface EditingTemplate {
   icon: string;
   qaEnabled: boolean;
   chatEnabled: boolean;
+  wordCloudEnabled: boolean;
   whiteboardEnabled: boolean;
   waitingRoomEngine: 'GARDEN' | 'GAME' | 'CLASSIC' | null;
   recordingEnabled: boolean;
@@ -87,6 +89,7 @@ const DEFAULT_NEW: EditingTemplate = {
   // quando serve.
   qaEnabled: false,
   chatEnabled: true,
+  wordCloudEnabled: false,
   whiteboardEnabled: false,
   waitingRoomEngine: null,
   recordingEnabled: false,
@@ -132,6 +135,7 @@ export default function TemplateManagement({
       icon: tpl.icon,
       qaEnabled: tpl.qaEnabled,
       chatEnabled: tpl.chatEnabled,
+      wordCloudEnabled: tpl.wordCloudEnabled,
       whiteboardEnabled: tpl.whiteboardEnabled,
       waitingRoomEngine: tpl.waitingRoomEngine,
       recordingEnabled: tpl.recordingEnabled,
@@ -527,6 +531,7 @@ function TemplateForm({
           [
             ['qaEnabled', 'Q&A'],
             ['chatEnabled', 'Chat'],
+            ['wordCloudEnabled', ta('wordCloudEnabled')],
             ['whiteboardEnabled', t('whiteboardLabel')],
             ['recordingEnabled', t('recordingLabel')],
             ['participantsCanUnmute', t('unmute')],
