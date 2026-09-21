@@ -17,7 +17,7 @@ Indice dei documenti. Se stai arrivando ora, parti dal
 |---|---|
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Progetto del sistema, modello dati, superficie API |
 | [adr/](adr/) | Decisioni architetturali registrate |
-| [ROADMAP.md](ROADMAP.md) | Cosa è stato rilasciato e cosa è pianificato |
+| [ROADMAP.md](ROADMAP.md) | Cosa manca ancora, e i limiti noti di ciò che c'è |
 | [../CHANGELOG.md](../CHANGELOG.md) | Storico dei rilasci |
 
 ## Installare e gestire

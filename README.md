@@ -335,7 +335,7 @@ Setup completo (db, test, troubleshooting): [`docs/DEVELOPMENT.md`](docs/DEVELOP
 | [`docs/GDPR.md`](docs/GDPR.md) | Conformità GDPR, retention, encryption, percorso guest, opt-out rubrica |
 | [`docs/CONTRIBUTING-QUALITY.md`](docs/CONTRIBUTING-QUALITY.md) | Standard di qualità, Scorecard, SBOM |
 | [`docs/LOAD-TESTING.md`](docs/LOAD-TESTING.md) | Benchmark, misurazioni reali, sizing JVB |
-| [`docs/ROADMAP.md`](docs/ROADMAP.md) | Rilasciato, in corso, a venire |
+| [`docs/ROADMAP.md`](docs/ROADMAP.md) | Cosa manca ancora, e i limiti noti |
 | [`docs/adr/`](docs/adr/) | Architecture Decision Records |
 | [`docs/README.md`](docs/README.md) | **Indice di tutta la documentazione** |
 

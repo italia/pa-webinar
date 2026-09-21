@@ -307,16 +307,23 @@ I test E2E richiedono lo stack completo in esecuzione (app + database + Jitsi + 
 
 ## CI/CD
 
-La pipeline GitHub Actions (`.github/workflows/ci.yml`) esegue i seguenti step ad ogni push e pull request:
+La pipeline GitHub Actions gira su push verso `main` e sulle pull request
+verso `main`; su `dev` girano soltanto la build delle immagini di sviluppo e
+l'analisi statica.
 
-1. **Lint** — ESLint + TypeScript type check
-2. **Unit test** — Vitest con coverage minima
-3. **Migration check** — Applica le migrazioni su un DB vuoto e verifica che lo schema Prisma sia sincronizzato con i file di migrazione
-4. **Security scan** — Audit dipendenze npm (`npm audit`)
-5. **Docker build** — Build dell'immagine multi-stage di produzione
-6. **Image scan** — Scansione vulnerabilità dell'immagine Docker (Trivy)
+**L'elenco autorevole dei job, e dei comandi che ciascuno esegue, è
+`.github/workflows/ci.yml`**: va letto da lì prima di aprire una pull request.
+Qui non se ne tiene una copia, perché una copia va a deriva e chi la legge non
+ha modo di accorgersene — è già successo con questo stesso elenco.
 
-La pipeline blocca il merge se uno qualsiasi degli step fallisce.
+Due cose che dal file non si vedono a colpo d'occhio:
+
+- alcuni job sono dichiarati `continue-on-error`, quindi un loro rosso **non**
+  blocca il merge: non vanno contati come gate;
+- il job che verifica il chart rende tutti i profili, controlla le invarianti
+  con `scripts/validate-chart.sh` e poi fa `kubectl apply --dry-run=server` dei
+  manifesti su un cluster usa-e-getta. È l'unico controllo che guardi il chart,
+  quindi chi lo tocca conviene che lo esegua anche in locale.
 
 ## Troubleshooting
 

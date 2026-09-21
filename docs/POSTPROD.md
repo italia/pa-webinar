@@ -94,12 +94,14 @@ completa una registrazione, la pipeline produce:
 | Sintesi "verbale PA" | `SUMMARY_MD` | sorgente | Markdown strutturato: argomenti, decisioni, action items |
 | Sottotitoli tradotti | `TRANSLATION_VTT` | target (EN/FR/…) | Una per lingua configurata |
 | Sintesi tradotta | `TRANSLATION_MD` | target | Una per lingua configurata |
+| Audio doppiato | `DUBBED_AUDIO` | target | Voce sintetica neutra da catalogo, una per lingua configurata. Prodotto solo con traduzione e doppiaggio entrambi accesi dall'amministratore, ed è marcato come sintetico |
 
-**Out of scope** (rimandati a versioni successive):
-- Voice cloning / dubbing (Art. 9 GDPR — richiede DPIA dedicata).
-- Live captioning (richiede Jigasi + worker sempre on, vedi
-  `docs/ROADMAP.md` v1.0.0).
-- Editor trascrizione (`docs/ROADMAP.md` v0.6.0).
+**Out of scope**:
+- Clonazione della voce (Art. 9 GDPR — richiede DPIA dedicata). Il doppiaggio
+  invece esiste ed è una funzione attivabile: usa voci sintetiche
+  pre-addestrate da catalogo, mai la voce di chi partecipa.
+- Sottotitoli in diretta: richiedono un motore di riconoscimento in streaming
+  accanto alla conferenza (`docs/ROADMAP.md`, sezione "Più avanti").
 
 ---
 

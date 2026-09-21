@@ -12,39 +12,148 @@ Il chart Helm supporta tre modalita, adatte a diverse dimensioni di PA e infrast
 
 (*) Valori indicativi su hardware tipico (4 vCPU, 8 GB per JVB). La capacità per singolo evento è limitata da un bridge JVB, perché Jicofo assegna una conferenza a un solo bridge. Per superare ~300 partecipanti in un singolo evento è necessario abilitare il bridge cascading (Octo) — non attivo di default. La capacità totale della piattaforma, invece, scala orizzontalmente aggiungendo pod JVB: più eventi concorrenti = più bridge. Per validare i numeri sulla propria infrastruttura vedere [`LOAD-TESTING.md`](LOAD-TESTING.md).
 
+## Dove gira
+
+Il chart è `apiVersion: v2`: si installa **sia con Helm 3 sia con Helm 4**, e
+resta in quel formato di proposito — passare al formato nuovo obbligherebbe
+ogni installazione ad avere Helm 4. La verifica in CI gira con Helm 3, che è la
+versione più bassa dichiarata.
+
+| Ambiente | Stato | Cosa serve sapere |
+|---|---|---|
+| **Kubernetes gestito** (AKS, GKE, EKS) | Esercitato | È l'ambiente su cui la piattaforma è in esercizio. Le note per singolo cloud più sotto coprono solo il pool di nodi dei bridge video |
+| **k3s, singolo nodo o piccolo cluster** | Da esercitare | Il controller di Ingress predefinito è Traefik: gli oggetti vengono serviti, le annotazioni no (vedi sotto). Servono comunque un IP pubblico raggiungibile e la porta UDP dei bridge |
+| **Ingresso su Envoy o altro controller** | Parziale, dipende da quale | Se serve ancora gli `Ingress` funziona, traducendo le annotazioni. Se parla solo Gateway API il chart non produce nulla di utilizzabile: vedi sotto |
+| **minikube, kind** | Solo per provare il chart | Vanno bene per verificare che i manifesti siano validi — è ciò che fa la CI — non per servire un evento: il bridge video pretende un indirizzo raggiungibile dai partecipanti, che in un cluster dentro una macchina non c'è |
+| **OpenShift** | Non verificato | Nessuno l'ha provato. I contesti di sicurezza del chart sono espliciti, quindi è plausibile, ma non è una dichiarazione |
+
+### Se non usi ingress-nginx
+
+Il chart produce oggetti `Ingress` e li configura con annotazioni di NGINX.
+Chi ha già spostato l'ingresso su Envoy, o su un altro controller, si trova in
+uno di due casi molto diversi fra loro.
+
+**Il controller serve ancora gli `Ingress`** (Contour, Emissary, il gateway di
+Istio, HAProxy, Traefik). Gli oggetti vengono presi in carico, ma le chiavi da
+cambiare sono due e governano due `Ingress` diversi:
+
+- `ingress.className` — l'`Ingress` del portale (`videocall.<dominio>`);
+- `jitsi-meet.web.ingress.ingressClassName` — l'`Ingress` della conferenza
+  (`jitsi.<dominio>`), che lo rende il sottochart.
+
+Sul secondo la classe **non basta**: va tolta anche l'annotazione
+`kubernetes.io/ingress.class: nginx` da `jitsi-meet.web.ingress.annotations`.
+È la forma storica dello stesso concetto e ha la precedenza: finché resta, il
+controller che la legge — Traefik fra questi — lascia stare l'oggetto, e il
+server API non può nemmeno assegnargli la classe predefinita del cluster. Il
+sintomo è che `jitsi.<dominio>` resta rivendicato da nginx e in sala non entra
+nessuno.
+
+Le altre annotazioni invece non vengono lette, e nessuno lo segnala — vanno
+tradotte nella configurazione del tuo controller. Quelle che cambiano il
+comportamento sono queste:
+
+| Cosa fa l'annotazione | Cosa succede se non viene tradotta |
+|---|---|
+| Tiene aperte le connessioni lunghe (un'ora) | I pannelli della sala, la chat e le mani alzate viaggiano su tre canali a connessione persistente. Con il timeout predefinito della maggior parte dei proxy vengono tagliati **durante l'evento**: l'interfaccia ripiega sulla lettura periodica, quindi si degrada invece di rompersi, ma è la cosa che si nota per prima |
+| Alza la dimensione massima del corpo | I materiali e le registrazioni caricate a mano oltre il limite predefinito vengono rifiutati |
+| Limita la frequenza delle richieste | È l'unico limite condiviso fra le repliche che esista: quello applicativo conta per singolo processo (vedi la roadmap) |
+| Reindirizza la radice del dominio della conferenza al portale | Chi apre il dominio della conferenza vede la pagina di Jitsi invece del portale. Il profilo di produzione la blocca con un frammento di configurazione NGINX, che è anche quello da tradurre |
+| HSTS e reindirizzamento a HTTPS | Da riportare nella configurazione del controller, o si perdono |
+
+**Il controller parla solo Gateway API** (Envoy Gateway). Qui gli `Ingress` non
+vengono serviti affatto: il chart non ha risorse `HTTPRoute`, quindi
+l'instradamento va scritto a mano fuori dal chart, e ogni aggiornamento del
+chart non lo aggiorna. Finché non ci sono, questa non è una modalità
+supportata: è un percorso che qualcuno deve costruirsi e mantenersi.
+
+Cosa il chart dà per scontato, e cosa decade se manca:
+
+- **ingress-nginx** — vedi sopra: con un altro controller le annotazioni
+  vengono ignorate senza errore
+- **cert-manager con un ClusterIssuer chiamato `letsencrypt-prod`** — senza,
+  nessun certificato viene emesso e gli Ingress restano senza TLS
+- **Un IP pubblico sui nodi dei bridge e la porta UDP 10000 aperta** — senza,
+  la conferenza si apre ma nessuno sente nessuno
+- **metrics-server** — senza, l'autoscaling dell'applicazione non si muove
+- **Uno StorageClass predefinito** — serve al database e alla registrazione
+- **Le definizioni del Prometheus Operator** — solo se attivi le metriche
+
 ## Prerequisiti comuni
 
-- Cluster Kubernetes (AKS, GKE, EKS, k3s, o bare metal)
-- `kubectl` configurato
-- Helm 3.x
+Da procurarsi **prima** di lanciare l'installazione. Il primo punto è quello che
+sorprende: i nomi di dominio sono due, non uno.
+
+- Cluster Kubernetes (vedi la tabella sopra)
+- `kubectl` configurato e Helm 3 o 4
 - Ingress controller (NGINX raccomandato)
-- DNS record che punta all'IP dell'Ingress
+- **Due record DNS** che puntano all'IP dell'Ingress: uno per il portale
+  (`videocall.<dominio>`) e uno per la conferenza (`jitsi.<dominio>`). Sono
+  serviti da Ingress distinti e servono entrambi anche in modalità semplice
+- Certificati per entrambi i nomi. Il chart annota gli Ingress per cert-manager
+  con un ClusterIssuer chiamato `letsencrypt-prod`: se usi cert-manager creane
+  uno con quel nome, altrimenti sostituisci le annotazioni con le tue
+- Un server SMTP: senza, nessun invito, promemoria o link di accesso parte mai
+  (vedi [`CONFIGURATION.md`](CONFIGURATION.md))
+- Uno storage a oggetti, se vuoi registrare gli eventi (Azure Blob, S3, MinIO,
+  GCS, R2). Non serve per valutare la piattaforma
+
+Il chart clonato non contiene i sottochart: `helm dependency update
+infra/helm/pa-webinar` li scarica prima della prima installazione.
 
 ## Modalita semplice
 
-Tutto nel cluster, nessuna dipendenza esterna. Ideale per valutare la piattaforma.
+Tutto nel cluster, nessuna dipendenza esterna oltre ai prerequisiti comuni.
+Ideale per valutare la piattaforma.
 
 ```bash
-# 1. Crea il namespace
+# 1. Namespace e sottochart
 kubectl create namespace videocall
+helm dependency update infra/helm/pa-webinar
 
-# 2. Installa
+# 2. Installa. Le password dei datastore si passano e vanno CONSERVATE: il
+#    chart non le inventa, perché un valore estratto a sorte cambierebbe a
+#    ogni resa mentre il database tiene quello con cui è stato inizializzato.
+#    L'indirizzo della banca dati lo compone il chart da questi valori.
 helm upgrade --install videocall ./infra/helm/pa-webinar \
   -f infra/helm/pa-webinar/examples/values-simple.yaml \
   -n videocall \
-  --set postgresql.auth.password="$(openssl rand -hex 16)" \
   --set secrets.generate.APP_SECRET="$(openssl rand -hex 32)" \
   --set secrets.generate.JITSI_JWT_SECRET="$(openssl rand -hex 32)" \
   --set secrets.generate.PII_ENCRYPTION_KEY="$(openssl rand -hex 32)" \
   --set secrets.generate.CRON_API_KEY="$(openssl rand -hex 32)" \
   --set secrets.generate.ADMIN_API_KEY="$(openssl rand -hex 32)" \
+  --set secrets.generate.POSTGRES_PASSWORD="$(openssl rand -hex 24)" \
+  --set secrets.generate.POSTGRES_ADMIN_PASSWORD="$(openssl rand -hex 24)" \
+  --set secrets.generate.REDIS_PASSWORD="$(openssl rand -hex 24)" \
   --set app.env.NEXT_PUBLIC_APP_URL=https://videocall.tuodominio.com \
-  --set "ingress.hosts[0].host=videocall.tuodominio.com"
+  --set app.env.NEXT_PUBLIC_JITSI_DOMAIN=jitsi.tuodominio.com \
+  --set "ingress.hosts[0].host=videocall.tuodominio.com" \
+  --set "ingress.tls[0].hosts[0]=videocall.tuodominio.com" \
+  --set "ingress.tls[0].secretName=videocall-tls" \
+  --set "jitsi-meet.publicURL=https://jitsi.tuodominio.com" \
+  --set "jitsi-meet.web.ingress.hosts[0].host=jitsi.tuodominio.com" \
+  --set "jitsi-meet.web.ingress.hosts[0].paths[0]=/" \
+  --set "jitsi-meet.web.ingress.tls[0].hosts[0]=jitsi.tuodominio.com" \
+  --set "jitsi-meet.web.ingress.tls[0].secretName=jitsi-tls" \
+  --set "secrets.generate.SMTP_HOST=smtp.tuodominio.com" \
+  --set "secrets.generate.SMTP_FROM=eventi@tuodominio.com"
 
 # 3. Verifica
 kubectl get pods -n videocall
 curl -s https://videocall.tuodominio.com/api/health
 ```
+
+Se lasci fuori i due nomi della conferenza l'installazione riesce lo stesso, ma
+il portale manda i partecipanti a un dominio d'esempio e nessuno entra in sala.
+
+Le tre password dei datastore vanno **conservate**: il chart non le rigenera, e
+finiscono in un Secret separato da quello dell'applicazione perché PostgreSQL
+monta per intero, come file dentro il proprio container, il Secret da cui legge
+la password — la chiave che cifra i dati personali non deve stare lì accanto.
+
+Prima di modificare il chart, `scripts/validate-chart.sh` rende tutti i profili
+e verifica le invarianti che, se violate, fanno fallire l'installazione.
 
 ## Modalita standard
 
@@ -71,13 +180,27 @@ kubectl create secret generic videocall-secrets -n videocall \
   --from-literal=SMTP_FROM="eventi@tuodominio.com" \
   --from-literal=SMTP_FROM_NAME="Eventi PA"
 
+# Secret separato per i datastore in cluster. Qui il database è esterno, ma
+# Redis gira nel cluster e senza password non parte. Sta in un Secret suo
+# perché quello dell'applicazione non deve finire montato dentro un datastore.
+kubectl create secret generic videocall-datastore -n videocall \
+  --from-literal=REDIS_PASSWORD="$(openssl rand -hex 24)"
+
 # 2. Installa
 helm upgrade --install videocall ./infra/helm/pa-webinar \
   -f infra/helm/pa-webinar/examples/values-standard.yaml \
   -n videocall \
   --set app.env.NEXT_PUBLIC_APP_URL=https://videocall.tuodominio.com \
+  --set app.env.NEXT_PUBLIC_JITSI_DOMAIN=jitsi.tuodominio.com \
   --set "ingress.hosts[0].host=videocall.tuodominio.com" \
   --set "ingress.tls[0].hosts[0]=videocall.tuodominio.com" \
+  --set "jitsi-meet.publicURL=https://jitsi.tuodominio.com" \
+  --set "jitsi-meet.web.ingress.hosts[0].host=jitsi.tuodominio.com" \
+  --set "jitsi-meet.web.ingress.hosts[0].paths[0]=/" \
+  --set "jitsi-meet.web.ingress.tls[0].hosts[0]=jitsi.tuodominio.com" \
+  --set "jitsi-meet.web.ingress.tls[0].secretName=jitsi-tls" \
+  --set secrets.datastoreSecretName=videocall-datastore \
+  --set redis.auth.existingSecret=videocall-datastore \
   --set jitsi-meet.prosody.auth.jwt.appSecret=$JITSI_JWT_SECRET
 
 # 3. Verifica
@@ -99,17 +222,27 @@ Database esterno, JVB su nodi dedicati con scale-to-zero, monitoring.
 - Porta UDP 10000 aperta verso Internet sui nodi JVB
 
 ```bash
-# 1. Crea namespace e segreti (come modalita standard)
+# 1. Crea namespace e segreti (entrambi, come modalita standard)
 kubectl create namespace videocall
 kubectl create secret generic videocall-secrets -n videocall --from-literal=...
+kubectl create secret generic videocall-datastore -n videocall \
+  --from-literal=REDIS_PASSWORD="$(openssl rand -hex 24)"
 
 # 2. Installa
 helm upgrade --install videocall ./infra/helm/pa-webinar \
   -f infra/helm/pa-webinar/examples/values-full.yaml \
   -n videocall \
   --set app.env.NEXT_PUBLIC_APP_URL=https://videocall.tuodominio.com \
+  --set app.env.NEXT_PUBLIC_JITSI_DOMAIN=jitsi.tuodominio.com \
   --set "ingress.hosts[0].host=videocall.tuodominio.com" \
   --set "ingress.tls[0].hosts[0]=videocall.tuodominio.com" \
+  --set "jitsi-meet.publicURL=https://jitsi.tuodominio.com" \
+  --set "jitsi-meet.web.ingress.hosts[0].host=jitsi.tuodominio.com" \
+  --set "jitsi-meet.web.ingress.hosts[0].paths[0]=/" \
+  --set "jitsi-meet.web.ingress.tls[0].hosts[0]=jitsi.tuodominio.com" \
+  --set "jitsi-meet.web.ingress.tls[0].secretName=jitsi-tls" \
+  --set secrets.datastoreSecretName=videocall-datastore \
+  --set redis.auth.existingSecret=videocall-datastore \
   --set jitsi-meet.prosody.auth.jwt.appSecret=$JITSI_JWT_SECRET \
   --wait --timeout 10m
 
@@ -328,6 +461,50 @@ app:
 Per k3s, usa `traefik` come `ingress.className` invece di `nginx`.
 
 ## Aggiornamento
+
+### Separare le password dei datastore (consigliato, non obbligatorio)
+
+Il sottochart PostgreSQL monta per intero, come file dentro il container del
+database, il Secret da cui legge la propria password. Se lì dentro ci sono
+anche le chiavi dell'applicazione — a partire da quella che cifra i dati
+personali — chiunque raggiunga quel container le legge.
+
+Le installazioni esistenti tengono tutto in un Secret solo e continuano a
+funzionare: il chart non cambia disposizione da sé.
+
+Questa procedura vale per la modalità `existing` (o `external`), dove i Secret
+li crei tu. In modalità `generate` il Secret dei datastore lo produce il chart:
+valorizza `secrets.datastoreSecretName` e allinea i due `existingSecret` dei
+sottochart, senza crearlo a mano — un Secret creato con `kubectl` e poi
+rivendicato dal chart fa fallire l'aggiornamento per conflitto di proprietà.
+
+Copia le chiavi nel nuovo Secret, con gli stessi valori: i datastore li hanno
+già scritti nel proprio volume e non li rileggono. Fallo **prima**
+dell'aggiornamento, altrimenti cercano una password dove non c'è.
+
+```bash
+kubectl create secret generic videocall-datastore -n <namespace> \
+  --from-literal=POSTGRES_PASSWORD="$(kubectl get secret videocall-secrets -n <namespace> \
+      -o jsonpath='{.data.POSTGRES_PASSWORD}' | base64 -d)" \
+  --from-literal=POSTGRES_ADMIN_PASSWORD="$(kubectl get secret videocall-secrets -n <namespace> \
+      -o jsonpath='{.data.POSTGRES_ADMIN_PASSWORD}' | base64 -d)" \
+  --from-literal=REDIS_PASSWORD="$(kubectl get secret videocall-secrets -n <namespace> \
+      -o jsonpath='{.data.REDIS_PASSWORD}' | base64 -d)"
+```
+
+Ometti le chiavi che non usi: con un database esterno serve solo quella di
+Redis. Poi punta il chart e i sottocharts al nuovo Secret:
+
+```
+  --set secrets.datastoreSecretName=videocall-datastore \
+  --set postgresql.auth.existingSecret=videocall-datastore \
+  --set redis.auth.existingSecret=videocall-datastore
+```
+
+Le vecchie copie restano nel Secret dell'applicazione finché non le togli a
+mano, e finché ci sono il problema è ancora lì.
+
+### Nuova versione
 
 ```bash
 # 1. Crea e pusha un nuovo tag — CI builda e pusha le immagini

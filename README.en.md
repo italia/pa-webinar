@@ -313,7 +313,7 @@ Full setup (DB, tests, troubleshooting): [`docs/DEVELOPMENT.md`](docs/DEVELOPMEN
 | [`docs/GDPR.md`](docs/GDPR.md) | GDPR compliance, retention, encryption, guest path, directory opt-out |
 | [`docs/CONTRIBUTING-QUALITY.md`](docs/CONTRIBUTING-QUALITY.md) | Quality standards, Scorecard, SBOM |
 | [`docs/LOAD-TESTING.md`](docs/LOAD-TESTING.md) | Benchmarks, real measurements, JVB sizing |
-| [`docs/ROADMAP.md`](docs/ROADMAP.md) | Shipped, in progress, planned |
+| [`docs/ROADMAP.md`](docs/ROADMAP.md) | What is still missing, and the known limits |
 | [`docs/adr/`](docs/adr/) | Architecture Decision Records |
 | [`docs/README.md`](docs/README.md) | **Index of all documentation** |
 
