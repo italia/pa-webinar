@@ -677,8 +677,6 @@
         "scaleMax": "Maximum",
         "required": "Povinná",
         "saveDraftAndGoQuestionnaires": "Uložit koncept a přejít na správu dotazníků",
-        "preQuestionnaire": "Dotazník před událostí",
-        "postQuestionnaire": "Dotazník po události (zpětná vazba)",
         "none": "— Žádný —"
       },
       "step5": {
@@ -724,6 +722,8 @@
       },
       "validationFailed": "Před pokračováním zkontrolujte zvýrazněná pole.",
       "partialFailure": "Událost byla vytvořena, ale některé položky se neuložily: {items}. Můžete je doplnit na stránce události.",
+      "partialFailureEdit": "The event changes were saved, but these could not be: {items}. Your work is still here: fix them and save again.",
+      "partialFailureEditDetail": "The event changes were saved, but these could not be: {items}. The server replied: {reason}. Your work is still here: fix them and save again.",
       "draftFound": "Našli jsme neuložený koncept této události. Chcete jej obnovit?",
       "draftRestore": "Obnovit koncept",
       "draftDiscard": "Ignorovat",
@@ -732,7 +732,8 @@
         "invitations": "pozvánky",
         "moderators": "moderátoři",
         "speakers": "řečníci",
-        "materials": "materiály"
+        "materials": "materiály",
+        "questionnaires": "questionnaires"
       }
     },
     "nav": {

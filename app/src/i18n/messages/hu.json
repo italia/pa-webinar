@@ -677,8 +677,6 @@
         "scaleMax": "Maximum",
         "required": "Kötelező",
         "saveDraftAndGoQuestionnaires": "Piszkozat mentése és tovább a kérdőívek kezeléséhez",
-        "preQuestionnaire": "Esemény előtti kérdőív",
-        "postQuestionnaire": "Esemény utáni kérdőív (visszajelzés)",
         "none": "— Nincs —"
       },
       "step5": {
@@ -724,6 +722,8 @@
       },
       "validationFailed": "Folytatás előtt ellenőrizze a kiemelt mezőket.",
       "partialFailure": "Az esemény létrejött, de néhány elem nem lett elmentve: {items}. Ezeket az esemény oldaláról adhatja hozzá.",
+      "partialFailureEdit": "The event changes were saved, but these could not be: {items}. Your work is still here: fix them and save again.",
+      "partialFailureEditDetail": "The event changes were saved, but these could not be: {items}. The server replied: {reason}. Your work is still here: fix them and save again.",
       "draftFound": "Találtunk egy el nem mentett piszkozatot ehhez az eseményhez. Visszaállítja?",
       "draftRestore": "Piszkozat visszaállítása",
       "draftDiscard": "Elvetés",
@@ -732,7 +732,8 @@
         "invitations": "meghívók",
         "moderators": "moderátorok",
         "speakers": "előadók",
-        "materials": "anyagok"
+        "materials": "anyagok",
+        "questionnaires": "questionnaires"
       }
     },
     "nav": {

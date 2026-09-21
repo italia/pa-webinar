@@ -677,8 +677,6 @@
         "scaleMax": "Uasmhéid",
         "required": "Riachtanach",
         "saveDraftAndGoQuestionnaires": "Sábháil dréacht agus téigh chuig bainistíocht ceistneoirí",
-        "preQuestionnaire": "Ceistneoir réamh-imeachta",
-        "postQuestionnaire": "Ceistneoir iar-imeachta (aiseolas)",
         "none": "— Gan ceann ar bith —"
       },
       "step5": {
@@ -724,6 +722,8 @@
       },
       "validationFailed": "Athbhreithnigh na réimsí aibhsithe sula leantar ar aghaidh.",
       "partialFailure": "Cruthaíodh an t-imeacht, ach níor sábháladh roinnt míreanna: {items}. Is féidir leat iad a chur leis ó leathanach an imeachta.",
+      "partialFailureEdit": "The event changes were saved, but these could not be: {items}. Your work is still here: fix them and save again.",
+      "partialFailureEditDetail": "The event changes were saved, but these could not be: {items}. The server replied: {reason}. Your work is still here: fix them and save again.",
       "draftFound": "Fuaireamar dréacht neamhshábháilte den imeacht seo. Ar mhaith leat é a athchóiriú?",
       "draftRestore": "Athchóirigh an dréacht",
       "draftDiscard": "Déan neamhaird",
@@ -732,7 +732,8 @@
         "invitations": "cuirí",
         "moderators": "modhnóirí",
         "speakers": "cainteoirí",
-        "materials": "ábhair"
+        "materials": "ábhair",
+        "questionnaires": "questionnaires"
       }
     },
     "nav": {

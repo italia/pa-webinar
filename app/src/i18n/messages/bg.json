@@ -677,8 +677,6 @@
         "scaleMax": "Максимум",
         "required": "Задължителен",
         "saveDraftAndGoQuestionnaires": "Запази черновата и отиди в управлението на въпросниците",
-        "preQuestionnaire": "Въпросник преди събитието",
-        "postQuestionnaire": "Въпросник след събитието (обратна връзка)",
         "none": "— Без —"
       },
       "step5": {
@@ -724,6 +722,8 @@
       },
       "validationFailed": "Проверете маркираните полета, преди да продължите.",
       "partialFailure": "Събитието е създадено, но някои елементи не бяха запазени: {items}. Можете да ги добавите от страницата на събитието.",
+      "partialFailureEdit": "The event changes were saved, but these could not be: {items}. Your work is still here: fix them and save again.",
+      "partialFailureEditDetail": "The event changes were saved, but these could not be: {items}. The server replied: {reason}. Your work is still here: fix them and save again.",
       "draftFound": "Намерихме незапазена чернова на това събитие. Искате ли да я възстановите?",
       "draftRestore": "Възстановяване на черновата",
       "draftDiscard": "Отхвърляне",
@@ -732,7 +732,8 @@
         "invitations": "покани",
         "moderators": "модератори",
         "speakers": "лектори",
-        "materials": "материали"
+        "materials": "материали",
+        "questionnaires": "questionnaires"
       }
     },
     "nav": {

@@ -677,8 +677,6 @@
         "scaleMax": "Maxim",
         "required": "Obligatorie",
         "saveDraftAndGoQuestionnaires": "Salvați ciorna și mergeți la gestionarea chestionarelor",
-        "preQuestionnaire": "Chestionar pre-eveniment",
-        "postQuestionnaire": "Chestionar post-eveniment (feedback)",
         "none": "— Niciunul —"
       },
       "step5": {
@@ -724,6 +722,8 @@
       },
       "validationFailed": "Verificați câmpurile evidențiate înainte de a continua.",
       "partialFailure": "Evenimentul a fost creat, dar unele elemente nu au fost salvate: {items}. Le puteți adăuga din pagina evenimentului.",
+      "partialFailureEdit": "The event changes were saved, but these could not be: {items}. Your work is still here: fix them and save again.",
+      "partialFailureEditDetail": "The event changes were saved, but these could not be: {items}. The server replied: {reason}. Your work is still here: fix them and save again.",
       "draftFound": "Am găsit o ciornă nesalvată a acestui eveniment. Doriți să o restaurați?",
       "draftRestore": "Restaurează ciorna",
       "draftDiscard": "Renunță",
@@ -732,7 +732,8 @@
         "invitations": "invitații",
         "moderators": "moderatori",
         "speakers": "vorbitori",
-        "materials": "materiale"
+        "materials": "materiale",
+        "questionnaires": "questionnaires"
       }
     },
     "nav": {

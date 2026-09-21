@@ -677,8 +677,6 @@
         "scaleMax": "Maksimum",
         "required": "Wymagane",
         "saveDraftAndGoQuestionnaires": "Zapisz wersję roboczą i przejdź do zarządzania kwestionariuszami",
-        "preQuestionnaire": "Kwestionariusz przed wydarzeniem",
-        "postQuestionnaire": "Kwestionariusz po wydarzeniu (opinie)",
         "none": "— Brak —"
       },
       "step5": {
@@ -724,6 +722,8 @@
       },
       "validationFailed": "Sprawdź podświetlone pola przed kontynuowaniem.",
       "partialFailure": "Wydarzenie zostało utworzone, ale niektóre elementy nie zostały zapisane: {items}. Możesz je dodać ze strony wydarzenia.",
+      "partialFailureEdit": "The event changes were saved, but these could not be: {items}. Your work is still here: fix them and save again.",
+      "partialFailureEditDetail": "The event changes were saved, but these could not be: {items}. The server replied: {reason}. Your work is still here: fix them and save again.",
       "draftFound": "Znaleźliśmy niezapisaną wersję roboczą tego wydarzenia. Przywrócić ją?",
       "draftRestore": "Przywróć wersję roboczą",
       "draftDiscard": "Odrzuć",
@@ -732,7 +732,8 @@
         "invitations": "zaproszenia",
         "moderators": "moderatorzy",
         "speakers": "prelegenci",
-        "materials": "materiały"
+        "materials": "materiały",
+        "questionnaires": "questionnaires"
       }
     },
     "nav": {

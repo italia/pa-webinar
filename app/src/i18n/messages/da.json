@@ -677,8 +677,6 @@
         "scaleMax": "Maksimum",
         "required": "Obligatorisk",
         "saveDraftAndGoQuestionnaires": "Gem kladde og gå til spørgeskemaer",
-        "preQuestionnaire": "Spørgeskema før arrangementet",
-        "postQuestionnaire": "Spørgeskema efter arrangementet (feedback)",
         "none": "— Ingen —"
       },
       "step5": {
@@ -724,6 +722,8 @@
       },
       "validationFailed": "Gennemgå de fremhævede felter, før du fortsætter.",
       "partialFailure": "Arrangementet blev oprettet, men nogle elementer blev ikke gemt: {items}. Du kan tilføje dem fra arrangementets side.",
+      "partialFailureEdit": "The event changes were saved, but these could not be: {items}. Your work is still here: fix them and save again.",
+      "partialFailureEditDetail": "The event changes were saved, but these could not be: {items}. The server replied: {reason}. Your work is still here: fix them and save again.",
       "draftFound": "Vi fandt en ikke-gemt kladde af dette arrangement. Vil du gendanne den?",
       "draftRestore": "Gendan kladden",
       "draftDiscard": "Ignorér",
@@ -732,7 +732,8 @@
         "invitations": "invitationer",
         "moderators": "moderatorer",
         "speakers": "talere",
-        "materials": "materialer"
+        "materials": "materialer",
+        "questionnaires": "questionnaires"
       }
     },
     "nav": {

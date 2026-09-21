@@ -677,8 +677,6 @@
         "scaleMax": "Maximum",
         "required": "Required",
         "saveDraftAndGoQuestionnaires": "Save draft and go to questionnaire management",
-        "preQuestionnaire": "Pre-event questionnaire",
-        "postQuestionnaire": "Post-event questionnaire (feedback)",
         "none": "— None —"
       },
       "step5": {
@@ -724,6 +722,8 @@
       },
       "validationFailed": "Please review the highlighted fields before continuing.",
       "partialFailure": "Event created, but some items weren't saved: {items}. You can add them from the event page.",
+      "partialFailureEdit": "The event changes were saved, but these could not be: {items}. Your work is still here: fix them and save again.",
+      "partialFailureEditDetail": "The event changes were saved, but these could not be: {items}. The server replied: {reason}. Your work is still here: fix them and save again.",
       "draftFound": "We found an unsaved draft of this event. Restore it?",
       "draftRestore": "Restore draft",
       "draftDiscard": "Dismiss",
@@ -732,7 +732,8 @@
         "invitations": "invitations",
         "moderators": "moderators",
         "speakers": "speakers",
-        "materials": "materials"
+        "materials": "materials",
+        "questionnaires": "questionnaires"
       }
     },
     "nav": {

@@ -677,8 +677,6 @@
         "scaleMax": "Máximo",
         "required": "Obligatoria",
         "saveDraftAndGoQuestionnaires": "Guardar borrador e ir a la gestión de cuestionarios",
-        "preQuestionnaire": "Cuestionario preevento",
-        "postQuestionnaire": "Cuestionario posevento (comentarios)",
         "none": "— Ninguno —"
       },
       "step5": {
@@ -724,6 +722,8 @@
       },
       "validationFailed": "Revise los campos resaltados antes de continuar.",
       "partialFailure": "Evento creado, pero algunos elementos no se han guardado: {items}. Puedes añadirlos desde la página del evento.",
+      "partialFailureEdit": "The event changes were saved, but these could not be: {items}. Your work is still here: fix them and save again.",
+      "partialFailureEditDetail": "The event changes were saved, but these could not be: {items}. The server replied: {reason}. Your work is still here: fix them and save again.",
       "draftFound": "Hemos encontrado un borrador sin guardar de este evento. ¿Quieres restaurarlo?",
       "draftRestore": "Restaurar el borrador",
       "draftDiscard": "Descartar",
@@ -732,7 +732,8 @@
         "invitations": "invitaciones",
         "moderators": "moderadores",
         "speakers": "ponentes",
-        "materials": "materiales"
+        "materials": "materiales",
+        "questionnaires": "questionnaires"
       }
     },
     "nav": {

@@ -677,8 +677,6 @@
         "scaleMax": "Didžiausia",
         "required": "Privaloma",
         "saveDraftAndGoQuestionnaires": "Įrašyti juodraštį ir eiti į klausimynų valdymą",
-        "preQuestionnaire": "Klausimynas prieš renginį",
-        "postQuestionnaire": "Klausimynas po renginio (atsiliepimas)",
         "none": "— Nė vieno —"
       },
       "step5": {
@@ -724,6 +722,8 @@
       },
       "validationFailed": "Patikrinkite paryškintus laukus prieš tęsdami.",
       "partialFailure": "Renginys sukurtas, tačiau kai kurie elementai neišsaugoti: {items}. Galite juos pridėti renginio puslapyje.",
+      "partialFailureEdit": "The event changes were saved, but these could not be: {items}. Your work is still here: fix them and save again.",
+      "partialFailureEditDetail": "The event changes were saved, but these could not be: {items}. The server replied: {reason}. Your work is still here: fix them and save again.",
       "draftFound": "Radome neišsaugotą šio renginio juodraštį. Ar norite jį atkurti?",
       "draftRestore": "Atkurti juodraštį",
       "draftDiscard": "Atmesti",
@@ -732,7 +732,8 @@
         "invitations": "kvietimai",
         "moderators": "moderatoriai",
         "speakers": "pranešėjai",
-        "materials": "medžiaga"
+        "materials": "medžiaga",
+        "questionnaires": "questionnaires"
       }
     },
     "nav": {

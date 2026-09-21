@@ -677,8 +677,6 @@
         "scaleMax": "Μέγιστο",
         "required": "Υποχρεωτική",
         "saveDraftAndGoQuestionnaires": "Αποθήκευση πρόχειρου και μετάβαση στη διαχείριση ερωτηματολογίων",
-        "preQuestionnaire": "Ερωτηματολόγιο πριν την εκδήλωση",
-        "postQuestionnaire": "Ερωτηματολόγιο μετά την εκδήλωση (ανατροφοδότηση)",
         "none": "— Κανένα —"
       },
       "step5": {
@@ -724,6 +722,8 @@
       },
       "validationFailed": "Ελέγξτε τα επισημασμένα πεδία πριν προχωρήσετε.",
       "partialFailure": "Η εκδήλωση δημιουργήθηκε, αλλά ορισμένα στοιχεία δεν αποθηκεύτηκαν: {items}. Μπορείτε να τα προσθέσετε από τη σελίδα της εκδήλωσης.",
+      "partialFailureEdit": "The event changes were saved, but these could not be: {items}. Your work is still here: fix them and save again.",
+      "partialFailureEditDetail": "The event changes were saved, but these could not be: {items}. The server replied: {reason}. Your work is still here: fix them and save again.",
       "draftFound": "Βρήκαμε ένα μη αποθηκευμένο πρόχειρο αυτής της εκδήλωσης. Θέλετε να το επαναφέρετε;",
       "draftRestore": "Επαναφορά προχείρου",
       "draftDiscard": "Παράβλεψη",
@@ -732,7 +732,8 @@
         "invitations": "προσκλήσεις",
         "moderators": "συντονιστές",
         "speakers": "ομιλητές",
-        "materials": "υλικό"
+        "materials": "υλικό",
+        "questionnaires": "questionnaires"
       }
     },
     "nav": {

@@ -677,8 +677,6 @@
         "scaleMax": "Maximum",
         "required": "Verplicht",
         "saveDraftAndGoQuestionnaires": "Concept opslaan en naar vragenlijstbeheer",
-        "preQuestionnaire": "Vragenlijst vóór het evenement",
-        "postQuestionnaire": "Vragenlijst na afloop (feedback)",
         "none": "— Geen —"
       },
       "step5": {
@@ -724,6 +722,8 @@
       },
       "validationFailed": "Controleer de gemarkeerde velden voordat u doorgaat.",
       "partialFailure": "Evenement aangemaakt, maar sommige onderdelen zijn niet opgeslagen: {items}. U kunt ze toevoegen vanaf de pagina van het evenement.",
+      "partialFailureEdit": "The event changes were saved, but these could not be: {items}. Your work is still here: fix them and save again.",
+      "partialFailureEditDetail": "The event changes were saved, but these could not be: {items}. The server replied: {reason}. Your work is still here: fix them and save again.",
       "draftFound": "We hebben een niet-opgeslagen concept van dit evenement gevonden. Wilt u het herstellen?",
       "draftRestore": "Concept herstellen",
       "draftDiscard": "Negeren",
@@ -732,7 +732,8 @@
         "invitations": "uitnodigingen",
         "moderators": "moderatoren",
         "speakers": "sprekers",
-        "materials": "materiaal"
+        "materials": "materiaal",
+        "questionnaires": "questionnaires"
       }
     },
     "nav": {

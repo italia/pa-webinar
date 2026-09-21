@@ -747,8 +747,6 @@
         "scaleMax": "Massimo",
         "required": "Obbligatoria",
         "saveDraftAndGoQuestionnaires": "Salva bozza e vai a gestione questionari",
-        "preQuestionnaire": "Questionario pre-evento",
-        "postQuestionnaire": "Questionario post-evento (feedback)",
         "none": "— Nessuno —"
       },
       "step5": {
@@ -794,6 +792,8 @@
       },
       "validationFailed": "Controlla i campi evidenziati prima di procedere.",
       "partialFailure": "Evento creato, ma alcuni elementi non sono stati salvati: {items}. Puoi aggiungerli dalla pagina dell'evento.",
+      "partialFailureEdit": "Le modifiche all'evento sono state salvate, ma non è stato possibile salvare: {items}. Il tuo lavoro è ancora qui: correggi e salva di nuovo.",
+      "partialFailureEditDetail": "Le modifiche all'evento sono state salvate, ma non è stato possibile salvare: {items}. Il server ha risposto: {reason}. Il tuo lavoro è ancora qui: correggi e salva di nuovo.",
       "draftFound": "Abbiamo trovato una bozza non salvata di questo evento. Vuoi ripristinarla?",
       "draftRestore": "Ripristina bozza",
       "draftDiscard": "Ignora",
@@ -802,7 +802,8 @@
         "invitations": "inviti",
         "moderators": "moderatori",
         "speakers": "relatori",
-        "materials": "materiali"
+        "materials": "materiali",
+        "questionnaires": "questionari"
       }
     },
     "nav": {

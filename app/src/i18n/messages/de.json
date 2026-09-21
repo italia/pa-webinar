@@ -677,8 +677,6 @@
         "scaleMax": "Maximum",
         "required": "Pflichtfeld",
         "saveDraftAndGoQuestionnaires": "Entwurf speichern und zur Fragebogen-Verwaltung",
-        "preQuestionnaire": "Vor-Event-Fragebogen",
-        "postQuestionnaire": "Nach-Event-Fragebogen (Feedback)",
         "none": "— Keiner —"
       },
       "step5": {
@@ -724,6 +722,8 @@
       },
       "validationFailed": "Bitte prüfen Sie die markierten Felder, bevor Sie fortfahren.",
       "partialFailure": "Veranstaltung erstellt, einige Elemente wurden jedoch nicht gespeichert: {items}. Sie können sie über die Seite der Veranstaltung hinzufügen.",
+      "partialFailureEdit": "The event changes were saved, but these could not be: {items}. Your work is still here: fix them and save again.",
+      "partialFailureEditDetail": "The event changes were saved, but these could not be: {items}. The server replied: {reason}. Your work is still here: fix them and save again.",
       "draftFound": "Wir haben einen nicht gespeicherten Entwurf dieser Veranstaltung gefunden. Möchten Sie ihn wiederherstellen?",
       "draftRestore": "Entwurf wiederherstellen",
       "draftDiscard": "Verwerfen",
@@ -732,7 +732,8 @@
         "invitations": "Einladungen",
         "moderators": "Moderatoren",
         "speakers": "Referenten",
-        "materials": "Materialien"
+        "materials": "Materialien",
+        "questionnaires": "questionnaires"
       }
     },
     "nav": {

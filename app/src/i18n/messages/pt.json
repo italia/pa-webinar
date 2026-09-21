@@ -677,8 +677,6 @@
         "scaleMax": "Máximo",
         "required": "Obrigatória",
         "saveDraftAndGoQuestionnaires": "Guardar rascunho e ir para a gestão de questionários",
-        "preQuestionnaire": "Questionário pré-evento",
-        "postQuestionnaire": "Questionário pós-evento (feedback)",
         "none": "— Nenhum —"
       },
       "step5": {
@@ -724,6 +722,8 @@
       },
       "validationFailed": "Verifique os campos assinalados antes de prosseguir.",
       "partialFailure": "Evento criado, mas alguns elementos não foram guardados: {items}. Pode adicioná-los a partir da página do evento.",
+      "partialFailureEdit": "The event changes were saved, but these could not be: {items}. Your work is still here: fix them and save again.",
+      "partialFailureEditDetail": "The event changes were saved, but these could not be: {items}. The server replied: {reason}. Your work is still here: fix them and save again.",
       "draftFound": "Encontrámos um rascunho não guardado deste evento. Pretende restaurá-lo?",
       "draftRestore": "Restaurar o rascunho",
       "draftDiscard": "Ignorar",
@@ -732,7 +732,8 @@
         "invitations": "convites",
         "moderators": "moderadores",
         "speakers": "oradores",
-        "materials": "materiais"
+        "materials": "materiais",
+        "questionnaires": "questionnaires"
       }
     },
     "nav": {

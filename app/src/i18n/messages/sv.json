@@ -677,8 +677,6 @@
         "scaleMax": "Maximum",
         "required": "Obligatorisk",
         "saveDraftAndGoQuestionnaires": "Spara utkast och gå till enkäthantering",
-        "preQuestionnaire": "Förmöteenkät",
-        "postQuestionnaire": "Eftermöteenkät (feedback)",
         "none": "— Ingen —"
       },
       "step5": {
@@ -724,6 +722,8 @@
       },
       "validationFailed": "Kontrollera de markerade fälten innan du fortsätter.",
       "partialFailure": "Evenemanget skapades, men vissa delar sparades inte: {items}. Du kan lägga till dem från evenemangets sida.",
+      "partialFailureEdit": "The event changes were saved, but these could not be: {items}. Your work is still here: fix them and save again.",
+      "partialFailureEditDetail": "The event changes were saved, but these could not be: {items}. The server replied: {reason}. Your work is still here: fix them and save again.",
       "draftFound": "Vi hittade ett osparat utkast av det här evenemanget. Vill du återställa det?",
       "draftRestore": "Återställ utkastet",
       "draftDiscard": "Ignorera",
@@ -732,7 +732,8 @@
         "invitations": "inbjudningar",
         "moderators": "moderatorer",
         "speakers": "talare",
-        "materials": "material"
+        "materials": "material",
+        "questionnaires": "questionnaires"
       }
     },
     "nav": {

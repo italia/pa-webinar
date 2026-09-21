@@ -677,8 +677,6 @@
         "scaleMax": "Maximum",
         "required": "Obligatoire",
         "saveDraftAndGoQuestionnaires": "Enregistrer le brouillon et accéder à la gestion des questionnaires",
-        "preQuestionnaire": "Questionnaire avant l'événement",
-        "postQuestionnaire": "Questionnaire après l'événement (retours)",
         "none": "— Aucun —"
       },
       "step5": {
@@ -724,6 +722,8 @@
       },
       "validationFailed": "Veuillez vérifier les champs en surbrillance avant de poursuivre.",
       "partialFailure": "Événement créé, mais certains éléments n'ont pas été enregistrés : {items}. Vous pouvez les ajouter depuis la page de l'événement.",
+      "partialFailureEdit": "The event changes were saved, but these could not be: {items}. Your work is still here: fix them and save again.",
+      "partialFailureEditDetail": "The event changes were saved, but these could not be: {items}. The server replied: {reason}. Your work is still here: fix them and save again.",
       "draftFound": "Nous avons trouvé un brouillon non enregistré de cet événement. Voulez-vous le restaurer ?",
       "draftRestore": "Restaurer le brouillon",
       "draftDiscard": "Ignorer",
@@ -732,7 +732,8 @@
         "invitations": "invitations",
         "moderators": "modérateurs",
         "speakers": "intervenants",
-        "materials": "documents"
+        "materials": "documents",
+        "questionnaires": "questionnaires"
       }
     },
     "nav": {

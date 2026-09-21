@@ -677,8 +677,6 @@
         "scaleMax": "Maksimum",
         "required": "Kohustuslik",
         "saveDraftAndGoQuestionnaires": "Salvesta mustand ja mine küsimustike haldusesse",
-        "preQuestionnaire": "Sündmuse-eelne küsimustik",
-        "postQuestionnaire": "Sündmusejärgne küsimustik (tagasiside)",
         "none": "— Pole —"
       },
       "step5": {
@@ -724,6 +722,8 @@
       },
       "validationFailed": "Enne jätkamist kontrollige esiletõstetud välju.",
       "partialFailure": "Sündmus loodi, kuid mõnda elementi ei salvestatud: {items}. Saad need lisada sündmuse lehelt.",
+      "partialFailureEdit": "The event changes were saved, but these could not be: {items}. Your work is still here: fix them and save again.",
+      "partialFailureEditDetail": "The event changes were saved, but these could not be: {items}. The server replied: {reason}. Your work is still here: fix them and save again.",
       "draftFound": "Leidsime selle sündmuse salvestamata mustandi. Kas taastame selle?",
       "draftRestore": "Taasta mustand",
       "draftDiscard": "Loobu",
@@ -732,7 +732,8 @@
         "invitations": "kutsed",
         "moderators": "moderaatorid",
         "speakers": "esinejad",
-        "materials": "materjalid"
+        "materials": "materjalid",
+        "questionnaires": "questionnaires"
       }
     },
     "nav": {

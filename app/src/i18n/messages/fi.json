@@ -677,8 +677,6 @@
         "scaleMax": "Maksimi",
         "required": "Pakollinen",
         "saveDraftAndGoQuestionnaires": "Tallenna luonnos ja siirry kyselyiden hallintaan",
-        "preQuestionnaire": "Tapahtumaa edeltävä kysely",
-        "postQuestionnaire": "Tapahtuman jälkeinen kysely (palaute)",
         "none": "— Ei valittu —"
       },
       "step5": {
@@ -724,6 +722,8 @@
       },
       "validationFailed": "Tarkista korostetut kentät ennen jatkamista.",
       "partialFailure": "Tapahtuma luotiin, mutta joitakin osia ei tallennettu: {items}. Voit lisätä ne tapahtuman sivulta.",
+      "partialFailureEdit": "The event changes were saved, but these could not be: {items}. Your work is still here: fix them and save again.",
+      "partialFailureEditDetail": "The event changes were saved, but these could not be: {items}. The server replied: {reason}. Your work is still here: fix them and save again.",
       "draftFound": "Löysimme tästä tapahtumasta tallentamattoman luonnoksen. Palautetaanko se?",
       "draftRestore": "Palauta luonnos",
       "draftDiscard": "Ohita",
@@ -732,7 +732,8 @@
         "invitations": "kutsut",
         "moderators": "moderaattorit",
         "speakers": "puhujat",
-        "materials": "materiaalit"
+        "materials": "materiaalit",
+        "questionnaires": "questionnaires"
       }
     },
     "nav": {

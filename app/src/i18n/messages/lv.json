@@ -677,8 +677,6 @@
         "scaleMax": "Maksimums",
         "required": "Obligāta",
         "saveDraftAndGoQuestionnaires": "Saglabāt melnrakstu un doties uz anketu pārvaldību",
-        "preQuestionnaire": "Pirmspasākuma anketa",
-        "postQuestionnaire": "Pēcpasākuma anketa (atsauksmes)",
         "none": "— Nav —"
       },
       "step5": {
@@ -724,6 +722,8 @@
       },
       "validationFailed": "Pirms turpināt, pārbaudiet izceltos laukus.",
       "partialFailure": "Pasākums ir izveidots, taču dažus elementus neizdevās saglabāt: {items}. Tos varat pievienot pasākuma lapā.",
+      "partialFailureEdit": "The event changes were saved, but these could not be: {items}. Your work is still here: fix them and save again.",
+      "partialFailureEditDetail": "The event changes were saved, but these could not be: {items}. The server replied: {reason}. Your work is still here: fix them and save again.",
       "draftFound": "Atradām nesaglabātu šī pasākuma melnrakstu. Vai to atjaunot?",
       "draftRestore": "Atjaunot melnrakstu",
       "draftDiscard": "Neņemt vērā",
@@ -732,7 +732,8 @@
         "invitations": "ielūgumi",
         "moderators": "moderatori",
         "speakers": "runātāji",
-        "materials": "materiāli"
+        "materials": "materiāli",
+        "questionnaires": "questionnaires"
       }
     },
     "nav": {

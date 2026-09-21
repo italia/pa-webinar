@@ -691,7 +691,32 @@ export default function EventWizard(props: WizardProps) {
             throw new Error(err.error ?? err.message ?? `HTTP ${putRes.status}`);
           }
 
-          await fanoutEditDiff(eventId, moderatorToken, form, initialEvent, props.defaultLocale);
+          const report = await fanoutEditDiff(
+            eventId,
+            moderatorToken,
+            form,
+            initialEvent,
+            props.defaultLocale,
+          );
+
+          if (report.failed.length > 0) {
+            // Non si cancella la bozza e non si naviga via: il testo digitato
+            // deve restare recuperabile, altrimenti l'avviso direbbe di
+            // sistemare qualcosa che non esiste piu'. L'errore viene reso
+            // come avviso persistente nella pagina, non come notifica che
+            // svanisce: dice che una modifica NON e' stata salvata.
+            const risorse = [...new Set(report.failed)]
+              .map((r) => t(`resources.${r}` as 'resources.materials'))
+              .join(', ');
+            throw new Error(
+              report.reason
+                ? t('partialFailureEditDetail', {
+                    items: risorse,
+                    reason: report.reason,
+                  })
+                : t('partialFailureEdit', { items: risorse }),
+            );
+          }
 
           clearDraft();
           router.push(
@@ -815,19 +840,26 @@ export default function EventWizard(props: WizardProps) {
           if (!ok) failed.add(t('resources.materials'));
         }
 
-        // 5) Questionnaires (pre/post)
+        // 5) Questionnaires (pre/post). Il rifiuto confluisce nello stesso
+        //    elenco delle altre risorse: finora era l'unico del gruppo a
+        //    sparire in silenzio, ed e' quello che fallisce piu' spesso —
+        //    basta una domanda estemporanea incompleta.
+        const reportQ: FanoutReport = { failed: [], reason: null };
         await submitQuestionnaire(
+          reportQ,
           created.id,
           'PRE_REGISTRATION',
           form.preEventQuestionnaire,
           props.defaultLocale,
         );
         await submitQuestionnaire(
+          reportQ,
           created.id,
           'POST_EVENT',
           form.postEventQuestionnaire,
           props.defaultLocale,
         );
+        if (reportQ.failed.length > 0) failed.add(t('resources.questionnaires'));
 
         // 6) Promote from DRAFT → PUBLISHED if requested. The create
         //    endpoint currently doesn't accept status; use PUT on the
@@ -1200,6 +1232,7 @@ function mapAdhocToApi(
 }
 
 async function submitQuestionnaire(
+  report: FanoutReport,
   eventId: string,
   placement: Placement,
   block: QuestionnaireBlock,
@@ -1224,16 +1257,16 @@ async function submitQuestionnaire(
       mapAdhocToApi(q, i, defaultLocale),
     ),
   };
-  await fetch(
+  await fanoutFetch(
+    report,
+    'questionnaires',
     `/api/admin/events/${eventId}/questionnaires/${placement}`,
     {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
     },
-  ).catch(() => {
-    /* best-effort; admin can fix from the questionnaires page */
-  });
+  );
 }
 
 /**
@@ -1245,6 +1278,7 @@ async function submitQuestionnaire(
  * swallowed silently; otherwise → the usual upsert.
  */
 async function saveQuestionnaire(
+  report: FanoutReport,
   eventId: string,
   placement: Placement,
   block: QuestionnaireBlock,
@@ -1257,15 +1291,19 @@ async function saveQuestionnaire(
     block.templateIds.length === 0 && block.adhocQuestions.length === 0;
   if (emptied) {
     if (!initial) return;
-    await fetch(`/api/admin/events/${eventId}/questionnaires/${placement}`, {
-      method: 'DELETE',
-    }).catch(() => {
-      /* best-effort, come il resto del fan-out */
-    });
+    await fanoutFetch(
+      report,
+      'questionnaires',
+      `/api/admin/events/${eventId}/questionnaires/${placement}`,
+      { method: 'DELETE' },
+      // Gia' eliminato dalla pagina dei questionari in un'altra scheda: e'
+      // lo stato desiderato, non un errore da mostrare.
+      [404],
+    );
     return;
   }
 
-  await submitQuestionnaire(eventId, placement, block, defaultLocale);
+  await submitQuestionnaire(report, eventId, placement, block, defaultLocale);
 }
 
 // ── Edit-mode fan-out: diff against the initial snapshot ────────────────────
@@ -1290,13 +1328,58 @@ async function saveQuestionnaire(
 // Questionnaires are handled differently: the upsert endpoint is PUT and
 // idempotently replaces templates + adhoc items, so we just call it.
 
+/**
+ * Cosa il fan-out non e' riuscito a salvare.
+ *
+ * Il fan-out applica le modifiche alle risorse collegate con una richiesta per
+ * ciascuna, e ognuna puo' fallire da sola: l'evento e' gia' salvato, il resto
+ * no. Finche' gli esiti venivano ingoiati, il caso piu' frequente — una
+ * domanda estemporanea incompleta, che fa rifiutare l'intero questionario —
+ * si presentava come un salvataggio riuscito, e il questionario spariva.
+ */
+interface FanoutReport {
+  /** Le risorse che hanno rifiutato, nell'ordine in cui sono state tentate. */
+  failed: string[];
+  /** Il primo motivo dato dal server: e' l'unico che l'operatore puo' usare. */
+  reason: string | null;
+}
+
+/**
+ * Esegue una richiesta del fan-out registrando il rifiuto invece di ingoiarlo.
+ *
+ * `okStatuses` serve alla cancellazione: una risorsa gia' eliminata altrove
+ * risponde 404, che qui e' lo stato desiderato e non un errore da mostrare.
+ */
+async function fanoutFetch(
+  report: FanoutReport,
+  resource: string,
+  input: string,
+  init: RequestInit,
+  okStatuses: number[] = [],
+): Promise<void> {
+  try {
+    const res = await fetch(input, init);
+    if (res.ok || okStatuses.includes(res.status)) return;
+    const body = (await res.json().catch(() => ({}))) as { error?: string };
+    report.failed.push(resource);
+    if (report.reason === null) {
+      report.reason = body.error ?? `HTTP ${res.status}`;
+    }
+  } catch {
+    // Rete caduta: la risorsa non e' salvata, e va detto comunque.
+    report.failed.push(resource);
+  }
+}
+
 async function fanoutEditDiff(
   eventId: string,
   moderatorToken: string,
   form: WizardForm,
   initial: InitialEventShape,
   defaultLocale: string,
-): Promise<void> {
+): Promise<FanoutReport> {
+  const report: FanoutReport = { failed: [], reason: null };
+
   // Organizers
   const orgKey = (o: { name: string; organization: string }) =>
     `${o.name}|${o.organization}`;
@@ -1306,7 +1389,7 @@ async function fanoutEditDiff(
   const currentOrgKeys = new Set(form.organizers.map(orgKey));
   for (const o of form.organizers) {
     if (initialOrgByKey.has(orgKey(o))) continue;
-    await fetch(`/api/events/${eventId}/organizers`, {
+    await fanoutFetch(report, 'organizers', `/api/events/${eventId}/organizers`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -1317,14 +1400,18 @@ async function fanoutEditDiff(
         logoUrl: o.logoUrl,
         websiteUrl: o.websiteUrl,
       }),
-    }).catch(() => {});
+    });
   }
   for (const o of initial.organizers) {
     if (currentOrgKeys.has(orgKey(o))) continue;
-    await fetch(`/api/events/${eventId}/organizers/${o.id}`, {
-      method: 'DELETE',
-      headers: { 'X-Moderator-Token': moderatorToken },
-    }).catch(() => {});
+    await fanoutFetch(
+      report,
+      'organizers',
+      `/api/events/${eventId}/organizers/${o.id}`,
+      { method: 'DELETE', headers: { 'X-Moderator-Token': moderatorToken } },
+      // Gia' rimosso altrove: e' lo stato che si voleva.
+      [404],
+    );
   }
 
   // EventModerators (MODERATOR + SPEAKER roles share one table)
@@ -1341,21 +1428,24 @@ async function fanoutEditDiff(
   const currentModKeys = new Set(currentMods.map(modKey));
   for (const m of currentMods) {
     if (initialModByKey.has(modKey(m))) continue;
-    await fetch(`/api/events/${eventId}/moderators`, {
+    await fanoutFetch(report, 'moderators', `/api/events/${eventId}/moderators`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${moderatorToken}`,
       },
       body: JSON.stringify({ name: m.name, email: m.email, role: m.role }),
-    }).catch(() => {});
+    });
   }
   for (const m of initial.eventModerators) {
     if (currentModKeys.has(modKey(m))) continue;
-    await fetch(`/api/events/${eventId}/moderators/${m.id}`, {
-      method: 'DELETE',
-      headers: { 'X-Moderator-Token': moderatorToken },
-    }).catch(() => {});
+    await fanoutFetch(
+      report,
+      'moderators',
+      `/api/events/${eventId}/moderators/${m.id}`,
+      { method: 'DELETE', headers: { 'X-Moderator-Token': moderatorToken } },
+      [404],
+    );
   }
 
   // Invitations (admin-session auth, no moderator token)
@@ -1364,22 +1454,31 @@ async function fanoutEditDiff(
   const currentInvKeys = new Set(form.invitations.map(invKey));
   for (const i of form.invitations) {
     if (initialInvByKey.has(invKey(i))) continue;
-    await fetch(`/api/admin/events/${eventId}/invitations`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        email: i.email,
-        name: i.name ?? undefined,
-        role: i.role,
-        personId: i.personId ?? undefined,
-      }),
-    }).catch(() => {});
+    await fanoutFetch(
+      report,
+      'invitations',
+      `/api/admin/events/${eventId}/invitations`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: i.email,
+          name: i.name ?? undefined,
+          role: i.role,
+          personId: i.personId ?? undefined,
+        }),
+      },
+    );
   }
   for (const i of initial.invitations) {
     if (currentInvKeys.has(invKey(i))) continue;
-    await fetch(`/api/admin/events/${eventId}/invitations/${i.id}`, {
-      method: 'DELETE',
-    }).catch(() => {});
+    await fanoutFetch(
+      report,
+      'invitations',
+      `/api/admin/events/${eventId}/invitations/${i.id}`,
+      { method: 'DELETE' },
+      [404],
+    );
   }
 
   // Materials
@@ -1388,17 +1487,21 @@ async function fanoutEditDiff(
   const currentMatKeys = new Set(form.materials.map(matKey));
   for (const m of form.materials) {
     if (initialMatByKey.has(matKey(m))) continue;
-    await fetch(`/api/admin/events/${eventId}/materials`, {
+    await fanoutFetch(report, 'materials', `/api/admin/events/${eventId}/materials`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(m),
-    }).catch(() => {});
+    });
   }
   for (const m of initial.materials) {
     if (currentMatKeys.has(matKey(m))) continue;
-    await fetch(`/api/admin/events/${eventId}/materials/${m.id}`, {
-      method: 'DELETE',
-    }).catch(() => {});
+    await fanoutFetch(
+      report,
+      'materials',
+      `/api/admin/events/${eventId}/materials/${m.id}`,
+      { method: 'DELETE' },
+      [404],
+    );
   }
 
   // Questionnaires — PUT is idempotent (replaces templates + adhoc items).
@@ -1411,6 +1514,7 @@ async function fanoutEditDiff(
   // would reset the title, the mandatory flag and any multilingual text the
   // wizard doesn't show (see questionnaire-diff for the full reasoning).
   await saveQuestionnaire(
+    report,
     eventId,
     'PRE_REGISTRATION',
     form.preEventQuestionnaire,
@@ -1418,10 +1522,13 @@ async function fanoutEditDiff(
     defaultLocale,
   );
   await saveQuestionnaire(
+    report,
     eventId,
     'POST_EVENT',
     form.postEventQuestionnaire,
     initial.postEventQuestionnaire,
     defaultLocale,
   );
+
+  return report;
 }

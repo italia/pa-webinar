@@ -677,8 +677,6 @@
         "scaleMax": "Največ",
         "required": "Obvezno",
         "saveDraftAndGoQuestionnaires": "Shrani osnutek in pojdi na upravljanje vprašalnikov",
-        "preQuestionnaire": "Vprašalnik pred dogodkom",
-        "postQuestionnaire": "Vprašalnik po dogodku (povratne informacije)",
         "none": "— Brez —"
       },
       "step5": {
@@ -724,6 +722,8 @@
       },
       "validationFailed": "Pred nadaljevanjem preverite označena polja.",
       "partialFailure": "Dogodek je ustvarjen, vendar nekateri elementi niso bili shranjeni: {items}. Dodate jih lahko na strani dogodka.",
+      "partialFailureEdit": "The event changes were saved, but these could not be: {items}. Your work is still here: fix them and save again.",
+      "partialFailureEditDetail": "The event changes were saved, but these could not be: {items}. The server replied: {reason}. Your work is still here: fix them and save again.",
       "draftFound": "Našli smo neshranjen osnutek tega dogodka. Ga želite obnoviti?",
       "draftRestore": "Obnovi osnutek",
       "draftDiscard": "Opusti",
@@ -732,7 +732,8 @@
         "invitations": "vabila",
         "moderators": "moderatorji",
         "speakers": "govorci",
-        "materials": "gradiva"
+        "materials": "gradiva",
+        "questionnaires": "questionnaires"
       }
     },
     "nav": {

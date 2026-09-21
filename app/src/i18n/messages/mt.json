@@ -677,8 +677,6 @@
         "scaleMax": "Massimu",
         "required": "Obbligatorja",
         "saveDraftAndGoQuestionnaires": "Ssejvja l-abbozz u mur għall-amministrazzjoni tal-kwestjonarji",
-        "preQuestionnaire": "Kwestjonarju pre-avveniment",
-        "postQuestionnaire": "Kwestjonarju post-avveniment (feedback)",
         "none": "— L-ebda —"
       },
       "step5": {
@@ -724,6 +722,8 @@
       },
       "validationFailed": "Iċċekkja l-oqsma evidenzjati qabel tipproċedi.",
       "partialFailure": "L-avveniment inħoloq, imma xi elementi ma ġewx salvati: {items}. Tista' żżidhom mill-paġna tal-avveniment.",
+      "partialFailureEdit": "The event changes were saved, but these could not be: {items}. Your work is still here: fix them and save again.",
+      "partialFailureEditDetail": "The event changes were saved, but these could not be: {items}. The server replied: {reason}. Your work is still here: fix them and save again.",
       "draftFound": "Sibna abbozz mhux salvat ta' dan l-avveniment. Trid tirrestawrah?",
       "draftRestore": "Irrestawra l-abbozz",
       "draftDiscard": "Injora",
@@ -732,7 +732,8 @@
         "invitations": "stediniet",
         "moderators": "moderaturi",
         "speakers": "kelliema",
-        "materials": "materjali"
+        "materials": "materjali",
+        "questionnaires": "questionnaires"
       }
     },
     "nav": {
