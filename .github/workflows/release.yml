@@ -90,7 +90,15 @@ jobs:
           context: .
           push: true
           target: builder
+          # Due tag per la stessa immagine. Quello senza `v` è la forma che il
+          # chart calcola da solo (`pa-webinar.migrationImage` in
+          # templates/_helpers.tpl): finché non veniva pubblicato, il valore
+          # predefinito del chart puntava a un tag inesistente e chi installava
+          # senza passare il tag a mano restava con l'initContainer bloccato.
+          # Quello con `v` resta perché è la forma citata dalle procedure di
+          # aggiornamento esistenti: toglierlo le romperebbe a metà.
           tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.version }}-migrate
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}-migrate
           cache-from: type=gha
 
@@ -198,6 +206,10 @@ jobs:
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - uses: azure/setup-helm@1a275c3b69536ee54be43f2070a358922e12c8d4 # v4
+        with:
+          # Stessa versione con cui il job `chart` di ci.yml convalida: a
+          # impacchettare dev'essere lo stesso Helm che ha reso e applicato.
+          version: "v3.16.3"
 
       - name: Add Helm repositories
         run: |
@@ -208,7 +220,13 @@ jobs:
       - name: Package chart
         run: |
           VERSION="${GITHUB_REF_NAME#v}"
-          helm dependency update infra/helm/pa-webinar
+          # `build`, non `update`: il pacchetto pubblicato deve contenere le
+          # versioni di sottochart fissate in Chart.lock, cioè quelle che il job
+          # `chart` di ci.yml ha reso e applicato con `--dry-run=server`.
+          # `update` le ri-risolve al massimo dell'intervallo dichiarato in
+          # Chart.yaml e pubblicherebbe sottochart mai applicati a un cluster,
+          # riscrivendo per di più il lock sul runner.
+          helm dependency build infra/helm/pa-webinar
           helm package infra/helm/pa-webinar \
             --version "$VERSION" \
             --app-version "$VERSION"

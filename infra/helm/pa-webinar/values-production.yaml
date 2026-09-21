@@ -132,6 +132,11 @@ jitsi-meet:
   enableAuth: true
   enableGuests: false
 
+  # L'immagine web patchata qui sotto è privata: serve la credenziale di
+  # prelievo, che deve già esistere nel namespace.
+  imagePullSecrets:
+    - name: ghcr-secret
+
   prosody:
     auth:
       type: jwt
@@ -223,6 +228,22 @@ jitsi-meet:
         memory: 4Gi
 
   web:
+    # Questo profilo accende la soppressione rumore avanzata
+    # (`NEXT_PUBLIC_JITSI_RNNOISE_ENFORCE: "false"` nell'env dell'app, sopra), e
+    # quella funziona SOLO con l'immagine patchata a 48 kHz: sull'immagine stock
+    # ammutolisce i microfoni, e il danno si scopre a evento iniziato. Le due
+    # impostazioni si cambiano insieme, sempre nella stessa direzione.
+    # `pullPolicy: Always` perché il tag viene riscritto sul posto quando la
+    # patch cambia: un nodo che serve una copia vecchia ammutolirebbe in
+    # silenzio, mentre un prelievo fallito è un guasto visibile e reversibile.
+    # Il tag porta una revisione che sale a ogni modifica della patch: è
+    # `IMAGE_TAG` in .github/workflows/jitsi-web.yml, e va riallineato qui
+    # quando quella cambia, altrimenti si torna indietro di una revisione senza
+    # accorgersene.
+    image:
+      repository: ghcr.io/italia/pa-webinar-jitsi-web
+      tag: stable-10741-rnnoise-r3
+      pullPolicy: Always
     ingress:
       enabled: true
       annotations:
@@ -232,10 +253,10 @@ jitsi-meet:
           location = / { return 403; }
           location = /index.html { return 403; }
       hosts:
+        # Lista di stringhe: il sottochart fissato le rende direttamente in
+        # `path:` e aggiunge da sé `pathType: Prefix`. Vedi values.yaml.
         - host: jitsi.videocall.example.com
-          paths:
-            - path: /
-              pathType: Prefix
+          paths: ["/"]
       tls:
         - secretName: jitsi-tls
           hosts:

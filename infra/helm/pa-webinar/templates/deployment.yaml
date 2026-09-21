@@ -1,3 +1,5 @@
+{{- include "pa-webinar.validateRnnoise" . }}
+{{- include "pa-webinar.validateDatastoreSecret" . }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -103,9 +105,25 @@ spec:
               value: {{ printf "http://%s-recorder-controller:%v" (include "pa-webinar.fullname" .) (.Values.recorder.controller.port | default 8080) | quote }}
             {{- end }}
             {{- if .Values.redis.enabled }}
-            # Derived at render time from the in-cluster redis subchart.
-            # Overridden by REDIS_URL from the Secret/envFrom block above
-            # if the operator set it explicitly (external / managed Redis).
+            # La password arriva dal Secret dei datastore, non da quello
+            # dell'applicazione: il container del database monta quest'ultimo
+            # per intero, e le due cose vanno tenute separate.
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "pa-webinar.datastoreSecretName" . }}
+                  key: REDIS_PASSWORD
+                  # Facoltativa di proposito. La chiave c'è in ogni
+                  # installazione con Redis in cluster, ma non è dichiarata
+                  # obbligatoria per i Secret creati a mano o sincronizzati da
+                  # un gestore esterno: pretenderla bloccherebbe l'avvio del
+                  # pod, trasformando una funzione degradata in un sito giù.
+                  optional: true
+            # Indirizzo del Redis in cluster, composto qui. Con il sottochart
+            # attivo questo valore VINCE su un REDIS_URL messo nel Secret,
+            # perché `env` ha la precedenza su `envFrom`: per puntare a un
+            # Redis gestito si spegne il sottochart (`redis.enabled: false`)
+            # e si passa REDIS_URL nel Secret.
             - name: REDIS_URL
               value: "redis://default:$(REDIS_PASSWORD)@{{ .Release.Name }}-redis-master.{{ .Release.Namespace }}.svc.cluster.local:6379/0"
             {{- end }}

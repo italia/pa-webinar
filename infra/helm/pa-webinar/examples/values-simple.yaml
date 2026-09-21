@@ -39,8 +39,19 @@ podDisruptionBudget:
 secrets:
   mode: "generate"
   existingSecretName: "videocall-secrets"
+  # Password dei datastore in un Secret loro: il sottochart PostgreSQL monta
+  # per intero, come file dentro il proprio container, il Secret da cui legge
+  # la password, e le chiavi dell'applicazione non devono finire lì.
+  datastoreSecretName: "videocall-datastore"
   generate:
-    DATABASE_URL: ""        # Auto-configured if postgresql.enabled=true
+    DATABASE_URL: ""        # Composto dal chart quando postgresql.enabled=true
+    # Password dei datastore in cluster: obbligatorie, e vanno CONSERVATE.
+    # Il chart non le inventa di proposito — una password generata a ogni resa
+    # verrebbe riscritta a ogni riconciliazione, mentre il database tiene
+    # quella con cui è stato inizializzato. Finiscono in un Secret separato.
+    POSTGRES_PASSWORD: ""         # Set via --set
+    POSTGRES_ADMIN_PASSWORD: ""   # Set via --set
+    REDIS_PASSWORD: ""            # Set via --set
     JITSI_JWT_SECRET: ""    # Set via --set
     JITSI_JWT_APP_ID: "pa_webinar"
     JITSI_JWT_ISSUER: "pa-webinar"
@@ -61,9 +72,13 @@ secrets:
 postgresql:
   enabled: true
   auth:
+    # Deve puntare allo stesso Secret di secrets.datastoreSecretName.
+    existingSecret: "videocall-datastore"
     username: eventi
     database: pa_webinar
-    password: ""  # Set via --set postgresql.auth.password=...
+    # La password si passa in secrets.generate.POSTGRES_PASSWORD, non qui:
+    # il sottochart la legge dal Secret indicato da secrets.datastoreSecretName,
+    # e un valore messo in questo campo verrebbe ignorato senza dirlo.
   primary:
     persistence:
       size: 5Gi
@@ -98,3 +113,8 @@ ingress:
 metrics:
   serviceMonitor:
     enabled: false
+
+# Redis nel cluster — legge la password dallo stesso Secret dei datastore.
+redis:
+  auth:
+    existingSecret: "videocall-datastore"

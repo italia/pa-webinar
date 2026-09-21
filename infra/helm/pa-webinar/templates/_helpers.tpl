@@ -78,6 +78,15 @@ Defaults tag to Chart.appVersion + "-migrate" if not set.
 {{- define "pa-webinar.migrationImage" -}}
 {{- $tag := .Values.app.migration.image.tag -}}
 {{- if not $tag -}}
+{{/*
+  Stesso nome dell'immagine dell'applicazione con il suffisso: il rilascio
+  pubblica il tag in questa forma. Storicamente pubblicava soltanto la forma
+  con la `v` iniziale del tag git, e per quelle versioni il valore predefinito
+  non si risolve: passa `app.migration.image.tag` esplicitamente, come fa la
+  procedura di aggiornamento. Il nome calcolato qui non è mai cambiato, e non
+  deve cambiare: c'è chi ha specchiato l'immagine nel proprio registro con
+  questo nome.
+*/}}
 {{- $tag = printf "%s-migrate" (default .Chart.AppVersion .Values.app.image.tag) -}}
 {{- end -}}
 {{- printf "%s:%s" .Values.app.migration.image.repository $tag -}}
@@ -97,4 +106,18 @@ Uses secrets.existingSecretName (new) with fallback to app.existingSecret (legac
 */}}
 {{- define "pa-webinar.secretName" -}}
 {{- .Values.secrets.existingSecretName | default .Values.app.existingSecret | default "videocall-secrets" -}}
+{{- end }}
+
+{{/*
+Nome del Secret con le password dei datastore in cluster.
+Tenuto distinto da quello dell'applicazione perché il sottochart PostgreSQL
+monta per intero, come file dentro il container del database, il Secret da cui
+legge la propria password.
+
+Vuoto = stesso Secret dell'applicazione, che è il comportamento delle
+installazioni esistenti: cambiarlo d'ufficio le manderebbe a cercare un Secret
+che nessuno ha creato. La separazione si sceglie, valorizzando il campo.
+*/}}
+{{- define "pa-webinar.datastoreSecretName" -}}
+{{- .Values.secrets.datastoreSecretName | default (include "pa-webinar.secretName" .) -}}
 {{- end }}

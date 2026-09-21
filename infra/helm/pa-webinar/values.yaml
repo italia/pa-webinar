@@ -226,6 +226,20 @@ secrets:
   # Name of the Kubernetes Secret (used by all modes as the target name)
   existingSecretName: "videocall-secrets"
 
+  # Secret con le sole password dei datastore in cluster (PostgreSQL, Redis).
+  #
+  # Conviene tenerlo separato da quello dell'applicazione: il sottochart
+  # PostgreSQL monta per intero, come file dentro il proprio container, il
+  # Secret da cui legge la password, quindi ogni chiave tenuta lì accanto —
+  # a partire da quella che cifra i dati personali — diventa leggibile da chi
+  # raggiunge il database. I profili di esempio per le nuove installazioni lo
+  # valorizzano; vedi docs/DEPLOYMENT.md per separarlo su un'installazione
+  # esistente, dove va fatto a mano e prima dell'aggiornamento.
+  #
+  # Vuoto = si usa lo stesso Secret dell'applicazione, che è ciò che fanno le
+  # installazioni già in piedi. Il valore predefinito non cambia da solo.
+  datastoreSecretName: ""
+
   # ── External Secrets Operator config (mode: "external") ──
   external:
     # Provider: "azure-key-vault", "aws-secrets-manager", "gcp-secret-manager"
@@ -393,8 +407,15 @@ ingress:
     nginx.ingress.kubernetes.io/proxy-body-size: "10m"
     nginx.ingress.kubernetes.io/proxy-buffer-size: "16k"
     nginx.ingress.kubernetes.io/proxy-buffers-number: "4"
-    nginx.ingress.kubernetes.io/rate-limit: "10"
-    nginx.ingress.kubernetes.io/rate-limit-window: "1m"
+    # Nessun limite di frequenza qui di proposito. Le annotazioni che stavano
+    # in questo punto (`rate-limit`, `rate-limit-window`) non esistono in
+    # ingress-nginx e non facevano nulla: promettevano una protezione assente.
+    # Quelle vere sono `limit-rps`, `limit-connections`,
+    # `limit-burst-multiplier` — vedi values-production.yaml — ma il valore va
+    # scelto guardando il traffico reale: la sala in diretta apre più
+    # connessioni per partecipante, e un limite stretto la fa cadere.
+    # Oggi è l'unico limite condiviso fra le repliche che esista: quello
+    # applicativo conta per singolo processo.
     nginx.ingress.kubernetes.io/hsts: "true"
     nginx.ingress.kubernetes.io/hsts-max-age: "31536000"
     nginx.ingress.kubernetes.io/hsts-include-subdomains: "true"
@@ -627,16 +648,16 @@ jitsi-meet:
   enableAuth: true
   enableGuests: false
 
-  # Global pull secrets for ALL jitsi component pods (the subchart exposes only a
-  # single global list, not per-component). `ghcr-secret` is required because
-  # `web.image` below is the PRIVATE GHCR patched image; `dockerhub-secret`
-  # keeps the stock Docker Hub images (jvb/jicofo/coturn/prosody/jibri) pulling
-  # without hitting anon rate limits. Both secrets must exist in the namespace
-  # (created out-of-band, like any private-registry chart). Without ghcr-secret a
-  # fresh install's web pod 401s on ghcr.io → ImagePullBackOff → nobody can join.
-  # NB: the existing prod (rev ≤44) was deployed before this default and wires
-  # ghcr-secret via a `kubectl patch deploy …-jitsi-meet-web` instead; a future
-  # non-`--reuse-values` upgrade converges it to this helm-managed value.
+  # Global pull secrets for ALL jitsi component pods (the subchart exposes only
+  # a single global list, not per-component). `ghcr-secret` serve perché
+  # `web.image` qui sotto è l'immagine patchata su un registro privato;
+  # `dockerhub-secret` evita il limite di prelievo anonimo sulle immagini
+  # standard. Entrambi i Secret devono già esistere nel namespace.
+  #
+  # Su un'installazione che usa l'immagine web standard non servono: si
+  # sostituiscono con una lista vuota insieme all'override di `web.image`.
+  # Un Secret nominato ma inesistente non blocca il prelievo di un'immagine
+  # pubblica, ma lascia un evento di errore su ogni pod.
   imagePullSecrets:
     - name: ghcr-secret
     - name: dockerhub-secret
@@ -673,27 +694,27 @@ jitsi-meet:
     tolerations: []
 
   web:
-    # F18: patched jitsi/web that forces the rnnoise noise-suppression
-    # AudioContext to 48 kHz (built from infra/jitsi-web-patched). Base image is
-    # stable-10741 (= the subchart appVersion prod already served), so
-    # prosody/jicofo/jvb compatibility is unchanged — only the noise-suppression
-    # context differs.
+    # Immagine web con la patch che forza a 48 kHz il contesto audio della
+    # soppressione rumore avanzata. Senza la patch quel filtro, su alcuni
+    # browser, ammutolisce il microfono senza alcun errore visibile — e il
+    # danno si scopre a evento iniziato.
     #
-    # pullPolicy: Always — the jitsi-web.yml workflow re-pushes the SAME
-    # `stable-10741-rnnoise` tag whenever the patch changes, so the tag is MUTABLE
-    # in practice. This is a DELIBERATE trade-off for a mic-silencing-critical
-    # image: IfNotPresent could let a node keep serving a stale, mis-patched image
-    # cached under that tag → SILENT, persistent mic loss after we push a fix (the
-    # worse failure). Always instead re-pulls on every web-pod (re)creation, so a
-    # transient GHCR hiccup during an upgrade can leave the pod ImagePullBackOff —
-    # a LOUD, obvious, self-healing outage. Loud+recoverable beats silent+wrong.
+    # Chi non può prelevare questa immagine usa quella standard, sostituendo il
+    # blocco con `repository: jitsi/web` e svuotando `imagePullSecrets` sopra:
+    # in quel caso la soppressione avanzata deve restare spenta, che è già il
+    # comportamento predefinito dell'applicazione. Le due impostazioni sono
+    # legate, e il chart si rifiuta di rendere una combinazione incoerente.
     #
-    # Pull auth: this is a PRIVATE GHCR image → the web pod needs `ghcr-secret`,
-    # supplied by the global `jitsi-meet.imagePullSecrets` above. (The existing
-    # prod predates that default and wires it via a `kubectl patch deploy
-    # …-jitsi-meet-web` — see that block's comment.) NB: a `--reuse-values`
-    # upgrade does NOT pick up these file-level defaults, so the prod deploy also
-    # passes repository/tag/pullPolicy via `--set`.
+    # `pullPolicy: Always` è voluto: il tag viene riscritto sul posto quando la
+    # patch cambia, e un nodo che serve una copia vecchia ammutolirebbe in
+    # silenzio. Un prelievo fallito è invece un guasto rumoroso e reversibile.
+    # Un aggiornamento con `--reuse-values` non riprende i valori predefiniti
+    # del file: passa l'override esplicitamente.
+    # ATTENZIONE: questo tag non coincide con `IMAGE_TAG` in
+    # .github/workflows/jitsi-web.yml, che pubblica una revisione più recente.
+    # Allinearli è un rollout dell'immagine della conferenza e va deciso, non
+    # fatto di passaggio: finché restano diversi, chi si appoggia a questo
+    # valore predefinito serve una revisione più vecchia di quella pubblicata.
     image:
       repository: ghcr.io/italia/pa-webinar-jitsi-web
       tag: stable-10741-rnnoise
@@ -704,10 +725,13 @@ jitsi-meet:
         kubernetes.io/ingress.class: nginx
         cert-manager.io/cluster-issuer: letsencrypt-prod
       hosts:
+        # `paths` is a list of STRINGS: the pinned jitsi-meet subchart renders
+        # each entry directly into `path:`. Writing it as the richer
+        # `- path: / / pathType: Prefix` mapping renders the map itself into the
+        # field, and the API server rejects the Ingress because the value is not
+        # an absolute path. The subchart always sets `pathType: Prefix` itself.
         - host: jitsi.videocall.example.com
-          paths:
-            - path: /
-              pathType: Prefix
+          paths: ["/"]
       tls:
         - secretName: jitsi-tls
           hosts:
@@ -777,7 +801,10 @@ postgresql:
   auth:
     username: eventi
     database: pa_webinar
-    # Pre-existing Secret for PostgreSQL passwords
+    # Secret da cui il sottochart legge le password. Viene montato per intero,
+    # come file, dentro il container del database: se ci tieni anche le chiavi
+    # dell'applicazione, chi raggiunge quel container le legge. Vedi
+    # secrets.datastoreSecretName per separarli.
     existingSecret: "videocall-secrets"
     secretKeys:
       adminPasswordKey: POSTGRES_ADMIN_PASSWORD
@@ -841,8 +868,9 @@ redis:
 
   auth:
     enabled: true
-    # Pre-existing Secret containing REDIS_PASSWORD. Required: Redis
-    # refuses to start without a password when auth is enabled.
+    # Obbligatorio: con l'autenticazione attiva Redis non parte senza password.
+    # Vedi secrets.datastoreSecretName per tenerlo separato da quello
+    # dell'applicazione.
     existingSecret: "videocall-secrets"
     existingSecretPasswordKey: "REDIS_PASSWORD"
 
