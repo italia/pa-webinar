@@ -161,6 +161,12 @@ L'aggiornamento automatico dell'immagine dei nodi ne produce una raffica a
 ogni giro. I fallimenti veri (exit code non zero, deadline superata)
 continuano a contare come prima.
 Richiede restartPolicy: Never sul pod template.
+
+`status` e` obbligatorio dentro `onPodConditions`: senza, il server API
+rifiuta il CronJob ("Required value: valid values: [False True Unknown]"). La
+resa e la validazione lato client non se ne accorgono — e` una regola che
+conosce solo il server, ed e` il motivo per cui il gate del chart fa anche
+`kubectl apply --dry-run=server`.
 */}}
 {{- define "pa-webinar.disruptionTolerantFailurePolicy" -}}
 podFailurePolicy:
@@ -168,4 +174,5 @@ podFailurePolicy:
     - action: Ignore
       onPodConditions:
         - type: DisruptionTarget
+          status: "True"
 {{- end }}
