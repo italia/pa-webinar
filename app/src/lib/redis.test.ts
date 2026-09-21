@@ -7,9 +7,10 @@
  * pronta su una rete che ingoia i pacchetti — e lì ad aspettare c'è una
  * rotta HTTP.
  *
- * Il caso che vale davvero la pena fissare è l'ultimo: un comando che
- * fallisce DOPO che la scadenza ha già vinto non è più osservato da nessuno,
- * e un rifiuto non osservato su Node abbatte il processo.
+ * Il caso che vale la pena fissare è il terzo: un comando che fallisce prima
+ * della scadenza deve dare il ripiego, non un'eccezione. È quello che fa la
+ * cattura sull'operazione — non evitare rifiuti non osservati, che
+ * `Promise.race` gestisce già da sé sottoscrivendo ogni promessa.
  */
 
 import { describe, it, expect, vi } from 'vitest';
@@ -33,10 +34,10 @@ describe('withDeadline', () => {
     await expect(withDeadline(rotto, 50, 'ripiego')).resolves.toBe('ripiego');
   });
 
-  it('non lascia un rifiuto non osservato quando il comando fallisce dopo la scadenza', async () => {
-    // Senza il `.catch()` sull'operazione questo rifiuto arriverebbe quando
-    // la corsa è già stata vinta dal timer, e nessuno lo starebbe più
-    // ascoltando: su Node è un processo che cade.
+  it('un fallimento dopo la scadenza non disturba chi ha già avuto il ripiego', async () => {
+    // Il valore è già stato restituito: il rifiuto tardivo non deve cambiarlo
+    // né far cadere il processo. (Il gestore ce l'ha `Promise.race`, che
+    // sottoscrive entrambe le promesse; la cattura serve al caso veloce.)
     const spia = vi.fn();
     process.on('unhandledRejection', spia);
 
@@ -47,7 +48,6 @@ describe('withDeadline', () => {
 
     await expect(withDeadline(tardivo, 5, 'ripiego')).resolves.toBe('ripiego');
     fallisci(new Error('arrivato tardi'));
-    // Un giro di event loop perché un eventuale rifiuto non osservato emerga.
     await new Promise((r) => setTimeout(r, 20));
 
     process.off('unhandledRejection', spia);

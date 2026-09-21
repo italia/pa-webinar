@@ -121,3 +121,33 @@ che nessuno ha creato. La separazione si sceglie, valorizzando il campo.
 {{- define "pa-webinar.datastoreSecretName" -}}
 {{- .Values.secrets.datastoreSecretName | default (include "pa-webinar.secretName" .) -}}
 {{- end }}
+
+{{/*
+Nome del Service di un sottochart Bitnami, riprodotto come lo calcola lui
+(`common.names.fullname`), override compresi.
+
+Serve perche' l'indirizzo con cui l'applicazione raggiunge banca dati e Redis
+lo compone questo chart: scriverlo a mano funziona solo finche' nessuno usa
+`nameOverride` o `fullnameOverride`, e un host sbagliato non e' un errore di
+resa ne' di apply — e' un pod che non parte, senza che niente dica quale
+valore e' stato calcolato.
+
+Attenzione ai default: i sottocharts dichiarano `nameOverride` con valore
+vuoto, quindi la chiave ESISTE e il terzo argomento di `dig` non scatta mai.
+Va usato `default`.
+
+Argomenti: dict "nome" (il nome del chart) "valori" (i suoi valori) "release"
+(il nome della release).
+*/}}
+{{- define "pa-webinar.subchartFullname" -}}
+{{- $valori := .valori | default dict -}}
+{{- $override := dig "fullnameOverride" "" $valori -}}
+{{- if $override -}}
+{{- $override | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- $nome := default .nome (dig "nameOverride" "" $valori) -}}
+{{- $rel := regexReplaceAll "(-?[^a-z\\d\\-])+-?" (lower .release) "-" -}}
+{{- ternary $rel (printf "%s-%s" $rel $nome) (contains $nome $rel) | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+{{- end }}
+

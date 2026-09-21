@@ -213,6 +213,19 @@ export default function EventWizard(props: WizardProps) {
 
   const mode: 'create' | 'edit' = props.mode ?? 'create';
   const initialEvent = props.initialEvent;
+  /**
+   * Lo scatto delle risorse collegate, aggiornato a ogni salvataggio riuscito.
+   *
+   * La prop e' la fotografia presa all'apertura della pagina e non viene mai
+   * riletta. Da quando un fallimento parziale lascia l'operatore sulla pagina
+   * a riprovare, servono due giri sulla stessa istanza: senza conservare qui
+   * cio' che e' andato a buon fine, il secondo giro ricreerebbe le righe del
+   * primo. Copia profonda, perche' il fan-out la modifica.
+   */
+  const snapshotRef = useRef<InitialEventShape | null>(null);
+  if (initialEvent && snapshotRef.current === null) {
+    snapshotRef.current = structuredClone(initialEvent);
+  }
 
   const defaultStart = new Date(Date.now() + 24 * 3600_000);
   // Durata predefinita dal template (semplificazione): l'utente meno esperto
@@ -657,7 +670,13 @@ export default function EventWizard(props: WizardProps) {
           // Review step
           dataRetentionDays: form.dataRetentionDays,
           gdprTemplateId: form.gdprTemplateId,
-          privacyPolicyText: form.privacyPolicyText?.trim() || undefined,
+          // La stringa vuota si spedisce, non si trasforma in `undefined`: il
+          // server scrive il campo solo quando è definito, e scegliere un
+          // modello di informativa deve poter CANCELLARE il testo scritto a
+          // mano. Altrimenti resterebbero valorizzati entrambi, e la pagina
+          // di iscrizione dà la precedenza al testo: il modello scelto non
+          // entrerebbe mai in vigore, senza che niente lo dica.
+          privacyPolicyText: form.privacyPolicyText?.trim() ?? undefined,
           privacyPolicyUrl: form.privacyPolicyUrl ?? undefined,
           moderatorName: form.moderatorName?.trim() || undefined,
           moderatorEmail: form.moderatorEmail?.trim() || undefined,
@@ -700,7 +719,7 @@ export default function EventWizard(props: WizardProps) {
             eventId,
             moderatorToken,
             form,
-            initialEvent,
+            snapshotRef.current ?? initialEvent,
             props.defaultLocale,
           );
 
@@ -1361,21 +1380,40 @@ async function fanoutFetch(
   input: string,
   init: RequestInit,
   okStatuses: number[] = [],
-): Promise<void> {
+): Promise<{ id?: string } | null> {
   try {
     const res = await fetch(input, init);
-    if (res.ok || okStatuses.includes(res.status)) return;
+    if (res.ok) {
+      // Il corpo serve a chi crea: porta l'identificativo della riga appena
+      // nata, che va registrato nello scatto perche' un secondo salvataggio
+      // non la ricrei, e perche' resti cancellabile nella stessa sessione.
+      return (await res.json().catch(() => null)) as { id?: string } | null;
+    }
+    if (okStatuses.includes(res.status)) return null;
     const body = (await res.json().catch(() => ({}))) as { error?: string };
     report.failed.push(resource);
     if (report.reason === null) {
       report.reason = body.error ?? `HTTP ${res.status}`;
     }
+    return null;
   } catch {
     // Rete caduta: la risorsa non e' salvata, e va detto comunque.
     report.failed.push(resource);
+    return null;
   }
 }
 
+/**
+ * Applica alle risorse collegate solo cio' che e' cambiato.
+ *
+ * `initial` viene AGGIORNATO man mano che le operazioni riescono, e chi chiama
+ * deve conservarlo fra un salvataggio e l'altro. Senza, dopo un fallimento
+ * parziale il secondo tentativo ricalcolerebbe il differenziale contro la
+ * fotografia scattata all'apertura della pagina e ricreerebbe cio' che al
+ * primo giro era gia' andato a buon fine: organizzatori, materiali e
+ * co-moderatori duplicati — e per i co-moderatori ogni duplicato e' un nuovo
+ * collegamento di accesso durevole, cioe' una credenziale.
+ */
 async function fanoutEditDiff(
   eventId: string,
   moderatorToken: string,
@@ -1394,18 +1432,32 @@ async function fanoutEditDiff(
   const currentOrgKeys = new Set(form.organizers.map(orgKey));
   for (const o of form.organizers) {
     if (initialOrgByKey.has(orgKey(o))) continue;
-    await fanoutFetch(report, 'organizers', `/api/events/${eventId}/organizers`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${moderatorToken}`,
+    const creato = await fanoutFetch(
+      report,
+      'organizers',
+      `/api/events/${eventId}/organizers`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${moderatorToken}`,
+        },
+        body: JSON.stringify({
+          name: o.name,
+          logoUrl: o.logoUrl,
+          websiteUrl: o.websiteUrl,
+        }),
       },
-      body: JSON.stringify({
+    );
+    if (creato?.id) {
+      initial.organizers.push({
+        id: creato.id,
         name: o.name,
-        logoUrl: o.logoUrl,
-        websiteUrl: o.websiteUrl,
-      }),
-    });
+        organization: o.organization,
+        logoUrl: o.logoUrl ?? null,
+        websiteUrl: o.websiteUrl ?? null,
+      });
+    }
   }
   for (const o of initial.organizers) {
     if (currentOrgKeys.has(orgKey(o))) continue;
@@ -1417,6 +1469,7 @@ async function fanoutEditDiff(
       // Gia' rimosso altrove: e' lo stato che si voleva.
       [404],
     );
+    initial.organizers = initial.organizers.filter((x) => x.id !== o.id);
   }
 
   // EventModerators (MODERATOR + SPEAKER roles share one table)
@@ -1433,14 +1486,28 @@ async function fanoutEditDiff(
   const currentModKeys = new Set(currentMods.map(modKey));
   for (const m of currentMods) {
     if (initialModByKey.has(modKey(m))) continue;
-    await fanoutFetch(report, 'moderators', `/api/events/${eventId}/moderators`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${moderatorToken}`,
+    const creato = await fanoutFetch(
+      report,
+      'moderators',
+      `/api/events/${eventId}/moderators`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${moderatorToken}`,
+        },
+        body: JSON.stringify({ name: m.name, email: m.email, role: m.role }),
       },
-      body: JSON.stringify({ name: m.name, email: m.email, role: m.role }),
-    });
+    );
+    if (creato?.id) {
+      initial.eventModerators.push({
+        id: creato.id,
+        name: m.name,
+        email: m.email,
+        role: m.role,
+        personId: null,
+      });
+    }
   }
   for (const m of initial.eventModerators) {
     if (currentModKeys.has(modKey(m))) continue;
@@ -1451,6 +1518,7 @@ async function fanoutEditDiff(
       { method: 'DELETE', headers: { 'X-Moderator-Token': moderatorToken } },
       [404],
     );
+    initial.eventModerators = initial.eventModerators.filter((x) => x.id !== m.id);
   }
 
   // Invitations (admin-session auth, no moderator token)
@@ -1459,7 +1527,7 @@ async function fanoutEditDiff(
   const currentInvKeys = new Set(form.invitations.map(invKey));
   for (const i of form.invitations) {
     if (initialInvByKey.has(invKey(i))) continue;
-    await fanoutFetch(
+    const creato = await fanoutFetch(
       report,
       'invitations',
       `/api/admin/events/${eventId}/invitations`,
@@ -1473,7 +1541,21 @@ async function fanoutEditDiff(
           personId: i.personId ?? undefined,
         }),
       },
+      // 409 = esiste gia' un invito per quella email su questo evento, che e'
+      // esattamente lo stato voluto. Senza, un secondo salvataggio dopo un
+      // fallimento parziale lo segnalerebbe come errore per sempre, e non si
+      // arriverebbe mai a un salvataggio pulito.
+      [409],
     );
+    if (creato?.id) {
+      initial.invitations.push({
+        id: creato.id,
+        name: i.name ?? null,
+        email: i.email,
+        role: i.role,
+        personId: i.personId ?? null,
+      });
+    }
   }
   for (const i of initial.invitations) {
     if (currentInvKeys.has(invKey(i))) continue;
@@ -1484,6 +1566,7 @@ async function fanoutEditDiff(
       { method: 'DELETE' },
       [404],
     );
+    initial.invitations = initial.invitations.filter((x) => x.id !== i.id);
   }
 
   // Materials
@@ -1492,11 +1575,19 @@ async function fanoutEditDiff(
   const currentMatKeys = new Set(form.materials.map(matKey));
   for (const m of form.materials) {
     if (initialMatByKey.has(matKey(m))) continue;
-    await fanoutFetch(report, 'materials', `/api/admin/events/${eventId}/materials`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(m),
-    });
+    const creato = await fanoutFetch(
+      report,
+      'materials',
+      `/api/admin/events/${eventId}/materials`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(m),
+      },
+    );
+    if (creato?.id) {
+      initial.materials.push({ ...m, id: creato.id, description: m.description ?? null });
+    }
   }
   for (const m of initial.materials) {
     if (currentMatKeys.has(matKey(m))) continue;
@@ -1507,6 +1598,7 @@ async function fanoutEditDiff(
       { method: 'DELETE' },
       [404],
     );
+    initial.materials = initial.materials.filter((x) => x.id !== m.id);
   }
 
   // Questionnaires — PUT is idempotent (replaces templates + adhoc items).

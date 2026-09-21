@@ -67,10 +67,11 @@ export function getRedisSubscriber(): RedisClient | null {
  * packets — there the command leaves and never returns, and what waits on it
  * is an HTTP route.
  *
- * The `.catch()` on the operation is NOT redundant with the race: when the
- * command fails AFTER the deadline has already won, nobody observes that
- * rejection any more and it becomes an unhandled rejection, which on Node
- * takes the process down.
+ * The `.catch()` on the operation is what turns a failure into the fallback:
+ * without it a command that rejects BEFORE the deadline would reject the race
+ * too, and the caller would get an exception where it asked for a value. It is
+ * not there to avoid unhandled rejections — `Promise.race` subscribes to every
+ * promise it is given, so a late rejection is observed either way.
  */
 export async function withDeadline<T>(
   op: Promise<T>,

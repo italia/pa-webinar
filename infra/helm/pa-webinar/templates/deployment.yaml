@@ -124,8 +124,11 @@ spec:
             # perché `env` ha la precedenza su `envFrom`: per puntare a un
             # Redis gestito si spegne il sottochart (`redis.enabled: false`)
             # e si passa REDIS_URL nel Secret.
+            {{- $redis := .Values.redis | default dict }}
+            {{- $redisHost := include "pa-webinar.subchartFullname" (dict "nome" "redis" "valori" $redis "release" .Release.Name) }}
+            {{- $redisPort := dig "master" "service" "ports" "redis" 6379 $redis }}
             - name: REDIS_URL
-              value: "redis://default:$(REDIS_PASSWORD)@{{ .Release.Name }}-redis-master.{{ .Release.Namespace }}.svc.cluster.local:6379/0"
+              value: "redis://default:$(REDIS_PASSWORD)@{{ $redisHost }}-master.{{ .Release.Namespace }}.svc.cluster.local:{{ $redisPort }}/0"
             {{- end }}
           {{- with .Values.app.probes.startup }}
           startupProbe:

@@ -243,7 +243,11 @@ export default function TranscriptEditor({
         redazioniApplicate?: number;
         archivioAggiornato?: boolean;
       };
-      setDrafts({});
+      // Le modifiche si azzerano solo se sono state applicate davvero. Con la
+      // riscrittura dell'archivio fallita si chiede di ripetere la
+      // cancellazione: azzerandole, il pulsante da ripremere resterebbe
+      // disabilitato, perche' si abilita solo con modifiche in sospeso.
+      if (!(cancellazione && res.archivioAggiornato === false)) setDrafts({});
       if (!cancellazione) {
         setSavedMsg(
           t('editSaved', {

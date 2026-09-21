@@ -188,6 +188,34 @@ for d in docs:
     if "." in host or host in servizi:
         continue
     print(f"DATABASE_URL punta all'host {host!r}, che non è un Service reso")
+
+
+def nome_breve(host):
+    """Il nome del Service dentro un indirizzo, anche se è un FQDN di cluster."""
+    if host.endswith(".svc.cluster.local"):
+        return host.split(".", 1)[0]
+    return None if "." in host else host
+
+
+# Stessa invariante per Redis, che però l'applicazione riceve come variabile
+# d'ambiente del Deployment e non dentro un Secret. È lo stesso difetto di
+# DATABASE_URL — un host scritto a mano che ignora gli override del sottochart
+# — e merita lo stesso controllo.
+for d in docs:
+    if d.get("kind") != "Deployment":
+        continue
+    for c in d["spec"]["template"]["spec"].get("containers") or []:
+        # `env:` puo' essere reso come chiave nulla, non solo assente.
+        for e in c.get("env") or []:
+            if e.get("name") != "REDIS_URL":
+                continue
+            trovato = re.match(r"redis://[^@]*@([^:/?]+)", str(e.get("value", "")))
+            if not trovato:
+                continue
+            breve = nome_breve(trovato.group(1))
+            if breve is None or breve in servizi:
+                continue
+            print(f"REDIS_URL punta all'host {breve!r}, che non è un Service reso")
 PY
   then
     errore "controllo dei Secret non eseguito su $nome: $(head -3 "$OUT/$nome.sec.err" | tr '\n' ' ')"
