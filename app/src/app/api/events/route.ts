@@ -55,6 +55,22 @@ export const POST = withErrorHandling(async (request) => {
 
   const data = parsed.data;
 
+  // Il modello dell'informativa è una chiave esterna: un id inesistente
+  // farebbe fallire la scrittura con un codice che `errorResponse` non mappa,
+  // quindi con un 500 al posto di un errore sul campo. La verifica costa una
+  // lettura solo quando un modello è stato scelto davvero.
+  if (data.gdprTemplateId) {
+    const modello = await prisma.gdprTemplate.findUnique({
+      where: { id: data.gdprTemplateId },
+      select: { id: true },
+    });
+    if (!modello) {
+      throw new ValidationError('Validation failed', [
+        { path: ['gdprTemplateId'], message: 'Unknown GDPR template' },
+      ]);
+    }
+  }
+
   // If the wizard supplied a permission matrix, keep the boolean toggles
   // in sync so legacy code paths stay correct. Matrix wins when both are
   // present.
@@ -125,6 +141,31 @@ export const POST = withErrorHandling(async (request) => {
       dataRetentionDays: data.dataRetentionDays,
       privacyPolicyUrl: data.privacyPolicyUrl,
       privacyPolicyText: data.privacyPolicyText,
+      // Accettati dallo schema e inviati dai moduli, ma finora mai scritti:
+      // la scelta fatta in creazione non arrivava in banca dati e l'unico
+      // modo di valorizzare queste colonne era duplicare un evento che le
+      // aveva già.
+      gdprTemplateId: data.gdprTemplateId ?? null,
+      requireOrganization: data.requireOrganization,
+      requireOrganizationRole: data.requireOrganizationRole,
+      requireOrganizationType: data.requireOrganizationType,
+      postEventPublic: data.postEventPublic,
+      postEventShowRecap: data.postEventShowRecap,
+      postEventShowWordCloud: data.postEventShowWordCloud,
+      postEventEmailEnabled: data.postEventEmailEnabled,
+      postEventPublicUntil: data.postEventPublicUntil
+        ? new Date(data.postEventPublicUntil)
+        : null,
+      gracePeriodMinutes: data.gracePeriodMinutes ?? null,
+      coverImageUrl: data.coverImageUrl ?? null,
+      ...(data.youtubeUrl !== undefined && { youtubeUrl: data.youtubeUrl }),
+      ...(data.libraryListed !== undefined && { libraryListed: data.libraryListed }),
+      ...(data.recordingConsentText !== undefined && {
+        recordingConsentText: data.recordingConsentText,
+      }),
+      ...(data.wordCloudEnabled !== undefined && {
+        wordCloudEnabled: data.wordCloudEnabled,
+      }),
       moderatorName: data.moderatorName,
       moderatorEmail: encryptPIIOrNull(data.moderatorEmail),
       speakersInfo: data.speakersInfo,

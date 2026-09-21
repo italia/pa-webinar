@@ -427,7 +427,10 @@ export default function EventWizard(props: WizardProps) {
 
       // Step 5 fields written here so review can surface them
       dataRetentionDays: tpl?.defaultRetentionDays ?? props.defaultRetentionDays,
-      gdprTemplateId: null,
+      // Il modello marcato come predefinito esiste per essere pre-scelto sui
+      // nuovi eventi: senza questo la colonna resterebbe vuota su ogni evento
+      // creato da qui, e quella marcatura non avrebbe alcun effetto.
+      gdprTemplateId: props.gdprTemplates.find((g) => g.isDefault)?.id ?? null,
       privacyPolicyText: '',
       privacyPolicyUrl: null,
       moderatorName: '',

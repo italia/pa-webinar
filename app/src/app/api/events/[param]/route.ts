@@ -197,6 +197,21 @@ export const PUT = withErrorHandling(async (request, context) => {
 
   const data = parsed.data;
 
+  // Il modello dell'informativa è una chiave esterna: un id inesistente
+  // farebbe fallire la scrittura con un codice non mappato, cioè con un 500
+  // al posto di un errore sul campo.
+  if (data.gdprTemplateId) {
+    const modello = await prisma.gdprTemplate.findUnique({
+      where: { id: data.gdprTemplateId },
+      select: { id: true },
+    });
+    if (!modello) {
+      throw new ValidationError('Validation failed', [
+        { path: ['gdprTemplateId'], message: 'Unknown GDPR template' },
+      ]);
+    }
+  }
+
   // Guard against the illusion of post-event configurability. These flags govern
   // LIVE capture — once an event is ENDED/ARCHIVED nothing can be captured
   // retroactively, so writing them does nothing but mislead. Strip them from a
@@ -353,6 +368,25 @@ export const PUT = withErrorHandling(async (request, context) => {
       }),
       ...(data.privacyPolicyUrl !== undefined && {
         privacyPolicyUrl: data.privacyPolicyUrl,
+      }),
+      // Accettati dallo schema e inviati dai moduli, ma finora mai scritti in
+      // modifica. Lo spread condizionato è obbligatorio: le modifiche parziali
+      // — un cambio di stato dalla sala, un flag di fine evento — non devono
+      // toccare campi che non hanno inviato.
+      ...(data.privacyPolicyText !== undefined && {
+        privacyPolicyText: data.privacyPolicyText,
+      }),
+      ...(data.gdprTemplateId !== undefined && {
+        gdprTemplateId: data.gdprTemplateId,
+      }),
+      ...(data.requireOrganization !== undefined && {
+        requireOrganization: data.requireOrganization,
+      }),
+      ...(data.requireOrganizationRole !== undefined && {
+        requireOrganizationRole: data.requireOrganizationRole,
+      }),
+      ...(data.requireOrganizationType !== undefined && {
+        requireOrganizationType: data.requireOrganizationType,
       }),
       ...(data.moderatorName !== undefined && {
         moderatorName: data.moderatorName,
