@@ -23,6 +23,7 @@ spec:
       # One Pod per job, no retries inside the Job (the queue retries
       # via PostprodJob.attempts).
       backoffLimit: 0
+      {{- include "pa-webinar.disruptionTolerantFailurePolicy" . | nindent 6 }}
       activeDeadlineSeconds: {{ .Values.postprod.worker.activeDeadlineSeconds | default 3600 }}
       ttlSecondsAfterFinished: {{ .Values.postprod.worker.ttlSecondsAfterFinished | default 600 }}
       template:

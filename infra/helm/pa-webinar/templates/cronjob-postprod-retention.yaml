@@ -18,6 +18,7 @@ spec:
       # dell'orario lavorativo e un guasto persistente resterebbe invisibile.
       ttlSecondsAfterFinished: {{ .Values.cronjobs.dailyJobTtlSeconds | default 259200 }}
       backoffLimit: 1
+      {{- include "pa-webinar.disruptionTolerantFailurePolicy" . | nindent 6 }}
       activeDeadlineSeconds: 300
       template:
         metadata:
