@@ -130,6 +130,21 @@ describe('applicaRedazione', () => {
     expect('words' in segs[0]!).toBe(true);
   });
 
+  it('riscrive la riga quando il testo corrente diverge da quello conservato', () => {
+    // Il confronto è contro la copia CONSERVATA, non contro il testo corrente:
+    // una riga già corretta in passato diverge ancora dalla copia, quindi una
+    // modifica del solo relatore la riscriverebbe. È il motivo per cui la
+    // cancellazione deve valere per un salvataggio solo, e per cui la casella
+    // nell'editor si spegne da sé: lasciata accesa, il salvataggio successivo
+    // sostituirebbe di nascosto il testo della macchina di quella riga.
+    const segs = segmenti();
+    const redatti = applicaRedazione(segs, [
+      { index: 1, text: 'Il paziente si chiama [omissis]' },
+    ]);
+    expect(redatti).toBe(1);
+    expect(segs[1]?.text).toBe('Il paziente si chiama [omissis]');
+  });
+
   it('ignora le modifiche senza testo e gli indici inesistenti', () => {
     const segs = segmenti();
     expect(applicaRedazione(segs, [{ index: 0 }, { index: 99, text: 'x' }])).toBe(0);

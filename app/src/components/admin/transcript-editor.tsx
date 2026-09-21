@@ -203,6 +203,10 @@ export default function TranscriptEditor({
 
   async function save(): Promise<void> {
     if (dirtySegments.length === 0) return;
+    // Il valore spedito decide come va letta la risposta: si legge una volta
+    // sola, all'inizio. Il cambio in corsa lo impedisce `disabled={saving}`
+    // sulla casella; questa è la lettura unica del contratto.
+    const cancellazione = redazione;
     setSaving(true);
     setSavedMsg(null);
     setSaveError(null);
@@ -217,7 +221,7 @@ export default function TranscriptEditor({
           method: 'PUT',
           credentials: 'include',
           headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ edits, redactOriginal: redazione }),
+          body: JSON.stringify({ edits, redactOriginal: cancellazione }),
         },
       );
       if (!r.ok) {
@@ -231,14 +235,44 @@ export default function TranscriptEditor({
         );
         return;
       }
-      const res = (await r.json()) as { textChanges: number; speakerChanges: number };
+      const res = (await r.json()) as {
+        textChanges: number;
+        speakerChanges: number;
+        // Presenti solo in risposta a una cancellazione: la rotta li emette
+        // con uno spread condizionato a `redactOriginal`.
+        redazioniApplicate?: number;
+        archivioAggiornato?: boolean;
+      };
       setDrafts({});
-      setSavedMsg(
-        t('editSaved', {
-          text: res.textChanges,
-          speaker: res.speakerChanges,
-        }),
-      );
+      if (!cancellazione) {
+        setSavedMsg(
+          t('editSaved', {
+            text: res.textChanges,
+            speaker: res.speakerChanges,
+          }),
+        );
+      } else if (res.archivioAggiornato === false) {
+        // La banca dati è già riscritta, il file archiviato no: la frase
+        // rimossa resta scaricabile. La casella NON si spegne — il nuovo
+        // tentativo deve restare una cancellazione — e non si mostra nessun
+        // messaggio di successo accanto all'errore.
+        setSavedMsg(null);
+        setSaveError(t('redactArchiveFailed'));
+      } else if (!res.redazioniApplicate) {
+        // Le correzioni sono state scritte; nel testo conservato non c'era
+        // nulla da togliere per le righe toccate. Si dichiara e basta: non ha
+        // senso chiedere di ripetere un'operazione dall'esito identico.
+        setRedazione(false);
+        setSavedMsg(null);
+        setSaveError(t('redactNothingRemoved'));
+      } else {
+        // Una cancellazione vale per il salvataggio in cui è stata chiesta, e
+        // per quello soltanto. Lasciata accesa, la correzione successiva
+        // riscriverebbe di nascosto il testo della macchina delle righe
+        // toccate: esattamente ciò che questo comando esiste per non fare.
+        setRedazione(false);
+        setSavedMsg(t('redactSaved', { n: res.redazioniApplicate }));
+      }
       await mutate();
       onSaved?.();
     } catch {
@@ -294,6 +328,7 @@ export default function TranscriptEditor({
                 type="checkbox"
                 id="redazione-originale"
                 checked={redazione}
+                disabled={saving}
                 onChange={(e) => setRedazione(e.target.checked)}
               />
               <label

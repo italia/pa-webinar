@@ -707,6 +707,7 @@
         "retentionHelp": "Po překročení tohoto prahu se osobní údaje automaticky mažou.",
         "gdprTemplate": "Šablona informací o ochraně",
         "gdprTemplateNone": "— Použít vlastní text —",
+        "gdprTemplateUnknown": "The selected privacy notice template no longer exists: pick another one or go back to custom text",
         "privacyText": "Informace o ochraně osobních údajů (text)",
         "moderatorHeading": "Kontakt moderátora",
         "moderatorPublishHint": "Ke zveřejnění události jsou jméno a e-mail povinné (slouží pro odkaz moderátora a potvrzovací e-mail). Pro uložení konceptu potřeba nejsou.",
@@ -2412,6 +2413,9 @@
       "redactLabel": "Erase from the original too",
       "redactHint": "Use for an erasure request: the changes also apply to the preserved machine text, which would otherwise keep the removed sentence",
       "redactSave": "Save and erase from the original",
+      "redactSaved": "{n, plural, one {1 line also removed from the original text} other {# lines also removed from the original text}}",
+      "redactNothingRemoved": "The corrections were saved, but there was nothing to remove from the original text for the lines you touched",
+      "redactArchiveFailed": "The corrections were saved to the database, but rewriting the archived file failed: the removed sentence is still downloadable from there. Try the removal again",
       "originalUncertain": "Origin not certain",
       "originalUncertainHint": "The preserved text may already include corrections made before this feature existed: it cannot be proven to be what the automatic transcription produced"
     },

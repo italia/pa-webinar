@@ -707,6 +707,7 @@
         "retentionHelp": "Após este limite, os dados pessoais são eliminados automaticamente.",
         "gdprTemplate": "Modelo da política de privacidade",
         "gdprTemplateNone": "— Utilizar texto personalizado —",
+        "gdprTemplateUnknown": "The selected privacy notice template no longer exists: pick another one or go back to custom text",
         "privacyText": "Política de privacidade (texto)",
         "moderatorHeading": "Contacto do moderador",
         "moderatorPublishHint": "O nome e o e-mail são obrigatórios para publicar o evento (são necessários para a ligação de moderador e para o e-mail de confirmação). Para guardar como rascunho não são exigidos.",
@@ -2412,6 +2413,9 @@
       "redactLabel": "Erase from the original too",
       "redactHint": "Use for an erasure request: the changes also apply to the preserved machine text, which would otherwise keep the removed sentence",
       "redactSave": "Save and erase from the original",
+      "redactSaved": "{n, plural, one {1 line also removed from the original text} other {# lines also removed from the original text}}",
+      "redactNothingRemoved": "The corrections were saved, but there was nothing to remove from the original text for the lines you touched",
+      "redactArchiveFailed": "The corrections were saved to the database, but rewriting the archived file failed: the removed sentence is still downloadable from there. Try the removal again",
       "originalUncertain": "Origin not certain",
       "originalUncertainHint": "The preserved text may already include corrections made before this feature existed: it cannot be proven to be what the automatic transcription produced"
     },

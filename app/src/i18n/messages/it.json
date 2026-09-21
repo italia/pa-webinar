@@ -777,6 +777,7 @@
         "retentionHelp": "Oltre questa soglia i dati personali vengono cancellati automaticamente.",
         "gdprTemplate": "Template informativa",
         "gdprTemplateNone": "— Usa testo personalizzato —",
+        "gdprTemplateUnknown": "Il modello di informativa scelto non esiste più: scegline un altro o torna al testo personalizzato",
         "privacyText": "Informativa privacy (testo)",
         "moderatorHeading": "Moderatore principale",
         "moderatorPublishHint": "Nome ed email sono obbligatori per pubblicare l'evento (servono per il link moderatore e l'email di conferma). Per salvare come bozza non sono richiesti.",
@@ -2482,6 +2483,9 @@
       "redactLabel": "Cancella anche dall’originale",
       "redactHint": "Da usare per una richiesta di cancellazione: le modifiche si applicano anche al testo conservato della macchina, che altrimenti conserverebbe la frase rimossa",
       "redactSave": "Salva e cancella dall’originale",
+      "redactSaved": "{n, plural, one {Cancellata 1 riga anche dal testo originale} other {Cancellate # righe anche dal testo originale}}",
+      "redactNothingRemoved": "Le correzioni sono state salvate, ma nel testo originale non c'era nulla da cancellare per le righe toccate",
+      "redactArchiveFailed": "Le correzioni sono state salvate nella banca dati, ma la riscrittura del file archiviato non è riuscita: la frase rimossa resta scaricabile da lì. Riprova la cancellazione",
       "originalUncertain": "Origine non certa",
       "originalUncertainHint": "Il testo conservato potrebbe già includere correzioni fatte prima che questa funzione esistesse: non è dimostrabile che sia quello prodotto dalla trascrizione automatica"
     },
