@@ -23,9 +23,13 @@
  * password — a fresh copy must not inherit a secret the operator cannot see.
  *
  * Optional body:
- *   { "nextOccurrence": true }        project the date from the source's RRULE
+ *   { "nextOccurrence": true }        project the date from the source's RRULE,
+ *                                     in the event's timezone, to the first
+ *                                     occurrence after the source that is not
+ *                                     in the past (minute resolution)
  *   { "startsAt": ISO, "endsAt": ISO } explicit reschedule
- * Neither → same dates as the source (historic behaviour).
+ * Neither, or an exhausted rule → same dates as the source, and the response
+ * says so with `scheduleProjected: false`. The 201 carries `startsAt`/`endsAt`.
  */
 import { randomUUID } from 'crypto';
 
@@ -129,15 +133,27 @@ async function readOptions(request: Request): Promise<DuplicateOptions> {
 
 /**
  * Dates for the copy. Explicit values win; `nextOccurrence` projects the first
- * date the source's RRULE yields strictly after now, keeping the original
- * duration and time of day. With no rule to project from we fall back to the
- * source dates rather than inventing a cadence — the operator can still edit
- * the draft, and a wrong guessed date is worse than an obvious placeholder.
+ * date the source's RRULE yields strictly after the source occurrence, and
+ * never in the past, keeping the original duration and the original time of day
+ * in the event's own timezone. With no rule to project from — or a rule already
+ * exhausted by COUNT/UNTIL — we fall back to the source dates rather than
+ * inventing a cadence, and report it as `projected: false`: a wrong guessed date
+ * is worse than an obvious placeholder, but only if the caller can tell it is
+ * one.
+ *
+ * The copy inherits the rule verbatim while its own start moves forward, so a
+ * COUNT restarts on the copy, and it is deliberately not linked to the series
+ * (see lib/events/duplicate-fields).
  */
 function resolveSchedule(
-  source: { startsAt: Date; endsAt: Date; recurrenceRule: string | null },
+  source: {
+    startsAt: Date;
+    endsAt: Date;
+    recurrenceRule: string | null;
+    timezone: string;
+  },
   options: DuplicateOptions,
-): { startsAt: Date; endsAt: Date } {
+): { startsAt: Date; endsAt: Date; projected: boolean } {
   const durationMs = source.endsAt.getTime() - source.startsAt.getTime();
 
   // Le date arrivano già validate dallo schema: sono ISO parsabili, `endsAt`
@@ -150,20 +166,38 @@ function resolveSchedule(
       endsAt: options.endsAt
         ? new Date(options.endsAt)
         : new Date(explicitStart.getTime() + durationMs),
+      projected: false,
     };
   }
 
   if (options.nextOccurrence && source.recurrenceRule) {
-    // Seek past the occurrences already held rather than enumerating a window:
-    // a daily series running for months would otherwise yield only past dates,
-    // and the copy would silently keep the source's (past) schedule.
-    const upcoming = nextOccurrenceAfter(source.recurrenceRule, source.startsAt, new Date());
+    // The anchor is not "now": `after()` returns the first occurrence STRICTLY
+    // later, and with a source in the future — the normal case for this route —
+    // the first occurrence after now is the source itself. The copy was born
+    // with the original's dates, and since the value wasn't null the fallback
+    // below was never reached either: a 201, no signal, and the operator ended
+    // up with two events at the same time.
+    // The max with the current time covers the opposite extreme: on a series
+    // running for months, the occurrence after the source is still in the past.
+    const anchor = new Date(Math.max(source.startsAt.getTime(), Date.now()));
+    const upcoming = nextOccurrenceAfter(
+      source.recurrenceRule,
+      source.startsAt,
+      anchor,
+      source.timezone,
+    );
     if (upcoming) {
-      return { startsAt: upcoming, endsAt: new Date(upcoming.getTime() + durationMs) };
+      // The duration stays additive across a daylight-saving change: an hour
+      // of meeting lasts an hour.
+      return {
+        startsAt: upcoming,
+        endsAt: new Date(upcoming.getTime() + durationMs),
+        projected: true,
+      };
     }
   }
 
-  return { startsAt: source.startsAt, endsAt: source.endsAt };
+  return { startsAt: source.startsAt, endsAt: source.endsAt, projected: false };
 }
 
 export const POST = withErrorHandling(async (request, context) => {
@@ -184,7 +218,10 @@ export const POST = withErrorHandling(async (request, context) => {
   });
   if (!source) throw new NotFoundError('Event not found');
 
-  const { startsAt, endsAt } = resolveSchedule(source, await readOptions(request));
+  const { startsAt, endsAt, projected } = resolveSchedule(
+    source,
+    await readOptions(request),
+  );
 
   const newTitle = suffixTitle(source.title as LocalizedField);
   const newSlug = await generateUniqueSlug(newTitle);
@@ -226,6 +263,14 @@ export const POST = withErrorHandling(async (request, context) => {
       id: duplicate.id,
       slug: duplicate.slug,
       moderatorToken: duplicate.moderatorToken,
+      // The dates actually written, and whether they were really projected:
+      // without this an exhausted rule returned the source's dates with the
+      // same 201 as a successful projection, and the caller had no way to tell
+      // the two apart. Read from the local values, not from the created row:
+      // that keeps the response independent of what `create` selects back.
+      startsAt: startsAt.toISOString(),
+      endsAt: endsAt.toISOString(),
+      scheduleProjected: projected,
     },
     { status: 201 },
   );

@@ -9,6 +9,8 @@
 
 import { RRule, type Frequency, type Weekday } from 'rrule';
 
+import { toDatetimeLocalInTz, fromDatetimeLocalInTz } from '@/lib/utils/date-format';
+
 export type RecurrencePreset =
   | 'none'
   | 'daily'
@@ -327,10 +329,21 @@ function formatLongDate(date: Date, locale: 'it' | 'en'): string {
 
 // ── nextOccurrences ─────────────────────────────────────────────────────────
 
+/**
+ * The next `limit` occurrences of the rule, for preview.
+ *
+ * `timeZone` makes the cadence run on wall-clock time, the same way
+ * `nextOccurrenceAfter` does: without it the preview promises a time that the
+ * duplication then produces an hour off, on either side of a daylight-saving
+ * change. The default keeps the historic behaviour for callers that don't pass
+ * one; with minute-aligned dates the two are identical, because the conversion
+ * truncates seconds.
+ */
 export function nextOccurrences(
   rrule: string,
   dtstart: Date,
   limit: number,
+  timeZone = 'UTC',
 ): Date[] {
   const body = stripRRulePrefix((rrule ?? '').trim());
   if (!body || limit <= 0) return [];
@@ -344,40 +357,108 @@ export function nextOccurrences(
 
   try {
     // The RRULE string alone doesn't carry DTSTART, so attach the caller's.
-    const rule = new RRule({ ...options, dtstart });
+    const rule = new RRule({
+      ...options,
+      dtstart: toFloating(dtstart, timeZone),
+      ...(options.until instanceof Date
+        ? { until: toFloating(options.until, timeZone) }
+        : {}),
+    });
 
     // If the rule has a COUNT or UNTIL, let it bound naturally; otherwise cap at `limit`.
-    if (typeof options.count === 'number' || options.until instanceof Date) {
-      const all = rule.all();
-      return all.slice(0, limit);
-    }
-    return rule.all((_d, i) => i < limit);
+    const hits =
+      typeof options.count === 'number' || options.until instanceof Date
+        ? rule.all().slice(0, limit)
+        : rule.all((_d, i) => i < limit);
+    return hits.map((d) => fromFloating(d, timeZone));
+    // An invalid timezone makes `Intl` throw: here it becomes an empty
+    // preview ("invalid rule"), not a crash while rendering.
   } catch {
     return [];
   }
 }
 
 /**
- * First occurrence strictly after `after`, or null.
+ * First occurrence strictly after `after`, in the event's own wall-clock time,
+ * or null.
  *
  * Distinct from `nextOccurrences(...).find(d => d > now)`: that enumerates from
  * DTSTART, so a series already past the requested limit returns only past dates
  * and the caller silently falls back to them. `RRule.after` seeks instead of
  * enumerating, so it is correct however long the series has been running (and
  * cheap for a daily rule started years ago).
+ *
+ * `timeZone` is not a formatting detail: `rrule` advances on UTC components, so
+ * a weekly rule adds exactly 7x24h and, across a daylight-saving change, the
+ * occurrence lands an hour off on the clock of whoever attends (11:00 becomes
+ * 10:00 once the autumn change is crossed). Here the cadence is computed on
+ * wall-clock time — the series is carried to local time, advanced there, then
+ * converted back to an instant — so the occurrence keeps the same local time on
+ * both sides of the change. UNTIL follows the same conversion: comparing it as
+ * an instant while the rest of the series is floating would cut the rule an
+ * hour early.
+ *
+ * Resolution is one minute: an event's time is entered through a
+ * `datetime-local`, which has no seconds. A DTSTART carrying seconds is
+ * truncated to the minute by the projection.
  */
-export function nextOccurrenceAfter(rrule: string, dtstart: Date, after: Date): Date | null {
+export function nextOccurrenceAfter(
+  rrule: string,
+  dtstart: Date,
+  after: Date,
+  timeZone: string,
+): Date | null {
   const body = stripRRulePrefix((rrule ?? '').trim());
   if (!body) return null;
   try {
     const options = RRule.parseString(body);
-    return new RRule({ ...options, dtstart }).after(after) ?? null;
+    const hit = new RRule({
+      ...options,
+      dtstart: toFloating(dtstart, timeZone),
+      ...(options.until instanceof Date
+        ? { until: toFloating(options.until, timeZone) }
+        : {}),
+    }).after(toFloating(after, timeZone));
+    return hit ? fromFloating(hit, timeZone) : null;
+    // The try also covers the conversions: an invalid timezone in the database
+    // makes `Intl` throw, and here that has to become a null fallback, not a
+    // 500.
   } catch {
     return null;
   }
 }
 
 // ── helpers ─────────────────────────────────────────────────────────────────
+
+/**
+ * Istante -> data "fluttuante": i numeri dell'orologio locale letti come se
+ * fossero UTC, che è il riferimento in cui `rrule` fa i suoi conti.
+ * Risoluzione al minuto.
+ */
+function toFloating(date: Date, timeZone: string): Date {
+  return new Date(`${toDatetimeLocalInTz(date, timeZone)}:00Z`);
+}
+
+/**
+ * Inverso di `toFloating`, in due passaggi e non in uno:
+ * `fromDatetimeLocalInTz` sceglie lo scarto dal fuso leggendolo sull'istante
+ * provvisorio, e nell'ora che precede il passaggio all'ora legale quell'istante
+ * sta già dall'altra parte del cambio — le 01:30 tornavano le 00:30. Se il
+ * risultato non si rilegge come l'orologio richiesto si corregge della
+ * differenza, e la correzione si tiene solo quando quadra: un orario che nel
+ * cambio d'ora non esiste non può quadrare, e lì si tiene il primo tentativo,
+ * che cade subito dopo il salto.
+ */
+function fromFloating(floating: Date, timeZone: string): Date {
+  const wall = toDatetimeLocalInTz(floating, 'UTC');
+  const first = fromDatetimeLocalInTz(wall, timeZone);
+  if (toDatetimeLocalInTz(first, timeZone) === wall) return first;
+  const drift =
+    new Date(`${toDatetimeLocalInTz(first, timeZone)}:00Z`).getTime() -
+    new Date(`${wall}:00Z`).getTime();
+  const second = new Date(first.getTime() - drift);
+  return toDatetimeLocalInTz(second, timeZone) === wall ? second : first;
+}
 
 function stripRRulePrefix(input: string): string {
   if (!input) return '';

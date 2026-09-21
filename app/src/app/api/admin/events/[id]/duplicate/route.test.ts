@@ -13,7 +13,7 @@
  */
 
 import type { NextRequest } from 'next/server';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 vi.mock('next/headers', () => ({
   cookies: vi.fn(async () => ({ get: () => ({ value: 'admin-session' }) })),
@@ -58,6 +58,9 @@ function sourceEvent() {
     title: { it: 'Evento originale', en: 'Original event' },
     startsAt: new Date('2026-09-01T09:00:00.000Z'),
     endsAt: new Date('2026-09-01T10:00:00.000Z'),
+    // La proiezione della data lavora sull'orologio dell'evento: senza un fuso
+    // esplicito il risultato dipenderebbe da quello della macchina.
+    timezone: 'Europe/Rome',
     recurrenceRule: null,
     moderatorToken: 'token-di-origine',
     jitsiRoomName: 'stanza-origine',
@@ -91,6 +94,10 @@ const context = { params: Promise.resolve({ id: SOURCE_ID }) };
 describe('POST /api/admin/events/[id]/duplicate', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // `resolveSchedule` legge l'ora corrente: senza congelarla, i casi sulla
+    // proiezione cambierebbero esito col passare del tempo.
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-10-01T08:00:00.000Z'));
     mocked.event.findUnique.mockResolvedValue(sourceEvent());
     mocked.eventReminder.findMany.mockResolvedValue([]);
     mocked.event.create.mockImplementation(async ({ data }: { data: Record<string, unknown> }) => ({
@@ -98,6 +105,10 @@ describe('POST /api/admin/events/[id]/duplicate', () => {
       slug: data.slug,
       moderatorToken: data.moderatorToken,
     }));
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it('rifiuta un corpo malformato invece di programmare la copia a caso', async () => {
@@ -181,5 +192,95 @@ describe('POST /api/admin/events/[id]/duplicate', () => {
     await POST(request(), context as never);
     const created = mocked.event.create.mock.calls[0]?.[0]?.data as Record<string, unknown>;
     expect(created.status).toBe('DRAFT');
+  });
+
+  // ── Proiezione della data sulla prossima occorrenza ──────────────────────
+
+  /** Sorgente FUTURA con cadenza settimanale: il caso normale della rotta. */
+  function sorgenteRicorrente(rule: string, startsAt = '2026-10-21T09:00:00.000Z') {
+    const inizio = new Date(startsAt);
+    return {
+      ...sourceEvent(),
+      startsAt: inizio,
+      endsAt: new Date(inizio.getTime() + 60 * 60 * 1000),
+      recurrenceRule: rule,
+    };
+  }
+
+  function dateScritte(): { startsAt: Date; endsAt: Date } {
+    const data = mocked.event.create.mock.calls[0]?.[0]?.data as Record<string, unknown>;
+    return { startsAt: data.startsAt as Date, endsAt: data.endsAt as Date };
+  }
+
+  it('su una sorgente futura proietta OLTRE la sorgente, non su di essa', async () => {
+    // È il difetto: l'ancora era l'ora corrente, e la prima occorrenza
+    // successiva a "adesso" di un evento futuro è l'evento stesso. La copia
+    // nasceva con le stesse date dell'originale, con un 201 e nessun segnale.
+    // Qui si verifica anche il fuso: le 11:00 di Roma restano le 11:00 dopo
+    // il cambio d'ora del 25 ottobre, cioè le 10:00 UTC.
+    mocked.event.findUnique.mockResolvedValue(sorgenteRicorrente('FREQ=WEEKLY;BYDAY=WE'));
+
+    const res = await POST(request({ nextOccurrence: true }), context as never);
+
+    expect(res.status).toBe(201);
+    const { startsAt } = dateScritte();
+    expect(startsAt).not.toEqual(new Date('2026-10-21T09:00:00.000Z'));
+    expect(startsAt.toISOString()).toBe('2026-10-28T10:00:00.000Z');
+  });
+
+  it("conserva la durata anche attraversando il cambio d'ora", async () => {
+    mocked.event.findUnique.mockResolvedValue(sorgenteRicorrente('FREQ=WEEKLY;BYDAY=WE'));
+
+    await POST(request({ nextOccurrence: true }), context as never);
+
+    const { startsAt, endsAt } = dateScritte();
+    expect(endsAt.getTime() - startsAt.getTime()).toBe(60 * 60 * 1000);
+  });
+
+  it('dichiara nella risposta che la data è stata proiettata', async () => {
+    mocked.event.findUnique.mockResolvedValue(sorgenteRicorrente('FREQ=WEEKLY;BYDAY=WE'));
+
+    const res = await POST(request({ nextOccurrence: true }), context as never);
+
+    const body = (await res.json()) as {
+      startsAt?: string;
+      endsAt?: string;
+      scheduleProjected?: boolean;
+    };
+    expect(body.scheduleProjected).toBe(true);
+    expect(body.startsAt).toBe('2026-10-28T10:00:00.000Z');
+    expect(body.endsAt).toBe('2026-10-28T11:00:00.000Z');
+  });
+
+  it('con una regola esaurita ripiega sulle date della sorgente, e lo dice', async () => {
+    // Prima, una regola esaurita e una proiezione riuscita erano
+    // indistinguibili: stesso 201, stesse date della sorgente.
+    mocked.event.findUnique.mockResolvedValue(sorgenteRicorrente('FREQ=WEEKLY;COUNT=1'));
+
+    const res = await POST(request({ nextOccurrence: true }), context as never);
+
+    const body = (await res.json()) as { scheduleProjected?: boolean };
+    expect(body.scheduleProjected).toBe(false);
+    expect(dateScritte().startsAt).toEqual(new Date('2026-10-21T09:00:00.000Z'));
+  });
+
+  it('senza cadenza tiene le date della sorgente senza inventarne una', async () => {
+    const res = await POST(request({ nextOccurrence: true }), context as never);
+
+    const body = (await res.json()) as { scheduleProjected?: boolean };
+    expect(body.scheduleProjected).toBe(false);
+    expect(dateScritte().startsAt).toEqual(sourceEvent().startsAt);
+  });
+
+  it('su una serie che va avanti da mesi proietta comunque nel futuro', async () => {
+    // L'estremo opposto: qui l'occorrenza subito dopo la sorgente è passata,
+    // ed è il motivo per cui l'ancora è il massimo fra sorgente e adesso.
+    mocked.event.findUnique.mockResolvedValue(
+      sorgenteRicorrente('FREQ=DAILY', '2026-08-05T09:00:00.000Z'),
+    );
+
+    await POST(request({ nextOccurrence: true }), context as never);
+
+    expect(dateScritte().startsAt.getTime()).toBeGreaterThan(Date.now());
   });
 });

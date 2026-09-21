@@ -137,7 +137,10 @@ export default function RecurrencePicker({
   const isActive = preset !== 'none';
   const previewDates = useMemo(() => {
     if (!value.rrule) return [];
-    return nextOccurrences(value.rrule, dtstart, 5);
+    // Stesso fuso con cui la duplicazione proietta la data: senza,
+    // l'anteprima prometterebbe un orario e la copia ne produrrebbe un
+    // altro a cavallo del cambio d'ora.
+    return nextOccurrences(value.rrule, dtstart, 5, timezone);
   }, [value.rrule, dtstart]);
 
   const customValid = useMemo(() => {
