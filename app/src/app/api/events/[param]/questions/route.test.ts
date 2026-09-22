@@ -12,7 +12,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 vi.mock('@/lib/db', () => ({
   prisma: {
     event: { findUnique: vi.fn() },
-    question: { findMany: vi.fn() },
+    question: { findMany: vi.fn(), create: vi.fn() },
     questionUpvote: { findMany: vi.fn() },
     registration: { findUnique: vi.fn() },
     eventModerator: { findUnique: vi.fn() },
@@ -30,7 +30,7 @@ vi.mock('@/lib/crypto/pii', () => ({ tryDecryptPII: (v: string) => v }));
 
 import { prisma } from '@/lib/db';
 
-import { GET } from './route';
+import { GET, POST } from './route';
 
 const mockedEvent = prisma.event.findUnique as unknown as ReturnType<typeof vi.fn>;
 const mockedQuestions = prisma.question.findMany as unknown as ReturnType<typeof vi.fn>;
@@ -40,6 +40,7 @@ const mockedRegistration = prisma.registration
   .findUnique as unknown as ReturnType<typeof vi.fn>;
 const mockedGrant = prisma.eventModerator
   .findUnique as unknown as ReturnType<typeof vi.fn>;
+const mockedCreate = prisma.question.create as unknown as ReturnType<typeof vi.fn>;
 
 const EVENT_ID = '44444444-4444-4444-8444-444444444444';
 const SLUG = 'evento-di-prova';
@@ -85,6 +86,16 @@ beforeEach(() => {
     },
   ]);
   mockedUpvotes.mockResolvedValue([]);
+  mockedCreate.mockResolvedValue({
+    id: 'q-new',
+    authorName: 'Relatrice',
+    text: 'Una domanda',
+    status: 'PENDING',
+    upvoteCount: 0,
+    createdAt: new Date('2026-09-22T10:05:00.000Z'),
+    highlightedAt: null,
+    answeredAt: null,
+  });
   mockedRegistration.mockResolvedValue(null);
   mockedGrant.mockResolvedValue(null);
 });
@@ -136,5 +147,48 @@ describe('GET /api/events/[slug]/questions — chi vede le domande', () => {
 
   it('un token che non risolve resta un 403', async () => {
     expect((await GET(get({ Authorization: 'Bearer SCADUTO' }), ctx())).status).toBe(403);
+  });
+});
+
+describe('POST /api/events/[slug]/questions — chi puo\u2019 chiedere', () => {
+  function ask(body: Record<string, unknown>): NextRequest {
+    return new Request(`https://webinar.gov.it/api/events/${SLUG}/questions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-forwarded-for': '203.0.113.11' },
+      body: JSON.stringify(body),
+    }) as unknown as NextRequest;
+  }
+
+  it('il relatore fa una domanda col proprio grant, non con una registrazione', async () => {
+    // Il pannello gli mostra il modulo; cercare quel token solo fra gli
+    // iscritti glielo faceva rifiutare con un errore generico.
+    mockedGrant.mockResolvedValue({
+      eventId: EVENT_ID,
+      revokedAt: null,
+      name: 'Relatrice',
+    });
+    const res = await POST(
+      ask({ text: 'Una domanda dal relatore', accessToken: 'TOKEN_RELATORE' }),
+      ctx(),
+    );
+    expect(res.status).toBe(201);
+    const data = mockedCreate.mock.calls[0]?.[0] as
+      | { data: Record<string, unknown> }
+      | undefined;
+    expect(data?.data).toMatchObject({ authorName: 'Relatrice', registrationId: undefined });
+  });
+
+  it('un grant revocato non fa piu\u2019 domande', async () => {
+    mockedGrant.mockResolvedValue({
+      eventId: EVENT_ID,
+      revokedAt: new Date(),
+      name: 'Relatrice',
+    });
+    const res = await POST(
+      ask({ text: 'Una domanda dal relatore', accessToken: 'TOKEN_RELATORE' }),
+      ctx(),
+    );
+    expect(res.status).toBe(403);
+    expect(mockedCreate).not.toHaveBeenCalled();
   });
 });

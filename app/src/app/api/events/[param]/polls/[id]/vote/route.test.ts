@@ -16,6 +16,7 @@ vi.mock('@/lib/db', () => ({
     poll: { findUnique: vi.fn() },
     pollVote: { findUnique: vi.fn(), create: vi.fn() },
     registration: { findUnique: vi.fn() },
+    eventModerator: { findUnique: vi.fn() },
   },
 }));
 vi.mock('@/lib/live-state/publish', () => ({ pokeLivePanel: vi.fn() }));
@@ -31,6 +32,8 @@ const mockedPoll = prisma.poll.findUnique as unknown as ReturnType<typeof vi.fn>
 const mockedExisting = prisma.pollVote.findUnique as unknown as ReturnType<typeof vi.fn>;
 const mockedCreate = prisma.pollVote.create as unknown as ReturnType<typeof vi.fn>;
 const mockedRegistration = prisma.registration
+  .findUnique as unknown as ReturnType<typeof vi.fn>;
+const mockedGrant = prisma.eventModerator
   .findUnique as unknown as ReturnType<typeof vi.fn>;
 const mockedJoinGrant = hasJoinGrant as unknown as ReturnType<typeof vi.fn>;
 
@@ -66,12 +69,16 @@ function votoPersistito(): Record<string, unknown> {
 let seq = 0;
 const nextGuest = () => `guest_${(seq += 1).toString().padStart(6, '0')}`;
 
-function vote(body: Record<string, unknown>): NextRequest {
+function vote(body: Record<string, unknown>, bearer?: string): NextRequest {
   return new Request(
     `https://webinar.gov.it/api/events/${SLUG}/polls/${POLL_ID}/vote`,
     {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-forwarded-for': '203.0.113.9' },
+      headers: {
+        'Content-Type': 'application/json',
+        'x-forwarded-for': '203.0.113.9',
+        ...(bearer ? { Authorization: `Bearer ${bearer}` } : {}),
+      },
       body: JSON.stringify(body),
     },
   ) as unknown as NextRequest;
@@ -89,6 +96,7 @@ beforeEach(() => {
   mockedExisting.mockResolvedValue(null);
   mockedCreate.mockResolvedValue({ id: 'vote-1' });
   mockedRegistration.mockResolvedValue(null);
+  mockedGrant.mockResolvedValue(null);
   mockedJoinGrant.mockResolvedValue(false);
 });
 
@@ -132,19 +140,35 @@ describe('POST .../polls/[id]/vote — con quale identità si vota', () => {
     expect(res.status).toBe(409);
   });
 
-  it('fuori dalla finestra della sala non si vota col browser', async () => {
+  it('fuori dalla finestra della sala un anonimo non vota', async () => {
     // Senza questo, chi conosce lo slug voterebbe su un sondaggio rimasto
     // aperto in un evento che non è più in diretta.
     mockedEvent.mockResolvedValue(eventRow({ status: 'ENDED' }));
     const res = await POST(vote({ optionIndex: 0, guestId: nextGuest() }), ctx());
-    expect(res.status).toBe(403);
+    expect(res.status).toBe(401);
     expect(mockedCreate).not.toHaveBeenCalled();
+  });
+
+  it('chi conduce vota anche prima della diretta, mostrando il token di sala', async () => {
+    // Un evento in pre-riscaldamento non è ancora "in diretta": l'ospite non
+    // entra, ma moderatori e relatori ci sono già — e votano con
+    // l'identificativo del browser, non col token.
+    mockedEvent.mockResolvedValue(eventRow({ status: 'PROVISIONING' }));
+    const senzaToken = await POST(vote({ optionIndex: 0, guestId: nextGuest() }), ctx());
+    expect(senzaToken.status).toBe(401);
+
+    const conToken = await POST(
+      vote({ optionIndex: 0, guestId: nextGuest() }, PRIMARY_TOKEN),
+      ctx(),
+    );
+    expect(conToken.status).toBe(201);
+    expect(votoPersistito()).toMatchObject({ registrationId: null });
   });
 
   it('con la password, serve il cookie di accesso', async () => {
     mockedEvent.mockResolvedValue(eventRow({ joinPasswordHash: 'hash' }));
     const negato = await POST(vote({ optionIndex: 0, guestId: nextGuest() }), ctx());
-    expect(negato.status).toBe(403);
+    expect(negato.status).toBe(401);
 
     mockedJoinGrant.mockResolvedValue(true);
     const ok = await POST(vote({ optionIndex: 0, guestId: nextGuest() }), ctx());

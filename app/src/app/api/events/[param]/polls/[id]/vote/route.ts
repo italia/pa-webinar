@@ -9,8 +9,7 @@ import {
 } from '@/lib/errors';
 import { deleteCacheByPrefix } from '@/lib/cache';
 import { prisma } from '@/lib/db';
-import { guestWindowOpen } from '@/lib/events/guest-window';
-import { hasJoinGrant } from '@/lib/events/join-grant';
+import { authorizePanelRead } from '@/lib/events/panel-read-access';
 import { pokeLivePanel } from '@/lib/live-state/publish';
 import { pollVoteSchema } from '@/lib/validation/schemas';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
@@ -84,19 +83,21 @@ export const POST = withErrorHandling(async (request, context) => {
     if (existing) throw new ConflictError('Already voted');
   } else if (guestId) {
     // Chi vota con l'identificativo del browser — ospiti, relatori e
-    // moderatori, che una registrazione non ce l'hanno — passa di qui.
-    // Attenzione a cosa questo controllo è e a cosa non è: verifica che la
-    // STANZA sia aperta, con la stessa soglia della lettura, non chi bussa.
-    // L'identificativo è scelto dal client, quindi la deduplica vale per
-    // browser onesto: è la stessa garanzia delle reazioni all'agenda, e un
-    // sondaggio in sala non è un'elezione. Legare il voto a un'identità
-    // firmata è un lavoro a sé, non una riga in più qui.
-    if (!guestWindowOpen(event)) {
-      throw new ForbiddenError('Voting requires a participant token');
-    }
-    if (event.joinPasswordHash && !(await hasJoinGrant(event.id))) {
-      throw new ForbiddenError('Voting requires the event join password');
-    }
+    // moderatori, che una registrazione non ce l'hanno — passa di qui, e
+    // deve superare lo stesso cancello della lettura: chi conduce lo fa col
+    // proprio token di sala (che NON è un'identità di voto, il server lo
+    // cerca fra le registrazioni), un ospite solo finché la stanza è aperta
+    // a chi arriva col link e non è protetta da password.
+    //
+    // Cosa questo NON garantisce: l'identificativo è scelto dal client,
+    // quindi la deduplica vale per browser onesto. È la stessa garanzia
+    // delle reazioni all'agenda, e un sondaggio in sala non è un'elezione;
+    // legarlo a un'identità firmata è un lavoro a sé.
+    const authHeader = request.headers.get('authorization');
+    const bearer = authHeader?.startsWith('Bearer ')
+      ? authHeader.slice(7).trim() || null
+      : null;
+    await authorizePanelRead(event, bearer);
 
     const rl = rateLimit(`poll-vote-guest:${guestId}`, { limit: 10, windowMs: 60_000 });
     if (!rl.allowed) throw new RateLimitError();

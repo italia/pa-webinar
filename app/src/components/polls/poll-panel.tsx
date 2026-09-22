@@ -116,7 +116,13 @@ export default function PollPanel({
       try {
         const res = await fetch(`/api/events/${eventSlug}/polls/${pollId}/vote`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          // Il token di sala non è l'identità con cui si vota, ma è ciò con
+          // cui moderatori e relatori dimostrano di essere in sala anche
+          // quando l'evento non è ancora "in diretta" (pre-riscaldamento,
+          // pausa senza traffico). Senza, il loro voto verrebbe respinto.
+          headers: token
+            ? { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
+            : { 'Content-Type': 'application/json' },
           body: JSON.stringify({ optionIndex, ...identity }),
         });
         if (!res.ok) {
@@ -129,7 +135,7 @@ export default function PollPanel({
       // da quella a schermo, ed è quella che va mostrata.
       void mutate();
     },
-    [eventSlug, voterAccessToken, voterGuestId, mutate, t],
+    [eventSlug, token, voterAccessToken, voterGuestId, mutate, t],
   );
 
   const handleStatusChange = useCallback(

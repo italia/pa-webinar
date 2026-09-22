@@ -5,6 +5,7 @@ import {
   ForbiddenError,
   ValidationError,
 } from '@/lib/errors';
+import { deleteCacheByPrefix } from '@/lib/cache';
 import { prisma } from '@/lib/db';
 import { pokeLivePanel } from '@/lib/live-state/publish';
 import { updatePollStatusSchema } from '@/lib/validation/schemas';
@@ -51,6 +52,7 @@ export const PATCH = withErrorHandling(async (request, context) => {
     },
   });
 
+  deleteCacheByPrefix(`polls:${event.id}`);
   pokeLivePanel(event.id, 'polls');
 
   return Response.json({
@@ -84,6 +86,7 @@ export const DELETE = withErrorHandling(async (request, context) => {
 
   await prisma.poll.delete({ where: { id: pollId } });
 
+  deleteCacheByPrefix(`polls:${event.id}`);
   pokeLivePanel(event.id, 'polls');
 
   return Response.json({ ok: true });

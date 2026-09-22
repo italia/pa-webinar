@@ -179,11 +179,23 @@ export const POST = withErrorHandling(async (request, context) => {
       where: { accessToken: token as string },
       select: { id: true, eventId: true, displayName: true },
     });
-    if (!registration || registration.eventId !== event.id) {
-      throw new ForbiddenError('Invalid access token');
+    if (registration && registration.eventId === event.id) {
+      registrationId = registration.id;
+      authorName = tryDecryptPII(registration.displayName) ?? registration.displayName;
+    } else {
+      // Un relatore ha un grant nominale, non una registrazione: cercarlo
+      // solo fra gli iscritti gli faceva rifiutare la domanda con un errore
+      // generico, davanti a un modulo che il pannello gli mostrava comunque.
+      // Il nome e' quello del grant, cifrato a riposo.
+      const grant = await prisma.eventModerator.findUnique({
+        where: { token: token as string },
+        select: { eventId: true, revokedAt: true, name: true },
+      });
+      if (!grant || grant.eventId !== event.id || grant.revokedAt !== null) {
+        throw new ForbiddenError('Invalid access token');
+      }
+      authorName = (tryDecryptPII(grant.name) ?? grant.name).slice(0, 80);
     }
-    registrationId = registration.id;
-    authorName = tryDecryptPII(registration.displayName) ?? registration.displayName;
   } else {
     // Guest path: requires a non-empty display name, rate-limited by IP
     // since there's no stable participant id to key on.
