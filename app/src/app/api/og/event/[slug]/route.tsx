@@ -114,7 +114,11 @@ async function locandinaInline(raw: string | null): Promise<string | null> {
     });
     if (!res.ok) return null;
     const tipo = (res.headers.get('content-type') ?? '').split(';')[0]?.trim() ?? '';
-    if (!tipo.startsWith('image/')) return null;
+    // Solo i formati che il disegnatore sa davvero decodificare. Un SVG o un
+    // WebP passerebbero un controllo generico su `image/` e poi farebbero
+    // fallire il rendering, cioe' l'anteprima intera invece della sola
+    // locandina.
+    if (tipo !== 'image/png' && tipo !== 'image/jpeg') return null;
 
     // Il tetto si applica PRIMA di tenere in memoria: dichiarato quando c'e',
     // e comunque contando i pezzi mentre arrivano. Un file enorme dietro un
@@ -247,8 +251,9 @@ export const GET = withErrorHandling(async (request, context) => {
     { name: 'Titillium Web', data: bold, weight: 700 as const, style: 'normal' as const },
   ].filter((f): f is typeof f & { data: ArrayBuffer } => f.data !== null);
 
-  const immagine = new ImageResponse(
-    (
+  const disegna = async (sfondo: string | null): Promise<Buffer> => {
+    const immagine = new ImageResponse(
+      (
       <div
         style={{
           width: '100%',
@@ -265,10 +270,10 @@ export const GET = withErrorHandling(async (request, context) => {
         {/* La locandina riempie la scheda; sopra ci va una velatura, altrimenti
             il testo bianco sparisce su un'immagine chiara. Senza locandina
             resta il colore istituzionale, che e' comunque riconoscibile. */}
-        {locandina && (
+        {sfondo && (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={locandina}
+            src={sfondo}
             alt=""
             width={LARGHEZZA}
             height={ALTEZZA}
@@ -290,8 +295,8 @@ export const GET = withErrorHandling(async (request, context) => {
             width: LARGHEZZA,
             height: ALTEZZA,
             display: 'flex',
-            background: locandina
-              ? 'linear-gradient(180deg, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.55) 45%, rgba(0,0,0,0.88) 100%)'
+            background: sfondo
+              ? 'linear-gradient(180deg, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.6) 45%, rgba(0,0,0,0.9) 100%)'
               : 'linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.35) 100%)',
           }}
         />
@@ -372,15 +377,34 @@ export const GET = withErrorHandling(async (request, context) => {
         />
       </div>
     ),
-    {
-      width: LARGHEZZA,
-      height: ALTEZZA,
-      // Vuoto quando i font non ci sono: il disegnatore usa il proprio.
-      ...(fonts.length > 0 ? { fonts } : {}),
-    },
-  );
+      {
+        width: LARGHEZZA,
+        height: ALTEZZA,
+        // Vuoto quando i font non ci sono: il disegnatore usa il proprio.
+        ...(fonts.length > 0 ? { fonts } : {}),
+      },
+    );
+    return Buffer.from(await immagine.arrayBuffer());
+  };
 
-  const png = Buffer.from(await immagine.arrayBuffer());
+  let png: Buffer;
+  try {
+    png = await disegna(locandina);
+  } catch (e) {
+    // La locandina e' l'unico pezzo che arriva da fuori e che il disegnatore
+    // puo' rifiutare (un formato che non sa leggere, un file corrotto). Se
+    // cade, si ridisegna senza: un'anteprima con il colore istituzionale vale
+    // molto piu' di un link senza anteprima. Un secondo fallimento non e' piu'
+    // la locandina, e va guardato.
+    console.warn(
+      `[pa-webinar] scheda di anteprima non disegnata con la locandina: ${
+        e instanceof Error ? e.message : String(e)
+      }`,
+    );
+    if (!locandina) throw e;
+    png = await disegna(null);
+  }
+
   ricorda(chiave, png);
   return rispostaPng(png, 'MISS');
 });
