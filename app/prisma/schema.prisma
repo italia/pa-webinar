@@ -1369,9 +1369,23 @@ model OrphanRecording {
   @@map("orphan_recordings")
 }
 
+/// Come si presenta la home. Non sono temi grafici ma impianti diversi: chi
+/// riusa la piattaforma parla a pubblici diversi, e la landing che racconta il
+/// progetto a chi lavora nel digitale e' la pagina sbagliata per un comune che
+/// pubblica gli incontri con i cittadini.
 enum HomePageMode {
+  /// Racconto del progetto: come funziona, cosa si puo' fare in diretta, con
+  /// quali tecnologie. E' la home di chi la piattaforma la propone.
   LANDING
+  /// Sobria e istituzionale: l'ente, il prossimo appuntamento in evidenza, gli
+  /// altri in elenco. Nessun linguaggio tecnico.
+  LANDING_ISTITUZIONALE
+  /// Poche parole e un solo invito: pensata per chi non frequenta gli eventi
+  /// online e deve capire in dieci secondi cosa fare.
+  LANDING_SEMPLICE
+  /// Solo l'elenco degli eventi.
   EVENTS_LIST
+  /// Contenuto scritto a mano dall'amministrazione, piu' l'elenco.
   CUSTOM
 }
 

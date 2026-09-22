@@ -619,7 +619,15 @@ function HomepageTab({ settings, updateField }: TabProps) {
     <div>
       <FormGroup tag="fieldset">
         <legend className="h6 fw-semibold mb-3">{t('modeLabel')}</legend>
-        {(['LANDING', 'EVENTS_LIST', 'CUSTOM'] as const).map((mode) => (
+        {(
+          [
+            'LANDING',
+            'LANDING_ISTITUZIONALE',
+            'LANDING_SEMPLICE',
+            'EVENTS_LIST',
+            'CUSTOM',
+          ] as const
+        ).map((mode) => (
           <FormGroup check key={mode} className="mb-2">
             <Input
               id={`mode-${mode}`}

@@ -6,6 +6,8 @@ import { getSettings } from '@/lib/settings';
 import { Link } from '@/i18n/navigation';
 import { publicEventStatusWhere } from '@/lib/events/visibility';
 import EventListClient from '@/components/events/event-list-client';
+import LandingIstituzionale from '@/components/home/landing-istituzionale';
+import LandingSemplice from '@/components/home/landing-semplice';
 
 async function loadUpcomingEvents() {
   const events = await prisma.event.findMany({
@@ -69,10 +71,37 @@ function SvgIcon({
 }
 
 export default async function HomePage() {
-  const _locale = await getLocale();
+  const locale = await getLocale();
   const settings = await getSettings();
   const upcoming = await loadUpcomingEvents();
   const parseTitleKicker = settings.parseTitleKicker;
+
+  // Impianti alternativi per chi riusa la piattaforma: la landing predefinita
+  // racconta il progetto, e per un ente che pubblica i propri incontri e' la
+  // pagina sbagliata. Vivono in file propri perche' questa pagina e' gia'
+  // lunga e i tre impianti non condividono quasi nulla oltre ai dati.
+  if (settings.homePageMode === 'LANDING_ISTITUZIONALE') {
+    return (
+      <LandingIstituzionale
+        upcoming={upcoming}
+        parseTitleKicker={parseTitleKicker}
+        organizationName={settings.organizationName || settings.siteName}
+        siteDescription={settings.siteDescription}
+        locale={locale}
+      />
+    );
+  }
+
+  if (settings.homePageMode === 'LANDING_SEMPLICE') {
+    return (
+      <LandingSemplice
+        upcoming={upcoming}
+        parseTitleKicker={parseTitleKicker}
+        organizationName={settings.organizationName || settings.siteName}
+        locale={locale}
+      />
+    );
+  }
 
   if (settings.homePageMode === 'EVENTS_LIST') {
     return <EventsListHome upcoming={upcoming} parseTitleKicker={parseTitleKicker} />;
