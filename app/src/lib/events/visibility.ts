@@ -85,6 +85,28 @@ function isEndedPostEventVisible(event: PostEventVisibilityFields): boolean {
   return true;
 }
 
+/**
+ * True se l'evento ha una PAGINA pubblica, cioè una scheda con descrizione,
+ * relatori e iscrizione.
+ *
+ * Una chiamata istantanea non ce l'ha: è usa-e-getta e si apre dal link, quindi
+ * finché è viva non ha senso pubblicarne una scheda — chi ha il link entra in
+ * sala, chi non ce l'ha non deve trovare niente. L'unica scheda che resta
+ * sensata è quella DOPO: la pagina post-evento con la registrazione, che però
+ * l'amministratore deve accendere di proposito (le nuove chiamate nascono con
+ * `postEventPublic` spento).
+ *
+ * Deliberatamente distinta da `isEventPubliclyVisible`: quella risponde «si può
+ * stare in questa stanza», e la usano le superfici DENTRO la sala — materiali,
+ * canale live. Confonderle spegnerebbe il canale realtime delle istantanee.
+ */
+export function isEventPageVisible(
+  event: EventLike & PostEventVisibilityFields,
+): boolean {
+  if (event.eventType === 'INSTANT' && event.status !== 'ENDED') return false;
+  return isEventPubliclyVisible(event);
+}
+
 /** True se la pagina pubblica dell'evento deve essere raggiungibile. */
 export function isEventPubliclyVisible(
   event: EventLike & PostEventVisibilityFields,
@@ -114,7 +136,10 @@ export function publicEventStatusWhere(opts?: {
   includeEnded?: boolean;
 }): Prisma.EventWhereInput {
   const or: Prisma.EventWhereInput[] = [
-    { status: { in: ['PUBLISHED', 'LIVE'] } },
+    // Le istantanee restano fuori: sono chiamate link-only, e una in corso
+    // comparirebbe in home, negli elenchi, nella sitemap e nel calendario
+    // pubblico come se fosse un evento a cui iscriversi.
+    { status: { in: ['PUBLISHED', 'LIVE'] }, eventType: { not: 'INSTANT' } },
     {
       status: { in: WARMUP_STATUSES },
       eventType: { not: 'INSTANT' },

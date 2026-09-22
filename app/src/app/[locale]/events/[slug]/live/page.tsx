@@ -12,7 +12,7 @@ import { resolveKickerEnabled } from '@/lib/utils/title-kicker';
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import { eventAccessCookieName, verifyEventAccess } from '@/lib/event-session';
 import { resolveGrantForEvent } from '@/lib/auth/moderator';
-import { isEventPubliclyVisible } from '@/lib/events/visibility';
+import { isEventPageVisible } from '@/lib/events/visibility';
 import { hasJoinGrant } from '@/lib/events/join-grant';
 import { resolveRnnoiseEnforceOff } from '@/lib/jitsi/rnnoise';
 
@@ -215,7 +215,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
       // Solo per stati in cui la pagina evento è raggiungibile (stesso check
       // della destinazione, lib/events/visibility): per DRAFT/ARCHIVED fa
       // notFound() a sua volta, e un redirect verso un 404 è peggio del 404.
-      if (isEventPubliclyVisible(event)) {
+      if (isEventPageVisible(event)) {
         redirect(`/${locale}/events/${slug}?invalidToken=1`);
       }
       notFound();

@@ -109,6 +109,11 @@ export const POST = withErrorHandling(async (request) => {
       // the IDLE-demotion fallback both depend on it being non-null.
       provisioningStartedAt: now,
       dataRetentionDays: 7,
+      // Usa e getta: finita la chiamata non resta una scheda pubblica in giro.
+      // Chi vuole pubblicare la registrazione accende la pagina post-evento
+      // dall'area di amministrazione, che è una scelta, non un'impostazione
+      // predefinita ereditata dagli eventi a calendario.
+      postEventPublic: false,
       capacityEstimateJson: {
         ...capacityEstimate,
         computedAt: now.toISOString(),

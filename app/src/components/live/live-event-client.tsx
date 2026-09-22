@@ -1290,6 +1290,7 @@ export default function LiveEventClient({
     return (
       <>
         <LiveTopBar
+          hasPublicPage={event.eventType !== 'INSTANT'}
           title={event.title}
           parseTitleKicker={event.parseTitleKicker}
           imageUrl={event.imageUrl}
@@ -1362,6 +1363,7 @@ export default function LiveEventClient({
       />
 
       <LiveTopBar
+        hasPublicPage={!isInstantCall}
         title={event.title}
         parseTitleKicker={event.parseTitleKicker}
         imageUrl={event.imageUrl}
@@ -2404,6 +2406,8 @@ interface LiveTopBarProps {
    *  moderator/access `?token=`). */
   slug: string;
   locale: string;
+  /** Una chiamata istantanea non ha una pagina pubblica da condividere. */
+  hasPublicPage?: boolean;
   /** Privileged moderator magic-link token — passed ONLY when the current
    *  user is a moderator, so the token never enters a non-moderator tree.
    *  Surfaced (collapsed, with a warning) in the share popup. */
@@ -2432,6 +2436,7 @@ function LiveTopBar({
   role,
   slug,
   locale,
+  hasPublicPage = true,
   moderatorToken,
   onLeaveRoom,
   isFullscreen,
@@ -2597,6 +2602,7 @@ function LiveTopBar({
           slug={slug}
           locale={locale}
           moderatorToken={moderatorToken}
+          hasPublicPage={hasPublicPage}
           modalContainer={modalContainer}
         />
         {onLeaveRoom && (

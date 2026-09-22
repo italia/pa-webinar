@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 
 import {
+  isEventPageVisible,
   isEventPubliclyVisible,
   isEventOpenForRegistration,
   publicEventStatusWhere,
@@ -125,7 +126,10 @@ describe('publicEventStatusWhere', () => {
   it('separa PUBLISHED/LIVE (sempre), warm-up schedulati non finiti, e ENDED col gate post-evento', () => {
     const where = publicEventStatusWhere();
     expect(where.OR).toHaveLength(3);
-    expect(where.OR?.[0]).toEqual({ status: { in: ['PUBLISHED', 'LIVE'] } });
+    expect(where.OR?.[0]).toEqual({
+      status: { in: ['PUBLISHED', 'LIVE'] },
+      eventType: { not: 'INSTANT' },
+    });
 
     const warmup = where.OR?.[1] as {
       status: { in: string[] };
@@ -152,8 +156,55 @@ describe('publicEventStatusWhere', () => {
   it('includeEnded: false esclude del tutto gli ENDED', () => {
     const where = publicEventStatusWhere({ includeEnded: false });
     expect(where.OR).toHaveLength(2);
-    expect(where.OR?.[0]).toEqual({ status: { in: ['PUBLISHED', 'LIVE'] } });
+    expect(where.OR?.[0]).toEqual({
+      status: { in: ['PUBLISHED', 'LIVE'] },
+      eventType: { not: 'INSTANT' },
+    });
     const serialized = (where.OR ?? []).map((c) => JSON.stringify(c));
     expect(serialized.some((s) => s.includes('ENDED'))).toBe(false);
+  });
+});
+
+/**
+ * La pagina pubblica dell'evento è una cosa diversa dal «si può stare in questa
+ * stanza»: una chiamata istantanea è viva e raggiungibile dal link, ma non ha
+ * una scheda da pubblicare. Tenere insieme le due domande spegnerebbe il canale
+ * live e i materiali delle istantanee, che stanno DENTRO la sala.
+ */
+describe('isEventPageVisible', () => {
+  const base = {
+    endsAt: new Date(Date.now() + 3_600_000),
+    postEventPublic: true,
+    postEventPublicUntil: null,
+  };
+
+  it('una chiamata istantanea viva non ha pagina pubblica', () => {
+    for (const status of ['PUBLISHED', 'LIVE', 'PROVISIONING', 'IDLE']) {
+      const event = { ...base, status, eventType: 'INSTANT' };
+      expect(isEventPageVisible(event), status).toBe(false);
+      // …ma resta una stanza in cui si sta, altrimenti il canale realtime e i
+      // materiali della chiamata si spegnerebbero con lei.
+      if (status === 'LIVE') expect(isEventPubliclyVisible(event)).toBe(true);
+    }
+  });
+
+  it('un evento a calendario non cambia comportamento', () => {
+    for (const status of ['PUBLISHED', 'LIVE']) {
+      expect(
+        isEventPageVisible({ ...base, status, eventType: 'SCHEDULED' }),
+        status,
+      ).toBe(true);
+    }
+  });
+
+  it('a chiamata finita la scheda esiste solo se qualcuno l\u2019ha accesa', () => {
+    const finita = (postEventPublic: boolean) => ({
+      ...base,
+      status: 'ENDED',
+      eventType: 'INSTANT',
+      postEventPublic,
+    });
+    expect(isEventPageVisible(finita(false))).toBe(false);
+    expect(isEventPageVisible(finita(true))).toBe(true);
   });
 });

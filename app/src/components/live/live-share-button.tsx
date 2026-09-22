@@ -75,11 +75,16 @@ export default function LiveShareButton({
   slug,
   locale,
   moderatorToken,
+  hasPublicPage = true,
   modalContainer,
 }: {
   slug: string;
   locale: string;
   moderatorToken?: string;
+  /** Falso per una chiamata istantanea: non ha una pagina pubblica, e
+   *  offrirne il link qui significherebbe far condividere un indirizzo che
+   *  risponde 404 a chi lo riceve. */
+  hasPublicPage?: boolean;
   /** Element to portal the modal into. The live client passes the fullscreen
    *  element while app-owned fullscreen is active — a modal left in
    *  <body> would be outside the fullscreen subtree, i.e. invisible. Undefined
@@ -127,8 +132,16 @@ export default function LiveShareButton({
 
   const rows: Array<{ key: RowKey; icon: ReactNode; label: string; hint: string; url: string }> = [
     { key: 'call', icon: <CallGlyph />, label: t('callLink'), hint: t('callLinkHint'), url: callUrl },
-    { key: 'event', icon: <EventGlyph />, label: t('eventLink'), hint: t('eventLinkHint'), url: eventUrl },
   ];
+  if (hasPublicPage) {
+    rows.push({
+      key: 'event',
+      icon: <EventGlyph />,
+      label: t('eventLink'),
+      hint: t('eventLinkHint'),
+      url: eventUrl,
+    });
+  }
 
   return (
     <>

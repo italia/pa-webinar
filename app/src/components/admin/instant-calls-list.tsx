@@ -17,6 +17,8 @@ import {
 } from 'design-react-kit';
 
 import { Link } from '@/i18n/navigation';
+import CopyButton from '@/components/admin/copy-button';
+import { localizedPath } from '@/lib/utils/localized-url';
 
 interface InstantCallRow {
   id: string;
@@ -140,7 +142,7 @@ function StatusBadge({
 }
 
 export default function InstantCallsList({
-  locale: _locale,
+  locale,
   idleGraceMinutes,
 }: {
   locale: string;
@@ -148,9 +150,14 @@ export default function InstantCallsList({
 }) {
   const t = useTranslations('admin.instantCalls');
   const tc = useTranslations('common');
+  const tl = useTranslations('admin.links');
   const fmt = useFormatter();
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  // I due link si copiano per incollarli altrove: devono essere assoluti.
+  const [origin, setOrigin] = useState('');
+  useEffect(() => setOrigin(window.location.origin), []);
 
   const [filters, setFilters] = useState<Filters>(() => ({
     q: searchParams.get('q') ?? '',
@@ -557,6 +564,27 @@ export default function InstantCallsList({
                         <Icon icon="it-arrow-right" size="sm" className="text-muted mt-1" />
                       </div>
                     </Link>
+                  </div>
+
+                  {/* I due link della chiamata. Una istantanea è usa-e-getta e
+                      non ha una pagina pubblica: questi sono l'unico modo di
+                      farci entrare qualcuno, quindi stanno in elenco e non a
+                      una schermata di distanza. Fuori dal <Link> della riga:
+                      un pulsante dentro un collegamento non è cliccabile da
+                      tastiera in modo prevedibile. */}
+                  <div className="d-flex flex-wrap align-items-center gap-2 mt-3 ps-4">
+                    <span className="text-muted" style={{ fontSize: '0.78rem' }}>
+                      {tl('moderatorLink')}
+                    </span>
+                    <CopyButton
+                      text={`${origin}${localizedPath(`/events/${call.slug}/live`, locale)}?token=${call.moderatorToken}`}
+                    />
+                    <span className="text-muted ms-2" style={{ fontSize: '0.78rem' }}>
+                      {tl('guestJoin')}
+                    </span>
+                    <CopyButton
+                      text={`${origin}${localizedPath(`/events/${call.slug}/live`, locale)}`}
+                    />
                   </div>
                 </CardBody>
               </Card>
