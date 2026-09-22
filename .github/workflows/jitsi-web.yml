@@ -1,6 +1,6 @@
 name: Build patched jitsi/web image
 
-# Builds ghcr.io/italia/pa-webinar-jitsi-web — a copy of jitsi/web:stable-10741
+# Builds ghcr.io/italia/pa-webinar-jitsi-web — a copy of the upstream jitsi/web
 # carrying our in-place patches (see infra/jitsi-web-patched/Dockerfile):
 #   • noise suppression — AudioContext forced to 48 kHz, so a microphone at a
 #     different sample rate is no longer silenced;
@@ -26,8 +26,9 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: italia/pa-webinar-jitsi-web
-  IMAGE_TAG: stable-10741-rnnoise-r3
-  BASE_IMAGE: jitsi/web:stable-10741
+  IMAGE_TAG: stable-11031-rnnoise
+  BASE_TAG: stable-11031
+  BASE_IMAGE: jitsi/web:stable-11031
 
 jobs:
   build:
@@ -70,6 +71,8 @@ jobs:
           # local daemon refuses to load. Disable so the exact validated image
           # loads and is then `docker push`ed unchanged.
           provenance: false
+          build-args: |
+            BASE_TAG=${{ env.BASE_TAG }}
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
 
       # Independent post-build gate on the EXACT image that will be pushed.
@@ -84,12 +87,20 @@ jobs:
           docker run --rm --entrypoint cat "$BASE_IMAGE" /usr/share/jitsi-meet/libs/app.bundle.min.js > orig.js
           # Count OCCURRENCES with `grep -oF … | wc -l` — NOT `grep -c`/`grep -oc`,
           # which count matching LINES and always return 1 on this single-line
-          # minified bundle. The patched form must appear exactly once and the
-          # unpatched target must be gone (catches a missing target AND an
-          # ambiguous over-patch — the mixer `this.audioContext=new AudioContext`
-          # is never a sed target, so it stays intact).
-          test "$(grep -oF 'Xy=new AudioContext({sampleRate:48000}))' patched.js | wc -l | tr -d ' ')" = "1"
-          test "$(grep -oF 'Xy=new AudioContext)' patched.js | wc -l | tr -d ' ')" = "0"
+          # minified bundle.
+          #
+          # Nessun identificatore minificato compare qui: cambiano a ogni build
+          # di upstream (la variabile del contesto rumore e' stata `Xy`, poi
+          # `Vs`) e un ago scritto a mano trasforma ogni bump di versione in
+          # archeologia. Si controlla la FORMA, sull'immagine esatta che verra'
+          # pubblicata: la patch presente una volta sola, il bersaglio sparito
+          # dal bundle patchato e presente una volta sola in quello originale
+          # (cosi' un bersaglio mancante non passa per "gia' a posto"). Il
+          # contesto del mixer locale — `this.audioContext=new AudioContext,` —
+          # non ha la parentesi e non entra in nessuno di questi conteggi.
+          test "$(grep -oF '=new AudioContext({sampleRate:48000}))' patched.js | wc -l | tr -d ' ')" = "1"
+          test "$(grep -oF '=new AudioContext)' patched.js | wc -l | tr -d ' ')" = "0"
+          test "$(grep -oF '=new AudioContext)' orig.js | wc -l | tr -d ' ')" = "1"
           # Syntax-validate. The extraction above uses `--entrypoint cat`: without
           # it the image's s6 init runs first and prepends its own lines to the
           # file, so BOTH bundles failed to parse — and the "only gate when the
@@ -116,9 +127,13 @@ jobs:
           # Self-view patch: an explicit config.disableSelfView=false must win
           # over the value stored in the browser, and the visitor rule must be
           # untouched. Verified on the exact bundle that will be pushed.
-          test "$(grep -oF '(!1!==e["features/base/config"].disableSelfView&&(e["features/base/config"].disableSelfView||e["features/base/settings"].disableSelfView))||e9(e)' patched.js | wc -l | tr -d ' ')" = "1"
-          test "$(grep -oF 'e["features/base/config"].disableSelfView||e["features/base/settings"].disableSelfView||e9(e)' patched.js | wc -l | tr -d ' ')" = "0"
-          test "$(grep -oF 'e["features/base/config"].disableSelfView||e["features/base/settings"].disableSelfView||e9(e)' orig.js | wc -l | tr -d ' ')" = "1"
+          # Anche qui per forma: il nome della funzione sui visitatori e' un
+          # identificatore minificato e cambia a ogni build, quindi lo si lascia
+          # indeterminato invece di fissarlo.
+          SELV='e\["features/base/config"\]\.disableSelfView\|\|e\["features/base/settings"\]\.disableSelfView\|\|[A-Za-z0-9_$]+\(e\)'
+          test "$(grep -oE '\(!1!==e\["features/base/config"\]\.disableSelfView&&' patched.js | wc -l | tr -d ' ')" = "1"
+          test "$(grep -oE "$SELV" patched.js | wc -l | tr -d ' ')" = "0"
+          test "$(grep -oE "$SELV" orig.js | wc -l | tr -d ' ')" = "1"
           echo "self-view selector patched exactly once, and the upstream form is gone"
 
       # Push the EXACT image that was validated above (loaded into the local
