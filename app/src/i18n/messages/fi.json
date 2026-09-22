@@ -420,6 +420,7 @@
       "live": "👥 {count, plural, one {# henkilö} other {# henkilöä}}"
     },
     "sidebarTabChatUnread": "Uusia lukemattomia viestejä",
+    "sidebarTabPollsOpen": "Open poll you have not voted in yet",
     "floatingControlsLabel": "Tapahtuman säätimet",
     "screenshareActive": "🖥️ {name} jakaa näyttöä",
     "screenshareFallbackName": "Osallistuja",
@@ -2584,7 +2585,9 @@
     "errors": {
       "questionRequired": "Kirjoita kyselyn kysymys",
       "minOptions": "Vähintään 2 vaihtoehtoa vaaditaan",
-      "generic": "Virhe kyselyn luomisessa"
+      "generic": "Virhe kyselyn luomisessa",
+      "vote": "Vote not recorded. Try again.",
+      "alreadyVoted": "You have already voted in this poll."
     }
   },
   "materials": {

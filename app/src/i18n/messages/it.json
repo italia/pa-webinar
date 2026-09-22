@@ -434,6 +434,7 @@
       "live": "👥 {count, plural, one {# persona} other {# persone}}"
     },
     "sidebarTabChatUnread": "Nuovi messaggi non letti",
+    "sidebarTabPollsOpen": "Sondaggio aperto in cui non hai ancora votato",
     "floatingControlsLabel": "Controlli evento",
     "screenshareActive": "🖥️ {name} sta condividendo lo schermo",
     "screenshareFallbackName": "Un partecipante",
@@ -512,7 +513,9 @@
     "errors": {
       "questionRequired": "Scrivi la domanda del sondaggio",
       "minOptions": "Servono almeno 2 opzioni",
-      "generic": "Errore nella creazione del sondaggio"
+      "generic": "Errore nella creazione del sondaggio",
+      "vote": "Voto non registrato. Riprova.",
+      "alreadyVoted": "Hai già votato in questo sondaggio."
     }
   },
   "materials": {

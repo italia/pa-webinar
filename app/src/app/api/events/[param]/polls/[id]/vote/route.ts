@@ -7,7 +7,10 @@ import {
   ValidationError,
   AppError,
 } from '@/lib/errors';
+import { deleteCacheByPrefix } from '@/lib/cache';
 import { prisma } from '@/lib/db';
+import { guestWindowOpen } from '@/lib/events/guest-window';
+import { hasJoinGrant } from '@/lib/events/join-grant';
 import { pokeLivePanel } from '@/lib/live-state/publish';
 import { pollVoteSchema } from '@/lib/validation/schemas';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
@@ -80,6 +83,21 @@ export const POST = withErrorHandling(async (request, context) => {
     });
     if (existing) throw new ConflictError('Already voted');
   } else if (guestId) {
+    // Chi vota con l'identificativo del browser — ospiti, relatori e
+    // moderatori, che una registrazione non ce l'hanno — passa di qui.
+    // Attenzione a cosa questo controllo è e a cosa non è: verifica che la
+    // STANZA sia aperta, con la stessa soglia della lettura, non chi bussa.
+    // L'identificativo è scelto dal client, quindi la deduplica vale per
+    // browser onesto: è la stessa garanzia delle reazioni all'agenda, e un
+    // sondaggio in sala non è un'elezione. Legare il voto a un'identità
+    // firmata è un lavoro a sé, non una riga in più qui.
+    if (!guestWindowOpen(event)) {
+      throw new ForbiddenError('Voting requires a participant token');
+    }
+    if (event.joinPasswordHash && !(await hasJoinGrant(event.id))) {
+      throw new ForbiddenError('Voting requires the event join password');
+    }
+
     const rl = rateLimit(`poll-vote-guest:${guestId}`, { limit: 10, windowMs: 60_000 });
     if (!rl.allowed) throw new RateLimitError();
 
@@ -89,15 +107,27 @@ export const POST = withErrorHandling(async (request, context) => {
     if (existing) throw new ConflictError('Already voted');
   }
 
-  await prisma.pollVote.create({
-    data: {
-      pollId,
-      registrationId,
-      guestId: guestId || null,
-      optionIndex,
-    },
-  });
+  try {
+    await prisma.pollVote.create({
+      data: {
+        pollId,
+        registrationId,
+        guestId: guestId || null,
+        optionIndex,
+      },
+    });
+  } catch (e) {
+    // Il controllo qui sopra e la scrittura non sono un'operazione sola: due
+    // clic ravvicinati passano entrambi. È l'indice univoco a dire l'ultima
+    // parola, e quel rifiuto è lo stesso «hai già votato» — non un errore
+    // interno, che il pannello mostrerebbe come guasto.
+    if ((e as { code?: string })?.code === 'P2002') {
+      throw new ConflictError('Already voted');
+    }
+    throw e;
+  }
 
+  deleteCacheByPrefix(`polls:${event.id}`);
   pokeLivePanel(event.id, 'polls');
 
   return Response.json({ ok: true, optionIndex }, { status: 201 });

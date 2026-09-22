@@ -25,6 +25,9 @@ interface PublicQuestion {
 interface QuestionsResponse {
   questions: PublicQuestion[];
   totalCount: number;
+  /** Lo dice il server: il pollice in su richiede l'identità di una
+   *  registrazione. Ospiti e relatori leggono e basta. */
+  canUpvote?: boolean;
 }
 
 interface QuestionListProps {
@@ -67,6 +70,7 @@ export default function QuestionList({
   const topRef = useRef<HTMLDivElement>(null);
 
   const questions = useMemo(() => data?.questions ?? [], [data]);
+  const canUpvote = data?.canUpvote ?? false;
 
   useEffect(() => {
     const firstHighlighted = questions.find((q) => q.status === 'HIGHLIGHTED');
@@ -151,6 +155,7 @@ export default function QuestionList({
             key={q.id}
             question={q}
             isModerator={isModerator}
+            canUpvote={canUpvote}
             onUpvote={handleUpvote}
             onStatusChange={handleStatusChange}
           />
@@ -165,6 +170,7 @@ export default function QuestionList({
 interface QuestionCardProps {
   question: PublicQuestion;
   isModerator: boolean;
+  canUpvote: boolean;
   onUpvote: (id: string) => void;
   onStatusChange: (id: string, status: string) => void;
 }
@@ -172,6 +178,7 @@ interface QuestionCardProps {
 function QuestionCard({
   question,
   isModerator,
+  canUpvote,
   onUpvote,
   onStatusChange,
 }: QuestionCardProps) {
@@ -217,7 +224,7 @@ function QuestionCard({
           </p>
         </div>
 
-        {!isModerator && !isDismissed && (
+        {!isModerator && !isDismissed && canUpvote && (
           <button
             type="button"
             className={`btn btn-sm border-0 d-flex flex-column align-items-center ${
@@ -233,6 +240,18 @@ function QuestionCard({
             />
             <span style={{ fontSize: '0.75rem' }}>{question.upvoteCount}</span>
           </button>
+        )}
+
+        {/* Chi non può votare vede comunque quanto una domanda è sentita: un
+            pulsante che non funziona è peggio di un numero. */}
+        {!isModerator && !isDismissed && !canUpvote && (
+          <span
+            className="text-muted d-flex flex-column align-items-center"
+            style={{ minWidth: '36px', fontSize: '0.75rem' }}
+          >
+            <Icon icon="it-arrow-up" size="sm" />
+            {question.upvoteCount}
+          </span>
         )}
 
         {isModerator && (

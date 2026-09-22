@@ -420,6 +420,7 @@
       "live": "👥 {count, plural, one {# persona} other {# personas}}"
     },
     "sidebarTabChatUnread": "Jauni nelasīti ziņojumi",
+    "sidebarTabPollsOpen": "Open poll you have not voted in yet",
     "floatingControlsLabel": "Pasākuma vadīklas",
     "screenshareActive": "🖥️ {name} koplieto ekrānu",
     "screenshareFallbackName": "Dalībnieks",
@@ -2584,7 +2585,9 @@
     "errors": {
       "questionRequired": "Uzrakstiet aptaujas jautājumu",
       "minOptions": "Nepieciešami vismaz 2 varianti",
-      "generic": "Kļūda, veidojot aptauju"
+      "generic": "Kļūda, veidojot aptauju",
+      "vote": "Vote not recorded. Try again.",
+      "alreadyVoted": "You have already voted in this poll."
     }
   },
   "materials": {

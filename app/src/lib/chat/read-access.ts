@@ -29,20 +29,14 @@ import { resolveTokenSender } from '@/lib/chat/sender';
 import { prisma } from '@/lib/db';
 import { AppError, ForbiddenError } from '@/lib/errors';
 import { eventParamWhere } from '@/lib/events/event-param';
+import { guestWindowOpen } from '@/lib/events/guest-window';
 import { hasJoinGrant } from '@/lib/events/join-grant';
 
 /** Status window in which an anonymous reader may follow the chat. Mirrors the
- *  guest POST branch exactly — if you may write here, you may read here. */
-export function guestChatWindowOpen(event: {
-  status: string;
-  eventType: string;
-}): boolean {
-  return (
-    event.status === 'LIVE' ||
-    (event.eventType === 'INSTANT' &&
-      (event.status === 'PROVISIONING' || event.status === 'IDLE'))
-  );
-}
+ *  guest POST branch exactly — if you may write here, you may read here.
+ *  La condizione vive in `events/guest-window`: la stessa finestra vale per
+ *  Q&A e sondaggi, e due copie divergono. */
+export const guestChatWindowOpen = guestWindowOpen;
 
 /**
  * Resolve read access or throw. Returns the event id so callers don't repeat

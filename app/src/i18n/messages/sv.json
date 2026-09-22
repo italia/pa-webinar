@@ -420,6 +420,7 @@
       "live": "👥 {count, plural, one {# person} other {# personer}}"
     },
     "sidebarTabChatUnread": "Nya olästa meddelanden",
+    "sidebarTabPollsOpen": "Open poll you have not voted in yet",
     "floatingControlsLabel": "Evenemangskontroller",
     "screenshareActive": "🖥️ {name} delar sin skärm",
     "screenshareFallbackName": "En deltagare",
@@ -2584,7 +2585,9 @@
     "errors": {
       "questionRequired": "Skriv omröstningsfrågan",
       "minOptions": "Minst 2 alternativ krävs",
-      "generic": "Fel vid skapande av omröstning"
+      "generic": "Fel vid skapande av omröstning",
+      "vote": "Vote not recorded. Try again.",
+      "alreadyVoted": "You have already voted in this poll."
     }
   },
   "materials": {

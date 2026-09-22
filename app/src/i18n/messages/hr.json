@@ -420,6 +420,7 @@
       "live": "👥 {count, plural, one {# osoba} few {# osobe} other {# osoba}}"
     },
     "sidebarTabChatUnread": "Nove nepročitane poruke",
+    "sidebarTabPollsOpen": "Open poll you have not voted in yet",
     "floatingControlsLabel": "Kontrole događaja",
     "screenshareActive": "🖥️ {name} dijeli zaslon",
     "screenshareFallbackName": "Sudionik",
@@ -2584,7 +2585,9 @@
     "errors": {
       "questionRequired": "Napišite pitanje ankete",
       "minOptions": "Potrebne su najmanje 2 opcije",
-      "generic": "Pogreška pri stvaranju ankete"
+      "generic": "Pogreška pri stvaranju ankete",
+      "vote": "Vote not recorded. Try again.",
+      "alreadyVoted": "You have already voted in this poll."
     }
   },
   "materials": {

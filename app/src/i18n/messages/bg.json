@@ -420,6 +420,7 @@
       "live": "👥 {count, plural, one {# човек} other {# души}}"
     },
     "sidebarTabChatUnread": "Нови непрочетени съобщения",
+    "sidebarTabPollsOpen": "Open poll you have not voted in yet",
     "floatingControlsLabel": "Контроли на събитието",
     "screenshareActive": "🖥️ {name} споделя екрана си",
     "screenshareFallbackName": "Участник",
@@ -2584,7 +2585,9 @@
     "errors": {
       "questionRequired": "Напишете въпроса на анкетата",
       "minOptions": "Необходими са поне 2 варианта",
-      "generic": "Грешка при създаване на анкетата"
+      "generic": "Грешка при създаване на анкетата",
+      "vote": "Vote not recorded. Try again.",
+      "alreadyVoted": "You have already voted in this poll."
     }
   },
   "materials": {

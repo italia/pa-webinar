@@ -420,6 +420,7 @@
       "live": "👥 {count, plural, one {# duine} other {# dhuine}}"
     },
     "sidebarTabChatUnread": "Teachtaireachtaí nua gan léamh",
+    "sidebarTabPollsOpen": "Open poll you have not voted in yet",
     "floatingControlsLabel": "Rialuithe imeachta",
     "screenshareActive": "🖥️ tá {name} ag comhroinnt an scáileáin",
     "screenshareFallbackName": "Rannpháirtí",
@@ -2584,7 +2585,9 @@
     "errors": {
       "questionRequired": "Scríobh ceist na pobalbhreithe",
       "minOptions": "Tá 2 rogha ar a laghad ag teastáil",
-      "generic": "Earráid agus an phobalbhreith á cruthú"
+      "generic": "Earráid agus an phobalbhreith á cruthú",
+      "vote": "Vote not recorded. Try again.",
+      "alreadyVoted": "You have already voted in this poll."
     }
   },
   "materials": {

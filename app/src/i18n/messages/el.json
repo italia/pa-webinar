@@ -420,6 +420,7 @@
       "live": "👥 {count, plural, one {# άτομο} other {# άτομα}}"
     },
     "sidebarTabChatUnread": "Νέα μη αναγνωσμένα μηνύματα",
+    "sidebarTabPollsOpen": "Open poll you have not voted in yet",
     "floatingControlsLabel": "Χειριστήρια εκδήλωσης",
     "screenshareActive": "🖥️ Ο/Η {name} μοιράζεται την οθόνη",
     "screenshareFallbackName": "Ένας συμμετέχων",
@@ -2584,7 +2585,9 @@
     "errors": {
       "questionRequired": "Γράψτε την ερώτηση δημοσκόπησης",
       "minOptions": "Απαιτούνται τουλάχιστον 2 επιλογές",
-      "generic": "Σφάλμα κατά τη δημιουργία της δημοσκόπησης"
+      "generic": "Σφάλμα κατά τη δημιουργία της δημοσκόπησης",
+      "vote": "Vote not recorded. Try again.",
+      "alreadyVoted": "You have already voted in this poll."
     }
   },
   "materials": {

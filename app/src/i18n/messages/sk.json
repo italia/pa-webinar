@@ -420,6 +420,7 @@
       "live": "👥 {count, plural, one {# osoba} other {# osôb}}"
     },
     "sidebarTabChatUnread": "Nové neprečítané správy",
+    "sidebarTabPollsOpen": "Open poll you have not voted in yet",
     "floatingControlsLabel": "Ovládanie podujatia",
     "screenshareActive": "🖥️ {name} zdieľa obrazovku",
     "screenshareFallbackName": "Účastník",
@@ -2584,7 +2585,9 @@
     "errors": {
       "questionRequired": "Napíšte otázku ankety",
       "minOptions": "Sú potrebné aspoň 2 možnosti",
-      "generic": "Chyba pri vytváraní ankety"
+      "generic": "Chyba pri vytváraní ankety",
+      "vote": "Vote not recorded. Try again.",
+      "alreadyVoted": "You have already voted in this poll."
     }
   },
   "materials": {

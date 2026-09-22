@@ -420,6 +420,7 @@
       "live": "👥 {count, plural, one {# persoon} other {# personen}}"
     },
     "sidebarTabChatUnread": "Nieuwe ongelezen berichten",
+    "sidebarTabPollsOpen": "Open poll you have not voted in yet",
     "floatingControlsLabel": "Bediening evenement",
     "screenshareActive": "🖥️ {name} deelt het scherm",
     "screenshareFallbackName": "Een deelnemer",
@@ -2584,7 +2585,9 @@
     "errors": {
       "questionRequired": "Schrijf de peilingvraag",
       "minOptions": "Er zijn ten minste 2 opties vereist",
-      "generic": "Fout bij het aanmaken van de peiling"
+      "generic": "Fout bij het aanmaken van de peiling",
+      "vote": "Vote not recorded. Try again.",
+      "alreadyVoted": "You have already voted in this poll."
     }
   },
   "materials": {

@@ -420,6 +420,7 @@
       "live": "👥 {count, plural, one {# inimene} other {# inimest}}"
     },
     "sidebarTabChatUnread": "Uued lugemata sõnumid",
+    "sidebarTabPollsOpen": "Open poll you have not voted in yet",
     "floatingControlsLabel": "Sündmuse juhtnupud",
     "screenshareActive": "🖥️ {name} jagab oma ekraani",
     "screenshareFallbackName": "Osaleja",
@@ -2584,7 +2585,9 @@
     "errors": {
       "questionRequired": "Kirjutage küsitluse küsimus",
       "minOptions": "Vaja on vähemalt 2 varianti",
-      "generic": "Viga küsitluse loomisel"
+      "generic": "Viga küsitluse loomisel",
+      "vote": "Vote not recorded. Try again.",
+      "alreadyVoted": "You have already voted in this poll."
     }
   },
   "materials": {

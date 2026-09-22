@@ -420,6 +420,7 @@
       "live": "👥 {count, plural, one {# fő} other {# fő}}"
     },
     "sidebarTabChatUnread": "Új, olvasatlan üzenetek",
+    "sidebarTabPollsOpen": "Open poll you have not voted in yet",
     "floatingControlsLabel": "Eseményvezérlők",
     "screenshareActive": "🖥️ {name} képernyőt oszt meg",
     "screenshareFallbackName": "Egy résztvevő",
@@ -2584,7 +2585,9 @@
     "errors": {
       "questionRequired": "Írja be a szavazás kérdését",
       "minOptions": "Legalább 2 lehetőség szükséges",
-      "generic": "Hiba a szavazás létrehozásakor"
+      "generic": "Hiba a szavazás létrehozásakor",
+      "vote": "Vote not recorded. Try again.",
+      "alreadyVoted": "You have already voted in this poll."
     }
   },
   "materials": {

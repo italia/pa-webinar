@@ -420,6 +420,7 @@
       "live": "👥 {count, plural, one {# asmuo} other {# asmenys}}"
     },
     "sidebarTabChatUnread": "Naujos neperskaitytos žinutės",
+    "sidebarTabPollsOpen": "Open poll you have not voted in yet",
     "floatingControlsLabel": "Renginio valdikliai",
     "screenshareActive": "🖥️ {name} dalijasi ekranu",
     "screenshareFallbackName": "Dalyvis",
@@ -2584,7 +2585,9 @@
     "errors": {
       "questionRequired": "Parašykite apklausos klausimą",
       "minOptions": "Reikia bent 2 variantų",
-      "generic": "Klaida kuriant apklausą"
+      "generic": "Klaida kuriant apklausą",
+      "vote": "Vote not recorded. Try again.",
+      "alreadyVoted": "You have already voted in this poll."
     }
   },
   "materials": {

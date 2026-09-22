@@ -420,6 +420,7 @@
       "live": "👥 {count, plural, one {# persuna} other {# persuni}}"
     },
     "sidebarTabChatUnread": "Messaġġi ġodda mhux moqrija",
+    "sidebarTabPollsOpen": "Open poll you have not voted in yet",
     "floatingControlsLabel": "Kontrolli tal-avveniment",
     "screenshareActive": "🖥️ {name} qed jaqsam l-iskrin",
     "screenshareFallbackName": "Parteċipant",
@@ -2584,7 +2585,9 @@
     "errors": {
       "questionRequired": "Ikteb il-mistoqsija tal-istħarriġa",
       "minOptions": "Hemm bżonn ta' mill-inqas 2 għażliet",
-      "generic": "Żball fil-ħolqien tal-istħarriġa"
+      "generic": "Żball fil-ħolqien tal-istħarriġa",
+      "vote": "Vote not recorded. Try again.",
+      "alreadyVoted": "You have already voted in this poll."
     }
   },
   "materials": {

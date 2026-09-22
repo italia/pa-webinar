@@ -14,7 +14,7 @@ import { pokeLivePanel } from '@/lib/live-state/publish';
 import { createQuestionSchema } from '@/lib/validation/schemas';
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
-import { isEventModeratorCached } from '@/lib/auth/moderator';
+import { authorizePanelRead } from '@/lib/events/panel-read-access';
 import { getCached, setCache, deleteCacheByPrefix } from '@/lib/cache';
 
 export const dynamic = 'force-dynamic';
@@ -27,31 +27,21 @@ export const GET = withErrorHandling(async (request, context) => {
   const { param: slug } = await context.params;
   const url = new URL(request.url);
   const authHeader = request.headers.get('authorization');
-  const token = authHeader?.startsWith('Bearer ')
+  const headerToken = authHeader?.startsWith('Bearer ')
     ? authHeader.slice(7).trim()
-    : url.searchParams.get('token');
-
-  if (!token) throw new UnauthorizedError('Token required');
+    : null;
+  // Bearer vuoto = ospite: la sala passa `token=""` a chi entra dal link, e
+  // `Bearer ` senza valore non è un token sbagliato, è l'assenza di token.
+  const token = headerToken || url.searchParams.get('token') || null;
 
   const event = await prisma.event.findUnique({ where: { slug } });
   if (!event) throw new NotFoundError('Event');
 
-  // Variante cache-ata: questa GET è pollata via SWR da ogni partecipante e
-  // la lookup co-moderatore sarebbe un miss DB garantito a ogni richiesta,
-  // vanificando la cache qa: qui sotto.
-  const isModerator = await isEventModeratorCached(event, token);
-  let registrationId: string | null = null;
-
-  if (!isModerator) {
-    const reg = await prisma.registration.findUnique({
-      where: { accessToken: token },
-      select: { id: true, eventId: true },
-    });
-    if (!reg || reg.eventId !== event.id) {
-      throw new ForbiddenError('Invalid token');
-    }
-    registrationId = reg.id;
-  }
+  // Regola di lettura condivisa con i sondaggi: ospiti e relatori sono in
+  // sala e devono vedere il pannello. La lookup co-moderatore che sta dentro
+  // resta cache-ata: questa GET è pollata via SWR da ogni partecipante e
+  // sarebbe un miss DB garantito a ogni richiesta.
+  const { isModerator, registrationId } = await authorizePanelRead(event, token);
 
   const statusFilter = url.searchParams.get('status') as QuestionStatus | null;
 
@@ -98,6 +88,11 @@ export const GET = withErrorHandling(async (request, context) => {
   interface QaResponse {
     questions: (CachedQuestion & { hasUpvoted: boolean })[];
     totalCount: number;
+    /** Il pollice in su ha bisogno di un'identità che il server sappia
+     *  riconoscere, e ce l'ha solo chi si è iscritto. Ospiti e relatori
+     *  leggono; senza questo campo il pannello mostrava loro un pulsante che
+     *  rispondeva 401 in silenzio. */
+    canUpvote: boolean;
   }
 
   let cachedQuestions: CachedQuestion[] | null = null;
@@ -151,6 +146,7 @@ export const GET = withErrorHandling(async (request, context) => {
   const response: QaResponse = {
     questions: [...highlighted, ...rest],
     totalCount: result.length,
+    canUpvote: registrationId !== null,
   };
 
   return Response.json(response, {

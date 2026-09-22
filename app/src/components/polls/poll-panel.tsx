@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button, Icon } from 'design-react-kit';
 import useSWR from 'swr';
@@ -28,24 +28,53 @@ interface PollsResponse {
 
 interface PollPanelProps {
   eventSlug: string;
+  /** Token di sala: moderatore, relatore o partecipante registrato. Vuoto per
+   *  gli ospiti, che entrano dal link e non ne hanno uno. Serve alla lettura e
+   *  alle azioni di moderazione, NON al voto. */
   token: string;
   isModerator: boolean;
+  /** L'`accessToken` della registrazione, e solo quello: è l'identità con cui
+   *  il server registra il voto di un partecipante iscritto. Un token
+   *  moderatore qui dentro vale un 403 — non è una registrazione. */
+  voterAccessToken?: string;
+  /** Identificativo stabile del browser per chi una registrazione non ce l'ha
+   *  (ospiti, relatori, moderatori): è così che votano, ed è la chiave con cui
+   *  il server evita il doppio voto. */
+  voterGuestId?: string;
+  /** La scheda dei sondaggi è quella aperta: senza push si interroga più
+   *  spesso, e i sondaggi da votare smettono di essere «da notificare». */
+  active?: boolean;
+  /** Quanti sondaggi aperti la persona non ha ancora votato: la barra delle
+   *  schede ci accende il pallino. */
+  onUnvotedCountChange?: (count: number) => void;
 }
 
 export default function PollPanel({
   eventSlug,
   token,
   isModerator,
+  voterAccessToken,
+  voterGuestId,
+  active = true,
+  onUnvotedCountChange,
 }: PollPanelProps) {
   const t = useTranslations('polls');
   const [showCreate, setShowCreate] = useState(false);
+  const [voteError, setVoteError] = useState<string | null>(null);
 
   const apiUrl = `/api/events/${eventSlug}/polls`;
+  // L'identificativo del browser entra nella chiave perché la risposta ne
+  // dipende: è quello che dice «questo l'hai già votato tu».
+  const swrKey = voterGuestId
+    ? `${apiUrl}?guestId=${encodeURIComponent(voterGuestId)}`
+    : apiUrl;
 
   const fetcher = useCallback(
     async (url: string) => {
       const r = await fetch(url, {
-        headers: { Authorization: `Bearer ${token}` },
+        // Un ospite non ha token: mandare `Bearer ` vuoto è ciò che faceva
+        // rispondere 401 a tutta la sala di una chiamata istantanea.
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
       });
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
       return r.json();
@@ -55,23 +84,52 @@ export default function PollPanel({
 
   const pushLive = useLivePush();
 
-  const { data, mutate } = useSWR<PollsResponse>(apiUrl, fetcher, {
-    // Spento quando il canale consegna: il pannello viene avvisato.
-    refreshInterval: pushLive ? 0 : 3000,
+  const { data, mutate } = useSWR<PollsResponse>(swrKey, fetcher, {
+    // Spento quando il canale consegna: il pannello viene avvisato. Senza
+    // canale il pannello resta montato anche su un'altra scheda, per poter
+    // accendere il pallino: lì basta un giro molto più lento.
+    refreshInterval: pushLive ? 0 : active ? 3000 : 15000,
   });
 
   const polls = data?.polls ?? [];
 
+  const unvotedCount = polls.filter((p) => p.status === 'OPEN' && !p.hasVoted).length;
+  useEffect(() => {
+    onUnvotedCountChange?.(unvotedCount);
+  }, [unvotedCount, onUnvotedCountChange]);
+
   const handleVote = useCallback(
     async (pollId: string, optionIndex: number) => {
-      await fetch(`/api/events/${eventSlug}/polls/${pollId}/vote`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ optionIndex, accessToken: token }),
-      });
-      mutate();
+      // Un'identità serve: senza, il server rifiuta e il voto sparirebbe in
+      // silenzio (è esattamente il difetto che questo pannello aveva).
+      const identity = voterAccessToken
+        ? { accessToken: voterAccessToken }
+        : voterGuestId
+          ? { guestId: voterGuestId }
+          : null;
+      if (!identity) {
+        setVoteError(t('errors.vote'));
+        return;
+      }
+
+      setVoteError(null);
+      try {
+        const res = await fetch(`/api/events/${eventSlug}/polls/${pollId}/vote`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ optionIndex, ...identity }),
+        });
+        if (!res.ok) {
+          setVoteError(res.status === 409 ? t('errors.alreadyVoted') : t('errors.vote'));
+        }
+      } catch {
+        setVoteError(t('errors.vote'));
+      }
+      // Si rilegge comunque: dopo un 409 la verità sul server è già diversa
+      // da quella a schermo, ed è quella che va mostrata.
+      void mutate();
     },
-    [eventSlug, token, mutate],
+    [eventSlug, voterAccessToken, voterGuestId, mutate, t],
   );
 
   const handleStatusChange = useCallback(
@@ -138,6 +196,12 @@ export default function PollPanel({
                 </Button>
               )}
             </div>
+          )}
+
+          {voteError && (
+            <p className="text-danger small mb-2" role="alert">
+              {voteError}
+            </p>
           )}
 
           {polls.length === 0 && (

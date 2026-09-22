@@ -420,6 +420,7 @@
       "live": "👥 {count, plural, one {# persoană} other {# persoane}}"
     },
     "sidebarTabChatUnread": "Mesaje noi necitite",
+    "sidebarTabPollsOpen": "Open poll you have not voted in yet",
     "floatingControlsLabel": "Comenzi eveniment",
     "screenshareActive": "🖥️ {name} partajează ecranul",
     "screenshareFallbackName": "Un participant",
@@ -2584,7 +2585,9 @@
     "errors": {
       "questionRequired": "Scrieți întrebarea sondajului",
       "minOptions": "Sunt necesare cel puțin 2 opțiuni",
-      "generic": "Eroare la crearea sondajului"
+      "generic": "Eroare la crearea sondajului",
+      "vote": "Vote not recorded. Try again.",
+      "alreadyVoted": "You have already voted in this poll."
     }
   },
   "materials": {

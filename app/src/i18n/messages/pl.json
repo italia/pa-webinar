@@ -420,6 +420,7 @@
       "live": "👥 {count, plural, one {# osoba} few {# osoby} many {# osób} other {# osób}}"
     },
     "sidebarTabChatUnread": "Nowe nieprzeczytane wiadomości",
+    "sidebarTabPollsOpen": "Open poll you have not voted in yet",
     "floatingControlsLabel": "Sterowanie wydarzeniem",
     "screenshareActive": "🖥️ {name} udostępnia ekran",
     "screenshareFallbackName": "Uczestnik",
@@ -2584,7 +2585,9 @@
     "errors": {
       "questionRequired": "Proszę wpisać pytanie ankiety",
       "minOptions": "Wymagane są co najmniej 2 opcje",
-      "generic": "Błąd podczas tworzenia ankiety"
+      "generic": "Błąd podczas tworzenia ankiety",
+      "vote": "Vote not recorded. Try again.",
+      "alreadyVoted": "You have already voted in this poll."
     }
   },
   "materials": {

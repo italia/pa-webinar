@@ -420,6 +420,7 @@
       "live": "👥 {count, plural, one {# persona} other {# personas}}"
     },
     "sidebarTabChatUnread": "Mensajes nuevos sin leer",
+    "sidebarTabPollsOpen": "Open poll you have not voted in yet",
     "floatingControlsLabel": "Controles del evento",
     "screenshareActive": "🖥️ {name} está compartiendo la pantalla",
     "screenshareFallbackName": "Un participante",
@@ -2584,7 +2585,9 @@
     "errors": {
       "questionRequired": "Escriba la pregunta de la encuesta",
       "minOptions": "Se necesitan al menos 2 opciones",
-      "generic": "Error al crear la encuesta"
+      "generic": "Error al crear la encuesta",
+      "vote": "Vote not recorded. Try again.",
+      "alreadyVoted": "You have already voted in this poll."
     }
   },
   "materials": {

@@ -36,7 +36,10 @@ export default function PollCard({
   const isOpen = poll.status === 'OPEN';
   const isClosed = poll.status === 'CLOSED';
   const isPublished = poll.status === 'PUBLISHED';
-  const canVote = isOpen && !poll.hasVoted && !isModerator;
+  // Anche chi conduce vota: in una riunione il moderatore è una delle persone
+  // in sala, e un sondaggio in cui non può esprimersi era la stessa cosa che
+  // agli ospiti appariva come «sondaggio rotto».
+  const canVote = isOpen && !poll.hasVoted;
   const showResults = poll.optionCounts !== null;
 
   return (
@@ -61,9 +64,47 @@ export default function PollCard({
             : 0;
           const isVoted = poll.votedOptionIndex === idx;
 
+          // Chi vede i risultati mentre il voto è aperto — il moderatore —
+          // vota SULLA riga dei risultati: sostituirla con un pulsante nudo
+          // gli toglierebbe di sotto il conteggio dal vivo, che è il motivo
+          // per cui sta guardando il pannello.
+          const resultRow = (
+            <div
+              className="position-relative rounded overflow-hidden"
+              style={{
+                backgroundColor: '#f0f0f0',
+                fontSize: '0.82rem',
+                minHeight: 28,
+              }}
+            >
+              {showResults && (
+                <div
+                  className="position-absolute top-0 start-0 h-100"
+                  style={{
+                    width: `${pct}%`,
+                    backgroundColor: isVoted ? '#0066CC' : '#B0C4DE',
+                    opacity: 0.3,
+                    transition: 'width 0.3s',
+                  }}
+                />
+              )}
+              <div className="position-relative d-flex justify-content-between align-items-center px-2 py-1">
+                <span className={isVoted ? 'fw-semibold' : ''}>
+                  {isVoted && <Icon icon="it-check" size="xs" className="me-1" />}
+                  {option}
+                </span>
+                {showResults && (
+                  <span className="text-muted" style={{ fontSize: '0.75rem' }}>
+                    {pct}% ({count})
+                  </span>
+                )}
+              </div>
+            </div>
+          );
+
           return (
             <div key={idx}>
-              {canVote ? (
+              {canVote && !showResults ? (
                 <button
                   type="button"
                   className="btn btn-sm btn-outline-primary w-100 text-start py-1 px-2"
@@ -72,38 +113,16 @@ export default function PollCard({
                 >
                   {option}
                 </button>
-              ) : (
-                <div
-                  className="position-relative rounded overflow-hidden"
-                  style={{
-                    backgroundColor: '#f0f0f0',
-                    fontSize: '0.82rem',
-                    minHeight: 28,
-                  }}
+              ) : canVote ? (
+                <button
+                  type="button"
+                  className="w-100 text-start p-0 border-0 bg-transparent"
+                  onClick={() => onVote(poll.id, idx)}
                 >
-                  {showResults && (
-                    <div
-                      className="position-absolute top-0 start-0 h-100"
-                      style={{
-                        width: `${pct}%`,
-                        backgroundColor: isVoted ? '#0066CC' : '#B0C4DE',
-                        opacity: 0.3,
-                        transition: 'width 0.3s',
-                      }}
-                    />
-                  )}
-                  <div className="position-relative d-flex justify-content-between align-items-center px-2 py-1">
-                    <span className={isVoted ? 'fw-semibold' : ''}>
-                      {isVoted && <Icon icon="it-check" size="xs" className="me-1" />}
-                      {option}
-                    </span>
-                    {showResults && (
-                      <span className="text-muted" style={{ fontSize: '0.75rem' }}>
-                        {pct}% ({count})
-                      </span>
-                    )}
-                  </div>
-                </div>
+                  {resultRow}
+                </button>
+              ) : (
+                resultRow
               )}
             </div>
           );

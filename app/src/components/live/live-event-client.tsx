@@ -280,8 +280,15 @@ export default function LiveEventClient({
   // a network-induced Jitsi reconnect keeps the same identity (poll/agenda
   // dedup + "my reaction" recall depend on it). SSR-safe: falls back to a
   // fresh in-memory id when window/localStorage is unavailable.
+  // Identità con cui si vota e si reagisce. Chi si è iscritto ha un
+  // `accessToken` di registrazione; ospiti, relatori e moderatori non ce
+  // l'hanno e usano l'identificativo stabile del browser qui sotto. Il token
+  // moderatore NON è un'identità di voto: il server lo cerca fra le
+  // registrazioni e risponde 403.
+  const registeredAccessToken =
+    !isGuest && !isModerator && !isSpeaker && token ? token : undefined;
   const [guestId] = useState(() => {
-    if (!isGuest) return '';
+    if (registeredAccessToken) return '';
     const fresh = () => `guest_${Math.random().toString(36).slice(2, 10)}`;
     if (typeof window === 'undefined') return fresh();
     try {
@@ -1120,7 +1127,7 @@ export default function LiveEventClient({
   const feedbackModal = showFeedback ? (
     <PostEventFeedbackModal
       eventSlug={event.slug}
-      accessToken={!isGuest && !isModerator && !isSpeaker ? token : undefined}
+      accessToken={registeredAccessToken}
       guestId={isGuest ? guestId : undefined}
       onClose={handleFeedbackClose}
     />
@@ -1489,6 +1496,8 @@ export default function LiveEventClient({
           displayName={credentials.displayName}
           canReactAgenda={!isModerator && !isSpeaker}
           guestId={isGuest ? guestId : undefined}
+          voterAccessToken={registeredAccessToken}
+          voterGuestId={registeredAccessToken ? undefined : guestId}
         />
       </div>
 
@@ -1680,6 +1689,11 @@ interface LiveSidebarProps {
   /** Stable guest id (anonymous) for agenda-reaction dedup; undefined for
    *  registered participants (identified by their accessToken). */
   guestId?: string;
+  /** Identità di voto nei sondaggi: l'`accessToken` di una registrazione… */
+  voterAccessToken?: string;
+  /** …oppure l'identificativo stabile del browser, per chi una registrazione
+   *  non ce l'ha (ospiti, relatori, moderatori). Esattamente uno dei due. */
+  voterGuestId?: string;
 }
 
 function LiveSidebar({
@@ -1695,6 +1709,8 @@ function LiveSidebar({
   displayName,
   canReactAgenda = false,
   guestId,
+  voterAccessToken,
+  voterGuestId,
 }: LiveSidebarProps) {
   const t = useTranslations('live');
   // Live feature flags: i flag arrivano come props al mount, ma un moderatore
@@ -1769,7 +1785,11 @@ function LiveSidebar({
   // A chat is "active" when the Chat tab is selected AND (on mobile)
   // the drawer is open.
   const [chatUnread, setChatUnread] = useState(0);
+  // Sondaggi aperti in cui questa persona non ha ancora votato: il pannello
+  // resta montato anche su un'altra scheda apposta per poterlo dire.
+  const [pollsUnvoted, setPollsUnvoted] = useState(0);
   const isChatActive = activeTab === 'chat';
+  const isPollsActive = activeTab === 'polls';
   // Browser tab title flash: when unread increases while document is
   // hidden, prefix the title with "● ". Restore on focus. We scope
   // the effect to *this* sidebar instance so at most one listener is
@@ -1819,6 +1839,9 @@ function LiveSidebar({
     svg: React.ReactNode;
     badge?: number;
     dot?: boolean;
+    /** Testo del pallino per chi usa uno screen reader: dire «messaggi non
+     *  letti» sopra la scheda dei sondaggi è peggio che non dire niente. */
+    dotLabel?: string;
     show: boolean;
   }> = [
     // Chat first: it is the primary audience channel, so it
@@ -1843,6 +1866,7 @@ function LiveSidebar({
         </svg>
       ),
       dot: chatUnread > 0,
+      dotLabel: t('sidebarTabChatUnread'),
       show: showChat,
     },
     {
@@ -1888,6 +1912,11 @@ function LiveSidebar({
           <path d="M7 14l4-4 4 4 5-5" />
         </svg>
       ),
+      // Un sondaggio aperto va notato anche da chi in quel momento sta
+      // guardando la chat: senza questo segno, il canale avvisava il pannello
+      // e il pannello non avvisava nessuno.
+      dot: pollsUnvoted > 0 && !isPollsActive,
+      dotLabel: t('sidebarTabPollsOpen'),
       show: true,
     },
     {
@@ -2060,8 +2089,8 @@ function LiveSidebar({
             {tab.dot && (
               <span
                 className="live-floating-btn__dot"
-                aria-label={t('sidebarTabChatUnread')}
-                title={t('sidebarTabChatUnread')}
+                aria-label={tab.dotLabel}
+                title={tab.dotLabel}
               />
             )}
           </button>
@@ -2232,9 +2261,25 @@ function LiveSidebar({
               />
             </div>
           )}
-          {activeTab === 'polls' && (
-            <PollPanel eventSlug={eventSlug} token={token} isModerator={isModerator} />
-          )}
+          {/* Come la chat: MONTATO anche quando la scheda non è quella attiva,
+              perché è il pannello stesso a sapere se c'è un sondaggio da
+              votare — e non può dirlo se viene smontato. Nascosto con
+              d-flex/d-none: le utility di Bootstrap Italia sono !important e
+              vincono su un `display` inline. */}
+          <div
+            className={`flex-column flex-grow-1 ${isPollsActive ? 'd-flex' : 'd-none'}`}
+            style={{ minHeight: 0 }}
+          >
+            <PollPanel
+              eventSlug={eventSlug}
+              token={token}
+              isModerator={isModerator}
+              voterAccessToken={voterAccessToken}
+              voterGuestId={voterGuestId}
+              active={isPollsActive}
+              onUnvotedCountChange={setPollsUnvoted}
+            />
+          </div>
           {activeTab === 'wordcloud' && effWordCloud && (
             <WordCloud eventSlug={eventSlug} token={token} isModerator={isModerator} />
           )}
