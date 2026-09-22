@@ -1366,8 +1366,9 @@ function ScalingTab({ settings, updateField }: TabProps) {
 
   return (
     <div>
+      {/* Nessuna <Icon> qui dentro: Bootstrap Italia disegna già la sua
+          nell'.alert, e la seconda comparirebbe accanto alla prima. */}
       <Alert color="info" className="mb-4">
-        <Icon icon="it-info-circle" className="me-2" />
         {t('intro')}
       </Alert>
 
@@ -1379,11 +1380,16 @@ function ScalingTab({ settings, updateField }: TabProps) {
         <Col md={5}>
           <FormGroup>
             <Label htmlFor="videoQuality">{t('videoQuality')}</Label>
-            <Input
+            {/* <select> nativo, non <Input type="select">: quel wrapper rende
+                un <input>, e un elemento vuoto con dei figli fa cadere React
+                (#137) portandosi via l'intera schermata delle impostazioni —
+                non solo questa scheda. È già successo, ed è per questo che il
+                resto del file usa il <select> nativo. */}
+            <select
+              className="form-select"
               id="videoQuality"
-              type="select"
               value={settings.videoQuality ?? 'HIGH'}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              onChange={(e) =>
                 updateField('videoQuality', e.target.value as SiteSetting['videoQuality'])
               }
             >
@@ -1393,7 +1399,7 @@ function ScalingTab({ settings, updateField }: TabProps) {
                   {t(`videoQualityOptions.${q}`)}
                 </option>
               ))}
-            </Input>
+            </select>
             <small className="text-muted d-block mt-1">{t('videoQualityHelp')}</small>
           </FormGroup>
         </Col>
