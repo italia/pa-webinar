@@ -37,11 +37,25 @@ export async function generateMetadata({
 
   const baseUrl = getPublicEnv('NEXT_PUBLIC_APP_URL');
   const pageUrl = localizedUrl(baseUrl, `/events/${slug}`, locale);
+  // Assoluta: i servizi che mostrano le anteprime leggono il tag senza avere
+  // un'origine su cui risolvere un percorso relativo. Porta con se' il momento
+  // dell'ultima modifica perche' quei servizi tengono in cache l'immagine per
+  // INDIRIZZO, anche per giorni: senza, correggere un titolo o sostituire la
+  // locandina la mattina dell'evento non cambierebbe nulla di cio' che vede
+  // chi riceve il link. Lo slug si codifica: da qui in poi e' un indirizzo con
+  // una parte di interrogazione, e un carattere speciale se la mangerebbe.
+  const scheda = settings.ogCardEnabled
+    ? `${baseUrl}/api/og/event/${encodeURIComponent(slug)}` +
+      `?locale=${locale}&v=${event.updatedAt.getTime()}`
+    : null;
 
   return {
     title,
     description: description.slice(0, 160),
-    // Immagine dell'anteprima: la copertina dell'evento se c'è (è la più
+    // Immagine dell'anteprima: la scheda composta dal server quando
+    // l'amministrazione la vuole (titolo, data e relatori DENTRO l'immagine,
+    // che e' l'unica cosa che molte applicazioni mostrano di un link), oppure
+    // il comportamento storico: la copertina dell'evento se c'è (è la più
     // pertinente per un link condiviso), altrimenti il logo di default. Va
     // messa QUI e non ereditata dal layout: Next sostituisce l'openGraph per
     // segmento, non lo fonde (vedi lib/seo). La copertina 16:9 (`coverImageUrl`)
@@ -55,12 +69,14 @@ export async function generateMetadata({
       type: 'website',
       locale: locale === 'en' ? 'en_GB' : 'it_IT',
       siteName: settings.siteName || 'PA Webinar',
-      images: openGraphImages(event.coverImageUrl ?? event.imageUrl),
+      images: scheda
+        ? [{ url: scheda, width: 1200, height: 630 }]
+        : openGraphImages(event.coverImageUrl ?? event.imageUrl),
     },
     twitter: twitterImageCard(
       title,
       description.slice(0, 160),
-      event.coverImageUrl ?? event.imageUrl,
+      scheda ?? event.coverImageUrl ?? event.imageUrl,
     ),
     alternates: {
       canonical: pageUrl,

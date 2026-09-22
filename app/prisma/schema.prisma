@@ -1128,6 +1128,18 @@ model SiteSetting {
   seoDescription String  @default("") @map("seo_description") @db.Text
   seoImage       String? @map("seo_image")
 
+  // Anteprima dei link condivisi (OpenGraph). L'immagine di un evento non e'
+  // piu' la sola locandina ritagliata dal social: e' una scheda composta dal
+  // server con quello che serve a capire di che si tratta senza aprire il
+  // link. Cosa entrarci lo decide l'amministrazione, perche' cambia da ente a
+  // ente: chi non mette mai una locandina vuole il logo grande, chi fa serie
+  // ricorrenti vuole la data, chi lavora con relatori esterni vuole i nomi.
+  ogCardEnabled      Boolean @default(true) @map("og_card_enabled")
+  ogShowPoster       Boolean @default(true) @map("og_show_poster")
+  ogShowDate         Boolean @default(true) @map("og_show_date")
+  ogShowSpeakers     Boolean @default(true) @map("og_show_speakers")
+  ogShowOrganization Boolean @default(true) @map("og_show_organization")
+
   // Home page
   homePageMode   HomePageMode @default(LANDING) @map("home_page_mode")
   customHomeHtml String?      @map("custom_home_html") @db.Text

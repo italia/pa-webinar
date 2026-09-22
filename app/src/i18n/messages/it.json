@@ -1524,7 +1524,19 @@
         "description": "Descrizione SEO",
         "descriptionHelp": "Descrizione per i motori di ricerca e le condivisioni social",
         "image": "Immagine Open Graph",
-        "imageHelp": "Immagine predefinita per le condivisioni social (1200x630 consigliato)"
+        "imageHelp": "Immagine predefinita per le condivisioni social (1200x630 consigliato)",
+        "ogSection": "Anteprima dei link condivisi",
+        "ogIntro": "Quando qualcuno incolla il link di un evento in chat o su un social, la piattaforma disegna un'immagine di anteprima con le informazioni dentro. Scegli quali: ogni campo in più toglie spazio al titolo.",
+        "ogCardEnabled": "Genera l'anteprima",
+        "ogCardEnabledHelp": "Spento, il link mostra la locandina così com'è (o il logo del sito se l'evento non ne ha una), senza titolo né data leggibili nell'immagine.",
+        "ogShowPoster": "Locandina come sfondo",
+        "ogShowPosterHelp": "Usa la copertina dell'evento come sfondo dell'anteprima, velata perché il testo resti leggibile. Senza locandina, o con questa opzione spenta, resta il colore istituzionale con il logo.",
+        "ogShowDate": "Data e ora",
+        "ogShowDateHelp": "Nel fuso orario predefinito della piattaforma.",
+        "ogShowSpeakers": "Relatori",
+        "ogShowSpeakersHelp": "Il testo dei relatori dell'evento, accorciato se troppo lungo.",
+        "ogShowOrganization": "Ente",
+        "ogShowOrganizationHelp": "L'organizzatore dell'evento se indicato, altrimenti il nome dell'organizzazione."
       },
       "homepage": {
         "modeLabel": "Modalità home page",

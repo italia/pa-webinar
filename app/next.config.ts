@@ -96,6 +96,20 @@ const nextConfig: NextConfig = {
   output: 'standalone',
   outputFileTracingRoot: path.join(__dirname, '..'),
 
+  // I font della scheda di anteprima dei link condivisi. Il generatore di
+  // immagini li legge dal disco a runtime, e il tracciamento delle dipendenze
+  // segue gli import del codice: un .ttf che nessuno importa non entrerebbe
+  // nell'immagine, e la rotta fallirebbe solo in produzione. Il design system
+  // e' gia' fra le dipendenze — duplicare i file font nel repo vorrebbe dire
+  // due copie da tenere allineate. Entrambi i percorsi perche' l'albero delle
+  // dipendenze puo' essere sollevato alla radice o restare nel workspace.
+  outputFileTracingIncludes: {
+    '/api/og/event/[slug]': [
+      '../node_modules/bootstrap-italia/src/fonts/Titillium_Web/*.ttf',
+      './node_modules/bootstrap-italia/src/fonts/Titillium_Web/*.ttf',
+    ],
+  },
+
   webpack(config, { webpack, dev, isServer }) {
     // Dev doesn't minify, so there's nothing to repair there; the server and
     // edge compilations emit no client stylesheet at all.

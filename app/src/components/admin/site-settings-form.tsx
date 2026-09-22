@@ -553,6 +553,62 @@ function SeoTab({ settings, updateField }: TabProps) {
           helpText={t('imageHelp')}
         />
       </FormGroup>
+
+      <hr className="my-4" />
+
+      {/* Cosa entra nell'anteprima che compare quando qualcuno incolla il link
+          di un evento. Sono interruttori e non un modello libero perche' ogni
+          campo in piu' toglie spazio al titolo: la scelta e' quali tre cose
+          contano per questo ente, non quante se ne possono stipare. */}
+      <h5 className="fw-semibold mb-1" style={{ color: 'var(--app-text)' }}>
+        {t('ogSection')}
+      </h5>
+      <p className="text-muted mb-3" style={{ fontSize: '0.88rem' }}>
+        {t('ogIntro')}
+      </p>
+
+      <div className="mb-3">
+        <ToggleSwitch
+          label={t('ogCardEnabled')}
+          checked={settings.ogCardEnabled}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            updateField('ogCardEnabled', e.target.checked)
+          }
+        />
+        <small className="text-muted d-block mt-1">{t('ogCardEnabledHelp')}</small>
+      </div>
+
+      {/* Gli interruttori di dettaglio restano visibili ma inerti quando la
+          scheda e' spenta: nasconderli farebbe sparire la spiegazione di cosa
+          si sta rinunciando ad avere. */}
+      <div
+        className="ps-3"
+        style={{
+          borderLeft: '3px solid var(--app-border, #d4d8dd)',
+          opacity: settings.ogCardEnabled ? 1 : 0.55,
+        }}
+      >
+        {(
+          [
+            ['ogShowPoster', 'ogShowPosterHelp'],
+            ['ogShowDate', 'ogShowDateHelp'],
+            ['ogShowSpeakers', 'ogShowSpeakersHelp'],
+            ['ogShowOrganization', 'ogShowOrganizationHelp'],
+          ] as const
+        ).map(([campo, aiuto]) => (
+          <div className="mb-3" key={campo}>
+            <ToggleSwitch
+              label={t(campo)}
+              checked={settings[campo]}
+              disabled={!settings.ogCardEnabled}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                updateField(campo, e.target.checked)
+              }
+            />
+            <small className="text-muted d-block mt-1">{t(aiuto)}</small>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

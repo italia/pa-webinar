@@ -1452,7 +1452,19 @@
         "description": "Cur síos SEO",
         "descriptionHelp": "Cur síos d'innill chuardaigh agus do roinnt sóisialta",
         "image": "Íomhá Open Graph",
-        "imageHelp": "Íomhá réamhshocraithe do roinnt sóisialta (1200x630 molta)"
+        "imageHelp": "Íomhá réamhshocraithe do roinnt sóisialta (1200x630 molta)",
+        "ogSection": "Shared link preview",
+        "ogIntro": "When someone pastes an event link into a chat or a social network, the platform draws a preview image with the details inside it. Choose which ones: every extra field takes room away from the title.",
+        "ogCardEnabled": "Generate the preview",
+        "ogCardEnabledHelp": "When off, the link shows the poster as is (or the site logo if the event has none), with no readable title or date in the image.",
+        "ogShowPoster": "Poster as background",
+        "ogShowPosterHelp": "Uses the event cover as the preview background, dimmed so the text stays readable. With no poster, or with this off, the institutional colour and the logo remain.",
+        "ogShowDate": "Date and time",
+        "ogShowDateHelp": "In the platform's default time zone.",
+        "ogShowSpeakers": "Speakers",
+        "ogShowSpeakersHelp": "The event's speaker text, shortened when too long.",
+        "ogShowOrganization": "Organisation",
+        "ogShowOrganizationHelp": "The event organiser when set, otherwise the organisation name."
       },
       "homepage": {
         "modeLabel": "Mód an leathanaigh bhaile",

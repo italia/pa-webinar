@@ -34,6 +34,11 @@ export const PUBLIC_SETTING_FIELDS = [
   'parentOrganization', 'parentOrganizationUrl',
   'logoUrl', 'faviconUrl', 'primaryColor', 'defaultTimezone',
   'seoTitle', 'seoDescription', 'seoImage',
+  // Anteprima dei link condivisi: dicono soltanto CHE COSA la scheda mostra, e
+  // quello che mostra e' gia' pubblico per definizione — sta nell'immagine che
+  // chiunque riceve incollando il link.
+  'ogCardEnabled', 'ogShowPoster', 'ogShowDate', 'ogShowSpeakers',
+  'ogShowOrganization',
   'homePageMode', 'footerLinks', 'privacyPolicy', 'accessibility',
   'statusPageEnabled', 'guestAccessEnabled', 'publicRegistrationEnabled',
   'calendarPublic', 'parseTitleKicker', 'waitingRoomEngine',

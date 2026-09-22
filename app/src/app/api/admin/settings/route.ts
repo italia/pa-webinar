@@ -49,6 +49,12 @@ const updateSettingsSchema = z.object({
   jitsiWatermarkOpacity: z.number().min(0).max(1).optional(),
   jitsiWatermarkPosition: z.enum(['top-left', 'top-right', 'bottom-left', 'bottom-right']).optional(),
   videoQuality: z.enum(['SAVE_DATA', 'BALANCED', 'HIGH', 'MAX']).optional(),
+  // Anteprima dei link condivisi: cosa entra nella scheda generata.
+  ogCardEnabled: z.boolean().optional(),
+  ogShowPoster: z.boolean().optional(),
+  ogShowDate: z.boolean().optional(),
+  ogShowSpeakers: z.boolean().optional(),
+  ogShowOrganization: z.boolean().optional(),
   githubUrl: z.string().url().nullish(),
   supportEmail: z.string().email().nullish(),
   // Nome mittente mostrato in posta; stringa vuota = torna al default.
