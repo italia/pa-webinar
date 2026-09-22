@@ -1480,6 +1480,14 @@
           "CUSTOM": {
             "title": "Vlastné",
             "description": "Vlastný HTML obsah + zoznam udalostí"
+          },
+          "LANDING_ISTITUZIONALE": {
+            "title": "Institutional landing",
+            "description": "Organisation, next event in the spotlight and the others listed. No technical language"
+          },
+          "LANDING_SEMPLICE": {
+            "title": "Plain-language landing",
+            "description": "Few words and a single invitation, for people new to online events"
           }
         },
         "customHtmlLabel": "Vlastný HTML obsah",
@@ -2569,6 +2577,49 @@
         "title": "Zvukový dabing",
         "desc": "Dabovaná zvuková stopa s neutrálnym syntetickým hlasom (bez klonovania hlasu), aby ste si mohli vypočuť podujatie v inom jazyku."
       }
+    },
+    "institutional": {
+      "title": "Online meetings and events",
+      "nextTitle": "Next event",
+      "nextCta": "Go to the event and sign up",
+      "othersTitle": "Other events",
+      "pointsTitle": "How to take part",
+      "points": {
+        "noInstall": {
+          "title": "Join from your browser",
+          "body": "No software to install: just open the link you receive."
+        },
+        "accessible": {
+          "title": "Designed for everyone",
+          "body": "Captions, keyboard and screen readers: the room works without a mouse too."
+        },
+        "privacy": {
+          "title": "Your data, handled with care",
+          "body": "Only what sign-up requires is collected, and you can ask for it back or have it deleted."
+        }
+      }
+    },
+    "simple": {
+      "title": "Online meetings by {organization}",
+      "subtitle": "Join from your computer or phone, with nothing to install.",
+      "cta": "Join the next meeting",
+      "noEvents": "No meetings are scheduled right now. Check back soon.",
+      "stepsTitle": "How it works",
+      "steps": {
+        "choose": {
+          "title": "Pick a meeting",
+          "body": "Each one shows its date and time."
+        },
+        "name": {
+          "title": "Leave your name",
+          "body": "Your name and email address are all it takes to get the link."
+        },
+        "enter": {
+          "title": "Join",
+          "body": "At the right time, open the link: you are in."
+        }
+      },
+      "listTitle": "Upcoming meetings"
     }
   },
   "polls": {
@@ -3609,7 +3660,17 @@
     "micToggleOn": "Mikrofón ZAP",
     "micToggleOff": "Mikrofón VYP",
     "cameraOffPreview": "Kamera vypnutá",
-    "speakerTest": "🔊 Test zvuku"
+    "speakerTest": "🔊 Test zvuku",
+    "backgroundLabel": "Virtual background",
+    "backgroundNoneShort": "No",
+    "backgroundHint": "Applied when you enter the room. To blur your background use the backgrounds button once inside: the preview above shows the camera without effects.",
+    "background": {
+      "nessuno": "No background",
+      "ufficio-chiaro": "Light office",
+      "blu-istituzionale": "Institutional blue",
+      "verde-salvia": "Sage green",
+      "grafite": "Graphite"
+    }
   },
   "garden": {
     "enable": "Zobraziť záhradu",

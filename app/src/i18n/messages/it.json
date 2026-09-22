@@ -1552,6 +1552,14 @@
           "CUSTOM": {
             "title": "Personalizzata",
             "description": "Contenuto HTML personalizzato + lista eventi"
+          },
+          "LANDING_ISTITUZIONALE": {
+            "title": "Landing istituzionale",
+            "description": "Ente, prossimo appuntamento in evidenza e gli altri in elenco. Nessun linguaggio tecnico"
+          },
+          "LANDING_SEMPLICE": {
+            "title": "Landing in parole semplici",
+            "description": "Poche parole e un solo invito, per chi non frequenta gli eventi online"
           }
         },
         "customHtmlLabel": "Contenuto HTML personalizzato",
@@ -2641,6 +2649,49 @@
         "title": "Doppiaggio audio",
         "desc": "Traccia audio doppiata con voce sintetica neutra (senza clonazione vocale), per ascoltare l'evento in un'altra lingua."
       }
+    },
+    "institutional": {
+      "title": "Incontri e appuntamenti online",
+      "nextTitle": "Prossimo appuntamento",
+      "nextCta": "Vai all'evento e iscriviti",
+      "othersTitle": "Gli altri appuntamenti",
+      "pointsTitle": "Come si partecipa",
+      "points": {
+        "noInstall": {
+          "title": "Si partecipa dal browser",
+          "body": "Non serve installare programmi: basta aprire il link che riceverai."
+        },
+        "accessible": {
+          "title": "Pensato per tutti",
+          "body": "Sottotitoli, tastiera e lettori di schermo: la sala è utilizzabile anche senza mouse."
+        },
+        "privacy": {
+          "title": "Dati trattati con cura",
+          "body": "Si raccolgono solo i dati necessari all'iscrizione, e si possono chiedere indietro o cancellare."
+        }
+      }
+    },
+    "simple": {
+      "title": "Gli incontri online di {organization}",
+      "subtitle": "Si partecipa dal computer o dal telefono, senza installare niente.",
+      "cta": "Partecipa al prossimo incontro",
+      "noEvents": "Al momento non ci sono incontri in programma. Torna a trovarci.",
+      "stepsTitle": "Come si fa",
+      "steps": {
+        "choose": {
+          "title": "Scegli l'incontro",
+          "body": "Trovi data e ora di ogni appuntamento."
+        },
+        "name": {
+          "title": "Lascia il tuo nome",
+          "body": "Bastano nome e indirizzo email per ricevere il link."
+        },
+        "enter": {
+          "title": "Entra",
+          "body": "All'ora giusta apri il link: sei dentro."
+        }
+      },
+      "listTitle": "Prossimi incontri"
     }
   },
   "gdpr": {
@@ -3609,7 +3660,17 @@
     "micToggleOn": "Microfono ON",
     "micToggleOff": "Microfono OFF",
     "cameraOffPreview": "Fotocamera spenta",
-    "speakerTest": "🔊 Test audio"
+    "speakerTest": "🔊 Test audio",
+    "backgroundLabel": "Sfondo virtuale",
+    "backgroundNoneShort": "No",
+    "backgroundHint": "Si applica quando entri in sala. Per sfocare lo sfondo usa il pulsante degli sfondi una volta dentro: l'anteprima qui sopra mostra la videocamera senza effetto.",
+    "background": {
+      "nessuno": "Nessuno sfondo",
+      "ufficio-chiaro": "Ufficio chiaro",
+      "blu-istituzionale": "Blu istituzionale",
+      "verde-salvia": "Verde salvia",
+      "grafite": "Grafite"
+    }
   },
   "garden": {
     "enable": "Mostra il giardino",
