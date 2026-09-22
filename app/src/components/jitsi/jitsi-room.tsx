@@ -17,6 +17,11 @@ import {
   type VideoQualityPreset,
 } from '@/lib/jitsi/config';
 import { humanParticipantCount } from '@/lib/jitsi/participants';
+import {
+  dataUriSfondo,
+  leggiSfondo,
+  SFONDO_PREDEFINITO,
+} from '@/lib/jitsi/virtual-background';
 
 interface WatermarkSettings {
   url?: string;
@@ -438,6 +443,37 @@ export default function JitsiRoom({
           setNoiseSuppression(true);
         };
 
+        // Sfondo virtuale scelto nella sala d'attesa.
+        //
+        // Si manda UNA volta sola, e la condizione e' «l'ho mandato», non «ci
+        // ho provato»: chi entra con la videocamera spenta non ha ancora una
+        // traccia su cui applicare l'effetto, e va riprovato quando la accende;
+        // chi invece lo sfondo l'ha gia' ricevuto e poi ne sceglie un altro dal
+        // pulsante nativo — dentro la sala — non deve vederselo sostituire al
+        // primo spegni-e-riaccendi della camera.
+        //
+        // «Nessuno» non e' l'assenza di un comando ma un comando: Jitsi ricorda
+        // l'effetto nel proprio spazio locale, sull'origine della conferenza,
+        // che l'applicazione non puo' leggere ne' svuotare. Senza lo spegnimento
+        // esplicito, chi la volta prima aveva acceso uno sfondo rientrerebbe con
+        // quello, mentre la sala d'attesa gli mostra «Nessuno sfondo» —
+        // l'interfaccia direbbe il contrario di quello che la stanza fa.
+        let sfondoConsegnato = false;
+        const applicaSfondoScelto = async (): Promise<void> => {
+          if (disposedRef.current || sfondoConsegnato) return;
+          const scelto = leggiSfondo();
+          const dataUri = await dataUriSfondo(scelto);
+          if (disposedRef.current) return;
+          // Immagine attesa e non arrivata (asset mancante, rete): non si
+          // consegna niente e si riprova alla prossima occasione, invece di
+          // spegnere uno sfondo che la persona aveva chiesto.
+          if (scelto !== SFONDO_PREDEFINITO && !dataUri) return;
+          // Solo IMMAGINE: il comando a distanza non sa impostare la
+          // sfocatura (vedi lib/jitsi/virtual-background).
+          api.executeCommand('setVirtualBackground', Boolean(dataUri), dataUri ?? undefined);
+          sfondoConsegnato = true;
+        };
+
         api.addListener('videoConferenceJoined', (evt: { id?: string }) => {
           if (disposedRef.current) return;
           // Il nostro endpoint id: usato per segnalare solo le nostre alzate.
@@ -477,6 +513,7 @@ export default function JitsiRoom({
           // ADR-013 Fase 0 — t0 della timeline = momento del join. Gli atMs
           // accumulati sono relativi a questo istante.
           speakerT0Ref.current = Date.now();
+          void applicaSfondoScelto();
           onReadyRef.current?.();
         });
 
@@ -496,7 +533,10 @@ export default function JitsiRoom({
           }
         };
         api.addListener('videoMuteStatusChanged', (e: { muted?: boolean }) => {
-          if (e && e.muted === false) reapplyVideoQuality();
+          if (e && e.muted === false) {
+            reapplyVideoQuality();
+            void applicaSfondoScelto();
+          }
         });
 
         // (Re)assert advanced rnnoise whenever the mic is unmuted — that's
