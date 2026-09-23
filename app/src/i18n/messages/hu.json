@@ -1241,7 +1241,12 @@
       "moderatorLinkHint": "Ezt a linket csak moderátorokkal ossza meg. Bárki, aki rendelkezik ezzel a linkkel, kezelheti az eseményt.",
       "liveRoomHint": "Közvetlen hivatkozás a moderátorként való belépéshez a terembe.",
       "copyLink": "Link másolása",
-      "copied": "Másolva!"
+      "copied": "Másolva!",
+      "reveal": "Megjelenítés",
+      "hide": "Elrejtés",
+      "warning": "Aki rendelkezik ezzel a hivatkozással, az kezeli az eseményt: ne jelenítse meg képernyőmegosztás közben, és ne illessze be csevegésbe.",
+      "hidden": "A hivatkozás rejtve van",
+      "copyFailed": "A másolás nem sikerült: jelölje ki az alábbi címet, és másolja ki kézzel."
     },
     "feedbackAdmin": {
       "title": "Visszajelzés eredményei",
@@ -2072,7 +2077,6 @@
     },
     "eventDetail": {
       "copyPublicUrl": "Nyilvános hivatkozás másolása",
-      "copyModeratorUrl": "Moderátori hivatkozás másolása",
       "enterAsModerator": "Belépés élőben",
       "editEvent": "Esemény szerkesztése",
       "editSettings": "Beállítások szerkesztése",
@@ -2115,7 +2119,6 @@
         "postEventSummary": "{connected} csatlakozott a(z) {registered} regisztrációból (becsült: {estimated})",
         "estimatedAttendance": "Becsült: {estimated} résztvevő"
       },
-      "copyGuestUrl": "Vendéghivatkozás másolása",
       "aiManageTitle": "Átirat, összefoglaló és fordítások",
       "aiManageDesc": "Kezelje ennek a felvételnek az AI-utómunkáját: javítsa az átiratot és a beszélők hozzárendelését (ki mit mond), szerkessze az összefoglalót, és kezelje a fordítási nyelveket.",
       "aiManageCta": "Az utómunka kezelésének megnyitása",

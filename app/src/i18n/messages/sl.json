@@ -1241,7 +1241,12 @@
       "moderatorLinkHint": "To povezavo delite samo z moderatorji. Kdor koli jo ima, lahko upravlja dogodek.",
       "liveRoomHint": "Povezava za neposreden vstop v sobo kot moderator.",
       "copyLink": "Kopiraj povezavo",
-      "copied": "Kopirano!"
+      "copied": "Kopirano!",
+      "reveal": "Prikaži",
+      "hide": "Skrij",
+      "warning": "Kdor koli ima to povezavo, upravlja dogodek: ne prikazujte je med deljenjem zaslona in je ne lepite v klepet.",
+      "hidden": "Povezava je skrita",
+      "copyFailed": "Kopiranje ni uspelo: izberite spodnji naslov in ga kopirajte ročno."
     },
     "feedbackAdmin": {
       "title": "Rezultati povratnih informacij",
@@ -2072,7 +2077,6 @@
     },
     "eventDetail": {
       "copyPublicUrl": "Kopiraj javno povezavo",
-      "copyModeratorUrl": "Kopiraj povezavo moderatorja",
       "enterAsModerator": "Vstopi v živo",
       "editEvent": "Uredi dogodek",
       "editSettings": "Uredi nastavitve",
@@ -2115,7 +2119,6 @@
         "postEventSummary": "{connected} povezanih od {registered} prijav (ocena {estimated})",
         "estimatedAttendance": "Ocena: {estimated} udeležencev"
       },
-      "copyGuestUrl": "Kopiraj povezavo za goste",
       "aiManageTitle": "Prepis, povzetek in prevodi",
       "aiManageDesc": "Upravljajte postprodukcijo AI za ta posnetek: popravite prepis in pripis govorcev (kdo kaj pove), uredite povzetek in upravljajte jezike prevoda.",
       "aiManageCta": "Odpri upravljanje postprodukcije",

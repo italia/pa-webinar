@@ -1241,7 +1241,12 @@
       "moderatorLinkHint": "Roinnigh an nasc seo le modhnóirí amháin. Is féidir le duine ar bith a bhfuil an nasc seo aige an t-imeacht a bhainistiú.",
       "liveRoomHint": "Nasc chun dul isteach díreach sa seomra mar mhodhnóir.",
       "copyLink": "Cóipeáil nasc",
-      "copied": "Cóipeáilte!"
+      "copied": "Cóipeáilte!",
+      "reveal": "Taispeáin",
+      "hide": "Folaigh",
+      "warning": "Riarann duine ar bith a bhfuil an nasc seo aige an t-imeacht: ná taispeáin é agus tú ag comhroinnt scáileáin agus ná greamaigh i gcomhrá é.",
+      "hidden": "Nasc folaithe",
+      "copyFailed": "Theip ar an gcóipeáil: roghnaigh an seoladh thíos agus cóipeáil de láimh é."
     },
     "feedbackAdmin": {
       "title": "Torthaí aiseolais",
@@ -2072,7 +2077,6 @@
     },
     "eventDetail": {
       "copyPublicUrl": "Cóipeáil nasc poiblí",
-      "copyModeratorUrl": "Cóipeáil nasc modhnóra",
       "enterAsModerator": "Téigh isteach beo",
       "editEvent": "Cuir imeacht in eagar",
       "editSettings": "Cuir socruithe in eagar",
@@ -2115,7 +2119,6 @@
         "postEventSummary": "{connected} ceangailte as {registered} cláruithe (measta {estimated})",
         "estimatedAttendance": "Measta: {estimated} rannpháirtí"
       },
-      "copyGuestUrl": "Cóipeáil nasc d'aíonna",
       "aiManageTitle": "Tras-scríbhinn, achoimre agus aistriúcháin",
       "aiManageDesc": "Bainistigh iarléiriú AI an taifeadta seo: ceartaigh an tras-scríbhinn agus sannadh na gcainteoirí (cé a deir cad é), cuir an achoimre in eagar agus bainistigh na teangacha aistriúcháin.",
       "aiManageCta": "Oscail bainistiú an iarléirithe",

@@ -1241,7 +1241,12 @@
       "moderatorLinkHint": "Partagez ce lien uniquement avec les modérateurs. Toute personne disposant de ce lien peut gérer l'événement.",
       "liveRoomHint": "Lien pour entrer directement dans la salle en tant que modérateur.",
       "copyLink": "Copier le lien",
-      "copied": "Copié !"
+      "copied": "Copié !",
+      "reveal": "Afficher",
+      "hide": "Masquer",
+      "warning": "Toute personne disposant de ce lien administre l’événement : ne l’affichez pas lors d’un partage d’écran et ne le collez pas dans une conversation.",
+      "hidden": "Lien masqué",
+      "copyFailed": "Échec de la copie : sélectionnez l’adresse ci-dessous et copiez-la manuellement."
     },
     "feedbackAdmin": {
       "title": "Résultats des retours",
@@ -2072,7 +2077,6 @@
     },
     "eventDetail": {
       "copyPublicUrl": "Copier le lien public",
-      "copyModeratorUrl": "Copier le lien modérateur",
       "enterAsModerator": "Entrer en live",
       "editEvent": "Modifier l'événement",
       "editSettings": "Modifier les paramètres",
@@ -2115,7 +2119,6 @@
         "postEventSummary": "{connected} connectés sur {registered} inscriptions (estimés {estimated})",
         "estimatedAttendance": "Estimés : {estimated} participants"
       },
-      "copyGuestUrl": "Copier le lien invité",
       "aiManageTitle": "Transcription, synthèse et traductions",
       "aiManageDesc": "Gérez la post-production IA de cet enregistrement : corrigez la transcription et l'attribution des locuteurs (qui dit quoi), modifiez la synthèse et gérez les langues de traduction.",
       "aiManageCta": "Ouvrir la gestion de la post-production",

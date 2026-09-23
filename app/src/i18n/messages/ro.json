@@ -1241,7 +1241,12 @@
       "moderatorLinkHint": "Distribuiți acest link doar moderatorilor. Oricine îl deține poate gestiona evenimentul.",
       "liveRoomHint": "Link pentru a intra direct în sală ca moderator.",
       "copyLink": "Copiați linkul",
-      "copied": "Copiat!"
+      "copied": "Copiat!",
+      "reveal": "Afișează",
+      "hide": "Ascunde",
+      "warning": "Oricine are acest link administrează evenimentul: nu îl afișa în timpul partajării ecranului și nu îl lipi într-un chat.",
+      "hidden": "Link ascuns",
+      "copyFailed": "Copierea a eșuat: selectează adresa de mai jos și copiaz-o manual."
     },
     "feedbackAdmin": {
       "title": "Rezultate feedback",
@@ -2072,7 +2077,6 @@
     },
     "eventDetail": {
       "copyPublicUrl": "Copiați linkul public",
-      "copyModeratorUrl": "Copiați linkul moderatorului",
       "enterAsModerator": "Intrați live",
       "editEvent": "Modificați evenimentul",
       "editSettings": "Modificați setările",
@@ -2115,7 +2119,6 @@
         "postEventSummary": "{connected} conectați din {registered} înscrieri (estimate {estimated})",
         "estimatedAttendance": "Estimați: {estimated} participanți"
       },
-      "copyGuestUrl": "Copiați linkul pentru invitați",
       "aiManageTitle": "Transcriere, rezumat și traduceri",
       "aiManageDesc": "Gestionați post-producția AI a acestei înregistrări: corectați transcrierea și atribuirea vorbitorilor (cine ce spune), modificați rezumatul și gestionați limbile de traducere.",
       "aiManageCta": "Deschide gestionarea post-producției",

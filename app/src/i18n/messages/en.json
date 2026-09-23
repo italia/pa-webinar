@@ -1241,7 +1241,12 @@
       "moderatorLinkHint": "Share this link only with moderators. Anyone with this link can manage the event.",
       "liveRoomHint": "Direct link to enter the live room as moderator.",
       "copyLink": "Copy link",
-      "copied": "Copied!"
+      "copied": "Copied!",
+      "reveal": "Show",
+      "hide": "Hide",
+      "warning": "Anyone with this link administers the event: do not show it while sharing your screen and do not paste it into a chat.",
+      "hidden": "Link hidden",
+      "copyFailed": "Copy failed: select the address below and copy it manually."
     },
     "feedbackAdmin": {
       "title": "Feedback Results",
@@ -2072,7 +2077,6 @@
     },
     "eventDetail": {
       "copyPublicUrl": "Copy public link",
-      "copyModeratorUrl": "Copy moderator link",
       "enterAsModerator": "Enter live",
       "editEvent": "Edit event",
       "editSettings": "Edit settings",
@@ -2115,7 +2119,6 @@
         "postEventSummary": "{connected} joined of {registered} registrations (estimated {estimated})",
         "estimatedAttendance": "Estimated: {estimated} attendees"
       },
-      "copyGuestUrl": "Copy guest link",
       "aiManageTitle": "Transcript, summary and translations",
       "aiManageDesc": "Manage the AI post-production of this recording: fix the transcript and speaker attribution (who says what), edit the summary and manage translation languages.",
       "aiManageCta": "Open post-production management",

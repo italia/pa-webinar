@@ -1241,7 +1241,12 @@
       "moderatorLinkHint": "Udostępnij ten link tylko moderatorom. Każda osoba posiadająca ten link może zarządzać wydarzeniem.",
       "liveRoomHint": "Bezpośredni link do wejścia do pokoju jako moderator.",
       "copyLink": "Kopiuj link",
-      "copied": "Skopiowano!"
+      "copied": "Skopiowano!",
+      "reveal": "Pokaż",
+      "hide": "Ukryj",
+      "warning": "Każdy, kto ma ten link, zarządza wydarzeniem: nie pokazuj go podczas udostępniania ekranu i nie wklejaj go na czacie.",
+      "hidden": "Link ukryty",
+      "copyFailed": "Kopiowanie nie powiodło się: zaznacz adres poniżej i skopiuj go ręcznie."
     },
     "feedbackAdmin": {
       "title": "Wyniki ankiety",
@@ -2072,7 +2077,6 @@
     },
     "eventDetail": {
       "copyPublicUrl": "Kopiuj link publiczny",
-      "copyModeratorUrl": "Kopiuj link moderatora",
       "enterAsModerator": "Wejdź na żywo",
       "editEvent": "Edytuj wydarzenie",
       "editSettings": "Edytuj ustawienia",
@@ -2115,7 +2119,6 @@
         "postEventSummary": "{connected} dołączonych z {registered} rejestracji (szacowane {estimated})",
         "estimatedAttendance": "Szacowani: {estimated} uczestników"
       },
-      "copyGuestUrl": "Kopiuj link dla gości",
       "aiManageTitle": "Transkrypcja, podsumowanie i tłumaczenia",
       "aiManageDesc": "Zarządzaj postprodukcją AI tego nagrania: popraw transkrypcję i przypisanie mówców (kto co mówi), edytuj podsumowanie i zarządzaj językami tłumaczenia.",
       "aiManageCta": "Otwórz zarządzanie postprodukcją",

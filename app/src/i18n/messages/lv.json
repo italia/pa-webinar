@@ -1241,7 +1241,12 @@
       "moderatorLinkHint": "Kopīgojiet šo saiti tikai ar moderatoriem. Ikviens ar šo saiti var pārvaldīt pasākumu.",
       "liveRoomHint": "Tieša saite, lai ieietu telpā kā moderators.",
       "copyLink": "Kopēt saiti",
-      "copied": "Nokopēts!"
+      "copied": "Nokopēts!",
+      "reveal": "Rādīt",
+      "hide": "Paslēpt",
+      "warning": "Ikviens, kam ir šī saite, pārvalda pasākumu: nerādiet to, koplietojot ekrānu, un neielīmējiet to tērzēšanā.",
+      "hidden": "Saite ir paslēpta",
+      "copyFailed": "Kopēšana neizdevās: atlasiet tālāk norādīto adresi un kopējiet to manuāli."
     },
     "feedbackAdmin": {
       "title": "Atsauksmju rezultāti",
@@ -2072,7 +2077,6 @@
     },
     "eventDetail": {
       "copyPublicUrl": "Kopēt publisko saiti",
-      "copyModeratorUrl": "Kopēt moderatora saiti",
       "enterAsModerator": "Ieiet tiešraidē",
       "editEvent": "Rediģēt pasākumu",
       "editSettings": "Rediģēt iestatījumus",
@@ -2115,7 +2119,6 @@
         "postEventSummary": "{connected} pievienojušies no {registered} reģistrācijām (aplēstas {estimated})",
         "estimatedAttendance": "Aplēsts: {estimated} dalībnieki"
       },
-      "copyGuestUrl": "Kopēt viesa saiti",
       "aiManageTitle": "Transkripcija, kopsavilkums un tulkojumi",
       "aiManageDesc": "Pārvaldiet šī ieraksta MI pēcapstrādi: labojiet transkripciju un runātāju piesaisti (kurš ko saka), rediģējiet kopsavilkumu un pārvaldiet tulkošanas valodas.",
       "aiManageCta": "Atvērt pēcapstrādes pārvaldību",

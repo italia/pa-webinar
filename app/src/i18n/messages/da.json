@@ -1241,7 +1241,12 @@
       "moderatorLinkHint": "Del kun dette link med moderatorer. Enhver med dette link kan administrere begivenheden.",
       "liveRoomHint": "Link til at gå direkte ind i lokalet som moderator.",
       "copyLink": "Kopiér link",
-      "copied": "Kopieret!"
+      "copied": "Kopieret!",
+      "reveal": "Vis",
+      "hide": "Skjul",
+      "warning": "Enhver med dette link administrerer begivenheden: vis det ikke, når du deler din skærm, og indsæt det ikke i en chat.",
+      "hidden": "Linket er skjult",
+      "copyFailed": "Kopiering mislykkedes: markér adressen nedenfor, og kopiér den manuelt."
     },
     "feedbackAdmin": {
       "title": "Feedbackresultater",
@@ -2072,7 +2077,6 @@
     },
     "eventDetail": {
       "copyPublicUrl": "Kopiér offentligt link",
-      "copyModeratorUrl": "Kopiér moderatorlink",
       "enterAsModerator": "Gå live",
       "editEvent": "Rediger arrangement",
       "editSettings": "Rediger indstillinger",
@@ -2115,7 +2119,6 @@
         "postEventSummary": "{connected} tilsluttede ud af {registered} tilmeldinger (estimeret {estimated})",
         "estimatedAttendance": "Estimeret: {estimated} deltagere"
       },
-      "copyGuestUrl": "Kopiér gæstelink",
       "aiManageTitle": "Transskription, resumé og oversættelser",
       "aiManageDesc": "Administrér AI-efterbehandlingen af denne optagelse: ret transskriptionen og tildelingen af talere (hvem siger hvad), redigér resuméet, og styr oversættelsessprogene.",
       "aiManageCta": "Åbn administrationen af efterbehandlingen",

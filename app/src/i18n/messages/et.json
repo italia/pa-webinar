@@ -1241,7 +1241,12 @@
       "moderatorLinkHint": "Jagage seda linki ainult moderaatoritega. Igaüks, kellel on see link, saab üritust hallata.",
       "liveRoomHint": "Otsene link sisenemiseks moderaatorina ruumi.",
       "copyLink": "Kopeeri link",
-      "copied": "Kopeeritud!"
+      "copied": "Kopeeritud!",
+      "reveal": "Näita",
+      "hide": "Peida",
+      "warning": "Igaüks, kellel on see link, haldab sündmust: ära näita seda ekraani jagamisel ega kleebi seda vestlusesse.",
+      "hidden": "Link on peidetud",
+      "copyFailed": "Kopeerimine ebaõnnestus: vali allolev aadress ja kopeeri see käsitsi."
     },
     "feedbackAdmin": {
       "title": "Tagasiside tulemused",
@@ -2072,7 +2077,6 @@
     },
     "eventDetail": {
       "copyPublicUrl": "Kopeeri avalik link",
-      "copyModeratorUrl": "Kopeeri moderaatorilink",
       "enterAsModerator": "Sisene LIVE",
       "editEvent": "Muuda sündmust",
       "editSettings": "Muuda seadeid",
@@ -2115,7 +2119,6 @@
         "postEventSummary": "{connected} liitus {registered} registreeringust (hinnatud {estimated})",
         "estimatedAttendance": "Hinnanguliselt: {estimated} osalejat"
       },
-      "copyGuestUrl": "Kopeeri külalislink",
       "aiManageTitle": "Transkriptsioon, kokkuvõte ja tõlked",
       "aiManageDesc": "Halda selle salvestise AI järeltöötlust: paranda transkriptsiooni ja kõnelejate omistamist (kes mida ütleb), muuda kokkuvõtet ja halda tõlkekeeli.",
       "aiManageCta": "Ava järeltöötluse haldus",

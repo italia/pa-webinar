@@ -28,6 +28,7 @@ import EventConfigDiagram from './event-config-diagram';
 import EventModeratorsPanel from './event-moderators-panel';
 import PostEventConfig from './post-event-config';
 import RecordingManagement from './recording-management';
+import EventLinksSection from './event-links-section';
 import StatusBadge from './status-badge';
 
 // ── Palette ──
@@ -404,9 +405,14 @@ export default function EventManagementClient({
 
           {/* Right CTAs */}
           <div className="d-flex flex-column gap-2 flex-shrink-0" style={{ minWidth: 220 }}>
+            {/* Un solo link in cima: la pagina pubblica e' quella che si
+                condivide quasi sempre. Gli altri due — invito diretto e
+                amministrazione — stanno nella sezione «Link dell'evento»,
+                dove c'e' scritto a chi vanno dati. Tre pulsanti «copia»
+                identici qui sopra si distinguevano solo per abitudine, e
+                sbagliare significa consegnare l'evento a chi riceve il link
+                sbagliato. */}
             <CopyBtn text={publicUrl} label={td('copyPublicUrl')} />
-            <CopyBtn text={guestLiveUrl} label={td('copyGuestUrl')} />
-            <CopyBtn text={moderatorUrl} label={td('copyModeratorUrl')} />
             {(status === 'PUBLISHED' || status === 'LIVE') && (
               <Link href={liveModeratorUrl}
                     className="btn btn-primary d-inline-flex align-items-center justify-content-center gap-2"
@@ -452,7 +458,15 @@ export default function EventManagementClient({
           <TabNav active={activeTab} onChange={setActiveTab} t={td} />
           <div className="p-4" style={CARD}>
             {activeTab === 'panoramica' && (
-              <OverviewTab event={event} description={description} locale={locale} editUrl={editUrl} />
+              <OverviewTab
+                event={event}
+                description={description}
+                locale={locale}
+                editUrl={editUrl}
+                publicUrl={publicUrl}
+                guestLiveUrl={guestLiveUrl}
+                moderatorUrl={moderatorUrl}
+              />
             )}
             {activeTab === 'impostazioni' && <SettingsTab event={event} editUrl={editUrl} />}
             {activeTab === 'persone' && (
@@ -630,11 +644,13 @@ function TabNav({ active, onChange, t }: {
 }
 
 // ── Tabs ──
-function OverviewTab({ event, description, locale, editUrl }: {
+function OverviewTab({ event, description, locale, editUrl, publicUrl, guestLiveUrl, moderatorUrl }: {
   event: EventData; description: string; locale: string; editUrl: string;
+  publicUrl: string; guestLiveUrl: string; moderatorUrl: string;
 }) {
   const td = useTranslations('admin.eventDetail');
   const te = useTranslations('events');
+  const tl = useTranslations('admin.links');
   const speakers = getLocalized(event.speakersInfo as LocalizedField, locale);
 
   const toggles: { label: string; value: boolean }[] = [
@@ -692,6 +708,20 @@ function OverviewTab({ event, description, locale, editUrl }: {
             </div>
           ))}
         </div>
+      </div>
+
+      {/* In fondo: i link servono spesso ma non sono la prima cosa da leggere
+          quando si apre un evento, e qui c'e' lo spazio per dire a chi va dato
+          quale — cosa che tre pulsanti «copia» in cima non potevano fare. */}
+      <div className="mt-4">
+        <H>{tl('title')}</H>
+        <EventLinksSection
+          righe={[
+            { chiave: 'publicPage', url: publicUrl },
+            { chiave: 'guestJoin', url: guestLiveUrl },
+            { chiave: 'moderatorLink', url: moderatorUrl, riservato: true },
+          ]}
+        />
       </div>
     </>
   );
@@ -1142,9 +1172,10 @@ function KV({ label, value }: { label: string; value: ReactNode }) {
 }
 
 // Minimal copy-to-clipboard button with a caller-supplied label.
-// We don't reuse the shared <CopyButton> because it hardcodes its
-// own label from `admin.links` — the hero needs two buttons side by
-// side with distinct labels ("public URL" vs "moderator URL").
+// Non si riusa <CopyButton> perche' quello prende l'etichetta da
+// `admin.links` e basta: qui serve poterla passare da fuori
+// (`copyPublicUrl`). In cima alla pagina ne resta uno solo — gli altri link
+// stanno nella sezione in fondo, dove c'e' spazio per dire a chi vanno dati.
 function CopyBtn({ text, label }: { text: string; label: string }) {
   const tl = useTranslations('admin.links');
   const [copied, setCopied] = useState(false);

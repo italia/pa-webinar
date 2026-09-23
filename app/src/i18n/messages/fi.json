@@ -1241,7 +1241,12 @@
       "moderatorLinkHint": "Jaa tämä linkki vain moderaattoreille. Kuka tahansa, jolla on tämä linkki, voi hallita tapahtumaa.",
       "liveRoomHint": "Suora linkki, jolla pääsee live-huoneeseen moderaattorina.",
       "copyLink": "Kopioi linkki",
-      "copied": "Kopioitu!"
+      "copied": "Kopioitu!",
+      "reveal": "Näytä",
+      "hide": "Piilota",
+      "warning": "Kuka tahansa, jolla on tämä linkki, hallinnoi tapahtumaa: älä näytä sitä näyttöä jaettaessa äläkä liitä sitä keskusteluun.",
+      "hidden": "Linkki on piilotettu",
+      "copyFailed": "Kopiointi epäonnistui: valitse alla oleva osoite ja kopioi se käsin."
     },
     "feedbackAdmin": {
       "title": "Palautteen tulokset",
@@ -2072,7 +2077,6 @@
     },
     "eventDetail": {
       "copyPublicUrl": "Kopioi julkinen linkki",
-      "copyModeratorUrl": "Kopioi moderaattorilinkki",
       "enterAsModerator": "Liity liveen",
       "editEvent": "Muokkaa tapahtumaa",
       "editSettings": "Muokkaa asetuksia",
@@ -2115,7 +2119,6 @@
         "postEventSummary": "{connected} liittyi / {registered} ilmoittautunutta (arvio {estimated})",
         "estimatedAttendance": "Arvio: {estimated} osallistujaa"
       },
-      "copyGuestUrl": "Kopioi vieraslinkki",
       "aiManageTitle": "Litterointi, yhteenveto ja käännökset",
       "aiManageDesc": "Hallinnoi tämän tallenteen tekoälyjälkituotantoa: korjaa litterointia ja puhujien kohdistusta (kuka sanoo mitä), muokkaa yhteenvetoa ja hallitse käännöskieliä.",
       "aiManageCta": "Avaa jälkituotannon hallinta",

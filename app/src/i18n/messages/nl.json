@@ -1241,7 +1241,12 @@
       "moderatorLinkHint": "Deel deze link alleen met moderators. Iedereen met deze link kan het evenement beheren.",
       "liveRoomHint": "Link om direct als moderator de ruimte binnen te gaan.",
       "copyLink": "Link kopiëren",
-      "copied": "Gekopieerd!"
+      "copied": "Gekopieerd!",
+      "reveal": "Tonen",
+      "hide": "Verbergen",
+      "warning": "Iedereen met deze link beheert het evenement: toon hem niet tijdens het delen van je scherm en plak hem niet in een chat.",
+      "hidden": "Link verborgen",
+      "copyFailed": "Kopiëren mislukt: selecteer het adres hieronder en kopieer het handmatig."
     },
     "feedbackAdmin": {
       "title": "Feedbackresultaten",
@@ -2072,7 +2077,6 @@
     },
     "eventDetail": {
       "copyPublicUrl": "Openbare link kopiëren",
-      "copyModeratorUrl": "Moderatorlink kopiëren",
       "enterAsModerator": "LIVE binnenkomen",
       "editEvent": "Evenement bewerken",
       "editSettings": "Instellingen bewerken",
@@ -2115,7 +2119,6 @@
         "postEventSummary": "{connected} verbonden van {registered} aanmeldingen (geschat {estimated})",
         "estimatedAttendance": "Geschat: {estimated} deelnemers"
       },
-      "copyGuestUrl": "Gastlink kopiëren",
       "aiManageTitle": "Transcriptie, samenvatting en vertalingen",
       "aiManageDesc": "Beheer de AI-postproductie van deze opname: corrigeer de transcriptie en de toewijzing van de sprekers (wie zegt wat), pas de samenvatting aan en beheer de vertaaltalen.",
       "aiManageCta": "Het postproductiebeheer openen",

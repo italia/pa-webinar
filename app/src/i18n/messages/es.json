@@ -1241,7 +1241,12 @@
       "moderatorLinkHint": "Comparta este enlace únicamente con los moderadores. Cualquier persona con este enlace puede gestionar el evento.",
       "liveRoomHint": "Enlace para entrar directamente en la sala como moderador.",
       "copyLink": "Copiar enlace",
-      "copied": "¡Copiado!"
+      "copied": "¡Copiado!",
+      "reveal": "Mostrar",
+      "hide": "Ocultar",
+      "warning": "Cualquiera que tenga este enlace administra el evento: no lo muestres al compartir pantalla ni lo pegues en un chat.",
+      "hidden": "Enlace oculto",
+      "copyFailed": "No se pudo copiar: selecciona la dirección de abajo y cópiala a mano."
     },
     "feedbackAdmin": {
       "title": "Resultados de valoraciones",
@@ -2072,7 +2077,6 @@
     },
     "eventDetail": {
       "copyPublicUrl": "Copiar enlace público",
-      "copyModeratorUrl": "Copiar enlace de moderador",
       "enterAsModerator": "Entrar en directo",
       "editEvent": "Editar evento",
       "editSettings": "Editar configuración",
@@ -2115,7 +2119,6 @@
         "postEventSummary": "{connected} asistieron de {registered} inscripciones (estimadas {estimated})",
         "estimatedAttendance": "Estimados: {estimated} participantes"
       },
-      "copyGuestUrl": "Copiar enlace para invitados",
       "aiManageTitle": "Transcripción, resumen y traducciones",
       "aiManageDesc": "Gestiona la posproducción con IA de esta grabación: corrige la transcripción y la asignación de los ponentes (quién dice qué), edita el resumen y gestiona los idiomas de traducción.",
       "aiManageCta": "Abrir la gestión de la posproducción",

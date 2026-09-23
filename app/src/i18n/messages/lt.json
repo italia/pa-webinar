@@ -1241,7 +1241,12 @@
       "moderatorLinkHint": "Dalykitės šia nuoroda tik su moderatoriais. Bet kas, turintis šią nuorodą, gali valdyti renginį.",
       "liveRoomHint": "Nuoroda tiesiogiai įeiti į salę kaip moderatorius.",
       "copyLink": "Kopijuoti nuorodą",
-      "copied": "Nukopijuota!"
+      "copied": "Nukopijuota!",
+      "reveal": "Rodyti",
+      "hide": "Slėpti",
+      "warning": "Kiekvienas, turintis šią nuorodą, administruoja renginį: nerodykite jos bendrinant ekraną ir neįklijuokite jos į pokalbį.",
+      "hidden": "Nuoroda paslėpta",
+      "copyFailed": "Nepavyko nukopijuoti: pasirinkite toliau pateiktą adresą ir nukopijuokite jį ranka."
     },
     "feedbackAdmin": {
       "title": "Atsiliepimų rezultatai",
@@ -2072,7 +2077,6 @@
     },
     "eventDetail": {
       "copyPublicUrl": "Kopijuoti viešą nuorodą",
-      "copyModeratorUrl": "Kopijuoti moderatoriaus nuorodą",
       "enterAsModerator": "Įeiti į live",
       "editEvent": "Redaguoti renginį",
       "editSettings": "Redaguoti nustatymus",
@@ -2115,7 +2119,6 @@
         "postEventSummary": "{connected} prisijungę iš {registered} registracijų (numatomi {estimated})",
         "estimatedAttendance": "Numatomi: {estimated} dalyviai"
       },
-      "copyGuestUrl": "Kopijuoti svečių nuorodą",
       "aiManageTitle": "Transkripcija, santrauka ir vertimai",
       "aiManageDesc": "Tvarkykite šio įrašo DI postprodukciją: taisykite transkripciją ir kalbėtojų priskyrimą (kas ką pasakė), redaguokite santrauką ir tvarkykite vertimo kalbas.",
       "aiManageCta": "Atverti postprodukcijos valdymą",

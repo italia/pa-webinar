@@ -1241,7 +1241,12 @@
       "moderatorLinkHint": "Dela enbart denna länk med moderatorer. Alla med denna länk kan hantera evenemanget.",
       "liveRoomHint": "Direktlänk för att gå direkt in i rummet som moderator.",
       "copyLink": "Kopiera länk",
-      "copied": "Kopierat!"
+      "copied": "Kopierat!",
+      "reveal": "Visa",
+      "hide": "Dölj",
+      "warning": "Alla som har den här länken administrerar evenemanget: visa den inte när du delar skärm och klistra inte in den i en chatt.",
+      "hidden": "Länken är dold",
+      "copyFailed": "Kopieringen misslyckades: markera adressen nedan och kopiera den manuellt."
     },
     "feedbackAdmin": {
       "title": "Feedbackresultat",
@@ -2072,7 +2077,6 @@
     },
     "eventDetail": {
       "copyPublicUrl": "Kopiera publik länk",
-      "copyModeratorUrl": "Kopiera moderatorlänk",
       "enterAsModerator": "Gå in live",
       "editEvent": "Redigera evenemang",
       "editSettings": "Redigera inställningar",
@@ -2115,7 +2119,6 @@
         "postEventSummary": "{connected} anslöt av {registered} anmälningar (uppskattat {estimated})",
         "estimatedAttendance": "Uppskattat: {estimated} deltagare"
       },
-      "copyGuestUrl": "Kopiera gästlänk",
       "aiManageTitle": "Transkription, sammanfattning och översättningar",
       "aiManageDesc": "Hantera AI-efterproduktionen av den här inspelningen: rätta transkriptionen och tilldelningen av talare (vem som säger vad), redigera sammanfattningen och hantera översättningsspråken.",
       "aiManageCta": "Öppna hanteringen av efterproduktionen",

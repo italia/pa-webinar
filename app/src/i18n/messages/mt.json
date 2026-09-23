@@ -1241,7 +1241,12 @@
       "moderatorLinkHint": "Aqsam dan il-link mal-moderaturi biss. Kull min għandu dan il-link jista' jimmaniġġja l-avveniment.",
       "liveRoomHint": "Link għal tidħol direttamentità fil-stanza bħal moderatur.",
       "copyLink": "Ikkopja l-link",
-      "copied": "Ikkopjat!"
+      "copied": "Ikkopjat!",
+      "reveal": "Uri",
+      "hide": "Aħbi",
+      "warning": "Kull min għandu dan il-link jamministra l-avveniment: turiehx waqt li taqsam l-iskrin u tehmżux f’chat.",
+      "hidden": "Il-link huwa moħbi",
+      "copyFailed": "L-ikkupjar ma rnexxiex: agħżel l-indirizz hawn taħt u kkupjah manwalment."
     },
     "feedbackAdmin": {
       "title": "Riżultati tal-Feedback",
@@ -2072,7 +2077,6 @@
     },
     "eventDetail": {
       "copyPublicUrl": "Copia link pubblico",
-      "copyModeratorUrl": "Copia link moderatur",
       "enterAsModerator": "Entra live",
       "editEvent": "Editja l-avveniment",
       "editSettings": "Editja impostazioni",
@@ -2115,7 +2119,6 @@
         "postEventSummary": "{connected} konnessi fuq {registered} reġistrazzjonijiet (stimatu {estimated})",
         "estimatedAttendance": "Stimati: {estimated} parteċipanti"
       },
-      "copyGuestUrl": "Copia link għal mistednin",
       "aiManageTitle": "Traskrizzjoni, sommarju u traduzzjonijiet",
       "aiManageDesc": "Immaniġġja l-post-produzzjoni bl-AI ta' din ir-reġistrazzjoni: ikkoreġi t-traskrizzjoni u l-attribuzzjoni tal-kelliema (min qal xiex), immodifika s-sommarju u mmaniġġja l-lingwi tat-traduzzjoni.",
       "aiManageCta": "Iftaħ il-ġestjoni tal-post-produzzjoni",

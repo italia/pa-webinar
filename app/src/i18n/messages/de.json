@@ -1241,7 +1241,12 @@
       "moderatorLinkHint": "Teilen Sie diesen Link nur mit Moderatoren. Jeder mit diesem Link kann die Veranstaltung verwalten.",
       "liveRoomHint": "Direktlink, um als Moderator den Live-Raum zu betreten.",
       "copyLink": "Link kopieren",
-      "copied": "Kopiert!"
+      "copied": "Kopiert!",
+      "reveal": "Anzeigen",
+      "hide": "Ausblenden",
+      "warning": "Wer diesen Link hat, verwaltet die Veranstaltung: Zeigen Sie ihn nicht bei der Bildschirmfreigabe und fügen Sie ihn nicht in einen Chat ein.",
+      "hidden": "Link ausgeblendet",
+      "copyFailed": "Kopieren fehlgeschlagen: Markieren Sie die Adresse unten und kopieren Sie sie manuell."
     },
     "feedbackAdmin": {
       "title": "Feedback-Ergebnisse",
@@ -2072,7 +2077,6 @@
     },
     "eventDetail": {
       "copyPublicUrl": "Öffentlichen Link kopieren",
-      "copyModeratorUrl": "Moderator-Link kopieren",
       "enterAsModerator": "Live betreten",
       "editEvent": "Event bearbeiten",
       "editSettings": "Einstellungen bearbeiten",
@@ -2115,7 +2119,6 @@
         "postEventSummary": "{connected} beigetreten von {registered} Anmeldungen (geschätzt {estimated})",
         "estimatedAttendance": "Geschätzt: {estimated} Teilnehmende"
       },
-      "copyGuestUrl": "Gast-Link kopieren",
       "aiManageTitle": "Transkript, Zusammenfassung und Übersetzungen",
       "aiManageDesc": "Verwalten Sie die KI-Nachbearbeitung dieser Aufzeichnung: Korrigieren Sie das Transkript und die Zuordnung der Sprecher (wer sagt was), bearbeiten Sie die Zusammenfassung und verwalten Sie die Übersetzungssprachen.",
       "aiManageCta": "Verwaltung der Nachbearbeitung öffnen",

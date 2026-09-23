@@ -1241,7 +1241,12 @@
       "moderatorLinkHint": "Partilhe esta ligação apenas com os moderadores. Qualquer pessoa com esta ligação pode gerir o evento.",
       "liveRoomHint": "Ligação para entrar diretamente na sala como moderador.",
       "copyLink": "Copiar ligação",
-      "copied": "Copiado!"
+      "copied": "Copiado!",
+      "reveal": "Mostrar",
+      "hide": "Ocultar",
+      "warning": "Quem tiver esta ligação administra o evento: não a mostre durante a partilha de ecrã e não a cole numa conversa.",
+      "hidden": "Ligação oculta",
+      "copyFailed": "Não foi possível copiar: selecione o endereço abaixo e copie-o manualmente."
     },
     "feedbackAdmin": {
       "title": "Resultados do Feedback",
@@ -2072,7 +2077,6 @@
     },
     "eventDetail": {
       "copyPublicUrl": "Copiar ligação pública",
-      "copyModeratorUrl": "Copiar ligação de moderador",
       "enterAsModerator": "Entrar em direto",
       "editEvent": "Editar evento",
       "editSettings": "Editar definições",
@@ -2115,7 +2119,6 @@
         "postEventSummary": "{connected} ligados em {registered} inscrições (estimadas {estimated})",
         "estimatedAttendance": "Estimados: {estimated} participantes"
       },
-      "copyGuestUrl": "Copiar ligação para convidados",
       "aiManageTitle": "Transcrição, resumo e traduções",
       "aiManageDesc": "Faça a gestão da pós-produção com IA desta gravação: corrija a transcrição e a atribuição dos oradores (quem diz o quê), edite o resumo e faça a gestão dos idiomas de tradução.",
       "aiManageCta": "Abrir a gestão da pós-produção",

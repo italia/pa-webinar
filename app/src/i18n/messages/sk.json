@@ -1241,7 +1241,12 @@
       "moderatorLinkHint": "Tento odkaz zdieľajte iba s moderátormi. Ktokoľvek s týmto odkazom môže udalosť spravovať.",
       "liveRoomHint": "Odkaz na priamy vstup do miestnosti ako moderátor.",
       "copyLink": "Kopírovať odkaz",
-      "copied": "Skopírované!"
+      "copied": "Skopírované!",
+      "reveal": "Zobraziť",
+      "hide": "Skryť",
+      "warning": "Ktokoľvek s týmto odkazom spravuje podujatie: nezobrazujte ho pri zdieľaní obrazovky a nevkladajte ho do chatu.",
+      "hidden": "Odkaz je skrytý",
+      "copyFailed": "Kopírovanie zlyhalo: vyberte adresu nižšie a skopírujte ju ručne."
     },
     "feedbackAdmin": {
       "title": "Výsledky spätnej väzby",
@@ -2072,7 +2077,6 @@
     },
     "eventDetail": {
       "copyPublicUrl": "Kopírovať verejný odkaz",
-      "copyModeratorUrl": "Kopírovať odkaz moderátora",
       "enterAsModerator": "Vstúpiť naživo",
       "editEvent": "Upraviť podujatie",
       "editSettings": "Upraviť nastavenia",
@@ -2115,7 +2119,6 @@
         "postEventSummary": "{connected} pripojených z {registered} registrácií (odhadovaných {estimated})",
         "estimatedAttendance": "Odhad: {estimated} účastníkov"
       },
-      "copyGuestUrl": "Kopírovať odkaz pre hostí",
       "aiManageTitle": "Prepis, zhrnutie a preklady",
       "aiManageDesc": "Spravujte AI postprodukciu tejto nahrávky: opravte prepis a priradenie rečníkov (kto čo hovorí), upravte zhrnutie a spravujte jazyky prekladu.",
       "aiManageCta": "Otvoriť správu postprodukcie",

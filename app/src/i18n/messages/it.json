@@ -1313,7 +1313,12 @@
       "moderatorLinkHint": "Condividi questo link solo con i moderatori. Chiunque lo abbia può gestire l'evento.",
       "liveRoomHint": "Link per entrare direttamente nella stanza come moderatore.",
       "copyLink": "Copia link",
-      "copied": "Copiato!"
+      "copied": "Copiato!",
+      "reveal": "Mostra",
+      "hide": "Nascondi",
+      "warning": "Chi ha questo link amministra l’evento: non mostrarlo in condivisione schermo e non incollarlo in chat.",
+      "hidden": "Link nascosto",
+      "copyFailed": "Copia non riuscita: seleziona l’indirizzo qui sotto e copialo a mano."
     },
     "feedbackAdmin": {
       "title": "Risultati Feedback",
@@ -2144,7 +2149,6 @@
     },
     "eventDetail": {
       "copyPublicUrl": "Copia link pubblico",
-      "copyModeratorUrl": "Copia link moderatore",
       "enterAsModerator": "Entra live",
       "editEvent": "Modifica evento",
       "editSettings": "Modifica impostazioni",
@@ -2187,7 +2191,6 @@
         "postEventSummary": "{connected} connessi su {registered} registrazioni (stimate {estimated})",
         "estimatedAttendance": "Stimati: {estimated} partecipanti"
       },
-      "copyGuestUrl": "Copia link per ospiti",
       "aiManageTitle": "Trascrizione, sintesi e traduzioni",
       "aiManageDesc": "Gestisci la post-produzione AI di questa registrazione: correggi la trascrizione e l'assegnazione dei relatori (chi dice cosa), modifica la sintesi e gestisci le lingue di traduzione.",
       "aiManageCta": "Apri la gestione post-produzione",
