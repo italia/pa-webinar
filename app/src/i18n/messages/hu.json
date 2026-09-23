@@ -3563,7 +3563,9 @@
     "backToWaitingRoom": "Vissza a váróterembe",
     "gardenDialogLabel": "A váróterem tere",
     "gardenGateHint": "Beléphetsz innen, vagy elviheted az avatarodat a kapuig.",
-    "classicVersion": "Klasszikus változat"
+    "classicVersion": "Klasszikus változat",
+    "roomNotReadyButton": "A terem készül…",
+    "roomNotReadyPiazza": "Addig nézz be a térre"
   },
   "recording": {
     "management": "Videofelvétel",

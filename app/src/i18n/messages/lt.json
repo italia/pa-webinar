@@ -3563,7 +3563,9 @@
     "backToWaitingRoom": "Atgal į laukiamąjį",
     "gardenDialogLabel": "Laukiamojo aikštė",
     "gardenGateHint": "Gali prisijungti iš čia arba nuvesti savo avatarą iki vartų.",
-    "classicVersion": "Klasikinė versija"
+    "classicVersion": "Klasikinė versija",
+    "roomNotReadyButton": "Salė ruošiama…",
+    "roomNotReadyPiazza": "Tuo tarpu užsuk į aikštę"
   },
   "recording": {
     "management": "Vaizdo įrašas",

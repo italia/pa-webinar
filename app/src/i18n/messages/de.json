@@ -3563,7 +3563,9 @@
     "backToWaitingRoom": "Zurück zum Warteraum",
     "gardenDialogLabel": "Platz des Warteraums",
     "gardenGateHint": "Sie können von hier beitreten oder Ihren Avatar bis zum Tor führen.",
-    "classicVersion": "Klassische Ansicht"
+    "classicVersion": "Klassische Ansicht",
+    "roomNotReadyButton": "Der Raum wird vorbereitet…",
+    "roomNotReadyPiazza": "Geh solange auf den Platz"
   },
   "recording": {
     "management": "Videoaufzeichnung",

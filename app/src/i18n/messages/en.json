@@ -3563,7 +3563,9 @@
     "backToWaitingRoom": "Back to the waiting room",
     "gardenDialogLabel": "Waiting-room square",
     "gardenGateHint": "You can join from here, or walk your avatar to the gate.",
-    "classicVersion": "Classic version"
+    "classicVersion": "Classic version",
+    "roomNotReadyButton": "The room is getting ready…",
+    "roomNotReadyPiazza": "Head to the square meanwhile"
   },
   "recording": {
     "management": "Video recording",

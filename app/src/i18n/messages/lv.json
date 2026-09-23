@@ -3563,7 +3563,9 @@
     "backToWaitingRoom": "Atpakaļ uz uzgaidāmo telpu",
     "gardenDialogLabel": "Uzgaidāmās telpas laukums",
     "gardenGateHint": "Vari pievienoties no šejienes vai aizvest savu avataru līdz vārtiem.",
-    "classicVersion": "Klasiskā versija"
+    "classicVersion": "Klasiskā versija",
+    "roomNotReadyButton": "Telpa tiek sagatavota…",
+    "roomNotReadyPiazza": "Pa to laiku aizej uz laukumu"
   },
   "recording": {
     "management": "Video ieraksts",

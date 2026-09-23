@@ -3563,7 +3563,9 @@
     "backToWaitingRoom": "Tilbage til venteværelset",
     "gardenDialogLabel": "Venteværelsets plads",
     "gardenGateHint": "Du kan deltage herfra, eller føre din avatar hen til porten.",
-    "classicVersion": "Klassisk version"
+    "classicVersion": "Klassisk version",
+    "roomNotReadyButton": "Rummet gøres klar…",
+    "roomNotReadyPiazza": "Gå på torvet i mellemtiden"
   },
   "recording": {
     "management": "Videooptagelse",

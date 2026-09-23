@@ -323,8 +323,37 @@ export default function WaitingRoom({
   // gated da un consenso esplicito. Niente consenso → niente ingresso.
   const multitrackRequired =
     !!event.multitrackRecordingEnabled && !isEnded && !multitrackConsentExempt;
+  // La piazza e' disponibile quando c'e' qualcosa da fare e nessun cancello
+  // davanti: a evento finito non serve, in vista classica e' stata rifiutata,
+  // e senza consenso multitraccia non si va da nessuna parte.
+  const canPlay = !isEnded && !classicView && !multitrackRequired;
+
+  // La sala e' pronta quando il ponte video c'e'. Si blocca SOLO su «si sta
+  // accendendo adesso»: gli altri valori — nessuno lo ha chiesto, sonda muta,
+  // conto andato in errore — non sono un no, e trattarli come tale
+  // chiuderebbe la porta a una conferenza sana.
+  const pontePresunto = jvbReady !== false;
+  // E comunque il cancello non puo' diventare una trappola. La misura viene da
+  // una fotografia che un lavoro periodico aggiorna: se quel lavoro e' fermo,
+  // o se due eventi si contendono i bridge, «si sta accendendo» resta scritto
+  // su una sala che funziona. Dopo un minuto si offre di entrare lo stesso:
+  // aspettare per niente e' un fastidio, non poter entrare e' un evento perso.
+  const [attesaLunga, setAttesaLunga] = useState(false);
+  useEffect(() => {
+    if (pontePresunto) {
+      setAttesaLunga(false);
+      return;
+    }
+    const t = setTimeout(() => setAttesaLunga(true), 60_000);
+    return () => clearTimeout(t);
+  }, [pontePresunto]);
+
+  const salaPronta = pontePresunto || attesaLunga;
   const canEnter =
-    nameValid && emailValid && (!multitrackRequired || multitrackConsent);
+    nameValid &&
+    emailValid &&
+    (!multitrackRequired || multitrackConsent) &&
+    salaPronta;
 
   // Cronometro warm-up. Ci si ancora UNA volta per ciclo (identità =
   // warmup.startedAt): senza questo, ri-ancorarsi a ogni poll (3s) fa
@@ -466,13 +495,18 @@ export default function WaitingRoom({
       handleEnterLive();
       return;
     }
+    // Se manca solo la sala, mandare la persona a sistemare il nome — che e'
+    // gia' a posto — la fa cercare un errore che non ha fatto.
+    if (!salaPronta && nameValid && emailValid) {
+      throw new Error(t('roomNotReadyButton'));
+    }
     if (typeof document !== 'undefined') {
       const el = document.getElementById('waiting-name') as HTMLInputElement | null;
       el?.focus();
       el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
     throw new Error('waiting-room: pre-join not complete');
-  }, [canEnter, handleEnterLive]);
+  }, [canEnter, handleEnterLive, salaPronta, nameValid, emailValid, t]);
 
   const handleDeviceStateChange = useCallback(
     (s: WaitingRoomJoinPrefs) => setDevicePrefs(s),
@@ -484,6 +518,9 @@ export default function WaitingRoom({
   const gameDialogRef = useRef<HTMLDivElement>(null);
   const inviteRef = useRef<HTMLButtonElement>(null);
   const classicToggleRef = useRef<HTMLButtonElement>(null);
+  /** L'invito alla piazza mostrato mentre la sala si prepara: quando si entra
+   *  di li', e' li' che il fuoco deve tornare uscendo. */
+  const piazzaAttesaRef = useRef<HTMLButtonElement>(null);
   const returnFocusRef = useRef(false);
   useEffect(() => {
     if (!gameOpen) {
@@ -491,7 +528,7 @@ export default function WaitingRoom({
         returnFocusRef.current = false;
         // L'invito, se c'è ancora; passando alla versione classica sparisce, e
         // allora il posto giusto è il pulsante che riporta indietro.
-        (inviteRef.current ?? classicToggleRef.current)?.focus();
+        (inviteRef.current ?? piazzaAttesaRef.current ?? classicToggleRef.current)?.focus();
       }
       return;
     }
@@ -534,6 +571,10 @@ export default function WaitingRoom({
                 size="sm"
                 className="fw-semibold"
                 onClick={() => {
+                  // Tornare indietro deve funzionare SEMPRE: questi due
+                  // pulsanti sono l'unica strada fuori dal riproduttore, e
+                  // disabilitarli ci intrappolava dentro chi non ha ancora
+                  // scritto il nome o sta aspettando la sala.
                   setWatchingCatchUp(false);
                   handleEnterLive();
                 }}
@@ -894,7 +935,28 @@ export default function WaitingRoom({
           )}
         </Button>
       )}
-      {canEnterLive ? (
+      {canEnterLive && !salaPronta ? (
+        // Entrare prima che il ponte video esista significa arrivare in una
+        // stanza che non c'e': si resta qui, e lo si dice.
+        <>
+          <Button color="primary" size="lg" className="fw-semibold" disabled>
+            <Spinner active small className="me-2" />
+            {t('roomNotReadyButton')}
+          </Button>
+          {canPlay && !gameOpen && (
+            <Button
+              color="primary"
+              outline
+              className="fw-semibold"
+              innerRef={piazzaAttesaRef}
+              onClick={() => setGameOpen(true)}
+            >
+              <span className="me-2" aria-hidden="true">🌿</span>
+              {t('roomNotReadyPiazza')}
+            </Button>
+          )}
+        </>
+      ) : canEnterLive ? (
         <Button
           color="primary"
           size="lg"
@@ -959,7 +1021,6 @@ export default function WaitingRoom({
   // ingombrante per essere un ornamento) e la seconda ha smesso di stare in una
   // scatola: si apre a piena pagina, con dentro tutto il necessario — nome,
   // controlli, ingresso in call — e un'uscita che riporta qui.
-  const canPlay = !isEnded && !classicView && !multitrackRequired;
 
   // La piazza non è una pagina DIVERSA: è QUESTA pagina, ri-disposta accanto
   // alla scena. Il primo tentativo duplicava i controlli in un pannello
@@ -1039,7 +1100,10 @@ export default function WaitingRoom({
   // L'invito al gioco: un riquadro nella colonna principale, sotto i controlli.
   // È il "pulsante o infografica" chiesto — un gesto esplicito, non una scena
   // che parte addosso a chi è arrivato per prepararsi.
-  const gameInvite = canPlay && !gameOpen ? (
+  // L'invito alla piazza: uno solo per schermata. Quando la sala non e' ancora
+  // pronta la proposta sta gia' sotto al pulsante d'ingresso, dove serve —
+  // qui sarebbe la stessa cosa detta due volte.
+  const gameInvite = canPlay && !gameOpen && salaPronta ? (
     <button
       type="button"
       className="wr-game-invite"

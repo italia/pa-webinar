@@ -3563,7 +3563,9 @@
     "backToWaitingRoom": "Επιστροφή στην αίθουσα αναμονής",
     "gardenDialogLabel": "Πλατεία της αίθουσας αναμονής",
     "gardenGateHint": "Μπορείτε να μπείτε από εδώ ή να οδηγήσετε το άβατάρ σας ως την πύλη.",
-    "classicVersion": "Κλασική έκδοση"
+    "classicVersion": "Κλασική έκδοση",
+    "roomNotReadyButton": "Η αίθουσα ετοιμάζεται…",
+    "roomNotReadyPiazza": "Στο μεταξύ πήγαινε στην πλατεία"
   },
   "recording": {
     "management": "Βιντεοσκόπηση",

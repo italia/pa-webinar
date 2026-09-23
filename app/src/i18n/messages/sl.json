@@ -3563,7 +3563,9 @@
     "backToWaitingRoom": "Nazaj v čakalnico",
     "gardenDialogLabel": "Trg čakalnice",
     "gardenGateHint": "Pridružiš se lahko od tu ali pa svojega avatarja pripelješ do vrat.",
-    "classicVersion": "Klasična različica"
+    "classicVersion": "Klasična različica",
+    "roomNotReadyButton": "Soba se pripravlja…",
+    "roomNotReadyPiazza": "Med tem skoči na trg"
   },
   "recording": {
     "management": "Video posnetek",

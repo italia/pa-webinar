@@ -3563,7 +3563,9 @@
     "backToWaitingRoom": "Tagasi ooteruumi",
     "gardenDialogLabel": "Ooteruumi väljak",
     "gardenGateHint": "Võid liituda siit või viia oma avatari väravani.",
-    "classicVersion": "Klassikaline versioon"
+    "classicVersion": "Klassikaline versioon",
+    "roomNotReadyButton": "Ruum valmistub…",
+    "roomNotReadyPiazza": "Mine seni väljakule"
   },
   "recording": {
     "management": "Videosalvestis",

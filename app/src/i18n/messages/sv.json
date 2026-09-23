@@ -3563,7 +3563,9 @@
     "backToWaitingRoom": "Tillbaka till väntrummet",
     "gardenDialogLabel": "Väntrummets torg",
     "gardenGateHint": "Du kan gå med härifrån, eller gå med din avatar fram till porten.",
-    "classicVersion": "Klassisk version"
+    "classicVersion": "Klassisk version",
+    "roomNotReadyButton": "Rummet förbereds…",
+    "roomNotReadyPiazza": "Gå till torget under tiden"
   },
   "recording": {
     "management": "Videoinspelning",

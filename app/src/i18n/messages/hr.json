@@ -3563,7 +3563,9 @@
     "backToWaitingRoom": "Natrag u čekaonicu",
     "gardenDialogLabel": "Trg čekaonice",
     "gardenGateHint": "Možeš ući odavde ili odvesti svoj avatar do vrata.",
-    "classicVersion": "Klasična verzija"
+    "classicVersion": "Klasična verzija",
+    "roomNotReadyButton": "Dvorana se priprema…",
+    "roomNotReadyPiazza": "U međuvremenu svrati na trg"
   },
   "recording": {
     "management": "Video snimka",

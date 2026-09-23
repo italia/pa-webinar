@@ -3563,7 +3563,9 @@
     "backToWaitingRoom": "Wróć do poczekalni",
     "gardenDialogLabel": "Plac poczekalni",
     "gardenGateHint": "Możesz dołączyć stąd albo doprowadzić swojego awatara do bramy.",
-    "classicVersion": "Wersja klasyczna"
+    "classicVersion": "Wersja klasyczna",
+    "roomNotReadyButton": "Sala się przygotowuje…",
+    "roomNotReadyPiazza": "W międzyczasie wpadnij na plac"
   },
   "recording": {
     "management": "Nagranie wideo",

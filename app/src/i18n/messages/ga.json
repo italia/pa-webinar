@@ -3563,7 +3563,9 @@
     "backToWaitingRoom": "Ar ais go dtí an seomra feithimh",
     "gardenDialogLabel": "Cearnóg an tseomra feithimh",
     "gardenGateHint": "Is féidir leat dul isteach as seo, nó d'abhatár a threorú chuig an ngeata.",
-    "classicVersion": "Leagan clasaiceach"
+    "classicVersion": "Leagan clasaiceach",
+    "roomNotReadyButton": "Tá an seomra á ullmhú…",
+    "roomNotReadyPiazza": "Téigh go dtí an chearnóg idir an dá linn"
   },
   "recording": {
     "management": "Taifeadadh físe",

@@ -19,6 +19,7 @@ import {
 import { Link, useRouter } from '@/i18n/navigation';
 import type { JitsiMeetExternalAPI } from '@/types/jitsi';
 import type { VideoQualityPreset } from '@/lib/jitsi/config';
+import { leggiStatoPonte } from '@/lib/jitsi/bridge-readiness';
 import JitsiRoom from '@/components/jitsi/jitsi-room';
 import { LivePushContext, useLivePush, useLiveState } from '@/hooks/use-live-state';
 import RecordingConsent, { RecordingBanner } from '@/components/jitsi/recording-consent';
@@ -343,8 +344,10 @@ export default function LiveEventClient({
         if (!res.ok || cancelled) return;
         const data = await res.json();
         if (!cancelled) {
-          setJvbReady(data.metrics?.jvbStatus === 'ready');
-          setJibriReady(data.metrics?.jibriStatus === 'ready');
+          // Vedi lib/jitsi/bridge-readiness: `false` vuol dire «si sta
+          // accendendo adesso», e nient'altro.
+          setJvbReady(leggiStatoPonte(data.metrics?.jvbStatus));
+          setJibriReady(leggiStatoPonte(data.metrics?.jibriStatus));
         }
       } catch {
         /* retry on next tick */

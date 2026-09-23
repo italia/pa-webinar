@@ -3563,7 +3563,9 @@
     "backToWaitingRoom": "Torna alla sala d’attesa",
     "gardenDialogLabel": "Piazza della sala d’attesa",
     "gardenGateHint": "Puoi entrare da qui, oppure portare il tuo avatar fino al cancello.",
-    "classicVersion": "Versione classica"
+    "classicVersion": "Versione classica",
+    "roomNotReadyButton": "La sala si sta preparando…",
+    "roomNotReadyPiazza": "Intanto entra nella piazza"
   },
   "recording": {
     "management": "Registrazione video",

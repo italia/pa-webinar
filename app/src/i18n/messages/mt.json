@@ -3563,7 +3563,9 @@
     "backToWaitingRoom": "Lura lejn il-kamra tal-istennija",
     "gardenDialogLabel": "Il-pjazza tal-kamra tal-istennija",
     "gardenGateHint": "Tista' tidħol minn hawn, jew twassal l-avatar tiegħek sal-bieb.",
-    "classicVersion": "Verżjoni klassika"
+    "classicVersion": "Verżjoni klassika",
+    "roomNotReadyButton": "Il-kamra qed titħejja…",
+    "roomNotReadyPiazza": "Sadanittant idħol fil-pjazza"
   },
   "recording": {
     "management": "Reġistrazzjoni bil-vidjo",

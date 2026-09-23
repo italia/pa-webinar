@@ -3563,7 +3563,9 @@
     "backToWaitingRoom": "Takaisin odotustilaan",
     "gardenDialogLabel": "Odotustilan tori",
     "gardenGateHint": "Voit liittyä täältä tai viedä hahmosi portille.",
-    "classicVersion": "Klassinen versio"
+    "classicVersion": "Klassinen versio",
+    "roomNotReadyButton": "Huonetta valmistellaan…",
+    "roomNotReadyPiazza": "Käy sillä välin torilla"
   },
   "recording": {
     "management": "Videotallenne",

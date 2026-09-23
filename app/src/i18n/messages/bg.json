@@ -3563,7 +3563,9 @@
     "backToWaitingRoom": "Обратно към чакалнята",
     "gardenDialogLabel": "Площад на чакалнята",
     "gardenGateHint": "Можете да влезете оттук или да отведете аватара си до портата.",
-    "classicVersion": "Класическа версия"
+    "classicVersion": "Класическа версия",
+    "roomNotReadyButton": "Залата се подготвя…",
+    "roomNotReadyPiazza": "Междувременно влез на площада"
   },
   "recording": {
     "management": "Видеозапис",

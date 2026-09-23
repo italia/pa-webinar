@@ -3563,7 +3563,9 @@
     "backToWaitingRoom": "Terug naar de wachtruimte",
     "gardenDialogLabel": "Plein van de wachtruimte",
     "gardenGateHint": "Je kunt hiervandaan deelnemen, of je avatar naar de poort lopen.",
-    "classicVersion": "Klassieke versie"
+    "classicVersion": "Klassieke versie",
+    "roomNotReadyButton": "De ruimte wordt klaargemaakt…",
+    "roomNotReadyPiazza": "Ga ondertussen naar het plein"
   },
   "recording": {
     "management": "Video-opname",
