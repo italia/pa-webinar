@@ -8,7 +8,6 @@
  * l'opzione compare nel pannello e il salvataggio la rifiuta.
  */
 import { z } from 'zod';
-
 import { HomePageMode } from '@prisma/client';
 
 export const updateSettingsSchema = z.object({
