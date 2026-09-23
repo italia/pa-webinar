@@ -443,7 +443,8 @@
       "hide": "Dölj timern",
       "remainingLabel": "Återstående tid (klicka för förfluten tid)",
       "elapsedLabel": "Förfluten tid (klicka för återstående tid)"
-    }
+    },
+    "videoCallFrameTitle": "Event video call"
   },
   "qa": {
     "title": "Frågor och svar",

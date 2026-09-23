@@ -443,7 +443,8 @@
       "hide": "Hide the timer",
       "remainingLabel": "Time remaining (click for time elapsed)",
       "elapsedLabel": "Time elapsed (click for time remaining)"
-    }
+    },
+    "videoCallFrameTitle": "Event video call"
   },
   "qa": {
     "title": "Questions & Answers",

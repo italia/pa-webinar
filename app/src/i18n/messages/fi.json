@@ -443,7 +443,8 @@
       "hide": "Piilota ajastin",
       "remainingLabel": "Aikaa jäljellä (napsauta nähdäksesi kuluneen ajan)",
       "elapsedLabel": "Kulunut aika (napsauta nähdäksesi jäljellä olevan ajan)"
-    }
+    },
+    "videoCallFrameTitle": "Event video call"
   },
   "qa": {
     "title": "Kysymykset ja vastaukset",

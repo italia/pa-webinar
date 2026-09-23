@@ -443,7 +443,8 @@
       "hide": "Folaigh an t-amadóir",
       "remainingLabel": "An t-am atá fágtha (cliceáil chun an t-am caite a fheiceáil)",
       "elapsedLabel": "An t-am caite (cliceáil chun an t-am atá fágtha a fheiceáil)"
-    }
+    },
+    "videoCallFrameTitle": "Event video call"
   },
   "qa": {
     "title": "Ceisteanna agus Freagraí",

@@ -443,7 +443,8 @@
       "hide": "Ukryj licznik",
       "remainingLabel": "Pozostały czas (kliknij, aby zobaczyć czas, który upłynął)",
       "elapsedLabel": "Czas, który upłynął (kliknij, aby zobaczyć pozostały czas)"
-    }
+    },
+    "videoCallFrameTitle": "Event video call"
   },
   "qa": {
     "title": "Pytania i odpowiedzi",

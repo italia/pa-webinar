@@ -443,7 +443,8 @@
       "hide": "Számláló elrejtése",
       "remainingLabel": "Hátralévő idő (kattintson az eltelt időért)",
       "elapsedLabel": "Eltelt idő (kattintson a hátralévő időért)"
-    }
+    },
+    "videoCallFrameTitle": "Event video call"
   },
   "qa": {
     "title": "Kérdések és válaszok",

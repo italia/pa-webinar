@@ -443,7 +443,8 @@
       "hide": "De timer verbergen",
       "remainingLabel": "Resterende tijd (klik voor de verstreken tijd)",
       "elapsedLabel": "Verstreken tijd (klik voor de resterende tijd)"
-    }
+    },
+    "videoCallFrameTitle": "Event video call"
   },
   "qa": {
     "title": "Vragen en Antwoorden",

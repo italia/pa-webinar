@@ -443,7 +443,8 @@
       "hide": "Slėpti laikmatį",
       "remainingLabel": "Likęs laikas (spustelėkite, kad matytumėte praėjusį)",
       "elapsedLabel": "Praėjęs laikas (spustelėkite, kad matytumėte likusį)"
-    }
+    },
+    "videoCallFrameTitle": "Event video call"
   },
   "qa": {
     "title": "Klausimai ir atsakymai",

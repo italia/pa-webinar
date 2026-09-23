@@ -443,7 +443,8 @@
       "hide": "Ascunde cronometrul",
       "remainingLabel": "Timp rămas (faceți clic pentru timpul scurs)",
       "elapsedLabel": "Timp scurs (faceți clic pentru timpul rămas)"
-    }
+    },
+    "videoCallFrameTitle": "Event video call"
   },
   "qa": {
     "title": "Întrebări și Răspunsuri",

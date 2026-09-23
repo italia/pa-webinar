@@ -443,7 +443,8 @@
       "hide": "Peida taimer",
       "remainingLabel": "Järelejäänud aeg (klõpsa, et näha kulunud aega)",
       "elapsedLabel": "Kulunud aeg (klõpsa, et näha järelejäänud aega)"
-    }
+    },
+    "videoCallFrameTitle": "Event video call"
   },
   "qa": {
     "title": "Küsimused ja vastused",

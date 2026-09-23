@@ -443,7 +443,8 @@
       "hide": "Skrij števec",
       "remainingLabel": "Preostali čas (kliknite za pretečeni čas)",
       "elapsedLabel": "Pretečeni čas (kliknite za preostali čas)"
-    }
+    },
+    "videoCallFrameTitle": "Event video call"
   },
   "qa": {
     "title": "Vprašanja in odgovori",

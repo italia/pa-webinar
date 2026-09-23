@@ -443,7 +443,8 @@
       "hide": "Skryť časovač",
       "remainingLabel": "Zostávajúci čas (kliknutím zobrazíte uplynutý čas)",
       "elapsedLabel": "Uplynutý čas (kliknutím zobrazíte zostávajúci čas)"
-    }
+    },
+    "videoCallFrameTitle": "Event video call"
   },
   "qa": {
     "title": "Otázky a odpovede",

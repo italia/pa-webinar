@@ -443,7 +443,8 @@
       "hide": "Timer ausblenden",
       "remainingLabel": "Verbleibende Zeit (klicken für die verstrichene Zeit)",
       "elapsedLabel": "Verstrichene Zeit (klicken für die verbleibende Zeit)"
-    }
+    },
+    "videoCallFrameTitle": "Event video call"
   },
   "qa": {
     "title": "Fragen und Antworten",

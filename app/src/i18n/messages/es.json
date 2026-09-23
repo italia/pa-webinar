@@ -443,7 +443,8 @@
       "hide": "Ocultar el contador",
       "remainingLabel": "Tiempo restante (haz clic para ver el tiempo transcurrido)",
       "elapsedLabel": "Tiempo transcurrido (haz clic para ver el tiempo restante)"
-    }
+    },
+    "videoCallFrameTitle": "Event video call"
   },
   "qa": {
     "title": "Preguntas y Respuestas",

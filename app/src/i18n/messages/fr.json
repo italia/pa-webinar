@@ -443,7 +443,8 @@
       "hide": "Masquer le minuteur",
       "remainingLabel": "Temps restant (cliquez pour le temps écoulé)",
       "elapsedLabel": "Temps écoulé (cliquez pour le temps restant)"
-    }
+    },
+    "videoCallFrameTitle": "Event video call"
   },
   "qa": {
     "title": "Questions et Réponses",

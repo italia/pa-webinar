@@ -443,7 +443,8 @@
       "hide": "Slēpt taimeri",
       "remainingLabel": "Atlikušais laiks (noklikšķiniet, lai redzētu pagājušo laiku)",
       "elapsedLabel": "Pagājušais laiks (noklikšķiniet, lai redzētu atlikušo laiku)"
-    }
+    },
+    "videoCallFrameTitle": "Event video call"
   },
   "qa": {
     "title": "Jautājumi un atbildes",

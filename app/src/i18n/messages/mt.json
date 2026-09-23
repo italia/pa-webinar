@@ -443,7 +443,8 @@
       "hide": "Aħbi l-kronometru",
       "remainingLabel": "Ħin li fadal (ikklikkja għall-ħin li għadda)",
       "elapsedLabel": "Ħin li għadda (ikklikkja għall-ħin li fadal)"
-    }
+    },
+    "videoCallFrameTitle": "Event video call"
   },
   "qa": {
     "title": "Mistoqsijiet u Tweġibiet",
