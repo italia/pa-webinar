@@ -135,7 +135,6 @@
       "toggleChat": "Klepet",
       "toggleQa": "Q&A",
       "toggleRecording": "Snemanje",
-      "settingsSection": "Nastavitve dogodka",
       "sessionsAndRecordings": "Seje in video posnetki",
       "postEventSection": "Po dogodku in povratne informacije"
     },
@@ -2084,7 +2083,7 @@
       "organizers": "Organizatorji",
       "privacyGdpr": "Zasebnost in GDPR",
       "postEventTitle": "Po dogodku in povratne informacije",
-      "recordingSection": "Snemanje",
+      "recordingSection": "Videoposnetek dogodka",
       "callSessions": "Seje in telemetrija",
       "questionnaires": "Vprašalniki",
       "questionnaireCount": "{count, plural, =0 {Brez povezanih vprašalnikov} one {1 povezan vprašalnik} two {# povezana vprašalnika} few {# povezani vprašalniki} other {# povezanih vprašalnikov}}",
@@ -2092,12 +2091,10 @@
       "manageQuestionnaires": "Upravljaj vprašalnike",
       "tabs": {
         "overview": "Pregled",
-        "settings": "Nastavitve",
         "people": "Osebe",
         "content": "Vsebine",
-        "audit": "Posnetki in pregled",
-        "postEvent": "Po dogodku",
-        "analytics": "Statistika"
+        "analytics": "Statistika",
+        "afterEvent": "Po dogodku"
       },
       "toggles": {
         "unmute": "Udeleženci lahko govorijo",
@@ -2116,8 +2113,11 @@
         "capacityEstimate": "≈{jvbs} JVB · {ram} RAM",
         "noReminders": "Ni nastavljenih opomnikov",
         "tags": "Oznake",
-        "postEventSummary": "{connected} povezanih od {registered} prijav (ocena {estimated})",
-        "estimatedAttendance": "Ocena: {estimated} udeležencev"
+        "postEventSummary": "{connected} povezanih od {registered} prijav (zmogljivost {estimated})",
+        "estimatedAttendance": "Največja zmogljivost: {estimated} udeležencev",
+        "reminderScheduled": "Odide {when}",
+        "reminderMissed": "Ni poslano — trenutek je minil",
+        "reminderSoon": "Vsak trenutek"
       },
       "aiManageTitle": "Prepis, povzetek in prevodi",
       "aiManageDesc": "Upravljajte postprodukcijo AI za ta posnetek: popravite prepis in pripis govorcev (kdo kaj pove), uredite povzetek in upravljajte jezike prevoda.",
@@ -2133,7 +2133,11 @@
       "duplicateNext": "Podvoji za naslednjič",
       "duplicateNextBusy": "Podvajanje…",
       "duplicateNextHint": "Ustvari osnutek s celotno nastavitvijo tega dogodka (snemanje, ločene sledi, AI, agenda, opomniki). Če ima dogodek ponavljanje, se datum premakne na naslednjo ponovitev; sicer ga nastavite sami.",
-      "duplicateNextError": "Podvajanje ni uspelo. Poskusite znova."
+      "duplicateNextError": "Podvajanje ni uspelo. Poskusite znova.",
+      "capacitySection": "Zmogljivost in infrastruktura",
+      "capacitySubtitle": "Nastavljeno za največ {max} udeležencev",
+      "publishBlockedLive": "Dogodek že poteka",
+      "publishBlockedEnded": "Dogodek se je končal"
     },
     "rubrica": {
       "title": "Imenik",

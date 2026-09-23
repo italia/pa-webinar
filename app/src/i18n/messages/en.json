@@ -135,7 +135,6 @@
       "toggleChat": "Chat",
       "toggleQa": "Q&A",
       "toggleRecording": "Recording",
-      "settingsSection": "Event settings",
       "sessionsAndRecordings": "Sessions and video recordings",
       "postEventSection": "Post-event and feedback"
     },
@@ -2084,7 +2083,7 @@
       "organizers": "Organizers",
       "privacyGdpr": "Privacy & GDPR",
       "postEventTitle": "Post-event & feedback",
-      "recordingSection": "Recording",
+      "recordingSection": "Event video",
       "callSessions": "Sessions & telemetry",
       "questionnaires": "Questionnaires",
       "questionnaireCount": "{count, plural, =0 {No questionnaires linked} one {1 questionnaire linked} other {# questionnaires linked}}",
@@ -2092,12 +2091,10 @@
       "manageQuestionnaires": "Manage questionnaires",
       "tabs": {
         "overview": "Overview",
-        "settings": "Settings",
         "people": "People",
         "content": "Content",
-        "audit": "Recordings & Audit",
-        "postEvent": "Post-event",
-        "analytics": "Statistics"
+        "analytics": "Statistics",
+        "afterEvent": "After the event"
       },
       "toggles": {
         "unmute": "Participants can unmute",
@@ -2111,13 +2108,16 @@
         "recordingConsent": "Recording consent"
       },
       "sidebar": {
-        "registrations": "Registrations",
+        "registrations": "Sign-ups",
         "ofMax": "{current} of {max}",
         "capacityEstimate": "≈{jvbs} JVB · {ram} RAM",
         "noReminders": "No reminders configured",
         "tags": "Tags",
-        "postEventSummary": "{connected} joined of {registered} registrations (estimated {estimated})",
-        "estimatedAttendance": "Estimated: {estimated} attendees"
+        "postEventSummary": "{connected} connected out of {registered} sign-ups (capacity {estimated})",
+        "estimatedAttendance": "Maximum capacity: {estimated} participants",
+        "reminderScheduled": "Goes out on {when}",
+        "reminderMissed": "Not sent — the moment has passed",
+        "reminderSoon": "Any moment now"
       },
       "aiManageTitle": "Transcript, summary and translations",
       "aiManageDesc": "Manage the AI post-production of this recording: fix the transcript and speaker attribution (who says what), edit the summary and manage translation languages.",
@@ -2133,7 +2133,11 @@
       "duplicateNext": "Duplicate for next time",
       "duplicateNextBusy": "Duplicating…",
       "duplicateNextHint": "Creates a draft carrying this event’s entire configuration (recording, separate tracks, AI, agenda, reminders). If the event has a cadence the date moves to the next occurrence; otherwise it is left for you to set.",
-      "duplicateNextError": "Could not duplicate. Please try again."
+      "duplicateNextError": "Could not duplicate. Please try again.",
+      "capacitySection": "Capacity and infrastructure",
+      "capacitySubtitle": "Configured for up to {max} participants",
+      "publishBlockedLive": "The event is already under way",
+      "publishBlockedEnded": "The event has ended"
     },
     "rubrica": {
       "title": "Address book",

@@ -135,7 +135,6 @@
       "toggleChat": "Czat",
       "toggleQa": "Q&A",
       "toggleRecording": "Nagrywanie",
-      "settingsSection": "Ustawienia wydarzenia",
       "sessionsAndRecordings": "Sesje i nagrania wideo",
       "postEventSection": "Po wydarzeniu i opinie"
     },
@@ -2084,7 +2083,7 @@
       "organizers": "Organizatorzy",
       "privacyGdpr": "Prywatność i RODO",
       "postEventTitle": "Po wydarzeniu i opinie",
-      "recordingSection": "Nagrywanie",
+      "recordingSection": "Nagranie wideo wydarzenia",
       "callSessions": "Sesje i telemetria",
       "questionnaires": "Kwestionariusze",
       "questionnaireCount": "{count, plural, =0 {Brak powiązanych kwestionariuszy} one {1 powiązany kwestionariusz} few {# powiązane kwestionariusze} many {# powiązanych kwestionariuszy} other {# powiązanych kwestionariuszy}}",
@@ -2092,12 +2091,10 @@
       "manageQuestionnaires": "Zarządzaj kwestionariuszami",
       "tabs": {
         "overview": "Przegląd",
-        "settings": "Ustawienia",
         "people": "Osoby",
         "content": "Treści",
-        "audit": "Nagrania i audyt",
-        "postEvent": "Po wydarzeniu",
-        "analytics": "Statystyki"
+        "analytics": "Statystyki",
+        "afterEvent": "Po wydarzeniu"
       },
       "toggles": {
         "unmute": "Uczestnicy mogą włączyć mikrofon",
@@ -2111,13 +2108,16 @@
         "recordingConsent": "Zgoda na nagrywanie"
       },
       "sidebar": {
-        "registrations": "Rejestracje",
+        "registrations": "Zapisy",
         "ofMax": "{current} z {max}",
         "capacityEstimate": "≈{jvbs} JVB · {ram} RAM",
         "noReminders": "Nie skonfigurowano przypomnień",
         "tags": "Tagi",
-        "postEventSummary": "{connected} dołączonych z {registered} rejestracji (szacowane {estimated})",
-        "estimatedAttendance": "Szacowani: {estimated} uczestników"
+        "postEventSummary": "{connected} połączonych z {registered} zapisów (pojemność {estimated})",
+        "estimatedAttendance": "Maksymalna pojemność: {estimated} uczestników",
+        "reminderScheduled": "Wyjdzie {when}",
+        "reminderMissed": "Nie wysłano — moment minął",
+        "reminderSoon": "Lada chwila"
       },
       "aiManageTitle": "Transkrypcja, podsumowanie i tłumaczenia",
       "aiManageDesc": "Zarządzaj postprodukcją AI tego nagrania: popraw transkrypcję i przypisanie mówców (kto co mówi), edytuj podsumowanie i zarządzaj językami tłumaczenia.",
@@ -2133,7 +2133,11 @@
       "duplicateNext": "Powiel na następny raz",
       "duplicateNextBusy": "Powielanie…",
       "duplicateNextHint": "Tworzy wersję roboczą z całą konfiguracją tego wydarzenia (nagrywanie, osobne ścieżki, AI, agenda, przypomnienia). Jeśli wydarzenie ma określony cykl, data zostaje przeniesiona na najbliższy termin; w przeciwnym razie pozostaje do ustawienia.",
-      "duplicateNextError": "Nie udało się powielić. Spróbuj ponownie."
+      "duplicateNextError": "Nie udało się powielić. Spróbuj ponownie.",
+      "capacitySection": "Pojemność i infrastruktura",
+      "capacitySubtitle": "Skonfigurowano dla maksymalnie {max} uczestników",
+      "publishBlockedLive": "Wydarzenie już trwa",
+      "publishBlockedEnded": "Wydarzenie się zakończyło"
     },
     "rubrica": {
       "title": "Książka adresowa",

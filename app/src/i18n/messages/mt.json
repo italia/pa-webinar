@@ -135,7 +135,6 @@
       "toggleChat": "Chat",
       "toggleQa": "Q&A",
       "toggleRecording": "Reġistrazzjoni",
-      "settingsSection": "Settings tal-avveniment",
       "sessionsAndRecordings": "Sessjonijiet u rekordings tal-vidjo",
       "postEventSection": "Post-avveniment u feedback"
     },
@@ -2084,7 +2083,7 @@
       "organizers": "Organizzaturi",
       "privacyGdpr": "Privatezza & GDPR",
       "postEventTitle": "Post-avveniment & feedback",
-      "recordingSection": "Rekording",
+      "recordingSection": "Il-vidjo tal-avveniment",
       "callSessions": "Sessjonijiet & telemetria",
       "questionnaires": "Kwestjonarji",
       "questionnaireCount": "{count, plural, =0 {Ebda dawnonario associato} one {1 dawnonario associato} other {# dawnonari associati}}",
@@ -2092,12 +2091,10 @@
       "manageQuestionnaires": "Amministra dawnonari",
       "tabs": {
         "overview": "Panoramica",
-        "settings": "Settings",
         "people": "Persuni",
         "content": "Kontenut",
-        "audit": "Reġistrazzjonijiet & Audit",
-        "postEvent": "Wara l-avveniment",
-        "analytics": "Statistiċi"
+        "analytics": "Statistiċi",
+        "afterEvent": "Wara l-avveniment"
       },
       "toggles": {
         "unmute": "Parteċipanti poshuma parlare",
@@ -2116,8 +2113,11 @@
         "capacityEstimate": "≈{jvbs} JVB · {ram} RAM",
         "noReminders": "Ebda promemoria configurato",
         "tags": "Tag",
-        "postEventSummary": "{connected} konnessi fuq {registered} reġistrazzjonijiet (stimatu {estimated})",
-        "estimatedAttendance": "Stimati: {estimated} parteċipanti"
+        "postEventSummary": "{connected} konnessi minn {registered} reġistrazzjonijiet (kapaċità {estimated})",
+        "estimatedAttendance": "Kapaċità massima: {estimated} parteċipanti",
+        "reminderScheduled": "Jintbagħat fil-{when}",
+        "reminderMissed": "Ma ntbagħatx — il-mument għadda",
+        "reminderSoon": "Minn mument għall-ieħor"
       },
       "aiManageTitle": "Traskrizzjoni, sommarju u traduzzjonijiet",
       "aiManageDesc": "Immaniġġja l-post-produzzjoni bl-AI ta' din ir-reġistrazzjoni: ikkoreġi t-traskrizzjoni u l-attribuzzjoni tal-kelliema (min qal xiex), immodifika s-sommarju u mmaniġġja l-lingwi tat-traduzzjoni.",
@@ -2133,7 +2133,11 @@
       "duplicateNext": "Idduplika għad-darba li jmiss",
       "duplicateNextBusy": "Qed jiġi dduplikat…",
       "duplicateNextHint": "Joħloq abbozz bil-konfigurazzjoni sħiħa ta' dan l-avveniment (reġistrazzjoni, traċċi separati, AI, aġenda, tfakkiriet). Jekk l-avveniment għandu ċiklu regolari, id-data titmexxa għall-okkorrenza li jmiss; inkella tibqa' għalik biex tissettjaha.",
-      "duplicateNextError": "Id-duplikazzjoni ma rnexxietx. Erġa' pprova."
+      "duplicateNextError": "Id-duplikazzjoni ma rnexxietx. Erġa' pprova.",
+      "capacitySection": "Kapaċità u infrastruttura",
+      "capacitySubtitle": "Ikkonfigurat għal massimu ta’ {max} parteċipanti",
+      "publishBlockedLive": "L-avveniment diġà għaddej",
+      "publishBlockedEnded": "L-avveniment intemm"
     },
     "rubrica": {
       "title": "Direttorju",

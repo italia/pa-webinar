@@ -4,9 +4,10 @@
  * Admin event detail page.
  *
  * Hero (title + status + tags + CTAs) on top; tabbed body on the left
- * (Panoramica / Impostazioni / Persone / Contenuti / Registrazioni &
- * Audit) — tab order mirrors the create-event wizard — and a sticky
- * sidebar on the right with KPIs, reminders and the primary edit CTA.
+ * (Panoramica / Persone / Contenuti / Dopo l'evento / Statistiche) and a
+ * sticky sidebar on the right with sign-ups, reminders and the actions.
+ * The tabs follow the life of an event: what it is, who is in it, what it
+ * carries, what is left of it afterwards.
  *
  * Feature-flag toggles are intentionally read-only here: editing lives
  * in /admin/events/[id]/edit. Having two sources of truth caused
@@ -28,6 +29,7 @@ import EventConfigDiagram from './event-config-diagram';
 import EventModeratorsPanel from './event-moderators-panel';
 import PostEventConfig from './post-event-config';
 import RecordingManagement from './recording-management';
+import CollapsibleSection from './collapsible-section';
 import EventLinksSection from './event-links-section';
 import StatusBadge from './status-badge';
 
@@ -159,7 +161,11 @@ interface EventManagementClientProps {
   event: EventData; baseUrl: string; locale: string; kickerEnabled: boolean;
 }
 
-type TabId = 'panoramica' | 'impostazioni' | 'persone' | 'contenuti' | 'postevento' | 'statistiche' | 'audit';
+// Le schede sono cinque e stanno in una riga sola anche su un telefono: oltre,
+// la striscia scorre in orizzontale e quelle in coda non si sa che esistano.
+// Le impostazioni dell'evento non sono fra queste — si cambiano dal wizard,
+// da «Modifica evento».
+type TabId = 'panoramica' | 'persone' | 'contenuti' | 'dopo' | 'statistiche';
 
 const ORG_TYPE_LABELS: Record<string, { it: string; en: string }> = {
   MINISTRY: { it: 'Ministero', en: 'Ministry' },
@@ -192,6 +198,15 @@ export default function EventManagementClient({
   const te = useTranslations('events');
   const tr = useTranslations('reminders');
   const format = useFormatter();
+  // Null finche' non siamo nel browser: il server e il client valutano
+  // «adesso» in due istanti diversi, e un promemoria proprio sul confine
+  // renderebbe due testi diversi. Finche' e' null si dice il minimo vero.
+  const [adesso, setAdesso] = useState<number | null>(null);
+  useEffect(() => {
+    setAdesso(Date.now());
+    const t = setInterval(() => setAdesso(Date.now()), 60_000);
+    return () => clearInterval(t);
+  }, []);
   const router = useRouter();
 
   const [activeTab, setActiveTab] = useState<TabId>('panoramica');
@@ -453,8 +468,12 @@ export default function EventManagementClient({
       )}
 
       {/* ═══ Body ═══ */}
+      {/* Su schermo stretto la colonna con stato e azioni viene prima del
+          contenuto della scheda: sono le cose per cui si apre questa pagina, e
+          in coda costerebbero un'intera scorsa. Su schermo largo torna a
+          destra, nell'ordine di lettura. */}
       <div className="row g-4">
-        <div className="col-lg-8">
+        <div className="col-lg-8 order-2 order-lg-1">
           <TabNav active={activeTab} onChange={setActiveTab} t={td} />
           <div className="p-4" style={CARD}>
             {activeTab === 'panoramica' && (
@@ -468,19 +487,19 @@ export default function EventManagementClient({
                 moderatorUrl={moderatorUrl}
               />
             )}
-            {activeTab === 'impostazioni' && <SettingsTab event={event} editUrl={editUrl} />}
             {activeTab === 'persone' && (
               <PeopleTab event={event} baseUrl={baseUrl} locale={locale} onExportCsv={exportCsv} />
             )}
             {activeTab === 'contenuti' && <ContentTab event={event} />}
-            {activeTab === 'postevento' && <PostEventTab event={event} status={status} />}
+            {activeTab === 'dopo' && (
+              <PostEventTab event={event} status={status} />
+            )}
             {activeTab === 'statistiche' && <EventAnalyticsPanel eventId={event.id} status={status} />}
-            {activeTab === 'audit' && <AuditTab event={event} />}
           </div>
         </div>
 
         {/* ═══ Sidebar ═══ */}
-        <div className="col-lg-4">
+        <div className="col-lg-4 order-1 order-lg-2">
           <div style={{ position: 'sticky', top: 20 }}>
             {/* KPI */}
             <div className="p-4 mb-3" style={CARD}>
@@ -521,6 +540,17 @@ export default function EventManagementClient({
                 <ul className="list-unstyled mb-0 d-flex flex-column gap-2">
                   {event.reminders.map((r) => {
                     const sent = r.sentCount > 0;
+                    // «Non inviata» da solo non distingue «deve ancora partire»
+                    // da «non partira' piu'». Il cron manda finche' l'evento
+                    // non e' cominciato, anche se il momento del promemoria e'
+                    // gia' passato — chi si iscrive nel frattempo lo riceve al
+                    // giro successivo. Quindi cio' che chiude la finestra e'
+                    // l'INIZIO dell'evento, non l'ora del promemoria.
+                    const quando = new Date(
+                      new Date(event.startsAt).getTime() - r.offsetMinutes * 60_000,
+                    );
+                    const iniziato = adesso !== null && new Date(event.startsAt).getTime() <= adesso;
+                    const imminente = adesso !== null && !iniziato && quando.getTime() <= adesso;
                     return (
                       <li key={r.id} className="d-flex align-items-center gap-2"
                           style={{ fontSize: '0.85rem', color: C_INK }}>
@@ -529,7 +559,22 @@ export default function EventManagementClient({
                                        background: sent ? C_SUCCESS : '#CED4DA' }} />
                         <span className="flex-grow-1">{r.label}</span>
                         <span style={{ color: C_MUTED, fontSize: '0.75rem' }}>
-                          {sent ? tr('sentStatus', { count: r.sentCount }) : tr('notSent')}
+                          {sent
+                            ? tr('sentStatus', { count: r.sentCount })
+                            : adesso === null
+                              ? tr('notSent')
+                              : iniziato
+                                ? td('sidebar.reminderMissed')
+                                : imminente
+                                  ? td('sidebar.reminderSoon')
+                                  : td('sidebar.reminderScheduled', {
+                                      when: format.dateTime(quando, {
+                                        day: 'numeric',
+                                        month: 'short',
+                                        hour: '2-digit',
+                                        minute: '2-digit',
+                                      }),
+                                    })}
                         </span>
                       </li>
                     );
@@ -569,9 +614,24 @@ export default function EventManagementClient({
                 <button type="button"
                         className={status === 'PUBLISHED' ? 'btn btn-outline-warning' : 'btn btn-outline-primary'}
                         onClick={togglePublish}
-                        disabled={updating || status === 'LIVE' || status === 'ENDED'}>
+                        disabled={updating || status === 'LIVE' || status === 'ENDED'}
+                        // Un pulsante spento che non si spiega e' un vicolo
+                        // cieco: chi lo trova grigio non sa se sta sbagliando
+                        // qualcosa o se e' il momento sbagliato.
+                        title={
+                          status === 'LIVE'
+                            ? td('publishBlockedLive')
+                            : status === 'ENDED'
+                              ? td('publishBlockedEnded')
+                              : undefined
+                        }>
                   {status === 'PUBLISHED' ? t('unpublish') : t('publish')}
                 </button>
+                {(status === 'LIVE' || status === 'ENDED') && (
+                  <div className="text-center mt-1" style={CAPTION}>
+                    {status === 'LIVE' ? td('publishBlockedLive') : td('publishBlockedEnded')}
+                  </div>
+                )}
                 <a href={publicUrl} target="_blank" rel="noopener noreferrer"
                    className="btn btn-outline-secondary d-flex align-items-center justify-content-center gap-2">
                   <Svg name="external" size={14} /> {t('openPublicPage')}
@@ -608,12 +668,10 @@ function TabNav({ active, onChange, t }: {
 }) {
   const tabs: { id: TabId; icon: IconName; key: string }[] = [
     { id: 'panoramica', icon: 'info', key: 'tabs.overview' },
-    { id: 'impostazioni', icon: 'settings', key: 'tabs.settings' },
     { id: 'persone', icon: 'user-group', key: 'tabs.people' },
     { id: 'contenuti', icon: 'folder', key: 'tabs.content' },
-    { id: 'postevento', icon: 'video', key: 'tabs.postEvent' },
+    { id: 'dopo', icon: 'video', key: 'tabs.afterEvent' },
     { id: 'statistiche', icon: 'chart', key: 'tabs.analytics' },
-    { id: 'audit', icon: 'shield', key: 'tabs.audit' },
   ];
   return (
     <ul className="nav nav-tabs mb-0" role="tablist" style={{ borderBottom: 'none' }}>
@@ -651,6 +709,7 @@ function OverviewTab({ event, description, locale, editUrl, publicUrl, guestLive
   const td = useTranslations('admin.eventDetail');
   const te = useTranslations('events');
   const tl = useTranslations('admin.links');
+  const t = useTranslations('admin');
   const speakers = getLocalized(event.speakersInfo as LocalizedField, locale);
 
   const toggles: { label: string; value: boolean }[] = [
@@ -670,23 +729,6 @@ function OverviewTab({ event, description, locale, editUrl, publicUrl, guestLive
           <MarkdownRenderer content={description} />
         </div>
       )}
-
-      <div className="mb-4">
-        <H>{te('manage.settingsSection')}</H>
-        <EventConfigDiagram
-          event={{
-            maxParticipants: event.maxParticipants,
-            qaEnabled: event.qaEnabled, chatEnabled: event.chatEnabled,
-            recordingEnabled: event.recordingEnabled,
-            participantsCanUnmute: event.participantsCanUnmute,
-            participantsCanStartVideo: event.participantsCanStartVideo,
-            participantsCanShareScreen: event.participantsCanShareScreen,
-            speakers: speakers || undefined,
-            startsAt: event.startsAt, endsAt: event.endsAt,
-          }}
-          registrationCount={event.registrationCount} adminMode
-        />
-      </div>
 
       <div>
         <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
@@ -723,19 +765,17 @@ function OverviewTab({ event, description, locale, editUrl, publicUrl, guestLive
           ]}
         />
       </div>
-    </>
-  );
-}
 
-function SettingsTab({ event, editUrl }: { event: EventData; editUrl: string }) {
-  const td = useTranslations('admin.eventDetail');
-  const t = useTranslations('admin');
-
-  return (
-    <>
-      <div className="mb-4">
-        <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-          <H>{td('privacyGdpr')}</H>
+      {/* Privacy e conservazione dei dati: si guardano quando si prepara
+          l'evento o quando qualcuno chiede conto, non ogni volta che si apre
+          la pagina. Per questo sono richiuse. */}
+      <div className="mt-4">
+        <CollapsibleSection
+          id="privacy-gdpr"
+          title={td('privacyGdpr')}
+          icon="it-lock"
+        >
+        <div className="d-flex justify-content-end mb-3">
           <Link href={editUrl}
                 className="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-2">
             <Svg name="pencil" size={12} /> {td('editSettings')}
@@ -758,30 +798,35 @@ function SettingsTab({ event, editUrl }: { event: EventData; editUrl: string }) 
                 value={<span style={{ whiteSpace: 'pre-wrap', color: C_INK }}>{event.recordingConsentText}</span>} />
           )}
         </dl>
+        </CollapsibleSection>
       </div>
 
-      <div>
-        <H>{td('postEventTitle')}</H>
-        <PostEventConfig
+      {/* Capacita' e infrastruttura in fondo e richiuse: «JVB», «Video Bridge»
+          e i megabit sono la risposta a una domanda che chi organizza un
+          evento non si sta facendo. Chi la fa, la trova aprendo. */}
+      <div className="mt-4">
+        <CollapsibleSection
+          id="capacita-infrastruttura"
+          title={td('capacitySection')}
+          subtitle={td('capacitySubtitle', { max: event.maxParticipants })}
+          icon="it-settings"
+        >
+        <EventConfigDiagram
           event={{
-            id: event.id, moderatorToken: event.moderatorToken,
-            postEventPublic: event.postEventPublic,
-            postEventPublicUntil: event.postEventPublicUntil,
-            libraryListed: event.libraryListed,
-            hasPlayableRecording:
-              (event.recordingPublished && !!event.recordingUrl) || !!event.youtubeUrl,
-            postEventShowQA: event.postEventShowQA,
-            postEventShowMaterials: event.postEventShowMaterials,
-            postEventShowPolls: event.postEventShowPolls,
-            postEventShowFeedback: event.postEventShowFeedback,
-            postEventShowRecap: event.postEventShowRecap,
-            postEventShowWordCloud: event.postEventShowWordCloud,
-            postEventEmailEnabled: event.postEventEmailEnabled,
-            feedbackEnabled: event.feedbackEnabled,
-            dataRetentionDays: event.dataRetentionDays,
+            maxParticipants: event.maxParticipants,
+            qaEnabled: event.qaEnabled, chatEnabled: event.chatEnabled,
+            recordingEnabled: event.recordingEnabled,
+            participantsCanUnmute: event.participantsCanUnmute,
+            participantsCanStartVideo: event.participantsCanStartVideo,
+            participantsCanShareScreen: event.participantsCanShareScreen,
+            speakers: speakers || undefined,
+            startsAt: event.startsAt, endsAt: event.endsAt,
           }}
+          registrationCount={event.registrationCount} adminMode
         />
+        </CollapsibleSection>
       </div>
+
     </>
   );
 }
@@ -967,7 +1012,16 @@ function ContentTab({ event }: { event: EventData }) {
 
 function PostEventTab({ event, status }: { event: EventData; status: string }) {
   const td = useTranslations('admin.eventDetail');
+  const t = useTranslations('admin');
+  const format = useFormatter();
   const isEnded = status === 'ENDED' || status === 'ARCHIVED';
+
+  // Colore della pastiglia dell'azione nel registro GDPR.
+  const actionColor = (action: string) => {
+    if (action === 'DATA_DELETED') return { bg: '#FFF3CD', fg: '#856404' };
+    if (action === 'DATA_EXPORTED') return { bg: '#D1ECF1', fg: '#0C5460' };
+    return { bg: '#D4EDDA', fg: '#155724' };
+  };
   // A Recording ROW exists (live capture happened) → the AI pipeline can run on
   // it. Gated on the row, NOT on recordingUrl: an externally/manually-set
   // recordingUrl has no Recording row, so generate-ai would 404 — the button
@@ -1008,6 +1062,32 @@ function PostEventTab({ event, status }: { event: EventData; status: string }) {
 
   return (
     <>
+      {/* Cosa succede dopo l'evento: prima le regole — pagina pubblica,
+          libreria, feedback — e poi cio' che ne e' uscito. Decisione e
+          risultato si leggono nello stesso posto. */}
+      <div>
+        <H>{td('postEventTitle')}</H>
+        <PostEventConfig
+          event={{
+            id: event.id, moderatorToken: event.moderatorToken,
+            postEventPublic: event.postEventPublic,
+            postEventPublicUntil: event.postEventPublicUntil,
+            libraryListed: event.libraryListed,
+            hasPlayableRecording:
+              (event.recordingPublished && !!event.recordingUrl) || !!event.youtubeUrl,
+            postEventShowQA: event.postEventShowQA,
+            postEventShowMaterials: event.postEventShowMaterials,
+            postEventShowPolls: event.postEventShowPolls,
+            postEventShowFeedback: event.postEventShowFeedback,
+            postEventShowRecap: event.postEventShowRecap,
+            postEventShowWordCloud: event.postEventShowWordCloud,
+            postEventEmailEnabled: event.postEventEmailEnabled,
+            feedbackEnabled: event.feedbackEnabled,
+            dataRetentionDays: event.dataRetentionDays,
+          }}
+        />
+      </div>
+
       {/* CTA prominente verso la gestione AI completa del video:
           trascrizione (testo + diarization), sintesi, traduzioni.
           È il collegamento che mancava fra evento e post-produzione. */}
@@ -1066,8 +1146,7 @@ function PostEventTab({ event, status }: { event: EventData; status: string }) {
         )}
       </div>
 
-      {/* Gestione del file di registrazione (play, download, pubblica,
-          elimina) — spostata qui dal tab Audit: è contenuto post-evento. */}
+      {/* Il file video: riprodurlo, scaricarlo, pubblicarlo, cancellarlo. */}
       <div className="mb-4">
         <H>{td('recordingSection')}</H>
         <RecordingManagement
@@ -1086,69 +1165,57 @@ function PostEventTab({ event, status }: { event: EventData; status: string }) {
           }}
         />
       </div>
-    </>
-  );
-}
 
-function AuditTab({ event }: { event: EventData }) {
-  const td = useTranslations('admin.eventDetail');
-  const t = useTranslations('admin');
-  const format = useFormatter();
-
-  // Small helper for the action-badge color mapping.
-  const actionColor = (action: string) => {
-    if (action === 'DATA_DELETED') return { bg: '#FFF3CD', fg: '#856404' };
-    if (action === 'DATA_EXPORTED') return { bg: '#D1ECF1', fg: '#0C5460' };
-    return { bg: '#D4EDDA', fg: '#155724' };
-  };
-
-  return (
-    <>
-      <div className="mb-4">
-        <H>{td('callSessions')}</H>
-        <CallSessionsPanel eventId={event.id} eventSlug={event.slug}
-                           moderatorToken={event.moderatorToken} />
-      </div>
-
-      {event.gdprAuditLogs.length > 0 && (
-        <div>
-          <H>{t('gdprAuditLog.title')}</H>
-          <div style={{ ...CAPTION, marginBottom: 8 }}>{t('gdprAuditLog.subtitle')}</div>
-          <div className="table-responsive">
-            <table className="table table-hover align-middle" style={{ fontSize: '0.85rem' }}>
-              <thead>
-                <tr>
-                  <th>{t('gdprAuditLog.date')}</th>
-                  <th>{t('gdprAuditLog.action')}</th>
-                  <th>{t('gdprAuditLog.recordCount')}</th>
-                  <th>{t('gdprAuditLog.details')}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {event.gdprAuditLogs.map((log) => {
-                  const c = actionColor(log.action);
-                  return (
-                    <tr key={log.id}>
-                      <td>{format.dateTime(new Date(log.createdAt), { dateStyle: 'short', timeStyle: 'short' })}</td>
-                      <td>
-                        <span className="px-2 py-1 rounded-pill"
-                              style={{ fontSize: '0.72rem', fontWeight: 600,
-                                       background: c.bg, color: c.fg }}>
-                          {t(`gdprAuditLog.actions.${log.action}`)}
-                        </span>
-                      </td>
-                      <td>{log.recordCount}</td>
-                      <td style={{ maxWidth: 200 }} className="text-truncate">
-                        {log.details ? JSON.stringify(JSON.parse(log.details)) : '—'}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+      {/* Le sessioni sono il registro di cio' che e' successo in sala: chi si
+          e' collegato, quando, per quanto. Stanno qui perche' si leggono dopo,
+          insieme al video e alla trascrizione. */}
+      <div className="mt-4">
+        <div className="mb-4">
+          <H>{td('callSessions')}</H>
+          <CallSessionsPanel eventId={event.id} eventSlug={event.slug}
+                             moderatorToken={event.moderatorToken} />
         </div>
-      )}
+
+        {event.gdprAuditLogs.length > 0 && (
+          <div>
+            <H>{t('gdprAuditLog.title')}</H>
+            <div style={{ ...CAPTION, marginBottom: 8 }}>{t('gdprAuditLog.subtitle')}</div>
+            <div className="table-responsive">
+              <table className="table table-hover align-middle" style={{ fontSize: '0.85rem' }}>
+                <thead>
+                  <tr>
+                    <th>{t('gdprAuditLog.date')}</th>
+                    <th>{t('gdprAuditLog.action')}</th>
+                    <th>{t('gdprAuditLog.recordCount')}</th>
+                    <th>{t('gdprAuditLog.details')}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {event.gdprAuditLogs.map((log) => {
+                    const c = actionColor(log.action);
+                    return (
+                      <tr key={log.id}>
+                        <td>{format.dateTime(new Date(log.createdAt), { dateStyle: 'short', timeStyle: 'short' })}</td>
+                        <td>
+                          <span className="px-2 py-1 rounded-pill"
+                                style={{ fontSize: '0.72rem', fontWeight: 600,
+                                         background: c.bg, color: c.fg }}>
+                            {t(`gdprAuditLog.actions.${log.action}`)}
+                          </span>
+                        </td>
+                        <td>{log.recordCount}</td>
+                        <td style={{ maxWidth: 200 }} className="text-truncate">
+                          {log.details ? JSON.stringify(JSON.parse(log.details)) : '—'}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+      </div>
     </>
   );
 }

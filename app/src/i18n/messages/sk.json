@@ -135,7 +135,6 @@
       "toggleChat": "Chat",
       "toggleQa": "Q&A",
       "toggleRecording": "Záznam",
-      "settingsSection": "Nastavenia udalosti",
       "sessionsAndRecordings": "Relácie a videozáznamy",
       "postEventSection": "Po podujatí a spätná väzba"
     },
@@ -2084,7 +2083,7 @@
       "organizers": "Organizátori",
       "privacyGdpr": "Súkromie a GDPR",
       "postEventTitle": "Po podujatí a spätná väzba",
-      "recordingSection": "Záznam",
+      "recordingSection": "Video podujatia",
       "callSessions": "Relácie a telemetria",
       "questionnaires": "Dotazníky",
       "questionnaireCount": "{count, plural, =0 {Žiadny prepojený dotazník} one {1 prepojený dotazník} other {# prepojených dotazníkov}}",
@@ -2092,12 +2091,10 @@
       "manageQuestionnaires": "Spravovať dotazníky",
       "tabs": {
         "overview": "Prehľad",
-        "settings": "Nastavenia",
         "people": "Osoby",
         "content": "Obsah",
-        "audit": "Záznamy a audit",
-        "postEvent": "Po podujatí",
-        "analytics": "Štatistiky"
+        "analytics": "Štatistiky",
+        "afterEvent": "Po podujatí"
       },
       "toggles": {
         "unmute": "Účastníci môžu hovoriť",
@@ -2111,13 +2108,16 @@
         "recordingConsent": "Súhlas so záznamom"
       },
       "sidebar": {
-        "registrations": "Registrácie",
+        "registrations": "Prihlášky",
         "ofMax": "{current} z {max}",
         "capacityEstimate": "≈{jvbs} JVB · {ram} RAM",
         "noReminders": "Žiadne pripomienky nakonfigurované",
         "tags": "Tagy",
-        "postEventSummary": "{connected} pripojených z {registered} registrácií (odhadovaných {estimated})",
-        "estimatedAttendance": "Odhad: {estimated} účastníkov"
+        "postEventSummary": "{connected} pripojených z {registered} prihlášok (kapacita {estimated})",
+        "estimatedAttendance": "Maximálna kapacita: {estimated} účastníkov",
+        "reminderScheduled": "Odíde {when}",
+        "reminderMissed": "Neodoslané — okamih už uplynul",
+        "reminderSoon": "Každú chvíľu"
       },
       "aiManageTitle": "Prepis, zhrnutie a preklady",
       "aiManageDesc": "Spravujte AI postprodukciu tejto nahrávky: opravte prepis a priradenie rečníkov (kto čo hovorí), upravte zhrnutie a spravujte jazyky prekladu.",
@@ -2133,7 +2133,11 @@
       "duplicateNext": "Duplikovať na ďalší raz",
       "duplicateNextBusy": "Duplikuje sa…",
       "duplicateNextHint": "Vytvorí koncept s celou konfiguráciou tohto podujatia (nahrávanie, samostatné stopy, AI, agenda, pripomienky). Ak má podujatie pravidelnú kadenciu, dátum sa posunie na ďalší výskyt; inak ho treba nastaviť.",
-      "duplicateNextError": "Duplikovanie sa nepodarilo. Skúste to znova."
+      "duplicateNextError": "Duplikovanie sa nepodarilo. Skúste to znova.",
+      "capacitySection": "Kapacita a infraštruktúra",
+      "capacitySubtitle": "Nastavené najviac pre {max} účastníkov",
+      "publishBlockedLive": "Podujatie už prebieha",
+      "publishBlockedEnded": "Podujatie sa skončilo"
     },
     "rubrica": {
       "title": "Adresár",

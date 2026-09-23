@@ -135,7 +135,6 @@
       "toggleChat": "Chat",
       "toggleQa": "Q&A",
       "toggleRecording": "Záznam",
-      "settingsSection": "Nastavení události",
       "sessionsAndRecordings": "Relace a videozáznamy",
       "postEventSection": "Po události a zpětná vazba"
     },
@@ -2084,7 +2083,7 @@
       "organizers": "Organizátoři",
       "privacyGdpr": "Soukromí a GDPR",
       "postEventTitle": "Po události a zpětná vazba",
-      "recordingSection": "Záznam",
+      "recordingSection": "Video události",
       "callSessions": "Relace a telemetrie",
       "questionnaires": "Dotazníky",
       "questionnaireCount": "{count, plural, =0 {Není přiřazen žádný dotazník} one {1 přiřazený dotazník} few {# přiřazené dotazníky} other {# přiřazených dotazníků}}",
@@ -2092,12 +2091,10 @@
       "manageQuestionnaires": "Spravovat dotazníky",
       "tabs": {
         "overview": "Přehled",
-        "settings": "Nastavení",
         "people": "Osoby",
         "content": "Obsah",
-        "audit": "Záznamy a audit",
-        "postEvent": "Po události",
-        "analytics": "Statistiky"
+        "analytics": "Statistiky",
+        "afterEvent": "Po události"
       },
       "toggles": {
         "unmute": "Účastníci mohou mluvit",
@@ -2111,13 +2108,16 @@
         "recordingConsent": "Souhlas se záznamem"
       },
       "sidebar": {
-        "registrations": "Registrace",
+        "registrations": "Přihlášky",
         "ofMax": "{current} z {max}",
         "capacityEstimate": "≈{jvbs} JVB · {ram} RAM",
         "noReminders": "Není nakonfigurováno žádné upozornění",
         "tags": "Štítky",
-        "postEventSummary": "{connected} připojených z {registered} registrací (odhadováno {estimated})",
-        "estimatedAttendance": "Odhadováno: {estimated} účastníků"
+        "postEventSummary": "{connected} připojených z {registered} přihlášek (kapacita {estimated})",
+        "estimatedAttendance": "Maximální kapacita: {estimated} účastníků",
+        "reminderScheduled": "Odejde {when}",
+        "reminderMissed": "Neodesláno — okamžik už minul",
+        "reminderSoon": "Každou chvíli"
       },
       "aiManageTitle": "Přepis, shrnutí a překlady",
       "aiManageDesc": "Spravujte AI postprodukci tohoto záznamu: opravte přepis a přiřazení mluvčích (kdo co říká), upravte shrnutí a spravujte jazyky překladu.",
@@ -2133,7 +2133,11 @@
       "duplicateNext": "Duplikovat pro příště",
       "duplicateNextBusy": "Duplikuji…",
       "duplicateNextHint": "Vytvoří koncept s celou konfigurací této události (nahrávání, oddělené stopy, AI, agenda, připomínky). Pokud se událost pravidelně opakuje, datum se posune na další výskyt; jinak jej doplníte sami.",
-      "duplicateNextError": "Duplikace se nezdařila. Zkuste to prosím znovu."
+      "duplicateNextError": "Duplikace se nezdařila. Zkuste to prosím znovu.",
+      "capacitySection": "Kapacita a infrastruktura",
+      "capacitySubtitle": "Nastaveno až pro {max} účastníků",
+      "publishBlockedLive": "Událost už probíhá",
+      "publishBlockedEnded": "Událost skončila"
     },
     "rubrica": {
       "title": "Adresář",

@@ -135,7 +135,6 @@
       "toggleChat": "Chat",
       "toggleQa": "Q&A",
       "toggleRecording": "Gravação",
-      "settingsSection": "Definições do evento",
       "sessionsAndRecordings": "Sessões e gravações de vídeo",
       "postEventSection": "Pós-evento e feedback"
     },
@@ -2084,7 +2083,7 @@
       "organizers": "Organizadores",
       "privacyGdpr": "Privacidade e RGPD",
       "postEventTitle": "Pós-evento e feedback",
-      "recordingSection": "Gravação",
+      "recordingSection": "Vídeo do evento",
       "callSessions": "Sessões e telemetria",
       "questionnaires": "Questionários",
       "questionnaireCount": "{count, plural, =0 {Nenhum questionário associado} one {1 questionário associado} other {# questionários associados}}",
@@ -2092,12 +2091,10 @@
       "manageQuestionnaires": "Gerir questionários",
       "tabs": {
         "overview": "Vista geral",
-        "settings": "Definições",
         "people": "Pessoas",
         "content": "Conteúdos",
-        "audit": "Gravações e auditoria",
-        "postEvent": "Pós-evento",
-        "analytics": "Estatísticas"
+        "analytics": "Estatísticas",
+        "afterEvent": "Depois do evento"
       },
       "toggles": {
         "unmute": "Participantes podem falar",
@@ -2116,8 +2113,11 @@
         "capacityEstimate": "≈{jvbs} JVB · {ram} RAM",
         "noReminders": "Nenhum lembrete configurado",
         "tags": "Etiquetas",
-        "postEventSummary": "{connected} ligados em {registered} inscrições (estimadas {estimated})",
-        "estimatedAttendance": "Estimados: {estimated} participantes"
+        "postEventSummary": "{connected} ligados em {registered} inscrições (capacidade {estimated})",
+        "estimatedAttendance": "Capacidade máxima: {estimated} participantes",
+        "reminderScheduled": "Sai a {when}",
+        "reminderMissed": "Não enviada — o momento já passou",
+        "reminderSoon": "A qualquer momento"
       },
       "aiManageTitle": "Transcrição, resumo e traduções",
       "aiManageDesc": "Faça a gestão da pós-produção com IA desta gravação: corrija a transcrição e a atribuição dos oradores (quem diz o quê), edite o resumo e faça a gestão dos idiomas de tradução.",
@@ -2133,7 +2133,11 @@
       "duplicateNext": "Duplicar para a próxima",
       "duplicateNextBusy": "A duplicar…",
       "duplicateNextHint": "Cria um rascunho com toda a configuração deste evento (gravação, faixas separadas, IA, agenda, lembretes). Se o evento tiver uma cadência, a data avança para a ocorrência seguinte; caso contrário, fica por definir.",
-      "duplicateNextError": "Não foi possível duplicar. Tente novamente."
+      "duplicateNextError": "Não foi possível duplicar. Tente novamente.",
+      "capacitySection": "Capacidade e infraestrutura",
+      "capacitySubtitle": "Configurado para um máximo de {max} participantes",
+      "publishBlockedLive": "O evento já está a decorrer",
+      "publishBlockedEnded": "O evento terminou"
     },
     "rubrica": {
       "title": "Agenda",

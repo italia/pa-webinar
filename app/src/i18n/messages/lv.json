@@ -135,7 +135,6 @@
       "toggleChat": "Tērzēšana",
       "toggleQa": "Q&A",
       "toggleRecording": "Ierakstīšana",
-      "settingsSection": "Pasākuma iestatījumi",
       "sessionsAndRecordings": "Sesijas un video ieraksti",
       "postEventSection": "Pēcpasākums un atsauksmes"
     },
@@ -2084,7 +2083,7 @@
       "organizers": "Organizatori",
       "privacyGdpr": "Privātums un VDAR",
       "postEventTitle": "Pēcpasākums un atsauksmes",
-      "recordingSection": "Ierakstīšana",
+      "recordingSection": "Pasākuma video",
       "callSessions": "Sesijas un telemetrija",
       "questionnaires": "Anketas",
       "questionnaireCount": "{count, plural, =0 {Nav saistītu anketu} one {1 saistīta anketa} other {# saistītas anketas}}",
@@ -2092,12 +2091,10 @@
       "manageQuestionnaires": "Pārvaldīt anketas",
       "tabs": {
         "overview": "Pārskats",
-        "settings": "Iestatījumi",
         "people": "Personas",
         "content": "Saturs",
-        "audit": "Ieraksti un audits",
-        "postEvent": "Pēc pasākuma",
-        "analytics": "Statistika"
+        "analytics": "Statistika",
+        "afterEvent": "Pēc pasākuma"
       },
       "toggles": {
         "unmute": "Dalībnieki var ieslēgt mikrofonu",
@@ -2111,13 +2108,16 @@
         "recordingConsent": "Ieraksta piekrišana"
       },
       "sidebar": {
-        "registrations": "Reģistrācijas",
+        "registrations": "Pieteikumi",
         "ofMax": "{current} no {max}",
         "capacityEstimate": "≈{jvbs} JVB · {ram} RAM",
         "noReminders": "Nav konfigurētu atgādinājumu",
         "tags": "Tagi",
-        "postEventSummary": "{connected} pievienojušies no {registered} reģistrācijām (aplēstas {estimated})",
-        "estimatedAttendance": "Aplēsts: {estimated} dalībnieki"
+        "postEventSummary": "{connected} pieslēgušies no {registered} pieteikumiem (ietilpība {estimated})",
+        "estimatedAttendance": "Maksimālā ietilpība: {estimated} dalībnieki",
+        "reminderScheduled": "Tiks nosūtīts {when}",
+        "reminderMissed": "Nav nosūtīts — brīdis ir pagājis",
+        "reminderSoon": "Jebkurā brīdī"
       },
       "aiManageTitle": "Transkripcija, kopsavilkums un tulkojumi",
       "aiManageDesc": "Pārvaldiet šī ieraksta MI pēcapstrādi: labojiet transkripciju un runātāju piesaisti (kurš ko saka), rediģējiet kopsavilkumu un pārvaldiet tulkošanas valodas.",
@@ -2133,7 +2133,11 @@
       "duplicateNext": "Izveidot kopiju nākamajai reizei",
       "duplicateNextBusy": "Notiek kopēšana…",
       "duplicateNextHint": "Izveido melnrakstu ar visu šī pasākuma konfigurāciju (ieraksts, atsevišķi celiņi, MI, darba kārtība, atgādinājumi). Ja pasākumam ir noteikts atkārtošanās biežums, datums tiek pārcelts uz nākamo reizi; pretējā gadījumā tas jānorāda jums.",
-      "duplicateNextError": "Kopiju neizdevās izveidot. Mēģiniet vēlreiz."
+      "duplicateNextError": "Kopiju neizdevās izveidot. Mēģiniet vēlreiz.",
+      "capacitySection": "Ietilpība un infrastruktūra",
+      "capacitySubtitle": "Konfigurēts līdz {max} dalībniekiem",
+      "publishBlockedLive": "Pasākums jau norisinās",
+      "publishBlockedEnded": "Pasākums ir beidzies"
     },
     "rubrica": {
       "title": "Kontaktu grāmata",

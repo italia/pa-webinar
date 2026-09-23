@@ -135,7 +135,6 @@
       "toggleChat": "Vestlus",
       "toggleQa": "Q&A",
       "toggleRecording": "Salvestamine",
-      "settingsSection": "Ürituse seaded",
       "sessionsAndRecordings": "Sessioonid ja videosalvestused",
       "postEventSection": "Pärast sündmust ja tagasiside"
     },
@@ -2084,7 +2083,7 @@
       "organizers": "Korraldajad",
       "privacyGdpr": "Privaatsus ja IKÜM",
       "postEventTitle": "Pärast sündmust ja tagasiside",
-      "recordingSection": "Salvestus",
+      "recordingSection": "Sündmuse video",
       "callSessions": "Sessioonid ja telemeetria",
       "questionnaires": "Küsimustikud",
       "questionnaireCount": "{count, plural, =0 {Seotud küsimustikke pole} one {1 seotud küsimustik} other {# seotud küsimustikku}}",
@@ -2092,12 +2091,10 @@
       "manageQuestionnaires": "Halda küsimustikke",
       "tabs": {
         "overview": "Ülevaade",
-        "settings": "Seaded",
         "people": "Inimesed",
         "content": "Sisu",
-        "audit": "Salvestused ja audit",
-        "postEvent": "Sündmusejärgne",
-        "analytics": "Statistika"
+        "analytics": "Statistika",
+        "afterEvent": "Pärast sündmust"
       },
       "toggles": {
         "unmute": "Osalejad saavad rääkida",
@@ -2111,13 +2108,16 @@
         "recordingConsent": "Salvestamise nõusolek"
       },
       "sidebar": {
-        "registrations": "Registreeringud",
+        "registrations": "Registreerimised",
         "ofMax": "{current} / {max}",
         "capacityEstimate": "≈{jvbs} JVB · {ram} RAM",
         "noReminders": "Meeldetuletusi pole konfigureeritud",
         "tags": "Sildid",
-        "postEventSummary": "{connected} liitus {registered} registreeringust (hinnatud {estimated})",
-        "estimatedAttendance": "Hinnanguliselt: {estimated} osalejat"
+        "postEventSummary": "{connected} ühendatud {registered} registreerimisest (maht {estimated})",
+        "estimatedAttendance": "Maksimaalne maht: {estimated} osalejat",
+        "reminderScheduled": "Saadetakse {when}",
+        "reminderMissed": "Saatmata — hetk on möödas",
+        "reminderSoon": "Iga hetk"
       },
       "aiManageTitle": "Transkriptsioon, kokkuvõte ja tõlked",
       "aiManageDesc": "Halda selle salvestise AI järeltöötlust: paranda transkriptsiooni ja kõnelejate omistamist (kes mida ütleb), muuda kokkuvõtet ja halda tõlkekeeli.",
@@ -2133,7 +2133,11 @@
       "duplicateNext": "Dubleeri järgmise korra jaoks",
       "duplicateNextBusy": "Dubleerimine…",
       "duplicateNextHint": "Loob mustandi, mis kannab üle kogu selle sündmuse seadistuse (salvestamine, eraldi rajad, AI, päevakava, meeldetuletused). Kui sündmusel on kordumissagedus, nihkub kuupäev järgmisele korrale; muul juhul jääb see sinu määrata.",
-      "duplicateNextError": "Dubleerimine ebaõnnestus. Proovi uuesti."
+      "duplicateNextError": "Dubleerimine ebaõnnestus. Proovi uuesti.",
+      "capacitySection": "Maht ja taristu",
+      "capacitySubtitle": "Seadistatud kuni {max} osalejale",
+      "publishBlockedLive": "Sündmus on juba käimas",
+      "publishBlockedEnded": "Sündmus on lõppenud"
     },
     "rubrica": {
       "title": "Aadressraamat",

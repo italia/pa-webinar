@@ -135,7 +135,6 @@
       "toggleChat": "Chat",
       "toggleQa": "Q&A",
       "toggleRecording": "Registrazione",
-      "settingsSection": "Impostazioni evento",
       "sessionsAndRecordings": "Sessioni e registrazioni video",
       "postEventSection": "Post-evento e feedback"
     },
@@ -2156,7 +2155,7 @@
       "organizers": "Organizzatori",
       "privacyGdpr": "Privacy & GDPR",
       "postEventTitle": "Post-evento & feedback",
-      "recordingSection": "Registrazione",
+      "recordingSection": "Video dell’evento",
       "callSessions": "Sessioni & telemetria",
       "questionnaires": "Questionari",
       "questionnaireCount": "{count, plural, =0 {Nessun questionario associato} one {1 questionario associato} other {# questionari associati}}",
@@ -2164,12 +2163,10 @@
       "manageQuestionnaires": "Gestisci questionari",
       "tabs": {
         "overview": "Panoramica",
-        "settings": "Impostazioni",
         "people": "Persone",
         "content": "Contenuti",
-        "audit": "Registrazioni & Audit",
-        "postEvent": "Post-evento",
-        "analytics": "Statistiche"
+        "analytics": "Statistiche",
+        "afterEvent": "Dopo l’evento"
       },
       "toggles": {
         "unmute": "Partecipanti possono parlare",
@@ -2183,13 +2180,16 @@
         "recordingConsent": "Consenso registrazione"
       },
       "sidebar": {
-        "registrations": "Registrazioni",
+        "registrations": "Iscrizioni",
         "ofMax": "{current} su {max}",
         "capacityEstimate": "≈{jvbs} JVB · {ram} RAM",
         "noReminders": "Nessun promemoria configurato",
         "tags": "Tag",
-        "postEventSummary": "{connected} connessi su {registered} registrazioni (stimate {estimated})",
-        "estimatedAttendance": "Stimati: {estimated} partecipanti"
+        "postEventSummary": "{connected} connessi su {registered} iscritti (capienza {estimated})",
+        "estimatedAttendance": "Capienza massima: {estimated} partecipanti",
+        "reminderScheduled": "Parte il {when}",
+        "reminderMissed": "Non inviata — momento passato",
+        "reminderSoon": "A momenti"
       },
       "aiManageTitle": "Trascrizione, sintesi e traduzioni",
       "aiManageDesc": "Gestisci la post-produzione AI di questa registrazione: correggi la trascrizione e l'assegnazione dei relatori (chi dice cosa), modifica la sintesi e gestisci le lingue di traduzione.",
@@ -2205,7 +2205,11 @@
       "duplicateNext": "Duplica per la prossima",
       "duplicateNextBusy": "Duplicazione…",
       "duplicateNextHint": "Crea una bozza con l'intera configurazione di questo evento (registrazione, tracce separate, AI, agenda, promemoria). Se l'evento ha una cadenza, la data viene portata alla prossima occorrenza; altrimenti resta da impostare.",
-      "duplicateNextError": "Duplicazione non riuscita. Riprova."
+      "duplicateNextError": "Duplicazione non riuscita. Riprova.",
+      "capacitySection": "Capacità e infrastruttura",
+      "capacitySubtitle": "Configurato per un massimo di {max} partecipanti",
+      "publishBlockedLive": "L’evento è già in corso",
+      "publishBlockedEnded": "L’evento è concluso"
     },
     "rubrica": {
       "title": "Rubrica",

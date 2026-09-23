@@ -135,7 +135,6 @@
       "toggleChat": "Chat",
       "toggleQa": "Q&A",
       "toggleRecording": "Aufzeichnung",
-      "settingsSection": "Veranstaltungseinstellungen",
       "sessionsAndRecordings": "Sitzungen und Videoaufzeichnungen",
       "postEventSection": "Nach dem Event und Feedback"
     },
@@ -2084,7 +2083,7 @@
       "organizers": "Veranstalter",
       "privacyGdpr": "Datenschutz & GDPR",
       "postEventTitle": "Nach dem Event & Feedback",
-      "recordingSection": "Aufzeichnung",
+      "recordingSection": "Video der Veranstaltung",
       "callSessions": "Sitzungen & Telemetrie",
       "questionnaires": "Fragebögen",
       "questionnaireCount": "{count, plural, =0 {Kein Fragebogen verknüpft} one {1 Fragebogen verknüpft} other {# Fragebögen verknüpft}}",
@@ -2092,12 +2091,10 @@
       "manageQuestionnaires": "Fragebögen verwalten",
       "tabs": {
         "overview": "Überblick",
-        "settings": "Einstellungen",
         "people": "Personen",
         "content": "Inhalte",
-        "audit": "Aufzeichnungen & Audit",
-        "postEvent": "Nach der Veranstaltung",
-        "analytics": "Statistiken"
+        "analytics": "Statistiken",
+        "afterEvent": "Nach der Veranstaltung"
       },
       "toggles": {
         "unmute": "Teilnehmende dürfen sprechen",
@@ -2116,8 +2113,11 @@
         "capacityEstimate": "≈{jvbs} JVB · {ram} RAM",
         "noReminders": "Keine Erinnerungen konfiguriert",
         "tags": "Tags",
-        "postEventSummary": "{connected} beigetreten von {registered} Anmeldungen (geschätzt {estimated})",
-        "estimatedAttendance": "Geschätzt: {estimated} Teilnehmende"
+        "postEventSummary": "{connected} verbunden von {registered} Anmeldungen (Kapazität {estimated})",
+        "estimatedAttendance": "Maximale Kapazität: {estimated} Teilnehmende",
+        "reminderScheduled": "Geht am {when} raus",
+        "reminderMissed": "Nicht gesendet — der Zeitpunkt ist vorbei",
+        "reminderSoon": "Jeden Moment"
       },
       "aiManageTitle": "Transkript, Zusammenfassung und Übersetzungen",
       "aiManageDesc": "Verwalten Sie die KI-Nachbearbeitung dieser Aufzeichnung: Korrigieren Sie das Transkript und die Zuordnung der Sprecher (wer sagt was), bearbeiten Sie die Zusammenfassung und verwalten Sie die Übersetzungssprachen.",
@@ -2133,7 +2133,11 @@
       "duplicateNext": "Für das nächste Mal duplizieren",
       "duplicateNextBusy": "Wird dupliziert…",
       "duplicateNextHint": "Erstellt einen Entwurf mit der gesamten Konfiguration dieser Veranstaltung (Aufzeichnung, getrennte Spuren, KI, Agenda, Erinnerungen). Hat die Veranstaltung einen festen Turnus, wird das Datum auf den nächsten Termin gesetzt; andernfalls bleibt es offen.",
-      "duplicateNextError": "Duplizieren fehlgeschlagen. Bitte versuchen Sie es erneut."
+      "duplicateNextError": "Duplizieren fehlgeschlagen. Bitte versuchen Sie es erneut.",
+      "capacitySection": "Kapazität und Infrastruktur",
+      "capacitySubtitle": "Konfiguriert für bis zu {max} Teilnehmende",
+      "publishBlockedLive": "Die Veranstaltung läuft bereits",
+      "publishBlockedEnded": "Die Veranstaltung ist beendet"
     },
     "rubrica": {
       "title": "Adressbuch",

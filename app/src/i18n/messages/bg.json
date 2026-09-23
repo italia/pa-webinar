@@ -135,7 +135,6 @@
       "toggleChat": "Чат",
       "toggleQa": "Q&A",
       "toggleRecording": "Запис",
-      "settingsSection": "Настройки на събитието",
       "sessionsAndRecordings": "Сесии и видеозаписи",
       "postEventSection": "След събитието и обратна връзка"
     },
@@ -2084,7 +2083,7 @@
       "organizers": "Организатори",
       "privacyGdpr": "Поверителност и ОРЗД",
       "postEventTitle": "След събитието и обратна връзка",
-      "recordingSection": "Запис",
+      "recordingSection": "Видео на събитието",
       "callSessions": "Сесии и телеметрия",
       "questionnaires": "Въпросници",
       "questionnaireCount": "{count, plural, =0 {Няма свързан въпросник} one {1 свързан въпросник} other {# свързани въпросника}}",
@@ -2092,12 +2091,10 @@
       "manageQuestionnaires": "Управлявай въпросниците",
       "tabs": {
         "overview": "Преглед",
-        "settings": "Настройки",
         "people": "Лица",
         "content": "Съдържание",
-        "audit": "Записи и одит",
-        "postEvent": "След събитието",
-        "analytics": "Статистика"
+        "analytics": "Статистика",
+        "afterEvent": "След събитието"
       },
       "toggles": {
         "unmute": "Участниците могат да говорят",
@@ -2111,13 +2108,16 @@
         "recordingConsent": "Съгласие за запис"
       },
       "sidebar": {
-        "registrations": "Регистрации",
+        "registrations": "Записвания",
         "ofMax": "{current} от {max}",
         "capacityEstimate": "≈{jvbs} JVB · {ram} RAM",
         "noReminders": "Няма конфигурирани напомняния",
         "tags": "Тагове",
-        "postEventSummary": "{connected} свързани от {registered} регистрации (оценени {estimated})",
-        "estimatedAttendance": "Оценени: {estimated} участници"
+        "postEventSummary": "{connected} свързани от {registered} записвания (капацитет {estimated})",
+        "estimatedAttendance": "Максимален капацитет: {estimated} участници",
+        "reminderScheduled": "Тръгва на {when}",
+        "reminderMissed": "Неизпратено — моментът отмина",
+        "reminderSoon": "Всеки момент"
       },
       "aiManageTitle": "Транскрипция, резюме и преводи",
       "aiManageDesc": "Управлявайте постпродукцията с ИИ на този запис: коригирайте транскрипцията и приписването на лекторите (кой какво казва), редактирайте резюмето и управлявайте езиците за превод.",
@@ -2133,7 +2133,11 @@
       "duplicateNext": "Дублиране за следващия път",
       "duplicateNextBusy": "Дублира се…",
       "duplicateNextHint": "Създава чернова с цялата конфигурация на това събитие (запис, отделни пътеки, ИИ, дневен ред, напомняния). Ако събитието има периодичност, датата се премества към следващото провеждане; в противен случай остава да бъде зададена.",
-      "duplicateNextError": "Дублирането не бе успешно. Опитайте отново."
+      "duplicateNextError": "Дублирането не бе успешно. Опитайте отново.",
+      "capacitySection": "Капацитет и инфраструктура",
+      "capacitySubtitle": "Конфигуриран за най-много {max} участници",
+      "publishBlockedLive": "Събитието вече е в ход",
+      "publishBlockedEnded": "Събитието приключи"
     },
     "rubrica": {
       "title": "Адресна книга",

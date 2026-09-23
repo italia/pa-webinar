@@ -135,7 +135,6 @@
       "toggleChat": "Keskustelu",
       "toggleQa": "Q&A",
       "toggleRecording": "Tallenne",
-      "settingsSection": "Tapahtuma-asetukset",
       "sessionsAndRecordings": "Istunnot ja videotallenteet",
       "postEventSection": "Tapahtuman jälkeen ja palaute"
     },
@@ -2084,7 +2083,7 @@
       "organizers": "Järjestäjät",
       "privacyGdpr": "Yksityisyys ja GDPR",
       "postEventTitle": "Tapahtuman jälkeen ja palaute",
-      "recordingSection": "Tallennus",
+      "recordingSection": "Tapahtuman video",
       "callSessions": "Istunnot ja telemetria",
       "questionnaires": "Kyselyt",
       "questionnaireCount": "{count, plural, =0 {Ei linkitettyjä kyselyitä} one {1 kysely linkitetty} other {# kyselyä linkitetty}}",
@@ -2092,12 +2091,10 @@
       "manageQuestionnaires": "Hallitse kyselyjä",
       "tabs": {
         "overview": "Yleiskatsaus",
-        "settings": "Asetukset",
         "people": "Henkilöt",
         "content": "Sisältö",
-        "audit": "Tallenteet ja auditointi",
-        "postEvent": "Tapahtuman jälkeen",
-        "analytics": "Tilastot"
+        "analytics": "Tilastot",
+        "afterEvent": "Tapahtuman jälkeen"
       },
       "toggles": {
         "unmute": "Osallistujat voivat avata mikrofonin",
@@ -2116,8 +2113,11 @@
         "capacityEstimate": "≈{jvbs} JVB · {ram} RAM",
         "noReminders": "Muistutuksia ei ole määritetty",
         "tags": "Tagit",
-        "postEventSummary": "{connected} liittyi / {registered} ilmoittautunutta (arvio {estimated})",
-        "estimatedAttendance": "Arvio: {estimated} osallistujaa"
+        "postEventSummary": "{connected} yhteydessä {registered} ilmoittautumisesta (kapasiteetti {estimated})",
+        "estimatedAttendance": "Enimmäiskapasiteetti: {estimated} osallistujaa",
+        "reminderScheduled": "Lähtee {when}",
+        "reminderMissed": "Ei lähetetty — hetki on ohi",
+        "reminderSoon": "Minä hetkenä hyvänsä"
       },
       "aiManageTitle": "Litterointi, yhteenveto ja käännökset",
       "aiManageDesc": "Hallinnoi tämän tallenteen tekoälyjälkituotantoa: korjaa litterointia ja puhujien kohdistusta (kuka sanoo mitä), muokkaa yhteenvetoa ja hallitse käännöskieliä.",
@@ -2133,7 +2133,11 @@
       "duplicateNext": "Monista seuraavaa kertaa varten",
       "duplicateNextBusy": "Monistetaan…",
       "duplicateNextHint": "Luo luonnoksen, joka sisältää tämän tapahtuman koko määrityksen (tallennus, erilliset raidat, tekoäly, agenda, muistutukset). Jos tapahtumalla on toistuvuus, päivämäärä siirtyy seuraavaan kertaan; muutoin se jää sinun asetettavaksesi.",
-      "duplicateNextError": "Monistaminen epäonnistui. Yritä uudelleen."
+      "duplicateNextError": "Monistaminen epäonnistui. Yritä uudelleen.",
+      "capacitySection": "Kapasiteetti ja infrastruktuuri",
+      "capacitySubtitle": "Määritetty enintään {max} osallistujalle",
+      "publishBlockedLive": "Tapahtuma on jo käynnissä",
+      "publishBlockedEnded": "Tapahtuma on päättynyt"
     },
     "rubrica": {
       "title": "Osoitekirja",

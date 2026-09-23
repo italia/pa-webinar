@@ -135,7 +135,6 @@
       "toggleChat": "Chat",
       "toggleQa": "Q&R",
       "toggleRecording": "Enregistrement",
-      "settingsSection": "Paramètres de l'événement",
       "sessionsAndRecordings": "Sessions et enregistrements vidéo",
       "postEventSection": "Après l'événement et retours"
     },
@@ -2084,7 +2083,7 @@
       "organizers": "Organisateurs",
       "privacyGdpr": "Confidentialité & RGPD",
       "postEventTitle": "Après l'événement & retours",
-      "recordingSection": "Enregistrement",
+      "recordingSection": "Vidéo de l’événement",
       "callSessions": "Sessions & télémétrie",
       "questionnaires": "Questionnaires",
       "questionnaireCount": "{count, plural, =0 {Aucun questionnaire associé} one {1 questionnaire associé} other {# questionnaires associés}}",
@@ -2092,12 +2091,10 @@
       "manageQuestionnaires": "Gérer les questionnaires",
       "tabs": {
         "overview": "Vue d'ensemble",
-        "settings": "Paramètres",
         "people": "Personnes",
         "content": "Contenus",
-        "audit": "Enregistrements & audit",
-        "postEvent": "Post-événement",
-        "analytics": "Statistiques"
+        "analytics": "Statistiques",
+        "afterEvent": "Après l’événement"
       },
       "toggles": {
         "unmute": "Les participants peuvent prendre la parole",
@@ -2116,8 +2113,11 @@
         "capacityEstimate": "≈{jvbs} JVB · {ram} RAM",
         "noReminders": "Aucun rappel configuré",
         "tags": "Tags",
-        "postEventSummary": "{connected} connectés sur {registered} inscriptions (estimés {estimated})",
-        "estimatedAttendance": "Estimés : {estimated} participants"
+        "postEventSummary": "{connected} connectés sur {registered} inscriptions (capacité {estimated})",
+        "estimatedAttendance": "Capacité maximale : {estimated} participants",
+        "reminderScheduled": "Part le {when}",
+        "reminderMissed": "Non envoyée — le moment est passé",
+        "reminderSoon": "D’un instant à l’autre"
       },
       "aiManageTitle": "Transcription, synthèse et traductions",
       "aiManageDesc": "Gérez la post-production IA de cet enregistrement : corrigez la transcription et l'attribution des locuteurs (qui dit quoi), modifiez la synthèse et gérez les langues de traduction.",
@@ -2133,7 +2133,11 @@
       "duplicateNext": "Dupliquer pour la prochaine fois",
       "duplicateNextBusy": "Duplication…",
       "duplicateNextHint": "Crée un brouillon reprenant toute la configuration de cet événement (enregistrement, pistes séparées, IA, ordre du jour, rappels). Si l'événement a une périodicité, la date est reportée à la prochaine occurrence ; sinon, elle reste à définir.",
-      "duplicateNextError": "Échec de la duplication. Veuillez réessayer."
+      "duplicateNextError": "Échec de la duplication. Veuillez réessayer.",
+      "capacitySection": "Capacité et infrastructure",
+      "capacitySubtitle": "Configuré pour {max} participants au maximum",
+      "publishBlockedLive": "L’événement est déjà en cours",
+      "publishBlockedEnded": "L’événement est terminé"
     },
     "rubrica": {
       "title": "Carnet d'adresses",

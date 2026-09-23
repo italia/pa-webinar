@@ -135,7 +135,6 @@
       "toggleChat": "Chat",
       "toggleQa": "Q&A",
       "toggleRecording": "Optagelse",
-      "settingsSection": "Begivenhedsindstillinger",
       "sessionsAndRecordings": "Sessioner og videooptagelser",
       "postEventSection": "Efter arrangementet og feedback"
     },
@@ -2084,7 +2083,7 @@
       "organizers": "Arrangører",
       "privacyGdpr": "Privatliv og GDPR",
       "postEventTitle": "Efter arrangementet og feedback",
-      "recordingSection": "Optagelse",
+      "recordingSection": "Begivenhedens video",
       "callSessions": "Sessioner og telemetri",
       "questionnaires": "Spørgeskemaer",
       "questionnaireCount": "{count, plural, =0 {Ingen tilknyttede spørgeskemaer} one {1 tilknyttet spørgeskema} other {# tilknyttede spørgeskemaer}}",
@@ -2092,12 +2091,10 @@
       "manageQuestionnaires": "Administrer spørgeskemaer",
       "tabs": {
         "overview": "Oversigt",
-        "settings": "Indstillinger",
         "people": "Personer",
         "content": "Indhold",
-        "audit": "Optagelser og audit",
-        "postEvent": "Efter arrangementet",
-        "analytics": "Statistik"
+        "analytics": "Statistik",
+        "afterEvent": "Efter begivenheden"
       },
       "toggles": {
         "unmute": "Deltagere kan slå mikrofonen til",
@@ -2116,8 +2113,11 @@
         "capacityEstimate": "≈{jvbs} JVB · {ram} RAM",
         "noReminders": "Ingen påmindelser konfigureret",
         "tags": "Tags",
-        "postEventSummary": "{connected} tilsluttede ud af {registered} tilmeldinger (estimeret {estimated})",
-        "estimatedAttendance": "Estimeret: {estimated} deltagere"
+        "postEventSummary": "{connected} forbundne ud af {registered} tilmeldinger (kapacitet {estimated})",
+        "estimatedAttendance": "Maksimal kapacitet: {estimated} deltagere",
+        "reminderScheduled": "Sendes den {when}",
+        "reminderMissed": "Ikke sendt — tidspunktet er passeret",
+        "reminderSoon": "Når som helst nu"
       },
       "aiManageTitle": "Transskription, resumé og oversættelser",
       "aiManageDesc": "Administrér AI-efterbehandlingen af denne optagelse: ret transskriptionen og tildelingen af talere (hvem siger hvad), redigér resuméet, og styr oversættelsessprogene.",
@@ -2133,7 +2133,11 @@
       "duplicateNext": "Dublér til næste gang",
       "duplicateNextBusy": "Dublerer…",
       "duplicateNextHint": "Opretter en kladde med hele dette arrangements opsætning (optagelse, separate spor, AI, dagsorden, påmindelser). Har arrangementet en kadence, flyttes datoen til næste forekomst; ellers skal du selv sætte den.",
-      "duplicateNextError": "Dubleringen mislykkedes. Prøv igen."
+      "duplicateNextError": "Dubleringen mislykkedes. Prøv igen.",
+      "capacitySection": "Kapacitet og infrastruktur",
+      "capacitySubtitle": "Konfigureret til op til {max} deltagere",
+      "publishBlockedLive": "Begivenheden er allerede i gang",
+      "publishBlockedEnded": "Begivenheden er afsluttet"
     },
     "rubrica": {
       "title": "Adressebog",

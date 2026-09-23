@@ -135,7 +135,6 @@
       "toggleChat": "Συνομιλία",
       "toggleQa": "Q&A",
       "toggleRecording": "Εγγραφή",
-      "settingsSection": "Ρυθμίσεις εκδήλωσης",
       "sessionsAndRecordings": "Συνεδρίες και βιντεοεγγραφές",
       "postEventSection": "Μετά την εκδήλωση και ανατροφοδότηση"
     },
@@ -2084,7 +2083,7 @@
       "organizers": "Διοργανωτές",
       "privacyGdpr": "Απόρρητο και ΓΚΠΔ",
       "postEventTitle": "Μετά την εκδήλωση και ανατροφοδότηση",
-      "recordingSection": "Εγγραφή",
+      "recordingSection": "Βίντεο της εκδήλωσης",
       "callSessions": "Συνεδρίες και τηλεμετρία",
       "questionnaires": "Ερωτηματολόγια",
       "questionnaireCount": "{count, plural, =0 {Κανένα συνδεδεμένο ερωτηματολόγιο} one {1 συνδεδεμένο ερωτηματολόγιο} other {# συνδεδεμένα ερωτηματολόγια}}",
@@ -2092,12 +2091,10 @@
       "manageQuestionnaires": "Διαχείριση ερωτηματολογίων",
       "tabs": {
         "overview": "Επισκόπηση",
-        "settings": "Ρυθμίσεις",
         "people": "Άτομα",
         "content": "Περιεχόμενο",
-        "audit": "Εγγραφές και Έλεγχος",
-        "postEvent": "Μετά την εκδήλωση",
-        "analytics": "Στατιστικά"
+        "analytics": "Στατιστικά",
+        "afterEvent": "Μετά την εκδήλωση"
       },
       "toggles": {
         "unmute": "Οι συμμετέχοντες μπορούν να μιλούν",
@@ -2116,8 +2113,11 @@
         "capacityEstimate": "≈{jvbs} JVB · {ram} RAM",
         "noReminders": "Δεν έχει διαμορφωθεί υπενθύμιση",
         "tags": "Ετικέτες",
-        "postEventSummary": "{connected} συνδεδεμένοι από {registered} εγγραφές (εκτιμώμενοι {estimated})",
-        "estimatedAttendance": "Εκτιμώμενοι: {estimated} συμμετέχοντες"
+        "postEventSummary": "{connected} συνδεδεμένοι από {registered} εγγραφές (χωρητικότητα {estimated})",
+        "estimatedAttendance": "Μέγιστη χωρητικότητα: {estimated} συμμετέχοντες",
+        "reminderScheduled": "Θα σταλεί στις {when}",
+        "reminderMissed": "Δεν στάλθηκε — η στιγμή πέρασε",
+        "reminderSoon": "Από στιγμή σε στιγμή"
       },
       "aiManageTitle": "Μεταγραφή, σύνοψη και μεταφράσεις",
       "aiManageDesc": "Διαχειριστείτε τη μεταπαραγωγή AI αυτής της καταγραφής: διορθώστε τη μεταγραφή και την απόδοση στους ομιλητές (ποιος λέει τι), επεξεργαστείτε τη σύνοψη και διαχειριστείτε τις γλώσσες μετάφρασης.",
@@ -2133,7 +2133,11 @@
       "duplicateNext": "Αντιγραφή για την επόμενη",
       "duplicateNextBusy": "Αντιγραφή…",
       "duplicateNextHint": "Δημιουργεί ένα πρόχειρο με ολόκληρη τη διαμόρφωση αυτής της εκδήλωσης (καταγραφή, ξεχωριστά κομμάτια, AI, ατζέντα, υπενθυμίσεις). Αν η εκδήλωση έχει περιοδικότητα, η ημερομηνία μεταφέρεται στην επόμενη εμφάνιση· διαφορετικά μένει να την ορίσετε εσείς.",
-      "duplicateNextError": "Η αντιγραφή απέτυχε. Δοκιμάστε ξανά."
+      "duplicateNextError": "Η αντιγραφή απέτυχε. Δοκιμάστε ξανά.",
+      "capacitySection": "Χωρητικότητα και υποδομή",
+      "capacitySubtitle": "Ρυθμισμένο για έως {max} συμμετέχοντες",
+      "publishBlockedLive": "Η εκδήλωση βρίσκεται ήδη σε εξέλιξη",
+      "publishBlockedEnded": "Η εκδήλωση ολοκληρώθηκε"
     },
     "rubrica": {
       "title": "Ευρετήριο",

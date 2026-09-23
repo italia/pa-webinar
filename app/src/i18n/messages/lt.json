@@ -135,7 +135,6 @@
       "toggleChat": "Pokalbiai",
       "toggleQa": "Q&A",
       "toggleRecording": "Įrašymas",
-      "settingsSection": "Renginio nustatymai",
       "sessionsAndRecordings": "Sesijos ir vaizdo įrašai",
       "postEventSection": "Po renginio ir atsiliepimai"
     },
@@ -2084,7 +2083,7 @@
       "organizers": "Organizatoriai",
       "privacyGdpr": "Privatumas ir GDPR/BDAR",
       "postEventTitle": "Po renginio ir atsiliepimai",
-      "recordingSection": "Įrašymas",
+      "recordingSection": "Renginio vaizdo įrašas",
       "callSessions": "Sesijos ir telemetrija",
       "questionnaires": "Klausimynai",
       "questionnaireCount": "{count, plural, =0 {Susieto klausimyno nėra} one {1 susietas klausimynas} other {# susieti klausimynai}}",
@@ -2092,12 +2091,10 @@
       "manageQuestionnaires": "Valdyti klausimynus",
       "tabs": {
         "overview": "Apžvalga",
-        "settings": "Nustatymai",
         "people": "Asmenys",
         "content": "Turinys",
-        "audit": "Įrašai ir auditas",
-        "postEvent": "Po renginio",
-        "analytics": "Statistika"
+        "analytics": "Statistika",
+        "afterEvent": "Po renginio"
       },
       "toggles": {
         "unmute": "Dalyviai gali kalbėti",
@@ -2116,8 +2113,11 @@
         "capacityEstimate": "≈{jvbs} JVB · {ram} RAM",
         "noReminders": "Priminimų nesukonfigūruota",
         "tags": "Žymos",
-        "postEventSummary": "{connected} prisijungę iš {registered} registracijų (numatomi {estimated})",
-        "estimatedAttendance": "Numatomi: {estimated} dalyviai"
+        "postEventSummary": "{connected} prisijungę iš {registered} registracijų (talpa {estimated})",
+        "estimatedAttendance": "Didžiausia talpa: {estimated} dalyvių",
+        "reminderScheduled": "Išsiunčiama {when}",
+        "reminderMissed": "Neišsiųsta — momentas praėjo",
+        "reminderSoon": "Bet kurią akimirką"
       },
       "aiManageTitle": "Transkripcija, santrauka ir vertimai",
       "aiManageDesc": "Tvarkykite šio įrašo DI postprodukciją: taisykite transkripciją ir kalbėtojų priskyrimą (kas ką pasakė), redaguokite santrauką ir tvarkykite vertimo kalbas.",
@@ -2133,7 +2133,11 @@
       "duplicateNext": "Dubliuoti kitam kartui",
       "duplicateNextBusy": "Dubliuojama…",
       "duplicateNextHint": "Sukuria juodraštį su visa šio renginio konfigūracija (įrašymas, atskiri takeliai, DI, darbotvarkė, priminimai). Jei renginys yra periodinis, data perkeliama į kitą kartą; kitu atveju ją reikia nustatyti patiems.",
-      "duplicateNextError": "Nepavyko dubliuoti. Bandykite dar kartą."
+      "duplicateNextError": "Nepavyko dubliuoti. Bandykite dar kartą.",
+      "capacitySection": "Talpa ir infrastruktūra",
+      "capacitySubtitle": "Sukonfigūruota iki {max} dalyvių",
+      "publishBlockedLive": "Renginys jau vyksta",
+      "publishBlockedEnded": "Renginys baigėsi"
     },
     "rubrica": {
       "title": "Adresų knyga",

@@ -135,7 +135,6 @@
       "toggleChat": "Razgovor",
       "toggleQa": "Q&A",
       "toggleRecording": "Snimanje",
-      "settingsSection": "Postavke događaja",
       "sessionsAndRecordings": "Sesije i videosnimke",
       "postEventSection": "Nakon događaja i povratne informacije"
     },
@@ -2084,7 +2083,7 @@
       "organizers": "Organizatori",
       "privacyGdpr": "Privatnost i GDPR",
       "postEventTitle": "Nakon događaja i povratne informacije",
-      "recordingSection": "Snimanje",
+      "recordingSection": "Videozapis događaja",
       "callSessions": "Sesije i telemetrija",
       "questionnaires": "Upitnici",
       "questionnaireCount": "{count, plural, =0 {Nema povezanih upitnika} one {1 povezani upitnik} few {# povezana upitnika} other {# povezanih upitnika}}",
@@ -2092,12 +2091,10 @@
       "manageQuestionnaires": "Upravljaj upitnicima",
       "tabs": {
         "overview": "Pregled",
-        "settings": "Postavke",
         "people": "Osobe",
         "content": "Sadržaj",
-        "audit": "Snimke i revizija",
-        "postEvent": "Nakon događaja",
-        "analytics": "Statistika"
+        "analytics": "Statistika",
+        "afterEvent": "Nakon događaja"
       },
       "toggles": {
         "unmute": "Sudionici mogu govoriti",
@@ -2116,8 +2113,11 @@
         "capacityEstimate": "≈{jvbs} JVB · {ram} RAM",
         "noReminders": "Nije konfiguriran nijedan podsjetnik",
         "tags": "Oznake",
-        "postEventSummary": "{connected} priključenih od {registered} prijava (procjena {estimated})",
-        "estimatedAttendance": "Procjena: {estimated} sudionika"
+        "postEventSummary": "{connected} povezanih od {registered} prijava (kapacitet {estimated})",
+        "estimatedAttendance": "Najveći kapacitet: {estimated} sudionika",
+        "reminderScheduled": "Šalje se {when}",
+        "reminderMissed": "Nije poslano — trenutak je prošao",
+        "reminderSoon": "Svakog trena"
       },
       "aiManageTitle": "Transkript, sažetak i prijevodi",
       "aiManageDesc": "Upravljaj AI postprodukcijom ove snimke: ispravi transkript i pripisivanje govornika (tko što govori), uredi sažetak i upravljaj jezicima prijevoda.",
@@ -2133,7 +2133,11 @@
       "duplicateNext": "Dupliciraj za sljedeći put",
       "duplicateNextBusy": "Dupliciranje…",
       "duplicateNextHint": "Stvara skicu s cjelokupnom konfiguracijom ovog događaja (snimanje, zasebne trake, AI, agenda, podsjetnici). Ako događaj ima učestalost, datum se pomiče na sljedeći termin; inače ga treba postaviti.",
-      "duplicateNextError": "Dupliciranje nije uspjelo. Pokušaj ponovno."
+      "duplicateNextError": "Dupliciranje nije uspjelo. Pokušaj ponovno.",
+      "capacitySection": "Kapacitet i infrastruktura",
+      "capacitySubtitle": "Konfigurirano za najviše {max} sudionika",
+      "publishBlockedLive": "Događaj je već u tijeku",
+      "publishBlockedEnded": "Događaj je završio"
     },
     "rubrica": {
       "title": "Imenik",

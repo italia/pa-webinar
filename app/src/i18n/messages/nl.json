@@ -135,7 +135,6 @@
       "toggleChat": "Chat",
       "toggleQa": "Q&A",
       "toggleRecording": "Opname",
-      "settingsSection": "Evenementinstellingen",
       "sessionsAndRecordings": "Sessies en video-opnames",
       "postEventSection": "Na afloop en feedback"
     },
@@ -2084,7 +2083,7 @@
       "organizers": "Organisatoren",
       "privacyGdpr": "Privacy & AVG",
       "postEventTitle": "Na afloop & feedback",
-      "recordingSection": "Opname",
+      "recordingSection": "Video van het evenement",
       "callSessions": "Sessies & telemetrie",
       "questionnaires": "Vragenlijsten",
       "questionnaireCount": "{count, plural, =0 {Geen gekoppelde vragenlijsten} one {1 gekoppelde vragenlijst} other {# gekoppelde vragenlijsten}}",
@@ -2092,12 +2091,10 @@
       "manageQuestionnaires": "Vragenlijsten beheren",
       "tabs": {
         "overview": "Overzicht",
-        "settings": "Instellingen",
         "people": "Personen",
         "content": "Inhoud",
-        "audit": "Opnames & audit",
-        "postEvent": "Na het evenement",
-        "analytics": "Statistieken"
+        "analytics": "Statistieken",
+        "afterEvent": "Na het evenement"
       },
       "toggles": {
         "unmute": "Deelnemers kunnen spreken",
@@ -2111,13 +2108,16 @@
         "recordingConsent": "Toestemming opname"
       },
       "sidebar": {
-        "registrations": "Aanmeldingen",
+        "registrations": "Inschrijvingen",
         "ofMax": "{current} van {max}",
         "capacityEstimate": "≈{jvbs} JVB · {ram} RAM",
         "noReminders": "Geen herinneringen geconfigureerd",
         "tags": "Tags",
-        "postEventSummary": "{connected} verbonden van {registered} aanmeldingen (geschat {estimated})",
-        "estimatedAttendance": "Geschat: {estimated} deelnemers"
+        "postEventSummary": "{connected} verbonden van {registered} inschrijvingen (capaciteit {estimated})",
+        "estimatedAttendance": "Maximale capaciteit: {estimated} deelnemers",
+        "reminderScheduled": "Gaat uit op {when}",
+        "reminderMissed": "Niet verzonden — het moment is voorbij",
+        "reminderSoon": "Elk moment"
       },
       "aiManageTitle": "Transcriptie, samenvatting en vertalingen",
       "aiManageDesc": "Beheer de AI-postproductie van deze opname: corrigeer de transcriptie en de toewijzing van de sprekers (wie zegt wat), pas de samenvatting aan en beheer de vertaaltalen.",
@@ -2133,7 +2133,11 @@
       "duplicateNext": "Dupliceren voor de volgende keer",
       "duplicateNextBusy": "Bezig met dupliceren…",
       "duplicateNextHint": "Maakt een concept met de volledige configuratie van dit evenement (opname, aparte sporen, AI, agenda, herinneringen). Als het evenement een vaste frequentie heeft, wordt de datum naar de volgende keer verplaatst; anders moet die nog worden ingesteld.",
-      "duplicateNextError": "Dupliceren mislukt. Probeer het opnieuw."
+      "duplicateNextError": "Dupliceren mislukt. Probeer het opnieuw.",
+      "capacitySection": "Capaciteit en infrastructuur",
+      "capacitySubtitle": "Ingesteld voor maximaal {max} deelnemers",
+      "publishBlockedLive": "Het evenement is al bezig",
+      "publishBlockedEnded": "Het evenement is afgelopen"
     },
     "rubrica": {
       "title": "Adresboek",

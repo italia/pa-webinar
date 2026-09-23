@@ -135,7 +135,6 @@
       "toggleChat": "Chatt",
       "toggleQa": "Q&A",
       "toggleRecording": "Inspelning",
-      "settingsSection": "Evenemangsinställningar",
       "sessionsAndRecordings": "Sessioner och videoinspelningar",
       "postEventSection": "Efterhantering och feedback"
     },
@@ -2084,7 +2083,7 @@
       "organizers": "Arrangörer",
       "privacyGdpr": "Integritet och GDPR",
       "postEventTitle": "Efter evenemanget och feedback",
-      "recordingSection": "Inspelning",
+      "recordingSection": "Evenemangets video",
       "callSessions": "Sessioner och telemetri",
       "questionnaires": "Enkäter",
       "questionnaireCount": "{count, plural, =0 {Inga enkäter kopplade} one {1 enkät kopplad} other {# enkäter kopplade}}",
@@ -2092,12 +2091,10 @@
       "manageQuestionnaires": "Hantera enkäter",
       "tabs": {
         "overview": "Översikt",
-        "settings": "Inställningar",
         "people": "Personer",
         "content": "Innehåll",
-        "audit": "Inspelningar och revision",
-        "postEvent": "Efter evenemanget",
-        "analytics": "Statistik"
+        "analytics": "Statistik",
+        "afterEvent": "Efter evenemanget"
       },
       "toggles": {
         "unmute": "Deltagare får tala",
@@ -2116,8 +2113,11 @@
         "capacityEstimate": "≈{jvbs} JVB · {ram} RAM",
         "noReminders": "Inga påminnelser konfigurerade",
         "tags": "Taggar",
-        "postEventSummary": "{connected} anslöt av {registered} anmälningar (uppskattat {estimated})",
-        "estimatedAttendance": "Uppskattat: {estimated} deltagare"
+        "postEventSummary": "{connected} anslutna av {registered} anmälningar (kapacitet {estimated})",
+        "estimatedAttendance": "Maximal kapacitet: {estimated} deltagare",
+        "reminderScheduled": "Skickas den {when}",
+        "reminderMissed": "Inte skickad — tidpunkten har passerat",
+        "reminderSoon": "När som helst"
       },
       "aiManageTitle": "Transkription, sammanfattning och översättningar",
       "aiManageDesc": "Hantera AI-efterproduktionen av den här inspelningen: rätta transkriptionen och tilldelningen av talare (vem som säger vad), redigera sammanfattningen och hantera översättningsspråken.",
@@ -2133,7 +2133,11 @@
       "duplicateNext": "Duplicera till nästa gång",
       "duplicateNextBusy": "Duplicerar…",
       "duplicateNextHint": "Skapar ett utkast med hela konfigurationen från det här evenemanget (inspelning, separata spår, AI, agenda, påminnelser). Om evenemanget är återkommande flyttas datumet till nästa tillfälle; annars får du ange det själv.",
-      "duplicateNextError": "Dupliceringen misslyckades. Försök igen."
+      "duplicateNextError": "Dupliceringen misslyckades. Försök igen.",
+      "capacitySection": "Kapacitet och infrastruktur",
+      "capacitySubtitle": "Konfigurerad för högst {max} deltagare",
+      "publishBlockedLive": "Evenemanget pågår redan",
+      "publishBlockedEnded": "Evenemanget är avslutat"
     },
     "rubrica": {
       "title": "Adressbok",

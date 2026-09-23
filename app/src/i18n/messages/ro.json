@@ -135,7 +135,6 @@
       "toggleChat": "Chat",
       "toggleQa": "Q&A",
       "toggleRecording": "Înregistrare",
-      "settingsSection": "Setări eveniment",
       "sessionsAndRecordings": "Sesiuni și înregistrări video",
       "postEventSection": "Post-eveniment și feedback"
     },
@@ -2084,7 +2083,7 @@
       "organizers": "Organizatori",
       "privacyGdpr": "Confidențialitate și RGPD",
       "postEventTitle": "Post-eveniment și feedback",
-      "recordingSection": "Înregistrare",
+      "recordingSection": "Videoclipul evenimentului",
       "callSessions": "Sesiuni și telemetrie",
       "questionnaires": "Chestionare",
       "questionnaireCount": "{count, plural, =0 {Niciun chestionar asociat} one {1 chestionar asociat} other {# chestionare asociate}}",
@@ -2092,12 +2091,10 @@
       "manageQuestionnaires": "Gestionați chestionarele",
       "tabs": {
         "overview": "Privire generală",
-        "settings": "Setări",
         "people": "Persoane",
         "content": "Conținut",
-        "audit": "Înregistrări și audit",
-        "postEvent": "Post-eveniment",
-        "analytics": "Statistici"
+        "analytics": "Statistici",
+        "afterEvent": "După eveniment"
       },
       "toggles": {
         "unmute": "Participanții pot vorbi",
@@ -2111,13 +2108,16 @@
         "recordingConsent": "Consimțământ pentru înregistrare"
       },
       "sidebar": {
-        "registrations": "Înregistrări",
+        "registrations": "Înscrieri",
         "ofMax": "{current} din {max}",
         "capacityEstimate": "≈{jvbs} JVB · {ram} RAM",
         "noReminders": "Niciun memento configurat",
         "tags": "Etichete",
-        "postEventSummary": "{connected} conectați din {registered} înscrieri (estimate {estimated})",
-        "estimatedAttendance": "Estimați: {estimated} participanți"
+        "postEventSummary": "{connected} conectați din {registered} înscrieri (capacitate {estimated})",
+        "estimatedAttendance": "Capacitate maximă: {estimated} participanți",
+        "reminderScheduled": "Pleacă pe {when}",
+        "reminderMissed": "Netrimisă — momentul a trecut",
+        "reminderSoon": "Din moment în moment"
       },
       "aiManageTitle": "Transcriere, rezumat și traduceri",
       "aiManageDesc": "Gestionați post-producția AI a acestei înregistrări: corectați transcrierea și atribuirea vorbitorilor (cine ce spune), modificați rezumatul și gestionați limbile de traducere.",
@@ -2133,7 +2133,11 @@
       "duplicateNext": "Duplică pentru data viitoare",
       "duplicateNextBusy": "Se duplică…",
       "duplicateNextHint": "Creează o ciornă cu întreaga configurație a acestui eveniment (înregistrare, piste separate, AI, agendă, memento-uri). Dacă evenimentul are o recurență, data trece la următoarea apariție; altfel rămâne de stabilit.",
-      "duplicateNextError": "Duplicarea nu a reușit. Încercați din nou."
+      "duplicateNextError": "Duplicarea nu a reușit. Încercați din nou.",
+      "capacitySection": "Capacitate și infrastructură",
+      "capacitySubtitle": "Configurat pentru maximum {max} participanți",
+      "publishBlockedLive": "Evenimentul este deja în desfășurare",
+      "publishBlockedEnded": "Evenimentul s-a încheiat"
     },
     "rubrica": {
       "title": "Agendă",

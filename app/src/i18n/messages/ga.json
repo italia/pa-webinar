@@ -135,7 +135,6 @@
       "toggleChat": "Comhrá",
       "toggleQa": "Q&A",
       "toggleRecording": "Taifeadadh",
-      "settingsSection": "Socruithe an imeachta",
       "sessionsAndRecordings": "Seisiúin agus taifeadtaí físe",
       "postEventSection": "Iar-imeacht agus aiseolas"
     },
@@ -2084,7 +2083,7 @@
       "organizers": "Eagraithe",
       "privacyGdpr": "Príobháideacht & GDPR",
       "postEventTitle": "Iar-imeacht & aiseolas",
-      "recordingSection": "Taifeadadh",
+      "recordingSection": "Físeán an imeachta",
       "callSessions": "Seisiúin & teileaméadracht",
       "questionnaires": "Ceistneoirí",
       "questionnaireCount": "{count, plural, =0 {Aon cheistneoir ceangailte} one {1 cheistneoir ceangailte} other {# ceistneoir ceangailte}}",
@@ -2092,12 +2091,10 @@
       "manageQuestionnaires": "Bainistigh ceistneoirí",
       "tabs": {
         "overview": "Forbhreathnú",
-        "settings": "Socruithe",
         "people": "Daoine",
         "content": "Ábhar",
-        "audit": "Taifeadtaí & Iniúchadh",
-        "postEvent": "Iarimeacht",
-        "analytics": "Staitisticí"
+        "analytics": "Staitisticí",
+        "afterEvent": "Tar éis an imeachta"
       },
       "toggles": {
         "unmute": "Is féidir le rannpháirtithe labhairt",
@@ -2116,8 +2113,11 @@
         "capacityEstimate": "≈{jvbs} JVB · {ram} RAM",
         "noReminders": "Aon mheabhrúchán cumraithe",
         "tags": "Clibeanna",
-        "postEventSummary": "{connected} ceangailte as {registered} cláruithe (measta {estimated})",
-        "estimatedAttendance": "Measta: {estimated} rannpháirtí"
+        "postEventSummary": "{connected} ceangailte as {registered} cláruithe (toilleadh {estimated})",
+        "estimatedAttendance": "Uastoilleadh: {estimated} rannpháirtí",
+        "reminderScheduled": "Seolfar é ar {when}",
+        "reminderMissed": "Gan seoladh — tá an nóiméad thart",
+        "reminderSoon": "Nóiméad ar bith anois"
       },
       "aiManageTitle": "Tras-scríbhinn, achoimre agus aistriúcháin",
       "aiManageDesc": "Bainistigh iarléiriú AI an taifeadta seo: ceartaigh an tras-scríbhinn agus sannadh na gcainteoirí (cé a deir cad é), cuir an achoimre in eagar agus bainistigh na teangacha aistriúcháin.",
@@ -2133,7 +2133,11 @@
       "duplicateNext": "Dúblaigh don chéad cheann eile",
       "duplicateNextBusy": "Á dhúbláil…",
       "duplicateNextHint": "Cruthaíonn sé dréacht a iompraíonn cumraíocht iomlán an imeachta seo (taifeadadh, rianta ar leith, AI, clár oibre, meabhrúcháin). Má tá minicíocht ag an imeacht, bogtar an dáta go dtí an chéad ócáid eile; murab ea, fágtar duitse é a shocrú.",
-      "duplicateNextError": "Níorbh fhéidir é a dhúbláil. Bain triail eile as."
+      "duplicateNextError": "Níorbh fhéidir é a dhúbláil. Bain triail eile as.",
+      "capacitySection": "Toilleadh agus bonneagar",
+      "capacitySubtitle": "Cumraithe do suas le {max} rannpháirtí",
+      "publishBlockedLive": "Tá an t-imeacht ar siúl cheana féin",
+      "publishBlockedEnded": "Tá an t-imeacht thart"
     },
     "rubrica": {
       "title": "Leabhar seoltaí",

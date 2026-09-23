@@ -135,7 +135,6 @@
       "toggleChat": "Csevegés",
       "toggleQa": "Q&A",
       "toggleRecording": "Felvétel",
-      "settingsSection": "Esemény beállítások",
       "sessionsAndRecordings": "Munkamenetek és videófelvételek",
       "postEventSection": "Esemény utáni szakasz és visszajelzés"
     },
@@ -2084,7 +2083,7 @@
       "organizers": "Szervezők",
       "privacyGdpr": "Adatvédelem és GDPR",
       "postEventTitle": "Esemény utáni szakasz és visszajelzés",
-      "recordingSection": "Felvétel",
+      "recordingSection": "Az esemény videója",
       "callSessions": "Munkamenetek és telemetria",
       "questionnaires": "Kérdőívek",
       "questionnaireCount": "{count, plural, =0 {Nincs hozzárendelt kérdőív} one {1 hozzárendelt kérdőív} other {# hozzárendelt kérdőív}}",
@@ -2092,12 +2091,10 @@
       "manageQuestionnaires": "Kérdőívek kezelése",
       "tabs": {
         "overview": "Áttekintés",
-        "settings": "Beállítások",
         "people": "Személyek",
         "content": "Tartalmak",
-        "audit": "Felvételek és napló",
-        "postEvent": "Esemény után",
-        "analytics": "Statisztikák"
+        "analytics": "Statisztikák",
+        "afterEvent": "Az esemény után"
       },
       "toggles": {
         "unmute": "A résztvevők beszélhetnek",
@@ -2111,13 +2108,16 @@
         "recordingConsent": "Felvételhez való hozzájárulás"
       },
       "sidebar": {
-        "registrations": "Regisztrációk",
+        "registrations": "Jelentkezések",
         "ofMax": "{current} / {max}",
         "capacityEstimate": "≈{jvbs} JVB · {ram} RAM",
         "noReminders": "Nincs beállított emlékeztető",
         "tags": "Címkék",
-        "postEventSummary": "{connected} csatlakozott a(z) {registered} regisztrációból (becsült: {estimated})",
-        "estimatedAttendance": "Becsült: {estimated} résztvevő"
+        "postEventSummary": "{connected} csatlakozott a(z) {registered} jelentkezésből (kapacitás {estimated})",
+        "estimatedAttendance": "Legnagyobb kapacitás: {estimated} résztvevő",
+        "reminderScheduled": "Kimegy: {when}",
+        "reminderMissed": "Nem küldve — az időpont elmúlt",
+        "reminderSoon": "Bármelyik pillanatban"
       },
       "aiManageTitle": "Átirat, összefoglaló és fordítások",
       "aiManageDesc": "Kezelje ennek a felvételnek az AI-utómunkáját: javítsa az átiratot és a beszélők hozzárendelését (ki mit mond), szerkessze az összefoglalót, és kezelje a fordítási nyelveket.",
@@ -2133,7 +2133,11 @@
       "duplicateNext": "Másolás a következő alkalomra",
       "duplicateNextBusy": "Másolás…",
       "duplicateNextHint": "Létrehoz egy piszkozatot ennek az eseménynek a teljes konfigurációjával (felvétel, külön sávok, AI, napirend, emlékeztetők). Ha az eseménynek van ismétlődése, a dátum a következő alkalomra kerül; egyébként Önnek kell beállítania.",
-      "duplicateNextError": "A másolás nem sikerült. Próbálja újra."
+      "duplicateNextError": "A másolás nem sikerült. Próbálja újra.",
+      "capacitySection": "Kapacitás és infrastruktúra",
+      "capacitySubtitle": "Legfeljebb {max} résztvevőre beállítva",
+      "publishBlockedLive": "Az esemény már zajlik",
+      "publishBlockedEnded": "Az esemény véget ért"
     },
     "rubrica": {
       "title": "Címjegyzék",
