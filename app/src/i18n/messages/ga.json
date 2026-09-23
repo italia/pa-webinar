@@ -3565,7 +3565,9 @@
     "gardenGateHint": "Is féidir leat dul isteach as seo, nó d'abhatár a threorú chuig an ngeata.",
     "classicVersion": "Leagan clasaiceach",
     "roomNotReadyButton": "Tá an seomra á ullmhú…",
-    "roomNotReadyPiazza": "Téigh go dtí an chearnóg idir an dá linn"
+    "roomNotReadyPiazza": "Téigh go dtí an chearnóg idir an dá linn",
+    "roomJustOpened": "Tá an seomra réidh — tar isteach",
+    "enterAnyway": "Téigh isteach mar sin féin"
   },
   "recording": {
     "management": "Taifeadadh físe",

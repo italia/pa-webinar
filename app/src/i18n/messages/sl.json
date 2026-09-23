@@ -3565,7 +3565,9 @@
     "gardenGateHint": "Pridružiš se lahko od tu ali pa svojega avatarja pripelješ do vrat.",
     "classicVersion": "Klasična različica",
     "roomNotReadyButton": "Soba se pripravlja…",
-    "roomNotReadyPiazza": "Med tem skoči na trg"
+    "roomNotReadyPiazza": "Med tem skoči na trg",
+    "roomJustOpened": "Soba je pripravljena — vstopi",
+    "enterAnyway": "Vseeno vstopi"
   },
   "recording": {
     "management": "Video posnetek",

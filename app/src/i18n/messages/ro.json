@@ -3565,7 +3565,9 @@
     "gardenGateHint": "Poți intra de aici sau îți poți duce avatarul până la poartă.",
     "classicVersion": "Versiunea clasică",
     "roomNotReadyButton": "Sala se pregătește…",
-    "roomNotReadyPiazza": "Între timp, treci prin piață"
+    "roomNotReadyPiazza": "Între timp, treci prin piață",
+    "roomJustOpened": "Sala e gata — intră",
+    "enterAnyway": "Intră oricum"
   },
   "recording": {
     "management": "Înregistrare video",

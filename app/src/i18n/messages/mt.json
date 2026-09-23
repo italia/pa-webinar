@@ -3565,7 +3565,9 @@
     "gardenGateHint": "Tista' tidħol minn hawn, jew twassal l-avatar tiegħek sal-bieb.",
     "classicVersion": "Verżjoni klassika",
     "roomNotReadyButton": "Il-kamra qed titħejja…",
-    "roomNotReadyPiazza": "Sadanittant idħol fil-pjazza"
+    "roomNotReadyPiazza": "Sadanittant idħol fil-pjazza",
+    "roomJustOpened": "Il-kamra lesta — idħol",
+    "enterAnyway": "Idħol xorta"
   },
   "recording": {
     "management": "Reġistrazzjoni bil-vidjo",

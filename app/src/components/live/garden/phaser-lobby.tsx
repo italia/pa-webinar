@@ -45,6 +45,10 @@ interface PhaserLobbyProps {
    * colonna a fianco della scena.
    */
   hostOwnsEntry?: boolean;
+  /** Falso mentre il ponte video si sta accendendo: la piazza tiene le porte
+   *  chiuse e ci mette davanti il cordone, invece di aprire su una stanza che
+   *  non c'e'. */
+  salaPronta?: boolean;
 }
 
 export default function PhaserLobby({
@@ -56,6 +60,7 @@ export default function PhaserLobby({
   onEnterLive,
   onExitClassic,
   hostOwnsEntry = false,
+  salaPronta = true,
 }: PhaserLobbyProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const handleRef = useRef<LobbyHandle | null>(null);
@@ -89,7 +94,7 @@ export default function PhaserLobby({
     const conference = new EnterLiveConference(shared, (name, prefs) =>
       onEnterRef.current(name, prefs),
     );
-    const schedule = new EventStatusSchedule(status, startsAtMs, isHost);
+    const schedule = new EventStatusSchedule(status, startsAtMs, isHost, salaPronta);
     scheduleRef.current = schedule;
     const media = new BrowserMediaDevices();
 
@@ -123,6 +128,7 @@ export default function PhaserLobby({
       window.clearTimeout(settle);
       handle.destroy();
       handleRef.current = null;
+      scheduleRef.current?.dispose();
       scheduleRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -130,8 +136,8 @@ export default function PhaserLobby({
 
   // Push event-status changes (gate opens on LIVE without a refresh).
   useEffect(() => {
-    scheduleRef.current?.update(status);
-  }, [status]);
+    scheduleRef.current?.update(status, salaPronta);
+  }, [status, salaPronta]);
 
   // Push name edits from the React side, if any.
   useEffect(() => {

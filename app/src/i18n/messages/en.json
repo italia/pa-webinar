@@ -3565,7 +3565,9 @@
     "gardenGateHint": "You can join from here, or walk your avatar to the gate.",
     "classicVersion": "Classic version",
     "roomNotReadyButton": "The room is getting ready…",
-    "roomNotReadyPiazza": "Head to the square meanwhile"
+    "roomNotReadyPiazza": "Head to the square meanwhile",
+    "roomJustOpened": "The room is ready — come in",
+    "enterAnyway": "Enter anyway"
   },
   "recording": {
     "management": "Video recording",

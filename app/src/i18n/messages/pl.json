@@ -3565,7 +3565,9 @@
     "gardenGateHint": "Możesz dołączyć stąd albo doprowadzić swojego awatara do bramy.",
     "classicVersion": "Wersja klasyczna",
     "roomNotReadyButton": "Sala się przygotowuje…",
-    "roomNotReadyPiazza": "W międzyczasie wpadnij na plac"
+    "roomNotReadyPiazza": "W międzyczasie wpadnij na plac",
+    "roomJustOpened": "Sala gotowa — wejdź",
+    "enterAnyway": "Wejdź mimo to"
   },
   "recording": {
     "management": "Nagranie wideo",

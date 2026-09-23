@@ -348,12 +348,51 @@ export default function WaitingRoom({
     return () => clearTimeout(t);
   }, [pontePresunto]);
 
-  const salaPronta = pontePresunto || attesaLunga;
+  // Due cose diverse, e vanno tenute diverse.
+  //
+  // `salaPronta` e' cio' che SAPPIAMO: il ponte c'e'. Muove le porte della
+  // piazza e l'annuncio «e' pronta, entra».
+  //
+  // `ingressoConsentito` e' cio' che PERMETTIAMO: dopo un minuto si prova
+  // comunque, perche' la misura puo' sbagliare. Ma non si annuncia niente —
+  // dire «la sala e' pronta» proprio quando l'unica prova che abbiamo dice il
+  // contrario manderebbe le persone a sbattere con una promessa nostra.
+  const salaPronta = pontePresunto;
+  const ingressoConsentito = salaPronta || attesaLunga;
+
+  // L'apertura va notata. Il passaggio da «aspetta» a «entra» avviene mentre
+  // la persona sta guardando altrove — la piazza, la chat, la propria
+  // anteprima — e un pulsante che cambia in silenzio se lo perde. Per qualche
+  // secondo si illumina e chiede di entrare, poi torna normale: un richiamo
+  // che non smette diventa rumore.
+  const [appenaAperta, setAppenaAperta] = useState(false);
+  const eraPronta = useRef(salaPronta);
   const canEnter =
     nameValid &&
     emailValid &&
     (!multitrackRequired || multitrackConsent) &&
-    salaPronta;
+    ingressoConsentito;
+
+  useEffect(() => {
+    if (!salaPronta) {
+      // Se la sala si richiude — il ponte sparisce, la fotografia torna
+      // indietro — il richiamo va spento: resterebbe un invito a entrare
+      // dove non si entra.
+      setAppenaAperta(false);
+      eraPronta.current = false;
+      return undefined;
+    }
+    if (eraPronta.current) return undefined;
+    eraPronta.current = true;
+    setAppenaAperta(true);
+    const t = setTimeout(() => setAppenaAperta(false), 10_000);
+    return () => clearTimeout(t);
+  }, [salaPronta]);
+
+  // Il richiamo si vede solo se il pulsante si puo' davvero premere. Lampeggiare
+  // di verde su un pulsante spento — nome non ancora scritto, consenso non dato —
+  // prometterebbe un ingresso che quel clic non dara'.
+  const evidenziaCta = appenaAperta && canEnter;
 
   // Cronometro warm-up. Ci si ancora UNA volta per ciclo (identità =
   // warmup.startedAt): senza questo, ri-ancorarsi a ogni poll (3s) fa
@@ -495,9 +534,11 @@ export default function WaitingRoom({
       handleEnterLive();
       return;
     }
-    // Se manca solo la sala, mandare la persona a sistemare il nome — che e'
-    // gia' a posto — la fa cercare un errore che non ha fatto.
-    if (!salaPronta && nameValid && emailValid) {
+    // Rete di sicurezza: il cancello della piazza non lascia passare mentre la
+    // sala si prepara, ma se un domani lo facesse, mandare la persona a
+    // sistemare il nome — che e' gia' a posto — le farebbe cercare un errore
+    // che non ha fatto.
+    if (!ingressoConsentito && nameValid && emailValid) {
       throw new Error(t('roomNotReadyButton'));
     }
     if (typeof document !== 'undefined') {
@@ -506,7 +547,7 @@ export default function WaitingRoom({
       el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
     throw new Error('waiting-room: pre-join not complete');
-  }, [canEnter, handleEnterLive, salaPronta, nameValid, emailValid, t]);
+  }, [canEnter, handleEnterLive, ingressoConsentito, nameValid, emailValid, t]);
 
   const handleDeviceStateChange = useCallback(
     (s: WaitingRoomJoinPrefs) => setDevicePrefs(s),
@@ -935,9 +976,11 @@ export default function WaitingRoom({
           )}
         </Button>
       )}
-      {canEnterLive && !salaPronta ? (
+      {canEnterLive && !ingressoConsentito ? (
         // Entrare prima che il ponte video esista significa arrivare in una
-        // stanza che non c'e': si resta qui, e lo si dice.
+        // stanza che non c'e': si resta qui, e lo si dice. Passato il minuto
+        // si torna al pulsante normale — si entra, senza pero' promettere che
+        // dall'altra parte ci sia qualcuno.
         <>
           <Button color="primary" size="lg" className="fw-semibold" disabled>
             <Spinner active small className="me-2" />
@@ -957,16 +1000,24 @@ export default function WaitingRoom({
           )}
         </>
       ) : canEnterLive ? (
-        <Button
-          color="primary"
-          size="lg"
-          className="fw-semibold"
-          onClick={handleEnterLive}
-          disabled={!canEnter}
-        >
-          <Icon icon="it-video" size="sm" color="white" className="me-2" />
-          {t('joinNowBtn')}
-        </Button>
+        <>
+          {/* Il colore e il battito non arrivano a chi non guarda lo schermo, e
+              l'etichetta che cambia dentro un pulsante non a fuoco non viene
+              letta: l'apertura va detta a voce, qui. */}
+          <p className="visually-hidden" role="status">
+            {evidenziaCta ? t('roomJustOpened') : ''}
+          </p>
+          <Button
+            color={evidenziaCta ? 'success' : 'primary'}
+            size="lg"
+            className={`fw-semibold${evidenziaCta ? ' wr-cta-pronta' : ''}`}
+            onClick={handleEnterLive}
+            disabled={!canEnter}
+          >
+            <Icon icon="it-video" size="sm" color="white" className="me-2" />
+            {evidenziaCta ? t('roomJustOpened') : t('joinNowBtn')}
+          </Button>
+        </>
       ) : isWarmingUp ? (
         <Button color="primary" size="lg" className="fw-semibold" disabled>
           <Spinner active small className="me-2" />
@@ -1059,6 +1110,7 @@ export default function WaitingRoom({
           status={event.status}
           startsAtMs={startsAtMs}
           isHost={isModerator}
+          salaPronta={salaPronta}
           onEnterLive={handleGameEnter}
           onExitClassic={goClassic}
         />
@@ -1078,7 +1130,25 @@ export default function WaitingRoom({
           <button type="button" className="wr-piazza-btn" onClick={goClassic}>
             {t('classicVersion')}
           </button>
-          {isLive && (
+          {/* Chi e' nella piazza non vede la colonna dei controlli: se il
+              cancello e' chiuso, qui dentro non c'e' altra strada. Finche' la
+              stanza non risulta allestita il cordone resta — non si promette
+              cio' che non si sa — ma scaduta l'attesa si offre lo stesso
+              passaggio che ha chi e' rimasto nella sala classica. */}
+          {isLive && !salaPronta && (
+            <p className="wr-piazza-hint mb-0">{t('roomNotReadyButton')}</p>
+          )}
+          {isLive && !salaPronta && ingressoConsentito && (
+            <button
+              type="button"
+              className="wr-piazza-btn"
+              onClick={handleEnterLive}
+              disabled={!canEnter}
+            >
+              {t('enterAnyway')}
+            </button>
+          )}
+          {isLive && salaPronta && (
             <p className="wr-piazza-hint mb-0">{t('gardenGateHint')}</p>
           )}
         </div>
@@ -1100,10 +1170,10 @@ export default function WaitingRoom({
   // L'invito al gioco: un riquadro nella colonna principale, sotto i controlli.
   // È il "pulsante o infografica" chiesto — un gesto esplicito, non una scena
   // che parte addosso a chi è arrivato per prepararsi.
-  // L'invito alla piazza: uno solo per schermata. Quando la sala non e' ancora
-  // pronta la proposta sta gia' sotto al pulsante d'ingresso, dove serve —
-  // qui sarebbe la stessa cosa detta due volte.
-  const gameInvite = canPlay && !gameOpen && salaPronta ? (
+  // L'invito alla piazza: uno solo per schermata. Finche' si resta in attesa la
+  // proposta sta gia' sotto al pulsante d'ingresso, dove serve — qui sarebbe la
+  // stessa cosa detta due volte.
+  const gameInvite = canPlay && !gameOpen && ingressoConsentito ? (
     <button
       type="button"
       className="wr-game-invite"

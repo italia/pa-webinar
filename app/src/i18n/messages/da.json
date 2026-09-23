@@ -3565,7 +3565,9 @@
     "gardenGateHint": "Du kan deltage herfra, eller føre din avatar hen til porten.",
     "classicVersion": "Klassisk version",
     "roomNotReadyButton": "Rummet gøres klar…",
-    "roomNotReadyPiazza": "Gå på torvet i mellemtiden"
+    "roomNotReadyPiazza": "Gå på torvet i mellemtiden",
+    "roomJustOpened": "Rummet er klar — kom ind",
+    "enterAnyway": "Gå ind alligevel"
   },
   "recording": {
     "management": "Videooptagelse",

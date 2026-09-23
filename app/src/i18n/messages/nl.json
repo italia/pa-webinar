@@ -3565,7 +3565,9 @@
     "gardenGateHint": "Je kunt hiervandaan deelnemen, of je avatar naar de poort lopen.",
     "classicVersion": "Klassieke versie",
     "roomNotReadyButton": "De ruimte wordt klaargemaakt…",
-    "roomNotReadyPiazza": "Ga ondertussen naar het plein"
+    "roomNotReadyPiazza": "Ga ondertussen naar het plein",
+    "roomJustOpened": "De ruimte is klaar — kom binnen",
+    "enterAnyway": "Toch binnengaan"
   },
   "recording": {
     "management": "Video-opname",

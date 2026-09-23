@@ -3565,7 +3565,9 @@
     "gardenGateHint": "Môžete vstúpiť odtiaľto, alebo doviesť svojho avatara k bráne.",
     "classicVersion": "Klasická verzia",
     "roomNotReadyButton": "Miestnosť sa pripravuje…",
-    "roomNotReadyPiazza": "Zatiaľ zájdi na námestie"
+    "roomNotReadyPiazza": "Zatiaľ zájdi na námestie",
+    "roomJustOpened": "Miestnosť je pripravená — vstúp",
+    "enterAnyway": "Vstúpiť napriek tomu"
   },
   "recording": {
     "management": "Videozáznam",

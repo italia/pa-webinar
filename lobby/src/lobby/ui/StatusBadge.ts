@@ -46,12 +46,16 @@ export class StatusBadge {
   private render(): void {
     this.root.classList.remove(
       'pawl-badge--scheduled',
+      'pawl-badge--preparing',
       'pawl-badge--live',
       'pawl-badge--ended',
     );
     this.root.classList.add(`pawl-badge--${this.status}`);
     if (this.status === 'live') this.text.textContent = 'IN DIRETTA';
     else if (this.status === 'ended') this.text.textContent = 'Evento terminato';
+    // A sala che si prepara l'ora d'inizio e' passata: il conto alla rovescia
+    // e' fermo a zero e stamparlo direbbe «Inizia tra 00:00» a tempo indefinito.
+    else if (this.status === 'preparing') this.text.textContent = 'La sala si sta preparando';
     else this.text.textContent = `Inizia tra ${formatClock(this.remaining)}`;
     this.count.textContent = `${this.people} in sala`;
   }

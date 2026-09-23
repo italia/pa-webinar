@@ -2701,3 +2701,39 @@ html.live-call-immersive body {
   font-size: 0.7rem;
   color: var(--app-muted, #5c6f82);
 }
+
+/* ── La sala si e' appena aperta ──────────────────────────────────────────
+   Il pulsante passa da spento a premibile mentre la persona sta guardando
+   altrove — la piazza, la chat, il proprio riflesso nell'anteprima. Un
+   cambio di stato muto se lo perde: qui il pulsante si illumina per qualche
+   secondo, cioe' esattamente il tempo in cui serve accorgersene.
+
+   Il battito si ferma da solo: un elemento che pulsa per sempre diventa
+   rumore e, per chi ha disturbi dell'attenzione, un ostacolo. Con il moto
+   ridotto richiesto dal sistema resta il contorno, che dice la stessa cosa
+   senza muoversi. */
+@keyframes wr-cta-pronta-battito {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(0, 135, 88, 0.55); }
+  50% { box-shadow: 0 0 0 12px rgba(0, 135, 88, 0); }
+}
+
+// Il richiamo vive su uno strato suo. Se prendesse `outline` e `box-shadow` del
+// pulsante si mangerebbe l'anello di focus da tastiera, che deve restare
+// visibile proprio mentre il pulsante chiede di essere premuto.
+.wr-cta-pronta {
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border: 3px solid #008758;
+    border-radius: inherit;
+    animation: wr-cta-pronta-battito 1.6s ease-out 6;
+    pointer-events: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wr-cta-pronta::after { animation: none; }
+}

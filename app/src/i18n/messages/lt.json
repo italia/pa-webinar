@@ -3565,7 +3565,9 @@
     "gardenGateHint": "Gali prisijungti iš čia arba nuvesti savo avatarą iki vartų.",
     "classicVersion": "Klasikinė versija",
     "roomNotReadyButton": "Salė ruošiama…",
-    "roomNotReadyPiazza": "Tuo tarpu užsuk į aikštę"
+    "roomNotReadyPiazza": "Tuo tarpu užsuk į aikštę",
+    "roomJustOpened": "Salė paruošta — užeik",
+    "enterAnyway": "Vis tiek įeiti"
   },
   "recording": {
     "management": "Vaizdo įrašas",

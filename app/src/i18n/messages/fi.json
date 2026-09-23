@@ -3565,7 +3565,9 @@
     "gardenGateHint": "Voit liittyä täältä tai viedä hahmosi portille.",
     "classicVersion": "Klassinen versio",
     "roomNotReadyButton": "Huonetta valmistellaan…",
-    "roomNotReadyPiazza": "Käy sillä välin torilla"
+    "roomNotReadyPiazza": "Käy sillä välin torilla",
+    "roomJustOpened": "Huone on valmis — tule sisään",
+    "enterAnyway": "Siirry silti sisään"
   },
   "recording": {
     "management": "Videotallenne",

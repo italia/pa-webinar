@@ -11,6 +11,9 @@ import type { WorldLayout } from './WorldMap';
  *
  *  - `scheduled` → doors shut, padlock on, dimmed; a countdown ("Inizia tra
  *    mm:ss") is shown over the gate AND on the stage screen.
+ *  - `preparing` → doors shut with a red rope across them: l'ora e' arrivata
+ *    ma la sala non c'e' ancora. Nessun conto alla rovescia — non si sta
+ *    aspettando un orario, si sta aspettando una stanza.
  *  - `live`      → doors swing open with a glow, the stage reads "● IN DIRETTA".
  *  - `ended`     → doors shut, "Evento terminato".
  *
@@ -82,14 +85,25 @@ export class CountdownGate {
     this.status = s;
     this.bus.emit('statusChange', s);
     this.bus.emit('canEnter', this.canEnter());
+    // Le scritte si riscrivono anche qui, non solo al cambio di secondo: a
+    // evento gia' iniziato il conto alla rovescia e' fermo a zero, quindi
+    // quel secondo non cambia piu' e le porte si aprivano sopra un cartello
+    // che continuava a dire «si sta preparando».
+    this.refreshLabels(Math.max(0, this.schedule.getStartsAt() - Date.now()));
   }
 
   canEnter(): boolean {
-    return this.status === 'live' || this.schedule.isHost();
+    return this.status === 'live' || this.anticipoHost();
+  }
+
+  /** L'ingresso anticipato vale prima dell'ora, non quando la sala non c'e':
+   *  a bridge spento anche chi conduce troverebbe una stanza vuota. */
+  private anticipoHost(): boolean {
+    return this.schedule.isHost() && this.status === 'scheduled';
   }
 
   private targetOpen(): number {
-    return this.status === 'live' || this.schedule.isHost() ? 1 : 0;
+    return this.status === 'live' || this.anticipoHost() ? 1 : 0;
   }
 
   update(nowMs: number, dtMs: number): void {
@@ -111,6 +125,11 @@ export class CountdownGate {
     if (this.status === 'live') {
       this.gateLabel.setText('Ingresso aperto').setColor('#008758');
       this.stageLabel.setText('● IN DIRETTA').setColor('#D9364F');
+      return;
+    }
+    if (this.status === 'preparing') {
+      this.gateLabel.setText('La sala si sta preparando…').setColor('#A66300');
+      this.stageLabel.setText('Fra poco').setColor('#A66300');
       return;
     }
     if (this.status === 'ended') {
@@ -155,8 +174,37 @@ export class CountdownGate {
       this.doors.strokeRoundedRect(x, dividerY - 26, leafW, 52, 5);
     }
 
+    // Cordone rosso mentre la sala si prepara: il segno che tutti conoscono
+    // per «non si passa, ma stanno per aprire». Sostituisce il lucchetto, che
+    // direbbe un'altra cosa — chiuso a chiave, torna piu' tardi.
+    if (this.status === 'preparing' && open < 0.5) {
+      const a = 1 - open * 2;
+      const cy = dividerY + 4;
+      const sx = gate.centerX - halfGap + 4;
+      const dx = gate.centerX + halfGap - 4;
+      // Colonnine
+      for (const x of [sx, dx]) {
+        this.doors.fillStyle(0xb8a06a, a);
+        this.doors.fillRoundedRect(x - 3, cy - 20, 6, 26, 2);
+        this.doors.fillStyle(0xd8c48c, a);
+        this.doors.fillCircle(x, cy - 22, 4);
+      }
+      // Il cordone, con la sua pancia
+      this.doors.lineStyle(4, 0xd9364f, a);
+      this.doors.beginPath();
+      this.doors.moveTo(sx, cy - 18);
+      const passi = 12;
+      for (let i = 1; i <= passi; i += 1) {
+        const t = i / passi;
+        const x = sx + (dx - sx) * t;
+        const y = cy - 18 + Math.sin(Math.PI * t) * 9;
+        this.doors.lineTo(x, y);
+      }
+      this.doors.strokePath();
+    }
+
     // Padlock while shut — institutional blue.
-    if (open < 0.5) {
+    if (this.status !== 'preparing' && open < 0.5) {
       const a = 1 - open * 2;
       const cx = gate.centerX;
       const cy = dividerY - 2;

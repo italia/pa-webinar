@@ -3565,7 +3565,9 @@
     "gardenGateHint": "Vari pievienoties no šejienes vai aizvest savu avataru līdz vārtiem.",
     "classicVersion": "Klasiskā versija",
     "roomNotReadyButton": "Telpa tiek sagatavota…",
-    "roomNotReadyPiazza": "Pa to laiku aizej uz laukumu"
+    "roomNotReadyPiazza": "Pa to laiku aizej uz laukumu",
+    "roomJustOpened": "Telpa ir gatava — nāc iekšā",
+    "enterAnyway": "Tomēr ienākt"
   },
   "recording": {
     "management": "Video ieraksts",

@@ -112,6 +112,12 @@ export class WorldScene extends Phaser.Scene {
       busOn(this.ctx.bus, 'joinRequest', (sel) => void this.handleJoin(sel)),
       busOn(this.ctx.bus, 'emote', (type) => this.localEmote(type)),
       busOn(this.ctx.bus, 'joyAxis', (a) => this.movement.setExternalAxis(a.x, a.y)),
+      // Aspettare davanti al cordone e' la posizione naturale, ed era un vicolo
+      // cieco: `emitGateZone` parla solo sul FRONTE: chi e' gia' dentro la zona
+      // quando il cancello si apre non genera nessun fronte, e le porte si
+      // aprivano su un ingresso che non partiva. Qui si chiude quel buco —
+      // l'apertura stessa vale come arrivo al cancello.
+      busOn(this.ctx.bus, 'statusChange', () => this.chiediIngressoSeAlCancello()),
     );
 
     this.scale.on('resize', this.applyCameraZoom, this);
@@ -347,14 +353,25 @@ export class WorldScene extends Phaser.Scene {
       // defaults here are only a placeholder. The standard host "Entra" button
       // stays available alongside this. Full-screen (dev harness) keeps the
       // explicit device-panel flow instead.
-      //
-      // Gate strictly on LIVE (not gate.canEnter(), which also opens early for
-      // hosts): the host shell's standard "Entra ora" only appears once LIVE,
-      // so a moderator must never be auto-entered pre-LIVE by brushing the gate.
-      if (inside && this.ctx.config.embed && this.ctx.schedule.getStatus() === 'live') {
-        this.ctx.bus.emit('joinRequest', { videoMuted: true, audioMuted: true });
-      }
+      this.chiediIngressoSeAlCancello();
     }
+  }
+
+  /**
+   * Chiede l'ingresso se l'avatar e' fermo dentro la zona del cancello e il
+   * cancello e' aperto. La chiamano due cose: l'arrivo al cancello e
+   * l'apertura del cancello su chi e' gia' li'.
+   *
+   * Gate rigorosamente su LIVE (non `gate.canEnter()`, che si apre in anticipo
+   * anche per gli host): il pulsante «Entra ora» della shell compare solo a
+   * evento avviato, e un moderatore non deve trovarsi dentro per aver sfiorato
+   * il cancello prima.
+   */
+  private chiediIngressoSeAlCancello(): void {
+    if (!this.inGateZone || !this.ctx.config.embed) return;
+    if (this.joining || this.localInCall) return;
+    if (this.ctx.schedule.getStatus() !== 'live') return;
+    this.ctx.bus.emit('joinRequest', { videoMuted: true, audioMuted: true });
   }
 
   private emitPeerCount(): void {

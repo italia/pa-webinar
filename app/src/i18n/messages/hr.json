@@ -3565,7 +3565,9 @@
     "gardenGateHint": "Možeš ući odavde ili odvesti svoj avatar do vrata.",
     "classicVersion": "Klasična verzija",
     "roomNotReadyButton": "Dvorana se priprema…",
-    "roomNotReadyPiazza": "U međuvremenu svrati na trg"
+    "roomNotReadyPiazza": "U međuvremenu svrati na trg",
+    "roomJustOpened": "Dvorana je spremna — uđi",
+    "enterAnyway": "Svejedno uđi"
   },
   "recording": {
     "management": "Video snimka",

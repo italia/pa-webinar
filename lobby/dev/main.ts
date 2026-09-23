@@ -6,7 +6,8 @@
  * (anteprima reale via getUserMedia), consenso e CTA d'ingresso.
  *
  * Querystring: ?in=20 (sec al LIVE, 0=subito) · ?host=1 · ?bots=120
- * Console:     window.lobby.addBots(50) · .live() · .end() · .destroy()
+ * Console:     window.lobby.addBots(50) · .preparing() · .live() · .end() · .destroy()
+ * Querystring:  ?in=<secondi> · ?host=1 · ?embed=1 (ingresso camminando)
  */
 import './harness.css';
 import { mountLobby } from '../src/lobby';
@@ -57,6 +58,10 @@ const handle = mountLobby(
     capacityHint: nBots,
     map: mapTheme,
     initialProfile: { name: savedName || 'Ospite' },
+    // `?embed=1` riproduce il modo in cui la piazza vive dentro il portale:
+    // la chrome interna si spegne e camminare fino al cancello aperto E'
+    // l'ingresso. E' l'unico modo di provare qui quel percorso.
+    embed: params.get('embed') === '1',
   },
   { presence, conference, schedule, media },
 );
@@ -83,6 +88,9 @@ function renderStatus(): void {
   } else if (st === 'ended') {
     statusChip.className = 'status-chip';
     statusChip.textContent = 'Evento concluso';
+  } else if (st === 'preparing') {
+    statusChip.className = 'status-chip';
+    statusChip.textContent = 'La sala si sta preparando';
   } else {
     statusChip.className = 'status-chip';
     statusChip.innerHTML = `Apre tra <b>${fmtCountdown(schedule.getStartsAt() - Date.now())}</b>`;
@@ -367,6 +375,7 @@ Object.assign(window, {
     presence,
     schedule,
     addBots: (n = 30) => presence.addBots(n),
+    preparing: () => schedule.setStatus('preparing'),
     live: () => schedule.setStatus('live'),
     end: () => schedule.setStatus('ended'),
     destroy: () => {

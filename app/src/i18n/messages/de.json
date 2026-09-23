@@ -3565,7 +3565,9 @@
     "gardenGateHint": "Sie können von hier beitreten oder Ihren Avatar bis zum Tor führen.",
     "classicVersion": "Klassische Ansicht",
     "roomNotReadyButton": "Der Raum wird vorbereitet…",
-    "roomNotReadyPiazza": "Geh solange auf den Platz"
+    "roomNotReadyPiazza": "Geh solange auf den Platz",
+    "roomJustOpened": "Der Raum ist bereit — komm rein",
+    "enterAnyway": "Trotzdem beitreten"
   },
   "recording": {
     "management": "Videoaufzeichnung",

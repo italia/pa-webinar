@@ -3565,7 +3565,9 @@
     "gardenGateHint": "Du kan gå med härifrån, eller gå med din avatar fram till porten.",
     "classicVersion": "Klassisk version",
     "roomNotReadyButton": "Rummet förbereds…",
-    "roomNotReadyPiazza": "Gå till torget under tiden"
+    "roomNotReadyPiazza": "Gå till torget under tiden",
+    "roomJustOpened": "Rummet är redo — kom in",
+    "enterAnyway": "Gå in ändå"
   },
   "recording": {
     "management": "Videoinspelning",

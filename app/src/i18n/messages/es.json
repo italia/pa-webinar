@@ -3565,7 +3565,9 @@
     "gardenGateHint": "Puedes entrar desde aquí, o llevar tu avatar hasta la puerta.",
     "classicVersion": "Versión clásica",
     "roomNotReadyButton": "La sala se está preparando…",
-    "roomNotReadyPiazza": "Mientras tanto, entra en la plaza"
+    "roomNotReadyPiazza": "Mientras tanto, entra en la plaza",
+    "roomJustOpened": "La sala está lista — entra",
+    "enterAnyway": "Entrar de todos modos"
   },
   "recording": {
     "management": "Grabación de vídeo",

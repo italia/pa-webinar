@@ -3565,7 +3565,9 @@
     "gardenGateHint": "Võid liituda siit või viia oma avatari väravani.",
     "classicVersion": "Klassikaline versioon",
     "roomNotReadyButton": "Ruum valmistub…",
-    "roomNotReadyPiazza": "Mine seni väljakule"
+    "roomNotReadyPiazza": "Mine seni väljakule",
+    "roomJustOpened": "Ruum on valmis — tule sisse",
+    "enterAnyway": "Sisene siiski"
   },
   "recording": {
     "management": "Videosalvestis",

@@ -3565,7 +3565,9 @@
     "gardenGateHint": "Можете да влезете оттук или да отведете аватара си до портата.",
     "classicVersion": "Класическа версия",
     "roomNotReadyButton": "Залата се подготвя…",
-    "roomNotReadyPiazza": "Междувременно влез на площада"
+    "roomNotReadyPiazza": "Междувременно влез на площада",
+    "roomJustOpened": "Залата е готова — влез",
+    "enterAnyway": "Влез въпреки това"
   },
   "recording": {
     "management": "Видеозапис",

@@ -3565,7 +3565,9 @@
     "gardenGateHint": "Beléphetsz innen, vagy elviheted az avatarodat a kapuig.",
     "classicVersion": "Klasszikus változat",
     "roomNotReadyButton": "A terem készül…",
-    "roomNotReadyPiazza": "Addig nézz be a térre"
+    "roomNotReadyPiazza": "Addig nézz be a térre",
+    "roomJustOpened": "A terem kész — gyere be",
+    "enterAnyway": "Belépés ennek ellenére"
   },
   "recording": {
     "management": "Videofelvétel",
