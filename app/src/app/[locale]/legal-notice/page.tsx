@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 
+import { getSettings, nomeEnte } from '@/lib/settings';
 import LegalDocumentPage from '@/components/layout/legal-document-page';
 
 interface LegalNotesPageProps {
@@ -20,6 +21,8 @@ export async function generateMetadata({
 
 export default async function LegalNotesPage() {
   const t = await getTranslations('legal.legalNotes');
+  const settings = await getSettings();
+  const tLegal = await getTranslations('legal');
 
   return (
     <LegalDocumentPage
@@ -28,7 +31,9 @@ export default async function LegalNotesPage() {
       sections={[
         {
           title: t('sections.ownership.title'),
-          body: t('sections.ownership.body'),
+          body: t('sections.ownership.body', {
+            organization: nomeEnte(settings) ?? tLegal('organizationNotConfigured'),
+          }),
         },
         {
           title: t('sections.usage.title'),

@@ -12,8 +12,8 @@
     "noReactions": "Vyjádřete svůj názor"
   },
   "common": {
-    "appName": "Události DTD",
-    "appDescription": "Platforma pro veřejné digitální události Odboru pro digitální transformaci",
+    "appName": "PA Webinar",
+    "appDescription": "Platforma pro veřejné digitální události",
     "loading": "Načítání...",
     "error": "Došlo k chybě",
     "errorMessage": "Něco se pokazilo. Zkuste to prosím znovu.",
@@ -1217,7 +1217,7 @@
       "autoStartRecording": "Automaticky spustit záznam",
       "autoStartRecordingDesc": "Při zahájení události se záznam spustí sám (bez dotazu na moderátora). Pozdě příchozí tak najdou přehrávač již dostupný.",
       "aiSectionHeading": "Automatická postprodukce",
-      "aiSectionDesc": "Po skončení události může být záznam zpracován AI pipeline běžící v clusteru, která vytvoří přepis, shrnutí a — pokud si to vyžádáte — překlady a dabing. Vše probíhá na infrastruktuře úřadu, žádná data neputují k třetím stranám.",
+      "aiSectionDesc": "Po skončení události může být záznam zpracován AI pipeline běžící v clusteru, která vytvoří přepis, shrnutí a — pokud si to vyžádáte — překlady a dabing. Vše probíhá na infrastruktuře této instalace, žádná data neputují k třetím stranám.",
       "aiTranscriptEnabled": "Automatický přepis",
       "aiTranscriptEnabledDesc": "Rozpoznávání řeči s identifikací mluvčích. Nutné pro zapnutí shrnutí, překladů a dabingu.",
       "aiSummaryEnabled": "Shrnutí a kapitoly",
@@ -1486,7 +1486,7 @@
         "siteNameHelp": "Zobrazeno v záhlaví, titulku prohlížeče a e-mailech",
         "siteDescription": "Popis aplikace",
         "organizationName": "Název organizace",
-        "organizationNameHelp": "např. Odbor pro digitální transformaci",
+        "organizationNameHelp": "Název subjektu, který vlastní platformu: zobrazuje se v záhlaví, zápatí a právních textech (např. Obec Příkladov)",
         "organizationNameShort": "Zkratka organizace",
         "organizationUrl": "URL organizace",
         "parentOrganization": "Nadřazená organizace",
@@ -1805,7 +1805,7 @@
         "newTitle": "Nová šablona GDPR",
         "editTitle": "Upravit šablonu GDPR",
         "name": "Interní název",
-        "namePlaceholder": "např. Standardní informace DTD",
+        "namePlaceholder": "např. Standardní informace o ochraně osobních údajů",
         "description": "Popis (volitelné)",
         "descriptionPlaceholder": "Krátké poznámky pro rozpoznání šablony",
         "bodyIt": "Text informací (italsky)",
@@ -2636,7 +2636,7 @@
     "projectTeaser": {
       "kicker": "Projekt",
       "title": "Open source a svrchovaný, vytvořený veřejnou správou pro veřejnou správu",
-      "body": "PA Webinar je platforma Odboru pro digitální transformaci pro veřejné digitální akce: designový systém .italia, video engine Jitsi Meet a plně in-cluster AI pipeline. Je uvolněna jako open source, aby ji mohla znovu použít jakákoli administrativa.",
+      "body": "PA Webinar je open source platforma pro veřejné digitální akce, vyvinutá italským Odborem pro digitální transformaci a uvolněná tak, aby ji mohla znovu použít jakákoli administrativa: designový systém .italia, video engine Jitsi Meet a plně in-cluster AI pipeline.",
       "sovereignty": {
         "title": "Datová svrchovanost",
         "desc": "Self-hosted na infrastruktuře administrativy: data nikdy neopustí prostředí a nehrozí vystavení CLOUD Act."
@@ -2795,8 +2795,8 @@
       "recordingRequired": "Pro účast na této události je nutný souhlas s nahráváním",
       "multitrack": "Souhlasím s nahráváním samostatné zvukové stopy svého hlasu výhradně za účelem správného přiřazení přepisu jednotlivým mluvčím. Stopa je dočasná a po přepisu se maže; nepoužívá se k identifikaci ani k reprodukci mého hlasu.",
       "multitrackRequired": "Souhlas s nahráváním vaší zvukové stopy je pro účast na této události povinný",
-      "futureCommunications": "Přeji si dostávat informace o budoucích událostech organizovaných DTD",
-      "addressBook": "Chci být zařazen do adresáře DTD, abych byl zván na podobné události",
+      "futureCommunications": "Přeji si dostávat informace o budoucích událostech zveřejněných na této platformě",
+      "addressBook": "Chci být zařazen do adresáře událostí, abych byl zván na podobné události",
       "addressBookHelp": "Samostatný souhlas (čl. 6.1.a GDPR). Můžete jej kdykoli odvolat pomocí odkazu „Odstranit moje údaje z adresáře“ v e-mailech, které obdržíte. Jméno a organizace budou převzaty z registračního profilu."
     },
     "export": {
@@ -2859,7 +2859,7 @@
       "sections": {
         "controller": {
           "title": "Správce údajů",
-          "body": "Zpracování osobních údajů probíhá v rámci institucionálních činností Odboru pro digitální transformaci za účelem technického a organizačního zajištění veřejných online událostí."
+          "body": "Správce údajů: {organization}. Zpracování osobních údajů probíhá v rámci jeho institucionálních činností za účelem technického a organizačního zajištění veřejných online událostí."
         },
         "data": {
           "title": "Zpracovávané údaje a účely",
@@ -2867,11 +2867,11 @@
         },
         "retention": {
           "title": "Uchovávání údajů a práva",
-          "body": "Údaje jsou uchovávány po dobu nakonfigurovanou pro každou událost a poté automaticky smazány, pokud zákonné povinnosti nestanoví jinak. Subjekty údajů mohou kdykoli uplatnit svá práva podle GDPR, včetně přístupu, opravy a výmazu, prostřednictvím institucionálních kanálů Odboru."
+          "body": "Údaje jsou uchovávány po dobu nakonfigurovanou pro každou událost a poté automaticky smazány, pokud zákonné povinnosti nestanoví jinak. Subjekty údajů mohou kdykoli uplatnit svá práva podle GDPR, včetně přístupu, opravy a výmazu, prostřednictvím institucionálních kanálů správce údajů."
         },
         "automatedProcessing": {
           "title": "Přepis, shrnutí a dabing vytvořené umělou inteligencí",
-          "body": "U událostí, které o to požádají, je po skončení přenosu nahrávka zpracována řetězcem umělé inteligence běžícím výhradně na klastrové infrastruktuře Odboru. Vzniká přepis mluveného slova (s rozlišením jednotlivých mluvčích), srozumitelné shrnutí, případné překlady do dalších evropských jazyků a dabovaná verze zvuku s obecným syntetickým hlasem. Všechny použité modely (WhisperX pro přepis, Mistral-Small pro shrnutí a překlad, Piper TTS pro dabing) běží na vyhrazených GPU uvnitř klastru: žádná data účastníků se neodesílají službám třetích stran. Hlas účastníků se neklonuje ani neuchovává jako biometrický údaj (čl. 9 GDPR): dabing používá veřejné předtrénované syntetické hlasy, přiřazované mluvčím libovolně. U každé nahrávky stránka události ukazuje přesný snímek použitých modelů („Transparentnost zpracování UI“). Vytvořený obsah může obsahovat nepřesnosti: závazným zdrojem zůstává vždy původní video (akt o UI, čl. 50)."
+          "body": "U událostí, které o to požádají, je po skončení přenosu nahrávka zpracována řetězcem umělé inteligence běžícím výhradně na klastrové infrastruktuře této instalace. Vzniká přepis mluveného slova (s rozlišením jednotlivých mluvčích), srozumitelné shrnutí, případné překlady do dalších evropských jazyků a dabovaná verze zvuku s obecným syntetickým hlasem. Všechny použité modely (WhisperX pro přepis, Mistral-Small pro shrnutí a překlad, Piper TTS pro dabing) běží na vyhrazených GPU uvnitř klastru: žádná data účastníků se neodesílají službám třetích stran. Hlas účastníků se neklonuje ani neuchovává jako biometrický údaj (čl. 9 GDPR): dabing používá veřejné předtrénované syntetické hlasy, přiřazované mluvčím libovolně. U každé nahrávky stránka události ukazuje přesný snímek použitých modelů („Transparentnost zpracování UI“). Vytvořený obsah může obsahovat nepřesnosti: závazným zdrojem zůstává vždy původní video (akt o UI, čl. 50)."
         }
       },
       "note": {
@@ -2883,7 +2883,7 @@
     "accessibility": {
       "metaTitle": "Prohlášení o přístupnosti",
       "title": "Prohlášení o přístupnosti",
-      "intro": "Ministerstvo pro digitální transformaci se zavazuje učinit PA Webinar přístupným v souladu s italským zákonem 4/2004, směrnicí (EU) 2016/2102 a pokyny AgID k přístupnosti nástrojů IKT.",
+      "intro": "Odpovědný subjekt: {organization}. Subjekt se zavazuje učinit tuto platformu přístupnou v souladu s italským zákonem 4/2004, směrnicí (EU) 2016/2102 a pokyny AgID k přístupnosti nástrojů IKT.",
       "sections": {
         "conformance": {
           "title": "Stav souladu",
@@ -2922,7 +2922,7 @@
       "sections": {
         "ownership": {
           "title": "Vlastnictví služby",
-          "body": "Platforma je provozována Odborem pro digitální transformaci a je poskytována pro organizaci a účast na veřejných online událostech institucionálního zájmu."
+          "body": "Vlastník platformy: {organization}. Platforma je poskytována pro organizaci a účast na veřejných online událostech institucionálního zájmu."
         },
         "usage": {
           "title": "Podmínky používání",
@@ -2930,7 +2930,7 @@
         },
         "liability": {
           "title": "Omezení odpovědnosti",
-          "body": "Přestože jsou přijata odpovídající technická a organizační opatření, Odbor nemůže zaručit úplnou absenci přerušení nebo poruch způsobených nepředvídatelnými událostmi, údržbou nebo vnějšími faktory. Zákonné odpovědnosti zůstávají nedotčeny."
+          "body": "Přestože jsou přijata odpovídající technická a organizační opatření, vlastník platformy nemůže zaručit úplnou absenci přerušení nebo poruch způsobených nepředvídatelnými událostmi, údržbou nebo vnějšími faktory. Zákonné odpovědnosti zůstávají nedotčeny."
         }
       }
     },
@@ -3029,7 +3029,8 @@
         },
         "note": "Úplný seznam komponent a služeb s verzemi, hashi a technickými vlastnostmi je k dispozici v předchozích částech a ve stahovatelném JSON."
       }
-    }
+    },
+    "organizationNotConfigured": "organizace zatím nebyla v nastavení uvedena"
   },
   "status": {
     "title": "Stav systému",
@@ -3735,8 +3736,8 @@
   },
   "rubrica": {
     "optOut": {
-      "title": "Odstranění z adresáře DTD",
-      "intro": "Chystáte se odvolat souhlas se zařazením do adresáře DTD. Po potvrzení již nebudete kontaktováni s pozvánkami na podobné události.",
+      "title": "Odstranění z adresáře událostí",
+      "intro": "Chystáte se odvolat souhlas se zařazením do adresáře událostí. Po potvrzení již nebudete kontaktováni s pozvánkami na podobné události.",
       "missingToken": "Odkaz není platný nebo je neúplný. Zkontrolujte původní e-mail.",
       "invalidToken": "Odkaz je neplatný nebo vypršel. Pro pomoc kontaktujte správce události.",
       "notFound": "Odkazu neodpovídá žádná osoba. Možná již byla odstraněna.",
@@ -3746,7 +3747,7 @@
       "confirm": "Potvrdit odstranění",
       "submitting": "Probíhá odstraňování…",
       "successTitle": "Odstranění dokončeno",
-      "successBody": "Vaše údaje již nejsou v adresáři DTD.",
+      "successBody": "Vaše údaje již nejsou v adresáři událostí.",
       "errors": {
         "generic": "Došlo k chybě. Zkuste to později."
       }

@@ -12,8 +12,8 @@
     "noReactions": "Išsakykite savo nuomonę"
   },
   "common": {
-    "appName": "DTD Renginiai",
-    "appDescription": "Skaitmeninių viešųjų renginių platforma, sukurta Skaitmeninės transformacijos departamento",
+    "appName": "PA Webinar",
+    "appDescription": "Viešųjų skaitmeninių renginių platforma",
     "loading": "Įkeliama...",
     "error": "Įvyko klaida",
     "errorMessage": "Kažkas nepavyko. Bandykite dar kartą.",
@@ -1217,7 +1217,7 @@
       "autoStartRecording": "Pradėti įrašymą automatiškai",
       "autoStartRecordingDesc": "Renginiui prasidėjus, įrašymas paleidžiamas savaime (moderatoriaus neklausiama). Vėluojantieji iš karto randa prieinamą grotuvą.",
       "aiSectionHeading": "Automatinis apdorojimas po renginio",
-      "aiSectionDesc": "Pasibaigus renginiui įrašą gali apdoroti klasteryje veikianti dirbtinio intelekto grandinė ir parengti transkripciją, santrauką, o pageidaujant – vertimus ir įgarsinimą. Viskas vyksta Departamento infrastruktūroje, jokie duomenys neperduodami tretiesiems asmenims.",
+      "aiSectionDesc": "Pasibaigus renginiui įrašą gali apdoroti klasteryje veikianti dirbtinio intelekto grandinė ir parengti transkripciją, santrauką, o pageidaujant – vertimus ir įgarsinimą. Viskas vyksta šio diegimo infrastruktūroje, jokie duomenys neperduodami tretiesiems asmenims.",
       "aiTranscriptEnabled": "Automatinė transkripcija",
       "aiTranscriptEnabledDesc": "Kalbos atpažinimas su kalbėtojų identifikavimu. Būtina norint įjungti santrauką, vertimus ir įgarsinimą.",
       "aiSummaryEnabled": "Santrauka ir skyriai",
@@ -1486,7 +1486,7 @@
         "siteNameHelp": "Rodomas antraštėje, naršyklės pavadinime ir el. laiškuose",
         "siteDescription": "Programos aprašymas",
         "organizationName": "Organizacijos pavadinimas",
-        "organizationNameHelp": "pvz. Skaitmeninės transformacijos departamentas",
+        "organizationNameHelp": "Platformai priklausančios institucijos pavadinimas: rodomas antraštėje, poraštėje ir teisiniuose tekstuose (pvz., Pavyzdžio miesto savivaldybė)",
         "organizationNameShort": "Organizacijos santrumpa",
         "organizationUrl": "Organizacijos URL",
         "parentOrganization": "Patronuojanti organizacija",
@@ -1805,7 +1805,7 @@
         "newTitle": "Naujas GDPR/BDAR šablonas",
         "editTitle": "Redaguoti GDPR/BDAR šabloną",
         "name": "Vidinis pavadinimas",
-        "namePlaceholder": "pvz., DTD standartinė informacija",
+        "namePlaceholder": "pvz., Standartinė privatumo informacija",
         "description": "Aprašymas (neprivaloma)",
         "descriptionPlaceholder": "Trumpos pastabos šablonui atpažinti",
         "bodyIt": "Privatumo informacijos tekstas (italų k.)",
@@ -2636,7 +2636,7 @@
     "projectTeaser": {
       "kicker": "Projektas",
       "title": "Atvirojo kodo ir suverenus, sukurtas valdžios institucijų valdžios institucijoms",
-      "body": "PA Webinar yra Skaitmeninės transformacijos departamento platforma viešiems skaitmeniniams renginiams: .italia dizaino sistema, Jitsi Meet vaizdo variklis ir visiškai in-cluster AI procesas. Ji išleista kaip atvirojo kodo, kad bet kuri administracija galėtų ją pakartotinai naudoti.",
+      "body": "PA Webinar yra atvirojo kodo platforma viešiems skaitmeniniams renginiams, sukurta Italijos Skaitmeninės transformacijos departamento ir išleista tam, kad bet kuri administracija galėtų ją pakartotinai naudoti: .italia dizaino sistema, Jitsi Meet vaizdo variklis ir visiškai in-cluster AI procesas.",
       "sovereignty": {
         "title": "Duomenų suverenumas",
         "desc": "Self-hosted administracijos infrastruktūroje: duomenys niekur neišeina ir nėra CLOUD Act poveikio."
@@ -2795,8 +2795,8 @@
       "recordingRequired": "Norint dalyvauti šiame renginyje, būtinas sutikimas dėl įrašymo",
       "multitrack": "Sutinku, kad mano balsas būtų įrašomas atskiru garso takeliu vien tam, kad transkripcija būtų teisingai priskirta kiekvienam kalbėtojui. Takelis yra laikinas ir po transkripcijos ištrinamas; jis nenaudojamas mano balsui atpažinti ar atkurti.",
       "multitrackRequired": "Sutikimas įrašyti jūsų garso takelį yra privalomas norint dalyvauti šiame renginyje",
-      "futureCommunications": "Noriu gauti informaciją apie būsimus DTD organizuojamus renginius",
-      "addressBook": "Noriu būti įtrauktas į DTD adresų knygą, kad būčiau kviečiamas į panašius renginius",
+      "futureCommunications": "Noriu gauti informaciją apie būsimus šioje platformoje skelbiamus renginius",
+      "addressBook": "Noriu būti įtrauktas į renginių adresų knygą, kad būčiau kviečiamas į panašius renginius",
       "addressBookHelp": "Atskiras sutikimas (GDPR/BDAR str. 6.1.a). Galite jį atšaukti bet kada per nuorodą „Pašalinkite mano duomenis iš adresų knygos“ gautuose el. laiškuose. Vardas ir organizacija bus paimti iš registracijos profilio."
     },
     "export": {
@@ -2859,7 +2859,7 @@
       "sections": {
         "controller": {
           "title": "Duomenų valdytojas",
-          "body": "Asmens duomenys tvarkomi vykdant Skaitmeninės transformacijos departamento institucinę veiklą, siekiant užtikrinti techninį ir organizacinį viešų internetinių renginių valdymą."
+          "body": "Duomenų valdytojas: {organization}. Asmens duomenys tvarkomi vykdant jo institucinę veiklą, siekiant užtikrinti techninį ir organizacinį viešų internetinių renginių valdymą."
         },
         "data": {
           "title": "Tvarkomi duomenys ir tikslai",
@@ -2867,11 +2867,11 @@
         },
         "retention": {
           "title": "Duomenų saugojimas ir teisės",
-          "body": "Duomenys saugomi kiekvienam renginiui sukonfigūruotą laikotarpį, po kurio automatiškai ištrinami, nebent taikomi kiti teisiniai įsipareigojimai. Duomenų subjektai gali bet kada pasinaudoti savo GDPR teisėmis, įskaitant prieigą, ištaisymą ir ištrynimą, per departamento institucinius kanalus."
+          "body": "Duomenys saugomi kiekvienam renginiui sukonfigūruotą laikotarpį, po kurio automatiškai ištrinami, nebent taikomi kiti teisiniai įsipareigojimai. Duomenų subjektai gali bet kada pasinaudoti savo GDPR teisėmis, įskaitant prieigą, ištaisymą ir ištrynimą, per duomenų valdytojo institucinius kanalus."
         },
         "automatedProcessing": {
           "title": "Dirbtinio intelekto sukurta transkripcija, santrauka ir įgarsinimas",
-          "body": "Renginiuose, kurie to prašo, pasibaigus transliacijai įrašas apdorojamas dirbtinio intelekto grandine, veikiančia vien tik Departamento klasterio infrastruktūroje. Ji parengia kalbos transkripciją (atskiriant skirtingus kalbėtojus), suprantamą santrauką, galimus vertimus į kitas Europos kalbas ir įgarsintą garso versiją su bendriniu sintetiniu balsu. Visi naudojami modeliai (WhisperX transkripcijai, Mistral-Small santraukai ir vertimui, Piper TTS įgarsinimui) veikia klasterio viduje esančiuose skirtuose GPU: jokie dalyvių duomenys nesiunčiami trečiųjų šalių paslaugoms. Dalyvių balsas neklonuojamas ir nesaugomas kaip biometrinis duomuo (BDAR 9 straipsnis): įgarsinimui naudojami vieši iš anksto apmokyti sintetiniai balsai, kalbėtojams priskiriami savavališkai. Kiekvieno įrašo atveju renginio puslapyje rodoma tiksli naudotų modelių nuotrauka („DI apdorojimo skaidrumas“). Sukurtas turinys gali turėti netikslumų: autoritetingas šaltinis visada lieka originalus vaizdo įrašas (DI aktas, 50 straipsnis)."
+          "body": "Renginiuose, kurie to prašo, pasibaigus transliacijai įrašas apdorojamas dirbtinio intelekto grandine, veikiančia vien tik šio diegimo klasterio infrastruktūroje. Ji parengia kalbos transkripciją (atskiriant skirtingus kalbėtojus), suprantamą santrauką, galimus vertimus į kitas Europos kalbas ir įgarsintą garso versiją su bendriniu sintetiniu balsu. Visi naudojami modeliai (WhisperX transkripcijai, Mistral-Small santraukai ir vertimui, Piper TTS įgarsinimui) veikia klasterio viduje esančiuose skirtuose GPU: jokie dalyvių duomenys nesiunčiami trečiųjų šalių paslaugoms. Dalyvių balsas neklonuojamas ir nesaugomas kaip biometrinis duomuo (BDAR 9 straipsnis): įgarsinimui naudojami vieši iš anksto apmokyti sintetiniai balsai, kalbėtojams priskiriami savavališkai. Kiekvieno įrašo atveju renginio puslapyje rodoma tiksli naudotų modelių nuotrauka („DI apdorojimo skaidrumas“). Sukurtas turinys gali turėti netikslumų: autoritetingas šaltinis visada lieka originalus vaizdo įrašas (DI aktas, 50 straipsnis)."
         }
       },
       "note": {
@@ -2883,7 +2883,7 @@
     "accessibility": {
       "metaTitle": "Prieinamumo deklaracija",
       "title": "Prieinamumo deklaracija",
-      "intro": "Skaitmeninės transformacijos departamentas įsipareigoja užtikrinti, kad „PA Webinar“ būtų prieinama, laikantis Italijos 2004 m. įstatymo Nr. 4, ES direktyvos 2016/2102 ir AgID gairių dėl IRT priemonių prieinamumo.",
+      "intro": "Atsakinga institucija: {organization}. Institucija įsipareigoja užtikrinti, kad ši platforma būtų prieinama, laikantis Italijos 2004 m. įstatymo Nr. 4, ES direktyvos 2016/2102 ir AgID gairių dėl IRT priemonių prieinamumo.",
       "sections": {
         "conformance": {
           "title": "Atitikties būklė",
@@ -2922,7 +2922,7 @@
       "sections": {
         "ownership": {
           "title": "Paslaugos nuosavybė",
-          "body": "Platformą remia Skaitmeninės transformacijos departamentas, ir ji yra prieinama institucinio pobūdžio viešų internetinių renginių organizavimui ir dalyvavimui juose."
+          "body": "Platformos savininkas: {organization}. Platforma yra prieinama institucinio pobūdžio viešų internetinių renginių organizavimui ir dalyvavimui juose."
         },
         "usage": {
           "title": "Paslaugos naudojimas",
@@ -2930,7 +2930,7 @@
         },
         "liability": {
           "title": "Atsakomybės apribojimai",
-          "body": "Nors taikomos tinkamos techninės ir organizacinės priemonės, departamentas negali garantuoti visiško pertrūkių ar gedimų dėl nenumatytų aplinkybių, priežiūros darbų ar išorinių veiksnių nebuvimo. Teisinė atsakomybė reglamentuojama galiojančiais teisės aktais."
+          "body": "Nors taikomos tinkamos techninės ir organizacinės priemonės, platformos savininkas negali garantuoti visiško pertrūkių ar gedimų dėl nenumatytų aplinkybių, priežiūros darbų ar išorinių veiksnių nebuvimo. Teisinė atsakomybė reglamentuojama galiojančiais teisės aktais."
         }
       }
     },
@@ -3029,7 +3029,8 @@
         },
         "note": "Pilnas komponentų ir paslaugų sąrašas su versijomis, hash reikšmėmis ir techninėmis savybėmis pateikiamas pirmesnėse skiltyse ir atsisiunčiamame JSON faile."
       }
-    }
+    },
+    "organizationNotConfigured": "organizacija nustatymuose dar nenurodyta"
   },
   "status": {
     "title": "Sistemos būsena",
@@ -3735,8 +3736,8 @@
   },
   "rubrica": {
     "optOut": {
-      "title": "Pašalinimas iš DTD adresų knygos",
-      "intro": "Ketinate atšaukti sutikimą būti įtrauktu į DTD adresų knygą. Po patvirtinimo nebebūsite kviečiamas į panašius renginius.",
+      "title": "Pašalinimas iš renginių adresų knygos",
+      "intro": "Ketinate atšaukti sutikimą būti įtrauktu į renginių adresų knygą. Po patvirtinimo nebebūsite kviečiamas į panašius renginius.",
       "missingToken": "Nuoroda neteisinga arba nepilna. Patikrinkite originalų el. laišką.",
       "invalidToken": "Nuoroda nebegalioja arba neteisinga. Susisiekite su renginio atstovu pagalbai.",
       "notFound": "Pagal nuorodą nė vienas asmuo neatitinka. Galbūt jis jau pašalintas.",
@@ -3746,7 +3747,7 @@
       "confirm": "Patvirtinti pašalinimą",
       "submitting": "Šalinama…",
       "successTitle": "Pašalinimas baigtas",
-      "successBody": "Jūsų duomenų DTD adresų knygoje nebėra.",
+      "successBody": "Jūsų duomenų renginių adresų knygoje nebėra.",
       "errors": {
         "generic": "Įvyko klaida. Bandykite vėliau."
       }

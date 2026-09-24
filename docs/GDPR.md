@@ -249,8 +249,8 @@ Con l'opzione disattivata (impostazione predefinita) **nessuna** richiesta viene
 Accesso (Art. 15) e cancellazione (Art. 17) si esercitano **in autonomia** dalla
 pagina `/[locale]/privacy/my-data`, con conferma via email — il dettaglio del
 flusso è più sotto. Per gli altri diritti (rettifica, portabilità, opposizione)
-si contatta l'organizzatore dell'evento o il Dipartimento per la Trasformazione
-Digitale.
+si contatta l'organizzatore dell'evento o il titolare del trattamento
+dell'installazione.
 
 La cancellazione automatica dei dati al termine del periodo di conservazione garantisce il principio di minimizzazione dei dati.
 
@@ -272,7 +272,7 @@ Tre consensi distinti nel modulo di registrazione:
 
 1. **Trattamento dati per partecipazione** (`consentGiven`) — obbligatorio, senza questo non è possibile registrarsi.
 2. **Registrazione audio/video** (`consentRecording`) — obbligatorio solo se l'evento ha `recordingEnabled = true`. Il campo è `null` se la registrazione non è abilitata.
-3. **Comunicazioni future** (`consentFutureCommunications`) — opzionale, default `false`. "Desidero ricevere informazioni su eventi futuri organizzati dal DTD."
+3. **Comunicazioni future** (`consentFutureCommunications`) — opzionale, default `false`. "Desidero ricevere informazioni sui prossimi eventi pubblicati su questa piattaforma."
 
 Nessun consenso è pre-selezionato.
 

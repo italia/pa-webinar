@@ -107,9 +107,9 @@ async function main() {
       siteName: 'PA Webinar',
       siteDescription:
         'Webinar ed eventi pubblici delle community della trasformazione digitale',
-      organizationName: 'Dipartimento per la Trasformazione Digitale',
-      organizationNameShort: 'DTD',
-      organizationUrl: 'https://innovazione.gov.it',
+      organizationName: '',
+      organizationNameShort: '',
+      organizationUrl: '',
       // Parent body shown in the .italia slim header. Left without a URL on
       // purpose: an unconfigured deploy shows the name as plain text rather
       // than linking out to an unrelated site.
@@ -160,7 +160,7 @@ async function main() {
       moderatorName: 'Mario Rossi',
       moderatorEmail: 'mario.rossi@example.com',
       speakersInfo: { it: 'Mario Rossi, Laura Bianchi, Giuseppe Verdi', en: 'Mario Rossi, Laura Bianchi, Giuseppe Verdi' },
-      organizerName: 'Dipartimento per la Trasformazione Digitale',
+      organizerName: 'Ente di esempio',
       status: 'PUBLISHED',
       dataRetentionDays: 30,
     },
@@ -185,7 +185,7 @@ async function main() {
       moderatorName: 'Anna Bianchi',
       moderatorEmail: 'anna.bianchi@example.com',
       speakersInfo: { it: 'Anna Bianchi, Marco Neri', en: 'Anna Bianchi, Marco Neri' },
-      organizerName: 'Dipartimento per la Trasformazione Digitale',
+      organizerName: 'Ente di esempio',
       status: 'PUBLISHED',
       dataRetentionDays: 60,
     },
@@ -209,7 +209,7 @@ async function main() {
       moderatorToken: randomUUID(),
       moderatorName: 'Luca Verdi',
       speakersInfo: { it: 'Luca Verdi, Francesca Russo, Alessandro Conti', en: 'Luca Verdi, Francesca Russo, Alessandro Conti' },
-      organizerName: 'Dipartimento per la Trasformazione Digitale',
+      organizerName: 'Ente di esempio',
       status: 'ENDED',
       recordingUrl: 'https://example.com/recordings/design-system-workshop.mp4',
       dataRetentionDays: 90,

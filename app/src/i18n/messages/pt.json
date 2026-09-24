@@ -12,8 +12,8 @@
     "noReactions": "Partilhe a sua opinião"
   },
   "common": {
-    "appName": "Eventos DTD",
-    "appDescription": "Plataforma para eventos públicos digitais do Departamento para a Transformação Digital",
+    "appName": "PA Webinar",
+    "appDescription": "Plataforma para eventos públicos digitais",
     "loading": "A carregar...",
     "error": "Ocorreu um erro",
     "errorMessage": "Algo correu mal. Por favor, tente novamente.",
@@ -1217,7 +1217,7 @@
       "autoStartRecording": "Iniciar a gravação automaticamente",
       "autoStartRecordingDesc": "No início do evento, a gravação começa automaticamente (sem pedir confirmação ao moderador). Assim, eventuais retardatários encontram já o leitor disponível.",
       "aiSectionHeading": "Pós-produção automática",
-      "aiSectionDesc": "Depois do fim do evento, a gravação pode ser processada por uma pipeline de inteligência artificial no cluster para produzir transcrição, resumo e, se for pedido, traduções e dobragem. Tudo acontece na infraestrutura do Departamento; nenhum dado sai para terceiros.",
+      "aiSectionDesc": "Depois do fim do evento, a gravação pode ser processada por uma pipeline de inteligência artificial no cluster para produzir transcrição, resumo e, se for pedido, traduções e dobragem. Tudo acontece na infraestrutura desta instalação; nenhum dado sai para terceiros.",
       "aiTranscriptEnabled": "Transcrição automática",
       "aiTranscriptEnabledDesc": "Reconhecimento da fala com identificação dos oradores. Necessária para ativar o resumo, as traduções e a dobragem.",
       "aiSummaryEnabled": "Resumo e capítulos",
@@ -1486,7 +1486,7 @@
         "siteNameHelp": "Apresentado no cabeçalho, no título do navegador e nos emails",
         "siteDescription": "Descrição da aplicação",
         "organizationName": "Nome da organização",
-        "organizationNameHelp": "ex. Departamento para a Transformação Digital",
+        "organizationNameHelp": "Nome da entidade titular da plataforma: aparece no cabeçalho, no rodapé e nos textos legais (ex. Município de Exemplo)",
         "organizationNameShort": "Sigla da organização",
         "organizationUrl": "URL da organização",
         "parentOrganization": "Organização superior",
@@ -1805,7 +1805,7 @@
         "newTitle": "Novo modelo RGPD",
         "editTitle": "Editar modelo RGPD",
         "name": "Nome interno",
-        "namePlaceholder": "ex.: Política padrão DTD",
+        "namePlaceholder": "ex.: Política de privacidade padrão",
         "description": "Descrição (facultativa)",
         "descriptionPlaceholder": "Notas breves para reconhecer o modelo",
         "bodyIt": "Texto da política (italiano)",
@@ -2636,7 +2636,7 @@
     "projectTeaser": {
       "kicker": "O projeto",
       "title": "Open source e soberano, construído pela administração pública para a administração pública",
-      "body": "PA Webinar é a plataforma do Departamento para a Transformação Digital para eventos públicos digitais: o sistema de design .italia, o motor de vídeo Jitsi Meet e uma pipeline de AI totalmente in-cluster. É lançada como open source para que qualquer administração a possa reutilizar.",
+      "body": "PA Webinar é uma plataforma open source para eventos públicos digitais, desenvolvida pelo Departamento para a Transformação Digital italiano e disponibilizada para que qualquer administração a possa reutilizar: o sistema de design .italia, o motor de vídeo Jitsi Meet e uma pipeline de AI totalmente in-cluster.",
       "sovereignty": {
         "title": "Soberania dos dados",
         "desc": "Self-hosted na infraestrutura da administração: os dados nunca saem e não há exposição ao CLOUD Act."
@@ -2795,8 +2795,8 @@
       "recordingRequired": "O consentimento para a gravação é obrigatório para participar neste evento",
       "multitrack": "Consinto a gravação de uma faixa de áudio separada da minha voz, com o único objetivo de atribuir corretamente a transcrição a cada pessoa que fala. A faixa é temporária e eliminada após a transcrição; não é usada para identificar nem reproduzir a minha voz.",
       "multitrackRequired": "O consentimento para a gravação da sua faixa de áudio é obrigatório para participar neste evento",
-      "futureCommunications": "Desejo receber informações sobre futuros eventos organizados pelo DTD",
-      "addressBook": "Quero ser inserido na Agenda DTD para ser convidado para eventos semelhantes",
+      "futureCommunications": "Desejo receber informações sobre os próximos eventos publicados nesta plataforma",
+      "addressBook": "Quero ser inserido na agenda de eventos para ser convidado para eventos semelhantes",
       "addressBookHelp": "Consentimento separado (art. 6.1.a RGPD). Poderá revogá-lo a qualquer momento através da ligação \"Remover os meus dados da agenda\" presente nos e-mails que receber. O nome e a organização serão obtidos a partir do perfil de inscrição."
     },
     "export": {
@@ -2859,7 +2859,7 @@
       "sections": {
         "controller": {
           "title": "Responsável pelo tratamento",
-          "body": "O tratamento dos dados pessoais ocorre no âmbito das atividades institucionais do Departamento para a Transformação Digital, para permitir a gestão técnica e organizativa dos eventos públicos online."
+          "body": "Responsável pelo tratamento: {organization}. O tratamento dos dados pessoais ocorre no âmbito das suas atividades institucionais, para permitir a gestão técnica e organizativa dos eventos públicos online."
         },
         "data": {
           "title": "Dados tratados e finalidades",
@@ -2867,11 +2867,11 @@
         },
         "retention": {
           "title": "Conservação dos dados e direitos",
-          "body": "Os dados são conservados pelo período configurado para cada evento e depois eliminados automaticamente, salvo obrigações legais diferentes. Em qualquer momento é possível exercer os direitos previstos pelo GDPR, incluindo acesso, retificação e eliminação, através dos canais institucionais do Departamento."
+          "body": "Os dados são conservados pelo período configurado para cada evento e depois eliminados automaticamente, salvo obrigações legais diferentes. Em qualquer momento é possível exercer os direitos previstos pelo GDPR, incluindo acesso, retificação e eliminação, através dos canais institucionais do responsável pelo tratamento."
         },
         "automatedProcessing": {
           "title": "Transcrição, síntese e dobragem gerados por inteligência artificial",
-          "body": "Nos eventos que o solicitam, terminada a emissão a gravação é processada por uma cadeia de inteligência artificial executada inteiramente na infraestrutura do cluster do Departamento. Produz a transcrição do discurso (com separação das diferentes pessoas que falam), uma síntese divulgativa, eventuais traduções para outras línguas europeias e uma versão dobrada do áudio com voz sintética genérica. Todos os modelos utilizados (WhisperX para a transcrição, Mistral-Small para a síntese e a tradução, Piper TTS para a dobragem) são executados em GPU dedicadas dentro do cluster: nenhum dado dos participantes é enviado a serviços de terceiros. A voz dos participantes não é clonada nem conservada como dado biométrico (art. 9.º do RGPD): a dobragem usa vozes sintéticas públicas pré-treinadas, atribuídas de forma arbitrária a cada pessoa. Para cada gravação, a página do evento mostra o retrato exato dos modelos usados («Transparência do processamento com IA»). Os conteúdos gerados podem conter imprecisões: a referência autorizada continua a ser sempre o vídeo original (Regulamento da IA, art. 50.º)."
+          "body": "Nos eventos que o solicitam, terminada a emissão a gravação é processada por uma cadeia de inteligência artificial executada inteiramente na infraestrutura de cluster desta instalação. Produz a transcrição do discurso (com separação das diferentes pessoas que falam), uma síntese divulgativa, eventuais traduções para outras línguas europeias e uma versão dobrada do áudio com voz sintética genérica. Todos os modelos utilizados (WhisperX para a transcrição, Mistral-Small para a síntese e a tradução, Piper TTS para a dobragem) são executados em GPU dedicadas dentro do cluster: nenhum dado dos participantes é enviado a serviços de terceiros. A voz dos participantes não é clonada nem conservada como dado biométrico (art. 9.º do RGPD): a dobragem usa vozes sintéticas públicas pré-treinadas, atribuídas de forma arbitrária a cada pessoa. Para cada gravação, a página do evento mostra o retrato exato dos modelos usados («Transparência do processamento com IA»). Os conteúdos gerados podem conter imprecisões: a referência autorizada continua a ser sempre o vídeo original (Regulamento da IA, art. 50.º)."
         }
       },
       "note": {
@@ -2883,7 +2883,7 @@
     "accessibility": {
       "metaTitle": "Declaração de acessibilidade",
       "title": "Declaração de acessibilidade",
-      "intro": "O Departamento para a Transformação Digital compromete-se a tornar o PA Webinar acessível, em conformidade com a Lei italiana 4/2004, a Diretiva (UE) 2016/2102 e as orientações da AgID sobre a acessibilidade dos instrumentos informáticos.",
+      "intro": "Entidade responsável: {organization}. A entidade compromete-se a tornar esta plataforma acessível, em conformidade com a Lei italiana 4/2004, a Diretiva (UE) 2016/2102 e as orientações da AgID sobre a acessibilidade dos instrumentos informáticos.",
       "sections": {
         "conformance": {
           "title": "Estado de conformidade",
@@ -2922,7 +2922,7 @@
       "sections": {
         "ownership": {
           "title": "Titularidade do serviço",
-          "body": "A plataforma é promovida pelo Departamento para a Transformação Digital e disponibilizada para a organização e fruição de eventos públicos online de interesse institucional."
+          "body": "Titular da plataforma: {organization}. A plataforma é disponibilizada para a organização e fruição de eventos públicos online de interesse institucional."
         },
         "usage": {
           "title": "Modalidades de utilização",
@@ -2930,7 +2930,7 @@
         },
         "liability": {
           "title": "Limitações de responsabilidade",
-          "body": "Apesar da adoção de medidas técnicas e organizativas adequadas, o Departamento não garante a ausência absoluta de interrupções ou avarias devidas a causas imprevisíveis, manutenções ou fatores externos. As responsabilidades previstas por lei mantêm-se em vigor."
+          "body": "Apesar da adoção de medidas técnicas e organizativas adequadas, o titular da plataforma não garante a ausência absoluta de interrupções ou avarias devidas a causas imprevisíveis, manutenções ou fatores externos. As responsabilidades previstas por lei mantêm-se em vigor."
         }
       }
     },
@@ -3029,7 +3029,8 @@
         },
         "note": "A lista completa de componentes e serviços, com versões, hashes e propriedades técnicas, está disponível nas secções anteriores e no JSON descarregável."
       }
-    }
+    },
+    "organizationNotConfigured": "organismo ainda não indicado nas definições"
   },
   "status": {
     "title": "Estado do sistema",
@@ -3735,8 +3736,8 @@
   },
   "rubrica": {
     "optOut": {
-      "title": "Remoção da Agenda DTD",
-      "intro": "Está prestes a revogar o consentimento para constar na Agenda DTD. Após a confirmação, deixará de ser contactado para ser convidado para eventos semelhantes.",
+      "title": "Remoção da agenda de eventos",
+      "intro": "Está prestes a revogar o consentimento para constar na agenda de eventos. Após a confirmação, deixará de ser contactado para ser convidado para eventos semelhantes.",
       "missingToken": "A ligação não é válida ou está incompleta. Verifique o e-mail original.",
       "invalidToken": "A ligação está expirada ou não é válida. Contacte o responsável do evento para obter assistência.",
       "notFound": "Nenhuma pessoa corresponde à ligação. Pode já ter sido removida.",
@@ -3746,7 +3747,7 @@
       "confirm": "Confirmar a remoção",
       "submitting": "A remover…",
       "successTitle": "Remoção concluída",
-      "successBody": "Os seus dados já não estão presentes na Agenda DTD.",
+      "successBody": "Os seus dados já não estão presentes na agenda de eventos.",
       "errors": {
         "generic": "Ocorreu um erro. Tente novamente mais tarde."
       }

@@ -6,7 +6,7 @@ Documento tecnico di riferimento per sviluppatori, sistemisti e personale tecnic
 
 ## Panoramica del sistema
 
-pa-webinar è una piattaforma fullstack per eventi digitali pubblici (webinar, presentazioni, riunioni aperte) del Dipartimento per la Trasformazione Digitale. Combina un portale costruito con Next.js e il design system .italia con Jitsi Meet come motore video, collegati tramite IFrame API.
+pa-webinar è una piattaforma fullstack per eventi digitali pubblici (webinar, presentazioni, riunioni aperte) della Pubblica Amministrazione, sviluppata dal Dipartimento per la Trasformazione Digitale e pensata per il riuso da parte di qualunque ente. Combina un portale costruito con Next.js e il design system .italia con Jitsi Meet come motore video, collegati tramite IFrame API.
 
 ```mermaid
 graph TD

@@ -12,8 +12,8 @@
     "noReactions": "Dela din åsikt"
   },
   "common": {
-    "appName": "DTD Evenemang",
-    "appDescription": "Plattform för offentliga digitala evenemang från Avdelningen för digital omvandling",
+    "appName": "PA Webinar",
+    "appDescription": "Plattform för offentliga digitala evenemang",
     "loading": "Laddar...",
     "error": "Ett fel uppstod",
     "errorMessage": "Något gick fel. Försök igen.",
@@ -1217,7 +1217,7 @@
       "autoStartRecording": "Starta inspelningen automatiskt",
       "autoStartRecordingDesc": "När evenemanget startar börjar inspelningen av sig själv (utan att fråga moderatorn). Eventuella sena anslutare hittar då redan en spelare tillgänglig.",
       "aiSectionHeading": "Automatisk efterproduktion",
-      "aiSectionDesc": "När evenemanget är slut kan inspelningen bearbetas av en AI-pipeline i klustret som tar fram transkription, sammanfattning och – om det efterfrågas – översättningar och dubbning. Allt sker på departementets egen infrastruktur, inga uppgifter lämnas till tredje part.",
+      "aiSectionDesc": "När evenemanget är slut kan inspelningen bearbetas av en AI-pipeline i klustret som tar fram transkription, sammanfattning och – om det efterfrågas – översättningar och dubbning. Allt sker på den här installationens infrastruktur, inga uppgifter lämnas till tredje part.",
       "aiTranscriptEnabled": "Automatisk transkribering",
       "aiTranscriptEnabledDesc": "Taligenkänning med identifiering av talare. Krävs för att kunna aktivera sammanfattning, översättningar och dubbning.",
       "aiSummaryEnabled": "Sammanfattning och kapitel",
@@ -1486,7 +1486,7 @@
         "siteNameHelp": "Visas i sidhuvudet, webbläsartiteln och e-postmeddelanden",
         "siteDescription": "Applikationsbeskrivning",
         "organizationName": "Organisationsnamn",
-        "organizationNameHelp": "t.ex. Avdelningen för digital omvandling",
+        "organizationNameHelp": "Namnet på den organisation som äger plattformen: visas i sidhuvudet, sidfoten och de juridiska texterna (t.ex. Exempels kommun)",
         "organizationNameShort": "Organisationsförkortning",
         "organizationUrl": "Organisations-URL",
         "parentOrganization": "Överordnad organisation",
@@ -1805,7 +1805,7 @@
         "newTitle": "Ny GDPR-mall",
         "editTitle": "Redigera GDPR-mall",
         "name": "Internt namn",
-        "namePlaceholder": "t.ex. DTD standardpolicy",
+        "namePlaceholder": "t.ex. Standardpolicy för personuppgifter",
         "description": "Beskrivning (valfritt)",
         "descriptionPlaceholder": "Korta noteringar för att känna igen mallen",
         "bodyIt": "Integritetstext (italienska)",
@@ -2636,7 +2636,7 @@
     "projectTeaser": {
       "kicker": "Projektet",
       "title": "Öppen källkod och suverän, byggd av offentlig förvaltning för offentlig förvaltning",
-      "body": "PA Webinar är Avdelningen för digital omställnings plattform för offentliga digitala evenemang: designsystemet .italia, videomotorn Jitsi Meet och en helt in-cluster AI-pipeline. Den släpps som öppen källkod så att alla förvaltningar kan återanvända den.",
+      "body": "PA Webinar är en plattform med öppen källkod för offentliga digitala evenemang, utvecklad av Italiens departement för digital omställning och släppt så att alla förvaltningar kan återanvända den: designsystemet .italia, videomotorn Jitsi Meet och en helt in-cluster AI-pipeline.",
       "sovereignty": {
         "title": "Datasuveränitet",
         "desc": "Self-hosted på förvaltningens infrastruktur: data lämnar aldrig miljön och det finns ingen exponering mot CLOUD Act."
@@ -2795,8 +2795,8 @@
       "recordingRequired": "Samtycke till inspelning krävs för att delta i detta evenemang",
       "multitrack": "Jag samtycker till inspelning av ett separat ljudspår med min röst, enbart för att transkriptionen ska kunna tillskrivas rätt talare. Spåret är tillfälligt och raderas efter transkriptionen; det används inte för att identifiera eller återge min röst.",
       "multitrackRequired": "Samtycke till inspelning av ditt ljudspår krävs för att delta i detta evenemang",
-      "futureCommunications": "Jag vill ta emot information om framtida evenemang arrangerade av DTD",
-      "addressBook": "Jag vill läggas till i DTD-adressboken för att bli inbjuden till liknande evenemang",
+      "futureCommunications": "Jag vill ta emot information om kommande evenemang som publiceras på den här plattformen",
+      "addressBook": "Jag vill läggas till i evenemangsadressboken för att bli inbjuden till liknande evenemang",
       "addressBookHelp": "Separat samtycke (GDPR art. 6.1.a). Du kan återkalla det när som helst via länken \"Ta bort mina uppgifter från adressboken\" i de mejl du får. Namn och organisation hämtas från din anmälningsprofil."
     },
     "export": {
@@ -2859,7 +2859,7 @@
       "sections": {
         "controller": {
           "title": "Personuppgiftsansvarig",
-          "body": "Personuppgifter behandlas inom ramen för Avdelningen för digital omvandlings institutionella verksamhet för att stödja den tekniska och organisatoriska hanteringen av offentliga onlineevenemang."
+          "body": "Personuppgiftsansvarig: {organization}. Personuppgifter behandlas inom ramen för dess institutionella verksamhet för att stödja den tekniska och organisatoriska hanteringen av offentliga onlineevenemang."
         },
         "data": {
           "title": "Behandlade uppgifter och ändamål",
@@ -2867,11 +2867,11 @@
         },
         "retention": {
           "title": "Lagring och rättigheter",
-          "body": "Uppgifter lagras under den period som konfigurerats för varje evenemang och raderas därefter automatiskt, om inte annan lagstiftning kräver annat. Registrerade kan när som helst utöva sina GDPR-rättigheter, inklusive tillgång, rättelse och radering, via avdelningens institutionella kanaler."
+          "body": "Uppgifter lagras under den period som konfigurerats för varje evenemang och raderas därefter automatiskt, om inte annan lagstiftning kräver annat. Registrerade kan när som helst utöva sina GDPR-rättigheter, inklusive tillgång, rättelse och radering, via den personuppgiftsansvariges institutionella kanaler."
         },
         "automatedProcessing": {
           "title": "Transkription, sammanfattning och dubbning genererade av artificiell intelligens",
-          "body": "För evenemang som begär det behandlas inspelningen efter sändningens slut av en AI-kedja som körs helt på avdelningens egen klusterinfrastruktur. Den tar fram transkription av det talade (med separering av de olika talarna), en lättläst sammanfattning, eventuella översättningar till andra europeiska språk och en dubbad ljudversion med en generisk syntetisk röst. Alla modeller som används (WhisperX för transkription, Mistral-Small för sammanfattning och översättning, Piper TTS för dubbning) körs på dedikerade GPU:er inuti klustret: inga deltagardata skickas till tredjepartstjänster. Deltagarnas röst klonas inte och lagras inte som biometriska uppgifter (art. 9 GDPR): dubbningen använder offentliga förtränade syntetiska röster som tilldelas talarna godtyckligt. För varje inspelning visar evenemangssidan den exakta ögonblicksbilden av de modeller som använts (”Transparens i AI-behandlingen”). Det genererade innehållet kan innehålla felaktigheter: den auktoritativa källan är alltid originalvideon (AI-förordningen, art. 50)."
+          "body": "För evenemang som begär det behandlas inspelningen efter sändningens slut av en AI-kedja som körs helt på den här installationens klusterinfrastruktur. Den tar fram transkription av det talade (med separering av de olika talarna), en lättläst sammanfattning, eventuella översättningar till andra europeiska språk och en dubbad ljudversion med en generisk syntetisk röst. Alla modeller som används (WhisperX för transkription, Mistral-Small för sammanfattning och översättning, Piper TTS för dubbning) körs på dedikerade GPU:er inuti klustret: inga deltagardata skickas till tredjepartstjänster. Deltagarnas röst klonas inte och lagras inte som biometriska uppgifter (art. 9 GDPR): dubbningen använder offentliga förtränade syntetiska röster som tilldelas talarna godtyckligt. För varje inspelning visar evenemangssidan den exakta ögonblicksbilden av de modeller som använts (”Transparens i AI-behandlingen”). Det genererade innehållet kan innehålla felaktigheter: den auktoritativa källan är alltid originalvideon (AI-förordningen, art. 50)."
         }
       },
       "note": {
@@ -2883,7 +2883,7 @@
     "accessibility": {
       "metaTitle": "Tillgänglighetsutlåtande",
       "title": "Tillgänglighetsutlåtande",
-      "intro": "Departementet för digital omvandling åtar sig att göra PA Webinar tillgängligt, i enlighet med italiensk lag 4/2004, EU-direktiv 2016/2102 och AgID:s riktlinjer om tillgänglighet för IT-verktyg.",
+      "intro": "Ansvarig myndighet: {organization}. Myndigheten åtar sig att göra den här plattformen tillgänglig, i enlighet med italiensk lag 4/2004, EU-direktiv 2016/2102 och AgID:s riktlinjer om tillgänglighet för IT-verktyg.",
       "sections": {
         "conformance": {
           "title": "Överensstämmelsestatus",
@@ -2922,7 +2922,7 @@
       "sections": {
         "ownership": {
           "title": "Tjänsteägande",
-          "body": "Plattformen drivs av Avdelningen för digital omvandling och tillhandahålls för anordnande av och deltagande i institutionella offentliga onlineevenemang."
+          "body": "Plattformens ägare: {organization}. Plattformen tillhandahålls för anordnande av och deltagande i institutionella offentliga onlineevenemang."
         },
         "usage": {
           "title": "Användning av tjänsten",
@@ -2930,7 +2930,7 @@
         },
         "liability": {
           "title": "Ansvarsbegränsning",
-          "body": "Trots att lämpliga tekniska och organisatoriska åtgärder vidtas kan avdelningen inte garantera fullständig frånvaro av avbrott eller störningar orsakade av oförutsedda händelser, underhåll eller externa faktorer. Rättsligt ansvar regleras av tillämplig lag."
+          "body": "Trots att lämpliga tekniska och organisatoriska åtgärder vidtas kan plattformens ägare inte garantera fullständig frånvaro av avbrott eller störningar orsakade av oförutsedda händelser, underhåll eller externa faktorer. Rättsligt ansvar regleras av tillämplig lag."
         }
       }
     },
@@ -3029,7 +3029,8 @@
         },
         "note": "Den fullständiga listan över komponenter och tjänster, med versioner, hash och tekniska egenskaper, finns i tidigare avsnitt och i den nedladdningsbara JSON."
       }
-    }
+    },
+    "organizationNotConfigured": "organisationen har ännu inte angetts i inställningarna"
   },
   "status": {
     "title": "Systemstatus",
@@ -3735,8 +3736,8 @@
   },
   "rubrica": {
     "optOut": {
-      "title": "Borttagning från DTD-adressboken",
-      "intro": "Du är på väg att återkalla samtycket till att vara med i DTD-adressboken. Efter bekräftelse kommer du inte längre att kontaktas för inbjudningar till liknande evenemang.",
+      "title": "Borttagning från evenemangsadressboken",
+      "intro": "Du är på väg att återkalla samtycket till att vara med i evenemangsadressboken. Efter bekräftelse kommer du inte längre att kontaktas för inbjudningar till liknande evenemang.",
       "missingToken": "Länken är ogiltig eller ofullständig. Kontrollera ursprungsmejlet.",
       "invalidToken": "Länken har gått ut eller är ogiltig. Kontakta evenemangsansvarig för hjälp.",
       "notFound": "Ingen person matchar länken. Personen kan redan ha tagits bort.",
@@ -3746,7 +3747,7 @@
       "confirm": "Bekräfta borttagningen",
       "submitting": "Tar bort…",
       "successTitle": "Borttagning klar",
-      "successBody": "Dina uppgifter finns inte längre i DTD-adressboken.",
+      "successBody": "Dina uppgifter finns inte längre i evenemangsadressboken.",
       "errors": {
         "generic": "Ett fel uppstod. Försök igen senare."
       }

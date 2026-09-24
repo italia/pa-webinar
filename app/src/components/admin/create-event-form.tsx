@@ -183,7 +183,7 @@ export default function CreateEventForm({
 
   // GDPR templates: reusable privacy notices managed under
   // /admin/settings/gdpr-templates. We fetch once on mount and auto-select
-  // the default template so an admin who has configured the DTD standard
+  // the default template so an admin who has configured the standard
   // notice doesn't have to touch the privacy section on every new event.
   const [gdprTemplates, setGdprTemplates] = useState<
     { id: string; name: string; body: Record<string, string>; isDefault: boolean }[]

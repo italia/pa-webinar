@@ -2,7 +2,7 @@
   "name": "pa-webinar",
   "version": "0.11.0",
   "private": true,
-  "description": "Piattaforma open-source per eventi pubblici digitali del DTD",
+  "description": "Piattaforma open-source per eventi pubblici digitali della Pubblica Amministrazione",
   "license": "EUPL-1.2",
   "workspaces": [
     "app",

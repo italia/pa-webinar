@@ -12,8 +12,8 @@
     "noReactions": "Del din mening"
   },
   "common": {
-    "appName": "DTD Begivenheder",
-    "appDescription": "Platform for offentlige digitale begivenheder fra Afdelingen for Digital Omstilling",
+    "appName": "PA Webinar",
+    "appDescription": "Platform for offentlige digitale begivenheder",
     "loading": "Indlæser...",
     "error": "Der opstod en fejl",
     "errorMessage": "Noget gik galt. Prøv venligst igen.",
@@ -1217,7 +1217,7 @@
       "autoStartRecording": "Start optagelsen automatisk",
       "autoStartRecordingDesc": "Når arrangementet starter, går optagelsen i gang af sig selv (uden at spørge moderatoren). På den måde finder evt. forsinkede deltagere afspilleren klar.",
       "aiSectionHeading": "Automatisk efterbehandling",
-      "aiSectionDesc": "Når arrangementet er slut, kan optagelsen behandles af en AI-pipeline i klyngen, der producerer transskription, resumé og — hvis det ønskes — oversættelser og eftersynkronisering. Alt foregår på Departementets egen infrastruktur, og ingen data sendes til tredjeparter.",
+      "aiSectionDesc": "Når arrangementet er slut, kan optagelsen behandles af en AI-pipeline i klyngen, der producerer transskription, resumé og — hvis det ønskes — oversættelser og eftersynkronisering. Alt foregår på denne installations infrastruktur, og ingen data sendes til tredjeparter.",
       "aiTranscriptEnabled": "Automatisk transskription",
       "aiTranscriptEnabledDesc": "Talegenkendelse med identifikation af talerne. Nødvendig for at kunne aktivere resumé, oversættelser og eftersynkronisering.",
       "aiSummaryEnabled": "Resumé og kapitler",
@@ -1486,7 +1486,7 @@
         "siteNameHelp": "Vises i headeren, browsertitlen og e-mails",
         "siteDescription": "Applikationsbeskrivelse",
         "organizationName": "Organisationsnavn",
-        "organizationNameHelp": "f.eks. Afdelingen for Digital Omstilling",
+        "organizationNameHelp": "Navnet på den myndighed, der ejer platformen: vises i sidehoved, sidefod og juridiske tekster (f.eks. Eksempel Kommune)",
         "organizationNameShort": "Organisationsforkortelse",
         "organizationUrl": "Organisations-URL",
         "parentOrganization": "Overordnet organisation",
@@ -1805,7 +1805,7 @@
         "newTitle": "Ny GDPR-skabelon",
         "editTitle": "Rediger GDPR-skabelon",
         "name": "Internt navn",
-        "namePlaceholder": "f.eks. DTD-standardprivatlivserklæring",
+        "namePlaceholder": "f.eks. Standardprivatlivserklæring",
         "description": "Beskrivelse (valgfri)",
         "descriptionPlaceholder": "Korte noter til at genkende skabelonen",
         "bodyIt": "Privatlivstekst (italiensk)",
@@ -2636,7 +2636,7 @@
     "projectTeaser": {
       "kicker": "Projektet",
       "title": "Open source og suverænt, bygget af det offentlige til det offentlige",
-      "body": "PA Webinar er Afdelingen for Digital Transformations platform til offentlige digitale arrangementer: designsystemet .italia, videomotoren Jitsi Meet og en fuldt in-cluster AI-pipeline. Den udgives som open source, så enhver myndighed kan genbruge den.",
+      "body": "PA Webinar er en open source-platform til offentlige digitale arrangementer, udviklet af det italienske Departement for Digital Transformation og frigivet, så enhver myndighed kan genbruge den: designsystemet .italia, videomotoren Jitsi Meet og en fuldt in-cluster AI-pipeline.",
       "sovereignty": {
         "title": "Datasuverænitet",
         "desc": "Self-hosted på myndighedens infrastruktur: data forlader aldrig miljøet, og der er ingen eksponering for CLOUD Act."
@@ -2795,8 +2795,8 @@
       "recordingRequired": "Samtykke til optagelse er påkrævet for at deltage i denne begivenhed",
       "multitrack": "Jeg samtykker til optagelse af et separat lydspor med min stemme, alene med det formål at tilskrive transskriptionen den rette taler. Sporet er midlertidigt og slettes efter transskriptionen; det bruges ikke til at identificere eller gengive min stemme.",
       "multitrackRequired": "Samtykke til optagelse af dit lydspor er påkrævet for at deltage i denne begivenhed",
-      "futureCommunications": "Jeg ønsker at modtage information om fremtidige begivenheder arrangeret af DTD",
-      "addressBook": "Jeg ønsker at blive optaget i DTD-adressebogen for at blive inviteret til lignende arrangementer",
+      "futureCommunications": "Jeg ønsker at modtage information om kommende arrangementer, der offentliggøres på denne platform",
+      "addressBook": "Jeg ønsker at blive optaget i arrangementsadressebogen for at blive inviteret til lignende arrangementer",
       "addressBookHelp": "Separat samtykke (GDPR art. 6.1.a). Du kan til enhver tid trække det tilbage via linket \"Fjern mine data fra adressebogen\" i de e-mails, du modtager. Navn og organisation hentes fra din tilmeldingsprofil."
     },
     "export": {
@@ -2859,7 +2859,7 @@
       "sections": {
         "controller": {
           "title": "Dataansvarlig",
-          "body": "Personoplysninger behandles inden for rammerne af de institutionelle aktiviteter i Afdelingen for Digital Omstilling med henblik på at understøtte den tekniske og organisatoriske styring af offentlige onlinebegivenheder."
+          "body": "Dataansvarlig: {organization}. Personoplysninger behandles inden for rammerne af dennes institutionelle aktiviteter med henblik på at understøtte den tekniske og organisatoriske styring af offentlige onlinebegivenheder."
         },
         "data": {
           "title": "Behandlede data og formål",
@@ -2867,11 +2867,11 @@
         },
         "retention": {
           "title": "Opbevaring og rettigheder",
-          "body": "Data opbevares i den konfigurerede periode for hver begivenhed og slettes derefter automatisk, medmindre anden lovgivning kræver det. Registrerede kan til enhver tid udøve deres GDPR-rettigheder, herunder adgang, berigtigelse og sletning, via afdelingens institutionelle kanaler."
+          "body": "Data opbevares i den konfigurerede periode for hver begivenhed og slettes derefter automatisk, medmindre anden lovgivning kræver det. Registrerede kan til enhver tid udøve deres GDPR-rettigheder, herunder adgang, berigtigelse og sletning, via den dataansvarliges institutionelle kanaler."
         },
         "automatedProcessing": {
           "title": "Transskription, resumé og eftersynkronisering genereret af kunstig intelligens",
-          "body": "For begivenheder, der anmoder om det, behandles optagelsen efter udsendelsens afslutning af en AI-kæde, der kører helt på afdelingens egen klyngeinfrastruktur. Den frembringer transskription af det talte (med adskillelse af de forskellige talere), et letlæseligt resumé, eventuelle oversættelser til andre europæiske sprog og en eftersynkroniseret lydversion med en generisk syntetisk stemme. Alle anvendte modeller (WhisperX til transskription, Mistral-Small til resumé og oversættelse, Piper TTS til eftersynkronisering) kører på dedikerede GPU'er inde i klyngen: ingen deltagerdata sendes til tredjepartstjenester. Deltagernes stemme klones ikke og gemmes ikke som biometriske data (art. 9 i GDPR): eftersynkroniseringen bruger offentlige, forudtrænede syntetiske stemmer, der tildeles talerne vilkårligt. For hver optagelse viser begivenhedssiden det nøjagtige øjebliksbillede af de anvendte modeller (»Gennemsigtighed i AI-behandlingen«). Det genererede indhold kan indeholde unøjagtigheder: den autoritative kilde er altid den oprindelige video (AI-forordningen, art. 50)."
+          "body": "For begivenheder, der anmoder om det, behandles optagelsen efter udsendelsens afslutning af en AI-kæde, der kører helt på denne installations klyngeinfrastruktur. Den frembringer transskription af det talte (med adskillelse af de forskellige talere), et letlæseligt resumé, eventuelle oversættelser til andre europæiske sprog og en eftersynkroniseret lydversion med en generisk syntetisk stemme. Alle anvendte modeller (WhisperX til transskription, Mistral-Small til resumé og oversættelse, Piper TTS til eftersynkronisering) kører på dedikerede GPU'er inde i klyngen: ingen deltagerdata sendes til tredjepartstjenester. Deltagernes stemme klones ikke og gemmes ikke som biometriske data (art. 9 i GDPR): eftersynkroniseringen bruger offentlige, forudtrænede syntetiske stemmer, der tildeles talerne vilkårligt. For hver optagelse viser begivenhedssiden det nøjagtige øjebliksbillede af de anvendte modeller (»Gennemsigtighed i AI-behandlingen«). Det genererede indhold kan indeholde unøjagtigheder: den autoritative kilde er altid den oprindelige video (AI-forordningen, art. 50)."
         }
       },
       "note": {
@@ -2883,7 +2883,7 @@
     "accessibility": {
       "metaTitle": "Tilgængelighedserklæring",
       "title": "Tilgængelighedserklæring",
-      "intro": "Departementet for Digital Transformation forpligter sig til at gøre PA Webinar tilgængelig i overensstemmelse med den italienske lov 4/2004, EU-direktiv 2016/2102 og AgID's retningslinjer for tilgængeligheden af IKT-værktøjer.",
+      "intro": "Ansvarligt organ: {organization}. Organet forpligter sig til at gøre denne platform tilgængelig i overensstemmelse med den italienske lov 4/2004, EU-direktiv 2016/2102 og AgID's retningslinjer for tilgængeligheden af IKT-værktøjer.",
       "sections": {
         "conformance": {
           "title": "Overensstemmelsesstatus",
@@ -2922,7 +2922,7 @@
       "sections": {
         "ownership": {
           "title": "Tjenesteejerskab",
-          "body": "Platformen promoveres af Afdelingen for Digital Omstilling og stilles til rådighed for afholdelse af og deltagelse i institutionelle offentlige onlinebegivenheder."
+          "body": "Platformens ejer: {organization}. Platformen stilles til rådighed for afholdelse af og deltagelse i institutionelle offentlige onlinebegivenheder."
         },
         "usage": {
           "title": "Brug af tjenesten",
@@ -2930,7 +2930,7 @@
         },
         "liability": {
           "title": "Ansvarsbegrænsning",
-          "body": "Selvom der træffes passende tekniske og organisatoriske foranstaltninger, kan afdelingen ikke garantere fuldstændig fravær af afbrydelser eller fejl forårsaget af uforudsete hændelser, vedligeholdelse eller eksterne faktorer. Det juridiske ansvar reguleres af gældende lov."
+          "body": "Selvom der træffes passende tekniske og organisatoriske foranstaltninger, kan platformens ejer ikke garantere fuldstændig fravær af afbrydelser eller fejl forårsaget af uforudsete hændelser, vedligeholdelse eller eksterne faktorer. Det juridiske ansvar reguleres af gældende lov."
         }
       }
     },
@@ -3029,7 +3029,8 @@
         },
         "note": "Den fulde liste over komponenter og tjenester, med versioner, hashes og tekniske egenskaber, findes i de foregående afsnit og i den downloadbare JSON."
       }
-    }
+    },
+    "organizationNotConfigured": "organisationen er endnu ikke angivet i indstillingerne"
   },
   "status": {
     "title": "Systemstatus",
@@ -3735,8 +3736,8 @@
   },
   "rubrica": {
     "optOut": {
-      "title": "Fjernelse fra DTD-adressebogen",
-      "intro": "Du er ved at trække dit samtykke til at være i DTD-adressebogen tilbage. Efter bekræftelsen kontaktes du ikke længere med invitationer til lignende arrangementer.",
+      "title": "Fjernelse fra arrangementsadressebogen",
+      "intro": "Du er ved at trække dit samtykke til at være i arrangementsadressebogen tilbage. Efter bekræftelsen kontaktes du ikke længere med invitationer til lignende arrangementer.",
       "missingToken": "Linket er ugyldigt eller ufuldstændigt. Kontrollér den oprindelige e-mail.",
       "invalidToken": "Linket er udløbet eller ugyldigt. Kontakt arrangementets ansvarlige for hjælp.",
       "notFound": "Ingen person matcher linket. Vedkommende kan allerede være fjernet.",
@@ -3746,7 +3747,7 @@
       "confirm": "Bekræft fjernelse",
       "submitting": "Fjerner…",
       "successTitle": "Fjernelse fuldført",
-      "successBody": "Dine data findes ikke længere i DTD-adressebogen.",
+      "successBody": "Dine data findes ikke længere i arrangementsadressebogen.",
       "errors": {
         "generic": "Der opstod en fejl. Prøv igen senere."
       }

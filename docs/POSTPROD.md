@@ -59,7 +59,7 @@ vanno a 0 (graceful: niente scrape gap, status "off" leggibile).
 
 ## Modelli scelti
 
-Scelta editoriale DTD: **niente artefatti pubblicati a bassa qualità**.
+Scelta editoriale: **niente artefatti pubblicati a bassa qualità**.
 La pipeline gira su 1× A100 80GB con i seguenti modelli, tutti
 **open-weights** scaricabili da HuggingFace e licenza
 commercial-friendly:
@@ -392,8 +392,8 @@ Perché A100 80GB e non T4:
 
 - **Qualità del verbale PA**. Il default LLM è Qwen3-32B-Instruct in
   fp16 (~64GB VRAM) — non entra in T4 16GB. Su T4 servirebbe un 7B
-  quantizzato AWQ con qualità nettamente inferiore. Scelta editoriale
-  DTD: niente artefatti AI pubblicati a bassa qualità.
+  quantizzato AWQ con qualità nettamente inferiore. Scelta editoriale:
+  niente artefatti AI pubblicati a bassa qualità.
 - **Throughput**. WhisperX su A100 gira a ~4-6× realtime; su T4 a
   0.3-0.5× — significa che 1h di call diventa 30-60 min di postprod
   su T4 vs 5-10 min su A100. Costo orario maggiore ma costo per job

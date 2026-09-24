@@ -2,7 +2,7 @@
 # Modalità completa — multi-pool, scale-to-zero, monitoraggio
 # ============================================================================
 #
-# Per DTD e grandi PA con cluster Kubernetes dedicati.
+# Per grandi PA con cluster Kubernetes dedicati.
 # Funziona su AKS, GKE, EKS, o qualsiasi cluster con node pool dedicati.
 #
 # Deploy:

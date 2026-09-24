@@ -12,8 +12,8 @@
     "noReactions": "Abair do thuairim"
   },
   "common": {
-    "appName": "Imeachtaí DTD",
-    "appDescription": "Ardán d'imeachtaí poiblí digiteacha na Roinne um Chlaochlú Digiteach",
+    "appName": "PA Webinar",
+    "appDescription": "Ardán d'imeachtaí poiblí digiteacha",
     "loading": "Ag lódáil...",
     "error": "Tharla earráid",
     "errorMessage": "Chuaigh rud éigin mícheart. Bain triail eile as, le bhur dtoil.",
@@ -1217,7 +1217,7 @@
       "autoStartRecording": "Tosaigh an taifeadadh go huathoibríoch",
       "autoStartRecordingDesc": "Nuair a thosaíonn an t-imeacht, tosaíonn an taifeadadh leis féin (ní iarrtar deimhniú ón modhnóir). Mar sin aimseoidh daoine déanacha seinnteoir ar fáil láithreach.",
       "aiSectionHeading": "Iarléiriú uathoibríoch",
-      "aiSectionDesc": "Tar éis dheireadh an imeachta, is féidir an taifeadadh a phróiseáil le píblíne intleachta saorga sa bhraisle chun tras-scríbhinn, achoimre agus — má iarrtar é — aistriúcháin agus dubáil a chruthú. Ritheann gach rud ar bhonneagar na Roinne, ní théann aon sonraí chuig tríú páirtithe.",
+      "aiSectionDesc": "Tar éis dheireadh an imeachta, is féidir an taifeadadh a phróiseáil le píblíne intleachta saorga sa bhraisle chun tras-scríbhinn, achoimre agus — má iarrtar é — aistriúcháin agus dubáil a chruthú. Ritheann gach rud ar bhonneagar na suiteála seo, ní théann aon sonraí chuig tríú páirtithe.",
       "aiTranscriptEnabled": "Tras-scríobh uathoibríoch",
       "aiTranscriptEnabledDesc": "Aithint cainte le sainaithint na gcainteoirí. Riachtanach chun an achoimre, na haistriúcháin agus an dubáil a chumasú.",
       "aiSummaryEnabled": "Achoimre agus caibidlí",
@@ -1486,7 +1486,7 @@
         "siteNameHelp": "Taispeántar sa cheanntásc, i dteideal an bhrabhsálaí agus i ríomhphoist",
         "siteDescription": "Cur síos ar an bhfeidhmchlár",
         "organizationName": "Ainm na heagraíochta",
-        "organizationNameHelp": "m.sh. An Roinn um Chlaochlú Digiteach",
+        "organizationNameHelp": "Ainm an chomhlachta ar leis an t-ardán: taispeántar é sa cheanntásc, sa bhuntásc agus sna téacsanna dlíthiúla (m.sh. Cathair Shamplach)",
         "organizationNameShort": "Giorrúchán na heagraíochta",
         "organizationUrl": "URL na heagraíochta",
         "parentOrganization": "Máthaireagraíocht",
@@ -1805,7 +1805,7 @@
         "newTitle": "Teimpléad GDPR nua",
         "editTitle": "Cuir teimpléad GDPR in eagar",
         "name": "Ainm inmheánach",
-        "namePlaceholder": "m.sh. Fógra príobháideachais caighdeánach DTD",
+        "namePlaceholder": "m.sh. Fógra príobháideachais caighdeánach",
         "description": "Cur síos (roghnach)",
         "descriptionPlaceholder": "Nótaí gairide chun an teimpléad a aithint",
         "bodyIt": "Téacs an fhógra (Iodáilis)",
@@ -2636,7 +2636,7 @@
     "projectTeaser": {
       "kicker": "An tionscadal",
       "title": "Foinse oscailte agus ceannasach, tógtha ag an rialtas don rialtas",
-      "body": "Is é PA Webinar ardán na Roinne um Chlaochlú Digiteach le haghaidh imeachtaí poiblí digiteacha: an córas dearaidh .italia, an t-inneall físe Jitsi Meet agus píblíne AI atá go hiomlán in-cluster. Eisítear é mar fhoinse oscailte ionas gur féidir le riarachán ar bith é a athúsáid.",
+      "body": "Is ardán foinse oscailte é PA Webinar d'imeachtaí poiblí digiteacha, arna fhorbairt ag Roinn na hIodáile um Chlaochlú Digiteach agus arna eisiúint ionas gur féidir le riarachán ar bith é a athúsáid: an córas dearaidh .italia, an t-inneall físe Jitsi Meet agus píblíne AI atá go hiomlán in-cluster.",
       "sovereignty": {
         "title": "Ceannasacht sonraí",
         "desc": "Self-hosted ar bhonneagar an riaracháin: ní fhágann na sonraí riamh agus níl aon nochtadh don CLOUD Act ann."
@@ -2795,8 +2795,8 @@
       "recordingRequired": "Tá toiliú leis an taifeadadh riachtanach chun páirt a ghlacadh san imeacht seo",
       "multitrack": "Toilím le taifeadadh rian fuaime ar leith de mo ghuth, chun na críche amháin an tras-scríbhinn a chur i leith gach cainteora i gceart. Tá an rian sealadach agus scriostar é tar éis na tras-scríbhinne; ní úsáidtear é chun mo ghuth a aithint ná a atáirgeadh.",
       "multitrackRequired": "Tá toiliú le taifeadadh do riain fuaime riachtanach chun páirt a ghlacadh san imeacht seo",
-      "futureCommunications": "Ba mhaith liom eolas a fháil faoi imeachtaí amach anseo arna n-eagrú ag DTD",
-      "addressBook": "Ba mhaith liom a bheith curtha le Leabhar Seoltaí DTD chun cuireadh a fháil chuig imeachtaí cosúla",
+      "futureCommunications": "Ba mhaith liom eolas a fháil faoi imeachtaí atá le teacht a fhoilsítear ar an ardán seo",
+      "addressBook": "Ba mhaith liom a bheith curtha le leabhar seoltaí na n-imeachtaí chun cuireadh a fháil chuig imeachtaí cosúla",
       "addressBookHelp": "Toiliú ar leith (airteagal 6.1.a GDPR). Is féidir é a tharraingt siar tráth ar bith tríd an nasc \"Bain mé den leabhar seoltaí\" sna ríomhphoist a gheobhaidh tú. Glactar an t-ainm agus an eagraíocht ón bpróifíl chlárúcháin."
     },
     "export": {
@@ -2859,7 +2859,7 @@
       "sections": {
         "controller": {
           "title": "Rialaitheoir sonraí",
-          "body": "Próiseáiltear sonraí pearsanta laistigh de ghníomhaíochtaí institiúideacha na Roinne um Chlaochlú Digiteach chun tacú le bainistíocht theicniúil agus eagraíochtúil imeachtaí poiblí ar líne."
+          "body": "Rialaitheoir sonraí: {organization}. Próiseáiltear sonraí pearsanta laistigh de ghníomhaíochtaí institiúideacha an rialaitheora chun tacú le bainistíocht theicniúil agus eagraíochtúil imeachtaí poiblí ar líne."
         },
         "data": {
           "title": "Sonraí próiseáilte agus cuspóirí",
@@ -2867,11 +2867,11 @@
         },
         "retention": {
           "title": "Coinneáil agus cearta",
-          "body": "Coinnítear sonraí ar feadh na tréimhse atá cumraithe do gach imeacht agus scriostar go huathoibríoch iad ina dhiaidh sin, mura bhfuil oibleagáidí dlíthiúla éagsúla i bhfeidhm. Is féidir le hábhair sonraí a gcearta GDPR a fheidhmiú am ar bith, lena n-áirítear rochtain, ceartú agus léirscriosadh, trí bhealaí institiúideacha na Roinne."
+          "body": "Coinnítear sonraí ar feadh na tréimhse atá cumraithe do gach imeacht agus scriostar go huathoibríoch iad ina dhiaidh sin, mura bhfuil oibleagáidí dlíthiúla éagsúla i bhfeidhm. Is féidir le hábhair sonraí a gcearta GDPR a fheidhmiú am ar bith, lena n-áirítear rochtain, ceartú agus léirscriosadh, trí bhealaí institiúideacha an rialaitheora sonraí."
         },
         "automatedProcessing": {
           "title": "Tras-scríbhinn, achoimre agus fuaimniú arna nginiúint ag intleacht shaorga",
-          "body": "I gcás imeachtaí a iarrann é, tar éis dheireadh na craolta déantar an taifeadadh a phróiseáil le slabhra intleachta saorga a ritheann go hiomlán ar bhonneagar braisle na Roinne. Cruthaítear tras-scríbhinn na cainte (le deighilt idir na cainteoirí éagsúla), achoimre shoiléir, aistriúcháin fhéideartha go teangacha Eorpacha eile agus leagan fuaimnithe den fhuaim le guth sintéiseach ginearálta. Ritheann na samhlacha uile a úsáidtear (WhisperX don tras-scríbhinn, Mistral-Small don achoimre agus don aistriúchán, Piper TTS don fhuaimniú) ar GPUnna tiomnaithe laistigh den bhraisle: ní sheoltar aon sonraí rannpháirtithe chuig seirbhísí tríú páirtí. Ní dhéantar guth na rannpháirtithe a chlónáil ná a stóráil mar shonraí bithmhéadracha (Airteagal 9 RGCS): úsáideann an fuaimniú guthanna sintéiseacha poiblí réamhoilte, a shanntar do na cainteoirí go treallach. I gcás gach taifeadta, taispeánann leathanach an imeachta an léargas cruinn ar na samhlacha a úsáideadh (\"Trédhearcacht na próiseála IS\"). D'fhéadfadh míchruinneas a bheith san ábhar a ghintear: is é an físeán bunaidh an fhoinse údarásach i gcónaí (An Gníomh um IS, Airteagal 50)."
+          "body": "I gcás imeachtaí a iarrann é, tar éis dheireadh na craolta déantar an taifeadadh a phróiseáil le slabhra intleachta saorga a ritheann go hiomlán ar bhonneagar braisle na suiteála seo. Cruthaítear tras-scríbhinn na cainte (le deighilt idir na cainteoirí éagsúla), achoimre shoiléir, aistriúcháin fhéideartha go teangacha Eorpacha eile agus leagan fuaimnithe den fhuaim le guth sintéiseach ginearálta. Ritheann na samhlacha uile a úsáidtear (WhisperX don tras-scríbhinn, Mistral-Small don achoimre agus don aistriúchán, Piper TTS don fhuaimniú) ar GPUnna tiomnaithe laistigh den bhraisle: ní sheoltar aon sonraí rannpháirtithe chuig seirbhísí tríú páirtí. Ní dhéantar guth na rannpháirtithe a chlónáil ná a stóráil mar shonraí bithmhéadracha (Airteagal 9 RGCS): úsáideann an fuaimniú guthanna sintéiseacha poiblí réamhoilte, a shanntar do na cainteoirí go treallach. I gcás gach taifeadta, taispeánann leathanach an imeachta an léargas cruinn ar na samhlacha a úsáideadh (\"Trédhearcacht na próiseála IS\"). D'fhéadfadh míchruinneas a bheith san ábhar a ghintear: is é an físeán bunaidh an fhoinse údarásach i gcónaí (An Gníomh um IS, Airteagal 50)."
         }
       },
       "note": {
@@ -2883,7 +2883,7 @@
     "accessibility": {
       "metaTitle": "Ráiteas inrochtaineachta",
       "title": "Ráiteas inrochtaineachta",
-      "intro": "Tá an Roinn um Chlaochlú Digiteach tiomanta do PA Webinar a dhéanamh inrochtana, i gcomhréir le Dlí na hIodáile 4/2004, le Treoir (AE) 2016/2102 agus le treoirlínte AgID maidir le hinrochtaineacht uirlisí TFC.",
+      "intro": "Comhlacht freagrach: {organization}. Tá an comhlacht tiomanta don ardán seo a dhéanamh inrochtana, i gcomhréir le Dlí na hIodáile 4/2004, le Treoir (AE) 2016/2102 agus le treoirlínte AgID maidir le hinrochtaineacht uirlisí TFC.",
       "sections": {
         "conformance": {
           "title": "Stádas comhréireachta",
@@ -2922,7 +2922,7 @@
       "sections": {
         "ownership": {
           "title": "Úinéireacht na seirbhíse",
-          "body": "Cuireann an Roinn um Chlaochlú Digiteach an t-ardán chun cinn agus cuirtear ar fáil é le haghaidh eagrú agus rannpháirtíochta in imeachtaí poiblí institiúideacha ar líne."
+          "body": "Úinéir an ardáin: {organization}. Cuirtear an t-ardán ar fáil le haghaidh eagrú agus rannpháirtíochta in imeachtaí poiblí institiúideacha ar líne."
         },
         "usage": {
           "title": "Úsáid na seirbhíse",
@@ -2930,7 +2930,7 @@
         },
         "liability": {
           "title": "Teorannú dliteanais",
-          "body": "Cé go nglactar bearta teicniúla agus eagraíochtúla cuí, ní féidir leis an Roinn asláithreacht iomlán bristeacha nó mífheidhmithe a ráthú de dheasca teagmhas gan choinne, gníomhaíochtaí cothabhála nó fachtóirí seachtracha. Tá freagrachtaí dlíthiúla fós faoi rialú ag an dlí infheidhme."
+          "body": "Cé go nglactar bearta teicniúla agus eagraíochtúla cuí, ní féidir le húinéir an ardáin asláithreacht iomlán bristeacha nó mífheidhmithe a ráthú de dheasca teagmhas gan choinne, gníomhaíochtaí cothabhála nó fachtóirí seachtracha. Tá freagrachtaí dlíthiúla fós faoi rialú ag an dlí infheidhme."
         }
       }
     },
@@ -3029,7 +3029,8 @@
         },
         "note": "Tá an liosta iomlán de chomhpháirteanna agus seirbhísí, lena leaganacha, hashanna agus airíonna teicniúla, ar fáil sna rannóga thuas agus sa JSON in-íoslódáilte."
       }
-    }
+    },
+    "organizationNotConfigured": "níl an eagraíocht socraithe fós sna socruithe"
   },
   "status": {
     "title": "Stádas an chórais",
@@ -3735,8 +3736,8 @@
   },
   "rubrica": {
     "optOut": {
-      "title": "Bain mé de Leabhar Seoltaí DTD",
-      "intro": "Tá tú ar tí do thoiliú a tharraingt siar le bheith liostáilte i Leabhar Seoltaí DTD. Tar éis deimhnithe ní dhéanfar teagmháil leat a thuilleadh le cuirí chuig imeachtaí cosúla.",
+      "title": "Bain mé de leabhar seoltaí na n-imeachtaí",
+      "intro": "Tá tú ar tí do thoiliú a tharraingt siar le bheith liostáilte i leabhar seoltaí na n-imeachtaí. Tar éis deimhnithe ní dhéanfar teagmháil leat a thuilleadh le cuirí chuig imeachtaí cosúla.",
       "missingToken": "Tá an nasc neamhbhailí nó neamhiomlán. Seiceáil an ríomhphost bunaidh.",
       "invalidToken": "Tá an nasc imithe in éag nó neamhbhailí. Déan teagmháil le heagraí an imeachta le haghaidh cabhrach.",
       "notFound": "Níl aon duine ag teacht leis an nasc seo — b'fhéidir gur baineadh é cheana.",
@@ -3746,7 +3747,7 @@
       "confirm": "Deimhnigh an baint",
       "submitting": "Á bhaint…",
       "successTitle": "Baint críochnaithe",
-      "successBody": "Níl do shonraí i Leabhar Seoltaí DTD a thuilleadh.",
+      "successBody": "Níl do shonraí i leabhar seoltaí na n-imeachtaí a thuilleadh.",
       "errors": {
         "generic": "Tharla earráid. Bain triail eile as ar ball."
       }

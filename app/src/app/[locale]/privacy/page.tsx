@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { getTranslations, getLocale } from 'next-intl/server';
 
-import { getSettings } from '@/lib/settings';
+import { getSettings, nomeEnte } from '@/lib/settings';
 import LegalDocumentPage from '@/components/layout/legal-document-page';
 import { getLocalizedExact, type LocalizedField } from '@/lib/utils/locale';
 
@@ -9,9 +9,7 @@ interface PrivacyPageProps {
   params: Promise<{ locale: string }>;
 }
 
-export async function generateMetadata({
-  params,
-}: PrivacyPageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: PrivacyPageProps): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'legal.privacy' });
 
@@ -24,6 +22,7 @@ export default async function PrivacyPage() {
   const t = await getTranslations('legal.privacy');
   const locale = await getLocale();
   const settings = await getSettings();
+  const tLegal = await getTranslations('legal');
 
   // Esatto, non con fallback: un documento legale non authored in questa
   // lingua deve mostrare il testo integrato e tradotto, non quello
@@ -49,7 +48,9 @@ export default async function PrivacyPage() {
       sections={[
         {
           title: t('sections.controller.title'),
-          body: t('sections.controller.body'),
+          body: t('sections.controller.body', {
+            organization: nomeEnte(settings) ?? tLegal('organizationNotConfigured'),
+          }),
         },
         {
           title: t('sections.data.title'),

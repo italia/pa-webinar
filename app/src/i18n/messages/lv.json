@@ -12,8 +12,8 @@
     "noReactions": "Izsakiet savu viedokli"
   },
   "common": {
-    "appName": "DTD Pasākumi",
-    "appDescription": "Digitālo publisko pasākumu platforma, ko izstrādājis Digitālās transformācijas departaments",
+    "appName": "PA Webinar",
+    "appDescription": "Digitālo publisko pasākumu platforma",
     "loading": "Ielādē...",
     "error": "Radās kļūda",
     "errorMessage": "Kaut kas nogāja greizi. Lūdzu, mēģiniet vēlreiz.",
@@ -1217,7 +1217,7 @@
       "autoStartRecording": "Sākt ierakstīšanu automātiski",
       "autoStartRecordingDesc": "Pasākuma sākumā ieraksts sākas pats (moderatoram netiek prasīts apstiprinājums). Vēlīni dalībnieki uzreiz atrod pieejamu atskaņotāju.",
       "aiSectionHeading": "Automātiskā pēcapstrāde",
-      "aiSectionDesc": "Pēc pasākuma beigām ierakstu var apstrādāt klasterī izvietots mākslīgā intelekta konveijers, lai izveidotu transkripciju, kopsavilkumu un — ja tas ir pieprasīts — tulkojumus un dublējumu. Viss notiek Departamenta infrastruktūrā, dati netiek nodoti trešajām personām.",
+      "aiSectionDesc": "Pēc pasākuma beigām ierakstu var apstrādāt klasterī izvietots mākslīgā intelekta konveijers, lai izveidotu transkripciju, kopsavilkumu un — ja tas ir pieprasīts — tulkojumus un dublējumu. Viss notiek šīs instalācijas infrastruktūrā, dati netiek nodoti trešajām personām.",
       "aiTranscriptEnabled": "Automātiskā transkripcija",
       "aiTranscriptEnabledDesc": "Runas atpazīšana ar runātāju identificēšanu. Nepieciešama, lai iespējotu kopsavilkumu, tulkojumus un dublēšanu.",
       "aiSummaryEnabled": "Kopsavilkums un nodaļas",
@@ -1486,7 +1486,7 @@
         "siteNameHelp": "Tiek rādīts galvenē, pārlūka nosaukumā un e-pastos",
         "siteDescription": "Lietotnes apraksts",
         "organizationName": "Organizācijas nosaukums",
-        "organizationNameHelp": "piem. Digitālās transformācijas departaments",
+        "organizationNameHelp": "Iestādes, kurai pieder platforma, nosaukums: tiek rādīts galvenē, kājenē un juridiskajos tekstos (piem., Piemēra pilsētas pašvaldība)",
         "organizationNameShort": "Organizācijas saīsinājums",
         "organizationUrl": "Organizācijas URL",
         "parentOrganization": "Mātesorganizācija",
@@ -1805,7 +1805,7 @@
         "newTitle": "Jauna VDAR veidne",
         "editTitle": "Rediģēt VDAR veidni",
         "name": "Iekšējais nosaukums",
-        "namePlaceholder": "piem., DTD standarta privātuma paziņojums",
+        "namePlaceholder": "piem., Standarta privātuma paziņojums",
         "description": "Apraksts (neobligāts)",
         "descriptionPlaceholder": "Īsas piezīmes, lai atpazītu veidni",
         "bodyIt": "Privātuma teksts (itāļu)",
@@ -2636,7 +2636,7 @@
     "projectTeaser": {
       "kicker": "Projekts",
       "title": "Atvērtā koda un suverēns, ko valsts pārvalde veidojusi valsts pārvaldei",
-      "body": "PA Webinar ir Digitālās transformācijas departamenta platforma publiskiem digitāliem pasākumiem: .italia dizaina sistēma, Jitsi Meet video dzinējs un pilnībā in-cluster AI process. Tā ir izlaista kā atvērtā koda, lai jebkura pārvalde to varētu atkārtoti izmantot.",
+      "body": "PA Webinar ir atvērtā koda platforma publiskiem digitāliem pasākumiem, ko izstrādājis Itālijas Digitālās transformācijas departaments un publicējis, lai jebkura pārvalde to varētu atkārtoti izmantot: .italia dizaina sistēma, Jitsi Meet video dzinējs un pilnībā in-cluster AI process.",
       "sovereignty": {
         "title": "Datu suverenitāte",
         "desc": "Self-hosted pārvaldes infrastruktūrā: dati nekur neaiziet, un nav CLOUD Act ietekmes."
@@ -2795,8 +2795,8 @@
       "recordingRequired": "Lai piedalītos šajā pasākumā, ir nepieciešama piekrišana ierakstīšanai",
       "multitrack": "Piekrītu, ka manas balss ieraksts tiek veikts atsevišķā audio celiņā vienīgi ar mērķi pareizi attiecināt atšifrējumu uz katru runātāju. Celiņš ir pagaidu un pēc atšifrēšanas tiek dzēsts; to neizmanto manas balss identificēšanai vai atskaņošanai.",
       "multitrackRequired": "Piekrišana jūsu audio celiņa ierakstīšanai ir obligāta, lai piedalītos šajā pasākumā",
-      "futureCommunications": "Vēlos saņemt informāciju par nākotnes pasākumiem, ko organizē DTD",
-      "addressBook": "Vēlos tikt iekļauts DTD kontaktu grāmatā, lai saņemtu uzaicinājumus uz līdzīgiem pasākumiem",
+      "futureCommunications": "Vēlos saņemt informāciju par nākamajiem pasākumiem, kas tiek publicēti šajā platformā",
+      "addressBook": "Vēlos tikt iekļauts pasākumu kontaktu grāmatā, lai saņemtu uzaicinājumus uz līdzīgiem pasākumiem",
       "addressBookHelp": "Atsevišķa piekrišana (VDAR 6.1.a pants). Jūs varat to atsaukt jebkurā laikā, izmantojot saiti \"Noņemt manus datus no kontaktu grāmatas\" saņemtajos e-pastos. Vārds un organizācija tiks iegūti no reģistrācijas profila."
     },
     "export": {
@@ -2859,7 +2859,7 @@
       "sections": {
         "controller": {
           "title": "Datu pārzinis",
-          "body": "Personas dati tiek apstrādāti Digitālās transformācijas departamenta institucionālās darbības ietvaros, lai nodrošinātu publisko tiešsaistes pasākumu tehnisko un organizatorisko pārvaldību."
+          "body": "Datu pārzinis: {organization}. Personas dati tiek apstrādāti tā institucionālās darbības ietvaros, lai nodrošinātu publisko tiešsaistes pasākumu tehnisko un organizatorisko pārvaldību."
         },
         "data": {
           "title": "Apstrādātie dati un mērķi",
@@ -2867,11 +2867,11 @@
         },
         "retention": {
           "title": "Datu saglabāšana un tiesības",
-          "body": "Dati tiek glabāti katram pasākumam konfigurēto periodu un pēc tam automātiski dzēsti, ja vien nepastāv citi juridiskie pienākumi. Datu subjekti var jebkurā laikā izmantot savas GDPR tiesības, tostarp piekļuvi, labošanu un dzēšanu, izmantojot departamenta institucionālos kanālus."
+          "body": "Dati tiek glabāti katram pasākumam konfigurēto periodu un pēc tam automātiski dzēsti, ja vien nepastāv citi juridiskie pienākumi. Datu subjekti var jebkurā laikā izmantot savas GDPR tiesības, tostarp piekļuvi, labošanu un dzēšanu, izmantojot datu pārziņa institucionālos kanālus."
         },
         "automatedProcessing": {
           "title": "Mākslīgā intelekta radīts atšifrējums, kopsavilkums un dublējums",
-          "body": "Pasākumiem, kas to pieprasa, pēc tiešraides beigām ieraksts tiek apstrādāts ar mākslīgā intelekta ķēdi, kas pilnībā darbojas Departamenta klastera infrastruktūrā. Tā izveido runas atšifrējumu (nodalot dažādus runātājus), saprotamu kopsavilkumu, iespējamos tulkojumus citās Eiropas valodās un dublētu audio versiju ar vispārīgu sintētisku balsi. Visi izmantotie modeļi (WhisperX atšifrēšanai, Mistral-Small kopsavilkumam un tulkojumam, Piper TTS dublēšanai) darbojas uz atsevišķiem GPU klastera iekšienē: nekādi dalībnieku dati netiek nosūtīti trešo pušu pakalpojumiem. Dalībnieku balss netiek klonēta un netiek glabāta kā biometrisks dats (VDAR 9. pants): dublēšanā izmanto publiskas iepriekš apmācītas sintētiskas balsis, kas runātājiem tiek piešķirtas patvaļīgi. Katram ierakstam pasākuma lapā ir redzams izmantoto modeļu precīzs momentuzņēmums („MI apstrādes pārredzamība“). Radītais saturs var saturēt neprecizitātes: noteicošais avots vienmēr paliek sākotnējais video (MI akts, 50. pants)."
+          "body": "Pasākumiem, kas to pieprasa, pēc tiešraides beigām ieraksts tiek apstrādāts ar mākslīgā intelekta ķēdi, kas pilnībā darbojas šīs instalācijas klastera infrastruktūrā. Tā izveido runas atšifrējumu (nodalot dažādus runātājus), saprotamu kopsavilkumu, iespējamos tulkojumus citās Eiropas valodās un dublētu audio versiju ar vispārīgu sintētisku balsi. Visi izmantotie modeļi (WhisperX atšifrēšanai, Mistral-Small kopsavilkumam un tulkojumam, Piper TTS dublēšanai) darbojas uz atsevišķiem GPU klastera iekšienē: nekādi dalībnieku dati netiek nosūtīti trešo pušu pakalpojumiem. Dalībnieku balss netiek klonēta un netiek glabāta kā biometrisks dats (VDAR 9. pants): dublēšanā izmanto publiskas iepriekš apmācītas sintētiskas balsis, kas runātājiem tiek piešķirtas patvaļīgi. Katram ierakstam pasākuma lapā ir redzams izmantoto modeļu precīzs momentuzņēmums („MI apstrādes pārredzamība“). Radītais saturs var saturēt neprecizitātes: noteicošais avots vienmēr paliek sākotnējais video (MI akts, 50. pants)."
         }
       },
       "note": {
@@ -2883,7 +2883,7 @@
     "accessibility": {
       "metaTitle": "Pieejamības paziņojums",
       "title": "Pieejamības paziņojums",
-      "intro": "Digitālās transformācijas departaments apņemas padarīt “PA Webinar” pieejamu saskaņā ar Itālijas 2004. gada Likumu Nr. 4, ES Direktīvu 2016/2102 un AgID vadlīnijām par IKT rīku pieejamību.",
+      "intro": "Atbildīgā iestāde: {organization}. Iestāde apņemas padarīt šo platformu pieejamu saskaņā ar Itālijas 2004. gada Likumu Nr. 4, ES Direktīvu 2016/2102 un AgID vadlīnijām par IKT rīku pieejamību.",
       "sections": {
         "conformance": {
           "title": "Atbilstības statuss",
@@ -2922,7 +2922,7 @@
       "sections": {
         "ownership": {
           "title": "Pakalpojuma īpašumtiesības",
-          "body": "Platformu veicina Digitālās transformācijas departaments, un tā ir pieejama institucionālo publisko tiešsaistes pasākumu organizēšanai un dalībai tajos."
+          "body": "Platformas īpašnieks: {organization}. Platforma ir pieejama institucionālo publisko tiešsaistes pasākumu organizēšanai un dalībai tajos."
         },
         "usage": {
           "title": "Pakalpojuma izmantošana",
@@ -2930,7 +2930,7 @@
         },
         "liability": {
           "title": "Atbildības ierobežojumi",
-          "body": "Lai gan tiek piemēroti atbilstoši tehniskie un organizatoriskie pasākumi, departaments nevar garantēt pilnīgu pārtraukumu vai darbības traucējumu neesamību neparedzamu apstākļu, uzturēšanas darbu vai ārējo faktoru dēļ. Juridiskā atbildība ir noteikta piemērojamos tiesību aktos."
+          "body": "Lai gan tiek piemēroti atbilstoši tehniskie un organizatoriskie pasākumi, platformas īpašnieks nevar garantēt pilnīgu pārtraukumu vai darbības traucējumu neesamību neparedzamu apstākļu, uzturēšanas darbu vai ārējo faktoru dēļ. Juridiskā atbildība ir noteikta piemērojamos tiesību aktos."
         }
       }
     },
@@ -3029,7 +3029,8 @@
         },
         "note": "Pilns komponentu un pakalpojumu saraksts ar versijām, jaucējkodiem un tehniskajām īpašībām ir pieejams iepriekšējās sadaļās un lejupielādējamā JSON."
       }
-    }
+    },
+    "organizationNotConfigured": "organizācija iestatījumos vēl nav norādīta"
   },
   "status": {
     "title": "Sistēmas statuss",
@@ -3735,8 +3736,8 @@
   },
   "rubrica": {
     "optOut": {
-      "title": "Noņemšana no DTD kontaktu grāmatas",
-      "intro": "Jūs gatavojaties atsaukt piekrišanu iekļaušanai DTD kontaktu grāmatā. Pēc apstiprināšanas vairs netiksiet kontaktēts uzaicinājumiem uz līdzīgiem pasākumiem.",
+      "title": "Noņemšana no pasākumu kontaktu grāmatas",
+      "intro": "Jūs gatavojaties atsaukt piekrišanu iekļaušanai pasākumu kontaktu grāmatā. Pēc apstiprināšanas vairs netiksiet kontaktēts uzaicinājumiem uz līdzīgiem pasākumiem.",
       "missingToken": "Saite ir nederīga vai nepilnīga. Pārbaudiet sākotnējo e-pastu.",
       "invalidToken": "Saite ir beigusies vai nederīga. Sazinieties ar pasākuma kontaktpersonu palīdzībai.",
       "notFound": "Neviena persona neatbilst saitei. Iespējams, tā jau ir noņemta.",
@@ -3746,7 +3747,7 @@
       "confirm": "Apstiprināt noņemšanu",
       "submitting": "Notiek noņemšana…",
       "successTitle": "Noņemšana pabeigta",
-      "successBody": "Jūsu dati vairs nav DTD kontaktu grāmatā.",
+      "successBody": "Jūsu dati vairs nav pasākumu kontaktu grāmatā.",
       "errors": {
         "generic": "Radās kļūda. Mēģiniet vēlāk."
       }

@@ -7,7 +7,7 @@
 The watermark overlaid on the Jitsi video area is configurable from the admin panel under **Impostazioni sito → Branding → Personalizzazione video**:
 
 - **Toggle**: enable/disable the watermark
-- **URL**: custom SVG or PNG image (transparent, ~120×40px recommended). Falls back to the organization logo, then to `/images/dtd-watermark.svg`
+- **URL**: custom SVG or PNG image (transparent, ~120×40px recommended). Falls back to the organization logo, then to `/images/default-watermark.svg`
 - **Opacity**: 10% to 80%
 - **Position**: bottom-left, bottom-right, top-left, top-right
 
@@ -49,7 +49,7 @@ When Jitsi is served from the same domain via Ingress (e.g. `eventi.dominio.gov.
 Example custom CSS for production:
 
 ```css
-/* Match toolbar to DTD navy theme */
+/* Match toolbar to the navy .italia theme */
 .new-toolbox {
   background: linear-gradient(180deg, transparent, rgba(0, 40, 85, 0.9)) !important;
 }
@@ -282,7 +282,7 @@ forzato con `STORAGE_FILES_PROVIDER` / `RECORDING_STORAGE_TYPE`. Tutto
 passa attraverso l'astrazione `app/src/lib/storage/` — nessun altro modulo
 importa SDK vendor direttamente.
 
-### Azure Blob (default DTD)
+### Azure Blob
 
 ```yaml
 # ConfigMap
@@ -381,7 +381,7 @@ il player e il form di upload possano comunicare con il bucket.
 
 | Provider | Upload PUT | Download GET | Delete | List | Note |
 |---|---|---|---|---|---|
-| Azure Blob | ✅ SAS | ✅ SAS | ✅ | ✅ | Default DTD |
+| Azure Blob | ✅ SAS | ✅ SAS | ✅ | ✅ | Installazione di riferimento |
 | AWS S3 | ✅ presigned | ✅ presigned | ✅ | ✅ | IRSA supportato |
 | MinIO | ✅ | ✅ | ✅ | ✅ | `forcePathStyle: true` |
 | Cloudflare R2 | ✅ | ✅ | ✅ | ✅ | region `auto` |

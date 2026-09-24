@@ -12,8 +12,8 @@
     "noReactions": "Esprimi l-opinjoni tiegħek"
   },
   "common": {
-    "appName": "Avvenimenti DTD",
-    "appDescription": "Pjattaforma għal-avvenimenti pubbliċi diġitali tad-Dipartiment għat-Trasformazzjoni Diġitali",
+    "appName": "PA Webinar",
+    "appDescription": "Pjattaforma għall-avvenimenti pubbliċi diġitali",
     "loading": "Qed jitgħabba...",
     "error": "Ġara żball",
     "errorMessage": "Xi ħaġa marret ħażin. Jekk jogħġbok erġa' pprova.",
@@ -1217,7 +1217,7 @@
       "autoStartRecording": "Ibda la reġistrazzjoni awtomatikament",
       "autoStartRecordingDesc": "Al momento tal-bidu tal-avveniment il-reġistrazzjoni partu da sola (senza chiederu ikkonferma lill-moderatur). Hekk eventuali ritardatari trovano diġà il player disponibbli.",
       "aiSectionHeading": "Post-produzzjoni awtomatika",
-      "aiSectionDesc": "Wara li jintemm l-avveniment, ir-reġistrazzjoni tista' tiġi pproċessata minn pipeline ta' intelliġenza artifiċjali fil-cluster biex tipproduċi traskrizzjoni, sommarju u, jekk mitlub, traduzzjonijiet u doppjaġġ. Kollox iseħħ fuq l-infrastruttura tad-Dipartiment, l-ebda data ma toħroġ lejn partijiet terzi.",
+      "aiSectionDesc": "Wara li jintemm l-avveniment, ir-reġistrazzjoni tista' tiġi pproċessata minn pipeline ta' intelliġenza artifiċjali fil-cluster biex tipproduċi traskrizzjoni, sommarju u, jekk mitlub, traduzzjonijiet u doppjaġġ. Kollox iseħħ fuq l-infrastruttura ta' din l-installazzjoni, l-ebda data ma toħroġ lejn partijiet terzi.",
       "aiTranscriptEnabled": "Traskrizzjoni awtomatika",
       "aiTranscriptEnabledDesc": "Rikonoxximent tad-diskors bl-identifikazzjoni tal-kelliema. Meħtieġa biex jiġu attivati s-sommarju, it-traduzzjonijiet u d-doppjaġġ.",
       "aiSummaryEnabled": "Sommarju u kapitli",
@@ -1486,7 +1486,7 @@
         "siteNameHelp": "Jidher fil-header, fit-titlu tal-browser u fl-emails",
         "siteDescription": "Deskrizzjoni tal-applikazzjoni",
         "organizationName": "Isem l-organizzazzjoni",
-        "organizationNameHelp": "eż. Dipartiment għat-Trasformazzjoni Diġitali",
+        "organizationNameHelp": "Isem il-korp li huwa sid il-pjattaforma: jidher fl-intestatura, fil-footer u fit-testi legali (eż. Belt ta' Eżempju)",
         "organizationNameShort": "Sigla tal-organizzazzjoni",
         "organizationUrl": "URL tal-organizzazzjoni",
         "parentOrganization": "Organizzazzjoni superjuri",
@@ -1805,7 +1805,7 @@
         "newTitle": "Ġdid template GDPR",
         "editTitle": "Editja template GDPR",
         "name": "Nomu interno",
-        "namePlaceholder": "es. Avviż standard DTD",
+        "namePlaceholder": "eż. Avviż ta' privatezza standard",
         "description": "Deskrizzjoni (fakultattiva)",
         "descriptionPlaceholder": "Notu brevi għal riconosceru il template",
         "bodyIt": "Testo avviż (Taljan)",
@@ -2636,7 +2636,7 @@
     "projectTeaser": {
       "kicker": "Il-proġett",
       "title": "Open source u sovran, mibni mill-gvern għall-gvern",
-      "body": "PA Webinar hija l-pjattaforma tad-Dipartiment għat-Trasformazzjoni Diġitali għall-avvenimenti diġitali pubbliċi: is-sistema ta' disinn .italia, il-magna tal-video Jitsi Meet u pipeline tal-AI kompletament in-cluster. Hija rilaxxata bħala open source biex kwalunkwe amministrazzjoni tkun tista' terġa' tużaha.",
+      "body": "PA Webinar hija pjattaforma open source għall-avvenimenti pubbliċi diġitali, żviluppata mid-Dipartiment Taljan għat-Trasformazzjoni Diġitali u rilaxxata biex kwalunkwe amministrazzjoni tkun tista' terġa' tużaha: is-sistema ta' disinn .italia, il-magna tal-video Jitsi Meet u pipeline tal-AI kompletament in-cluster.",
       "sovereignty": {
         "title": "Sovranità tad-data",
         "desc": "Self-hosted fuq l-infrastruttura tal-amministrazzjoni: id-data qatt ma toħroġ u m'hemm l-ebda esponiment għas-CLOUD Act."
@@ -2795,8 +2795,8 @@
       "recordingRequired": "Il-kunsens għar-reġistrazzjoni huwa obbligatorju biex tipparteċipa f'dan l-avveniment",
       "multitrack": "Nagħti l-kunsens għar-reġistrazzjoni ta' traċċa awdjo separata tal-vuċi tiegħi, unikament biex it-traskrizzjoni tiġi attribwita korrettament lil kull kelliem. It-traċċa hija temporanja u titħassar wara t-traskrizzjoni; ma tintużax biex tidentifika jew tirriproduċi l-vuċi tiegħi.",
       "multitrackRequired": "Il-kunsens għar-reġistrazzjoni tat-traċċa awdjo tiegħek huwa obbligatorju biex tipparteċipa f'dan l-avveniment",
-      "futureCommunications": "Nixtieq nirċievi informazzjoni dwar avvenimenti futuri organizzati mid-DTD",
-      "addressBook": "Voglio tkun imdaħħal fil-Direttorju DTD għal tkun mistieden ad avvenimenti simili",
+      "futureCommunications": "Nixtieq nirċievi informazzjoni dwar avvenimenti li jmiss ippubblikati fuq din il-pjattaforma",
+      "addressBook": "Nixtieq niġi mdaħħal fid-direttorju tal-avvenimenti biex niġi mistieden għal avvenimenti simili",
       "addressBookHelp": "Kunsens separato (art. 6.1.a GDPR). Potrlill- revocarlo fi qualsiasi momento mill-link \"Neħħi il-miei data mill-direttorju\" fl-email li jirċievirai. Il nomu u l'organizzazzjoni ikunu ricavati mill-profilo ta' reġistrazzjoni."
     },
     "export": {
@@ -2859,7 +2859,7 @@
       "sections": {
         "controller": {
           "title": "Kontrollur tad-dejta",
-          "body": "Id-dejta personali tiġi pproċessata fil-qafas tal-attivitajiet istituzzjonali tad-Dipartiment għat-Trasformazzjoni Diġitali biex issostni l-ġestjoni teknika u organizzattiva tal-avvenimenti pubbliċi online."
+          "body": "Kontrollur tad-dejta: {organization}. Id-dejta personali tiġi pproċessata fil-qafas tal-attivitajiet istituzzjonali tiegħu biex tiġi appoġġjata l-ġestjoni teknika u organizzattiva tal-avvenimenti pubbliċi online."
         },
         "data": {
           "title": "Dejta pproċessata u finijiet",
@@ -2867,11 +2867,11 @@
         },
         "retention": {
           "title": "Żamma u drittijiet",
-          "body": "Id-dejta tinżamm għall-perjodu kkonfigurat għal kull avveniment u mbagħad tiġi mħassra awtomatikament, sakemm ma japplikawx obbligi legali differenti. Is-suġġetti tad-dejta jistgħu jeżerċitaw id-drittijiet tagħhom skont il-GDPR fi kwalunkwe ħin, inkluż l-aċċess, ir-rettifika u t-tħassir, permezz tal-kanali istituzzjonali tad-Dipartiment."
+          "body": "Id-dejta tinżamm għall-perjodu kkonfigurat għal kull avveniment u mbagħad tiġi mħassra awtomatikament, sakemm ma japplikawx obbligi legali differenti. Is-suġġetti tad-dejta jistgħu jeżerċitaw id-drittijiet tagħhom skont il-GDPR fi kwalunkwe ħin, inkluż l-aċċess, ir-rettifika u t-tħassir, permezz tal-kanali istituzzjonali tal-kontrollur tad-dejta."
         },
         "automatedProcessing": {
           "title": "Traskrizzjoni, sommarju u doppjaġġ iġġenerati minn intelliġenza artifiċjali",
-          "body": "Għall-avvenimenti li jitolbuh, wara t-tmiem tax-xandira r-reġistrazzjoni tiġi pproċessata minn katina ta' intelliġenza artifiċjali li taħdem kollha kemm hi fuq l-infrastruttura tal-cluster tad-Dipartiment. Tipproduċi t-traskrizzjoni tad-diskors (bis-separazzjoni tal-kelliema differenti), sommarju f'lingwaġġ ċar, traduzzjonijiet eventwali f'lingwi Ewropej oħra u verżjoni doppjata tal-awdjo b'vuċi sintetika ġenerali. Il-mudelli kollha użati (WhisperX għat-traskrizzjoni, Mistral-Small għas-sommarju u t-traduzzjoni, Piper TTS għad-doppjaġġ) jaħdmu fuq GPU dedikati fi ħdan il-cluster: l-ebda dejta tal-parteċipanti ma tintbagħat lil servizzi ta' partijiet terzi. Il-vuċi tal-parteċipanti ma tiġix ikklonjata u ma tinżammx bħala dejta bijometrika (Art. 9 GDPR): id-doppjaġġ juża vuċijiet sintetiċi pubbliċi mħarrġa minn qabel, assenjati lill-kelliema b'mod arbitrarju. Għal kull reġistrazzjoni, il-paġna tal-avveniment turi r-ritratt eżatt tal-mudelli użati (\"Trasparenza tal-ipproċessar bl-IA\"). Il-kontenut iġġenerat jista' jkun fih impreċiżjonijiet: is-sors awtorevoli jibqa' dejjem il-vidjo oriġinali (Att dwar l-IA, Art. 50)."
+          "body": "Għall-avvenimenti li jitolbuh, wara t-tmiem tax-xandira r-reġistrazzjoni tiġi pproċessata minn katina ta' intelliġenza artifiċjali li taħdem kollha kemm hi fuq l-infrastruttura tal-cluster ta' din l-installazzjoni. Tipproduċi t-traskrizzjoni tad-diskors (bis-separazzjoni tal-kelliema differenti), sommarju f'lingwaġġ ċar, traduzzjonijiet eventwali f'lingwi Ewropej oħra u verżjoni doppjata tal-awdjo b'vuċi sintetika ġenerali. Il-mudelli kollha użati (WhisperX għat-traskrizzjoni, Mistral-Small għas-sommarju u t-traduzzjoni, Piper TTS għad-doppjaġġ) jaħdmu fuq GPU dedikati fi ħdan il-cluster: l-ebda dejta tal-parteċipanti ma tintbagħat lil servizzi ta' partijiet terzi. Il-vuċi tal-parteċipanti ma tiġix ikklonjata u ma tinżammx bħala dejta bijometrika (Art. 9 GDPR): id-doppjaġġ juża vuċijiet sintetiċi pubbliċi mħarrġa minn qabel, assenjati lill-kelliema b'mod arbitrarju. Għal kull reġistrazzjoni, il-paġna tal-avveniment turi r-ritratt eżatt tal-mudelli użati (\"Trasparenza tal-ipproċessar bl-IA\"). Il-kontenut iġġenerat jista' jkun fih impreċiżjonijiet: is-sors awtorevoli jibqa' dejjem il-vidjo oriġinali (Att dwar l-IA, Art. 50)."
         }
       },
       "note": {
@@ -2883,7 +2883,7 @@
     "accessibility": {
       "metaTitle": "Dikjarazzjoni dwar l-aċċessibbiltà",
       "title": "Dikjarazzjoni dwar l-aċċessibbiltà",
-      "intro": "Id-Dipartiment għat-Trasformazzjoni Diġitali jimpenja ruħu li jagħmel lil PA Webinar aċċessibbli, f'konformità mal-Liġi Taljana 4/2004, mad-Direttiva tal-UE 2016/2102 u mal-linji gwida tal-AgID dwar l-aċċessibbiltà tal-għodod tal-ICT.",
+      "intro": "Korp responsabbli: {organization}. Il-korp jimpenja ruħu li jagħmel din il-pjattaforma aċċessibbli, f'konformità mal-Liġi Taljana 4/2004, mad-Direttiva tal-UE 2016/2102 u mal-linji gwida tal-AgID dwar l-aċċessibbiltà tal-għodod tal-ICT.",
       "sections": {
         "conformance": {
           "title": "Stat ta' konformità",
@@ -2922,7 +2922,7 @@
       "sections": {
         "ownership": {
           "title": "Titolarità tas-servizz",
-          "body": "Il-pjattaforma hija promossa mid-Dipartiment għat-Trasformazzjoni Diġitali u hija magħmula disponibbli għall-organizzazzjoni u l-parteċipazzjoni f'avvenimenti pubbliċi istituzzjonali online."
+          "body": "Sid il-pjattaforma: {organization}. Il-pjattaforma hija magħmula disponibbli għall-organizzazzjoni u l-parteċipazzjoni f'avvenimenti pubbliċi istituzzjonali online."
         },
         "usage": {
           "title": "Użu tas-servizz",
@@ -2930,7 +2930,7 @@
         },
         "liability": {
           "title": "Limitazzjoni tar-responsabbiltà",
-          "body": "Filwaqt li jiġu adottati miżuri tekniċi u organizzattivi xierqa, id-Dipartiment ma jistax jiggarantixxi n-nuqqas assolut ta' interruzzjonijiet jew malfunzjonamenti dovuti għal kawżi mhux prevedibbli, attivitajiet ta' manutenzjoni jew fatturi esterni. Ir-responsabbiltajiet legali jibqgħu regolati mil-liġi applikabbli."
+          "body": "Filwaqt li jiġu adottati miżuri tekniċi u organizzattivi xierqa, sid il-pjattaforma ma jistax jiggarantixxi n-nuqqas assolut ta' interruzzjonijiet jew malfunzjonamenti dovuti għal kawżi mhux prevedibbli, attivitajiet ta' manutenzjoni jew fatturi esterni. Ir-responsabbiltajiet legali jibqgħu regolati mil-liġi applikabbli."
         }
       }
     },
@@ -3029,7 +3029,8 @@
         },
         "note": "L'elenco completo ta' componentitajiet u servizi, ma' versioni, hash u proprietà tecniche, huwa disponibbli fl-sezioni precedentitajiet u fil-JSON niżżelbile."
       }
-    }
+    },
+    "organizationNotConfigured": "l-organizzazzjoni għadha mhix speċifikata fl-issettjar"
   },
   "status": {
     "title": "Status tas-sistema",
@@ -3735,8 +3736,8 @@
   },
   "rubrica": {
     "optOut": {
-      "title": "Rimozionu mill-Direttorju DTD",
-      "intro": "Stlill- per revocaru il kunsens lill-inserimento fil-Direttorju DTD. Wara la ikkonferma, mhux sarlill- aktar contattato għal tkun mistieden lil avvenimenti simili.",
+      "title": "Tneħħija mid-direttorju tal-avvenimenti",
+      "intro": "Se tirtira l-kunsens tiegħek biex tkun imniżżel fid-direttorju tal-avvenimenti. Wara l-konferma, ma tibqax tiġi kkuntattjat għal stediniet għal avvenimenti simili.",
       "missingToken": "Il link mhux validu jew huwa incompleto. Iċċekkja l'email originale.",
       "invalidToken": "Il link huwa scaduto jew mhux validu. Ikkuntattja il referentità tal-avveniment għal assistenza.",
       "notFound": "Ebda persona corrispondu lill-link. Potrebbu tkun diġà stata rimossa.",
@@ -3746,7 +3747,7 @@
       "confirm": "Ikkonferma il-rimozione",
       "submitting": "Rimozionu in corso…",
       "successTitle": "Rimozionu tlestiet",
-      "successBody": "I tuoi data mhux huma aktar presentitajiet fil-Direttorju DTD.",
+      "successBody": "Id-dejta tiegħek m'għadhiex fid-direttorju tal-avvenimenti.",
       "errors": {
         "generic": "Seħħ żball. Erġa' pprova aktar tard."
       }

@@ -12,8 +12,8 @@
     "noReactions": "Povejte svoje mnenje"
   },
   "common": {
-    "appName": "Dogodki DTD",
-    "appDescription": "Platforma za javne digitalne dogodke Oddelka za digitalno preobrazbo",
+    "appName": "PA Webinar",
+    "appDescription": "Platforma za javne digitalne dogodke",
     "loading": "Nalaganje...",
     "error": "Prišlo je do napake",
     "errorMessage": "Nekaj je šlo narobe. Prosimo, poskusite znova.",
@@ -1217,7 +1217,7 @@
       "autoStartRecording": "Samodejno začni snemanje",
       "autoStartRecordingDesc": "Ob začetku dogodka se snemanje začne samodejno (brez vprašanja moderatorju). Tako poznejši udeleženci takoj najdejo razpoložljiv predvajalnik.",
       "aiSectionHeading": "Samodejna postprodukcija",
-      "aiSectionDesc": "Po koncu dogodka lahko posnetek obdela cevovod umetne inteligence v gruči in pripravi prepis, povzetek ter — če je tako zahtevano — prevode in sinhronizacijo. Vse poteka na infrastrukturi Oddelka, noben podatek ne odide k tretjim osebam.",
+      "aiSectionDesc": "Po koncu dogodka lahko posnetek obdela cevovod umetne inteligence v gruči in pripravi prepis, povzetek ter — če je tako zahtevano — prevode in sinhronizacijo. Vse poteka na infrastrukturi te namestitve, noben podatek ne odide k tretjim osebam.",
       "aiTranscriptEnabled": "Samodejni prepis",
       "aiTranscriptEnabledDesc": "Razpoznava govora s prepoznavanjem govorcev. Potrebna je za povzetek, prevode in sinhronizacijo.",
       "aiSummaryEnabled": "Povzetek in poglavja",
@@ -1486,7 +1486,7 @@
         "siteNameHelp": "Prikazano v glavi, naslovu brskalnika in e-pošti",
         "siteDescription": "Opis aplikacije",
         "organizationName": "Ime organizacije",
-        "organizationNameHelp": "npr. Oddelek za digitalno preobrazbo",
+        "organizationNameHelp": "Ime organa, ki je lastnik platforme: prikazano v glavi, nogi in pravnih besedilih (npr. Občina Primer)",
         "organizationNameShort": "Kratica organizacije",
         "organizationUrl": "URL organizacije",
         "parentOrganization": "Nadrejena organizacija",
@@ -1805,7 +1805,7 @@
         "newTitle": "Nova predloga GDPR",
         "editTitle": "Uredi predlogo GDPR",
         "name": "Interno ime",
-        "namePlaceholder": "npr. Standardno obvestilo DTD",
+        "namePlaceholder": "npr. Standardno obvestilo o zasebnosti",
         "description": "Opis (neobvezno)",
         "descriptionPlaceholder": "Kratke opombe za prepoznavanje predloge",
         "bodyIt": "Besedilo obvestila (italijansko)",
@@ -2636,7 +2636,7 @@
     "projectTeaser": {
       "kicker": "Projekt",
       "title": "Odprtokoden in suveren, ki ga je javna uprava zgradila za javno upravo",
-      "body": "PA Webinar je platforma Oddelka za digitalno preobrazbo za javne digitalne dogodke: oblikovni sistem .italia, video pogon Jitsi Meet in povsem in-cluster cevovod AI. Izdana je kot odprtokodna, da jo lahko ponovno uporabi vsaka uprava.",
+      "body": "PA Webinar je odprtokodna platforma za javne digitalne dogodke, ki jo je razvil italijanski Oddelek za digitalno preobrazbo in jo izdal, da jo lahko ponovno uporabi vsaka uprava: oblikovni sistem .italia, video pogon Jitsi Meet in povsem in-cluster cevovod AI.",
       "sovereignty": {
         "title": "Suverenost podatkov",
         "desc": "Self-hosted na infrastrukturi uprave: podatki nikoli ne zapustijo okolja in ni izpostavljenosti CLOUD Act."
@@ -2795,8 +2795,8 @@
       "recordingRequired": "Soglasje s snemanjem je obvezno za udeležbo na tem dogodku",
       "multitrack": "Soglašam s snemanjem ločene zvočne sledi svojega glasu izključno za namen pravilnega pripisa prepisa posameznim govorcem. Sled je začasna in se po prepisu izbriše; ne uporablja se za prepoznavo ali predvajanje mojega glasu.",
       "multitrackRequired": "Soglasje za snemanje vaše zvočne sledi je za udeležbo na tem dogodku obvezno",
-      "futureCommunications": "Želim prejemati informacije o prihodnjih dogodkih, ki jih organizira DTD",
-      "addressBook": "Želim biti vključen v imenik DTD za prejemanje vabil na podobne dogodke",
+      "futureCommunications": "Želim prejemati informacije o prihodnjih dogodkih, objavljenih na tej platformi",
+      "addressBook": "Želim biti vključen v imenik dogodkov za prejemanje vabil na podobne dogodke",
       "addressBookHelp": "Ločeno soglasje (čl. 6.1.a GDPR). Prekličete ga lahko kadar koli prek povezave „Odstrani moje podatke iz imenika“ v prejetih e-poštnih sporočilih. Ime in organizacija se prevzameta iz profila prijave."
     },
     "export": {
@@ -2859,7 +2859,7 @@
       "sections": {
         "controller": {
           "title": "Upravljavec podatkov",
-          "body": "Obdelava osebnih podatkov poteka v okviru institucionalnih dejavnosti Oddelka za digitalno preobrazbo za omogočanje tehničnega in organizacijskega upravljanja javnih spletnih dogodkov."
+          "body": "Upravljavec podatkov: {organization}. Obdelava osebnih podatkov poteka v okviru njegovih institucionalnih dejavnosti za omogočanje tehničnega in organizacijskega upravljanja javnih spletnih dogodkov."
         },
         "data": {
           "title": "Obdelani podatki in nameni",
@@ -2867,11 +2867,11 @@
         },
         "retention": {
           "title": "Hramba podatkov in pravice",
-          "body": "Podatki se hranijo za obdobje, konfigurirano za vsak dogodek, nato pa se samodejno izbrišejo, razen če veljajo drugačne zakonske obveznosti. Kadarkoli je mogoče uveljavljati pravice, predvidene z GDPR, vključno z dostopom, popravkom in izbrisom, prek institucionalnih kanalov Oddelka."
+          "body": "Podatki se hranijo za obdobje, konfigurirano za vsak dogodek, nato pa se samodejno izbrišejo, razen če veljajo drugačne zakonske obveznosti. Kadarkoli je mogoče uveljavljati pravice, predvidene z GDPR, vključno z dostopom, popravkom in izbrisom, prek institucionalnih kanalov upravljavca podatkov."
         },
         "automatedProcessing": {
           "title": "Prepis, povzetek in sinhronizacija, ustvarjeni z umetno inteligenco",
-          "body": "Pri dogodkih, ki to zahtevajo, se posnetek po koncu prenosa obdela z verigo umetne inteligence, ki teče v celoti na gruči Oddelka. Ustvari prepis govora (z ločevanjem posameznih govorcev), poljuden povzetek, morebitne prevode v druge evropske jezike in sinhronizirano zvočno različico s splošnim sintetičnim glasom. Vsi uporabljeni modeli (WhisperX za prepis, Mistral-Small za povzetek in prevod, Piper TTS za sinhronizacijo) tečejo na namenskih GPU znotraj gruče: nobenih podatkov udeležencev ne pošiljamo storitvam tretjih oseb. Glas udeležencev se ne klonira in se ne hrani kot biometrični podatek (9. člen GDPR): sinhronizacija uporablja javne vnaprej naučene sintetične glasove, ki se govorcem dodelijo poljubno. Za vsak posnetek stran dogodka prikaže natančen posnetek stanja uporabljenih modelov (»Preglednost obdelave z UI«). Ustvarjena vsebina lahko vsebuje netočnosti: merodajen vir ostaja vedno izvirni videoposnetek (Akt o UI, 50. člen)."
+          "body": "Pri dogodkih, ki to zahtevajo, se posnetek po koncu prenosa obdela z verigo umetne inteligence, ki teče v celoti na infrastrukturi gruče te namestitve. Ustvari prepis govora (z ločevanjem posameznih govorcev), poljuden povzetek, morebitne prevode v druge evropske jezike in sinhronizirano zvočno različico s splošnim sintetičnim glasom. Vsi uporabljeni modeli (WhisperX za prepis, Mistral-Small za povzetek in prevod, Piper TTS za sinhronizacijo) tečejo na namenskih GPU znotraj gruče: nobenih podatkov udeležencev ne pošiljamo storitvam tretjih oseb. Glas udeležencev se ne klonira in se ne hrani kot biometrični podatek (9. člen GDPR): sinhronizacija uporablja javne vnaprej naučene sintetične glasove, ki se govorcem dodelijo poljubno. Za vsak posnetek stran dogodka prikaže natančen posnetek stanja uporabljenih modelov (»Preglednost obdelave z UI«). Ustvarjena vsebina lahko vsebuje netočnosti: merodajen vir ostaja vedno izvirni videoposnetek (Akt o UI, 50. člen)."
         }
       },
       "note": {
@@ -2883,7 +2883,7 @@
     "accessibility": {
       "metaTitle": "Izjava o dostopnosti",
       "title": "Izjava o dostopnosti",
-      "intro": "Oddelek za digitalno preobrazbo se zavezuje, da bo platformo PA Webinar naredil dostopno v skladu z italijanskim zakonom 4/2004, Direktivo (EU) 2016/2102 in smernicami AgID o dostopnosti informacijskih orodij.",
+      "intro": "Odgovorni organ: {organization}. Organ se zavezuje, da bo to platformo naredil dostopno v skladu z italijanskim zakonom 4/2004, Direktivo (EU) 2016/2102 in smernicami AgID o dostopnosti informacijskih orodij.",
       "sections": {
         "conformance": {
           "title": "Stanje skladnosti",
@@ -2922,7 +2922,7 @@
       "sections": {
         "ownership": {
           "title": "Lastništvo storitve",
-          "body": "Platformo spodbuja Oddelek za digitalno preobrazbo in je na voljo za organizacijo in izvedbo institucionalnih javnih spletnih dogodkov."
+          "body": "Lastnik platforme: {organization}. Platforma je na voljo za organizacijo in izvedbo institucionalnih javnih spletnih dogodkov."
         },
         "usage": {
           "title": "Način uporabe",
@@ -2930,7 +2930,7 @@
         },
         "liability": {
           "title": "Omejitev odgovornosti",
-          "body": "Kljub sprejetju ustreznih tehničnih in organizacijskih ukrepov Oddelek ne zagotavlja popolne odsotnosti prekinitev ali okvar, ki jih povzročijo nepredvideni dogodki, vzdrževalna dela ali zunanji dejavniki. Zakonske odgovornosti ureja veljavna zakonodaja."
+          "body": "Kljub sprejetju ustreznih tehničnih in organizacijskih ukrepov lastnik platforme ne zagotavlja popolne odsotnosti prekinitev ali okvar, ki jih povzročijo nepredvideni dogodki, vzdrževalna dela ali zunanji dejavniki. Zakonske odgovornosti ureja veljavna zakonodaja."
         }
       }
     },
@@ -3029,7 +3029,8 @@
         },
         "note": "Popoln seznam komponent in storitev, z različicami, zgoščenimi vrednostmi in tehničnimi lastnostmi, je na voljo v zgornjih razdelkih in v JSON, ki ga lahko prenesete."
       }
-    }
+    },
+    "organizationNotConfigured": "organizacija v nastavitvah še ni navedena"
   },
   "status": {
     "title": "Stanje sistema",
@@ -3735,8 +3736,8 @@
   },
   "rubrica": {
     "optOut": {
-      "title": "Odstranitev iz imenika DTD",
-      "intro": "Preklicali boste soglasje za vključitev v imenik DTD. Po potrditvi vas ne bomo več kontaktirali za vabila na podobne dogodke.",
+      "title": "Odstranitev iz imenika dogodkov",
+      "intro": "Preklicali boste soglasje za vključitev v imenik dogodkov. Po potrditvi vas ne bomo več kontaktirali za vabila na podobne dogodke.",
       "missingToken": "Povezava ni veljavna ali je nepopolna. Preverite izvirno e-poštno sporočilo.",
       "invalidToken": "Povezava je potekla ali ni veljavna. Za pomoč se obrnite na skrbnika dogodka.",
       "notFound": "Nobena oseba ne ustreza povezavi. Morda je bila že odstranjena.",
@@ -3746,7 +3747,7 @@
       "confirm": "Potrdi odstranitev",
       "submitting": "Odstranjevanje poteka …",
       "successTitle": "Odstranitev zaključena",
-      "successBody": "Vaših podatkov ni več v imeniku DTD.",
+      "successBody": "Vaših podatkov ni več v imeniku dogodkov.",
       "errors": {
         "generic": "Prišlo je do napake. Poskusite znova pozneje."
       }

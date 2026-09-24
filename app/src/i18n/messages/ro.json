@@ -12,8 +12,8 @@
     "noReactions": "Spuneți-vă părerea"
   },
   "common": {
-    "appName": "Evenimente DTD",
-    "appDescription": "Platformă pentru evenimente publice digitale a Departamentului pentru Transformarea Digitală",
+    "appName": "PA Webinar",
+    "appDescription": "Platformă pentru evenimente publice digitale",
     "loading": "Se încarcă...",
     "error": "A apărut o eroare",
     "errorMessage": "Ceva nu a funcționat corect. Vă rugăm să reîncercați.",
@@ -1217,7 +1217,7 @@
       "autoStartRecording": "Porniți înregistrarea automat",
       "autoStartRecordingDesc": "La începutul evenimentului, înregistrarea pornește singură (fără a cere confirmare moderatorului). Astfel eventualii întârziați găsesc deja player-ul disponibil.",
       "aiSectionHeading": "Post-producție automată",
-      "aiSectionDesc": "După încheierea evenimentului, înregistrarea poate fi procesată de un pipeline de inteligență artificială în cluster, pentru a produce transcrierea, rezumatul și, la cerere, traduceri și dublaj. Totul se desfășoară pe infrastructura Departamentului, niciun fel de date nu ajung la terți.",
+      "aiSectionDesc": "După încheierea evenimentului, înregistrarea poate fi procesată de un pipeline de inteligență artificială în cluster, pentru a produce transcrierea, rezumatul și, la cerere, traduceri și dublaj. Totul se desfășoară pe infrastructura acestei instalări, niciun fel de date nu ajung la terți.",
       "aiTranscriptEnabled": "Transcriere automată",
       "aiTranscriptEnabledDesc": "Recunoașterea vorbirii cu identificarea vorbitorilor. Necesară pentru activarea rezumatului, traducerilor și dublajului.",
       "aiSummaryEnabled": "Rezumat și capitole",
@@ -1486,7 +1486,7 @@
         "siteNameHelp": "Afișat în antet, în titlul browserului și în emailuri",
         "siteDescription": "Descrierea aplicației",
         "organizationName": "Numele organizației",
-        "organizationNameHelp": "de ex. Departamentul pentru Transformarea Digitală",
+        "organizationNameHelp": "Numele entității titulare a platformei: apare în antet, în subsol și în textele juridice (de ex. Primăria Exemplu)",
         "organizationNameShort": "Sigla organizației",
         "organizationUrl": "URL organizație",
         "parentOrganization": "Organizația superioară",
@@ -1805,7 +1805,7 @@
         "newTitle": "Șablon RGPD nou",
         "editTitle": "Modificați șablonul RGPD",
         "name": "Nume intern",
-        "namePlaceholder": "ex.: Notă de informare standard DTD",
+        "namePlaceholder": "ex.: Notă de informare standard",
         "description": "Descriere (opțională)",
         "descriptionPlaceholder": "Note scurte pentru a recunoaște șablonul",
         "bodyIt": "Text notă de informare (italiană)",
@@ -2636,7 +2636,7 @@
     "projectTeaser": {
       "kicker": "Proiectul",
       "title": "Open source și suveran, construit de administrație pentru administrație",
-      "body": "PA Webinar este platforma Departamentului pentru Transformare Digitală pentru evenimente publice digitale: sistemul de design .italia, motorul video Jitsi Meet și un pipeline AI complet in-cluster. Este lansată ca open source pentru ca orice administrație să o poată reutiliza.",
+      "body": "PA Webinar este o platformă open source pentru evenimente publice digitale, dezvoltată de Departamentul italian pentru Transformare Digitală și lansată pentru ca orice administrație să o poată reutiliza: sistemul de design .italia, motorul video Jitsi Meet și un pipeline AI complet in-cluster.",
       "sovereignty": {
         "title": "Suveranitatea datelor",
         "desc": "Self-hosted pe infrastructura administrației: datele nu ies niciodată și nu există expunere la CLOUD Act."
@@ -2795,8 +2795,8 @@
       "recordingRequired": "Consimțământul pentru înregistrare este obligatoriu pentru a participa la acest eveniment",
       "multitrack": "Consimt la înregistrarea unei piste audio separate a vocii mele, exclusiv în scopul atribuirii corecte a transcrierii fiecărui vorbitor. Pista este temporară și ștearsă după transcriere; nu este folosită pentru a identifica sau reproduce vocea mea.",
       "multitrackRequired": "Consimțământul pentru înregistrarea pistei tale audio este obligatoriu pentru a participa la acest eveniment",
-      "futureCommunications": "Doresc să primesc informații despre evenimentele viitoare organizate de DTD",
-      "addressBook": "Doresc să fiu inclus în Agenda DTD pentru a fi invitat la evenimente similare",
+      "futureCommunications": "Doresc să primesc informații despre evenimentele viitoare publicate pe această platformă",
+      "addressBook": "Doresc să fiu inclus în agenda de evenimente pentru a fi invitat la evenimente similare",
       "addressBookHelp": "Consimțământ separat (art. 6.1.a RGPD). Îl puteți retrage în orice moment prin linkul „Eliminați-mi datele din agendă” din e-mailurile pe care le veți primi. Numele și organizația vor fi preluate din profilul de înregistrare."
     },
     "export": {
@@ -2859,7 +2859,7 @@
       "sections": {
         "controller": {
           "title": "Operatorul de date",
-          "body": "Prelucrarea datelor personale se desfășoară în cadrul activităților instituționale ale Departamentului pentru Transformarea Digitală, pentru a permite gestionarea tehnică și organizatorică a evenimentelor publice online."
+          "body": "Operatorul de date: {organization}. Prelucrarea datelor personale se desfășoară în cadrul activităților sale instituționale, pentru a permite gestionarea tehnică și organizatorică a evenimentelor publice online."
         },
         "data": {
           "title": "Date prelucrate și scopuri",
@@ -2867,11 +2867,11 @@
         },
         "retention": {
           "title": "Păstrarea datelor și drepturi",
-          "body": "Datele sunt păstrate pe perioada configurată pentru fiecare eveniment și apoi șterse automat, cu excepția unor obligații legale diferite. În orice moment pot fi exercitate drepturile prevăzute de GDPR, inclusiv accesul, rectificarea și ștergerea, prin canalele instituționale ale Departamentului."
+          "body": "Datele sunt păstrate pe perioada configurată pentru fiecare eveniment și apoi șterse automat, cu excepția unor obligații legale diferite. În orice moment pot fi exercitate drepturile prevăzute de GDPR, inclusiv accesul, rectificarea și ștergerea, prin canalele instituționale ale operatorului de date."
         },
         "automatedProcessing": {
           "title": "Transcriere, sinteză și dublaj generate de inteligența artificială",
-          "body": "Pentru evenimentele care solicită acest lucru, după încheierea transmisiunii înregistrarea este procesată de un flux de inteligență artificială executat integral pe infrastructura de cluster a Departamentului. Acesta produce transcrierea vorbirii (cu separarea vorbitorilor), o sinteză pe înțelesul tuturor, eventuale traduceri în alte limbi europene și o versiune dublată a audio cu o voce sintetică generică. Toate modelele folosite (WhisperX pentru transcriere, Mistral-Small pentru sinteză și traducere, Piper TTS pentru dublaj) rulează pe GPU dedicate în interiorul clusterului: niciun dat al participanților nu este trimis către servicii terțe. Vocea participanților nu este clonată și nu este păstrată ca dată biometrică (art. 9 GDPR): dublajul folosește voci sintetice publice preantrenate, atribuite arbitrar vorbitorilor. Pentru fiecare înregistrare, pagina evenimentului arată fotografia exactă a modelelor utilizate („Transparența procesării IA”). Conținutul generat poate conține inexactități: referința de autoritate rămâne întotdeauna înregistrarea video originală (Regulamentul IA, art. 50)."
+          "body": "Pentru evenimentele care solicită acest lucru, după încheierea transmisiunii înregistrarea este procesată de un flux de inteligență artificială executat integral pe infrastructura de cluster a acestei instalări. Acesta produce transcrierea vorbirii (cu separarea vorbitorilor), o sinteză pe înțelesul tuturor, eventuale traduceri în alte limbi europene și o versiune dublată a audio cu o voce sintetică generică. Toate modelele folosite (WhisperX pentru transcriere, Mistral-Small pentru sinteză și traducere, Piper TTS pentru dublaj) rulează pe GPU dedicate în interiorul clusterului: niciun dat al participanților nu este trimis către servicii terțe. Vocea participanților nu este clonată și nu este păstrată ca dată biometrică (art. 9 GDPR): dublajul folosește voci sintetice publice preantrenate, atribuite arbitrar vorbitorilor. Pentru fiecare înregistrare, pagina evenimentului arată fotografia exactă a modelelor utilizate („Transparența procesării IA”). Conținutul generat poate conține inexactități: referința de autoritate rămâne întotdeauna înregistrarea video originală (Regulamentul IA, art. 50)."
         }
       },
       "note": {
@@ -2883,7 +2883,7 @@
     "accessibility": {
       "metaTitle": "Declarație de accesibilitate",
       "title": "Declarație de accesibilitate",
-      "intro": "Departamentul pentru Transformare Digitală se angajează să facă PA Webinar accesibil, în conformitate cu Legea italiană 4/2004, cu Directiva (UE) 2016/2102 și cu orientările AgID privind accesibilitatea instrumentelor informatice.",
+      "intro": "Entitatea responsabilă: {organization}. Entitatea se angajează să facă această platformă accesibilă, în conformitate cu Legea italiană 4/2004, cu Directiva (UE) 2016/2102 și cu orientările AgID privind accesibilitatea instrumentelor informatice.",
       "sections": {
         "conformance": {
           "title": "Stadiul conformității",
@@ -2922,7 +2922,7 @@
       "sections": {
         "ownership": {
           "title": "Titularul serviciului",
-          "body": "Platforma este promovată de Departamentul pentru Transformarea Digitală și este pusă la dispoziție pentru organizarea și desfășurarea evenimentelor publice online de interes instituțional."
+          "body": "Titularul platformei: {organization}. Platforma este pusă la dispoziție pentru organizarea și desfășurarea evenimentelor publice online de interes instituțional."
         },
         "usage": {
           "title": "Modalități de utilizare",
@@ -2930,7 +2930,7 @@
         },
         "liability": {
           "title": "Limitări de responsabilitate",
-          "body": "Deși se adoptă măsuri tehnice și organizatorice adecvate, Departamentul nu garantează absența absolută a întreruperilor sau defecțiunilor cauzate de evenimente neprevăzute, activități de mentenanță sau factori externi. Responsabilitățile legale rămân cele prevăzute de legislația aplicabilă."
+          "body": "Deși se adoptă măsuri tehnice și organizatorice adecvate, titularul platformei nu garantează absența absolută a întreruperilor sau defecțiunilor cauzate de evenimente neprevăzute, activități de mentenanță sau factori externi. Responsabilitățile legale rămân cele prevăzute de legislația aplicabilă."
         }
       }
     },
@@ -3029,7 +3029,8 @@
         },
         "note": "Lista completă de componente și servicii, cu versiuni, hash-uri și proprietăți tehnice, este disponibilă în secțiunile precedente și în JSON-ul descărcabil."
       }
-    }
+    },
+    "organizationNotConfigured": "organizația nu a fost încă indicată în setări"
   },
   "status": {
     "title": "Starea sistemului",
@@ -3735,8 +3736,8 @@
   },
   "rubrica": {
     "optOut": {
-      "title": "Eliminare din Agenda DTD",
-      "intro": "Sunteți pe cale să retrageți consimțământul pentru includerea în Agenda DTD. După confirmare, nu veți mai fi contactat pentru a fi invitat la evenimente similare.",
+      "title": "Eliminare din agenda de evenimente",
+      "intro": "Sunteți pe cale să retrageți consimțământul pentru includerea în agenda de evenimente. După confirmare, nu veți mai fi contactat pentru a fi invitat la evenimente similare.",
       "missingToken": "Linkul nu este valid sau este incomplet. Verificați e-mailul original.",
       "invalidToken": "Linkul a expirat sau nu este valid. Contactați persoana responsabilă de eveniment pentru asistență.",
       "notFound": "Nicio persoană nu corespunde linkului. Este posibil să fi fost deja eliminată.",
@@ -3746,7 +3747,7 @@
       "confirm": "Confirmați eliminarea",
       "submitting": "Se elimină…",
       "successTitle": "Eliminare finalizată",
-      "successBody": "Datele dvs. nu mai sunt prezente în Agenda DTD.",
+      "successBody": "Datele dvs. nu mai sunt prezente în agenda de evenimente.",
       "errors": {
         "generic": "S-a produs o eroare. Încercați din nou mai târziu."
       }

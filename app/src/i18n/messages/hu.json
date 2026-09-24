@@ -12,8 +12,8 @@
     "noReactions": "Ossza meg a véleményét"
   },
   "common": {
-    "appName": "DTD Események",
-    "appDescription": "A Digitális Átalakulási Főosztály nyilvános digitális eseményplatformja",
+    "appName": "PA Webinar",
+    "appDescription": "Platform nyilvános digitális eseményekhez",
     "loading": "Betöltés...",
     "error": "Hiba történt",
     "errorMessage": "Valami hiba történt. Kérjük, próbálja újra.",
@@ -1217,7 +1217,7 @@
       "autoStartRecording": "Felvétel automatikus indítása",
       "autoStartRecordingDesc": "Az esemény kezdetekor a felvétel automatikusan elindul (a moderátortól nem kér megerősítést). Így a később csatlakozók azonnal elérhető lejátszót találnak.",
       "aiSectionHeading": "Automatikus utómunka",
-      "aiSectionDesc": "Az esemény befejezése után a felvételt egy fürtön belüli mesterségesintelligencia-pipeline dolgozhatja fel, amely átiratot és összefoglalót, igény esetén pedig fordításokat és szinkront készít. Minden a Főosztály infrastruktúráján történik, semmilyen adat nem kerül harmadik félhez.",
+      "aiSectionDesc": "Az esemény befejezése után a felvételt egy fürtön belüli mesterségesintelligencia-pipeline dolgozhatja fel, amely átiratot és összefoglalót, igény esetén pedig fordításokat és szinkront készít. Minden ennek a telepítésnek az infrastruktúráján történik, semmilyen adat nem kerül harmadik félhez.",
       "aiTranscriptEnabled": "Automatikus átiratkészítés",
       "aiTranscriptEnabledDesc": "Beszédfelismerés a beszélők azonosításával. Az összefoglaló, a fordítások és a szinkron bekapcsolásához szükséges.",
       "aiSummaryEnabled": "Összefoglaló és fejezetek",
@@ -1486,7 +1486,7 @@
         "siteNameHelp": "A fejlécben, a böngésző címsorában és az e-mailekben jelenik meg",
         "siteDescription": "Alkalmazás leírása",
         "organizationName": "Szervezet neve",
-        "organizationNameHelp": "pl. Digitális Átalakulási Főosztály",
+        "organizationNameHelp": "A platform tulajdonosaként működő szervezet neve: megjelenik a fejlécben, a láblécben és a jogi szövegekben (pl. Példaváros Önkormányzata)",
         "organizationNameShort": "Szervezet rövidítése",
         "organizationUrl": "Szervezet URL",
         "parentOrganization": "Fölérendelt szervezet",
@@ -1805,7 +1805,7 @@
         "newTitle": "Új GDPR-sablon",
         "editTitle": "GDPR-sablon szerkesztése",
         "name": "Belső név",
-        "namePlaceholder": "pl. DTD szabvány adatvédelmi tájékoztató",
+        "namePlaceholder": "pl. Szabványos adatvédelmi tájékoztató",
         "description": "Leírás (opcionális)",
         "descriptionPlaceholder": "Rövid megjegyzések a sablon felismeréséhez",
         "bodyIt": "Adatvédelmi szöveg (olasz)",
@@ -2636,7 +2636,7 @@
     "projectTeaser": {
       "kicker": "A projekt",
       "title": "Nyílt forráskódú és szuverén, a közigazgatás által a közigazgatás számára építve",
-      "body": "A PA Webinar a Digitális Átállásért Felelős Minisztérium platformja a nyilvános digitális eseményekhez: a .italia tervezési rendszer, a Jitsi Meet videómotor és egy teljesen in-cluster AI pipeline. Nyílt forráskódként jelent meg, hogy bármely közigazgatás újrahasználhassa.",
+      "body": "A PA Webinar nyílt forráskódú platform nyilvános digitális eseményekhez, amelyet az olasz Digitális Átalakulási Főosztály fejlesztett, és azért tett közzé, hogy bármely közigazgatás újrahasználhassa: a .italia tervezési rendszer, a Jitsi Meet videómotor és egy teljesen in-cluster AI pipeline.",
       "sovereignty": {
         "title": "Adatszuverenitás",
         "desc": "Self-hosted a közigazgatás infrastruktúráján: az adatok soha nem hagyják el azt, és nincs CLOUD Act-kitettség."
@@ -2795,8 +2795,8 @@
       "recordingRequired": "A felvételhez való hozzájárulás szükséges az eseményen való részvételhez",
       "multitrack": "Hozzájárulok a hangom külön hangsávon történő rögzítéséhez, kizárólag abból a célból, hogy az átirat helyesen legyen az egyes beszélőkhöz rendelve. A sáv ideiglenes, és az átirat elkészülte után törlésre kerül; nem használják a hangom azonosítására vagy visszajátszására.",
       "multitrackRequired": "A hangsávod rögzítéséhez adott hozzájárulás kötelező az eseményen való részvételhez",
-      "futureCommunications": "Szeretnék tájékoztatást kapni a DTD által szervezett jövőbeli eseményekről",
-      "addressBook": "Szeretnék felkerülni a DTD címjegyzékére, hogy hasonló eseményekre meghívást kapjak",
+      "futureCommunications": "Szeretnék tájékoztatást kapni az ezen a platformon közzétett jövőbeli eseményekről",
+      "addressBook": "Szeretnék felkerülni az események címjegyzékére, hogy hasonló eseményekre meghívást kapjak",
       "addressBookHelp": "Külön hozzájárulás (GDPR 6. cikk (1) a) pont). Bármikor visszavonhatja a kapott e-mailekben található „Adataim eltávolítása a címjegyzékből” hivatkozással. A név és a szervezet a regisztrációs profilból származik."
     },
     "export": {
@@ -2859,7 +2859,7 @@
       "sections": {
         "controller": {
           "title": "Adatkezelő",
-          "body": "A személyes adatok kezelése a Digitális Átalakulási Főosztály intézményi tevékenységei keretében történik a nyilvános online események technikai és szervezési kezelésének támogatása érdekében."
+          "body": "Adatkezelő: {organization}. A személyes adatok kezelése az adatkezelő intézményi tevékenységei keretében történik a nyilvános online események technikai és szervezési kezelésének támogatása érdekében."
         },
         "data": {
           "title": "Kezelt adatok és célok",
@@ -2867,11 +2867,11 @@
         },
         "retention": {
           "title": "Adatmegőrzés és jogok",
-          "body": "Az adatokat az egyes eseményekhez konfigurált ideig őrizzük, majd automatikusan töröljük, hacsak jogszabályi kötelezettségek másként nem rendelkeznek. Az érintettek bármikor gyakorolhatják GDPR szerinti jogaikat, beleértve a hozzáférést, helyesbítést és törlést, a Főosztály intézményi csatornáin keresztül."
+          "body": "Az adatokat az egyes eseményekhez konfigurált ideig őrizzük, majd automatikusan töröljük, hacsak jogszabályi kötelezettségek másként nem rendelkeznek. Az érintettek bármikor gyakorolhatják GDPR szerinti jogaikat, beleértve a hozzáférést, helyesbítést és törlést, az adatkezelő intézményi csatornáin keresztül."
         },
         "automatedProcessing": {
           "title": "Mesterséges intelligencia által készített átirat, összefoglaló és szinkron",
-          "body": "Az ezt kérő eseményeknél az élő adás végeztével a felvételt egy mesterségesintelligencia-lánc dolgozza fel, amely teljes egészében az Osztály saját fürtinfrastruktúráján fut. Elkészül a beszéd átirata (az egyes beszélők elkülönítésével), egy közérthető összefoglaló, esetleges fordítások más európai nyelvekre, valamint a hang szinkronizált változata általános szintetikus hanggal. Minden felhasznált modell (WhisperX az átirathoz, Mistral-Small az összefoglalóhoz és a fordításhoz, Piper TTS a szinkronhoz) a fürtön belüli dedikált GPU-kon fut: a résztvevők adatai nem kerülnek harmadik felek szolgáltatásaihoz. A résztvevők hangját nem klónozzuk és nem tároljuk biometrikus adatként (GDPR 9. cikk): a szinkron nyilvános, előre betanított szintetikus hangokat használ, amelyeket önkényesen rendelünk a beszélőkhöz. Minden felvételnél az esemény oldala mutatja a felhasznált modellek pontos pillanatképét („Az MI-feldolgozás átláthatósága”). A létrehozott tartalom pontatlanságokat tartalmazhat: a mérvadó forrás mindig az eredeti videó (MI-rendelet, 50. cikk)."
+          "body": "Az ezt kérő eseményeknél az élő adás végeztével a felvételt egy mesterségesintelligencia-lánc dolgozza fel, amely teljes egészében ennek a telepítésnek a fürtinfrastruktúráján fut. Elkészül a beszéd átirata (az egyes beszélők elkülönítésével), egy közérthető összefoglaló, esetleges fordítások más európai nyelvekre, valamint a hang szinkronizált változata általános szintetikus hanggal. Minden felhasznált modell (WhisperX az átirathoz, Mistral-Small az összefoglalóhoz és a fordításhoz, Piper TTS a szinkronhoz) a fürtön belüli dedikált GPU-kon fut: a résztvevők adatai nem kerülnek harmadik felek szolgáltatásaihoz. A résztvevők hangját nem klónozzuk és nem tároljuk biometrikus adatként (GDPR 9. cikk): a szinkron nyilvános, előre betanított szintetikus hangokat használ, amelyeket önkényesen rendelünk a beszélőkhöz. Minden felvételnél az esemény oldala mutatja a felhasznált modellek pontos pillanatképét („Az MI-feldolgozás átláthatósága”). A létrehozott tartalom pontatlanságokat tartalmazhat: a mérvadó forrás mindig az eredeti videó (MI-rendelet, 50. cikk)."
         }
       },
       "note": {
@@ -2883,7 +2883,7 @@
     "accessibility": {
       "metaTitle": "Akadálymentesítési nyilatkozat",
       "title": "Akadálymentesítési nyilatkozat",
-      "intro": "A Digitális Átalakítási Osztály elkötelezett amellett, hogy a PA Webinar akadálymentes legyen, összhangban a 4/2004. számú olasz törvénnyel, az (EU) 2016/2102 irányelvvel és az AgID informatikai eszközök akadálymentességére vonatkozó iránymutatásaival.",
+      "intro": "Felelős szervezet: {organization}. A szervezet elkötelezett amellett, hogy ez a platform akadálymentes legyen, összhangban a 4/2004. számú olasz törvénnyel, az (EU) 2016/2102 irányelvvel és az AgID informatikai eszközök akadálymentességére vonatkozó iránymutatásaival.",
       "sections": {
         "conformance": {
           "title": "Megfelelőségi állapot",
@@ -2922,7 +2922,7 @@
       "sections": {
         "ownership": {
           "title": "A szolgáltatás tulajdonosa",
-          "body": "A platformot a Digitális Átalakulási Főosztály üzemelteti, és intézményi érdekű nyilvános online események szervezésére és lebonyolítására szolgál."
+          "body": "A platform tulajdonosa: {organization}. A platform intézményi érdekű nyilvános online események szervezésére és az azokon való részvételre áll rendelkezésre."
         },
         "usage": {
           "title": "A szolgáltatás használata",
@@ -2930,7 +2930,7 @@
         },
         "liability": {
           "title": "Felelősségkorlátozás",
-          "body": "Megfelelő technikai és szervezési intézkedések ellenére a Főosztály nem garantálhatja az előre nem látható események, karbantartási tevékenységek vagy külső tényezők okozta fennakadások vagy üzemzavarok teljes hiányát. A jogszabályi felelősségek a vonatkozó törvények szerint érvényesek."
+          "body": "Megfelelő technikai és szervezési intézkedések ellenére a platform tulajdonosa nem garantálhatja az előre nem látható események, karbantartási tevékenységek vagy külső tényezők okozta fennakadások vagy üzemzavarok teljes hiányát. A jogszabályi felelősségek a vonatkozó törvények szerint érvényesek."
         }
       }
     },
@@ -3029,7 +3029,8 @@
         },
         "note": "A komponensek és szolgáltatások teljes listája — verziókkal, hash-ekkel és műszaki jellemzőkkel — a fenti szakaszokban és a letölthető JSON-ban érhető el."
       }
-    }
+    },
+    "organizationNotConfigured": "a szervezet még nincs megadva a beállításokban"
   },
   "status": {
     "title": "Rendszer állapota",
@@ -3735,8 +3736,8 @@
   },
   "rubrica": {
     "optOut": {
-      "title": "Eltávolítás a DTD címjegyzékből",
-      "intro": "Vissza kívánja vonni a hozzájárulását ahhoz, hogy a DTD címjegyzékben szerepeljen. A megerősítés után többé nem keressük fel hasonló események meghívása céljából.",
+      "title": "Eltávolítás az események címjegyzékéből",
+      "intro": "Vissza kívánja vonni a hozzájárulását ahhoz, hogy az események címjegyzékében szerepeljen. A megerősítés után többé nem keressük fel hasonló események meghívása céljából.",
       "missingToken": "A hivatkozás érvénytelen vagy hiányos. Ellenőrizze az eredeti e-mailt.",
       "invalidToken": "A hivatkozás lejárt vagy érvénytelen. Forduljon segítségért az esemény kapcsolattartójához.",
       "notFound": "Nincs a hivatkozásnak megfelelő személy. Lehetséges, hogy már eltávolításra került.",
@@ -3746,7 +3747,7 @@
       "confirm": "Eltávolítás megerősítése",
       "submitting": "Eltávolítás folyamatban…",
       "successTitle": "Eltávolítás befejezve",
-      "successBody": "Az adatai már nem szerepelnek a DTD címjegyzékében.",
+      "successBody": "Az adatai már nem szerepelnek az események címjegyzékében.",
       "errors": {
         "generic": "Hiba történt. Kérjük, próbálja újra később."
       }

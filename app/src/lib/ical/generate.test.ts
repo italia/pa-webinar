@@ -87,7 +87,7 @@ describe('generateEventICal', () => {
     expect(start(rome)).toBe(start(utc));
   });
 
-  it('contains PRODID with DTD', () => {
+  it('contains PRODID', () => {
     const ics = generateEventICal(baseInput());
     expect(ics).toContain('PRODID');
   });

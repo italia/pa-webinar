@@ -12,8 +12,8 @@
     "noReactions": "Geef uw mening"
   },
   "common": {
-    "appName": "DTD Evenementen",
-    "appDescription": "Platform voor publieke digitale evenementen van het Departement voor Digitale Transformatie",
+    "appName": "PA Webinar",
+    "appDescription": "Platform voor publieke digitale evenementen",
     "loading": "Laden...",
     "error": "Er is een fout opgetreden",
     "errorMessage": "Er is iets misgegaan. Probeer het opnieuw.",
@@ -1217,7 +1217,7 @@
       "autoStartRecording": "Opname automatisch starten",
       "autoStartRecordingDesc": "Bij de start van het evenement begint de opname vanzelf (zonder bevestiging te vragen aan de moderator). Zo vinden eventuele laatkomers de speler direct beschikbaar.",
       "aiSectionHeading": "Automatische postproductie",
-      "aiSectionDesc": "Na afloop van het evenement kan de opname worden verwerkt door een AI-pijplijn in het cluster om een transcriptie, een samenvatting en, indien gewenst, vertalingen en nasynchronisatie te produceren. Alles gebeurt op de infrastructuur van het Departement, er gaan geen gegevens naar derden.",
+      "aiSectionDesc": "Na afloop van het evenement kan de opname worden verwerkt door een AI-pijplijn in het cluster om een transcriptie, een samenvatting en, indien gewenst, vertalingen en nasynchronisatie te produceren. Alles gebeurt op de infrastructuur van deze installatie, er gaan geen gegevens naar derden.",
       "aiTranscriptEnabled": "Automatische transcriptie",
       "aiTranscriptEnabledDesc": "Spraakherkenning met identificatie van de sprekers. Vereist om samenvatting, vertalingen en nasynchronisatie in te schakelen.",
       "aiSummaryEnabled": "Samenvatting en hoofdstukken",
@@ -1486,7 +1486,7 @@
         "siteNameHelp": "Weergegeven in de header, de browsertitel en e-mails",
         "siteDescription": "Applicatiebeschrijving",
         "organizationName": "Naam organisatie",
-        "organizationNameHelp": "bijv. Departement voor Digitale Transformatie",
+        "organizationNameHelp": "Naam van de instantie die eigenaar is van het platform: wordt getoond in de koptekst, de voettekst en de juridische teksten (bijv. Gemeente Voorbeeld)",
         "organizationNameShort": "Afkorting organisatie",
         "organizationUrl": "URL organisatie",
         "parentOrganization": "Bovenliggende organisatie",
@@ -1805,7 +1805,7 @@
         "newTitle": "Nieuw AVG-sjabloon",
         "editTitle": "AVG-sjabloon bewerken",
         "name": "Interne naam",
-        "namePlaceholder": "bv. Standaard DTD-privacyverklaring",
+        "namePlaceholder": "bv. Standaard privacyverklaring",
         "description": "Beschrijving (optioneel)",
         "descriptionPlaceholder": "Korte notities om het sjabloon te herkennen",
         "bodyIt": "Tekst privacyverklaring (Italiaans)",
@@ -2636,7 +2636,7 @@
     "projectTeaser": {
       "kicker": "Het project",
       "title": "Open source en soeverein, gebouwd door de overheid voor de overheid",
-      "body": "PA Webinar is het platform van het Departement voor Digitale Transformatie voor openbare digitale evenementen: het .italia-ontwerpsysteem, de Jitsi Meet-videomotor en een volledig in-cluster AI-pijplijn. Het wordt als open source uitgebracht zodat elke overheidsinstantie het kan hergebruiken.",
+      "body": "PA Webinar is een opensourceplatform voor openbare digitale evenementen, ontwikkeld door het Italiaanse Departement voor Digitale Transformatie en uitgebracht zodat elke overheidsinstantie het kan hergebruiken: het .italia-ontwerpsysteem, de Jitsi Meet-videomotor en een volledig in-cluster AI-pijplijn.",
       "sovereignty": {
         "title": "Datasoevereiniteit",
         "desc": "Self-hosted op de infrastructuur van de overheidsinstantie: gegevens verlaten die nooit en er is geen blootstelling aan de CLOUD Act."
@@ -2795,8 +2795,8 @@
       "recordingRequired": "Toestemming voor opname is vereist om deel te nemen aan dit evenement",
       "multitrack": "Ik stem in met het opnemen van een apart audiospoor van mijn stem, uitsluitend om het transcript correct aan elke spreker toe te wijzen. Het spoor is tijdelijk en wordt na de transcriptie verwijderd; het wordt niet gebruikt om mijn stem te identificeren of weer te geven.",
       "multitrackRequired": "Toestemming voor het opnemen van je audiospoor is verplicht om aan dit evenement deel te nemen",
-      "futureCommunications": "Ik wil informatie ontvangen over toekomstige evenementen van DTD",
-      "addressBook": "Ik wil opgenomen worden in het DTD-adresboek om uitgenodigd te worden voor soortgelijke evenementen",
+      "futureCommunications": "Ik wil informatie ontvangen over toekomstige evenementen die op dit platform worden gepubliceerd",
+      "addressBook": "Ik wil opgenomen worden in het evenementenadresboek om uitgenodigd te worden voor soortgelijke evenementen",
       "addressBookHelp": "Aparte toestemming (art. 6.1.a AVG). U kunt deze op elk moment intrekken via de link \"Verwijder mijn gegevens uit het adresboek\" in de e-mails die u ontvangt. Naam en organisatie worden overgenomen uit uw aanmeldingsprofiel."
     },
     "export": {
@@ -2859,7 +2859,7 @@
       "sections": {
         "controller": {
           "title": "Verwerkingsverantwoordelijke",
-          "body": "De verwerking van persoonsgegevens vindt plaats binnen de institutionele activiteiten van het Departement voor Digitale Transformatie, ter ondersteuning van het technische en organisatorische beheer van publieke online evenementen."
+          "body": "Verwerkingsverantwoordelijke: {organization}. Persoonsgegevens worden verwerkt binnen haar institutionele activiteiten, ter ondersteuning van het technische en organisatorische beheer van publieke online evenementen."
         },
         "data": {
           "title": "Verwerkte gegevens en doeleinden",
@@ -2867,11 +2867,11 @@
         },
         "retention": {
           "title": "Bewaring en rechten",
-          "body": "Gegevens worden bewaard gedurende de voor elk evenement geconfigureerde periode en vervolgens automatisch verwijderd, tenzij andere wettelijke verplichtingen van toepassing zijn. Betrokkenen kunnen te allen tijde hun GDPR-rechten uitoefenen, waaronder inzage, rectificatie en wissing, via de institutionele kanalen van het Departement."
+          "body": "Gegevens worden bewaard gedurende de voor elk evenement geconfigureerde periode en vervolgens automatisch verwijderd, tenzij andere wettelijke verplichtingen van toepassing zijn. Betrokkenen kunnen te allen tijde hun GDPR-rechten uitoefenen, waaronder inzage, rectificatie en wissing, via de institutionele kanalen van de verwerkingsverantwoordelijke."
         },
         "automatedProcessing": {
           "title": "Door kunstmatige intelligentie gegenereerde transcriptie, samenvatting en nasynchronisatie",
-          "body": "Bij evenementen die daarom vragen, wordt de opname na afloop van de uitzending verwerkt door een AI-pijplijn die volledig draait op de clusterinfrastructuur van het Departement. Die produceert de transcriptie van het gesprokene (met scheiding van de verschillende sprekers), een samenvatting in gewone taal, eventuele vertalingen naar andere Europese talen en een nagesynchroniseerde audioversie met een generieke synthetische stem. Alle gebruikte modellen (WhisperX voor de transcriptie, Mistral-Small voor samenvatting en vertaling, Piper TTS voor de nasynchronisatie) draaien op eigen GPU's binnen het cluster: er worden geen deelnemersgegevens naar diensten van derden gestuurd. De stem van deelnemers wordt niet gekloond en niet bewaard als biometrisch gegeven (art. 9 AVG): de nasynchronisatie gebruikt openbare, vooraf getrainde synthetische stemmen die willekeurig aan de sprekers worden toegewezen. Voor elke opname toont de evenementpagina de exacte momentopname van de gebruikte modellen ('Transparantie van de AI-verwerking'). De gegenereerde inhoud kan onnauwkeurigheden bevatten: de gezaghebbende bron blijft altijd de originele video (AI-verordening, art. 50)."
+          "body": "Bij evenementen die daarom vragen, wordt de opname na afloop van de uitzending verwerkt door een AI-pijplijn die volledig draait op de clusterinfrastructuur van deze installatie. Die produceert de transcriptie van het gesprokene (met scheiding van de verschillende sprekers), een samenvatting in gewone taal, eventuele vertalingen naar andere Europese talen en een nagesynchroniseerde audioversie met een generieke synthetische stem. Alle gebruikte modellen (WhisperX voor de transcriptie, Mistral-Small voor samenvatting en vertaling, Piper TTS voor de nasynchronisatie) draaien op eigen GPU's binnen het cluster: er worden geen deelnemersgegevens naar diensten van derden gestuurd. De stem van deelnemers wordt niet gekloond en niet bewaard als biometrisch gegeven (art. 9 AVG): de nasynchronisatie gebruikt openbare, vooraf getrainde synthetische stemmen die willekeurig aan de sprekers worden toegewezen. Voor elke opname toont de evenementpagina de exacte momentopname van de gebruikte modellen ('Transparantie van de AI-verwerking'). De gegenereerde inhoud kan onnauwkeurigheden bevatten: de gezaghebbende bron blijft altijd de originele video (AI-verordening, art. 50)."
         }
       },
       "note": {
@@ -2883,7 +2883,7 @@
     "accessibility": {
       "metaTitle": "Toegankelijkheidsverklaring",
       "title": "Toegankelijkheidsverklaring",
-      "intro": "Het Departement voor Digitale Transformatie zet zich in om PA Webinar toegankelijk te maken, in overeenstemming met de Italiaanse Wet 4/2004, de EU-richtlijn 2016/2102 en de richtsnoeren van AgID over de toegankelijkheid van ICT-middelen.",
+      "intro": "Verantwoordelijke instantie: {organization}. De instantie zet zich in om dit platform toegankelijk te maken, in overeenstemming met de Italiaanse Wet 4/2004, de EU-richtlijn 2016/2102 en de richtsnoeren van AgID over de toegankelijkheid van ICT-middelen.",
       "sections": {
         "conformance": {
           "title": "Nalevingsstatus",
@@ -2922,7 +2922,7 @@
       "sections": {
         "ownership": {
           "title": "Eigenaar van de dienst",
-          "body": "Het platform wordt aangeboden door het Departement voor Digitale Transformatie en is beschikbaar gesteld voor de organisatie van en deelname aan institutionele publieke online evenementen."
+          "body": "Eigenaar van het platform: {organization}. Het platform is beschikbaar gesteld voor de organisatie van en deelname aan institutionele publieke online evenementen."
         },
         "usage": {
           "title": "Gebruiksvoorwaarden",
@@ -2930,7 +2930,7 @@
         },
         "liability": {
           "title": "Beperking van aansprakelijkheid",
-          "body": "Ondanks het nemen van passende technische en organisatorische maatregelen kan het Departement niet garanderen dat er geen onderbrekingen of storingen optreden als gevolg van onvoorziene omstandigheden, onderhoud of externe factoren. De wettelijke aansprakelijkheden blijven van kracht."
+          "body": "Ondanks het nemen van passende technische en organisatorische maatregelen kan de eigenaar van het platform niet garanderen dat er geen onderbrekingen of storingen optreden als gevolg van onvoorziene omstandigheden, onderhoud of externe factoren. De wettelijke aansprakelijkheden blijven van kracht."
         }
       }
     },
@@ -3029,7 +3029,8 @@
         },
         "note": "De volledige lijst van componenten en services, met versies, hashes en technische eigenschappen, is beschikbaar in de bovenstaande secties en in de downloadbare JSON."
       }
-    }
+    },
+    "organizationNotConfigured": "organisatie nog niet opgegeven in de instellingen"
   },
   "status": {
     "title": "Systeemstatus",
@@ -3735,8 +3736,8 @@
   },
   "rubrica": {
     "optOut": {
-      "title": "Verwijdering uit het DTD-adresboek",
-      "intro": "U staat op het punt uw toestemming voor opname in het DTD-adresboek in te trekken. Na bevestiging wordt u niet meer benaderd voor uitnodigingen voor soortgelijke evenementen.",
+      "title": "Verwijdering uit het evenementenadresboek",
+      "intro": "U staat op het punt uw toestemming voor opname in het evenementenadresboek in te trekken. Na bevestiging wordt u niet meer benaderd voor uitnodigingen voor soortgelijke evenementen.",
       "missingToken": "De link is niet geldig of onvolledig. Controleer de oorspronkelijke e-mail.",
       "invalidToken": "De link is verlopen of ongeldig. Neem voor hulp contact op met de organisator van het evenement.",
       "notFound": "Geen persoon komt overeen met de link. Mogelijk is hij/zij al verwijderd.",
@@ -3746,7 +3747,7 @@
       "confirm": "Verwijdering bevestigen",
       "submitting": "Verwijderen…",
       "successTitle": "Verwijdering voltooid",
-      "successBody": "Uw gegevens staan niet meer in het DTD-adresboek.",
+      "successBody": "Uw gegevens staan niet meer in het evenementenadresboek.",
       "errors": {
         "generic": "Er is een fout opgetreden. Probeer het later opnieuw."
       }

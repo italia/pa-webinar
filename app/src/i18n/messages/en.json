@@ -13,7 +13,7 @@
   },
   "common": {
     "appName": "PA Webinar",
-    "appDescription": "Public digital event platform by the Department for Digital Transformation",
+    "appDescription": "Platform for public digital events",
     "loading": "Loading...",
     "error": "An error occurred",
     "errorMessage": "Something went wrong. Please try again.",
@@ -1217,7 +1217,7 @@
       "autoStartRecording": "Start recording automatically",
       "autoStartRecordingDesc": "When the event starts, recording begins on its own (the moderator is not prompted). Late joiners immediately find a catch-up player available.",
       "aiSectionHeading": "Automatic post-production",
-      "aiSectionDesc": "After the event ends, the recording can be processed by an in-cluster AI pipeline to produce transcript, summary and — if requested — translations and dubbing. Everything runs on the Department's infrastructure, no data leaves to third parties.",
+      "aiSectionDesc": "After the event ends, the recording can be processed by an in-cluster AI pipeline to produce transcript, summary and — if requested — translations and dubbing. Everything runs on this installation's infrastructure, no data leaves to third parties.",
       "aiTranscriptEnabled": "Automatic transcription",
       "aiTranscriptEnabledDesc": "Speech recognition with speaker identification. Required to enable summary, translations and dubbing.",
       "aiSummaryEnabled": "Summary and chapters",
@@ -1486,7 +1486,7 @@
         "siteNameHelp": "Shown in the header, browser title and emails",
         "siteDescription": "Application description",
         "organizationName": "Organization name",
-        "organizationNameHelp": "e.g. Department for Digital Transformation",
+        "organizationNameHelp": "Name of the body that owns the platform: shown in the header, footer and legal texts (e.g. City of Example)",
         "organizationNameShort": "Organization short name",
         "organizationUrl": "Organization URL",
         "parentOrganization": "Parent organization",
@@ -1805,7 +1805,7 @@
         "newTitle": "New GDPR template",
         "editTitle": "Edit GDPR template",
         "name": "Internal name",
-        "namePlaceholder": "e.g. DTD standard privacy notice",
+        "namePlaceholder": "e.g. Standard privacy notice",
         "description": "Description (optional)",
         "descriptionPlaceholder": "Short notes to recognise the template",
         "bodyIt": "Privacy text (Italian)",
@@ -2636,7 +2636,7 @@
     "projectTeaser": {
       "kicker": "The project",
       "title": "Open source and sovereign, built by government for government",
-      "body": "PA Webinar is the Department for Digital Transformation's platform for public digital events: the .italia design system, the Jitsi Meet video engine and a fully in-cluster AI pipeline. It is released as open source so any administration can reuse it.",
+      "body": "PA Webinar is an open-source platform for public digital events, developed by the Italian Department for Digital Transformation and released so any administration can reuse it: the .italia design system, the Jitsi Meet video engine and a fully in-cluster AI pipeline.",
       "sovereignty": {
         "title": "Data sovereignty",
         "desc": "Self-hosted on the administration's infrastructure: data never leaves and there is no CLOUD Act exposure."
@@ -2795,8 +2795,8 @@
       "recordingRequired": "Recording consent is required to participate in this event",
       "multitrack": "I consent to recording a separate audio track of my voice, for the sole purpose of correctly attributing the transcript to each speaker. The track is temporary and deleted after transcription; it is not used to identify or reproduce my voice.",
       "multitrackRequired": "Consent to recording your audio track is required to participate in this event",
-      "futureCommunications": "I would like to receive information about future events organized by DTD",
-      "addressBook": "I want to be added to the DTD address book to be invited to similar events",
+      "futureCommunications": "I would like to receive information about upcoming events published on this platform",
+      "addressBook": "I want to be added to the events address book to be invited to similar events",
       "addressBookHelp": "Separate consent (GDPR art. 6.1.a). You can withdraw it at any time using the \"Remove me from the address book\" link in emails. Your name and organization are taken from your registration profile."
     },
     "export": {
@@ -2859,7 +2859,7 @@
       "sections": {
         "controller": {
           "title": "Data controller",
-          "body": "Personal data is processed within the institutional activities of the Department for Digital Transformation to support the technical and organisational management of public online events."
+          "body": "Data controller: {organization}. Personal data is processed within its institutional activities to support the technical and organisational management of public online events."
         },
         "data": {
           "title": "Processed data and purposes",
@@ -2867,11 +2867,11 @@
         },
         "retention": {
           "title": "Retention and rights",
-          "body": "Data is retained for the period configured for each event and then automatically deleted, unless different legal obligations apply. Data subjects may exercise their GDPR rights at any time, including access, rectification and erasure, through the Department's institutional channels."
+          "body": "Data is retained for the period configured for each event and then automatically deleted, unless different legal obligations apply. Data subjects may exercise their GDPR rights at any time, including access, rectification and erasure, through the data controller's institutional channels."
         },
         "automatedProcessing": {
           "title": "AI-generated transcript, summary and dubbing",
-          "body": "For events that opt in, after the live session ends the recording is processed by an artificial-intelligence pipeline running entirely on the Department's own cluster infrastructure. The pipeline produces the transcript of the speech (with speaker separation), a plain-language summary, optional translations into other European languages and a dubbed version of the audio with a generic synthetic voice. The models used (WhisperX for transcription, Mistral-Small for summary and translation, Piper TTS for dubbing) all run on dedicated GPUs inside the cluster: no participant data is sent to third-party services. The voice of the participants is not cloned and is not stored as biometric data (Art. 9 GDPR): the dubbing uses pre-trained public synthetic voices, assigned to the different speakers in an arbitrary way. Each recording exposes the exact snapshot of the models used on the event page ('AI processing transparency'). Generated content may contain inaccuracies: the authoritative reference is always the original video (AI Act, Art. 50)."
+          "body": "For events that opt in, after the live session ends the recording is processed by an artificial-intelligence pipeline running entirely on the cluster infrastructure of this installation. The pipeline produces the transcript of the speech (with speaker separation), a plain-language summary, optional translations into other European languages and a dubbed version of the audio with a generic synthetic voice. The models used (WhisperX for transcription, Mistral-Small for summary and translation, Piper TTS for dubbing) all run on dedicated GPUs inside the cluster: no participant data is sent to third-party services. The voice of the participants is not cloned and is not stored as biometric data (Art. 9 GDPR): the dubbing uses pre-trained public synthetic voices, assigned to the different speakers in an arbitrary way. Each recording exposes the exact snapshot of the models used on the event page ('AI processing transparency'). Generated content may contain inaccuracies: the authoritative reference is always the original video (AI Act, Art. 50)."
         }
       },
       "note": {
@@ -2883,7 +2883,7 @@
     "accessibility": {
       "metaTitle": "Accessibility statement",
       "title": "Accessibility statement",
-      "intro": "The Department for Digital Transformation is committed to making PA Webinar accessible, in line with Italian Law 4/2004, EU Directive 2016/2102 and AgID's guidelines on the accessibility of ICT tools.",
+      "intro": "Responsible body: {organization}. The body is committed to making this platform accessible, in line with Italian Law 4/2004, EU Directive 2016/2102 and AgID's guidelines on the accessibility of ICT tools.",
       "sections": {
         "conformance": {
           "title": "Conformance status",
@@ -2922,7 +2922,7 @@
       "sections": {
         "ownership": {
           "title": "Service ownership",
-          "body": "The platform is promoted by the Department for Digital Transformation and made available for the organisation and participation in institutional public online events."
+          "body": "Platform owner: {organization}. The platform is made available for the organisation and participation in institutional public online events."
         },
         "usage": {
           "title": "Use of the service",
@@ -2930,7 +2930,7 @@
         },
         "liability": {
           "title": "Limitation of liability",
-          "body": "While appropriate technical and organisational measures are adopted, the Department cannot guarantee the complete absence of interruptions or malfunctions caused by unforeseen events, maintenance activities or external factors. Legal responsibilities remain governed by applicable law."
+          "body": "While appropriate technical and organisational measures are adopted, the platform owner cannot guarantee the complete absence of interruptions or malfunctions caused by unforeseen events, maintenance activities or external factors. Legal responsibilities remain governed by applicable law."
         }
       }
     },
@@ -3029,7 +3029,8 @@
         },
         "note": "The complete list of components and services, with versions, hashes and technical properties, is available in the sections above and in the downloadable JSON."
       }
-    }
+    },
+    "organizationNotConfigured": "organisation not yet set in the settings"
   },
   "status": {
     "title": "System status",
@@ -3735,8 +3736,8 @@
   },
   "rubrica": {
     "optOut": {
-      "title": "Remove me from the DTD address book",
-      "intro": "You are about to withdraw your consent to be listed in the DTD address book. After confirmation you will no longer be contacted for invitations to similar events.",
+      "title": "Remove me from the events address book",
+      "intro": "You are about to withdraw your consent to be listed in the events address book. After confirmation you will no longer be contacted for invitations to similar events.",
       "missingToken": "The link is invalid or incomplete. Please check the original email.",
       "invalidToken": "The link is expired or invalid. Contact the event organizer for help.",
       "notFound": "No person matches this link — they may already have been removed.",
@@ -3746,7 +3747,7 @@
       "confirm": "Confirm removal",
       "submitting": "Removing…",
       "successTitle": "Removal complete",
-      "successBody": "Your data is no longer in the DTD address book.",
+      "successBody": "Your data is no longer in the events address book.",
       "errors": {
         "generic": "Something went wrong. Please try again later."
       }

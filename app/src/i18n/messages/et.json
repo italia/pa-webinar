@@ -12,8 +12,8 @@
     "noReactions": "Avalda oma arvamus"
   },
   "common": {
-    "appName": "DTD Üritused",
-    "appDescription": "Digitaalsete avalike ürituste platvorm, mille on loonud Digitaalse Ümberkujundamise Osakond",
+    "appName": "PA Webinar",
+    "appDescription": "Digitaalsete avalike ürituste platvorm",
     "loading": "Laadimine...",
     "error": "Ilmnes viga",
     "errorMessage": "Midagi läks valesti. Palun proovige uuesti.",
@@ -1217,7 +1217,7 @@
       "autoStartRecording": "Käivita salvestus automaatselt",
       "autoStartRecordingDesc": "Sündmuse alguses käivitub salvestus iseseisvalt (moderaatorilt kinnitust ei küsita). Hilinejad leiavad kohe järelejõudmismängija saadaval.",
       "aiSectionHeading": "Automaatne järeltöötlus",
-      "aiSectionDesc": "Pärast sündmuse lõppu saab salvestist töödelda klastrisisese tehisintellekti töövooga, et luua transkriptsioon, kokkuvõte ning soovi korral tõlked ja dubleering. Kõik toimub osakonna taristus, andmeid ei edastata kolmandatele isikutele.",
+      "aiSectionDesc": "Pärast sündmuse lõppu saab salvestist töödelda klastrisisese tehisintellekti töövooga, et luua transkriptsioon, kokkuvõte ning soovi korral tõlked ja dubleering. Kõik toimub selle paigalduse taristus, andmeid ei edastata kolmandatele isikutele.",
       "aiTranscriptEnabled": "Automaatne transkribeerimine",
       "aiTranscriptEnabledDesc": "Kõnetuvastus koos kõnelejate tuvastamisega. Vajalik kokkuvõtte, tõlgete ja dubleerimise sisselülitamiseks.",
       "aiSummaryEnabled": "Kokkuvõte ja peatükid",
@@ -1486,7 +1486,7 @@
         "siteNameHelp": "Kuvatakse päises, brauseri pealkirjas ja e-kirjades",
         "siteDescription": "Rakenduse kirjeldus",
         "organizationName": "Organisatsiooni nimi",
-        "organizationNameHelp": "nt Digitaalse Ümberkujundamise Osakond",
+        "organizationNameHelp": "Platvormi omava asutuse nimi: kuvatakse päises, jaluses ja õigustekstides (nt Näidisvalla vallavalitsus)",
         "organizationNameShort": "Organisatsiooni lühend",
         "organizationUrl": "Organisatsiooni URL",
         "parentOrganization": "Emaorganisatsioon",
@@ -1805,7 +1805,7 @@
         "newTitle": "Uus IKÜM-i mall",
         "editTitle": "Muuda IKÜM-i malli",
         "name": "Sisemine nimi",
-        "namePlaceholder": "nt DTD standardteatis",
+        "namePlaceholder": "nt Standardne privaatsusteade",
         "description": "Kirjeldus (valikuline)",
         "descriptionPlaceholder": "Lühikesed märkmed malli äratundmiseks",
         "bodyIt": "Teabe tekst (itaalia keeles)",
@@ -2636,7 +2636,7 @@
     "projectTeaser": {
       "kicker": "Projekt",
       "title": "Avatud lähtekoodiga ja suveräänne, loodud halduse poolt halduse jaoks",
-      "body": "PA Webinar on Digipöörde osakonna platvorm avalike digiürituste jaoks: .italia disainisüsteem, Jitsi Meet videomootor ja täielikult in-cluster AI torustik. See on avaldatud avatud lähtekoodiga, et iga haldusasutus saaks seda taaskasutada.",
+      "body": "PA Webinar on avatud lähtekoodiga platvorm avalike digiürituste jaoks, mille on välja töötanud Itaalia digipöörde osakond ja mis on avaldatud, et iga haldusasutus saaks seda taaskasutada: .italia disainisüsteem, Jitsi Meet videomootor ja täielikult in-cluster AI torustik.",
       "sovereignty": {
         "title": "Andmesuveräänsus",
         "desc": "Self-hosted halduse taristus: andmed ei lahku kunagi ja CLOUD Act'i mõju ei ole."
@@ -2795,8 +2795,8 @@
       "recordingRequired": "Selles üritusel osalemiseks on nõutav salvestamise nõusolek",
       "multitrack": "Nõustun oma hääle salvestamisega eraldi helirajale ainsa eesmärgiga omistada transkriptsioon õigesti igale kõnelejale. Rada on ajutine ja kustutatakse pärast transkribeerimist; seda ei kasutata minu hääle tuvastamiseks ega taasesitamiseks.",
       "multitrackRequired": "Nõusolek sinu heliraja salvestamiseks on sellel sündmusel osalemiseks kohustuslik",
-      "futureCommunications": "Soovin saada teavet DTD tulevaste ürituste kohta",
-      "addressBook": "Soovin olla DTD aadressraamatus, et saada kutseid sarnastele sündmustele",
+      "futureCommunications": "Soovin saada teavet sellel platvormil avaldatavate tulevaste ürituste kohta",
+      "addressBook": "Soovin olla ürituste aadressraamatus, et saada kutseid sarnastele sündmustele",
       "addressBookHelp": "Eraldi nõusolek (IKÜM art. 6.1.a). Saate selle igal ajal tagasi võtta lingiga \"Eemalda mu andmed aadressraamatust\" saadud e-kirjades. Nimi ja organisatsioon võetakse registreerimisprofiilist."
     },
     "export": {
@@ -2859,7 +2859,7 @@
       "sections": {
         "controller": {
           "title": "Vastutav töötleja",
-          "body": "Isikuandmeid töödeldakse Digitaalse Ümberkujundamise Osakonna institutsioonilise tegevuse raames, et toetada avalike veebiürituste tehnilist ja organisatsioonilist korraldamist."
+          "body": "Vastutav töötleja: {organization}. Isikuandmeid töödeldakse tema institutsioonilise tegevuse raames, et toetada avalike veebiürituste tehnilist ja organisatsioonilist korraldamist."
         },
         "data": {
           "title": "Töödeldavad andmed ja eesmärgid",
@@ -2867,11 +2867,11 @@
         },
         "retention": {
           "title": "Andmete säilitamine ja õigused",
-          "body": "Andmeid säilitatakse iga ürituse jaoks seadistatud perioodi jooksul ja seejärel kustutatakse automaatselt, välja arvatud juhul, kui kehtivad muud õiguslikud kohustused. Andmesubjektid saavad igal ajal kasutada oma GDPR-i õigusi, sealhulgas juurdepääsu, parandamise ja kustutamise õigust, osakonna institutsiooniliste kanalite kaudu."
+          "body": "Andmeid säilitatakse iga ürituse jaoks seadistatud perioodi jooksul ja seejärel kustutatakse automaatselt, välja arvatud juhul, kui kehtivad muud õiguslikud kohustused. Andmesubjektid saavad igal ajal kasutada oma GDPR-i õigusi, sealhulgas juurdepääsu, parandamise ja kustutamise õigust, vastutava töötleja institutsiooniliste kanalite kaudu."
         },
         "automatedProcessing": {
           "title": "Tehisintellekti loodud transkriptsioon, kokkuvõte ja dubleering",
-          "body": "Sündmuste puhul, mis seda taotlevad, töödeldakse salvestist pärast ülekande lõppu tehisintellekti ahelaga, mis töötab täielikult osakonna enda klastritaristul. See loob kõne transkriptsiooni (eri kõnelejad eristatud), üldarusaadava kokkuvõtte, võimalikud tõlked teistesse Euroopa keeltesse ja dubleeritud heliversiooni üldise sünteeshäälega. Kõik kasutatud mudelid (WhisperX transkriptsiooniks, Mistral-Small kokkuvõtteks ja tõlkeks, Piper TTS dubleerimiseks) töötavad klastri sees pühendatud GPU-del: osalejate andmeid ei saadeta kolmandate isikute teenustesse. Osalejate häält ei kloonita ega säilitata biomeetrilise andmena (isikuandmete kaitse üldmääruse art 9): dubleerimisel kasutatakse avalikke eelõpetatud sünteeshääli, mis omistatakse kõnelejatele suvaliselt. Iga salvestise puhul näitab sündmuse leht kasutatud mudelite täpset hetktõmmist („Tehisintellekti töötluse läbipaistvus“). Loodud sisu võib sisaldada ebatäpsusi: mõõduandev allikas on alati algne video (tehisintellekti määrus, art 50)."
+          "body": "Sündmuste puhul, mis seda taotlevad, töödeldakse salvestist pärast ülekande lõppu tehisintellekti ahelaga, mis töötab täielikult selle paigalduse klastritaristul. See loob kõne transkriptsiooni (eri kõnelejad eristatud), üldarusaadava kokkuvõtte, võimalikud tõlked teistesse Euroopa keeltesse ja dubleeritud heliversiooni üldise sünteeshäälega. Kõik kasutatud mudelid (WhisperX transkriptsiooniks, Mistral-Small kokkuvõtteks ja tõlkeks, Piper TTS dubleerimiseks) töötavad klastri sees pühendatud GPU-del: osalejate andmeid ei saadeta kolmandate isikute teenustesse. Osalejate häält ei kloonita ega säilitata biomeetrilise andmena (isikuandmete kaitse üldmääruse art 9): dubleerimisel kasutatakse avalikke eelõpetatud sünteeshääli, mis omistatakse kõnelejatele suvaliselt. Iga salvestise puhul näitab sündmuse leht kasutatud mudelite täpset hetktõmmist („Tehisintellekti töötluse läbipaistvus“). Loodud sisu võib sisaldada ebatäpsusi: mõõduandev allikas on alati algne video (tehisintellekti määrus, art 50)."
         }
       },
       "note": {
@@ -2883,7 +2883,7 @@
     "accessibility": {
       "metaTitle": "Juurdepääsetavuse deklaratsioon",
       "title": "Juurdepääsetavuse deklaratsioon",
-      "intro": "Digipöörde osakond on võtnud kohustuse muuta PA Webinar juurdepääsetavaks kooskõlas Itaalia seadusega 4/2004, ELi direktiiviga 2016/2102 ja AgID suunistega info- ja kommunikatsioonitehnoloogia vahendite juurdepääsetavuse kohta.",
+      "intro": "Vastutav asutus: {organization}. Asutus on võtnud kohustuse muuta see platvorm juurdepääsetavaks kooskõlas Itaalia seadusega 4/2004, ELi direktiiviga 2016/2102 ja AgID suunistega info- ja kommunikatsioonitehnoloogia vahendite juurdepääsetavuse kohta.",
       "sections": {
         "conformance": {
           "title": "Vastavuse seisund",
@@ -2922,7 +2922,7 @@
       "sections": {
         "ownership": {
           "title": "Teenuse omandiõigus",
-          "body": "Platvormi edendab Digitaalse Ümberkujundamise Osakond ning see on kättesaadav institutsioonilise tähtsusega avalike veebiürituste korraldamiseks ja nendel osalemiseks."
+          "body": "Platvormi omanik: {organization}. Platvorm on kättesaadav institutsioonilise tähtsusega avalike veebiürituste korraldamiseks ja nendel osalemiseks."
         },
         "usage": {
           "title": "Teenuse kasutamine",
@@ -2930,7 +2930,7 @@
         },
         "liability": {
           "title": "Vastutuse piirangud",
-          "body": "Ehkki rakendatakse asjakohaseid tehnilisi ja organisatsioonilisi meetmeid, ei saa osakond garanteerida katkestuste või tõrgete täielikku puudumist ettenägematute asjaolude, hooldustööde või väliste tegurite tõttu. Seadusest tulenevad vastutused kehtivad vastavalt kohaldatavale õigusele."
+          "body": "Ehkki rakendatakse asjakohaseid tehnilisi ja organisatsioonilisi meetmeid, ei saa platvormi omanik garanteerida katkestuste või tõrgete täielikku puudumist ettenägematute asjaolude, hooldustööde või väliste tegurite tõttu. Seadusest tulenevad vastutused kehtivad vastavalt kohaldatavale õigusele."
         }
       }
     },
@@ -3029,7 +3029,8 @@
         },
         "note": "Komponentide ja teenuste täielik loend koos versioonide, räsidega ja tehniliste omadustega on saadaval ülaltoodud sektsioonides ja allalaaditavas JSON-failis."
       }
-    }
+    },
+    "organizationNotConfigured": "asutus pole seadetes veel määratud"
   },
   "status": {
     "title": "Süsteemi olek",
@@ -3735,8 +3736,8 @@
   },
   "rubrica": {
     "optOut": {
-      "title": "Eemaldamine DTD aadressraamatust",
-      "intro": "Olete tühistamas oma nõusolekut olla DTD aadressraamatus. Pärast kinnitust ei võta me teiega enam ühendust sarnastele sündmustele kutsumiseks.",
+      "title": "Eemaldamine ürituste aadressraamatust",
+      "intro": "Olete tühistamas oma nõusolekut olla ürituste aadressraamatus. Pärast kinnitust ei võta me teiega enam ühendust sarnastele sündmustele kutsumiseks.",
       "missingToken": "Link pole kehtiv või on puudulik. Kontrollige originaal-e-kirja.",
       "invalidToken": "Link on aegunud või kehtetu. Abi saamiseks võtke ühendust sündmuse kontaktisikuga.",
       "notFound": "Lingile ei vasta ükski isik. Võimalik, et nad on juba eemaldatud.",
@@ -3746,7 +3747,7 @@
       "confirm": "Kinnita eemaldamine",
       "submitting": "Eemaldamine käib…",
       "successTitle": "Eemaldamine valmis",
-      "successBody": "Teie andmed ei ole enam DTD aadressraamatus.",
+      "successBody": "Teie andmed ei ole enam ürituste aadressraamatus.",
       "errors": {
         "generic": "Tekkis viga. Palun proovige hiljem uuesti."
       }

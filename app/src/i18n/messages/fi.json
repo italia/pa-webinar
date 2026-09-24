@@ -12,8 +12,8 @@
     "noReactions": "Kerro mielipiteesi"
   },
   "common": {
-    "appName": "DTD Tapahtumat",
-    "appDescription": "Digitaalisen muutoksen osaston julkisten digitaalisten tapahtumien alusta",
+    "appName": "PA Webinar",
+    "appDescription": "Julkisten digitaalisten tapahtumien alusta",
     "loading": "Ladataan...",
     "error": "Tapahtui virhe",
     "errorMessage": "Jokin meni pieleen. Yritä uudelleen.",
@@ -1217,7 +1217,7 @@
       "autoStartRecording": "Aloita tallennus automaattisesti",
       "autoStartRecordingDesc": "Tapahtuman alkaessa tallennus käynnistyy itsestään (moderaattorilta ei pyydetä vahvistusta). Näin myöhässä tulijat löytävät catch-up-toistimen heti käytettävissä.",
       "aiSectionHeading": "Automaattinen jälkituotanto",
-      "aiSectionDesc": "Tapahtuman päätyttyä tallenne voidaan käsitellä klusterissa toimivalla tekoälyputkella, joka tuottaa litteroinnin, yhteenvedon sekä pyydettäessä käännökset ja dubbauksen. Kaikki tapahtuu osaston omassa infrastruktuurissa, eikä tietoja siirry kolmansille osapuolille.",
+      "aiSectionDesc": "Tapahtuman päätyttyä tallenne voidaan käsitellä klusterissa toimivalla tekoälyputkella, joka tuottaa litteroinnin, yhteenvedon sekä pyydettäessä käännökset ja dubbauksen. Kaikki tapahtuu tämän asennuksen infrastruktuurissa, eikä tietoja siirry kolmansille osapuolille.",
       "aiTranscriptEnabled": "Automaattinen litterointi",
       "aiTranscriptEnabledDesc": "Puheentunnistus ja puhujien tunnistus. Vaaditaan, jotta yhteenveto, käännökset ja dubbaus voidaan ottaa käyttöön.",
       "aiSummaryEnabled": "Yhteenveto ja luvut",
@@ -1486,7 +1486,7 @@
         "siteNameHelp": "Näytetään otsikossa, selaimen välilehdessä ja sähköposteissa",
         "siteDescription": "Sovelluksen kuvaus",
         "organizationName": "Organisaation nimi",
-        "organizationNameHelp": "esim. Digitaalisen muutoksen osasto",
+        "organizationNameHelp": "Alustan omistavan organisaation nimi: näkyy ylätunnisteessa, alatunnisteessa ja oikeudellisissa teksteissä (esim. Esimerkkikaupunki)",
         "organizationNameShort": "Organisaation lyhenne",
         "organizationUrl": "Organisaation URL",
         "parentOrganization": "Yläorganisaatio",
@@ -1805,7 +1805,7 @@
         "newTitle": "Uusi GDPR-malli",
         "editTitle": "Muokkaa GDPR-mallia",
         "name": "Sisäinen nimi",
-        "namePlaceholder": "esim. DTD:n vakiotietosuojaseloste",
+        "namePlaceholder": "esim. Vakiotietosuojaseloste",
         "description": "Kuvaus (valinnainen)",
         "descriptionPlaceholder": "Lyhyitä muistiinpanoja mallin tunnistamiseksi",
         "bodyIt": "Tietosuojateksti (italia)",
@@ -2636,7 +2636,7 @@
     "projectTeaser": {
       "kicker": "Projekti",
       "title": "Avoin lähdekoodi ja suvereeni, julkishallinnon tekemä julkishallinnolle",
-      "body": "PA Webinar on Digitaalisen muutoksen osaston alusta julkisia digitaalisia tapahtumia varten: .italia-suunnittelujärjestelmä, Jitsi Meet -videomoottori ja täysin in-cluster AI-putki. Se julkaistaan avoimena lähdekoodina, jotta mikä tahansa hallinto voi käyttää sitä uudelleen.",
+      "body": "PA Webinar on avoimen lähdekoodin alusta julkisia digitaalisia tapahtumia varten. Sen on kehittänyt Italian digitaalisen muutoksen osasto, ja se on julkaistu, jotta mikä tahansa hallinto voi käyttää sitä uudelleen: .italia-suunnittelujärjestelmä, Jitsi Meet -videomoottori ja täysin in-cluster AI-putki.",
       "sovereignty": {
         "title": "Datan suvereniteetti",
         "desc": "Self-hosted hallinnon infrastruktuurissa: data ei poistu koskaan eikä CLOUD Act -altistumista ole."
@@ -2795,8 +2795,8 @@
       "recordingRequired": "Suostumus tallennukseen on pakollinen tähän tapahtumaan osallistumiseksi",
       "multitrack": "Suostun siihen, että ääneni tallennetaan erilliselle ääniraidalle yksinomaan siksi, että litterointi kohdistetaan oikein kullekin puhujalle. Raita on väliaikainen ja poistetaan litteroinnin jälkeen; sitä ei käytetä ääneni tunnistamiseen tai toistamiseen.",
       "multitrackRequired": "Suostumus ääniraitasi tallentamiseen on pakollinen tähän tapahtumaan osallistumiseksi",
-      "futureCommunications": "Haluan saada tietoa DTD:n järjestämistä tulevista tapahtumista",
-      "addressBook": "Haluan, että minut lisätään DTD:n osoitekirjaan, jotta minut voidaan kutsua vastaaviin tapahtumiin",
+      "futureCommunications": "Haluan saada tietoa tällä alustalla julkaistavista tulevista tapahtumista",
+      "addressBook": "Haluan, että minut lisätään tapahtumien osoitekirjaan, jotta minut voidaan kutsua vastaaviin tapahtumiin",
       "addressBookHelp": "Erillinen suostumus (GDPR art. 6.1.a). Voit peruuttaa sen milloin tahansa saamissasi sähköposteissa olevasta linkistä \"Poista tietoni osoitekirjasta\". Nimi ja organisaatio otetaan ilmoittautumisprofiilista."
     },
     "export": {
@@ -2859,7 +2859,7 @@
       "sections": {
         "controller": {
           "title": "Rekisterinpitäjä",
-          "body": "Henkilötietoja käsitellään Digitaalisen muutoksen osaston institutionaalisen toiminnan puitteissa julkisten verkkotapahtumien teknisen ja organisatorisen hallinnan tukemiseksi."
+          "body": "Rekisterinpitäjä: {organization}. Henkilötietoja käsitellään sen institutionaalisen toiminnan puitteissa julkisten verkkotapahtumien teknisen ja organisatorisen hallinnan tukemiseksi."
         },
         "data": {
           "title": "Käsiteltävät tiedot ja tarkoitukset",
@@ -2867,11 +2867,11 @@
         },
         "retention": {
           "title": "Säilytys ja oikeudet",
-          "body": "Tietoja säilytetään kullekin tapahtumalle määritetyn ajan ja poistetaan sen jälkeen automaattisesti, ellei lainsäädäntö edellytä toisin. Rekisteröidyt voivat käyttää GDPR-oikeuksiaan milloin tahansa, mukaan lukien pääsy tietoihin, oikaisu ja poisto, osaston institutionaalisten kanavien kautta."
+          "body": "Tietoja säilytetään kullekin tapahtumalle määritetyn ajan ja poistetaan sen jälkeen automaattisesti, ellei lainsäädäntö edellytä toisin. Rekisteröidyt voivat käyttää GDPR-oikeuksiaan milloin tahansa, mukaan lukien pääsy tietoihin, oikaisu ja poisto, rekisterinpitäjän institutionaalisten kanavien kautta."
         },
         "automatedProcessing": {
           "title": "Tekoälyn tuottama litterointi, tiivistelmä ja dubbaus",
-          "body": "Tapahtumissa, jotka sitä pyytävät, tallenne käsitellään lähetyksen päätyttyä tekoälyketjulla, joka suoritetaan kokonaan osaston omassa klusteri-infrastruktuurissa. Se tuottaa puheen litteroinnin (eri puhujat erotellen), yleistajuisen tiivistelmän, mahdolliset käännökset muille eurooppalaisille kielille sekä dubatun ääniversion yleisluontoisella synteettisellä äänellä. Kaikki käytetyt mallit (WhisperX litterointiin, Mistral-Small tiivistelmään ja käännökseen, Piper TTS dubbaukseen) suoritetaan klusterin sisäisillä omilla GPU:illa: osallistujien tietoja ei lähetetä kolmansien osapuolten palveluihin. Osallistujien ääntä ei kloonata eikä säilytetä biometrisenä tietona (yleisen tietosuoja-asetuksen 9 artikla): dubbauksessa käytetään julkisia esikoulutettuja synteettisiä ääniä, jotka annetaan puhujille mielivaltaisesti. Jokaisen tallenteen kohdalla tapahtuman sivu näyttää käytettyjen mallien tarkan tilannekuvan (”Tekoälykäsittelyn läpinäkyvyys”). Tuotettu sisältö voi sisältää epätarkkuuksia: ratkaiseva lähde on aina alkuperäinen video (tekoälyasetus, 50 artikla)."
+          "body": "Tapahtumissa, jotka sitä pyytävät, tallenne käsitellään lähetyksen päätyttyä tekoälyketjulla, joka suoritetaan kokonaan tämän asennuksen klusteri-infrastruktuurissa. Se tuottaa puheen litteroinnin (eri puhujat erotellen), yleistajuisen tiivistelmän, mahdolliset käännökset muille eurooppalaisille kielille sekä dubatun ääniversion yleisluontoisella synteettisellä äänellä. Kaikki käytetyt mallit (WhisperX litterointiin, Mistral-Small tiivistelmään ja käännökseen, Piper TTS dubbaukseen) suoritetaan klusterin sisäisillä omilla GPU:illa: osallistujien tietoja ei lähetetä kolmansien osapuolten palveluihin. Osallistujien ääntä ei kloonata eikä säilytetä biometrisenä tietona (yleisen tietosuoja-asetuksen 9 artikla): dubbauksessa käytetään julkisia esikoulutettuja synteettisiä ääniä, jotka annetaan puhujille mielivaltaisesti. Jokaisen tallenteen kohdalla tapahtuman sivu näyttää käytettyjen mallien tarkan tilannekuvan (”Tekoälykäsittelyn läpinäkyvyys”). Tuotettu sisältö voi sisältää epätarkkuuksia: ratkaiseva lähde on aina alkuperäinen video (tekoälyasetus, 50 artikla)."
         }
       },
       "note": {
@@ -2883,7 +2883,7 @@
     "accessibility": {
       "metaTitle": "Saavutettavuusseloste",
       "title": "Saavutettavuusseloste",
-      "intro": "Digitalisaatio-osasto sitoutuu tekemään PA Webinarista saavutettavan Italian lain 4/2004, EU-direktiivin 2016/2102 sekä AgID:n tieto- ja viestintätekniikan välineiden saavutettavuutta koskevien ohjeiden mukaisesti.",
+      "intro": "Vastuullinen organisaatio: {organization}. Organisaatio sitoutuu tekemään tästä alustasta saavutettavan Italian lain 4/2004, EU-direktiivin 2016/2102 sekä AgID:n tieto- ja viestintätekniikan välineiden saavutettavuutta koskevien ohjeiden mukaisesti.",
       "sections": {
         "conformance": {
           "title": "Vaatimustenmukaisuuden tila",
@@ -2922,7 +2922,7 @@
       "sections": {
         "ownership": {
           "title": "Palvelun omistajuus",
-          "body": "Alustaa ylläpitää Digitaalisen muutoksen osasto, ja se on käytettävissä institutionaalisten julkisten verkkotapahtumien järjestämiseen ja niihin osallistumiseen."
+          "body": "Alustan omistaja: {organization}. Alusta on käytettävissä institutionaalisten julkisten verkkotapahtumien järjestämiseen ja niihin osallistumiseen."
         },
         "usage": {
           "title": "Palvelun käyttö",
@@ -2930,7 +2930,7 @@
         },
         "liability": {
           "title": "Vastuunrajoitus",
-          "body": "Asianmukaisista teknisistä ja organisatorisista toimenpiteistä huolimatta osasto ei voi taata, ettei ennakoimattomista tapahtumista, huoltotoimista tai ulkoisista tekijöistä johtuvia keskeytyksiä tai häiriöitä esiinny. Oikeudellinen vastuu määräytyy sovellettavan lainsäädännön mukaisesti."
+          "body": "Asianmukaisista teknisistä ja organisatorisista toimenpiteistä huolimatta alustan omistaja ei voi taata, ettei ennakoimattomista tapahtumista, huoltotoimista tai ulkoisista tekijöistä johtuvia keskeytyksiä tai häiriöitä esiinny. Oikeudellinen vastuu määräytyy sovellettavan lainsäädännön mukaisesti."
         }
       }
     },
@@ -3029,7 +3029,8 @@
         },
         "note": "Täydellinen luettelo komponenteista ja palveluista versioineen, hash-tunnisteineen ja teknisine ominaisuuksineen on saatavilla yllä olevissa osioissa ja ladattavassa JSON-tiedostossa."
       }
-    }
+    },
+    "organizationNotConfigured": "organisaatiota ei ole vielä määritetty asetuksissa"
   },
   "status": {
     "title": "Järjestelmän tila",
@@ -3735,8 +3736,8 @@
   },
   "rubrica": {
     "optOut": {
-      "title": "Poisto DTD:n osoitekirjasta",
-      "intro": "Olet peruuttamassa suostumuksesi DTD:n osoitekirjaan listaamiseen. Vahvistuksen jälkeen sinuun ei oteta enää yhteyttä vastaaviin tapahtumiin kutsumiseksi.",
+      "title": "Poisto tapahtumien osoitekirjasta",
+      "intro": "Olet peruuttamassa suostumuksesi tapahtumien osoitekirjaan listaamiseen. Vahvistuksen jälkeen sinuun ei oteta enää yhteyttä vastaaviin tapahtumiin kutsumiseksi.",
       "missingToken": "Linkki ei ole kelvollinen tai se on vajaa. Tarkista alkuperäinen sähköposti.",
       "invalidToken": "Linkki on vanhentunut tai virheellinen. Pyydä apua tapahtuman yhteyshenkilöltä.",
       "notFound": "Linkki ei vastaa ketään henkilöä. Hänet on saatettu jo poistaa.",
@@ -3746,7 +3747,7 @@
       "confirm": "Vahvista poisto",
       "submitting": "Poistetaan…",
       "successTitle": "Poisto valmis",
-      "successBody": "Tietojasi ei ole enää DTD:n osoitekirjassa.",
+      "successBody": "Tietojasi ei ole enää tapahtumien osoitekirjassa.",
       "errors": {
         "generic": "Tapahtui virhe. Yritä myöhemmin uudelleen."
       }

@@ -26,3 +26,13 @@ export function invalidateSettingsCache(): void {
   cachedSettings = null;
   cacheExpiry = 0;
 }
+
+/**
+ * Il nome dell'ente titolare, per i testi legali integrati; `null` se non e'
+ * configurato. Non ricade sul nome del sito: un testo legale che indica il
+ * software come titolare sembra plausibile ed e' falso, meglio che dichiari
+ * il dato mancante.
+ */
+export function nomeEnte(settings: Pick<SiteSetting, 'organizationName'>): string | null {
+  return settings.organizationName.trim() || null;
+}

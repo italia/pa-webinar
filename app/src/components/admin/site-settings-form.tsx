@@ -1462,8 +1462,8 @@ function FeaturesTab({ settings, updateField }: TabProps) {
 // ─── Scaling tab ────────────────────────────────────────────
 //
 // Per-cluster JVB/Jibri sizing knobs. Defaults are calibrated for
-// Azure F16s_v2 (16 vCPU / 32 GiB) which is what the DTD test and
-// prod environments use. Any PA reusing the platform tweaks these
+// Azure F16s_v2 (16 vCPU / 32 GiB), the node size of the reference
+// deployment. Any PA reusing the platform tweaks these
 // here instead of forking the scaler code.
 
 function ScalingTab({ settings, updateField }: TabProps) {

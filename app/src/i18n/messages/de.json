@@ -12,8 +12,8 @@
     "noReactions": "Sagen Sie uns Ihre Meinung"
   },
   "common": {
-    "appName": "DTD Veranstaltungen",
-    "appDescription": "Plattform für öffentliche digitale Veranstaltungen des Departements für digitale Transformation",
+    "appName": "PA Webinar",
+    "appDescription": "Plattform für öffentliche digitale Veranstaltungen",
     "loading": "Wird geladen...",
     "error": "Ein Fehler ist aufgetreten",
     "errorMessage": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut.",
@@ -1217,7 +1217,7 @@
       "autoStartRecording": "Aufzeichnung automatisch starten",
       "autoStartRecordingDesc": "Beim Eventstart beginnt die Aufzeichnung automatisch (ohne Rückfrage an die Moderation). Spät Hinzukommende finden so sofort einen Player vor.",
       "aiSectionHeading": "Automatische Nachbearbeitung",
-      "aiSectionDesc": "Nach dem Ende der Veranstaltung kann die Aufzeichnung von einer KI-Pipeline im Cluster verarbeitet werden, um Transkript, Zusammenfassung und — auf Wunsch — Übersetzungen und Synchronisation zu erzeugen. Alles läuft auf der Infrastruktur der Behörde, es gelangen keine Daten an Dritte.",
+      "aiSectionDesc": "Nach dem Ende der Veranstaltung kann die Aufzeichnung von einer KI-Pipeline im Cluster verarbeitet werden, um Transkript, Zusammenfassung und — auf Wunsch — Übersetzungen und Synchronisation zu erzeugen. Alles läuft auf der Infrastruktur dieser Installation, es gelangen keine Daten an Dritte.",
       "aiTranscriptEnabled": "Automatische Transkription",
       "aiTranscriptEnabledDesc": "Spracherkennung mit Sprecheridentifikation. Erforderlich, um Zusammenfassung, Übersetzungen und Synchronisation zu aktivieren.",
       "aiSummaryEnabled": "Zusammenfassung und Kapitel",
@@ -1486,7 +1486,7 @@
         "siteNameHelp": "Wird im Header, im Browsertitel und in E-Mails angezeigt",
         "siteDescription": "Anwendungsbeschreibung",
         "organizationName": "Name der Organisation",
-        "organizationNameHelp": "z. B. Departement für digitale Transformation",
+        "organizationNameHelp": "Name der Stelle, die Inhaberin der Plattform ist: erscheint in Kopfzeile, Fußzeile und rechtlichen Texten (z. B. Stadt Musterstadt)",
         "organizationNameShort": "Abkürzung der Organisation",
         "organizationUrl": "URL der Organisation",
         "parentOrganization": "Übergeordnete Organisation",
@@ -1805,7 +1805,7 @@
         "newTitle": "Neue GDPR-Vorlage",
         "editTitle": "GDPR-Vorlage bearbeiten",
         "name": "Interner Name",
-        "namePlaceholder": "z. B. DTD-Standard-Datenschutzhinweis",
+        "namePlaceholder": "z. B. Standard-Datenschutzhinweis",
         "description": "Beschreibung (optional)",
         "descriptionPlaceholder": "Kurze Notizen zur Erkennung der Vorlage",
         "bodyIt": "Datenschutztext (italienisch)",
@@ -2636,7 +2636,7 @@
     "projectTeaser": {
       "kicker": "Das Projekt",
       "title": "Open Source und souverän, von der Verwaltung für die Verwaltung entwickelt",
-      "body": "PA Webinar ist die Plattform des Ministeriums für digitale Transformation für öffentliche digitale Veranstaltungen: das Designsystem .italia, die Video-Engine Jitsi Meet und eine vollständig in-cluster AI-Pipeline. Sie wird als Open Source veröffentlicht, damit jede Verwaltung sie wiederverwenden kann.",
+      "body": "PA Webinar ist eine Open-Source-Plattform für öffentliche digitale Veranstaltungen, entwickelt vom italienischen Departement für digitale Transformation und veröffentlicht, damit jede Verwaltung sie wiederverwenden kann: das Designsystem .italia, die Video-Engine Jitsi Meet und eine vollständig in-cluster AI-Pipeline.",
       "sovereignty": {
         "title": "Datensouveränität",
         "desc": "Self-hosted auf der Infrastruktur der Verwaltung: Die Daten verlassen sie nie und es besteht keine Exposition gegenüber dem CLOUD Act."
@@ -2795,8 +2795,8 @@
       "recordingRequired": "Die Einwilligung zur Aufzeichnung ist für die Teilnahme an dieser Veranstaltung erforderlich",
       "multitrack": "Ich willige in die Aufzeichnung einer separaten Tonspur meiner Stimme ein, allein zu dem Zweck, das Transkript den Sprechenden korrekt zuzuordnen. Die Spur ist temporär und wird nach der Transkription gelöscht; sie wird nicht verwendet, um meine Stimme zu identifizieren oder wiederzugeben.",
       "multitrackRequired": "Die Einwilligung in die Aufzeichnung Ihrer Tonspur ist für die Teilnahme an dieser Veranstaltung erforderlich",
-      "futureCommunications": "Ich möchte Informationen über zukünftige Veranstaltungen des DTD erhalten",
-      "addressBook": "Ich möchte ins DTD-Adressbuch aufgenommen werden, um zu ähnlichen Veranstaltungen eingeladen zu werden",
+      "futureCommunications": "Ich möchte Informationen über kommende Veranstaltungen erhalten, die auf dieser Plattform veröffentlicht werden",
+      "addressBook": "Ich möchte ins Veranstaltungs-Adressbuch aufgenommen werden, um zu ähnlichen Veranstaltungen eingeladen zu werden",
       "addressBookHelp": "Separate Einwilligung (Art. 6.1.a GDPR). Sie können sie jederzeit über den Link \"Meine Daten aus dem Adressbuch entfernen\" in den E-Mails widerrufen. Name und Organisation werden aus dem Anmeldeprofil übernommen."
     },
     "export": {
@@ -2859,7 +2859,7 @@
       "sections": {
         "controller": {
           "title": "Verantwortlicher für die Datenverarbeitung",
-          "body": "Die Verarbeitung personenbezogener Daten erfolgt im Rahmen der institutionellen Tätigkeiten des Departements für digitale Transformation zur technischen und organisatorischen Verwaltung öffentlicher Online-Veranstaltungen."
+          "body": "Verantwortlicher für die Datenverarbeitung: {organization}. Die Verarbeitung personenbezogener Daten erfolgt im Rahmen seiner institutionellen Tätigkeiten zur technischen und organisatorischen Verwaltung öffentlicher Online-Veranstaltungen."
         },
         "data": {
           "title": "Verarbeitete Daten und Zwecke",
@@ -2867,11 +2867,11 @@
         },
         "retention": {
           "title": "Speicherung und Rechte",
-          "body": "Die Daten werden für den für jede Veranstaltung konfigurierten Zeitraum aufbewahrt und anschließend automatisch gelöscht, sofern keine anderen gesetzlichen Verpflichtungen bestehen. Betroffene können ihre GDPR-Rechte jederzeit ausüben, einschließlich Auskunft, Berichtigung und Löschung, über die institutionellen Kanäle des Departements."
+          "body": "Die Daten werden für den für jede Veranstaltung konfigurierten Zeitraum aufbewahrt und anschließend automatisch gelöscht, sofern keine anderen gesetzlichen Verpflichtungen bestehen. Betroffene können ihre GDPR-Rechte jederzeit ausüben, einschließlich Auskunft, Berichtigung und Löschung, über die institutionellen Kanäle des Verantwortlichen."
         },
         "automatedProcessing": {
           "title": "Von künstlicher Intelligenz erzeugte Transkription, Zusammenfassung und Synchronisation",
-          "body": "Bei Veranstaltungen, die dies anfordern, wird die Aufzeichnung nach Ende der Live-Übertragung von einer KI-Pipeline verarbeitet, die vollständig auf der Cluster-Infrastruktur des Departments läuft. Die Pipeline erzeugt die Transkription des Gesprochenen (mit Trennung der einzelnen Sprechenden), eine allgemeinverständliche Zusammenfassung, gegebenenfalls Übersetzungen in andere europäische Sprachen und eine synchronisierte Tonfassung mit einer generischen synthetischen Stimme. Alle verwendeten Modelle (WhisperX für die Transkription, Mistral-Small für Zusammenfassung und Übersetzung, Piper TTS für die Synchronisation) laufen auf eigenen GPUs innerhalb des Clusters: Es werden keine Teilnehmerdaten an Dritte übermittelt. Die Stimme der Teilnehmenden wird nicht geklont und nicht als biometrisches Datum gespeichert (Art. 9 DSGVO): Die Synchronisation verwendet öffentlich vortrainierte synthetische Stimmen, die den Sprechenden willkürlich zugewiesen werden. Für jede Aufzeichnung kann die genaue Momentaufnahme der verwendeten Modelle auf der Veranstaltungsseite eingesehen werden („Transparenz der KI-Verarbeitung“). Die erzeugten Inhalte können Ungenauigkeiten enthalten: Maßgeblich bleibt stets das Originalvideo (KI-Verordnung, Art. 50)."
+          "body": "Bei Veranstaltungen, die dies anfordern, wird die Aufzeichnung nach Ende der Live-Übertragung von einer KI-Pipeline verarbeitet, die vollständig auf der Cluster-Infrastruktur dieser Installation läuft. Die Pipeline erzeugt die Transkription des Gesprochenen (mit Trennung der einzelnen Sprechenden), eine allgemeinverständliche Zusammenfassung, gegebenenfalls Übersetzungen in andere europäische Sprachen und eine synchronisierte Tonfassung mit einer generischen synthetischen Stimme. Alle verwendeten Modelle (WhisperX für die Transkription, Mistral-Small für Zusammenfassung und Übersetzung, Piper TTS für die Synchronisation) laufen auf eigenen GPUs innerhalb des Clusters: Es werden keine Teilnehmerdaten an Dritte übermittelt. Die Stimme der Teilnehmenden wird nicht geklont und nicht als biometrisches Datum gespeichert (Art. 9 DSGVO): Die Synchronisation verwendet öffentlich vortrainierte synthetische Stimmen, die den Sprechenden willkürlich zugewiesen werden. Für jede Aufzeichnung kann die genaue Momentaufnahme der verwendeten Modelle auf der Veranstaltungsseite eingesehen werden („Transparenz der KI-Verarbeitung“). Die erzeugten Inhalte können Ungenauigkeiten enthalten: Maßgeblich bleibt stets das Originalvideo (KI-Verordnung, Art. 50)."
         }
       },
       "note": {
@@ -2883,7 +2883,7 @@
     "accessibility": {
       "metaTitle": "Erklärung zur Barrierefreiheit",
       "title": "Erklärung zur Barrierefreiheit",
-      "intro": "Das Ministerium für digitale Transformation verpflichtet sich, PA Webinar in Übereinstimmung mit dem italienischen Gesetz 4/2004, der EU-Richtlinie 2016/2102 und den Leitlinien der AgID zur Barrierefreiheit von IKT-Werkzeugen barrierefrei zu gestalten.",
+      "intro": "Verantwortliche Stelle: {organization}. Die Stelle verpflichtet sich, diese Plattform in Übereinstimmung mit dem italienischen Gesetz 4/2004, der EU-Richtlinie 2016/2102 und den Leitlinien der AgID zur Barrierefreiheit von IKT-Werkzeugen barrierefrei zu gestalten.",
       "sections": {
         "conformance": {
           "title": "Stand der Vereinbarkeit",
@@ -2922,7 +2922,7 @@
       "sections": {
         "ownership": {
           "title": "Diensteigentum",
-          "body": "Die Plattform wird vom Departement für digitale Transformation gefördert und für die Organisation und Teilnahme an öffentlichen Online-Veranstaltungen von institutionellem Interesse bereitgestellt."
+          "body": "Inhaber der Plattform: {organization}. Die Plattform wird für die Organisation und Teilnahme an öffentlichen Online-Veranstaltungen von institutionellem Interesse bereitgestellt."
         },
         "usage": {
           "title": "Nutzung des Dienstes",
@@ -2930,7 +2930,7 @@
         },
         "liability": {
           "title": "Haftungsbeschränkung",
-          "body": "Obwohl angemessene technische und organisatorische Maßnahmen getroffen werden, kann das Departement das vollständige Ausbleiben von Unterbrechungen oder Störungen durch unvorhersehbare Ereignisse, Wartungsarbeiten oder externe Faktoren nicht garantieren. Die gesetzlichen Haftungsregelungen bleiben davon unberührt."
+          "body": "Obwohl angemessene technische und organisatorische Maßnahmen getroffen werden, kann der Inhaber der Plattform das vollständige Ausbleiben von Unterbrechungen oder Störungen durch unvorhersehbare Ereignisse, Wartungsarbeiten oder externe Faktoren nicht garantieren. Die gesetzlichen Haftungsregelungen bleiben davon unberührt."
         }
       }
     },
@@ -3029,7 +3029,8 @@
         },
         "note": "Die vollständige Liste der Komponenten und Dienste mit Versionen, Hashes und technischen Eigenschaften finden Sie in den Abschnitten oben und in der herunterladbaren JSON-Datei."
       }
-    }
+    },
+    "organizationNotConfigured": "Organisation in den Einstellungen noch nicht angegeben"
   },
   "status": {
     "title": "Systemstatus",
@@ -3735,8 +3736,8 @@
   },
   "rubrica": {
     "optOut": {
-      "title": "Aus dem DTD-Adressbuch entfernen",
-      "intro": "Sie sind dabei, Ihre Einwilligung zur Aufnahme in das DTD-Adressbuch zu widerrufen. Nach Bestätigung werden Sie nicht mehr zu ähnlichen Veranstaltungen eingeladen.",
+      "title": "Aus dem Veranstaltungs-Adressbuch entfernen",
+      "intro": "Sie sind dabei, Ihre Einwilligung zur Aufnahme in das Veranstaltungs-Adressbuch zu widerrufen. Nach Bestätigung werden Sie nicht mehr zu ähnlichen Veranstaltungen eingeladen.",
       "missingToken": "Der Link ist ungültig oder unvollständig. Bitte prüfen Sie die ursprüngliche E-Mail.",
       "invalidToken": "Der Link ist abgelaufen oder ungültig. Bitte wenden Sie sich an die Eventverantwortlichen.",
       "notFound": "Keine Person zu diesem Link gefunden — sie wurde möglicherweise bereits entfernt.",
@@ -3746,7 +3747,7 @@
       "confirm": "Entfernung bestätigen",
       "submitting": "Wird entfernt…",
       "successTitle": "Entfernung abgeschlossen",
-      "successBody": "Ihre Daten sind nicht mehr im DTD-Adressbuch enthalten.",
+      "successBody": "Ihre Daten sind nicht mehr im Veranstaltungs-Adressbuch enthalten.",
       "errors": {
         "generic": "Es ist ein Fehler aufgetreten. Bitte später erneut versuchen."
       }
