@@ -8,7 +8,7 @@
  * Mutations use optimistic updates with rollback on error so the UI
  * stays responsive on slow connections.
  *
- * Note on icons: per project memory, design-react-kit's <Icon> can
+ * Note on icons: design-react-kit's <Icon> can
  * cause hydration mismatches inside list items that rerender on every
  * mutation — so this component uses inline SVG / emoji fallbacks.
  */

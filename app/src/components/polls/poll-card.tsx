@@ -1,7 +1,9 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { Button, Badge, Icon } from 'design-react-kit';
+import { Button, Badge } from 'design-react-kit';
+
+import { Icon } from '@/components/ui/icon';
 
 interface PollData {
   id: string;

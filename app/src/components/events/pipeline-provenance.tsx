@@ -20,8 +20,8 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Icon } from 'design-react-kit';
 
+import { Icon } from '@/components/ui/icon';
 import { speakerColor } from '@/lib/utils/speaker-palette';
 import { localeDisplayName } from '@/lib/utils/locale-display';
 

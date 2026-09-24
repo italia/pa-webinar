@@ -4,8 +4,9 @@ import { useState, useEffect, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import useSWR from 'swr';
 
+import { Icon } from '@/components/ui/icon';
 import { useLivePush } from '@/hooks/use-live-state';
-import { Button, Icon, Badge, Input } from 'design-react-kit';
+import { Button, Badge, Input } from 'design-react-kit';
 
 interface WordCloudProps {
   eventSlug: string;

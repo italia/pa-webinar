@@ -10,13 +10,13 @@ import {
   CardBody,
   Col,
   FormGroup,
-  Icon,
   Input,
   Label,
   Row,
   Spinner,
 } from 'design-react-kit';
 import type { SiteSetting } from '@prisma/client';
+import { Icon } from '@/components/ui/icon';
 import ToggleSwitch from '@/components/ui/toggle-switch';
 import FileOrUrlInput from '@/components/ui/file-or-url-input';
 import { videoQualityMaxHeight } from '@/lib/jitsi/config';

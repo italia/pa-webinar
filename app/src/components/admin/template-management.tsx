@@ -6,7 +6,6 @@ import {
   Button,
   Card,
   CardBody,
-  Icon,
   Input,
   TextArea,
   FormGroup,
@@ -16,6 +15,7 @@ import {
   Badge,
 } from 'design-react-kit';
 
+import { Icon } from '@/components/ui/icon';
 import ToggleSwitch from '@/components/ui/toggle-switch';
 import { useConfirm } from '@/components/ui/confirm-dialog';
 

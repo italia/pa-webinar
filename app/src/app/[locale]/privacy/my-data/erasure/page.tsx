@@ -9,9 +9,10 @@ import {
   Card,
   CardBody,
   FormGroup,
-  Icon,
   Input,
 } from 'design-react-kit';
+
+import { Icon } from '@/components/ui/icon';
 
 type Phase = 'idle' | 'submitting' | 'requestSent' | 'confirmed' | 'error';
 

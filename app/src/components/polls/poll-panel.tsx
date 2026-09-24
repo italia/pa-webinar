@@ -2,8 +2,9 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
-import { Button, Icon } from 'design-react-kit';
+import { Button } from 'design-react-kit';
 import useSWR from 'swr';
+import { Icon } from '@/components/ui/icon';
 import { useLivePush } from '@/hooks/use-live-state';
 
 import PollCard from './poll-card';

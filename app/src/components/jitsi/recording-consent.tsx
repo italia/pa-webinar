@@ -1,7 +1,9 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { Button, Alert, Icon } from 'design-react-kit';
+import { Button, Alert } from 'design-react-kit';
+
+import { Icon } from '@/components/ui/icon';
 
 interface RecordingConsentProps {
   onAccept: () => void;

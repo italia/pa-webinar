@@ -13,8 +13,8 @@
 
 import { useTranslations } from 'next-intl';
 import type { RefObject } from 'react';
-import { Icon } from 'design-react-kit';
 
+import { Icon } from '@/components/ui/icon';
 import type { VideoPlayerHandle } from '@/components/events/video-player';
 import { useBookmarks } from '@/lib/utils/use-bookmarks';
 

@@ -19,7 +19,9 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Alert, Button, Card, CardBody, Icon, Progress, Spinner } from 'design-react-kit';
+import { Alert, Button, Card, CardBody, Progress, Spinner } from 'design-react-kit';
+
+import { Icon } from '@/components/ui/icon';
 
 type EventStatus = 'DRAFT' | 'PUBLISHED' | 'PROVISIONING' | 'LIVE' | 'IDLE' | 'ENDED' | 'ARCHIVED';
 

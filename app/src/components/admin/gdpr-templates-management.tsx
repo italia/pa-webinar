@@ -2,8 +2,9 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Badge, Button, Card, CardBody, Icon, Input, Label } from 'design-react-kit';
+import { Badge, Button, Card, CardBody, Input, Label } from 'design-react-kit';
 
+import { Icon } from '@/components/ui/icon';
 import { useToast } from '@/components/ui/toast';
 import { useConfirm } from '@/components/ui/confirm-dialog';
 import { SkeletonLines } from '@/components/ui/skeleton';

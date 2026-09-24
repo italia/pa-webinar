@@ -6,9 +6,9 @@ import {
   Badge,
   Card,
   CardBody,
-  Icon,
 } from 'design-react-kit';
 
+import { Icon } from '@/components/ui/icon';
 import TranscriptPanel from '@/components/events/transcript-panel';
 import type { VideoPlayerHandle } from '@/components/events/video-player';
 

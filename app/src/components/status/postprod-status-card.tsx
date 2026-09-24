@@ -19,7 +19,9 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslations, useFormatter } from 'next-intl';
-import { Badge, Card, CardBody, Icon } from 'design-react-kit';
+import { Badge, Card, CardBody } from 'design-react-kit';
+
+import { Icon } from '@/components/ui/icon';
 
 const POLL_INTERVAL_MS = 30_000;
 

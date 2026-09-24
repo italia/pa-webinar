@@ -2,8 +2,9 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslations } from 'next-intl';
-import { Button, Icon } from 'design-react-kit';
+import { Button } from 'design-react-kit';
 
+import { Icon } from '@/components/ui/icon';
 import type { JitsiMeetExternalAPI } from '@/types/jitsi';
 
 import { resolveDisplayName, RETRY_DELAYS_MS } from './raised-hands-resolve';

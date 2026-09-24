@@ -6,12 +6,13 @@ import {
   Badge,
   Card,
   CardBody,
-  Icon,
   Row,
   Col,
 } from 'design-react-kit';
 
 import PostprodStatusCard from './postprod-status-card';
+
+import { Icon } from '@/components/ui/icon';
 
 interface SystemStatus {
   overall: 'operational' | 'degraded' | 'outage';

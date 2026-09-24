@@ -3,13 +3,13 @@
 import { useState, useCallback, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 
+import { Icon } from '@/components/ui/icon';
 import { useConfirm } from '@/components/ui/confirm-dialog';
 import {
   Alert,
   Button,
   Card,
   CardBody,
-  Icon,
   Input,
   FormGroup,
   Label,

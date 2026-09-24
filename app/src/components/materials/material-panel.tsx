@@ -3,7 +3,9 @@
 import { useState, useCallback, type FormEvent } from 'react';
 import { useTranslations, useFormatter } from 'next-intl';
 import useSWR from 'swr';
-import { Button, Icon } from 'design-react-kit';
+import { Button } from 'design-react-kit';
+
+import { Icon } from '@/components/ui/icon';
 
 interface MaterialData {
   id: string;

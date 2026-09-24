@@ -1,7 +1,9 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { Badge, Card, CardBody, Icon } from 'design-react-kit';
+import { Badge, Card, CardBody } from 'design-react-kit';
+
+import { Icon } from '@/components/ui/icon';
 
 interface Question {
   id: string;

@@ -7,9 +7,9 @@ import {
   HeaderContent,
   HeaderBrand,
   HeaderRightZone,
-  Icon,
 } from 'design-react-kit';
 
+import { Icon } from '@/components/ui/icon';
 import { Link } from '@/i18n/navigation';
 import { useSettings } from '@/lib/settings-context';
 

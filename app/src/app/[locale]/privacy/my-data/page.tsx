@@ -16,9 +16,9 @@ import {
   FormGroup,
   Card,
   CardBody,
-  Icon,
 } from 'design-react-kit';
 
+import { Icon } from '@/components/ui/icon';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 
 interface ExportEventData {

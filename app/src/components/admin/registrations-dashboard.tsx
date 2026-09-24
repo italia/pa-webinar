@@ -13,8 +13,9 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslations, useFormatter } from 'next-intl';
-import { Badge, Card, CardBody, Icon, Input, Label } from 'design-react-kit';
+import { Badge, Card, CardBody, Input, Label } from 'design-react-kit';
 
+import { Icon } from '@/components/ui/icon';
 import { SkeletonLines } from '@/components/ui/skeleton';
 
 interface EventOption {

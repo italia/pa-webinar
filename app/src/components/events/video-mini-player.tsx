@@ -22,8 +22,8 @@
 
 import { useEffect, useRef, useState, type RefObject } from 'react';
 import { useTranslations } from 'next-intl';
-import { Icon } from 'design-react-kit';
 
+import { Icon } from '@/components/ui/icon';
 import type { VideoPlayerHandle } from '@/components/events/video-player';
 
 interface Props {

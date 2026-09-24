@@ -3,11 +3,11 @@
 import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import useSWR from 'swr';
+import { Icon } from '@/components/ui/icon';
 import { useLivePush } from '@/hooks/use-live-state';
 import {
   Badge,
   Button,
-  Icon,
 } from 'design-react-kit';
 
 interface PublicQuestion {

@@ -38,7 +38,7 @@ const EMPTY_DRAFT: Draft = {
 const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const HEX_COLOR_RE = /^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;
 
-// Inline SVGs — avoid design-react-kit <Icon> per project memory
+// Inline SVGs — design-react-kit <Icon> causes hydration mismatches
 // (async icons cache triggers hydration mismatches on list/header UI).
 function IconPlus() {
   return (

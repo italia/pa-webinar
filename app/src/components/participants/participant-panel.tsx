@@ -2,8 +2,9 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
-import { Badge, Icon } from 'design-react-kit';
+import { Badge } from 'design-react-kit';
 
+import { Icon } from '@/components/ui/icon';
 import type { JitsiMeetExternalAPI, JitsiParticipant } from '@/types/jitsi';
 import { useJitsiStats, qualityLabel, qualityColor } from '@/hooks/use-jitsi-stats';
 import { isHumanParticipant, participantIdentityKey } from '@/lib/jitsi/participants';

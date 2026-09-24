@@ -2,8 +2,8 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Icon } from 'design-react-kit';
 
+import { Icon } from '@/components/ui/icon';
 import { renderChatBody, mentionsUser } from '@/lib/chat/linkify';
 import { CHAT_REACTION_EMOJIS } from '@/lib/chat/emoji';
 import {
