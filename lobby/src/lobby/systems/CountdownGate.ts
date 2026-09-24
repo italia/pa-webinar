@@ -5,6 +5,7 @@ import type { EventSchedule } from '../ports/EventSchedule';
 import type { EventStatus, Unsub } from '../ports/types';
 import { formatClock } from '../util';
 import type { WorldLayout } from './WorldMap';
+import { DEFAULT_GATE_LABELS, type GateLabels } from '../public-types';
 
 /**
  * Event-state gate. Translates {@link EventSchedule} into the world:
@@ -42,6 +43,7 @@ export class CountdownGate {
     private readonly layout: WorldLayout,
     private readonly schedule: EventSchedule,
     private readonly bus: LobbyBus,
+    private readonly labels: GateLabels = DEFAULT_GATE_LABELS,
   ) {
     this.status = schedule.getStatus();
     this.openAmount = this.targetOpen();
@@ -122,24 +124,25 @@ export class CountdownGate {
   }
 
   private refreshLabels(remainingMs: number): void {
+    const l = this.labels;
     if (this.status === 'live') {
-      this.gateLabel.setText('Ingresso aperto').setColor('#008758');
-      this.stageLabel.setText('● IN DIRETTA').setColor('#D9364F');
+      this.gateLabel.setText(l.gateOpen).setColor('#008758');
+      this.stageLabel.setText(l.stageLive).setColor('#D9364F');
       return;
     }
     if (this.status === 'preparing') {
-      this.gateLabel.setText('La sala si sta preparando…').setColor('#A66300');
-      this.stageLabel.setText('Fra poco').setColor('#A66300');
+      this.gateLabel.setText(l.gatePreparing).setColor('#A66300');
+      this.stageLabel.setText(l.stagePreparing).setColor('#A66300');
       return;
     }
     if (this.status === 'ended') {
-      this.gateLabel.setText('Evento terminato').setColor('#cdd6e0');
-      this.stageLabel.setText('Evento terminato').setColor('#cdd6e0');
+      this.gateLabel.setText(l.ended).setColor('#cdd6e0');
+      this.stageLabel.setText(l.ended).setColor('#cdd6e0');
       return;
     }
-    const label = `Inizia tra ${formatClock(remainingMs)}`;
+    const label = l.startsIn.replace('{time}', formatClock(remainingMs));
     this.gateLabel
-      .setText(this.schedule.isHost() ? 'Ingresso anticipato (host)' : label)
+      .setText(this.schedule.isHost() ? l.hostEarly : label)
       .setColor('#ffffff');
     this.stageLabel.setText(formatClock(remainingMs)).setColor('#0066CC');
   }

@@ -33,6 +33,8 @@ export class WorldScene extends Phaser.Scene {
   private localPos = { x: 0, y: 0 };
   private moveAccum = 0;
   private inGateZone = false;
+  /** Gia' chiesto l'ingresso da quando l'avatar e' entrato nella zona. */
+  private ingressoChiesto = false;
   private lastPeerCount = -1;
 
   // Seats (amphitheatre) for inCall avatars.
@@ -95,7 +97,13 @@ export class WorldScene extends Phaser.Scene {
     });
 
     this.links = new ProximityLinks(this);
-    this.gate = new CountdownGate(this, this.layout, this.ctx.schedule, this.ctx.bus);
+    this.gate = new CountdownGate(
+      this,
+      this.layout,
+      this.ctx.schedule,
+      this.ctx.bus,
+      this.ctx.config.labels,
+    );
 
     // Presence/conference reconciliation.
     this.store = new PeerStore(
@@ -308,6 +316,7 @@ export class WorldScene extends Phaser.Scene {
     this.ctx.bus.emit('joined', undefined);
     this.ctx.bus.emit('gateZone', false);
     this.inGateZone = false;
+    this.ingressoChiesto = false;
   }
 
   private takeLocalSeat(): { x: number; y: number } {
@@ -345,6 +354,9 @@ export class WorldScene extends Phaser.Scene {
       !this.localInCall && Phaser.Geom.Rectangle.Contains(this.layout.gateTrigger, x, y);
     if (inside !== this.inGateZone) {
       this.inGateZone = inside;
+      // Uscire dalla zona riarma la richiesta: e' il «passo indietro» che
+      // permette di riprovare dopo aver corretto nome o email.
+      if (!inside) this.ingressoChiesto = false;
       this.ctx.bus.emit('gateZone', inside);
       // Embed: the host shell suppresses the in-game device panel, so reaching
       // the OPEN gate IS the enter action ("cammina fino al cancello → entra").
@@ -371,6 +383,12 @@ export class WorldScene extends Phaser.Scene {
     if (!this.inGateZone || !this.ctx.config.embed) return;
     if (this.joining || this.localInCall) return;
     if (this.ctx.schedule.getStatus() !== 'live') return;
+    // Una sola richiesta per arrivo: lo stato della sala arriva da un
+    // sondaggio e puo' oscillare, e ogni ritorno a `live` rifarebbe il
+    // tentativo — ogni rifiuto riporta il focus sul campo del nome, e chi sta
+    // correggendo l'email non riuscirebbe a finire di scrivere.
+    if (this.ingressoChiesto) return;
+    this.ingressoChiesto = true;
     this.ctx.bus.emit('joinRequest', { videoMuted: true, audioMuted: true });
   }
 

@@ -14,6 +14,7 @@ import type { PlayerProfile } from './ports/types';
 // Re-export the full contract surface so the host imports everything from here.
 export type {
   AssetConfig,
+  GateLabels,
   LobbyConfig,
   LobbyDeps,
   LobbyHandle,
