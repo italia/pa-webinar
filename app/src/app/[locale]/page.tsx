@@ -120,7 +120,13 @@ export default async function HomePage() {
   }
 
   // Default: LANDING
-  return <LandingHome upcoming={upcoming} parseTitleKicker={parseTitleKicker} />;
+  return (
+    <LandingHome
+      upcoming={upcoming}
+      parseTitleKicker={parseTitleKicker}
+      showProject={settings.homeShowProject}
+    />
+  );
 }
 
 async function EventsSection({
@@ -201,9 +207,11 @@ async function EventsListHome({
 async function LandingHome({
   upcoming,
   parseTitleKicker,
+  showProject,
 }: {
   upcoming: Awaited<ReturnType<typeof loadUpcomingEvents>>;
   parseTitleKicker: boolean;
+  showProject: boolean;
 }) {
   const t = await getTranslations('home');
 
@@ -440,6 +448,9 @@ async function LandingHome({
       </section>
 
       {/* ── Teaser progetto (in fondo: pubblico = altre PA / curiosi) ──── */}
+      {/* Parla a chi valuta la piattaforma, non a chi partecipa: si accende
+          dalle impostazioni della home. */}
+      {showProject && (
       <section
         className="text-white py-5"
         style={{ background: 'linear-gradient(135deg, #17324D 0%, #102438 100%)' }}
@@ -547,6 +558,7 @@ async function LandingHome({
           </div>
         </div>
       </section>
+      )}
     </>
   );
 }

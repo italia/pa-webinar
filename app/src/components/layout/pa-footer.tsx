@@ -1,9 +1,10 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 
 import { Link, percorsoSeNoto } from '@/i18n/navigation';
 import { useSettings } from '@/lib/settings-context';
+import { mottoDelSito } from '@/lib/utils/locale';
 
 interface FooterLink {
   title: string;
@@ -117,11 +118,14 @@ function formatBuildDate(iso: string): string {
 export default function PAFooter() {
   const t = useTranslations();
   const settings = useSettings();
+  const locale = useLocale();
 
+  // Come nella fascia alta: i nomi vengono dalla configurazione, mai da un
+  // ente scritto nel codice. Senza ente si firma col nome del sito.
   const orgName =
-    settings.organizationName || t('footer.departmentName');
+    settings.organizationName?.trim() || settings.siteName?.trim() || t('common.appName');
   const parentOrg =
-    settings.parentOrganization || t('footer.presidencyName');
+    settings.parentOrganization?.trim() || mottoDelSito(settings.siteTagline, locale);
   const orgUrl = settings.organizationUrl || '#';
   const githubUrl = settings.githubUrl || '';
 
@@ -158,7 +162,7 @@ export default function PAFooter() {
                     />
                     <div className="it-brand-text">
                       <h2 className="mb-0">{orgName}</h2>
-                      <h3 className="d-none d-md-block mb-0">{parentOrg}</h3>
+                      {parentOrg && <h3 className="d-none d-md-block mb-0">{parentOrg}</h3>}
                     </div>
                   </Link>
                 </div>

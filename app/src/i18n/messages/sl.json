@@ -54,8 +54,6 @@
     "skipToFooter": "Preskoči na nogo"
   },
   "header": {
-    "slimTitle": "Predsedstvo Sveta ministrov",
-    "slimSubtitle": "Oddelek za digitalno preobrazbo",
     "followUs": "Sledite nam na"
   },
   "events": {
@@ -488,6 +486,66 @@
     "submitPrimary": "Pošlji vprašanje"
   },
   "admin": {
+    "accessDenied": {
+      "title": "Ta razdelek za vašo vlogo ni na voljo",
+      "body": "Kot organizator upravljate svoje dogodke: ustvarjanje, objavo, gradiva, vprašalnike in postprodukcijo. Nastavitve platforme in podatki vseh dogodkov ostanejo administraciji.",
+      "back": "Pojdi na svoje dogodke"
+    },
+    "staffLogin": {
+      "title": "Prijava v administracijo",
+      "intro": "Organizatorji dogodkov se prijavijo s povezavo, poslano na njihov e-naslov: brez gesla, ki bi si ga morali zapomniti.",
+      "emailLabel": "Vaš službeni e-naslov",
+      "send": "Pošlji mi povezavo",
+      "sending": "Pošiljanje…",
+      "sent": "Če je naslov omogočen, boste kmalu prejeli e-sporočilo s povezavo za prijavo. Povezava velja samo enkrat in poteče po {minutes} minutah.",
+      "error": "Zahteve ni bilo mogoče poslati. Poskusite znova čez nekaj minut.",
+      "keySection": "Prijava s ključem instance",
+      "accessTitle": "Vstop v administracijo",
+      "accessIntro": "Za prijavo pritisnite gumb. Povezava velja samo enkrat.",
+      "enter": "Prijava",
+      "invalidLink": "Povezava ni veljavna: morda je potekla ali je že bila uporabljena.",
+      "newLink": "Zahtevaj novo povezavo"
+    },
+    "organizers": {
+      "title": "Organizatorji",
+      "intro": "Osebe, ki organizirajo dogodke, ne da bi upravljale platformo: ustvarjajo lastne dogodke, jih objavljajo ter upravljajo gradiva, vprašalnike in postprodukcijo. Prijavijo se s povezavo, poslano na e-naslov, brez gesla.",
+      "newTitle": "Dodaj organizatorja",
+      "name": "Ime in priimek",
+      "email": "E-pošta",
+      "add": "Dodaj",
+      "sendNow": "Takoj pošlji povezavo za prijavo",
+      "listTitle": "Omogočeni organizatorji",
+      "loading": "Nalaganje…",
+      "empty": "Organizatorjev še ni.",
+      "events": "Dogodki",
+      "lastLogin": "Zadnja prijava",
+      "status": "Stanje",
+      "actions": "Dejanja",
+      "never": "Nikoli",
+      "active": "Aktiven",
+      "inactive": "Onemogočen",
+      "invite": "Pošlji povezavo",
+      "inviteFor": "Pošlji povezavo za prijavo: {name}",
+      "deactivate": "Onemogoči",
+      "deactivateFor": "Onemogoči: {name}",
+      "activate": "Znova omogoči",
+      "activateFor": "Znova omogoči: {name}",
+      "delete": "Izbriši",
+      "deleteFor": "Izbriši: {name}",
+      "deleteTitle": "Izbrisati organizatorja?",
+      "deleteMessage": "Račun {name} bo izbrisan. Njegovi dogodki ({count}) se ne izbrišejo: vrnejo se administraciji.",
+      "deactivateTitle": "Onemogočiti organizatorja?",
+      "deactivateMessage": "{name} se ne bo več mogel prijaviti, že poslane povezave pa prenehajo delovati. Njegovi dogodki ostanejo nespremenjeni.",
+      "exists": "Organizator s tem e-naslovom že obstaja.",
+      "created": "Organizator dodan.",
+      "createdInvited": "Organizator dodan: povezava za prijavo je na poti.",
+      "invited": "Povezava za prijavo poslana.",
+      "deleted": "Organizator izbrisan.",
+      "updated": "Sprememba shranjena.",
+      "actionError": "Dejanje ni uspelo. Poskusite znova.",
+      "loadError": "Seznama ni bilo mogoče naložiti.",
+      "inviteFailed": "Organizator dodan, vendar povezave za prijavo ni bilo mogoče poslati: pošljite jo znova iz njegove vrstice."
+    },
     "fileOrUrl": {
       "tabUpload": "Naloži datoteko",
       "tabUrl": "Prilepi URL",
@@ -776,6 +834,8 @@
       "eventQuestionnaires": "Vprašalniki",
       "rubricaList": "Seznam",
       "rubricaDetail": "Podrobnosti",
+      "organizers": "Organizatorji",
+      "people": "Osebe",
       "postprodDetail": "Posnetek",
       "recordingsPostprod": "Prepisi / AI",
       "feedbackDashboard": "Feedback"
@@ -1408,8 +1468,10 @@
         "slimBarTitle": "Zgornja vrstica (Slim Header)",
         "slimBarDescription": "Tanka vrstica na vrhu strani, ki identificira nadrejeno ustanovo.",
         "parentOrganization": "Nadrejena ustanova",
-        "parentOrganizationHelp": "Npr. \"Predsedstvo Sveta ministrov\"",
+        "parentOrganizationHelp": "Organ, pod katerega spada vaša uprava. Pustite prazno, da ne navedete nobenega.",
         "parentOrganizationUrl": "URL nadrejene ustanove",
+        "siteTagline": "Moto spletnega mesta",
+        "siteTaglineHelp": "Prikaže se v zgornji vrstici in nogi, ko je nadrejeni organ prazen. Pustite prazno, da se ne prikaže nič. Vpiše se za vsak jezik: kjer manjka, se uporabi angleški, nato katerikoli drug.",
         "centerBarTitle": "Osrednja glava",
         "centerBarDescription": "Glavno območje glave z imenom aplikacije in logotipom.",
         "appName": "Ime aplikacije",
@@ -1428,7 +1490,7 @@
         "organizationNameShort": "Kratica organizacije",
         "organizationUrl": "URL organizacije",
         "parentOrganization": "Nadrejena organizacija",
-        "parentOrganizationHelp": "npr. Predsedstvo Sveta ministrov",
+        "parentOrganizationHelp": "Organ, pod katerega spada vaša uprava. Pustite prazno, da ne navedete nobenega.",
         "parentOrganizationUrl": "URL nadrejene organizacije",
         "logoUrl": "URL prilagojenega logotipa",
         "logoUrlHelp": "Pustite prazno za privzeto ikono javne uprave",
@@ -1497,7 +1559,9 @@
           }
         },
         "customHtmlLabel": "Prilagojena HTML vsebina",
-        "customHtmlHelp": "HTML, prikazan v glavnem razdelku domače strani"
+        "customHtmlHelp": "HTML, prikazan v glavnem razdelku domače strani",
+        "showProject": "Prikaži razdelek »Projekt«",
+        "showProjectHelp": "Arhitektura, suverenost podatkov in odprta koda platforme: zanimivo za tiste, ki razmišljajo o ponovni uporabi, bolj kot za udeležence."
       },
       "pages": {
         "privacyTitle": "Politika zasebnosti",
@@ -3300,8 +3364,6 @@
     }
   },
   "footer": {
-    "departmentName": "Oddelek za digitalno preobrazbo",
-    "presidencyName": "Predsedstvo Sveta ministrov",
     "privacy": "Politika zasebnosti",
     "accessibility": "Izjava o dostopnosti",
     "openSource": "Odprtokodna programska oprema",

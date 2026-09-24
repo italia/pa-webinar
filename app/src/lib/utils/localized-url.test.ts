@@ -116,7 +116,8 @@ describe('briciole di pane', () => {
       .map((f) => f.replace(/\\/g, '/'))
       .filter((f) => f === 'page.tsx' || f.endsWith('/page.tsx'))
       .map((f) => ('/admin/' + f.replace(/\/?page\.tsx$/, '')).replace(/\/$/, ''))
-      .filter((p) => p !== '/admin/login');
+      // Le porte d'ingresso non hanno briciole: non si sta dentro l'area.
+      .filter((p) => p !== '/admin/login' && p !== '/admin/access');
     expect(pagine.filter((p) => !sorgente.includes(`'${p}':`))).toEqual([]);
   });
 });

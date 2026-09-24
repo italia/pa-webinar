@@ -54,8 +54,6 @@
     "skipToFooter": "Siirry alatunnisteeseen"
   },
   "header": {
-    "slimTitle": "Ministerineuvoston puheenjohtajuus",
-    "slimSubtitle": "Digitaalisen muutoksen osasto",
     "followUs": "Seuraa meitä"
   },
   "events": {
@@ -488,6 +486,66 @@
     "submitPrimary": "Lähetä kysymys"
   },
   "admin": {
+    "accessDenied": {
+      "title": "Tämä osio ei ole käytettävissä roolillesi",
+      "body": "Järjestäjänä hallinnoit omia tapahtumiasi: niiden luomista ja julkaisua, materiaaleja, kyselyitä ja jälkituotantoa. Alustan asetukset ja kaikkien tapahtumien tiedot pysyvät ylläpidolla.",
+      "back": "Siirry omiin tapahtumiisi"
+    },
+    "staffLogin": {
+      "title": "Kirjaudu ylläpitoon",
+      "intro": "Tapahtumien järjestäjät kirjautuvat sähköpostiin lähetetyllä linkillä: ei muistettavaa salasanaa.",
+      "emailLabel": "Työsähköpostisi",
+      "send": "Lähetä minulle linkki",
+      "sending": "Lähetetään…",
+      "sent": "Jos osoite on sallittu, saat pian sähköpostin, jossa on kirjautumislinkki. Linkki toimii vain kerran ja vanhenee {minutes} minuutissa.",
+      "error": "Pyyntöä ei voitu lähettää. Yritä uudelleen muutaman minuutin kuluttua.",
+      "keySection": "Kirjautuminen instanssin avaimella",
+      "accessTitle": "Siirry ylläpitoon",
+      "accessIntro": "Kirjaudu sisään painamalla painiketta. Linkki toimii vain kerran.",
+      "enter": "Kirjaudu",
+      "invalidLink": "Linkki ei ole kelvollinen: se on voinut vanhentua tai olla jo käytetty.",
+      "newLink": "Pyydä uusi linkki"
+    },
+    "organizers": {
+      "title": "Järjestäjät",
+      "intro": "Henkilöt, jotka järjestävät tapahtumia ylläpitämättä alustaa: he luovat omat tapahtumansa, julkaisevat ne ja hallinnoivat materiaaleja, kyselyitä ja jälkituotantoa. He kirjautuvat sähköpostiinsa lähetetyllä linkillä ilman salasanaa.",
+      "newTitle": "Lisää järjestäjä",
+      "name": "Etu- ja sukunimi",
+      "email": "Sähköposti",
+      "add": "Lisää",
+      "sendNow": "Lähetä kirjautumislinkki heti",
+      "listTitle": "Sallitut järjestäjät",
+      "loading": "Ladataan…",
+      "empty": "Ei vielä järjestäjiä.",
+      "events": "Tapahtumat",
+      "lastLogin": "Viimeisin kirjautuminen",
+      "status": "Tila",
+      "actions": "Toiminnot",
+      "never": "Ei koskaan",
+      "active": "Aktiivinen",
+      "inactive": "Poistettu käytöstä",
+      "invite": "Lähetä linkki",
+      "inviteFor": "Lähetä kirjautumislinkki henkilölle {name}",
+      "deactivate": "Poista käytöstä",
+      "deactivateFor": "Poista {name} käytöstä",
+      "activate": "Ota uudelleen käyttöön",
+      "activateFor": "Ota {name} uudelleen käyttöön",
+      "delete": "Poista",
+      "deleteFor": "Poista {name}",
+      "deleteTitle": "Poistetaanko järjestäjä?",
+      "deleteMessage": "Henkilön {name} tili poistetaan. Tapahtumia ({count}) ei poisteta: ne palaavat ylläpidolle.",
+      "deactivateTitle": "Poistetaanko järjestäjä käytöstä?",
+      "deactivateMessage": "{name} ei voi enää kirjautua, ja jo lähetetyt kirjautumislinkit lakkaavat toimimasta. Tapahtumat pysyvät ennallaan.",
+      "exists": "Tällä sähköpostilla on jo järjestäjä.",
+      "created": "Järjestäjä lisätty.",
+      "createdInvited": "Järjestäjä lisätty: kirjautumislinkki on matkalla.",
+      "invited": "Kirjautumislinkki lähetetty.",
+      "deleted": "Järjestäjä poistettu.",
+      "updated": "Muutos tallennettu.",
+      "actionError": "Toiminto epäonnistui. Yritä uudelleen.",
+      "loadError": "Luetteloa ei voitu ladata.",
+      "inviteFailed": "Järjestäjä lisätty, mutta kirjautumislinkkiä ei voitu lähettää: lähetä se uudelleen rivin kautta."
+    },
     "fileOrUrl": {
       "tabUpload": "Lataa tiedosto",
       "tabUrl": "Liitä URL",
@@ -776,6 +834,8 @@
       "eventQuestionnaires": "Kyselyt",
       "rubricaList": "Luettelo",
       "rubricaDetail": "Tiedot",
+      "organizers": "Järjestäjät",
+      "people": "Henkilöt",
       "postprodDetail": "Tallenne",
       "recordingsPostprod": "Litteroinnit / tekoäly",
       "feedbackDashboard": "Feedback"
@@ -1408,8 +1468,10 @@
         "slimBarTitle": "Yläpalkki (Slim Header)",
         "slimBarDescription": "Ohut palkki sivun yläosassa, joka tunnistaa yläorganisaation.",
         "parentOrganization": "Yläorganisaatio",
-        "parentOrganizationHelp": "Esim. \"Ministerineuvoston puheenjohtajuus\"",
+        "parentOrganizationHelp": "Taho, jonka alaisuudessa organisaationne toimii. Jätä tyhjäksi, jos et halua nimetä mitään.",
         "parentOrganizationUrl": "Yläorganisaation URL",
+        "siteTagline": "Sivuston tunnuslause",
+        "siteTaglineHelp": "Näkyy yläpalkissa ja alatunnisteessa, kun ylempi organisaatio on tyhjä. Jätä tyhjäksi, jos et halua näyttää mitään. Kirjoitetaan kielittäin: jos kieleltä puuttuu, käytetään englanninkielistä, sitten mitä tahansa muuta.",
         "centerBarTitle": "Keskusotsikko",
         "centerBarDescription": "Otsikon pääalue sovelluksen nimellä ja logolla.",
         "appName": "Sovelluksen nimi",
@@ -1428,7 +1490,7 @@
         "organizationNameShort": "Organisaation lyhenne",
         "organizationUrl": "Organisaation URL",
         "parentOrganization": "Yläorganisaatio",
-        "parentOrganizationHelp": "esim. Ministerineuvoston puheenjohtajuus",
+        "parentOrganizationHelp": "Taho, jonka alaisuudessa organisaationne toimii. Jätä tyhjäksi, jos et halua nimetä mitään.",
         "parentOrganizationUrl": "Yläorganisaation URL",
         "logoUrl": "Mukautetun logon URL",
         "logoUrlHelp": "Jätä tyhjäksi käyttääksesi oletuskuvaketta",
@@ -1497,7 +1559,9 @@
           }
         },
         "customHtmlLabel": "Mukautettu HTML-sisältö",
-        "customHtmlHelp": "HTML, joka näytetään etusivun pääosiossa"
+        "customHtmlHelp": "HTML, joka näytetään etusivun pääosiossa",
+        "showProject": "Näytä ”Projekti”-osio",
+        "showProjectHelp": "Alustan arkkitehtuuri, datasuvereniteetti ja avoin lähdekoodi: kiinnostaa uudelleenkäyttöä harkitsevia enemmän kuin osallistujia."
       },
       "pages": {
         "privacyTitle": "Tietosuojaseloste",
@@ -3300,8 +3364,6 @@
     }
   },
   "footer": {
-    "departmentName": "Digitaalisen muutoksen osasto",
-    "presidencyName": "Ministerineuvoston puheenjohtajuus",
     "privacy": "Tietosuojaseloste",
     "accessibility": "Saavutettavuusseloste",
     "openSource": "Avoimen lähdekoodin ohjelmisto",

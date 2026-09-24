@@ -14,6 +14,12 @@ Nessun altro dato viene raccolto dal partecipante.
 - **Nome** e **email** del moderatore: opzionali, configurati alla creazione dell'evento. Usati per l'intestazione delle email e le informazioni .ics.
 - **Token moderatore** (`moderatorToken`): UUID unico che funge da credenziale di accesso. Non è previsto un sistema di account utente.
 
+### Organizzatori / Organizers
+- **Nome** ed **email** di chi organizza eventi senza amministrare la piattaforma (vedi [ADR-014](adr/014-organizer-role.md)): inseriti dall'amministrazione, **cifrati a riposo**; l'email si cerca per hash HMAC. Servono a mandare il link di accesso e a indicare chi ha creato un evento.
+- **Link di accesso**: nel database resta solo l'hash del token, con scadenza e momento d'uso. Nessuna password.
+- **Ultimo accesso**: data e ora, per permettere all'amministrazione di riconoscere gli account inattivi.
+- L'account resta finché l'amministrazione non lo elimina; eliminarlo cancella anche i link di accesso e lascia gli eventi all'amministrazione. Disattivarlo impedisce subito l'accesso.
+
 ## Archiviazione e crittografia / Storage & Encryption
 
 | Dato | Storage | Crittografia |

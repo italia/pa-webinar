@@ -1,18 +1,14 @@
-import { cookies } from 'next/headers';
-import { redirect } from 'next/navigation';
 import { getTranslations, getLocale } from 'next-intl/server';
 
-import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { staffOLogin } from '@/lib/auth/staff-page';
 import PostprodDashboard from '@/components/admin/postprod-dashboard';
 
 export const dynamic = 'force-dynamic';
 
 export default async function PostprodPage() {
   const locale = await getLocale();
-  const isAdmin = await isAdminAuthenticated(await cookies());
-  if (!isAdmin) {
-    redirect(`/${locale}/admin/login`);
-  }
+  // Aperta allo staff: le registrazioni le filtra la rotta (ADR-014).
+  await staffOLogin(locale);
 
   const t = await getTranslations('admin.postprod');
 

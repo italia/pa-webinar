@@ -21,6 +21,13 @@ model Event {
 
   maxParticipants Int @default(300) @map("max_participants")
 
+  // Chi ha creato l'evento, quando e' un organizzatore (vedi ADR-014).
+  // Vuoto per gli eventi creati dall'amministrazione dell'istanza e per
+  // quelli nati prima dei ruoli: li gestisce solo l'amministrazione.
+  // SetNull: cancellare un account non cancella gli eventi.
+  createdById String?       @map("created_by_id") @db.Uuid
+  createdBy   StaffAccount? @relation("EventCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+
   // Expected share of participants that will actually send media (mic
   // or webcam). Drives JVB sizing — a webinar with 100 attendees and
   // 20% senders is *very* different infra-load than 100 all-senders.
@@ -297,6 +304,9 @@ model Event {
   // Hot path for the JVB scaler / monitoring queries that scan for
   // LIVE events with stale `last_active_at` (idle reaping).
   @@index([status, lastActiveAt], map: "events_status_last_active_idx")
+  // «Gli eventi di questo organizzatore»: l'elenco dell'area di
+  // amministrazione per chi non e' amministratore.
+  @@index([createdById], map: "events_created_by_id_idx")
   @@map("events")
 }
 
@@ -1116,6 +1126,10 @@ model SiteSetting {
   organizationUrl       String  @default("") @map("organization_url")
   parentOrganization    String  @default("") @map("parent_organization")
   parentOrganizationUrl String  @default("") @map("parent_organization_url")
+  // Motto mostrato nella fascia alta e nel pie' di pagina quando non c'e' un
+  // ente sovraordinato da nominare, per lingua ({ it, en, ... }). Vuoto: non
+  // si scrive nulla.
+  siteTagline           Json    @default("{}") @map("site_tagline") @db.JsonB
   logoUrl               String? @map("logo_url")
   faviconUrl            String? @map("favicon_url")
   primaryColor          String  @default("#0066CC") @map("primary_color")
@@ -1142,6 +1156,10 @@ model SiteSetting {
 
   // Home page
   homePageMode   HomePageMode @default(LANDING) @map("home_page_mode")
+  // Il blocco «Il progetto» della home (architettura, sovranita', open
+  // source): parla a chi valuta la piattaforma, non a chi partecipa agli
+  // eventi. Spento per impostazione predefinita, si accende da qui.
+  homeShowProject Boolean @default(false) @map("home_show_project")
   customHomeHtml String?      @map("custom_home_html") @db.Text
 
   // Footer
@@ -2204,4 +2222,55 @@ model Speaker {
   @@unique([recordingId, diarLabel])
   @@index([personId])
   @@map("speakers")
+}
+
+// ─────────────────────────────────────────────────────────────
+// Account dello staff (ADR-014)
+//
+// Persone che usano l'area di amministrazione senza la chiave
+// dell'istanza. Oggi un solo ruolo, ORGANIZER: crea eventi, li pubblica,
+// ne gestisce materiali, questionari e post-produzione — solo i propri.
+// L'amministrazione dell'istanza resta la chiave API.
+//
+// Nessuna password: si entra con un link monouso mandato all'email.
+// Email e nome sono dati personali, cifrati a riposo (`encryptPII`);
+// l'email si cerca per `emailHash` (`hashEmail`, HMAC con APP_SECRET).
+// ─────────────────────────────────────────────────────────────
+
+enum StaffRole {
+  ORGANIZER
+}
+
+model StaffAccount {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  emailHash   String    @unique @map("email_hash") @db.VarChar(64)
+  email       String
+  name        String
+  role        StaffRole @default(ORGANIZER)
+  // Disattivare revoca subito: la sessione rilegge l'account a ogni
+  // richiesta, non si fida del solo cookie.
+  active      Boolean   @default(true)
+  createdAt   DateTime  @default(now()) @map("created_at")
+  lastLoginAt DateTime? @map("last_login_at")
+
+  events      Event[]           @relation("EventCreatedBy")
+  loginTokens StaffLoginToken[]
+
+  @@map("staff_accounts")
+}
+
+// Link di accesso monouso. Si conserva solo l'hash del token: chi legge
+// il database non puo' entrare al posto di nessuno.
+model StaffLoginToken {
+  id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  accountId String    @map("account_id") @db.Uuid
+  tokenHash String    @unique @map("token_hash") @db.VarChar(64)
+  expiresAt DateTime  @map("expires_at")
+  usedAt    DateTime? @map("used_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  account StaffAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([accountId], map: "staff_login_tokens_account_id_idx")
+  @@map("staff_login_tokens")
 }

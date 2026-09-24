@@ -1,5 +1,6 @@
-import { getTranslations } from 'next-intl/server';
+import { getLocale, getTranslations } from 'next-intl/server';
 
+import { staffOLogin } from '@/lib/auth/staff-page';
 import { prisma } from '@/lib/db';
 import { jvbMaxReplicasFromEnv } from '@/lib/jvb-sizing';
 import { getSettings } from '@/lib/settings';
@@ -14,6 +15,8 @@ interface CreateEventPageProps {
 export default async function CreateEventPage({
   searchParams,
 }: CreateEventPageProps) {
+  // Creare eventi e' il mestiere dell'organizzatore (ADR-014).
+  const session = await staffOLogin(await getLocale());
   const t = await getTranslations('admin');
   const { template: templateId } = await searchParams;
 
@@ -127,6 +130,7 @@ export default async function CreateEventPage({
         defaultLocale={siteSettings.defaultLocale ?? 'it'}
         defaultSenderRatioPct={siteSettings.defaultSenderRatioPct ?? 30}
         defaultRetentionDays={30}
+        canUseRubrica={session.role === 'admin'}
         jvbSizingConfig={{
           cpuCoresPerPod: siteSettings.jvbCpuCoresPerPod ?? 16,
           receiversPerCore: siteSettings.jvbReceiversPerCore ?? 18.75,

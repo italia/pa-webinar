@@ -36,6 +36,7 @@ import { questionnaireChanged } from './questionnaire-diff';
 import Step1Base, { type Step1Value } from './step-1-base';
 import Step2Permissions, { type Step2Value } from './step-2-permissions';
 import Step3Invites, { type Step3Value } from './step-3-invites';
+import { RubricaAccessContext } from '../rubrica-picker';
 import Step4Content, {
   type Step4Value,
   type QuestionnaireBlock,
@@ -80,6 +81,8 @@ export interface WizardProps {
   defaultLocale: string;
   defaultSenderRatioPct: number;
   defaultRetentionDays: number;
+  /** Mostrare la ricerca in rubrica negli inviti: solo all'amministrazione. */
+  canUseRubrica?: boolean;
   jvbSizingConfig: JvbSizingConfig;
   availableTags: Array<{ slug: string; name: Record<string, string>; color: string | null }>;
   gdprTemplates: Array<{ id: string; name: string; isDefault: boolean }>;
@@ -999,10 +1002,9 @@ export default function EventWizard(props: WizardProps) {
           />
         )}
         {activeStep === 'invites' && (
-          <Step3Invites
-            value={form}
-            onChange={updateForm}
-          />
+          <RubricaAccessContext.Provider value={props.canUseRubrica ?? false}>
+            <Step3Invites value={form} onChange={updateForm} />
+          </RubricaAccessContext.Provider>
         )}
         {activeStep === 'content' && (
           <Step4Content

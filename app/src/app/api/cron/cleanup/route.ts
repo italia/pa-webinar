@@ -382,8 +382,19 @@ export const GET = withErrorHandling(async (request) => {
     }
   }
 
+  // ── Link di accesso dello staff (ADR-014) ──
+  // Usati o scaduti da oltre un giorno non servono piu' a niente: tenerli
+  // sarebbe conservare, senza scopo, lo storico degli accessi di ogni persona.
+  // Il giorno di margine lascia leggibile il tentativo appena fallito a chi
+  // deve aiutare qualcuno che non riesce a entrare.
+  const unGiornoFa = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+  const staffLinks = await prisma.staffLoginToken.deleteMany({
+    where: { OR: [{ usedAt: { lt: unGiornoFa } }, { expiresAt: { lt: unGiornoFa } }] },
+  });
+
   return Response.json({
     ok: true,
+    staffLoginLinksDeleted: staffLinks.count,
     tempRecordingsCleaned: tempRecordingEvents.length,
     publishedRecordingsCleaned: recordingRetentionEvents.filter((evt) =>
       isRecordingRetentionExpired(evt, now)

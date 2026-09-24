@@ -54,8 +54,6 @@
     "skipToFooter": "Gå till sidfot"
   },
   "header": {
-    "slimTitle": "Ministerrådets kansli",
-    "slimSubtitle": "Avdelningen för digital omvandling",
     "followUs": "Följ oss på"
   },
   "events": {
@@ -488,6 +486,66 @@
     "submitPrimary": "Skicka fråga"
   },
   "admin": {
+    "accessDenied": {
+      "title": "Den här delen är inte tillgänglig för din roll",
+      "body": "Som arrangör hanterar du dina egna evenemang: skapa och publicera dem, material, enkäter och efterbearbetning. Plattformens inställningar och data för alla evenemang ligger kvar hos administrationen.",
+      "back": "Till dina evenemang"
+    },
+    "staffLogin": {
+      "title": "Logga in i administrationen",
+      "intro": "Arrangörer loggar in med en länk som skickas till deras e-post: inget lösenord att komma ihåg.",
+      "emailLabel": "Din e-postadress i tjänsten",
+      "send": "Skicka länken",
+      "sending": "Skickar…",
+      "sent": "Om adressen är behörig får du snart ett e-postmeddelande med inloggningslänken. Länken fungerar bara en gång och upphör efter {minutes} minuter.",
+      "error": "Begäran kunde inte skickas. Försök igen om några minuter.",
+      "keySection": "Logga in med instansnyckeln",
+      "accessTitle": "Gå till administrationen",
+      "accessIntro": "Tryck på knappen för att logga in. Länken fungerar bara en gång.",
+      "enter": "Logga in",
+      "invalidLink": "Länken är inte giltig: den kan ha gått ut eller redan använts.",
+      "newLink": "Begär en ny länk"
+    },
+    "organizers": {
+      "title": "Arrangörer",
+      "intro": "Personer som arrangerar evenemang utan att administrera plattformen: de skapar egna evenemang, publicerar dem och hanterar material, enkäter och efterbearbetning. De loggar in med en länk som skickas till deras e-post, utan lösenord.",
+      "newTitle": "Lägg till en arrangör",
+      "name": "För- och efternamn",
+      "email": "E-post",
+      "add": "Lägg till",
+      "sendNow": "Skicka inloggningslänken direkt",
+      "listTitle": "Behöriga arrangörer",
+      "loading": "Laddar…",
+      "empty": "Inga arrangörer ännu.",
+      "events": "Evenemang",
+      "lastLogin": "Senaste inloggning",
+      "status": "Status",
+      "actions": "Åtgärder",
+      "never": "Aldrig",
+      "active": "Aktiv",
+      "inactive": "Inaktiverad",
+      "invite": "Skicka länk",
+      "inviteFor": "Skicka en inloggningslänk till {name}",
+      "deactivate": "Inaktivera",
+      "deactivateFor": "Inaktivera {name}",
+      "activate": "Återaktivera",
+      "activateFor": "Återaktivera {name}",
+      "delete": "Ta bort",
+      "deleteFor": "Ta bort {name}",
+      "deleteTitle": "Ta bort arrangören?",
+      "deleteMessage": "Kontot för {name} tas bort. Evenemangen ({count}) raderas inte: de går tillbaka till administrationen.",
+      "deactivateTitle": "Inaktivera arrangören?",
+      "deactivateMessage": "{name} kan inte längre logga in, och redan skickade inloggningslänkar slutar fungera. Evenemangen förblir som de är.",
+      "exists": "Det finns redan en arrangör med den här e-postadressen.",
+      "created": "Arrangör tillagd.",
+      "createdInvited": "Arrangör tillagd: inloggningslänken är på väg.",
+      "invited": "Inloggningslänk skickad.",
+      "deleted": "Arrangör borttagen.",
+      "updated": "Ändringen har sparats.",
+      "actionError": "Åtgärden misslyckades. Försök igen.",
+      "loadError": "Listan kunde inte laddas.",
+      "inviteFailed": "Arrangören har lagts till, men inloggningslänken kunde inte skickas: skicka den igen från raden."
+    },
     "fileOrUrl": {
       "tabUpload": "Ladda upp fil",
       "tabUrl": "Klistra in URL",
@@ -776,6 +834,8 @@
       "eventQuestionnaires": "Enkäter",
       "rubricaList": "Lista",
       "rubricaDetail": "Post",
+      "organizers": "Arrangörer",
+      "people": "Personer",
       "postprodDetail": "Inspelning",
       "recordingsPostprod": "Transkriptioner / AI",
       "feedbackDashboard": "Feedback"
@@ -1408,8 +1468,10 @@
         "slimBarTitle": "Topplisten (Slim Header)",
         "slimBarDescription": "Det tunna fältet längst upp på sidan som identifierar den överordnade organisationen.",
         "parentOrganization": "Överordnad organisation",
-        "parentOrganizationHelp": "T.ex. \"Ministerrådets kansli\"",
+        "parentOrganizationHelp": "Den myndighet er organisation lyder under. Lämna tomt för att inte ange någon.",
         "parentOrganizationUrl": "URL för överordnad organisation",
+        "siteTagline": "Webbplatsens slogan",
+        "siteTaglineHelp": "Visas i det övre fältet och i sidfoten när den överordnade organisationen är tom. Lämna tomt för att inte visa något. Skrivs per språk: saknas den används den engelska, därefter vilken som helst.",
         "centerBarTitle": "Centralt sidhuvud",
         "centerBarDescription": "Huvudområdet i sidhuvudet med applikationsnamn och logotyp.",
         "appName": "Applikationsnamn",
@@ -1428,7 +1490,7 @@
         "organizationNameShort": "Organisationsförkortning",
         "organizationUrl": "Organisations-URL",
         "parentOrganization": "Överordnad organisation",
-        "parentOrganizationHelp": "t.ex. Ministerrådets kansli",
+        "parentOrganizationHelp": "Den myndighet er organisation lyder under. Lämna tomt för att inte ange någon.",
         "parentOrganizationUrl": "URL för överordnad organisation",
         "logoUrl": "Anpassad logotyp-URL",
         "logoUrlHelp": "Lämna tomt för att använda standardikonen",
@@ -1497,7 +1559,9 @@
           }
         },
         "customHtmlLabel": "Anpassat HTML-innehåll",
-        "customHtmlHelp": "HTML som visas i startsidans huvudsektion"
+        "customHtmlHelp": "HTML som visas i startsidans huvudsektion",
+        "showProject": "Visa avsnittet ”Projektet”",
+        "showProjectHelp": "Plattformens arkitektur, datasuveränitet och öppna källkod: intressant för den som överväger återanvändning snarare än för deltagare."
       },
       "pages": {
         "privacyTitle": "Integritetspolicy",
@@ -3300,8 +3364,6 @@
     }
   },
   "footer": {
-    "departmentName": "Avdelningen för digital omvandling",
-    "presidencyName": "Ministerrådets kansli",
     "privacy": "Integritetspolicy",
     "accessibility": "Tillgänglighetsförklaring",
     "openSource": "Öppen källkod",

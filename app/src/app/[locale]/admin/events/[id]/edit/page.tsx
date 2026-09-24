@@ -1,6 +1,8 @@
+import { cookies } from 'next/headers';
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 
+import { getStaffSession } from '@/lib/auth/staff-session';
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { jvbMaxReplicasFromEnv } from '@/lib/jvb-sizing';
@@ -257,6 +259,7 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
 
       <EventWizard
         mode="edit"
+        canUseRubrica={(await getStaffSession(await cookies()))?.role === 'admin'}
         initialEvent={initialEvent}
         siteTimezone={event.timezone}
         enabledLocales={

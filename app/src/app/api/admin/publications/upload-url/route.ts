@@ -22,8 +22,8 @@ import { randomUUID } from 'crypto';
 import { cookies } from 'next/headers';
 
 import { withErrorHandling } from '@/lib/api-handler';
-import { isAdminAuthenticated } from '@/lib/auth/admin-session';
-import { AppError, UnauthorizedError } from '@/lib/errors';
+import { requireStaff } from '@/lib/auth/staff-session';
+import { AppError } from '@/lib/errors';
 import {
   generateRecordingUploadUrl,
   isRecordingStorageConfigured,
@@ -45,8 +45,10 @@ function buildObjectName(originalName: string): string {
 }
 
 export const GET = withErrorHandling(async (request) => {
-  const isAdmin = await isAdminAuthenticated(await cookies());
-  if (!isAdmin) throw new UnauthorizedError();
+  // Anche l'organizzatore carica la registrazione dei propri eventi; il file
+  // si aggancia all'evento con il PATCH di /publications/:id, che controlla
+  // il proprietario (ADR-014).
+  await requireStaff(await cookies());
 
   if (!isRecordingStorageConfigured()) {
     throw new AppError(

@@ -63,6 +63,7 @@ interface Props {
   defaultLocale: string;
   defaultSenderRatioPct: number;
   defaultRetentionDays: number;
+  canUseRubrica: boolean;
   jvbSizingConfig: JvbSizingConfig;
   availableTags: Array<{ slug: string; name: Record<string, string>; color: string | null }>;
   gdprTemplates: Array<{ id: string; name: string; isDefault: boolean }>;
@@ -78,6 +79,7 @@ export default function CreateEventWithTemplate({
   defaultLocale,
   defaultSenderRatioPct,
   defaultRetentionDays,
+  canUseRubrica,
   jvbSizingConfig,
   availableTags,
   gdprTemplates,
@@ -178,6 +180,7 @@ export default function CreateEventWithTemplate({
       defaultLocale={defaultLocale}
       defaultSenderRatioPct={defaultSenderRatioPct}
       defaultRetentionDays={defaultRetentionDays}
+      canUseRubrica={canUseRubrica}
       jvbSizingConfig={jvbSizingConfig}
       availableTags={availableTags}
       gdprTemplates={gdprTemplates}

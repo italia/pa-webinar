@@ -104,6 +104,7 @@ export const NOT_DUPLICATED_EVENT_FIELDS: Record<string, string> = {
   endsAt: 'set by the caller (explicit date or projected occurrence)',
   status: 'a copy always starts as DRAFT',
   moderatorToken: 'a fresh secret — reusing it would grant the old link control of the new room',
+  createdById: 'the copy belongs to whoever creates it: an organizer duplicating their own event must be able to manage the copy (ADR-014)',
   jitsiRoomName: 'a fresh room — reusing it would drop the copy into the old conference',
   joinPasswordHash: 'a secret the operator cannot read back, so it cannot be knowingly inherited',
   recurrenceSeriesId: 'series membership is assigned deliberately, not inherited (v0.9)',

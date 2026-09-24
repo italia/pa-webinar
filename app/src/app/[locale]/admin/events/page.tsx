@@ -1,5 +1,7 @@
-import { getTranslations } from 'next-intl/server';
+import { getLocale, getTranslations } from 'next-intl/server';
 
+import { staffOLogin } from '@/lib/auth/staff-page';
+import { eventScope } from '@/lib/auth/staff-session';
 import { prisma } from '@/lib/db';
 import { getSettings } from '@/lib/settings';
 import { Link } from '@/i18n/navigation';
@@ -9,8 +11,10 @@ interface EventsListPageProps {
   searchParams: Promise<{ token?: string }>;
 }
 
-async function loadEvents(token?: string) {
-  const where = token ? { moderatorToken: token } : {};
+async function loadEvents(scope: { createdById?: string }, token?: string) {
+  // Col token si vede l'evento di quel token, chi lo possiede lo modera
+  // comunque; senza, quelli che la sessione puo' gestire (ADR-014).
+  const where = token ? { moderatorToken: token } : scope;
   const events = await prisma.event.findMany({
     where,
     include: {
@@ -68,9 +72,11 @@ export default async function EventsListPage({
   searchParams,
 }: EventsListPageProps) {
   const { token } = await searchParams;
+  const locale = await getLocale();
+  const session = await staffOLogin(locale);
   const t = await getTranslations('admin');
   const [events, availableTags, settings] = await Promise.all([
-    loadEvents(token),
+    loadEvents(eventScope(session), token),
     loadAvailableTags(),
     getSettings(),
   ]);

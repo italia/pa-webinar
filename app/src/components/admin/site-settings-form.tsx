@@ -18,6 +18,8 @@ import {
 import type { SiteSetting } from '@prisma/client';
 import { Icon } from '@/components/ui/icon';
 import ToggleSwitch from '@/components/ui/toggle-switch';
+import LocaleTabBar from '@/components/ui/locale-tab-bar';
+import { localeNames, type Locale } from '@/i18n/config';
 import FileOrUrlInput from '@/components/ui/file-or-url-input';
 import { videoQualityMaxHeight } from '@/lib/jitsi/config';
 
@@ -646,6 +648,23 @@ function HomepageTab({ settings, updateField }: TabProps) {
           </FormGroup>
         ))}
       </FormGroup>
+      <FormGroup check className="mt-4">
+        <Input
+          id="home-show-project"
+          type="checkbox"
+          checked={settings.homeShowProject}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            updateField('homeShowProject', e.target.checked)
+          }
+          aria-describedby="home-show-project-help"
+        />
+        <Label check htmlFor="home-show-project">
+          {t('showProject')}
+        </Label>
+        <small id="home-show-project-help" className="d-block text-muted">
+          {t('showProjectHelp')}
+        </small>
+      </FormGroup>
       {settings.homePageMode === 'CUSTOM' && (
         <FormGroup className="mt-4">
           <Label htmlFor="customHomeHtml">{t('customHtmlLabel')}</Label>
@@ -944,6 +963,23 @@ function FooterTab({ settings, updateField }: TabProps) {
 
 function HeaderTab({ settings, updateField }: TabProps) {
   const t = useTranslations('admin.settings.header');
+  // Il motto si scrive per lingua, tra quelle attive del sito.
+  const lingueAttive =
+    Array.isArray(settings.availableLocales) && settings.availableLocales.length > 0
+      ? (settings.availableLocales as string[])
+      : ['it', 'en'];
+  const linguaPredefinita = settings.defaultLocale || 'it';
+  const [linguaMotto, setLinguaMotto] = useState(linguaPredefinita);
+  const motto = (
+    settings.siteTagline && typeof settings.siteTagline === 'object' && !Array.isArray(settings.siteTagline)
+      ? settings.siteTagline
+      : {}
+  ) as Record<string, string>;
+  const scriviMotto = (valore: string) => {
+    const nuovo = { ...motto, [linguaMotto]: valore };
+    if (!valore.trim()) delete nuovo[linguaMotto];
+    updateField('siteTagline', nuovo);
+  };
 
   return (
     <div>
@@ -979,6 +1015,29 @@ function HeaderTab({ settings, updateField }: TabProps) {
           </FormGroup>
         </Col>
       </Row>
+      <FormGroup>
+        <Label htmlFor="hdr-tagline">
+          {t('siteTagline')} — {localeNames[linguaMotto as Locale] ?? linguaMotto}
+        </Label>
+        <LocaleTabBar
+          enabledLocales={lingueAttive}
+          defaultLocale={linguaPredefinita}
+          activeLocale={linguaMotto}
+          onSelectLocale={setLinguaMotto}
+          filledLocales={Object.keys(motto).filter((k) => motto[k]?.trim())}
+        />
+        <Input
+          id="hdr-tagline"
+          lang={linguaMotto}
+          value={motto[linguaMotto] ?? ''}
+          maxLength={200}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => scriviMotto(e.target.value)}
+          aria-describedby="hdr-tagline-help"
+        />
+        <small id="hdr-tagline-help" className="text-muted">
+          {t('siteTaglineHelp')}
+        </small>
+      </FormGroup>
 
       <hr className="my-4" />
 

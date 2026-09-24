@@ -14,9 +14,26 @@ interface NavItem {
   exact?: boolean;
 }
 
+/**
+ * Le voci che l'organizzatore vede (ADR-014). Un elenco di ammessi, non di
+ * esclusi: una sezione aggiunta domani nasce riservata all'amministrazione
+ * finche' qualcuno non decide il contrario — com'e' per le pagine, che senza
+ * guardia esplicita mostrano «accesso non consentito».
+ */
+const VOCI_ORGANIZZATORE: ReadonlySet<PercorsoStatico> = new Set<PercorsoStatico>([
+  '/admin/events',
+  '/admin/events/new',
+  '/admin/events/calls',
+  '/admin/calendar',
+  '/admin/recordings',
+  '/admin/postprod',
+]);
+
 const MAIN_SECTIONS: NavItem[] = [
   { href: '/admin/events', icon: 'it-calendar', labelKey: 'events' },
-  { href: '/admin/registrations', icon: 'it-user', labelKey: 'registrations' },
+  // La sezione raccoglie le persone, non solo le iscrizioni: rubrica,
+  // moderatori, registro GDPR, organizzatori.
+  { href: '/admin/registrations', icon: 'it-user', labelKey: 'people' },
   { href: '/admin/questionnaires', icon: 'it-help-circle', labelKey: 'questionnaires' },
   { href: '/admin/publications', icon: 'it-files', labelKey: 'publications' },
   { href: '/admin/recordings', icon: 'it-video', labelKey: 'recordings' },
@@ -44,6 +61,7 @@ const REGISTRATIONS_SUB_NAV: NavItem[] = [
   { href: '/admin/rubrica', icon: 'it-pa', labelKey: 'rubrica' },
   { href: '/admin/moderators', icon: 'it-key', labelKey: 'moderators' },
   { href: '/admin/gdpr-audit', icon: 'it-files', labelKey: 'gdprAudit' },
+  { href: '/admin/organizers', icon: 'it-key', labelKey: 'organizers' },
 ];
 
 // Recordings / instant calls / live sessions — everything video-output.
@@ -127,9 +145,10 @@ const QUESTIONNAIRES_SUB_NAV: NavItem[] = [
   },
 ];
 
-export default function AdminNav() {
+export default function AdminNav({ role = 'admin' }: { role?: 'admin' | 'organizer' }) {
   const t = useTranslations('admin.nav');
   const pathname = usePathname();
+  const visibile = (item: NavItem) => role === 'admin' || VOCI_ORGANIZZATORE.has(item.href);
 
   // `usePathname` restituisce il percorso INTERNO — senza prefisso di lingua
   // e con i segnaposto (`/admin/events/[id]`) — quindi le sezioni si
@@ -147,6 +166,7 @@ export default function AdminNav() {
     '/admin/rubrica',
     '/admin/moderators',
     '/admin/gdpr-audit',
+    '/admin/organizers',
   );
   const inRecordings = sotto('/admin/recordings', '/admin/postprod');
   const inPublications = sotto('/admin/publications');
@@ -197,7 +217,7 @@ export default function AdminNav() {
       >
         <div className="container">
           <ul className="nav" style={{ gap: 0 }}>
-            {MAIN_SECTIONS.map((item) => {
+            {MAIN_SECTIONS.filter(visibile).map((item) => {
               const active = isActive(item);
               return (
                 <li key={item.href} className="nav-item">
@@ -245,7 +265,7 @@ export default function AdminNav() {
         >
           <div className="container">
             <ul className="nav" style={{ gap: 0 }}>
-              {subNav.map((item) => {
+              {subNav.filter(visibile).map((item) => {
                 const active = isSubActive(item);
                 return (
                   <li key={item.href} className="nav-item">

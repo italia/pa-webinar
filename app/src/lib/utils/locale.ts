@@ -118,3 +118,12 @@ export function localiseEvent(
     description: getLocalized(event.description as LocalizedField, locale),
   };
 }
+
+/**
+ * Il motto del sito nella lingua richiesta. Se manca, l'inglese — la lingua
+ * che chi arriva da un'altra lingua ha piu' probabilita' di leggere — e poi
+ * qualunque lingua compilata. Vuoto se non ce n'e' nessuna.
+ */
+export function mottoDelSito(field: unknown, locale: string): string {
+  return getLocalized(field as LocalizedField, locale, 'en').trim();
+}

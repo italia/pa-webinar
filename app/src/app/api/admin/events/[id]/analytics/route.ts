@@ -17,10 +17,10 @@
 import { cookies } from 'next/headers';
 
 import { withErrorHandling } from '@/lib/api-handler';
-import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { requireEventManager } from '@/lib/auth/staff-session';
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
-import { NotFoundError, UnauthorizedError } from '@/lib/errors';
+import { NotFoundError } from '@/lib/errors';
 import { buildRecap, ensureEventRecap } from '@/lib/events/recap';
 import {
   bucketTimeline,
@@ -54,10 +54,9 @@ function personKey(opts: { senderId?: string | null; registrationId?: string | n
 }
 
 export const GET = withErrorHandling(async (_request, context) => {
-  const isAdmin = await isAdminAuthenticated(await cookies());
-  if (!isAdmin) throw new UnauthorizedError();
-
   const { id } = await (context as { params: Promise<{ id: string }> }).params;
+  // Dell'evento: l'admin, o l'organizzatore che l'ha creato (ADR-014).
+  await requireEventManager(await cookies(), id);
 
   const event = await prisma.event.findUnique({
     where: { id },

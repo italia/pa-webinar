@@ -54,8 +54,6 @@
     "skipToFooter": "Pereiti prie poraštės"
   },
   "header": {
-    "slimTitle": "Ministrų Tarybos Pirmininkystė",
-    "slimSubtitle": "Skaitmeninės transformacijos departamentas",
     "followUs": "Sekite mus"
   },
   "events": {
@@ -488,6 +486,66 @@
     "submitPrimary": "Siųsti klausimą"
   },
   "admin": {
+    "accessDenied": {
+      "title": "Šis skyrius jūsų vaidmeniui nepasiekiamas",
+      "body": "Kaip organizatorius tvarkote savo renginius: jų kūrimą ir skelbimą, medžiagą, klausimynus ir postprodukciją. Platformos nustatymai ir visų renginių duomenys lieka administracijai.",
+      "back": "Eiti į savo renginius"
+    },
+    "staffLogin": {
+      "title": "Prisijungimas prie administravimo srities",
+      "intro": "Renginių organizatoriai prisijungia nuoroda, išsiųsta jų el. paštu: nereikia prisiminti slaptažodžio.",
+      "emailLabel": "Jūsų darbo el. paštas",
+      "send": "Atsiųskite man nuorodą",
+      "sending": "Siunčiama…",
+      "sent": "Jei adresas leidžiamas, netrukus gausite el. laišką su prisijungimo nuoroda. Nuoroda veikia tik kartą ir nustoja galioti po {minutes} minučių.",
+      "error": "Užklausos išsiųsti nepavyko. Bandykite dar kartą po kelių minučių.",
+      "keySection": "Prisijungimas su egzemplioriaus raktu",
+      "accessTitle": "Įeiti į administravimo sritį",
+      "accessIntro": "Paspauskite mygtuką, kad prisijungtumėte. Nuoroda veikia tik kartą.",
+      "enter": "Prisijungti",
+      "invalidLink": "Nuoroda negalioja: ji galėjo nustoti galioti arba jau buvo panaudota.",
+      "newLink": "Prašyti naujos nuorodos"
+    },
+    "organizers": {
+      "title": "Organizatoriai",
+      "intro": "Asmenys, organizuojantys renginius, bet neadministruojantys platformos: jie kuria savo renginius, juos skelbia ir tvarko medžiagą, klausimynus bei postprodukciją. Prisijungia nuoroda, išsiųsta jų el. paštu, be slaptažodžio.",
+      "newTitle": "Pridėti organizatorių",
+      "name": "Vardas ir pavardė",
+      "email": "El. paštas",
+      "add": "Pridėti",
+      "sendNow": "Iškart siųsti prisijungimo nuorodą",
+      "listTitle": "Leidžiami organizatoriai",
+      "loading": "Įkeliama…",
+      "empty": "Organizatorių dar nėra.",
+      "events": "Renginiai",
+      "lastLogin": "Paskutinis prisijungimas",
+      "status": "Būsena",
+      "actions": "Veiksmai",
+      "never": "Niekada",
+      "active": "Aktyvus",
+      "inactive": "Išjungtas",
+      "invite": "Siųsti nuorodą",
+      "inviteFor": "Siųsti prisijungimo nuorodą: {name}",
+      "deactivate": "Išjungti",
+      "deactivateFor": "Išjungti: {name}",
+      "activate": "Vėl įjungti",
+      "activateFor": "Vėl įjungti: {name}",
+      "delete": "Ištrinti",
+      "deleteFor": "Ištrinti: {name}",
+      "deleteTitle": "Ištrinti organizatorių?",
+      "deleteMessage": "{name} paskyra bus ištrinta. Jo renginiai ({count}) neištrinami: jie grąžinami administracijai.",
+      "deactivateTitle": "Išjungti organizatorių?",
+      "deactivateMessage": "{name} nebegalės prisijungti, o jau išsiųstos nuorodos nustos veikti. Jo renginiai lieka nepakitę.",
+      "exists": "Organizatorius su šiuo el. paštu jau yra.",
+      "created": "Organizatorius pridėtas.",
+      "createdInvited": "Organizatorius pridėtas: prisijungimo nuoroda jau keliauja.",
+      "invited": "Prisijungimo nuoroda išsiųsta.",
+      "deleted": "Organizatorius ištrintas.",
+      "updated": "Pakeitimas išsaugotas.",
+      "actionError": "Veiksmas nepavyko. Bandykite dar kartą.",
+      "loadError": "Sąrašo įkelti nepavyko.",
+      "inviteFailed": "Organizatorius pridėtas, bet prisijungimo nuorodos išsiųsti nepavyko: išsiųskite ją dar kartą iš jo eilutės."
+    },
     "fileOrUrl": {
       "tabUpload": "Įkelti failą",
       "tabUrl": "Įklijuoti URL",
@@ -776,6 +834,8 @@
       "eventQuestionnaires": "Klausimynai",
       "rubricaList": "Sąrašas",
       "rubricaDetail": "Įrašas",
+      "organizers": "Organizatoriai",
+      "people": "Asmenys",
       "postprodDetail": "Įrašas",
       "recordingsPostprod": "Transkripcijos / DI",
       "feedbackDashboard": "Feedback"
@@ -1408,8 +1468,10 @@
         "slimBarTitle": "Viršutinė juosta (Slim Header)",
         "slimBarDescription": "Plona juosta puslapio viršuje, nurodanti patronuojančią organizaciją.",
         "parentOrganization": "Patronuojanti organizacija",
-        "parentOrganizationHelp": "Pvz. \"Ministrų Tarybos Pirmininkystė\"",
+        "parentOrganizationHelp": "Institucija, kuriai pavaldi jūsų administracija. Palikite tuščią, kad nebūtų nurodyta jokia.",
         "parentOrganizationUrl": "Patronuojančios organizacijos URL",
+        "siteTagline": "Svetainės šūkis",
+        "siteTaglineHelp": "Rodomas viršutinėje juostoje ir poraštėje, kai aukštesnioji institucija tuščia. Palikite tuščią, kad nieko nebūtų rodoma. Rašomas kiekvienai kalbai: kur trūksta, naudojamas anglų, paskui bet kuris kitas.",
         "centerBarTitle": "Centrinė antraštė",
         "centerBarDescription": "Pagrindinė antraštės zona su programos pavadinimu ir logotipu.",
         "appName": "Programos pavadinimas",
@@ -1428,7 +1490,7 @@
         "organizationNameShort": "Organizacijos santrumpa",
         "organizationUrl": "Organizacijos URL",
         "parentOrganization": "Patronuojanti organizacija",
-        "parentOrganizationHelp": "pvz. Ministrų Tarybos Pirmininkystė",
+        "parentOrganizationHelp": "Institucija, kuriai pavaldi jūsų administracija. Palikite tuščią, kad nebūtų nurodyta jokia.",
         "parentOrganizationUrl": "Patronuojančios organizacijos URL",
         "logoUrl": "Pasirinktinio logotipo URL",
         "logoUrlHelp": "Palikite tuščią, kad būtų naudojama numatytoji VA piktograma",
@@ -1497,7 +1559,9 @@
           }
         },
         "customHtmlLabel": "Pasirinktinis HTML turinys",
-        "customHtmlHelp": "HTML, rodomas pagrindinėje pradžios puslapio dalyje"
+        "customHtmlHelp": "HTML, rodomas pagrindinėje pradžios puslapio dalyje",
+        "showProject": "Rodyti skyrių „Projektas“",
+        "showProjectHelp": "Platformos architektūra, duomenų suverenumas ir atvirasis kodas: aktualu svarstantiems pakartotinį naudojimą labiau nei dalyviams."
       },
       "pages": {
         "privacyTitle": "Privatumo politika",
@@ -3300,8 +3364,6 @@
     }
   },
   "footer": {
-    "departmentName": "Skaitmeninės transformacijos departamentas",
-    "presidencyName": "Ministrų Tarybos Pirmininkystė",
     "privacy": "Privatumo politika",
     "accessibility": "Prieinamumo deklaracija",
     "openSource": "Atvirojo kodo programinė įranga",

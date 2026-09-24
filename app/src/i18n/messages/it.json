@@ -54,8 +54,6 @@
     "skipToFooter": "Vai al footer"
   },
   "header": {
-    "slimTitle": "Presidenza del Consiglio dei Ministri",
-    "slimSubtitle": "Dipartimento per la Trasformazione Digitale",
     "followUs": "Seguici su"
   },
   "events": {
@@ -560,6 +558,66 @@
     }
   },
   "admin": {
+    "accessDenied": {
+      "title": "Questa sezione non è disponibile per il tuo ruolo",
+      "body": "Da organizzatore gestisci i tuoi eventi: crearli, pubblicarli, i materiali, i questionari e la post-produzione. La configurazione della piattaforma e i dati di tutti gli eventi restano all'amministrazione.",
+      "back": "Vai ai tuoi eventi"
+    },
+    "staffLogin": {
+      "title": "Accedi all’area di amministrazione",
+      "intro": "Chi organizza eventi entra con un link mandato alla propria email: niente password da ricordare.",
+      "emailLabel": "La tua email di lavoro",
+      "send": "Mandami il link",
+      "sending": "Invio in corso…",
+      "sent": "Se l’indirizzo è abilitato, a breve riceverai un’email con il link per entrare. Il link vale una sola volta e scade dopo {minutes} minuti.",
+      "error": "Non è stato possibile inviare la richiesta. Riprova tra qualche minuto.",
+      "keySection": "Accesso con la chiave dell’istanza",
+      "accessTitle": "Entra nell’area di amministrazione",
+      "accessIntro": "Premi il pulsante per entrare. Il link vale una sola volta.",
+      "enter": "Entra",
+      "invalidLink": "Il link non è valido: potrebbe essere scaduto o già stato usato.",
+      "newLink": "Chiedi un nuovo link"
+    },
+    "organizers": {
+      "title": "Organizzatori",
+      "intro": "Chi organizza eventi senza amministrare la piattaforma: crea i propri eventi, li pubblica, gestisce materiali, questionari e post-produzione. Entra con un link mandato alla sua email, senza password.",
+      "newTitle": "Aggiungi un organizzatore",
+      "name": "Nome e cognome",
+      "email": "Email",
+      "add": "Aggiungi",
+      "sendNow": "Manda subito il link di accesso",
+      "listTitle": "Organizzatori abilitati",
+      "loading": "Caricamento…",
+      "empty": "Nessun organizzatore, per ora.",
+      "events": "Eventi",
+      "lastLogin": "Ultimo accesso",
+      "status": "Stato",
+      "actions": "Azioni",
+      "never": "Mai",
+      "active": "Attivo",
+      "inactive": "Disattivato",
+      "invite": "Manda link",
+      "inviteFor": "Manda un link di accesso a {name}",
+      "deactivate": "Disattiva",
+      "deactivateFor": "Disattiva {name}",
+      "activate": "Riattiva",
+      "activateFor": "Riattiva {name}",
+      "delete": "Elimina",
+      "deleteFor": "Elimina {name}",
+      "deleteTitle": "Eliminare l’organizzatore?",
+      "deleteMessage": "L’account di {name} sarà eliminato. I suoi eventi ({count}) non vengono cancellati: tornano all’amministrazione.",
+      "deactivateTitle": "Disattivare l’organizzatore?",
+      "deactivateMessage": "{name} non potrà più entrare, e i link di accesso già inviati smettono di funzionare. I suoi eventi restano come sono.",
+      "exists": "Esiste già un organizzatore con questa email.",
+      "created": "Organizzatore aggiunto.",
+      "createdInvited": "Organizzatore aggiunto: il link di accesso è in viaggio.",
+      "invited": "Link di accesso inviato.",
+      "deleted": "Organizzatore eliminato.",
+      "updated": "Modifica salvata.",
+      "actionError": "Operazione non riuscita. Riprova.",
+      "loadError": "Non è stato possibile caricare l’elenco.",
+      "inviteFailed": "Organizzatore aggiunto, ma l’invio del link non è riuscito: rimandalo dalla sua riga."
+    },
     "fileOrUrl": {
       "tabUpload": "Carica file",
       "tabUrl": "Incolla URL",
@@ -848,6 +906,8 @@
       "eventQuestionnaires": "Questionari",
       "rubricaList": "Elenco",
       "rubricaDetail": "Dettaglio",
+      "organizers": "Organizzatori",
+      "people": "Persone",
       "postprodDetail": "Registrazione",
       "recordingsPostprod": "Trascrizioni / AI",
       "feedbackDashboard": "Feedback"
@@ -1480,8 +1540,10 @@
         "slimBarTitle": "Barra superiore (Slim Header)",
         "slimBarDescription": "La barra sottile in alto alla pagina che identifica l'ente di appartenenza.",
         "parentOrganization": "Ente superiore",
-        "parentOrganizationHelp": "Es. \"Presidenza del Consiglio dei Ministri\"",
+        "parentOrganizationHelp": "L’ente da cui dipende la vostra amministrazione. Lascia vuoto per non nominarne nessuno.",
         "parentOrganizationUrl": "URL ente superiore",
+        "siteTagline": "Motto del sito",
+        "siteTaglineHelp": "Compare nella fascia in alto e nel piè di pagina quando l’ente sovraordinato è vuoto. Lascia vuoto per non mostrare nulla. Si scrive per lingua: dove manca, si usa quello inglese, poi uno qualunque.",
         "centerBarTitle": "Header centrale",
         "centerBarDescription": "L'area principale dell'header con il nome dell'applicazione e il logo.",
         "appName": "Nome applicazione",
@@ -1500,7 +1562,7 @@
         "organizationNameShort": "Sigla organizzazione",
         "organizationUrl": "URL organizzazione",
         "parentOrganization": "Organizzazione superiore",
-        "parentOrganizationHelp": "es. Presidenza del Consiglio dei Ministri",
+        "parentOrganizationHelp": "L’ente da cui dipende la vostra amministrazione. Lascia vuoto per non nominarne nessuno.",
         "parentOrganizationUrl": "URL organizzazione superiore",
         "logoUrl": "URL logo personalizzato",
         "logoUrlHelp": "Lascia vuoto per usare l'icona PA predefinita",
@@ -1569,7 +1631,9 @@
           }
         },
         "customHtmlLabel": "Contenuto HTML personalizzato",
-        "customHtmlHelp": "HTML mostrato nella sezione principale della home page"
+        "customHtmlHelp": "HTML mostrato nella sezione principale della home page",
+        "showProject": "Mostra il blocco «Il progetto»",
+        "showProjectHelp": "Architettura, sovranità dei dati e open source della piattaforma: interessa chi valuta di riusarla più di chi partecipa agli eventi."
       },
       "pages": {
         "privacyTitle": "Informativa privacy",
@@ -3300,8 +3364,6 @@
     }
   },
   "footer": {
-    "departmentName": "Dipartimento per la Trasformazione Digitale",
-    "presidencyName": "Presidenza del Consiglio dei Ministri",
     "privacy": "Informativa privacy",
     "accessibility": "Dichiarazione di accessibilità",
     "openSource": "Software open source",

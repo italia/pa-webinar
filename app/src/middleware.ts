@@ -10,7 +10,11 @@ import { getPublicEnv } from '@/lib/env';
 const LOCALE_SEGMENT = locales.join('|');
 
 const ADMIN_PATH_RE = new RegExp(`^/(?:${LOCALE_SEGMENT})/admin(?:/|$)`);
-const ADMIN_LOGIN_RE = new RegExp(`^/(?:${LOCALE_SEGMENT})/admin/login(?:/|$)`);
+// Le pagine per entrare: il login con la chiave e l'atterraggio del link
+// d'accesso mandato per email (`/admin/access`, in italiano `/admin/accesso`).
+const ADMIN_LOGIN_RE = new RegExp(
+  `^/(?:${LOCALE_SEGMENT})/admin/(?:login|access|accesso)(?:/|$)`,
+);
 // Event pages under /admin reachable by a NON-admin event moderator via magic
 // link (moderatorLink = /admin/events/{id}?token=…): the shared management page
 // and its /edit. They authenticate on the event moderator token, not the admin
@@ -196,7 +200,11 @@ async function isValidAdminSession(request: NextRequest): Promise<boolean> {
   try {
     const secret = new TextEncoder().encode(appSecret);
     const { payload } = await jwtVerify(token, secret);
-    return payload.role === 'admin';
+    // Anche l'organizzatore entra nell'area (ADR-014): qui si controlla solo
+    // la firma, perche' il middleware non legge il database. Cosa vede lo
+    // decide ogni pagina, che rilegge l'account e il proprietario
+    // dell'evento.
+    return payload.role === 'admin' || payload.role === 'organizer';
   } catch {
     return false;
   }
@@ -239,20 +247,15 @@ export default async function middleware(request: NextRequest) {
     return applySecurityHeaders(response, nonce);
   }
 
-  // No valid admin session. Distinguish two very different visitors:
-  //  • an EVENT MODERATOR reaching a `?token=` management/edit page via magic
-  //    link — they have NO admin_session cookie at all and must keep access
-  //    (bouncing them to an admin-key login they can't pass would lock them out
-  //    of running their own event: moderatorLink = /admin/events/{id}?token=…);
-  //  • an ADMIN whose session LAPSED — the cookie outlives the JWT (see
-  //    ADMIN_COOKIE_MAX_AGE_SECONDS), so it is still PRESENT though invalid;
-  //    that "present-but-invalid" state means an admin, and they go to login.
+  // Nessuna sessione valida. Le pagine di gestione dell'evento col token nel
+  // link (`/admin/events/{id}?token=…`) passano comunque: il token le
+  // autentica da solo, e chi lo ha — un moderatore esterno, o l'organizzatore
+  // che modera il proprio evento con la sessione scaduta — non deve essere
+  // mandato a un login per fare cio' che il link gia' gli consente. Tutto il
+  // resto va al login.
   const tokenParam = request.nextUrl.searchParams.get('token');
   const isModeratorTokenPage =
-    ADMIN_EVENT_RE.test(pathname) &&
-    !!tokenParam &&
-    UUID_RE.test(tokenParam) &&
-    !hasAdminCookie;
+    ADMIN_EVENT_RE.test(pathname) && !!tokenParam && UUID_RE.test(tokenParam);
   if (isModeratorTokenPage) {
     return applySecurityHeaders(response, nonce);
   }

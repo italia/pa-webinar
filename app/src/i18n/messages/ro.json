@@ -54,8 +54,6 @@
     "skipToFooter": "Salt la subsol"
   },
   "header": {
-    "slimTitle": "Președinția Consiliului de Miniștri",
-    "slimSubtitle": "Departamentul pentru Transformarea Digitală",
     "followUs": "Urmăriți-ne pe"
   },
   "events": {
@@ -488,6 +486,66 @@
     "submitPrimary": "Trimiteți întrebarea"
   },
   "admin": {
+    "accessDenied": {
+      "title": "Această secțiune nu este disponibilă pentru rolul tău",
+      "body": "Ca organizator îți gestionezi propriile evenimente: crearea și publicarea lor, materialele, chestionarele și post-producția. Setările platformei și datele tuturor evenimentelor rămân la administrație.",
+      "back": "Mergi la evenimentele tale"
+    },
+    "staffLogin": {
+      "title": "Autentificare în zona de administrare",
+      "intro": "Organizatorii de evenimente intră cu un link trimis pe e-mail: nicio parolă de ținut minte.",
+      "emailLabel": "E-mailul tău de serviciu",
+      "send": "Trimite-mi linkul",
+      "sending": "Se trimite…",
+      "sent": "Dacă adresa este activată, vei primi în curând un e-mail cu linkul de acces. Linkul funcționează o singură dată și expiră după {minutes} de minute.",
+      "error": "Cererea nu a putut fi trimisă. Încearcă din nou peste câteva minute.",
+      "keySection": "Autentificare cu cheia instanței",
+      "accessTitle": "Intră în zona de administrare",
+      "accessIntro": "Apasă butonul pentru a intra. Linkul funcționează o singură dată.",
+      "enter": "Intră",
+      "invalidLink": "Linkul nu este valid: poate a expirat sau a fost deja folosit.",
+      "newLink": "Cere un link nou"
+    },
+    "organizers": {
+      "title": "Organizatori",
+      "intro": "Persoane care organizează evenimente fără să administreze platforma: își creează propriile evenimente, le publică și gestionează materialele, chestionarele și post-producția. Intră cu un link trimis pe e-mail, fără parolă.",
+      "newTitle": "Adaugă un organizator",
+      "name": "Nume și prenume",
+      "email": "E-mail",
+      "add": "Adaugă",
+      "sendNow": "Trimite acum linkul de acces",
+      "listTitle": "Organizatori activați",
+      "loading": "Se încarcă…",
+      "empty": "Încă nu există organizatori.",
+      "events": "Evenimente",
+      "lastLogin": "Ultima autentificare",
+      "status": "Stare",
+      "actions": "Acțiuni",
+      "never": "Niciodată",
+      "active": "Activ",
+      "inactive": "Dezactivat",
+      "invite": "Trimite link",
+      "inviteFor": "Trimite un link de acces către {name}",
+      "deactivate": "Dezactivează",
+      "deactivateFor": "Dezactivează {name}",
+      "activate": "Reactivează",
+      "activateFor": "Reactivează {name}",
+      "delete": "Șterge",
+      "deleteFor": "Șterge {name}",
+      "deleteTitle": "Ștergi organizatorul?",
+      "deleteMessage": "Contul lui {name} va fi șters. Evenimentele sale ({count}) nu se șterg: revin la administrație.",
+      "deactivateTitle": "Dezactivezi organizatorul?",
+      "deactivateMessage": "{name} nu se va mai putea autentifica, iar linkurile de acces deja trimise nu mai funcționează. Evenimentele sale rămân neschimbate.",
+      "exists": "Există deja un organizator cu acest e-mail.",
+      "created": "Organizator adăugat.",
+      "createdInvited": "Organizator adăugat: linkul de acces este pe drum.",
+      "invited": "Link de acces trimis.",
+      "deleted": "Organizator șters.",
+      "updated": "Modificare salvată.",
+      "actionError": "Operațiunea a eșuat. Încearcă din nou.",
+      "loadError": "Lista nu a putut fi încărcată.",
+      "inviteFailed": "Organizator adăugat, dar linkul de acces nu a putut fi trimis: retrimite-l din rândul său."
+    },
     "fileOrUrl": {
       "tabUpload": "Încărcați fișier",
       "tabUrl": "Lipiți URL",
@@ -776,6 +834,8 @@
       "eventQuestionnaires": "Chestionare",
       "rubricaList": "Listă",
       "rubricaDetail": "Detaliu",
+      "organizers": "Organizatori",
+      "people": "Persoane",
       "postprodDetail": "Înregistrare",
       "recordingsPostprod": "Transcrieri / AI",
       "feedbackDashboard": "Feedback"
@@ -1408,8 +1468,10 @@
         "slimBarTitle": "Bară superioară (Slim Header)",
         "slimBarDescription": "Bara subțire din partea de sus a paginii care identifică instituția superioară.",
         "parentOrganization": "Instituția superioară",
-        "parentOrganizationHelp": "De ex. \"Președinția Consiliului de Miniștri\"",
+        "parentOrganizationHelp": "Organismul de care depinde administrația ta. Lasă gol pentru a nu numi niciunul.",
         "parentOrganizationUrl": "URL instituție superioară",
+        "siteTagline": "Motto-ul site-ului",
+        "siteTaglineHelp": "Apare în bara de sus și în subsol când organizația superioară este goală. Lasă gol pentru a nu afișa nimic. Se scrie pe limbă: unde lipsește, se folosește cel în engleză, apoi oricare altul.",
         "centerBarTitle": "Antet central",
         "centerBarDescription": "Zona principală a antetului cu numele aplicației și logo-ul.",
         "appName": "Numele aplicației",
@@ -1428,7 +1490,7 @@
         "organizationNameShort": "Sigla organizației",
         "organizationUrl": "URL organizație",
         "parentOrganization": "Organizația superioară",
-        "parentOrganizationHelp": "de ex. Președinția Consiliului de Miniștri",
+        "parentOrganizationHelp": "Organismul de care depinde administrația ta. Lasă gol pentru a nu numi niciunul.",
         "parentOrganizationUrl": "URL organizație superioară",
         "logoUrl": "URL logo personalizat",
         "logoUrlHelp": "Lăsați gol pentru a utiliza pictograma AP implicită",
@@ -1497,7 +1559,9 @@
           }
         },
         "customHtmlLabel": "Conținut HTML personalizat",
-        "customHtmlHelp": "HTML afișat în secțiunea principală a paginii de start"
+        "customHtmlHelp": "HTML afișat în secțiunea principală a paginii de start",
+        "showProject": "Afișează secțiunea „Proiectul”",
+        "showProjectHelp": "Arhitectura, suveranitatea datelor și codul deschis al platformei: interesează pe cei care evaluează reutilizarea mai mult decât pe participanți."
       },
       "pages": {
         "privacyTitle": "Politica de confidențialitate",
@@ -3300,8 +3364,6 @@
     }
   },
   "footer": {
-    "departmentName": "Departamentul pentru Transformarea Digitală",
-    "presidencyName": "Președinția Consiliului de Miniștri",
     "privacy": "Politica de confidențialitate",
     "accessibility": "Declarația de accesibilitate",
     "openSource": "Software open source",

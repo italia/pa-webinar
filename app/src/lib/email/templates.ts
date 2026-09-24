@@ -595,3 +595,69 @@ ${recordingHtml}`;
   textLines.push('', footer);
   return { subject, html, text: textLines.join('\n') };
 }
+
+// ── Accesso dello staff (ADR-014) ───────────────────────────────────────
+
+export interface StaffLoginEmailInput {
+  locale: Locale;
+  name: string;
+  url: string;
+  minutes: number;
+  siteName?: string;
+}
+
+const staffLoginCopy: Record<
+  Locale,
+  {
+    subject: (site: string) => string;
+    heading: string;
+    intro: (name: string, site: string) => string;
+    cta: string;
+    expiry: (minutes: number) => string;
+    ignore: string;
+  }
+> = {
+  it: {
+    subject: (site) => `Il tuo link di accesso a ${site}`,
+    heading: 'Accedi all’area di amministrazione',
+    intro: (name, site) =>
+      `Ciao ${name}, ecco il tuo link per entrare nell’area di amministrazione di ${site}. Vale una sola volta.`,
+    cta: 'Entra',
+    expiry: (m) => `Il link scade tra ${m} minuti.`,
+    ignore: 'Se non aspettavi questo messaggio, ignoralo: senza il link non entra nessuno.',
+  },
+  en: {
+    subject: (site) => `Your sign-in link for ${site}`,
+    heading: 'Sign in to the administration area',
+    intro: (name, site) =>
+      `Hello ${name}, here is your link to sign in to the administration area of ${site}. It works only once.`,
+    cta: 'Sign in',
+    expiry: (m) => `The link expires in ${m} minutes.`,
+    ignore: 'If you were not expecting this message, ignore it: nobody can sign in without the link.',
+  },
+};
+
+export function staffLoginEmail(input: StaffLoginEmailInput): {
+  subject: string;
+  html: string;
+  text: string;
+} {
+  const c = staffLoginCopy[input.locale];
+  const site = input.siteName ?? 'PA Webinar';
+  const body = `
+<p style="margin:0 0 16px;">${escapeHtml(c.intro(input.name, site))}</p>
+${ctaButton(c.cta, input.url)}
+<p style="margin:16px 0 0;color:#5A768A;font-size:14px;">${escapeHtml(c.expiry(input.minutes))}<br>${escapeHtml(c.ignore)}</p>`;
+  const html = layout(escapeHtml(c.heading), body, '', input.locale, site);
+  const text = [
+    c.heading,
+    '',
+    c.intro(input.name, site),
+    '',
+    `${c.cta}: ${input.url}`,
+    '',
+    c.expiry(input.minutes),
+    c.ignore,
+  ].join('\n');
+  return { subject: c.subject(site), html, text };
+}

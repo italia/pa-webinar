@@ -54,8 +54,6 @@
     "skipToFooter": "Przejdź do stopki"
   },
   "header": {
-    "slimTitle": "Prezydencja Rady Ministrów",
-    "slimSubtitle": "Departament ds. Transformacji Cyfrowej",
     "followUs": "Obserwuj nas na"
   },
   "events": {
@@ -488,6 +486,66 @@
     "submitPrimary": "Wyślij pytanie"
   },
   "admin": {
+    "accessDenied": {
+      "title": "Ta sekcja nie jest dostępna dla Twojej roli",
+      "body": "Jako organizator zarządzasz własnymi wydarzeniami: tworzeniem, publikacją, materiałami, ankietami i postprodukcją. Ustawienia platformy i dane wszystkich wydarzeń pozostają w gestii administracji.",
+      "back": "Przejdź do swoich wydarzeń"
+    },
+    "staffLogin": {
+      "title": "Logowanie do panelu administracyjnego",
+      "intro": "Organizatorzy wydarzeń logują się linkiem wysłanym na ich e-mail: bez hasła do zapamiętania.",
+      "emailLabel": "Twój służbowy e-mail",
+      "send": "Wyślij mi link",
+      "sending": "Wysyłanie…",
+      "sent": "Jeśli adres jest uprawniony, wkrótce otrzymasz e-mail z linkiem do logowania. Link działa tylko raz i wygasa po {minutes} minutach.",
+      "error": "Nie udało się wysłać prośby. Spróbuj ponownie za kilka minut.",
+      "keySection": "Logowanie kluczem instancji",
+      "accessTitle": "Wejdź do panelu administracyjnego",
+      "accessIntro": "Naciśnij przycisk, aby się zalogować. Link działa tylko raz.",
+      "enter": "Zaloguj się",
+      "invalidLink": "Link jest nieważny: mógł wygasnąć lub zostać już użyty.",
+      "newLink": "Poproś o nowy link"
+    },
+    "organizers": {
+      "title": "Organizatorzy",
+      "intro": "Osoby, które organizują wydarzenia bez administrowania platformą: tworzą własne wydarzenia, publikują je i zarządzają materiałami, ankietami i postprodukcją. Logują się linkiem wysłanym na e-mail, bez hasła.",
+      "newTitle": "Dodaj organizatora",
+      "name": "Imię i nazwisko",
+      "email": "E-mail",
+      "add": "Dodaj",
+      "sendNow": "Wyślij link do logowania od razu",
+      "listTitle": "Uprawnieni organizatorzy",
+      "loading": "Ładowanie…",
+      "empty": "Nie ma jeszcze organizatorów.",
+      "events": "Wydarzenia",
+      "lastLogin": "Ostatnie logowanie",
+      "status": "Status",
+      "actions": "Działania",
+      "never": "Nigdy",
+      "active": "Aktywny",
+      "inactive": "Wyłączony",
+      "invite": "Wyślij link",
+      "inviteFor": "Wyślij link do logowania: {name}",
+      "deactivate": "Wyłącz",
+      "deactivateFor": "Wyłącz: {name}",
+      "activate": "Włącz ponownie",
+      "activateFor": "Włącz ponownie: {name}",
+      "delete": "Usuń",
+      "deleteFor": "Usuń: {name}",
+      "deleteTitle": "Usunąć organizatora?",
+      "deleteMessage": "Konto {name} zostanie usunięte. Jego wydarzenia ({count}) nie są kasowane: wracają do administracji.",
+      "deactivateTitle": "Wyłączyć organizatora?",
+      "deactivateMessage": "{name} nie będzie mógł się już zalogować, a wysłane wcześniej linki przestaną działać. Wydarzenia pozostają bez zmian.",
+      "exists": "Organizator z tym adresem e-mail już istnieje.",
+      "created": "Dodano organizatora.",
+      "createdInvited": "Dodano organizatora: link do logowania jest w drodze.",
+      "invited": "Wysłano link do logowania.",
+      "deleted": "Usunięto organizatora.",
+      "updated": "Zapisano zmianę.",
+      "actionError": "Operacja nie powiodła się. Spróbuj ponownie.",
+      "loadError": "Nie udało się wczytać listy.",
+      "inviteFailed": "Dodano organizatora, ale nie udało się wysłać linku do logowania: wyślij go ponownie z jego wiersza."
+    },
     "fileOrUrl": {
       "tabUpload": "Prześlij plik",
       "tabUrl": "Wklej URL",
@@ -776,6 +834,8 @@
       "eventQuestionnaires": "Kwestionariusze",
       "rubricaList": "Lista",
       "rubricaDetail": "Wpis",
+      "organizers": "Organizatorzy",
+      "people": "Osoby",
       "postprodDetail": "Nagranie",
       "recordingsPostprod": "Transkrypcje / AI",
       "feedbackDashboard": "Feedback"
@@ -1408,8 +1468,10 @@
         "slimBarTitle": "Górny pasek (Slim Header)",
         "slimBarDescription": "Wąski pasek na górze strony identyfikujący instytucję nadrzędną.",
         "parentOrganization": "Instytucja nadrzędna",
-        "parentOrganizationHelp": "Np. \"Prezydencja Rady Ministrów\"",
+        "parentOrganizationHelp": "Jednostka, której podlega Twoja administracja. Pozostaw puste, aby żadnej nie wskazywać.",
         "parentOrganizationUrl": "URL instytucji nadrzędnej",
+        "siteTagline": "Hasło serwisu",
+        "siteTaglineHelp": "Wyświetla się na górnym pasku i w stopce, gdy jednostka nadrzędna jest pusta. Pozostaw puste, aby nic nie wyświetlać. Wpisuje się je dla każdego języka: tam, gdzie go brak, używane jest angielskie, a potem dowolne inne.",
         "centerBarTitle": "Nagłówek centralny",
         "centerBarDescription": "Główny obszar nagłówka z nazwą aplikacji i logotypem.",
         "appName": "Nazwa aplikacji",
@@ -1428,7 +1490,7 @@
         "organizationNameShort": "Skrót organizacji",
         "organizationUrl": "URL organizacji",
         "parentOrganization": "Organizacja nadrzędna",
-        "parentOrganizationHelp": "np. Prezydencja Rady Ministrów",
+        "parentOrganizationHelp": "Jednostka, której podlega Twoja administracja. Pozostaw puste, aby żadnej nie wskazywać.",
         "parentOrganizationUrl": "URL organizacji nadrzędnej",
         "logoUrl": "URL niestandardowego logotypu",
         "logoUrlHelp": "Pozostaw puste, aby użyć domyślnej ikony AP",
@@ -1497,7 +1559,9 @@
           }
         },
         "customHtmlLabel": "Niestandardowa treść HTML",
-        "customHtmlHelp": "HTML wyświetlany w głównej sekcji strony głównej"
+        "customHtmlHelp": "HTML wyświetlany w głównej sekcji strony głównej",
+        "showProject": "Pokaż sekcję „Projekt”",
+        "showProjectHelp": "Architektura, suwerenność danych i otwarte oprogramowanie platformy: interesujące dla rozważających ponowne użycie bardziej niż dla uczestników."
       },
       "pages": {
         "privacyTitle": "Polityka prywatności",
@@ -3300,8 +3364,6 @@
     }
   },
   "footer": {
-    "departmentName": "Departament ds. Transformacji Cyfrowej",
-    "presidencyName": "Prezydencja Rady Ministrów",
     "privacy": "Polityka prywatności",
     "accessibility": "Oświadczenie o dostępności",
     "openSource": "Oprogramowanie open source",

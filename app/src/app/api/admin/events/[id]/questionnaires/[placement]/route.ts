@@ -13,10 +13,10 @@ import { cookies } from 'next/headers';
 import { Prisma } from '@prisma/client';
 
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
-import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { requireEventManager } from '@/lib/auth/staff-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { prisma } from '@/lib/db';
-import { AppError, NotFoundError, UnauthorizedError, ValidationError } from '@/lib/errors';
+import { AppError, NotFoundError, ValidationError } from '@/lib/errors';
 import {
   upsertEventQuestionnaireSchema,
   QUESTIONNAIRE_PLACEMENTS,
@@ -55,10 +55,9 @@ function adhocItemCreate(item: UpsertEventQuestionnaireInput['adhocItems'][numbe
 }
 
 export const GET = withErrorHandling(async (_request, context) => {
-  const isAdmin = await isAdminAuthenticated(await cookies());
-  if (!isAdmin) throw new UnauthorizedError();
-
   const { id, placement: rawPlacement } = await context.params;
+  // Dell'evento: l'admin, o l'organizzatore che l'ha creato (ADR-014).
+  await requireEventManager(await cookies(), id);
   if (!UUID_RE.test(id)) {
     throw new AppError('Event ID must be a UUID', 400, 'BAD_REQUEST');
   }
@@ -101,10 +100,9 @@ export const GET = withErrorHandling(async (_request, context) => {
 });
 
 export const PUT = withErrorHandling(async (request, context) => {
-  const isAdmin = await isAdminAuthenticated(await cookies());
-  if (!isAdmin) throw new UnauthorizedError();
-
   const { id, placement: rawPlacement } = await context.params;
+  // Dell'evento: l'admin, o l'organizzatore che l'ha creato (ADR-014).
+  await requireEventManager(await cookies(), id);
   if (!UUID_RE.test(id)) {
     throw new AppError('Event ID must be a UUID', 400, 'BAD_REQUEST');
   }
@@ -215,10 +213,9 @@ export const PUT = withErrorHandling(async (request, context) => {
 });
 
 export const DELETE = withErrorHandling(async (request, context) => {
-  const isAdmin = await isAdminAuthenticated(await cookies());
-  if (!isAdmin) throw new UnauthorizedError();
-
   const { id, placement: rawPlacement } = await context.params;
+  // Dell'evento: l'admin, o l'organizzatore che l'ha creato (ADR-014).
+  await requireEventManager(await cookies(), id);
   if (!UUID_RE.test(id)) {
     throw new AppError('Event ID must be a UUID', 400, 'BAD_REQUEST');
   }

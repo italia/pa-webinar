@@ -54,8 +54,6 @@
     "skipToFooter": "Ga naar footer"
   },
   "header": {
-    "slimTitle": "Voorzitterschap van de Raad van Ministers",
-    "slimSubtitle": "Departement voor Digitale Transformatie",
     "followUs": "Volg ons op"
   },
   "events": {
@@ -488,6 +486,66 @@
     "submitPrimary": "Vraag versturen"
   },
   "admin": {
+    "accessDenied": {
+      "title": "Dit onderdeel is niet beschikbaar voor uw rol",
+      "body": "Als organisator beheert u uw eigen evenementen: aanmaken, publiceren, materialen, vragenlijsten en nabewerking. De platforminstellingen en de gegevens van alle evenementen blijven bij de beheerders.",
+      "back": "Naar uw evenementen"
+    },
+    "staffLogin": {
+      "title": "Inloggen in het beheergedeelte",
+      "intro": "Organisatoren loggen in met een link die naar hun e-mailadres wordt gestuurd: geen wachtwoord om te onthouden.",
+      "emailLabel": "Uw werk-e-mailadres",
+      "send": "Stuur mij de link",
+      "sending": "Bezig met verzenden…",
+      "sent": "Als het adres is ingeschakeld, ontvangt u binnenkort een e-mail met de inloglink. De link werkt maar één keer en verloopt na {minutes} minuten.",
+      "error": "Het verzoek kon niet worden verzonden. Probeer het over enkele minuten opnieuw.",
+      "keySection": "Inloggen met de instantiesleutel",
+      "accessTitle": "Naar het beheergedeelte",
+      "accessIntro": "Druk op de knop om in te loggen. De link werkt maar één keer.",
+      "enter": "Inloggen",
+      "invalidLink": "De link is niet geldig: hij is mogelijk verlopen of al gebruikt.",
+      "newLink": "Nieuwe link aanvragen"
+    },
+    "organizers": {
+      "title": "Organisatoren",
+      "intro": "Mensen die evenementen organiseren zonder het platform te beheren: zij maken hun eigen evenementen aan, publiceren ze en beheren materialen, vragenlijsten en nabewerking. Ze loggen in met een link die naar hun e-mail wordt gestuurd, zonder wachtwoord.",
+      "newTitle": "Organisator toevoegen",
+      "name": "Voor- en achternaam",
+      "email": "E-mail",
+      "add": "Toevoegen",
+      "sendNow": "Stuur de inloglink meteen",
+      "listTitle": "Ingeschakelde organisatoren",
+      "loading": "Laden…",
+      "empty": "Nog geen organisatoren.",
+      "events": "Evenementen",
+      "lastLogin": "Laatste aanmelding",
+      "status": "Status",
+      "actions": "Acties",
+      "never": "Nooit",
+      "active": "Actief",
+      "inactive": "Uitgeschakeld",
+      "invite": "Link sturen",
+      "inviteFor": "Stuur een inloglink naar {name}",
+      "deactivate": "Uitschakelen",
+      "deactivateFor": "{name} uitschakelen",
+      "activate": "Opnieuw inschakelen",
+      "activateFor": "{name} opnieuw inschakelen",
+      "delete": "Verwijderen",
+      "deleteFor": "{name} verwijderen",
+      "deleteTitle": "Organisator verwijderen?",
+      "deleteMessage": "Het account van {name} wordt verwijderd. De evenementen ({count}) blijven bestaan en gaan terug naar de beheerders.",
+      "deactivateTitle": "Organisator uitschakelen?",
+      "deactivateMessage": "{name} kan niet meer inloggen en reeds verstuurde inloglinks werken niet meer. De evenementen blijven zoals ze zijn.",
+      "exists": "Er bestaat al een organisator met dit e-mailadres.",
+      "created": "Organisator toegevoegd.",
+      "createdInvited": "Organisator toegevoegd: de inloglink is onderweg.",
+      "invited": "Inloglink verstuurd.",
+      "deleted": "Organisator verwijderd.",
+      "updated": "Wijziging opgeslagen.",
+      "actionError": "De bewerking is mislukt. Probeer het opnieuw.",
+      "loadError": "De lijst kon niet worden geladen.",
+      "inviteFailed": "Organisator toegevoegd, maar de inloglink kon niet worden verstuurd: stuur hem opnieuw vanuit de rij."
+    },
     "fileOrUrl": {
       "tabUpload": "Bestand uploaden",
       "tabUrl": "URL plakken",
@@ -776,6 +834,8 @@
       "eventQuestionnaires": "Vragenlijsten",
       "rubricaList": "Lijst",
       "rubricaDetail": "Detail",
+      "organizers": "Organisatoren",
+      "people": "Personen",
       "postprodDetail": "Opname",
       "recordingsPostprod": "Transcripties / AI",
       "feedbackDashboard": "Feedback"
@@ -1408,8 +1468,10 @@
         "slimBarTitle": "Bovenste balk (Slim Header)",
         "slimBarDescription": "De dunne balk bovenaan de pagina die de bovenliggende organisatie identificeert.",
         "parentOrganization": "Bovenliggende organisatie",
-        "parentOrganizationHelp": "Bijv. \"Voorzitterschap van de Raad van Ministers\"",
+        "parentOrganizationHelp": "De organisatie waaronder uw overheid valt. Laat leeg om er geen te noemen.",
         "parentOrganizationUrl": "URL bovenliggende organisatie",
+        "siteTagline": "Slogan van de site",
+        "siteTaglineHelp": "Verschijnt in de bovenste balk en de voettekst als de bovenliggende organisatie leeg is. Laat leeg om niets te tonen. Wordt per taal ingevuld: ontbreekt er een, dan wordt de Engelse gebruikt, daarna een willekeurige andere.",
         "centerBarTitle": "Centrale header",
         "centerBarDescription": "Het hoofdgebied van de header met de applicatienaam en het logo.",
         "appName": "Applicatienaam",
@@ -1428,7 +1490,7 @@
         "organizationNameShort": "Afkorting organisatie",
         "organizationUrl": "URL organisatie",
         "parentOrganization": "Bovenliggende organisatie",
-        "parentOrganizationHelp": "bijv. Voorzitterschap van de Raad van Ministers",
+        "parentOrganizationHelp": "De organisatie waaronder uw overheid valt. Laat leeg om er geen te noemen.",
         "parentOrganizationUrl": "URL bovenliggende organisatie",
         "logoUrl": "URL aangepast logo",
         "logoUrlHelp": "Laat leeg om het standaard PA-pictogram te gebruiken",
@@ -1497,7 +1559,9 @@
           }
         },
         "customHtmlLabel": "Aangepaste HTML-inhoud",
-        "customHtmlHelp": "HTML weergegeven in het hoofdgedeelte van de startpagina"
+        "customHtmlHelp": "HTML weergegeven in het hoofdgedeelte van de startpagina",
+        "showProject": "Onderdeel ‘Het project’ tonen",
+        "showProjectHelp": "Architectuur, datasoevereiniteit en open source van het platform: interessant voor wie hergebruik overweegt, minder voor deelnemers."
       },
       "pages": {
         "privacyTitle": "Privacybeleid",
@@ -3300,8 +3364,6 @@
     }
   },
   "footer": {
-    "departmentName": "Departement voor Digitale Transformatie",
-    "presidencyName": "Voorzitterschap van de Raad van Ministers",
     "privacy": "Privacybeleid",
     "accessibility": "Toegankelijkheidsverklaring",
     "openSource": "Open source software",

@@ -54,8 +54,6 @@
     "skipToFooter": "Aller au pied de page"
   },
   "header": {
-    "slimTitle": "Présidence du Conseil des Ministres",
-    "slimSubtitle": "Département pour la Transformation Numérique",
     "followUs": "Suivez-nous sur"
   },
   "events": {
@@ -488,6 +486,66 @@
     "submitPrimary": "Envoyer la question"
   },
   "admin": {
+    "accessDenied": {
+      "title": "Cette section n’est pas disponible pour votre rôle",
+      "body": "En tant qu’organisateur, vous gérez vos propres événements : création, publication, supports, questionnaires et post-production. Les réglages de la plateforme et les données de tous les événements restent à l’administration.",
+      "back": "Aller à vos événements"
+    },
+    "staffLogin": {
+      "title": "Connexion à l’espace d’administration",
+      "intro": "Les organisateurs se connectent avec un lien envoyé à leur adresse e-mail : aucun mot de passe à retenir.",
+      "emailLabel": "Votre adresse e-mail professionnelle",
+      "send": "M’envoyer le lien",
+      "sending": "Envoi en cours…",
+      "sent": "Si l’adresse est autorisée, vous recevrez sous peu un e-mail avec le lien de connexion. Le lien n’est valable qu’une fois et expire après {minutes} minutes.",
+      "error": "La demande n’a pas pu être envoyée. Réessayez dans quelques minutes.",
+      "keySection": "Connexion avec la clé de l’instance",
+      "accessTitle": "Entrer dans l’espace d’administration",
+      "accessIntro": "Appuyez sur le bouton pour vous connecter. Le lien n’est valable qu’une fois.",
+      "enter": "Se connecter",
+      "invalidLink": "Le lien n’est pas valide : il a peut-être expiré ou déjà été utilisé.",
+      "newLink": "Demander un nouveau lien"
+    },
+    "organizers": {
+      "title": "Organisateurs",
+      "intro": "Les personnes qui organisent des événements sans administrer la plateforme : elles créent leurs propres événements, les publient et gèrent supports, questionnaires et post-production. Elles se connectent avec un lien envoyé à leur e-mail, sans mot de passe.",
+      "newTitle": "Ajouter un organisateur",
+      "name": "Nom et prénom",
+      "email": "E-mail",
+      "add": "Ajouter",
+      "sendNow": "Envoyer le lien de connexion tout de suite",
+      "listTitle": "Organisateurs autorisés",
+      "loading": "Chargement…",
+      "empty": "Aucun organisateur pour le moment.",
+      "events": "Événements",
+      "lastLogin": "Dernière connexion",
+      "status": "Statut",
+      "actions": "Actions",
+      "never": "Jamais",
+      "active": "Actif",
+      "inactive": "Désactivé",
+      "invite": "Envoyer le lien",
+      "inviteFor": "Envoyer un lien de connexion à {name}",
+      "deactivate": "Désactiver",
+      "deactivateFor": "Désactiver {name}",
+      "activate": "Réactiver",
+      "activateFor": "Réactiver {name}",
+      "delete": "Supprimer",
+      "deleteFor": "Supprimer {name}",
+      "deleteTitle": "Supprimer l’organisateur ?",
+      "deleteMessage": "Le compte de {name} sera supprimé. Ses événements ({count}) ne sont pas effacés : ils reviennent à l’administration.",
+      "deactivateTitle": "Désactiver l’organisateur ?",
+      "deactivateMessage": "{name} ne pourra plus se connecter et les liens déjà envoyés cessent de fonctionner. Ses événements restent en l’état.",
+      "exists": "Un organisateur avec cet e-mail existe déjà.",
+      "created": "Organisateur ajouté.",
+      "createdInvited": "Organisateur ajouté : le lien de connexion est en route.",
+      "invited": "Lien de connexion envoyé.",
+      "deleted": "Organisateur supprimé.",
+      "updated": "Modification enregistrée.",
+      "actionError": "L’opération a échoué. Veuillez réessayer.",
+      "loadError": "La liste n’a pas pu être chargée.",
+      "inviteFailed": "Organisateur ajouté, mais le lien de connexion n’a pas pu être envoyé : renvoyez-le depuis sa ligne."
+    },
     "fileOrUrl": {
       "tabUpload": "Téléverser un fichier",
       "tabUrl": "Coller une URL",
@@ -776,6 +834,8 @@
       "eventQuestionnaires": "Questionnaires",
       "rubricaList": "Liste",
       "rubricaDetail": "Détail",
+      "organizers": "Organisateurs",
+      "people": "Personnes",
       "postprodDetail": "Enregistrement",
       "recordingsPostprod": "Transcriptions / IA",
       "feedbackDashboard": "Feedback"
@@ -1408,8 +1468,10 @@
         "slimBarTitle": "Barre supérieure (Slim Header)",
         "slimBarDescription": "La barre fine en haut de la page identifiant l'organisme de rattachement.",
         "parentOrganization": "Organisme supérieur",
-        "parentOrganizationHelp": "P. ex. « Présidence du Conseil des Ministres »",
+        "parentOrganizationHelp": "L’organisme dont dépend votre administration. Laissez vide pour n’en nommer aucun.",
         "parentOrganizationUrl": "URL de l'organisme supérieur",
+        "siteTagline": "Devise du site",
+        "siteTaglineHelp": "Affichée dans le bandeau supérieur et le pied de page lorsque l’organisme de tutelle est vide. Laissez vide pour ne rien afficher. Elle se saisit par langue : si elle manque, on utilise l’anglaise, puis n’importe quelle autre.",
         "centerBarTitle": "En-tête central",
         "centerBarDescription": "La zone principale de l'en-tête avec le nom de l'application et le logo.",
         "appName": "Nom de l'application",
@@ -1428,7 +1490,7 @@
         "organizationNameShort": "Sigle de l'organisation",
         "organizationUrl": "URL de l'organisation",
         "parentOrganization": "Organisation supérieure",
-        "parentOrganizationHelp": "p. ex. Présidence du Conseil des Ministres",
+        "parentOrganizationHelp": "L’organisme dont dépend votre administration. Laissez vide pour n’en nommer aucun.",
         "parentOrganizationUrl": "URL de l'organisation supérieure",
         "logoUrl": "URL du logo personnalisé",
         "logoUrlHelp": "Laissez vide pour utiliser l'icône PA par défaut",
@@ -1497,7 +1559,9 @@
           }
         },
         "customHtmlLabel": "Contenu HTML personnalisé",
-        "customHtmlHelp": "HTML affiché dans la section principale de la page d'accueil"
+        "customHtmlHelp": "HTML affiché dans la section principale de la page d'accueil",
+        "showProject": "Afficher la section « Le projet »",
+        "showProjectHelp": "Architecture, souveraineté des données et open source de la plateforme : utile à qui évalue sa réutilisation plus qu’aux participants."
       },
       "pages": {
         "privacyTitle": "Politique de confidentialité",
@@ -3300,8 +3364,6 @@
     }
   },
   "footer": {
-    "departmentName": "Département pour la Transformation Numérique",
-    "presidencyName": "Présidence du Conseil des Ministres",
     "privacy": "Politique de confidentialité",
     "accessibility": "Déclaration d'accessibilité",
     "openSource": "Logiciel open source",

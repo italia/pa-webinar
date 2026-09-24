@@ -723,6 +723,7 @@ flowchart TD
     START["Utente accede al portale"] --> CHECK{"Quale percorso?"}
 
     CHECK -- "/admin/*" --> ADMIN_FLOW
+    CHECK -- "/admin/* con email" --> ORG_FLOW
     CHECK -- "/eventi/[slug]/live?moderator=xxx" --> MOD_FLOW
     CHECK -- "/eventi/[slug]/live?token=xxx" --> PART_FLOW
 
@@ -735,6 +736,14 @@ flowchart TD
         A1 --> A2 --> A3
         A3 -- "Si" --> A4
         A3 -- "No" --> A5
+    end
+
+    subgraph ORG_FLOW["Flusso Organizzatore (ADR-014)"]
+        O1["POST /api/staff/login-link<br/>con l'email"]
+        O2["Link monouso via email<br/>solo l'hash nel database"]
+        O3["Clic su /admin/accesso<br/>POST /api/staff/login-link/verify"]
+        O4["JWT organizer + sub account<br/>stesso cookie HttpOnly"]
+        O1 --> O2 --> O3 --> O4
     end
 
     subgraph MOD_FLOW["Flusso Moderatore"]
@@ -760,6 +769,7 @@ flowchart TD
     end
 
     A4 --> DASHBOARD["Dashboard admin"]
+    O4 --> OWN["Area admin<br/>solo i propri eventi"]
     M4 --> ROOM_MOD["Sala evento - ruolo moderatore"]
     P4 --> ROOM_PART["Sala evento - ruolo partecipante"]
 ```

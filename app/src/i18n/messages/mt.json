@@ -54,8 +54,6 @@
     "skipToFooter": "Mur il-footer"
   },
   "header": {
-    "slimTitle": "Presidenza tal-Kunsill tal-Ministri",
-    "slimSubtitle": "Dipartiment għat-Trasformazzjoni Diġitali",
     "followUs": "Segwina fuq"
   },
   "events": {
@@ -488,6 +486,66 @@
     "submitPrimary": "Ibgħat il-mistoqsija"
   },
   "admin": {
+    "accessDenied": {
+      "title": "Din it-taqsima mhijiex disponibbli għar-rwol tiegħek",
+      "body": "Bħala organizzatur timmaniġġja l-avvenimenti tiegħek: toħloqhom u tippubblikahom, il-materjali, il-kwestjonarji u l-postproduzzjoni. Is-settings tal-pjattaforma u d-data tal-avvenimenti kollha jibqgħu għand l-amministrazzjoni.",
+      "back": "Mur għall-avvenimenti tiegħek"
+    },
+    "staffLogin": {
+      "title": "Idħol fiż-żona tal-amministrazzjoni",
+      "intro": "Min jorganizza avvenimenti jidħol b’link mibgħut lill-email tiegħu: l-ebda password x’tiftakar.",
+      "emailLabel": "L-email tax-xogħol tiegħek",
+      "send": "Ibgħatli l-link",
+      "sending": "Qed jintbagħat…",
+      "sent": "Jekk l-indirizz ikun awtorizzat, dalwaqt tirċievi email bil-link biex tidħol. Il-link jaħdem darba biss u jiskadi wara {minutes} minuta.",
+      "error": "It-talba ma setgħetx tintbagħat. Erġa’ pprova fi ftit minuti.",
+      "keySection": "Dħul biċ-ċavetta tal-istanza",
+      "accessTitle": "Idħol fiż-żona tal-amministrazzjoni",
+      "accessIntro": "Agħfas il-buttuna biex tidħol. Il-link jaħdem darba biss.",
+      "enter": "Idħol",
+      "invalidLink": "Il-link mhuwiex validu: jista’ jkun skada jew intuża diġà.",
+      "newLink": "Itlob link ġdid"
+    },
+    "organizers": {
+      "title": "Organizzaturi",
+      "intro": "Persuni li jorganizzaw avvenimenti mingħajr ma jamministraw il-pjattaforma: joħolqu l-avvenimenti tagħhom, jippubblikawhom u jimmaniġġjaw materjali, kwestjonarji u postproduzzjoni. Jidħlu b’link mibgħut lill-email tagħhom, mingħajr password.",
+      "newTitle": "Żid organizzatur",
+      "name": "Isem u kunjom",
+      "email": "Email",
+      "add": "Żid",
+      "sendNow": "Ibgħat il-link tad-dħul issa",
+      "listTitle": "Organizzaturi awtorizzati",
+      "loading": "Qed jitgħabba…",
+      "empty": "Għad m’hemmx organizzaturi.",
+      "events": "Avvenimenti",
+      "lastLogin": "L-aħħar dħul",
+      "status": "Status",
+      "actions": "Azzjonijiet",
+      "never": "Qatt",
+      "active": "Attiv",
+      "inactive": "Diżattivat",
+      "invite": "Ibgħat link",
+      "inviteFor": "Ibgħat link tad-dħul lil {name}",
+      "deactivate": "Iddiżattiva",
+      "deactivateFor": "Iddiżattiva lil {name}",
+      "activate": "Erġa’ attiva",
+      "activateFor": "Erġa’ attiva lil {name}",
+      "delete": "Ħassar",
+      "deleteFor": "Ħassar lil {name}",
+      "deleteTitle": "Tħassar l-organizzatur?",
+      "deleteMessage": "Il-kont ta’ {name} se jitħassar. L-avvenimenti tiegħu ({count}) ma jitħassrux: jerġgħu lura għand l-amministrazzjoni.",
+      "deactivateTitle": "Tiddiżattiva l-organizzatur?",
+      "deactivateMessage": "{name} ma jkunx jista’ jidħol aktar, u l-links diġà mibgħuta ma jibqgħux jaħdmu. L-avvenimenti tiegħu jibqgħu kif inhuma.",
+      "exists": "Diġà jeżisti organizzatur b’din l-email.",
+      "created": "Organizzatur miżjud.",
+      "createdInvited": "Organizzatur miżjud: il-link tad-dħul fi triqtu.",
+      "invited": "Link tad-dħul mibgħut.",
+      "deleted": "Organizzatur imħassar.",
+      "updated": "Bidla salvata.",
+      "actionError": "L-operazzjoni ma rnexxietx. Erġa’ pprova.",
+      "loadError": "Il-lista ma setgħetx titgħabba.",
+      "inviteFailed": "L-organizzatur ġie miżjud, iżda l-link tad-dħul ma setax jintbagħat: erġa’ ibgħatu mir-ringiela tiegħu."
+    },
     "fileOrUrl": {
       "tabUpload": "Tella' fajl",
       "tabUrl": "Waħħal URL",
@@ -776,6 +834,8 @@
       "eventQuestionnaires": "Kwestjonarji",
       "rubricaList": "Lista",
       "rubricaDetail": "Dettall",
+      "organizers": "Organizzaturi",
+      "people": "Persuni",
       "postprodDetail": "Reġistrazzjoni",
       "recordingsPostprod": "Traskrizzjonijiet / AI",
       "feedbackDashboard": "Feedback"
@@ -1408,8 +1468,10 @@
         "slimBarTitle": "Barra ta' fuq (Slim Header)",
         "slimBarDescription": "Il-barra rqiqa fin-naħa ta' fuq tal-paġna li tidentifika l-entità superjuri.",
         "parentOrganization": "Entità superjuri",
-        "parentOrganizationHelp": "Eż. \"Presidenza tal-Kunsill tal-Ministri\"",
+        "parentOrganizationHelp": "L-entità li minnha tiddependi l-amministrazzjoni tiegħek. Ħalliha vojta biex ma ssemmi l-ebda waħda.",
         "parentOrganizationUrl": "URL tal-entità superjuri",
+        "siteTagline": "Il-motto tas-sit",
+        "siteTaglineHelp": "Jidher fil-faxxa ta’ fuq u fil-footer meta l-entità superjuri tkun vojta. Ħalliha vojta biex ma jidher xejn. Jinkiteb skont il-lingwa: fejn jonqos, jintuża dak bl-Ingliż, imbagħad kwalunkwe ieħor.",
         "centerBarTitle": "Header ċentrali",
         "centerBarDescription": "Iż-żona prinċipali tal-header bl-isem tal-applikazzjoni u l-logo.",
         "appName": "Isem l-applikazzjoni",
@@ -1428,7 +1490,7 @@
         "organizationNameShort": "Sigla tal-organizzazzjoni",
         "organizationUrl": "URL tal-organizzazzjoni",
         "parentOrganization": "Organizzazzjoni superjuri",
-        "parentOrganizationHelp": "eż. Presidenza tal-Kunsill tal-Ministri",
+        "parentOrganizationHelp": "L-entità li minnha tiddependi l-amministrazzjoni tiegħek. Ħalliha vojta biex ma ssemmi l-ebda waħda.",
         "parentOrganizationUrl": "URL tal-organizzazzjoni superjuri",
         "logoUrl": "URL tal-logo personalizzat",
         "logoUrlHelp": "Ħallih vojt biex tuża l-ikona predefinita tal-PA",
@@ -1497,7 +1559,9 @@
           }
         },
         "customHtmlLabel": "Kontenut HTML personalizzat",
-        "customHtmlHelp": "HTML li jidher fis-sezzjoni prinċipali tal-paġna ewlenija"
+        "customHtmlHelp": "HTML li jidher fis-sezzjoni prinċipali tal-paġna ewlenija",
+        "showProject": "Uri t-taqsima “Il-proġett”",
+        "showProjectHelp": "L-arkitettura, is-sovranità tad-data u s-sors miftuħ tal-pjattaforma: jinteressaw lil min qed jikkunsidra l-użu mill-ġdid aktar milli lill-parteċipanti."
       },
       "pages": {
         "privacyTitle": "Avviż dwar il-privatezza",
@@ -3300,8 +3364,6 @@
     }
   },
   "footer": {
-    "departmentName": "Dipartiment għat-Trasformazzjoni Diġitali",
-    "presidencyName": "Presidenza tal-Kunsill tal-Ministri",
     "privacy": "Avviż dwar il-privatezza",
     "accessibility": "Dikjarazzjoni ta' aċċessibbiltà",
     "openSource": "Software open source",

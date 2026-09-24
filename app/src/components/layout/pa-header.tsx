@@ -1,6 +1,6 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import {
   Headers,
   Header,
@@ -12,6 +12,7 @@ import {
 import { Icon } from '@/components/ui/icon';
 import { Link } from '@/i18n/navigation';
 import { useSettings } from '@/lib/settings-context';
+import { mottoDelSito } from '@/lib/utils/locale';
 
 import LanguageSwitcher from './language-switcher';
 
@@ -22,16 +23,21 @@ interface PAHeaderProps {
 export default function PAHeader({ isAdmin }: PAHeaderProps) {
   const t = useTranslations();
   const settings = useSettings();
+  const locale = useLocale();
 
-  const slimTitle =
-    settings.parentOrganization || t('header.slimTitle');
+  // La fascia alta nomina l'ente sovraordinato se l'amministrazione lo ha
+  // indicato, altrimenti il motto del sito, altrimenti niente. Nessun nome di
+  // ente di riserva scritto nel codice: chi installa la piattaforma non deve
+  // ritrovarsi quello di un'altra amministrazione, e chi ha svuotato il campo
+  // voleva proprio che sparisse.
+  const parent = settings.parentOrganization?.trim() ?? '';
+  const tagline = mottoDelSito(settings.siteTagline, locale);
+  const slimTitle = parent || tagline;
   const slimSubtitle =
-    settings.organizationNameShort || settings.organizationName || t('header.slimSubtitle');
-  // Only link the slim-header brand when the adopting PA has configured a
-  // parent-organisation URL. We intentionally do NOT fall back to a hardcoded
-  // governo.it link: an unconfigured deploy should show the parent body as
-  // plain text, not point at an unrelated site.
-  const parentUrl = settings.parentOrganizationUrl?.trim() || undefined;
+    settings.organizationNameShort?.trim() || settings.organizationName?.trim() || slimTitle;
+  // Il collegamento vale per l'ente, non per il motto; e mai verso un sito
+  // scelto dal codice.
+  const parentUrl = parent ? settings.parentOrganizationUrl?.trim() || undefined : undefined;
   const appName = settings.siteName || t('common.appName');
 
   return (

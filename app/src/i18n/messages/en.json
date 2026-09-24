@@ -54,8 +54,6 @@
     "skipToFooter": "Skip to footer"
   },
   "header": {
-    "slimTitle": "Presidency of the Council of Ministers",
-    "slimSubtitle": "Department for Digital Transformation",
     "followUs": "Follow us on"
   },
   "events": {
@@ -488,6 +486,66 @@
     "submitPrimary": "Send question"
   },
   "admin": {
+    "accessDenied": {
+      "title": "This section is not available for your role",
+      "body": "As an organizer you manage your own events: creating and publishing them, materials, questionnaires and post-production. Platform settings and data across all events stay with the administration.",
+      "back": "Go to your events"
+    },
+    "staffLogin": {
+      "title": "Sign in to the administration area",
+      "intro": "Event organizers sign in with a link sent to their email: no password to remember.",
+      "emailLabel": "Your work email",
+      "send": "Send me the link",
+      "sending": "Sending…",
+      "sent": "If the address is enabled, you will shortly receive an email with the sign-in link. The link works only once and expires after {minutes} minutes.",
+      "error": "The request could not be sent. Please try again in a few minutes.",
+      "keySection": "Sign in with the instance key",
+      "accessTitle": "Enter the administration area",
+      "accessIntro": "Press the button to sign in. The link works only once.",
+      "enter": "Sign in",
+      "invalidLink": "The link is not valid: it may have expired or already been used.",
+      "newLink": "Request a new link"
+    },
+    "organizers": {
+      "title": "Organizers",
+      "intro": "People who organize events without administering the platform: they create their own events, publish them, and manage materials, questionnaires and post-production. They sign in with a link sent to their email, without a password.",
+      "newTitle": "Add an organizer",
+      "name": "Full name",
+      "email": "Email",
+      "add": "Add",
+      "sendNow": "Send the sign-in link now",
+      "listTitle": "Enabled organizers",
+      "loading": "Loading…",
+      "empty": "No organizers yet.",
+      "events": "Events",
+      "lastLogin": "Last sign-in",
+      "status": "Status",
+      "actions": "Actions",
+      "never": "Never",
+      "active": "Active",
+      "inactive": "Deactivated",
+      "invite": "Send link",
+      "inviteFor": "Send a sign-in link to {name}",
+      "deactivate": "Deactivate",
+      "deactivateFor": "Deactivate {name}",
+      "activate": "Reactivate",
+      "activateFor": "Reactivate {name}",
+      "delete": "Delete",
+      "deleteFor": "Delete {name}",
+      "deleteTitle": "Delete the organizer?",
+      "deleteMessage": "{name}’s account will be deleted. Their events ({count}) are not removed: they go back to the administration.",
+      "deactivateTitle": "Deactivate the organizer?",
+      "deactivateMessage": "{name} will no longer be able to sign in, and sign-in links already sent stop working. Their events stay as they are.",
+      "exists": "An organizer with this email already exists.",
+      "created": "Organizer added.",
+      "createdInvited": "Organizer added: the sign-in link is on its way.",
+      "invited": "Sign-in link sent.",
+      "deleted": "Organizer deleted.",
+      "updated": "Change saved.",
+      "actionError": "The operation failed. Please try again.",
+      "loadError": "The list could not be loaded.",
+      "inviteFailed": "Organizer added, but the sign-in link could not be sent: send it again from their row."
+    },
     "fileOrUrl": {
       "tabUpload": "Upload file",
       "tabUrl": "Paste URL",
@@ -776,6 +834,8 @@
       "eventQuestionnaires": "Questionnaires",
       "rubricaList": "List",
       "rubricaDetail": "Entry",
+      "organizers": "Organizers",
+      "people": "People",
       "postprodDetail": "Recording",
       "recordingsPostprod": "Transcripts / AI",
       "feedbackDashboard": "Feedback"
@@ -1408,8 +1468,10 @@
         "slimBarTitle": "Top bar (Slim Header)",
         "slimBarDescription": "The thin bar at the top of the page identifying the parent organization.",
         "parentOrganization": "Parent organization",
-        "parentOrganizationHelp": "E.g. \"Presidency of the Council of Ministers\"",
+        "parentOrganizationHelp": "The body your organization reports to. Leave empty to name none.",
         "parentOrganizationUrl": "Parent organization URL",
+        "siteTagline": "Site tagline",
+        "siteTaglineHelp": "Shown in the top bar and footer when the parent organization is empty. Leave empty to show nothing. It is written per language: where one is missing, the English one is used, then any other.",
         "centerBarTitle": "Center header",
         "centerBarDescription": "The main header area with the application name and logo.",
         "appName": "Application name",
@@ -1428,7 +1490,7 @@
         "organizationNameShort": "Organization short name",
         "organizationUrl": "Organization URL",
         "parentOrganization": "Parent organization",
-        "parentOrganizationHelp": "e.g. Presidency of the Council of Ministers",
+        "parentOrganizationHelp": "The body your organization reports to. Leave empty to name none.",
         "parentOrganizationUrl": "Parent organization URL",
         "logoUrl": "Custom logo URL",
         "logoUrlHelp": "Leave empty to use the default PA icon",
@@ -1497,7 +1559,9 @@
           }
         },
         "customHtmlLabel": "Custom HTML content",
-        "customHtmlHelp": "HTML shown in the main section of the home page"
+        "customHtmlHelp": "HTML shown in the main section of the home page",
+        "showProject": "Show the “The project” section",
+        "showProjectHelp": "The platform’s architecture, data sovereignty and open source: of interest to those evaluating reuse more than to event participants."
       },
       "pages": {
         "privacyTitle": "Privacy policy",
@@ -3300,8 +3364,6 @@
     }
   },
   "footer": {
-    "departmentName": "Department for Digital Transformation",
-    "presidencyName": "Presidency of the Council of Ministers",
     "privacy": "Privacy policy",
     "accessibility": "Accessibility statement",
     "openSource": "Open source software",

@@ -30,11 +30,11 @@ import { z } from 'zod';
 import { cookies } from 'next/headers';
 
 import { withErrorHandling } from '@/lib/api-handler';
-import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { requireRecordingManager } from '@/lib/auth/staff-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { prisma } from '@/lib/db';
 import { applicaRedazione, conservaOriginali } from '@/lib/ai/original-body';
-import { NotFoundError, UnauthorizedError, ValidationError } from '@/lib/errors';
+import { NotFoundError, ValidationError } from '@/lib/errors';
 import { encryptPII, tryDecryptPII } from '@/lib/crypto/pii';
 import { rewritePostprodBlob } from '@/lib/storage/postprod';
 import { buildVtt, parseInlineTranscriptJson, sha256Hex } from '@/lib/ai/transcript-format';
@@ -112,10 +112,9 @@ function parseTranscript(inlineBody: string | null): TranscriptJson {
 }
 
 export const GET = withErrorHandling(async (_request, context) => {
-  const isAdmin = await isAdminAuthenticated(await cookies());
-  if (!isAdmin) throw new UnauthorizedError();
-
   const { id } = await (context as { params: Promise<{ id: string }> }).params;
+  // Dell'evento della registrazione: l'admin o chi l'ha creato (ADR-014).
+  await requireRecordingManager(await cookies(), id);
 
   const recording = await loadRecording(id);
   if (!recording) throw new NotFoundError('Recording');
@@ -249,10 +248,9 @@ const bodySchema = z.object({
 });
 
 export const PUT = withErrorHandling(async (request, context) => {
-  const isAdmin = await isAdminAuthenticated(await cookies());
-  if (!isAdmin) throw new UnauthorizedError();
-
   const { id } = await (context as { params: Promise<{ id: string }> }).params;
+  // Dell'evento della registrazione: l'admin o chi l'ha creato (ADR-014).
+  await requireRecordingManager(await cookies(), id);
   const { edits, redactOriginal } = bodySchema.parse(await request.json());
 
   const recording = await loadRecording(id);

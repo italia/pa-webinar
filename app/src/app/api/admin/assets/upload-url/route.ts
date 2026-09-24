@@ -33,13 +33,12 @@ import { randomUUID } from 'crypto';
 import { cookies } from 'next/headers';
 import type { NextRequest } from 'next/server';
 
+import { requireStaff } from '@/lib/auth/staff-session';
 import { withErrorHandling } from '@/lib/api-handler';
-import { isAdminAuthenticated } from '@/lib/auth/admin-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import {
   AppError,
   RateLimitError,
-  UnauthorizedError,
   ValidationError,
 } from '@/lib/errors';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
@@ -95,8 +94,8 @@ function assertAssetKind(raw: string | null): AssetKind {
 }
 
 export const POST = withErrorHandling(async (request: NextRequest) => {
-  const isAdmin = await isAdminAuthenticated(await cookies());
-  if (!isAdmin) throw new UnauthorizedError();
+  // Locandine e immagini degli eventi: le carica anche l'organizzatore.
+  await requireStaff(await cookies());
 
   const ip = getClientIp(request);
   const rl = rateLimit(`asset-upload:${ip}`, { limit: 30, windowMs: 60_000 });

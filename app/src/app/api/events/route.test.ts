@@ -20,8 +20,9 @@ vi.mock('next/headers', () => ({
   cookies: vi.fn(async () => ({ get: () => ({ value: 'admin-session' }) })),
 }));
 
-vi.mock('@/lib/auth/admin-session', () => ({
-  isAdminAuthenticated: vi.fn(async () => true),
+vi.mock('@/lib/auth/staff-session', () => ({
+  requireStaff: vi.fn(async () => ({ role: 'admin' })),
+  puoGestire: vi.fn(async () => true),
 }));
 
 vi.mock('@/lib/audit/admin-audit', () => ({

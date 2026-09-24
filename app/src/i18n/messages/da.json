@@ -54,8 +54,6 @@
     "skipToFooter": "Gå til sidefod"
   },
   "header": {
-    "slimTitle": "Præsidiet for Ministerrådet",
-    "slimSubtitle": "Afdelingen for Digital Omstilling",
     "followUs": "Følg os på"
   },
   "events": {
@@ -488,6 +486,66 @@
     "submitPrimary": "Send spørgsmål"
   },
   "admin": {
+    "accessDenied": {
+      "title": "Denne sektion er ikke tilgængelig for din rolle",
+      "body": "Som arrangør administrerer du dine egne arrangementer: oprettelse, udgivelse, materialer, spørgeskemaer og efterbehandling. Platformens indstillinger og data for alle arrangementer forbliver hos administrationen.",
+      "back": "Gå til dine arrangementer"
+    },
+    "staffLogin": {
+      "title": "Log ind i administrationen",
+      "intro": "Arrangører logger ind med et link, der sendes til deres e-mail: ingen adgangskode at huske.",
+      "emailLabel": "Din arbejdsmail",
+      "send": "Send mig linket",
+      "sending": "Sender…",
+      "sent": "Hvis adressen er aktiveret, modtager du snart en e-mail med linket til at logge ind. Linket virker kun én gang og udløber efter {minutes} minutter.",
+      "error": "Anmodningen kunne ikke sendes. Prøv igen om et par minutter.",
+      "keySection": "Log ind med instansnøglen",
+      "accessTitle": "Gå til administrationen",
+      "accessIntro": "Tryk på knappen for at logge ind. Linket virker kun én gang.",
+      "enter": "Log ind",
+      "invalidLink": "Linket er ikke gyldigt: det kan være udløbet eller allerede brugt.",
+      "newLink": "Bed om et nyt link"
+    },
+    "organizers": {
+      "title": "Arrangører",
+      "intro": "Personer, der arrangerer arrangementer uden at administrere platformen: de opretter egne arrangementer, udgiver dem og håndterer materialer, spørgeskemaer og efterbehandling. De logger ind med et link sendt til deres e-mail, uden adgangskode.",
+      "newTitle": "Tilføj en arrangør",
+      "name": "For- og efternavn",
+      "email": "E-mail",
+      "add": "Tilføj",
+      "sendNow": "Send loginlinket med det samme",
+      "listTitle": "Aktiverede arrangører",
+      "loading": "Indlæser…",
+      "empty": "Ingen arrangører endnu.",
+      "events": "Arrangementer",
+      "lastLogin": "Seneste login",
+      "status": "Status",
+      "actions": "Handlinger",
+      "never": "Aldrig",
+      "active": "Aktiv",
+      "inactive": "Deaktiveret",
+      "invite": "Send link",
+      "inviteFor": "Send et loginlink til {name}",
+      "deactivate": "Deaktivér",
+      "deactivateFor": "Deaktivér {name}",
+      "activate": "Genaktivér",
+      "activateFor": "Genaktivér {name}",
+      "delete": "Slet",
+      "deleteFor": "Slet {name}",
+      "deleteTitle": "Slet arrangøren?",
+      "deleteMessage": "Kontoen for {name} slettes. Arrangementerne ({count}) slettes ikke: de går tilbage til administrationen.",
+      "deactivateTitle": "Deaktivér arrangøren?",
+      "deactivateMessage": "{name} kan ikke længere logge ind, og allerede sendte loginlinks holder op med at virke. Arrangementerne forbliver, som de er.",
+      "exists": "Der findes allerede en arrangør med denne e-mail.",
+      "created": "Arrangør tilføjet.",
+      "createdInvited": "Arrangør tilføjet: loginlinket er på vej.",
+      "invited": "Loginlink sendt.",
+      "deleted": "Arrangør slettet.",
+      "updated": "Ændring gemt.",
+      "actionError": "Handlingen mislykkedes. Prøv igen.",
+      "loadError": "Listen kunne ikke indlæses.",
+      "inviteFailed": "Arrangøren er tilføjet, men loginlinket kunne ikke sendes: send det igen fra rækken."
+    },
     "fileOrUrl": {
       "tabUpload": "Upload fil",
       "tabUrl": "Indsæt URL",
@@ -776,6 +834,8 @@
       "eventQuestionnaires": "Spørgeskemaer",
       "rubricaList": "Liste",
       "rubricaDetail": "Post",
+      "organizers": "Arrangører",
+      "people": "Personer",
       "postprodDetail": "Optagelse",
       "recordingsPostprod": "Transskriptioner / AI",
       "feedbackDashboard": "Feedback"
@@ -1408,8 +1468,10 @@
         "slimBarTitle": "Topbjælke (Slim Header)",
         "slimBarDescription": "Den tynde bjælke øverst på siden, der identificerer den overordnede organisation.",
         "parentOrganization": "Overordnet organisation",
-        "parentOrganizationHelp": "F.eks. \"Præsidiet for Ministerrådet\"",
+        "parentOrganizationHelp": "Den myndighed, jeres organisation hører under. Lad feltet stå tomt for ikke at nævne nogen.",
         "parentOrganizationUrl": "URL for overordnet organisation",
+        "siteTagline": "Webstedets slogan",
+        "siteTaglineHelp": "Vises i den øverste bjælke og i sidefoden, når den overordnede organisation er tom. Lad feltet stå tomt for ikke at vise noget. Skrives pr. sprog: mangler det, bruges det engelske og derefter et vilkårligt andet.",
         "centerBarTitle": "Central header",
         "centerBarDescription": "Det primære headerområde med applikationsnavn og logo.",
         "appName": "Applikationsnavn",
@@ -1428,7 +1490,7 @@
         "organizationNameShort": "Organisationsforkortelse",
         "organizationUrl": "Organisations-URL",
         "parentOrganization": "Overordnet organisation",
-        "parentOrganizationHelp": "f.eks. Præsidiet for Ministerrådet",
+        "parentOrganizationHelp": "Den myndighed, jeres organisation hører under. Lad feltet stå tomt for ikke at nævne nogen.",
         "parentOrganizationUrl": "URL for overordnet organisation",
         "logoUrl": "Brugerdefineret logo-URL",
         "logoUrlHelp": "Lad feltet stå tomt for at bruge standardikonet",
@@ -1497,7 +1559,9 @@
           }
         },
         "customHtmlLabel": "Brugerdefineret HTML-indhold",
-        "customHtmlHelp": "HTML vist i hoveddelen af startsiden"
+        "customHtmlHelp": "HTML vist i hoveddelen af startsiden",
+        "showProject": "Vis afsnittet »Projektet«",
+        "showProjectHelp": "Platformens arkitektur, datasuverænitet og open source: relevant for dem, der overvejer genbrug, mere end for deltagere."
       },
       "pages": {
         "privacyTitle": "Privatlivspolitik",
@@ -3300,8 +3364,6 @@
     }
   },
   "footer": {
-    "departmentName": "Afdelingen for Digital Omstilling",
-    "presidencyName": "Præsidiet for Ministerrådet",
     "privacy": "Privatlivspolitik",
     "accessibility": "Tilgængelighedserklæring",
     "openSource": "Open source-software",

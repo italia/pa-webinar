@@ -10,7 +10,7 @@ import { metadataBase, openGraphImages, twitterImageCard } from '@/lib/seo';
 import { Skiplink } from '@/components/layout/skiplinks';
 import PAHeader from '@/components/layout/pa-header';
 import PAFooter from '@/components/layout/pa-footer';
-import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { getStaffSession } from '@/lib/auth/staff-session';
 import { getSettings } from '@/lib/settings';
 import { SettingsProvider } from '@/lib/settings-context';
 
@@ -74,7 +74,9 @@ export default async function LocaleLayout({
   }
 
   const messages = await getMessages();
-  const isAdmin = await isAdminAuthenticated(await cookies());
+  // Il collegamento all'area di amministrazione nell'intestazione, per chiunque
+  // dello staff vi sia entrato: anche l'organizzatore (ADR-014).
+  const isAdmin = (await getStaffSession(await cookies())) !== null;
   const settings = await getSettings();
 
   return (

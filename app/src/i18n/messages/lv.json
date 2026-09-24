@@ -54,8 +54,6 @@
     "skipToFooter": "Pāriet uz kājeni"
   },
   "header": {
-    "slimTitle": "Ministru padomes prezidentūra",
-    "slimSubtitle": "Digitālās transformācijas departaments",
     "followUs": "Sekojiet mums"
   },
   "events": {
@@ -488,6 +486,66 @@
     "submitPrimary": "Nosūtīt jautājumu"
   },
   "admin": {
+    "accessDenied": {
+      "title": "Šī sadaļa jūsu lomai nav pieejama",
+      "body": "Kā organizators jūs pārvaldāt savus pasākumus: to izveidi un publicēšanu, materiālus, aptaujas un pēcapstrādi. Platformas iestatījumi un visu pasākumu dati paliek administrācijas ziņā.",
+      "back": "Uz jūsu pasākumiem"
+    },
+    "staffLogin": {
+      "title": "Pieteikšanās administrēšanas sadaļā",
+      "intro": "Pasākumu organizatori piesakās ar saiti, kas nosūtīta uz viņu e-pastu: nav jāatceras parole.",
+      "emailLabel": "Jūsu darba e-pasts",
+      "send": "Sūtīt man saiti",
+      "sending": "Sūta…",
+      "sent": "Ja adrese ir atļauta, drīz saņemsiet e-pastu ar pieteikšanās saiti. Saite darbojas tikai vienreiz un beidzas pēc {minutes} minūtēm.",
+      "error": "Pieprasījumu neizdevās nosūtīt. Mēģiniet vēlreiz pēc dažām minūtēm.",
+      "keySection": "Pieteikšanās ar instances atslēgu",
+      "accessTitle": "Ieiet administrēšanas sadaļā",
+      "accessIntro": "Nospiediet pogu, lai pieteiktos. Saite darbojas tikai vienreiz.",
+      "enter": "Pieteikties",
+      "invalidLink": "Saite nav derīga: tai var būt beidzies termiņš vai tā jau izmantota.",
+      "newLink": "Pieprasīt jaunu saiti"
+    },
+    "organizers": {
+      "title": "Organizatori",
+      "intro": "Personas, kas organizē pasākumus, neadministrējot platformu: viņi izveido savus pasākumus, tos publicē un pārvalda materiālus, aptaujas un pēcapstrādi. Viņi piesakās ar saiti, kas nosūtīta uz e-pastu, bez paroles.",
+      "newTitle": "Pievienot organizatoru",
+      "name": "Vārds un uzvārds",
+      "email": "E-pasts",
+      "add": "Pievienot",
+      "sendNow": "Nosūtīt pieteikšanās saiti uzreiz",
+      "listTitle": "Atļautie organizatori",
+      "loading": "Ielādē…",
+      "empty": "Vēl nav organizatoru.",
+      "events": "Pasākumi",
+      "lastLogin": "Pēdējā pieteikšanās",
+      "status": "Statuss",
+      "actions": "Darbības",
+      "never": "Nekad",
+      "active": "Aktīvs",
+      "inactive": "Deaktivizēts",
+      "invite": "Sūtīt saiti",
+      "inviteFor": "Sūtīt pieteikšanās saiti: {name}",
+      "deactivate": "Deaktivizēt",
+      "deactivateFor": "Deaktivizēt: {name}",
+      "activate": "Atkārtoti aktivizēt",
+      "activateFor": "Atkārtoti aktivizēt: {name}",
+      "delete": "Dzēst",
+      "deleteFor": "Dzēst: {name}",
+      "deleteTitle": "Dzēst organizatoru?",
+      "deleteMessage": "{name} konts tiks dzēsts. Viņa pasākumi ({count}) netiek dzēsti: tie atgriežas administrācijai.",
+      "deactivateTitle": "Deaktivizēt organizatoru?",
+      "deactivateMessage": "{name} vairs nevarēs pieteikties, un jau nosūtītās saites pārstās darboties. Viņa pasākumi paliek nemainīti.",
+      "exists": "Organizators ar šo e-pastu jau pastāv.",
+      "created": "Organizators pievienots.",
+      "createdInvited": "Organizators pievienots: pieteikšanās saite ir ceļā.",
+      "invited": "Pieteikšanās saite nosūtīta.",
+      "deleted": "Organizators dzēsts.",
+      "updated": "Izmaiņas saglabātas.",
+      "actionError": "Darbība neizdevās. Mēģiniet vēlreiz.",
+      "loadError": "Sarakstu neizdevās ielādēt.",
+      "inviteFailed": "Organizators pievienots, bet pieteikšanās saiti neizdevās nosūtīt: nosūtiet to vēlreiz no viņa rindas."
+    },
     "fileOrUrl": {
       "tabUpload": "Augšupielādēt failu",
       "tabUrl": "Ielīmēt URL",
@@ -776,6 +834,8 @@
       "eventQuestionnaires": "Anketas",
       "rubricaList": "Saraksts",
       "rubricaDetail": "Ieraksts",
+      "organizers": "Organizatori",
+      "people": "Personas",
       "postprodDetail": "Ieraksts",
       "recordingsPostprod": "Transkripcijas / MI",
       "feedbackDashboard": "Feedback"
@@ -1408,8 +1468,10 @@
         "slimBarTitle": "Augšējā josla (Slim Header)",
         "slimBarDescription": "Plānā josla lapas augšdaļā, kas norāda mātesorganizāciju.",
         "parentOrganization": "Mātesorganizācija",
-        "parentOrganizationHelp": "Piem. \"Ministru padomes prezidentūra\"",
+        "parentOrganizationHelp": "Iestāde, kurai pakļauta jūsu administrācija. Atstājiet tukšu, lai nenosauktu nevienu.",
         "parentOrganizationUrl": "Mātesorganizācijas URL",
+        "siteTagline": "Vietnes moto",
+        "siteTaglineHelp": "Tiek rādīts augšējā joslā un kājenē, ja augstākā iestāde ir tukša. Atstājiet tukšu, lai neko nerādītu. To raksta katrai valodai: kur trūkst, izmanto angļu, pēc tam jebkuru citu.",
         "centerBarTitle": "Centrālā galvene",
         "centerBarDescription": "Galvenais galvenes apgabals ar lietotnes nosaukumu un logotipu.",
         "appName": "Lietotnes nosaukums",
@@ -1428,7 +1490,7 @@
         "organizationNameShort": "Organizācijas saīsinājums",
         "organizationUrl": "Organizācijas URL",
         "parentOrganization": "Mātesorganizācija",
-        "parentOrganizationHelp": "piem. Ministru padomes prezidentūra",
+        "parentOrganizationHelp": "Iestāde, kurai pakļauta jūsu administrācija. Atstājiet tukšu, lai nenosauktu nevienu.",
         "parentOrganizationUrl": "Mātesorganizācijas URL",
         "logoUrl": "Pielāgota logotipa URL",
         "logoUrlHelp": "Atstājiet tukšu, lai izmantotu noklusējuma VA ikonu",
@@ -1497,7 +1559,9 @@
           }
         },
         "customHtmlLabel": "Pielāgots HTML saturs",
-        "customHtmlHelp": "HTML, kas tiek rādīts sākumlapas galvenajā sadaļā"
+        "customHtmlHelp": "HTML, kas tiek rādīts sākumlapas galvenajā sadaļā",
+        "showProject": "Rādīt sadaļu “Projekts”",
+        "showProjectHelp": "Platformas arhitektūra, datu suverenitāte un atvērtais kods: interesē tos, kas apsver atkalizmantošanu, vairāk nekā dalībniekus."
       },
       "pages": {
         "privacyTitle": "Privātuma politika",
@@ -3300,8 +3364,6 @@
     }
   },
   "footer": {
-    "departmentName": "Digitālās transformācijas departaments",
-    "presidencyName": "Ministru padomes prezidentūra",
     "privacy": "Privātuma politika",
     "accessibility": "Pieejamības paziņojums",
     "openSource": "Atvērtā pirmkoda programmatūra",

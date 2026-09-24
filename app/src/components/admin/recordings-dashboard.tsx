@@ -110,9 +110,15 @@ type Tab = 'library' | 'orphans';
 export default function RecordingsDashboard({
   events,
   locale,
+  canManageStorage = true,
 }: {
   events: EventOption[];
   locale: string;
+  /**
+   * I file orfani sono dell'archivio dell'istanza, non di un evento: la
+   * scheda resta all'amministrazione (ADR-014).
+   */
+  canManageStorage?: boolean;
 }) {
   const t = useTranslations('admin.recordingsLibrary');
   const tc = useTranslations('common');
@@ -241,6 +247,7 @@ export default function RecordingsDashboard({
             {t('tabs.library')}
           </button>
         </li>
+        {canManageStorage && (
         <li className="nav-item">
           <button
             type="button"
@@ -256,6 +263,7 @@ export default function RecordingsDashboard({
             )}
           </button>
         </li>
+        )}
       </ul>
 
       {tab === 'orphans' ? (

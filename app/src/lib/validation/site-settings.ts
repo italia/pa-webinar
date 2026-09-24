@@ -18,6 +18,7 @@ export const updateSettingsSchema = z.object({
   organizationUrl: z.string().url().or(z.literal('')).optional(),
   parentOrganization: z.string().max(200).optional(),
   parentOrganizationUrl: z.string().url().or(z.literal('')).optional(),
+  siteTagline: z.record(z.string(), z.string().max(200)).optional(),
   logoUrl: z.string().url().nullish(),
   faviconUrl: z.string().url().nullish(),
   primaryColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/).optional(),
@@ -30,6 +31,7 @@ export const updateSettingsSchema = z.object({
   // schema in modalita' stretta a cadere e' l'intero salvataggio, non solo
   // quel campo. Un presidio lo verifica (`route.test.ts`).
   homePageMode: z.nativeEnum(HomePageMode).optional(),
+  homeShowProject: z.boolean().optional(),
   waitingRoomEngine: z.enum(['GARDEN', 'GAME', 'CLASSIC']).optional(),
   customHomeHtml: z.string().max(50000).nullish(),
   footerLinks: z.array(z.object({

@@ -36,6 +36,7 @@ const ETICHETTE: Partial<Record<PercorsoInterno, string>> = {
   '/admin/events/[id]/questionnaires': 'eventQuestionnaires',
   '/admin/registrations': 'registrations',
   '/admin/moderators': 'moderators',
+  '/admin/organizers': 'organizers',
   '/admin/gdpr-audit': 'gdprAudit',
   '/admin/rubrica': 'rubrica',
   '/admin/rubrica/[id]': 'rubricaDetail',
@@ -89,7 +90,9 @@ export default function AdminBreadcrumb() {
 
   // La radice non ha bisogno di briciole: ci si e' gia', e il menu sopra
   // basta a orientarsi.
-  if (pathname === '/admin' || pathname === '/admin/login') return null;
+  if (pathname === '/admin' || pathname === '/admin/login' || pathname === '/admin/access') {
+    return null;
+  }
 
   const chain = ancestorChain(pathname, params ?? {});
   if (chain.length < 2) return null;

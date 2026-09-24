@@ -1,7 +1,9 @@
 import { createHash } from 'crypto';
+import { jwtVerify } from 'jose';
 
 import { prisma } from '@/lib/db';
 import { getClientIp } from '@/lib/rate-limit';
+import { tryGetAppSecret } from '@/lib/auth/app-secret';
 
 /**
  * Append-only audit log for privileged admin actions. Every mutating
@@ -20,20 +22,38 @@ export interface LogAdminActionInput {
   action: string; // e.g. EVENT_CREATE, EVENT_UPDATE, RECORDING_DELETE
   target?: string | null;
   details?: Record<string, unknown> | null;
+  /**
+   * Chi agisce, quando la richiesta non lo porta ancora: all'accesso il
+   * cookie della nuova sessione non c'e', e quello in arrivo puo' essere di
+   * qualcun altro che ha usato lo stesso browser.
+   */
+  actor?: string;
 }
 
 /**
- * Best-effort identifier for the admin session. The platform has no
- * per-admin accounts yet (single shared ADMIN_API_KEY); we derive a
- * short SHA-256 prefix of the session-cookie ciphertext so that the
- * same browser shows the same actorHash across actions, without ever
- * persisting any part of the JWT itself.
+ * Chi ha agito. L'amministrazione dell'istanza e' una chiave condivisa, senza
+ * persone: si registra un prefisso SHA-256 del cookie, che resta uguale per lo
+ * stesso browser senza conservare nulla del token. L'organizzatore invece e'
+ * un account (ADR-014), e si registra quello — `organizer:<id>` — cosi' «chi
+ * ha fatto cosa» ha una risposta anche dopo i rinnovi della sessione, che
+ * cambiano il cookie.
  */
-function deriveActorHash(request: Request): string {
+async function deriveActor(request: Request): Promise<string> {
   const cookieHeader = request.headers.get('cookie') ?? '';
   const m = /(?:^|;\s*)admin_session=([^;]+)/.exec(cookieHeader);
   const cookieValue = m?.[1] ?? '';
   if (!cookieValue) return 'unknown';
+  const secret = tryGetAppSecret();
+  if (secret) {
+    try {
+      const { payload } = await jwtVerify(cookieValue, new TextEncoder().encode(secret));
+      if (payload.role === 'organizer' && typeof payload.sub === 'string') {
+        return `organizer:${payload.sub}`;
+      }
+    } catch {
+      // Firma non valida o scaduta: resta l'impronta del cookie.
+    }
+  }
   return createHash('sha256').update(cookieValue).digest('hex').slice(0, 16);
 }
 
@@ -42,7 +62,7 @@ export async function logAdminAction(input: LogAdminActionInput): Promise<void> 
   try {
     await prisma.adminAuditLog.create({
       data: {
-        actorHash: deriveActorHash(request),
+        actorHash: input.actor ?? (await deriveActor(request)),
         action,
         target: input.target ?? null,
         ip: getClientIp(request),

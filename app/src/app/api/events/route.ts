@@ -4,14 +4,14 @@ import type { EventStatus, Prisma } from '@prisma/client';
 import { cookies } from 'next/headers';
 
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
-import { UnauthorizedError, RateLimitError, ValidationError } from '@/lib/errors';
+import { RateLimitError, ValidationError } from '@/lib/errors';
 import { prisma } from '@/lib/db';
 import { createEventSchema } from '@/lib/validation/schemas';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
 import { generateUniqueSlug } from '@/lib/utils/slug';
 import { resolveLocale, localiseEvent, pruneEmptyTranslations, type LocalizedField } from '@/lib/utils/locale';
 import { localizedUrl } from '@/lib/utils/localized-url';
-import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { puoGestire, requireStaff } from '@/lib/auth/staff-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { encryptPIIOrNull } from '@/lib/crypto/pii';
 import { getPublicEnv } from '@/lib/env';
@@ -31,8 +31,9 @@ export const dynamic = 'force-dynamic';
 
 export const POST = withErrorHandling(async (request) => {
   const cookieStore = await cookies();
-  const isAdmin = await isAdminAuthenticated(cookieStore);
-  if (!isAdmin) throw new UnauthorizedError();
+  // Crea l'amministrazione e crea l'organizzatore; l'evento dell'organizzatore
+  // porta il suo nome, ed e' quello che gli permette di gestirlo (ADR-014).
+  const session = await requireStaff(cookieStore);
 
   const ip = getClientIp(request);
   const rl = rateLimit(`create-event:${ip}`, {
@@ -110,8 +111,17 @@ export const POST = withErrorHandling(async (request) => {
     expectedSenderRatioPct: data.expectedSenderRatioPct ?? null,
   });
 
+  // La serie e' un evento capostipite: agganciarsi a quella di un altro
+  // significherebbe entrare in un raggruppamento che non si gestisce (ADR-014).
+  if (data.recurrenceSeriesId && !(await puoGestire(session, data.recurrenceSeriesId))) {
+    throw new ValidationError('Validation failed', [
+      { path: ['recurrenceSeriesId'], message: 'series_not_manageable' },
+    ]);
+  }
+
   const event = await prisma.event.create({
     data: {
+      createdById: session.role === 'organizer' ? session.accountId : null,
       slug,
       jitsiRoomName,
       moderatorToken,

@@ -54,8 +54,6 @@
     "skipToFooter": "Přejít na zápatí"
   },
   "header": {
-    "slimTitle": "Předsednictví Rady ministrů",
-    "slimSubtitle": "Odbor pro digitální transformaci",
     "followUs": "Sledujte nás na"
   },
   "events": {
@@ -488,6 +486,66 @@
     "submitPrimary": "Odeslat otázku"
   },
   "admin": {
+    "accessDenied": {
+      "title": "Tato sekce není pro vaši roli dostupná",
+      "body": "Jako organizátor spravujete své vlastní události: jejich vytváření a zveřejňování, materiály, dotazníky a postprodukci. Nastavení platformy a data všech událostí zůstávají správě.",
+      "back": "Přejít na vaše události"
+    },
+    "staffLogin": {
+      "title": "Přihlášení do administrace",
+      "intro": "Organizátoři událostí se přihlašují odkazem zaslaným na svůj e-mail: žádné heslo k zapamatování.",
+      "emailLabel": "Váš pracovní e-mail",
+      "send": "Pošlete mi odkaz",
+      "sending": "Odesílání…",
+      "sent": "Pokud je adresa povolena, brzy obdržíte e-mail s přihlašovacím odkazem. Odkaz platí jen jednou a vyprší po {minutes} minutách.",
+      "error": "Žádost se nepodařilo odeslat. Zkuste to znovu za několik minut.",
+      "keySection": "Přihlášení klíčem instance",
+      "accessTitle": "Vstoupit do administrace",
+      "accessIntro": "Stiskněte tlačítko pro přihlášení. Odkaz platí jen jednou.",
+      "enter": "Přihlásit se",
+      "invalidLink": "Odkaz není platný: mohl vypršet nebo už byl použit.",
+      "newLink": "Požádat o nový odkaz"
+    },
+    "organizers": {
+      "title": "Organizátoři",
+      "intro": "Lidé, kteří organizují události, aniž by spravovali platformu: vytvářejí vlastní události, zveřejňují je a spravují materiály, dotazníky a postprodukci. Přihlašují se odkazem zaslaným na e-mail, bez hesla.",
+      "newTitle": "Přidat organizátora",
+      "name": "Jméno a příjmení",
+      "email": "E-mail",
+      "add": "Přidat",
+      "sendNow": "Odeslat přihlašovací odkaz hned",
+      "listTitle": "Povolení organizátoři",
+      "loading": "Načítání…",
+      "empty": "Zatím žádní organizátoři.",
+      "events": "Události",
+      "lastLogin": "Poslední přihlášení",
+      "status": "Stav",
+      "actions": "Akce",
+      "never": "Nikdy",
+      "active": "Aktivní",
+      "inactive": "Deaktivován",
+      "invite": "Poslat odkaz",
+      "inviteFor": "Poslat přihlašovací odkaz: {name}",
+      "deactivate": "Deaktivovat",
+      "deactivateFor": "Deaktivovat: {name}",
+      "activate": "Znovu aktivovat",
+      "activateFor": "Znovu aktivovat: {name}",
+      "delete": "Smazat",
+      "deleteFor": "Smazat: {name}",
+      "deleteTitle": "Smazat organizátora?",
+      "deleteMessage": "Účet {name} bude smazán. Jeho události ({count}) se nemažou: vracejí se správě.",
+      "deactivateTitle": "Deaktivovat organizátora?",
+      "deactivateMessage": "{name} se už nebude moci přihlásit a již odeslané odkazy přestanou fungovat. Jeho události zůstanou beze změny.",
+      "exists": "Organizátor s tímto e-mailem už existuje.",
+      "created": "Organizátor přidán.",
+      "createdInvited": "Organizátor přidán: přihlašovací odkaz je na cestě.",
+      "invited": "Přihlašovací odkaz odeslán.",
+      "deleted": "Organizátor smazán.",
+      "updated": "Změna uložena.",
+      "actionError": "Operace se nezdařila. Zkuste to znovu.",
+      "loadError": "Seznam se nepodařilo načíst.",
+      "inviteFailed": "Organizátor přidán, ale přihlašovací odkaz se nepodařilo odeslat: pošlete ho znovu z jeho řádku."
+    },
     "fileOrUrl": {
       "tabUpload": "Nahrát soubor",
       "tabUrl": "Vložit URL",
@@ -776,6 +834,8 @@
       "eventQuestionnaires": "Dotazníky",
       "rubricaList": "Seznam",
       "rubricaDetail": "Detail",
+      "organizers": "Organizátoři",
+      "people": "Osoby",
       "postprodDetail": "Záznam",
       "recordingsPostprod": "Přepisy / AI",
       "feedbackDashboard": "Feedback"
@@ -1408,8 +1468,10 @@
         "slimBarTitle": "Horní lišta (Slim Header)",
         "slimBarDescription": "Tenká lišta v horní části stránky identifikující nadřazenou organizaci.",
         "parentOrganization": "Nadřazená organizace",
-        "parentOrganizationHelp": "Např. \"Předsednictví Rady ministrů\"",
+        "parentOrganizationHelp": "Orgán, pod který vaše instituce spadá. Ponechte prázdné, aby žádný uveden nebyl.",
         "parentOrganizationUrl": "URL nadřazené organizace",
+        "siteTagline": "Motto webu",
+        "siteTaglineHelp": "Zobrazí se v horní liště a v zápatí, když je nadřízený orgán prázdný. Ponechte prázdné, aby se nezobrazovalo nic. Zadává se pro každý jazyk: kde chybí, použije se anglické a pak jakékoli jiné.",
         "centerBarTitle": "Centrální záhlaví",
         "centerBarDescription": "Hlavní oblast záhlaví s názvem aplikace a logem.",
         "appName": "Název aplikace",
@@ -1428,7 +1490,7 @@
         "organizationNameShort": "Zkratka organizace",
         "organizationUrl": "URL organizace",
         "parentOrganization": "Nadřazená organizace",
-        "parentOrganizationHelp": "např. Předsednictví Rady ministrů",
+        "parentOrganizationHelp": "Orgán, pod který vaše instituce spadá. Ponechte prázdné, aby žádný uveden nebyl.",
         "parentOrganizationUrl": "URL nadřazené organizace",
         "logoUrl": "URL vlastního loga",
         "logoUrlHelp": "Ponechte prázdné pro výchozí ikonu veřejné správy",
@@ -1497,7 +1559,9 @@
           }
         },
         "customHtmlLabel": "Vlastní HTML obsah",
-        "customHtmlHelp": "HTML zobrazené v hlavní sekci domovské stránky"
+        "customHtmlHelp": "HTML zobrazené v hlavní sekci domovské stránky",
+        "showProject": "Zobrazit sekci „Projekt“",
+        "showProjectHelp": "Architektura, suverenita dat a otevřený kód platformy: zajímavé spíš pro ty, kdo zvažují opětovné použití, než pro účastníky."
       },
       "pages": {
         "privacyTitle": "Zásady ochrany osobních údajů",
@@ -3300,8 +3364,6 @@
     }
   },
   "footer": {
-    "departmentName": "Odbor pro digitální transformaci",
-    "presidencyName": "Předsednictví Rady ministrů",
     "privacy": "Zásady ochrany osobních údajů",
     "accessibility": "Prohlášení o přístupnosti",
     "openSource": "Open source software",

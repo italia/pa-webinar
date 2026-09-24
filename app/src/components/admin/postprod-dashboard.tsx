@@ -240,13 +240,15 @@ export default function PostprodDashboard() {
   async function updateSpeaker(
     speakerId: string,
     displayName: string | null,
-    personId: string | null,
+    personId?: string | null,
   ): Promise<void> {
     const r = await fetch(`/api/admin/postprod/speakers/${speakerId}`, {
       method: 'PUT',
       credentials: 'include',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ displayName, personId }),
+      // Il collegamento alla rubrica si manda solo quando si vuole cambiarlo:
+      // rinominare un relatore non deve scollegarlo in silenzio.
+      body: JSON.stringify(personId === undefined ? { displayName } : { displayName, personId }),
     });
     if (!r.ok) {
       toast.error(t('speakerUpdateFailed', { code: r.status }));
@@ -410,7 +412,7 @@ function RecordingDetails({
   onSpeakerSave: (
     speakerId: string,
     displayName: string | null,
-    personId: string | null,
+    personId?: string | null,
   ) => Promise<void>;
   onMutate: () => Promise<unknown>;
 }) {
@@ -499,7 +501,7 @@ function SpeakersEditor({
   onSave: (
     speakerId: string,
     displayName: string | null,
-    personId: string | null,
+    personId?: string | null,
   ) => Promise<void>;
 }) {
   const t = useTranslations('admin.postprod');
@@ -533,7 +535,7 @@ function SpeakersEditor({
                 className="btn btn-sm btn-primary"
                 disabled={!dirty}
                 onClick={() =>
-                  void onSave(s.id, current.trim() === '' ? null : current.trim(), null)
+                  void onSave(s.id, current.trim() === '' ? null : current.trim())
                 }
               >
                 {t('save')}

@@ -3,6 +3,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 vi.mock('@/lib/db', () => ({
   prisma: {
     event: { findMany: vi.fn(), update: vi.fn() },
+    staffLoginToken: { deleteMany: vi.fn(async () => ({ count: 0 })) },
     gdprAuditLog: { create: vi.fn() },
     eventMaterial: { findMany: vi.fn(), deleteMany: vi.fn() },
     chatMessage: { findMany: vi.fn(), deleteMany: vi.fn() },
@@ -55,6 +56,7 @@ type Mock = ReturnType<typeof vi.fn>;
 
 const db = prisma as unknown as {
   event: { findMany: Mock; update: Mock };
+  staffLoginToken: { deleteMany: Mock };
   gdprAuditLog: { create: Mock };
   eventMaterial: { findMany: Mock; deleteMany: Mock };
   chatMessage: { findMany: Mock; deleteMany: Mock };
@@ -538,6 +540,21 @@ describe('GET /api/cron/cleanup', () => {
     });
   });
 
+  it('cancella i link di accesso dello staff usati o scaduti da oltre un giorno', async () => {
+    // Senza, ogni link lascerebbe per sempre una riga: lo storico degli
+    // accessi di ogni persona, conservato senza scopo.
+    stubEventQueries({});
+    await runCleanup();
+    const chiamata = db.staffLoginToken.deleteMany.mock.calls[0]?.[0] as {
+      where: { OR: Array<{ usedAt?: { lt: Date }; expiresAt?: { lt: Date } }> };
+    };
+    const soglie = chiamata.where.OR.map((c) => (c.usedAt ?? c.expiresAt)!.lt.getTime());
+    for (const t of soglie) {
+      expect(Date.now() - t).toBeGreaterThanOrEqual(24 * 60 * 60 * 1000 - 1000);
+    }
+    expect(chiamata.where.OR).toHaveLength(2);
+  });
+
   it('non fa nulla quando nessun evento ha superato la retention', async () => {
     stubEventQueries({ ended: [endedEvent({ id: 'evt-ieri', endsAt: daysAgo(1) })] });
 
@@ -549,6 +566,7 @@ describe('GET /api/cron/cleanup', () => {
     expect(deleteBlobMock).not.toHaveBeenCalled();
     expect(body).toEqual({
       ok: true,
+      staffLoginLinksDeleted: 0,
       tempRecordingsCleaned: 0,
       publishedRecordingsCleaned: 0,
       eventsProcessed: 0,

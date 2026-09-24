@@ -113,3 +113,18 @@ describe('absoluteEventImage', () => {
     expect(absoluteEventImage({ imageUrl: null, coverImageUrl: null }, BASE)).toBeNull();
   });
 });
+
+describe('email di accesso dello staff', () => {
+  it('il nome non diventa markup', async () => {
+    const { staffLoginEmail } = await import('./templates');
+    const m = staffLoginEmail({
+      locale: 'it',
+      name: '<img src=x onerror=alert(1)>',
+      url: 'https://esempio.it/it/admin/accesso?t=abc',
+      minutes: 20,
+    });
+    expect(m.html).not.toContain('<img src=x');
+    expect(m.html).toContain('&lt;img');
+    expect(m.text).toContain('https://esempio.it/it/admin/accesso?t=abc');
+  });
+});

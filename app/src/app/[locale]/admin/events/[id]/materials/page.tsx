@@ -1,12 +1,13 @@
-import { cookies } from 'next/headers';
 import Link from 'next/link';
-import { notFound, redirect } from 'next/navigation';
+import { notFound } from 'next/navigation';
 import { getLocale, getTranslations } from 'next-intl/server';
 
 import EventMaterialsManager, {
   type MaterialRow,
 } from '@/components/admin/event-materials-manager';
-import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { staffOLogin } from '@/lib/auth/staff-page';
+import { puoGestire } from '@/lib/auth/staff-session';
+import AccessDenied from '@/components/admin/access-denied';
 import { prisma } from '@/lib/db';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import { localizedPath } from '@/lib/utils/localized-url';
@@ -22,10 +23,7 @@ export default async function EventMaterialsAdminPage({ params }: PageProps) {
   const { id } = await params;
   const locale = await getLocale();
 
-  const isAdmin = await isAdminAuthenticated(await cookies());
-  if (!isAdmin) {
-    redirect(`/${locale}/admin/login`);
-  }
+  const session = await staffOLogin(locale);
   if (!UUID_RE.test(id)) notFound();
 
   const event = await prisma.event.findUnique({
@@ -38,6 +36,7 @@ export default async function EventMaterialsAdminPage({ params }: PageProps) {
     },
   });
   if (!event) notFound();
+  if (!(await puoGestire(session, event.id))) return <AccessDenied />;
 
   const t = await getTranslations('admin.materials');
   const tCommon = await getTranslations('common');

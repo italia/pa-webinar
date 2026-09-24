@@ -14,10 +14,10 @@ import { cookies } from 'next/headers';
 import { z } from 'zod';
 
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
-import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { requireEventManager } from '@/lib/auth/staff-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { prisma } from '@/lib/db';
-import { AppError, UnauthorizedError, ValidationError } from '@/lib/errors';
+import { AppError, ValidationError } from '@/lib/errors';
 
 export const dynamic = 'force-dynamic';
 
@@ -36,8 +36,9 @@ async function loadEvent(id: string) {
 }
 
 export const GET = withErrorHandling(async (_request, context) => {
-  if (!(await isAdminAuthenticated(await cookies()))) throw new UnauthorizedError();
   const { id } = await context.params;
+  // Dell'evento: l'admin, o l'organizzatore che l'ha creato (ADR-014).
+  await requireEventManager(await cookies(), id);
   await loadEvent(id);
 
   const rows = await prisma.eventTagLink.findMany({
@@ -49,8 +50,9 @@ export const GET = withErrorHandling(async (_request, context) => {
 });
 
 export const PUT = withErrorHandling(async (request, context) => {
-  if (!(await isAdminAuthenticated(await cookies()))) throw new UnauthorizedError();
   const { id } = await context.params;
+  // Dell'evento: l'admin, o l'organizzatore che l'ha creato (ADR-014).
+  await requireEventManager(await cookies(), id);
   await loadEvent(id);
 
   const body = await parseJsonBody(request);

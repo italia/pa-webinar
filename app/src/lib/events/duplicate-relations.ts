@@ -39,6 +39,7 @@ type DuplicatedRelation = (typeof DUPLICATED_EVENT_RELATIONS)[number];
 
 /** Relazioni deliberatamente NON copiate, con il motivo. */
 export const NOT_DUPLICATED_EVENT_RELATIONS: Record<string, string> = {
+  createdBy: 'il proprietario è chi crea la copia, non chi ha creato l’originale (ADR-014)',
   // Legami che viaggiano già con una colonna scalare (vedi duplicate-fields).
   gdprTemplate: 'il legame viaggia con la colonna gdprTemplateId',
   recurrenceSeries: 'idem con recurrenceSeriesId: l’appartenenza a una serie si assegna, non si eredita',

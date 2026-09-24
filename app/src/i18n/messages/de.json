@@ -54,8 +54,6 @@
     "skipToFooter": "Zum Footer springen"
   },
   "header": {
-    "slimTitle": "Präsidentschaft des Ministerrates",
-    "slimSubtitle": "Departement für digitale Transformation",
     "followUs": "Folgen Sie uns auf"
   },
   "events": {
@@ -488,6 +486,66 @@
     "submitPrimary": "Frage senden"
   },
   "admin": {
+    "accessDenied": {
+      "title": "Dieser Bereich ist für Ihre Rolle nicht verfügbar",
+      "body": "Als Veranstaltende verwalten Sie Ihre eigenen Veranstaltungen: anlegen, veröffentlichen, Materialien, Fragebögen und Nachbearbeitung. Die Plattformeinstellungen und die Daten aller Veranstaltungen bleiben bei der Administration.",
+      "back": "Zu Ihren Veranstaltungen"
+    },
+    "staffLogin": {
+      "title": "Anmeldung im Verwaltungsbereich",
+      "intro": "Veranstaltende melden sich mit einem Link an, der an ihre E-Mail-Adresse gesendet wird: kein Passwort zu merken.",
+      "emailLabel": "Ihre dienstliche E-Mail-Adresse",
+      "send": "Link zusenden",
+      "sending": "Wird gesendet…",
+      "sent": "Wenn die Adresse freigeschaltet ist, erhalten Sie in Kürze eine E-Mail mit dem Anmeldelink. Der Link gilt nur einmal und läuft nach {minutes} Minuten ab.",
+      "error": "Die Anfrage konnte nicht gesendet werden. Bitte versuchen Sie es in einigen Minuten erneut.",
+      "keySection": "Anmeldung mit dem Instanzschlüssel",
+      "accessTitle": "Verwaltungsbereich betreten",
+      "accessIntro": "Drücken Sie die Schaltfläche, um sich anzumelden. Der Link gilt nur einmal.",
+      "enter": "Anmelden",
+      "invalidLink": "Der Link ist ungültig: Er ist möglicherweise abgelaufen oder wurde bereits verwendet.",
+      "newLink": "Neuen Link anfordern"
+    },
+    "organizers": {
+      "title": "Veranstaltende",
+      "intro": "Personen, die Veranstaltungen organisieren, ohne die Plattform zu verwalten: Sie legen eigene Veranstaltungen an, veröffentlichen sie und verwalten Materialien, Fragebögen und Nachbearbeitung. Sie melden sich mit einem per E-Mail gesendeten Link an, ohne Passwort.",
+      "newTitle": "Veranstaltende hinzufügen",
+      "name": "Vor- und Nachname",
+      "email": "E-Mail",
+      "add": "Hinzufügen",
+      "sendNow": "Anmeldelink sofort senden",
+      "listTitle": "Freigeschaltete Veranstaltende",
+      "loading": "Wird geladen…",
+      "empty": "Noch keine Veranstaltenden.",
+      "events": "Veranstaltungen",
+      "lastLogin": "Letzte Anmeldung",
+      "status": "Status",
+      "actions": "Aktionen",
+      "never": "Nie",
+      "active": "Aktiv",
+      "inactive": "Deaktiviert",
+      "invite": "Link senden",
+      "inviteFor": "Anmeldelink an {name} senden",
+      "deactivate": "Deaktivieren",
+      "deactivateFor": "{name} deaktivieren",
+      "activate": "Reaktivieren",
+      "activateFor": "{name} reaktivieren",
+      "delete": "Löschen",
+      "deleteFor": "{name} löschen",
+      "deleteTitle": "Veranstaltende löschen?",
+      "deleteMessage": "Das Konto von {name} wird gelöscht. Die Veranstaltungen ({count}) bleiben erhalten und gehen an die Administration zurück.",
+      "deactivateTitle": "Veranstaltende deaktivieren?",
+      "deactivateMessage": "{name} kann sich nicht mehr anmelden, und bereits gesendete Anmeldelinks funktionieren nicht mehr. Die Veranstaltungen bleiben unverändert.",
+      "exists": "Es gibt bereits Veranstaltende mit dieser E-Mail-Adresse.",
+      "created": "Veranstaltende hinzugefügt.",
+      "createdInvited": "Veranstaltende hinzugefügt: Der Anmeldelink ist unterwegs.",
+      "invited": "Anmeldelink gesendet.",
+      "deleted": "Veranstaltende gelöscht.",
+      "updated": "Änderung gespeichert.",
+      "actionError": "Der Vorgang ist fehlgeschlagen. Bitte erneut versuchen.",
+      "loadError": "Die Liste konnte nicht geladen werden.",
+      "inviteFailed": "Veranstaltende hinzugefügt, aber der Anmeldelink konnte nicht gesendet werden: Senden Sie ihn über die Zeile erneut."
+    },
     "fileOrUrl": {
       "tabUpload": "Datei hochladen",
       "tabUrl": "URL einfügen",
@@ -776,6 +834,8 @@
       "eventQuestionnaires": "Fragebögen",
       "rubricaList": "Liste",
       "rubricaDetail": "Eintrag",
+      "organizers": "Veranstaltende",
+      "people": "Personen",
       "postprodDetail": "Aufzeichnung",
       "recordingsPostprod": "Transkripte / KI",
       "feedbackDashboard": "Feedback"
@@ -1408,8 +1468,10 @@
         "slimBarTitle": "Obere Leiste (Slim Header)",
         "slimBarDescription": "Die schmale Leiste oben auf der Seite, die die übergeordnete Organisation identifiziert.",
         "parentOrganization": "Übergeordnete Organisation",
-        "parentOrganizationHelp": "Z. B. «Präsidentschaft des Ministerrates»",
+        "parentOrganizationHelp": "Die Stelle, der Ihre Verwaltung untersteht. Leer lassen, um keine zu nennen.",
         "parentOrganizationUrl": "URL der übergeordneten Organisation",
+        "siteTagline": "Leitspruch der Website",
+        "siteTaglineHelp": "Erscheint in der oberen Leiste und in der Fußzeile, wenn die übergeordnete Organisation leer ist. Leer lassen, um nichts anzuzeigen. Er wird pro Sprache geschrieben: Wo einer fehlt, wird der englische verwendet, dann ein beliebiger anderer.",
         "centerBarTitle": "Zentraler Header",
         "centerBarDescription": "Der Hauptbereich des Headers mit dem Anwendungsnamen und dem Logo.",
         "appName": "Anwendungsname",
@@ -1428,7 +1490,7 @@
         "organizationNameShort": "Abkürzung der Organisation",
         "organizationUrl": "URL der Organisation",
         "parentOrganization": "Übergeordnete Organisation",
-        "parentOrganizationHelp": "z. B. Präsidentschaft des Ministerrates",
+        "parentOrganizationHelp": "Die Stelle, der Ihre Verwaltung untersteht. Leer lassen, um keine zu nennen.",
         "parentOrganizationUrl": "URL der übergeordneten Organisation",
         "logoUrl": "Benutzerdefinierte Logo-URL",
         "logoUrlHelp": "Leer lassen, um das Standard-PA-Symbol zu verwenden",
@@ -1497,7 +1559,9 @@
           }
         },
         "customHtmlLabel": "Benutzerdefinierter HTML-Inhalt",
-        "customHtmlHelp": "HTML, das im Hauptbereich der Startseite angezeigt wird"
+        "customHtmlHelp": "HTML, das im Hauptbereich der Startseite angezeigt wird",
+        "showProject": "Abschnitt „Das Projekt“ anzeigen",
+        "showProjectHelp": "Architektur, Datensouveränität und Open Source der Plattform: interessant für alle, die eine Nachnutzung prüfen, weniger für Teilnehmende."
       },
       "pages": {
         "privacyTitle": "Datenschutzerklärung",
@@ -3300,8 +3364,6 @@
     }
   },
   "footer": {
-    "departmentName": "Departement für digitale Transformation",
-    "presidencyName": "Präsidentschaft des Ministerrates",
     "privacy": "Datenschutzerklärung",
     "accessibility": "Barrierefreiheitserklärung",
     "openSource": "Open-Source-Software",

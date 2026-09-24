@@ -54,8 +54,6 @@
     "skipToFooter": "Téigh go dtí an buntásc"
   },
   "header": {
-    "slimTitle": "Uachtaránacht Chomhairle na nAirí",
-    "slimSubtitle": "An Roinn um Chlaochlú Digiteach",
     "followUs": "Lean sinn ar"
   },
   "events": {
@@ -488,6 +486,66 @@
     "submitPrimary": "Seol an cheist"
   },
   "admin": {
+    "accessDenied": {
+      "title": "Níl an chuid seo ar fáil do do ról",
+      "body": "Mar eagraí bainistíonn tú d’imeachtaí féin: iad a chruthú agus a fhoilsiú, ábhair, ceistneoirí agus iarléiriúchán. Fanann socruithe an ardáin agus sonraí na n-imeachtaí go léir ag an riarachán.",
+      "back": "Téigh chuig d’imeachtaí"
+    },
+    "staffLogin": {
+      "title": "Sínigh isteach sa limistéar riaracháin",
+      "intro": "Síníonn eagraithe imeachtaí isteach le nasc a sheoltar chuig a ríomhphost: gan pasfhocal le cuimhneamh air.",
+      "emailLabel": "Do ríomhphost oibre",
+      "send": "Seol an nasc chugam",
+      "sending": "Á sheoladh…",
+      "sent": "Má tá an seoladh cumasaithe, gheobhaidh tú ríomhphost leis an nasc síniú isteach go luath. Ní oibríonn an nasc ach uair amháin agus rachaidh sé in éag tar éis {minutes} nóiméad.",
+      "error": "Níorbh fhéidir an t-iarratas a sheoladh. Bain triail eile as i gceann cúpla nóiméad.",
+      "keySection": "Síniú isteach le heochair an ásc",
+      "accessTitle": "Téigh isteach sa limistéar riaracháin",
+      "accessIntro": "Brúigh an cnaipe chun síniú isteach. Ní oibríonn an nasc ach uair amháin.",
+      "enter": "Sínigh isteach",
+      "invalidLink": "Níl an nasc bailí: seans go bhfuil sé imithe in éag nó úsáidte cheana.",
+      "newLink": "Iarr nasc nua"
+    },
+    "organizers": {
+      "title": "Eagraithe",
+      "intro": "Daoine a eagraíonn imeachtaí gan an t-ardán a riar: cruthaíonn siad a n-imeachtaí féin, foilsíonn siad iad agus bainistíonn siad ábhair, ceistneoirí agus iarléiriúchán. Síníonn siad isteach le nasc a sheoltar chuig a ríomhphost, gan phasfhocal.",
+      "newTitle": "Cuir eagraí leis",
+      "name": "Ainm iomlán",
+      "email": "Ríomhphost",
+      "add": "Cuir leis",
+      "sendNow": "Seol an nasc síniú isteach anois",
+      "listTitle": "Eagraithe cumasaithe",
+      "loading": "Á lódáil…",
+      "empty": "Níl aon eagraí fós.",
+      "events": "Imeachtaí",
+      "lastLogin": "Síniú isteach deireanach",
+      "status": "Stádas",
+      "actions": "Gníomhartha",
+      "never": "Riamh",
+      "active": "Gníomhach",
+      "inactive": "Díghníomhachtaithe",
+      "invite": "Seol nasc",
+      "inviteFor": "Seol nasc síniú isteach chuig {name}",
+      "deactivate": "Díghníomhachtaigh",
+      "deactivateFor": "Díghníomhachtaigh {name}",
+      "activate": "Athghníomhachtaigh",
+      "activateFor": "Athghníomhachtaigh {name}",
+      "delete": "Scrios",
+      "deleteFor": "Scrios {name}",
+      "deleteTitle": "An t-eagraí a scriosadh?",
+      "deleteMessage": "Scriosfar cuntas {name}. Ní scriostar a n-imeachtaí ({count}): filleann siad ar an riarachán.",
+      "deactivateTitle": "An t-eagraí a dhíghníomhachtú?",
+      "deactivateMessage": "Ní bheidh {name} in ann síniú isteach a thuilleadh, agus stopfaidh na naisc a seoladh cheana ag obair. Fanann a n-imeachtaí mar atá.",
+      "exists": "Tá eagraí leis an ríomhphost seo ann cheana.",
+      "created": "Eagraí curtha leis.",
+      "createdInvited": "Eagraí curtha leis: tá an nasc síniú isteach ar an mbealach.",
+      "invited": "Nasc síniú isteach seolta.",
+      "deleted": "Eagraí scriosta.",
+      "updated": "Athrú sábháilte.",
+      "actionError": "Theip ar an oibríocht. Bain triail eile as.",
+      "loadError": "Níorbh fhéidir an liosta a lódáil.",
+      "inviteFailed": "Cuireadh an t-eagraí leis, ach níorbh fhéidir an nasc síniú isteach a sheoladh: seol arís é óna ró."
+    },
     "fileOrUrl": {
       "tabUpload": "Uaslódáil comhad",
       "tabUrl": "Greamaigh URL",
@@ -776,6 +834,8 @@
       "eventQuestionnaires": "Ceistneoirí",
       "rubricaList": "Liosta",
       "rubricaDetail": "Iontráil",
+      "organizers": "Eagraithe",
+      "people": "Daoine",
       "postprodDetail": "Taifeadadh",
       "recordingsPostprod": "Tras-scríbhinní / AI",
       "feedbackDashboard": "Feedback"
@@ -1408,8 +1468,10 @@
         "slimBarTitle": "Barra barr (Ceanntásc Caol)",
         "slimBarDescription": "An barra caol ag barr an leathanaigh a aithníonn an mháthaireagraíocht.",
         "parentOrganization": "Máthaireagraíocht",
-        "parentOrganizationHelp": "m.sh. \"Uachtaránacht Chomhairle na nAirí\"",
+        "parentOrganizationHelp": "An comhlacht a bhfuil do riarachán faoina chúram. Fág folamh é chun gan aon cheann a ainmniú.",
         "parentOrganizationUrl": "URL na máthaireagraíochta",
+        "siteTagline": "Mana an tsuímh",
+        "siteTaglineHelp": "Taispeántar é sa bharra uachtair agus sa bhuntásc nuair atá an máthaireagraíocht folamh. Fág folamh é chun rud ar bith a thaispeáint. Scríobhtar é de réir teanga: nuair atá sé ar iarraidh, úsáidtear an ceann Béarla, ansin ceann ar bith eile.",
         "centerBarTitle": "Ceanntásc láir",
         "centerBarDescription": "An príomhlimistéar ceanntáisc le hainm an fheidhmchláir agus an lógó.",
         "appName": "Ainm an fheidhmchláir",
@@ -1428,7 +1490,7 @@
         "organizationNameShort": "Giorrúchán na heagraíochta",
         "organizationUrl": "URL na heagraíochta",
         "parentOrganization": "Máthaireagraíocht",
-        "parentOrganizationHelp": "m.sh. Uachtaránacht Chomhairle na nAirí",
+        "parentOrganizationHelp": "An comhlacht a bhfuil do riarachán faoina chúram. Fág folamh é chun gan aon cheann a ainmniú.",
         "parentOrganizationUrl": "URL na máthaireagraíochta",
         "logoUrl": "URL lógó saincheaptha",
         "logoUrlHelp": "Fágaigí folamh chun deilbhín réamhshocraithe RA a úsáid",
@@ -1497,7 +1559,9 @@
           }
         },
         "customHtmlLabel": "Ábhar HTML saincheaptha",
-        "customHtmlHelp": "HTML a thaispeántar sa phríomhrannán den leathanach baile"
+        "customHtmlHelp": "HTML a thaispeántar sa phríomhrannán den leathanach baile",
+        "showProject": "Taispeáin an chuid “An tionscadal”",
+        "showProjectHelp": "Ailtireacht, flaitheas sonraí agus foinse oscailte an ardáin: is suimiúla é dóibh siúd atá ag machnamh ar athúsáid ná do rannpháirtithe."
       },
       "pages": {
         "privacyTitle": "Beartas príobháideachta",
@@ -3300,8 +3364,6 @@
     }
   },
   "footer": {
-    "departmentName": "An Roinn um Chlaochlú Digiteach",
-    "presidencyName": "Uachtaránacht Chomhairle na nAirí",
     "privacy": "Beartas príobháideachta",
     "accessibility": "Ráiteas inrochtaineachta",
     "openSource": "Bogearraí foinse oscailte",

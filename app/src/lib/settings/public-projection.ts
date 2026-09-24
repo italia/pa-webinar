@@ -31,7 +31,7 @@ export const NON_PUBLIC_SETTING_FIELDS: Record<string, string> = {
 export const PUBLIC_SETTING_FIELDS = [
   'id', 'siteName', 'siteDescription',
   'organizationName', 'organizationNameShort', 'organizationUrl',
-  'parentOrganization', 'parentOrganizationUrl',
+  'parentOrganization', 'parentOrganizationUrl', 'siteTagline',
   'logoUrl', 'faviconUrl', 'primaryColor', 'defaultTimezone',
   'seoTitle', 'seoDescription', 'seoImage',
   // Anteprima dei link condivisi: dicono soltanto CHE COSA la scheda mostra, e
@@ -39,7 +39,7 @@ export const PUBLIC_SETTING_FIELDS = [
   // chiunque riceve incollando il link.
   'ogCardEnabled', 'ogShowPoster', 'ogShowDate', 'ogShowSpeakers',
   'ogShowOrganization',
-  'homePageMode', 'footerLinks', 'privacyPolicy', 'accessibility',
+  'homePageMode', 'homeShowProject', 'footerLinks', 'privacyPolicy', 'accessibility',
   'statusPageEnabled', 'guestAccessEnabled', 'publicRegistrationEnabled',
   'calendarPublic', 'parseTitleKicker', 'waitingRoomEngine',
   'jitsiWatermarkUrl', 'jitsiWatermarkEnabled', 'jitsiWatermarkOpacity',

@@ -54,8 +54,6 @@
     "skipToFooter": "Liigu jalusesse"
   },
   "header": {
-    "slimTitle": "Ministrite Nõukogu Kantselei",
-    "slimSubtitle": "Digitaalse Ümberkujundamise Osakond",
     "followUs": "Jälgige meid"
   },
   "events": {
@@ -488,6 +486,66 @@
     "submitPrimary": "Saada küsimus"
   },
   "admin": {
+    "accessDenied": {
+      "title": "See jaotis pole teie rolli jaoks saadaval",
+      "body": "Korraldajana haldate oma üritusi: nende loomist ja avaldamist, materjale, küsimustikke ja järeltöötlust. Platvormi seaded ja kõigi ürituste andmed jäävad administraatorile.",
+      "back": "Mine oma üritustele"
+    },
+    "staffLogin": {
+      "title": "Logi haldusalasse",
+      "intro": "Ürituste korraldajad sisenevad oma e-postile saadetud lingiga: parooli pole vaja meeles pidada.",
+      "emailLabel": "Sinu töö-e-post",
+      "send": "Saada mulle link",
+      "sending": "Saatmine…",
+      "sent": "Kui aadress on lubatud, saad peagi e-kirja sisselogimislingiga. Link töötab ainult üks kord ja aegub {minutes} minuti pärast.",
+      "error": "Päringut ei õnnestunud saata. Proovi mõne minuti pärast uuesti.",
+      "keySection": "Sisselogimine instantsi võtmega",
+      "accessTitle": "Sisene haldusalasse",
+      "accessIntro": "Sisselogimiseks vajuta nuppu. Link töötab ainult üks kord.",
+      "enter": "Sisene",
+      "invalidLink": "Link ei kehti: see võib olla aegunud või juba kasutatud.",
+      "newLink": "Küsi uut linki"
+    },
+    "organizers": {
+      "title": "Korraldajad",
+      "intro": "Inimesed, kes korraldavad üritusi platvormi haldamata: nad loovad oma üritusi, avaldavad neid ning haldavad materjale, küsimustikke ja järeltöötlust. Nad sisenevad oma e-postile saadetud lingiga, ilma paroolita.",
+      "newTitle": "Lisa korraldaja",
+      "name": "Ees- ja perekonnanimi",
+      "email": "E-post",
+      "add": "Lisa",
+      "sendNow": "Saada sisselogimislink kohe",
+      "listTitle": "Lubatud korraldajad",
+      "loading": "Laadimine…",
+      "empty": "Korraldajaid veel pole.",
+      "events": "Üritused",
+      "lastLogin": "Viimane sisselogimine",
+      "status": "Olek",
+      "actions": "Toimingud",
+      "never": "Mitte kunagi",
+      "active": "Aktiivne",
+      "inactive": "Deaktiveeritud",
+      "invite": "Saada link",
+      "inviteFor": "Saada sisselogimislink kasutajale {name}",
+      "deactivate": "Deaktiveeri",
+      "deactivateFor": "Deaktiveeri {name}",
+      "activate": "Aktiveeri uuesti",
+      "activateFor": "Aktiveeri {name} uuesti",
+      "delete": "Kustuta",
+      "deleteFor": "Kustuta {name}",
+      "deleteTitle": "Kas kustutada korraldaja?",
+      "deleteMessage": "Kasutaja {name} konto kustutatakse. Tema üritusi ({count}) ei kustutata: need lähevad tagasi administraatorile.",
+      "deactivateTitle": "Kas deaktiveerida korraldaja?",
+      "deactivateMessage": "{name} ei saa enam sisse logida ja juba saadetud lingid lakkavad töötamast. Tema üritused jäävad samaks.",
+      "exists": "Selle e-postiga korraldaja on juba olemas.",
+      "created": "Korraldaja lisatud.",
+      "createdInvited": "Korraldaja lisatud: sisselogimislink on teel.",
+      "invited": "Sisselogimislink saadetud.",
+      "deleted": "Korraldaja kustutatud.",
+      "updated": "Muudatus salvestatud.",
+      "actionError": "Toiming ebaõnnestus. Proovige uuesti.",
+      "loadError": "Loendit ei õnnestunud laadida.",
+      "inviteFailed": "Korraldaja lisatud, kuid sisselogimislinki ei õnnestunud saata: saada see uuesti tema realt."
+    },
     "fileOrUrl": {
       "tabUpload": "Laadi fail üles",
       "tabUrl": "Kleebi URL",
@@ -776,6 +834,8 @@
       "eventQuestionnaires": "Küsimustikud",
       "rubricaList": "Loend",
       "rubricaDetail": "Detail",
+      "organizers": "Korraldajad",
+      "people": "Inimesed",
       "postprodDetail": "Salvestis",
       "recordingsPostprod": "Transkriptsioonid / AI",
       "feedbackDashboard": "Feedback"
@@ -1408,8 +1468,10 @@
         "slimBarTitle": "Ülemine riba (Slim Header)",
         "slimBarDescription": "Õhuke riba lehe ülaosas, mis näitab emaorganisatsiooni.",
         "parentOrganization": "Emaorganisatsioon",
-        "parentOrganizationHelp": "Nt \"Ministrite Nõukogu Kantselei\"",
+        "parentOrganizationHelp": "Asutus, mille alla teie asutus kuulub. Jäta tühjaks, et ühtegi ei nimetataks.",
         "parentOrganizationUrl": "Emaorganisatsiooni URL",
+        "siteTagline": "Saidi tunnuslause",
+        "siteTaglineHelp": "Kuvatakse ülariba ja jaluse osas, kui ülemasutus on tühi. Jäta tühjaks, et midagi ei kuvataks. Kirjutatakse keelte kaupa: kui see puudub, kasutatakse ingliskeelset, seejärel mis tahes muud.",
         "centerBarTitle": "Keskne päis",
         "centerBarDescription": "Peamine päise ala rakenduse nime ja logoga.",
         "appName": "Rakenduse nimi",
@@ -1428,7 +1490,7 @@
         "organizationNameShort": "Organisatsiooni lühend",
         "organizationUrl": "Organisatsiooni URL",
         "parentOrganization": "Emaorganisatsioon",
-        "parentOrganizationHelp": "nt Ministrite Nõukogu Kantselei",
+        "parentOrganizationHelp": "Asutus, mille alla teie asutus kuulub. Jäta tühjaks, et ühtegi ei nimetataks.",
         "parentOrganizationUrl": "Emaorganisatsiooni URL",
         "logoUrl": "Kohandatud logo URL",
         "logoUrlHelp": "Jätke tühjaks vaikimisi AH ikooni kasutamiseks",
@@ -1497,7 +1559,9 @@
           }
         },
         "customHtmlLabel": "Kohandatud HTML-sisu",
-        "customHtmlHelp": "HTML, mida kuvatakse avalehe põhiosas"
+        "customHtmlHelp": "HTML, mida kuvatakse avalehe põhiosas",
+        "showProject": "Näita jaotist „Projekt“",
+        "showProjectHelp": "Platvormi arhitektuur, andmesuveräänsus ja avatud lähtekood: huvitab pigem korduskasutust kaaluvaid kui osalejaid."
       },
       "pages": {
         "privacyTitle": "Privaatsuspoliitika",
@@ -3300,8 +3364,6 @@
     }
   },
   "footer": {
-    "departmentName": "Digitaalse Ümberkujundamise Osakond",
-    "presidencyName": "Ministrite Nõukogu Kantselei",
     "privacy": "Privaatsuspoliitika",
     "accessibility": "Ligipääsetavuse avaldus",
     "openSource": "Avatud lähtekoodiga tarkvara",

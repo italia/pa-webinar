@@ -38,13 +38,12 @@ import { cookies } from 'next/headers';
 import { z } from 'zod';
 
 import { withErrorHandling } from '@/lib/api-handler';
-import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { requireEventManager } from '@/lib/auth/staff-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { prisma } from '@/lib/db';
 import {
   AppError,
   NotFoundError,
-  UnauthorizedError,
   ValidationError,
 } from '@/lib/errors';
 import { duplicatedConfig } from '@/lib/events/duplicate-fields';
@@ -201,10 +200,9 @@ function resolveSchedule(
 }
 
 export const POST = withErrorHandling(async (request, context) => {
-  const isAdmin = await isAdminAuthenticated(await cookies());
-  if (!isAdmin) throw new UnauthorizedError();
-
   const { id } = await context.params;
+  // Dell'evento: l'admin, o l'organizzatore che l'ha creato (ADR-014).
+  const session = await requireEventManager(await cookies(), id);
   if (typeof id !== 'string' || !UUID_RE.test(id)) {
     throw new AppError('id must be a UUID', 400, 'BAD_REQUEST');
   }
@@ -230,6 +228,9 @@ export const POST = withErrorHandling(async (request, context) => {
 
   const duplicate = await prisma.event.create({
     data: {
+      // La copia e' di chi la crea: l'organizzatore che duplica il proprio
+      // evento deve poterla gestire (ADR-014).
+      createdById: session.role === 'organizer' ? session.accountId : null,
       // Everything the copy inherits, from the single classified list — see
       // lib/events/duplicate-fields.ts for why this is not spelled out inline.
       ...duplicatedConfig(source),

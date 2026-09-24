@@ -54,8 +54,6 @@
     "skipToFooter": "Ir para o rodapé"
   },
   "header": {
-    "slimTitle": "Presidência do Conselho de Ministros",
-    "slimSubtitle": "Departamento para a Transformação Digital",
     "followUs": "Siga-nos em"
   },
   "events": {
@@ -488,6 +486,66 @@
     "submitPrimary": "Enviar pergunta"
   },
   "admin": {
+    "accessDenied": {
+      "title": "Esta secção não está disponível para a sua função",
+      "body": "Como organizador, gere os seus próprios eventos: criá-los, publicá-los, os materiais, os questionários e a pós-produção. As definições da plataforma e os dados de todos os eventos ficam com a administração.",
+      "back": "Ir para os seus eventos"
+    },
+    "staffLogin": {
+      "title": "Aceder à área de administração",
+      "intro": "Quem organiza eventos entra com uma ligação enviada para o seu e-mail: sem palavras-passe para lembrar.",
+      "emailLabel": "O seu e-mail profissional",
+      "send": "Enviar-me a ligação",
+      "sending": "A enviar…",
+      "sent": "Se o endereço estiver autorizado, receberá em breve um e-mail com a ligação de acesso. A ligação só funciona uma vez e expira ao fim de {minutes} minutos.",
+      "error": "Não foi possível enviar o pedido. Tente novamente dentro de alguns minutos.",
+      "keySection": "Acesso com a chave da instância",
+      "accessTitle": "Entrar na área de administração",
+      "accessIntro": "Prima o botão para entrar. A ligação só funciona uma vez.",
+      "enter": "Entrar",
+      "invalidLink": "A ligação não é válida: pode ter expirado ou já ter sido usada.",
+      "newLink": "Pedir uma nova ligação"
+    },
+    "organizers": {
+      "title": "Organizadores",
+      "intro": "Pessoas que organizam eventos sem administrar a plataforma: criam os seus próprios eventos, publicam-nos e gerem materiais, questionários e pós-produção. Entram com uma ligação enviada para o seu e-mail, sem palavra-passe.",
+      "newTitle": "Adicionar um organizador",
+      "name": "Nome completo",
+      "email": "E-mail",
+      "add": "Adicionar",
+      "sendNow": "Enviar já a ligação de acesso",
+      "listTitle": "Organizadores autorizados",
+      "loading": "A carregar…",
+      "empty": "Ainda não há organizadores.",
+      "events": "Eventos",
+      "lastLogin": "Último acesso",
+      "status": "Estado",
+      "actions": "Ações",
+      "never": "Nunca",
+      "active": "Ativo",
+      "inactive": "Desativado",
+      "invite": "Enviar ligação",
+      "inviteFor": "Enviar uma ligação de acesso a {name}",
+      "deactivate": "Desativar",
+      "deactivateFor": "Desativar {name}",
+      "activate": "Reativar",
+      "activateFor": "Reativar {name}",
+      "delete": "Eliminar",
+      "deleteFor": "Eliminar {name}",
+      "deleteTitle": "Eliminar o organizador?",
+      "deleteMessage": "A conta de {name} será eliminada. Os seus eventos ({count}) não são apagados: voltam para a administração.",
+      "deactivateTitle": "Desativar o organizador?",
+      "deactivateMessage": "{name} deixará de poder entrar e as ligações de acesso já enviadas deixam de funcionar. Os seus eventos ficam como estão.",
+      "exists": "Já existe um organizador com este e-mail.",
+      "created": "Organizador adicionado.",
+      "createdInvited": "Organizador adicionado: a ligação de acesso está a caminho.",
+      "invited": "Ligação de acesso enviada.",
+      "deleted": "Organizador eliminado.",
+      "updated": "Alteração guardada.",
+      "actionError": "A operação falhou. Tente novamente.",
+      "loadError": "Não foi possível carregar a lista.",
+      "inviteFailed": "Organizador adicionado, mas não foi possível enviar a ligação de acesso: reenvie-a a partir da respetiva linha."
+    },
     "fileOrUrl": {
       "tabUpload": "Carregar ficheiro",
       "tabUrl": "Colar URL",
@@ -776,6 +834,8 @@
       "eventQuestionnaires": "Questionários",
       "rubricaList": "Lista",
       "rubricaDetail": "Entrada",
+      "organizers": "Organizadores",
+      "people": "Pessoas",
       "postprodDetail": "Gravação",
       "recordingsPostprod": "Transcrições / IA",
       "feedbackDashboard": "Feedback"
@@ -1408,8 +1468,10 @@
         "slimBarTitle": "Barra superior (Slim Header)",
         "slimBarDescription": "A barra fina no topo da página que identifica o organismo de pertença.",
         "parentOrganization": "Organismo superior",
-        "parentOrganizationHelp": "Ex. \"Presidência do Conselho de Ministros\"",
+        "parentOrganizationHelp": "O organismo do qual depende a sua administração. Deixe vazio para não nomear nenhum.",
         "parentOrganizationUrl": "URL do organismo superior",
+        "siteTagline": "Lema do site",
+        "siteTaglineHelp": "Aparece na faixa superior e no rodapé quando o organismo superior está vazio. Deixe vazio para não mostrar nada. Escreve-se por língua: onde faltar, usa-se o inglês e, depois, qualquer outro.",
         "centerBarTitle": "Cabeçalho central",
         "centerBarDescription": "A área principal do cabeçalho com o nome da aplicação e o logótipo.",
         "appName": "Nome da aplicação",
@@ -1428,7 +1490,7 @@
         "organizationNameShort": "Sigla da organização",
         "organizationUrl": "URL da organização",
         "parentOrganization": "Organização superior",
-        "parentOrganizationHelp": "ex. Presidência do Conselho de Ministros",
+        "parentOrganizationHelp": "O organismo do qual depende a sua administração. Deixe vazio para não nomear nenhum.",
         "parentOrganizationUrl": "URL da organização superior",
         "logoUrl": "URL do logótipo personalizado",
         "logoUrlHelp": "Deixe vazio para utilizar o ícone AP predefinido",
@@ -1497,7 +1559,9 @@
           }
         },
         "customHtmlLabel": "Conteúdo HTML personalizado",
-        "customHtmlHelp": "HTML apresentado na secção principal da página inicial"
+        "customHtmlHelp": "HTML apresentado na secção principal da página inicial",
+        "showProject": "Mostrar a secção «O projeto»",
+        "showProjectHelp": "Arquitetura, soberania dos dados e código aberto da plataforma: interessa mais a quem avalia a reutilização do que a quem participa nos eventos."
       },
       "pages": {
         "privacyTitle": "Política de privacidade",
@@ -3300,8 +3364,6 @@
     }
   },
   "footer": {
-    "departmentName": "Departamento para a Transformação Digital",
-    "presidencyName": "Presidência do Conselho de Ministros",
     "privacy": "Política de privacidade",
     "accessibility": "Declaração de acessibilidade",
     "openSource": "Software de código aberto",
