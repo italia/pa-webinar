@@ -77,6 +77,12 @@ export default function RegistrationFormClient({
 
   const [orgSuggestions, setOrgSuggestions] = useState<string[]>([]);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+  // Un campo corretto dopo un invio fallito smette subito di risultare
+  // sbagliato, invece di restare rosso fino all'invio successivo.
+  const pulisciErrore = useCallback((campo: string) => {
+    setErrors((prev) => (prev[campo] ? { ...prev, [campo]: undefined } : prev));
+  }, []);
 
   const [errors, setErrors] = useState<FieldErrors>({});
   const [serverError, setServerError] = useState('');
@@ -169,7 +175,17 @@ export default function RegistrationFormClient({
       setAlreadyRegistered(false);
       setResent(false);
 
-      if (!validate()) return;
+      if (!validate()) {
+        // Dopo il rendering degli errori il focus va sul primo campo da
+        // correggere: restando sul pulsante, chi usa un lettore di schermo non
+        // saprebbe cosa non va.
+        requestAnimationFrame(() => {
+          formRef.current
+            ?.querySelector<HTMLElement>('[aria-invalid="true"], .is-invalid')
+            ?.focus();
+        });
+        return;
+      }
 
       setSubmitting(true);
       try {
@@ -368,7 +384,7 @@ export default function RegistrationFormClient({
   }
 
   return (
-    <form onSubmit={handleSubmit} noValidate>
+    <form ref={formRef} onSubmit={handleSubmit} noValidate>
       {serverError && (
         <Alert color="danger" className="mb-4">
           {serverError}
@@ -406,30 +422,62 @@ export default function RegistrationFormClient({
         <Input
           type="text"
           id="displayName"
+          // Aiuto ed errore stanno subito sotto il campo, fuori dal contenitore
+          // del kit: il suo margine li staccherebbe dal campo.
+          wrapperClassName="mb-1"
           label={t('name')}
-          placeholder={t('namePlaceholder')}
+          autoComplete="name"
+          required
+          aria-invalid={errors.displayName ? true : undefined}
+          aria-describedby={errors.displayName ? 'displayNameHelp displayNameError' : 'displayNameHelp'}
           value={displayName}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setDisplayName(e.target.value)
-          }
-          valid={!errors.displayName && displayName.length > 0}
-          {...(errors.displayName ? { validationText: t('errors.nameRequired') } : {})}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+            setDisplayName(e.target.value);
+            pulisciErrore('displayName');
+          }}
+          // Rosso solo dopo un invio fallito: un campo ancora vuoto non e'
+          // sbagliato, e la spunta verde su un'email malformata mentirebbe.
+          valid={errors.displayName ? false : undefined}
         />
+        <small id="displayNameHelp" className="form-text">
+          {t('namePlaceholder')}
+        </small>
+        {errors.displayName && (
+          <div id="displayNameError" className="invalid-feedback d-block">
+            {t('errors.nameRequired')}
+          </div>
+        )}
       </FormGroup>
 
       <FormGroup className="mb-4">
         <Input
           type="email"
           id="email"
+          // Aiuto ed errore stanno subito sotto il campo, fuori dal contenitore
+          // del kit: il suo margine li staccherebbe dal campo.
+          wrapperClassName="mb-1"
           label={t('email')}
-          placeholder={t('emailPlaceholder')}
+          autoComplete="email"
+          required
+          aria-invalid={errors.email ? true : undefined}
+          aria-describedby={errors.email ? 'emailHelp emailError' : 'emailHelp'}
           value={email}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setEmail(e.target.value)
-          }
-          valid={!errors.email && email.length > 0}
-          {...(errors.email ? { validationText: t('errors.emailInvalid') } : {})}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+            setEmail(e.target.value);
+            pulisciErrore('email');
+          }}
+          // Rosso solo dopo un invio fallito: un campo ancora vuoto non e'
+          // sbagliato, e la spunta verde su un'email malformata mentirebbe.
+          valid={errors.email ? false : undefined}
         />
+        <small id="emailHelp" className="form-text">
+          {t('emailPlaceholder')}
+        </small>
+        {errors.email && (
+          <div id="emailError" className="invalid-feedback d-block">
+            {t('errors.emailInvalid')}
+          </div>
+        )}
       </FormGroup>
 
       {showOrg && (
@@ -440,8 +488,14 @@ export default function RegistrationFormClient({
             id="organization"
             className={`form-control${errors.organization ? ' is-invalid' : ''}`}
             placeholder={t('organizationPlaceholder')}
+            required
+            aria-invalid={errors.organization ? true : undefined}
+            aria-describedby={errors.organization ? 'organizationError' : undefined}
             value={organization}
-            onChange={(e) => setOrganization(e.target.value)}
+            onChange={(e) => {
+              setOrganization(e.target.value);
+              pulisciErrore('organization');
+            }}
             list="org-suggestions"
             autoComplete="organization"
           />
@@ -453,7 +507,7 @@ export default function RegistrationFormClient({
             </datalist>
           )}
           {errors.organization && (
-            <div className="invalid-feedback d-block">
+            <div id="organizationError" className="invalid-feedback d-block">
               {t('errors.organizationRequired')}
             </div>
           )}
@@ -533,17 +587,21 @@ export default function RegistrationFormClient({
         <Input
           type="checkbox"
           id="consentGiven"
+          aria-invalid={errors.consentGiven ? true : undefined}
+          aria-required="true"
+          aria-describedby={errors.consentGiven ? 'consentGivenError' : undefined}
           checked={consentGiven}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setConsentGiven(e.target.checked)
-          }
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+            setConsentGiven(e.target.checked);
+            pulisciErrore('consentGiven');
+          }}
         />
         <Label for="consentGiven" check>
           {t('gdprConsent')}
           {(showOrg || showRole || showType) && (' ' + t('gdprConsentProfiling'))}
         </Label>
         {errors.consentGiven && (
-          <div className="text-danger small mt-1">
+          <div id="consentGivenError" className="text-danger small mt-1">
             {t('errors.consentRequired')}
           </div>
         )}
@@ -555,16 +613,20 @@ export default function RegistrationFormClient({
           <Input
             type="checkbox"
             id="consentRecording"
+            aria-invalid={errors.consentRecording ? true : undefined}
+            aria-required="true"
+            aria-describedby={errors.consentRecording ? 'consentRecordingError' : undefined}
             checked={consentRecording}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setConsentRecording(e.target.checked)
-            }
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+              setConsentRecording(e.target.checked);
+              pulisciErrore('consentRecording');
+            }}
           />
           <Label for="consentRecording" check>
             {tg('consent.recording')}
           </Label>
           {errors.consentRecording && (
-            <div className="text-danger small mt-1">
+            <div id="consentRecordingError" className="text-danger small mt-1">
               {tg('consent.recordingRequired')}
             </div>
           )}
@@ -577,16 +639,20 @@ export default function RegistrationFormClient({
           <Input
             type="checkbox"
             id="consentMultitrack"
+            aria-invalid={errors.consentMultitrack ? true : undefined}
+            aria-required="true"
+            aria-describedby={errors.consentMultitrack ? 'consentMultitrackError' : undefined}
             checked={consentMultitrack}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setConsentMultitrack(e.target.checked)
-            }
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+              setConsentMultitrack(e.target.checked);
+              pulisciErrore('consentMultitrack');
+            }}
           />
           <Label for="consentMultitrack" check>
             {tg('consent.multitrack')}
           </Label>
           {errors.consentMultitrack && (
-            <div className="text-danger small mt-1">
+            <div id="consentMultitrackError" className="text-danger small mt-1">
               {tg('consent.multitrackRequired')}
             </div>
           )}

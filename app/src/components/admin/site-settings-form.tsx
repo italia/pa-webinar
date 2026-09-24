@@ -120,6 +120,7 @@ export default function SiteSettingsForm({
               onClick={() => setActiveTab(tab.id)}
               role="tab"
               aria-selected={activeTab === tab.id}
+              aria-label={tab.label}
               type="button"
             >
               <Icon icon={tab.icon} size="sm" />

@@ -135,6 +135,9 @@ function CenterHeader({
               dal footer → poco scopribile. Esposto in header su ogni pagina. */}
           <Link
             href="/video-library"
+            // Sotto i 768px resta la sola icona: il nome serve comunque a chi
+            // usa un lettore di schermo.
+            aria-label={t('videoLibrary')}
             className="text-white text-decoration-none d-inline-flex align-items-center gap-1 me-3"
             style={{ fontSize: '0.9rem' }}
           >
@@ -144,6 +147,7 @@ function CenterHeader({
           {isAdmin && (
             <Link
               href="/admin"
+              aria-label={t('admin')}
               className="text-white text-decoration-none d-inline-flex align-items-center gap-1 me-3"
               style={{ fontSize: '0.9rem' }}
             >
