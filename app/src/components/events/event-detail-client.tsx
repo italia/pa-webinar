@@ -106,6 +106,8 @@ interface TagChip {
 interface EventDetailClientProps {
   event: EventData;
   locale: string;
+  /** Origine pubblica dell'app, per i link assoluti del calendario. */
+  appUrl: string;
   parseTitleKicker?: boolean;
   answeredQuestions?: AnsweredQuestion[];
   materials?: MaterialData[];
@@ -143,6 +145,7 @@ function localeDisplayName(lang: string): string {
 export default function EventDetailClient({
   event,
   locale,
+  appUrl,
   parseTitleKicker = false,
   answeredQuestions = [],
   materials = [],
@@ -793,6 +796,7 @@ export default function EventDetailClient({
                     startsAt={event.startsAt}
                     endsAt={event.endsAt}
                     slug={event.slug}
+                    appUrl={appUrl}
                   />
                 </>
               )}

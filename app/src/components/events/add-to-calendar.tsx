@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import {
   Dropdown,
@@ -26,6 +26,7 @@ interface AddToCalendarProps {
   startsAt: string;
   endsAt: string;
   slug: string;
+  appUrl: string;
 }
 
 export default function AddToCalendar({
@@ -34,15 +35,20 @@ export default function AddToCalendar({
   startsAt,
   endsAt,
   slug,
+  appUrl,
 }: AddToCalendarProps) {
   const t = useTranslations('events.detail.calendar');
   const locale = useLocale();
   const [open, setOpen] = useState(false);
 
-  const baseUrl =
-    typeof window !== 'undefined'
-      ? window.location.origin
-      : 'http://localhost:3000';
+  // Dal server, non da `window`: il markup resta identico fra server e
+  // browser, e i link finiscono nel calendario con l'indirizzo pubblico.
+  // Solo se l'indirizzo pubblico non e' configurato si ripiega, dopo il
+  // montaggio, sull'origine della pagina.
+  const [baseUrl, setBaseUrl] = useState(appUrl);
+  useEffect(() => {
+    if (!appUrl) setBaseUrl(window.location.origin);
+  }, [appUrl]);
 
   const input = {
     title,

@@ -8,7 +8,7 @@ import { eventAccessCookieName, verifyEventAccess } from '@/lib/event-session';
 import { isEventPageVisible } from '@/lib/events/visibility';
 import { ensureEventRecap, type EventRecap } from '@/lib/events/recap';
 import EventDetailClient from '@/components/events/event-detail-client';
-import { getPublicEnv } from '@/lib/env';
+import { appBaseUrl, getPublicEnv } from '@/lib/env';
 import { getSettings } from '@/lib/settings';
 import { localizedUrl } from '@/lib/utils/localized-url';
 import { openGraphImages, twitterImageCard } from '@/lib/seo';
@@ -30,7 +30,9 @@ export async function generateMetadata({
   const settings = await (await import('@/lib/settings')).getSettings();
 
   const event = await prisma.event.findUnique({ where: { slug } });
-  if (!event) return { title: 'Not found' };
+  // Come la pagina: un evento non pubblico non espone titolo, descrizione
+  // e immagine nemmeno nei metadati della risposta «non trovato».
+  if (!event || !isEventPageVisible(event)) return { robots: { index: false } };
 
   const title = getLocalized(event.title as LocalizedField, locale);
   const description = getLocalized(event.description as LocalizedField, locale);
@@ -372,6 +374,7 @@ export default async function EventDetailPage({
       <EventDetailClient
         event={serialised}
         locale={locale}
+        appUrl={appBaseUrl()?.href.replace(/\/$/, '') ?? ''}
         invalidToken={invalidToken}
         hasRoomAccess={hasRoomAccess}
         parseTitleKicker={resolveKickerEnabled(event, settings.parseTitleKicker)}
