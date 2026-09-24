@@ -312,9 +312,13 @@ export default function LiveEventClient({
   // Pre-join camera/mic choice captured by the waiting room's DeviceCheck.
   // Forwarded to JitsiRoom as `startWithVideoMuted`/`startWithAudioMuted`
   // so the user actually lands in the room with the state they picked.
+  // Fotocamera e microfono all'ingresso: accesi per chi conduce o interviene
+  // e nelle chiamate istantanee, che sono riunioni fra pari; spenti per chi
+  // assiste a un evento, che li accende quando vuole intervenire.
+  const devicesOnByDefault = isModerator || isSpeaker || event.eventType === 'INSTANT';
   const [joinPrefs, setJoinPrefs] = useState<WaitingRoomJoinPrefs>({
-    cameraOn: true,
-    micOn: true,
+    cameraOn: devicesOnByDefault,
+    micOn: devicesOnByDefault,
   });
 
   // ── Network-resilience: distinguish intentional hangup (user clicked
@@ -1173,6 +1177,7 @@ export default function LiveEventClient({
           }}
           participantCount={participantCount}
           role={isModerator ? 'moderator' : isGuest ? 'guest' : 'participant'}
+          devicesOnByDefault={devicesOnByDefault}
           jvbReady={jvbReady}
           warmup={warmup}
           // Uscita esplicita dalla sala d'attesa: le instant call non hanno una
@@ -1456,10 +1461,12 @@ export default function LiveEventClient({
               displayName={credentials.displayName}
               locale={locale}
               eventSlug={event.slug}
+              // I relatori hanno AV pieno (ADR 3): i limiti dei partecipanti non
+              // valgono per loro, anche se in sala non moderano.
               role={isActualModerator ? 'moderator' : 'participant'}
-              participantsCanUnmute={event.participantsCanUnmute}
-              participantsCanStartVideo={event.participantsCanStartVideo}
-              participantsCanShareScreen={event.participantsCanShareScreen}
+              participantsCanUnmute={event.participantsCanUnmute || isSpeaker}
+              participantsCanStartVideo={event.participantsCanStartVideo || isSpeaker}
+              participantsCanShareScreen={event.participantsCanShareScreen || isSpeaker}
               enableFileSharing={isInstantCall}
               whiteboardEnabled={event.whiteboardEnabled || isInstantCall}
               videoQuality={event.videoQuality}

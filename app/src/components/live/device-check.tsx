@@ -13,8 +13,15 @@ import {
 
 type PermissionState = 'idle' | 'requesting' | 'granted' | 'denied';
 
-const CAMERA_PREF_KEY = 'pawebinar.deviceCheck.cameraOn';
-const MIC_PREF_KEY = 'pawebinar.deviceCheck.micOn';
+// Una scelta per ruolo, non una sola per browser: chi ha acceso il microfono
+// conducendo un evento non deve ritrovarlo acceso quando partecipa a un altro.
+const prefKeys = (defaultOn: boolean) => {
+  const ruolo = defaultOn ? 'conduce' : 'partecipa';
+  return {
+    camera: `pawebinar.deviceCheck.${ruolo}.cameraOn`,
+    mic: `pawebinar.deviceCheck.${ruolo}.micOn`,
+  };
+};
 
 function readBoolPref(key: string, fallback: boolean): boolean {
   if (typeof window === 'undefined') return fallback;
@@ -47,13 +54,30 @@ interface DeviceCheckProps {
   /** true = vertical stacked layout (for narrow containers / mobile).
    *  false = horizontal with a 240x135 preview on the left. */
   compact?: boolean;
+  /** Stato iniziale di fotocamera e microfono se la persona non ha mai
+   *  scelto su questo browser. Spenti per chi partecipa, accesi per chi
+   *  conduce o interviene. */
+  defaultOn?: boolean;
 }
 
-export default function DeviceCheck({ onReady, onStateChange, compact = false }: DeviceCheckProps) {
+export default function DeviceCheck({
+  onReady,
+  onStateChange,
+  compact = false,
+  defaultOn = false,
+}: DeviceCheckProps) {
   const t = useTranslations('deviceCheck');
 
-  const [cameraOn, setCameraOn] = useState<boolean>(() => readBoolPref(CAMERA_PREF_KEY, true));
-  const [micOn, setMicOn] = useState<boolean>(() => readBoolPref(MIC_PREF_KEY, true));
+  // Si parte dal predefinito del ruolo e si legge la scelta memorizzata dopo
+  // il montaggio: il server non la conosce, e leggerla nell'inizializzatore
+  // farebbe divergere interruttori ed etichette fra server e browser.
+  const chiavi = prefKeys(defaultOn);
+  const [cameraOn, setCameraOn] = useState<boolean>(defaultOn);
+  const [micOn, setMicOn] = useState<boolean>(defaultOn);
+  useEffect(() => {
+    setCameraOn(readBoolPref(chiavi.camera, defaultOn));
+    setMicOn(readBoolPref(chiavi.mic, defaultOn));
+  }, [chiavi.camera, chiavi.mic, defaultOn]);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -235,14 +259,14 @@ export default function DeviceCheck({ onReady, onStateChange, compact = false }:
   const handleCameraToggle = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const next = e.target.checked;
     setCameraOn(next);
-    writeBoolPref(CAMERA_PREF_KEY, next);
-  }, []);
+    writeBoolPref(chiavi.camera, next);
+  }, [chiavi.camera]);
 
   const handleMicToggle = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const next = e.target.checked;
     setMicOn(next);
-    writeBoolPref(MIC_PREF_KEY, next);
-  }, []);
+    writeBoolPref(chiavi.mic, next);
+  }, [chiavi.mic]);
 
   const handleVideoChange = useCallback(async (e: React.ChangeEvent<HTMLSelectElement>) => {
     const id = e.target.value;

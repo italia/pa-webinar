@@ -136,6 +136,9 @@ interface WaitingRoomProps {
   event: WaitingRoomEvent;
   participantCount: number;
   role: 'moderator' | 'participant' | 'guest';
+  /** Fotocamera e microfono accesi all'ingresso (moderatori e relatori);
+   *  chi partecipa entra spento e li accende quando vuole intervenire. */
+  devicesOnByDefault?: boolean;
   jvbReady?: boolean | null;
   defaultName: string;
   /** Called when the user confirms "Entra ora" / "Guarda registrazione".
@@ -179,6 +182,7 @@ export default function WaitingRoom({
   event,
   participantCount,
   role,
+  devicesOnByDefault = false,
   jvbReady,
   defaultName,
   onEnterLive,
@@ -211,8 +215,8 @@ export default function WaitingRoom({
   // La piazza/giardino si apre su richiesta: vedi il commento su gameInvite.
   const [gameOpen, setGameOpen] = useState(false);
   const [devicePrefs, setDevicePrefs] = useState<WaitingRoomJoinPrefs>({
-    cameraOn: true,
-    micOn: true,
+    cameraOn: devicesOnByDefault,
+    micOn: devicesOnByDefault,
   });
   const [startError, setStartError] = useState('');
   // Consenso esplicito alla registrazione per-partecipante (multitrack).
@@ -743,7 +747,13 @@ export default function WaitingRoom({
     </FormGroup>
   );
 
-  const deviceCheckField = <DeviceCheck compact onStateChange={handleDeviceStateChange} />;
+  const deviceCheckField = (
+    <DeviceCheck
+      compact
+      defaultOn={devicesOnByDefault}
+      onStateChange={handleDeviceStateChange}
+    />
+  );
 
   const netiquetteBlock = (
     <div className="waiting-netiquette rounded-3 p-3" style={{ backgroundColor: '#F5F7FA' }}>
