@@ -100,6 +100,13 @@ export class EventStatusSchedule implements EventSchedule {
     if (attesa > ORIZZONTE_MS) return;
     this.timer = setTimeout(() => {
       this.timer = null;
+      // Il timer puo' scattare un soffio prima di `Date.now()`: senza
+      // riarmarlo, l'ora risulterebbe non ancora passata e il cancello
+      // resterebbe fermo per sempre.
+      if (!this.oraPassata()) {
+        this.armaOraInizio();
+        return;
+      }
       this.applica();
     }, attesa);
   }
