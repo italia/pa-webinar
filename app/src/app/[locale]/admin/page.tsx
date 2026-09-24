@@ -1,9 +1,6 @@
 import { getTranslations } from 'next-intl/server';
-import { cookies } from 'next/headers';
 
 import { prisma } from '@/lib/db';
-import { isAdminAuthenticated } from '@/lib/auth/admin-session';
-import AdminLogoutButton from '@/components/admin/admin-logout-button';
 import AdminLandingClient from '@/components/admin/admin-landing-client';
 
 interface AdminPageProps {
@@ -13,7 +10,6 @@ interface AdminPageProps {
 export default async function AdminPage({ searchParams }: AdminPageProps) {
   const { token } = await searchParams;
   const t = await getTranslations('admin');
-  const isAdmin = await isAdminAuthenticated(await cookies());
 
   if (token) {
     const { redirect } = await import('next/navigation');
@@ -64,11 +60,6 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
           </h1>
           <p className="text-secondary mb-0">{t('landing.subtitle')}</p>
         </div>
-        {isAdmin && (
-          <div className="d-flex gap-2 align-items-center flex-shrink-0">
-            <AdminLogoutButton />
-          </div>
-        )}
       </div>
 
       <AdminLandingClient

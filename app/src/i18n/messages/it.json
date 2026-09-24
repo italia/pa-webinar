@@ -73,7 +73,7 @@
       "fullyBooked": "Posti esauriti",
       "ended": "Concluso",
       "occupiedSpots": "{registered}/{max} iscritti",
-      "registeredCount": "{count, plural, =0 {Nessuna registrazione} one {1 registrazione} other {# registrazioni}}"
+      "registeredCount": "{count, plural, =0 {Nessun iscritto} one {1 iscritto} other {# iscritti}}"
     },
     "recap": {
       "title": "Riepilogo dell'evento",
@@ -405,7 +405,7 @@
       "endEvent": "Termina evento",
       "whiteboard": "Lavagna",
       "endEventConfirm": "Sei sicuro di voler terminare l'evento per tutti i partecipanti?",
-      "participantCount": "{count} partecipanti",
+      "participantCount": "{count, plural, one {# partecipante} other {# partecipanti}}",
       "raisedHands": "Mani alzate",
       "noRaisedHands": "Nessuna mano alzata",
       "giveFloor": "Dai la parola",
@@ -848,6 +848,7 @@
       "eventQuestionnaires": "Questionari",
       "rubricaList": "Elenco",
       "rubricaDetail": "Dettaglio",
+      "postprodDetail": "Registrazione",
       "recordingsPostprod": "Trascrizioni / AI",
       "feedbackDashboard": "Feedback"
     },
@@ -2106,9 +2107,31 @@
       "resultsCount": "{count, plural, =0 {Nessun evento} one {# evento} other {# eventi}}",
       "durationMinutes": "{minutes} min",
       "durationHoursMinutes": "{hours}h {minutes}min",
-      "moderatorsSpeakers": "{mods} moderatori · {speakers} relatori",
-      "postEventSummary": "{connected} connessi · {registered} registrazioni",
-      "registeredCount": "{count, plural, =0 {Nessuna registrazione} one {1 registrazione} other {# registrazioni}}"
+      "menu": {
+        "actionsFor": "Azioni per «{title}»",
+        "manage": "Gestisci",
+        "edit": "Modifica",
+        "openPublic": "Apri la pagina pubblica",
+        "newTab": "(si apre in una nuova scheda)",
+        "copyLink": "Copia il link pubblico",
+        "linkCopied": "Link copiato",
+        "publish": "Pubblica",
+        "unpublish": "Ritira dalla pubblicazione",
+        "unpublishTitle": "Ritirare l'evento?",
+        "unpublishMessage": "«{title}» sparirà dalle pagine pubbliche finché non lo pubblichi di nuovo. Le iscrizioni già ricevute restano.",
+        "published": "Evento pubblicato",
+        "unpublished": "Evento ritirato",
+        "duplicate": "Duplica come prossima occorrenza",
+        "delete": "Elimina",
+        "deleteTitle": "Eliminare l'evento?",
+        "deleteMessage": "«{title}» e tutti i suoi dati verranno eliminati. L'operazione non si può annullare.",
+        "deleted": "Evento eliminato",
+        "failed": "Operazione non riuscita. Riprova."
+      },
+      "instantBadge": "Chiamata rapida",
+      "moderatorsSpeakers": "{mods, plural, one {# moderatore} other {# moderatori}} · {speakers, plural, one {# relatore} other {# relatori}}",
+      "postEventSummary": "{connected} connessi · {registered} iscritti",
+      "registeredCount": "{count, plural, =0 {Nessun iscritto} one {1 iscritto} other {# iscritti}}"
     },
     "tags": {
       "title": "Gestione tag",
@@ -3566,6 +3589,15 @@
     "classicVersion": "Versione classica",
     "roomNotReadyButton": "La sala si sta preparando…",
     "roomNotReadyPiazza": "Intanto entra nella piazza",
+    "gate": {
+      "gateOpen": "Ingresso aperto",
+      "stageLive": "● IN DIRETTA",
+      "gatePreparing": "La sala si sta preparando…",
+      "stagePreparing": "Fra poco",
+      "ended": "Evento terminato",
+      "startsIn": "Inizia tra {time}",
+      "hostEarly": "Ingresso anticipato (host)"
+    },
     "roomJustOpened": "La sala è pronta — entra",
     "enterAnyway": "Entra comunque"
   },

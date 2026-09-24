@@ -37,6 +37,21 @@ const eslintConfig = [
         { prefer: 'type-imports' },
       ],
 
+      // L'icona di design-react-kit si carica in una cache asincrona: il
+      // server la disegna, il browser al primo disegno no, e l'icona sparisce.
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              name: 'design-react-kit',
+              importNames: ['Icon'],
+              message: "Usa `Icon` da '@/components/ui/icon': quella di design-react-kit sparisce all'idratazione.",
+            },
+          ],
+        },
+      ],
+
       // No console.log in production code
       'no-console': ['warn', { allow: ['warn', 'error'] }],
 

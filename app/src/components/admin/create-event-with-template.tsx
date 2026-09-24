@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 
-import { useRouter } from '@/i18n/navigation';
+import { useRouter, percorso } from '@/i18n/navigation';
 import TemplatePicker from '@/components/admin/template-picker';
 import EventWizard from '@/components/admin/event-wizard/wizard-shell';
 import type { PermissionMatrix } from '@/lib/utils/permission-matrix';
@@ -162,7 +162,7 @@ export default function CreateEventWithTemplate({
         <TemplatePicker
           templates={templates}
           onSelect={(tpl) => {
-            router.push(`/admin/events/new?template=${tpl.id}`);
+            router.push(percorso(`/admin/events/new?template=${tpl.id}`));
           }}
           onSkip={() => setSkipped(true)}
         />

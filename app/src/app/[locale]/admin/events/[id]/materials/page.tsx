@@ -9,6 +9,7 @@ import EventMaterialsManager, {
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
 import { prisma } from '@/lib/db';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
+import { localizedPath } from '@/lib/utils/localized-url';
 
 interface PageProps {
   params: Promise<{ id: string; locale: string }>;
@@ -68,7 +69,7 @@ export default async function EventMaterialsAdminPage({ params }: PageProps) {
     <div className="container py-5">
       <div className="mb-4">
         <Link
-          href={`/${locale}/admin/events/${event.id}`}
+          href={localizedPath(`/admin/events/${event.id}`, locale)}
           className="text-decoration-none small"
         >
           ← {tCommon('back')}

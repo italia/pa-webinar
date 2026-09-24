@@ -10,9 +10,10 @@
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslations, useFormatter } from 'next-intl';
-import { Badge, Button, Card, CardBody, Icon, Input, Label } from 'design-react-kit';
+import { Badge, Button, Card, CardBody, Input, Label } from 'design-react-kit';
 
-import { Link } from '@/i18n/navigation';
+import { Icon } from '@/components/ui/icon';
+import { Link, percorso } from '@/i18n/navigation';
 
 interface OrphanRow {
   id: string;
@@ -409,7 +410,7 @@ export default function RecordingsDashboard({
                             {fmt.dateTime(new Date(r.startedAt), { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
                           </td>
                           <td>
-                            <Link href={`/admin/events/${r.eventId}`} className="text-decoration-none">
+                            <Link href={percorso(`/admin/events/${r.eventId}`)} className="text-decoration-none">
                               {r.eventTitle}
                             </Link>
                             {r.eventType === 'INSTANT' && (
@@ -444,11 +445,11 @@ export default function RecordingsDashboard({
                                   <Icon icon="it-download" size="xs" />
                                 </a>
                                 <Link
-                                  href={
+                                  href={percorso(
                                     r.transcript
                                       ? `/admin/postprod/${r.transcript.recordingId}`
-                                      : `/admin/postprod?eventId=${r.eventId}`
-                                  }
+                                      : `/admin/postprod?eventId=${r.eventId}`,
+                                  )}
                                   className={`btn btn-sm d-inline-flex align-items-center gap-1 ${
                                     r.transcript?.hasTranscript
                                       ? 'btn-outline-success'

@@ -81,8 +81,8 @@ export async function generateMetadata({
     alternates: {
       canonical: pageUrl,
       languages: {
-        it: `${baseUrl}/it/eventi/${slug}`,
-        en: `${baseUrl}/en/events/${slug}`,
+        it: localizedUrl(baseUrl, `/events/${slug}`, 'it'),
+        en: localizedUrl(baseUrl, `/events/${slug}`, 'en'),
       },
     },
   };

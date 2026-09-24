@@ -10,12 +10,12 @@ import {
   Card,
   CardBody,
   FormGroup,
-  Icon,
   Input,
   Spinner,
 } from 'design-react-kit';
 
-import { Link } from '@/i18n/navigation';
+import { Icon } from '@/components/ui/icon';
+import { Link, percorso } from '@/i18n/navigation';
 import { resolveWaitingRoomMode } from '@/lib/waiting-room/resolve-engine';
 import AudioPlayer from '@/components/live/audio-player';
 import ChatPanel from '@/components/live/chat-panel';
@@ -366,7 +366,12 @@ export default function WaitingRoom({
   // secondo si illumina e chiede di entrare, poi torna normale: un richiamo
   // che non smette diventa rumore.
   const [appenaAperta, setAppenaAperta] = useState(false);
-  const eraPronta = useRef(salaPronta);
+  // L'apertura e' il momento in cui si puo' entrare davvero: evento avviato
+  // E ponte presente. Guardare solo il ponte perderebbe il caso piu' comune —
+  // il moderatore avvia con il ponte gia' caldo, e il ponte non e' mai stato
+  // «non pronto» agli occhi di chi aspettava.
+  const salaAperta = canEnterLive && salaPronta;
+  const eraAperta = useRef(salaAperta);
   const canEnter =
     nameValid &&
     emailValid &&
@@ -374,20 +379,20 @@ export default function WaitingRoom({
     ingressoConsentito;
 
   useEffect(() => {
-    if (!salaPronta) {
+    if (!salaAperta) {
       // Se la sala si richiude — il ponte sparisce, la fotografia torna
       // indietro — il richiamo va spento: resterebbe un invito a entrare
       // dove non si entra.
       setAppenaAperta(false);
-      eraPronta.current = false;
+      eraAperta.current = false;
       return undefined;
     }
-    if (eraPronta.current) return undefined;
-    eraPronta.current = true;
+    if (eraAperta.current) return undefined;
+    eraAperta.current = true;
     setAppenaAperta(true);
     const t = setTimeout(() => setAppenaAperta(false), 10_000);
     return () => clearTimeout(t);
-  }, [salaPronta]);
+  }, [salaAperta]);
 
   // Il richiamo si vede solo se il pulsante si puo' davvero premere. Lampeggiare
   // di verde su un pulsante spento — nome non ancora scritto, consenso non dato —
@@ -852,7 +857,7 @@ export default function WaitingRoom({
   ) : null;
 
   const backLinkBlock = isPublished ? (
-    <Link href={`/events/${event.slug}`}>
+    <Link href={percorso(`/events/${event.slug}`)}>
       <Button color="primary" outline tag="span" size="sm">
         <Icon icon="it-arrow-left" size="xs" className="me-1" />
         {tc('back')}
@@ -1047,7 +1052,7 @@ export default function WaitingRoom({
           verso la stessa pagina evento — evitiamo il doppione. */}
       {exitHref && !isEnded && !isPublished && (
         <Link
-          href={exitHref}
+          href={percorso(exitHref)}
           className="btn btn-outline-secondary btn-sm mt-1"
           style={{ justifySelf: 'center' }}
         >

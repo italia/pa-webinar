@@ -6,11 +6,10 @@ import {
   Card,
   CardBody,
   Col,
-  Icon,
   Row,
 } from 'design-react-kit';
 
-import { Link } from '@/i18n/navigation';
+import { Icon } from '@/components/ui/icon';
 import type { InfrastructureInfo } from '@/lib/infrastructure';
 
 interface InfrastructurePanelProps {
@@ -234,12 +233,14 @@ export default function InfrastructurePanel({ info }: InfrastructurePanelProps) 
           <Icon icon="it-info-circle" size="xs" className="me-1" />
           {t('note')}
         </p>
-        <Link
+        <a
           href="https://github.com/italia/pa-webinar/blob/main/docs/DEPLOYMENT.md"
           className="small"
+          target="_blank"
+          rel="noopener noreferrer"
         >
           {t('deployDocs')}
-        </Link>
+        </a>
       </div>
     </div>
   );

@@ -15,6 +15,7 @@ import { resolveGrantForEvent } from '@/lib/auth/moderator';
 import { isEventPageVisible } from '@/lib/events/visibility';
 import { hasJoinGrant } from '@/lib/events/join-grant';
 import { resolveRnnoiseEnforceOff } from '@/lib/jitsi/rnnoise';
+import { localizedPath } from '@/lib/utils/localized-url';
 
 export const dynamic = 'force-dynamic';
 
@@ -97,7 +98,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
   // require a cleared join-grant cookie before we issue the guest JWT.
   if (!token) {
     if (event.joinPasswordHash && !(await hasJoinGrant(event.id))) {
-      redirect(`/${locale}/events/${slug}/password`);
+      redirect(localizedPath(`/events/${slug}/password`, locale));
     }
     // Re-establish a registered participant from the signed per-event access
     // cookie (set at registration) BEFORE falling back to guest access or the
@@ -181,9 +182,9 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
       // Evento concluso senza token (link della sala salvato, cookie scaduto):
       // manda alla pagina evento — registrazione video, archivio Q&A, feedback —
       // invece che a /registration, che per stati ≠ PUBLISHED/LIVE fa 404.
-      redirect(`/${locale}/events/${slug}`);
+      redirect(localizedPath(`/events/${slug}`, locale));
     } else {
-      redirect(`/${locale}/events/${slug}/registration`);
+      redirect(localizedPath(`/events/${slug}/registration`, locale));
     }
   }
 
@@ -216,7 +217,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
       // della destinazione, lib/events/visibility): per DRAFT/ARCHIVED fa
       // notFound() a sua volta, e un redirect verso un 404 è peggio del 404.
       if (isEventPageVisible(event)) {
-        redirect(`/${locale}/events/${slug}?invalidToken=1`);
+        redirect(localizedPath(`/events/${slug}?invalidToken=1`, locale));
       }
       notFound();
     }

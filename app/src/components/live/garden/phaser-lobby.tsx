@@ -14,6 +14,7 @@
  * as the React waiting room hands off to the consent/Jitsi flow.
  */
 import { useEffect, useRef } from 'react';
+import { useTranslations } from 'next-intl';
 
 import { mountLobby, type LobbyHandle } from '@pa-webinar/lobby';
 
@@ -62,6 +63,7 @@ export default function PhaserLobby({
   hostOwnsEntry = false,
   salaPronta = true,
 }: PhaserLobbyProps) {
+  const tGate = useTranslations('waiting.gate');
   const containerRef = useRef<HTMLDivElement>(null);
   const handleRef = useRef<LobbyHandle | null>(null);
   const scheduleRef = useRef<EventStatusSchedule | null>(null);
@@ -103,6 +105,16 @@ export default function PhaserLobby({
       {
         worldSize: world,
         embed: hostOwnsEntry,
+        labels: {
+          gateOpen: tGate('gateOpen'),
+          stageLive: tGate('stageLive'),
+          gatePreparing: tGate('gatePreparing'),
+          stagePreparing: tGate('stagePreparing'),
+          ended: tGate('ended'),
+          // Il segnaposto lo riempie la piazza a ogni secondo.
+          startsIn: tGate('startsIn', { time: '{time}' }),
+          hostEarly: tGate('hostEarly'),
+        },
         initialProfile: { name: displayName.trim() },
         onExitToClassic: () => onExitRef.current(),
       },

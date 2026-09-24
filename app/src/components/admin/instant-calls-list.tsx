@@ -8,7 +8,6 @@ import {
   Button,
   Card,
   CardBody,
-  Icon,
   Input,
   Modal,
   ModalBody,
@@ -16,7 +15,8 @@ import {
   ModalHeader,
 } from 'design-react-kit';
 
-import { Link } from '@/i18n/navigation';
+import { Icon } from '@/components/ui/icon';
+import { Link, percorso } from '@/i18n/navigation';
 import CopyButton from '@/components/admin/copy-button';
 import { localizedPath } from '@/lib/utils/localized-url';
 
@@ -267,7 +267,7 @@ export default function InstantCallsList({
       setCreateOpen(false);
       setNewTitle('');
       setNewModerator('');
-      router.push(`/admin/events/${data.id}?token=${data.moderatorToken}`);
+      router.push(localizedPath(`/admin/events/${data.id}?token=${data.moderatorToken}`, locale));
       router.refresh();
     } finally {
       setSubmitting(false);
@@ -501,7 +501,7 @@ export default function InstantCallsList({
                       />
                     </div>
                     <Link
-                      href={`/admin/events/${call.id}?token=${call.moderatorToken}`}
+                      href={percorso(`/admin/events/${call.id}?token=${call.moderatorToken}`)}
                       className="text-decoration-none flex-grow-1"
                     >
                       <div className="d-flex justify-content-between align-items-start">
@@ -594,7 +594,7 @@ export default function InstantCallsList({
       )}
 
       <Modal isOpen={createOpen} toggle={() => !submitting && setCreateOpen(false)} centered>
-        <ModalHeader toggle={() => !submitting && setCreateOpen(false)}>
+        <ModalHeader closeAriaLabel={tc('close')} toggle={() => !submitting && setCreateOpen(false)}>
           {t('createNew')}
         </ModalHeader>
         <ModalBody>
@@ -634,7 +634,7 @@ export default function InstantCallsList({
       </Modal>
 
       <Modal isOpen={deleteOpen} toggle={() => !submitting && setDeleteOpen(false)} centered>
-        <ModalHeader toggle={() => !submitting && setDeleteOpen(false)}>
+        <ModalHeader closeAriaLabel={tc('close')} toggle={() => !submitting && setDeleteOpen(false)}>
           {t('deleteSelected')}
         </ModalHeader>
         <ModalBody>

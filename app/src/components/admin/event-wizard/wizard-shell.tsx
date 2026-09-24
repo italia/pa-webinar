@@ -19,7 +19,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
-import { useRouter } from '@/i18n/navigation';
+import { useRouter, percorso } from '@/i18n/navigation';
 import { useToast } from '@/components/ui/toast';
 import {
   coerceMatrix,
@@ -744,7 +744,7 @@ export default function EventWizard(props: WizardProps) {
 
           clearDraft();
           router.push(
-            `/admin/events/${eventId}?token=${encodeURIComponent(moderatorToken)}`,
+            percorso(`/admin/events/${eventId}?token=${encodeURIComponent(moderatorToken)}`),
           );
           return;
         }
@@ -914,7 +914,7 @@ export default function EventWizard(props: WizardProps) {
         } else if (overrideRedirect) {
           destination = overrideRedirect;
         }
-        router.push(destination);
+        router.push(percorso(destination));
       } catch (e) {
         setSubmitError(e instanceof Error ? e.message : 'Unknown error');
       } finally {

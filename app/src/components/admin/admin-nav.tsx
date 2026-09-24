@@ -1,12 +1,14 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { Icon } from 'design-react-kit';
 
+import AdminLogoutButton from '@/components/admin/admin-logout-button';
+import { Icon } from '@/components/ui/icon';
 import { Link, usePathname } from '@/i18n/navigation';
+import type { PercorsoStatico } from '@/i18n/percorsi';
 
 interface NavItem {
-  href: string;
+  href: PercorsoStatico;
   icon: string;
   labelKey: string;
   exact?: boolean;
@@ -129,80 +131,29 @@ export default function AdminNav() {
   const t = useTranslations('admin.nav');
   const pathname = usePathname();
 
-  const stripped = pathname.replace(/^\/[a-z]{2}/, '');
-  const inEvents =
-    stripped.startsWith('/admin/events') ||
-    stripped.startsWith('/admin/eventi') ||
-    stripped.startsWith('/admin/calendar') ||
-    stripped.startsWith('/admin/calendario');
-  // Monitoring area groups /admin/monitoring and /admin/infrastructure.
-  // These used to live under Settings but they are operational views,
-  // not configuration — so they get their own top-level section.
-  const inMonitoring =
-    stripped.startsWith('/admin/monitoring') ||
-    stripped.startsWith('/admin/infrastructure') ||
-    stripped.startsWith('/admin/infrastruttura');
-  const inSettings =
-    (stripped.startsWith('/admin/settings') ||
-      stripped.startsWith('/admin/impostazioni')) &&
-    !inMonitoring;
-  // Registrations area: attendee sign-ups, moderators, GDPR audit —
-  // everything that has to do with the *people* on the platform.
-  const inRegistrations =
-    stripped.startsWith('/admin/registrations') ||
-    stripped.startsWith('/admin/iscrizioni') ||
-    stripped.startsWith('/admin/rubrica') ||
-    stripped.startsWith('/admin/moderators') ||
-    stripped.startsWith('/admin/moderatori') ||
-    stripped.startsWith('/admin/gdpr-audit');
-  const inRecordings =
-    stripped.startsWith('/admin/recordings') ||
-    stripped.startsWith('/admin/registrazioni-video') ||
-    stripped.startsWith('/admin/postprod');
-  const inPublications =
-    stripped.startsWith('/admin/publications') ||
-    stripped.startsWith('/admin/pubblicazioni');
-  const inQuestionnaires = stripped.startsWith('/admin/questionnaires');
-
-  const PATH_ALIASES: Record<string, string[]> = {
-    '/admin/events': ['/admin/events', '/admin/eventi'],
-    '/admin/events/new': ['/admin/events/new', '/admin/eventi/nuovo'],
-    '/admin/events/calls': ['/admin/events/calls', '/admin/eventi/chiamate-rapide'],
-    '/admin/events/template': ['/admin/events/template'],
-    '/admin/events/statistics': ['/admin/events/statistics', '/admin/eventi/statistiche'],
-    '/admin/calendar': ['/admin/calendar', '/admin/calendario'],
-    '/admin/registrations': ['/admin/registrations', '/admin/iscrizioni'],
-    '/admin/recordings': ['/admin/recordings', '/admin/registrazioni-video'],
-    '/admin/postprod': ['/admin/postprod'],
-    '/admin/publications': ['/admin/publications', '/admin/pubblicazioni'],
-    '/admin/publications/new': ['/admin/publications/new', '/admin/pubblicazioni/nuova'],
-    '/admin/moderators': ['/admin/moderators', '/admin/moderatori'],
-    '/admin/rubrica': ['/admin/rubrica'],
-    '/admin/gdpr-audit': ['/admin/gdpr-audit'],
-    '/admin/settings': ['/admin/settings', '/admin/impostazioni'],
-    '/admin/settings/languages': [
-      '/admin/settings/languages',
-      '/admin/impostazioni/lingue',
-    ],
-    '/admin/settings/gdpr-templates': [
-      '/admin/settings/gdpr-templates',
-      '/admin/impostazioni/modelli-gdpr',
-    ],
-    '/admin/settings/email-templates': [
-      '/admin/settings/email-templates',
-      '/admin/impostazioni/modelli-email',
-    ],
-    '/admin/settings/tags': ['/admin/settings/tags', '/admin/impostazioni/tag'],
-    '/admin/infrastructure': ['/admin/infrastructure', '/admin/infrastruttura'],
-    '/admin/monitoring': ['/admin/monitoring'],
-    '/admin/questionnaires': ['/admin/questionnaires'],
-    '/admin/questionnaires/responses': ['/admin/questionnaires/responses'],
-  };
+  // `usePathname` restituisce il percorso INTERNO — senza prefisso di lingua
+  // e con i segnaposto (`/admin/events/[id]`) — quindi le sezioni si
+  // riconoscono una volta sola, in qualunque lingua sia l'indirizzo.
+  const sotto = (...radici: string[]) =>
+    radici.some((r) => pathname === r || pathname.startsWith(`${r}/`));
+  const inEvents = sotto('/admin/events', '/admin/calendar');
+  // Monitoraggio e infrastruttura sono viste operative, non configurazione:
+  // hanno una sezione loro.
+  const inMonitoring = sotto('/admin/monitoring', '/admin/infrastructure');
+  const inSettings = sotto('/admin/settings');
+  // Le persone: iscrizioni, rubrica, moderatori, registro GDPR.
+  const inRegistrations = sotto(
+    '/admin/registrations',
+    '/admin/rubrica',
+    '/admin/moderators',
+    '/admin/gdpr-audit',
+  );
+  const inRecordings = sotto('/admin/recordings', '/admin/postprod');
+  const inPublications = sotto('/admin/publications');
+  const inQuestionnaires = sotto('/admin/questionnaires');
 
   function matchesPath(href: string, exact?: boolean): boolean {
-    const aliases = PATH_ALIASES[href] || [href];
-    if (exact) return aliases.some((a) => stripped === a);
-    return aliases.some((a) => stripped.startsWith(a));
+    return exact ? pathname === href : sotto(href);
   }
 
   function isActive(item: NavItem): boolean {
@@ -264,6 +215,10 @@ export default function AdminNav() {
                       marginBottom: '-1px',
                     }}
                     aria-current={active ? 'page' : undefined}
+                    // Sui telefoni l'etichetta e' nascosta (`d-none` la toglie
+                    // anche ai lettori di schermo): il nome del link lo porta
+                    // l'attributo, altrimenti resterebbe un'icona muta.
+                    aria-label={t(item.labelKey)}
                   >
                     <Icon icon={item.icon} size="sm" />
                     <span className="d-none d-sm-inline">{t(item.labelKey)}</span>
@@ -271,6 +226,11 @@ export default function AdminNav() {
                 </li>
               );
             })}
+            {/* L'uscita sta qui, su ogni pagina e in fondo alla barra: era
+                solo in due pagine, e accanto all'azione principale. */}
+            <li className="nav-item ms-auto d-flex align-items-center">
+              <AdminLogoutButton variant="nav" />
+            </li>
           </ul>
         </div>
       </nav>
@@ -303,6 +263,7 @@ export default function AdminNav() {
                         marginBottom: '-1px',
                       }}
                       aria-current={active ? 'page' : undefined}
+                      aria-label={t(item.labelKey)}
                     >
                       <Icon icon={item.icon} size="xs" />
                       <span className="d-none d-sm-inline">{t(item.labelKey)}</span>

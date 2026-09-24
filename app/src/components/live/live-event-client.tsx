@@ -8,7 +8,6 @@ import {
   Alert,
   Badge,
   Button,
-  Icon,
   Modal,
   ModalHeader,
   ModalBody,
@@ -16,7 +15,8 @@ import {
   Spinner,
 } from 'design-react-kit';
 
-import { Link, useRouter } from '@/i18n/navigation';
+import { Icon } from '@/components/ui/icon';
+import { Link, useRouter, percorso } from '@/i18n/navigation';
 import type { JitsiMeetExternalAPI } from '@/types/jitsi';
 import type { VideoQualityPreset } from '@/lib/jitsi/config';
 import { leggiStatoPonte, leggiStatoRegistratore } from '@/lib/jitsi/bridge-readiness';
@@ -508,7 +508,7 @@ export default function LiveEventClient({
   }, []);
 
   const handleConsentDecline = useCallback(() => {
-    router.push(`/events/${event.slug}`);
+    router.push(percorso(`/events/${event.slug}`));
   }, [router, event.slug]);
 
   const handlePreJoin = useCallback((name: string) => {
@@ -1210,7 +1210,7 @@ export default function LiveEventClient({
         {feedbackModal}
 
         {isPrimaryModerator ? (
-          <Link href={`/admin/events/${event.id}?token=${token}`}>
+          <Link href={percorso(`/admin/events/${event.id}?token=${token}`)}>
             <Button color="primary" outline tag="span">
               {tc('back')}
             </Button>
@@ -1218,7 +1218,7 @@ export default function LiveEventClient({
         ) : (
           // Co-moderatori, speaker e partecipanti: il pannello admin accetta
           // solo il token primario, quindi torniamo alla pagina evento.
-          <Link href={`/events/${event.slug}`}>
+          <Link href={percorso(`/events/${event.slug}`)}>
             <Button color="primary" outline tag="span">
               {t('backToEvent')}
             </Button>
@@ -1244,7 +1244,7 @@ export default function LiveEventClient({
           >
             {tc('retry')}
           </Button>
-          <Link href={`/events/${event.slug}`}>
+          <Link href={percorso(`/events/${event.slug}`)}>
             <Button color="secondary" outline tag="span">
               {t('backToEvent')}
             </Button>
@@ -1515,7 +1515,7 @@ export default function LiveEventClient({
         centered
         container={modalContainer}
       >
-        <ModalHeader toggle={handleRecPromptLater}>
+        <ModalHeader closeAriaLabel={tc('close')} toggle={handleRecPromptLater}>
           {t('recordingPromptTitle')}
         </ModalHeader>
         <ModalBody>
@@ -1538,7 +1538,7 @@ export default function LiveEventClient({
         centered
         container={modalContainer}
       >
-        <ModalHeader toggle={() => !endingForAll && setShowLeaveChoice(false)}>
+        <ModalHeader closeAriaLabel={tc('close')} toggle={() => !endingForAll && setShowLeaveChoice(false)}>
           {t('leaveChoice.title')}
         </ModalHeader>
         <ModalBody>
@@ -1579,7 +1579,7 @@ export default function LiveEventClient({
         centered
         container={modalContainer}
       >
-        <ModalHeader toggle={() => !endingForAll && setShowEndDestino(false)}>
+        <ModalHeader closeAriaLabel={tc('close')} toggle={() => !endingForAll && setShowEndDestino(false)}>
           {t('endDestino.title')}
         </ModalHeader>
         <ModalBody>

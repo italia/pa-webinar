@@ -2,7 +2,10 @@
 
 import { useTranslations } from 'next-intl';
 
-import { Link, usePathname } from '@/i18n/navigation';
+import { useParams } from 'next/navigation';
+
+import { Link, usePathname, type Href } from '@/i18n/navigation';
+import type { PercorsoInterno } from '@/i18n/percorsi';
 
 // Inline SVG instead of <Icon> to avoid design-react-kit's async icon
 // cache triggering hydration mismatches on a component rendered by the
@@ -15,71 +18,80 @@ function ChevronLeft() {
   );
 }
 
-// Admin route tree. Ordered parent → child. Dynamic segments like
-// `[id]` are matched as UUIDs. The label is the i18n key inside the
-// `admin.nav` namespace (same table used by AdminNav). This keeps
-// breadcrumb labels and nav labels in sync without a second glossary.
-const ROUTE_TREE: { match: RegExp; labelKey: string; href: string }[] = [
-  { match: /^\/admin$/, labelKey: 'admin', href: '/admin' },
-  { match: /^\/admin\/events$/, labelKey: 'events', href: '/admin/events' },
-  { match: /^\/admin\/events\/new$/, labelKey: 'newEvent', href: '/admin/events/new' },
-  { match: /^\/admin\/events\/calls$/, labelKey: 'instantCalls', href: '/admin/events/calls' },
-  { match: /^\/admin\/events\/template$/, labelKey: 'templates', href: '/admin/events/template' },
-  { match: /^\/admin\/events\/statistics$/, labelKey: 'analytics', href: '/admin/events/statistics' },
-  { match: /^\/admin\/calendar$/, labelKey: 'calendar', href: '/admin/calendar' },
-  { match: /^\/admin\/events\/[0-9a-f-]{36}$/, labelKey: 'eventDetail', href: '' },
-  { match: /^\/admin\/events\/[0-9a-f-]{36}\/edit$/, labelKey: 'eventEdit', href: '' },
-  { match: /^\/admin\/events\/[0-9a-f-]{36}\/materials$/, labelKey: 'eventMaterials', href: '' },
-  { match: /^\/admin\/events\/[0-9a-f-]{36}\/questionnaires$/, labelKey: 'eventQuestionnaires', href: '' },
-  { match: /^\/admin\/registrations$/, labelKey: 'registrations', href: '/admin/registrations' },
-  { match: /^\/admin\/moderators$/, labelKey: 'moderators', href: '/admin/moderators' },
-  { match: /^\/admin\/gdpr-audit$/, labelKey: 'gdprAudit', href: '/admin/gdpr-audit' },
-  { match: /^\/admin\/rubrica$/, labelKey: 'rubrica', href: '/admin/rubrica' },
-  { match: /^\/admin\/rubrica\/[0-9a-f-]{36}$/, labelKey: 'rubricaDetail', href: '' },
-  { match: /^\/admin\/recordings$/, labelKey: 'recordings', href: '/admin/recordings' },
-  { match: /^\/admin\/publications$/, labelKey: 'publications', href: '/admin/publications' },
-  { match: /^\/admin\/publications\/new$/, labelKey: 'publicationsNew', href: '/admin/publications/new' },
-  { match: /^\/admin\/questionnaires$/, labelKey: 'questionnaires', href: '/admin/questionnaires' },
-  { match: /^\/admin\/questionnaires\/responses$/, labelKey: 'questionnairesResponses', href: '/admin/questionnaires/responses' },
-  { match: /^\/admin\/monitoring$/, labelKey: 'monitoring', href: '/admin/monitoring' },
-  { match: /^\/admin\/infrastructure$/, labelKey: 'infrastructure', href: '/admin/infrastructure' },
-  { match: /^\/admin\/settings$/, labelKey: 'settings', href: '/admin/settings' },
-  { match: /^\/admin\/settings\/languages$/, labelKey: 'settingsLanguages', href: '/admin/settings/languages' },
-  { match: /^\/admin\/settings\/gdpr-templates$/, labelKey: 'settingsGdprTemplates', href: '/admin/settings/gdpr-templates' },
-  { match: /^\/admin\/settings\/email-templates$/, labelKey: 'settingsEmailTemplates', href: '/admin/settings/email-templates' },
-  { match: /^\/admin\/settings\/tags$/, labelKey: 'settingsTags', href: '/admin/settings/tags' },
-];
+// L'albero dell'amministrazione, per percorso interno (quello che
+// restituisce `usePathname`: senza lingua, con i segnaposto). L'etichetta e'
+// la chiave nello spazio `admin.nav`, la stessa del menu: le due non possono
+// divergere.
+const ETICHETTE: Partial<Record<PercorsoInterno, string>> = {
+  '/admin': 'admin',
+  '/admin/events': 'events',
+  '/admin/events/new': 'newEvent',
+  '/admin/events/calls': 'instantCalls',
+  '/admin/events/template': 'templates',
+  '/admin/events/statistics': 'analytics',
+  '/admin/calendar': 'calendar',
+  '/admin/events/[id]': 'eventDetail',
+  '/admin/events/[id]/edit': 'eventEdit',
+  '/admin/events/[id]/materials': 'eventMaterials',
+  '/admin/events/[id]/questionnaires': 'eventQuestionnaires',
+  '/admin/registrations': 'registrations',
+  '/admin/moderators': 'moderators',
+  '/admin/gdpr-audit': 'gdprAudit',
+  '/admin/rubrica': 'rubrica',
+  '/admin/rubrica/[id]': 'rubricaDetail',
+  '/admin/recordings': 'recordings',
+  '/admin/postprod': 'recordingsPostprod',
+  '/admin/postprod/[recordingId]': 'postprodDetail',
+  '/admin/publications': 'publications',
+  '/admin/publications/new': 'publicationsNew',
+  '/admin/questionnaires': 'questionnaires',
+  '/admin/questionnaires/responses': 'questionnairesResponses',
+  '/admin/questionnaires/feedback': 'feedbackDashboard',
+  '/admin/monitoring': 'monitoring',
+  '/admin/infrastructure': 'infrastructure',
+  '/admin/settings': 'settings',
+  '/admin/settings/languages': 'settingsLanguages',
+  '/admin/settings/gdpr-templates': 'settingsGdprTemplates',
+  '/admin/settings/email-templates': 'settingsEmailTemplates',
+  '/admin/settings/tags': 'settingsTags',
+};
 
-// For each matched route, the chain of ancestor routes (by prefix) we
-// want to surface as breadcrumb parents. Computed lazily from the full
-// tree so renaming/adding routes needs one edit.
-function ancestorChain(pathname: string): { labelKey: string; href: string }[] {
-  const normalized = pathname.replace(/\/$/, '');
-  const segments = normalized.split('/').filter(Boolean);
-  const chain: { labelKey: string; href: string }[] = [];
-  for (let i = 1; i <= segments.length; i += 1) {
-    const path = `/${segments.slice(0, i).join('/')}`;
-    const match = ROUTE_TREE.find((r) => r.match.test(path));
-    if (match) {
-      chain.push({ labelKey: match.labelKey, href: match.href || path });
-    }
+interface Anello {
+  labelKey: string;
+  href: Href;
+}
+
+// Gli antenati sono i prefissi del percorso interno che l'albero conosce.
+// Un antenato con segnaposto (il singolo evento, sopra la sua modifica) si
+// riempie con i parametri dell'indirizzo corrente.
+function ancestorChain(pathname: string, params: Record<string, string>): Anello[] {
+  const segmenti = pathname.split('/').filter(Boolean);
+  const catena: Anello[] = [];
+  for (let i = 1; i <= segmenti.length; i += 1) {
+    const prefisso = `/${segmenti.slice(0, i).join('/')}` as PercorsoInterno;
+    const labelKey = ETICHETTE[prefisso];
+    if (!labelKey) continue;
+    const nomi = [...prefisso.matchAll(/\[([^\]]+)\]/g)].map((m) => m[1] ?? '');
+    const href = (
+      nomi.length === 0
+        ? prefisso
+        : { pathname: prefisso, params: Object.fromEntries(nomi.map((n) => [n, params[n] ?? ''])) }
+    ) as Href;
+    catena.push({ labelKey, href });
   }
-  return chain;
+  return catena;
 }
 
 export default function AdminBreadcrumb() {
   const pathname = usePathname();
+  const params = useParams<Record<string, string>>();
   const t = useTranslations('admin.nav');
 
-  // Strip the locale prefix (/it/admin/... or /en/admin/...) to match the
-  // patterns in ROUTE_TREE, which are locale-agnostic.
-  const stripped = pathname.replace(/^\/[a-z]{2}/, '');
+  // La radice non ha bisogno di briciole: ci si e' gia', e il menu sopra
+  // basta a orientarsi.
+  if (pathname === '/admin' || pathname === '/admin/login') return null;
 
-  // The admin landing page doesn't need a breadcrumb — the user is
-  // already at the tree root and the top nav is self-explanatory.
-  if (stripped === '/admin' || stripped === '/admin/login') return null;
-
-  const chain = ancestorChain(stripped);
+  const chain = ancestorChain(pathname, params ?? {});
   if (chain.length < 2) return null;
 
   const parent = chain[chain.length - 2];
@@ -94,7 +106,7 @@ export default function AdminBreadcrumb() {
       }}
     >
       <div className="container d-flex align-items-center gap-2 flex-wrap">
-        {parent?.href && (
+        {parent && (
           <Link
             href={parent.href}
             className="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1"
@@ -116,7 +128,7 @@ export default function AdminBreadcrumb() {
                 className={`breadcrumb-item ${isLast ? 'active' : ''}`}
                 aria-current={isLast ? 'page' : undefined}
               >
-                {isLast || !c.href ? (
+                {isLast ? (
                   <span style={{ color: 'var(--app-muted)' }}>{t(c.labelKey)}</span>
                 ) : (
                   <Link href={c.href} className="text-decoration-none">

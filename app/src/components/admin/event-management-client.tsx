@@ -17,10 +17,12 @@
 import { useCallback, useEffect, useState, type CSSProperties, type ReactNode } from 'react';
 import { useFormatter, useTranslations } from 'next-intl';
 
-import { Link, useRouter } from '@/i18n/navigation';
+import { Link, useRouter, percorso } from '@/i18n/navigation';
 import EventTitle from '@/components/events/event-title';
 import { MarkdownRenderer } from '@/components/ui/markdown';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
+import { duplicaComeProssima, impostaStatoEvento } from '@/lib/events/event-actions';
+import { localizedUrl } from '@/lib/utils/localized-url';
 
 import CallSessionsPanel from './call-sessions-panel';
 import DeleteEventModal from './delete-event-modal';
@@ -222,9 +224,15 @@ export default function EventManagementClient({
   const durationHours = Math.floor(durationMs / 3_600_000);
   const durationMinutes = Math.floor((durationMs % 3_600_000) / 60_000);
 
-  const publicUrl = `${baseUrl}/${locale}/${locale === 'it' ? 'eventi' : 'events'}/${event.slug}`;
-  const guestLiveUrl = `${baseUrl}/${locale}/${locale === 'it' ? 'eventi' : 'events'}/${event.slug}/live`;
-  const moderatorUrl = `${baseUrl}/${locale}/admin/events/${event.id}?token=${event.moderatorToken}`;
+  // Gli indirizzi che si copiano e si condividono: nella forma che il router
+  // riconosce direttamente, senza passare da una redirezione.
+  const publicUrl = localizedUrl(baseUrl, `/events/${event.slug}`, locale);
+  const guestLiveUrl = localizedUrl(baseUrl, `/events/${event.slug}/live`, locale);
+  const moderatorUrl = localizedUrl(
+    baseUrl,
+    `/admin/events/${event.id}?token=${event.moderatorToken}`,
+    locale,
+  );
   const liveModeratorUrl = `/events/${event.slug}/live?token=${event.moderatorToken}`;
   const editUrl = `/admin/events/${event.id}/edit?token=${event.moderatorToken}`;
 
@@ -238,15 +246,11 @@ export default function EventManagementClient({
     const newStatus = status === 'PUBLISHED' ? 'DRAFT' : 'PUBLISHED';
     setUpdating(true); setFeedback('');
     try {
-      const res = await fetch(`/api/events/${event.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${event.moderatorToken}` },
-        body: JSON.stringify({ status: newStatus }),
-      });
-      if (res.ok) {
-        setStatus(newStatus);
-        setFeedback(newStatus === 'PUBLISHED' ? t('publishSuccess') : t('unpublishSuccess'));
-      }
+      await impostaStatoEvento(event.id, event.moderatorToken, newStatus);
+      setStatus(newStatus);
+      setFeedback(newStatus === 'PUBLISHED' ? t('publishSuccess') : t('unpublishSuccess'));
+    } catch {
+      // Senza conferma dal server lo stato mostrato resta quello vero.
     } finally { setUpdating(false); }
   }, [status, event.id, event.moderatorToken, t]);
 
@@ -281,22 +285,12 @@ export default function EventManagementClient({
     setDuplicating(true);
     setDuplicateError(null);
     try {
-      const res = await fetch(`/api/admin/events/${event.id}/duplicate`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nextOccurrence: true }),
-      });
-      if (!res.ok) throw new Error(String(res.status));
       // Il token DEVE viaggiare nell'URL: la pagina di modifica risponde
-      // notFound() senza (edit/page.tsx). Leggerlo qui non costa nulla — la
-      // rotta di duplicazione lo restituisce già — e senza, il bottone
-      // "Duplica come prossima occorrenza" atterrava su un 404 dopo aver
-      // creato davvero l'evento: la copia c'era, ma l'operatore vedeva una
-      // pagina inesistente e non aveva modo di raggiungerla.
-      const created = (await res.json()) as { id: string; moderatorToken?: string };
-      if (!created.moderatorToken) throw new Error('missing token');
+      // notFound() senza (edit/page.tsx). Senza, il bottone atterrava su un
+      // 404 dopo aver creato davvero l'evento.
+      const created = await duplicaComeProssima(event.id);
       router.push(
-        `/admin/events/${created.id}/edit?token=${encodeURIComponent(created.moderatorToken)}`,
+        percorso(`/admin/events/${created.id}/edit?token=${encodeURIComponent(created.moderatorToken)}`),
       );
     } catch {
       setDuplicateError(td('duplicateNextError'));
@@ -429,7 +423,7 @@ export default function EventManagementClient({
                 sbagliato. */}
             <CopyBtn text={publicUrl} label={td('copyPublicUrl')} />
             {(status === 'PUBLISHED' || status === 'LIVE') && (
-              <Link href={liveModeratorUrl}
+              <Link href={percorso(liveModeratorUrl)}
                     className="btn btn-primary d-inline-flex align-items-center justify-content-center gap-2"
                     style={{ fontSize: '0.88rem' }}>
                 <Svg name="video" size={14} /> {td('enterAsModerator')}
@@ -460,7 +454,7 @@ export default function EventManagementClient({
               </span>
             )}
           </div>
-          <Link href={liveModeratorUrl} className="btn btn-primary btn-sm"
+          <Link href={percorso(liveModeratorUrl)} className="btn btn-primary btn-sm"
                 style={{ fontSize: '0.84rem' }}>
             {t('joinAsModeratorBtn')}
           </Link>
@@ -607,7 +601,7 @@ export default function EventManagementClient({
                     <Svg name="video" size={14} /> {t('startEvent')}
                   </button>
                 )}
-                <Link href={editUrl}
+                <Link href={percorso(editUrl)}
                       className="btn btn-primary d-flex align-items-center justify-content-center gap-2">
                   <Svg name="pencil" size={14} /> {td('editEvent')}
                 </Link>
@@ -733,7 +727,7 @@ function OverviewTab({ event, description, locale, editUrl, publicUrl, guestLive
       <div>
         <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
           <H>{td('featureSummary')}</H>
-          <Link href={editUrl}
+          <Link href={percorso(editUrl)}
                 className="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-2">
             <Svg name="pencil" size={12} /> {td('editSettings')}
           </Link>
@@ -776,7 +770,7 @@ function OverviewTab({ event, description, locale, editUrl, publicUrl, guestLive
           icon="it-lock"
         >
         <div className="d-flex justify-content-end mb-3">
-          <Link href={editUrl}
+          <Link href={percorso(editUrl)}
                 className="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-2">
             <Svg name="pencil" size={12} /> {td('editSettings')}
           </Link>
@@ -957,7 +951,7 @@ function ContentTab({ event }: { event: EventData }) {
               ({event.materials.length})
             </span>
           </H>
-          <Link href={`/admin/events/${event.id}/materials`}
+          <Link href={percorso(`/admin/events/${event.id}/materials`)}
                 className="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-2">
             <Svg name="pencil" size={12} /> {td('manageMaterials')}
           </Link>
@@ -997,7 +991,7 @@ function ContentTab({ event }: { event: EventData }) {
       <div>
         <div className="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
           <H>{td('questionnaires')}</H>
-          <Link href={`/admin/events/${event.id}/questionnaires`}
+          <Link href={percorso(`/admin/events/${event.id}/questionnaires`)}
                 className="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-2">
             <Svg name="pencil" size={12} /> {td('manageQuestionnaires')}
           </Link>
@@ -1118,7 +1112,7 @@ function PostEventTab({ event, status }: { event: EventData; status: string }) {
                 </button>
               )}
               <Link
-                href={`/admin/postprod?eventId=${event.id}`}
+                href={percorso(`/admin/postprod?eventId=${event.id}`)}
                 className={`btn d-inline-flex align-items-center gap-2 ${
                   hasRecording ? 'btn-outline-primary' : 'btn-primary'
                 }`}

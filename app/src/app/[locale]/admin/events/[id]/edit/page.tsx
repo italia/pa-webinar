@@ -5,7 +5,7 @@ import { tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { jvbMaxReplicasFromEnv } from '@/lib/jvb-sizing';
 import { getSettings } from '@/lib/settings';
-import { Link } from '@/i18n/navigation';
+import { Link, percorso } from '@/i18n/navigation';
 import EventWizard, {
   type InitialEventShape,
 } from '@/components/admin/event-wizard/wizard-shell';
@@ -243,7 +243,7 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
     <div className="container py-4">
       <div className="mb-2">
         <Link
-          href={`/admin/events/${id}?token=${token}`}
+          href={percorso(`/admin/events/${id}?token=${token}`)}
           className="text-decoration-none d-inline-flex align-items-center text-primary"
           style={{ fontSize: '0.9rem' }}
         >

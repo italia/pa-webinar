@@ -15,7 +15,7 @@ import { getTranslations } from 'next-intl/server';
 import EventListClient from '@/components/events/event-list-client';
 import SvgIcon from '@/components/home/svg-icon';
 import type { EventoHome } from '@/components/home/landing-istituzionale';
-import { Link } from '@/i18n/navigation';
+import { Link, percorso } from '@/i18n/navigation';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 
 interface Props {
@@ -56,7 +56,7 @@ export default async function LandingSemplice({
               {prossimo ? (
                 <>
                   <Link
-                    href={`/events/${prossimo.slug}`}
+                    href={percorso(`/events/${prossimo.slug}`)}
                     className="btn btn-primary btn-lg px-5"
                   >
                     {t('simple.cta')}

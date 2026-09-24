@@ -2,9 +2,10 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useTranslations, useFormatter } from 'next-intl';
-import { Alert, Button, Badge, Card, CardBody, Icon, Row, Col } from 'design-react-kit';
+import { Alert, Button, Badge, Card, CardBody, Row, Col } from 'design-react-kit';
 
-import { Link } from '@/i18n/navigation';
+import { Icon } from '@/components/ui/icon';
+import { Link, percorso } from '@/i18n/navigation';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import { REGISTRABLE_STATUSES } from '@/lib/events/visibility';
 import AddToCalendar from '@/components/events/add-to-calendar';
@@ -400,7 +401,7 @@ export default function EventDetailClient({
                 return (
                   <Link
                     key={tag.slug}
-                    href={`/events?tag=${tag.slug}`}
+                    href={percorso(`/events?tag=${tag.slug}`)}
                     className="text-decoration-none"
                     style={{
                       padding: '0.25rem 0.75rem',
@@ -736,7 +737,7 @@ export default function EventDetailClient({
                     </p>
                   )}
                   {canRegister && !(hasRoomAccess && !invalidToken) && (
-                    <Link href={`/events/${event.slug}/registration`}>
+                    <Link href={percorso(`/events/${event.slug}/registration`)}>
                       <Button
                         color="primary"
                         size="lg"
@@ -761,7 +762,7 @@ export default function EventDetailClient({
                     // link accanto all'alert creerebbe un ping-pong infinito.
                     <p className="text-center mt-3 mb-0" style={{ fontSize: '0.85rem' }}>
                       <Link
-                        href={`/events/${event.slug}/live`}
+                        href={percorso(`/events/${event.slug}/live`)}
                         className="text-decoration-none fw-semibold text-primary"
                         onMouseDown={() => {
                           // 1a: anticipa il risveglio del bridge (JVB) al

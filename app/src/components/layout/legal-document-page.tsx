@@ -1,4 +1,4 @@
-import { Link } from '@/i18n/navigation';
+import { Link, percorso } from '@/i18n/navigation';
 
 interface LegalDocumentSection {
   title: string;
@@ -73,7 +73,7 @@ export default function LegalDocumentPage({
                 {noteTitle ? <h2 className="h4 mb-3">{noteTitle}</h2> : null}
                 {noteBody ? <p className="mb-3">{noteBody}</p> : null}
                 {noteLink ? (
-                  <Link href={noteLink.href} className="btn btn-primary">
+                  <Link href={percorso(noteLink.href)} className="btn btn-primary">
                     {noteLink.label}
                   </Link>
                 ) : null}

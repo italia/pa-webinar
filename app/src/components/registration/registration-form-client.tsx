@@ -8,11 +8,11 @@ import {
   Input,
   FormGroup,
   Label,
-  Icon,
   Spinner,
 } from 'design-react-kit';
 
-import { Link, useRouter } from '@/i18n/navigation';
+import { Icon } from '@/components/ui/icon';
+import { Link, useRouter, percorso } from '@/i18n/navigation';
 import QuestionnaireForm from '@/components/questionnaires/questionnaire-form';
 import { createRegistrationSchema, ORGANIZATION_TYPES } from '@/lib/validation/schemas';
 
@@ -275,7 +275,7 @@ export default function RegistrationFormClient({
     if (!success || !registrationAccessToken || hasPreRegistrationQuestionnaire) return;
     if (!isNearStart()) return;
     const target = `/events/${eventSlug}/live?token=${registrationAccessToken}`;
-    const id = setTimeout(() => router.push(target), 1200);
+    const id = setTimeout(() => router.push(percorso(target)), 1200);
     return () => clearTimeout(id);
   }, [success, registrationAccessToken, hasPreRegistrationQuestionnaire, eventSlug, router, isNearStart, nowTick]);
 
@@ -341,7 +341,7 @@ export default function RegistrationFormClient({
           )}
           {registrationAccessToken && nearStart && (
             <Link
-              href={`/events/${eventSlug}/live?token=${registrationAccessToken}`}
+              href={percorso(`/events/${eventSlug}/live?token=${registrationAccessToken}`)}
             >
               <Button color="primary" size="lg" tag="span">
                 {tlive('enterRoom')}
@@ -357,7 +357,7 @@ export default function RegistrationFormClient({
               {t('addToCalendar')}
             </a>
           )}
-          <Link href={`/events/${eventSlug}`}>
+          <Link href={percorso(`/events/${eventSlug}`)}>
             <Button color="primary" outline tag="span">
               {t('backToEvent')}
             </Button>
@@ -635,7 +635,7 @@ export default function RegistrationFormClient({
         {submitting ? t('submitting') : t('submit')}
       </Button>
 
-      <Link href={`/events/${eventSlug}`}>
+      <Link href={percorso(`/events/${eventSlug}`)}>
         <Button color="secondary" outline tag="span">
           {tc('cancel')}
         </Button>

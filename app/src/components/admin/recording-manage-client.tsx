@@ -13,7 +13,7 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 
-import { Link } from '@/i18n/navigation';
+import { Link, percorso } from '@/i18n/navigation';
 import { useToast } from '@/components/ui/toast';
 import { useConfirm } from '@/components/ui/confirm-dialog';
 
@@ -185,7 +185,7 @@ export default function RecordingManageClient({
         <div className="d-flex align-items-center gap-2">
           {eventSlug && (
             <Link
-              href={`/eventi/${eventSlug}`}
+              href={percorso(`/events/${eventSlug}`)}
               className="btn btn-sm btn-outline-secondary"
               target="_blank"
             >

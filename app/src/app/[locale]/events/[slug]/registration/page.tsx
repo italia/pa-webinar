@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 import { getTranslations, getLocale } from 'next-intl/server';
 
 import { prisma } from '@/lib/db';
-import { Link } from '@/i18n/navigation';
+import { Link, percorso } from '@/i18n/navigation';
 import RegistrationFormClient from '@/components/registration/registration-form-client';
 import EventTitle from '@/components/events/event-title';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
@@ -68,7 +68,7 @@ export default async function RegistrationPage({
         <div className="col-lg-7">
           <div className="mb-3">
             <Link
-              href={`/events/${slug}`}
+              href={percorso(`/events/${slug}`)}
               className="text-decoration-none d-inline-flex align-items-center text-primary"
               style={{ fontSize: '0.9rem' }}
             >

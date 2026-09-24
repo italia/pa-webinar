@@ -4,7 +4,6 @@ import { prisma } from '@/lib/db';
 import { getSettings } from '@/lib/settings';
 import { Link } from '@/i18n/navigation';
 import AdminDashboardClient from '@/components/admin/admin-dashboard-client';
-import AdminLogoutButton from '@/components/admin/admin-logout-button';
 
 interface EventsListPageProps {
   searchParams: Promise<{ token?: string }>;
@@ -75,16 +74,16 @@ export default async function EventsListPage({
     loadAvailableTags(),
     getSettings(),
   ]);
-  const showLogout = !token;
 
   return (
     <div className="container py-5">
       <div className="d-flex justify-content-between align-items-start mb-5 flex-wrap gap-3">
         <div>
+          {/* Niente sottotitolo «Pannello di amministrazione»: il menu sopra
+              dice gia' dove si e'. */}
           <h1 className="mb-1 fw-bold" style={{ color: 'var(--app-text)' }}>
             {t('title')}
           </h1>
-          <p className="text-secondary mb-0">{t('subtitle')}</p>
         </div>
         <div className="d-flex gap-2 align-items-center flex-shrink-0">
           <Link
@@ -94,7 +93,6 @@ export default async function EventsListPage({
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
             {t('createEvent')}
           </Link>
-          {showLogout && <AdminLogoutButton />}
         </div>
       </div>
 

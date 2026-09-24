@@ -92,6 +92,7 @@ export default function LiveShareButton({
   modalContainer?: HTMLElement;
 }) {
   const t = useTranslations('live.share');
+  const tc = useTranslations('common');
   const [open, setOpen] = useState(false);
   const [origin, setOrigin] = useState('');
   const [copied, setCopied] = useState<RowKey | null>(null);
@@ -158,7 +159,7 @@ export default function LiveShareButton({
       </Button>
 
       <Modal isOpen={open} toggle={() => setOpen(false)} centered container={modalContainer}>
-        <ModalHeader toggle={() => setOpen(false)}>{t('title')}</ModalHeader>
+        <ModalHeader closeAriaLabel={tc('close')} toggle={() => setOpen(false)}>{t('title')}</ModalHeader>
         <ModalBody>
           {rows.map((r) => (
             <div key={r.key} className="mb-3">

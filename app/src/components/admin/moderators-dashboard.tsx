@@ -2,9 +2,10 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslations, useFormatter } from 'next-intl';
-import { Badge, Card, CardBody, Icon, Input } from 'design-react-kit';
+import { Badge, Card, CardBody, Input } from 'design-react-kit';
 
-import { Link } from '@/i18n/navigation';
+import { Icon } from '@/components/ui/icon';
+import { Link, percorso } from '@/i18n/navigation';
 import { useToast } from '@/components/ui/toast';
 import { useConfirm } from '@/components/ui/confirm-dialog';
 
@@ -138,7 +139,7 @@ export default function ModeratorsDashboard({
                   {data.rows.map((r) => (
                     <tr key={r.id}>
                       <td>
-                        <Link href={`/admin/events/${r.id}`} className="text-decoration-none fw-semibold">
+                        <Link href={percorso(`/admin/events/${r.id}`)} className="text-decoration-none fw-semibold">
                           {r.title}
                         </Link>
                         {r.eventType === 'INSTANT' && (

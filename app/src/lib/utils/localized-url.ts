@@ -1,37 +1,22 @@
-const IT_PATHS: Record<string, string> = {
-  '/events': '/eventi',
-  '/events/': '/eventi/',
-  '/calendar': '/calendario',
-  '/accessibility': '/accessibilita',
-  '/legal-notice': '/note-legali',
-  '/privacy/my-data': '/privacy/i-miei-dati',
-};
+import { traduci } from '@/i18n/percorsi';
 
 /**
- * Build a public-facing URL with localized path segments.
- * For Italian locale, translates known path segments.
- * For all other locales, uses the English (internal) path.
+ * Indirizzi pubblici con i segmenti nella lingua di chi li riceve.
  *
- * Use this for external URLs (emails, SEO, Open Graph, iCal) where
- * the URL must match what the user sees in their browser.
- * For internal navigation (Link href, router.push, redirect), use English paths directly.
+ * Servono dove non passa il router: email, calendario, anteprime condivise,
+ * link da copiare. Si derivano dalla stessa mappa che usa il router
+ * (`routing.pathnames`), non da una tabella a parte: una tabella parallela
+ * resta indietro, e un indirizzo che il router non riconosce e' un 404 dentro
+ * un'email che nessuno puo' piu' correggere.
+ *
+ * Si parte sempre dal percorso interno, in inglese (`/events/<slug>/live`).
+ * Query e frammento passano intatti.
  */
 export function localizedPath(path: string, locale: string): string {
-  if (locale !== 'it') return `/${locale}${path}`;
-
-  let localized = path;
-  for (const [en, it] of Object.entries(IT_PATHS)) {
-    if (localized.startsWith(en)) {
-      localized = it + localized.slice(en.length);
-      break;
-    }
-  }
-  return `/${locale}${localized}`;
+  return `/${locale}${traduci(path, locale)}`;
 }
 
-/**
- * Build a full external URL with localized path segments.
- */
+/** Indirizzo completo, per email, calendario e condivisioni. */
 export function localizedUrl(baseUrl: string, path: string, locale: string): string {
   return `${baseUrl}${localizedPath(path, locale)}`;
 }

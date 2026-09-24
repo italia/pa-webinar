@@ -17,7 +17,7 @@ import { useSearchParams } from 'next/navigation';
 import useSWR from 'swr';
 import { useTranslations } from 'next-intl';
 
-import { Link, useRouter } from '@/i18n/navigation';
+import { Link, useRouter, percorso } from '@/i18n/navigation';
 import { useToast } from '@/components/ui/toast';
 import { useConfirm } from '@/components/ui/confirm-dialog';
 import TranscriptEditor from './transcript-editor';
@@ -202,7 +202,7 @@ export default function PostprodDashboard() {
       // Deep-link da registrazioni/evento → pagina di gestione completa
       // del video (trascrizione + sintesi + traduzioni), non l'editor
       // inline cramped della lista.
-      router.push(`/admin/postprod/${match.id}`);
+      router.push(percorso(`/admin/postprod/${match.id}`));
     }
   }, [data, deepRecordingId, deepEventId, router]);
 
@@ -331,7 +331,7 @@ export default function PostprodDashboard() {
                     <td><ArtifactBadges artifacts={row.artifacts} /></td>
                     <td className="text-end">
                       <Link
-                        href={`/admin/postprod/${row.id}`}
+                        href={percorso(`/admin/postprod/${row.id}`)}
                         className="btn btn-sm btn-primary me-1"
                         onClick={(e) => e.stopPropagation()}
                       >

@@ -2,7 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 
-import { Link } from '@/i18n/navigation';
+import { Link, percorsoSeNoto } from '@/i18n/navigation';
 import { useSettings } from '@/lib/settings-context';
 
 interface FooterLink {
@@ -255,12 +255,20 @@ export default function PAFooter() {
           <h3 className="visually-hidden">{t('footer.legalNotes')}</h3>
           <ul className="it-footer-small-prints-list list-inline mb-0 d-flex flex-column flex-md-row">
             {legalLinks.length > 0 ? (
-              legalLinks.map((link) => (
+              legalLinks.map((link) => {
+                const interno = link.url.startsWith('/') ? percorsoSeNoto(link.url) : null;
+                return (
                 <li key={link.url} className="list-inline-item">
-                  {link.url.startsWith('/') ? (
-                    <Link href={link.url}>
+                  {interno ? (
+                    <Link href={interno}>
                       <IconLabel icon={pickLegalIcon(link)}>{link.title}</IconLabel>
                     </Link>
+                  ) : link.url.startsWith('/') ? (
+                    // Un indirizzo interno che la mappa non conosce resta
+                    // nella stessa scheda, com'e' stato scritto.
+                    <a href={link.url}>
+                      <IconLabel icon={pickLegalIcon(link)}>{link.title}</IconLabel>
+                    </a>
                   ) : (
                     <a
                       href={link.url}
@@ -271,7 +279,8 @@ export default function PAFooter() {
                     </a>
                   )}
                 </li>
-              ))
+                );
+              })
             ) : (
               <>
                 <li className="list-inline-item">

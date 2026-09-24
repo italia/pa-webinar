@@ -26,7 +26,7 @@ export default async function PublicationsPage() {
           <p className="text-secondary mb-0">{t('subtitle')}</p>
         </div>
       </div>
-      <PublicationsDashboard locale={locale} />
+      <PublicationsDashboard />
     </div>
   );
 }

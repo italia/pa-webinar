@@ -1,12 +1,11 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import {
   Dropdown,
   DropdownToggle,
   DropdownMenu,
-  Icon,
   LinkList,
   LinkListItem,
 } from 'design-react-kit';
@@ -17,6 +16,9 @@ import {
   generateYahooCalendarUrl,
   generateIcsDownloadUrl,
 } from '@/lib/ical/calendar-links';
+
+import { Icon } from '@/components/ui/icon';
+import { localizedPath } from '@/lib/utils/localized-url';
 
 interface AddToCalendarProps {
   title: string;
@@ -34,6 +36,7 @@ export default function AddToCalendar({
   slug,
 }: AddToCalendarProps) {
   const t = useTranslations('events.detail.calendar');
+  const locale = useLocale();
   const [open, setOpen] = useState(false);
 
   const baseUrl =
@@ -46,7 +49,9 @@ export default function AddToCalendar({
     description: description.slice(0, 300),
     startsAt: new Date(startsAt),
     endsAt: new Date(endsAt),
-    joinUrl: `${baseUrl}/it/eventi/${slug}`,
+    // Nella lingua di chi aggiunge l'evento: e' la pagina che aprira'
+    // dal proprio calendario.
+    joinUrl: `${baseUrl}${localizedPath(`/events/${slug}`, locale)}`,
   };
 
   const toggle = useCallback(() => setOpen((prev) => !prev), []);

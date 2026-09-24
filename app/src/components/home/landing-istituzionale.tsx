@@ -15,7 +15,7 @@ import { getTranslations } from 'next-intl/server';
 
 import EventListClient from '@/components/events/event-list-client';
 import SvgIcon from '@/components/home/svg-icon';
-import { Link } from '@/i18n/navigation';
+import { Link, percorso } from '@/i18n/navigation';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 
 export interface EventoHome {
@@ -115,7 +115,7 @@ export default async function LandingIstituzionale({
                   {getLocalized(prossimo.description as LocalizedField, locale).slice(0, 260)}
                 </p>
               )}
-              <Link href={`/events/${prossimo.slug}`} className="btn btn-primary btn-lg">
+              <Link href={percorso(`/events/${prossimo.slug}`)} className="btn btn-primary btn-lg">
                 {t('institutional.nextCta')}
               </Link>
             </div>

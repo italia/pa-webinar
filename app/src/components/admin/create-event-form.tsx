@@ -14,14 +14,14 @@ import {
   Label,
   Col,
   Row,
-  Icon,
   Badge,
 } from 'design-react-kit';
 
+import { Icon } from '@/components/ui/icon';
 import ToggleSwitch from '@/components/ui/toggle-switch';
 import LocaleTabBar from '@/components/ui/locale-tab-bar';
 import { MarkdownEditor } from '@/components/ui/markdown';
-import { useRouter } from '@/i18n/navigation';
+import { useRouter, percorso } from '@/i18n/navigation';
 import { createEventSchema } from '@/lib/validation/schemas';
 import EventConfigDiagram from '@/components/admin/event-config-diagram';
 import JvbCapacityPreview from '@/components/admin/jvb-capacity-preview';
@@ -308,7 +308,7 @@ export default function CreateEventForm({
 
         const created = await res.json();
         router.push(
-          `/admin/events/${created.id}?token=${created.moderatorToken}`,
+          percorso(`/admin/events/${created.id}?token=${created.moderatorToken}`),
         );
       } catch {
         setServerError(tc('error'));

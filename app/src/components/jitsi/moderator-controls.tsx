@@ -5,7 +5,6 @@ import { useTranslations } from 'next-intl';
 import {
   Button,
   Badge,
-  Icon,
   Modal,
   ModalHeader,
   ModalBody,
@@ -13,9 +12,10 @@ import {
   Spinner,
 } from 'design-react-kit';
 
+import { Icon } from '@/components/ui/icon';
 import type { JitsiMeetExternalAPI } from '@/types/jitsi';
 import { useJitsiEvents } from '@/hooks/use-jitsi-events';
-import { useRouter } from '@/i18n/navigation';
+import { useRouter, percorso } from '@/i18n/navigation';
 
 import RaisedHandsPanel from './raised-hands-panel';
 
@@ -274,7 +274,7 @@ export default function ModeratorControls({
       // client turns into the "evento concluso" screen — no 404 redirect.
       if (isPrimaryModerator) {
         endNavigationTimerRef.current = setTimeout(() => {
-          router.push(`/admin/events/${eventId}?token=${moderatorToken}`);
+          router.push(percorso(`/admin/events/${eventId}?token=${moderatorToken}`));
         }, 2000);
       }
     } catch {
@@ -481,7 +481,7 @@ export default function ModeratorControls({
 
       {/* End event confirmation modal */}
       <Modal isOpen={endModalOpen} toggle={() => setEndModalOpen(false)} centered>
-        <ModalHeader toggle={() => setEndModalOpen(false)}>
+        <ModalHeader closeAriaLabel={tc('close')} toggle={() => setEndModalOpen(false)}>
           {t('endEvent')}
         </ModalHeader>
         <ModalBody>

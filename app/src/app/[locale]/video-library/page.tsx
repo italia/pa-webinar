@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { getLocale, getTranslations } from 'next-intl/server';
+import { getTranslations } from 'next-intl/server';
 
 import VideoLibraryClient from '@/components/public/video-library-client';
 
@@ -15,7 +15,6 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function VideoLibraryPage() {
   const t = await getTranslations('videoLibrary');
-  const locale = await getLocale();
 
   return (
     <div className="container py-5">
@@ -26,7 +25,7 @@ export default async function VideoLibraryPage() {
         <p className="text-secondary mb-0">{t('subtitle')}</p>
       </header>
 
-      <VideoLibraryClient locale={locale} />
+      <VideoLibraryClient />
     </div>
   );
 }
