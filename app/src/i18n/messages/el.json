@@ -85,9 +85,9 @@
       "topWords": "Λέξεις που μοιράστηκαν περισσότερο",
       "feedback": "Μέση βαθμολογία",
       "feedbackCount": "{count, plural, one {1 απάντηση} other {# απαντήσεις}}",
-      "chatQuestions": "Questions from the chat",
-      "reactionsCount": "{count, plural, one {1 reaction} other {# reactions}}",
-      "answered": "answered"
+      "chatQuestions": "Ερωτήσεις από τη συνομιλία",
+      "reactionsCount": "{count, plural, one {1 αντίδραση} other {# αντιδράσεις}}",
+      "answered": "απαντήθηκε"
     },
     "detail": {
       "title": "Λεπτομέρειες εκδήλωσης",
@@ -162,12 +162,12 @@
     "successMessage": "Θα λάβετε email επιβεβαίωσης με τον σύνδεσμο πρόσβασης στην εκδήλωση.",
     "successScheduledMessage": "Η εγγραφή σας ολοκληρώθηκε! Σας στείλαμε ένα email με τον προσωπικό σας σύνδεσμο πρόσβασης. Προσθέστε την εκδήλωση στο ημερολόγιό σας και επιστρέψτε εδώ λίγο πριν από την έναρξη.",
     "addToCalendar": "Προσθήκη στο ημερολόγιο",
-    "enteringRoom": "We're taking you to the event waiting room.",
-    "enteringRoomHint": "Opening the room…",
+    "enteringRoom": "Σας μεταφέρουμε στην αίθουσα αναμονής της εκδήλωσης.",
+    "enteringRoomHint": "Άνοιγμα της αίθουσας…",
     "alreadyRegistered": "Είστε ήδη εγγεγραμμένοι σε αυτή την εκδήλωση",
-    "resendLink": "Resend my access link",
-    "resending": "Sending…",
-    "resendSent": "If the address is registered, we've re-sent the access link by email.",
+    "resendLink": "Νέα αποστολή του συνδέσμου πρόσβασης",
+    "resending": "Αποστολή…",
+    "resendSent": "Αν η διεύθυνση είναι εγγεγραμμένη, σας στείλαμε ξανά τον σύνδεσμο πρόσβασης μέσω email.",
     "backToEvent": "Επιστροφή στην εκδήλωση",
     "organization": "Φορέας",
     "organizationPlaceholder": "π.χ. AGID, Υπουργείο Οικονομικών, Δήμος Ρώμης",
@@ -340,23 +340,23 @@
       "reactNotAllowed": "Για να αντιδράσετε σε μηνύματα χρειάζεται ο προσωπικός σας σύνδεσμος ή ο σύνδεσμος συντονιστή.",
       "editNotAllowed": "Αυτός ο σύνδεσμος είναι κοινόχρηστος: δεν επιτρέπει την επεξεργασία των μηνυμάτων.",
       "editExpired": "Έχουν περάσει πάνω από 15 λεπτά: το μήνυμα δεν μπορεί πλέον να τροποποιηθεί.",
-      "askAsQuestionLabel": "Mark as a question",
-      "placeholderQuestion": "Write your question...",
-      "lensGroupLabel": "Filter messages",
-      "lensAll": "All",
-      "lensQuestions": "Questions ({count})",
-      "lensAnnounceAll": "Listing all messages",
-      "lensAnnounceQuestions": "Listing {count, plural, =0 {no questions} one {1 question} other {# questions}}",
-      "questionOpen": "Question",
-      "questionAnswered": "Answered",
-      "questionDismissed": "Won't be taken",
-      "questionMarkAnswered": "Mark answered",
-      "questionReopen": "Reopen",
-      "questionDismiss": "Dismiss",
-      "questionRestore": "Restore",
-      "questionStatusFailed": "Could not update the question",
-      "questionNeedsText": "Type the text of your question: an attachment alone does not enter the queue",
-      "lensTruncated": "Only the most recent messages are loaded: there may be older questions not listed."
+      "askAsQuestionLabel": "Σήμανση ως ερώτηση",
+      "placeholderQuestion": "Γράψτε την ερώτησή σας...",
+      "lensGroupLabel": "Φιλτράρισμα μηνυμάτων",
+      "lensAll": "Όλα",
+      "lensQuestions": "Ερωτήσεις ({count})",
+      "lensAnnounceAll": "Εμφανίζονται όλα τα μηνύματα",
+      "lensAnnounceQuestions": "Στη λίστα: {count, plural, =0 {καμία ερώτηση} one {1 ερώτηση} other {# ερωτήσεις}}",
+      "questionOpen": "Ερώτηση",
+      "questionAnswered": "Απαντήθηκε",
+      "questionDismissed": "Δεν θα εξεταστεί",
+      "questionMarkAnswered": "Σήμανση ως απαντημένη",
+      "questionReopen": "Επανάνοιγμα",
+      "questionDismiss": "Απόρριψη",
+      "questionRestore": "Επαναφορά",
+      "questionStatusFailed": "Δεν ήταν δυνατή η ενημέρωση της ερώτησης",
+      "questionNeedsText": "Γράψτε το κείμενο της ερώτησης: ένα συνημμένο από μόνο του δεν μπαίνει στην ουρά",
+      "lensTruncated": "Έχουν φορτωθεί μόνο τα πιο πρόσφατα μηνύματα: ενδέχεται να υπάρχουν παλαιότερες ερωτήσεις που δεν εμφανίζονται στη λίστα."
     },
     "role": {
       "moderator": "Συντονιστής",
@@ -417,7 +417,7 @@
       "live": "👥 {count, plural, one {# άτομο} other {# άτομα}}"
     },
     "sidebarTabChatUnread": "Νέα μη αναγνωσμένα μηνύματα",
-    "sidebarTabPollsOpen": "Open poll you have not voted in yet",
+    "sidebarTabPollsOpen": "Ανοιχτή δημοσκόπηση στην οποία δεν έχετε ψηφίσει ακόμη",
     "floatingControlsLabel": "Χειριστήρια εκδήλωσης",
     "screenshareActive": "🖥️ Ο/Η {name} μοιράζεται την οθόνη",
     "screenshareFallbackName": "Ένας συμμετέχων",
@@ -441,7 +441,7 @@
       "remainingLabel": "Υπολειπόμενος χρόνος (κάντε κλικ για τον χρόνο που πέρασε)",
       "elapsedLabel": "Χρόνος που πέρασε (κάντε κλικ για τον υπολειπόμενο χρόνο)"
     },
-    "videoCallFrameTitle": "Event video call"
+    "videoCallFrameTitle": "Βιντεοκλήση της εκδήλωσης"
   },
   "qa": {
     "title": "Ερωτήσεις και Απαντήσεις",
@@ -764,7 +764,7 @@
         "retentionHelp": "Πέραν αυτού του ορίου τα προσωπικά δεδομένα διαγράφονται αυτόματα.",
         "gdprTemplate": "Πρότυπο ενημέρωσης",
         "gdprTemplateNone": "— Χρήση προσαρμοσμένου κειμένου —",
-        "gdprTemplateUnknown": "The selected privacy notice template no longer exists: pick another one or go back to custom text",
+        "gdprTemplateUnknown": "Το επιλεγμένο πρότυπο ενημέρωσης απορρήτου δεν υπάρχει πλέον: επιλέξτε άλλο ή επιστρέψτε στο προσαρμοσμένο κείμενο",
         "privacyText": "Ενημέρωση απορρήτου (κείμενο)",
         "moderatorHeading": "Στοιχεία επικοινωνίας συντονιστή",
         "moderatorPublishHint": "Το όνομα και το email είναι υποχρεωτικά για τη δημοσίευση της εκδήλωσης (χρησιμεύουν για τον σύνδεσμο συντονιστή και το email επιβεβαίωσης). Για την αποθήκευση ως πρόχειρο δεν απαιτούνται.",
@@ -781,8 +781,8 @@
       },
       "validationFailed": "Ελέγξτε τα επισημασμένα πεδία πριν προχωρήσετε.",
       "partialFailure": "Η εκδήλωση δημιουργήθηκε, αλλά ορισμένα στοιχεία δεν αποθηκεύτηκαν: {items}. Μπορείτε να τα προσθέσετε από τη σελίδα της εκδήλωσης.",
-      "partialFailureEdit": "The event changes were saved, but these could not be: {items}. Your work is still here: fix them and save again.",
-      "partialFailureEditDetail": "The event changes were saved, but these could not be: {items}. The server replied: {reason}. Your work is still here: fix them and save again.",
+      "partialFailureEdit": "Οι αλλαγές στην εκδήλωση αποθηκεύτηκαν, αλλά δεν ήταν δυνατή η αποθήκευση των εξής: {items}. Η εργασία σας είναι ακόμη εδώ: διορθώστε τα και αποθηκεύστε ξανά.",
+      "partialFailureEditDetail": "Οι αλλαγές στην εκδήλωση αποθηκεύτηκαν, αλλά δεν ήταν δυνατή η αποθήκευση των εξής: {items}. Ο διακομιστής απάντησε: {reason}. Η εργασία σας είναι ακόμη εδώ: διορθώστε τα και αποθηκεύστε ξανά.",
       "draftFound": "Βρήκαμε ένα μη αποθηκευμένο πρόχειρο αυτής της εκδήλωσης. Θέλετε να το επαναφέρετε;",
       "draftRestore": "Επαναφορά προχείρου",
       "draftDiscard": "Παράβλεψη",
@@ -792,7 +792,7 @@
         "moderators": "συντονιστές",
         "speakers": "ομιλητές",
         "materials": "υλικό",
-        "questionnaires": "questionnaires"
+        "questionnaires": "ερωτηματολόγια"
       }
     },
     "nav": {
@@ -1182,8 +1182,8 @@
         "title": "Εκτιμώμενη χωρητικότητα JVB",
         "pod": "pod JVB",
         "pods": "pods JVB",
-        "senders": "Senders",
-        "receivers": "Receivers",
+        "senders": "Αποστολείς",
+        "receivers": "Παραλήπτες",
         "effectiveRatio": "Πραγματικός λόγος",
         "inherited": "κληρονομημένος",
         "presetLabel": "Προρύθμιση",
@@ -1210,8 +1210,8 @@
       "recordingEnabled": "Ενεργοποίηση βιντεοσκόπησης",
       "agendaEnabled": "Ζωντανές σημειώσεις / λίστα ελέγχου (ατζέντα)",
       "agendaEnabledDesc": "Μια λίστα ελέγχου με τα θέματα προς συζήτηση, την οποία οι συντονιστές σημειώνουν κατά τη διάρκεια της εκδήλωσης. Τροφοδοτεί την αυτόματη σύνοψη. Προαιρετική και μπορεί να ενεργοποιηθεί ακόμη και κατά τη διάρκεια της εκδήλωσης.",
-      "wordCloudEnabled": "Live word cloud",
-      "wordCloudEnabledDesc": "Participants send a word and the cloud updates live. Useful to open a discussion or gather a feeling in a few seconds.",
+      "wordCloudEnabled": "Ζωντανό σύννεφο λέξεων",
+      "wordCloudEnabledDesc": "Οι συμμετέχοντες στέλνουν μια λέξη και το σύννεφο ενημερώνεται σε πραγματικό χρόνο. Χρήσιμο για να ανοίξει μια συζήτηση ή να αποτυπωθεί μια διάθεση σε λίγα δευτερόλεπτα.",
       "whiteboardEnabled": "Κοινόχρηστος πίνακας",
       "whiteboardEnabledDesc": "Ενεργοποιεί τον ενσωματωμένο συνεργατικό πίνακα (Excalidraw): οι συντονιστές μπορούν να τον ανοίξουν από τη γραμμή εργαλείων κατά τη διάρκεια της εκδήλωσης. Πάντα ενεργός στις άμεσες κλήσεις.",
       "autoStartRecording": "Αυτόματη έναρξη εγγραφής",
@@ -1448,20 +1448,20 @@
         "graceSection": "Ομαλή έξοδος (λήξη εκδήλωσης)",
         "eventGracePeriodMinutes": "Λεπτά περιθωρίου μετά το endsAt (προεπιλογή)",
         "eventGracePeriodMinutesHelp": "Επιπλέον χρόνος μετά την προγραμματισμένη ώρα λήξης πριν κλείσει η κλήση. 0 = σκληρό κλείσιμο, -1 = χωρίς αυτόματο κλείσιμο (στον cleanup αδράνειας), 15 = banner και κλείσιμο μετά από 15 λεπτά. Κάθε εκδήλωση μπορεί να το παρακάμψει.",
-        "videoQualitySection": "Video/audio quality",
-        "videoQuality": "Default quality",
-        "videoQualityHelp": "Preset applied to every event (overridable per event). Higher quality needs more bandwidth — “High” is the best trade-off. Takes effect immediately, no restart.",
+        "videoQualitySection": "Ποιότητα βίντεο/ήχου",
+        "videoQuality": "Προεπιλεγμένη ποιότητα",
+        "videoQualityHelp": "Προκαθορισμένη ρύθμιση για όλες τις εκδηλώσεις (μπορεί να αλλάξει ανά εκδήλωση). Όσο υψηλότερη η ποιότητα, τόσο περισσότερο εύρος ζώνης χρειάζεται: η «Υψηλή» είναι η καλύτερη ισορροπία. Εφαρμόζεται αμέσως, χωρίς επανεκκίνηση.",
         "videoQualityOptions": {
-          "MAX": "Maximum — 1080p",
-          "HIGH": "High — 720p (recommended)",
-          "BALANCED": "Balanced — 540p",
-          "SAVE_DATA": "Save data — 360p"
+          "MAX": "Μέγιστη — 1080p",
+          "HIGH": "Υψηλή — 720p (συνιστάται)",
+          "BALANCED": "Ισορροπημένη — 540p",
+          "SAVE_DATA": "Εξοικονόμηση δεδομένων — 360p"
         },
         "videoQualityDesc": {
-          "MAX": "Full HD 1080p, up to ~4 Mbps, stereo Opus 510 kbps audio. Top fidelity for small high-stakes calls — uses more bandwidth and loads the bridge more.",
-          "HIGH": "720p with a capped bitrate (~2.2 Mbps peak) and 96 kbps Opus audio. Great quality without maxing bandwidth: the recommended production trade-off.",
-          "BALANCED": "540p with a contained bitrate (~1 Mbps) and fewer simultaneous incoming videos. Good for large audiences or weak networks.",
-          "SAVE_DATA": "360p at minimal bitrate (~600 kbps) with unused-layer suspension. For very slow connections."
+          "MAX": "Full HD 1080p, έως ~4 Mbps, στερεοφωνικός ήχος Opus 510 kbps. Μέγιστη πιστότητα για μικρές και σημαντικές κλήσεις — καταναλώνει περισσότερο εύρος ζώνης και επιβαρύνει περισσότερο τη γέφυρα βίντεο.",
+          "HIGH": "720p με ανώτατο όριο bitrate (αιχμή ~2,2 Mbps) και ήχο Opus 96 kbps. Εξαιρετική ποιότητα χωρίς κορεσμό του εύρους ζώνης: η συνιστώμενη ισορροπία για την παραγωγή.",
+          "BALANCED": "540p με περιορισμένο bitrate (~1 Mbps) και λιγότερα ταυτόχρονα εισερχόμενα βίντεο. Κατάλληλο για μεγάλο κοινό ή αδύναμα δίκτυα.",
+          "SAVE_DATA": "360p με ελάχιστο bitrate (~600 kbps) και αναστολή των αχρησιμοποίητων επιπέδων. Για πολύ αργές συνδέσεις."
         }
       },
       "header": {
@@ -1521,18 +1521,18 @@
         "descriptionHelp": "Περιγραφή για μηχανές αναζήτησης και κοινοποιήσεις στα μέσα κοινωνικής δικτύωσης",
         "image": "Εικόνα Open Graph",
         "imageHelp": "Προεπιλεγμένη εικόνα για κοινοποιήσεις στα κοινωνικά δίκτυα (1200x630 συνιστάται)",
-        "ogSection": "Shared link preview",
-        "ogIntro": "When someone pastes an event link into a chat or a social network, the platform draws a preview image with the details inside it. Choose which ones: every extra field takes room away from the title.",
-        "ogCardEnabled": "Generate the preview",
-        "ogCardEnabledHelp": "When off, the link shows the poster as is (or the site logo if the event has none), with no readable title or date in the image.",
-        "ogShowPoster": "Poster as background",
-        "ogShowPosterHelp": "Uses the event cover as the preview background, dimmed so the text stays readable. With no poster, or with this off, the institutional colour and the logo remain.",
-        "ogShowDate": "Date and time",
-        "ogShowDateHelp": "In the platform's default time zone.",
-        "ogShowSpeakers": "Speakers",
-        "ogShowSpeakersHelp": "The event's speaker text, shortened when too long.",
-        "ogShowOrganization": "Organisation",
-        "ogShowOrganizationHelp": "The event organiser when set, otherwise the organisation name."
+        "ogSection": "Προεπισκόπηση κοινοποιημένων συνδέσμων",
+        "ogIntro": "Όταν κάποιος επικολλά τον σύνδεσμο μιας εκδήλωσης σε μια συνομιλία ή σε ένα κοινωνικό δίκτυο, η πλατφόρμα σχεδιάζει μια εικόνα προεπισκόπησης με τις πληροφορίες μέσα. Επιλέξτε ποιες: κάθε επιπλέον πεδίο αφαιρεί χώρο από τον τίτλο.",
+        "ogCardEnabled": "Δημιουργία προεπισκόπησης",
+        "ogCardEnabledHelp": "Όταν είναι απενεργοποιημένη, ο σύνδεσμος εμφανίζει την αφίσα ως έχει (ή το λογότυπο του ιστότοπου αν η εκδήλωση δεν έχει αφίσα), χωρίς ευανάγνωστο τίτλο ή ημερομηνία στην εικόνα.",
+        "ogShowPoster": "Αφίσα ως φόντο",
+        "ogShowPosterHelp": "Χρησιμοποιεί το εξώφυλλο της εκδήλωσης ως φόντο της προεπισκόπησης, σκιασμένο ώστε το κείμενο να παραμένει ευανάγνωστο. Χωρίς αφίσα ή με αυτή την επιλογή απενεργοποιημένη, παραμένουν το θεσμικό χρώμα και το λογότυπο.",
+        "ogShowDate": "Ημερομηνία και ώρα",
+        "ogShowDateHelp": "Στην προεπιλεγμένη ζώνη ώρας της πλατφόρμας.",
+        "ogShowSpeakers": "Ομιλητές",
+        "ogShowSpeakersHelp": "Το κείμενο των ομιλητών της εκδήλωσης, συντομευμένο αν είναι πολύ μεγάλο.",
+        "ogShowOrganization": "Φορέας",
+        "ogShowOrganizationHelp": "Ο διοργανωτής της εκδήλωσης, αν έχει οριστεί, διαφορετικά το όνομα του φορέα."
       },
       "homepage": {
         "modeLabel": "Λειτουργία αρχικής σελίδας",
@@ -1550,12 +1550,12 @@
             "description": "Προσαρμοσμένο περιεχόμενο HTML + λίστα εκδηλώσεων"
           },
           "LANDING_ISTITUZIONALE": {
-            "title": "Institutional landing",
-            "description": "Organisation, next event in the spotlight and the others listed. No technical language"
+            "title": "Θεσμική σελίδα υποδοχής",
+            "description": "Φορέας, η επόμενη εκδήλωση σε πρώτο πλάνο και οι υπόλοιπες σε λίστα. Χωρίς τεχνική ορολογία"
           },
           "LANDING_SEMPLICE": {
-            "title": "Plain-language landing",
-            "description": "Few words and a single invitation, for people new to online events"
+            "title": "Σελίδα υποδοχής σε απλή γλώσσα",
+            "description": "Λίγα λόγια και μία μόνο πρόσκληση, για όσους δεν είναι εξοικειωμένοι με τις διαδικτυακές εκδηλώσεις"
           }
         },
         "customHtmlLabel": "Προσαρμοσμένο περιεχόμενο HTML",
@@ -2523,20 +2523,20 @@
       "generateAi": "Δημιουργία AI",
       "generateAiConfirm": "Εκτελέστε την pipeline AI (μεταγραφή και σύνοψη) σε αυτήν την καταγραφή. Η επεξεργασία AI θα ενεργοποιηθεί για την εκδήλωση και ξεκινά στο παρασκήνιο. Οι μεταφράσεις προστίθενται στη συνέχεια, μία γλώσσα κάθε φορά, από την καρτέλα «Μεταφράσεις».",
       "generateAiOk": "Η pipeline AI ξεκίνησε.",
-      "originalToggle": "Show original text",
-      "originalToggleHint": "Show, under each corrected line, the text as the automatic transcription produced it",
-      "originalNotComparable": "The number of lines has changed from the original version: a line-by-line comparison is not possible",
-      "originalLabel": "Original text:",
-      "revisedBadge": "Edited by a person",
-      "revisedHint": "At least one line was corrected by a person after the automatic transcription",
-      "redactLabel": "Erase from the original too",
-      "redactHint": "Use for an erasure request: the changes also apply to the preserved machine text, which would otherwise keep the removed sentence",
-      "redactSave": "Save and erase from the original",
-      "redactSaved": "{n, plural, one {1 line also removed from the original text} other {# lines also removed from the original text}}",
-      "redactNothingRemoved": "The corrections were saved, but there was nothing to remove from the original text for the lines you touched",
-      "redactArchiveFailed": "The corrections were saved to the database, but rewriting the archived file failed: the removed sentence is still downloadable from there. Try the removal again",
-      "originalUncertain": "Origin not certain",
-      "originalUncertainHint": "The preserved text may already include corrections made before this feature existed: it cannot be proven to be what the automatic transcription produced"
+      "originalToggle": "Εμφάνιση αρχικού κειμένου",
+      "originalToggleHint": "Εμφανίζει, κάτω από κάθε διορθωμένη γραμμή, το κείμενο όπως το είχε παραγάγει η αυτόματη μεταγραφή",
+      "originalNotComparable": "Ο αριθμός των γραμμών έχει αλλάξει σε σχέση με την αρχική έκδοση: δεν είναι δυνατή η σύγκριση γραμμή προς γραμμή",
+      "originalLabel": "Αρχικό κείμενο:",
+      "revisedBadge": "Αναθεωρήθηκε χειροκίνητα",
+      "revisedHint": "Τουλάχιστον μία γραμμή διορθώθηκε από άνθρωπο μετά την αυτόματη μεταγραφή",
+      "redactLabel": "Διαγραφή και από το πρωτότυπο",
+      "redactHint": "Για χρήση σε αίτημα διαγραφής: οι αλλαγές εφαρμόζονται και στο διατηρημένο κείμενο της μηχανής, το οποίο διαφορετικά θα διατηρούσε τη φράση που αφαιρέθηκε",
+      "redactSave": "Αποθήκευση και διαγραφή από το πρωτότυπο",
+      "redactSaved": "{n, plural, one {Διαγράφηκε 1 γραμμή και από το αρχικό κείμενο} other {Διαγράφηκαν # γραμμές και από το αρχικό κείμενο}}",
+      "redactNothingRemoved": "Οι διορθώσεις αποθηκεύτηκαν, αλλά στο αρχικό κείμενο δεν υπήρχε τίποτα προς διαγραφή για τις γραμμές που τροποποιήθηκαν",
+      "redactArchiveFailed": "Οι διορθώσεις αποθηκεύτηκαν στη βάση δεδομένων, αλλά η επανεγγραφή του αρχειοθετημένου αρχείου απέτυχε: η φράση που αφαιρέθηκε μπορεί ακόμη να ληφθεί από εκεί. Επαναλάβετε τη διαγραφή",
+      "originalUncertain": "Αβέβαιη προέλευση",
+      "originalUncertainHint": "Το διατηρημένο κείμενο ενδέχεται να περιλαμβάνει ήδη διορθώσεις που έγιναν πριν υπάρξει αυτή η λειτουργία: δεν μπορεί να αποδειχθεί ότι είναι αυτό που παρήγαγε η αυτόματη μεταγραφή"
     },
     "questionnairesPage": {
       "title": "Ερωτηματολόγια",
@@ -2674,47 +2674,47 @@
       }
     },
     "institutional": {
-      "title": "Online meetings and events",
-      "nextTitle": "Next event",
-      "nextCta": "Go to the event and sign up",
-      "othersTitle": "Other events",
-      "pointsTitle": "How to take part",
+      "title": "Διαδικτυακές συναντήσεις και εκδηλώσεις",
+      "nextTitle": "Επόμενη εκδήλωση",
+      "nextCta": "Μεταβείτε στην εκδήλωση και εγγραφείτε",
+      "othersTitle": "Οι υπόλοιπες εκδηλώσεις",
+      "pointsTitle": "Πώς συμμετέχετε",
       "points": {
         "noInstall": {
-          "title": "Join from your browser",
-          "body": "No software to install: just open the link you receive."
+          "title": "Συμμετοχή από το πρόγραμμα περιήγησης",
+          "body": "Δεν χρειάζεται να εγκαταστήσετε λογισμικό: αρκεί να ανοίξετε τον σύνδεσμο που θα λάβετε."
         },
         "accessible": {
-          "title": "Designed for everyone",
-          "body": "Captions, keyboard and screen readers: the room works without a mouse too."
+          "title": "Σχεδιασμένο για όλους",
+          "body": "Υπότιτλοι, πληκτρολόγιο και αναγνώστες οθόνης: η αίθουσα λειτουργεί και χωρίς ποντίκι."
         },
         "privacy": {
-          "title": "Your data, handled with care",
-          "body": "Only what sign-up requires is collected, and you can ask for it back or have it deleted."
+          "title": "Δεδομένα που αντιμετωπίζονται με φροντίδα",
+          "body": "Συλλέγονται μόνο τα δεδομένα που απαιτούνται για την εγγραφή, και μπορείτε να τα ζητήσετε πίσω ή να ζητήσετε τη διαγραφή τους."
         }
       }
     },
     "simple": {
-      "title": "Online meetings by {organization}",
-      "subtitle": "Join from your computer or phone, with nothing to install.",
-      "cta": "Join the next meeting",
-      "noEvents": "No meetings are scheduled right now. Check back soon.",
-      "stepsTitle": "How it works",
+      "title": "Διαδικτυακές συναντήσεις – {organization}",
+      "subtitle": "Συμμετέχετε από υπολογιστή ή τηλέφωνο, χωρίς να εγκαταστήσετε τίποτα.",
+      "cta": "Συμμετάσχετε στην επόμενη συνάντηση",
+      "noEvents": "Προς το παρόν δεν έχουν προγραμματιστεί συναντήσεις. Επισκεφθείτε μας ξανά σύντομα.",
+      "stepsTitle": "Πώς λειτουργεί",
       "steps": {
         "choose": {
-          "title": "Pick a meeting",
-          "body": "Each one shows its date and time."
+          "title": "Επιλέξτε συνάντηση",
+          "body": "Για κάθε συνάντηση θα βρείτε ημερομηνία και ώρα."
         },
         "name": {
-          "title": "Leave your name",
-          "body": "Your name and email address are all it takes to get the link."
+          "title": "Δώστε το όνομά σας",
+          "body": "Αρκούν το όνομα και η διεύθυνση email σας για να λάβετε τον σύνδεσμο."
         },
         "enter": {
-          "title": "Join",
-          "body": "At the right time, open the link: you are in."
+          "title": "Είσοδος",
+          "body": "Την κατάλληλη ώρα ανοίξτε τον σύνδεσμο: είστε μέσα."
         }
       },
-      "listTitle": "Upcoming meetings"
+      "listTitle": "Επερχόμενες συναντήσεις"
     }
   },
   "polls": {
@@ -2744,8 +2744,8 @@
       "questionRequired": "Γράψτε την ερώτηση δημοσκόπησης",
       "minOptions": "Απαιτούνται τουλάχιστον 2 επιλογές",
       "generic": "Σφάλμα κατά τη δημιουργία της δημοσκόπησης",
-      "vote": "Vote not recorded. Try again.",
-      "alreadyVoted": "You have already voted in this poll."
+      "vote": "Η ψήφος δεν καταχωρίστηκε. Δοκιμάστε ξανά.",
+      "alreadyVoted": "Έχετε ήδη ψηφίσει σε αυτή τη δημοσκόπηση."
     }
   },
   "materials": {
@@ -2807,10 +2807,10 @@
       "emailInvalid": "Εισαγάγετε μια έγκυρη διεύθυνση email",
       "submit": "Αίτηση δεδομένων",
       "loading": "Αναζήτηση...",
-      "requestSubmittedTitle": "Check your inbox",
-      "requestSubmittedBody": "If this email matches a registration, we've sent you a link to download your data. The link is valid for 1 hour.",
-      "linkInvalid": "This link is invalid or expired. Please request a new link.",
-      "requestNew": "Request a new link",
+      "requestSubmittedTitle": "Ελέγξτε τα εισερχόμενά σας",
+      "requestSubmittedBody": "Αν η διεύθυνση email αντιστοιχεί σε εγγραφή, σας στείλαμε έναν σύνδεσμο για να κατεβάσετε τα δεδομένα σας. Ο σύνδεσμος ισχύει για 1 ώρα.",
+      "linkInvalid": "Ο σύνδεσμος δεν είναι έγκυρος ή έχει λήξει. Ζητήστε νέο σύνδεσμο.",
+      "requestNew": "Ζητήστε νέο σύνδεσμο",
       "noData": "Δεν βρέθηκαν δεδομένα για αυτή τη διεύθυνση email.",
       "error": "Παρουσιάστηκε σφάλμα. Δοκιμάστε ξανά αργότερα.",
       "rateLimited": "Υπερβολικά πολλά αιτήματα. Δοκιμάστε ξανά σε μία ώρα.",
@@ -2825,30 +2825,30 @@
       "questionsTitle": "Ερωτήσεις Q&A",
       "pollVotesTitle": "Ψήφοι δημοσκοπήσεων",
       "optionLabel": "Επιλογή",
-      "erasureCtaTitle": "Want to delete your data?",
-      "erasureCtaBody": "You can request full erasure of the data tied to your email (GDPR Art. 17).",
-      "erasureCtaButton": "Request erasure"
+      "erasureCtaTitle": "Θέλετε να διαγράψετε τα δεδομένα σας;",
+      "erasureCtaBody": "Μπορείτε να ζητήσετε την πλήρη διαγραφή των δεδομένων που συνδέονται με τη διεύθυνση email σας (άρθρο 17 GDPR).",
+      "erasureCtaButton": "Αίτημα διαγραφής"
     },
     "erasure": {
-      "title": "Erase your data",
-      "subtitle": "Confirm the erasure of the personal data tied to your email address (GDPR Art. 17).",
-      "emailLabel": "Your email address",
-      "emailPlaceholder": "Enter the email used for registration",
-      "emailInvalid": "Please enter a valid email address",
-      "submit": "Request erasure",
-      "requestSubmittedTitle": "Check your inbox",
-      "requestSubmittedBody": "If this email matches a registration, we've sent you a link to confirm the erasure. The link is valid for 1 hour.",
-      "linkInvalid": "This link is invalid or expired. Please request a new link.",
-      "confirmWarning": "You are about to permanently erase all personal data tied to your email.",
-      "confirmBody": "Registrations, questions, poll votes, feedback and reminders will be deleted. This action is irreversible.",
-      "confirmButton": "Confirm erasure",
-      "cancel": "Cancel",
-      "processing": "Deleting...",
-      "doneTitle": "Erasure completed",
-      "doneBody": "{count} registrations and the linked data have been deleted.",
-      "error": "An error occurred. Please try again later.",
-      "rateLimited": "Too many requests. Please try again in one hour.",
-      "back": "Back to my data"
+      "title": "Διαγραφή των δεδομένων σας",
+      "subtitle": "Επιβεβαιώστε τη διαγραφή των προσωπικών δεδομένων που συνδέονται με τη διεύθυνση email σας (άρθρο 17 GDPR).",
+      "emailLabel": "Η διεύθυνση email σας",
+      "emailPlaceholder": "Εισαγάγετε το email που χρησιμοποιήσατε για την εγγραφή",
+      "emailInvalid": "Εισαγάγετε έγκυρη διεύθυνση email",
+      "submit": "Αίτημα διαγραφής",
+      "requestSubmittedTitle": "Ελέγξτε τα εισερχόμενά σας",
+      "requestSubmittedBody": "Αν η διεύθυνση email αντιστοιχεί σε εγγραφή, σας στείλαμε έναν σύνδεσμο για να επιβεβαιώσετε τη διαγραφή. Ο σύνδεσμος ισχύει για 1 ώρα.",
+      "linkInvalid": "Ο σύνδεσμος δεν είναι έγκυρος ή έχει λήξει. Ζητήστε νέο σύνδεσμο.",
+      "confirmWarning": "Πρόκειται να διαγράψετε οριστικά όλα τα προσωπικά δεδομένα που συνδέονται με τη διεύθυνση email σας.",
+      "confirmBody": "Θα διαγραφούν οι εγγραφές, οι ερωτήσεις, οι ψήφοι σε δημοσκοπήσεις, η ανατροφοδότηση και οι υπενθυμίσεις. Η ενέργεια είναι μη αναστρέψιμη.",
+      "confirmButton": "Επιβεβαίωση διαγραφής",
+      "cancel": "Ακύρωση",
+      "processing": "Διαγραφή σε εξέλιξη...",
+      "doneTitle": "Η διαγραφή ολοκληρώθηκε",
+      "doneBody": "Διαγράφηκαν {count} εγγραφές και τα συνδεδεμένα δεδομένα.",
+      "error": "Παρουσιάστηκε σφάλμα. Δοκιμάστε ξανά αργότερα.",
+      "rateLimited": "Πάρα πολλά αιτήματα. Δοκιμάστε ξανά σε μία ώρα.",
+      "back": "Επιστροφή στα δεδομένα μου"
     }
   },
   "legal": {
@@ -3617,8 +3617,8 @@
     "nameLabel": "Το όνομά σας",
     "nameHelp": "Θα εμφανιστεί στους άλλους συμμετέχοντες",
     "joinNowBtn": "Είσοδος τώρα",
-    "roomOpen": "The room is open",
-    "whileYouWait": "While you wait",
+    "roomOpen": "Η αίθουσα είναι ανοιχτή",
+    "whileYouWait": "Όσο περιμένετε",
     "openingAt": "Άνοιγμα στις {time}",
     "netiquetteTitle": "Καλές πρακτικές συμμετοχής",
     "netiquetteBullet1": "Φτάστε λίγα λεπτά νωρίτερα για να ελέγξετε μικρόφωνο και κάμερα",
@@ -3638,8 +3638,8 @@
     "emailHelp": "Μόνο για τυχόν follow-up μετά την εκδήλωση",
     "emailInvalid": "Εισαγάγετε έγκυρη διεύθυνση email",
     "chatLockedMessage": "Εισαγάγετε το όνομά σας για να συμμετάσχετε στο chat της εκδήλωσης.",
-    "classicView": "Classic view",
-    "backToGarden": "Back to the park",
+    "classicView": "Κλασική προβολή",
+    "backToGarden": "Επιστροφή στο πάρκο",
     "aiNoticeTitle": "Επεξεργασία με ΤΝ μετά την εκδήλωση",
     "aiNotice": "Μετά τη λήξη, η καταγραφή θα επεξεργαστεί από εργαλεία τεχνητής νοημοσύνης για τη δημιουργία απομαγνητοφώνησης, περίληψης και τυχόν μεταφράσεων και μεταγλώττισης. Τα αποτελέσματα ενδέχεται να περιέχουν ανακρίβειες· το βίντεο παραμένει η αυθεντική πηγή.",
     "multitrackConsentTitle": "Καταγραφή ανά συμμετέχοντα",
@@ -3768,15 +3768,15 @@
     "micToggleOff": "Μικρόφωνο OFF",
     "cameraOffPreview": "Κάμερα απενεργοποιημένη",
     "speakerTest": "🔊 Δοκιμή ήχου",
-    "backgroundLabel": "Virtual background",
+    "backgroundLabel": "Εικονικό φόντο",
     "backgroundNoneShort": "No",
-    "backgroundHint": "Applied when you enter the room. To blur your background use the backgrounds button once inside: the preview above shows the camera without effects.",
+    "backgroundHint": "Εφαρμόζεται όταν μπαίνετε στην αίθουσα. Για να θολώσετε το φόντο, χρησιμοποιήστε το κουμπί φόντων μόλις μπείτε: η προεπισκόπηση παραπάνω δείχνει την κάμερα χωρίς εφέ.",
     "background": {
-      "nessuno": "No background",
-      "ufficio-chiaro": "Light office",
-      "blu-istituzionale": "Institutional blue",
-      "verde-salvia": "Sage green",
-      "grafite": "Graphite"
+      "nessuno": "Χωρίς φόντο",
+      "ufficio-chiaro": "Φωτεινό γραφείο",
+      "blu-istituzionale": "Θεσμικό μπλε",
+      "verde-salvia": "Πράσινο φασκόμηλου",
+      "grafite": "Γραφίτης"
     }
   },
   "garden": {
@@ -3784,7 +3784,7 @@
     "classicView": "Κλασική προβολή",
     "changeAvatar": "Αλλαγή avatar",
     "peopleInGarden": "{count, plural, =0 {Κανείς στον κήπο} one {1 άτομο στον κήπο} other {# άτομα στον κήπο}}",
-    "guestName": "Guest",
+    "guestName": "Επισκέπτης",
     "hintKeyboard": "Μετακινηθείτε με WASD ή τα βέλη",
     "pickerTitle": "Επιλέξτε το avatar σας",
     "pickerHelp": "Ο χαρακτήρας σας αντιπροσωπεύει στον κήπο της αναμονής. Μπορείτε να τον αλλάξετε όποτε θέλετε.",
@@ -3793,11 +3793,11 @@
     "hintJoystick": "Σύρετε για μετακίνηση"
   },
   "feedbackAdmin": {
-    "title": "Feedback results",
-    "totalVotes": "responses",
-    "noFeedback": "No feedback received",
-    "comments": "Comments",
-    "noComments": "No comments",
+    "title": "Αποτελέσματα ανατροφοδότησης",
+    "totalVotes": "απαντήσεις",
+    "noFeedback": "Δεν ελήφθη ανατροφοδότηση",
+    "comments": "Σχόλια",
+    "noComments": "Χωρίς σχόλια",
     "yes": "Ναι",
     "no": "Όχι"
   }

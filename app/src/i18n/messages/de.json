@@ -85,9 +85,9 @@
       "topWords": "Meistgenannte Wörter",
       "feedback": "Durchschnittliche Bewertung",
       "feedbackCount": "{count, plural, one {1 Antwort} other {# Antworten}}",
-      "chatQuestions": "Questions from the chat",
-      "reactionsCount": "{count, plural, one {1 reaction} other {# reactions}}",
-      "answered": "answered"
+      "chatQuestions": "Fragen aus dem Chat",
+      "reactionsCount": "{count, plural, one {1 Reaktion} other {# Reaktionen}}",
+      "answered": "beantwortet"
     },
     "detail": {
       "title": "Veranstaltungsdetails",
@@ -162,12 +162,12 @@
     "successMessage": "Sie erhalten eine Bestätigungs-E-Mail mit dem Zugangslink zur Veranstaltung.",
     "successScheduledMessage": "Sie sind angemeldet! Wir haben Ihnen eine E-Mail mit Ihrem persönlichen Zugangslink geschickt. Tragen Sie die Veranstaltung in Ihren Kalender ein und kommen Sie kurz vor Beginn wieder hierher.",
     "addToCalendar": "Zum Kalender hinzufügen",
-    "enteringRoom": "We're taking you to the event waiting room.",
-    "enteringRoomHint": "Opening the room…",
+    "enteringRoom": "Wir bringen Sie in den Warteraum der Veranstaltung.",
+    "enteringRoomHint": "Raum wird geöffnet…",
     "alreadyRegistered": "Sie sind bereits für diese Veranstaltung angemeldet",
-    "resendLink": "Resend my access link",
-    "resending": "Sending…",
-    "resendSent": "If the address is registered, we've re-sent the access link by email.",
+    "resendLink": "Zugangslink erneut senden",
+    "resending": "Wird gesendet…",
+    "resendSent": "Wenn die Adresse angemeldet ist, haben wir den Zugangslink erneut per E-Mail gesendet.",
     "backToEvent": "Zurück zur Veranstaltung",
     "organization": "Organisation",
     "organizationPlaceholder": "z. B. AGID, Wirtschaftsministerium, Stadt Rom",
@@ -340,23 +340,23 @@
       "reactNotAllowed": "Zum Reagieren auf Nachrichten benötigen Sie Ihren persönlichen Link oder den Moderator-Link.",
       "editNotAllowed": "Dieser Link ist ein geteilter Link: Damit lassen sich Nachrichten nicht bearbeiten.",
       "editExpired": "Es sind mehr als 15 Minuten vergangen: Diese Nachricht kann nicht mehr bearbeitet werden.",
-      "askAsQuestionLabel": "Mark as a question",
-      "placeholderQuestion": "Write your question...",
-      "lensGroupLabel": "Filter messages",
-      "lensAll": "All",
-      "lensQuestions": "Questions ({count})",
-      "lensAnnounceAll": "Listing all messages",
-      "lensAnnounceQuestions": "Listing {count, plural, =0 {no questions} one {1 question} other {# questions}}",
-      "questionOpen": "Question",
-      "questionAnswered": "Answered",
-      "questionDismissed": "Won't be taken",
-      "questionMarkAnswered": "Mark answered",
-      "questionReopen": "Reopen",
-      "questionDismiss": "Dismiss",
-      "questionRestore": "Restore",
-      "questionStatusFailed": "Could not update the question",
-      "questionNeedsText": "Type the text of your question: an attachment alone does not enter the queue",
-      "lensTruncated": "Only the most recent messages are loaded: there may be older questions not listed."
+      "askAsQuestionLabel": "Als Frage markieren",
+      "placeholderQuestion": "Schreiben Sie Ihre Frage...",
+      "lensGroupLabel": "Nachrichten filtern",
+      "lensAll": "Alle",
+      "lensQuestions": "Fragen ({count})",
+      "lensAnnounceAll": "Angezeigt: alle Nachrichten",
+      "lensAnnounceQuestions": "In der Liste: {count, plural, =0 {keine Fragen} one {1 Frage} other {# Fragen}}",
+      "questionOpen": "Frage",
+      "questionAnswered": "Beantwortet",
+      "questionDismissed": "Wird nicht behandelt",
+      "questionMarkAnswered": "Als beantwortet markieren",
+      "questionReopen": "Wieder öffnen",
+      "questionDismiss": "Verwerfen",
+      "questionRestore": "Wiederherstellen",
+      "questionStatusFailed": "Die Frage konnte nicht aktualisiert werden",
+      "questionNeedsText": "Geben Sie den Text Ihrer Frage ein: Ein Anhang allein wird nicht in die Warteschlange aufgenommen",
+      "lensTruncated": "Es sind nur die neuesten Nachrichten geladen: Ältere Fragen werden möglicherweise nicht aufgeführt."
     },
     "role": {
       "moderator": "Moderator",
@@ -417,7 +417,7 @@
       "live": "👥 {count, plural, one {# Person} other {# Personen}}"
     },
     "sidebarTabChatUnread": "Neue ungelesene Nachrichten",
-    "sidebarTabPollsOpen": "Open poll you have not voted in yet",
+    "sidebarTabPollsOpen": "Offene Umfrage, an der Sie noch nicht teilgenommen haben",
     "floatingControlsLabel": "Event-Steuerung",
     "screenshareActive": "🖥️ {name} teilt den Bildschirm",
     "screenshareFallbackName": "Ein/e Teilnehmer/in",
@@ -441,7 +441,7 @@
       "remainingLabel": "Verbleibende Zeit (klicken für die verstrichene Zeit)",
       "elapsedLabel": "Verstrichene Zeit (klicken für die verbleibende Zeit)"
     },
-    "videoCallFrameTitle": "Event video call"
+    "videoCallFrameTitle": "Videokonferenz der Veranstaltung"
   },
   "qa": {
     "title": "Fragen und Antworten",
@@ -764,7 +764,7 @@
         "retentionHelp": "Nach Ablauf werden personenbezogene Daten automatisch gelöscht.",
         "gdprTemplate": "Datenschutz-Vorlage",
         "gdprTemplateNone": "— Eigenen Text verwenden —",
-        "gdprTemplateUnknown": "The selected privacy notice template no longer exists: pick another one or go back to custom text",
+        "gdprTemplateUnknown": "Die gewählte Vorlage für die Datenschutzhinweise existiert nicht mehr: Wählen Sie eine andere oder kehren Sie zum individuellen Text zurück",
         "privacyText": "Datenschutzhinweis (Text)",
         "moderatorHeading": "Moderator-Kontakt",
         "moderatorPublishHint": "Name und E-Mail-Adresse sind erforderlich, um die Veranstaltung zu veröffentlichen (sie werden für den Moderator-Link und die Bestätigungs-E-Mail benötigt). Zum Speichern als Entwurf sind sie nicht erforderlich.",
@@ -781,8 +781,8 @@
       },
       "validationFailed": "Bitte prüfen Sie die markierten Felder, bevor Sie fortfahren.",
       "partialFailure": "Veranstaltung erstellt, einige Elemente wurden jedoch nicht gespeichert: {items}. Sie können sie über die Seite der Veranstaltung hinzufügen.",
-      "partialFailureEdit": "The event changes were saved, but these could not be: {items}. Your work is still here: fix them and save again.",
-      "partialFailureEditDetail": "The event changes were saved, but these could not be: {items}. The server replied: {reason}. Your work is still here: fix them and save again.",
+      "partialFailureEdit": "Die Änderungen an der Veranstaltung wurden gespeichert, Folgendes konnte jedoch nicht gespeichert werden: {items}. Ihre Arbeit ist noch vorhanden: Korrigieren Sie die Angaben und speichern Sie erneut.",
+      "partialFailureEditDetail": "Die Änderungen an der Veranstaltung wurden gespeichert, Folgendes konnte jedoch nicht gespeichert werden: {items}. Der Server hat geantwortet: {reason}. Ihre Arbeit ist noch vorhanden: Korrigieren Sie die Angaben und speichern Sie erneut.",
       "draftFound": "Wir haben einen nicht gespeicherten Entwurf dieser Veranstaltung gefunden. Möchten Sie ihn wiederherstellen?",
       "draftRestore": "Entwurf wiederherstellen",
       "draftDiscard": "Verwerfen",
@@ -792,7 +792,7 @@
         "moderators": "Moderatoren",
         "speakers": "Referenten",
         "materials": "Materialien",
-        "questionnaires": "questionnaires"
+        "questionnaires": "Fragebögen"
       }
     },
     "nav": {
@@ -878,13 +878,13 @@
       "untitled": "(ohne Titel)",
       "tabs": {
         "all": "Alle",
-        "scheduled": "Events",
+        "scheduled": "Veranstaltungen",
         "instant": "Sofortanrufe",
         "legacy": "Hochgeladene Archive",
         "pending": "Zu promoten"
       },
       "source": {
-        "scheduled": "Event",
+        "scheduled": "Veranstaltung",
         "instant": "Sofort",
         "legacy": "Legacy"
       },
@@ -948,7 +948,7 @@
       "range30d": "Letzte 30 Tage",
       "range90d": "Letzte 90 Tage",
       "rangeAll": "Gesamt",
-      "eventFilter": "Event",
+      "eventFilter": "Veranstaltung",
       "allEvents": "Alle Events",
       "hasRecording": "Mit Aufzeichnung",
       "hasRecordingYes": "Nur mit Videodatei",
@@ -959,14 +959,14 @@
       "statTotalSize": "Belegter Speicher",
       "statTotalDuration": "Gesamtdauer",
       "colStartedAt": "Beginn",
-      "colEvent": "Event",
+      "colEvent": "Veranstaltung",
       "colSource": "Quelle",
       "colDuration": "Dauer",
       "colSize": "Größe",
       "colPeak": "Spitzenteilnehmer",
       "colActions": "Aktionen",
       "sources": {
-        "event": "Event",
+        "event": "Veranstaltung",
         "session": "Sitzung"
       },
       "download": "Herunterladen",
@@ -1029,7 +1029,7 @@
       "recordsAffected": "{count} betroffene Datensätze",
       "colWhen": "Wann",
       "colAction": "Aktion",
-      "colEvent": "Event",
+      "colEvent": "Veranstaltung",
       "colRecords": "Datensätze",
       "colDetails": "Details",
       "noResults": "Keine Audit-Einträge im ausgewählten Zeitraum."
@@ -1039,7 +1039,7 @@
       "subtitle": "Magic-Links der Moderatoren abrufen, kopieren und neu generieren",
       "searchPlaceholder": "Nach Slug, Moderatorname oder E-Mail suchen…",
       "searchHelp": "Der Magic-Link enthält einen einzigartigen Token: nur an den/die zuständige Moderator/in weitergeben.",
-      "colEvent": "Event",
+      "colEvent": "Veranstaltung",
       "colModerator": "Moderator",
       "colDate": "Datum",
       "colStatus": "Status",
@@ -1062,7 +1062,7 @@
       "range30d": "Letzte 30 Tage",
       "range90d": "Letzte 90 Tage",
       "rangeAll": "Gesamt",
-      "eventFilter": "Event",
+      "eventFilter": "Veranstaltung",
       "allEvents": "Alle Events",
       "orgType": "Organisationstyp",
       "allOrgTypes": "Alle",
@@ -1079,7 +1079,7 @@
       "topOrgTypes": "Top-Organisationen",
       "orgTypeUnknown": "Nicht angegeben",
       "colCreatedAt": "Anmeldedatum",
-      "colEvent": "Event",
+      "colEvent": "Veranstaltung",
       "colName": "Name",
       "colEmail": "E-Mail",
       "colOrg": "Organisation",
@@ -1210,8 +1210,8 @@
       "recordingEnabled": "Videoaufzeichnung aktivieren",
       "agendaEnabled": "Live-Notizen / Checkliste (Agenda)",
       "agendaEnabledDesc": "Eine Checkliste der zu behandelnden Punkte, die die Moderatoren während der Veranstaltung abhaken. Fließt in die automatische Zusammenfassung ein. Optional und auch während der Veranstaltung aktivierbar.",
-      "wordCloudEnabled": "Live word cloud",
-      "wordCloudEnabledDesc": "Participants send a word and the cloud updates live. Useful to open a discussion or gather a feeling in a few seconds.",
+      "wordCloudEnabled": "Live-Wortwolke",
+      "wordCloudEnabledDesc": "Teilnehmende senden ein Wort, und die Wolke aktualisiert sich live. Nützlich, um eine Diskussion zu eröffnen oder in wenigen Sekunden ein Stimmungsbild einzuholen.",
       "whiteboardEnabled": "Gemeinsames Whiteboard",
       "whiteboardEnabledDesc": "Aktiviert das native kollaborative Whiteboard (Excalidraw): Moderatoren können es während der Veranstaltung über die Symbolleiste öffnen. Bei Sofortkonferenzen immer aktiv.",
       "autoStartRecording": "Aufzeichnung automatisch starten",
@@ -1448,20 +1448,20 @@
         "graceSection": "Soft Exit (Eventende)",
         "eventGracePeriodMinutes": "Karenzminuten nach endsAt (Standard)",
         "eventGracePeriodMinutesHelp": "Zusätzliche Zeit nach der geplanten Endzeit, bevor der Anruf geschlossen wird. 0 = harte Schließung, -1 = nicht automatisch schließen (dem Idle-Cleanup überlassen), 15 = Banner und Schließung nach 15 Min. Jedes Event kann den Wert überschreiben.",
-        "videoQualitySection": "Video/audio quality",
-        "videoQuality": "Default quality",
-        "videoQualityHelp": "Preset applied to every event (overridable per event). Higher quality needs more bandwidth — “High” is the best trade-off. Takes effect immediately, no restart.",
+        "videoQualitySection": "Video-/Audioqualität",
+        "videoQuality": "Standardqualität",
+        "videoQualityHelp": "Voreinstellung für alle Veranstaltungen (pro Veranstaltung überschreibbar). Je höher die Qualität, desto mehr Bandbreite wird benötigt: „Hoch“ ist der beste Kompromiss. Wirkt sofort, ohne Neustart.",
         "videoQualityOptions": {
-          "MAX": "Maximum — 1080p",
-          "HIGH": "High — 720p (recommended)",
-          "BALANCED": "Balanced — 540p",
-          "SAVE_DATA": "Save data — 360p"
+          "MAX": "Maximal — 1080p",
+          "HIGH": "Hoch — 720p (empfohlen)",
+          "BALANCED": "Ausgewogen — 540p",
+          "SAVE_DATA": "Datensparmodus — 360p"
         },
         "videoQualityDesc": {
-          "MAX": "Full HD 1080p, up to ~4 Mbps, stereo Opus 510 kbps audio. Top fidelity for small high-stakes calls — uses more bandwidth and loads the bridge more.",
-          "HIGH": "720p with a capped bitrate (~2.2 Mbps peak) and 96 kbps Opus audio. Great quality without maxing bandwidth: the recommended production trade-off.",
-          "BALANCED": "540p with a contained bitrate (~1 Mbps) and fewer simultaneous incoming videos. Good for large audiences or weak networks.",
-          "SAVE_DATA": "360p at minimal bitrate (~600 kbps) with unused-layer suspension. For very slow connections."
+          "MAX": "Full HD 1080p, bis zu ~4 Mbps, Stereo-Opus-Audio mit 510 kbps. Höchste Wiedergabetreue für kleine, wichtige Calls — verbraucht mehr Bandbreite und belastet die Video-Bridge stärker.",
+          "HIGH": "720p mit gedeckelter Bitrate (Spitze ~2,2 Mbps) und Opus-Audio mit 96 kbps. Sehr gute Qualität, ohne die Bandbreite auszureizen: der empfohlene Kompromiss für den Produktivbetrieb.",
+          "BALANCED": "540p mit begrenzter Bitrate (~1 Mbps) und weniger gleichzeitig empfangenen Videos. Geeignet für ein großes Publikum oder schwache Netze.",
+          "SAVE_DATA": "360p mit minimaler Bitrate (~600 kbps) und Aussetzen nicht genutzter Ebenen. Für sehr langsame Verbindungen."
         }
       },
       "header": {
@@ -1521,18 +1521,18 @@
         "descriptionHelp": "Beschreibung für Suchmaschinen und Social-Media-Vorschauen",
         "image": "Open-Graph-Bild",
         "imageHelp": "Standardbild für Social-Media-Vorschauen (1200×630 empfohlen)",
-        "ogSection": "Shared link preview",
-        "ogIntro": "When someone pastes an event link into a chat or a social network, the platform draws a preview image with the details inside it. Choose which ones: every extra field takes room away from the title.",
-        "ogCardEnabled": "Generate the preview",
-        "ogCardEnabledHelp": "When off, the link shows the poster as is (or the site logo if the event has none), with no readable title or date in the image.",
-        "ogShowPoster": "Poster as background",
-        "ogShowPosterHelp": "Uses the event cover as the preview background, dimmed so the text stays readable. With no poster, or with this off, the institutional colour and the logo remain.",
-        "ogShowDate": "Date and time",
-        "ogShowDateHelp": "In the platform's default time zone.",
-        "ogShowSpeakers": "Speakers",
-        "ogShowSpeakersHelp": "The event's speaker text, shortened when too long.",
+        "ogSection": "Vorschau geteilter Links",
+        "ogIntro": "Wenn jemand den Link einer Veranstaltung in einen Chat oder ein soziales Netzwerk einfügt, erzeugt die Plattform ein Vorschaubild mit den Angaben darin. Wählen Sie aus, welche: Jedes zusätzliche Feld nimmt dem Titel Platz weg.",
+        "ogCardEnabled": "Vorschau erzeugen",
+        "ogCardEnabledHelp": "Wenn deaktiviert, zeigt der Link das Plakat unverändert (oder das Logo der Website, falls die Veranstaltung keines hat), ohne lesbaren Titel oder Datum im Bild.",
+        "ogShowPoster": "Plakat als Hintergrund",
+        "ogShowPosterHelp": "Verwendet das Titelbild der Veranstaltung als Hintergrund der Vorschau, abgedunkelt, damit der Text lesbar bleibt. Ohne Plakat oder wenn diese Option deaktiviert ist, bleiben die institutionelle Farbe und das Logo.",
+        "ogShowDate": "Datum und Uhrzeit",
+        "ogShowDateHelp": "In der Standardzeitzone der Plattform.",
+        "ogShowSpeakers": "Referenten",
+        "ogShowSpeakersHelp": "Der Text zu den Referierenden der Veranstaltung, gekürzt, wenn er zu lang ist.",
         "ogShowOrganization": "Organisation",
-        "ogShowOrganizationHelp": "The event organiser when set, otherwise the organisation name."
+        "ogShowOrganizationHelp": "Der Veranstalter der Veranstaltung, falls angegeben, andernfalls der Name der Organisation."
       },
       "homepage": {
         "modeLabel": "Startseiten-Modus",
@@ -1550,12 +1550,12 @@
             "description": "Benutzerdefinierter HTML-Inhalt + Veranstaltungsliste"
           },
           "LANDING_ISTITUZIONALE": {
-            "title": "Institutional landing",
-            "description": "Organisation, next event in the spotlight and the others listed. No technical language"
+            "title": "Institutionelle Landing Page",
+            "description": "Organisation, nächste Veranstaltung hervorgehoben und die weiteren als Liste. Keine Fachsprache"
           },
           "LANDING_SEMPLICE": {
-            "title": "Plain-language landing",
-            "description": "Few words and a single invitation, for people new to online events"
+            "title": "Landing Page in einfacher Sprache",
+            "description": "Wenige Worte und eine einzige Einladung, für Menschen ohne Erfahrung mit Online-Veranstaltungen"
           }
         },
         "customHtmlLabel": "Benutzerdefinierter HTML-Inhalt",
@@ -2062,7 +2062,7 @@
       "chartRegistrationsBucket": "Anmeldungen",
       "chartCallsBucket": "Anruf-Sitzungen",
       "chartPeakBucket": "Spitzenteilnehmer",
-      "colEvent": "Event",
+      "colEvent": "Veranstaltung",
       "colStartedAt": "Beginn",
       "colDuration": "Dauer",
       "colPeakParts": "Spitze",
@@ -2523,20 +2523,20 @@
       "generateAi": "KI erzeugen",
       "generateAiConfirm": "Die KI-Pipeline (Transkription und Zusammenfassung) für diese Aufzeichnung starten. Die KI-Verarbeitung wird für die Veranstaltung aktiviert und läuft im Hintergrund. Übersetzungen werden anschließend sprachweise über den Reiter „Übersetzungen“ hinzugefügt.",
       "generateAiOk": "KI-Pipeline gestartet.",
-      "originalToggle": "Show original text",
-      "originalToggleHint": "Show, under each corrected line, the text as the automatic transcription produced it",
-      "originalNotComparable": "The number of lines has changed from the original version: a line-by-line comparison is not possible",
-      "originalLabel": "Original text:",
-      "revisedBadge": "Edited by a person",
-      "revisedHint": "At least one line was corrected by a person after the automatic transcription",
-      "redactLabel": "Erase from the original too",
-      "redactHint": "Use for an erasure request: the changes also apply to the preserved machine text, which would otherwise keep the removed sentence",
-      "redactSave": "Save and erase from the original",
-      "redactSaved": "{n, plural, one {1 line also removed from the original text} other {# lines also removed from the original text}}",
-      "redactNothingRemoved": "The corrections were saved, but there was nothing to remove from the original text for the lines you touched",
-      "redactArchiveFailed": "The corrections were saved to the database, but rewriting the archived file failed: the removed sentence is still downloadable from there. Try the removal again",
-      "originalUncertain": "Origin not certain",
-      "originalUncertainHint": "The preserved text may already include corrections made before this feature existed: it cannot be proven to be what the automatic transcription produced"
+      "originalToggle": "Originaltext anzeigen",
+      "originalToggleHint": "Zeigt unter jeder korrigierten Zeile den Text so an, wie ihn die automatische Transkription erzeugt hat",
+      "originalNotComparable": "Die Zeilenanzahl hat sich gegenüber der Originalfassung geändert: Ein zeilenweiser Vergleich ist nicht möglich",
+      "originalLabel": "Originaltext:",
+      "revisedBadge": "Manuell überarbeitet",
+      "revisedHint": "Mindestens eine Zeile wurde nach der automatischen Transkription von einer Person korrigiert",
+      "redactLabel": "Auch im Original löschen",
+      "redactHint": "Bei einem Antrag auf Löschung zu verwenden: Die Änderungen gelten auch für den aufbewahrten maschinellen Text, der den entfernten Satz sonst behalten würde",
+      "redactSave": "Speichern und im Original löschen",
+      "redactSaved": "{n, plural, one {1 Zeile auch aus dem Originaltext gelöscht} other {# Zeilen auch aus dem Originaltext gelöscht}}",
+      "redactNothingRemoved": "Die Korrekturen wurden gespeichert, im Originaltext gab es für die bearbeiteten Zeilen jedoch nichts zu löschen",
+      "redactArchiveFailed": "Die Korrekturen wurden in der Datenbank gespeichert, das Neuschreiben der archivierten Datei ist jedoch fehlgeschlagen: Der entfernte Satz kann dort weiterhin heruntergeladen werden. Wiederholen Sie die Löschung",
+      "originalUncertain": "Herkunft nicht gesichert",
+      "originalUncertainHint": "Der aufbewahrte Text kann bereits Korrekturen enthalten, die vor Einführung dieser Funktion vorgenommen wurden: Es lässt sich nicht nachweisen, dass er von der automatischen Transkription stammt"
     },
     "questionnairesPage": {
       "title": "Fragebögen",
@@ -2674,47 +2674,47 @@
       }
     },
     "institutional": {
-      "title": "Online meetings and events",
-      "nextTitle": "Next event",
-      "nextCta": "Go to the event and sign up",
-      "othersTitle": "Other events",
-      "pointsTitle": "How to take part",
+      "title": "Online-Treffen und -Veranstaltungen",
+      "nextTitle": "Nächste Veranstaltung",
+      "nextCta": "Zur Veranstaltung und anmelden",
+      "othersTitle": "Weitere Veranstaltungen",
+      "pointsTitle": "So nehmen Sie teil",
       "points": {
         "noInstall": {
-          "title": "Join from your browser",
-          "body": "No software to install: just open the link you receive."
+          "title": "Teilnahme über den Browser",
+          "body": "Keine Software zu installieren: Öffnen Sie einfach den Link, den Sie erhalten."
         },
         "accessible": {
-          "title": "Designed for everyone",
-          "body": "Captions, keyboard and screen readers: the room works without a mouse too."
+          "title": "Für alle gedacht",
+          "body": "Untertitel, Tastatur und Screenreader: Der Raum ist auch ohne Maus nutzbar."
         },
         "privacy": {
-          "title": "Your data, handled with care",
-          "body": "Only what sign-up requires is collected, and you can ask for it back or have it deleted."
+          "title": "Sorgfältiger Umgang mit Ihren Daten",
+          "body": "Es werden nur die für die Anmeldung erforderlichen Daten erhoben, und Sie können sie anfordern oder löschen lassen."
         }
       }
     },
     "simple": {
-      "title": "Online meetings by {organization}",
-      "subtitle": "Join from your computer or phone, with nothing to install.",
-      "cta": "Join the next meeting",
-      "noEvents": "No meetings are scheduled right now. Check back soon.",
-      "stepsTitle": "How it works",
+      "title": "Online-Treffen von {organization}",
+      "subtitle": "Teilnahme per Computer oder Telefon, ohne etwas zu installieren.",
+      "cta": "Am nächsten Treffen teilnehmen",
+      "noEvents": "Derzeit sind keine Treffen geplant. Schauen Sie bald wieder vorbei.",
+      "stepsTitle": "So funktioniert es",
       "steps": {
         "choose": {
-          "title": "Pick a meeting",
-          "body": "Each one shows its date and time."
+          "title": "Treffen auswählen",
+          "body": "Bei jedem Treffen finden Sie Datum und Uhrzeit."
         },
         "name": {
-          "title": "Leave your name",
-          "body": "Your name and email address are all it takes to get the link."
+          "title": "Namen angeben",
+          "body": "Name und E-Mail-Adresse genügen, um den Link zu erhalten."
         },
         "enter": {
-          "title": "Join",
-          "body": "At the right time, open the link: you are in."
+          "title": "Beitreten",
+          "body": "Öffnen Sie zur richtigen Zeit den Link: Schon sind Sie dabei."
         }
       },
-      "listTitle": "Upcoming meetings"
+      "listTitle": "Nächste Treffen"
     }
   },
   "polls": {
@@ -2744,8 +2744,8 @@
       "questionRequired": "Bitte schreiben Sie die Umfragefrage",
       "minOptions": "Mindestens 2 Optionen erforderlich",
       "generic": "Fehler beim Erstellen der Umfrage",
-      "vote": "Vote not recorded. Try again.",
-      "alreadyVoted": "You have already voted in this poll."
+      "vote": "Stimme nicht erfasst. Bitte versuchen Sie es erneut.",
+      "alreadyVoted": "Sie haben an dieser Umfrage bereits teilgenommen."
     }
   },
   "materials": {
@@ -2807,10 +2807,10 @@
       "emailInvalid": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
       "submit": "Meine Daten anfordern",
       "loading": "Suche läuft...",
-      "requestSubmittedTitle": "Check your inbox",
-      "requestSubmittedBody": "If this email matches a registration, we've sent you a link to download your data. The link is valid for 1 hour.",
-      "linkInvalid": "This link is invalid or expired. Please request a new link.",
-      "requestNew": "Request a new link",
+      "requestSubmittedTitle": "Prüfen Sie Ihr Postfach",
+      "requestSubmittedBody": "Wenn diese E-Mail-Adresse zu einer Anmeldung gehört, haben wir Ihnen einen Link zum Herunterladen Ihrer Daten gesendet. Der Link ist 1 Stunde gültig.",
+      "linkInvalid": "Dieser Link ist ungültig oder abgelaufen. Bitte fordern Sie einen neuen Link an.",
+      "requestNew": "Neuen Link anfordern",
       "noData": "Keine Daten für diese E-Mail-Adresse gefunden.",
       "error": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.",
       "rateLimited": "Zu viele Anfragen. Bitte versuchen Sie es in einer Stunde erneut.",
@@ -2825,30 +2825,30 @@
       "questionsTitle": "Q&A-Fragen",
       "pollVotesTitle": "Umfragestimmen",
       "optionLabel": "Option",
-      "erasureCtaTitle": "Want to delete your data?",
-      "erasureCtaBody": "You can request full erasure of the data tied to your email (GDPR Art. 17).",
-      "erasureCtaButton": "Request erasure"
+      "erasureCtaTitle": "Möchten Sie Ihre Daten löschen?",
+      "erasureCtaBody": "Sie können die vollständige Löschung der mit Ihrer E-Mail-Adresse verknüpften Daten beantragen (Art. 17 GDPR).",
+      "erasureCtaButton": "Löschung beantragen"
     },
     "erasure": {
-      "title": "Erase your data",
-      "subtitle": "Confirm the erasure of the personal data tied to your email address (GDPR Art. 17).",
-      "emailLabel": "Your email address",
-      "emailPlaceholder": "Enter the email used for registration",
-      "emailInvalid": "Please enter a valid email address",
-      "submit": "Request erasure",
-      "requestSubmittedTitle": "Check your inbox",
-      "requestSubmittedBody": "If this email matches a registration, we've sent you a link to confirm the erasure. The link is valid for 1 hour.",
-      "linkInvalid": "This link is invalid or expired. Please request a new link.",
-      "confirmWarning": "You are about to permanently erase all personal data tied to your email.",
-      "confirmBody": "Registrations, questions, poll votes, feedback and reminders will be deleted. This action is irreversible.",
-      "confirmButton": "Confirm erasure",
-      "cancel": "Cancel",
-      "processing": "Deleting...",
-      "doneTitle": "Erasure completed",
-      "doneBody": "{count} registrations and the linked data have been deleted.",
-      "error": "An error occurred. Please try again later.",
-      "rateLimited": "Too many requests. Please try again in one hour.",
-      "back": "Back to my data"
+      "title": "Löschung Ihrer Daten",
+      "subtitle": "Bestätigen Sie die Löschung der mit Ihrer E-Mail-Adresse verknüpften personenbezogenen Daten (Art. 17 GDPR).",
+      "emailLabel": "Ihre E-Mail-Adresse",
+      "emailPlaceholder": "Geben Sie die bei der Anmeldung verwendete E-Mail-Adresse ein",
+      "emailInvalid": "Geben Sie eine gültige E-Mail-Adresse ein",
+      "submit": "Löschung beantragen",
+      "requestSubmittedTitle": "Prüfen Sie Ihr Postfach",
+      "requestSubmittedBody": "Wenn diese E-Mail-Adresse zu einer Anmeldung gehört, haben wir Ihnen einen Link zur Bestätigung der Löschung gesendet. Der Link ist 1 Stunde gültig.",
+      "linkInvalid": "Dieser Link ist ungültig oder abgelaufen. Bitte fordern Sie einen neuen Link an.",
+      "confirmWarning": "Sie sind im Begriff, alle mit Ihrer E-Mail-Adresse verknüpften personenbezogenen Daten endgültig zu löschen.",
+      "confirmBody": "Anmeldungen, Fragen, Umfragestimmen, Feedback und Erinnerungen werden gelöscht. Dieser Vorgang ist unwiderruflich.",
+      "confirmButton": "Löschung bestätigen",
+      "cancel": "Abbrechen",
+      "processing": "Wird gelöscht...",
+      "doneTitle": "Löschung abgeschlossen",
+      "doneBody": "{count} Anmeldungen und die zugehörigen Daten wurden gelöscht.",
+      "error": "Es ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut.",
+      "rateLimited": "Zu viele Anfragen. Bitte versuchen Sie es in einer Stunde erneut.",
+      "back": "Zurück zu meinen Daten"
     }
   },
   "legal": {
@@ -3617,8 +3617,8 @@
     "nameLabel": "Ihr Name",
     "nameHelp": "Andere Teilnehmende sehen ihn",
     "joinNowBtn": "Jetzt eintreten",
-    "roomOpen": "The room is open",
-    "whileYouWait": "While you wait",
+    "roomOpen": "Der Raum ist geöffnet",
+    "whileYouWait": "Während Sie warten",
     "openingAt": "Öffnung um {time}",
     "netiquetteTitle": "Hinweise zur Teilnahme",
     "netiquetteBullet1": "Kommen Sie ein paar Minuten früher, um Mikrofon und Webcam zu testen",
@@ -3638,8 +3638,8 @@
     "emailHelp": "Nur für ein eventuelles Follow-up nach dem Event",
     "emailInvalid": "Bitte eine gültige E-Mail-Adresse eingeben",
     "chatLockedMessage": "Geben Sie Ihren Namen ein, um am Event-Chat teilzunehmen.",
-    "classicView": "Classic view",
-    "backToGarden": "Back to the park",
+    "classicView": "Klassische Ansicht",
+    "backToGarden": "Zurück zum Park",
     "aiNoticeTitle": "KI-Verarbeitung nach der Veranstaltung",
     "aiNotice": "Nach dem Ende wird die Aufzeichnung von KI-Werkzeugen verarbeitet, um Transkript, Zusammenfassung sowie eventuelle Übersetzungen und Synchronisationen zu erstellen. Die Ergebnisse können Ungenauigkeiten enthalten; maßgeblich bleibt das Video.",
     "multitrackConsentTitle": "Aufzeichnung pro Teilnehmende",
@@ -3768,15 +3768,15 @@
     "micToggleOff": "Mikrofon AUS",
     "cameraOffPreview": "Kamera ausgeschaltet",
     "speakerTest": "🔊 Audio testen",
-    "backgroundLabel": "Virtual background",
+    "backgroundLabel": "Virtueller Hintergrund",
     "backgroundNoneShort": "No",
-    "backgroundHint": "Applied when you enter the room. To blur your background use the backgrounds button once inside: the preview above shows the camera without effects.",
+    "backgroundHint": "Wird beim Betreten des Raums angewendet. Um den Hintergrund weichzuzeichnen, verwenden Sie im Raum die Schaltfläche für Hintergründe: Die Vorschau oben zeigt die Kamera ohne Effekte.",
     "background": {
-      "nessuno": "No background",
-      "ufficio-chiaro": "Light office",
-      "blu-istituzionale": "Institutional blue",
-      "verde-salvia": "Sage green",
-      "grafite": "Graphite"
+      "nessuno": "Kein Hintergrund",
+      "ufficio-chiaro": "Helles Büro",
+      "blu-istituzionale": "Institutionelles Blau",
+      "verde-salvia": "Salbeigrün",
+      "grafite": "Graphit"
     }
   },
   "garden": {
@@ -3784,7 +3784,7 @@
     "classicView": "Klassische Ansicht",
     "changeAvatar": "Avatar wechseln",
     "peopleInGarden": "{count, plural, =0 {Niemand im Garten} one {1 Person im Garten} other {# Personen im Garten}}",
-    "guestName": "Guest",
+    "guestName": "Gast",
     "hintKeyboard": "Bewegen Sie sich mit WASD oder den Pfeiltasten",
     "pickerTitle": "Wählen Sie Ihren Avatar",
     "pickerHelp": "Die Figur repräsentiert Sie im Wartegarten. Sie können sie jederzeit wechseln.",

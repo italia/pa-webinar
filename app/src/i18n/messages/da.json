@@ -85,9 +85,9 @@
       "topWords": "Mest delte ord",
       "feedback": "Gennemsnitlig bedømmelse",
       "feedbackCount": "{count, plural, one {1 svar} other {# svar}}",
-      "chatQuestions": "Questions from the chat",
-      "reactionsCount": "{count, plural, one {1 reaction} other {# reactions}}",
-      "answered": "answered"
+      "chatQuestions": "Spørgsmål fra chatten",
+      "reactionsCount": "{count, plural, one {1 reaktion} other {# reaktioner}}",
+      "answered": "besvaret"
     },
     "detail": {
       "title": "Begivenhedsdetaljer",
@@ -162,12 +162,12 @@
     "successMessage": "Du modtager en bekræftelsesmail med linket til begivenheden.",
     "successScheduledMessage": "Du er tilmeldt! Vi har sendt dig en e-mail med dit personlige adgangslink. Læg arrangementet i kalenderen, og kom tilbage kort før det begynder.",
     "addToCalendar": "Føj til kalender",
-    "enteringRoom": "We're taking you to the event waiting room.",
-    "enteringRoomHint": "Opening the room…",
+    "enteringRoom": "Vi fører dig til arrangementets venteværelse.",
+    "enteringRoomHint": "Åbner rummet…",
     "alreadyRegistered": "Du er allerede tilmeldt denne begivenhed",
-    "resendLink": "Resend my access link",
-    "resending": "Sending…",
-    "resendSent": "If the address is registered, we've re-sent the access link by email.",
+    "resendLink": "Send mit adgangslink igen",
+    "resending": "Sender…",
+    "resendSent": "Hvis adressen er tilmeldt, har vi sendt adgangslinket igen via e-mail.",
     "backToEvent": "Tilbage til begivenheden",
     "organization": "Organisation",
     "organizationPlaceholder": "f.eks. AGID, Økonomiministeriet, Roms Kommune",
@@ -340,23 +340,23 @@
       "reactNotAllowed": "For at reagere på beskeder skal du bruge dit personlige link eller moderatorlinket.",
       "editNotAllowed": "Dette link er delt: det giver ikke mulighed for at redigere beskeder.",
       "editExpired": "Der er gået mere end 15 minutter: beskeden kan ikke længere redigeres.",
-      "askAsQuestionLabel": "Mark as a question",
-      "placeholderQuestion": "Write your question...",
-      "lensGroupLabel": "Filter messages",
-      "lensAll": "All",
-      "lensQuestions": "Questions ({count})",
-      "lensAnnounceAll": "Listing all messages",
-      "lensAnnounceQuestions": "Listing {count, plural, =0 {no questions} one {1 question} other {# questions}}",
-      "questionOpen": "Question",
-      "questionAnswered": "Answered",
-      "questionDismissed": "Won't be taken",
-      "questionMarkAnswered": "Mark answered",
-      "questionReopen": "Reopen",
-      "questionDismiss": "Dismiss",
-      "questionRestore": "Restore",
-      "questionStatusFailed": "Could not update the question",
-      "questionNeedsText": "Type the text of your question: an attachment alone does not enter the queue",
-      "lensTruncated": "Only the most recent messages are loaded: there may be older questions not listed."
+      "askAsQuestionLabel": "Markér som spørgsmål",
+      "placeholderQuestion": "Skriv dit spørgsmål...",
+      "lensGroupLabel": "Filtrer beskeder",
+      "lensAll": "Alle",
+      "lensQuestions": "Spørgsmål ({count})",
+      "lensAnnounceAll": "Viser alle beskeder",
+      "lensAnnounceQuestions": "På listen: {count, plural, =0 {ingen spørgsmål} one {1 spørgsmål} other {# spørgsmål}}",
+      "questionOpen": "Spørgsmål",
+      "questionAnswered": "Besvaret",
+      "questionDismissed": "Behandles ikke",
+      "questionMarkAnswered": "Markér som besvaret",
+      "questionReopen": "Genåbn",
+      "questionDismiss": "Afvis",
+      "questionRestore": "Gendan",
+      "questionStatusFailed": "Spørgsmålet kunne ikke opdateres",
+      "questionNeedsText": "Skriv teksten til dit spørgsmål: en vedhæftet fil alene kommer ikke i køen",
+      "lensTruncated": "Kun de nyeste beskeder er indlæst: der kan være ældre spørgsmål, som ikke er på listen."
     },
     "role": {
       "moderator": "Moderator",
@@ -417,7 +417,7 @@
       "live": "👥 {count, plural, one {# person} other {# personer}}"
     },
     "sidebarTabChatUnread": "Nye ulæste beskeder",
-    "sidebarTabPollsOpen": "Open poll you have not voted in yet",
+    "sidebarTabPollsOpen": "Åben afstemning, som du endnu ikke har stemt i",
     "floatingControlsLabel": "Arrangementsknapper",
     "screenshareActive": "🖥️ {name} deler sin skærm",
     "screenshareFallbackName": "En deltager",
@@ -441,7 +441,7 @@
       "remainingLabel": "Resterende tid (klik for forbrugt tid)",
       "elapsedLabel": "Forbrugt tid (klik for resterende tid)"
     },
-    "videoCallFrameTitle": "Event video call"
+    "videoCallFrameTitle": "Arrangementets videoopkald"
   },
   "qa": {
     "title": "Spørgsmål og svar",
@@ -764,7 +764,7 @@
         "retentionHelp": "Efter denne grænse slettes personoplysninger automatisk.",
         "gdprTemplate": "Privatlivsskabelon",
         "gdprTemplateNone": "— Brug brugerdefineret tekst —",
-        "gdprTemplateUnknown": "The selected privacy notice template no longer exists: pick another one or go back to custom text",
+        "gdprTemplateUnknown": "Den valgte skabelon til privatlivsoplysninger findes ikke længere: vælg en anden, eller gå tilbage til tilpasset tekst",
         "privacyText": "Privatlivserklæring (tekst)",
         "moderatorHeading": "Moderatorkontakt",
         "moderatorPublishHint": "Navn og e-mail er obligatoriske for at udgive arrangementet (de bruges til moderatorlinket og bekræftelsesmailen). De er ikke påkrævet for at gemme som kladde.",
@@ -781,8 +781,8 @@
       },
       "validationFailed": "Gennemgå de fremhævede felter, før du fortsætter.",
       "partialFailure": "Arrangementet blev oprettet, men nogle elementer blev ikke gemt: {items}. Du kan tilføje dem fra arrangementets side.",
-      "partialFailureEdit": "The event changes were saved, but these could not be: {items}. Your work is still here: fix them and save again.",
-      "partialFailureEditDetail": "The event changes were saved, but these could not be: {items}. The server replied: {reason}. Your work is still here: fix them and save again.",
+      "partialFailureEdit": "Ændringerne til arrangementet blev gemt, men følgende kunne ikke gemmes: {items}. Dit arbejde er her stadig: ret dem, og gem igen.",
+      "partialFailureEditDetail": "Ændringerne til arrangementet blev gemt, men følgende kunne ikke gemmes: {items}. Serveren svarede: {reason}. Dit arbejde er her stadig: ret dem, og gem igen.",
       "draftFound": "Vi fandt en ikke-gemt kladde af dette arrangement. Vil du gendanne den?",
       "draftRestore": "Gendan kladden",
       "draftDiscard": "Ignorér",
@@ -792,7 +792,7 @@
         "moderators": "moderatorer",
         "speakers": "talere",
         "materials": "materialer",
-        "questionnaires": "questionnaires"
+        "questionnaires": "spørgeskemaer"
       }
     },
     "nav": {
@@ -1210,8 +1210,8 @@
       "recordingEnabled": "Aktivér videooptagelse",
       "agendaEnabled": "Live-noter / tjekliste (dagsorden)",
       "agendaEnabledDesc": "En tjekliste over de emner, der skal behandles, som moderatorerne krydser af under arrangementet. Indgår i det automatiske resumé. Valgfri og kan også slås til under arrangementet.",
-      "wordCloudEnabled": "Live word cloud",
-      "wordCloudEnabledDesc": "Participants send a word and the cloud updates live. Useful to open a discussion or gather a feeling in a few seconds.",
+      "wordCloudEnabled": "Live-ordsky",
+      "wordCloudEnabledDesc": "Deltagerne sender et ord, og skyen opdateres live. Nyttigt til at åbne en drøftelse eller indsamle en stemning på få sekunder.",
       "whiteboardEnabled": "Delt whiteboard",
       "whiteboardEnabledDesc": "Aktiverer det indbyggede whiteboard til samarbejde (Excalidraw): moderatorerne kan åbne det fra værktøjslinjen under arrangementet. Altid slået til ved øjeblikkelige opkald.",
       "autoStartRecording": "Start optagelsen automatisk",
@@ -1448,20 +1448,20 @@
         "graceSection": "Soft exit (afslutning af arrangement)",
         "eventGracePeriodMinutes": "Minutters henstand efter endsAt (standard)",
         "eventGracePeriodMinutesHelp": "Ekstra tid efter den planlagte sluttid før opkaldet lukkes. 0 = hård lukning, -1 = luk aldrig automatisk (overlad til inaktivitetsoprydning), 15 = banner og lukning efter 15 min. Hvert arrangement kan tilsidesætte.",
-        "videoQualitySection": "Video/audio quality",
-        "videoQuality": "Default quality",
-        "videoQualityHelp": "Preset applied to every event (overridable per event). Higher quality needs more bandwidth — “High” is the best trade-off. Takes effect immediately, no restart.",
+        "videoQualitySection": "Video-/lydkvalitet",
+        "videoQuality": "Standardkvalitet",
+        "videoQualityHelp": "Forudindstilling anvendt på alle arrangementer (kan tilsidesættes pr. arrangement). Jo højere kvalitet, desto mere båndbredde kræves: »Høj« er det bedste kompromis. Træder i kraft med det samme, uden genstart.",
         "videoQualityOptions": {
-          "MAX": "Maximum — 1080p",
-          "HIGH": "High — 720p (recommended)",
-          "BALANCED": "Balanced — 540p",
-          "SAVE_DATA": "Save data — 360p"
+          "MAX": "Maksimal — 1080p",
+          "HIGH": "Høj — 720p (anbefalet)",
+          "BALANCED": "Balanceret — 540p",
+          "SAVE_DATA": "Datasparetilstand — 360p"
         },
         "videoQualityDesc": {
-          "MAX": "Full HD 1080p, up to ~4 Mbps, stereo Opus 510 kbps audio. Top fidelity for small high-stakes calls — uses more bandwidth and loads the bridge more.",
-          "HIGH": "720p with a capped bitrate (~2.2 Mbps peak) and 96 kbps Opus audio. Great quality without maxing bandwidth: the recommended production trade-off.",
-          "BALANCED": "540p with a contained bitrate (~1 Mbps) and fewer simultaneous incoming videos. Good for large audiences or weak networks.",
-          "SAVE_DATA": "360p at minimal bitrate (~600 kbps) with unused-layer suspension. For very slow connections."
+          "MAX": "Full HD 1080p, op til ~4 Mbps, stereo Opus-lyd på 510 kbps. Maksimal gengivelse til små og vigtige opkald — bruger mere båndbredde og belaster videobroen mere.",
+          "HIGH": "720p med loft over bitraten (~2,2 Mbps i spidsbelastning) og Opus-lyd på 96 kbps. Fremragende kvalitet uden at mætte båndbredden: det anbefalede kompromis til produktion.",
+          "BALANCED": "540p med begrænset bitrate (~1 Mbps) og færre samtidigt modtagne videoer. Egnet til et stort publikum eller svage netværk.",
+          "SAVE_DATA": "360p med minimal bitrate (~600 kbps) og suspension af ubrugte lag. Til meget langsomme forbindelser."
         }
       },
       "header": {
@@ -1521,18 +1521,18 @@
         "descriptionHelp": "Beskrivelse til søgemaskiner og deling på sociale medier",
         "image": "Open Graph-billede",
         "imageHelp": "Standardbillede til deling på sociale medier (1200x630 anbefalet)",
-        "ogSection": "Shared link preview",
-        "ogIntro": "When someone pastes an event link into a chat or a social network, the platform draws a preview image with the details inside it. Choose which ones: every extra field takes room away from the title.",
-        "ogCardEnabled": "Generate the preview",
-        "ogCardEnabledHelp": "When off, the link shows the poster as is (or the site logo if the event has none), with no readable title or date in the image.",
-        "ogShowPoster": "Poster as background",
-        "ogShowPosterHelp": "Uses the event cover as the preview background, dimmed so the text stays readable. With no poster, or with this off, the institutional colour and the logo remain.",
-        "ogShowDate": "Date and time",
-        "ogShowDateHelp": "In the platform's default time zone.",
-        "ogShowSpeakers": "Speakers",
-        "ogShowSpeakersHelp": "The event's speaker text, shortened when too long.",
+        "ogSection": "Forhåndsvisning af delte links",
+        "ogIntro": "Når nogen indsætter linket til et arrangement i en chat eller på et socialt netværk, tegner platformen et forhåndsvisningsbillede med oplysningerne i. Vælg hvilke: hvert ekstra felt tager plads fra titlen.",
+        "ogCardEnabled": "Generér forhåndsvisningen",
+        "ogCardEnabledHelp": "Når den er slået fra, viser linket plakaten, som den er (eller webstedets logo, hvis arrangementet ikke har en), uden læsbar titel eller dato i billedet.",
+        "ogShowPoster": "Plakat som baggrund",
+        "ogShowPosterHelp": "Bruger arrangementets forsidebillede som baggrund for forhåndsvisningen, dæmpet, så teksten forbliver læsbar. Uden plakat, eller når denne indstilling er slået fra, bruges den institutionelle farve og logoet.",
+        "ogShowDate": "Dato og klokkeslæt",
+        "ogShowDateHelp": "I platformens standardtidszone.",
+        "ogShowSpeakers": "Talere",
+        "ogShowSpeakersHelp": "Arrangementets tekst om talerne, forkortet, hvis den er for lang.",
         "ogShowOrganization": "Organisation",
-        "ogShowOrganizationHelp": "The event organiser when set, otherwise the organisation name."
+        "ogShowOrganizationHelp": "Arrangøren af arrangementet, hvis angivet, ellers organisationens navn."
       },
       "homepage": {
         "modeLabel": "Startsidetype",
@@ -1550,12 +1550,12 @@
             "description": "Brugerdefineret HTML-indhold + begivenhedsliste"
           },
           "LANDING_ISTITUZIONALE": {
-            "title": "Institutional landing",
-            "description": "Organisation, next event in the spotlight and the others listed. No technical language"
+            "title": "Institutionel landingsside",
+            "description": "Organisation, næste arrangement fremhævet og de øvrige i en liste. Intet teknisk sprog"
           },
           "LANDING_SEMPLICE": {
-            "title": "Plain-language landing",
-            "description": "Few words and a single invitation, for people new to online events"
+            "title": "Landingsside i klart sprog",
+            "description": "Få ord og én enkelt invitation, til dem, der ikke er vant til onlinearrangementer"
           }
         },
         "customHtmlLabel": "Brugerdefineret HTML-indhold",
@@ -2523,20 +2523,20 @@
       "generateAi": "Generér AI",
       "generateAiConfirm": "Kør AI-pipelinen (transskription og resumé) på denne optagelse. AI-behandlingen slås til for arrangementet og starter i baggrunden. Oversættelserne tilføjes bagefter ét sprog ad gangen fra fanen »Oversættelser«.",
       "generateAiOk": "AI-pipelinen er startet.",
-      "originalToggle": "Show original text",
-      "originalToggleHint": "Show, under each corrected line, the text as the automatic transcription produced it",
-      "originalNotComparable": "The number of lines has changed from the original version: a line-by-line comparison is not possible",
-      "originalLabel": "Original text:",
-      "revisedBadge": "Edited by a person",
-      "revisedHint": "At least one line was corrected by a person after the automatic transcription",
-      "redactLabel": "Erase from the original too",
-      "redactHint": "Use for an erasure request: the changes also apply to the preserved machine text, which would otherwise keep the removed sentence",
-      "redactSave": "Save and erase from the original",
-      "redactSaved": "{n, plural, one {1 line also removed from the original text} other {# lines also removed from the original text}}",
-      "redactNothingRemoved": "The corrections were saved, but there was nothing to remove from the original text for the lines you touched",
-      "redactArchiveFailed": "The corrections were saved to the database, but rewriting the archived file failed: the removed sentence is still downloadable from there. Try the removal again",
-      "originalUncertain": "Origin not certain",
-      "originalUncertainHint": "The preserved text may already include corrections made before this feature existed: it cannot be proven to be what the automatic transcription produced"
+      "originalToggle": "Vis originaltekst",
+      "originalToggleHint": "Viser under hver rettet linje teksten, sådan som den automatiske transskription frembragte den",
+      "originalNotComparable": "Antallet af linjer er ændret i forhold til den oprindelige version: en sammenligning linje for linje er ikke mulig",
+      "originalLabel": "Originaltekst:",
+      "revisedBadge": "Manuelt revideret",
+      "revisedHint": "Mindst én linje er blevet rettet af en person efter den automatiske transskription",
+      "redactLabel": "Slet også fra originalen",
+      "redactHint": "Bruges ved en anmodning om sletning: ændringerne gælder også den bevarede maskintekst, som ellers ville beholde den fjernede sætning",
+      "redactSave": "Gem og slet fra originalen",
+      "redactSaved": "{n, plural, one {1 linje også slettet fra originalteksten} other {# linjer også slettet fra originalteksten}}",
+      "redactNothingRemoved": "Rettelserne blev gemt, men der var intet at slette i originalteksten for de redigerede linjer",
+      "redactArchiveFailed": "Rettelserne blev gemt i databasen, men omskrivningen af den arkiverede fil mislykkedes: den fjernede sætning kan stadig downloades derfra. Prøv sletningen igen",
+      "originalUncertain": "Usikker oprindelse",
+      "originalUncertainHint": "Den bevarede tekst kan allerede indeholde rettelser foretaget, før denne funktion fandtes: det kan ikke dokumenteres, at det er den tekst, den automatiske transskription frembragte"
     },
     "questionnairesPage": {
       "title": "Spørgeskemaer",
@@ -2674,47 +2674,47 @@
       }
     },
     "institutional": {
-      "title": "Online meetings and events",
-      "nextTitle": "Next event",
-      "nextCta": "Go to the event and sign up",
-      "othersTitle": "Other events",
-      "pointsTitle": "How to take part",
+      "title": "Onlinemøder og -arrangementer",
+      "nextTitle": "Næste arrangement",
+      "nextCta": "Gå til arrangementet, og tilmeld dig",
+      "othersTitle": "Øvrige arrangementer",
+      "pointsTitle": "Sådan deltager du",
       "points": {
         "noInstall": {
-          "title": "Join from your browser",
-          "body": "No software to install: just open the link you receive."
+          "title": "Deltag fra browseren",
+          "body": "Du skal ikke installere noget: åbn blot det link, du modtager."
         },
         "accessible": {
-          "title": "Designed for everyone",
-          "body": "Captions, keyboard and screen readers: the room works without a mouse too."
+          "title": "Tænkt for alle",
+          "body": "Undertekster, tastatur og skærmlæsere: rummet kan også bruges uden mus."
         },
         "privacy": {
-          "title": "Your data, handled with care",
-          "body": "Only what sign-up requires is collected, and you can ask for it back or have it deleted."
+          "title": "Dine data behandles med omhu",
+          "body": "Der indsamles kun de data, tilmeldingen kræver, og du kan bede om at få dem udleveret eller slettet."
         }
       }
     },
     "simple": {
-      "title": "Online meetings by {organization}",
-      "subtitle": "Join from your computer or phone, with nothing to install.",
-      "cta": "Join the next meeting",
-      "noEvents": "No meetings are scheduled right now. Check back soon.",
-      "stepsTitle": "How it works",
+      "title": "Onlinemøder fra {organization}",
+      "subtitle": "Deltag fra computer eller telefon, uden at installere noget.",
+      "cta": "Deltag i næste møde",
+      "noEvents": "Der er ingen planlagte møder i øjeblikket. Kig forbi igen snart.",
+      "stepsTitle": "Sådan fungerer det",
       "steps": {
         "choose": {
-          "title": "Pick a meeting",
-          "body": "Each one shows its date and time."
+          "title": "Vælg et møde",
+          "body": "Du kan se dato og klokkeslæt for hvert møde."
         },
         "name": {
-          "title": "Leave your name",
-          "body": "Your name and email address are all it takes to get the link."
+          "title": "Angiv dit navn",
+          "body": "Navn og e-mailadresse er alt, der skal til for at få linket."
         },
         "enter": {
-          "title": "Join",
-          "body": "At the right time, open the link: you are in."
+          "title": "Deltag",
+          "body": "Åbn linket på det rette tidspunkt: så er du med."
         }
       },
-      "listTitle": "Upcoming meetings"
+      "listTitle": "Kommende møder"
     }
   },
   "polls": {
@@ -2744,8 +2744,8 @@
       "questionRequired": "Skriv afstemningsspørgsmålet",
       "minOptions": "Mindst 2 valgmuligheder er påkrævet",
       "generic": "Fejl ved oprettelse af afstemning",
-      "vote": "Vote not recorded. Try again.",
-      "alreadyVoted": "You have already voted in this poll."
+      "vote": "Stemmen blev ikke registreret. Prøv igen.",
+      "alreadyVoted": "Du har allerede stemt i denne afstemning."
     }
   },
   "materials": {
@@ -2807,10 +2807,10 @@
       "emailInvalid": "Indtast venligst en gyldig e-mailadresse",
       "submit": "Anmod om mine data",
       "loading": "Søger...",
-      "requestSubmittedTitle": "Check your inbox",
-      "requestSubmittedBody": "If this email matches a registration, we've sent you a link to download your data. The link is valid for 1 hour.",
-      "linkInvalid": "This link is invalid or expired. Please request a new link.",
-      "requestNew": "Request a new link",
+      "requestSubmittedTitle": "Tjek din indbakke",
+      "requestSubmittedBody": "Hvis e-mailadressen svarer til en tilmelding, har vi sendt dig et link til at downloade dine data. Linket er gyldigt i 1 time.",
+      "linkInvalid": "Linket er ugyldigt eller udløbet. Anmod om et nyt link.",
+      "requestNew": "Anmod om et nyt link",
       "noData": "Ingen data fundet for denne e-mailadresse.",
       "error": "Der opstod en fejl. Prøv venligst igen senere.",
       "rateLimited": "For mange anmodninger. Prøv igen om en time.",
@@ -2825,30 +2825,30 @@
       "questionsTitle": "Q&A-spørgsmål",
       "pollVotesTitle": "Afstemningsstemmer",
       "optionLabel": "Valgmulighed",
-      "erasureCtaTitle": "Want to delete your data?",
-      "erasureCtaBody": "You can request full erasure of the data tied to your email (GDPR Art. 17).",
-      "erasureCtaButton": "Request erasure"
+      "erasureCtaTitle": "Vil du slette dine data?",
+      "erasureCtaBody": "Du kan anmode om fuld sletning af de data, der er tilknyttet din e-mailadresse (GDPR art. 17).",
+      "erasureCtaButton": "Anmod om sletning"
     },
     "erasure": {
-      "title": "Erase your data",
-      "subtitle": "Confirm the erasure of the personal data tied to your email address (GDPR Art. 17).",
-      "emailLabel": "Your email address",
-      "emailPlaceholder": "Enter the email used for registration",
-      "emailInvalid": "Please enter a valid email address",
-      "submit": "Request erasure",
-      "requestSubmittedTitle": "Check your inbox",
-      "requestSubmittedBody": "If this email matches a registration, we've sent you a link to confirm the erasure. The link is valid for 1 hour.",
-      "linkInvalid": "This link is invalid or expired. Please request a new link.",
-      "confirmWarning": "You are about to permanently erase all personal data tied to your email.",
-      "confirmBody": "Registrations, questions, poll votes, feedback and reminders will be deleted. This action is irreversible.",
-      "confirmButton": "Confirm erasure",
-      "cancel": "Cancel",
-      "processing": "Deleting...",
-      "doneTitle": "Erasure completed",
-      "doneBody": "{count} registrations and the linked data have been deleted.",
-      "error": "An error occurred. Please try again later.",
-      "rateLimited": "Too many requests. Please try again in one hour.",
-      "back": "Back to my data"
+      "title": "Sletning af dine data",
+      "subtitle": "Bekræft sletningen af personoplysninger tilknyttet din e-mailadresse (GDPR art. 17).",
+      "emailLabel": "Din e-mailadresse",
+      "emailPlaceholder": "Indtast den e-mail, du brugte ved tilmeldingen",
+      "emailInvalid": "Indtast en gyldig e-mailadresse",
+      "submit": "Anmod om sletning",
+      "requestSubmittedTitle": "Tjek din indbakke",
+      "requestSubmittedBody": "Hvis e-mailadressen svarer til en tilmelding, har vi sendt dig et link til at bekræfte sletningen. Linket er gyldigt i 1 time.",
+      "linkInvalid": "Linket er ugyldigt eller udløbet. Anmod om et nyt link.",
+      "confirmWarning": "Du er ved at slette alle personoplysninger tilknyttet din e-mailadresse permanent.",
+      "confirmBody": "Tilmeldinger, spørgsmål, afstemningsstemmer, feedback og påmindelser slettes. Handlingen kan ikke fortrydes.",
+      "confirmButton": "Bekræft sletning",
+      "cancel": "Annuller",
+      "processing": "Sletter...",
+      "doneTitle": "Sletning gennemført",
+      "doneBody": "{count} tilmeldinger og de tilknyttede data er blevet slettet.",
+      "error": "Der opstod en fejl. Prøv igen senere.",
+      "rateLimited": "For mange anmodninger. Prøv igen om en time.",
+      "back": "Tilbage til mine data"
     }
   },
   "legal": {
@@ -3144,7 +3144,7 @@
     "iceSuccess": "Succesfulde forbindelser",
     "totalConferences": "Konferencer i alt",
     "octoConferences": "Octo-konferencer (multi-bridge)",
-    "octoEndpoints": "Endpoints via relay",
+    "octoEndpoints": "Endepunkter via relæ",
     "octoSend": "Udgående relay mellem bridges",
     "octoReceive": "Indgående relay mellem bridges",
     "lastUpdated": "Sidst opdateret",
@@ -3617,8 +3617,8 @@
     "nameLabel": "Dit navn",
     "nameHelp": "Vises for de andre deltagere",
     "joinNowBtn": "Gå ind nu",
-    "roomOpen": "The room is open",
-    "whileYouWait": "While you wait",
+    "roomOpen": "Rummet er åbent",
+    "whileYouWait": "Mens du venter",
     "openingAt": "Åbner kl. {time}",
     "netiquetteTitle": "Gode råd til at deltage",
     "netiquetteBullet1": "Mød op et par minutter før for at teste mikrofon og webcam",
@@ -3638,8 +3638,8 @@
     "emailHelp": "Kun til en eventuel opfølgning efter arrangementet",
     "emailInvalid": "Indtast en gyldig e-mailadresse",
     "chatLockedMessage": "Indtast dit navn for at deltage i arrangementets chat.",
-    "classicView": "Classic view",
-    "backToGarden": "Back to the park",
+    "classicView": "Klassisk visning",
+    "backToGarden": "Tilbage til parken",
     "aiNoticeTitle": "AI-behandling efter begivenheden",
     "aiNotice": "Når det er slut, behandles optagelsen af AI-værktøjer for at lave transskription, resumé og eventuelle oversættelser og eftersynkronisering. Resultaterne kan indeholde unøjagtigheder; videoen er fortsat den autoritative kilde.",
     "multitrackConsentTitle": "Optagelse pr. deltager",
@@ -3768,15 +3768,15 @@
     "micToggleOff": "Mikrofon FRA",
     "cameraOffPreview": "Kameraet er slukket",
     "speakerTest": "🔊 Lydtest",
-    "backgroundLabel": "Virtual background",
+    "backgroundLabel": "Virtuel baggrund",
     "backgroundNoneShort": "No",
-    "backgroundHint": "Applied when you enter the room. To blur your background use the backgrounds button once inside: the preview above shows the camera without effects.",
+    "backgroundHint": "Anvendes, når du går ind i rummet. Brug knappen til baggrunde, når du er inde, hvis du vil sløre din baggrund: forhåndsvisningen ovenfor viser kameraet uden effekter.",
     "background": {
-      "nessuno": "No background",
-      "ufficio-chiaro": "Light office",
-      "blu-istituzionale": "Institutional blue",
-      "verde-salvia": "Sage green",
-      "grafite": "Graphite"
+      "nessuno": "Ingen baggrund",
+      "ufficio-chiaro": "Lyst kontor",
+      "blu-istituzionale": "Institutionel blå",
+      "verde-salvia": "Salviegrøn",
+      "grafite": "Grafit"
     }
   },
   "garden": {
@@ -3784,7 +3784,7 @@
     "classicView": "Klassisk visning",
     "changeAvatar": "Skift avatar",
     "peopleInGarden": "{count, plural, =0 {Ingen i haven} one {1 person i haven} other {# personer i haven}}",
-    "guestName": "Guest",
+    "guestName": "Gæst",
     "hintKeyboard": "Bevæg dig med WASD eller piletasterne",
     "pickerTitle": "Vælg din avatar",
     "pickerHelp": "Figuren repræsenterer dig i venteområdets have. Du kan skifte den når som helst.",
@@ -3793,11 +3793,11 @@
     "hintJoystick": "Træk for at flytte"
   },
   "feedbackAdmin": {
-    "title": "Feedback results",
-    "totalVotes": "responses",
-    "noFeedback": "No feedback received",
-    "comments": "Comments",
-    "noComments": "No comments",
+    "title": "Feedbackresultater",
+    "totalVotes": "svar",
+    "noFeedback": "Ingen feedback modtaget",
+    "comments": "Kommentarer",
+    "noComments": "Ingen kommentarer",
     "yes": "Ja",
     "no": "Nej"
   }

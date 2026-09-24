@@ -85,9 +85,9 @@
       "topWords": "Na focail is mó a roinneadh",
       "feedback": "Meánrátáil",
       "feedbackCount": "{count, plural, one {1 freagra} two {2 fhreagra} few {# fhreagra} many {# bhfreagra} other {# freagra}}",
-      "chatQuestions": "Questions from the chat",
-      "reactionsCount": "{count, plural, one {1 reaction} other {# reactions}}",
-      "answered": "answered"
+      "chatQuestions": "Ceisteanna ón gcomhrá",
+      "reactionsCount": "{count, plural, one {1 imoibriú} two {2 imoibriú} few {# imoibriú} many {# n-imoibriú} other {# imoibriú}}",
+      "answered": "freagartha"
     },
     "detail": {
       "title": "Sonraí an imeachta",
@@ -162,12 +162,12 @@
     "successMessage": "Gheobhaidh sibh ríomhphost deimhnithe leis an nasc chun rochtain a fháil ar an imeacht.",
     "successScheduledMessage": "Tá tú cláraithe! Sheolamar ríomhphost chugat leis an nasc rochtana pearsanta. Cuir an t-imeacht le do fhéilire agus tar ar ais anseo go gairid roimh an tús.",
     "addToCalendar": "Cuir le do fhéilire",
-    "enteringRoom": "We're taking you to the event waiting room.",
-    "enteringRoomHint": "Opening the room…",
+    "enteringRoom": "Táimid do bhur dtabhairt chuig seomra feithimh an imeachta.",
+    "enteringRoomHint": "An seomra á oscailt…",
     "alreadyRegistered": "Tá sibh cláraithe cheana féin don imeacht seo",
-    "resendLink": "Resend my access link",
-    "resending": "Sending…",
-    "resendSent": "If the address is registered, we've re-sent the access link by email.",
+    "resendLink": "Seol an nasc rochtana arís",
+    "resending": "Á sheoladh…",
+    "resendSent": "Má tá an seoladh cláraithe, sheolamar an nasc rochtana chugaibh arís trí ríomhphost.",
     "backToEvent": "Ar ais go dtí an t-imeacht",
     "organization": "Eagraíocht",
     "organizationPlaceholder": "m.sh. AGID, An Roinn Airgeadais, Bardas na Róimhe",
@@ -340,23 +340,23 @@
       "reactNotAllowed": "Teastaíonn do nasc pearsanta nó nasc modhnóra chun frithghníomhú le teachtaireachtaí.",
       "editNotAllowed": "Is nasc comhroinnte é seo: ní féidir teachtaireachtaí a chur in eagar leis.",
       "editExpired": "Tá níos mó ná 15 nóiméad caite: ní féidir an teachtaireacht seo a chur in eagar a thuilleadh.",
-      "askAsQuestionLabel": "Mark as a question",
-      "placeholderQuestion": "Write your question...",
-      "lensGroupLabel": "Filter messages",
-      "lensAll": "All",
-      "lensQuestions": "Questions ({count})",
-      "lensAnnounceAll": "Listing all messages",
-      "lensAnnounceQuestions": "Listing {count, plural, =0 {no questions} one {1 question} other {# questions}}",
-      "questionOpen": "Question",
-      "questionAnswered": "Answered",
-      "questionDismissed": "Won't be taken",
-      "questionMarkAnswered": "Mark answered",
-      "questionReopen": "Reopen",
-      "questionDismiss": "Dismiss",
-      "questionRestore": "Restore",
-      "questionStatusFailed": "Could not update the question",
-      "questionNeedsText": "Type the text of your question: an attachment alone does not enter the queue",
-      "lensTruncated": "Only the most recent messages are loaded: there may be older questions not listed."
+      "askAsQuestionLabel": "Marcáil mar cheist",
+      "placeholderQuestion": "Scríobh bhur gceist...",
+      "lensGroupLabel": "Scag teachtaireachtaí",
+      "lensAll": "Iad go léir",
+      "lensQuestions": "Ceisteanna ({count})",
+      "lensAnnounceAll": "Gach teachtaireacht á liostú",
+      "lensAnnounceQuestions": "Á liostú: {count, plural, =0 {gan aon cheist} one {1 cheist} two {2 cheist} few {# cheist} many {# gceist} other {# ceist}}",
+      "questionOpen": "Ceist",
+      "questionAnswered": "Freagartha",
+      "questionDismissed": "Ní phléifear í",
+      "questionMarkAnswered": "Marcáil mar freagartha",
+      "questionReopen": "Athoscail",
+      "questionDismiss": "Díbir",
+      "questionRestore": "Athchóirigh",
+      "questionStatusFailed": "Níorbh fhéidir an cheist a nuashonrú",
+      "questionNeedsText": "Clóscríobh téacs na ceiste: ní théann ceangaltán leis féin isteach sa scuaine",
+      "lensTruncated": "Níl ach na teachtaireachtaí is déanaí luchtaithe: d'fhéadfadh ceisteanna níos sine a bheith ann nach bhfuil liostaithe."
     },
     "role": {
       "moderator": "Modhnóir",
@@ -417,7 +417,7 @@
       "live": "👥 {count, plural, one {# duine} other {# dhuine}}"
     },
     "sidebarTabChatUnread": "Teachtaireachtaí nua gan léamh",
-    "sidebarTabPollsOpen": "Open poll you have not voted in yet",
+    "sidebarTabPollsOpen": "Pobalbhreith oscailte nár vótáil sibh inti fós",
     "floatingControlsLabel": "Rialuithe imeachta",
     "screenshareActive": "🖥️ tá {name} ag comhroinnt an scáileáin",
     "screenshareFallbackName": "Rannpháirtí",
@@ -441,7 +441,7 @@
       "remainingLabel": "An t-am atá fágtha (cliceáil chun an t-am caite a fheiceáil)",
       "elapsedLabel": "An t-am caite (cliceáil chun an t-am atá fágtha a fheiceáil)"
     },
-    "videoCallFrameTitle": "Event video call"
+    "videoCallFrameTitle": "Físghlao an imeachta"
   },
   "qa": {
     "title": "Ceisteanna agus Freagraí",
@@ -764,7 +764,7 @@
         "retentionHelp": "Tar éis na tairsí seo, scriostar sonraí pearsanta go huathoibríoch.",
         "gdprTemplate": "Teimpléad fógra príobháideachais",
         "gdprTemplateNone": "— Úsáid téacs saincheaptha —",
-        "gdprTemplateUnknown": "The selected privacy notice template no longer exists: pick another one or go back to custom text",
+        "gdprTemplateUnknown": "Níl an teimpléad fógra príobháideachais a roghnaíodh ann a thuilleadh: roghnaigh ceann eile nó fill ar an téacs saincheaptha",
         "privacyText": "Fógra príobháideachais (téacs)",
         "moderatorHeading": "Teagmháil mhodhnóra",
         "moderatorPublishHint": "Tá an t-ainm agus an ríomhphost riachtanach chun an t-imeacht a fhoilsiú (úsáidtear iad don nasc modhnóra agus don ríomhphost deimhnithe). Níl siad riachtanach chun é a shábháil mar dhréacht.",
@@ -781,8 +781,8 @@
       },
       "validationFailed": "Athbhreithnigh na réimsí aibhsithe sula leantar ar aghaidh.",
       "partialFailure": "Cruthaíodh an t-imeacht, ach níor sábháladh roinnt míreanna: {items}. Is féidir leat iad a chur leis ó leathanach an imeachta.",
-      "partialFailureEdit": "The event changes were saved, but these could not be: {items}. Your work is still here: fix them and save again.",
-      "partialFailureEditDetail": "The event changes were saved, but these could not be: {items}. The server replied: {reason}. Your work is still here: fix them and save again.",
+      "partialFailureEdit": "Sábháladh na hathruithe ar an imeacht, ach níorbh fhéidir na nithe seo a shábháil: {items}. Tá bhur gcuid oibre anseo fós: ceartaigh agus sábháil arís.",
+      "partialFailureEditDetail": "Sábháladh na hathruithe ar an imeacht, ach níorbh fhéidir na nithe seo a shábháil: {items}. D'fhreagair an freastalaí: {reason}. Tá bhur gcuid oibre anseo fós: ceartaigh agus sábháil arís.",
       "draftFound": "Fuaireamar dréacht neamhshábháilte den imeacht seo. Ar mhaith leat é a athchóiriú?",
       "draftRestore": "Athchóirigh an dréacht",
       "draftDiscard": "Déan neamhaird",
@@ -792,7 +792,7 @@
         "moderators": "modhnóirí",
         "speakers": "cainteoirí",
         "materials": "ábhair",
-        "questionnaires": "questionnaires"
+        "questionnaires": "ceistneoirí"
       }
     },
     "nav": {
@@ -1210,8 +1210,8 @@
       "recordingEnabled": "Cumasaigh taifeadadh físe",
       "agendaEnabled": "Nótaí / Seicliosta beo (clár oibre)",
       "agendaEnabledDesc": "Seicliosta de na topaicí atá le plé a thiceálann na modhnóirí le linn an imeachta. Cuirtear san áireamh san achoimre uathoibríoch é. Roghnach, agus is féidir é a chur ar siúl le linn an imeachta freisin.",
-      "wordCloudEnabled": "Live word cloud",
-      "wordCloudEnabledDesc": "Participants send a word and the cloud updates live. Useful to open a discussion or gather a feeling in a few seconds.",
+      "wordCloudEnabled": "Scamall focal beo",
+      "wordCloudEnabledDesc": "Seolann na rannpháirtithe focal agus nuashonraítear an scamall beo. Úsáideach chun plé a oscailt nó chun mothú a bhailiú i gceann cúpla soicind.",
       "whiteboardEnabled": "Clár bán comhroinnte",
       "whiteboardEnabledDesc": "Cumasaíonn sé an clár bán comhoibríoch dúchasach (Excalidraw): is féidir le modhnóirí é a oscailt ón mbarra uirlisí le linn an imeachta. Ar siúl i gcónaí i nglaonna láithreacha.",
       "autoStartRecording": "Tosaigh an taifeadadh go huathoibríoch",
@@ -1448,20 +1448,20 @@
         "graceSection": "Imeacht bog (deireadh imeachta)",
         "eventGracePeriodMinutes": "Nóiméid mhaithiúnais tar éis endsAt (réamhshocrú)",
         "eventGracePeriodMinutesHelp": "Am breise tar éis an ama deiridh sceidealaithe sular dúnadh an glao. 0 = stop crua, -1 = ná dún go huathoibríoch (fág faoin nglanadh díomhaointe é), 15 = meirge agus dúnadh tar éis 15 nóim. Is féidir le gach imeacht é a sháraíocht.",
-        "videoQualitySection": "Video/audio quality",
-        "videoQuality": "Default quality",
-        "videoQualityHelp": "Preset applied to every event (overridable per event). Higher quality needs more bandwidth — “High” is the best trade-off. Takes effect immediately, no restart.",
+        "videoQualitySection": "Cáilíocht físe/fuaime",
+        "videoQuality": "Cáilíocht réamhshocraithe",
+        "videoQualityHelp": "Réamhshocrú a chuirtear i bhfeidhm ar gach imeacht (is féidir é a shárú in aghaidh an imeachta). Dá airde an cháilíocht, is ea is mó bandaleithid a theastaíonn: is é “Ard” an comhréiteach is fearr. Tagann sé i bhfeidhm láithreach, gan atosú.",
         "videoQualityOptions": {
-          "MAX": "Maximum — 1080p",
-          "HIGH": "High — 720p (recommended)",
-          "BALANCED": "Balanced — 540p",
-          "SAVE_DATA": "Save data — 360p"
+          "MAX": "Uasta — 1080p",
+          "HIGH": "Ard — 720p (molta)",
+          "BALANCED": "Cothromaithe — 540p",
+          "SAVE_DATA": "Coigilt sonraí — 360p"
         },
         "videoQualityDesc": {
-          "MAX": "Full HD 1080p, up to ~4 Mbps, stereo Opus 510 kbps audio. Top fidelity for small high-stakes calls — uses more bandwidth and loads the bridge more.",
-          "HIGH": "720p with a capped bitrate (~2.2 Mbps peak) and 96 kbps Opus audio. Great quality without maxing bandwidth: the recommended production trade-off.",
-          "BALANCED": "540p with a contained bitrate (~1 Mbps) and fewer simultaneous incoming videos. Good for large audiences or weak networks.",
-          "SAVE_DATA": "360p at minimal bitrate (~600 kbps) with unused-layer suspension. For very slow connections."
+          "MAX": "Full HD 1080p, suas le ~4 Mbps, fuaim Opus steiréo 510 kbps. Dílseacht uasta do ghlaonna beaga tábhachtacha — úsáideann sé níos mó bandaleithid agus cuireann sé níos mó ualaigh ar an droichead físe.",
+          "HIGH": "720p le giotánráta teoranta (~2.2 Mbps ag buaic) agus fuaim Opus 96 kbps. Cáilíocht an-mhaith gan an bandaleithead a phlúchadh: an comhréiteach a mholtar don táirgeadh.",
+          "BALANCED": "540p le giotánráta srianta (~1 Mbps) agus níos lú físeán isteach ag an am céanna. Oiriúnach do lucht féachana mór nó do líonraí laga.",
+          "SAVE_DATA": "360p ag giotánráta íosta (~600 kbps) agus sraitheanna nach n-úsáidtear curtha ar fionraí. Do naisc an-mhall."
         }
       },
       "header": {
@@ -1521,18 +1521,18 @@
         "descriptionHelp": "Cur síos d'innill chuardaigh agus do roinnt sóisialta",
         "image": "Íomhá Open Graph",
         "imageHelp": "Íomhá réamhshocraithe do roinnt sóisialta (1200x630 molta)",
-        "ogSection": "Shared link preview",
-        "ogIntro": "When someone pastes an event link into a chat or a social network, the platform draws a preview image with the details inside it. Choose which ones: every extra field takes room away from the title.",
-        "ogCardEnabled": "Generate the preview",
-        "ogCardEnabledHelp": "When off, the link shows the poster as is (or the site logo if the event has none), with no readable title or date in the image.",
-        "ogShowPoster": "Poster as background",
-        "ogShowPosterHelp": "Uses the event cover as the preview background, dimmed so the text stays readable. With no poster, or with this off, the institutional colour and the logo remain.",
-        "ogShowDate": "Date and time",
-        "ogShowDateHelp": "In the platform's default time zone.",
-        "ogShowSpeakers": "Speakers",
-        "ogShowSpeakersHelp": "The event's speaker text, shortened when too long.",
-        "ogShowOrganization": "Organisation",
-        "ogShowOrganizationHelp": "The event organiser when set, otherwise the organisation name."
+        "ogSection": "Réamhamharc ar naisc chomhroinnte",
+        "ogIntro": "Nuair a ghreamaíonn duine nasc imeachta i gcomhrá nó ar líonra sóisialta, tarraingíonn an t-ardán íomhá réamhamhairc ina bhfuil na sonraí. Roghnaigh cé acu: tógann gach réimse breise spás ón teideal.",
+        "ogCardEnabled": "Gin an réamhamharc",
+        "ogCardEnabledHelp": "Nuair atá sé múchta, taispeánann an nasc an póstaer mar atá (nó lógó an tsuímh mura bhfuil póstaer ag an imeacht), gan teideal ná dáta inléite san íomhá.",
+        "ogShowPoster": "Póstaer mar chúlra",
+        "ogShowPosterHelp": "Úsáidtear clúdach an imeachta mar chúlra an réamhamhairc, maolaithe ionas go bhfanfaidh an téacs inléite. Gan phóstaer, nó leis an rogha seo múchta, fanann an dath institiúideach agus an lógó.",
+        "ogShowDate": "Dáta agus am",
+        "ogShowDateHelp": "I gcrios ama réamhshocraithe an ardáin.",
+        "ogShowSpeakers": "Cainteoirí",
+        "ogShowSpeakersHelp": "Téacs chainteoirí an imeachta, giorraithe má tá sé rófhada.",
+        "ogShowOrganization": "Eagraíocht",
+        "ogShowOrganizationHelp": "Eagraí an imeachta má tá sé socraithe, nó ainm na heagraíochta murach sin."
       },
       "homepage": {
         "modeLabel": "Mód an leathanaigh bhaile",
@@ -1550,12 +1550,12 @@
             "description": "Ábhar HTML saincheaptha + liosta imeachtaí"
           },
           "LANDING_ISTITUZIONALE": {
-            "title": "Institutional landing",
-            "description": "Organisation, next event in the spotlight and the others listed. No technical language"
+            "title": "Leathanach tuirlingthe institiúideach",
+            "description": "An eagraíocht, an chéad imeacht eile chun tosaigh agus na cinn eile i liosta. Gan aon bhéarlagair teicniúil"
           },
           "LANDING_SEMPLICE": {
-            "title": "Plain-language landing",
-            "description": "Few words and a single invitation, for people new to online events"
+            "title": "Leathanach tuirlingthe i dteanga shimplí",
+            "description": "Beagán focal agus cuireadh amháin, do dhaoine nach bhfuil taithí acu ar imeachtaí ar líne"
           }
         },
         "customHtmlLabel": "Ábhar HTML saincheaptha",
@@ -1689,7 +1689,7 @@
         "2": "Céa",
         "3": "Déa",
         "4": "Aoi",
-        "5": "Sat",
+        "5": "Sath",
         "6": "Domh"
       },
       "endLabel": "Deireadh atarlaithe",
@@ -2523,20 +2523,20 @@
       "generateAi": "Cruthaigh AI",
       "generateAiConfirm": "Rith an phíblíne AI (tras-scríobh agus achoimre) ar an taifeadadh seo. Cumasófar an phróiseáil AI don imeacht agus tosóidh sí sa chúlra. Cuirtear na haistriúcháin leis ina dhiaidh sin, teanga ar theanga, ón gcluaisín “Aistriúcháin”.",
       "generateAiOk": "Tosaíodh an phíblíne AI.",
-      "originalToggle": "Show original text",
-      "originalToggleHint": "Show, under each corrected line, the text as the automatic transcription produced it",
-      "originalNotComparable": "The number of lines has changed from the original version: a line-by-line comparison is not possible",
-      "originalLabel": "Original text:",
-      "revisedBadge": "Edited by a person",
-      "revisedHint": "At least one line was corrected by a person after the automatic transcription",
-      "redactLabel": "Erase from the original too",
-      "redactHint": "Use for an erasure request: the changes also apply to the preserved machine text, which would otherwise keep the removed sentence",
-      "redactSave": "Save and erase from the original",
-      "redactSaved": "{n, plural, one {1 line also removed from the original text} other {# lines also removed from the original text}}",
-      "redactNothingRemoved": "The corrections were saved, but there was nothing to remove from the original text for the lines you touched",
-      "redactArchiveFailed": "The corrections were saved to the database, but rewriting the archived file failed: the removed sentence is still downloadable from there. Try the removal again",
-      "originalUncertain": "Origin not certain",
-      "originalUncertainHint": "The preserved text may already include corrections made before this feature existed: it cannot be proven to be what the automatic transcription produced"
+      "originalToggle": "Taispeáin an téacs bunaidh",
+      "originalToggleHint": "Taispeántar, faoi gach líne cheartaithe, an téacs mar a tháirg an tras-scríobh uathoibríoch é",
+      "originalNotComparable": "Tá athrú tagtha ar líon na línte i gcomparáid leis an leagan bunaidh: ní féidir comparáid líne ar líne a dhéanamh",
+      "originalLabel": "Téacs bunaidh:",
+      "revisedBadge": "Athbhreithnithe de láimh",
+      "revisedHint": "Cheartaigh duine líne amháin ar a laghad tar éis an tras-scríofa uathoibríoch",
+      "redactLabel": "Scrios ón mbunleagan freisin",
+      "redactHint": "Le húsáid le haghaidh iarratas ar scriosadh: baineann na hathruithe freisin leis an téacs meaisín caomhnaithe, a choinneodh an abairt a baineadh murach sin",
+      "redactSave": "Sábháil agus scrios ón mbunleagan",
+      "redactSaved": "{n, plural, one {Scriosadh 1 líne ón téacs bunaidh freisin} two {Scriosadh # líne ón téacs bunaidh freisin} few {Scriosadh # líne ón téacs bunaidh freisin} many {Scriosadh # líne ón téacs bunaidh freisin} other {Scriosadh # líne ón téacs bunaidh freisin}}",
+      "redactNothingRemoved": "Sábháladh na ceartúcháin, ach ní raibh aon rud le scriosadh sa téacs bunaidh do na línte a athraíodh",
+      "redactArchiveFailed": "Sábháladh na ceartúcháin sa bhunachar sonraí, ach theip ar athscríobh an chomhaid chartlannaithe: is féidir an abairt a baineadh a íoslódáil uaidh fós. Bain triail eile as an scriosadh",
+      "originalUncertain": "Bunús neamhchinnte",
+      "originalUncertainHint": "D'fhéadfadh ceartúcháin a rinneadh sula raibh an fheidhm seo ann a bheith sa téacs caomhnaithe cheana féin: ní féidir a chruthú gurb é an téacs a tháirg an tras-scríobh uathoibríoch é"
     },
     "questionnairesPage": {
       "title": "Ceistneoirí",
@@ -2674,47 +2674,47 @@
       }
     },
     "institutional": {
-      "title": "Online meetings and events",
-      "nextTitle": "Next event",
-      "nextCta": "Go to the event and sign up",
-      "othersTitle": "Other events",
-      "pointsTitle": "How to take part",
+      "title": "Cruinnithe agus imeachtaí ar líne",
+      "nextTitle": "An chéad imeacht eile",
+      "nextCta": "Téigh chuig an imeacht agus cláraigh",
+      "othersTitle": "Imeachtaí eile",
+      "pointsTitle": "Conas páirt a ghlacadh",
       "points": {
         "noInstall": {
-          "title": "Join from your browser",
-          "body": "No software to install: just open the link you receive."
+          "title": "Glactar páirt ón mbrabhsálaí",
+          "body": "Ní gá aon bhogearraí a shuiteáil: níl le déanamh ach an nasc a gheobhaidh sibh a oscailt."
         },
         "accessible": {
-          "title": "Designed for everyone",
-          "body": "Captions, keyboard and screen readers: the room works without a mouse too."
+          "title": "Ceaptha do chách",
+          "body": "Fotheidil, méarchlár agus léitheoirí scáileáin: is féidir an seomra a úsáid gan luch freisin."
         },
         "privacy": {
-          "title": "Your data, handled with care",
-          "body": "Only what sign-up requires is collected, and you can ask for it back or have it deleted."
+          "title": "Sonraí á láimhseáil go cúramach",
+          "body": "Ní bhailítear ach na sonraí atá riachtanach don chlárú, agus is féidir iad a iarraidh ar ais nó iad a scriosadh."
         }
       }
     },
     "simple": {
-      "title": "Online meetings by {organization}",
-      "subtitle": "Join from your computer or phone, with nothing to install.",
-      "cta": "Join the next meeting",
-      "noEvents": "No meetings are scheduled right now. Check back soon.",
-      "stepsTitle": "How it works",
+      "title": "Cruinnithe ar líne — {organization}",
+      "subtitle": "Glac páirt ó ríomhaire nó ó ghuthán, gan aon rud a shuiteáil.",
+      "cta": "Glac páirt sa chéad chruinniú eile",
+      "noEvents": "Níl aon chruinniú sceidealta faoi láthair. Tagaigí ar ais go luath.",
+      "stepsTitle": "Conas a oibríonn sé",
       "steps": {
         "choose": {
-          "title": "Pick a meeting",
-          "body": "Each one shows its date and time."
+          "title": "Roghnaigí cruinniú",
+          "body": "Taispeántar dáta agus am gach cruinnithe."
         },
         "name": {
-          "title": "Leave your name",
-          "body": "Your name and email address are all it takes to get the link."
+          "title": "Fágaigí bhur n-ainm",
+          "body": "Níl ag teastáil ach bhur n-ainm agus bhur seoladh ríomhphoist chun an nasc a fháil."
         },
         "enter": {
-          "title": "Join",
-          "body": "At the right time, open the link: you are in."
+          "title": "Téigí isteach",
+          "body": "Ag an am ceart, osclaígí an nasc: tá sibh istigh."
         }
       },
-      "listTitle": "Upcoming meetings"
+      "listTitle": "Cruinnithe atá le teacht"
     }
   },
   "polls": {
@@ -2744,8 +2744,8 @@
       "questionRequired": "Scríobh ceist na pobalbhreithe",
       "minOptions": "Tá 2 rogha ar a laghad ag teastáil",
       "generic": "Earráid agus an phobalbhreith á cruthú",
-      "vote": "Vote not recorded. Try again.",
-      "alreadyVoted": "You have already voted in this poll."
+      "vote": "Níor taifeadadh an vóta. Bain triail eile as.",
+      "alreadyVoted": "Tá vóta caite agaibh sa phobalbhreith seo cheana."
     }
   },
   "materials": {
@@ -2807,10 +2807,10 @@
       "emailInvalid": "Cuir isteach seoladh ríomhphoist bailí, le bhur dtoil",
       "submit": "Iarr mo chuid sonraí",
       "loading": "Ag cuardach...",
-      "requestSubmittedTitle": "Check your inbox",
-      "requestSubmittedBody": "If this email matches a registration, we've sent you a link to download your data. The link is valid for 1 hour.",
-      "linkInvalid": "This link is invalid or expired. Please request a new link.",
-      "requestNew": "Request a new link",
+      "requestSubmittedTitle": "Seiceáil bhur mbosca isteach",
+      "requestSubmittedBody": "Má mheaitseálann an seoladh ríomhphoist seo clárúchán, sheolamar nasc chugaibh chun bhur gcuid sonraí a íoslódáil. Beidh an nasc bailí ar feadh uair an chloig.",
+      "linkInvalid": "Tá an nasc neamhbhailí nó imithe in éag. Iarr nasc nua.",
+      "requestNew": "Iarr nasc nua",
       "noData": "Níor aimsíodh aon sonraí don seoladh ríomhphoist seo.",
       "error": "Tharla earráid. Bain triail eile as ar ball, le bhur dtoil.",
       "rateLimited": "An iomarca iarratas. Bain triail eile as i gceann uaire.",
@@ -2825,30 +2825,30 @@
       "questionsTitle": "Ceisteanna Q&A",
       "pollVotesTitle": "Vótaí pobalbhreitheanna",
       "optionLabel": "Rogha",
-      "erasureCtaTitle": "Want to delete your data?",
-      "erasureCtaBody": "You can request full erasure of the data tied to your email (GDPR Art. 17).",
-      "erasureCtaButton": "Request erasure"
+      "erasureCtaTitle": "Ar mhaith libh bhur gcuid sonraí a scriosadh?",
+      "erasureCtaBody": "Is féidir libh scriosadh iomlán na sonraí a bhaineann le bhur seoladh ríomhphoist a iarraidh (Airteagal 17 de GDPR).",
+      "erasureCtaButton": "Iarr scriosadh"
     },
     "erasure": {
-      "title": "Erase your data",
-      "subtitle": "Confirm the erasure of the personal data tied to your email address (GDPR Art. 17).",
-      "emailLabel": "Your email address",
-      "emailPlaceholder": "Enter the email used for registration",
-      "emailInvalid": "Please enter a valid email address",
-      "submit": "Request erasure",
-      "requestSubmittedTitle": "Check your inbox",
-      "requestSubmittedBody": "If this email matches a registration, we've sent you a link to confirm the erasure. The link is valid for 1 hour.",
-      "linkInvalid": "This link is invalid or expired. Please request a new link.",
-      "confirmWarning": "You are about to permanently erase all personal data tied to your email.",
-      "confirmBody": "Registrations, questions, poll votes, feedback and reminders will be deleted. This action is irreversible.",
-      "confirmButton": "Confirm erasure",
-      "cancel": "Cancel",
-      "processing": "Deleting...",
-      "doneTitle": "Erasure completed",
-      "doneBody": "{count} registrations and the linked data have been deleted.",
-      "error": "An error occurred. Please try again later.",
-      "rateLimited": "Too many requests. Please try again in one hour.",
-      "back": "Back to my data"
+      "title": "Scriosadh bhur gcuid sonraí",
+      "subtitle": "Deimhnigh scriosadh na sonraí pearsanta a bhaineann le bhur seoladh ríomhphoist (Airteagal 17 de GDPR).",
+      "emailLabel": "Bhur seoladh ríomhphoist",
+      "emailPlaceholder": "Cuir isteach an ríomhphost a úsáideadh le haghaidh cláraithe",
+      "emailInvalid": "Cuir isteach seoladh ríomhphoist bailí",
+      "submit": "Iarr scriosadh",
+      "requestSubmittedTitle": "Seiceáil bhur mbosca isteach",
+      "requestSubmittedBody": "Má mheaitseálann an seoladh ríomhphoist seo clárúchán, sheolamar nasc chugaibh chun an scriosadh a dheimhniú. Beidh an nasc bailí ar feadh uair an chloig.",
+      "linkInvalid": "Tá an nasc neamhbhailí nó imithe in éag. Iarr nasc nua.",
+      "confirmWarning": "Tá sibh ar tí na sonraí pearsanta go léir a bhaineann le bhur seoladh ríomhphoist a scriosadh go buan.",
+      "confirmBody": "Scriosfar clárúcháin, ceisteanna, vótaí pobalbhreithe, aiseolas agus meabhrúcháin. Ní féidir an gníomh seo a chealú.",
+      "confirmButton": "Deimhnigh an scriosadh",
+      "cancel": "Cealaigh",
+      "processing": "Á scriosadh...",
+      "doneTitle": "Scriosadh críochnaithe",
+      "doneBody": "Clárúcháin scriosta: {count}. Scriosadh na sonraí gaolmhara freisin.",
+      "error": "Tharla earráid. Bain triail eile as ar ball, le bhur dtoil.",
+      "rateLimited": "An iomarca iarratas. Bain triail eile as i gceann uaire.",
+      "back": "Ar ais chuig mo chuid sonraí"
     }
   },
   "legal": {
@@ -3617,8 +3617,8 @@
     "nameLabel": "D'ainm",
     "nameHelp": "Feicfidh rannpháirtithe eile é seo",
     "joinNowBtn": "Téigh isteach anois",
-    "roomOpen": "The room is open",
-    "whileYouWait": "While you wait",
+    "roomOpen": "Tá an seomra oscailte",
+    "whileYouWait": "Fad atá sibh ag fanacht",
     "openingAt": "Osclaíonn ag {time}",
     "netiquetteTitle": "Conas páirt a ghlacadh",
     "netiquetteBullet1": "Tar cúpla nóiméad luath chun do mhicreafón agus do cheamara a thástáil",
@@ -3638,8 +3638,8 @@
     "emailHelp": "Le haghaidh leantachta iar-imeachta amháin",
     "emailInvalid": "Iontráil seoladh ríomhphoist bailí",
     "chatLockedMessage": "Iontráil d'ainm chun páirt a ghlacadh i gcomhrá an imeachta.",
-    "classicView": "Classic view",
-    "backToGarden": "Back to the park",
+    "classicView": "Amharc clasaiceach",
+    "backToGarden": "Ar ais chuig an bpáirc",
     "aiNoticeTitle": "Próiseáil le IS tar éis an imeachta",
     "aiNotice": "Ag an deireadh, déanfar an taifeadadh a phróiseáil le huirlisí intleachta saorga chun tras-scríbhinn, achoimre agus aistriúcháin nó fuaimniú a chruthú. D'fhéadfadh míchruinneas a bheith sna torthaí; is é an físeán an fhoinse údarásach i gcónaí.",
     "multitrackConsentTitle": "Taifeadadh de réir rannpháirtí",
@@ -3768,15 +3768,15 @@
     "micToggleOff": "Micreafón OFF",
     "cameraOffPreview": "Ceamara as",
     "speakerTest": "🔊 Tástáil fuaime",
-    "backgroundLabel": "Virtual background",
+    "backgroundLabel": "Cúlra fíorúil",
     "backgroundNoneShort": "No",
-    "backgroundHint": "Applied when you enter the room. To blur your background use the backgrounds button once inside: the preview above shows the camera without effects.",
+    "backgroundHint": "Cuirtear i bhfeidhm é nuair a théann sibh isteach sa seomra. Chun an cúlra a dhoiléiriú, úsáidigí an cnaipe cúlraí nuair atá sibh istigh: taispeánann an réamhamharc thuas an ceamara gan éifeacht.",
     "background": {
-      "nessuno": "No background",
-      "ufficio-chiaro": "Light office",
-      "blu-istituzionale": "Institutional blue",
-      "verde-salvia": "Sage green",
-      "grafite": "Graphite"
+      "nessuno": "Gan chúlra",
+      "ufficio-chiaro": "Oifig gheal",
+      "blu-istituzionale": "Gorm institiúideach",
+      "verde-salvia": "Glas sáiste",
+      "grafite": "Graifít"
     }
   },
   "garden": {
@@ -3784,7 +3784,7 @@
     "classicView": "Radharc clasaiceach",
     "changeAvatar": "Athraigh avatar",
     "peopleInGarden": "{count, plural, =0 {Aon duine sa ghairdín} one {1 duine sa ghairdín} other {# duine sa ghairdín}}",
-    "guestName": "Guest",
+    "guestName": "Aoi",
     "hintKeyboard": "Bog le WASD nó leis na saigheada",
     "pickerTitle": "Roghnaigh d'avatar",
     "pickerHelp": "Léiríonn an carachtar seo tú sa ghairdín feithimh. Is féidir leat é a athrú aon uair.",
@@ -3793,11 +3793,11 @@
     "hintJoystick": "Tarraing chun bogadh"
   },
   "feedbackAdmin": {
-    "title": "Feedback results",
-    "totalVotes": "responses",
-    "noFeedback": "No feedback received",
-    "comments": "Comments",
-    "noComments": "No comments",
+    "title": "Torthaí an aiseolais",
+    "totalVotes": "freagraí",
+    "noFeedback": "Níor fuarthas aon aiseolas",
+    "comments": "Tráchtanna",
+    "noComments": "Gan tráchtanna",
     "yes": "Tá",
     "no": "Níl"
   }

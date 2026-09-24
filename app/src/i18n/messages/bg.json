@@ -85,9 +85,9 @@
       "topWords": "Най-споделяни думи",
       "feedback": "Средна оценка",
       "feedbackCount": "{count, plural, one {1 отговор} other {# отговора}}",
-      "chatQuestions": "Questions from the chat",
-      "reactionsCount": "{count, plural, one {1 reaction} other {# reactions}}",
-      "answered": "answered"
+      "chatQuestions": "Въпроси от чата",
+      "reactionsCount": "{count, plural, one {1 реакция} other {# реакции}}",
+      "answered": "отговорен"
     },
     "detail": {
       "title": "Детайли за събитието",
@@ -162,12 +162,12 @@
     "successMessage": "Ще получите имейл за потвърждение с линк за достъп до събитието.",
     "successScheduledMessage": "Регистрацията е успешна! Изпратихме ви имейл с личната връзка за достъп. Добавете събитието в календара си и се върнете тук малко преди началото.",
     "addToCalendar": "Добавяне в календара",
-    "enteringRoom": "We're taking you to the event waiting room.",
-    "enteringRoomHint": "Opening the room…",
+    "enteringRoom": "Пренасочваме Ви към чакалнята на събитието.",
+    "enteringRoomHint": "Отваряне на залата…",
     "alreadyRegistered": "Вие вече сте регистрирани за това събитие",
-    "resendLink": "Resend my access link",
-    "resending": "Sending…",
-    "resendSent": "If the address is registered, we've re-sent the access link by email.",
+    "resendLink": "Изпращане отново на линка за достъп",
+    "resending": "Изпращане…",
+    "resendSent": "Ако адресът е регистриран, изпратихме Ви отново линка за достъп по имейл.",
     "backToEvent": "Обратно към събитието",
     "organization": "Организация",
     "organizationPlaceholder": "напр. AGID, Министерство на икономиката, Община Рим",
@@ -340,23 +340,23 @@
       "reactNotAllowed": "За реакции към съобщенията е необходима личната или модераторската ви връзка.",
       "editNotAllowed": "Тази връзка е споделена: тя не позволява редактиране на съобщения.",
       "editExpired": "Изминали са повече от 15 минути: съобщението вече не може да се редактира.",
-      "askAsQuestionLabel": "Mark as a question",
-      "placeholderQuestion": "Write your question...",
-      "lensGroupLabel": "Filter messages",
-      "lensAll": "All",
-      "lensQuestions": "Questions ({count})",
-      "lensAnnounceAll": "Listing all messages",
-      "lensAnnounceQuestions": "Listing {count, plural, =0 {no questions} one {1 question} other {# questions}}",
-      "questionOpen": "Question",
-      "questionAnswered": "Answered",
-      "questionDismissed": "Won't be taken",
-      "questionMarkAnswered": "Mark answered",
-      "questionReopen": "Reopen",
-      "questionDismiss": "Dismiss",
-      "questionRestore": "Restore",
-      "questionStatusFailed": "Could not update the question",
-      "questionNeedsText": "Type the text of your question: an attachment alone does not enter the queue",
-      "lensTruncated": "Only the most recent messages are loaded: there may be older questions not listed."
+      "askAsQuestionLabel": "Отбелязване като въпрос",
+      "placeholderQuestion": "Напишете въпроса си...",
+      "lensGroupLabel": "Филтриране на съобщенията",
+      "lensAll": "Всички",
+      "lensQuestions": "Въпроси ({count})",
+      "lensAnnounceAll": "Показани са всички съобщения",
+      "lensAnnounceQuestions": "В списъка: {count, plural, =0 {няма въпроси} one {1 въпрос} other {# въпроса}}",
+      "questionOpen": "Въпрос",
+      "questionAnswered": "Отговорен",
+      "questionDismissed": "Няма да бъде разгледан",
+      "questionMarkAnswered": "Отбелязване като отговорен",
+      "questionReopen": "Повторно отваряне",
+      "questionDismiss": "Отхвърляне",
+      "questionRestore": "Възстановяване",
+      "questionStatusFailed": "Въпросът не можа да бъде обновен",
+      "questionNeedsText": "Напишете текста на въпроса: само прикачен файл не влиза в опашката",
+      "lensTruncated": "Заредени са само най-новите съобщения: възможно е да има по-стари въпроси, които не са в списъка."
     },
     "role": {
       "moderator": "Модератор",
@@ -417,7 +417,7 @@
       "live": "👥 {count, plural, one {# човек} other {# души}}"
     },
     "sidebarTabChatUnread": "Нови непрочетени съобщения",
-    "sidebarTabPollsOpen": "Open poll you have not voted in yet",
+    "sidebarTabPollsOpen": "Отворена анкета, в която още не сте гласували",
     "floatingControlsLabel": "Контроли на събитието",
     "screenshareActive": "🖥️ {name} споделя екрана си",
     "screenshareFallbackName": "Участник",
@@ -441,7 +441,7 @@
       "remainingLabel": "Оставащо време (щракнете за изминалото време)",
       "elapsedLabel": "Изминало време (щракнете за оставащото време)"
     },
-    "videoCallFrameTitle": "Event video call"
+    "videoCallFrameTitle": "Видеоразговор на събитието"
   },
   "qa": {
     "title": "Въпроси и отговори",
@@ -764,7 +764,7 @@
         "retentionHelp": "След този праг личните данни се изтриват автоматично.",
         "gdprTemplate": "Шаблон за информация",
         "gdprTemplateNone": "— Използвай персонализиран текст —",
-        "gdprTemplateUnknown": "The selected privacy notice template no longer exists: pick another one or go back to custom text",
+        "gdprTemplateUnknown": "Избраният шаблон за информация за поверителност вече не съществува: изберете друг или се върнете към персонализирания текст",
         "privacyText": "Декларация за поверителност (текст)",
         "moderatorHeading": "Контакт на модератора",
         "moderatorPublishHint": "Името и имейлът са задължителни за публикуване на събитието (използват се за модераторската връзка и имейла за потвърждение). За запазване като чернова не са необходими.",
@@ -781,8 +781,8 @@
       },
       "validationFailed": "Проверете маркираните полета, преди да продължите.",
       "partialFailure": "Събитието е създадено, но някои елементи не бяха запазени: {items}. Можете да ги добавите от страницата на събитието.",
-      "partialFailureEdit": "The event changes were saved, but these could not be: {items}. Your work is still here: fix them and save again.",
-      "partialFailureEditDetail": "The event changes were saved, but these could not be: {items}. The server replied: {reason}. Your work is still here: fix them and save again.",
+      "partialFailureEdit": "Промените в събитието бяха запазени, но следното не можа да бъде запазено: {items}. Работата Ви е все още тук: коригирайте и запазете отново.",
+      "partialFailureEditDetail": "Промените в събитието бяха запазени, но следното не можа да бъде запазено: {items}. Сървърът отговори: {reason}. Работата Ви е все още тук: коригирайте и запазете отново.",
       "draftFound": "Намерихме незапазена чернова на това събитие. Искате ли да я възстановите?",
       "draftRestore": "Възстановяване на черновата",
       "draftDiscard": "Отхвърляне",
@@ -792,7 +792,7 @@
         "moderators": "модератори",
         "speakers": "лектори",
         "materials": "материали",
-        "questionnaires": "questionnaires"
+        "questionnaires": "въпросници"
       }
     },
     "nav": {
@@ -1210,8 +1210,8 @@
       "recordingEnabled": "Активиране на видеозапис",
       "agendaEnabled": "Бележки / Чеклист (дневен ред) на живо",
       "agendaEnabledDesc": "Списък с темите за обсъждане, които модераторите отмятат по време на събитието. Влиза в автоматичното резюме. По избор, може да се включи и по време на събитието.",
-      "wordCloudEnabled": "Live word cloud",
-      "wordCloudEnabledDesc": "Participants send a word and the cloud updates live. Useful to open a discussion or gather a feeling in a few seconds.",
+      "wordCloudEnabled": "Облак от думи на живо",
+      "wordCloudEnabledDesc": "Участниците изпращат дума и облакът се обновява на живо. Полезно, за да се открие дискусия или да се долови настроение за няколко секунди.",
       "whiteboardEnabled": "Споделена бяла дъска",
       "whiteboardEnabledDesc": "Активира вградената съвместна бяла дъска (Excalidraw): модераторите могат да я отворят от лентата с инструменти по време на събитието. Винаги активна при незабавните разговори.",
       "autoStartRecording": "Стартирай записа автоматично",
@@ -1448,20 +1448,20 @@
         "graceSection": "Soft exit (край на събитието)",
         "eventGracePeriodMinutes": "Минути отсрочка след endsAt (по подразбиране)",
         "eventGracePeriodMinutesHelp": "Допълнително време, предоставено след планирания краен час преди затваряне на разговора. 0 = твърдо затваряне, -1 = не затваряй автоматично (остави на cleanup за неактивност), 15 = банер и затваряне след 15 мин. Всяко събитие може да го override.",
-        "videoQualitySection": "Video/audio quality",
-        "videoQuality": "Default quality",
-        "videoQualityHelp": "Preset applied to every event (overridable per event). Higher quality needs more bandwidth — “High” is the best trade-off. Takes effect immediately, no restart.",
+        "videoQualitySection": "Качество на видеото/звука",
+        "videoQuality": "Качество по подразбиране",
+        "videoQualityHelp": "Предварителна настройка за всички събития (може да се промени за отделно събитие). Колкото по-високо е качеството, толкова повече честотна лента е нужна: „Високо“ е най-добрият компромис. Прилага се веднага, без рестартиране.",
         "videoQualityOptions": {
-          "MAX": "Maximum — 1080p",
-          "HIGH": "High — 720p (recommended)",
-          "BALANCED": "Balanced — 540p",
-          "SAVE_DATA": "Save data — 360p"
+          "MAX": "Максимално — 1080p",
+          "HIGH": "Високо — 720p (препоръчително)",
+          "BALANCED": "Балансирано — 540p",
+          "SAVE_DATA": "Пестене на данни — 360p"
         },
         "videoQualityDesc": {
-          "MAX": "Full HD 1080p, up to ~4 Mbps, stereo Opus 510 kbps audio. Top fidelity for small high-stakes calls — uses more bandwidth and loads the bridge more.",
-          "HIGH": "720p with a capped bitrate (~2.2 Mbps peak) and 96 kbps Opus audio. Great quality without maxing bandwidth: the recommended production trade-off.",
-          "BALANCED": "540p with a contained bitrate (~1 Mbps) and fewer simultaneous incoming videos. Good for large audiences or weak networks.",
-          "SAVE_DATA": "360p at minimal bitrate (~600 kbps) with unused-layer suspension. For very slow connections."
+          "MAX": "Full HD 1080p, до ~4 Mbps, стерео Opus аудио 510 kbps. Максимална точност на възпроизвеждането за малки и важни разговори — използва повече честотна лента и натоварва повече видео моста.",
+          "HIGH": "720p с ограничен битрейт (пик ~2,2 Mbps) и Opus аудио 96 kbps. Отлично качество без претоварване на честотната лента: препоръчителният компромис за продукционна среда.",
+          "BALANCED": "540p с ограничен битрейт (~1 Mbps) и по-малко едновременно получавани видеа. Подходящо за голяма аудитория или слаби мрежи.",
+          "SAVE_DATA": "360p с минимален битрейт (~600 kbps) и спиране на неизползваните слоеве. За много бавни връзки."
         }
       },
       "header": {
@@ -1521,18 +1521,18 @@
         "descriptionHelp": "Описание за търсачки и споделяне в социалните мрежи",
         "image": "Изображение Open Graph",
         "imageHelp": "Изображение по подразбиране за споделяне в социалните мрежи (препоръчително 1200x630)",
-        "ogSection": "Shared link preview",
-        "ogIntro": "When someone pastes an event link into a chat or a social network, the platform draws a preview image with the details inside it. Choose which ones: every extra field takes room away from the title.",
-        "ogCardEnabled": "Generate the preview",
-        "ogCardEnabledHelp": "When off, the link shows the poster as is (or the site logo if the event has none), with no readable title or date in the image.",
-        "ogShowPoster": "Poster as background",
-        "ogShowPosterHelp": "Uses the event cover as the preview background, dimmed so the text stays readable. With no poster, or with this off, the institutional colour and the logo remain.",
-        "ogShowDate": "Date and time",
-        "ogShowDateHelp": "In the platform's default time zone.",
-        "ogShowSpeakers": "Speakers",
-        "ogShowSpeakersHelp": "The event's speaker text, shortened when too long.",
-        "ogShowOrganization": "Organisation",
-        "ogShowOrganizationHelp": "The event organiser when set, otherwise the organisation name."
+        "ogSection": "Визуализация на споделени линкове",
+        "ogIntro": "Когато някой постави линка към събитие в чат или социална мрежа, платформата създава изображение за визуализация с информацията в него. Изберете каква да бъде: всяко допълнително поле отнема място от заглавието.",
+        "ogCardEnabled": "Генериране на визуализацията",
+        "ogCardEnabledHelp": "Когато е изключено, линкът показва плаката както е (или логото на сайта, ако събитието няма плакат), без четливо заглавие или дата в изображението.",
+        "ogShowPoster": "Плакат като фон",
+        "ogShowPosterHelp": "Използва корицата на събитието като фон на визуализацията, затъмнена, за да остане текстът четлив. Без плакат или при изключена опция остават институционалният цвят и логото.",
+        "ogShowDate": "Дата и час",
+        "ogShowDateHelp": "В часовата зона по подразбиране на платформата.",
+        "ogShowSpeakers": "Лектори",
+        "ogShowSpeakersHelp": "Текстът за лекторите на събитието, съкратен, ако е твърде дълъг.",
+        "ogShowOrganization": "Организация",
+        "ogShowOrganizationHelp": "Организаторът на събитието, ако е посочен, в противен случай името на организацията."
       },
       "homepage": {
         "modeLabel": "Режим на началната страница",
@@ -1550,12 +1550,12 @@
             "description": "Персонализирано HTML съдържание + списък със събития"
           },
           "LANDING_ISTITUZIONALE": {
-            "title": "Institutional landing",
-            "description": "Organisation, next event in the spotlight and the others listed. No technical language"
+            "title": "Институционална начална страница",
+            "description": "Институция, следващото събитие на преден план и останалите в списък. Без технически език"
           },
           "LANDING_SEMPLICE": {
-            "title": "Plain-language landing",
-            "description": "Few words and a single invitation, for people new to online events"
+            "title": "Начална страница на ясен език",
+            "description": "Малко думи и една-единствена покана — за хора, които не посещават онлайн събития"
           }
         },
         "customHtmlLabel": "Персонализирано HTML съдържание",
@@ -2023,7 +2023,7 @@
       "chatSseConnections": "SSE връзки",
       "chatSseSubtitle": "активни subscriber",
       "redisConnectedClients": "Redis клиенти",
-      "redisConnectedSubtitle": "publishers + subscribers",
+      "redisConnectedSubtitle": "издатели + абонати",
       "redisPubsubChannels": "pub/sub канали",
       "redisPubsubSubtitle": "= събития с активен чат",
       "chartRedisMemory": "Redis памет",
@@ -2045,7 +2045,7 @@
       "participantsNow": "Активни участници",
       "jvbStress": "Натоварване на JVB",
       "conferences": "Активни конференции",
-      "octoRelay": "Octo inter-bridge relay",
+      "octoRelay": "Octo реле между видео мостовете",
       "interBridge": "Octo трафик",
       "chartCpu": "CPU usage",
       "chartMemory": "Memory usage",
@@ -2523,20 +2523,20 @@
       "generateAi": "Генериране с ИИ",
       "generateAiConfirm": "Стартирайте ИИ пайплайна (транскрипция и резюме) върху този запис. Обработката с ИИ ще бъде активирана за събитието и тръгва във фонов режим. Преводите се добавят след това, по един език, от раздела „Преводи“.",
       "generateAiOk": "ИИ пайплайнът е стартиран.",
-      "originalToggle": "Show original text",
-      "originalToggleHint": "Show, under each corrected line, the text as the automatic transcription produced it",
-      "originalNotComparable": "The number of lines has changed from the original version: a line-by-line comparison is not possible",
-      "originalLabel": "Original text:",
-      "revisedBadge": "Edited by a person",
-      "revisedHint": "At least one line was corrected by a person after the automatic transcription",
-      "redactLabel": "Erase from the original too",
-      "redactHint": "Use for an erasure request: the changes also apply to the preserved machine text, which would otherwise keep the removed sentence",
-      "redactSave": "Save and erase from the original",
-      "redactSaved": "{n, plural, one {1 line also removed from the original text} other {# lines also removed from the original text}}",
-      "redactNothingRemoved": "The corrections were saved, but there was nothing to remove from the original text for the lines you touched",
-      "redactArchiveFailed": "The corrections were saved to the database, but rewriting the archived file failed: the removed sentence is still downloadable from there. Try the removal again",
-      "originalUncertain": "Origin not certain",
-      "originalUncertainHint": "The preserved text may already include corrections made before this feature existed: it cannot be proven to be what the automatic transcription produced"
+      "originalToggle": "Показване на оригиналния текст",
+      "originalToggleHint": "Показва под всеки коригиран ред текста така, както го е генерирала автоматичната транскрипция",
+      "originalNotComparable": "Броят на редовете се е променил спрямо оригиналната версия: сравнение ред по ред не е възможно",
+      "originalLabel": "Оригинален текст:",
+      "revisedBadge": "Ръчно редактирано",
+      "revisedHint": "Поне един ред е коригиран от човек след автоматичната транскрипция",
+      "redactLabel": "Изтриване и от оригинала",
+      "redactHint": "Използвайте при искане за изтриване: промените се прилагат и към съхранения машинен текст, който иначе би запазил премахнатото изречение",
+      "redactSave": "Запазване и изтриване от оригинала",
+      "redactSaved": "{n, plural, one {1 ред е изтрит и от оригиналния текст} other {# реда са изтрити и от оригиналния текст}}",
+      "redactNothingRemoved": "Корекциите бяха запазени, но в оригиналния текст нямаше какво да се изтрие за редактираните редове",
+      "redactArchiveFailed": "Корекциите бяха запазени в базата данни, но презаписването на архивирания файл не бе успешно: премахнатото изречение все още може да бъде изтеглено оттам. Опитайте изтриването отново",
+      "originalUncertain": "Несигурен произход",
+      "originalUncertainHint": "Съхраненият текст може вече да съдържа корекции, направени преди тази функция да съществува: не може да се докаже, че това е текстът, генериран от автоматичната транскрипция"
     },
     "questionnairesPage": {
       "title": "Въпросници",
@@ -2674,47 +2674,47 @@
       }
     },
     "institutional": {
-      "title": "Online meetings and events",
-      "nextTitle": "Next event",
-      "nextCta": "Go to the event and sign up",
-      "othersTitle": "Other events",
-      "pointsTitle": "How to take part",
+      "title": "Онлайн срещи и събития",
+      "nextTitle": "Следващо събитие",
+      "nextCta": "Отидете на събитието и се регистрирайте",
+      "othersTitle": "Други събития",
+      "pointsTitle": "Как се участва",
       "points": {
         "noInstall": {
-          "title": "Join from your browser",
-          "body": "No software to install: just open the link you receive."
+          "title": "Участие от браузъра",
+          "body": "Не е нужно да инсталирате програми: достатъчно е да отворите линка, който ще получите."
         },
         "accessible": {
-          "title": "Designed for everyone",
-          "body": "Captions, keyboard and screen readers: the room works without a mouse too."
+          "title": "Създадено за всички",
+          "body": "Субтитри, клавиатура и екранни четци: залата може да се използва и без мишка."
         },
         "privacy": {
-          "title": "Your data, handled with care",
-          "body": "Only what sign-up requires is collected, and you can ask for it back or have it deleted."
+          "title": "Грижливо обработване на данните",
+          "body": "Събират се само данните, необходими за регистрацията, и можете да поискате да Ви бъдат предоставени или изтрити."
         }
       }
     },
     "simple": {
-      "title": "Online meetings by {organization}",
-      "subtitle": "Join from your computer or phone, with nothing to install.",
-      "cta": "Join the next meeting",
-      "noEvents": "No meetings are scheduled right now. Check back soon.",
-      "stepsTitle": "How it works",
+      "title": "Онлайн срещите на {organization}",
+      "subtitle": "Участвате от компютър или телефон, без да инсталирате нищо.",
+      "cta": "Участвайте в следващата среща",
+      "noEvents": "В момента няма насрочени срещи. Заповядайте отново скоро.",
+      "stepsTitle": "Как става",
       "steps": {
         "choose": {
-          "title": "Pick a meeting",
-          "body": "Each one shows its date and time."
+          "title": "Изберете среща",
+          "body": "За всяка среща ще намерите дата и час."
         },
         "name": {
-          "title": "Leave your name",
-          "body": "Your name and email address are all it takes to get the link."
+          "title": "Оставете името си",
+          "body": "Достатъчни са име и имейл адрес, за да получите линка."
         },
         "enter": {
-          "title": "Join",
-          "body": "At the right time, open the link: you are in."
+          "title": "Влезте",
+          "body": "В точния час отворете линка: вече сте вътре."
         }
       },
-      "listTitle": "Upcoming meetings"
+      "listTitle": "Предстоящи срещи"
     }
   },
   "polls": {
@@ -2744,8 +2744,8 @@
       "questionRequired": "Напишете въпроса на анкетата",
       "minOptions": "Необходими са поне 2 варианта",
       "generic": "Грешка при създаване на анкетата",
-      "vote": "Vote not recorded. Try again.",
-      "alreadyVoted": "You have already voted in this poll."
+      "vote": "Гласът не е записан. Опитайте отново.",
+      "alreadyVoted": "Вече сте гласували в тази анкета."
     }
   },
   "materials": {
@@ -2807,10 +2807,10 @@
       "emailInvalid": "Въведете валиден имейл адрес",
       "submit": "Заявка за моите данни",
       "loading": "Търсене...",
-      "requestSubmittedTitle": "Check your inbox",
-      "requestSubmittedBody": "If this email matches a registration, we've sent you a link to download your data. The link is valid for 1 hour.",
-      "linkInvalid": "This link is invalid or expired. Please request a new link.",
-      "requestNew": "Request a new link",
+      "requestSubmittedTitle": "Проверете входящата си поща",
+      "requestSubmittedBody": "Ако този имейл адрес съответства на регистрация, изпратихме Ви линк за изтегляне на Вашите данни. Линкът е валиден 1 час.",
+      "linkInvalid": "Този линк е невалиден или е изтекъл. Моля, поискайте нов линк.",
+      "requestNew": "Поискайте нов линк",
       "noData": "Не са намерени данни за този имейл адрес.",
       "error": "Възникна грешка. Моля, опитайте отново по-късно.",
       "rateLimited": "Твърде много заявки. Моля, опитайте отново след един час.",
@@ -2825,30 +2825,30 @@
       "questionsTitle": "Въпроси Q&A",
       "pollVotesTitle": "Гласове в анкети",
       "optionLabel": "Вариант",
-      "erasureCtaTitle": "Want to delete your data?",
-      "erasureCtaBody": "You can request full erasure of the data tied to your email (GDPR Art. 17).",
-      "erasureCtaButton": "Request erasure"
+      "erasureCtaTitle": "Искате ли да изтриете данните си?",
+      "erasureCtaBody": "Можете да поискате пълно изтриване на данните, свързани с Вашия имейл адрес, съгласно чл. 17 от GDPR.",
+      "erasureCtaButton": "Заявка за изтриване"
     },
     "erasure": {
-      "title": "Erase your data",
-      "subtitle": "Confirm the erasure of the personal data tied to your email address (GDPR Art. 17).",
-      "emailLabel": "Your email address",
-      "emailPlaceholder": "Enter the email used for registration",
-      "emailInvalid": "Please enter a valid email address",
-      "submit": "Request erasure",
-      "requestSubmittedTitle": "Check your inbox",
-      "requestSubmittedBody": "If this email matches a registration, we've sent you a link to confirm the erasure. The link is valid for 1 hour.",
-      "linkInvalid": "This link is invalid or expired. Please request a new link.",
-      "confirmWarning": "You are about to permanently erase all personal data tied to your email.",
-      "confirmBody": "Registrations, questions, poll votes, feedback and reminders will be deleted. This action is irreversible.",
-      "confirmButton": "Confirm erasure",
-      "cancel": "Cancel",
-      "processing": "Deleting...",
-      "doneTitle": "Erasure completed",
-      "doneBody": "{count} registrations and the linked data have been deleted.",
-      "error": "An error occurred. Please try again later.",
-      "rateLimited": "Too many requests. Please try again in one hour.",
-      "back": "Back to my data"
+      "title": "Изтриване на Вашите данни",
+      "subtitle": "Потвърдете изтриването на личните данни, свързани с Вашия имейл адрес, съгласно чл. 17 от GDPR.",
+      "emailLabel": "Вашият имейл адрес",
+      "emailPlaceholder": "Въведете имейла, използван при регистрацията",
+      "emailInvalid": "Въведете валиден имейл адрес",
+      "submit": "Заявка за изтриване",
+      "requestSubmittedTitle": "Проверете входящата си поща",
+      "requestSubmittedBody": "Ако този имейл адрес съответства на регистрация, изпратихме Ви линк за потвърждаване на изтриването. Линкът е валиден 1 час.",
+      "linkInvalid": "Този линк е невалиден или е изтекъл. Моля, поискайте нов линк.",
+      "confirmWarning": "На път сте да изтриете окончателно всички лични данни, свързани с Вашия имейл адрес.",
+      "confirmBody": "Ще бъдат изтрити регистрациите, въпросите, гласовете в анкетите, обратната връзка и напомнянията. Действието е необратимо.",
+      "confirmButton": "Потвърждаване на изтриването",
+      "cancel": "Отказ",
+      "processing": "Изтриване...",
+      "doneTitle": "Изтриването е завършено",
+      "doneBody": "Изтрити са {count} регистрации и свързаните с тях данни.",
+      "error": "Възникна грешка. Моля, опитайте отново по-късно.",
+      "rateLimited": "Твърде много заявки. Моля, опитайте отново след един час.",
+      "back": "Обратно към моите данни"
     }
   },
   "legal": {
@@ -3024,7 +3024,7 @@
           },
           "platform": {
             "title": "Платформа",
-            "sub": "Kubernetes runtime, SMTP, CI/CD, observability"
+            "sub": "Среда за изпълнение Kubernetes, SMTP, CI/CD, наблюдаемост"
           }
         },
         "note": "Пълният списък на компонентите и услугите с версии, хешове и технически свойства е наличен в предходните секции и в изтегляемия JSON."
@@ -3617,8 +3617,8 @@
     "nameLabel": "Вашето име",
     "nameHelp": "Ще се вижда от другите участници",
     "joinNowBtn": "Влез сега",
-    "roomOpen": "The room is open",
-    "whileYouWait": "While you wait",
+    "roomOpen": "Залата е отворена",
+    "whileYouWait": "Докато чакате",
     "openingAt": "Отваряне в {time}",
     "netiquetteTitle": "Добри практики за участие",
     "netiquetteBullet1": "Пристигнете няколко минути по-рано, за да тествате микрофона и уеб камерата",
@@ -3638,8 +3638,8 @@
     "emailHelp": "Само за евентуален follow-up след събитието",
     "emailInvalid": "Въведете валиден имейл адрес",
     "chatLockedMessage": "Въведете името си, за да участвате в чата на събитието.",
-    "classicView": "Classic view",
-    "backToGarden": "Back to the park",
+    "classicView": "Класически изглед",
+    "backToGarden": "Обратно към парка",
     "aiNoticeTitle": "Обработка с ИИ след събитието",
     "aiNotice": "След края записът ще бъде обработен с инструменти с изкуствен интелект, за да се създадат транскрипция, резюме и евентуални преводи и дублаж. Резултатите може да съдържат неточности; видеото остава меродавният източник.",
     "multitrackConsentTitle": "Запис по участник",
@@ -3768,15 +3768,15 @@
     "micToggleOff": "Микрофонът ИЗКЛ",
     "cameraOffPreview": "Камерата е изключена",
     "speakerTest": "🔊 Тест на звука",
-    "backgroundLabel": "Virtual background",
+    "backgroundLabel": "Виртуален фон",
     "backgroundNoneShort": "No",
-    "backgroundHint": "Applied when you enter the room. To blur your background use the backgrounds button once inside: the preview above shows the camera without effects.",
+    "backgroundHint": "Прилага се при влизане в залата. За да размажете фона, използвайте бутона за фонове, след като влезете: визуализацията по-горе показва камерата без ефекти.",
     "background": {
-      "nessuno": "No background",
-      "ufficio-chiaro": "Light office",
-      "blu-istituzionale": "Institutional blue",
-      "verde-salvia": "Sage green",
-      "grafite": "Graphite"
+      "nessuno": "Без фон",
+      "ufficio-chiaro": "Светъл офис",
+      "blu-istituzionale": "Институционално синьо",
+      "verde-salvia": "Зелено салвия",
+      "grafite": "Графит"
     }
   },
   "garden": {
@@ -3784,7 +3784,7 @@
     "classicView": "Класически изглед",
     "changeAvatar": "Смени аватара",
     "peopleInGarden": "{count, plural, =0 {Никой в градината} one {1 човек в градината} other {# души в градината}}",
-    "guestName": "Guest",
+    "guestName": "Гост",
     "hintKeyboard": "Движете се с WASD или стрелките",
     "pickerTitle": "Изберете своя аватар",
     "pickerHelp": "Персонажът Ви представлява в градината на изчакване. Можете да го промените по всяко време.",
@@ -3793,11 +3793,11 @@
     "hintJoystick": "Влачете, за да се движите"
   },
   "feedbackAdmin": {
-    "title": "Feedback results",
-    "totalVotes": "responses",
-    "noFeedback": "No feedback received",
-    "comments": "Comments",
-    "noComments": "No comments",
+    "title": "Резултати от обратната връзка",
+    "totalVotes": "отговори",
+    "noFeedback": "Няма получена обратна връзка",
+    "comments": "Коментари",
+    "noComments": "Няма коментари",
     "yes": "Да",
     "no": "Не"
   }

@@ -85,9 +85,9 @@
       "topWords": "Mest delade ord",
       "feedback": "Genomsnittligt betyg",
       "feedbackCount": "{count, plural, one {1 svar} other {# svar}}",
-      "chatQuestions": "Questions from the chat",
-      "reactionsCount": "{count, plural, one {1 reaction} other {# reactions}}",
-      "answered": "answered"
+      "chatQuestions": "Frågor från chatten",
+      "reactionsCount": "{count, plural, one {1 reaktion} other {# reaktioner}}",
+      "answered": "besvarad"
     },
     "detail": {
       "title": "Evenemangsdetaljer",
@@ -162,12 +162,12 @@
     "successMessage": "Du kommer att få ett bekräftelsemeddelande med länken till evenemanget.",
     "successScheduledMessage": "Du är anmäld! Vi har skickat ett mejl med din personliga åtkomstlänk. Lägg till evenemanget i kalendern och kom tillbaka hit strax innan det börjar.",
     "addToCalendar": "Lägg till i kalendern",
-    "enteringRoom": "We're taking you to the event waiting room.",
-    "enteringRoomHint": "Opening the room…",
+    "enteringRoom": "Vi tar dig till evenemangets väntrum.",
+    "enteringRoomHint": "Rummet öppnas…",
     "alreadyRegistered": "Du är redan anmäld till detta evenemang",
-    "resendLink": "Resend my access link",
-    "resending": "Sending…",
-    "resendSent": "If the address is registered, we've re-sent the access link by email.",
+    "resendLink": "Skicka åtkomstlänken igen",
+    "resending": "Skickar…",
+    "resendSent": "Om adressen är anmäld har vi skickat åtkomstlänken igen via e-post.",
     "backToEvent": "Tillbaka till evenemanget",
     "organization": "Organisation",
     "organizationPlaceholder": "t.ex. AGID, Ekonomiministeriet, Roms kommun",
@@ -340,23 +340,23 @@
       "reactNotAllowed": "För att reagera på meddelanden krävs din personliga länk eller moderatorlänken.",
       "editNotAllowed": "Den här länken är delad och kan därför inte redigera meddelanden.",
       "editExpired": "Mer än 15 minuter har gått: meddelandet går inte längre att redigera.",
-      "askAsQuestionLabel": "Mark as a question",
-      "placeholderQuestion": "Write your question...",
-      "lensGroupLabel": "Filter messages",
-      "lensAll": "All",
-      "lensQuestions": "Questions ({count})",
-      "lensAnnounceAll": "Listing all messages",
-      "lensAnnounceQuestions": "Listing {count, plural, =0 {no questions} one {1 question} other {# questions}}",
-      "questionOpen": "Question",
-      "questionAnswered": "Answered",
-      "questionDismissed": "Won't be taken",
-      "questionMarkAnswered": "Mark answered",
-      "questionReopen": "Reopen",
-      "questionDismiss": "Dismiss",
-      "questionRestore": "Restore",
-      "questionStatusFailed": "Could not update the question",
-      "questionNeedsText": "Type the text of your question: an attachment alone does not enter the queue",
-      "lensTruncated": "Only the most recent messages are loaded: there may be older questions not listed."
+      "askAsQuestionLabel": "Markera som fråga",
+      "placeholderQuestion": "Skriv din fråga...",
+      "lensGroupLabel": "Filtrera meddelanden",
+      "lensAll": "Alla",
+      "lensQuestions": "Frågor ({count})",
+      "lensAnnounceAll": "Visar: alla meddelanden",
+      "lensAnnounceQuestions": "Visar: {count, plural, =0 {inga frågor} one {1 fråga} other {# frågor}}",
+      "questionOpen": "Fråga",
+      "questionAnswered": "Besvarad",
+      "questionDismissed": "Kommer inte att tas upp",
+      "questionMarkAnswered": "Markera som besvarad",
+      "questionReopen": "Öppna igen",
+      "questionDismiss": "Avfärda",
+      "questionRestore": "Återställ",
+      "questionStatusFailed": "Det gick inte att uppdatera frågan",
+      "questionNeedsText": "Skriv texten till din fråga: en bilaga ensam hamnar inte i kön",
+      "lensTruncated": "Endast de senaste meddelandena är inlästa: det kan finnas äldre frågor som inte visas i listan."
     },
     "role": {
       "moderator": "Moderator",
@@ -417,7 +417,7 @@
       "live": "👥 {count, plural, one {# person} other {# personer}}"
     },
     "sidebarTabChatUnread": "Nya olästa meddelanden",
-    "sidebarTabPollsOpen": "Open poll you have not voted in yet",
+    "sidebarTabPollsOpen": "Öppen omröstning där du ännu inte har röstat",
     "floatingControlsLabel": "Evenemangskontroller",
     "screenshareActive": "🖥️ {name} delar sin skärm",
     "screenshareFallbackName": "En deltagare",
@@ -441,7 +441,7 @@
       "remainingLabel": "Återstående tid (klicka för förfluten tid)",
       "elapsedLabel": "Förfluten tid (klicka för återstående tid)"
     },
-    "videoCallFrameTitle": "Event video call"
+    "videoCallFrameTitle": "Evenemangets videosamtal"
   },
   "qa": {
     "title": "Frågor och svar",
@@ -764,7 +764,7 @@
         "retentionHelp": "Efter denna gräns raderas personuppgifter automatiskt.",
         "gdprTemplate": "Integritetsmall",
         "gdprTemplateNone": "— Använd anpassad text —",
-        "gdprTemplateUnknown": "The selected privacy notice template no longer exists: pick another one or go back to custom text",
+        "gdprTemplateUnknown": "Den valda mallen för integritetsmeddelandet finns inte längre: välj en annan eller gå tillbaka till anpassad text",
         "privacyText": "Integritetspolicy (text)",
         "moderatorHeading": "Moderatorkontakt",
         "moderatorPublishHint": "Namn och e-postadress krävs för att publicera evenemanget (de används för moderatorlänken och bekräftelsemejlet). De krävs inte för att spara som utkast.",
@@ -781,8 +781,8 @@
       },
       "validationFailed": "Kontrollera de markerade fälten innan du fortsätter.",
       "partialFailure": "Evenemanget skapades, men vissa delar sparades inte: {items}. Du kan lägga till dem från evenemangets sida.",
-      "partialFailureEdit": "The event changes were saved, but these could not be: {items}. Your work is still here: fix them and save again.",
-      "partialFailureEditDetail": "The event changes were saved, but these could not be: {items}. The server replied: {reason}. Your work is still here: fix them and save again.",
+      "partialFailureEdit": "Ändringarna av evenemanget har sparats, men följande kunde inte sparas: {items}. Ditt arbete finns kvar här: rätta till och spara igen.",
+      "partialFailureEditDetail": "Ändringarna av evenemanget har sparats, men följande kunde inte sparas: {items}. Servern svarade: {reason}. Ditt arbete finns kvar här: rätta till och spara igen.",
       "draftFound": "Vi hittade ett osparat utkast av det här evenemanget. Vill du återställa det?",
       "draftRestore": "Återställ utkastet",
       "draftDiscard": "Ignorera",
@@ -792,7 +792,7 @@
         "moderators": "moderatorer",
         "speakers": "talare",
         "materials": "material",
-        "questionnaires": "questionnaires"
+        "questionnaires": "enkäter"
       }
     },
     "nav": {
@@ -1210,8 +1210,8 @@
       "recordingEnabled": "Aktivera videoinspelning",
       "agendaEnabled": "Live-anteckningar / checklista (agenda)",
       "agendaEnabledDesc": "En checklista över ämnen som ska tas upp och som moderatorerna bockar av under evenemanget. Den används i den automatiska sammanfattningen. Valfri och kan aktiveras även under evenemanget.",
-      "wordCloudEnabled": "Live word cloud",
-      "wordCloudEnabledDesc": "Participants send a word and the cloud updates live. Useful to open a discussion or gather a feeling in a few seconds.",
+      "wordCloudEnabled": "Ordmoln live",
+      "wordCloudEnabledDesc": "Deltagarna skickar ett ord och molnet uppdateras live. Användbart för att öppna en diskussion eller fånga en stämning på några sekunder.",
       "whiteboardEnabled": "Delad whiteboard",
       "whiteboardEnabledDesc": "Aktiverar den inbyggda samarbetswhiteboarden (Excalidraw): moderatorerna kan öppna den från verktygsfältet under evenemanget. Alltid på i snabbsamtal.",
       "autoStartRecording": "Starta inspelningen automatiskt",
@@ -1448,20 +1448,20 @@
         "graceSection": "Mjuk avslutning (slut på evenemang)",
         "eventGracePeriodMinutes": "Minuter respit efter endsAt (standard)",
         "eventGracePeriodMinutesHelp": "Extra tid som ges efter den planerade sluttiden innan samtalet stängs. 0 = hård stopp, -1 = aldrig auto-stäng (lämnas till idle-cleanup), 15 = banner och stängning efter 15 min. Varje evenemang kan åsidosätta.",
-        "videoQualitySection": "Video/audio quality",
-        "videoQuality": "Default quality",
-        "videoQualityHelp": "Preset applied to every event (overridable per event). Higher quality needs more bandwidth — “High” is the best trade-off. Takes effect immediately, no restart.",
+        "videoQualitySection": "Video-/ljudkvalitet",
+        "videoQuality": "Standardkvalitet",
+        "videoQualityHelp": "Förinställning som tillämpas på alla evenemang (kan ändras per evenemang). Ju högre kvalitet, desto mer bandbredd krävs: ”Hög” är den bästa avvägningen. Gäller direkt, utan omstart.",
         "videoQualityOptions": {
-          "MAX": "Maximum — 1080p",
-          "HIGH": "High — 720p (recommended)",
-          "BALANCED": "Balanced — 540p",
-          "SAVE_DATA": "Save data — 360p"
+          "MAX": "Maximal — 1080p",
+          "HIGH": "Hög — 720p (rekommenderas)",
+          "BALANCED": "Balanserad — 540p",
+          "SAVE_DATA": "Spara data — 360p"
         },
         "videoQualityDesc": {
-          "MAX": "Full HD 1080p, up to ~4 Mbps, stereo Opus 510 kbps audio. Top fidelity for small high-stakes calls — uses more bandwidth and loads the bridge more.",
-          "HIGH": "720p with a capped bitrate (~2.2 Mbps peak) and 96 kbps Opus audio. Great quality without maxing bandwidth: the recommended production trade-off.",
-          "BALANCED": "540p with a contained bitrate (~1 Mbps) and fewer simultaneous incoming videos. Good for large audiences or weak networks.",
-          "SAVE_DATA": "360p at minimal bitrate (~600 kbps) with unused-layer suspension. For very slow connections."
+          "MAX": "Full HD 1080p, bithastighet upp till ~4 Mbit/s, Opus-stereoljud 510 kbit/s. Högsta återgivning för små, viktiga samtal — använder mer bandbredd och belastar videobryggan mer.",
+          "HIGH": "720p med begränsad bithastighet (~2,2 Mbit/s i topp) och Opus-ljud 96 kbit/s. Mycket bra kvalitet utan att mätta bandbredden: den rekommenderade avvägningen för produktion.",
+          "BALANCED": "540p med måttlig bithastighet (~1 Mbit/s) och färre samtidigt mottagna videoströmmar. Lämpligt för stor publik eller svaga nätverk.",
+          "SAVE_DATA": "360p med minimal bithastighet (~600 kbit/s) och vilande oanvända lager. För mycket långsamma anslutningar."
         }
       },
       "header": {
@@ -1521,18 +1521,18 @@
         "descriptionHelp": "Beskrivning för sökmotorer och delning på sociala medier",
         "image": "Open Graph-bild",
         "imageHelp": "Standardbild för delning på sociala medier (1200x630 rekommenderat)",
-        "ogSection": "Shared link preview",
-        "ogIntro": "When someone pastes an event link into a chat or a social network, the platform draws a preview image with the details inside it. Choose which ones: every extra field takes room away from the title.",
-        "ogCardEnabled": "Generate the preview",
-        "ogCardEnabledHelp": "When off, the link shows the poster as is (or the site logo if the event has none), with no readable title or date in the image.",
-        "ogShowPoster": "Poster as background",
-        "ogShowPosterHelp": "Uses the event cover as the preview background, dimmed so the text stays readable. With no poster, or with this off, the institutional colour and the logo remain.",
-        "ogShowDate": "Date and time",
-        "ogShowDateHelp": "In the platform's default time zone.",
-        "ogShowSpeakers": "Speakers",
-        "ogShowSpeakersHelp": "The event's speaker text, shortened when too long.",
+        "ogSection": "Förhandsvisning av delade länkar",
+        "ogIntro": "När någon klistrar in länken till ett evenemang i en chatt eller på sociala medier ritar plattformen en förhandsvisningsbild med uppgifterna i. Välj vilka: varje extra fält tar plats från titeln.",
+        "ogCardEnabled": "Skapa förhandsvisningen",
+        "ogCardEnabledHelp": "Avstängt visar länken affischen som den är (eller webbplatsens logotyp om evenemanget saknar affisch), utan läsbar titel eller datum i bilden.",
+        "ogShowPoster": "Affisch som bakgrund",
+        "ogShowPosterHelp": "Använder evenemangets omslag som bakgrund för förhandsvisningen, nedtonat så att texten förblir läsbar. Utan affisch, eller med detta avstängt, visas den institutionella färgen med logotypen.",
+        "ogShowDate": "Datum och tid",
+        "ogShowDateHelp": "I plattformens standardtidszon.",
+        "ogShowSpeakers": "Talare",
+        "ogShowSpeakersHelp": "Evenemangets text om talare, förkortad om den är för lång.",
         "ogShowOrganization": "Organisation",
-        "ogShowOrganizationHelp": "The event organiser when set, otherwise the organisation name."
+        "ogShowOrganizationHelp": "Evenemangets arrangör om den anges, annars organisationens namn."
       },
       "homepage": {
         "modeLabel": "Startsideläge",
@@ -1550,12 +1550,12 @@
             "description": "Anpassat HTML-innehåll + evenemangslista"
           },
           "LANDING_ISTITUZIONALE": {
-            "title": "Institutional landing",
-            "description": "Organisation, next event in the spotlight and the others listed. No technical language"
+            "title": "Institutionell landningssida",
+            "description": "Organisationen, nästa evenemang framhävt och övriga i en lista. Inget tekniskt språk"
           },
           "LANDING_SEMPLICE": {
-            "title": "Plain-language landing",
-            "description": "Few words and a single invitation, for people new to online events"
+            "title": "Landningssida på klarspråk",
+            "description": "Få ord och en enda inbjudan, för den som inte är van vid onlineevenemang"
           }
         },
         "customHtmlLabel": "Anpassat HTML-innehåll",
@@ -2023,7 +2023,7 @@
       "chatSseConnections": "SSE-anslutningar",
       "chatSseSubtitle": "aktiva prenumeranter",
       "redisConnectedClients": "Redis-klienter",
-      "redisConnectedSubtitle": "publishers + subscribers",
+      "redisConnectedSubtitle": "utgivare + prenumeranter",
       "redisPubsubChannels": "Pub/sub-kanaler",
       "redisPubsubSubtitle": "= evenemang med aktiv chatt",
       "chartRedisMemory": "Redis-minne",
@@ -2523,20 +2523,20 @@
       "generateAi": "Generera AI",
       "generateAiConfirm": "Kör AI-pipelinen (transkription och sammanfattning) på den här inspelningen. AI-bearbetning aktiveras för evenemanget och startar i bakgrunden. Översättningar läggs till efteråt, ett språk i taget, från fliken ”Översättningar”.",
       "generateAiOk": "AI-pipelinen har startat.",
-      "originalToggle": "Show original text",
-      "originalToggleHint": "Show, under each corrected line, the text as the automatic transcription produced it",
-      "originalNotComparable": "The number of lines has changed from the original version: a line-by-line comparison is not possible",
-      "originalLabel": "Original text:",
-      "revisedBadge": "Edited by a person",
-      "revisedHint": "At least one line was corrected by a person after the automatic transcription",
-      "redactLabel": "Erase from the original too",
-      "redactHint": "Use for an erasure request: the changes also apply to the preserved machine text, which would otherwise keep the removed sentence",
-      "redactSave": "Save and erase from the original",
-      "redactSaved": "{n, plural, one {1 line also removed from the original text} other {# lines also removed from the original text}}",
-      "redactNothingRemoved": "The corrections were saved, but there was nothing to remove from the original text for the lines you touched",
-      "redactArchiveFailed": "The corrections were saved to the database, but rewriting the archived file failed: the removed sentence is still downloadable from there. Try the removal again",
-      "originalUncertain": "Origin not certain",
-      "originalUncertainHint": "The preserved text may already include corrections made before this feature existed: it cannot be proven to be what the automatic transcription produced"
+      "originalToggle": "Visa originaltext",
+      "originalToggleHint": "Visar under varje korrigerad rad texten så som den automatiska transkriberingen hade tagit fram den",
+      "originalNotComparable": "Antalet rader har ändrats jämfört med originalversionen: en jämförelse rad för rad är inte möjlig",
+      "originalLabel": "Originaltext:",
+      "revisedBadge": "Manuellt granskad",
+      "revisedHint": "Minst en rad har korrigerats av en person efter den automatiska transkriberingen",
+      "redactLabel": "Radera även från originalet",
+      "redactHint": "Används vid en begäran om radering: ändringarna tillämpas även på den bevarade maskintexten, som annars skulle behålla den borttagna meningen",
+      "redactSave": "Spara och radera från originalet",
+      "redactSaved": "{n, plural, one {1 rad raderad även från originaltexten} other {# rader raderade även från originaltexten}}",
+      "redactNothingRemoved": "Korrigeringarna har sparats, men i originaltexten fanns inget att radera för de ändrade raderna",
+      "redactArchiveFailed": "Korrigeringarna har sparats i databasen, men omskrivningen av den arkiverade filen misslyckades: den borttagna meningen kan fortfarande laddas ned därifrån. Försök radera igen",
+      "originalUncertain": "Osäkert ursprung",
+      "originalUncertainHint": "Den bevarade texten kan redan innehålla korrigeringar gjorda innan den här funktionen fanns: det går inte att visa att det är den text som den automatiska transkriberingen tog fram"
     },
     "questionnairesPage": {
       "title": "Enkäter",
@@ -2674,47 +2674,47 @@
       }
     },
     "institutional": {
-      "title": "Online meetings and events",
-      "nextTitle": "Next event",
-      "nextCta": "Go to the event and sign up",
-      "othersTitle": "Other events",
-      "pointsTitle": "How to take part",
+      "title": "Onlinemöten och evenemang",
+      "nextTitle": "Nästa evenemang",
+      "nextCta": "Gå till evenemanget och anmäl dig",
+      "othersTitle": "Övriga evenemang",
+      "pointsTitle": "Så deltar du",
       "points": {
         "noInstall": {
-          "title": "Join from your browser",
-          "body": "No software to install: just open the link you receive."
+          "title": "Delta från webbläsaren",
+          "body": "Du behöver inte installera några program: öppna bara länken du får."
         },
         "accessible": {
-          "title": "Designed for everyone",
-          "body": "Captions, keyboard and screen readers: the room works without a mouse too."
+          "title": "Utformat för alla",
+          "body": "Undertexter, tangentbord och skärmläsare: rummet går att använda även utan mus."
         },
         "privacy": {
-          "title": "Your data, handled with care",
-          "body": "Only what sign-up requires is collected, and you can ask for it back or have it deleted."
+          "title": "Uppgifter som hanteras med omsorg",
+          "body": "Endast de uppgifter som krävs för anmälan samlas in, och du kan begära att få ut dem eller få dem raderade."
         }
       }
     },
     "simple": {
-      "title": "Online meetings by {organization}",
-      "subtitle": "Join from your computer or phone, with nothing to install.",
-      "cta": "Join the next meeting",
-      "noEvents": "No meetings are scheduled right now. Check back soon.",
-      "stepsTitle": "How it works",
+      "title": "Onlinemöten från {organization}",
+      "subtitle": "Delta från datorn eller telefonen, utan att installera något.",
+      "cta": "Delta i nästa möte",
+      "noEvents": "Just nu finns inga möten planerade. Titta in igen snart.",
+      "stepsTitle": "Så går det till",
       "steps": {
         "choose": {
-          "title": "Pick a meeting",
-          "body": "Each one shows its date and time."
+          "title": "Välj ett möte",
+          "body": "Vid varje möte står datum och tid."
         },
         "name": {
-          "title": "Leave your name",
-          "body": "Your name and email address are all it takes to get the link."
+          "title": "Lämna ditt namn",
+          "body": "Det räcker med namn och e-postadress för att få länken."
         },
         "enter": {
-          "title": "Join",
-          "body": "At the right time, open the link: you are in."
+          "title": "Delta",
+          "body": "Öppna länken vid rätt tid: du är inne."
         }
       },
-      "listTitle": "Upcoming meetings"
+      "listTitle": "Kommande möten"
     }
   },
   "polls": {
@@ -2744,8 +2744,8 @@
       "questionRequired": "Skriv omröstningsfrågan",
       "minOptions": "Minst 2 alternativ krävs",
       "generic": "Fel vid skapande av omröstning",
-      "vote": "Vote not recorded. Try again.",
-      "alreadyVoted": "You have already voted in this poll."
+      "vote": "Rösten registrerades inte. Försök igen.",
+      "alreadyVoted": "Du har redan röstat i den här omröstningen."
     }
   },
   "materials": {
@@ -2807,10 +2807,10 @@
       "emailInvalid": "Ange en giltig e-postadress",
       "submit": "Begär mina uppgifter",
       "loading": "Söker...",
-      "requestSubmittedTitle": "Check your inbox",
-      "requestSubmittedBody": "If this email matches a registration, we've sent you a link to download your data. The link is valid for 1 hour.",
-      "linkInvalid": "This link is invalid or expired. Please request a new link.",
-      "requestNew": "Request a new link",
+      "requestSubmittedTitle": "Kontrollera din inkorg",
+      "requestSubmittedBody": "Om e-postadressen motsvarar en anmälan har vi skickat en länk för att ladda ned dina uppgifter. Länken är giltig i 1 timme.",
+      "linkInvalid": "Länken är ogiltig eller har gått ut. Begär en ny länk.",
+      "requestNew": "Begär en ny länk",
       "noData": "Inga uppgifter hittades för denna e-postadress.",
       "error": "Ett fel uppstod. Försök igen senare.",
       "rateLimited": "För många förfrågningar. Försök igen om en timme.",
@@ -2825,30 +2825,30 @@
       "questionsTitle": "Q&A-frågor",
       "pollVotesTitle": "Omröstningsröster",
       "optionLabel": "Alternativ",
-      "erasureCtaTitle": "Want to delete your data?",
-      "erasureCtaBody": "You can request full erasure of the data tied to your email (GDPR Art. 17).",
-      "erasureCtaButton": "Request erasure"
+      "erasureCtaTitle": "Vill du radera dina uppgifter?",
+      "erasureCtaBody": "Du kan begära fullständig radering av de uppgifter som är kopplade till din e-postadress (GDPR art. 17).",
+      "erasureCtaButton": "Begär radering"
     },
     "erasure": {
-      "title": "Erase your data",
-      "subtitle": "Confirm the erasure of the personal data tied to your email address (GDPR Art. 17).",
-      "emailLabel": "Your email address",
-      "emailPlaceholder": "Enter the email used for registration",
-      "emailInvalid": "Please enter a valid email address",
-      "submit": "Request erasure",
-      "requestSubmittedTitle": "Check your inbox",
-      "requestSubmittedBody": "If this email matches a registration, we've sent you a link to confirm the erasure. The link is valid for 1 hour.",
-      "linkInvalid": "This link is invalid or expired. Please request a new link.",
-      "confirmWarning": "You are about to permanently erase all personal data tied to your email.",
-      "confirmBody": "Registrations, questions, poll votes, feedback and reminders will be deleted. This action is irreversible.",
-      "confirmButton": "Confirm erasure",
-      "cancel": "Cancel",
-      "processing": "Deleting...",
-      "doneTitle": "Erasure completed",
-      "doneBody": "{count} registrations and the linked data have been deleted.",
-      "error": "An error occurred. Please try again later.",
-      "rateLimited": "Too many requests. Please try again in one hour.",
-      "back": "Back to my data"
+      "title": "Radering av dina uppgifter",
+      "subtitle": "Bekräfta raderingen av de personuppgifter som är kopplade till din e-postadress (GDPR art. 17).",
+      "emailLabel": "Din e-postadress",
+      "emailPlaceholder": "Ange den e-post du använde vid anmälan",
+      "emailInvalid": "Ange en giltig e-postadress",
+      "submit": "Begär radering",
+      "requestSubmittedTitle": "Kontrollera din inkorg",
+      "requestSubmittedBody": "Om e-postadressen motsvarar en anmälan har vi skickat en länk för att bekräfta raderingen. Länken är giltig i 1 timme.",
+      "linkInvalid": "Länken är ogiltig eller har gått ut. Begär en ny länk.",
+      "confirmWarning": "Du håller på att permanent radera alla personuppgifter som är kopplade till din e-postadress.",
+      "confirmBody": "Anmälningar, frågor, röster i omröstningar, återkoppling och påminnelser raderas. Åtgärden kan inte ångras.",
+      "confirmButton": "Bekräfta radering",
+      "cancel": "Avbryt",
+      "processing": "Raderar...",
+      "doneTitle": "Raderingen är klar",
+      "doneBody": "Raderade anmälningar: {count}, tillsammans med tillhörande uppgifter.",
+      "error": "Ett fel uppstod. Försök igen senare.",
+      "rateLimited": "För många förfrågningar. Försök igen om en timme.",
+      "back": "Tillbaka till mina uppgifter"
     }
   },
   "legal": {
@@ -3617,8 +3617,8 @@
     "nameLabel": "Ditt namn",
     "nameHelp": "Visas för andra deltagare",
     "joinNowBtn": "Anslut nu",
-    "roomOpen": "The room is open",
-    "whileYouWait": "While you wait",
+    "roomOpen": "Rummet är öppet",
+    "whileYouWait": "Medan du väntar",
     "openingAt": "Öppnas {time}",
     "netiquetteTitle": "Goda råd för deltagande",
     "netiquetteBullet1": "Kom några minuter tidigare för att testa mikrofon och webbkamera",
@@ -3638,8 +3638,8 @@
     "emailHelp": "Endast för eventuell uppföljning efter evenemanget",
     "emailInvalid": "Ange en giltig e-postadress",
     "chatLockedMessage": "Ange ditt namn för att delta i evenemangets chatt.",
-    "classicView": "Classic view",
-    "backToGarden": "Back to the park",
+    "classicView": "Klassisk vy",
+    "backToGarden": "Tillbaka till parken",
     "aiNoticeTitle": "AI-bearbetning efter evenemanget",
     "aiNotice": "När det är slut bearbetas inspelningen av AI-verktyg för att skapa transkription, sammanfattning och eventuella översättningar och dubbning. Resultaten kan innehålla felaktigheter; videon är fortfarande den auktoritativa källan.",
     "multitrackConsentTitle": "Inspelning per deltagare",
@@ -3768,15 +3768,15 @@
     "micToggleOff": "Mikrofon AV",
     "cameraOffPreview": "Kamera avstängd",
     "speakerTest": "🔊 Testa ljud",
-    "backgroundLabel": "Virtual background",
+    "backgroundLabel": "Virtuell bakgrund",
     "backgroundNoneShort": "No",
-    "backgroundHint": "Applied when you enter the room. To blur your background use the backgrounds button once inside: the preview above shows the camera without effects.",
+    "backgroundHint": "Tillämpas när du går in i rummet. För att göra bakgrunden suddig använder du bakgrundsknappen när du är inne: förhandsvisningen ovan visar kameran utan effekt.",
     "background": {
-      "nessuno": "No background",
-      "ufficio-chiaro": "Light office",
-      "blu-istituzionale": "Institutional blue",
-      "verde-salvia": "Sage green",
-      "grafite": "Graphite"
+      "nessuno": "Ingen bakgrund",
+      "ufficio-chiaro": "Ljust kontor",
+      "blu-istituzionale": "Institutionell blå",
+      "verde-salvia": "Salviagrön",
+      "grafite": "Grafit"
     }
   },
   "garden": {
@@ -3784,7 +3784,7 @@
     "classicView": "Klassisk vy",
     "changeAvatar": "Byt avatar",
     "peopleInGarden": "{count, plural, =0 {Ingen i trädgården} one {1 person i trädgården} other {# personer i trädgården}}",
-    "guestName": "Guest",
+    "guestName": "Gäst",
     "hintKeyboard": "Rör dig med WASD eller piltangenterna",
     "pickerTitle": "Välj din avatar",
     "pickerHelp": "Karaktären representerar dig i väntrummets trädgård. Du kan byta när du vill.",
@@ -3793,11 +3793,11 @@
     "hintJoystick": "Dra för att röra dig"
   },
   "feedbackAdmin": {
-    "title": "Feedback results",
-    "totalVotes": "responses",
-    "noFeedback": "No feedback received",
-    "comments": "Comments",
-    "noComments": "No comments",
+    "title": "Återkopplingsresultat",
+    "totalVotes": "svar",
+    "noFeedback": "Ingen återkoppling mottagen",
+    "comments": "Kommentarer",
+    "noComments": "Inga kommentarer",
     "yes": "Ja",
     "no": "Nej"
   }

@@ -85,9 +85,9 @@
       "topWords": "Leggyakrabban megosztott szavak",
       "feedback": "Átlagos értékelés",
       "feedbackCount": "{count, plural, one {1 válasz} other {# válasz}}",
-      "chatQuestions": "Questions from the chat",
-      "reactionsCount": "{count, plural, one {1 reaction} other {# reactions}}",
-      "answered": "answered"
+      "chatQuestions": "Kérdések a chatből",
+      "reactionsCount": "{count, plural, one {1 reakció} other {# reakció}}",
+      "answered": "megválaszolva"
     },
     "detail": {
       "title": "Esemény részletei",
@@ -162,12 +162,12 @@
     "successMessage": "Visszaigazoló e-mailt kap az eseményhez való hozzáférési linkkel.",
     "successScheduledMessage": "Sikeresen regisztrált! E-mailben elküldtük a személyes belépési linkjét. Vegye fel az eseményt a naptárába, és térjen vissza ide röviddel a kezdés előtt.",
     "addToCalendar": "Hozzáadás a naptárhoz",
-    "enteringRoom": "We're taking you to the event waiting room.",
-    "enteringRoomHint": "Opening the room…",
+    "enteringRoom": "Átirányítjuk az esemény várótermébe.",
+    "enteringRoomHint": "A terem megnyitása…",
     "alreadyRegistered": "Ön már regisztrált erre az eseményre",
-    "resendLink": "Resend my access link",
-    "resending": "Sending…",
-    "resendSent": "If the address is registered, we've re-sent the access link by email.",
+    "resendLink": "Hozzáférési link újraküldése",
+    "resending": "Küldés…",
+    "resendSent": "Ha a cím regisztrálva van, e-mailben újra elküldtük a hozzáférési linket.",
     "backToEvent": "Vissza az eseményhez",
     "organization": "Szervezet",
     "organizationPlaceholder": "pl. AGID, Gazdasági Minisztérium, Budapest Főváros",
@@ -340,23 +340,23 @@
       "reactNotAllowed": "Az üzenetekre való reagáláshoz személyes vagy moderátori link szükséges.",
       "editNotAllowed": "Ez egy megosztott link: nem teszi lehetővé az üzenetek szerkesztését.",
       "editExpired": "Több mint 15 perc telt el: az üzenet már nem szerkeszthető.",
-      "askAsQuestionLabel": "Mark as a question",
-      "placeholderQuestion": "Write your question...",
-      "lensGroupLabel": "Filter messages",
-      "lensAll": "All",
-      "lensQuestions": "Questions ({count})",
-      "lensAnnounceAll": "Listing all messages",
-      "lensAnnounceQuestions": "Listing {count, plural, =0 {no questions} one {1 question} other {# questions}}",
-      "questionOpen": "Question",
-      "questionAnswered": "Answered",
-      "questionDismissed": "Won't be taken",
-      "questionMarkAnswered": "Mark answered",
-      "questionReopen": "Reopen",
-      "questionDismiss": "Dismiss",
-      "questionRestore": "Restore",
-      "questionStatusFailed": "Could not update the question",
-      "questionNeedsText": "Type the text of your question: an attachment alone does not enter the queue",
-      "lensTruncated": "Only the most recent messages are loaded: there may be older questions not listed."
+      "askAsQuestionLabel": "Megjelölés kérdésként",
+      "placeholderQuestion": "Írja be a kérdését...",
+      "lensGroupLabel": "Üzenetek szűrése",
+      "lensAll": "Összes",
+      "lensQuestions": "Kérdések ({count})",
+      "lensAnnounceAll": "Listázva: minden üzenet",
+      "lensAnnounceQuestions": "Listázva: {count, plural, =0 {nincs kérdés} one {1 kérdés} other {# kérdés}}",
+      "questionOpen": "Kérdés",
+      "questionAnswered": "Megválaszolva",
+      "questionDismissed": "Nem kerül sorra",
+      "questionMarkAnswered": "Megválaszoltnak jelölés",
+      "questionReopen": "Újranyitás",
+      "questionDismiss": "Elvetés",
+      "questionRestore": "Visszaállítás",
+      "questionStatusFailed": "Nem sikerült frissíteni a kérdést",
+      "questionNeedsText": "Írja be a kérdés szövegét: önmagában egy melléklet nem kerül a sorba",
+      "lensTruncated": "Csak a legfrissebb üzenetek vannak betöltve: régebbi kérdések hiányozhatnak a listából."
     },
     "role": {
       "moderator": "Moderátor",
@@ -417,7 +417,7 @@
       "live": "👥 {count, plural, one {# fő} other {# fő}}"
     },
     "sidebarTabChatUnread": "Új, olvasatlan üzenetek",
-    "sidebarTabPollsOpen": "Open poll you have not voted in yet",
+    "sidebarTabPollsOpen": "Nyitott szavazás, amelyen még nem szavazott",
     "floatingControlsLabel": "Eseményvezérlők",
     "screenshareActive": "🖥️ {name} képernyőt oszt meg",
     "screenshareFallbackName": "Egy résztvevő",
@@ -441,7 +441,7 @@
       "remainingLabel": "Hátralévő idő (kattintson az eltelt időért)",
       "elapsedLabel": "Eltelt idő (kattintson a hátralévő időért)"
     },
-    "videoCallFrameTitle": "Event video call"
+    "videoCallFrameTitle": "Az esemény videohívása"
   },
   "qa": {
     "title": "Kérdések és válaszok",
@@ -764,7 +764,7 @@
         "retentionHelp": "E küszöb után a személyes adatok automatikusan törlődnek.",
         "gdprTemplate": "Adatvédelmi sablon",
         "gdprTemplateNone": "— Egyedi szöveg használata —",
-        "gdprTemplateUnknown": "The selected privacy notice template no longer exists: pick another one or go back to custom text",
+        "gdprTemplateUnknown": "A kiválasztott adatvédelmi sablon már nem létezik: válasszon másikat, vagy térjen vissza az egyéni szöveghez",
         "privacyText": "Adatvédelmi tájékoztató (szöveg)",
         "moderatorHeading": "Moderátor elérhetősége",
         "moderatorPublishHint": "Az esemény közzétételéhez a név és az e-mail-cím megadása kötelező (ezek szükségesek a moderátori linkhez és a visszaigazoló e-mailhez). Piszkozatként való mentéshez nem kötelezőek.",
@@ -781,8 +781,8 @@
       },
       "validationFailed": "Folytatás előtt ellenőrizze a kiemelt mezőket.",
       "partialFailure": "Az esemény létrejött, de néhány elem nem lett elmentve: {items}. Ezeket az esemény oldaláról adhatja hozzá.",
-      "partialFailureEdit": "The event changes were saved, but these could not be: {items}. Your work is still here: fix them and save again.",
-      "partialFailureEditDetail": "The event changes were saved, but these could not be: {items}. The server replied: {reason}. Your work is still here: fix them and save again.",
+      "partialFailureEdit": "Az esemény módosításai mentésre kerültek, de a következőket nem sikerült menteni: {items}. A munkája megmaradt: javítsa, és mentse újra.",
+      "partialFailureEditDetail": "Az esemény módosításai mentésre kerültek, de a következőket nem sikerült menteni: {items}. A szerver válasza: {reason}. A munkája megmaradt: javítsa, és mentse újra.",
       "draftFound": "Találtunk egy el nem mentett piszkozatot ehhez az eseményhez. Visszaállítja?",
       "draftRestore": "Piszkozat visszaállítása",
       "draftDiscard": "Elvetés",
@@ -792,7 +792,7 @@
         "moderators": "moderátorok",
         "speakers": "előadók",
         "materials": "anyagok",
-        "questionnaires": "questionnaires"
+        "questionnaires": "kérdőívek"
       }
     },
     "nav": {
@@ -1210,8 +1210,8 @@
       "recordingEnabled": "Videofelvétel engedélyezése",
       "agendaEnabled": "Élő jegyzetek / ellenőrzőlista (napirend)",
       "agendaEnabledDesc": "A megtárgyalandó pontok ellenőrzőlistája, amelyet a moderátorok az esemény során kipipálnak. Beépül az automatikus összefoglalóba. Nem kötelező, és az esemény közben is bekapcsolható.",
-      "wordCloudEnabled": "Live word cloud",
-      "wordCloudEnabledDesc": "Participants send a word and the cloud updates live. Useful to open a discussion or gather a feeling in a few seconds.",
+      "wordCloudEnabled": "Élő szófelhő",
+      "wordCloudEnabledDesc": "A résztvevők beküldenek egy szót, és a felhő élőben frissül. Hasznos egy beszélgetés elindításához vagy a hangulat néhány másodperc alatti felméréséhez.",
       "whiteboardEnabled": "Megosztott tábla",
       "whiteboardEnabledDesc": "Bekapcsolja a beépített, együttműködésre szolgáló táblát (Excalidraw): a moderátorok az esemény alatt az eszköztárból nyithatják meg. Az azonnali hívásokban mindig aktív.",
       "autoStartRecording": "Felvétel automatikus indítása",
@@ -1448,20 +1448,20 @@
         "graceSection": "Soft exit (esemény vége)",
         "eventGracePeriodMinutes": "Türelmi percek endsAt után (alapértelmezett)",
         "eventGracePeriodMinutesHelp": "A tervezett befejezési időpont után a hívás lezárásáig engedélyezett extra idő. 0 = kemény leállás, -1 = ne záruljon automatikusan (az inaktivitási cleanup dönt), 15 = banner, majd 15 perc utáni lezárás. Eseményenként felülbírálható.",
-        "videoQualitySection": "Video/audio quality",
-        "videoQuality": "Default quality",
-        "videoQualityHelp": "Preset applied to every event (overridable per event). Higher quality needs more bandwidth — “High” is the best trade-off. Takes effect immediately, no restart.",
+        "videoQualitySection": "Videó- és hangminőség",
+        "videoQuality": "Alapértelmezett minőség",
+        "videoQualityHelp": "Minden eseményre alkalmazott beállítás (eseményenként felülírható). Minél jobb a minőség, annál több sávszélesség kell: a „Magas” a legjobb kompromisszum. Azonnal érvényes, újraindítás nélkül.",
         "videoQualityOptions": {
-          "MAX": "Maximum — 1080p",
-          "HIGH": "High — 720p (recommended)",
-          "BALANCED": "Balanced — 540p",
-          "SAVE_DATA": "Save data — 360p"
+          "MAX": "Maximális — 1080p",
+          "HIGH": "Magas — 720p (ajánlott)",
+          "BALANCED": "Kiegyensúlyozott — 540p",
+          "SAVE_DATA": "Adattakarékos — 360p"
         },
         "videoQualityDesc": {
-          "MAX": "Full HD 1080p, up to ~4 Mbps, stereo Opus 510 kbps audio. Top fidelity for small high-stakes calls — uses more bandwidth and loads the bridge more.",
-          "HIGH": "720p with a capped bitrate (~2.2 Mbps peak) and 96 kbps Opus audio. Great quality without maxing bandwidth: the recommended production trade-off.",
-          "BALANCED": "540p with a contained bitrate (~1 Mbps) and fewer simultaneous incoming videos. Good for large audiences or weak networks.",
-          "SAVE_DATA": "360p at minimal bitrate (~600 kbps) with unused-layer suspension. For very slow connections."
+          "MAX": "Full HD 1080p, legfeljebb ~4 Mbps bitsebesség, 510 kbps-os sztereó Opus hang. Maximális hűség kis létszámú, fontos hívásokhoz — több sávszélességet használ, és jobban terheli a videóhidat.",
+          "HIGH": "720p korlátozott bitsebességgel (~2,2 Mbps csúcs) és 96 kbps-os Opus hanggal. Kiváló minőség a sávszélesség túlterhelése nélkül: az éles üzemhez ajánlott kompromisszum.",
+          "BALANCED": "540p mérsékelt bitsebességgel (~1 Mbps) és kevesebb egyidejűleg fogadott videóval. Nagy közönséghez vagy gyenge hálózatokhoz ajánlott.",
+          "SAVE_DATA": "360p minimális bitsebességgel (~600 kbps), a nem használt rétegek felfüggesztésével. Nagyon lassú kapcsolatokhoz."
         }
       },
       "header": {
@@ -1494,7 +1494,7 @@
         "parentOrganizationUrl": "Fölérendelt szervezet URL",
         "logoUrl": "Egyéni logó URL",
         "logoUrlHelp": "Hagyja üresen az alapértelmezett közigazgatási ikon használatához",
-        "faviconUrl": "Favicon URL",
+        "faviconUrl": "Favicon URL-címe",
         "primaryColor": "Elsődleges szín",
         "defaultTimezone": "Alapértelmezett időzóna",
         "defaultTimezoneHelp": "A dátumok megjelenítéséhez és új események létrehozásához használt."
@@ -1521,18 +1521,18 @@
         "descriptionHelp": "Leírás a keresőmotorok és a közösségi megosztás számára",
         "image": "Open Graph kép",
         "imageHelp": "Alapértelmezett kép a közösségi megosztáshoz (ajánlott: 1200×630)",
-        "ogSection": "Shared link preview",
-        "ogIntro": "When someone pastes an event link into a chat or a social network, the platform draws a preview image with the details inside it. Choose which ones: every extra field takes room away from the title.",
-        "ogCardEnabled": "Generate the preview",
-        "ogCardEnabledHelp": "When off, the link shows the poster as is (or the site logo if the event has none), with no readable title or date in the image.",
-        "ogShowPoster": "Poster as background",
-        "ogShowPosterHelp": "Uses the event cover as the preview background, dimmed so the text stays readable. With no poster, or with this off, the institutional colour and the logo remain.",
-        "ogShowDate": "Date and time",
-        "ogShowDateHelp": "In the platform's default time zone.",
-        "ogShowSpeakers": "Speakers",
-        "ogShowSpeakersHelp": "The event's speaker text, shortened when too long.",
-        "ogShowOrganization": "Organisation",
-        "ogShowOrganizationHelp": "The event organiser when set, otherwise the organisation name."
+        "ogSection": "Megosztott linkek előnézete",
+        "ogIntro": "Amikor valaki beilleszti egy esemény linkjét egy chatbe vagy közösségi oldalra, a platform előnézeti képet készít, benne az adatokkal. Válassza ki, melyeket: minden további mező a címtől veszi el a helyet.",
+        "ogCardEnabled": "Előnézet létrehozása",
+        "ogCardEnabledHelp": "Kikapcsolva a link a plakátot változatlanul mutatja (vagy a webhely logóját, ha az eseménynek nincs plakátja), a képen olvasható cím és dátum nélkül.",
+        "ogShowPoster": "Plakát háttérként",
+        "ogShowPosterHelp": "Az esemény borítóképét használja az előnézet háttereként, elhalványítva, hogy a szöveg olvasható maradjon. Plakát nélkül vagy kikapcsolt beállításnál az intézményi szín és a logó marad.",
+        "ogShowDate": "Dátum és időpont",
+        "ogShowDateHelp": "A platform alapértelmezett időzónájában.",
+        "ogShowSpeakers": "Előadók",
+        "ogShowSpeakersHelp": "Az esemény előadóinak szövege, túl hosszú esetén lerövidítve.",
+        "ogShowOrganization": "Szervezet",
+        "ogShowOrganizationHelp": "Az esemény szervezője, ha meg van adva, egyébként a szervezet neve."
       },
       "homepage": {
         "modeLabel": "Kezdőlap mód",
@@ -1550,12 +1550,12 @@
             "description": "Egyéni HTML tartalom + eseménylista"
           },
           "LANDING_ISTITUZIONALE": {
-            "title": "Institutional landing",
-            "description": "Organisation, next event in the spotlight and the others listed. No technical language"
+            "title": "Intézményi nyitóoldal",
+            "description": "Szervezet, kiemelt következő esemény, a többi listában. Szakzsargon nélkül"
           },
           "LANDING_SEMPLICE": {
-            "title": "Plain-language landing",
-            "description": "Few words and a single invitation, for people new to online events"
+            "title": "Közérthető nyitóoldal",
+            "description": "Kevés szó és egyetlen meghívás azoknak, akik még nem járatosak az online eseményekben"
           }
         },
         "customHtmlLabel": "Egyéni HTML tartalom",
@@ -2035,7 +2035,7 @@
       "uptime24h": "24 órás uptime",
       "uptime7d": "7 napos uptime",
       "errorRate": "Error rate",
-      "podUptime": "Pod uptime",
+      "podUptime": "Pod üzemideje",
       "oldestPod": "Legrégebbi pod",
       "latencyP50": "P50 késleltetés",
       "latencyP95": "P95 késleltetés",
@@ -2045,7 +2045,7 @@
       "participantsNow": "Aktív résztvevők",
       "jvbStress": "JVB-terhelés",
       "conferences": "Aktív konferenciák",
-      "octoRelay": "Octo inter-bridge relay",
+      "octoRelay": "Octo bridge-ek közötti relay",
       "interBridge": "Octo forgalom",
       "chartCpu": "CPU usage",
       "chartMemory": "Memory usage",
@@ -2523,20 +2523,20 @@
       "generateAi": "AI-tartalom létrehozása",
       "generateAiConfirm": "Elindítja az AI pipeline-t (átiratkészítés és összefoglaló) ezen a felvételen. Az AI-feldolgozás bekapcsol az eseményhez, és a háttérben elindul. A fordítások ezt követően, nyelvenként adhatók hozzá a „Fordítások” fülön.",
       "generateAiOk": "Az AI pipeline elindult.",
-      "originalToggle": "Show original text",
-      "originalToggleHint": "Show, under each corrected line, the text as the automatic transcription produced it",
-      "originalNotComparable": "The number of lines has changed from the original version: a line-by-line comparison is not possible",
-      "originalLabel": "Original text:",
-      "revisedBadge": "Edited by a person",
-      "revisedHint": "At least one line was corrected by a person after the automatic transcription",
-      "redactLabel": "Erase from the original too",
-      "redactHint": "Use for an erasure request: the changes also apply to the preserved machine text, which would otherwise keep the removed sentence",
-      "redactSave": "Save and erase from the original",
-      "redactSaved": "{n, plural, one {1 line also removed from the original text} other {# lines also removed from the original text}}",
-      "redactNothingRemoved": "The corrections were saved, but there was nothing to remove from the original text for the lines you touched",
-      "redactArchiveFailed": "The corrections were saved to the database, but rewriting the archived file failed: the removed sentence is still downloadable from there. Try the removal again",
-      "originalUncertain": "Origin not certain",
-      "originalUncertainHint": "The preserved text may already include corrections made before this feature existed: it cannot be proven to be what the automatic transcription produced"
+      "originalToggle": "Eredeti szöveg megjelenítése",
+      "originalToggleHint": "Minden javított sor alatt megjeleníti a szöveget úgy, ahogyan az automatikus átirat előállította",
+      "originalNotComparable": "A sorok száma megváltozott az eredeti változathoz képest: soronkénti összehasonlítás nem lehetséges",
+      "originalLabel": "Eredeti szöveg:",
+      "revisedBadge": "Kézzel ellenőrizve",
+      "revisedHint": "Legalább egy sort egy személy javított az automatikus átirat után",
+      "redactLabel": "Törlés az eredetiből is",
+      "redactHint": "Törlési kérelem esetén használja: a módosítások a gép által előállított, megőrzött szövegre is vonatkoznak, amely különben megtartaná az eltávolított mondatot",
+      "redactSave": "Mentés és törlés az eredetiből",
+      "redactSaved": "{n, plural, one {1 sor az eredeti szövegből is törölve} other {# sor az eredeti szövegből is törölve}}",
+      "redactNothingRemoved": "A javítások mentésre kerültek, de az eredeti szövegben a módosított sorokhoz nem volt mit törölni",
+      "redactArchiveFailed": "A javítások az adatbázisba mentésre kerültek, de az archivált fájl újraírása nem sikerült: az eltávolított mondat onnan továbbra is letölthető. Próbálja meg újra a törlést",
+      "originalUncertain": "Bizonytalan eredet",
+      "originalUncertainHint": "A megőrzött szöveg már tartalmazhat olyan javításokat, amelyek e funkció bevezetése előtt készültek: nem igazolható, hogy azonos az automatikus átirat által előállított szöveggel"
     },
     "questionnairesPage": {
       "title": "Kérdőívek",
@@ -2674,47 +2674,47 @@
       }
     },
     "institutional": {
-      "title": "Online meetings and events",
-      "nextTitle": "Next event",
-      "nextCta": "Go to the event and sign up",
-      "othersTitle": "Other events",
-      "pointsTitle": "How to take part",
+      "title": "Online találkozók és események",
+      "nextTitle": "Következő esemény",
+      "nextCta": "Esemény megnyitása és regisztráció",
+      "othersTitle": "További események",
+      "pointsTitle": "Hogyan lehet részt venni",
       "points": {
         "noInstall": {
-          "title": "Join from your browser",
-          "body": "No software to install: just open the link you receive."
+          "title": "Részvétel böngészőből",
+          "body": "Nem kell programot telepíteni: elég megnyitni a kapott linket."
         },
         "accessible": {
-          "title": "Designed for everyone",
-          "body": "Captions, keyboard and screen readers: the room works without a mouse too."
+          "title": "Mindenkinek tervezve",
+          "body": "Feliratok, billentyűzet és képernyőolvasók: a terem egér nélkül is használható."
         },
         "privacy": {
-          "title": "Your data, handled with care",
-          "body": "Only what sign-up requires is collected, and you can ask for it back or have it deleted."
+          "title": "Gondosan kezelt adatok",
+          "body": "Csak a regisztrációhoz szükséges adatokat gyűjtjük, és ezeket ki lehet kérni vagy törölni lehet."
         }
       }
     },
     "simple": {
-      "title": "Online meetings by {organization}",
-      "subtitle": "Join from your computer or phone, with nothing to install.",
-      "cta": "Join the next meeting",
-      "noEvents": "No meetings are scheduled right now. Check back soon.",
-      "stepsTitle": "How it works",
+      "title": "{organization} online találkozói",
+      "subtitle": "Számítógépről vagy telefonról is részt vehet, telepítés nélkül.",
+      "cta": "Részvétel a következő találkozón",
+      "noEvents": "Jelenleg nincs tervezett találkozó. Nézzen vissza később.",
+      "stepsTitle": "Hogyan működik",
       "steps": {
         "choose": {
-          "title": "Pick a meeting",
-          "body": "Each one shows its date and time."
+          "title": "Válasszon alkalmat",
+          "body": "Mindegyiknél megtalálja a dátumot és az időpontot."
         },
         "name": {
-          "title": "Leave your name",
-          "body": "Your name and email address are all it takes to get the link."
+          "title": "Adja meg a nevét",
+          "body": "A link megkapásához elég a neve és az e-mail címe."
         },
         "enter": {
-          "title": "Join",
-          "body": "At the right time, open the link: you are in."
+          "title": "Lépjen be",
+          "body": "A megadott időben nyissa meg a linket, és már bent is van."
         }
       },
-      "listTitle": "Upcoming meetings"
+      "listTitle": "Következő találkozók"
     }
   },
   "polls": {
@@ -2744,8 +2744,8 @@
       "questionRequired": "Írja be a szavazás kérdését",
       "minOptions": "Legalább 2 lehetőség szükséges",
       "generic": "Hiba a szavazás létrehozásakor",
-      "vote": "Vote not recorded. Try again.",
-      "alreadyVoted": "You have already voted in this poll."
+      "vote": "A szavazat nem lett rögzítve. Próbálja újra.",
+      "alreadyVoted": "Ezen a szavazáson már szavazott."
     }
   },
   "materials": {
@@ -2807,10 +2807,10 @@
       "emailInvalid": "Adjon meg érvényes e-mail címet",
       "submit": "Adataim igénylése",
       "loading": "Keresés...",
-      "requestSubmittedTitle": "Check your inbox",
-      "requestSubmittedBody": "If this email matches a registration, we've sent you a link to download your data. The link is valid for 1 hour.",
-      "linkInvalid": "This link is invalid or expired. Please request a new link.",
-      "requestNew": "Request a new link",
+      "requestSubmittedTitle": "Nézze meg a postafiókját",
+      "requestSubmittedBody": "Ha az e-mail cím egy regisztrációhoz tartozik, elküldtük Önnek az adatai letöltésére szolgáló linket. A link 1 óráig érvényes.",
+      "linkInvalid": "A link érvénytelen vagy lejárt. Kérjen új linket.",
+      "requestNew": "Új link kérése",
       "noData": "Ehhez az e-mail címhez nem találhatók adatok.",
       "error": "Hiba történt. Kérjük, próbálja újra később.",
       "rateLimited": "Túl sok kérés. Próbálja újra egy óra múlva.",
@@ -2825,30 +2825,30 @@
       "questionsTitle": "Q&A kérdések",
       "pollVotesTitle": "Szavazási szavazatok",
       "optionLabel": "Lehetőség",
-      "erasureCtaTitle": "Want to delete your data?",
-      "erasureCtaBody": "You can request full erasure of the data tied to your email (GDPR Art. 17).",
-      "erasureCtaButton": "Request erasure"
+      "erasureCtaTitle": "Szeretné törölni az adatait?",
+      "erasureCtaBody": "Kérheti az e-mail címéhez társított adatok teljes törlését (GDPR 17. cikk).",
+      "erasureCtaButton": "Törlés kérése"
     },
     "erasure": {
-      "title": "Erase your data",
-      "subtitle": "Confirm the erasure of the personal data tied to your email address (GDPR Art. 17).",
-      "emailLabel": "Your email address",
-      "emailPlaceholder": "Enter the email used for registration",
-      "emailInvalid": "Please enter a valid email address",
-      "submit": "Request erasure",
-      "requestSubmittedTitle": "Check your inbox",
-      "requestSubmittedBody": "If this email matches a registration, we've sent you a link to confirm the erasure. The link is valid for 1 hour.",
-      "linkInvalid": "This link is invalid or expired. Please request a new link.",
-      "confirmWarning": "You are about to permanently erase all personal data tied to your email.",
-      "confirmBody": "Registrations, questions, poll votes, feedback and reminders will be deleted. This action is irreversible.",
-      "confirmButton": "Confirm erasure",
-      "cancel": "Cancel",
-      "processing": "Deleting...",
-      "doneTitle": "Erasure completed",
-      "doneBody": "{count} registrations and the linked data have been deleted.",
-      "error": "An error occurred. Please try again later.",
-      "rateLimited": "Too many requests. Please try again in one hour.",
-      "back": "Back to my data"
+      "title": "Az Ön adatainak törlése",
+      "subtitle": "Erősítse meg az e-mail címéhez társított személyes adatok törlését (GDPR 17. cikk).",
+      "emailLabel": "Az Ön e-mail címe",
+      "emailPlaceholder": "Adja meg a regisztrációkor használt e-mail címet",
+      "emailInvalid": "Adjon meg egy érvényes e-mail címet",
+      "submit": "Törlés kérése",
+      "requestSubmittedTitle": "Nézze meg a postafiókját",
+      "requestSubmittedBody": "Ha az e-mail cím egy regisztrációhoz tartozik, elküldtük Önnek a törlés megerősítésére szolgáló linket. A link 1 óráig érvényes.",
+      "linkInvalid": "A link érvénytelen vagy lejárt. Kérjen új linket.",
+      "confirmWarning": "Az e-mail címéhez társított összes személyes adat végleges törlésére készül.",
+      "confirmBody": "Törlésre kerülnek a regisztrációk, a kérdések, a szavazatok, a visszajelzések és az emlékeztetők. A művelet visszavonhatatlan.",
+      "confirmButton": "Törlés megerősítése",
+      "cancel": "Mégse",
+      "processing": "Törlés folyamatban...",
+      "doneTitle": "A törlés befejeződött",
+      "doneBody": "{count} regisztráció és a kapcsolódó adatok törölve lettek.",
+      "error": "Hiba történt. Kérjük, próbálja újra később.",
+      "rateLimited": "Túl sok kérés. Próbálja újra egy óra múlva.",
+      "back": "Vissza az adataimhoz"
     }
   },
   "legal": {
@@ -3617,8 +3617,8 @@
     "nameLabel": "Az Ön neve",
     "nameHelp": "A többi résztvevő számára látható lesz",
     "joinNowBtn": "Belépés most",
-    "roomOpen": "The room is open",
-    "whileYouWait": "While you wait",
+    "roomOpen": "A terem nyitva van",
+    "whileYouWait": "Várakozás közben",
     "openingAt": "Nyitás {time}-kor",
     "netiquetteTitle": "Bevált gyakorlatok a részvételhez",
     "netiquetteBullet1": "Érkezzen néhány perccel korábban a mikrofon és a webkamera teszteléséhez",
@@ -3638,8 +3638,8 @@
     "emailHelp": "Kizárólag esetleges esemény utáni utánkövetéshez",
     "emailInvalid": "Adjon meg egy érvényes e-mail címet",
     "chatLockedMessage": "Adja meg a nevét, hogy csatlakozhasson az esemény chatjéhez.",
-    "classicView": "Classic view",
-    "backToGarden": "Back to the park",
+    "classicView": "Klasszikus nézet",
+    "backToGarden": "Vissza a parkba",
     "aiNoticeTitle": "MI-feldolgozás az esemény után",
     "aiNotice": "A végén a felvételt mesterséges intelligencia eszközök dolgozzák fel átirat, összefoglaló, valamint esetleges fordítások és szinkron készítéséhez. Az eredmények pontatlanságokat tartalmazhatnak; a mérvadó forrás továbbra is a videó.",
     "multitrackConsentTitle": "Résztvevőnkénti rögzítés",
@@ -3768,15 +3768,15 @@
     "micToggleOff": "Mikrofon KI",
     "cameraOffPreview": "Kamera kikapcsolva",
     "speakerTest": "🔊 Hangteszt",
-    "backgroundLabel": "Virtual background",
+    "backgroundLabel": "Virtuális háttér",
     "backgroundNoneShort": "No",
-    "backgroundHint": "Applied when you enter the room. To blur your background use the backgrounds button once inside: the preview above shows the camera without effects.",
+    "backgroundHint": "A terembe lépéskor lép érvénybe. A háttér elmosásához a teremben használja a hátterek gombot: a fenti előnézet effektus nélkül mutatja a kamerát.",
     "background": {
-      "nessuno": "No background",
-      "ufficio-chiaro": "Light office",
-      "blu-istituzionale": "Institutional blue",
-      "verde-salvia": "Sage green",
-      "grafite": "Graphite"
+      "nessuno": "Nincs háttér",
+      "ufficio-chiaro": "Világos iroda",
+      "blu-istituzionale": "Intézményi kék",
+      "verde-salvia": "Zsályazöld",
+      "grafite": "Grafit"
     }
   },
   "garden": {
@@ -3784,7 +3784,7 @@
     "classicView": "Klasszikus nézet",
     "changeAvatar": "Avatar megváltoztatása",
     "peopleInGarden": "{count, plural, =0 {Senki sincs a kertben} one {1 személy van a kertben} other {# személy van a kertben}}",
-    "guestName": "Guest",
+    "guestName": "Vendég",
     "hintKeyboard": "Mozgás a WASD-vel vagy a nyilakkal",
     "pickerTitle": "Válassza ki az avatarját",
     "pickerHelp": "A karakter Önt képviseli a várakozási kertben. Bármikor megváltoztathatja.",
@@ -3793,11 +3793,11 @@
     "hintJoystick": "Húzza a mozgáshoz"
   },
   "feedbackAdmin": {
-    "title": "Feedback results",
-    "totalVotes": "responses",
-    "noFeedback": "No feedback received",
-    "comments": "Comments",
-    "noComments": "No comments",
+    "title": "Visszajelzések eredményei",
+    "totalVotes": "válasz",
+    "noFeedback": "Nem érkezett visszajelzés",
+    "comments": "Megjegyzések",
+    "noComments": "Nincsenek megjegyzések",
     "yes": "Igen",
     "no": "Nem"
   }

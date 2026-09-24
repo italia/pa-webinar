@@ -85,9 +85,9 @@
       "topWords": "L-aktar kliem kondiviż",
       "feedback": "Valutazzjoni medja",
       "feedbackCount": "{count, plural, one {tweġiba waħda} two {# tweġibiet} few {# tweġibiet} many {#-il tweġiba} other {# tweġiba}}",
-      "chatQuestions": "Questions from the chat",
-      "reactionsCount": "{count, plural, one {1 reaction} other {# reactions}}",
-      "answered": "answered"
+      "chatQuestions": "Mistoqsijiet mis-chat",
+      "reactionsCount": "{count, plural, one {reazzjoni waħda} two {# reazzjonijiet} few {# reazzjonijiet} many {#-il reazzjoni} other {# reazzjoni}}",
+      "answered": "imwieġba"
     },
     "detail": {
       "title": "Dettalji tal-avveniment",
@@ -162,12 +162,12 @@
     "successMessage": "Se tirċievi email ta' konferma bil-link biex taċċessa l-avveniment.",
     "successScheduledMessage": "Inti rreġistrat! Bgħatnielek email bil-link personali tal-aċċess. Żid l-avveniment mal-kalendarju tiegħek u erġa' ejja hawn ftit qabel il-bidu.",
     "addToCalendar": "Żid mal-kalendarju",
-    "enteringRoom": "We're taking you to the event waiting room.",
-    "enteringRoomHint": "Opening the room…",
+    "enteringRoom": "Qed nieħduk fil-kamra tal-istennija tal-avveniment.",
+    "enteringRoomHint": "Is-sala qed tinfetaħ…",
     "alreadyRegistered": "Diġà rreġistrat/a għal dan l-avveniment",
-    "resendLink": "Resend my access link",
-    "resending": "Sending…",
-    "resendSent": "If the address is registered, we've re-sent the access link by email.",
+    "resendLink": "Ibgħat il-link tal-aċċess mill-ġdid",
+    "resending": "Qed jintbagħat…",
+    "resendSent": "Jekk l-indirizz ikun irreġistrat, bgħatnielek il-link tal-aċċess mill-ġdid bl-email.",
     "backToEvent": "Lura lejn l-avveniment",
     "organization": "Entità ta' appartenenza",
     "organizationPlaceholder": "eż. AGID, Ministeru tal-Ekonomija, Muniċipju ta' Ruma",
@@ -340,23 +340,23 @@
       "reactNotAllowed": "Biex tirreaġixxi għall-messaġġi teħtieġ il-link personali jew dak tal-moderatur.",
       "editNotAllowed": "Dan il-link huwa kondiviż, għalhekk ma jistax jimmodifika l-messaġġi.",
       "editExpired": "Għaddew aktar minn 15-il minuta: dan il-messaġġ ma jistax jiġi mmodifikat aktar.",
-      "askAsQuestionLabel": "Mark as a question",
-      "placeholderQuestion": "Write your question...",
-      "lensGroupLabel": "Filter messages",
-      "lensAll": "All",
-      "lensQuestions": "Questions ({count})",
-      "lensAnnounceAll": "Listing all messages",
-      "lensAnnounceQuestions": "Listing {count, plural, =0 {no questions} one {1 question} other {# questions}}",
-      "questionOpen": "Question",
-      "questionAnswered": "Answered",
-      "questionDismissed": "Won't be taken",
-      "questionMarkAnswered": "Mark answered",
-      "questionReopen": "Reopen",
-      "questionDismiss": "Dismiss",
-      "questionRestore": "Restore",
-      "questionStatusFailed": "Could not update the question",
-      "questionNeedsText": "Type the text of your question: an attachment alone does not enter the queue",
-      "lensTruncated": "Only the most recent messages are loaded: there may be older questions not listed."
+      "askAsQuestionLabel": "Immarka bħala mistoqsija",
+      "placeholderQuestion": "Ikteb il-mistoqsija tiegħek...",
+      "lensGroupLabel": "Iffiltra l-messaġġi",
+      "lensAll": "Kollha",
+      "lensQuestions": "Mistoqsijiet ({count})",
+      "lensAnnounceAll": "Qed jintwerew il-messaġġi kollha",
+      "lensAnnounceQuestions": "Fil-lista: {count, plural, =0 {l-ebda mistoqsija} one {mistoqsija waħda} two {# mistoqsijiet} few {# mistoqsijiet} many {#-il mistoqsija} other {# mistoqsija}}",
+      "questionOpen": "Mistoqsija",
+      "questionAnswered": "Imwieġba",
+      "questionDismissed": "Mhux se tiġi ttrattata",
+      "questionMarkAnswered": "Immarka bħala mwieġba",
+      "questionReopen": "Iftaħ mill-ġdid",
+      "questionDismiss": "Warrab",
+      "questionRestore": "Irrestawra",
+      "questionStatusFailed": "Ma kienx possibbli li l-mistoqsija tiġi aġġornata",
+      "questionNeedsText": "Ikteb it-test tal-mistoqsija: attachment waħdu ma jidħolx fil-kju",
+      "lensTruncated": "Huma mgħobbija biss l-aktar messaġġi reċenti: jista' jkun hemm mistoqsijiet eqdem li mhumiex elenkati."
     },
     "role": {
       "moderator": "Moderatur",
@@ -417,7 +417,7 @@
       "live": "👥 {count, plural, one {# persuna} other {# persuni}}"
     },
     "sidebarTabChatUnread": "Messaġġi ġodda mhux moqrija",
-    "sidebarTabPollsOpen": "Open poll you have not voted in yet",
+    "sidebarTabPollsOpen": "Stħarriġ miftuħ li għadek ma vvutajtx fih",
     "floatingControlsLabel": "Kontrolli tal-avveniment",
     "screenshareActive": "🖥️ {name} qed jaqsam l-iskrin",
     "screenshareFallbackName": "Parteċipant",
@@ -441,7 +441,7 @@
       "remainingLabel": "Ħin li fadal (ikklikkja għall-ħin li għadda)",
       "elapsedLabel": "Ħin li għadda (ikklikkja għall-ħin li fadal)"
     },
-    "videoCallFrameTitle": "Event video call"
+    "videoCallFrameTitle": "Sejħa bil-vidjo tal-avveniment"
   },
   "qa": {
     "title": "Mistoqsijiet u Tweġibiet",
@@ -764,7 +764,7 @@
         "retentionHelp": "Wara dan il-livell, id-data personali titħassar awtomatikament.",
         "gdprTemplate": "Template tal-avviż",
         "gdprTemplateNone": "— Uża test personalizzat —",
-        "gdprTemplateUnknown": "The selected privacy notice template no longer exists: pick another one or go back to custom text",
+        "gdprTemplateUnknown": "It-template tal-avviż ta' privatezza magħżul ma għadux jeżisti: agħżel ieħor jew erġa' lura għat-test personalizzat",
         "privacyText": "Avviż tal-privatezza (test)",
         "moderatorHeading": "Kuntatt moderatur",
         "moderatorPublishHint": "L-isem u l-email huma obbligatorji biex tippubblika l-avveniment (jintużaw għal-link tal-moderatur u għall-email ta' konferma). Mhumiex meħtieġa biex tissalva bħala abbozz.",
@@ -781,8 +781,8 @@
       },
       "validationFailed": "Iċċekkja l-oqsma evidenzjati qabel tipproċedi.",
       "partialFailure": "L-avveniment inħoloq, imma xi elementi ma ġewx salvati: {items}. Tista' żżidhom mill-paġna tal-avveniment.",
-      "partialFailureEdit": "The event changes were saved, but these could not be: {items}. Your work is still here: fix them and save again.",
-      "partialFailureEditDetail": "The event changes were saved, but these could not be: {items}. The server replied: {reason}. Your work is still here: fix them and save again.",
+      "partialFailureEdit": "Il-bidliet fl-avveniment ġew issejvjati, iżda dawn ma setgħux jiġu ssejvjati: {items}. Ix-xogħol tiegħek għadu hawn: ikkoreġi u erġa' ssejvja.",
+      "partialFailureEditDetail": "Il-bidliet fl-avveniment ġew issejvjati, iżda dawn ma setgħux jiġu ssejvjati: {items}. Is-server wieġeb: {reason}. Ix-xogħol tiegħek għadu hawn: ikkoreġi u erġa' ssejvja.",
       "draftFound": "Sibna abbozz mhux salvat ta' dan l-avveniment. Trid tirrestawrah?",
       "draftRestore": "Irrestawra l-abbozz",
       "draftDiscard": "Injora",
@@ -792,7 +792,7 @@
         "moderators": "moderaturi",
         "speakers": "kelliema",
         "materials": "materjali",
-        "questionnaires": "questionnaires"
+        "questionnaires": "kwestjonarji"
       }
     },
     "nav": {
@@ -1210,8 +1210,8 @@
       "recordingEnabled": "Ippermetti r-reġistrazzjoni bil-vidjo",
       "agendaEnabled": "Noti / Lista ta' kontroll (aġenda) live",
       "agendaEnabledDesc": "Lista ta' kontroll tat-temi li għandhom jiġu koperti, li l-moderaturi jimmarkaw matul l-avveniment. Tidħol fis-sommarju awtomatiku. Mhijiex obbligatorja u tista' tiġi attivata anke matul l-avveniment.",
-      "wordCloudEnabled": "Live word cloud",
-      "wordCloudEnabledDesc": "Participants send a word and the cloud updates live. Useful to open a discussion or gather a feeling in a few seconds.",
+      "wordCloudEnabled": "Sħaba ta' kliem f'ħin reali",
+      "wordCloudEnabledDesc": "Il-parteċipanti jibagħtu kelma u s-sħaba tiġi aġġornata f'ħin reali. Utli biex tiftaħ diskussjoni jew tiġbor sentiment fi ftit sekondi.",
       "whiteboardEnabled": "Whiteboard kondiviża",
       "whiteboardEnabledDesc": "Tattiva l-whiteboard kollaborattiva nattiva (Excalidraw): il-moderaturi jistgħu jiftħuha mit-toolbar matul l-avveniment. Dejjem attiva fis-sejħiet istantanji.",
       "autoStartRecording": "Ibda la reġistrazzjoni awtomatikament",
@@ -1448,20 +1448,20 @@
         "graceSection": "Soft exit (tmiem avveniment)",
         "eventGracePeriodMinutes": "Minuti ta' grazia wara endsAt (default)",
         "eventGracePeriodMinutesHelp": "Tempo extra concesso wara l'orario ta' tmiem premuri l-ewwel di chiuderu la call. 0 = chiusura dura, -1 = mhux auto-chiuderu (ħalli lill-cleanup ta' inattività), 15 = banner u chiusura wara 15 min. Kull avveniment può overridare.",
-        "videoQualitySection": "Video/audio quality",
-        "videoQuality": "Default quality",
-        "videoQualityHelp": "Preset applied to every event (overridable per event). Higher quality needs more bandwidth — “High” is the best trade-off. Takes effect immediately, no restart.",
+        "videoQualitySection": "Kwalità tal-vidjo/awdjo",
+        "videoQuality": "Kwalità predefinita",
+        "videoQualityHelp": "Preset applikat għall-avvenimenti kollha (jista' jinbidel għal kull avveniment). Iktar ma tkun għolja l-kwalità, iktar bandwidth hemm bżonn: «Għolja» hija l-aħjar kompromess. Tidħol fis-seħħ minnufih, mingħajr restart.",
         "videoQualityOptions": {
-          "MAX": "Maximum — 1080p",
-          "HIGH": "High — 720p (recommended)",
-          "BALANCED": "Balanced — 540p",
-          "SAVE_DATA": "Save data — 360p"
+          "MAX": "Massima — 1080p",
+          "HIGH": "Għolja — 720p (rakkomandata)",
+          "BALANCED": "Ibbilanċjata — 540p",
+          "SAVE_DATA": "Iffranka d-dejta — 360p"
         },
         "videoQualityDesc": {
-          "MAX": "Full HD 1080p, up to ~4 Mbps, stereo Opus 510 kbps audio. Top fidelity for small high-stakes calls — uses more bandwidth and loads the bridge more.",
-          "HIGH": "720p with a capped bitrate (~2.2 Mbps peak) and 96 kbps Opus audio. Great quality without maxing bandwidth: the recommended production trade-off.",
-          "BALANCED": "540p with a contained bitrate (~1 Mbps) and fewer simultaneous incoming videos. Good for large audiences or weak networks.",
-          "SAVE_DATA": "360p at minimal bitrate (~600 kbps) with unused-layer suspension. For very slow connections."
+          "MAX": "Full HD 1080p, bitrate sa ~4 Mbps, awdjo Opus stereo ta' 510 kbps. Fedeltà massima għal sejħiet żgħar u importanti — juża aktar bandwidth u jgħabbi aktar il-bridge tal-vidjo.",
+          "HIGH": "720p b'bitrate limitat (~2.2 Mbps fl-ogħla punt) u awdjo Opus ta' 96 kbps. Kwalità eċċellenti mingħajr ma tissatura l-bandwidth: il-kompromess rakkomandat għall-produzzjoni.",
+          "BALANCED": "540p b'bitrate moderat (~1 Mbps) u inqas vidjows riċevuti fl-istess ħin. Adatt għal udjenzi kbar jew netwerks dgħajfa.",
+          "SAVE_DATA": "360p b'bitrate minimu (~600 kbps) b'sospensjoni tas-saffi mhux użati. Għal konnessjonijiet bil-mod ħafna."
         }
       },
       "header": {
@@ -1521,18 +1521,18 @@
         "descriptionHelp": "Deskrizzjoni għall-magni tat-tiftix u l-kondiviżjoni soċjali",
         "image": "Immaġni Open Graph",
         "imageHelp": "Immaġni predefinita għall-kondiviżjoni soċjali (1200x630 rakkomandata)",
-        "ogSection": "Shared link preview",
-        "ogIntro": "When someone pastes an event link into a chat or a social network, the platform draws a preview image with the details inside it. Choose which ones: every extra field takes room away from the title.",
-        "ogCardEnabled": "Generate the preview",
-        "ogCardEnabledHelp": "When off, the link shows the poster as is (or the site logo if the event has none), with no readable title or date in the image.",
-        "ogShowPoster": "Poster as background",
-        "ogShowPosterHelp": "Uses the event cover as the preview background, dimmed so the text stays readable. With no poster, or with this off, the institutional colour and the logo remain.",
-        "ogShowDate": "Date and time",
-        "ogShowDateHelp": "In the platform's default time zone.",
-        "ogShowSpeakers": "Speakers",
-        "ogShowSpeakersHelp": "The event's speaker text, shortened when too long.",
-        "ogShowOrganization": "Organisation",
-        "ogShowOrganizationHelp": "The event organiser when set, otherwise the organisation name."
+        "ogSection": "Preview tal-links kondiviżi",
+        "ogIntro": "Meta xi ħadd iwaħħal il-link ta' avveniment f'chat jew fuq netwerk soċjali, il-pjattaforma tfassal immaġni ta' preview bl-informazzjoni fiha. Agħżel liema: kull qasam żejjed jieħu spazju mit-titlu.",
+        "ogCardEnabled": "Iġġenera l-preview",
+        "ogCardEnabledHelp": "Meta tkun mitfija, il-link juri l-poster kif inhu (jew il-logo tas-sit jekk l-avveniment m'għandux wieħed), mingħajr titlu jew data li jinqraw fl-immaġni.",
+        "ogShowPoster": "Poster bħala sfond",
+        "ogShowPosterHelp": "Juża l-qoxra tal-avveniment bħala sfond tal-preview, imdallma biex it-test jibqa' jinqara. Mingħajr poster, jew b'din l-għażla mitfija, jibqgħu l-kulur istituzzjonali u l-logo.",
+        "ogShowDate": "Data u ħin",
+        "ogShowDateHelp": "Fiż-żona tal-ħin predefinita tal-pjattaforma.",
+        "ogShowSpeakers": "Kelliema",
+        "ogShowSpeakersHelp": "It-test tal-kelliema tal-avveniment, imqassar jekk ikun twil wisq.",
+        "ogShowOrganization": "Organizzazzjoni",
+        "ogShowOrganizationHelp": "L-organizzatur tal-avveniment jekk ikun indikat, inkella l-isem tal-organizzazzjoni."
       },
       "homepage": {
         "modeLabel": "Mod tal-paġna ewlenija",
@@ -1550,12 +1550,12 @@
             "description": "Kontenut HTML personalizzat + lista tal-avvenimenti"
           },
           "LANDING_ISTITUZIONALE": {
-            "title": "Institutional landing",
-            "description": "Organisation, next event in the spotlight and the others listed. No technical language"
+            "title": "Landing page istituzzjonali",
+            "description": "L-entità, l-avveniment li jmiss enfasizzat u l-oħrajn f'lista. L-ebda lingwaġġ tekniku"
           },
           "LANDING_SEMPLICE": {
-            "title": "Plain-language landing",
-            "description": "Few words and a single invitation, for people new to online events"
+            "title": "Landing page b'lingwaġġ sempliċi",
+            "description": "Ftit kliem u stedina waħda, għal min mhux imdorri bl-avvenimenti online"
           }
         },
         "customHtmlLabel": "Kontenut HTML personalizzat",
@@ -2523,20 +2523,20 @@
       "generateAi": "Iġġenera l-AI",
       "generateAiConfirm": "Ħaddem il-pipeline tal-AI (traskrizzjoni u sommarju) fuq din ir-reġistrazzjoni. L-ipproċessar bl-AI se jiġi attivat għall-avveniment u jibda fl-isfond. It-traduzzjonijiet jiżdiedu wara, lingwa b'lingwa, mill-iskeda «Traduzzjonijiet».",
       "generateAiOk": "Il-pipeline tal-AI bdiet.",
-      "originalToggle": "Show original text",
-      "originalToggleHint": "Show, under each corrected line, the text as the automatic transcription produced it",
-      "originalNotComparable": "The number of lines has changed from the original version: a line-by-line comparison is not possible",
-      "originalLabel": "Original text:",
-      "revisedBadge": "Edited by a person",
-      "revisedHint": "At least one line was corrected by a person after the automatic transcription",
-      "redactLabel": "Erase from the original too",
-      "redactHint": "Use for an erasure request: the changes also apply to the preserved machine text, which would otherwise keep the removed sentence",
-      "redactSave": "Save and erase from the original",
-      "redactSaved": "{n, plural, one {1 line also removed from the original text} other {# lines also removed from the original text}}",
-      "redactNothingRemoved": "The corrections were saved, but there was nothing to remove from the original text for the lines you touched",
-      "redactArchiveFailed": "The corrections were saved to the database, but rewriting the archived file failed: the removed sentence is still downloadable from there. Try the removal again",
-      "originalUncertain": "Origin not certain",
-      "originalUncertainHint": "The preserved text may already include corrections made before this feature existed: it cannot be proven to be what the automatic transcription produced"
+      "originalToggle": "Uri t-test oriġinali",
+      "originalToggleHint": "Juri, taħt kull linja kkoreġuta, it-test kif ipproduċietu t-traskrizzjoni awtomatika",
+      "originalNotComparable": "In-numru ta' linji nbidel meta mqabbel mal-verżjoni oriġinali: il-paragun linja b'linja mhuwiex possibbli",
+      "originalLabel": "Test oriġinali:",
+      "revisedBadge": "Riveduta manwalment",
+      "revisedHint": "Mill-inqas linja waħda ġiet ikkoreġuta minn persuna wara t-traskrizzjoni awtomatika",
+      "redactLabel": "Ħassar ukoll mill-oriġinal",
+      "redactHint": "Użah għal talba għat-tħassir: il-bidliet japplikaw ukoll għat-test tal-magna ppreservat, li inkella jżomm is-sentenza mneħħija",
+      "redactSave": "Issejvja u ħassar mill-oriġinal",
+      "redactSaved": "{n, plural, one {Linja waħda mħassra wkoll mit-test oriġinali} two {# linji mħassra wkoll mit-test oriġinali} few {# linji mħassra wkoll mit-test oriġinali} many {#-il linja mħassra wkoll mit-test oriġinali} other {# linja mħassra wkoll mit-test oriġinali}}",
+      "redactNothingRemoved": "Il-korrezzjonijiet ġew issejvjati, iżda fit-test oriġinali ma kien hemm xejn x'jitħassar għal-linji mmodifikati",
+      "redactArchiveFailed": "Il-korrezzjonijiet ġew issejvjati fid-database, iżda l-kitba mill-ġdid tal-fajl arkivjat ma rnexxietx: is-sentenza mneħħija għadha tista' titniżżel minn hemm. Erġa' pprova t-tħassir",
+      "originalUncertain": "Oriġini mhux ċerta",
+      "originalUncertainHint": "It-test ippreservat jista' diġà jinkludi korrezzjonijiet li saru qabel ma kienet teżisti din il-funzjoni: ma jistax jiġi ppruvat li huwa t-test prodott mit-traskrizzjoni awtomatika"
     },
     "questionnairesPage": {
       "title": "Kwestjonarji",
@@ -2674,47 +2674,47 @@
       }
     },
     "institutional": {
-      "title": "Online meetings and events",
-      "nextTitle": "Next event",
-      "nextCta": "Go to the event and sign up",
-      "othersTitle": "Other events",
-      "pointsTitle": "How to take part",
+      "title": "Laqgħat u avvenimenti online",
+      "nextTitle": "L-avveniment li jmiss",
+      "nextCta": "Mur għall-avveniment u irreġistra",
+      "othersTitle": "Avvenimenti oħra",
+      "pointsTitle": "Kif tipparteċipa",
       "points": {
         "noInstall": {
-          "title": "Join from your browser",
-          "body": "No software to install: just open the link you receive."
+          "title": "Tipparteċipa mill-browser",
+          "body": "M'hemmx bżonn tinstalla programmi: biżżejjed tiftaħ il-link li tirċievi."
         },
         "accessible": {
-          "title": "Designed for everyone",
-          "body": "Captions, keyboard and screen readers: the room works without a mouse too."
+          "title": "Maħsub għal kulħadd",
+          "body": "Sottotitoli, tastiera u screen readers: is-sala tista' tintuża anke mingħajr maws."
         },
         "privacy": {
-          "title": "Your data, handled with care",
-          "body": "Only what sign-up requires is collected, and you can ask for it back or have it deleted."
+          "title": "Dejta trattata b'attenzjoni",
+          "body": "Tinġabar biss id-dejta meħtieġa għar-reġistrazzjoni, u tista' titlobha lura jew titlob li titħassar."
         }
       }
     },
     "simple": {
-      "title": "Online meetings by {organization}",
-      "subtitle": "Join from your computer or phone, with nothing to install.",
-      "cta": "Join the next meeting",
-      "noEvents": "No meetings are scheduled right now. Check back soon.",
-      "stepsTitle": "How it works",
+      "title": "Il-laqgħat online ta' {organization}",
+      "subtitle": "Ipparteċipa mill-kompjuter jew mit-telefon, mingħajr ma tinstalla xejn.",
+      "cta": "Ipparteċipa fil-laqgħa li jmiss",
+      "noEvents": "Bħalissa m'hemm l-ebda laqgħa ppjanata. Erġa' żurna dalwaqt.",
+      "stepsTitle": "Kif jaħdem",
       "steps": {
         "choose": {
-          "title": "Pick a meeting",
-          "body": "Each one shows its date and time."
+          "title": "Agħżel laqgħa",
+          "body": "Kull waħda turi d-data u l-ħin tagħha."
         },
         "name": {
-          "title": "Leave your name",
-          "body": "Your name and email address are all it takes to get the link."
+          "title": "Ħalli ismek",
+          "body": "Biżżejjed ismek u l-indirizz email tiegħek biex tirċievi l-link."
         },
         "enter": {
-          "title": "Join",
-          "body": "At the right time, open the link: you are in."
+          "title": "Idħol",
+          "body": "Fil-ħin it-tajjeb, iftaħ il-link: tkun ġewwa."
         }
       },
-      "listTitle": "Upcoming meetings"
+      "listTitle": "Laqgħat li ġejjin"
     }
   },
   "polls": {
@@ -2744,8 +2744,8 @@
       "questionRequired": "Ikteb il-mistoqsija tal-istħarriġa",
       "minOptions": "Hemm bżonn ta' mill-inqas 2 għażliet",
       "generic": "Żball fil-ħolqien tal-istħarriġa",
-      "vote": "Vote not recorded. Try again.",
-      "alreadyVoted": "You have already voted in this poll."
+      "vote": "Il-vot ma ġiex irreġistrat. Erġa' pprova.",
+      "alreadyVoted": "Diġà vvutajt f'dan l-istħarriġ."
     }
   },
   "materials": {
@@ -2807,10 +2807,10 @@
       "emailInvalid": "Jekk jogħġbok daħħal indirizz email validu",
       "submit": "Itlob id-dejta tiegħi",
       "loading": "Qed ifittex...",
-      "requestSubmittedTitle": "Check your inbox",
-      "requestSubmittedBody": "If this email matches a registration, we've sent you a link to download your data. The link is valid for 1 hour.",
-      "linkInvalid": "This link is invalid or expired. Please request a new link.",
-      "requestNew": "Request a new link",
+      "requestSubmittedTitle": "Iċċekkja l-inbox tiegħek",
+      "requestSubmittedBody": "Jekk l-indirizz email jaqbel ma' reġistrazzjoni, bgħatnielek link biex tniżżel id-dejta tiegħek. Il-link ikun validu għal siegħa.",
+      "linkInvalid": "Il-link mhuwiex validu jew skada. Jekk jogħġbok itlob link ġdid.",
+      "requestNew": "Itlob link ġdid",
       "noData": "L-ebda dejta misjuba għal dan l-indirizz email.",
       "error": "Ġara żball. Jekk jogħġbok erġa' pprova aktar tard.",
       "rateLimited": "Wisq talbiet. Jekk jogħġbok erġa' pprova wara siegħa.",
@@ -2825,30 +2825,30 @@
       "questionsTitle": "Mistoqsijiet Q&A",
       "pollVotesTitle": "Voti tal-istħarriġ",
       "optionLabel": "Għażla",
-      "erasureCtaTitle": "Want to delete your data?",
-      "erasureCtaBody": "You can request full erasure of the data tied to your email (GDPR Art. 17).",
-      "erasureCtaButton": "Request erasure"
+      "erasureCtaTitle": "Trid tħassar id-dejta tiegħek?",
+      "erasureCtaBody": "Tista' titlob it-tħassir sħiħ tad-dejta assoċjata mal-indirizz email tiegħek (Art. 17 tal-GDPR).",
+      "erasureCtaButton": "Itlob it-tħassir"
     },
     "erasure": {
-      "title": "Erase your data",
-      "subtitle": "Confirm the erasure of the personal data tied to your email address (GDPR Art. 17).",
-      "emailLabel": "Your email address",
-      "emailPlaceholder": "Enter the email used for registration",
-      "emailInvalid": "Please enter a valid email address",
-      "submit": "Request erasure",
-      "requestSubmittedTitle": "Check your inbox",
-      "requestSubmittedBody": "If this email matches a registration, we've sent you a link to confirm the erasure. The link is valid for 1 hour.",
-      "linkInvalid": "This link is invalid or expired. Please request a new link.",
-      "confirmWarning": "You are about to permanently erase all personal data tied to your email.",
-      "confirmBody": "Registrations, questions, poll votes, feedback and reminders will be deleted. This action is irreversible.",
-      "confirmButton": "Confirm erasure",
-      "cancel": "Cancel",
-      "processing": "Deleting...",
-      "doneTitle": "Erasure completed",
-      "doneBody": "{count} registrations and the linked data have been deleted.",
-      "error": "An error occurred. Please try again later.",
-      "rateLimited": "Too many requests. Please try again in one hour.",
-      "back": "Back to my data"
+      "title": "Tħassir tad-dejta tiegħek",
+      "subtitle": "Ikkonferma t-tħassir tad-dejta personali assoċjata mal-indirizz email tiegħek (Art. 17 tal-GDPR).",
+      "emailLabel": "L-indirizz email tiegħek",
+      "emailPlaceholder": "Daħħal l-email użata għar-reġistrazzjoni",
+      "emailInvalid": "Jekk jogħġbok daħħal indirizz email validu",
+      "submit": "Itlob it-tħassir",
+      "requestSubmittedTitle": "Iċċekkja l-inbox tiegħek",
+      "requestSubmittedBody": "Jekk l-indirizz email jaqbel ma' reġistrazzjoni, bgħatnielek link biex tikkonferma t-tħassir. Il-link ikun validu għal siegħa.",
+      "linkInvalid": "Il-link mhuwiex validu jew skada. Jekk jogħġbok itlob link ġdid.",
+      "confirmWarning": "Se tħassar b'mod permanenti d-dejta personali kollha assoċjata mal-indirizz email tiegħek.",
+      "confirmBody": "Se jitħassru r-reġistrazzjonijiet, il-mistoqsijiet, il-voti fl-istħarriġiet, il-feedback u t-tfakkiriet. L-operazzjoni hija irriversibbli.",
+      "confirmButton": "Ikkonferma t-tħassir",
+      "cancel": "Ikkanċella",
+      "processing": "Qed jitħassar...",
+      "doneTitle": "Tħassir lest",
+      "doneBody": "Reġistrazzjonijiet imħassra: {count}. Tħassret ukoll id-dejta relatata.",
+      "error": "Ġara żball. Jekk jogħġbok erġa' pprova aktar tard.",
+      "rateLimited": "Wisq talbiet. Jekk jogħġbok erġa' pprova wara siegħa.",
+      "back": "Lura għad-dejta tiegħi"
     }
   },
   "legal": {
@@ -3617,8 +3617,8 @@
     "nameLabel": "Il tuo nome",
     "nameHelp": "Apparirà lill-altri parteċipanti",
     "joinNowBtn": "Entra ora",
-    "roomOpen": "The room is open",
-    "whileYouWait": "While you wait",
+    "roomOpen": "Is-sala hija miftuħa",
+    "whileYouWait": "Waqt li tistenna",
     "openingAt": "Apertura lill-{time}",
     "netiquetteTitle": "Buonu pratichu per tipparteċipa",
     "netiquetteBullet1": "Arriva ftit minuti l-ewwel per tittestja mikrofonu u webcam",
@@ -3638,8 +3638,8 @@
     "emailHelp": "Biss per eventualu follow-up post-avveniment",
     "emailInvalid": "Daħħal wieħed indirizz email validu",
     "chatLockedMessage": "Daħħal il-tuo nomu per tipparteċipa lill-chat tal-avveniment.",
-    "classicView": "Classic view",
-    "backToGarden": "Back to the park",
+    "classicView": "Veduta klassika",
+    "backToGarden": "Lura għall-park",
     "aiNoticeTitle": "Ipproċessar bl-IA wara l-avveniment",
     "aiNotice": "Fl-aħħar, ir-reġistrazzjoni tiġi pproċessata b'għodod ta' intelliġenza artifiċjali biex jinħolqu traskrizzjoni, sommarju u eventwali traduzzjonijiet u doppjaġġi. Ir-riżultati jistgħu jkun fihom impreċiżjonijiet; il-vidjo jibqa' s-sors awtorevoli.",
     "multitrackConsentTitle": "Reġistrazzjoni għal kull parteċipant",
@@ -3768,15 +3768,15 @@
     "micToggleOff": "Mikrofonu OFF",
     "cameraOffPreview": "Fotocamera spenta",
     "speakerTest": "🔊 Test awdjo",
-    "backgroundLabel": "Virtual background",
+    "backgroundLabel": "Sfond virtwali",
     "backgroundNoneShort": "No",
-    "backgroundHint": "Applied when you enter the room. To blur your background use the backgrounds button once inside: the preview above shows the camera without effects.",
+    "backgroundHint": "Japplika meta tidħol fis-sala. Biex iċċajpar l-isfond, uża l-buttuna tal-isfondi ladarba tkun ġewwa: il-preview hawn fuq turi l-kamera mingħajr effett.",
     "background": {
-      "nessuno": "No background",
-      "ufficio-chiaro": "Light office",
-      "blu-istituzionale": "Institutional blue",
-      "verde-salvia": "Sage green",
-      "grafite": "Graphite"
+      "nessuno": "L-ebda sfond",
+      "ufficio-chiaro": "Uffiċċju ċar",
+      "blu-istituzionale": "Blu istituzzjonali",
+      "verde-salvia": "Aħdar salvja",
+      "grafite": "Grafita"
     }
   },
   "garden": {
@@ -3784,7 +3784,7 @@
     "classicView": "Vista classica",
     "changeAvatar": "Tbiddel avatar",
     "peopleInGarden": "{count, plural, =0 {Ħadd fil-giardino} one {1 persona fil-giardino} other {# personu fil-giardino}}",
-    "guestName": "Guest",
+    "guestName": "Mistieden",
     "hintKeyboard": "Muoviti ma' WASD jew lu frecce",
     "pickerTitle": "Agħżel il tuo avatar",
     "pickerHelp": "Il personaggio rappresenta tu fil-giardino tal-stennija. Puoi tbiddelrlo meta vuoi.",
@@ -3793,11 +3793,11 @@
     "hintJoystick": "Trascina għal muoverti"
   },
   "feedbackAdmin": {
-    "title": "Feedback results",
-    "totalVotes": "responses",
-    "noFeedback": "No feedback received",
-    "comments": "Comments",
-    "noComments": "No comments",
+    "title": "Riżultati tal-feedback",
+    "totalVotes": "tweġibiet",
+    "noFeedback": "Ma wasal l-ebda feedback",
+    "comments": "Kummenti",
+    "noComments": "L-ebda kumment",
     "yes": "Iva",
     "no": "Le"
   }

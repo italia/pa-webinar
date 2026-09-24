@@ -85,9 +85,9 @@
       "topWords": "Meest gedeelde woorden",
       "feedback": "Gemiddelde beoordeling",
       "feedbackCount": "{count, plural, one {1 antwoord} other {# antwoorden}}",
-      "chatQuestions": "Questions from the chat",
-      "reactionsCount": "{count, plural, one {1 reaction} other {# reactions}}",
-      "answered": "answered"
+      "chatQuestions": "Vragen uit de chat",
+      "reactionsCount": "{count, plural, one {1 reactie} other {# reacties}}",
+      "answered": "beantwoord"
     },
     "detail": {
       "title": "Evenementdetails",
@@ -162,12 +162,12 @@
     "successMessage": "U ontvangt een bevestigingsmail met de link om toegang te krijgen tot het evenement.",
     "successScheduledMessage": "U bent geregistreerd! We hebben u een e-mail gestuurd met uw persoonlijke toegangslink. Zet het evenement in uw agenda en kom kort voor aanvang weer terug.",
     "addToCalendar": "Aan agenda toevoegen",
-    "enteringRoom": "We're taking you to the event waiting room.",
-    "enteringRoomHint": "Opening the room…",
+    "enteringRoom": "We brengen u naar de wachtruimte van het evenement.",
+    "enteringRoomHint": "De zaal wordt geopend…",
     "alreadyRegistered": "U bent al ingeschreven voor dit evenement",
-    "resendLink": "Resend my access link",
-    "resending": "Sending…",
-    "resendSent": "If the address is registered, we've re-sent the access link by email.",
+    "resendLink": "Toegangslink opnieuw versturen",
+    "resending": "Bezig met verzenden…",
+    "resendSent": "Als het adres is ingeschreven, hebben we de toegangslink opnieuw per e-mail verstuurd.",
     "backToEvent": "Terug naar evenement",
     "organization": "Organisatie",
     "organizationPlaceholder": "bijv. AGID, Ministerie van Economie, Gemeente Rome",
@@ -340,23 +340,23 @@
       "reactNotAllowed": "Om op berichten te reageren hebt u uw persoonlijke link of de moderatorlink nodig.",
       "editNotAllowed": "Dit is een gedeelde link: daarmee kunt u berichten niet bewerken.",
       "editExpired": "Er zijn meer dan 15 minuten verstreken: dit bericht kan niet meer worden bewerkt.",
-      "askAsQuestionLabel": "Mark as a question",
-      "placeholderQuestion": "Write your question...",
-      "lensGroupLabel": "Filter messages",
-      "lensAll": "All",
-      "lensQuestions": "Questions ({count})",
-      "lensAnnounceAll": "Listing all messages",
-      "lensAnnounceQuestions": "Listing {count, plural, =0 {no questions} one {1 question} other {# questions}}",
-      "questionOpen": "Question",
-      "questionAnswered": "Answered",
-      "questionDismissed": "Won't be taken",
-      "questionMarkAnswered": "Mark answered",
-      "questionReopen": "Reopen",
-      "questionDismiss": "Dismiss",
-      "questionRestore": "Restore",
-      "questionStatusFailed": "Could not update the question",
-      "questionNeedsText": "Type the text of your question: an attachment alone does not enter the queue",
-      "lensTruncated": "Only the most recent messages are loaded: there may be older questions not listed."
+      "askAsQuestionLabel": "Markeren als vraag",
+      "placeholderQuestion": "Schrijf uw vraag...",
+      "lensGroupLabel": "Berichten filteren",
+      "lensAll": "Alle",
+      "lensQuestions": "Vragen ({count})",
+      "lensAnnounceAll": "Weergegeven: alle berichten",
+      "lensAnnounceQuestions": "Weergegeven: {count, plural, =0 {geen vragen} one {1 vraag} other {# vragen}}",
+      "questionOpen": "Vraag",
+      "questionAnswered": "Beantwoord",
+      "questionDismissed": "Wordt niet behandeld",
+      "questionMarkAnswered": "Markeren als beantwoord",
+      "questionReopen": "Heropenen",
+      "questionDismiss": "Afwijzen",
+      "questionRestore": "Herstellen",
+      "questionStatusFailed": "De vraag kon niet worden bijgewerkt",
+      "questionNeedsText": "Typ de tekst van uw vraag: een bijlage alleen komt niet in de wachtrij",
+      "lensTruncated": "Alleen de meest recente berichten zijn geladen: er kunnen oudere vragen zijn die niet in de lijst staan."
     },
     "role": {
       "moderator": "Moderator",
@@ -417,7 +417,7 @@
       "live": "👥 {count, plural, one {# persoon} other {# personen}}"
     },
     "sidebarTabChatUnread": "Nieuwe ongelezen berichten",
-    "sidebarTabPollsOpen": "Open poll you have not voted in yet",
+    "sidebarTabPollsOpen": "Open peiling waarin u nog niet hebt gestemd",
     "floatingControlsLabel": "Bediening evenement",
     "screenshareActive": "🖥️ {name} deelt het scherm",
     "screenshareFallbackName": "Een deelnemer",
@@ -441,7 +441,7 @@
       "remainingLabel": "Resterende tijd (klik voor de verstreken tijd)",
       "elapsedLabel": "Verstreken tijd (klik voor de resterende tijd)"
     },
-    "videoCallFrameTitle": "Event video call"
+    "videoCallFrameTitle": "Videogesprek van het evenement"
   },
   "qa": {
     "title": "Vragen en Antwoorden",
@@ -764,7 +764,7 @@
         "retentionHelp": "Na deze drempel worden persoonsgegevens automatisch verwijderd.",
         "gdprTemplate": "Privacy-sjabloon",
         "gdprTemplateNone": "— Aangepaste tekst gebruiken —",
-        "gdprTemplateUnknown": "The selected privacy notice template no longer exists: pick another one or go back to custom text",
+        "gdprTemplateUnknown": "Het gekozen sjabloon voor de privacyverklaring bestaat niet meer: kies een ander sjabloon of ga terug naar de aangepaste tekst",
         "privacyText": "Privacyverklaring (tekst)",
         "moderatorHeading": "Contact moderator",
         "moderatorPublishHint": "Naam en e-mailadres zijn verplicht om het evenement te publiceren (ze worden gebruikt voor de moderatorlink en de bevestigingsmail). Om als concept op te slaan zijn ze niet vereist.",
@@ -781,8 +781,8 @@
       },
       "validationFailed": "Controleer de gemarkeerde velden voordat u doorgaat.",
       "partialFailure": "Evenement aangemaakt, maar sommige onderdelen zijn niet opgeslagen: {items}. U kunt ze toevoegen vanaf de pagina van het evenement.",
-      "partialFailureEdit": "The event changes were saved, but these could not be: {items}. Your work is still here: fix them and save again.",
-      "partialFailureEditDetail": "The event changes were saved, but these could not be: {items}. The server replied: {reason}. Your work is still here: fix them and save again.",
+      "partialFailureEdit": "De wijzigingen aan het evenement zijn opgeslagen, maar het volgende kon niet worden opgeslagen: {items}. Uw werk staat er nog: corrigeer het en sla opnieuw op.",
+      "partialFailureEditDetail": "De wijzigingen aan het evenement zijn opgeslagen, maar het volgende kon niet worden opgeslagen: {items}. De server antwoordde: {reason}. Uw werk staat er nog: corrigeer het en sla opnieuw op.",
       "draftFound": "We hebben een niet-opgeslagen concept van dit evenement gevonden. Wilt u het herstellen?",
       "draftRestore": "Concept herstellen",
       "draftDiscard": "Negeren",
@@ -792,7 +792,7 @@
         "moderators": "moderatoren",
         "speakers": "sprekers",
         "materials": "materiaal",
-        "questionnaires": "questionnaires"
+        "questionnaires": "vragenlijsten"
       }
     },
     "nav": {
@@ -1210,8 +1210,8 @@
       "recordingEnabled": "Video-opname inschakelen",
       "agendaEnabled": "Live notities / checklist (agenda)",
       "agendaEnabledDesc": "Een checklist met de te behandelen punten die de moderatoren tijdens het evenement afvinken. Wordt meegenomen in de automatische samenvatting. Optioneel en ook tijdens het evenement in te schakelen.",
-      "wordCloudEnabled": "Live word cloud",
-      "wordCloudEnabledDesc": "Participants send a word and the cloud updates live. Useful to open a discussion or gather a feeling in a few seconds.",
+      "wordCloudEnabled": "Live woordwolk",
+      "wordCloudEnabledDesc": "Deelnemers sturen een woord en de wolk wordt live bijgewerkt. Handig om een discussie te openen of in enkele seconden een stemming te peilen.",
       "whiteboardEnabled": "Gedeeld whiteboard",
       "whiteboardEnabledDesc": "Schakelt het ingebouwde samenwerkingswhiteboard (Excalidraw) in: de moderatoren kunnen het tijdens het evenement openen via de werkbalk. Altijd actief bij directe calls.",
       "autoStartRecording": "Opname automatisch starten",
@@ -1448,20 +1448,20 @@
         "graceSection": "Soft exit (einde evenement)",
         "eventGracePeriodMinutes": "Standaard respijtminuten na endsAt",
         "eventGracePeriodMinutesHelp": "Extra tijd toegestaan na de geplande eindtijd voordat de call wordt gesloten. 0 = harde sluiting, -1 = niet automatisch sluiten (laten aan inactiviteit-cleanup), 15 = banner en sluiting na 15 min. Elk evenement kan dit overrulen.",
-        "videoQualitySection": "Video/audio quality",
-        "videoQuality": "Default quality",
-        "videoQualityHelp": "Preset applied to every event (overridable per event). Higher quality needs more bandwidth — “High” is the best trade-off. Takes effect immediately, no restart.",
+        "videoQualitySection": "Video-/audiokwaliteit",
+        "videoQuality": "Standaardkwaliteit",
+        "videoQualityHelp": "Voorinstelling die op alle evenementen wordt toegepast (per evenement aan te passen). Hoe hoger de kwaliteit, hoe meer bandbreedte nodig is: „Hoog” is het beste compromis. Wordt direct toegepast, zonder herstart.",
         "videoQualityOptions": {
-          "MAX": "Maximum — 1080p",
-          "HIGH": "High — 720p (recommended)",
-          "BALANCED": "Balanced — 540p",
-          "SAVE_DATA": "Save data — 360p"
+          "MAX": "Maximaal — 1080p",
+          "HIGH": "Hoog — 720p (aanbevolen)",
+          "BALANCED": "Gebalanceerd — 540p",
+          "SAVE_DATA": "Databesparing — 360p"
         },
         "videoQualityDesc": {
-          "MAX": "Full HD 1080p, up to ~4 Mbps, stereo Opus 510 kbps audio. Top fidelity for small high-stakes calls — uses more bandwidth and loads the bridge more.",
-          "HIGH": "720p with a capped bitrate (~2.2 Mbps peak) and 96 kbps Opus audio. Great quality without maxing bandwidth: the recommended production trade-off.",
-          "BALANCED": "540p with a contained bitrate (~1 Mbps) and fewer simultaneous incoming videos. Good for large audiences or weak networks.",
-          "SAVE_DATA": "360p at minimal bitrate (~600 kbps) with unused-layer suspension. For very slow connections."
+          "MAX": "Full HD 1080p, bitrate tot ~4 Mbps, Opus-stereoaudio 510 kbps. Maximale getrouwheid voor kleine, belangrijke gesprekken — verbruikt meer bandbreedte en belast de videobridge zwaarder.",
+          "HIGH": "720p met begrensde bitrate (~2,2 Mbps piek) en Opus-audio 96 kbps. Uitstekende kwaliteit zonder de bandbreedte te verzadigen: het aanbevolen compromis voor productie.",
+          "BALANCED": "540p met beperkte bitrate (~1 Mbps) en minder gelijktijdig ontvangen videostreams. Geschikt voor een groot publiek of zwakke netwerken.",
+          "SAVE_DATA": "360p met minimale bitrate (~600 kbps) en onderbreking van ongebruikte lagen. Voor zeer trage verbindingen."
         }
       },
       "header": {
@@ -1521,18 +1521,18 @@
         "descriptionHelp": "Beschrijving voor zoekmachines en social media",
         "image": "Open Graph-afbeelding",
         "imageHelp": "Standaardafbeelding voor social media (1200x630 aanbevolen)",
-        "ogSection": "Shared link preview",
-        "ogIntro": "When someone pastes an event link into a chat or a social network, the platform draws a preview image with the details inside it. Choose which ones: every extra field takes room away from the title.",
-        "ogCardEnabled": "Generate the preview",
-        "ogCardEnabledHelp": "When off, the link shows the poster as is (or the site logo if the event has none), with no readable title or date in the image.",
-        "ogShowPoster": "Poster as background",
-        "ogShowPosterHelp": "Uses the event cover as the preview background, dimmed so the text stays readable. With no poster, or with this off, the institutional colour and the logo remain.",
-        "ogShowDate": "Date and time",
-        "ogShowDateHelp": "In the platform's default time zone.",
-        "ogShowSpeakers": "Speakers",
-        "ogShowSpeakersHelp": "The event's speaker text, shortened when too long.",
-        "ogShowOrganization": "Organisation",
-        "ogShowOrganizationHelp": "The event organiser when set, otherwise the organisation name."
+        "ogSection": "Voorbeeld van gedeelde links",
+        "ogIntro": "Wanneer iemand de link van een evenement in een chat of op sociale media plakt, tekent het platform een voorbeeldafbeelding met de gegevens erin. Kies welke: elk extra veld neemt ruimte weg van de titel.",
+        "ogCardEnabled": "Voorbeeld genereren",
+        "ogCardEnabledHelp": "Uitgeschakeld toont de link de affiche zoals die is (of het logo van de site als het evenement er geen heeft), zonder leesbare titel of datum in de afbeelding.",
+        "ogShowPoster": "Affiche als achtergrond",
+        "ogShowPosterHelp": "Gebruikt de omslag van het evenement als achtergrond van het voorbeeld, gedimd zodat de tekst leesbaar blijft. Zonder affiche, of met deze optie uitgeschakeld, blijven de institutionele kleur en het logo.",
+        "ogShowDate": "Datum en tijd",
+        "ogShowDateHelp": "In de standaardtijdzone van het platform.",
+        "ogShowSpeakers": "Sprekers",
+        "ogShowSpeakersHelp": "De sprekerstekst van het evenement, ingekort als die te lang is.",
+        "ogShowOrganization": "Organisatie",
+        "ogShowOrganizationHelp": "De organisator van het evenement indien opgegeven, anders de naam van de organisatie."
       },
       "homepage": {
         "modeLabel": "Modus startpagina",
@@ -1550,12 +1550,12 @@
             "description": "Aangepaste HTML-inhoud + evenementenlijst"
           },
           "LANDING_ISTITUZIONALE": {
-            "title": "Institutional landing",
-            "description": "Organisation, next event in the spotlight and the others listed. No technical language"
+            "title": "Institutionele landingspagina",
+            "description": "Organisatie, volgende evenement uitgelicht en de overige in een lijst. Geen technische taal"
           },
           "LANDING_SEMPLICE": {
-            "title": "Plain-language landing",
-            "description": "Few words and a single invitation, for people new to online events"
+            "title": "Landingspagina in eenvoudige taal",
+            "description": "Weinig woorden en één uitnodiging, voor wie niet gewend is aan online evenementen"
           }
         },
         "customHtmlLabel": "Aangepaste HTML-inhoud",
@@ -2017,7 +2017,7 @@
       "sectionQos": "Servicekwaliteit (latentie)",
       "sectionCapacity": "Capaciteit & JVB",
       "sectionResources": "Hardware-resources",
-      "sectionChat": "In-app chat & Redis",
+      "sectionChat": "Chat in de app & Redis",
       "chatMessagesPerMin": "Chatberichten/min",
       "chatMessagesSubtitle": "gemiddelde laatste 5 min",
       "chatSseConnections": "SSE-verbindingen",
@@ -2045,7 +2045,7 @@
       "participantsNow": "Actieve deelnemers",
       "jvbStress": "JVB-belasting",
       "conferences": "Actieve vergaderingen",
-      "octoRelay": "Octo inter-bridge relay",
+      "octoRelay": "Octo-relay tussen bridges",
       "interBridge": "Octo-verkeer",
       "chartCpu": "CPU usage",
       "chartMemory": "Memory usage",
@@ -2523,20 +2523,20 @@
       "generateAi": "AI genereren",
       "generateAiConfirm": "Start de AI-pijplijn (transcriptie en samenvatting) op deze opname. De AI-verwerking wordt voor het evenement ingeschakeld en start op de achtergrond. De vertalingen worden daarna per taal toegevoegd via het tabblad “Vertalingen”.",
       "generateAiOk": "AI-pijplijn gestart.",
-      "originalToggle": "Show original text",
-      "originalToggleHint": "Show, under each corrected line, the text as the automatic transcription produced it",
-      "originalNotComparable": "The number of lines has changed from the original version: a line-by-line comparison is not possible",
-      "originalLabel": "Original text:",
-      "revisedBadge": "Edited by a person",
-      "revisedHint": "At least one line was corrected by a person after the automatic transcription",
-      "redactLabel": "Erase from the original too",
-      "redactHint": "Use for an erasure request: the changes also apply to the preserved machine text, which would otherwise keep the removed sentence",
-      "redactSave": "Save and erase from the original",
-      "redactSaved": "{n, plural, one {1 line also removed from the original text} other {# lines also removed from the original text}}",
-      "redactNothingRemoved": "The corrections were saved, but there was nothing to remove from the original text for the lines you touched",
-      "redactArchiveFailed": "The corrections were saved to the database, but rewriting the archived file failed: the removed sentence is still downloadable from there. Try the removal again",
-      "originalUncertain": "Origin not certain",
-      "originalUncertainHint": "The preserved text may already include corrections made before this feature existed: it cannot be proven to be what the automatic transcription produced"
+      "originalToggle": "Originele tekst tonen",
+      "originalToggleHint": "Toont onder elke gecorrigeerde regel de tekst zoals de automatische transcriptie die had geproduceerd",
+      "originalNotComparable": "Het aantal regels is gewijzigd ten opzichte van de originele versie: een vergelijking per regel is niet mogelijk",
+      "originalLabel": "Originele tekst:",
+      "revisedBadge": "Handmatig nagekeken",
+      "revisedHint": "Ten minste één regel is na de automatische transcriptie door een persoon gecorrigeerd",
+      "redactLabel": "Ook uit het origineel verwijderen",
+      "redactHint": "Te gebruiken bij een verzoek tot verwijdering: de wijzigingen worden ook toegepast op de bewaarde machinetekst, die anders de verwijderde zin zou behouden",
+      "redactSave": "Opslaan en uit het origineel verwijderen",
+      "redactSaved": "{n, plural, one {1 regel ook uit de originele tekst verwijderd} other {# regels ook uit de originele tekst verwijderd}}",
+      "redactNothingRemoved": "De correcties zijn opgeslagen, maar in de originele tekst was er voor de bewerkte regels niets te verwijderen",
+      "redactArchiveFailed": "De correcties zijn opgeslagen in de database, maar het herschrijven van het gearchiveerde bestand is mislukt: de verwijderde zin blijft daar downloadbaar. Probeer de verwijdering opnieuw",
+      "originalUncertain": "Herkomst niet zeker",
+      "originalUncertainHint": "De bewaarde tekst kan al correcties bevatten die zijn gemaakt voordat deze functie bestond: niet aantoonbaar is dat het de tekst is die de automatische transcriptie heeft geproduceerd"
     },
     "questionnairesPage": {
       "title": "Vragenlijsten",
@@ -2674,47 +2674,47 @@
       }
     },
     "institutional": {
-      "title": "Online meetings and events",
-      "nextTitle": "Next event",
-      "nextCta": "Go to the event and sign up",
-      "othersTitle": "Other events",
-      "pointsTitle": "How to take part",
+      "title": "Online bijeenkomsten en evenementen",
+      "nextTitle": "Volgende evenement",
+      "nextCta": "Naar het evenement en inschrijven",
+      "othersTitle": "Overige evenementen",
+      "pointsTitle": "Hoe u deelneemt",
       "points": {
         "noInstall": {
-          "title": "Join from your browser",
-          "body": "No software to install: just open the link you receive."
+          "title": "Deelnemen via de browser",
+          "body": "U hoeft geen software te installeren: open gewoon de link die u ontvangt."
         },
         "accessible": {
-          "title": "Designed for everyone",
-          "body": "Captions, keyboard and screen readers: the room works without a mouse too."
+          "title": "Ontworpen voor iedereen",
+          "body": "Ondertiteling, toetsenbord en schermlezers: de zaal is ook zonder muis te gebruiken."
         },
         "privacy": {
-          "title": "Your data, handled with care",
-          "body": "Only what sign-up requires is collected, and you can ask for it back or have it deleted."
+          "title": "Zorgvuldig omgaan met gegevens",
+          "body": "Alleen de gegevens die nodig zijn voor de inschrijving worden verzameld, en u kunt ze opvragen of laten verwijderen."
         }
       }
     },
     "simple": {
-      "title": "Online meetings by {organization}",
-      "subtitle": "Join from your computer or phone, with nothing to install.",
-      "cta": "Join the next meeting",
-      "noEvents": "No meetings are scheduled right now. Check back soon.",
-      "stepsTitle": "How it works",
+      "title": "Online bijeenkomsten van {organization}",
+      "subtitle": "Deelnemen via computer of telefoon, zonder iets te installeren.",
+      "cta": "Neem deel aan de volgende bijeenkomst",
+      "noEvents": "Er zijn momenteel geen bijeenkomsten gepland. Kom later terug.",
+      "stepsTitle": "Zo werkt het",
       "steps": {
         "choose": {
-          "title": "Pick a meeting",
-          "body": "Each one shows its date and time."
+          "title": "Kies een bijeenkomst",
+          "body": "Bij elke bijeenkomst staan datum en tijd."
         },
         "name": {
-          "title": "Leave your name",
-          "body": "Your name and email address are all it takes to get the link."
+          "title": "Laat uw naam achter",
+          "body": "Uw naam en e-mailadres zijn voldoende om de link te ontvangen."
         },
         "enter": {
-          "title": "Join",
-          "body": "At the right time, open the link: you are in."
+          "title": "Deelnemen",
+          "body": "Open de link op het juiste moment: u bent binnen."
         }
       },
-      "listTitle": "Upcoming meetings"
+      "listTitle": "Komende bijeenkomsten"
     }
   },
   "polls": {
@@ -2744,8 +2744,8 @@
       "questionRequired": "Schrijf de peilingvraag",
       "minOptions": "Er zijn ten minste 2 opties vereist",
       "generic": "Fout bij het aanmaken van de peiling",
-      "vote": "Vote not recorded. Try again.",
-      "alreadyVoted": "You have already voted in this poll."
+      "vote": "Stem niet geregistreerd. Probeer het opnieuw.",
+      "alreadyVoted": "U hebt al gestemd in deze peiling."
     }
   },
   "materials": {
@@ -2807,10 +2807,10 @@
       "emailInvalid": "Voer een geldig e-mailadres in",
       "submit": "Mijn gegevens opvragen",
       "loading": "Zoeken...",
-      "requestSubmittedTitle": "Check your inbox",
-      "requestSubmittedBody": "If this email matches a registration, we've sent you a link to download your data. The link is valid for 1 hour.",
-      "linkInvalid": "This link is invalid or expired. Please request a new link.",
-      "requestNew": "Request a new link",
+      "requestSubmittedTitle": "Controleer uw mailbox",
+      "requestSubmittedBody": "Als dit e-mailadres overeenkomt met een inschrijving, hebben we u een link gestuurd om uw gegevens te downloaden. De link is 1 uur geldig.",
+      "linkInvalid": "Deze link is ongeldig of verlopen. Vraag een nieuwe link aan.",
+      "requestNew": "Nieuwe link aanvragen",
       "noData": "Geen gegevens gevonden voor dit e-mailadres.",
       "error": "Er is een fout opgetreden. Probeer het later opnieuw.",
       "rateLimited": "Te veel verzoeken. Probeer het over een uur opnieuw.",
@@ -2825,30 +2825,30 @@
       "questionsTitle": "Q&A-vragen",
       "pollVotesTitle": "Peilingstemmen",
       "optionLabel": "Optie",
-      "erasureCtaTitle": "Want to delete your data?",
-      "erasureCtaBody": "You can request full erasure of the data tied to your email (GDPR Art. 17).",
-      "erasureCtaButton": "Request erasure"
+      "erasureCtaTitle": "Wilt u uw gegevens laten verwijderen?",
+      "erasureCtaBody": "U kunt de volledige verwijdering aanvragen van de gegevens die aan uw e-mailadres zijn gekoppeld (Art. 17 GDPR).",
+      "erasureCtaButton": "Verwijdering aanvragen"
     },
     "erasure": {
-      "title": "Erase your data",
-      "subtitle": "Confirm the erasure of the personal data tied to your email address (GDPR Art. 17).",
-      "emailLabel": "Your email address",
-      "emailPlaceholder": "Enter the email used for registration",
-      "emailInvalid": "Please enter a valid email address",
-      "submit": "Request erasure",
-      "requestSubmittedTitle": "Check your inbox",
-      "requestSubmittedBody": "If this email matches a registration, we've sent you a link to confirm the erasure. The link is valid for 1 hour.",
-      "linkInvalid": "This link is invalid or expired. Please request a new link.",
-      "confirmWarning": "You are about to permanently erase all personal data tied to your email.",
-      "confirmBody": "Registrations, questions, poll votes, feedback and reminders will be deleted. This action is irreversible.",
-      "confirmButton": "Confirm erasure",
-      "cancel": "Cancel",
-      "processing": "Deleting...",
-      "doneTitle": "Erasure completed",
-      "doneBody": "{count} registrations and the linked data have been deleted.",
-      "error": "An error occurred. Please try again later.",
-      "rateLimited": "Too many requests. Please try again in one hour.",
-      "back": "Back to my data"
+      "title": "Verwijdering van uw gegevens",
+      "subtitle": "Bevestig de verwijdering van de persoonsgegevens die aan uw e-mailadres zijn gekoppeld (Art. 17 GDPR).",
+      "emailLabel": "Uw e-mailadres",
+      "emailPlaceholder": "Voer het e-mailadres in dat u bij de inschrijving hebt gebruikt",
+      "emailInvalid": "Voer een geldig e-mailadres in",
+      "submit": "Verwijdering aanvragen",
+      "requestSubmittedTitle": "Controleer uw mailbox",
+      "requestSubmittedBody": "Als dit e-mailadres overeenkomt met een inschrijving, hebben we u een link gestuurd om de verwijdering te bevestigen. De link is 1 uur geldig.",
+      "linkInvalid": "Deze link is ongeldig of verlopen. Vraag een nieuwe link aan.",
+      "confirmWarning": "U staat op het punt alle persoonsgegevens die aan uw e-mailadres zijn gekoppeld definitief te verwijderen.",
+      "confirmBody": "Inschrijvingen, vragen, stemmen in peilingen, feedback en herinneringen worden verwijderd. Deze handeling kan niet ongedaan worden gemaakt.",
+      "confirmButton": "Verwijdering bevestigen",
+      "cancel": "Annuleren",
+      "processing": "Bezig met verwijderen...",
+      "doneTitle": "Verwijdering voltooid",
+      "doneBody": "Verwijderde inschrijvingen: {count}, samen met de gekoppelde gegevens.",
+      "error": "Er is een fout opgetreden. Probeer het later opnieuw.",
+      "rateLimited": "Te veel verzoeken. Probeer het over een uur opnieuw.",
+      "back": "Terug naar mijn gegevens"
     }
   },
   "legal": {
@@ -3367,7 +3367,7 @@
   "footer": {
     "privacy": "Privacybeleid",
     "accessibility": "Toegankelijkheidsverklaring",
-    "openSource": "Open source software",
+    "openSource": "Opensourcesoftware",
     "contacts": "Contact",
     "legalNotes": "Juridische kennisgeving",
     "governmentSite": "Italiaanse Overheid",
@@ -3617,8 +3617,8 @@
     "nameLabel": "Uw naam",
     "nameHelp": "De andere deelnemers zien deze",
     "joinNowBtn": "Nu binnenkomen",
-    "roomOpen": "The room is open",
-    "whileYouWait": "While you wait",
+    "roomOpen": "De zaal is open",
+    "whileYouWait": "Terwijl u wacht",
     "openingAt": "Opening om {time}",
     "netiquetteTitle": "Goede praktijken voor deelname",
     "netiquetteBullet1": "Kom enkele minuten van tevoren om uw microfoon en webcam te testen",
@@ -3638,8 +3638,8 @@
     "emailHelp": "Alleen voor eventuele follow-up na afloop",
     "emailInvalid": "Voer een geldig e-mailadres in",
     "chatLockedMessage": "Voer uw naam in om deel te nemen aan de chat van het evenement.",
-    "classicView": "Classic view",
-    "backToGarden": "Back to the park",
+    "classicView": "Klassieke weergave",
+    "backToGarden": "Terug naar het park",
     "aiNoticeTitle": "AI-verwerking na het evenement",
     "aiNotice": "Na afloop wordt de opname verwerkt door AI-hulpmiddelen om een transcript, een samenvatting en eventuele vertalingen en nasynchronisatie te maken. De resultaten kunnen onnauwkeurigheden bevatten; de video blijft de gezaghebbende bron.",
     "multitrackConsentTitle": "Opname per deelnemer",
@@ -3768,15 +3768,15 @@
     "micToggleOff": "Microfoon UIT",
     "cameraOffPreview": "Camera uit",
     "speakerTest": "🔊 Audiotest",
-    "backgroundLabel": "Virtual background",
+    "backgroundLabel": "Virtuele achtergrond",
     "backgroundNoneShort": "No",
-    "backgroundHint": "Applied when you enter the room. To blur your background use the backgrounds button once inside: the preview above shows the camera without effects.",
+    "backgroundHint": "Wordt toegepast wanneer u de zaal betreedt. Gebruik om uw achtergrond te vervagen de achtergrondknop zodra u binnen bent: het voorbeeld hierboven toont de camera zonder effect.",
     "background": {
-      "nessuno": "No background",
-      "ufficio-chiaro": "Light office",
-      "blu-istituzionale": "Institutional blue",
-      "verde-salvia": "Sage green",
-      "grafite": "Graphite"
+      "nessuno": "Geen achtergrond",
+      "ufficio-chiaro": "Licht kantoor",
+      "blu-istituzionale": "Institutioneel blauw",
+      "verde-salvia": "Saliegroen",
+      "grafite": "Grafiet"
     }
   },
   "garden": {
@@ -3784,7 +3784,7 @@
     "classicView": "Klassieke weergave",
     "changeAvatar": "Avatar wijzigen",
     "peopleInGarden": "{count, plural, =0 {Niemand in de tuin} one {1 persoon in de tuin} other {# personen in de tuin}}",
-    "guestName": "Guest",
+    "guestName": "Gast",
     "hintKeyboard": "Beweeg met WASD of de pijltjestoetsen",
     "pickerTitle": "Kies uw avatar",
     "pickerHelp": "Het personage vertegenwoordigt u in de wachttuin. U kunt het op elk moment wijzigen.",
@@ -3793,11 +3793,11 @@
     "hintJoystick": "Versleep om te bewegen"
   },
   "feedbackAdmin": {
-    "title": "Feedback results",
-    "totalVotes": "responses",
-    "noFeedback": "No feedback received",
-    "comments": "Comments",
-    "noComments": "No comments",
+    "title": "Feedbackresultaten",
+    "totalVotes": "antwoorden",
+    "noFeedback": "Geen feedback ontvangen",
+    "comments": "Opmerkingen",
+    "noComments": "Geen opmerkingen",
     "yes": "Ja",
     "no": "Nee"
   }

@@ -85,9 +85,9 @@
       "topWords": "Eniten jaetut sanat",
       "feedback": "Keskiarvosana",
       "feedbackCount": "{count, plural, one {1 vastaus} other {# vastausta}}",
-      "chatQuestions": "Questions from the chat",
-      "reactionsCount": "{count, plural, one {1 reaction} other {# reactions}}",
-      "answered": "answered"
+      "chatQuestions": "Kysymykset chatista",
+      "reactionsCount": "{count, plural, one {1 reaktio} other {# reaktiota}}",
+      "answered": "vastattu"
     },
     "detail": {
       "title": "Tapahtuman tiedot",
@@ -162,12 +162,12 @@
     "successMessage": "Saat vahvistusviestin, jossa on linkki tapahtumaan.",
     "successScheduledMessage": "Ilmoittautumisesi on rekisteröity! Lähetimme sinulle sähköpostin, jossa on henkilökohtainen pääsylinkkisi. Lisää tapahtuma kalenteriisi ja palaa tänne vähän ennen alkua.",
     "addToCalendar": "Lisää kalenteriin",
-    "enteringRoom": "We're taking you to the event waiting room.",
-    "enteringRoomHint": "Opening the room…",
+    "enteringRoom": "Ohjaamme sinut tapahtuman odotushuoneeseen.",
+    "enteringRoomHint": "Salia avataan…",
     "alreadyRegistered": "Olet jo ilmoittautunut tähän tapahtumaan",
-    "resendLink": "Resend my access link",
-    "resending": "Sending…",
-    "resendSent": "If the address is registered, we've re-sent the access link by email.",
+    "resendLink": "Lähetä pääsylinkki uudelleen",
+    "resending": "Lähetetään…",
+    "resendSent": "Jos osoite on rekisteröity, lähetimme pääsylinkin uudelleen sähköpostitse.",
     "backToEvent": "Takaisin tapahtumaan",
     "organization": "Organisaatio",
     "organizationPlaceholder": "esim. AGID, Talousministeriö, Rooman kaupunki",
@@ -340,23 +340,23 @@
       "reactNotAllowed": "Viesteihin reagoiminen edellyttää henkilökohtaista linkkiä tai moderaattorilinkkiä.",
       "editNotAllowed": "Tämä linkki on jaettu, joten sillä ei voi muokata viestejä.",
       "editExpired": "Yli 15 minuuttia on kulunut: tätä viestiä ei voi enää muokata.",
-      "askAsQuestionLabel": "Mark as a question",
-      "placeholderQuestion": "Write your question...",
-      "lensGroupLabel": "Filter messages",
-      "lensAll": "All",
-      "lensQuestions": "Questions ({count})",
-      "lensAnnounceAll": "Listing all messages",
-      "lensAnnounceQuestions": "Listing {count, plural, =0 {no questions} one {1 question} other {# questions}}",
-      "questionOpen": "Question",
-      "questionAnswered": "Answered",
-      "questionDismissed": "Won't be taken",
-      "questionMarkAnswered": "Mark answered",
-      "questionReopen": "Reopen",
-      "questionDismiss": "Dismiss",
-      "questionRestore": "Restore",
-      "questionStatusFailed": "Could not update the question",
-      "questionNeedsText": "Type the text of your question: an attachment alone does not enter the queue",
-      "lensTruncated": "Only the most recent messages are loaded: there may be older questions not listed."
+      "askAsQuestionLabel": "Merkitse kysymykseksi",
+      "placeholderQuestion": "Kirjoita kysymyksesi...",
+      "lensGroupLabel": "Suodata viestejä",
+      "lensAll": "Kaikki",
+      "lensQuestions": "Kysymykset ({count})",
+      "lensAnnounceAll": "Näytetään kaikki viestit",
+      "lensAnnounceQuestions": "Luettelossa: {count, plural, =0 {ei kysymyksiä} one {1 kysymys} other {# kysymystä}}",
+      "questionOpen": "Kysymys",
+      "questionAnswered": "Vastattu",
+      "questionDismissed": "Ei käsitellä",
+      "questionMarkAnswered": "Merkitse vastatuksi",
+      "questionReopen": "Avaa uudelleen",
+      "questionDismiss": "Hylkää",
+      "questionRestore": "Palauta",
+      "questionStatusFailed": "Kysymystä ei voitu päivittää",
+      "questionNeedsText": "Kirjoita kysymyksen teksti: pelkkä liite ei pääse jonoon",
+      "lensTruncated": "Vain uusimmat viestit on ladattu: vanhempia kysymyksiä voi puuttua luettelosta."
     },
     "role": {
       "moderator": "Moderaattori",
@@ -417,7 +417,7 @@
       "live": "👥 {count, plural, one {# henkilö} other {# henkilöä}}"
     },
     "sidebarTabChatUnread": "Uusia lukemattomia viestejä",
-    "sidebarTabPollsOpen": "Open poll you have not voted in yet",
+    "sidebarTabPollsOpen": "Avoin kysely, johon et ole vielä vastannut",
     "floatingControlsLabel": "Tapahtuman säätimet",
     "screenshareActive": "🖥️ {name} jakaa näyttöä",
     "screenshareFallbackName": "Osallistuja",
@@ -441,7 +441,7 @@
       "remainingLabel": "Aikaa jäljellä (napsauta nähdäksesi kuluneen ajan)",
       "elapsedLabel": "Kulunut aika (napsauta nähdäksesi jäljellä olevan ajan)"
     },
-    "videoCallFrameTitle": "Event video call"
+    "videoCallFrameTitle": "Tapahtuman videopuhelu"
   },
   "qa": {
     "title": "Kysymykset ja vastaukset",
@@ -764,7 +764,7 @@
         "retentionHelp": "Tämän rajan ylittyessä henkilötiedot poistetaan automaattisesti.",
         "gdprTemplate": "Tietosuojaseloste-malli",
         "gdprTemplateNone": "— Käytä mukautettua tekstiä —",
-        "gdprTemplateUnknown": "The selected privacy notice template no longer exists: pick another one or go back to custom text",
+        "gdprTemplateUnknown": "Valittua tietosuojaseloste-mallia ei enää ole: valitse toinen tai palaa mukautettuun tekstiin",
         "privacyText": "Tietosuojaseloste (teksti)",
         "moderatorHeading": "Moderaattorin yhteystiedot",
         "moderatorPublishHint": "Nimi ja sähköpostiosoite ovat pakollisia tapahtuman julkaisemiseksi (niitä tarvitaan moderaattorilinkkiin ja vahvistussähköpostiin). Luonnoksena tallentamiseen niitä ei vaadita.",
@@ -781,8 +781,8 @@
       },
       "validationFailed": "Tarkista korostetut kentät ennen jatkamista.",
       "partialFailure": "Tapahtuma luotiin, mutta joitakin osia ei tallennettu: {items}. Voit lisätä ne tapahtuman sivulta.",
-      "partialFailureEdit": "The event changes were saved, but these could not be: {items}. Your work is still here: fix them and save again.",
-      "partialFailureEditDetail": "The event changes were saved, but these could not be: {items}. The server replied: {reason}. Your work is still here: fix them and save again.",
+      "partialFailureEdit": "Tapahtuman muutokset tallennettiin, mutta seuraavia ei voitu tallentaa: {items}. Työsi on yhä tallessa: korjaa ja tallenna uudelleen.",
+      "partialFailureEditDetail": "Tapahtuman muutokset tallennettiin, mutta seuraavia ei voitu tallentaa: {items}. Palvelin vastasi: {reason}. Työsi on yhä tallessa: korjaa ja tallenna uudelleen.",
       "draftFound": "Löysimme tästä tapahtumasta tallentamattoman luonnoksen. Palautetaanko se?",
       "draftRestore": "Palauta luonnos",
       "draftDiscard": "Ohita",
@@ -792,7 +792,7 @@
         "moderators": "moderaattorit",
         "speakers": "puhujat",
         "materials": "materiaalit",
-        "questionnaires": "questionnaires"
+        "questionnaires": "kyselyt"
       }
     },
     "nav": {
@@ -1210,8 +1210,8 @@
       "recordingEnabled": "Ota videotallennus käyttöön",
       "agendaEnabled": "Live-muistiinpanot / tarkistuslista (agenda)",
       "agendaEnabledDesc": "Tarkistuslista käsiteltävistä aiheista, jotka moderaattorit merkitsevät tehdyiksi tapahtuman aikana. Se sisältyy automaattiseen yhteenvetoon. Valinnainen, ja sen voi ottaa käyttöön myös tapahtuman aikana.",
-      "wordCloudEnabled": "Live word cloud",
-      "wordCloudEnabledDesc": "Participants send a word and the cloud updates live. Useful to open a discussion or gather a feeling in a few seconds.",
+      "wordCloudEnabled": "Reaaliaikainen sanapilvi",
+      "wordCloudEnabledDesc": "Osallistujat lähettävät sanan, ja sanapilvi päivittyy reaaliajassa. Hyödyllinen keskustelun avaamiseen tai tunnelman kartoittamiseen muutamassa sekunnissa.",
       "whiteboardEnabled": "Jaettu piirtotaulu",
       "whiteboardEnabledDesc": "Ottaa käyttöön natiivin yhteiskäyttöisen piirtotaulun (Excalidraw): moderaattorit voivat avata sen työkalupalkista tapahtuman aikana. Aina käytössä pikapuheluissa.",
       "autoStartRecording": "Aloita tallennus automaattisesti",
@@ -1448,20 +1448,20 @@
         "graceSection": "Pehmeä poistuminen (tapahtuman päättyminen)",
         "eventGracePeriodMinutes": "Armonaika minuutteina endsAt:n jälkeen (oletus)",
         "eventGracePeriodMinutesHelp": "Lisäaika, joka annetaan suunnitellun päättymisajan jälkeen ennen puhelun sulkemista. 0 = kova pysäytys, -1 = ei automaattista sulkemista (jätä idle-cleanupin päätettäväksi), 15 = banneri ja sulkeminen 15 minuutin kuluttua. Jokainen tapahtuma voi ohittaa.",
-        "videoQualitySection": "Video/audio quality",
-        "videoQuality": "Default quality",
-        "videoQualityHelp": "Preset applied to every event (overridable per event). Higher quality needs more bandwidth — “High” is the best trade-off. Takes effect immediately, no restart.",
+        "videoQualitySection": "Video- ja äänenlaatu",
+        "videoQuality": "Oletuslaatu",
+        "videoQualityHelp": "Esiasetus, jota sovelletaan kaikkiin tapahtumiin (voidaan ohittaa tapahtumakohtaisesti). Mitä parempi laatu, sitä enemmän kaistaa tarvitaan: ”Korkea” on paras kompromissi. Tulee voimaan heti ilman uudelleenkäynnistystä.",
         "videoQualityOptions": {
-          "MAX": "Maximum — 1080p",
-          "HIGH": "High — 720p (recommended)",
-          "BALANCED": "Balanced — 540p",
-          "SAVE_DATA": "Save data — 360p"
+          "MAX": "Suurin — 1080p",
+          "HIGH": "Korkea — 720p (suositeltu)",
+          "BALANCED": "Tasapainoinen — 540p",
+          "SAVE_DATA": "Datansäästö — 360p"
         },
         "videoQualityDesc": {
-          "MAX": "Full HD 1080p, up to ~4 Mbps, stereo Opus 510 kbps audio. Top fidelity for small high-stakes calls — uses more bandwidth and loads the bridge more.",
-          "HIGH": "720p with a capped bitrate (~2.2 Mbps peak) and 96 kbps Opus audio. Great quality without maxing bandwidth: the recommended production trade-off.",
-          "BALANCED": "540p with a contained bitrate (~1 Mbps) and fewer simultaneous incoming videos. Good for large audiences or weak networks.",
-          "SAVE_DATA": "360p at minimal bitrate (~600 kbps) with unused-layer suspension. For very slow connections."
+          "MAX": "Full HD 1080p, bittinopeus enintään ~4 Mbps, 510 kbps:n stereo-Opus-ääni. Paras laatu pieniin ja tärkeisiin puheluihin — kuluttaa enemmän kaistaa ja kuormittaa videosiltaa enemmän.",
+          "HIGH": "720p rajoitetulla bittinopeudella (~2,2 Mbps huippu) ja 96 kbps:n Opus-äänellä. Erinomainen laatu kuormittamatta kaistaa liikaa: suositeltu kompromissi tuotantokäyttöön.",
+          "BALANCED": "540p maltillisella bittinopeudella (~1 Mbps) ja vähemmillä samanaikaisesti vastaanotetuilla videoilla. Sopii suurille yleisöille tai heikoille verkoille.",
+          "SAVE_DATA": "360p pienimmällä bittinopeudella (~600 kbps), käyttämättömät kerrokset keskeytetään. Hyvin hitaille yhteyksille."
         }
       },
       "header": {
@@ -1521,18 +1521,18 @@
         "descriptionHelp": "Kuvaus hakukoneille ja sosiaalisen median jakamista varten",
         "image": "Open Graph -kuva",
         "imageHelp": "Oletuskuva sosiaalisen median jakamista varten (1200x630 suositeltu)",
-        "ogSection": "Shared link preview",
-        "ogIntro": "When someone pastes an event link into a chat or a social network, the platform draws a preview image with the details inside it. Choose which ones: every extra field takes room away from the title.",
-        "ogCardEnabled": "Generate the preview",
-        "ogCardEnabledHelp": "When off, the link shows the poster as is (or the site logo if the event has none), with no readable title or date in the image.",
-        "ogShowPoster": "Poster as background",
-        "ogShowPosterHelp": "Uses the event cover as the preview background, dimmed so the text stays readable. With no poster, or with this off, the institutional colour and the logo remain.",
-        "ogShowDate": "Date and time",
-        "ogShowDateHelp": "In the platform's default time zone.",
-        "ogShowSpeakers": "Speakers",
-        "ogShowSpeakersHelp": "The event's speaker text, shortened when too long.",
-        "ogShowOrganization": "Organisation",
-        "ogShowOrganizationHelp": "The event organiser when set, otherwise the organisation name."
+        "ogSection": "Jaettujen linkkien esikatselu",
+        "ogIntro": "Kun joku liittää tapahtuman linkin chattiin tai sosiaaliseen mediaan, alusta luo esikatselukuvan, jossa tiedot näkyvät. Valitse, mitkä tiedot näytetään: jokainen lisäkenttä vie tilaa otsikolta.",
+        "ogCardEnabled": "Luo esikatselu",
+        "ogCardEnabledHelp": "Kun asetus on pois päältä, linkki näyttää julisteen sellaisenaan (tai sivuston logon, jos tapahtumalla ei ole julistetta) ilman kuvassa luettavaa otsikkoa tai päivämäärää.",
+        "ogShowPoster": "Juliste taustana",
+        "ogShowPosterHelp": "Käyttää tapahtuman kansikuvaa esikatselun taustana himmennettynä, jotta teksti pysyy luettavana. Ilman julistetta tai kun asetus on pois päältä käytetään organisaation virallista väriä ja logoa.",
+        "ogShowDate": "Päivämäärä ja kellonaika",
+        "ogShowDateHelp": "Alustan oletusaikavyöhykkeellä.",
+        "ogShowSpeakers": "Puhujat",
+        "ogShowSpeakersHelp": "Tapahtuman puhujateksti, lyhennettynä jos se on liian pitkä.",
+        "ogShowOrganization": "Organisaatio",
+        "ogShowOrganizationHelp": "Tapahtuman järjestäjä, jos se on ilmoitettu, muuten organisaation nimi."
       },
       "homepage": {
         "modeLabel": "Etusivun tila",
@@ -1550,12 +1550,12 @@
             "description": "Mukautettu HTML-sisältö + tapahtumalista"
           },
           "LANDING_ISTITUZIONALE": {
-            "title": "Institutional landing",
-            "description": "Organisation, next event in the spotlight and the others listed. No technical language"
+            "title": "Virallinen aloitussivu",
+            "description": "Organisaatio, seuraava tilaisuus korostettuna ja muut luettelona. Ei teknistä kieltä"
           },
           "LANDING_SEMPLICE": {
-            "title": "Plain-language landing",
-            "description": "Few words and a single invitation, for people new to online events"
+            "title": "Selkokielinen aloitussivu",
+            "description": "Vähän sanoja ja yksi kutsu niille, joille verkkotapahtumat ovat uusia"
           }
         },
         "customHtmlLabel": "Mukautettu HTML-sisältö",
@@ -2523,20 +2523,20 @@
       "generateAi": "Luo tekoälyllä",
       "generateAiConfirm": "Aja tekoälyputki (litterointi ja yhteenveto) tälle tallenteelle. Tekoälykäsittely otetaan käyttöön tapahtumassa ja käynnistyy taustalla. Käännökset lisätään myöhemmin kieli kerrallaan ”Käännökset”-välilehdeltä.",
       "generateAiOk": "Tekoälyputki käynnistetty.",
-      "originalToggle": "Show original text",
-      "originalToggleHint": "Show, under each corrected line, the text as the automatic transcription produced it",
-      "originalNotComparable": "The number of lines has changed from the original version: a line-by-line comparison is not possible",
-      "originalLabel": "Original text:",
-      "revisedBadge": "Edited by a person",
-      "revisedHint": "At least one line was corrected by a person after the automatic transcription",
-      "redactLabel": "Erase from the original too",
-      "redactHint": "Use for an erasure request: the changes also apply to the preserved machine text, which would otherwise keep the removed sentence",
-      "redactSave": "Save and erase from the original",
-      "redactSaved": "{n, plural, one {1 line also removed from the original text} other {# lines also removed from the original text}}",
-      "redactNothingRemoved": "The corrections were saved, but there was nothing to remove from the original text for the lines you touched",
-      "redactArchiveFailed": "The corrections were saved to the database, but rewriting the archived file failed: the removed sentence is still downloadable from there. Try the removal again",
-      "originalUncertain": "Origin not certain",
-      "originalUncertainHint": "The preserved text may already include corrections made before this feature existed: it cannot be proven to be what the automatic transcription produced"
+      "originalToggle": "Näytä alkuperäinen teksti",
+      "originalToggleHint": "Näyttää jokaisen korjatun rivin alla tekstin sellaisena kuin automaattinen litterointi sen tuotti",
+      "originalNotComparable": "Rivien määrä on muuttunut alkuperäiseen versioon verrattuna: rivikohtainen vertailu ei ole mahdollista",
+      "originalLabel": "Alkuperäinen teksti:",
+      "revisedBadge": "Käsin tarkistettu",
+      "revisedHint": "Henkilö on korjannut vähintään yhden rivin automaattisen litteroinnin jälkeen",
+      "redactLabel": "Poista myös alkuperäisestä",
+      "redactHint": "Käytä poistopyynnön yhteydessä: muutokset koskevat myös säilytettyä automaattisesti tuotettua tekstiä, johon poistettu lause muuten jäisi",
+      "redactSave": "Tallenna ja poista alkuperäisestä",
+      "redactSaved": "{n, plural, one {1 rivi poistettu myös alkuperäisestä tekstistä} other {# riviä poistettu myös alkuperäisestä tekstistä}}",
+      "redactNothingRemoved": "Korjaukset tallennettiin, mutta alkuperäisessä tekstissä ei ollut poistettavaa muokatuilla riveillä",
+      "redactArchiveFailed": "Korjaukset tallennettiin tietokantaan, mutta arkistoidun tiedoston uudelleenkirjoitus epäonnistui: poistettu lause on yhä ladattavissa sieltä. Yritä poistoa uudelleen",
+      "originalUncertain": "Alkuperä epävarma",
+      "originalUncertainHint": "Säilytetty teksti saattaa jo sisältää korjauksia, jotka on tehty ennen tämän toiminnon käyttöönottoa: ei voida osoittaa, että se on automaattisen litteroinnin tuottama teksti"
     },
     "questionnairesPage": {
       "title": "Kyselyt",
@@ -2674,47 +2674,47 @@
       }
     },
     "institutional": {
-      "title": "Online meetings and events",
-      "nextTitle": "Next event",
-      "nextCta": "Go to the event and sign up",
-      "othersTitle": "Other events",
-      "pointsTitle": "How to take part",
+      "title": "Verkkotilaisuudet ja -tapaamiset",
+      "nextTitle": "Seuraava tilaisuus",
+      "nextCta": "Siirry tapahtumaan ja ilmoittaudu",
+      "othersTitle": "Muut tilaisuudet",
+      "pointsTitle": "Näin osallistut",
       "points": {
         "noInstall": {
-          "title": "Join from your browser",
-          "body": "No software to install: just open the link you receive."
+          "title": "Osallistu selaimella",
+          "body": "Ohjelmia ei tarvitse asentaa: riittää, että avaat saamasi linkin."
         },
         "accessible": {
-          "title": "Designed for everyone",
-          "body": "Captions, keyboard and screen readers: the room works without a mouse too."
+          "title": "Suunniteltu kaikille",
+          "body": "Tekstitykset, näppäimistö ja ruudunlukijat: salia voi käyttää myös ilman hiirtä."
         },
         "privacy": {
-          "title": "Your data, handled with care",
-          "body": "Only what sign-up requires is collected, and you can ask for it back or have it deleted."
+          "title": "Tietoja käsitellään huolellisesti",
+          "body": "Vain ilmoittautumiseen tarvittavat tiedot kerätään, ja voit pyytää ne itsellesi tai pyytää niiden poistamista."
         }
       }
     },
     "simple": {
-      "title": "Online meetings by {organization}",
-      "subtitle": "Join from your computer or phone, with nothing to install.",
-      "cta": "Join the next meeting",
-      "noEvents": "No meetings are scheduled right now. Check back soon.",
-      "stepsTitle": "How it works",
+      "title": "{organization} – verkkotilaisuudet",
+      "subtitle": "Osallistu tietokoneelta tai puhelimelta asentamatta mitään.",
+      "cta": "Osallistu seuraavaan tilaisuuteen",
+      "noEvents": "Tilaisuuksia ei ole tällä hetkellä suunniteltu. Tervetuloa myöhemmin uudelleen.",
+      "stepsTitle": "Näin se toimii",
       "steps": {
         "choose": {
-          "title": "Pick a meeting",
-          "body": "Each one shows its date and time."
+          "title": "Valitse tilaisuus",
+          "body": "Jokaisen tilaisuuden päivämäärä ja kellonaika näkyvät."
         },
         "name": {
-          "title": "Leave your name",
-          "body": "Your name and email address are all it takes to get the link."
+          "title": "Jätä nimesi",
+          "body": "Linkin saamiseen riittävät nimi ja sähköpostiosoite."
         },
         "enter": {
-          "title": "Join",
-          "body": "At the right time, open the link: you are in."
+          "title": "Liity",
+          "body": "Avaa linkki oikeaan aikaan: olet mukana."
         }
       },
-      "listTitle": "Upcoming meetings"
+      "listTitle": "Tulevat tilaisuudet"
     }
   },
   "polls": {
@@ -2744,8 +2744,8 @@
       "questionRequired": "Kirjoita kyselyn kysymys",
       "minOptions": "Vähintään 2 vaihtoehtoa vaaditaan",
       "generic": "Virhe kyselyn luomisessa",
-      "vote": "Vote not recorded. Try again.",
-      "alreadyVoted": "You have already voted in this poll."
+      "vote": "Ääntä ei tallennettu. Yritä uudelleen.",
+      "alreadyVoted": "Olet jo äänestänyt tässä kyselyssä."
     }
   },
   "materials": {
@@ -2807,10 +2807,10 @@
       "emailInvalid": "Syötä kelvollinen sähköpostiosoite",
       "submit": "Pyydä tietoni",
       "loading": "Haetaan...",
-      "requestSubmittedTitle": "Check your inbox",
-      "requestSubmittedBody": "If this email matches a registration, we've sent you a link to download your data. The link is valid for 1 hour.",
-      "linkInvalid": "This link is invalid or expired. Please request a new link.",
-      "requestNew": "Request a new link",
+      "requestSubmittedTitle": "Tarkista sähköpostisi",
+      "requestSubmittedBody": "Jos sähköpostiosoite vastaa ilmoittautumista, lähetimme sinulle linkin tietojesi lataamista varten. Linkki on voimassa 1 tunnin.",
+      "linkInvalid": "Linkki on virheellinen tai vanhentunut. Pyydä uusi linkki.",
+      "requestNew": "Pyydä uusi linkki",
       "noData": "Tälle sähköpostiosoitteelle ei löytynyt tietoja.",
       "error": "Tapahtui virhe. Yritä myöhemmin uudelleen.",
       "rateLimited": "Liian monta pyyntöä. Yritä uudelleen tunnin kuluttua.",
@@ -2825,30 +2825,30 @@
       "questionsTitle": "Q&A-kysymykset",
       "pollVotesTitle": "Kyselyäänet",
       "optionLabel": "Vaihtoehto",
-      "erasureCtaTitle": "Want to delete your data?",
-      "erasureCtaBody": "You can request full erasure of the data tied to your email (GDPR Art. 17).",
-      "erasureCtaButton": "Request erasure"
+      "erasureCtaTitle": "Haluatko poistaa tietosi?",
+      "erasureCtaBody": "Voit pyytää kaikkien sähköpostiosoitteeseesi liittyvien tietojen poistamista (GDPR:n 17 artikla).",
+      "erasureCtaButton": "Pyydä poistoa"
     },
     "erasure": {
-      "title": "Erase your data",
-      "subtitle": "Confirm the erasure of the personal data tied to your email address (GDPR Art. 17).",
-      "emailLabel": "Your email address",
-      "emailPlaceholder": "Enter the email used for registration",
-      "emailInvalid": "Please enter a valid email address",
-      "submit": "Request erasure",
-      "requestSubmittedTitle": "Check your inbox",
-      "requestSubmittedBody": "If this email matches a registration, we've sent you a link to confirm the erasure. The link is valid for 1 hour.",
-      "linkInvalid": "This link is invalid or expired. Please request a new link.",
-      "confirmWarning": "You are about to permanently erase all personal data tied to your email.",
-      "confirmBody": "Registrations, questions, poll votes, feedback and reminders will be deleted. This action is irreversible.",
-      "confirmButton": "Confirm erasure",
-      "cancel": "Cancel",
-      "processing": "Deleting...",
-      "doneTitle": "Erasure completed",
-      "doneBody": "{count} registrations and the linked data have been deleted.",
-      "error": "An error occurred. Please try again later.",
-      "rateLimited": "Too many requests. Please try again in one hour.",
-      "back": "Back to my data"
+      "title": "Tietojesi poistaminen",
+      "subtitle": "Vahvista sähköpostiosoitteeseesi liittyvien henkilötietojen poisto (GDPR:n 17 artikla).",
+      "emailLabel": "Sähköpostiosoitteesi",
+      "emailPlaceholder": "Syötä ilmoittautumisessa käyttämäsi sähköposti",
+      "emailInvalid": "Syötä kelvollinen sähköpostiosoite",
+      "submit": "Pyydä poistoa",
+      "requestSubmittedTitle": "Tarkista sähköpostisi",
+      "requestSubmittedBody": "Jos sähköpostiosoite vastaa ilmoittautumista, lähetimme sinulle linkin poiston vahvistamista varten. Linkki on voimassa 1 tunnin.",
+      "linkInvalid": "Linkki on virheellinen tai vanhentunut. Pyydä uusi linkki.",
+      "confirmWarning": "Olet poistamassa pysyvästi kaikki sähköpostiosoitteeseesi liittyvät henkilötiedot.",
+      "confirmBody": "Ilmoittautumiset, kysymykset, kyselyjen äänet, palautteet ja muistutukset poistetaan. Toimintoa ei voi perua.",
+      "confirmButton": "Vahvista poisto",
+      "cancel": "Peruuta",
+      "processing": "Poistetaan...",
+      "doneTitle": "Poisto suoritettu",
+      "doneBody": "Poistettuja ilmoittautumisia: {count}. Myös niihin liittyvät tiedot on poistettu.",
+      "error": "Tapahtui virhe. Yritä myöhemmin uudelleen.",
+      "rateLimited": "Liian monta pyyntöä. Yritä uudelleen tunnin kuluttua.",
+      "back": "Takaisin omiin tietoihin"
     }
   },
   "legal": {
@@ -3617,8 +3617,8 @@
     "nameLabel": "Nimesi",
     "nameHelp": "Muut osallistujat näkevät tämän",
     "joinNowBtn": "Liity nyt",
-    "roomOpen": "The room is open",
-    "whileYouWait": "While you wait",
+    "roomOpen": "Sali on auki",
+    "whileYouWait": "Odottaessasi",
     "openingAt": "Avautuu klo {time}",
     "netiquetteTitle": "Hyvät käytännöt osallistumiseen",
     "netiquetteBullet1": "Saavu muutamia minuutteja etukäteen testataksesi mikrofonisi ja kamerasi",
@@ -3638,8 +3638,8 @@
     "emailHelp": "Vain mahdollista tapahtuman jälkeistä yhteydenpitoa varten",
     "emailInvalid": "Anna kelvollinen sähköpostiosoite",
     "chatLockedMessage": "Anna nimesi, jotta voit liittyä tapahtuman chattiin.",
-    "classicView": "Classic view",
-    "backToGarden": "Back to the park",
+    "classicView": "Perinteinen näkymä",
+    "backToGarden": "Takaisin puistoon",
     "aiNoticeTitle": "Tekoälykäsittely tapahtuman jälkeen",
     "aiNotice": "Lopuksi tallenne käsitellään tekoälytyökaluilla litteroinnin, tiivistelmän sekä mahdollisten käännösten ja dubbausten tuottamiseksi. Tulokset voivat sisältää epätarkkuuksia; video on edelleen ratkaiseva lähde.",
     "multitrackConsentTitle": "Osallistujakohtainen tallennus",
@@ -3768,15 +3768,15 @@
     "micToggleOff": "Mikrofoni pois",
     "cameraOffPreview": "Kamera pois päältä",
     "speakerTest": "🔊 Äänen testi",
-    "backgroundLabel": "Virtual background",
+    "backgroundLabel": "Virtuaalitausta",
     "backgroundNoneShort": "No",
-    "backgroundHint": "Applied when you enter the room. To blur your background use the backgrounds button once inside: the preview above shows the camera without effects.",
+    "backgroundHint": "Otetaan käyttöön, kun tulet saliin. Voit sumentaa taustan salissa taustapainikkeella: yllä oleva esikatselu näyttää kameran kuvan ilman tehosteita.",
     "background": {
-      "nessuno": "No background",
-      "ufficio-chiaro": "Light office",
-      "blu-istituzionale": "Institutional blue",
-      "verde-salvia": "Sage green",
-      "grafite": "Graphite"
+      "nessuno": "Ei taustaa",
+      "ufficio-chiaro": "Vaalea toimisto",
+      "blu-istituzionale": "Virallinen sininen",
+      "verde-salvia": "Salvianvihreä",
+      "grafite": "Grafiitti"
     }
   },
   "garden": {
@@ -3784,7 +3784,7 @@
     "classicView": "Klassinen näkymä",
     "changeAvatar": "Vaihda avatar",
     "peopleInGarden": "{count, plural, =0 {Ei ketään puutarhassa} one {1 henkilö puutarhassa} other {# henkilöä puutarhassa}}",
-    "guestName": "Guest",
+    "guestName": "Vieras",
     "hintKeyboard": "Liiku WASD- tai nuolinäppäimillä",
     "pickerTitle": "Valitse avatarisi",
     "pickerHelp": "Hahmo edustaa sinua odotuspuutarhassa. Voit vaihtaa sen milloin tahansa.",
@@ -3793,11 +3793,11 @@
     "hintJoystick": "Vedä liikkuaksesi"
   },
   "feedbackAdmin": {
-    "title": "Feedback results",
-    "totalVotes": "responses",
-    "noFeedback": "No feedback received",
-    "comments": "Comments",
-    "noComments": "No comments",
+    "title": "Palautteen tulokset",
+    "totalVotes": "vastausta",
+    "noFeedback": "Palautetta ei ole vastaanotettu",
+    "comments": "Kommentit",
+    "noComments": "Ei kommentteja",
     "yes": "Kyllä",
     "no": "Ei"
   }

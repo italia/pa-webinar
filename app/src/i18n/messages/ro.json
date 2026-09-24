@@ -85,9 +85,9 @@
       "topWords": "Cele mai frecvente cuvinte",
       "feedback": "Evaluare medie",
       "feedbackCount": "{count, plural, one {1 răspuns} few {# răspunsuri} other {# de răspunsuri}}",
-      "chatQuestions": "Questions from the chat",
-      "reactionsCount": "{count, plural, one {1 reaction} other {# reactions}}",
-      "answered": "answered"
+      "chatQuestions": "Întrebări din chat",
+      "reactionsCount": "{count, plural, one {1 reacție} few {# reacții} other {# de reacții}}",
+      "answered": "cu răspuns"
     },
     "detail": {
       "title": "Detalii eveniment",
@@ -162,12 +162,12 @@
     "successMessage": "Veți primi un email de confirmare cu linkul de acces la eveniment.",
     "successScheduledMessage": "V-ați înscris! V-am trimis un e-mail cu linkul personal de acces. Adăugați evenimentul în calendar și reveniți aici cu puțin timp înainte de început.",
     "addToCalendar": "Adaugă în calendar",
-    "enteringRoom": "We're taking you to the event waiting room.",
-    "enteringRoomHint": "Opening the room…",
+    "enteringRoom": "Vă conducem în sala de așteptare a evenimentului.",
+    "enteringRoomHint": "Se deschide sala…",
     "alreadyRegistered": "Sunteți deja înregistrat la acest eveniment",
-    "resendLink": "Resend my access link",
-    "resending": "Sending…",
-    "resendSent": "If the address is registered, we've re-sent the access link by email.",
+    "resendLink": "Retrimiteți linkul de acces",
+    "resending": "Se trimite…",
+    "resendSent": "Dacă adresa este înregistrată, v-am retrimis linkul de acces prin email.",
     "backToEvent": "Înapoi la eveniment",
     "organization": "Instituția de apartenență",
     "organizationPlaceholder": "de ex. AGID, Ministerul Economiei, Primăria Romei",
@@ -340,23 +340,23 @@
       "reactNotAllowed": "Pentru a reacționa la mesaje aveți nevoie de linkul personal sau de cel de moderator.",
       "editNotAllowed": "Acest link este partajat: nu permite modificarea mesajelor.",
       "editExpired": "Au trecut mai mult de 15 minute: mesajul nu mai poate fi modificat.",
-      "askAsQuestionLabel": "Mark as a question",
-      "placeholderQuestion": "Write your question...",
-      "lensGroupLabel": "Filter messages",
-      "lensAll": "All",
-      "lensQuestions": "Questions ({count})",
-      "lensAnnounceAll": "Listing all messages",
-      "lensAnnounceQuestions": "Listing {count, plural, =0 {no questions} one {1 question} other {# questions}}",
-      "questionOpen": "Question",
-      "questionAnswered": "Answered",
-      "questionDismissed": "Won't be taken",
-      "questionMarkAnswered": "Mark answered",
-      "questionReopen": "Reopen",
-      "questionDismiss": "Dismiss",
-      "questionRestore": "Restore",
-      "questionStatusFailed": "Could not update the question",
-      "questionNeedsText": "Type the text of your question: an attachment alone does not enter the queue",
-      "lensTruncated": "Only the most recent messages are loaded: there may be older questions not listed."
+      "askAsQuestionLabel": "Marcați ca întrebare",
+      "placeholderQuestion": "Scrieți întrebarea dumneavoastră...",
+      "lensGroupLabel": "Filtrați mesajele",
+      "lensAll": "Toate",
+      "lensQuestions": "Întrebări ({count})",
+      "lensAnnounceAll": "În listă: toate mesajele",
+      "lensAnnounceQuestions": "În listă: {count, plural, =0 {nicio întrebare} one {1 întrebare} few {# întrebări} other {# de întrebări}}",
+      "questionOpen": "Întrebare",
+      "questionAnswered": "Cu răspuns",
+      "questionDismissed": "Nu va fi abordată",
+      "questionMarkAnswered": "Marcați ca având răspuns",
+      "questionReopen": "Redeschideți",
+      "questionDismiss": "Respingeți",
+      "questionRestore": "Restaurați",
+      "questionStatusFailed": "Întrebarea nu a putut fi actualizată",
+      "questionNeedsText": "Scrieți textul întrebării: un atașament singur nu intră în coadă",
+      "lensTruncated": "Sunt încărcate doar mesajele cele mai recente: pot exista întrebări mai vechi care nu apar în listă."
     },
     "role": {
       "moderator": "Moderator",
@@ -417,7 +417,7 @@
       "live": "👥 {count, plural, one {# persoană} other {# persoane}}"
     },
     "sidebarTabChatUnread": "Mesaje noi necitite",
-    "sidebarTabPollsOpen": "Open poll you have not voted in yet",
+    "sidebarTabPollsOpen": "Sondaj deschis la care încă nu ați votat",
     "floatingControlsLabel": "Comenzi eveniment",
     "screenshareActive": "🖥️ {name} partajează ecranul",
     "screenshareFallbackName": "Un participant",
@@ -441,7 +441,7 @@
       "remainingLabel": "Timp rămas (faceți clic pentru timpul scurs)",
       "elapsedLabel": "Timp scurs (faceți clic pentru timpul rămas)"
     },
-    "videoCallFrameTitle": "Event video call"
+    "videoCallFrameTitle": "Apelul video al evenimentului"
   },
   "qa": {
     "title": "Întrebări și Răspunsuri",
@@ -764,7 +764,7 @@
         "retentionHelp": "Peste acest prag, datele cu caracter personal sunt șterse automat.",
         "gdprTemplate": "Șablon notă de informare",
         "gdprTemplateNone": "— Folosiți text personalizat —",
-        "gdprTemplateUnknown": "The selected privacy notice template no longer exists: pick another one or go back to custom text",
+        "gdprTemplateUnknown": "Modelul de notă de informare privind confidențialitatea ales nu mai există: alegeți altul sau reveniți la textul personalizat",
         "privacyText": "Notă de informare privind confidențialitatea (text)",
         "moderatorHeading": "Contact moderator",
         "moderatorPublishHint": "Numele și adresa de e-mail sunt obligatorii pentru publicarea evenimentului (sunt folosite pentru linkul de moderator și e-mailul de confirmare). Pentru salvarea ca ciornă nu sunt necesare.",
@@ -781,8 +781,8 @@
       },
       "validationFailed": "Verificați câmpurile evidențiate înainte de a continua.",
       "partialFailure": "Evenimentul a fost creat, dar unele elemente nu au fost salvate: {items}. Le puteți adăuga din pagina evenimentului.",
-      "partialFailureEdit": "The event changes were saved, but these could not be: {items}. Your work is still here: fix them and save again.",
-      "partialFailureEditDetail": "The event changes were saved, but these could not be: {items}. The server replied: {reason}. Your work is still here: fix them and save again.",
+      "partialFailureEdit": "Modificările evenimentului au fost salvate, dar nu s-a putut salva: {items}. Munca dumneavoastră este încă aici: corectați și salvați din nou.",
+      "partialFailureEditDetail": "Modificările evenimentului au fost salvate, dar nu s-a putut salva: {items}. Serverul a răspuns: {reason}. Munca dumneavoastră este încă aici: corectați și salvați din nou.",
       "draftFound": "Am găsit o ciornă nesalvată a acestui eveniment. Doriți să o restaurați?",
       "draftRestore": "Restaurează ciorna",
       "draftDiscard": "Renunță",
@@ -792,7 +792,7 @@
         "moderators": "moderatori",
         "speakers": "vorbitori",
         "materials": "materiale",
-        "questionnaires": "questionnaires"
+        "questionnaires": "chestionare"
       }
     },
     "nav": {
@@ -1210,8 +1210,8 @@
       "recordingEnabled": "Activați înregistrarea video",
       "agendaEnabled": "Notițe / Listă de verificare (agendă) live",
       "agendaEnabledDesc": "O listă a punctelor de tratat, pe care moderatorii le bifează în timpul evenimentului. Este preluată în rezumatul automat. Opțională și activabilă și în timpul evenimentului.",
-      "wordCloudEnabled": "Live word cloud",
-      "wordCloudEnabledDesc": "Participants send a word and the cloud updates live. Useful to open a discussion or gather a feeling in a few seconds.",
+      "wordCloudEnabled": "Nor de cuvinte în direct",
+      "wordCloudEnabledDesc": "Participanții trimit un cuvânt, iar norul se actualizează în direct. Util pentru a deschide o discuție sau a surprinde o stare de spirit în câteva secunde.",
       "whiteboardEnabled": "Tablă partajată",
       "whiteboardEnabledDesc": "Activează tabla colaborativă nativă (Excalidraw): moderatorii o pot deschide din bara de instrumente în timpul evenimentului. Întotdeauna activă în apelurile instantanee.",
       "autoStartRecording": "Porniți înregistrarea automat",
@@ -1448,20 +1448,20 @@
         "graceSection": "Soft exit (sfârșit eveniment)",
         "eventGracePeriodMinutes": "Minute de grație după endsAt (implicit)",
         "eventGracePeriodMinutesHelp": "Timp suplimentar acordat după ora de încheiere prevăzută înainte de a închide apelul. 0 = închidere dură, -1 = nu închideți automat (lăsați la cleanup-ul de inactivitate), 15 = banner și închidere după 15 min. Fiecare eveniment poate suprascrie.",
-        "videoQualitySection": "Video/audio quality",
-        "videoQuality": "Default quality",
-        "videoQualityHelp": "Preset applied to every event (overridable per event). Higher quality needs more bandwidth — “High” is the best trade-off. Takes effect immediately, no restart.",
+        "videoQualitySection": "Calitate video/audio",
+        "videoQuality": "Calitate implicită",
+        "videoQualityHelp": "Presetare aplicată tuturor evenimentelor (poate fi modificată pentru fiecare eveniment). Cu cât calitatea este mai mare, cu atât este nevoie de mai multă lățime de bandă: „Ridicată” este cel mai bun compromis. Se aplică imediat, fără reporniri.",
         "videoQualityOptions": {
-          "MAX": "Maximum — 1080p",
-          "HIGH": "High — 720p (recommended)",
-          "BALANCED": "Balanced — 540p",
-          "SAVE_DATA": "Save data — 360p"
+          "MAX": "Maximă — 1080p",
+          "HIGH": "Ridicată — 720p (recomandată)",
+          "BALANCED": "Echilibrată — 540p",
+          "SAVE_DATA": "Economisire date — 360p"
         },
         "videoQualityDesc": {
-          "MAX": "Full HD 1080p, up to ~4 Mbps, stereo Opus 510 kbps audio. Top fidelity for small high-stakes calls — uses more bandwidth and loads the bridge more.",
-          "HIGH": "720p with a capped bitrate (~2.2 Mbps peak) and 96 kbps Opus audio. Great quality without maxing bandwidth: the recommended production trade-off.",
-          "BALANCED": "540p with a contained bitrate (~1 Mbps) and fewer simultaneous incoming videos. Good for large audiences or weak networks.",
-          "SAVE_DATA": "360p at minimal bitrate (~600 kbps) with unused-layer suspension. For very slow connections."
+          "MAX": "Full HD 1080p, bitrate de până la ~4 Mbps, audio Opus stereo 510 kbps. Fidelitate maximă pentru apeluri restrânse și importante — consumă mai multă lățime de bandă și încarcă mai mult puntea video.",
+          "HIGH": "720p cu bitrate limitat (~2,2 Mbps la vârf) și audio Opus 96 kbps. Calitate foarte bună fără a satura lățimea de bandă: compromisul recomandat pentru producție.",
+          "BALANCED": "540p cu bitrate redus (~1 Mbps) și mai puține fluxuri video primite simultan. Potrivit pentru audiențe numeroase sau rețele slabe.",
+          "SAVE_DATA": "360p la bitrate minim (~600 kbps) cu suspendarea straturilor neutilizate. Pentru conexiuni foarte lente."
         }
       },
       "header": {
@@ -1521,18 +1521,18 @@
         "descriptionHelp": "Descriere pentru motoarele de căutare și distribuirea pe rețele sociale",
         "image": "Imagine Open Graph",
         "imageHelp": "Imagine implicită pentru distribuirea pe rețele sociale (1200x630 recomandat)",
-        "ogSection": "Shared link preview",
-        "ogIntro": "When someone pastes an event link into a chat or a social network, the platform draws a preview image with the details inside it. Choose which ones: every extra field takes room away from the title.",
-        "ogCardEnabled": "Generate the preview",
-        "ogCardEnabledHelp": "When off, the link shows the poster as is (or the site logo if the event has none), with no readable title or date in the image.",
-        "ogShowPoster": "Poster as background",
-        "ogShowPosterHelp": "Uses the event cover as the preview background, dimmed so the text stays readable. With no poster, or with this off, the institutional colour and the logo remain.",
-        "ogShowDate": "Date and time",
-        "ogShowDateHelp": "In the platform's default time zone.",
-        "ogShowSpeakers": "Speakers",
-        "ogShowSpeakersHelp": "The event's speaker text, shortened when too long.",
-        "ogShowOrganization": "Organisation",
-        "ogShowOrganizationHelp": "The event organiser when set, otherwise the organisation name."
+        "ogSection": "Previzualizarea linkurilor distribuite",
+        "ogIntro": "Când cineva lipește linkul unui eveniment într-un chat sau pe o rețea socială, platforma generează o imagine de previzualizare care conține informațiile. Alegeți care: fiecare câmp în plus ia spațiu titlului.",
+        "ogCardEnabled": "Generați previzualizarea",
+        "ogCardEnabledHelp": "Dezactivată, linkul afișează afișul așa cum este (sau sigla site-ului, dacă evenimentul nu are afiș), fără titlu sau dată lizibile în imagine.",
+        "ogShowPoster": "Afișul ca fundal",
+        "ogShowPosterHelp": "Folosește coperta evenimentului ca fundal al previzualizării, estompată pentru ca textul să rămână lizibil. Fără afiș sau cu această opțiune dezactivată, rămân culoarea instituțională și sigla.",
+        "ogShowDate": "Data și ora",
+        "ogShowDateHelp": "În fusul orar implicit al platformei.",
+        "ogShowSpeakers": "Vorbitori",
+        "ogShowSpeakersHelp": "Textul despre vorbitorii evenimentului, scurtat dacă este prea lung.",
+        "ogShowOrganization": "Instituție",
+        "ogShowOrganizationHelp": "Organizatorul evenimentului, dacă este indicat; altfel, numele organizației."
       },
       "homepage": {
         "modeLabel": "Modul paginii principale",
@@ -1550,12 +1550,12 @@
             "description": "Conținut HTML personalizat + lista evenimentelor"
           },
           "LANDING_ISTITUZIONALE": {
-            "title": "Institutional landing",
-            "description": "Organisation, next event in the spotlight and the others listed. No technical language"
+            "title": "Pagină de prezentare instituțională",
+            "description": "Instituția, următorul eveniment evidențiat și celelalte în listă. Fără limbaj tehnic"
           },
           "LANDING_SEMPLICE": {
-            "title": "Plain-language landing",
-            "description": "Few words and a single invitation, for people new to online events"
+            "title": "Pagină de prezentare în limbaj simplu",
+            "description": "Puține cuvinte și o singură invitație, pentru cei care nu participă de obicei la evenimente online"
           }
         },
         "customHtmlLabel": "Conținut HTML personalizat",
@@ -2023,7 +2023,7 @@
       "chatSseConnections": "Conexiuni SSE",
       "chatSseSubtitle": "abonați activi",
       "redisConnectedClients": "Clienți Redis",
-      "redisConnectedSubtitle": "publishers + subscribers",
+      "redisConnectedSubtitle": "publicatori + abonați",
       "redisPubsubChannels": "Canale pub/sub",
       "redisPubsubSubtitle": "= evenimente cu chat activ",
       "chartRedisMemory": "Memorie Redis",
@@ -2523,20 +2523,20 @@
       "generateAi": "Generează AI",
       "generateAiConfirm": "Rulează pipeline-ul AI (transcriere și rezumat) pe această înregistrare. Procesarea AI va fi activată pentru eveniment și pornește în fundal. Traducerile se adaugă ulterior, limbă cu limbă, din fila „Traduceri”.",
       "generateAiOk": "Pipeline-ul AI a pornit.",
-      "originalToggle": "Show original text",
-      "originalToggleHint": "Show, under each corrected line, the text as the automatic transcription produced it",
-      "originalNotComparable": "The number of lines has changed from the original version: a line-by-line comparison is not possible",
-      "originalLabel": "Original text:",
-      "revisedBadge": "Edited by a person",
-      "revisedHint": "At least one line was corrected by a person after the automatic transcription",
-      "redactLabel": "Erase from the original too",
-      "redactHint": "Use for an erasure request: the changes also apply to the preserved machine text, which would otherwise keep the removed sentence",
-      "redactSave": "Save and erase from the original",
-      "redactSaved": "{n, plural, one {1 line also removed from the original text} other {# lines also removed from the original text}}",
-      "redactNothingRemoved": "The corrections were saved, but there was nothing to remove from the original text for the lines you touched",
-      "redactArchiveFailed": "The corrections were saved to the database, but rewriting the archived file failed: the removed sentence is still downloadable from there. Try the removal again",
-      "originalUncertain": "Origin not certain",
-      "originalUncertainHint": "The preserved text may already include corrections made before this feature existed: it cannot be proven to be what the automatic transcription produced"
+      "originalToggle": "Afișați textul original",
+      "originalToggleHint": "Afișează, sub fiecare rând corectat, textul așa cum fusese produs de transcrierea automată",
+      "originalNotComparable": "Numărul de rânduri s-a schimbat față de versiunea originală: comparația rând cu rând nu este posibilă",
+      "originalLabel": "Text original:",
+      "revisedBadge": "Revizuită manual",
+      "revisedHint": "Cel puțin un rând a fost corectat de o persoană după transcrierea automată",
+      "redactLabel": "Ștergeți și din original",
+      "redactHint": "De folosit pentru o cerere de ștergere: modificările se aplică și textului automat păstrat, care altfel ar păstra fraza eliminată",
+      "redactSave": "Salvați și ștergeți din original",
+      "redactSaved": "{n, plural, one {1 rând șters și din textul original} few {# rânduri șterse și din textul original} other {# de rânduri șterse și din textul original}}",
+      "redactNothingRemoved": "Corecturile au fost salvate, dar în textul original nu era nimic de șters pentru rândurile modificate",
+      "redactArchiveFailed": "Corecturile au fost salvate în baza de date, dar rescrierea fișierului arhivat nu a reușit: fraza eliminată poate fi încă descărcată de acolo. Reîncercați ștergerea",
+      "originalUncertain": "Origine incertă",
+      "originalUncertainHint": "Textul păstrat poate include deja corecturi făcute înainte ca această funcție să existe: nu se poate demonstra că este cel produs de transcrierea automată"
     },
     "questionnairesPage": {
       "title": "Chestionare",
@@ -2674,47 +2674,47 @@
       }
     },
     "institutional": {
-      "title": "Online meetings and events",
-      "nextTitle": "Next event",
-      "nextCta": "Go to the event and sign up",
-      "othersTitle": "Other events",
-      "pointsTitle": "How to take part",
+      "title": "Întâlniri și evenimente online",
+      "nextTitle": "Următorul eveniment",
+      "nextCta": "Mergeți la eveniment și înscrieți-vă",
+      "othersTitle": "Celelalte evenimente",
+      "pointsTitle": "Cum se participă",
       "points": {
         "noInstall": {
-          "title": "Join from your browser",
-          "body": "No software to install: just open the link you receive."
+          "title": "Se participă din browser",
+          "body": "Nu este nevoie să instalați programe: este suficient să deschideți linkul pe care îl veți primi."
         },
         "accessible": {
-          "title": "Designed for everyone",
-          "body": "Captions, keyboard and screen readers: the room works without a mouse too."
+          "title": "Gândit pentru toți",
+          "body": "Subtitrări, tastatură și cititoare de ecran: sala poate fi folosită și fără mouse."
         },
         "privacy": {
-          "title": "Your data, handled with care",
-          "body": "Only what sign-up requires is collected, and you can ask for it back or have it deleted."
+          "title": "Date tratate cu grijă",
+          "body": "Se colectează doar datele necesare înscrierii, iar dumneavoastră puteți cere să le primiți înapoi sau să fie șterse."
         }
       }
     },
     "simple": {
-      "title": "Online meetings by {organization}",
-      "subtitle": "Join from your computer or phone, with nothing to install.",
-      "cta": "Join the next meeting",
-      "noEvents": "No meetings are scheduled right now. Check back soon.",
-      "stepsTitle": "How it works",
+      "title": "Întâlnirile online ale {organization}",
+      "subtitle": "Se participă de pe calculator sau de pe telefon, fără a instala nimic.",
+      "cta": "Participați la următoarea întâlnire",
+      "noEvents": "Momentan nu sunt programate întâlniri. Reveniți în curând.",
+      "stepsTitle": "Cum funcționează",
       "steps": {
         "choose": {
-          "title": "Pick a meeting",
-          "body": "Each one shows its date and time."
+          "title": "Alegeți întâlnirea",
+          "body": "Găsiți data și ora fiecărei întâlniri."
         },
         "name": {
-          "title": "Leave your name",
-          "body": "Your name and email address are all it takes to get the link."
+          "title": "Lăsați-vă numele",
+          "body": "Sunt suficiente numele și adresa de email pentru a primi linkul."
         },
         "enter": {
-          "title": "Join",
-          "body": "At the right time, open the link: you are in."
+          "title": "Intrați",
+          "body": "La ora potrivită, deschideți linkul: sunteți înăuntru."
         }
       },
-      "listTitle": "Upcoming meetings"
+      "listTitle": "Următoarele întâlniri"
     }
   },
   "polls": {
@@ -2744,8 +2744,8 @@
       "questionRequired": "Scrieți întrebarea sondajului",
       "minOptions": "Sunt necesare cel puțin 2 opțiuni",
       "generic": "Eroare la crearea sondajului",
-      "vote": "Vote not recorded. Try again.",
-      "alreadyVoted": "You have already voted in this poll."
+      "vote": "Votul nu a fost înregistrat. Reîncercați.",
+      "alreadyVoted": "Ați votat deja în acest sondaj."
     }
   },
   "materials": {
@@ -2807,10 +2807,10 @@
       "emailInvalid": "Introduceți o adresă de email validă",
       "submit": "Solicitați datele mele",
       "loading": "Se caută...",
-      "requestSubmittedTitle": "Check your inbox",
-      "requestSubmittedBody": "If this email matches a registration, we've sent you a link to download your data. The link is valid for 1 hour.",
-      "linkInvalid": "This link is invalid or expired. Please request a new link.",
-      "requestNew": "Request a new link",
+      "requestSubmittedTitle": "Verificați-vă căsuța de email",
+      "requestSubmittedBody": "Dacă adresa de email corespunde unei înregistrări, v-am trimis un link pentru a descărca datele dumneavoastră. Linkul este valabil 1 oră.",
+      "linkInvalid": "Linkul nu este valid sau a expirat. Solicitați un link nou.",
+      "requestNew": "Solicitați un link nou",
       "noData": "Nicio dată găsită pentru această adresă de email.",
       "error": "A apărut o eroare. Vă rugăm să reîncercați mai târziu.",
       "rateLimited": "Prea multe solicitări. Vă rugăm să reîncercați peste o oră.",
@@ -2825,30 +2825,30 @@
       "questionsTitle": "Întrebări Q&A",
       "pollVotesTitle": "Voturi sondaje",
       "optionLabel": "Opțiune",
-      "erasureCtaTitle": "Want to delete your data?",
-      "erasureCtaBody": "You can request full erasure of the data tied to your email (GDPR Art. 17).",
-      "erasureCtaButton": "Request erasure"
+      "erasureCtaTitle": "Doriți să vă ștergeți datele?",
+      "erasureCtaBody": "Puteți solicita ștergerea completă a datelor asociate adresei dumneavoastră de email (Art. 17 din GDPR).",
+      "erasureCtaButton": "Solicitați ștergerea"
     },
     "erasure": {
-      "title": "Erase your data",
-      "subtitle": "Confirm the erasure of the personal data tied to your email address (GDPR Art. 17).",
-      "emailLabel": "Your email address",
-      "emailPlaceholder": "Enter the email used for registration",
-      "emailInvalid": "Please enter a valid email address",
-      "submit": "Request erasure",
-      "requestSubmittedTitle": "Check your inbox",
-      "requestSubmittedBody": "If this email matches a registration, we've sent you a link to confirm the erasure. The link is valid for 1 hour.",
-      "linkInvalid": "This link is invalid or expired. Please request a new link.",
-      "confirmWarning": "You are about to permanently erase all personal data tied to your email.",
-      "confirmBody": "Registrations, questions, poll votes, feedback and reminders will be deleted. This action is irreversible.",
-      "confirmButton": "Confirm erasure",
-      "cancel": "Cancel",
-      "processing": "Deleting...",
-      "doneTitle": "Erasure completed",
-      "doneBody": "{count} registrations and the linked data have been deleted.",
-      "error": "An error occurred. Please try again later.",
-      "rateLimited": "Too many requests. Please try again in one hour.",
-      "back": "Back to my data"
+      "title": "Ștergerea datelor dumneavoastră",
+      "subtitle": "Confirmați ștergerea datelor personale asociate adresei dumneavoastră de email (Art. 17 din GDPR).",
+      "emailLabel": "Adresa dumneavoastră de email",
+      "emailPlaceholder": "Introduceți emailul utilizat la înregistrare",
+      "emailInvalid": "Introduceți o adresă de email validă",
+      "submit": "Solicitați ștergerea",
+      "requestSubmittedTitle": "Verificați-vă căsuța de email",
+      "requestSubmittedBody": "Dacă adresa de email corespunde unei înregistrări, v-am trimis un link pentru a confirma ștergerea. Linkul este valabil 1 oră.",
+      "linkInvalid": "Linkul nu este valid sau a expirat. Solicitați un link nou.",
+      "confirmWarning": "Sunteți pe cale să ștergeți definitiv toate datele personale asociate adresei dumneavoastră de email.",
+      "confirmBody": "Vor fi șterse înregistrările, întrebările, voturile din sondaje, feedbackul și mementourile. Operațiunea este ireversibilă.",
+      "confirmButton": "Confirmați ștergerea",
+      "cancel": "Anulați",
+      "processing": "Ștergere în curs...",
+      "doneTitle": "Ștergere finalizată",
+      "doneBody": "Înregistrări șterse: {count}, împreună cu datele asociate.",
+      "error": "A apărut o eroare. Reîncercați mai târziu.",
+      "rateLimited": "Prea multe solicitări. Reîncercați peste o oră.",
+      "back": "Înapoi la datele mele"
     }
   },
   "legal": {
@@ -3617,8 +3617,8 @@
     "nameLabel": "Numele dvs.",
     "nameHelp": "Va apărea celorlalți participanți",
     "joinNowBtn": "Intrați acum",
-    "roomOpen": "The room is open",
-    "whileYouWait": "While you wait",
+    "roomOpen": "Sala este deschisă",
+    "whileYouWait": "Cât așteptați",
     "openingAt": "Deschidere la {time}",
     "netiquetteTitle": "Bune practici de participare",
     "netiquetteBullet1": "Sosiți cu câteva minute mai devreme pentru a testa microfonul și camera web",
@@ -3638,8 +3638,8 @@
     "emailHelp": "Doar pentru eventual follow-up post-eveniment",
     "emailInvalid": "Introduceți o adresă de e-mail validă",
     "chatLockedMessage": "Introduceți numele pentru a participa la chatul evenimentului.",
-    "classicView": "Classic view",
-    "backToGarden": "Back to the park",
+    "classicView": "Vizualizare clasică",
+    "backToGarden": "Înapoi în parc",
     "aiNoticeTitle": "Procesare cu IA după eveniment",
     "aiNotice": "La final, înregistrarea va fi procesată cu instrumente de inteligență artificială pentru a genera transcriere, rezumat și eventuale traduceri și dublaje. Rezultatele pot conține inexactități; înregistrarea video rămâne sursa de referință.",
     "multitrackConsentTitle": "Înregistrare per participant",
@@ -3768,15 +3768,15 @@
     "micToggleOff": "Microfon INACTIV",
     "cameraOffPreview": "Cameră oprită",
     "speakerTest": "🔊 Test audio",
-    "backgroundLabel": "Virtual background",
+    "backgroundLabel": "Fundal virtual",
     "backgroundNoneShort": "No",
-    "backgroundHint": "Applied when you enter the room. To blur your background use the backgrounds button once inside: the preview above shows the camera without effects.",
+    "backgroundHint": "Se aplică atunci când intrați în sală. Pentru a estompa fundalul, folosiți butonul pentru fundaluri odată intrat: previzualizarea de mai sus arată camera fără efect.",
     "background": {
-      "nessuno": "No background",
-      "ufficio-chiaro": "Light office",
-      "blu-istituzionale": "Institutional blue",
-      "verde-salvia": "Sage green",
-      "grafite": "Graphite"
+      "nessuno": "Fără fundal",
+      "ufficio-chiaro": "Birou luminos",
+      "blu-istituzionale": "Albastru instituțional",
+      "verde-salvia": "Verde salvie",
+      "grafite": "Grafit"
     }
   },
   "garden": {
@@ -3784,7 +3784,7 @@
     "classicView": "Vizualizare clasică",
     "changeAvatar": "Schimbați avatarul",
     "peopleInGarden": "{count, plural, =0 {Nimeni în grădină} one {1 persoană în grădină} other {# persoane în grădină}}",
-    "guestName": "Guest",
+    "guestName": "Invitat",
     "hintKeyboard": "Deplasați-vă cu WASD sau săgețile",
     "pickerTitle": "Alegeți avatarul",
     "pickerHelp": "Personajul vă reprezintă în grădina de așteptare. Îl puteți schimba oricând.",
@@ -3793,11 +3793,11 @@
     "hintJoystick": "Trageți pentru a vă deplasa"
   },
   "feedbackAdmin": {
-    "title": "Feedback results",
-    "totalVotes": "responses",
-    "noFeedback": "No feedback received",
-    "comments": "Comments",
-    "noComments": "No comments",
+    "title": "Rezultatele feedbackului",
+    "totalVotes": "răspunsuri",
+    "noFeedback": "Niciun feedback primit",
+    "comments": "Comentarii",
+    "noComments": "Niciun comentariu",
     "yes": "Da",
     "no": "Nu"
   }
