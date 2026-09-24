@@ -7,16 +7,18 @@ import { prisma } from '@/lib/db';
 import { decryptPII, tryDecryptPII } from '@/lib/crypto/pii';
 import { generateEventICal } from '@/lib/ical/generate';
 import { enqueueEmail } from '@/lib/email/outbox';
+import { lingueIscrizione } from '@/lib/email/lingua';
+import { getSettings } from '@/lib/settings';
 import { formatDate, formatTime } from '@/lib/utils/date-format';
 import { getPublicEnv } from '@/lib/env';
 import { localizedUrl } from '@/lib/utils/localized-url';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
+import type { EmailLocale } from '@/lib/email/lingua';
 
-type Locale = 'it' | 'en';
+type Locale = EmailLocale;
 
 interface DateChangeNotificationInput {
   eventId: string;
-  locale: Locale;
 }
 
 const COPY = {
@@ -37,6 +39,33 @@ const COPY = {
     newTime: 'New time',
     linkNote: 'Your personal join link remains unchanged.',
     footer: 'This email was sent automatically by PA Webinar.',
+  },
+  fr: {
+    subject: (title: string) => `Mise à jour : ${title} — Nouvelle date`,
+    heading: 'Date de l’événement modifiée',
+    body: 'La date de l’événement auquel vous êtes inscrit a été modifiée.',
+    newDate: 'Nouvelle date',
+    newTime: 'Nouvel horaire',
+    linkNote: 'Votre lien personnel pour participer reste inchangé.',
+    footer: 'Cet e-mail a été envoyé automatiquement par PA Webinar.',
+  },
+  de: {
+    subject: (title: string) => `Aktualisierung: ${title} — Neues Datum`,
+    heading: 'Datum der Veranstaltung geändert',
+    body: 'Das Datum der Veranstaltung, für die Sie angemeldet sind, wurde geändert.',
+    newDate: 'Neues Datum',
+    newTime: 'Neue Uhrzeit',
+    linkNote: 'Ihr persönlicher Teilnahmelink bleibt unverändert.',
+    footer: 'Diese E-Mail wurde automatisch von PA Webinar versendet.',
+  },
+  es: {
+    subject: (title: string) => `Actualización: ${title} — Nueva fecha`,
+    heading: 'Fecha del evento actualizada',
+    body: 'Se ha modificado la fecha del evento en el que está inscrito.',
+    newDate: 'Nueva fecha',
+    newTime: 'Nuevo horario',
+    linkNote: 'Su enlace personal para participar no cambia.',
+    footer: 'Este correo electrónico ha sido enviado automáticamente por PA Webinar.',
   },
 } as const;
 
@@ -89,51 +118,65 @@ export function sendDateChangeNotifications(input: DateChangeNotificationInput):
 
       if (!event || event.registrations.length === 0) return;
 
-      const title = getLocalized(event.title as LocalizedField, input.locale);
-      const description = getLocalized(event.description as LocalizedField, input.locale);
-      const date = formatDate(event.startsAt, input.locale, event.timezone);
-      const time = formatTime(event.startsAt, input.locale, event.timezone);
-
       const baseUrl = getPublicEnv('NEXT_PUBLIC_APP_URL');
-      const eventPageUrl = localizedUrl(baseUrl, `/events/${event.slug}`, input.locale);
+      const { defaultLocale: predefinita } = await getSettings();
 
-      const icsContent = generateEventICal({
-        title,
-        description,
-        startsAt: event.startsAt,
-        endsAt: event.endsAt,
-        timezone: event.timezone,
-        url: eventPageUrl,
-        organizerName: event.moderatorName ?? 'PA Webinar',
-        // moderatorEmail is stored AES-256-GCM encrypted — decrypt before it
-        // becomes the iCal ORGANIZER mailto (otherwise calendar clients get
-        // base64 ciphertext). Mirrors confirmation.ts / calendar.ics.
-        organizerEmail:
-          tryDecryptPII(event.moderatorEmail) ?? process.env.SMTP_FROM ?? 'noreply@dominio.gov.it',
-      });
-
-      const subject = COPY[input.locale].subject(title);
-      const html = notificationHtml(input.locale, title, date, time);
-      const text = notificationText(input.locale, title, date, time);
+      // Ognuno nella lingua in cui si e' iscritto: testi, titolo, data e
+      // link. Il contenuto si prepara una volta per lingua.
+      const perLingua = new Map<string, { subject: string; html: string; text: string; ics: string }>();
+      const contenuto = (pagina: string, testi: Locale) => {
+        const chiave = `${pagina}|${testi}`;
+        const pronto = perLingua.get(chiave);
+        if (pronto) return pronto;
+        const title = getLocalized(event.title as LocalizedField, pagina);
+        const description = getLocalized(event.description as LocalizedField, pagina);
+        const date = formatDate(event.startsAt, testi, event.timezone);
+        const time = formatTime(event.startsAt, testi, event.timezone);
+        const eventPageUrl = localizedUrl(baseUrl, `/events/${event.slug}`, pagina);
+        const ics = generateEventICal({
+          title,
+          description,
+          startsAt: event.startsAt,
+          endsAt: event.endsAt,
+          timezone: event.timezone,
+          url: eventPageUrl,
+          organizerName: event.moderatorName ?? 'PA Webinar',
+          // moderatorEmail is stored AES-256-GCM encrypted — decrypt before it
+          // becomes the iCal ORGANIZER mailto (otherwise calendar clients get
+          // base64 ciphertext). Mirrors confirmation.ts / calendar.ics.
+          organizerEmail:
+            tryDecryptPII(event.moderatorEmail) ?? process.env.SMTP_FROM ?? 'noreply@dominio.gov.it',
+        });
+        const nuovo = {
+          subject: COPY[testi].subject(title),
+          html: notificationHtml(testi, title, date, time),
+          text: notificationText(testi, title, date, time),
+          ics,
+        };
+        perLingua.set(chiave, nuovo);
+        return nuovo;
+      };
 
       for (const registration of event.registrations) {
         try {
+          const { pagina, testi } = lingueIscrizione(registration.locale, predefinita);
+          const mail = contenuto(pagina, testi);
           const recipientEmail = decryptPII(registration.email);
           await enqueueEmail({
             to: recipientEmail,
-            subject,
-            html,
-            text,
+            subject: mail.subject,
+            html: mail.html,
+            text: mail.text,
             attachments: [{
               filename: 'event-updated.ics',
-              content: icsContent,
+              content: mail.ics,
               contentType: 'text/calendar; charset=utf-8; method=REQUEST',
             }],
             metadata: {
               kind: 'date-change-notification',
               registrationId: registration.id,
               eventId: input.eventId,
-              locale: input.locale,
+              locale: testi,
             },
           });
         } catch (err) {

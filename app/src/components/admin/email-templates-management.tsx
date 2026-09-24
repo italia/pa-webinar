@@ -4,11 +4,12 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button, Input, Label } from 'design-react-kit';
 
+import { EMAIL_LOCALES, type EmailLocale } from '@/lib/email/lingua';
 import { useConfirm } from '@/components/ui/confirm-dialog';
 import { SkeletonLines } from '@/components/ui/skeleton';
 
 type TemplateKey = 'confirmation' | 'reminder';
-type LocaleCode = 'it' | 'en';
+type LocaleCode = EmailLocale;
 
 interface TemplateRow {
   id: string;
@@ -33,7 +34,7 @@ interface Defaults {
 }
 
 interface DefaultsMap {
-  [key: string]: Record<LocaleCode, Defaults>;
+  [key: string]: Partial<Record<LocaleCode, Defaults>>;
 }
 
 interface Draft {
@@ -55,7 +56,8 @@ const EMPTY_DRAFT: Draft = {
 };
 
 const KEYS: TemplateKey[] = ['confirmation', 'reminder'];
-const LOCALES: LocaleCode[] = ['it', 'en'];
+// Le lingue in cui le email partono; le altre ricevono l'inglese.
+const LOCALES: readonly LocaleCode[] = EMAIL_LOCALES;
 
 function rowToDraft(row: TemplateRow | undefined): Draft {
   if (!row) return EMPTY_DRAFT;

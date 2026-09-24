@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect, useRef, type FormEvent } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import {
   Button,
   Alert,
@@ -77,6 +77,8 @@ export default function RegistrationFormClient({
 
   const [orgSuggestions, setOrgSuggestions] = useState<string[]>([]);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // La lingua della pagina: decide la lingua delle email che seguiranno.
+  const locale = useLocale();
   const formRef = useRef<HTMLFormElement>(null);
   // Un campo corretto dopo un invio fallito smette subito di risultare
   // sbagliato, invece di restare rosso fino all'invio successivo.
@@ -193,6 +195,7 @@ export default function RegistrationFormClient({
           displayName, email, consentGiven,
           consentFutureCommunications,
           consentAddressBook,
+          locale,
         };
         if (recordingEnabled) body.consentRecording = consentRecording;
         if (multitrackRecordingEnabled) body.consentMultitrack = consentMultitrack;
@@ -237,7 +240,7 @@ export default function RegistrationFormClient({
         setSubmitting(false);
       }
     },
-    [displayName, email, consentGiven, consentRecording, consentMultitrack, consentFutureCommunications, consentAddressBook, organization, organizationRole, organizationType, eventSlug, validate, t, showOrg, showRole, showType, recordingEnabled, multitrackRecordingEnabled],
+    [displayName, email, consentGiven, consentRecording, consentMultitrack, consentFutureCommunications, consentAddressBook, organization, organizationRole, organizationType, eventSlug, validate, t, showOrg, showRole, showType, recordingEnabled, multitrackRecordingEnabled, locale],
   );
 
   // Duplicate sign-up recovery: re-send the original confirmation email
@@ -249,7 +252,7 @@ export default function RegistrationFormClient({
       await fetch(`/api/events/${eventSlug}/registrations/resend`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, locale }),
       });
       setResent(true);
     } catch {
@@ -257,7 +260,7 @@ export default function RegistrationFormClient({
     } finally {
       setResending(false);
     }
-  }, [eventSlug, email]);
+  }, [eventSlug, email, locale]);
 
   // Registration routing by time: "near start" = the event begins within
   // waitingRoomLeadMinutes. Computed at call time so it stays correct while the

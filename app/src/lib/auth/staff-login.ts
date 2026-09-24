@@ -2,6 +2,7 @@ import { createHash, randomBytes } from 'node:crypto';
 
 import { prisma } from '@/lib/db';
 import { tryDecryptPII } from '@/lib/crypto/pii';
+import { linguaEmail } from '@/lib/email/lingua';
 import { enqueueEmail } from '@/lib/email/outbox';
 import { staffLoginEmail } from '@/lib/email/templates';
 import { getPublicEnv } from '@/lib/env';
@@ -44,7 +45,7 @@ export async function inviaLinkAccesso(
   // piattaforma, l'indirizzo nella mail porterebbe a una pagina inesistente e
   // il token andrebbe sprecato.
   const localeValido = (locales as readonly string[]).includes(locale) ? locale : defaultLocale;
-  const lingua = localeValido === 'en' ? 'en' : 'it';
+  const lingua = linguaEmail(localeValido);
   const base = getPublicEnv('NEXT_PUBLIC_APP_URL');
   const settings = await getSettings();
   const mail = staffLoginEmail({

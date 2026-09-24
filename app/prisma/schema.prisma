@@ -703,6 +703,11 @@ model Registration {
   email       String // encrypted at application level
   emailHash   String @map("email_hash") // SHA-256 for dedup & Jitsi JWT
 
+  // Lingua della pagina da cui ci si e' iscritti: decide la lingua di
+  // conferma, promemoria e comunicazioni successive e quella dei loro link.
+  // Assente per le iscrizioni precedenti: si ricade sulla lingua predefinita.
+  locale String? @map("locale") @db.VarChar(5)
+
   // Profiling (configurable per event)
   organization     String?           @map("organization")
   organizationRole String?           @map("organization_role")

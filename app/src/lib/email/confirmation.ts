@@ -31,12 +31,13 @@ import {
 import { formatDate, formatTime, formatDuration } from '@/lib/utils/date-format';
 import { getPublicEnv } from '@/lib/env';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
-
-type Locale = 'it' | 'en';
+import { linguaEmail } from '@/lib/email/lingua';
 
 interface ConfirmationEmailInput {
   registrationId: string;
-  locale: Locale;
+  /** La lingua della pagina di chi si e' iscritto: titolo e link la seguono;
+   *  i testi dell'email sono nella lingua email corrispondente. */
+  locale: string;
   joinUrl: string;
   eventPageUrl: string;
   siteName?: string;
@@ -64,6 +65,7 @@ export async function sendConfirmationEmail(input: ConfirmationEmailInput): Prom
 
     const event = registration.event;
     const recipientEmail = decryptPII(registration.email);
+    const testi = linguaEmail(input.locale);
     const title = getLocalized(event.title as LocalizedField, input.locale);
     const description = getLocalized(event.description as LocalizedField, input.locale);
 
@@ -77,10 +79,10 @@ export async function sendConfirmationEmail(input: ConfirmationEmailInput): Prom
     };
 
     const templateInput = {
-      locale: input.locale,
+      locale: testi,
       eventTitle: title,
-      eventDate: formatDate(event.startsAt, input.locale, event.timezone),
-      eventTime: formatTime(event.startsAt, input.locale, event.timezone),
+      eventDate: formatDate(event.startsAt, testi, event.timezone),
+      eventTime: formatTime(event.startsAt, testi, event.timezone),
       eventDuration: formatDuration(event.startsAt, event.endsAt),
       joinUrl: input.joinUrl,
       eventPageUrl: input.eventPageUrl,
@@ -114,7 +116,7 @@ export async function sendConfirmationEmail(input: ConfirmationEmailInput): Prom
         tryDecryptPII(event.moderatorEmail) ?? process.env.SMTP_FROM ?? 'noreply@dominio.gov.it',
     });
 
-    const override = await loadEmailTemplateOverride('confirmation', input.locale);
+    const override = await loadEmailTemplateOverride('confirmation', testi);
     const resolved = applyOverride(
       baseConfirmationCopy(templateInput),
       override,
@@ -145,7 +147,7 @@ export async function sendConfirmationEmail(input: ConfirmationEmailInput): Prom
         kind: 'confirmation',
         registrationId: input.registrationId,
         eventId: event.id,
-        locale: input.locale,
+        locale: testi,
       },
     });
 

@@ -17,6 +17,7 @@ import type { Prisma } from '@prisma/client';
 
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
+import type { EmailLocale } from '@/lib/email/lingua';
 
 const MAX_QUESTIONS = 5;
 const MAX_WORDS = 15;
@@ -60,30 +61,66 @@ export interface EventRecap {
   feedback: { average: number | null; count: number };
 }
 
+const RECAP_LABELS: Record<
+  EmailLocale,
+  {
+    participants: string;
+    registered: string;
+    questions: string;
+    polls: string;
+    feedback: string;
+    responses: string;
+  }
+> = {
+  it: {
+    participants: 'Partecipanti (picco)',
+    registered: 'Registrati',
+    questions: 'Domande risposte',
+    polls: 'Sondaggi',
+    feedback: 'Media feedback',
+    responses: 'risposte',
+  },
+  en: {
+    participants: 'Participants (peak)',
+    registered: 'Registered',
+    questions: 'Answered questions',
+    polls: 'Polls',
+    feedback: 'Average rating',
+    responses: 'responses',
+  },
+  fr: {
+    participants: 'Participants (pic)',
+    registered: 'Inscrits',
+    questions: 'Questions avec réponse',
+    polls: 'Sondages',
+    feedback: 'Note moyenne',
+    responses: 'réponses',
+  },
+  de: {
+    participants: 'Teilnehmende (Spitzenwert)',
+    registered: 'Angemeldet',
+    questions: 'Beantwortete Fragen',
+    polls: 'Umfragen',
+    feedback: 'Durchschnittliche Bewertung',
+    responses: 'Antworten',
+  },
+  es: {
+    participants: 'Participantes (pico)',
+    registered: 'Inscritos',
+    questions: 'Preguntas respondidas',
+    polls: 'Encuestas',
+    feedback: 'Valoración media',
+    responses: 'respuestas',
+  },
+};
+
 /**
  * A short plain-text summary of the recap for the moderator follow-up email.
  * Locale labels are inlined so this stays a pure, server/edge-safe function
  * (no next-intl dependency). Omits empty sections.
  */
-export function formatRecapSummary(recap: EventRecap, locale: 'it' | 'en'): string {
-  const L =
-    locale === 'it'
-      ? {
-          participants: 'Partecipanti (picco)',
-          registered: 'Registrati',
-          questions: 'Domande risposte',
-          polls: 'Sondaggi',
-          feedback: 'Media feedback',
-          responses: 'risposte',
-        }
-      : {
-          participants: 'Participants (peak)',
-          registered: 'Registered',
-          questions: 'Answered questions',
-          polls: 'Polls',
-          feedback: 'Average rating',
-          responses: 'responses',
-        };
+export function formatRecapSummary(recap: EventRecap, locale: EmailLocale): string {
+  const L = RECAP_LABELS[locale];
   const lines: string[] = [];
   if (recap.headcount > 0) lines.push(`${L.participants}: ${recap.headcount}`);
   if (recap.registrations > 0) lines.push(`${L.registered}: ${recap.registrations}`);

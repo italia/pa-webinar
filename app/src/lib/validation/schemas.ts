@@ -263,6 +263,9 @@ export const createRegistrationSchema = z.object({
   // false means: unchecked is "no", which is the GDPR-required starting
   // state for opt-in consent.
   consentAddressBook: z.boolean().default(false),
+  // Lingua della pagina da cui ci si iscrive: la lingua delle email
+  // successive. Un valore che non e' una lingua della piattaforma si ignora.
+  locale: z.string().max(10).optional(),
 });
 
 export type CreateRegistrationInput = z.infer<typeof createRegistrationSchema>;

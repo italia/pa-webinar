@@ -6,6 +6,8 @@ import { hashEmail } from '@/lib/crypto/pii';
 import { sendConfirmationEmail } from '@/lib/email/confirmation';
 import { getPublicEnv } from '@/lib/env';
 import { localizedUrl } from '@/lib/utils/localized-url';
+import { defaultLocale } from '@/i18n/config';
+import { linguaDaIntestazione, linguaPagina } from '@/lib/email/lingua';
 
 export const dynamic = 'force-dynamic';
 
@@ -38,7 +40,7 @@ export const POST = withErrorHandling(async (request, context) => {
   });
   if (!event) throw new NotFoundError('Event');
 
-  const body = (await parseJsonBody(request)) as { email?: unknown };
+  const body = (await parseJsonBody(request)) as { email?: unknown; locale?: unknown };
   const email = typeof body.email === 'string' ? body.email.trim() : '';
 
   // Neutral response shared by every path so existence isn't leaked.
@@ -53,13 +55,19 @@ export const POST = withErrorHandling(async (request, context) => {
   const emailHash = hashEmail(email);
   const registration = await prisma.registration.findUnique({
     where: { eventId_emailHash: { eventId: event.id, emailHash } },
-    select: { id: true, accessToken: true },
+    select: { id: true, accessToken: true, locale: true },
   });
 
   if (registration) {
     const baseUrl = getPublicEnv('NEXT_PUBLIC_APP_URL');
-    const acceptLang = request.headers.get('Accept-Language') ?? '';
-    const locale: 'it' | 'en' = acceptLang.toLowerCase().startsWith('en') ? 'en' : 'it';
+    // La lingua dell'iscrizione, la stessa di promemoria e avvisi: la rotta
+    // non e' autenticata, e chi conosce un'email non deve poter cambiare la
+    // lingua in cui l'iscritto riceve il proprio link.
+    const locale =
+      linguaPagina(registration.locale) ??
+      linguaPagina(typeof body.locale === 'string' ? body.locale : null) ??
+      linguaDaIntestazione(request.headers.get('Accept-Language')) ??
+      defaultLocale;
     const joinUrl = localizedUrl(
       baseUrl,
       `/events/${slug}/live?token=${registration.accessToken}`,

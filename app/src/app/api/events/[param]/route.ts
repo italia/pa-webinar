@@ -479,8 +479,8 @@ export const PUT = withErrorHandling(async (request, context) => {
   });
 
   if (dateChanged && event.status === 'PUBLISHED') {
-    const locale = resolveLocale(request) as 'it' | 'en';
-    sendDateChangeNotifications({ eventId, locale });
+    // Ogni iscritto riceve l'avviso nella lingua in cui si e' iscritto.
+    sendDateChangeNotifications({ eventId });
   }
 
   // Chi è in sala vede subito una funzione accesa o spenta, senza aspettare il

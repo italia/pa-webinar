@@ -4,6 +4,7 @@
 
 ### Partecipanti / Participants
 - **Nome visualizzato** (`displayName`): mostrato agli altri partecipanti nella sala evento.
+- **Lingua della pagina** da cui ci si iscrive: decide la lingua delle email successive. Non è un dato personale in sé e non viene usata per altro.
 - **Email**: utilizzata solo per inviare la conferma di registrazione, il link di accesso e promemoria. L'email viene crittografata a riposo (`encryptPII`) e un hash (`hashEmail`) viene usato per impedire registrazioni duplicate.
 - **Consenso GDPR** (`consentGiven`, `consentTimestamp`): flag e timestamp del consenso esplicito.
 - **Token di accesso** (`accessToken`): token unico per accedere alla sala evento.
@@ -15,7 +16,7 @@ Nessun altro dato viene raccolto dal partecipante.
 - **Token moderatore** (`moderatorToken`): UUID unico che funge da credenziale di accesso. Non è previsto un sistema di account utente.
 
 ### Organizzatori / Organizers
-- **Nome** ed **email** di chi organizza eventi senza amministrare la piattaforma (vedi [ADR-014](adr/014-organizer-role.md)): inseriti dall'amministrazione, **cifrati a riposo**; l'email si cerca per hash HMAC. Servono a mandare il link di accesso e a indicare chi ha creato un evento.
+- **Nome** ed **email** dello staff — chi organizza eventi e chi amministra la piattaforma con un account nominale (vedi [ADR-014](adr/014-organizer-role.md) e [ADR-015](adr/015-named-administrators.md)): inseriti dall'amministrazione, **cifrati a riposo**; l'email si cerca per hash HMAC. Servono a mandare il link di accesso, a indicare chi ha creato un evento e a sapere chi ha compiuto un'operazione nel registro dell'amministrazione.
 - **Link di accesso**: nel database resta solo l'hash del token, con scadenza e momento d'uso. Nessuna password.
 - **Ultimo accesso**: data e ora, per permettere all'amministrazione di riconoscere gli account inattivi.
 - L'account resta finché l'amministrazione non lo elimina; eliminarlo cancella anche i link di accesso e lascia gli eventi all'amministrazione. Disattivarlo impedisce subito l'accesso.

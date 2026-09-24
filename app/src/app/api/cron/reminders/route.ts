@@ -30,7 +30,7 @@ import { localizedUrl } from '@/lib/utils/localized-url';
 
 export const dynamic = 'force-dynamic';
 
-type Locale = 'it' | 'en';
+import { lingueIscrizione } from '@/lib/email/lingua';
 
 /**
  * GET /api/cron/reminders
@@ -75,6 +75,7 @@ export const GET = withErrorHandling(async (request) => {
   let emailsSent = 0;
   let emailsFailed = 0;
 
+  const overridePerLingua = new Map<string, Awaited<ReturnType<typeof loadEmailTemplateOverride>>>();
   for (const reminder of dueReminders) {
     const event = reminder.event;
 
@@ -90,12 +91,13 @@ export const GET = withErrorHandling(async (request) => {
     if (registrations.length === 0) continue;
     remindersProcessed++;
 
-    const locale: Locale = 'it';
-    const title = getLocalized(event.title as LocalizedField, locale);
-    const description = getLocalized(event.description as LocalizedField, locale);
-
     for (const reg of registrations) {
       try {
+        // Ognuno nella lingua in cui si e' iscritto: link e titolo in quella
+        // della pagina, testi nella lingua email corrispondente.
+        const { pagina: locale, testi } = lingueIscrizione(reg.locale, settings.defaultLocale);
+        const title = getLocalized(event.title as LocalizedField, locale);
+        const description = getLocalized(event.description as LocalizedField, locale);
         const recipientEmail = decryptPII(reg.email);
         const joinUrl = localizedUrl(baseUrl, `/events/${event.slug}/live?token=${reg.accessToken}`, locale);
         const eventPageUrl = localizedUrl(baseUrl, `/events/${event.slug}`, locale);
@@ -109,10 +111,10 @@ export const GET = withErrorHandling(async (request) => {
         };
 
         const templateInput = {
-          locale,
+          locale: testi,
           eventTitle: title,
-          eventDate: formatDate(event.startsAt, locale, event.timezone),
-          eventTime: formatTime(event.startsAt, locale, event.timezone),
+          eventDate: formatDate(event.startsAt, testi, event.timezone),
+          eventTime: formatTime(event.startsAt, testi, event.timezone),
           eventDuration: formatDuration(event.startsAt, event.endsAt),
           joinUrl,
           eventPageUrl,
@@ -140,7 +142,12 @@ export const GET = withErrorHandling(async (request) => {
             'noreply@dominio.gov.it',
         });
 
-        const override = await loadEmailTemplateOverride('reminder', locale);
+        // Una lettura per lingua, non una per iscritto.
+        let override = overridePerLingua.get(testi);
+        if (override === undefined) {
+          override = await loadEmailTemplateOverride('reminder', testi);
+          overridePerLingua.set(testi, override);
+        }
         const resolved = applyOverride(
           baseReminderCopy(templateInput),
           override,
@@ -201,6 +208,7 @@ export const GET = withErrorHandling(async (request) => {
     now,
     baseUrl,
     siteName: settings.siteName || 'PA Webinar',
+    defaultLocale: settings.defaultLocale,
   });
 
   return Response.json({

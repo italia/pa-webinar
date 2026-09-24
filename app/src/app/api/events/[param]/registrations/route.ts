@@ -1,5 +1,7 @@
 import { nanoid } from 'nanoid';
 
+import { defaultLocale } from '@/i18n/config';
+import { linguaDaIntestazione, linguaPagina } from '@/lib/email/lingua';
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import {
   NotFoundError,
@@ -67,6 +69,14 @@ export const POST = withErrorHandling(async (request, context) => {
     consentRecording, consentMultitrack, consentFutureCommunications, consentAddressBook,
   } = parsed.data;
 
+  // La lingua della pagina da cui ci si iscrive; l'intestazione del browser
+  // solo se la richiesta non la dice. Vale per questa email e per quelle che
+  // seguiranno (promemoria, avvisi, post-evento).
+  const pageLocale =
+    linguaPagina(parsed.data.locale) ??
+    linguaDaIntestazione(request.headers.get('Accept-Language')) ??
+    defaultLocale;
+
   // If recording is enabled, consentRecording must be true
   if (event.recordingEnabled && consentRecording !== true) {
     throw new ValidationError('Validation failed', [{ path: ['consentRecording'], message: 'registration.errors.recordingConsentRequired' }]);
@@ -114,6 +124,7 @@ export const POST = withErrorHandling(async (request, context) => {
         consentRecording: event.recordingEnabled ? (consentRecording ?? false) : null,
         consentMultitrack: event.multitrackRecordingEnabled ? (consentMultitrack ?? false) : null,
         consentFutureCommunications: consentFutureCommunications ?? false,
+        locale: pageLocale,
         accessToken,
         personId,
       },
@@ -140,15 +151,12 @@ export const POST = withErrorHandling(async (request, context) => {
 
   const baseUrl = getPublicEnv('NEXT_PUBLIC_APP_URL');
 
-  const acceptLang = request.headers.get('Accept-Language') ?? '';
-  const locale: 'it' | 'en' = acceptLang.toLowerCase().startsWith('en') ? 'en' : 'it';
-
-  const joinUrl = localizedUrl(baseUrl, `/events/${slug}/live?token=${accessToken}`, locale);
-  const eventPageUrl = localizedUrl(baseUrl, `/events/${slug}`, locale);
+  const joinUrl = localizedUrl(baseUrl, `/events/${slug}/live?token=${accessToken}`, pageLocale);
+  const eventPageUrl = localizedUrl(baseUrl, `/events/${slug}`, pageLocale);
 
   await sendConfirmationEmail({
     registrationId: registration.id,
-    locale,
+    locale: pageLocale,
     joinUrl,
     eventPageUrl,
   });

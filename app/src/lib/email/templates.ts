@@ -4,8 +4,9 @@
  */
 
 import type { ResolvedEmailTemplate } from './resolve-template';
+import type { EmailLocale } from './lingua';
 
-type Locale = 'it' | 'en';
+type Locale = EmailLocale;
 
 export function escapeHtml(str: string): string {
   return str
@@ -128,6 +129,114 @@ const copy: Record<Locale, LocaleCopy> = {
     footer: '',
     unsubscribe:
       'You are receiving this email because you registered for the event. No further action is needed to unsubscribe.',
+  },
+  fr: {
+    confirmationSubject: (title) => `Inscription confirmée : ${title}`,
+    reminderSubject: (title, offsetMinutes) => {
+      if (offsetMinutes >= 1440) return `Rappel : ${title} commence demain`;
+      if (offsetMinutes >= 60) {
+        const hours = Math.round(offsetMinutes / 60);
+        return `Rappel : ${title} commence dans ${hours} heure${hours === 1 ? '' : 's'}`;
+      }
+      return `Rappel : ${title} commence dans ${offsetMinutes} minute${offsetMinutes === 1 ? '' : 's'}`;
+    },
+    confirmationHeading: 'Inscription confirmée',
+    reminderHeading: 'Rappel de l’événement',
+    reminderNote: (offsetMinutes) => {
+      if (offsetMinutes >= 1440) {
+        return 'L’événement auquel vous êtes inscrit commence demain. Utilisez le lien ci-dessous pour y accéder.';
+      }
+      if (offsetMinutes >= 60) {
+        const hours = Math.round(offsetMinutes / 60);
+        return `L’événement auquel vous êtes inscrit commence dans ${hours} heure${hours === 1 ? '' : 's'}. Utilisez le lien ci-dessous pour y accéder.`;
+      }
+      return `L’événement auquel vous êtes inscrit commence dans ${offsetMinutes} minute${offsetMinutes === 1 ? '' : 's'}. Utilisez le lien ci-dessous pour y accéder.`;
+    },
+    eventLabel: 'Événement',
+    dateLabel: 'Date',
+    timeLabel: 'Heure',
+    durationLabel: 'Durée',
+    joinLabel: 'Accéder à l’événement',
+    keepNote:
+      'Conservez cet e-mail : il contient votre lien personnel pour accéder à l’événement.',
+    viewEvent: 'Voir la page de l’événement',
+    addToCalendar: 'Ajoutez-le à votre agenda :',
+    downloadIcs: 'Télécharger le fichier .ics',
+    footer: '',
+    unsubscribe:
+      'Vous recevez cet e-mail parce que vous vous êtes inscrit à l’événement. Aucune autre action n’est nécessaire pour vous désinscrire.',
+  },
+  de: {
+    confirmationSubject: (title) => `Anmeldung bestätigt: ${title}`,
+    reminderSubject: (title, offsetMinutes) => {
+      if (offsetMinutes >= 1440) return `Erinnerung: ${title} beginnt morgen`;
+      if (offsetMinutes >= 60) {
+        const hours = Math.round(offsetMinutes / 60);
+        return `Erinnerung: ${title} beginnt in ${hours} Stunde${hours === 1 ? '' : 'n'}`;
+      }
+      return `Erinnerung: ${title} beginnt in ${offsetMinutes} Minute${offsetMinutes === 1 ? '' : 'n'}`;
+    },
+    confirmationHeading: 'Anmeldung bestätigt',
+    reminderHeading: 'Erinnerung an die Veranstaltung',
+    reminderNote: (offsetMinutes) => {
+      if (offsetMinutes >= 1440) {
+        return 'Die Veranstaltung, für die Sie angemeldet sind, beginnt morgen. Nutzen Sie den folgenden Link, um teilzunehmen.';
+      }
+      if (offsetMinutes >= 60) {
+        const hours = Math.round(offsetMinutes / 60);
+        return `Die Veranstaltung, für die Sie angemeldet sind, beginnt in ${hours} Stunde${hours === 1 ? '' : 'n'}. Nutzen Sie den folgenden Link, um teilzunehmen.`;
+      }
+      return `Die Veranstaltung, für die Sie angemeldet sind, beginnt in ${offsetMinutes} Minute${offsetMinutes === 1 ? '' : 'n'}. Nutzen Sie den folgenden Link, um teilzunehmen.`;
+    },
+    eventLabel: 'Veranstaltung',
+    dateLabel: 'Datum',
+    timeLabel: 'Uhrzeit',
+    durationLabel: 'Dauer',
+    joinLabel: 'An der Veranstaltung teilnehmen',
+    keepNote:
+      'Bitte bewahren Sie diese E-Mail auf: Sie enthält Ihren persönlichen Link zur Veranstaltung.',
+    viewEvent: 'Seite der Veranstaltung anzeigen',
+    addToCalendar: 'Zu Ihrem Kalender hinzufügen:',
+    downloadIcs: '.ics herunterladen',
+    footer: '',
+    unsubscribe:
+      'Sie erhalten diese E-Mail, weil Sie sich für die Veranstaltung angemeldet haben. Für eine Abmeldung ist keine weitere Aktion erforderlich.',
+  },
+  es: {
+    confirmationSubject: (title) => `Inscripción confirmada: ${title}`,
+    reminderSubject: (title, offsetMinutes) => {
+      if (offsetMinutes >= 1440) return `Recordatorio: ${title} comienza mañana`;
+      if (offsetMinutes >= 60) {
+        const hours = Math.round(offsetMinutes / 60);
+        return `Recordatorio: ${title} comienza en ${hours} hora${hours === 1 ? '' : 's'}`;
+      }
+      return `Recordatorio: ${title} comienza en ${offsetMinutes} minuto${offsetMinutes === 1 ? '' : 's'}`;
+    },
+    confirmationHeading: 'Inscripción confirmada',
+    reminderHeading: 'Recordatorio del evento',
+    reminderNote: (offsetMinutes) => {
+      if (offsetMinutes >= 1440) {
+        return 'El evento en el que está inscrito comienza mañana. Utilice el enlace que figura a continuación para acceder.';
+      }
+      if (offsetMinutes >= 60) {
+        const hours = Math.round(offsetMinutes / 60);
+        return `El evento en el que está inscrito comienza en ${hours} hora${hours === 1 ? '' : 's'}. Utilice el enlace que figura a continuación para acceder.`;
+      }
+      return `El evento en el que está inscrito comienza en ${offsetMinutes} minuto${offsetMinutes === 1 ? '' : 's'}. Utilice el enlace que figura a continuación para acceder.`;
+    },
+    eventLabel: 'Evento',
+    dateLabel: 'Fecha',
+    timeLabel: 'Hora',
+    durationLabel: 'Duración',
+    joinLabel: 'Acceder al evento',
+    keepNote:
+      'Conserve este correo electrónico: contiene su enlace personal para acceder al evento.',
+    viewEvent: 'Ver la página del evento',
+    addToCalendar: 'Añada el evento a su calendario:',
+    downloadIcs: 'Descargar .ics',
+    footer: '',
+    unsubscribe:
+      'Recibe este correo electrónico porque se ha inscrito en el evento. No es necesaria ninguna otra acción para darse de baja.',
   },
 };
 
@@ -526,6 +635,45 @@ const postEventCopy: Record<
     moderatorCta: 'Open the event page',
     recordingCta: 'Watch the recording',
   },
+  fr: {
+    participantSubject: (t) => `Merci de votre participation : ${t}`,
+    participantHeading: 'Merci de votre participation',
+    participantIntro: (t) =>
+      `Merci d’avoir participé à « ${t} ». Sur la page de l’événement, vous trouverez le récapitulatif et pourrez laisser votre avis.`,
+    participantCta: 'Voir le récapitulatif et donner votre avis',
+    moderatorSubject: (t) => `Événement terminé : ${t}`,
+    moderatorHeading: 'Votre événement est terminé',
+    moderatorIntro: (t) => `L’événement « ${t} » est terminé. Voici un bref récapitulatif.`,
+    recapLabel: 'Récapitulatif',
+    moderatorCta: 'Ouvrir la page de l’événement',
+    recordingCta: 'Voir l’enregistrement',
+  },
+  de: {
+    participantSubject: (t) => `Vielen Dank für Ihre Teilnahme: ${t}`,
+    participantHeading: 'Vielen Dank für Ihre Teilnahme',
+    participantIntro: (t) =>
+      `Vielen Dank für Ihre Teilnahme an „${t}“. Auf der Seite der Veranstaltung finden Sie die Zusammenfassung und können eine Rückmeldung geben.`,
+    participantCta: 'Zusammenfassung ansehen und Rückmeldung geben',
+    moderatorSubject: (t) => `Veranstaltung beendet: ${t}`,
+    moderatorHeading: 'Ihre Veranstaltung ist beendet',
+    moderatorIntro: (t) => `Die Veranstaltung „${t}“ ist beendet. Hier eine kurze Zusammenfassung.`,
+    recapLabel: 'Zusammenfassung',
+    moderatorCta: 'Seite der Veranstaltung öffnen',
+    recordingCta: 'Aufzeichnung ansehen',
+  },
+  es: {
+    participantSubject: (t) => `Gracias por su participación: ${t}`,
+    participantHeading: 'Gracias por su participación',
+    participantIntro: (t) =>
+      `Gracias por participar en «${t}». En la página del evento encontrará el resumen y podrá dejar su opinión.`,
+    participantCta: 'Ver el resumen y dejar su opinión',
+    moderatorSubject: (t) => `Evento finalizado: ${t}`,
+    moderatorHeading: 'Su evento ha finalizado',
+    moderatorIntro: (t) => `El evento «${t}» ha finalizado. A continuación, un breve resumen.`,
+    recapLabel: 'Resumen',
+    moderatorCta: 'Abrir la página del evento',
+    recordingCta: 'Ver la grabación',
+  },
 };
 
 export function postEventParticipantEmail(input: PostEventParticipantInput): {
@@ -634,6 +782,36 @@ const staffLoginCopy: Record<
     cta: 'Sign in',
     expiry: (m) => `The link expires in ${m} minutes.`,
     ignore: 'If you were not expecting this message, ignore it: nobody can sign in without the link.',
+  },
+  fr: {
+    subject: (site) => `Votre lien de connexion à ${site}`,
+    heading: 'Connexion à l’espace d’administration',
+    intro: (name, site) =>
+      `Bonjour ${name}, voici votre lien pour accéder à l’espace d’administration de ${site}. Il n’est valable qu’une seule fois.`,
+    cta: 'Se connecter',
+    expiry: (m) => `Le lien expire dans ${m} minute${m === 1 ? '' : 's'}.`,
+    ignore:
+      'Si vous n’attendiez pas ce message, ignorez-le : personne ne peut se connecter sans le lien.',
+  },
+  de: {
+    subject: (site) => `Ihr Anmeldelink für ${site}`,
+    heading: 'Anmeldung im Verwaltungsbereich',
+    intro: (name, site) =>
+      `Guten Tag ${name}, hier ist Ihr Link zur Anmeldung im Verwaltungsbereich von ${site}. Er ist nur einmal gültig.`,
+    cta: 'Anmelden',
+    expiry: (m) => `Der Link läuft in ${m} Minute${m === 1 ? '' : 'n'} ab.`,
+    ignore:
+      'Falls Sie diese Nachricht nicht erwartet haben, ignorieren Sie sie: Ohne den Link kann sich niemand anmelden.',
+  },
+  es: {
+    subject: (site) => `Su enlace de acceso a ${site}`,
+    heading: 'Acceso al área de administración',
+    intro: (name, site) =>
+      `Hola, ${name}: este es su enlace para acceder al área de administración de ${site}. Solo es válido una vez.`,
+    cta: 'Acceder',
+    expiry: (m) => `El enlace caduca en ${m} minuto${m === 1 ? '' : 's'}.`,
+    ignore:
+      'Si no esperaba este mensaje, ignórelo: nadie puede acceder sin el enlace.',
   },
 };
 
