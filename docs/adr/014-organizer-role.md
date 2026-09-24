@@ -1,6 +1,6 @@
 # ADR-014 — Ruolo organizzatore: account dello staff con accesso via email
 
-**Stato**: Accettato e implementato
+**Stato**: Accettato e implementato — esteso da [ADR-015](015-named-administrators.md) (amministratori nominali)
 **Decisori**: team pa-webinar
 
 ## Contesto

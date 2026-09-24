@@ -74,7 +74,7 @@ export const POST = withErrorHandling(async (request) => {
 
   const event = await prisma.event.create({
     data: {
-      createdById: session.role === 'organizer' ? session.accountId : null,
+      createdById: session.accountId,
       slug,
       jitsiRoomName,
       moderatorToken,

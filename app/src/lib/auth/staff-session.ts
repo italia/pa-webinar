@@ -1,3 +1,4 @@
+import type { StaffRole } from '@prisma/client';
 import { cache } from 'react';
 import { jwtVerify, SignJWT } from 'jose';
 import type { ReadonlyRequestCookies } from 'next/dist/server/web/spec-extension/adapters/request-cookies';
@@ -13,16 +14,21 @@ const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
 /**
  * Chi sta usando l'area di amministrazione (ADR-014).
  *
- * - `admin` — la chiave dell'istanza: tutto.
+ * - `admin` — tutta l'istanza. Con un account nominale (`accountId`) o con
+ *   la chiave dell'istanza (`accountId: null`), che resta come accesso di
+ *   emergenza e per l'automazione.
  * - `organizer` — un account dello staff: i propri eventi e cio' che serve
  *   a crearli, niente configurazione dell'istanza ne' dati di tutti.
  *
- * Entrambi viaggiano nello stesso cookie firmato (`admin_session`), con il
- * ruolo nel token. `isAdminAuthenticated` resta vera SOLO per l'admin: le
- * rotte che non sono state riviste per il nuovo ruolo continuano a
- * rifiutare l'organizzatore, invece di aprirsi per errore.
+ * Tutti viaggiano nello stesso cookie firmato (`admin_session`). Per gli
+ * account il ruolo NON si prende dal token ma dall'account, riletto a ogni
+ * richiesta: nominare, degradare o disattivare qualcuno vale subito.
+ * `isAdminAuthenticated` resta vera SOLO per l'admin: le rotte che non sono
+ * state riviste per l'organizzatore continuano a rifiutarlo.
  */
-export type StaffSession = { role: 'admin' } | { role: 'organizer'; accountId: string };
+export type StaffSession =
+  | { role: 'admin'; accountId: string | null }
+  | { role: 'organizer'; accountId: string };
 
 /**
  * La sessione corrente, o `null`. Per l'organizzatore rilegge l'account:
@@ -45,25 +51,46 @@ export const getStaffSession = cache(async function getStaffSession(
     return null;
   }
 
-  if (payload.role === 'admin') return { role: 'admin' };
-  if (payload.role !== 'organizer' || typeof payload.sub !== 'string') return null;
+  // La chiave dell'istanza: nessun account dietro.
+  if (typeof payload.sub !== 'string') {
+    return payload.role === 'admin' ? { role: 'admin', accountId: null } : null;
+  }
+  if (payload.role !== 'admin' && payload.role !== 'organizer') return null;
+  if (!UUID_RE.test(payload.sub)) return null;
 
   const account = await prisma.staffAccount.findUnique({
     where: { id: payload.sub },
-    select: { id: true, active: true },
+    select: { id: true, active: true, role: true },
   });
   if (!account?.active) return null;
-  return { role: 'organizer', accountId: account.id };
+  return account.role === 'ADMIN'
+    ? { role: 'admin', accountId: account.id }
+    : { role: 'organizer', accountId: account.id };
 });
 
-/** Un token di sessione per l'organizzatore. */
-export async function signOrganizerSession(accountId: string): Promise<string> {
-  return new SignJWT({ role: 'organizer' })
+/**
+ * Un token di sessione per un account dello staff. Il ruolo nel token serve
+ * solo al middleware, che non legge il database; chi decide e' l'account.
+ */
+export async function signStaffSession(account: {
+  id: string;
+  role: StaffRole;
+}): Promise<string> {
+  return new SignJWT({ role: account.role === 'ADMIN' ? 'admin' : 'organizer' })
     .setProtectedHeader({ alg: 'HS256' })
-    .setSubject(accountId)
+    .setSubject(account.id)
     .setIssuedAt()
     .setExpirationTime(`${ADMIN_SESSION_TTL_SECONDS}s`)
     .sign(requireAppSecretKey());
+}
+
+/** Un amministratore, con la chiave o con un account; altrimenti 401. */
+export async function requireAdmin(
+  cookies: ReadonlyRequestCookies,
+): Promise<{ role: 'admin'; accountId: string | null }> {
+  const session = await getStaffSession(cookies);
+  if (session?.role !== 'admin') throw new UnauthorizedError();
+  return session;
 }
 
 /** Qualunque persona dello staff; altrimenti 401. */

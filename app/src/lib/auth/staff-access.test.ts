@@ -23,7 +23,7 @@ function file(dir: string, nome: string): string[] {
 const rel = (f: string) => path.relative(APP, f).replace(/\\/g, '/');
 
 const GUARDIE_STAFF = /\b(requireStaff|requireEventManager|requireRecordingManager|requireSpeakerManager)\(/;
-const GUARDIA_ADMIN = /\bisAdminAuthenticated\(/;
+const GUARDIA_ADMIN = /\b(isAdminAuthenticated|requireAdmin)\(/;
 
 /** Le rotte dell'area che l'organizzatore puo' usare, ciascuna col suo perche'. */
 const ROTTE_ORGANIZZATORE: Record<string, string> = {

@@ -1,6 +1,6 @@
 /**
  * POST /api/staff/login-link/verify — consuma il link e apre la sessione
- * dell'organizzatore (ADR-014).
+ * dell'account dello staff, organizzatore o amministratore (ADR-014).
  *
  * POST e non GET: il link nella email apre una pagina che chiede un clic, e
  * solo quel clic arriva qui. Un filtro antispam che visita il link non
@@ -13,7 +13,8 @@ import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { setAdminSessionCookie } from '@/lib/auth/admin-session';
 import { consumaLinkAccesso } from '@/lib/auth/staff-login';
-import { signOrganizerSession } from '@/lib/auth/staff-session';
+import { signStaffSession } from '@/lib/auth/staff-session';
+import { prisma } from '@/lib/db';
 import { RateLimitError, ValidationError } from '@/lib/errors';
 import { getClientIp, rateLimit } from '@/lib/rate-limit';
 
@@ -33,13 +34,19 @@ export const POST = withErrorHandling(async (request) => {
   // Scaduto, gia' usato, inesistente, account disattivato: una sola risposta.
   if (!accountId) throw new ValidationError('invalid_link');
 
+  const account = await prisma.staffAccount.findUnique({
+    where: { id: accountId },
+    select: { id: true, role: true },
+  });
+  // Eliminato fra il consumo del link e questa lettura: stessa risposta.
+  if (!account) throw new ValidationError('invalid_link');
   await logAdminAction({
     request,
     action: 'STAFF_LOGIN',
     target: accountId,
-    actor: `organizer:${accountId}`,
+    actor: `${account.role === 'ADMIN' ? 'admin' : 'organizer'}:${accountId}`,
   });
   const response = NextResponse.json({ ok: true });
-  setAdminSessionCookie(response, await signOrganizerSession(accountId));
+  setAdminSessionCookie(response, await signStaffSession(account));
   return response;
 });

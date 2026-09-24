@@ -2238,7 +2238,11 @@ model Speaker {
 // ─────────────────────────────────────────────────────────────
 
 enum StaffRole {
+  // I propri eventi e cio' che serve a crearli.
   ORGANIZER
+  // Tutta l'istanza, come la chiave, ma con un nome: il registro delle
+  // operazioni sa chi e' stato, e chi lascia l'ente si disattiva da solo.
+  ADMIN
 }
 
 model StaffAccount {

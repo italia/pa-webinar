@@ -25,7 +25,7 @@ import {
   ADMIN_SESSION_TTL_SECONDS,
   setAdminSessionCookie,
 } from '@/lib/auth/admin-session';
-import { getStaffSession, signOrganizerSession } from '@/lib/auth/staff-session';
+import { getStaffSession, signStaffSession } from '@/lib/auth/staff-session';
 
 export const dynamic = 'force-dynamic';
 
@@ -44,9 +44,14 @@ export const POST = withErrorHandling(async (_request) => {
     throw new AppError('server_misconfigured', 500, 'INTERNAL_ERROR');
   }
 
+  // Il ruolo del nuovo token e' quello dell'account adesso: un rinnovo dopo
+  // una nomina o un declassamento allinea anche il middleware.
   const token =
-    session.role === 'organizer'
-      ? await signOrganizerSession(session.accountId)
+    session.accountId !== null
+      ? await signStaffSession({
+          id: session.accountId,
+          role: session.role === 'admin' ? 'ADMIN' : 'ORGANIZER',
+        })
       : await new SignJWT({ role: 'admin' })
           .setProtectedHeader({ alg: 'HS256' })
           .setIssuedAt()

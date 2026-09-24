@@ -1,20 +1,22 @@
 /**
- * /api/admin/organizers/:id — attivazione, nome, eliminazione (ADR-014).
+ * /api/admin/organizers/:id — attivazione, nome, ruolo, eliminazione
+ * (ADR-014).
  *
  * Eliminare un account non elimina i suoi eventi: tornano
  * all'amministrazione (la relazione e' SetNull).
  */
 import { randomUUID } from 'node:crypto';
+
 import { cookies } from 'next/headers';
 import type { Prisma } from '@prisma/client';
 import { z } from 'zod';
 
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { logAdminAction } from '@/lib/audit/admin-audit';
-import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { requireAdmin } from '@/lib/auth/staff-session';
 import { encryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
-import { NotFoundError, UnauthorizedError, ValidationError } from '@/lib/errors';
+import { ForbiddenError, NotFoundError, ValidationError } from '@/lib/errors';
 
 export const dynamic = 'force-dynamic';
 
@@ -24,6 +26,7 @@ const patchSchema = z
   .object({
     active: z.boolean().optional(),
     name: z.string().trim().min(2).max(120).optional(),
+    role: z.enum(['ORGANIZER', 'ADMIN']).optional(),
   })
   .strict();
 
@@ -39,6 +42,15 @@ async function ruotaTokenEventi(tx: Prisma.TransactionClient, accountId: string)
   }
 }
 
+/**
+ * Solo un amministratore gestisce gli account. Il proprio no: togliersi il
+ * ruolo, disattivarsi o eliminarsi per errore lascerebbe l'istanza senza chi
+ * la amministra, se l'unica altra via e' una chiave che nessuno ricorda.
+ */
+async function amministratore(): Promise<{ accountId: string | null }> {
+  return requireAdmin(await cookies());
+}
+
 async function idValido(context: { params: Promise<{ id: string }> }): Promise<string> {
   const { id } = await context.params;
   if (!UUID_RE.test(id)) throw new NotFoundError('Organizer');
@@ -46,11 +58,14 @@ async function idValido(context: { params: Promise<{ id: string }> }): Promise<s
 }
 
 export const PATCH = withErrorHandling(async (request, context) => {
-  if (!(await isAdminAuthenticated(await cookies()))) throw new UnauthorizedError();
+  const io = await amministratore();
   const id = await idValido(context as { params: Promise<{ id: string }> });
   const parsed = patchSchema.safeParse(await parseJsonBody(request));
   if (!parsed.success) throw new ValidationError('Validation failed');
-  const { active, name } = parsed.data;
+  const { active, name, role } = parsed.data;
+  if (id === io.accountId && (active === false || role === 'ORGANIZER')) {
+    throw new ForbiddenError('not_on_self');
+  }
   const esiste = await prisma.staffAccount.findUnique({ where: { id }, select: { id: true } });
   if (!esiste) throw new NotFoundError('Organizer');
   await prisma.$transaction(async (tx) => {
@@ -59,6 +74,7 @@ export const PATCH = withErrorHandling(async (request, context) => {
       data: {
         ...(active !== undefined && { active }),
         ...(name !== undefined && { name: encryptPII(name) }),
+        ...(role !== undefined && { role }),
       },
     });
     if (active === false) {
@@ -72,15 +88,24 @@ export const PATCH = withErrorHandling(async (request, context) => {
   });
   await logAdminAction({
     request,
-    action: active === false ? 'ORGANIZER_DEACTIVATE' : 'ORGANIZER_UPDATE',
+    // Un cambio di ruolo ha una voce sua: nel registro una nomina ad
+    // amministratore non deve confondersi con la correzione di un nome.
+    action:
+      active === false
+        ? 'ORGANIZER_DEACTIVATE'
+        : role !== undefined
+          ? 'STAFF_ROLE_CHANGE'
+          : 'ORGANIZER_UPDATE',
     target: id,
+    ...(role !== undefined && { details: { role } }),
   });
   return Response.json({ ok: true });
 });
 
 export const DELETE = withErrorHandling(async (request, context) => {
-  if (!(await isAdminAuthenticated(await cookies()))) throw new UnauthorizedError();
+  const io = await amministratore();
   const id = await idValido(context as { params: Promise<{ id: string }> });
+  if (id === io.accountId) throw new ForbiddenError('not_on_self');
   // Gli eventi tornano all'amministrazione (SetNull), e i loro link da
   // moderatore cambiano: quelli vecchi li conosceva chi se ne va.
   const res = await prisma.$transaction(async (tx) => {

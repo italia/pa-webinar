@@ -29,7 +29,7 @@ docker compose --profile setup run --rm db-migrate
 #    Jitsi:   https://localhost:8443
 ```
 
-L'admin panel è accessibile con l'API key configurata nella variabile d'ambiente `ADMIN_API_KEY` (valore di default per sviluppo: `dev_admin_key_2026`).
+L'admin panel è accessibile con l'API key configurata nella variabile d'ambiente `ADMIN_API_KEY` (valore di default per sviluppo: `dev_admin_key_2026`). Entrati con la chiave, dalla pagina **Utenze** si creano gli account nominali di organizzatori e amministratori, che accedono con un link via email (in locale lo si legge in Mailpit dopo aver fatto girare `GET /api/cron/email-outbox`): la chiave resta per il primo accesso, l'emergenza e l'automazione.
 
 ## Struttura del progetto
 

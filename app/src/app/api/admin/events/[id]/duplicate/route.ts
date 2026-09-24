@@ -34,7 +34,6 @@
 import { randomUUID } from 'crypto';
 
 import { cookies } from 'next/headers';
-
 import { z } from 'zod';
 
 import { withErrorHandling } from '@/lib/api-handler';
@@ -230,7 +229,7 @@ export const POST = withErrorHandling(async (request, context) => {
     data: {
       // La copia e' di chi la crea: l'organizzatore che duplica il proprio
       // evento deve poterla gestire (ADR-014).
-      createdById: session.role === 'organizer' ? session.accountId : null,
+      createdById: session.accountId,
       // Everything the copy inherits, from the single classified list — see
       // lib/events/duplicate-fields.ts for why this is not spelled out inline.
       ...duplicatedConfig(source),

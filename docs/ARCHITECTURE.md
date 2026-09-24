@@ -727,7 +727,7 @@ flowchart TD
     CHECK -- "/eventi/[slug]/live?moderator=xxx" --> MOD_FLOW
     CHECK -- "/eventi/[slug]/live?token=xxx" --> PART_FLOW
 
-    subgraph ADMIN_FLOW["Flusso Amministratore"]
+    subgraph ADMIN_FLOW["Chiave dell'istanza (primo accesso, emergenza)"]
         A1["POST /api/admin/login<br/>con ADMIN_API_KEY"]
         A2["Server verifica chiave<br/>contro variabile ambiente"]
         A3{"Chiave valida?"}
@@ -738,12 +738,13 @@ flowchart TD
         A3 -- "No" --> A5
     end
 
-    subgraph ORG_FLOW["Flusso Organizzatore (ADR-014)"]
+    subgraph ORG_FLOW["Staff: organizzatori e amministratori (ADR-014, ADR-015)"]
         O1["POST /api/staff/login-link<br/>con l'email"]
         O2["Link monouso via email<br/>solo l'hash nel database"]
         O3["Clic su /admin/accesso<br/>POST /api/staff/login-link/verify"]
-        O4["JWT organizer + sub account<br/>stesso cookie HttpOnly"]
-        O1 --> O2 --> O3 --> O4
+        O4["JWT + sub account<br/>stesso cookie HttpOnly"]
+        O5["A ogni richiesta ruolo e stato<br/>riletti dall'account"]
+        O1 --> O2 --> O3 --> O4 --> O5
     end
 
     subgraph MOD_FLOW["Flusso Moderatore"]
@@ -1311,7 +1312,7 @@ Riepilogo delle misure di sicurezza implementate:
 |---|---|---|
 | **Trasporto** | TLS ovunque | cert-manager + Let's Encrypt, HTTPS e WSS |
 | **Autenticazione Jitsi** | JWT event-scoped | Token a breve scadenza, firmato con shared secret |
-| **Autenticazione admin** | API key + JWT cookie | Cookie HttpOnly, Secure, SameSite=Strict |
+| **Autenticazione admin** | Account nominali con link monouso via email (ruoli organizzatore e amministratore); API key dell'istanza per il primo accesso e l'emergenza. JWT in cookie | Cookie HttpOnly, Secure, SameSite=Lax; ruolo e stato dell'account riletti a ogni richiesta |
 | **Autenticazione moderatore** | Magic link UUID | Token unico per evento, verificato server-side |
 | **Autorizzazione** | Middleware Next.js | Controllo su tutte le route `/admin/*` e API protette |
 | **PII a riposo** | AES-256-GCM | Email cifrata a livello applicativo prima del salvataggio |

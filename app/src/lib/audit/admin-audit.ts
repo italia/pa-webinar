@@ -1,4 +1,5 @@
 import { createHash } from 'crypto';
+
 import { jwtVerify } from 'jose';
 
 import { prisma } from '@/lib/db';
@@ -47,8 +48,16 @@ async function deriveActor(request: Request): Promise<string> {
   if (secret) {
     try {
       const { payload } = await jwtVerify(cookieValue, new TextEncoder().encode(secret));
-      if (payload.role === 'organizer' && typeof payload.sub === 'string') {
-        return `organizer:${payload.sub}`;
+      // Gli account dello staff si registrano per nome di account; la chiave
+      // dell'istanza, che non ha un titolare, con l'impronta della sessione.
+      // Il prefisso viene dall'account, non dal token: dopo una nomina o un
+      // declassamento il token dice ancora il ruolo di prima.
+      if (typeof payload.sub === 'string') {
+        const account = await prisma.staffAccount.findUnique({
+          where: { id: payload.sub },
+          select: { role: true },
+        });
+        if (account) return `${account.role === 'ADMIN' ? 'admin' : 'organizer'}:${payload.sub}`;
       }
     } catch {
       // Firma non valida o scaduta: resta l'impronta del cookie.

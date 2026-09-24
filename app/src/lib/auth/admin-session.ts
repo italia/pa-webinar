@@ -1,8 +1,5 @@
-import { jwtVerify } from 'jose';
 import type { NextResponse } from 'next/server';
 import type { ReadonlyRequestCookies } from 'next/dist/server/web/spec-extension/adapters/request-cookies';
-
-import { tryGetAppSecret } from './app-secret';
 
 /**
  * Admin session lifetime (JWT `exp`) — the ceiling for an IDLE session, i.e.
@@ -22,25 +19,16 @@ export const ADMIN_SESSION_TTL_SECONDS = 6 * 60 * 60;
 export const ADMIN_COOKIE_MAX_AGE_SECONDS = 24 * 60 * 60;
 
 /**
- * Verify the admin_session cookie and return whether it carries a
- * valid admin role. Centralised so the middleware and individual
- * route handlers share the same check.
+ * Vera se la sessione e' di un amministratore: la chiave dell'istanza o un
+ * account dello staff con ruolo ADMIN, attivo. Passa da `getStaffSession`,
+ * cosi' un amministratore disattivato o degradato perde l'accesso subito
+ * su ogni rotta, non alla scadenza del cookie.
  */
 export async function isAdminAuthenticated(
   cookies: ReadonlyRequestCookies,
 ): Promise<boolean> {
-  const appSecret = tryGetAppSecret();
-  if (!appSecret) return false;
-
-  const token = cookies.get('admin_session')?.value;
-  if (!token) return false;
-  try {
-    const secret = new TextEncoder().encode(appSecret);
-    const { payload } = await jwtVerify(token, secret);
-    return payload.role === 'admin';
-  } catch {
-    return false;
-  }
+  const { getStaffSession } = await import('./staff-session');
+  return (await getStaffSession(cookies))?.role === 'admin';
 }
 
 /**
