@@ -1,8 +1,10 @@
+import type { Metadata } from 'next';
 import { cookies } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
 import { getLocale } from 'next-intl/server';
 
 import { prisma } from '@/lib/db';
+import { titoloEventoPubblico } from '@/lib/events/meta-title';
 import { getPublicEnv } from '@/lib/env';
 import { getSettings } from '@/lib/settings';
 import { isJibriAvailable } from '@/lib/infrastructure';
@@ -22,6 +24,12 @@ export const dynamic = 'force-dynamic';
 interface LivePageProps {
   params: Promise<{ slug: string }>;
   searchParams: Promise<{ token?: string }>;
+}
+
+export async function generateMetadata({ params }: LivePageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const titolo = await titoloEventoPubblico(slug);
+  return { ...(titolo ? { title: titolo } : {}), robots: { index: false } };
 }
 
 export default async function LivePage({ params, searchParams }: LivePageProps) {

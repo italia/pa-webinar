@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getTranslations, getLocale } from 'next-intl/server';
 
@@ -9,9 +10,22 @@ import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import { resolveKickerEnabled } from '@/lib/utils/title-kicker';
 import { getSettings } from '@/lib/settings';
 import { isEventOpenForRegistration } from '@/lib/events/visibility';
+import { titoloEventoPubblico } from '@/lib/events/meta-title';
 
 interface RegistrationPageProps {
   params: Promise<{ slug: string }>;
+}
+
+export async function generateMetadata({
+  params,
+}: RegistrationPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const t = await getTranslations('registration');
+  const titolo = await titoloEventoPubblico(slug, isEventOpenForRegistration);
+  return {
+    title: titolo ? `${t('title')}: ${titolo}` : t('title'),
+    robots: { index: false },
+  };
 }
 
 export default async function RegistrationPage({

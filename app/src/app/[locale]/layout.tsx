@@ -52,7 +52,12 @@ export async function generateMetadata({
 
   return {
     metadataBase: metadataBase(),
-    title,
+    // Le pagine con un titolo proprio restano riconoscibili fra le schede e
+    // nella cronologia: «Iscrizione: <evento> — <sito>».
+    title: {
+      default: title,
+      template: `%s — ${settings.siteName || t('appName')}`,
+    },
     description,
     openGraph: {
       title,
