@@ -489,7 +489,8 @@
       "tooLong": "De vraag mag niet meer dan 500 tekens bevatten",
       "rateLimit": "Wacht even voordat u een nieuwe vraag stelt",
       "busy": "Er komen nu veel vragen binnen vanaf uw netwerk: probeer het over een paar seconden opnieuw",
-      "generic": "Fout bij het verzenden van de vraag"
+      "generic": "Fout bij het verzenden van de vraag",
+      "upvoteFailed": "Uw stem is niet geregistreerd: probeer het over een paar seconden opnieuw."
     },
     "ctaTitle": "Stel de eerste vraag",
     "ctaBody": "Andere deelnemers kunnen op uw vraag stemmen. Moderatoren zien hem en kunnen mondeling of schriftelijk antwoorden.",
@@ -733,7 +734,7 @@
         "materialUrl": "Bestand of link",
         "visibilityLabel": "Zichtbaarheid",
         "visibility": {
-          "ALWAYS": "Altijd",
+          "ALWAYS": "In de zaal en na het evenement",
           "BEFORE": "Vóór het evenement",
           "DURING": "Tijdens het evenement",
           "AFTER": "Na het evenement"
@@ -1793,7 +1794,7 @@
       "selectFile": "Bestand selecteren",
       "fileTitle": "Titel",
       "visibility": "Zichtbaarheid",
-      "visibilityAlways": "Altijd zichtbaar",
+      "visibilityAlways": "In de zaal en na het evenement",
       "visibilityBefore": "Alleen vóór het evenement",
       "visibilityDuring": "Alleen tijdens het evenement",
       "visibilityAfter": "Alleen na het evenement",
@@ -1814,10 +1815,11 @@
       "titleLabel": "Titel",
       "descriptionLabel": "Beschrijving (optioneel)",
       "visibilityLabel": "Zichtbaarheid",
-      "visibilityAlways": "Altijd",
+      "visibilityAlways": "In de zaal en na het evenement",
       "visibilityBefore": "Vóór het evenement",
       "visibilityDuring": "Tijdens het evenement",
       "visibilityAfter": "Na het evenement",
+      "visibilityHelp": "Vóór de start toont de openbare pagina van het evenement alleen materialen met ‘Vóór het evenement’. Materialen met ‘In de zaal en na het evenement’ verschijnen tijdens het evenement in de zaal en op de pagina van het afgelopen evenement.",
       "typeLabel": "Type",
       "fileUploaded": "Bestand geüpload",
       "typeFile": "Bestand",

@@ -1748,7 +1748,8 @@ interface LiveSidebarProps {
   /** Stable guest id (anonymous) for agenda-reaction dedup; undefined for
    *  registered participants (identified by their accessToken). */
   guestId?: string;
-  /** Identità di voto nei sondaggi: l'`accessToken` di una registrazione… */
+  /** Identità di voto nei sondaggi, nella nuvola e nel Q&A: l'`accessToken` di
+   *  una registrazione… */
   voterAccessToken?: string;
   /** …oppure l'identificativo stabile del browser, per chi una registrazione
    *  non ce l'ha (ospiti, relatori, moderatori). Esattamente uno dei due. */
@@ -2295,6 +2296,8 @@ function LiveSidebar({
               isModerator={isModerator}
               guestName={!token ? displayName : undefined}
               guestId={!token ? voterGuestId : undefined}
+              voterAccessToken={voterAccessToken}
+              voterGuestId={voterGuestId}
             />
           )}
           {/* ChatPanel stays mounted while the event is live so it can

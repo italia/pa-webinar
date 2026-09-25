@@ -33,6 +33,13 @@ export const GET = withErrorHandling(async (request, context) => {
   // Bearer vuoto = ospite: la sala passa `token=""` a chi entra dal link, e
   // `Bearer ` senza valore non è un token sbagliato, è l'assenza di token.
   const token = headerToken || url.searchParams.get('token') || null;
+  // Chi non ha una registrazione (ospiti, relatori, moderatori) vota con
+  // l'identificativo stabile del browser, come nei sondaggi: è con quello che
+  // il pannello sa quali domande ha già sostenuto. Oltre i cento caratteri
+  // non è un identificativo che il voto accetterebbe, quindi non lo è nemmeno
+  // qui.
+  const guestIdParam = url.searchParams.get('guestId')?.trim() ?? '';
+  const guestId = guestIdParam.length > 0 && guestIdParam.length <= 100 ? guestIdParam : null;
 
   const event = await prisma.event.findUnique({ where: { slug } });
   if (!event) throw new NotFoundError('Event');
@@ -89,9 +96,10 @@ export const GET = withErrorHandling(async (request, context) => {
     questions: (CachedQuestion & { hasUpvoted: boolean })[];
     totalCount: number;
     /** Il pollice in su ha bisogno di un'identità che il server sappia
-     *  riconoscere, e ce l'ha solo chi si è iscritto. Ospiti e relatori
-     *  leggono; senza questo campo il pannello mostrava loro un pulsante che
-     *  rispondeva 401 in silenzio. */
+     *  riconoscere: la registrazione di un iscritto, o l'identificativo del
+     *  browser che chi non è iscritto manda come `?guestId=`. Senza nessuna
+     *  delle due il pannello mostra il numero e non il pulsante, che
+     *  risponderebbe 401. */
     canUpvote: boolean;
   }
 
@@ -123,15 +131,29 @@ export const GET = withErrorHandling(async (request, context) => {
     }
   }
 
+  // I voti di chi chiede: per registrazione se c'è, altrimenti per browser.
+  // Stessa precedenza del voto, che lega alla registrazione anche l'iscritto
+  // che manda l'identificativo del browser.
+  const votante = registrationId ? { registrationId } : guestId ? { guestId } : null;
+
+  // Questa ricerca non passa dalla cache: è una query in più per ogni
+  // lettura di chi ha un'identità di voto, e la sala manda l'identificativo
+  // del browser a tutti quelli che non sono iscritti. Si cercano solo le
+  // domande che hanno almeno un voto: finché nessuna ne ha, la query non
+  // parte affatto.
+  const conVoti = cachedQuestions.filter((q) => q.upvoteCount > 0).map((q) => q.id);
   let userUpvotedIds: Set<string> = new Set();
-  if (registrationId && cachedQuestions.length > 0) {
-    const upvotes = await prisma.questionUpvote.findMany({
-      where: {
-        registrationId,
-        questionId: { in: cachedQuestions.map((q) => q.id) },
-      },
-      select: { questionId: true },
-    });
+  if (votante && conVoti.length > 0) {
+    const upvotes =
+      'registrationId' in votante
+        ? await prisma.questionUpvote.findMany({
+            where: { registrationId: votante.registrationId, questionId: { in: conVoti } },
+            select: { questionId: true },
+          })
+        : await prisma.questionGuestUpvote.findMany({
+            where: { guestId: votante.guestId, questionId: { in: conVoti } },
+            select: { questionId: true },
+          });
     userUpvotedIds = new Set(upvotes.map((u) => u.questionId));
   }
 
@@ -146,7 +168,7 @@ export const GET = withErrorHandling(async (request, context) => {
   const response: QaResponse = {
     questions: [...highlighted, ...rest],
     totalCount: result.length,
-    canUpvote: registrationId !== null,
+    canUpvote: votante !== null,
   };
 
   return Response.json(response, {

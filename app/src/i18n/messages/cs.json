@@ -489,7 +489,8 @@
       "tooLong": "Otázka nesmí přesáhnout 500 znaků",
       "rateLimit": "Počkejte prosím, než odešlete další otázku",
       "busy": "Z vaší sítě právě přichází mnoho otázek: zkuste to prosím znovu za několik sekund",
-      "generic": "Chyba při odesílání otázky"
+      "generic": "Chyba při odesílání otázky",
+      "upvoteFailed": "Váš hlas nebyl zaznamenán: zkuste to prosím znovu za několik sekund."
     },
     "ctaTitle": "Položte první otázku",
     "ctaBody": "Ostatní účastníci budou moci hlasovat pro vaši otázku. Moderátoři ji uvidí a mohou odpovědět hlasem nebo písemně.",
@@ -733,7 +734,7 @@
         "materialUrl": "Soubor nebo odkaz",
         "visibilityLabel": "Viditelnost",
         "visibility": {
-          "ALWAYS": "Vždy",
+          "ALWAYS": "V místnosti a po události",
           "BEFORE": "Před událostí",
           "DURING": "Během události",
           "AFTER": "Po události"
@@ -1793,7 +1794,7 @@
       "selectFile": "Vybrat soubor",
       "fileTitle": "Název",
       "visibility": "Viditelnost",
-      "visibilityAlways": "Vždy viditelné",
+      "visibilityAlways": "V místnosti a po události",
       "visibilityBefore": "Pouze před událostí",
       "visibilityDuring": "Pouze během události",
       "visibilityAfter": "Pouze po události",
@@ -1814,10 +1815,11 @@
       "titleLabel": "Název",
       "descriptionLabel": "Popis (volitelné)",
       "visibilityLabel": "Viditelnost",
-      "visibilityAlways": "Vždy",
+      "visibilityAlways": "V místnosti a po události",
       "visibilityBefore": "Před událostí",
       "visibilityDuring": "Během události",
       "visibilityAfter": "Po události",
+      "visibilityHelp": "Před začátkem zobrazuje veřejná stránka události pouze materiály s volbou „Před událostí“. Materiály s volbou „V místnosti a po události“ se zobrazují v místnosti během události a na stránce ukončené události.",
       "typeLabel": "Typ",
       "fileUploaded": "Soubor nahrán",
       "typeFile": "Soubor",

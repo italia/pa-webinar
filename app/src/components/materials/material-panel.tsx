@@ -54,8 +54,13 @@ export default function MaterialPanel({ eventSlug, token, isModerator }: Materia
   const tv = useTranslations('admin.materials');
   const format = useFormatter();
 
-  // Etichetta per i materiali a visibilità limitata (null = sempre visibile).
+  // Quando il pubblico vede il materiale: chi conduce vede tutto l'elenco, e
+  // ogni voce porta la propria fase. Anche il predefinito (ALWAYS, «in sala e
+  // dopo l'evento»): prima dell'inizio il pubblico e i relatori non lo
+  // vedono, e senza etichetta chi controlla la sala in anticipo non avrebbe
+  // modo di accorgersene.
   const visibilityLabel = (v: string | undefined): string | null => {
+    if (v === 'ALWAYS') return tv('visibilityAlways');
     if (v === 'BEFORE') return tv('visibilityBefore');
     if (v === 'DURING') return tv('visibilityDuring');
     if (v === 'AFTER') return tv('visibilityAfter');

@@ -187,6 +187,15 @@ export const GET = withErrorHandling(async (request) => {
           where: { question: { eventId: evt.id } },
         });
 
+        // I pollici in su dati con l'identificativo del browser (ospiti,
+        // relatori, moderatori) stanno in una tabella a parte. Se ne
+        // andrebbero anche per cascata con la domanda, qui sotto: si
+        // cancellano per nome come quelli degli iscritti, perché la pulizia
+        // non dipenda da una clausola della chiave esterna.
+        const guestUpvotesDeleted = await tx.questionGuestUpvote.deleteMany({
+          where: { question: { eventId: evt.id } },
+        });
+
         const questionsDeleted = await tx.question.deleteMany({
           where: { eventId: evt.id },
         });
@@ -318,6 +327,7 @@ export const GET = withErrorHandling(async (request) => {
 
         const counts = {
           upvotes: upvotesDeleted.count,
+          guestUpvotes: guestUpvotesDeleted.count,
           questions: questionsDeleted.count,
           pollVotes: pollVotesDeleted.count,
           polls: pollsDeleted.count,

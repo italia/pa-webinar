@@ -21,11 +21,11 @@
  * (cancellare il materiale cancella quel blob) né lasciare una riga che punta
  * a un file mai arrivato.
  *
- * VISIBILITÀ. `ALWAYS`, come il predefinito dell'area admin e come i link
- * aggiunti dalla sala: ciò che si condivide in diretta (le slide, un
- * documento) di solito serve anche dopo, e un `DURING` lo farebbe sparire
- * dalla pagina dell'evento alla chiusura. Chi vuole un'altra fase la cambia
- * dall'area admin.
+ * VISIBILITÀ. `ALWAYS` («in sala e dopo l'evento»), come il predefinito
+ * dell'area admin e come i link aggiunti dalla sala: ciò che si condivide in
+ * diretta (le slide, un documento) di solito serve anche dopo, e un `DURING`
+ * lo farebbe sparire dalla pagina dell'evento alla chiusura. Chi vuole
+ * un'altra fase la cambia dall'area admin.
  *
  * QUANTO. Il link moderatore è condiviso e non scade: oltre al limite per
  * minuto, un tetto per evento sul numero di file e sui byte

@@ -120,16 +120,18 @@ beforeEach(() => {
 });
 
 describe('GET /api/events/[slug]/materials — il pubblico vede la fase in corso', () => {
-  it('prima dell’inizio: sempre visibili + solo prima', async () => {
+  it('prima dell’inizio: solo i materiali scelti per il prima', async () => {
+    // L'elenco è pubblico: se il predefinito ALWAYS passasse qui, chiunque
+    // leggerebbe prima dell'inizio i materiali pensati per la sala.
     const res = await GET(get(), ctx());
     expect(res.status).toBe(200);
     expect(whereInterrogato()).toEqual({
       eventId: EVENT_ID,
-      visibility: { in: ['ALWAYS', 'BEFORE'] },
+      visibility: { in: ['BEFORE'] },
     });
   });
 
-  it('in diretta: sempre visibili + solo durante', async () => {
+  it('in diretta: quelli «in sala e dopo» + solo durante', async () => {
     mockedEvent.mockResolvedValue(eventRow({ status: 'LIVE' }));
     await GET(get(), ctx());
     expect(whereInterrogato()).toEqual({
@@ -138,7 +140,7 @@ describe('GET /api/events/[slug]/materials — il pubblico vede la fase in corso
     });
   });
 
-  it('a evento concluso: sempre visibili + solo dopo', async () => {
+  it('a evento concluso: quelli «in sala e dopo» + solo dopo', async () => {
     mockedEvent.mockResolvedValue(eventRow({ status: 'ENDED' }));
     await GET(get(), ctx());
     expect(whereInterrogato()).toEqual({
@@ -213,7 +215,7 @@ describe('GET /api/events/[slug]/materials — una sessione staff non allarga l�
     await GET(get(), ctx());
     expect(whereInterrogato()).toEqual({
       eventId: EVENT_ID,
-      visibility: { in: ['ALWAYS', 'BEFORE'] },
+      visibility: { in: ['BEFORE'] },
     });
   });
 

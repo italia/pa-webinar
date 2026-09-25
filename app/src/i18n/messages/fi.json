@@ -489,7 +489,8 @@
       "tooLong": "Kysymys ei saa ylittää 500 merkkiä",
       "rateLimit": "Odota ennen seuraavan kysymyksen lähettämistä",
       "busy": "Verkostasi saapuu juuri nyt paljon kysymyksiä: yritä uudelleen muutaman sekunnin kuluttua",
-      "generic": "Virhe kysymyksen lähettämisessä"
+      "generic": "Virhe kysymyksen lähettämisessä",
+      "upvoteFailed": "Ääntäsi ei kirjattu: yritä uudelleen muutaman sekunnin kuluttua."
     },
     "ctaTitle": "Esitä ensimmäinen kysymys",
     "ctaBody": "Muut osallistujat voivat äänestää kysymystäsi. Moderaattorit näkevät sen ja voivat vastata äänellä tai kirjallisesti.",
@@ -733,7 +734,7 @@
         "materialUrl": "Tiedosto tai linkki",
         "visibilityLabel": "Näkyvyys",
         "visibility": {
-          "ALWAYS": "Aina",
+          "ALWAYS": "Huoneessa ja tapahtuman jälkeen",
           "BEFORE": "Ennen tapahtumaa",
           "DURING": "Tapahtuman aikana",
           "AFTER": "Tapahtuman jälkeen"
@@ -1793,7 +1794,7 @@
       "selectFile": "Valitse tiedosto",
       "fileTitle": "Otsikko",
       "visibility": "Näkyvyys",
-      "visibilityAlways": "Aina näkyvissä",
+      "visibilityAlways": "Huoneessa ja tapahtuman jälkeen",
       "visibilityBefore": "Vain ennen tapahtumaa",
       "visibilityDuring": "Vain tapahtuman aikana",
       "visibilityAfter": "Vain tapahtuman jälkeen",
@@ -1814,10 +1815,11 @@
       "titleLabel": "Otsikko",
       "descriptionLabel": "Kuvaus (valinnainen)",
       "visibilityLabel": "Näkyvyys",
-      "visibilityAlways": "Aina",
+      "visibilityAlways": "Huoneessa ja tapahtuman jälkeen",
       "visibilityBefore": "Ennen tapahtumaa",
       "visibilityDuring": "Tapahtuman aikana",
       "visibilityAfter": "Tapahtuman jälkeen",
+      "visibilityHelp": "Ennen alkua tapahtuman julkinen sivu näyttää vain materiaalit, joiden näkyvyys on ”Ennen tapahtumaa”. Materiaalit, joiden näkyvyys on ”Huoneessa ja tapahtuman jälkeen”, näkyvät huoneessa tapahtuman aikana ja päättyneen tapahtuman sivulla.",
       "typeLabel": "Tyyppi",
       "fileUploaded": "Tiedosto ladattu",
       "typeFile": "Tiedosto",

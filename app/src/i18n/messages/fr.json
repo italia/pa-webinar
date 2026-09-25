@@ -489,7 +489,8 @@
       "tooLong": "La question ne peut pas dépasser 500 caractères",
       "rateLimit": "Veuillez patienter avant d'envoyer une autre question",
       "busy": "De nombreuses questions arrivent de votre réseau en ce moment : veuillez réessayer dans quelques secondes",
-      "generic": "Erreur lors de l'envoi de la question"
+      "generic": "Erreur lors de l'envoi de la question",
+      "upvoteFailed": "Votre vote n'a pas été enregistré : veuillez réessayer dans quelques secondes."
     },
     "ctaTitle": "Posez la première question",
     "ctaBody": "Les autres participants pourront voter pour votre question. Les modérateurs la verront et pourront y répondre à l'oral ou à l'écrit.",
@@ -733,7 +734,7 @@
         "materialUrl": "Fichier ou lien",
         "visibilityLabel": "Visibilité",
         "visibility": {
-          "ALWAYS": "Toujours",
+          "ALWAYS": "Dans la salle et après l'événement",
           "BEFORE": "Avant l'événement",
           "DURING": "Pendant l'événement",
           "AFTER": "Après l'événement"
@@ -1793,7 +1794,7 @@
       "selectFile": "Sélectionner un fichier",
       "fileTitle": "Titre",
       "visibility": "Visibilité",
-      "visibilityAlways": "Toujours visible",
+      "visibilityAlways": "Dans la salle et après l'événement",
       "visibilityBefore": "Avant l'événement uniquement",
       "visibilityDuring": "Pendant l'événement uniquement",
       "visibilityAfter": "Après l'événement uniquement",
@@ -1814,10 +1815,11 @@
       "titleLabel": "Titre",
       "descriptionLabel": "Description (facultative)",
       "visibilityLabel": "Visibilité",
-      "visibilityAlways": "Toujours",
+      "visibilityAlways": "Dans la salle et après l'événement",
       "visibilityBefore": "Avant l'événement",
       "visibilityDuring": "Pendant l'événement",
       "visibilityAfter": "Après l'événement",
+      "visibilityHelp": "Avant le début, la page publique de l'événement n'affiche que les ressources marquées « Avant l'événement ». Celles marquées « Dans la salle et après l'événement » apparaissent dans la salle pendant l'événement et sur la page de l'événement terminé.",
       "typeLabel": "Type",
       "fileUploaded": "Fichier téléversé",
       "typeFile": "Fichier",

@@ -347,10 +347,11 @@ export default async function EventDetailPage({
 
   // Prima dell'inizio la scheda è l'unica superficie in cui il pubblico trova
   // i materiali: in sala si entra solo in diretta, dove la fase è già
-  // «durante». Qui la vista del pubblico della fase «prima»: i materiali
-  // sempre visibili e quelli preparatori (lib/events/material-visibility).
-  // Dall'inizio in poi li elencano la sala e, a evento concluso, la scheda
-  // post-evento qui sopra.
+  // «durante». Qui la vista del pubblico della fase «prima»: SOLO i materiali
+  // marcati «Prima dell'evento». Il predefinito vale «in sala e dopo
+  // l'evento» e qui non compare (lib/events/material-visibility). Dall'inizio
+  // in poi li elencano la sala e, a evento concluso, la scheda post-evento qui
+  // sopra.
   if (materialPhase(event) === 'BEFORE') {
     const preEventRaw = await prisma.eventMaterial.findMany({
       where: { eventId: event.id, ...materialVisibilityWhere('BEFORE') },

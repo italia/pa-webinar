@@ -489,7 +489,8 @@
       "tooLong": "Die Frage darf 500 Zeichen nicht überschreiten",
       "rateLimit": "Bitte warten Sie, bevor Sie eine weitere Frage senden",
       "busy": "Aus Ihrem Netzwerk kommen gerade viele Fragen: Bitte versuchen Sie es in einigen Sekunden erneut",
-      "generic": "Fehler beim Senden der Frage"
+      "generic": "Fehler beim Senden der Frage",
+      "upvoteFailed": "Ihre Stimme wurde nicht gezählt: Bitte versuchen Sie es in einigen Sekunden erneut."
     },
     "ctaTitle": "Stellen Sie die erste Frage",
     "ctaBody": "Andere Teilnehmende können Ihre Frage hochstufen. Die Moderation sieht sie und kann mündlich oder schriftlich antworten.",
@@ -733,7 +734,7 @@
         "materialUrl": "Datei oder Link",
         "visibilityLabel": "Sichtbarkeit",
         "visibility": {
-          "ALWAYS": "Immer",
+          "ALWAYS": "Im Raum und nach dem Event",
           "BEFORE": "Vor dem Event",
           "DURING": "Während des Events",
           "AFTER": "Nach dem Event"
@@ -1793,7 +1794,7 @@
       "selectFile": "Datei auswählen",
       "fileTitle": "Titel",
       "visibility": "Sichtbarkeit",
-      "visibilityAlways": "Immer sichtbar",
+      "visibilityAlways": "Im Raum und nach dem Event",
       "visibilityBefore": "Nur vor der Veranstaltung",
       "visibilityDuring": "Nur während der Veranstaltung",
       "visibilityAfter": "Nur nach der Veranstaltung",
@@ -1814,10 +1815,11 @@
       "titleLabel": "Titel",
       "descriptionLabel": "Beschreibung (optional)",
       "visibilityLabel": "Sichtbarkeit",
-      "visibilityAlways": "Immer",
+      "visibilityAlways": "Im Raum und nach dem Event",
       "visibilityBefore": "Vor dem Event",
       "visibilityDuring": "Während des Events",
       "visibilityAfter": "Nach dem Event",
+      "visibilityHelp": "Vor dem Beginn zeigt die öffentliche Event-Seite nur Materialien mit „Vor dem Event“. Materialien mit „Im Raum und nach dem Event“ erscheinen während des Events im Raum und auf der Seite des beendeten Events.",
       "typeLabel": "Typ",
       "fileUploaded": "Datei hochgeladen",
       "typeFile": "Datei",

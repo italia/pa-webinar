@@ -3,7 +3,12 @@ import path from 'node:path';
 
 import { describe, it, expect } from 'vitest';
 
-import { questionSubmitBody, questionSubmitError } from './question-request';
+import {
+  questionSubmitBody,
+  questionSubmitError,
+  questionsReadUrl,
+  upvoteInit,
+} from './question-request';
 
 /**
  * Con quale identità il modulo del Q&A invia una domanda.
@@ -52,10 +57,27 @@ describe('dal pannello alla richiesta', () => {
     expect(src).toMatch(/<QuestionForm[\s\S]*?guestId=\{guestId\}[\s\S]*?\/>/);
   });
 
+  it('la lista legge e vota con l’identità di voto, non col token di sala', () => {
+    const src = leggi('qa', 'question-list.tsx');
+    expect(src).toContain('questionsReadUrl(`/api/events/${eventSlug}/questions`, { voterGuestId })');
+    expect(src).toContain('upvoteInit(token, { voterAccessToken, voterGuestId })');
+    expect(src).not.toContain('JSON.stringify({ accessToken: token })');
+  });
+
+  it("il pannello passa l'identità di voto alla lista", () => {
+    const src = leggi('qa', 'qa-panel.tsx');
+    expect(src).toMatch(
+      /<QuestionList[\s\S]*?voterAccessToken=\{voterAccessToken\}[\s\S]*?voterGuestId=\{voterGuestId\}[\s\S]*?\/>/,
+    );
+  });
+
   it("la sala lo passa al pannello per chi entra senza token, e alla nuvola l'identità di voto", () => {
     // Quale identità sia, per ogni posto in sala, lo verifica voter-identity.test.
     const src = leggi('live', 'live-event-client.tsx');
     expect(src).toMatch(/<QAPanel[\s\S]*?guestId=\{!token \? voterGuestId : undefined\}[\s\S]*?\/>/);
+    expect(src).toMatch(
+      /<QAPanel[\s\S]*?voterAccessToken=\{voterAccessToken\}[\s\S]*?voterGuestId=\{voterGuestId\}[\s\S]*?\/>/,
+    );
     expect(src).toMatch(
       /<WordCloud[\s\S]*?voterAccessToken=\{voterAccessToken\}[\s\S]*?voterGuestId=\{voterGuestId\}[\s\S]*?\/>/,
     );
@@ -85,5 +107,57 @@ describe('questionSubmitError', () => {
   it('il modulo usa questa regola', () => {
     const src = readFileSync(path.join(__dirname, 'question-form.tsx'), 'utf8');
     expect(src).toContain('questionSubmitError(res.status, code)');
+  });
+});
+
+/**
+ * Con quale identità si sostiene una domanda. Il pulsante mandava il token di
+ * sala come `accessToken`: il server lo cerca fra le registrazioni, quindi
+ * votavano soltanto gli iscritti, e a ospiti e relatori il pulsante non veniva
+ * nemmeno mostrato.
+ */
+describe('upvoteInit', () => {
+  function corpo(init: RequestInit | null): Record<string, unknown> {
+    expect(init).not.toBeNull();
+    return JSON.parse(String(init!.body)) as Record<string, unknown>;
+  }
+  const intestazioni = (init: RequestInit | null) =>
+    (init?.headers ?? {}) as Record<string, string>;
+
+  it("l'ospite vota con l'identificativo del browser, senza token", () => {
+    const init = upvoteInit('', { voterGuestId: 'guest_abc' });
+    expect(corpo(init)).toEqual({ guestId: 'guest_abc' });
+    expect(intestazioni(init).Authorization).toBeUndefined();
+  });
+
+  it('il relatore manda il token di sala come prova di presenza, non come identità', () => {
+    const init = upvoteInit('TOKEN_RELATORE', { voterGuestId: 'guest_rel' });
+    expect(corpo(init)).toEqual({ guestId: 'guest_rel' });
+    expect(intestazioni(init).Authorization).toBe('Bearer TOKEN_RELATORE');
+  });
+
+  it("l'iscritto vota con la propria registrazione", () => {
+    expect(corpo(upvoteInit('ALICE', { voterAccessToken: 'ALICE' }))).toEqual({
+      accessToken: 'ALICE',
+    });
+  });
+
+  it("senza un'identità non parte nessuna richiesta", () => {
+    expect(upvoteInit('TOKEN', {})).toBeNull();
+  });
+});
+
+describe('questionsReadUrl', () => {
+  const API = '/api/events/evento/questions';
+
+  it("chi vota col browser legge con il proprio identificativo", () => {
+    expect(questionsReadUrl(API, { voterGuestId: 'guest a&b' })).toBe(
+      `${API}?guestId=guest%20a%26b`,
+    );
+  });
+
+  it("l'iscritto legge l'elenco com'è: lo riconosce il token", () => {
+    expect(questionsReadUrl(API, { voterAccessToken: 'ALICE' })).toBe(API);
+    expect(questionsReadUrl(API, {})).toBe(API);
   });
 });

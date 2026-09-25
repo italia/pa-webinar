@@ -19,6 +19,7 @@ async function main() {
   await prisma.poll.deleteMany();
   await prisma.eventMaterial.deleteMany();
   await prisma.questionUpvote.deleteMany();
+  await prisma.questionGuestUpvote.deleteMany();
   await prisma.question.deleteMany();
   await prisma.registration.deleteMany();
   await prisma.event.deleteMany();

@@ -14,6 +14,7 @@ vi.mock('@/lib/db', () => ({
     event: { findUnique: vi.fn() },
     question: { findMany: vi.fn(), create: vi.fn() },
     questionUpvote: { findMany: vi.fn() },
+    questionGuestUpvote: { findMany: vi.fn() },
     registration: { findUnique: vi.fn() },
     eventModerator: { findUnique: vi.fn() },
   },
@@ -39,6 +40,8 @@ const mockedEvent = prisma.event.findUnique as unknown as ReturnType<typeof vi.f
 const mockedQuestions = prisma.question.findMany as unknown as ReturnType<typeof vi.fn>;
 const mockedUpvotes = prisma.questionUpvote
   .findMany as unknown as ReturnType<typeof vi.fn>;
+const mockedGuestUpvotes = prisma.questionGuestUpvote
+  .findMany as unknown as ReturnType<typeof vi.fn>;
 const mockedRegistration = prisma.registration
   .findUnique as unknown as ReturnType<typeof vi.fn>;
 const mockedGrant = prisma.eventModerator
@@ -60,8 +63,22 @@ function whereInterrogato(): Record<string, unknown> {
   return call!.where;
 }
 
-function get(headers: HeadersInit = {}): NextRequest {
-  return new Request(`https://webinar.gov.it/api/events/${SLUG}/questions`, {
+/** Una domanda pubblicabile con il numero di voti dato. */
+function domanda(id: string, upvoteCount: number) {
+  return {
+    id,
+    authorName: 'Anna',
+    text: `Domanda ${id}`,
+    status: 'PENDING',
+    upvoteCount,
+    createdAt: new Date('2026-09-22T10:00:00.000Z'),
+    highlightedAt: null,
+    answeredAt: null,
+  };
+}
+
+function get(headers: HeadersInit = {}, query = ''): NextRequest {
+  return new Request(`https://webinar.gov.it/api/events/${SLUG}/questions${query}`, {
     headers,
   }) as unknown as NextRequest;
 }
@@ -90,6 +107,7 @@ beforeEach(() => {
     },
   ]);
   mockedUpvotes.mockResolvedValue([]);
+  mockedGuestUpvotes.mockResolvedValue([]);
   mockedCreate.mockResolvedValue({
     id: 'q-new',
     authorName: 'Relatrice',
@@ -136,17 +154,89 @@ describe('GET /api/events/[slug]/questions — chi vede le domande', () => {
     expect(whereInterrogato()).toEqual({ eventId: EVENT_ID });
   });
 
-  it('senza una registrazione il pollice in su non si può dare', async () => {
-    // Il pannello si regola su questo campo: prima mostrava a ospiti e
-    // relatori un pulsante che rispondeva 401 senza dirlo a nessuno.
-    const ospite = await (await GET(get(), ctx())).json();
-    expect(ospite.canUpvote).toBe(false);
+  it('senza nessuna identità di voto il pollice in su non si può dare', async () => {
+    // Il pannello si regola su questo campo: senza, mostrerebbe un pulsante
+    // che risponde 401 senza dirlo a nessuno.
+    const anonimo = await (await GET(get(), ctx())).json();
+    expect(anonimo.canUpvote).toBe(false);
+    expect(mockedUpvotes).not.toHaveBeenCalled();
+    expect(mockedGuestUpvotes).not.toHaveBeenCalled();
 
     mockedRegistration.mockResolvedValue({ id: 'reg-1', eventId: EVENT_ID });
     const iscritto = await (
       await GET(get({ Authorization: 'Bearer ALICE' }), ctx())
     ).json();
     expect(iscritto.canUpvote).toBe(true);
+  });
+
+  it("l'ospite vota con l'identificativo del browser e ritrova i propri voti", async () => {
+    mockedQuestions.mockResolvedValue([domanda('q-1', 2), domanda('q-2', 0)]);
+    mockedGuestUpvotes.mockResolvedValue([{ questionId: 'q-1' }]);
+    const res = await GET(get({}, '?guestId=guest_abc'), ctx());
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.canUpvote).toBe(true);
+    expect(body.questions.find((q: { id: string }) => q.id === 'q-1').hasUpvoted).toBe(true);
+    // Si cercano solo le domande che hanno almeno un voto, e nella tabella
+    // dei voti dal browser.
+    expect(mockedGuestUpvotes.mock.calls[0]?.[0]?.where).toEqual({
+      guestId: 'guest_abc',
+      questionId: { in: ['q-1'] },
+    });
+    expect(mockedUpvotes).not.toHaveBeenCalled();
+  });
+
+  it('finché nessuna domanda ha voti, la lettura non cerca i voti di chi legge', async () => {
+    // Una sala piena che interroga il pannello ogni pochi secondi: senza
+    // questa scorciatoia ogni lettura costerebbe una query in più anche
+    // quando la risposta è per forza vuota.
+    const body = await (await GET(get({}, '?guestId=guest_abc'), ctx())).json();
+    expect(body.canUpvote).toBe(true);
+    expect(body.questions[0].hasUpvoted).toBe(false);
+    expect(mockedGuestUpvotes).not.toHaveBeenCalled();
+    expect(mockedUpvotes).not.toHaveBeenCalled();
+  });
+
+  it('anche il relatore vota col browser, mostrando il token di sala', async () => {
+    mockedQuestions.mockResolvedValue([domanda('q-1', 1)]);
+    mockedGrant.mockResolvedValue({ eventId: EVENT_ID, revokedAt: null });
+    const body = await (
+      await GET(get({ Authorization: 'Bearer TOKEN_RELATORE' }, '?guestId=guest_rel'), ctx())
+    ).json();
+    expect(body.canUpvote).toBe(true);
+    expect(mockedGuestUpvotes.mock.calls[0]?.[0]?.where).toMatchObject({ guestId: 'guest_rel' });
+  });
+
+  it("l'iscritto conta per la registrazione anche se manda l'identificativo", async () => {
+    mockedQuestions.mockResolvedValue([domanda('q-1', 1)]);
+    mockedRegistration.mockResolvedValue({ id: 'reg-1', eventId: EVENT_ID });
+    await GET(get({ Authorization: 'Bearer ALICE' }, '?guestId=guest_abc'), ctx());
+    const where = mockedUpvotes.mock.calls[0]?.[0]?.where;
+    expect(where).toMatchObject({ registrationId: 'reg-1' });
+    expect(where).not.toHaveProperty('guestId');
+    expect(mockedGuestUpvotes).not.toHaveBeenCalled();
+  });
+
+  it('un identificativo vuoto o troppo lungo non è un’identità', async () => {
+    mockedQuestions.mockResolvedValue([domanda('q-1', 1)]);
+    for (const q of ['?guestId=', '?guestId=%20%20', `?guestId=${'x'.repeat(101)}`]) {
+      const body = await (await GET(get({}, q), ctx())).json();
+      expect(body.canUpvote, q).toBe(false);
+    }
+    expect(mockedUpvotes).not.toHaveBeenCalled();
+    expect(mockedGuestUpvotes).not.toHaveBeenCalled();
+  });
+
+  it('fuori dalla finestra degli ospiti l’identificativo non apre il pannello', async () => {
+    mockedEvent.mockResolvedValue({
+      id: EVENT_ID,
+      status: 'PUBLISHED',
+      eventType: 'SCHEDULED',
+      moderatorToken: PRIMARY_TOKEN,
+      joinPasswordHash: null,
+      qaEnabled: true,
+    });
+    expect((await GET(get({}, '?guestId=guest_abc'), ctx())).status).toBe(401);
   });
 
   it('un token che non risolve resta un 403', async () => {

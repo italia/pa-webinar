@@ -17,6 +17,7 @@ vi.mock('@/lib/db', () => ({
     eventMaterial: { findMany: vi.fn(), findFirst: vi.fn(), deleteMany: vi.fn() },
     chatMessage: { findMany: vi.fn(), deleteMany: vi.fn() },
     questionUpvote: { deleteMany: vi.fn() },
+    questionGuestUpvote: { deleteMany: vi.fn() },
     question: { deleteMany: vi.fn() },
     pollVote: { deleteMany: vi.fn() },
     poll: { deleteMany: vi.fn() },
@@ -72,6 +73,8 @@ const db = prisma as unknown as {
   gdprAuditLog: { create: Mock };
   eventMaterial: { findMany: Mock; findFirst: Mock; deleteMany: Mock };
   chatMessage: { findMany: Mock; deleteMany: Mock };
+  questionUpvote: { deleteMany: Mock };
+  questionGuestUpvote: { deleteMany: Mock };
   question: { deleteMany: Mock };
   poll: { deleteMany: Mock };
   questionnaireResponse: { deleteMany: Mock };
@@ -332,6 +335,15 @@ describe('GET /api/cron/cleanup', () => {
     // che `docs/GDPR.md` promette esplicitamente di cancellare.
     expect(db.registration.deleteMany).toHaveBeenCalledWith(byEvent);
     expect(db.question.deleteMany).toHaveBeenCalledWith(byEvent);
+    // I pollici in su si cancellano passando dalla domanda, in tutte e due le
+    // tabelle: quella degli iscritti e quella di chi vota con l'identificativo
+    // del browser (ospiti, relatori, moderatori).
+    expect(db.questionUpvote.deleteMany).toHaveBeenCalledWith({
+      where: { question: { eventId: 'evt-vecchio' } },
+    });
+    expect(db.questionGuestUpvote.deleteMany).toHaveBeenCalledWith({
+      where: { question: { eventId: 'evt-vecchio' } },
+    });
     expect(db.poll.deleteMany).toHaveBeenCalledWith(byEvent);
     // Le risposte ai questionari contengono nome + hash email del rispondente
     // e non sono raggiungibili da `eventId`: si passa dal questionario.

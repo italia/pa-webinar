@@ -489,7 +489,8 @@
       "tooLong": "Klausimas negali viršyti 500 simbolių",
       "rateLimit": "Palaukite prieš pateikdami kitą klausimą",
       "busy": "Šiuo metu iš jūsų tinklo gaunama daug klausimų: bandykite dar kartą po kelių sekundžių",
-      "generic": "Klaida pateikiant klausimą"
+      "generic": "Klaida pateikiant klausimą",
+      "upvoteFailed": "Jūsų balsas neužregistruotas: bandykite dar kartą po kelių sekundžių."
     },
     "ctaTitle": "Užduokite pirmą klausimą",
     "ctaBody": "Kiti dalyviai galės balsuoti už jūsų klausimą. Moderatoriai jį matys ir galės atsakyti balsu arba raštu.",
@@ -733,7 +734,7 @@
         "materialUrl": "Failas arba nuoroda",
         "visibilityLabel": "Matomumas",
         "visibility": {
-          "ALWAYS": "Visada",
+          "ALWAYS": "Salėje ir po renginio",
           "BEFORE": "Prieš renginį",
           "DURING": "Renginio metu",
           "AFTER": "Po renginio"
@@ -1793,7 +1794,7 @@
       "selectFile": "Pasirinkti failą",
       "fileTitle": "Pavadinimas",
       "visibility": "Matomumas",
-      "visibilityAlways": "Visada matomas",
+      "visibilityAlways": "Salėje ir po renginio",
       "visibilityBefore": "Tik prieš renginį",
       "visibilityDuring": "Tik renginio metu",
       "visibilityAfter": "Tik po renginio",
@@ -1814,10 +1815,11 @@
       "titleLabel": "Pavadinimas",
       "descriptionLabel": "Aprašymas (neprivaloma)",
       "visibilityLabel": "Matomumas",
-      "visibilityAlways": "Visada",
+      "visibilityAlways": "Salėje ir po renginio",
       "visibilityBefore": "Prieš renginį",
       "visibilityDuring": "Renginio metu",
       "visibilityAfter": "Po renginio",
+      "visibilityHelp": "Prieš pradžią viešajame renginio puslapyje rodoma tik medžiaga, pažymėta „Prieš renginį“. Medžiaga, pažymėta „Salėje ir po renginio“, rodoma salėje renginio metu ir pasibaigusio renginio puslapyje.",
       "typeLabel": "Tipas",
       "fileUploaded": "Failas įkeltas",
       "typeFile": "Failas",

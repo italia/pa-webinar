@@ -489,7 +489,8 @@
       "tooLong": "La pregunta no puede superar los 500 caracteres",
       "rateLimit": "Espere antes de enviar otra pregunta",
       "busy": "En este momento llegan muchas preguntas desde su red: inténtelo de nuevo en unos segundos",
-      "generic": "Error al enviar la pregunta"
+      "generic": "Error al enviar la pregunta",
+      "upvoteFailed": "El voto no se ha registrado: inténtelo de nuevo en unos segundos."
     },
     "ctaTitle": "Haga la primera pregunta",
     "ctaBody": "El resto de los participantes podrán votar su pregunta. Los moderadores la verán y podrán responder de viva voz o por escrito.",
@@ -733,7 +734,7 @@
         "materialUrl": "Archivo o enlace",
         "visibilityLabel": "Visibilidad",
         "visibility": {
-          "ALWAYS": "Siempre",
+          "ALWAYS": "En la sala y después del evento",
           "BEFORE": "Antes del evento",
           "DURING": "Durante el evento",
           "AFTER": "Después del evento"
@@ -1793,7 +1794,7 @@
       "selectFile": "Seleccionar archivo",
       "fileTitle": "Título",
       "visibility": "Visibilidad",
-      "visibilityAlways": "Siempre visible",
+      "visibilityAlways": "En la sala y después del evento",
       "visibilityBefore": "Solo antes del evento",
       "visibilityDuring": "Solo durante el evento",
       "visibilityAfter": "Solo después del evento",
@@ -1814,10 +1815,11 @@
       "titleLabel": "Título",
       "descriptionLabel": "Descripción (opcional)",
       "visibilityLabel": "Visibilidad",
-      "visibilityAlways": "Siempre",
+      "visibilityAlways": "En la sala y después del evento",
       "visibilityBefore": "Antes del evento",
       "visibilityDuring": "Durante el evento",
       "visibilityAfter": "Después del evento",
+      "visibilityHelp": "Antes del inicio, la página pública del evento muestra solo los materiales marcados como «Antes del evento». Los marcados como «En la sala y después del evento» aparecen en la sala durante el evento y en la página del evento concluido.",
       "typeLabel": "Tipo",
       "fileUploaded": "Archivo subido",
       "typeFile": "Archivo",

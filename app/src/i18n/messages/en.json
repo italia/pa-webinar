@@ -489,7 +489,8 @@
       "tooLong": "Question cannot exceed 500 characters",
       "rateLimit": "Please wait before submitting another question",
       "busy": "Many questions are arriving from your network right now: please try again in a few seconds",
-      "generic": "Error submitting question"
+      "generic": "Error submitting question",
+      "upvoteFailed": "Your vote was not recorded: please try again in a few seconds."
     },
     "ctaTitle": "Ask the first question",
     "ctaBody": "Other attendees can upvote your question. Moderators will see it and can answer live or in writing.",
@@ -733,7 +734,7 @@
         "materialUrl": "File or link",
         "visibilityLabel": "Visibility",
         "visibility": {
-          "ALWAYS": "Always",
+          "ALWAYS": "In the room and after the event",
           "BEFORE": "Before the event",
           "DURING": "During the event",
           "AFTER": "After the event"
@@ -1793,7 +1794,7 @@
       "selectFile": "Select file",
       "fileTitle": "Title",
       "visibility": "Visibility",
-      "visibilityAlways": "Always visible",
+      "visibilityAlways": "In the room and after the event",
       "visibilityBefore": "Before event only",
       "visibilityDuring": "During event only",
       "visibilityAfter": "After event only",
@@ -1814,10 +1815,11 @@
       "titleLabel": "Title",
       "descriptionLabel": "Description (optional)",
       "visibilityLabel": "Visibility",
-      "visibilityAlways": "Always",
+      "visibilityAlways": "In the room and after the event",
       "visibilityBefore": "Before the event",
       "visibilityDuring": "During the event",
       "visibilityAfter": "After the event",
+      "visibilityHelp": "Before the start, the public event page lists only the materials set to “Before the event”. Materials set to “In the room and after the event” appear in the live room during the event and on the page of the concluded event.",
       "typeLabel": "Type",
       "fileUploaded": "File uploaded",
       "typeFile": "File",

@@ -489,7 +489,8 @@
       "tooLong": "Il-mistoqsija ma tistax taqbeż il-500 karattru",
       "rateLimit": "Jekk jogħġbok stenna qabel ma tibgħat mistoqsija oħra",
       "busy": "Bħalissa qed jaslu ħafna mistoqsijiet min-netwerk tiegħek: jekk jogħġbok erġa' pprova fi ftit sekondi",
-      "generic": "Żball fl-ibgħat tal-mistoqsija"
+      "generic": "Żball fl-ibgħat tal-mistoqsija",
+      "upvoteFailed": "Il-vot ma ġiex irreġistrat: jekk jogħġbok ipprova mill-ġdid fi ftit sekondi."
     },
     "ctaTitle": "Staqsi l-ewwel mistoqsija",
     "ctaBody": "Il-parteċipanti l-oħra jistgħu jivvutaw il-mistoqsija tiegħek. Il-moderaturi se jarawha u jistgħu jwieġbu bil-vuċi jew bil-kitba.",
@@ -733,7 +734,7 @@
         "materialUrl": "Fajl jew link",
         "visibilityLabel": "Viżibbiltà",
         "visibility": {
-          "ALWAYS": "Dejjem",
+          "ALWAYS": "Fis-sala u wara l-avveniment",
           "BEFORE": "Qabel l-avveniment",
           "DURING": "Matul l-avveniment",
           "AFTER": "Wara l-avveniment"
@@ -1793,7 +1794,7 @@
       "selectFile": "Agħżel fajl",
       "fileTitle": "Titlu",
       "visibility": "Viżibbiltà",
-      "visibilityAlways": "Dejjem viżibbli",
+      "visibilityAlways": "Fis-sala u wara l-avveniment",
       "visibilityBefore": "Qabel l-avveniment biss",
       "visibilityDuring": "Matul l-avveniment biss",
       "visibilityAfter": "Wara l-avveniment biss",
@@ -1814,10 +1815,11 @@
       "titleLabel": "Titlu",
       "descriptionLabel": "Deskrizzjoni (fakultattiva)",
       "visibilityLabel": "Viżibbiltà",
-      "visibilityAlways": "Dejjem",
+      "visibilityAlways": "Fis-sala u wara l-avveniment",
       "visibilityBefore": "Qabel l-avveniment",
       "visibilityDuring": "Matul l-avveniment",
       "visibilityAfter": "Wara l-avveniment",
+      "visibilityHelp": "Qabel il-bidu, il-paġna pubblika tal-avveniment turi biss il-materjali mmarkati “Qabel l-avveniment”. Il-materjali mmarkati “Fis-sala u wara l-avveniment” jidhru fis-sala matul l-avveniment u fil-paġna tal-avveniment li ntemm.",
       "typeLabel": "Tip",
       "fileUploaded": "Fajl caricato",
       "typeFile": "File",

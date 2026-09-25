@@ -489,7 +489,8 @@
       "tooLong": "Frågan får inte överstiga 500 tecken",
       "rateLimit": "Vänta innan du skickar en ny fråga",
       "busy": "Just nu kommer många frågor från ditt nätverk: försök igen om några sekunder",
-      "generic": "Fel vid sändning av fråga"
+      "generic": "Fel vid sändning av fråga",
+      "upvoteFailed": "Din röst registrerades inte: försök igen om några sekunder."
     },
     "ctaTitle": "Ställ den första frågan",
     "ctaBody": "Andra deltagare kan rösta på din fråga. Moderatorerna ser den och kan svara muntligt eller skriftligt.",
@@ -733,7 +734,7 @@
         "materialUrl": "Fil eller länk",
         "visibilityLabel": "Synlighet",
         "visibility": {
-          "ALWAYS": "Alltid",
+          "ALWAYS": "I rummet och efter evenemanget",
           "BEFORE": "Före evenemanget",
           "DURING": "Under evenemanget",
           "AFTER": "Efter evenemanget"
@@ -1793,7 +1794,7 @@
       "selectFile": "Välj fil",
       "fileTitle": "Titel",
       "visibility": "Synlighet",
-      "visibilityAlways": "Alltid synlig",
+      "visibilityAlways": "I rummet och efter evenemanget",
       "visibilityBefore": "Enbart före evenemanget",
       "visibilityDuring": "Enbart under evenemanget",
       "visibilityAfter": "Enbart efter evenemanget",
@@ -1814,10 +1815,11 @@
       "titleLabel": "Titel",
       "descriptionLabel": "Beskrivning (valfritt)",
       "visibilityLabel": "Synlighet",
-      "visibilityAlways": "Alltid",
+      "visibilityAlways": "I rummet och efter evenemanget",
       "visibilityBefore": "Före evenemanget",
       "visibilityDuring": "Under evenemanget",
       "visibilityAfter": "Efter evenemanget",
+      "visibilityHelp": "Före starten visar evenemangets offentliga sida bara material markerat ”Före evenemanget”. Material markerat ”I rummet och efter evenemanget” visas i rummet under evenemanget och på sidan för det avslutade evenemanget.",
       "typeLabel": "Typ",
       "fileUploaded": "Fil uppladdad",
       "typeFile": "Fil",

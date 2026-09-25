@@ -57,8 +57,20 @@ describe('materialPhase', () => {
 describe('isMaterialVisibleInPhase', () => {
   const FASI: MaterialPhase[] = ['BEFORE', 'DURING', 'AFTER'];
 
-  it('ALWAYS si vede in ogni fase', () => {
-    for (const fase of FASI) expect(isMaterialVisibleInPhase('ALWAYS', fase)).toBe(true);
+  it('ALWAYS vuol dire in sala e dopo: mai sulla scheda pubblica prima dell’inizio', () => {
+    // Il predefinito di ogni materiale nuovo. Se valesse anche prima, le slide
+    // caricate in anticipo finirebbero sulla scheda pubblica senza che nessuno
+    // l'abbia deciso.
+    expect(isMaterialVisibleInPhase('ALWAYS', 'BEFORE')).toBe(false);
+    expect(isMaterialVisibleInPhase('ALWAYS', 'DURING')).toBe(true);
+    expect(isMaterialVisibleInPhase('ALWAYS', 'AFTER')).toBe(true);
+  });
+
+  it('prima dell’inizio il pubblico vede solo ciò che è marcato BEFORE', () => {
+    const visibili = ['ALWAYS', 'BEFORE', 'DURING', 'AFTER'].filter((v) =>
+      isMaterialVisibleInPhase(v, 'BEFORE'),
+    );
+    expect(visibili).toEqual(['BEFORE']);
   });
 
   it('un materiale limitato si vede solo nella sua fase', () => {
@@ -79,7 +91,18 @@ describe('isMaterialVisibleInPhase', () => {
 
 describe('materialVisibilityWhere', () => {
   it('seleziona nel DB gli stessi materiali della regola in memoria', () => {
+    expect(materialVisibilityWhere('BEFORE')).toEqual({ visibility: { in: ['BEFORE'] } });
+    expect(materialVisibilityWhere('DURING')).toEqual({ visibility: { in: ['ALWAYS', 'DURING'] } });
     expect(materialVisibilityWhere('AFTER')).toEqual({ visibility: { in: ['ALWAYS', 'AFTER'] } });
-    expect(materialVisibilityWhere('BEFORE')).toEqual({ visibility: { in: ['ALWAYS', 'BEFORE'] } });
+  });
+
+  it('coincide con la regola in memoria per ogni valore e ogni fase', () => {
+    const FASI: MaterialPhase[] = ['BEFORE', 'DURING', 'AFTER'];
+    for (const fase of FASI) {
+      const nelDb = materialVisibilityWhere(fase).visibility.in;
+      for (const v of ['ALWAYS', 'BEFORE', 'DURING', 'AFTER', '']) {
+        expect(nelDb.includes(v), `${v} in ${fase}`).toBe(isMaterialVisibleInPhase(v, fase));
+      }
+    }
   });
 });

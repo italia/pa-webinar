@@ -489,7 +489,8 @@
       "tooLong": "Pytanie nie może przekroczyć 500 znaków",
       "rateLimit": "Proszę poczekać przed wysłaniem kolejnego pytania",
       "busy": "Z tej sieci napływa teraz wiele pytań: proszę spróbować ponownie za kilka sekund",
-      "generic": "Błąd podczas wysyłania pytania"
+      "generic": "Błąd podczas wysyłania pytania",
+      "upvoteFailed": "Głos nie został zapisany: proszę spróbować ponownie za kilka sekund."
     },
     "ctaTitle": "Zadaj pierwsze pytanie",
     "ctaBody": "Inni uczestnicy będą mogli zagłosować na Twoje pytanie. Moderatorzy je zobaczą i będą mogli odpowiedzieć głosowo lub pisemnie.",
@@ -733,7 +734,7 @@
         "materialUrl": "Plik lub link",
         "visibilityLabel": "Widoczność",
         "visibility": {
-          "ALWAYS": "Zawsze",
+          "ALWAYS": "W sali i po wydarzeniu",
           "BEFORE": "Przed wydarzeniem",
           "DURING": "Podczas wydarzenia",
           "AFTER": "Po wydarzeniu"
@@ -1793,7 +1794,7 @@
       "selectFile": "Wybierz plik",
       "fileTitle": "Tytuł",
       "visibility": "Widoczność",
-      "visibilityAlways": "Zawsze widoczny",
+      "visibilityAlways": "W sali i po wydarzeniu",
       "visibilityBefore": "Tylko przed wydarzeniem",
       "visibilityDuring": "Tylko podczas wydarzenia",
       "visibilityAfter": "Tylko po wydarzeniu",
@@ -1814,10 +1815,11 @@
       "titleLabel": "Tytuł",
       "descriptionLabel": "Opis (opcjonalny)",
       "visibilityLabel": "Widoczność",
-      "visibilityAlways": "Zawsze",
+      "visibilityAlways": "W sali i po wydarzeniu",
       "visibilityBefore": "Przed wydarzeniem",
       "visibilityDuring": "Podczas wydarzenia",
       "visibilityAfter": "Po wydarzeniu",
+      "visibilityHelp": "Przed rozpoczęciem publiczna strona wydarzenia pokazuje tylko materiały oznaczone „Przed wydarzeniem”. Materiały oznaczone „W sali i po wydarzeniu” są widoczne w sali podczas wydarzenia i na stronie zakończonego wydarzenia.",
       "typeLabel": "Typ",
       "fileUploaded": "Plik przesłany",
       "typeFile": "Plik",

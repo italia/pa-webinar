@@ -35,3 +35,51 @@ export function questionSubmitError(status: number, code?: string): QuestionSubm
   if (status === 429) return code === 'NETWORK_RATE_LIMIT' ? 'busy' : 'rateLimit';
   return 'generic';
 }
+
+/**
+ * Con quale identità si sostiene una domanda col pollice in su: la stessa del
+ * voto nei sondaggi e della nuvola di parole (live/voter-identity). Chi si è
+ * iscritto usa la propria registrazione; ospiti, relatori e moderatori
+ * l'identificativo stabile del browser. Esattamente uno dei due.
+ */
+export interface QaVoter {
+  voterAccessToken?: string;
+  voterGuestId?: string;
+}
+
+/**
+ * L'indirizzo della lettura delle domande. Chi vota col browser ci aggiunge il
+ * proprio identificativo: è così che il server sa quali domande ha già
+ * sostenuto e gli dice che il pulsante può usarlo (`canUpvote`). La chiave
+ * resta un prefisso dell'elenco, quindi il canale della sala la rinfresca
+ * comunque (hooks/use-live-state).
+ */
+export function questionsReadUrl(apiUrl: string, { voterGuestId }: QaVoter): string {
+  return voterGuestId ? `${apiUrl}?guestId=${encodeURIComponent(voterGuestId)}` : apiUrl;
+}
+
+/**
+ * La richiesta del pollice in su, o null se manca un'identità: senza, il
+ * server risponderebbe 401. Il token di sala non è un'identità di voto — il
+ * server lo cercherebbe fra le registrazioni — ma viaggia come
+ * `Authorization: Bearer`, prova di presenza di chi conduce o parla anche
+ * fuori dalla finestra degli ospiti.
+ */
+export function upvoteInit(
+  token: string,
+  { voterAccessToken, voterGuestId }: QaVoter,
+): RequestInit | null {
+  const identity = voterAccessToken
+    ? { accessToken: voterAccessToken }
+    : voterGuestId
+      ? { guestId: voterGuestId }
+      : null;
+  if (!identity) return null;
+  return {
+    method: 'POST',
+    headers: token
+      ? { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
+      : { 'Content-Type': 'application/json' },
+    body: JSON.stringify(identity),
+  };
+}

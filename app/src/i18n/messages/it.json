@@ -489,7 +489,8 @@
       "tooLong": "La domanda non può superare i 500 caratteri",
       "rateLimit": "Attendi prima di inviare un'altra domanda",
       "busy": "Molte domande in arrivo dalla tua rete in questo momento: riprova tra qualche secondo",
-      "generic": "Errore nell'invio della domanda"
+      "generic": "Errore nell'invio della domanda",
+      "upvoteFailed": "Il voto non è stato registrato: riprova tra qualche secondo."
     },
     "ctaTitle": "Fai la prima domanda",
     "ctaBody": "Gli altri partecipanti potranno votare la tua domanda. I moderatori la vedranno e potranno dare risposta in voce o in scritto.",
@@ -823,7 +824,7 @@
         "materialUrl": "File o link",
         "visibilityLabel": "Visibilità",
         "visibility": {
-          "ALWAYS": "Sempre",
+          "ALWAYS": "In sala e dopo l'evento",
           "BEFORE": "Prima dell'evento",
           "DURING": "Durante l'evento",
           "AFTER": "Dopo l'evento"
@@ -1883,7 +1884,7 @@
       "selectFile": "Seleziona file",
       "fileTitle": "Titolo",
       "visibility": "Visibilità",
-      "visibilityAlways": "Sempre visibile",
+      "visibilityAlways": "In sala e dopo l'evento",
       "visibilityBefore": "Solo prima dell'evento",
       "visibilityDuring": "Solo durante l'evento",
       "visibilityAfter": "Solo dopo l'evento",
@@ -1904,10 +1905,11 @@
       "titleLabel": "Titolo",
       "descriptionLabel": "Descrizione (facoltativa)",
       "visibilityLabel": "Visibilità",
-      "visibilityAlways": "Sempre",
+      "visibilityAlways": "In sala e dopo l'evento",
       "visibilityBefore": "Prima dell'evento",
       "visibilityDuring": "Durante l'evento",
       "visibilityAfter": "Dopo l'evento",
+      "visibilityHelp": "Prima dell'inizio la pagina pubblica dell'evento mostra solo i materiali «Prima dell'evento». Quelli «In sala e dopo l'evento» compaiono nella sala durante la diretta e sulla pagina dell'evento concluso.",
       "typeLabel": "Tipo",
       "fileUploaded": "File caricato",
       "typeFile": "File",

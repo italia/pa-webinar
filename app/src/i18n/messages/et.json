@@ -489,7 +489,8 @@
       "tooLong": "Küsimus ei tohi ületada 500 tähemärki",
       "rateLimit": "Palun oodake enne järgmise küsimuse esitamist",
       "busy": "Teie võrgust saabub praegu palju küsimusi: palun proovige mõne sekundi pärast uuesti",
-      "generic": "Viga küsimuse esitamisel"
+      "generic": "Viga küsimuse esitamisel",
+      "upvoteFailed": "Teie häält ei salvestatud: palun proovige mõne sekundi pärast uuesti."
     },
     "ctaTitle": "Esitage esimene küsimus",
     "ctaBody": "Teised osalejad saavad teie küsimust hinnata. Moderaatorid näevad seda ja saavad vastata suuliselt või kirjalikult.",
@@ -733,7 +734,7 @@
         "materialUrl": "Fail või link",
         "visibilityLabel": "Nähtavus",
         "visibility": {
-          "ALWAYS": "Alati",
+          "ALWAYS": "Ruumis ja pärast sündmust",
           "BEFORE": "Enne sündmust",
           "DURING": "Sündmuse ajal",
           "AFTER": "Pärast sündmust"
@@ -1793,7 +1794,7 @@
       "selectFile": "Vali fail",
       "fileTitle": "Pealkiri",
       "visibility": "Nähtavus",
-      "visibilityAlways": "Alati nähtav",
+      "visibilityAlways": "Ruumis ja pärast sündmust",
       "visibilityBefore": "Ainult enne üritust",
       "visibilityDuring": "Ainult ürituse ajal",
       "visibilityAfter": "Ainult pärast üritust",
@@ -1814,10 +1815,11 @@
       "titleLabel": "Pealkiri",
       "descriptionLabel": "Kirjeldus (valikuline)",
       "visibilityLabel": "Nähtavus",
-      "visibilityAlways": "Alati",
+      "visibilityAlways": "Ruumis ja pärast sündmust",
       "visibilityBefore": "Enne sündmust",
       "visibilityDuring": "Sündmuse ajal",
       "visibilityAfter": "Pärast sündmust",
+      "visibilityHelp": "Enne algust näitab sündmuse avalik leht ainult materjale, mille nähtavus on „Enne sündmust“. Materjalid nähtavusega „Ruumis ja pärast sündmust“ on nähtavad ruumis sündmuse ajal ja lõppenud sündmuse lehel.",
       "typeLabel": "Tüüp",
       "fileUploaded": "Fail laaditud",
       "typeFile": "Fail",

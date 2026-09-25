@@ -1,9 +1,16 @@
 /**
  * Quando un materiale dell'evento è visibile al pubblico.
  *
- * Ogni materiale porta una `visibility` scelta da chi lo carica: ALWAYS
- * (sempre), BEFORE (solo prima dell'evento), DURING (solo durante), AFTER
- * (solo dopo). La regola si applica LATO SERVER su ogni superficie che elenca
+ * Ogni materiale porta una `visibility` scelta da chi lo carica: BEFORE (solo
+ * prima dell'evento), DURING (solo durante), AFTER (solo dopo) e ALWAYS, il
+ * predefinito, che nonostante il nome vuol dire «in sala e dopo l'evento»:
+ * durante e dopo, MAI prima dell'inizio. Prima dell'inizio il pubblico vede
+ * solo ciò che chi organizza ha scelto esplicitamente di mostrare prima (le
+ * slide di un relatore caricate in anticipo non finiscono sulla scheda
+ * pubblica solo perché nessuno ha cambiato il predefinito). Il valore nel DB resta
+ * `ALWAYS`: cambia ciò che vuol dire, non come si scrive.
+ *
+ * La regola si applica LATO SERVER su ogni superficie che elenca
  * i materiali al pubblico — scheda dell'evento prima dell'inizio, pannello
  * della sala live, scheda post-evento, elenco dei file — perché un filtro nel
  * client non nasconde niente: la risposta dell'API resta leggibile da
@@ -47,13 +54,18 @@ export function materialPhase(
   return 'DURING';
 }
 
+/** Le `visibility` che il pubblico vede in ciascuna fase. */
+function visibleValues(phase: MaterialPhase): string[] {
+  return phase === 'BEFORE' ? ['BEFORE'] : ['ALWAYS', phase];
+}
+
 /**
  * True se un materiale con questa `visibility` va mostrato al pubblico nella
  * fase indicata. Un valore sconosciuto (la colonna è una stringa libera nel
  * DB) resta nascosto: nel dubbio non si pubblica.
  */
 export function isMaterialVisibleInPhase(visibility: string, phase: MaterialPhase): boolean {
-  return visibility === 'ALWAYS' || visibility === phase;
+  return visibleValues(phase).includes(visibility);
 }
 
 /**
@@ -63,5 +75,5 @@ export function isMaterialVisibleInPhase(visibility: string, phase: MaterialPhas
 export function materialVisibilityWhere(phase: MaterialPhase): {
   visibility: { in: string[] };
 } {
-  return { visibility: { in: ['ALWAYS', phase] } };
+  return { visibility: { in: visibleValues(phase) } };
 }

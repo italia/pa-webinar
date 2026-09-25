@@ -10,6 +10,8 @@ import {
   Button,
 } from 'design-react-kit';
 
+import { questionsReadUrl, upvoteInit, type QaVoter } from './question-request';
+
 interface PublicQuestion {
   id: string;
   authorName: string;
@@ -25,12 +27,12 @@ interface PublicQuestion {
 interface QuestionsResponse {
   questions: PublicQuestion[];
   totalCount: number;
-  /** Lo dice il server: il pollice in su richiede l'identità di una
-   *  registrazione. Ospiti e relatori leggono e basta. */
+  /** Lo dice il server: il pollice in su richiede un'identità di voto, la
+   *  registrazione o l'identificativo del browser mandato con la lettura. */
   canUpvote?: boolean;
 }
 
-interface QuestionListProps {
+interface QuestionListProps extends QaVoter {
   eventSlug: string;
   token: string;
   isModerator: boolean;
@@ -42,9 +44,11 @@ export default function QuestionList({
   eventSlug,
   token,
   isModerator,
+  voterAccessToken,
+  voterGuestId,
 }: QuestionListProps) {
   const t = useTranslations('qa');
-  const apiUrl = `/api/events/${eventSlug}/questions`;
+  const apiUrl = questionsReadUrl(`/api/events/${eventSlug}/questions`, { voterGuestId });
 
   // Send token via header instead of query param to avoid leaking in logs
   const fetcherWithAuth = useCallback(
@@ -66,6 +70,7 @@ export default function QuestionList({
   });
 
   const [filter, setFilter] = useState<FilterTab>('ALL');
+  const [upvoteFailed, setUpvoteFailed] = useState(false);
   const prevHighlightedRef = useRef<string | null>(null);
   const topRef = useRef<HTMLDivElement>(null);
 
@@ -89,17 +94,23 @@ export default function QuestionList({
 
   const handleUpvote = useCallback(
     async (questionId: string) => {
-      await fetch(
-        `/api/events/${eventSlug}/questions/${questionId}/upvote`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ accessToken: token }),
-        },
-      );
+      const init = upvoteInit(token, { voterAccessToken, voterGuestId });
+      if (!init) return;
+      setUpvoteFailed(false);
+      try {
+        const res = await fetch(
+          `/api/events/${eventSlug}/questions/${questionId}/upvote`,
+          init,
+        );
+        // Un voto respinto (limite, stanza chiusa) non cambia niente sullo
+        // schermo: senza un messaggio sembrerebbe un pulsante rotto.
+        if (!res.ok) setUpvoteFailed(true);
+      } catch {
+        setUpvoteFailed(true);
+      }
       mutate();
     },
-    [eventSlug, token, mutate],
+    [eventSlug, token, voterAccessToken, voterGuestId, mutate],
   );
 
   const handleStatusChange = useCallback(
@@ -143,6 +154,12 @@ export default function QuestionList({
             ),
           )}
         </div>
+      )}
+
+      {upvoteFailed && (
+        <p className="text-danger small mb-2" role="alert">
+          {t('errors.upvoteFailed')}
+        </p>
       )}
 
       {filteredQuestions.length === 0 && (

@@ -523,6 +523,7 @@ function MaterialsSection({
   onChange: (next: MaterialDraft[]) => void;
 }) {
   const t = useTranslations('admin.wizard.step4');
+  const tMaterials = useTranslations('admin.materials');
   const [draft, setDraft] = useState<MaterialDraft>({
     title: '',
     url: '',
@@ -627,6 +628,7 @@ function MaterialsSection({
             <select
               id="mat-vis"
               className="form-select"
+              aria-describedby="mat-vis-help"
               value={draft.visibility}
               onChange={(e) =>
                 setDraft({
@@ -640,6 +642,12 @@ function MaterialsSection({
               <option value="DURING">{t('visibility.DURING')}</option>
               <option value="AFTER">{t('visibility.AFTER')}</option>
             </select>
+            {/* Il predefinito non compare sulla pagina pubblica prima
+                dell'inizio: senza dirlo, chi carica le slide in anticipo si
+                aspetterebbe di vederle lì (lib/events/material-visibility). */}
+            <div id="mat-vis-help" className="form-text">
+              {tMaterials('visibilityHelp')}
+            </div>
           </div>
           <div className="col-md-6 d-flex align-items-end">
             <button

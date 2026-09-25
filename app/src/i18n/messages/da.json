@@ -489,7 +489,8 @@
       "tooLong": "Spørgsmålet må ikke overstige 500 tegn",
       "rateLimit": "Vent venligst, før du sender endnu et spørgsmål",
       "busy": "Der kommer mange spørgsmål fra dit netværk lige nu: prøv venligst igen om et par sekunder",
-      "generic": "Fejl ved afsendelse af spørgsmål"
+      "generic": "Fejl ved afsendelse af spørgsmål",
+      "upvoteFailed": "Din stemme blev ikke registreret: prøv venligst igen om et par sekunder."
     },
     "ctaTitle": "Stil det første spørgsmål",
     "ctaBody": "De øvrige deltagere kan stemme på dit spørgsmål. Moderatorerne ser det og kan svare mundtligt eller skriftligt.",
@@ -733,7 +734,7 @@
         "materialUrl": "Fil eller link",
         "visibilityLabel": "Synlighed",
         "visibility": {
-          "ALWAYS": "Altid",
+          "ALWAYS": "I rummet og efter arrangementet",
           "BEFORE": "Før arrangementet",
           "DURING": "Under arrangementet",
           "AFTER": "Efter arrangementet"
@@ -1793,7 +1794,7 @@
       "selectFile": "Vælg fil",
       "fileTitle": "Titel",
       "visibility": "Synlighed",
-      "visibilityAlways": "Altid synlig",
+      "visibilityAlways": "I rummet og efter arrangementet",
       "visibilityBefore": "Kun før begivenheden",
       "visibilityDuring": "Kun under begivenheden",
       "visibilityAfter": "Kun efter begivenheden",
@@ -1814,10 +1815,11 @@
       "titleLabel": "Titel",
       "descriptionLabel": "Beskrivelse (valgfri)",
       "visibilityLabel": "Synlighed",
-      "visibilityAlways": "Altid",
+      "visibilityAlways": "I rummet og efter arrangementet",
       "visibilityBefore": "Før arrangementet",
       "visibilityDuring": "Under arrangementet",
       "visibilityAfter": "Efter arrangementet",
+      "visibilityHelp": "Før starten viser arrangementets offentlige side kun materialer markeret „Før arrangementet“. Materialer markeret „I rummet og efter arrangementet“ vises i rummet under arrangementet og på siden for det afsluttede arrangement.",
       "typeLabel": "Type",
       "fileUploaded": "Fil uploadet",
       "typeFile": "Fil",

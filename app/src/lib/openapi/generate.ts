@@ -12,6 +12,7 @@ import {
   createRegistrationSchema,
   createQuestionSchema,
   updateQuestionStatusSchema,
+  upvoteQuestionSchema,
   jitsiTokenRequestSchema,
   createPollSchema,
   updatePollStatusSchema,
@@ -244,6 +245,10 @@ registry.registerPath({
   path: '/api/events/{param}/questions',
   tags: ['Q&A'],
   summary: 'List questions',
+  description:
+    'Callers without a registration token can pass their stable browser id as `?guestId=` ' +
+    '(at most 100 characters): the response then marks the questions that id has upvoted ' +
+    '(`hasUpvoted`) and reports `canUpvote: true`.',
   request: { params: z.object({ param: z.string() }) },
   responses: { 200: { description: 'Questions array with upvote counts' } },
 });
@@ -272,8 +277,23 @@ registry.registerPath({
   path: '/api/events/{param}/questions/{id}/upvote',
   tags: ['Q&A'],
   summary: 'Toggle upvote on a question',
-  request: { params: z.object({ param: z.string(), id: z.string() }) },
-  responses: { 200: { description: 'Upvote toggled' } },
+  description:
+    'One upvote per question per identity: a registration (`accessToken` in the body, or ' +
+    '`?token=`) or a stable browser id (`guestId`) for guests, speakers and moderators. A ' +
+    'browser-id upvote passes the same gate as reading the Q&A panel: a room token as ' +
+    '`Authorization: Bearer`, or, without a token, only while the room is open to guests and ' +
+    'the event has no join password. Limits: 10 per minute per identity, and 300 per minute ' +
+    'per client address and event for browser-id upvotes (`NETWORK_RATE_LIMIT`).',
+  request: {
+    params: z.object({ param: z.string(), id: z.string() }),
+    body: { content: { 'application/json': { schema: upvoteQuestionSchema } } },
+  },
+  responses: {
+    200: { description: 'Upvote toggled: `{ upvoted, upvoteCount }`' },
+    401: { description: 'No identity, or a guest outside the guest window' },
+    403: { description: 'A token that does not belong to this event' },
+    429: { description: 'Rate limited' },
+  },
 });
 
 registry.registerPath({
@@ -320,8 +340,10 @@ registry.registerPath({
   tags: ['Materials'],
   summary: 'List event materials',
   description:
-    'Public callers receive the materials whose visibility matches the current phase of the event ' +
-    '(ALWAYS plus BEFORE, DURING or AFTER). A moderator token (Bearer) receives every material; ' +
+    'Public callers receive the materials whose visibility matches the current phase of the event: ' +
+    'before the start only BEFORE; during the event ALWAYS and DURING; after it ALWAYS and AFTER ' +
+    '(ALWAYS means in the live room and after the event, never before the start). ' +
+    'A moderator token (Bearer) receives every material; ' +
     'an admin session does not widen this list (the admin API lists everything). Only the list ' +
     'is filtered: an uploaded file stays reachable at its URL.',
   request: { params: z.object({ param: z.string() }) },

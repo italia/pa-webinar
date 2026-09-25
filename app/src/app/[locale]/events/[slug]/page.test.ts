@@ -159,12 +159,15 @@ beforeEach(() => {
 });
 
 describe('scheda dell’evento — materiali per il pubblico', () => {
-  it('prima dell’inizio elenca i sempre visibili e i preparatori', async () => {
+  it('prima dell’inizio elenca solo i materiali scelti per il prima', async () => {
+    // Il predefinito (ALWAYS, «in sala e dopo l'evento») resta fuori: sulla
+    // scheda pubblica prima dell'inizio compare solo ciò che chi organizza ha
+    // marcato esplicitamente «Prima dell'evento».
     mockedEvent.mockResolvedValue(eventRow());
     const props = await clientProps();
     expect(whereInterrogato()).toEqual({
       eventId: EVENT_ID,
-      visibility: { in: ['ALWAYS', 'BEFORE'] },
+      visibility: { in: ['BEFORE'] },
     });
     expect(props.materials).toEqual([
       {
@@ -183,7 +186,7 @@ describe('scheda dell’evento — materiali per il pubblico', () => {
     await clientProps();
     expect(whereInterrogato()).toEqual({
       eventId: EVENT_ID,
-      visibility: { in: ['ALWAYS', 'BEFORE'] },
+      visibility: { in: ['BEFORE'] },
     });
   });
 
@@ -209,7 +212,7 @@ describe('scheda dell’evento — materiali per il pubblico', () => {
     expect(props.materials).toEqual([]);
   });
 
-  it('a evento concluso elenca i sempre visibili e quelli del dopo', async () => {
+  it('a evento concluso elenca quelli «in sala e dopo» e quelli del dopo', async () => {
     mockedEvent.mockResolvedValue(
       eventRow({
         status: 'ENDED',

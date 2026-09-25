@@ -489,7 +489,8 @@
       "tooLong": "A pergunta não pode exceder 500 caracteres",
       "rateLimit": "Aguarde antes de enviar outra pergunta",
       "busy": "Neste momento chegam muitas perguntas da sua rede: tente novamente dentro de alguns segundos",
-      "generic": "Erro ao enviar a pergunta"
+      "generic": "Erro ao enviar a pergunta",
+      "upvoteFailed": "O voto não foi registado: tente novamente dentro de alguns segundos."
     },
     "ctaTitle": "Faça a primeira pergunta",
     "ctaBody": "Os outros participantes poderão votar a sua pergunta. Os moderadores irão vê-la e poderão responder por voz ou por escrito.",
@@ -733,7 +734,7 @@
         "materialUrl": "Ficheiro ou ligação",
         "visibilityLabel": "Visibilidade",
         "visibility": {
-          "ALWAYS": "Sempre",
+          "ALWAYS": "Na sala e depois do evento",
           "BEFORE": "Antes do evento",
           "DURING": "Durante o evento",
           "AFTER": "Depois do evento"
@@ -1793,7 +1794,7 @@
       "selectFile": "Selecionar ficheiro",
       "fileTitle": "Título",
       "visibility": "Visibilidade",
-      "visibilityAlways": "Sempre visível",
+      "visibilityAlways": "Na sala e depois do evento",
       "visibilityBefore": "Apenas antes do evento",
       "visibilityDuring": "Apenas durante o evento",
       "visibilityAfter": "Apenas após o evento",
@@ -1814,10 +1815,11 @@
       "titleLabel": "Título",
       "descriptionLabel": "Descrição (facultativa)",
       "visibilityLabel": "Visibilidade",
-      "visibilityAlways": "Sempre",
+      "visibilityAlways": "Na sala e depois do evento",
       "visibilityBefore": "Antes do evento",
       "visibilityDuring": "Durante o evento",
       "visibilityAfter": "Depois do evento",
+      "visibilityHelp": "Antes do início, a página pública do evento mostra apenas os materiais marcados como «Antes do evento». Os marcados como «Na sala e depois do evento» aparecem na sala durante o evento e na página do evento concluído.",
       "typeLabel": "Tipo",
       "fileUploaded": "Ficheiro carregado",
       "typeFile": "Ficheiro",

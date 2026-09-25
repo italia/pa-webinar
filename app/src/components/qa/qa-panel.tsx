@@ -18,6 +18,12 @@ interface QAPanelProps {
   /** Identificativo stabile del browser dell'ospite: il server ci lega il
    *  limite di una domanda ogni trenta secondi, a persona e non per IP. */
   guestId?: string;
+  /** Identità con cui si sostiene una domanda: l'`accessToken` di una
+   *  registrazione… */
+  voterAccessToken?: string;
+  /** …oppure l'identificativo stabile del browser, per chi una registrazione
+   *  non ce l'ha (ospiti, relatori, moderatori). Esattamente uno dei due. */
+  voterGuestId?: string;
 }
 
 export default function QAPanel({
@@ -26,6 +32,8 @@ export default function QAPanel({
   isModerator,
   guestName,
   guestId,
+  voterAccessToken,
+  voterGuestId,
 }: QAPanelProps) {
   const t = useTranslations('qa');
   const [refreshKey, setRefreshKey] = useState(0);
@@ -97,6 +105,8 @@ export default function QAPanel({
             eventSlug={eventSlug}
             token={token}
             isModerator={isModerator}
+            voterAccessToken={voterAccessToken}
+            voterGuestId={voterGuestId}
           />
         </div>
     </div>

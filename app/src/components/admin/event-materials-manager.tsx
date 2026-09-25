@@ -416,7 +416,7 @@ export default function EventMaterialsManager({
           />
         </div>
 
-        <fieldset className="mb-3">
+        <fieldset className="mb-3" aria-describedby="mat-vis-help">
           <legend className="form-label fw-semibold" style={{ fontSize: '1rem' }}>
             {t('visibilityLabel')}
           </legend>
@@ -436,6 +436,12 @@ export default function EventMaterialsManager({
                 </label>
               </div>
             ))}
+          </div>
+          {/* Il predefinito non compare sulla pagina pubblica prima
+              dell'inizio: senza dirlo, chi carica le slide in anticipo si
+              aspetterebbe di vederle lì (lib/events/material-visibility). */}
+          <div id="mat-vis-help" className="form-text">
+            {t('visibilityHelp')}
           </div>
         </fieldset>
 

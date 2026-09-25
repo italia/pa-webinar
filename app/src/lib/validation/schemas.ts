@@ -287,6 +287,20 @@ export const updateQuestionStatusSchema = z.object({
   status: z.enum(['PENDING', 'HIGHLIGHTED', 'ANSWERED', 'DISMISSED']),
 });
 
+/**
+ * Il pollice in su a una domanda. L'identità è una sola, come nel voto dei
+ * sondaggi e nella nuvola di parole: l'`accessToken` di una registrazione di
+ * questo evento, oppure l'identificativo stabile del browser per chi una
+ * registrazione non ce l'ha (ospiti, relatori, moderatori); in quel caso il
+ * token di sala, se c'è, viaggia come `Authorization: Bearer` a prova di
+ * presenza. Il corpo può anche mancare: l'iscritto può passare il token come
+ * `?token=`.
+ */
+export const upvoteQuestionSchema = z.object({
+  accessToken: z.string().min(1).optional(),
+  guestId: z.string().trim().min(1).max(100).optional(),
+});
+
 export type CreateQuestionInput = z.infer<typeof createQuestionSchema>;
 export type UpdateQuestionStatusInput = z.infer<typeof updateQuestionStatusSchema>;
 

@@ -24,7 +24,16 @@ const t = messages.materials;
 
 let container: HTMLDivElement;
 let root: Root;
-let elenco: { id: string; type: string; title: string; url: string; description: null; addedBy: string; createdAt: string }[];
+let elenco: {
+  id: string;
+  type: string;
+  title: string;
+  url: string;
+  description: null;
+  addedBy: string;
+  createdAt: string;
+  visibility?: string;
+}[];
 const fetchMock = vi.fn();
 
 function materiale(id: string) {
@@ -39,12 +48,16 @@ function materiale(id: string) {
   };
 }
 
-async function render() {
+async function render({ isModerator = true }: { isModerator?: boolean } = {}) {
   await act(async () => {
     root.render(
       <NextIntlClientProvider locale="it" messages={messages} timeZone="Europe/Rome">
         <SWRConfig value={{ provider: () => new Map(), dedupingInterval: 0 }}>
-          <MaterialPanel eventSlug={SLUG} token="TOKEN_MODERATORE" isModerator />
+          <MaterialPanel
+            eventSlug={SLUG}
+            token={isModerator ? 'TOKEN_MODERATORE' : ''}
+            isModerator={isModerator}
+          />
         </SWRConfig>
       </NextIntlClientProvider>,
     );
@@ -200,5 +213,28 @@ describe('MaterialPanel — togliere un materiale', () => {
     scrivi(campoUrl(), 'https://example.org/slide');
     await invia();
     expect(erroreLista()).not.toContain(t.errors.deleteFailed);
+  });
+});
+
+describe('MaterialPanel — quando il pubblico vede un materiale', () => {
+  const tv = messages.admin.materials;
+  const etichette = () =>
+    Array.from(container.querySelectorAll('.badge')).map((el) => el.textContent?.trim());
+
+  it('chi conduce vede la fase di ogni voce, anche del predefinito', async () => {
+    // Prima dell'inizio il pubblico non vede il predefinito: senza etichetta
+    // chi controlla la sala in anticipo non se ne accorgerebbe.
+    elenco = [
+      { ...materiale('m1'), visibility: 'ALWAYS' },
+      { ...materiale('m2'), visibility: 'BEFORE' },
+    ];
+    await render();
+    expect(etichette()).toEqual([tv.visibilityAlways, tv.visibilityBefore]);
+  });
+
+  it('il pubblico non vede etichette', async () => {
+    elenco = [{ ...materiale('m1'), visibility: 'ALWAYS' }];
+    await render({ isModerator: false });
+    expect(etichette()).toEqual([]);
   });
 });

@@ -489,7 +489,8 @@
       "tooLong": "Întrebarea nu poate depăși 500 de caractere",
       "rateLimit": "Așteptați înainte de a trimite altă întrebare",
       "busy": "În acest moment sosesc multe întrebări din rețeaua dumneavoastră: încercați din nou peste câteva secunde",
-      "generic": "Eroare la trimiterea întrebării"
+      "generic": "Eroare la trimiterea întrebării",
+      "upvoteFailed": "Votul nu a fost înregistrat: încercați din nou peste câteva secunde."
     },
     "ctaTitle": "Adresați prima întrebare",
     "ctaBody": "Ceilalți participanți vor putea vota întrebarea dvs. Moderatorii o vor vedea și vor putea răspunde verbal sau în scris.",
@@ -733,7 +734,7 @@
         "materialUrl": "Fișier sau link",
         "visibilityLabel": "Vizibilitate",
         "visibility": {
-          "ALWAYS": "Întotdeauna",
+          "ALWAYS": "În sală și după eveniment",
           "BEFORE": "Înainte de eveniment",
           "DURING": "În timpul evenimentului",
           "AFTER": "După eveniment"
@@ -1793,7 +1794,7 @@
       "selectFile": "Selectați fișierul",
       "fileTitle": "Titlu",
       "visibility": "Vizibilitate",
-      "visibilityAlways": "Întotdeauna vizibil",
+      "visibilityAlways": "În sală și după eveniment",
       "visibilityBefore": "Doar înainte de eveniment",
       "visibilityDuring": "Doar în timpul evenimentului",
       "visibilityAfter": "Doar după eveniment",
@@ -1814,10 +1815,11 @@
       "titleLabel": "Titlu",
       "descriptionLabel": "Descriere (opțională)",
       "visibilityLabel": "Vizibilitate",
-      "visibilityAlways": "Întotdeauna",
+      "visibilityAlways": "În sală și după eveniment",
       "visibilityBefore": "Înainte de eveniment",
       "visibilityDuring": "În timpul evenimentului",
       "visibilityAfter": "După eveniment",
+      "visibilityHelp": "Înainte de început, pagina publică a evenimentului afișează doar materialele marcate „Înainte de eveniment”. Cele marcate „În sală și după eveniment” apar în sală în timpul evenimentului și pe pagina evenimentului încheiat.",
       "typeLabel": "Tip",
       "fileUploaded": "Fișier încărcat",
       "typeFile": "Fișier",

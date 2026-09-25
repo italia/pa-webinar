@@ -489,7 +489,8 @@
       "tooLong": "A kérdés nem haladhatja meg az 500 karaktert",
       "rateLimit": "Kérjük, várjon a következő kérdés elküldése előtt",
       "busy": "A hálózatáról most sok kérdés érkezik: kérjük, próbálja újra néhány másodperc múlva",
-      "generic": "Hiba a kérdés elküldésekor"
+      "generic": "Hiba a kérdés elküldésekor",
+      "upvoteFailed": "A szavazata nem került rögzítésre: kérjük, próbálja újra néhány másodperc múlva."
     },
     "ctaTitle": "Tegye fel az első kérdést",
     "ctaBody": "A többi résztvevő szavazhat a kérdésére. A moderátorok látják és válaszolhatnak rá hangban vagy írásban.",
@@ -733,7 +734,7 @@
         "materialUrl": "Fájl vagy hivatkozás",
         "visibilityLabel": "Láthatóság",
         "visibility": {
-          "ALWAYS": "Mindig",
+          "ALWAYS": "A teremben és az esemény után",
           "BEFORE": "Az esemény előtt",
           "DURING": "Az esemény alatt",
           "AFTER": "Az esemény után"
@@ -1793,7 +1794,7 @@
       "selectFile": "Fájl kiválasztása",
       "fileTitle": "Cím",
       "visibility": "Láthatóság",
-      "visibilityAlways": "Mindig látható",
+      "visibilityAlways": "A teremben és az esemény után",
       "visibilityBefore": "Csak az esemény előtt",
       "visibilityDuring": "Csak az esemény alatt",
       "visibilityAfter": "Csak az esemény után",
@@ -1814,10 +1815,11 @@
       "titleLabel": "Cím",
       "descriptionLabel": "Leírás (opcionális)",
       "visibilityLabel": "Láthatóság",
-      "visibilityAlways": "Mindig",
+      "visibilityAlways": "A teremben és az esemény után",
       "visibilityBefore": "Az esemény előtt",
       "visibilityDuring": "Az esemény alatt",
       "visibilityAfter": "Az esemény után",
+      "visibilityHelp": "A kezdés előtt az esemény nyilvános oldala csak az „Az esemény előtt” jelölésű anyagokat mutatja. Az „A teremben és az esemény után” jelölésű anyagok az esemény alatt a teremben, majd a lezárult esemény oldalán jelennek meg.",
       "typeLabel": "Típus",
       "fileUploaded": "Fájl feltöltve",
       "typeFile": "Fájl",

@@ -489,7 +489,8 @@
       "tooLong": "Vprašanje ne sme presegati 500 znakov",
       "rateLimit": "Počakajte, preden pošljete novo vprašanje",
       "busy": "Iz vašega omrežja trenutno prihaja veliko vprašanj: poskusite znova čez nekaj sekund",
-      "generic": "Napaka pri pošiljanju vprašanja"
+      "generic": "Napaka pri pošiljanju vprašanja",
+      "upvoteFailed": "Vaš glas ni bil zabeležen: poskusite znova čez nekaj sekund."
     },
     "ctaTitle": "Postavite prvo vprašanje",
     "ctaBody": "Drugi udeleženci bodo lahko glasovali za vaše vprašanje. Moderatorji ga bodo videli in lahko nanj odgovorijo ustno ali pisno.",
@@ -733,7 +734,7 @@
         "materialUrl": "Datoteka ali povezava",
         "visibilityLabel": "Vidnost",
         "visibility": {
-          "ALWAYS": "Vedno",
+          "ALWAYS": "V sobi in po dogodku",
           "BEFORE": "Pred dogodkom",
           "DURING": "Med dogodkom",
           "AFTER": "Po dogodku"
@@ -1793,7 +1794,7 @@
       "selectFile": "Izberi datoteko",
       "fileTitle": "Naslov",
       "visibility": "Vidnost",
-      "visibilityAlways": "Vedno vidno",
+      "visibilityAlways": "V sobi in po dogodku",
       "visibilityBefore": "Samo pred dogodkom",
       "visibilityDuring": "Samo med dogodkom",
       "visibilityAfter": "Samo po dogodku",
@@ -1814,10 +1815,11 @@
       "titleLabel": "Naslov",
       "descriptionLabel": "Opis (neobvezno)",
       "visibilityLabel": "Vidnost",
-      "visibilityAlways": "Vedno",
+      "visibilityAlways": "V sobi in po dogodku",
       "visibilityBefore": "Pred dogodkom",
       "visibilityDuring": "Med dogodkom",
       "visibilityAfter": "Po dogodku",
+      "visibilityHelp": "Pred začetkom javna stran dogodka prikazuje samo gradiva z oznako »Pred dogodkom«. Gradiva z oznako »V sobi in po dogodku« so vidna v sobi med dogodkom in na strani zaključenega dogodka.",
       "typeLabel": "Tip",
       "fileUploaded": "Naložena datoteka",
       "typeFile": "Datoteka",

@@ -489,7 +489,8 @@
       "tooLong": "Ní féidir leis an gceist 500 carachtar a shárú",
       "rateLimit": "Fan sula seolann sibh ceist eile, le bhur dtoil",
       "busy": "Tá go leor ceisteanna ag teacht ó bhur líonra faoi láthair: bainigí triail eile as i gceann cúpla soicind",
-      "generic": "Earráid agus an cheist á seoladh"
+      "generic": "Earráid agus an cheist á seoladh",
+      "upvoteFailed": "Níor taifeadadh an vóta: bainigí triail eile as i gceann cúpla soicind."
     },
     "ctaTitle": "Cuir an chéad cheist",
     "ctaBody": "Beidh rannpháirtithe eile in ann do cheist a vótáil. Feicfidh na modhnóirí í agus is féidir leo freagra a thabhairt ó bhéal nó i scríbhinn.",
@@ -733,7 +734,7 @@
         "materialUrl": "Comhad nó nasc",
         "visibilityLabel": "Infheictheacht",
         "visibility": {
-          "ALWAYS": "I gcónaí",
+          "ALWAYS": "Sa seomra agus tar éis an imeachta",
           "BEFORE": "Roimh an imeacht",
           "DURING": "Le linn an imeachta",
           "AFTER": "Tar éis an imeachta"
@@ -1793,7 +1794,7 @@
       "selectFile": "Roghnaigh comhad",
       "fileTitle": "Teideal",
       "visibility": "Infheictheacht",
-      "visibilityAlways": "Infheicthe i gcónaí",
+      "visibilityAlways": "Sa seomra agus tar éis an imeachta",
       "visibilityBefore": "Roimh an imeacht amháin",
       "visibilityDuring": "Le linn an imeachta amháin",
       "visibilityAfter": "Tar éis an imeachta amháin",
@@ -1814,10 +1815,11 @@
       "titleLabel": "Teideal",
       "descriptionLabel": "Cur síos (roghnach)",
       "visibilityLabel": "Infheictheacht",
-      "visibilityAlways": "I gcónaí",
+      "visibilityAlways": "Sa seomra agus tar éis an imeachta",
       "visibilityBefore": "Roimh an imeacht",
       "visibilityDuring": "Le linn an imeachta",
       "visibilityAfter": "Tar éis an imeachta",
+      "visibilityHelp": "Roimh an tús, ní thaispeánann leathanach poiblí an imeachta ach na hábhair atá marcáilte “Roimh an imeacht”. Taispeántar na hábhair atá marcáilte “Sa seomra agus tar éis an imeachta” sa seomra le linn an imeachta agus ar leathanach an imeachta atá críochnaithe.",
       "typeLabel": "Cineál",
       "fileUploaded": "Comhad uaslódáilte",
       "typeFile": "Comhad",

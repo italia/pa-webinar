@@ -489,7 +489,8 @@
       "tooLong": "Pitanje ne može premašiti 500 znakova",
       "rateLimit": "Pričekajte prije slanja novog pitanja",
       "busy": "Iz vaše mreže trenutačno stiže mnogo pitanja: pokušajte ponovno za nekoliko sekundi",
-      "generic": "Pogreška pri slanju pitanja"
+      "generic": "Pogreška pri slanju pitanja",
+      "upvoteFailed": "Vaš glas nije zabilježen: pokušajte ponovno za nekoliko sekundi."
     },
     "ctaTitle": "Postavite prvo pitanje",
     "ctaBody": "Drugi sudionici moći će glasati za vaše pitanje. Moderatori će ga vidjeti i moći odgovoriti glasom ili pisanim putem.",
@@ -733,7 +734,7 @@
         "materialUrl": "Datoteka ili poveznica",
         "visibilityLabel": "Vidljivost",
         "visibility": {
-          "ALWAYS": "Uvijek",
+          "ALWAYS": "U sobi i nakon događaja",
           "BEFORE": "Prije događaja",
           "DURING": "Tijekom događaja",
           "AFTER": "Nakon događaja"
@@ -1793,7 +1794,7 @@
       "selectFile": "Odaberi datoteku",
       "fileTitle": "Naslov",
       "visibility": "Vidljivost",
-      "visibilityAlways": "Uvijek vidljivo",
+      "visibilityAlways": "U sobi i nakon događaja",
       "visibilityBefore": "Samo prije događaja",
       "visibilityDuring": "Samo tijekom događaja",
       "visibilityAfter": "Samo nakon događaja",
@@ -1814,10 +1815,11 @@
       "titleLabel": "Naslov",
       "descriptionLabel": "Opis (neobavezno)",
       "visibilityLabel": "Vidljivost",
-      "visibilityAlways": "Uvijek",
+      "visibilityAlways": "U sobi i nakon događaja",
       "visibilityBefore": "Prije događaja",
       "visibilityDuring": "Tijekom događaja",
       "visibilityAfter": "Nakon događaja",
+      "visibilityHelp": "Prije početka javna stranica događaja prikazuje samo materijale označene s „Prije događaja”. Materijali označeni s „U sobi i nakon događaja” prikazuju se u sobi tijekom događaja i na stranici završenog događaja.",
       "typeLabel": "Vrsta",
       "fileUploaded": "Datoteka učitana",
       "typeFile": "Datoteka",

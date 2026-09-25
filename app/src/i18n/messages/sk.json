@@ -489,7 +489,8 @@
       "tooLong": "Otázka nesmie presiahnuť 500 znakov",
       "rateLimit": "Počkajte prosím, kým odošlete ďalšiu otázku",
       "busy": "Z vašej siete práve prichádza veľa otázok: skúste to prosím znova o niekoľko sekúnd",
-      "generic": "Chyba pri odosielaní otázky"
+      "generic": "Chyba pri odosielaní otázky",
+      "upvoteFailed": "Váš hlas nebol zaznamenaný: skúste to prosím znova o niekoľko sekúnd."
     },
     "ctaTitle": "Položte prvú otázku",
     "ctaBody": "Ostatní účastníci môžu hlasovať za vašu otázku. Moderátori ju uvidia a môžu odpovedať hlasom alebo písomne.",
@@ -733,7 +734,7 @@
         "materialUrl": "Súbor alebo odkaz",
         "visibilityLabel": "Viditeľnosť",
         "visibility": {
-          "ALWAYS": "Vždy",
+          "ALWAYS": "V miestnosti a po podujatí",
           "BEFORE": "Pred podujatím",
           "DURING": "Počas podujatia",
           "AFTER": "Po podujatí"
@@ -1793,7 +1794,7 @@
       "selectFile": "Vybrať súbor",
       "fileTitle": "Názov",
       "visibility": "Viditeľnosť",
-      "visibilityAlways": "Vždy viditeľné",
+      "visibilityAlways": "V miestnosti a po podujatí",
       "visibilityBefore": "Iba pred udalosťou",
       "visibilityDuring": "Iba počas udalosti",
       "visibilityAfter": "Iba po udalosti",
@@ -1814,10 +1815,11 @@
       "titleLabel": "Názov",
       "descriptionLabel": "Popis (voliteľný)",
       "visibilityLabel": "Viditeľnosť",
-      "visibilityAlways": "Vždy",
+      "visibilityAlways": "V miestnosti a po podujatí",
       "visibilityBefore": "Pred podujatím",
       "visibilityDuring": "Počas podujatia",
       "visibilityAfter": "Po podujatí",
+      "visibilityHelp": "Pred začiatkom verejná stránka podujatia zobrazuje iba materiály s voľbou „Pred podujatím“. Materiály s voľbou „V miestnosti a po podujatí“ sa zobrazujú v miestnosti počas podujatia a na stránke ukončeného podujatia.",
       "typeLabel": "Typ",
       "fileUploaded": "Súbor nahraný",
       "typeFile": "Súbor",
