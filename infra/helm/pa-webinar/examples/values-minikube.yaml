@@ -1,0 +1,165 @@
+# ============================================================================
+# Valutazione su minikube — si sovrappone al profilo semplice
+# ============================================================================
+#
+# Percorso consigliato: `scripts/minikube-up.sh`, che avvia il profilo
+# minikube, genera i segreti, scrive i valori che dipendono dalla macchina e
+# installa il chart con questo file. A mano, l'ordine dei file di valori è:
+#
+#   helm upgrade --install pa-webinar ./infra/helm/pa-webinar \
+#     --kube-context pa-webinar -n pa-webinar --create-namespace \
+#     -f infra/helm/pa-webinar/examples/values-simple.yaml \
+#     -f infra/helm/pa-webinar/examples/values-minikube.yaml \
+#     -f <indirizzi.yaml> -f <segreti.yaml>
+#
+# <indirizzi.yaml> porta i nomi nip.io sull'IP del nodo (`minikube -p
+# pa-webinar ip`), che cambia da una macchina all'altra:
+#
+#   app:
+#     env:
+#       NEXT_PUBLIC_APP_URL: https://app.<node-ip>.nip.io
+#       NEXT_PUBLIC_JITSI_DOMAIN: jitsi.<node-ip>.nip.io
+#   ingress:
+#     hosts:
+#       - host: app.<node-ip>.nip.io
+#         paths: [{ path: /, pathType: Prefix }]
+#   jitsi-meet:
+#     publicURL: https://jitsi.<node-ip>.nip.io
+#     web:
+#       ingress:
+#         hosts:
+#           - host: jitsi.<node-ip>.nip.io
+#             paths: ["/"]
+#
+# <segreti.yaml>, tenuto fuori dal repository: i segreti elencati in testa a
+# values-simple.yaml e le due password XMPP interne, generati una volta e
+# ripassati identici a ogni aggiornamento (qui sotto la resa si ferma se
+# mancano le password).
+#
+# Immagini: quelle pubblicate dal ramo di sviluppo (`:dev`, `:dev-migrate`).
+# Se il registro chiede credenziali anche in lettura e non ce ne sono, lo
+# script costruisce le immagini dai sorgenti e le carica nel nodo; con le
+# credenziali crea un Secret di prelievo, o preleva con il docker della
+# macchina (vedi `scripts/minikube-up.sh --help`). A mano, senza credenziali:
+# docs/INFRASTRUCTURE.md, "Install by hand".
+#
+# Dimensioni provate: vedi docs/INFRASTRUCTURE.md, "Evaluation: minikube".
+# Le richieste qui sotto stanno in un nodo da 2 CPU e 3 GB, e il bridge ha la
+# memoria limitata perché su un nodo da 4 GB il valore predefinito
+# dell'immagine (heap fino a 3 GB) ha portato tutto il nodo allo stallo con 20
+# partecipanti in video.
+# ============================================================================
+
+app:
+  image:
+    repository: ghcr.io/italia/pa-webinar
+    tag: dev
+    # `:dev` è un tag mobile: con `Always` ogni riavvio del pod prende
+    # l'ultima immagine pubblicata. Lo script lo porta a `IfNotPresent` o
+    # `Never` quando carica le immagini nel nodo da sé.
+    pullPolicy: Always
+  migration:
+    image:
+      repository: ghcr.io/italia/pa-webinar
+      tag: dev-migrate
+      pullPolicy: Always
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: "1"
+      memory: 512Mi
+  # Il tetto di un bridge (app.env.JVB_MAX_REPLICAS) viene dal profilo
+  # semplice: il bridge è uno solo e non si scala.
+
+postgresql:
+  primary:
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: "1"
+        memory: 512Mi
+
+jitsi:
+  # Lo script genera e conserva le password XMPP interne: senza, ogni `helm
+  # upgrade` riavvierebbe la conferenza. Chi installa a mano deve passarle.
+  requirePinnedCredentials: true
+
+jitsi-meet:
+  # Immagine web standard (vedi sotto): nessun registro privato da cui
+  # prelevare. Con credenziali per il registro lo script rimette l'immagine
+  # patchata del chart e il Secret per prelevarla.
+  imagePullSecrets: []
+
+  jicofo:
+    # Solo richieste: senza, Jicofo e Prosody sono i primi a essere uccisi
+    # quando il nodo resta senza memoria, e lo scheduler non li vede.
+    resources:
+      requests:
+        cpu: 50m
+        memory: 320Mi
+
+  prosody:
+    resources:
+      requests:
+        cpu: 50m
+        memory: 128Mi
+
+  jvb:
+    # Heap del bridge limitato a 1 GB: l'immagine lo lascia crescere fino a
+    # 3 GB e non lo restituisce, più di quanto un nodo di valutazione possa
+    # dare. Con 20 partecipanti tutti in video, su un nodo da 2 CPU e 3 GB, il
+    # processo intero (heap più memoria fuori heap) è arrivato a 1464 MiB e lì
+    # è rimasto: il 95% del limite di 1536 MiB usato allora. Il limite di
+    # 2 GiB lascia margine; un limite non riserva niente sul nodo, la
+    # richiesta resta 1 GiB.
+    extraEnvs:
+      VIDEOBRIDGE_MAX_MEMORY: "1024m"
+    resources:
+      requests:
+        cpu: 250m
+        memory: 1Gi
+      limits:
+        cpu: "2"
+        memory: 2Gi
+    # Sonda più tollerante di quella del sottochart (1 s, tre tentativi): su
+    # una macchina di lavoro carica il bridge a riposo veniva riavviato, e il
+    # riavvio fa cadere ogni conferenza.
+    livenessProbe:
+      httpGet:
+        path: /about/health
+        port: 8080
+      periodSeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 6
+    # Il bridge annuncia l'IP del nodo (`useNodeIP`, predefinito del chart in
+    # values.yaml), che il browser sulla stessa macchina raggiunge
+    # direttamente: nessun server STUN di terzi da interrogare.
+    stunServers: ""
+
+  web:
+    # Immagine standard, alla versione di Jitsi del sottochart. La
+    # soppressione rumore avanzata resta spenta, come già è per impostazione
+    # predefinita dell'applicazione (vedi `jitsi-meet.web.image` in values.yaml).
+    image:
+      repository: jitsi/web
+      tag: null
+      pullPolicy: IfNotPresent
+    resources:
+      requests:
+        cpu: 10m
+        memory: 64Mi
+    ingress:
+      ingressClassName: nginx
+      # Certificato autofirmato del controller: nessun cert-manager nel nodo.
+      # La pagina di stato del portale controlla la conferenza verificando il
+      # certificato, e qui segna Jitsi, Prosody e Jicofo come non raggiungibili
+      # anche quando la sala funziona.
+      tls: []
+
+ingress:
+  className: nginx
+  tls: []

@@ -69,7 +69,8 @@ segreto_jwt="$(openssl rand -hex 32)"
 
 # nome:file di valori. I profili con un suffisso aggiungono gli argomenti di
 # `argomenti_profilo`: la NetworkPolicy accesa, un controller diverso da
-# ingress-nginx, Jitsi esterno, i segreti da External Secrets.
+# ingress-nginx, Jitsi esterno, i segreti da External Secrets, k3s in sede,
+# minikube per la valutazione.
 profili=(
   "predefinito:"
   "semplice:$CHART/examples/values-simple.yaml"
@@ -80,6 +81,8 @@ profili=(
   "sviluppo:$CHART/values-dev.yaml"
   "semplice-rete:$CHART/examples/values-simple.yaml"
   "semplice-traefik:$CHART/examples/values-simple.yaml"
+  "k3s:$CHART/examples/values-simple.yaml"
+  "semplice-minikube:$CHART/examples/values-simple.yaml"
   "produzione-rete:$CHART/values-production.yaml"
   "completo-segreti-esterni:$CHART/examples/values-full.yaml"
   "jitsi-esterno:"
@@ -108,6 +111,16 @@ argomenti_profilo() {
         --set secrets.jitsiJwtSecretName=videocall-jitsi-jwt ;;
     jitsi-esterno)
       printf '%s\n' --set jitsi.enabled=false ;;
+    # Il profilo per k3s in sede (infra/onprem/k3s) sopra al semplice: si
+    # regge su un'annotazione annullata, sul filtro delle annotazioni per le
+    # classi diverse da nginx e sull'immagine web del sottochart.
+    k3s)
+      printf '%s\n' -f "$CHART/examples/values-k3s.yaml" ;;
+    # Il profilo di scripts/minikube-up.sh sopra al semplice: immagine web del
+    # sottochart con un tag nullo, sonda del bridge, credenziali XMPP
+    # pretese (qui arrivano da `comuni`, come dal file dei segreti).
+    semplice-minikube)
+      printf '%s\n' -f "$CHART/examples/values-minikube.yaml" ;;
   esac
 }
 
