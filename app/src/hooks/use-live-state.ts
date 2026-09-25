@@ -48,7 +48,17 @@ function prefissoChiave(slug: string, panel: PokeablePanel): string {
       return `${base}/agenda`;
     case 'wordcloud':
       return `${base}/wordcloud`;
+    case 'materials':
+      return `${base}/materials`;
   }
+}
+
+/** L'URL di una chiave SWR: la chiave stessa, o il primo elemento quando è una
+ *  tupla `[url, token]` (i materiali tengono il token fuori dall'URL). */
+function urlDellaChiave(chiave: unknown): string | null {
+  if (typeof chiave === 'string') return chiave;
+  if (Array.isArray(chiave) && typeof chiave[0] === 'string') return chiave[0];
+  return null;
 }
 
 /**
@@ -83,6 +93,8 @@ export function useLiveState(eventSlug: string, attivo = true): LiveStateHook {
   const pushDisponibileRef = useRef(false);
 
   const ultimoMessaggioRef = useRef<number>(0);
+  /** L'ultimo stato dell'evento arrivato dal canale, per accorgersi del cambio. */
+  const ultimoStatoRef = useRef<string | null>(null);
   const ultimoRinfrescoRef = useRef<Record<string, number>>({});
   const codaRef = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
 
@@ -92,9 +104,7 @@ export function useLiveState(eventSlug: string, attivo = true): LiveStateHook {
       const esegui = () => {
         ultimoRinfrescoRef.current[panel] = Date.now();
         delete codaRef.current[panel];
-        void globalMutate(
-          (chiave) => typeof chiave === 'string' && chiave.startsWith(prefisso)
-        );
+        void globalMutate((chiave) => urlDellaChiave(chiave)?.startsWith(prefisso) === true);
       };
 
       // Già in coda: l'avviso appena arrivato è coperto da quella rilettura.
@@ -120,6 +130,7 @@ export function useLiveState(eventSlug: string, attivo = true): LiveStateHook {
 
     const sorgente = new EventSource(`/api/events/${eventSlug}/live/stream`);
     let vivo = true;
+    ultimoStatoRef.current = null;
 
     sorgente.onmessage = (evento: MessageEvent<string>) => {
       ultimoMessaggioRef.current = Date.now();
@@ -155,9 +166,19 @@ export function useLiveState(eventSlug: string, attivo = true): LiveStateHook {
             revalidate: false,
           });
           break;
-        case 'eventStatus':
+        case 'eventStatus': {
           if (vivo) setEventStatus(busta.status);
+          // I materiali che il pubblico vede dipendono dalla fase dell'evento
+          // (lib/events/material-visibility): al passaggio in diretta o alla
+          // chiusura l'elenco cambia senza che nessuno tocchi un materiale, e
+          // nessun avviso `poke` lo annuncia. Il primo stato arriva a ogni
+          // apertura dello stream ed è quello già letto dal pannello: si
+          // rilegge solo quando cambia, anche fra una riconnessione e l'altra.
+          const prima = ultimoStatoRef.current;
+          ultimoStatoRef.current = busta.status;
+          if (prima !== null && prima !== busta.status) rinfresca('materials');
           break;
+        }
         case 'poke':
           rinfresca(busta.panel);
           break;

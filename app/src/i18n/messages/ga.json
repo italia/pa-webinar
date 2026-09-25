@@ -139,7 +139,9 @@
     "status": {
       "DRAFT": "Dréacht",
       "PUBLISHED": "Foilsithe",
+      "PROVISIONING": "Á ullmhú",
       "LIVE": "Beo",
+      "IDLE": "Ar sos",
       "ENDED": "Críochnaithe",
       "ARCHIVED": "Cartlannaithe"
     },
@@ -288,6 +290,9 @@
     "jibriNotConfigured": "Taifeadadh gan chumrú sa bhonneagar",
     "jibriScaling": "Taifeadadh á thosú…",
     "jibriScalingTooltip": "Tá comhpháirt an taifeadta á tosú. Beidh sí ar fáil go gairid.",
+    "recorderNotStarted": "Níl an taifeadadh ar fáil",
+    "recorderNotStartedDetail": "Níor thosaigh an tseirbhís taifeadta fós: go fóill leanann an t-imeacht ar aghaidh gan taifeadadh. Cuir riarthóirí an ardáin ar an eolas.",
+    "recorderStartFailed": "Níor thosaigh an taifeadadh. Bain triail eile as i gceann cúpla nóiméad; má leanann an fhadhb, cuir riarthóirí an ardáin ar an eolas.",
     "roomPreparing": "Seomra á ullmhú…",
     "roomPreparingDetail": "Tá na freastalaithe físe á dtosú. Tógann sé seo timpeall 2 nóiméad. Gníomhófar an seomra go huathoibríoch.",
     "recordingPromptTitle": "An taifeadadh a thosú?",
@@ -483,6 +488,7 @@
       "textRequired": "Scríobh bhur gceist, le bhur dtoil",
       "tooLong": "Ní féidir leis an gceist 500 carachtar a shárú",
       "rateLimit": "Fan sula seolann sibh ceist eile, le bhur dtoil",
+      "busy": "Tá go leor ceisteanna ag teacht ó bhur líonra faoi láthair: bainigí triail eile as i gceann cúpla soicind",
       "generic": "Earráid agus an cheist á seoladh"
     },
     "ctaTitle": "Cuir an chéad cheist",
@@ -703,7 +709,7 @@
         "speakerEmail": "Ríomhphost",
         "speakerRequired": "Tá ainm agus ríomhphost riachtanach.",
         "invitationsHeading": "Cuirí",
-        "invitationsHelp": "Daoine réamhchláraithe — gheobhaidh gach duine nasc rannpháirtíochta pearsanta.",
+        "invitationsHelp": "Liosta na ndaoine a bhfuil cuireadh acu. Ní sheolann an t-ardán cuirí: roinn féin nasc an imeachta leo. Nuair atá an clárú poiblí múchta, ní féidir ach leis na seoltaí seo clárú, agus seoltar an nasc pearsanta chun dul isteach trí ríomhphost tar éis an chlárúcháin.",
         "invitationName": "Ainm (roghnach)",
         "invitationEmail": "Ríomhphost",
         "invitationRole": "Ról",
@@ -1317,6 +1323,8 @@
       "publicPageHint": "An leathanach le comhroinnt chun cláruithe nua a bhailiú.",
       "guestJoin": "Cuireadh díreach (gan clárú)",
       "guestJoinHint": "Nasc tapa chun rannpháirtí ar an nóiméad deireanach a thabhairt isteach: téann sé isteach mar aoi nuair a bhíonn an t-imeacht beo, gan an fhoirm chláraithe a líonadh.",
+      "callInvite": "Nasc do rannpháirtithe",
+      "callInviteHint": "An té a fhaigheann é, glacann sé páirt sa ghlao mar aoi, gan clárú. Níl leathanach poiblí ag glao tapa: is é seo an nasc le comhroinnt.",
       "moderatorLink": "Nasc modhnóra",
       "moderatorLinkHint": "Roinnigh an nasc seo le modhnóirí amháin. Is féidir le duine ar bith a bhfuil an nasc seo aige an t-imeacht a bhainistiú.",
       "liveRoomHint": "Nasc chun dul isteach díreach sa seomra mar mhodhnóir.",
@@ -1443,7 +1451,7 @@
         "jobMaxAttempts": "Iarrachtaí roimh theip",
         "jobMaxAttemptsHelp": "Cé mhéad uair a bhaineann an phíblíne triail eile as jab sula marcálann sí mar theipthe é. Fásann an cúlú idir iarrachtaí go heispéantúil (ó 30 soicind suas go 2 uair an chloig). Is é 5 an gnáthluach.",
         "artifactRetentionDays": "Coinneáil na ndéantán (laethanta)",
-        "artifactRetentionDaysHelp": "Ag 0, leanann na déantáin AI sceideal coinneála an imeachta féin. Coinníonn luach dearfach iad ar feadh an líon laethanta a shonraítear, fiú tar éis an t-imeacht a dhúnadh, go dtí go scriosann cron laethúil iad. Cuimsíonn an scriosadh ainmneacha na gcainteoirí agus pálasta na jabanna, i gcomhréir le docs/GDPR.md.",
+        "artifactRetentionDaysHelp": "Ag 0 níl aon teorainn don suíomh ar fad: leanann na déantáin AI tréimhse choinneála a dtaifeadta nó an imeachta. Le luach níos mó ná nialas, scriosann jab laethúil gach déantán a cruthaíodh níos mó ná an líon sin laethanta ó shin, foilsithe nó nach ea: is féidir leis an gcoinneáil a ghiorrú, ach ní a fhadú choíche. Níl ainmneacha na gcainteoirí ná pálasta na jabanna san áireamh: leanann siad tréimhse choinneála an taifeadta nó an imeachta. Sonraí in docs/privacy/recordings-and-ai.md.",
         "consentDisclosureSection": "Fógra AI sa seomra feithimh",
         "consentDisclosureHelp": "Téacs a thaispeántar do rannpháirtithe sa seomra feithimh nuair a bhaineann an t-imeacht úsáid as iarléiriú AI (tras-scríobh, achoimre, aistriúchán, dubáil). Inoiriúnaithe de réir teanga. Fág folamh chun an téacs réamhshocraithe a úsáid.",
         "consentDisclosurePlaceholder": "M.sh. Déanfar an t-imeacht seo a thras-scríobh agus a achoimriú go huathoibríoch le huirlisí AI tar éis an tarchuir bheo…"
@@ -1642,7 +1650,7 @@
         "jvbStressCriticalPercent": "Tairseach struis chriticiúil (%)",
         "jvbStressCriticalPercentHelp": "Os cionn na tairsí seo cuireann an scálálaí 2 mhacasamhail JVB sa bhreis. Réamhshocrú 70. Ní mór dó a bheith níos airde ná an rabhadh.",
         "jvbProvisioningTimeoutMinutes": "Teorainn ama soláthair (nóiméid)",
-        "jvbProvisioningTimeoutMinutesHelp": "Tar éis cé mhéad nóiméad ó startsAt go marcáiltear imeacht le JVB nár ullmhaíodh fós mar 'meathlaithe' ar an leathanach stádais. Réamhshocrú 15. Clúdaíonn sé tús fuar an nóid (~3-5 nóim) móide corrlach sábháilteachta.",
+        "jvbProvisioningTimeoutMinutesHelp": "Tar éis cé mhéad nóiméad ó startsAt go marcáiltear imeacht le JVB nár ullmhaíodh fós mar 'meathlaithe' ar an leathanach stádais. Réamhshocrú 15. Clúdaíonn sé tús fuar an nóid (~3-5 nóim) móide corrlach sábháilteachta. Baineann sé leis an tseirbhís taifeadta freisin, á chomhaireamh ón uair a iarrann imeacht le taifeadadh í: tar éis an ama seo gan freagra, stopann an seomra beo á taispeáint mar 'ag tosú' agus tuairiscíonn sé nár thosaigh sí.",
         "statusPollIntervalSeconds": "Eatramh vótála leathanach stádais (soicindí)",
         "statusPollIntervalSecondsHelp": "Cé chomh minic a athnuann an leathanach /status na sonraí ar thaobh an bhrabhsálaí. Réamhshocrú 30. Luachanna níos ísle = sonraí níos úire ach níos mó luchta ar an aip.",
         "emailSenderTitle": "Seoltóir na ríomhphost",
@@ -2187,7 +2195,12 @@
     },
     "eventDetail": {
       "copyPublicUrl": "Cóipeáil nasc poiblí",
-      "enterAsModerator": "Téigh isteach beo",
+      "copyInviteUrl": "Cóipeáil nasc an chuiridh",
+      "enterAsParticipant": "Téigh isteach mar rannpháirtí",
+      "openAsParticipant": "Oscail mar rannpháirtí",
+      "participantHintRoom": "Osclaítear i gcluaisín nua é: an seomra mar a fheiceann aoi é, gan cumhachtaí modhnóra.",
+      "participantHintPassword": "Osclaítear i gcluaisín nua é: an seomra mar a fheiceann aoi é, tar éis phasfhocal an imeachta.",
+      "participantHintPage": "Osclaítear i gcluaisín nua é: an leathanach poiblí mar a fheiceann na rannpháirtithe é.",
       "editEvent": "Cuir imeacht in eagar",
       "editSettings": "Cuir socruithe in eagar",
       "featureSummary": "Gnéithe gníomhacha",
@@ -2788,9 +2801,27 @@
     "add": "Cuir leis",
     "adding": "Ag cur leis...",
     "cancel": "Cealaigh",
+    "modeLabel": "Cineál ábhair",
+    "modeLink": "Nasc",
+    "modeFile": "Comhad",
+    "titleOptional": "Teideal (roghnach; murach sin, ainm an chomhaid)",
+    "fileLabel": "Comhad le huaslódáil",
+    "fileHelp": "Formáidí tacaithe: PDF, DOCX, PPTX, XLSX, TXT — uasmhéid {maxMb} MB",
+    "upload": "Uaslódáil",
+    "uploading": "Á uaslódáil…",
     "errors": {
       "urlInvalid": "Cuir isteach URL bailí, le bhur dtoil",
-      "generic": "Earráid agus an t-ábhar á chur leis"
+      "generic": "Earráid agus an t-ábhar á chur leis",
+      "fileMissing": "Roghnaigh comhad le huaslódáil",
+      "titleMissing": "Cuir isteach teideal don nasc",
+      "fileTooLarge": "Tá an comhad níos mó ná an teorainn {maxMb} MB",
+      "fileTooLargeForServer": "Ní ghlacann an freastalaí le comhad chomh mór sin: bain triail as comhad níos lú",
+      "fileType": "Cineál comhaid nach dtacaítear leis (PDF, DOCX, PPTX, XLSX, TXT)",
+      "uploadUnavailable": "Níl uaslódáil comhad ar fáil ar an suiteáil seo",
+      "uploadFailed": "Earráid agus an comhad á uaslódáil",
+      "quotaExceeded": "Tá teorainn na gcomhad uaslódáilte bainte amach ag an imeacht seo ({maxFiles} comhad, {maxMb} MB san iomlán): bain cuid acu chun tuilleadh a uaslódáil",
+      "uploadBusy": "An iomarca uaslódálacha faoi láthair: bain triail eile as i gceann cúpla soicind",
+      "deleteFailed": "Níorbh fhéidir an t-ábhar a scriosadh"
     }
   },
   "reminders": {
@@ -3343,7 +3374,13 @@
     "noActiveRound": "Gan word cloud gníomhach faoi láthair.",
     "noWords": "Ag fanacht leis na chéad fhocail...",
     "wordsSubmitted": "{count} focal seolta",
-    "timeRemaining": "Am fágtha"
+    "timeRemaining": "Am fágtha",
+    "errors": {
+      "send": "Níor seoladh an focal. Bain triail eile as.",
+      "closed": "Tá an babhta seo dúnta: ní ghlactar le tuilleadh focal.",
+      "limit": "Tá an líon uasta focal seolta agaibh cheana don bhabhta seo.",
+      "rateLimited": "An iomarca seoltaí faoi láthair: fan cúpla soicind sula mbainfidh tú triail eile as."
+    }
   },
   "timer": {
     "title": "Amadóir",
@@ -3642,6 +3679,8 @@
     "warmingUpButton": "Seomra á ullmhú...",
     "nameLabel": "D'ainm",
     "nameHelp": "Feicfidh rannpháirtithe eile é seo",
+    "nameRequiredToEnter": "Iontráil d'ainm chun dul isteach (2 charachtar ar a laghad).",
+    "roomOpenNameMissing": "Tá an seomra oscailte: iontráil d'ainm chun dul isteach.",
     "joinNowBtn": "Téigh isteach anois",
     "roomOpen": "Tá an seomra oscailte",
     "whileYouWait": "Fad atá sibh ag fanacht",

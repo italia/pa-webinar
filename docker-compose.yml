@@ -105,9 +105,9 @@ services:
       retries: 5
 
   # ── Jitsi Meet Stack ─────────────────────────────────────
-  # NOTE: In production, Jitsi Web should NOT be directly accessible.
-  # Use Kubernetes Ingress rules to restrict access to IFrame API paths only.
-  # See docs/ARCHITECTURE.md for the recommended Ingress configuration.
+  # NOTE: local stack only. In Kubernetes the conference is served by the
+  # jitsi-meet subchart's own Ingress; what must stay reachable on the
+  # conference host is in docs/DEPLOYMENT.md, "The conference Ingress".
 
   jitsi-web:
     image: jitsi/web:stable

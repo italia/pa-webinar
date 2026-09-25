@@ -9,6 +9,7 @@ import { prisma } from '@/lib/db';
 import { pokeLivePanel } from '@/lib/live-state/publish';
 import { createWordCloudRoundSchema } from '@/lib/validation/schemas';
 import { isEventModerator, extractModeratorToken } from '@/lib/auth/moderator';
+import { authorizePanelRead } from '@/lib/events/panel-read-access';
 
 export const dynamic = 'force-dynamic';
 
@@ -73,11 +74,17 @@ export const POST = withErrorHandling(async (request, context) => {
 });
 
 // GET /api/events/[slug]/wordcloud — get active round with aggregated words
-export const GET = withErrorHandling(async (_request, context) => {
+export const GET = withErrorHandling(async (request, context) => {
   const { param: slug } = await context.params;
 
   const event = await prisma.event.findUnique({ where: { slug } });
   if (!event) throw new NotFoundError('Event');
+
+  // Stessa regola di lettura di domande e sondaggi: la nuvola è fatta delle
+  // parole di chi sta in sala, e chi non può entrare — fuori dalla finestra
+  // degli ospiti, o senza la password di un evento protetto — non la legge.
+  // Il `Bearer ` vuoto che manda l'ospite è l'assenza di token.
+  await authorizePanelRead(event, extractModeratorToken(request) || null);
 
   const round = await prisma.wordCloudRound.findFirst({
     where: { eventId: event.id },
@@ -97,11 +104,19 @@ export const GET = withErrorHandling(async (_request, context) => {
   if (round.status === 'OPEN') {
     const elapsedMs = Date.now() - round.createdAt.getTime();
     if (elapsedMs > round.duration * 1000) {
-      await prisma.wordCloudRound.update({
-        where: { id: round.id },
-        data: { status: 'CLOSED', closedAt: new Date() },
+      // Allo scadere del conto alla rovescia la sala intera rilegge nello
+      // stesso secondo: la condizione sullo stato fa scrivere solo la prima.
+      const closedAt = new Date();
+      const chiusi = await prisma.wordCloudRound.updateMany({
+        where: { id: round.id, status: 'OPEN' },
+        data: { status: 'CLOSED', closedAt },
       });
       round.status = 'CLOSED';
+      round.closedAt = closedAt;
+      // Chi l'ha chiuso lo dice alla sala: chi ha l'orologio avanti ha già
+      // riletto trovandolo aperto, e senza avviso lo vedrebbe aperto fino al
+      // prossimo giro periodico, con le parole respinte.
+      if (chiusi.count > 0) pokeLivePanel(event.id, 'wordcloud');
     }
   }
 

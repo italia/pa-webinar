@@ -9,7 +9,7 @@
 
 import { z } from 'zod';
 
-import { withErrorHandling } from '@/lib/api-handler';
+import { parseJsonBody, withErrorHandling } from '@/lib/api-handler';
 import { prisma } from '@/lib/db';
 import { pokeLivePanel } from '@/lib/live-state/publish';
 import { NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
@@ -93,7 +93,7 @@ export const POST = withErrorHandling(async (request, context) => {
   const event = await verifyModeratorToken(slug, token);
   if (!event) throw new ForbiddenError('Moderator access required');
 
-  const { label } = createSchema.parse(await request.json());
+  const { label } = createSchema.parse(await parseJsonBody(request));
 
   const max = await prisma.eventAgendaItem.aggregate({
     where: { eventId: event.id },

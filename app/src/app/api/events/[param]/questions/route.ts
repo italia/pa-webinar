@@ -15,8 +15,6 @@ import { createQuestionSchema } from '@/lib/validation/schemas';
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
 import { authorizePanelRead } from '@/lib/events/panel-read-access';
-import { guestWindowOpen } from '@/lib/events/guest-window';
-import { getSettings } from '@/lib/settings';
 import { getCached, setCache, deleteCacheByPrefix } from '@/lib/cache';
 
 export const dynamic = 'force-dynamic';
@@ -174,6 +172,7 @@ export const POST = withErrorHandling(async (request, context) => {
   if (!event || !event.qaEnabled) throw new NotFoundError('Event');
 
   let registrationId: string | null = null;
+  let grantId: string | null = null;
   let authorName = '';
 
   if (token) {
@@ -191,23 +190,22 @@ export const POST = withErrorHandling(async (request, context) => {
       // Il nome e' quello del grant, cifrato a riposo.
       const grant = await prisma.eventModerator.findUnique({
         where: { token: token as string },
-        select: { eventId: true, revokedAt: true, name: true },
+        select: { id: true, eventId: true, revokedAt: true, name: true },
       });
       if (!grant || grant.eventId !== event.id || grant.revokedAt !== null) {
         throw new ForbiddenError('Invalid access token');
       }
+      grantId = grant.id;
       authorName = (tryDecryptPII(grant.name) ?? grant.name).slice(0, 80);
     }
   } else {
-    // Un ospite chiede solo finché la stanza è aperta a chi arriva senza
-    // token: stessa finestra di chat e sondaggi, che tiene conto anche
-    // dell'accesso ospiti deciso dall'amministrazione. Fuori da lì in sala
-    // non c'è nessun ospite, e la domanda arriverebbe da chi non può entrare.
-    if (!guestWindowOpen(event, (await getSettings()).guestAccessEnabled)) {
-      throw new UnauthorizedError('Token required');
-    }
-    // Guest path: requires a non-empty display name, rate-limited by IP
-    // since there's no stable participant id to key on.
+    // Un ospite chiede solo se può stare nella stanza: stesso cancello della
+    // lettura del pannello (finestra degli ospiti, che tiene conto anche
+    // dell'accesso ospiti deciso dall'amministrazione, e password
+    // d'ingresso). Chi ha solo il link di un evento protetto non legge le
+    // domande, e non deve poterne scrivere.
+    await authorizePanelRead(event, null);
+    // L'ospite firma col nome scelto in sala d'attesa.
     const name = typeof guestName === 'string' ? guestName.trim() : '';
     if (name.length < 2) {
       throw new UnauthorizedError('guestName required for anonymous Q&A');
@@ -223,9 +221,43 @@ export const POST = withErrorHandling(async (request, context) => {
     );
   }
 
+  // Una domanda ogni trenta secondi PER PERSONA. La chiave per indirizzo IP
+  // era condivisa da chiunque stia dietro lo stesso NAT — un ufficio, una
+  // rete di ente — e da relatori e ospiti insieme: in una chiamata rapida,
+  // dove sono tutti ospiti, la prima domanda bloccava quelle dei colleghi per
+  // mezzo minuto, e a loro il pannello diceva di aspettare prima di inviarne
+  // "un'altra". Il relatore ha il proprio grant; l'ospite l'identificativo
+  // del browser, scelto dal client: per questo sull'IP resta un tetto per
+  // evento che ferma chi cambia identificativo a ogni domanda. Sessanta al
+  // minuto: una sala di sessanta persone dietro un solo NAT che chiedono
+  // tutte nello stesso minuto, la stessa capienza del tetto dei sondaggi.
+  // Ha un codice suo, perché il pannello non dica a chi non ha ancora chiesto
+  // nulla di aspettare prima di un'«altra» domanda. Senza identificativo
+  // (client vecchio, chiamata diretta) vale la chiave per IP di prima.
+  const guestId = parsed.data.guestId;
+  const ip = getClientIp(request);
+  // Il tetto viene PRIMA del limite personale, come per sondaggi, agenda e
+  // nuvola: la chiave personale dell'ospite la sceglie il client, e se la si
+  // registrasse prima ogni identificativo inventato aggiungerebbe una voce
+  // alla memoria del limitatore anche quando il tetto poi respinge la
+  // domanda. Così un ospite fermato dal tetto non si trova anche il proprio
+  // mezzo minuto consumato.
+  if (!registrationId && !grantId && guestId) {
+    const ipRl = rateLimit(`qa-guest-ip:${event.id}:${ip}`, {
+      limit: 60,
+      windowMs: 60_000,
+    });
+    if (!ipRl.allowed) {
+      throw new RateLimitError((ipRl.resetAt - Date.now()) / 1000, 'NETWORK_RATE_LIMIT');
+    }
+  }
   const rlKey = registrationId
     ? `qa:${registrationId}`
-    : `qa-guest:${getClientIp(request)}`;
+    : grantId
+      ? `qa-grant:${grantId}`
+      : guestId
+        ? `qa-guest:${event.id}:${guestId}`
+        : `qa-guest:${ip}`;
   const rl = rateLimit(rlKey, { limit: 1, windowMs: 30_000 });
   if (!rl.allowed) {
     throw new RateLimitError((rl.resetAt - Date.now()) / 1000);

@@ -139,7 +139,9 @@
     "status": {
       "DRAFT": "Koncept",
       "PUBLISHED": "Publikováno",
+      "PROVISIONING": "Připravuje se",
       "LIVE": "Právě probíhá",
+      "IDLE": "Pozastaveno",
       "ENDED": "Ukončeno",
       "ARCHIVED": "Archivováno"
     },
@@ -288,6 +290,9 @@
     "jibriNotConfigured": "Nahrávání není v infrastruktuře nakonfigurováno",
     "jibriScaling": "Záznam se spouští…",
     "jibriScalingTooltip": "Komponenta záznamu se spouští. Bude brzy k dispozici.",
+    "recorderNotStarted": "Nahrávání není k dispozici",
+    "recorderNotStartedDetail": "Služba nahrávání se ještě nespustila: událost zatím pokračuje bez nahrávání. Dejte vědět správcům platformy.",
+    "recorderStartFailed": "Nahrávání se nespustilo. Zkuste to znovu za několik minut; pokud problém přetrvá, dejte vědět správcům platformy.",
     "roomPreparing": "Místnost se připravuje…",
     "roomPreparingDetail": "Video servery se spouštějí. Operace trvá přibližně 2 minuty. Místnost se aktivuje automaticky.",
     "recordingPromptTitle": "Spustit záznam?",
@@ -483,6 +488,7 @@
       "textRequired": "Napište svou otázku",
       "tooLong": "Otázka nesmí přesáhnout 500 znaků",
       "rateLimit": "Počkejte prosím, než odešlete další otázku",
+      "busy": "Z vaší sítě právě přichází mnoho otázek: zkuste to prosím znovu za několik sekund",
       "generic": "Chyba při odesílání otázky"
     },
     "ctaTitle": "Položte první otázku",
@@ -703,7 +709,7 @@
         "speakerEmail": "E-mail",
         "speakerRequired": "Jméno a e-mail jsou povinné.",
         "invitationsHeading": "Pozvánky",
-        "invitationsHelp": "Předem registrované osoby — obdrží osobní odkaz pro účast.",
+        "invitationsHelp": "Seznam pozvaných osob. Platforma pozvánky neposílá: odkaz na událost jim sdílejte sami. Když je veřejná registrace vypnutá, mohou se zaregistrovat jen tyto adresy a osobní odkaz pro vstup přijde e-mailem po registraci.",
         "invitationName": "Jméno (volitelné)",
         "invitationEmail": "E-mail",
         "invitationRole": "Role",
@@ -1317,6 +1323,8 @@
       "publicPageHint": "Stránka ke sdílení pro sběr nových registrací.",
       "guestJoin": "Přímé pozvání (bez registrace)",
       "guestJoinHint": "Rychlý odkaz pro pozvání účastníka na poslední chvíli: připojí se jako host během živé události bez vyplňování registračního formuláře.",
+      "callInvite": "Odkaz pro účastníky",
+      "callInviteHint": "Kdo jej obdrží, připojí se k hovoru jako host, bez registrace. Rychlý hovor nemá veřejnou stránku: sdílejte tento odkaz.",
       "moderatorLink": "Odkaz moderátora",
       "moderatorLinkHint": "Tento odkaz sdílejte pouze s moderátory. Kdokoli s tímto odkazem může událost spravovat.",
       "liveRoomHint": "Odkaz pro přímý vstup do místnosti jako moderátor.",
@@ -1443,7 +1451,7 @@
         "jobMaxAttempts": "Počet pokusů před selháním",
         "jobMaxAttemptsHelp": "Kolikrát pipeline zopakuje úlohu, než ji označí za neúspěšnou. Prodleva mezi pokusy roste exponenciálně (od 30 sekund až po 2 hodiny). Obvyklá hodnota je 5.",
         "artifactRetentionDays": "Uchování artefaktů (dny)",
-        "artifactRetentionDaysHelp": "Při hodnotě 0 se AI artefakty řídí stejnou lhůtou jako samotná událost. Kladná hodnota je uchová po zadaný počet dní i po uzavření události, dokud je denní cron nesmaže. Smazání zahrnuje jména mluvčích a payloady úloh, v souladu s docs/GDPR.md.",
+        "artifactRetentionDaysHelp": "Při hodnotě 0 neplatí žádný limit pro celý web: AI artefakty se řídí dobou uchování své nahrávky nebo události. Kladná hodnota nechá denní úlohu smazat každý artefakt vytvořený před více než zadaným počtem dní, zveřejněný i nezveřejněný: dobu uchování tak může zkrátit, nikdy prodloužit. Jmen mluvčích a payloadů úloh se to netýká: řídí se dobou uchování nahrávky nebo události. Podrobnosti v docs/privacy/recordings-and-ai.md.",
         "consentDisclosureSection": "Informace o AI v čekárně",
         "consentDisclosureHelp": "Text zobrazený účastníkům v čekárně, když událost používá AI postprodukci (přepis, shrnutí, překlad, dabing). Lze upravit pro každý jazyk. Ponechte prázdné, chcete-li použít výchozí systémový text.",
         "consentDisclosurePlaceholder": "Např. Tato událost bude po skončení živého přenosu automaticky přepsána a shrnuta pomocí nástrojů AI…"
@@ -1642,7 +1650,7 @@
         "jvbStressCriticalPercent": "Kritický práh stresu (%)",
         "jvbStressCriticalPercentHelp": "Nad tímto prahem scaler přidá 2 repliky JVB. Výchozí 70. Musí být vyšší než varování.",
         "jvbProvisioningTimeoutMinutes": "Časový limit zřizování (minuty)",
-        "jvbProvisioningTimeoutMinutesHelp": "Po kolika minutách od startsAt je událost bez připraveného JVB označena jako „degraded“ na status stránce. Výchozí 15. Pokrývá studený start uzlu (~3–5 min) + bezpečnostní rezervu.",
+        "jvbProvisioningTimeoutMinutesHelp": "Po kolika minutách od startsAt je událost bez připraveného JVB označena jako „degraded“ na status stránce. Výchozí 15. Pokrývá studený start uzlu (~3–5 min) + bezpečnostní rezervu. Platí i pro nahrávací službu, počítáno od chvíle, kdy ji vyžádá událost s nahráváním: po uplynutí této doby bez odpovědi ji živá místnost přestane zobrazovat jako „spouští se“ a označí ji jako nespuštěnou.",
         "statusPollIntervalSeconds": "Interval pollingu status stránky (sekundy)",
         "statusPollIntervalSecondsHelp": "Každých kolik sekund stránka /status aktualizuje data v prohlížeči. Výchozí 30. Nižší hodnoty = čerstvější data, ale větší zátěž na aplikaci.",
         "emailSenderTitle": "Odesílatel e-mailů",
@@ -2187,7 +2195,12 @@
     },
     "eventDetail": {
       "copyPublicUrl": "Zkopírovat veřejný odkaz",
-      "enterAsModerator": "Vstoupit živě",
+      "copyInviteUrl": "Zkopírovat odkaz s pozvánkou",
+      "enterAsParticipant": "Připojit se jako účastník",
+      "openAsParticipant": "Otevřít jako účastník",
+      "participantHintRoom": "Otevře se na nové kartě: místnost tak, jak ji vidí host, bez oprávnění moderátora.",
+      "participantHintPassword": "Otevře se na nové kartě: místnost tak, jak ji vidí host, po zadání hesla události.",
+      "participantHintPage": "Otevře se na nové kartě: veřejná stránka tak, jak ji vidí účastníci.",
       "editEvent": "Upravit událost",
       "editSettings": "Upravit nastavení",
       "featureSummary": "Aktivní funkce",
@@ -2788,9 +2801,27 @@
     "add": "Přidat",
     "adding": "Přidávání...",
     "cancel": "Zrušit",
+    "modeLabel": "Typ materiálu",
+    "modeLink": "Odkaz",
+    "modeFile": "Soubor",
+    "titleOptional": "Název (nepovinný, jinak název souboru)",
+    "fileLabel": "Soubor k nahrání",
+    "fileHelp": "Podporované formáty: PDF, DOCX, PPTX, XLSX, TXT — max {maxMb} MB",
+    "upload": "Nahrát",
+    "uploading": "Probíhá nahrávání…",
     "errors": {
       "urlInvalid": "Zadejte platný URL",
-      "generic": "Chyba při přidávání materiálu"
+      "generic": "Chyba při přidávání materiálu",
+      "fileMissing": "Vyberte soubor k nahrání",
+      "titleMissing": "Zadejte název odkazu",
+      "fileTooLarge": "Soubor překračuje limit {maxMb} MB",
+      "fileTooLargeForServer": "Server nepřijímá tak velký soubor: zkuste menší soubor",
+      "fileType": "Nepodporovaný typ souboru (PDF, DOCX, PPTX, XLSX, TXT)",
+      "uploadUnavailable": "Nahrávání souborů není v této instalaci k dispozici",
+      "uploadFailed": "Chyba při nahrávání souboru",
+      "quotaExceeded": "Tato akce dosáhla limitu nahraných souborů ({maxFiles} souborů, celkem {maxMb} MB): odstraňte některé, abyste mohli nahrát další",
+      "uploadBusy": "Právě probíhá příliš mnoho nahrávání: zkuste to znovu za několik sekund",
+      "deleteFailed": "Materiál se nepodařilo smazat"
     }
   },
   "reminders": {
@@ -3343,7 +3374,13 @@
     "noActiveRound": "V tuto chvíli není aktivní žádný word cloud.",
     "noWords": "Čekáme na první slova...",
     "wordsSubmitted": "{count} odeslaných slov",
-    "timeRemaining": "Zbývající čas"
+    "timeRemaining": "Zbývající čas",
+    "errors": {
+      "send": "Slovo nebylo odesláno. Zkuste to znovu.",
+      "closed": "Toto kolo je uzavřeno: další slova se nepřijímají.",
+      "limit": "Pro toto kolo jste již odeslali maximální počet slov.",
+      "rateLimited": "Právě probíhá příliš mnoho odeslání: počkejte několik sekund, než to zkusíte znovu."
+    }
   },
   "timer": {
     "title": "Časovač",
@@ -3642,6 +3679,8 @@
     "warmingUpButton": "Místnost se připravuje…",
     "nameLabel": "Vaše jméno",
     "nameHelp": "Zobrazí se ostatním účastníkům",
+    "nameRequiredToEnter": "Pro vstup zadejte své jméno (alespoň 2 znaky).",
+    "roomOpenNameMissing": "Místnost je otevřená: pro vstup zadejte své jméno.",
     "joinNowBtn": "Vstoupit nyní",
     "roomOpen": "Místnost je otevřená",
     "whileYouWait": "Během čekání",

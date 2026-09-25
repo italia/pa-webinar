@@ -9,6 +9,7 @@ import {
 import { prisma } from '@/lib/db';
 import { publishEventStatus, publishFlagsIfChanged } from '@/lib/live-state/publish';
 import { reviveStatus } from '@/lib/events/lifecycle';
+import { removeFilesOfEventsBeingDeleted } from '@/lib/events/material-files';
 import { updateEventSchema } from '@/lib/validation/schemas';
 import { resolveLocale, localiseEvent, pruneEmptyTranslations, type LocalizedField } from '@/lib/utils/locale';
 import {
@@ -427,9 +428,9 @@ export const PUT = withErrorHandling(async (request, context) => {
           data.joinPassword.length > 0 ? hashJoinPassword(data.joinPassword) : null,
       }),
       ...(data.youtubeUrl !== undefined && { youtubeUrl: data.youtubeUrl }),
-      // The wizard sends the cadence back on every save; it used to be accepted
-      // by the schema and then dropped here, so editing an event silently wiped
-      // its recurrence (docs/ROADMAP.md, "Eventi ricorrenti / serie").
+      // The wizard sends the cadence back on every save: without this line the
+      // schema accepts it and the update drops it, so editing an event silently
+      // wipes its recurrence (docs/architecture/event-journey.md, "Recurrence").
       ...(data.recurrenceRule !== undefined && { recurrenceRule: data.recurrenceRule }),
       ...(data.libraryListed !== undefined && { libraryListed: data.libraryListed }),
       ...(data.coverImageUrl !== undefined && { coverImageUrl: data.coverImageUrl }),
@@ -520,6 +521,10 @@ export const DELETE = withErrorHandling(async (request, context) => {
   const event = await verifyModeratorToken(eventId, token);
   if (!event) throw new ForbiddenError('Invalid moderator token or event not found');
 
+  // I file dell'evento (materiali caricati, allegati di chat) se ne vanno
+  // prima: la cascata porta via le righe, e dopo nessuno saprebbe più quali
+  // blob cancellare. Se lo storage non risponde l'evento resta (503).
+  await removeFilesOfEventsBeingDeleted({ id: eventId });
   await prisma.event.delete({ where: { id: eventId } });
 
   await logAdminAction({

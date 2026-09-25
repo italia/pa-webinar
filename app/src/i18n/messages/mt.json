@@ -139,7 +139,9 @@
     "status": {
       "DRAFT": "Abbozz",
       "PUBLISHED": "Ippubblikat",
+      "PROVISIONING": "Qed jitħejja",
       "LIVE": "Ħaj",
+      "IDLE": "Fil-pawża",
       "ENDED": "Intemm",
       "ARCHIVED": "Arkivjat"
     },
@@ -288,6 +290,9 @@
     "jibriNotConfigured": "Reġistrazzjoni mhijiex ikkonfigurata fl-infrastruttura",
     "jibriScaling": "Ir-rekording qed jibda…",
     "jibriScalingTooltip": "Il-komponent tar-rekording qed jibda. Se jkun disponibbli fi ftit ħin.",
+    "recorderNotStarted": "Ir-reġistrazzjoni mhix disponibbli",
+    "recorderNotStartedDetail": "Is-servizz tar-reġistrazzjoni għadu ma bediex: għalissa l-avveniment ikompli mingħajr reġistrazzjoni. Għarraf lill-amministraturi tal-pjattaforma.",
+    "recorderStartFailed": "Ir-reġistrazzjoni ma bdietx. Erġa' pprova fi ftit minuti; jekk il-problema tippersisti, għarraf lill-amministraturi tal-pjattaforma.",
     "roomPreparing": "Is-sala qed titħejja…",
     "roomPreparingDetail": "Is-servers tal-vidjo qed jibdew. Din l-operazzjoni tieħu madwar 2 minuti. Is-sala se tiġi attivata awtomatikament.",
     "recordingPromptTitle": "Tibda r-rekording?",
@@ -483,6 +488,7 @@
       "textRequired": "Jekk jogħġbok ikteb il-mistoqsija tiegħek",
       "tooLong": "Il-mistoqsija ma tistax taqbeż il-500 karattru",
       "rateLimit": "Jekk jogħġbok stenna qabel ma tibgħat mistoqsija oħra",
+      "busy": "Bħalissa qed jaslu ħafna mistoqsijiet min-netwerk tiegħek: jekk jogħġbok erġa' pprova fi ftit sekondi",
       "generic": "Żball fl-ibgħat tal-mistoqsija"
     },
     "ctaTitle": "Staqsi l-ewwel mistoqsija",
@@ -703,7 +709,7 @@
         "speakerEmail": "Email",
         "speakerRequired": "L-isem u l-email huma obbligatorji.",
         "invitationsHeading": "Stediniet",
-        "invitationsHelp": "Persuni preġistrati — jirċievu link personali biex jipparteċipaw.",
+        "invitationsHelp": "Lista tal-persuni mistiedna. Il-pjattaforma ma tibgħatx stediniet: aqsam int il-link tal-avveniment. Meta r-reġistrazzjoni pubblika tkun mitfija, jistgħu jirreġistraw biss dawn l-indirizzi, u l-link personali biex tidħol jasal bl-email wara r-reġistrazzjoni.",
         "invitationName": "Isem (fakultattiv)",
         "invitationEmail": "Email",
         "invitationRole": "Rwol",
@@ -1317,6 +1323,8 @@
       "publicPageHint": "La paġna minn condivideru per raccoglieru ġodda reġistrazzjonijiet.",
       "guestJoin": "Invito diretto (senza reġistrazzjoni)",
       "guestJoinHint": "Link rapidu għal invitaru wieħed parteċipant lill-aħħar momento: accedu bħal mistieden meta l'avveniment huwa mill-vivo, mingħajr timla il-form ta' reġistrazzjoni.",
+      "callInvite": "Link għall-parteċipanti",
+      "callInviteHint": "Min jirċevih jidħol fis-sejħa bħala mistieden, mingħajr reġistrazzjoni. Sejħa rapida m'għandhiex paġna pubblika: din hija l-link li għandha tinqasam.",
       "moderatorLink": "Link tal-moderatur",
       "moderatorLinkHint": "Aqsam dan il-link mal-moderaturi biss. Kull min għandu dan il-link jista' jimmaniġġja l-avveniment.",
       "liveRoomHint": "Link għal tidħol direttamentità fil-stanza bħal moderatur.",
@@ -1443,7 +1451,7 @@
         "jobMaxAttempts": "Tentattivi qabel il-falliment",
         "jobMaxAttemptsHelp": "Kemm-il darba l-pipeline terġa' tipprova xogħol qabel timmarkah bħala falliment. Il-backoff bejn tentattiv u ieħor jikber b'mod esponenzjali (minn 30 sekonda sa sagħtejn). Il-valur tipiku huwa 5.",
         "artifactRetentionDays": "Żamma tal-artefatti (jiem)",
-        "artifactRetentionDaysHelp": "Jekk jitħalla 0, l-artefatti tal-AI isegwu l-istess skadenza tal-avveniment. Valur ikbar minn żero jżommhom għan-numru ta' jiem indikat, anke wara l-għeluq tal-avveniment, sakemm cron ta' kuljum iħassarhom. It-tħassir jinkludi l-ismijiet tal-kelliema u l-payload tax-xogħlijiet, f'konformità ma' docs/GDPR.md.",
+        "artifactRetentionDaysHelp": "B'0 ma hemm l-ebda limitu għas-sit kollu: l-artefatti tal-AI isegwu ż-żamma tar-reġistrazzjoni tagħhom jew tal-avveniment. Valur ikbar minn żero jġiegħel xogħol ta' kuljum iħassar kull artefatt maħluq aktar minn dak in-numru ta' jiem ilu, ippubblikat jew le: jista' jqassar iż-żamma, iżda qatt ma jtawwalha. L-ismijiet tal-kelliema u l-payload tax-xogħlijiet mhumiex inklużi: isegwu ż-żamma tar-reġistrazzjoni jew tal-avveniment. Dettalji f'docs/privacy/recordings-and-ai.md.",
         "consentDisclosureSection": "Avviż dwar l-AI fil-kamra tal-istennija",
         "consentDisclosureHelp": "Test muri lill-parteċipanti fil-kamra tal-istennija meta l-avveniment juża l-post-produzzjoni bl-AI (traskrizzjoni, sommarju, traduzzjoni, doppjaġġ). Jista' jiġi personalizzat għal kull lingwa. Ħalli vojt biex tuża t-test prestabbilit tas-sistema.",
         "consentDisclosurePlaceholder": "Eż. Dan l-avveniment se jiġi traskritt u sommarizzat awtomatikament b'għodod tal-AI wara d-dirett…"
@@ -1642,7 +1650,7 @@
         "jvbStressCriticalPercent": "Soglia stress criticlill- (%)",
         "jvbStressCriticalPercentHelp": "Sopra din soglia il-scaler aggiungu 2 replichu JVB. Default 70. Devu tkun maggisigħat tal-warn.",
         "jvbProvisioningTimeoutMinutes": "Timeout provisioning (minuti)",
-        "jvbProvisioningTimeoutMinutesHelp": "Wara quanti minuti minn startsAt wieħed avveniment ma' JVB għadhu mhux pronto vienu segnalato bħal 'degraded' sulla status page. Default 15. Copru cold-start tal-nodu (~3-5 min) + marginu di sicurezza.",
+        "jvbProvisioningTimeoutMinutesHelp": "Wara quanti minuti minn startsAt wieħed avveniment ma' JVB għadhu mhux pronto vienu segnalato bħal 'degraded' sulla status page. Default 15. Copru cold-start tal-nodu (~3-5 min) + marginu di sicurezza. Japplika wkoll għas-servizz tar-reġistrazzjoni, magħdud minn meta avveniment b'reġistrazzjoni jitolbu: wara dan il-ħin mingħajr tweġiba, is-sala diretta tieqaf turih bħala 'qed jibda' u tirrappurtah bħala li ma bediex.",
         "statusPollIntervalSeconds": "Intervall polling status pagu (sekondi)",
         "statusPollIntervalSecondsHelp": "Kull quanti sekondi il-paġna /status aġġorna il-data lato browser. Default 30. Valori aktar bassi = data aktar fresmin ma aktar carico sull'app.",
         "emailSenderTitle": "Min jibgħat l-emails",
@@ -2187,7 +2195,12 @@
     },
     "eventDetail": {
       "copyPublicUrl": "Copia link pubblico",
-      "enterAsModerator": "Entra live",
+      "copyInviteUrl": "Ikkopja l-link tal-istedina",
+      "enterAsParticipant": "Idħol bħala parteċipant",
+      "openAsParticipant": "Iftaħ bħala parteċipant",
+      "participantHintRoom": "Jinfetaħ f'tab ġdida: il-kamra kif jaraha mistieden, mingħajr setgħat ta' moderazzjoni.",
+      "participantHintPassword": "Jinfetaħ f'tab ġdida: il-kamra kif jaraha mistieden, wara l-password tal-avveniment.",
+      "participantHintPage": "Jinfetaħ f'tab ġdida: il-paġna pubblika kif jarawha l-parteċipanti.",
       "editEvent": "Editja l-avveniment",
       "editSettings": "Editja impostazioni",
       "featureSummary": "Funzionalità attive",
@@ -2788,9 +2801,27 @@
     "add": "Żid",
     "adding": "Qed jiżdied...",
     "cancel": "Ikkanċella",
+    "modeLabel": "Tip ta' materjal",
+    "modeLink": "Link",
+    "modeFile": "Fajl",
+    "titleOptional": "Titlu (mhux obbligatorju; inkella l-isem tal-fajl)",
+    "fileLabel": "Fajl li jrid jittella'",
+    "fileHelp": "Formati appoġġjati: PDF, DOCX, PPTX, XLSX, TXT — massimu {maxMb} MB",
+    "upload": "Tella'",
+    "uploading": "Qed jitla'…",
     "errors": {
       "urlInvalid": "Jekk jogħġbok daħħal URL validu",
-      "generic": "Żball fiż-żieda tal-materjal"
+      "generic": "Żball fiż-żieda tal-materjal",
+      "fileMissing": "Agħżel fajl biex ittellgħu",
+      "titleMissing": "Daħħal titlu għal-link",
+      "fileTooLarge": "Il-fajl jaqbeż il-limitu ta' {maxMb} MB",
+      "fileTooLargeForServer": "Is-server ma jaċċettax fajl daqshekk kbir: ipprova fajl iżgħar",
+      "fileType": "Tip ta' fajl mhux appoġġjat (PDF, DOCX, PPTX, XLSX, TXT)",
+      "uploadUnavailable": "It-tlugħ tal-fajls mhux disponibbli f'din l-installazzjoni",
+      "uploadFailed": "Żball waqt it-tlugħ tal-fajl",
+      "quotaExceeded": "Dan l-avveniment laħaq il-limitu tal-fajls imtella' ({maxFiles} fajl, {maxMb} MB b'kollox): neħħi xi wħud biex ittella' oħrajn",
+      "uploadBusy": "Wisq fajls qed jitellgħu bħalissa: erġa' pprova fi ftit sekondi",
+      "deleteFailed": "Ma setax jitħassar il-materjal"
     }
   },
   "reminders": {
@@ -3343,7 +3374,13 @@
     "noActiveRound": "L-ebda word cloud attiv bħalissa.",
     "noWords": "Qed nistennew l-ewwel kliem...",
     "wordsSubmitted": "{count} kliem mibgħuta",
-    "timeRemaining": "Ħin li fadal"
+    "timeRemaining": "Ħin li fadal",
+    "errors": {
+      "send": "Il-kelma ma ntbagħtitx. Erġa' pprova.",
+      "closed": "Din ir-rawnd għalqet: ma jiġux aċċettati aktar kliem.",
+      "limit": "Diġà bgħatt l-ogħla numru ta' kliem għal din ir-rawnd.",
+      "rateLimited": "Wisq invji bħalissa: stenna ftit sekondi qabel ma terġa' tipprova."
+    }
   },
   "timer": {
     "title": "Timer",
@@ -3642,6 +3679,8 @@
     "warmingUpButton": "Sala in allestimento...",
     "nameLabel": "Il tuo nome",
     "nameHelp": "Apparirà lill-altri parteċipanti",
+    "nameRequiredToEnter": "Biex tidħol, daħħal ismek (mill-inqas 2 karattri).",
+    "roomOpenNameMissing": "Is-sala hija miftuħa: daħħal ismek biex tidħol.",
     "joinNowBtn": "Entra ora",
     "roomOpen": "Is-sala hija miftuħa",
     "whileYouWait": "Waqt li tistenna",

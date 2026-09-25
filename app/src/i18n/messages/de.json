@@ -139,7 +139,9 @@
     "status": {
       "DRAFT": "Entwurf",
       "PUBLISHED": "Veröffentlicht",
+      "PROVISIONING": "Wird vorbereitet",
       "LIVE": "Läuft",
+      "IDLE": "Pausiert",
       "ENDED": "Beendet",
       "ARCHIVED": "Archiviert"
     },
@@ -288,6 +290,9 @@
     "jibriNotConfigured": "Aufzeichnung in der Infrastruktur nicht konfiguriert",
     "jibriScaling": "Aufzeichnung wird gestartet…",
     "jibriScalingTooltip": "Die Aufzeichnungskomponente wird gestartet. Sie ist in Kürze verfügbar.",
+    "recorderNotStarted": "Aufzeichnung nicht verfügbar",
+    "recorderNotStartedDetail": "Der Aufzeichnungsdienst ist noch nicht gestartet: Die Veranstaltung läuft vorerst ohne Aufzeichnung weiter. Informieren Sie die Verantwortlichen der Plattform.",
+    "recorderStartFailed": "Die Aufzeichnung ist nicht gestartet. Versuchen Sie es in einigen Minuten erneut; wenn das Problem weiterhin besteht, informieren Sie die Verantwortlichen der Plattform.",
     "roomPreparing": "Raum wird vorbereitet…",
     "roomPreparingDetail": "Die Videoserver werden gestartet. Der Vorgang dauert etwa 2 Minuten. Der Raum wird automatisch aktiviert.",
     "recordingPromptTitle": "Aufzeichnung starten?",
@@ -483,6 +488,7 @@
       "textRequired": "Bitte schreiben Sie Ihre Frage",
       "tooLong": "Die Frage darf 500 Zeichen nicht überschreiten",
       "rateLimit": "Bitte warten Sie, bevor Sie eine weitere Frage senden",
+      "busy": "Aus Ihrem Netzwerk kommen gerade viele Fragen: Bitte versuchen Sie es in einigen Sekunden erneut",
       "generic": "Fehler beim Senden der Frage"
     },
     "ctaTitle": "Stellen Sie die erste Frage",
@@ -703,7 +709,7 @@
         "speakerEmail": "E-Mail",
         "speakerRequired": "Name und E-Mail sind erforderlich.",
         "invitationsHeading": "Einladungen",
-        "invitationsHelp": "Vorab registrierte Personen — erhalten einen persönlichen Teilnahmelink.",
+        "invitationsHelp": "Liste der eingeladenen Personen. Die Plattform verschickt keine Einladungen: Teilen Sie den Link zur Veranstaltung selbst. Ist die öffentliche Registrierung deaktiviert, können sich nur diese Adressen registrieren, und der persönliche Teilnahmelink kommt nach der Registrierung per E-Mail.",
         "invitationName": "Name (optional)",
         "invitationEmail": "E-Mail",
         "invitationRole": "Rolle",
@@ -1317,6 +1323,8 @@
       "publicPageHint": "Die zu teilende Seite, um neue Anmeldungen zu sammeln.",
       "guestJoin": "Direkteinladung (ohne Anmeldung)",
       "guestJoinHint": "Schneller Link, um in letzter Minute einen Teilnehmer einzuladen: Eintritt als Gast während des Live-Events ohne Ausfüllen des Anmeldeformulars.",
+      "callInvite": "Link für Teilnehmende",
+      "callInviteHint": "Wer ihn erhält, tritt dem Anruf als Gast bei, ohne Anmeldung. Ein Sofortanruf hat keine öffentliche Seite: Dies ist der Link zum Teilen.",
       "moderatorLink": "Moderator-Link",
       "moderatorLinkHint": "Teilen Sie diesen Link nur mit Moderatoren. Jeder mit diesem Link kann die Veranstaltung verwalten.",
       "liveRoomHint": "Direktlink, um als Moderator den Live-Raum zu betreten.",
@@ -1443,7 +1451,7 @@
         "jobMaxAttempts": "Versuche vor dem Fehlschlag",
         "jobMaxAttemptsHelp": "Wie oft die Pipeline einen Job wiederholt, bevor sie ihn als fehlgeschlagen markiert. Der Backoff zwischen den Versuchen wächst exponentiell (von 30 Sekunden bis zu 2 Stunden). Der typische Wert ist 5.",
         "artifactRetentionDays": "Aufbewahrung der Artefakte (Tage)",
-        "artifactRetentionDaysHelp": "Bei 0 folgen die KI-Artefakte derselben Frist wie die Veranstaltung. Ein Wert größer als null bewahrt sie für die angegebene Anzahl von Tagen auf, auch nach dem Abschluss der Veranstaltung, bis ein täglicher Cron sie löscht. Die Löschung umfasst die Namen der Sprecher und die Payloads der Jobs, im Einklang mit docs/GDPR.md.",
+        "artifactRetentionDaysHelp": "Bei 0 gilt keine seitenweite Grenze: Die KI-Artefakte folgen der Aufbewahrungsfrist ihrer Aufzeichnung oder der Veranstaltung. Ein Wert größer als null lässt einen täglichen Job jedes Artefakt löschen, das vor mehr als dieser Anzahl von Tagen erstellt wurde, ob veröffentlicht oder nicht: Er kann die Aufbewahrung verkürzen, aber nie verlängern. Namen der Sprecher und Payloads der Jobs sind nicht erfasst: Sie folgen der Aufbewahrungsfrist der Aufzeichnung oder der Veranstaltung. Details in docs/privacy/recordings-and-ai.md.",
         "consentDisclosureSection": "KI-Hinweis im Warteraum",
         "consentDisclosureHelp": "Text, der den Teilnehmern im Warteraum angezeigt wird, wenn die Veranstaltung die KI-Nachbearbeitung nutzt (Transkription, Zusammenfassung, Übersetzung, Synchronisation). Pro Sprache anpassbar. Leer lassen, um den vom System vorgegebenen Standardtext zu verwenden.",
         "consentDisclosurePlaceholder": "Z. B. Diese Veranstaltung wird nach der Live-Übertragung automatisch mit KI-Werkzeugen transkribiert und zusammengefasst …"
@@ -1642,7 +1650,7 @@
         "jvbStressCriticalPercent": "Stress-Kritischschwelle (%)",
         "jvbStressCriticalPercentHelp": "Oberhalb dieses Schwellwerts fügt der Scaler 2 zusätzliche JVB-Replicas hinzu. Standard 70. Muss höher sein als der Warn-Wert.",
         "jvbProvisioningTimeoutMinutes": "Provisioning-Timeout (Minuten)",
-        "jvbProvisioningTimeoutMinutesHelp": "Nach wie vielen Minuten nach startsAt ein Event mit noch nicht bereitem JVB auf der Statusseite als 'degraded' gemeldet wird. Standard 15. Deckt den Cold-Start des Knotens (~3–5 Min) plus Sicherheitsmarge ab.",
+        "jvbProvisioningTimeoutMinutesHelp": "Nach wie vielen Minuten nach startsAt ein Event mit noch nicht bereitem JVB auf der Statusseite als 'degraded' gemeldet wird. Standard 15. Deckt den Cold-Start des Knotens (~3–5 Min) plus Sicherheitsmarge ab. Gilt auch für den Aufzeichnungsdienst, gerechnet ab der Anforderung durch ein Event mit Aufzeichnung: Antwortet er in dieser Zeit nicht, zeigt der Live-Raum ihn nicht mehr als „startet“ an, sondern meldet ihn als nicht gestartet.",
         "statusPollIntervalSeconds": "Polling-Intervall der Statusseite (Sekunden)",
         "statusPollIntervalSecondsHelp": "Wie oft die /status-Seite die Daten browserseitig aktualisiert. Standard 30. Niedrigere Werte = aktuellere Daten, aber höhere Last auf der App.",
         "emailSenderTitle": "Absender der E-Mails",
@@ -2187,7 +2195,12 @@
     },
     "eventDetail": {
       "copyPublicUrl": "Öffentlichen Link kopieren",
-      "enterAsModerator": "Live betreten",
+      "copyInviteUrl": "Einladungslink kopieren",
+      "enterAsParticipant": "Als Teilnehmer beitreten",
+      "openAsParticipant": "Als Teilnehmer öffnen",
+      "participantHintRoom": "Öffnet sich in einem neuen Tab: der Raum, wie ihn ein Gast sieht, ohne Moderationsrechte.",
+      "participantHintPassword": "Öffnet sich in einem neuen Tab: der Raum, wie ihn ein Gast sieht, nach dem Passwort der Veranstaltung.",
+      "participantHintPage": "Öffnet sich in einem neuen Tab: die öffentliche Seite, wie Teilnehmende sie sehen.",
       "editEvent": "Event bearbeiten",
       "editSettings": "Einstellungen bearbeiten",
       "featureSummary": "Aktive Funktionen",
@@ -2788,9 +2801,27 @@
     "add": "Hinzufügen",
     "adding": "Wird hinzugefügt...",
     "cancel": "Abbrechen",
+    "modeLabel": "Art des Materials",
+    "modeLink": "Link",
+    "modeFile": "Datei",
+    "titleOptional": "Titel (optional, sonst der Dateiname)",
+    "fileLabel": "Hochzuladende Datei",
+    "fileHelp": "Unterstützte Formate: PDF, DOCX, PPTX, XLSX, TXT — max. {maxMb} MB",
+    "upload": "Hochladen",
+    "uploading": "Wird hochgeladen…",
     "errors": {
       "urlInvalid": "Bitte geben Sie eine gültige URL ein",
-      "generic": "Fehler beim Hinzufügen des Materials"
+      "generic": "Fehler beim Hinzufügen des Materials",
+      "fileMissing": "Wählen Sie eine Datei zum Hochladen aus",
+      "titleMissing": "Geben Sie einen Titel für den Link ein",
+      "fileTooLarge": "Die Datei überschreitet das Limit von {maxMb} MB",
+      "fileTooLargeForServer": "Der Server akzeptiert keine so große Datei: Versuchen Sie es mit einer kleineren Datei",
+      "fileType": "Dateityp nicht unterstützt (PDF, DOCX, PPTX, XLSX, TXT)",
+      "uploadUnavailable": "Das Hochladen von Dateien ist in dieser Installation nicht verfügbar",
+      "uploadFailed": "Fehler beim Hochladen der Datei",
+      "quotaExceeded": "Diese Veranstaltung hat das Limit für hochgeladene Dateien erreicht ({maxFiles} Dateien, insgesamt {maxMb} MB): Entfernen Sie einige, um weitere hochzuladen",
+      "uploadBusy": "Zu viele Uploads im Moment: Versuchen Sie es in einigen Sekunden erneut",
+      "deleteFailed": "Das Material konnte nicht gelöscht werden"
     }
   },
   "reminders": {
@@ -3343,7 +3374,13 @@
     "noActiveRound": "Derzeit keine Word Cloud aktiv.",
     "noWords": "Warten auf die ersten Wörter...",
     "wordsSubmitted": "{count} Wörter eingereicht",
-    "timeRemaining": "Verbleibende Zeit"
+    "timeRemaining": "Verbleibende Zeit",
+    "errors": {
+      "send": "Wort nicht gesendet. Bitte versuchen Sie es erneut.",
+      "closed": "Diese Runde ist geschlossen: Es werden keine weiteren Wörter angenommen.",
+      "limit": "Sie haben für diese Runde bereits die maximale Anzahl an Wörtern gesendet.",
+      "rateLimited": "Zu viele Einsendungen im Moment: Bitte warten Sie einige Sekunden, bevor Sie es erneut versuchen."
+    }
   },
   "timer": {
     "title": "Timer",
@@ -3642,6 +3679,8 @@
     "warmingUpButton": "Raum wird vorbereitet...",
     "nameLabel": "Ihr Name",
     "nameHelp": "Andere Teilnehmende sehen ihn",
+    "nameRequiredToEnter": "Geben Sie Ihren Namen ein, um einzutreten (mindestens 2 Zeichen).",
+    "roomOpenNameMissing": "Der Raum ist geöffnet: Geben Sie Ihren Namen ein, um einzutreten.",
     "joinNowBtn": "Jetzt eintreten",
     "roomOpen": "Der Raum ist geöffnet",
     "whileYouWait": "Während Sie warten",

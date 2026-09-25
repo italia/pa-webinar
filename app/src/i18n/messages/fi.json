@@ -139,7 +139,9 @@
     "status": {
       "DRAFT": "Luonnos",
       "PUBLISHED": "Julkaistu",
+      "PROVISIONING": "Valmistellaan",
       "LIVE": "Käynnissä",
+      "IDLE": "Tauolla",
       "ENDED": "Päättynyt",
       "ARCHIVED": "Arkistoitu"
     },
@@ -288,6 +290,9 @@
     "jibriNotConfigured": "Tallennusta ei ole määritetty infrastruktuurissa",
     "jibriScaling": "Tallennus käynnistyy…",
     "jibriScalingTooltip": "Tallennuskomponentti käynnistyy. Se on käytettävissä pian.",
+    "recorderNotStarted": "Tallennus ei ole käytettävissä",
+    "recorderNotStartedDetail": "Tallennuspalvelu ei ole vielä käynnistynyt: toistaiseksi tapahtuma jatkuu ilman tallennusta. Ilmoita alustan ylläpitäjille.",
+    "recorderStartFailed": "Tallennus ei käynnistynyt. Yritä uudelleen muutaman minuutin kuluttua; jos ongelma jatkuu, ilmoita alustan ylläpitäjille.",
     "roomPreparing": "Huonetta valmistellaan…",
     "roomPreparingDetail": "Videopalvelimet käynnistyvät. Tämä kestää noin 2 minuuttia. Huone aktivoituu automaattisesti.",
     "recordingPromptTitle": "Aloitetaanko tallennus?",
@@ -483,6 +488,7 @@
       "textRequired": "Kirjoita kysymyksesi",
       "tooLong": "Kysymys ei saa ylittää 500 merkkiä",
       "rateLimit": "Odota ennen seuraavan kysymyksen lähettämistä",
+      "busy": "Verkostasi saapuu juuri nyt paljon kysymyksiä: yritä uudelleen muutaman sekunnin kuluttua",
       "generic": "Virhe kysymyksen lähettämisessä"
     },
     "ctaTitle": "Esitä ensimmäinen kysymys",
@@ -703,7 +709,7 @@
         "speakerEmail": "Sähköposti",
         "speakerRequired": "Nimi ja sähköposti ovat pakollisia.",
         "invitationsHeading": "Kutsut",
-        "invitationsHelp": "Ennakkoon ilmoittautuneet — kukin saa henkilökohtaisen liittymislinkin.",
+        "invitationsHelp": "Luettelo kutsutuista. Alusta ei lähetä kutsuja: jaa tapahtuman linkki itse. Kun julkinen rekisteröityminen on pois käytöstä, vain nämä osoitteet voivat rekisteröityä, ja henkilökohtainen liittymislinkki tulee sähköpostitse rekisteröitymisen jälkeen.",
         "invitationName": "Nimi (valinnainen)",
         "invitationEmail": "Sähköposti",
         "invitationRole": "Rooli",
@@ -1317,6 +1323,8 @@
       "publicPageHint": "Sivu, jota jaetaan uusien ilmoittautumisten keräämistä varten.",
       "guestJoin": "Suora kutsu (ilman ilmoittautumista)",
       "guestJoinHint": "Pikalinkki viime hetken osallistujan kutsumiseen: hän liittyy vieraana, kun tapahtuma on käynnissä, ilman ilmoittautumislomakkeen täyttämistä.",
+      "callInvite": "Osallistujien linkki",
+      "callInviteHint": "Linkin saanut liittyy puheluun vieraana ilman ilmoittautumista. Pikapuhelulla ei ole julkista sivua: tämä on jaettava linkki.",
       "moderatorLink": "Moderaattorilinkki",
       "moderatorLinkHint": "Jaa tämä linkki vain moderaattoreille. Kuka tahansa, jolla on tämä linkki, voi hallita tapahtumaa.",
       "liveRoomHint": "Suora linkki, jolla pääsee live-huoneeseen moderaattorina.",
@@ -1443,7 +1451,7 @@
         "jobMaxAttempts": "Yrityksiä ennen epäonnistumista",
         "jobMaxAttemptsHelp": "Kuinka monta kertaa putki yrittää työtä uudelleen ennen kuin merkitsee sen epäonnistuneeksi. Odotusaika yritysten välillä kasvaa eksponentiaalisesti (30 sekunnista jopa 2 tuntiin). Tyypillinen arvo on 5.",
         "artifactRetentionDays": "Tuotosten säilytys (päivää)",
-        "artifactRetentionDaysHelp": "Arvolla 0 tekoälyn tuotokset noudattavat tapahtuman omaa säilytysaikaa. Nollaa suurempi arvo säilyttää ne ilmoitetun päivien määrän ajan myös tapahtuman sulkemisen jälkeen, kunnes päivittäinen cron poistaa ne. Poisto kattaa puhujien nimet ja töiden hyötykuormat docs/GDPR.md-tiedoston mukaisesti.",
+        "artifactRetentionDaysHelp": "Arvolla 0 koko sivustoa koskevaa rajaa ei ole: tekoälyn tuotokset noudattavat tallenteensa tai tapahtuman säilytysaikaa. Nollaa suurempi arvo saa päivittäisen työn poistamaan jokaisen tuotoksen, joka on luotu yli annetun päivien määrän sitten, julkaistun tai julkaisemattoman: se voi lyhentää säilytysaikaa mutta ei koskaan pidentää sitä. Puhujien nimet ja töiden hyötykuormat eivät kuulu tähän: ne noudattavat tallenteen tai tapahtuman säilytysaikaa. Lisätietoja: docs/privacy/recordings-and-ai.md.",
         "consentDisclosureSection": "Tekoälyilmoitus odotushuoneessa",
         "consentDisclosureHelp": "Teksti, joka näytetään osallistujille odotushuoneessa, kun tapahtumassa käytetään tekoälyjälkituotantoa (litterointi, yhteenveto, käännös, dubbaus). Mukautettavissa kielikohtaisesti. Jätä tyhjäksi, jos haluat käyttää järjestelmän oletustekstiä.",
         "consentDisclosurePlaceholder": "Esim. Tämä tapahtuma litteroidaan ja tiivistetään automaattisesti tekoälytyökaluilla suoran lähetyksen jälkeen…"
@@ -1642,7 +1650,7 @@
         "jvbStressCriticalPercent": "Stressin kriittinen kynnys (%)",
         "jvbStressCriticalPercentHelp": "Tämän kynnyksen ylittyessä skaalain lisää 2 ylimääräistä JVB-replikkaa. Oletus 70. Tulee olla suurempi kuin varoituskynnys.",
         "jvbProvisioningTimeoutMinutes": "Provisioinnin aikakatkaisu (minuuttia)",
-        "jvbProvisioningTimeoutMinutesHelp": "Kuinka monen minuutin kuluttua startsAt:sta tapahtuma, jonka JVB ei ole valmis, merkitään tilasivulla 'degraded'. Oletus 15. Kattaa solmun cold-startin (~3–5 min) ja turvamarginaalin.",
+        "jvbProvisioningTimeoutMinutesHelp": "Kuinka monen minuutin kuluttua startsAt:sta tapahtuma, jonka JVB ei ole valmis, merkitään tilasivulla 'degraded'. Oletus 15. Kattaa solmun cold-startin (~3–5 min) ja turvamarginaalin. Koskee myös tallennuspalvelua, laskettuna siitä, kun tallennusta käyttävä tapahtuma pyytää sitä: jos se ei vastaa tässä ajassa, live-huone lakkaa näyttämästä sitä käynnistyvänä ja ilmoittaa sen käynnistymättömäksi.",
         "statusPollIntervalSeconds": "Tilasivun pollausväli (sekuntia)",
         "statusPollIntervalSecondsHelp": "Kuinka usein /status-sivu päivittyy selaimessa. Oletus 30. Pienemmät arvot = tuoreemmat tiedot, mutta enemmän kuormaa sovellukselle.",
         "emailSenderTitle": "Sähköpostin lähettäjä",
@@ -2187,7 +2195,12 @@
     },
     "eventDetail": {
       "copyPublicUrl": "Kopioi julkinen linkki",
-      "enterAsModerator": "Liity liveen",
+      "copyInviteUrl": "Kopioi kutsulinkki",
+      "enterAsParticipant": "Liity osallistujana",
+      "openAsParticipant": "Avaa osallistujana",
+      "participantHintRoom": "Avautuu uuteen välilehteen: huone sellaisena kuin vieras sen näkee, ilman moderaattorin oikeuksia.",
+      "participantHintPassword": "Avautuu uuteen välilehteen: huone sellaisena kuin vieras sen näkee, tapahtuman salasanan jälkeen.",
+      "participantHintPage": "Avautuu uuteen välilehteen: julkinen sivu sellaisena kuin osallistujat sen näkevät.",
       "editEvent": "Muokkaa tapahtumaa",
       "editSettings": "Muokkaa asetuksia",
       "featureSummary": "Aktiiviset toiminnot",
@@ -2788,9 +2801,27 @@
     "add": "Lisää",
     "adding": "Lisätään...",
     "cancel": "Peruuta",
+    "modeLabel": "Materiaalin tyyppi",
+    "modeLink": "Linkki",
+    "modeFile": "Tiedosto",
+    "titleOptional": "Otsikko (valinnainen, oletuksena tiedoston nimi)",
+    "fileLabel": "Ladattava tiedosto",
+    "fileHelp": "Tuetut muodot: PDF, DOCX, PPTX, XLSX, TXT — enint. {maxMb} MB",
+    "upload": "Lataa",
+    "uploading": "Ladataan…",
     "errors": {
       "urlInvalid": "Syötä kelvollinen URL",
-      "generic": "Virhe materiaalin lisäämisessä"
+      "generic": "Virhe materiaalin lisäämisessä",
+      "fileMissing": "Valitse ladattava tiedosto",
+      "titleMissing": "Anna linkille otsikko",
+      "fileTooLarge": "Tiedosto ylittää {maxMb} MB:n rajan",
+      "fileTooLargeForServer": "Palvelin ei hyväksy näin suurta tiedostoa: kokeile pienempää tiedostoa",
+      "fileType": "Tiedostotyyppiä ei tueta (PDF, DOCX, PPTX, XLSX, TXT)",
+      "uploadUnavailable": "Tiedostojen lataaminen ei ole käytettävissä tässä asennuksessa",
+      "uploadFailed": "Virhe tiedoston latauksessa",
+      "quotaExceeded": "Tämä tapahtuma on saavuttanut ladattujen tiedostojen rajan ({maxFiles} tiedostoa, yhteensä {maxMb} MB): poista joitakin ladataksesi lisää",
+      "uploadBusy": "Liian monta latausta juuri nyt: yritä uudelleen muutaman sekunnin kuluttua",
+      "deleteFailed": "Materiaalia ei voitu poistaa"
     }
   },
   "reminders": {
@@ -3343,7 +3374,13 @@
     "noActiveRound": "Ei aktiivista word cloudia tällä hetkellä.",
     "noWords": "Odotetaan ensimmäisiä sanoja...",
     "wordsSubmitted": "{count} sanaa lähetetty",
-    "timeRemaining": "Aikaa jäljellä"
+    "timeRemaining": "Aikaa jäljellä",
+    "errors": {
+      "send": "Sanaa ei lähetetty. Yritä uudelleen.",
+      "closed": "Kierros on päättynyt: uusia sanoja ei enää oteta vastaan.",
+      "limit": "Olet jo lähettänyt tämän kierroksen enimmäismäärän sanoja.",
+      "rateLimited": "Liian monta lähetystä juuri nyt: odota muutama sekunti ennen kuin yrität uudelleen."
+    }
   },
   "timer": {
     "title": "Ajastin",
@@ -3642,6 +3679,8 @@
     "warmingUpButton": "Huone valmistautuu...",
     "nameLabel": "Nimesi",
     "nameHelp": "Muut osallistujat näkevät tämän",
+    "nameRequiredToEnter": "Anna nimesi päästäksesi sisään (vähintään 2 merkkiä).",
+    "roomOpenNameMissing": "Sali on auki: anna nimesi päästäksesi sisään.",
     "joinNowBtn": "Liity nyt",
     "roomOpen": "Sali on auki",
     "whileYouWait": "Odottaessasi",

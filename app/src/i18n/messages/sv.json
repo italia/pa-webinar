@@ -139,7 +139,9 @@
     "status": {
       "DRAFT": "Utkast",
       "PUBLISHED": "Publicerat",
+      "PROVISIONING": "Förbereds",
       "LIVE": "Pågår",
+      "IDLE": "Pausad",
       "ENDED": "Avslutat",
       "ARCHIVED": "Arkiverat"
     },
@@ -288,6 +290,9 @@
     "jibriNotConfigured": "Inspelning ej konfigurerad i infrastrukturen",
     "jibriScaling": "Inspelning startar…",
     "jibriScalingTooltip": "Inspelningskomponenten startar. Den blir tillgänglig inom kort.",
+    "recorderNotStarted": "Inspelning inte tillgänglig",
+    "recorderNotStartedDetail": "Inspelningstjänsten har inte startat än: tills vidare fortsätter evenemanget utan inspelning. Meddela plattformens administratörer.",
+    "recorderStartFailed": "Inspelningen startade inte. Försök igen om några minuter; om problemet kvarstår, meddela plattformens administratörer.",
     "roomPreparing": "Rummet förbereds…",
     "roomPreparingDetail": "Videoservrarna startar. Detta tar cirka 2 minuter. Rummet aktiveras automatiskt.",
     "recordingPromptTitle": "Starta inspelningen?",
@@ -483,6 +488,7 @@
       "textRequired": "Skriv din fråga",
       "tooLong": "Frågan får inte överstiga 500 tecken",
       "rateLimit": "Vänta innan du skickar en ny fråga",
+      "busy": "Just nu kommer många frågor från ditt nätverk: försök igen om några sekunder",
       "generic": "Fel vid sändning av fråga"
     },
     "ctaTitle": "Ställ den första frågan",
@@ -703,7 +709,7 @@
         "speakerEmail": "E-post",
         "speakerRequired": "Namn och e-post är obligatoriska.",
         "invitationsHeading": "Inbjudningar",
-        "invitationsHelp": "Förregistrerade personer — får en personlig anslutningslänk.",
+        "invitationsHelp": "Lista över inbjudna personer. Plattformen skickar inga inbjudningar: dela länken till evenemanget själv. När offentlig registrering är avstängd kan bara dessa adresser registrera sig, och den personliga länken för att delta kommer via e-post efter registreringen.",
         "invitationName": "Namn (valfritt)",
         "invitationEmail": "E-post",
         "invitationRole": "Roll",
@@ -1317,6 +1323,8 @@
       "publicPageHint": "Sidan att dela för att samla nya anmälningar.",
       "guestJoin": "Direktinbjudan (utan anmälan)",
       "guestJoinHint": "Snabb länk för att bjuda in en deltagare i sista minuten: ansluter som gäst medan evenemanget är live, utan att fylla i anmälningsformuläret.",
+      "callInvite": "Länk för deltagare",
+      "callInviteHint": "Den som får den ansluter till samtalet som gäst, utan anmälan. Ett snabbsamtal har ingen offentlig sida: det här är länken att dela.",
       "moderatorLink": "Moderatorlänk",
       "moderatorLinkHint": "Dela enbart denna länk med moderatorer. Alla med denna länk kan hantera evenemanget.",
       "liveRoomHint": "Direktlänk för att gå direkt in i rummet som moderator.",
@@ -1443,7 +1451,7 @@
         "jobMaxAttempts": "Försök före misslyckande",
         "jobMaxAttemptsHelp": "Hur många gånger pipelinen gör om ett jobb innan det markeras som misslyckat. Väntetiden mellan försöken växer exponentiellt (från 30 sekunder upp till 2 timmar). Typiskt värde är 5.",
         "artifactRetentionDays": "Lagring av artefakter (dagar)",
-        "artifactRetentionDaysHelp": "Lämnat på 0 följer AI-artefakterna evenemangets egen lagringstid. Ett värde större än noll behåller dem i angivet antal dagar även efter att evenemanget är stängt, tills ett dagligt cron-jobb raderar dem. Raderingen omfattar talarnas namn och jobbens payload, i linje med docs/GDPR.md.",
+        "artifactRetentionDaysHelp": "Vid 0 finns ingen gräns för hela webbplatsen: AI-artefakterna följer lagringstiden för sin inspelning eller sitt evenemang. Ett värde större än noll får ett dagligt jobb att radera varje artefakt som skapades för mer än så många dagar sedan, publicerad eller inte: det kan förkorta lagringen men aldrig förlänga den. Talarnas namn och jobbens payload omfattas inte: de följer inspelningens eller evenemangets lagringstid. Detaljer i docs/privacy/recordings-and-ai.md.",
         "consentDisclosureSection": "AI-information i väntrummet",
         "consentDisclosureHelp": "Text som visas för deltagarna i väntrummet när evenemanget använder AI-efterproduktion (transkription, sammanfattning, översättning, dubbning). Kan anpassas per språk. Lämna tomt för att använda systemets standardtext.",
         "consentDisclosurePlaceholder": "T.ex. Det här evenemanget kommer att transkriberas och sammanfattas automatiskt med AI-verktyg efter direktsändningen…"
@@ -1642,7 +1650,7 @@
         "jvbStressCriticalPercent": "Tröskel stress critical (%)",
         "jvbStressCriticalPercentHelp": "Över denna tröskel lägger skalern till 2 extra JVB-repliker. Standard 70. Måste vara högre än warn.",
         "jvbProvisioningTimeoutMinutes": "Provisioning-timeout (minuter)",
-        "jvbProvisioningTimeoutMinutesHelp": "Efter hur många minuter från startsAt ett evenemang utan JVB redo flaggas som 'degraded' på statussidan. Standard 15. Täcker nodens cold-start (~3–5 min) plus säkerhetsmarginal.",
+        "jvbProvisioningTimeoutMinutesHelp": "Efter hur många minuter från startsAt ett evenemang utan JVB redo flaggas som 'degraded' på statussidan. Standard 15. Täcker nodens cold-start (~3–5 min) plus säkerhetsmarginal. Gäller även inspelningstjänsten, räknat från när ett evenemang med inspelning begär den: utan svar inom denna tid slutar live-rummet visa den som ”startar” och anger den som inte startad.",
         "statusPollIntervalSeconds": "Pollningsintervall för statussida (sekunder)",
         "statusPollIntervalSecondsHelp": "Hur ofta /status-sidan uppdateras från webbläsaren. Standard 30. Lägre värden = färskare data men mer belastning på appen.",
         "emailSenderTitle": "Avsändare för e-post",
@@ -2187,7 +2195,12 @@
     },
     "eventDetail": {
       "copyPublicUrl": "Kopiera publik länk",
-      "enterAsModerator": "Gå in live",
+      "copyInviteUrl": "Kopiera inbjudningslänk",
+      "enterAsParticipant": "Gå in som deltagare",
+      "openAsParticipant": "Öppna som deltagare",
+      "participantHintRoom": "Öppnas i en ny flik: rummet som en gäst ser det, utan moderatorbehörighet.",
+      "participantHintPassword": "Öppnas i en ny flik: rummet som en gäst ser det, efter evenemangets lösenord.",
+      "participantHintPage": "Öppnas i en ny flik: den offentliga sidan som deltagarna ser den.",
       "editEvent": "Redigera evenemang",
       "editSettings": "Redigera inställningar",
       "featureSummary": "Aktiva funktioner",
@@ -2788,9 +2801,27 @@
     "add": "Lägg till",
     "adding": "Lägger till...",
     "cancel": "Avbryt",
+    "modeLabel": "Typ av material",
+    "modeLink": "Länk",
+    "modeFile": "Fil",
+    "titleOptional": "Titel (valfri, annars filnamnet)",
+    "fileLabel": "Fil att ladda upp",
+    "fileHelp": "Format som stöds: PDF, DOCX, PPTX, XLSX, TXT — max {maxMb} MB",
+    "upload": "Ladda upp",
+    "uploading": "Laddar upp…",
     "errors": {
       "urlInvalid": "Ange en giltig URL",
-      "generic": "Fel vid tillägg av material"
+      "generic": "Fel vid tillägg av material",
+      "fileMissing": "Välj en fil att ladda upp",
+      "titleMissing": "Ange en titel för länken",
+      "fileTooLarge": "Filen överskrider gränsen på {maxMb} MB",
+      "fileTooLargeForServer": "Servern tar inte emot en så stor fil: försök med en mindre fil",
+      "fileType": "Filtypen stöds inte (PDF, DOCX, PPTX, XLSX, TXT)",
+      "uploadUnavailable": "Filuppladdning är inte tillgänglig i den här installationen",
+      "uploadFailed": "Fel vid uppladdning av filen",
+      "quotaExceeded": "Det här evenemanget har nått gränsen för uppladdade filer ({maxFiles} filer, {maxMb} MB totalt): ta bort några för att ladda upp fler",
+      "uploadBusy": "För många uppladdningar just nu: försök igen om några sekunder",
+      "deleteFailed": "Materialet kunde inte tas bort"
     }
   },
   "reminders": {
@@ -3343,7 +3374,13 @@
     "noActiveRound": "Ingen aktiv word cloud just nu.",
     "noWords": "Väntar på de första orden...",
     "wordsSubmitted": "{count} ord inskickade",
-    "timeRemaining": "Tid kvar"
+    "timeRemaining": "Tid kvar",
+    "errors": {
+      "send": "Ordet skickades inte. Försök igen.",
+      "closed": "Omgången är stängd: inga fler ord tas emot.",
+      "limit": "Du har redan skickat det högsta antalet ord för den här omgången.",
+      "rateLimited": "För många inskick just nu: vänta några sekunder innan du försöker igen."
+    }
   },
   "timer": {
     "title": "Timer",
@@ -3642,6 +3679,8 @@
     "warmingUpButton": "Rummet förbereds...",
     "nameLabel": "Ditt namn",
     "nameHelp": "Visas för andra deltagare",
+    "nameRequiredToEnter": "Ange ditt namn för att komma in (minst 2 tecken).",
+    "roomOpenNameMissing": "Rummet är öppet: ange ditt namn för att komma in.",
     "joinNowBtn": "Anslut nu",
     "roomOpen": "Rummet är öppet",
     "whileYouWait": "Medan du väntar",

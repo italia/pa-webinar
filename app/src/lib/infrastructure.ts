@@ -1,3 +1,57 @@
+import { resolveProviderType } from '@/lib/storage/provider-type';
+
+/**
+ * Lo storage delle registrazioni e' configurato, con la stessa regola della
+ * factory che poi ci scrive (lib/storage/provider-type): il tipo esplicito
+ * oppure le credenziali del fornitore. Guardare solo RECORDING_STORAGE_TYPE
+ * dichiarava «non configurato» un'installazione che si affida al rilevamento
+ * automatico, e la sala mostrava la registrazione come mai disponibile.
+ */
+export function recordingStorageConfigured(
+  env: Record<string, string | undefined> = process.env,
+): boolean {
+  return resolveProviderType('recordings', env) !== null;
+}
+
+/**
+ * Se questa installazione si aspetta Jibri: se la sala e le pagine di stato,
+ * quando la sua API di salute non risponde, devono dire «in avvio» e poi «non
+ * partito» invece di «non configurato». Vale quando lo storage delle
+ * registrazioni è dichiarato con RECORDING_STORAGE_TYPE (e la factory lo
+ * risolve): è l'impostazione che accompagna Jibri.
+ *
+ * Le sole credenziali dello storage non bastano: servono anche al registratore
+ * per partecipante e alle pubblicazioni manuali, su installazioni che Jibri non
+ * lo hanno. Né basta JIBRI_HEALTH_URL, che il chart imposta a ogni
+ * installazione con Jitsi, anche a Jibri spento. Contarle farebbe segnalare, a
+ * ogni evento con la registrazione accesa, un registratore degradato e poi
+ * «non partito» dove non ce n'è nessuno.
+ */
+export function jibriRecordingExpected(
+  env: Record<string, string | undefined> = process.env,
+): boolean {
+  const dichiarato = env.RECORDING_STORAGE_TYPE;
+  return !!dichiarato && dichiarato !== 'local' && recordingStorageConfigured(env);
+}
+
+/**
+ * Il nome dello storage delle registrazioni da mostrare accanto a
+ * `recordingStorageConfigured()`, con la stessa regola: il valore di
+ * RECORDING_STORAGE_TYPE quando e' uno di quelli che la factory riconosce
+ * (dice di piu': minio, gcs), altrimenti il fornitore rilevato dalle
+ * credenziali, altrimenti il valore grezzo o `not-configured`.
+ */
+export function recordingStorageLabel(
+  env: Record<string, string | undefined> = process.env,
+): string {
+  const dichiarato = env.RECORDING_STORAGE_TYPE || '';
+  const rilevato = resolveProviderType('recordings', env);
+  if (!rilevato) return dichiarato || 'not-configured';
+  const riconosciuto =
+    resolveProviderType('recordings', { RECORDING_STORAGE_TYPE: dichiarato }) !== null;
+  return riconosciuto ? dichiarato : rilevato;
+}
+
 let jibriAvailable: boolean | null = null;
 let jibriCheckExpiry = 0;
 
@@ -6,8 +60,7 @@ export async function isJibriAvailable(): Promise<boolean> {
     return jibriAvailable;
   }
 
-  const storageType = process.env.RECORDING_STORAGE_TYPE;
-  jibriAvailable = !!storageType && storageType !== 'local';
+  jibriAvailable = jibriRecordingExpected();
   jibriCheckExpiry = Date.now() + 300_000;
 
   return jibriAvailable;
@@ -109,7 +162,7 @@ export async function getInfrastructureInfo(): Promise<InfrastructureInfo> {
   }
 
   const smtpHost = process.env.SMTP_HOST || '';
-  const storageType = process.env.RECORDING_STORAGE_TYPE || 'not-configured';
+  const storageType = recordingStorageLabel();
 
   return {
     deployment: {
@@ -136,7 +189,7 @@ export async function getInfrastructureInfo(): Promise<InfrastructureInfo> {
     jibri: {
       available: await isJibriAvailable(),
       storageType,
-      storageConfigured: storageType !== 'not-configured' && storageType !== 'local',
+      storageConfigured: jibriRecordingExpected(),
     },
     email: {
       provider: inferEmailProvider(smtpHost),

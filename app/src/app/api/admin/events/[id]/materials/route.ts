@@ -16,6 +16,8 @@ import { requireEventManager } from '@/lib/auth/staff-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { prisma } from '@/lib/db';
 import { AppError, NotFoundError, ValidationError } from '@/lib/errors';
+import { materialBlobClaimProblem, materialBlobPathProblem } from '@/lib/events/material-files';
+import { pokeLivePanel } from '@/lib/live-state/publish';
 import { createMaterialAdminSchema } from '@/lib/validation/materials';
 
 export const dynamic = 'force-dynamic';
@@ -109,6 +111,21 @@ export const POST = withErrorHandling(async (request, context) => {
     );
   }
 
+  // Il file di un materiale si cancella con il materiale: lo tiene solo un
+  // FILE, la chiave deve essere quella di un documento caricato, il file che
+  // l'URL serve, e un file che nessun altro usa già (lib/events/material-files),
+  // non un blob qualunque dello storage.
+  if (parsed.data.blobPath) {
+    const problem =
+      parsed.data.type !== 'FILE'
+        ? 'Only a FILE material holds an uploaded file'
+        : (materialBlobPathProblem(parsed.data.blobPath, parsed.data.url) ??
+          (await materialBlobClaimProblem(parsed.data.blobPath)));
+    if (problem) {
+      throw new ValidationError('Validation failed', [{ path: ['blobPath'], message: problem }]);
+    }
+  }
+
   const material = await prisma.eventMaterial.create({
     data: {
       eventId: id,
@@ -131,6 +148,9 @@ export const POST = withErrorHandling(async (request, context) => {
     target: material.id,
     details: { eventId: id, type: material.type },
   });
+
+  // Se la sala è aperta, il pannello «Materiali» rilegge subito.
+  pokeLivePanel(id, 'materials');
 
   return Response.json(serializeMaterial(material), { status: 201 });
 });

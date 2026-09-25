@@ -33,9 +33,11 @@ export const CLEANABLE_EVENT_STATUSES = ['ENDED', 'ARCHIVED'] as const;
 
 /**
  * Vita della registrazione temporanea non pubblicata: 24 ore
- * (`docs/GDPR.md` → "Flusso registrazione", punto 1). È il video grezzo di
- * Jibri che serve solo ai ritardatari per il catch-up; nessuno lo ha
- * pubblicato, quindi scaduta la finestra non ha più alcuna base per esistere.
+ * (`docs/GDPR.md` → "The daily GDPR cleanup", fase 1). È un video grezzo che
+ * la sala d'attesa offre ai ritardatari per il catch-up; nessun flusso
+ * integrato lo crea (arriva solo dall'API di modifica dell'evento) e nessuno
+ * lo ha pubblicato, quindi scaduta la finestra non ha più alcuna base per
+ * esistere.
  */
 export const TEMP_RECORDING_TTL_MS = 24 * 60 * 60 * 1000;
 

@@ -1,6 +1,8 @@
 import { withErrorHandling } from '@/lib/api-handler';
 import { prisma } from '@/lib/db';
 import { getPublicEnv } from '@/lib/env';
+import { jibriRecordingExpected } from '@/lib/infrastructure';
+import { recorderWaitingSince } from '@/lib/jitsi/recorder-wait';
 import { readJvbSnapshot } from '@/lib/jvb-snapshot';
 import { jvbsForEvent, jvbMaxReplicasFromEnv, JVB_BILLABLE_STATUSES } from '@/lib/jvb-sizing';
 import { getSettings } from '@/lib/settings';
@@ -8,6 +10,18 @@ import { statusDataVisible } from '@/lib/status-page';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 
 export const dynamic = 'force-dynamic';
+
+/**
+ * Stato del registratore letto dalla sala live (lib/jitsi/bridge-readiness):
+ *   - `ready`       l'API di salute risponde;
+ *   - `scaling`     serve e si sta accendendo;
+ *   - `failed`      serve, ma non si e' acceso entro il tempo massimo di
+ *                   allestimento: la sala smette di dire «in avvio»;
+ *   - `standby`     spento perche' nessun evento lo chiede;
+ *   - `unavailable` Jibri non previsto: storage delle registrazioni non
+ *                   dichiarato (lib/infrastructure#jibriRecordingExpected).
+ */
+type JibriStatus = 'ready' | 'scaling' | 'failed' | 'standby' | 'unavailable';
 
 interface ComponentStatus {
   name: string;
@@ -37,7 +51,7 @@ interface SystemStatus {
     jvbOctoConferences: number | null;
     jvbOctoEndpoints: number | null;
     jvbOctoSendBitrateBps: number | null;
-    jibriStatus: 'ready' | 'scaling' | 'standby' | 'unavailable';
+    jibriStatus: JibriStatus;
     jibriRunningReplicas: number;
     jibriStale: boolean;
     // Orphan recordings awaiting operator decision or auto-cleanup.
@@ -366,15 +380,21 @@ async function getJvbStatus(
   }
 }
 
-async function getJibriStatus(recordingNeeded: boolean, recordingStale: boolean): Promise<{
+async function getJibriStatus(
+  /** Eventi in diretta o in allestimento con la registrazione attiva. */
+  recordingEventIds: readonly string[],
+  recordingStale: boolean,
+  startTimeoutMinutes: number,
+  now: Date,
+): Promise<{
   component: ComponentStatus;
   running: number;
-  jibriStatus: 'ready' | 'scaling' | 'standby' | 'unavailable';
+  jibriStatus: JibriStatus;
 }> {
-  const storageType = process.env.RECORDING_STORAGE_TYPE;
-  const storageConfigured = !!storageType && storageType !== 'local';
-
-  if (!storageConfigured) {
+  // Solo un'installazione che dichiara lo storage di Jibri se lo aspetta
+  // (lib/infrastructure#jibriRecordingExpected): altrove un'API di salute che
+  // non risponde non è un registratore in avvio, è un registratore che non c'è.
+  if (!jibriRecordingExpected()) {
     return {
       component: { name: 'jibri', status: 'standby', details: 'Not configured' },
       running: 0,
@@ -382,6 +402,7 @@ async function getJibriStatus(recordingNeeded: boolean, recordingStale: boolean)
     };
   }
 
+  const recordingNeeded = recordingEventIds.length > 0;
   let running = 0;
   let busyStatus: string | null = null;
 
@@ -411,6 +432,17 @@ async function getJibriStatus(recordingNeeded: boolean, recordingStale: boolean)
     };
   }
 
+  // Orologio condiviso dell'attesa (lib/jitsi/recorder-wait): parte quando un
+  // evento chiede il registratore e non c'e', si azzera quando risponde o non
+  // serve piu'; un evento nuovo non eredita l'attesa di uno gia' concluso.
+  // Senza, un registratore che non arriva mai resterebbe «in avvio» per tutto
+  // l'evento.
+  const waitingSince = await recorderWaitingSince(
+    recordingEventIds,
+    running === 0,
+    now.getTime(),
+  );
+
   // If no live/provisioning event asks for recording, Jibri is allowed to
   // be scaled to zero. Report "standby" instead of "degraded" so the page's
   // overall status stays green while the cluster is idle.
@@ -426,17 +458,22 @@ async function getJibriStatus(recordingNeeded: boolean, recordingStale: boolean)
     };
   }
 
-  const jibriStatus: 'ready' | 'scaling' | 'standby' | 'unavailable' =
-    running > 0 ? 'ready' : 'scaling';
+  const waitedMs = waitingSince === null ? 0 : now.getTime() - waitingSince;
+  const startTimedOut = running === 0 && waitedMs >= startTimeoutMinutes * 60_000;
+
+  const jibriStatus: JibriStatus =
+    running > 0 ? 'ready' : startTimedOut ? 'failed' : 'scaling';
 
   // If the event requesting recording has been waiting past the
   // provisioning timeout, flag Jibri as degraded with a stale-specific
   // message instead of the generic "scaling up".
   const details = running > 0
     ? `${running} instance(s) ready${busyStatus ? ` (${busyStatus})` : ''}`
-    : recordingStale
-      ? 'Stale: event with recording waiting Jibri past timeout'
-      : 'No instances running — scaling up';
+    : startTimedOut
+      ? `Not started: requested ${Math.round(waitedMs / 60_000)} min ago, health API not answering`
+      : recordingStale
+        ? 'Stale: event with recording waiting Jibri past timeout'
+        : 'No instances running — scaling up';
 
   return {
     component: {
@@ -466,7 +503,7 @@ export const GET = withErrorHandling(async () => {
     },
     select: { id: true, startsAt: true, provisioningStartedAt: true },
   });
-  const recordingNeeded = recordingEvents.length > 0;
+  const recordingEventIds = recordingEvents.map((e) => e.id);
   const recordingStale = recordingEvents.some((e) => {
     const since = e.provisioningStartedAt ?? e.startsAt;
     return since <= staleCutoff;
@@ -486,7 +523,7 @@ export const GET = withErrorHandling(async () => {
   if (!(await statusDataVisible())) {
     const [jvbSala, jibriSala] = await Promise.all([
       getJvbStatus(preScaleMinutes, provisioningTimeoutMinutes, jvbSizing),
-      getJibriStatus(recordingNeeded, recordingStale),
+      getJibriStatus(recordingEventIds, recordingStale, provisioningTimeoutMinutes, now),
     ]);
     return Response.json(
       {
@@ -508,7 +545,7 @@ export const GET = withErrorHandling(async () => {
     checkSmtp(),
     checkRedis(),
     getJvbStatus(preScaleMinutes, provisioningTimeoutMinutes, jvbSizing),
-    getJibriStatus(recordingNeeded, recordingStale),
+    getJibriStatus(recordingEventIds, recordingStale, provisioningTimeoutMinutes, now),
     prisma.orphanRecording.count({ where: { decision: 'pending' } }).catch(() => 0),
   ]);
 
@@ -583,7 +620,8 @@ export const GET = withErrorHandling(async () => {
       jvbOctoSendBitrateBps: jvb.octoSendBitrateBps,
       jibriStatus: jibriResult.jibriStatus,
       jibriRunningReplicas: jibriResult.running,
-      jibriStale: recordingStale && jibriResult.running === 0,
+      jibriStale:
+        (recordingStale || jibriResult.jibriStatus === 'failed') && jibriResult.running === 0,
       orphanRecordingsPending: orphanRecordingsPendingCount,
     },
     upcomingEvents: upcomingEvents.map((e) => ({

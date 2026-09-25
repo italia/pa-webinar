@@ -27,7 +27,7 @@ export function getPostprodStorage(): StorageProvider {
     throw new Error(
       'Postprod storage requires the recordings domain to be configured ' +
         '(RECORDING_STORAGE_TYPE + RECORDING_{AZURE,S3}_* env). See ' +
-        'docs/POSTPROD.md.',
+        'docs/configuration/storage.md.',
     );
   }
   return provider;

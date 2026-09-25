@@ -114,6 +114,10 @@ export default async function EventManagePage({
     participantsCanStartVideo: event.participantsCanStartVideo,
     participantsCanShareScreen: event.participantsCanShareScreen,
     status: event.status,
+    eventType: event.eventType,
+    // Solo se c'e', mai l'hash: serve a dire a chi organizza che la sala
+    // chiedera' la password a chi entra da ospite.
+    hasJoinPassword: event.joinPasswordHash !== null,
     coverImageUrl: event.coverImageUrl,
     imageUrl: event.imageUrl,
     parseTitleKicker: event.parseTitleKicker,
@@ -224,6 +228,10 @@ export default async function EventManagePage({
         locale={locale}
         kickerEnabled={effectiveKicker}
         guestEntryOpen={guestAccessAllowed(event, settings.guestAccessEnabled)}
+        // L'istante di questo rendering: le finestre a tempo della pagina
+        // pubblica si valutano su questo finche' il browser non ha il suo
+        // orologio, cosi' la prima passata del client coincide col server.
+        renderedAt={Date.now()}
       />
     </div>
   );

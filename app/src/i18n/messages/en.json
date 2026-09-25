@@ -139,7 +139,9 @@
     "status": {
       "DRAFT": "Draft",
       "PUBLISHED": "Published",
+      "PROVISIONING": "Setting up",
       "LIVE": "Live",
+      "IDLE": "Paused",
       "ENDED": "Ended",
       "ARCHIVED": "Archived"
     },
@@ -288,6 +290,9 @@
     "jibriNotConfigured": "Recording not configured in infrastructure",
     "jibriScaling": "Recording starting…",
     "jibriScalingTooltip": "The recording component is starting up. It will be available shortly.",
+    "recorderNotStarted": "Recording unavailable",
+    "recorderNotStartedDetail": "The recording service has not started yet: for now the event continues without recording. Let the platform administrators know.",
+    "recorderStartFailed": "The recording did not start. Try again in a few minutes; if the problem persists, let the platform administrators know.",
     "roomPreparing": "Setting up the room…",
     "roomPreparingDetail": "Video servers are starting up. This takes about 2 minutes. The room will activate automatically.",
     "recordingPromptTitle": "Start recording?",
@@ -483,6 +488,7 @@
       "textRequired": "Please write your question",
       "tooLong": "Question cannot exceed 500 characters",
       "rateLimit": "Please wait before submitting another question",
+      "busy": "Many questions are arriving from your network right now: please try again in a few seconds",
       "generic": "Error submitting question"
     },
     "ctaTitle": "Ask the first question",
@@ -703,7 +709,7 @@
         "speakerEmail": "Email",
         "speakerRequired": "Name and email are required.",
         "invitationsHeading": "Invitations",
-        "invitationsHelp": "Pre-registered attendees — each gets a personal join link.",
+        "invitationsHelp": "List of invited people. The platform does not send invitations: share the event link with them yourself. With public registration off, only these addresses can register, and the personal link to enter arrives by email after registering.",
         "invitationName": "Name (optional)",
         "invitationEmail": "Email",
         "invitationRole": "Role",
@@ -1317,6 +1323,8 @@
       "publicPageHint": "Share this URL to collect new registrations.",
       "guestJoin": "Direct invite (no registration)",
       "guestJoinHint": "Quick link to invite a last-minute attendee: they join as a guest while the event is live, without filling in the registration form.",
+      "callInvite": "Participant link",
+      "callInviteHint": "Whoever receives it joins the call as a guest, without registering. An instant call has no public page: this is the link to share.",
       "moderatorLink": "Moderator link",
       "moderatorLinkHint": "Share this link only with moderators. Anyone with this link can manage the event.",
       "liveRoomHint": "Direct link to enter the live room as moderator.",
@@ -1443,7 +1451,7 @@
         "jobMaxAttempts": "Attempts before failure",
         "jobMaxAttemptsHelp": "How many times the pipeline retries a job before marking it as failed. Backoff between attempts grows exponentially (from 30 seconds up to 2 hours). The typical value is 5.",
         "artifactRetentionDays": "Artifact retention (days)",
-        "artifactRetentionDaysHelp": "Left at 0, AI artifacts follow the event's own retention schedule. A positive value keeps them for the given number of days even after the event is closed, until a daily cron deletes them. Deletion includes speaker names and job payloads, consistent with docs/GDPR.md.",
+        "artifactRetentionDaysHelp": "At 0 there is no site-wide limit: AI artifacts follow the retention of their recording or event. A value greater than zero makes a daily job delete every artifact created more than that many days ago, published or not, so it can shorten retention but never extend it. Speaker names and job payloads are not covered: they follow the recording or event retention. Details in docs/privacy/recordings-and-ai.md.",
         "consentDisclosureSection": "AI notice in the waiting room",
         "consentDisclosureHelp": "Text shown to participants in the waiting room when the event uses AI post-production (transcription, summary, translation, dubbing). Customisable per language. Leave empty to use the built-in default text.",
         "consentDisclosurePlaceholder": "E.g. This event will be automatically transcribed and summarised with AI tools after the live session…"
@@ -1642,7 +1650,7 @@
         "jvbStressCriticalPercent": "Stress critical threshold (%)",
         "jvbStressCriticalPercentHelp": "Above this threshold the scaler adds 2 extra JVB replicas. Default 70. Must be higher than warn.",
         "jvbProvisioningTimeoutMinutes": "Provisioning timeout (minutes)",
-        "jvbProvisioningTimeoutMinutesHelp": "After how many minutes since startsAt an event without JVB ready is flagged as 'degraded' on the status page. Default 15. Covers node cold-start (~3-5 min) plus safety margin.",
+        "jvbProvisioningTimeoutMinutesHelp": "After how many minutes since startsAt an event without JVB ready is flagged as 'degraded' on the status page. Default 15. Covers node cold-start (~3-5 min) plus safety margin. Also applies to the recording service, counted from when an event with recording requests it: after this time without an answer, the live room stops showing it as starting and reports it as not started.",
         "statusPollIntervalSeconds": "Status page poll interval (seconds)",
         "statusPollIntervalSecondsHelp": "How often the /status page refreshes from the browser. Default 30. Lower values = fresher data but more load on the app.",
         "emailSenderTitle": "Email sender",
@@ -2187,7 +2195,12 @@
     },
     "eventDetail": {
       "copyPublicUrl": "Copy public link",
-      "enterAsModerator": "Enter live",
+      "copyInviteUrl": "Copy invite link",
+      "enterAsParticipant": "Join as participant",
+      "openAsParticipant": "Open as participant",
+      "participantHintRoom": "Opens in a new tab: the room as a guest sees it, without moderator powers.",
+      "participantHintPassword": "Opens in a new tab: the room as a guest sees it, after the event password.",
+      "participantHintPage": "Opens in a new tab: the public page as participants see it.",
       "editEvent": "Edit event",
       "editSettings": "Edit settings",
       "featureSummary": "Active features",
@@ -2788,9 +2801,27 @@
     "add": "Add",
     "adding": "Adding...",
     "cancel": "Cancel",
+    "modeLabel": "Material type",
+    "modeLink": "Link",
+    "modeFile": "File",
+    "titleOptional": "Title (optional: defaults to the file name)",
+    "fileLabel": "File to upload",
+    "fileHelp": "Supported formats: PDF, DOCX, PPTX, XLSX, TXT — max {maxMb} MB",
+    "upload": "Upload",
+    "uploading": "Uploading…",
     "errors": {
       "urlInvalid": "Please enter a valid URL",
-      "generic": "Error adding material"
+      "generic": "Error adding material",
+      "fileMissing": "Choose a file to upload",
+      "titleMissing": "Enter a title for the link",
+      "fileTooLarge": "The file exceeds the {maxMb} MB limit",
+      "fileTooLargeForServer": "The server does not accept a file this large: try a smaller file",
+      "fileType": "Unsupported file type (PDF, DOCX, PPTX, XLSX, TXT)",
+      "uploadUnavailable": "File upload is not available on this installation",
+      "uploadFailed": "Error while uploading the file",
+      "quotaExceeded": "This event has reached its upload limit ({maxFiles} files, {maxMb} MB in total): remove some files to upload more",
+      "uploadBusy": "Too many uploads at the moment: try again in a few seconds",
+      "deleteFailed": "Could not delete the material"
     }
   },
   "reminders": {
@@ -3343,7 +3374,13 @@
     "noActiveRound": "No word cloud active at the moment.",
     "noWords": "Waiting for the first words...",
     "wordsSubmitted": "{count} words submitted",
-    "timeRemaining": "Time remaining"
+    "timeRemaining": "Time remaining",
+    "errors": {
+      "send": "Word not sent. Please try again.",
+      "closed": "This round is closed: no more words are accepted.",
+      "limit": "You have already sent the maximum number of words for this round.",
+      "rateLimited": "Too many submissions right now: wait a few seconds before trying again."
+    }
   },
   "timer": {
     "title": "Timer",
@@ -3642,6 +3679,8 @@
     "warmingUpButton": "Room warming up...",
     "nameLabel": "Your name",
     "nameHelp": "Other participants will see this",
+    "nameRequiredToEnter": "To enter, type your name (at least 2 characters).",
+    "roomOpenNameMissing": "The room is open: type your name to enter.",
     "joinNowBtn": "Enter now",
     "roomOpen": "The room is open",
     "whileYouWait": "While you wait",

@@ -139,7 +139,9 @@
     "status": {
       "DRAFT": "Melnraksts",
       "PUBLISHED": "Publicēts",
+      "PROVISIONING": "Iestatīšanā",
       "LIVE": "Notiek",
+      "IDLE": "Pauzē",
       "ENDED": "Beidzies",
       "ARCHIVED": "Arhivēts"
     },
@@ -288,6 +290,9 @@
     "jibriNotConfigured": "Ierakstīšana nav konfigurēta infrastruktūrā",
     "jibriScaling": "Ieraksts tiek startēts…",
     "jibriScalingTooltip": "Ierakstīšanas komponente tiek startēta. Tā būs pieejama drīzumā.",
+    "recorderNotStarted": "Ierakstīšana nav pieejama",
+    "recorderNotStartedDetail": "Ierakstīšanas pakalpojums vēl nav palaists: pagaidām pasākums turpinās bez ieraksta. Informējiet platformas administratorus.",
+    "recorderStartFailed": "Ierakstīšana netika sākta. Mēģiniet vēlreiz pēc dažām minūtēm; ja problēma saglabājas, informējiet platformas administratorus.",
     "roomPreparing": "Telpa tiek sagatavota…",
     "roomPreparingDetail": "Video serveri tiek startēti. Tas aizņem aptuveni 2 minūtes. Telpa aktivizēsies automātiski.",
     "recordingPromptTitle": "Sākt ierakstīšanu?",
@@ -483,6 +488,7 @@
       "textRequired": "Uzrakstiet savu jautājumu",
       "tooLong": "Jautājums nedrīkst pārsniegt 500 rakstzīmes",
       "rateLimit": "Lūdzu, uzgaidiet pirms nākamā jautājuma iesniegšanas",
+      "busy": "No jūsu tīkla pašlaik pienāk daudz jautājumu: lūdzu, mēģiniet vēlreiz pēc dažām sekundēm",
       "generic": "Kļūda, iesniedzot jautājumu"
     },
     "ctaTitle": "Uzdodiet pirmo jautājumu",
@@ -703,7 +709,7 @@
         "speakerEmail": "E-pasts",
         "speakerRequired": "Vārds un e-pasts ir obligāti.",
         "invitationsHeading": "Ielūgumi",
-        "invitationsHelp": "Iepriekš reģistrētie dalībnieki — saņems personīgu pievienošanās saiti.",
+        "invitationsHelp": "Uzaicināto personu saraksts. Platforma uzaicinājumus nesūta: pasākuma saiti kopīgojiet paši. Ja publiskā reģistrācija ir izslēgta, reģistrēties var tikai šīs adreses, un personīgā pievienošanās saite pēc reģistrācijas pienāk pa e-pastu.",
         "invitationName": "Vārds (neobligāts)",
         "invitationEmail": "E-pasts",
         "invitationRole": "Loma",
@@ -1317,6 +1323,8 @@
       "publicPageHint": "Lapa, kas jākoplieto, lai apkopotu jaunas reģistrācijas.",
       "guestJoin": "Tieša ielūguma saite (bez reģistrācijas)",
       "guestJoinHint": "Ātrā saite, lai pēdējā brīdī uzaicinātu dalībnieku: tas pievienojas kā viesis, kamēr pasākums ir tiešsaistē, neaizpildot reģistrācijas formu.",
+      "callInvite": "Saite dalībniekiem",
+      "callInviteHint": "Saņēmējs pievienojas zvanam kā viesis, bez reģistrācijas. Ātrajam zvanam nav publiskas lapas: šī ir kopīgojamā saite.",
       "moderatorLink": "Moderatora saite",
       "moderatorLinkHint": "Kopīgojiet šo saiti tikai ar moderatoriem. Ikviens ar šo saiti var pārvaldīt pasākumu.",
       "liveRoomHint": "Tieša saite, lai ieietu telpā kā moderators.",
@@ -1443,7 +1451,7 @@
         "jobMaxAttempts": "Mēģinājumi pirms atteices",
         "jobMaxAttemptsHelp": "Cik reižu konveijers atkārto darbu, pirms atzīmē to kā neizdevušos. Gaidīšanas laiks starp mēģinājumiem pieaug eksponenciāli (no 30 sekundēm līdz 2 stundām). Tipiskā vērtība ir 5.",
         "artifactRetentionDays": "Artefaktu glabāšana (dienas)",
-        "artifactRetentionDaysHelp": "Ja atstāta vērtība 0, MI artefaktiem ir tāds pats termiņš kā pašam pasākumam. Vērtība, kas lielāka par nulli, saglabā tos norādīto dienu skaitu arī pēc pasākuma slēgšanas, līdz tos izdzēš ikdienas cron uzdevums. Dzēšana ietver runātāju vārdus un darbu datus atbilstoši docs/GDPR.md.",
+        "artifactRetentionDaysHelp": "Ar vērtību 0 visai vietnei nav ierobežojuma: MI artefaktiem ir sava ieraksta vai pasākuma glabāšanas termiņš. Vērtība, kas lielāka par nulli, liek ikdienas uzdevumam dzēst katru artefaktu, kas izveidots pirms vairāk nekā šī dienu skaita, publicētu vai nē: tā var saīsināt glabāšanu, bet nekad to nepagarina. Runātāju vārdi un darbu dati uz to neattiecas: tiem ir ieraksta vai pasākuma glabāšanas termiņš. Sīkāk: docs/privacy/recordings-and-ai.md.",
         "consentDisclosureSection": "MI paziņojums uzgaidāmajā telpā",
         "consentDisclosureHelp": "Teksts, ko dalībnieki redz uzgaidāmajā telpā, ja pasākumā tiek izmantota MI pēcapstrāde (transkripcija, kopsavilkums, tulkošana, dublēšana). Pielāgojams katrai valodai. Atstājiet tukšu, lai izmantotu sistēmas noklusējuma tekstu.",
         "consentDisclosurePlaceholder": "Piem., šis pasākums pēc tiešraides tiks automātiski transkribēts un apkopots ar MI rīkiem…"
@@ -1642,7 +1650,7 @@
         "jvbStressCriticalPercent": "Slodzes kritiskais slieksnis (%)",
         "jvbStressCriticalPercentHelp": "Virs šī sliekšņa mērogotājs pievieno 2 papildu JVB replikas. Noklusējums 70. Jābūt augstākam par brīdinājumu.",
         "jvbProvisioningTimeoutMinutes": "Nodrošināšanas noildze (minūtes)",
-        "jvbProvisioningTimeoutMinutesHelp": "Pēc cik minūtēm kopš startsAt pasākums bez gatava JVB tiek atzīmēts kā 'degraded' statusa lapā. Noklusējums 15. Sedz mezgla auksto startu (~3-5 min) plus drošības rezervi.",
+        "jvbProvisioningTimeoutMinutesHelp": "Pēc cik minūtēm kopš startsAt pasākums bez gatava JVB tiek atzīmēts kā 'degraded' statusa lapā. Noklusējums 15. Sedz mezgla auksto startu (~3-5 min) plus drošības rezervi. Attiecas arī uz ierakstīšanas pakalpojumu, skaitot no brīža, kad pasākums ar ierakstīšanu to pieprasa: ja šajā laikā tas neatbild, tiešraides telpa pārstāj to rādīt kā „palaižas” un atzīmē kā nepalaistu.",
         "statusPollIntervalSeconds": "Statusa lapas aptaujas intervāls (sekundes)",
         "statusPollIntervalSecondsHelp": "Cik sekundēs /status lapa atjaunina datus pārlūka pusē. Noklusējums 30. Zemākas vērtības = svaigāki dati, bet lielāka slodze uz lietotni.",
         "emailSenderTitle": "E-pasta sūtītājs",
@@ -2187,7 +2195,12 @@
     },
     "eventDetail": {
       "copyPublicUrl": "Kopēt publisko saiti",
-      "enterAsModerator": "Ieiet tiešraidē",
+      "copyInviteUrl": "Kopēt ielūguma saiti",
+      "enterAsParticipant": "Pievienoties kā dalībnieks",
+      "openAsParticipant": "Atvērt kā dalībnieks",
+      "participantHintRoom": "Atveras jaunā cilnē: telpa tāda, kādu to redz viesis, bez moderatora tiesībām.",
+      "participantHintPassword": "Atveras jaunā cilnē: telpa tāda, kādu to redz viesis, pēc pasākuma paroles.",
+      "participantHintPage": "Atveras jaunā cilnē: publiskā lapa tāda, kādu to redz dalībnieki.",
       "editEvent": "Rediģēt pasākumu",
       "editSettings": "Rediģēt iestatījumus",
       "featureSummary": "Aktīvās funkcijas",
@@ -2788,9 +2801,27 @@
     "add": "Pievienot",
     "adding": "Pievieno...",
     "cancel": "Atcelt",
+    "modeLabel": "Materiāla veids",
+    "modeLink": "Saite",
+    "modeFile": "Fails",
+    "titleOptional": "Nosaukums (neobligāts; citādi faila nosaukums)",
+    "fileLabel": "Augšupielādējamais fails",
+    "fileHelp": "Atbalstītie formāti: PDF, DOCX, PPTX, XLSX, TXT — maks. {maxMb} MB",
+    "upload": "Augšupielādēt",
+    "uploading": "Notiek augšupielāde…",
     "errors": {
       "urlInvalid": "Lūdzu, ievadiet derīgu URL",
-      "generic": "Kļūda, pievienojot materiālu"
+      "generic": "Kļūda, pievienojot materiālu",
+      "fileMissing": "Izvēlieties augšupielādējamo failu",
+      "titleMissing": "Ievadiet saites nosaukumu",
+      "fileTooLarge": "Fails pārsniedz {maxMb} MB ierobežojumu",
+      "fileTooLargeForServer": "Serveris nepieņem tik lielu failu: mēģiniet ar mazāku failu",
+      "fileType": "Faila tips netiek atbalstīts (PDF, DOCX, PPTX, XLSX, TXT)",
+      "uploadUnavailable": "Failu augšupielāde šajā instalācijā nav pieejama",
+      "uploadFailed": "Kļūda, augšupielādējot failu",
+      "quotaExceeded": "Šis pasākums ir sasniedzis augšupielādēto failu ierobežojumu ({maxFiles} faili, kopā {maxMb} MB): noņemiet dažus, lai augšupielādētu citus",
+      "uploadBusy": "Pašlaik ir pārāk daudz augšupielāžu: mēģiniet vēlreiz pēc dažām sekundēm",
+      "deleteFailed": "Materiālu neizdevās dzēst"
     }
   },
   "reminders": {
@@ -3343,7 +3374,13 @@
     "noActiveRound": "Šobrīd nav aktīva \"Word Cloud\".",
     "noWords": "Gaidām pirmos vārdus...",
     "wordsSubmitted": "{count} vārdi iesniegti",
-    "timeRemaining": "Atlikušais laiks"
+    "timeRemaining": "Atlikušais laiks",
+    "errors": {
+      "send": "Vārds netika nosūtīts. Mēģiniet vēlreiz.",
+      "closed": "Šī kārta ir slēgta: vairāk vārdu netiek pieņemts.",
+      "limit": "Šajā kārtā jau ir nosūtīts maksimālais vārdu skaits.",
+      "rateLimited": "Pašlaik ir pārāk daudz sūtījumu: pagaidiet dažas sekundes, pirms mēģināt vēlreiz."
+    }
   },
   "timer": {
     "title": "Taimeris",
@@ -3642,6 +3679,8 @@
     "warmingUpButton": "Telpa tiek sagatavota...",
     "nameLabel": "Jūsu vārds",
     "nameHelp": "Tas būs redzams citiem dalībniekiem",
+    "nameRequiredToEnter": "Lai ienāktu, ievadiet savu vārdu (vismaz 2 rakstzīmes).",
+    "roomOpenNameMissing": "Telpa ir atvērta: lai ienāktu, ievadiet savu vārdu.",
     "joinNowBtn": "Ieiet tagad",
     "roomOpen": "Telpa ir atvērta",
     "whileYouWait": "Kamēr gaidāt",

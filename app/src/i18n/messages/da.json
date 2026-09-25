@@ -139,7 +139,9 @@
     "status": {
       "DRAFT": "Kladde",
       "PUBLISHED": "Publiceret",
+      "PROVISIONING": "Under klargøring",
       "LIVE": "I gang",
+      "IDLE": "På pause",
       "ENDED": "Afsluttet",
       "ARCHIVED": "Arkiveret"
     },
@@ -288,6 +290,9 @@
     "jibriNotConfigured": "Optagelse ikke konfigureret i infrastrukturen",
     "jibriScaling": "Optagelse starter…",
     "jibriScalingTooltip": "Optagelseskomponenten er ved at starte. Den er klar om kort tid.",
+    "recorderNotStarted": "Optagelse ikke tilgængelig",
+    "recorderNotStartedDetail": "Optagelsestjenesten er endnu ikke startet: indtil videre fortsætter arrangementet uden optagelse. Giv besked til platformens administratorer.",
+    "recorderStartFailed": "Optagelsen startede ikke. Prøv igen om et par minutter; hvis problemet fortsætter, så giv besked til platformens administratorer.",
     "roomPreparing": "Lokalet forberedes…",
     "roomPreparingDetail": "Videoserverne starter op. Det tager cirka 2 minutter. Lokalet aktiveres automatisk.",
     "recordingPromptTitle": "Start optagelsen?",
@@ -483,6 +488,7 @@
       "textRequired": "Skriv venligst dit spørgsmål",
       "tooLong": "Spørgsmålet må ikke overstige 500 tegn",
       "rateLimit": "Vent venligst, før du sender endnu et spørgsmål",
+      "busy": "Der kommer mange spørgsmål fra dit netværk lige nu: prøv venligst igen om et par sekunder",
       "generic": "Fejl ved afsendelse af spørgsmål"
     },
     "ctaTitle": "Stil det første spørgsmål",
@@ -703,7 +709,7 @@
         "speakerEmail": "E-mail",
         "speakerRequired": "Navn og e-mail er påkrævet.",
         "invitationsHeading": "Invitationer",
-        "invitationsHelp": "Forhåndstilmeldte personer — modtager hver et personligt link til at deltage.",
+        "invitationsHelp": "Liste over inviterede personer. Platformen sender ikke invitationer: del selv linket til arrangementet med dem. Når offentlig registrering er slået fra, kan kun disse adresser tilmelde sig, og det personlige link til at deltage kommer med e-mail efter tilmeldingen.",
         "invitationName": "Navn (valgfrit)",
         "invitationEmail": "E-mail",
         "invitationRole": "Rolle",
@@ -1317,6 +1323,8 @@
       "publicPageHint": "Siden, der skal deles for at indsamle nye tilmeldinger.",
       "guestJoin": "Direkte invitation (uden tilmelding)",
       "guestJoinHint": "Hurtigt link til at invitere en deltager i sidste øjeblik: vedkommende kommer ind som gæst, mens arrangementet er live, uden at udfylde tilmeldingsformularen.",
+      "callInvite": "Link til deltagere",
+      "callInviteHint": "Den, der modtager det, deltager i opkaldet som gæst uden tilmelding. Et hurtigopkald har ingen offentlig side: det er dette link, der skal deles.",
       "moderatorLink": "Moderatorlink",
       "moderatorLinkHint": "Del kun dette link med moderatorer. Enhver med dette link kan administrere begivenheden.",
       "liveRoomHint": "Link til at gå direkte ind i lokalet som moderator.",
@@ -1443,7 +1451,7 @@
         "jobMaxAttempts": "Forsøg før fejl",
         "jobMaxAttemptsHelp": "Hvor mange gange pipelinen forsøger et job igen, før det markeres som mislykket. Ventetiden mellem forsøgene vokser eksponentielt (fra 30 sekunder op til 2 timer). Den typiske værdi er 5.",
         "artifactRetentionDays": "Opbevaring af artefakter (dage)",
-        "artifactRetentionDaysHelp": "Står værdien på 0, følger AI-artefakterne arrangementets egen udløbsfrist. En værdi over nul beholder dem i det angivne antal dage, også efter at arrangementet er lukket, indtil et dagligt cron-job sletter dem. Sletningen omfatter talernes navne og jobbenes payload, i tråd med docs/GDPR.md.",
+        "artifactRetentionDaysHelp": "Ved 0 er der ingen grænse for hele webstedet: AI-artefakterne følger opbevaringsperioden for deres optagelse eller arrangement. En værdi over nul får et dagligt job til at slette alle artefakter, der er oprettet for mere end det antal dage siden, offentliggjort eller ej: den kan forkorte opbevaringen, aldrig forlænge den. Talernes navne og jobbenes payload er ikke omfattet: de følger optagelsens eller arrangementets opbevaringsperiode. Detaljer i docs/privacy/recordings-and-ai.md.",
         "consentDisclosureSection": "AI-oplysning i venteværelset",
         "consentDisclosureHelp": "Tekst, der vises for deltagerne i venteværelset, når arrangementet bruger AI-efterbehandling (transskription, resumé, oversættelse, eftersynkronisering). Kan tilpasses pr. sprog. Lad feltet stå tomt for at bruge systemets standardtekst.",
         "consentDisclosurePlaceholder": "F.eks. Dette arrangement bliver automatisk transskriberet og resumeret med AI-værktøjer efter den direkte udsendelse…"
@@ -1642,7 +1650,7 @@
         "jvbStressCriticalPercent": "Kritisk stresstærskel (%)",
         "jvbStressCriticalPercentHelp": "Over denne tærskel tilføjer scaleren 2 JVB-replikaer. Standard 70. Skal være højere end advarslen.",
         "jvbProvisioningTimeoutMinutes": "Provisioneringstimeout (minutter)",
-        "jvbProvisioningTimeoutMinutesHelp": "Efter hvor mange minutter siden startsAt et arrangement uden klar JVB markeres som 'degraded' på statussiden. Standard 15. Dækker cold start (~3-5 min) plus sikkerhedsmargen.",
+        "jvbProvisioningTimeoutMinutesHelp": "Efter hvor mange minutter siden startsAt et arrangement uden klar JVB markeres som 'degraded' på statussiden. Standard 15. Dækker cold start (~3-5 min) plus sikkerhedsmargen. Gælder også optagelsestjenesten, regnet fra det tidspunkt et arrangement med optagelse beder om den: uden svar inden for denne tid holder live-rummet op med at vise den som ved at starte og melder den som ikke startet.",
         "statusPollIntervalSeconds": "Statussidens pollinginterval (sekunder)",
         "statusPollIntervalSecondsHelp": "Hvor ofte siden /status opdaterer data fra browseren. Standard 30. Lavere værdier = friskere data, men mere belastning på appen.",
         "emailSenderTitle": "Afsender af e-mails",
@@ -2187,7 +2195,12 @@
     },
     "eventDetail": {
       "copyPublicUrl": "Kopiér offentligt link",
-      "enterAsModerator": "Gå live",
+      "copyInviteUrl": "Kopiér invitationslink",
+      "enterAsParticipant": "Gå ind som deltager",
+      "openAsParticipant": "Åbn som deltager",
+      "participantHintRoom": "Åbner i en ny fane: rummet, som en gæst ser det, uden moderatorrettigheder.",
+      "participantHintPassword": "Åbner i en ny fane: rummet, som en gæst ser det, efter begivenhedens adgangskode.",
+      "participantHintPage": "Åbner i en ny fane: den offentlige side, som deltagerne ser den.",
       "editEvent": "Rediger arrangement",
       "editSettings": "Rediger indstillinger",
       "featureSummary": "Aktive funktioner",
@@ -2788,9 +2801,27 @@
     "add": "Tilføj",
     "adding": "Tilføjer...",
     "cancel": "Annuller",
+    "modeLabel": "Materialetype",
+    "modeLink": "Link",
+    "modeFile": "Fil",
+    "titleOptional": "Titel (valgfri, ellers filnavnet)",
+    "fileLabel": "Fil, der skal uploades",
+    "fileHelp": "Understøttede formater: PDF, DOCX, PPTX, XLSX, TXT — maks. {maxMb} MB",
+    "upload": "Upload",
+    "uploading": "Uploader…",
     "errors": {
       "urlInvalid": "Indtast venligst en gyldig URL",
-      "generic": "Fejl ved tilføjelse af materiale"
+      "generic": "Fejl ved tilføjelse af materiale",
+      "fileMissing": "Vælg en fil, der skal uploades",
+      "titleMissing": "Angiv en titel til linket",
+      "fileTooLarge": "Filen overskrider grænsen på {maxMb} MB",
+      "fileTooLargeForServer": "Serveren accepterer ikke en så stor fil: prøv med en mindre fil",
+      "fileType": "Filtypen understøttes ikke (PDF, DOCX, PPTX, XLSX, TXT)",
+      "uploadUnavailable": "Upload af filer er ikke tilgængelig i denne installation",
+      "uploadFailed": "Fejl under upload af filen",
+      "quotaExceeded": "Denne begivenhed har nået grænsen for uploadede filer ({maxFiles} filer, {maxMb} MB i alt): fjern nogle for at uploade flere",
+      "uploadBusy": "For mange uploads lige nu: prøv igen om et par sekunder",
+      "deleteFailed": "Materialet kunne ikke slettes"
     }
   },
   "reminders": {
@@ -3343,7 +3374,13 @@
     "noActiveRound": "Ingen aktiv word cloud i øjeblikket.",
     "noWords": "Venter på de første ord...",
     "wordsSubmitted": "{count} ord indsendt",
-    "timeRemaining": "Tid tilbage"
+    "timeRemaining": "Tid tilbage",
+    "errors": {
+      "send": "Ordet blev ikke sendt. Prøv igen.",
+      "closed": "Runden er lukket: der modtages ikke flere ord.",
+      "limit": "Du har allerede sendt det maksimale antal ord i denne runde.",
+      "rateLimited": "For mange indsendelser lige nu: vent et par sekunder, før du prøver igen."
+    }
   },
   "timer": {
     "title": "Timer",
@@ -3642,6 +3679,8 @@
     "warmingUpButton": "Lokalet klargøres...",
     "nameLabel": "Dit navn",
     "nameHelp": "Vises for de andre deltagere",
+    "nameRequiredToEnter": "Indtast dit navn for at komme ind (mindst 2 tegn).",
+    "roomOpenNameMissing": "Rummet er åbent: indtast dit navn for at komme ind.",
     "joinNowBtn": "Gå ind nu",
     "roomOpen": "Rummet er åbent",
     "whileYouWait": "Mens du venter",

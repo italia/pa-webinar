@@ -22,6 +22,13 @@ import EventTitle from '@/components/events/event-title';
 import { MarkdownRenderer } from '@/components/ui/markdown';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import { duplicaComeProssima, impostaStatoEvento } from '@/lib/events/event-actions';
+import {
+  callInviteOpen,
+  moderatorRoomOpen,
+  participantEntry,
+  shareLink,
+} from '@/lib/events/participant-entry';
+import { isEventPageVisible } from '@/lib/events/visibility';
 import { localizedUrl } from '@/lib/utils/localized-url';
 
 import CallSessionsPanel from './call-sessions-panel';
@@ -29,7 +36,7 @@ import DeleteEventModal from './delete-event-modal';
 import EventAnalyticsPanel from './event-analytics-panel';
 import EventConfigDiagram from './event-config-diagram';
 import EventModeratorsPanel from './event-moderators-panel';
-import PostEventConfig from './post-event-config';
+import PostEventConfig, { type PostEventVisibility } from './post-event-config';
 import RecordingManagement from './recording-management';
 import CollapsibleSection from './collapsible-section';
 import EventLinksSection from './event-links-section';
@@ -131,7 +138,7 @@ interface EventData {
   maxParticipants: number; registrationCount: number; peakParticipants: number;
   qaEnabled: boolean; chatEnabled: boolean; recordingEnabled: boolean;
   participantsCanUnmute: boolean; participantsCanStartVideo: boolean; participantsCanShareScreen: boolean;
-  status: string;
+  status: string; eventType: string; hasJoinPassword: boolean;
   coverImageUrl: string | null; imageUrl: string | null;
   parseTitleKicker: boolean | null;
   expectedSenderRatioPct: number | null;
@@ -164,6 +171,8 @@ interface EventManagementClientProps {
   /** L'evento ammette chi entra senza iscrizione (lib/events/guest-window):
    *  senza, l'invito diretto porterebbe all'iscrizione e non va offerto. */
   guestEntryOpen?: boolean;
+  /** L'istante del rendering sul server (ms): vedi `istante` qui sotto. */
+  renderedAt: number;
 }
 
 // Le schede sono cinque e stanno in una riga sola anche su un telefono: oltre,
@@ -196,7 +205,7 @@ function tagChipStyle(color: string | null): CSSProperties {
 
 // ── Main component ──
 export default function EventManagementClient({
-  event, baseUrl, locale, kickerEnabled, guestEntryOpen = true,
+  event, baseUrl, locale, kickerEnabled, guestEntryOpen = true, renderedAt,
 }: EventManagementClientProps) {
   const t = useTranslations('admin');
   const td = useTranslations('admin.eventDetail');
@@ -216,6 +225,14 @@ export default function EventManagementClient({
 
   const [activeTab, setActiveTab] = useState<TabId>('panoramica');
   const [status, setStatus] = useState(event.status);
+  // La pagina post-evento si accende e si spegne dalla scheda «Dopo l'evento»
+  // senza ricaricare. Come lo stato, i due campi che la governano vivono qui:
+  // i pulsanti che aprono o condividono la pagina ne dipendono, e con i valori
+  // del caricamento offrirebbero una pagina spenta o nasconderebbero una accesa.
+  const [paginaPostEvento, setPaginaPostEvento] = useState<PostEventVisibility>({
+    postEventPublic: event.postEventPublic,
+    postEventPublicUntil: event.postEventPublicUntil,
+  });
   const [updating, setUpdating] = useState(false);
   const [feedback, setFeedback] = useState('');
 
@@ -239,6 +256,25 @@ export default function EventManagementClient({
   const liveModeratorUrl = `/events/${event.slug}/live?token=${event.moderatorToken}`;
   const editUrl = `/admin/events/${event.id}/edit?token=${event.moderatorToken}`;
 
+  // I due ruoli con cui si entra, detti per nome: da moderatore, col link di
+  // conduzione, e da partecipante, dalla stessa porta del pubblico — per
+  // vedere l'evento come lo vede chi ci partecipa. L'ingresso da partecipante
+  // segue lo stato corrente (pubblicare o avviare da questa pagina lo cambia)
+  // e le regole della sala: vedi lib/events/participant-entry.
+  // Le finestre a tempo si valutano sull'istante del rendering sul server
+  // finche' il browser non ha il suo orologio: server e prima passata del
+  // client devono disegnare gli stessi pulsanti.
+  const istante = adesso ?? renderedAt;
+  const isInstant = event.eventType === 'INSTANT';
+  const eventoOra = { ...event, status, ...paginaPostEvento };
+  const ingressoPartecipante = participantEntry(eventoOra, guestEntryOpen, istante);
+  const entraModeratore = moderatorRoomOpen(eventoOra, istante);
+  const publicPageVisible = isEventPageVisible(eventoOra, istante);
+  // Il link in cima: la pagina pubblica o, per una chiamata rapida, l'invito
+  // alla sala finche' funziona (lo stesso dell'elenco delle chiamate). Una
+  // chiamata chiusa senza pagina post-evento non ha niente da condividere.
+  const condivisione = shareLink(eventoOra, istante);
+  const invitoChiamata = callInviteOpen(eventoOra, istante);
 
   // Capacity estimate sidebar surface. Everything else stays in the diagram.
   const capacity = event.capacityEstimateJson ?? null;
@@ -276,7 +312,8 @@ export default function EventManagementClient({
 
   const handleDeleted = useCallback(() => { router.push('/admin'); }, [router]);
 
-  // "Duplica come prossima occorrenza" (docs/ROADMAP.md, "Eventi ricorrenti"):
+  // "Duplica come prossima occorrenza" (docs/architecture/event-journey.md,
+  // "Duplicating as the next occurrence"):
   // le call ricorrenti si ricreano a mano ogni volta, e la copia manuale è
   // proprio dove si perdono i flag di cattura. Qui l'endpoint eredita l'intera
   // configurazione e, se l'evento ha una cadenza, proietta la data della
@@ -415,24 +452,56 @@ export default function EventManagementClient({
             )}
           </div>
 
-          {/* Right CTAs */}
+          {/* Right CTAs — senza nessuna (chiamata rapida chiusa e senza
+              pagina post-evento) la colonna non c'e'. */}
+          {(condivisione || entraModeratore || ingressoPartecipante) && (
           <div className="d-flex flex-column gap-2 flex-shrink-0" style={{ minWidth: 220 }}>
             {/* Un solo link in cima: la pagina pubblica e' quella che si
-                condivide quasi sempre. Gli altri due — invito diretto e
+                condivide quasi sempre (per una chiamata rapida, che non ne
+                ha una, l'invito alla sala). Gli altri — invito diretto e
                 amministrazione — stanno nella sezione «Link dell'evento»,
                 dove c'e' scritto a chi vanno dati. Tre pulsanti «copia»
                 identici qui sopra si distinguevano solo per abitudine, e
                 sbagliare significa consegnare l'evento a chi riceve il link
                 sbagliato. */}
-            <CopyBtn text={publicUrl} label={td('copyPublicUrl')} />
-            {(status === 'PUBLISHED' || status === 'LIVE') && (
+            {condivisione && (
+              <CopyBtn text={localizedUrl(baseUrl, condivisione.path, locale)}
+                       label={condivisione.kind === 'invite' ? td('copyInviteUrl') : td('copyPublicUrl')} />
+            )}
+            {entraModeratore && (
               <Link href={percorso(liveModeratorUrl)}
                     className="btn btn-primary d-inline-flex align-items-center justify-content-center gap-2"
                     style={{ fontSize: '0.88rem' }}>
-                <Svg name="video" size={14} /> {td('enterAsModerator')}
+                <Svg name="video" size={14} /> {t('joinAsModeratorBtn')}
               </Link>
             )}
+            {/* In una scheda nuova: chi organizza tiene aperta la gestione, e
+                spesso anche la sala da moderatore accanto. Il link non porta
+                token: si entra come chiunque altro, da ospite o dalla pagina
+                pubblica. La riga sotto dice che cosa si apre, perche' le due
+                porte non si somigliano. */}
+            {ingressoPartecipante && (
+              <>
+                <Link href={percorso(ingressoPartecipante.path)} target="_blank"
+                      aria-describedby="ingresso-partecipante-nota"
+                      className="btn btn-outline-primary d-inline-flex align-items-center justify-content-center gap-2"
+                      style={{ fontSize: '0.88rem' }}>
+                  <Svg name="external" size={14} />
+                  {ingressoPartecipante.kind === 'room'
+                    ? td('enterAsParticipant')
+                    : td('openAsParticipant')}
+                </Link>
+                <div id="ingresso-partecipante-nota" style={{ ...CAPTION, fontSize: '0.78rem', maxWidth: 260 }}>
+                  {ingressoPartecipante.kind === 'page'
+                    ? td('participantHintPage')
+                    : event.hasJoinPassword
+                      ? td('participantHintPassword')
+                      : td('participantHintRoom')}
+                </div>
+              </>
+            )}
           </div>
+          )}
         </div>
       </div>
 
@@ -479,9 +548,16 @@ export default function EventManagementClient({
                 description={description}
                 locale={locale}
                 editUrl={editUrl}
-                publicUrl={publicUrl}
-                guestLiveUrl={guestEntryOpen ? guestLiveUrl : null}
+                // Di un evento a calendario la pagina pubblica si offre anche
+                // in bozza, da preparare per quando esce; una chiamata rapida
+                // ne ha una solo a chiamata conclusa, se il post-evento e'
+                // pubblico.
+                publicUrl={!isInstant || publicPageVisible ? publicUrl : null}
+                // L'invito di una chiamata rapida solo finche' apre la sala:
+                // dopo risponde «non trovato».
+                guestLiveUrl={(isInstant ? invitoChiamata : guestEntryOpen) ? guestLiveUrl : null}
                 moderatorUrl={moderatorUrl}
+                instant={isInstant}
               />
             )}
             {activeTab === 'persone' && (
@@ -489,7 +565,10 @@ export default function EventManagementClient({
             )}
             {activeTab === 'contenuti' && <ContentTab event={event} />}
             {activeTab === 'dopo' && (
-              <PostEventTab event={event} status={status} />
+              <PostEventTab event={event} status={status}
+                            paginaPostEvento={paginaPostEvento}
+                            onPaginaPostEvento={(patch) =>
+                              setPaginaPostEvento((prima) => ({ ...prima, ...patch }))} />
             )}
             {activeTab === 'statistiche' && <EventAnalyticsPanel eventId={event.id} status={status} />}
           </div>
@@ -629,10 +708,15 @@ export default function EventManagementClient({
                     {status === 'LIVE' ? td('publishBlockedLive') : td('publishBlockedEnded')}
                   </div>
                 )}
-                <a href={publicUrl} target="_blank" rel="noopener noreferrer"
-                   className="btn btn-outline-secondary d-flex align-items-center justify-content-center gap-2">
-                  <Svg name="external" size={14} /> {t('openPublicPage')}
-                </a>
+                {/* Solo quando la pagina esiste: in bozza, archiviato o per
+                    una chiamata rapida in corso l'indirizzo risponde «non
+                    trovato». */}
+                {publicPageVisible && (
+                  <a href={publicUrl} target="_blank" rel="noopener noreferrer"
+                     className="btn btn-outline-secondary d-flex align-items-center justify-content-center gap-2">
+                    <Svg name="external" size={14} /> {t('openPublicPage')}
+                  </a>
+                )}
                 <button type="button"
                         className="btn btn-outline-primary d-flex align-items-center justify-content-center gap-2"
                         onClick={duplicateAsNext}
@@ -699,9 +783,10 @@ function TabNav({ active, onChange, t }: {
 }
 
 // ── Tabs ──
-function OverviewTab({ event, description, locale, editUrl, publicUrl, guestLiveUrl, moderatorUrl }: {
+function OverviewTab({ event, description, locale, editUrl, publicUrl, guestLiveUrl, moderatorUrl, instant }: {
   event: EventData; description: string; locale: string; editUrl: string;
-  publicUrl: string; guestLiveUrl: string | null; moderatorUrl: string;
+  publicUrl: string | null; guestLiveUrl: string | null; moderatorUrl: string;
+  instant: boolean;
 }) {
   const td = useTranslations('admin.eventDetail');
   const te = useTranslations('events');
@@ -756,10 +841,14 @@ function OverviewTab({ event, description, locale, editUrl, publicUrl, guestLive
         <H>{tl('title')}</H>
         <EventLinksSection
           // Senza accesso degli ospiti l'invito diretto non fa entrare
-          // nessuno: porta all'iscrizione, come la pagina pubblica.
+          // nessuno: porta all'iscrizione, come la pagina pubblica. Per una
+          // chiamata rapida lo stesso indirizzo e' IL link dei partecipanti,
+          // e si presenta cosi'.
           righe={[
-            { chiave: 'publicPage', url: publicUrl },
-            ...(guestLiveUrl ? [{ chiave: 'guestJoin' as const, url: guestLiveUrl }] : []),
+            ...(publicUrl ? [{ chiave: 'publicPage' as const, url: publicUrl }] : []),
+            ...(guestLiveUrl
+              ? [{ chiave: instant ? ('callInvite' as const) : ('guestJoin' as const), url: guestLiveUrl }]
+              : []),
             { chiave: 'moderatorLink', url: moderatorUrl, riservato: true },
           ]}
         />
@@ -1009,7 +1098,11 @@ function ContentTab({ event }: { event: EventData }) {
   );
 }
 
-function PostEventTab({ event, status }: { event: EventData; status: string }) {
+function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento }: {
+  event: EventData; status: string;
+  paginaPostEvento: PostEventVisibility;
+  onPaginaPostEvento: (patch: Partial<PostEventVisibility>) => void;
+}) {
   const td = useTranslations('admin.eventDetail');
   const t = useTranslations('admin');
   const format = useFormatter();
@@ -1066,11 +1159,14 @@ function PostEventTab({ event, status }: { event: EventData; status: string }) {
           risultato si leggono nello stesso posto. */}
       <div>
         <H>{td('postEventTitle')}</H>
+        {/* I valori correnti, non quelli del caricamento: la scheda si
+            rimonta ogni volta che la si riapre. */}
         <PostEventConfig
+          onPublicPageChange={onPaginaPostEvento}
           event={{
             id: event.id, moderatorToken: event.moderatorToken,
-            postEventPublic: event.postEventPublic,
-            postEventPublicUntil: event.postEventPublicUntil,
+            postEventPublic: paginaPostEvento.postEventPublic,
+            postEventPublicUntil: paginaPostEvento.postEventPublicUntil,
             libraryListed: event.libraryListed,
             hasPlayableRecording:
               (event.recordingPublished && !!event.recordingUrl) || !!event.youtubeUrl,

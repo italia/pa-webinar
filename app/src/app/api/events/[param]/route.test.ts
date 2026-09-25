@@ -40,23 +40,33 @@ vi.mock('@/lib/live-state/publish', () => ({
   publishFlagsIfChanged: vi.fn(async () => undefined),
 }));
 
+const { files } = vi.hoisted(() => ({
+  files: { removeFilesOfEventsBeingDeleted: vi.fn() },
+}));
+vi.mock('@/lib/events/material-files', () => files);
+
 vi.mock('@/lib/db', () => ({
   prisma: {
-    event: { findUnique: vi.fn(), update: vi.fn() },
+    event: { findUnique: vi.fn(), update: vi.fn(), delete: vi.fn() },
     gdprTemplate: { findUnique: vi.fn() },
     registration: { count: vi.fn(async () => 0) },
   },
 }));
 
 import { prisma } from '@/lib/db';
+import { AppError } from '@/lib/errors';
 
-import { PUT } from './route';
+import { DELETE, PUT } from './route';
 
 const EVENT_ID = '7c6d5e4f-3a2b-4c1d-8e9f-0a1b2c3d4e5f';
 const GDPR_ID = '3f2a1b0c-4d5e-4f6a-8b9c-0d1e2f3a4b5c';
 
 const mocked = prisma as unknown as {
-  event: { findUnique: ReturnType<typeof vi.fn>; update: ReturnType<typeof vi.fn> };
+  event: {
+    findUnique: ReturnType<typeof vi.fn>;
+    update: ReturnType<typeof vi.fn>;
+    delete: ReturnType<typeof vi.fn>;
+  };
   gdprTemplate: { findUnique: ReturnType<typeof vi.fn> };
 };
 
@@ -190,5 +200,41 @@ describe('PUT /api/events/[param] — le modifiche parziali restano parziali', (
 
     expect(r.status).toBe(422);
     expect(mocked.event.update).not.toHaveBeenCalled();
+  });
+});
+
+describe('DELETE /api/events/[param] — i file dell’evento', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocked.event.delete.mockResolvedValue({});
+    files.removeFilesOfEventsBeingDeleted.mockResolvedValue(1);
+  });
+
+  function cancella(): NextRequest {
+    return new Request(`http://localhost/api/events/${EVENT_ID}`, {
+      method: 'DELETE',
+      headers: { authorization: 'Bearer token-valido' },
+    }) as unknown as NextRequest;
+  }
+
+  it('la cascata porta via le righe: i file si cancellano prima', async () => {
+    const r = await DELETE(cancella(), contesto as never);
+
+    expect(r.status).toBe(200);
+    expect(files.removeFilesOfEventsBeingDeleted).toHaveBeenCalledWith({ id: EVENT_ID });
+    expect(mocked.event.delete).toHaveBeenCalledWith({ where: { id: EVENT_ID } });
+    expect(files.removeFilesOfEventsBeingDeleted.mock.invocationCallOrder[0]).toBeLessThan(
+      mocked.event.delete.mock.invocationCallOrder[0]!,
+    );
+  });
+
+  it('se i file non si cancellano, l’evento resta: 503', async () => {
+    files.removeFilesOfEventsBeingDeleted.mockRejectedValue(
+      new AppError('storage', 503, 'STORAGE_DELETE_FAILED'),
+    );
+    const r = await DELETE(cancella(), contesto as never);
+
+    expect(r.status).toBe(503);
+    expect(mocked.event.delete).not.toHaveBeenCalled();
   });
 });

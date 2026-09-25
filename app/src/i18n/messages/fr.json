@@ -139,7 +139,9 @@
     "status": {
       "DRAFT": "Brouillon",
       "PUBLISHED": "Publié",
+      "PROVISIONING": "En préparation",
       "LIVE": "En direct",
+      "IDLE": "En pause",
       "ENDED": "Terminé",
       "ARCHIVED": "Archivé"
     },
@@ -288,6 +290,9 @@
     "jibriNotConfigured": "Enregistrement non configuré dans l'infrastructure",
     "jibriScaling": "Démarrage de l'enregistrement…",
     "jibriScalingTooltip": "Le composant d'enregistrement démarre. Il sera disponible sous peu.",
+    "recorderNotStarted": "Enregistrement indisponible",
+    "recorderNotStartedDetail": "Le service d'enregistrement n'a pas encore démarré : pour l'instant, l'événement continue sans enregistrement. Prévenez les responsables de la plateforme.",
+    "recorderStartFailed": "L'enregistrement n'a pas démarré. Réessayez dans quelques minutes ; si le problème persiste, prévenez les responsables de la plateforme.",
     "roomPreparing": "Salle en préparation…",
     "roomPreparingDetail": "Les serveurs vidéo démarrent. L'opération prend environ 2 minutes. La salle s'activera automatiquement.",
     "recordingPromptTitle": "Démarrer l'enregistrement ?",
@@ -483,6 +488,7 @@
       "textRequired": "Veuillez rédiger votre question",
       "tooLong": "La question ne peut pas dépasser 500 caractères",
       "rateLimit": "Veuillez patienter avant d'envoyer une autre question",
+      "busy": "De nombreuses questions arrivent de votre réseau en ce moment : veuillez réessayer dans quelques secondes",
       "generic": "Erreur lors de l'envoi de la question"
     },
     "ctaTitle": "Posez la première question",
@@ -703,7 +709,7 @@
         "speakerEmail": "E-mail",
         "speakerRequired": "Le nom et l'e-mail sont obligatoires.",
         "invitationsHeading": "Invitations",
-        "invitationsHelp": "Personnes pré-inscrites — chacune recevra un lien personnel pour participer.",
+        "invitationsHelp": "Liste des personnes invitées. La plateforme n'envoie pas d'invitations : partagez vous-même le lien de l'événement. Lorsque l'inscription publique est désactivée, seules ces adresses peuvent s'inscrire, et le lien personnel pour entrer arrive par e-mail après l'inscription.",
         "invitationName": "Nom (facultatif)",
         "invitationEmail": "E-mail",
         "invitationRole": "Rôle",
@@ -1317,6 +1323,8 @@
       "publicPageHint": "La page à partager pour collecter de nouvelles inscriptions.",
       "guestJoin": "Invitation directe (sans inscription)",
       "guestJoinHint": "Lien rapide pour inviter un participant à la dernière minute : il accède en tant qu'invité quand l'événement est en direct, sans remplir le formulaire d'inscription.",
+      "callInvite": "Lien pour les participants",
+      "callInviteHint": "La personne qui le reçoit rejoint l'appel en tant qu'invité, sans inscription. Un appel instantané n'a pas de page publique : c'est ce lien qu'il faut partager.",
       "moderatorLink": "Lien modérateur",
       "moderatorLinkHint": "Partagez ce lien uniquement avec les modérateurs. Toute personne disposant de ce lien peut gérer l'événement.",
       "liveRoomHint": "Lien pour entrer directement dans la salle en tant que modérateur.",
@@ -1443,7 +1451,7 @@
         "jobMaxAttempts": "Tentatives avant échec",
         "jobMaxAttemptsHelp": "Nombre de fois où la chaîne de traitement relance une tâche avant de la marquer comme échouée. Le délai entre tentatives croît de façon exponentielle (de 30 secondes jusqu'à 2 heures). La valeur typique est 5.",
         "artifactRetentionDays": "Conservation des artefacts (jours)",
-        "artifactRetentionDaysHelp": "Laissé à 0, les artefacts IA suivent la même échéance que l'événement. Une valeur supérieure à zéro les conserve pendant le nombre de jours indiqué, même après la clôture de l'événement, jusqu'à ce qu'un cron quotidien les supprime. La suppression inclut les noms des intervenants et les charges utiles des tâches, conformément à docs/GDPR.md.",
+        "artifactRetentionDaysHelp": "À 0, il n'y a pas de limite pour tout le site : les artefacts IA suivent la conservation de leur enregistrement ou de l'événement. Une valeur supérieure à zéro fait supprimer par une tâche quotidienne tout artefact créé il y a plus de ce nombre de jours, publié ou non : elle peut raccourcir la conservation, jamais l'allonger. Les noms des intervenants et les charges utiles des tâches ne sont pas concernés : ils suivent la conservation de l'enregistrement ou de l'événement. Détails dans docs/privacy/recordings-and-ai.md.",
         "consentDisclosureSection": "Avis IA dans la salle d'attente",
         "consentDisclosureHelp": "Texte affiché aux participants dans la salle d'attente lorsque l'événement utilise la post-production IA (transcription, synthèse, traduction, doublage). Personnalisable par langue. Laissez vide pour utiliser le texte par défaut du système.",
         "consentDisclosurePlaceholder": "Ex. Cet événement sera transcrit et résumé automatiquement à l'aide d'outils d'IA après le direct…"
@@ -1642,7 +1650,7 @@
         "jvbStressCriticalPercent": "Seuil critique de charge (%)",
         "jvbStressCriticalPercentHelp": "Au-dessus de ce seuil, le scaler ajoute 2 répliques JVB. Par défaut 70. Doit être supérieur au seuil d'alerte.",
         "jvbProvisioningTimeoutMinutes": "Délai de provisioning (minutes)",
-        "jvbProvisioningTimeoutMinutesHelp": "Au bout de combien de minutes depuis startsAt un événement dont JVB n'est pas encore prêt est signalé comme « degraded » sur la status page. Par défaut 15. Couvre le cold-start du nœud (~3-5 min) plus une marge de sécurité.",
+        "jvbProvisioningTimeoutMinutesHelp": "Au bout de combien de minutes depuis startsAt un événement dont JVB n'est pas encore prêt est signalé comme « degraded » sur la status page. Par défaut 15. Couvre le cold-start du nœud (~3-5 min) plus une marge de sécurité. S'applique aussi au service d'enregistrement, à compter du moment où un événement avec enregistrement le demande : passé ce délai sans réponse, la salle en direct cesse de l'afficher « en cours de démarrage » et le signale comme non démarré.",
         "statusPollIntervalSeconds": "Intervalle de polling de la status page (secondes)",
         "statusPollIntervalSecondsHelp": "À quelle fréquence en secondes la page /status rafraîchit les données côté navigateur. Par défaut 30. Des valeurs plus basses = données plus fraîches mais plus de charge sur l'application.",
         "emailSenderTitle": "Expéditeur des e-mails",
@@ -2187,7 +2195,12 @@
     },
     "eventDetail": {
       "copyPublicUrl": "Copier le lien public",
-      "enterAsModerator": "Entrer en live",
+      "copyInviteUrl": "Copier le lien d'invitation",
+      "enterAsParticipant": "Rejoindre en tant que participant",
+      "openAsParticipant": "Ouvrir en tant que participant",
+      "participantHintRoom": "S'ouvre dans un nouvel onglet : la salle telle qu'un invité la voit, sans pouvoirs de modération.",
+      "participantHintPassword": "S'ouvre dans un nouvel onglet : la salle telle qu'un invité la voit, après le mot de passe de l'événement.",
+      "participantHintPage": "S'ouvre dans un nouvel onglet : la page publique telle que la voient les participants.",
       "editEvent": "Modifier l'événement",
       "editSettings": "Modifier les paramètres",
       "featureSummary": "Fonctionnalités actives",
@@ -2788,9 +2801,27 @@
     "add": "Ajouter",
     "adding": "Ajout...",
     "cancel": "Annuler",
+    "modeLabel": "Type de document",
+    "modeLink": "Lien",
+    "modeFile": "Fichier",
+    "titleOptional": "Titre (facultatif : sinon le nom du fichier)",
+    "fileLabel": "Fichier à téléverser",
+    "fileHelp": "Formats pris en charge : PDF, DOCX, PPTX, XLSX, TXT — max {maxMb} Mo",
+    "upload": "Téléverser",
+    "uploading": "Téléversement en cours…",
     "errors": {
       "urlInvalid": "Veuillez saisir une URL valide",
-      "generic": "Erreur lors de l'ajout du document"
+      "generic": "Erreur lors de l'ajout du document",
+      "fileMissing": "Choisissez un fichier à téléverser",
+      "titleMissing": "Saisissez un titre pour le lien",
+      "fileTooLarge": "Le fichier dépasse la limite de {maxMb} Mo",
+      "fileTooLargeForServer": "Le serveur n'accepte pas un fichier aussi volumineux : essayez un fichier plus léger",
+      "fileType": "Type de fichier non pris en charge (PDF, DOCX, PPTX, XLSX, TXT)",
+      "uploadUnavailable": "Le téléversement de fichiers n'est pas disponible sur cette installation",
+      "uploadFailed": "Erreur lors du téléversement du fichier",
+      "quotaExceeded": "Cet événement a atteint la limite de fichiers téléversés ({maxFiles} fichiers, {maxMb} Mo au total) : supprimez-en quelques-uns pour en ajouter d'autres",
+      "uploadBusy": "Trop de téléversements en ce moment : réessayez dans quelques secondes",
+      "deleteFailed": "Impossible de supprimer le document"
     }
   },
   "reminders": {
@@ -3343,7 +3374,13 @@
     "noActiveRound": "Aucun word cloud actif pour le moment.",
     "noWords": "En attente des premiers mots...",
     "wordsSubmitted": "{count} mots soumis",
-    "timeRemaining": "Temps restant"
+    "timeRemaining": "Temps restant",
+    "errors": {
+      "send": "Mot non envoyé. Veuillez réessayer.",
+      "closed": "Ce tour est clos : aucun autre mot n'est accepté.",
+      "limit": "Vous avez déjà envoyé le nombre maximal de mots pour ce tour.",
+      "rateLimited": "Trop d'envois en ce moment : patientez quelques secondes avant de réessayer."
+    }
   },
   "timer": {
     "title": "Minuteur",
@@ -3642,6 +3679,8 @@
     "warmingUpButton": "Salle en préparation...",
     "nameLabel": "Votre nom",
     "nameHelp": "Visible des autres participants",
+    "nameRequiredToEnter": "Pour entrer, saisissez votre nom (au moins 2 caractères).",
+    "roomOpenNameMissing": "La salle est ouverte : saisissez votre nom pour entrer.",
     "joinNowBtn": "Entrer maintenant",
     "roomOpen": "La salle est ouverte",
     "whileYouWait": "En attendant",

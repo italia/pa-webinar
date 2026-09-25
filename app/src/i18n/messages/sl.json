@@ -139,7 +139,9 @@
     "status": {
       "DRAFT": "Osnutek",
       "PUBLISHED": "Objavljeno",
+      "PROVISIONING": "V pripravi",
       "LIVE": "V živo",
+      "IDLE": "Na premoru",
       "ENDED": "Zaključeno",
       "ARCHIVED": "Arhivirano"
     },
@@ -288,6 +290,9 @@
     "jibriNotConfigured": "Snemanje ni konfigurirano v infrastrukturi",
     "jibriScaling": "Snemanje se zaganja …",
     "jibriScalingTooltip": "Komponenta za snemanje se zaganja. Na voljo bo kmalu.",
+    "recorderNotStarted": "Snemanje ni na voljo",
+    "recorderNotStartedDetail": "Storitev snemanja se še ni zagnala: dogodek se zaenkrat nadaljuje brez snemanja. Obvestite skrbnike platforme.",
+    "recorderStartFailed": "Snemanje se ni začelo. Poskusite znova čez nekaj minut; če se težava ponavlja, obvestite skrbnike platforme.",
     "roomPreparing": "Soba se pripravlja …",
     "roomPreparingDetail": "Video strežniki se zaganjajo. Postopek traja približno 2 minuti. Soba se bo aktivirala samodejno.",
     "recordingPromptTitle": "Začnem snemanje?",
@@ -483,6 +488,7 @@
       "textRequired": "Napišite svoje vprašanje",
       "tooLong": "Vprašanje ne sme presegati 500 znakov",
       "rateLimit": "Počakajte, preden pošljete novo vprašanje",
+      "busy": "Iz vašega omrežja trenutno prihaja veliko vprašanj: poskusite znova čez nekaj sekund",
       "generic": "Napaka pri pošiljanju vprašanja"
     },
     "ctaTitle": "Postavite prvo vprašanje",
@@ -703,7 +709,7 @@
         "speakerEmail": "E-pošta",
         "speakerRequired": "Ime in e-pošta sta obvezna.",
         "invitationsHeading": "Vabila",
-        "invitationsHelp": "Vnaprej prijavljene osebe — prejmejo osebno povezavo za udeležbo.",
+        "invitationsHelp": "Seznam povabljenih oseb. Platforma ne pošilja vabil: povezavo do dogodka delite sami. Ko je javna registracija izklopljena, se lahko registrirajo le ti naslovi, osebna povezava za vstop pa po registraciji prispe po e-pošti.",
         "invitationName": "Ime (neobvezno)",
         "invitationEmail": "E-pošta",
         "invitationRole": "Vloga",
@@ -1317,6 +1323,8 @@
       "publicPageHint": "Stran, ki jo delite za zbiranje novih prijav.",
       "guestJoin": "Neposredno povabilo (brez prijave)",
       "guestJoinHint": "Hitra povezava za povabilo udeleženca v zadnjem trenutku: pridruži se kot gost med dogodkom v živo, brez izpolnjevanja prijavnega obrazca.",
+      "callInvite": "Povezava za udeležence",
+      "callInviteHint": "Kdor jo prejme, se klicu pridruži kot gost, brez prijave. Hitri klic nima javne strani: deliti je treba to povezavo.",
       "moderatorLink": "Moderatorska povezava",
       "moderatorLinkHint": "To povezavo delite samo z moderatorji. Kdor koli jo ima, lahko upravlja dogodek.",
       "liveRoomHint": "Povezava za neposreden vstop v sobo kot moderator.",
@@ -1443,7 +1451,7 @@
         "jobMaxAttempts": "Poskusi pred neuspehom",
         "jobMaxAttemptsHelp": "Kolikokrat cevovod ponovi opravilo, preden ga označi kot neuspešno. Zamik med poskusi narašča eksponentno (od 30 sekund do 2 ur). Običajna vrednost je 5.",
         "artifactRetentionDays": "Hramba artefaktov (dnevi)",
-        "artifactRetentionDaysHelp": "Pri vrednosti 0 artefakti AI sledijo istemu roku hrambe kot dogodek. Vrednost, večja od nič, jih ohrani navedeno število dni tudi po zaprtju dogodka, dokler jih dnevni cron ne izbriše. Izbris vključuje imena govorcev in vsebino opravil, skladno z docs/GDPR.md.",
+        "artifactRetentionDaysHelp": "Pri vrednosti 0 ni omejitve za celotno spletno mesto: artefakti AI sledijo roku hrambe svojega posnetka ali dogodka. Vrednost, večja od nič, poskrbi, da dnevno opravilo izbriše vsak artefakt, ustvarjen pred več kot toliko dnevi, objavljen ali ne: rok hrambe lahko skrajša, nikoli pa ga ne podaljša. Imena govorcev in vsebina opravil niso zajeti: sledijo roku hrambe posnetka ali dogodka. Podrobnosti v docs/privacy/recordings-and-ai.md.",
         "consentDisclosureSection": "Obvestilo o AI v čakalnici",
         "consentDisclosureHelp": "Besedilo, prikazano udeležencem v čakalnici, kadar dogodek uporablja postprodukcijo z AI (prepis, povzetek, prevod, sinhronizacija). Prilagodljivo po jezikih. Pustite prazno, da se uporabi privzeto sistemsko besedilo.",
         "consentDisclosurePlaceholder": "Npr. Ta dogodek bo po prenosu v živo samodejno prepisan in povzet z orodji umetne inteligence …"
@@ -1642,7 +1650,7 @@
         "jvbStressCriticalPercent": "Prag kritičnega stresa (%)",
         "jvbStressCriticalPercentHelp": "Nad tem pragom skalator doda 2 repliki JVB. Privzeto 70. Mora biti večji od opozorila.",
         "jvbProvisioningTimeoutMinutes": "Časovna omejitev priprave (minute)",
-        "jvbProvisioningTimeoutMinutesHelp": "Po koliko minutah od startsAt se dogodek z JVB, ki še ni pripravljen, na strani stanja označi kot 'degraded'. Privzeto 15. Pokriva hladni zagon vozlišča (~3–5 min) + varnostno mejo.",
+        "jvbProvisioningTimeoutMinutesHelp": "Po koliko minutah od startsAt se dogodek z JVB, ki še ni pripravljen, na strani stanja označi kot 'degraded'. Privzeto 15. Pokriva hladni zagon vozlišča (~3–5 min) + varnostno mejo. Velja tudi za storitev snemanja, šteto od trenutka, ko jo zahteva dogodek s snemanjem: če v tem času ne odgovori, je soba v živo ne prikazuje več kot »se zaganja« in jo označi kot nezagnano.",
         "statusPollIntervalSeconds": "Interval poizvedb strani stanja (sekunde)",
         "statusPollIntervalSecondsHelp": "Vsakih koliko sekund stran /status osveži podatke v brskalniku. Privzeto 30. Nižje vrednosti = svežejši podatki, vendar večja obremenitev aplikacije.",
         "emailSenderTitle": "Pošiljatelj e-sporočil",
@@ -2187,7 +2195,12 @@
     },
     "eventDetail": {
       "copyPublicUrl": "Kopiraj javno povezavo",
-      "enterAsModerator": "Vstopi v živo",
+      "copyInviteUrl": "Kopiraj povezavo za povabilo",
+      "enterAsParticipant": "Vstopi kot udeleženec",
+      "openAsParticipant": "Odpri kot udeleženec",
+      "participantHintRoom": "Odpre se v novem zavihku: soba, kot jo vidi gost, brez moderatorskih pooblastil.",
+      "participantHintPassword": "Odpre se v novem zavihku: soba, kot jo vidi gost, po vnosu gesla dogodka.",
+      "participantHintPage": "Odpre se v novem zavihku: javna stran, kot jo vidijo udeleženci.",
       "editEvent": "Uredi dogodek",
       "editSettings": "Uredi nastavitve",
       "featureSummary": "Aktivne funkcije",
@@ -2788,9 +2801,27 @@
     "add": "Dodaj",
     "adding": "Dodajanje...",
     "cancel": "Prekliči",
+    "modeLabel": "Vrsta gradiva",
+    "modeLink": "Povezava",
+    "modeFile": "Datoteka",
+    "titleOptional": "Naslov (neobvezno, sicer ime datoteke)",
+    "fileLabel": "Datoteka za nalaganje",
+    "fileHelp": "Podprti formati: PDF, DOCX, PPTX, XLSX, TXT — največ {maxMb} MB",
+    "upload": "Naloži",
+    "uploading": "Nalaganje poteka …",
     "errors": {
       "urlInvalid": "Vnesite veljaven URL",
-      "generic": "Napaka pri dodajanju gradiva"
+      "generic": "Napaka pri dodajanju gradiva",
+      "fileMissing": "Izberite datoteko za nalaganje",
+      "titleMissing": "Vnesite naslov povezave",
+      "fileTooLarge": "Datoteka presega omejitev {maxMb} MB",
+      "fileTooLargeForServer": "Strežnik ne sprejme tako velike datoteke: poskusite z manjšo datoteko",
+      "fileType": "Vrsta datoteke ni podprta (PDF, DOCX, PPTX, XLSX, TXT)",
+      "uploadUnavailable": "Nalaganje datotek v tej namestitvi ni na voljo",
+      "uploadFailed": "Napaka pri nalaganju datoteke",
+      "quotaExceeded": "Ta dogodek je dosegel omejitev naloženih datotek ({maxFiles} datotek, skupaj {maxMb} MB): odstranite nekaj datotek, da naložite nove",
+      "uploadBusy": "Trenutno je preveč nalaganj: poskusite znova čez nekaj sekund",
+      "deleteFailed": "Gradiva ni bilo mogoče izbrisati"
     }
   },
   "reminders": {
@@ -3343,7 +3374,13 @@
     "noActiveRound": "Trenutno ni aktivnega word clouda.",
     "noWords": "Čakamo na prve besede...",
     "wordsSubmitted": "{count} besed poslanih",
-    "timeRemaining": "Preostali čas"
+    "timeRemaining": "Preostali čas",
+    "errors": {
+      "send": "Beseda ni bila poslana. Poskusite znova.",
+      "closed": "Ta krog je zaprt: novih besed ni več mogoče oddati.",
+      "limit": "V tem krogu ste že poslali največje dovoljeno število besed.",
+      "rateLimited": "Trenutno je preveč pošiljanj: počakajte nekaj sekund, preden poskusite znova."
+    }
   },
   "timer": {
     "title": "Časovnik",
@@ -3642,6 +3679,8 @@
     "warmingUpButton": "Soba se pripravlja ...",
     "nameLabel": "Vaše ime",
     "nameHelp": "Vidno bo drugim udeležencem",
+    "nameRequiredToEnter": "Za vstop vnesite svoje ime (vsaj 2 znaka).",
+    "roomOpenNameMissing": "Dvorana je odprta: za vstop vnesite svoje ime.",
     "joinNowBtn": "Vstopi zdaj",
     "roomOpen": "Dvorana je odprta",
     "whileYouWait": "Medtem ko čakate",

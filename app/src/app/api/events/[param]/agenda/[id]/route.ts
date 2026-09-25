@@ -6,7 +6,7 @@
 
 import { z } from 'zod';
 
-import { withErrorHandling } from '@/lib/api-handler';
+import { parseJsonBody, withErrorHandling } from '@/lib/api-handler';
 import { prisma } from '@/lib/db';
 import { pokeLivePanel } from '@/lib/live-state/publish';
 import { NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
@@ -32,7 +32,7 @@ async function authItem(request: Request, slug: string, id: string) {
 export const PATCH = withErrorHandling(async (request, context) => {
   const { param: slug, id } = (await context.params) as { param: string; id: string };
   const { eventId } = await authItem(request, slug, id);
-  const body = patchSchema.parse(await request.json());
+  const body = patchSchema.parse(await parseJsonBody(request));
 
   const updated = await prisma.eventAgendaItem.update({
     where: { id },

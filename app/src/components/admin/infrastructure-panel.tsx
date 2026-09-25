@@ -218,7 +218,7 @@ export default function InfrastructurePanel({ info }: InfrastructurePanelProps) 
           <Icon icon="it-info-circle" className="me-2" />
           {t('jibri.configureHint')}{' '}
           <a
-            href="https://github.com/italia/pa-webinar/blob/main/docs/DEPLOYMENT.md#configurazione-registrazione-video-jibri"
+            href="https://github.com/italia/pa-webinar/blob/main/docs/operations/recording-setup.md#recording-storage"
             target="_blank"
             rel="noopener noreferrer"
           >

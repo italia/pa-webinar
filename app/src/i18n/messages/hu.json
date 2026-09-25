@@ -139,7 +139,9 @@
     "status": {
       "DRAFT": "Vázlat",
       "PUBLISHED": "Közzétéve",
+      "PROVISIONING": "Előkészítés alatt",
       "LIVE": "Éppen zajlik",
+      "IDLE": "Szüneteltetve",
       "ENDED": "Befejezve",
       "ARCHIVED": "Archiválva"
     },
@@ -288,6 +290,9 @@
     "jibriNotConfigured": "Felvétel nincs konfigurálva az infrastruktúrában",
     "jibriScaling": "Felvétel indítása…",
     "jibriScalingTooltip": "A felvevő komponens éppen indul. Hamarosan elérhető lesz.",
+    "recorderNotStarted": "A felvétel nem érhető el",
+    "recorderNotStartedDetail": "A felvételi szolgáltatás még nem indult el: az esemény egyelőre felvétel nélkül folytatódik. Értesítse a platform üzemeltetőit.",
+    "recorderStartFailed": "A felvétel nem indult el. Próbálja újra néhány perc múlva; ha a probléma továbbra is fennáll, értesítse a platform üzemeltetőit.",
     "roomPreparing": "Terem előkészítése…",
     "roomPreparingDetail": "A videószerverek éppen elindulnak. A művelet körülbelül 2 percet vesz igénybe. A terem automatikusan aktiválódik.",
     "recordingPromptTitle": "Elindítja a felvételt?",
@@ -483,6 +488,7 @@
       "textRequired": "Írja be kérdését",
       "tooLong": "A kérdés nem haladhatja meg az 500 karaktert",
       "rateLimit": "Kérjük, várjon a következő kérdés elküldése előtt",
+      "busy": "A hálózatáról most sok kérdés érkezik: kérjük, próbálja újra néhány másodperc múlva",
       "generic": "Hiba a kérdés elküldésekor"
     },
     "ctaTitle": "Tegye fel az első kérdést",
@@ -703,7 +709,7 @@
         "speakerEmail": "E-mail",
         "speakerRequired": "A név és az e-mail cím megadása kötelező.",
         "invitationsHeading": "Meghívók",
-        "invitationsHelp": "Előzetesen regisztrált személyek — személyes csatlakozási hivatkozást kapnak.",
+        "invitationsHelp": "A meghívott személyek listája. A platform nem küld meghívókat: az esemény hivatkozását Ön ossza meg velük. Ha a nyilvános regisztráció ki van kapcsolva, csak ezek a címek regisztrálhatnak, a személyes belépési hivatkozás pedig a regisztráció után e-mailben érkezik.",
         "invitationName": "Név (opcionális)",
         "invitationEmail": "E-mail",
         "invitationRole": "Szerepkör",
@@ -1317,6 +1323,8 @@
       "publicPageHint": "Az új regisztrációk gyűjtéséhez megosztandó oldal.",
       "guestJoin": "Közvetlen meghívás (regisztráció nélkül)",
       "guestJoinHint": "Gyors hivatkozás egy utolsó pillanatban érkező résztvevő meghívásához: vendégként csatlakozhat, amikor az esemény élőben fut, regisztrációs űrlap kitöltése nélkül.",
+      "callInvite": "Hivatkozás a résztvevőknek",
+      "callInviteHint": "Aki megkapja, vendégként, regisztráció nélkül csatlakozik a híváshoz. Az azonnali hívásnak nincs nyilvános oldala: ezt a hivatkozást kell megosztani.",
       "moderatorLink": "Moderátor link",
       "moderatorLinkHint": "Ezt a linket csak moderátorokkal ossza meg. Bárki, aki rendelkezik ezzel a linkkel, kezelheti az eseményt.",
       "liveRoomHint": "Közvetlen hivatkozás a moderátorként való belépéshez a terembe.",
@@ -1443,7 +1451,7 @@
         "jobMaxAttempts": "Próbálkozások a sikertelenné nyilvánítás előtt",
         "jobMaxAttemptsHelp": "Hányszor próbálja újra a pipeline a feladatot, mielőtt sikertelennek jelöli. A próbálkozások közötti várakozás exponenciálisan nő (30 másodperctől 2 óráig). A szokásos érték 5.",
         "artifactRetentionDays": "Artefaktumok megőrzése (nap)",
-        "artifactRetentionDaysHelp": "0-n hagyva az AI-artefaktumok az esemény saját megőrzési ütemezését követik. A nullánál nagyobb érték a megadott számú napig megőrzi őket, az esemény lezárása után is, amíg egy napi cron nem törli őket. A törlés kiterjed a beszélők neveire és a feladatok adattartalmára is, összhangban a docs/GDPR.md dokumentummal.",
+        "artifactRetentionDaysHelp": "0 értéknél nincs az egész webhelyre vonatkozó korlát: az AI-artefaktumok a felvételük vagy az esemény megőrzési idejét követik. A nullánál nagyobb érték esetén egy napi feladat töröl minden olyan artefaktumot, amely ennél több napja jött létre, akár közzétették, akár nem: ez lerövidítheti a megőrzést, de soha nem hosszabbítja meg. A beszélők neveire és a feladatok adattartalmára ez nem vonatkozik: ezek a felvétel vagy az esemény megőrzési idejét követik. Részletek: docs/privacy/recordings-and-ai.md.",
         "consentDisclosureSection": "AI-tájékoztató a váróteremben",
         "consentDisclosureHelp": "A résztvevőknek a váróteremben megjelenő szöveg, ha az esemény AI-utómunkát használ (átiratkészítés, összefoglaló, fordítás, szinkron). Nyelvenként testre szabható. Hagyja üresen a beépített alapértelmezett szöveg használatához.",
         "consentDisclosurePlaceholder": "Pl. Ezt az eseményt az élő közvetítés után automatikusan átírjuk és összefoglaljuk AI-eszközökkel…"
@@ -1642,7 +1650,7 @@
         "jvbStressCriticalPercent": "Kritikus stresszküszöb (%)",
         "jvbStressCriticalPercentHelp": "E küszöb felett a skálázó 2 további JVB-replikát ad hozzá. Alapértelmezett: 70. Magasabbnak kell lennie a figyelmeztetésinél.",
         "jvbProvisioningTimeoutMinutes": "Provisioning időkorlát (perc)",
-        "jvbProvisioningTimeoutMinutesHelp": "A startsAt után hány perccel kerül egy nem még készen álló JVB-vel rendelkező esemény „degraded” státuszba az állapotoldalon. Alapértelmezett: 15. Lefedi a csomópont hidegindítását (~3-5 perc) plusz biztonsági ráhagyást.",
+        "jvbProvisioningTimeoutMinutesHelp": "A startsAt után hány perccel kerül egy nem még készen álló JVB-vel rendelkező esemény „degraded” státuszba az állapotoldalon. Alapértelmezett: 15. Lefedi a csomópont hidegindítását (~3-5 perc) plusz biztonsági ráhagyást. A felvételi szolgáltatásra is vonatkozik, attól számítva, hogy egy felvétellel rendelkező esemény igényli: ha ennyi idő alatt nem válaszol, az élő terem már nem „indul” állapotban mutatja, hanem el nem indultként jelzi.",
         "statusPollIntervalSeconds": "Állapotoldal lekérdezési intervallum (másodperc)",
         "statusPollIntervalSecondsHelp": "Hány másodpercenként frissíti a /status oldal az adatokat a böngészőben. Alapértelmezett: 30. Alacsonyabb értékek = frissebb adatok, de nagyobb terhelés az alkalmazáson.",
         "emailSenderTitle": "Az e-mailek feladója",
@@ -2187,7 +2195,12 @@
     },
     "eventDetail": {
       "copyPublicUrl": "Nyilvános hivatkozás másolása",
-      "enterAsModerator": "Belépés élőben",
+      "copyInviteUrl": "Meghívó hivatkozás másolása",
+      "enterAsParticipant": "Belépés résztvevőként",
+      "openAsParticipant": "Megnyitás résztvevőként",
+      "participantHintRoom": "Új lapon nyílik meg: a terem úgy, ahogy egy vendég látja, moderátori jogok nélkül.",
+      "participantHintPassword": "Új lapon nyílik meg: a terem úgy, ahogy egy vendég látja, az esemény jelszavának megadása után.",
+      "participantHintPage": "Új lapon nyílik meg: a nyilvános oldal úgy, ahogy a résztvevők látják.",
       "editEvent": "Esemény szerkesztése",
       "editSettings": "Beállítások szerkesztése",
       "featureSummary": "Aktív funkciók",
@@ -2788,9 +2801,27 @@
     "add": "Hozzáadás",
     "adding": "Hozzáadás...",
     "cancel": "Mégse",
+    "modeLabel": "Anyag típusa",
+    "modeLink": "Hivatkozás",
+    "modeFile": "Fájl",
+    "titleOptional": "Cím (nem kötelező, alapértelmezés szerint a fájl neve)",
+    "fileLabel": "Feltöltendő fájl",
+    "fileHelp": "Támogatott formátumok: PDF, DOCX, PPTX, XLSX, TXT — max. {maxMb} MB",
+    "upload": "Feltöltés",
+    "uploading": "Feltöltés folyamatban…",
     "errors": {
       "urlInvalid": "Adjon meg érvényes URL-t",
-      "generic": "Hiba az anyag hozzáadásakor"
+      "generic": "Hiba az anyag hozzáadásakor",
+      "fileMissing": "Válasszon ki egy feltöltendő fájlt",
+      "titleMissing": "Adja meg a hivatkozás címét",
+      "fileTooLarge": "A fájl meghaladja a {maxMb} MB-os korlátot",
+      "fileTooLargeForServer": "A szerver nem fogad el ilyen nagy fájlt: próbálkozzon kisebb fájllal",
+      "fileType": "Nem támogatott fájltípus (PDF, DOCX, PPTX, XLSX, TXT)",
+      "uploadUnavailable": "A fájlfeltöltés ezen a telepítésen nem érhető el",
+      "uploadFailed": "Hiba a fájl feltöltése során",
+      "quotaExceeded": "Ez az esemény elérte a feltöltött fájlok korlátját ({maxFiles} fájl, összesen {maxMb} MB): távolítson el néhányat, hogy újakat tölthessen fel",
+      "uploadBusy": "Jelenleg túl sok a feltöltés: próbálja újra néhány másodperc múlva",
+      "deleteFailed": "Az anyagot nem sikerült törölni"
     }
   },
   "reminders": {
@@ -3343,7 +3374,13 @@
     "noActiveRound": "Jelenleg nincs aktív word cloud.",
     "noWords": "Várunk az első szavakra...",
     "wordsSubmitted": "{count} beküldött szó",
-    "timeRemaining": "Hátralévő idő"
+    "timeRemaining": "Hátralévő idő",
+    "errors": {
+      "send": "A szó nem lett elküldve. Próbálja újra.",
+      "closed": "Ez a kör lezárult: további szavakat már nem fogadunk.",
+      "limit": "Ebben a körben már elküldte a megengedett legtöbb szót.",
+      "rateLimited": "Túl sok beküldés érkezik most: várjon néhány másodpercet, mielőtt újra próbálkozik."
+    }
   },
   "timer": {
     "title": "Időzítő",
@@ -3642,6 +3679,8 @@
     "warmingUpButton": "Terem előkészítése...",
     "nameLabel": "Az Ön neve",
     "nameHelp": "A többi résztvevő számára látható lesz",
+    "nameRequiredToEnter": "A belépéshez adja meg a nevét (legalább 2 karakter).",
+    "roomOpenNameMissing": "A terem nyitva van: a belépéshez adja meg a nevét.",
     "joinNowBtn": "Belépés most",
     "roomOpen": "A terem nyitva van",
     "whileYouWait": "Várakozás közben",

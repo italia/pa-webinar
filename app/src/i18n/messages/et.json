@@ -139,7 +139,9 @@
     "status": {
       "DRAFT": "Mustand",
       "PUBLISHED": "Avaldatud",
+      "PROVISIONING": "Ettevalmistamisel",
       "LIVE": "Toimub",
+      "IDLE": "Pausil",
       "ENDED": "Lõppenud",
       "ARCHIVED": "Arhiveeritud"
     },
@@ -288,6 +290,9 @@
     "jibriNotConfigured": "Salvestamine pole infrastruktuuris seadistatud",
     "jibriScaling": "Salvestus käivitub…",
     "jibriScalingTooltip": "Salvestuskomponent käivitub. See on peagi saadaval.",
+    "recorderNotStarted": "Salvestamine pole saadaval",
+    "recorderNotStartedDetail": "Salvestusteenus pole veel käivitunud: seni jätkub üritus ilma salvestuseta. Andke platvormi haldajatele teada.",
+    "recorderStartFailed": "Salvestamine ei alanud. Proovige mõne minuti pärast uuesti; kui probleem püsib, andke platvormi haldajatele teada.",
     "roomPreparing": "Ruum valmistub…",
     "roomPreparingDetail": "Videoserverid käivituvad. See võtab umbes 2 minutit. Ruum aktiveerub automaatselt.",
     "recordingPromptTitle": "Käivitada salvestus?",
@@ -483,6 +488,7 @@
       "textRequired": "Kirjutage oma küsimus",
       "tooLong": "Küsimus ei tohi ületada 500 tähemärki",
       "rateLimit": "Palun oodake enne järgmise küsimuse esitamist",
+      "busy": "Teie võrgust saabub praegu palju küsimusi: palun proovige mõne sekundi pärast uuesti",
       "generic": "Viga küsimuse esitamisel"
     },
     "ctaTitle": "Esitage esimene küsimus",
@@ -703,7 +709,7 @@
         "speakerEmail": "E-post",
         "speakerRequired": "Nimi ja e-post on kohustuslikud.",
         "invitationsHeading": "Kutsed",
-        "invitationsHelp": "Eelregistreerunud isikud — saavad isikliku osalemislingi.",
+        "invitationsHelp": "Kutsutud isikute nimekiri. Platvorm kutseid ei saada: jaga sündmuse linki ise. Kui avalik registreerumine on välja lülitatud, saavad registreeruda ainult need aadressid ning isiklik sisenemislink saabub pärast registreerumist e-postiga.",
         "invitationName": "Nimi (valikuline)",
         "invitationEmail": "E-post",
         "invitationRole": "Roll",
@@ -1317,6 +1323,8 @@
       "publicPageHint": "Leht, mida jagada uute registreeringute kogumiseks.",
       "guestJoin": "Otsene kutse (ilma registreerimiseta)",
       "guestJoinHint": "Kiirlink osaleja viimase hetke kutsumiseks: ta siseneb külalisena, kui sündmus on aktiivne, ilma registreerimisvormi täitmata.",
+      "callInvite": "Link osalejatele",
+      "callInviteHint": "Selle saaja liitub kõnega külalisena, ilma registreerimiseta. Kiirkõnel ei ole avalikku lehte: jagamiseks on see link.",
       "moderatorLink": "Moderaatori link",
       "moderatorLinkHint": "Jagage seda linki ainult moderaatoritega. Igaüks, kellel on see link, saab üritust hallata.",
       "liveRoomHint": "Otsene link sisenemiseks moderaatorina ruumi.",
@@ -1443,7 +1451,7 @@
         "jobMaxAttempts": "Katseid enne ebaõnnestumist",
         "jobMaxAttemptsHelp": "Mitu korda töövoog tööd uuesti proovib, enne kui märgib selle ebaõnnestunuks. Katsete vaheline ooteaeg kasvab eksponentsiaalselt (30 sekundist kuni 2 tunnini). Tüüpiline väärtus on 5.",
         "artifactRetentionDays": "Artefaktide säilitamine (päevades)",
-        "artifactRetentionDaysHelp": "Väärtusega 0 järgivad AI artefaktid sündmuse enda säilitustähtaega. Nullist suurem väärtus hoiab neid määratud arvu päevi ka pärast sündmuse sulgemist, kuni igapäevane cron need kustutab. Kustutamine hõlmab kõnelejate nimesid ja tööde andmeid kooskõlas failiga docs/GDPR.md.",
+        "artifactRetentionDaysHelp": "Väärtusega 0 ei kehti kogu saidi piirangut: AI artefaktid järgivad oma salvestise või sündmuse säilitustähtaega. Nullist suurem väärtus paneb igapäevase töö kustutama iga artefakti, mis loodi rohkem kui nii mitu päeva tagasi, olgu avaldatud või mitte: see võib säilitusaega lühendada, kuid mitte kunagi pikendada. Kõnelejate nimesid ja tööde andmeid see ei puuduta: need järgivad salvestise või sündmuse säilitustähtaega. Üksikasjad: docs/privacy/recordings-and-ai.md.",
         "consentDisclosureSection": "AI teavitus ooteruumis",
         "consentDisclosureHelp": "Tekst, mida näidatakse osalejatele ooteruumis, kui sündmus kasutab AI järeltöötlust (transkribeerimine, kokkuvõte, tõlge, dubleerimine). Kohandatav keelte kaupa. Jäta tühjaks, et kasutada süsteemi vaiketeksti.",
         "consentDisclosurePlaceholder": "Nt Sellest sündmusest tehakse pärast otseülekannet AI tööriistadega automaatselt transkriptsioon ja kokkuvõte…"
@@ -1642,7 +1650,7 @@
         "jvbStressCriticalPercent": "Stressi kriitiline lävi (%)",
         "jvbStressCriticalPercentHelp": "Üle selle läve lisab skaleerija 2 JVB koopiat. Vaikeväärtus 70. Peab olema suurem kui hoiatuslävi.",
         "jvbProvisioningTimeoutMinutes": "Ettevalmistuse ajalimiit (minutid)",
-        "jvbProvisioningTimeoutMinutesHelp": "Mitu minutit pärast startsAt JVB-ga ette valmistamata sündmus märgitakse oleku lehel 'halvenenuks'. Vaikeväärtus 15. Katab sõlme külmkäivituse (~3-5 min) pluss turvavaru.",
+        "jvbProvisioningTimeoutMinutesHelp": "Mitu minutit pärast startsAt JVB-ga ette valmistamata sündmus märgitakse oleku lehel 'halvenenuks'. Vaikeväärtus 15. Katab sõlme külmkäivituse (~3-5 min) pluss turvavaru. Kehtib ka salvestusteenusele, arvestades hetkest, mil salvestusega sündmus seda nõuab: kui see selle aja jooksul ei vasta, lõpetab otseülekande ruum selle näitamise käivitumas olevana ja märgib selle mitte käivitunuks.",
         "statusPollIntervalSeconds": "Olekulehe küsitlemise intervall (sekundid)",
         "statusPollIntervalSecondsHelp": "Mitu sekundit /status leht brauseri poolt värskendab. Vaikeväärtus 30. Madalamad väärtused = värskemad andmed, kuid suurem koormus rakendusele.",
         "emailSenderTitle": "E-kirjade saatja",
@@ -2187,7 +2195,12 @@
     },
     "eventDetail": {
       "copyPublicUrl": "Kopeeri avalik link",
-      "enterAsModerator": "Sisene LIVE",
+      "copyInviteUrl": "Kopeeri kutse link",
+      "enterAsParticipant": "Sisene osalejana",
+      "openAsParticipant": "Ava osalejana",
+      "participantHintRoom": "Avaneb uuel vahekaardil: ruum nii, nagu külaline seda näeb, ilma moderaatori õigusteta.",
+      "participantHintPassword": "Avaneb uuel vahekaardil: ruum nii, nagu külaline seda näeb, pärast ürituse parooli.",
+      "participantHintPage": "Avaneb uuel vahekaardil: avalik leht nii, nagu osalejad seda näevad.",
       "editEvent": "Muuda sündmust",
       "editSettings": "Muuda seadeid",
       "featureSummary": "Aktiivsed funktsioonid",
@@ -2788,9 +2801,27 @@
     "add": "Lisa",
     "adding": "Lisamine...",
     "cancel": "Tühista",
+    "modeLabel": "Materjali tüüp",
+    "modeLink": "Link",
+    "modeFile": "Fail",
+    "titleOptional": "Pealkiri (valikuline, muidu faili nimi)",
+    "fileLabel": "Üleslaaditav fail",
+    "fileHelp": "Toetatud vormingud: PDF, DOCX, PPTX, XLSX, TXT — max {maxMb} MB",
+    "upload": "Lae üles",
+    "uploading": "Üleslaadimine…",
     "errors": {
       "urlInvalid": "Palun sisestage kehtiv URL",
-      "generic": "Viga materjali lisamisel"
+      "generic": "Viga materjali lisamisel",
+      "fileMissing": "Valige üleslaaditav fail",
+      "titleMissing": "Sisestage lingi pealkiri",
+      "fileTooLarge": "Fail ületab {maxMb} MB piirangu",
+      "fileTooLargeForServer": "Server ei võta nii suurt faili vastu: proovige väiksemat faili",
+      "fileType": "Failitüüp ei ole toetatud (PDF, DOCX, PPTX, XLSX, TXT)",
+      "uploadUnavailable": "Failide üleslaadimine pole selles paigalduses saadaval",
+      "uploadFailed": "Faili üleslaadimisel tekkis viga",
+      "quotaExceeded": "See sündmus on jõudnud üleslaaditud failide piirini ({maxFiles} faili, kokku {maxMb} MB): eemaldage mõni, et rohkem üles laadida",
+      "uploadBusy": "Praegu on liiga palju üleslaadimisi: proovige mõne sekundi pärast uuesti",
+      "deleteFailed": "Materjali ei õnnestunud kustutada"
     }
   },
   "reminders": {
@@ -3343,7 +3374,13 @@
     "noActiveRound": "Hetkel pole aktiivset Word Cloud'i.",
     "noWords": "Ootame esimesi sõnu...",
     "wordsSubmitted": "{count} sõna saadetud",
-    "timeRemaining": "Jäänud aega"
+    "timeRemaining": "Jäänud aega",
+    "errors": {
+      "send": "Sõna ei saadetud. Proovige uuesti.",
+      "closed": "See voor on suletud: rohkem sõnu vastu ei võeta.",
+      "limit": "Olete selles voorus juba saatnud maksimaalse arvu sõnu.",
+      "rateLimited": "Praegu on liiga palju saatmisi: oodake mõni sekund, enne kui uuesti proovite."
+    }
   },
   "timer": {
     "title": "Taimer",
@@ -3642,6 +3679,8 @@
     "warmingUpButton": "Ruum valmistub...",
     "nameLabel": "Teie nimi",
     "nameHelp": "Teised osalejad näevad seda",
+    "nameRequiredToEnter": "Sisenemiseks sisestage oma nimi (vähemalt 2 tähemärki).",
+    "roomOpenNameMissing": "Ruum on avatud: sisenemiseks sisestage oma nimi.",
     "joinNowBtn": "Sisene kohe",
     "roomOpen": "Ruum on avatud",
     "whileYouWait": "Ootamise ajal",

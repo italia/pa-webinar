@@ -172,7 +172,7 @@ export default function PostprodStatusCard() {
             è renderizzata, perché significa che l'admin ha attivato la
             pipeline. Estetica nota in box laterale invece di icona-i
             inline (che duplicava quella implicita di Bootstrap Italia
-            nei contesti alert; vedi feedback_bootstrap-italia-alert). */}
+            nei contesti alert, disegnata via ::before). */}
         <p
           className="mb-3 p-2 rounded"
           style={{

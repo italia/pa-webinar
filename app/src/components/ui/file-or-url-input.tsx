@@ -15,13 +15,13 @@
  *
  * Icons: we inline SVGs rather than using <Icon /> from design-react-kit
  * because that component ships sprite refs that can hydrate differently
- * between server and client in some layouts (see MEMORY feedback on
- * design-react-kit Icon hydration mismatches).
+ * between server and client in some layouts.
  */
 
 import { useCallback, useId, useMemo, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
+import { MATERIAL_FILE_MIME_TYPES } from '@/lib/validation/materials';
 import type { AssetUploadResponse } from '@/lib/validation/schemas';
 
 export type FileOrUrlAssetType = 'image' | 'audio' | 'document';
@@ -52,8 +52,7 @@ export interface FileOrUrlInputProps {
 const DEFAULT_ACCEPT: Record<FileOrUrlAssetType, string> = {
   image: 'image/png,image/jpeg,image/webp,image/svg+xml,image/gif',
   audio: 'audio/mpeg,audio/wav,audio/ogg,audio/mp4,audio/webm',
-  document:
-    'application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.presentationml.presentation,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/plain',
+  document: MATERIAL_FILE_MIME_TYPES.join(','),
 };
 
 function isValidUrl(v: string): boolean {

@@ -91,7 +91,8 @@ app:
     # Counted like Envoy's xff_num_trusted_hops, NOT like Express "trust
     # proxy": the ingress itself is 0. When the ingress appends, one too high
     # lets a client choose its own key; one too low makes all clients share
-    # one counter. Values per setup: docs/CONFIGURATION.md.
+    # one counter. Values per setup: docs/CONFIGURATION.md, "Client address
+    # and rate limits".
     # Behind one load balancer/WAF that appends, or with the GKE Ingress
     # (classes gce, gce-internal: it appends "<client>,<lb-ip>"):
     #   TRUSTED_PROXY_HOPS: "1"
@@ -100,8 +101,10 @@ app:
     #
     # Public transparency artifact served at /service-inventory. Describes
     # both software dependencies (DEV) and operational services (OPS) that
-    # make up THIS tenant's deployment. See docs/ARCHITECTURE.md or the
-    # OWASP CycloneDX spec for the format.
+    # make up THIS tenant's deployment. For the format see
+    # docs/SERVICE-INVENTORY.md ("Rendering contract"),
+    # docs/SERVICE-INVENTORY-GENERATION.md ("The document model") or the
+    # OWASP CycloneDX spec.
     #
     # Accepted forms:
     #   - absolute https URL (e.g. Azure Blob public container) — fetched
@@ -257,8 +260,9 @@ secrets:
   # Secret da cui legge la password, quindi ogni chiave tenuta lì accanto —
   # a partire da quella che cifra i dati personali — diventa leggibile da chi
   # raggiunge il database. I profili di esempio per le nuove installazioni lo
-  # valorizzano; vedi docs/DEPLOYMENT.md per separarlo su un'installazione
-  # esistente, dove va fatto a mano e prima dell'aggiornamento.
+  # valorizzano; per separarlo su un'installazione esistente, dove va fatto a
+  # mano e prima dell'aggiornamento, vedi docs/operations/upgrades.md
+  # ("Moving datastore passwords into a separate Secret").
   #
   # Vuoto = si usa lo stesso Secret dell'applicazione, che è ciò che fanno le
   # installazioni già in piedi. Il valore predefinito non cambia da solo.
@@ -491,7 +495,15 @@ ingress:
   # predefinite, si toglie una chiave impostandola a null.
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
-    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+    # Sopra il file più grande che l'app accetta passando da sé: i materiali
+    # dell'evento, dalla sala e dall'area admin, fino a 25 MiB più la cornice
+    # del modulo (`MATERIAL_FILE_MAX_BYTES` in app/src/lib/validation/
+    # materials.ts). Più basso, ingress-nginx risponde 413 a file che l'app
+    # dichiara ammessi. Le registrazioni non passano di qui: vanno dritte
+    # allo storage con un URL firmato. Il limite alto non vale per le rotte
+    # JSON: l'app rifiuta con 413 un corpo JSON oltre 10 MiB prima di leggerlo
+    # (`JSON_BODY_MAX_BYTES` in app/src/lib/api-handler.ts).
+    nginx.ingress.kubernetes.io/proxy-body-size: "30m"
     nginx.ingress.kubernetes.io/proxy-buffer-size: "16k"
     nginx.ingress.kubernetes.io/proxy-buffers-number: "4"
     # Nessun limite di frequenza qui di proposito. Le annotazioni che stavano
@@ -1117,7 +1129,7 @@ postprod:
   # vLLM (LLM server per i task SUMMARIZE/TRANSLATE). E' un Deployment GPU
   # separato (oggi applicato a mano, vedi docs/POSTPROD.md). Su un pool
   # aigpu scale-to-zero, tenerlo sempre a replicas=1 vanifica lo
-  # scale-to-zero e tiene acceso l'A100 (~3.40 EUR/h) anche a vuoto.
+  # scale-to-zero e tiene acceso il nodo GPU anche a vuoto.
   vllm:
     # Se true, l'orchestrator scala il Deployment vLLM a 1 quando c'e'
     # lavoro postprod (desired>0 o worker attivi) e a 0 quando la pipeline

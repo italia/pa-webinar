@@ -1,11 +1,20 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
+const { filesStorage } = vi.hoisted(() => ({
+  filesStorage: {
+    current: null as null | {
+      delete: ReturnType<typeof vi.fn>;
+      list: ReturnType<typeof vi.fn>;
+    },
+  },
+}));
+
 vi.mock('@/lib/db', () => ({
   prisma: {
-    event: { findMany: vi.fn(), update: vi.fn() },
+    event: { findMany: vi.fn(), findFirst: vi.fn(), update: vi.fn() },
     staffLoginToken: { deleteMany: vi.fn(async () => ({ count: 0 })) },
     gdprAuditLog: { create: vi.fn() },
-    eventMaterial: { findMany: vi.fn(), deleteMany: vi.fn() },
+    eventMaterial: { findMany: vi.fn(), findFirst: vi.fn(), deleteMany: vi.fn() },
     chatMessage: { findMany: vi.fn(), deleteMany: vi.fn() },
     questionUpvote: { deleteMany: vi.fn() },
     question: { deleteMany: vi.fn() },
@@ -33,6 +42,9 @@ vi.mock('@/lib/azure/blob-storage', () => ({
   deleteBlob: vi.fn(),
   isAzureConfigured: vi.fn(),
 }));
+vi.mock('@/lib/storage', () => ({
+  getFilesStorage: () => filesStorage.current,
+}));
 
 import { prisma } from '@/lib/db';
 import { deleteRecordingBlob } from '@/lib/storage/recordings';
@@ -55,10 +67,10 @@ import { GET } from './route';
 type Mock = ReturnType<typeof vi.fn>;
 
 const db = prisma as unknown as {
-  event: { findMany: Mock; update: Mock };
+  event: { findMany: Mock; findFirst: Mock; update: Mock };
   staffLoginToken: { deleteMany: Mock };
   gdprAuditLog: { create: Mock };
-  eventMaterial: { findMany: Mock; deleteMany: Mock };
+  eventMaterial: { findMany: Mock; findFirst: Mock; deleteMany: Mock };
   chatMessage: { findMany: Mock; deleteMany: Mock };
   question: { deleteMany: Mock };
   poll: { deleteMany: Mock };
@@ -150,6 +162,7 @@ describe('GET /api/cron/cleanup', () => {
         const mock = fn as Mock;
         if (typeof mock !== 'function') continue;
         if (name === 'findMany') mock.mockResolvedValue([]);
+        else if (name === 'findFirst') mock.mockResolvedValue(null);
         else if (name === 'deleteMany' || name === 'updateMany')
           mock.mockResolvedValue({ count: 0 });
         else mock.mockResolvedValue({});
@@ -165,6 +178,10 @@ describe('GET /api/cron/cleanup', () => {
     deleteRecordingBlobMock.mockResolvedValue(true);
     deleteBlobMock.mockResolvedValue(true);
     isAzureConfiguredMock.mockReturnValue(true);
+    filesStorage.current = {
+      delete: vi.fn().mockResolvedValue(true),
+      list: vi.fn().mockResolvedValue([]),
+    };
     vi.spyOn(console, 'log').mockImplementation(() => {});
     vi.spyOn(console, 'error').mockImplementation(() => {});
     process.env.CRON_API_KEY = CRON_KEY;
@@ -402,7 +419,9 @@ describe('GET /api/cron/cleanup', () => {
     // (contenuto scritto da un partecipante) nello storage per sempre, senza
     // più nessuna riga che lo indichi.
     stubEventQueries({ ended: [endedEvent({ id: 'evt-vecchio' })] });
-    db.eventMaterial.findMany.mockResolvedValue([{ blobPath: 'events/x/files/slide.pdf' }]);
+    db.eventMaterial.findMany.mockResolvedValue([
+      { id: 'mat-1', eventId: 'evt-vecchio', blobPath: 'events/evt-vecchio/files/slide.pdf' },
+    ]);
     db.chatMessage.findMany.mockResolvedValue([
       { attachmentBlobPath: 'assets/chat/a.png' },
       { attachmentBlobPath: 'assets/chat/b.pdf' },
@@ -415,12 +434,76 @@ describe('GET /api/cron/cleanup', () => {
       where: { eventId: 'evt-vecchio', attachmentBlobPath: { not: null } },
       select: { attachmentBlobPath: true },
     });
+    // I file dei materiali si raccolgono per `blobPath`, qualunque sia il tipo.
+    expect(db.eventMaterial.findMany).toHaveBeenCalledWith({
+      where: { event: { id: 'evt-vecchio' }, blobPath: { not: null } },
+      select: { id: true, eventId: true, blobPath: true },
+    });
+    expect(filesStorage.current!.delete).toHaveBeenCalledWith('events/evt-vecchio/files/slide.pdf');
     expect(deleteBlobMock.mock.calls.map((c) => c[0]).sort()).toEqual([
       'assets/chat/a.png',
       'assets/chat/b.pdf',
-      'events/x/files/slide.pdf',
     ]);
     expect(body.materialBlobsDeleted).toBe(3);
+  });
+
+  it('fase 3: il file di un materiale si cancella prima della riga', async () => {
+    stubEventQueries({ ended: [endedEvent({ id: 'evt-vecchio' })] });
+    db.eventMaterial.findMany.mockResolvedValue([
+      { id: 'mat-1', eventId: 'evt-vecchio', blobPath: 'events/evt-vecchio/files/slide.pdf' },
+    ]);
+
+    await runCleanup();
+
+    expect(filesStorage.current!.delete.mock.invocationCallOrder[0]).toBeLessThan(
+      db.eventMaterial.deleteMany.mock.invocationCallOrder[0] as number
+    );
+    expect(db.eventMaterial.deleteMany).toHaveBeenCalledWith({ where: { eventId: 'evt-vecchio' } });
+  });
+
+  it('fase 3: un file che lo storage non cancella lascia la sua riga al giro dopo', async () => {
+    // Cancellare la riga lo stesso lascerebbe nello storage un file che
+    // nessuno ritroverebbe più. Le PII dell'evento se ne vanno comunque.
+    stubEventQueries({ ended: [endedEvent({ id: 'evt-vecchio' })] });
+    db.eventMaterial.findMany.mockResolvedValue([
+      { id: 'mat-ok', eventId: 'evt-vecchio', blobPath: 'events/evt-vecchio/files/a.pdf' },
+      { id: 'mat-ko', eventId: 'evt-vecchio', blobPath: 'events/evt-vecchio/files/b.pdf' },
+    ]);
+    filesStorage.current!.delete.mockImplementation(async (key: string) => {
+      if (key.endsWith('b.pdf')) throw new Error('storage down');
+      return true;
+    });
+
+    const res = await runCleanup();
+    const body = await res.json();
+
+    expect(db.eventMaterial.deleteMany).toHaveBeenCalledWith({
+      where: { eventId: 'evt-vecchio', id: { notIn: ['mat-ko'] } },
+    });
+    expect(db.registration.deleteMany).toHaveBeenCalled();
+    expect(body.materialBlobsDeleted).toBe(1);
+    expect(body.eventsProcessed).toBe(1);
+  });
+
+  it('fase 3: il file che il materiale di un altro evento tiene ancora resta', async () => {
+    // Un materiale che punta al file di un altro evento (una riga scritta prima
+    // che l'area admin rifiutasse le chiavi già in uso): la retention del suo
+    // evento non deve togliere il file all'altro.
+    const chiave = 'assets/document/2026/09/66666666-6666-4666-8666-666666666666-slide.pdf';
+    stubEventQueries({ ended: [endedEvent({ id: 'evt-vecchio' })] });
+    db.eventMaterial.findMany.mockResolvedValue([
+      { id: 'mat-1', eventId: 'evt-vecchio', blobPath: chiave },
+    ]);
+    db.eventMaterial.findFirst.mockResolvedValue({ id: 'materiale-di-un-altro-evento' });
+
+    await runCleanup();
+
+    expect(db.eventMaterial.findFirst).toHaveBeenCalledWith({
+      where: { blobPath: chiave, id: { notIn: ['mat-1'] } },
+      select: { id: true },
+    });
+    expect(filesStorage.current!.delete).not.toHaveBeenCalled();
+    expect(db.eventMaterial.deleteMany).toHaveBeenCalledWith({ where: { eventId: 'evt-vecchio' } });
   });
 
   it('fase 3: legge i path degli allegati PRIMA di cancellare le righe', async () => {
@@ -443,14 +526,19 @@ describe('GET /api/cron/cleanup', () => {
     // In dev non c'è provider: `deleteBlob` tornerebbe false a vuoto. La
     // cancellazione delle PII dal database non deve dipenderne.
     isAzureConfiguredMock.mockReturnValue(false);
+    filesStorage.current = null;
     stubEventQueries({ ended: [endedEvent({ id: 'evt-vecchio' })] });
     db.chatMessage.findMany.mockResolvedValue([{ attachmentBlobPath: 'assets/chat/a.png' }]);
+    db.eventMaterial.findMany.mockResolvedValue([
+      { id: 'mat-1', eventId: 'evt-vecchio', blobPath: 'events/evt-vecchio/files/slide.pdf' },
+    ]);
 
     const res = await runCleanup();
     const body = await res.json();
 
     expect(deleteBlobMock).not.toHaveBeenCalled();
     expect(db.chatMessage.deleteMany).toHaveBeenCalled();
+    expect(db.eventMaterial.deleteMany).toHaveBeenCalledWith({ where: { eventId: 'evt-vecchio' } });
     expect(body.eventsProcessed).toBe(1);
   });
 

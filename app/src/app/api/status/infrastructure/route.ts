@@ -3,6 +3,11 @@ import { NotFoundError } from '@/lib/errors';
 import { statusDataVisible } from '@/lib/status-page';
 import { prisma } from '@/lib/db';
 import { getPublicEnv } from '@/lib/env';
+import {
+  jibriRecordingExpected,
+  recordingStorageConfigured,
+  recordingStorageLabel,
+} from '@/lib/infrastructure';
 import { readJvbSnapshot } from '@/lib/jvb-snapshot';
 import { jvbsForEvent, jvbMaxReplicasFromEnv, JVB_BILLABLE_STATUSES } from '@/lib/jvb-sizing';
 import { getAppProcessMetrics } from '@/lib/metrics';
@@ -381,8 +386,12 @@ export const GET = withErrorHandling(async () => {
   const settings = await getSettings();
   const preScaleMinutes = settings.jvbPreScaleMinutes ?? 10;
   const provisioningTimeoutMinutes = settings.jvbProvisioningTimeoutMinutes ?? 15;
-  const storageType = process.env.RECORDING_STORAGE_TYPE || 'not-configured';
-  const storageConfigured = storageType !== 'not-configured' && storageType !== 'local';
+  // Lo storage: stessa regola della factory, tipo esplicito o credenziali.
+  const storageType = recordingStorageLabel();
+  const storageConfigured = recordingStorageConfigured();
+  // Jibri: stessa regola di /api/status, solo con lo storage dichiarato
+  // (lib/infrastructure#jibriRecordingExpected).
+  const jibriExpected = jibriRecordingExpected();
   const namespace = process.env.POD_NAMESPACE || 'default';
 
   const [
@@ -587,12 +596,12 @@ export const GET = withErrorHandling(async () => {
     : 'down';
   const jitsiWebStatus: ServiceStatus = jitsiProbe.ok ? 'healthy' : jitsiDomain ? 'down' : 'standby';
   // Jibri status reflects scale-to-zero semantics, mirroring /api/status:
-  //   - unconfigured (no storage backend) → standby with unconfigured verdict
+  //   - unconfigured (Jibri not expected)  → standby with unconfigured verdict
   //   - healthy pod reachable              → healthy / busy
   //   - no pod but nothing needs recording → standby (scale-to-zero normal)
   //   - no pod but a billable+recording event waits past timeout → degraded (stale)
   //   - no pod but something needs recording, not yet stale → scaling
-  const jibriStatus: ServiceStatus = !storageConfigured
+  const jibriStatus: ServiceStatus = !jibriExpected
     ? 'standby'
     : jibriInfo.healthy
       ? 'healthy'
@@ -733,20 +742,20 @@ export const GET = withErrorHandling(async () => {
       // standby. The only "down" case is when storage IS configured AND
       // a billable+recording event has been waiting past the timeout —
       // which is the 'stale' verdict.
-      verdict: !storageConfigured
+      verdict: !jibriExpected
         ? 'infraMap.verdicts.jibri.unconfigured'
         : jibriInfo.healthy
           ? (jibriInfo.busy ? 'infraMap.verdicts.jibri.busy' : 'infraMap.verdicts.jibri.healthy')
           : jibriStale
             ? 'infraMap.verdicts.jibri.stale'
             : 'infraMap.verdicts.jibri.standby',
-      impact: jibriStale ? 'infraMap.impacts.jibriStale' : null,
+      impact: jibriExpected && jibriStale ? 'infraMap.impacts.jibriStale' : null,
       replicas: { running: jibriInfo.healthy ? 1 : 0, desired: null, max: null },
       ports: [{ name: 'api', port: 2222, protocol: 'TCP' }],
       metadata: {
         busy: jibriInfo.busy,
         busyStatus: jibriInfo.busyStatus,
-        storageConfigured,
+        storageConfigured: jibriExpected,
         recordingNeeded,
       },
     },
@@ -879,7 +888,7 @@ export const GET = withErrorHandling(async () => {
     services,
     storage: {
       type: storageType,
-      configured: storageType !== 'not-configured' && storageType !== 'local',
+      configured: storageConfigured,
       recordings: { count: recordingCount, totalSizeBytes: null },
     },
     traffic: {

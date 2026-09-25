@@ -1,6 +1,11 @@
 import { describe, it, expect } from 'vitest';
 
-import { leggiStatoPonte, leggiStatoRegistratore } from './bridge-readiness';
+import {
+  faseRegistratoreStabile,
+  leggiFaseRegistratore,
+  leggiStatoPonte,
+  leggiStatoRegistratore,
+} from './bridge-readiness';
 
 describe('lettura dello stato del ponte video', () => {
   it('«ready» e «scaling» sono le uniche risposte nette', () => {
@@ -58,6 +63,48 @@ describe('lettura dello stato del registratore', () => {
     expect(leggiStatoRegistratore('ready')).toBe(true);
     expect(leggiStatoRegistratore('scaling')).toBe(false);
     expect(leggiStatoRegistratore('unavailable')).toBeNull();
+    expect(leggiStatoRegistratore('failed')).toBeNull();
     expect(leggiStatoRegistratore(undefined)).toBeNull();
+  });
+});
+
+describe('fase del registratore mostrata a chi modera', () => {
+  it('«in avvio» solo quando la sonda lo dice', () => {
+    expect(leggiFaseRegistratore('scaling')).toBe('in-avvio');
+    expect(leggiFaseRegistratore('ready')).toBe('pronto');
+  });
+
+  it('passato il tempo massimo non e’ piu’ «in avvio» ma «non partito»', () => {
+    expect(leggiFaseRegistratore('failed')).toBe('non-partito');
+  });
+
+  it('storage non configurato e’ una fase sua, non un’attesa', () => {
+    expect(leggiFaseRegistratore('unavailable')).toBe('non-configurato');
+  });
+
+  it('tutto il resto e’ «non lo so», che non blocca il pulsante', () => {
+    for (const muto of ['standby', '', undefined, null, 42, {}]) {
+      expect(leggiFaseRegistratore(muto), String(muto)).toBeNull();
+    }
+  });
+});
+
+describe('fase del registratore stabile dentro la stessa attesa', () => {
+  it('«non partito» non torna «in avvio» per una risposta discorde', () => {
+    expect(faseRegistratoreStabile('non-partito', 'in-avvio')).toBe('non-partito');
+  });
+
+  it('l’attesa finisce quando la sonda dice altro', () => {
+    expect(faseRegistratoreStabile('non-partito', 'pronto')).toBe('pronto');
+    expect(faseRegistratoreStabile('non-partito', 'non-configurato')).toBe('non-configurato');
+    expect(faseRegistratoreStabile('non-partito', null)).toBeNull();
+    // Dopo, un'attesa nuova si mostra di nuovo «in avvio».
+    expect(faseRegistratoreStabile('pronto', 'in-avvio')).toBe('in-avvio');
+    expect(faseRegistratoreStabile(null, 'in-avvio')).toBe('in-avvio');
+  });
+
+  it('i passaggi in avanti restano quelli della sonda', () => {
+    expect(faseRegistratoreStabile('in-avvio', 'non-partito')).toBe('non-partito');
+    expect(faseRegistratoreStabile('in-avvio', 'pronto')).toBe('pronto');
   });
 });

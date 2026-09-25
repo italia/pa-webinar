@@ -151,7 +151,7 @@ describe('confine di ciò che viaggia sul canale', () => {
     ];
     publishFlagsIfChanged('evt-1', FLAG_BASE, { ...FLAG_BASE, qaEnabled: false });
     publishEventStatus('evt-1', 'LIVE');
-    for (const pannello of ['qa', 'polls', 'agenda', 'wordcloud'] as const) {
+    for (const pannello of ['qa', 'polls', 'agenda', 'wordcloud', 'materials'] as const) {
       pokeLivePanel('evt-1', pannello);
     }
 

@@ -24,6 +24,11 @@ import {
   timerActionSchema,
   sendReactionSchema,
 } from '@/lib/validation/schemas';
+import {
+  MATERIAL_FILE_MAX_BYTES,
+  MATERIAL_FILES_PER_EVENT_MAX,
+  MATERIAL_FILES_PER_EVENT_MAX_BYTES,
+} from '@/lib/validation/materials';
 
 extendZodWithOpenApi(z);
 
@@ -331,6 +336,45 @@ registry.registerPath({
   security: [{ [moderatorToken.name]: [] }],
   request: { params: z.object({ param: z.string() }), body: { content: { 'application/json': { schema: createMaterialSchema } } } },
   responses: { 201: { description: 'Material created' } },
+});
+
+registry.registerPath({
+  method: 'post',
+  path: '/api/events/{param}/materials/upload',
+  tags: ['Materials'],
+  summary: 'Upload a file material (moderator)',
+  description:
+    'Multipart form with a `file` field and optional `title` (defaults to the file name) and ' +
+    '`description`. Same types and size cap as the admin document upload: PDF, DOCX, PPTX, XLSX, TXT ' +
+    `up to ${MATERIAL_FILE_MAX_BYTES / 1024 / 1024} MiB, checked against the file content. The file ` +
+    'is stored in the files storage and served from /api/assets; the material is created with ' +
+    `visibility ALWAYS. An event holds at most ${MATERIAL_FILES_PER_EVENT_MAX} uploaded files and ` +
+    `${MATERIAL_FILES_PER_EVENT_MAX_BYTES / 1024 / 1024} MiB in total.`,
+  security: [{ [moderatorToken.name]: [] }],
+  request: {
+    params: z.object({ param: z.string() }),
+    body: {
+      content: {
+        'multipart/form-data': {
+          schema: z.object({
+            file: z.string().openapi({ format: 'binary' }),
+            title: z.string().max(300).optional(),
+            description: z.string().max(500).optional(),
+          }),
+        },
+      },
+    },
+  },
+  responses: {
+    201: { description: 'Material created' },
+    403: { description: 'Not a moderator token for this event' },
+    411: { description: 'Content-Length missing' },
+    409: { description: 'The event already holds the maximum number or size of uploaded files (MATERIALS_QUOTA_EXCEEDED)' },
+    413: { description: 'File too large' },
+    415: { description: 'File type not allowed or content does not match it' },
+    429: { description: 'Too many uploads: per-minute limit, or the server is already receiving other files' },
+    503: { description: 'Files storage not configured' },
+  },
 });
 
 registry.registerPath({

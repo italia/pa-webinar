@@ -12,7 +12,8 @@
  * Splitting the model into these two exhaustive lists lets a test assert, against
  * Prisma's own schema, that EVERY scalar column is classified. Add a column and
  * forget it here and the suite fails, instead of the next duplicated event
- * quietly losing it. See docs/ROADMAP.md, "Eventi ricorrenti / serie".
+ * quietly losing it. See docs/architecture/event-journey.md, "What a copy
+ * inherits".
  */
 
 /** Columns copied verbatim from the source event. */

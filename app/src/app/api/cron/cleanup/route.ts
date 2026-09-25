@@ -3,6 +3,7 @@ import { prisma } from '@/lib/db';
 import { assertCronApiKey } from '@/lib/auth/cron';
 import { deleteRecordingBlob } from '@/lib/storage/recordings';
 import { deleteBlob, isAzureConfigured } from '@/lib/azure/blob-storage';
+import { materialBlobsOfEvents, removeMaterialBlobs } from '@/lib/events/material-files';
 import {
   CLEANABLE_EVENT_STATUSES,
   isEventDataRetentionExpired,
@@ -159,13 +160,20 @@ export const GET = withErrorHandling(async (request) => {
 
   for (const evt of toClean) {
     try {
-      // Capture FILE material blob keys BEFORE the transaction deletes the rows,
-      // so we can remove the underlying blobs afterwards (network I/O must stay
-      // out of the transaction — see the recording deletes below).
-      const fileMaterialBlobs = await prisma.eventMaterial.findMany({
-        where: { eventId: evt.id, type: 'FILE', blobPath: { not: null } },
-        select: { blobPath: true },
+      // I file dei materiali se ne vanno PRIMA delle righe, fuori dalla
+      // transazione (I/O di rete), con le regole di ogni altra cancellazione di
+      // un materiale (lib/events/material-files): solo le chiavi dei materiali
+      // di questo evento, e non un file che un'altra riga o l'informativa di un
+      // evento usa ancora. Si raccolgono per `blobPath`, qualunque sia il tipo:
+      // è la colonna che dice quale riga possiede un file. Una riga il cui file
+      // non si è potuto cancellare resta per il giro successivo, invece di
+      // lasciare nello storage un file che nessuno ritroverebbe più.
+      const materialFiles = await materialBlobsOfEvents({ id: evt.id });
+      const materialBlobs = await removeMaterialBlobs(materialFiles, {
+        materialIds: materialFiles.map((m) => m.id),
       });
+      totalMaterialBlobsDeleted += materialBlobs.deleted;
+      const materialsKept = materialBlobs.failed.map((m) => m.id);
 
       // Chat attachment blobs (files domain, assets/ prefix) — capture before
       // the rows are deleted so we can purge the underlying blobs afterwards.
@@ -214,7 +222,10 @@ export const GET = withErrorHandling(async (request) => {
         });
 
         const materialsDeleted = await tx.eventMaterial.deleteMany({
-          where: { eventId: evt.id },
+          where: {
+            eventId: evt.id,
+            ...(materialsKept.length > 0 && { id: { notIn: materialsKept } }),
+          },
         });
 
         const reminderSentDeleted = await tx.reminderSent.deleteMany({
@@ -354,12 +365,6 @@ export const GET = withErrorHandling(async (request) => {
         if (ok) totalRecordingBlobsDeleted++;
       }
       if (isAzureConfigured()) {
-        for (const m of fileMaterialBlobs) {
-          if (m.blobPath) {
-            const ok = await deleteBlob(m.blobPath).catch(() => false);
-            if (ok) totalMaterialBlobsDeleted++;
-          }
-        }
         for (const c of chatAttachmentBlobs) {
           if (c.attachmentBlobPath) {
             const ok = await deleteBlob(c.attachmentBlobPath).catch(() => false);

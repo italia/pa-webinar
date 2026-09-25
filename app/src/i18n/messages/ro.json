@@ -139,7 +139,9 @@
     "status": {
       "DRAFT": "Ciornă",
       "PUBLISHED": "Publicat",
+      "PROVISIONING": "În pregătire",
       "LIVE": "În desfășurare",
+      "IDLE": "În pauză",
       "ENDED": "Încheiat",
       "ARCHIVED": "Arhivat"
     },
@@ -288,6 +290,9 @@
     "jibriNotConfigured": "Înregistrarea nu este configurată în infrastructură",
     "jibriScaling": "Înregistrarea pornește…",
     "jibriScalingTooltip": "Componenta de înregistrare pornește. Va fi disponibilă în scurt timp.",
+    "recorderNotStarted": "Înregistrarea nu este disponibilă",
+    "recorderNotStartedDetail": "Serviciul de înregistrare nu a pornit încă: deocamdată evenimentul continuă fără înregistrare. Anunțați administratorii platformei.",
+    "recorderStartFailed": "Înregistrarea nu a pornit. Încercați din nou peste câteva minute; dacă problema persistă, anunțați administratorii platformei.",
     "roomPreparing": "Sala se pregătește…",
     "roomPreparingDetail": "Serverele video pornesc. Operațiunea durează aproximativ 2 minute. Sala se va activa automat.",
     "recordingPromptTitle": "Porniți înregistrarea?",
@@ -483,6 +488,7 @@
       "textRequired": "Scrieți întrebarea dumneavoastră",
       "tooLong": "Întrebarea nu poate depăși 500 de caractere",
       "rateLimit": "Așteptați înainte de a trimite altă întrebare",
+      "busy": "În acest moment sosesc multe întrebări din rețeaua dumneavoastră: încercați din nou peste câteva secunde",
       "generic": "Eroare la trimiterea întrebării"
     },
     "ctaTitle": "Adresați prima întrebare",
@@ -703,7 +709,7 @@
         "speakerEmail": "E-mail",
         "speakerRequired": "Numele și e-mailul sunt obligatorii.",
         "invitationsHeading": "Invitații",
-        "invitationsHelp": "Persoane preînregistrate — vor primi un link personal de participare.",
+        "invitationsHelp": "Lista persoanelor invitate. Platforma nu trimite invitații: distribuie tu linkul evenimentului. Cu înregistrarea publică dezactivată, se pot înregistra doar aceste adrese, iar linkul personal de acces sosește prin e-mail după înregistrare.",
         "invitationName": "Nume (opțional)",
         "invitationEmail": "E-mail",
         "invitationRole": "Rol",
@@ -1317,6 +1323,8 @@
       "publicPageHint": "Pagina de partajat pentru a colecta noi înscrieri.",
       "guestJoin": "Invitație directă (fără înregistrare)",
       "guestJoinHint": "Link rapid pentru a invita un participant în ultimul moment: accesează ca invitat când evenimentul este în direct, fără a completa formularul de înregistrare.",
+      "callInvite": "Link pentru participanți",
+      "callInviteHint": "Cine îl primește intră în apel ca invitat, fără înregistrare. Un apel rapid nu are pagină publică: acesta este linkul de distribuit.",
       "moderatorLink": "Link moderator",
       "moderatorLinkHint": "Distribuiți acest link doar moderatorilor. Oricine îl deține poate gestiona evenimentul.",
       "liveRoomHint": "Link pentru a intra direct în sală ca moderator.",
@@ -1443,7 +1451,7 @@
         "jobMaxAttempts": "Încercări înainte de eșec",
         "jobMaxAttemptsHelp": "De câte ori reîncearcă pipeline-ul un job înainte de a-l marca drept eșuat. Intervalul dintre încercări crește exponențial (de la 30 de secunde până la 2 ore). Valoarea tipică este 5.",
         "artifactRetentionDays": "Păstrarea artefactelor (zile)",
-        "artifactRetentionDaysHelp": "Lăsată la 0, artefactele AI urmează același termen de păstrare ca evenimentul. O valoare mai mare decât zero le păstrează pentru numărul de zile indicat, chiar și după închiderea evenimentului, până când un cron zilnic le șterge. Ștergerea include numele vorbitorilor și payload-urile joburilor, în conformitate cu docs/GDPR.md.",
+        "artifactRetentionDaysHelp": "La 0 nu există o limită pentru întregul site: artefactele AI urmează termenul de păstrare al înregistrării lor sau al evenimentului. O valoare mai mare decât zero face ca un job zilnic să șteargă orice artefact creat cu mai mult de acest număr de zile în urmă, publicat sau nu: poate scurta păstrarea, dar nu o prelungește niciodată. Numele vorbitorilor și payload-urile joburilor nu sunt incluse: urmează termenul de păstrare al înregistrării sau al evenimentului. Detalii în docs/privacy/recordings-and-ai.md.",
         "consentDisclosureSection": "Notă informativă AI în sala de așteptare",
         "consentDisclosureHelp": "Text afișat participanților în sala de așteptare când evenimentul folosește post-producția AI (transcriere, rezumat, traducere, dublaj). Personalizabil pentru fiecare limbă. Lăsați gol pentru a folosi textul implicit al sistemului.",
         "consentDisclosurePlaceholder": "Ex. Acest eveniment va fi transcris și rezumat automat cu instrumente AI după transmisiunea în direct…"
@@ -1642,7 +1650,7 @@
         "jvbStressCriticalPercent": "Prag stress critical (%)",
         "jvbStressCriticalPercentHelp": "Peste acest prag, scaler-ul adaugă 2 replici JVB. Implicit 70. Trebuie să fie mai mare decât warn.",
         "jvbProvisioningTimeoutMinutes": "Timeout provisioning (minute)",
-        "jvbProvisioningTimeoutMinutesHelp": "După câte minute de la startsAt un eveniment cu JVB încă nepregătit este semnalat ca „degraded” pe pagina de status. Implicit 15. Acoperă cold-start-ul nodului (~3-5 min) + marjă de siguranță.",
+        "jvbProvisioningTimeoutMinutesHelp": "După câte minute de la startsAt un eveniment cu JVB încă nepregătit este semnalat ca „degraded” pe pagina de status. Implicit 15. Acoperă cold-start-ul nodului (~3-5 min) + marjă de siguranță. Se aplică și serviciului de înregistrare, socotit din momentul în care un eveniment cu înregistrare îl solicită: după acest timp fără răspuns, sala live nu îl mai afișează „în curs de pornire” și îl semnalează ca nepornit.",
         "statusPollIntervalSeconds": "Interval polling pagină status (secunde)",
         "statusPollIntervalSecondsHelp": "La câte secunde pagina /status reîmprospătează datele în browser. Implicit 30. Valori mai mici = date mai proaspete, dar mai multă încărcare pe aplicație.",
         "emailSenderTitle": "Expeditorul e-mailurilor",
@@ -2187,7 +2195,12 @@
     },
     "eventDetail": {
       "copyPublicUrl": "Copiați linkul public",
-      "enterAsModerator": "Intrați live",
+      "copyInviteUrl": "Copiați linkul de invitație",
+      "enterAsParticipant": "Intrați ca participant",
+      "openAsParticipant": "Deschideți ca participant",
+      "participantHintRoom": "Se deschide într-o filă nouă: sala așa cum o vede un invitat, fără puteri de moderare.",
+      "participantHintPassword": "Se deschide într-o filă nouă: sala așa cum o vede un invitat, după parola evenimentului.",
+      "participantHintPage": "Se deschide într-o filă nouă: pagina publică așa cum o văd participanții.",
       "editEvent": "Modificați evenimentul",
       "editSettings": "Modificați setările",
       "featureSummary": "Funcționalități active",
@@ -2788,9 +2801,27 @@
     "add": "Adăugați",
     "adding": "Se adaugă...",
     "cancel": "Anulați",
+    "modeLabel": "Tipul materialului",
+    "modeLink": "Link",
+    "modeFile": "Fișier",
+    "titleOptional": "Titlu (opțional; altfel, numele fișierului)",
+    "fileLabel": "Fișierul de încărcat",
+    "fileHelp": "Formate acceptate: PDF, DOCX, PPTX, XLSX, TXT — max {maxMb} MB",
+    "upload": "Încărcați",
+    "uploading": "Se încarcă…",
     "errors": {
       "urlInvalid": "Introduceți un URL valid",
-      "generic": "Eroare la adăugarea materialului"
+      "generic": "Eroare la adăugarea materialului",
+      "fileMissing": "Alegeți un fișier de încărcat",
+      "titleMissing": "Introduceți un titlu pentru link",
+      "fileTooLarge": "Fișierul depășește limita de {maxMb} MB",
+      "fileTooLargeForServer": "Serverul nu acceptă un fișier atât de mare: încercați cu un fișier mai mic",
+      "fileType": "Tip de fișier neacceptat (PDF, DOCX, PPTX, XLSX, TXT)",
+      "uploadUnavailable": "Încărcarea fișierelor nu este disponibilă în această instalare",
+      "uploadFailed": "Eroare la încărcarea fișierului",
+      "quotaExceeded": "Acest eveniment a atins limita de fișiere încărcate ({maxFiles} fișiere, {maxMb} MB în total): eliminați câteva pentru a încărca altele",
+      "uploadBusy": "Prea multe încărcări în acest moment: încercați din nou în câteva secunde",
+      "deleteFailed": "Materialul nu a putut fi șters"
     }
   },
   "reminders": {
@@ -3343,7 +3374,13 @@
     "noActiveRound": "Niciun word cloud activ momentan.",
     "noWords": "Se așteaptă primele cuvinte...",
     "wordsSubmitted": "{count} cuvinte trimise",
-    "timeRemaining": "Timp rămas"
+    "timeRemaining": "Timp rămas",
+    "errors": {
+      "send": "Cuvântul nu a fost trimis. Reîncercați.",
+      "closed": "Această rundă este închisă: nu se mai acceptă cuvinte.",
+      "limit": "Ați trimis deja numărul maxim de cuvinte pentru această rundă.",
+      "rateLimited": "Prea multe trimiteri în acest moment: așteptați câteva secunde înainte de a reîncerca."
+    }
   },
   "timer": {
     "title": "Cronometru",
@@ -3642,6 +3679,8 @@
     "warmingUpButton": "Sala se pregătește...",
     "nameLabel": "Numele dvs.",
     "nameHelp": "Va apărea celorlalți participanți",
+    "nameRequiredToEnter": "Pentru a intra, introduceți numele (cel puțin 2 caractere).",
+    "roomOpenNameMissing": "Sala este deschisă: introduceți numele pentru a intra.",
     "joinNowBtn": "Intrați acum",
     "roomOpen": "Sala este deschisă",
     "whileYouWait": "Cât așteptați",

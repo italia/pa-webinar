@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 
-import { withErrorHandling } from '@/lib/api-handler';
+import { parseJsonBody, withErrorHandling } from '@/lib/api-handler';
 import { prisma } from '@/lib/db';
 import { AppError, RateLimitError } from '@/lib/errors';
 import { extractModeratorToken, resolveGrantForEvent } from '@/lib/auth/moderator';
@@ -64,7 +64,7 @@ const peakSchema = z.object({
 export const POST = withErrorHandling(async (request, context) => {
   const { param } = await context.params;
 
-  const body = await request.json();
+  const body = await parseJsonBody(request);
   const parsed = peakSchema.safeParse(body);
   if (!parsed.success) {
     throw new AppError('Invalid payload', 400, 'INVALID_BODY');

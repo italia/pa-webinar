@@ -1718,7 +1718,7 @@ function ScalingTab({ settings, updateField }: TabProps) {
  * (trascrizione, sintesi, traduzione, dubbing). Kill-switch generale
  * + provider routing + retention. La pipeline è disabled di default,
  * va attivata esplicitamente qui dopo aver verificato i prerequisiti
- * (vedi docs/POSTPROD.md per la checklist completa).
+ * (vedi docs/POSTPROD.md, "Operational checklist").
  *
  * Stile visivo coerente con FeaturesTab (toggle switch + small helper
  * text) e ScalingTab (number input per i parametri operativi).
@@ -1729,8 +1729,7 @@ function PostprodTab({ settings, updateField }: TabProps) {
   return (
     <div>
       {/* Prerequisiti operativi. NIENTE <Icon> nell'alert: Bootstrap
-          Italia ne disegna già una "i" via ::before — vedi memoria
-          feedback_bootstrap-italia-alert.md. */}
+          Italia ne disegna già una "i" via ::before. */}
       <div className="alert alert-info" role="note" style={{ fontSize: '0.88rem' }}>
         {t('prerequisitesNote')}
       </div>
@@ -1923,7 +1922,7 @@ function PostprodTab({ settings, updateField }: TabProps) {
         {t('voiceCloningSection')}
       </h6>
       {/* Nota stabile sull'esclusione del voice cloning. Stesso vincolo
-          della memoria progettuale: niente <Icon> dentro l'alert. */}
+          dell'alert sopra: niente <Icon> dentro l'alert. */}
       <div className="alert alert-warning" role="note" style={{ fontSize: '0.88rem' }}>
         {t('voiceCloningNote')}
       </div>

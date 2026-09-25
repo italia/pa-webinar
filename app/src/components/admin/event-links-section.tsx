@@ -20,7 +20,7 @@ import { useCallback, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
 interface Riga {
-  chiave: 'publicPage' | 'guestJoin' | 'moderatorLink';
+  chiave: 'publicPage' | 'guestJoin' | 'callInvite' | 'moderatorLink';
   url: string;
   /** Coperto finche' non lo si chiede. */
   riservato?: boolean;

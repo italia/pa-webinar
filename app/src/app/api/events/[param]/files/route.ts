@@ -12,7 +12,6 @@ import { RateLimitError, UnauthorizedError, ValidationError, NotFoundError } fro
 import {
   isAzureConfigured,
   generateUploadSasUrl,
-  deleteBlob,
   getBlobPath,
   ensureContainer,
 } from '@/lib/azure/blob-storage';
@@ -20,6 +19,7 @@ import { rateLimit, getClientIp } from '@/lib/rate-limit';
 import { getFilesStorage } from '@/lib/storage';
 import { isEventPubliclyVisible } from '@/lib/events/visibility';
 import { MATERIAL_ACCESS_EVENT_SELECT, materialsWhereFor } from '@/lib/events/material-access';
+import { fileDeletionFailed, removeMaterialBlob } from '@/lib/events/material-files';
 
 const uploadRequestSchema = z.object({
   fileName: z.string().min(1).max(255),
@@ -189,9 +189,14 @@ export const DELETE = withErrorHandling(
 
     if (!material) throw new NotFoundError('Material not found');
 
-    if (material.blobPath && isAzureConfigured()) {
-      await deleteBlob(material.blobPath);
-    }
+    // Stesse regole di ogni altra cancellazione di un materiale
+    // (lib/events/material-files): il file solo se è di questo evento e nessun
+    // altro lo usa ancora, e prima della riga, che resta se lo storage non
+    // risponde.
+    const file = await removeMaterialBlob(material.blobPath, event.id, {
+      materialIds: [material.id],
+    });
+    if (file === 'failed') throw fileDeletionFailed();
 
     await prisma.eventMaterial.delete({ where: { id: materialId } });
 

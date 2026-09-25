@@ -29,12 +29,13 @@ import { getRedis, getRedisSubscriber } from '@/lib/redis';
 /**
  * I pannelli che si limitano a dire «rileggi». Due motivi distinti per starci:
  * la visibilità dipende dal RUOLO (Q&A e sondaggi: chi ha votato, cosa è stato
- * archiviato, i conteggi nascosti fino alla chiusura) oppure la risposta
+ * archiviato, i conteggi nascosti fino alla chiusura; materiali: chi conduce li
+ * vede tutti, il pubblico solo quelli della fase in corso) oppure la risposta
  * contiene un campo PER-UTENTE (agenda e word cloud: la propria reazione, la
  * propria parola). In entrambi i casi uno snapshot unico scritto nella cache
  * condivisa mostrerebbe a qualcuno lo stato di qualcun altro.
  */
-export type PokeablePanel = 'qa' | 'polls' | 'agenda' | 'wordcloud';
+export type PokeablePanel = 'qa' | 'polls' | 'agenda' | 'wordcloud' | 'materials';
 
 /**
  * Gli interruttori attivabili durante l'evento. L'elenco è quello servito da

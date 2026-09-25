@@ -6,6 +6,7 @@ import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { prisma } from '@/lib/db';
 import { ValidationError } from '@/lib/errors';
+import { removeFilesOfEventsBeingDeleted } from '@/lib/events/material-files';
 
 export const dynamic = 'force-dynamic';
 
@@ -27,9 +28,12 @@ export const POST = withErrorHandling(async (request) => {
     );
   }
 
-  const result = await prisma.event.deleteMany({
-    where: { id: { in: parsed.data.ids }, ...eventScope(session) },
-  });
+  const where = { id: { in: parsed.data.ids }, ...eventScope(session) };
+  // I file degli eventi (materiali caricati, allegati di chat) se ne vanno
+  // prima: la cascata porta via le righe, e dopo nessuno saprebbe più quali
+  // blob cancellare. Se lo storage non risponde gli eventi restano (503).
+  await removeFilesOfEventsBeingDeleted(where);
+  const result = await prisma.event.deleteMany({ where });
 
   await logAdminAction({
     request,

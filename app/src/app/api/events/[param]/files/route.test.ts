@@ -10,12 +10,21 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
  * storage non esce, e la dimensione (BigInt nel DB) arriva come stringa invece
  * di far fallire la serializzazione.
  */
+const { storage } = vi.hoisted(() => ({
+  storage: {
+    current: null as null | { delete: ReturnType<typeof vi.fn>; list: ReturnType<typeof vi.fn> },
+  },
+}));
+
 vi.mock('@/lib/db', () => ({
   prisma: {
-    event: { findFirst: vi.fn() },
-    eventMaterial: { findMany: vi.fn() },
+    event: { findFirst: vi.fn(), findUnique: vi.fn() },
+    eventMaterial: { findMany: vi.fn(), findFirst: vi.fn(), delete: vi.fn() },
     eventModerator: { findUnique: vi.fn() },
   },
+}));
+vi.mock('@/lib/storage', () => ({
+  getFilesStorage: () => storage.current,
 }));
 vi.mock('next/headers', () => ({
   cookies: async () => ({ get: () => undefined }),
@@ -41,7 +50,7 @@ vi.mock('@/lib/azure/blob-storage', () => ({
 import type * as StaffSessionModule from '@/lib/auth/staff-session';
 import { prisma } from '@/lib/db';
 
-import { GET } from './route';
+import { DELETE, GET } from './route';
 
 const mockedEvent = prisma.event.findFirst as unknown as ReturnType<typeof vi.fn>;
 const mockedMaterials = prisma.eventMaterial.findMany as unknown as ReturnType<typeof vi.fn>;
@@ -137,5 +146,76 @@ describe('GET /api/events/[slug]/files', () => {
     mockedEvent.mockResolvedValue(eventRow({ postEventPublic: false }));
     expect((await GET(get(), ctx())).status).toBe(404);
     expect(mockedMaterials).not.toHaveBeenCalled();
+  });
+});
+
+/**
+ * Togliere un file con il caricamento per evento segue le regole di ogni altra
+ * cancellazione di un materiale (lib/events/material-files): il file solo se è
+ * di questo evento e nessun'altra riga lo tiene, e prima della riga. Prima il
+ * blob si cancellava senza controlli: un materiale che puntava al file di un
+ * altro evento glielo toglieva.
+ */
+describe('DELETE /api/events/[slug]/files', () => {
+  const MATERIAL_ID = 'file-1';
+  const KEY_ALTRUI = 'assets/document/2026/09/66666666-6666-4666-8666-666666666666-slide.pdf';
+  const mockedFindUnique = prisma.event.findUnique as unknown as ReturnType<typeof vi.fn>;
+  const mockedMaterial = prisma.eventMaterial.findFirst as unknown as ReturnType<typeof vi.fn>;
+  const mockedDelete = prisma.eventMaterial.delete as unknown as ReturnType<typeof vi.fn>;
+
+  function del(): NextRequest {
+    return new Request(
+      `https://webinar.example.gov.it/api/events/${SLUG}/files?materialId=${MATERIAL_ID}`,
+      { method: 'DELETE', headers: { Authorization: `Bearer ${PRIMARY_TOKEN}` } },
+    ) as unknown as NextRequest;
+  }
+
+  beforeEach(() => {
+    storage.current = { delete: vi.fn().mockResolvedValue(true), list: vi.fn().mockResolvedValue([]) };
+    mockedFindUnique.mockResolvedValue(eventRow());
+    mockedEvent.mockResolvedValue(null);
+    mockedDelete.mockResolvedValue({});
+  });
+
+  it('il file dell’evento: via il blob e poi la riga', async () => {
+    const key = `events/${EVENT_ID}/files/slide.pdf`;
+    // Prima lettura: il materiale; poi «un'altra riga lo usa?»: no.
+    mockedMaterial.mockResolvedValueOnce({ ...FILE_ROW, blobPath: key }).mockResolvedValue(null);
+    const res = await DELETE(del(), ctx());
+    expect(res.status).toBe(200);
+    expect(storage.current!.delete).toHaveBeenCalledWith(key);
+    expect(storage.current!.delete.mock.invocationCallOrder[0]).toBeLessThan(
+      mockedDelete.mock.invocationCallOrder[0]!,
+    );
+  });
+
+  it('il file che il materiale di un altro evento tiene ancora resta', async () => {
+    mockedMaterial
+      .mockResolvedValueOnce({ ...FILE_ROW, blobPath: KEY_ALTRUI })
+      .mockResolvedValue({ id: 'materiale-di-un-altro-evento' });
+    const res = await DELETE(del(), ctx());
+    expect(res.status).toBe(200);
+    expect(mockedDelete).toHaveBeenCalled();
+    expect(storage.current!.delete).not.toHaveBeenCalled();
+  });
+
+  it('la cartella di un altro evento non si tocca', async () => {
+    mockedMaterial.mockResolvedValueOnce({
+      ...FILE_ROW,
+      blobPath: 'events/99999999-9999-4999-8999-999999999999/files/slide.pdf',
+    });
+    const res = await DELETE(del(), ctx());
+    expect(res.status).toBe(200);
+    expect(storage.current!.delete).not.toHaveBeenCalled();
+  });
+
+  it('se lo storage non risponde, la riga resta: 503', async () => {
+    mockedMaterial
+      .mockResolvedValueOnce({ ...FILE_ROW, blobPath: `events/${EVENT_ID}/files/slide.pdf` })
+      .mockResolvedValue(null);
+    storage.current!.delete.mockRejectedValue(new Error('down'));
+    const res = await DELETE(del(), ctx());
+    expect(res.status).toBe(503);
+    expect(mockedDelete).not.toHaveBeenCalled();
   });
 });

@@ -277,6 +277,10 @@ export const createQuestionSchema = z.object({
     .string()
     .min(3, 'qa.errors.textRequired')
     .max(500, 'qa.errors.tooLong'),
+  /** Identificativo stabile del browser di chi chiede senza token (ospite):
+   *  e' la chiave del limite di frequenza per persona, al posto dell'IP che
+   *  un intero ufficio dietro lo stesso NAT condivide. */
+  guestId: z.string().trim().min(1).max(100).optional(),
 });
 
 export const updateQuestionStatusSchema = z.object({
@@ -384,9 +388,13 @@ export const createWordCloudRoundSchema = z.object({
 });
 
 export const submitWordCloudSchema = z.object({
-  word: z.string().min(1).max(30),
+  word: z.string().trim().min(1).max(30),
+  /** L'accessToken di una registrazione di questo evento… */
   accessToken: z.string().min(1).optional(),
-  guestId: z.string().min(1).optional(),
+  /** …oppure l'identificativo stabile del browser, per chi una registrazione
+   *  non ce l'ha (ospiti, relatori, moderatori): in quel caso il token di
+   *  sala, se c'è, viaggia come `Authorization: Bearer` a prova di presenza. */
+  guestId: z.string().trim().min(1).max(100).optional(),
 }).refine(
   (data) => data.accessToken || data.guestId,
   { message: 'Either accessToken or guestId is required' },

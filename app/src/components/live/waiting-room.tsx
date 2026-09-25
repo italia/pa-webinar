@@ -17,6 +17,11 @@ import {
 import { Icon } from '@/components/ui/icon';
 import { Link, percorso } from '@/i18n/navigation';
 import { resolveWaitingRoomMode } from '@/lib/waiting-room/resolve-engine';
+import {
+  annuncioApertura,
+  statoIngresso,
+  type BloccoModulo,
+} from '@/lib/waiting-room/entry-state';
 import AudioPlayer from '@/components/live/audio-player';
 import ChatPanel from '@/components/live/chat-panel';
 import DeviceCheck from '@/components/live/device-check';
@@ -178,6 +183,19 @@ const PARTICIPANT_EMAIL_KEY = 'pawebinar.participant.email';
 const ARCADE_CLASSIC_KEY = 'pawebinar.arcade.classic';
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+/** Il campo su cui portare il fuoco per ciascun blocco. */
+const CAMPO_DEL_BLOCCO: Record<BloccoModulo, string> = {
+  name: 'waiting-name',
+  email: 'waiting-email',
+  consent: 'waiting-multitrack-consent',
+};
+/** Il messaggio che spiega ciascun blocco: descrive il campo e il pulsante. */
+const MESSAGGIO_DEL_BLOCCO: Record<BloccoModulo, string> = {
+  name: 'waiting-name-required',
+  email: 'waiting-email-invalid',
+  consent: 'waiting-multitrack-consent-required',
+};
+
 export default function WaitingRoom({
   event,
   participantCount,
@@ -208,6 +226,9 @@ export default function WaitingRoom({
   // vuoto + CTA "Apertura alle {ora passata}" (incoerente e sfiduciante).
   const [startingSoon, setStartingSoon] = useState(false);
   const [name, setName] = useState(defaultName);
+  // Diventa vero dopo aver letto il nome salvato nel browser: fino ad allora
+  // un campo vuoto non vuol dire che il nome manchi.
+  const [nomeNoto, setNomeNoto] = useState(false);
   const [email, setEmail] = useState('');
   // Full-screen park (default) vs. static classic card (accessibility
   // fallback). Initialised false to match SSR, then synced from storage.
@@ -252,6 +273,7 @@ export default function WaitingRoom({
     } catch {
       /* private mode / blocked storage → fall back to defaults */
     }
+    setNomeNoto(true);
   }, [defaultName]);
 
   // Resolve the waiting-room engine + classic-view post-mount, in priority
@@ -376,11 +398,27 @@ export default function WaitingRoom({
   // «non pronto» agli occhi di chi aspettava.
   const salaAperta = canEnterLive && salaPronta;
   const eraAperta = useRef(salaAperta);
-  const canEnter =
-    nameValid &&
-    emailValid &&
-    (!multitrackRequired || multitrackConsent) &&
-    ingressoConsentito;
+  // Un tentativo d'ingresso con il modulo incompleto — il pulsante, il
+  // cancello della piazza, il ritorno dalla registrazione — trasforma
+  // l'indicazione in errore e porta il fuoco sul campo da completare.
+  const [ingressoTentato, setIngressoTentato] = useState(false);
+  const [campoDaCompletare, setCampoDaCompletare] = useState<{
+    blocco: BloccoModulo;
+    n: number;
+  } | null>(null);
+  // Sala non pronta e modulo incompleto sono due ragioni diverse per non
+  // entrare, con due risposte diverse: vedi lib/waiting-room/entry-state.
+  const { canEnter, bloccoModulo, nomeDaChiedere, nomeSegnalato, bloccoSpiegato } =
+    statoIngresso({
+      canEnterLive,
+      ingressoConsentito,
+      nameValid,
+      emailValid,
+      multitrackRequired,
+      multitrackConsent,
+      ingressoTentato,
+      nomeNoto,
+    });
 
   useEffect(() => {
     if (!salaAperta) {
@@ -398,10 +436,22 @@ export default function WaitingRoom({
     return () => clearTimeout(t);
   }, [salaAperta]);
 
-  // Il richiamo si vede solo se il pulsante si puo' davvero premere. Lampeggiare
-  // di verde su un pulsante spento — nome non ancora scritto, consenso non dato —
-  // prometterebbe un ingresso che quel clic non dara'.
+  // Il richiamo si vede solo se il pulsante fa davvero entrare. Lampeggiare di
+  // verde con il nome ancora da scrivere o il consenso non dato prometterebbe
+  // un ingresso che quel clic non dara': in quel caso compare, accanto al
+  // campo e sopra il pulsante, la richiesta di cio' che manca.
   const evidenziaCta = appenaAperta && canEnter;
+  const annuncio = annuncioApertura({ appenaAperta, canEnter, bloccoModulo: bloccoSpiegato });
+
+  // Il fuoco va sul campo da completare DOPO il disegno: chi arriva dal
+  // riproduttore della registrazione non ha ancora il modulo sullo schermo.
+  useEffect(() => {
+    if (!campoDaCompletare || typeof document === 'undefined') return;
+    const el = document.getElementById(CAMPO_DEL_BLOCCO[campoDaCompletare.blocco]);
+    if (!el) return;
+    el.focus({ preventScroll: true });
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, [campoDaCompletare]);
 
   // Cronometro warm-up. Ci si ancora UNA volta per ciclo (identità =
   // warmup.startedAt): senza questo, ri-ancorarsi a ogni poll (3s) fa
@@ -504,8 +554,23 @@ export default function WaitingRoom({
     }
   }, [onStartEvent, t]);
 
+  // Un tentativo con il modulo incompleto: si dice cosa manca e si porta la
+  // persona li'. Falso se il modulo e' a posto (a trattenere e' la sala).
+  const segnalaCampoMancante = useCallback((): boolean => {
+    if (!bloccoModulo) return false;
+    setIngressoTentato(true);
+    setCampoDaCompletare((prev) => ({ blocco: bloccoModulo, n: (prev?.n ?? 0) + 1 }));
+    return true;
+  }, [bloccoModulo]);
+
+  // L'unico cancello del modulo: il pulsante «Entra» resta premibile, quindi
+  // nome, email e consenso alla registrazione li trattiene questo controllo.
+  // Ogni ingresso passa di qui (waiting-room.test.tsx lo verifica).
   const handleEnterLive = useCallback(() => {
-    if (!canEnter) return;
+    if (!canEnter) {
+      segnalaCampoMancante();
+      return;
+    }
     // Persist the last-used identity so guests don't have to retype on
     // reconnects / accidental reloads.
     if (typeof window !== 'undefined') {
@@ -521,7 +586,7 @@ export default function WaitingRoom({
       }
     }
     onEnterLive(trimmedName, devicePrefs);
-  }, [canEnter, onEnterLive, trimmedName, trimmedEmail, devicePrefs]);
+  }, [canEnter, segnalaCampoMancante, onEnterLive, trimmedName, trimmedEmail, devicePrefs]);
 
   // Entry triggered from INSIDE the Phaser game (walking the avatar into the
   // open gate). It funnels through the SAME validated handleEnterLive as the
@@ -547,16 +612,11 @@ export default function WaitingRoom({
     // sala si prepara, ma se un domani lo facesse, mandare la persona a
     // sistemare il nome — che e' gia' a posto — le farebbe cercare un errore
     // che non ha fatto.
-    if (!ingressoConsentito && nameValid && emailValid) {
+    if (!segnalaCampoMancante()) {
       throw new Error(t('roomNotReadyButton'));
     }
-    if (typeof document !== 'undefined') {
-      const el = document.getElementById('waiting-name') as HTMLInputElement | null;
-      el?.focus();
-      el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
     throw new Error('waiting-room: pre-join not complete');
-  }, [canEnter, handleEnterLive, ingressoConsentito, nameValid, emailValid, t]);
+  }, [canEnter, handleEnterLive, segnalaCampoMancante, t]);
 
   const handleDeviceStateChange = useCallback(
     (s: WaitingRoomJoinPrefs) => setDevicePrefs(s),
@@ -704,6 +764,14 @@ export default function WaitingRoom({
 
   // ── Shared interactive pieces, reused by the arcade dock/drawer and the
   //   classic card so there's a single source of truth for the form + CTA.
+  // A sala aperta il pulsante «Entra» resta premibile anche senza nome: un
+  // pulsante spento non dice perche' lo e'. Qui si dice, accanto al campo —
+  // prima come indicazione, dopo un tentativo come errore — e il campo lo
+  // annuncia a chi usa un lettore di schermo.
+  const nameDescribedBy =
+    [isGuest ? 'waiting-name-help' : null, nomeDaChiedere ? MESSAGGIO_DEL_BLOCCO.name : null]
+      .filter(Boolean)
+      .join(' ') || undefined;
   const nameField = (
     <FormGroup className="mb-0">
       <Input
@@ -715,11 +783,29 @@ export default function WaitingRoom({
         required
         minLength={2}
         maxLength={100}
+        autoComplete="name"
+        valid={nomeSegnalato ? false : undefined}
+        aria-invalid={nomeSegnalato || undefined}
+        aria-describedby={nameDescribedBy}
       />
       {isGuest && (
-        <small className="text-muted" style={{ fontSize: '0.8rem' }}>
+        <small id="waiting-name-help" className="text-muted" style={{ fontSize: '0.8rem' }}>
           {t('nameHelp')}
         </small>
+      )}
+      {nomeDaChiedere && (
+        <div
+          id={MESSAGGIO_DEL_BLOCCO.name}
+          className="d-flex align-items-start rounded-2 px-2 py-1 mt-2"
+          style={
+            nomeSegnalato
+              ? { fontSize: '0.85rem', color: '#A1112E', background: '#FDF0F2', border: '1px solid #E8A3B0' }
+              : { fontSize: '0.85rem', color: '#6B4400', background: '#FFF8E6', border: '1px solid #E0C97A' }
+          }
+        >
+          <Icon icon="it-warning-circle" size="xs" className="me-1 mt-1 flex-shrink-0" style={{ fill: 'currentColor' }} />
+          <span>{t('nameRequiredToEnter')}</span>
+        </div>
       )}
     </FormGroup>
   );
@@ -734,13 +820,18 @@ export default function WaitingRoom({
         onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
         maxLength={200}
         aria-invalid={!emailValid}
+        aria-describedby={!emailValid ? MESSAGGIO_DEL_BLOCCO.email : undefined}
         autoComplete="email"
       />
       <small className="text-muted" style={{ fontSize: '0.8rem' }}>
         {t('emailHelp')}
       </small>
       {!emailValid && (
-        <div className="small text-danger mt-1" style={{ fontSize: '0.8rem' }}>
+        <div
+          id={MESSAGGIO_DEL_BLOCCO.email}
+          className="small text-danger mt-1"
+          style={{ fontSize: '0.8rem' }}
+        >
           {t('emailInvalid')}
         </div>
       )}
@@ -771,9 +862,8 @@ export default function WaitingRoom({
   );
 
   // NIENTE <Icon> dentro <Alert>: Bootstrap Italia disegna già un'icona via
-  // ::before (padding-left:4em riservato) e un Icon inline si sovrappone
-  // (vedi memoria feedback_bootstrap-italia-alert). Solo testo, come
-  // aiNoticeBlock.
+  // ::before (padding-left:4em riservato) e un Icon inline si sovrappone.
+  // Solo testo, come aiNoticeBlock.
   const recordingNoticeBlock = event.recordingEnabled && !isEnded ? (
     <Alert color="warning" className="text-start mb-0" style={{ fontSize: '0.82rem' }}>
       {t('recordingNotice')}
@@ -783,8 +873,7 @@ export default function WaitingRoom({
   // Informativa AI in sala d'attesa: mostrata quando l'evento usa la
   // pipeline AI post-evento. Testo custom dell'admin (per-locale) con
   // fallback al testo generico i18n. NIENTE <Icon> dentro <Alert>:
-  // Bootstrap Italia ne disegna già una via ::before (vedi memoria
-  // feedback_bootstrap-italia-alert).
+  // Bootstrap Italia ne disegna già una via ::before.
   const aiConsentText =
     event.aiConsentDisclosure && event.aiConsentDisclosure.trim()
       ? event.aiConsentDisclosure
@@ -797,8 +886,9 @@ export default function WaitingRoom({
   ) : null;
 
   // Consenso esplicito alla registrazione per-partecipante (multitrack):
-  // hard-gate. Senza la spunta, `canEnter` è false e il CTA resta disabilitato
-  // → non si entra. Non è un <Alert> (serve un input + evita l'icona ::before).
+  // hard-gate. Senza la spunta, `canEnter` è false e il CTA non fa entrare —
+  // premerlo porta il fuoco sulla casella. Non è un <Alert> (serve un input +
+  // evita l'icona ::before).
   const multitrackConsentBlock = multitrackRequired ? (
     <div
       className="rounded-3 p-3 text-start"
@@ -817,6 +907,7 @@ export default function WaitingRoom({
           id="waiting-multitrack-consent"
           checked={multitrackConsent}
           onChange={(e) => setMultitrackConsent(e.target.checked)}
+          aria-describedby={!multitrackConsent ? MESSAGGIO_DEL_BLOCCO.consent : undefined}
         />
         <label
           className="form-check-label"
@@ -827,7 +918,11 @@ export default function WaitingRoom({
         </label>
       </div>
       {!multitrackConsent && (
-        <div className="small text-muted mt-2" style={{ fontSize: '0.78rem' }}>
+        <div
+          id={MESSAGGIO_DEL_BLOCCO.consent}
+          className="small text-muted mt-2"
+          style={{ fontSize: '0.78rem' }}
+        >
           {t('multitrackConsentRequired')}
         </div>
       )}
@@ -879,7 +974,7 @@ export default function WaitingRoom({
   // time (warming-up implies not LIVE, JVB only LIVE). Rendered as plain
   // styled divs — NOT <Alert> — because Bootstrap Italia's .alert draws an
   // icon via ::before (reserved padding-left:4em) and the leading <Spinner>
-  // would collide with it (see feedback_bootstrap-italia-alert). The div
+  // would collide with it. The div
   // owns its own spinner+border layout, like multitrackConsentBlock.
   const statusBanners = (
     <>
@@ -1020,14 +1115,32 @@ export default function WaitingRoom({
               l'etichetta che cambia dentro un pulsante non a fuoco non viene
               letta: l'apertura va detta a voce, qui. */}
           <p className="visually-hidden" role="status">
-            {evidenziaCta ? t('roomJustOpened') : ''}
+            {annuncio ? t(annuncio) : ''}
           </p>
+          {/* Il campo del nome sta sopra l'anteprima della fotocamera: chi
+              guarda il pulsante spesso non lo vede. Il motivo lo si ripete qui
+              per gli occhi; il lettore di schermo lo riceve una volta sola,
+              come descrizione del pulsante. Il consenso non serve ripeterlo:
+              il suo riquadro sta subito sopra. */}
+          {(bloccoSpiegato === 'name' || bloccoSpiegato === 'email') && (
+            <p
+              className="d-flex align-items-start justify-content-center text-center mb-0"
+              style={{ fontSize: '0.85rem', color: bloccoSpiegato === 'name' && !nomeSegnalato ? '#6B4400' : '#A1112E' }}
+              aria-hidden="true"
+            >
+              <Icon icon="it-warning-circle" size="xs" className="me-1 mt-1 flex-shrink-0" style={{ fill: 'currentColor' }} />
+              <span>{bloccoSpiegato === 'name' ? t('nameRequiredToEnter') : t('emailInvalid')}</span>
+            </p>
+          )}
+          {/* Premibile anche a modulo incompleto: premerlo dice cosa manca e
+              porta sul campo. Resta spento solo cio' che non dipende dalla
+              persona — la sala che si prepara, l'ora d'apertura. */}
           <Button
             color={evidenziaCta ? 'success' : 'primary'}
             size="lg"
             className={`fw-semibold${evidenziaCta ? ' wr-cta-pronta' : ''}`}
             onClick={handleEnterLive}
-            disabled={!canEnter}
+            aria-describedby={bloccoSpiegato ? MESSAGGIO_DEL_BLOCCO[bloccoSpiegato] : undefined}
           >
             <Icon icon="it-video" size="sm" color="white" className="me-2" />
             {evidenziaCta ? t('roomJustOpened') : t('joinNowBtn')}
@@ -1153,18 +1266,25 @@ export default function WaitingRoom({
           {isLive && !salaPronta && (
             <p className="wr-piazza-hint mb-0">{t('roomNotReadyButton')}</p>
           )}
+          {/* Premibile anche a modulo incompleto, come «Entra» nella colonna:
+              premerlo porta sul campo che manca. */}
           {isLive && !salaPronta && ingressoConsentito && (
             <button
               type="button"
               className="wr-piazza-btn"
               onClick={handleEnterLive}
-              disabled={!canEnter}
+              aria-describedby={bloccoSpiegato ? MESSAGGIO_DEL_BLOCCO[bloccoSpiegato] : undefined}
             >
               {t('enterAnyway')}
             </button>
           )}
+          {/* Senza nome il cancello respinge: invece di invitare a camminarci
+              dentro, qui sopra la scena — dove la persona sta guardando — si
+              dice cosa manca. */}
           {isLive && salaPronta && (
-            <p className="wr-piazza-hint mb-0">{t('gardenGateHint')}</p>
+            <p className="wr-piazza-hint mb-0">
+              {bloccoSpiegato === 'name' ? t('nameRequiredToEnter') : t('gardenGateHint')}
+            </p>
           )}
         </div>
       </div>

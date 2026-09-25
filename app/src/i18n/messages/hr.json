@@ -139,7 +139,9 @@
     "status": {
       "DRAFT": "Nacrt",
       "PUBLISHED": "Objavljeno",
+      "PROVISIONING": "U pripremi",
       "LIVE": "Uživo",
+      "IDLE": "Na čekanju",
       "ENDED": "Završeno",
       "ARCHIVED": "Arhivirano"
     },
@@ -288,6 +290,9 @@
     "jibriNotConfigured": "Snimanje nije konfigurirano u infrastrukturi",
     "jibriScaling": "Snimanje se pokreće…",
     "jibriScalingTooltip": "Komponenta za snimanje se pokreće. Bit će dostupna uskoro.",
+    "recorderNotStarted": "Snimanje nije dostupno",
+    "recorderNotStartedDetail": "Usluga snimanja još se nije pokrenula: za sada se događaj nastavlja bez snimanja. Obavijestite administratore platforme.",
+    "recorderStartFailed": "Snimanje se nije pokrenulo. Pokušajte ponovno za nekoliko minuta; ako se problem nastavi, obavijestite administratore platforme.",
     "roomPreparing": "Soba se priprema…",
     "roomPreparingDetail": "Videoposlužitelji se pokreću. Postupak traje oko 2 minute. Soba će se aktivirati automatski.",
     "recordingPromptTitle": "Pokrenuti snimanje?",
@@ -483,6 +488,7 @@
       "textRequired": "Napišite svoje pitanje",
       "tooLong": "Pitanje ne može premašiti 500 znakova",
       "rateLimit": "Pričekajte prije slanja novog pitanja",
+      "busy": "Iz vaše mreže trenutačno stiže mnogo pitanja: pokušajte ponovno za nekoliko sekundi",
       "generic": "Pogreška pri slanju pitanja"
     },
     "ctaTitle": "Postavite prvo pitanje",
@@ -703,7 +709,7 @@
         "speakerEmail": "E-pošta",
         "speakerRequired": "Ime i e-pošta su obavezni.",
         "invitationsHeading": "Pozivnice",
-        "invitationsHelp": "Unaprijed prijavljene osobe — primit će osobnu poveznicu za sudjelovanje.",
+        "invitationsHelp": "Popis pozvanih osoba. Platforma ne šalje pozivnice: sami podijelite poveznicu na događaj. Kad je javna registracija isključena, mogu se registrirati samo ove adrese, a osobna poveznica za ulazak stiže e-poštom nakon registracije.",
         "invitationName": "Ime (neobavezno)",
         "invitationEmail": "E-pošta",
         "invitationRole": "Uloga",
@@ -1317,6 +1323,8 @@
       "publicPageHint": "Stranica koju je potrebno dijeliti za prikupljanje novih prijava.",
       "guestJoin": "Izravna pozivnica (bez prijave)",
       "guestJoinHint": "Brza poveznica za pozivanje sudionika u zadnji čas: pristupa kao gost dok je događaj uživo, bez ispunjavanja obrasca za prijavu.",
+      "callInvite": "Poveznica za sudionike",
+      "callInviteHint": "Tko je primi, pridružuje se pozivu kao gost, bez prijave. Brzi poziv nema javnu stranicu: dijeli se ova poveznica.",
       "moderatorLink": "Moderatorska poveznica",
       "moderatorLinkHint": "Podijelite ovu poveznicu samo s moderatorima. Tko god je ima, može upravljati događajem.",
       "liveRoomHint": "Poveznica za izravan ulazak u sobu kao moderator.",
@@ -1443,7 +1451,7 @@
         "jobMaxAttempts": "Pokušaji prije neuspjeha",
         "jobMaxAttemptsHelp": "Koliko puta pipeline ponavlja posao prije nego što ga označi neuspjelim. Odgoda između pokušaja raste eksponencijalno (od 30 sekundi do 2 sata). Uobičajena vrijednost je 5.",
         "artifactRetentionDays": "Čuvanje artefakata (dani)",
-        "artifactRetentionDaysHelp": "Ako ostane 0, AI artefakti slijede isti rok čuvanja kao i događaj. Vrijednost veća od nule čuva ih navedeni broj dana i nakon zatvaranja događaja, sve dok ih dnevni cron ne izbriše. Brisanje uključuje imena govornika i podatke poslova, u skladu s docs/GDPR.md.",
+        "artifactRetentionDaysHelp": "Uz 0 nema ograničenja za cijelu stranicu: AI artefakti slijede rok čuvanja svoje snimke ili događaja. Vrijednost veća od nule znači da dnevni posao briše svaki artefakt stvoren prije više od toliko dana, objavljen ili ne: rok čuvanja može skratiti, ali ga nikad ne produljuje. Imena govornika i podaci poslova nisu obuhvaćeni: slijede rok čuvanja snimke ili događaja. Pojedinosti u docs/privacy/recordings-and-ai.md.",
         "consentDisclosureSection": "AI obavijest u čekaonici",
         "consentDisclosureHelp": "Tekst prikazan sudionicima u čekaonici kada događaj koristi AI postprodukciju (transkripcija, sažetak, prijevod, sinkronizacija). Može se prilagoditi po jeziku. Ostavi prazno za zadani tekst sustava.",
         "consentDisclosurePlaceholder": "Npr. Ovaj će događaj nakon prijenosa uživo biti automatski transkribiran i sažet AI alatima…"
@@ -1642,7 +1650,7 @@
         "jvbStressCriticalPercent": "Kritični prag opterećenja (%)",
         "jvbStressCriticalPercentHelp": "Iznad ovog praga skaler dodaje 2 JVB replike. Zadano 70. Mora biti veće od praga upozorenja.",
         "jvbProvisioningTimeoutMinutes": "Vremensko ograničenje pripreme (minute)",
-        "jvbProvisioningTimeoutMinutesHelp": "Nakon koliko minuta od startsAt se događaj bez pripremljenog JVB-a označava kao 'degradiran' na status stranici. Zadano 15. Pokriva hladno pokretanje čvora (~3-5 min) plus sigurnosna marža.",
+        "jvbProvisioningTimeoutMinutesHelp": "Nakon koliko minuta od startsAt se događaj bez pripremljenog JVB-a označava kao 'degradiran' na status stranici. Zadano 15. Pokriva hladno pokretanje čvora (~3-5 min) plus sigurnosna marža. Vrijedi i za uslugu snimanja, računajući od trenutka kad je zatraži događaj sa snimanjem: nakon tog vremena bez odgovora soba uživo prestaje je prikazivati kao „pokreće se” i označava je kao nepokrenutu.",
         "statusPollIntervalSeconds": "Interval osvježavanja status stranice (sekunde)",
         "statusPollIntervalSecondsHelp": "Koliko često stranica /status osvježava podatke u pregledniku. Zadano 30. Niže vrijednosti = svježiji podaci, ali veće opterećenje aplikacije.",
         "emailSenderTitle": "Pošiljatelj e-poruka",
@@ -2187,7 +2195,12 @@
     },
     "eventDetail": {
       "copyPublicUrl": "Kopiraj javnu poveznicu",
-      "enterAsModerator": "Uđi uživo",
+      "copyInviteUrl": "Kopiraj poveznicu za pozivnicu",
+      "enterAsParticipant": "Uđi kao sudionik",
+      "openAsParticipant": "Otvori kao sudionik",
+      "participantHintRoom": "Otvara se u novoj kartici: soba kako je vidi gost, bez ovlasti moderatora.",
+      "participantHintPassword": "Otvara se u novoj kartici: soba kako je vidi gost, nakon lozinke događaja.",
+      "participantHintPage": "Otvara se u novoj kartici: javna stranica kako je vide sudionici.",
       "editEvent": "Uredi događaj",
       "editSettings": "Uredi postavke",
       "featureSummary": "Aktivne funkcionalnosti",
@@ -2788,9 +2801,27 @@
     "add": "Dodaj",
     "adding": "Dodavanje...",
     "cancel": "Odustani",
+    "modeLabel": "Vrsta materijala",
+    "modeLink": "Poveznica",
+    "modeFile": "Datoteka",
+    "titleOptional": "Naslov (neobavezno, inače naziv datoteke)",
+    "fileLabel": "Datoteka za učitavanje",
+    "fileHelp": "Podržani formati: PDF, DOCX, PPTX, XLSX, TXT — maks. {maxMb} MB",
+    "upload": "Učitaj",
+    "uploading": "Učitavanje u tijeku…",
     "errors": {
       "urlInvalid": "Unesite valjani URL",
-      "generic": "Pogreška pri dodavanju materijala"
+      "generic": "Pogreška pri dodavanju materijala",
+      "fileMissing": "Odaberite datoteku za učitavanje",
+      "titleMissing": "Unesite naslov poveznice",
+      "fileTooLarge": "Datoteka premašuje ograničenje od {maxMb} MB",
+      "fileTooLargeForServer": "Poslužitelj ne prihvaća tako veliku datoteku: pokušajte s manjom datotekom",
+      "fileType": "Vrsta datoteke nije podržana (PDF, DOCX, PPTX, XLSX, TXT)",
+      "uploadUnavailable": "Učitavanje datoteka nije dostupno u ovoj instalaciji",
+      "uploadFailed": "Pogreška pri učitavanju datoteke",
+      "quotaExceeded": "Ovaj je događaj dosegao ograničenje učitanih datoteka ({maxFiles} datoteka, ukupno {maxMb} MB): uklonite neke da biste učitali nove",
+      "uploadBusy": "Trenutačno ima previše učitavanja: pokušajte ponovno za nekoliko sekundi",
+      "deleteFailed": "Materijal nije moguće izbrisati"
     }
   },
   "reminders": {
@@ -3343,7 +3374,13 @@
     "noActiveRound": "Trenutno nema aktivnog word clouda.",
     "noWords": "Čekamo prve riječi...",
     "wordsSubmitted": "{count} riječi poslano",
-    "timeRemaining": "Preostalo vrijeme"
+    "timeRemaining": "Preostalo vrijeme",
+    "errors": {
+      "send": "Riječ nije poslana. Pokušajte ponovno.",
+      "closed": "Ovaj krug je zatvoren: nove riječi se više ne primaju.",
+      "limit": "Već ste poslali najveći dopušteni broj riječi za ovaj krug.",
+      "rateLimited": "Trenutačno ima previše slanja: pričekajte nekoliko sekundi prije ponovnog pokušaja."
+    }
   },
   "timer": {
     "title": "Mjerač vremena",
@@ -3642,6 +3679,8 @@
     "warmingUpButton": "Soba se priprema...",
     "nameLabel": "Vaše ime",
     "nameHelp": "Bit će vidljivo ostalim sudionicima",
+    "nameRequiredToEnter": "Za ulazak unesite svoje ime (najmanje 2 znaka).",
+    "roomOpenNameMissing": "Soba je otvorena: unesite svoje ime za ulazak.",
     "joinNowBtn": "Uđi sada",
     "roomOpen": "Soba je otvorena",
     "whileYouWait": "Dok čekate",

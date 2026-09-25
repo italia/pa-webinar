@@ -13,8 +13,10 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
  * per dimostrare che NON conta: un amministratore che apre la sala da iscritto
  * o da ospite deve vedere ciò che vede il pubblico.
  */
-const { staffSession } = vi.hoisted(() => ({
+const { staffSession, filesStorage, joinGrant } = vi.hoisted(() => ({
   staffSession: { current: null as null | { role: 'admin' | 'organizer'; accountId: string | null } },
+  filesStorage: { current: null as null | object },
+  joinGrant: { current: false },
 }));
 
 vi.mock('@/lib/db', () => ({
@@ -22,7 +24,14 @@ vi.mock('@/lib/db', () => ({
     event: { findUnique: vi.fn() },
     eventMaterial: { findMany: vi.fn(), create: vi.fn() },
     eventModerator: { findUnique: vi.fn() },
+    registration: { findUnique: vi.fn() },
   },
+}));
+vi.mock('@/lib/events/join-grant', () => ({
+  hasJoinGrant: vi.fn(async () => joinGrant.current),
+}));
+vi.mock('@/lib/storage', () => ({
+  getFilesStorage: () => filesStorage.current,
 }));
 vi.mock('next/headers', () => ({
   cookies: async () => ({ get: () => undefined }),
@@ -40,6 +49,7 @@ import { GET } from './route';
 const mockedEvent = prisma.event.findUnique as unknown as ReturnType<typeof vi.fn>;
 const mockedMaterials = prisma.eventMaterial.findMany as unknown as ReturnType<typeof vi.fn>;
 const mockedGrant = prisma.eventModerator.findUnique as unknown as ReturnType<typeof vi.fn>;
+const mockedRegistration = prisma.registration.findUnique as unknown as ReturnType<typeof vi.fn>;
 
 const EVENT_ID = '22222222-2222-4222-8222-222222222222';
 const OWNER_ID = '33333333-3333-4333-8333-333333333333';
@@ -60,6 +70,7 @@ function eventRow(over: Record<string, unknown> = {}) {
     endsAt: new Date(now + 4 * HOUR),
     postEventPublic: true,
     postEventPublicUntil: null,
+    joinPasswordHash: null,
     ...over,
   };
 }
@@ -100,9 +111,12 @@ function whereInterrogato(): Record<string, unknown> {
 beforeEach(() => {
   vi.clearAllMocks();
   staffSession.current = null;
+  filesStorage.current = null;
   mockedEvent.mockResolvedValue(eventRow());
   mockedMaterials.mockResolvedValue([materialRow('ALWAYS')]);
   mockedGrant.mockResolvedValue(null);
+  mockedRegistration.mockResolvedValue(null);
+  joinGrant.current = false;
 });
 
 describe('GET /api/events/[slug]/materials — il pubblico vede la fase in corso', () => {
@@ -212,6 +226,92 @@ describe('GET /api/events/[slug]/materials — una sessione staff non allarga l�
   it('con il token moderatore vede tutto, sessione o no', async () => {
     staffSession.current = { role: 'organizer', accountId: OTHER_ID };
     await GET(get({ Authorization: `Bearer ${PRIMARY_TOKEN}` }), ctx());
+    expect(whereInterrogato()).toEqual({ eventId: EVENT_ID });
+  });
+});
+
+describe('GET /api/events/[slug]/materials — i file caricati', () => {
+  it('il peso del file viaggia come numero, il percorso nello storage no', async () => {
+    mockedMaterials.mockResolvedValue([
+      {
+        ...materialRow('ALWAYS'),
+        type: 'FILE',
+        fileName: 'slide.pdf',
+        fileSize: BigInt(2_500_000),
+        mimeType: 'application/pdf',
+        blobPath: 'assets/document/2026/09/uuid-slide.pdf',
+      },
+    ]);
+    const res = await GET(get(), ctx());
+    const body = (await res.json()) as { materials: Record<string, unknown>[] };
+    expect(body.materials[0]).toMatchObject({ type: 'FILE', fileSize: 2_500_000 });
+    expect(body.materials[0]).not.toHaveProperty('blobPath');
+  });
+
+  it('dice se questa installazione accetta caricamenti', async () => {
+    let body = (await (await GET(get(), ctx())).json()) as { uploadsEnabled: boolean };
+    expect(body.uploadsEnabled).toBe(false);
+    filesStorage.current = {};
+    body = (await (await GET(get(), ctx())).json()) as { uploadsEnabled: boolean };
+    expect(body.uploadsEnabled).toBe(true);
+  });
+});
+
+/**
+ * Un evento protetto da password: i materiali sono della stanza, compresi i
+ * file caricati in diretta, e chi ha solo il link non entra nella stanza.
+ * Prima l'elenco rispondeva a chiunque avesse lo slug, mentre domande e nuvola
+ * della stessa sala rispondevano 401.
+ */
+describe('GET /api/events/[slug]/materials — evento protetto da password', () => {
+  beforeEach(() => {
+    mockedEvent.mockResolvedValue(eventRow({ status: 'LIVE', joinPasswordHash: 'hash' }));
+  });
+
+  it('chi ha solo il link: 401, nessun materiale letto', async () => {
+    const res = await GET(get(), ctx());
+    expect(res.status).toBe(401);
+    expect(mockedMaterials).not.toHaveBeenCalled();
+  });
+
+  it('un token che non è di questo evento vale come nessun token: 401', async () => {
+    mockedRegistration.mockResolvedValue({ eventId: '99999999-9999-4999-8999-999999999999' });
+    const res = await GET(get({ Authorization: 'Bearer TOKEN_ALTRUI' }), ctx());
+    expect(res.status).toBe(401);
+  });
+
+  it('l’ospite che ha inserito la password: vista del pubblico', async () => {
+    joinGrant.current = true;
+    const res = await GET(get(), ctx());
+    expect(res.status).toBe(200);
+    expect(whereInterrogato()).toEqual({
+      eventId: EVENT_ID,
+      visibility: { in: ['ALWAYS', 'DURING'] },
+    });
+  });
+
+  it('l’iscritto con il proprio token: vista del pubblico', async () => {
+    mockedRegistration.mockResolvedValue({ eventId: EVENT_ID });
+    const res = await GET(get({ Authorization: 'Bearer TOKEN_DI_UN_ISCRITTO' }), ctx());
+    expect(res.status).toBe(200);
+    expect(whereInterrogato()).toHaveProperty('visibility');
+  });
+
+  it('il relatore con il proprio grant: vista del pubblico', async () => {
+    mockedGrant.mockResolvedValue({ eventId: EVENT_ID, revokedAt: null, role: 'SPEAKER' });
+    const res = await GET(get({ Authorization: 'Bearer TOKEN_DEL_RELATORE' }), ctx());
+    expect(res.status).toBe(200);
+  });
+
+  it('un relatore revocato non entra più: 401', async () => {
+    mockedGrant.mockResolvedValue({ eventId: EVENT_ID, revokedAt: new Date(), role: 'SPEAKER' });
+    const res = await GET(get({ Authorization: 'Bearer TOKEN_REVOCATO' }), ctx());
+    expect(res.status).toBe(401);
+  });
+
+  it('il moderatore vede tutto', async () => {
+    const res = await GET(get({ Authorization: `Bearer ${PRIMARY_TOKEN}` }), ctx());
+    expect(res.status).toBe(200);
     expect(whereInterrogato()).toEqual({ eventId: EVENT_ID });
   });
 });

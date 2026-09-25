@@ -176,7 +176,7 @@ ingress:
   className: nginx
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
-    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+    nginx.ingress.kubernetes.io/proxy-body-size: "30m"  # vedi values.yaml
     # Limiti veri di ingress-nginx: i nomi `rate-limit`/`rate-limit-window`
     # che stavano qui non esistono e non facevano nulla. Il valore va tarato
     # sul traffico reale prima di alzarlo a protezione: la sala in diretta

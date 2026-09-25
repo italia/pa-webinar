@@ -15,6 +15,9 @@ interface QAPanelProps {
   /** Guest display name, forwarded to QuestionForm when token is empty
    *  so anonymous attendees can post questions. */
   guestName?: string;
+  /** Identificativo stabile del browser dell'ospite: il server ci lega il
+   *  limite di una domanda ogni trenta secondi, a persona e non per IP. */
+  guestId?: string;
 }
 
 export default function QAPanel({
@@ -22,6 +25,7 @@ export default function QAPanel({
   token,
   isModerator,
   guestName,
+  guestId,
 }: QAPanelProps) {
   const t = useTranslations('qa');
   const [refreshKey, setRefreshKey] = useState(0);
@@ -73,6 +77,7 @@ export default function QAPanel({
                 eventSlug={eventSlug}
                 token={token}
                 guestName={guestName}
+                guestId={guestId}
                 onSubmitted={handleSubmitted}
               />
             </>

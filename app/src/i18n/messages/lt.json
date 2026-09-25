@@ -139,7 +139,9 @@
     "status": {
       "DRAFT": "Juodraštis",
       "PUBLISHED": "Paskelbtas",
+      "PROVISIONING": "Ruošiama",
       "LIVE": "Vyksta",
+      "IDLE": "Pristabdyta",
       "ENDED": "Pasibaigė",
       "ARCHIVED": "Archyvuotas"
     },
@@ -288,6 +290,9 @@
     "jibriNotConfigured": "Įrašymas nesukonfigūruotas infrastruktūroje",
     "jibriScaling": "Įrašymas pradedamas…",
     "jibriScalingTooltip": "Įrašymo komponentas paleidžiamas. Netrukus bus prieinamas.",
+    "recorderNotStarted": "Įrašymas nepasiekiamas",
+    "recorderNotStartedDetail": "Įrašymo paslauga dar nepasileido: kol kas renginys tęsiamas be įrašymo. Praneškite platformos administratoriams.",
+    "recorderStartFailed": "Įrašymas neprasidėjo. Bandykite dar kartą po kelių minučių; jei problema kartojasi, praneškite platformos administratoriams.",
     "roomPreparing": "Salė ruošiama…",
     "roomPreparingDetail": "Vaizdo serveriai paleidžiami. Operacija užtrunka apie 2 minutes. Salė bus aktyvuota automatiškai.",
     "recordingPromptTitle": "Pradėti įrašymą?",
@@ -483,6 +488,7 @@
       "textRequired": "Parašykite savo klausimą",
       "tooLong": "Klausimas negali viršyti 500 simbolių",
       "rateLimit": "Palaukite prieš pateikdami kitą klausimą",
+      "busy": "Šiuo metu iš jūsų tinklo gaunama daug klausimų: bandykite dar kartą po kelių sekundžių",
       "generic": "Klaida pateikiant klausimą"
     },
     "ctaTitle": "Užduokite pirmą klausimą",
@@ -703,7 +709,7 @@
         "speakerEmail": "El. paštas",
         "speakerRequired": "Vardas ir el. paštas yra privalomi.",
         "invitationsHeading": "Kvietimai",
-        "invitationsHelp": "Iš anksto registruoti asmenys — gaus asmeninę prisijungimo nuorodą.",
+        "invitationsHelp": "Pakviestų asmenų sąrašas. Platforma kvietimų nesiunčia: renginio nuoroda pasidalykite patys. Kai viešoji registracija išjungta, užsiregistruoti gali tik šie adresai, o asmeninė prisijungimo nuoroda po registracijos atsiunčiama el. paštu.",
         "invitationName": "Vardas (neprivaloma)",
         "invitationEmail": "El. paštas",
         "invitationRole": "Vaidmuo",
@@ -1317,6 +1323,8 @@
       "publicPageHint": "Puslapis, kurį dalykitės naujoms registracijoms surinkti.",
       "guestJoin": "Tiesioginis kvietimas (be registracijos)",
       "guestJoinHint": "Greita nuoroda paskutinę minutę pakviesti dalyvį: jis prisijungia kaip svečias, kai renginys tiesiogiai vyksta, nepildydamas registracijos formos.",
+      "callInvite": "Nuoroda dalyviams",
+      "callInviteHint": "Ją gavęs asmuo prisijungia prie skambučio kaip svečias, be registracijos. Greitasis skambutis neturi viešo puslapio: dalytis reikia šia nuoroda.",
       "moderatorLink": "Moderatoriaus nuoroda",
       "moderatorLinkHint": "Dalykitės šia nuoroda tik su moderatoriais. Bet kas, turintis šią nuorodą, gali valdyti renginį.",
       "liveRoomHint": "Nuoroda tiesiogiai įeiti į salę kaip moderatorius.",
@@ -1443,7 +1451,7 @@
         "jobMaxAttempts": "Bandymai iki nesėkmės",
         "jobMaxAttemptsHelp": "Kiek kartų grandinė kartoja užduotį, prieš pažymėdama ją kaip nepavykusią. Pertrauka tarp bandymų auga eksponentiškai (nuo 30 sekundžių iki 2 valandų). Įprasta reikšmė – 5.",
         "artifactRetentionDays": "Artefaktų saugojimas (dienomis)",
-        "artifactRetentionDaysHelp": "Palikus 0, DI artefaktams taikomas toks pat terminas kaip ir renginiui. Už nulį didesnė reikšmė juos išsaugo nurodytą dienų skaičių net ir uždarius renginį, kol kasdienis cron jų neištrina. Ištrinami ir kalbėtojų vardai bei užduočių duomenys, kaip numatyta docs/GDPR.md.",
+        "artifactRetentionDaysHelp": "Esant 0, visai svetainei taikomos ribos nėra: DI artefaktams taikomas jų įrašo arba renginio saugojimo terminas. Už nulį didesnė reikšmė lemia, kad kasdienė užduotis ištrina kiekvieną artefaktą, sukurtą anksčiau nei prieš tiek dienų, paskelbtą ar ne: ji gali sutrumpinti saugojimą, bet niekada jo nepailgina. Kalbėtojų vardams ir užduočių duomenims tai netaikoma: jiems taikomas įrašo arba renginio saugojimo terminas. Išsamiau: docs/privacy/recordings-and-ai.md.",
         "consentDisclosureSection": "DI pranešimas laukiamajame",
         "consentDisclosureHelp": "Tekstas, rodomas dalyviams laukiamajame, kai renginyje naudojama DI postprodukcija (transkripcija, santrauka, vertimas, įgarsinimas). Pritaikomas kiekvienai kalbai. Palikite tuščią, kad būtų naudojamas numatytasis sistemos tekstas.",
         "consentDisclosurePlaceholder": "Pvz. Šis renginys po tiesioginės transliacijos bus automatiškai transkribuotas ir apibendrintas DI įrankiais…"
@@ -1642,7 +1650,7 @@
         "jvbStressCriticalPercent": "Įtampos kritinė riba (%)",
         "jvbStressCriticalPercentHelp": "Viršijus šią ribą, masteliuotojas prideda 2 papildomas JVB replikas. Numatytoji 70. Turi būti didesnė už įspėjimo.",
         "jvbProvisioningTimeoutMinutes": "Paruošimo laiko limitas (minutės)",
-        "jvbProvisioningTimeoutMinutesHelp": "Po kiek minučių nuo startsAt renginys, kurio JVB dar nepasiruošęs, pažymimas kaip „degradavęs“ būsenos puslapyje. Numatyta 15. Apima šaltą mazgo paleidimą (~3–5 min) ir saugumo atsargą.",
+        "jvbProvisioningTimeoutMinutesHelp": "Po kiek minučių nuo startsAt renginys, kurio JVB dar nepasiruošęs, pažymimas kaip „degradavęs“ būsenos puslapyje. Numatyta 15. Apima šaltą mazgo paleidimą (~3–5 min) ir saugumo atsargą. Taikoma ir įrašymo paslaugai, skaičiuojant nuo to, kai renginys su įrašymu jos paprašo: praėjus šiam laikui be atsakymo, tiesioginė salė neberodo jos kaip „paleidžiamos“ ir pažymi kaip nepasileidusią.",
         "statusPollIntervalSeconds": "Būsenos puslapio atnaujinimo intervalas (sekundėmis)",
         "statusPollIntervalSecondsHelp": "Kas kiek sekundžių /status puslapis atnaujina duomenis naršyklės pusėje. Numatyta 30. Mažesnės reikšmės = šviežesni duomenys, bet didesnė programos apkrova.",
         "emailSenderTitle": "El. laiškų siuntėjas",
@@ -2187,7 +2195,12 @@
     },
     "eventDetail": {
       "copyPublicUrl": "Kopijuoti viešą nuorodą",
-      "enterAsModerator": "Įeiti į live",
+      "copyInviteUrl": "Kopijuoti kvietimo nuorodą",
+      "enterAsParticipant": "Prisijungti kaip dalyvis",
+      "openAsParticipant": "Atidaryti kaip dalyvis",
+      "participantHintRoom": "Atsidaro naujame skirtuke: kambarys taip, kaip jį mato svečias, be moderatoriaus teisių.",
+      "participantHintPassword": "Atsidaro naujame skirtuke: kambarys taip, kaip jį mato svečias, įvedus renginio slaptažodį.",
+      "participantHintPage": "Atsidaro naujame skirtuke: viešas puslapis taip, kaip jį mato dalyviai.",
       "editEvent": "Redaguoti renginį",
       "editSettings": "Redaguoti nustatymus",
       "featureSummary": "Aktyvios funkcijos",
@@ -2788,9 +2801,27 @@
     "add": "Pridėti",
     "adding": "Pridedama...",
     "cancel": "Atšaukti",
+    "modeLabel": "Medžiagos tipas",
+    "modeLink": "Nuoroda",
+    "modeFile": "Failas",
+    "titleOptional": "Pavadinimas (neprivalomas; kitaip – failo pavadinimas)",
+    "fileLabel": "Įkeliamas failas",
+    "fileHelp": "Palaikomi formatai: PDF, DOCX, PPTX, XLSX, TXT — iki {maxMb} MB",
+    "upload": "Įkelti",
+    "uploading": "Įkeliama…",
     "errors": {
       "urlInvalid": "Įveskite galiojantį URL",
-      "generic": "Klaida pridedant medžiagą"
+      "generic": "Klaida pridedant medžiagą",
+      "fileMissing": "Pasirinkite įkeliamą failą",
+      "titleMissing": "Įveskite nuorodos pavadinimą",
+      "fileTooLarge": "Failas viršija {maxMb} MB ribą",
+      "fileTooLargeForServer": "Serveris nepriima tokio didelio failo: bandykite mažesnį failą",
+      "fileType": "Failo tipas nepalaikomas (PDF, DOCX, PPTX, XLSX, TXT)",
+      "uploadUnavailable": "Failų įkėlimas šiame diegime negalimas",
+      "uploadFailed": "Klaida įkeliant failą",
+      "quotaExceeded": "Šis renginys pasiekė įkeltų failų ribą ({maxFiles} failų, iš viso {maxMb} MB): pašalinkite kelis, kad galėtumėte įkelti daugiau",
+      "uploadBusy": "Šiuo metu per daug įkėlimų: bandykite dar kartą po kelių sekundžių",
+      "deleteFailed": "Medžiagos ištrinti nepavyko"
     }
   },
   "reminders": {
@@ -3343,7 +3374,13 @@
     "noActiveRound": "Šiuo metu \"Word Cloud\" neaktyvus.",
     "noWords": "Laukiama pirmųjų žodžių...",
     "wordsSubmitted": "{count} žodžių pateikta",
-    "timeRemaining": "Liko laiko"
+    "timeRemaining": "Liko laiko",
+    "errors": {
+      "send": "Žodis neišsiųstas. Bandykite dar kartą.",
+      "closed": "Šis raundas uždarytas: daugiau žodžių nepriimama.",
+      "limit": "Šiame raunde jau išsiuntėte didžiausią leistiną žodžių skaičių.",
+      "rateLimited": "Šiuo metu per daug siuntimų: palaukite kelias sekundes ir bandykite dar kartą."
+    }
   },
   "timer": {
     "title": "Laikmatis",
@@ -3642,6 +3679,8 @@
     "warmingUpButton": "Salė ruošiama...",
     "nameLabel": "Jūsų vardas",
     "nameHelp": "Jį matys kiti dalyviai",
+    "nameRequiredToEnter": "Kad įeitumėte, įveskite savo vardą (bent 2 simboliai).",
+    "roomOpenNameMissing": "Salė atidaryta: kad įeitumėte, įveskite savo vardą.",
     "joinNowBtn": "Įeiti dabar",
     "roomOpen": "Salė atidaryta",
     "whileYouWait": "Kol laukiate",

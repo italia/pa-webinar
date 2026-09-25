@@ -59,11 +59,14 @@ interface PostEventVisibilityFields {
   postEventPublicUntil: Date | string | null;
 }
 
-function isWarmupPubliclyVisible(event: EventLike): boolean {
+// `now` e' facoltativo in tutte le funzioni che dipendono dall'ora: il server
+// usa l'orologio, un Client Component passa l'istante del rendering sul server
+// cosi' che la prima passata nel browser dia lo stesso risultato.
+function isWarmupPubliclyVisible(event: EventLike, now: number = Date.now()): boolean {
   return (
     (WARMUP_STATUSES as string[]).includes(event.status) &&
     event.eventType !== 'INSTANT' &&
-    new Date(event.endsAt).getTime() > Date.now()
+    new Date(event.endsAt).getTime() > now
   );
 }
 
@@ -74,11 +77,14 @@ function isWarmupPubliclyVisible(event: EventLike): boolean {
  * dai listing) — coerente con come `lib/ai/access.ts` gestisce già la finestra
  * per i download di registrazione/AI.
  */
-function isEndedPostEventVisible(event: PostEventVisibilityFields): boolean {
+function isEndedPostEventVisible(
+  event: PostEventVisibilityFields,
+  now: number = Date.now(),
+): boolean {
   if (!event.postEventPublic) return false;
   if (
     event.postEventPublicUntil != null &&
-    new Date(event.postEventPublicUntil).getTime() <= Date.now()
+    new Date(event.postEventPublicUntil).getTime() <= now
   ) {
     return false;
   }
@@ -102,21 +108,23 @@ function isEndedPostEventVisible(event: PostEventVisibilityFields): boolean {
  */
 export function isEventPageVisible(
   event: EventLike & PostEventVisibilityFields,
+  now: number = Date.now(),
 ): boolean {
   if (event.eventType === 'INSTANT' && event.status !== 'ENDED') return false;
-  return isEventPubliclyVisible(event);
+  return isEventPubliclyVisible(event, now);
 }
 
 /** True se la pagina pubblica dell'evento deve essere raggiungibile. */
 export function isEventPubliclyVisible(
   event: EventLike & PostEventVisibilityFields,
+  now: number = Date.now(),
 ): boolean {
   if (event.status === 'ENDED') {
-    return isEndedPostEventVisible(event);
+    return isEndedPostEventVisible(event, now);
   }
   return (
     (ALWAYS_PUBLIC_STATUSES as string[]).includes(event.status) ||
-    isWarmupPubliclyVisible(event)
+    isWarmupPubliclyVisible(event, now)
   );
 }
 

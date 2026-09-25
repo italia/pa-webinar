@@ -62,3 +62,48 @@ export function leggiStatoRegistratore(valore: unknown): StatoPonte {
   if (valore === 'scaling') return false;
   return null;
 }
+
+/**
+ * Cosa mostrare a chi modera sul pulsante di registrazione.
+ *
+ * «In avvio» si scrive solo quando la sonda lo dice (`scaling`), e la sonda
+ * smette di dirlo passato il tempo massimo di allestimento (`failed`): cosi'
+ * la scritta non resta per tutto l'evento, e tutti i moderatori, che leggono
+ * la stessa sonda, vedono la stessa cosa. `unavailable` e' uno storage delle
+ * registrazioni non configurato. Il resto — `standby`, un valore assente, una
+ * risposta illeggibile — e' «non lo so»: il pulsante resta usabile, e se il
+ * registratore non c'e' e' Jitsi stesso a rifiutare l'avvio.
+ */
+export type FaseRegistratore = 'pronto' | 'in-avvio' | 'non-partito' | 'non-configurato';
+
+export function leggiFaseRegistratore(valore: unknown): FaseRegistratore | null {
+  switch (valore) {
+    case 'ready':
+      return 'pronto';
+    case 'scaling':
+      return 'in-avvio';
+    case 'failed':
+      return 'non-partito';
+    case 'unavailable':
+      return 'non-configurato';
+    default:
+      return null;
+  }
+}
+
+/**
+ * La fase da mostrare, data quella mostrata finora e quella appena letta.
+ *
+ * Dentro la stessa attesa «non partito» non torna «in avvio»: la sonda puo'
+ * dirlo per un giro — una replica appena avviata, o con Redis che non
+ * risponde, conta l'attesa dalla propria prima richiesta — e la sala
+ * rimostrerebbe l'indicatore di avvio e ripeterebbe l'avviso. L'attesa finisce
+ * quando la sonda dice altro: pronto, non configurato, o non lo so.
+ */
+export function faseRegistratoreStabile(
+  mostrata: FaseRegistratore | null,
+  letta: FaseRegistratore | null,
+): FaseRegistratore | null {
+  if (mostrata === 'non-partito' && letta === 'in-avvio') return 'non-partito';
+  return letta;
+}

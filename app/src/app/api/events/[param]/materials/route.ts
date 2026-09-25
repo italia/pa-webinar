@@ -10,6 +10,8 @@ import { isEventModerator, extractModeratorToken } from '@/lib/auth/moderator';
 import { prisma } from '@/lib/db';
 import { isEventPubliclyVisible } from '@/lib/events/visibility';
 import { MATERIAL_ACCESS_EVENT_SELECT, materialsWhereFor } from '@/lib/events/material-access';
+import { pokeLivePanel } from '@/lib/live-state/publish';
+import { getFilesStorage } from '@/lib/storage';
 import { createMaterialSchema } from '@/lib/validation/schemas';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
 
@@ -53,10 +55,15 @@ export const GET = withErrorHandling(async (request, context) => {
         title: m.title,
         url: m.url,
         description: m.description,
+        // Solo per i file caricati (type FILE): il peso da mostrare accanto.
+        fileSize: m.fileSize != null ? Number(m.fileSize) : null,
         visibility: m.visibility,
         addedBy: m.addedBy,
         createdAt: m.createdAt.toISOString(),
       })),
+      // Se questa installazione ha uno storage per i file: il pannello della
+      // sala offre il caricamento (POST ./upload) solo quando può riuscire.
+      uploadsEnabled: getFilesStorage() !== null,
     },
     // La risposta dipende da chi chiede e dall'ora: nessuna cache condivisa.
     { headers: { 'Cache-Control': 'private, no-store' } },
@@ -100,6 +107,9 @@ export const POST = withErrorHandling(async (request, context) => {
       addedBy: event.moderatorName ?? 'Moderator',
     },
   });
+
+  // Il pannello di chi è in sala rilegge subito, ognuno con i propri permessi.
+  pokeLivePanel(event.id, 'materials');
 
   return Response.json(
     {

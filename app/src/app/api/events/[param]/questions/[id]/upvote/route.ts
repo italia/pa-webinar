@@ -1,4 +1,4 @@
-import { withErrorHandling } from '@/lib/api-handler';
+import { parseJsonBody, withErrorHandling } from '@/lib/api-handler';
 import {
   NotFoundError,
   UnauthorizedError,
@@ -19,7 +19,7 @@ export const POST = withErrorHandling(async (request, context) => {
 
   let accessToken: string | undefined;
   try {
-    const body = await request.json();
+    const body = (await parseJsonBody(request)) as { accessToken?: unknown } | null;
     if (body && typeof body === 'object' && typeof body.accessToken === 'string') {
       accessToken = body.accessToken;
     }

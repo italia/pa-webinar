@@ -139,7 +139,9 @@
     "status": {
       "DRAFT": "Concept",
       "PUBLISHED": "Gepubliceerd",
+      "PROVISIONING": "In voorbereiding",
       "LIVE": "LIVE",
+      "IDLE": "Gepauzeerd",
       "ENDED": "Afgelopen",
       "ARCHIVED": "Gearchiveerd"
     },
@@ -288,6 +290,9 @@
     "jibriNotConfigured": "Opname niet geconfigureerd in de infrastructuur",
     "jibriScaling": "Opname wordt gestart…",
     "jibriScalingTooltip": "De opnamecomponent wordt gestart. Hij is binnenkort beschikbaar.",
+    "recorderNotStarted": "Opname niet beschikbaar",
+    "recorderNotStartedDetail": "De opnamedienst is nog niet gestart: voorlopig gaat het evenement verder zonder opname. Laat het de beheerders van het platform weten.",
+    "recorderStartFailed": "De opname is niet gestart. Probeer het over een paar minuten opnieuw; als het probleem blijft, laat het de beheerders van het platform weten.",
     "roomPreparing": "Ruimte wordt voorbereid…",
     "roomPreparingDetail": "De videoservers worden gestart. Dit duurt ongeveer 2 minuten. De ruimte wordt automatisch geactiveerd.",
     "recordingPromptTitle": "Opname starten?",
@@ -483,6 +488,7 @@
       "textRequired": "Schrijf uw vraag",
       "tooLong": "De vraag mag niet meer dan 500 tekens bevatten",
       "rateLimit": "Wacht even voordat u een nieuwe vraag stelt",
+      "busy": "Er komen nu veel vragen binnen vanaf uw netwerk: probeer het over een paar seconden opnieuw",
       "generic": "Fout bij het verzenden van de vraag"
     },
     "ctaTitle": "Stel de eerste vraag",
@@ -703,7 +709,7 @@
         "speakerEmail": "E-mail",
         "speakerRequired": "Naam en e-mail zijn verplicht.",
         "invitationsHeading": "Uitnodigingen",
-        "invitationsHelp": "Vooraf aangemelde personen — zij ontvangen een persoonlijke deelnamelink.",
+        "invitationsHelp": "Lijst van uitgenodigde personen. Het platform verstuurt geen uitnodigingen: deel de link naar het evenement zelf. Als publieke inschrijving uitstaat, kunnen alleen deze adressen zich inschrijven, en de persoonlijke deelnamelink komt na de inschrijving per e-mail.",
         "invitationName": "Naam (optioneel)",
         "invitationEmail": "E-mail",
         "invitationRole": "Rol",
@@ -1317,6 +1323,8 @@
       "publicPageHint": "De pagina om te delen voor het verzamelen van nieuwe aanmeldingen.",
       "guestJoin": "Directe uitnodiging (zonder aanmelding)",
       "guestJoinHint": "Snelle link om last-minute een deelnemer uit te nodigen: zij nemen deel als gast wanneer het evenement live is, zonder het aanmeldformulier in te vullen.",
+      "callInvite": "Link voor deelnemers",
+      "callInviteHint": "Wie hem ontvangt, neemt als gast deel aan het gesprek, zonder aanmelding. Een directe oproep heeft geen openbare pagina: dit is de link om te delen.",
       "moderatorLink": "Moderatorlink",
       "moderatorLinkHint": "Deel deze link alleen met moderators. Iedereen met deze link kan het evenement beheren.",
       "liveRoomHint": "Link om direct als moderator de ruimte binnen te gaan.",
@@ -1443,7 +1451,7 @@
         "jobMaxAttempts": "Pogingen vóór mislukking",
         "jobMaxAttemptsHelp": "Hoe vaak de pijplijn een taak opnieuw probeert voordat deze als mislukt wordt gemarkeerd. De backoff tussen de pogingen groeit exponentieel (van 30 seconden tot 2 uur). De gebruikelijke waarde is 5.",
         "artifactRetentionDays": "Bewaring van de artefacten (dagen)",
-        "artifactRetentionDaysHelp": "Op 0 volgen de AI-artefacten dezelfde vervaltermijn als het evenement. Een waarde groter dan nul bewaart ze gedurende het opgegeven aantal dagen, ook na de afsluiting van het evenement, totdat een dagelijkse cron ze verwijdert. Het verwijderen omvat de namen van de sprekers en de payloads van de jobs, in lijn met docs/GDPR.md.",
+        "artifactRetentionDaysHelp": "Bij 0 geldt geen limiet voor de hele site: de AI-artefacten volgen de bewaartermijn van hun opname of van het evenement. Een waarde groter dan nul laat een dagelijkse taak elk artefact verwijderen dat meer dan dat aantal dagen geleden is aangemaakt, gepubliceerd of niet: zo kan de bewaring korter worden, maar nooit langer. Namen van sprekers en payloads van de jobs vallen hier niet onder: die volgen de bewaartermijn van de opname of van het evenement. Details in docs/privacy/recordings-and-ai.md.",
         "consentDisclosureSection": "AI-mededeling in de wachtruimte",
         "consentDisclosureHelp": "Tekst die aan de deelnemers in de wachtruimte wordt getoond wanneer het evenement AI-postproductie gebruikt (transcriptie, samenvatting, vertaling, nasynchronisatie). Per taal aan te passen. Laat leeg om de standaardtekst van het systeem te gebruiken.",
         "consentDisclosurePlaceholder": "Bijv. Dit evenement wordt na de live-uitzending automatisch getranscribeerd en samengevat met AI-hulpmiddelen…"
@@ -1642,7 +1650,7 @@
         "jvbStressCriticalPercent": "Drempel stress critical (%)",
         "jvbStressCriticalPercentHelp": "Boven deze drempel voegt de scaler 2 JVB-replicas toe. Standaard 70. Moet hoger zijn dan warn.",
         "jvbProvisioningTimeoutMinutes": "Provisioning-timeout (minuten)",
-        "jvbProvisioningTimeoutMinutesHelp": "Na hoeveel minuten vanaf startsAt een evenement zonder JVB-readiness als 'degraded' wordt gemeld op de statuspagina. Standaard 15. Dekt cold-start van de knoop (~3-5 min) + veiligheidsmarge.",
+        "jvbProvisioningTimeoutMinutesHelp": "Na hoeveel minuten vanaf startsAt een evenement zonder JVB-readiness als 'degraded' wordt gemeld op de statuspagina. Standaard 15. Dekt cold-start van de knoop (~3-5 min) + veiligheidsmarge. Geldt ook voor de opnamedienst, gerekend vanaf het moment dat een evenement met opname erom vraagt: blijft een antwoord binnen deze tijd uit, dan toont de live-ruimte hem niet meer als 'wordt gestart' en meldt hem als niet gestart.",
         "statusPollIntervalSeconds": "Polling-interval statuspagina (seconden)",
         "statusPollIntervalSecondsHelp": "Hoe vaak de /status-pagina vanuit de browser wordt vernieuwd. Standaard 30. Lagere waarden = verser data maar meer belasting op de app.",
         "emailSenderTitle": "Afzender van de e-mails",
@@ -2187,7 +2195,12 @@
     },
     "eventDetail": {
       "copyPublicUrl": "Openbare link kopiëren",
-      "enterAsModerator": "LIVE binnenkomen",
+      "copyInviteUrl": "Uitnodigingslink kopiëren",
+      "enterAsParticipant": "Als deelnemer binnenkomen",
+      "openAsParticipant": "Openen als deelnemer",
+      "participantHintRoom": "Opent in een nieuw tabblad: de ruimte zoals een gast die ziet, zonder moderatorrechten.",
+      "participantHintPassword": "Opent in een nieuw tabblad: de ruimte zoals een gast die ziet, na het wachtwoord van het evenement.",
+      "participantHintPage": "Opent in een nieuw tabblad: de openbare pagina zoals deelnemers die zien.",
       "editEvent": "Evenement bewerken",
       "editSettings": "Instellingen bewerken",
       "featureSummary": "Actieve functies",
@@ -2788,9 +2801,27 @@
     "add": "Toevoegen",
     "adding": "Toevoegen...",
     "cancel": "Annuleren",
+    "modeLabel": "Soort materiaal",
+    "modeLink": "Link",
+    "modeFile": "Bestand",
+    "titleOptional": "Titel (optioneel, anders de bestandsnaam)",
+    "fileLabel": "Te uploaden bestand",
+    "fileHelp": "Ondersteunde formaten: PDF, DOCX, PPTX, XLSX, TXT — max. {maxMb} MB",
+    "upload": "Uploaden",
+    "uploading": "Bezig met uploaden…",
     "errors": {
       "urlInvalid": "Voer een geldige URL in",
-      "generic": "Fout bij het toevoegen van materiaal"
+      "generic": "Fout bij het toevoegen van materiaal",
+      "fileMissing": "Kies een bestand om te uploaden",
+      "titleMissing": "Voer een titel voor de link in",
+      "fileTooLarge": "Het bestand is groter dan de limiet van {maxMb} MB",
+      "fileTooLargeForServer": "De server accepteert geen bestand van deze grootte: probeer een kleiner bestand",
+      "fileType": "Niet-ondersteund bestandstype (PDF, DOCX, PPTX, XLSX, TXT)",
+      "uploadUnavailable": "Bestanden uploaden is niet beschikbaar in deze installatie",
+      "uploadFailed": "Fout bij het uploaden van het bestand",
+      "quotaExceeded": "Dit evenement heeft de limiet voor geüploade bestanden bereikt ({maxFiles} bestanden, {maxMb} MB in totaal): verwijder er enkele om meer te uploaden",
+      "uploadBusy": "Te veel uploads op dit moment: probeer het over een paar seconden opnieuw",
+      "deleteFailed": "Het materiaal kon niet worden verwijderd"
     }
   },
   "reminders": {
@@ -3343,7 +3374,13 @@
     "noActiveRound": "Momenteel geen word cloud actief.",
     "noWords": "Wachten op de eerste woorden...",
     "wordsSubmitted": "{count} woorden ingediend",
-    "timeRemaining": "Resterende tijd"
+    "timeRemaining": "Resterende tijd",
+    "errors": {
+      "send": "Woord niet verzonden. Probeer het opnieuw.",
+      "closed": "Deze ronde is gesloten: er worden geen woorden meer aangenomen.",
+      "limit": "U hebt voor deze ronde al het maximale aantal woorden verzonden.",
+      "rateLimited": "Te veel inzendingen op dit moment: wacht een paar seconden voordat u het opnieuw probeert."
+    }
   },
   "timer": {
     "title": "Timer",
@@ -3642,6 +3679,8 @@
     "warmingUpButton": "Ruimte wordt voorbereid...",
     "nameLabel": "Uw naam",
     "nameHelp": "De andere deelnemers zien deze",
+    "nameRequiredToEnter": "Voer uw naam in om binnen te komen (minimaal 2 tekens).",
+    "roomOpenNameMissing": "De zaal is open: voer uw naam in om binnen te komen.",
     "joinNowBtn": "Nu binnenkomen",
     "roomOpen": "De zaal is open",
     "whileYouWait": "Terwijl u wacht",

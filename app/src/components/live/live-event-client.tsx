@@ -19,7 +19,13 @@ import { Icon } from '@/components/ui/icon';
 import { Link, useRouter, percorso } from '@/i18n/navigation';
 import type { JitsiMeetExternalAPI } from '@/types/jitsi';
 import type { VideoQualityPreset } from '@/lib/jitsi/config';
-import { leggiStatoPonte, leggiStatoRegistratore } from '@/lib/jitsi/bridge-readiness';
+import {
+  faseRegistratoreStabile,
+  leggiFaseRegistratore,
+  leggiStatoPonte,
+  leggiStatoRegistratore,
+  type FaseRegistratore,
+} from '@/lib/jitsi/bridge-readiness';
 import JitsiRoom from '@/components/jitsi/jitsi-room';
 import { LivePushContext, useLivePush, useLiveState } from '@/hooks/use-live-state';
 import RecordingConsent, { RecordingBanner } from '@/components/jitsi/recording-consent';
@@ -36,6 +42,11 @@ import PresentationTimer from '@/components/live/presentation-timer';
 import ReactionBar from '@/components/live/reaction-bar';
 import ChatPanel from '@/components/live/chat-panel';
 import WordCloud from '@/components/live/word-cloud';
+import {
+  registrationAccessToken,
+  voterIdentity,
+  voterIdStorageKey,
+} from '@/components/live/voter-identity';
 import EventTimer from '@/components/live/event-timer';
 import LiveShareButton from '@/components/live/live-share-button';
 import WaitingRoom, {
@@ -289,15 +300,21 @@ export default function LiveEventClient({
   // `accessToken` di registrazione; ospiti, relatori e moderatori non ce
   // l'hanno e usano l'identificativo stabile del browser qui sotto. Il token
   // moderatore NON è un'identità di voto: il server lo cerca fra le
-  // registrazioni e risponde 403.
-  const registeredAccessToken =
-    !isGuest && !isModerator && !isSpeaker && token ? token : undefined;
+  // registrazioni e risponde 403. La regola sta in voter-identity.
+  const registeredAccessToken = registrationAccessToken({
+    token,
+    isGuest,
+    isModerator,
+    isSpeaker,
+  });
   const [guestId] = useState(() => {
     if (registeredAccessToken) return '';
     const fresh = () => `guest_${Math.random().toString(36).slice(2, 10)}`;
     if (typeof window === 'undefined') return fresh();
     try {
-      const k = 'paw_guest_id';
+      // Una chiave per ruolo: l'anteprima da ospite aperta da chi conduce
+      // nello stesso browser non eredita i suoi voti (voter-identity).
+      const k = voterIdStorageKey({ isModerator, isSpeaker });
       let v = window.localStorage.getItem(k);
       if (!v) {
         v = fresh();
@@ -310,6 +327,9 @@ export default function LiveEventClient({
   });
   const [jvbReady, setJvbReady] = useState<boolean | null>(null);
   const [jibriReady, setJibriReady] = useState<boolean | null>(null);
+  // Cosa mostrare sul pulsante di registrazione di chi modera: «in avvio»
+  // solo finché la sonda lo dice, poi «non partito» (vedi bridge-readiness).
+  const [recorderPhase, setRecorderPhase] = useState<FaseRegistratore | null>(null);
   // Telemetria warm-up dal poll /lifecycle (solo mentre IDLE/PROVISIONING):
   // alimenta il pannello di attesa onesto della WaitingRoom.
   const [warmup, setWarmup] = useState<WaitingRoomWarmup | null>(null);
@@ -343,6 +363,7 @@ export default function LiveEventClient({
     if (eventStatus !== 'LIVE') {
       setJvbReady(null);
       setJibriReady(null);
+      setRecorderPhase(null);
       return;
     }
     let cancelled = false;
@@ -356,6 +377,9 @@ export default function LiveEventClient({
           // accendendo adesso», e nient'altro.
           setJvbReady(leggiStatoPonte(data.metrics));
           setJibriReady(leggiStatoRegistratore(data.metrics?.jibriStatus));
+          setRecorderPhase((mostrata) =>
+            faseRegistratoreStabile(mostrata, leggiFaseRegistratore(data.metrics?.jibriStatus)),
+          );
         }
       } catch {
         /* retry on next tick */
@@ -1418,7 +1442,7 @@ export default function LiveEventClient({
           eventId={event.id}
           moderatorToken={token}
           recordingEnabled={event.recordingEnabled}
-          jibriAvailable={jibriReady === true}
+          recorderPhase={recorderPhase}
           participantsCanUnmute={event.participantsCanUnmute}
           participantsCanStartVideo={event.participantsCanStartVideo}
           whiteboardEnabled={event.whiteboardEnabled || isInstantCall}
@@ -1530,8 +1554,7 @@ export default function LiveEventClient({
           displayName={credentials.displayName}
           canReactAgenda={!isModerator && !isSpeaker}
           guestId={isGuest ? guestId : undefined}
-          voterAccessToken={registeredAccessToken}
-          voterGuestId={registeredAccessToken ? undefined : guestId}
+          {...voterIdentity(registeredAccessToken, guestId)}
         />
       </div>
 
@@ -2271,6 +2294,7 @@ function LiveSidebar({
               token={token}
               isModerator={isModerator}
               guestName={!token ? displayName : undefined}
+              guestId={!token ? voterGuestId : undefined}
             />
           )}
           {/* ChatPanel stays mounted while the event is live so it can
@@ -2318,7 +2342,13 @@ function LiveSidebar({
             />
           </div>
           {activeTab === 'wordcloud' && effWordCloud && (
-            <WordCloud eventSlug={eventSlug} token={token} isModerator={isModerator} />
+            <WordCloud
+              eventSlug={eventSlug}
+              token={token}
+              isModerator={isModerator}
+              voterAccessToken={voterAccessToken}
+              voterGuestId={voterGuestId}
+            />
           )}
           {activeTab === 'agenda' && effAgenda && (
             <AgendaPanel

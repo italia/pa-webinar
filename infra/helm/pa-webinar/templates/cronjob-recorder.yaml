@@ -89,7 +89,8 @@ spec:
                 # confronta il dominio del JID con `config.hiddenDomain` e, se
                 # coincide, non lo mostra e non lo conta. Senza queste, il bot
                 # entra col JWT del portale ed e' un partecipante come gli
-                # altri. Vedi docs/ARCHITECTURE.md.
+                # altri. Vedi docs/operations/recording-setup.md, "Make the
+                # bot invisible".
                 - name: JITSI_XMPP_DOMAIN
                   value: {{ .Values.recorder.hiddenDomain | quote }}
                 - name: JITSI_XMPP_USER

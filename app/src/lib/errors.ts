@@ -58,8 +58,10 @@ export class AlreadyRegisteredError extends AppError {
 }
 
 export class RateLimitError extends AppError {
-  constructor(retryAfterSeconds?: number) {
-    super('Too many requests', 429, 'RATE_LIMIT');
+  /** `code` distingue un limite dall'altro quando il client deve dire cose
+   *  diverse (il limite della persona o quello condiviso da una rete). */
+  constructor(retryAfterSeconds?: number, code = 'RATE_LIMIT') {
+    super('Too many requests', 429, code);
     if (retryAfterSeconds !== undefined) {
       this.headers = {
         'Retry-After': String(Math.ceil(retryAfterSeconds)),

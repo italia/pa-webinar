@@ -50,6 +50,10 @@ import {
   type AssetType,
 } from '@/lib/utils/asset-key';
 import { contentMatchesDeclaredMime } from '@/lib/utils/mime-sniff';
+import {
+  MATERIAL_FILE_MAX_BYTES,
+  MATERIAL_FILE_MIME_TYPES,
+} from '@/lib/validation/materials';
 
 export const dynamic = 'force-dynamic';
 
@@ -70,20 +74,15 @@ const ALLOWED_MIME: Record<AssetKind, ReadonlySet<string>> = {
     'audio/mp4',
     'audio/webm',
   ]),
-  document: new Set([
-    'application/pdf',
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
-    'application/vnd.openxmlformats-officedocument.presentationml.presentation', // .pptx
-    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
-    'text/plain',
-  ]),
+  // I documenti sono i materiali dell'evento: stessa regola della sala.
+  document: new Set<string>(MATERIAL_FILE_MIME_TYPES),
 };
 
 // Caps in bytes (MiB-based to match object-store dashboards).
 const MAX_SIZE: Record<AssetKind, number> = {
   image: 10 * 1024 * 1024,
   audio: 20 * 1024 * 1024,
-  document: 25 * 1024 * 1024,
+  document: MATERIAL_FILE_MAX_BYTES,
 };
 
 function assertAssetKind(raw: string | null): AssetKind {

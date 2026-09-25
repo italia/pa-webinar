@@ -139,7 +139,9 @@
     "status": {
       "DRAFT": "Wersja robocza",
       "PUBLISHED": "Opublikowane",
+      "PROVISIONING": "W przygotowaniu",
       "LIVE": "Na żywo",
+      "IDLE": "Wstrzymane",
       "ENDED": "Zakończone",
       "ARCHIVED": "Zarchiwizowane"
     },
@@ -288,6 +290,9 @@
     "jibriNotConfigured": "Nagrywanie nie skonfigurowane w infrastrukturze",
     "jibriScaling": "Uruchamianie nagrywania…",
     "jibriScalingTooltip": "Komponent nagrywania jest uruchamiany. Wkrótce będzie dostępny.",
+    "recorderNotStarted": "Nagrywanie niedostępne",
+    "recorderNotStartedDetail": "Usługa nagrywania jeszcze się nie uruchomiła: na razie wydarzenie trwa bez nagrywania. Powiadom administratorów platformy.",
+    "recorderStartFailed": "Nagrywanie nie rozpoczęło się. Spróbuj ponownie za kilka minut; jeśli problem się powtarza, powiadom administratorów platformy.",
     "roomPreparing": "Przygotowywanie sali…",
     "roomPreparingDetail": "Serwery wideo się uruchamiają. Operacja trwa około 2 minut. Sala uaktywni się automatycznie.",
     "recordingPromptTitle": "Rozpocząć nagrywanie?",
@@ -483,6 +488,7 @@
       "textRequired": "Proszę napisać pytanie",
       "tooLong": "Pytanie nie może przekroczyć 500 znaków",
       "rateLimit": "Proszę poczekać przed wysłaniem kolejnego pytania",
+      "busy": "Z tej sieci napływa teraz wiele pytań: proszę spróbować ponownie za kilka sekund",
       "generic": "Błąd podczas wysyłania pytania"
     },
     "ctaTitle": "Zadaj pierwsze pytanie",
@@ -703,7 +709,7 @@
         "speakerEmail": "E-mail",
         "speakerRequired": "Imię i nazwisko oraz e-mail są wymagane.",
         "invitationsHeading": "Zaproszenia",
-        "invitationsHelp": "Wstępnie zarejestrowane osoby — każda otrzyma osobisty link do dołączenia.",
+        "invitationsHelp": "Lista zaproszonych osób. Platforma nie wysyła zaproszeń: udostępnij link do wydarzenia samodzielnie. Gdy rejestracja publiczna jest wyłączona, zarejestrować się mogą tylko te adresy, a osobisty link do wejścia przychodzi e-mailem po rejestracji.",
         "invitationName": "Imię i nazwisko (opcjonalnie)",
         "invitationEmail": "E-mail",
         "invitationRole": "Rola",
@@ -1317,6 +1323,8 @@
       "publicPageHint": "Strona do udostępniania w celu zbierania nowych rejestracji.",
       "guestJoin": "Bezpośrednie zaproszenie (bez rejestracji)",
       "guestJoinHint": "Szybki link do zaproszenia uczestnika w ostatniej chwili: dołącza jako gość, gdy wydarzenie jest na żywo, bez wypełniania formularza rejestracyjnego.",
+      "callInvite": "Link dla uczestników",
+      "callInviteHint": "Osoba, która go otrzyma, dołącza do połączenia jako gość, bez rejestracji. Szybkie połączenie nie ma strony publicznej: to ten link należy udostępnić.",
       "moderatorLink": "Link moderatora",
       "moderatorLinkHint": "Udostępnij ten link tylko moderatorom. Każda osoba posiadająca ten link może zarządzać wydarzeniem.",
       "liveRoomHint": "Bezpośredni link do wejścia do pokoju jako moderator.",
@@ -1443,7 +1451,7 @@
         "jobMaxAttempts": "Próby przed uznaniem za nieudane",
         "jobMaxAttemptsHelp": "Ile razy potok ponawia zadanie, zanim oznaczy je jako nieudane. Odstęp między kolejnymi próbami rośnie wykładniczo (od 30 sekund do 2 godzin). Typowa wartość to 5.",
         "artifactRetentionDays": "Przechowywanie artefaktów (dni)",
-        "artifactRetentionDaysHelp": "Przy wartości 0 artefakty AI podlegają temu samemu terminowi co wydarzenie. Wartość większa od zera zachowuje je przez podaną liczbę dni, także po zamknięciu wydarzenia, dopóki nie usunie ich codzienne zadanie cron. Usunięcie obejmuje nazwiska mówców i dane zadań, zgodnie z docs/GDPR.md.",
+        "artifactRetentionDaysHelp": "Przy wartości 0 nie ma limitu dla całej witryny: artefakty AI podlegają okresowi przechowywania swojego nagrania lub wydarzenia. Wartość większa od zera sprawia, że codzienne zadanie usuwa każdy artefakt utworzony ponad tyle dni temu, opublikowany czy nie: może to skrócić przechowywanie, ale nigdy go nie wydłuża. Nie dotyczy to nazwisk mówców ani danych zadań: podlegają one okresowi przechowywania nagrania lub wydarzenia. Szczegóły w docs/privacy/recordings-and-ai.md.",
         "consentDisclosureSection": "Informacja o AI w poczekalni",
         "consentDisclosureHelp": "Tekst wyświetlany uczestnikom w poczekalni, gdy wydarzenie korzysta z postprodukcji AI (transkrypcja, podsumowanie, tłumaczenie, dubbing). Można go dostosować dla każdego języka. Pozostaw puste, aby użyć domyślnego tekstu systemowego.",
         "consentDisclosurePlaceholder": "Np. To wydarzenie zostanie po transmisji na żywo automatycznie przetranskrybowane i podsumowane narzędziami AI…"
@@ -1642,7 +1650,7 @@
         "jvbStressCriticalPercent": "Krytyczny próg stresu (%)",
         "jvbStressCriticalPercentHelp": "Powyżej tego progu skaler dodaje 2 repliki JVB. Domyślnie 70. Musi być większy niż próg ostrzeżenia.",
         "jvbProvisioningTimeoutMinutes": "Limit czasu udostępniania (minuty)",
-        "jvbProvisioningTimeoutMinutesHelp": "Po ilu minutach od startsAt wydarzenie z niegotowym JVB jest oznaczane jako 'degraded' na stronie statusu. Domyślnie 15. Obejmuje cold-start węzła (~3-5 min) + margines bezpieczeństwa.",
+        "jvbProvisioningTimeoutMinutesHelp": "Po ilu minutach od startsAt wydarzenie z niegotowym JVB jest oznaczane jako 'degraded' na stronie statusu. Domyślnie 15. Obejmuje cold-start węzła (~3-5 min) + margines bezpieczeństwa. Dotyczy też usługi nagrywania, licząc od chwili, gdy zażąda jej wydarzenie z nagrywaniem: po tym czasie bez odpowiedzi sala na żywo przestaje pokazywać ją jako „uruchamianą” i oznacza ją jako nieuruchomioną.",
         "statusPollIntervalSeconds": "Interwał odpytywania strony statusu (sekundy)",
         "statusPollIntervalSecondsHelp": "Co ile sekund strona /status odświeża dane po stronie przeglądarki. Domyślnie 30. Niższe wartości = świeższe dane, ale większe obciążenie aplikacji.",
         "emailSenderTitle": "Nadawca e-maili",
@@ -2187,7 +2195,12 @@
     },
     "eventDetail": {
       "copyPublicUrl": "Kopiuj link publiczny",
-      "enterAsModerator": "Wejdź na żywo",
+      "copyInviteUrl": "Kopiuj link z zaproszeniem",
+      "enterAsParticipant": "Dołącz jako uczestnik",
+      "openAsParticipant": "Otwórz jako uczestnik",
+      "participantHintRoom": "Otwiera się w nowej karcie: sala tak, jak widzi ją gość, bez uprawnień moderatora.",
+      "participantHintPassword": "Otwiera się w nowej karcie: sala tak, jak widzi ją gość, po podaniu hasła wydarzenia.",
+      "participantHintPage": "Otwiera się w nowej karcie: strona publiczna tak, jak widzą ją uczestnicy.",
       "editEvent": "Edytuj wydarzenie",
       "editSettings": "Edytuj ustawienia",
       "featureSummary": "Aktywne funkcje",
@@ -2788,9 +2801,27 @@
     "add": "Dodaj",
     "adding": "Dodawanie...",
     "cancel": "Anuluj",
+    "modeLabel": "Rodzaj materiału",
+    "modeLink": "Link",
+    "modeFile": "Plik",
+    "titleOptional": "Tytuł (opcjonalnie, domyślnie nazwa pliku)",
+    "fileLabel": "Plik do przesłania",
+    "fileHelp": "Obsługiwane formaty: PDF, DOCX, PPTX, XLSX, TXT — maks. {maxMb} MB",
+    "upload": "Prześlij",
+    "uploading": "Przesyłanie…",
     "errors": {
       "urlInvalid": "Proszę podać prawidłowy URL",
-      "generic": "Błąd podczas dodawania materiału"
+      "generic": "Błąd podczas dodawania materiału",
+      "fileMissing": "Wybierz plik do przesłania",
+      "titleMissing": "Wpisz tytuł linku",
+      "fileTooLarge": "Plik przekracza limit {maxMb} MB",
+      "fileTooLargeForServer": "Serwer nie przyjmuje tak dużego pliku: spróbuj z mniejszym plikiem",
+      "fileType": "Nieobsługiwany typ pliku (PDF, DOCX, PPTX, XLSX, TXT)",
+      "uploadUnavailable": "Przesyłanie plików nie jest dostępne w tej instalacji",
+      "uploadFailed": "Błąd podczas przesyłania pliku",
+      "quotaExceeded": "To wydarzenie osiągnęło limit przesłanych plików ({maxFiles} plików, łącznie {maxMb} MB): usuń część, aby przesłać kolejne",
+      "uploadBusy": "Zbyt wiele przesyłań w tej chwili: spróbuj ponownie za kilka sekund",
+      "deleteFailed": "Nie udało się usunąć materiału"
     }
   },
   "reminders": {
@@ -3343,7 +3374,13 @@
     "noActiveRound": "Brak aktywnego word cloud w tym momencie.",
     "noWords": "Oczekiwanie na pierwsze słowa...",
     "wordsSubmitted": "{count} przesłanych słów",
-    "timeRemaining": "Pozostały czas"
+    "timeRemaining": "Pozostały czas",
+    "errors": {
+      "send": "Nie wysłano słowa. Spróbuj ponownie.",
+      "closed": "Ta runda jest zamknięta: kolejne słowa nie są przyjmowane.",
+      "limit": "W tej rundzie wysłano już maksymalną liczbę słów.",
+      "rateLimited": "Zbyt wiele wysłanych słów w tej chwili: odczekaj kilka sekund przed ponowną próbą."
+    }
   },
   "timer": {
     "title": "Minutnik",
@@ -3642,6 +3679,8 @@
     "warmingUpButton": "Sala w przygotowaniu...",
     "nameLabel": "Twoje imię",
     "nameHelp": "Pojawi się u innych uczestników",
+    "nameRequiredToEnter": "Aby wejść, wpisz swoje imię (co najmniej 2 znaki).",
+    "roomOpenNameMissing": "Sala jest otwarta: wpisz swoje imię, aby wejść.",
     "joinNowBtn": "Wejdź teraz",
     "roomOpen": "Sala jest otwarta",
     "whileYouWait": "W oczekiwaniu",
