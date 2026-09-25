@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   jibriRecordingExpected,
+  jvbScalerEnabled,
   recordingStorageConfigured,
   recordingStorageLabel,
 } from './infrastructure';
@@ -75,5 +76,24 @@ describe('jibriRecordingExpected', () => {
     );
     // Un tipo che la factory non risolve, senza credenziali: nulla da registrare.
     expect(jibriRecordingExpected({ RECORDING_STORAGE_TYPE: 'bucket' })).toBe(false);
+  });
+});
+
+/**
+ * Lo scaler dei bridge nel pannello Infrastruttura: lo dichiara il chart, non
+ * si deduce dal tetto dei bridge.
+ */
+describe('jvbScalerEnabled', () => {
+  it('dichiarato dal chart: attivo solo con "true"', () => {
+    expect(jvbScalerEnabled({ JVB_SCALER_ENABLED: 'true' })).toBe(true);
+    expect(jvbScalerEnabled({ JVB_SCALER_ENABLED: 'false' })).toBe(false);
+  });
+
+  it('un tetto dei bridge senza scaler non è uno scaler', () => {
+    // Profilo semplice: un bridge fisso, tetto a 1.
+    expect(jvbScalerEnabled({ JVB_MAX_REPLICAS: '1', JVB_SCALER_ENABLED: 'false' })).toBe(false);
+    // Docker Compose e installazioni senza il chart: nessuna dichiarazione.
+    expect(jvbScalerEnabled({ JVB_MAX_REPLICAS: '4' })).toBe(false);
+    expect(jvbScalerEnabled({})).toBe(false);
   });
 });

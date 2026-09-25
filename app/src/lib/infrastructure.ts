@@ -52,6 +52,17 @@ export function recordingStorageLabel(
   return riconosciuto ? dichiarato : rilevato;
 }
 
+/**
+ * Se i bridge si accendono e si spengono da soli: lo dice JVB_SCALER_ENABLED,
+ * che il chart scrive nella ConfigMap dell'applicazione (vero quando rende lo
+ * scaler, oppure impostato a mano da chi scala i bridge con un altro
+ * strumento). JVB_MAX_REPLICAS non basta: è un tetto, e lo imposta a 1 anche
+ * un'installazione con un solo bridge fisso e nessuno scaler.
+ */
+export function jvbScalerEnabled(env: Record<string, string | undefined> = process.env): boolean {
+  return env.JVB_SCALER_ENABLED === 'true';
+}
+
 let jibriAvailable: boolean | null = null;
 let jibriCheckExpiry = 0;
 
@@ -184,7 +195,7 @@ export async function getInfrastructureInfo(): Promise<InfrastructureInfo> {
       desiredReplicas: parseInt(process.env.JVB_DESIRED_REPLICAS || '0', 10),
       maxReplicas: parseInt(process.env.JVB_MAX_REPLICAS || '0', 10),
       preScaleMinutes: parseInt(process.env.JVB_PRE_SCALE_MINUTES || '30', 10),
-      scalerEnabled: parseInt(process.env.JVB_MAX_REPLICAS || '0', 10) > 0,
+      scalerEnabled: jvbScalerEnabled(),
     },
     jibri: {
       available: await isJibriAvailable(),

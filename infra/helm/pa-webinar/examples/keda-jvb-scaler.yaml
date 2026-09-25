@@ -10,7 +10,9 @@
 # Apply:
 #   kubectl apply -f examples/keda-jvb-scaler.yaml
 #
-# When using KEDA, disable the CronJob scaler: jvbScaler.enabled=false
+# When using KEDA, disable the CronJob scaler: jvbScaler.enabled=false.
+# Then set app.env.JVB_SCALER_ENABLED: "true", so that the administration's
+# infrastructure page still reports that the bridges scale to zero.
 #
 apiVersion: keda.sh/v1alpha1
 kind: ScaledObject

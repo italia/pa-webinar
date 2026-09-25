@@ -8,3 +8,16 @@ data:
   {{- range $key, $value := .Values.app.env }}
   {{ $key }}: {{ $value | quote }}
   {{- end }}
+  {{- /*
+    Dice al pannello Infrastruttura dell'amministrazione se i bridge si
+    accendono e si spengono da soli: vero quando il chart rende lo scaler
+    (stessa condizione di cronjob-jvb-scaler.yaml). Chi scala i bridge con un
+    altro strumento, ad esempio KEDA, lo imposta a "true" in app.env.
+  */}}
+  {{- if not (hasKey (.Values.app.env | default dict) "JVB_SCALER_ENABLED") }}
+  {{- if and .Values.jitsi.enabled (eq (default "simple" .Values.jitsi.mode) "full") .Values.jvbScaler.enabled }}
+  JVB_SCALER_ENABLED: "true"
+  {{- else }}
+  JVB_SCALER_ENABLED: "false"
+  {{- end }}
+  {{- end }}

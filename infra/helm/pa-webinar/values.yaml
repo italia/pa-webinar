@@ -343,6 +343,11 @@ secrets:
 service:
   type: ClusterIP
   port: 3000
+  # Annotazioni del Service dell'app. Servono dove il controller di
+  # ingresso si configura dal Service: su GKE, ad esempio,
+  # cloud.google.com/backend-config collega una BackendConfig con i timeout
+  # lunghi che chiedono SSE e BOSH (il predefinito di 30 s li interrompe).
+  annotations: {}
 
 # ── NetworkPolicy ────────────────────────────────────────────
 # Opt-in default-deny + allow-list for the application pods only (the
@@ -1096,9 +1101,8 @@ redis:
 #     default (~48 GB di pesi in fp16)
 #     + WhisperX large-v3 + pyannote 3.1 simultaneamente.
 #   - Pool con `min_count=0, max_count=2`, taint `workload=ai-gpu:NoSchedule`.
-#   - `infra/tofu/ai-gpu-nodepool.tf` è un modello per forma, label e taint
-#     del pool: il suo `vm_size` (T4 16GB) basta alla trascrizione ma non al
-#     modello LLM di default. Sostituiscilo con lo SKU A100 indicato sopra.
+#   - Su AKS il pool lo crea infra/tofu/aks con `gpu_pool = { enabled = true }`,
+#     con questo SKU, etichetta e taint come valori predefiniti.
 #
 # Enable the orchestrator only on clusters that have a GPU node pool
 # AND a vLLM Service reachable from the worker.

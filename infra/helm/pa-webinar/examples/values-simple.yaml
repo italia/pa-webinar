@@ -37,6 +37,12 @@ app:
     limits:
       cpu: "1"
       memory: 512Mi
+  env:
+    # Un solo bridge fisso, senza scaler: il numero di bridge che il portale
+    # si aspetta non deve superarlo, altrimenti con due eventi in diretta
+    # insieme la sala d'attesa resta chiusa ad aspettare un secondo bridge
+    # che non arrivera' mai.
+    JVB_MAX_REPLICAS: "1"
 
 autoscaling:
   enabled: false
