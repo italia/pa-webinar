@@ -137,7 +137,7 @@ jobs:
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo 'Deploy to test cluster:' >> "$GITHUB_STEP_SUMMARY"
           echo '```sh' >> "$GITHUB_STEP_SUMMARY"
-          echo 'kubectl -n videocall-test rollout restart deploy/videocall-test-pa-webinar' >> "$GITHUB_STEP_SUMMARY"
+          echo 'kubectl -n <namespace> rollout restart deploy/<fullname>' >> "$GITHUB_STEP_SUMMARY"
           echo '```' >> "$GITHUB_STEP_SUMMARY"
 
   # Postprod AI worker: container Python con CUDA + WhisperX + pyannote
@@ -265,7 +265,7 @@ jobs:
           echo '```sh' >> "$GITHUB_STEP_SUMMARY"
           echo '# Nessuna azione: il CronJob orchestrator crea Job nuovi col tag :dev a ogni tick.' >> "$GITHUB_STEP_SUMMARY"
           echo '# Per forzare un re-pull dei nodi GPU già allocati:' >> "$GITHUB_STEP_SUMMARY"
-          echo 'kubectl -n videocall-test delete jobs -l app.kubernetes.io/component=postprod-worker' >> "$GITHUB_STEP_SUMMARY"
+          echo 'kubectl -n <namespace> delete jobs -l app.kubernetes.io/component=postprod-worker' >> "$GITHUB_STEP_SUMMARY"
           echo '```' >> "$GITHUB_STEP_SUMMARY"
 
   # ── Recorder multi-track (ADR-013, Fase 3) ────────────────────────────

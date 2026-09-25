@@ -1,16 +1,22 @@
 # AI GPU node pool — riferimento (NON applicare da qui).
 #
-# Per il tenant produttivo DTD, il pool è definito e gestito nel repo
-# IaC dedicato: `iac-azure/modules/aks/main.tf` (resource
-# `azurerm_kubernetes_cluster_node_pool.ai_gpu`) + valori in
-# `iac-azure/environments/prod/locals.tf` (chiave `ai_gpu_*`).
+# In un'installazione reale il pool si definisce e si gestisce nel repo
+# IaC dell'operatore (per esempio una risorsa
+# `azurerm_kubernetes_cluster_node_pool` nel modulo del cluster, con i
+# valori per ambiente accanto agli altri pool): copia da qui la risorsa
+# e adattala.
 #
-# Default attuali (Italy North, maggio 2026):
+# Valori di riferimento (AKS, regione Italy North):
 #   vm_size   = "Standard_NC16as_T4_v3"   (1× T4 16GB, 16 vCPU, 110 GiB)
 #   min_count = 0                           (scale-to-zero)
 #   max_count = 2
 #   taint     = workload=ai-gpu:NoSchedule
 #   labels    = workload=ai-gpu, accelerator=nvidia
+#
+# Il T4 16GB basta a WhisperX + pyannote ma NON al modello LLM di default
+# (~48 GB di pesi in fp16, vedi `postprod` in values.yaml): per ospitarlo
+# usa `Standard_NC24ads_A100_v4` (1× A100 80GB). I default di risorse del
+# worker (`postprod.worker.resources`) sono dimensionati su quel nodo.
 #
 # Questo file resta come reference per chi adotta il chart in un cluster
 # proprio (PA terze, on-prem k3s con tolerations equivalenti, ecc.).
@@ -28,7 +34,7 @@
 # H100 NON disponibili in Italy North a oggi.
 
 resource "azurerm_kubernetes_cluster_node_pool" "ai_gpu" {
-  count                 = 0 # disabilitato per default: usa `iac-azure` invece
+  count                 = 0 # disabilitato per default: il pool vive nel tuo IaC
   name                  = "aigpu"
   kubernetes_cluster_id = data.azurerm_kubernetes_cluster.main.id
 
@@ -63,7 +69,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "ai_gpu" {
 }
 
 # ─────────────────────────────────────────────────────────────
-# Requisiti operativi (uguali sia per AKS-prod che per altri cluster)
+# Requisiti operativi (uguali per ogni cluster)
 # ─────────────────────────────────────────────────────────────
 #
 # 1. NVIDIA GPU Operator installato (espone nvidia.com/gpu come risorsa):
@@ -81,5 +87,5 @@ resource "azurerm_kubernetes_cluster_node_pool" "ai_gpu" {
 #    `pyannote/speaker-diarization-3.1`. Necessario UNA VOLTA durante il
 #    seed della PVC; a runtime il container ha `HF_HUB_OFFLINE=1`.
 #
-# 4. Deployment vLLM in-cluster + Service `pa-webinar-vllm.<ns>` esposto
-#    in OpenAI-compat. Vedi `docs/POSTPROD.md` §"Deploy on AKS Italy North".
+# 4. Deployment vLLM in-cluster + Service `<fullname>-vllm.<ns>` esposto
+#    in OpenAI-compat. Esempio di Deployment in `docs/POSTPROD.md`.
