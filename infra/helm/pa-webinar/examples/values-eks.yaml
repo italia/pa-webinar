@@ -1,0 +1,277 @@
+# ============================================================================
+# Amazon EKS — si sovrappone al profilo completo (values-full.yaml)
+# ============================================================================
+#
+# Il cluster si prepara con infra/tofu/eks (vedi il suo README.md): VPC,
+# gruppi di nodi `applications` e `jvb` (quest'ultimo da zero nodi), driver
+# EBS con la StorageClass predefinita gp3, bucket S3, ruoli dei controller.
+# Nel cluster vanno poi AWS Load Balancer Controller, Cluster Autoscaler,
+# ingress-nginx dietro un Network Load Balancer e cert-manager, con i comandi
+# dello stesso README. Poi, dalla radice del repository:
+#
+#   tofu -chdir=infra/tofu/eks output -raw helm_values > pa-webinar.eks-infra.yaml
+#   helm upgrade --install pa-webinar ./infra/helm/pa-webinar \
+#     -n pa-webinar --create-namespace \
+#     -f infra/helm/pa-webinar/examples/values-full.yaml \
+#     -f infra/helm/pa-webinar/examples/values-eks.yaml \
+#     -f pa-webinar.eks-infra.yaml \
+#     -f <installazione.yaml> -f <segreti.yaml> \
+#     --wait --timeout 15m
+#
+# pa-webinar.eks-infra.yaml porta ciò che dipende dall'infrastruttura
+# (bucket, regione, porta UDP, Elastic IP e sottorete del bilanciatore del
+# bridge, sorgenti ammesse dai bilanciatori, tetto dei bridge): sostituisce i
+# segnaposto `<…>` di questo file.
+#
+# <installazione.yaml> è il file dei valori dell'installazione di
+# docs/DEPLOYMENT.md ("The values file for your installation"). Porta:
+#   - i due tag delle immagini, che né questo file né values-full.yaml
+#     fissano: app.image.tag "<versione>" (senza `v`) e
+#     app.migration.image.tag "v<versione>-migrate" (con la `v`). Senza, il
+#     chart ricava un tag delle migrazioni che non tutti i rilasci pubblicano,
+#     e i pod del portale restano in Init:ImagePullBackOff;
+#   - i due nomi DNS, entrambi da puntare (CNAME) sul nome del Network Load
+#     Balancer di ingress-nginx: app.env.NEXT_PUBLIC_APP_URL,
+#     app.env.NEXT_PUBLIC_JITSI_DOMAIN, jitsi-meet.publicURL, gli host e i tls
+#     di `ingress` e di `jitsi-meet.web.ingress`.
+#
+# <segreti.yaml>, tenuto fuori dal repository: le credenziali interne della
+# conferenza, generate una volta e ripassate identiche a ogni aggiornamento
+# (docs/DEPLOYMENT.md, "Pin the conference's internal credentials"): le
+# password XMPP jitsi-meet.jicofo.xmpp.password e jitsi-meet.jvb.xmpp.password,
+# con Jibri le due di jitsi-meet.jibri, con il TURN il segreto condiviso
+# jitsi-meet.coturn.staticAuth.secret (oppure
+# jitsi-meet.coturn.staticAuth.existingSecretName, chiave TURN_CREDENTIALS).
+# Qui sotto la resa si ferma se ne manca una.
+#
+# Secret da creare prima, nel namespace (docs/DEPLOYMENT.md, "Standard
+# profile", con in più il database del cluster e le chiavi dello storage):
+#   videocall-secrets    — le chiavi dell'applicazione, più
+#                          DATABASE_URL=postgresql://eventi:<POSTGRES_PASSWORD>@pa-webinar-postgresql.pa-webinar.svc.cluster.local:5432/pa_webinar
+#                          e STORAGE_FILES_S3_ACCESS_KEY_ID,
+#                          STORAGE_FILES_S3_SECRET_ACCESS_KEY,
+#                          RECORDING_S3_ACCESS_KEY_ID,
+#                          RECORDING_S3_SECRET_ACCESS_KEY dagli output
+#                          s3_access_key_id e s3_secret_access_key;
+#   videocall-datastore  — POSTGRES_PASSWORD, POSTGRES_ADMIN_PASSWORD,
+#                          REDIS_PASSWORD;
+#   videocall-jitsi-jwt  — JWT_APP_SECRET, stesso valore di JITSI_JWT_SECRET;
+#   ghcr-secret          — credenziali del registro delle immagini (sotto).
+#
+# Verificato solo con `helm template`: nessuna installazione su un account AWS.
+# ============================================================================
+
+app:
+  # Il pool delle applicazioni creato da infra/tofu/eks porta questa
+  # etichetta. CronJob, scaler dei bridge e controller della registrazione
+  # ereditano il selettore.
+  nodeSelector:
+    workload: applications
+
+  # Il registro delle immagini del portale oggi chiede credenziali anche in
+  # lettura:
+  #   kubectl -n pa-webinar create secret docker-registry ghcr-secret \
+  #     --docker-server=ghcr.io --docker-username=<utente> \
+  #     --docker-password=<token con read:packages>
+  # In alternativa si copiano le immagini (app e -migrate) in un registro ECR
+  # dell'account, che i nodi leggono senza Secret: `app.image.repository` e
+  # `app.migration.image.repository` puntati lì, e questa lista vuota.
+  imagePullSecrets:
+    - name: ghcr-secret
+
+  env:
+    # Sostituiti da pa-webinar.eks-infra.yaml. Chiavi d'accesso nel Secret.
+    STORAGE_FILES_PROVIDER: "s3"
+    STORAGE_FILES_S3_REGION: "<regione>"
+    STORAGE_FILES_S3_BUCKET: "<bucket>"
+    RECORDING_STORAGE_TYPE: "s3"
+    RECORDING_S3_REGION: "<regione>"
+    RECORDING_S3_BUCKET: "<bucket>"
+    # Un solo bridge dietro il bilanciatore UDP: lo scaler non ne chiede di
+    # più (vedi "Bridge" sotto).
+    JVB_MAX_REPLICAS: "1"
+    # ingress-nginx riceve l'indirizzo vero del client (preserve_client_ip
+    # sul bilanciatore, README.md) e scrive X-Forwarded-For da sé: il valore
+    # predefinito di TRUSTED_PROXY_HOPS (0) è quello giusto. Con un ALB davanti
+    # ai pod, anche: l'ALB aggiunge il client come ultima voce.
+
+# ── Portale ──────────────────────────────────────────────────
+# L'Ingress resta quello del profilo completo, per ingress-nginx. I suoi
+# limiti di frequenza (limit-rps, limit-connections) contano per indirizzo
+# del client: il bilanciatore di ingress-nginx deve consegnarlo
+# (preserve_client_ip, README.md), altrimenti tutti i partecipanti arrivano
+# da pochi indirizzi del bilanciatore e il limite ferma tutti insieme.
+# Con un ALB (classe `alb`) il chart toglie da sé le annotazioni di
+# ingress-nginx; servono allora le `alb.ingress.kubernetes.io/*`, un
+# certificato ACM e il timeout d'inattività portato a 3600 secondi.
+
+# ── Segreti ──────────────────────────────────────────────────
+secrets:
+  mode: "existing"
+  existingSecretName: "videocall-secrets"
+  # Password dei datastore in un Secret loro: il sottochart PostgreSQL monta
+  # per intero il Secret da cui legge la password.
+  datastoreSecretName: "videocall-datastore"
+
+# ── Dati ─────────────────────────────────────────────────────
+# PostgreSQL nel cluster, su un volume EBS gp3 cifrato. Il volume vive in una
+# zona: il pod resta legato a quella, e ci deve essere un nodo delle
+# applicazioni lì. Per l'esercizio si preferisce Amazon RDS for PostgreSQL:
+# `postgresql.enabled: false` e DATABASE_URL verso RDS (con
+# `?sslmode=require`) nel Secret.
+postgresql:
+  enabled: true
+  auth:
+    existingSecret: "videocall-datastore"
+  primary:
+    persistence:
+      # Creata da infra/tofu/eks (storage-class.tf). Indicata per nome: il
+      # database non dipende da quale classe il cluster tiene come predefinita.
+      storageClass: gp3
+
+redis:
+  auth:
+    existingSecret: "videocall-datastore"
+
+# ── Rete ─────────────────────────────────────────────────────
+# infra/tofu/eks accende l'applicazione delle NetworkPolicy nel VPC CNI
+# (enable_network_policy). ingress-nginx gira nel namespace ingress-nginx,
+# il valore predefinito del chart.
+networkPolicy:
+  enabled: true
+
+# ── Monitoraggio ─────────────────────────────────────────────
+# Il profilo completo accende i ServiceMonitor, che senza Prometheus Operator
+# nel cluster fanno fallire l'installazione. Accendili dopo aver installato
+# kube-prometheus-stack, con le credenziali di lettura (docs/DEPLOYMENT.md,
+# "Metrics"). Amazon Managed Service for Prometheus usa un proprio raccoglitore.
+metrics:
+  serviceMonitor:
+    enabled: false
+
+jvbScaler:
+  # Come il valore predefinito del chart: il profilo completo lo rallenta a
+  # cinque minuti, e i bridge seguirebbero il calendario in ritardo.
+  schedule: "*/2 * * * *"
+
+jitsi:
+  # Senza password XMPP fissate ogni `helm upgrade` riavvia Prosody, Jicofo e
+  # il bridge, e fa cadere le chiamate in corso.
+  requirePinnedCredentials: true
+
+# ── Conferenza ───────────────────────────────────────────────
+jitsi-meet:
+  # Immagine web standard (sotto): nessun registro privato da cui prelevare.
+  imagePullSecrets: []
+
+  web:
+    # Immagine standard, alla versione di Jitsi del sottochart. La
+    # soppressione rumore avanzata resta spenta, come già è per impostazione
+    # predefinita dell'applicazione (vedi `jitsi-meet.web.image` in
+    # values.yaml).
+    image:
+      repository: jitsi/web
+      tag: null
+      pullPolicy: IfNotPresent
+
+  # ── Bridge ─────────────────────────────────────────────────
+  # Un solo bridge dietro un Network Load Balancer UDP con un Elastic IP
+  # fisso (jvb_exposure = "nlb" in infra/tofu/eks). Il bridge annuncia
+  # quell'indirizzo, e i nodi restano privati. Il bilanciatore lo crea AWS
+  # Load Balancer Controller: quello integrato di Kubernetes farebbe un
+  # Classic Load Balancer, che non porta UDP.
+  #
+  # Con più bridge (jvb_exposure = "node-public-ip", non verificato) si torna
+  # alla porta dell'host su nodi con indirizzo pubblico, e ogni bridge scopre
+  # il proprio con STUN; JVB_MAX_REPLICAS viene da pa-webinar.eks-infra.yaml:
+  #   jvb:
+  #     useHostPort: true
+  #     useNodeIP: false
+  #     publicIPs: []
+  #     stunServers: "<tuo-server-stun>:3478"
+  #     extraEnvs:
+  #       JVB_ADVERTISE_PRIVATE_CANDIDATES: "false"
+  #     service:
+  #       enabled: false
+  jvb:
+    useHostPort: false
+    useNodeIP: false
+    # L'Elastic IP del bilanciatore: nessun STUN serve a scoprirlo.
+    publicIPs:
+      - "<ip-pubblico-del-bridge>"
+    stunServers: ""
+    # Né Cluster Autoscaler né Karpenter devono togliere un nodo con un bridge
+    # a evento in corso: lo spegnimento lo decide lo scaler dei bridge.
+    podAnnotations:
+      cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
+      karpenter.sh/do-not-disrupt: "true"
+    service:
+      enabled: true
+      type: LoadBalancer
+      loadBalancerClass: service.k8s.aws/nlb
+      annotations:
+        service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
+        service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: ip
+        # Sostituiti da pa-webinar.eks-infra.yaml: una sola sottorete
+        # pubblica, quella della zona dei nodi del bridge, e il suo Elastic IP.
+        # Lo stesso file aggiunge le sorgenti ammesse dal bilanciatore
+        # (load-balancer-source-ranges, da public_ingress_cidrs).
+        service.beta.kubernetes.io/aws-load-balancer-subnets: "<sottorete-pubblica>"
+        service.beta.kubernetes.io/aws-load-balancer-eip-allocations: "<eipalloc-del-bridge>"
+        # La porta UDP non si sonda: il controllo va sull'API di salute.
+        service.beta.kubernetes.io/aws-load-balancer-healthcheck-protocol: http
+        service.beta.kubernetes.io/aws-load-balancer-healthcheck-port: "8080"
+        service.beta.kubernetes.io/aws-load-balancer-healthcheck-path: /about/health
+    metrics:
+      serviceMonitor:
+        enabled: false
+
+  # ── Jibri ──────────────────────────────────────────────────
+  # Spento: vuole il modulo del kernel snd-aloop, che sull'AMI Amazon Linux
+  # 2023 non è stato verificato, e lo script che carica il file va montato a
+  # mano (docs/operations/recording-setup.md). Per accenderlo sul pool
+  # `jibri` di infra/tofu/eks (jibri_enabled = true):
+  #   jibri:
+  #     enabled: true
+  #     nodeSelector:
+  #       workload: jitsi-jibri
+  #     tolerations:
+  #       - key: workload
+  #         value: jitsi-jibri
+  #         effect: NoSchedule
+  #     podAnnotations:
+  #       cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
+  #       karpenter.sh/do-not-disrupt: "true"
+  jibri:
+    enabled: false
+
+  # ── TURN (coturn) ──────────────────────────────────────────
+  # Per le reti che bloccano l'UDP del bridge: TURN su TLS alla porta 443, su
+  # un terzo nome DNS (turn.<dominio>) puntato sull'output turn_public_ip di
+  # infra/tofu/eks (turn_enabled = true). Il certificato di quel nome non passa
+  # la verifica HTTP-01: serve DNS-01 su Route 53
+  # (cert_manager_route53_zone_ids) o un Secret TLS esistente. Allinea il
+  # resto a docs/DEPLOYMENT.md, "coturn (TURN and TURNS)":
+  #   turnHost: turn.<dominio>
+  #   jvb:
+  #     useInternalStun: false
+  #   coturn:
+  #     enabled: true
+  #     # Il segreto condiviso con Prosody va fissato in <segreti.yaml>
+  #     # (staticAuth.secret, oppure staticAuth.existingSecretName con la
+  #     # chiave TURN_CREDENTIALS): senza, la resa si ferma.
+  #     turns:
+  #       enabled: true
+  #       certificate:
+  #         issuerRef:
+  #           name: letsencrypt-dns01
+  #           kind: ClusterIssuer
+  #     # allowedPeerIPs e le annotazioni con sottorete ed Elastic IP vengono
+  #     # da pa-webinar.eks-infra.yaml.
+  #     service:
+  #       loadBalancerClass: service.k8s.aws/nlb
+  #       annotations:
+  #         service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
+  #         service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: ip
+  #         # coturn gira sui nodi delle applicazioni, in qualunque zona.
+  #         service.beta.kubernetes.io/aws-load-balancer-attributes: load_balancing.cross_zone.enabled=true

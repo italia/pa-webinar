@@ -1,0 +1,103 @@
+# Oggetti dell'Ingress di GKE per PA Webinar (ingress_mode = "gce").
+#
+# Si applicano nel namespace dell'applicazione PRIMA del chart:
+#   tofu output -raw gce_ingress_manifest | kubectl -n <namespace> apply -f -
+# I nomi sono quelli a cui rimandano gli Ingress e i Service in
+# infra/helm/pa-webinar/examples/values-gke.yaml: se li cambi qui, cambiali
+# anche lì.
+#
+# Perché servono: il bilanciatore di Google chiude ogni richiesta dopo il
+# timeout del backend, 30 secondi se non lo si imposta. Quel limite vale per
+# tutta la durata della risposta, non per il silenzio: taglia i flussi di
+# eventi della sala in diretta (Server-Sent Events, che restano aperti per
+# tutto l'evento) e le richieste BOSH della conferenza, che il server tiene
+# in attesa fino a un minuto. Con 3600 secondi il flusso si chiude una volta
+# l'ora e il browser (EventSource) lo riapre da sé. Con i WebSocket della
+# conferenza accesi
+# (websockets.xmpp.enabled nel sottochart) lo stesso timeout è la durata
+# massima di ogni connessione.
+---
+apiVersion: cloud.google.com/v1
+kind: BackendConfig
+metadata:
+  name: pa-webinar-portal
+spec:
+  timeoutSec: 3600
+  connectionDraining:
+    drainingTimeoutSec: 60
+  # Log delle richieste del bilanciatore spenti. GKE li accende per ogni
+  # Ingress se non lo si dice qui, e ogni riga porta l'indirizzo del client e
+  # l'URL completo di query: sul portale il link del moderatore, quelli di
+  # partecipazione e il flusso della chat (?token=); sulla conferenza il
+  # token di ingresso (?jwt=, che porta il nome del partecipante).
+  # Finirebbero nel bucket _Default di Cloud Logging, leggibile da chiunque
+  # abbia il ruolo Viewer sul progetto. Per una diagnosi si riaccendono per il
+  # tempo che serve, con sampleRate basso, sapendo che quei log contengono
+  # credenziali (docs/architecture/security.md, "Tokens in query strings").
+  logging:
+    enable: false
+  # Lo stesso controllo della readiness del pod: un pod che non vede il
+  # database esce dal bilanciatore. Con i NEG la porta è quella del container.
+  healthCheck:
+    type: HTTP
+    requestPath: /api/ready
+    port: 3000
+    checkIntervalSec: 10
+    timeoutSec: 5
+    healthyThreshold: 1
+    unhealthyThreshold: 3
+  # Protezione e limiti di frequenza a monte si aggiungono con una policy di
+  # Cloud Armor, da tarare sul traffico reale: la sala in diretta apre più
+  # connessioni per partecipante.
+  #   securityPolicy:
+  #     name: <policy-cloud-armor>
+---
+apiVersion: cloud.google.com/v1
+kind: BackendConfig
+metadata:
+  name: pa-webinar-conference
+spec:
+  timeoutSec: 3600
+  connectionDraining:
+    drainingTimeoutSec: 60
+  # Spenti come sopra: l'URL della conferenza porta il token (?jwt=).
+  logging:
+    enable: false
+  healthCheck:
+    type: HTTP
+    requestPath: /
+    port: 80
+    checkIntervalSec: 10
+    timeoutSec: 5
+    healthyThreshold: 1
+    unhealthyThreshold: 3
+---
+# Da HTTP a HTTPS sui due nomi, e solo TLS 1.2 o superiore (la policy SSL la
+# crea tofu: addresses.tf).
+apiVersion: networking.gke.io/v1beta1
+kind: FrontendConfig
+metadata:
+  name: pa-webinar-https-redirect
+spec:
+  redirectToHttps:
+    enabled: true
+    responseCodeName: MOVED_PERMANENTLY_DEFAULT
+  sslPolicy: ${ssl_policy_name}
+---
+# Certificati gestiti da Google. Il rilascio parte quando il nome risolve
+# sull'indirizzo del suo Ingress e può richiedere fino a un'ora.
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: pa-webinar-portal
+spec:
+  domains:
+    - ${portal_hostname}
+---
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: pa-webinar-conference
+spec:
+  domains:
+    - ${conference_hostname}
