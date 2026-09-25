@@ -1,750 +1,470 @@
-# Load testing pa-webinar — guida operativa
+# Load-test toolkit
 
-Questa directory contiene tutto il necessario per eseguire load test realistici
-contro un deploy pa-webinar usando [jitsi-meet-torture](https://github.com/jitsi/jitsi-meet-torture)
-(in particolare lo scenario `MalleusJitsificus`) confezionato in un container
-unico che funziona con `podman` o `docker`.
+This directory holds the tooling for load-testing the conference side of a PA Webinar installation with
+the `MalleusJitsificus` scenario of [jitsi-meet-torture](https://github.com/jitsi/jitsi-meet-torture):
+a container image that runs the bots from a workstation, the scripts that mint their tokens, and the
+manifests for an in-cluster run. This page is the tool manual, written for maintainers who run the
+bundled container.
 
-La guida spiega:
+- The method, what to watch, the success criteria and the reference measurements are in
+  [Load testing and reference measurements](../../docs/LOAD-TESTING.md).
+- Running the bots inside the cluster, on a Selenium Grid, is covered by the runbook
+  [In-cluster load test with Selenium Grid](SELENIUM-GRID.md).
 
-- Come funziona l'immagine e quali fix di bug upstream contiene
-- Come eseguire test in locale con podman/docker
-- Come eseguirli in-cluster come Kubernetes Job
-- Cosa misurare e come interpretare i risultati
-- Gli scenari testati e i numeri reali raccolti sulla nostra infra
+> **Never run a load test during a real event.** The bots share the ingress, Prosody, Jicofo and the
+> bridges with real participants, and preparing the target restarts the Jitsi web pods.
 
-Per la sezione **teorica** (architettura, capacità, bottleneck di Jitsi) vedere
-[`../../docs/LOAD-TESTING.md`](../../docs/LOAD-TESTING.md).
+## Files in this directory
 
----
+| File | What it is |
+|---|---|
+| `Dockerfile` | The toolkit image: Chrome, a matching chromedriver, a virtual display and a patched copy of jitsi-meet-torture. |
+| `run-torture-local.sh` | The image's entrypoint. It mints a token and runs Malleus from the environment variables. |
+| `run-local.sh` | A wrapper that builds the image if needed and runs it with Podman, or Docker when Podman is absent. |
+| `mint-jwt.sh` | Mints a wildcard-room moderator token with `openssl` and `jq`. The entrypoint uses it, and so does the grid runbook. |
+| `mint-jwt.mjs` | A Node alternative that mints a token for one room, as a participant or a moderator. |
+| `run-torture.sh` | Runs Malleus from a local checkout of jitsi-meet-torture, without the image. It has none of the image's fixes (see [Other entry points](#other-entry-points)). |
+| `selenium-grid.yaml`, `torture-job-selenium.yaml` | The in-cluster run, documented in [SELENIUM-GRID.md](SELENIUM-GRID.md). |
+| `k8s-job.yaml` | A Job that runs Chrome inside the Maven container. Chrome exits on startup there, so the file is kept as a reference only (see [Why the local-Chrome Job does not work](../../docs/LOAD-TESTING.md#why-the-local-chrome-job-does-not-work)). |
+| `coherence-bots.mjs` | A harness for per-participant recording, not a capacity tool (see [Other entry points](#other-entry-points)). |
+
+## Where the bots go
+
+The bots open room pages on the conference host directly, with a token they carry themselves, and never
+touch the portal, its database or its object storage. [Test topology](../../docs/LOAD-TESTING.md#test-topology)
+draws their signaling and media paths. One consequence matters when you run this tool: while the scaler
+is paused, the cross-bridge snapshot behind the status pages and `/api/metrics` expires (see
+[Across bridges](../../docs/LOAD-TESTING.md#across-bridges)), so read each bridge directly, as in
+[Watch the bridges](#5-watch-the-bridges).
+
+## What the image contains, and why
+
+Most parts of the `Dockerfile` exist because a run failed without them.
+
+- **Base.** The official Maven image, which is Ubuntu-based and ships a Java 17 JDK, plus `xvfb`, `jq`,
+  `openssl`, fonts and the libraries Chrome needs.
+- **Google Chrome stable**, from Google's own apt repository. Ubuntu's `chromium` package is a
+  transitional snap that cannot run in a container.
+- **chromedriver**, from the Chrome for Testing latest-stable release at build time, so that it matches
+  the Chrome version.
+- **jitsi-meet-torture**, cloned from its default branch at build time, with its Maven dependencies
+  pre-fetched on a best-effort basis so that a run does not start with a long download.
+- **A usable fake camera file.** Malleus gives every bot the fake video file
+  `resources/FourPeople_1280x720_30.y4m`, and jitsi-meet-torture does not ship it. It ships
+  `fakeVideoStream.y4m`, a 320×180 clip at 5 frames per second. The build transcodes that clip with
+  `ffmpeg` to 1280×720 at 30 frames per second and saves it under the name Malleus expects. The result is
+  about 2.5 GB of raw video, which makes the image large.
+- **The prejoin patch.** The build removes the `config.prejoinConfig.enabled=false` parameter that
+  jitsi-meet-torture adds to every room URL (see issue 4 in
+  [Troubleshooting](#troubleshooting)). The build fails if the parameter is still there after the
+  patch, so an upstream change cannot silently undo it.
+- **The entrypoint** `run-torture-local.sh` and the token script `mint-jwt.sh`.
+
+The image is for `amd64` only: both the Chrome repository and chromedriver are x86-64 builds.
+
+It pins nothing. Every build takes the current Chrome, chromedriver and jitsi-meet-torture, so two
+builds made at different times can behave differently. Rebuild with `--no-cache` when you want the
+current versions, and note when the image was built next to your results. If a run fails with
+`session not created` and a Chrome version message, the two Google channels disagreed at build time;
+rebuild later.
+
+### What the entrypoint does
+
+1. It checks that `JITSI_URL`, `JITSI_JWT_SECRET` and `JITSI_JWT_SUBJECT` are set.
+2. It mints **one** token with `mint-jwt.sh`. Every bot of the run carries that same token.
+3. It runs `mvn test` for `MalleusJitsificus` under `xvfb-run`, on a 1280×720 virtual screen: one
+   conference, one bot joining per second, with `SENDERS` bots publishing both audio and video. Chrome
+   runs as a normal windowed browser on the virtual display, not headless.
+4. It adds the token and the mute overrides to each bot's room URL: `jwt=…`, and for senders
+   `config.startWithAudioMuted=false` and `config.startWithVideoMuted=false`. For every bot it sets
+   `config.startAudioMuted` and `config.startVideoMuted` to 99999 (see
+   [Two settings with similar names](#two-settings-with-similar-names)).
+
+> **The run log contains the token.** Malleus prints its extra URL parameters at startup, and the
+> entrypoint puts the token there. That token grants moderator rights in every room of the installation
+> until it expires. Keep the output of a run private and do not paste it into issues.
 
 ## Quick start
 
+The commands use Podman. Docker takes the same flags; with Docker, the image is `pa-webinar-load-test`
+instead of `localhost/pa-webinar-load-test`. Kubernetes examples use `pa-webinar` as both the Helm
+release and the namespace.
+
+### 1. Build the image
+
+From the repository root:
+
 ```bash
-# 1. Build dell'immagine (una volta, 3-5 min)
-cd pa-webinar/scripts/load-test
-podman build -t pa-webinar-load-test .
-# oppure: docker build -t pa-webinar-load-test .
+podman build -t pa-webinar-load-test scripts/load-test/
+```
 
-# 2. Estrai il JWT secret dal cluster di test
-export JITSI_JWT_SECRET="$(kubectl -n <namespace> get secret <app-secret> \
+### 2. Get the signing secret
+
+The bots need a token that Prosody accepts, signed with the installation's `JITSI_JWT_SECRET`. The value
+is in the application Secret, the one named by `secrets.existingSecretName` (chart default
+`videocall-secrets`):
+
+```bash
+export JITSI_JWT_SECRET="$(kubectl -n pa-webinar get secret <app-secret> \
   -o jsonpath='{.data.JITSI_JWT_SECRET}' | base64 -d)"
+```
 
-# 3. Lancia uno smoke test (20 bot, 5 sender video, 5 min)
-podman run --rm --shm-size=4g \
+Whoever holds this value can mint a moderator token for any room of the installation. Keep it out of
+shared shells and CI logs, and unset it when you finish. The claims a token must carry are explained in
+[A token that Prosody accepts](../../docs/LOAD-TESTING.md#a-token-that-prosody-accepts) and
+[Minting tokens](#minting-tokens).
+
+### 3. Prepare the target
+
+For a full-media run the target must have the prejoin page disabled server-side, otherwise the bots
+stop at the prejoin screen (issue 4 in [Troubleshooting](#troubleshooting)). The change rolls the Jitsi
+web pods, so make it only when no call is running:
+
+```bash
+kubectl -n pa-webinar set env deployment/pa-webinar-jitsi-meet-web ENABLE_PREJOIN_PAGE=false
+kubectl -n pa-webinar rollout status deployment/pa-webinar-jitsi-meet-web
+
+curl -s https://meet.webinar.example.com/config.js | grep -A1 'prejoinConfig = {'
+# the line after it must read: enabled: false
+```
+
+The web image is pulled again on every rollout (`pullPolicy: Always`); if the rollout stalls, see
+[ImagePullBackOff on the Jitsi web pod](../../docs/operations/troubleshooting.md#imagepullbackoff-on-the-jitsi-web-pod).
+
+Make this change with `kubectl` for the test only, not in the chart's values. Prejoin and peer-to-peer
+matter only to pages that open the conference host directly; the portal already configures both for real
+participants.
+
+Then make sure the bridges stay up for the whole run. On an installation with the JVB scaler, a test
+room has no event behind it, and the scaler takes the bridges down within a tick. Pause it and set the
+bridge count by hand, or keep an event `LIVE`, as described in
+[Bridges that stay up for the whole run](../../docs/LOAD-TESTING.md#bridges-that-stay-up-for-the-whole-run)
+and [Pausing for maintenance or load tests](../../docs/operations/jvb-scaler.md#pausing-for-maintenance-or-load-tests).
+
+### 4. Run a smoke test
+
+Twenty bots, five of them senders, each staying five minutes:
+
+```bash
+podman run --rm \
+  --shm-size=4g \
   --pids-limit=-1 \
   --ulimit nofile=65536:65536 \
   --ulimit nproc=65536:65536 \
-  -e JITSI_URL=https://jitsi.example.com \
+  -e JITSI_URL=https://meet.webinar.example.com \
   -e JITSI_JWT_SECRET \
-  -e JITSI_JWT_SUBJECT=jitsi.example.com \
+  -e JITSI_JWT_SUBJECT=meet.webinar.example.com \
   -e JITSI_ROOM=load-test-smoke \
   -e PARTICIPANTS=20 \
   -e SENDERS=5 \
   -e DURATION=300 \
-  -e USE_LOAD_TEST=false \
-  -e MAVEN_OPTS='-Xss256k -Xmx8g -XX:+UseG1GC' \
   localhost/pa-webinar-load-test
-
-# 4. In un altro terminale, osserva le metriche lato JVB
-kubectl -n <namespace> exec <jvb-pod> -- \
-  wget -qO- http://localhost:8080/colibri/stats | jq .
 ```
 
-Nei comandi di questa guida sostituisci `<namespace>` con il namespace del
-deploy, `<app-secret>` con il Secret che contiene le variabili d'ambiente
-dell'app, `<release>` con il nome della release Helm e `jitsi.example.com` con
-l'hostname Jitsi del deploy da testare.
+The bots join the room `load-test-smoke0`: Malleus appends the conference index to the prefix.
 
-Per una lista completa di env var e scenari, continua a leggere.
+To keep the reports, add `-v "$PWD/results:/torture/target/surefire-reports"` (with `:Z` on hosts that
+enforce SELinux). With `SAVE_LOGS=true` the browser console logs land there too, in `logs/`.
 
----
+### 5. Watch the bridges
 
-## Variabili d'ambiente
-
-| Env | Default | Descrizione |
-|---|---|---|
-| `JITSI_URL` | *(required)* | URL pubblico del dominio Jitsi (es. `https://jitsi.example.com`) |
-| `JITSI_JWT_SECRET` | *(required)* | Segreto HS256 usato da Prosody per validare il JWT |
-| `JITSI_JWT_SUBJECT` | *(required)* | Claim `sub` del JWT (tipicamente il dominio Jitsi) |
-| `JITSI_JWT_ISSUER` | `pa-webinar` | Claim `iss` |
-| `JITSI_JWT_AUDIENCE` | `jitsi` | Claim `aud` |
-| `JITSI_ROOM` | `load-test-room` | Prefisso del nome della room (Malleus appende `0`) |
-| `PARTICIPANTS` | `20` | Numero totale di bot che entrano in conferenza |
-| `SENDERS` | `2` | Quanti dei bot pubblicano video+audio (gli altri sono receiver) |
-| `DURATION` | `300` | Durata della conferenza in secondi (esclusi bootstrap e join ramp) |
-| `USE_LOAD_TEST` | `false` | Se `true`, apre `/_load-test/<room>` — no media, solo segnalazione |
-| `RECEIVERS_PER_TAB` | `1` | Solo con `USE_LOAD_TEST=true`: multiplexing di client per tab |
-| `SENDERS_PER_TAB` | `1` | Idem per i sender |
-| `RECEIVER_TABS_PER_BROWSER` | `1` | Tab aggiuntivi per browser Chrome |
-| `SENDER_TABS_PER_BROWSER` | `1` | Idem per i sender |
-| `SAVE_LOGS` | `false` | Se `true`, salva i log console del browser in `target/surefire-reports/logs/` |
-| `MAVEN_OPTS` | *(vedi sotto)* | Flag JVM per Maven — importanti per scalare oltre ~15 bot |
-
-### MAVEN_OPTS raccomandate
-
-Default interno di Maven lascia troppo poca memoria per gestire molti Chrome driver
-in parallelo. Usa questi valori — riducono lo stack size e aumentano l'heap:
-
-```
--Xss256k -Xmx8g -XX:+UseG1GC -XX:MaxMetaspaceSize=512m
-```
-
-Senza questo, oltre ~15 bot ottieni `java.lang.OutOfMemoryError: unable to create
-native thread`. Il problema **non** è la RAM dell'host, ma il virtual address space
-consumato dagli stack frame di Java (1 MB × thread × N browser).
-
----
-
-## Modalità di esecuzione
-
-### Modalità 1: media plane completo (`USE_LOAD_TEST=false`)
-
-Ogni bot è un Chrome headless real che chiama `getUserMedia` su un dispositivo
-fake alimentato da un y4m/wav statico. I sender pubblicano RTP verso JVB, i
-receiver si iscrivono e ricevono media. **È questa la modalità che stressa
-realmente JVB**.
-
-Limite pratico: **~20 bot / pod** con 8-10 GB RAM, 4-7 CPU limite. Oltre servono
-più pod paralleli (vedi `k8s-job.yaml` con `parallelism`) o una workstation più
-grossa.
-
-### Modalità 2: segnalazione-only (`USE_LOAD_TEST=true`)
-
-Apre `/_load-test/<room>` (il frontend stripped-down di Jitsi). I bot fanno
-XMPP + MUC join + ICE/DTLS, ma NON iniziano il media plane (disableInitialGUM
-è forzato a true). Perfetto per stressare Prosody, Jicofo, autenticazione JWT,
-e reti di signaling. **JVB riceve pochissimo traffico in questo modo** — gli
-endpoint sono connessi ma "inattivi" lato media.
-
-Con `RECEIVERS_PER_TAB=20` puoi far girare **centinaia di bot** in un singolo
-pod con poche risorse (15 Chrome fisici × 20 client ciascuno = 300 partecipanti).
-
----
-
-## Esecuzione in cluster (Kubernetes Job)
-
-Per workload più lunghi o ripetibili in CI, usa il Job template.
-
-Tieni nel tuo repo di configurazione Kubernetes, accanto ai values dell'ambiente,
-un `load-test-job.yaml` che lancia lo stesso container come `batch/Job`. Vantaggi:
-- Traffico interno al cluster (no egress egress ingress round trip)
-- Ripetibile (`kubectl apply -f`)
-- `parallelism: N` per distribuire il carico su più pod
+Sample `/colibri/stats` on every bridge, every 30 seconds or so, from another terminal:
 
 ```bash
-kubectl -n <namespace> apply -f load-test-job.yaml
-kubectl -n <namespace> logs -f job/load-test-torture -c torture
-kubectl -n <namespace> delete job load-test-torture   # cleanup
+for p in $(kubectl -n pa-webinar get pods -l app.kubernetes.io/component=jvb \
+    --field-selector=status.phase=Running -o name); do
+  echo "== $p"
+  kubectl -n pa-webinar exec "$p" -- curl -s http://127.0.0.1:8080/colibri/stats \
+    | jq '{participants, endpoints_sending_video, endpoints_sending_audio,
+           stress_level, bit_rate_upload, bit_rate_download}'
+done
 ```
 
-Il template fa il mint del JWT in un initContainer con `alpine + openssl + jq`
-(zero dipendenze Node/Java per il minting).
+What each field means, and when a run passes, is in
+[What to watch](../../docs/LOAD-TESTING.md#what-to-watch).
 
----
+### 6. Restore the target
 
-## Hardware usato nei nostri test
-
-Documentare l'ambiente di esecuzione è fondamentale per interpretare i numeri.
-I nostri risultati sono stati raccolti su:
-
-### Cluster (AKS `<cluster>`)
-
-**Storico v1 — dismesso 2026-04-15**:
-
-| Componente | Node pool | Instance type | CPU | Mem | Spot? |
-|---|---|---|---|---|---|
-| JVB | `jvb` | `Standard_D4as_v5` | 4 | 16 Gi | no |
-
-Chart values v1: `requests 500m/1Gi, limits 3 CPU/2 Gi`. JVB OOM osservato
-a 60-80 participants webinar (vedi scenario A storico).
-
-**v2 — attuale**:
-
-| Componente | Node pool | Instance type | CPU | Mem | Spot? | Usato come |
-|---|---|---|---|---|---|---|
-| **JVB** | `jvb` | `Standard_F16s_v2` | 16 | 32 Gi | **no** | Media plane SFU, 1 pod = 1 nodo |
-| **Jibri** | `jibri` | `Standard_F4s_v2` | 4 | 8 Gi | **no** | Recording (anti-affinity con JVB) |
-| **Prosody / Jicofo / Web** | `test` | `Standard_D2as_v5` (spot) | 2 | 8 Gi | sì | Signaling, auth, statici |
-| **App + load-test pod** | `applications` | `Standard_D8as_v5` | 8 | 32 Gi | no | Runtime applicativo |
-
-Chart values v2 (dai values dell'ambiente di test):
-- JVB `requests: cpu=14 memory=24Gi, limits: cpu=15 memory=28Gi`
-- `VIDEOBRIDGE_OPTS=-Xms4g -Xmx16g -XX:MaxDirectMemorySize=8g -XX:+UseG1GC -XX:MaxGCPauseMillis=40`
-- `octo.enabled: true`
-- Entrambi `jvb` e `jibri` hanno `temporary_name_for_rotation` lato Terraform
-  per permettere cambi futuri di vm_size senza recreate manuale.
-
-### Workstation locale (sviluppo)
-
-| Componente | Valore |
-|---|---|
-| CPU | 24 core (AMD/Intel, verificare con `lscpu`) |
-| RAM totale | 124 Gi (99 Gi tipicamente libera) |
-| Uplink | 1 Gbps simmetrico |
-| OS | Fedora 43 |
-| Container runtime | Podman 5.8 (rootless) |
-
-Questa workstation regge comodamente scenari fino a ~120 bot in media mode
-senza saturarsi; il limite operativo è la CPU del generatore (Chrome media
-encode), non la RAM.
-
----
-
-## Scenari testati e risultati
-
-I risultati sotto sono raccolti con:
-- **Target**: dominio Jitsi del deploy di test (cluster AKS sopra)
-- **Generatore**: workstation locale via `podman run` (vedi comando quick-start)
-- **Data**: 2026-04-14
-
-Le metriche JVB provengono da `colibri/stats` campionato ogni 30s mentre il test
-è in corso, dopo ~90s di bootstrap (installazione Chrome + chromedriver) + ~60s
-di join ramp-up (1 bot/s).
-
-### Scenario 1 — Webinar mini (20 part / 5 sender / 300s)
-
-Approssimazione in scala 1/6 del caso webinar target (300 auditors + pochi
-speaker). Serve come baseline numerico e smoke test del setup.
-
-| Metrica | Valore stabile (9 campioni su 5 min) |
-|---|---|
-| `participants` | 20 |
-| `endpoints_sending_video` | 5 |
-| `endpoints_sending_audio` | 5 |
-| `bit_rate_download` (JVB inbound) | ~520 kbps |
-| `bit_rate_upload` (JVB outbound) | ~6.2 Mbps |
-| `stress_level` | 0.19 (19%) |
-| `p2p_conferences` | 0 |
-| OOM / errori | 0 |
-
-**Interpretazione**: con 5 sender attivi e 15 receiver, JVB è al 19% di stress
-level. Banda outbound verso i 15 receiver: ~6.2 Mbps totali = ~410 kbps/receiver
-(audio + video 1280x720@30 + simulcast layers). Banda inbound dai 5 sender: ~520 kbps
-totali = ~100 kbps/sender (il y4m transcoded è a bitrate moderato).
-
-Headroom enorme: al 19% siamo ben lontani dal tetto. Possiamo 4x questo carico
-prima di toccare lo stress critico (~0.8).
-
-### Scenario 2 — Webinar medio (60 part / 6 sender / 600s)
-
-Simulazione di un webinar vero (54 auditors + 6 relatori). Test interrotto
-manualmente a ~3 min (6 campioni stabili).
-
-| Campione | participants | s_video | bit_rate_up | stress | fase |
-|---|---|---|---|---|---|
-| t1 (+60s) | 40 | 6 | 6.8 Mbps | 0.244 | ramp-up |
-| t2 (+90s) | 45 | 6 | 16.6 Mbps | 0.369 | ramp-up |
-| t3 (+120s) | 60 | 6 | 16.6 Mbps | 0.432 | tutti joined |
-| t4 (+150s) | 60 | 6 | 20.2 Mbps | 0.484 | stabile |
-| t5 (+180s) | 60 | 6 | 18.0 Mbps | 0.458 | stabile |
-| t6 (+210s) | 60 | 6 | 20.8 Mbps | 0.505 | stabile |
-
-**Interpretazione**:
-- Al ramp-up si vede chiaramente il costo marginale di ogni nuovo receiver:
-  da 40→60 receiver il bit_rate_upload passa da 6.8 a ~19 Mbps (triplicato) e
-  lo stress da 0.24 a 0.47 (~raddoppiato).
-- Stabile a 60 partecipanti: JVB a ~47% di stress, **~19 Mbps uscita media**,
-  ~860 kbps ingresso dai 6 sender.
-- Banda per receiver: 19 Mbps / 54 receiver = ~350 kbps/receiver (5 sender
-  attivi visualizzabili + audio).
-- Ancora ~2x di headroom prima del tetto critico (0.8). A occhio il limite
-  pratico del singolo JVB in questo scenario è 100-120 participants.
-
-### Scenario 3 — Videocall mini (30 part / 30 sender / 120s)
-
-Tutti i partecipanti attivi come sender video. Caso peggiore per JVB: 30
-encoder in ingresso E 30 × 29 = 870 subscription in uscita. È lo scenario
-in cui ci aspettiamo JVB di saturare rapidamente rispetto al caso webinar.
-
-| Campione | participants | s_video | s_audio | bit_rate_up | bit_rate_down | stress | fase |
-|---|---|---|---|---|---|---|---|
-| t1 (+60s) | 30 | 14 | 15 | 3.5 Mbps | 263 kbps | 0.35 | metà sender attivi |
-| t2 (+90s) | 30 | 25 | 30 | **39.7 Mbps** | 2.0 Mbps | **0.77** | quasi tutti attivi |
-| t3 (+120s) | 30 | 26 | 30 | **42.0 Mbps** | 2.1 Mbps | **0.83** ⚠️ | **saturazione** |
-| t4 (+150s) | 4 | 4 | 4 | 968 kbps | 346 kbps | 0.60 | teardown |
-
-**Interpretazione**:
-- **JVB raggiunge stress 0.83 a ~26 sender video concorrenti** — sopra la
-  soglia critica 0.8 oltre cui Jitsi marca il bridge come "overstressed" e
-  Jicofo smette di assegnargli nuove conferenze.
-- Bit_rate_upload cresce non-linearmente col numero di sender: 14 sender →
-  3.5 Mbps, 26 sender → 42 Mbps (12x). Il costo non è N × (N-1) per un
-  semplice motivo: simulcast. Ogni sender invia 2-3 layer (180p/360p/720p),
-  JVB forwarda solo quello effettivamente richiesto da ogni receiver. Ma
-  con 30 receiver eterogenei, JVB finisce a forwardare tutti i layer → il
-  contatore cresce più rapidamente del quadrato.
-- Zero OOM lato generatore: 30 Chrome sender hanno girato comodamente sulla
-  workstation (~12 GB RAM, ~6 core usati).
-- Durata effettiva a 30 sender concorrenti: ~30 secondi. Poi il test scade
-  (duration 120s include il ramp-up di 30 join × 1s).
-
-**Tetto pratico videocall singolo JVB**: da questi numeri, **~25-30
-partecipanti all-active** è il massimo sul chart test corrente (1 JVB, 3 CPU
-limit, 2 Gi). Per supportare 150 sender concorrenti servono:
-- Octo / bridge cascading (una conferenza distribuita su N JVB), oppure
-- Upscaling vincolato del pod JVB (più CPU), oppure
-- Deployment dedicato "videocall" vs "webinar" con sizing differente
-
-## Sommario dei risultati v1 (D4as_v5, 3 CPU / 2 Gi)
-
-| Scenario | Part | Send | Stress JVB | Up JVB | Down JVB | Verdetto |
-|---|---|---|---|---|---|---|
-| **Webinar mini** | 20 | 5 | 0.19 | 6.2 Mbps | 520 kbps | ✅ trivial, pod al ~20% |
-| **Webinar medio** | 60 | 6 | 0.47 | 19 Mbps | 860 kbps | ✅ OK, ~50% risorse JVB |
-| **Videocall mini** | 30 | 30 | **0.83** | **42 Mbps** | 2.1 Mbps | ⚠️ **JVB al limite** (saturazione) |
-
-### Conclusioni operative v1
-
-1. **Pattern webinar (pochi sender, molti receiver) scala molto meglio del
-   pattern videocall (tutti sender).** Con 1 solo JVB (3 CPU / 2 Gi) si
-   reggono comodamente 60+ partecipanti in modalità webinar, ma solo ~25
-   in modalità all-active.
-
-2. **Il bit_rate_upload di JVB cresce super-linearmente col numero di
-   sender**, anche con simulcast. Chiunque documenti capacità di un deploy
-   Jitsi deve separare i due regimi: "N partecipanti con K sender" invece
-   di "N partecipanti" totale.
-
-3. **Lo stress level JVB è l'indicatore affidabile**, non banda assoluta.
-   A 0.8 comincia il degrado perceivable (frame drop, audio glitch). Il
-   valore 0.83 misurato in scenario 3 non significa crash, ma qualità
-   audio/video in diminuzione progressiva.
-
-4. **Il chart values.yaml di default (1 JVB, scale-to-zero, 3 CPU limit) è
-   dimensionato per webinar tipico (fino a ~100 part / pochi sender).** Per
-   videocall di gruppo ≥30 part con tutti video servono risorse maggiori:
-   bumpare limit a 6-8 CPU, oppure abilitare cluster autoscaler per JVB
-   multipli + Octo.
-
----
-
-## Scenari v2 — F16s_v2 + scale-to-zero + Octo (2026-04-15)
-
-Il 15/04/2026 il nodepool JVB è stato portato a **Standard_F16s_v2** (16
-vCPU / 32 GiB, compute-optimized) e il pod JVB occupa l'intero nodo:
-
-- `requests: cpu=14 memory=24Gi`
-- `limits:   cpu=15 memory=28Gi`
-- `VIDEOBRIDGE_OPTS=-Xms4g -Xmx16g -XX:MaxDirectMemorySize=8g -XX:+UseG1GC -XX:MaxGCPauseMillis=40`
-
-Jibri è stato spostato su un nodepool dedicato `Standard_F4s_v2` con taint
-`workload=jitsi-jibri:NoSchedule` e Octo è stato abilitato nel subchart
-`jitsi-meet` per consentire a Jicofo di distribuire una singola conferenza
-su più bridge. Strategia di default `RegionBasedBridgeSelectionStrategy`
-(riempie un bridge alla volta, spilla al successivo oltre lo stress target).
-
-### Topologia operativa
-
-```mermaid
-flowchart LR
-    U1[Utenti pubblici]-->|HTTPS|ING[NGINX Ingress]
-    ING-->|/|APP[pa-webinar<br/>Next.js]
-    ING-->|/event/*|JWEB[Jitsi Web]
-    APP-->|Prisma|DB[(Azure Postgres)]
-    APP-->|REST /colibri/stats|JVB1
-    JWEB-->|XMPP BOSH|PROS[Prosody]
-    PROS-->|MUC|JIC[Jicofo]
-    JIC-->|bridge select|JVB1
-    JIC-->|bridge select|JVB2
-
-    subgraph JVBPOOL["jvb nodepool · F16s_v2 · scale 0-6"]
-      JVB1[JVB pod 1<br/>16 CPU · 28 Gi]
-      JVB2[JVB pod 2<br/>16 CPU · 28 Gi]
-      JVB1<-->|Octo UDP 4096|JVB2
-    end
-
-    subgraph JIBRIPOOL["jibri nodepool · F4s_v2 · scale 0-2"]
-      JIBRI[Jibri pod<br/>4 CPU · 6 Gi]
-    end
-
-    JIBRI-->|record RTP|JVB1
-    JIBRI-->|finalize upload|BLOB[(Azure Blob<br/>recordings)]
-
-    CRON[jvb-scaler CronJob<br/>*/2 min]
-    CRON-->|GET desired-replicas|APP
-    CRON-->|kubectl scale|JVB1
-    CRON-->|kubectl scale|JIBRI
-
-    U2[Partecipante/Moderatore]-->|WebRTC UDP 10000|JVB1
-    U2-->|WebRTC UDP 10000|JVB2
+```bash
+kubectl -n pa-webinar set env deployment/pa-webinar-jitsi-meet-web ENABLE_PREJOIN_PAGE-
+kubectl -n pa-webinar rollout status deployment/pa-webinar-jitsi-meet-web
 ```
 
-### Ciclo di vita eventi con scale-to-zero
+Do this by hand. A later `helm upgrade` does not remove the variable for you: Helm's three-way merge
+leaves alone the fields that neither the old nor the new chart manifest sets, and a variable added with
+`kubectl set env` is such a field. Then resume the scaler if you paused it.
 
-```mermaid
-stateDiagram-v2
-    [*] --> DRAFT
-    DRAFT --> PUBLISHED : admin pubblica
-    PUBLISHED --> PROVISIONING : scheduled pre-scale (T-preScaleMin)
-    PUBLISHED --> PROVISIONING : POST /events/[slug]/wake
-    PROVISIONING --> LIVE : JVB Ready + startsAt ≤ now
-    LIVE --> LIVE : traffico attivo, lastActiveAt refresh
-    LIVE --> IDLE : 0 parts per ≥ graceMinutes (def 45)
-    IDLE --> PROVISIONING : POST /wake riaccende il nodo
-    LIVE --> ENDED : endsAt superato
-    IDLE --> ENDED : endsAt superato
-    PROVISIONING --> ENDED : endsAt superato
-    ENDED --> [*]
-```
+### Why the container flags matter
 
-L'intero flusso `IDLE → PROVISIONING → LIVE → JVB ready` è stato osservato
-su cluster in **~3 minuti** di cold start (CA spinup del nodo F16 + JVB
-boot + Jicofo bridge registration).
+- **`--pids-limit=-1` and `--ulimit nproc=65536:65536`.** Every Chrome runs several processes with many
+  threads, and the JVM that drives them adds threads for every bot. All of them count against the
+  container's process limit, and Podman applies one by default (`pids_limit` in `containers.conf`). When
+  the limit is reached, thread creation fails and the JVM reports
+  `java.lang.OutOfMemoryError: unable to create native thread`, typically somewhere past 15 bots.
+  Host memory is not the problem.
+- **`--ulimit nofile=65536:65536`.** Each browser holds many sockets and files open.
+- **`--shm-size=4g`.** Room for the browsers' shared memory; the container default is 64 MiB. Chrome is
+  also launched with `--disable-dev-shm-usage`, which jitsi-meet-torture adds whenever it disables the
+  Chrome sandbox (its default), so this is a safety margin more than a hard requirement.
+- **`MAVEN_OPTS`** is set by the entrypoint to
+  `-Xss512k -Xmx6g -XX:+UseG1GC -Dwebdriver.http.factory=netty` unless you pass your own. These options
+  size the Maven process. jitsi-meet-torture runs its tests through the Surefire plugin, which forks a
+  separate JVM, and its `pom.xml` sets no `argLine`: heap and thread-stack settings in `MAVEN_OPTS` do
+  not reach the JVM that drives the browsers. Lowering `-Xss` there does not raise the bot ceiling; the
+  process limits above do.
 
-### Scenario C — Webinar 150 su singolo F16 (180s)
+`run-local.sh` sets `--shm-size` (from `SHM_SIZE`, default `4g`) but none of the other flags, so use the
+explicit command above for runs beyond a handful of bots.
 
-Stesso pattern di Scenario 2 (poche sender, molti receiver) ma su JVB
-full-node F16 invece che 3 CPU / 2 Gi. 5 container × 30 bot locali → tetto
-di generatore ~78-80 browser.
+### Minting tokens
 
-| Metrica | Valore peak (campioni stabili) |
-|---|---|
-| `participants` | **78** (limite locale, non JVB) |
-| `endpoints_sending_video` | 6-7 |
-| `bit_rate_upload` (JVB outbound) | **54.5 Mbps** max |
-| `stress_level` | **0.183** (18.3%) max |
-| `threads` JVB | 273 |
-| JVB CPU usage | **1.14 / 15 core** (7%) |
-| JVB memory usage | **1.1 / 16 GiB heap** (7%) |
-| OOM / errori | 0 |
-
-**Confronto con v1 (Scenario 2)**: stesso workload (93 part / 7 sender)
-passava da **60.7% stress su 4 CPU** → **~18% proiettato su 15 CPU**.
-Rapporto quasi perfettamente lineare (60.7 × 4/15 = 16.2% vs 18.3%
-misurato), conferma che il collo di bottiglia era solo CPU.
-
-**Proiezione lineare**: stress cresce ~0.22% per partecipante webinar con
-~7 sender. Estrapolando:
-- **150 parts ≈ 35% stress** — abbondante margine
-- **300 parts ≈ 70% stress** — sotto la soglia reactive (tipicamente 80%),
-  supportato da 1 singolo F16
-- **500 parts ≈ 115% stress** — serve Octo (2 bridge, Jicofo spilla metà
-  dei partecipanti sul secondo)
-
-### Scenario D — Videocall all-sender su singolo F16 (180s)
-
-Ogni bot attiva mic + webcam. Avviati 2 container × 25 bot, tetto locale
-~25 sender contemporanei attivi (la workstation locale diventa il collo).
-
-| Metrica | Valore peak |
-|---|---|
-| `participants` | 47 |
-| `endpoints_sending_video` | **25** (di 50 richiesti) |
-| `bit_rate_upload` (JVB outbound) | **23.4 Mbps** |
-| `stress_level` | **0.095** (9.5%) |
-| JVB CPU usage | **1.05 / 15 core** (7%) |
-| OOM / errori | 0 |
-
-**Confronto con v1 (Scenario 3)**: 30 all-sender su 3 CPU facevano **83%**
-stress (limite critico). 25 all-sender su 15 CPU fanno 9.5%. Scaling
-lineare: 30 × 3/15 × 15/25 → stress proiettato 9% ↔ misurato 9.5%, allineato.
-
-**Proiezione lineare per all-sender**:
-- **50 parts ≈ 20% stress** — abbondante margine
-- **100 parts ≈ 40% stress** — ancora su 1 solo bridge
-- **150 parts ≈ 60% stress** — ancora fattibile singolo JVB, ma rischio
-  picchi quando qualcuno condivide schermo → **meglio 2 bridge**
-- **200 parts** richiede **≥3 bridge + Octo** per margine di sicurezza
-
-### Scenario E — Octo 2 bridge (60 parts, 180s)
-
-Validazione della cascata Octo con `SplitBridgeSelectionStrategy` forzata
-(produzione usa `RegionBased` che spilla solo sotto stress). 2 container ×
-30 bot, stessa room, 2 JVB pod su 2 F16 distinti.
-
-| Bridge | parts locali | octo_endpoints | octo_send_bitrate | stress |
-|---|---|---|---|---|
-| JVB1 | ~30 | 30 | 85-100 Mbps | 3-4% |
-| JVB2 | ~30 | 30 | 85-100 Mbps | 3-4% |
-
-- Totale unique parts nella room: **60**
-- **octo_conferences: 1** su entrambi i bridge → conferenza unica
-- Ogni bridge ha 30 partecipanti locali + 30 remoti via relay
-- **Traffico inter-bridge ~90 Mbps per verso** per soli 6 sender totali —
-  è il costo dell'Octo: ogni sender viene replicato una volta verso il
-  peer bridge, e il peer lo fanout ai propri receiver
-
-**Implicazione banda**: Octo **raddoppia** la banda aggregata JVB→JVB
-rispetto a un singolo bridge con gli stessi sender, perché ogni layer di
-simulcast deve attraversare il relay. Per 50 all-sender su 2 bridge
-proiettiamo ~150-200 Mbps di traffico inter-bridge — entro l'accelerated
-networking degli F16 (~12.5 Gbps), ma va monitorato.
-
-### Scenario F — Scale-down end-to-end (validazione logica)
-
-Non un test di performance, ma una validazione dell'automazione:
-1. `SiteSetting.jvbInactiveGraceMinutes = 1` (override per velocizzare)
-2. Un evento di prova marcato `LIVE` con `lastActiveAt = -10 min`
-3. Riattivato `jvb-scaler` CronJob
-4. **Osservato nel log scaler (ciclo successivo, ~2 min dopo)**:
-   ```
-   [10:58:42] JVB Scaler: API response: {"desired":0,...,"liveToIdle":1,
-              "inactiveGraceMinutes":1,"preScaleMinutes":1}
-   [10:58:42] JVB Scaler: Current: 1, Desired: 0
-   [10:58:42] JVB Scaler: Scaling JVB from 1 to 0
-   ```
-5. Evento in DB transizionato a `IDLE`, pod JVB terminato, nodo F16
-   rimosso dal CA nei 10 min successivi
-
-Conferma che: (a) la grace viene letta dal `SiteSetting` (override admin
-applicato in <1 ciclo), (b) la transizione `LIVE → IDLE` è atomica con
-lo scale-down, (c) il nuovo endpoint distingue correttamente i billable
-events dagli IDLE.
-
-## Capacity plan operativo (post v2)
-
-**Per singolo JVB su F16s_v2 (target stress 70% max con margine reactive):**
-
-```mermaid
-quadrantChart
-    title Capacità per deploy · asse X = numero parts, asse Y = % sender
-    x-axis "pochi partecipanti" --> "molti partecipanti"
-    y-axis "webinar (pochi sender)" --> "videocall (tutti sender)"
-    quadrant-1 "Octo obbligatorio"
-    quadrant-2 "Singolo bridge (videocall piccolo)"
-    quadrant-3 "Singolo bridge (webinar piccolo)"
-    quadrant-4 "Octo consigliato (webinar grande)"
-    "webinar 50": [0.08, 0.1]
-    "webinar 150": [0.22, 0.1]
-    "webinar 300": [0.45, 0.1]
-    "webinar 500": [0.82, 0.05]
-    "videocall 25": [0.08, 0.85]
-    "videocall 50": [0.22, 0.95]
-    "videocall 100": [0.52, 0.95]
-    "videocall 150": [0.78, 0.95]
-```
-
-| Scenario target | Bridge necessari | Octo? | Stima stress per bridge |
+| Script | Room claim | Role | Use it for |
 |---|---|---|---|
-| Webinar ≤150 part | 1 F16 | no | ~18% |
-| Webinar ≤300 part | 1 F16 | no | ~40% |
-| Webinar 300-500 part | 2 F16 | **sì** (RegionBased) | ~35% per bridge |
-| Videocall all-sender ≤30 | 1 F16 | no | ~12% |
-| Videocall all-sender ≤50 | 1 F16 | no | ~20% |
-| Videocall all-sender 50-100 | 2 F16 | **sì** | ~25% per bridge |
-| Videocall all-sender 100-150 | 3 F16 | **sì** | ~30% per bridge |
+| `mint-jwt.sh` | `*`, any room | moderator (`affiliation: owner`) | The image, and the Secret of the grid runbook |
+| `mint-jwt.mjs` | the room passed with `--room` | participant, or moderator with `--moderator` | Hand-made tests, `run-torture.sh` |
 
-**Limiti di validazione**: tutti i numeri ≤80 partecipanti/bridge sono
-misurati direttamente. Tutto quello oltre (150 webinar, 50 all-sender
-reali, 300 webinar, 500 webinar, >50 videocall) è **proiezione lineare**
-dalle misure dirette, non test end-to-end. La linearità CPU è confermata
-per pattern omogenei, ma i seguenti fattori possono far degradare prima:
+Both sign with HS256 and set `iss`, `aud` and `sub` from `JITSI_JWT_ISSUER`, `JITSI_JWT_AUDIENCE` and
+`JITSI_JWT_SUBJECT`. Use the portal's values: Prosody accepts only the issuer and audience it is
+configured with (`JWT_ACCEPTED_ISSUERS`, `JWT_ACCEPTED_AUDIENCES`; see
+[The Prosody JWT secret](../../docs/DEPLOYMENT.md#the-prosody-jwt-secret)). For `sub`, the portal uses
+its own `JITSI_JWT_SUBJECT`, or the conference host `NEXT_PUBLIC_JITSI_DOMAIN` when that is unset.
 
-- **GC pause** del JVM con heap 16g: sopra ~200 endpoint/bridge il G1
-  può introdurre pause visibili. Monitorare `jvm_gc_pause_seconds`.
-- **UDP buffer overflow**: con 150+ endpoint concorrenti a 720p la coda
-  di pacchetti può saturare. Richiede sysctl lato nodo (`net.core.rmem_max`).
-- **Inter-bridge bandwidth Octo**: per 100+ sender la somma dei relay
-  può eccedere il singolo link. Verificare con `octo_send_bitrate` peak.
+- **`mint-jwt.sh`** needs all four `JITSI_JWT_*` variables; the entrypoint supplies the defaults for
+  issuer and audience, but a standalone call does not. Optional: `BOT_NAME` (default `LoadBot`),
+  `JWT_TTL_SECONDS` (default `7200`) and `JITSI_JWT_APP_ID` (default `pa_webinar`, used only as the
+  prefix of the `jti` claim). It prints the token, or writes it to the file given as its first argument.
+- **`mint-jwt.mjs`** imports `jose`; run it from inside the repository after `npm ci` at the root, where
+  the workspaces install it. Options: `--room` (required), `--name`, `--moderator` and `--ttl` (for
+  example `2h`, the default). Set `JITSI_JWT_SUBJECT` explicitly: the script falls back to `meet.jitsi`,
+  which is not the portal's fallback. It reads `JITSI_JWT_APP_ID` but does not put it in the token.
 
-**Raccomandazione**: prima di un evento da >150 parts tutti-sender fare
-un **test di conferma** con bot reali alla scala target (richiede 2-3
-workstation di generazione o Selenium Grid in cluster).
+**The room suffix.** A token for one room must name the room the bot actually joins. With Malleus that
+is the prefix plus the conference index, so `--room load-test` fails for a run whose prefix is
+`load-test`: mint `--room load-test0`, or `--room '*'`.
 
-## Stato corrente del deploy test (2026-04-15)
+## Environment variables
 
-- Nodepool `jvb`: F16s_v2 · min=0 max=6 · scale-to-zero
-- Nodepool `jibri`: F4s_v2 · min=0 max=2 · scale-to-zero
-- JVB replicaCount default: `0` (portato a 1+ dallo scaler)
-- Octo: abilitato, strategia `RegionBasedBridgeSelectionStrategy`
-- Grace di scale-down: `SiteSetting.jvbInactiveGraceMinutes = 45` (configurabile)
-- Pre-scale: `SiteSetting.jvbPreScaleMinutes = 10` (configurabile)
-- Soglie reactive: warn 50% / critical 70% (configurabili)
+These are the variables of the image's entrypoint and of `mint-jwt.sh`, with the defaults set in those
+scripts. The last column says whether `run-local.sh` forwards the variable into the container.
 
-## Note sulla misurazione della banda
+| Variable | Default | Meaning | `run-local.sh` |
+|---|---|---|---|
+| `JITSI_URL` | required | Public URL of the conference host, for example `https://meet.webinar.example.com` | yes |
+| `JITSI_JWT_SECRET` | required | The installation's `JITSI_JWT_SECRET` | yes |
+| `JITSI_JWT_SUBJECT` | required | `sub` claim, as the portal sets it | yes |
+| `JITSI_JWT_ISSUER` | `pa-webinar` | `iss` claim; must be one of Prosody's accepted issuers | yes |
+| `JITSI_JWT_AUDIENCE` | `jitsi` | `aud` claim; must be one of Prosody's accepted audiences | yes |
+| `JITSI_JWT_APP_ID` | `pa_webinar` | Prefix of the `jti` claim | no |
+| `BOT_NAME` | `LoadBot` | Display name carried in the token | yes |
+| `JWT_TTL_SECONDS` | `7200` | Token lifetime; it must outlast the join ramp of the run | no |
+| `JITSI_ROOM` | `load-test-room` | Room prefix; the bots join `<prefix>0` | yes |
+| `PARTICIPANTS` | `20` | Total bots, or total clients in signaling-only mode | yes |
+| `SENDERS` | `2` | Bots that publish audio and video; the others only receive | yes |
+| `DURATION` | `300` | Seconds from each bot's join slot until it leaves; browser start-up counts against it | yes |
+| `USE_LOAD_TEST` | `false` | `true` selects the signaling-only mode, which needs the load-test client on the target (see [Signaling only](#signaling-only-use_load_testtrue)) | yes |
+| `SENDERS_PER_TAB` | `1` | Sender clients per browser tab; signaling-only mode only | yes |
+| `RECEIVERS_PER_TAB` | `1` | Receiver clients per browser tab; signaling-only mode only | yes |
+| `SENDER_TABS_PER_BROWSER` | `1` | Sender tabs per Chrome instance | yes |
+| `RECEIVER_TABS_PER_BROWSER` | `1` | Receiver tabs per Chrome instance | yes |
+| `SAVE_LOGS` | `false` | `true` saves each browser's console log with the reports | no |
+| `MAVEN_OPTS` | see [above](#why-the-container-flags-matter) | Options for the Maven process | no |
 
-**Importante**: il contatore `bit_rate_upload` di JVB misura il **payload
-applicativo RTP aggregato in uscita**. Se si osserva il traffico con strumenti
-network-level (iftop, nload, podman stats), si possono vedere valori più alti
-per le seguenti ragioni:
+`run-local.sh` also reads `IMAGE` (default `pa-webinar-load-test`) and `SHM_SIZE` (default `4g`), and
+builds the image first when it is missing or when called with `--build`. It runs the container with
+`-it`, so it needs a terminal.
 
-1. **Overhead di protocollo** (UDP/IP headers, SRTP auth tag, DTLS) ~3-5% sul
-   wire rispetto al payload
-2. **TURN relay double-count**: se i bot negoziano candidati `relay` invece che
-   `host` o `srflx`, il traffico transita JVB → coturn → bot. JVB e coturn
-   appaiono entrambi con contatori a 19 Mbps, e dal punto di vista dell'ingress
-   cluster lo stesso flusso è conteggiato due volte. Vedi
-   `config.p2p.useStunTurn=true` nei `_custom_config_js` del deploy test.
-3. **Altri client reali**: durante il test, verifica che nessun utente reale
-   sia in call sullo stesso deploy. Le tue due sessioni browser "di verifica"
-   pesano ~2-4 Mbps ciascuna se stanno decodificando video.
-4. **Misurazioni non per-container**: `iftop` sulla workstation cattura TUTTO
-   il traffico di rete, non solo il container podman. Per misurare solo il
-   traffico del container:
-   ```bash
-   podman stats --no-stream <container-name>
-   # colonna NET IO mostra rx/tx cumulativi del container
-   ```
+**Timing.** Malleus gives the bots join slots one second apart, and each bot leaves `DURATION` seconds
+after its slot, so they also leave one per second. All of them are in the room together for about
+`DURATION` minus `PARTICIPANTS` seconds, less the time each Chrome takes to start. Choose `DURATION` well
+above `PARTICIPANTS`.
 
-Per un rapporto pulito, confronta sempre:
-- JVB `colibri/stats` (autorevole per payload media)
-- `podman stats` del container load-test (autorevole per traffico del test)
-- Eventuali contatori di ingress controller lato cluster
+## Modes
 
----
+### Full media (`USE_LOAD_TEST=false`)
 
-## Troubleshooting — bug scoperti durante il tuning
+Every bot is a real Chrome. Senders capture the transcoded video and jitsi-meet-torture's bundled audio
+file through Chrome's fake capture devices; receivers join without capturing anything and receive what
+the bridge forwards (Malleus disables video autoplay on every bot). This is the mode that loads the
+bridge, and every synthetic reference result in
+[LOAD-TESTING](../../docs/LOAD-TESTING.md#reference-measurements) comes from it.
 
-Durante lo sviluppo di questa pipeline abbiamo trovato **sei** problemi in cascata
-che sono documentati qui come anti-regressione. Tutti i fix sono già applicati
-nel `Dockerfile` e negli script di questa directory.
+The generator is often the first limit. [Where to run the bots](../../docs/LOAD-TESTING.md#where-to-run-the-bots)
+gives the per-browser budget and what to do when one workstation is not enough.
 
-### 1. Podman container chromium = snap wrapper (Ubuntu)
+The `*_PER_TAB` variables have no effect in this mode: Malleus resets them to 1 and prints a warning.
+Several tabs per browser do work, but Malleus lets at most 16 tabs of one browser send audio and
+silently mutes the rest.
 
-**Sintomo**: `Driver server process died prematurely`.
+### Signaling only (`USE_LOAD_TEST=true`)
 
-**Causa**: il pacchetto `chromium` su Ubuntu (base image di `maven:3-eclipse-temurin-17`)
-è uno snap transitional package che richiede snapd, non funzionante in container.
+In this mode Malleus points the bots at `/_load-test/<room>` on the conference host, the path of Jitsi's
+lightweight load-test client, instead of the full Jitsi Meet page. One tab can host several clients
+(`SENDERS_PER_TAB`, `RECEIVERS_PER_TAB`), and `PARTICIPANTS` then counts clients, not browsers. For
+example, `PARTICIPANTS=300 SENDERS=2 RECEIVERS_PER_TAB=25` needs about a dozen receiver tabs.
 
-**Fix**: installa `google-chrome-stable` dal repo ufficiale Google + chromedriver
-dal Chrome for Testing API. Vedi `Dockerfile` lines 25-50.
+**The mode does not work out of the box: the Jitsi web image does not contain the load-test client.**
+Neither the stock `jitsi/web` image nor the patched one includes it. `ENABLE_LOAD_TEST_CLIENT=true` on
+the web container only adds nginx routes: `/_load-test/<room>` is rewritten to
+`/usr/share/jitsi-meet/load-test/index.html`, and `/_load-test/libs/` is served from the `libs/`
+directory beside it. Nothing is installed there, so without the client the route returns 404.
 
-### 2. Chrome 147 ha rimosso l'headless legacy
+The client page and its scripts have to be placed at that path, for example with a volume or a derived
+image. The current jitsi-meet source does not ship a page for that route. It builds the load-test client
+only as a script (`npm run build:load-test`), and the jitsi-meet repository's own load tester
+(`tests/malleus`) uploads it into each browser instead of serving it from the deployment. This toolkit
+provides no tested way to install the client, and this mode has not been run against the chart's web
+image.
 
-**Sintomo**: `Chrome instance exited` immediatamente dopo ChromeDriver.
+If you do install the client, turn the route on for the test the same way as the prejoin change, and
+revert it the same way:
 
-**Causa**: jitsi-meet-torture passa `--headless` (modalità legacy), rimossa da
-Chrome ~132.
-
-**Fix**: eseguire Chrome in `xvfb-run` dentro un virtual display, così torture
-non sa che è headless e Chrome è in modalità normale. Vedi `run-torture-local.sh`.
-
-### 3. `FourPeople_1280x720_30.y4m` non esiste, il file è `fakeVideoStream.y4m`
-
-**Sintomo**: `getUserMedia.constraint_failed: Constraint could not be satisfied`.
-
-**Causa**: Malleus hardcoda il path `resources/FourPeople_1280x720_30.y4m` ma il
-repo ship `fakeVideoStream.y4m`, che è 320x180@5fps (non 1280x720@30 come il
-nome suggerisce). Chrome `--use-file-for-fake-video-capture` riceve un file che
-non soddisfa i constraint video richiesti da Jitsi Meet, getUserMedia fallisce.
-
-**Fix**: nel Dockerfile, usa `ffmpeg` per transcodificare `fakeVideoStream.y4m`
-a 1280x720@30 e salvarlo col nome che Malleus si aspetta.
-
-### 4. `config.prejoinConfig.enabled=false` + non-embedded = disableInitialGUM forzato
-
-**Sintomo**: `Initialized with 0 local tracks` — non viene creata alcuna traccia.
-
-**Causa**: `react/features/base/config/functions.any.ts:387` contiene:
-```ts
-if (!isEmbedded() && 'config.prejoinConfig.enabled' in params && config.prejoinConfig?.enabled === false) {
-    config.disableInitialGUM = true;
-}
+```bash
+kubectl -n pa-webinar set env deployment/pa-webinar-jitsi-meet-web ENABLE_LOAD_TEST_CLIENT=true
+kubectl -n pa-webinar rollout status deployment/pa-webinar-jitsi-meet-web
+# after the run:
+kubectl -n pa-webinar set env deployment/pa-webinar-jitsi-meet-web ENABLE_LOAD_TEST_CLIENT-
 ```
-È una protezione anti-bot: se apri l'URL direttamente (non in IFrame) e forzi
-prejoin a false, Jitsi presume che sei un recorder headless e disabilita GUM.
-Malleus mette sempre `config.prejoinConfig.enabled=false` nella URL → cade
-dritto nella trappola.
 
-**Fix**: due mosse combinate:
-1. `sed` patch su `WebParticipant.java:56` del source torture per rimuovere
-   l'append del parametro prejoin.
-2. Sul deploy target, `ENABLE_PREJOIN_PAGE=false` come env var sul pod web
-   (così il default lato server è già disabilitato e non compare la schermata
-   di prejoin).
+Before a run, open `https://meet.webinar.example.com/_load-test/<room>` in a browser and check that the
+load-test page loads. A 404 there means the client is missing from the web pods.
 
-### 5. `Audio unmute permissions set by Jicofo to false` NON è una negazione
+This mode loads Prosody, Jicofo, token authentication and the ingress, and puts little load on the
+bridge. No reference result was measured this way: start with a small run and check in Prosody's logs
+that the clients really join before you trust a large one.
 
-**Sintomo**: log del browser mostra la frase, si pensa che Jicofo blocchi il
-media come AV moderation.
+## In-cluster runs
 
-**Causa**: il log è fuorviante. La variabile reale è `audioLimitReached` (e
-`videoLimitReached`), che vale `true` SOLO quando il numero di sender attivi
-supera la soglia `max-audio-senders` / `max-video-senders` configurata in Jicofo.
-`false` significa "limite NON raggiunto = puoi pubblicare". È `lib-jitsi-meet`
-che scrive il messaggio in modo confuso.
+Use the Selenium Grid runbook, [SELENIUM-GRID.md](SELENIUM-GRID.md). It pauses the scaler, deploys a
+Selenium hub with Chrome nodes, and runs Malleus in remote mode from a Job, with the token in a Secret
+minted by `mint-jwt.sh`.
 
-**Fix**: nessuno — ignorare il log. La semantica è opposta a quella che sembra.
-Spiegazione documentata qui per non rifare l'errore.
+The grid does not use this image. Its Job runs jitsi-meet-torture unpatched. The prejoin parameter stays
+in the room URL, so senders start without camera and microphone (issue 4) and have no video file. A grid
+run publishes little or no media, and it validates joins, ICE and connection stability at scale, not
+video throughput. [Adapting the run](SELENIUM-GRID.md#adapting-the-run) describes a variant with real
+video that has not been run.
 
-### 6. P2P mode con ≤2 partecipanti bypassa JVB
+## Other entry points
 
-**Sintomo**: bot con media effettivamente in pubblicazione, ma `endpoints_sending_video=0`
-nelle stats JVB.
+### `run-torture.sh`
 
-**Causa**: con `config.p2p.enabled=true` (default Jitsi) e ≤2 partecipanti in
-conferenza, il media flow va peer-to-peer direttamente tra i bot, bypassando
-JVB. JVB vede gli endpoint connessi ma non il traffico RTP.
+Runs Malleus on the host, from a checkout of jitsi-meet-torture that it clones into
+`./.cache/jitsi-meet-torture` under the current directory (override with `TORTURE_DIR`). It needs a JDK,
+Maven, Chrome and chromedriver on the host. It takes `JITSI_URL`, `JITSI_ROOM` and a ready token in
+`JITSI_JWT`, which it passes as `-Dorg.jitsi.token`; `PARTICIPANTS` defaults to 50 here.
 
-**Fix**: testare con **≥3 partecipanti** (Jitsi disabilita automaticamente P2P
-sopra quella soglia), oppure passare `config.p2p.enabled=false` esplicito via
-`extra_sender_params` / `extra_receiver_params`.
+It has none of the image's fixes, so it suits signaling checks only:
 
-### 7. `java.lang.OutOfMemoryError: unable to create native thread` con ≥20 bot
+- The checkout is unpatched: the room URL keeps the prejoin parameter, and the senders start without
+  camera or microphone (issue 4 below).
+- The fake video file Malleus asks for does not exist in a plain checkout (issue 3 below).
+- It starts Chrome headless (`org.jitsi.malleus.enable.headless=true`); inside a container that fails as
+  in issue 2 below.
+- It joins every bot at once (`join_delay=0`), not one per second, so the
+  [Timing](#environment-variables) notes above do not apply.
+- `GRID_URL` sets `-Dremote.address` but not `-Djitsi-meet.isRemote=true`, the property that switches
+  jitsi-meet-torture to remote browsers, so the browsers still start locally. Use the grid runbook for
+  remote browsers.
+- Mint its token with `--room '*'` or with the suffixed room name (see [Minting tokens](#minting-tokens)).
 
-**Sintomo**: primi 10 bot OK, poi alcuni dei successivi falliscono creando
-ChromeDriver.
+### `coherence-bots.mjs`
 
-**Causa**: ogni `JdkHttpClient` di Selenium 4 crea un thread pool, e con 20+
-istanze lo spazio di indirizzamento per gli stack frame Java (default 1 MB ×
-thread) si consuma rapidamente.
+Drives a few sender bots with distinct names, each with its own token, that toggle their microphones and
+join and leave on a stagger. It exists to validate per-participant recording and speaker attribution
+(see [Recording](../../docs/architecture/recording.md)), not to measure capacity. It needs `puppeteer`,
+which the repository's root workspaces do not install. Its variables are documented in its header.
 
-**Fix**: `MAVEN_OPTS='-Xss256k -Xmx8g'` riduce lo stack per thread da 1 MB a
-256 KB, quadruplicando il numero di thread che il JVM può creare. Aggiungere
-anche `--pids-limit=-1 --ulimit nproc=65536` al `podman run` per evitare limiti
-container.
+## Troubleshooting
 
----
+### Known issues
 
-## Come riprodurre i test
+The image and the entrypoint already handle issues 1 to 4 and 7. They are listed so that nobody undoes a
+fix by accident, and because they reappear in any setup built another way.
 
-Passi concreti per rifare i test:
+**1. `Driver server process died prematurely`.** Ubuntu's `chromium` package is a transitional snap
+that cannot run in a container. The image installs Google Chrome stable from Google's repository and
+chromedriver from Chrome for Testing.
 
-1. **Applica le modifiche di deploy temporanee** (vengono sovrascritte al
-   prossimo helm upgrade, quindi sono sicure per test ad-hoc):
-   ```bash
-   kubectl -n <namespace> set env deployment/<release>-jitsi-meet-web ENABLE_PREJOIN_PAGE=false
-   kubectl -n <namespace> rollout status deployment/<release>-jitsi-meet-web
-   ```
+**2. Chrome exits right after chromedriver starts it (`Chrome instance exited`).** Started headless
+inside this container, Chrome exits on startup; the same happens with `k8s-job.yaml`. Headless works on
+Selenium Chrome nodes, which the grid Job uses. The entrypoint therefore does not ask Malleus for headless
+browsers and runs Maven under `xvfb-run`, so each Chrome is a normal windowed browser on a virtual
+display. Do not add `org.jitsi.malleus.enable.headless=true` to the entrypoint.
 
-2. **Verifica che il deploy abbia prejoin disabilitato**:
-   ```bash
-   curl -sk https://jitsi.example.com/config.js | grep prejoinConfig
-   # deve dire: enabled: false
-   ```
+**3. `getUserMedia.constraint_failed: Constraint could not be satisfied`.** Malleus points every bot at
+`resources/FourPeople_1280x720_30.y4m`, and a plain jitsi-meet-torture checkout does not contain it.
+The image transcodes the bundled clip to that name and format with `ffmpeg`.
 
-3. **Build dell'immagine load-test**:
-   ```bash
-   cd pa-webinar/scripts/load-test
-   podman build -t pa-webinar-load-test .
-   ```
+**4. `Initialized with 0 local tracks`: no bot sends media.** Jitsi Meet starts without camera and
+microphone when a page that is not embedded in an iframe carries `config.prejoinConfig.enabled=false` in
+its URL; the browser log shows `Using prejoinConfig.enabled config URL overwrite implies starting without
+media.` jitsi-meet-torture adds that parameter to every room URL. The fix has two halves: the image
+removes the parameter, and the target must disable the prejoin page server-side
+(`ENABLE_PREJOIN_PAGE=false`, see [Prepare the target](#3-prepare-the-target)), or the bots stop at the
+prejoin screen. Real participants are not affected either way: the portal embeds the room and turns the
+prejoin page off itself.
 
-4. **Estrai il secret JWT**:
-   ```bash
-   export JITSI_JWT_SECRET=$(kubectl -n <namespace> get secret <app-secret> \
-     -o jsonpath='{.data.JITSI_JWT_SECRET}' | base64 -d)
-   ```
+**5. `Audio unmute permissions set by Jicofo to false` is not a refusal.** lib-jitsi-meet logs the value
+of Jicofo's "audio sender limit reached" flag with that wording. `false` means the limit has not been
+reached and the bot may publish. The same holds for the video message. Ignore the line.
 
-5. **Lancia gli scenari** con un runner che campiona JVB ogni 30s tramite
-   `kubectl exec` verso l'endpoint `colibri/stats` del pod JVB.
+**6. The bots publish, but the bridge shows `endpoints_sending_video` at zero.** With two participants
+in a room, Jitsi sends the media peer-to-peer and bypasses the bridge. Malleus enables peer-to-peer
+unless told otherwise (`org.jitsi.malleus.enable_p2p`, which the entrypoint does not expose), and the
+portal's own P2P switch-off never reaches bots that open the room directly (see
+[Media path](../../docs/architecture/jitsi-integration.md#media-path)). Jitsi uses peer-to-peer only
+while exactly two participants are present, so always run with three bots or more.
 
-6. **Cleanup finale**:
-   ```bash
-   kubectl -n <namespace> set env deployment/<release>-jitsi-meet-web ENABLE_PREJOIN_PAGE-
-   kubectl -n <namespace> rollout status deployment/<release>-jitsi-meet-web
-   ```
+**7. `java.lang.OutOfMemoryError: unable to create native thread` past about 15 bots.** The container's
+process limit, not memory. Run with `--pids-limit=-1` and `--ulimit nproc=65536:65536`, as in the
+[Quick start](#4-run-a-smoke-test). See [Why the container flags matter](#why-the-container-flags-matter).
 
----
+### Two settings with similar names
 
-## Checklist pre-test
+Jitsi has two unrelated start-muted settings, and the entrypoint sets both:
 
-Prima di ogni sessione di load test:
+- `startWithAudioMuted` and `startWithVideoMuted` are booleans that apply to the client that sets them.
+  The entrypoint sets them to `false` for senders.
+- `startAudioMuted` and `startVideoMuted` are conference thresholds: every participant after the Nth
+  starts muted. The Jitsi web image's `config.js` sets both to 10 by default (`START_AUDIO_MUTED`,
+  `START_VIDEO_MUTED`), so in a run with more than ten bots the late senders would join muted. The
+  entrypoint raises both thresholds to 99999.
 
-- [ ] Deploy target fresh e in stato noto (no test precedenti pending)
-- [ ] `ENABLE_PREJOIN_PAGE=false` sul pod web del deploy
-- [ ] JVB pod running e ready (non in stato Pending / ContainerCreating)
-- [ ] Nessun utente reale in chiamata sul deploy (evita rumore sulle stats)
-- [ ] Workstation locale con ≥16 Gi RAM libera, CPU idle <30%
-- [ ] `podman ps` vuoto (nessun container precedente pendente)
-- [ ] Directory risultati pronta e accessibile in scrittura
+Changing one when you meant the other produces runs where some senders publish nothing.
 
-## Cosa NON fare
+### Other failures
 
-- ❌ Non lanciare load test su deploy di **produzione** durante eventi reali.
-- ❌ Non modificare il chart Helm committato per fixare bug di torture — usa
-  `kubectl set env` o patch temporanei che non entrano in git.
-- ❌ Non attribuire fiducia a stats JVB `endpoints_sending_video=0` se ci sono
-  solo 2 bot — quello è solo P2P mode.
-- ❌ Non confondere `startWithAudioMuted` (booleano per utente) con `startAudioMuted`
-  (numero threshold della conferenza) — sono due cose diverse.
+- **No bot joins, and Prosody logs no connection at all.** The token is rejected before the signaling
+  connection opens: the secret, the issuer or the audience does not match Prosody's, or the room claim
+  does not match the room (see [Minting tokens](#minting-tokens)).
+- **Every page load fails on the certificate.** The entrypoint passes `-Dallow.insecure.certs=true`, but
+  jitsi-meet-torture reads a property named `allowInsecureCerts`, so the flag has no effect. The target
+  needs a certificate that Chrome trusts; only `localhost` is exempt. In an invocation you control,
+  `-DallowInsecureCerts=true` is the property jitsi-meet-torture reads.
+- **The bots join, then the bridge disappears.** The scaler scaled it down because no event needed it.
+  See [Bridges that stay up for the whole run](../../docs/LOAD-TESTING.md#bridges-that-stay-up-for-the-whole-run).
+
+## Checklist
+
+Before a run:
+
+- [ ] A window with no event: nothing `LIVE`, nothing inside its pre-scale window, no `IDLE` room anyone
+  may wake and no instant call about to start.
+- [ ] The bridges will stay up for the whole run: scaler paused and bridge count set by hand, or an event
+  kept `LIVE`.
+- [ ] For full-media runs, the prejoin page is off on the target, and `config.js` confirms it.
+- [ ] At least three bots, and `DURATION` well above `PARTICIPANTS`.
+- [ ] Nobody else in a call on the installation.
+- [ ] The generator has free memory for every browser, an idle CPU, and no leftover containers
+  (`podman ps`).
+- [ ] A place for the results: the reports mount and the `/colibri/stats` samples.
+
+After a run:
+
+- [ ] `ENABLE_PREJOIN_PAGE` removed from the Jitsi web Deployment, together with
+  `ENABLE_LOAD_TEST_CLIENT` and any load-test client you installed, and the rollout finished.
+- [ ] Scaler resumed and bridge count restored, as the scaler page describes.
+- [ ] `JITSI_JWT_SECRET` unset, and any saved log or file that contains a token deleted or kept private.
+- [ ] Results recorded with the metadata listed in
+  [Publishing results](../../docs/LOAD-TESTING.md#publishing-results), including when the image was
+  built.
