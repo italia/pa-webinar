@@ -51,7 +51,7 @@ spec:
           {{- end }}
           containers:
             - name: scaler
-              image: {{ .Values.jvbScaler.image | default "bitnami/kubectl:latest" }}
+              image: {{ .Values.jvbScaler.image | default .Values.kubectlImage }}
               command:
                 - /bin/sh
                 - -c

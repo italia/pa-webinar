@@ -11,7 +11,15 @@
 #     -f values.yaml \
 #     -f values-production.yaml \
 #     -n videocall \
-#     --set jitsi-meet.prosody.auth.jwt.appSecret=$JITSI_JWT_SECRET
+#     --set jitsi-meet.prosody.jwt.secret=$JITSI_JWT_SECRET \
+#     -f <file with the pinned internal Jitsi passwords>
+#
+# The conference verifies the portal's tokens with the same value as
+# JITSI_JWT_SECRET in the application Secret. The internal XMPP passwords
+# (jitsi-meet.jicofo.xmpp.password, jitsi-meet.jvb.xmpp.password,
+# jitsi-meet.jibri.xmpp.password, jitsi-meet.jibri.recorder.password) are
+# generated once and passed on every upgrade: the chart refuses to render
+# without them (jitsi.requirePinnedCredentials below).
 # ─────────────────────────────────────────────────────────────
 
 app:
@@ -126,6 +134,7 @@ recorder:
 jitsi:
   enabled: true
   mode: full
+  requirePinnedCredentials: true
 
 jitsi-meet:
   publicURL: "https://jitsi.videocall.example.com"
@@ -138,14 +147,7 @@ jitsi-meet:
     - name: ghcr-secret
 
   prosody:
-    auth:
-      type: jwt
-      jwt:
-        appId: "pa_webinar"
-        appSecret: ""
-        acceptedIssuers: "pa-webinar"
-        acceptedAudiences: "jitsi"
-
+    # The JWT secret is passed at install time (see the header).
     extraEnvs:
       # Il bot recorder entra come `recorder@hidden.meet.jitsi` invece che col
       # JWT del portale: e' cosi' che jitsi-meet lo nasconde NATIVAMENTE (ogni
@@ -189,6 +191,9 @@ jitsi-meet:
 
   jvb:
     replicaCount: 0
+    # STUN stays on the default (a third-party server, jitsi.net). To drop
+    # it set `publicIPs` (one bridge behind a fixed IP) and `stunServers: ""`,
+    # or point `stunServers` to your own server (see values.yaml).
     nodeSelector:
       workload: jitsi-jvb
     tolerations:
@@ -246,8 +251,8 @@ jitsi-meet:
       pullPolicy: Always
     ingress:
       enabled: true
+      ingressClassName: nginx
       annotations:
-        kubernetes.io/ingress.class: nginx
         cert-manager.io/cluster-issuer: letsencrypt-prod
         nginx.ingress.kubernetes.io/server-snippet: |
           location = / { return 403; }
@@ -267,7 +272,7 @@ jitsi-meet:
 jvbScaler:
   enabled: true
   schedule: "*/2 * * * *"
-  image: bitnami/kubectl:1.29
+  # Image: the chart's pinned kubectlImage.
   jvbDeploymentName: ""  # Auto-detect by label
 
 # ── CronJobs ─────────────────────────────────────────────────

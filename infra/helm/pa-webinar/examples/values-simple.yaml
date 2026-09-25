@@ -4,10 +4,20 @@
 #
 # Deploy:
 #   helm upgrade --install videocall ./infra/helm/pa-webinar \
-#     -f examples/values-simple.yaml \
-#     -n videocall \
-#     --set postgresql.auth.password=<password> \
-#     --set app.env.NEXT_PUBLIC_APP_URL=https://your-domain.com
+#     -f infra/helm/pa-webinar/examples/values-simple.yaml \
+#     -n videocall --create-namespace \
+#     -f <file con i tuoi domini e i segreti qui sotto>
+#
+# Segreti da generare UNA volta e conservare, da ripassare identici a ogni
+# aggiornamento (in un file di valori tenuto fuori dal repository):
+#   secrets.generate: APP_SECRET, JITSI_JWT_SECRET, PII_ENCRYPTION_KEY,
+#     CRON_API_KEY, ADMIN_API_KEY (openssl rand -hex 32),
+#     POSTGRES_PASSWORD, POSTGRES_ADMIN_PASSWORD, REDIS_PASSWORD
+#   jitsi-meet.jicofo.xmpp.password, jitsi-meet.jvb.xmpp.password
+#     (openssl rand -hex 16): se cambiano, ogni aggiornamento riavvia la
+#     conferenza e fa cadere le chiamate in corso.
+# Domini: app.env.NEXT_PUBLIC_APP_URL, app.env.NEXT_PUBLIC_JITSI_DOMAIN,
+#   jitsi-meet.publicURL, gli host di ingress e jitsi-meet.web.ingress.
 #
 # Cosa include:
 #   - 1 replica dell'app (no autoscaling)
@@ -39,6 +49,8 @@ podDisruptionBudget:
 secrets:
   mode: "generate"
   existingSecretName: "videocall-secrets"
+  # Il segreto JWT della conferenza, reso dal chart da JITSI_JWT_SECRET.
+  jitsiJwtSecretName: "videocall-jitsi-jwt"
   # Password dei datastore in un Secret loro: il sottochart PostgreSQL monta
   # per intero, come file dentro il proprio container, il Secret da cui legge
   # la password, e le chiavi dell'applicazione non devono finire lì.
@@ -88,19 +100,46 @@ postgresql:
 jitsi:
   enabled: true
   mode: simple
+  # Con `true` la resa si ferma se le password XMPP interne qui sotto non sono
+  # fissate; senza, le note dopo l'installazione le elencano. Accendilo nel
+  # tuo file di valori insieme alle password.
+  requirePinnedCredentials: false
 
 jitsi-meet:
+  prosody:
+    jwt:
+      # Lo stesso nome di secrets.jitsiJwtSecretName: il Secret lo rende il
+      # chart da secrets.generate.JITSI_JWT_SECRET.
+      existingSecretName: "videocall-jitsi-jwt"
+  jicofo:
+    xmpp:
+      password: ""  # Set via --set, fissa (openssl rand -hex 16)
   jvb:
     replicaCount: 1  # Always 1, no autoscaling
     nodeSelector: {}  # Runs on any node
     tolerations: []
+    xmpp:
+      password: ""  # Set via --set, fissa (openssl rand -hex 16)
+    # STUN: resta quello predefinito (un server di terzi, jitsi.net), con cui
+    # il bridge scopre l'indirizzo pubblico del nodo. Per farne a meno indica
+    # l'indirizzo che i partecipanti raggiungono sulla porta UDP 10000 in
+    # `publicIPs: ["<ip>"]` (necessario su una VM con indirizzo privato e IP
+    # pubblico associato) e poi `stunServers: ""`, oppure un tuo server STUN
+    # in `stunServers: "<host>:<porta>"`. `stunServers: ""` senza `publicIPs`
+    # va bene solo se la scheda di rete del nodo ha l'indirizzo pubblico.
   jibri:
     enabled: false  # No recording in simple mode
 
 ingress:
   enabled: true
+  # `nginx` per ingress-nginx, `traefik` per il Traefik di k3s: con
+  # `traefik` il chart toglie le annotazioni di ingress-nginx (vedi
+  # ingress.nonNginxClassNames). Stessa scelta, e solo lì, in
+  # `jitsi-meet.web.ingress.ingressClassName`: niente annotazione
+  # `kubernetes.io/ingress.class`.
   className: nginx
-  # Minimal annotations — add TLS config for your environment
+  # `{}` non toglie le annotazioni predefinite (Helm fonde le mappe): per
+  # toglierne una la si imposta a null.
   annotations: {}
   hosts:
     - host: videocall.example.com

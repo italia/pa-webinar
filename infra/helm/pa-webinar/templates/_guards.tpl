@@ -87,3 +87,178 @@ niente di reso qui.
 {{- end -}}
 {{- end -}}
 {{- end -}}
+
+{{/*
+La conferenza deve poter verificare i token dell'applicazione.
+
+Con l'autenticazione a token Prosody accetta solo token firmati con il segreto
+che riceve, emessi da un issuer e per un'audience che conosce. Se manca uno dei
+tre, rifiuta ogni ingresso, e il portale mostra una sala che non si apre senza
+dire perche'. L'errore di resa lo dice prima dell'installazione.
+
+Il segreto arriva a Prosody come variabile JWT_APP_SECRET, e le strade valide
+sono piu' d'una: `jwt.secret` (il sottochart rende il Secret), `jwt.existingSecretName`
+(un Secret con quella chiave, creato a mano o reso da questo chart con
+`secrets.jitsiJwtSecretName`), una voce JWT_APP_SECRET in `prosody.extraSecrets`,
+un `prosody.extraEnvFrom` o il `releaseSecretsOverride` del sottochart, una
+variabile JWT_APP_SECRET in `prosody.extraEnvs` o in `extraCommonEnvs` (il
+sottochart la mette nel ConfigMap comune, che Prosody carica). Di
+`extraEnvFrom` e `releaseSecretsOverride` non si vede il contenuto: si accettano
+sulla fiducia, perche' rifiutarle bloccherebbe l'aggiornamento di installazioni
+che funzionano.
+
+Gli identificativi (AUTH_TYPE, JWT_APP_ID, JWT_ACCEPTED_ISSUERS,
+JWT_ACCEPTED_AUDIENCES) il chart li imposta in `prosody.extraEnvs`, che per
+Prosody vince su `extraCommonEnvs`: un valore diverso messo solo li' verrebbe
+ignorato in silenzio.
+*/}}
+{{- define "pa-webinar.validateJitsiJwt" -}}
+{{- if .Values.jitsi.enabled }}
+{{- $jm := index .Values "jitsi-meet" | default dict }}
+{{- $prosody := dig "prosody" dict $jm | default dict }}
+{{- $jwt := dig "jwt" dict $prosody | default dict }}
+{{- $envs := dig "extraEnvs" dict $prosody | default dict }}
+{{- $comuni := dig "extraCommonEnvs" dict $jm | default dict }}
+{{- range $chiave := list "AUTH_TYPE" "JWT_APP_ID" "JWT_ACCEPTED_ISSUERS" "JWT_ACCEPTED_AUDIENCES" }}
+{{- $locale := toString (index $envs $chiave | default "") }}
+{{- $comune := toString (index $comuni $chiave | default "") }}
+{{- if and $locale $comune (ne $locale $comune) }}
+{{- fail (printf "jitsi-meet.extraCommonEnvs.%s è %q ma Prosody riceve %q da jitsi-meet.prosody.extraEnvs.%s, che vince: il valore comune verrebbe ignorato senza errori, e con un issuer o un'audience diversi da quelli dell'applicazione nessuno entrerebbe in sala. Imposta il valore in jitsi-meet.prosody.extraEnvs.%s." $chiave $comune $locale $chiave $chiave) }}
+{{- end }}
+{{- end }}
+{{- $authType := lower (toString (index $envs "AUTH_TYPE" | default (index $comuni "AUTH_TYPE") | default "")) }}
+{{- if and (dig "enableAuth" false $jm) (eq $authType "jwt") }}
+{{- if and $jwt.secret $jwt.existingSecretName }}
+{{- fail (printf "jitsi-meet.prosody.jwt.secret e jitsi-meet.prosody.jwt.existingSecretName (%q) sono entrambi valorizzati: il sottochart usa il Secret indicato e ignora il segreto passato, senza dirlo. Tieni uno solo dei due: togli existingSecretName (anche se arriva da un file di valori di esempio) oppure il segreto." (toString $jwt.existingSecretName)) }}
+{{- end }}
+{{- $daExtraSecrets := false }}
+{{- range (dig "extraSecrets" list $prosody | default list) }}
+{{- if and (kindIs "map" .) (eq (toString (index . "name" | default "")) "JWT_APP_SECRET") }}
+{{- $daExtraSecrets = true }}
+{{- end }}
+{{- end }}
+{{- $daEnvFrom := not (empty (dig "extraEnvFrom" list $prosody)) }}
+{{- $override := false }}
+{{- range $globale := list (.Values.global | default dict) (dig "global" dict $jm | default dict) }}
+{{- $rso := dig "releaseSecretsOverride" dict $globale | default dict }}
+{{- if and (dig "enabled" false $rso) (not (empty (dig "extraEnvFrom" list $rso))) }}
+{{- $override = true }}
+{{- end }}
+{{- end }}
+{{- if not (or $jwt.secret $jwt.existingSecretName $daExtraSecrets $daEnvFrom $override (index $envs "JWT_APP_SECRET") (index $comuni "JWT_APP_SECRET")) }}
+{{- fail "jitsi-meet.enableAuth è attivo con AUTH_TYPE=jwt ma Prosody non ha il segreto per verificare i token: nessuno entrerebbe in sala. Indica jitsi-meet.prosody.jwt.secret con lo stesso valore di JITSI_JWT_SECRET, oppure jitsi-meet.prosody.jwt.existingSecretName con il nome di un Secret che ha la chiave JWT_APP_SECRET (in modalità \"generate\" o \"external\" lo rende il chart se secrets.jitsiJwtSecretName ha lo stesso nome), oppure una voce JWT_APP_SECRET in jitsi-meet.prosody.extraSecrets." }}
+{{- end }}
+{{- $reso := toString (.Values.secrets.jitsiJwtSecretName | default "") }}
+{{- if and $reso (has .Values.secrets.mode (list "generate" "external")) $jwt.existingSecretName (ne (toString $jwt.existingSecretName) $reso) }}
+{{- fail (printf "jitsi-meet.prosody.jwt.existingSecretName è %q ma il chart rende il segreto JWT con il nome di secrets.jitsiJwtSecretName (%q): Prosody leggerebbe un altro Secret. Allinea i due valori, oppure svuota secrets.jitsiJwtSecretName se il Secret %q lo crei tu." (toString $jwt.existingSecretName) $reso (toString $jwt.existingSecretName)) }}
+{{- end }}
+{{- if eq .Values.secrets.mode "generate" }}
+{{- $gen := .Values.secrets.generate | default dict }}
+{{- range $coppia := list (list "JITSI_JWT_ISSUER" "JWT_ACCEPTED_ISSUERS") (list "JITSI_JWT_AUDIENCE" "JWT_ACCEPTED_AUDIENCES") }}
+{{- $app := toString (index $gen (index $coppia 0) | default "") }}
+{{- $accettati := toString (index $envs (index $coppia 1) | default (index $comuni (index $coppia 1)) | default "") }}
+{{- $lista := list }}
+{{- range (splitList "," $accettati) }}
+{{- $lista = append $lista (trim .) }}
+{{- end }}
+{{- if and $app $accettati (not (has $app $lista)) (not (has "*" $lista)) }}
+{{- fail (printf "secrets.generate.%s è %q ma Prosody accetta solo %q (jitsi-meet.prosody.extraEnvs.%s): rifiuterebbe ogni token dell'applicazione e nessuno entrerebbe in sala. Allinea i due valori." (index $coppia 0) $app $accettati (index $coppia 1)) }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end -}}
+
+{{/*
+Credenziali interne della conferenza lasciate al caso.
+
+Il sottochart genera con `randAlphaNum`, a ogni resa, ogni password XMPP interna
+(Jicofo, bridge, Jibri, bot di registrazione, jigasi) e il segreto statico di
+coturn che non ricevono un valore o un Secret esistente. I Secret cambiano a
+ogni `helm upgrade`, Prosody porta la loro impronta nel template del pod, e
+Prosody, Jicofo e il bridge ripartono: le conferenze in corso cadono, anche per
+un aggiornamento che non tocca la conferenza.
+
+Restituisce i percorsi dei valori non fissati, separati da virgola; vuoto se
+sono tutti fissati.
+*/}}
+{{- define "pa-webinar.jitsiUnpinnedCredentials" -}}
+{{- $jm := index .Values "jitsi-meet" | default dict -}}
+{{- $voci := list
+      (list true "jicofo" "xmpp" "password")
+      (list true "jvb" "xmpp" "password")
+      (list (dig "jibri" "enabled" false $jm) "jibri" "xmpp" "password")
+      (list (dig "jibri" "enabled" false $jm) "jibri" "recorder" "password")
+      (list (dig "coturn" "enabled" false $jm) "coturn" "staticAuth" "secret")
+      (list (or (dig "jigasi" "enabled" false $jm) (dig "transcriber" "enabled" false $jm)) "jigasi" "xmpp" "password")
+      (list (dig "transcriber" "enabled" false $jm) "transcriber" "xmpp" "password") -}}
+{{- $mancanti := list -}}
+{{- range $voce := $voci -}}
+{{- if index $voce 0 -}}
+{{- $blocco := dig (index $voce 1) (index $voce 2) dict $jm | default dict -}}
+{{- if not (or (index $blocco (index $voce 3)) (index $blocco "existingSecretName")) -}}
+{{- $mancanti = append $mancanti (printf "jitsi-meet.%s.%s.%s" (index $voce 1) (index $voce 2) (index $voce 3)) -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+{{- join ", " $mancanti -}}
+{{- end -}}
+
+{{/*
+Chi lo chiede (i profili di esempio lo fanno) vuole che quelle credenziali
+siano fissate: la resa si ferma, con l'elenco di cosa manca. Senza la richiesta
+il chart avvisa soltanto, nelle note dopo l'installazione, perche' fermare
+l'aggiornamento di un'installazione esistente sarebbe peggio del difetto.
+*/}}
+{{- define "pa-webinar.validateJitsiCredentials" -}}
+{{- if and .Values.jitsi.enabled (dig "requirePinnedCredentials" false (.Values.jitsi | default dict)) -}}
+{{- $mancanti := include "pa-webinar.jitsiUnpinnedCredentials" . -}}
+{{- if $mancanti -}}
+{{- fail (printf "Queste credenziali interne della conferenza non sono fissate: %s. Il sottochart le rigenera a caso a ogni resa, e ogni helm upgrade riavvierebbe Prosody, Jicofo e il bridge facendo cadere le conferenze in corso. Generale una volta (per esempio con openssl rand -hex 16), conservale con gli altri segreti e passale a ogni aggiornamento, oppure indica per ciascuna un Secret esistente con existingSecretName." $mancanti) -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Classe dell'Ingress e annotazione di classe devono coincidere.
+
+Il controller che serve un Ingress lo sceglie `spec.ingressClassName`;
+l'annotazione `kubernetes.io/ingress.class` e' la forma precedente. Se sono
+entrambe presenti e diverse, alla prima installazione l'API server rifiuta
+l'Ingress; in un aggiornamento lo accetta, e l'host passa in silenzio al
+controller della classe: se quel controller nel cluster non c'e', il portale o
+la conferenza smettono di rispondere. Succede a chi sceglie il controller con
+l'annotazione e lascia la classe predefinita (`nginx`). Qui diventa un errore
+di resa, con l'indicazione di cosa cambiare.
+
+Un'annotazione impostata a null senza un valore predefinito da togliere resta
+nel manifesto come null, che l'API server legge come stringa vuota: per la
+conferenza conta come diversa dalla classe. L'Ingress del portale invece le
+annotazioni a null non le rende.
+*/}}
+{{- define "pa-webinar.validateIngressClass" -}}
+{{- $casi := list -}}
+{{- if .Values.ingress.enabled -}}
+{{- $casi = append $casi (list "ingress.className" .Values.ingress.className "ingress.annotations" .Values.ingress.annotations false) -}}
+{{- end -}}
+{{- if .Values.jitsi.enabled -}}
+{{- $web := dig "web" "ingress" dict (index .Values "jitsi-meet" | default dict) | default dict -}}
+{{- if dig "enabled" false $web -}}
+{{- $casi = append $casi (list "jitsi-meet.web.ingress.ingressClassName" (index $web "ingressClassName") "jitsi-meet.web.ingress.annotations" (index $web "annotations") true) -}}
+{{- end -}}
+{{- $redirect := .Values.jitsi.webIngress | default dict -}}
+{{- if dig "redirectUrl" "" $redirect -}}
+{{- $casi = append $casi (list "jitsi.webIngress.ingressClassName" (index $redirect "ingressClassName") "jitsi.webIngress.annotations" (index $redirect "annotations") true) -}}
+{{- end -}}
+{{- end -}}
+{{- range $caso := $casi -}}
+{{- $classe := toString (index $caso 1 | default "") -}}
+{{- $ann := index $caso 3 | default dict -}}
+{{- $vecchia := index $ann "kubernetes.io/ingress.class" -}}
+{{- $conta := or (index $caso 4) (not (kindIs "invalid" $vecchia)) -}}
+{{- if and $classe (hasKey $ann "kubernetes.io/ingress.class") $conta (ne (ternary "" (toString $vecchia) (kindIs "invalid" $vecchia)) $classe) -}}
+{{- fail (printf "%s è %q ma %s.kubernetes.io/ingress.class è %q. Il controller lo sceglie la classe: l'host passerebbe al controller %q, e se nel cluster non c'è smetterebbe di rispondere; a una nuova installazione l'API server rifiuta l'Ingress. Indica il controller solo nella classe (%s=%s) e togli l'annotazione kubernetes.io/ingress.class dal tuo file di valori." (index $caso 0) $classe (index $caso 2) (ternary "" (toString $vecchia) (kindIs "invalid" $vecchia)) $classe (index $caso 0) (ternary "<classe>" (toString $vecchia) (kindIs "invalid" $vecchia))) -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}

@@ -61,7 +61,7 @@ spec:
           {{- end }}
           containers:
             - name: orchestrator
-              image: {{ .Values.postprod.orchestrator.image | default "bitnami/kubectl:latest" }}
+              image: {{ .Values.postprod.orchestrator.image | default .Values.kubectlImage }}
               command:
                 - /bin/sh
                 - -c

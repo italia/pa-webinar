@@ -176,3 +176,62 @@ podFailurePolicy:
         - type: DisruptionTarget
           status: "True"
 {{- end }}
+
+{{/*
+Versione dell'API di External Secrets Operator per SecretStore ed ExternalSecret.
+
+`secrets.external.apiVersion` la impone. Vuoto = quella che il cluster serve:
+`v1` dove c'e' (l'operatore la introduce con la 0.16 e le versioni successive
+smettono di servire `v1beta1`), `v1beta1` solo dove il cluster serve soltanto
+quella. Senza un cluster da interrogare (`helm template`) vale `v1`.
+*/}}
+{{- define "pa-webinar.externalSecretsApiVersion" -}}
+{{- $scelta := dig "apiVersion" "" (.Values.secrets.external | default dict) -}}
+{{- if $scelta -}}
+{{- $scelta -}}
+{{- else if .Capabilities.APIVersions.Has "external-secrets.io/v1/ExternalSecret" -}}
+external-secrets.io/v1
+{{- else if .Capabilities.APIVersions.Has "external-secrets.io/v1beta1/ExternalSecret" -}}
+external-secrets.io/v1beta1
+{{- else -}}
+external-secrets.io/v1
+{{- end -}}
+{{- end }}
+
+{{/*
+Il Service del sottochart espone l'API REST del bridge (porta 8080, dove
+risponde /colibri/stats)?
+
+Il sottochart rende un Service per il bridge solo senza hostPort e senza
+hostNetwork, e la porta 8080 solo se la si aggiunge in `jvb.service.extraPorts`.
+Restituisce "true" oppure niente.
+*/}}
+{{- define "pa-webinar.jvbRestFromSubchart" -}}
+{{- $jvb := dig "jvb" dict (index .Values "jitsi-meet" | default dict) | default dict -}}
+{{- $svc := dig "service" dict $jvb | default dict -}}
+{{- $porta := false -}}
+{{- range (dig "extraPorts" list $svc | default list) -}}
+{{- if and (kindIs "map" .) (eq (toString (index . "port" | default "")) "8080") -}}
+{{- $porta = true -}}
+{{- end -}}
+{{- end -}}
+{{- if and (dig "enabled" false $svc) (not (dig "useHostPort" false $jvb)) (not (dig "useHostNetwork" false $jvb)) $porta -}}
+true
+{{- end -}}
+{{- end }}
+
+{{/*
+Indirizzo con cui l'applicazione legge le statistiche del bridge
+(JVB_HEALTH_URL): `jitsi.jvbHealthUrl` se indicato, altrimenti il Service del
+sottochart quando espone la porta 8080, altrimenti il Service che questo chart
+rende apposta (templates/jvb-rest-service.yaml).
+*/}}
+{{- define "pa-webinar.jvbHealthUrl" -}}
+{{- if .Values.jitsi.jvbHealthUrl -}}
+{{- .Values.jitsi.jvbHealthUrl -}}
+{{- else if include "pa-webinar.jvbRestFromSubchart" . -}}
+{{- printf "http://%s-jitsi-meet-jvb:8080" .Release.Name -}}
+{{- else -}}
+{{- printf "http://%s-jvb-rest:8080" (include "pa-webinar.fullname" .) -}}
+{{- end -}}
+{{- end }}

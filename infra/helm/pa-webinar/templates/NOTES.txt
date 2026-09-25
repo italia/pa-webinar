@@ -60,6 +60,44 @@
   Connessione a Jitsi esterno: {{ .Values.jitsi.external.domain }}
   Verifica che JITSI_JWT_SECRET sia configurato nel Secret "{{ include "pa-webinar.secretName" . }}".
 {{- end }}
+{{- $avvisi := list }}
+{{- $segnaposto := list }}
+{{- range $chiave, $valore := .Values.app.env }}
+{{- if contains "example.com" (toString $valore) }}
+{{- $segnaposto = append $segnaposto (printf "app.env.%s" $chiave) }}
+{{- end }}
+{{- end }}
+{{- if .Values.jitsi.enabled }}
+{{- $jm := index .Values "jitsi-meet" | default dict }}
+{{- if contains "example.com" (toString (dig "publicURL" "" $jm)) }}
+{{- $segnaposto = append $segnaposto "jitsi-meet.publicURL" }}
+{{- end }}
+{{- $mancanti := include "pa-webinar.jitsiUnpinnedCredentials" . }}
+{{- if $mancanti }}
+{{- $avvisi = append $avvisi (printf "Credenziali interne della conferenza non fissate: %s. Il sottochart le rigenera a ogni resa: ogni helm upgrade riavvia Prosody, Jicofo e il bridge e fa cadere le conferenze in corso. Generale una volta, conservale e passale a ogni aggiornamento (jitsi.requirePinnedCredentials=true lo pretende)." $mancanti) }}
+{{- end }}
+{{- $stun := toString (dig "jvb" "stunServers" "" $jm | default "") }}
+{{- $stunInterno := and (dig "turnHost" "" $jm) (dig "coturn" "enabled" false $jm) (dig "jvb" "useInternalStun" false $jm) }}
+{{- if and (contains "jitsi.net" $stun) (not $stunInterno) }}
+{{- $avvisi = append $avvisi (printf "Il bridge scopre il proprio indirizzo pubblico con un server STUN di terzi (%s). Imposta jitsi-meet.jvb.stunServers a \"\" se l'indirizzo annunciato è già quello giusto (publicIPs, oppure useNodeIP su un nodo con indirizzo pubblico sulla scheda di rete), o indica un tuo server." $stun) }}
+{{- end }}
+{{- if and (not $stun) (not $stunInterno) (empty (dig "jvb" "publicIPs" list $jm)) }}
+{{- $avvisi = append $avvisi "Il bridge non usa STUN e non ha publicIPs: annuncia l'indirizzo del nodo (useNodeIP) o del pod. Se è un indirizzo privato dietro NAT, chi è fuori dalla rete entra in sala ma non sente e non vede nessuno. Indica jitsi-meet.jvb.publicIPs o un server STUN in jitsi-meet.jvb.stunServers." }}
+{{- end }}
+{{- if and .Values.jitsi.webIngress.redirectUrl (has (toString .Values.jitsi.webIngress.ingressClassName) (dig "nonNginxClassNames" list (.Values.ingress | default dict))) }}
+{{- $avvisi = append $avvisi (printf "jitsi.webIngress.redirectUrl usa un'annotazione di ingress-nginx: con la classe %q il reindirizzamento dalla radice della conferenza non avviene." (toString .Values.jitsi.webIngress.ingressClassName)) }}
+{{- end }}
+{{- end }}
+{{- if $segnaposto }}
+{{- $avvisi = append $avvisi (printf "Valori ancora di esempio (example.com): %s. Il portale genererebbe link e inviti verso un dominio che non è il tuo." (join ", " $segnaposto)) }}
+{{- end }}
+{{- if $avvisi }}
+
+─── Da controllare ───────────────────────────────────────────
+{{- range $avvisi }}
+  - {{ wrapWith 64 "\n    " . }}
+{{- end }}
+{{- end }}
 
 ─── Prossimi passi ───────────────────────────────────────────
 {{- if eq (default "existing" .Values.secrets.mode) "existing" }}

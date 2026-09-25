@@ -5,8 +5,19 @@
 # Deploy:
 #   kubectl create namespace videocall
 #   kubectl create secret generic videocall-secrets -n videocall --from-literal=...
+#   # Il segreto con cui la conferenza verifica i token: la sola chiave
+#   # JWT_APP_SECRET, con lo stesso valore di JITSI_JWT_SECRET qui sopra.
+#   kubectl create secret generic videocall-jitsi-jwt -n videocall \
+#     --from-literal=JWT_APP_SECRET=<stesso valore di JITSI_JWT_SECRET>
 #   helm upgrade --install videocall ./infra/helm/pa-webinar \
-#     -f examples/values-standard.yaml -n videocall
+#     -f infra/helm/pa-webinar/examples/values-standard.yaml -n videocall \
+#     -f <file con i tuoi domini e le password XMPP qui sotto>
+#
+# Password XMPP interne da generare UNA volta (openssl rand -hex 16) e
+# ripassare identiche a ogni aggiornamento: jitsi-meet.jicofo.xmpp.password,
+# jitsi-meet.jvb.xmpp.password, jitsi-meet.jibri.xmpp.password,
+# jitsi-meet.jibri.recorder.password. Se cambiano, ogni aggiornamento
+# riavvia la conferenza e fa cadere le chiamate in corso.
 #
 # Cosa include:
 #   - 2 repliche dell'app con HPA (2-4)
@@ -54,15 +65,36 @@ postgresql:
 jitsi:
   enabled: true
   mode: standard
+  # Con `true` la resa si ferma se le password XMPP interne qui sotto non sono
+  # fissate; senza, le note dopo l'installazione le elencano. Accendilo nel
+  # tuo file di valori insieme alle password.
+  requirePinnedCredentials: false
 
 jitsi-meet:
+  prosody:
+    jwt:
+      # Secret creato insieme a videocall-secrets (vedi sopra), con la sola
+      # chiave JWT_APP_SECRET = stesso valore di JITSI_JWT_SECRET.
+      existingSecretName: "videocall-jitsi-jwt"
+  jicofo:
+    xmpp:
+      password: ""  # Set via --set, fissa
   jvb:
     replicaCount: 1
     nodeSelector: {}
     tolerations: []
+    xmpp:
+      password: ""  # Set via --set, fissa
+    # STUN: resta quello predefinito (jitsi.net). Per farne a meno indica
+    # `publicIPs` e poi `stunServers: ""`, oppure un tuo server STUN in
+    # `stunServers` (vedi values.yaml).
   jibri:
     enabled: true
     replicaCount: 1
+    xmpp:
+      password: ""  # Set via --set, fissa
+    recorder:
+      password: ""  # Set via --set, fissa
 
 ingress:
   enabled: true

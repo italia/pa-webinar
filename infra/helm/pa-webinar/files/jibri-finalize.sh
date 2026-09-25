@@ -11,7 +11,7 @@
 #   6. Clean up the local recording directory.
 #
 # Required environment (set via jibri.extraEnvs in Helm values):
-#   APP_INTERNAL_URL — e.g. http://videocall-test-pa-webinar:3000
+#   APP_INTERNAL_URL — e.g. http://<fullname>:3000 (the app Service rendered by the chart)
 #   CRON_API_KEY     — shared secret for the internal endpoint + webhook
 #
 # Arguments:

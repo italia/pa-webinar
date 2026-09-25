@@ -47,6 +47,10 @@ fi
 
 # Segreti fittizi, della forma giusta: le guardie dell'applicazione rifiutano i
 # valori che sembrano segnaposto, quindi non possono essere stringhe qualsiasi.
+# Le password XMPP interne della conferenza sono fissate come farebbe chi
+# installa: values-production.yaml (jitsi.requirePinnedCredentials) si rifiuta
+# di rendere senza, gli altri profili le elencherebbero nelle note come da
+# controllare.
 comuni=(
   --set "secrets.generate.APP_SECRET=$(openssl rand -hex 32)"
   --set "secrets.generate.JITSI_JWT_SECRET=$(openssl rand -hex 32)"
@@ -56,19 +60,70 @@ comuni=(
   --set "secrets.generate.POSTGRES_PASSWORD=$(openssl rand -hex 24)"
   --set "secrets.generate.POSTGRES_ADMIN_PASSWORD=$(openssl rand -hex 24)"
   --set "secrets.generate.REDIS_PASSWORD=$(openssl rand -hex 24)"
+  --set "jitsi-meet.jicofo.xmpp.password=$(openssl rand -hex 16)"
+  --set "jitsi-meet.jvb.xmpp.password=$(openssl rand -hex 16)"
+  --set "jitsi-meet.jibri.xmpp.password=$(openssl rand -hex 16)"
+  --set "jitsi-meet.jibri.recorder.password=$(openssl rand -hex 16)"
 )
+segreto_jwt="$(openssl rand -hex 32)"
 
+# nome:file di valori. I profili con un suffisso aggiungono gli argomenti di
+# `argomenti_profilo`: la NetworkPolicy accesa, un controller diverso da
+# ingress-nginx, Jitsi esterno, i segreti da External Secrets.
 profili=(
   "predefinito:"
   "semplice:$CHART/examples/values-simple.yaml"
   "standard:$CHART/examples/values-standard.yaml"
   "completo:$CHART/examples/values-full.yaml"
   "produzione:$CHART/values-production.yaml"
+  "produzione-generica:$CHART/values-prod.yaml"
   "sviluppo:$CHART/values-dev.yaml"
+  "semplice-rete:$CHART/examples/values-simple.yaml"
+  "semplice-traefik:$CHART/examples/values-simple.yaml"
+  "produzione-rete:$CHART/values-production.yaml"
+  "completo-segreti-esterni:$CHART/examples/values-full.yaml"
+  "jitsi-esterno:"
 )
 
+argomenti_profilo() {
+  case "$1" in
+    # I valori predefiniti e questi file non dicono dove sta il segreto JWT
+    # della conferenza, e il chart giustamente si rifiuta di rendere: qui lo
+    # si passa come fa chi installa.
+    predefinito|produzione|produzione-generica|sviluppo|produzione-rete)
+      printf '%s\n' --set "jitsi-meet.prosody.jwt.secret=$segreto_jwt" ;;
+  esac
+  case "$1" in
+    *-rete|semplice-traefik) printf '%s\n' --set networkPolicy.enabled=true ;;
+  esac
+  case "$1" in
+    semplice-traefik)
+      printf '%s\n' \
+        --set ingress.className=traefik \
+        --set jitsi-meet.web.ingress.ingressClassName=traefik \
+        --set 'networkPolicy.ingress.fromNamespaceSelectors[0].kubernetes\.io/metadata\.name=kube-system' ;;
+    completo-segreti-esterni)
+      printf '%s\n' \
+        --set secrets.mode=external \
+        --set secrets.jitsiJwtSecretName=videocall-jitsi-jwt ;;
+    jitsi-esterno)
+      printf '%s\n' --set jitsi.enabled=false ;;
+  esac
+}
+
 echo "helm lint"
-helm lint "$CHART" >/dev/null || errore "helm lint fallisce"
+# Con i soli valori predefiniti la resa si ferma alla guardia sul segreto JWT
+# della conferenza, e il lint non guarderebbe gli altri template.
+helm lint "$CHART" --set "jitsi-meet.prosody.jwt.secret=$segreto_jwt" >/dev/null 2>"$OUT/lint.err" \
+  || errore "helm lint fallisce: $(head -3 "$OUT/lint.err" | tr '\n' ' ')"
+# Una guardia che scatta durante il lint non lo fa fallire: Helm la registra
+# come messaggio informativo e esce con 0. Il testo cambia fra le versioni
+# (Helm 3: `[INFO] Fail: …`, Helm 4: `funcMap fail`), quindi si cercano
+# entrambi.
+guardia_lint='\[INFO\] Fail:|funcMap fail'
+if grep -qE "$guardia_lint" "$OUT/lint.err"; then
+  errore "helm lint si ferma a una guardia: $(grep -m1 -E "$guardia_lint" "$OUT/lint.err" | cut -c1-200)"
+fi
 
 for voce in "${profili[@]}"; do
   nome="${voce%%:*}"
@@ -77,6 +132,8 @@ for voce in "${profili[@]}"; do
 
   args=(template videocall "$CHART" -n videocall "${comuni[@]}")
   [ -n "$file" ] && args+=(-f "$file")
+  mapfile -t extra < <(argomenti_profilo "$nome")
+  [ "${#extra[@]}" -gt 0 ] && args+=("${extra[@]}")
 
   echo "profilo: $nome"
   if ! helm "${args[@]}" >"$reso" 2>"$OUT/$nome.err"; then
@@ -223,6 +280,157 @@ PY
   while read -r problema; do
     [ -n "$problema" ] && errore "$problema"
   done <"$OUT/$nome.sec"
+
+  # Invarianti che si vedono solo su un cluster, con un controller diverso da
+  # ingress-nginx o con la NetworkPolicy accesa: qui si riproducono sui
+  # manifesti resi.
+  if ! python3 - "$reso" "$CHART/values.yaml" >"$OUT/$nome.net" 2>"$OUT/$nome.net.err" <<'PY'
+import re
+import sys
+
+import yaml
+
+docs = [d for d in yaml.safe_load_all(open(sys.argv[1])) if d]
+# Le classi che il chart tratta come controller diversi da ingress-nginx.
+altri_controller = set((yaml.safe_load(open(sys.argv[2])).get("ingress") or {}).get("nonNginxClassNames") or [])
+
+
+def modelli():
+    """(tipo, nome, modello di pod) di ogni carico di lavoro reso."""
+    for d in docs:
+        tipo, spec = d.get("kind"), d.get("spec") or {}
+        if tipo in ("Deployment", "StatefulSet", "DaemonSet", "Job"):
+            yield tipo, d["metadata"]["name"], spec.get("template") or {}
+        elif tipo == "CronJob":
+            job = (spec.get("jobTemplate") or {}).get("spec") or {}
+            yield tipo, d["metadata"]["name"], job.get("template") or {}
+
+
+def etichette(modello):
+    return (modello.get("metadata") or {}).get("labels") or {}
+
+
+def seleziona(selettore, et):
+    for k, v in (selettore.get("matchLabels") or {}).items():
+        if str(et.get(k)) != str(v):
+            return False
+    for e in selettore.get("matchExpressions") or []:
+        k, op, valori = e["key"], e["operator"], e.get("values") or []
+        if op == "In" and et.get(k) not in valori:
+            return False
+        if op == "NotIn" and et.get(k) in valori:
+            return False
+        if op == "Exists" and k not in et:
+            return False
+        if op == "DoesNotExist" and k in et:
+            return False
+    return True
+
+
+def ammette(regola, et, porta):
+    """La regola di ingresso lascia passare un pod dello stesso namespace?"""
+    porte = regola.get("ports")
+    if porte and not any(p.get("port") in (porta, "http") for p in porte):
+        return False
+    fonti = regola.get("from")
+    if not fonti:
+        return True
+    for f in fonti:
+        if f.get("namespaceSelector") or "ipBlock" in f:
+            continue
+        if "podSelector" in f and seleziona(f["podSelector"] or {}, et):
+            return True
+    return False
+
+
+carichi = list(modelli())
+deployment = {n for t, n, _ in carichi if t == "Deployment"}
+servizi = {d["metadata"]["name"] for d in docs if d.get("kind") == "Service"}
+
+# Ingress: l'API server rifiuta un Ingress la cui annotazione di classe non
+# coincide con ingressClassName, e un controller che non è ingress-nginx
+# ignora in silenzio le annotazioni di ingress-nginx.
+for d in docs:
+    if d.get("kind") != "Ingress":
+        continue
+    nome = d["metadata"]["name"]
+    classe = (d.get("spec") or {}).get("ingressClassName")
+    ann = d["metadata"].get("annotations") or {}
+    legacy = ann.get("kubernetes.io/ingress.class")
+    if classe and legacy is not None and legacy != classe:
+        print(f"l'Ingress {nome} ha classe {classe!r} e annotazione di classe {legacy!r}: l'API server lo rifiuta")
+    if classe in altri_controller and any(k.startswith("nginx.ingress.kubernetes.io/") for k in ann):
+        print(f"l'Ingress {nome} ha classe {classe!r} ma annotazioni di ingress-nginx, che non avrebbero effetto")
+
+# NetworkPolicy del chart: deve selezionare il Deployment dell'applicazione e
+# solo quello (gli altri pod parlano con l'API server, i bridge, la GPU), e
+# lasciar entrare sulla porta 3000 ogni CronJob e Jibri, che a fine
+# registrazione chiama l'applicazione.
+for pol in docs:
+    if pol.get("kind") != "NetworkPolicy":
+        continue
+    if not str((pol["metadata"].get("labels") or {}).get("helm.sh/chart", "")).startswith("pa-webinar-"):
+        continue
+    nome = pol["metadata"]["name"]
+    spec = pol.get("spec") or {}
+    selettore = spec.get("podSelector") or {}
+    if not any(t == "Deployment" and n == nome and seleziona(selettore, etichette(m)) for t, n, m in carichi):
+        print(f"la NetworkPolicy {nome} non seleziona il Deployment dell'applicazione, che resterebbe senza restrizioni")
+    for tipo, n, modello in carichi:
+        if seleziona(selettore, etichette(modello)) and not (tipo == "Deployment" and n == nome):
+            print(f"la NetworkPolicy {nome} seleziona anche {tipo}/{n}, di cui non descrive il traffico")
+    istanza = (selettore.get("matchLabels") or {}).get("app.kubernetes.io/instance")
+    della_release = {"matchLabels": {k: v for k, v in (selettore.get("matchLabels") or {}).items()
+                                     if k != "app.kubernetes.io/component"}}
+    for tipo, n, modello in carichi:
+        et = etichette(modello)
+        cron = tipo == "CronJob" and seleziona(della_release, et)
+        jibri = et.get("app.kubernetes.io/component") == "jibri" and et.get("app.kubernetes.io/instance") == istanza
+        if not (cron or jibri):
+            continue
+        if not any(ammette(r, et, 3000) for r in spec.get("ingress") or []):
+            print(f"{tipo}/{n} non raggiungerebbe l'applicazione: la NetworkPolicy {nome} non lo ammette sulla porta 3000")
+
+# Lo scaler dei bridge con un nome esplicito deve trovare quel Deployment:
+# altrimenti legge zero repliche, `kubectl scale` fallisce e con
+# `replicaCount: 0` nessun bridge parte mai.
+for tipo, n, modello in carichi:
+    if tipo != "CronJob":
+        continue
+    for c in (modello.get("spec") or {}).get("containers") or []:
+        testo = " ".join(str(x) for x in (c.get("command") or []) + (c.get("args") or []))
+        trovato = re.search(r'JVB_DEPLOY="([^"$]+)"', testo)
+        if trovato and trovato.group(1) not in deployment:
+            print(f"lo scaler cerca il Deployment {trovato.group(1)!r}, che non è reso")
+
+# Le statistiche del bridge: l'indirizzo deve essere un Service reso.
+for tipo, n, modello in carichi:
+    if tipo != "Deployment":
+        continue
+    for c in (modello.get("spec") or {}).get("containers") or []:
+        for e in c.get("env") or []:
+            if e.get("name") != "JVB_HEALTH_URL":
+                continue
+            trovato = re.match(r"https?://([^:/]+)", str(e.get("value", "")))
+            if trovato and "." not in trovato.group(1) and trovato.group(1) not in servizi:
+                print(f"JVB_HEALTH_URL punta all'host {trovato.group(1)!r}, che non è un Service reso")
+
+# Bitnami pubblica nel registro pubblico solo `latest`, che cambia contenuto:
+# un tag con la versione non esiste (ImagePullBackOff), e `latest` senza
+# digest porta un nodo nuovo su una versione diversa dagli altri.
+for tipo, n, modello in carichi:
+    spec = modello.get("spec") or {}
+    for c in (spec.get("containers") or []) + (spec.get("initContainers") or []):
+        immagine = str(c.get("image", ""))
+        if re.search(r"(^|/)bitnami/", immagine) and "@sha256:" not in immagine:
+            print(f"{tipo}/{n}: l'immagine {immagine} non è fissata per digest")
+PY
+  then
+    errore "controllo di rete e immagini non eseguito su $nome: $(head -3 "$OUT/$nome.net.err" | tr '\n' ' ')"
+  fi
+  while read -r problema; do
+    [ -n "$problema" ] && errore "$problema"
+  done <"$OUT/$nome.net"
 
   # Un nome di risorsa oltre i 63 caratteri viene rifiutato all'apply.
   while read -r n; do

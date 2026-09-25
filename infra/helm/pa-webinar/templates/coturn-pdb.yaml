@@ -1,5 +1,5 @@
 {{- if .Values.coturnPodDisruptionBudget.enabled }}
-{{- if index .Values "jitsi-meet" "coturn" "enabled" }}
+{{- if and .Values.jitsi.enabled (dig "coturn" "enabled" false (index .Values "jitsi-meet" | default dict)) }}
 # PodDisruptionBudget per coturn (media relay TURN/TURNS del subchart jitsi-meet).
 # Il subchart non espone un PDB: lo aggiungiamo qui selezionando i pod coturn per label.
 # Protegge lo SPOF del media plane da disruption volontarie (node drain / eviction API)

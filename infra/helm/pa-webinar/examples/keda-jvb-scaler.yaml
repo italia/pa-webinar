@@ -21,7 +21,10 @@ spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: videocall-jitsi-meet-jvb  # Adjust to match actual JVB deployment name
+    # The subchart names it <release>-jitsi-meet-jvb-0 (one Deployment per
+    # port of the range: -0, -1, …). Check with
+    #   kubectl get deploy -l app.kubernetes.io/component=jvb
+    name: videocall-jitsi-meet-jvb-0
 
   # Scale to 0 when no events
   minReplicaCount: 0
