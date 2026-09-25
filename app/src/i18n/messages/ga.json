@@ -168,6 +168,12 @@
     "resendLink": "Seol an nasc rochtana arís",
     "resending": "Á sheoladh…",
     "resendSent": "Má tá an seoladh cláraithe, sheolamar an nasc rochtana chugaibh arís trí ríomhphost.",
+    "invitationOnly": "Tá an clárú curtha in áirithe do dhaoine a fuair cuireadh: úsáidigí an seoladh ríomhphoist lenar tugadh cuireadh daoibh. Gheobhaidh sibh an nasc isteach trí ríomhphost.",
+    "closed": "Níl an clárú don imeacht seo oscailte don phobal.",
+    "lostLink": "Cláraithe cheana? Faighigí bhur nasc pearsanta arís",
+    "lostLinkHelp": "Cuirigí isteach an seoladh ríomhphoist lenar chláraigh sibh: má tá sé cláraithe don imeacht seo, seolfaimid an nasc isteach chugaibh arís.",
+    "checkEmailTitle": "Seiceálaigí bhur ríomhphost",
+    "checkEmail": "Má tá an seoladh ar liosta na ndaoine a fuair cuireadh, gheobhaidh sibh ríomhphost go luath le bhur nasc pearsanta chun dul isteach sa seomra. Mura bhfuil sé agaibh, seiceálaigí an fillteán turscair.",
     "backToEvent": "Ar ais go dtí an t-imeacht",
     "organization": "Eagraíocht",
     "organizationPlaceholder": "m.sh. AGID, An Roinn Airgeadais, Bardas na Róimhe",
@@ -276,6 +282,7 @@
     "guestJoinSubtitle": "Téigh isteach san imeacht beo mar aoi",
     "guestJoinButton": "Téigh isteach mar aoi",
     "guestRedirectToRegister": "Níor thosaigh an t-imeacht fós. Cláraigh chun bhur nasc rochtana a fháil.",
+    "guestAccessDisabled": "Tá clárú ag teastáil don imeacht seo: níl sé indéanta dul isteach mar aoi.",
     "jibriUnavailable": "Taifeadadh gan a bheith ar fáil — Jibri gan chumrú",
     "endEventError": "Theip ar an imeacht a chríochnú. Bain triail eile as.",
     "jibriNotConfigured": "Taifeadadh gan chumrú sa bhonneagar",
@@ -1510,7 +1517,11 @@
         "faviconUrl": "URL favicon",
         "primaryColor": "Príomhdhath",
         "defaultTimezone": "Crios ama réamhshocraithe",
-        "defaultTimezoneHelp": "Úsáidtear le haghaidh taispeáint dátaí agus cruthú imeachtaí nua."
+        "defaultTimezoneHelp": "Úsáidtear le haghaidh taispeáint dátaí agus cruthú imeachtaí nua.",
+        "waitingRoomEngine": "Seomra feithimh (réamhshocrú an tsuímh)",
+        "waitingRoomEngineGame": "Físchluiche (forsheomra Phaser)",
+        "waitingRoomEngineClassic": "Clasaiceach (statach)",
+        "waitingRoomEngineHelp": "Mód réamhshocraithe an tseomra feithimh. Is féidir é a athrú d'imeacht ar leith agus, do chuairt amháin, leis an bparaiméadar {param} sa seoladh."
       },
       "watermark": {
         "title": "Saincheapadh físe",
@@ -1601,11 +1612,11 @@
       },
       "features": {
         "statusPageEnabled": "Leathanach stádais gníomhach",
-        "statusPageEnabledHelp": "Taispeáin leathanach stádas na seirbhíse",
+        "statusPageEnabledHelp": "Foilsíonn sé leathanach stádas na seirbhíse. Nuair atá sé múchta, níl an leathanach ann agus ní fheiceann ach riarthóirí a chuid sonraí.",
         "guestAccessEnabled": "Rochtain aonna gníomhach",
-        "guestAccessEnabledHelp": "Ceadaigh rochtain aonna ar imeachtaí beo",
+        "guestAccessEnabledHelp": "Is féidir le daoine nach bhfuil cláraithe dul isteach in imeachtaí atá ar siúl lena n-ainm amháin. Nuair atá sé múchta, ní féidir dul isteach in imeachtaí sceidealaithe ach le clárú nó le nasc modhnóra nó cainteora; fanann glaonna físe láithreacha oscailte d'aon duine a bhfuil an nasc aige.",
         "publicRegistrationEnabled": "Clárú poiblí gníomhach",
-        "publicRegistrationEnabledHelp": "Is féidir le duine ar bith imeachtaí a chruthú (má tá sé díchumasaithe, riarthóirí amháin)",
+        "publicRegistrationEnabledHelp": "Is féidir le duine ar bith clárú d'imeachtaí. Nuair atá sé múchta, ní féidir clárú ach le daoine atá ar liosta cuireadh an imeachta, agus ní sheoltar an nasc pearsanta isteach ach trí ríomhphost; leanann daoine atá cláraithe cheana agus naisc mhodhnóirí agus chainteoirí ag obair.",
         "calendarPublic": "Féilire poiblí",
         "calendarPublicHelp": "Foilsigh féilire na n-imeachtaí. Is féidir le cuairteoirí imeachtaí beartaithe a fheiceáil.",
         "parseTitleKicker": "Teidil le ciceálaí eagarthóireachta",
@@ -3461,7 +3472,9 @@
     "shortcutsF": "Lánscáileán",
     "shortcutsSpeed": "Laghdaigh nó méadaigh an luas",
     "captionsOn": "Fotheidil ar siúl",
-    "captionsOff": "Fotheidil múchta"
+    "captionsOff": "Fotheidil múchta",
+    "watchOnYouTube": "Féach ar an bhfíseán ar YouTube",
+    "externalSiteNote": "Osclaítear ar YouTube é, suíomh seachtrach a bhfuil a théarmaí úsáide agus a fhógra príobháideachais féin aige."
   },
   "postprod": {
     "loading": "Tras-scríbhinn á lódáil…",

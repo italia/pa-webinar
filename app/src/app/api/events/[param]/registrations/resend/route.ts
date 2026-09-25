@@ -6,6 +6,8 @@ import { hashEmail } from '@/lib/crypto/pii';
 import { sendConfirmationEmail } from '@/lib/email/confirmation';
 import { getPublicEnv } from '@/lib/env';
 import { localizedUrl } from '@/lib/utils/localized-url';
+import { registrationJoinUrl } from '@/lib/events/registration-link';
+import { getSettings } from '@/lib/settings';
 import { defaultLocale } from '@/i18n/config';
 import { linguaDaIntestazione, linguaPagina } from '@/lib/email/lingua';
 
@@ -68,17 +70,27 @@ export const POST = withErrorHandling(async (request, context) => {
       linguaPagina(typeof body.locale === 'string' ? body.locale : null) ??
       linguaDaIntestazione(request.headers.get('Accept-Language')) ??
       defaultLocale;
-    const joinUrl = localizedUrl(
+    // Con l'iscrizione pubblica spenta il link dell'email e' anche la prova
+    // d'identita' (lib/events/registration-link); gli eventi di calendario
+    // hanno comunque quello della sala.
+    const link = {
       baseUrl,
-      `/events/${slug}/live?token=${registration.accessToken}`,
+      slug,
+      eventId: event.id,
+      accessToken: registration.accessToken,
       locale,
-    );
+    };
+    const joinUrl = registrationJoinUrl({
+      ...link,
+      viaEmailEntry: !(await getSettings()).publicRegistrationEnabled,
+    });
     const eventPageUrl = localizedUrl(baseUrl, `/events/${slug}`, locale);
 
     await sendConfirmationEmail({
       registrationId: registration.id,
       locale,
       joinUrl,
+      calendarJoinUrl: registrationJoinUrl({ ...link, viaEmailEntry: false }),
       eventPageUrl,
     });
   }

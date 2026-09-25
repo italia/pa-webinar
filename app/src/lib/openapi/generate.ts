@@ -90,6 +90,10 @@ registry.registerPath({
   path: '/api/status',
   tags: ['Status'],
   summary: 'Public system status',
+  description:
+    'When the administration turns the status page off, callers other than an administrator ' +
+    'receive only the video bridge and recorder readiness the live room needs ' +
+    '(metrics.jvbStatus, jvbParticipants, jvbStale, jibriStatus).',
   responses: { 200: { description: 'System status with component health, metrics, upcoming events' } },
 });
 
@@ -98,7 +102,10 @@ registry.registerPath({
   path: '/api/status/infrastructure',
   tags: ['Status'],
   summary: 'Infrastructure map data',
-  responses: { 200: { description: 'Detailed infrastructure topology, service status, Prometheus data' } },
+  responses: {
+    200: { description: 'Detailed infrastructure topology, service status, Prometheus data' },
+    404: { description: 'Status page turned off by the administration (administrators still receive the data)' },
+  },
 });
 
 registry.registerPath({
@@ -107,7 +114,10 @@ registry.registerPath({
   tags: ['Status'],
   summary: 'Public Prometheus metric queries (predefined)',
   request: { query: z.object({ metric: z.enum(['uptime', 'responseTime', 'participants', 'conferences', 'stress']), hours: z.string().optional() }) },
-  responses: { 200: { description: 'Time series data' } },
+  responses: {
+    200: { description: 'Time series data' },
+    404: { description: 'Status page turned off by the administration (administrators still receive the data)' },
+  },
 });
 
 registry.registerPath({
@@ -182,7 +192,25 @@ registry.registerPath({
   tags: ['Registration'],
   summary: 'Register for an event',
   request: { params: z.object({ param: z.string() }), body: { content: { 'application/json': { schema: createRegistrationSchema } } } },
-  responses: { 201: { description: 'Registration created with access token and join URL' } },
+  responses: {
+    201: { description: 'Registration created with access token and join URL (public registration on)' },
+    202: { description: 'Public registration off: the same body ({ eventSlug, delivery: "email" }) for every address. An invited address is registered, and an already registered one gets its link again; either way the personal link goes only to that mailbox. No access token, join URL or access cookie in the response' },
+    409: { description: 'ALREADY_REGISTERED (public registration on only)' },
+  },
+});
+
+registry.registerPath({
+  method: 'get',
+  path: '/api/events/{param}/registrations/enter',
+  tags: ['Registration'],
+  summary: 'Personal link from the email when public registration is off',
+  request: {
+    params: z.object({ param: z.string() }),
+    query: z.object({ token: z.string(), sig: z.string(), lang: z.string().optional() }),
+  },
+  responses: {
+    303: { description: 'Redirect to the live page with the token. With a valid signature it also sets the event access cookie that binds the browser to the registration' },
+  },
 });
 
 registry.registerPath({
@@ -200,7 +228,10 @@ registry.registerPath({
   tags: ['Jitsi'],
   summary: 'Get Jitsi JWT for room join',
   request: { params: z.object({ param: z.string() }), body: { content: { 'application/json': { schema: jitsiTokenRequestSchema } } } },
-  responses: { 200: { description: 'JWT token, room name, display name, role' } },
+  responses: {
+    200: { description: 'JWT token, room name, display name, role' },
+    403: { description: 'Guest request refused: GUEST_ACCESS_DISABLED (guest access turned off, scheduled events only) or JOIN_PASSWORD_REQUIRED (password-protected event without the join grant cookie)' },
+  },
 });
 
 registry.registerPath({
@@ -283,6 +314,11 @@ registry.registerPath({
   path: '/api/events/{param}/materials',
   tags: ['Materials'],
   summary: 'List event materials',
+  description:
+    'Public callers receive the materials whose visibility matches the current phase of the event ' +
+    '(ALWAYS plus BEFORE, DURING or AFTER). A moderator token (Bearer) receives every material; ' +
+    'an admin session does not widen this list (the admin API lists everything). Only the list ' +
+    'is filtered: an uploaded file stays reachable at its URL.',
   request: { params: z.object({ param: z.string() }) },
   responses: { 200: { description: 'Materials array' } },
 });

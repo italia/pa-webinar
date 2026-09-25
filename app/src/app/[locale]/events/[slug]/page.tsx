@@ -6,6 +6,9 @@ import { getLocale } from 'next-intl/server';
 import { prisma } from '@/lib/db';
 import { eventAccessCookieName, verifyEventAccess } from '@/lib/event-session';
 import { isEventPageVisible } from '@/lib/events/visibility';
+import { guestAccessAllowed } from '@/lib/events/guest-window';
+import { registrationAccessFor } from '@/lib/events/registration-access';
+import { materialPhase, materialVisibilityWhere } from '@/lib/events/material-visibility';
 import { ensureEventRecap, type EventRecap } from '@/lib/events/recap';
 import EventDetailClient from '@/components/events/event-detail-client';
 import { appBaseUrl, getPublicEnv } from '@/lib/env';
@@ -129,6 +132,14 @@ export default async function EventDetailPage({
     cookieStore.get(eventAccessCookieName(event.id))?.value,
   ));
 
+  // Le due scelte dell'amministrazione che decidono i pulsanti della scheda:
+  // chi può iscriversi, e se in diretta si entra anche senza iscrizione.
+  const registrationAccess = await registrationAccessFor(
+    event.id,
+    settings.publicRegistrationEnabled,
+  );
+  const guestEntryOpen = guestAccessAllowed(event, settings.guestAccessEnabled);
+
   const title = getLocalized(event.title as LocalizedField, locale);
   const description = getLocalized(event.description as LocalizedField, locale);
   const baseUrl = getPublicEnv('NEXT_PUBLIC_APP_URL');
@@ -196,9 +207,15 @@ export default async function EventDetailPage({
 
     const [materialsRaw, questionsRaw, pollsRaw, feedbackAgg, feedbackDist] =
       await Promise.all([
+        // Vista del pubblico: la visibilità del singolo materiale
+        // (lib/events/material-visibility) vale anche qui, come nell'API della
+        // sala — un materiale «solo durante l'evento» non resta nell'archivio.
         event.postEventShowMaterials
           ? prisma.eventMaterial.findMany({
-              where: { eventId: event.id },
+              where: {
+                eventId: event.id,
+                ...materialVisibilityWhere(materialPhase(event)),
+              },
               orderBy: { createdAt: 'desc' },
             })
           : Promise.resolve([]),
@@ -328,6 +345,27 @@ export default async function EventDetailPage({
     }
   }
 
+  // Prima dell'inizio la scheda è l'unica superficie in cui il pubblico trova
+  // i materiali: in sala si entra solo in diretta, dove la fase è già
+  // «durante». Qui la vista del pubblico della fase «prima»: i materiali
+  // sempre visibili e quelli preparatori (lib/events/material-visibility).
+  // Dall'inizio in poi li elencano la sala e, a evento concluso, la scheda
+  // post-evento qui sopra.
+  if (materialPhase(event) === 'BEFORE') {
+    const preEventRaw = await prisma.eventMaterial.findMany({
+      where: { eventId: event.id, ...materialVisibilityWhere('BEFORE') },
+      orderBy: { createdAt: 'desc' },
+    });
+    eventMaterials = preEventRaw.map((m) => ({
+      id: m.id,
+      title: m.title,
+      url: m.url,
+      description: m.description,
+      addedBy: m.addedBy,
+      createdAt: m.createdAt.toISOString(),
+    }));
+  }
+
   const serialised = {
     id: event.id,
     slug: event.slug,
@@ -377,6 +415,8 @@ export default async function EventDetailPage({
         appUrl={appBaseUrl()?.href.replace(/\/$/, '') ?? ''}
         invalidToken={invalidToken}
         hasRoomAccess={hasRoomAccess}
+        registrationAccess={registrationAccess}
+        guestEntryOpen={guestEntryOpen}
         parseTitleKicker={resolveKickerEnabled(event, settings.parseTitleKicker)}
         answeredQuestions={answeredQuestions}
         materials={eventMaterials}

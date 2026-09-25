@@ -27,6 +27,8 @@ vi.mock('@/lib/cache', () => ({
 vi.mock('@/lib/live-state/publish', () => ({ pokeLivePanel: vi.fn() }));
 vi.mock('@/lib/events/join-grant', () => ({ hasJoinGrant: vi.fn(() => false) }));
 vi.mock('@/lib/crypto/pii', () => ({ tryDecryptPII: (v: string) => v }));
+const { siteSettings } = vi.hoisted(() => ({ siteSettings: { guestAccessEnabled: true } }));
+vi.mock('@/lib/settings', () => ({ getSettings: async () => siteSettings }));
 
 import { prisma } from '@/lib/db';
 
@@ -65,6 +67,7 @@ function get(headers: HeadersInit = {}): NextRequest {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  siteSettings.guestAccessEnabled = true;
   mockedEvent.mockResolvedValue({
     id: EVENT_ID,
     status: 'LIVE',
@@ -148,16 +151,87 @@ describe('GET /api/events/[slug]/questions — chi vede le domande', () => {
   it('un token che non risolve resta un 403', async () => {
     expect((await GET(get({ Authorization: 'Bearer SCADUTO' }), ctx())).status).toBe(403);
   });
+
+  it("con l'accesso ospiti spento un evento a calendario non si legge senza token", async () => {
+    siteSettings.guestAccessEnabled = false;
+    mockedEvent.mockResolvedValue({
+      id: EVENT_ID,
+      status: 'LIVE',
+      eventType: 'SCHEDULED',
+      moderatorToken: PRIMARY_TOKEN,
+      joinPasswordHash: null,
+      qaEnabled: true,
+    });
+    expect((await GET(get(), ctx())).status).toBe(401);
+    // Chi ha un token legge come prima.
+    expect((await GET(get({ Authorization: `Bearer ${PRIMARY_TOKEN}` }), ctx())).status).toBe(200);
+  });
 });
 
 describe('POST /api/events/[slug]/questions — chi puo\u2019 chiedere', () => {
-  function ask(body: Record<string, unknown>): NextRequest {
+  function ask(body: Record<string, unknown>, ip = '203.0.113.11'): NextRequest {
     return new Request(`https://webinar.gov.it/api/events/${SLUG}/questions`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-forwarded-for': '203.0.113.11' },
+      headers: { 'Content-Type': 'application/json', 'x-forwarded-for': ip },
       body: JSON.stringify(body),
     }) as unknown as NextRequest;
   }
+
+  function scheduled(status: string) {
+    mockedEvent.mockResolvedValue({
+      id: EVENT_ID,
+      status,
+      eventType: 'SCHEDULED',
+      moderatorToken: PRIMARY_TOKEN,
+      joinPasswordHash: null,
+      qaEnabled: true,
+    });
+  }
+
+  it('un ospite in sala chiede col solo nome', async () => {
+    scheduled('LIVE');
+    const res = await POST(
+      ask({ text: 'Una domanda da ospite', guestName: 'Ospite' }, '203.0.113.21'),
+      ctx(),
+    );
+    expect(res.status).toBe(201);
+  });
+
+  it('senza token, fuori dalla diretta non si chiede', async () => {
+    // Un ospite in sala non c'è prima dell'avvio né dopo la fine: una
+    // domanda anonima arriverebbe da chi alla sala non può entrare.
+    for (const [i, status] of ['PUBLISHED', 'ENDED'].entries()) {
+      scheduled(status);
+      const res = await POST(
+        ask({ text: 'Una domanda da ospite', guestName: 'Ospite' }, `203.0.113.3${i}`),
+        ctx(),
+      );
+      expect(res.status, status).toBe(401);
+    }
+    expect(mockedCreate).not.toHaveBeenCalled();
+  });
+
+  it("con l'accesso ospiti spento un evento a calendario non accetta domande anonime", async () => {
+    siteSettings.guestAccessEnabled = false;
+    scheduled('LIVE');
+    const res = await POST(
+      ask({ text: 'Una domanda da ospite', guestName: 'Ospite' }, '203.0.113.41'),
+      ctx(),
+    );
+    expect(res.status).toBe(401);
+    expect(mockedCreate).not.toHaveBeenCalled();
+  });
+
+  it("con l'accesso ospiti spento il relatore chiede come prima", async () => {
+    siteSettings.guestAccessEnabled = false;
+    scheduled('LIVE');
+    mockedGrant.mockResolvedValue({ eventId: EVENT_ID, revokedAt: null, name: 'Relatrice' });
+    const res = await POST(
+      ask({ text: 'Una domanda dal relatore', accessToken: 'TOKEN_RELATORE' }, '203.0.113.51'),
+      ctx(),
+    );
+    expect(res.status).toBe(201);
+  });
 
   it('il relatore fa una domanda col proprio grant, non con una registrazione', async () => {
     // Il pannello gli mostra il modulo; cercare quel token solo fra gli

@@ -168,6 +168,12 @@
     "resendLink": "Išsiųsti prieigos nuorodą dar kartą",
     "resending": "Siunčiama…",
     "resendSent": "Jei adresas užregistruotas, dar kartą išsiuntėme prieigos nuorodą el. paštu.",
+    "invitationOnly": "Registracija skirta tik pakviestiems asmenims: naudokite el. pašto adresą, kuriuo buvote pakviesti. Nuorodą prisijungti gausite el. paštu.",
+    "closed": "Registracija į šį renginį nėra vieša.",
+    "lostLink": "Jau užsiregistravote? Gaukite asmeninę nuorodą dar kartą",
+    "lostLinkHelp": "Įveskite el. pašto adresą, kuriuo registravotės: jei jis užregistruotas į šį renginį, dar kartą atsiųsime nuorodą prisijungti.",
+    "checkEmailTitle": "Patikrinkite el. paštą",
+    "checkEmail": "Jei adresas yra pakviestųjų sąraše, netrukus gausite el. laišką su asmenine nuoroda patekti į kambarį. Jei jo nerandate, patikrinkite brukalo aplanką.",
     "backToEvent": "Grįžti prie renginio",
     "organization": "Organizacija",
     "organizationPlaceholder": "pvz. AGID, Ekonomikos ministerija, Romos savivaldybė",
@@ -276,6 +282,7 @@
     "guestJoinSubtitle": "Prisijunkite prie vykstančio renginio kaip svečias",
     "guestJoinButton": "Prisijungti kaip svečias",
     "guestRedirectToRegister": "Renginys dar neprasidėjo. Užsiregistruokite, kad gautumėte prieigos nuorodą.",
+    "guestAccessDisabled": "Šiam renginiui reikia registracijos: prisijungti kaip svečias negalima.",
     "jibriUnavailable": "Įrašymas neprieinamas — Jibri nesukonfigūruotas",
     "endEventError": "Klaida užbaigiant renginį. Bandykite dar kartą.",
     "jibriNotConfigured": "Įrašymas nesukonfigūruotas infrastruktūroje",
@@ -1510,7 +1517,11 @@
         "faviconUrl": "Favicon URL adresas",
         "primaryColor": "Pagrindinė spalva",
         "defaultTimezone": "Numatytoji laiko juosta",
-        "defaultTimezoneHelp": "Naudojama datų rodymui ir naujų renginių kūrimui."
+        "defaultTimezoneHelp": "Naudojama datų rodymui ir naujų renginių kūrimui.",
+        "waitingRoomEngine": "Laukiamasis (svetainės numatytasis)",
+        "waitingRoomEngineGame": "Vaizdo žaidimas (Phaser fojė)",
+        "waitingRoomEngineClassic": "Klasikinis (statinis)",
+        "waitingRoomEngineHelp": "Numatytasis laukiamojo režimas. Jį galima pakeisti atskiram renginiui, o vienam apsilankymui – adreso parametru {param}."
       },
       "watermark": {
         "title": "Vaizdo tinkinimas",
@@ -1601,11 +1612,11 @@
       },
       "features": {
         "statusPageEnabled": "Būsenos puslapis įjungtas",
-        "statusPageEnabledHelp": "Rodyti paslaugos būsenos puslapį",
+        "statusPageEnabledHelp": "Paskelbia paslaugos būsenos puslapį. Išjungus puslapio nėra, o jo duomenis mato tik administratoriai.",
         "guestAccessEnabled": "Svečio prieiga įjungta",
-        "guestAccessEnabledHelp": "Leisti svečiams prisijungti prie vykstančių renginių",
+        "guestAccessEnabledHelp": "Neužsiregistravę asmenys gali prisijungti prie vykstančių renginių nurodę tik savo vardą. Išjungus prie suplanuotų renginių galima prisijungti tik užsiregistravus arba su moderatoriaus ar pranešėjo nuoroda; momentiniai vaizdo skambučiai lieka atviri visiems, kas turi nuorodą.",
         "publicRegistrationEnabled": "Viešoji registracija įjungta",
-        "publicRegistrationEnabledHelp": "Bet kas gali kurti renginius (jei išjungta, tik administratoriai)",
+        "publicRegistrationEnabledHelp": "Į renginius gali registruotis bet kas. Išjungus registruotis gali tik renginio pakviestųjų sąraše esantys asmenys, o asmeninė prisijungimo nuoroda siunčiama tik el. paštu; jau užsiregistravusieji ir moderatorių bei pranešėjų nuorodos veikia toliau.",
         "calendarPublic": "Viešas kalendorius",
         "calendarPublicHelp": "Paskelbti renginių kalendorių. Lankytojai gali matyti suplanuotus renginius.",
         "parseTitleKicker": "Pavadinimai su redakcine antrašte",
@@ -3461,7 +3472,9 @@
     "shortcutsF": "Įjungti arba išjungti visą ekraną",
     "shortcutsSpeed": "Sumažinti arba padidinti greitį",
     "captionsOn": "Subtitrai įjungti",
-    "captionsOff": "Subtitrai išjungti"
+    "captionsOff": "Subtitrai išjungti",
+    "watchOnYouTube": "Žiūrėti vaizdo įrašą „YouTube“",
+    "externalSiteNote": "Atsidaro „YouTube“ – išorinėje svetainėje, turinčioje savo naudojimo sąlygas ir privatumo pranešimą."
   },
   "postprod": {
     "loading": "Įkeliama transkripcija…",

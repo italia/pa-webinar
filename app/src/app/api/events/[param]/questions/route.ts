@@ -15,6 +15,8 @@ import { createQuestionSchema } from '@/lib/validation/schemas';
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
 import { authorizePanelRead } from '@/lib/events/panel-read-access';
+import { guestWindowOpen } from '@/lib/events/guest-window';
+import { getSettings } from '@/lib/settings';
 import { getCached, setCache, deleteCacheByPrefix } from '@/lib/cache';
 
 export const dynamic = 'force-dynamic';
@@ -197,6 +199,13 @@ export const POST = withErrorHandling(async (request, context) => {
       authorName = (tryDecryptPII(grant.name) ?? grant.name).slice(0, 80);
     }
   } else {
+    // Un ospite chiede solo finché la stanza è aperta a chi arriva senza
+    // token: stessa finestra di chat e sondaggi, che tiene conto anche
+    // dell'accesso ospiti deciso dall'amministrazione. Fuori da lì in sala
+    // non c'è nessun ospite, e la domanda arriverebbe da chi non può entrare.
+    if (!guestWindowOpen(event, (await getSettings()).guestAccessEnabled)) {
+      throw new UnauthorizedError('Token required');
+    }
     // Guest path: requires a non-empty display name, rate-limited by IP
     // since there's no stable participant id to key on.
     const name = typeof guestName === 'string' ? guestName.trim() : '';

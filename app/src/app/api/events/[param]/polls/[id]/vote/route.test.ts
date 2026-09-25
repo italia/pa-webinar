@@ -21,6 +21,8 @@ vi.mock('@/lib/db', () => ({
 }));
 vi.mock('@/lib/live-state/publish', () => ({ pokeLivePanel: vi.fn() }));
 vi.mock('@/lib/events/join-grant', () => ({ hasJoinGrant: vi.fn() }));
+const { siteSettings } = vi.hoisted(() => ({ siteSettings: { guestAccessEnabled: true } }));
+vi.mock('@/lib/settings', () => ({ getSettings: async () => siteSettings }));
 
 import { prisma } from '@/lib/db';
 import { hasJoinGrant } from '@/lib/events/join-grant';
@@ -86,6 +88,7 @@ function vote(body: Record<string, unknown>, bearer?: string): NextRequest {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  siteSettings.guestAccessEnabled = true;
   mockedEvent.mockResolvedValue(eventRow());
   mockedPoll.mockResolvedValue({
     id: POLL_ID,

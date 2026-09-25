@@ -168,6 +168,12 @@
     "resendLink": "Reenviar mi enlace de acceso",
     "resending": "Enviando…",
     "resendSent": "Si la dirección está inscrita, te hemos reenviado el enlace de acceso por correo electrónico.",
+    "invitationOnly": "La inscripción está reservada a las personas invitadas: utilice la dirección de correo electrónico con la que le invitaron. El enlace para entrar le llegará por correo electrónico.",
+    "closed": "La inscripción a este evento no está abierta al público.",
+    "lostLink": "¿Ya se inscribió? Reciba de nuevo su enlace personal",
+    "lostLinkHelp": "Escriba la dirección de correo electrónico con la que se inscribió: si está inscrita en este evento, le volveremos a enviar el enlace para entrar.",
+    "checkEmailTitle": "Revise su correo electrónico",
+    "checkEmail": "Si la dirección figura en la lista de invitados, en breve recibirá un correo con su enlace personal para entrar en la sala. Si no lo encuentra, revise la carpeta de spam.",
     "backToEvent": "Volver al evento",
     "organization": "Organismo de pertenencia",
     "organizationPlaceholder": "p. ej. AGID, Ministerio de Economía, Ayuntamiento de Roma",
@@ -276,6 +282,7 @@
     "guestJoinSubtitle": "Unirse como invitado al evento en curso",
     "guestJoinButton": "Unirse como invitado",
     "guestRedirectToRegister": "El evento aún no ha comenzado. Inscríbase para recibir su enlace de acceso.",
+    "guestAccessDisabled": "Este evento requiere inscripción: no es posible entrar sin inscribirse.",
     "jibriUnavailable": "Grabación no disponible — Jibri no configurado",
     "endEventError": "Error al finalizar el evento. Vuelva a intentarlo.",
     "jibriNotConfigured": "Grabación no configurada en la infraestructura",
@@ -1510,7 +1517,11 @@
         "faviconUrl": "URL del favicon",
         "primaryColor": "Color primario",
         "defaultTimezone": "Zona horaria predeterminada",
-        "defaultTimezoneHelp": "Se utiliza para la visualización de fechas y la creación de nuevos eventos."
+        "defaultTimezoneHelp": "Se utiliza para la visualización de fechas y la creación de nuevos eventos.",
+        "waitingRoomEngine": "Sala de espera (predeterminada del sitio)",
+        "waitingRoomEngineGame": "Videojuego (lobby Phaser)",
+        "waitingRoomEngineClassic": "Clásica (estática)",
+        "waitingRoomEngineHelp": "Modo predeterminado de la sala de espera. Se puede cambiar para cada evento y, para una sola visita, con el parámetro {param} en la dirección."
       },
       "watermark": {
         "title": "Personalización del vídeo",
@@ -1601,11 +1612,11 @@
       },
       "features": {
         "statusPageEnabled": "Página de estado activa",
-        "statusPageEnabledHelp": "Mostrar la página de estado del servicio",
+        "statusPageEnabledHelp": "Publica la página de estado del servicio. Si se desactiva, la página no existe y sus datos solo los ven los administradores.",
         "guestAccessEnabled": "Acceso de invitados activo",
-        "guestAccessEnabledHelp": "Permitir el acceso como invitado a los eventos en curso",
+        "guestAccessEnabledHelp": "Quien no se ha inscrito puede entrar en los eventos en curso indicando solo su nombre. Si se desactiva, a los eventos programados solo se entra con inscripción o con el enlace de moderador o ponente; las videollamadas instantáneas siguen abiertas a quien tenga el enlace.",
         "publicRegistrationEnabled": "Inscripción pública activa",
-        "publicRegistrationEnabledHelp": "Cualquier persona puede crear eventos (si se desactiva, solo los administradores)",
+        "publicRegistrationEnabledHelp": "Cualquier persona puede inscribirse en los eventos. Si se desactiva, solo pueden inscribirse las personas de la lista de invitados del evento y el enlace personal para entrar se envía solo por correo electrónico; quienes ya están inscritos y los enlaces de moderadores y ponentes siguen funcionando.",
         "calendarPublic": "Calendario público",
         "calendarPublicHelp": "Publicar el calendario de eventos. Los visitantes pueden ver los eventos programados.",
         "parseTitleKicker": "Títulos con kicker editorial",
@@ -3461,7 +3472,9 @@
     "shortcutsF": "Pantalla completa",
     "shortcutsSpeed": "Reducir o aumentar la velocidad",
     "captionsOn": "Subtítulos activados",
-    "captionsOff": "Subtítulos desactivados"
+    "captionsOff": "Subtítulos desactivados",
+    "watchOnYouTube": "Ver el vídeo en YouTube",
+    "externalSiteNote": "Se abre en YouTube, un sitio externo con sus propias condiciones de uso y su propia política de privacidad."
   },
   "postprod": {
     "loading": "Cargando la transcripción…",

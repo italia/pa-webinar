@@ -16,7 +16,9 @@ import { eventAccessCookieName, verifyEventAccess } from '@/lib/event-session';
 import { resolveGrantForEvent } from '@/lib/auth/moderator';
 import { isEventPageVisible } from '@/lib/events/visibility';
 import { hasJoinGrant } from '@/lib/events/join-grant';
+import { guestAccessAllowed, guestWindowOpen } from '@/lib/events/guest-window';
 import { resolveRnnoiseEnforceOff } from '@/lib/jitsi/rnnoise';
+import { resolveWhiteboardInfraReady } from '@/lib/jitsi/whiteboard';
 import { localizedPath } from '@/lib/utils/localized-url';
 
 export const dynamic = 'force-dynamic';
@@ -85,6 +87,13 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
     getPublicEnv('NEXT_PUBLIC_JITSI_RNNOISE_ENFORCE'),
   );
 
+  // Lavagna di Jitsi: il pulsante del moderatore compare solo se
+  // l'installazione ne ha il backend. Letto qui a runtime per lo stesso motivo
+  // di rnnoise (lib/jitsi/whiteboard.ts).
+  const whiteboardInfraReady = resolveWhiteboardInfraReady(
+    getPublicEnv('NEXT_PUBLIC_WHITEBOARD_ENABLED'),
+  );
+
   // Informativa AI per la sala d'attesa (AI Act / GDPR trasparenza): la
   // mostriamo quando il master switch è attivo E l'evento ha almeno una
   // feature AI. Il testo è il custom per-locale dell'admin
@@ -104,8 +113,15 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
 
   // No token: guest access or redirect. Password-protected events
   // require a cleared join-grant cookie before we issue the guest JWT.
+  // La password protegge l'ingresso da ospite: se l'amministrazione non
+  // ammette ospiti (eventi a calendario, lib/events/guest-window), chiederla
+  // sarebbe un passaggio a vuoto prima del rimando all'iscrizione.
   if (!token) {
-    if (event.joinPasswordHash && !(await hasJoinGrant(event.id))) {
+    if (
+      guestAccessAllowed(event, settings.guestAccessEnabled) &&
+      event.joinPasswordHash &&
+      !(await hasJoinGrant(event.id))
+    ) {
       redirect(localizedPath(`/events/${slug}/password`, locale));
     }
     // Re-establish a registered participant from the signed per-event access
@@ -125,8 +141,9 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
       // for any joinable status (LIVE / IDLE / PROVISIONING) so the user lands
       // on the waiting room even while the bridge warms up. SCHEDULED events
       // still require a personal token for any non-LIVE status — via
-      // /registration.
-      (isInstant ? ['LIVE', 'IDLE', 'PROVISIONING'] : ['LIVE']).includes(event.status)
+      // /registration — and for LIVE too when the administration turns guest
+      // access off. La regola e' la stessa di chat e pannelli.
+      guestWindowOpen(event, settings.guestAccessEnabled)
     ) {
       const title = getLocalized(event.title as LocalizedField, locale);
       return (
@@ -182,6 +199,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
           jibriAvailable={jibriAvailable}
           reactionsMode={settings.reactionsMode === 'CUSTOM' ? 'CUSTOM' : 'NATIVE'}
           rnnoiseEnforceOff={rnnoiseEnforceOff}
+          whiteboardInfraReady={whiteboardInfraReady}
         />
       );
     } else if (isInstant) {
@@ -261,6 +279,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
         endsAt: event.endsAt.toISOString(),
         status: event.status,
         eventType: event.eventType,
+        guestEntryOpen: guestAccessAllowed(event, settings.guestAccessEnabled),
         postEventPublic: event.postEventPublic,
         libraryListed: event.libraryListed,
         recordingEnabled: event.recordingEnabled,
@@ -313,6 +332,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
       jibriAvailable={jibriAvailable}
       reactionsMode={settings.reactionsMode === 'CUSTOM' ? 'CUSTOM' : 'NATIVE'}
       rnnoiseEnforceOff={rnnoiseEnforceOff}
+      whiteboardInfraReady={whiteboardInfraReady}
     />
   );
 }

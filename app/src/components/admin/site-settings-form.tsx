@@ -282,7 +282,7 @@ function BrandingTab({ settings, updateField }: TabProps) {
           </FormGroup>
 
           <FormGroup>
-            <Label htmlFor="waitingRoomEngine">Sala d&apos;attesa (default)</Label>
+            <Label htmlFor="waitingRoomEngine">{t('waitingRoomEngine')}</Label>
             <select
               className="form-select"
               id="waitingRoomEngine"
@@ -297,12 +297,11 @@ function BrandingTab({ settings, updateField }: TabProps) {
                 )
               }
             >
-              <option value="GAME">Videogame (lobby Phaser)</option>
-              <option value="CLASSIC">Classica (statica)</option>
+              <option value="GAME">{t('waitingRoomEngineGame')}</option>
+              <option value="CLASSIC">{t('waitingRoomEngineClassic')}</option>
             </select>
             <small className="text-muted">
-              Modalità di default della sala d&apos;attesa; sovrascrivibile per
-              singolo evento e con <code>?engine=</code> nell&apos;URL.
+              {t('waitingRoomEngineHelp', { param: '?engine=' })}
             </small>
           </FormGroup>
         </Col>

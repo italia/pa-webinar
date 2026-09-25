@@ -168,6 +168,12 @@
     "resendLink": "Skicka åtkomstlänken igen",
     "resending": "Skickar…",
     "resendSent": "Om adressen är anmäld har vi skickat åtkomstlänken igen via e-post.",
+    "invitationOnly": "Anmälan är förbehållen inbjudna: använd den e-postadress som du bjöds in med. Länken för att delta skickas till dig via e-post.",
+    "closed": "Anmälan till det här evenemanget är inte öppen för allmänheten.",
+    "lostLink": "Redan anmäld? Få din personliga länk igen",
+    "lostLinkHelp": "Skriv den e-postadress som du anmälde dig med: om den är anmäld till det här evenemanget skickar vi länken för att delta igen.",
+    "checkEmailTitle": "Kontrollera din e-post",
+    "checkEmail": "Om adressen finns på inbjudningslistan får du snart ett e-postmeddelande med din personliga länk till rummet. Hittar du det inte, kontrollera skräppostmappen.",
     "backToEvent": "Tillbaka till evenemanget",
     "organization": "Organisation",
     "organizationPlaceholder": "t.ex. AGID, Ekonomiministeriet, Roms kommun",
@@ -276,6 +282,7 @@
     "guestJoinSubtitle": "Delta som gäst i det pågående evenemanget",
     "guestJoinButton": "Delta som gäst",
     "guestRedirectToRegister": "Evenemanget har inte börjat ännu. Anmäl dig för att få din åtkomstlänk.",
+    "guestAccessDisabled": "Det här evenemanget kräver anmälan: det går inte att delta som gäst.",
     "jibriUnavailable": "Inspelning ej tillgänglig — Jibri ej konfigurerat",
     "endEventError": "Det gick inte att avsluta evenemanget. Försök igen.",
     "jibriNotConfigured": "Inspelning ej konfigurerad i infrastrukturen",
@@ -1510,7 +1517,11 @@
         "faviconUrl": "Favicon-URL",
         "primaryColor": "Primärfärg",
         "defaultTimezone": "Standardtidszon",
-        "defaultTimezoneHelp": "Används för datumvisning och skapande av nya evenemang."
+        "defaultTimezoneHelp": "Används för datumvisning och skapande av nya evenemang.",
+        "waitingRoomEngine": "Väntrum (webbplatsens standard)",
+        "waitingRoomEngineGame": "Videospel (Phaser-lobby)",
+        "waitingRoomEngineClassic": "Klassiskt (statiskt)",
+        "waitingRoomEngineHelp": "Väntrummets standardläge. Det kan ändras för ett enskilt evenemang och, för ett enda besök, med parametern {param} i adressen."
       },
       "watermark": {
         "title": "Videoanpassning",
@@ -1601,11 +1612,11 @@
       },
       "features": {
         "statusPageEnabled": "Statussida aktiverad",
-        "statusPageEnabledHelp": "Visa tjänstens statussida",
+        "statusPageEnabledHelp": "Publicerar tjänstens statussida. När den är avstängd finns sidan inte och dess data visas bara för administratörer.",
         "guestAccessEnabled": "Gäståtkomst aktiverad",
-        "guestAccessEnabledHelp": "Tillåt gäståtkomst till pågående evenemang",
+        "guestAccessEnabledHelp": "Personer som inte har anmält sig kan delta i pågående evenemang med bara sitt namn. När det är avstängt kan man bara delta i schemalagda evenemang med anmälan eller med en moderator- eller talarlänk; omedelbara videosamtal förblir öppna för alla som har länken.",
         "publicRegistrationEnabled": "Offentlig registrering aktiverad",
-        "publicRegistrationEnabledHelp": "Alla kan skapa evenemang (om inaktiverat, enbart administratörer)",
+        "publicRegistrationEnabledHelp": "Vem som helst kan anmäla sig till evenemang. När det är avstängt kan bara personer på evenemangets inbjudningslista anmäla sig, och den personliga länken för att delta skickas bara via e-post; redan anmälda och moderator- och talarlänkar fungerar fortfarande.",
         "calendarPublic": "Offentlig kalender",
         "calendarPublicHelp": "Publicera evenemangskalendern. Besökare kan se schemalagda evenemang.",
         "parseTitleKicker": "Titlar med redaktionell övertitel",
@@ -3461,7 +3472,9 @@
     "shortcutsF": "Helskärm",
     "shortcutsSpeed": "Sänk eller höj hastigheten",
     "captionsOn": "Undertexter på",
-    "captionsOff": "Undertexter av"
+    "captionsOff": "Undertexter av",
+    "watchOnYouTube": "Se videon på YouTube",
+    "externalSiteNote": "Öppnas på YouTube, en extern webbplats med egna användarvillkor och en egen integritetspolicy."
   },
   "postprod": {
     "loading": "Läser in transkriptionen…",

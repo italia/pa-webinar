@@ -168,6 +168,12 @@
     "resendLink": "Retrimiteți linkul de acces",
     "resending": "Se trimite…",
     "resendSent": "Dacă adresa este înregistrată, v-am retrimis linkul de acces prin email.",
+    "invitationOnly": "Înregistrarea este rezervată persoanelor invitate: folosiți adresa de email cu care ați fost invitat. Linkul pentru a intra îl veți primi prin email.",
+    "closed": "Înregistrarea la acest eveniment nu este deschisă publicului.",
+    "lostLink": "V-ați înregistrat deja? Primiți din nou linkul personal",
+    "lostLinkHelp": "Introduceți adresa de email cu care v-ați înregistrat: dacă este înregistrată la acest eveniment, vă vom retrimite linkul pentru a intra.",
+    "checkEmailTitle": "Verificați-vă emailul",
+    "checkEmail": "Dacă adresa se află pe lista invitaților, veți primi în curând un email cu linkul personal pentru a intra în sală. Dacă nu îl găsiți, verificați dosarul de spam.",
     "backToEvent": "Înapoi la eveniment",
     "organization": "Instituția de apartenență",
     "organizationPlaceholder": "de ex. AGID, Ministerul Economiei, Primăria Romei",
@@ -276,6 +282,7 @@
     "guestJoinSubtitle": "Intrați ca invitat la evenimentul în desfășurare",
     "guestJoinButton": "Intrați ca invitat",
     "guestRedirectToRegister": "Evenimentul nu a început încă. Înregistrați-vă pentru a primi linkul de acces.",
+    "guestAccessDisabled": "Acest eveniment necesită înregistrare: nu se poate intra fără înregistrare.",
     "jibriUnavailable": "Înregistrare indisponibilă — Jibri nu este configurat",
     "endEventError": "Eroare la încheierea evenimentului. Încercați din nou.",
     "jibriNotConfigured": "Înregistrarea nu este configurată în infrastructură",
@@ -1510,7 +1517,11 @@
         "faviconUrl": "URL favicon",
         "primaryColor": "Culoare primară",
         "defaultTimezone": "Fus orar implicit",
-        "defaultTimezoneHelp": "Utilizat pentru afișarea datelor și crearea evenimentelor noi."
+        "defaultTimezoneHelp": "Utilizat pentru afișarea datelor și crearea evenimentelor noi.",
+        "waitingRoomEngine": "Sala de așteptare (implicită a site-ului)",
+        "waitingRoomEngineGame": "Joc video (lobby Phaser)",
+        "waitingRoomEngineClassic": "Clasică (statică)",
+        "waitingRoomEngineHelp": "Modul implicit al sălii de așteptare. Poate fi schimbat pentru un singur eveniment și, pentru o singură vizită, cu parametrul {param} în adresă."
       },
       "watermark": {
         "title": "Personalizare video",
@@ -1601,11 +1612,11 @@
       },
       "features": {
         "statusPageEnabled": "Pagina de stare activă",
-        "statusPageEnabledHelp": "Afișați pagina de stare a serviciului",
+        "statusPageEnabledHelp": "Publică pagina de stare a serviciului. Când este dezactivată, pagina nu există, iar datele ei sunt vizibile doar administratorilor.",
         "guestAccessEnabled": "Acces invitați activ",
-        "guestAccessEnabledHelp": "Permiteți accesul ca invitat la evenimentele în desfășurare",
+        "guestAccessEnabledHelp": "Persoanele neînregistrate pot intra la evenimentele în desfășurare indicând doar numele. Când este dezactivat, la evenimentele programate se intră doar cu înregistrare sau cu linkul de moderator ori de vorbitor; apelurile video instant rămân deschise oricui are linkul.",
         "publicRegistrationEnabled": "Înregistrare publică activă",
-        "publicRegistrationEnabledHelp": "Oricine poate crea evenimente (dacă este dezactivat, doar administratorii)",
+        "publicRegistrationEnabledHelp": "Oricine se poate înregistra la evenimente. Când este dezactivată, se pot înregistra doar persoanele de pe lista invitaților la eveniment, iar linkul personal pentru a intra se trimite doar prin email; persoanele deja înregistrate și linkurile moderatorilor și vorbitorilor funcționează în continuare.",
         "calendarPublic": "Calendar public",
         "calendarPublicHelp": "Publicați calendarul evenimentelor. Vizitatorii pot vedea evenimentele programate.",
         "parseTitleKicker": "Titluri cu kicker editorial",
@@ -3461,7 +3472,9 @@
     "shortcutsF": "Ecran complet",
     "shortcutsSpeed": "Scade sau crește viteza",
     "captionsOn": "Subtitrări activate",
-    "captionsOff": "Subtitrări dezactivate"
+    "captionsOff": "Subtitrări dezactivate",
+    "watchOnYouTube": "Vizionați videoclipul pe YouTube",
+    "externalSiteNote": "Se deschide pe YouTube, un site extern cu propriii termeni de utilizare și propria notă de confidențialitate."
   },
   "postprod": {
     "loading": "Se încarcă transcrierea…",

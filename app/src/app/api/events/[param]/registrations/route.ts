@@ -18,6 +18,9 @@ import { sendConfirmationEmail } from '@/lib/email/confirmation';
 import { getPublicEnv } from '@/lib/env';
 import { upsertPersonOnRegistration } from '@/lib/persons';
 import { isEventOpenForRegistration } from '@/lib/events/visibility';
+import { isInvited } from '@/lib/events/registration-access';
+import { registrationJoinUrl } from '@/lib/events/registration-link';
+import { getSettings } from '@/lib/settings';
 import { localizedUrl } from '@/lib/utils/localized-url';
 import {
   buildEventAccessSetCookie,
@@ -26,6 +29,18 @@ import {
 } from '@/lib/event-session';
 
 export const dynamic = 'force-dynamic';
+
+interface IscrizioneTrovata {
+  id: string;
+  accessToken: string;
+  locale: string | null;
+}
+
+/** Cosa ha fatto la transazione con l'indirizzo ricevuto. */
+type EsitoIscrizione =
+  | { tipo: 'nuova'; registrazione: IscrizioneTrovata }
+  | { tipo: 'esistente'; registrazione: IscrizioneTrovata }
+  | { tipo: 'nonInvitato' };
 
 // ── POST /api/events/[slug]/registrations ────────────────────
 
@@ -91,14 +106,27 @@ export const POST = withErrorHandling(async (request, context) => {
   const emailHash = hashEmail(email);
   const encryptedEmail = encryptPII(email);
   const accessToken = nanoid(24);
+  // Iscrizione pubblica spenta dall'amministrazione: si iscrive solo chi e'
+  // fra gli invitati dell'evento (lib/events/registration-access), e il link
+  // personale lo consegna solo l'email (lib/events/registration-link).
+  const soloInvitati = !(await getSettings()).publicRegistrationEnabled;
 
-  const registration = await prisma.$transaction(async (tx) => {
+  const esito: EsitoIscrizione = await prisma.$transaction(async (tx) => {
     // Check for duplicates inside transaction
     const existing = await tx.registration.findUnique({
       where: { eventId_emailHash: { eventId: event.id, emailHash } },
+      select: { id: true, accessToken: true, locale: true },
     });
     if (existing) {
+      // Solo su invito si risponde come a tutti gli altri e il link torna
+      // nella casella dell'iscritto: «gia' iscritto» direbbe a chiunque che
+      // quell'indirizzo e' fra gli invitati.
+      if (soloInvitati) return { tipo: 'esistente', registrazione: existing };
       throw new AlreadyRegisteredError();
+    }
+
+    if (soloInvitati && !(await isInvited(tx, event.id, email))) {
+      return { tipo: 'nonInvitato' };
     }
 
     const personId = await upsertPersonOnRegistration(tx, {
@@ -146,10 +174,49 @@ export const POST = withErrorHandling(async (request, context) => {
       },
     });
 
-    return reg;
+    return { tipo: 'nuova', registrazione: reg };
   });
 
   const baseUrl = getPublicEnv('NEXT_PUBLIC_APP_URL');
+
+  if (soloInvitati) {
+    // Stessa risposta che l'indirizzo sia invitato, gia' iscritto o nessuno
+    // dei due, come per il rinvio del link (registrations/resend): niente
+    // token, niente link, niente cookie. Chi ha compilato il modulo non ha
+    // provato di possedere l'indirizzo; chi apre l'email si'.
+    if (esito.tipo !== 'nonInvitato') {
+      const { registrazione } = esito;
+      // Chi era gia' iscritto riceve il link nella lingua dell'iscrizione,
+      // come dal rinvio: chi conosce un indirizzo non ne cambia la lingua.
+      const locale =
+        esito.tipo === 'esistente'
+          ? (linguaPagina(registrazione.locale) ?? pageLocale)
+          : pageLocale;
+      const link = {
+        baseUrl,
+        slug,
+        eventId: event.id,
+        accessToken: registrazione.accessToken,
+        locale,
+      };
+      await sendConfirmationEmail({
+        registrationId: registrazione.id,
+        locale,
+        joinUrl: registrationJoinUrl({ ...link, viaEmailEntry: true }),
+        calendarJoinUrl: registrationJoinUrl({ ...link, viaEmailEntry: false }),
+        eventPageUrl: localizedUrl(baseUrl, `/events/${slug}`, locale),
+      });
+    }
+    return Response.json(
+      { eventSlug: slug, delivery: 'email' },
+      { status: 202, headers: { 'Cache-Control': 'no-store' } },
+    );
+  }
+
+  // Iscrizione aperta: la transazione ha creato l'iscrizione, oppure ha gia'
+  // risposto «gia' iscritto».
+  if (esito.tipo !== 'nuova') throw new AlreadyRegisteredError();
+  const registration = esito.registrazione;
 
   const joinUrl = localizedUrl(baseUrl, `/events/${slug}/live?token=${accessToken}`, pageLocale);
   const eventPageUrl = localizedUrl(baseUrl, `/events/${slug}`, pageLocale);

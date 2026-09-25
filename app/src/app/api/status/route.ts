@@ -4,6 +4,7 @@ import { getPublicEnv } from '@/lib/env';
 import { readJvbSnapshot } from '@/lib/jvb-snapshot';
 import { jvbsForEvent, jvbMaxReplicasFromEnv, JVB_BILLABLE_STATUSES } from '@/lib/jvb-sizing';
 import { getSettings } from '@/lib/settings';
+import { statusDataVisible } from '@/lib/status-page';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 
 export const dynamic = 'force-dynamic';
@@ -471,17 +472,42 @@ export const GET = withErrorHandling(async () => {
     return since <= staleCutoff;
   });
 
+  const jvbSizing = {
+    cpuCoresPerPod: settings.jvbCpuCoresPerPod ?? 16,
+    receiversPerCore: settings.jvbReceiversPerCore ?? 18.75,
+    sendersPerCore: settings.jvbSendersPerCore ?? 3.125,
+    defaultSenderRatioPct: settings.defaultSenderRatioPct ?? 30,
+  };
+
+  // Pagina di stato spenta dall'amministrazione (lib/status-page): la sala
+  // live continua a chiedere qui se il ponte video e il registratore sono
+  // pronti (lib/jitsi/bridge-readiness), e riceve quei valori e nient'altro —
+  // niente componenti, conteggi o prossimi eventi.
+  if (!(await statusDataVisible())) {
+    const [jvbSala, jibriSala] = await Promise.all([
+      getJvbStatus(preScaleMinutes, provisioningTimeoutMinutes, jvbSizing),
+      getJibriStatus(recordingNeeded, recordingStale),
+    ]);
+    return Response.json(
+      {
+        metrics: {
+          jvbStatus: jvbSala.jvbStatus,
+          jvbParticipants: jvbSala.participants,
+          jvbStale: jvbSala.stale,
+          jibriStatus: jibriSala.jibriStatus,
+        },
+        lastChecked: now.toISOString(),
+      },
+      { headers: { 'Cache-Control': 'no-store' } },
+    );
+  }
+
   const [db, jitsi, smtp, redisHealth, jvb, jibriResult, orphanRecordingsPendingCount] = await Promise.all([
     checkDatabase(),
     checkJitsiWeb(),
     checkSmtp(),
     checkRedis(),
-    getJvbStatus(preScaleMinutes, provisioningTimeoutMinutes, {
-      cpuCoresPerPod: settings.jvbCpuCoresPerPod ?? 16,
-      receiversPerCore: settings.jvbReceiversPerCore ?? 18.75,
-      sendersPerCore: settings.jvbSendersPerCore ?? 3.125,
-      defaultSenderRatioPct: settings.defaultSenderRatioPct ?? 30,
-    }),
+    getJvbStatus(preScaleMinutes, provisioningTimeoutMinutes, jvbSizing),
     getJibriStatus(recordingNeeded, recordingStale),
     prisma.orphanRecording.count({ where: { decision: 'pending' } }).catch(() => 0),
   ]);

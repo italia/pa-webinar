@@ -59,6 +59,10 @@ interface EventInfo {
   endsAt: string;
   status: string;
   eventType?: string;
+  /** L'evento ammette chi entra senza token (lib/events/guest-window). Falso
+   *  solo per un evento in calendario con l'accesso ospiti spento: il link
+   *  «per partecipare» porterebbe all'iscrizione e non va offerto. */
+  guestEntryOpen?: boolean;
   recordingEnabled: boolean;
   autoStartRecording?: boolean;
   qaEnabled: boolean;
@@ -137,6 +141,12 @@ interface LiveEventClientProps {
    *  lib/jitsi/rnnoise.ts): qui non si può leggere l'env, perché in un
    *  componente client webpack lo congela nel bundle a build time. */
   rnnoiseEnforceOff?: boolean;
+  /** L'installazione ha il backend della lavagna (Excalidraw) e
+   *  `config.whiteboard.enabled` lato Jitsi. Senza, il pulsante del moderatore
+   *  e il promemoria di esportazione restano nascosti — insieme. Risolto a
+   *  RUNTIME dal Server Component (lib/jitsi/whiteboard.ts), per lo stesso
+   *  motivo di `rnnoiseEnforceOff`. Default false. */
+  whiteboardInfraReady?: boolean;
 }
 
 type LivePhase =
@@ -160,13 +170,6 @@ const MAX_RECONNECT_ATTEMPTS = 3;
 // signal veto the reconnect so clicking hangup doesn't bounce the user back
 // into the call. A genuine drop (no readyToClose) just reconnects 1.2s later.
 const LEAVE_RECONNECT_GRACE_MS = 1200;
-
-// The native Jitsi/Excalidraw whiteboard needs a collab backend deployed +
-// Jitsi `config.whiteboard.enabled` server-side, which isn't provisioned yet.
-// Keep BOTH the moderator button (moderator-controls.tsx) and the "export it
-// before the call ends" hint hidden until that infra lands and this build-time
-// env is set — same gate in both files so button and hint appear together.
-const WHITEBOARD_INFRA_READY = process.env.NEXT_PUBLIC_WHITEBOARD_ENABLED === 'true';
 
 // Phases that render the full-bleed call surface. While in one of these we
 // flip the page into "immersive" mode (see `.live-call-immersive` in
@@ -209,6 +212,7 @@ export default function LiveEventClient({
   jibriAvailable: _jibriAvailable = true,
   reactionsMode = 'NATIVE',
   rnnoiseEnforceOff = true,
+  whiteboardInfraReady = false,
 }: LiveEventClientProps) {
   const t = useTranslations('live');
   const tc = useTranslations('common');
@@ -474,7 +478,20 @@ export default function LiveEventClient({
 
       if (!res.ok) {
         const data = await res.json();
-        setError(data.error ?? t('connectionError'));
+        // Il cookie della password e' scaduto mentre si era in sala: la
+        // pagina della password lo rilascia, riprovare qui non servirebbe.
+        if (data.code === 'JOIN_PASSWORD_REQUIRED') {
+          router.replace(percorso(`/events/${event.slug}/password`));
+          return;
+        }
+        // L'amministrazione ha chiuso l'ingresso da ospite mentre si era in
+        // sala d'attesa: il testo del server non e' tradotto, e «Riprova»
+        // non cambierebbe l'esito.
+        setError(
+          data.code === 'GUEST_ACCESS_DISABLED'
+            ? t('guestAccessDisabled')
+            : (data.error ?? t('connectionError')),
+        );
         setPhase('error');
         return;
       }
@@ -494,6 +511,7 @@ export default function LiveEventClient({
     token,
     chosenName,
     initialDisplayName,
+    router,
     t,
   ]);
 
@@ -1299,6 +1317,7 @@ export default function LiveEventClient({
       <>
         <LiveTopBar
           hasPublicPage={event.eventType !== 'INSTANT'}
+          hasCallLink={event.guestEntryOpen !== false}
           title={event.title}
           parseTitleKicker={event.parseTitleKicker}
           imageUrl={event.imageUrl}
@@ -1372,6 +1391,7 @@ export default function LiveEventClient({
 
       <LiveTopBar
         hasPublicPage={!isInstantCall}
+        hasCallLink={event.guestEntryOpen !== false}
         title={event.title}
         parseTitleKicker={event.parseTitleKicker}
         imageUrl={event.imageUrl}
@@ -1402,6 +1422,7 @@ export default function LiveEventClient({
           participantsCanUnmute={event.participantsCanUnmute}
           participantsCanStartVideo={event.participantsCanStartVideo}
           whiteboardEnabled={event.whiteboardEnabled || isInstantCall}
+          whiteboardInfraReady={whiteboardInfraReady}
           localDisplayName={credentials?.displayName ?? chosenName ?? ''}
           isPrimaryModerator={isPrimaryModerator}
         />
@@ -1504,6 +1525,7 @@ export default function LiveEventClient({
           chatEnabled={event.chatEnabled}
           agendaEnabled={event.agendaEnabled}
           whiteboardEnabled={event.whiteboardEnabled || isInstantCall}
+          whiteboardInfraReady={whiteboardInfraReady}
           jitsiApi={jitsiApi}
           displayName={credentials.displayName}
           canReactAgenda={!isModerator && !isSpeaker}
@@ -1693,6 +1715,8 @@ interface LiveSidebarProps {
   agendaEnabled: boolean;
   /** Whiteboard is enabled for this call → show the "not saved" reminder. */
   whiteboardEnabled: boolean;
+  /** …and the installation actually serves it (see LiveEventClientProps). */
+  whiteboardInfraReady: boolean;
   jitsiApi: JitsiMeetExternalAPI | null;
   displayName: string;
   /** Audience (guests + registered participants) may react to agenda items;
@@ -1717,6 +1741,7 @@ function LiveSidebar({
   chatEnabled,
   agendaEnabled,
   whiteboardEnabled,
+  whiteboardInfraReady,
   jitsiApi,
   displayName,
   canReactAgenda = false,
@@ -2231,7 +2256,7 @@ function LiveSidebar({
           {/* Whiteboard isn't persisted (native Jitsi/Excalidraw is ephemeral and
               end-to-end encrypted — there's no capture hook). Remind moderators
               to export + attach it as a material before the call ends. */}
-          {isModerator && whiteboardEnabled && WHITEBOARD_INFRA_READY && (
+          {isModerator && whiteboardEnabled && whiteboardInfraReady && (
             <div
               className="px-3 py-2"
               style={{ borderBottom: '1px solid #e8e8e8', fontSize: '0.78rem' }}
@@ -2418,6 +2443,8 @@ interface LiveTopBarProps {
   locale: string;
   /** Una chiamata istantanea non ha una pagina pubblica da condividere. */
   hasPublicPage?: boolean;
+  /** Il link senza token fa entrare (vedi `EventInfo.guestEntryOpen`). */
+  hasCallLink?: boolean;
   /** Privileged moderator magic-link token — passed ONLY when the current
    *  user is a moderator, so the token never enters a non-moderator tree.
    *  Surfaced (collapsed, with a warning) in the share popup. */
@@ -2447,6 +2474,7 @@ function LiveTopBar({
   slug,
   locale,
   hasPublicPage = true,
+  hasCallLink = true,
   moderatorToken,
   onLeaveRoom,
   isFullscreen,
@@ -2613,6 +2641,7 @@ function LiveTopBar({
           locale={locale}
           moderatorToken={moderatorToken}
           hasPublicPage={hasPublicPage}
+          hasCallLink={hasCallLink}
           modalContainer={modalContainer}
         />
         {onLeaveRoom && (

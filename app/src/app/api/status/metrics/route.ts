@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 
 import { withErrorHandling } from '@/lib/api-handler';
+import { NotFoundError } from '@/lib/errors';
+import { ADMIN_ONLY_CACHE_CONTROL, statusDataAccess } from '@/lib/status-page';
 import {
   isPrometheusConfigured,
   queryPrometheusRange,
@@ -18,6 +20,11 @@ const ALLOWED_QUERIES: Record<string, string> = {
 };
 
 export const GET = withErrorHandling(async (request) => {
+  // Pagina di stato spenta dall'amministrazione: questi dati servono solo a
+  // lei e alla mappa dell'infrastruttura dell'area admin (lib/status-page).
+  const access = await statusDataAccess();
+  if (access === 'none') throw new NotFoundError('Status page');
+
   if (!isPrometheusConfigured()) {
     return NextResponse.json({ available: false });
   }
@@ -42,7 +49,11 @@ export const GET = withErrorHandling(async (request) => {
       metric,
       data: result.data,
     }, {
-      headers: { 'Cache-Control': 'public, max-age=30' },
+      // Pubblica solo se lo è la pagina: altrimenti la risposta è quella
+      // dell'amministratore, e una cache condivisa la girerebbe a tutti.
+      headers: {
+        'Cache-Control': access === 'public' ? 'public, max-age=30' : ADMIN_ONLY_CACHE_CONTROL,
+      },
     });
   } catch {
     return NextResponse.json({ available: false });

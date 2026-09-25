@@ -12,6 +12,7 @@ import { AppError, ForbiddenError, ValidationError } from '@/lib/errors';
 import { resolveTokenSender } from '@/lib/chat/sender';
 import { guestChatWindowOpen } from '@/lib/chat/read-access';
 import { getClientIp } from '@/lib/rate-limit';
+import { getSettings } from '@/lib/settings';
 
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -79,8 +80,10 @@ export async function authenticateChatSender(
   // dal LIVE: /wake è non autenticato e chiunque potrebbe flippare
   // PUBLISHED→PROVISIONING per iniettare messaggi anonimi (regressione chiusa).
   // Shared with the read side (lib/chat/read-access) so the guest write window
-  // and the guest read window can never drift apart.
-  if (!guestChatWindowOpen(event)) {
+  // and the guest read window can never drift apart. Con l'accesso ospiti
+  // spento dall'amministrazione la finestra resta chiusa sugli eventi a
+  // calendario: chi non puo' entrare nella sala non ci scrive.
+  if (!guestChatWindowOpen(event, (await getSettings()).guestAccessEnabled)) {
     throw new ForbiddenError('Chat requires a participant or moderator token');
   }
   const name = (guestName ?? '').trim();

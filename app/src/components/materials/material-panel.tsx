@@ -7,12 +7,17 @@ import { Button } from 'design-react-kit';
 
 import { Icon } from '@/components/ui/icon';
 
+import { fetchMaterials, materialsListKey } from './material-request';
+
 interface MaterialData {
   id: string;
   type: string;
   title: string;
   url: string;
   description: string | null;
+  /** ALWAYS | BEFORE | DURING | AFTER. Il server filtra già per il pubblico;
+   *  al moderatore, che vede tutto, serve a sapere cosa la sala NON vede. */
+  visibility?: string;
   addedBy: string;
   createdAt: string;
 }
@@ -23,15 +28,25 @@ interface MaterialPanelProps {
   isModerator: boolean;
 }
 
-const fetcher = (url: string) => fetch(url).then((r) => r.json());
-
 export default function MaterialPanel({ eventSlug, token, isModerator }: MaterialPanelProps) {
   const t = useTranslations('materials');
+  const tv = useTranslations('admin.materials');
   const format = useFormatter();
 
+  // Etichetta per i materiali a visibilità limitata (null = sempre visibile).
+  const visibilityLabel = (v: string | undefined): string | null => {
+    if (v === 'BEFORE') return tv('visibilityBefore');
+    if (v === 'DURING') return tv('visibilityDuring');
+    if (v === 'AFTER') return tv('visibilityAfter');
+    return null;
+  };
+
   const { data, mutate } = useSWR<{ materials: MaterialData[] }>(
-    `/api/events/${eventSlug}/materials`,
-    fetcher,
+    // Il token parte solo per chi conduce (./material-request): è l'unico caso
+    // in cui il server allarga l'elenco, e l'unico in cui compaiono i
+    // contrassegni qui sotto.
+    materialsListKey(eventSlug, token, isModerator),
+    fetchMaterials,
     // I materiali cambiano due o tre volte per evento, ma questa richiesta la
     // ripete ogni partecipante: a cinque secondi sono dodici chiamate al minuto
     // a testa per un dato quasi fermo. Trenta secondi restano dentro l'attesa
@@ -207,6 +222,11 @@ export default function MaterialPanel({ eventSlug, token, isModerator }: Materia
                     <div className="text-muted" style={{ fontSize: '0.78rem' }}>
                       {m.description}
                     </div>
+                  )}
+                  {isModerator && visibilityLabel(m.visibility) && (
+                    <span className="badge bg-light text-dark border" style={{ fontSize: '0.68rem' }}>
+                      {visibilityLabel(m.visibility)}
+                    </span>
                   )}
                   <div className="text-muted" style={{ fontSize: '0.72rem' }}>
                     {t('addedBy', { name: m.addedBy })} ·{' '}

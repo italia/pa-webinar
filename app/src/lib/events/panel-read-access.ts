@@ -16,7 +16,8 @@
  *   • accessToken di una registrazione di QUESTO evento → vista del pubblico,
  *     con la propria risposta ricordata;
  *   • nessun token → vista del pubblico, ma solo finché la stanza è davvero
- *     aperta a chi arriva col link (`guestWindowOpen`) e l'evento non è
+ *     aperta a chi arriva col link (`guestWindowOpen`, che tiene conto anche
+ *     dell'accesso ospiti deciso dall'amministrazione) e l'evento non è
  *     protetto da password. È la stessa soglia della chat: chi può stare nella
  *     stanza può leggere la stanza.
  *
@@ -30,6 +31,7 @@ import { prisma } from '@/lib/db';
 import { ForbiddenError, UnauthorizedError } from '@/lib/errors';
 import { guestWindowOpen } from '@/lib/events/guest-window';
 import { hasJoinGrant } from '@/lib/events/join-grant';
+import { getSettings } from '@/lib/settings';
 
 export type PanelReaderKind = 'moderator' | 'speaker' | 'participant' | 'guest';
 
@@ -94,7 +96,7 @@ export async function authorizePanelRead(
     throw new ForbiddenError('Invalid token for this event');
   }
 
-  if (!guestWindowOpen(event)) {
+  if (!guestWindowOpen(event, (await getSettings()).guestAccessEnabled)) {
     throw new UnauthorizedError('Token required');
   }
 

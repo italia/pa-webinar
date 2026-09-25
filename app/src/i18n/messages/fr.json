@@ -168,6 +168,12 @@
     "resendLink": "Renvoyer le lien d'accès",
     "resending": "Envoi en cours…",
     "resendSent": "Si l'adresse est inscrite, nous vous avons renvoyé le lien d'accès par e-mail.",
+    "invitationOnly": "L'inscription est réservée aux personnes invitées : utilisez l'adresse e-mail avec laquelle vous avez été invité. Le lien pour entrer vous parviendra par e-mail.",
+    "closed": "L'inscription à cet événement n'est pas ouverte au public.",
+    "lostLink": "Déjà inscrit ? Recevez à nouveau votre lien personnel",
+    "lostLinkHelp": "Saisissez l'adresse e-mail avec laquelle vous vous êtes inscrit : si elle est inscrite à cet événement, nous vous renverrons le lien pour entrer.",
+    "checkEmailTitle": "Consultez votre messagerie",
+    "checkEmail": "Si l'adresse figure sur la liste des invités, vous recevrez bientôt un e-mail avec votre lien personnel pour entrer dans la salle. Si vous ne le trouvez pas, vérifiez votre dossier de courrier indésirable.",
     "backToEvent": "Retour à l'événement",
     "organization": "Organisme d'appartenance",
     "organizationPlaceholder": "p. ex. AGID, Ministère de l'Économie, Ville de Rome",
@@ -276,6 +282,7 @@
     "guestJoinSubtitle": "Rejoindre l'événement en cours en tant qu'invité",
     "guestJoinButton": "Rejoindre en tant qu'invité",
     "guestRedirectToRegister": "L'événement n'a pas encore commencé. Inscrivez-vous pour recevoir votre lien d'accès.",
+    "guestAccessDisabled": "Cet événement nécessite une inscription : il n'est pas possible d'entrer sans être inscrit.",
     "jibriUnavailable": "Enregistrement non disponible — Jibri non configuré",
     "endEventError": "Erreur lors de la fin de l'événement. Veuillez réessayer.",
     "jibriNotConfigured": "Enregistrement non configuré dans l'infrastructure",
@@ -1510,7 +1517,11 @@
         "faviconUrl": "URL du favicon",
         "primaryColor": "Couleur principale",
         "defaultTimezone": "Fuseau horaire par défaut",
-        "defaultTimezoneHelp": "Utilisé pour l'affichage des dates et la création de nouveaux événements."
+        "defaultTimezoneHelp": "Utilisé pour l'affichage des dates et la création de nouveaux événements.",
+        "waitingRoomEngine": "Salle d'attente (valeur par défaut du site)",
+        "waitingRoomEngineGame": "Jeu vidéo (lobby Phaser)",
+        "waitingRoomEngineClassic": "Classique (statique)",
+        "waitingRoomEngineHelp": "Mode par défaut de la salle d'attente. Il peut être modifié pour un événement donné et, pour une seule visite, avec le paramètre {param} dans l'adresse."
       },
       "watermark": {
         "title": "Personnalisation vidéo",
@@ -1601,11 +1612,11 @@
       },
       "features": {
         "statusPageEnabled": "Page de statut active",
-        "statusPageEnabledHelp": "Afficher la page de statut du service",
+        "statusPageEnabledHelp": "Publie la page de statut du service. Si elle est désactivée, la page n'existe pas et ses données ne sont visibles que par les administrateurs.",
         "guestAccessEnabled": "Accès invité actif",
-        "guestAccessEnabledHelp": "Autoriser l'accès en tant qu'invité aux événements en cours",
+        "guestAccessEnabledHelp": "Les personnes non inscrites peuvent rejoindre les événements en cours en indiquant seulement leur nom. Si elle est désactivée, on n'entre dans les événements programmés qu'avec une inscription ou un lien de modérateur ou d'intervenant ; les appels vidéo instantanés restent ouverts à toute personne disposant du lien.",
         "publicRegistrationEnabled": "Inscription publique active",
-        "publicRegistrationEnabledHelp": "Tout le monde peut créer des événements (si désactivé, uniquement les administrateurs)",
+        "publicRegistrationEnabledHelp": "Tout le monde peut s'inscrire aux événements. Si elle est désactivée, seules les personnes figurant sur la liste des invités de l'événement peuvent s'inscrire, et le lien personnel pour entrer n'est envoyé que par e-mail ; les personnes déjà inscrites et les liens de modérateurs et d'intervenants continuent de fonctionner.",
         "calendarPublic": "Calendrier public",
         "calendarPublicHelp": "Publier le calendrier des événements. Les visiteurs peuvent voir les événements programmés.",
         "parseTitleKicker": "Sur-titres éditoriaux",
@@ -3461,7 +3472,9 @@
     "shortcutsF": "Plein écran",
     "shortcutsSpeed": "Diminuer ou augmenter la vitesse",
     "captionsOn": "Sous-titres activés",
-    "captionsOff": "Sous-titres désactivés"
+    "captionsOff": "Sous-titres désactivés",
+    "watchOnYouTube": "Regarder la vidéo sur YouTube",
+    "externalSiteNote": "S'ouvre sur YouTube, un site externe qui a ses propres conditions d'utilisation et sa propre politique de confidentialité."
   },
   "postprod": {
     "loading": "Chargement de la transcription…",

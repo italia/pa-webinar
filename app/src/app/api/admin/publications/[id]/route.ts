@@ -36,7 +36,7 @@ const updatePublicationSchema = z.object({
     .nullable()
     .optional(),
   // Attach an already-uploaded blob to the event as its primary
-  // recording. The admin reaches this after the direct-to-Azure upload
+  // recording. The admin reaches this after the direct-to-storage upload
   // has completed, so the URL is guaranteed to point at an existing
   // blob in our container. Setting recordingUrl implies publishing
   // unless the caller explicitly passes recordingPublished: false.

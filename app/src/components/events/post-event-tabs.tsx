@@ -10,6 +10,7 @@ import {
 
 import { Icon } from '@/components/ui/icon';
 import TranscriptPanel from '@/components/events/transcript-panel';
+import MaterialList from '@/components/materials/material-list';
 import type { VideoPlayerHandle } from '@/components/events/video-player';
 
 interface QuestionData {
@@ -160,7 +161,7 @@ export default function PostEventTabs({
         <QATabContent questions={questions} />
       )}
       {activeTab === 'materials' && showMaterials && (
-        <MaterialsTabContent materials={materials} />
+        <MaterialList materials={materials} />
       )}
       {activeTab === 'polls' && showPolls && (
         <PollsTabContent polls={polls} />
@@ -199,33 +200,6 @@ function QATabContent({ questions }: { questions: QuestionData[] }) {
                 </span>
               </div>
             </div>
-          </CardBody>
-        </Card>
-      ))}
-    </div>
-  );
-}
-
-function MaterialsTabContent({ materials }: { materials: MaterialData[] }) {
-  return (
-    <div className="d-flex flex-column gap-2">
-      {materials.map((m) => (
-        <Card key={m.id} className="shadow-sm border-0" style={{ borderRadius: '0.5rem' }}>
-          <CardBody className="p-3">
-            <a
-              href={m.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="fw-semibold text-primary text-decoration-none d-inline-flex align-items-center gap-1"
-            >
-              <Icon icon="it-external-link" size="sm" />
-              {m.title}
-            </a>
-            {m.description && (
-              <p className="text-muted mb-0 mt-1" style={{ fontSize: '0.88rem' }}>
-                {m.description}
-              </p>
-            )}
           </CardBody>
         </Card>
       ))}

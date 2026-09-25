@@ -168,6 +168,12 @@
     "resendLink": "Resend my access link",
     "resending": "Sending…",
     "resendSent": "If the address is registered, we've re-sent the access link by email.",
+    "invitationOnly": "Registration is reserved for invited people: use the email address you were invited with. The link to enter will reach you by email.",
+    "closed": "Registration for this event is not open to the public.",
+    "lostLink": "Already registered? Get your personal link again",
+    "lostLinkHelp": "Enter the email address you registered with: if it is registered for this event, we will send you the link to enter again.",
+    "checkEmailTitle": "Check your email",
+    "checkEmail": "If the address is on the invitation list, you will shortly receive an email with your personal link to enter the room. If you cannot find it, check your spam folder.",
     "backToEvent": "Back to event",
     "organization": "Organization",
     "organizationPlaceholder": "e.g. AGID, Ministry of Economy, City of Rome",
@@ -276,6 +282,7 @@
     "guestJoinSubtitle": "Join the live event as a guest",
     "guestJoinButton": "Join as guest",
     "guestRedirectToRegister": "The event has not started yet. Register to receive your access link.",
+    "guestAccessDisabled": "This event requires registration: joining as a guest is not available.",
     "jibriUnavailable": "Recording unavailable — Jibri not configured",
     "endEventError": "Failed to end the event. Please try again.",
     "jibriNotConfigured": "Recording not configured in infrastructure",
@@ -1510,7 +1517,11 @@
         "faviconUrl": "Favicon URL",
         "primaryColor": "Primary color",
         "defaultTimezone": "Default timezone",
-        "defaultTimezoneHelp": "Used for date display and new event creation."
+        "defaultTimezoneHelp": "Used for date display and new event creation.",
+        "waitingRoomEngine": "Waiting room (site default)",
+        "waitingRoomEngineGame": "Videogame (Phaser lobby)",
+        "waitingRoomEngineClassic": "Classic (static)",
+        "waitingRoomEngineHelp": "Default mode of the waiting room. It can be changed for a single event and, for one visit, with the {param} parameter in the address."
       },
       "watermark": {
         "title": "Video customization",
@@ -1601,11 +1612,11 @@
       },
       "features": {
         "statusPageEnabled": "Status page enabled",
-        "statusPageEnabledHelp": "Show the service status page",
+        "statusPageEnabledHelp": "Publishes the service status page. When off, the page does not exist and its data is visible to administrators only.",
         "guestAccessEnabled": "Guest access enabled",
-        "guestAccessEnabledHelp": "Allow guest access to live events",
+        "guestAccessEnabledHelp": "People who have not registered can join live events with just their name. When off, scheduled events can only be joined by registering or with a moderator or speaker link; instant video calls stay open to anyone with the link.",
         "publicRegistrationEnabled": "Public registration enabled",
-        "publicRegistrationEnabledHelp": "Anyone can create events (if disabled, only admins can)",
+        "publicRegistrationEnabledHelp": "Anyone can register for events. When off, only people on the event's invitation list can register, and the personal link to enter is sent only by email; people already registered and moderator or speaker links keep working.",
         "calendarPublic": "Public calendar",
         "calendarPublicHelp": "Publish the event calendar. Visitors can see scheduled events.",
         "parseTitleKicker": "Editorial title kicker",
@@ -3461,7 +3472,9 @@
     "shortcutsF": "Toggle fullscreen",
     "shortcutsSpeed": "Decrease or increase speed",
     "captionsOn": "Captions on",
-    "captionsOff": "Captions off"
+    "captionsOff": "Captions off",
+    "watchOnYouTube": "Watch the video on YouTube",
+    "externalSiteNote": "Opens on YouTube, an external site with its own terms of use and privacy notice."
   },
   "postprod": {
     "loading": "Loading transcript…",

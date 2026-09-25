@@ -30,6 +30,12 @@ interface ModeratorControlsProps {
   /** Event opted into the native Jitsi/Excalidraw whiteboard → show the
    *  "Apri lavagna" toggle (desktop only, matching Jitsi's own gating). */
   whiteboardEnabled?: boolean;
+  /** The installation serves the whiteboard (Excalidraw backend + Jitsi
+   *  `config.whiteboard.enabled`). Without it the toggle stays hidden so it
+   *  never shows as a dead button. Resolved at RUNTIME by the live page's
+   *  Server Component (lib/jitsi/whiteboard.ts), never read from
+   *  `process.env` here: webpack would freeze it into the image at build. */
+  whiteboardInfraReady?: boolean;
   /** Local moderator's display name, forwarded to the raised-hands panel
    *  so it can resolve the current user's own raise-hand event. */
   localDisplayName?: string;
@@ -62,12 +68,6 @@ const BTN_DANGER: React.CSSProperties = {
   fontSize: '0.82rem',
 };
 
-// The native Jitsi/Excalidraw whiteboard needs a collab backend + Jitsi
-// `config.whiteboard.enabled` server-side, which is NOT deployed yet (no
-// excalidraw backend in any cluster). Keep the toggle hidden until the infra
-// lands and this build-time env is set, so it never shows as a dead button.
-const WHITEBOARD_INFRA_READY = process.env.NEXT_PUBLIC_WHITEBOARD_ENABLED === 'true';
-
 export default function ModeratorControls({
   api,
   eventId,
@@ -77,6 +77,7 @@ export default function ModeratorControls({
   participantsCanUnmute = false,
   participantsCanStartVideo = false,
   whiteboardEnabled = false,
+  whiteboardInfraReady = false,
   localDisplayName = '',
   isPrimaryModerator = false,
 }: ModeratorControlsProps) {
@@ -406,7 +407,7 @@ export default function ModeratorControls({
           {/* Whiteboard — toggle the native Jitsi/Excalidraw board via the
               IFrame API. Desktop-only (matches Jitsi's own toolbar gating; the
               board doesn't render on mobile) and only when the event opted in. */}
-          {whiteboardEnabled && WHITEBOARD_INFRA_READY && (
+          {whiteboardEnabled && whiteboardInfraReady && (
             <Button
               color="secondary"
               size="sm"

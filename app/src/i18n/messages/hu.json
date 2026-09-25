@@ -168,6 +168,12 @@
     "resendLink": "Hozzáférési link újraküldése",
     "resending": "Küldés…",
     "resendSent": "Ha a cím regisztrálva van, e-mailben újra elküldtük a hozzáférési linket.",
+    "invitationOnly": "A regisztráció csak meghívottaknak szól: azt az e-mail címet használja, amellyel meghívták. A belépési linket e-mailben kapja meg.",
+    "closed": "Erre az eseményre a regisztráció nem nyilvános.",
+    "lostLink": "Már regisztrált? Kérje újra a személyes linkjét",
+    "lostLinkHelp": "Adja meg azt az e-mail címet, amellyel regisztrált: ha regisztrálva van erre az eseményre, újra elküldjük a belépési linket.",
+    "checkEmailTitle": "Ellenőrizze az e-mailjeit",
+    "checkEmail": "Ha a cím szerepel a meghívottak listáján, hamarosan e-mailt kap a teremhez vezető személyes linkjével. Ha nem találja, nézze meg a levélszemét mappát.",
     "backToEvent": "Vissza az eseményhez",
     "organization": "Szervezet",
     "organizationPlaceholder": "pl. AGID, Gazdasági Minisztérium, Budapest Főváros",
@@ -276,6 +282,7 @@
     "guestJoinSubtitle": "Csatlakozzon vendégként a folyamatban lévő eseményhez",
     "guestJoinButton": "Belépés vendégként",
     "guestRedirectToRegister": "Az esemény még nem kezdődött el. Regisztráljon a hozzáférési link megkapásához.",
+    "guestAccessDisabled": "Erre az eseményre regisztráció szükséges: vendégként nem lehet belépni.",
     "jibriUnavailable": "Felvétel nem elérhető — Jibri nincs konfigurálva",
     "endEventError": "Hiba az esemény befejezésekor. Kérjük, próbálja újra.",
     "jibriNotConfigured": "Felvétel nincs konfigurálva az infrastruktúrában",
@@ -1510,7 +1517,11 @@
         "faviconUrl": "Favicon URL-címe",
         "primaryColor": "Elsődleges szín",
         "defaultTimezone": "Alapértelmezett időzóna",
-        "defaultTimezoneHelp": "A dátumok megjelenítéséhez és új események létrehozásához használt."
+        "defaultTimezoneHelp": "A dátumok megjelenítéséhez és új események létrehozásához használt.",
+        "waitingRoomEngine": "Váróterem (a webhely alapértelmezése)",
+        "waitingRoomEngineGame": "Videojáték (Phaser lobby)",
+        "waitingRoomEngineClassic": "Klasszikus (statikus)",
+        "waitingRoomEngineHelp": "A váróterem alapértelmezett módja. Egy-egy eseménynél módosítható, egyetlen látogatásra pedig a címben szereplő {param} paraméterrel."
       },
       "watermark": {
         "title": "Videó testreszabás",
@@ -1601,11 +1612,11 @@
       },
       "features": {
         "statusPageEnabled": "Állapotoldal aktív",
-        "statusPageEnabledHelp": "A szolgáltatás állapotoldalának megjelenítése",
+        "statusPageEnabledHelp": "Közzéteszi a szolgáltatás állapotoldalát. Kikapcsolva az oldal nem létezik, és az adatait csak az adminisztrátorok látják.",
         "guestAccessEnabled": "Vendég hozzáférés aktív",
-        "guestAccessEnabledHelp": "Vendégként való hozzáférés engedélyezése a folyamatban lévő eseményekhez",
+        "guestAccessEnabledHelp": "A nem regisztrált személyek csak a nevük megadásával csatlakozhatnak a folyamatban lévő eseményekhez. Kikapcsolva a tervezett eseményekre csak regisztrációval vagy moderátori, illetve előadói hivatkozással lehet belépni; az azonnali videohívások mindenki számára nyitva maradnak, akinek megvan a hivatkozás.",
         "publicRegistrationEnabled": "Nyilvános regisztráció aktív",
-        "publicRegistrationEnabledHelp": "Bárki létrehozhat eseményeket (ha kikapcsolva, csak adminisztrátorok)",
+        "publicRegistrationEnabledHelp": "Bárki regisztrálhat az eseményekre. Kikapcsolva csak az esemény meghívotti listáján szereplők regisztrálhatnak, és a személyes belépési linket csak e-mailben küldjük el; a már regisztráltak, valamint a moderátori és előadói hivatkozások továbbra is működnek.",
         "calendarPublic": "Nyilvános naptár",
         "calendarPublicHelp": "Az eseménynaptár közzététele. A látogatók megtekinthetik a tervezett eseményeket.",
         "parseTitleKicker": "Címek szerkesztői felcímmel",
@@ -3461,7 +3472,9 @@
     "shortcutsF": "Teljes képernyő be- vagy kikapcsolása",
     "shortcutsSpeed": "A sebesség csökkentése vagy növelése",
     "captionsOn": "Feliratok bekapcsolva",
-    "captionsOff": "Feliratok kikapcsolva"
+    "captionsOff": "Feliratok kikapcsolva",
+    "watchOnYouTube": "Videó megtekintése a YouTube-on",
+    "externalSiteNote": "A YouTube-on nyílik meg, amely saját felhasználási feltételekkel és adatvédelmi tájékoztatóval rendelkező külső webhely."
   },
   "postprod": {
     "loading": "Átirat betöltése…",

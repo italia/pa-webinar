@@ -86,12 +86,18 @@ export default function FileManagement({
         throw new Error(data.error ?? 'Upload failed');
       }
 
-      const { material, uploadUrl } = await res.json();
+      const { material, uploadUrl, uploadHeaders } = (await res.json()) as {
+        material: FileMaterial;
+        uploadUrl: string;
+        uploadHeaders?: Record<string, string>;
+      };
 
+      // Gli header li decide il server in base al fornitore dello storage;
+      // senza, vale quello che Azure pretende.
       const uploadRes = await fetch(uploadUrl, {
         method: 'PUT',
         headers: {
-          'x-ms-blob-type': 'BlockBlob',
+          ...(uploadHeaders ?? { 'x-ms-blob-type': 'BlockBlob' }),
           'Content-Type': file.type || 'application/octet-stream',
         },
         body: file,

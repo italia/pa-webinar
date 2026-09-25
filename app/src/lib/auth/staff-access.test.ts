@@ -55,6 +55,7 @@ const ROTTE_ORGANIZZATORE: Record<string, string> = {
   'api/admin/postprod/recordings/[id]/translations/route.ts': 'registrazione di un proprio evento',
   'api/admin/postprod/speakers/[id]/route.ts': 'relatore di un proprio evento',
   'api/admin/publications/upload-url/route.ts': 'firma il caricamento della registrazione',
+  'api/admin/publications/upload-url/multipart/route.ts': 'chiude o annulla il caricamento della registrazione',
   'api/admin/publications/[id]/route.ts': 'PATCH: pubblicazione del proprio evento',
   'api/admin/question-templates/route.ts': 'solo lettura, per comporre i propri questionari',
   'api/admin/recordings/route.ts': 'registrazioni dei propri eventi',

@@ -28,6 +28,8 @@
  */
 
 import { withErrorHandling } from '@/lib/api-handler';
+import { NotFoundError } from '@/lib/errors';
+import { ADMIN_ONLY_CACHE_CONTROL, statusDataAccess } from '@/lib/status-page';
 import { prisma } from '@/lib/db';
 import { refreshPostprodGauges } from '@/lib/ai/metrics';
 
@@ -77,6 +79,15 @@ export interface PostprodStatus {
 }
 
 export const GET = withErrorHandling(async () => {
+  // Pagina di stato spenta dall'amministrazione: questi dati servono solo a
+  // lei e alla mappa dell'infrastruttura dell'area admin (lib/status-page).
+  const access = await statusDataAccess();
+  if (access === 'none') throw new NotFoundError('Status page');
+  // A pagina spenta la risposta è dell'amministratore: fuori dalle cache
+  // condivise (lib/status-page).
+  const headers =
+    access === 'admin' ? { 'Cache-Control': ADMIN_ONLY_CACHE_CONTROL } : undefined;
+
   const site = await prisma.siteSetting.findUnique({
     where: { id: 'singleton' },
     select: {
@@ -111,7 +122,7 @@ export const GET = withErrorHandling(async () => {
       },
       events: { aiEnabledCount: 0, summaryEnabledCount: 0, translationEnabledCount: 0 },
       lastChecked: new Date().toISOString(),
-    } satisfies PostprodStatus);
+    } satisfies PostprodStatus, { headers });
   }
 
   // Single round-trip: il queue snapshot + Recording counts + last
@@ -220,5 +231,5 @@ export const GET = withErrorHandling(async () => {
       translationEnabledCount: Number(evStat?.translation_enabled ?? 0n),
     },
     lastChecked: new Date().toISOString(),
-  } satisfies PostprodStatus);
+  } satisfies PostprodStatus, { headers });
 });

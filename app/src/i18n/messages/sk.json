@@ -168,6 +168,12 @@
     "resendLink": "Znova poslať prístupový odkaz",
     "resending": "Odosiela sa…",
     "resendSent": "Ak je adresa zaregistrovaná, znova sme vám e-mailom poslali prístupový odkaz.",
+    "invitationOnly": "Registrácia je vyhradená pre pozvané osoby: použite e-mailovú adresu, na ktorú ste boli pozvaní. Odkaz na vstup vám príde e-mailom.",
+    "closed": "Registrácia na túto udalosť nie je otvorená verejnosti.",
+    "lostLink": "Už ste registrovaní? Nechajte si znova poslať svoj osobný odkaz",
+    "lostLinkHelp": "Zadajte e-mailovú adresu, s ktorou ste sa registrovali: ak je na túto udalosť registrovaná, znova vám pošleme odkaz na vstup.",
+    "checkEmailTitle": "Skontrolujte si e-mail",
+    "checkEmail": "Ak je adresa na zozname pozvaných, čoskoro dostanete e-mail s osobným odkazom na vstup do miestnosti. Ak ho nenájdete, pozrite sa do priečinka so spamom.",
     "backToEvent": "Späť na udalosť",
     "organization": "Organizácia",
     "organizationPlaceholder": "napr. AGID, Ministerstvo hospodárstva, Obec Bratislava",
@@ -276,6 +282,7 @@
     "guestJoinSubtitle": "Pripojte sa ako hosť k prebiehajúcej udalosti",
     "guestJoinButton": "Pripojiť sa ako hosť",
     "guestRedirectToRegister": "Udalosť ešte nezačala. Zaregistrujte sa na získanie prístupového odkazu.",
+    "guestAccessDisabled": "Táto udalosť vyžaduje registráciu: vstup ako hosť nie je k dispozícii.",
     "jibriUnavailable": "Nahrávanie nedostupné — Jibri nie je nakonfigurovaný",
     "endEventError": "Chyba pri ukončení podujatia. Skúste to znova.",
     "jibriNotConfigured": "Nahrávanie nie je v infraštruktúre nakonfigurované",
@@ -1510,7 +1517,11 @@
         "faviconUrl": "URL favicon",
         "primaryColor": "Primárna farba",
         "defaultTimezone": "Predvolené časové pásmo",
-        "defaultTimezoneHelp": "Používa sa na zobrazenie dátumov a vytváranie nových udalostí."
+        "defaultTimezoneHelp": "Používa sa na zobrazenie dátumov a vytváranie nových udalostí.",
+        "waitingRoomEngine": "Čakáreň (predvolené nastavenie webu)",
+        "waitingRoomEngineGame": "Videohra (lobby Phaser)",
+        "waitingRoomEngineClassic": "Klasická (statická)",
+        "waitingRoomEngineHelp": "Predvolený režim čakárne. Dá sa zmeniť pre jednotlivé podujatie a pre jednu návštevu parametrom {param} v adrese."
       },
       "watermark": {
         "title": "Prispôsobenie videa",
@@ -1601,11 +1612,11 @@
       },
       "features": {
         "statusPageEnabled": "Stavová stránka aktívna",
-        "statusPageEnabledHelp": "Zobraziť stavovú stránku služby",
+        "statusPageEnabledHelp": "Zverejňuje stavovú stránku služby. Keď je vypnutá, stránka neexistuje a jej údaje vidia iba administrátori.",
         "guestAccessEnabled": "Prístup hostí aktívny",
-        "guestAccessEnabledHelp": "Povoliť prístup hostí k prebiehajúcim udalostiam",
+        "guestAccessEnabledHelp": "Neregistrovaní sa môžu k prebiehajúcim udalostiam pripojiť iba so svojím menom. Keď je vypnuté, k plánovaným udalostiam sa dá pripojiť iba po registrácii alebo s odkazom pre moderátora či rečníka; okamžité videohovory zostávajú otvorené každému, kto má odkaz.",
         "publicRegistrationEnabled": "Verejná registrácia aktívna",
-        "publicRegistrationEnabledHelp": "Ktokoľvek môže vytvárať udalosti (ak je deaktivované, môžu iba administrátori)",
+        "publicRegistrationEnabledHelp": "Na udalosti sa môže registrovať ktokoľvek. Keď je vypnutá, registrovať sa môžu iba osoby zo zoznamu pozvaných na udalosť a osobný odkaz na vstup sa posiela iba e-mailom; už registrovaní a odkazy pre moderátorov a rečníkov fungujú ďalej.",
         "calendarPublic": "Verejný kalendár",
         "calendarPublicHelp": "Zverejniť kalendár udalostí. Návštevníci môžu vidieť naplánované udalosti.",
         "parseTitleKicker": "Názvy s redakčným nadtitulkom",
@@ -3461,7 +3472,9 @@
     "shortcutsF": "Celá obrazovka",
     "shortcutsSpeed": "Znížiť alebo zvýšiť rýchlosť",
     "captionsOn": "Titulky sú zapnuté",
-    "captionsOff": "Titulky sú vypnuté"
+    "captionsOff": "Titulky sú vypnuté",
+    "watchOnYouTube": "Pozrieť video na YouTube",
+    "externalSiteNote": "Otvorí sa na YouTube, externej stránke s vlastnými podmienkami používania a zásadami ochrany súkromia."
   },
   "postprod": {
     "loading": "Načítava sa prepis…",

@@ -21,13 +21,19 @@
 
 import { AzureStorageProvider, type AzureProviderConfig } from './azure-provider';
 import { S3StorageProvider, type S3ProviderConfig } from './s3-provider';
-import type { StorageProvider, StorageProviderType } from './provider';
+import type { StorageProvider } from './provider';
+import { resolveProviderType, type StorageDomain } from './provider-type';
 
-export type { StorageProvider, StorageProviderType, BlobEntry } from './provider';
+export type {
+  StorageProvider,
+  StorageProviderType,
+  BlobEntry,
+  BrowserUpload,
+} from './provider';
 export { AzureStorageProvider } from './azure-provider';
 export { S3StorageProvider } from './s3-provider';
 
-type Domain = 'files' | 'recordings';
+type Domain = StorageDomain;
 
 let _filesProvider: StorageProvider | null | undefined;
 let _recordingsProvider: StorageProvider | null | undefined;
@@ -45,23 +51,7 @@ function boolEnv(name: string): boolean {
 }
 
 // ── Domain → config extraction ─────────────────────────────────
-
-function resolveProviderType(domain: Domain): StorageProviderType | null {
-  if (domain === 'files') {
-    const explicit = env('STORAGE_FILES_PROVIDER');
-    if (explicit === 'azure' || explicit === 's3') return explicit;
-    if (env('AZURE_STORAGE_CONNECTION_STRING')) return 'azure';
-    if (env('STORAGE_FILES_S3_BUCKET')) return 's3';
-    return null;
-  }
-  // recordings
-  const explicit = env('RECORDING_STORAGE_TYPE');
-  if (explicit === 'azure-blob' || explicit === 'azure') return 'azure';
-  if (explicit === 's3' || explicit === 'minio' || explicit === 'gcs') return 's3';
-  if (env('RECORDING_AZURE_CONNECTION_STRING')) return 'azure';
-  if (env('RECORDING_S3_BUCKET')) return 's3';
-  return null;
-}
+// La scelta del fornitore sta in `provider-type.ts`, condivisa con la CSP.
 
 function azureConfigFor(domain: Domain): AzureProviderConfig | null {
   if (domain === 'files') {

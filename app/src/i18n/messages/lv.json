@@ -168,6 +168,12 @@
     "resendLink": "Nosūtīt piekļuves saiti vēlreiz",
     "resending": "Sūta…",
     "resendSent": "Ja adrese ir reģistrēta, mēs vēlreiz nosūtījām piekļuves saiti pa e-pastu.",
+    "invitationOnly": "Reģistrācija ir paredzēta tikai uzaicinātajiem: izmantojiet e-pasta adresi, ar kuru jūs tikāt uzaicināts. Saiti ieiešanai saņemsiet pa e-pastu.",
+    "closed": "Reģistrācija šim pasākumam nav atvērta sabiedrībai.",
+    "lostLink": "Jau reģistrējāties? Saņemiet savu personīgo saiti vēlreiz",
+    "lostLinkHelp": "Ievadiet e-pasta adresi, ar kuru reģistrējāties: ja tā ir reģistrēta šim pasākumam, mēs vēlreiz nosūtīsim saiti ieiešanai.",
+    "checkEmailTitle": "Pārbaudiet savu e-pastu",
+    "checkEmail": "Ja adrese ir uzaicināto sarakstā, drīz saņemsiet e-pastu ar personīgo saiti ieiešanai telpā. Ja to neatrodat, pārbaudiet surogātpasta mapi.",
     "backToEvent": "Atpakaļ pie pasākuma",
     "organization": "Organizācija",
     "organizationPlaceholder": "piem. AGID, Ekonomikas ministrija, Romas pašvaldība",
@@ -276,6 +282,7 @@
     "guestJoinSubtitle": "Pievienojieties notiekošajam pasākumam kā viesis",
     "guestJoinButton": "Pievienoties kā viesis",
     "guestRedirectToRegister": "Pasākums vēl nav sācies. Reģistrējieties, lai saņemtu piekļuves saiti.",
+    "guestAccessDisabled": "Šim pasākumam nepieciešama reģistrācija: pievienoties kā viesim nav iespējams.",
     "jibriUnavailable": "Ierakstīšana nav pieejama — Jibri nav konfigurēts",
     "endEventError": "Kļūda, beidzot pasākumu. Lūdzu, mēģiniet vēlreiz.",
     "jibriNotConfigured": "Ierakstīšana nav konfigurēta infrastruktūrā",
@@ -1510,7 +1517,11 @@
         "faviconUrl": "Favicon URL adrese",
         "primaryColor": "Primārā krāsa",
         "defaultTimezone": "Noklusējuma laika josla",
-        "defaultTimezoneHelp": "Izmanto datumu attēlošanai un jaunu pasākumu izveidei."
+        "defaultTimezoneHelp": "Izmanto datumu attēlošanai un jaunu pasākumu izveidei.",
+        "waitingRoomEngine": "Uzgaidāmā telpa (vietnes noklusējums)",
+        "waitingRoomEngineGame": "Videospēle (Phaser vestibils)",
+        "waitingRoomEngineClassic": "Klasiskā (statiskā)",
+        "waitingRoomEngineHelp": "Uzgaidāmās telpas noklusējuma režīms. To var mainīt atsevišķam pasākumam un vienam apmeklējumam — ar parametru {param} adresē."
       },
       "watermark": {
         "title": "Video pielāgošana",
@@ -1601,11 +1612,11 @@
       },
       "features": {
         "statusPageEnabled": "Statusa lapa iespējota",
-        "statusPageEnabledHelp": "Rādīt pakalpojuma statusa lapu",
+        "statusPageEnabledHelp": "Publicē pakalpojuma statusa lapu. Ja tā ir izslēgta, lapa nepastāv un tās datus redz tikai administratori.",
         "guestAccessEnabled": "Viesu piekļuve iespējota",
-        "guestAccessEnabledHelp": "Atļaut viesu piekļuvi notiekošiem pasākumiem",
+        "guestAccessEnabledHelp": "Nereģistrētas personas var pievienoties notiekošiem pasākumiem, norādot tikai savu vārdu. Ja tā ir izslēgta, plānotajiem pasākumiem var pievienoties tikai ar reģistrāciju vai ar moderatora vai runātāja saiti; tūlītējie video zvani paliek atvērti ikvienam, kam ir saite.",
         "publicRegistrationEnabled": "Publiskā reģistrācija iespējota",
-        "publicRegistrationEnabledHelp": "Ikviens var veidot pasākumus (ja izslēgts, tikai administratori)",
+        "publicRegistrationEnabledHelp": "Ikviens var reģistrēties pasākumiem. Ja tā ir izslēgta, reģistrēties var tikai personas no pasākuma uzaicināto saraksta, un personīgā saite ieiešanai tiek nosūtīta tikai pa e-pastu; jau reģistrētie un moderatoru un runātāju saites turpina darboties.",
         "calendarPublic": "Publiskais kalendārs",
         "calendarPublicHelp": "Publicēt pasākumu kalendāru. Apmeklētāji var redzēt plānotos pasākumus.",
         "parseTitleKicker": "Nosaukumi ar redakcionālu virsrakstu",
@@ -3461,7 +3472,9 @@
     "shortcutsF": "Pilnekrāna režīms",
     "shortcutsSpeed": "Samazināt vai palielināt atskaņošanas ātrumu",
     "captionsOn": "Subtitri ieslēgti",
-    "captionsOff": "Subtitri izslēgti"
+    "captionsOff": "Subtitri izslēgti",
+    "watchOnYouTube": "Skatīties video vietnē YouTube",
+    "externalSiteNote": "Tiek atvērts vietnē YouTube — ārējā vietnē ar saviem lietošanas noteikumiem un privātuma paziņojumu."
   },
   "postprod": {
     "loading": "Notiek transkripcijas ielāde…",

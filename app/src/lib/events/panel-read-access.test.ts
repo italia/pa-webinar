@@ -14,6 +14,8 @@ vi.mock('@/lib/auth/moderator', () => ({
 vi.mock('@/lib/events/join-grant', () => ({
   hasJoinGrant: vi.fn(),
 }));
+const { siteSettings } = vi.hoisted(() => ({ siteSettings: { guestAccessEnabled: true } }));
+vi.mock('@/lib/settings', () => ({ getSettings: async () => siteSettings }));
 
 import { isEventModeratorCached } from '@/lib/auth/moderator';
 import { prisma } from '@/lib/db';
@@ -39,6 +41,7 @@ const evento = (over: Partial<PanelReadEvent> = {}): PanelReadEvent => ({
 
 beforeEach(() => {
   vi.clearAllMocks();
+  siteSettings.guestAccessEnabled = true;
   mockedIsModerator.mockResolvedValue(false);
   mockedRegistration.mockResolvedValue(null);
   mockedGrant.mockResolvedValue(null);
@@ -135,6 +138,24 @@ describe('authorizePanelRead', () => {
     await expect(authorizePanelRead(evento(), 'tok-speaker')).rejects.toMatchObject({
       statusCode: 403,
     });
+  });
+
+  it("con l'accesso ospiti spento un evento a calendario pretende un token anche in diretta", async () => {
+    siteSettings.guestAccessEnabled = false;
+    await expect(authorizePanelRead(evento(), null)).rejects.toMatchObject({
+      statusCode: 401,
+    });
+    // Chi conduce e chi è iscritto leggono come prima.
+    mockedIsModerator.mockResolvedValue(true);
+    await expect(authorizePanelRead(evento(), 'tok-mod')).resolves.toMatchObject({
+      kind: 'moderator',
+    });
+  });
+
+  it("con l'accesso ospiti spento una chiamata istantanea resta aperta a chi ha il link", async () => {
+    siteSettings.guestAccessEnabled = false;
+    const r = await authorizePanelRead(evento({ eventType: 'INSTANT' }), null);
+    expect(r.kind).toBe('guest');
   });
 
   it('un token che non risolve fallisce, non si declassa a ospite', async () => {

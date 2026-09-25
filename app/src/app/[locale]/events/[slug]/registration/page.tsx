@@ -10,6 +10,7 @@ import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import { resolveKickerEnabled } from '@/lib/utils/title-kicker';
 import { getSettings } from '@/lib/settings';
 import { isEventOpenForRegistration } from '@/lib/events/visibility';
+import { registrationAccessFor } from '@/lib/events/registration-access';
 import { titoloEventoPubblico } from '@/lib/events/meta-title';
 
 interface RegistrationPageProps {
@@ -59,6 +60,12 @@ export default async function RegistrationPage({
 
   const title = getLocalized(event.title as LocalizedField, locale);
   const settings = await getSettings();
+  // Con l'iscrizione pubblica spenta la pagina resta raggiungibile — ci
+  // arriva anche chi viene rimandato dalla sala — ma spiega chi può iscriversi.
+  const registrationAccess = await registrationAccessFor(
+    event.id,
+    settings.publicRegistrationEnabled,
+  );
 
   const privacyUrl =
     event.privacyPolicyUrl ??
@@ -112,6 +119,7 @@ export default async function RegistrationPage({
               requireOrganizationRole: event.requireOrganizationRole,
               requireOrganizationType: event.requireOrganizationType,
             }}
+            registrationAccess={registrationAccess}
           />
         </div>
       </div>

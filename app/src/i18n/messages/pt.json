@@ -168,6 +168,12 @@
     "resendLink": "Enviar novamente a ligação de acesso",
     "resending": "A enviar…",
     "resendSent": "Se o endereço estiver registado, enviámos-lhe novamente a ligação de acesso por email.",
+    "invitationOnly": "A inscrição está reservada às pessoas convidadas: utilize o endereço de email com que foi convidado. A ligação para entrar ser-lhe-á enviada por email.",
+    "closed": "A inscrição neste evento não está aberta ao público.",
+    "lostLink": "Já se inscreveu? Receba novamente a sua ligação pessoal",
+    "lostLinkHelp": "Escreva o endereço de email com que se inscreveu: se estiver inscrito neste evento, voltamos a enviar-lhe a ligação para entrar.",
+    "checkEmailTitle": "Consulte o seu email",
+    "checkEmail": "Se o endereço constar da lista de convidados, receberá em breve um email com a sua ligação pessoal para entrar na sala. Se não o encontrar, verifique a pasta de spam.",
     "backToEvent": "Voltar ao evento",
     "organization": "Organismo de pertença",
     "organizationPlaceholder": "ex. AGID, Ministério da Economia, Câmara Municipal de Roma",
@@ -276,6 +282,7 @@
     "guestJoinSubtitle": "Entre como convidado no evento em curso",
     "guestJoinButton": "Entrar como convidado",
     "guestRedirectToRegister": "O evento ainda não começou. Inscreva-se para receber a ligação de acesso.",
+    "guestAccessDisabled": "Este evento requer inscrição: não é possível entrar sem se inscrever.",
     "jibriUnavailable": "Gravação indisponível — Jibri não configurado",
     "endEventError": "Erro ao terminar o evento. Tente novamente.",
     "jibriNotConfigured": "Gravação não configurada na infraestrutura",
@@ -1510,7 +1517,11 @@
         "faviconUrl": "URL do favicon",
         "primaryColor": "Cor primária",
         "defaultTimezone": "Fuso horário predefinido",
-        "defaultTimezoneHelp": "Utilizado para a apresentação de datas e a criação de novos eventos."
+        "defaultTimezoneHelp": "Utilizado para a apresentação de datas e a criação de novos eventos.",
+        "waitingRoomEngine": "Sala de espera (predefinição do site)",
+        "waitingRoomEngineGame": "Videojogo (lobby Phaser)",
+        "waitingRoomEngineClassic": "Clássica (estática)",
+        "waitingRoomEngineHelp": "Modo predefinido da sala de espera. Pode ser alterado para cada evento e, para uma única visita, com o parâmetro {param} no endereço."
       },
       "watermark": {
         "title": "Personalização do vídeo",
@@ -1601,11 +1612,11 @@
       },
       "features": {
         "statusPageEnabled": "Página de estado ativa",
-        "statusPageEnabledHelp": "Apresentar a página de estado do serviço",
+        "statusPageEnabledHelp": "Publica a página de estado do serviço. Quando desativada, a página não existe e os seus dados só são visíveis para os administradores.",
         "guestAccessEnabled": "Acesso de convidados ativo",
-        "guestAccessEnabledHelp": "Permitir o acesso como convidado aos eventos em direto",
+        "guestAccessEnabledHelp": "Quem não está inscrito pode entrar nos eventos em curso indicando apenas o nome. Quando desativado, nos eventos agendados só se entra com inscrição ou com a ligação de moderador ou orador; as videochamadas instantâneas continuam abertas a quem tiver a ligação.",
         "publicRegistrationEnabled": "Inscrição pública ativa",
-        "publicRegistrationEnabledHelp": "Qualquer pessoa pode criar eventos (se desativado, apenas os administradores)",
+        "publicRegistrationEnabledHelp": "Qualquer pessoa pode inscrever-se nos eventos. Quando desativado, só se podem inscrever as pessoas da lista de convidados do evento e a ligação pessoal para entrar é enviada apenas por email; quem já está inscrito e as ligações de moderadores e oradores continuam a funcionar.",
         "calendarPublic": "Calendário público",
         "calendarPublicHelp": "Publicar o calendário de eventos. Os visitantes podem ver os eventos programados.",
         "parseTitleKicker": "Títulos com sobretítulo editorial",
@@ -3461,7 +3472,9 @@
     "shortcutsF": "Ecrã inteiro",
     "shortcutsSpeed": "Diminuir ou aumentar a velocidade",
     "captionsOn": "Legendas ativas",
-    "captionsOff": "Legendas desativadas"
+    "captionsOff": "Legendas desativadas",
+    "watchOnYouTube": "Ver o vídeo no YouTube",
+    "externalSiteNote": "Abre no YouTube, um site externo com os seus próprios termos de utilização e aviso de privacidade."
   },
   "postprod": {
     "loading": "A carregar a transcrição…",

@@ -168,6 +168,12 @@
     "resendLink": "Send mit adgangslink igen",
     "resending": "Sender…",
     "resendSent": "Hvis adressen er tilmeldt, har vi sendt adgangslinket igen via e-mail.",
+    "invitationOnly": "Tilmelding er forbeholdt inviterede: brug den e-mailadresse, du er blevet inviteret med. Linket til at deltage får du tilsendt via e-mail.",
+    "closed": "Tilmelding til denne begivenhed er ikke åben for offentligheden.",
+    "lostLink": "Allerede tilmeldt? Få dit personlige link igen",
+    "lostLinkHelp": "Skriv den e-mailadresse, du tilmeldte dig med: hvis den er tilmeldt denne begivenhed, sender vi dig linket til at deltage igen.",
+    "checkEmailTitle": "Tjek din e-mail",
+    "checkEmail": "Hvis adressen er på invitationslisten, modtager du snart en e-mail med dit personlige link til rummet. Kan du ikke finde den, så tjek din spam-mappe.",
     "backToEvent": "Tilbage til begivenheden",
     "organization": "Organisation",
     "organizationPlaceholder": "f.eks. AGID, Økonomiministeriet, Roms Kommune",
@@ -276,6 +282,7 @@
     "guestJoinSubtitle": "Deltag som gæst i den igangværende begivenhed",
     "guestJoinButton": "Deltag som gæst",
     "guestRedirectToRegister": "Begivenheden er endnu ikke startet. Tilmeld dig for at modtage dit adgangslink.",
+    "guestAccessDisabled": "Denne begivenhed kræver tilmelding: det er ikke muligt at deltage som gæst.",
     "jibriUnavailable": "Optagelse ikke tilgængelig — Jibri ikke konfigureret",
     "endEventError": "Fejl ved afslutning af arrangementet. Prøv igen.",
     "jibriNotConfigured": "Optagelse ikke konfigureret i infrastrukturen",
@@ -1510,7 +1517,11 @@
         "faviconUrl": "Favicon-URL",
         "primaryColor": "Primærfarve",
         "defaultTimezone": "Standardtidszone",
-        "defaultTimezoneHelp": "Bruges til datovisning og oprettelse af nye begivenheder."
+        "defaultTimezoneHelp": "Bruges til datovisning og oprettelse af nye begivenheder.",
+        "waitingRoomEngine": "Venteværelse (sitets standard)",
+        "waitingRoomEngineGame": "Videospil (Phaser-lobby)",
+        "waitingRoomEngineClassic": "Klassisk (statisk)",
+        "waitingRoomEngineHelp": "Venteværelsets standardtilstand. Den kan ændres for det enkelte arrangement og, for et enkelt besøg, med parameteren {param} i adressen."
       },
       "watermark": {
         "title": "Videotilpasning",
@@ -1601,11 +1612,11 @@
       },
       "features": {
         "statusPageEnabled": "Statusside aktiveret",
-        "statusPageEnabledHelp": "Vis tjenestens statusside",
+        "statusPageEnabledHelp": "Offentliggør tjenestens statusside. Når den er slået fra, findes siden ikke, og dens data kan kun ses af administratorer.",
         "guestAccessEnabled": "Gæsteadgang aktiveret",
-        "guestAccessEnabledHelp": "Tillad gæsteadgang til igangværende begivenheder",
+        "guestAccessEnabledHelp": "Personer, der ikke er tilmeldt, kan deltage i igangværende begivenheder alene med deres navn. Når det er slået fra, kan man kun deltage i planlagte begivenheder med tilmelding eller med et moderator- eller oplægsholderlink; øjeblikkelige videoopkald forbliver åbne for alle med linket.",
         "publicRegistrationEnabled": "Offentlig registrering aktiveret",
-        "publicRegistrationEnabledHelp": "Alle kan oprette begivenheder (hvis deaktiveret, kun administratorer)",
+        "publicRegistrationEnabledHelp": "Alle kan tilmelde sig begivenheder. Når det er slået fra, kan kun personer på begivenhedens invitationsliste tilmelde sig, og det personlige link til at deltage sendes kun via e-mail; allerede tilmeldte og moderator- og oplægsholderlinks virker fortsat.",
         "calendarPublic": "Offentlig kalender",
         "calendarPublicHelp": "Offentliggør begivenhedskalenderen. Besøgende kan se planlagte begivenheder.",
         "parseTitleKicker": "Titler med redaktionel kicker",
@@ -3461,7 +3472,9 @@
     "shortcutsF": "Fuld skærm",
     "shortcutsSpeed": "Sænk eller øg hastigheden",
     "captionsOn": "Undertekster slået til",
-    "captionsOff": "Undertekster slået fra"
+    "captionsOff": "Undertekster slået fra",
+    "watchOnYouTube": "Se videoen på YouTube",
+    "externalSiteNote": "Åbner på YouTube, et eksternt websted med egne brugsvilkår og egen privatlivspolitik."
   },
   "postprod": {
     "loading": "Indlæser transskriptionen…",

@@ -168,6 +168,12 @@
     "resendLink": "Saada minu juurdepääsulink uuesti",
     "resending": "Saatmine…",
     "resendSent": "Kui aadress on registreeritud, saatsime juurdepääsulingi e-postiga uuesti.",
+    "invitationOnly": "Registreerumine on ainult kutsutud isikutele: kasutage e-posti aadressi, millega teid kutsuti. Sisenemislingi saate e-postiga.",
+    "closed": "Sellele üritusele registreerumine ei ole avalik.",
+    "lostLink": "Olete juba registreerunud? Saage oma isiklik link uuesti",
+    "lostLinkHelp": "Sisestage e-posti aadress, millega registreerusite: kui see on sellele üritusele registreeritud, saadame teile sisenemislingi uuesti.",
+    "checkEmailTitle": "Kontrollige oma e-posti",
+    "checkEmail": "Kui aadress on kutsutute nimekirjas, saate peagi e-kirja isikliku lingiga ruumi sisenemiseks. Kui te seda ei leia, vaadake rämpsposti kausta.",
     "backToEvent": "Tagasi ürituse juurde",
     "organization": "Organisatsioon",
     "organizationPlaceholder": "nt AGID, Majandusministeerium, Rooma linnavalitsus",
@@ -276,6 +282,7 @@
     "guestJoinSubtitle": "Liituge toimuva üritusega külalisena",
     "guestJoinButton": "Sisene külalisena",
     "guestRedirectToRegister": "Üritus ei ole veel alanud. Registreeruge, et saada ligipääsu link.",
+    "guestAccessDisabled": "Sellele üritusele on vaja registreeruda: külalisena sisenemine ei ole võimalik.",
     "jibriUnavailable": "Salvestamine pole saadaval — Jibri pole seadistatud",
     "endEventError": "Sündmuse lõpetamine ebaõnnestus. Palun proovige uuesti.",
     "jibriNotConfigured": "Salvestamine pole infrastruktuuris seadistatud",
@@ -1510,7 +1517,11 @@
         "faviconUrl": "Favikoni URL",
         "primaryColor": "Põhivärv",
         "defaultTimezone": "Vaikimisi ajavöönd",
-        "defaultTimezoneHelp": "Kasutatakse kuupäevade kuvamiseks ja uute ürituste loomiseks."
+        "defaultTimezoneHelp": "Kasutatakse kuupäevade kuvamiseks ja uute ürituste loomiseks.",
+        "waitingRoomEngine": "Ooteruum (saidi vaikeväärtus)",
+        "waitingRoomEngineGame": "Videomäng (Phaseri ooteala)",
+        "waitingRoomEngineClassic": "Klassikaline (staatiline)",
+        "waitingRoomEngineHelp": "Ooteruumi vaikerežiim. Seda saab muuta üksiku sündmuse jaoks ja ühe külastuse jaoks aadressis oleva parameetriga {param}."
       },
       "watermark": {
         "title": "Video kohandamine",
@@ -1601,11 +1612,11 @@
       },
       "features": {
         "statusPageEnabled": "Olekuleht lubatud",
-        "statusPageEnabledHelp": "Kuva teenuse olekuleht",
+        "statusPageEnabledHelp": "Avaldab teenuse olekulehe. Kui see on välja lülitatud, lehte ei ole ja selle andmeid näevad ainult administraatorid.",
         "guestAccessEnabled": "Külaliste ligipääs lubatud",
-        "guestAccessEnabledHelp": "Luba külaliste ligipääs toimuvatele üritustele",
+        "guestAccessEnabledHelp": "Registreerimata inimesed saavad toimuvatele üritustele siseneda ainult oma nimega. Kui see on välja lülitatud, saab kavandatud üritustele siseneda ainult registreerudes või moderaatori või esineja lingiga; kiired videokõned jäävad avatuks kõigile, kellel on link.",
         "publicRegistrationEnabled": "Avalik registreerumine lubatud",
-        "publicRegistrationEnabledHelp": "Igaüks saab üritusi luua (kui keelatud, ainult administraatorid)",
+        "publicRegistrationEnabledHelp": "Üritustele saab registreeruda igaüks. Kui see on välja lülitatud, saavad registreeruda ainult ürituse kutsutute nimekirjas olevad isikud ja isiklik sisenemislink saadetakse ainult e-postiga; juba registreerunud ning moderaatorite ja esinejate lingid toimivad edasi.",
         "calendarPublic": "Avalik kalender",
         "calendarPublicHelp": "Avalda ürituste kalender. Külastajad saavad näha planeeritud üritusi.",
         "parseTitleKicker": "Toimetuslike ülapealkirjadega pealkirjad",
@@ -3461,7 +3472,9 @@
     "shortcutsF": "Täisekraan",
     "shortcutsSpeed": "Vähenda või suurenda kiirust",
     "captionsOn": "Subtiitrid sees",
-    "captionsOff": "Subtiitrid väljas"
+    "captionsOff": "Subtiitrid väljas",
+    "watchOnYouTube": "Vaata videot YouTube'is",
+    "externalSiteNote": "Avaneb YouTube'is – välisel saidil, millel on oma kasutustingimused ja privaatsusteade."
   },
   "postprod": {
     "loading": "Transkriptsiooni laadimine…",

@@ -27,6 +27,7 @@ import { getPublicEnv } from '@/lib/env';
 import { WARMUP_STATUSES } from '@/lib/events/visibility';
 import { finalizePostEventEmails } from '@/lib/events/post-event-finalize';
 import { localizedUrl } from '@/lib/utils/localized-url';
+import { registrationJoinUrl } from '@/lib/events/registration-link';
 
 export const dynamic = 'force-dynamic';
 
@@ -99,15 +100,33 @@ export const GET = withErrorHandling(async (request) => {
         const title = getLocalized(event.title as LocalizedField, locale);
         const description = getLocalized(event.description as LocalizedField, locale);
         const recipientEmail = decryptPII(reg.email);
-        const joinUrl = localizedUrl(baseUrl, `/events/${event.slug}/live?token=${reg.accessToken}`, locale);
+        // Con l'iscrizione pubblica spenta il link dell'email e' anche la
+        // prova d'identita' (lib/events/registration-link).
+        const joinUrl = registrationJoinUrl({
+          baseUrl,
+          slug: event.slug,
+          eventId: event.id,
+          accessToken: reg.accessToken,
+          locale,
+          viaEmailEntry: !settings.publicRegistrationEnabled,
+        });
         const eventPageUrl = localizedUrl(baseUrl, `/events/${event.slug}`, locale);
 
+        // Negli eventi di calendario il link della sala, senza firma: si
+        // inoltrano e si condividono, e non devono portare l'identita'.
         const calendarInput = {
           title,
           description,
           startsAt: event.startsAt,
           endsAt: event.endsAt,
-          joinUrl,
+          joinUrl: registrationJoinUrl({
+            baseUrl,
+            slug: event.slug,
+            eventId: event.id,
+            accessToken: reg.accessToken,
+            locale,
+            viaEmailEntry: false,
+          }),
         };
 
         const templateInput = {

@@ -8,6 +8,7 @@ import { tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { getPublicEnv } from '@/lib/env';
 import { getSettings } from '@/lib/settings';
+import { guestAccessAllowed } from '@/lib/events/guest-window';
 import EventManagementClient from '@/components/admin/event-management-client';
 
 interface EventManagePageProps {
@@ -222,6 +223,7 @@ export default async function EventManagePage({
         baseUrl={baseUrl}
         locale={locale}
         kickerEnabled={effectiveKicker}
+        guestEntryOpen={guestAccessAllowed(event, settings.guestAccessEnabled)}
       />
     </div>
   );

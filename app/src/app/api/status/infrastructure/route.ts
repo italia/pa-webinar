@@ -1,4 +1,6 @@
 import { withErrorHandling } from '@/lib/api-handler';
+import { NotFoundError } from '@/lib/errors';
+import { statusDataVisible } from '@/lib/status-page';
 import { prisma } from '@/lib/db';
 import { getPublicEnv } from '@/lib/env';
 import { readJvbSnapshot } from '@/lib/jvb-snapshot';
@@ -368,6 +370,10 @@ function inferEmailProvider(host: string): string {
 }
 
 export const GET = withErrorHandling(async () => {
+  // Pagina di stato spenta dall'amministrazione: questi dati servono solo a
+  // lei e alla mappa dell'infrastruttura dell'area admin (lib/status-page).
+  if (!(await statusDataVisible())) throw new NotFoundError('Status page');
+
   const mode = inferDeploymentMode();
   const jitsiDomain = getPublicEnv('NEXT_PUBLIC_JITSI_DOMAIN') || '';
   const appDomain = getPublicEnv('NEXT_PUBLIC_APP_URL') || '';

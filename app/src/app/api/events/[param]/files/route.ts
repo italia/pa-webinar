@@ -17,6 +17,9 @@ import {
   ensureContainer,
 } from '@/lib/azure/blob-storage';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
+import { getFilesStorage } from '@/lib/storage';
+import { isEventPubliclyVisible } from '@/lib/events/visibility';
+import { MATERIAL_ACCESS_EVENT_SELECT, materialsWhereFor } from '@/lib/events/material-access';
 
 const uploadRequestSchema = z.object({
   fileName: z.string().min(1).max(255),
@@ -29,7 +32,7 @@ const uploadRequestSchema = z.object({
 
 export const GET = withErrorHandling(
   async (
-    _request: NextRequest,
+    request: NextRequest,
     context: { params: Promise<{ param: string }> },
   ) => {
     const { param } = await context.params;
@@ -42,17 +45,49 @@ export const GET = withErrorHandling(
 
     const event = await prisma.event.findFirst({
       where,
-      select: { id: true },
+      select: {
+        ...MATERIAL_ACCESS_EVENT_SELECT,
+        eventType: true,
+        postEventPublic: true,
+        postEventPublicUntil: true,
+      },
     });
 
-    if (!event) throw new NotFoundError('Event not found');
+    // Stessa soglia dell'elenco dei materiali: un evento che non ha una
+    // pagina pubblica (bozza, post-evento spento) non espone i suoi file.
+    if (!event || !isEventPubliclyVisible(event)) {
+      throw new NotFoundError('Event not found');
+    }
 
+    // Visibilità per fase per il pubblico, tutto per chi ha un token
+    // moderatore (lib/events/material-access).
     const materials = await prisma.eventMaterial.findMany({
-      where: { eventId: event.id, type: 'FILE' },
+      where: {
+        ...(await materialsWhereFor(event, extractModeratorToken(request))),
+        type: 'FILE',
+      },
       orderBy: { createdAt: 'desc' },
     });
 
-    return NextResponse.json(materials);
+    // Campi esposti uno per uno: `blobPath` è il percorso interno nello
+    // storage e resta sul server; `fileSize` è un BigInt, che JSON non
+    // serializza, e viaggia come stringa come nella risposta del POST.
+    return NextResponse.json(
+      materials.map((m) => ({
+        id: m.id,
+        type: m.type,
+        title: m.title,
+        url: m.url,
+        description: m.description,
+        fileName: m.fileName,
+        fileSize: m.fileSize?.toString() ?? null,
+        mimeType: m.mimeType,
+        visibility: m.visibility,
+        addedBy: m.addedBy,
+        createdAt: m.createdAt.toISOString(),
+      })),
+      { headers: { 'Cache-Control': 'private, no-store' } },
+    );
   },
 );
 
@@ -119,6 +154,13 @@ export const POST = withErrorHandling(
       {
         material: { ...material, fileSize: material.fileSize?.toString() },
         uploadUrl,
+        // Header da mandare con la PUT su `uploadUrl`, oltre al Content-Type:
+        // Azure pretende il tipo di blob, S3 non vuole header in più (ognuno
+        // andrebbe ammesso anche nel CORS del bucket).
+        uploadHeaders:
+          getFilesStorage()?.type === 'azure'
+            ? { 'x-ms-blob-type': 'BlockBlob' }
+            : {},
       },
       { status: 201 },
     );

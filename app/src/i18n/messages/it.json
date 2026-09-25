@@ -168,6 +168,12 @@
     "resendLink": "Invia di nuovo il link di accesso",
     "resending": "Invio in corso…",
     "resendSent": "Se l'indirizzo è registrato, ti abbiamo inviato di nuovo il link di accesso via email.",
+    "invitationOnly": "La registrazione è riservata alle persone invitate: usa l'indirizzo email con cui ti hanno invitato. Il link per entrare ti arriverà via email.",
+    "closed": "La registrazione a questo evento non è aperta al pubblico.",
+    "lostLink": "Ti eri già registrato? Ricevi di nuovo il tuo link personale",
+    "lostLinkHelp": "Scrivi l'indirizzo email con cui ti sei registrato: se risulta iscritto a questo evento, ti rimandiamo il link per entrare.",
+    "checkEmailTitle": "Controlla la tua email",
+    "checkEmail": "Se l'indirizzo è fra le persone invitate, riceverai a breve un'email con il tuo link personale per entrare nella sala. Se non la trovi, controlla la cartella dello spam.",
     "backToEvent": "Torna all'evento",
     "organization": "Ente di appartenenza",
     "organizationPlaceholder": "es. AGID, Ministero dell'Economia, Comune di Roma",
@@ -290,6 +296,7 @@
     "guestJoinSubtitle": "Entra come ospite nell'evento in corso",
     "guestJoinButton": "Entra come ospite",
     "guestRedirectToRegister": "L'evento non è ancora iniziato. Registrati per ricevere il link di accesso.",
+    "guestAccessDisabled": "Questo evento richiede la registrazione: non si può entrare come ospite.",
     "jibriUnavailable": "Registrazione non disponibile — Jibri non configurato",
     "endEventError": "Errore nella terminazione dell'evento. Riprova.",
     "jibriNotConfigured": "Registrazione non configurata nell'infrastruttura",
@@ -1582,7 +1589,11 @@
         "faviconUrl": "URL favicon",
         "primaryColor": "Colore primario",
         "defaultTimezone": "Fuso orario predefinito",
-        "defaultTimezoneHelp": "Usato per la visualizzazione delle date e la creazione di nuovi eventi."
+        "defaultTimezoneHelp": "Usato per la visualizzazione delle date e la creazione di nuovi eventi.",
+        "waitingRoomEngine": "Sala d'attesa (predefinita del sito)",
+        "waitingRoomEngineGame": "Videogame (lobby Phaser)",
+        "waitingRoomEngineClassic": "Classica (statica)",
+        "waitingRoomEngineHelp": "Modalità predefinita della sala d'attesa. Si può cambiare per il singolo evento e, per una sola visita, con il parametro {param} nell'indirizzo."
       },
       "watermark": {
         "title": "Personalizzazione video",
@@ -1673,11 +1684,11 @@
       },
       "features": {
         "statusPageEnabled": "Pagina stato attiva",
-        "statusPageEnabledHelp": "Mostra la pagina di stato del servizio",
+        "statusPageEnabledHelp": "Pubblica la pagina di stato del servizio. Se disattivata, la pagina non esiste e i suoi dati li vedono solo gli amministratori.",
         "guestAccessEnabled": "Accesso ospiti attivo",
-        "guestAccessEnabledHelp": "Consenti l'accesso come ospite agli eventi in corso",
+        "guestAccessEnabledHelp": "Chi non è registrato può entrare negli eventi in corso indicando solo il nome. Se disattivato, agli eventi in calendario si entra solo con la registrazione o con il link di moderatore o relatore; le videocall istantanee restano aperte a chi ha il link.",
         "publicRegistrationEnabled": "Registrazione pubblica attiva",
-        "publicRegistrationEnabledHelp": "Chiunque può creare eventi (se disattivato, solo gli amministratori)",
+        "publicRegistrationEnabledHelp": "Chiunque può registrarsi agli eventi. Se disattivata, si registra solo chi è nell'elenco degli invitati dell'evento e il link personale per entrare arriva solo via email; chi è già registrato e chi ha il link di moderatore o relatore continua a entrare.",
         "calendarPublic": "Calendario pubblico",
         "calendarPublicHelp": "Pubblica il calendario degli eventi. Visitatori possono vedere gli eventi programmati.",
         "parseTitleKicker": "Titoli con kicker editoriale",
@@ -3461,7 +3472,9 @@
     "shortcutsF": "Schermo intero",
     "shortcutsSpeed": "Diminuisce o aumenta la velocità",
     "captionsOn": "Sottotitoli attivi",
-    "captionsOff": "Sottotitoli disattivati"
+    "captionsOff": "Sottotitoli disattivati",
+    "watchOnYouTube": "Guarda il video su YouTube",
+    "externalSiteNote": "Si apre su YouTube, un sito esterno con le proprie condizioni d'uso e la propria informativa privacy."
   },
   "postprod": {
     "loading": "Caricamento trascrizione…",

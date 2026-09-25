@@ -168,6 +168,12 @@
     "resendLink": "Lähetä pääsylinkki uudelleen",
     "resending": "Lähetetään…",
     "resendSent": "Jos osoite on rekisteröity, lähetimme pääsylinkin uudelleen sähköpostitse.",
+    "invitationOnly": "Ilmoittautuminen on vain kutsutuille: käytä sähköpostiosoitetta, jolla sinut kutsuttiin. Linkki sisäänpääsyyn lähetetään sinulle sähköpostitse.",
+    "closed": "Tähän tapahtumaan ilmoittautuminen ei ole avoinna yleisölle.",
+    "lostLink": "Oletko jo ilmoittautunut? Pyydä henkilökohtainen linkkisi uudelleen",
+    "lostLinkHelp": "Kirjoita sähköpostiosoite, jolla ilmoittauduit: jos se on ilmoittautunut tähän tapahtumaan, lähetämme sinulle linkin uudelleen.",
+    "checkEmailTitle": "Tarkista sähköpostisi",
+    "checkEmail": "Jos osoite on kutsuttujen luettelossa, saat pian sähköpostin, jossa on henkilökohtainen linkkisi huoneeseen. Jos et löydä sitä, tarkista roskapostikansio.",
     "backToEvent": "Takaisin tapahtumaan",
     "organization": "Organisaatio",
     "organizationPlaceholder": "esim. AGID, Talousministeriö, Rooman kaupunki",
@@ -276,6 +282,7 @@
     "guestJoinSubtitle": "Liity käynnissä olevaan tapahtumaan vieraana",
     "guestJoinButton": "Liity vieraana",
     "guestRedirectToRegister": "Tapahtuma ei ole vielä alkanut. Ilmoittaudu saadaksesi pääsylinkin.",
+    "guestAccessDisabled": "Tähän tapahtumaan on ilmoittauduttava: vieraana liittyminen ei ole mahdollista.",
     "jibriUnavailable": "Tallenne ei saatavilla — Jibri ei ole määritetty",
     "endEventError": "Tapahtuman päättäminen epäonnistui. Yritä uudelleen.",
     "jibriNotConfigured": "Tallennusta ei ole määritetty infrastruktuurissa",
@@ -1510,7 +1517,11 @@
         "faviconUrl": "Favicon-URL",
         "primaryColor": "Ensisijainen väri",
         "defaultTimezone": "Oletusaikavyöhyke",
-        "defaultTimezoneHelp": "Käytetään päivämäärien näyttämiseen ja uusien tapahtumien luomiseen."
+        "defaultTimezoneHelp": "Käytetään päivämäärien näyttämiseen ja uusien tapahtumien luomiseen.",
+        "waitingRoomEngine": "Odotushuone (sivuston oletus)",
+        "waitingRoomEngineGame": "Videopeli (Phaser-aula)",
+        "waitingRoomEngineClassic": "Klassinen (staattinen)",
+        "waitingRoomEngineHelp": "Odotushuoneen oletustila. Sitä voi muuttaa yksittäiselle tapahtumalle ja yhden käynnin ajaksi osoitteen parametrilla {param}."
       },
       "watermark": {
         "title": "Videon mukauttaminen",
@@ -1601,11 +1612,11 @@
       },
       "features": {
         "statusPageEnabled": "Tilasivu käytössä",
-        "statusPageEnabledHelp": "Näytä palvelun tilasivu",
+        "statusPageEnabledHelp": "Julkaisee palvelun tilasivun. Kun asetus on pois käytöstä, sivua ei ole ja sen tiedot näkyvät vain ylläpitäjille.",
         "guestAccessEnabled": "Vieraspääsy käytössä",
-        "guestAccessEnabledHelp": "Salli vieraspääsy käynnissä oleviin tapahtumiin",
+        "guestAccessEnabledHelp": "Ilmoittautumattomat voivat liittyä käynnissä oleviin tapahtumiin pelkällä nimellään. Kun asetus on pois käytöstä, suunniteltuihin tapahtumiin pääsee vain ilmoittautumalla tai moderaattorin tai puhujan linkillä; pikavideopuhelut pysyvät avoimina kaikille, joilla on linkki.",
         "publicRegistrationEnabled": "Julkinen rekisteröityminen käytössä",
-        "publicRegistrationEnabledHelp": "Kuka tahansa voi luoda tapahtumia (jos pois käytöstä, vain ylläpitäjät)",
+        "publicRegistrationEnabledHelp": "Kuka tahansa voi ilmoittautua tapahtumiin. Kun asetus on pois käytöstä, vain tapahtuman kutsuttujen luettelossa olevat voivat ilmoittautua, ja henkilökohtainen linkki lähetetään vain sähköpostitse; jo ilmoittautuneet sekä moderaattorien ja puhujien linkit toimivat edelleen.",
         "calendarPublic": "Julkinen kalenteri",
         "calendarPublicHelp": "Julkaise tapahtumakalenteri. Kävijät voivat nähdä suunnitellut tapahtumat.",
         "parseTitleKicker": "Toimitukselliset yläotsikot otsikossa",
@@ -3461,7 +3472,9 @@
     "shortcutsF": "Koko näyttö päälle tai pois",
     "shortcutsSpeed": "Hidasta tai nopeuta toistoa",
     "captionsOn": "Tekstitykset käytössä",
-    "captionsOff": "Tekstitykset pois käytöstä"
+    "captionsOff": "Tekstitykset pois käytöstä",
+    "watchOnYouTube": "Katso video YouTubessa",
+    "externalSiteNote": "Avautuu YouTubessa, ulkoisella sivustolla, jolla on omat käyttöehdot ja tietosuojaseloste."
   },
   "postprod": {
     "loading": "Ladataan litterointia…",

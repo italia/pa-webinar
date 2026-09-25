@@ -168,6 +168,12 @@
     "resendLink": "Ibgħat il-link tal-aċċess mill-ġdid",
     "resending": "Qed jintbagħat…",
     "resendSent": "Jekk l-indirizz ikun irreġistrat, bgħatnielek il-link tal-aċċess mill-ġdid bl-email.",
+    "invitationOnly": "Ir-reġistrazzjoni hija riżervata għal persuni mistiedna: uża l-indirizz tal-email li bih ġejt mistieden/mistiedna. Il-link biex tidħol jaslek bl-email.",
+    "closed": "Ir-reġistrazzjoni għal dan l-avveniment mhijiex miftuħa għall-pubbliku.",
+    "lostLink": "Diġà rreġistrajt? Irċievi l-link personali tiegħek mill-ġdid",
+    "lostLinkHelp": "Ikteb l-indirizz tal-email li bih irreġistrajt: jekk ikun irreġistrat għal dan l-avveniment, nerġgħu nibagħtulek il-link biex tidħol.",
+    "checkEmailTitle": "Iċċekkja l-email tiegħek",
+    "checkEmail": "Jekk l-indirizz ikun fil-lista tal-mistiedna, dalwaqt tirċievi email bil-link personali tiegħek biex tidħol fil-kamra. Jekk ma ssibhiex, iċċekkja l-folder tal-ispam.",
     "backToEvent": "Lura lejn l-avveniment",
     "organization": "Entità ta' appartenenza",
     "organizationPlaceholder": "eż. AGID, Ministeru tal-Ekonomija, Muniċipju ta' Ruma",
@@ -276,6 +282,7 @@
     "guestJoinSubtitle": "Idħol fl-avveniment ħaj bħala mistieden",
     "guestJoinButton": "Idħol bħala mistieden",
     "guestRedirectToRegister": "L-avveniment għadu ma bediex. Irreġistra biex tirċievi l-link ta' aċċess.",
+    "guestAccessDisabled": "Dan l-avveniment jeħtieġ reġistrazzjoni: ma tistax tidħol mingħajr ma tirreġistra.",
     "jibriUnavailable": "Reġistrazzjoni mhijiex disponibbli — Jibri mhux ikkonfigurat",
     "endEventError": "Żball fl-għeluq tal-avveniment. Erġa' pprova.",
     "jibriNotConfigured": "Reġistrazzjoni mhijiex ikkonfigurata fl-infrastruttura",
@@ -1510,7 +1517,11 @@
         "faviconUrl": "URL tal-favicon",
         "primaryColor": "Kulur primarju",
         "defaultTimezone": "Żona tal-ħin predefinita",
-        "defaultTimezoneHelp": "Użat għall-viżwalizzazzjoni tad-dati u l-ħolqien ta' avvenimenti ġodda."
+        "defaultTimezoneHelp": "Użat għall-viżwalizzazzjoni tad-dati u l-ħolqien ta' avvenimenti ġodda.",
+        "waitingRoomEngine": "Kamra tal-istennija (prestabbilit tas-sit)",
+        "waitingRoomEngineGame": "Videogame (lobby Phaser)",
+        "waitingRoomEngineClassic": "Klassika (statika)",
+        "waitingRoomEngineHelp": "Il-modalità prestabbilita tal-kamra tal-istennija. Tista' tinbidel għal avveniment wieħed u, għal żjara waħda, bil-parametru {param} fl-indirizz."
       },
       "watermark": {
         "title": "Personalizzazzjoni tal-vidjo",
@@ -1601,11 +1612,11 @@
       },
       "features": {
         "statusPageEnabled": "Paġna tal-istatus attiva",
-        "statusPageEnabledHelp": "Uri l-paġna tal-istatus tas-servizz",
+        "statusPageEnabledHelp": "Tippubblika l-paġna tal-istatus tas-servizz. Meta tkun mitfija, il-paġna ma teżistix u d-data tagħha jarawha biss l-amministraturi.",
         "guestAccessEnabled": "Aċċess għall-mistednin attiv",
-        "guestAccessEnabledHelp": "Ippermetti l-aċċess bħala mistieden għall-avvenimenti ħajjin",
+        "guestAccessEnabledHelp": "Min mhuwiex irreġistrat jista' jidħol f'avvenimenti għaddejjin billi jagħti ismu biss. Meta tkun mitfija, fl-avvenimenti skedati tidħol biss b'reġistrazzjoni jew bil-link ta' moderatur jew kelliem; il-videocalls istantanji jibqgħu miftuħa għal kull min għandu l-link.",
         "publicRegistrationEnabled": "Reġistrazzjoni pubblika attiva",
-        "publicRegistrationEnabledHelp": "Kulħadd jista' joħloq avvenimenti (jekk disattivat, l-amministraturi biss)",
+        "publicRegistrationEnabledHelp": "Kulħadd jista' jirreġistra għall-avvenimenti. Meta tkun mitfija, jistgħu jirreġistraw biss il-persuni fil-lista tal-mistiedna tal-avveniment, u l-link personali biex tidħol jintbagħat biss bl-email; min diġà rreġistra u l-links tal-moderaturi u l-kelliema jibqgħu jaħdmu.",
         "calendarPublic": "Kalendarju pubbliku",
         "calendarPublicHelp": "Ippubblika l-kalendarju tal-avvenimenti. Iż-żitaturi jistgħu jaraw l-avvenimenti skedati.",
         "parseTitleKicker": "Titoli ma' kicker editorjali",
@@ -3461,7 +3472,9 @@
     "shortcutsF": "Skrin sħiħ",
     "shortcutsSpeed": "Naqqas jew żid il-veloċità",
     "captionsOn": "Sottotitli mixgħula",
-    "captionsOff": "Sottotitli mitfija"
+    "captionsOff": "Sottotitli mitfija",
+    "watchOnYouTube": "Ara l-vidjo fuq YouTube",
+    "externalSiteNote": "Jinfetaħ fuq YouTube, sit estern bil-kundizzjonijiet tal-użu u l-avviż ta' privatezza tiegħu."
   },
   "postprod": {
     "loading": "Qed titgħabba t-traskrizzjoni…",

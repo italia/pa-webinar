@@ -15,21 +15,54 @@
 
 import {
   S3Client,
+  AbortMultipartUploadCommand,
+  CompleteMultipartUploadCommand,
+  CreateMultipartUploadCommand,
   DeleteObjectCommand,
   ListObjectsV2Command,
+  ListPartsCommand,
   PutObjectCommand,
   GetObjectCommand,
   HeadBucketCommand,
+  HeadObjectCommand,
   CreateBucketCommand,
+  UploadPartCommand,
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
-import type {
-  StorageProvider,
-  UploadUrlOptions,
-  DownloadUrlOptions,
-  BlobEntry,
+import {
+  IncompleteUploadError,
+  type StorageProvider,
+  type UploadUrlOptions,
+  type DownloadUrlOptions,
+  type BlobEntry,
+  type BrowserUpload,
+  type BrowserUploadOptions,
 } from './provider';
+
+const MIB = 1024 * 1024;
+/** Parte minima del caricamento dal browser (S3 chiede almeno 5 MiB). */
+const MIN_PART_SIZE = 16 * MIB;
+/**
+ * Tetto al numero di parti: tiene la risposta di firma contenuta e la
+ * verifica finale in una sola pagina di ListParts (S3 ne ammette 10.000).
+ */
+const MAX_PARTS = 1000;
+/** Oggetto più grande che S3 accetta. */
+const MAX_OBJECT_SIZE = 5 * 1024 * 1024 * MIB;
+
+/**
+ * Dimensione delle parti per un file di `sizeBytes`. Deterministica: il
+ * server la ricalcola alla chiusura invece di fidarsi del client.
+ */
+export function multipartPartSize(sizeBytes: number): number {
+  return Math.max(MIN_PART_SIZE, Math.ceil(sizeBytes / MAX_PARTS / MIB) * MIB);
+}
+
+/** Errore dello storage con quel codice (l'SDK lo mette in `name`). */
+function isNamed(e: unknown, name: string): boolean {
+  return e instanceof Error && e.name === name;
+}
 
 export interface S3ProviderConfig {
   region: string;
@@ -59,6 +92,15 @@ export class S3StorageProvider implements StorageProvider {
       },
       ...(config.endpoint && { endpoint: config.endpoint }),
       forcePathStyle: config.forcePathStyle ?? !!config.endpoint,
+      // Di default l'SDK aggiunge un checksum CRC32 a ogni richiesta che lo
+      // supporta. In un URL firmato il corpo non c'è ancora: finisce nella
+      // query il CRC32 del corpo vuoto (`x-amz-checksum-crc32=AAAAAA==`) e
+      // qualunque PUT con dei byte viene rifiutato, anche da AWS. Sulle
+      // richieste dirette, poi, il checksum viaggia in coda al corpo
+      // (aws-chunked), che GCS e diversi S3 on-prem non accettano. Il
+      // checksum resta dove l'API lo pretende.
+      requestChecksumCalculation: 'WHEN_REQUIRED',
+      responseChecksumValidation: 'WHEN_REQUIRED',
     });
   }
 
@@ -154,6 +196,163 @@ export class S3StorageProvider implements StorageProvider {
     });
     const uploadUrl = await getSignedUrl(this.client, cmd, { expiresIn });
     return { uploadUrl, publicUrl: this.publicUrl(key) };
+  }
+
+  async createBrowserUpload(
+    key: string,
+    opts: BrowserUploadOptions,
+  ): Promise<BrowserUpload> {
+    const expiresIn = (opts.expiresInMinutes ?? 30) * 60;
+    if (!Number.isSafeInteger(opts.sizeBytes) || opts.sizeBytes <= 0 || opts.sizeBytes > MAX_OBJECT_SIZE) {
+      throw new RangeError(`Invalid upload size: ${opts.sizeBytes}`);
+    }
+    const partSize = multipartPartSize(opts.sizeBytes);
+
+    // Fino a una parte basta un PUT. Il Content-Type entra nella firma, così
+    // l'oggetto non può arrivare con un tipo diverso da quello validato.
+    if (opts.sizeBytes <= partSize) {
+      const url = await getSignedUrl(
+        this.client,
+        new PutObjectCommand({
+          Bucket: this.bucket,
+          Key: key,
+          ContentType: opts.contentType,
+        }),
+        { expiresIn, signableHeaders: new Set(['content-type']) },
+      );
+      return {
+        protocol: 's3-put',
+        url,
+        headers: { 'Content-Type': opts.contentType },
+      };
+    }
+
+    // Oltre, a parti: un PUT singolo non dà avanzamento né ripresa e si ferma
+    // a 5 GiB. Il Content-Type lo fissa il server all'apertura.
+    const created = await this.client.send(
+      new CreateMultipartUploadCommand({
+        Bucket: this.bucket,
+        Key: key,
+        ContentType: opts.contentType,
+      }),
+    );
+    const uploadId = created.UploadId;
+    if (!uploadId) throw new Error('CreateMultipartUpload returned no UploadId');
+
+    const partCount = Math.ceil(opts.sizeBytes / partSize);
+    const partUrls = await Promise.all(
+      Array.from({ length: partCount }, (_, i) =>
+        getSignedUrl(
+          this.client,
+          new UploadPartCommand({
+            Bucket: this.bucket,
+            Key: key,
+            UploadId: uploadId,
+            PartNumber: i + 1,
+          }),
+          { expiresIn },
+        ),
+      ),
+    );
+    return { protocol: 's3-multipart', uploadId, partSize, partUrls };
+  }
+
+  async completeBrowserUpload(
+    key: string,
+    opts: { uploadId: string; sizeBytes: number },
+  ): Promise<void> {
+    try {
+      await this.completeParts(key, opts);
+    } catch (e) {
+      // La chiusura è idempotente. Se la risposta di una chiusura riuscita
+      // si perde (il proxy scade mentre lo storage ricompone un file grande,
+      // la rete cade) il client ritenta, ma il caricamento a quel punto non
+      // esiste più: se l'oggetto c'è con la dimensione dichiarata, è chiuso.
+      if (isNamed(e, 'NoSuchUpload') && (await this.objectSize(key)) === opts.sizeBytes) {
+        return;
+      }
+      throw e;
+    }
+  }
+
+  /** Dimensione dell'oggetto, o null se non esiste. */
+  private async objectSize(key: string): Promise<number | null> {
+    try {
+      const head = await this.client.send(
+        new HeadObjectCommand({ Bucket: this.bucket, Key: key }),
+      );
+      return head.ContentLength ?? null;
+    } catch (e) {
+      if (isNamed(e, 'NotFound') || isNamed(e, 'NoSuchKey')) return null;
+      throw e;
+    }
+  }
+
+  private async completeParts(
+    key: string,
+    opts: { uploadId: string; sizeBytes: number },
+  ): Promise<void> {
+    // Gli ETag delle parti li legge il server con ListParts invece di
+    // riceverli dal browser: non serve esporre `ETag` nel CORS del bucket e
+    // il client non può ricomporre un oggetto con parti che non ha caricato.
+    const parts: { PartNumber: number; ETag: string; Size: number }[] = [];
+    let marker: string | undefined;
+    do {
+      const res = await this.client.send(
+        new ListPartsCommand({
+          Bucket: this.bucket,
+          Key: key,
+          UploadId: opts.uploadId,
+          ...(marker && { PartNumberMarker: marker }),
+        }),
+      );
+      for (const p of res.Parts ?? []) {
+        if (p.PartNumber === undefined || !p.ETag) continue;
+        parts.push({ PartNumber: p.PartNumber, ETag: p.ETag, Size: p.Size ?? 0 });
+      }
+      marker = res.IsTruncated ? res.NextPartNumberMarker : undefined;
+    } while (marker);
+
+    parts.sort((a, b) => a.PartNumber - b.PartNumber);
+    const expected = Math.ceil(opts.sizeBytes / multipartPartSize(opts.sizeBytes));
+    const received = parts.reduce((sum, p) => sum + p.Size, 0);
+    if (
+      parts.length !== expected ||
+      parts.some((p, i) => p.PartNumber !== i + 1) ||
+      received !== opts.sizeBytes
+    ) {
+      throw new IncompleteUploadError(
+        `Upload incomplete: ${parts.length}/${expected} parts, ${received}/${opts.sizeBytes} bytes`,
+      );
+    }
+
+    await this.client.send(
+      new CompleteMultipartUploadCommand({
+        Bucket: this.bucket,
+        Key: key,
+        UploadId: opts.uploadId,
+        MultipartUpload: {
+          Parts: parts.map(({ PartNumber, ETag }) => ({ PartNumber, ETag })),
+        },
+      }),
+    );
+  }
+
+  async abortBrowserUpload(key: string, uploadId: string): Promise<void> {
+    try {
+      await this.client.send(
+        new AbortMultipartUploadCommand({
+          Bucket: this.bucket,
+          Key: key,
+          UploadId: uploadId,
+        }),
+      );
+    } catch (e) {
+      // Già chiuso o già annullato: il risultato che si voleva c'è. Su un
+      // caricamento già chiuso l'oggetto resta com'è.
+      if (isNamed(e, 'NoSuchUpload')) return;
+      throw e;
+    }
   }
 
   async getDownloadUrl(

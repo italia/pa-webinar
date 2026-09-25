@@ -168,6 +168,12 @@
     "resendLink": "Znova pošlji povezavo za dostop",
     "resending": "Pošiljanje…",
     "resendSent": "Če je naslov prijavljen, smo vam povezavo za dostop znova poslali po e-pošti.",
+    "invitationOnly": "Prijava je namenjena samo povabljenim: uporabite e-poštni naslov, s katerim ste bili povabljeni. Povezavo za vstop boste prejeli po e-pošti.",
+    "closed": "Prijava na ta dogodek ni odprta za javnost.",
+    "lostLink": "Ste že prijavljeni? Znova prejmite svojo osebno povezavo",
+    "lostLinkHelp": "Vpišite e-poštni naslov, s katerim ste se prijavili: če je prijavljen na ta dogodek, vam bomo znova poslali povezavo za vstop.",
+    "checkEmailTitle": "Preverite svojo e-pošto",
+    "checkEmail": "Če je naslov na seznamu povabljenih, boste kmalu prejeli e-pošto z osebno povezavo za vstop v sobo. Če je ne najdete, preverite mapo z neželeno pošto.",
     "backToEvent": "Nazaj na dogodek",
     "organization": "Organizacija",
     "organizationPlaceholder": "npr. AGID, Ministrstvo za gospodarstvo, Mestna občina Rim",
@@ -276,6 +282,7 @@
     "guestJoinSubtitle": "Pridružite se dogodku v živo kot gost",
     "guestJoinButton": "Vstopi kot gost",
     "guestRedirectToRegister": "Dogodek se še ni začel. Prijavite se, da prejmete povezavo za dostop.",
+    "guestAccessDisabled": "Za ta dogodek je potrebna prijava: vstop kot gost ni mogoč.",
     "jibriUnavailable": "Snemanje ni na voljo — Jibri ni konfiguriran",
     "endEventError": "Napaka pri zaključevanju dogodka. Poskusite znova.",
     "jibriNotConfigured": "Snemanje ni konfigurirano v infrastrukturi",
@@ -1510,7 +1517,11 @@
         "faviconUrl": "URL favicona",
         "primaryColor": "Primarna barva",
         "defaultTimezone": "Privzeti časovni pas",
-        "defaultTimezoneHelp": "Uporablja se za prikaz datumov in ustvarjanje novih dogodkov."
+        "defaultTimezoneHelp": "Uporablja se za prikaz datumov in ustvarjanje novih dogodkov.",
+        "waitingRoomEngine": "Čakalnica (privzeto za spletišče)",
+        "waitingRoomEngineGame": "Videoigra (lobi Phaser)",
+        "waitingRoomEngineClassic": "Klasična (statična)",
+        "waitingRoomEngineHelp": "Privzeti način čakalnice. Spremeniti ga je mogoče za posamezen dogodek, za en obisk pa s parametrom {param} v naslovu."
       },
       "watermark": {
         "title": "Prilagoditev videa",
@@ -1601,11 +1612,11 @@
       },
       "features": {
         "statusPageEnabled": "Stran stanja aktivna",
-        "statusPageEnabledHelp": "Prikaži stran stanja storitve",
+        "statusPageEnabledHelp": "Objavi stran stanja storitve. Ko je izklopljena, stran ne obstaja, njene podatke pa vidijo samo skrbniki.",
         "guestAccessEnabled": "Dostop gostom aktiven",
-        "guestAccessEnabledHelp": "Dovoli dostop gostom na dogodke v živo",
+        "guestAccessEnabledHelp": "Neprijavljeni se lahko pridružijo dogodkom v teku samo s svojim imenom. Ko je izklopljeno, se na načrtovane dogodke vstopi samo s prijavo ali s povezavo za moderatorja ali govorca; takojšnji video klici ostanejo odprti za vse, ki imajo povezavo.",
         "publicRegistrationEnabled": "Javna registracija aktivna",
-        "publicRegistrationEnabledHelp": "Kdor koli lahko ustvari dogodke (če je onemogočeno, samo administratorji)",
+        "publicRegistrationEnabledHelp": "Na dogodke se lahko prijavi kdorkoli. Ko je izklopljena, se lahko prijavijo samo osebe s seznama povabljenih na dogodek, osebna povezava za vstop pa se pošlje samo po e-pošti; že prijavljeni ter povezave moderatorjev in govorcev še naprej delujejo.",
         "calendarPublic": "Javni koledar",
         "calendarPublicHelp": "Objavi koledar dogodkov. Obiskovalci lahko vidijo načrtovane dogodke.",
         "parseTitleKicker": "Naslovi z uredniškim podnaslovom",
@@ -3461,7 +3472,9 @@
     "shortcutsF": "Preklopi celozaslonski način",
     "shortcutsSpeed": "Zmanjšaj ali povečaj hitrost",
     "captionsOn": "Podnapisi so vklopljeni",
-    "captionsOff": "Podnapisi so izklopljeni"
+    "captionsOff": "Podnapisi so izklopljeni",
+    "watchOnYouTube": "Oglejte si videoposnetek na YouTubu",
+    "externalSiteNote": "Odpre se na YouTubu, zunanjem spletišču z lastnimi pogoji uporabe in obvestilom o zasebnosti."
   },
   "postprod": {
     "loading": "Nalaganje prepisa…",

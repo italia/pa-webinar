@@ -168,6 +168,12 @@
     "resendLink": "Zugangslink erneut senden",
     "resending": "Wird gesendet…",
     "resendSent": "Wenn die Adresse angemeldet ist, haben wir den Zugangslink erneut per E-Mail gesendet.",
+    "invitationOnly": "Die Anmeldung ist eingeladenen Personen vorbehalten: Verwenden Sie die E-Mail-Adresse, mit der Sie eingeladen wurden. Den Link zur Teilnahme erhalten Sie per E-Mail.",
+    "closed": "Die Anmeldung zu dieser Veranstaltung ist nicht öffentlich.",
+    "lostLink": "Bereits angemeldet? Persönlichen Link erneut erhalten",
+    "lostLinkHelp": "Geben Sie die E-Mail-Adresse ein, mit der Sie sich angemeldet haben: Ist sie für diese Veranstaltung angemeldet, senden wir Ihnen den Link zur Teilnahme erneut.",
+    "checkEmailTitle": "Prüfen Sie Ihr E-Mail-Postfach",
+    "checkEmail": "Wenn die Adresse auf der Einladungsliste steht, erhalten Sie in Kürze eine E-Mail mit Ihrem persönlichen Link zum Raum. Falls Sie sie nicht finden, sehen Sie im Spam-Ordner nach.",
     "backToEvent": "Zurück zur Veranstaltung",
     "organization": "Organisation",
     "organizationPlaceholder": "z. B. AGID, Wirtschaftsministerium, Stadt Rom",
@@ -276,6 +282,7 @@
     "guestJoinSubtitle": "Als Gast an der laufenden Veranstaltung teilnehmen",
     "guestJoinButton": "Als Gast teilnehmen",
     "guestRedirectToRegister": "Die Veranstaltung hat noch nicht begonnen. Melden Sie sich an, um Ihren Zugangslink zu erhalten.",
+    "guestAccessDisabled": "Für diese Veranstaltung ist eine Anmeldung erforderlich: Die Teilnahme als Gast ist nicht möglich.",
     "jibriUnavailable": "Aufzeichnung nicht verfügbar — Jibri nicht konfiguriert",
     "endEventError": "Fehler beim Beenden des Events. Erneut versuchen.",
     "jibriNotConfigured": "Aufzeichnung in der Infrastruktur nicht konfiguriert",
@@ -1510,7 +1517,11 @@
         "faviconUrl": "Favicon-URL",
         "primaryColor": "Primärfarbe",
         "defaultTimezone": "Standard-Zeitzone",
-        "defaultTimezoneHelp": "Wird zur Datumsanzeige und bei der Erstellung neuer Veranstaltungen verwendet."
+        "defaultTimezoneHelp": "Wird zur Datumsanzeige und bei der Erstellung neuer Veranstaltungen verwendet.",
+        "waitingRoomEngine": "Warteraum (Standard der Website)",
+        "waitingRoomEngineGame": "Videospiel (Phaser-Lobby)",
+        "waitingRoomEngineClassic": "Klassisch (statisch)",
+        "waitingRoomEngineHelp": "Standardmodus des Warteraums. Er lässt sich für eine einzelne Veranstaltung ändern und, für einen einzelnen Besuch, mit dem Parameter {param} in der Adresse."
       },
       "watermark": {
         "title": "Video-Anpassung",
@@ -1601,11 +1612,11 @@
       },
       "features": {
         "statusPageEnabled": "Statusseite aktiv",
-        "statusPageEnabledHelp": "Die Dienststatus-Seite anzeigen",
+        "statusPageEnabledHelp": "Veröffentlicht die Dienststatus-Seite. Wenn deaktiviert, existiert die Seite nicht und ihre Daten sind nur für Administratoren sichtbar.",
         "guestAccessEnabled": "Gastzugang aktiv",
-        "guestAccessEnabledHelp": "Gastzugang zu laufenden Veranstaltungen erlauben",
+        "guestAccessEnabledHelp": "Nicht angemeldete Personen können laufenden Veranstaltungen allein mit ihrem Namen beitreten. Wenn deaktiviert, ist die Teilnahme an geplanten Veranstaltungen nur mit Anmeldung oder mit einem Moderations- oder Referentenlink möglich; Sofort-Videoanrufe bleiben für alle mit dem Link offen.",
         "publicRegistrationEnabled": "Öffentliche Registrierung aktiv",
-        "publicRegistrationEnabledHelp": "Jeder kann Veranstaltungen erstellen (wenn deaktiviert, nur Administratoren)",
+        "publicRegistrationEnabledHelp": "Jede Person kann sich zu Veranstaltungen anmelden. Wenn deaktiviert, können sich nur Personen auf der Einladungsliste der Veranstaltung anmelden, und der persönliche Link zur Teilnahme wird nur per E-Mail verschickt; bereits angemeldete Personen sowie Moderations- und Referentenlinks funktionieren weiterhin.",
         "calendarPublic": "Öffentlicher Kalender",
         "calendarPublicHelp": "Den Veranstaltungskalender veröffentlichen. Besucher können geplante Veranstaltungen sehen.",
         "parseTitleKicker": "Titel mit redaktionellem Kicker",
@@ -3461,7 +3472,9 @@
     "shortcutsF": "Vollbild",
     "shortcutsSpeed": "Geschwindigkeit verringern oder erhöhen",
     "captionsOn": "Untertitel aktiv",
-    "captionsOff": "Untertitel deaktiviert"
+    "captionsOff": "Untertitel deaktiviert",
+    "watchOnYouTube": "Video auf YouTube ansehen",
+    "externalSiteNote": "Öffnet sich auf YouTube, einer externen Website mit eigenen Nutzungsbedingungen und eigener Datenschutzerklärung."
   },
   "postprod": {
     "loading": "Transkript wird geladen…",

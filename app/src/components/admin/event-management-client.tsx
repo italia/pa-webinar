@@ -161,6 +161,9 @@ interface EventData {
 
 interface EventManagementClientProps {
   event: EventData; baseUrl: string; locale: string; kickerEnabled: boolean;
+  /** L'evento ammette chi entra senza iscrizione (lib/events/guest-window):
+   *  senza, l'invito diretto porterebbe all'iscrizione e non va offerto. */
+  guestEntryOpen?: boolean;
 }
 
 // Le schede sono cinque e stanno in una riga sola anche su un telefono: oltre,
@@ -193,7 +196,7 @@ function tagChipStyle(color: string | null): CSSProperties {
 
 // ── Main component ──
 export default function EventManagementClient({
-  event, baseUrl, locale, kickerEnabled,
+  event, baseUrl, locale, kickerEnabled, guestEntryOpen = true,
 }: EventManagementClientProps) {
   const t = useTranslations('admin');
   const td = useTranslations('admin.eventDetail');
@@ -477,7 +480,7 @@ export default function EventManagementClient({
                 locale={locale}
                 editUrl={editUrl}
                 publicUrl={publicUrl}
-                guestLiveUrl={guestLiveUrl}
+                guestLiveUrl={guestEntryOpen ? guestLiveUrl : null}
                 moderatorUrl={moderatorUrl}
               />
             )}
@@ -698,7 +701,7 @@ function TabNav({ active, onChange, t }: {
 // ── Tabs ──
 function OverviewTab({ event, description, locale, editUrl, publicUrl, guestLiveUrl, moderatorUrl }: {
   event: EventData; description: string; locale: string; editUrl: string;
-  publicUrl: string; guestLiveUrl: string; moderatorUrl: string;
+  publicUrl: string; guestLiveUrl: string | null; moderatorUrl: string;
 }) {
   const td = useTranslations('admin.eventDetail');
   const te = useTranslations('events');
@@ -752,9 +755,11 @@ function OverviewTab({ event, description, locale, editUrl, publicUrl, guestLive
       <div className="mt-4">
         <H>{tl('title')}</H>
         <EventLinksSection
+          // Senza accesso degli ospiti l'invito diretto non fa entrare
+          // nessuno: porta all'iscrizione, come la pagina pubblica.
           righe={[
             { chiave: 'publicPage', url: publicUrl },
-            { chiave: 'guestJoin', url: guestLiveUrl },
+            ...(guestLiveUrl ? [{ chiave: 'guestJoin' as const, url: guestLiveUrl }] : []),
             { chiave: 'moderatorLink', url: moderatorUrl, riservato: true },
           ]}
         />

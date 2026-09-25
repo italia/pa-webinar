@@ -168,6 +168,12 @@
     "resendLink": "Wyślij ponownie link dostępu",
     "resending": "Wysyłanie…",
     "resendSent": "Jeśli adres jest zarejestrowany, ponownie wysłaliśmy link dostępu e-mailem.",
+    "invitationOnly": "Rejestracja jest zarezerwowana dla osób zaproszonych: użyj adresu e-mail, na który otrzymano zaproszenie. Link do wejścia otrzymasz e-mailem.",
+    "closed": "Rejestracja na to wydarzenie nie jest otwarta dla wszystkich.",
+    "lostLink": "Rejestracja już dokonana? Otrzymaj ponownie swój osobisty link",
+    "lostLinkHelp": "Wpisz adres e-mail użyty przy rejestracji: jeśli jest zarejestrowany na to wydarzenie, ponownie wyślemy link do wejścia.",
+    "checkEmailTitle": "Sprawdź pocztę e-mail",
+    "checkEmail": "Jeśli adres jest na liście zaproszonych, wkrótce otrzymasz e-mail z osobistym linkiem do wejścia do sali. Jeśli go nie widzisz, sprawdź folder spam.",
     "backToEvent": "Powrót do wydarzenia",
     "organization": "Instytucja",
     "organizationPlaceholder": "np. AGID, Ministerstwo Gospodarki, Gmina Rzym",
@@ -276,6 +282,7 @@
     "guestJoinSubtitle": "Dołącz jako gość do trwającego wydarzenia",
     "guestJoinButton": "Dołącz jako gość",
     "guestRedirectToRegister": "Wydarzenie jeszcze się nie rozpoczęło. Zarejestruj się, aby otrzymać link dostępu.",
+    "guestAccessDisabled": "To wydarzenie wymaga rejestracji: wejście jako gość nie jest dostępne.",
     "jibriUnavailable": "Nagrywanie niedostępne — Jibri nie skonfigurowany",
     "endEventError": "Błąd kończenia wydarzenia. Spróbuj ponownie.",
     "jibriNotConfigured": "Nagrywanie nie skonfigurowane w infrastrukturze",
@@ -1510,7 +1517,11 @@
         "faviconUrl": "URL favicona",
         "primaryColor": "Kolor główny",
         "defaultTimezone": "Domyślna strefa czasowa",
-        "defaultTimezoneHelp": "Używana do wyświetlania dat i tworzenia nowych wydarzeń."
+        "defaultTimezoneHelp": "Używana do wyświetlania dat i tworzenia nowych wydarzeń.",
+        "waitingRoomEngine": "Poczekalnia (domyślna dla witryny)",
+        "waitingRoomEngineGame": "Gra wideo (lobby Phaser)",
+        "waitingRoomEngineClassic": "Klasyczna (statyczna)",
+        "waitingRoomEngineHelp": "Domyślny tryb poczekalni. Można go zmienić dla pojedynczego wydarzenia, a na jedną wizytę – parametrem {param} w adresie."
       },
       "watermark": {
         "title": "Personalizacja wideo",
@@ -1601,11 +1612,11 @@
       },
       "features": {
         "statusPageEnabled": "Strona statusu aktywna",
-        "statusPageEnabledHelp": "Wyświetl stronę statusu usługi",
+        "statusPageEnabledHelp": "Publikuje stronę statusu usługi. Po wyłączeniu strona nie istnieje, a jej dane widzą tylko administratorzy.",
         "guestAccessEnabled": "Dostęp gościnny aktywny",
-        "guestAccessEnabledHelp": "Zezwól na dostęp gościnny do trwających wydarzeń",
+        "guestAccessEnabledHelp": "Osoby niezarejestrowane mogą dołączać do trwających wydarzeń, podając tylko imię. Po wyłączeniu do zaplanowanych wydarzeń można dołączyć tylko po rejestracji lub z linkiem moderatora albo prelegenta; wideorozmowy natychmiastowe pozostają otwarte dla każdego, kto ma link.",
         "publicRegistrationEnabled": "Rejestracja publiczna aktywna",
-        "publicRegistrationEnabledHelp": "Każdy może tworzyć wydarzenia (jeśli wyłączone, tylko administratorzy)",
+        "publicRegistrationEnabledHelp": "Każdy może rejestrować się na wydarzenia. Po wyłączeniu zarejestrować się mogą tylko osoby z listy zaproszonych na wydarzenie, a osobisty link do wejścia jest wysyłany wyłącznie e-mailem; osoby już zarejestrowane oraz linki moderatorów i prelegentów nadal działają.",
         "calendarPublic": "Kalendarz publiczny",
         "calendarPublicHelp": "Opublikuj kalendarz wydarzeń. Odwiedzający mogą zobaczyć zaplanowane wydarzenia.",
         "parseTitleKicker": "Tytuły z nagłówkiem redakcyjnym",
@@ -3461,7 +3472,9 @@
     "shortcutsF": "Pełny ekran",
     "shortcutsSpeed": "Zmniejsz lub zwiększ prędkość",
     "captionsOn": "Napisy włączone",
-    "captionsOff": "Napisy wyłączone"
+    "captionsOff": "Napisy wyłączone",
+    "watchOnYouTube": "Obejrzyj film w serwisie YouTube",
+    "externalSiteNote": "Otwiera się w serwisie YouTube – zewnętrznej witrynie z własnym regulaminem i polityką prywatności."
   },
   "postprod": {
     "loading": "Wczytywanie transkrypcji…",

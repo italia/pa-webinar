@@ -30,6 +30,8 @@ vi.mock('@/lib/crypto/pii', () => ({
 }));
 vi.mock('@/lib/chat/pubsub', () => ({ publishChat: vi.fn() }));
 vi.mock('@/lib/events/join-grant', () => ({ hasJoinGrant: vi.fn() }));
+const { siteSettings } = vi.hoisted(() => ({ siteSettings: { guestAccessEnabled: true } }));
+vi.mock('@/lib/settings', () => ({ getSettings: async () => siteSettings }));
 vi.mock('@/lib/event-session', () => ({ readOwnedEventAccessToken: vi.fn() }));
 
 import { prisma } from '@/lib/db';
@@ -129,6 +131,7 @@ function postRequest(body: Record<string, unknown>, token?: string): NextRequest
 
 beforeEach(() => {
   vi.clearAllMocks();
+  siteSettings.guestAccessEnabled = true;
   mockedFindFirst.mockResolvedValue(eventRow());
   mockedFindUnique.mockResolvedValue(eventRow());
   mockedMessages.mockResolvedValue([]);
@@ -280,6 +283,13 @@ describe('GET /api/events/[param]/chat — the raw senderId never ships', () => 
 describe('POST /api/events/[param]/chat — write authorization', () => {
   it('rejects a tokenless guest outside the guest window', async () => {
     mockedFindUnique.mockResolvedValue(eventRow({ status: 'PUBLISHED' }));
+    const res = await POST(postRequest({ text: 'ciao', guestName: 'Anna' }), ctx());
+    expect(res.status).toBe(403);
+    expect(mockedCreate).not.toHaveBeenCalled();
+  });
+
+  it('rejects a tokenless guest on a LIVE scheduled event when guest access is off', async () => {
+    siteSettings.guestAccessEnabled = false;
     const res = await POST(postRequest({ text: 'ciao', guestName: 'Anna' }), ctx());
     expect(res.status).toBe(403);
     expect(mockedCreate).not.toHaveBeenCalled();

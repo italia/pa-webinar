@@ -168,6 +168,12 @@
     "resendLink": "Toegangslink opnieuw versturen",
     "resending": "Bezig met verzenden…",
     "resendSent": "Als het adres is ingeschreven, hebben we de toegangslink opnieuw per e-mail verstuurd.",
+    "invitationOnly": "Inschrijving is voorbehouden aan genodigden: gebruik het e-mailadres waarmee u bent uitgenodigd. De link om deel te nemen ontvangt u per e-mail.",
+    "closed": "Inschrijving voor dit evenement is niet openbaar.",
+    "lostLink": "Al ingeschreven? Ontvang uw persoonlijke link opnieuw",
+    "lostLinkHelp": "Vul het e-mailadres in waarmee u zich hebt ingeschreven: als het voor dit evenement is ingeschreven, sturen we u de link om deel te nemen opnieuw.",
+    "checkEmailTitle": "Controleer uw e-mail",
+    "checkEmail": "Als het adres op de uitnodigingslijst staat, ontvangt u binnenkort een e-mail met uw persoonlijke link naar de zaal. Kunt u die niet vinden, kijk dan in uw spammap.",
     "backToEvent": "Terug naar evenement",
     "organization": "Organisatie",
     "organizationPlaceholder": "bijv. AGID, Ministerie van Economie, Gemeente Rome",
@@ -276,6 +282,7 @@
     "guestJoinSubtitle": "Neem als gast deel aan het lopende evenement",
     "guestJoinButton": "Als gast deelnemen",
     "guestRedirectToRegister": "Het evenement is nog niet begonnen. Schrijf u in om een toegangslink te ontvangen.",
+    "guestAccessDisabled": "Voor dit evenement is inschrijving vereist: deelnemen als gast is niet mogelijk.",
     "jibriUnavailable": "Opname niet beschikbaar — Jibri niet geconfigureerd",
     "endEventError": "Fout bij het beëindigen van het evenement. Probeer het opnieuw.",
     "jibriNotConfigured": "Opname niet geconfigureerd in de infrastructuur",
@@ -1510,7 +1517,11 @@
         "faviconUrl": "Favicon-URL",
         "primaryColor": "Primaire kleur",
         "defaultTimezone": "Standaard tijdzone",
-        "defaultTimezoneHelp": "Gebruikt voor datumweergave en het aanmaken van nieuwe evenementen."
+        "defaultTimezoneHelp": "Gebruikt voor datumweergave en het aanmaken van nieuwe evenementen.",
+        "waitingRoomEngine": "Wachtruimte (standaard van de site)",
+        "waitingRoomEngineGame": "Videogame (Phaser-lobby)",
+        "waitingRoomEngineClassic": "Klassiek (statisch)",
+        "waitingRoomEngineHelp": "Standaardmodus van de wachtruimte. Die kan per evenement worden gewijzigd en, voor één bezoek, met de parameter {param} in het adres."
       },
       "watermark": {
         "title": "Video-aanpassing",
@@ -1601,11 +1612,11 @@
       },
       "features": {
         "statusPageEnabled": "Statuspagina actief",
-        "statusPageEnabledHelp": "De servicestatuspagina weergeven",
+        "statusPageEnabledHelp": "Publiceert de servicestatuspagina. Indien uitgeschakeld bestaat de pagina niet en zijn de gegevens alleen zichtbaar voor beheerders.",
         "guestAccessEnabled": "Gasttoegang actief",
-        "guestAccessEnabledHelp": "Gasttoegang tot lopende evenementen toestaan",
+        "guestAccessEnabledHelp": "Wie niet is ingeschreven, kan lopende evenementen bijwonen met alleen een naam. Indien uitgeschakeld, is deelname aan geplande evenementen alleen mogelijk met een inschrijving of met een moderator- of sprekerslink; directe videogesprekken blijven open voor iedereen met de link.",
         "publicRegistrationEnabled": "Publieke inschrijving actief",
-        "publicRegistrationEnabledHelp": "Iedereen kan evenementen aanmaken (indien uitgeschakeld, alleen beheerders)",
+        "publicRegistrationEnabledHelp": "Iedereen kan zich inschrijven voor evenementen. Indien uitgeschakeld, kunnen alleen personen op de uitnodigingslijst van het evenement zich inschrijven en wordt de persoonlijke link om deel te nemen alleen per e-mail verstuurd; bestaande inschrijvingen en moderator- en sprekerslinks blijven werken.",
         "calendarPublic": "Openbare kalender",
         "calendarPublicHelp": "De evenementenkalender publiceren. Bezoekers kunnen geplande evenementen zien.",
         "parseTitleKicker": "Titels met redactionele kicker",
@@ -3461,7 +3472,9 @@
     "shortcutsF": "Volledig scherm",
     "shortcutsSpeed": "De snelheid verlagen of verhogen",
     "captionsOn": "Ondertiteling aan",
-    "captionsOff": "Ondertiteling uit"
+    "captionsOff": "Ondertiteling uit",
+    "watchOnYouTube": "Bekijk de video op YouTube",
+    "externalSiteNote": "Opent op YouTube, een externe site met eigen gebruiksvoorwaarden en een eigen privacyverklaring."
   },
   "postprod": {
     "loading": "Transcriptie laden…",

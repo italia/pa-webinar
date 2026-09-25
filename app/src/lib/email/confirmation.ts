@@ -39,6 +39,10 @@ interface ConfirmationEmailInput {
    *  i testi dell'email sono nella lingua email corrispondente. */
   locale: string;
   joinUrl: string;
+  /** Il link per gli eventi di calendario, se diverso da `joinUrl`: un evento
+   *  di calendario si inoltra e si condivide, e non deve portare con sé la
+   *  prova d'identità del link dell'email (lib/events/registration-link). */
+  calendarJoinUrl?: string;
   eventPageUrl: string;
   siteName?: string;
   organizationFooter?: string;
@@ -75,7 +79,7 @@ export async function sendConfirmationEmail(input: ConfirmationEmailInput): Prom
       description,
       startsAt: event.startsAt,
       endsAt: event.endsAt,
-      joinUrl: input.joinUrl,
+      joinUrl: input.calendarJoinUrl ?? input.joinUrl,
     };
 
     const templateInput = {

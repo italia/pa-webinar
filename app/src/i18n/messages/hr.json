@@ -168,6 +168,12 @@
     "resendLink": "Ponovno pošalji poveznicu za pristup",
     "resending": "Slanje…",
     "resendSent": "Ako je adresa prijavljena, ponovno smo vam e-poštom poslali poveznicu za pristup.",
+    "invitationOnly": "Prijava je rezervirana za pozvane osobe: upotrijebite adresu e-pošte s kojom ste pozvani. Poveznicu za ulazak dobit ćete e-poštom.",
+    "closed": "Prijava za ovaj događaj nije otvorena za javnost.",
+    "lostLink": "Već ste prijavljeni? Ponovno primite svoju osobnu poveznicu",
+    "lostLinkHelp": "Upišite adresu e-pošte s kojom ste se prijavili: ako je prijavljena na ovaj događaj, ponovno ćemo vam poslati poveznicu za ulazak.",
+    "checkEmailTitle": "Provjerite svoju e-poštu",
+    "checkEmail": "Ako je adresa na popisu pozvanih, uskoro ćete primiti e-poruku s osobnom poveznicom za ulazak u sobu. Ako je ne pronađete, provjerite mapu neželjene pošte.",
     "backToEvent": "Natrag na događaj",
     "organization": "Ustanova",
     "organizationPlaceholder": "npr. AGID, Ministarstvo gospodarstva, Grad Rim",
@@ -276,6 +282,7 @@
     "guestJoinSubtitle": "Pridružite se događaju uživo kao gost",
     "guestJoinButton": "Uđi kao gost",
     "guestRedirectToRegister": "Događaj još nije započeo. Prijavite se kako biste primili poveznicu za pristup.",
+    "guestAccessDisabled": "Za ovaj događaj potrebna je prijava: ulazak kao gost nije moguć.",
     "jibriUnavailable": "Snimanje nedostupno — Jibri nije konfiguriran",
     "endEventError": "Pogreška pri završetku događaja. Pokušajte ponovno.",
     "jibriNotConfigured": "Snimanje nije konfigurirano u infrastrukturi",
@@ -1510,7 +1517,11 @@
         "faviconUrl": "URL ikone (favicon)",
         "primaryColor": "Primarna boja",
         "defaultTimezone": "Zadana vremenska zona",
-        "defaultTimezoneHelp": "Koristi se za prikaz datuma i stvaranje novih događaja."
+        "defaultTimezoneHelp": "Koristi se za prikaz datuma i stvaranje novih događaja.",
+        "waitingRoomEngine": "Čekaonica (zadano za stranicu)",
+        "waitingRoomEngineGame": "Videoigra (Phaser predvorje)",
+        "waitingRoomEngineClassic": "Klasična (statična)",
+        "waitingRoomEngineHelp": "Zadani način rada čekaonice. Može se promijeniti za pojedini događaj i, za jedan posjet, parametrom {param} u adresi."
       },
       "watermark": {
         "title": "Prilagodba videa",
@@ -1601,11 +1612,11 @@
       },
       "features": {
         "statusPageEnabled": "Stranica stanja aktivna",
-        "statusPageEnabledHelp": "Prikaži stranicu stanja usluge",
+        "statusPageEnabledHelp": "Objavljuje stranicu stanja usluge. Kad je isključeno, stranica ne postoji, a njezine podatke vide samo administratori.",
         "guestAccessEnabled": "Pristup gostima aktivan",
-        "guestAccessEnabledHelp": "Dopusti pristup gostima na događaje uživo",
+        "guestAccessEnabledHelp": "Osobe koje se nisu prijavile mogu ući na događaje u tijeku samo sa svojim imenom. Kad je isključeno, na planirane događaje ulazi se samo s prijavom ili s poveznicom za moderatora ili govornika; trenutačni videopozivi ostaju otvoreni svima koji imaju poveznicu.",
         "publicRegistrationEnabled": "Javna registracija aktivna",
-        "publicRegistrationEnabledHelp": "Bilo tko može stvoriti događaje (ako je isključeno, samo administratori)",
+        "publicRegistrationEnabledHelp": "Svatko se može prijaviti na događaje. Kad je isključeno, mogu se prijaviti samo osobe s popisa pozvanih na događaj, a osobna poveznica za ulazak šalje se samo e-poštom; već prijavljeni te poveznice moderatora i govornika i dalje rade.",
         "calendarPublic": "Javni kalendar",
         "calendarPublicHelp": "Objavi kalendar događaja. Posjetitelji mogu vidjeti zakazane događaje.",
         "parseTitleKicker": "Naslovi s uredničkim nadnaslovom",
@@ -3461,7 +3472,9 @@
     "shortcutsF": "Cijeli zaslon",
     "shortcutsSpeed": "Smanji ili povećaj brzinu",
     "captionsOn": "Titlovi uključeni",
-    "captionsOff": "Titlovi isključeni"
+    "captionsOff": "Titlovi isključeni",
+    "watchOnYouTube": "Pogledajte videozapis na YouTubeu",
+    "externalSiteNote": "Otvara se na YouTubeu, vanjskoj stranici s vlastitim uvjetima korištenja i obaviješću o privatnosti."
   },
   "postprod": {
     "loading": "Učitavanje transkripta…",

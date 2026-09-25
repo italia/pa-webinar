@@ -168,6 +168,12 @@
     "resendLink": "Znovu poslat můj přístupový odkaz",
     "resending": "Odesílání…",
     "resendSent": "Pokud je adresa registrována, znovu jsme vám e-mailem poslali přístupový odkaz.",
+    "invitationOnly": "Registrace je vyhrazena pozvaným osobám: použijte e-mailovou adresu, na kterou jste byli pozváni. Odkaz pro vstup vám přijde e-mailem.",
+    "closed": "Registrace na tuto událost není otevřena veřejnosti.",
+    "lostLink": "Už jste registrováni? Nechte si znovu poslat svůj osobní odkaz",
+    "lostLinkHelp": "Zadejte e-mailovou adresu, se kterou jste se registrovali: pokud je na tuto událost registrována, znovu vám pošleme odkaz pro vstup.",
+    "checkEmailTitle": "Zkontrolujte svůj e-mail",
+    "checkEmail": "Pokud je adresa na seznamu pozvaných, brzy vám přijde e-mail s osobním odkazem pro vstup do místnosti. Pokud ho nenajdete, podívejte se do složky se spamem.",
     "backToEvent": "Zpět na událost",
     "organization": "Organizace",
     "organizationPlaceholder": "např. AGID, Ministerstvo hospodářství, Obec Praha",
@@ -276,6 +282,7 @@
     "guestJoinSubtitle": "Připojte se jako host k probíhající události",
     "guestJoinButton": "Připojit se jako host",
     "guestRedirectToRegister": "Událost ještě nezačala. Zaregistrujte se pro získání přístupového odkazu.",
+    "guestAccessDisabled": "Tato událost vyžaduje registraci: vstup jako host není k dispozici.",
     "jibriUnavailable": "Nahrávání nedostupné — Jibri není nakonfigurován",
     "endEventError": "Chyba při ukončování události. Zkuste to znovu.",
     "jibriNotConfigured": "Nahrávání není v infrastruktuře nakonfigurováno",
@@ -1510,7 +1517,11 @@
         "faviconUrl": "URL favicon",
         "primaryColor": "Primární barva",
         "defaultTimezone": "Výchozí časové pásmo",
-        "defaultTimezoneHelp": "Používá se pro zobrazení dat a vytváření nových událostí."
+        "defaultTimezoneHelp": "Používá se pro zobrazení dat a vytváření nových událostí.",
+        "waitingRoomEngine": "Čekárna (výchozí nastavení webu)",
+        "waitingRoomEngineGame": "Videohra (lobby Phaser)",
+        "waitingRoomEngineClassic": "Klasická (statická)",
+        "waitingRoomEngineHelp": "Výchozí režim čekárny. Lze jej změnit pro jednotlivou událost a pro jednu návštěvu parametrem {param} v adrese."
       },
       "watermark": {
         "title": "Přizpůsobení videa",
@@ -1601,11 +1612,11 @@
       },
       "features": {
         "statusPageEnabled": "Stavová stránka aktivní",
-        "statusPageEnabledHelp": "Zobrazit stavovou stránku služby",
+        "statusPageEnabledHelp": "Zveřejňuje stavovou stránku služby. Pokud je vypnuto, stránka neexistuje a její údaje vidí pouze administrátoři.",
         "guestAccessEnabled": "Přístup hostů aktivní",
-        "guestAccessEnabledHelp": "Povolit přístup hostů k probíhajícím událostem",
+        "guestAccessEnabledHelp": "Neregistrovaní se mohou k probíhajícím událostem připojit jen se svým jménem. Pokud je vypnuto, k plánovaným událostem se lze připojit pouze po registraci nebo odkazem pro moderátora či řečníka; okamžité videohovory zůstávají otevřené každému, kdo má odkaz.",
         "publicRegistrationEnabled": "Veřejná registrace aktivní",
-        "publicRegistrationEnabledHelp": "Kdokoli může vytvářet události (pokud je deaktivováno, mohou pouze administrátoři)",
+        "publicRegistrationEnabledHelp": "Na události se může registrovat kdokoli. Pokud je vypnuto, mohou se registrovat pouze osoby ze seznamu pozvaných na událost a osobní odkaz pro vstup se posílá pouze e-mailem; již registrovaní a odkazy pro moderátory a řečníky fungují dál.",
         "calendarPublic": "Veřejný kalendář",
         "calendarPublicHelp": "Zveřejnit kalendář událostí. Návštěvníci mohou vidět naplánované události.",
         "parseTitleKicker": "Názvy s redakčním kickerem",
@@ -3461,7 +3472,9 @@
     "shortcutsF": "Celá obrazovka",
     "shortcutsSpeed": "Snížit nebo zvýšit rychlost",
     "captionsOn": "Titulky zapnuty",
-    "captionsOff": "Titulky vypnuty"
+    "captionsOff": "Titulky vypnuty",
+    "watchOnYouTube": "Přehrát video na YouTube",
+    "externalSiteNote": "Otevře se na YouTube, externím webu s vlastními podmínkami použití a zásadami ochrany soukromí."
   },
   "postprod": {
     "loading": "Načítání přepisu…",

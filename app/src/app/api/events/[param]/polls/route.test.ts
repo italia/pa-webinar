@@ -24,6 +24,8 @@ vi.mock('@/lib/db', () => ({
 }));
 vi.mock('@/lib/live-state/publish', () => ({ pokeLivePanel: vi.fn() }));
 vi.mock('@/lib/events/join-grant', () => ({ hasJoinGrant: vi.fn() }));
+const { siteSettings } = vi.hoisted(() => ({ siteSettings: { guestAccessEnabled: true } }));
+vi.mock('@/lib/settings', () => ({ getSettings: async () => siteSettings }));
 // Senza Redis il pubblico passa dalla cache a TTL breve: qui la si tiene
 // spenta, altrimenti una risposta scavalcherebbe il test successivo.
 vi.mock('@/lib/redis', () => ({ getRedis: () => null }));
@@ -105,6 +107,7 @@ function get(headers: HeadersInit = {}, query = ''): NextRequest {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  siteSettings.guestAccessEnabled = true;
   mockedEvent.mockResolvedValue(eventRow());
   mockedPolls.mockResolvedValue([pollRow()]);
   mockedTally.mockResolvedValue(

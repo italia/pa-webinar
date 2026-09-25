@@ -9,7 +9,7 @@
 import { createHash } from 'crypto';
 
 import { describe, it, expect, vi, beforeAll, beforeEach } from 'vitest';
-import { jwtVerify } from 'jose';
+import { SignJWT, jwtVerify } from 'jose';
 import type { NextRequest } from 'next/server';
 
 import { encryptPII } from '@/lib/crypto/pii';
@@ -77,7 +77,11 @@ beforeAll(() => {
   encryptedEmail = encryptPII(REGISTRANT_EMAIL);
 });
 
-type EventOverrides = Partial<{ status: string }>;
+type EventOverrides = Partial<{
+  status: string;
+  eventType: string;
+  joinPasswordHash: string | null;
+}>;
 
 function eventRow(overrides: EventOverrides = {}) {
   return {
@@ -85,6 +89,8 @@ function eventRow(overrides: EventOverrides = {}) {
     slug: SLUG,
     jitsiRoomName: ROOM,
     status: 'LIVE',
+    eventType: 'SCHEDULED',
+    joinPasswordHash: null,
     moderatorToken: PRIMARY_TOKEN,
     moderatorName: 'Moderatore',
     ...overrides,
@@ -103,14 +109,36 @@ function registrationRow(overrides: Record<string, unknown> = {}) {
   };
 }
 
-function setGravatarEnabled(enabled: boolean) {
+const DEFAULT_SETTINGS = { gravatarEnabled: false, guestAccessEnabled: true };
+let siteSettings = { ...DEFAULT_SETTINGS };
+
+function applySettings(overrides: Partial<typeof DEFAULT_SETTINGS>) {
+  siteSettings = { ...siteSettings, ...overrides };
   vi.mocked(prisma.siteSetting.upsert).mockResolvedValue({
     id: 'singleton',
-    gravatarEnabled: enabled,
+    ...siteSettings,
   } as never);
   // La cache dei settings vive 60s a livello di modulo: senza questo il primo
   // valore letto varrebbe per tutto il file.
   invalidateSettingsCache();
+}
+
+function setGravatarEnabled(enabled: boolean) {
+  applySettings({ gravatarEnabled: enabled });
+}
+
+function setGuestAccessEnabled(enabled: boolean) {
+  applySettings({ guestAccessEnabled: enabled });
+}
+
+/** Il cookie che `verify-password` posa dopo la password giusta. */
+async function grantJoinPassword() {
+  const grant = await new SignJWT({ eventId: EVENT_ID, role: 'guest' })
+    .setProtectedHeader({ alg: 'HS256', typ: 'JWT' })
+    .setIssuedAt()
+    .setExpirationTime('1h')
+    .sign(new TextEncoder().encode(process.env.APP_SECRET));
+  cookieJar.set(`join_granted_${EVENT_ID}`, grant);
 }
 
 // I rami ospite passano da un rate limit per-IP in-memory che sopravvive fra
@@ -162,7 +190,8 @@ beforeEach(() => {
   cookieJar.clear();
   vi.mocked(prisma.event.findUnique).mockResolvedValue(eventRow() as never);
   vi.mocked(prisma.registration.update).mockResolvedValue({} as never);
-  setGravatarEnabled(false);
+  siteSettings = { ...DEFAULT_SETTINGS };
+  applySettings({});
 });
 
 // ── Grant da magic link (moderatore primario, co-moderatore, relatore) ──
@@ -445,6 +474,119 @@ describe('POST jitsi/token — ramo ospite', () => {
     expect(res.status).toBe(409);
     const body = (await res.json()) as { jwt?: string };
     expect(body.jwt).toBeUndefined();
+  });
+
+  it("con l'accesso ospiti spento un evento a calendario non conia nulla (403)", async () => {
+    setGuestAccessEnabled(false);
+
+    const res = await post({ guestName: 'Ospite Anonimo' });
+    expect(res.status).toBe(403);
+    const body = (await res.json()) as { code: string; jwt?: string };
+    // Codice dedicato: la sala mostra un messaggio tradotto, non il testo del server.
+    expect(body.code).toBe('GUEST_ACCESS_DISABLED');
+    expect(body.jwt).toBeUndefined();
+  });
+
+  it("con l'accesso ospiti spento una chiamata rapida resta aperta a chi ha il link", async () => {
+    // La chiamata rapida non ha iscrizione: chiuderla agli ospiti vorrebbe
+    // dire che non ci entra nessuno oltre a chi l'ha creata.
+    setGuestAccessEnabled(false);
+    vi.mocked(prisma.event.findUnique).mockResolvedValue(
+      eventRow({ eventType: 'INSTANT' }) as never,
+    );
+
+    const res = await post({ guestName: 'Ospite Anonimo' });
+    expect(res.status).toBe(200);
+    const { body } = await minted(res);
+    expect(body.role).toBe('guest');
+  });
+
+  it('evento con password: senza il cookie di accesso non conia nulla', async () => {
+    vi.mocked(prisma.event.findUnique).mockResolvedValue(
+      eventRow({ joinPasswordHash: 'hash-della-password' }) as never,
+    );
+
+    const res = await post({ guestName: 'Ospite Anonimo' });
+    expect(res.status).toBe(403);
+    const body = (await res.json()) as { code: string; jwt?: string };
+    expect(body.code).toBe('JOIN_PASSWORD_REQUIRED');
+    expect(body.jwt).toBeUndefined();
+  });
+
+  it('evento con password: col cookie di accesso conia il JWT da ospite', async () => {
+    vi.mocked(prisma.event.findUnique).mockResolvedValue(
+      eventRow({ joinPasswordHash: 'hash-della-password' }) as never,
+    );
+    await grantJoinPassword();
+
+    const res = await post({ guestName: 'Ospite Anonimo' });
+    expect(res.status).toBe(200);
+    const { body } = await minted(res);
+    expect(body.role).toBe('guest');
+  });
+});
+
+// ── Accesso ospiti spento: chi ha un token entra come prima ──
+
+describe('POST jitsi/token — accesso ospiti spento', () => {
+  beforeEach(() => {
+    setGuestAccessEnabled(false);
+  });
+
+  it('il moderatore entra', async () => {
+    const res = await post({
+      moderatorToken: PRIMARY_TOKEN,
+      displayNameOverride: 'Giulia Verdi',
+    });
+    expect(res.status).toBe(200);
+    const { body } = await minted(res);
+    expect(body.role).toBe('moderator');
+  });
+
+  it('il relatore entra', async () => {
+    vi.mocked(prisma.eventModerator.findUnique).mockResolvedValue({
+      id: 'grant-2',
+      eventId: EVENT_ID,
+      revokedAt: null,
+      role: 'SPEAKER',
+      name: encryptPII('Luca Neri'),
+      email: null,
+    } as never);
+
+    const res = await post({ moderatorToken: GRANT_TOKEN });
+    expect(res.status).toBe(200);
+    const { body } = await minted(res);
+    expect(body.role).toBe('speaker');
+  });
+
+  it("l'iscritto entra dal browser con cui si è registrato", async () => {
+    vi.mocked(prisma.registration.findUnique).mockResolvedValue(
+      registrationRow() as never,
+    );
+    cookieJar.set(
+      eventAccessCookieName(EVENT_ID),
+      await signEventAccess(EVENT_ID, ACCESS_TOKEN, 3600),
+    );
+
+    const res = await post({ accessToken: ACCESS_TOKEN });
+    expect(res.status).toBe(200);
+    const { body } = await minted(res);
+    expect(body.role).toBe('participant');
+  });
+
+  it("l'iscritto entra anche da un altro dispositivo: il token è il suo posto", async () => {
+    // Senza il cookie il ramo conia un'identità da ospite, ma chi lo percorre
+    // ha il link personale di un'iscrizione: non è l'ingresso senza
+    // iscrizione che l'impostazione chiude.
+    vi.mocked(prisma.registration.findUnique).mockResolvedValue(
+      registrationRow() as never,
+    );
+
+    const res = await post({
+      accessToken: ACCESS_TOKEN,
+      displayNameOverride: 'Mario dal telefono',
+    });
+    expect(res.status).toBe(200);
   });
 });
 

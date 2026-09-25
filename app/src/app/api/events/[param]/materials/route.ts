@@ -9,6 +9,7 @@ import {
 import { isEventModerator, extractModeratorToken } from '@/lib/auth/moderator';
 import { prisma } from '@/lib/db';
 import { isEventPubliclyVisible } from '@/lib/events/visibility';
+import { MATERIAL_ACCESS_EVENT_SELECT, materialsWhereFor } from '@/lib/events/material-access';
 import { createMaterialSchema } from '@/lib/validation/schemas';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
 
@@ -16,16 +17,14 @@ export const dynamic = 'force-dynamic';
 
 // ── GET /api/events/[slug]/materials ─────────────────────
 
-export const GET = withErrorHandling(async (_request, context) => {
+export const GET = withErrorHandling(async (request, context) => {
   const { param: slug } = await context.params;
 
   const event = await prisma.event.findUnique({
     where: { slug },
     select: {
-      id: true,
-      status: true,
+      ...MATERIAL_ACCESS_EVENT_SELECT,
       eventType: true,
-      endsAt: true,
       postEventPublic: true,
       postEventPublicUntil: true,
     },
@@ -37,22 +36,31 @@ export const GET = withErrorHandling(async (_request, context) => {
     throw new NotFoundError('Event');
   }
 
+  // La visibilità del singolo materiale (prima/durante/dopo) vale per il
+  // pubblico; chi ha un token moderatore vede tutto
+  // (lib/events/material-access). Il token è facoltativo: senza, è la vista
+  // del pubblico.
   const materials = await prisma.eventMaterial.findMany({
-    where: { eventId: event.id },
+    where: await materialsWhereFor(event, extractModeratorToken(request)),
     orderBy: { createdAt: 'desc' },
   });
 
-  return Response.json({
-    materials: materials.map((m) => ({
-      id: m.id,
-      type: m.type,
-      title: m.title,
-      url: m.url,
-      description: m.description,
-      addedBy: m.addedBy,
-      createdAt: m.createdAt.toISOString(),
-    })),
-  });
+  return Response.json(
+    {
+      materials: materials.map((m) => ({
+        id: m.id,
+        type: m.type,
+        title: m.title,
+        url: m.url,
+        description: m.description,
+        visibility: m.visibility,
+        addedBy: m.addedBy,
+        createdAt: m.createdAt.toISOString(),
+      })),
+    },
+    // La risposta dipende da chi chiede e dall'ora: nessuna cache condivisa.
+    { headers: { 'Cache-Control': 'private, no-store' } },
+  );
 });
 
 // ── POST /api/events/[slug]/materials ────────────────────

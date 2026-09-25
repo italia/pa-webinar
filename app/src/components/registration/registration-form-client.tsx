@@ -15,6 +15,7 @@ import { Icon } from '@/components/ui/icon';
 import { Link, useRouter, percorso } from '@/i18n/navigation';
 import QuestionnaireForm from '@/components/questionnaires/questionnaire-form';
 import { createRegistrationSchema, ORGANIZATION_TYPES } from '@/lib/validation/schemas';
+import type { RegistrationAccess } from '@/lib/events/registration-access';
 
 interface ProfilingConfig {
   requireOrganization: boolean;
@@ -39,9 +40,16 @@ interface RegistrationFormClientProps {
    *  (SiteSetting.waitingRoomLeadMinutes). */
   waitingRoomLeadMinutes: number;
   profiling?: ProfilingConfig;
+  /** Chi può iscriversi (lib/events/registration-access): con l'iscrizione
+   *  pubblica spenta il modulo spiega che serve l'invito e che il link arriva
+   *  per email; senza invitati resta solo il rinvio del link a chi è iscritto. */
+  registrationAccess?: RegistrationAccess;
 }
 
 type FieldErrors = Partial<Record<string, string>>;
+
+/** Lo stesso controllo della rotta di rinvio del link. */
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function RegistrationFormClient({
   eventSlug,
@@ -53,6 +61,7 @@ export default function RegistrationFormClient({
   startsAt,
   waitingRoomLeadMinutes,
   profiling,
+  registrationAccess = 'open',
 }: RegistrationFormClientProps) {
   const t = useTranslations('registration');
   const tg = useTranslations('gdpr');
@@ -90,6 +99,9 @@ export default function RegistrationFormClient({
   const [serverError, setServerError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
+  // Solo su invito il server risponde allo stesso modo a chiunque e il link
+  // lo manda per email: qui non si sa se l'indirizzo era fra gli invitati.
+  const [linkByEmail, setLinkByEmail] = useState(false);
   const [registrationAccessToken, setRegistrationAccessToken] = useState<string | null>(null);
   // Duplicate sign-up: offer to re-send the original access link instead
   // of leaving the user stuck on a generic error.
@@ -229,6 +241,14 @@ export default function RegistrationFormClient({
           return;
         }
 
+        // 202: iscrizione solo su invito. Niente token: il link arriva
+        // nella casella dell'indirizzo, se è fra gli invitati.
+        if (res.status === 202) {
+          setLinkByEmail(true);
+          setSuccess(true);
+          return;
+        }
+
         const regData = await res.json().catch(() => ({}));
         if (regData?.accessToken) {
           setRegistrationAccessToken(regData.accessToken);
@@ -247,6 +267,7 @@ export default function RegistrationFormClient({
   // (with the personal join link). The endpoint always answers 200 with a
   // neutral body, so this never reveals whether the address is registered.
   const handleResend = useCallback(async () => {
+    setResent(false);
     setResending(true);
     try {
       await fetch(`/api/events/${eventSlug}/registrations/resend`, {
@@ -297,6 +318,20 @@ export default function RegistrationFormClient({
     const id = setTimeout(() => router.push(percorso(target)), 1200);
     return () => clearTimeout(id);
   }, [success, registrationAccessToken, hasPreRegistrationQuestionnaire, eventSlug, router, isNearStart, nowTick]);
+
+  if (success && linkByEmail) {
+    return (
+      <div className="py-4 text-center">
+        <h2 className="h3 mb-3">{t('checkEmailTitle')}</h2>
+        <p className="mb-4">{t('checkEmail')}</p>
+        <Link href={percorso(`/events/${eventSlug}`)}>
+          <Button color="primary" outline tag="span">
+            {t('backToEvent')}
+          </Button>
+        </Link>
+      </div>
+    );
+  }
 
   if (success) {
     // Auto-redirect straight into the waiting room when there's nothing
@@ -386,8 +421,90 @@ export default function RegistrationFormClient({
     );
   }
 
+  // Iscrizione pubblica spenta e nessun invitato per l'evento: nessun nuovo
+  // indirizzo verrebbe accettato, un modulo da compilare sarebbe un inganno.
+  // Resta la via per chi si era iscritto prima: farsi rimandare il link, che
+  // da questa pagina — dove la sala rimanda chi arriva senza — è l'unica.
+  if (registrationAccess === 'closed') {
+    return (
+      <>
+        <Alert color="info" className="mb-4">
+          {t('closed')}
+        </Alert>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (!EMAIL_RE.test(email.trim())) {
+              setErrors({ email: 'registration.errors.emailInvalid' });
+              return;
+            }
+            setErrors({});
+            void handleResend();
+          }}
+          noValidate
+        >
+          <h2 className="h5 fw-semibold mb-2">{t('lostLink')}</h2>
+          <p className="text-muted mb-3" style={{ fontSize: '0.9rem' }}>
+            {t('lostLinkHelp')}
+          </p>
+          <FormGroup className="mb-3">
+            <Input
+              type="email"
+              id="email"
+              wrapperClassName="mb-1"
+              label={t('email')}
+              autoComplete="email"
+              required
+              aria-invalid={errors.email ? true : undefined}
+              aria-describedby={errors.email ? 'emailError' : undefined}
+              value={email}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                setEmail(e.target.value);
+                setResent(false);
+                pulisciErrore('email');
+              }}
+              valid={errors.email ? false : undefined}
+            />
+            {errors.email && (
+              <div id="emailError" className="invalid-feedback d-block">
+                {t('errors.emailInvalid')}
+              </div>
+            )}
+          </FormGroup>
+          {resent ? (
+            <Alert color="success" className="mb-3">
+              {t('resendSent')}
+            </Alert>
+          ) : (
+            <Button color="primary" type="submit" disabled={resending} className="me-3">
+              {resending ? (
+                <>
+                  <Spinner active small className="me-2" />
+                  {t('resending')}
+                </>
+              ) : (
+                t('resendLink')
+              )}
+            </Button>
+          )}
+          <Link href={percorso(`/events/${eventSlug}`)}>
+            <Button color="secondary" outline tag="span">
+              {t('backToEvent')}
+            </Button>
+          </Link>
+        </form>
+      </>
+    );
+  }
+
   return (
     <form ref={formRef} onSubmit={handleSubmit} noValidate>
+      {registrationAccess === 'invitation' && (
+        <Alert color="info" className="mb-4">
+          {t('invitationOnly')}
+        </Alert>
+      )}
+
       {serverError && (
         <Alert color="danger" className="mb-4">
           {serverError}

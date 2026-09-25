@@ -7,6 +7,7 @@ import { Alert, Button, Badge, Card, CardBody, Row, Col } from 'design-react-kit
 import { Icon } from '@/components/ui/icon';
 import { Link, percorso } from '@/i18n/navigation';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
+import { youtubeWatchLink } from '@/lib/utils/youtube-link';
 import { REGISTRABLE_STATUSES } from '@/lib/events/visibility';
 import AddToCalendar from '@/components/events/add-to-calendar';
 import VideoPlayer, {
@@ -15,8 +16,10 @@ import VideoPlayer, {
   type AudioTrack,
 } from '@/components/events/video-player';
 import PostEventTabs from '@/components/events/post-event-tabs';
+import MaterialList from '@/components/materials/material-list';
 import PostEventRecap from '@/components/events/post-event-recap';
 import { isRecapEmpty, type EventRecap } from '@/lib/events/recap';
+import type { RegistrationAccess } from '@/lib/events/registration-access';
 import PostEventFeedbackInvite from '@/components/events/post-event-feedback-invite';
 import PostEventHero, {
   type StructuredSummary,
@@ -110,6 +113,9 @@ interface EventDetailClientProps {
   appUrl: string;
   parseTitleKicker?: boolean;
   answeredQuestions?: AnsweredQuestion[];
+  /** Materiali già filtrati dal server per il pubblico: quelli della fase
+   *  «prima» prima dell'inizio, quelli post-evento a evento concluso,
+   *  nessuno nel mezzo (li elenca la sala). */
   materials?: MaterialData[];
   polls?: PollData[];
   feedbackSummary?: FeedbackSummary | null;
@@ -122,6 +128,10 @@ interface EventDetailClientProps {
   /** Il device ha il cookie d'accesso firmato per questo evento: il link
    *  "Entra nella sala" può re-identificarlo su /live. */
   hasRoomAccess?: boolean;
+  /** Chi può iscriversi (lib/events/registration-access). */
+  registrationAccess?: RegistrationAccess;
+  /** In diretta si entra anche senza iscrizione (lib/events/guest-window). */
+  guestEntryOpen?: boolean;
 }
 
 const STATUS_COLOR: Record<string, string> = {
@@ -155,9 +165,13 @@ export default function EventDetailClient({
   tags = [],
   invalidToken = false,
   hasRoomAccess = false,
+  registrationAccess = 'open',
+  guestEntryOpen = true,
 }: EventDetailClientProps) {
   const t = useTranslations('events');
+  const tr = useTranslations('registration');
   const tv = useTranslations('video');
+  const tm = useTranslations('materials');
   const tPostprod = useTranslations('postprod');
   const format = useFormatter();
 
@@ -213,6 +227,7 @@ export default function EventDetailClient({
     ? 'PUBLISHED'
     : event.status;
   const isEnded = event.status === 'ENDED';
+  const youtubeLink = youtubeWatchLink(event.youtubeUrl);
   const isLive = event.status === 'LIVE';
   const accentColor = STATUS_COLOR[publicStatus] ?? STATUS_COLOR.PUBLISHED;
 
@@ -535,16 +550,28 @@ export default function EventDetailClient({
             />
           )}
 
-          {/* Video player for ended events with a recording. YouTube
-              embed wins when set (legacy uploads / mirrored streams);
-              otherwise the self-hosted MP4 is served via our signed
-              /api/events/[slug]/recording route. */}
-          {isEnded && event.youtubeUrl && (
+          {/* Video di un evento concluso. La registrazione pubblicata passa
+              dal player del portale (/api/events/[slug]/recording). Il
+              `youtubeUrl` è solo un link esterno, mai un player incorporato:
+              un iframe di YouTube farebbe contattare un servizio terzo a
+              chiunque apra la pagina (lib/utils/youtube-link). */}
+          {isEnded && youtubeLink && (
             <div className="mb-4">
-              <YouTubeEmbed url={event.youtubeUrl} title={title} />
+              <a
+                href={youtubeLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary text-decoration-none d-inline-flex align-items-center gap-1 fw-semibold"
+              >
+                <Icon icon="it-external-link" size="sm" color="primary" />
+                {tv('watchOnYouTube')}
+              </a>
+              <div className="text-muted" style={{ fontSize: '0.82rem' }}>
+                {tv('externalSiteNote')}
+              </div>
             </div>
           )}
-          {isEnded && !event.youtubeUrl && event.recordingUrl && (
+          {isEnded && event.recordingUrl && (
             <div className="mb-4">
               <div ref={playerAnchorRef} style={{ position: 'relative' }}>
                 <VideoPlayer
@@ -627,6 +654,19 @@ export default function EventDetailClient({
             {t('detail.description')}
           </h2>
           <MarkdownRenderer content={description} className="mb-4" />
+
+          {/* Materiali prima dell'inizio: il server manda qui solo quelli che
+              il pubblico può vedere in questa fase (sempre visibili e
+              preparatori), e nessuno da quando l'evento è iniziato. A evento
+              concluso l'elenco sta nelle tab post-evento. */}
+          {!isEnded && materials.length > 0 && (
+            <section className="mb-4">
+              <h2 className="h4 fw-semibold mb-3" style={{ color: 'var(--app-text)' }}>
+                {tm('title')}
+              </h2>
+              <MaterialList materials={materials} />
+            </section>
+          )}
 
           {/* Post-event recap: aggregate summary card above the detail tabs. */}
           {isEnded &&
@@ -739,7 +779,9 @@ export default function EventDetailClient({
                       {t('detail.registered')}
                     </p>
                   )}
-                  {canRegister && !(hasRoomAccess && !invalidToken) && (
+                  {canRegister &&
+                    !(hasRoomAccess && !invalidToken) &&
+                    registrationAccess !== 'closed' && (
                     <Link href={percorso(`/events/${event.slug}/registration`)}>
                       <Button
                         color="primary"
@@ -753,10 +795,39 @@ export default function EventDetailClient({
                     </Link>
                   )}
 
-                  {canRegister && (isLive || (hasRoomAccess && !invalidToken)) && (
+                  {/* Iscrizione pubblica spenta: si dice prima del clic chi può
+                      iscriversi, o che non si può. Senza il pulsante, chi si
+                      era iscritto prima trova qui la via per farsi rimandare
+                      il link: la pagina d'iscrizione, che senza invitati
+                      offre solo quella. */}
+                  {canRegister &&
+                    !(hasRoomAccess && !invalidToken) &&
+                    registrationAccess !== 'open' && (
+                    <p className="text-muted mt-2 mb-0" style={{ fontSize: '0.85rem' }}>
+                      {registrationAccess === 'invitation' ? tr('invitationOnly') : tr('closed')}
+                    </p>
+                  )}
+                  {canRegister &&
+                    !(hasRoomAccess && !invalidToken) &&
+                    registrationAccess === 'closed' && (
+                    <p className="mt-2 mb-0" style={{ fontSize: '0.85rem' }}>
+                      <Link
+                        href={percorso(`/events/${event.slug}/registration`)}
+                        className="text-decoration-none fw-semibold text-primary"
+                      >
+                        {tr('lostLink')}
+                      </Link>
+                    </p>
+                  )}
+
+                  {canRegister &&
+                    ((isLive && guestEntryOpen) || (hasRoomAccess && !invalidToken)) && (
                     // Via d'ingresso per chi si è già registrato: /live lo
                     // re-identifica dal cookie firmato (o lo fa entrare come
-                    // ospite se LIVE), evitando il loop registrazione → 409.
+                    // ospite se LIVE e l'amministrazione ammette ospiti),
+                    // evitando il loop registrazione → 409. Senza cookie e
+                    // senza ospiti /live rimanderebbe all'iscrizione: il link
+                    // non compare.
                     // Su evento non ancora LIVE il link appare SOLO se il device
                     // ha il cookie firmato valido: senza, /live rimbalzerebbe alla
                     // registrazione — esattamente il dead-end che questo link vuole
@@ -926,72 +997,5 @@ function PostEventSidebar({
         </div>
       )}
     </>
-  );
-}
-
-/**
- * Normalize a YouTube watch/shortlink URL to an embed URL.
- * Accepts:
- *   - https://www.youtube.com/watch?v=VIDEO_ID
- *   - https://youtu.be/VIDEO_ID
- *   - https://www.youtube.com/embed/VIDEO_ID (already normalized)
- * Returns null for anything we can't confidently map to a video id.
- */
-function toYouTubeEmbed(url: string): string | null {
-  try {
-    const u = new URL(url);
-    if (u.hostname.includes('youtu.be')) {
-      const id = u.pathname.replace(/^\//, '').split('/')[0];
-      return id ? `https://www.youtube.com/embed/${id}` : null;
-    }
-    if (u.hostname.includes('youtube.com')) {
-      if (u.pathname.startsWith('/embed/')) return url;
-      const id = u.searchParams.get('v');
-      return id ? `https://www.youtube.com/embed/${id}` : null;
-    }
-  } catch {
-    /* fall through */
-  }
-  return null;
-}
-
-function YouTubeEmbed({ url, title }: { url: string; title: string }) {
-  const embed = toYouTubeEmbed(url);
-  if (!embed) {
-    // Fallback to a plain link if the URL didn't parse as a YouTube
-    // video — better than rendering nothing silently.
-    return (
-      <a href={url} target="_blank" rel="noopener noreferrer">
-        {url}
-      </a>
-    );
-  }
-  return (
-    <div
-      style={{
-        position: 'relative',
-        paddingBottom: '56.25%',
-        height: 0,
-        overflow: 'hidden',
-        borderRadius: 8,
-        background: '#000',
-      }}
-    >
-      <iframe
-        src={embed}
-        title={title}
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowFullScreen
-        loading="lazy"
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          border: 0,
-        }}
-      />
-    </div>
   );
 }
