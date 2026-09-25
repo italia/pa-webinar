@@ -1,0 +1,68 @@
+# Configurazione del Traefik che k3s installa da sé. install-server.sh la
+# copia in /var/lib/rancher/k3s/server/manifests/ prima del primo avvio; dopo,
+# k3s riapplica il file a ogni modifica (Traefik si reinstalla da solo). Si
+# modifica questo file e si rilancia install-server.sh: la copia installata
+# viene sostituita a ogni lancio.
+apiVersion: helm.cattle.io/v1
+kind: HelmChartConfig
+metadata:
+  name: traefik
+  namespace: kube-system
+spec:
+  valuesContent: |-
+    service:
+      spec:
+        # Con il valore di k3s (Cluster) le connessioni in arrivo vengono
+        # tradotte e Traefik vede ogni client come il gateway della rete dei
+        # pod: i limiti per IP del portale (iscrizioni, accessi, reinvio del
+        # link) diventano un limite unico per tutto il pubblico. Con Local
+        # arriva l'indirizzo vero, per il traffico che entra dal nodo su cui
+        # gira Traefik.
+        externalTrafficPolicy: Local
+
+    # Tutto il traffico in chiaro sulla porta 80 viene reindirizzato a HTTPS:
+    # senza, portale e conferenza rispondono anche in chiaro, e chi scrive
+    # http://<portale>/admin manderebbe la chiave di amministrazione senza
+    # cifratura. Con cert-manager e la verifica HTTP-01 il reindirizzamento
+    # fa fallire il controllo che cert-manager fa prima di chiedere il
+    # certificato: usa la verifica DNS-01, oppure togli questo blocco e
+    # tieni chiusa la porta 80 quando non serve. Le chiavi sono quelle del
+    # chart di Traefik incluso nella versione di k3s provata: una chiave che
+    # il chart non conosce viene ignorata senza errori, quindi dopo un cambio
+    # di versione di k3s si controlla che `curl -I http://<portale>/`
+    # risponda ancora 308.
+    ports:
+      web:
+        http:
+          redirections:
+            entryPoint:
+              to: websecure
+              scheme: https
+              permanent: true
+
+    # Solo dietro un bilanciatore, un reverse proxy o un WAF che aggiunge la
+    # propria voce a X-Forwarded-For: si indicano i suoi indirizzi, e solo
+    # quelli, e nei valori del chart si mette app.env.TRUSTED_PROXY_HOPS a
+    # "1". Mai `forwardedHeaders.insecure`: chiunque sceglierebbe il proprio
+    # indirizzo e aggirerebbe i limiti.
+    # Si aggiunge al `ports:` qui sopra, non come un secondo `ports:`, che in
+    # YAML sostituirebbe il primo e toglierebbe il reindirizzamento:
+    #   ports:
+    #     web:
+    #       http: …come sopra…
+    #       forwardedHeaders:
+    #         trustedIPs: ["<ip-bilanciatore>/32"]
+    #     websecure:
+    #       forwardedHeaders:
+    #         trustedIPs: ["<ip-bilanciatore>/32"]
+
+    # Con tre nodi: Traefik sul nodo a cui puntano i nomi DNS, lo stesso che
+    # ServiceLB serve (etichetta svccontroller.k3s.cattle.io/enablelb=true).
+    # Con Local l'indirizzo del client arriva solo se Traefik è sul nodo di
+    # ingresso. Almeno un nodo deve avere l'etichetta, o Traefik resta in
+    # Pending: install-server.sh --node-label
+    # svccontroller.k3s.cattle.io/enablelb=true la dà al server dal primo
+    # avvio; per un altro nodo, label-jvb-node.sh --ingress-node e poi si
+    # rilancia install-server.sh. Lo script si ferma se manca.
+    # nodeSelector:
+    #   svccontroller.k3s.cattle.io/enablelb: "true"
