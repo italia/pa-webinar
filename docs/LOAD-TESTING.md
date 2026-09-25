@@ -12,7 +12,8 @@ The page owns the **method** and the **reference results**. Two companion files 
   running the bots inside the cluster, next to its manifests.
 
 How bridges are sized and scaled is explained in [Scaling the media plane](architecture/scaling.md).
-Choosing and sizing hardware is covered in [Infrastructure](INFRASTRUCTURE.md). Both link here for
+Choosing and sizing hardware is covered in [Requirements](install/README.md#requirements), with the lab
+measurements in [Infrastructure reference: Sizing](INFRASTRUCTURE.md#sizing). They link here for
 numbers.
 
 ## What is measured
@@ -367,8 +368,9 @@ event are:
 | `GET /api/events/{slug}` | Public event data | The app does not cache it, so every request that reaches a pod queries the database. The public response carries `Cache-Control: public, s-maxage=30, stale-while-revalidate=60`: a caching proxy or CDN in front of the portal would absorb repeats, and the chart's ingress does not cache. The moderator response (a request with a valid token) carries no such header |
 | `POST /api/events/{slug}/registrations` | Creates a registration: encrypted personal data, a consent audit entry, a person record, and a confirmation email queued in the email outbox | A per-address limit on each app pod. A repeated email address returns `409`, so give every virtual user its own address |
 | `POST /api/events/{slug}/jitsi/token` | Issues the conference JWT at join time | Guest tokens have a per-address limit on each app pod, set by `GUEST_JWT_RATE_LIMIT_PER_MINUTE` |
+| `GET /api/events/{slug}/questions` | Reads the Q&A panel. The room re-reads it after every `qa` poke, and polls it every 3 seconds while push is unavailable | While push is unavailable, each pod caches the question list for 2 seconds. Finding the caller's own upvotes is not cached: every read from a caller with a voting identity (a registration, or the browser id the room sends for everyone else) costs one more indexed query, once at least one listed question has an upvote |
 | `POST /api/events/{slug}/questions` | Submits a Q&A question | A cooldown per registration, or per address for guests |
-| `POST /api/events/{slug}/questions/{id}/upvote` | Upvotes a question | 10 per minute per registration (`app/src/app/api/events/[param]/questions/[id]/upvote/route.ts`); requires a registration token |
+| `POST /api/events/{slug}/questions/{id}/upvote` | Upvotes a question | 10 per minute per registration or browser id, plus 300 per minute per address and event for browser ids (`app/src/app/api/events/[param]/questions/[id]/upvote/route.ts`); a browser id is accepted only inside the guest window or with a room token |
 
 The values of the other limits are in [Reference limits](architecture/security.md#reference-limits).
 
@@ -388,7 +390,7 @@ afterwards. [Privacy and data protection](GDPR.md) describes what each record ho
 (`app/src/lib/rate-limit.ts`), so more app pods raise the effective limit. Per-address limits use the
 `X-Forwarded-For` entry written by the nearest trusted proxy (`TRUSTED_PROXY_HOPS`), so only real source
 addresses spread a generator; forged headers do not. The Q&A limit is per registration (per address for
-guests), and the upvote limit is per registration. A generator on one address therefore meets `429`
+guests), and the upvote limit is per registration or browser id. A generator on one address therefore meets `429`
 almost at once on the per-address routes. Spread it over
 several source addresses, or accept that the run measures the limiter. If the ingress sets
 `nginx.ingress.kubernetes.io/limit-rps` or `limit-connections` (see the example in
@@ -428,8 +430,9 @@ nothing else. Measure your own installation before you publish a capacity figure
 Two other sets of results are published next to the pages they serve:
 
 - Measurements of small single-node installations (the simple profile on k3s and minikube: resources
-  per component, one node under load, meeting patterns) are in
-  [Infrastructure: Sizing](INFRASTRUCTURE.md#sizing).
+  per component, meeting patterns, the cost of a participant) are in
+  [Infrastructure reference: Sizing](INFRASTRUCTURE.md#sizing), and the tables of each platform in
+  [minikube](install/minikube.md#measured-usage) and [k3s](install/k3s.md#measured-numbers).
 - The in-cluster grid run, 30 bots on one bridge behind one address, is in
   [In-cluster load test with Selenium Grid](../scripts/load-test/SELENIUM-GRID.md#reference-result-and-what-it-validates).
 
@@ -594,7 +597,8 @@ names, and secrets.
   runbook.
 - [Scaling the media plane](architecture/scaling.md): how bridges are sized, provisioned and scaled to
   zero.
-- [Infrastructure](INFRASTRUCTURE.md): choosing and sizing hardware and network.
+- [Installing PA Webinar](install/README.md) and the [Infrastructure reference](INFRASTRUCTURE.md):
+  choosing and sizing hardware and network.
 - [Running the JVB scaler](operations/jvb-scaler.md): pausing and resuming the scaler around a test.
 - [Monitoring and health](operations/monitoring.md): metrics, alerts and the dashboard.
 - [How PA Webinar extends Jitsi Meet](architecture/jitsi-integration.md): the media path and token

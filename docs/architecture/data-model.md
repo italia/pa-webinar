@@ -148,7 +148,7 @@ flowchart LR
 |---|---|---|---|
 | Events and content | `Event`, `EventTemplate`, `Tag` and `EventTagLink`, `EventMaterial`, `EventReminder`, `EventQuestionnaire` with `QuestionTemplate`, `QuestionnaireTemplateLink` and `QuestionItem`, `GdprTemplate` | The event and everything an organizer prepares for it. `EventTemplate` only pre-fills the wizard: an event keeps no reference to its template, so editing a template never changes existing events. | [event-journey.md](event-journey.md); statuses in [event-lifecycle.md](event-lifecycle.md) |
 | Participation | `Registration`, `EventInvitation`, `Person`, `ReminderSent`, `QuestionnaireResponse` and `QuestionnaireAnswer`, `EventFeedback` | Who registered, who was invited, the opt-in address book, and what participants answered. | [event-journey.md](event-journey.md); address book in [GDPR.md](../GDPR.md) and [ADR-011](../adr/011-person-rubrica.md) |
-| Live interaction | `ChatMessage` and `ChatMessageReaction`, `Question` and `QuestionUpvote`, `Poll` and `PollVote`, `WordCloudRound` and `WordCloudSubmission`, `EventAgendaItem` and `AgendaItemReaction`, `Reaction` | The table-backed features beside the video during a live event. PostgreSQL holds their state, and Redis only fans it out. The timer and the reaction-bar counters have no table ([Live interaction](#live-interaction)). | [live-interaction.md](live-interaction.md), [ADR-005](../adr/005-live-interaction-in-portal.md) |
+| Live interaction | `ChatMessage` and `ChatMessageReaction`, `Question`, `QuestionUpvote` and `QuestionGuestUpvote`, `Poll` and `PollVote`, `WordCloudRound` and `WordCloudSubmission`, `EventAgendaItem` and `AgendaItemReaction`, `Reaction` | The table-backed features beside the video during a live event. PostgreSQL holds their state, and Redis only fans it out. The timer and the reaction-bar counters have no table ([Live interaction](#live-interaction)). | [live-interaction.md](live-interaction.md), [ADR-005](../adr/005-live-interaction-in-portal.md) |
 | Access | `EventModerator`, `StaffAccount`, `StaffLoginToken` | Named moderator and speaker grants, staff accounts and their one-time sign-in links. The primary moderator link is a column on `Event`, and the instance API key is not stored in the database. `EventOrganizer` sits next to these models but is display metadata only: it lists co-organizing organizations on the event page and grants no access. | [identity-and-access.md](identity-and-access.md) |
 | Recording and AI | `Recording`, `RecordingTrack`, `Speaker`, `PostprodJob`, `PostprodArtifact`, `PostprodOriginalBody`, `OrphanRecording` | Recordings, per-participant audio tracks, the AI post-production queue and its outputs. | [recording.md](recording.md), [POSTPROD.md](../POSTPROD.md) |
 | Settings and audit | `SiteSetting`, `EmailTemplate`, `EmailOutbox`, `CallSession`, `GdprAuditLog`, `AdminAuditLog` | The runtime settings singleton, email overrides and the outbox, call-session analytics, and the two audit trails. | [runtime-settings.md](../configuration/runtime-settings.md), [email.md](email.md), [call sessions](event-lifecycle.md#call-sessions), [GDPR.md](../GDPR.md), [audit actor format](identity-and-access.md#audit-actor-format) |
@@ -271,6 +271,7 @@ erDiagram
   REGISTRATION ||--o{ QUESTION_UPVOTE : "one per question"
   EVENT ||--o{ QUESTION : "Q&A panel"
   QUESTION ||--o{ QUESTION_UPVOTE : "upvotes"
+  QUESTION ||--o{ QUESTION_GUEST_UPVOTE : "upvotes by browser id"
   EVENT ||--o{ CHAT_MESSAGE : "chat"
   CHAT_MESSAGE ||--o{ CHAT_MESSAGE_REACTION : "emoji"
   CHAT_MESSAGE |o--o{ CHAT_MESSAGE : "reply to (SetNull)"
@@ -312,6 +313,11 @@ erDiagram
     uuid id PK
     uuid questionId FK
     uuid registrationId FK
+  }
+  QUESTION_GUEST_UPVOTE {
+    uuid id PK
+    uuid questionId FK
+    string guestId "browser id"
   }
   POLL {
     uuid id PK
@@ -382,8 +388,8 @@ The values below are copied from `schema.prisma`. The owner page explains what e
 Each rule below names the mechanism that enforces it. Keep that mechanism in place when you change the model.
 
 - **One registration per email per event.** Enforced by the unique index `(eventId, emailHash)` on `Registration`. The email column holds ciphertext with a random IV, so only the hash can carry uniqueness. `EventInvitation` has the same pair. Its older `(eventId, email)` index only affects legacy plaintext rows.
-- **One upvote per registrant per question.** Enforced by the unique index `(questionId, registrationId)` on `QuestionUpvote`. `registrationId` is required there, so guests cannot upvote.
-- **`Question.upvoteCount` is denormalized.** The upvote route creates or deletes the `QuestionUpvote` row and increments or decrements the counter in a single transaction. The index `(eventId, status, upvoteCount DESC)` serves the sorted list. Any new code that adds or removes upvotes must keep the row and the counter in step.
+- **One upvote per identity per question.** A registrant's upvote is a `QuestionUpvote` row, unique on `(questionId, registrationId)`, and `registrationId` is required there. Anyone without a registration (a guest, a speaker or a moderator) upvotes with the browser id, stored as a `QuestionGuestUpvote` row, unique on `(questionId, guestId)`. The two identities live in separate tables so that `QuestionUpvote.registrationId` stays required, and an earlier release that reads it never meets a row without a registration.
+- **`Question.upvoteCount` is denormalized.** The upvote route creates or deletes the `QuestionUpvote` or `QuestionGuestUpvote` row and increments or decrements the counter in a single transaction. The counter covers both tables. The index `(eventId, status, upvoteCount DESC)` serves the sorted list. Any new code that adds or removes upvotes must keep the row and the counter in step.
 - **Guests can ask questions.** `Question.registrationId` is nullable. `authorName` is always set and is the name displayed.
 - **One vote per identity.** `PollVote`, `AgendaItemReaction`, `EventFeedback` and `QuestionnaireResponse` each carry two unique indexes, one on the parent plus `registrationId` and one on the parent plus `guestId`. PostgreSQL ignores `NULL` in unique indexes, so each index constrains only the identity present on the row. A `guestId` comes from the browser and the server cannot verify it, so for guests the index stops double submissions, not a guest who clears local storage. `ChatMessageReaction` is unique on `(messageId, senderId, emoji)`, which makes a toggle idempotent.
 - **At most one questionnaire per placement.** Enforced by the unique index `(eventId, placement)` on `EventQuestionnaire`.
@@ -410,7 +416,7 @@ Each rule below names the mechanism that enforces it. Keep that mechanism in pla
 
 **Rules.**
 
-- **A migration must be additive.** Add tables, nullable columns, columns with defaults and indexes. Do not drop or rename anything that the previous release still reads.
+- **A migration must be additive.** Add tables, nullable columns, columns with defaults and indexes. Do not drop or rename anything that the previous release still reads, and do not relax a constraint it relies on: once a required column becomes nullable, the new release can write rows that the previous release's generated client fails to read. To give an existing relation a second kind of owner, add a table, as `QuestionGuestUpvote` does beside `QuestionUpvote`.
 - **Never use `db:push`.** The `db:push` script bypasses migrations, can drop data, and leaves the migration history out of sync with the schema.
 - **Never edit a migration that has been applied anywhere.** Prisma records a checksum for every applied migration, and `prisma migrate dev` treats a changed file as drift and offers to reset the database. Write a new migration instead.
 - **Data changes inside a migration must be idempotent** and must not overwrite a value an administrator may have changed. Seed rows use `WHERE NOT EXISTS` or `ON CONFLICT DO NOTHING`. A changed default updates only the rows that still hold the old value (for example `WHERE jvb_pre_scale_minutes = 10`), or only rows nobody has edited.

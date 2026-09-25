@@ -192,7 +192,7 @@ Nothing merges the DEV half into the inventory for you. The release publishes SB
 
 ## The OPS half: operational services
 
-Use the provider's own inventory as the source of truth. Never copy another operator's values. Each recipe below produces raw JSON that you then map to `services[]` ([Mapping a service to `services[]`](#mapping-a-service-to-services)). Choosing a provider and sizing the platform are covered in [Infrastructure](INFRASTRUCTURE.md).
+Use the provider's own inventory as the source of truth. Never copy another operator's values. Each recipe below produces raw JSON that you then map to `services[]` ([Mapping a service to `services[]`](#mapping-a-service-to-services)). Choosing a provider and sizing the platform are covered in [Installing PA Webinar](install/README.md).
 
 ### Azure
 

@@ -589,5 +589,5 @@ Until every bridge has its own address, keep the platform at one bridge.
   resuming the scaler.
 - [Scaling the media plane](../../docs/architecture/scaling.md): how bridge
   capacity is modeled, and the single-IP pitfall.
-- [Infrastructure](../../docs/INFRASTRUCTURE.md): choosing and sizing a
-  setup, and exposing the bridges.
+- [Infrastructure](../../docs/INFRASTRUCTURE.md): sizing evidence, and
+  exposing the bridges.

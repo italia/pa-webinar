@@ -1102,15 +1102,17 @@ On any cloud:
    On GKE the platform installs the drivers: turn off the operator's driver
    component there.
 
-`infra/tofu/ai-gpu-nodepool.tf` is a reference definition for AKS
-(`azurerm_kubernetes_cluster_node_pool`, disabled with `count = 0`): minimum
-zero, maximum two, the `workload=ai-gpu` label and taint. Its `vm_size` is a
-16 GB T4 instance, which is enough for transcription but not for the default
-language model. For vLLM with the default model, choose an instance type with
-an 80 GB GPU, or add a second pool for it and point the vLLM Deployment's
-`nodeSelector` at that pool. The equivalents are a node pool with a GPU
-accelerator and minimum zero on GKE, and a managed node group or Karpenter
-with a GPU AMI on EKS. The node pool layout per cloud is in
+The reference modules create the pool on request, with a minimum of zero and
+the `workload=ai-gpu` label and taint: `gpu_pool` in `infra/tofu/aks`, whose
+default machine carries an 80 GB A100, `gpu_pool` in `infra/tofu/gke` and
+`gpu_enabled` in `infra/tofu/eks`. The default language model needs an 80 GB
+GPU: on a smaller GPU, choose a larger instance type for vLLM, or add a second
+pool for it and point the vLLM Deployment's `nodeSelector` at that pool. The
+node's allocatable CPU and memory must also exceed the worker's requests
+(`postprod.worker.resources` in `values.yaml`), or the autoscaler never adds
+it. The device plugin must tolerate the pool's taint, and on spot capacity
+the spot taint too. Each platform guide covers its pool:
+[AKS](install/aks.md), [GKE](install/gke.md) and [EKS](install/eks.md). The node pool layout per cloud is in
 [Infrastructure](INFRASTRUCTURE.md#node-pools).
 
 ## Administration
@@ -1558,8 +1560,9 @@ Several of these are tracked in the [Roadmap](ROADMAP.md).
   legal bases, retention and erasure.
 - [Scheduled and background jobs](architecture/background-jobs.md): every
   CronJob, including the post-production ones.
-- [Infrastructure](INFRASTRUCTURE.md): choosing a setup and the node pool
-  layout per cloud.
+- [Installing PA Webinar](install/README.md): choosing a platform, with the
+  GPU pool of each managed cloud in its guide; the node pool layout on any
+  cluster is in [Node pools](INFRASTRUCTURE.md#node-pools).
 - [Monitoring and health](operations/monitoring.md): probes, metrics and
   alerts.
 - [Glossary](GLOSSARY.md): the pipeline's terms.

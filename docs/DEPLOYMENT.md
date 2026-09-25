@@ -6,10 +6,14 @@ switches each part on, which Secrets you must create, how to install each exampl
 check a fresh installation. The day-2 procedures (upgrades, the bridge scaler, recording, monitoring,
 troubleshooting) have their own pages, listed at the end.
 
-**Read [INFRASTRUCTURE.md](INFRASTRUCTURE.md) first.** It explains how to choose a profile, how to size
-bridges and node pools, how to design the network (public addresses, firewall, TURN), and what differs
-per cloud. This page assumes those decisions are made and does not repeat them. To try PA Webinar on a
-single machine with Docker Compose, see [Local development](DEVELOPMENT.md).
+**Start from [Installing PA Webinar](install/README.md).** It helps you choose a platform, lists what to
+prepare, gives the measured requirements and the known limitations, and links a guide for each
+platform: [minikube](install/minikube.md) to evaluate on a workstation, [k3s](install/k3s.md) on your
+own VMs, and [AKS](install/aks.md), [GKE](install/gke.md) or [EKS](install/eks.md). Each guide installs
+this chart with a platform overlay. This page is the chart reference those guides rely on, and the
+install path for any other conformant cluster. The network design, the node pools and the evidence
+behind the sizes are in the [Infrastructure reference](INFRASTRUCTURE.md). Docker Compose is for
+changing the code, not for installing ([Local development](DEVELOPMENT.md)).
 
 On this page:
 
@@ -31,10 +35,11 @@ On this page:
 
 - **The chart is `apiVersion: v2`.** It installs with Helm 3 and Helm 4. CI renders and validates it
   with Helm 3, the lowest version it claims to support.
-- **Kubernetes flavor.** The chart targets any conformant cluster, but the repository's reference
-  infrastructure code (`infra/tofu`) describes only Azure Kubernetes Service (AKS) node pools, and some
-  example values use AKS node labels. What has and has not been exercised elsewhere is summarized in
-  [Reusing PA Webinar](REUSE.md#maturity-today).
+- **Kubernetes flavor.** The chart targets any conformant cluster. The repository carries reference
+  infrastructure for Azure Kubernetes Service (AKS), Google Kubernetes Engine (GKE) and Amazon EKS
+  (`infra/tofu/aks`, `infra/tofu/gke`, `infra/tofu/eks`) and scripts for k3s on your own VMs
+  (`infra/onprem/k3s`). What has run real events, what was tested in lab and what is only validated is
+  in [What has been exercised](install/README.md#what-has-been-exercised-and-what-is-only-validated).
 - **Examples on this page** use `pa-webinar` as both the release name and the namespace, and
   `webinar.example.com` (portal) and `meet.webinar.example.com` (conference) as hostnames.
 - **Before you change the chart**, run `./scripts/validate-chart.sh` from the repository root. It runs
@@ -175,7 +180,7 @@ Things the table does not show:
 
 A profile is an example values file, not a mode of the chart. Each one is layered on the chart's
 defaults with `-f` and sets a coherent group of keys. None of them encodes a capacity: how many people
-and events a profile carries depends on your nodes, and [INFRASTRUCTURE.md](INFRASTRUCTURE.md) sizes it,
+and events a profile carries depends on your nodes, and [Requirements](install/README.md#requirements) sizes it,
 using the measurements in [Load testing](LOAD-TESTING.md).
 
 | Keys the profile sets | `examples/values-simple.yaml` | `examples/values-standard.yaml` | `examples/values-full.yaml` |
@@ -198,6 +203,14 @@ placeholders are for you to fill: see
 [Pin the conference's internal credentials](#pin-the-conferences-internal-credentials). The comments in
 each file list the alternatives to the third-party STUN default
 ([Bridge (JVB)](#bridge-jvb)).
+
+**Platform overlays.** Each installation guide layers a small file from the same folder on a profile:
+`examples/values-minikube.yaml` and `examples/values-k3s.yaml` on the simple profile, and
+`examples/values-aks.yaml`, `values-gke.yaml` and `values-eks.yaml` on the full profile, together with
+the values that the platform's OpenTofu module outputs. The guides explain each overlay:
+[minikube](install/minikube.md#what-the-overlay-changes), [k3s](install/k3s.md),
+[AKS](install/aks.md), [GKE](install/gke.md) and [EKS](install/eks.md).
+`scripts/validate-chart.sh` renders the minikube and k3s overlays with every other profile.
 
 **Known issues in `examples/values-full.yaml`.** Fix them in your copy of the file:
 
@@ -231,7 +244,7 @@ Get these ready before the first install. The first item is the one that surpris
 - **A reachable address for the bridge.** Participants send media to the bridge on UDP port 10000,
   bound on the node. The nodes that run JVB need an address that participants can reach and that port
   open. Without it the conference opens and nobody hears anybody. How to provide it on each cloud is in
-  [INFRASTRUCTURE.md](INFRASTRUCTURE.md).
+  [Exposing the bridges over UDP](INFRASTRUCTURE.md#exposing-the-bridges-over-udp).
 - **metrics-server**, for the app's HorizontalPodAutoscaler.
 - **A default StorageClass**, for the in-cluster PostgreSQL volume.
 - **Prometheus Operator CRDs**, only if you enable a ServiceMonitor or the PrometheusRule. The full
@@ -830,10 +843,12 @@ Jibri is deployed but records nothing until it has storage and its finalize scri
 External database, bridges and Jibri on a dedicated node pool that scales to zero, the JVB scaler, and
 ServiceMonitors.
 
-1. Prepare the cluster, following [INFRASTRUCTURE.md](INFRASTRUCTURE.md):
+1. Prepare the cluster, following [Node pools and bridge exposure](INFRASTRUCTURE.md#node-pools-and-bridge-exposure),
+   or the guide for [AKS](install/aks.md), [GKE](install/gke.md) or [EKS](install/eks.md), whose modules
+   create all of it:
    - a node pool for bridges and Jibri whose nodes carry the label `workload=jitsi-jvb` and the taint
-     `workload=jitsi-jvb:NoSchedule`, with a cluster autoscaler minimum of zero (`infra/tofu/jvb-nodepool.tf`
-     is an AKS reference);
+     `workload=jitsi-jvb:NoSchedule`, with a cluster autoscaler minimum of zero
+     ([The JVB pool contract](../infra/aks/node-pools.md#the-jvb-pool-contract));
    - a reachable address and the bridge UDP port open on those nodes;
    - the Prometheus Operator CRDs, or set `metrics.serviceMonitor.enabled` and
      `jitsi-meet.jvb.metrics.serviceMonitor.enabled` to `false`.
@@ -883,7 +898,7 @@ ServiceMonitors.
 The subchart's own documentation is at [jitsi-contrib/jitsi-helm](https://github.com/jitsi-contrib/jitsi-helm).
 This section covers the keys that PA Webinar sets or depends on. Why the media path works the way it does
 is in [How PA Webinar extends Jitsi Meet](architecture/jitsi-integration.md#media-path); which ports to
-open and whether you need TURN is in [INFRASTRUCTURE.md](INFRASTRUCTURE.md).
+open and whether you need TURN is in [Networking](INFRASTRUCTURE.md#networking).
 
 ### Authentication
 
@@ -1080,7 +1095,7 @@ Set what the defaults cannot know before you rely on the policy:
   ([Before enabling the NetworkPolicy](architecture/background-jobs.md#before-enabling-the-networkpolicy)).
 
 Without a CNI that enforces NetworkPolicy, the object is accepted and ignored. Which platforms enforce
-it is in [INFRASTRUCTURE.md](INFRASTRUCTURE.md#network-policies).
+it is in [Network policies](INFRASTRUCTURE.md#network-policies).
 
 To test enforcement, run a short-lived pod that carries the app's labels, so that the policy selects
 it:
@@ -1099,7 +1114,8 @@ the app port. That proves enforcement. Run it again with a third label,
 report `app: reachable`, which is the path the scheduled jobs use. Its first line says `open`,
 because nothing restricts that pod.
 
-The design of network isolation for the whole installation is in [INFRASTRUCTURE.md](INFRASTRUCTURE.md).
+The design of network isolation for the whole installation is in
+[Network policies](INFRASTRUCTURE.md#network-policies).
 
 <!-- Legacy anchor: app/src/components/admin/infrastructure-panel.tsx links here. -->
 <a id="configurazione-registrazione-video-jibri"></a>

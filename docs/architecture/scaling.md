@@ -8,8 +8,9 @@ developers who work on the scaler.
 It describes the model, not the procedures:
 
 - measured results are in [Load testing](../LOAD-TESTING.md);
-- choosing hardware and sizing a setup are in
-  [Infrastructure](../INFRASTRUCTURE.md);
+- choosing hardware and sizing a platform are in
+  [Installing PA Webinar](../install/README.md), with the lab measurements in
+  [Infrastructure](../INFRASTRUCTURE.md#sizing);
 - enabling, tuning, validating and pausing the scaler are in
   [Running the JVB scaler](../operations/jvb-scaler.md);
 - the event status machine that the scaler drives is in
@@ -237,8 +238,8 @@ The sizing defaults describe a 16-core bridge: 300 receive-only viewers, or
 50 participants who all send, per bridge (see the comments in
 `jvb-sizing.ts`). The JVB resources that the chart ships are far smaller:
 `jitsi-meet.jvb.resources` in `values.yaml` requests one CPU, with a limit
-of three. The reference node pool in `infra/tofu/jvb-nodepool.tf` uses
-4-vCPU machines.
+of three. The bridge pools of the reference modules in `infra/tofu/aks`,
+`infra/tofu/gke` and `infra/tofu/eks` use 4-vCPU machines by default.
 
 If the defaults stay unchanged on small bridges, the scaler believes that
 each bridge holds several times what it can. To align them:
@@ -248,7 +249,7 @@ each bridge holds several times what it can. To align them:
 2. Set **vCPU per JVB pod** (`jvbCpuCoresPerPod`) to that number.
 3. Keep the per-core ratios until your own measurements say otherwise.
 
-[Infrastructure](../INFRASTRUCTURE.md) covers choosing the machine, and
+[Requirements](../install/README.md#requirements) covers choosing the machine, and
 [Load testing](../LOAD-TESTING.md) covers measuring it.
 
 ### From demand to bridges
@@ -465,8 +466,10 @@ both.
 
 ### The dedicated pool
 
-The reference pool is `infra/tofu/jvb-nodepool.tf`. It is an AKS example,
-and its header lists the GKE and EKS equivalents. It has:
+The reference modules in `infra/tofu/aks`, `infra/tofu/gke` and
+`infra/tofu/eks` create the pool, and
+[The JVB pool contract](../../infra/aks/node-pools.md#the-jvb-pool-contract)
+states what any pool must meet. It has:
 
 - the taint `workload=jitsi-jvb:NoSchedule`, which keeps every other
   workload off the pool so the pool can empty;
@@ -477,7 +480,9 @@ The bridges reach the pool through `jitsi-meet.jvb.nodeSelector` and
 `jitsi-meet.jvb.tolerations`. The full-profile example
 (`infra/helm/pa-webinar/examples/values-full.yaml`) sets both, and it places
 Jibri on the same pool. Machine size, pool limits and zones are covered in
-[Infrastructure](../INFRASTRUCTURE.md).
+the guide of each managed cloud ([AKS](../install/aks.md), [GKE](../install/gke.md),
+[EKS](../install/eks.md)) and, for any cluster, in
+[Node pools](../INFRASTRUCTURE.md#node-pools).
 
 ### One bridge per node
 
@@ -489,14 +494,15 @@ the node size. Node count follows bridge count:
 - set the pool maximum to at least `JVB_MAX_REPLICAS`, plus room for Jibri
   if it shares the pool;
 - expect replicas above the pool maximum to stay `Pending`. The reference
-  pool allows 4 nodes, while `JVB_MAX_REPLICAS` defaults to 6, so align the
-  two.
+  modules cap the pool at a few nodes (the bridge pool variables in each
+  module's `variables.tf`), while `JVB_MAX_REPLICAS` defaults to 6 in
+  `app/src/lib/jvb-sizing.ts`, so align the two.
 
 ### Not spot
 
 The JVB pool must be a regular pool, not spot or preemptible capacity. An
 eviction removes a bridge in the middle of an event, and every participant
-on it loses media. The reference pool sets no spot priority.
+on it loses media. The reference modules create it as regular capacity.
 
 ### Cold start and the pre-scale window
 
@@ -536,18 +542,18 @@ An event stops being billable when it becomes `IDLE` or `ENDED`. It becomes
 `IDLE` after `jvbInactiveGraceMinutes` with an empty room (default `45` in
 `schema.prisma`). The next tick then lowers `desired`, and the job scales the
 Deployment down. The emptied node is removed by the cluster autoscaler after
-its own scale-down delay. `jvb-nodepool.tf` suggests an autoscaler profile
-for that delay. The job adds no stabilization window of its own. Which pod
+its own scale-down delay; on AKS, the module's `auto_scaler_profile`
+(`infra/tofu/aks/cluster.tf`) sets it to 10 minutes. The job adds no stabilization window of its own. Which pod
 Kubernetes removes is a known limitation (see
 [Known limitations](#known-limitations)).
 
 ### Other pools
 
-The GPU pool for post-production (`infra/tofu/ai-gpu-nodepool.tf`) follows
-the same pattern, with a minimum of 0 nodes and a dedicated taint. The
+The GPU pool for post-production, which the reference modules create on
+request, follows the same pattern, with a minimum of 0 nodes and a dedicated taint. The
 post-production queue drives it, not this scaler. See
 [AI post-production](../POSTPROD.md) and
-[Infrastructure](../INFRASTRUCTURE.md).
+[Node pools](../INFRASTRUCTURE.md#node-pools).
 
 ## The single-IP pitfall
 
@@ -586,8 +592,9 @@ The rules:
 - **Every bridge must be reachable on its own address**, advertised by that
   bridge alone. An example is a public IP on each bridge node, with
   UDP 10000 open. [How PA Webinar extends Jitsi Meet](jitsi-integration.md)
-  explains the media path, and [Infrastructure](../INFRASTRUCTURE.md)
-  covers per-cloud network design.
+  explains the media path, and
+  [Exposing the bridges over UDP](../INFRASTRUCTURE.md#exposing-the-bridges-over-udp)
+  covers the topologies on each cloud.
 - **Until that holds, cap the platform at one bridge.** Use the global cap,
   because the per-event cap limits each event and not the sum:
 
@@ -670,7 +677,7 @@ The portal scales in the usual way for a stateless web application:
 - **Datastores.** There is a single PostgreSQL, either the in-cluster
   subchart or an external managed database, and a standalone Redis
   (`redis.architecture: standalone`). Both scale vertically; sizing them is
-  covered in [Infrastructure](../INFRASTRUCTURE.md).
+  covered in [Requirements](../install/README.md#requirements).
 
 ## Known limitations
 
@@ -713,8 +720,10 @@ The portal scales in the usual way for a stateless web application:
   events through, grace periods and `CallSession`.
 - [Running the JVB scaler](../operations/jvb-scaler.md): enabling, tuning,
   validating and pausing the scaler.
-- [Infrastructure](../INFRASTRUCTURE.md): choosing and sizing a setup,
-  network design, node pools per cloud.
+- [Installing PA Webinar](../install/README.md): choosing and sizing a
+  platform, with a guide per platform.
+- [Infrastructure](../INFRASTRUCTURE.md): network design and node pools on any
+  cluster.
 - [Load testing](../LOAD-TESTING.md): method and reference measurements.
 - [How PA Webinar extends Jitsi Meet](jitsi-integration.md): the media path
   and the advertised address.

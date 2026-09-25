@@ -247,10 +247,11 @@ title before a `|` as a small label above the main title.
 [Branding and white-labeling](configuration/branding.md#editorial-title-kicker)
 
 **Materials** (`EventMaterial`, UI **Materials**): links and files attached to
-an event. Each has a visibility (**Always**, **Before the event**, **During the
-event**, **After the event**) that decides which public lists show it: the
-event page before the start, the live room's drawer, the concluded event's
-page. It does not restrict who can open a file's URL.
+an event. Each has a visibility (**In the room and after the event**, the
+default, **Before the event**, **During the event**, **After the event**) that
+decides which public lists show it: the event page before the start, the live
+room's drawer, the concluded event's page. Before the start only **Before the
+event** materials are listed. It does not restrict who can open a file's URL.
 [From creation to recap](architecture/event-journey.md)
 
 **Occurrence**: one event of a recurring series. Every occurrence is a
@@ -448,7 +449,7 @@ named after `Event.jitsiRoomName`.
 
 **coturn / TURN**: the relay server for clients that cannot reach the bridge
 directly over UDP. TURNS carries the relay over TLS on TCP port 443 for
-restrictive networks. [Infrastructure guide](INFRASTRUCTURE.md),
+restrictive networks. [TURN](INFRASTRUCTURE.md#turn),
 [Deploying with Helm](DEPLOYMENT.md)
 
 **Dominant speaker**: Jitsi's running notion of who is speaking
@@ -540,8 +541,9 @@ hand, kept apart from chat and panel updates.
 
 **Docker Compose stack**: the `docker-compose.yml` at the repository root. It
 runs the portal, PostgreSQL, Redis, a single-node Jitsi, Mailpit and a `cron`
-service, for local development and for single-VM installations.
-[Local development](DEVELOPMENT.md), [Infrastructure guide](INFRASTRUCTURE.md)
+service. It is the loop for developing the code, not an installation: a
+single VM runs the Helm chart on k3s.
+[Local development](DEVELOPMENT.md)
 
 **Email outbox** (`EmailOutbox`): the durable queue of outgoing email.
 Features call `enqueueEmail()`, and a scheduled job
@@ -563,10 +565,18 @@ profile and only when `jvbScaler.enabled` is true (off by default in
 [Scaling the media plane](architecture/scaling.md),
 [Running the JVB scaler](operations/jvb-scaler.md)
 
+**k3s**: a lightweight Kubernetes distribution that runs on ordinary VMs. The
+scripts in `infra/onprem/k3s` install it on one or three VMs, with the chart's
+`simple` profile. [Installing on your own VMs with k3s](install/k3s.md)
+
+**minikube**: a single-node Kubernetes cluster on a workstation. The
+evaluation path: `scripts/minikube-up.sh` installs the same chart that runs in
+production. [Try PA Webinar on minikube](install/minikube.md)
+
 **Node pool**: a group of Kubernetes nodes of the same machine size. The
 `full` profile expects a dedicated pool for bridges, and AI post-production a
 GPU pool. Either can scale to zero.
-[Infrastructure guide](INFRASTRUCTURE.md)
+[Node pools](INFRASTRUCTURE.md#node-pools)
 
 **Object storage**: where recordings, tracks, AI outputs and uploaded files
 live. PA Webinar supports Azure Blob Storage and S3-compatible services;
@@ -581,6 +591,11 @@ or may not be the public body that runs the events.
 event or call session references. A reconciliation job finds orphan
 recordings, and they are deleted after a grace period unless an administrator
 decides otherwise. [Recording](architecture/recording.md)
+
+**Platform overlay**: a small values file in `infra/helm/pa-webinar/examples/`
+(`values-minikube.yaml`, `values-k3s.yaml`, `values-aks.yaml`,
+`values-gke.yaml`, `values-eks.yaml`) that an installation guide layers on a
+profile. [Profiles and values files](DEPLOYMENT.md#profiles-and-values-files)
 
 **Profile** (`jitsi.mode`: `simple`, `standard`, `full`): the Helm setting
 that selects how much of the media stack the chart deploys: bridge placement,

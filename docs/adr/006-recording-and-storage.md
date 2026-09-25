@@ -185,7 +185,7 @@ transcript once someone revises it, and it exists only in the database.
 - **`RECORDING_STORAGE_TYPE` does more than pick a provider.** The live room and the status page read it
   directly: when it is unset or `local`, Jibri counts as unavailable, even when auto-detection finds a
   recordings bucket. Set it explicitly whenever Jibri is used
-  ([Object storage](../configuration/storage.md#recording_storage_type-does-more-than-pick-a-provider)).
+  ([Object storage](../configuration/storage.md#recording-availability-follows-the-resolved-provider)).
 - **One composite recording at a time.** The scaler asks for at most one Jibri replica.
 - **The recording indicator follows Jibri only.** When an event is captured by the multitrack recorder
   alone, participants learn about it from the consent gates, not from a banner in the room.

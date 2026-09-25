@@ -762,7 +762,7 @@ More symptoms are in [Troubleshooting](troubleshooting.md).
 
 - [Deploying with Helm](../DEPLOYMENT.md): the chart keys, profiles and
   NetworkPolicy.
-- [Infrastructure](../INFRASTRUCTURE.md): choosing and sizing a setup.
+- [Installing PA Webinar](../install/README.md): choosing and sizing a platform.
 - [Scaling the media plane](../architecture/scaling.md): the scaler tick and
   the Redis snapshot.
 - [Running the JVB scaler](jvb-scaler.md): enabling, tuning and pausing the

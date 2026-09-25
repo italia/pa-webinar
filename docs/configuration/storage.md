@@ -12,7 +12,7 @@ for developers who write code that stores files.
 
 | Looking for | Go to |
 |---|---|
-| Which storage service to buy or host, and how to size it | [Infrastructure guide](../INFRASTRUCTURE.md) |
+| Which storage service to buy or host, and how to size it | [Installing PA Webinar](../install/README.md#checklist-before-you-install) and the storage section of each platform guide |
 | How long each kind of object is kept, and the legal basis | [Privacy and data protection](../GDPR.md) and [Recordings, voice data and AI outputs](../privacy/recordings-and-ai.md) |
 | How recordings are produced and handed to post-production | [Recording](../architecture/recording.md) |
 | The exact Content Security Policy | [Content Security Policy](../SECURITY-CSP.md) |

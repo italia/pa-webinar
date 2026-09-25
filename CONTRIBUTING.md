@@ -26,7 +26,7 @@ Search the [existing issues](https://github.com/italia/pa-webinar/issues) first.
 - **Description**: what is broken, in one or two sentences.
 - **Steps to reproduce**: numbered, starting from a known state (for example "an event in `PUBLISHED` status with registration required").
 - **Expected behavior** and **actual behavior**.
-- **Environment**: the release marked **Current version** on the `/changelog` page, or the image tag you deployed (`ghcr.io/italia/pa-webinar:X.Y.Z`); browser and operating system; installation type (Docker Compose on a single VM, Helm with `jitsi.mode` `simple`, `standard` or `full`, or Helm with an external Jitsi, `jitsi.enabled: false`).
+- **Environment**: the release marked **Current version** on the `/changelog` page, or the image tag you deployed (`ghcr.io/italia/pa-webinar:X.Y.Z`); browser and operating system; installation type (Helm with `jitsi.mode` `simple`, `standard` or `full`, on minikube, k3s or a managed cluster; Helm with an external Jitsi, `jitsi.enabled: false`; or the Docker Compose development stack).
 - **Screenshots or logs**, when they help.
 
 Strip personal data before you attach anything. Remove names, email addresses, IP addresses and the hostnames of your installation, and replace them with placeholders such as `webinar.example.com`. Never paste a moderator link, a magic link or any URL with a `?token=` parameter: these are working credentials, and the moderator link does not expire.

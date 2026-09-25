@@ -11,7 +11,7 @@ This is the index of the PA Webinar documentation. It lists every page, grouped 
 
 ## Documentation map
 
-The four journeys below match the sections of this index. The dark nodes are the two entry points. Each folder node stands for the drill-down pages of the page above it. [Infrastructure](INFRASTRUCTURE.md), drawn with a dashed outline, belongs to two journeys: evaluators read it to judge what a setup costs, and operators read it before they install.
+The four journeys below match the sections of this index. The dark nodes are the two entry points. Each folder node stands for the drill-down pages of the page above it. [Installing PA Webinar](install/README.md), drawn with a dashed outline, belongs to two journeys: evaluators read it to judge what a platform costs and try the product on minikube, and operators start their installation there.
 
 ```mermaid
 flowchart LR
@@ -27,10 +27,12 @@ flowchart LR
     GOV["GOVERNANCE.md<br/>who decides"]:::ext
   end
 
-  INFRA["INFRASTRUCTURE.md<br/>choose and size a setup"]:::ext
+  INST["install/README.md<br/>choose a platform"]:::ext
 
   subgraph OPS["Install and operate"]
     direction TB
+    INSTD["install/<br/>minikube, k3s,<br/>AKS, GKE, EKS"]:::data
+    INFRA["INFRASTRUCTURE.md<br/>sizing evidence, network,<br/>policies, images"]:::data
     DEP["DEPLOYMENT.md<br/>the Helm chart"]:::data
     OPSD["operations/<br/>upgrades, scaler, recording,<br/>monitoring, troubleshooting"]:::data
     CONF["CONFIGURATION.md<br/>variables and secrets"]:::data
@@ -56,11 +58,12 @@ flowchart LR
   end
 
   HUB -->|"evaluate"| EVAL
-  HUB -->|"pick a setup"| INFRA
-  INFRA -->|"then install"| OPS
+  HUB -->|"pick a platform"| INST
+  INST -->|"then install"| OPS
   HUB -->|"understand and build"| BUILD
   HUB -->|"protect data"| PRIV
 
+  INSTD --> INFRA
   DEP --> OPSD
   CONF --> CONFD
   ARCH --> ARCHD
@@ -74,7 +77,7 @@ flowchart LR
   classDef portal fill:#E6F0FA,stroke:#0066CC,stroke-width:2px,color:#17324D
   classDef risk fill:#FBE9EC,stroke:#D1344C,stroke-width:2px,color:#17324D
   classDef optional stroke-dasharray:5 4
-  class INFRA optional
+  class INST optional
   style EVAL fill:#FFFFFF,stroke:#5C6F82,color:#17324D
   style OPS fill:#FFFFFF,stroke:#008055,color:#17324D
   style BUILD fill:#FFFFFF,stroke:#0066CC,color:#17324D
@@ -97,13 +100,17 @@ For decision-makers in a public administration (PA): IT managers, procurement an
 
 ## Install and operate
 
-For the IT staff who install and run an installation. Start with [Infrastructure](INFRASTRUCTURE.md): it tells you which setup fits what you have and how large it must be, before you touch the chart.
+For the IT staff who install and run an installation. Start with [Installing PA Webinar](install/README.md): it tells you which platform fits what you have, what to prepare and how large it must be, before you touch the chart. PA Webinar is Kubernetes-native: every guide installs the same Helm chart, and minikube is the way to evaluate it.
 
-### Choose a setup and install it
+### Choose a platform and install it
 
 | Page | What it answers |
 |---|---|
-| [Infrastructure](INFRASTRUCTURE.md) | Which setup to run (a workstation, one VM, three VMs, or managed Kubernetes on AKS, GKE or EKS) and how to size it. For each setup it gives the measured resources, the commands that worked, its verification status, and the networking, TURN, network-policy and image requirements. |
+| [Installing PA Webinar](install/README.md) | Which platform to run (a workstation, one VM, three VMs, or managed Kubernetes on AKS, GKE or EKS), the checklist before you install, the measured requirements, how scaling works, and the known limitations: TURN, ingress controllers and proxies, UDP load balancers, network plugins, registry access and high availability. |
+| [Try PA Webinar on minikube](install/minikube.md) | The evaluation path: one command, `scripts/minikube-up.sh`, installs the chart on a workstation. First steps, measured usage, troubleshooting, the installation by hand and what the minikube overlay changes. |
+| [Installing on your own VMs with k3s](install/k3s.md) | One or three VMs with the scripts in `infra/onprem/k3s`: layouts, ports, proxies and air-gapped nodes, RHEL with SELinux, certificates, backups, failure behavior and measurements. |
+| [Installing on AKS](install/aks.md), [GKE](install/gke.md) and [EKS](install/eks.md) | The full profile on a managed cluster, from the reference OpenTofu module to a first event: decisions, checklist, install steps, bridge and TURN exposure, storage, scaling, upgrades and what has been verified. |
+| [Infrastructure reference](INFRASTRUCTURE.md) | The evidence and the design behind the guides: how the lab measured capacity, what a participant costs on the bridge, node pools and bridge exposure on any cluster, ports, advertised addresses, TURN, TLS, ingress controllers and client addresses, the chart's NetworkPolicy, the published images and the chart issues the lab installs found. |
 | [Deploying with Helm](DEPLOYMENT.md) | The chart reference and install guide: what the chart renders, the `simple`, `standard` and `full` profiles, secrets, hostnames and ingress, the Jitsi keys, NetworkPolicy, metrics and first-run checks. |
 
 ### Run it day to day
@@ -188,7 +195,7 @@ For developers who change the code or the documentation.
 
 | Page | What it answers |
 |---|---|
-| [Local development](DEVELOPMENT.md) | How to run PA Webinar on a workstation with Docker Compose: prerequisites, quick start and first access, local services, what differs from a cluster, the database workflow and local troubleshooting. |
+| [Local development](DEVELOPMENT.md) | The development loop with Docker Compose: prerequisites, quick start and first access, local services, what differs from a cluster, the database workflow, trying a chart change on minikube, and local troubleshooting. |
 | [How we develop PA Webinar](development/methodology.md) | The development method: branches, Conventional Commits, pre-commit gates, CI parity before every push, code review, regression discipline, the coverage ratchet, database changes, ADRs and documentation discipline. |
 | [CI, images and releases](development/ci-and-release.md) | What each GitHub Actions workflow does and produces, the image-tag table, SBOMs, release notes and the step-by-step release procedure. |
 | [Testing](development/testing.md) | Every test layer with its command and CI job, the guard tests that turn project rules into failing tests, the coverage ratchet and what cannot be tested headless. |
@@ -227,7 +234,9 @@ Each of these files sits next to the code it describes.
 | [`infra/jitsi-web-patched/README.md`](../infra/jitsi-web-patched/README.md) | The patched `jitsi/web` image: the three fixes, patching by shape, building, bumping to a new Jitsi release and verification. |
 | [`infra/jitsi/README.md`](../infra/jitsi/README.md) | The custom Prosody module and the two Jibri finalize scripts, and which script the chart uses. |
 | [`infra/helm/pa-webinar/README.md`](../infra/helm/pa-webinar/README.md) | The short README that travels inside the packaged chart, pointing to the full documentation. |
-| [`infra/aks/node-pools.md`](../infra/aks/node-pools.md) | The AKS reference node pools: the JVB pool contract and how to create the pool. |
+| [`infra/onprem/k3s/README.md`](../infra/onprem/k3s/README.md) | The reference for the k3s installation scripts: every option, proxies, registry mirrors, air-gapped nodes and SELinux. The procedure is in [Installing on your own VMs with k3s](install/k3s.md). |
+| [`infra/tofu/aks/README.md`](../infra/tofu/aks/README.md), [`gke`](../infra/tofu/gke/README.md), [`eks`](../infra/tofu/eks/README.md) | The reference OpenTofu modules for the managed clouds: what each creates, its variables and outputs, network rules and what has been verified. |
+| [`infra/aks/node-pools.md`](../infra/aks/node-pools.md) | The JVB pool contract that every bridge pool must meet, and how to add the pool to an AKS cluster you already have. |
 | [`infra/service-inventory/azure/README.md`](../infra/service-inventory/azure/README.md) | The reference Azure automation for the operational half of the service inventory, and what it publishes. |
 | [`scripts/load-test/README.md`](../scripts/load-test/README.md) | The load-test toolkit manual: the image, variables, runs and known issues. Its companion [`SELENIUM-GRID.md`](../scripts/load-test/SELENIUM-GRID.md) is the runbook for an in-cluster load test. |
 | [`app/public/audio/README.md`](../app/public/audio/README.md) | The bundled waiting-room music: when it plays, how to replace it, and its attribution. |
@@ -239,10 +248,12 @@ Each of these files sits next to the code it describes.
 
 | Question | Page |
 |---|---|
-| Which setup fits our administration, and how large must it be? | [Infrastructure: choosing a setup](INFRASTRUCTURE.md#choosing-a-setup) and [sizing](INFRASTRUCTURE.md#sizing) |
+| Which platform fits our administration, and how large must it be? | [Installing PA Webinar: choose a platform](install/README.md#choose-a-platform) and [requirements](install/README.md#requirements) |
+| How do I try PA Webinar on my workstation? | [Try PA Webinar on minikube](install/minikube.md) |
 | How many participants can one bridge carry? | [Load testing: reference measurements](LOAD-TESTING.md#reference-measurements) and [Scaling: sizing](architecture/scaling.md#sizing-from-an-event-to-a-number-of-bridges) |
-| Which ports must the firewall open? | [Infrastructure: ports and firewall](INFRASTRUCTURE.md#ports-and-firewall) |
-| How do I install on Kubernetes? | [Deploying with Helm: install walkthroughs](DEPLOYMENT.md#install-walkthroughs) |
+| Which ports must the firewall open? | [Infrastructure reference: ports and firewall](INFRASTRUCTURE.md#ports-and-firewall) |
+| How do I install on Kubernetes? | The guide for your platform, from [Installing PA Webinar](install/README.md#choose-a-platform), and [Deploying with Helm: install walkthroughs](DEPLOYMENT.md#install-walkthroughs) for any other cluster |
+| What are the known limits of an installation (TURN, ingress, proxies)? | [Installing PA Webinar: known limitations](install/README.md#known-limitations) |
 | What does an environment variable do? | [Configuration: environment variable reference](CONFIGURATION.md#environment-variable-reference) |
 | How do I upgrade, and how do I roll back? | [Upgrades and rollback](operations/upgrades.md) |
 | Participants cannot hear or see each other. | [Troubleshooting: no audio or video](operations/troubleshooting.md#no-audio-or-video) |

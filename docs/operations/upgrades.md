@@ -6,7 +6,7 @@ misbehaves. It also says what a rollback puts back and what it does not.
 
 The first installation is covered in [Deploying with Helm](../DEPLOYMENT.md). The images each
 release publishes, and their tags, are in [CI, images and releases](../development/ci-and-release.md).
-Choosing and sizing a setup is in [Infrastructure](../INFRASTRUCTURE.md).
+Choosing and sizing a platform is in [Installing PA Webinar](../install/README.md).
 
 The examples use `pa-webinar` as both the release name and the namespace, and `X.Y.Z` for the
 target release. Replace them with your own values.
@@ -63,6 +63,10 @@ Read [CHANGELOG.md](../../CHANGELOG.md) and the GitHub Release notes for every r
 one you run and the one you target. Releases follow semantic versioning; while the major version is
 0, a minor release can change chart values and behavior. The GitHub Release also carries the SBOMs
 and the packaged chart.
+
+Some behavior changes need no migration and no new value, yet change what the public sees on events
+that are already published: for example, which event materials a public page lists before the start.
+The release notes flag them. After such an upgrade, check the upcoming events with their organizers.
 
 To see what runs now:
 
@@ -759,5 +763,5 @@ newer version, as it does with Helm.
 - [Setting up recording](recording-setup.md): the values that the recorder bot and Jibri depend on.
 - [Monitoring and health](monitoring.md): probes, status pages and alerts after an upgrade.
 - [Troubleshooting](troubleshooting.md): symptoms and fixes for running installations.
-- [Infrastructure](../INFRASTRUCTURE.md): choosing and sizing a setup.
+- [Installing PA Webinar](../install/README.md): choosing and sizing a platform.
 - [Configuration reference](../CONFIGURATION.md): the secrets map, including `PII_ENCRYPTION_KEY`.

@@ -20,7 +20,7 @@ providers or the retention periods:
 | Recording storage settings and providers | [Object storage](../configuration/storage.md) |
 | How long recordings and tracks are kept | [Privacy and data protection](../GDPR.md) and [Recordings, voice data and AI outputs](../privacy/recordings-and-ai.md) |
 | What happens to a recording after the event | [AI post-production](../POSTPROD.md) |
-| Node pools, disk and storage sizing | [Infrastructure](../INFRASTRUCTURE.md) |
+| Node pools, disk and storage sizing | [Node pools](../INFRASTRUCTURE.md#node-pools), [Requirements](../install/README.md#requirements) |
 
 Examples use `pa-webinar` as both the Helm release and the namespace, so the
 chart's full name is `pa-webinar` and the Jitsi subchart's is
@@ -124,7 +124,7 @@ turn Jibri on explicitly.
 | `jitsi-meet.jibri.enabled` | `false` | `true` in `examples/values-standard.yaml` and `examples/values-full.yaml` | Also makes the subchart set `ENABLE_RECORDING` for the Jitsi components and create the recorder XMPP account |
 | `jitsi-meet.jibri.replicaCount` | `0` | `1` (standard), `0` (full) | In the full profile the JVB scaler scales Jibri between 0 and 1 ([Running the JVB scaler](jvb-scaler.md)) |
 | `jitsi-meet.jibri.singleUseMode` | `true` | `true` | Each Jibri instance restarts after one recording |
-| `jitsi-meet.jibri.nodeSelector`, `tolerations`, `resources` | empty | full profile: the JVB node pool, 1 CPU and 2 GiB requested | Jibri runs a browser and an encoder; see [Infrastructure](../INFRASTRUCTURE.md) |
+| `jitsi-meet.jibri.nodeSelector`, `tolerations`, `resources` | empty | full profile: the JVB node pool, 1 CPU and 2 GiB requested | Jibri runs a browser and an encoder; see [Node pools](../INFRASTRUCTURE.md#node-pools) |
 | `jitsi-meet.jibri.persistence.*`, `jitsi-meet.jibri.shm.*` | subchart defaults: disabled | not set | Without persistence the recording directory is an `emptyDir`; the subchart notes that its Chromium may need `/dev/shm` |
 
 One Jibri records one conference at a time, and the JVB scaler never asks for
@@ -617,8 +617,8 @@ Before the first reconcile run after a database restore, read
 
 ## Storage sizing
 
-How to size the Jibri and recorder nodes is covered in
-[Infrastructure](../INFRASTRUCTURE.md). The local working space is set here:
+Where the Jibri and recorder pods run is covered in
+[Node pools](../INFRASTRUCTURE.md#node-pools). The local working space is set here:
 `jitsi-meet.jibri.persistence.*` for Jibri (an `emptyDir` unless enabled) and
 `recorder.workSizeLimit` for each bot.
 

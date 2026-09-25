@@ -204,26 +204,31 @@ Each seam, its limits and the checklist for upgrading Jitsi are in [How PA Webin
 
 ## Where it runs
 
-| Setup | What runs | Use it for |
-|---|---|---|
-| Docker Compose on one machine | The portal, PostgreSQL, Redis, the Jitsi stack, Mailpit and a `cron` loop for email, reminders and cleanup. The per-participant recorder is an optional profile. No TLS on the portal, no object storage, no TURN | Development and a first look. It is not built to serve events |
-| Helm, `simple` profile | The portal with PostgreSQL and Redis in the cluster, one bridge, no Jibri | Evaluation, and a single node such as k3s on one VM |
-| Helm, `standard` profile | An external database, app autoscaling, one bridge and Jibri | Regular events with composite recording |
-| Helm, `full` profile | Bridges and Jibri on a dedicated node pool that scales to zero under the JVB scaler | Concurrent or large events, recording and AI post-production |
+PA Webinar is Kubernetes-native. One Helm chart, `infra/helm/pa-webinar`, installs it everywhere, from a workstation to a managed cluster: only the values files layered on it change. Scheduled work runs as Kubernetes CronJobs, and in the `full` profile a CronJob also scales the bridges through the Kubernetes API.
 
-The profiles are example values files in `infra/helm/pa-webinar/examples/`, not modes of the chart, and none of them encodes a capacity. With `jitsi.enabled: false`, the chart deploys no Jitsi and the portal uses an existing Jitsi deployment, which must verify the portal's tokens.
+| Platform | Start from | What you get | Status |
+|---|---|---|---|
+| minikube on a workstation | [Try PA Webinar on minikube](docs/install/minikube.md): `scripts/minikube-up.sh` | Evaluation: the whole chart in the `simple` profile, with a test mailbox. Browsers on the same workstation only | Tested in lab |
+| k3s on one or three VMs | [Installing on your own VMs with k3s](docs/install/k3s.md): the scripts in `infra/onprem/k3s` | Occasional events of about 20 participants on camera: one bridge, PostgreSQL and Redis in the cluster, no TURN. Not highly available | Tested in lab |
+| AKS | [Installing on AKS](docs/install/aks.md): the module in `infra/tofu/aks` | The `full` profile: bridges that scale to zero, coturn, Azure Blob storage | Exercised with real events; the module itself has not yet been applied |
+| GKE, EKS | [Installing on GKE](docs/install/gke.md), [Installing on EKS](docs/install/eks.md): the modules in `infra/tofu/gke` and `infra/tofu/eks` | The `full` profile on Google Cloud or AWS | Not yet verified |
+| Docker Compose | [Local development](docs/DEVELOPMENT.md) | The loop for changing the code. It is not an installation and does not serve events | Development only |
 
-Some capabilities need more than one machine. Bridge scale-to-zero and multi-node scaling need Kubernetes with an autoscaling node pool, and AI post-production needs a GPU node pool in the same cluster. Jibri needs the ALSA loopback kernel module on its node and elevated container privileges (the Jitsi subchart adds `SYS_ADMIN`).
+The chart's three example profiles are values files in `infra/helm/pa-webinar/examples/`, not modes of the chart, and none of them encodes a capacity: `simple` runs the portal with PostgreSQL and Redis in the cluster and one bridge; `standard` adds an external database, app autoscaling and Jibri; `full` puts the bridges and Jibri on a dedicated node pool that scales to zero under the JVB scaler. Each platform adds a small overlay in the same folder. With `jitsi.enabled: false`, the chart deploys no Jitsi and the portal uses an existing Jitsi deployment, which must verify the portal's tokens.
 
-To choose and size a setup, read [Infrastructure](docs/INFRASTRUCTURE.md). To install the chart, read [Deploying with Helm](docs/DEPLOYMENT.md).
+Some capabilities need more than one machine. Bridge scale-to-zero and multi-node scaling need a cluster with an autoscaling node pool, and AI post-production needs a GPU node pool in the same cluster. Jibri needs the ALSA loopback kernel module on its node and elevated container privileges (the Jitsi subchart adds `SYS_ADMIN`).
+
+To choose a platform, go through the checklist and read the measured requirements and known limitations, start from [Installing PA Webinar](docs/install/README.md). The chart's keys are in [Deploying with Helm](docs/DEPLOYMENT.md), and the evidence behind the sizes and the network design is in the [Infrastructure reference](docs/INFRASTRUCTURE.md).
 
 ## Scalability
 
 - **Capacity is two numbers.** Per event, the chart does not enable Jitsi's bridge cascading, so a conference stays on one bridge and a bigger event needs a bigger bridge. Across events, more bridges carry more conferences, up to the replica caps and the size of the node pool. Each extra bridge needs its own public address.
 - **Bridges scale to zero, opt-in, in the `full` profile only** (`jitsi.mode: full` with `jvbScaler.enabled: true`). A CronJob reads every bridge's statistics, and the portal decides from the event calendar how many bridges should run and moves events through their statuses. Bridges start before a scheduled event, and the node pool shrinks to zero between events.
 - **Without the scaler**, bridges run at a fixed count, and moderators start and end events themselves with **Start event** and **End for everyone**.
-- **Sizing comes from what the organizer declared**: expected participants and the share expected to send video. The defaults assume 16-core bridges (`jvbCpuCoresPerPod` in `app/prisma/schema.prisma`; the formula is in `app/src/lib/jvb-sizing.ts`). Align them with your hardware. Measured results are in [Load testing](docs/LOAD-TESTING.md).
+- **Without a node autoscaler**, as on minikube and k3s, the `simple` profile runs one bridge at a fixed count, and growing means a bigger node.
+- **Sizing comes from what the organizer declared**: expected participants and the share expected to send video. The defaults assume 16-core bridges (`jvbCpuCoresPerPod` in `app/prisma/schema.prisma`; the formula is in `app/src/lib/jvb-sizing.ts`). Align them with your hardware. The measured requirements of each platform are in [Requirements](docs/install/README.md#requirements), and the bridge measurements in [Load testing](docs/LOAD-TESTING.md).
 - **The app tier is stateless.** Pods scale with a HorizontalPodAutoscaler (`autoscaling` in `infra/helm/pa-webinar/values.yaml`), and Redis delivers live updates to every replica.
+- **Where the limits are**, in the order you meet them: one bridge per event; the replica cap and the size of the bridge pool; one Prosody and one Jicofo shared by every conference; network egress, which in tile view grows with the square of the cameras; and a single PostgreSQL and Redis that scale vertically. Around them sit the limits of the network: participants whose networks block UDP need TURN (coturn, with its own address and DNS name), the chart's HTTP tuning is written for ingress-nginx, and proxies in front of the ingress must be declared so that per-IP limits see real clients. All of them are in [Known limitations](docs/install/README.md#known-limitations).
 
 ```mermaid
 stateDiagram-v2
@@ -308,23 +313,37 @@ The interface ships in the 24 official EU languages through next-intl, with Ital
 
 ## Quick start
 
-You need Docker with Compose. The local stack is for development, not for events.
+### Try it on minikube
+
+To see the product and the Helm chart on one workstation, you need minikube, Helm, kubectl, openssl, curl and Docker (the minimum versions are `MINIKUBE_MIN` and `HELM_MIN` in `scripts/minikube-up.sh`). One command installs the same chart that runs in production, in the `simple` profile with a small overlay:
 
 ```bash
 git clone https://github.com/italia/pa-webinar.git
 cd pa-webinar
+scripts/minikube-up.sh
+```
+
+The script creates a minikube profile named `pa-webinar` (4 CPU and 6 GB by default) and never changes your current kubectl context. It generates the secrets once, in `~/.config/pa-webinar/minikube/pa-webinar/secrets.yaml`, outside the repository. It uses the images that the development branch publishes when the node can pull them; without registry credentials it builds them from your checkout, and in the lab the whole run took about five minutes with Docker's build cache already warm (a first build takes longer). At the end it prints the addresses:
+
+| Service | Address | Note |
+|---|---|---|
+| Conference | `https://jitsi.<node-ip>.nip.io` | Open it first and accept its self-signed certificate, or the room embedded in the portal does not load |
+| Portal | `https://app.<node-ip>.nip.io` | Accept its certificate too. The administration area is at `/en/admin/login`: **Sign in with the instance key**, with `ADMIN_API_KEY` from the secrets file |
+| Mailpit | `https://mail.<node-ip>.nip.io` | Every email the portal sends lands here |
+
+Join from browsers on the same workstation: with the Docker driver, other machines cannot reach the node. The installation has no demo data and no scaler, so create an event and open its room with **Start event**. Every step, the measured usage and how to stop or remove the profile are in [Try PA Webinar on minikube](docs/install/minikube.md). For real events, continue with [Installing PA Webinar](docs/install/README.md).
+
+### Change the code with Docker Compose
+
+Docker Compose is the loop for developing PA Webinar, not a way to install it: it serves the portal over plain HTTP, keeps public placeholder secrets and runs only some of the scheduled jobs.
+
+```bash
 docker compose up --build -d                        # build and start the stack
 docker compose --profile setup run --rm db-migrate  # first run only: migrations and demo data
 docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build   # optional: hot reload
 ```
 
-| Service | Address | Note |
-|---|---|---|
-| Portal | <http://localhost:3000/en> | `/it` for the Italian interface |
-| Mailpit | <http://localhost:8025> | Every email the stack sends lands here |
-| Jitsi Meet | <https://localhost:8443> | Open it once and accept the self-signed certificate, or the live room shows no call |
-
-To sign in for the first time, open <http://localhost:3000/en/admin/login>, expand **Sign in with the instance key** and enter the `ADMIN_API_KEY` value from `docker-compose.yml`, a public development placeholder. The seed prints a moderator link for each demo event. The local stack has no scaler, so a room opens when a moderator presses **Start event**. Everything else about the local stack is in [Local development](docs/DEVELOPMENT.md).
+The portal answers on <http://localhost:3000/en>, Mailpit on <http://localhost:8025> and Jitsi on <https://localhost:8443>, whose self-signed certificate you accept once. Sign in at <http://localhost:3000/en/admin/login> with the `ADMIN_API_KEY` placeholder from `docker-compose.yml`. The seed prints a moderator link for each demo event. Everything else about the local stack is in [Local development](docs/DEVELOPMENT.md).
 
 ## How we build it
 
@@ -386,7 +405,7 @@ The full method is in [How we develop PA Webinar](docs/development/methodology.m
 The [documentation hub](docs/README.md) indexes every page by reader journey:
 
 - **Evaluate:** the [feature tour](docs/FEATURES.md), [Reusing PA Webinar](docs/REUSE.md) and the [roadmap](docs/ROADMAP.md).
-- **Install and operate:** [Infrastructure](docs/INFRASTRUCTURE.md), [Deploying with Helm](docs/DEPLOYMENT.md) and the [configuration reference](docs/CONFIGURATION.md).
+- **Install and operate:** [Installing PA Webinar](docs/install/README.md) and its platform guides, [Deploying with Helm](docs/DEPLOYMENT.md), the [configuration reference](docs/CONFIGURATION.md) and the [Infrastructure reference](docs/INFRASTRUCTURE.md).
 - **Understand:** [Architecture](docs/ARCHITECTURE.md), the [decision records](docs/adr/README.md) and the [glossary](docs/GLOSSARY.md).
 - **Develop and contribute:** [Local development](docs/DEVELOPMENT.md), [Extending PA Webinar](docs/development/extending.md) and [Testing](docs/development/testing.md).
 - **Protect data:** [Privacy and data protection](docs/GDPR.md) and the [privacy notice checklist](docs/privacy/privacy-notice-checklist.md).
@@ -395,6 +414,6 @@ The [documentation hub](docs/README.md) indexes every page by reader journey:
 
 PA Webinar is released under the European Union Public Licence ([EUPL-1.2](LICENSE)), written for public-sector software: any public body in the EU, and anyone else, may install, adapt and redistribute it. Modified versions that are distributed, or offered to others as an online service, must be released under the same license or a compatible one. Contributions are accepted under the same license. [`publiccode.yml`](publiccode.yml) describes the project in the metadata format that the Developers Italia catalog reads, following the [AgID Guidelines on the acquisition and reuse of software](https://docs.italia.it/italia/developers-italia/lg-acquisizione-e-riuso-software-per-pa-docs/) (AgID is the Agenzia per l'Italia Digitale, the Italian digital agency). Third-party components keep their own licenses, listed in [THIRD-PARTY-LICENSES.md](THIRD-PARTY-LICENSES.md).
 
-Maturity, stated plainly: `publiccode.yml` declares the project `beta`. The chart renders and validates on every profile in CI, and the `simple` profile has been installed from scratch in lab. A from-scratch installation by another administration, on a managed cluster through to a working event, has not yet been exercised end to end, and the [roadmap](docs/ROADMAP.md#installation-and-operations) tracks that work. What is proven, what it takes and what an adopter is responsible for are in [Reusing PA Webinar](docs/REUSE.md).
+Maturity, stated plainly: `publiccode.yml` declares the project `beta`. The chart renders and validates on every example profile in CI, and the `simple` profile has been installed from scratch in lab, on minikube and on k3s. A from-scratch installation by another administration, on a managed cluster through to a working event, has not yet been exercised end to end, and the [roadmap](docs/ROADMAP.md#installation-and-operations) tracks that work. What is proven, what it takes and what an adopter is responsible for are in [Reusing PA Webinar](docs/REUSE.md).
 
 Copyright © 2026 Dipartimento per la Trasformazione Digitale, Presidenza del Consiglio dei Ministri.

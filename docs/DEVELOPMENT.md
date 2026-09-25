@@ -1,13 +1,13 @@
 # Local development
 
-This page explains how to run PA Webinar on your own machine: the Docker Compose stack, the three ways to work on the code, the database workflow, the separate components and the problems people run into most often. It is for contributors setting up a workstation and for operators who want to try the platform before installing it.
+This page explains how to run PA Webinar on your own machine: the Docker Compose stack, the three ways to work on the code, the database workflow, the separate components and the problems people run into most often. It is for contributors who change the code. Docker Compose is the development loop, not an installation: to try the product or the Helm chart on a workstation, use [minikube](install/minikube.md), which installs the same chart that runs in production.
 
 Other topics have their own pages:
 
 - how to run and write tests: [Testing](development/testing.md);
 - branching, commits, review and the gates a change must pass: [How we develop PA Webinar](development/methodology.md) and [Contributing](../CONTRIBUTING.md);
 - code conventions and step-by-step recipes for each kind of change: [Extending PA Webinar](development/extending.md);
-- installing on Kubernetes: [Deploying with Helm](DEPLOYMENT.md); choosing and sizing a setup, including a single VM: [Infrastructure](INFRASTRUCTURE.md).
+- installing PA Webinar, from minikube on a workstation to a single VM or a managed cluster: [Installing PA Webinar](install/README.md); the chart's keys: [Deploying with Helm](DEPLOYMENT.md).
 
 ## Prerequisites
 
@@ -221,11 +221,11 @@ Legend:
 
 Three capabilities are not part of the Compose stack and are impractical on a typical workstation:
 
-- **AI post-production** needs a CUDA GPU and the weights of every model the pipeline runs: speech recognition (WhisperX), diarization (pyannote), speech synthesis (Piper) and a language model served by vLLM. The default language model, set in `app/src/lib/ai/providers.ts` (`mistralai/Mistral-Small-3.2-24B-Instruct-2506`), needs tens of gigabytes of GPU memory at fp16 on its own. On a CPU the pipeline would take far too long to be usable. The in-cluster pipeline (orchestrator, worker and vLLM) runs only in a cluster. A workstation with an NVIDIA GPU can run the stages off-cluster with the `infra/ai/local-out/` development tool, on test data only (see [AI post-production worker](#ai-post-production-worker)). Everything else in the platform works without it. GPU sizing is covered in [Infrastructure](INFRASTRUCTURE.md), the pipeline in [AI post-production](POSTPROD.md).
+- **AI post-production** needs a CUDA GPU and the weights of every model the pipeline runs: speech recognition (WhisperX), diarization (pyannote), speech synthesis (Piper) and a language model served by vLLM. The default language model, set in `app/src/lib/ai/providers.ts` (`mistralai/Mistral-Small-3.2-24B-Instruct-2506`), needs tens of gigabytes of GPU memory at fp16 on its own. On a CPU the pipeline would take far too long to be usable. The in-cluster pipeline (orchestrator, worker and vLLM) runs only in a cluster. A workstation with an NVIDIA GPU can run the stages off-cluster with the `infra/ai/local-out/` development tool, on test data only (see [AI post-production worker](#ai-post-production-worker)). Everything else in the platform works without it. GPU node pools are covered in [Node pools](INFRASTRUCTURE.md#node-pools), the pipeline in [AI post-production](POSTPROD.md).
 - **JVB scale-to-zero** is only useful where nodes are billed by use and a cluster autoscaler can remove them. On a single machine the bridge is already running.
 - **Jibri** needs the ALSA loopback kernel module on its host and elevated container privileges: the Jitsi subchart adds the `SYS_ADMIN` capability. A developer workstation is rarely prepared for either. Without a cluster, the recording path is the per-participant recorder, with the limits linked above ([Recording](architecture/recording.md)).
 
-The Compose stack is for development and for a first look at the product, not for running events: the portal is served over plain HTTP, the secrets are public placeholders and no container has resource limits. To run PA Webinar on a single machine, [Infrastructure](INFRASTRUCTURE.md#single-node-k3s-on-one-vm) describes a single-node installation with the Helm chart. Making a single server a supported production path is tracked under **Single-server installation** in the [roadmap](ROADMAP.md#installation-and-operations).
+The Compose stack is for development, not for evaluating an installation or running events: the portal is served over plain HTTP, the secrets are public placeholders and no container has resource limits. To try the product and the chart on a workstation, use [minikube](install/minikube.md). To run PA Webinar on a single machine, [Installing on your own VMs with k3s](install/k3s.md) installs the Helm chart on one VM. Making a single server a supported production path is tracked under **Single-server installation** in the [roadmap](ROADMAP.md#installation-and-operations).
 
 ## Development modes
 
@@ -243,7 +243,7 @@ flowchart LR
   B2["Sources are mounted.<br/>Dependencies and the<br/>Prisma client are baked:<br/>rebuild after changing them"]:::note
   C2["Reads app/.env.<br/>No cron and no Redis<br/>unless you add them"]:::note
 
-  Q -->|"trying the platform,<br/>reproducing an installation"| A
+  Q -->|"checking the production<br/>image and its guards"| A
   Q -->|"changing app<br/>or lobby code"| B
   Q -->|"breakpoints, profiling,<br/>Prisma commands"| C
   A --- A2
@@ -429,6 +429,8 @@ The worker in `infra/ai/worker/` is a Python package. Its unit tests need no GPU
 
 No other local check reads the chart, so run `./scripts/validate-chart.sh` whenever you touch `infra/helm/`. It renders every profile and checks the invariants that would break an installation. What it needs (Helm 3, `openssl`, Python 3 with PyYAML and the subcharts), how to fetch the subcharts, and the server-side dry run that only CI adds are in [Testing: Helm chart](development/testing.md#helm-chart). The chart reference is [Deploying with Helm](DEPLOYMENT.md), with a pointer in [`infra/helm/pa-webinar/README.md`](../infra/helm/pa-webinar/README.md).
 
+To see a chart change running, install it on minikube with `scripts/minikube-up.sh` ([Try PA Webinar on minikube](install/minikube.md)). Without registry credentials, the script builds the portal and migration images from your checkout, uncommitted changes included, and loads them into the node. Running it again after a change rebuilds the images when needed and upgrades the release with the same secrets. Loading the two images into the node takes about 96 s after each rebuild, which is why Compose stays the faster loop for application code, and minikube the place to test the chart, its values and the Kubernetes jobs.
+
 ## Working with translations
 
 The interface ships in 24 languages, with catalogs in `app/src/i18n/messages/`. A new string goes into all 24, and the parity test in the unit suite fails when a key is missing or empty in any catalog, or when its placeholders differ. The steps are in [Extending PA Webinar](development/extending.md#adding-ui-text-or-a-language), and the sync script is described in [Languages and localization](architecture/i18n.md#the-sync-script).
@@ -522,7 +524,7 @@ The local stack is addressed as `localhost`, so a phone or a second computer can
 - camera and microphone: browsers grant them only in a secure context (HTTPS, or `localhost`), and the conference frame inherits the portal page's context, so over plain HTTP from another device no one can join with audio or video;
 - the staff session cookie (`app/src/lib/auth/admin-session.ts`) and the participants' event-access cookie (`app/src/lib/event-session.ts`). The all-containers mode runs the production image, which marks both cookies `Secure`. Browsers drop a `Secure` cookie sent over plain HTTP, and most make an exception only for `localhost`, so a registrant who returns to the live room without `?token=` in the link is not recognized. The dev overlay and Next.js on the host run with `NODE_ENV=development` and do not mark them.
 
-Media also needs UDP port 10000 open on the host, and there is no TURN relay, so a network that blocks UDP carries no audio or video. There is no ready-made recipe for changing all of these together. For tests with several real devices, use one of the Kubernetes setups in [Infrastructure](INFRASTRUCTURE.md).
+Media also needs UDP port 10000 open on the host, and there is no TURN relay, so a network that blocks UDP carries no audio or video. There is no ready-made recipe for changing all of these together. For tests with several real devices, install on a VM that they can reach ([Installing on your own VMs with k3s](install/k3s.md)): minikube with the Docker driver is reachable only from the workstation.
 
 ## Related pages
 
@@ -531,4 +533,4 @@ Media also needs UDP port 10000 open on the host, and there is no TURN relay, so
 - [Extending PA Webinar](development/extending.md): code conventions and recipes.
 - [Configuration reference](CONFIGURATION.md): every environment variable and secret.
 - [Scheduled and background jobs](architecture/background-jobs.md): what the `cron` service and the CronJobs call.
-- [Infrastructure](INFRASTRUCTURE.md) and [Deploying with Helm](DEPLOYMENT.md): from a workstation to an installation.
+- [Installing PA Webinar](install/README.md) and [Deploying with Helm](DEPLOYMENT.md): from minikube on a workstation to an installation.

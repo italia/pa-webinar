@@ -52,4 +52,5 @@ helm template pa-webinar ./infra/helm/pa-webinar -n pa-webinar -f <profile> -f p
 
 - [Deploying with Helm](https://github.com/italia/pa-webinar/blob/main/docs/DEPLOYMENT.md): what the chart renders, prerequisites, Secrets, install walkthroughs and first-run checks.
 - [Configuration reference](https://github.com/italia/pa-webinar/blob/main/docs/CONFIGURATION.md): environment variables, configuration layers and the secrets map.
-- [Infrastructure](https://github.com/italia/pa-webinar/blob/main/docs/INFRASTRUCTURE.md): choosing and sizing a setup, network design, TURN, and per-cloud notes.
+- [Installing PA Webinar](https://github.com/italia/pa-webinar/blob/main/docs/install/README.md): choosing a platform, the checklist, requirements and known limitations, with a guide for minikube, k3s, AKS, GKE and EKS.
+- [Infrastructure reference](https://github.com/italia/pa-webinar/blob/main/docs/INFRASTRUCTURE.md): sizing evidence, network design, TURN, network policies and images.

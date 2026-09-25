@@ -299,7 +299,7 @@ API, because it writes names into the transcript. Signed-URL mechanics are in
   VM with the `recorder` profile, schedule `postprod-retention` yourself: it is
   the job that deletes tracks at the event's retention. `multitrack-purge` has
   nothing to act on without AI post-production
-  ([how](../architecture/background-jobs.md#docker-compose-on-a-single-vm)).
+  ([how](../architecture/background-jobs.md#docker-compose)).
 - **The orphan sweep reaches every track file.** `recordings-reconcile` lists
   every object under `recordings/` and knows only the composite video
   (`Event.recordingUrl`, `CallSession.recordingUrl`,

@@ -439,7 +439,7 @@ values override is in [Deploying with Helm](../../docs/DEPLOYMENT.md#web-image-a
 | Self-view recovery | Nobody new can hide their tile, because the portal removes the control on any image. People who hid it earlier stay stuck until they clear the site data of the conference origin or use a private window |
 | Click-through reaction emoji | With native reactions, emoji can briefly block toolbar clicks. Setting **Reactions (emoji)** to **App custom (left-hand bar, with stats)** avoids the problem, because Jitsi's reactions are then off |
 
-The Docker Compose stack uses stock `jitsi/web` for local development and single-VM installations, with
+The Docker Compose development stack uses stock `jitsi/web`, with
 the same trade-offs.
 
 ## License

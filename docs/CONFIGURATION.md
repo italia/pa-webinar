@@ -2,7 +2,7 @@
 
 This page describes how PA Webinar is configured. It covers the three configuration layers, every environment variable the application reads, and the map of secrets and keys. It is written for operators who install and run an instance, and for developers who add a new setting.
 
-The in-depth pages for single topics are [Object storage](configuration/storage.md), [Email delivery (SMTP)](configuration/email.md), [Branding and white-labeling](configuration/branding.md) and [Runtime settings](configuration/runtime-settings.md). Network design, firewall rules and TURN are covered in [Infrastructure](INFRASTRUCTURE.md) and [Deploying with Helm](DEPLOYMENT.md). The Content Security Policy is in [SECURITY-CSP.md](SECURITY-CSP.md), and AI operations are in [AI post-production](POSTPROD.md).
+The in-depth pages for single topics are [Object storage](configuration/storage.md), [Email delivery (SMTP)](configuration/email.md), [Branding and white-labeling](configuration/branding.md) and [Runtime settings](configuration/runtime-settings.md). Network design, firewall rules and TURN are covered in [Networking](INFRASTRUCTURE.md#networking) and [Deploying with Helm](DEPLOYMENT.md). The Content Security Policy is in [SECURITY-CSP.md](SECURITY-CSP.md), and AI operations are in [AI post-production](POSTPROD.md).
 
 ## Configuration layers
 
@@ -261,7 +261,8 @@ The sizing model and the scaler tick are described in [Scaling the media plane](
 
 | Name | Required | Default | Secret | Helm key | Description |
 |---|---|---|---|---|---|
-| `JVB_MAX_REPLICAS` | No | `6` | No | `app.env` | **Global** cap on the number of bridges the scaler asks for, applied to the final sum. It is read once when the process starts. The per-event cap is the runtime setting `jvbMaxReplicas`. The chart does not set it. The administration's infrastructure page reads it with a default of `0` and reports the scaler as disabled while it is unset, although the scaler itself uses `6` (`app/src/lib/infrastructure.ts`) |
+| `JVB_MAX_REPLICAS` | No | `6` | No | `app.env` | **Global** cap on the number of bridges the scaler asks for, applied to the final sum. It is read once when the process starts. The per-event cap is the runtime setting `jvbMaxReplicas`. The chart's defaults do not set it. The simple profile sets it to `1`, its single fixed bridge, and so do the examples for managed clusters. The administration's infrastructure page shows it as the bridge maximum, with a default of `0` (`app/src/lib/infrastructure.ts`) |
+| `JVB_SCALER_ENABLED` | No | `false` | No | Chart, in the application ConfigMap: `"true"` when it renders the scaler (`jitsi.mode: full` and `jvbScaler.enabled`), `"false"` otherwise. A value in `app.env` takes its place | Tells the administration's infrastructure page whether the bridges scale to zero. Display only. Set it to `"true"` in `app.env` when another tool, such as KEDA, scales the bridges (`app/src/lib/infrastructure.ts`) |
 | `JVB_HEALTH_URL` | Conditional | none | No | Chart, when `jitsi.enabled`: `jitsi.jvbHealthUrl`. When it is empty, the chart uses the subchart's bridge Service (`http://<release>-jitsi-meet-jvb:8080`) if that Service exists and exposes port 8080 in `jitsi-meet.jvb.service.extraPorts`. Otherwise it renders a Service for this purpose and uses `http://<fullname>-jvb-rest:8080` (`templates/jvb-rest-service.yaml`). The defaults in `values.yaml` set `jitsi-meet.jvb.useHostPort`, and the subchart then renders no bridge Service, so a default install is in the second case | Base URL of the bridge's REST interface (`/colibri/stats`). Used by the status page, the bridge gauges of `/api/metrics` and the scaler's single-bridge fallback. With several bridges, the Service reaches one pod at a time, so the figures read through it are a lower bound |
 | `JIBRI_HEALTH_URL` | Conditional | none | No | Chart, when `jitsi.enabled`: `jitsi.jibriHealthUrl`, default `http://<release>-jitsi-meet-jibri:2222` | Base URL of the Jibri health API. When it is unset in a cluster, Jibri is reported as not running |
 | `JVB_PRE_SCALE_MINUTES`, `JVB_INACTIVE_GRACE_MIN`, `JVB_EMPTY_CLOSE_MIN` | No | unused | No | none | Fallbacks for the runtime settings `jvbPreScaleMinutes`, `jvbInactiveGraceMinutes` and `jvbEmptyCloseMinutes`. Those columns cannot be null, so the fallbacks never apply. Set the values in [Runtime settings](configuration/runtime-settings.md). The administration's infrastructure page still displays `JVB_PRE_SCALE_MINUTES` |
@@ -421,7 +422,7 @@ Docker Compose runs Redis without a password (`redis://redis:6379`) and without 
 
 The sizing knobs (vCPU per bridge, participants per core, per-event cap, pre-scale window, grace periods) are runtime settings: see [Runtime settings](configuration/runtime-settings.md).
 How they turn events into a number of bridges, and the global cap `JVB_MAX_REPLICAS`, are explained in [Scaling the media plane](architecture/scaling.md).
-Choosing and sizing the machines is covered in [Infrastructure](INFRASTRUCTURE.md).
+Choosing and sizing the machines is covered in [Installing PA Webinar](install/README.md#requirements).
 
 ## Drill-downs
 
@@ -435,7 +436,7 @@ Choosing and sizing the machines is covered in [Infrastructure](INFRASTRUCTURE.m
 Related pages:
 
 - [Deploying with Helm](DEPLOYMENT.md) covers the chart, its profiles and the install walkthrough.
-- [Infrastructure](INFRASTRUCTURE.md) covers choosing and sizing a setup, and network design.
+- [Installing PA Webinar](install/README.md) covers choosing and sizing a platform, and the [Infrastructure reference](INFRASTRUCTURE.md) the network design.
 - [Identity, access and tokens](architecture/identity-and-access.md) covers every credential and cookie.
 - [Security architecture](architecture/security.md) covers the application's controls, and [SECURITY.md](../SECURITY.md) covers supply chain and disclosure.
 - [Privacy and data protection](GDPR.md) covers retention and encryption.

@@ -183,11 +183,13 @@ the chart does not render. The orchestrator scales the Deployment named in
 `postprod.vllm.deploymentName` (empty means `<fullname>-vllm`). The portal sends workers to
 `AI_VLLM_BASE_URL`, which defaults to `http://pa-webinar-vllm:8000/v1` in `providers.ts`, so set it
 when the Service has another name or namespace. vLLM and each worker request a whole GPU, so without
-GPU sharing a summary or translation run occupies two GPU nodes. `infra/tofu/ai-gpu-nodepool.tf` is a
-reference pool for AKS and is disabled (`count = 0`). Its T4 instance type is enough for transcription
-but not for the default language model. The steps are in the
+GPU sharing a summary or translation run occupies two GPU nodes. The reference modules in
+`infra/tofu/aks`, `infra/tofu/gke` and `infra/tofu/eks` create a GPU pool on request. The default
+language model needs an 80 GB GPU, which the AKS module's default machine carries; the GKE and EKS
+defaults are smaller. The steps are in the
 [operational checklist](../POSTPROD.md#operational-checklist). Choosing hardware, quotas and costs per
-cloud is covered in [Infrastructure](../INFRASTRUCTURE.md).
+cloud is covered in the platform guides of [Installing PA Webinar](../install/README.md) and in
+[Node pools](../INFRASTRUCTURE.md#node-pools).
 
 ### Cold starts
 
@@ -240,7 +242,7 @@ provenance panel.
 
 Post-production needs Kubernetes and a GPU pool. The Docker Compose stack has no orchestrator, no
 worker and no reclaim, retention or multitrack-purge job
-([Docker Compose on a single VM](../architecture/background-jobs.md#docker-compose-on-a-single-vm)).
+([Docker Compose](../architecture/background-jobs.md#docker-compose)).
 The job that deletes per-participant tracks after transcription is rendered only with
 `postprod.enabled`. An installation that records per-participant audio therefore needs post-production
 turned on, or the tracks are never purged.
@@ -321,7 +323,8 @@ replica with `postprod.vllm.autoscale` off, gives exactly that.
   The keys are under `postprod` in `infra/helm/pa-webinar/values.yaml`.
 - **Worker:** `infra/ai/worker/` and `infra/ai/Dockerfile.worker`. The worker's tests run with
   `python -m pytest` from that folder.
-- **Reference GPU pool:** `infra/tofu/ai-gpu-nodepool.tf`.
+- **Reference GPU pools:** `gpu_pool` in `infra/tofu/aks` and `infra/tofu/gke`, `gpu_enabled` in
+  `infra/tofu/eks`.
 - **Data model:** `Recording`, `RecordingTrack`, `PostprodJob`, `PostprodArtifact`,
   `PostprodOriginalBody` and `Speaker` in `app/prisma/schema.prisma`.
 
@@ -339,4 +342,4 @@ replica with `postprod.vllm.autoscale` off, gives exactly that.
 - [Recordings, voice data and AI outputs](../privacy/recordings-and-ai.md): legal bases, voice data,
   transparency and retention.
 - [Scheduled and background jobs](../architecture/background-jobs.md): every post-production CronJob.
-- [Infrastructure](../INFRASTRUCTURE.md): choosing and sizing the GPU pool.
+- [Node pools](../INFRASTRUCTURE.md#node-pools): the GPU pool on any cluster.

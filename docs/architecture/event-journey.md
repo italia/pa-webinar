@@ -393,7 +393,7 @@ The older rating-and-comment feedback (`EventFeedback`, `POST /api/events/{slug}
 
 ## Materials and agenda
 
-Materials (`EventMaterial`) are links or uploaded files, each with a title, an optional description and a visibility: `ALWAYS`, `BEFORE`, `DURING` or `AFTER`. Files go through the upload widget to object storage (`POST /api/admin/assets/upload-url`) and are served under `/api/assets/…` ([configuration/storage.md](../configuration/storage.md)).
+Materials (`EventMaterial`) are links or uploaded files, each with a title, an optional description and a visibility: `ALWAYS`, `BEFORE`, `DURING` or `AFTER`. `ALWAYS` is the default and the interface labels it **In the room and after the event**: despite the stored value's name, it is never listed before the start. Files go through the upload widget to object storage (`POST /api/admin/assets/upload-url`) and are served under `/api/assets/…` ([configuration/storage.md](../configuration/storage.md)).
 
 | Where | Route | Credential |
 |---|---|---|
@@ -403,8 +403,8 @@ Materials (`EventMaterial`) are links or uploaded files, each with a title, an o
 
 Visibility is enforced on the server (`app/src/lib/events/material-visibility.ts`). The event's phase comes from its status when the status is decisive: `LIVE` is `DURING`, and `ENDED` and `ARCHIVED` are `AFTER`. In any other status the clock decides: before `startsAt` is `BEFORE`, from `endsAt` on is `AFTER`, and in between is `DURING`.
 
-- **Public readers** see the `ALWAYS` materials plus those of the current phase, on every surface that lists materials: the public event page before the start, the live room's drawer, the post-event page's **Materials** tab (when `postEventShowMaterials` is on) and the public API.
-- **Holders of the primary moderator link or of an active co-moderator grant** see every material on the public API (`app/src/lib/events/material-access.ts`). Speakers, registrants and guests get the public view.
+- **Public readers** see only the `BEFORE` materials before the start, the `ALWAYS` and `DURING` materials during the event, and the `ALWAYS` and `AFTER` materials after it. This applies on every surface that lists materials: the public event page before the start, the live room's drawer, the post-event page's **Materials** tab (when `postEventShowMaterials` is on) and the public API.
+- **Holders of the primary moderator link or of an active co-moderator grant** see every material on the public API (`app/src/lib/events/material-access.ts`), and the room's drawer shows them each item's visibility, the default included. Speakers, registrants and guests get the public view. A speaker who enters the room while it warms up, before the start and before the event is `LIVE`, therefore sees only the `BEFORE` materials: to give speakers their slides before the start, mark them **Before the event**, which also lists them on the public event page, or share them outside the platform.
 - **Staff** see every material in the administration area. A staff session does not widen the public API: staff who open the live room as a registrant or a guest see what the public sees.
 
 The filter governs lists, not access: a link stays an external address, and an uploaded file stays downloadable from its `/api/assets/…` URL by anyone who already has it. Materials are not copied when an event is duplicated.

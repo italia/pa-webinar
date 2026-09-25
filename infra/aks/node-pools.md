@@ -2,13 +2,18 @@
 
 This page is for operators who run the Helm full profile (`jitsi.mode: full`)
 on Azure Kubernetes Service (AKS). It states the contract that the bridge node
-pool must meet, shows how to create that pool from the reference definition in
-`infra/tofu/`, and notes the cluster-wide autoscaler profile that goes with it.
-The last section points to the GPU pool for AI post-production.
+pool must meet, shows how the reference module in
+[`infra/tofu/aks/`](../tofu/aks/README.md) creates that pool, and notes the
+cluster-wide autoscaler profile that goes with it. The last section points to
+the GPU pool for AI post-production.
 
-It does not cover sizing. Choosing machines, pool limits, zones, network
-topology and the equivalents on GKE and EKS are covered in
-[Infrastructure](../../docs/INFRASTRUCTURE.md). How the JVB scaler and the
+The installation on AKS, from an empty subscription to a first event, with
+the choice of machines, pool limits and zones, is in
+[Installing on AKS](../../docs/install/aks.md). The contract below is the same
+on every cloud: the [GKE](../../docs/install/gke.md) and
+[EKS](../../docs/install/eks.md) modules meet it with their own pools, and
+[Node pools and bridge exposure](../../docs/INFRASTRUCTURE.md#node-pools-and-bridge-exposure)
+covers any other cluster. How the JVB scaler and the
 cluster autoscaler take the pool to zero and back is explained in
 [Node-pool scale to zero](../../docs/architecture/scaling.md#node-pool-scale-to-zero).
 The simple and standard profiles need no dedicated pool: their bridge runs on
@@ -79,7 +84,7 @@ Whatever tool creates the pool, it must meet these requirements:
 | Node label | `workload=jitsi-jvb` | `jitsi-meet.jvb.nodeSelector` | Sends the bridges to this pool |
 | Node taint | `workload=jitsi-jvb:NoSchedule` | `jitsi-meet.jvb.tolerations` | Keeps every other pod off, so the pool can empty |
 | Autoscaling | on, minimum `0` nodes | cluster autoscaler | Removes the nodes once the bridges are gone |
-| Maximum nodes | `4` in the reference | `JVB_MAX_REPLICAS` (`app.env`) | Keep `JVB_MAX_REPLICAS` at `1` until each bridge has an address of its own; only then raise it, with the pool maximum at least as high. See below |
+| Maximum nodes | `2` in the reference module (`jvb_pool.max_count`) | `JVB_MAX_REPLICAS` (`app.env`) | Keep `JVB_MAX_REPLICAS` at `1` until each bridge has an address of its own; only then raise it, with the pool maximum at least as high. See below |
 | Capacity type | regular, not spot | nothing in the chart | An eviction drops every participant on that bridge |
 | Media port | UDP `10000` reachable from participants | `jitsi-meet.jvb.UDPPort` | Participants send media straight to the bridge |
 
@@ -110,31 +115,24 @@ Whatever tool creates the pool, it must meet these requirements:
 
 ### With OpenTofu or Terraform
 
-`infra/tofu/jvb-nodepool.tf` is a reference definition, not a module that this
-repository applies. Copy the `azurerm_kubernetes_cluster_node_pool` resource
-into your own infrastructure code and adapt it:
+The reference module [`infra/tofu/aks/`](../tofu/aks/README.md) creates the
+pool together with the cluster, the network rules for the media port, the
+fixed public addresses and the storage account. The pool is the
+`azurerm_kubernetes_cluster_node_pool.jvb` resource in
+`infra/tofu/aks/node-pools.tf`, and the module's `helm_values` output carries
+the matching node selector and tolerations.
 
-- declare the data source it references, which the file leaves to you:
-
-  ```hcl
-  data "azurerm_kubernetes_cluster" "main" {
-    name                = "<cluster>"
-    resource_group_name = "<resource-group>"
-  }
-  ```
-
-- set `max_count` according to the pool contract above;
-- replace the example `tags` with your own;
-- ignore the file's comment that a node can run one or two bridges: with host
-  ports, each bridge takes a node of its own.
-
-The file also carries, as a comment, an `auto_scaler_profile` block to merge
-into your `azurerm_kubernetes_cluster` resource. See
-[Autoscaler profile](#autoscaler-profile).
+To add the pool to a cluster that you already manage, copy that resource into
+your own infrastructure code, set `kubernetes_cluster_id` and
+`vnet_subnet_id` to your cluster and subnet, and keep its label, taint,
+minimum of zero and regular priority. The module's `cluster.tf` holds the
+`auto_scaler_profile` block that goes with it (see
+[Autoscaler profile](#autoscaler-profile)).
 
 ### With the Azure CLI
 
-The equivalent of the reference definition:
+The equivalent of the module's pool, for a cluster that has a bridge behind a
+load-balancer address:
 
 ```bash
 az aks nodepool add \
@@ -142,11 +140,11 @@ az aks nodepool add \
   --cluster-name <cluster> \
   --name jvb \
   --mode User \
-  --node-vm-size Standard_D4s_v3 \
+  --node-vm-size Standard_D4s_v5 \
   --enable-cluster-autoscaler \
   --node-count 0 \
   --min-count 0 \
-  --max-count 4 \
+  --max-count 2 \
   --labels workload=jitsi-jvb \
   --node-taints workload=jitsi-jvb:NoSchedule \
   --os-type Linux \
@@ -156,21 +154,30 @@ az aks nodepool add \
   --max-surge 33%
 ```
 
+For one public address per bridge node, add `--enable-node-public-ip` and
+`--allowed-host-ports 10000/udp`, and allow UDP 10000 in the network security
+group of the pool's subnet.
+
 ### Reaching UDP 10000
 
-The reference definition gives the nodes no public IP address and opens no
-host port. As written, it fits a single bridge exposed through a
-load-balancer IP, with `JVB_MAX_REPLICAS: "1"` in `app.env`. Running several
-bridges needs an address of their own for each of them, typically a public IP
-on every bridge node with UDP 10000 allowed to it. Both topologies, and the
-values that go with them, are in
-[Exposing the bridges over UDP](../../docs/INFRASTRUCTURE.md#exposing-the-bridges-over-udp).
+The module offers the two topologies described in
+[Exposing the bridges over UDP](../../docs/INFRASTRUCTURE.md#exposing-the-bridges-over-udp),
+through its `jvb_exposure` variable:
+
+- `load_balancer`, the default: one bridge behind a fixed public address
+  that the module creates, with `JVB_MAX_REPLICAS: "1"`. This is the topology
+  that the reference installation runs.
+- `node_public_ip`: a public address on every bridge node and UDP 10000 open
+  on the host, so that `JVB_MAX_REPLICAS` can follow the pool maximum. Each
+  bridge learns its node's address through a STUN server outside the cluster.
+  Not yet verified.
+
 Several bridges behind one address drop participants: see
 [The single-IP pitfall](../../docs/architecture/scaling.md#the-single-ip-pitfall).
 
 ## Autoscaler profile
 
-The `auto_scaler_profile` block in `infra/tofu/jvb-nodepool.tf` sets
+The `auto_scaler_profile` block in `infra/tofu/aks/cluster.tf` sets
 `scale_down_unneeded = "10m"`, which is also the AKS default, and
 `scale_down_delay_after_add = "10m"`. Both apply to the whole cluster, not
 only to this pool: an emptied bridge node stays until it has been unneeded for
@@ -185,26 +192,30 @@ and [Why not KEDA](../../docs/architecture/scaling.md#why-not-keda).
 
 The autoscaler can also evict a bridge to consolidate nodes. Protecting bridge
 and Jibri pods with an annotation is recommended in
-[Installing on a managed cluster](../../docs/INFRASTRUCTURE.md#installing-on-a-managed-cluster).
+[Settings for autoscaled pools](../../docs/INFRASTRUCTURE.md#settings-for-autoscaled-pools);
+`infra/helm/pa-webinar/examples/values-aks.yaml` sets it.
 
 ## Machine size and `jvbCpuCoresPerPod`
 
-The reference pool uses 4-vCPU `Standard_D4s_v3` machines, while
+The reference module's pool uses 4-vCPU `Standard_D4s_v5` machines
+(`jvb_pool.vm_size`), while
 **vCPU per JVB pod** (`jvbCpuCoresPerPod`) defaults to `16` in
 `app/prisma/schema.prisma`, so the scaler provisions too few bridges until the
 two are aligned. How to align them is in
 [Align the defaults with your bridges](../../docs/architecture/scaling.md#align-the-defaults-with-your-bridges),
-and choosing the machine in [Sizing](../../docs/INFRASTRUCTURE.md#sizing).
+and choosing the machine in
+[How big the bridge must be](../../docs/install/aks.md#how-big-the-bridge-must-be).
 
 ## The GPU pool
 
 AI post-production runs its worker Jobs, and optionally a vLLM server that you
 deploy, on a separate pool with the label and taint `workload=ai-gpu`, also
 scaling from zero. The post-production queue drives it, not the JVB scaler.
-The AKS reference is `infra/tofu/ai-gpu-nodepool.tf`, which, like the JVB
-pool, references a `data.azurerm_kubernetes_cluster.main` that you declare.
-If you choose spot capacity for this pool, add your platform's spot taint to
-`postprod.worker.tolerations` and to the vLLM Deployment. The pool, the
+The reference module creates it with `gpu_pool = { enabled = true }`
+(`azurerm_kubernetes_cluster_node_pool.gpu` in `infra/tofu/aks/node-pools.tf`),
+on an 80 GB A100 machine by default. With `gpu_pool.spot`, the module's
+`helm_values` output adds the AKS spot taint to `postprod.worker.tolerations`;
+add it to the vLLM Deployment yourself. The pool, the
 device plugin and quotas are covered in
 [Provisioning a GPU node pool](../../docs/POSTPROD.md#provisioning-a-gpu-node-pool),
 and the models volume in
@@ -212,8 +223,12 @@ and the models volume in
 
 ## Related pages
 
-- [Infrastructure](../../docs/INFRASTRUCTURE.md): choosing and sizing a
-  setup, node pools on other clouds, networking.
+- [AKS reference infrastructure](../tofu/aks/README.md): the OpenTofu module
+  that creates the cluster, the pools, the network rules and the storage.
+- [Installing on AKS](../../docs/install/aks.md): the whole installation,
+  with the module and the chart overlay.
+- [Infrastructure reference](../../docs/INFRASTRUCTURE.md#node-pools-and-bridge-exposure):
+  node pools and bridge exposure on any cluster, and networking.
 - [Scaling the media plane](../../docs/architecture/scaling.md): the capacity
   model and node-pool scale to zero.
 - [Running the JVB scaler](../../docs/operations/jvb-scaler.md): enabling,

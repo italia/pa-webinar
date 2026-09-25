@@ -8,7 +8,7 @@ This page is the map. It shows the parts, how they connect and where each concep
 
 - Each section gives the shape of one concept and ends with a link to the page that owns it. Owner pages go into detail. This page does not.
 - Colors are the same on every diagram. Blue is the portal, teal the media plane (Jitsi), green data, amber batch work, and gray people and systems outside PA Webinar. Dark navy is PA Webinar as a whole, in the context diagram only. A dashed border means optional, off by default.
-- Running an installation (upgrades, monitoring, troubleshooting) is covered by the operations pages linked from [Deploying with Helm](DEPLOYMENT.md). Choosing and sizing a setup is covered in [INFRASTRUCTURE.md](INFRASTRUCTURE.md).
+- Running an installation (upgrades, monitoring, troubleshooting) is covered by the operations pages linked from [Deploying with Helm](DEPLOYMENT.md). Choosing and sizing a platform is covered in [Installing PA Webinar](install/README.md).
 - Terms such as *seat*, *named grant* or *the square* are defined in the [glossary](GLOSSARY.md).
 
 ## System context
@@ -193,7 +193,7 @@ In the table, the "Default" column gives the chart default from `infra/helm/pa-w
 | Lobby square (`lobby/`) | The Phaser 2D square that people can step into from the waiting room | Workspace package `@pa-webinar/lobby`, compiled into the app bundle | Part of the app image | Offered unless the waiting-room engine is `CLASSIC` (`waitingRoomEngine`, site-wide with a per-event override) | [Waiting room](architecture/waiting-room.md) |
 | Patched jitsi-web (`pa-webinar-jitsi-web`) | The Jitsi Meet web front end, patched where no configuration point exists | `jitsi-meet.web.image` in the subchart. Compose runs the stock `jitsi/web` | `jitsi-web.yml` | On | [Jitsi integration](architecture/jitsi-integration.md), [ADR-017](adr/017-patched-jitsi-web-image.md) |
 | Prosody, Jicofo, Jitsi Videobridge (JVB) | XMPP signaling and JWT authentication, conference focus, and selective forwarding of media | The jitsi-contrib `jitsi-meet` subchart, or an external Jitsi (`jitsi.enabled: false`) | Upstream images | On | [Jitsi integration](architecture/jitsi-integration.md), [Scaling](architecture/scaling.md) |
-| coturn | TURN/TURNS relay for networks that block UDP | `jitsi-meet.coturn` in the subchart | Upstream | Off | [INFRASTRUCTURE](INFRASTRUCTURE.md), [DEPLOYMENT](DEPLOYMENT.md) |
+| coturn | TURN/TURNS relay for networks that block UDP | `jitsi-meet.coturn` in the subchart | Upstream | Off | [TURN](INFRASTRUCTURE.md#turn), [DEPLOYMENT](DEPLOYMENT.md#coturn-turn-and-turns) |
 | Jibri | Composite MP4 recording of the conference | `jitsi-meet.jibri` in the subchart, with the finalize script from a chart ConfigMap | Upstream | Off | [Recording](architecture/recording.md) |
 | PostgreSQL | All durable application state | Bitnami subchart, or external (`postgresql.enabled: false`) | Upstream | On | [Data model](architecture/data-model.md) |
 | Redis | Pub/sub fan-out, the JVB snapshot and square presence | Bitnami subchart, standalone with no persistence, or external | Upstream | On | [Live interaction](architecture/live-interaction.md) |
@@ -231,7 +231,7 @@ The paths above are internal paths, and they are in English. The URL a visitor s
 - **Kubernetes with the Helm chart** is the only production target, from single-node k3s on one VM to managed clusters with dedicated node pools. The profiles (`simple`, `standard`, `full`) are sets of values over the same chart. Capabilities that need a cluster exist only here: bridge scale-to-zero on a dedicated node pool, CronJobs, recorder and post-production Jobs, and External Secrets.
 - **Docker Compose** is the development stack. It runs the app, PostgreSQL, Redis, the Jitsi stack, Mailpit as a local mail catcher, a `cron` service that calls a subset of the scheduled endpoints and, behind the optional `recorder` profile, the recorder controller. It has no bridge scale-to-zero and no AI post-production, and it is not meant for events.
 
-To choose and size a setup, including the network design, firewall and TURN, and per-cloud notes, read [INFRASTRUCTURE.md](INFRASTRUCTURE.md). To install and configure the chart, read [Deploying with Helm](DEPLOYMENT.md). What runs locally compared with a cluster is covered in [Local development](DEVELOPMENT.md).
+To choose a platform and install it, read [Installing PA Webinar](install/README.md) and the guide for your platform; the network design, firewall and TURN are in the [Infrastructure reference](INFRASTRUCTURE.md). To install and configure the chart, read [Deploying with Helm](DEPLOYMENT.md). What runs locally compared with a cluster is covered in [Local development](DEVELOPMENT.md).
 
 ## Three planes and what crosses between them
 
@@ -396,9 +396,9 @@ Names and roles only. Versions are in `package.json` (root, `app/`, `lobby/`, `i
 |---|---|---|
 | `app/` | The portal: pages and API (`src/app`), components, libraries, the Prisma schema and migrations (`prisma/`), i18n catalogs (`src/i18n/messages`), static assets (`public/`) | [Local development](DEVELOPMENT.md), [Extending PA Webinar](development/extending.md) |
 | `lobby/` | The square, an isolated workspace mounted by the waiting room | [lobby/README.md](../lobby/README.md) |
-| `infra/` | Everything that is not the portal, one folder per component | [Helm chart](../infra/helm/pa-webinar/README.md), [patched jitsi-web](../infra/jitsi-web-patched/README.md), [Jitsi extras](../infra/jitsi/README.md), [recorder](../infra/recorder/README.md), [recorder controller](../infra/recorder-controller/README.md), [AI worker](../infra/ai/worker/README.md), [off-cluster post-production](../infra/ai/local-out/README.md), [service-inventory generator](../infra/service-inventory/azure/README.md), [AKS node pools](../infra/aks/node-pools.md) |
-| `scripts/` | Repository tooling: chart validation, i18n sync, changelog and license-report generation, the load-test toolkit | [Load-test toolkit](../scripts/load-test/README.md), [Testing](development/testing.md) |
-| `docs/` | This documentation | [Documentation hub](README.md) |
+| `infra/` | Everything that is not the portal, one folder per component | [Helm chart](../infra/helm/pa-webinar/README.md), [patched jitsi-web](../infra/jitsi-web-patched/README.md), [Jitsi extras](../infra/jitsi/README.md), [recorder](../infra/recorder/README.md), [recorder controller](../infra/recorder-controller/README.md), [AI worker](../infra/ai/worker/README.md), [off-cluster post-production](../infra/ai/local-out/README.md), [service-inventory generator](../infra/service-inventory/azure/README.md), [k3s scripts](../infra/onprem/k3s/README.md), OpenTofu modules for [AKS](../infra/tofu/aks/README.md), [GKE](../infra/tofu/gke/README.md) and [EKS](../infra/tofu/eks/README.md), [AKS node pools](../infra/aks/node-pools.md) |
+| `scripts/` | Repository tooling: chart validation, the minikube installer, i18n sync, changelog and license-report generation, the load-test toolkit | [Try PA Webinar on minikube](install/minikube.md), [Load-test toolkit](../scripts/load-test/README.md), [Testing](development/testing.md) |
+| `docs/` | This documentation, with the installation guides in `docs/install/` | [Documentation hub](README.md), [Installing PA Webinar](install/README.md) |
 | `.github/` | Workflows, pull-request and issue templates, Dependabot | [CI, images and releases](development/ci-and-release.md) |
 | Root files | `Dockerfile`, `docker-compose.yml` and its dev override, `publiccode.yml`, license files | [Local development](DEVELOPMENT.md), [Reusing PA Webinar](REUSE.md) |
 

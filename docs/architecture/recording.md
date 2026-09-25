@@ -19,7 +19,7 @@ their owner pages:
 | Storage providers, credentials, key layout of other producers | [Object storage](../configuration/storage.md) |
 | Helm values that turn each path on | [Setting up recording](../operations/recording-setup.md) |
 | Transcription, summaries, translation, dubbing, the archive | [AI post-production](../POSTPROD.md) |
-| Node pools, sizing, kernel modules on nodes | [INFRASTRUCTURE](../INFRASTRUCTURE.md) |
+| Node pools, sizing, kernel modules on nodes | [Node pools](../INFRASTRUCTURE.md#node-pools), [Installing PA Webinar](../install/README.md) |
 | The decision records | [ADR-006](../adr/006-recording-and-storage.md), [ADR-013](../adr/013-multitrack-speaker-attribution.md) |
 
 ## Two paths, two purposes

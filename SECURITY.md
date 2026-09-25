@@ -291,7 +291,7 @@ The license policy is in [THIRD-PARTY-LICENSES.md](THIRD-PARTY-LICENSES.md).
 The repository contains no credentials. An installation supplies its secrets at runtime:
 
 - **Helm:** a Kubernetes Secret (see [Secrets in a Helm installation](#secrets-in-a-helm-installation)).
-- **Docker Compose: development and evaluation only.** The tracked `docker-compose.yml` carries public placeholders as literal values and sets the `ALLOW_INSECURE_PII_KEY` escape hatch, so it must never hold real data (see [docs/INFRASTRUCTURE.md](docs/INFRASTRUCTURE.md#development-docker-compose)).
+- **Docker Compose: development only.** The tracked `docker-compose.yml` carries public placeholders as literal values and sets the `ALLOW_INSECURE_PII_KEY` escape hatch, so it must never hold real data (see [Local stack vs cluster](docs/DEVELOPMENT.md#local-stack-vs-cluster)).
 
 The secrets map in [docs/CONFIGURATION.md](docs/CONFIGURATION.md) lists every secret key and what it protects.
 

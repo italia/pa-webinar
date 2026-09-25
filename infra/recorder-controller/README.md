@@ -350,7 +350,9 @@ The bots get through without the rule only when `networkPolicy.ingress.fromNames
 `fromPodSelectors` are both empty, which opens the app's port to every source. The recording side of the
 policy is in [Network policy](../../docs/operations/recording-setup.md#network-policy).
 
-### With Docker Compose on a single VM
+<a id="with-docker-compose-on-a-single-vm"></a>
+
+### With Docker Compose
 
 The Compose file defines a `recorder-controller` service under the `recorder` profile:
 
@@ -464,7 +466,7 @@ de-duplication behave the same everywhere.
 
 ## Known limitations
 
-- **The Compose profile does not work as shipped.** See [With Docker Compose on a single VM](#with-docker-compose-on-a-single-vm).
+- **The Compose profile does not work as shipped.** See [With Docker Compose](#with-docker-compose).
 - **Slow replacement on Kubernetes.** A failed or finished Job keeps its deterministic name until
   `ttlSecondsAfterFinished` deletes it, so a replacement waits for the TTL. A bot pod that never starts
   holds the recording until `activeDeadlineSeconds`.

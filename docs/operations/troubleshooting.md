@@ -233,7 +233,7 @@ Only a `LIVE` event lets anyone into the conference, and only a `LIVE` event adm
 
 - Measure your cold start and raise **Pre-scale lead time (minutes)** under **Site settings** → **Features** → **Video bridge scaling (JVB)** to cover it ([jvb-scaler.md](jvb-scaler.md#lead-time-and-cold-start)). The value is read from the settings row. The `JVB_PRE_SCALE_MINUTES` environment variable has no effect ([runtime-settings.md](../configuration/runtime-settings.md#event-lifecycle-and-bridge-timing)).
 - If a bridge pod stays `Pending`, read its events with `kubectl -n pa-webinar describe pod <jvb-pod>`. Each bridge binds UDP 10000 as a host port and so needs a node of its own: the pool maximum must be at least `JVB_MAX_REPLICAS`, plus any Jibri pods that share the pool. A cloud quota can also block the scale-up.
-- Machine sizes and pool limits are chosen in [INFRASTRUCTURE.md](../INFRASTRUCTURE.md).
+- Machine sizes and pool limits are chosen in the guide of your platform ([Installing PA Webinar](../install/README.md)).
 
 ### No audio or video
 
@@ -285,7 +285,7 @@ flowchart TD
 Green boxes are fixes; the red box means the cause is elsewhere, so collect the [diagnostics](#collecting-diagnostics-without-personal-data) and ask for help.
 
 1. **A bridge is running.** `kubectl -n pa-webinar get pods -l app.kubernetes.io/component=jvb -o wide` shows a pod that is `Running` and ready. In the `full` profile, no bridge outside an event is normal. See [Slow cold start](#slow-cold-start).
-2. **UDP 10000 reaches the bridge node.** The firewall, network security group or security group of the bridge nodes must allow inbound UDP 10000 from the internet. In a participant's browser, `chrome://webrtc-internals` lists the ICE candidate pairs toward the bridge: a pair toward port 10000 that never succeeds points to this check or to the next one. Firewall design is covered in [INFRASTRUCTURE.md](../INFRASTRUCTURE.md).
+2. **UDP 10000 reaches the bridge node.** The firewall, network security group or security group of the bridge nodes must allow inbound UDP 10000 from the internet. In a participant's browser, `chrome://webrtc-internals` lists the ICE candidate pairs toward the bridge: a pair toward port 10000 that never succeeds points to this check or to the next one. Firewall design is covered in [Ports and firewall](../INFRASTRUCTURE.md#ports-and-firewall).
 3. **The bridge advertises a reachable address.** Compare what the bridge announces with the node's public address:
 
    ```bash
@@ -445,7 +445,7 @@ Quick checks before the pipeline's own troubleshooting in [POSTPROD.md](../POSTP
 - `postprod.enabled` is `false` by default in `values.yaml`. Without it the chart renders neither the orchestrator nor the worker template.
 - **Post-event pipeline active** (`aiPipelineEnabled`, off by default in `app/prisma/schema.prisma`), under **Site settings** → **Post-event AI pipeline**. While it is off, the orchestrator is told to start nothing.
 - At most `aiMaxConcurrentJobs` workers run at once (2 by default in `schema.prisma`), and a failed job waits for its retry delay.
-- A worker pod in `Pending` with `Insufficient nvidia.com/gpu` means that no GPU node is available or that the GPU device plugin is missing. GPU pools and quotas are covered in [INFRASTRUCTURE.md](../INFRASTRUCTURE.md).
+- A worker pod in `Pending` with `Insufficient nvidia.com/gpu` means that no GPU node is available or that the GPU device plugin is missing. GPU pools are covered in [Node pools](../INFRASTRUCTURE.md#node-pools), and quotas in the guide of each managed cloud.
 
 ```bash
 kubectl -n pa-webinar logs -l app.kubernetes.io/component=cronjob-postprod-orchestrator --tail=20
@@ -492,7 +492,7 @@ What the platform logs, and how long operators should keep it, is covered in [GD
 ## Related pages
 
 - [Deploying with Helm](../DEPLOYMENT.md): the chart reference and first-run checks.
-- [Infrastructure](../INFRASTRUCTURE.md): choosing and sizing a setup, network design, firewall and TURN.
+- [Installing PA Webinar](../install/README.md): choosing and sizing a platform; [Infrastructure](../INFRASTRUCTURE.md): network design, firewall and TURN.
 - [Upgrades and rollback](upgrades.md): the drift-safe procedure and what does not roll back.
 - [Monitoring and health](monitoring.md): probes, status pages, metrics, alerts and logs.
 - [Running the JVB scaler](jvb-scaler.md): enabling, tuning, validating and pausing the scaler.

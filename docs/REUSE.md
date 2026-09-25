@@ -159,9 +159,9 @@ Dashed boxes are optional.
 
 | You need | What depends on it | Details |
 |---|---|---|
-| A Kubernetes cluster and Helm 3 or 4: minikube to evaluate the chart, k3s on one or three VMs for a small installation, managed Kubernetes for concurrent or large events. Docker Compose on a workstation gives a first look | Everything | [Infrastructure](INFRASTRUCTURE.md#choosing-a-setup), [Deploying with Helm](DEPLOYMENT.md) |
+| A Kubernetes cluster and Helm 3 or 4: minikube to evaluate the chart, k3s on one or three VMs for a small installation, managed Kubernetes for concurrent or large events. Docker Compose is only for changing the code | Everything | [Installing PA Webinar](install/README.md#choose-a-platform), [Deploying with Helm](DEPLOYMENT.md) |
 | Two DNS names with TLS certificates, one for the portal (`webinar.example.com`) and one for the conference (`meet.webinar.example.com`). TURN over TLS needs a third name on coturn's own IP, with a certificate issued through DNS-01 | The portal and the conference are served by separate ingresses. TURN does not go through the ingress | [DNS and TLS](INFRASTRUCTURE.md#dns-and-tls), [TURN](INFRASTRUCTURE.md#turn) |
-| A network path for media: a public IP on the bridge nodes with the bridge UDP port open, plus TURN over TLS on port 443 for participants behind restrictive firewalls | Audio and video. Media never passes through the portal | [Infrastructure](INFRASTRUCTURE.md), [Jitsi integration](architecture/jitsi-integration.md) |
+| A network path for media: a public IP on the bridge nodes with the bridge UDP port open, plus TURN over TLS on port 443 for participants behind restrictive firewalls | Audio and video. Media never passes through the portal | [Networking](INFRASTRUCTURE.md#networking), [Jitsi integration](architecture/jitsi-integration.md) |
 | PostgreSQL and Redis, in the cluster through the chart or as managed services | All state (PostgreSQL) and realtime fan-out in the live room (Redis) | [Deploying with Helm](DEPLOYMENT.md) |
 | An SMTP relay | Registration confirmations with the personal link (the only way it reaches registrants while public registration is off), reminders, staff sign-in links, confirmations of data-subject requests | [Email delivery](configuration/email.md), [Email and calendar](architecture/email.md) |
 | Object storage: Azure Blob Storage or an S3-compatible service (AWS S3, MinIO, Google Cloud Storage through its S3-compatible API) | Recordings, uploaded materials and videos, AI outputs. Evaluation does not need it | [Object storage](configuration/storage.md) |
@@ -198,10 +198,12 @@ the ingress-nginx and Traefik defaults that replace the header, is in
 only the Gateway API. See
 [Ingress controllers](INFRASTRUCTURE.md#ingress-controllers).
 
-This page gives no sizing figures. [Infrastructure](INFRASTRUCTURE.md) covers
-choosing and sizing a setup, and [load testing](LOAD-TESTING.md) has the
-measurements. Before installing, read its [Known gaps](INFRASTRUCTURE.md#known-gaps),
-which list the chart issues the lab installs ran into and their workarounds.
+This page gives no sizing figures. [Installing PA Webinar](install/README.md)
+covers choosing and sizing a platform, and [load testing](LOAD-TESTING.md) has
+the measurements. Before installing, read its
+[Known limitations](install/README.md#known-limitations), and the
+[chart issues](INFRASTRUCTURE.md#chart-issues-found-by-the-lab-installs) that
+the lab installs ran into, with their workarounds.
 
 Skills your team, or a supplier, needs:
 
@@ -222,10 +224,12 @@ processing. Make those before you install.
 
 ### Choosing a setup
 
-[Infrastructure](INFRASTRUCTURE.md#choosing-a-setup) compares the setups, from
-Docker Compose on a workstation through minikube and k3s on one or three VMs to
-managed Kubernetes. For each it gives the measured capacity, what you give up
-and how far it is proven. Choose the setup there, then a profile.
+[Installing PA Webinar](install/README.md#choose-a-platform) compares the
+platforms, from minikube on a workstation through k3s on one or three VMs to
+managed Kubernetes on AKS, GKE or EKS, with a guide for each. It gives the
+measured requirements, what you give up and how far each is proven. Docker
+Compose is only for changing the code. Choose the platform there, then a
+profile.
 
 Profiles are example value sets in `infra/helm/pa-webinar/examples/`, each
 built around a `jitsi.mode`, and [Deploying with Helm](DEPLOYMENT.md#profiles-and-values-files)
@@ -401,7 +405,7 @@ its operations half works only on Azure. See
 `0.x`. The application layer is the most mature part. Installation and
 operations are the least mature, and the [roadmap](ROADMAP.md) says so openly.
 
-[Infrastructure](INFRASTRUCTURE.md#choosing-a-setup) gives every setup one of
+[Installing PA Webinar](install/README.md) gives every platform one of
 three statuses, and this page uses the same ones:
 
 - **Exercised**: Azure Kubernetes Service (AKS), which runs real events.
@@ -423,11 +427,11 @@ Plan the first installation as a project, not as a routine procedure.
 
 | Area | State today | What it means for you |
 |---|---|---|
-| Helm chart | Rendered for every profile and validated in CI (invariant checks and a server-side dry run on kind) | The manifests are valid. That does not prove the installation works. [Known gaps](INFRASTRUCTURE.md#known-gaps) lists the chart issues the lab installs hit and their workarounds |
-| Kubernetes flavor | AKS exercised. minikube and k3s tested in lab. GKE and EKS not yet verified. OpenShift not covered | Expect to adapt node pools, load balancers and ingress to your provider ([Managed Kubernetes](INFRASTRUCTURE.md#managed-kubernetes-aks-gke-eks)) |
+| Helm chart | Rendered for every profile and validated in CI (invariant checks and a server-side dry run on kind) | The manifests are valid. That does not prove the installation works. [Chart issues found by the lab installs](INFRASTRUCTURE.md#chart-issues-found-by-the-lab-installs) lists them with their workarounds |
+| Kubernetes flavor | AKS exercised. minikube and k3s tested in lab. GKE and EKS not yet verified. OpenShift not covered | Expect to adapt node pools, load balancers and ingress to your provider ([Node pools and bridge exposure](INFRASTRUCTURE.md#node-pools-and-bridge-exposure)) |
 | Ingress | The values default to ingress-nginx and to a cert-manager ClusterIssuer named `letsencrypt-prod` | On another controller, set the Ingress classes and translate the ingress-nginx settings you need. Traefik is tested in lab. Controllers that speak only the Gateway API get no routes ([Ingress controllers](INFRASTRUCTURE.md#ingress-controllers)) |
-| Docker Compose | A development stack. Its placeholder secrets live in the tracked file. The portal is served without TLS, and the session cookie is `Secure`, so staff sign-in works only on `localhost`. It has no object storage and no TURN. It schedules only the `email-outbox`, `reminders` and `cleanup` jobs | Good for a first look. It is not built to serve events ([Scheduled jobs](architecture/background-jobs.md)) |
-| Single VM | k3s on one VM with the simple profile, tested in lab. The VM is a single point of failure, there is no Jibri, and object storage is yours to provide | The documented path for a single server ([Single node: k3s on one VM](INFRASTRUCTURE.md#single-node-k3s-on-one-vm)) |
+| Docker Compose | A development stack. Its placeholder secrets live in the tracked file. The portal is served without TLS, and the session cookie is `Secure`, so staff sign-in works only on `localhost`. It has no object storage and no TURN. It schedules only the `email-outbox`, `reminders` and `cleanup` jobs | For changing the code. It is not built to serve events ([Scheduled jobs](architecture/background-jobs.md)). To evaluate the chart, use [minikube](install/minikube.md) |
+| Single VM | k3s on one VM with the simple profile, tested in lab. The VM is a single point of failure, there is no Jibri, and object storage is yours to provide | The documented path for a single server ([Installing on your own VMs with k3s](install/k3s.md)) |
 | Object storage | Azure Blob and S3-compatible providers are implemented, including video uploads from the administration area. Unit tests cover both providers with mocked SDKs. The S3 upload path has been exercised by hand against S3-compatible servers, but no automated test runs against a real storage service | The storage must accept uploads from browsers: CORS that allows `PUT` from the portal's origin and, on S3-compatible storage, an endpoint that is a public HTTPS address reachable by browsers and pods, and an access key with the permissions listed in [Object storage](configuration/storage.md#creating-buckets-and-containers). Test uploads and playback on your provider before the first event |
 | Composite recording (Jibri) | The standard and full profiles enable Jibri, but the chart does not wire the upload | The finalize script must be given to Jibri by hand, or composite recordings are neither uploaded nor registered ([Mount the finalize script](operations/recording-setup.md#mount-the-finalize-script)) |
 | TURN over TLS | coturn is an option of the Jitsi subchart. None of the lab setups exercised it | It needs its own IP, a third DNS name and a DNS-01 certificate. Test from a restrictive network before the first event ([TURN](INFRASTRUCTURE.md#turn)) |
@@ -611,39 +615,24 @@ Before deciding:
       guidelines is recorded.
 - [ ] You have decided whether to keep or replace the bundled waiting-room
       music ([Bundled assets](../THIRD-PARTY-LICENSES.md#bundled-assets)).
-- [ ] The platform has been tried: Docker Compose for a first look
-      ([Local development](DEVELOPMENT.md)), minikube for the chart
-      ([Evaluation: minikube](INFRASTRUCTURE.md#evaluation-minikube)).
+- [ ] The platform has been tried on minikube
+      ([Try PA Webinar on minikube](install/minikube.md)).
 - [ ] The roadmap's installation items and known limitations have been read.
 - [ ] Your DPO has reviewed [Privacy and data protection](GDPR.md) and
       [Recordings, voice data and AI outputs](privacy/recordings-and-ai.md).
 
 Before installing:
 
-- [ ] Setup and profile chosen ([Infrastructure](INFRASTRUCTURE.md#choosing-a-setup)),
-      and its [Known gaps](INFRASTRUCTURE.md#known-gaps) read.
-- [ ] Two DNS names (portal and conference) and their certificates are ready,
-      plus a third name with its own IP and a DNS-01 certificate for TURN
-      over TLS.
-- [ ] Your ingress controller is ingress-nginx, or another controller
-      configured as in [Ingress controllers](INFRASTRUCTURE.md#ingress-controllers).
-- [ ] The bridge nodes have a public IP and an open UDP port, and TURN is
-      reachable on 443.
-- [ ] PostgreSQL and Redis are provisioned, in the cluster or managed.
-- [ ] An SMTP relay with an authenticated sender domain is available.
-- [ ] Object storage is provisioned if you record or upload. Its CORS allows
-      uploads from the portal. On S3-compatible storage, the endpoint is a
-      public HTTPS address and the access key has the permissions listed in
-      [Object storage](configuration/storage.md#creating-buckets-and-containers).
-- [ ] `TRUSTED_PROXY_HOPS` matches the number of `X-Forwarded-For` entries
-      your trusted infrastructure adds after the client's (`1` on GKE Ingress;
-      [Client address and rate limits](CONFIGURATION.md#client-address-and-rate-limits)).
-- [ ] You have chosen an image source (build or mirror), and the auxiliary
-      images are pinned.
-- [ ] Every secret is freshly generated, and `PII_ENCRYPTION_KEY` and
-      `APP_SECRET` are stored with the backups.
-- [ ] The conference's internal credentials are pinned in your values file
-      ([Deploying with Helm](DEPLOYMENT.md#pin-the-conferences-internal-credentials)).
+- [ ] Platform and profile chosen ([Choose a platform](install/README.md#choose-a-platform)),
+      and its [Known limitations](install/README.md#known-limitations) read.
+- [ ] The technical [checklist before you install](install/README.md#checklist-before-you-install)
+      is complete: DNS names and certificates, TURN, the bridge's public
+      address and UDP port, the ingress controller and the proxies in front
+      of it (`TRUSTED_PROXY_HOPS`), the SMTP relay, object storage with CORS
+      for browser uploads, access to the images with pinned tags, the
+      database, secrets generated once with `PII_ENCRYPTION_KEY` and
+      `APP_SECRET` kept with the backups, and the conference's internal
+      credentials pinned.
 - [ ] Backup and restore of database, storage and secrets are designed and
       tested.
 - [ ] Recording paths are decided. If you use Jibri, its finalize script is

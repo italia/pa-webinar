@@ -40,8 +40,8 @@ nodes.** The mechanism is described in full in
 ### A dedicated node pool with a minimum of zero
 
 The bridges run on a node pool of their own, with node autoscaling and a minimum of 0 nodes. The
-reference pool is `infra/tofu/jvb-nodepool.tf`, an AKS example whose header lists the GKE and EKS
-equivalents. It carries the taint `workload=jitsi-jvb:NoSchedule` and the label `workload=jitsi-jvb`.
+reference modules in `infra/tofu/aks`, `infra/tofu/gke` and `infra/tofu/eks` create such a pool. It
+carries the taint `workload=jitsi-jvb:NoSchedule` and the label `workload=jitsi-jvb`.
 The taint keeps every other workload off the pool, so the pool can empty.
 
 The bridges reach the pool through `jitsi-meet.jvb.nodeSelector` and `jitsi-meet.jvb.tolerations`, which
@@ -215,7 +215,7 @@ stateless portal, which the chart scales from `autoscaling` in `values.yaml`
 - [Event lifecycle](../architecture/event-lifecycle.md): the statuses that the tick moves, grace,
   overtime, wake, and life without the scaler.
 - [Running the JVB scaler](../operations/jvb-scaler.md): enabling, tuning, validating and pausing it.
-- [Infrastructure](../INFRASTRUCTURE.md): choosing machines and sizing the bridge pool for a setup.
+- [Installing PA Webinar](../install/README.md): choosing a platform and sizing the bridge pool.
 - [Runtime settings](../configuration/runtime-settings.md): the sizing and lifecycle settings with
   their defaults.
 - [ADR-006: Optional recording paths on provider-agnostic storage](006-recording-and-storage.md): the

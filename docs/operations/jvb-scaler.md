@@ -12,7 +12,8 @@ It does not explain how the scaler decides:
 - the event statuses that each tick moves are in
   [Event lifecycle](../architecture/event-lifecycle.md);
 - choosing machines and sizing the bridge pool are in
-  [Infrastructure](../INFRASTRUCTURE.md);
+  [Installing PA Webinar](../install/README.md#requirements) and the guide of
+  each managed cloud;
 - the chart keys around it are in [Deploying with Helm](../DEPLOYMENT.md).
 
 The literal examples use `pa-webinar` as both the Helm release and the
@@ -148,8 +149,10 @@ meet is stated once, in
 [The JVB pool contract](../../infra/aks/node-pools.md#the-jvb-pool-contract),
 and why each rule matters is explained in
 [Node-pool scale to zero](../architecture/scaling.md#node-pool-scale-to-zero).
-Machine size, pool limits, zones and the equivalents on other clouds are in
-[Infrastructure](../INFRASTRUCTURE.md). Three points concern the scaler
+Machine size, pool limits and zones are in the guide of each managed cloud
+([AKS](../install/aks.md), [GKE](../install/gke.md), [EKS](../install/eks.md)),
+and any other cluster in [Node pools](../INFRASTRUCTURE.md#node-pools). Three
+points concern the scaler
 directly:
 
 - **The pool must be able to reach 0 nodes.** The scaler only removes bridge
@@ -355,8 +358,8 @@ model behind the window is in
 A bridge is released on the first tick after its last event stops being
 billable: when the event goes `IDLE` after `jvbInactiveGraceMinutes`, or
 `ENDED`. The emptied node then remains until the cluster autoscaler's own
-scale-down delay has passed. `infra/tofu/jvb-nodepool.tf` suggests an
-autoscaler profile for that delay, and you pay for the node until it
+scale-down delay has passed: 10 minutes in the AKS module's autoscaler
+profile (`infra/tofu/aks/cluster.tf`). You pay for the node until it
 expires. Shorten the inactivity grace to save cost. Lengthen it if
 participants often leave and come back after a break.
 
@@ -720,8 +723,8 @@ The full list of reasons is in
   moves, and life without the scaler.
 - [Runtime settings](../configuration/runtime-settings.md): every setting
   quoted on this page.
-- [Infrastructure](../INFRASTRUCTURE.md): choosing machines and sizing the
-  bridge pool.
+- [Installing PA Webinar](../install/README.md): choosing machines and sizing
+  the bridge pool.
 - [Deploying with Helm](../DEPLOYMENT.md): profiles, chart keys and the
   NetworkPolicy.
 - [Upgrades and rollback](upgrades.md): upgrading without disturbing a live

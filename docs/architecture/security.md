@@ -10,7 +10,7 @@ Related pages:
 - The exact Content Security Policy and its companion headers: [Content Security Policy](../SECURITY-CSP.md).
 - Supply chain, CI isolation, scanners, SBOMs and vulnerability reporting: [Security policy](../../SECURITY.md).
 - Which columns hold personal data, retention and data-subject rights: [Privacy and data protection](../GDPR.md). Encryption mechanics: [Data model](data-model.md#encrypted-fields).
-- Network design, firewall and TURN decisions: [Infrastructure](../INFRASTRUCTURE.md).
+- Network design, firewall and TURN decisions: [Infrastructure](../INFRASTRUCTURE.md#networking).
 
 ## At a glance
 
@@ -338,7 +338,7 @@ Only the portal pod, including its `db-migrate` init container, loads the whole 
 - **Fixed windows.** A window starts with the first request for a key, and the counter resets when the window ends.
 - **Per-process state.** Counters live in an in-memory `Map` in each pod. The chart runs two portal replicas by default and lets the HPA scale them from 2 to 6 (`app.replicaCount` and `autoscaling` in `values.yaml`). Every limit is therefore multiplied by the number of pods, and a restart resets it. A shared counter is on the [roadmap](../ROADMAP.md#later).
 - **Bounded memory.** Each process keeps about 50,000 keys at most. The excess is trimmed at most once a minute, oldest first, which resets those counters.
-- **Response.** Exceeding a limit usually returns 429 `RATE_LIMIT`, with `Retry-After` on most routes. A few per-voter limits (Q&A upvote, poll vote, agenda reactions) omit the header. The exceptions to the 429:
+- **Response.** Exceeding a limit usually returns 429 `RATE_LIMIT`, with `Retry-After` on most routes. A few per-voter limits (poll vote, agenda reactions) omit the header. The exceptions to the 429:
   - the address-book opt-out answers 422 `VALIDATION_ERROR`;
   - the per-address limits of the staff sign-in link request drop the email silently and still answer 202, so they do not reveal whether an account exists;
   - the per-address limits of the data-subject export and erasure requests also drop the email silently and still answer 200.
@@ -375,6 +375,7 @@ The values below come from the route files. To list every call site with its val
 | Call session opening | `POST …/sessions` | IP | 30 per minute |
 | Chat message / attachment | `POST …/chat`, `POST …/chat/attachment` | Event and sender | 30 / 10 per minute |
 | Q&A question | `POST …/questions` | Registration, named grant, or the guest's browser id and event (IP when a guest sends no browser id) / IP and event, for guests with a browser id | 1 per 30 seconds / 60 per minute |
+| Q&A upvote | `POST …/questions/{id}/upvote` | IP and event, for browser ids / voter (registration or browser id) | 300 / 10 per minute |
 | Poll vote | `POST …/polls/{id}/vote` | IP and event / voter | 60 / 10 per minute |
 | Square presence ping | `POST …/garden/ping` | IP | 600 per minute |
 | Data-subject export or erasure request | `POST /api/gdpr/export/request`, `POST /api/gdpr/erasure/request` | IP / email hash | 5 / 3 per hour |
@@ -474,7 +475,7 @@ Two of these grants reach further than their purpose:
 
 ### NetworkPolicy
 
-`networkPolicy.enabled` is `false` by default, and it needs a CNI that enforces policies ([Deploying with Helm](../DEPLOYMENT.md#networkpolicy), [Infrastructure](../INFRASTRUCTURE.md)). When enabled, `templates/networkpolicy.yaml` renders a default-deny policy for the portal pods only: it selects the release's pods that carry no `app.kubernetes.io/component` label, or, when `app.podLabels` gives the portal pods that label, the pods with that value.
+`networkPolicy.enabled` is `false` by default, and it needs a CNI that enforces policies ([Deploying with Helm](../DEPLOYMENT.md#networkpolicy), [Infrastructure](../INFRASTRUCTURE.md#network-policies)). When enabled, `templates/networkpolicy.yaml` renders a default-deny policy for the portal pods only: it selects the release's pods that carry no `app.kubernetes.io/component` label, or, when `app.podLabels` gives the portal pods that label, the pods with that value.
 
 The other pods of the release are deliberately not selected: the scheduled jobs, the JVB scaler, the recorder controller and bots, the AI orchestrator and worker, and the configuration reload hook. They talk to the Kubernetes API, the bridges and the GPU pool, which the policy does not describe, so their own traffic is not restricted.
 

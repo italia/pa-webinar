@@ -202,9 +202,11 @@ The CronJob templates (`infra/helm/pa-webinar/templates/cronjob-*.yaml`) share t
 - **Hardening.** The scheduled jobs, the worker and the recorder controller run as non-root with a read-only root filesystem, all capabilities dropped and the `RuntimeDefault` seccomp profile. The recorder bot runs as non-root with capabilities dropped but a writable root filesystem. The config-reload hook sets no security context. The `curl` jobs mount no ServiceAccount token. The scaler, the orchestrator and the recorder controller each have their own ServiceAccount, bound to a namespaced Role that grants only what they need.
 - **Placement.** The scheduled jobs use the portal's placement (`app.nodeSelector`, `app.tolerations`, empty by default in `values.yaml`). With the bridge and GPU pools tainted, as in the [reference node pools](../../infra/aks/node-pools.md), they never land on or wake those pools.
 
-## Docker Compose on a single VM
+<a id="docker-compose-on-a-single-vm"></a>
 
-The Compose stack has no CronJobs. Its `cron` service is a shell loop in a `curl` container. The loop ticks every 30 seconds and calls three routes with the same `x-api-key` header (`docker-compose.yml`):
+## Docker Compose
+
+The Compose stack is the development loop, not an installation, and it has no CronJobs. Its `cron` service is a shell loop in a `curl` container. The loop ticks every 30 seconds and calls three routes with the same `x-api-key` header (`docker-compose.yml`):
 
 | Job | Chart default | Compose |
 |---|---|---|
@@ -362,7 +364,7 @@ A new scheduled task needs a route, a chart template, a decision for Compose and
 2. **Tests.** Test the selection rules as pure functions, as `app/src/lib/gdpr/cleanup-selection.ts` does for the cleanup, and add a route test next to the handler.
 3. **Chart template.** Copy an existing `curl` template such as `templates/cronjob-rubrica-retention.yaml`. Keep `concurrencyPolicy: Forbid`, the history limits, the TTL key that matches the cadence, a deadline that includes scheduling and image pull, the disruption policy with `restartPolicy: Never`, the security context, `CRON_API_KEY` from `pa-webinar.secretName`, and a pod label `app.kubernetes.io/component: cronjob-<name>`.
 4. **Values.** Add `cronjobs.<name>` with `enabled`, `schedule` and `image`. `helm upgrade --reuse-values` keeps the previous release's values and does not pick up keys that are new in the chart, so the whole `cronjobs.<name>` map is then missing. A guard copied from the existing templates, `{{- if .Values.cronjobs.<name>.enabled }}`, then fails to render with a nil pointer error before any `| default` is evaluated. Read the guard and every new key with a nil-safe lookup, for example `dig "<name>" "enabled" true (.Values.cronjobs | default dict)` or `(.Values.cronjobs.<name> | default dict)`, and give each key its default there. Run `./scripts/validate-chart.sh`.
-5. **Compose.** Decide whether a single VM needs the job. If it does, add it to the `cron` service's loop. If it does not, add the consequence to the Compose table on this page.
+5. **Compose.** Decide whether the development stack needs the job. If it does, add it to the `cron` service's loop. If it does not, add the consequence to the Compose table on this page.
 6. **Documentation.** Add a catalog row and a section on this page. If the job deletes personal data, update the retention table in [GDPR.md](../GDPR.md).
 
 A job that acts on the cluster also needs its own ServiceAccount and a namespaced Role limited to the verbs it uses, like `cronjob-jvb-scaler.yaml` and `cronjob-postprod-orchestrator.yaml`. It should get its numbers from an `/api/internal/*` route instead of reading the database.

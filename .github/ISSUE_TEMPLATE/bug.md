@@ -51,7 +51,7 @@ assignees: ''
 - Interface language: <!-- for example `en`, as in the URL prefix `/en/` -->
 - Browser and version:
 - Operating system:
-- Installation: <!-- Docker Compose on a single VM; Helm with the `simple`, `standard` or `full` profile (`jitsi.mode`); or Helm with an external Jitsi (`jitsi.enabled: false`) -->
+- Installation: <!-- Helm with the `simple`, `standard` or `full` profile (`jitsi.mode`), on minikube, k3s or a managed cluster (which one); Helm with an external Jitsi (`jitsi.enabled: false`); or the Docker Compose development stack -->
 
 ## Screenshots and logs
 

@@ -426,8 +426,8 @@ choose:
   on.
 
 The [service inventory](../SERVICE-INVENTORY.md) of your installation lists the
-providers and can document their regions. Choosing providers is covered in the
-[Infrastructure guide](../INFRASTRUCTURE.md).
+providers and can document their regions. Choosing providers is covered in
+[Installing PA Webinar](../install/README.md).
 
 ### Contacts
 

@@ -352,7 +352,7 @@ Fill it in by following step 2 of the [new-installation checklist](SERVICE-INVEN
 - [Service inventory: generating the document](SERVICE-INVENTORY-GENERATION.md): producing the DEV and OPS halves, and PA declarations.
 - [Configuration reference](CONFIGURATION.md): `SERVICE_INVENTORY_URL` among the other environment variables.
 - [Deploying with Helm](DEPLOYMENT.md): `app.extraVolumes`, `app.extraVolumeMounts` and the NetworkPolicy keys.
-- [Infrastructure](INFRASTRUCTURE.md): choosing and sizing a setup, which decides most of what goes into the OPS half.
+- [Installing PA Webinar](install/README.md): choosing and sizing a platform, which decides most of what goes into the OPS half.
 - [SECURITY.md](../SECURITY.md): release SBOMs and supply-chain controls.
 - [Privacy and data protection](GDPR.md): the personal data behind the **personal data** and **recorded content** badges.
 - [Feature tour](FEATURES.md): the public transparency pages in context.

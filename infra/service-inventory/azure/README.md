@@ -405,4 +405,4 @@ To see the latest runs, use `kubectl -n <namespace> get cronjob service-inventor
 - [Service inventory: generating the document](../../../docs/SERVICE-INVENTORY-GENERATION.md): the document model, the DEV half, declarations, merge recipes and cadence.
 - [`docs/examples/service-inventory.example.json`](../../../docs/examples/service-inventory.example.json): the template for your base document.
 - [Scheduled and background jobs](../../../docs/architecture/background-jobs.md): the jobs that the chart runs, and those it does not.
-- [Infrastructure](../../../docs/INFRASTRUCTURE.md): choosing and sizing an installation, including on Azure.
+- [Installing PA Webinar](../../../docs/install/README.md): choosing and sizing an installation, with a guide for Azure ([Installing on AKS](../../../docs/install/aks.md)).

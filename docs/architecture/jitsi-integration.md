@@ -11,7 +11,7 @@ product can be reused, and for maintainers bumping the Jitsi version.
 
 Out of scope here, and owned elsewhere:
 
-- firewall, TURN and network design decisions: [INFRASTRUCTURE](../INFRASTRUCTURE.md);
+- firewall, TURN and network design decisions: [INFRASTRUCTURE](../INFRASTRUCTURE.md#networking);
 - Helm keys and install walkthroughs: [DEPLOYMENT](../DEPLOYMENT.md);
 - the claims inside the Jitsi JWT and every other credential: [identity and access](identity-and-access.md);
 - the live panels (Q&A, chat, polls and the rest): [live interaction](live-interaction.md);
@@ -683,7 +683,7 @@ flowchart LR
   `jitsi-meet.websockets`).
 
 Which ports to open, whether to deploy TURN, and how to give JVB a reachable address on each cloud are
-infrastructure decisions, covered in [INFRASTRUCTURE](../INFRASTRUCTURE.md). The Helm keys are in
+infrastructure decisions, covered in [INFRASTRUCTURE](../INFRASTRUCTURE.md#networking). The Helm keys are in
 [DEPLOYMENT](../DEPLOYMENT.md). How bridges scale, including why several bridges behind one address
 break calls, is in [scaling](scaling.md).
 
@@ -723,8 +723,8 @@ In local development Docker Compose publishes Jitsi on `https://localhost:8443` 
 
 The simple, standard and full profiles all deploy Jitsi from the pinned subchart; they differ in bridge
 placement, Jibri and the JVB scaler, and are compared in
-[Profiles and values files](../DEPLOYMENT.md#profiles-and-values-files). Choosing and sizing one is
-covered in [INFRASTRUCTURE](../INFRASTRUCTURE.md).
+[Profiles and values files](../DEPLOYMENT.md#profiles-and-values-files). Choosing a platform and sizing it
+is covered in [Installing PA Webinar](../install/README.md).
 
 With external Jitsi (`jitsi.enabled: false`) the chart deploys no Jitsi. The portal still needs
 `NEXT_PUBLIC_JITSI_DOMAIN` and the `JITSI_JWT_*` settings to match the external deployment, and that
