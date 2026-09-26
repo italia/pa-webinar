@@ -1,0 +1,23 @@
+# TURNS sulla 443 condivisa con il portale, con il certificato che Traefik
+# ottiene dal suo resolver ACME per questo nome. Come turn-route.yaml per il
+# resto. Modello di turn.sh (--cert-resolver).
+apiVersion: traefik.io/v1alpha1
+kind: IngressRouteTCP
+metadata:
+  name: @@RELEASE@@-turns
+  labels:
+    app.kubernetes.io/name: coturn
+    app.kubernetes.io/instance: @@RELEASE@@
+    app.kubernetes.io/part-of: pa-webinar
+    app.kubernetes.io/managed-by: pa-webinar-addons
+spec:
+  entryPoints: [websecure]
+  routes:
+    - match: HostSNI(`@@HOST@@`)
+      services:
+        - name: @@RELEASE@@-turn-tcp
+          port: 3478
+  tls:
+    certResolver: @@CERT_RESOLVER@@
+    domains:
+      - main: @@HOST@@

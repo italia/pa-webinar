@@ -1,11 +1,15 @@
+import { cookies } from 'next/headers';
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 
+import { getStaffSession } from '@/lib/auth/staff-session';
+import { getPublicEnv } from '@/lib/env';
+import { resolveWhiteboardInfraReady } from '@/lib/jitsi/whiteboard';
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { jvbMaxReplicasFromEnv } from '@/lib/jvb-sizing';
 import { getSettings } from '@/lib/settings';
-import { Link } from '@/i18n/navigation';
+import { Link, percorso } from '@/i18n/navigation';
 import EventWizard, {
   type InitialEventShape,
 } from '@/components/admin/event-wizard/wizard-shell';
@@ -34,6 +38,8 @@ function adhocFromDb(
     options: unknown;
     scaleMin: number | null;
     scaleMax: number | null;
+    scaleMinLabel?: unknown;
+    scaleMaxLabel?: unknown;
     required: boolean;
   },
   defaultLocale: string,
@@ -66,6 +72,15 @@ function adhocFromDb(
     scaleMin: item.scaleMin,
     scaleMax: item.scaleMax,
     required: item.required,
+    // Trasportati senza modifiche: il wizard mostra una lingua sola e non ha
+    // campo per le etichette delle scale. Se la domanda non viene riscritta,
+    // il salvataggio li rimanda indietro come sono.
+    original: {
+      prompt: promptMap,
+      options: item.options ?? undefined,
+      scaleMinLabel: item.scaleMinLabel ?? undefined,
+      scaleMaxLabel: item.scaleMaxLabel ?? undefined,
+    },
   };
 }
 
@@ -120,6 +135,12 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
     ? {
         templateIds: pre.templates.map((l) => l.templateId),
         adhocQuestions: pre.adhocItems.map((i) => adhocFromDb(i, defaultLocale)),
+        original: {
+          title: pre.title,
+          description: pre.description,
+          required: pre.required,
+          allowEdit: pre.allowEdit,
+        },
       }
     : null;
   const postBlock: QuestionnaireBlock | null = post
@@ -128,6 +149,12 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
         adhocQuestions: post.adhocItems.map((i) =>
           adhocFromDb(i, defaultLocale),
         ),
+        original: {
+          title: post.title,
+          description: post.description,
+          required: post.required,
+          allowEdit: post.allowEdit,
+        },
       }
     : null;
 
@@ -161,6 +188,7 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
       participantsCanShareScreen: event.participantsCanShareScreen,
       recordingEnabled: event.recordingEnabled,
       agendaEnabled: event.agendaEnabled,
+      wordCloudEnabled: event.wordCloudEnabled,
       whiteboardEnabled: event.whiteboardEnabled,
       autoStartRecording: event.autoStartRecording,
       aiTranscriptEnabled: event.aiTranscriptEnabled,
@@ -219,7 +247,7 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
     <div className="container py-4">
       <div className="mb-2">
         <Link
-          href={`/admin/events/${id}?token=${token}`}
+          href={percorso(`/admin/events/${id}?token=${token}`)}
           className="text-decoration-none d-inline-flex align-items-center text-primary"
           style={{ fontSize: '0.9rem' }}
         >
@@ -233,6 +261,7 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
 
       <EventWizard
         mode="edit"
+        canUseRubrica={(await getStaffSession(await cookies()))?.role === 'admin'}
         initialEvent={initialEvent}
         siteTimezone={event.timezone}
         enabledLocales={
@@ -258,6 +287,10 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
         gdprTemplates={gdprTemplates}
         siteDefaultParseTitleKicker={siteSettings.parseTitleKicker}
         siteDefaultVideoQuality={siteSettings.videoQuality}
+        // Letto a runtime come nella sala (lib/jitsi/whiteboard.ts).
+        whiteboardInfraReady={resolveWhiteboardInfraReady(
+          getPublicEnv('NEXT_PUBLIC_WHITEBOARD_ENABLED'),
+        )}
       />
     </div>
   );

@@ -1,8 +1,9 @@
-import { cookies } from 'next/headers';
-import { redirect, notFound } from 'next/navigation';
+import { notFound } from 'next/navigation';
 import { getLocale } from 'next-intl/server';
 
-import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { staffOLogin } from '@/lib/auth/staff-page';
+import { canManageEvent } from '@/lib/auth/staff-session';
+import AccessDenied from '@/components/admin/access-denied';
 import { prisma } from '@/lib/db';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import RecordingManageClient from '@/components/admin/recording-manage-client';
@@ -20,9 +21,7 @@ interface PageProps {
  */
 export default async function RecordingManagePage({ params }: PageProps) {
   const locale = await getLocale();
-  if (!(await isAdminAuthenticated(await cookies()))) {
-    redirect(`/${locale}/admin/login`);
-  }
+  const session = await staffOLogin(locale);
 
   const { recordingId } = await params;
   const recording = await prisma.recording.findUnique({
@@ -34,10 +33,14 @@ export default async function RecordingManagePage({ params }: PageProps) {
       sourceLanguage: true,
       createdAt: true,
       eventId: true,
-      event: { select: { title: true, slug: true } },
+      event: { select: { title: true, slug: true, createdById: true } },
     },
   });
   if (!recording) notFound();
+  // La registrazione e' dell'evento: la gestisce chi gestisce l'evento.
+  if (!canManageEvent(session, { createdById: recording.event?.createdById ?? null })) {
+    return <AccessDenied />;
+  }
 
   const eventTitle = getLocalized(recording.event?.title as LocalizedField, locale) || '—';
 

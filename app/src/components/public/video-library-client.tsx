@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslations, useFormatter } from 'next-intl';
 import { Badge, Card, CardBody, Input } from 'design-react-kit';
 
-import { Link } from '@/i18n/navigation';
+import { Link, percorso } from '@/i18n/navigation';
 
 interface LibraryRow {
   id: string;
@@ -34,7 +34,7 @@ function formatDuration(seconds: number | null): string {
   return `${m}m`;
 }
 
-export default function VideoLibraryClient({ locale }: { locale: string }) {
+export default function VideoLibraryClient() {
   const t = useTranslations('videoLibrary');
   const fmt = useFormatter();
 
@@ -73,7 +73,6 @@ export default function VideoLibraryClient({ locale }: { locale: string }) {
     return Math.max(1, Math.ceil(data.total / data.pageSize));
   }, [data]);
 
-  const eventHrefBase = locale === 'en' ? '/events' : '/eventi';
 
   return (
     <div>
@@ -121,7 +120,7 @@ export default function VideoLibraryClient({ locale }: { locale: string }) {
               return (
                 <div key={r.id} className="col-sm-6 col-lg-4">
                   <Link
-                    href={`${eventHrefBase}/${r.slug}`}
+                    href={percorso(`/events/${r.slug}`)}
                     className="text-decoration-none d-block h-100"
                   >
                     <Card

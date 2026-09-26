@@ -8,11 +8,11 @@ import {
   Button,
   Card,
   CardBody,
-  Icon,
 } from 'design-react-kit';
 
+import { Icon } from '@/components/ui/icon';
 import ToggleSwitch from '@/components/ui/toggle-switch';
-import { useRouter, Link } from '@/i18n/navigation';
+import { useRouter, Link, percorso } from '@/i18n/navigation';
 import { useToast } from '@/components/ui/toast';
 import { useConfirm } from '@/components/ui/confirm-dialog';
 import RecordingUploadWidget from './recording-upload-widget';
@@ -309,7 +309,7 @@ export default function RecordingManagement({
                   {/* Apre la gestione post-produzione (trascrizione, speaker,
                       traduzione, editor) per questo evento. */}
                   <Link
-                    href={`/admin/postprod?eventId=${event.id}`}
+                    href={percorso(`/admin/postprod?eventId=${event.id}`)}
                     className="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1"
                   >
                     <Icon icon="it-comment" size="sm" />

@@ -232,7 +232,7 @@ def correct_transcript_segments(
 
     `glossary_terms`: lista di nomi propri / sigle dell'evento
     (`speakersInfo`, organizzazione, etc.) che Mistral deve preservare
-    e correggere se Whisper li ha approssimati. Es. ["Raffaele",
+    e correggere se Whisper li ha approssimati. Es. ["Mario Rossi",
     "PCM", "OVH", "Azure", "Kubernetes"].
     """
     if not segments_text:

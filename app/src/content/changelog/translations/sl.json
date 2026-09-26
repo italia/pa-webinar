@@ -1,4 +1,37 @@
 {
+  "0.12.0": {
+    "title": "Pripravljeno za ponovno uporabo: namestitev z enim ukazom, dogodki pa tečejo sami",
+    "notes": [
+      "Namestitev z enim ukazom: na računalniku z minikube za preizkušanje in razvoj, na strežniku k3s za produkcijo, s certifikati, testnim poštnim predalom, objektno shrambo, TURN in načrtovanim varnostnim kopiranjem. Vsako namestitev je mogoče preveriti z enim ukazom, varnostno kopiranje in obnova baze podatkov in datotek imata svoje skripte, dokumentacija, zdaj v angleščini, pa ima vodnike za minikube, k3s, AKS, GKE in EKS ter kontrolne sezname za zagon v produkcijo.",
+      "Dogodki se odprejo ob začetni uri in zaprejo ob koncu tudi v namestitvah brez samodejnega zagona video mostov. »Zaženi dogodek« je vedno na voljo tistemu, ki vodi dogodek, in dogodek ne obtiči več v stanju »Priprava«.",
+      "Imenski računi za osebje: skrbniki in organizatorji se prijavijo z osebno povezavo, prejeto po e-pošti, in vsak vidi le tisto, kar dovoljuje njegova vloga. Ključ instance ostaja za prvi dostop in za nujne primere.",
+      "E-poštna sporočila v italijanščini, angleščini, francoščini, nemščini in španščini, v jeziku prejemnika. Osebne povezave moderatorjev in govornikov prispejo po e-pošti, opomniki ne prihajajo več vsi hkrati, vabila v koledar pa se ne podvajajo več.",
+      "V videokonferenci je vloga odvisna od povezave, s katero se vstopi: gostje in prijavljeni so udeleženci in moderatorju ne morejo več izklopiti zvoka ali ga odstraniti.",
+      "V sobi: vprašanja, glasovanja in oblak besed delujejo tudi za goste in govornike; gradiva poleg povezav sprejemajo tudi datoteke; kdor odide sam, se lahko vrne, namesto da bi videl »Dogodek je zaključen«; če videokonferenca ni dosegljiva, soba to pove in ponudi »Poskusite znova«; kamera in mikrofon se udeležencem zaženeta izklopljena; navidezno ozadje je mogoče izbrati že v čakalnici.",
+      "Zasebnost: klepet prisotnim ne posreduje več IP-naslova gostov; povezave za izvoz ali izbris lastnih podatkov vodijo na pravi naslov; obvestilo in soglasje za snemanje se prikažeta povsod, kjer lahko kaj snema.",
+      "Stran stanja preverja storitve od znotraj in zaradi nejavnega potrdila ne javlja več izpada; namestitve s fiksnim video mostom so prikazane pravilno.",
+      "Upravljanje: preklic somoderatorjev in govornikov v čarovniku zdaj res deluje, čarovnik pove, kaj ni bilo shranjeno, po objavi pa se odpre stran dogodka. Hitri klici nimajo več javne strani, deljene povezave pa prikažejo predogled dogodka.",
+      "Za nadgradnjo: Prosody, Jicofo, spletna konferenca in video most se enkrat znova zaženejo, zato je bolje nadgraditi, ko ni dogodkov v teku; kdor ima prilagojene nosilce ali module za Prosody, mora dodati tiste iz charta; brez scalerja se dogodki v živo zdaj zaprejo ob koncu, ko poteče še dodatni čas."
+    ]
+  },
+  "0.11.0": {
+    "title": "Soba se zdaj odzove v trenutku, ko se kaj spremeni",
+    "notes": [
+      "Vprašanja, ankete, program in oblak besed se posodobijo takoj, ko se kaj spremeni, namesto da bi vsakih nekaj sekund povpraševali strežnik: kdor je v sobi, vidi vprašanje takoj, na dobro obiskanem dogodku pa se promet občutno zmanjša.",
+      "Manj dela tudi za strežnik: redna preverjanja sobe zdaj zahtevajo le potrebne podatke, gradiva — ki se redko spreminjajo — pa se preverjajo redkeje.",
+      "Če takojšnja povezava ni na voljo, se soba sama vrne na prejšnje redno preverjanje: nobena funkcija zaradi novega mehanizma ne preneha delovati.",
+      "Popravki: če sta bila dva nova oblaka besed odprta v kratkem razmiku, je eden lahko ostal neviden, besede, poslane vanj, pa se nikomur niso pokazale; stran s stanjem storitve je vedno navajala isto številko različice namesto tiste, ki je v resnici tekla."
+    ]
+  },
+  "0.10.0": {
+    "title": "Vprašanja v klepetu, preprostejši ponavljajoči se dogodki in popravljene institucionalne barve",
+    "notes": [
+      "Kdor piše v klepetu, lahko svoje sporočilo označi kot vprašanje: moderatorji ga označijo kot odgovorjeno ali ga odložijo, filter pa prikaže samo vprašanja. Med dogodkom ni drugega kanala, ki bi ga bilo treba nadzirati.",
+      "Vprašanja iz klepeta se skupaj s prejetimi odzivi pokažejo na javni strani s povzetkom dogodka in ostanejo berljiva tudi po izbrisu osebnih podatkov udeležencev.",
+      "Priprava naslednje ponovitve niza je hitrejša: kopija dogodka prevzame oznake, organizatorje, somoderatorje (vsak z novimi dostopnimi podatki), program, vprašalnike in opomnike, predloge pa ohranijo nastavitve snemanja in nadaljnje obdelave.",
+      "Popravki: institucionalne barve so znova takšne, kot morajo biti – trak na vrhu spletišča se je prikazoval bel –, gumb, ki ustvari kopijo dogodka, ne vodi več na neobstoječo stran, in ob izteku hrambe se izbrišejo tudi kontakti povabljenih ter imenovanih moderatorjev in govorcev."
+    ]
+  },
   "0.9.0": {
     "title": "Varnost odvisnosti, usklajena dokumentacija in popolno lokalno okolje",
     "notes": [

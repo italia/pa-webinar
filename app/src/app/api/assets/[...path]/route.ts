@@ -28,7 +28,8 @@
  *    alla moderazione e alla retention (un URL trapelato diventa 404), cache
  *    breve perché una rimozione si propaghi. Un ACL vero — che rilegga lo stato
  *    vivo dell'evento a ogni richiesta — richiede un cookie con ambito sulla
- *    rotta (un <img> non manda header), ed è in ROADMAP. I due tentativi con un
+ *    rotta (un <img> non manda header): docs/ROADMAP.md, "Later", voce
+ *    "Access control on chat attachments". I due tentativi con un
  *    token nell'URL (credenziale durevole trapelata; capability autosufficiente
  *    che ignora lo stato vivo) erano entrambi peggiori del problema.
  *
@@ -100,7 +101,9 @@ export async function GET(
   // capability autosufficiente che ignora lo stato vivo per tutta la sua durata
   // — entrambe peggiori del problema. La forma giusta è un COOKIE con ambito
   // sulla rotta, rinnovato, riletto e ri-autorizzato dal server a ogni
-  // richiesta: è una feature, ed è in ROADMAP ("ACL allegati chat via cookie").
+  // richiesta: è una feature, in docs/ROADMAP.md ("Later", voce "Access
+  // control on chat attachments"; il limite attuale è in "Known limitations of
+  // shipped features", voce "Chat attachments").
   // Nel frattempo la difesa è quella documentata: UUID non indovinabile, blob
   // cancellato alla moderazione e alla retention (un URL trapelato diventa un
   // 404), cache breve perché una rimozione si propaghi in fretta.

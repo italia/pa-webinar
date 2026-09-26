@@ -13,9 +13,11 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslations, useFormatter } from 'next-intl';
-import { Badge, Card, CardBody, Icon, Input, Label } from 'design-react-kit';
+import { Badge, Card, CardBody, Input, Label } from 'design-react-kit';
 
+import { Icon } from '@/components/ui/icon';
 import { SkeletonLines } from '@/components/ui/skeleton';
+import { localizedPath } from '@/lib/utils/localized-url';
 
 interface EventOption {
   id: string;
@@ -325,7 +327,10 @@ export default function RegistrationsDashboard({
                         {fmt.dateTime(new Date(r.createdAt), { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
                       </td>
                       <td>
-                        <a href={`/${locale}/admin/events/${r.eventId}`} className="text-decoration-none">
+                        <a
+                          href={localizedPath(`/admin/events/${r.eventId}`, locale)}
+                          className="text-decoration-none"
+                        >
                           {r.eventTitle}
                         </a>
                       </td>

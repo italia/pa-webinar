@@ -1,69 +1,83 @@
 /**
- * Issue a short-lived SAS write URL so the browser can upload a
- * video directly to our Azure Blob container, bypassing our Next.js
- * server entirely (no egress bottleneck, no 5xx risk on large files).
+ * Apre il caricamento diretto dal browser di un video (MP4 / WebM / MOV /
+ * M4V) nello storage delle registrazioni, senza passare dall'app: nessun
+ * collo di bottiglia in uscita, nessun 5xx sui file grandi.
  *
- * Expected flow:
- *   1. Admin opens /admin/publications/new, picks an MP4 / WebM /
- *      MOV file.
- *   2. Client GETs /api/admin/publications/upload-url?filename=...
- *      which returns { uploadUrl, recordingUrl }.
- *   3. Client uploads to `uploadUrl` via the Azure SDK's
- *      BlockBlobClient (multi-block so 500 MiB+ files work).
- *   4. Client POSTs metadata + `recordingUrl` to
- *      /api/admin/publications which creates the LEGACY Event.
+ * Flusso:
+ *   1. L'amministrazione (nuova pubblicazione o registrazione di un evento
+ *      esistente) sceglie il file.
+ *   2. POST qui con { filename, contentType, sizeBytes }: la risposta dice
+ *      l'URL canonico (`recordingUrl`) e come caricare (`upload`), in base
+ *      al fornitore configurato:
+ *        - `azure-block`   blocchi Azure con l'SDK del browser (SAS);
+ *        - `s3-put`        un PUT firmato, per i file fino a una parte;
+ *        - `s3-multipart`  PUT firmati per parte, poi POST su
+ *                          `./multipart` per chiudere (DELETE per annullare).
+ *   3. Il client salva `recordingUrl` su /api/admin/publications (nuova
+ *      pubblicazione) o con PATCH su /api/admin/publications/:id.
  *
- * The SAS is scoped to a single blob name and expires in 60 minutes —
- * enough for a 1-hour MsTeams export on a residential uplink, short
- * enough to limit the blast radius if a log with the SAS leaks.
+ * Gli URL firmati valgono per un solo oggetto e 60 minuti: abbastanza per
+ * l'esportazione di un'ora di riunione su una linea domestica, poco per
+ * limitare il danno se un log con la firma finisce in giro.
  */
 
-import { randomUUID } from 'crypto';
 import { cookies } from 'next/headers';
+import { z } from 'zod';
 
-import { withErrorHandling } from '@/lib/api-handler';
-import { isAdminAuthenticated } from '@/lib/auth/admin-session';
-import { AppError, UnauthorizedError } from '@/lib/errors';
+import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
+import { requireStaff } from '@/lib/auth/staff-session';
+import { AppError, ValidationError } from '@/lib/errors';
 import {
-  generateRecordingUploadUrl,
+  MAX_PUBLICATION_UPLOAD_BYTES,
+  planPublicationObject,
+} from '@/lib/storage/publication-upload';
+import {
+  createRecordingBrowserUpload,
   isRecordingStorageConfigured,
 } from '@/lib/storage/recordings';
 
 export const dynamic = 'force-dynamic';
 
 const SAS_EXPIRY_MINUTES = 60;
-const ALLOWED_EXTENSIONS = new Set(['mp4', 'webm', 'mov', 'm4v']);
 
-// `publications/<year>/<uuid>.<ext>` groups uploads by year so the
-// Azure Storage browser stays navigable as the archive grows.
-function buildObjectName(originalName: string): string {
-  const dot = originalName.lastIndexOf('.');
-  const extRaw = dot >= 0 ? originalName.slice(dot + 1).toLowerCase() : '';
-  const ext = ALLOWED_EXTENSIONS.has(extRaw) ? extRaw : 'mp4';
-  const year = new Date().getUTCFullYear();
-  return `publications/${year}/${randomUUID()}.${ext}`;
-}
+const startUploadSchema = z.object({
+  filename: z.string().trim().min(1).max(255),
+  // Il tipo rilevato dal browser; se non è un video ammesso vale
+  // l'estensione (vedi planPublicationObject).
+  contentType: z.string().max(100).optional(),
+  sizeBytes: z.number().int().positive().max(MAX_PUBLICATION_UPLOAD_BYTES),
+});
 
-export const GET = withErrorHandling(async (request) => {
-  const isAdmin = await isAdminAuthenticated(await cookies());
-  if (!isAdmin) throw new UnauthorizedError();
+export const POST = withErrorHandling(async (request) => {
+  // Anche l'organizzatore carica la registrazione dei propri eventi; il file
+  // si aggancia all'evento con il PATCH di /publications/:id, che controlla
+  // il proprietario (ADR-014).
+  await requireStaff(await cookies());
 
   if (!isRecordingStorageConfigured()) {
-    throw new AppError(
-      'Recording storage not configured',
-      503,
-      'STORAGE_UNAVAILABLE',
+    // Un'installazione senza storage delle registrazioni e' una
+    // configurazione ammessa, non un guasto: 503 per il client, `warn` nel log.
+    const err = new AppError('Recording storage not configured', 503, 'STORAGE_UNAVAILABLE');
+    err.expected = true;
+    throw err;
+  }
+
+  const parsed = startUploadSchema.safeParse(await parseJsonBody(request));
+  if (!parsed.success) {
+    throw new ValidationError(
+      parsed.error.issues.map((i) => i.message).join(', '),
     );
   }
 
-  const url = new URL(request.url);
-  const filename = url.searchParams.get('filename')?.trim();
-  if (!filename) {
-    throw new AppError('Missing `filename` query parameter', 400, 'BAD_REQUEST');
-  }
-
-  const objectName = buildObjectName(filename);
-  const result = await generateRecordingUploadUrl(objectName, SAS_EXPIRY_MINUTES);
+  const { objectName, contentType } = planPublicationObject(
+    parsed.data.filename,
+    parsed.data.contentType,
+  );
+  const result = await createRecordingBrowserUpload(objectName, {
+    contentType,
+    sizeBytes: parsed.data.sizeBytes,
+    expiresInMinutes: SAS_EXPIRY_MINUTES,
+  });
   if (!result) {
     throw new AppError(
       'Unable to generate upload URL',
@@ -73,9 +87,10 @@ export const GET = withErrorHandling(async (request) => {
   }
 
   return Response.json({
-    uploadUrl: result.uploadUrl,
     recordingUrl: result.recordingUrl,
     objectName,
+    contentType,
     expiresInSeconds: SAS_EXPIRY_MINUTES * 60,
+    upload: result.upload,
   });
 });

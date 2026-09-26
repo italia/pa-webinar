@@ -1,0 +1,29 @@
+# Nome pubblico dello storage, con il certificato di un Secret TLS.
+# Modello di storage.sh (--tls-secret).
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: @@NAME@@
+  labels:
+    app.kubernetes.io/name: garage
+    app.kubernetes.io/instance: @@RELEASE@@
+    app.kubernetes.io/part-of: pa-webinar
+    app.kubernetes.io/managed-by: pa-webinar-addons
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+spec:
+  ingressClassName: traefik
+  tls:
+    - hosts: [@@HOST@@]
+      secretName: @@TLS_SECRET@@
+  rules:
+    - host: @@HOST@@
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: @@NAME@@
+                port:
+                  name: s3

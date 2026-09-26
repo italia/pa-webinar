@@ -5,7 +5,8 @@
  *
  * Deletes every Registration row for the email-hash carried by the
  * token, along with the cascade-deleted Q&A, poll votes, feedback and
- * reminders attached to those registrations. Recordings tied to the
+ * reminders attached to those registrations, and the address-book entry
+ * (Person, ADR-011) with the same email-hash. Recordings tied to the
  * underlying Event are NOT deleted here — they are governed by the
  * event-level retention cron and are subject to separate legal-hold
  * rules.
@@ -45,13 +46,21 @@ export const POST = withErrorHandling(async (request) => {
 
   const { emailHash } = verified;
 
+  // La voce di rubrica e' un dato della stessa persona, e sopravviveva: le
+  // iscrizioni la puntano con onDelete SetNull, quindi cancellarle non la
+  // toglieva. Va via anche quando non resta nessuna iscrizione (la rubrica
+  // dura oltre la conservazione degli eventi). Inviti e relatori che la
+  // citano restano, con il collegamento azzerato.
+  const addressBook = await prisma.person.deleteMany({ where: { emailHash } });
+  const addressBookDeleted = addressBook.count > 0;
+
   const registrations = await prisma.registration.findMany({
     where: { emailHash },
     select: { id: true, eventId: true },
   });
 
   if (registrations.length === 0) {
-    return Response.json({ ok: true, deleted: 0 });
+    return Response.json({ ok: true, deleted: 0, addressBookDeleted });
   }
 
   const registrationIds = registrations.map((r) => r.id);
@@ -73,10 +82,11 @@ export const POST = withErrorHandling(async (request) => {
         details: JSON.stringify({
           source: 'gdpr-erasure-endpoint',
           emailHashPrefix: emailHash.substring(0, 8),
+          addressBookDeleted,
         }),
       },
     });
   }
 
-  return Response.json({ ok: true, deleted: deleted.count });
+  return Response.json({ ok: true, deleted: deleted.count, addressBookDeleted });
 });

@@ -15,7 +15,8 @@ import { withErrorHandling } from '@/lib/api-handler';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
 import { prisma } from '@/lib/db';
 import { UnauthorizedError } from '@/lib/errors';
-import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
+import { activeStatusWhere } from '@/lib/status/event-activity';
+import { getLocalized, resolveLocale, type LocalizedField } from '@/lib/utils/locale';
 
 export const dynamic = 'force-dynamic';
 
@@ -93,6 +94,8 @@ export const GET = withErrorHandling(async (request) => {
   const url = new URL(request.url);
   const { range, since, bucket } = parseRange(url.searchParams.get('range'));
   const now = new Date();
+  // I titoli nella lingua della pagina (?locale=).
+  const locale = resolveLocale(request);
 
   const [
     eventsInRange,
@@ -152,12 +155,17 @@ export const GET = withErrorHandling(async (request) => {
         },
       },
     }),
+    // La regola dei contatori della pagina di stato (lib/status/event-activity):
+    // le dirette contano anche oltre l'orario di fine.
     prisma.event.groupBy({
       by: ['status'],
       _count: { id: true },
       where: {
-        status: { in: ['LIVE', 'IDLE', 'PROVISIONING'] },
-        endsAt: { gte: now },
+        OR: [
+          activeStatusWhere('LIVE', now),
+          activeStatusWhere('IDLE', now),
+          activeStatusWhere('PROVISIONING', now),
+        ],
       },
     }),
   ]);
@@ -218,7 +226,7 @@ export const GET = withErrorHandling(async (request) => {
   for (const e of eventsInRange) {
     if (!mostCrowded || e.peakParticipants > mostCrowded.peak) {
       mostCrowded = {
-        title: getLocalized(e.title as LocalizedField, 'it'),
+        title: getLocalized(e.title as LocalizedField, locale),
         peak: e.peakParticipants,
         startedAt: e.createdAt.toISOString(),
       };
@@ -275,7 +283,7 @@ export const GET = withErrorHandling(async (request) => {
     recentCalls: recentCallSessions.map((cs) => ({
       id: cs.id,
       eventId: cs.eventId,
-      eventTitle: getLocalized(cs.event.title as LocalizedField, 'it'),
+      eventTitle: getLocalized(cs.event.title as LocalizedField, locale),
       eventSlug: cs.event.slug,
       jitsiRoomName: cs.jitsiRoomName,
       startedAt: cs.startedAt.toISOString(),

@@ -9,13 +9,13 @@ import {
   CardBody,
   Col,
   FormGroup,
-  Icon,
   Input,
   Label,
   Row,
   Spinner,
   Badge,
 } from 'design-react-kit';
+import { Icon } from '@/components/ui/icon';
 import { locales, localeNames, type Locale } from '@/i18n/config';
 
 interface LanguageConfig {

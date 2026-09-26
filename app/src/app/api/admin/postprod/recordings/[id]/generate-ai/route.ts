@@ -3,7 +3,7 @@
  *
  * Recording-scoped "start the AI pipeline" for the admin postprod page.
  *
- * Closes the F15 trap: a recording captured while the event had AI disabled
+ * Closes a dead end: a recording captured while the event had AI disabled
  * (or an AUDIO-ONLY multitrack recording, whose transcription only ever
  * auto-enqueues at event end) sits at status=READY with zero jobs, and every
  * launch control on the page is gated on an existing transcript. The plain
@@ -22,19 +22,18 @@
 import { cookies } from 'next/headers';
 
 import { withErrorHandling } from '@/lib/api-handler';
-import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { requireRecordingManager } from '@/lib/auth/staff-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { enqueuePostprodForRecording } from '@/lib/ai/enqueue';
 import { prisma } from '@/lib/db';
-import { NotFoundError, UnauthorizedError, ValidationError } from '@/lib/errors';
+import { NotFoundError, ValidationError } from '@/lib/errors';
 
 export const dynamic = 'force-dynamic';
 
 export const POST = withErrorHandling(async (request, context) => {
-  const isAdmin = await isAdminAuthenticated(await cookies());
-  if (!isAdmin) throw new UnauthorizedError();
-
   const { id } = await (context as { params: Promise<{ id: string }> }).params;
+  // Dell'evento della registrazione: l'admin o chi l'ha creato (ADR-014).
+  await requireRecordingManager(await cookies(), id);
 
   // Master kill-switch first, so we never flip flags then leave nothing enqueued.
   const site = await prisma.siteSetting.findUnique({

@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // resolveTokenSender pulls the grant resolver, the registration row, the PII
-// decryptor, and the F7 cookie-ownership reader. Mock all four so the test is a
+// decryptor, and the cookie-ownership reader. Mock all four so the test is a
 // pure check of the identity gate: an owning registrant is named from their DB
 // name; a forwarded-link opener is named from the typed override — never the
 // registrant's DB name — while keeping the pre-existing reg-<id> seat.
@@ -30,7 +30,7 @@ const mockedOwned = readOwnedEventAccessToken as unknown as ReturnType<typeof vi
 
 const EVENT = { id: 'evt-1', moderatorToken: 'MOD_TOKEN', moderatorName: 'Org' };
 
-describe('resolveTokenSender — F7 registration name gate', () => {
+describe('resolveTokenSender — registration name gate', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockedGrant.mockResolvedValue(null); // participant token: never a grant
@@ -57,7 +57,7 @@ describe('resolveTokenSender — F7 registration name gate', () => {
   it('forwarded opener (no matching cookie): typed name, NOT the DB name', async () => {
     mockedOwned.mockResolvedValue(null); // this browser owns no token for the event
     const sender = await resolveTokenSender(EVENT, 'ALICE_TOKEN', 'Bob');
-    // Same reg-<id> seat as HEAD (so analytics/rate-limit identity is unchanged),
+    // Same reg-<id> seat as the owner (so analytics/rate-limit identity is unchanged),
     // but named from what Bob typed — never Alice's decrypted DB name.
     expect(sender).toEqual({
       eventId: 'evt-1',

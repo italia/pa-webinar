@@ -1,4 +1,37 @@
 {
+  "0.12.0": {
+    "title": "Gotowe do ponownego wykorzystania: instalacja jednym poleceniem, a wydarzenia toczą się same",
+    "notes": [
+      "Instalacja jednym poleceniem: na komputerze z minikube do testowania i rozwoju, na serwerze k3s do produkcji, z certyfikatami, testową skrzynką pocztową, magazynem obiektów, TURN i zaplanowaną kopią zapasową. Każdą instalację można sprawdzić jednym poleceniem, kopia zapasowa i przywracanie bazy danych i plików mają własne skrypty, a dokumentacja, teraz po angielsku, zawiera przewodniki dla minikube, k3s, AKS, GKE i EKS oraz listy kontrolne przed uruchomieniem produkcyjnym.",
+      "Wydarzenia otwierają się o godzinie rozpoczęcia i zamykają na koniec także w instalacjach bez automatycznego uruchamiania mostów wideo. „Rozpocznij wydarzenie” jest zawsze dostępne dla osoby prowadzącej, a wydarzenie nie utyka już w stanie „Przygotowywanie”.",
+      "Imienne konta dla personelu: administratorzy i organizatorzy logują się osobistym linkiem otrzymanym e-mailem, a każdy widzi tylko to, na co pozwala jego rola. Klucz instancji pozostaje do pierwszego logowania i na sytuacje awaryjne.",
+      "E-maile po włosku, angielsku, francusku, niemiecku i hiszpańsku, w języku odbiorcy. Osobiste linki moderatorów i prelegentów przychodzą e-mailem, przypomnienia nie przychodzą już wszystkie naraz, a zaproszenia do kalendarza już się nie dublują.",
+      "W wideokonferencji rola zależy od linku, którym się wchodzi: goście i osoby zarejestrowane są uczestnikami i nie mogą już wyciszyć ani usunąć moderatora.",
+      "W sali: pytania, głosowania i chmura słów działają także dla gości i prelegentów; materiały przyjmują pliki oprócz linków; kto wyjdzie sam, może wrócić, zamiast widzieć „Wydarzenie zakończone”; jeśli wideokonferencja jest nieosiągalna, sala o tym informuje i proponuje „Ponów”; kamera i mikrofon uczestników startują wyłączone; wirtualne tło można wybrać już w poczekalni.",
+      "Prywatność: czat nie przekazuje już obecnym adresu IP gości; linki do eksportu lub usunięcia własnych danych prowadzą pod właściwy adres; informacja i zgoda na nagrywanie pojawiają się wszędzie tam, gdzie coś może nagrywać.",
+      "Strona statusu sprawdza usługi od wewnątrz i nie zgłasza już awarii z powodu niepublicznego certyfikatu; instalacje ze stałym mostem wideo są wyświetlane poprawnie.",
+      "Administracja: odbieranie uprawnień współmoderatorom i prelegentom w kreatorze naprawdę działa, kreator informuje, czego nie zapisano, a po publikacji trafia się na stronę wydarzenia. Szybkie połączenia nie mają już strony publicznej, a udostępniane linki pokazują podgląd wydarzenia.",
+      "Przy aktualizacji: Prosody, Jicofo, konferencja webowa i most wideo uruchamiają się ponownie jeden raz, dlatego najlepiej aktualizować, gdy nie trwają żadne wydarzenia; kto ma własne wolumeny lub moduły Prosody, musi dodać te z chartu; bez scalera wydarzenia na żywo zamykają się teraz po czasie zakończenia powiększonym o okres karencji."
+    ]
+  },
+  "0.11.0": {
+    "title": "Sala reaguje teraz w chwili, gdy coś się zmienia",
+    "notes": [
+      "Pytania, ankiety, agenda i chmura słów odświeżają się, gdy tylko coś się zmieni, zamiast odpytywać serwer co kilka sekund: osoba w sali widzi pytanie od razu, a przy licznym wydarzeniu ruch spada wyraźnie.",
+      "Mniej pracy również dla serwera: okresowe sprawdzenia sali pobierają teraz tylko potrzebne dane, a materiały — które zmieniają się rzadko — są sprawdzane rzadziej.",
+      "Jeśli natychmiastowe połączenie jest niedostępne, sala sama wraca do wcześniejszego sprawdzania okresowego: żadna funkcja nie przestaje działać z powodu nowego mechanizmu.",
+      "Poprawki: otwarcie dwóch nowych chmur słów krótko po sobie mogło pozostawić jedną niewidoczną, a wysłane do niej słowa nie pojawiały się nikomu; strona stanu usługi zawsze podawała ten sam numer wersji zamiast tej faktycznie działającej."
+    ]
+  },
+  "0.10.0": {
+    "title": "Pytania na czacie, prostsze serie cykliczne i przywrócone barwy instytucjonalne",
+    "notes": [
+      "Osoba pisząca na czacie może oznaczyć własną wiadomość jako pytanie: moderatorzy oznaczają je jako obsłużone albo odkładają, a filtr pokazuje tylko pytania. W czasie wydarzenia nie ma drugiego kanału do pilnowania.",
+      "Pytania z czatu, wraz z otrzymanymi reakcjami, pojawiają się na publicznej stronie podsumowania wydarzenia i pozostają czytelne także po usunięciu danych osobowych uczestników.",
+      "Przygotowanie kolejnego wydarzenia z serii jest szybsze: kopia wydarzenia przenosi tagi, organizatorów, współmoderatorów (każdy z nowymi danymi dostępu), agendę, ankiety i przypomnienia, a szablony zachowują ustawienia nagrywania i późniejszego przetwarzania.",
+      "Poprawki: barwy instytucjonalne znów są takie, jakie powinny być — pasek u góry witryny wyświetlał się na biało —, przycisk tworzący kopię wydarzenia nie prowadzi już do nieistniejącej strony, a po upływie okresu przechowywania usuwane są również dane kontaktowe zaproszonych oraz wyznaczonych moderatorów i prelegentów."
+    ]
+  },
   "0.9.0": {
     "title": "Bezpieczeństwo zależności, zaktualizowana dokumentacja i pełne środowisko lokalne",
     "notes": [

@@ -42,7 +42,33 @@ export interface LobbyConfig {
    * Default false (stand-alone full-screen lobby).
    */
   embed?: boolean;
+  /**
+   * Testi del cancello, gia' tradotti dalla pagina che ospita la piazza.
+   * Mancanti, restano quelli italiani: la piazza si usa anche da sola, nel
+   * banco di prova. `{time}` in `startsIn` e' il conto alla rovescia.
+   */
+  labels?: Partial<GateLabels>;
 }
+
+export interface GateLabels {
+  gateOpen: string;
+  stageLive: string;
+  gatePreparing: string;
+  stagePreparing: string;
+  ended: string;
+  startsIn: string;
+  hostEarly: string;
+}
+
+export const DEFAULT_GATE_LABELS: GateLabels = {
+  gateOpen: 'Ingresso aperto',
+  stageLive: '● IN DIRETTA',
+  gatePreparing: 'La sala si sta preparando…',
+  stagePreparing: 'Fra poco',
+  ended: 'Evento terminato',
+  startsIn: 'Inizia tra {time}',
+  hostEarly: 'Ingresso anticipato (host)',
+};
 
 export interface LobbyDeps {
   presence: PresenceClient;

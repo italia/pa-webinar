@@ -43,6 +43,9 @@ interface EditableSegment {
   end: number;
   text: string;
   speaker: string | null;
+  /** Il testo come l'ha prodotto la macchina, solo dove differisce da quello
+   *  corrente. Null quando coincidono o quando non è stato conservato. */
+  originalText?: string | null;
 }
 
 interface RosterEntry {
@@ -61,6 +64,21 @@ interface TranscriptResponse {
   /** False when no TRANSCRIPT_JSON exists yet (pipeline not run / still
    *  processing) — distinct from an existing transcript with 0 segments. */
   hasTranscript: boolean;
+  /** Presente dalla prima correzione: dice quando è stato conservato il testo
+   *  della macchina e quale modello l'aveva prodotto. */
+  original?: {
+    capturedAt: string;
+    modelId: string | null;
+    modelVersion: string | null;
+    /** Falso se il numero di segmenti non coincide: in quel caso non si
+     *  confronta riga per riga. */
+    comparable: boolean;
+    /** Falso quando il testo conservato potrebbe già includere correzioni
+     *  fatte prima che questa funzione esistesse. */
+    certainMachineOrigin: boolean;
+  } | null;
+  /** Quando una persona ha corretto questa trascrizione. */
+  revisedAt?: string | null;
 }
 
 interface Draft {
@@ -97,6 +115,16 @@ export default function TranscriptEditor({
   const [savedMsg, setSavedMsg] = useState<string | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [activeIndex, setActiveIndex] = useState(-1);
+  // Spento di default: la versione della macchina è un riferimento da
+  // consultare, non qualcosa che deve stare sempre sotto gli occhi mentre si
+  // corregge.
+  const [mostraOriginale, setMostraOriginale] = useState(false);
+  // Cancellazione, non correzione: applica le stesse modifiche anche al testo
+  // conservato della macchina. Spento di default, perché una correzione
+  // ordinaria non deve riscrivere ciò che la macchina aveva prodotto — ma
+  // senza questo comando una riga svuotata resterebbe nella copia, e chi la
+  // svuota crederebbe di averla cancellata.
+  const [redazione, setRedazione] = useState(false);
   const playerRef = useRef<TimelineControls | null>(null);
   const segScrollRef = useRef<HTMLDivElement>(null);
 
@@ -175,6 +203,10 @@ export default function TranscriptEditor({
 
   async function save(): Promise<void> {
     if (dirtySegments.length === 0) return;
+    // Il valore spedito decide come va letta la risposta: si legge una volta
+    // sola, all'inizio. Il cambio in corsa lo impedisce `disabled={saving}`
+    // sulla casella; questa è la lettura unica del contratto.
+    const cancellazione = redazione;
     setSaving(true);
     setSavedMsg(null);
     setSaveError(null);
@@ -189,7 +221,7 @@ export default function TranscriptEditor({
           method: 'PUT',
           credentials: 'include',
           headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ edits }),
+          body: JSON.stringify({ edits, redactOriginal: cancellazione }),
         },
       );
       if (!r.ok) {
@@ -203,14 +235,48 @@ export default function TranscriptEditor({
         );
         return;
       }
-      const res = (await r.json()) as { textChanges: number; speakerChanges: number };
-      setDrafts({});
-      setSavedMsg(
-        t('editSaved', {
-          text: res.textChanges,
-          speaker: res.speakerChanges,
-        }),
-      );
+      const res = (await r.json()) as {
+        textChanges: number;
+        speakerChanges: number;
+        // Presenti solo in risposta a una cancellazione: la rotta li emette
+        // con uno spread condizionato a `redactOriginal`.
+        redazioniApplicate?: number;
+        archivioAggiornato?: boolean;
+      };
+      // Le modifiche si azzerano solo se sono state applicate davvero. Con la
+      // riscrittura dell'archivio fallita si chiede di ripetere la
+      // cancellazione: azzerandole, il pulsante da ripremere resterebbe
+      // disabilitato, perche' si abilita solo con modifiche in sospeso.
+      if (!(cancellazione && res.archivioAggiornato === false)) setDrafts({});
+      if (!cancellazione) {
+        setSavedMsg(
+          t('editSaved', {
+            text: res.textChanges,
+            speaker: res.speakerChanges,
+          }),
+        );
+      } else if (res.archivioAggiornato === false) {
+        // La banca dati è già riscritta, il file archiviato no: la frase
+        // rimossa resta scaricabile. La casella NON si spegne — il nuovo
+        // tentativo deve restare una cancellazione — e non si mostra nessun
+        // messaggio di successo accanto all'errore.
+        setSavedMsg(null);
+        setSaveError(t('redactArchiveFailed'));
+      } else if (!res.redazioniApplicate) {
+        // Le correzioni sono state scritte; nel testo conservato non c'era
+        // nulla da togliere per le righe toccate. Si dichiara e basta: non ha
+        // senso chiedere di ripetere un'operazione dall'esito identico.
+        setRedazione(false);
+        setSavedMsg(null);
+        setSaveError(t('redactNothingRemoved'));
+      } else {
+        // Una cancellazione vale per il salvataggio in cui è stata chiesta, e
+        // per quello soltanto. Lasciata accesa, la correzione successiva
+        // riscriverebbe di nascosto il testo della macchina delle righe
+        // toccate: esattamente ciò che questo comando esiste per non fare.
+        setRedazione(false);
+        setSavedMsg(t('redactSaved', { n: res.redazioniApplicate }));
+      }
       await mutate();
       onSaved?.();
     } catch {
@@ -225,6 +291,32 @@ export default function TranscriptEditor({
       <div className="d-flex align-items-center gap-2 mb-2">
         <strong className="small">{t('editTranscriptTitle')}</strong>
         <span className="badge bg-light text-dark">{data.sourceLanguage}</span>
+        {data.revisedAt ? (
+          <span className="badge bg-warning text-dark" title={t('revisedHint')}>
+            {t('revisedBadge')}
+          </span>
+        ) : null}
+        {data.original && !data.original.certainMachineOrigin ? (
+          <span className="badge bg-light text-dark" title={t('originalUncertainHint')}>
+            {t('originalUncertain')}
+          </span>
+        ) : null}
+        {data.original ? (
+          <button
+            type="button"
+            className={`btn btn-sm ${mostraOriginale ? 'btn-secondary' : 'btn-outline-secondary'}`}
+            aria-pressed={mostraOriginale}
+            onClick={() => setMostraOriginale((v) => !v)}
+            title={
+              data.original.comparable
+                ? t('originalToggleHint')
+                : t('originalNotComparable')
+            }
+            disabled={!data.original.comparable}
+          >
+            {t('originalToggle')}
+          </button>
+        ) : null}
         <div className="ms-auto d-flex align-items-center gap-2">
           {savedMsg && <span className="small text-success">{savedMsg}</span>}
           {saveError && <span className="small text-danger">{saveError}</span>}
@@ -233,13 +325,32 @@ export default function TranscriptEditor({
               {t('editDirty', { n: dirtySegments.length })}
             </span>
           )}
+          {data.original ? (
+            <div className="form-check form-check-inline mb-0">
+              <input
+                className="form-check-input"
+                type="checkbox"
+                id="redazione-originale"
+                checked={redazione}
+                disabled={saving}
+                onChange={(e) => setRedazione(e.target.checked)}
+              />
+              <label
+                className="form-check-label small"
+                htmlFor="redazione-originale"
+                title={t('redactHint')}
+              >
+                {t('redactLabel')}
+              </label>
+            </div>
+          ) : null}
           <button
             type="button"
-            className="btn btn-sm btn-primary"
+            className={`btn btn-sm ${redazione ? 'btn-danger' : 'btn-primary'}`}
             disabled={dirtySegments.length === 0 || saving}
             onClick={() => void save()}
           >
-            {saving ? t('editSaving') : t('editSave')}
+            {saving ? t('editSaving') : redazione ? t('redactSave') : t('editSave')}
           </button>
         </div>
       </div>
@@ -312,6 +423,15 @@ export default function TranscriptEditor({
                       value={d.text}
                       onChange={(e) => setDraft(seg, { text: e.target.value })}
                     />
+                    {mostraOriginale && seg.originalText ? (
+                      <p
+                        className="mt-1 mb-0 small text-muted"
+                        style={{ borderLeft: '3px solid #c5c7c9', paddingLeft: '.5rem' }}
+                      >
+                        <span className="fw-semibold">{t('originalLabel')}</span>{' '}
+                        {seg.originalText}
+                      </p>
+                    ) : null}
                   </td>
                 </tr>
               );

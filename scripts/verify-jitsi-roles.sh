@@ -6,11 +6,15 @@
 #
 # Prerequisites: curl, jq, base64
 # Usage: ./scripts/verify-jitsi-roles.sh [base-url] [admin-api-key]
+#
+# La chiave si passa meglio nell'ambiente, fuori dalla riga di comando (che
+# `ps` mostra a tutti): ADMIN_API_KEY=... ./scripts/verify-jitsi-roles.sh <url>
+# Senza chiave vale quella di sviluppo di docker-compose.yml.
 
 set -euo pipefail
 
 BASE_URL="${1:-http://localhost:3000}"
-ADMIN_KEY="${2:-dev_admin_key_2026}"
+ADMIN_KEY="${ADMIN_API_KEY:-${2:-dev_admin_key_2026}}"
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -27,13 +31,11 @@ echo ""
 
 # ── Step 1: Authenticate as admin ─────────────────────────────
 echo "=== Step 1: Authenticate as admin ==="
-LOGIN_RESPONSE=$(curl -s -X POST "$BASE_URL/api/admin/login" \
+# La rotta legge `key`. Il corpo passa a curl da standard input, non come
+# argomento.
+ADMIN_COOKIE=$(printf '%s' "$ADMIN_KEY" | jq -Rs '{key: .}' | curl -s -D - -o /dev/null -X POST "$BASE_URL/api/admin/login" \
   -H 'Content-Type: application/json' \
-  -d "{\"apiKey\": \"$ADMIN_KEY\"}")
-
-ADMIN_COOKIE=$(curl -s -D - -o /dev/null -X POST "$BASE_URL/api/admin/login" \
-  -H 'Content-Type: application/json' \
-  -d "{\"apiKey\": \"$ADMIN_KEY\"}" 2>/dev/null | grep -i 'set-cookie' | head -1 | sed 's/[Ss]et-[Cc]ookie: //' | cut -d';' -f1)
+  --data-binary @- 2>/dev/null | grep -i '^set-cookie: admin_session=' | head -1 | sed 's/^[Ss]et-[Cc]ookie: //' | cut -d';' -f1 | tr -d '\r')
 
 if [ -z "$ADMIN_COOKIE" ]; then
   echo "ERROR: Failed to authenticate as admin. Check ADMIN_API_KEY."
@@ -52,10 +54,8 @@ EVENT_RESPONSE=$(curl -s -X POST "$BASE_URL/api/events" \
   -H 'Content-Type: application/json' \
   -H "Cookie: $ADMIN_COOKIE" \
   -d "{
-    \"titleIt\": \"Test Verifica Ruoli Jitsi\",
-    \"titleEn\": \"Jitsi Role Verification Test\",
-    \"descriptionIt\": \"Test automatico per verifica ruoli JWT\",
-    \"descriptionEn\": \"Automated JWT role verification test\",
+    \"title\": {\"it\": \"Test Verifica Ruoli Jitsi\", \"en\": \"Jitsi Role Verification Test\"},
+    \"description\": {\"it\": \"Test automatico per verifica ruoli JWT\", \"en\": \"Automated JWT role verification test\"},
     \"startsAt\": \"$STARTS_AT\",
     \"endsAt\": \"$ENDS_AT\",
     \"maxParticipants\": 10,
@@ -75,17 +75,27 @@ fi
 
 echo "Event created: $SLUG (ID: $EVENT_ID)"
 
+# L'evento di prova si cancella anche se lo script si ferma prima della fine:
+# altrimenti resta in diretta.
+# shellcheck disable=SC2329 # la chiama il trap EXIT qui sotto
+cleanup_on_exit() {
+  curl -s -X DELETE "$BASE_URL/api/events/$EVENT_ID" -H "Authorization: Bearer $MOD_TOKEN" > /dev/null || true
+}
+trap cleanup_on_exit EXIT
+
 # ── Step 3: Publish the event ─────────────────────────────────
 echo ""
 echo "=== Step 3: Publish event ==="
-curl -s -X PUT "$BASE_URL/api/events/$EVENT_ID?token=$MOD_TOKEN" \
+curl -s -X PUT "$BASE_URL/api/events/$EVENT_ID" \
+  -H "Authorization: Bearer $MOD_TOKEN" \
   -H 'Content-Type: application/json' \
   -d '{"status": "PUBLISHED"}' | jq '{status}'
 
 # ── Step 4: Set event to LIVE ─────────────────────────────────
 echo ""
 echo "=== Step 4: Set event LIVE ==="
-curl -s -X PUT "$BASE_URL/api/events/$EVENT_ID?token=$MOD_TOKEN" \
+curl -s -X PUT "$BASE_URL/api/events/$EVENT_ID" \
+  -H "Authorization: Bearer $MOD_TOKEN" \
   -H 'Content-Type: application/json' \
   -d '{"status": "LIVE"}' | jq '{status}'
 
@@ -106,7 +116,7 @@ if [ "$ACCESS_TOKEN" = "null" ] || [ -z "$ACCESS_TOKEN" ]; then
   echo "ERROR: Failed to register participant"
   echo "$REG_RESPONSE" | jq .
   # Cleanup before exiting
-  curl -s -X DELETE "$BASE_URL/api/events/$EVENT_ID?token=$MOD_TOKEN" > /dev/null
+  curl -s -X DELETE "$BASE_URL/api/events/$EVENT_ID" -H "Authorization: Bearer $MOD_TOKEN" > /dev/null
   exit 1
 fi
 
@@ -117,7 +127,7 @@ echo ""
 echo "=== Step 6: Moderator JWT ==="
 MOD_JWT_RESPONSE=$(curl -s -X POST "$BASE_URL/api/events/$SLUG/jitsi/token" \
   -H 'Content-Type: application/json' \
-  -d "{\"moderatorToken\": \"$MOD_TOKEN\"}")
+  -d "{\"moderatorToken\": \"$MOD_TOKEN\", \"displayNameOverride\": \"Test Moderator\"}")
 
 MOD_JWT=$(echo "$MOD_JWT_RESPONSE" | jq -r '.jwt')
 MOD_ROLE=$(echo "$MOD_JWT_RESPONSE" | jq -r '.role')
@@ -149,7 +159,7 @@ echo ""
 echo "=== Step 7: Participant JWT ==="
 PART_JWT_RESPONSE=$(curl -s -X POST "$BASE_URL/api/events/$SLUG/jitsi/token" \
   -H 'Content-Type: application/json' \
-  -d "{\"accessToken\": \"$ACCESS_TOKEN\"}")
+  -d "{\"accessToken\": \"$ACCESS_TOKEN\", \"displayNameOverride\": \"Test Participant\"}")
 
 PART_JWT=$(echo "$PART_JWT_RESPONSE" | jq -r '.jwt')
 PART_ROLE=$(echo "$PART_JWT_RESPONSE" | jq -r '.role')
@@ -238,7 +248,8 @@ fi
 # ── Step 9: Cleanup ──────────────────────────────────────────
 echo ""
 echo "=== Cleanup ==="
-CLEANUP_RESULT=$(curl -s -X DELETE "$BASE_URL/api/events/$EVENT_ID?token=$MOD_TOKEN")
+trap - EXIT
+CLEANUP_RESULT=$(curl -s -X DELETE "$BASE_URL/api/events/$EVENT_ID" -H "Authorization: Bearer $MOD_TOKEN")
 echo "$CLEANUP_RESULT" | jq '{deleted: .deleted}' 2>/dev/null || echo "$CLEANUP_RESULT"
 
 echo ""

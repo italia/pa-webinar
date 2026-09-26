@@ -1,8 +1,6 @@
-import { cookies } from 'next/headers';
-import { redirect } from 'next/navigation';
 import { getTranslations, getLocale } from 'next-intl/server';
 
-import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { soloAdmin } from '@/lib/auth/staff-page';
 import { prisma } from '@/lib/db';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import RegistrationsDashboard from '@/components/admin/registrations-dashboard';
@@ -11,10 +9,8 @@ export const dynamic = 'force-dynamic';
 
 export default async function RegistrationsPage() {
   const locale = await getLocale();
-  const isAdmin = await isAdminAuthenticated(await cookies());
-  if (!isAdmin) {
-    redirect(`/${locale}/admin/login`);
-  }
+  const negato = await soloAdmin(locale);
+  if (negato) return negato;
 
   const t = await getTranslations('admin.registrations');
 

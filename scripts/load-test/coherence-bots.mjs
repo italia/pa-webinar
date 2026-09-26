@@ -12,7 +12,7 @@
  *   - staggered join  → late-join offsets in the merged timeline
  *
  * Env:
- *   JITSI_DOMAIN        e.g. pa-webinar-jitsi.developers.italia.it
+ *   JITSI_DOMAIN        Jitsi hostname of the deploy under test (e.g. jitsi.example.com)
  *   JITSI_ROOM          room name (must match the recorder's room, incl. any suffix)
  *   JITSI_JWT_SECRET    HS256 secret (Prosody)
  *   JITSI_JWT_ISSUER    (pa-webinar)  JITSI_JWT_AUDIENCE (jitsi)  JITSI_JWT_SUBJECT (domain)

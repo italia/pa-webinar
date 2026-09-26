@@ -1,7 +1,19 @@
 {
+  "agenda": {
+    "title": "Notities / Checklist",
+    "empty": "Nog geen punten. Voeg de te bespreken onderwerpen toe en vink ze gaandeweg af.",
+    "add": "Toevoegen",
+    "addPlaceholder": "Nieuw punt…",
+    "remove": "Verwijderen",
+    "inProgress": "bezig",
+    "agree": "Eens",
+    "disagree": "Oneens",
+    "favorablePct": "{pct}% voor",
+    "noReactions": "Geef uw mening"
+  },
   "common": {
-    "appName": "DTD Evenementen",
-    "appDescription": "Platform voor publieke digitale evenementen van het Departement voor Digitale Transformatie",
+    "appName": "PA Webinar",
+    "appDescription": "Platform voor publieke digitale evenementen",
     "loading": "Laden...",
     "error": "Er is een fout opgetreden",
     "errorMessage": "Er is iets misgegaan. Probeer het opnieuw.",
@@ -42,8 +54,6 @@
     "skipToFooter": "Ga naar footer"
   },
   "header": {
-    "slimTitle": "Voorzitterschap van de Raad van Ministers",
-    "slimSubtitle": "Departement voor Digitale Transformatie",
     "followUs": "Volg ons op"
   },
   "events": {
@@ -52,6 +62,7 @@
     "past": "Eerdere evenementen",
     "noUpcoming": "Momenteel geen evenementen gepland. Kom binnenkort terug!",
     "noPast": "Geen eerdere evenementen",
+    "wordCloudTitle": "Woordwolk",
     "card": {
       "publicEvent": "Publiek evenement",
       "readMore": "Meer informatie",
@@ -61,6 +72,22 @@
       "ended": "Afgelopen",
       "occupiedSpots": "{registered}/{max} ingeschreven",
       "registeredCount": "{count, plural, =0 {Geen aanmeldingen} one {1 aanmelding} other {# aanmeldingen}}"
+    },
+    "recap": {
+      "title": "Samenvatting van het evenement",
+      "intro": "Een overzicht van wat er tijdens het evenement aan bod is gekomen.",
+      "participants": "Deelnemers (piek)",
+      "registered": "Geregistreerd",
+      "topQuestions": "Vragen met de meeste stemmen",
+      "upvotes": "{count, plural, =0 {geen stemmen} one {1 stem} other {# stemmen}}",
+      "polls": "Resultaten van de peilingen",
+      "votes": "{count, plural, =0 {geen stemmen} one {1 stem} other {# stemmen}}",
+      "topWords": "Meest gedeelde woorden",
+      "feedback": "Gemiddelde beoordeling",
+      "feedbackCount": "{count, plural, one {1 antwoord} other {# antwoorden}}",
+      "chatQuestions": "Vragen uit de chat",
+      "reactionsCount": "{count, plural, one {1 reactie} other {# reacties}}",
+      "answered": "beantwoord"
     },
     "detail": {
       "title": "Evenementdetails",
@@ -85,6 +112,10 @@
       "noRecording": "Er is geen video-opname beschikbaar voor dit evenement.",
       "watchRecording": "Opname bekijken",
       "backToEvents": "Terug naar evenementen",
+      "alreadyRegisteredEnter": "Al geregistreerd? Ga naar de zaal",
+      "invalidTokenTitle": "Toegangslink niet meer geldig",
+      "invalidTokenBody": "De link die u hebt gebruikt is ongeldig of verlopen. Als u zich hebt geregistreerd, vindt u uw persoonlijke link in de bevestigingsmail; registreer u anders hieronder opnieuw.",
+      "invalidTokenBodyEnded": "De link die u hebt gebruikt is niet meer geldig. Het evenement is afgelopen: hieronder vindt u de opname en het materiaal.",
       "speakers": "Sprekers",
       "organizer": "Organisator",
       "chatNotSaved": "Chatberichten worden niet opgeslagen na afloop van het evenement.",
@@ -97,43 +128,27 @@
         "yahoo": "Yahoo Calendar",
         "downloadIcs": ".ics-bestand downloaden"
       },
-      "alreadyRegisteredEnter": "Al geregistreerd? Ga naar de zaal",
-      "invalidTokenTitle": "Toegangslink niet meer geldig",
-      "invalidTokenBody": "De link die u hebt gebruikt is ongeldig of verlopen. Als u zich hebt geregistreerd, vindt u uw persoonlijke link in de bevestigingsmail; registreer u anders hieronder opnieuw.",
-      "invalidTokenBodyEnded": "De link die u hebt gebruikt is niet meer geldig. Het evenement is afgelopen: hieronder vindt u de opname en het materiaal."
+      "registrationEnded": "Het evenement is afgelopen: de inschrijving is gesloten."
     },
     "manage": {
       "toggleChat": "Chat",
       "toggleQa": "Q&A",
       "toggleRecording": "Opname",
-      "settingsSection": "Evenementinstellingen",
       "sessionsAndRecordings": "Sessies en video-opnames",
       "postEventSection": "Na afloop en feedback"
     },
     "status": {
       "DRAFT": "Concept",
       "PUBLISHED": "Gepubliceerd",
+      "PROVISIONING": "In voorbereiding",
       "LIVE": "LIVE",
+      "IDLE": "Gepauzeerd",
       "ENDED": "Afgelopen",
       "ARCHIVED": "Gearchiveerd"
     },
     "list": {
       "filterByTag": "Filteren op categorie",
       "allTags": "Alle"
-    },
-    "wordCloudTitle": "Woordwolk",
-    "recap": {
-      "title": "Samenvatting van het evenement",
-      "intro": "Een overzicht van wat er tijdens het evenement aan bod is gekomen.",
-      "participants": "Deelnemers (piek)",
-      "registered": "Geregistreerd",
-      "topQuestions": "Vragen met de meeste stemmen",
-      "upvotes": "{count, plural, =0 {geen stemmen} one {1 stem} other {# stemmen}}",
-      "polls": "Resultaten van de peilingen",
-      "votes": "{count, plural, =0 {geen stemmen} one {1 stem} other {# stemmen}}",
-      "topWords": "Meest gedeelde woorden",
-      "feedback": "Gemiddelde beoordeling",
-      "feedbackCount": "{count, plural, one {1 antwoord} other {# antwoorden}}"
     }
   },
   "registration": {
@@ -148,12 +163,20 @@
     "submitting": "Bezig met inschrijven...",
     "success": "Inschrijving voltooid!",
     "successMessage": "U ontvangt een bevestigingsmail met de link om toegang te krijgen tot het evenement.",
-    "enteringRoom": "We're taking you to the event waiting room.",
-    "enteringRoomHint": "Opening the room…",
+    "successScheduledMessage": "U bent geregistreerd! We hebben u een e-mail gestuurd met uw persoonlijke toegangslink. Zet het evenement in uw agenda en kom kort voor aanvang weer terug.",
+    "addToCalendar": "Aan agenda toevoegen",
+    "enteringRoom": "We brengen u naar de wachtruimte van het evenement.",
+    "enteringRoomHint": "De zaal wordt geopend…",
     "alreadyRegistered": "U bent al ingeschreven voor dit evenement",
-    "resendLink": "Resend my access link",
-    "resending": "Sending…",
-    "resendSent": "If the address is registered, we've re-sent the access link by email.",
+    "resendLink": "Toegangslink opnieuw versturen",
+    "resending": "Bezig met verzenden…",
+    "resendSent": "Als het adres is ingeschreven, hebben we de toegangslink opnieuw per e-mail verstuurd.",
+    "invitationOnly": "Inschrijving is voorbehouden aan genodigden: gebruik het e-mailadres waarmee u bent uitgenodigd. De link om deel te nemen ontvangt u per e-mail.",
+    "closed": "Inschrijving voor dit evenement is niet openbaar.",
+    "lostLink": "Al ingeschreven? Ontvang uw persoonlijke link opnieuw",
+    "lostLinkHelp": "Vul het e-mailadres in waarmee u zich hebt ingeschreven: als het voor dit evenement is ingeschreven, sturen we u de link om deel te nemen opnieuw.",
+    "checkEmailTitle": "Controleer uw e-mail",
+    "checkEmail": "Als het adres op de uitnodigingslijst staat, ontvangt u binnenkort een e-mail met uw persoonlijke link naar de zaal. Kunt u die niet vinden, kijk dan in uw spammap.",
     "backToEvent": "Terug naar evenement",
     "organization": "Organisatie",
     "organizationPlaceholder": "bijv. AGID, Ministerie van Economie, Gemeente Rome",
@@ -181,12 +204,10 @@
       "organizationRequired": "Voer uw organisatie in",
       "consentRequired": "Toestemming voor gegevensverwerking is vereist",
       "recordingConsentRequired": "Toestemming voor opname is vereist voor dit evenement",
+      "multitrackConsentRequired": "Toestemming voor het opnemen van uw audiospoor is verplicht voor dit evenement",
       "eventFull": "Het evenement heeft het maximale aantal deelnemers bereikt",
-      "generic": "Fout bij inschrijving. Probeer het opnieuw.",
-      "multitrackConsentRequired": "Toestemming voor het opnemen van uw audiospoor is verplicht voor dit evenement"
-    },
-    "successScheduledMessage": "U bent geregistreerd! We hebben u een e-mail gestuurd met uw persoonlijke toegangslink. Zet het evenement in uw agenda en kom kort voor aanvang weer terug.",
-    "addToCalendar": "Aan agenda toevoegen"
+      "generic": "Fout bij inschrijving. Probeer het opnieuw."
+    }
   },
   "videoLibrary": {
     "title": "Videobibliotheek",
@@ -213,6 +234,8 @@
     "connecting": "Verbinden...",
     "connectionError": "Kan geen verbinding maken met de zaal. Controleer uw verbinding en probeer het opnieuw.",
     "activeVsRegistered": "{active} actief · {registered} aangemeld",
+    "enterFullscreen": "Volledig scherm",
+    "exitFullscreen": "Volledig scherm verlaten",
     "overtime": {
       "withCountdown": "De geplande eindtijd is verstreken. Het evenement wordt automatisch beëindigd over {minutes, plural, one {# minuut} other {# minuten}}.",
       "closingNow": "De eindtijd is bereikt. Het evenement wordt afgesloten.",
@@ -224,6 +247,27 @@
     "declineRecording": "Niet deelnemen",
     "enterRoom": "Zaal betreden",
     "leaveRoom": "Zaal verlaten",
+    "leaveChoice": {
+      "title": "Hoe wilt u de call verlaten?",
+      "body": "U kunt alleen zelf vertrekken — de call blijft actief voor de anderen — of de call voor alle deelnemers beëindigen.",
+      "leaveSelf": "Alleen zelf vertrekken",
+      "endForAll": "Voor iedereen beëindigen",
+      "ending": "Bezig met beëindigen…",
+      "endError": "Beëindigen mislukt. Probeer het opnieuw."
+    },
+    "endDestino": {
+      "title": "Bestemming van het evenement",
+      "body": "U staat op het punt het evenement voor iedereen te beëindigen. Wat moet ermee gebeuren zodra het is afgelopen?",
+      "public": "Openbaar houden",
+      "publicHelp": "De pagina van het afgelopen evenement blijft zichtbaar met samenvatting, vragen (Q&A), peilingen, materiaal en feedback.",
+      "library": "In de bibliotheek publiceren",
+      "libraryHelp": "Zoals hierboven, en bovendien wordt het evenement getoond in de openbare videobibliotheek (vereist een gepubliceerde opname of een YouTube-video).",
+      "archive": "Archiveren (privé)",
+      "archiveHelp": "De pagina van het afgelopen evenement wordt niet openbaar (404). De gegevens blijven bewaard tot de bewaartermijn verstrijkt en worden daarna verwijderd.",
+      "genAi": "AI-transcriptie en -samenvatting genereren uit de opname (zodra de verwerking klaar is)",
+      "back": "Terug",
+      "confirm": "Evenement beëindigen"
+    },
     "eventNotStarted": "Het evenement is nog niet begonnen",
     "eventStartsAt": "Het evenement begint op {date} om {time}",
     "countdown": "Resterende tijd",
@@ -241,11 +285,15 @@
     "guestJoinSubtitle": "Neem als gast deel aan het lopende evenement",
     "guestJoinButton": "Als gast deelnemen",
     "guestRedirectToRegister": "Het evenement is nog niet begonnen. Schrijf u in om een toegangslink te ontvangen.",
+    "guestAccessDisabled": "Voor dit evenement is inschrijving vereist: deelnemen als gast is niet mogelijk.",
     "jibriUnavailable": "Opname niet beschikbaar — Jibri niet geconfigureerd",
     "endEventError": "Fout bij het beëindigen van het evenement. Probeer het opnieuw.",
     "jibriNotConfigured": "Opname niet geconfigureerd in de infrastructuur",
     "jibriScaling": "Opname wordt gestart…",
     "jibriScalingTooltip": "De opnamecomponent wordt gestart. Hij is binnenkort beschikbaar.",
+    "recorderNotStarted": "Opname niet beschikbaar",
+    "recorderNotStartedDetail": "De opnamedienst is nog niet gestart: voorlopig gaat het evenement verder zonder opname. Laat het de beheerders van het platform weten.",
+    "recorderStartFailed": "De opname is niet gestart. Probeer het over een paar minuten opnieuw; als het probleem blijft, laat het de beheerders van het platform weten.",
     "roomPreparing": "Ruimte wordt voorbereid…",
     "roomPreparingDetail": "De videoservers worden gestart. Dit duurt ongeveer 2 minuten. De ruimte wordt automatisch geactiveerd.",
     "recordingPromptTitle": "Opname starten?",
@@ -263,8 +311,13 @@
     "qaSidebarPlaceholder": "Het Q&A-paneel wordt beschikbaar wanneer het evenement begint.",
     "invalidToken": "Ongeldige link. Controleer de link die u per e-mail hebt ontvangen.",
     "sidebarTabQa": "Q&A",
+    "liveFeaturesLabel": "Functies:",
+    "whiteboardNotSavedHint": "Het whiteboard wordt niet automatisch opgeslagen. Als u het gebruikt, exporteer het dan (menu van het whiteboard) en voeg het toe aan het Materiaal van het evenement voordat u afsluit.",
     "sidebarTabChat": "Chat",
     "sidebarTabPolls": "Peilingen",
+    "sidebarTabWordcloud": "Woordwolk",
+    "sidebarTabAgenda": "Notities / Checklist",
+    "liveToggleAgenda": "Notities / Checklist (agenda)",
     "sidebarTabMaterials": "Materialen",
     "sidebarTabParticipants": "Deelnemers",
     "chat": {
@@ -299,7 +352,25 @@
       "exportChat": "De chat downloaden",
       "reactNotAllowed": "Om op berichten te reageren hebt u uw persoonlijke link of de moderatorlink nodig.",
       "editNotAllowed": "Dit is een gedeelde link: daarmee kunt u berichten niet bewerken.",
-      "editExpired": "Er zijn meer dan 15 minuten verstreken: dit bericht kan niet meer worden bewerkt."
+      "editExpired": "Er zijn meer dan 15 minuten verstreken: dit bericht kan niet meer worden bewerkt.",
+      "askAsQuestionLabel": "Markeren als vraag",
+      "placeholderQuestion": "Schrijf uw vraag...",
+      "lensGroupLabel": "Berichten filteren",
+      "lensAll": "Alle",
+      "lensQuestions": "Vragen ({count})",
+      "lensAnnounceAll": "Weergegeven: alle berichten",
+      "lensAnnounceQuestions": "Weergegeven: {count, plural, =0 {geen vragen} one {1 vraag} other {# vragen}}",
+      "questionOpen": "Vraag",
+      "questionAnswered": "Beantwoord",
+      "questionDismissed": "Wordt niet behandeld",
+      "questionMarkAnswered": "Markeren als beantwoord",
+      "questionReopen": "Heropenen",
+      "questionDismiss": "Afwijzen",
+      "questionRestore": "Herstellen",
+      "questionStatusFailed": "De vraag kon niet worden bijgewerkt",
+      "questionNeedsText": "Typ de tekst van uw vraag: een bijlage alleen komt niet in de wachtrij",
+      "lensTruncated": "Alleen de meest recente berichten zijn geladen: er kunnen oudere vragen zijn die niet in de lijst staan.",
+      "attachUnavailable": "Bijlagen zijn niet beschikbaar op deze installatie."
     },
     "role": {
       "moderator": "Moderator",
@@ -320,7 +391,8 @@
         "unknown": "n.v.t."
       },
       "volume": "Volume",
-      "volumeFor": "Volume van {name}"
+      "volumeFor": "Volume van {name}",
+      "kickName": "{name} verwijderen"
     },
     "moderator": {
       "muteAll": "Iedereen dempen",
@@ -331,7 +403,7 @@
       "toggleChat": "Chat aan/uit",
       "endEvent": "Evenement beëindigen",
       "endEventConfirm": "Weet u zeker dat u het evenement wilt beëindigen voor alle deelnemers?",
-      "participantCount": "{count} deelnemers",
+      "participantCount": "{count, plural, one {# deelnemer} other {# deelnemers}}",
       "raisedHands": "Opgestoken handen",
       "noRaisedHands": "Geen handen opgestoken",
       "giveFloor": "Woord geven",
@@ -339,27 +411,28 @@
       "approveVideo": "Woord geven (video)",
       "approveAll": "Woord geven",
       "audioOnly": "Alleen audio",
+      "lowerHand": "Hand omlaag",
       "participantFallback": "Deelnemer",
       "audioModeration": "Microfoon deelnemers",
       "micDisabled": "Microfoon uit",
       "videoModeration": "Video deelnemers",
       "videoDisabled": "Video uit",
       "eventEndedSuccess": "Evenement succesvol beëindigd. U wordt doorgestuurd...",
-      "whiteboard": "Whiteboard",
-      "lowerHand": "Hand omlaag"
+      "whiteboard": "Whiteboard"
     },
     "closeDrawer": "Sluiten",
     "hintBanner": {
+      "ariaLabel": "Tips",
       "controls": "Bediening onderaan",
       "raiseHand": "Steek uw hand op om te spreken",
       "sidebar": "Q&A en chat in het zijpaneel",
-      "dismiss": "Begrepen",
-      "ariaLabel": "Tips"
+      "dismiss": "Begrepen"
     },
     "topBarCount": {
       "live": "👥 {count, plural, one {# persoon} other {# personen}}"
     },
     "sidebarTabChatUnread": "Nieuwe ongelezen berichten",
+    "sidebarTabPollsOpen": "Open peiling waarin u nog niet hebt gestemd",
     "floatingControlsLabel": "Bediening evenement",
     "screenshareActive": "🖥️ {name} deelt het scherm",
     "screenshareFallbackName": "Een deelnemer",
@@ -377,40 +450,24 @@
       "moderatorLink": "Moderatorlink",
       "moderatorLinkHint": "Wie deze link opent, komt binnen als moderator met volledige regie over de zaal."
     },
-    "enterFullscreen": "Volledig scherm",
-    "exitFullscreen": "Volledig scherm verlaten",
-    "leaveChoice": {
-      "title": "Hoe wilt u de call verlaten?",
-      "body": "U kunt alleen zelf vertrekken — de call blijft actief voor de anderen — of de call voor alle deelnemers beëindigen.",
-      "leaveSelf": "Alleen zelf vertrekken",
-      "endForAll": "Voor iedereen beëindigen",
-      "ending": "Bezig met beëindigen…",
-      "endError": "Beëindigen mislukt. Probeer het opnieuw."
-    },
-    "endDestino": {
-      "title": "Bestemming van het evenement",
-      "body": "U staat op het punt het evenement voor iedereen te beëindigen. Wat moet ermee gebeuren zodra het is afgelopen?",
-      "public": "Openbaar houden",
-      "publicHelp": "De pagina van het afgelopen evenement blijft zichtbaar met samenvatting, vragen (Q&A), peilingen, materiaal en feedback.",
-      "library": "In de bibliotheek publiceren",
-      "libraryHelp": "Zoals hierboven, en bovendien wordt het evenement getoond in de openbare videobibliotheek (vereist een gepubliceerde opname of een YouTube-video).",
-      "archive": "Archiveren (privé)",
-      "archiveHelp": "De pagina van het afgelopen evenement wordt niet openbaar (404). De gegevens blijven bewaard tot de bewaartermijn verstrijkt en worden daarna verwijderd.",
-      "genAi": "AI-transcriptie en -samenvatting genereren uit de opname (zodra de verwerking klaar is)",
-      "back": "Terug",
-      "confirm": "Evenement beëindigen"
-    },
-    "liveFeaturesLabel": "Functies:",
-    "whiteboardNotSavedHint": "Het whiteboard wordt niet automatisch opgeslagen. Als u het gebruikt, exporteer het dan (menu van het whiteboard) en voeg het toe aan het Materiaal van het evenement voordat u afsluit.",
-    "sidebarTabWordcloud": "Woordwolk",
-    "sidebarTabAgenda": "Notities / Checklist",
-    "liveToggleAgenda": "Notities / Checklist (agenda)",
     "timer": {
       "show": "De timer tonen",
       "hide": "De timer verbergen",
       "remainingLabel": "Resterende tijd (klik voor de verstreken tijd)",
       "elapsedLabel": "Verstreken tijd (klik voor de resterende tijd)"
-    }
+    },
+    "videoCallFrameTitle": "Videogesprek van het evenement",
+    "insecureContextTitle": "Onveilig adres",
+    "insecureContextBody": "Deze pagina is geopend via http://: de browser staat microfoon en camera niet toe, en het videogesprek kan niet starten. Open dezelfde pagina op het beveiligde adres.",
+    "insecureContextLink": "https://{host} openen",
+    "conferenceUnreachableTitle": "De videogesprekdienst reageert niet",
+    "conferenceUnreachableBody": "Uw browser kan de server voor videogesprekken ({host}) niet bereiken. Open deze in een nieuw tabblad: als de browser een beveiligingswaarschuwing toont, accepteer die, kom dan hier terug en probeer het opnieuw. Als de pagina niet opent, wordt de server mogelijk geblokkeerd door het netwerk waarmee u verbonden bent.",
+    "conferenceOpenHost": "{host} openen in een nieuw tabblad",
+    "leftTitle": "U hebt de zaal verlaten",
+    "leftMessage": "Het evenement is nog bezig: u kunt op elk moment terugkeren.",
+    "leftModeratorReminder": "Het evenement blijft open tot iemand het beëindigt. Als u klaar bent, keer dan terug en kies ‘{action}’.",
+    "rejoin": "Terugkeren",
+    "backToHome": "Terug naar de startpagina"
   },
   "qa": {
     "title": "Vragen en Antwoorden",
@@ -445,7 +502,9 @@
       "textRequired": "Schrijf uw vraag",
       "tooLong": "De vraag mag niet meer dan 500 tekens bevatten",
       "rateLimit": "Wacht even voordat u een nieuwe vraag stelt",
-      "generic": "Fout bij het verzenden van de vraag"
+      "busy": "Er komen nu veel vragen binnen vanaf uw netwerk: probeer het over een paar seconden opnieuw",
+      "generic": "Fout bij het verzenden van de vraag",
+      "upvoteFailed": "Uw stem is niet geregistreerd: probeer het over een paar seconden opnieuw."
     },
     "ctaTitle": "Stel de eerste vraag",
     "ctaBody": "Andere deelnemers kunnen op uw vraag stemmen. Moderatoren zien hem en kunnen mondeling of schriftelijk antwoorden.",
@@ -455,6 +514,79 @@
     "submitPrimary": "Vraag versturen"
   },
   "admin": {
+    "accessDenied": {
+      "title": "Dit onderdeel is niet beschikbaar voor uw rol",
+      "body": "Als organisator beheert u uw eigen evenementen: aanmaken, publiceren, materialen, vragenlijsten en nabewerking. De platforminstellingen en de gegevens van alle evenementen blijven bij de beheerders.",
+      "back": "Naar uw evenementen"
+    },
+    "staffLogin": {
+      "title": "Inloggen in het beheergedeelte",
+      "intro": "Organisatoren en beheerders loggen in met een link die naar hun e-mailadres wordt gestuurd: geen wachtwoord om te onthouden.",
+      "emailLabel": "Uw werk-e-mailadres",
+      "send": "Stuur mij de link",
+      "sending": "Bezig met verzenden…",
+      "sent": "Als het adres is ingeschakeld, ontvangt u binnenkort een e-mail met de inloglink. De link werkt maar één keer en verloopt na {minutes} minuten.",
+      "error": "Het verzoek kon niet worden verzonden. Probeer het over enkele minuten opnieuw.",
+      "keySection": "Inloggen met de instantiesleutel",
+      "accessTitle": "Naar het beheergedeelte",
+      "accessIntro": "Druk op de knop om in te loggen. De link werkt maar één keer.",
+      "enter": "Inloggen",
+      "invalidLink": "De link is niet geldig: hij is mogelijk verlopen of al gebruikt.",
+      "newLink": "Nieuwe link aanvragen"
+    },
+    "organizers": {
+      "title": "Medewerkersaccounts",
+      "intro": "Mensen die onder hun eigen naam in het beheergedeelte werken. Organisatoren maken en beheren hun eigen evenementen; beheerders beheren de hele instantie. Ze loggen in met een link die naar hun e-mailadres wordt gestuurd, zonder wachtwoord. De instantiesleutel blijft beschikbaar voor noodgevallen en automatisering.",
+      "newTitle": "Persoon toevoegen",
+      "name": "Voor- en achternaam",
+      "email": "E-mail",
+      "add": "Toevoegen",
+      "sendNow": "Stuur de inloglink meteen",
+      "listTitle": "Personen met toegang",
+      "loading": "Laden…",
+      "empty": "Nog geen accounts.",
+      "events": "Evenementen",
+      "lastLogin": "Laatste aanmelding",
+      "status": "Status",
+      "actions": "Acties",
+      "never": "Nooit",
+      "active": "Actief",
+      "inactive": "Uitgeschakeld",
+      "invite": "Link sturen",
+      "inviteFor": "Stuur een inloglink naar {name}",
+      "deactivate": "Uitschakelen",
+      "deactivateFor": "{name} uitschakelen",
+      "activate": "Opnieuw inschakelen",
+      "activateFor": "{name} opnieuw inschakelen",
+      "delete": "Verwijderen",
+      "deleteFor": "{name} verwijderen",
+      "deleteTitle": "Account verwijderen?",
+      "deleteMessage": "Het account van {name} wordt verwijderd. De evenementen ({count}) blijven bestaan en gaan terug naar de beheerders.",
+      "deactivateTitle": "Account deactiveren?",
+      "deactivateMessage": "{name} kan niet meer inloggen en reeds verstuurde inloglinks werken niet meer. De evenementen blijven zoals ze zijn.",
+      "exists": "Er bestaat al een account met dit e-mailadres.",
+      "created": "Account toegevoegd.",
+      "createdInvited": "Account toegevoegd: de inloglink is onderweg.",
+      "invited": "Inloglink verstuurd.",
+      "deleted": "Account verwijderd.",
+      "updated": "Wijziging opgeslagen.",
+      "actionError": "De bewerking is mislukt. Probeer het opnieuw.",
+      "loadError": "De lijst kon niet worden geladen.",
+      "inviteFailed": "Account toegevoegd, maar de link kon niet worden verstuurd: stuur hem opnieuw vanuit de rij.",
+      "role": "Rol",
+      "roleOrganizer": "Organisator",
+      "roleAdmin": "Beheerder",
+      "roleHelp": "Organisatoren zien en beheren alleen hun eigen evenementen. Beheerders beheren alles: instellingen, alle evenementen, adresboek en accounts.",
+      "roleFor": "Rol van {name}",
+      "promoteTitle": "Beheerder maken?",
+      "promoteMessage": "{name} kan dan de hele instantie beheren: instellingen, alle evenementen, adresboek en medewerkersaccounts.",
+      "promote": "Beheerder maken",
+      "demoteTitle": "Terugzetten naar organisator?",
+      "demoteMessage": "{name} verliest meteen de toegang tot de instellingen en tot de evenementen van anderen en ziet alleen nog de eigen evenementen.",
+      "demote": "Terugzetten naar organisator",
+      "you": "u",
+      "selfLocked": "Uw account wordt beheerd door een andere beheerder"
+    },
     "fileOrUrl": {
       "tabUpload": "Bestand uploaden",
       "tabUrl": "URL plakken",
@@ -472,7 +604,8 @@
       "errorGeneric": "Fout bij het uploaden van het bestand",
       "helpImage": "Ondersteunde formaten: PNG, JPEG, WebP, SVG, GIF — max. 10 MB",
       "helpAudio": "Ondersteunde formaten: MP3, WAV, OGG, M4A, WebM — max. 20 MB",
-      "helpDocument": "Ondersteunde formaten: PDF, DOCX, PPTX, XLSX, TXT — max. 25 MB"
+      "helpDocument": "Ondersteunde formaten: PDF, DOCX, PPTX, XLSX, TXT — max. 25 MB",
+      "uploadsUnavailable": "Bestanden uploaden is op deze installatie niet beschikbaar: plak in plaats daarvan de URL van het bestand."
     },
     "rubricaPicker": {
       "loading": "Bezig met zoeken…",
@@ -510,7 +643,9 @@
           "endsAt": "Einddatum moet na startdatum liggen.",
           "titleRequired": "De titel is verplicht (minimaal 3 tekens).",
           "titleRequiredOtherLocale": "De titel in de standaardtaal ({locale}) is verplicht: ga naar het tabblad {locale}.",
-          "maxParticipants": "Voer een getal tussen 2 en 500 in."
+          "maxParticipants": "Voer een getal tussen 2 en 500 in.",
+          "descriptionRequired": "De beschrijving is verplicht (minimaal {min} tekens).",
+          "descriptionRequiredOtherLocale": "De beschrijving in de standaardtaal ({locale}) is verplicht: ga naar het tabblad {locale}."
         },
         "senderRatioLabel": "Geschat percentage actief",
         "senderRatioHelp": "Hoeveel deelnemers naar verwachting microfoon/video aan zullen hebben. Helpt bij het dimensioneren van de videoserver.",
@@ -579,6 +714,7 @@
         "organizerName": "Contactpersoon",
         "organizerOrganization": "Organisatie",
         "organizerWebsite": "Website",
+        "organizerLogo": "Logo van de organisator",
         "organizerRequired": "Contactpersoon en organisatie zijn verplicht.",
         "moderatorsHeading": "Moderatoren",
         "moderatorsHelp": "Moderatoren kunnen de sessie beheren en de rechten tijdens het evenement aanpassen.",
@@ -591,7 +727,7 @@
         "speakerEmail": "E-mail",
         "speakerRequired": "Naam en e-mail zijn verplicht.",
         "invitationsHeading": "Uitnodigingen",
-        "invitationsHelp": "Vooraf aangemelde personen — zij ontvangen een persoonlijke deelnamelink.",
+        "invitationsHelp": "Lijst van uitgenodigde personen. Het platform verstuurt geen uitnodigingen: deel de link naar het evenement zelf. Als publieke inschrijving uitstaat, kunnen alleen deze adressen zich inschrijven, en de persoonlijke deelnamelink komt na de inschrijving per e-mail.",
         "invitationName": "Naam (optioneel)",
         "invitationEmail": "E-mail",
         "invitationRole": "Rol",
@@ -604,8 +740,7 @@
         "invalidEmail": "Ongeldig e-mailadres.",
         "duplicateEmail": "Adres al toegevoegd.",
         "rubricaPick": "Zoeken in adresboek…",
-        "rubricaOrAdd": "of handmatig toevoegen",
-        "organizerLogo": "Logo van de organisator"
+        "rubricaOrAdd": "of handmatig toevoegen"
       },
       "step4": {
         "heading": "Inhoud en materialen",
@@ -616,7 +751,7 @@
         "materialUrl": "Bestand of link",
         "visibilityLabel": "Zichtbaarheid",
         "visibility": {
-          "ALWAYS": "Altijd",
+          "ALWAYS": "In de zaal en na het evenement",
           "BEFORE": "Vóór het evenement",
           "DURING": "Tijdens het evenement",
           "AFTER": "Na het evenement"
@@ -645,8 +780,6 @@
         "scaleMax": "Maximum",
         "required": "Verplicht",
         "saveDraftAndGoQuestionnaires": "Concept opslaan en naar vragenlijstbeheer",
-        "preQuestionnaire": "Vragenlijst vóór het evenement",
-        "postQuestionnaire": "Vragenlijst na afloop (feedback)",
         "none": "— Geen —"
       },
       "step5": {
@@ -675,22 +808,25 @@
         "retentionHelp": "Na deze drempel worden persoonsgegevens automatisch verwijderd.",
         "gdprTemplate": "Privacy-sjabloon",
         "gdprTemplateNone": "— Aangepaste tekst gebruiken —",
+        "gdprTemplateUnknown": "Het gekozen sjabloon voor de privacyverklaring bestaat niet meer: kies een ander sjabloon of ga terug naar de aangepaste tekst",
         "privacyText": "Privacyverklaring (tekst)",
         "moderatorHeading": "Contact moderator",
+        "moderatorPublishHint": "Naam en e-mailadres zijn verplicht om het evenement te publiceren (ze worden gebruikt voor de moderatorlink en de bevestigingsmail). Om als concept op te slaan zijn ze niet vereist.",
+        "moderatorLinkNote": "Deze persoon is de hoofdmoderator van het evenement: hij of zij ontvangt per e-mail een privélink om het te beheren (opname starten, vragen modereren, peilingen starten…). Dit is iets anders dan de comoderatoren die in de stap “Personen” worden toegevoegd; die krijgen elk hun eigen link.",
+        "moderatorRequired": "Voer de naam van de moderator in",
+        "moderatorEmailRequired": "Voer een geldig e-mailadres van de moderator in",
         "moderatorName": "Naam",
         "moderatorEmail": "E-mail",
         "capacityHeading": "Geschatte capaciteit",
         "featuresHeading": "Configuratie-overzicht",
         "privacyDoc": "Privacydocument (PDF of link)",
         "privacyDocHelp": "Upload een PDF of plak de URL van een vervangende privacyverklaring. Vervangt het AVG-sjabloon indien aanwezig.",
-        "privacyTextHelp": "Korte tekst die op het aanmeldingsformulier wordt getoond; kan het AVG-sjabloon aanvullen of vervangen.",
-        "moderatorPublishHint": "Naam en e-mailadres zijn verplicht om het evenement te publiceren (ze worden gebruikt voor de moderatorlink en de bevestigingsmail). Om als concept op te slaan zijn ze niet vereist.",
-        "moderatorLinkNote": "Deze persoon is de hoofdmoderator van het evenement: hij of zij ontvangt per e-mail een privélink om het te beheren (opname starten, vragen modereren, peilingen starten…). Dit is iets anders dan de comoderatoren die in de stap “Personen” worden toegevoegd; die krijgen elk hun eigen link.",
-        "moderatorRequired": "Voer de naam van de moderator in",
-        "moderatorEmailRequired": "Voer een geldig e-mailadres van de moderator in"
+        "privacyTextHelp": "Korte tekst die op het aanmeldingsformulier wordt getoond; kan het AVG-sjabloon aanvullen of vervangen."
       },
       "validationFailed": "Controleer de gemarkeerde velden voordat u doorgaat.",
       "partialFailure": "Evenement aangemaakt, maar sommige onderdelen zijn niet opgeslagen: {items}. U kunt ze toevoegen vanaf de pagina van het evenement.",
+      "partialFailureEdit": "De wijzigingen aan het evenement zijn opgeslagen, maar het volgende kon niet worden opgeslagen: {items}. Uw werk staat er nog: corrigeer het en sla opnieuw op.",
+      "partialFailureEditDetail": "De wijzigingen aan het evenement zijn opgeslagen, maar het volgende kon niet worden opgeslagen: {items}. De server antwoordde: {reason}. Uw werk staat er nog: corrigeer het en sla opnieuw op.",
       "draftFound": "We hebben een niet-opgeslagen concept van dit evenement gevonden. Wilt u het herstellen?",
       "draftRestore": "Concept herstellen",
       "draftDiscard": "Negeren",
@@ -699,8 +835,13 @@
         "invitations": "uitnodigingen",
         "moderators": "moderatoren",
         "speakers": "sprekers",
-        "materials": "materiaal"
-      }
+        "materials": "materiaal",
+        "questionnaires": "vragenlijsten"
+      },
+      "revocationFailed": "Het intrekken van de toegang van {name} is mislukt: de toegangslink is nog steeds geldig. Sla opnieuw op om het nogmaals te proberen, of trek hem in via het tabblad “{tab}” op de pagina van het evenement.",
+      "validationFailedDetail": "De server heeft enkele gegevens geweigerd: {reason}. Corrigeer ze en probeer het opnieuw.",
+      "publishFailed": "Het evenement is aangemaakt maar niet gepubliceerd: het is nog een concept. Publiceer het vanaf de pagina van het evenement.",
+      "publishFailedDetail": "Het evenement is aangemaakt maar niet gepubliceerd: het is nog een concept. De server antwoordde: {reason}. Publiceer het vanaf de pagina van het evenement."
     },
     "nav": {
       "events": "Evenementbeheer",
@@ -741,8 +882,11 @@
       "eventQuestionnaires": "Vragenlijsten",
       "rubricaList": "Lijst",
       "rubricaDetail": "Detail",
-      "feedbackDashboard": "Feedback",
-      "recordingsPostprod": "Transcripties / AI"
+      "organizers": "Accounts",
+      "people": "Personen",
+      "postprodDetail": "Opname",
+      "recordingsPostprod": "Transcripties / AI",
+      "feedbackDashboard": "Feedback"
     },
     "landing": {
       "title": "Beheerpaneel",
@@ -1112,8 +1256,35 @@
       "qaEnabled": "Q&A inschakelen",
       "chatEnabled": "Chat inschakelen",
       "recordingEnabled": "Video-opname inschakelen",
+      "agendaEnabled": "Live notities / checklist (agenda)",
+      "agendaEnabledDesc": "Een checklist met de te behandelen punten die de moderatoren tijdens het evenement afvinken. Wordt meegenomen in de automatische samenvatting. Optioneel en ook tijdens het evenement in te schakelen.",
+      "wordCloudEnabled": "Live woordwolk",
+      "wordCloudEnabledDesc": "Deelnemers sturen een woord en de wolk wordt live bijgewerkt. Handig om een discussie te openen of in enkele seconden een stemming te peilen.",
+      "whiteboardEnabled": "Gedeeld whiteboard",
+      "whiteboardEnabledDesc": "Schakelt het ingebouwde samenwerkingswhiteboard (Excalidraw) in: de moderatoren kunnen het tijdens het evenement openen via de werkbalk. Vereist de whiteboarddienst van de installatie; waar die beschikbaar is, is het bij directe calls altijd actief.",
       "autoStartRecording": "Opname automatisch starten",
       "autoStartRecordingDesc": "Bij de start van het evenement begint de opname vanzelf (zonder bevestiging te vragen aan de moderator). Zo vinden eventuele laatkomers de speler direct beschikbaar.",
+      "aiSectionHeading": "Automatische postproductie",
+      "aiSectionDesc": "Na afloop van het evenement kan de opname worden verwerkt door een AI-pijplijn in het cluster om een transcriptie, een samenvatting en, indien gewenst, vertalingen en nasynchronisatie te produceren. Alles gebeurt op de infrastructuur van deze installatie, er gaan geen gegevens naar derden.",
+      "aiTranscriptEnabled": "Automatische transcriptie",
+      "aiTranscriptEnabledDesc": "Spraakherkenning met identificatie van de sprekers. Vereist om samenvatting, vertalingen en nasynchronisatie in te schakelen.",
+      "aiSummaryEnabled": "Samenvatting en hoofdstukken",
+      "aiSummaryEnabledDesc": "Samenvatting van de bijeenkomst, genomen besluiten, actiepunten en indeling in hoofdstukken met tijdsaanduiding.",
+      "aiTranslationEnabled": "Vertaling in andere talen",
+      "aiTranslationEnabledDesc": "Transcriptie en samenvatting vertaald in de hieronder ingestelde talen.",
+      "aiTargetLocales": "Vertaaltalen",
+      "aiTargetLocalesDesc": "ISO-taalcodes (bijv. en, fr, de) gescheiden door komma’s. Laat leeg om de talen te gebruiken die op siteniveau zijn ingesteld.",
+      "aiTargetLocalesRequired": "Geef minstens één vertaaltaal op, of schakel de automatische vertaling uit.",
+      "aiDubbingEnabled": "Audio-nasynchronisatie",
+      "aiDubbingEnabledDesc": "Nagesynchroniseerde audio in de doeltalen, gegenereerd met vooraf getrainde synthetische stemmen. De stem van de deelnemers wordt niet gekloond.",
+      "consentBadge": "Uitdrukkelijke toestemming",
+      "retentionBadge": "Verlengt de bewaartermijn",
+      "multitrackRecordingEnabled": "Opname per deelnemer (hoge nauwkeurigheid)",
+      "multitrackRecordingEnabledDesc": "Neemt voor elke deelnemer een apart audiospoor op, zodat de transcriptie met zekerheid toewijst wie wat zegt (geen “Spreker 1/2” meer). Hierbij wordt geïsoleerde audio van één spreker verwerkt (gevoelig persoonsgegeven): de sporen zijn tijdelijk en worden meteen na de transcriptie verwijderd. Vereist toestemming voor de opname.",
+      "retainParticipantTracks": "De sporen per deelnemer bewaren",
+      "retainParticipantTracksDesc": "Bewaart de afzonderlijke audiosporen ook na de transcriptie, voor het downloadbare archief en het terugluisteren per spreker. LET OP: dit verlengt de bewaring van gevoelige persoonsgegevens (geïsoleerde stem) tot het verstrijken van de bewaartermijn van het evenement. Alleen inschakelen wanneer het nodig is en met passende toestemming/informatievoorziening.",
+      "expectedSpeakers": "Verwacht aantal sprekers",
+      "expectedSpeakersDesc": "Wanneer u dit weet (bijv. 3 sprekers), verbetert het opgeven ervan de kwaliteit van de sprekeridentificatie. Laat leeg om de pijplijn te laten beslissen.",
       "dataRetentionDays": "Gegevensbewaring (dagen na het evenement)",
       "dataRetentionHint": "Na deze periode worden de inschrijvingen, Q&A-vragen en eventuele video-opnamen automatisch verwijderd.",
       "privacyPolicyUrl": "URL privacybeleid",
@@ -1167,31 +1338,7 @@
       "retentionPreviewKept": "Geaggregeerde statistieken en metadata van het evenement blijven bewaard.",
       "configPreview": "Configuratievoorbeeld",
       "templateApplied": "Sjabloon toegepast: {name}. U kunt alle instellingen wijzigen.",
-      "agendaEnabled": "Live notities / checklist (agenda)",
-      "agendaEnabledDesc": "Een checklist met de te behandelen punten die de moderatoren tijdens het evenement afvinken. Wordt meegenomen in de automatische samenvatting. Optioneel en ook tijdens het evenement in te schakelen.",
-      "whiteboardEnabled": "Gedeeld whiteboard",
-      "whiteboardEnabledDesc": "Schakelt het ingebouwde samenwerkingswhiteboard (Excalidraw) in: de moderatoren kunnen het tijdens het evenement openen via de werkbalk. Altijd actief bij directe calls.",
-      "aiSectionHeading": "Automatische postproductie",
-      "aiSectionDesc": "Na afloop van het evenement kan de opname worden verwerkt door een AI-pijplijn in het cluster om een transcriptie, een samenvatting en, indien gewenst, vertalingen en nasynchronisatie te produceren. Alles gebeurt op de infrastructuur van het Departement, er gaan geen gegevens naar derden.",
-      "aiTranscriptEnabled": "Automatische transcriptie",
-      "aiTranscriptEnabledDesc": "Spraakherkenning met identificatie van de sprekers. Vereist om samenvatting, vertalingen en nasynchronisatie in te schakelen.",
-      "aiSummaryEnabled": "Samenvatting en hoofdstukken",
-      "aiSummaryEnabledDesc": "Samenvatting van de bijeenkomst, genomen besluiten, actiepunten en indeling in hoofdstukken met tijdsaanduiding.",
-      "aiTranslationEnabled": "Vertaling in andere talen",
-      "aiTranslationEnabledDesc": "Transcriptie en samenvatting vertaald in de hieronder ingestelde talen.",
-      "aiTargetLocales": "Vertaaltalen",
-      "aiTargetLocalesDesc": "ISO-taalcodes (bijv. en, fr, de) gescheiden door komma’s. Laat leeg om de talen te gebruiken die op siteniveau zijn ingesteld.",
-      "aiTargetLocalesRequired": "Geef minstens één vertaaltaal op, of schakel de automatische vertaling uit.",
-      "aiDubbingEnabled": "Audio-nasynchronisatie",
-      "aiDubbingEnabledDesc": "Nagesynchroniseerde audio in de doeltalen, gegenereerd met vooraf getrainde synthetische stemmen. De stem van de deelnemers wordt niet gekloond.",
-      "consentBadge": "Uitdrukkelijke toestemming",
-      "retentionBadge": "Verlengt de bewaartermijn",
-      "multitrackRecordingEnabled": "Opname per deelnemer (hoge nauwkeurigheid)",
-      "multitrackRecordingEnabledDesc": "Neemt voor elke deelnemer een apart audiospoor op, zodat de transcriptie met zekerheid toewijst wie wat zegt (geen “Spreker 1/2” meer). Hierbij wordt geïsoleerde audio van één spreker verwerkt (gevoelig persoonsgegeven): de sporen zijn tijdelijk en worden meteen na de transcriptie verwijderd. Vereist toestemming voor de opname.",
-      "retainParticipantTracks": "De sporen per deelnemer bewaren",
-      "retainParticipantTracksDesc": "Bewaart de afzonderlijke audiosporen ook na de transcriptie, voor het downloadbare archief en het terugluisteren per spreker. LET OP: dit verlengt de bewaring van gevoelige persoonsgegevens (geïsoleerde stem) tot het verstrijken van de bewaartermijn van het evenement. Alleen inschakelen wanneer het nodig is en met passende toestemming/informatievoorziening.",
-      "expectedSpeakers": "Verwacht aantal sprekers",
-      "expectedSpeakersDesc": "Wanneer u dit weet (bijv. 3 sprekers), verbetert het opgeven ervan de kwaliteit van de sprekeridentificatie. Laat leeg om de pijplijn te laten beslissen."
+      "whiteboardUnavailable": "Niet beschikbaar op deze installatie: de whiteboarddienst van Jitsi ontbreekt; de beheerder van het platform kan die inschakelen."
     },
     "links": {
       "title": "Evenementlinks",
@@ -1199,11 +1346,18 @@
       "publicPageHint": "De pagina om te delen voor het verzamelen van nieuwe aanmeldingen.",
       "guestJoin": "Directe uitnodiging (zonder aanmelding)",
       "guestJoinHint": "Snelle link om last-minute een deelnemer uit te nodigen: zij nemen deel als gast wanneer het evenement live is, zonder het aanmeldformulier in te vullen.",
+      "callInvite": "Link voor deelnemers",
+      "callInviteHint": "Wie hem ontvangt, neemt als gast deel aan het gesprek, zonder aanmelding. Een directe oproep heeft geen openbare pagina: dit is de link om te delen.",
       "moderatorLink": "Moderatorlink",
       "moderatorLinkHint": "Deel deze link alleen met moderators. Iedereen met deze link kan het evenement beheren.",
       "liveRoomHint": "Link om direct als moderator de ruimte binnen te gaan.",
       "copyLink": "Link kopiëren",
-      "copied": "Gekopieerd!"
+      "copied": "Gekopieerd!",
+      "reveal": "Tonen",
+      "hide": "Verbergen",
+      "warning": "Iedereen met deze link beheert het evenement: toon hem niet tijdens het delen van je scherm en plak hem niet in een chat.",
+      "hidden": "Link verborgen",
+      "copyFailed": "Kopiëren mislukt: selecteer het adres hieronder en kopieer het handmatig."
     },
     "feedbackAdmin": {
       "title": "Feedbackresultaten",
@@ -1294,185 +1448,6 @@
         "scaling": "Infra-dimensionering",
         "postprod": "AI-pijplijn na het evenement"
       },
-      "scaling": {
-        "intro": "Parameters die de capaciteit van het cluster beschrijven waarop het platform draait. De standaardwaarden zijn afgestemd op Azure F16s_v2 (16 vCPU / 32 GiB) voor JVB en F4s_v2 (4 vCPU / 8 GiB) voor Jibri. Bij andere hardware deze waarden bijwerken — de scaler herberekent direct.",
-        "jvbSection": "Capaciteit videobridge (JVB)",
-        "jvbCpuCoresPerPod": "vCPU per JVB-pod",
-        "jvbCpuCoresPerPodHelp": "Aantal CPU-cores dat de JVB-container vraagt (resources.requests.cpu). Azure F16s_v2 = 16.",
-        "jvbReceiversPerCore": "Passieve kijkers per core",
-        "jvbReceiversPerCoreHelp": "Hoeveel receive-only kijkers er in 1 vCPU passen. Gekalibreerd op 18,75 (300 webinar ÷ 16 cores) op F16s_v2.",
-        "jvbSendersPerCore": "Actieve deelnemers per core",
-        "jvbSendersPerCoreHelp": "Hoeveel senders (mic+webcam) er in 1 vCPU passen. Gekalibreerd op 3,125 (50 all-sender ÷ 16 cores) op F16s_v2.",
-        "jvbMaxReplicas": "Max. JVB-replicas",
-        "jvbMaxReplicasHelp": "Harde limiet om runaway scale-up te voorkomen. Standaard 6.",
-        "jibriCpuCoresPerPod": "vCPU per Jibri-pod",
-        "jibriCpuCoresPerPodHelp": "Cores die de Jibri-container vraagt (ffmpeg + headless Chrome). Azure F4s_v2 = 4.",
-        "defaultSenderRatioPct": "Standaard sender-ratio",
-        "defaultSenderRatioPctHelp": "Percentage verwachte deelnemers dat als sender (mic+webcam) zal optreden wanneer het evenement dit niet specificeert. Webinar 10-30%, panel 50-100%.",
-        "previewTitle": "Voorbeeld berekening",
-        "previewBody": "Evenement met {participants} verwachte deelnemers bij {ratio}% senders → {senders} senders + {receivers} passief → {cores} geschatte cores → {jvbs} JVB.",
-        "graceSection": "Soft exit (einde evenement)",
-        "eventGracePeriodMinutes": "Standaard respijtminuten na endsAt",
-        "eventGracePeriodMinutesHelp": "Extra tijd toegestaan na de geplande eindtijd voordat de call wordt gesloten. 0 = harde sluiting, -1 = niet automatisch sluiten (laten aan inactiviteit-cleanup), 15 = banner en sluiting na 15 min. Elk evenement kan dit overrulen.",
-        "videoQualitySection": "Video/audio quality",
-        "videoQuality": "Default quality",
-        "videoQualityHelp": "Preset applied to every event (overridable per event). Higher quality needs more bandwidth — “High” is the best trade-off. Takes effect immediately, no restart.",
-        "videoQualityOptions": {
-          "MAX": "Maximum — 1080p",
-          "HIGH": "High — 720p (recommended)",
-          "BALANCED": "Balanced — 540p",
-          "SAVE_DATA": "Save data — 360p"
-        },
-        "videoQualityDesc": {
-          "MAX": "Full HD 1080p, up to ~4 Mbps, stereo Opus 510 kbps audio. Top fidelity for small high-stakes calls — uses more bandwidth and loads the bridge more.",
-          "HIGH": "720p with a capped bitrate (~2.2 Mbps peak) and 96 kbps Opus audio. Great quality without maxing bandwidth: the recommended production trade-off.",
-          "BALANCED": "540p with a contained bitrate (~1 Mbps) and fewer simultaneous incoming videos. Good for large audiences or weak networks.",
-          "SAVE_DATA": "360p at minimal bitrate (~600 kbps) with unused-layer suspension. For very slow connections."
-        }
-      },
-      "header": {
-        "slimBarTitle": "Bovenste balk (Slim Header)",
-        "slimBarDescription": "De dunne balk bovenaan de pagina die de bovenliggende organisatie identificeert.",
-        "parentOrganization": "Bovenliggende organisatie",
-        "parentOrganizationHelp": "Bijv. \"Voorzitterschap van de Raad van Ministers\"",
-        "parentOrganizationUrl": "URL bovenliggende organisatie",
-        "centerBarTitle": "Centrale header",
-        "centerBarDescription": "Het hoofdgebied van de header met de applicatienaam en het logo.",
-        "appName": "Applicatienaam",
-        "appNameHelp": "Weergegeven in de header en de browsertitel",
-        "organizationShort": "Korte naam organisatie",
-        "logoUrl": "Logo-URL",
-        "logoUrlHelp": "Laat leeg om het standaard PA-pictogram te gebruiken",
-        "organizationUrl": "URL website organisatie"
-      },
-      "branding": {
-        "siteName": "Applicatienaam",
-        "siteNameHelp": "Weergegeven in de header, de browsertitel en e-mails",
-        "siteDescription": "Applicatiebeschrijving",
-        "organizationName": "Naam organisatie",
-        "organizationNameHelp": "bijv. Departement voor Digitale Transformatie",
-        "organizationNameShort": "Afkorting organisatie",
-        "organizationUrl": "URL organisatie",
-        "parentOrganization": "Bovenliggende organisatie",
-        "parentOrganizationHelp": "bijv. Voorzitterschap van de Raad van Ministers",
-        "parentOrganizationUrl": "URL bovenliggende organisatie",
-        "logoUrl": "URL aangepast logo",
-        "logoUrlHelp": "Laat leeg om het standaard PA-pictogram te gebruiken",
-        "faviconUrl": "Favicon-URL",
-        "primaryColor": "Primaire kleur",
-        "defaultTimezone": "Standaard tijdzone",
-        "defaultTimezoneHelp": "Gebruikt voor datumweergave en het aanmaken van nieuwe evenementen."
-      },
-      "watermark": {
-        "title": "Video-aanpassing",
-        "enabled": "Watermerk actief",
-        "url": "URL watermerk",
-        "urlHelp": "URL van een transparante SVG- of PNG-afbeelding. Laat leeg om het organisatielogo te gebruiken.",
-        "opacity": "Dekking",
-        "position": "Positie",
-        "previewLabel": "Voorbeeld videogebied",
-        "positions": {
-          "bottomLeft": "Linksonder",
-          "bottomRight": "Rechtsonder",
-          "topLeft": "Linksboven",
-          "topRight": "Rechtsboven"
-        }
-      },
-      "seo": {
-        "title": "SEO-titel",
-        "titleHelp": "Titel weergegeven in zoekresultaten en het browsertabblad",
-        "description": "SEO-beschrijving",
-        "descriptionHelp": "Beschrijving voor zoekmachines en social media",
-        "image": "Open Graph-afbeelding",
-        "imageHelp": "Standaardafbeelding voor social media (1200x630 aanbevolen)"
-      },
-      "homepage": {
-        "modeLabel": "Modus startpagina",
-        "modes": {
-          "LANDING": {
-            "title": "Landingspagina",
-            "description": "Hero, functionaliteiten, komende evenementen en hoe het werkt"
-          },
-          "EVENTS_LIST": {
-            "title": "Evenementenlijst",
-            "description": "Toont direct de lijst met evenementen"
-          },
-          "CUSTOM": {
-            "title": "Aangepast",
-            "description": "Aangepaste HTML-inhoud + evenementenlijst"
-          }
-        },
-        "customHtmlLabel": "Aangepaste HTML-inhoud",
-        "customHtmlHelp": "HTML weergegeven in het hoofdgedeelte van de startpagina"
-      },
-      "pages": {
-        "privacyTitle": "Privacybeleid",
-        "privacyIt": "Inhoud (Italiaans)",
-        "privacyEn": "Inhoud (Engels)",
-        "privacyLabel": "Inhoud privacyverklaring",
-        "accessibilityTitle": "Toegankelijkheidsverklaring",
-        "accessibilityIt": "Inhoud (Italiaans)",
-        "accessibilityEn": "Inhoud (Engels)",
-        "accessibilityLabel": "Inhoud toegankelijkheidsverklaring",
-        "preview": "Voorbeeld"
-      },
-      "footer": {
-        "linksTitle": "Footerlinks",
-        "addLink": "Link toevoegen",
-        "noLinks": "Geen links geconfigureerd. Standaardlinks worden gebruikt.",
-        "linkTitle": "Titel",
-        "linkSection": "Sectie",
-        "sectionLegal": "Juridisch",
-        "sectionMain": "Hoofdmenu",
-        "moveUp": "Omhoog",
-        "moveDown": "Omlaag",
-        "removeLink": "Link verwijderen"
-      },
-      "features": {
-        "statusPageEnabled": "Statuspagina actief",
-        "statusPageEnabledHelp": "De servicestatuspagina weergeven",
-        "guestAccessEnabled": "Gasttoegang actief",
-        "guestAccessEnabledHelp": "Gasttoegang tot lopende evenementen toestaan",
-        "publicRegistrationEnabled": "Publieke inschrijving actief",
-        "publicRegistrationEnabledHelp": "Iedereen kan evenementen aanmaken (indien uitgeschakeld, alleen beheerders)",
-        "calendarPublic": "Openbare kalender",
-        "calendarPublicHelp": "De evenementenkalender publiceren. Bezoekers kunnen geplande evenementen zien.",
-        "parseTitleKicker": "Titels met redactionele kicker",
-        "parseTitleKickerHelp": "Als de titel van een evenement het teken \"|\" bevat, wordt het deel ervoor weergegeven als kleine kapitaal-bovenkop boven de hoofdtitel. Voorbeeld: \"Caffettino | OSS-test\" → bovenkop \"CAFFETTINO\" + titel \"OSS-test\".",
-        "githubUrl": "URL GitHub-repository",
-        "supportEmail": "E-mail ondersteuning",
-        "jvbScalingTitle": "Schalen videobridge (JVB)",
-        "jvbScalingHelp": "Regelt hoe lang er gewacht wordt voordat een inactieve videoknooppunt wordt uitgeschakeld en hoe ver van tevoren deze gestart wordt voor een gepland evenement.",
-        "jvbInactiveGraceMinutes": "Inactiviteitsminuten vóór uitschakeling",
-        "jvbInactiveGraceMinutesHelp": "Na hoeveel tijd zonder vergadering de videoknoop wordt gepauzeerd. Aanbevolen 45 minuten. Bereik 5-240.",
-        "jvbPreScaleMinutes": "Minuten van tevoren voor geplande start",
-        "jvbPreScaleMinutesHelp": "Hoe lang vóór startsAt de videoknoop wordt gestart voor een gepland evenement. Aanbevolen 10 minuten.",
-        "jvbStressWarnPercent": "Drempel stress warning (%)",
-        "jvbStressWarnPercentHelp": "Boven deze drempel voegt de scaler 1 extra JVB-replica toe, ook als de predictive sizing dat niet vraagt. Standaard 50.",
-        "jvbStressCriticalPercent": "Drempel stress critical (%)",
-        "jvbStressCriticalPercentHelp": "Boven deze drempel voegt de scaler 2 JVB-replicas toe. Standaard 70. Moet hoger zijn dan warn.",
-        "jvbProvisioningTimeoutMinutes": "Provisioning-timeout (minuten)",
-        "jvbProvisioningTimeoutMinutesHelp": "Na hoeveel minuten vanaf startsAt een evenement zonder JVB-readiness als 'degraded' wordt gemeld op de statuspagina. Standaard 15. Dekt cold-start van de knoop (~3-5 min) + veiligheidsmarge.",
-        "statusPollIntervalSeconds": "Polling-interval statuspagina (seconden)",
-        "statusPollIntervalSecondsHelp": "Hoe vaak de /status-pagina vanuit de browser wordt vernieuwd. Standaard 30. Lagere waarden = verser data maar meer belasting op de app.",
-        "jvbEmptyCloseMinutes": "Minuten lege zaal vóór definitieve sluiting",
-        "jvbEmptyCloseMinutesHelp": "Als een LIVE zaal die al deelnemers heeft gehad dit aantal minuten leeg blijft, wordt de zaal definitief gesloten (ENDED) — zo sluit een evenement zonder moderator zichzelf wegens inactiviteit, zonder het geplande eindtijdstip af te wachten. Standaard 15 (actief). -1 = uitgeschakeld. 0 = sluiten bij de eerste controle met lege zaal.",
-        "waitingRoomLeadMinutes": "Vervroegde toegang tot de zaal (minuten)",
-        "waitingRoomLeadMinutesHelp": "Wie zich binnen dit aantal minuten vóór de aanvang registreert, komt meteen in de wachtruimte; wie zich eerder registreert, ziet de bevestiging met de link naar de agenda. 0 = altijd het bevestigingsscherm tot aan de aanvang. Aanbevolen 15.",
-        "reactionsMode": "Reacties (emoji)",
-        "reactionsModeNative": "Native van Jitsi (in de balk, kortstondig)",
-        "reactionsModeCustom": "Van de app zelf (balk links, met statistieken)",
-        "reactionsModeHelp": "Native = de reactieknop van Jitsi in de bedieningsbalk, licht en kortstondig (niet meegeteld). Custom = de reactiebalk van de app linksonder, met tellingen en statistieken. Standaard: Native.",
-        "emailSenderTitle": "Afzender van de e-mails",
-        "emailSenderHelp": "Hoe de afzender verschijnt in de mailbox van wie zich registreert. Het verzendadres blijft in de deployment geconfigureerd (het moet overeenkomen met het adres dat de SMTP-server toestaat).",
-        "emailFromName": "Naam van de afzender",
-        "emailFromNameHelp": "Leeg = de naam die in de deployment is geconfigureerd (SMTP_FROM_NAME) wordt gebruikt. De e-mails worden nog steeds vanaf het systeemadres verzonden.",
-        "emailReplyTo": "Adres voor antwoorden",
-        "emailReplyToHelp": "De e-mails komen van een no-reply-adres: zonder dit adres komt een antwoord bij niemand terecht.",
-        "avatarTitle": "Afbeeldingen van de deelnemers",
-        "gravatarEnabled": "Gravatar gebruiken wanneer beschikbaar",
-        "gravatarEnabledHelp": "Wie zich heeft geregistreerd met een e-mailadres dat een Gravatar heeft, ziet die als afbeelding in de zaal; voor alle anderen blijven de initialen die het platform genereert. De afbeelding loopt via onze server, dus de browser van de deelnemers neemt geen contact op met gravatar.com — het platform wel: dat moet in de privacyverklaring worden vermeld."
-      },
       "postprod": {
         "prerequisitesNote": "De postproductie werkt op de volledige opname, na afloop van het evenement. De speciale GPU-pool wordt actief zodra de eerste taak in de wachtrij komt en schakelt uit wanneer de wachtrij leeg is, om de kosten te beperken. Controleer voordat u de pijplijn inschakelt of het cluster de GPU-pool geconfigureerd heeft, of de NVIDIA-operator is geïnstalleerd, of de HuggingFace-inloggegevens in de namespace aanwezig zijn en of het volume met de modelgewichten vooraf is geladen. De operationele checklist staat in docs/POSTPROD.md.",
         "pipelineEnabled": "Pijplijn na het evenement actief",
@@ -1499,10 +1474,217 @@
         "jobMaxAttempts": "Pogingen vóór mislukking",
         "jobMaxAttemptsHelp": "Hoe vaak de pijplijn een taak opnieuw probeert voordat deze als mislukt wordt gemarkeerd. De backoff tussen de pogingen groeit exponentieel (van 30 seconden tot 2 uur). De gebruikelijke waarde is 5.",
         "artifactRetentionDays": "Bewaring van de artefacten (dagen)",
-        "artifactRetentionDaysHelp": "Op 0 volgen de AI-artefacten dezelfde vervaltermijn als het evenement. Een waarde groter dan nul bewaart ze gedurende het opgegeven aantal dagen, ook na de afsluiting van het evenement, totdat een dagelijkse cron ze verwijdert. Het verwijderen omvat de namen van de sprekers en de payloads van de jobs, in lijn met docs/GDPR.md.",
+        "artifactRetentionDaysHelp": "Bij 0 geldt geen limiet voor de hele site: de AI-artefacten volgen de bewaartermijn van hun opname of van het evenement. Een waarde groter dan nul laat een dagelijkse taak elk artefact verwijderen dat meer dan dat aantal dagen geleden is aangemaakt, gepubliceerd of niet: zo kan de bewaring korter worden, maar nooit langer. Namen van sprekers en payloads van de jobs vallen hier niet onder: die volgen de bewaartermijn van de opname of van het evenement. Details in docs/privacy/recordings-and-ai.md.",
         "consentDisclosureSection": "AI-mededeling in de wachtruimte",
         "consentDisclosureHelp": "Tekst die aan de deelnemers in de wachtruimte wordt getoond wanneer het evenement AI-postproductie gebruikt (transcriptie, samenvatting, vertaling, nasynchronisatie). Per taal aan te passen. Laat leeg om de standaardtekst van het systeem te gebruiken.",
         "consentDisclosurePlaceholder": "Bijv. Dit evenement wordt na de live-uitzending automatisch getranscribeerd en samengevat met AI-hulpmiddelen…"
+      },
+      "scaling": {
+        "intro": "Parameters die de capaciteit van het cluster beschrijven waarop het platform draait. De standaardwaarden zijn afgestemd op Azure F16s_v2 (16 vCPU / 32 GiB) voor JVB en F4s_v2 (4 vCPU / 8 GiB) voor Jibri. Bij andere hardware deze waarden bijwerken — de scaler herberekent direct.",
+        "jvbSection": "Capaciteit videobridge (JVB)",
+        "jvbCpuCoresPerPod": "vCPU per JVB-pod",
+        "jvbCpuCoresPerPodHelp": "Aantal CPU-cores dat de JVB-container vraagt (resources.requests.cpu). Azure F16s_v2 = 16.",
+        "jvbReceiversPerCore": "Passieve kijkers per core",
+        "jvbReceiversPerCoreHelp": "Hoeveel receive-only kijkers er in 1 vCPU passen. Gekalibreerd op 18,75 (300 webinar ÷ 16 cores) op F16s_v2.",
+        "jvbSendersPerCore": "Actieve deelnemers per core",
+        "jvbSendersPerCoreHelp": "Hoeveel senders (mic+webcam) er in 1 vCPU passen. Gekalibreerd op 3,125 (50 all-sender ÷ 16 cores) op F16s_v2.",
+        "jvbMaxReplicas": "Max. JVB-replicas",
+        "jvbMaxReplicasHelp": "Harde limiet om runaway scale-up te voorkomen. Standaard 6.",
+        "jibriCpuCoresPerPod": "vCPU per Jibri-pod",
+        "jibriCpuCoresPerPodHelp": "Cores die de Jibri-container vraagt (ffmpeg + headless Chrome). Azure F4s_v2 = 4.",
+        "defaultSenderRatioPct": "Standaard sender-ratio",
+        "defaultSenderRatioPctHelp": "Percentage verwachte deelnemers dat als sender (mic+webcam) zal optreden wanneer het evenement dit niet specificeert. Webinar 10-30%, panel 50-100%.",
+        "previewTitle": "Voorbeeld berekening",
+        "previewBody": "Evenement met {participants} verwachte deelnemers bij {ratio}% senders → {senders} senders + {receivers} passief → {cores} geschatte cores → {jvbs} JVB.",
+        "graceSection": "Soft exit (einde evenement)",
+        "eventGracePeriodMinutes": "Standaard respijtminuten na endsAt",
+        "eventGracePeriodMinutesHelp": "Extra tijd toegestaan na de geplande eindtijd voordat de call wordt gesloten. 0 = harde sluiting, -1 = niet automatisch sluiten (laten aan inactiviteit-cleanup), 15 = banner en sluiting na 15 min. Elk evenement kan dit overrulen.",
+        "videoQualitySection": "Video-/audiokwaliteit",
+        "videoQuality": "Standaardkwaliteit",
+        "videoQualityHelp": "Voorinstelling die op alle evenementen wordt toegepast (per evenement aan te passen). Hoe hoger de kwaliteit, hoe meer bandbreedte nodig is: „Hoog” is het beste compromis. Wordt direct toegepast, zonder herstart.",
+        "videoQualityOptions": {
+          "MAX": "Maximaal — 1080p",
+          "HIGH": "Hoog — 720p (aanbevolen)",
+          "BALANCED": "Gebalanceerd — 540p",
+          "SAVE_DATA": "Databesparing — 360p"
+        },
+        "videoQualityDesc": {
+          "MAX": "Full HD 1080p, bitrate tot ~4 Mbps, Opus-stereoaudio 510 kbps. Maximale getrouwheid voor kleine, belangrijke gesprekken — verbruikt meer bandbreedte en belast de videobridge zwaarder.",
+          "HIGH": "720p met begrensde bitrate (~2,2 Mbps piek) en Opus-audio 96 kbps. Uitstekende kwaliteit zonder de bandbreedte te verzadigen: het aanbevolen compromis voor productie.",
+          "BALANCED": "540p met beperkte bitrate (~1 Mbps) en minder gelijktijdig ontvangen videostreams. Geschikt voor een groot publiek of zwakke netwerken.",
+          "SAVE_DATA": "360p met minimale bitrate (~600 kbps) en onderbreking van ongebruikte lagen. Voor zeer trage verbindingen."
+        }
+      },
+      "header": {
+        "slimBarTitle": "Bovenste balk (Slim Header)",
+        "slimBarDescription": "De dunne balk bovenaan de pagina die de bovenliggende organisatie identificeert.",
+        "parentOrganization": "Bovenliggende organisatie",
+        "parentOrganizationHelp": "De organisatie waaronder uw overheid valt. Laat leeg om er geen te noemen.",
+        "parentOrganizationUrl": "URL bovenliggende organisatie",
+        "siteTagline": "Slogan van de site",
+        "siteTaglineHelp": "Verschijnt in de bovenste balk en de voettekst als de bovenliggende organisatie leeg is. Laat leeg om niets te tonen. Wordt per taal ingevuld: ontbreekt er een, dan wordt de Engelse gebruikt, daarna een willekeurige andere.",
+        "centerBarTitle": "Centrale header",
+        "centerBarDescription": "Het hoofdgebied van de header met de applicatienaam en het logo.",
+        "appName": "Applicatienaam",
+        "appNameHelp": "Weergegeven in de header en de browsertitel",
+        "organizationShort": "Korte naam organisatie",
+        "logoUrl": "Logo-URL",
+        "logoUrlHelp": "Laat leeg om het standaard PA-pictogram te gebruiken",
+        "organizationUrl": "URL website organisatie"
+      },
+      "branding": {
+        "siteName": "Applicatienaam",
+        "siteNameHelp": "Weergegeven in de header, de browsertitel en e-mails",
+        "siteDescription": "Applicatiebeschrijving",
+        "organizationName": "Naam organisatie",
+        "organizationNameHelp": "Naam van de instantie die eigenaar is van het platform: wordt getoond in de koptekst, de voettekst en de juridische teksten (bijv. Gemeente Voorbeeld)",
+        "organizationNameShort": "Afkorting organisatie",
+        "organizationUrl": "URL organisatie",
+        "parentOrganization": "Bovenliggende organisatie",
+        "parentOrganizationHelp": "De organisatie waaronder uw overheid valt. Laat leeg om er geen te noemen.",
+        "parentOrganizationUrl": "URL bovenliggende organisatie",
+        "logoUrl": "URL aangepast logo",
+        "logoUrlHelp": "Laat leeg om het standaard PA-pictogram te gebruiken",
+        "faviconUrl": "Favicon-URL",
+        "primaryColor": "Primaire kleur",
+        "defaultTimezone": "Standaard tijdzone",
+        "defaultTimezoneHelp": "Gebruikt voor datumweergave en het aanmaken van nieuwe evenementen.",
+        "waitingRoomEngine": "Wachtruimte (standaard van de site)",
+        "waitingRoomEngineGame": "Videogame (Phaser-lobby)",
+        "waitingRoomEngineClassic": "Klassiek (statisch)",
+        "waitingRoomEngineHelp": "Standaardmodus van de wachtruimte. Die kan per evenement worden gewijzigd en, voor één bezoek, met de parameter {param} in het adres."
+      },
+      "watermark": {
+        "title": "Video-aanpassing",
+        "enabled": "Watermerk actief",
+        "url": "URL watermerk",
+        "urlHelp": "URL van een transparante SVG- of PNG-afbeelding. Laat leeg om het organisatielogo te gebruiken.",
+        "opacity": "Dekking",
+        "position": "Positie",
+        "previewLabel": "Voorbeeld videogebied",
+        "positions": {
+          "bottomLeft": "Linksonder",
+          "bottomRight": "Rechtsonder",
+          "topLeft": "Linksboven",
+          "topRight": "Rechtsboven"
+        }
+      },
+      "seo": {
+        "title": "SEO-titel",
+        "titleHelp": "Titel weergegeven in zoekresultaten en het browsertabblad",
+        "description": "SEO-beschrijving",
+        "descriptionHelp": "Beschrijving voor zoekmachines en social media",
+        "image": "Open Graph-afbeelding",
+        "imageHelp": "Standaardafbeelding voor social media (1200x630 aanbevolen)",
+        "ogSection": "Voorbeeld van gedeelde links",
+        "ogIntro": "Wanneer iemand de link van een evenement in een chat of op sociale media plakt, tekent het platform een voorbeeldafbeelding met de gegevens erin. Kies welke: elk extra veld neemt ruimte weg van de titel.",
+        "ogCardEnabled": "Voorbeeld genereren",
+        "ogCardEnabledHelp": "Uitgeschakeld toont de link de affiche zoals die is (of het logo van de site als het evenement er geen heeft), zonder leesbare titel of datum in de afbeelding.",
+        "ogShowPoster": "Affiche als achtergrond",
+        "ogShowPosterHelp": "Gebruikt de omslag van het evenement als achtergrond van het voorbeeld, gedimd zodat de tekst leesbaar blijft. Zonder affiche, of met deze optie uitgeschakeld, blijven de institutionele kleur en het logo.",
+        "ogShowDate": "Datum en tijd",
+        "ogShowDateHelp": "In de standaardtijdzone van het platform.",
+        "ogShowSpeakers": "Sprekers",
+        "ogShowSpeakersHelp": "De sprekerstekst van het evenement, ingekort als die te lang is.",
+        "ogShowOrganization": "Organisatie",
+        "ogShowOrganizationHelp": "De organisator van het evenement indien opgegeven, anders de naam van de organisatie."
+      },
+      "homepage": {
+        "modeLabel": "Modus startpagina",
+        "modes": {
+          "LANDING": {
+            "title": "Landingspagina",
+            "description": "Hero, functionaliteiten, komende evenementen en hoe het werkt"
+          },
+          "EVENTS_LIST": {
+            "title": "Evenementenlijst",
+            "description": "Toont direct de lijst met evenementen"
+          },
+          "CUSTOM": {
+            "title": "Aangepast",
+            "description": "Aangepaste HTML-inhoud + evenementenlijst"
+          },
+          "LANDING_ISTITUZIONALE": {
+            "title": "Institutionele landingspagina",
+            "description": "Organisatie, volgende evenement uitgelicht en de overige in een lijst. Geen technische taal"
+          },
+          "LANDING_SEMPLICE": {
+            "title": "Landingspagina in eenvoudige taal",
+            "description": "Weinig woorden en één uitnodiging, voor wie niet gewend is aan online evenementen"
+          }
+        },
+        "customHtmlLabel": "Aangepaste HTML-inhoud",
+        "customHtmlHelp": "HTML weergegeven in het hoofdgedeelte van de startpagina",
+        "showProject": "Onderdeel ‘Het project’ tonen",
+        "showProjectHelp": "Architectuur, datasoevereiniteit en open source van het platform: interessant voor wie hergebruik overweegt, minder voor deelnemers."
+      },
+      "pages": {
+        "privacyTitle": "Privacybeleid",
+        "privacyIt": "Inhoud (Italiaans)",
+        "privacyEn": "Inhoud (Engels)",
+        "privacyLabel": "Inhoud privacyverklaring",
+        "accessibilityTitle": "Toegankelijkheidsverklaring",
+        "accessibilityIt": "Inhoud (Italiaans)",
+        "accessibilityEn": "Inhoud (Engels)",
+        "accessibilityLabel": "Inhoud toegankelijkheidsverklaring",
+        "preview": "Voorbeeld"
+      },
+      "footer": {
+        "linksTitle": "Footerlinks",
+        "addLink": "Link toevoegen",
+        "noLinks": "Geen links geconfigureerd. Standaardlinks worden gebruikt.",
+        "linkTitle": "Titel",
+        "linkSection": "Sectie",
+        "sectionLegal": "Juridisch",
+        "sectionMain": "Hoofdmenu",
+        "moveUp": "Omhoog",
+        "moveDown": "Omlaag",
+        "removeLink": "Link verwijderen"
+      },
+      "features": {
+        "statusPageEnabled": "Statuspagina actief",
+        "statusPageEnabledHelp": "Publiceert de servicestatuspagina. Indien uitgeschakeld bestaat de pagina niet en zijn de gegevens alleen zichtbaar voor beheerders.",
+        "guestAccessEnabled": "Gasttoegang actief",
+        "guestAccessEnabledHelp": "Wie niet is ingeschreven, kan lopende evenementen bijwonen met alleen een naam. Indien uitgeschakeld, is deelname aan geplande evenementen alleen mogelijk met een inschrijving of met een moderator- of sprekerslink; directe videogesprekken blijven open voor iedereen met de link.",
+        "publicRegistrationEnabled": "Publieke inschrijving actief",
+        "publicRegistrationEnabledHelp": "Iedereen kan zich inschrijven voor evenementen. Indien uitgeschakeld, kunnen alleen personen op de uitnodigingslijst van het evenement zich inschrijven en wordt de persoonlijke link om deel te nemen alleen per e-mail verstuurd; bestaande inschrijvingen en moderator- en sprekerslinks blijven werken.",
+        "calendarPublic": "Openbare kalender",
+        "calendarPublicHelp": "De evenementenkalender publiceren. Bezoekers kunnen geplande evenementen zien.",
+        "parseTitleKicker": "Titels met redactionele kicker",
+        "parseTitleKickerHelp": "Als de titel van een evenement het teken \"|\" bevat, wordt het deel ervoor weergegeven als kleine kapitaal-bovenkop boven de hoofdtitel. Voorbeeld: \"Koffiepauze | OSS-test\" → bovenkop \"KOFFIEPAUZE\" + titel \"OSS-test\".",
+        "githubUrl": "URL GitHub-repository",
+        "supportEmail": "E-mail ondersteuning",
+        "jvbScalingTitle": "Schalen videobridge (JVB)",
+        "jvbScalingHelp": "Regelt hoe lang er gewacht wordt voordat een inactieve videoknooppunt wordt uitgeschakeld en hoe ver van tevoren deze gestart wordt voor een gepland evenement.",
+        "jvbInactiveGraceMinutes": "Inactiviteitsminuten vóór uitschakeling",
+        "jvbInactiveGraceMinutesHelp": "Na hoeveel tijd zonder vergadering de videoknoop wordt gepauzeerd. Aanbevolen 45 minuten. Bereik 5-240.",
+        "jvbPreScaleMinutes": "Minuten van tevoren voor geplande start",
+        "jvbPreScaleMinutesHelp": "Hoe lang vóór startsAt de videoknoop wordt gestart voor een gepland evenement. Aanbevolen 10 minuten.",
+        "jvbEmptyCloseMinutes": "Minuten lege zaal vóór definitieve sluiting",
+        "jvbEmptyCloseMinutesHelp": "Als een LIVE zaal die al deelnemers heeft gehad dit aantal minuten leeg blijft, wordt de zaal definitief gesloten (ENDED) — zo sluit een evenement zonder moderator zichzelf wegens inactiviteit, zonder het geplande eindtijdstip af te wachten. Standaard 15 (actief). -1 = uitgeschakeld. 0 = sluiten bij de eerste controle met lege zaal.",
+        "waitingRoomLeadMinutes": "Vervroegde toegang tot de zaal (minuten)",
+        "waitingRoomLeadMinutesHelp": "Wie zich binnen dit aantal minuten vóór de aanvang registreert, komt meteen in de wachtruimte; wie zich eerder registreert, ziet de bevestiging met de link naar de agenda. 0 = altijd het bevestigingsscherm tot aan de aanvang. Aanbevolen 15.",
+        "reactionsMode": "Reacties (emoji)",
+        "reactionsModeNative": "Native van Jitsi (in de balk, kortstondig)",
+        "reactionsModeCustom": "Van de app zelf (balk links, met statistieken)",
+        "reactionsModeHelp": "Native = de reactieknop van Jitsi in de bedieningsbalk, licht en kortstondig (niet meegeteld). Custom = de reactiebalk van de app linksonder, met tellingen en statistieken. Standaard: Native.",
+        "jvbStressWarnPercent": "Drempel stress warning (%)",
+        "jvbStressWarnPercentHelp": "Boven deze drempel voegt de scaler 1 extra JVB-replica toe, ook als de predictive sizing dat niet vraagt. Standaard 50.",
+        "jvbStressCriticalPercent": "Drempel stress critical (%)",
+        "jvbStressCriticalPercentHelp": "Boven deze drempel voegt de scaler 2 JVB-replicas toe. Standaard 70. Moet hoger zijn dan warn.",
+        "jvbProvisioningTimeoutMinutes": "Provisioning-timeout (minuten)",
+        "jvbProvisioningTimeoutMinutesHelp": "Na hoeveel minuten vanaf startsAt een evenement zonder JVB-readiness als 'degraded' wordt gemeld op de statuspagina. Standaard 15. Dekt cold-start van de knoop (~3-5 min) + veiligheidsmarge. Geldt ook voor de opnamedienst, gerekend vanaf het moment dat een evenement met opname erom vraagt: blijft een antwoord binnen deze tijd uit, dan toont de live-ruimte hem niet meer als 'wordt gestart' en meldt hem als niet gestart.",
+        "statusPollIntervalSeconds": "Polling-interval statuspagina (seconden)",
+        "statusPollIntervalSecondsHelp": "Hoe vaak de /status-pagina vanuit de browser wordt vernieuwd. Standaard 30. Lagere waarden = verser data maar meer belasting op de app.",
+        "emailSenderTitle": "Afzender van de e-mails",
+        "emailSenderHelp": "Hoe de afzender verschijnt in de mailbox van wie zich registreert. Het verzendadres blijft in de deployment geconfigureerd (het moet overeenkomen met het adres dat de SMTP-server toestaat).",
+        "emailFromName": "Naam van de afzender",
+        "emailFromNameHelp": "Leeg = de naam die in de deployment is geconfigureerd (SMTP_FROM_NAME) wordt gebruikt. De e-mails worden nog steeds vanaf het systeemadres verzonden.",
+        "emailReplyTo": "Adres voor antwoorden",
+        "emailReplyToHelp": "De e-mails komen van een no-reply-adres: zonder dit adres komt een antwoord bij niemand terecht.",
+        "avatarTitle": "Afbeeldingen van de deelnemers",
+        "gravatarEnabled": "Gravatar gebruiken wanneer beschikbaar",
+        "gravatarEnabledHelp": "Wie zich heeft geregistreerd met een e-mailadres dat een Gravatar heeft, ziet die als afbeelding in de zaal; voor alle anderen blijven de initialen die het platform genereert. De afbeelding loopt via onze server, dus de browser van de deelnemers neemt geen contact op met gravatar.com — het platform wel: dat moet in de privacyverklaring worden vermeld."
       }
     },
     "analytics": {
@@ -1583,20 +1765,17 @@
       "descriptionLabel": "Beschrijving",
       "maxParticipantsLabel": "Max. deelnemers",
       "featuresLabel": "Functionaliteiten",
-      "recordingLabel": "Opname",
-      "unmute": "Microfoon deelnemers",
-      "video": "Video deelnemers",
-      "screen": "Scherm delen",
-      "pickerTitle": "Kies een sjabloon",
-      "pickerSubtitle": "Selecteer een sjabloon om de evenementinstellingen vooraf te configureren, of sla over om alles handmatig in te stellen.",
-      "skipTemplate": "Handmatig instellen",
       "whiteboardLabel": "Whiteboard",
+      "recordingLabel": "Opname",
       "waitingRoomEngineLabel": "Wachtruimte (standaard van het sjabloon)",
       "waitingRoomEngineSiteDefault": "Standaard van de site",
       "waitingRoomEngineGarden": "Tuin (normaal)",
       "waitingRoomEngineGame": "Videogame (Phaser-lobby)",
       "waitingRoomEngineClassic": "Klassiek (statisch)",
       "waitingRoomEngineHelp": "Vult de engine van de wachtruimte vooraf in voor evenementen die met dit sjabloon worden gemaakt. Blijft aanpasbaar in de wizard.",
+      "unmute": "Microfoon deelnemers",
+      "video": "Video deelnemers",
+      "screen": "Scherm delen",
       "durationLabel": "Standaardduur (minuten)",
       "durationHint": "Vult het einde van het evenement vooraf in (begin + duur). De gebruiker kan dit wijzigen. Leeg = 2 uur.",
       "retentionLabel": "Standaard bewaring van gegevens (dagen)",
@@ -1605,7 +1784,10 @@
       "descriptionTemplateHint": "Tekst die vooraf in de beschrijving van het evenement wordt ingevuld (aanpasbaar).",
       "aiTranscript": "Automatische transcriptie (standaard)",
       "aiSummary": "Automatische samenvatting (standaard)",
-      "aiTranslation": "Automatische vertaling (standaard)"
+      "aiTranslation": "Automatische vertaling (standaard)",
+      "pickerTitle": "Kies een sjabloon",
+      "pickerSubtitle": "Selecteer een sjabloon om de evenementinstellingen vooraf te configureren, of sla over om alles handmatig in te stellen.",
+      "skipTemplate": "Handmatig instellen"
     },
     "instantCall": {
       "title": "Directe videogesprek",
@@ -1634,7 +1816,7 @@
       "selectFile": "Bestand selecteren",
       "fileTitle": "Titel",
       "visibility": "Zichtbaarheid",
-      "visibilityAlways": "Altijd zichtbaar",
+      "visibilityAlways": "In de zaal en na het evenement",
       "visibilityBefore": "Alleen vóór het evenement",
       "visibilityDuring": "Alleen tijdens het evenement",
       "visibilityAfter": "Alleen na het evenement",
@@ -1655,10 +1837,11 @@
       "titleLabel": "Titel",
       "descriptionLabel": "Beschrijving (optioneel)",
       "visibilityLabel": "Zichtbaarheid",
-      "visibilityAlways": "Altijd",
+      "visibilityAlways": "In de zaal en na het evenement",
       "visibilityBefore": "Vóór het evenement",
       "visibilityDuring": "Tijdens het evenement",
       "visibilityAfter": "Na het evenement",
+      "visibilityHelp": "Vóór de start toont de openbare pagina van het evenement alleen materialen met ‘Vóór het evenement’. Materialen met ‘In de zaal en na het evenement’ verschijnen tijdens het evenement in de zaal en op de pagina van het afgelopen evenement.",
       "typeLabel": "Type",
       "fileUploaded": "Bestand geüpload",
       "typeFile": "Bestand",
@@ -1678,7 +1861,7 @@
         "newTitle": "Nieuw AVG-sjabloon",
         "editTitle": "AVG-sjabloon bewerken",
         "name": "Interne naam",
-        "namePlaceholder": "bv. Standaard DTD-privacyverklaring",
+        "namePlaceholder": "bv. Standaard privacyverklaring",
         "description": "Beschrijving (optioneel)",
         "descriptionPlaceholder": "Korte notities om het sjabloon te herkennen",
         "bodyIt": "Tekst privacyverklaring (Italiaans)",
@@ -1764,9 +1947,9 @@
       "version": "Versie",
       "environment": "Omgeving",
       "modes": {
-        "simple": "Eenvoudig (Docker Compose)",
-        "standard": "Standaard (Kubernetes)",
-        "full": "Volledig (Kubernetes met scale-to-zero)",
+        "simple": "Eenvoudig",
+        "standard": "Standaard",
+        "full": "Volledig (bridges met scale-to-zero)",
         "unknown": "Onbekend"
       },
       "database": {
@@ -1780,7 +1963,9 @@
         "title": "Jitsi Meet",
         "reachable": "Bereikbaar",
         "unreachable": "Onbereikbaar",
-        "notConfigured": "Niet geconfigureerd"
+        "notConfigured": "Niet geconfigureerd",
+        "degraded": "Bereikbaar, maar reageert met fouten of traag",
+        "publicCheckFailed": "Controle op het openbare adres mislukt ({code}): de portaalserver accepteert het certificaat of de naam niet. Conferenties kunnen toch werken."
       },
       "jvb": {
         "title": "Video Bridge (JVB)",
@@ -1788,7 +1973,9 @@
         "replicas": "{current}/{max} knooppunten",
         "preScale": "Pre-scale: {minutes} min",
         "fixedMode": "Vaste modus",
-        "scalerEnabled": "Scaler ingeschakeld"
+        "scalerEnabled": "Scaler ingeschakeld",
+        "fixedDown": "De videobridge reageert niet",
+        "unmonitored": "Niet bewaakt: het adres van de bridge (JVB_HEALTH_URL) is niet ingesteld"
       },
       "jibri": {
         "title": "Opname (Jibri)",
@@ -1810,7 +1997,11 @@
         "metrics": "Metrics-endpoint"
       },
       "note": "Infrastructuurwijzigingen worden uitgevoerd via Helm values en de CI/CD-pipeline.",
-      "deployDocs": "Implementatiedocumentatie"
+      "deployDocs": "Implementatiedocumentatie",
+      "platforms": {
+        "kubernetes": "Op Kubernetes",
+        "other": "Buiten Kubernetes (Docker Compose of één server)"
+      }
     },
     "instantCalls": {
       "title": "Snelgesprekken",
@@ -1890,7 +2081,7 @@
       "sectionQos": "Servicekwaliteit (latentie)",
       "sectionCapacity": "Capaciteit & JVB",
       "sectionResources": "Hardware-resources",
-      "sectionChat": "In-app chat & Redis",
+      "sectionChat": "Chat in de app & Redis",
       "chatMessagesPerMin": "Chatberichten/min",
       "chatMessagesSubtitle": "gemiddelde laatste 5 min",
       "chatSseConnections": "SSE-verbindingen",
@@ -1915,10 +2106,10 @@
       "latencyP99": "Latentie P99",
       "requestRate": "Verzoeken/s",
       "chartLatencyQuantiles": "Applicatielatentie — P50 / P95 / P99",
-      "participantsNow": "Actieve deelnemers",
+      "participantsNow": "Deelnemers op de videobridge",
       "jvbStress": "JVB-belasting",
-      "conferences": "Actieve vergaderingen",
-      "octoRelay": "Octo inter-bridge relay",
+      "conferences": "Conferenties op de videobridge",
+      "octoRelay": "Octo-relay tussen bridges",
       "interBridge": "Octo-verkeer",
       "chartCpu": "CPU usage",
       "chartMemory": "Memory usage",
@@ -1944,7 +2135,8 @@
       "liveNow": "LIVE",
       "provisioningNow": "in voorbereiding",
       "idleNow": "IDLE (gepauzeerd)",
-      "scaleToZeroHelp": "IDLE is de normale staat voor een evenement zonder verkeer langer dan de respijtperiode. Bij het volgende bezoek van een gebruiker keert het terug naar PROVISIONING en daarna LIVE."
+      "scaleToZeroHelp": "IDLE is de normale staat voor een evenement zonder verkeer langer dan de respijtperiode. Bij het volgende bezoek van een gebruiker keert het terug naar PROVISIONING en daarna LIVE.",
+      "capacityFromStatus": "Actuele waarden, gelezen van de videobridge. De geschiedenis vereist Prometheus."
     },
     "bulk": {
       "selectAll": "Alles selecteren",
@@ -1972,7 +2164,29 @@
       "resultsCount": "{count, plural, =0 {Geen evenementen} one {# evenement} other {# evenementen}}",
       "durationMinutes": "{minutes} min",
       "durationHoursMinutes": "{hours}u {minutes}min",
-      "moderatorsSpeakers": "{mods} moderatoren · {speakers} sprekers",
+      "menu": {
+        "actionsFor": "Acties voor ‘{title}’",
+        "manage": "Beheren",
+        "edit": "Bewerken",
+        "openPublic": "Openbare pagina openen",
+        "newTab": "(opent in een nieuw tabblad)",
+        "copyLink": "Openbare link kopiëren",
+        "linkCopied": "Link gekopieerd",
+        "publish": "Publiceren",
+        "unpublish": "Publicatie intrekken",
+        "unpublishTitle": "Evenement intrekken?",
+        "unpublishMessage": "‘{title}’ verdwijnt van de openbare pagina’s tot u het opnieuw publiceert. Reeds ontvangen inschrijvingen blijven bewaard.",
+        "published": "Evenement gepubliceerd",
+        "unpublished": "Evenement ingetrokken",
+        "duplicate": "Dupliceren als volgende editie",
+        "delete": "Verwijderen",
+        "deleteTitle": "Evenement verwijderen?",
+        "deleteMessage": "‘{title}’ en alle bijbehorende gegevens worden verwijderd. Dit kan niet ongedaan worden gemaakt.",
+        "deleted": "Evenement verwijderd",
+        "failed": "De bewerking is mislukt. Probeer het opnieuw."
+      },
+      "instantBadge": "Directe oproep",
+      "moderatorsSpeakers": "{mods, plural, one {# moderator} other {# moderatoren}} · {speakers, plural, one {# spreker} other {# sprekers}}",
       "postEventSummary": "{connected} verbonden · {registered} aanmeldingen",
       "registeredCount": "{count, plural, =0 {Geen aanmeldingen} one {1 aanmelding} other {# aanmeldingen}}"
     },
@@ -2014,15 +2228,19 @@
     },
     "eventDetail": {
       "copyPublicUrl": "Openbare link kopiëren",
-      "copyModeratorUrl": "Moderatorlink kopiëren",
-      "enterAsModerator": "LIVE binnenkomen",
+      "copyInviteUrl": "Uitnodigingslink kopiëren",
+      "enterAsParticipant": "Als deelnemer binnenkomen",
+      "openAsParticipant": "Openen als deelnemer",
+      "participantHintRoom": "Opent in een nieuw tabblad: de ruimte zoals een gast die ziet, zonder moderatorrechten.",
+      "participantHintPassword": "Opent in een nieuw tabblad: de ruimte zoals een gast die ziet, na het wachtwoord van het evenement.",
+      "participantHintPage": "Opent in een nieuw tabblad: de openbare pagina zoals deelnemers die zien.",
       "editEvent": "Evenement bewerken",
       "editSettings": "Instellingen bewerken",
       "featureSummary": "Actieve functies",
       "organizers": "Organisatoren",
       "privacyGdpr": "Privacy & AVG",
       "postEventTitle": "Na afloop & feedback",
-      "recordingSection": "Opname",
+      "recordingSection": "Video van het evenement",
       "callSessions": "Sessies & telemetrie",
       "questionnaires": "Vragenlijsten",
       "questionnaireCount": "{count, plural, =0 {Geen gekoppelde vragenlijsten} one {1 gekoppelde vragenlijst} other {# gekoppelde vragenlijsten}}",
@@ -2030,12 +2248,10 @@
       "manageQuestionnaires": "Vragenlijsten beheren",
       "tabs": {
         "overview": "Overzicht",
-        "settings": "Instellingen",
         "people": "Personen",
         "content": "Inhoud",
-        "audit": "Opnames & audit",
-        "postEvent": "Na het evenement",
-        "analytics": "Statistieken"
+        "analytics": "Statistieken",
+        "afterEvent": "Na het evenement"
       },
       "toggles": {
         "unmute": "Deelnemers kunnen spreken",
@@ -2049,15 +2265,17 @@
         "recordingConsent": "Toestemming opname"
       },
       "sidebar": {
-        "registrations": "Aanmeldingen",
+        "registrations": "Inschrijvingen",
         "ofMax": "{current} van {max}",
         "capacityEstimate": "≈{jvbs} JVB · {ram} RAM",
         "noReminders": "Geen herinneringen geconfigureerd",
         "tags": "Tags",
-        "postEventSummary": "{connected} verbonden van {registered} aanmeldingen (geschat {estimated})",
-        "estimatedAttendance": "Geschat: {estimated} deelnemers"
+        "postEventSummary": "{connected} verbonden van {registered} inschrijvingen (capaciteit {estimated})",
+        "estimatedAttendance": "Maximale capaciteit: {estimated} deelnemers",
+        "reminderScheduled": "Gaat uit op {when}",
+        "reminderMissed": "Niet verzonden — het moment is voorbij",
+        "reminderSoon": "Elk moment"
       },
-      "copyGuestUrl": "Gastlink kopiëren",
       "aiManageTitle": "Transcriptie, samenvatting en vertalingen",
       "aiManageDesc": "Beheer de AI-postproductie van deze opname: corrigeer de transcriptie en de toewijzing van de sprekers (wie zegt wat), pas de samenvatting aan en beheer de vertaaltalen.",
       "aiManageCta": "Het postproductiebeheer openen",
@@ -2072,24 +2290,16 @@
       "duplicateNext": "Dupliceren voor de volgende keer",
       "duplicateNextBusy": "Bezig met dupliceren…",
       "duplicateNextHint": "Maakt een concept met de volledige configuratie van dit evenement (opname, aparte sporen, AI, agenda, herinneringen). Als het evenement een vaste frequentie heeft, wordt de datum naar de volgende keer verplaatst; anders moet die nog worden ingesteld.",
-      "duplicateNextError": "Dupliceren mislukt. Probeer het opnieuw."
+      "duplicateNextError": "Dupliceren mislukt. Probeer het opnieuw.",
+      "capacitySection": "Capaciteit en infrastructuur",
+      "capacitySubtitle": "Ingesteld voor maximaal {max} deelnemers",
+      "publishBlockedLive": "Het evenement is al bezig",
+      "publishBlockedEnded": "Het evenement is afgelopen"
     },
     "rubrica": {
       "title": "Adresboek",
       "subtitle": "Personen die toestemming hebben gegeven voor opname in het adresboek (art. 6.1.a AVG). Profielinformatie wordt automatisch bijgewerkt bij elke nieuwe aanmelding.",
       "backToList": "← Terug naar adresboek"
-    },
-    "questionnairesPage": {
-      "title": "Vragenlijsten",
-      "subtitle": "Herbruikbare vraagsjablonen voor aanmeldings- en post-event vragenlijsten."
-    },
-    "questionnaireResponses": {
-      "title": "Antwoorden vragenlijsten",
-      "subtitle": "Aggregaties per vraag, filterbaar op evenement, fase en datumbereik."
-    },
-    "eventQuestionnaires": {
-      "title": "Vragenlijsten — {eventTitle}",
-      "subtitle": "Configureer een aanmeldings- en/of post-event vragenlijst door sjablonen en ad-hoc vragen te combineren."
     },
     "eventAnalytics": {
       "title": "Statistieken",
@@ -2238,11 +2448,6 @@
       "manageSource": "Brontaal",
       "manageOpenPublic": "Openbare pagina",
       "manageRerunOk": "Pijplijn opnieuw gestart.",
-      "manageRerunNoop": "Geen job gestart: AI is uitgeschakeld voor dit evenement of de pijplijn is gepauzeerd. Gebruik “AI genereren”.",
-      "manageRerunAlreadyQueued": "De verwerking staat al in de wachtrij: er is niets nieuws te starten.",
-      "generateAi": "AI genereren",
-      "generateAiConfirm": "Start de AI-pijplijn (transcriptie en samenvatting) op deze opname. De AI-verwerking wordt voor het evenement ingeschakeld en start op de achtergrond. De vertalingen worden daarna per taal toegevoegd via het tabblad “Vertalingen”.",
-      "generateAiOk": "AI-pijplijn gestart.",
       "manageOpen": "Beheren",
       "cancelConfirmTitle": "Postproductie annuleren",
       "speakerUpdateSuccess": "Spreker bijgewerkt",
@@ -2382,7 +2587,38 @@
       },
       "archiveSourceTitle": "Bronopname",
       "archiveSourceHint": "Originele video van het evenement. Aparte sporen per deelnemer en het MKV-archief vereisen opname met meerdere sporen (niet actief voor dit evenement).",
-      "archiveSourceDownload": "Originele video downloaden"
+      "archiveSourceDownload": "Originele video downloaden",
+      "manageRerunNoop": "Geen job gestart: AI is uitgeschakeld voor dit evenement of de pijplijn is gepauzeerd. Gebruik “AI genereren”.",
+      "manageRerunAlreadyQueued": "De verwerking staat al in de wachtrij: er is niets nieuws te starten.",
+      "generateAi": "AI genereren",
+      "generateAiConfirm": "Start de AI-pijplijn (transcriptie en samenvatting) op deze opname. De AI-verwerking wordt voor het evenement ingeschakeld en start op de achtergrond. De vertalingen worden daarna per taal toegevoegd via het tabblad “Vertalingen”.",
+      "generateAiOk": "AI-pijplijn gestart.",
+      "originalToggle": "Originele tekst tonen",
+      "originalToggleHint": "Toont onder elke gecorrigeerde regel de tekst zoals de automatische transcriptie die had geproduceerd",
+      "originalNotComparable": "Het aantal regels is gewijzigd ten opzichte van de originele versie: een vergelijking per regel is niet mogelijk",
+      "originalLabel": "Originele tekst:",
+      "revisedBadge": "Handmatig nagekeken",
+      "revisedHint": "Ten minste één regel is na de automatische transcriptie door een persoon gecorrigeerd",
+      "redactLabel": "Ook uit het origineel verwijderen",
+      "redactHint": "Te gebruiken bij een verzoek tot verwijdering: de wijzigingen worden ook toegepast op de bewaarde machinetekst, die anders de verwijderde zin zou behouden",
+      "redactSave": "Opslaan en uit het origineel verwijderen",
+      "redactSaved": "{n, plural, one {1 regel ook uit de originele tekst verwijderd} other {# regels ook uit de originele tekst verwijderd}}",
+      "redactNothingRemoved": "De correcties zijn opgeslagen, maar in de originele tekst was er voor de bewerkte regels niets te verwijderen",
+      "redactArchiveFailed": "De correcties zijn opgeslagen in de database, maar het herschrijven van het gearchiveerde bestand is mislukt: de verwijderde zin blijft daar downloadbaar. Probeer de verwijdering opnieuw",
+      "originalUncertain": "Herkomst niet zeker",
+      "originalUncertainHint": "De bewaarde tekst kan al correcties bevatten die zijn gemaakt voordat deze functie bestond: niet aantoonbaar is dat het de tekst is die de automatische transcriptie heeft geproduceerd"
+    },
+    "questionnairesPage": {
+      "title": "Vragenlijsten",
+      "subtitle": "Herbruikbare vraagsjablonen voor aanmeldings- en post-event vragenlijsten."
+    },
+    "questionnaireResponses": {
+      "title": "Antwoorden vragenlijsten",
+      "subtitle": "Aggregaties per vraag, filterbaar op evenement, fase en datumbereik."
+    },
+    "eventQuestionnaires": {
+      "title": "Vragenlijsten — {eventTitle}",
+      "subtitle": "Configureer een aanmeldings- en/of post-event vragenlijst door sjablonen en ad-hoc vragen te combineren."
     }
   },
   "email": {
@@ -2470,7 +2706,7 @@
     "projectTeaser": {
       "kicker": "Het project",
       "title": "Open source en soeverein, gebouwd door de overheid voor de overheid",
-      "body": "PA Webinar is het platform van het Departement voor Digitale Transformatie voor openbare digitale evenementen: het .italia-ontwerpsysteem, de Jitsi Meet-videomotor en een volledig in-cluster AI-pijplijn. Het wordt als open source uitgebracht zodat elke overheidsinstantie het kan hergebruiken.",
+      "body": "PA Webinar is een opensourceplatform voor openbare digitale evenementen, ontwikkeld door het Italiaanse Departement voor Digitale Transformatie en uitgebracht zodat elke overheidsinstantie het kan hergebruiken: het .italia-ontwerpsysteem, de Jitsi Meet-videomotor en een volledig in-cluster AI-pijplijn.",
       "sovereignty": {
         "title": "Datasoevereiniteit",
         "desc": "Self-hosted op de infrastructuur van de overheidsinstantie: gegevens verlaten die nooit en er is geen blootstelling aan de CLOUD Act."
@@ -2506,6 +2742,49 @@
         "title": "Audionasynchronisatie",
         "desc": "Een nagesynchroniseerd audiospoor met een neutrale synthetische stem (zonder stemklonen), om het evenement in een andere taal te beluisteren."
       }
+    },
+    "institutional": {
+      "title": "Online bijeenkomsten en evenementen",
+      "nextTitle": "Volgende evenement",
+      "nextCta": "Naar het evenement en inschrijven",
+      "othersTitle": "Overige evenementen",
+      "pointsTitle": "Hoe u deelneemt",
+      "points": {
+        "noInstall": {
+          "title": "Deelnemen via de browser",
+          "body": "U hoeft geen software te installeren: open gewoon de link die u ontvangt."
+        },
+        "accessible": {
+          "title": "Ontworpen voor iedereen",
+          "body": "Ondertiteling, toetsenbord en schermlezers: de zaal is ook zonder muis te gebruiken."
+        },
+        "privacy": {
+          "title": "Zorgvuldig omgaan met gegevens",
+          "body": "Alleen de gegevens die nodig zijn voor de inschrijving worden verzameld, en u kunt ze opvragen of laten verwijderen."
+        }
+      }
+    },
+    "simple": {
+      "title": "Online bijeenkomsten van {organization}",
+      "subtitle": "Deelnemen via computer of telefoon, zonder iets te installeren.",
+      "cta": "Neem deel aan de volgende bijeenkomst",
+      "noEvents": "Er zijn momenteel geen bijeenkomsten gepland. Kom later terug.",
+      "stepsTitle": "Zo werkt het",
+      "steps": {
+        "choose": {
+          "title": "Kies een bijeenkomst",
+          "body": "Bij elke bijeenkomst staan datum en tijd."
+        },
+        "name": {
+          "title": "Laat uw naam achter",
+          "body": "Uw naam en e-mailadres zijn voldoende om de link te ontvangen."
+        },
+        "enter": {
+          "title": "Deelnemen",
+          "body": "Open de link op het juiste moment: u bent binnen."
+        }
+      },
+      "listTitle": "Komende bijeenkomsten"
     }
   },
   "polls": {
@@ -2534,7 +2813,9 @@
     "errors": {
       "questionRequired": "Schrijf de peilingvraag",
       "minOptions": "Er zijn ten minste 2 opties vereist",
-      "generic": "Fout bij het aanmaken van de peiling"
+      "generic": "Fout bij het aanmaken van de peiling",
+      "vote": "Stem niet geregistreerd. Probeer het opnieuw.",
+      "alreadyVoted": "U hebt al gestemd in deze peiling."
     }
   },
   "materials": {
@@ -2553,10 +2834,29 @@
     "add": "Toevoegen",
     "adding": "Toevoegen...",
     "cancel": "Annuleren",
+    "modeLabel": "Soort materiaal",
+    "modeLink": "Link",
+    "modeFile": "Bestand",
+    "titleOptional": "Titel (optioneel, anders de bestandsnaam)",
+    "fileLabel": "Te uploaden bestand",
+    "fileHelp": "Ondersteunde formaten: PDF, DOCX, PPTX, XLSX, TXT — max. {maxMb} MB",
+    "upload": "Uploaden",
+    "uploading": "Bezig met uploaden…",
     "errors": {
       "urlInvalid": "Voer een geldige URL in",
-      "generic": "Fout bij het toevoegen van materiaal"
-    }
+      "generic": "Fout bij het toevoegen van materiaal",
+      "fileMissing": "Kies een bestand om te uploaden",
+      "titleMissing": "Voer een titel voor de link in",
+      "fileTooLarge": "Het bestand is groter dan de limiet van {maxMb} MB",
+      "fileTooLargeForServer": "De server accepteert geen bestand van deze grootte: probeer een kleiner bestand",
+      "fileType": "Niet-ondersteund bestandstype (PDF, DOCX, PPTX, XLSX, TXT)",
+      "uploadUnavailable": "Bestanden uploaden is niet beschikbaar in deze installatie",
+      "uploadFailed": "Fout bij het uploaden van het bestand",
+      "quotaExceeded": "Dit evenement heeft de limiet voor geüploade bestanden bereikt ({maxFiles} bestanden, {maxMb} MB in totaal): verwijder er enkele om meer te uploaden",
+      "uploadBusy": "Te veel uploads op dit moment: probeer het over een paar seconden opnieuw",
+      "deleteFailed": "Het materiaal kon niet worden verwijderd"
+    },
+    "addedByStaff": "Toegevoegd door de organisatie"
   },
   "reminders": {
     "title": "Meldingen",
@@ -2582,11 +2882,11 @@
     "consent": {
       "recording": "Ik stem in met de audio-/video-opname van het evenement",
       "recordingRequired": "Toestemming voor opname is vereist om deel te nemen aan dit evenement",
-      "futureCommunications": "Ik wil informatie ontvangen over toekomstige evenementen van DTD",
-      "addressBook": "Ik wil opgenomen worden in het DTD-adresboek om uitgenodigd te worden voor soortgelijke evenementen",
-      "addressBookHelp": "Aparte toestemming (art. 6.1.a AVG). U kunt deze op elk moment intrekken via de link \"Verwijder mijn gegevens uit het adresboek\" in de e-mails die u ontvangt. Naam en organisatie worden overgenomen uit uw aanmeldingsprofiel.",
       "multitrack": "Ik stem in met het opnemen van een apart audiospoor van mijn stem, uitsluitend om het transcript correct aan elke spreker toe te wijzen. Het spoor is tijdelijk en wordt na de transcriptie verwijderd; het wordt niet gebruikt om mijn stem te identificeren of weer te geven.",
-      "multitrackRequired": "Toestemming voor het opnemen van je audiospoor is verplicht om aan dit evenement deel te nemen"
+      "multitrackRequired": "Toestemming voor het opnemen van je audiospoor is verplicht om aan dit evenement deel te nemen",
+      "futureCommunications": "Ik wil informatie ontvangen over toekomstige evenementen die op dit platform worden gepubliceerd",
+      "addressBook": "Ik wil opgenomen worden in het evenementenadresboek om uitgenodigd te worden voor soortgelijke evenementen",
+      "addressBookHelp": "Aparte toestemming (art. 6.1.a AVG). U kunt deze op elk moment intrekken via de link \"Verwijder mijn gegevens uit het adresboek\" in de e-mails die u ontvangt. Naam en organisatie worden overgenomen uit uw aanmeldingsprofiel."
     },
     "export": {
       "title": "Mijn gegevens",
@@ -2596,10 +2896,10 @@
       "emailInvalid": "Voer een geldig e-mailadres in",
       "submit": "Mijn gegevens opvragen",
       "loading": "Zoeken...",
-      "requestSubmittedTitle": "Check your inbox",
-      "requestSubmittedBody": "If this email matches a registration, we've sent you a link to download your data. The link is valid for 1 hour.",
-      "linkInvalid": "This link is invalid or expired. Please request a new link.",
-      "requestNew": "Request a new link",
+      "requestSubmittedTitle": "Controleer uw mailbox",
+      "requestSubmittedBody": "Als dit e-mailadres overeenkomt met een inschrijving, hebben we u een link gestuurd om uw gegevens te downloaden. De link is 1 uur geldig.",
+      "linkInvalid": "Deze link is ongeldig of verlopen. Vraag een nieuwe link aan.",
+      "requestNew": "Nieuwe link aanvragen",
       "noData": "Geen gegevens gevonden voor dit e-mailadres.",
       "error": "Er is een fout opgetreden. Probeer het later opnieuw.",
       "rateLimited": "Te veel verzoeken. Probeer het over een uur opnieuw.",
@@ -2614,30 +2914,30 @@
       "questionsTitle": "Q&A-vragen",
       "pollVotesTitle": "Peilingstemmen",
       "optionLabel": "Optie",
-      "erasureCtaTitle": "Want to delete your data?",
-      "erasureCtaBody": "You can request full erasure of the data tied to your email (GDPR Art. 17).",
-      "erasureCtaButton": "Request erasure"
+      "erasureCtaTitle": "Wilt u uw gegevens laten verwijderen?",
+      "erasureCtaBody": "U kunt de volledige verwijdering aanvragen van de gegevens die aan uw e-mailadres zijn gekoppeld (Art. 17 GDPR).",
+      "erasureCtaButton": "Verwijdering aanvragen"
     },
     "erasure": {
-      "title": "Erase your data",
-      "subtitle": "Confirm the erasure of the personal data tied to your email address (GDPR Art. 17).",
-      "emailLabel": "Your email address",
-      "emailPlaceholder": "Enter the email used for registration",
-      "emailInvalid": "Please enter a valid email address",
-      "submit": "Request erasure",
-      "requestSubmittedTitle": "Check your inbox",
-      "requestSubmittedBody": "If this email matches a registration, we've sent you a link to confirm the erasure. The link is valid for 1 hour.",
-      "linkInvalid": "This link is invalid or expired. Please request a new link.",
-      "confirmWarning": "You are about to permanently erase all personal data tied to your email.",
-      "confirmBody": "Registrations, questions, poll votes, feedback and reminders will be deleted. This action is irreversible.",
-      "confirmButton": "Confirm erasure",
-      "cancel": "Cancel",
-      "processing": "Deleting...",
-      "doneTitle": "Erasure completed",
-      "doneBody": "{count} registrations and the linked data have been deleted.",
-      "error": "An error occurred. Please try again later.",
-      "rateLimited": "Too many requests. Please try again in one hour.",
-      "back": "Back to my data"
+      "title": "Verwijdering van uw gegevens",
+      "subtitle": "Bevestig de verwijdering van de persoonsgegevens die aan uw e-mailadres zijn gekoppeld (Art. 17 GDPR).",
+      "emailLabel": "Uw e-mailadres",
+      "emailPlaceholder": "Voer het e-mailadres in dat u bij de inschrijving hebt gebruikt",
+      "emailInvalid": "Voer een geldig e-mailadres in",
+      "submit": "Verwijdering aanvragen",
+      "requestSubmittedTitle": "Controleer uw mailbox",
+      "requestSubmittedBody": "Als dit e-mailadres overeenkomt met een inschrijving, hebben we u een link gestuurd om de verwijdering te bevestigen. De link is 1 uur geldig.",
+      "linkInvalid": "Deze link is ongeldig of verlopen. Vraag een nieuwe link aan.",
+      "confirmWarning": "U staat op het punt alle persoonsgegevens die aan uw e-mailadres zijn gekoppeld definitief te verwijderen.",
+      "confirmBody": "Inschrijvingen, vragen, stemmen in peilingen, feedback, herinneringen en uw vermelding in het evenementenadresboek worden verwijderd. Deze handeling kan niet ongedaan worden gemaakt.",
+      "confirmButton": "Verwijdering bevestigen",
+      "cancel": "Annuleren",
+      "processing": "Bezig met verwijderen...",
+      "doneTitle": "Verwijdering voltooid",
+      "doneBody": "Verwijderde inschrijvingen: {count}, samen met de gekoppelde gegevens.",
+      "error": "Er is een fout opgetreden. Probeer het later opnieuw.",
+      "rateLimited": "Te veel verzoeken. Probeer het over een uur opnieuw.",
+      "back": "Terug naar mijn gegevens"
     }
   },
   "legal": {
@@ -2648,7 +2948,7 @@
       "sections": {
         "controller": {
           "title": "Verwerkingsverantwoordelijke",
-          "body": "De verwerking van persoonsgegevens vindt plaats binnen de institutionele activiteiten van het Departement voor Digitale Transformatie, ter ondersteuning van het technische en organisatorische beheer van publieke online evenementen."
+          "body": "Verwerkingsverantwoordelijke: {organization}. Persoonsgegevens worden verwerkt binnen haar institutionele activiteiten, ter ondersteuning van het technische en organisatorische beheer van publieke online evenementen."
         },
         "data": {
           "title": "Verwerkte gegevens en doeleinden",
@@ -2656,11 +2956,11 @@
         },
         "retention": {
           "title": "Bewaring en rechten",
-          "body": "Gegevens worden bewaard gedurende de voor elk evenement geconfigureerde periode en vervolgens automatisch verwijderd, tenzij andere wettelijke verplichtingen van toepassing zijn. Betrokkenen kunnen te allen tijde hun GDPR-rechten uitoefenen, waaronder inzage, rectificatie en wissing, via de institutionele kanalen van het Departement."
+          "body": "Gegevens worden bewaard gedurende de voor elk evenement geconfigureerde periode en vervolgens automatisch verwijderd, tenzij andere wettelijke verplichtingen van toepassing zijn. Betrokkenen kunnen te allen tijde hun GDPR-rechten uitoefenen, waaronder inzage, rectificatie en wissing, via de institutionele kanalen van de verwerkingsverantwoordelijke."
         },
         "automatedProcessing": {
           "title": "Door kunstmatige intelligentie gegenereerde transcriptie, samenvatting en nasynchronisatie",
-          "body": "Bij evenementen die daarom vragen, wordt de opname na afloop van de uitzending verwerkt door een AI-pijplijn die volledig draait op de clusterinfrastructuur van het Departement. Die produceert de transcriptie van het gesprokene (met scheiding van de verschillende sprekers), een samenvatting in gewone taal, eventuele vertalingen naar andere Europese talen en een nagesynchroniseerde audioversie met een generieke synthetische stem. Alle gebruikte modellen (WhisperX voor de transcriptie, Mistral-Small voor samenvatting en vertaling, Piper TTS voor de nasynchronisatie) draaien op eigen GPU's binnen het cluster: er worden geen deelnemersgegevens naar diensten van derden gestuurd. De stem van deelnemers wordt niet gekloond en niet bewaard als biometrisch gegeven (art. 9 AVG): de nasynchronisatie gebruikt openbare, vooraf getrainde synthetische stemmen die willekeurig aan de sprekers worden toegewezen. Voor elke opname toont de evenementpagina de exacte momentopname van de gebruikte modellen ('Transparantie van de AI-verwerking'). De gegenereerde inhoud kan onnauwkeurigheden bevatten: de gezaghebbende bron blijft altijd de originele video (AI-verordening, art. 50)."
+          "body": "Bij evenementen die daarom vragen, wordt de opname na afloop van de uitzending verwerkt door een AI-pijplijn die volledig draait op de clusterinfrastructuur van deze installatie. Die produceert de transcriptie van het gesprokene (met scheiding van de verschillende sprekers), een samenvatting in gewone taal, eventuele vertalingen naar andere Europese talen en een nagesynchroniseerde audioversie met een generieke synthetische stem. Alle gebruikte modellen (WhisperX voor de transcriptie, Mistral-Small voor samenvatting en vertaling, Piper TTS voor de nasynchronisatie) draaien op eigen GPU's binnen het cluster: er worden geen deelnemersgegevens naar diensten van derden gestuurd. De stem van deelnemers wordt niet gekloond en niet bewaard als biometrisch gegeven (art. 9 AVG): de nasynchronisatie gebruikt openbare, vooraf getrainde synthetische stemmen die willekeurig aan de sprekers worden toegewezen. Voor elke opname toont de evenementpagina de exacte momentopname van de gebruikte modellen ('Transparantie van de AI-verwerking'). De gegenereerde inhoud kan onnauwkeurigheden bevatten: de gezaghebbende bron blijft altijd de originele video (AI-verordening, art. 50)."
         }
       },
       "note": {
@@ -2672,7 +2972,7 @@
     "accessibility": {
       "metaTitle": "Toegankelijkheidsverklaring",
       "title": "Toegankelijkheidsverklaring",
-      "intro": "Het Departement voor Digitale Transformatie zet zich in om PA Webinar toegankelijk te maken, in overeenstemming met de Italiaanse Wet 4/2004, de EU-richtlijn 2016/2102 en de richtsnoeren van AgID over de toegankelijkheid van ICT-middelen.",
+      "intro": "Verantwoordelijke instantie: {organization}. De instantie zet zich in om dit platform toegankelijk te maken, in overeenstemming met de Italiaanse Wet 4/2004, de EU-richtlijn 2016/2102 en de richtsnoeren van AgID over de toegankelijkheid van ICT-middelen.",
       "sections": {
         "conformance": {
           "title": "Nalevingsstatus",
@@ -2711,7 +3011,7 @@
       "sections": {
         "ownership": {
           "title": "Eigenaar van de dienst",
-          "body": "Het platform wordt aangeboden door het Departement voor Digitale Transformatie en is beschikbaar gesteld voor de organisatie van en deelname aan institutionele publieke online evenementen."
+          "body": "Eigenaar van het platform: {organization}. Het platform is beschikbaar gesteld voor de organisatie van en deelname aan institutionele publieke online evenementen."
         },
         "usage": {
           "title": "Gebruiksvoorwaarden",
@@ -2719,7 +3019,7 @@
         },
         "liability": {
           "title": "Beperking van aansprakelijkheid",
-          "body": "Ondanks het nemen van passende technische en organisatorische maatregelen kan het Departement niet garanderen dat er geen onderbrekingen of storingen optreden als gevolg van onvoorziene omstandigheden, onderhoud of externe factoren. De wettelijke aansprakelijkheden blijven van kracht."
+          "body": "Ondanks het nemen van passende technische en organisatorische maatregelen kan de eigenaar van het platform niet garanderen dat er geen onderbrekingen of storingen optreden als gevolg van onvoorziene omstandigheden, onderhoud of externe factoren. De wettelijke aansprakelijkheden blijven van kracht."
         }
       }
     },
@@ -2818,7 +3118,8 @@
         },
         "note": "De volledige lijst van componenten en services, met versies, hashes en technische eigenschappen, is beschikbaar in de bovenstaande secties en in de downloadbare JSON."
       }
-    }
+    },
+    "organizationNotConfigured": "organisatie nog niet opgegeven in de instellingen"
   },
   "status": {
     "title": "Systeemstatus",
@@ -2851,7 +3152,7 @@
     "nodesReady": "gereedstaande nodes",
     "scaling": "opschaling",
     "jvbStress": "JVB-belasting",
-    "participantsConnected": "deelnemers verbonden",
+    "participantsConnected": "deelnemers op de videobridge",
     "videoInteractive": "interactief",
     "videoWebinar": "webinar",
     "participantsAvailable": "deelnemers beschikbaar",
@@ -2874,13 +3175,13 @@
     "systemStatus": "Systeemstatus",
     "postprod": {
       "title": "Pijplijn na het evenement",
-      "subtitle": "Transcriptie, samenvatting, vertaling en nasynchronisatie van de opname",
-      "whatItDoes": "Wanneer een evenement afloopt, gaat de opname door een interne pijplijn: de transcriptie wordt gegenereerd door WhisperX, de samenvatting en de vertalingen door een Mistral-model, de nagesynchroniseerde audio door Piper TTS. Alle modellen draaien op een GPU van het cluster die alleen aan blijft zolang het werk duurt, zodat het energieverbruik de werkelijke belasting volgt.",
       "status": {
         "idle": "In afwachting",
         "running": "Wordt uitgevoerd",
         "degraded": "Verminderde werking"
       },
+      "subtitle": "Transcriptie, samenvatting, vertaling en nasynchronisatie van de opname",
+      "whatItDoes": "Wanneer een evenement afloopt, gaat de opname door een interne pijplijn: de transcriptie wordt gegenereerd door WhisperX, de samenvatting en de vertalingen door een Mistral-model, de nagesynchroniseerde audio door Piper TTS. Alle modellen draaien op een GPU van het cluster die alleen aan blijft zolang het werk duurt, zodat het energieverbruik de werkelijke belasting volgt.",
       "aiBadge": "De transcriptie, de samenvatting en de nasynchronisatie van dit evenement zijn gegenereerd door modellen voor kunstmatige intelligentie en kunnen onnauwkeurigheden bevatten. Raadpleeg voor volledige zekerheid altijd de originele video.",
       "idleMessage": "Pijplijn gereed, op dit moment geen opnamen te verwerken.",
       "queueAriaLabel": "Samenstelling van de wachtrij voor postproductie",
@@ -2895,7 +3196,12 @@
       "lastFailure": "Laatste fout {when}",
       "artifactsProduced": "{count, plural, =0 {geen artefacten} one {1 artefact geproduceerd} other {# artefacten geproduceerd}}",
       "eventsEnabled": "{count, plural, =0 {geen evenementen met AI} one {1 evenement met AI actief} other {# evenementen met AI actief}}"
-    }
+    },
+    "jvbFixedUp": "{count, plural, =1 {Videobridge actief} other {Videobridge actief · # bridges voorzien}}",
+    "jvbFixedDown": "De videobridge reageert niet",
+    "jvbFixedDownDetail": "Deelnemers ontvangen geen audio of video totdat de bridge weer bereikbaar is.",
+    "jvbUnmonitored": "Status niet bewaakt",
+    "jvbUnmonitoredDetail": "Deze installatie bevraagt de videobridge niet, dus de status is hier niet beschikbaar."
   },
   "infraMap": {
     "loading": "Infrastructuurkaart laden...",
@@ -2903,8 +3209,8 @@
     "ariaLabel": "Systeeminfrastructuurkaart",
     "title": "Infrastructuurkaart",
     "subtitle": "Realtime visualisatie van de architectuur en servicestatus",
-    "participants": "Deelnemers",
-    "conferences": "Conferenties",
+    "participants": "Deelnemers op de videobridge",
+    "conferences": "Conferenties op de videobridge",
     "bandwidthIn": "Inkomende bandbreedte",
     "bandwidthOut": "Uitgaande bandbreedte",
     "recordings": "Opnames",
@@ -2947,6 +3253,7 @@
     "connMedia": "videostream",
     "connRecording": "opname",
     "connUpload": "uploaden",
+    "connPostprod": "AI-postproductie",
     "connPubSub": "chat pub/sub",
     "services": {
       "app": "Webportaal",
@@ -2989,23 +3296,33 @@
       "jitsiWeb": {
         "healthy": "De videoconferentiekamer is bereikbaar en klaar voor evenementen.",
         "down": "De videoconferentiekamer is niet bereikbaar. Het is niet mogelijk om evenementen te starten of bij te wonen.",
-        "standby": "De videoconferentiekamer is niet geconfigureerd."
+        "standby": "De videoconferentiekamer is niet geconfigureerd.",
+        "degraded": "De videoconferentiekamer reageert, maar met fouten of traag.",
+        "publicCheckFailed": "Het portaal kan de kamer niet controleren op het openbare adres: vanaf de server is het certificaat of de naam niet geldig. Voor deelnemers kan de kamer toch werken.",
+        "unmonitored": "De status van de videoconferentiekamer wordt in deze installatie niet bewaakt."
       },
       "prosody": {
         "healthy": "Interne berichtgeving tussen videodiensten werkt correct.",
         "down": "Interne berichtgeving is niet bereikbaar. Videodiensten kunnen niet met elkaar communiceren.",
-        "standby": "De berichtendienst is niet geconfigureerd."
+        "standby": "De berichtendienst is niet geconfigureerd.",
+        "degraded": "De interne berichtgeving reageert, maar met fouten of traag.",
+        "publicCheckFailed": "Het portaal kan de interne berichtgeving niet controleren via het openbare adres van de kamer: vanaf de server is het certificaat of de naam niet geldig. Conferenties kunnen toch werken.",
+        "unmonitored": "De status van de interne berichtgeving wordt in deze installatie niet bewaakt."
       },
       "jicofo": {
         "healthy": "De conferentiecoördinator is actief en beheert sessies.",
         "down": "De conferentiecoördinator is niet bereikbaar. Het is niet mogelijk om nieuwe conferenties aan te maken.",
-        "standby": "De conferentiecoördinator is niet geconfigureerd."
+        "standby": "De conferentiecoördinator is niet geconfigureerd.",
+        "degraded": "De conferentiecoördinator reageert, maar met fouten of traag.",
+        "unmonitored": "De status van de conferentiecoördinator wordt in deze installatie niet bewaakt."
       },
       "jvb": {
         "healthy": "De videobridge is actief en verzendt audio/video naar deelnemers.",
         "scaling": "De videobridge bereidt zich voor op een aankomend evenement. Servers worden automatisch aangemaakt.",
         "standby": "De videobridge is in stand-by. Deze wordt automatisch geactiveerd vóór de start van een gepland evenement.",
-        "stale": "Een evenement wacht langer dan de geconfigureerde timeout op de videobridge. Controleer de cluster autoscaler en de logs van de JVB-pods."
+        "stale": "Een evenement wacht langer dan de geconfigureerde timeout op de videobridge. Controleer de cluster autoscaler en de logs van de JVB-pods.",
+        "fixedDown": "De videobridge reageert niet. Conferenties verzenden geen audio of video totdat hij weer bereikbaar is.",
+        "unmonitored": "De status van de videobridge wordt in deze installatie niet bewaakt: het portaal heeft geen adres om hem te bevragen."
       },
       "jibri": {
         "healthy": "De opnamedienst is gereed en beschikbaar.",
@@ -3037,7 +3354,8 @@
       "jibri": "Evenementen kunnen niet worden opgenomen. Deelnemers kunnen nog steeds deelnemen.",
       "jibriStale": "Een evenement met actieve opname wacht langer dan de timeout op Jibri: de sessie wordt niet opgenomen.",
       "smtp": "Bevestigingsmails en herinneringen voor inschrijvingen worden niet verstuurd.",
-      "postprodDegraded": "De transcripties en de samenvattingen van enkele recente opnamen zijn niet gegenereerd. De video-opnamen blijven wel beschikbaar."
+      "postprodDegraded": "De transcripties en de samenvattingen van enkele recente opnamen zijn niet gegenereerd. De video-opnamen blijven wel beschikbaar.",
+      "jvbDown": "Deelnemers ontvangen geen audio of video."
     },
     "overallVerdicts": {
       "operational": "Alle diensten werken correct. Het platform is volledig operationeel.",
@@ -3067,7 +3385,8 @@
       "degraded": "Vertraagd",
       "down": "Niet beschikbaar",
       "standby": "Stand-by",
-      "scaling": "Voorbereiden"
+      "scaling": "Voorbereiden",
+      "unknown": "Niet bewaakt"
     },
     "metrics": {
       "uptime24h": "Uptime 24u",
@@ -3079,7 +3398,7 @@
       "requestRate": "Verzoeken/s",
       "podUptime": "Pod uptime"
     },
-    "connPostprod": "AI-postproductie"
+    "probeDetail": "Resultaat van de controle"
   },
   "feedback": {
     "title": "Hoe beoordeelt u dit evenement?",
@@ -3107,7 +3426,13 @@
     "noActiveRound": "Momenteel geen word cloud actief.",
     "noWords": "Wachten op de eerste woorden...",
     "wordsSubmitted": "{count} woorden ingediend",
-    "timeRemaining": "Resterende tijd"
+    "timeRemaining": "Resterende tijd",
+    "errors": {
+      "send": "Woord niet verzonden. Probeer het opnieuw.",
+      "closed": "Deze ronde is gesloten: er worden geen woorden meer aangenomen.",
+      "limit": "U hebt voor deze ronde al het maximale aantal woorden verzonden.",
+      "rateLimited": "Te veel inzendingen op dit moment: wacht een paar seconden voordat u het opnieuw probeert."
+    }
   },
   "timer": {
     "title": "Timer",
@@ -3153,11 +3478,9 @@
     }
   },
   "footer": {
-    "departmentName": "Departement voor Digitale Transformatie",
-    "presidencyName": "Voorzitterschap van de Raad van Ministers",
     "privacy": "Privacybeleid",
     "accessibility": "Toegankelijkheidsverklaring",
-    "openSource": "Open source software",
+    "openSource": "Opensourcesoftware",
     "contacts": "Contact",
     "legalNotes": "Juridische kennisgeving",
     "governmentSite": "Italiaanse Overheid",
@@ -3169,8 +3492,38 @@
     "buildInfoDev": "ontwikkelbuild",
     "viewCommit": "Bekijk commit op GitHub",
     "viewRelease": "Bekijk release op GitHub",
-    "buildDatePrefix": "Gebouwd op",
-    "viewChangelog": "Bekijk wat er nieuw is (changelog)"
+    "viewChangelog": "Bekijk wat er nieuw is (changelog)",
+    "buildDatePrefix": "Gebouwd op"
+  },
+  "changelog": {
+    "metaTitle": "Nieuws en changelog",
+    "title": "Nieuws en changelog",
+    "intro": "Alle versies van het platform, te beginnen met de meest recente. Elk item vat de belangrijkste nieuwe functies, correcties en verbeteringen samen.",
+    "current": "Huidige versie",
+    "sourceNote": "De notities zijn samengesteld op basis van de tags, pull requests en commits van het project.",
+    "sourceLink": "Bekijk alle releases op GitHub",
+    "rawChangelog": "CHANGELOG.md in de repository",
+    "transparencyNote": "Voor elke versie: wat er draait en met welke componenten, in de",
+    "transparencyInventory": "dienstentransparantie",
+    "transparencySecurity": "beveiliging en SBOM",
+    "technicalDetail": "Technische details",
+    "releaseLink": "Release",
+    "securityBadge": "Beveiliging",
+    "sbomButton": "SBOM",
+    "pipelineLink": "Pipeline",
+    "scorecardLink": "OpenSSF Scorecard",
+    "sbomClose": "Sluiten",
+    "sbomLoading": "Laden…",
+    "sbomError": "Kan de SBOM niet laden.",
+    "sbomComponents": "onderdelen",
+    "sbomSearch": "onderdeel zoeken…",
+    "sbomColName": "Onderdeel",
+    "sbomColVersion": "Versie",
+    "sbomColEcosystem": "Ecosysteem",
+    "sbomNoMatch": "Geen overeenkomend onderdeel.",
+    "sbomDownload": "Volledige SBOM downloaden (SPDX)",
+    "sourcesLink": "Broncode",
+    "codeScanningLink": "Code-scanning (CodeQL)"
   },
   "pages": {
     "privacyTitle": "Privacybeleid",
@@ -3208,281 +3561,9 @@
     "shortcutsF": "Volledig scherm",
     "shortcutsSpeed": "De snelheid verlagen of verhogen",
     "captionsOn": "Ondertiteling aan",
-    "captionsOff": "Ondertiteling uit"
-  },
-  "diagram": {
-    "title": "Evenementconfiguratie",
-    "topology": "Topologie",
-    "features": "Actieve functionaliteiten",
-    "estimates": "Geschatte middelen",
-    "moderator": "Moderator",
-    "participants": "Deelnemers",
-    "bridge": "Video Bridge",
-    "jvb": "Video Bridge",
-    "jibri": "Opname",
-    "occupancy": "Bezetting",
-    "sizedForRegistrations": "Gebaseerd op {count} huidige aanmeldingen",
-    "sizedForCapacity": "Gebaseerd op maximale capaciteit van {count}",
-    "chips": {
-      "mic": "Microfoon",
-      "video": "Webcam",
-      "screen": "Scherm delen"
-    },
-    "bandwidth": {
-      "moderator": "Bandbreedte moderator",
-      "participant": "Bandbreedte per deelnemer",
-      "total": "Geschatte totale bandbreedte"
-    },
-    "jvbCount": "Benodigde JVB's",
-    "jvbRam": "Geschat JVB-RAM",
-    "storage": "Opslagruimte opname",
-    "duration": "Geschatte duur",
-    "viewOnly": "Alleen weergave",
-    "preview": "Configuratievoorbeeld"
-  },
-  "waiting": {
-    "startsIn": "Het evenement begint over",
-    "eventLive": "Het evenement is live!",
-    "connectedParticipants": "{count, plural, =0 {Geen deelnemers} =1 {1 deelnemer verbonden} other {{count} deelnemers verbonden}}",
-    "elapsedTime": "Al {minutes} minuten bezig",
-    "youAreLate": "Het evenement is {minutes} minuten geleden begonnen",
-    "chooseHowToJoin": "Kies hoe u wilt deelnemen:",
-    "enterLive": "LIVE deelnemen",
-    "enterLiveDesc": "Neem live deel. U kunt altijd de opname bekijken na het evenement.",
-    "enterNow": "Nu deelnemen",
-    "watchFromStart": "Vanaf het begin bekijken",
-    "watchFromStartDesc": "Bekijk de opname vanaf het begin en ga live wanneer u wilt.",
-    "watchNow": "Bekijken",
-    "switchToLive": "Overschakelen naar live",
-    "enterRoom": "Zaal betreden",
-    "recordingNotice": "Dit evenement wordt opgenomen.",
-    "recordingAvailableAfter": "De opname is beschikbaar na het evenement.",
-    "autoRefreshHint": "De pagina wordt automatisch vernieuwd wanneer het evenement begint.",
-    "startEventButton": "Evenement starten",
-    "startingEvent": "Starten...",
-    "peopleWaiting": "{count, plural, =0 {} =1 {1 persoon wacht} other {{count} personen wachten}}",
-    "jvbScaling": "Zaal wordt voorbereid...",
-    "jvbScalingDetail": "Videoservers worden gestart. Dit duurt ongeveer 2 minuten.",
-    "jvbReady": "Zaal gereed!",
-    "warmingUp": "Ruimte wordt voorbereid",
-    "warmingUpDetail": "We zetten de videoservers op. Bereid u in de tussentijd voor — alles is over 2-3 minuten klaar en u kunt binnenkomen.",
-    "warmingUpButton": "Ruimte wordt voorbereid...",
-    "nameLabel": "Uw naam",
-    "nameHelp": "De andere deelnemers zien deze",
-    "joinNowBtn": "Nu binnenkomen",
-    "roomOpen": "The room is open",
-    "whileYouWait": "While you wait",
-    "openingAt": "Opening om {time}",
-    "netiquetteTitle": "Goede praktijken voor deelname",
-    "netiquetteBullet1": "Kom enkele minuten van tevoren om uw microfoon en webcam te testen",
-    "netiquetteBullet2": "Zet webcam en microfoon alleen aan wanneer u wilt spreken — steek uw hand op om het woord te vragen",
-    "netiquetteBullet3": "Gebruik de chat voor snelle uitwisselingen, Q&A voor vragen aan de sprekers",
-    "netiquetteBullet4": "De opname, indien actief, wordt alleen door moderatoren beheerd en is gemarkeerd met een rode indicator",
-    "watchCatchup": "Vanaf het begin bekijken",
-    "watchCatchupDesc": "Bekijk de gedeeltelijke opname en sluit aan bij de live-uitzending wanneer u wilt",
-    "chatPreviewTitle": "Chat van het evenement",
-    "chatPreviewHint": "Lees wat de andere deelnemers zeggen terwijl u zich voorbereidt",
-    "endedTitle": "Evenement beëindigd",
-    "endedWatchRecording": "Bekijk de opname",
-    "endedLeaveFeedback": "Geef feedback",
-    "moderatedBy": "Gemodereerd door {name}",
-    "startEventError": "Fout bij het starten van het evenement. Probeer het opnieuw.",
-    "emailLabel": "E-mail (optioneel)",
-    "emailHelp": "Alleen voor eventuele follow-up na afloop",
-    "emailInvalid": "Voer een geldig e-mailadres in",
-    "chatLockedMessage": "Voer uw naam in om deel te nemen aan de chat van het evenement.",
-    "classicView": "Classic view",
-    "backToGarden": "Back to the park",
-    "startingSoon": "Het evenement begint zo, wacht op de organisatie…",
-    "exitWaiting": "Wachtruimte verlaten",
-    "aiNoticeTitle": "AI-verwerking na het evenement",
-    "aiNotice": "Na afloop wordt de opname verwerkt door AI-hulpmiddelen om een transcript, een samenvatting en eventuele vertalingen en nasynchronisatie te maken. De resultaten kunnen onnauwkeurigheden bevatten; de video blijft de gezaghebbende bron.",
-    "multitrackConsentTitle": "Opname per deelnemer",
-    "multitrackConsentRequired": "Je moet instemmen met de opname van je audiospoor om binnen te komen",
-    "enterGardenTitle": "Betreed het plein",
-    "enterGardenHint": "Een plek om rond te lopen terwijl je wacht — daar kun je ook je naam en microfoon instellen en aan het evenement deelnemen.",
-    "backToWaitingRoom": "Terug naar de wachtruimte",
-    "gardenDialogLabel": "Plein van de wachtruimte",
-    "gardenGateHint": "Je kunt hiervandaan deelnemen, of je avatar naar de poort lopen.",
-    "classicVersion": "Klassieke versie",
-    "warmup": {
-      "queued": "Verzoek ontvangen",
-      "startingBridge": "Videoserver wordt gestart…",
-      "provisioningNode": "Een eigen videoserver wordt aangemaakt",
-      "almostReady": "Videoserver actief: bijna klaar",
-      "almostReadyDetail": "Nog even en de deelnameknop wordt vanzelf actief.",
-      "honestHint": "Gebruikelijke wachttijd: minder dan een minuut als de infrastructuur al warm is, 3–5 minuten bij de eerste start. Ondertussen kun je camera en microfoon controleren of de chat gebruiken.",
-      "elapsed": "in voorbereiding sinds {time}"
-    }
-  },
-  "recording": {
-    "management": "Video-opname",
-    "inProgress": "Bezig",
-    "available": "Opname beschikbaar",
-    "duration": "Duur",
-    "fileSize": "Bestandsgrootte",
-    "startedAt": "Gestart",
-    "automatic": "automatisch",
-    "publish": "Opname publiceren",
-    "publishDesc": "De video beschikbaar maken op de evenementpagina",
-    "retentionLabel": "Bewaring",
-    "retention": {
-      "24h": "24 uur (tijdelijk)",
-      "7d": "7 dagen",
-      "30d": "30 dagen",
-      "90d": "90 dagen",
-      "forever": "Nooit (tot evenement verloopt)"
-    },
-    "retentionNote": "De video volgt hoe dan ook de GDPR-bewaring van het evenement",
-    "delete": "Opname verwijderen",
-    "deleteConfirm": "Weet u het zeker? De video wordt definitief verwijderd.",
-    "notConfigured": "Jibri is niet geconfigureerd in de infrastructuur. Video-opname is niet beschikbaar.",
-    "disabledHint": "Video-opname is niet ingeschakeld voor dit evenement. Open het gedeelte Instellingen hierboven en zet de schakelaar \"Opname\" aan.",
-    "play": "Afspelen",
-    "download": "Downloaden",
-    "transcriptManage": "Transcriptie / AI",
-    "deleteConfirmTitle": "Opname verwijderen",
-    "deleteFailed": "Verwijderen mislukt",
-    "deleteSuccess": "Opname verwijderd"
-  },
-  "postEvent": {
-    "config": "Configuratie na het evenement",
-    "pageVisible": "Evenementpagina zichtbaar na afloop",
-    "showQA": "Q&A-vragen tonen",
-    "showMaterials": "Gedeelde materialen tonen",
-    "showPolls": "Peilingresultaten tonen",
-    "showFeedback": "Feedback tonen",
-    "feedbackEnabled": "Feedbackenquête actief na het evenement",
-    "visibilityAlways": "Altijd zichtbaar",
-    "visibilityUntil": "Zichtbaar tot:",
-    "dataRetentionNote": "Persoonsgegevens van deelnemers worden verwijderd volgens de bewaartermijn van het evenement ({days} dagen). De inhoud van het evenement blijft beschikbaar zolang de pagina zichtbaar is.",
-    "availableUntil": "Dit evenement en de bijbehorende inhoud zijn beschikbaar tot {date}.",
-    "tabs": {
-      "qa": "Vragen en Antwoorden",
-      "materials": "Materialen",
-      "polls": "Peilingen",
-      "feedback": "Feedback",
-      "transcript": "AI-transcriptie"
-    },
-    "pageVisibleHelp": "Wanneer deze uit staat (of het zichtbaarheidsvenster is verstreken), geeft de openbare pagina van het afgelopen evenement 404 terug en verdwijnt het evenement uit de overzichten en de sitemap.",
-    "libraryListed": "In de videobibliotheek publiceren",
-    "libraryListedHelp": "Toont dit evenement in de openbare bibliotheek (/video-library). Vereist een gepubliceerde opname of een YouTube-video, en dat de pagina van het evenement zichtbaar is.",
-    "libraryListedNoRecording": "Geen gepubliceerde opname: het evenement verschijnt pas in de bibliotheek wanneer u de opname publiceert of een YouTube-video toevoegt.",
-    "showRecap": "De samenvatting van het evenement tonen",
-    "showWordCloud": "De woordwolk tonen",
-    "emailEnabled": "Een samenvattingsmail versturen bij het einde van het evenement",
-    "emailEnabledHelp": "Bij de afsluiting ontvangen de geregistreerde deelnemers een bedankmail met de link naar de samenvatting en naar de feedback, en de moderator een beknopt overzicht. Wordt maar één keer verzonden."
-  },
-  "provisioning": {
-    "loading": "Laden",
-    "titleFromIdle": "Ruimte wordt heractiveerd",
-    "titleColdStart": "Ruimte wordt voorbereid",
-    "descriptionFromIdle": "De ruimte was vanwege inactiviteit gepauzeerd om het energieverbruik te beperken. We starten hem opnieuw op: dit duurt ongeveer 2-3 minuten.",
-    "descriptionColdStart": "We bereiden de virtuele ruimte voor dit evenement voor. De bewerking duurt ongeveer 2-3 minuten: u wordt automatisch doorgestuurd zodra alles klaar is.",
-    "progressLabel": "{seconds} s",
-    "retry": "Herladen",
-    "tempError": "We proberen opnieuw contact te maken met de server, geen actie vereist.",
-    "ended": "Het evenement is beëindigd.",
-    "scaleToZeroNote": "Om de impact op het milieu te beperken, worden videoknooppunten uitgeschakeld wanneer niemand in een gesprek is. De herstart vindt automatisch plaats bij de eerste binnenkomst."
-  },
-  "rubrica": {
-    "optOut": {
-      "title": "Verwijdering uit het DTD-adresboek",
-      "intro": "U staat op het punt uw toestemming voor opname in het DTD-adresboek in te trekken. Na bevestiging wordt u niet meer benaderd voor uitnodigingen voor soortgelijke evenementen.",
-      "missingToken": "De link is niet geldig of onvolledig. Controleer de oorspronkelijke e-mail.",
-      "invalidToken": "De link is verlopen of ongeldig. Neem voor hulp contact op met de organisator van het evenement.",
-      "notFound": "Geen persoon komt overeen met de link. Mogelijk is hij/zij al verwijderd.",
-      "loading": "Laden…",
-      "previewHeader": "U staat op het punt uit het adresboek te verwijderen:",
-      "warning": "Deze bewerking verwijdert niet de geschiedenis van aanmeldingen voor afzonderlijke evenementen.",
-      "confirm": "Verwijdering bevestigen",
-      "submitting": "Verwijderen…",
-      "successTitle": "Verwijdering voltooid",
-      "successBody": "Uw gegevens staan niet meer in het DTD-adresboek.",
-      "errors": {
-        "generic": "Er is een fout opgetreden. Probeer het later opnieuw."
-      }
-    }
-  },
-  "deviceCheck": {
-    "preview": "Videovoorbeeld",
-    "micLevel": "Microfoonniveau",
-    "cameraLabel": "Camera",
-    "micLabel": "Microfoon",
-    "permissionNeeded": "Geef toegang tot mic en webcam om ze te testen. U kunt ook zonder binnenkomen.",
-    "noVideo": "Geen video",
-    "noAudio": "Microfoon niet beschikbaar",
-    "retry": "Opnieuw proberen",
-    "cameraToggleOn": "Camera AAN",
-    "cameraToggleOff": "Camera UIT",
-    "micToggleOn": "Microfoon AAN",
-    "micToggleOff": "Microfoon UIT",
-    "cameraOffPreview": "Camera uit",
-    "speakerTest": "🔊 Audiotest"
-  },
-  "garden": {
-    "enable": "Toon de tuin",
-    "classicView": "Klassieke weergave",
-    "changeAvatar": "Avatar wijzigen",
-    "peopleInGarden": "{count, plural, =0 {Niemand in de tuin} one {1 persoon in de tuin} other {# personen in de tuin}}",
-    "guestName": "Guest",
-    "hintKeyboard": "Beweeg met WASD of de pijltjestoetsen",
-    "pickerTitle": "Kies uw avatar",
-    "pickerHelp": "Het personage vertegenwoordigt u in de wachttuin. U kunt het op elk moment wijzigen.",
-    "close": "Sluiten",
-    "hintBanner": "Druk op de pijltjestoetsen om door de tuin te lopen",
-    "hintJoystick": "Versleep om te bewegen"
-  },
-  "feedbackAdmin": {
-    "title": "Feedback results",
-    "totalVotes": "responses",
-    "noFeedback": "No feedback received",
-    "comments": "Comments",
-    "noComments": "No comments",
-    "yes": "Ja",
-    "no": "Nee"
-  },
-  "agenda": {
-    "title": "Notities / Checklist",
-    "empty": "Nog geen punten. Voeg de te bespreken onderwerpen toe en vink ze gaandeweg af.",
-    "add": "Toevoegen",
-    "addPlaceholder": "Nieuw punt…",
-    "remove": "Verwijderen",
-    "inProgress": "bezig",
-    "agree": "Eens",
-    "disagree": "Oneens",
-    "favorablePct": "{pct}% voor",
-    "noReactions": "Geef uw mening"
-  },
-  "changelog": {
-    "metaTitle": "Nieuws en changelog",
-    "title": "Nieuws en changelog",
-    "intro": "Alle versies van het platform, te beginnen met de meest recente. Elk item vat de belangrijkste nieuwe functies, correcties en verbeteringen samen.",
-    "current": "Huidige versie",
-    "sourceNote": "De notities zijn samengesteld op basis van de tags, pull requests en commits van het project.",
-    "sourceLink": "Bekijk alle releases op GitHub",
-    "rawChangelog": "CHANGELOG.md in de repository",
-    "transparencyNote": "Voor elke versie: wat er draait en met welke componenten, in de",
-    "transparencyInventory": "dienstentransparantie",
-    "transparencySecurity": "beveiliging en SBOM",
-    "technicalDetail": "Technische details",
-    "releaseLink": "Release",
-    "securityBadge": "Beveiliging",
-    "sbomButton": "SBOM",
-    "pipelineLink": "Pipeline",
-    "scorecardLink": "OpenSSF Scorecard",
-    "sbomClose": "Sluiten",
-    "sbomLoading": "Laden…",
-    "sbomError": "Kan de SBOM niet laden.",
-    "sbomComponents": "onderdelen",
-    "sbomSearch": "onderdeel zoeken…",
-    "sbomColName": "Onderdeel",
-    "sbomColVersion": "Versie",
-    "sbomColEcosystem": "Ecosysteem",
-    "sbomNoMatch": "Geen overeenkomend onderdeel.",
-    "sbomDownload": "Volledige SBOM downloaden (SPDX)",
-    "sourcesLink": "Broncode",
-    "codeScanningLink": "Code-scanning (CodeQL)"
+    "captionsOff": "Ondertiteling uit",
+    "watchOnYouTube": "Bekijk de video op YouTube",
+    "externalSiteNote": "Opent op YouTube, een externe site met eigen gebruiksvoorwaarden en een eigen privacyverklaring."
   },
   "postprod": {
     "loading": "Transcriptie laden…",
@@ -3579,5 +3660,277 @@
     },
     "overlapBadge": "gelijktijdig",
     "overlapTitle": "Gelijktijdig spreken: in dit interval spreekt meer dan één persoon tegelijk."
+  },
+  "diagram": {
+    "title": "Evenementconfiguratie",
+    "topology": "Topologie",
+    "features": "Actieve functionaliteiten",
+    "estimates": "Geschatte middelen",
+    "moderator": "Moderator",
+    "participants": "Deelnemers",
+    "bridge": "Video Bridge",
+    "jvb": "Video Bridge",
+    "jibri": "Opname",
+    "occupancy": "Bezetting",
+    "sizedForRegistrations": "Gebaseerd op {count} huidige aanmeldingen",
+    "sizedForCapacity": "Gebaseerd op maximale capaciteit van {count}",
+    "chips": {
+      "mic": "Microfoon",
+      "video": "Webcam",
+      "screen": "Scherm delen"
+    },
+    "bandwidth": {
+      "moderator": "Bandbreedte moderator",
+      "participant": "Bandbreedte per deelnemer",
+      "total": "Geschatte totale bandbreedte"
+    },
+    "jvbCount": "Benodigde JVB's",
+    "jvbRam": "Geschat JVB-RAM",
+    "storage": "Opslagruimte opname",
+    "duration": "Geschatte duur",
+    "viewOnly": "Alleen weergave",
+    "preview": "Configuratievoorbeeld"
+  },
+  "waiting": {
+    "startsIn": "Het evenement begint over",
+    "startingSoon": "Het evenement begint zo, wacht op de organisatie…",
+    "eventLive": "Het evenement is live!",
+    "connectedParticipants": "{count, plural, =0 {Geen deelnemers} =1 {1 deelnemer verbonden} other {{count} deelnemers verbonden}}",
+    "elapsedTime": "Al {minutes} minuten bezig",
+    "youAreLate": "Het evenement is {minutes} minuten geleden begonnen",
+    "chooseHowToJoin": "Kies hoe u wilt deelnemen:",
+    "enterLive": "LIVE deelnemen",
+    "enterLiveDesc": "Neem live deel. U kunt altijd de opname bekijken na het evenement.",
+    "enterNow": "Nu deelnemen",
+    "watchFromStart": "Vanaf het begin bekijken",
+    "watchFromStartDesc": "Bekijk de opname vanaf het begin en ga live wanneer u wilt.",
+    "watchNow": "Bekijken",
+    "switchToLive": "Overschakelen naar live",
+    "enterRoom": "Zaal betreden",
+    "recordingNotice": "Dit evenement wordt opgenomen.",
+    "recordingAvailableAfter": "De opname is beschikbaar na het evenement.",
+    "autoRefreshHint": "De pagina wordt automatisch vernieuwd wanneer het evenement begint.",
+    "startEventButton": "Evenement starten",
+    "startingEvent": "Starten...",
+    "peopleWaiting": "{count, plural, =0 {} =1 {1 persoon wacht} other {{count} personen wachten}}",
+    "jvbScaling": "Zaal wordt voorbereid...",
+    "jvbScalingDetail": "Videoservers worden gestart. Dit duurt ongeveer 2 minuten.",
+    "jvbReady": "Zaal gereed!",
+    "warmup": {
+      "queued": "Verzoek ontvangen",
+      "startingBridge": "Videoserver wordt gestart…",
+      "provisioningNode": "Een eigen videoserver wordt aangemaakt",
+      "almostReady": "Videoserver actief: bijna klaar",
+      "almostReadyDetail": "Nog even en de deelnameknop wordt vanzelf actief.",
+      "honestHint": "Gebruikelijke wachttijd: minder dan een minuut als de infrastructuur al warm is, 3–5 minuten bij de eerste start. Ondertussen kun je camera en microfoon controleren of de chat gebruiken.",
+      "elapsed": "in voorbereiding sinds {time}",
+      "scheduled": "De zaal gaat open op het starttijdstip",
+      "scheduledDetail": "Of eerder, wanneer de organisatie het evenement start. Ondertussen kun je camera en microfoon controleren of de chat gebruiken."
+    },
+    "exitWaiting": "Wachtruimte verlaten",
+    "warmingUp": "Ruimte wordt voorbereid",
+    "warmingUpDetail": "We zetten de videoservers op. Bereid u in de tussentijd voor — alles is over 2-3 minuten klaar en u kunt binnenkomen.",
+    "warmingUpButton": "Ruimte wordt voorbereid...",
+    "nameLabel": "Uw naam",
+    "nameHelp": "De andere deelnemers zien deze",
+    "nameRequiredToEnter": "Voer uw naam in om binnen te komen (minimaal 2 tekens).",
+    "roomOpenNameMissing": "De zaal is open: voer uw naam in om binnen te komen.",
+    "joinNowBtn": "Nu binnenkomen",
+    "roomOpen": "De zaal is open",
+    "whileYouWait": "Terwijl u wacht",
+    "openingAt": "Opening om {time}",
+    "netiquetteTitle": "Goede praktijken voor deelname",
+    "netiquetteBullet1": "Kom enkele minuten van tevoren om uw microfoon en webcam te testen",
+    "netiquetteBullet2": "Zet webcam en microfoon alleen aan wanneer u wilt spreken — steek uw hand op om het woord te vragen",
+    "netiquetteBullet3": "Gebruik de chat voor snelle uitwisselingen, Q&A voor vragen aan de sprekers",
+    "netiquetteBullet4": "De opname, indien actief, wordt alleen door moderatoren beheerd en is gemarkeerd met een rode indicator",
+    "watchCatchup": "Vanaf het begin bekijken",
+    "watchCatchupDesc": "Bekijk de gedeeltelijke opname en sluit aan bij de live-uitzending wanneer u wilt",
+    "chatPreviewTitle": "Chat van het evenement",
+    "chatPreviewHint": "Lees wat de andere deelnemers zeggen terwijl u zich voorbereidt",
+    "endedTitle": "Evenement beëindigd",
+    "endedWatchRecording": "Bekijk de opname",
+    "endedLeaveFeedback": "Geef feedback",
+    "moderatedBy": "Gemodereerd door {name}",
+    "startEventError": "Fout bij het starten van het evenement. Probeer het opnieuw.",
+    "emailLabel": "E-mail (optioneel)",
+    "emailHelp": "Alleen voor eventuele follow-up na afloop",
+    "emailInvalid": "Voer een geldig e-mailadres in",
+    "chatLockedMessage": "Voer uw naam in om deel te nemen aan de chat van het evenement.",
+    "classicView": "Klassieke weergave",
+    "backToGarden": "Terug naar het park",
+    "aiNoticeTitle": "AI-verwerking na het evenement",
+    "aiNotice": "Na afloop wordt de opname verwerkt door AI-hulpmiddelen om een transcript, een samenvatting en eventuele vertalingen en nasynchronisatie te maken. De resultaten kunnen onnauwkeurigheden bevatten; de video blijft de gezaghebbende bron.",
+    "multitrackConsentTitle": "Opname per deelnemer",
+    "multitrackConsentRequired": "Je moet instemmen met de opname van je audiospoor om binnen te komen",
+    "enterGardenTitle": "Betreed het plein",
+    "enterGardenHint": "Een plek om rond te lopen terwijl je wacht — daar kun je ook je naam en microfoon instellen en aan het evenement deelnemen.",
+    "backToWaitingRoom": "Terug naar de wachtruimte",
+    "gardenDialogLabel": "Plein van de wachtruimte",
+    "gardenGateHint": "Je kunt hiervandaan deelnemen, of je avatar naar de poort lopen.",
+    "classicVersion": "Klassieke versie",
+    "roomNotReadyButton": "De ruimte wordt klaargemaakt…",
+    "roomNotReadyPiazza": "Ga ondertussen naar het plein",
+    "gate": {
+      "gateOpen": "Ingang open",
+      "stageLive": "● LIVE",
+      "gatePreparing": "De zaal wordt voorbereid…",
+      "stagePreparing": "Zo meteen",
+      "ended": "Evenement afgelopen",
+      "startsIn": "Begint over {time}",
+      "hostEarly": "Vroege toegang (host)"
+    },
+    "roomJustOpened": "De ruimte is klaar — kom binnen",
+    "enterAnyway": "Toch binnengaan",
+    "notHeldBadge": "Tijd verstreken",
+    "notHeldTitle": "Het geplande tijdstip van het evenement is verstreken",
+    "notHeldDetail": "De zaal is niet geopend. Kijk op de evenementpagina voor eventuele updates."
+  },
+  "recording": {
+    "management": "Video-opname",
+    "inProgress": "Bezig",
+    "available": "Opname beschikbaar",
+    "duration": "Duur",
+    "fileSize": "Bestandsgrootte",
+    "startedAt": "Gestart",
+    "automatic": "automatisch",
+    "publish": "Opname publiceren",
+    "publishDesc": "De video beschikbaar maken op de evenementpagina",
+    "retentionLabel": "Bewaring",
+    "retention": {
+      "24h": "24 uur (tijdelijk)",
+      "7d": "7 dagen",
+      "30d": "30 dagen",
+      "90d": "90 dagen",
+      "forever": "Nooit (tot evenement verloopt)"
+    },
+    "retentionNote": "De video volgt hoe dan ook de GDPR-bewaring van het evenement",
+    "delete": "Opname verwijderen",
+    "deleteConfirm": "Weet u het zeker? De video wordt definitief verwijderd.",
+    "notConfigured": "Jibri is niet geconfigureerd in de infrastructuur. Video-opname is niet beschikbaar.",
+    "disabledHint": "Video-opname is niet ingeschakeld voor dit evenement. Open het gedeelte Instellingen hierboven en zet de schakelaar \"Opname\" aan.",
+    "play": "Afspelen",
+    "download": "Downloaden",
+    "transcriptManage": "Transcriptie / AI",
+    "deleteConfirmTitle": "Opname verwijderen",
+    "deleteFailed": "Verwijderen mislukt",
+    "deleteSuccess": "Opname verwijderd"
+  },
+  "postEvent": {
+    "config": "Configuratie na het evenement",
+    "pageVisible": "Evenementpagina zichtbaar na afloop",
+    "pageVisibleHelp": "Wanneer deze uit staat (of het zichtbaarheidsvenster is verstreken), geeft de openbare pagina van het afgelopen evenement 404 terug en verdwijnt het evenement uit de overzichten en de sitemap.",
+    "libraryListed": "In de videobibliotheek publiceren",
+    "libraryListedHelp": "Toont dit evenement in de openbare bibliotheek (/video-library). Vereist een gepubliceerde opname of een YouTube-video, en dat de pagina van het evenement zichtbaar is.",
+    "libraryListedNoRecording": "Geen gepubliceerde opname: het evenement verschijnt pas in de bibliotheek wanneer u de opname publiceert of een YouTube-video toevoegt.",
+    "showQA": "Q&A-vragen tonen",
+    "showMaterials": "Gedeelde materialen tonen",
+    "showPolls": "Peilingresultaten tonen",
+    "showFeedback": "Feedback tonen",
+    "showRecap": "De samenvatting van het evenement tonen",
+    "showWordCloud": "De woordwolk tonen",
+    "emailEnabled": "Een samenvattingsmail versturen bij het einde van het evenement",
+    "emailEnabledHelp": "Bij de afsluiting ontvangen de geregistreerde deelnemers een bedankmail met de link naar de samenvatting en naar de feedback, en de moderator een beknopt overzicht. Wordt maar één keer verzonden.",
+    "feedbackEnabled": "Feedbackenquête actief na het evenement",
+    "visibilityAlways": "Altijd zichtbaar",
+    "visibilityUntil": "Zichtbaar tot:",
+    "dataRetentionNote": "Persoonsgegevens van deelnemers worden verwijderd volgens de bewaartermijn van het evenement ({days} dagen). De inhoud van het evenement blijft beschikbaar zolang de pagina zichtbaar is.",
+    "availableUntil": "Dit evenement en de bijbehorende inhoud zijn beschikbaar tot {date}.",
+    "tabs": {
+      "qa": "Vragen en Antwoorden",
+      "materials": "Materialen",
+      "polls": "Peilingen",
+      "feedback": "Feedback",
+      "transcript": "AI-transcriptie"
+    }
+  },
+  "provisioning": {
+    "loading": "Laden",
+    "titleFromIdle": "Ruimte wordt heractiveerd",
+    "titleColdStart": "Ruimte wordt voorbereid",
+    "descriptionFromIdle": "De ruimte was vanwege inactiviteit gepauzeerd om het energieverbruik te beperken. We starten hem opnieuw op: dit duurt ongeveer 2-3 minuten.",
+    "descriptionColdStart": "We bereiden de virtuele ruimte voor dit evenement voor. De bewerking duurt ongeveer 2-3 minuten: u wordt automatisch doorgestuurd zodra alles klaar is.",
+    "progressLabel": "{seconds} s",
+    "retry": "Herladen",
+    "tempError": "We proberen opnieuw contact te maken met de server, geen actie vereist.",
+    "ended": "Het evenement is beëindigd.",
+    "scaleToZeroNote": "Om de impact op het milieu te beperken, worden videoknooppunten uitgeschakeld wanneer niemand in een gesprek is. De herstart vindt automatisch plaats bij de eerste binnenkomst."
+  },
+  "rubrica": {
+    "optOut": {
+      "title": "Verwijdering uit het evenementenadresboek",
+      "intro": "U staat op het punt uw toestemming voor opname in het evenementenadresboek in te trekken. Na bevestiging wordt u niet meer benaderd voor uitnodigingen voor soortgelijke evenementen.",
+      "missingToken": "De link is niet geldig of onvolledig. Controleer de oorspronkelijke e-mail.",
+      "invalidToken": "De link is verlopen of ongeldig. Neem voor hulp contact op met de organisator van het evenement.",
+      "notFound": "Geen persoon komt overeen met de link. Mogelijk is hij/zij al verwijderd.",
+      "loading": "Laden…",
+      "previewHeader": "U staat op het punt uit het adresboek te verwijderen:",
+      "warning": "Deze bewerking verwijdert niet de geschiedenis van aanmeldingen voor afzonderlijke evenementen.",
+      "confirm": "Verwijdering bevestigen",
+      "submitting": "Verwijderen…",
+      "successTitle": "Verwijdering voltooid",
+      "successBody": "Uw gegevens staan niet meer in het evenementenadresboek.",
+      "errors": {
+        "generic": "Er is een fout opgetreden. Probeer het later opnieuw."
+      }
+    }
+  },
+  "deviceCheck": {
+    "preview": "Videovoorbeeld",
+    "micLevel": "Microfoonniveau",
+    "cameraLabel": "Camera",
+    "micLabel": "Microfoon",
+    "permissionNeeded": "Geef toegang tot mic en webcam om ze te testen. U kunt ook zonder binnenkomen.",
+    "noVideo": "Geen video",
+    "noAudio": "Microfoon niet beschikbaar",
+    "retry": "Opnieuw proberen",
+    "cameraToggleOn": "Camera AAN",
+    "cameraToggleOff": "Camera UIT",
+    "micToggleOn": "Microfoon AAN",
+    "micToggleOff": "Microfoon UIT",
+    "cameraOffPreview": "Camera uit",
+    "speakerTest": "🔊 Audiotest",
+    "backgroundLabel": "Virtuele achtergrond",
+    "backgroundNoneShort": "No",
+    "backgroundHint": "Wordt toegepast wanneer u de zaal betreedt. Gebruik om uw achtergrond te vervagen de achtergrondknop zodra u binnen bent: het voorbeeld hierboven toont de camera zonder effect.",
+    "background": {
+      "nessuno": "Geen achtergrond",
+      "ufficio-chiaro": "Licht kantoor",
+      "blu-istituzionale": "Institutioneel blauw",
+      "verde-salvia": "Saliegroen",
+      "grafite": "Grafiet"
+    }
+  },
+  "garden": {
+    "enable": "Toon de tuin",
+    "classicView": "Klassieke weergave",
+    "changeAvatar": "Avatar wijzigen",
+    "peopleInGarden": "{count, plural, =0 {Niemand in de tuin} one {1 persoon in de tuin} other {# personen in de tuin}}",
+    "guestName": "Gast",
+    "hintKeyboard": "Beweeg met WASD of de pijltjestoetsen",
+    "pickerTitle": "Kies uw avatar",
+    "pickerHelp": "Het personage vertegenwoordigt u in de wachttuin. U kunt het op elk moment wijzigen.",
+    "close": "Sluiten",
+    "hintBanner": "Druk op de pijltjestoetsen om door de tuin te lopen",
+    "hintJoystick": "Versleep om te bewegen"
+  },
+  "feedbackAdmin": {
+    "title": "Feedbackresultaten",
+    "totalVotes": "antwoorden",
+    "noFeedback": "Geen feedback ontvangen",
+    "comments": "Opmerkingen",
+    "noComments": "Geen opmerkingen",
+    "yes": "Ja",
+    "no": "Nee"
+  },
+  "questionnaire": {
+    "loadFailed": "De vragenlijst kon niet worden geladen.",
+    "submit": "Antwoorden verzenden",
+    "submitFailed": "Verzenden mislukt. Probeer het opnieuw.",
+    "answersInvalid": "Sommige antwoorden ontbreken of zijn ongeldig: controleer de verplichte vragen en probeer het opnieuw.",
+    "alreadySubmitted": "U hebt uw antwoorden op deze vragenlijst al verzonden.",
+    "thankYou": "Bedankt voor uw antwoorden.",
+    "yes": "Ja",
+    "no": "Nee"
   }
 }

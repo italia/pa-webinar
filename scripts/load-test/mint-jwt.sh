@@ -6,7 +6,8 @@
 #   JITSI_JWT_SECRET    HS256 shared secret configured on Prosody
 #   JITSI_JWT_ISSUER    iss claim (e.g. "pa-webinar")
 #   JITSI_JWT_AUDIENCE  aud claim (e.g. "jitsi")
-#   JITSI_JWT_SUBJECT   sub claim (Jitsi domain, e.g. "jitsi-test.innovazione.gov.it")
+#   JITSI_JWT_SUBJECT   sub claim (Jitsi domain, e.g. "jitsi.example.com" —
+#                       placeholder for the hostname of the deploy under test)
 #
 # Optional:
 #   BOT_NAME            participant display name (default: LoadBot)

@@ -1,9 +1,9 @@
-import { getTranslations } from 'next-intl/server';
-import { cookies } from 'next/headers';
+import { getLocale, getTranslations } from 'next-intl/server';
+import { redirect } from 'next/navigation';
 
+import { staffOLogin } from '@/lib/auth/staff-page';
 import { prisma } from '@/lib/db';
-import { isAdminAuthenticated } from '@/lib/auth/admin-session';
-import AdminLogoutButton from '@/components/admin/admin-logout-button';
+import { localizedPath } from '@/lib/utils/localized-url';
 import AdminLandingClient from '@/components/admin/admin-landing-client';
 
 interface AdminPageProps {
@@ -13,12 +13,16 @@ interface AdminPageProps {
 export default async function AdminPage({ searchParams }: AdminPageProps) {
   const { token } = await searchParams;
   const t = await getTranslations('admin');
-  const isAdmin = await isAdminAuthenticated(await cookies());
 
   if (token) {
-    const { redirect } = await import('next/navigation');
-    redirect(`/admin/events?token=${token}`);
+    redirect(localizedPath(`/admin/events?token=${token}`, await getLocale()));
   }
+
+  // L'indice mostra i numeri di tutta l'istanza: per chi organizza i propri
+  // eventi la pagina di partenza e' l'elenco di quelli (ADR-014).
+  const locale = await getLocale();
+  const session = await staffOLogin(locale);
+  if (session.role !== 'admin') redirect(localizedPath('/admin/events', locale));
 
   const now = new Date();
   const todayStart = new Date(now);
@@ -64,11 +68,6 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
           </h1>
           <p className="text-secondary mb-0">{t('landing.subtitle')}</p>
         </div>
-        {isAdmin && (
-          <div className="d-flex gap-2 align-items-center flex-shrink-0">
-            <AdminLogoutButton />
-          </div>
-        )}
       </div>
 
       <AdminLandingClient

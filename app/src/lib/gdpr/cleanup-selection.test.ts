@@ -3,7 +3,9 @@ import { describe, it, expect } from 'vitest';
 import {
   CLEANABLE_EVENT_STATUSES,
   TEMP_RECORDING_TTL_MS,
+  UNFINISHED_EVENT_STATUSES,
   isEventDataRetentionExpired,
+  isEventEligibleForCleanup,
   isRecordingRetentionExpired,
   shouldPurgeRecordingBlob,
   tempRecordingExpiryCutoff,
@@ -187,6 +189,57 @@ describe('CLEANABLE_EVENT_STATUSES', () => {
     // chat, storicamente) resterebbe lì per sempre.
     expect(CLEANABLE_EVENT_STATUSES as readonly string[]).toContain('ARCHIVED');
     expect(CLEANABLE_EVENT_STATUSES as readonly string[]).toContain('ENDED');
+  });
+});
+
+describe('isEventEligibleForCleanup', () => {
+  const base = { endsAt: daysFromNow(-40), dataRetentionDays: 30, lastActiveAt: null };
+
+  it('un evento concluso segue la sua retention come sempre', () => {
+    expect(isEventEligibleForCleanup({ ...base, status: 'ENDED' }, NOW)).toBe(true);
+    expect(isEventEligibleForCleanup({ ...base, status: 'ARCHIVED' }, NOW)).toBe(true);
+    expect(
+      isEventEligibleForCleanup({ ...base, status: 'ENDED', endsAt: daysFromNow(-10) }, NOW),
+    ).toBe(false);
+  });
+
+  it('un evento mai concluso oltre fine + retention si ripulisce, qualunque stato abbia', () => {
+    // Nessuno lo ha chiuso: la retention decorre dalla fine, non dallo stato.
+    for (const status of UNFINISHED_EVENT_STATUSES) {
+      expect(isEventEligibleForCleanup({ ...base, status }, NOW), status).toBe(true);
+      expect(
+        isEventEligibleForCleanup({ ...base, status, endsAt: daysFromNow(-10) }, NOW),
+        status,
+      ).toBe(false);
+    }
+  });
+
+  it('per un evento mai concluso la finestra decorre dall’ultima attività, se più tarda della fine', () => {
+    // Una sala a tempo indefinito usata ancora dopo la fine programmata.
+    expect(
+      isEventEligibleForCleanup(
+        { ...base, status: 'LIVE', lastActiveAt: daysFromNow(-5) },
+        NOW,
+      ),
+    ).toBe(false);
+    expect(
+      isEventEligibleForCleanup(
+        { ...base, status: 'LIVE', lastActiveAt: daysFromNow(-31) },
+        NOW,
+      ),
+    ).toBe(true);
+  });
+
+  it('il confine resta stretto anche per gli eventi mai conclusi', () => {
+    const endsAt = daysFromNow(-30);
+    expect(
+      isEventEligibleForCleanup({ ...base, status: 'PUBLISHED', endsAt }, NOW),
+    ).toBe(false);
+  });
+
+  it('una bozza non si ripulisce mai', () => {
+    expect(isEventEligibleForCleanup({ ...base, status: 'DRAFT' }, NOW)).toBe(false);
+    expect(UNFINISHED_EVENT_STATUSES as readonly string[]).not.toContain('DRAFT');
   });
 });
 

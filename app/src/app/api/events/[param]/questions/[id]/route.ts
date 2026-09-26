@@ -7,7 +7,9 @@ import {
   ForbiddenError,
   ValidationError,
 } from '@/lib/errors';
+import { deleteCacheByPrefix } from '@/lib/cache';
 import { prisma } from '@/lib/db';
+import { pokeLivePanel } from '@/lib/live-state/publish';
 import { updateQuestionStatusSchema } from '@/lib/validation/schemas';
 import { isEventModerator } from '@/lib/auth/moderator';
 
@@ -35,7 +37,10 @@ export const PATCH = withErrorHandling(async (request, context) => {
   const body = await parseJsonBody(request);
   const parsed = updateQuestionStatusSchema.safeParse(body);
   if (!parsed.success) {
-    throw new ValidationError('Validation failed', parsed.error.issues.map((i) => ({ path: i.path, message: i.message })));
+    throw new ValidationError(
+      'Validation failed',
+      parsed.error.issues.map((i) => ({ path: i.path, message: i.message }))
+    );
   }
 
   const question = await prisma.question.findUnique({
@@ -57,6 +62,9 @@ export const PATCH = withErrorHandling(async (request, context) => {
     where: { id },
     data,
   });
+
+  deleteCacheByPrefix(`qa:${event.id}:`);
+  pokeLivePanel(event.id, 'qa');
 
   return Response.json({
     id: updated.id,

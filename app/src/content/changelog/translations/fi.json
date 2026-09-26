@@ -1,4 +1,37 @@
 {
+  "0.12.0": {
+    "title": "Valmis uudelleenkäyttöön: asennus yhdellä komennolla, ja tapahtumat etenevät itsestään",
+    "notes": [
+      "Asennus yhdellä komennolla: tietokoneelle, jossa on minikube, kokeilua ja kehitystä varten, k3s-palvelimelle tuotantoon, mukana varmenteet, testipostilaatikko, objektitallennus, TURN ja ajastettu varmuuskopiointi. Jokaisen asennuksen voi tarkistaa yhdellä komennolla, tietokannan ja tiedostojen varmuuskopioinnille ja palautukselle on omat skriptinsä, ja nyt englanninkielisessä dokumentaatiossa on ohjeet ympäristöille minikube, k3s, AKS, GKE ja EKS sekä tarkistuslistat tuotantoon siirtymistä varten.",
+      "Tapahtumat avautuvat alkamisaikana ja sulkeutuvat lopussa myös asennuksissa, joissa videosiltoja ei käynnistetä automaattisesti. ”Käynnistä tapahtuma” on aina tapahtuman vetäjän käytettävissä, eikä tapahtuma enää jää jumiin tilaan ”Valmistellaan”.",
+      "Henkilökohtaiset tilit henkilöstölle: ylläpitäjät ja järjestäjät kirjautuvat sähköpostilla saamallaan henkilökohtaisella linkillä, ja kukin näkee vain sen, minkä hänen roolinsa sallii. Instanssin avain säilyy ensimmäistä kirjautumista ja hätätilanteita varten.",
+      "Sähköpostit italiaksi, englanniksi, ranskaksi, saksaksi ja espanjaksi, vastaanottajan kielellä. Moderaattorit ja puhujat saavat henkilökohtaiset linkkinsä sähköpostilla, muistutukset eivät enää saavu kaikki kerralla, eivätkä kalenterikutsut enää monistu.",
+      "Videokokouksessa rooli määräytyy linkistä, jolla liitytään: vieraat ja ilmoittautuneet ovat osallistujia eivätkä voi enää mykistää moderaattoria tai poistaa häntä.",
+      "Salissa: kysymykset, äänestykset ja sanapilvi toimivat myös vieraille ja puhujille; materiaaleihin voi lisätä tiedostoja linkkien lisäksi; itse poistunut voi palata sen sijaan, että näkisi ilmoituksen ”Tapahtuma päättynyt”; jos videokokousta ei tavoiteta, sali kertoo sen ja tarjoaa vaihtoehdon ”Yritä uudelleen”; kamera ja mikrofoni ovat osallistujilla aluksi pois päältä; virtuaalitaustan voi valita jo odotustilassa.",
+      "Tietosuoja: chat ei enää välitä vieraiden IP-osoitetta paikalla oleville; linkit omien tietojen viemiseen tai poistamiseen johtavat oikeaan osoitteeseen; tallennusilmoitus ja -suostumus näkyvät kaikkialla, missä jokin voi tallentaa.",
+      "Tilasivu tarkistaa palvelut sisältäpäin eikä enää ilmoita häiriöstä ei-julkisen varmenteen vuoksi; asennukset, joissa on kiinteä videosilta, näytetään oikein.",
+      "Hallinta: apumoderaattorien ja puhujien oikeuksien peruminen ohjatussa toiminnossa toimii nyt todella, ohjattu toiminto kertoo, mitä ei tallennettu, ja julkaisun jälkeen siirrytään tapahtuman sivulle. Pikapuheluilla ei enää ole julkista sivua, ja jaetut linkit näyttävät tapahtuman esikatselun.",
+      "Päivittäjille: Prosody, Jicofo, verkkokonferenssi ja videosilta käynnistyvät kerran uudelleen, joten päivitys kannattaa tehdä, kun tapahtumia ei ole käynnissä; jos Prosodylle on omia taltioita tai moduuleja, niihin on lisättävä myös chartin omat; ilman skaalainta suorat tapahtumat sulkeutuvat nyt, kun loppuaika ja armonaika ovat kuluneet."
+    ]
+  },
+  "0.11.0": {
+    "title": "Sali reagoi nyt heti, kun jokin muuttuu",
+    "notes": [
+      "Kysymykset, kyselyt, ohjelma ja sanapilvi päivittyvät heti muutoksen tapahtuessa sen sijaan, että ne kysyisivät palvelimelta muutaman sekunnin välein: salissa oleva näkee kysymyksen ilmestyvän saman tien, ja vilkkaassa tapahtumassa liikenne vähenee tuntuvasti.",
+      "Vähemmän työtä myös palvelimelle: salin säännölliset tarkistukset pyytävät nyt vain tarvittavan tiedon, ja aineistot — jotka muuttuvat harvoin — tarkistetaan harvemmin.",
+      "Jos välitön yhteys ei ole käytettävissä, sali palaa itsestään aiempaan säännölliseen tarkistukseen: mikään toiminto ei lakkaa toimimasta uuden tavan takia.",
+      "Korjaukset: kahden uuden sanapilven avaaminen nopeasti peräkkäin saattoi jättää toisen näkymättömiin, eivätkä sinne lähetetyt sanat näkyneet kenellekään; palvelun tilasivu ilmoitti aina saman versionumeron sen sijaan, joka todella oli käytössä."
+    ]
+  },
+  "0.10.0": {
+    "title": "Kysymykset chatissa, sujuvammat toistuvat sarjat ja korjatut instituutiovärit",
+    "notes": [
+      "Chatissa kirjoittava voi merkitä oman viestinsä kysymykseksi: valvojat merkitsevät sen vastatuksi tai siirtävät sen sivuun, ja suodatin näyttää vain kysymykset. Tapahtuman aikana ei ole toista kanavaa valvottavana.",
+      "Chatin kysymykset näkyvät saamiensa reaktioiden kanssa tapahtuman julkisella yhteenvetosivulla ja pysyvät luettavina myös sen jälkeen, kun osallistujien henkilötiedot on poistettu.",
+      "Sarjan seuraavan kerran valmistelu on nopeampaa: tapahtuman kopio ottaa mukaan aihetunnisteet, järjestäjät, apuvalvojat (kullekin uudet käyttöoikeustiedot), ohjelman, kyselyt ja muistutukset, ja mallit säilyttävät tallennuksen ja jälkikäsittelyn asetukset.",
+      "Korjaukset: instituutiovärit ovat jälleen oikeat – sivuston ylälaidan palkki näkyi valkoisena –, tapahtuman kopion luova painike ei enää johda puuttuvalle sivulle, ja säilytysajan päätyttyä poistetaan myös kutsuttujen sekä nimettyjen valvojien ja esiintyjien yhteystiedot."
+    ]
+  },
   "0.9.0": {
     "title": "Riippuvuuksien tietoturva, ajantasainen dokumentaatio ja täysi paikallinen ympäristö",
     "notes": [

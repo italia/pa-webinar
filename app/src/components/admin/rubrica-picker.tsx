@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useId, useRef, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useId, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
 export interface RubricaPickedPerson {
@@ -52,7 +52,21 @@ function rowToPerson(row: RubricaRow): RubricaPickedPerson {
   };
 }
 
+/**
+ * Se chi usa la pagina puo' consultare la rubrica. La rubrica e'
+ * dell'amministrazione (ADR-014): per un organizzatore o per chi arriva col
+ * solo token del moderatore la ricerca risponderebbe sempre 401, e il
+ * selettore sembrerebbe una rubrica vuota. Senza accesso non si mostra: resta
+ * l'inserimento a mano.
+ */
+export const RubricaAccessContext = createContext(true);
+
 export default function RubricaPicker(props: RubricaPickerProps) {
+  if (!useContext(RubricaAccessContext)) return null;
+  return <RubricaPickerInner {...props} />;
+}
+
+function RubricaPickerInner(props: RubricaPickerProps) {
   const { placeholder, disabled } = props;
   const mode: 'single' | 'multi' = props.mode ?? 'single';
   const t = useTranslations('admin.rubricaPicker');

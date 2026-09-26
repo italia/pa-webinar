@@ -48,7 +48,7 @@ export default function DeleteEventModal({
         {t('deleteEvent')}
       </Button>
       <Modal isOpen={isOpen} toggle={() => setIsOpen(false)} centered>
-        <ModalHeader toggle={() => setIsOpen(false)}>
+        <ModalHeader closeAriaLabel={tc('close')} toggle={() => setIsOpen(false)}>
           {t('deleteEvent')}
         </ModalHeader>
         <ModalBody>

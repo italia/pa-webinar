@@ -15,7 +15,9 @@
 
 import type { Prisma } from '@prisma/client';
 
+import { tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
+import type { EmailLocale } from '@/lib/email/lingua';
 
 const MAX_QUESTIONS = 5;
 const MAX_WORDS = 15;
@@ -27,7 +29,12 @@ export interface RecapPoll {
 }
 
 export interface EventRecap {
-  version: 1;
+  /**
+   * 1 = senza `chatQuestions` (snapshot persistiti prima delle domande in chat).
+   * Il campo nuovo è OPZIONALE proprio per questo: gli snapshot già scritti
+   * restano leggibili senza migrazione né rigenerazione.
+   */
+  version: 1 | 2;
   generatedAt: string;
   /** Peak concurrent participants during the live event. */
   headcount: number;
@@ -35,6 +42,18 @@ export interface EventRecap {
   registrations: number;
   /** Top answered/highlighted questions by upvotes — text only, no author. */
   topQuestions: { text: string; upvotes: number }[];
+  /**
+   * Domande poste in chat, dal più votato. Testo soltanto: niente nome di chi ha
+   * chiesto, come per `topQuestions`.
+   *
+   * Perché stanno QUI e non si leggono dalla chat quando serve: il cleanup GDPR
+   * cancella `chat_messages` alla scadenza della retention, quindi una pagina
+   * che interrogasse la chat mostrerebbe l'archivio per N giorni e poi lo
+   * troverebbe vuoto, senza errori e senza che nessuno se ne accorga. Lo
+   * snapshot invece si congela alla prima visita della pagina conclusa, mentre i
+   * messaggi ci sono ancora.
+   */
+  chatQuestions?: { text: string; reactions: number; answered: boolean }[];
   /** Published polls with per-option vote counts. */
   polls: RecapPoll[];
   /** Most-submitted word-cloud words with counts. */
@@ -42,34 +61,73 @@ export interface EventRecap {
   feedback: { average: number | null; count: number };
 }
 
+const RECAP_LABELS: Record<
+  EmailLocale,
+  {
+    participants: string;
+    registered: string;
+    questions: string;
+    polls: string;
+    feedback: string;
+    responses: string;
+  }
+> = {
+  it: {
+    participants: 'Partecipanti (picco)',
+    registered: 'Registrati',
+    questions: 'Domande risposte',
+    polls: 'Sondaggi',
+    feedback: 'Media feedback',
+    responses: 'risposte',
+  },
+  en: {
+    participants: 'Participants (peak)',
+    registered: 'Registered',
+    questions: 'Answered questions',
+    polls: 'Polls',
+    feedback: 'Average rating',
+    responses: 'responses',
+  },
+  fr: {
+    participants: 'Participants (pic)',
+    registered: 'Inscrits',
+    questions: 'Questions avec réponse',
+    polls: 'Sondages',
+    feedback: 'Note moyenne',
+    responses: 'réponses',
+  },
+  de: {
+    participants: 'Teilnehmende (Spitzenwert)',
+    registered: 'Angemeldet',
+    questions: 'Beantwortete Fragen',
+    polls: 'Umfragen',
+    feedback: 'Durchschnittliche Bewertung',
+    responses: 'Antworten',
+  },
+  es: {
+    participants: 'Participantes (pico)',
+    registered: 'Inscritos',
+    questions: 'Preguntas respondidas',
+    polls: 'Encuestas',
+    feedback: 'Valoración media',
+    responses: 'respuestas',
+  },
+};
+
 /**
  * A short plain-text summary of the recap for the moderator follow-up email.
  * Locale labels are inlined so this stays a pure, server/edge-safe function
  * (no next-intl dependency). Omits empty sections.
  */
-export function formatRecapSummary(recap: EventRecap, locale: 'it' | 'en'): string {
-  const L =
-    locale === 'it'
-      ? {
-          participants: 'Partecipanti (picco)',
-          registered: 'Registrati',
-          questions: 'Domande risposte',
-          polls: 'Sondaggi',
-          feedback: 'Media feedback',
-          responses: 'risposte',
-        }
-      : {
-          participants: 'Participants (peak)',
-          registered: 'Registered',
-          questions: 'Answered questions',
-          polls: 'Polls',
-          feedback: 'Average rating',
-          responses: 'responses',
-        };
+export function formatRecapSummary(recap: EventRecap, locale: EmailLocale): string {
+  const L = RECAP_LABELS[locale];
   const lines: string[] = [];
   if (recap.headcount > 0) lines.push(`${L.participants}: ${recap.headcount}`);
   if (recap.registrations > 0) lines.push(`${L.registered}: ${recap.registrations}`);
-  if (recap.topQuestions.length > 0) lines.push(`${L.questions}: ${recap.topQuestions.length}`);
+  // Le domande poste in chat contano come domande: per chi legge il riepilogo
+  // sono la stessa cosa, cambia solo dove sono state scritte.
+  const questionCount = recap.topQuestions.length + (recap.chatQuestions?.length ?? 0);
+  if (questionCount > 0) lines.push(`${L.questions}: ${questionCount}`);
   if (recap.polls.length > 0) lines.push(`${L.polls}: ${recap.polls.length}`);
   if (recap.feedback.average != null && recap.feedback.count > 0) {
     lines.push(
@@ -85,6 +143,7 @@ export function isRecapEmpty(recap: EventRecap): boolean {
     recap.headcount === 0 &&
     recap.registrations === 0 &&
     recap.topQuestions.length === 0 &&
+    (recap.chatQuestions?.length ?? 0) === 0 &&
     recap.polls.length === 0 &&
     recap.topWords.length === 0 &&
     recap.feedback.count === 0
@@ -93,7 +152,7 @@ export function isRecapEmpty(recap: EventRecap): boolean {
 
 /** Compute the recap from the current raw rows (does not persist). */
 export async function buildRecap(eventId: string): Promise<EventRecap> {
-  const [event, registrations, questions, polls, words, feedback] = await Promise.all([
+  const [event, registrations, questions, polls, words, feedback, chatQuestions] = await Promise.all([
     prisma.event.findUnique({
       where: { id: eventId },
       select: { peakParticipants: true },
@@ -122,6 +181,20 @@ export async function buildRecap(eventId: string): Promise<EventRecap> {
       _avg: { rating: true },
       _count: true,
     }),
+    // Domande poste in chat. Le scartate NON entrano nell'archivio pubblico —
+    // stessa regola del Q&A storico, che pubblicava solo ANSWERED/HIGHLIGHTED:
+    // un archivio che mostra "questa non verrà trattata" espone chi ha chiesto.
+    // Le nascoste dalla moderazione sono escluse a maggior ragione.
+    prisma.chatMessage.findMany({
+      where: { eventId, isQuestion: true, hiddenAt: null, dismissedAt: null },
+      select: {
+        text: true,
+        answeredAt: true,
+        // Il conteggio, non gli autori delle reazioni: qui non deve entrare
+        // nessun identificativo di persona.
+        _count: { select: { reactions: true } },
+      },
+    }),
   ]);
 
   const recapPolls: RecapPoll[] = polls.map((p) => {
@@ -139,12 +212,26 @@ export async function buildRecap(eventId: string): Promise<EventRecap> {
     };
   });
 
+  // Il testo della chat è cifrato a riposo: qui si decifra una volta sola,
+  // mentre lo snapshot si forma. L'ordinamento è per reazioni ricevute — è il
+  // "voto" che la chat ha già — e si fa in memoria perché le reazioni sono
+  // righe, non un contatore denormalizzato come sulle vecchie domande.
+  const recapChatQuestions = chatQuestions
+    .map((m) => ({
+      text: tryDecryptPII(m.text) ?? m.text,
+      reactions: m._count.reactions,
+      answered: m.answeredAt !== null,
+    }))
+    .sort((a, b) => b.reactions - a.reactions)
+    .slice(0, MAX_QUESTIONS);
+
   return {
-    version: 1,
+    version: 2,
     generatedAt: new Date().toISOString(),
     headcount: event?.peakParticipants ?? 0,
     registrations,
     topQuestions: questions.map((q) => ({ text: q.text, upvotes: q.upvoteCount })),
+    chatQuestions: recapChatQuestions,
     polls: recapPolls,
     topWords: words.map((w) => ({ word: w.word, count: w._count.word })),
     feedback: {

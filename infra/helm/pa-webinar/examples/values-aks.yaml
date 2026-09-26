@@ -1,0 +1,169 @@
+# ============================================================================
+# AKS — profilo completo sull'infrastruttura di riferimento (infra/tofu/aks)
+# ============================================================================
+#
+# Si passa DOPO examples/values-full.yaml. I valori che dipendono
+# dall'infrastruttura (indirizzi pubblici, resource group, topologia dei
+# bridge, container) qui sono segnaposto `<...>` o i valori predefiniti del
+# modulo: li sostituisce il frammento che il modulo produce, passato subito
+# dopo questo file.
+#
+# Dalla radice del repository, con i file dell'installazione in una
+# cartella fuori dal repository ($CONF):
+#
+#   tofu -chdir=infra/tofu/aks output -raw helm_values > "$CONF/aks-infra.values.yaml"
+#   helm upgrade --install pa-webinar ./infra/helm/pa-webinar -n pa-webinar \
+#     -f infra/helm/pa-webinar/examples/values-full.yaml \
+#     -f infra/helm/pa-webinar/examples/values-aks.yaml \
+#     -f "$CONF/aks-infra.values.yaml" \
+#     -f "$CONF/pa-webinar.values.yaml" \
+#     -f "$CONF/pa-webinar.private.yaml" \
+#     --wait --timeout 15m
+#
+# pa-webinar.values.yaml: domini, dimensioni e immagini della tua istanza.
+# pa-webinar.private.yaml: password XMPP interne e segreto di coturn,
+# generati una volta (openssl rand -hex 16) e ripassati identici a ogni
+# aggiornamento (vedi values-full.yaml).
+#
+# Cosa si dà per già installato nel cluster (il modulo non lo installa):
+#   - ingress-nginx, release `ingress-nginx` nel namespace `ingress-nginx`,
+#     con l'indirizzo pubblico fisso del modulo
+#     (`tofu output -raw ingress_nginx_values`) e la classe `nginx`;
+#   - cert-manager con un ClusterIssuer `letsencrypt-prod` che convalida con
+#     HTTP-01 sulla classe nginx: certificati di portale, conferenza e TURN;
+#   - Stakater Reloader, che riavvia coturn quando cert-manager rinnova il
+#     certificato TURN: coturn lo legge solo all'avvio;
+#   - nel namespace dell'installazione, il Secret dell'applicazione
+#     (`videocall-secrets`) con, oltre alle altre chiavi,
+#     AZURE_STORAGE_CONNECTION_STRING e RECORDING_AZURE_CONNECTION_STRING,
+#     entrambe uguali a `tofu output -raw storage_connection_string`, e il
+#     Secret `videocall-jitsi-jwt` (vedi values-full.yaml);
+#   - le credenziali per prelevare le immagini, se le preleva da un registro
+#     privato (`app.imagePullSecrets`, `jitsi-meet.imagePullSecrets`).
+#
+# Il database è esterno come nel profilo completo (per esempio Azure
+# Database for PostgreSQL), con DATABASE_URL nel Secret dell'applicazione;
+# Redis resta nel cluster. Istruzioni complete: infra/tofu/aks/README.md.
+# ============================================================================
+
+app:
+  # Pool applicativo del modulo (apps_pool.name). Il pool di sistema porta il
+  # taint CriticalAddonsOnly e i pool di bridge, Jibri e GPU i propri: il
+  # selettore lo rende esplicito. CronJob, scaler dei bridge e controller
+  # della registrazione lo ereditano.
+  nodeSelector:
+    agentpool: applications
+
+  env:
+    # Storage: uno storage account, due container privati. Le connection
+    # string stanno nel Secret, non qui.
+    RECORDING_STORAGE_TYPE: "azure-blob"
+    AZURE_STORAGE_CONTAINER_NAME: "files"
+    RECORDING_AZURE_CONTAINER: "recordings"
+    # Un solo bridge dietro l'indirizzo fisso del bilanciatore: più bridge
+    # dietro lo stesso indirizzo fanno cadere i partecipanti. Con la
+    # topologia node_public_ip il frammento del modulo alza il valore.
+    JVB_MAX_REPLICAS: "1"
+
+# Lo scaler segue il calendario ogni due minuti, come il valore predefinito
+# del chart (il profilo completo lo rallenta a cinque).
+jvbScaler:
+  schedule: "*/2 * * * *"
+
+# Il modulo non installa il Prometheus Operator: senza le sue CRD i
+# ServiceMonitor del profilo completo fanno fallire l'installazione. Con
+# kube-prometheus-stack installato, riaccendili insieme a
+# metrics.bearerTokenSecret (vedi docs/DEPLOYMENT.md, "Full profile").
+metrics:
+  serviceMonitor:
+    enabled: false
+
+jitsi-meet:
+  # Nome annunciato ai partecipanti per STUN, TURN e TURN su TLS: il suo
+  # record DNS punta all'indirizzo di `tofu output turn_public_ip`.
+  turnHost: "turn.videocall.example.com"
+
+  jvb:
+    # Topologia load_balancer, quella del modulo per impostazione
+    # predefinita: niente porta dell'host, un Service LoadBalancer
+    # agganciato all'indirizzo pubblico creato dal modulo, e il bridge che
+    # annuncia proprio quell'indirizzo, senza chiedere a un server STUN.
+    useHostPort: false
+    useNodeIP: false
+    publicIPs:
+      - "<jvb-public-ip>"          # tofu output jvb_public_ip
+    stunServers: ""
+    service:
+      enabled: true
+      type: LoadBalancer
+      # Solo il nodo che ospita il bridge risponde alla sonda del
+      # bilanciatore, e il bridge vede l'indirizzo vero del partecipante.
+      externalTrafficPolicy: Local
+      annotations:
+        service.beta.kubernetes.io/azure-pip-name: "pa-webinar-jvb-pip"
+        service.beta.kubernetes.io/azure-load-balancer-resource-group: "<resource-group>"
+    # L'autoscaler non sposta un bridge per compattare i nodi a evento in
+    # corso.
+    podAnnotations:
+      cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
+    metrics:
+      serviceMonitor:
+        enabled: false
+
+  jibri:
+    podAnnotations:
+      cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
+
+  # TURN per chi è dietro reti che bloccano UDP: TURN su UDP 3478 e TURN su
+  # TLS su TCP 443, su un indirizzo pubblico suo.
+  coturn:
+    enabled: true
+    # Due repliche. Con una sola, il PDB di coturn del chart
+    # (coturnPodDisruptionBudget, minAvailable 1) non ammette nessuna
+    # evacuazione: il drain degli aggiornamenti automatici di AKS (canale
+    # patch e immagine dei nodi ogni settimana) resta appeso fino al timeout
+    # e fallisce, e l'autoscaler non può togliere quel nodo. Con due, il
+    # drain sposta un pod alla volta. Dietro l'unico indirizzo il
+    # bilanciatore di Azure tiene ogni client sullo stesso pod (hash sulla
+    # 5-tupla). Chi passa dal pod spostato perde i media finché la
+    # conferenza non ricollega la sessione: la finestra di manutenzione va
+    # comunque tenuta fuori dagli eventi.
+    replicaCount: 2
+    affinity:
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              topologyKey: kubernetes.io/hostname
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: jitsi-meet
+                  app.kubernetes.io/component: coturn
+    staticAuth:
+      secret: ""                   # fissalo nel file privato (openssl rand -hex 32)
+    turns:
+      enabled: true
+      certificate:
+        create: true
+        issuerRef:
+          name: letsencrypt-prod
+          kind: ClusterIssuer
+        # Il record di turnHost punta a coturn, non all'ingress: la sfida
+        # HTTP-01 arriva a coturn, e questo proxy la gira a ingress-nginx.
+        # In alternativa: un emittente DNS-01, oppure un certificato
+        # esistente in existingSecretName con create: false.
+        acmeProxy:
+          enabled: true
+          target: ingress-nginx-controller.ingress-nginx.svc.cluster.local
+          targetPort: 80
+    service:
+      type: LoadBalancer
+      annotations:
+        service.beta.kubernetes.io/azure-pip-name: "pa-webinar-turn-pip"
+        service.beta.kubernetes.io/azure-load-balancer-resource-group: "<resource-group>"
+    # Unico intervallo privato verso cui il relay può inoltrare: i pod, con
+    # l'intervallo predefinito del modulo (tofu output coturn_allowed_peer_ips).
+    # Il bridge annuncia il proprio indirizzo di pod; le subnet dei nodi
+    # restano negate, perché ogni partecipante riceve credenziali TURN.
+    allowedPeerIPs:
+      - "10.244.0.0-10.244.255.255"

@@ -109,6 +109,35 @@ describe('POST /api/events/[param]/garden/ping — canale emote', () => {
     expect(mockedPublish).not.toHaveBeenCalled();
   });
 
+  it('distingue una snapshot mancante da un giardino vuoto', async () => {
+    // Le due cose sono indistinguibili sul filo se si manda soltanto `peers`,
+    // e chi legge reagisce in modo opposto: a un giardino vuoto toglie gli
+    // avatar dalla scena, a una snapshot mancante deve tenerseli. Senza
+    // questo segnale, un secondo di Redis lento fa sparire tutti e tornare
+    // tutti al giro dopo.
+    mockedList.mockResolvedValueOnce(null);
+
+    const res = await POST(pingRequest(legacyPing()), ctx());
+
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as {
+      peers: unknown[];
+      degraded?: boolean;
+    };
+    expect(body.degraded).toBe(true);
+    expect(body.peers).toEqual([]);
+  });
+
+  it('non dichiara degradata una snapshot davvero vuota', async () => {
+    mockedList.mockResolvedValueOnce([]);
+
+    const res = await POST(pingRequest(legacyPing()), ctx());
+
+    const body = (await res.json()) as { peers: unknown[]; degraded?: boolean };
+    expect(body.degraded).toBeUndefined();
+    expect(body.peers).toEqual([]);
+  });
+
   it('rifiuta un’emote senza timestamp: senza `at` il ricevente non deduplica', async () => {
     // `at` è l'identità dell'emote per chi legge: se manca, la ripetizione su
     // ogni ping farebbe ripartire l'animazione a ogni poll.

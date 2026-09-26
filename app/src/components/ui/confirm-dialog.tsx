@@ -16,6 +16,7 @@
  * dismiss). Only one dialog is shown at a time.
  */
 
+import { useTranslations } from 'next-intl';
 import {
   createContext,
   useCallback,
@@ -50,6 +51,7 @@ interface DialogState extends ConfirmOptions {
 }
 
 export function ConfirmProvider({ children }: { children: ReactNode }): React.ReactElement {
+  const tc = useTranslations('common');
   const [state, setState] = useState<DialogState>({
     open: false,
     title: '',
@@ -76,7 +78,7 @@ export function ConfirmProvider({ children }: { children: ReactNode }): React.Re
     <ConfirmContext.Provider value={confirm}>
       {children}
       <Modal isOpen={state.open} toggle={() => settle(false)} centered>
-        <ModalHeader toggle={() => settle(false)}>{state.title}</ModalHeader>
+        <ModalHeader closeAriaLabel={tc('close')} toggle={() => settle(false)}>{state.title}</ModalHeader>
         <ModalBody>
           <p className="mb-0">{state.message}</p>
         </ModalBody>

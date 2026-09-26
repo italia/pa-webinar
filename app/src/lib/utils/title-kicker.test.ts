@@ -4,22 +4,22 @@ import { splitTitleKicker } from './title-kicker';
 
 describe('splitTitleKicker', () => {
   it('returns plain title when disabled', () => {
-    expect(splitTitleKicker('Caffettino | Test', false)).toEqual({
+    expect(splitTitleKicker('Pausa digitale | Test', false)).toEqual({
       kicker: null,
-      main: 'Caffettino | Test',
+      main: 'Pausa digitale | Test',
     });
   });
 
   it('returns plain title when no pipe', () => {
-    expect(splitTitleKicker('Caffettino special', true)).toEqual({
+    expect(splitTitleKicker('Pausa digitale speciale', true)).toEqual({
       kicker: null,
-      main: 'Caffettino special',
+      main: 'Pausa digitale speciale',
     });
   });
 
   it('splits on first pipe and trims both parts', () => {
-    expect(splitTitleKicker('Caffettino special | Prova OSS', true)).toEqual({
-      kicker: 'Caffettino special',
+    expect(splitTitleKicker('Pausa digitale speciale | Prova OSS', true)).toEqual({
+      kicker: 'Pausa digitale speciale',
       main: 'Prova OSS',
     });
   });

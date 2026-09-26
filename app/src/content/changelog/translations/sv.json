@@ -1,4 +1,37 @@
 {
+  "0.12.0": {
+    "title": "Redo för återanvändning: installeras med ett kommando, och evenemangen sköter sig själva",
+    "notes": [
+      "Installation med ett kommando: på en dator med minikube för att prova och utveckla, på en k3s-server för produktion, med certifikat, testbrevlåda, objektlagring, TURN och schemalagd säkerhetskopiering. Varje installation kan kontrolleras med ett kommando, säkerhetskopiering och återställning av databas och filer har egna skript, och dokumentationen, nu på engelska, har guider för minikube, k3s, AKS, GKE och EKS samt checklistor för driftsättning.",
+      "Evenemang öppnar vid starttiden och stänger vid sluttiden, även på installationer utan automatisk start av videobryggorna. ”Starta evenemang” finns alltid tillgängligt för den som leder evenemanget, och ett evenemang fastnar inte längre på ”Förbereder”.",
+      "Personliga konton för personalen: administratörer och arrangörer loggar in med en personlig länk som skickas via e-post, och var och en ser bara det som rollen tillåter. Instansnyckeln finns kvar för den första inloggningen och för nödlägen.",
+      "E-post på italienska, engelska, franska, tyska och spanska, på mottagarens språk. Moderatorer och talare får sina personliga länkar via e-post, påminnelser kommer inte längre alla på en gång och kalenderinbjudningar dubbleras inte längre.",
+      "I videokonferensen beror rollen på länken man ansluter med: gäster och anmälda är deltagare och kan inte längre stänga av ljudet för moderatorn eller ta bort moderatorn.",
+      "I rummet: frågor, röstningar och ordmoln fungerar även för gäster och talare; material tar emot filer utöver länkar; den som lämnar på egen hand kan gå in igen i stället för att se ”Evenemanget avslutat”; om videokonferensen inte går att nå säger rummet det och erbjuder ”Försök igen”; kamera och mikrofon startar avstängda för deltagarna; den virtuella bakgrunden kan väljas redan i väntrummet.",
+      "Integritet: chatten skickar inte längre gästers IP-adress till de närvarande; länkarna för att exportera eller radera sina egna uppgifter leder till rätt adress; meddelande och samtycke till inspelning visas överallt där något kan spela in.",
+      "Statussidan kontrollerar tjänsterna inifrån och rapporterar inte längre ett avbrott på grund av ett icke-offentligt certifikat; installationer med en fast videobrygga visas korrekt.",
+      "Administration: att återkalla medmoderatorer och talare i guiden fungerar nu på riktigt, guiden visar vad som inte sparades, och efter publiceringen hamnar man på evenemangets sida. Snabbsamtal har inte längre någon offentlig sida, och delade länkar visar en förhandsvisning av evenemanget.",
+      "Vid uppgradering: Prosody, Jicofo, webbkonferensen och videobryggan startas om en gång, så uppgradera helst när inga evenemang pågår; den som har egna volymer eller moduler för Prosody måste lägga till chartens; utan scaler stänger direktsända evenemang nu vid sluttiden plus respittiden."
+    ]
+  },
+  "0.11.0": {
+    "title": "Rummet reagerar nu i samma stund som något ändras",
+    "notes": [
+      "Frågor, omröstningar, program och ordmoln uppdateras så snart något ändras, i stället för att fråga servern med några sekunders mellanrum: den som är i rummet ser en fråga dyka upp direkt, och vid ett välbesökt evenemang minskar trafiken kraftigt.",
+      "Mindre arbete för servern också: rummets återkommande kontroller hämtar nu bara de uppgifter som behövs, och material — som sällan ändras — kontrolleras mer sällan.",
+      "Om den omedelbara förbindelsen inte är tillgänglig återgår rummet av sig självt till den tidigare återkommande kontrollen: ingen funktion slutar fungera på grund av det nya sättet.",
+      "Rättningar: att öppna två nya ordmoln tätt inpå varandra kunde lämna ett av dem osynligt, och orden som skickades dit syntes inte för någon; tjänstens statussida uppgav alltid samma versionsnummer i stället för det som faktiskt kördes."
+    ]
+  },
+  "0.10.0": {
+    "title": "Frågor i chatten, enklare återkommande serier och återställda institutionella färger",
+    "notes": [
+      "Den som skriver i chatten kan markera sitt eget meddelande som en fråga: moderatorerna markerar den som besvarad eller lägger den åt sidan, och ett filter visar bara frågorna. Det finns ingen andra kanal att bevaka under evenemanget.",
+      "Frågorna från chatten visas, tillsammans med de reaktioner de fått, på evenemangets offentliga sammanfattningssida och går att läsa även efter att deltagarnas personuppgifter har raderats.",
+      "Att förbereda nästa tillfälle i en serie går snabbare: en kopia av ett evenemang tar med sig etiketter, arrangörer, medmoderatorer (var och en med nya inloggningsuppgifter), program, enkäter och påminnelser, och mallarna behåller sina inställningar för inspelning och efterbearbetning.",
+      "Rättningar: de institutionella färgerna är åter som de ska vara – listen högst upp på webbplatsen visades vit –, knappen som skapar en kopia av ett evenemang leder inte längre till en sida som inte finns, och när bevarandetiden går ut raderas även kontaktuppgifterna till inbjudna och till utsedda moderatorer och talare."
+    ]
+  },
   "0.9.0": {
     "title": "Säkerhet i beroenden, uppdaterad dokumentation och en komplett lokal miljö",
     "notes": [

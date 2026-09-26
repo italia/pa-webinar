@@ -1,4 +1,37 @@
 {
+  "0.12.0": {
+    "title": "Listo para la reutilización: se instala con un comando y los eventos avanzan solos",
+    "notes": [
+      "Instalación con un comando: en un ordenador con minikube para probar y desarrollar, en un servidor k3s para producción, con certificados, buzón de prueba, almacenamiento de objetos, TURN y copia de seguridad programada. Cada instalación se verifica con un comando, la copia de seguridad y la restauración de la base de datos y de los archivos tienen sus propios scripts, y la documentación, ahora en inglés, incluye guías para minikube, k3s, AKS, GKE y EKS y listas de comprobación para la puesta en producción.",
+      "Los eventos se abren a la hora de inicio y se cierran al final incluso en las instalaciones sin encendido automático de los puentes de vídeo. «Iniciar evento» está siempre a disposición de quien conduce el evento, y un evento ya no se queda bloqueado «en preparación».",
+      "Cuentas nominativas para el personal: administradores y organizadores acceden con un enlace personal recibido por correo electrónico, y cada uno ve solo lo que su rol permite. La clave de la instancia se mantiene para el primer acceso y para emergencias.",
+      "Correos en italiano, inglés, francés, alemán y español, en el idioma de quien los recibe. Los enlaces personales de moderadores y ponentes llegan por correo, los recordatorios ya no llegan todos a la vez y las invitaciones de calendario ya no se duplican.",
+      "En la videoconferencia, el rol depende del enlace con el que se entra: invitados e inscritos son participantes y ya no pueden silenciar ni expulsar al moderador.",
+      "En la sala: preguntas, votos y nube de palabras funcionan también para invitados y ponentes; los materiales aceptan archivos además de enlaces; quien sale por su cuenta puede volver a entrar, en lugar de ver «Evento finalizado»; si la videoconferencia no está accesible, la sala lo indica y ofrece «Reintentar»; la cámara y el micrófono se inician apagados para los participantes; el fondo virtual se elige ya en la sala de espera.",
+      "Privacidad: el chat ya no transmite a los presentes la dirección IP de los invitados; los enlaces para exportar o eliminar los propios datos llevan a la dirección correcta; el aviso y el consentimiento de grabación aparecen allí donde algo puede grabar.",
+      "La página de estado comprueba los servicios desde dentro y ya no señala una avería por un certificado no público; las instalaciones con un puente de vídeo fijo se muestran correctamente.",
+      "Administración: la revocación de co-moderadores y ponentes desde el asistente funciona de verdad, el asistente indica qué no se ha guardado, y tras la publicación se llega a la página del evento. Las llamadas rápidas ya no tienen página pública, y los enlaces compartidos muestran una vista previa del evento.",
+      "Para quien actualiza: Prosody, Jicofo, la conferencia web y el puente de vídeo se reinician una vez, así que conviene actualizar sin eventos en curso; quien tenga volúmenes o módulos personalizados en Prosody debe añadir los del chart; sin scaler, los eventos en directo ahora se cierran al final más el margen de cortesía."
+    ]
+  },
+  "0.11.0": {
+    "title": "La sala reacciona en el momento en que algo cambia",
+    "notes": [
+      "Preguntas, encuestas, programa y nube de palabras se actualizan en cuanto algo cambia, en lugar de consultar al servidor cada pocos segundos: quien está en la sala ve aparecer una pregunta de inmediato, y en un evento concurrido el tráfico se reduce mucho.",
+      "También menos trabajo para el servidor: las comprobaciones periódicas de la sala piden ahora solo el dato necesario, y los materiales —que cambian rara vez— se comprueban con menos frecuencia.",
+      "Si la conexión inmediata no está disponible, la sala vuelve por sí sola a la comprobación periódica anterior: ninguna función deja de funcionar por culpa del nuevo mecanismo.",
+      "Correcciones: abrir dos nubes de palabras seguidas podía dejar una invisible, y las palabras enviadas allí no aparecían a nadie; la página de estado del servicio declaraba siempre el mismo número de versión en lugar del realmente en ejecución."
+    ]
+  },
+  "0.10.0": {
+    "title": "Preguntas en el chat, series periódicas más sencillas y colores institucionales restaurados",
+    "notes": [
+      "Quien escribe en el chat puede marcar su propio mensaje como pregunta: los moderadores la señalan como respondida o la reservan, y un filtro muestra solo las preguntas. No hay un segundo canal que atender durante el evento.",
+      "Las preguntas del chat, junto con las reacciones recibidas, aparecen en la página pública de resumen del evento y siguen siendo legibles incluso después de eliminar los datos personales de los participantes.",
+      "Preparar la próxima edición de una serie es más rápido: la copia de un evento conserva etiquetas, organizadores, co-moderadores (cada uno con credenciales de acceso nuevas), programa, cuestionarios y recordatorios, y las plantillas mantienen sus ajustes de grabación y de procesamiento posterior.",
+      "Correcciones: los colores institucionales vuelven a ser los previstos —la banda superior del sitio se veía blanca—, el botón que crea la copia de un evento ya no lleva a una página inexistente y, al vencer la conservación, se eliminan también los datos de contacto de las personas invitadas y de los moderadores y ponentes designados."
+    ]
+  },
   "0.9.0": {
     "title": "Seguridad de las dependencias, documentación alineada y entorno local completo",
     "notes": [

@@ -21,6 +21,7 @@ spec:
         app.kubernetes.io/component: recorder
     spec:
       backoffLimit: {{ .Values.recorder.backoffLimit | default 1 }}
+      {{- include "pa-webinar.disruptionTolerantFailurePolicy" . | nindent 6 }}
       activeDeadlineSeconds: {{ .Values.recorder.activeDeadlineSeconds | default 21600 }}
       ttlSecondsAfterFinished: {{ .Values.recorder.ttlSecondsAfterFinished | default 600 }}
       template:
@@ -67,7 +68,7 @@ spec:
                   mountPath: /recordings
               env:
                 - name: JITSI_DOMAIN
-                  value: {{ .Values.recorder.jitsiDomain | default (index .Values.app.env "NEXT_PUBLIC_JITSI_DOMAIN") | quote }}
+                  value: {{ .Values.recorder.jitsiDomain | default (include "pa-webinar.jitsiDomain" .) | quote }}
                 - name: PORTAL_URL
                   value: {{ include "pa-webinar.internalUrl" . | quote }}
                 - name: OUTPUT_DIR
@@ -88,7 +89,8 @@ spec:
                 # confronta il dominio del JID con `config.hiddenDomain` e, se
                 # coincide, non lo mostra e non lo conta. Senza queste, il bot
                 # entra col JWT del portale ed e' un partecipante come gli
-                # altri. Vedi docs/ARCHITECTURE.md.
+                # altri. Vedi docs/operations/recording-setup.md, "Make the
+                # bot invisible".
                 - name: JITSI_XMPP_DOMAIN
                   value: {{ .Values.recorder.hiddenDomain | quote }}
                 - name: JITSI_XMPP_USER

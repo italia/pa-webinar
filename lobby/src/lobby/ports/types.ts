@@ -46,4 +46,12 @@ export interface DeviceSelection {
   audioMuted: boolean;
 }
 
-export type EventStatus = 'scheduled' | 'live' | 'ended';
+/**
+ * Stato dell'evento visto dalla piazza.
+ *
+ * `preparing` non e' un dettaglio tecnico travestito: e' la differenza fra
+ * «non e' ancora ora» e «e' ora, ma la sala non c'e' ancora». Le due cose si
+ * guardano diverse — un conto alla rovescia oppure un cordone — perche' a chi
+ * aspetta dicono cose diverse: nel primo caso c'e' tempo, nel secondo no.
+ */
+export type EventStatus = 'scheduled' | 'preparing' | 'live' | 'ended';

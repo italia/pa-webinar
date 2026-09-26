@@ -1,4 +1,37 @@
 {
+  "0.12.0": {
+    "title": "Pronto per il riuso: si installa in un comando, e gli eventi vanno avanti da soli",
+    "notes": [
+      "Installazione in un comando: su un computer con minikube per provare e sviluppare, su un server k3s per la produzione, con certificati, casella di prova, object storage, TURN e backup pianificato. Ogni installazione si verifica con un comando, copia e ripristino di database e file hanno i loro script, e la documentazione, ora in inglese, ha guide per minikube, k3s, AKS, GKE ed EKS e le checklist per il go-live.",
+      "Gli eventi si aprono all'orario d'inizio e si chiudono alla fine anche sulle installazioni senza accensione automatica dei ponti video. «Avvia evento» resta sempre a disposizione di chi conduce, e un evento non resta più bloccato «in preparazione».",
+      "Account nominali per lo staff: amministratori e organizzatori entrano con un link personale ricevuto per email, e ciascuno vede solo quello che il suo ruolo permette. La chiave dell'istanza resta per il primo accesso e per le emergenze.",
+      "Email in italiano, inglese, francese, tedesco e spagnolo, nella lingua di chi le riceve. I link personali di moderatori e relatori arrivano per email, i promemoria non arrivano più tutti insieme, e gli inviti del calendario non si duplicano.",
+      "In videoconferenza il ruolo dipende dal link con cui si entra: ospiti e iscritti sono partecipanti e non possono più silenziare o allontanare il moderatore.",
+      "In sala: domande, voti e nuvola di parole funzionano anche per ospiti e relatori; i materiali accettano file oltre ai link; chi esce da solo può rientrare, invece di vedere «evento concluso»; se la videoconferenza non è raggiungibile la sala lo dice e propone «Riprova»; fotocamera e microfono partono spenti per chi partecipa; lo sfondo virtuale si sceglie già nella sala d'attesa.",
+      "Privacy: la chat non trasmette più ai presenti l'indirizzo IP degli ospiti; i link per esportare o cancellare i propri dati portano all'indirizzo giusto; avviso e consenso alla registrazione compaiono dove qualcosa può registrare.",
+      "La pagina di stato controlla i servizi dall'interno e non segnala più un guasto per un certificato non pubblico; le installazioni con un ponte video fisso vengono mostrate correttamente.",
+      "Amministrazione: la revoca di co-moderatori e relatori dal wizard funziona davvero, il wizard dice cosa non è stato salvato, e dopo la pubblicazione si arriva alla pagina dell'evento. Le chiamate rapide non hanno più una pagina pubblica, e i link condivisi mostrano un'anteprima dell'evento.",
+      "Per chi aggiorna: Prosody, Jicofo, la conferenza web e il ponte video si riavviano una volta, quindi conviene aggiornare senza eventi in corso; chi ha volumi o moduli personalizzati su Prosody deve aggiungere quelli del chart; senza scaler, gli eventi in diretta ora si chiudono alla fine più la tolleranza."
+    ]
+  },
+  "0.11.0": {
+    "title": "La sala reagisce nel momento in cui qualcosa cambia",
+    "notes": [
+      "Domande, sondaggi, scaletta e nuvola di parole si aggiornano appena qualcosa cambia, invece di ricontrollare il server ogni pochi secondi: chi è in sala vede una domanda comparire subito, e su un evento affollato il traffico si riduce di molto.",
+      "Meno lavoro anche per il server: i controlli periodici della sala ora chiedono solo il dato che serve, e i materiali — che cambiano di rado — vengono ricontrollati meno spesso.",
+      "Se il collegamento immediato non è disponibile, la sala torna da sola al controllo periodico di prima: nessuna funzione smette di funzionare per colpa del nuovo meccanismo.",
+      "Correzioni: aprendo due nuove nuvole di parole a distanza ravvicinata poteva restarne una invisibile, e le parole inviate lì non comparivano a nessuno; la pagina di stato del servizio dichiarava sempre lo stesso numero di versione invece di quello davvero in esecuzione."
+    ]
+  },
+  "0.10.0": {
+    "title": "Domande in chat, serie ricorrenti più semplici e colori istituzionali corretti",
+    "notes": [
+      "Chi scrive in chat può marcare il proprio messaggio come domanda: i moderatori la segnano come risposta o la mettono da parte, e una lente mostra soltanto le domande. Non c'è un secondo canale da presidiare durante l'evento.",
+      "Le domande della chat, con le reazioni che hanno ricevuto, entrano nella pagina pubblica di riepilogo dell'evento e restano leggibili anche dopo la cancellazione dei dati personali dei partecipanti.",
+      "Preparare la prossima occorrenza di una serie è più rapido: la copia di un evento porta con sé tag, organizzatori, co-moderatori (ognuno con credenziali di accesso nuove), scaletta, questionari e promemoria, e i modelli conservano le impostazioni di registrazione e di elaborazione successiva.",
+      "Correzioni: i colori istituzionali tornano quelli previsti — la fascia in cima al sito si vedeva bianca —, il pulsante che crea la copia di un evento non porta più a una pagina inesistente e alla scadenza della conservazione vengono cancellati anche i recapiti degli invitati e dei moderatori e relatori nominati."
+    ]
+  },
   "0.9.0": {
     "title": "Sicurezza delle dipendenze, documentazione allineata e stack locale completo",
     "notes": [

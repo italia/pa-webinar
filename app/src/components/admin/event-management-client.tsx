@@ -4,9 +4,10 @@
  * Admin event detail page.
  *
  * Hero (title + status + tags + CTAs) on top; tabbed body on the left
- * (Panoramica / Impostazioni / Persone / Contenuti / Registrazioni &
- * Audit) — tab order mirrors the create-event wizard — and a sticky
- * sidebar on the right with KPIs, reminders and the primary edit CTA.
+ * (Panoramica / Persone / Contenuti / Dopo l'evento / Statistiche) and a
+ * sticky sidebar on the right with sign-ups, reminders and the actions.
+ * The tabs follow the life of an event: what it is, who is in it, what it
+ * carries, what is left of it afterwards.
  *
  * Feature-flag toggles are intentionally read-only here: editing lives
  * in /admin/events/[id]/edit. Having two sources of truth caused
@@ -16,18 +17,33 @@
 import { useCallback, useEffect, useState, type CSSProperties, type ReactNode } from 'react';
 import { useFormatter, useTranslations } from 'next-intl';
 
-import { Link, useRouter } from '@/i18n/navigation';
+import { Link, useRouter, percorso } from '@/i18n/navigation';
 import EventTitle from '@/components/events/event-title';
 import { MarkdownRenderer } from '@/components/ui/markdown';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
+import { duplicaComeProssima, impostaStatoEvento } from '@/lib/events/event-actions';
+import {
+  callInviteOpen,
+  moderatorRoomOpen,
+  participantEntry,
+  shareLink,
+} from '@/lib/events/participant-entry';
+import { isEventPageVisible } from '@/lib/events/visibility';
+import { canStartManually } from '@/lib/events/lifecycle';
+import { materialAuthorName } from '@/lib/events/material-author';
+import { reminderTriggerAt } from '@/lib/email/reminder-plan';
+import { unsentReminderState } from '@/lib/email/reminder-status';
+import { localizedUrl } from '@/lib/utils/localized-url';
 
 import CallSessionsPanel from './call-sessions-panel';
 import DeleteEventModal from './delete-event-modal';
 import EventAnalyticsPanel from './event-analytics-panel';
 import EventConfigDiagram from './event-config-diagram';
 import EventModeratorsPanel from './event-moderators-panel';
-import PostEventConfig from './post-event-config';
+import PostEventConfig, { type PostEventVisibility } from './post-event-config';
 import RecordingManagement from './recording-management';
+import CollapsibleSection from './collapsible-section';
+import EventLinksSection from './event-links-section';
 import StatusBadge from './status-badge';
 
 // ── Palette ──
@@ -126,7 +142,7 @@ interface EventData {
   maxParticipants: number; registrationCount: number; peakParticipants: number;
   qaEnabled: boolean; chatEnabled: boolean; recordingEnabled: boolean;
   participantsCanUnmute: boolean; participantsCanStartVideo: boolean; participantsCanShareScreen: boolean;
-  status: string;
+  status: string; eventType: string; hasJoinPassword: boolean;
   coverImageUrl: string | null; imageUrl: string | null;
   parseTitleKicker: boolean | null;
   expectedSenderRatioPct: number | null;
@@ -156,9 +172,18 @@ interface EventData {
 
 interface EventManagementClientProps {
   event: EventData; baseUrl: string; locale: string; kickerEnabled: boolean;
+  /** L'evento ammette chi entra senza iscrizione (lib/events/guest-window):
+   *  senza, l'invito diretto porterebbe all'iscrizione e non va offerto. */
+  guestEntryOpen?: boolean;
+  /** L'istante del rendering sul server (ms): vedi `istante` qui sotto. */
+  renderedAt: number;
 }
 
-type TabId = 'panoramica' | 'impostazioni' | 'persone' | 'contenuti' | 'postevento' | 'statistiche' | 'audit';
+// Le schede sono cinque e stanno in una riga sola anche su un telefono: oltre,
+// la striscia scorre in orizzontale e quelle in coda non si sa che esistano.
+// Le impostazioni dell'evento non sono fra queste — si cambiano dal wizard,
+// da «Modifica evento».
+type TabId = 'panoramica' | 'persone' | 'contenuti' | 'dopo' | 'statistiche';
 
 const ORG_TYPE_LABELS: Record<string, { it: string; en: string }> = {
   MINISTRY: { it: 'Ministero', en: 'Ministry' },
@@ -184,17 +209,38 @@ function tagChipStyle(color: string | null): CSSProperties {
 
 // ── Main component ──
 export default function EventManagementClient({
-  event, baseUrl, locale, kickerEnabled,
+  event, baseUrl, locale, kickerEnabled, guestEntryOpen = true, renderedAt,
 }: EventManagementClientProps) {
   const t = useTranslations('admin');
   const td = useTranslations('admin.eventDetail');
   const te = useTranslations('events');
   const tr = useTranslations('reminders');
   const format = useFormatter();
+  // Null finche' non siamo nel browser: il server e il client valutano
+  // «adesso» in due istanti diversi, e un promemoria proprio sul confine
+  // renderebbe due testi diversi. Finche' e' null si dice il minimo vero.
+  const [adesso, setAdesso] = useState<number | null>(null);
+  useEffect(() => {
+    setAdesso(Date.now());
+    const t = setInterval(() => setAdesso(Date.now()), 60_000);
+    return () => clearInterval(t);
+  }, []);
+  // Promemoria e iscrizioni nella forma che usa il cron, per dire di ogni
+  // promemoria non spedito se partira' (lib/email/reminder-status).
+  const promemoria = event.reminders.map((r) => ({ ...r, createdAt: new Date(r.createdAt) }));
+  const iscrittiIl = event.registrations.map((r) => new Date(r.createdAt));
   const router = useRouter();
 
   const [activeTab, setActiveTab] = useState<TabId>('panoramica');
   const [status, setStatus] = useState(event.status);
+  // La pagina post-evento si accende e si spegne dalla scheda «Dopo l'evento»
+  // senza ricaricare. Come lo stato, i due campi che la governano vivono qui:
+  // i pulsanti che aprono o condividono la pagina ne dipendono, e con i valori
+  // del caricamento offrirebbero una pagina spenta o nasconderebbero una accesa.
+  const [paginaPostEvento, setPaginaPostEvento] = useState<PostEventVisibility>({
+    postEventPublic: event.postEventPublic,
+    postEventPublicUntil: event.postEventPublicUntil,
+  });
   const [updating, setUpdating] = useState(false);
   const [feedback, setFeedback] = useState('');
 
@@ -206,12 +252,37 @@ export default function EventManagementClient({
   const durationHours = Math.floor(durationMs / 3_600_000);
   const durationMinutes = Math.floor((durationMs % 3_600_000) / 60_000);
 
-  const publicUrl = `${baseUrl}/${locale}/${locale === 'it' ? 'eventi' : 'events'}/${event.slug}`;
-  const guestLiveUrl = `${baseUrl}/${locale}/${locale === 'it' ? 'eventi' : 'events'}/${event.slug}/live`;
-  const moderatorUrl = `${baseUrl}/${locale}/admin/events/${event.id}?token=${event.moderatorToken}`;
+  // Gli indirizzi che si copiano e si condividono: nella forma che il router
+  // riconosce direttamente, senza passare da una redirezione.
+  const publicUrl = localizedUrl(baseUrl, `/events/${event.slug}`, locale);
+  const guestLiveUrl = localizedUrl(baseUrl, `/events/${event.slug}/live`, locale);
+  const moderatorUrl = localizedUrl(
+    baseUrl,
+    `/admin/events/${event.id}?token=${event.moderatorToken}`,
+    locale,
+  );
   const liveModeratorUrl = `/events/${event.slug}/live?token=${event.moderatorToken}`;
   const editUrl = `/admin/events/${event.id}/edit?token=${event.moderatorToken}`;
 
+  // I due ruoli con cui si entra, detti per nome: da moderatore, col link di
+  // conduzione, e da partecipante, dalla stessa porta del pubblico — per
+  // vedere l'evento come lo vede chi ci partecipa. L'ingresso da partecipante
+  // segue lo stato corrente (pubblicare o avviare da questa pagina lo cambia)
+  // e le regole della sala: vedi lib/events/participant-entry.
+  // Le finestre a tempo si valutano sull'istante del rendering sul server
+  // finche' il browser non ha il suo orologio: server e prima passata del
+  // client devono disegnare gli stessi pulsanti.
+  const istante = adesso ?? renderedAt;
+  const isInstant = event.eventType === 'INSTANT';
+  const eventoOra = { ...event, status, ...paginaPostEvento };
+  const ingressoPartecipante = participantEntry(eventoOra, guestEntryOpen, istante);
+  const entraModeratore = moderatorRoomOpen(eventoOra, istante);
+  const publicPageVisible = isEventPageVisible(eventoOra, istante);
+  // Il link in cima: la pagina pubblica o, per una chiamata rapida, l'invito
+  // alla sala finche' funziona (lo stesso dell'elenco delle chiamate). Una
+  // chiamata chiusa senza pagina post-evento non ha niente da condividere.
+  const condivisione = shareLink(eventoOra, istante);
+  const invitoChiamata = callInviteOpen(eventoOra, istante);
 
   // Capacity estimate sidebar surface. Everything else stays in the diagram.
   const capacity = event.capacityEstimateJson ?? null;
@@ -222,15 +293,11 @@ export default function EventManagementClient({
     const newStatus = status === 'PUBLISHED' ? 'DRAFT' : 'PUBLISHED';
     setUpdating(true); setFeedback('');
     try {
-      const res = await fetch(`/api/events/${event.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${event.moderatorToken}` },
-        body: JSON.stringify({ status: newStatus }),
-      });
-      if (res.ok) {
-        setStatus(newStatus);
-        setFeedback(newStatus === 'PUBLISHED' ? t('publishSuccess') : t('unpublishSuccess'));
-      }
+      await impostaStatoEvento(event.id, event.moderatorToken, newStatus);
+      setStatus(newStatus);
+      setFeedback(newStatus === 'PUBLISHED' ? t('publishSuccess') : t('unpublishSuccess'));
+    } catch {
+      // Senza conferma dal server lo stato mostrato resta quello vero.
     } finally { setUpdating(false); }
   }, [status, event.id, event.moderatorToken, t]);
 
@@ -253,26 +320,26 @@ export default function EventManagementClient({
 
   const handleDeleted = useCallback(() => { router.push('/admin'); }, [router]);
 
-  // "Duplica come prossima occorrenza" (docs/ROADMAP.md, "Eventi ricorrenti"):
-  // le call ricorrenti reali — Caffettino, sync DevIt — si ricreano a mano ogni
-  // volta, e la copia manuale è proprio dove si perdono i flag di cattura. Qui
-  // l'endpoint eredita l'intera configurazione e, se l'evento ha una cadenza,
-  // proietta la data della prossima occorrenza; la copia nasce in BOZZA, quindi
-  // resta comunque da confermare (le date DevIt slittano spesso).
+  // "Duplica come prossima occorrenza" (docs/architecture/event-journey.md,
+  // "Duplicating as the next occurrence"):
+  // le call ricorrenti si ricreano a mano ogni volta, e la copia manuale è
+  // proprio dove si perdono i flag di cattura. Qui l'endpoint eredita l'intera
+  // configurazione e, se l'evento ha una cadenza, proietta la data della
+  // prossima occorrenza; la copia nasce in BOZZA, quindi resta comunque da
+  // confermare (nella pratica le date di una serie slittano spesso).
   const [duplicating, setDuplicating] = useState(false);
   const [duplicateError, setDuplicateError] = useState<string | null>(null);
   const duplicateAsNext = useCallback(async () => {
     setDuplicating(true);
     setDuplicateError(null);
     try {
-      const res = await fetch(`/api/admin/events/${event.id}/duplicate`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nextOccurrence: true }),
-      });
-      if (!res.ok) throw new Error(String(res.status));
-      const created = (await res.json()) as { id: string };
-      router.push(`/admin/events/${created.id}/edit`);
+      // Il token DEVE viaggiare nell'URL: la pagina di modifica risponde
+      // notFound() senza (edit/page.tsx). Senza, il bottone atterrava su un
+      // 404 dopo aver creato davvero l'evento.
+      const created = await duplicaComeProssima(event.id);
+      router.push(
+        percorso(`/admin/events/${created.id}/edit?token=${encodeURIComponent(created.moderatorToken)}`),
+      );
     } catch {
       setDuplicateError(td('duplicateNextError'));
       setDuplicating(false);
@@ -393,19 +460,56 @@ export default function EventManagementClient({
             )}
           </div>
 
-          {/* Right CTAs */}
+          {/* Right CTAs — senza nessuna (chiamata rapida chiusa e senza
+              pagina post-evento) la colonna non c'e'. */}
+          {(condivisione || entraModeratore || ingressoPartecipante) && (
           <div className="d-flex flex-column gap-2 flex-shrink-0" style={{ minWidth: 220 }}>
-            <CopyBtn text={publicUrl} label={td('copyPublicUrl')} />
-            <CopyBtn text={guestLiveUrl} label={td('copyGuestUrl')} />
-            <CopyBtn text={moderatorUrl} label={td('copyModeratorUrl')} />
-            {(status === 'PUBLISHED' || status === 'LIVE') && (
-              <Link href={liveModeratorUrl}
+            {/* Un solo link in cima: la pagina pubblica e' quella che si
+                condivide quasi sempre (per una chiamata rapida, che non ne
+                ha una, l'invito alla sala). Gli altri — invito diretto e
+                amministrazione — stanno nella sezione «Link dell'evento»,
+                dove c'e' scritto a chi vanno dati. Tre pulsanti «copia»
+                identici qui sopra si distinguevano solo per abitudine, e
+                sbagliare significa consegnare l'evento a chi riceve il link
+                sbagliato. */}
+            {condivisione && (
+              <CopyBtn text={localizedUrl(baseUrl, condivisione.path, locale)}
+                       label={condivisione.kind === 'invite' ? td('copyInviteUrl') : td('copyPublicUrl')} />
+            )}
+            {entraModeratore && (
+              <Link href={percorso(liveModeratorUrl)}
                     className="btn btn-primary d-inline-flex align-items-center justify-content-center gap-2"
                     style={{ fontSize: '0.88rem' }}>
-                <Svg name="video" size={14} /> {td('enterAsModerator')}
+                <Svg name="video" size={14} /> {t('joinAsModeratorBtn')}
               </Link>
             )}
+            {/* In una scheda nuova: chi organizza tiene aperta la gestione, e
+                spesso anche la sala da moderatore accanto. Il link non porta
+                token: si entra come chiunque altro, da ospite o dalla pagina
+                pubblica. La riga sotto dice che cosa si apre, perche' le due
+                porte non si somigliano. */}
+            {ingressoPartecipante && (
+              <>
+                <Link href={percorso(ingressoPartecipante.path)} target="_blank"
+                      aria-describedby="ingresso-partecipante-nota"
+                      className="btn btn-outline-primary d-inline-flex align-items-center justify-content-center gap-2"
+                      style={{ fontSize: '0.88rem' }}>
+                  <Svg name="external" size={14} />
+                  {ingressoPartecipante.kind === 'room'
+                    ? td('enterAsParticipant')
+                    : td('openAsParticipant')}
+                </Link>
+                <div id="ingresso-partecipante-nota" style={{ ...CAPTION, fontSize: '0.78rem', maxWidth: 260 }}>
+                  {ingressoPartecipante.kind === 'page'
+                    ? td('participantHintPage')
+                    : event.hasJoinPassword
+                      ? td('participantHintPassword')
+                      : td('participantHintRoom')}
+                </div>
+              </>
+            )}
           </div>
+          )}
         </div>
       </div>
 
@@ -430,7 +534,7 @@ export default function EventManagementClient({
               </span>
             )}
           </div>
-          <Link href={liveModeratorUrl} className="btn btn-primary btn-sm"
+          <Link href={percorso(liveModeratorUrl)} className="btn btn-primary btn-sm"
                 style={{ fontSize: '0.84rem' }}>
             {t('joinAsModeratorBtn')}
           </Link>
@@ -438,26 +542,48 @@ export default function EventManagementClient({
       )}
 
       {/* ═══ Body ═══ */}
+      {/* Su schermo stretto la colonna con stato e azioni viene prima del
+          contenuto della scheda: sono le cose per cui si apre questa pagina, e
+          in coda costerebbero un'intera scorsa. Su schermo largo torna a
+          destra, nell'ordine di lettura. */}
       <div className="row g-4">
-        <div className="col-lg-8">
+        <div className="col-lg-8 order-2 order-lg-1">
           <TabNav active={activeTab} onChange={setActiveTab} t={td} />
           <div className="p-4" style={CARD}>
             {activeTab === 'panoramica' && (
-              <OverviewTab event={event} description={description} locale={locale} editUrl={editUrl} />
+              <OverviewTab
+                event={event}
+                description={description}
+                locale={locale}
+                editUrl={editUrl}
+                // Di un evento a calendario la pagina pubblica si offre anche
+                // in bozza, da preparare per quando esce; una chiamata rapida
+                // ne ha una solo a chiamata conclusa, se il post-evento e'
+                // pubblico.
+                publicUrl={!isInstant || publicPageVisible ? publicUrl : null}
+                // L'invito di una chiamata rapida solo finche' apre la sala:
+                // dopo risponde «non trovato».
+                guestLiveUrl={(isInstant ? invitoChiamata : guestEntryOpen) ? guestLiveUrl : null}
+                moderatorUrl={moderatorUrl}
+                instant={isInstant}
+              />
             )}
-            {activeTab === 'impostazioni' && <SettingsTab event={event} editUrl={editUrl} />}
             {activeTab === 'persone' && (
               <PeopleTab event={event} baseUrl={baseUrl} locale={locale} onExportCsv={exportCsv} />
             )}
             {activeTab === 'contenuti' && <ContentTab event={event} />}
-            {activeTab === 'postevento' && <PostEventTab event={event} status={status} />}
+            {activeTab === 'dopo' && (
+              <PostEventTab event={event} status={status}
+                            paginaPostEvento={paginaPostEvento}
+                            onPaginaPostEvento={(patch) =>
+                              setPaginaPostEvento((prima) => ({ ...prima, ...patch }))} />
+            )}
             {activeTab === 'statistiche' && <EventAnalyticsPanel eventId={event.id} status={status} />}
-            {activeTab === 'audit' && <AuditTab event={event} />}
           </div>
         </div>
 
         {/* ═══ Sidebar ═══ */}
-        <div className="col-lg-4">
+        <div className="col-lg-4 order-1 order-lg-2">
           <div style={{ position: 'sticky', top: 20 }}>
             {/* KPI */}
             <div className="p-4 mb-3" style={CARD}>
@@ -498,6 +624,24 @@ export default function EventManagementClient({
                 <ul className="list-unstyled mb-0 d-flex flex-column gap-2">
                   {event.reminders.map((r) => {
                     const sent = r.sentCount > 0;
+                    // «Non inviata» da solo non distingue «deve ancora partire»
+                    // da «non partira' piu'»: lo stato viene dalle stesse
+                    // regole del cron (lib/email/reminder-status). Parte solo
+                    // il promemoria corrente, a chi era iscritto quando e'
+                    // scattato; uno superato da un promemoria piu' vicino
+                    // all'inizio, o scaduto gia' alla creazione, non parte piu'.
+                    const inizio = new Date(event.startsAt);
+                    const quando = reminderTriggerAt(inizio, r.offsetMinutes);
+                    const stato =
+                      adesso === null
+                        ? null
+                        : unsentReminderState(
+                            { ...r, createdAt: new Date(r.createdAt) },
+                            promemoria,
+                            inizio,
+                            new Date(adesso),
+                            iscrittiIl,
+                          );
                     return (
                       <li key={r.id} className="d-flex align-items-center gap-2"
                           style={{ fontSize: '0.85rem', color: C_INK }}>
@@ -506,7 +650,22 @@ export default function EventManagementClient({
                                        background: sent ? C_SUCCESS : '#CED4DA' }} />
                         <span className="flex-grow-1">{r.label}</span>
                         <span style={{ color: C_MUTED, fontSize: '0.75rem' }}>
-                          {sent ? tr('sentStatus', { count: r.sentCount }) : tr('notSent')}
+                          {sent
+                            ? tr('sentStatus', { count: r.sentCount })
+                            : stato === null
+                              ? tr('notSent')
+                              : stato === 'missed'
+                                ? td('sidebar.reminderMissed')
+                                : stato === 'soon'
+                                  ? td('sidebar.reminderSoon')
+                                  : td('sidebar.reminderScheduled', {
+                                      when: format.dateTime(quando, {
+                                        day: 'numeric',
+                                        month: 'short',
+                                        hour: '2-digit',
+                                        minute: '2-digit',
+                                      }),
+                                    })}
                         </span>
                       </li>
                     );
@@ -532,27 +691,50 @@ export default function EventManagementClient({
             {/* Actions */}
             <div className="p-4 mb-3" style={CARD}>
               <div className="d-grid gap-2">
-                {status === 'PUBLISHED' && (
+                {/* Anche in preparazione o in pausa: se nessuno porta la sala a
+                    LIVE (lo scaler è fermo, o non c'è), l'avvio resta a chi
+                    organizza. */}
+                {canStartManually(status) && (
                   <button type="button"
                           className="btn btn-success d-flex align-items-center justify-content-center gap-2"
                           onClick={startEvent} disabled={updating}>
                     <Svg name="video" size={14} /> {t('startEvent')}
                   </button>
                 )}
-                <Link href={editUrl}
+                <Link href={percorso(editUrl)}
                       className="btn btn-primary d-flex align-items-center justify-content-center gap-2">
                   <Svg name="pencil" size={14} /> {td('editEvent')}
                 </Link>
                 <button type="button"
                         className={status === 'PUBLISHED' ? 'btn btn-outline-warning' : 'btn btn-outline-primary'}
                         onClick={togglePublish}
-                        disabled={updating || status === 'LIVE' || status === 'ENDED'}>
+                        disabled={updating || status === 'LIVE' || status === 'ENDED'}
+                        // Un pulsante spento che non si spiega e' un vicolo
+                        // cieco: chi lo trova grigio non sa se sta sbagliando
+                        // qualcosa o se e' il momento sbagliato.
+                        title={
+                          status === 'LIVE'
+                            ? td('publishBlockedLive')
+                            : status === 'ENDED'
+                              ? td('publishBlockedEnded')
+                              : undefined
+                        }>
                   {status === 'PUBLISHED' ? t('unpublish') : t('publish')}
                 </button>
-                <a href={publicUrl} target="_blank" rel="noopener noreferrer"
-                   className="btn btn-outline-secondary d-flex align-items-center justify-content-center gap-2">
-                  <Svg name="external" size={14} /> {t('openPublicPage')}
-                </a>
+                {(status === 'LIVE' || status === 'ENDED') && (
+                  <div className="text-center mt-1" style={CAPTION}>
+                    {status === 'LIVE' ? td('publishBlockedLive') : td('publishBlockedEnded')}
+                  </div>
+                )}
+                {/* Solo quando la pagina esiste: in bozza, archiviato o per
+                    una chiamata rapida in corso l'indirizzo risponde «non
+                    trovato». */}
+                {publicPageVisible && (
+                  <a href={publicUrl} target="_blank" rel="noopener noreferrer"
+                     className="btn btn-outline-secondary d-flex align-items-center justify-content-center gap-2">
+                    <Svg name="external" size={14} /> {t('openPublicPage')}
+                  </a>
+                )}
                 <button type="button"
                         className="btn btn-outline-primary d-flex align-items-center justify-content-center gap-2"
                         onClick={duplicateAsNext}
@@ -585,12 +767,10 @@ function TabNav({ active, onChange, t }: {
 }) {
   const tabs: { id: TabId; icon: IconName; key: string }[] = [
     { id: 'panoramica', icon: 'info', key: 'tabs.overview' },
-    { id: 'impostazioni', icon: 'settings', key: 'tabs.settings' },
     { id: 'persone', icon: 'user-group', key: 'tabs.people' },
     { id: 'contenuti', icon: 'folder', key: 'tabs.content' },
-    { id: 'postevento', icon: 'video', key: 'tabs.postEvent' },
+    { id: 'dopo', icon: 'video', key: 'tabs.afterEvent' },
     { id: 'statistiche', icon: 'chart', key: 'tabs.analytics' },
-    { id: 'audit', icon: 'shield', key: 'tabs.audit' },
   ];
   return (
     <ul className="nav nav-tabs mb-0" role="tablist" style={{ borderBottom: 'none' }}>
@@ -621,11 +801,15 @@ function TabNav({ active, onChange, t }: {
 }
 
 // ── Tabs ──
-function OverviewTab({ event, description, locale, editUrl }: {
+function OverviewTab({ event, description, locale, editUrl, publicUrl, guestLiveUrl, moderatorUrl, instant }: {
   event: EventData; description: string; locale: string; editUrl: string;
+  publicUrl: string | null; guestLiveUrl: string | null; moderatorUrl: string;
+  instant: boolean;
 }) {
   const td = useTranslations('admin.eventDetail');
   const te = useTranslations('events');
+  const tl = useTranslations('admin.links');
+  const t = useTranslations('admin');
   const speakers = getLocalized(event.speakersInfo as LocalizedField, locale);
 
   const toggles: { label: string; value: boolean }[] = [
@@ -646,27 +830,10 @@ function OverviewTab({ event, description, locale, editUrl }: {
         </div>
       )}
 
-      <div className="mb-4">
-        <H>{te('manage.settingsSection')}</H>
-        <EventConfigDiagram
-          event={{
-            maxParticipants: event.maxParticipants,
-            qaEnabled: event.qaEnabled, chatEnabled: event.chatEnabled,
-            recordingEnabled: event.recordingEnabled,
-            participantsCanUnmute: event.participantsCanUnmute,
-            participantsCanStartVideo: event.participantsCanStartVideo,
-            participantsCanShareScreen: event.participantsCanShareScreen,
-            speakers: speakers || undefined,
-            startsAt: event.startsAt, endsAt: event.endsAt,
-          }}
-          registrationCount={event.registrationCount} adminMode
-        />
-      </div>
-
       <div>
         <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
           <H>{td('featureSummary')}</H>
-          <Link href={editUrl}
+          <Link href={percorso(editUrl)}
                 className="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-2">
             <Svg name="pencil" size={12} /> {td('editSettings')}
           </Link>
@@ -684,20 +851,38 @@ function OverviewTab({ event, description, locale, editUrl }: {
           ))}
         </div>
       </div>
-    </>
-  );
-}
 
-function SettingsTab({ event, editUrl }: { event: EventData; editUrl: string }) {
-  const td = useTranslations('admin.eventDetail');
-  const t = useTranslations('admin');
+      {/* In fondo: i link servono spesso ma non sono la prima cosa da leggere
+          quando si apre un evento, e qui c'e' lo spazio per dire a chi va dato
+          quale — cosa che tre pulsanti «copia» in cima non potevano fare. */}
+      <div className="mt-4">
+        <H>{tl('title')}</H>
+        <EventLinksSection
+          // Senza accesso degli ospiti l'invito diretto non fa entrare
+          // nessuno: porta all'iscrizione, come la pagina pubblica. Per una
+          // chiamata rapida lo stesso indirizzo e' IL link dei partecipanti,
+          // e si presenta cosi'.
+          righe={[
+            ...(publicUrl ? [{ chiave: 'publicPage' as const, url: publicUrl }] : []),
+            ...(guestLiveUrl
+              ? [{ chiave: instant ? ('callInvite' as const) : ('guestJoin' as const), url: guestLiveUrl }]
+              : []),
+            { chiave: 'moderatorLink', url: moderatorUrl, riservato: true },
+          ]}
+        />
+      </div>
 
-  return (
-    <>
-      <div className="mb-4">
-        <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-          <H>{td('privacyGdpr')}</H>
-          <Link href={editUrl}
+      {/* Privacy e conservazione dei dati: si guardano quando si prepara
+          l'evento o quando qualcuno chiede conto, non ogni volta che si apre
+          la pagina. Per questo sono richiuse. */}
+      <div className="mt-4">
+        <CollapsibleSection
+          id="privacy-gdpr"
+          title={td('privacyGdpr')}
+          icon="it-lock"
+        >
+        <div className="d-flex justify-content-end mb-3">
+          <Link href={percorso(editUrl)}
                 className="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-2">
             <Svg name="pencil" size={12} /> {td('editSettings')}
           </Link>
@@ -719,30 +904,35 @@ function SettingsTab({ event, editUrl }: { event: EventData; editUrl: string }) 
                 value={<span style={{ whiteSpace: 'pre-wrap', color: C_INK }}>{event.recordingConsentText}</span>} />
           )}
         </dl>
+        </CollapsibleSection>
       </div>
 
-      <div>
-        <H>{td('postEventTitle')}</H>
-        <PostEventConfig
+      {/* Capacita' e infrastruttura in fondo e richiuse: «JVB», «Video Bridge»
+          e i megabit sono la risposta a una domanda che chi organizza un
+          evento non si sta facendo. Chi la fa, la trova aprendo. */}
+      <div className="mt-4">
+        <CollapsibleSection
+          id="capacita-infrastruttura"
+          title={td('capacitySection')}
+          subtitle={td('capacitySubtitle', { max: event.maxParticipants })}
+          icon="it-settings"
+        >
+        <EventConfigDiagram
           event={{
-            id: event.id, moderatorToken: event.moderatorToken,
-            postEventPublic: event.postEventPublic,
-            postEventPublicUntil: event.postEventPublicUntil,
-            libraryListed: event.libraryListed,
-            hasPlayableRecording:
-              (event.recordingPublished && !!event.recordingUrl) || !!event.youtubeUrl,
-            postEventShowQA: event.postEventShowQA,
-            postEventShowMaterials: event.postEventShowMaterials,
-            postEventShowPolls: event.postEventShowPolls,
-            postEventShowFeedback: event.postEventShowFeedback,
-            postEventShowRecap: event.postEventShowRecap,
-            postEventShowWordCloud: event.postEventShowWordCloud,
-            postEventEmailEnabled: event.postEventEmailEnabled,
-            feedbackEnabled: event.feedbackEnabled,
-            dataRetentionDays: event.dataRetentionDays,
+            maxParticipants: event.maxParticipants,
+            qaEnabled: event.qaEnabled, chatEnabled: event.chatEnabled,
+            recordingEnabled: event.recordingEnabled,
+            participantsCanUnmute: event.participantsCanUnmute,
+            participantsCanStartVideo: event.participantsCanStartVideo,
+            participantsCanShareScreen: event.participantsCanShareScreen,
+            speakers: speakers || undefined,
+            startsAt: event.startsAt, endsAt: event.endsAt,
           }}
+          registrationCount={event.registrationCount} adminMode
         />
+        </CollapsibleSection>
       </div>
+
     </>
   );
 }
@@ -860,6 +1050,12 @@ function PeopleTab({ event, baseUrl, locale, onExportCsv }: {
 
 function ContentTab({ event }: { event: EventData }) {
   const tm = useTranslations('materials');
+  // Senza un nome (aggiunto dallo staff, da un co-moderatore, o una parola
+  // fissa salvata in passato) la dicitura tradotta: lib/events/material-author.
+  const autore = (addedBy: string): string => {
+    const nome = materialAuthorName(addedBy);
+    return nome ? tm('addedBy', { name: nome }) : tm('addedByStaff');
+  };
   const td = useTranslations('admin.eventDetail');
   const format = useFormatter();
 
@@ -873,7 +1069,7 @@ function ContentTab({ event }: { event: EventData }) {
               ({event.materials.length})
             </span>
           </H>
-          <Link href={`/admin/events/${event.id}/materials`}
+          <Link href={percorso(`/admin/events/${event.id}/materials`)}
                 className="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-2">
             <Svg name="pencil" size={12} /> {td('manageMaterials')}
           </Link>
@@ -897,7 +1093,7 @@ function ContentTab({ event }: { event: EventData }) {
                     <div style={CAPTION}>{m.description}</div>
                   )}
                   <div style={{ ...CAPTION, fontSize: '0.78rem' }}>
-                    {tm('addedBy', { name: m.addedBy })} ·{' '}
+                    {autore(m.addedBy)} ·{' '}
                     {format.dateTime(new Date(m.createdAt), {
                       day: 'numeric', month: 'short',
                       hour: '2-digit', minute: '2-digit',
@@ -913,7 +1109,7 @@ function ContentTab({ event }: { event: EventData }) {
       <div>
         <div className="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
           <H>{td('questionnaires')}</H>
-          <Link href={`/admin/events/${event.id}/questionnaires`}
+          <Link href={percorso(`/admin/events/${event.id}/questionnaires`)}
                 className="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-2">
             <Svg name="pencil" size={12} /> {td('manageQuestionnaires')}
           </Link>
@@ -926,9 +1122,22 @@ function ContentTab({ event }: { event: EventData }) {
   );
 }
 
-function PostEventTab({ event, status }: { event: EventData; status: string }) {
+function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento }: {
+  event: EventData; status: string;
+  paginaPostEvento: PostEventVisibility;
+  onPaginaPostEvento: (patch: Partial<PostEventVisibility>) => void;
+}) {
   const td = useTranslations('admin.eventDetail');
+  const t = useTranslations('admin');
+  const format = useFormatter();
   const isEnded = status === 'ENDED' || status === 'ARCHIVED';
+
+  // Colore della pastiglia dell'azione nel registro GDPR.
+  const actionColor = (action: string) => {
+    if (action === 'DATA_DELETED') return { bg: '#FFF3CD', fg: '#856404' };
+    if (action === 'DATA_EXPORTED') return { bg: '#D1ECF1', fg: '#0C5460' };
+    return { bg: '#D4EDDA', fg: '#155724' };
+  };
   // A Recording ROW exists (live capture happened) → the AI pipeline can run on
   // it. Gated on the row, NOT on recordingUrl: an externally/manually-set
   // recordingUrl has no Recording row, so generate-ai would 404 — the button
@@ -969,6 +1178,35 @@ function PostEventTab({ event, status }: { event: EventData; status: string }) {
 
   return (
     <>
+      {/* Cosa succede dopo l'evento: prima le regole — pagina pubblica,
+          libreria, feedback — e poi cio' che ne e' uscito. Decisione e
+          risultato si leggono nello stesso posto. */}
+      <div>
+        <H>{td('postEventTitle')}</H>
+        {/* I valori correnti, non quelli del caricamento: la scheda si
+            rimonta ogni volta che la si riapre. */}
+        <PostEventConfig
+          onPublicPageChange={onPaginaPostEvento}
+          event={{
+            id: event.id, moderatorToken: event.moderatorToken,
+            postEventPublic: paginaPostEvento.postEventPublic,
+            postEventPublicUntil: paginaPostEvento.postEventPublicUntil,
+            libraryListed: event.libraryListed,
+            hasPlayableRecording:
+              (event.recordingPublished && !!event.recordingUrl) || !!event.youtubeUrl,
+            postEventShowQA: event.postEventShowQA,
+            postEventShowMaterials: event.postEventShowMaterials,
+            postEventShowPolls: event.postEventShowPolls,
+            postEventShowFeedback: event.postEventShowFeedback,
+            postEventShowRecap: event.postEventShowRecap,
+            postEventShowWordCloud: event.postEventShowWordCloud,
+            postEventEmailEnabled: event.postEventEmailEnabled,
+            feedbackEnabled: event.feedbackEnabled,
+            dataRetentionDays: event.dataRetentionDays,
+          }}
+        />
+      </div>
+
       {/* CTA prominente verso la gestione AI completa del video:
           trascrizione (testo + diarization), sintesi, traduzioni.
           È il collegamento che mancava fra evento e post-produzione. */}
@@ -999,7 +1237,7 @@ function PostEventTab({ event, status }: { event: EventData; status: string }) {
                 </button>
               )}
               <Link
-                href={`/admin/postprod?eventId=${event.id}`}
+                href={percorso(`/admin/postprod?eventId=${event.id}`)}
                 className={`btn d-inline-flex align-items-center gap-2 ${
                   hasRecording ? 'btn-outline-primary' : 'btn-primary'
                 }`}
@@ -1027,8 +1265,7 @@ function PostEventTab({ event, status }: { event: EventData; status: string }) {
         )}
       </div>
 
-      {/* Gestione del file di registrazione (play, download, pubblica,
-          elimina) — spostata qui dal tab Audit: è contenuto post-evento. */}
+      {/* Il file video: riprodurlo, scaricarlo, pubblicarlo, cancellarlo. */}
       <div className="mb-4">
         <H>{td('recordingSection')}</H>
         <RecordingManagement
@@ -1047,69 +1284,57 @@ function PostEventTab({ event, status }: { event: EventData; status: string }) {
           }}
         />
       </div>
-    </>
-  );
-}
 
-function AuditTab({ event }: { event: EventData }) {
-  const td = useTranslations('admin.eventDetail');
-  const t = useTranslations('admin');
-  const format = useFormatter();
-
-  // Small helper for the action-badge color mapping.
-  const actionColor = (action: string) => {
-    if (action === 'DATA_DELETED') return { bg: '#FFF3CD', fg: '#856404' };
-    if (action === 'DATA_EXPORTED') return { bg: '#D1ECF1', fg: '#0C5460' };
-    return { bg: '#D4EDDA', fg: '#155724' };
-  };
-
-  return (
-    <>
-      <div className="mb-4">
-        <H>{td('callSessions')}</H>
-        <CallSessionsPanel eventId={event.id} eventSlug={event.slug}
-                           moderatorToken={event.moderatorToken} />
-      </div>
-
-      {event.gdprAuditLogs.length > 0 && (
-        <div>
-          <H>{t('gdprAuditLog.title')}</H>
-          <div style={{ ...CAPTION, marginBottom: 8 }}>{t('gdprAuditLog.subtitle')}</div>
-          <div className="table-responsive">
-            <table className="table table-hover align-middle" style={{ fontSize: '0.85rem' }}>
-              <thead>
-                <tr>
-                  <th>{t('gdprAuditLog.date')}</th>
-                  <th>{t('gdprAuditLog.action')}</th>
-                  <th>{t('gdprAuditLog.recordCount')}</th>
-                  <th>{t('gdprAuditLog.details')}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {event.gdprAuditLogs.map((log) => {
-                  const c = actionColor(log.action);
-                  return (
-                    <tr key={log.id}>
-                      <td>{format.dateTime(new Date(log.createdAt), { dateStyle: 'short', timeStyle: 'short' })}</td>
-                      <td>
-                        <span className="px-2 py-1 rounded-pill"
-                              style={{ fontSize: '0.72rem', fontWeight: 600,
-                                       background: c.bg, color: c.fg }}>
-                          {t(`gdprAuditLog.actions.${log.action}`)}
-                        </span>
-                      </td>
-                      <td>{log.recordCount}</td>
-                      <td style={{ maxWidth: 200 }} className="text-truncate">
-                        {log.details ? JSON.stringify(JSON.parse(log.details)) : '—'}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+      {/* Le sessioni sono il registro di cio' che e' successo in sala: chi si
+          e' collegato, quando, per quanto. Stanno qui perche' si leggono dopo,
+          insieme al video e alla trascrizione. */}
+      <div className="mt-4">
+        <div className="mb-4">
+          <H>{td('callSessions')}</H>
+          <CallSessionsPanel eventId={event.id} eventSlug={event.slug}
+                             moderatorToken={event.moderatorToken} />
         </div>
-      )}
+
+        {event.gdprAuditLogs.length > 0 && (
+          <div>
+            <H>{t('gdprAuditLog.title')}</H>
+            <div style={{ ...CAPTION, marginBottom: 8 }}>{t('gdprAuditLog.subtitle')}</div>
+            <div className="table-responsive">
+              <table className="table table-hover align-middle" style={{ fontSize: '0.85rem' }}>
+                <thead>
+                  <tr>
+                    <th>{t('gdprAuditLog.date')}</th>
+                    <th>{t('gdprAuditLog.action')}</th>
+                    <th>{t('gdprAuditLog.recordCount')}</th>
+                    <th>{t('gdprAuditLog.details')}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {event.gdprAuditLogs.map((log) => {
+                    const c = actionColor(log.action);
+                    return (
+                      <tr key={log.id}>
+                        <td>{format.dateTime(new Date(log.createdAt), { dateStyle: 'short', timeStyle: 'short' })}</td>
+                        <td>
+                          <span className="px-2 py-1 rounded-pill"
+                                style={{ fontSize: '0.72rem', fontWeight: 600,
+                                         background: c.bg, color: c.fg }}>
+                            {t(`gdprAuditLog.actions.${log.action}`)}
+                          </span>
+                        </td>
+                        <td>{log.recordCount}</td>
+                        <td style={{ maxWidth: 200 }} className="text-truncate">
+                          {log.details ? JSON.stringify(JSON.parse(log.details)) : '—'}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+      </div>
     </>
   );
 }
@@ -1133,9 +1358,10 @@ function KV({ label, value }: { label: string; value: ReactNode }) {
 }
 
 // Minimal copy-to-clipboard button with a caller-supplied label.
-// We don't reuse the shared <CopyButton> because it hardcodes its
-// own label from `admin.links` — the hero needs two buttons side by
-// side with distinct labels ("public URL" vs "moderator URL").
+// Non si riusa <CopyButton> perche' quello prende l'etichetta da
+// `admin.links` e basta: qui serve poterla passare da fuori
+// (`copyPublicUrl`). In cima alla pagina ne resta uno solo — gli altri link
+// stanno nella sezione in fondo, dove c'e' spazio per dire a chi vanno dati.
 function CopyBtn({ text, label }: { text: string; label: string }) {
   const tl = useTranslations('admin.links');
   const [copied, setCopied] = useState(false);

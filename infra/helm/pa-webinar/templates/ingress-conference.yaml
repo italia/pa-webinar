@@ -1,0 +1,56 @@
+{{- /*
+  L'Ingress della conferenza reso da questo chart, al posto di quello del
+  sottochart (jitsi-meet.web.ingress), quando jitsi.conferenceIngress.enabled.
+  Le annotazioni sono una mappa di questo chart, quindi una chiave a null si
+  toglie davvero, e l'host viene da site.conferenceHost (o da
+  NEXT_PUBLIC_JITSI_DOMAIN). Le incoerenze le ferma
+  pa-webinar.validateConferenceIngress.
+*/}}
+{{- $ci := dig "conferenceIngress" dict (.Values.jitsi | default dict) | default dict }}
+{{- if and .Values.jitsi.enabled (dig "enabled" false $ci) }}
+{{- $host := include "pa-webinar.conferenceHost" . }}
+{{- $classe := toString ((index $ci "className") | default .Values.ingress.className | default "") }}
+{{- $annotazioni := include "pa-webinar.ingressAnnotations" (dict "annotazioni" (index $ci "annotations") "classe" $classe "root" .) }}
+{{- $jm := index .Values "jitsi-meet" | default dict }}
+{{- $porta := dig "web" "service" "port" 80 $jm | default 80 }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "pa-webinar.fullname" . }}-conference
+  labels:
+    {{- include "pa-webinar.labels" . | nindent 4 }}
+    app.kubernetes.io/component: conference-ingress
+  {{- with $annotazioni }}
+  annotations:
+    {{- . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- with $classe }}
+  ingressClassName: {{ . }}
+  {{- end }}
+  {{- with (index $ci "tls") }}
+  tls:
+    {{- range . }}
+    - hosts:
+        - {{ $host | quote }}
+      {{- with (index (. | default dict) "secretName") }}
+      secretName: {{ . }}
+      {{- end }}
+    {{- end }}
+  {{- end }}
+  rules:
+    - host: {{ $host | quote }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "pa-webinar.jitsiFullname" . }}-web
+                port:
+                  {{- if kindIs "string" $porta }}
+                  name: {{ $porta }}
+                  {{- else }}
+                  number: {{ $porta }}
+                  {{- end }}
+{{- end }}

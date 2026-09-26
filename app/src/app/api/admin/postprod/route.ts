@@ -19,9 +19,8 @@ import { cookies } from 'next/headers';
 import type { Prisma } from '@prisma/client';
 
 import { withErrorHandling } from '@/lib/api-handler';
-import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { eventScope, requireStaff } from '@/lib/auth/staff-session';
 import { prisma } from '@/lib/db';
-import { UnauthorizedError } from '@/lib/errors';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import { tryDecryptPII } from '@/lib/crypto/pii';
 
@@ -31,8 +30,8 @@ const DEFAULT_LIMIT = 50;
 const MAX_LIMIT = 200;
 
 export const GET = withErrorHandling(async (request) => {
-  const isAdmin = await isAdminAuthenticated(await cookies());
-  if (!isAdmin) throw new UnauthorizedError();
+  // Le registrazioni dei propri eventi, per l'organizzatore (ADR-014).
+  const session = await requireStaff(await cookies());
 
   const url = new URL(request.url);
   const limit = Math.min(
@@ -51,6 +50,7 @@ export const GET = withErrorHandling(async (request) => {
 
   const where: Prisma.RecordingWhereInput = {
     ...(eventId && { eventId }),
+    ...(session.role === 'organizer' && { event: eventScope(session) }),
     ...(statuses && {
       status: {
         in: statuses as Prisma.RecordingWhereInput['status'] extends infer T

@@ -1,0 +1,85 @@
+# ============================================================================
+# k3s in sede — TURN sul nodo (coturn), sopra values-k3s.yaml
+# ============================================================================
+#
+# Per i partecipanti le cui reti bloccano UDP verso la porta 10000 del
+# bridge. coturn lo rende questo chart; infra/onprem/k3s/addons/turn.sh
+# prepara il resto: il segreto di coturn (Secret <release>-turn), TURNS sulla
+# 443 condivisa con il portale (Traefik riconosce il nome turn.<...>, termina
+# il TLS e inoltra TURN su TCP a coturn) e i limiti di uscita di coturn. Lo
+# script scrive nella sua cartella di stato values-turn.yaml, con il nome del
+# TURN, il Secret e le reti verso cui coturn inoltra. Poi, dalla radice del
+# repository:
+#
+#   helm upgrade --install pa-webinar ./infra/helm/pa-webinar \
+#     -n pa-webinar --create-namespace \
+#     -f infra/helm/pa-webinar/examples/values-simple.yaml \
+#     -f infra/helm/pa-webinar/examples/values-k3s.yaml \
+#     -f infra/helm/pa-webinar/examples/values-k3s-turn.yaml \
+#     -f <file del sito> -f <cartella di stato>/values-turn.yaml \
+#     --wait --timeout 15m
+#
+# Porte verso il nodo di ingresso: UDP 3478 (TURN) e TCP 443 (TURNS, già
+# aperta per il portale). Un nome DNS in più, turn.<...>, verso quel nodo.
+#
+# Con un secondo indirizzo pubblico sul nodo si può dare a coturn la 443 tutta
+# per sé, senza passare da Traefik: serve un bilanciatore che sappia usare
+# quell'indirizzo (ServiceLB di k3s pubblica ogni porta su tutti gli
+# indirizzi del nodo, e la 443 è già di Traefik). Non è la strada di questo
+# file.
+# ============================================================================
+
+# Il nome del TURN (turnHost e TURNS_HOST) e il Secret con il segreto di
+# coturn non stanno qui: li scrive values-turn.yaml, dopo che turn.sh ha creato
+# il Secret. Senza quel file la resa si ferma sulla guardia delle credenziali
+# fissate di values-k3s.yaml (jitsi-meet.coturn.staticAuth), invece di
+# installare un Prosody che aspetta un Secret inesistente e non parte: con lui
+# si fermerebbero tutte le conferenze.
+jitsi-meet:
+  coturn:
+    enabled: true
+    # TURN su UDP 3478, pubblicato da ServiceLB sull'indirizzo del nodo.
+    # coturn ascolta anche su TCP 3478, raggiunto solo da Traefik.
+    turn:
+      transport: udp
+    # Il TLS di TURNS lo termina Traefik, non coturn: nessun certificato qui,
+    # e nessun riavvio di coturn quando il certificato si rinnova.
+    turns:
+      enabled: false
+    service:
+      type: LoadBalancer
+      ports:
+        turn: 3478
+    # Verso dove coturn può inoltrare: il bridge, sulla rete dei pod o
+    # sull'indirizzo del nodo, che coturn altrimenti nega come reti private.
+    # values-turn.yaml sostituisce questa lista con le reti del cluster.
+    allowedPeerIPs:
+      - "10.42.0.0-10.42.255.255"
+    # L'indirizzo che coturn annuncia per i relay. Il sottochart lo fa
+    # ascoltare su 0.0.0.0 e l'immagine cerca l'indirizzo pubblico con una
+    # richiesta DNS verso Internet: se non la fa (niente uscita, o la
+    # NetworkPolicy di turn.sh), coturn annuncia 0.0.0.0, il browser scarta il
+    # relay e chi ha UDP bloccato resta senza media. values-turn.yaml mette
+    # qui l'indirizzo pubblico del nodo (REAL_EXTERNAL_IP, letto dall'immagine
+    # al posto della richiesta DNS); il bridge scopre da solo l'indirizzo vero
+    # di coturn nella rete dei pod.
+    # extraEnvs:
+    #   REAL_EXTERNAL_IP: "<ip-pubblico-del-nodo>"
+    resources:
+      requests:
+        cpu: 100m
+        memory: 64Mi
+      limits:
+        memory: 512Mi
+
+  prosody:
+    extraEnvs:
+      # TURNS annunciato ai client sulla 443 di Traefik. TURNS_HOST lo scrive
+      # values-turn.yaml, insieme a turnHost.
+      TURNS_PORT: "443"
+
+# Un solo coturn su un solo nodo: un budget di interruzione bloccherebbe lo
+# svuotamento del nodo senza proteggere niente, come per il portale nel
+# profilo semplice.
+coturnPodDisruptionBudget:
+  enabled: false

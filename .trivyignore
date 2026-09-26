@@ -10,10 +10,10 @@
 azure-storage-account-key
 
 # CVE-2026-4372 — HuggingFace transformers RCE via untrusted model loading.
-# infra/ai/worker pins transformers==4.48.3 as part of a deliberately balanced
+# infra/ai/worker pins transformers as part of a deliberately balanced
 # stack (whisperx 3.3.x ← pyannote 3.3 ← numpy 1.x ← torch 2.6.0). The only
-# fixed version is 5.3.0, which is incompatible with that stack: dependabot's
-# 5.3.0 bump (#116) fails the worker Docker build. The RCE vector requires
+# fixed line is 5.x, which is incompatible with that stack: the 5.x bump fails
+# the worker Docker build. The RCE vector requires
 # loading an attacker-supplied model/config; the worker only loads pinned,
 # trusted HuggingFace models (whisper/pyannote) in an isolated, opt-in batch
 # pod with no untrusted-model path. Risk accepted (VEX: not_affected). Revisit
@@ -33,3 +33,22 @@ CVE-2026-4372
 # l'alert Dependabot #113 chiuso con la stessa motivazione. Da rivedere quando
 # whisperx supporterà una linea transformers corretta.
 CVE-2026-5241
+
+# CVE-2026-9856 - transformers: `save_pretrained` consente la scrittura
+# arbitraria di file attraverso un percorso che risale le directory. Il vettore
+# richiede di CHIAMARE `save_pretrained` con un percorso che l'attaccante
+# controlla. Questo worker non lo chiama mai: un grep di
+# `save_pretrained|from_pretrained|AutoModel|trust_remote_code` sul codice di
+# produzione e' vuoto. La trascrizione passa da whisperx/faster-whisper
+# (CTranslate2), la sintesi dal servizio vLLM in cluster, e i percorsi di
+# scrittura degli artefatti li decide la piattaforma, non chi partecipa agli
+# eventi. L'unica linea corretta e' transformers 5.x, incompatibile con lo stack
+# pinnato (whisperx<3.5 <- pyannote 3.3 <- numpy 1.x <- torch 2.6): il salto
+# rompe il build del worker. Rischio accettato (VEX: not_affected).
+#
+# Le tre deroghe a `transformers` in questo file condividono la stessa causa e
+# la stessa condizione di uscita: vanno rivalutate INSIEME, a ogni
+# aggiornamento di whisperx o di pyannote che allenti il vincolo su
+# transformers. Finche' il vincolo regge, la verifica da rifare e' che il grep
+# qui sopra resti vuoto.
+CVE-2026-9856

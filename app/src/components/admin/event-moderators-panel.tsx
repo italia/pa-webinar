@@ -6,6 +6,7 @@ import { Badge, Button, Input, Label } from 'design-react-kit';
 
 import { useConfirm } from '@/components/ui/confirm-dialog';
 import { SkeletonLines } from '@/components/ui/skeleton';
+import { localizedUrl } from '@/lib/utils/localized-url';
 
 type GrantRole = 'MODERATOR' | 'SPEAKER';
 
@@ -121,8 +122,10 @@ export default function EventModeratorsPanel({
     }, [eventId, moderatorToken, fetchRows, t, confirm],
   );
 
+  // Indirizzo con i segmenti nella lingua della pagina (`/it/eventi/…`): un
+  // link da copiare non passa dal router, quindi si traduce dalla mappa.
   const magicLink = useCallback(
-    (token: string) => `${baseUrl}/${locale}/events/${eventSlug}/live?token=${token}`,
+    (token: string) => localizedUrl(baseUrl, `/events/${eventSlug}/live?token=${token}`, locale),
     [baseUrl, locale, eventSlug],
   );
 

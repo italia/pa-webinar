@@ -6,13 +6,13 @@ import {
   Card,
   CardBody,
   Col,
-  Icon,
   Row,
   Spinner,
   Table,
 } from 'design-react-kit';
 
-import { Link } from '@/i18n/navigation';
+import { Icon } from '@/components/ui/icon';
+import { Link, percorso } from '@/i18n/navigation';
 
 type Period = '7d' | '30d' | '90d' | 'all';
 
@@ -309,7 +309,7 @@ function EventsTable({ events }: { events: EventAnalytics[] }) {
             <tr key={event.eventId}>
               <td>
                 <Link
-                  href={`/admin/events/${event.eventId}`}
+                  href={percorso(`/admin/events/${event.eventId}`)}
                   className="text-decoration-none fw-semibold"
                   style={{ color: 'var(--app-primary)' }}
                 >

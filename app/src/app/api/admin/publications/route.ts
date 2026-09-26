@@ -168,8 +168,8 @@ export const GET = withErrorHandling(async (request) => {
 
 /**
  * Create a LEGACY publication. The client has already uploaded the
- * video to blob storage via the SAS URL issued by /upload-url, so all
- * we do here is persist the metadata row and point at the blob URL.
+ * video to object storage through the upload opened by /upload-url, so
+ * all we do here is persist the metadata row and point at the blob URL.
  */
 export const POST = withErrorHandling(async (request) => {
   const isAdmin = await isAdminAuthenticated(await cookies());

@@ -117,6 +117,8 @@ export const GET = withErrorHandling(async (request) => {
         consentRecording: r.consentRecording,
         consentMultitrack: r.consentMultitrack,
         consentFutureCommunications: r.consentFutureCommunications,
+        // La lingua delle email, che la piattaforma conserva e usa.
+        locale: r.locale,
         registeredAt: r.createdAt.toISOString(),
         joinedAt: r.joinedAt?.toISOString() ?? null,
       },

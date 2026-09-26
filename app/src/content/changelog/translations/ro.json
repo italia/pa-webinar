@@ -1,4 +1,37 @@
 {
+  "0.12.0": {
+    "title": "Gata pentru reutilizare: se instalează cu o singură comandă, iar evenimentele merg singure",
+    "notes": [
+      "Instalare cu o singură comandă: pe un calculator cu minikube pentru testare și dezvoltare, pe un server k3s pentru producție, cu certificate, cutie poștală de test, stocare de obiecte, TURN și backup programat. Fiecare instalare se verifică cu o comandă, backupul și restaurarea bazei de date și a fișierelor au propriile scripturi, iar documentația, acum în engleză, are ghiduri pentru minikube, k3s, AKS, GKE și EKS și liste de verificare pentru punerea în producție.",
+      "Evenimentele se deschid la ora de început și se închid la final chiar și pe instalările fără pornirea automată a punților video. „Porniți evenimentul” rămâne mereu la dispoziția celui care conduce evenimentul, iar un eveniment nu mai rămâne blocat în starea „Pregătire”.",
+      "Conturi nominale pentru personal: administratorii și organizatorii intră cu un link personal primit prin e-mail, iar fiecare vede doar ce îi permite rolul. Cheia instanței rămâne pentru primul acces și pentru situații de urgență.",
+      "E-mailuri în italiană, engleză, franceză, germană și spaniolă, în limba destinatarului. Linkurile personale ale moderatorilor și vorbitorilor sosesc prin e-mail, mementourile nu mai sosesc toate deodată, iar invitațiile din calendar nu se mai dublează.",
+      "În videoconferință, rolul depinde de linkul cu care se intră: invitații și înscrișii sunt participanți și nu mai pot să închidă microfonul moderatorului și nici să-l elimine.",
+      "În sală: întrebările, voturile și norul de cuvinte funcționează și pentru invitați și vorbitori; materialele acceptă fișiere pe lângă linkuri; cine iese singur poate reveni, în loc să vadă „Eveniment încheiat”; dacă videoconferința nu poate fi accesată, sala spune acest lucru și propune „Reîncercați”; camera și microfonul pornesc oprite pentru participanți; fundalul virtual se alege deja în sala de așteptare.",
+      "Confidențialitate: chatul nu mai transmite celor prezenți adresa IP a invitaților; linkurile pentru exportul sau ștergerea propriilor date duc la adresa corectă; informarea și consimțământul pentru înregistrare apar oriunde ceva poate înregistra.",
+      "Pagina de stare verifică serviciile din interior și nu mai semnalează o defecțiune din cauza unui certificat nepublic; instalările cu o punte video fixă sunt afișate corect.",
+      "Administrare: revocarea co-moderatorilor și a vorbitorilor din asistent funcționează cu adevărat, asistentul spune ce nu a fost salvat, iar după publicare se ajunge la pagina evenimentului. Apelurile rapide nu mai au o pagină publică, iar linkurile partajate arată o previzualizare a evenimentului.",
+      "Pentru cine actualizează: Prosody, Jicofo, conferința web și puntea video repornesc o dată, deci e bine să actualizați fără evenimente în desfășurare; cine are volume sau module personalizate pentru Prosody trebuie să le adauge și pe cele din chart; fără scaler, evenimentele live se închid acum la final plus perioada de grație."
+    ]
+  },
+  "0.11.0": {
+    "title": "Sala reacționează acum în momentul în care ceva se schimbă",
+    "notes": [
+      "Întrebările, sondajele, programul și norul de cuvinte se actualizează de îndată ce ceva se schimbă, în loc să interogheze serverul la câteva secunde: cine se află în sală vede întrebarea apărând imediat, iar la un eveniment aglomerat traficul scade considerabil.",
+      "Mai puțină muncă și pentru server: verificările periodice ale sălii cer acum doar datele necesare, iar materialele — care se schimbă rar — sunt verificate mai rar.",
+      "Dacă legătura imediată nu este disponibilă, sala revine singură la verificarea periodică de dinainte: nicio funcție nu încetează să meargă din cauza noului mecanism.",
+      "Corecții: deschiderea a doi nori de cuvinte la scurt timp unul după altul putea lăsa unul invizibil, iar cuvintele trimise acolo nu apăreau nimănui; pagina de stare a serviciului declara mereu același număr de versiune în locul celui aflat efectiv în execuție."
+    ]
+  },
+  "0.10.0": {
+    "title": "Întrebări în chat, serii recurente mai simple și culori instituționale corectate",
+    "notes": [
+      "Cine scrie în chat își poate marca propriul mesaj ca întrebare: moderatorii o marchează ca soluționată sau o pun deoparte, iar un filtru afișează numai întrebările. În timpul evenimentului nu există un al doilea canal de supravegheat.",
+      "Întrebările din chat, împreună cu reacțiile primite, apar pe pagina publică de sinteză a evenimentului și rămân lizibile chiar și după ștergerea datelor personale ale participanților.",
+      "Pregătirea următoarei ediții dintr-o serie este mai rapidă: copia unui eveniment preia etichetele, organizatorii, co-moderatorii (fiecare cu credențiale de acces noi), programul, chestionarele și memento-urile, iar șabloanele păstrează setările de înregistrare și de prelucrare ulterioară.",
+      "Corecții: culorile instituționale au revenit la cele prevăzute — banda din partea de sus a sitului apărea albă —, butonul care creează copia unui eveniment nu mai duce la o pagină inexistentă, iar la expirarea păstrării se șterg și datele de contact ale invitaților și ale moderatorilor și vorbitorilor desemnați."
+    ]
+  },
   "0.9.0": {
     "title": "Securitatea dependențelor, documentație aliniată și mediu local complet",
     "notes": [

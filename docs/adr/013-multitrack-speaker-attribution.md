@@ -1,165 +1,546 @@
-# ADR-013 — Speaker attribution accurato via registrazione multi-traccia per-partecipante
+# ADR-013: Per-participant multitrack recording for speaker attribution
 
-**Stato**: Accettato e implementato (proposto 2026-06-01) — recorder multi-traccia in produzione; il bot entra su dominio nascosto Prosody, quindi non compare tra i partecipanti (v0.8.6).
-**Decisori**: team pa-webinar / DTD
-**Contesto abilitante**: la trascrizione post-evento attribuisce i parlanti con pyannote in "blind diarization" sull'audio misto Jibri; mislabel frequenti, mapping manuale e gestione debole delle sovrapposizioni. Jitsi conosce la sorgente reale di ogni voce, ma oggi la buttiamo via.
+**Status:** Accepted
 
-## Contesto
+**Extends:** [ADR-006](006-recording-and-storage.md)
 
-Stato attuale della pipeline (vedi [`docs/POSTPROD.md`](../POSTPROD.md), `infra/ai/worker/transcribe.py`):
+The capability is implemented and optional. An installation turns it on with `recorder.enabled`, which
+defaults to `false` in `infra/helm/pa-webinar/values.yaml`, together with `recorder.controller.enabled`,
+which defaults to `true` there. Each event then opts in. The `recorder` profile of Docker Compose defines
+the controller, but the shipped Compose file needs the additions listed in
+[Recording](../architecture/recording.md#docker-single-vm) before it completes a recording. This record
+states the decision and the design facts it rests on. The mechanisms are described in full in
+[Recording](../architecture/recording.md#per-participant-audio-with-the-multitrack-recorder).
 
-1. **Jibri** registra la conferenza come **un singolo MP4 composito** (`startRecording({mode:'file'})`), con **una sola traccia audio mista**.
-2. Il worker esegue **WhisperX + pyannote.audio 3.1** sull'audio misto: pyannote raggruppa le voci in cluster acustici `SPEAKER_00/01/…` **senza alcuna informazione di identità**.
-3. L'admin **mappa a mano** ogni `SPEAKER_xx` a un nome reale (editor post-evento, ADR feature waveform/editor).
+## Context
 
-Limiti strutturali:
-- **Mislabel**: pyannote sbaglia il numero di speaker (outlier, voci simili, audio VoIP) → l'`expected_speakers` aiuta ma non risolve.
-- **Sovrapposizioni**: la diarization assegna **un solo speaker per segmento**; quando due persone parlano insieme, una viene persa o attribuita male.
-- **Lavoro manuale**: il mapping `SPEAKER_xx → nome` è sempre necessario.
+AI post-production ([ADR-016](016-in-cluster-ai-postproduction.md)) turns a recording into a transcript.
+For an event that only Jibri records, the input is one MP4 with a single mixed audio track
+([ADR-006](006-recording-and-storage.md)). The `TRANSCRIBE` job runs WhisperX on the mix, then pyannote
+diarization to split it by voice. Diarization groups voices into anonymous acoustic clusters
+(`SPEAKER_00`, `SPEAKER_01`, and so on) that carry no identity. It has structural limits:
 
-Eppure Jitsi/JVB **conosce la verità di base**: ogni endpoint ha uno stream audio separato (SSRC) con identità (displayName dal JWT del portale), più eventi `dominantSpeakerChanged` e livelli audio per-partecipante. L'informazione esiste in diretta e viene **distrutta** dal mixing di Jibri.
+- **Mislabels.** It can get the number of speakers wrong when voices are similar, interventions are short
+  or the conference audio is compressed. The expected number of speakers (`Event.expectedSpeakers`)
+  fixes the cluster count, which helps, but it does not make the attribution right.
+- **One speaker per segment.** When two people talk at once, one of them is lost or attributed to the
+  other.
+- **Manual work.** Each cluster has to be mapped to a real name by hand in the transcript editor.
 
-Obiettivo: attribuzione **certa** (nome reale, non cluster acustico) e **gestione naturale degli overlap**.
+Jitsi already knows the ground truth. Each endpoint sends its own audio stream to the bridge. Each
+participant carries the display name from the portal-signed JWT ([ADR-004](004-jitsi-jwt.md)). The
+conference also reports who the dominant speaker is. The mix discards all of this.
 
-## Opzioni valutate
+The goal is exact attribution, meaning a real name rather than an acoustic cluster, and natural handling
+of overlapping speech. Four constraints apply:
 
-### Opzione A — Recorder multi-traccia custom (bot lib-jitsi-meet headless) — SCELTA
+- **The Jitsi boundary.** Jitsi source code is never modified, and a Jitsi upgrade must stay cheap
+  ([ADR-001](001-jitsi-iframe-api.md)).
+- **An isolated voice is sensitive personal data.** A file that holds one person's voice is closer to
+  biometric data than a mix is. It needs its own consent, a short retention, encryption of what
+  identifies the speaker, and no public exposure.
+- **Portability.** Public administrations (PAs) that reuse PA Webinar run any Kubernetes distribution, or
+  a single VM with Docker Compose. The portal is one platform-agnostic deployable
+  ([ADR-002](002-nextjs-fullstack.md)), and it must not depend on the Kubernetes API.
+- **Contained credentials.** Only the portal holds storage keys and the key that encrypts personal data
+  ([ADR-006](006-recording-and-storage.md)).
 
-Un nuovo servizio "multitrack recorder": un bot headless che entra nella stanza col JWT (come un partecipante invisibile), si sottoscrive a **ogni traccia audio remota**, e registra **N file audio separati** (uno per partecipante), ciascuno etichettato con l'identità del partecipante (displayName dal JWT / endpoint id). A fine evento carica le N tracce + un manifest `track → partecipante`.
+## Decision
 
-Il worker poi trascrive **ogni traccia indipendentemente** con WhisperX (una traccia = un parlante → **niente diarization**), e fonde i segmenti per timestamp: il risultato ha **nomi reali** e **overlap nativi** (segmenti di tracce diverse possono sovrapporsi nel tempo, perché sono registrazioni separate).
+PA Webinar records per-participant audio with a headless recorder bot (option A in
+[Alternatives considered](#alternatives-considered)), orchestrated by a small reconciling controller. It
+keeps two fallbacks.
 
-**Pro**
-- Attribuzione **esatta** (identità dal JWT, non inferenza acustica) → **zero mapping manuale**.
-- **Overlap risolti per costruzione**: tracce indipendenti, due parlanti contemporanei = due segmenti concorrenti.
-- WhisperX **senza pyannote**: più semplice, più veloce, niente modello gated HF, niente `expected_speakers`.
-- Audio per-traccia è **mono pulito** del singolo parlante → ASR più accurato (no cross-talk).
-- Si innesta sulla pipeline esistente (artifact storage, worker, editor) cambiando solo l'ingest.
+- **The recorder bot** (`infra/recorder`) joins the conference of a `LIVE` event receive-only. It writes
+  one audio track per participant track session, labeled with the participant's Jitsi endpoint id and
+  display name. The worker's `TRANSCRIBE_MULTITRACK` job transcribes each track without diarization and
+  merges the segments. Overlaps are kept, and segments that overlap another speaker are marked as
+  concurrent.
+- **The dominant-speaker timeline** (option D) is captured in every live room. Each browser reports
+  dominant-speaker changes through the IFrame API to `POST /api/events/<param>/speaker-events`, and the
+  portal appends them to a call session's `CallSession.dominantSpeakerLog`. The transcript view uses the
+  timeline to name anonymous diarization clusters. In the current code this fallback rarely finds a
+  timeline to use (see [below](#how-a-transcript-gets-its-speaker-names)).
+- **Diarization of the mix** remains the path for every event without per-participant tracks.
 
-**Contro**
-- **Nuovo servizio media** (WebRTC receive-only) da scrivere e mantenere: Node + lib-jitsi-meet + cattura tracce (`node-webrtc`/`werift` o Chrome headless con `MediaRecorder` per-track). È il pezzo a maggior rischio/sforzo.
-- Scala con gli eventi come Jibri (CPU + banda per ricevere N stream) → deployment dedicato + scale-with-events.
-- **PII più granulare**: la voce isolata di una persona è dato personale (vicino al biometrico) → vincoli GDPR forti (consenso, retention, cifratura, minimizzazione).
-- Più storage (N tracce vs 1) — mitigato: audio-only Opus ~16-32 kbps/parlante.
+The decision sets these boundaries:
 
-### Opzione B — Jigasi (gateway transcription Jitsi)
+- **A deliberate exception to ADR-001.** The bot uses `lib-jitsi-meet`. It loads the library and the
+  deployment's `config.js` at run time from the installation's own Jitsi web server, so it always matches
+  the deployed Jitsi version. No Jitsi source is modified, and no Jitsi client code is bundled.
+- **The portal decides and mints.** It decides which recordings are wanted and issues every Jitsi token
+  and storage permission. In the recording path, the controller is the only component that talks to the
+  Kubernetes API or the Docker socket; the portal never does.
+- **Optional at two levels.** `recorder.enabled` (with `recorder.controller.enabled`) controls the
+  installation. For each event, `multitrackRecordingEnabled` (**Per-participant recording (high
+  accuracy)**) takes effect only together with `recordingEnabled` and `aiTranscriptEnabled`.
+- **A consent of its own**, separate from the recording consent.
+- **Tracks are intermediate input.** They are never public, and they are deleted after transcription
+  unless the event keeps them.
+- **Audio only.** The bot publishes nothing and records no video.
 
-Jigasi entra in conferenza e riceve gli stream per-partecipante; è il path "nativo" Jitsi per la trascrizione live. Potrebbe fornirci il **per-speaker** già separato.
+### How a transcript gets its speaker names
 
-**Pro**: componente Jitsi ufficiale; riceve già stream separati; integra l'identità.
-**Contro**: orientato a **STT live** (Vosk/Google), non alla **cattura audio post-evento ad alta qualità**; ripiegarlo a "registratore di tracce" è innaturale; qualità STT inferiore a WhisperX large-v3; aggiunge comunque un servizio. Utile semmai per la **timeline parlante** (vedi Opzione D), non per il nostro post-processing di qualità.
+The fallbacks form a chain. The transcript route
+(`app/src/app/api/events/[param]/postprod/transcript/route.ts`) applies the last three steps each time a
+transcript is displayed.
 
-### Opzione C — Dump RTP a livello JVB
+```mermaid
+flowchart TD
+    START(["Recording ready for AI post-production"]):::neutral
+    Q1{"Per-participant<br/>tracks ingested?"}:::neutral
+    MT["TRANSCRIBE_MULTITRACK<br/>one known speaker per track,<br/>no diarization"]:::media
+    MTN["Name from the portal JWT<br/>overlaps kept as concurrent segments"]:::ok
+    MIX["TRANSCRIBE on the mix<br/>pyannote diarization,<br/>anonymous clusters"]:::job
+    Q2{"Cluster mapped<br/>by an administrator?"}:::neutral
+    ADM["Administrator's name"]:::ok
+    Q3{"Dominant-speaker timeline<br/>overlaps the cluster?<br/>the log is usually empty"}:::neutral
+    DOM["Name from the timeline<br/>best effort, at display time"]:::warn
+    NUM["Numbered participant label"]:::risk
 
-Estendere/patchare il JVB per dumpare l'RTP per-endpoint.
+    START --> Q1
+    Q1 -->|"yes"| MT --> MTN
+    Q1 -->|"no: automatic for a Jibri-only event,<br/>otherwise run by an administrator"| MIX --> Q2
+    Q2 -->|"yes"| ADM
+    Q2 -->|"no"| Q3
+    Q3 -->|"yes"| DOM
+    Q3 -->|"no"| NUM
 
-**Contro**: invasivo sul core SFU, fragile fra gli upgrade Jitsi, fuori dal nostro perimetro di manutenzione. Scartato.
-
-### Opzione D — Audio misto + timeline dominant-speaker (fallback leggero)
-
-Tenere la registrazione mista Jibri + catturare in diretta `dominantSpeakerChanged` (timestamp + partecipante) → allineare i segmenti pyannote alla timeline per **dare i nomi reali** e correggere i mislabel.
-
-**Pro**: piccolo (listener frontend + ingest + allineamento), nessun servizio nuovo, nessuna PII audio aggiuntiva.
-**Contro**: **non risolve gli overlap** (dominant speaker = uno alla volta); resta dipendente dalla qualità di pyannote per la segmentazione.
-
-> D **non è alternativa** a C ma **complemento a basso costo**: la timeline dominant-speaker è un'ottima fonte di verità anche per A (validazione/etichettatura) e va catturata comunque. La implementiamo come **Fase 0** perché dà valore subito e indipendentemente.
-
-## Decisione
-
-Adottare **Opzione A** (recorder multi-traccia custom) come traguardo, con **Opzione D come Fase 0** (valore immediato + base dati riusabile). pyannote resta come **fallback** per registrazioni miste/legacy o eventi senza recorder multi-traccia.
-
-## Architettura & modello dati (bozza)
-
-- **Recorder**: nuovo deployable `multitrack-recorder` (namespace, scale-with-events come Jibri). Riceve-only WebRTC, una `MediaRecorder`/encoder per traccia remota → file `audio/{participantId}.opus`. Identità presa dal JWT del portale (già emesso, vedi `app/src/app/api/events/[param]/jitsi/token`).
-- **Storage/manifest**: alla fine, upload tracce sotto `recordings/multitrack/{eventId}/{recordingId}/` + manifest `tracks.json` (`[{participantId, displayName(enc), trackKey, startOffsetMs, durationMs}]`). Webhook al portale (riusa `/api/webhooks/recording`).
-- **Prisma**: nuovo `RecordingTrack` (recordingId, participantId, displayName cifrato, blobKey, startOffsetMs, durationMs) **oppure** estendere `Speaker` perché diventi "identità reale" (diarLabel → participantId). Lo `Speaker.displayName` arriva dal JWT, non più mapping manuale.
-- **Worker** — nuovo flusso `TRANSCRIBE_MULTITRACK`: per ogni traccia, WhisperX **senza diarization** → segmenti `{start, end, text}` con `speaker = participantId`; poi **merge** di tutte le tracce ordinate per `start`, allineate sull'`startOffsetMs` comune. Output `TRANSCRIPT_JSON` con segmenti **eventualmente sovrapposti** + `speakers[]` con nomi reali. Il resto (SUMMARIZE/TRANSLATE/SUBTITLE/DUB/WAVEFORM) invariato; la waveform può restare quella del mix Jibri (se ancora prodotto) o una somma delle tracce.
-- **UI**: l'editor/transcript panel deve gestire **segmenti sovrapposti** (oggi assume sequenzialità) — render interlacciato per speaker, niente più "Partecipante N" anonimi.
-
-## Implicazioni GDPR (bloccante)
-
-L'audio isolato del singolo parlante è **dato personale ad alta sensibilità** (prossimo al biometrico vocale, art. 9 se usato per identificazione). Richiede:
-- **Consenso esplicito** al momento della registrazione (estendere il consenso evento/partecipante; la registrazione mista è già consentita, ma la traccia individuale è un trattamento nuovo da dichiarare).
-- **Minimizzazione**: le tracce per-partecipante sono **intermedie** — si possono **cancellare subito dopo** la trascrizione (non serve conservarle come gli artifact). Retention molto più breve del transcript.
-- **Cifratura at-rest** + chiavi separate; mai esposte al pubblico (solo input worker).
-- Aggiornare `docs/GDPR.md`, l'informativa privacy e il service inventory (CycloneDX) — coerente con il lavoro AI Act già fatto.
-- Coerenza con la linea "niente voice cloning": qui **non** si clona la voce, si usa per attribuire il testo; va però documentato il trattamento.
-
-## Piano a fasi
-
-- **Fase 0 — Dominant-speaker timeline** (1–2 gg, nessun servizio nuovo): listener `dominantSpeakerChanged` in `jitsi-room.tsx` → ingest `/api/events/[param]/speaker-events` → campo su `CallSession`. Allineamento opzionale in fase di transcript per auto-nominare i cluster pyannote. **Valore immediato anche senza C.**
-- **Fase 1 — Merge multi-traccia nel worker** (testabile da solo, **nessuna GPU/infra**): funzione `transcribe_tracks([...]) → merge` + WhisperX single-speaker. Mockabile e unit-testabile subito.
-- **Fase 2 — Modello dati + ingest** (`RecordingTrack`, manifest, webhook, storage layout).
-- **Fase 3 — Recorder bot** (il pezzo grosso): PoC lib-jitsi-meet headless receive-only → file per traccia → upload. Deployment scale-with-events.
-- **Fase 4 — UI overlap** + nomi reali nell'editor/transcript/VTT.
-- **Fase 5 — GDPR**: consenso, retention breve tracce, informativa, service inventory.
-
-## Fase 3 — Orchestrazione del recorder (operator a pod fisso)
-
-> Amendment (giugno 2026). Risolve "come si avvia il recorder quando un evento è LIVE?" tenendo conto dei requisiti: **reattivo**, **efficiente** (niente Job speculativi), **portabile** (AKS/GKE/EKS/k3s), **sicuro**, **affidabile**.
-
-### Perché NON un CronJob (come il postprod-orchestrator)
-Il `cronjob-postprod-orchestrator` va bene per la coda postprod (lavoro batch, claim da una coda), ma è il modello sbagliato per il recorder:
-- **Latenza**: un tick al minuto può perdere i primi ~60s dell'evento (l'apertura).
-- **Spreco**: l'orchestrator postprod spawna worker *generici* fino a `desired`; un pattern analogo per il recorder creerebbe Job anche quando non servono.
-- L'utente vuole esplicitamente **un pod fisso con RBAC** (operator).
-
-### Modello scelto: operator riconciliante (edge-triggered + level-triggered)
-Un **Deployment fisso a 1 replica** (`recorder-controller`, immagine leggera Node, **senza** Chrome/puppeteer) con RBAC namespaced minimale. È il pattern classico degli operator K8s:
-
-- **Edge-triggered (reattività)**: il portale, nel punto in cui *rileva* la transizione → `LIVE` (oggi `POST /api/internal/jvb-desired-replicas`, chiamato dallo scaler JVB), fa un best-effort `POST` al controller (`/dispatch {eventId}`). Il controller crea **subito** il Job recorder. Niente attesa del prossimo tick.
-- **Level-triggered (affidabilità)**: il controller ha un **reconcile loop** a bassa frequenza (es. 30s) che interroga il portale (`GET /api/internal/recorder-desired`) per la lista degli eventi che *dovrebbero* avere un recorder attivo (LIVE + `aiTranscriptEnabled` + consenso multi-traccia) e **diffonde** verso lo stato reale dei Job nel namespace. Ripara i push persi, ricrea Job falliti, e fa **GC** dei Job per eventi non più LIVE. È la spina dorsale: il push è solo un'ottimizzazione di latenza.
-- **Idempotenza/efficienza**: **un solo** Job per `recordingId`, nome deterministico + label `recordingId=<uuid>`. Push duplicati o reconcile concorrenti non raddoppiano. Job creati **solo** per eventi che servono davvero → zero spreco.
-
-```
-  ┌────────── portale (Next.js, K8s-agnostico) ──────────┐
-  │  jvb-desired-replicas: rileva LIVE                    │
-  │     └─(best-effort) POST controller /dispatch         │  edge
-  │  GET /api/internal/recorder-desired  ← reconcile      │  level
-  │  POST /api/internal/recorder-claim   ← work-order      │
-  │  POST /api/internal/multitrack-manifest ← ingest (✓Fase2)│
-  └───────────────────────────────────────────────────────┘
-            ▲ (HTTP, x-api-key)        │ crea Job (K8s API, RBAC)
-            │                          ▼
-     recorder-controller (pod fisso) ──► Job recorder (per recordingId)
-                                              └─ claim → cattura → upload → ingest
+    classDef neutral fill:#EEF1F4,stroke:#5C6F82,stroke-width:1px,color:#17324D
+    classDef media fill:#E0F5F5,stroke:#00A3A3,stroke-width:2px,color:#17324D
+    classDef job fill:#FFF3E0,stroke:#CC7A00,stroke-width:2px,color:#17324D
+    classDef ok fill:#E3F2EC,stroke:#008055,stroke-width:2px,color:#17324D
+    classDef warn fill:#FFF3E0,stroke:#CC7A00,stroke-width:1px,stroke-dasharray:4 3,color:#17324D
+    classDef risk fill:#FCE8EC,stroke:#D1344C,stroke-width:1px,color:#17324D
 ```
 
-### Chi conia cosa (sicurezza: credenziali fuori dall'operator)
-Il controller **non** tocca credenziali Jitsi/storage: passa solo `recordingId`/`eventId` come env del Job. Il recorder, all'avvio, fa **`POST /api/internal/recorder-claim`** (x-api-key) e riceve il work-order:
-- **JWT bot** coniato da `generateJitsiJwt` (identità `rec-bot-<recordingId>`, `affiliation: member`, receive-only, TTL = durata max evento).
-- **Recording row** creata *al claim* (oggi nasce dal webhook Jibri, troppo tardi per il multitrack): si crea `CallSession`+`Recording` con `consentSnapshot`/`pipelineSnapshot` al dispatch.
-- **Upload**: per-traccia, a fine evento, il recorder chiede un **PUT firmato per singolo blob** (riusa `presignArtifactUpload`, scope minimo per-blob — preferito a una SAS di container per sicurezza) sotto il prefisso `recordings/multitrack/{eventId}/{recordingId}/`. In alternativa, una SAS prefissata se si vuole evitare il round-trip per traccia (documentato, ma scope più ampio).
-- L'**ingest** finale (`multitrack-manifest`, già esistente) è path-confinato: anche un recorder compromesso non può scrivere RecordingTrack fuori dal prefisso.
+The transcript route reads the timeline from the call session linked to the recording. When nothing
+matches, the cluster gets a numbered participant label, and an administrator can still map it by hand.
 
-### Portabilità — NON K8s-native only (riuso open-source su VM/compose)
-Vincolo di riuso: l'applicativo va rilasciato anche **open-source su VM con docker-compose** (eventualmente "full mode" in meno). L'orchestrazione **non deve dipendere da Kubernetes**. Per questo il controller è strutturato così:
-- la **logica di riconciliazione è pura e platform-agnostica** (`reconcile.ts`);
-- l'unica parte ambiente-specifica è dietro l'astrazione **`RecorderRunner`** (`list`/`start`/`stop` su un'unità di lavoro con handle opaco), con due implementazioni intercambiabili via env `RUNNER`:
-  - **`KubernetesRunner`** (full mode): crea un **Job** dal template CronJob sospeso `recorder`, via `@kubernetes/client-node` (solo API standard → AKS/GKE/EKS/k3s identico). RBAC = `Role`/`RoleBinding`/`ServiceAccount` namespaced (clone del SA dell'orchestrator postprod): `batch/jobs` CRUD, `batch/cronjobs` get/list, `pods`/`pods/log` get/list. Niente cluster-wide.
-  - **`DockerRunner`** (VM/compose): crea un **container** recorder via socket Docker (`dockerode`, `/var/run/docker.sock`), elenca/ferma per label. Pattern noto e portabile su qualsiasi VM con Docker — nessun cluster. L'env del recorder è composta da un allowlist passthrough `RECORDER_ENV_*` (no CronJob template in compose).
+In the current code the timeline branch rarely names a cluster. The speaker-events route appends to the
+event's newest open call session, which is normally the analytics session that the live page opens on
+the first join. The Jibri webhook links a Jibri-only recording to a new call session that it creates
+already closed, so the log the transcript route reads for that recording is normally empty. Each browser
+also measures `atMs` from its own join, not from the start of the recording.
 
-Lo stesso operator, lo stesso loop, gli stessi label/naming deterministici: cambia solo il runner. In K8s lo spec del recorder (nodeSelector/tolerations/resources del pool **normale**, non GPU) viene da `values.yaml` (`recorder.*`) come CronJob sospeso; in compose viene dall'immagine + env. **Modalità ridotta**: chi non vuole il recorder lascia `recorder.enabled=false` (Helm) o non avvia il servizio controller (compose) — il resto della piattaforma funziona identico.
+## Consequences
 
-### Affidabilità
-- Reconcile periodico = self-healing (push persi, pod riavviato, Job crashati).
-- `activeDeadlineSeconds` = durata max evento; `ttlSecondsAfterFinished` per GC automatica.
-- Il recorder ha già idle/max-duration timeout interni (esce da solo a fine evento → Job `Completed`).
-- 1 replica + `leaderElection` non necessario a questa scala (Deployment con `Recreate`); la riconciliazione è idempotente quindi anche un doppio pod transitorio è sicuro.
+### What the decision buys
 
-### Stato implementazione
-- ✅ Recorder bot: core cattura WebRTC; flusso **claim** (JWT bot + room da `recorder-claim`); upload **presign per-traccia** (`recorder-upload-url`); ingest `multitrack-manifest`; immagine CI. 37 unit-test.
-- ✅ `recorder-controller`: pacchetto, `reconcile` puro (15 test), astrazione **`RecorderRunner`** con **KubernetesRunner** (Job) + **DockerRunner** (container, per VM/compose), HTTP `/dispatch` + reconcile loop, immagine CI.
-- ✅ Portale: `recorder-desired` (crea Recording early, lifecycle unificato) + `recorder-claim` (JWT bot) + `recorder-upload-url` (presign per-traccia path-confinata); webhook Jibri reso idempotente (riusa il segnaposto multitraccia); edge-trigger best-effort in `jvb-desired-replicas`.
-- ✅ Helm: Deployment controller + RBAC namespaced + Service + CronJob `recorder` sospeso (template) + sezione `recorder.*` in `values.yaml` (default `enabled=false`). Helm lint/template verdi.
-- ✅ Compose: servizio `recorder-controller` opt-in (`--profile recorder`, `RUNNER=docker`, socket Docker) per il riuso su VM senza K8s.
-- ⚠️ La cattura WebRTC e l'intera catena vanno validate **in-cluster/VM contro Jitsi reale**: non sono E2E-testabili in locale. Default `recorder.enabled=false`.
-- ☐ Fase 5 GDPR: consenso esplicito multi-traccia prima della prod (gate oggi su `aiTranscriptEnabled`+`recordingEnabled`); TTL JWT bot per eventi > 90min (oggi TTL participant); retention breve tracce (già coperta da `multitrack-purge`).
+- **Named transcripts with no mapping.** Names come from the identity the portal issued, and overlapping
+  speech is kept. The transcript panel marks concurrent segments.
+- **No diarization model for these events,** and the rest of the pipeline is unchanged.
+- **Portable orchestration.** The same controller and the same reconcile run on Kubernetes and on Docker.
+  The portal stays platform-agnostic and never needs cluster permissions.
+- **Contained credentials.** The controller holds no Jitsi, storage or personal-data credential, but its
+  `CRON_API_KEY` can obtain them. Each upload URL the bot receives covers one object.
+- **Self-healing.** Missed edge triggers and controller restarts are repaired at the next tick. A failed
+  bot is replaced after its unit is cleaned up.
 
-## Conseguenze
+### What it costs
 
-- Elimina il mapping manuale degli speaker e la dipendenza da pyannote per gli eventi con recorder multi-traccia; pyannote resta fallback per il mix.
-- Overlap gestiti per costruzione.
-- Nuovo servizio media da mantenere + superficie PII maggiore (mitigata da retention breve sulle tracce).
-- Compatibilità: il transcript con segmenti sovrapposti richiede adeguamento di editor/VTT/summary-prompt.
-- La **Fase 0** e la **Fase 1** danno valore e sono realizzabili/testabili senza l'infra del recorder: partire da lì.
+- **A heavy media component.** The bot image carries headless Chrome and PulseAudio. Headless Chrome
+  records remote audio as silence unless the track is also being played out. The bot plays each track
+  through a hidden `<audio>` element and starts a best-effort PulseAudio null sink so that Chrome has an
+  output device. Each bot requests 1 CPU and 2 GiB in `values.yaml`, and one bot runs per recorded `LIVE`
+  event.
+- **Hard to test.** The capture needs a real Jitsi deployment. CI runs the unit tests and type checks of
+  the recorder and the controller, which cover the manifest, the paths, the upload, the claim and the
+  reconcile logic. End-to-end capture is validated against a running installation. As a safeguard, the
+  portal refuses to transcribe a recording whose tracks are all silent: it marks the recording
+  `POSTPROD_FAILED` instead (`app/src/lib/ai/track-silence.ts`).
+- **More personal data.** An isolated voice per person, mitigated by consent, encryption of names and
+  early deletion, but still real. The waiting-room consent leaves no stored record, and moderators are
+  recorded without a gate.
+- **A shared machine key.** The bot and the controller hold `CRON_API_KEY`, which authorizes every
+  internal and scheduled endpoint. The controller's role can create Jobs, and a Job can mount any Secret in
+  the release namespace. On Docker, the socket is root-equivalent on the host.
+- **A dependency on post-production.** Tracks are transcribed only when post-production runs, and the
+  purge and retention CronJobs render only when `postprod.enabled` is true. Its default is `false`. Turn
+  the recorder on only together with post-production.
+- **No indicator in the room** when only the recorder captures.
+- **The edge trigger needs the JVB scaler.** Without it, a recorder starts within one reconcile interval.
+- **Runs after the first.** When a bot ends while its event is still `LIVE`, for example at the capture
+  cap, a new run starts for the same recording once the finished unit is cleaned up. Its tracks are
+  stored, but they do not start a new transcription. The new run writes into the same folder, replaces
+  `tracks.json`, and can reuse a track key of the first run. A re-uploaded track whose row is already
+  marked purged is not purged again.
+- **A changed transcript contract.** Segments may overlap in time. The transcript panel marks them as
+  concurrent, and WebVTT allows overlapping cues. Any other consumer of `TRANSCRIPT_JSON` must not assume
+  that segments are sequential.
+
+## Alternatives considered
+
+### A. A receive-only recorder bot (chosen)
+
+A bot joins the conference as a participant that publishes nothing. It subscribes to every remote audio
+track and writes one audio file per participant. Each file is labeled with the identity that Jitsi
+already has. After the event, the bot uploads the files and a manifest. The worker transcribes each
+track on its own, without diarization, and merges the segments on a common timeline.
+
+- **Exact attribution.** The identity comes from the JWT, not from acoustic inference, so no manual
+  mapping is needed.
+- **Overlaps are solved by construction.** Two people speaking at once produce two concurrent segments
+  from two separate files.
+- **Better input for speech recognition.** Each track is clean single-speaker audio with no cross-talk,
+  and the job needs no diarization model.
+- **Only the ingest changes.** Storage, the job queue, the transcript editor and the downstream jobs
+  (summary, translation, subtitles, dubbing) consume the same `TRANSCRIPT_JSON`.
+
+The costs:
+
+- It is a new media component to write and maintain, and it is the riskiest piece of the design.
+- It scales with events: one bot per recorded event, with the CPU and the bandwidth to receive every
+  stream.
+- It creates more sensitive personal data, one isolated voice per person.
+- It needs more storage than one mix. Tracks are Opus audio at 32 kbps (`infra/recorder/src/capture.ts`),
+  and they are deleted after transcription by default.
+
+### B. Jigasi
+
+Jigasi is Jitsi's gateway for SIP and live transcription. It joins a conference and receives
+per-participant streams with their identity, so it is the native Jitsi way to reach separate voices. It is
+built for live speech-to-text through its own integrations, not for high-quality capture that is
+processed after the event. Turning it into a track recorder works against its design, and it would still
+be a new service to run. It was rejected.
+
+### C. An RTP dump inside the bridge
+
+This option extends or patches Jitsi Videobridge to dump the RTP of each endpoint. It touches the core of
+the SFU, breaks with Jitsi upgrades, contradicts [ADR-001](001-jitsi-iframe-api.md), and is outside what
+the project maintains. It was rejected.
+
+### D. Keep the mix and add a dominant-speaker timeline
+
+This option keeps the Jibri mix and captures the dominant-speaker changes in the live room. It then
+aligns the diarization clusters to that timeline to give them real names. It is small: a listener, an
+ingest route and an alignment step, with no new service and no extra audio. It does not solve overlaps,
+because only one person is the dominant speaker at a time, and it still depends on diarization for
+segmentation. D is not an alternative to A. It is a low-cost complement, and it is adopted as a fallback
+(see [Decision](#decision)).
+
+### Within option A: a browser, not a Node WebRTC stack
+
+`lib-jitsi-meet` is written for a browser. It uses DOM APIs and the browser's WebRTC implementation:
+simulcast, data channels, statistics, `MediaStreamTrack` and `MediaRecorder`. Node WebRTC libraries such
+as `node-webrtc` and `werift` do not implement all of it, and the shims they would need tend to break at
+each Jitsi upgrade. Chrome, driven headless by Puppeteer, runs the same WebRTC stack as the participants'
+browsers; Jibri likewise records through a real Chrome. The price is a heavier image. Headless Chrome was
+chosen.
+
+### Within option A: a controller, not a CronJob
+
+The AI pipeline's orchestrator is a CronJob that starts workers for a queue
+([ADR-016](016-in-cluster-ai-postproduction.md)). That shape does not fit recording:
+
+- **Latency.** A Kubernetes CronJob runs at most once a minute. It can miss the opening of an event, and
+  an opening cannot be recorded later.
+- **Waste.** A queue-driven spawner starts generic workers up to a target count. For recording, it would
+  start bots that have no event to record.
+- **Portability.** A CronJob exists only on Kubernetes, and the same logic must run on a VM with Docker.
+
+## Implementation notes
+
+`app/prisma/schema.prisma` is the authority for the data model. The mechanisms, contracts and trust
+boundaries are described in [Recording](../architecture/recording.md); the values that turn them on are in
+[Setting up recording](../operations/recording-setup.md).
+
+### Orchestration
+
+`infra/recorder-controller` runs one reconcile function from two triggers:
+
+- **Level-triggered: the backbone.** Every `RECONCILE_INTERVAL_MS` (Helm
+  `recorder.controller.reconcileIntervalMs`), the controller reads `GET /api/internal/recorder-desired`
+  and compares the answer with the recorder units that exist. The reconcile repairs lost triggers,
+  replaces failed units once the runner has removed them (after `recorder.ttlSecondsAfterFinished` on
+  Kubernetes, at once on Docker) and removes duplicates.
+- **Edge-triggered: for latency.** When the JVB scaler's call to `/api/internal/jvb-desired-replicas`
+  moves an event from `PROVISIONING` to `LIVE`, the portal sends a fire-and-forget `POST /dispatch` to
+  `RECORDER_CONTROLLER_URL`. The controller answers `202` and reconciles at once. Every other way of
+  reaching `LIVE`, and every installation without the JVB scaler, relies on the next tick.
+
+The reconcile keeps **one unit per recording**. The portal lists the events that are `LIVE` and have
+`recordingEnabled`, `aiTranscriptEnabled` and `multitrackRecordingEnabled` set, each as a `recordingId`
+and an `eventId`. A unit is created only for a desired recording that has no active or succeeded unit. Its
+name is derived from the `recordingId`, so a name conflict on create counts as success; this is also why a
+failed Kubernetes Job blocks its replacement until it is removed. On Kubernetes, the Job itself retries a
+crashed pod in place (`recorder.backoffLimit`). When two active units exist for the same recording, the
+first is kept and the others are deleted. The controller does not stop a recorder when its event leaves
+`LIVE`: the bot ends on its own timeouts, and the runner cleans up finished units. The decision logic is a
+pure, unit-tested function, `infra/recorder-controller/src/reconcile.ts`; the runners only do I/O. The
+labels and naming are in [Recording](../architecture/recording.md#reconcile-rules).
+
+The chart runs the controller as a one-replica `Deployment` with the `Recreate` strategy and no leader
+election. The reconcile is idempotent and the names are deterministic, so two controllers that overlap
+briefly still converge on one unit per recording. `/dispatch` is unauthenticated. It only triggers a
+reconcile, which reads the desired state from the portal, so a stray call cannot create a recorder that
+the portal does not want.
+
+The controller starts units through the `RecorderRunner` interface, chosen with `RUNNER`: `kubernetes`
+creates a `Job` from a suspended CronJob template with a namespaced `Role`, and `docker` creates a
+container through the Docker socket. The runners, their privileges and their clean-up are in
+[Recording](../architecture/recording.md#runners). The shipped Compose file does not run the Docker path
+end to end; the missing settings are listed in [Recording](../architecture/recording.md#docker-single-vm).
+
+### Who mints what
+
+The controller starts a unit with only `RECORDING_ID` and `EVENT_ID`, plus the static settings of its
+runner. The portal mints everything else when the bot asks for it.
+
+```mermaid
+flowchart LR
+    PORTAL["Portal (Next.js)<br/>decides which recordings are wanted<br/>and mints every credential"]:::portal
+    CTRL["Recorder controller<br/>one replica"]:::job
+    NOTE["Holds CRON_API_KEY only,<br/>no Jitsi, storage or PII credential<br/>of its own. Starts a unit with only<br/>RECORDING_ID and EVENT_ID"]:::note
+    RUNTIME["Kubernetes API<br/>or Docker socket"]:::neutral
+    BOT["Recorder bot<br/>one Job or container per recording<br/>optional"]:::optional
+    JITSI["Jitsi conference<br/>Prosody + bridge (JVB)"]:::media
+    STORE[("Object storage<br/>recordings domain")]:::data
+
+    PORTAL -->|"POST /dispatch<br/>edge trigger, best effort"| CTRL
+    CTRL -->|"GET recorder-desired<br/>every reconcile interval"| PORTAL
+    CTRL -.- NOTE
+    CTRL -->|"create or delete unit"| RUNTIME
+    RUNTIME --> BOT
+    BOT -->|"claim, upload URLs,<br/>manifest ingest"| PORTAL
+    BOT -->|"receive-only join<br/>with the minted JWT"| JITSI
+    BOT -->|"PUT one object<br/>per signed URL"| STORE
+
+    classDef portal fill:#E6F0FA,stroke:#0066CC,stroke-width:2px,color:#17324D
+    classDef job fill:#FFF3E0,stroke:#CC7A00,stroke-width:2px,color:#17324D
+    classDef optional fill:#FFF3E0,stroke:#CC7A00,stroke-width:2px,stroke-dasharray:6 4,color:#17324D
+    classDef media fill:#E0F5F5,stroke:#00A3A3,stroke-width:2px,color:#17324D
+    classDef data fill:#E3F2EC,stroke:#008055,stroke-width:2px,color:#17324D
+    classDef neutral fill:#EEF1F4,stroke:#5C6F82,stroke-width:1px,color:#17324D
+    classDef note fill:#F7F9FB,stroke:#5C6F82,stroke-width:1px,stroke-dasharray:3 3,color:#17324D
+```
+
+| What | Minted by | When | Scope |
+|---|---|---|---|
+| The `Recording` and a dedicated `CallSession` | `GET /api/internal/recorder-desired` | The first reconcile that sees the eligible `LIVE` event | One per event while its key is still the placeholder. Once a Jibri webhook has attached an MP4, a later recorder-desired call for a `LIVE` event creates a new `Recording` and `CallSession`, and the controller starts a new bot for it |
+| The bot's Jitsi JWT | `POST /api/internal/recorder-claim` | When the bot starts | The event's room. The bot is not a moderator. It has the stable user id `rec-bot-<recordingId>` and the reserved display name `RECORDER_DISPLAY_NAME` (`app/src/lib/jitsi/participants.ts`) |
+| Each upload URL | `POST /api/internal/recorder-upload-url` | For each object, after the capture | One object confined to `recordings/multitrack/<eventId>/<recordingId>/` (`app/src/lib/recorder/blob-key.ts`). Refused once the recording is `ARCHIVED` |
+| `RecordingTrack` rows, encrypted names, the pipeline | `POST /api/internal/multitrack-manifest` | After the upload | That recording. Each key must sit under its prefix |
+| Read URLs for the worker | The post-production claim | For each job | One object each, for the length of the job's lease |
+
+Credentials that are held rather than minted:
+
+- **The controller** holds `CRON_API_KEY`, which it uses only to read the desired list, and a namespaced
+  service account.
+- **The bot** holds `CRON_API_KEY`. With the hidden domain set, it also holds the recorder's XMPP
+  account. It holds no storage key and no key that encrypts personal data. The participant names travel
+  in plain text in the manifest, and the portal encrypts them on ingest.
+
+`CRON_API_KEY` is the installation-wide key for internal and scheduled endpoints. Each credential the
+portal mints with it is confined to one room or one object. The key itself is not scoped to a recording:
+whoever holds it can claim any recording and call every internal and scheduled endpoint (see
+[A shared machine key](#what-it-costs)). The trust boundaries are detailed in
+[Recording](../architecture/recording.md#trust-boundaries) and in
+[Identity, access and tokens](../architecture/identity-and-access.md).
+
+### Data model
+
+The diagram of the recording models is in [Recording](../architecture/recording.md#data-model).
+
+- **The `Recording` exists before any file.** The recorder needs a `recordingId` from the moment it
+  starts, while the Jibri webhook arrives only when Jibri stops recording. `ensureMultitrackRecording`
+  (`app/src/lib/recorder/lifecycle.ts`) is called by `recorder-desired`. It creates a dedicated
+  `CallSession`, which starts at the event's `startsAt`, and a `Recording` whose `blobKey` is the
+  placeholder `recordings/multitrack/<eventId>/`. The call is idempotent only while that placeholder key
+  is in place. When Jibri's webhook arrives, it attaches the MP4 to this row, replacing the placeholder
+  key, and enqueues nothing.
+- **`RecordingTrack` is one row per track session.** It is unique on (`recordingId`, `blobKey`), and the
+  key contains the track session id `<participantId>-<sequence>`. When a participant's audio track is
+  added again, the bot writes a new file and the portal adds a new row, so the first session is never
+  overwritten. A row holds the Jitsi endpoint id (`participantId`), the encrypted `displayName`, the
+  storage key, the size, `startOffsetMs`, `durationMs` and `audioPurgedAt`. A retried ingest updates the
+  same rows.
+- **Speaker labels come from the tracks.** The worker merges the rows that share a `participantId` under
+  one speaker label. The transcript's speaker list carries the names, and the portal stores them on
+  `Speaker` rows, so nobody maps speaker labels by hand.
+- **Timing.** Each track's origin is the moment its `MediaRecorder` starts. The manifest's t0 is the
+  earliest origin, and each track carries its offset from t0. When the Jibri mix exists on the same
+  recording, the worker refines each offset by cross-correlating energy envelopes against the mix
+  (`infra/ai/worker/align.py`). When the correlation is weak, it keeps the manifest offset.
+- **A shared contract.** Three components depend on the storage layout and on the `tracks.json`
+  manifest: the recorder (`infra/recorder/src/paths.ts`, `infra/recorder/src/manifest.ts`), the portal's
+  confinement checks, and the worker (`infra/ai/worker/multitrack.py`). A change to the layout changes all
+  three.
+
+### Consent gates
+
+The privacy view, including legal bases and retention regimes, is owned by
+[Recordings, voice data and AI outputs](../privacy/recordings-and-ai.md). This section and the three that
+follow record what the decision requires and where the code enforces it.
+
+- **At registration.** When `multitrackRecordingEnabled` is on, the registration API rejects a
+  registration without `consentMultitrack`. The answer is stored on `Registration.consentMultitrack`,
+  which is null for events without per-participant recording.
+- **In the waiting room.** The consent checkbox in the **Per-participant recording** box must be ticked
+  before entry. A registrant who consented at registration and opens the room in the same browser is not
+  asked again. That browser is the one that holds the signed event-access cookie. Moderators are exempt.
+  Speakers (named grants with role `SPEAKER`) and guests must tick the box.
+- **What the gates are.** They are admission gates, not a filter on tracks. The bot records every remote
+  audio track, including those of the exempt moderators. The waiting-room tick is checked in the browser
+  only. It is not stored, and the room-token route (`/api/events/[param]/jitsi/token`) does not check it.
+  Jitsi's in-room recording indicator follows Jibri only, so a capture made only by the recorder does not
+  raise it.
+
+### Consent snapshot
+
+When post-production is enqueued at manifest ingest, the portal writes `Recording.consentSnapshot`. The
+snapshot holds the event's AI flags, including `multitrackRecordingEnabled`, and a timestamp. It records
+what was switched on when processing started. No code reads it back to gate processing.
+
+### Purge after transcription
+
+`GET /api/cron/multitrack-purge` deletes a track's audio and stamps `audioPurgedAt` once two conditions
+hold:
+
+- a `TRANSCRIBE_MULTITRACK` job of the track's recording is `DONE`;
+- no `TRANSCRIBE_MULTITRACK` or `ARCHIVE` job of that recording is still pending or running.
+
+In the chart, the job is a CronJob that renders only when `postprod.enabled` is true. Its schedule is
+`postprod.multitrackPurgeSchedule`, every 15 minutes by default in
+`infra/helm/pa-webinar/templates/cronjob-multitrack-purge.yaml`.
+
+### Keeping tracks
+
+**Keep per-participant tracks** (`Event.retainParticipantTracks`, off by default) keeps the audio after
+transcription, for the downloadable archive and per-speaker playback. The audio is then meant to live
+until the recording's retention expires, when `multitrack-purge` or `postprod-retention` deletes it. The
+orphan sweep (`recordings-reconcile`) also treats these objects as orphans and deletes them after
+`SiteSetting.orphanRecordingGraceDays` unless they are marked **Keep** (see
+[Known limitations](#known-limitations)). Turning per-participant recording off in the event wizard also
+turns this option off. The consent text that participants see still says that the track is deleted after
+transcription.
+
+```mermaid
+stateDiagram-v2
+    direction LR
+    state "On the bot's work volume<br/>during the event" as Local
+    state "In object storage<br/>RecordingTrack row, name encrypted" as Stored
+    state "Transcribed<br/>TRANSCRIBE_MULTITRACK done" as Transcribed
+    state "Kept<br/>Keep per-participant tracks on" as Kept
+    state "Audio deleted<br/>audioPurgedAt set" as Purged
+    state "Audio deleted by the orphan sweep<br/>row kept, audioPurgedAt not set" as Swept
+    state "Row deleted" as Gone
+
+    [*] --> Local: consent gates passed, bot captures
+    Local --> Stored: upload with one signed URL per object, then manifest ingest
+    Stored --> Transcribed: worker reads the track through a signed URL
+    Transcribed --> Purged: multitrack-purge, default
+    Transcribed --> Kept: event keeps tracks
+    Kept --> Purged: recording retention expires, multitrack-purge
+    Kept --> Gone: recording retention expires, postprod-retention
+    Kept --> Swept: orphan sweep after the grace period, unless marked Keep
+    Purged --> Gone: event data retention (cleanup) or recording retention
+    Swept --> Gone: recording retention, postprod-retention
+    Gone --> [*]
+
+    classDef capture fill:#E0F5F5,stroke:#00A3A3,color:#17324D
+    classDef stored fill:#E6F0FA,stroke:#0066CC,color:#17324D
+    classDef job fill:#FFF3E0,stroke:#CC7A00,color:#17324D
+    classDef risk fill:#FCE8EC,stroke:#D1344C,color:#17324D
+    classDef done fill:#E3F2EC,stroke:#008055,color:#17324D
+    class Local capture
+    class Stored stored
+    class Transcribed job
+    class Kept risk
+    class Swept risk
+    class Purged done
+    class Gone done
+```
+
+The tracks serve only to attribute text. They are not used to build voiceprints or to clone voices.
+Dubbing uses synthetic voices from a catalog ([ADR-016](016-in-cluster-ai-postproduction.md)). The
+manifest `tracks.json` keeps the display names in plain text, and the purge jobs do not delete it; in
+practice the orphan sweep is what removes it. See the known limitations in
+[Recording](../architecture/recording.md#known-limitations).
+
+### The hidden Prosody domain (optional)
+
+By default, the bot joins with its JWT. It is then a visible participant under the reserved display name,
+and the portal leaves that name out of its headcounts and rosters. Setting `recorder.hiddenDomain` makes
+the bot invisible with Jitsi's native mechanism for bots, the one Jibri uses. The bot logs in with SASL on
+Prosody's hidden virtual host instead of presenting the JWT. Every Jitsi client drops the participants
+whose real JID is on `config.hiddenDomain`: they get no tile, no roster entry and no join notification,
+and they are not counted.
+
+This path has these requirements:
+
+- `recorder.xmppSecretName` must name the Secret that holds the recorder account. The chart refuses to
+  render when the domain is set without it.
+- The account must exist on Prosody. The Jitsi subchart creates it, and its Secret, only when
+  `jitsi-meet.jibri.enabled` is true; `replicaCount` can stay at `0`.
+- The MUC must admit that single account without a token, through `mod_token_verification`'s
+  allowlist. Allowing the whole domain would let anyone who holds the password into any room.
+- The account's password must be pinned, so that an upgrade does not regenerate it.
+
+The steps are in [Setting up recording](../operations/recording-setup.md#make-the-bot-invisible), and the
+Jitsi side is in [How PA Webinar extends Jitsi Meet](../architecture/jitsi-integration.md).
+
+A rejected login must not cost the event its audio. If the bot never joins the conference with the
+hidden-domain login, it runs the whole capture again with the JWT, and it stays visible for the rest of
+the event. The condition, "never joined", is checked after the capture ends. A room that simply stayed
+empty is therefore not retried, and a disconnection in the middle of the event does not make the bot
+reappear as a visible participant. A bot that never joins with either method exits with an error, so the
+unit fails and is retried. Hiding the bot does not hide the recording: the consent gates apply
+regardless.
+
+### Timeouts and limits
+
+- **The JWT lifetime follows the event.** It is the time left until the event's `endsAt` plus 30
+  minutes, at least 10 minutes and at most 6 hours (`app/src/app/api/internal/recorder-claim/route.ts`).
+  The 6-hour ceiling matches the Job's default deadline. The bot presents the JWT only when it joins with
+  it.
+- **The capture cap stays at or below the Job deadline.** Keep `recorder.maxDurationSec` at or below
+  `recorder.activeDeadlineSeconds`, so that the bot saves its tracks before Kubernetes stops it.
+- **Every exit saves.** When the capture ends for any reason, whether an empty room, the cap or a failed
+  conference, the bot saves what it has recorded. Each upload URL covers one object for 30 minutes.
+  Uploads run four at a time with three attempts per object. A track that still fails is skipped, and the
+  manifest lists only the tracks that were uploaded, so the portal never refers to a missing object.
+
+The defaults of the wait for the first participant, the idle timeout, the capture cap, the Job deadline,
+retries, clean-up and the work volume are in
+[Setting up recording](../operations/recording-setup.md#recorder-values).
+
+## Known limitations
+
+- **The dominant-speaker fallback rarely names a cluster.** The timeline and the recording normally sit
+  on different call sessions, and each browser times the timeline from its own join (see
+  [How a transcript gets its speaker names](#how-a-transcript-gets-its-speaker-names)).
+- **A second multitrack recording in one event.** The portal recognizes the event's multitrack
+  `Recording` by its placeholder key, and a Jibri webhook replaces that key. Once a webhook has attached
+  an MP4, the next desired-state call for a `LIVE` event (Jibri stopped mid-event, or the event went
+  `LIVE` again after `IDLE`) creates a second `Recording` and `CallSession`, and the controller starts a
+  second bot even if the first is still in the room. The event then gets two sets of tracks and two `TRANSCRIBE_MULTITRACK` pipelines.
+- **No automatic transcript when the recorder captures nothing.** On an event with per-participant
+  recording, the Jibri webhook attaches the MP4 to the placeholder and enqueues nothing. If the recorder
+  produced no tracks, the mix is not transcribed until an administrator runs post-production.
+- **Kept tracks and the orphan sweep.** Retained track audio and every `tracks.json` can be deleted by the
+  orphan sweep before the recording's retention (see [Keeping tracks](#keeping-tracks)).
+- **Re-used track keys.** A later run for the same recording can overwrite a track of the first run, and
+  the purge jobs skip it when its row is already marked purged (see [What it costs](#what-it-costs)).
+
+The complete list of limits of both recording paths is in
+[Recording](../architecture/recording.md#known-limitations).
+
+## Related
+
+- [Recording: composite video and per-speaker audio](../architecture/recording.md): triggers, the claim
+  model, capture, the manifest and ingest contracts, the runners and the lifecycle
+- [Setting up recording](../operations/recording-setup.md): the `recorder.*` values, the hidden domain and
+  checks
+- [AI post-production](../POSTPROD.md): `TRANSCRIBE_MULTITRACK`, the archive and the transcript editor
+- [Recordings, voice data and AI outputs](../privacy/recordings-and-ai.md) and
+  [Privacy and data protection](../GDPR.md): consent, retention regimes and legal bases
+- [How PA Webinar extends Jitsi Meet](../architecture/jitsi-integration.md): Prosody, the hidden domain and
+  the IFrame API
+- [Identity, access and tokens](../architecture/identity-and-access.md): the Jitsi JWT and `CRON_API_KEY`
+- [Scheduled and background jobs](../architecture/background-jobs.md): `multitrack-purge`,
+  `postprod-retention` and `recordings-reconcile`
+- Component READMEs: [`infra/recorder`](../../infra/recorder/README.md) and
+  [`infra/recorder-controller`](../../infra/recorder-controller/README.md)
+- [ADR-001](001-jitsi-iframe-api.md), [ADR-004](004-jitsi-jwt.md), [ADR-006](006-recording-and-storage.md),
+  [ADR-016](016-in-cluster-ai-postproduction.md)

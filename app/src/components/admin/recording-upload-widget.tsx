@@ -2,10 +2,13 @@
 
 import { useCallback, useState, type ChangeEvent } from 'react';
 import { useTranslations } from 'next-intl';
-import { BlockBlobClient } from '@azure/storage-blob';
 import { Alert, Button, Label, Progress } from 'design-react-kit';
 
 import { useRouter } from '@/i18n/navigation';
+import {
+  RecordingUploadError,
+  uploadRecordingFile,
+} from '@/lib/storage/browser-upload';
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024 * 1024; // 5 GiB
 const ACCEPTED_MIME = ['video/mp4', 'video/webm', 'video/quicktime', 'video/x-m4v'];
@@ -19,9 +22,10 @@ type Phase = 'idle' | 'signing' | 'uploading' | 'attaching';
  * recovered from another system, a re-upload after manual editing).
  *
  * Flow mirrors /admin/publications/new but targets an existing event:
- *   1. GET  /api/admin/publications/upload-url?filename=…  → SAS URL
- *   2. BlockBlobClient.uploadData(file, …) direct to Azure (multi-block)
- *   3. PATCH /api/admin/publications/<eventId> with recordingUrl + size
+ *   1. `uploadRecordingFile` signs and uploads the file straight to
+ *      object storage, with the provider's protocol (Azure blocks or S3
+ *      presigned PUTs)
+ *   2. PATCH /api/admin/publications/<eventId> with recordingUrl + size
  *      — the admin-authenticated endpoint flips recordingEnabled on
  *      and auto-publishes the recording.
  *
@@ -72,28 +76,13 @@ export default function RecordingUploadWidget({
     setError(null);
     try {
       setPhase('signing');
-      const signRes = await fetch(
-        `/api/admin/publications/upload-url?filename=${encodeURIComponent(file.name)}`,
-      );
-      if (!signRes.ok) {
-        setError(t('errors.signFailed'));
-        setPhase('idle');
-        return;
-      }
-      const { uploadUrl, recordingUrl } = await signRes.json();
-
-      setPhase('uploading');
-      setProgress(0);
-      const blob = new BlockBlobClient(uploadUrl);
-      await blob.uploadData(file, {
-        blockSize: 8 * 1024 * 1024,
-        concurrency: 4,
-        blobHTTPHeaders: { blobContentType: file.type || 'video/mp4' },
-        onProgress: (ev) => {
-          setProgress(Math.min(99, Math.floor((ev.loadedBytes / file.size) * 100)));
+      const { recordingUrl } = await uploadRecordingFile(file, {
+        onUploadStart: () => {
+          setPhase('uploading');
+          setProgress(0);
         },
+        onProgress: setProgress,
       });
-      setProgress(100);
 
       setPhase('attaching');
       const attachRes = await fetch(`/api/admin/publications/${eventId}`, {
@@ -118,7 +107,11 @@ export default function RecordingUploadWidget({
       setProgress(0);
       setPhase('idle');
     } catch (e) {
-      setError(e instanceof Error ? e.message : t('errors.uploadFailed'));
+      if (e instanceof RecordingUploadError) {
+        setError(t(e.step === 'sign' ? 'errors.signFailed' : 'errors.uploadFailed'));
+      } else {
+        setError(e instanceof Error ? e.message : t('errors.uploadFailed'));
+      }
       setPhase('idle');
     }
   }, [file, eventId, router, t]);

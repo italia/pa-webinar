@@ -15,6 +15,28 @@
 # Documentazione: docs/DEPLOYMENT.md, docs/CONFIGURATION.md
 # ============================================================================
 
+# ── Nomi pubblici ────────────────────────────────────────────
+# I due nomi DNS dell'installazione, senza schema, porta né percorso (per
+# esempio `webinar.ente.it` e `meet.ente.it`). Valorizzati, il chart ne ricava:
+#   - portalHost: app.env.NEXT_PUBLIC_APP_URL (https://<nome>), l'host
+#     dell'Ingress del portale e gli host delle sue voci `ingress.tls` che non
+#     ne indicano;
+#   - conferenceHost: app.env.NEXT_PUBLIC_JITSI_DOMAIN, l'host e gli host TLS
+#     di `jitsi.conferenceIngress` e quelli del reindirizzamento
+#     `jitsi.webIngress`.
+# Le chiavi esplicite restano valide: se sono scritte devono coincidere, e la
+# resa si ferma quando dicono altro. I valori di esempio di questo file
+# (videocall.example.com) contano come non scritti.
+# Due valori del sottochart della conferenza non si possono ricavare, perché
+# Helm passa i valori di un sottochart così come sono scritti: `jitsi-meet.
+# publicURL` va scritto (https://<conferenceHost>) e, se l'Ingress della
+# conferenza lo rende il sottochart, anche i suoi host. La resa li confronta
+# con conferenceHost e si ferma se non coincidono.
+# Vuoti = nessuna derivazione: valgono le chiavi esplicite, come prima.
+site:
+  portalHost: ""
+  conferenceHost: ""
+
 # ── Application ──────────────────────────────────────────────
 
 app:
@@ -72,29 +94,48 @@ app:
     NEXT_PUBLIC_APP_URL: "https://videocall.example.com"
     NEXT_PUBLIC_DEFAULT_LOCALE: "it"
     DEFAULT_DATA_RETENTION_DAYS: "30"
-    DEFAULT_PRIVACY_POLICY_URL: "https://videocall.example.com/it/privacy"
+    # Informativa privacy linkata dal modulo di iscrizione quando l'evento non
+    # ne indica una propria. Non impostata = la pagina /privacy del portale.
+    # Si imposta solo per puntare a un'informativa pubblicata altrove.
+    #   DEFAULT_PRIVACY_POLICY_URL: "https://<portale>/it/privacy"
     # Prometheus URL for PromQL queries from the app (admin monitoring, status page).
     # Set to the internal Prometheus service URL, e.g.:
     #   http://kube-prometheus-stack-prometheus.monitoring:9090
     # Leave empty to disable Prometheus integration (probe-only status page).
     PROMETHEUS_URL: ""
 
+    # ── Client address for per-IP limits ──
+    #
+    # The app keys per-IP limits and the admin audit log on X-Forwarded-For
+    # counted from the right. TRUSTED_PROXY_HOPS = how many entries trusted
+    # infrastructure adds AFTER the client's. Unset = 0: the rightmost entry,
+    # written by the ingress; right for ingress-nginx and Traefik defaults.
+    # Counted like Envoy's xff_num_trusted_hops, NOT like Express "trust
+    # proxy": the ingress itself is 0. When the ingress appends, one too high
+    # lets a client choose its own key; one too low makes all clients share
+    # one counter. Values per setup: docs/CONFIGURATION.md, "Client address
+    # and rate limits".
+    # Behind one load balancer/WAF that appends, or with the GKE Ingress
+    # (classes gce, gce-internal: it appends "<client>,<lb-ip>"):
+    #   TRUSTED_PROXY_HOPS: "1"
+
     # ── Service inventory (CycloneDX 1.6) ──
     #
     # Public transparency artifact served at /service-inventory. Describes
     # both software dependencies (DEV) and operational services (OPS) that
-    # make up THIS tenant's deployment. See docs/ARCHITECTURE.md or the
-    # OWASP CycloneDX spec for the format.
+    # make up THIS tenant's deployment. For the format see
+    # docs/SERVICE-INVENTORY.md ("Rendering contract"),
+    # docs/SERVICE-INVENTORY-GENERATION.md ("The document model") or the
+    # OWASP CycloneDX spec.
     #
     # Accepted forms:
     #   - absolute https URL (e.g. Azure Blob public container) — fetched
     #     with revalidate:3600
     #   - path starting with "/" served from the app's public/ directory
     #
-    # Leave empty to render a "not yet published" placeholder. A sample
-    # document (the videocall-test tenant) is shipped at
-    # /tenants/videocall-test/service-inventory.json — use it as a
-    # structure reference when building per-tenant artifacts.
+    # Leave empty to render a "not yet published" placeholder. The image
+    # ships no inventory: start from docs/examples/service-inventory.example.json
+    # in the source tree and publish your own document.
     # Generation runbook + Azure reference implementation:
     #   docs/SERVICE-INVENTORY-GENERATION.md
     #   infra/service-inventory/azure/
@@ -170,6 +211,22 @@ app:
     - name: next-cache
       mountPath: /app/.next/cache
 
+  # ── Autorità di certificazione in più ──
+  # Per SMTP, object storage o gli indirizzi pubblici del portale e della
+  # conferenza serviti con un certificato di un'autorità interna: il chart
+  # monta in sola lettura una chiave di un Secret o di un ConfigMap già
+  # presente nel namespace (certificati PEM, anche più d'uno concatenati) e la
+  # indica a Node con NODE_EXTRA_CA_CERTS, in aggiunta alle autorità di
+  # sistema. Uno solo fra secretName e configMapName. Node legge il file
+  # all'avvio: dopo averlo cambiato, riavvia il Deployment. Non vale per le
+  # migrazioni: la connessione TLS al database si configura in DATABASE_URL.
+  #   kubectl -n <namespace> create configmap ente-ca --from-file=ca.crt=<ca.pem>
+  #   extraCaCerts: { configMapName: ente-ca, key: ca.crt }
+  extraCaCerts:
+    secretName: ""
+    configMapName: ""
+    key: ca.crt
+
   # ── Health probes ──
 
   probes:
@@ -222,15 +279,44 @@ app:
 
 secrets:
   mode: "existing"
+  # Nome del Secret con il segreto JWT della conferenza (la sola chiave
+  # JWT_APP_SECRET, stesso valore di JITSI_JWT_SECRET), da indicare anche in
+  # jitsi-meet.prosody.jwt.existingSecretName. Lo rende il chart in modalita'
+  # "generate" (da secrets.generate.JITSI_JWT_SECRET) ed "external" (dalla
+  # stessa voce remota di JITSI_JWT_SECRET). In modalita' "existing" non si
+  # rende: il Secret lo crei tu. Vuoto = nessun Secret reso, e il segreto
+  # arriva a Prosody in un altro modo (vedi jitsi-meet.prosody.jwt).
+  jitsiJwtSecretName: ""
 
   # Name of the Kubernetes Secret (used by all modes as the target name)
   existingSecretName: "videocall-secrets"
+
+  # Secret con le sole password dei datastore in cluster (PostgreSQL, Redis).
+  #
+  # Conviene tenerlo separato da quello dell'applicazione: il sottochart
+  # PostgreSQL monta per intero, come file dentro il proprio container, il
+  # Secret da cui legge la password, quindi ogni chiave tenuta lì accanto —
+  # a partire da quella che cifra i dati personali — diventa leggibile da chi
+  # raggiunge il database. I profili di esempio per le nuove installazioni lo
+  # valorizzano; per separarlo su un'installazione esistente, dove va fatto a
+  # mano e prima dell'aggiornamento, vedi docs/operations/upgrades.md
+  # ("Moving datastore passwords into a separate Secret").
+  #
+  # Vuoto = si usa lo stesso Secret dell'applicazione, che è ciò che fanno le
+  # installazioni già in piedi. Il valore predefinito non cambia da solo.
+  datastoreSecretName: ""
 
   # ── External Secrets Operator config (mode: "external") ──
   external:
     # Provider: "azure-key-vault", "aws-secrets-manager", "gcp-secret-manager"
     provider: "azure-key-vault"
     refreshInterval: "1h"
+    # Versione dell'API dell'operatore. Vuoto = external-secrets.io/v1 dove il
+    # cluster la serve (operatore 0.16 e successivi), v1beta1 solo dove il
+    # cluster serve soltanto quella; senza un cluster da interrogare
+    # (`helm template`) vale v1. Imposta "external-secrets.io/v1beta1" per un
+    # operatore precedente alla 0.16 quando rendi i manifesti fuori dal cluster.
+    apiVersion: ""
 
     azureKeyVault:
       vaultUrl: ""
@@ -256,6 +342,10 @@ secrets:
 
     gcpSecretManager:
       projectID: ""
+      # Workload Identity: vuoti = l'operatore li ricava dal cluster GKE su cui
+      # gira. Servono solo se l'operatore gira altrove.
+      clusterLocation: ""
+      clusterName: ""
       # Maps Kubernetes secret keys → GCP Secret Manager secret names
       secretMappings: {}
 
@@ -291,13 +381,27 @@ secrets:
 service:
   type: ClusterIP
   port: 3000
+  # Annotazioni del Service dell'app. Servono dove il controller di
+  # ingresso si configura dal Service: su GKE, ad esempio,
+  # cloud.google.com/backend-config collega una BackendConfig con i timeout
+  # lunghi che chiedono SSE e BOSH (il predefinito di 30 s li interrompe).
+  annotations: {}
 
 # ── NetworkPolicy ────────────────────────────────────────────
-# Opt-in default-deny + allow-list for the app pods. Requires a CNI
-# that honours NetworkPolicy: on AKS the cluster must be created with
-# `--network-policy azure` or `--network-policy calico`, on EKS install
-# the Calico/Cilium addon, on GKE enable Dataplane V2. See
-# docs/DEPLOYMENT.md for the per-cloud notes.
+# Opt-in default-deny + allow-list for the application pods only (the
+# Deployment). CronJobs, the JVB scaler, the config-reload hook, the
+# recorder bot and controller and the post-production jobs are not
+# selected: they need the API server, the bridges or the GPU pool, and
+# are admitted to the application by the same-release ingress rule.
+#
+# Requires a CNI that enforces NetworkPolicy (Azure NPM, Calico or
+# Cilium on AKS, Dataplane V2 on GKE, the VPC CNI network policy agent
+# on EKS, kube-router on k3s). See docs/DEPLOYMENT.md.
+#
+# The ingress controller namespace depends on the controller:
+#   ingress-nginx:     kubernetes.io/metadata.name: ingress-nginx (default)
+#   Traefik on k3s:    kubernetes.io/metadata.name: kube-system
+#   AKS app routing:   kubernetes.io/metadata.name: app-routing-system
 
 networkPolicy:
   # Default off: lots of installs run on bare AKS without a policy
@@ -310,7 +414,8 @@ networkPolicy:
     fromNamespaceSelectors:
       - kubernetes.io/metadata.name: ingress-nginx
     # Extra per-pod selectors (e.g. for a specific ingress controller
-    # deployment) — added as additional `from` blocks.
+    # deployment) — added as additional `from` blocks. With both lists
+    # empty the application port accepts every source.
     fromPodSelectors: []
 
     # Whether to also accept scrape traffic from the monitoring
@@ -320,7 +425,20 @@ networkPolicy:
     monitoringNamespaceSelector:
       kubernetes.io/metadata.name: monitoring
 
+    # Additional NetworkPolicyIngressRule entries, appended as-is.
+    extraRules: []
+
   egress:
+    # DNS. The default matches CoreDNS/kube-dns pods in any namespace.
+    # With NodeLocal DNSCache (common on GKE) add its address, e.g.
+    #   - ipBlock: { cidr: 169.254.20.10/32 }
+    dns:
+      to:
+        - namespaceSelector: {}
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+
     # Postgres allow-list. Override `to` for an external managed DB
     # (use ipBlock with cidr=<DB IP>/32) or leave as the in-cluster
     # Bitnami chart match.
@@ -339,9 +457,13 @@ networkPolicy:
             matchLabels:
               app.kubernetes.io/name: redis
 
-    # Jitsi Prosody — XMPP for JWT-authenticated room creation.
-    # When jitsi.enabled=false this stays effectively empty and the
-    # HTTPS rule below covers the external instance.
+    # In-cluster Jitsi: Prosody (5222/5280, XMPP for JWT-authenticated
+    # room creation, and BOSH for PROSODY_INTERNAL_URL), the bridge REST
+    # API (8080, JVB_HEALTH_URL), the Jibri health API (2222,
+    # JIBRI_HEALTH_URL), the web container (80, JITSI_WEB_INTERNAL_URL; the
+    # value of jitsi-meet.web.service.port) and the Jicofo REST API (8888,
+    # JICOFO_HEALTH_URL). When jitsi.enabled=false this stays effectively
+    # empty and the HTTPS rule below covers the external instance.
     jitsi:
       to:
         - podSelector:
@@ -352,6 +474,34 @@ networkPolicy:
           protocol: TCP
         - port: 5280
           protocol: TCP
+        - port: 8080
+          protocol: TCP
+        - port: 2222
+          protocol: TCP
+        - port: 80
+          protocol: TCP
+        - port: 8888
+          protocol: TCP
+
+    # The ingress controller, reached when the application calls the
+    # portal's or the conference's public hostname (status checks,
+    # absolute links). Inside the cluster the call is translated to the
+    # controller pod, so the policy must allow the controller's
+    # container ports: 443 for ingress-nginx, 8443 for Traefik. The
+    # peers are the namespaces in ingress.fromNamespaceSelectors.
+    ingressController:
+      enabled: true
+      ports: [443, 8443]
+
+    # Additional NetworkPolicyEgressRule entries, appended as-is. Use it
+    # for in-cluster services the application calls, for example
+    # Prometheus (PROMETHEUS_URL) or an in-cluster S3 endpoint:
+    #   - to:
+    #       - namespaceSelector:
+    #           matchLabels: { kubernetes.io/metadata.name: monitoring }
+    #     ports:
+    #       - { protocol: TCP, port: 9090 }
+    extraRules: []
 
     # Outbound SMTP port for the email queue cron. Default is the
     # submission port (587/STARTTLS). Set allowImplicitTlsSmtp to also
@@ -387,18 +537,53 @@ serviceAccount:
 
 ingress:
   enabled: true
+  # Classe dell'Ingress: `nginx` per ingress-nginx, `traefik` per il Traefik
+  # di k3s, o quella del tuo controller.
   className: nginx
+  # Helm fonde le mappe: `{}` in un file di override non toglie le chiavi
+  # predefinite, si toglie una chiave impostandola a null.
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
-    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+    # Sopra il file più grande che l'app accetta passando da sé: i materiali
+    # dell'evento, dalla sala e dall'area admin, fino a 25 MiB più la cornice
+    # del modulo (`MATERIAL_FILE_MAX_BYTES` in app/src/lib/validation/
+    # materials.ts). Più basso, ingress-nginx risponde 413 a file che l'app
+    # dichiara ammessi. Le registrazioni non passano di qui: vanno dritte
+    # allo storage con un URL firmato. Il limite alto non vale per le rotte
+    # JSON: l'app rifiuta con 413 un corpo JSON oltre 10 MiB prima di leggerlo
+    # (`JSON_BODY_MAX_BYTES` in app/src/lib/api-handler.ts).
+    nginx.ingress.kubernetes.io/proxy-body-size: "30m"
     nginx.ingress.kubernetes.io/proxy-buffer-size: "16k"
     nginx.ingress.kubernetes.io/proxy-buffers-number: "4"
-    nginx.ingress.kubernetes.io/rate-limit: "10"
-    nginx.ingress.kubernetes.io/rate-limit-window: "1m"
+    # Nessun limite di frequenza qui di proposito. Le annotazioni che stavano
+    # in questo punto (`rate-limit`, `rate-limit-window`) non esistono in
+    # ingress-nginx e non facevano nulla: promettevano una protezione assente.
+    # Quelle vere sono `limit-rps`, `limit-connections`,
+    # `limit-burst-multiplier` — vedi values-production.yaml — ma il valore va
+    # scelto guardando il traffico reale: la sala in diretta apre più
+    # connessioni per partecipante, e un limite stretto la fa cadere.
+    # Oggi è l'unico limite condiviso fra le repliche che esista: quello
+    # applicativo conta per singolo processo.
     nginx.ingress.kubernetes.io/hsts: "true"
     nginx.ingress.kubernetes.io/hsts-max-age: "31536000"
     nginx.ingress.kubernetes.io/hsts-include-subdomains: "true"
     nginx.ingress.kubernetes.io/hsts-preload: "true"
+  # Classi di controller che non sono ingress-nginx. Con una di queste in
+  # `className` il chart toglie le annotazioni `nginx.ingress.kubernetes.io/*`,
+  # che quel controller ignorerebbe senza avviso. Con qualunque altra classe,
+  # comprese quelle di ingress-nginx con un nome scelto da te, restano: senza
+  # `proxy-body-size` ingress-nginx torna al limite di 1 MB e i caricamenti più
+  # grandi falliscono con 413.
+  nonNginxClassNames:
+    - traefik
+    - haproxy
+    - kong
+    - alb
+    - gce
+    - gce-internal
+    - azure-application-gateway
+    - istio
+    - cilium
   hosts:
     - host: videocall.example.com
       paths:
@@ -449,9 +634,19 @@ podDisruptionBudget:
 # l'unico relay a evento in corso (il drain viene bloccato finche' non c'e' un rimpiazzo).
 # Per avere ANCHE la drenabilita' senza interruzioni, portare coturn a 2 repliche
 # (funziona dietro singolo LB: l'hash 5-tuple di Azure tiene ogni client sullo stesso pod).
+# Negli ambienti spenti a orario la protezione va rovesciata: con coturn fermo o a
+# una sola replica, minAvailable=1 lascia il PDB a disruptionsAllowed=0 e ogni drain
+# volontario resta appeso, compreso l'aggiornamento automatico dell'immagine dei nodi.
+# Valorizzare maxUnavailable (mutuamente esclusivo con minAvailable, il PDB non li
+# accetta entrambi) rende il pool drenabile rinunciando alla protezione.
 coturnPodDisruptionBudget:
   enabled: true
   minAvailable: 1
+  # Se valorizzato, sostituisce minAvailable.
+  maxUnavailable: ""
+  # IfHealthyBudget (il default di Kubernetes) impedisce di evacuare un pod non
+  # Ready quando il budget e` gia` esaurito, e inchioda drain e scale-down.
+  unhealthyPodEvictionPolicy: AlwaysAllow
 
 # ── CronJobs ─────────────────────────────────────────────────
 
@@ -471,6 +666,14 @@ cronjobs:
   # default 600s), invariato.
   jobTtlSeconds: 7200
   dailyJobTtlSeconds: 259200
+  # Per quanti secondi i CronJob che chiamano il portale riprovano (ogni 5 s,
+  # qualunque errore) prima di arrendersi. Copre l'avvio a freddo: dopo la
+  # prima installazione, un riavvio del nodo o un aggiornamento il portale
+  # risponde solo quando PostgreSQL e le migrazioni sono pronti, e con meno
+  # tentativi i primi giri lasciano pod in Error. Deve stare, con il lavoro
+  # vero, dentro activeDeadlineSeconds del CronJob più stretto (120 s:
+  # cleanup e rubrica-retention).
+  portalRetrySeconds: 90
 
   # Email reminders for upcoming events (runs every 15 minutes)
   reminders:
@@ -511,6 +714,31 @@ cronjobs:
     schedule: "*/1 * * * *"
     image: curlimages/curl:8.11.1
 
+  # Ciclo di vita degli eventi senza lo scaler dei bridge: apre gli eventi
+  # all'ora di inizio, chiude quelli finiti (dopo la tolleranza) e le sessioni
+  # di chiamata rimaste aperte. Reso solo quando lo scaler non lo è (profili
+  # semplice e standard, Jitsi esterno, bridge scalati con KEDA): con lo
+  # scaler il ciclo di vita lo porta avanti lui. Con `enabled: false`, e senza
+  # scaler, gli eventi cambiano stato solo a mano (Avvia / Termina per tutti).
+  lifecycle:
+    enabled: true
+    schedule: "*/1 * * * *"
+    image: curlimages/curl:8.11.1
+
+# ── Immagine kubectl ─────────────────────────────────────────
+# Usata dai lavori che parlano con l'API di Kubernetes (scaler dei bridge,
+# orchestratore della post-produzione, riavvio della configurazione web)
+# quando il loro campo `image` è vuoto. Serve una shell con kubectl, curl,
+# grep e sed.
+#
+# Fissata per digest: nel registro pubblico Bitnami pubblica ormai solo il tag
+# `latest`, che cambia contenuto a ogni ricostruzione, e i tag con la versione
+# (per esempio `1.29`) non esistono più. Questo digest è kubectl 1.37.1. Per
+# aggiornarlo si risolve il digest corrente di `latest` e lo si prova prima di
+# cambiarlo qui. Un cluster senza accesso a Docker Hub la specchia nel proprio
+# registro e mette qui il riferimento.
+kubectlImage: "docker.io/bitnami/kubectl@sha256:ab90e1058e5a658cc94b4e7eb6d48e5758cfd6d77b5dd1869513aec3a3054673"
+
 # ── JVB Auto-Scaler ─────────────────────────────────────────
 # CronJob that scales JVB replicas based on upcoming/active events.
 # Only used with jitsi.mode=full. No external dependencies (no KEDA).
@@ -519,10 +747,13 @@ cronjobs:
 jvbScaler:
   enabled: false
   schedule: "*/2 * * * *"
-  image: bitnami/kubectl:latest
+  # Empty → kubectlImage.
+  image: ""
   # Name of the JVB Deployment to scale.
   # Leave empty to auto-detect by label (app.kubernetes.io/component=jvb)
-  # or name pattern. Set explicitly if auto-detection fails.
+  # or name pattern. Set explicitly if auto-detection fails: the subchart
+  # names it `<release>-jitsi-meet-jvb-0` (one Deployment per port of the
+  # range, suffixed -0, -1, …).
   jvbDeploymentName: ""
 
 # ── Web config-reload hook ───────────────────────────────────
@@ -539,7 +770,7 @@ configReloadHook:
   # Default: web (config.js). Add jicofo / prosody if you change their custom config.
   components:
     - web
-  # Image with kubectl. Empty → falls back to jvbScaler.image, else bitnami/kubectl:latest.
+  # Image with kubectl. Empty → jvbScaler.image, then kubectlImage.
   image: ""
 
 # ── Prometheus Metrics ───────────────────────────────────────
@@ -593,10 +824,38 @@ jitsi:
   #   "full"     — JVB on dedicated nodes with taints, scale-to-zero ready, Jibri on dedicated nodes
   mode: "simple"
 
+  # Pretende che le credenziali interne della conferenza (password XMPP di
+  # Jicofo, del bridge, di Jibri e del bot di registrazione, segreto di coturn)
+  # siano fissate nei valori o in un Secret esistente. Il sottochart genera a
+  # caso quelle mancanti a ogni resa: ogni `helm upgrade` riavvierebbe Prosody,
+  # Jicofo e il bridge, facendo cadere le conferenze in corso. Con `true` la
+  # resa si ferma ed elenca le chiavi mancanti; con `false` le note dopo
+  # l'installazione le elencano soltanto. I profili di esempio elencano le
+  # chiavi da fissare.
+  requirePinnedCredentials: false
+
+  # Indirizzo dell'API REST del bridge (/colibri/stats) letto dall'applicazione
+  # per stato e metriche. Vuoto = il Service del sottochart se espone la porta
+  # 8080 (`jvb.service.extraPorts`), altrimenti un Service reso da questo chart.
+  jvbHealthUrl: ""
+  # Indirizzo dell'API di salute di Jibri. Vuoto = il Service del sottochart,
+  # solo se `jitsi-meet.jibri.enabled`; senza Jibri la variabile non si scrive.
+  jibriHealthUrl: ""
+  # Indirizzi interni che la pagina di stato interroga al posto del nome
+  # pubblico della conferenza. Vuoti = i Service della release: la parte web
+  # e Prosody (BOSH, 5280) del sottochart, e per Jicofo (API REST, 8888) un
+  # Service che questo chart rende apposta. Gli indirizzi calcolati usano il
+  # nome completo del Service (<servizio>.<namespace>.svc.<dominio>, con il
+  # dominio di global.clusterDomain, predefinito cluster.local).
+  webInternalUrl: ""
+  prosodyInternalUrl: ""
+  jicofoHealthUrl: ""
+
   # ── Jitsi root redirect ──
   # Creates an Exact / ingress that redirects to the portal URL (301).
   # The subchart's Prefix / ingress still serves all other paths.
-  # Nginx gives Exact match higher priority than Prefix.
+  # Nginx gives Exact match higher priority than Prefix. The redirect is an
+  # ingress-nginx annotation: with another controller it has no effect.
   webIngress:
     redirectUrl: ""  # e.g. "https://videocall.example.com"
     ingressClassName: nginx
@@ -607,6 +866,36 @@ jitsi:
       - secretName: jitsi-tls
         hosts:
           - jitsi.videocall.example.com
+
+  # ── Ingress della conferenza reso da questo chart ──
+  # Spento (predefinito) = l'Ingress della conferenza lo rende il sottochart,
+  # da `jitsi-meet.web.ingress`, come sempre. Acceso, lo rende questo chart
+  # con il nome `<fullname>-conference`, e quello del sottochart va spento
+  # (`jitsi-meet.web.ingress.enabled: false`, altrimenti la resa si ferma:
+  # due Ingress per lo stesso host). Serve a due cose che dal sottochart non si
+  # possono fare:
+  #   - togliere un'annotazione predefinita: questa è una mappa del chart, e
+  #     una chiave impostata a null sparisce con ogni versione di Helm. In una
+  #     mappa del sottochart Helm 4 la lascia nel manifesto con valore nullo
+  #     (Helm 3 la toglie);
+  #   - ricavare host e host TLS da `site.conferenceHost` (o, se vuoto, da
+  #     app.env.NEXT_PUBLIC_JITSI_DOMAIN).
+  # Il servizio è quello web del sottochart (`<nome>-web`, porta
+  # `jitsi-meet.web.service.port`), sul percorso `/`. Con una classe elencata
+  # in `ingress.nonNginxClassNames` le annotazioni di ingress-nginx si
+  # tolgono, come per il portale. Resta `jitsi-meet.publicURL`, da scrivere.
+  conferenceIngress:
+    enabled: false
+    # Vuoto = la classe del portale (ingress.className).
+    className: ""
+    # Stessa annotazione predefinita del portale; per toglierla, null.
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+    # Voci {secretName, hosts}: senza `hosts` vale il nome della conferenza;
+    # senza `secretName` il controller usa il certificato che ha (per esempio
+    # quello di un risolutore ACME di Traefik). Vuoto = nessuna sezione tls.
+    tls:
+      - secretName: jitsi-tls
 
   # ── External Jitsi configuration (when jitsi.enabled=false) ──
   external:
@@ -627,28 +916,104 @@ jitsi-meet:
   enableAuth: true
   enableGuests: false
 
-  # Global pull secrets for ALL jitsi component pods (the subchart exposes only a
-  # single global list, not per-component). `ghcr-secret` is required because
-  # `web.image` below is the PRIVATE GHCR patched image (F18); `dockerhub-secret`
-  # keeps the stock Docker Hub images (jvb/jicofo/coturn/prosody/jibri) pulling
-  # without hitting anon rate limits. Both secrets must exist in the namespace
-  # (created out-of-band, like any private-registry chart). Without ghcr-secret a
-  # fresh install's web pod 401s on ghcr.io → ImagePullBackOff → nobody can join.
-  # NB: the existing prod (rev ≤44) was deployed before this default and wires
-  # ghcr-secret via a `kubectl patch deploy …-jitsi-meet-web` instead; a future
-  # non-`--reuse-values` upgrade converges it to this helm-managed value.
+  # Global pull secrets for ALL jitsi component pods (the subchart exposes only
+  # a single global list, not per-component). `ghcr-secret` serve perché
+  # `web.image` qui sotto è l'immagine patchata su un registro privato;
+  # `dockerhub-secret` evita il limite di prelievo anonimo sulle immagini
+  # standard. Entrambi i Secret devono già esistere nel namespace.
+  #
+  # Su un'installazione che usa l'immagine web standard non servono: si
+  # sostituiscono con una lista vuota insieme all'override di `web.image`.
+  # Un Secret nominato ma inesistente non blocca il prelievo di un'immagine
+  # pubblica, ma lascia un evento di errore su ogni pod.
   imagePullSecrets:
     - name: ghcr-secret
     - name: dockerhub-secret
 
+  # Autenticazione della conferenza con i token dell'applicazione. Issuer e
+  # audience accettati devono contenere JITSI_JWT_ISSUER e JITSI_JWT_AUDIENCE
+  # dell'applicazione, e il segreto deve essere JITSI_JWT_SECRET: se divergono
+  # Prosody rifiuta ogni token e nessuno entra in sala, senza errori visibili
+  # nel portale. Per cambiarli si cambiano qui, in `prosody.extraEnvs`: per
+  # Prosody questa mappa vince su `extraCommonEnvs`, e il chart si rifiuta di
+  # rendere se i due dicono cose diverse.
   prosody:
-    auth:
-      type: jwt
-      jwt:
-        appId: "pa_webinar"
-        appSecret: ""  # Set via --set or Secret
-        acceptedIssuers: "pa-webinar"
-        acceptedAudiences: "jitsi"
+    extraEnvs:
+      AUTH_TYPE: jwt
+      JWT_APP_ID: pa_webinar
+      JWT_ACCEPTED_ISSUERS: pa-webinar
+      JWT_ACCEPTED_AUDIENCES: jitsi
+      # Ruoli nella sala decisi dal token del portale: `owner` (moderatore)
+      # per chi entra con il link di moderazione, `member` (partecipante) per
+      # tutti gli altri, relatori compresi. `token_affiliation` è il modulo
+      # dell'immagine; `token_affiliation_custom` è quello del progetto,
+      # montato qui sotto da un ConfigMap del chart, che assegna il ruolo
+      # prima dell'ingresso invece che dopo. Va in coppia con
+      # `jicofo.extraEnvs` più sotto. Per aggiungere moduli, tieni questi due.
+      XMPP_MUC_MODULES: token_affiliation,token_affiliation_custom
+    # Il modulo del progetto (infra/jitsi/prosody-plugins), dal ConfigMap
+    # `pa-webinar-prosody-plugins` che il chart rende quando questo volume lo
+    # nomina. Il nome è fisso: una sola release per namespace. Sono liste: se
+    # ne imposti di tue in un altro file di valori, sostituiscono queste, e
+    # queste due voci vanno ripetute (la resa si ferma se il modulo è
+    # richiesto ma non montato). Un cambio del modulo non riavvia Prosody:
+    # dopo l'aggiornamento, `kubectl rollout restart statefulset` di Prosody,
+    # a sale vuote.
+    extraVolumes:
+      - name: prosody-plugins-custom
+        configMap:
+          name: pa-webinar-prosody-plugins
+    extraVolumeMounts:
+      - name: prosody-plugins-custom
+        mountPath: /prosody-plugins-custom
+        readOnly: true
+    # Il segreto arriva a Prosody come JWT_APP_SECRET. Una sola di queste strade:
+    #   - `jwt.secret`: il valore, e il sottochart rende il Secret;
+    #   - `jwt.existingSecretName`: un Secret con la chiave JWT_APP_SECRET,
+    #     creato a mano o reso dal chart con `secrets.jitsiJwtSecretName`;
+    #   - una voce in `extraSecrets` che legge JITSI_JWT_SECRET dal Secret
+    #     dell'applicazione (un solo valore da ruotare):
+    #       extraSecrets:
+    #         - name: JWT_APP_SECRET
+    #           valueFrom:
+    #             secretKeyRef: { name: videocall-secrets, key: JITSI_JWT_SECRET }
+    # Con `secret` ed `existingSecretName` insieme il sottochart ignora il
+    # primo senza dirlo: il chart si rifiuta di rendere.
+    jwt:
+      secret: ""
+      existingSecretName: ""
+    # Solo richieste, come per Jicofo qui sotto.
+    resources:
+      requests:
+        cpu: 50m
+        memory: 128Mi
+
+  # Jicofo senza autenticazione propria. Con l'autenticazione accesa (il
+  # predefinito del sottochart con `enableAuth`) Jicofo rende moderatore
+  # ogni partecipante autenticato, e con i token del portale lo sono tutti:
+  # ospiti e iscritti potrebbero silenziare o espellere il moderatore.
+  # L'accesso resta protetto da Prosody, che rifiuta chi non ha un token
+  # valido; chi è moderatore lo decide solo il token (prosody.extraEnvs
+  # qui sopra). ENABLE_AUTO_OWNER spento: nessuno diventa moderatore perché
+  # è entrato per primo o perché il moderatore è uscito. La resa si ferma se
+  # l'autenticazione è spenta qui ma Prosody non assegna i ruoli dal token.
+  jicofo:
+    extraEnvs:
+      JICOFO_ENABLE_AUTH: "false"
+      ENABLE_AUTO_OWNER: "false"
+    # Solo richieste, nessun limite: senza, lo scheduler non vede Jicofo e,
+    # quando il nodo resta senza memoria, Jicofo, Prosody e la parte web sono
+    # i primi processi uccisi, e la conferenza cade. Valori misurati a riposo
+    # e con una chiamata in corso.
+    resources:
+      requests:
+        cpu: 50m
+        memory: 320Mi
+
+  # Lavagna condivisa: non inclusa. La sala la mostra solo se la conferenza ha
+  # un server di collaborazione e se app.env.NEXT_PUBLIC_WHITEBOARD_ENABLED è
+  # "true". Il sottochart ne ha uno facoltativo (`excalidraw.enabled`, spento),
+  # che questo chart non accende e con cui la lavagna non è stata provata.
 
   jvb:
     replicaCount: 1
@@ -661,9 +1026,35 @@ jitsi-meet:
         memory: 4Gi
     nodeSelector: {}
     tolerations: []
+    # Sonda più tollerante di quella del sottochart (1 s, tre tentativi): su
+    # un nodo carico il bridge a riposo veniva riavviato, e il riavvio fa
+    # cadere ogni conferenza. Così un bridge bloccato si riavvia dopo circa un
+    # minuto invece di trenta secondi.
+    livenessProbe:
+      httpGet:
+        path: /about/health
+        port: 8080
+      periodSeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 6
     useHostPort: true
     useNodeIP: true
     UDPPort: 10000
+    # STUN con cui il bridge scopre il proprio indirizzo pubblico. Il valore
+    # predefinito del sottochart è un server di terzi (jitsi.net): il bridge vi
+    # manda richieste e rivela il proprio indirizzo. Alternative: "" quando
+    # l'indirizzo annunciato è già quello giusto (`publicIPs`, oppure
+    # `useNodeIP` su un nodo con indirizzo pubblico sulla scheda di rete), un
+    # tuo server STUN, oppure il coturn del chart (`coturn.enabled`, `turnHost`
+    # e `useInternalStun: true`, tutti e tre). Attenzione: su un nodo con
+    # indirizzo privato dietro NAT (le VM dei cloud pubblici) `useNodeIP`
+    # annuncia l'indirizzo privato, e senza STUN né `publicIPs` chi è fuori
+    # dalla rete entra in sala ma non sente e non vede nessuno.
+    stunServers: "meet-jit-si-turnrelay.jitsi.net:443"
+    # Le password XMPP interne (`jicofo.xmpp.password`, `jvb.xmpp.password`, e
+    # con Jibri `jibri.xmpp.password` e `jibri.recorder.password`) vanno
+    # generate una volta e passate a ogni aggiornamento: vedi
+    # jitsi.requirePinnedCredentials.
 
   jibri:
     enabled: false
@@ -673,100 +1064,80 @@ jitsi-meet:
     tolerations: []
 
   web:
-    # F18: patched jitsi/web that forces the rnnoise noise-suppression
-    # AudioContext to 48 kHz (built from infra/jitsi-web-patched). Base image is
-    # stable-10741 (= the subchart appVersion prod already served), so
-    # prosody/jicofo/jvb compatibility is unchanged — only the noise-suppression
-    # context differs.
+    # Immagine web con la patch che forza a 48 kHz il contesto audio della
+    # soppressione rumore avanzata. Senza la patch quel filtro, su alcuni
+    # browser, ammutolisce il microfono senza alcun errore visibile — e il
+    # danno si scopre a evento iniziato.
     #
-    # pullPolicy: Always — the jitsi-web.yml workflow re-pushes the SAME
-    # `stable-10741-rnnoise` tag whenever the patch changes, so the tag is MUTABLE
-    # in practice. This is a DELIBERATE trade-off for a mic-silencing-critical
-    # image: IfNotPresent could let a node keep serving a stale, mis-patched image
-    # cached under that tag → SILENT, persistent mic loss after we push a fix (the
-    # worse failure). Always instead re-pulls on every web-pod (re)creation, so a
-    # transient GHCR hiccup during an upgrade can leave the pod ImagePullBackOff —
-    # a LOUD, obvious, self-healing outage. Loud+recoverable beats silent+wrong.
+    # Chi non può prelevare questa immagine usa quella standard, sostituendo il
+    # blocco con `repository: jitsi/web` e svuotando `imagePullSecrets` sopra:
+    # in quel caso la soppressione avanzata deve restare spenta, che è già il
+    # comportamento predefinito dell'applicazione. Le due impostazioni sono
+    # legate, e il chart si rifiuta di rendere una combinazione incoerente.
     #
-    # Pull auth: this is a PRIVATE GHCR image → the web pod needs `ghcr-secret`,
-    # supplied by the global `jitsi-meet.imagePullSecrets` above. (The existing
-    # prod predates that default and wires it via a `kubectl patch deploy
-    # …-jitsi-meet-web` — see that block's comment.) NB: a `--reuse-values`
-    # upgrade does NOT pick up these file-level defaults, so the prod deploy also
-    # passes repository/tag/pullPolicy via `--set`.
+    # `pullPolicy: Always` è voluto: il tag viene riscritto sul posto quando la
+    # patch cambia, e un nodo che serve una copia vecchia ammutolirebbe in
+    # silenzio. Un prelievo fallito è invece un guasto rumoroso e reversibile.
+    # Un aggiornamento con `--reuse-values` non riprende i valori predefiniti
+    # del file: passa l'override esplicitamente.
+    # ATTENZIONE: questo tag non coincide con `IMAGE_TAG` in
+    # .github/workflows/jitsi-web.yml, che pubblica una revisione più recente.
+    # Allinearli è un rollout dell'immagine della conferenza e va deciso, non
+    # fatto di passaggio: finché restano diversi, chi si appoggia a questo
+    # valore predefinito serve una revisione più vecchia di quella pubblicata.
     image:
       repository: ghcr.io/italia/pa-webinar-jitsi-web
       tag: stable-10741-rnnoise
       pullPolicy: Always
+    # Solo richieste, come per Jicofo.
+    resources:
+      requests:
+        cpu: 10m
+        memory: 64Mi
     ingress:
       enabled: true
+      # Per un altro controller si cambia solo la classe. Niente annotazione
+      # `kubernetes.io/ingress.class`: l'API server rifiuta un Ingress in cui
+      # annotazione e classe non coincidono, e da qui non la si potrebbe
+      # togliere (Helm fonde le mappe dei sottochart).
+      ingressClassName: nginx
+      # Una sola chiave di questa mappa impostata a null: Helm 3 la toglie,
+      # Helm 4 la lascia nel manifesto con valore nullo (le note dopo
+      # l'installazione lo segnalano). `annotations: null` le toglie tutte con
+      # entrambi; per scegliere le annotazioni una per una, l'Ingress della
+      # conferenza lo rende il chart (`jitsi.conferenceIngress`).
       annotations:
-        kubernetes.io/ingress.class: nginx
         cert-manager.io/cluster-issuer: letsencrypt-prod
       hosts:
+        # `paths` is a list of STRINGS: the pinned jitsi-meet subchart renders
+        # each entry directly into `path:`. Writing it as the richer
+        # `- path: / / pathType: Prefix` mapping renders the map itself into the
+        # field, and the API server rejects the Ingress because the value is not
+        # an absolute path. The subchart always sets `pathType: Prefix` itself.
         - host: jitsi.videocall.example.com
-          paths:
-            - path: /
-              pathType: Prefix
+          paths: ["/"]
       tls:
         - secretName: jitsi-tls
           hosts:
             - jitsi.videocall.example.com
 
-# ── Recording Pipeline ────────────────────────────────────────
-# Configuration for Jibri recording storage and finalize script.
-# Only effective when jitsi-meet.jibri.enabled=true.
-#
-# The finalize script (infra/jitsi/jibri-finalize.sh) is mounted as a ConfigMap
-# in the Jibri pod. It:
-#   1. Extracts duration/size via ffprobe
-#   2. Re-muxes with faststart (no re-encode) for streaming
-#   3. Tags MP4 metadata (title, organizer, participants) from the portal
-#   4. Uploads to configured object storage
-#   5. Notifies the portal webhook with enriched payload (creates CallSession)
-#
-# Required env vars for finalize (set automatically from secrets/configmap):
-#   RECORDING_STORAGE_TYPE, RECORDING_WEBHOOK_URL, CRON_API_KEY, APP_INTERNAL_URL
-
-recording:
-  storage:
-    # local | azure-blob | s3 | gcs | minio
-    type: "local"
-
-    # Azure Blob Storage (AKS recommended)
-    azure:
-      connectionString: ""  # From secret
-      containerName: "recordings"
-
-    # AWS S3
-    s3:
-      bucket: ""
-      region: ""
-      accessKeyId: ""     # From secret
-      secretAccessKey: "" # From secret
-
-    # Google Cloud Storage
-    gcs:
-      bucket: ""
-      credentials: ""    # From secret (service account JSON)
-
-    # MinIO (self-hosted S3-compatible)
-    minio:
-      endpoint: ""
-      bucket: ""
-      accessKey: ""      # From secret
-      secretKey: ""      # From secret
-
-  # Jibri local PVC for in-progress recording
-  persistence:
-    enabled: true
-    size: 50Gi
-    storageClassName: ""  # Use cluster default
-
-  # GDPR retention — cleanup cron deletes recordings after this period
-  retentionDays: 90
-  # Safety limit for maximum recording duration
-  maxDurationMinutes: 240
+# ── Registrazione composita (Jibri) ──────────────────────────
+# Non esiste un blocco `recording:` in questo chart: nessun template lo
+# leggeva, e i valori messi lì non avevano effetto. La registrazione si
+# configura dove viene letta davvero:
+#   - storage delle registrazioni: `app.env` (RECORDING_STORAGE_TYPE,
+#     RECORDING_AZURE_CONTAINER, RECORDING_S3_*) e le credenziali nel Secret
+#     dell'applicazione (RECORDING_AZURE_CONNECTION_STRING,
+#     RECORDING_S3_ACCESS_KEY_ID, RECORDING_S3_SECRET_ACCESS_KEY);
+#   - Jibri: `jitsi-meet.jibri.*`. Lo script che carica il file e avvisa il
+#     portale a fine registrazione va passato in
+#     `jitsi-meet.jibri.custom.other._finalize_sh`, insieme a
+#     `jitsi-meet.jibri.extraEnvs.APP_INTERNAL_URL` e a CRON_API_KEY (per
+#     esempio con `jitsi-meet.jibri.extraSecretsFrom` sul Secret
+#     dell'applicazione). Il ConfigMap `<fullname>-jibri-finalize` reso da
+#     questo chart ne contiene una copia, ma il sottochart non lo monta;
+#   - conservazione: la decide l'applicazione (pannello di amministrazione e
+#     cron di pulizia), non il chart.
 
 # ── PostgreSQL ───────────────────────────────────────────────
 
@@ -774,10 +1145,24 @@ postgresql:
   # Set to false to use an external database (Azure DB, RDS, Cloud SQL, etc.)
   enabled: true
 
+  # Immagine fissata per digest dentro il tag (`latest@sha256:…`, PostgreSQL
+  # 18.6.0). Il sottochart punta a `latest`, l'unico tag che Bitnami pubblica
+  # ancora nel registro pubblico: un nodo che la preleva quando esce una nuova
+  # versione maggiore avvierebbe un server che rifiuta la cartella dati
+  # esistente, e il database non ripartirebbe. Un cambio di versione maggiore
+  # richiede una migrazione dei dati (dump e ripristino), non un cambio di
+  # tag. Chi imposta `tag` sostituisce tutto il valore; chi cambia `registry`
+  # o `repository` (un registro specchio) deve cambiare anche `tag`.
+  image:
+    tag: "latest@sha256:21b97a850d7417940e58d929b8d0ebb0fc9b9f44bc1b6cd8f128d1b4ce6988e5"
+
   auth:
     username: eventi
     database: pa_webinar
-    # Pre-existing Secret for PostgreSQL passwords
+    # Secret da cui il sottochart legge le password. Viene montato per intero,
+    # come file, dentro il container del database: se ci tieni anche le chiavi
+    # dell'applicazione, chi raggiunge quel container le legge. Vedi
+    # secrets.datastoreSecretName per separarli.
     existingSecret: "videocall-secrets"
     secretKeys:
       adminPasswordKey: POSTGRES_ADMIN_PASSWORD
@@ -819,6 +1204,44 @@ postgresql:
     existingSecret: ""
     secretKey: "DATABASE_URL"
 
+# ── Copia del database ───────────────────────────────────────
+# Un CronJob (`<fullname>-backup`) che fa `pg_dump -Fc` del PostgreSQL del
+# chart in un volume (`<fullname>-backup`, oppure `persistence.existingClaim`)
+# e tiene le ultime `retention` copie. Ogni file si chiama
+# `pa-webinar-<AAAAMMGG>T<hhmmss>Z.dump`, è leggibile solo dal proprietario e
+# contiene dati personali: va trattato come il database. Il volume ha
+# `helm.sh/resource-policy: keep`, quindi `helm uninstall` non lo cancella
+# (la cancellazione del namespace sì). Solo con il database del chart
+# (`postgresql.enabled`): un database gestito ha le copie del suo fornitore.
+# Una copia sullo stesso disco del database non protegge dalla perdita del
+# nodo: portala anche altrove. Il ripristino è nelle note dopo
+# l'installazione.
+backup:
+  enabled: false
+  # Ora UTC. Dopo la pulizia dei dati scaduti (cronjobs.cleanup, alle 3):
+  # la copia non conserva ciò che la pulizia ha appena tolto.
+  schedule: "30 3 * * *"
+  # Quante copie tenere, le più recenti. Un dato cancellato dal portale resta
+  # nelle copie per altrettanti giorni.
+  retention: 7
+  # Vuoto = la stessa immagine del PostgreSQL del chart: pg_dump deve essere
+  # della versione del server o più recente.
+  image: ""
+  activeDeadlineSeconds: 3600
+  persistence:
+    size: 10Gi
+    # Vuoto = la classe predefinita del cluster (local-path su k3s).
+    storageClass: ""
+    # Un PVC già presente nel namespace, al posto di quello del chart.
+    existingClaim: ""
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: "1"
+      memory: 512Mi
+
 # ── Redis ────────────────────────────────────────────────────
 #
 # Redis powers real-time chat fan-out (pub/sub) across app pods.
@@ -829,20 +1252,29 @@ redis:
 
   architecture: standalone  # single node is enough for pub/sub + rate-limit
 
-  # As of 2025-08-28 Bitnami moved most pinned image tags to their
-  # "Legacy Catalog"; the chart's default tag may disappear from the
-  # public registry. We deliberately track `latest` because we only
-  # rely on PUBLISH/SUBSCRIBE/GET/SET — those are stable across major
-  # Redis versions. Override in values-<env>.yaml if your org pins a
-  # specific digest.
+  # Nel registro pubblico Bitnami pubblica ormai solo il tag `latest`, che
+  # cambia contenuto a ogni ricostruzione, e i tag predefiniti del sottochart
+  # non esistono più. L'immagine è fissata per digest dentro il tag
+  # (`latest@sha256:…`, Redis 8.10.2): un nodo nuovo non preleva una versione
+  # diversa da quella degli altri. Chi imposta `tag` sostituisce tutto il
+  # valore, digest compreso; chi cambia `registry` o `repository` (un registro
+  # specchio) deve cambiare anche `tag`.
   image:
-    tag: "latest"
-    pullPolicy: Always
+    tag: "latest@sha256:ef8442c1ec2e28cef662999f348a4369c22343dc0c86c3bc23041fad22f13ca1"
+    pullPolicy: IfNotPresent
+
+  # L'esportatore di metriche, se lo accendi (`metrics.enabled`): il suo tag
+  # predefinito nel sottochart non esiste più, stesso rimedio (redis-exporter
+  # 1.92.0).
+  metrics:
+    image:
+      tag: "latest@sha256:5c505fe0a1666711039cb2c0c7ad6d1a8eba9d2f3393b809a9846e9260243446"
 
   auth:
     enabled: true
-    # Pre-existing Secret containing REDIS_PASSWORD. Required: Redis
-    # refuses to start without a password when auth is enabled.
+    # Obbligatorio: con l'autenticazione attiva Redis non parte senza password.
+    # Vedi secrets.datastoreSecretName per tenerlo separato da quello
+    # dell'applicazione.
     existingSecret: "videocall-secrets"
     existingSecretPasswordKey: "REDIS_PASSWORD"
 
@@ -874,7 +1306,8 @@ redis:
 #
 # Adds a post-production lifecycle on top of Jibri recordings:
 # transcription (WhisperX large-v3 + pyannote 3.1), summary + translation
-# (in-cluster vLLM, default model Qwen3-32B-Instruct). See docs/POSTPROD.md.
+# (in-cluster vLLM, default model Mistral-Small-3.2-24B-Instruct). See
+# docs/POSTPROD.md.
 #
 # Sovereignty: every component runs in-cluster on the GPU node pool.
 # No external API calls. Pre-populate model weights into a PVC mounted
@@ -882,10 +1315,12 @@ redis:
 # is set in the container.
 #
 # Recommended hardware (Italy North, 2026):
-#   - 1× A100 80GB (Standard_NC24ads_A100_v4) — ospita Qwen3-32B fp16
+#   - 1× A100 80GB (Standard_NC24ads_A100_v4) — ospita il modello LLM di
+#     default (~48 GB di pesi in fp16)
 #     + WhisperX large-v3 + pyannote 3.1 simultaneamente.
 #   - Pool con `min_count=0, max_count=2`, taint `workload=ai-gpu:NoSchedule`.
-#   - Vedi `iac-azure/environments/prod` per la definizione Tofu del pool.
+#   - Su AKS il pool lo crea infra/tofu/aks con `gpu_pool = { enabled = true }`,
+#     con questo SKU, etichetta e taint come valori predefiniti.
 #
 # Enable the orchestrator only on clusters that have a GPU node pool
 # AND a vLLM Service reachable from the worker.
@@ -910,12 +1345,13 @@ postprod:
   orchestrator:
     enabled: true
     schedule: "* * * * *"
-    image: bitnami/kubectl:latest
+    # Empty → kubectlImage.
+    image: ""
 
   # vLLM (LLM server per i task SUMMARIZE/TRANSLATE). E' un Deployment GPU
   # separato (oggi applicato a mano, vedi docs/POSTPROD.md). Su un pool
   # aigpu scale-to-zero, tenerlo sempre a replicas=1 vanifica lo
-  # scale-to-zero e tiene acceso l'A100 (~3.40 EUR/h) anche a vuoto.
+  # scale-to-zero e tiene acceso il nodo GPU anche a vuoto.
   vllm:
     # Se true, l'orchestrator scala il Deployment vLLM a 1 quando c'e'
     # lavoro postprod (desired>0 o worker attivi) e a 0 quando la pipeline
@@ -1012,10 +1448,10 @@ recorder:
   # partecipante). Gira sul pool NORMALE, non GPU.
   image: ghcr.io/italia/pa-webinar-recorder:dev
   # NOTE on stale images: with a MUTABLE tag like `:dev`, IfNotPresent may reuse
-  # a node's cached (possibly outdated) layer for that tag. Prod sets `Always`
-  # via a values override so each recorder Job re-pulls the current `:dev` — the
-  # per-track audio fix landed in recorder commit 9739d70, and a cached pre-fix
-  # layer captures only silence. The chart DEFAULT stays IfNotPresent so an
+  # a node's cached (possibly outdated) layer for that tag. Set `Always` via a
+  # values override so each recorder Job re-pulls the current `:dev`: a cached
+  # layer from an older recorder build can capture only silence. The chart
+  # DEFAULT stays IfNotPresent so an
   # offline / air-gapped cluster that pre-loads the image (or a registry outage)
   # doesn't turn every recording into ImagePullBackOff. When you enable the
   # recorder with registry access, pin an immutable digest or set `Always`.

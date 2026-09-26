@@ -10,16 +10,23 @@ import {
   Card,
   CardBody,
   FormGroup,
-  Icon,
   Input,
   Spinner,
 } from 'design-react-kit';
 
-import { Link } from '@/i18n/navigation';
+import { Icon } from '@/components/ui/icon';
+import { Link, percorso } from '@/i18n/navigation';
 import { resolveWaitingRoomMode } from '@/lib/waiting-room/resolve-engine';
+import { canStartManually } from '@/lib/events/lifecycle';
+import {
+  annuncioApertura,
+  statoIngresso,
+  type BloccoModulo,
+} from '@/lib/waiting-room/entry-state';
 import AudioPlayer from '@/components/live/audio-player';
 import ChatPanel from '@/components/live/chat-panel';
 import DeviceCheck from '@/components/live/device-check';
+import { InsecureContextNotice } from '@/components/live/insecure-context';
 import VideoPlayer from '@/components/events/video-player';
 import EventTitle from '@/components/events/event-title';
 
@@ -96,6 +103,8 @@ interface WaitingRoomEvent {
   imageUrl?: string | null;
   coverImageUrl?: string | null;
   maxParticipants: number;
+  /** Mostra l'avviso di registrazione: l'evento registra E l'installazione
+   *  ha qualcosa che puo' farlo (lo combina LiveEventClient). */
   recordingEnabled: boolean;
   tempRecordingUrl?: string | null;
   recordingUrl?: string | null;
@@ -124,7 +133,10 @@ export interface WaitingRoomJoinPrefs {
 /** Telemetria warm-up dal poll /lifecycle: alimenta il pannello di attesa
  *  onesto (fase + tempo trascorso) al posto dello spinner cieco. */
 export interface WaitingRoomWarmup {
-  phase: 'queued' | 'starting' | 'ready';
+  /** 'scheduled': nessuno scaler, il bridge è fisso — la sala si apre
+   *  all'orario d'inizio o quando il moderatore avvia l'evento, e non c'è
+   *  nessun riscaldamento da stimare. */
+  phase: 'queued' | 'starting' | 'ready' | 'scheduled';
   /** Stopwatch anchor, già ripulito lato server: valorizzato solo mentre
    *  PROVISIONING e recente (null in IDLE / se residuo di un ciclo passato),
    *  così il cronometro non parte mai da un timestamp stantìo. */
@@ -136,6 +148,9 @@ interface WaitingRoomProps {
   event: WaitingRoomEvent;
   participantCount: number;
   role: 'moderator' | 'participant' | 'guest';
+  /** Fotocamera e microfono accesi all'ingresso (moderatori e relatori);
+   *  chi partecipa entra spento e li accende quando vuole intervenire. */
+  devicesOnByDefault?: boolean;
   jvbReady?: boolean | null;
   defaultName: string;
   /** Called when the user confirms "Entra ora" / "Guarda registrazione".
@@ -175,10 +190,24 @@ const PARTICIPANT_EMAIL_KEY = 'pawebinar.participant.email';
 const ARCADE_CLASSIC_KEY = 'pawebinar.arcade.classic';
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+/** Il campo su cui portare il fuoco per ciascun blocco. */
+const CAMPO_DEL_BLOCCO: Record<BloccoModulo, string> = {
+  name: 'waiting-name',
+  email: 'waiting-email',
+  consent: 'waiting-multitrack-consent',
+};
+/** Il messaggio che spiega ciascun blocco: descrive il campo e il pulsante. */
+const MESSAGGIO_DEL_BLOCCO: Record<BloccoModulo, string> = {
+  name: 'waiting-name-required',
+  email: 'waiting-email-invalid',
+  consent: 'waiting-multitrack-consent-required',
+};
+
 export default function WaitingRoom({
   event,
   participantCount,
   role,
+  devicesOnByDefault = false,
   jvbReady,
   defaultName,
   onEnterLive,
@@ -203,7 +232,17 @@ export default function WaitingRoom({
   // premuto "Avvia evento": mostriamo uno stato dedicato invece del countdown
   // vuoto + CTA "Apertura alle {ora passata}" (incoerente e sfiduciante).
   const [startingSoon, setStartingSoon] = useState(false);
+  // Mai aperto (PUBLISHED, in preparazione o in pausa) e oltre la fine
+  // programmata: l'evento non si è tenuto. Il giro del ciclo di vita lo
+  // chiuderà a momenti; fino ad allora «attendi l'organizzatore», la
+  // preparazione in corso o «Avvia evento» sarebbero promesse false.
+  // Calcolato in un effetto (non nel rendering) perché server e prima passata
+  // del client coincidano.
+  const [notHeld, setNotHeld] = useState(false);
   const [name, setName] = useState(defaultName);
+  // Diventa vero dopo aver letto il nome salvato nel browser: fino ad allora
+  // un campo vuoto non vuol dire che il nome manchi.
+  const [nomeNoto, setNomeNoto] = useState(false);
   const [email, setEmail] = useState('');
   // Full-screen park (default) vs. static classic card (accessibility
   // fallback). Initialised false to match SSR, then synced from storage.
@@ -211,8 +250,8 @@ export default function WaitingRoom({
   // La piazza/giardino si apre su richiesta: vedi il commento su gameInvite.
   const [gameOpen, setGameOpen] = useState(false);
   const [devicePrefs, setDevicePrefs] = useState<WaitingRoomJoinPrefs>({
-    cameraOn: true,
-    micOn: true,
+    cameraOn: devicesOnByDefault,
+    micOn: devicesOnByDefault,
   });
   const [startError, setStartError] = useState('');
   // Consenso esplicito alla registrazione per-partecipante (multitrack).
@@ -248,6 +287,7 @@ export default function WaitingRoom({
     } catch {
       /* private mode / blocked storage → fall back to defaults */
     }
+    setNomeNoto(true);
   }, [defaultName]);
 
   // Resolve the waiting-room engine + classic-view post-mount, in priority
@@ -286,15 +326,19 @@ export default function WaitingRoom({
   }, [event.waitingRoomEngine]);
 
   const startsAtMs = new Date(event.startsAt).getTime();
+  const endsAtMs = new Date(event.endsAt).getTime();
   const isLive = event.status === 'LIVE';
-  const isEnded = event.status === 'ENDED';
+  // Un evento mai aperto oltre la sua fine si presenta come concluso: niente
+  // modulo d'ingresso, niente piazza, niente avvio.
+  const isEnded = event.status === 'ENDED' || notHeld;
   const isPublished = event.status === 'PUBLISHED';
   // IDLE = bridge scaled to zero, /wake just fired from LiveEventClient.
   // PROVISIONING = scaler picked up the wake, JVB is starting.
   // Both are short-lived "warming up" states — show a non-blocking
   // banner so the user knows entry is gated, and let them keep using
   // the rest of the room (garden, name input, device check, chat).
-  const isWarmingUp = event.status === 'IDLE' || event.status === 'PROVISIONING';
+  const isWarmingUp =
+    (event.status === 'IDLE' || event.status === 'PROVISIONING') && !notHeld;
   const isGuest = role === 'guest';
   const isModerator = role === 'moderator';
   const heroUrl = event.imageUrl ?? event.coverImageUrl ?? null;
@@ -323,8 +367,109 @@ export default function WaitingRoom({
   // gated da un consenso esplicito. Niente consenso → niente ingresso.
   const multitrackRequired =
     !!event.multitrackRecordingEnabled && !isEnded && !multitrackConsentExempt;
-  const canEnter =
-    nameValid && emailValid && (!multitrackRequired || multitrackConsent);
+  // La piazza e' disponibile quando c'e' qualcosa da fare e nessun cancello
+  // davanti: a evento finito non serve, in vista classica e' stata rifiutata,
+  // e senza consenso multitraccia non si va da nessuna parte.
+  const canPlay = !isEnded && !classicView && !multitrackRequired;
+
+  // La sala e' pronta quando il ponte video c'e'. Si blocca SOLO su «si sta
+  // accendendo adesso»: gli altri valori — nessuno lo ha chiesto, sonda muta,
+  // conto andato in errore — non sono un no, e trattarli come tale
+  // chiuderebbe la porta a una conferenza sana.
+  const pontePresunto = jvbReady !== false;
+  // E comunque il cancello non puo' diventare una trappola. La misura viene da
+  // una fotografia che un lavoro periodico aggiorna: se quel lavoro e' fermo,
+  // o se due eventi si contendono i bridge, «si sta accendendo» resta scritto
+  // su una sala che funziona. Dopo un minuto si offre di entrare lo stesso:
+  // aspettare per niente e' un fastidio, non poter entrare e' un evento perso.
+  const [attesaLunga, setAttesaLunga] = useState(false);
+  useEffect(() => {
+    if (pontePresunto) {
+      setAttesaLunga(false);
+      return;
+    }
+    const t = setTimeout(() => setAttesaLunga(true), 60_000);
+    return () => clearTimeout(t);
+  }, [pontePresunto]);
+
+  // Due cose diverse, e vanno tenute diverse.
+  //
+  // `salaPronta` e' cio' che SAPPIAMO: il ponte c'e'. Muove le porte della
+  // piazza e l'annuncio «e' pronta, entra».
+  //
+  // `ingressoConsentito` e' cio' che PERMETTIAMO: dopo un minuto si prova
+  // comunque, perche' la misura puo' sbagliare. Ma non si annuncia niente —
+  // dire «la sala e' pronta» proprio quando l'unica prova che abbiamo dice il
+  // contrario manderebbe le persone a sbattere con una promessa nostra.
+  const salaPronta = pontePresunto;
+  const ingressoConsentito = salaPronta || attesaLunga;
+
+  // L'apertura va notata. Il passaggio da «aspetta» a «entra» avviene mentre
+  // la persona sta guardando altrove — la piazza, la chat, la propria
+  // anteprima — e un pulsante che cambia in silenzio se lo perde. Per qualche
+  // secondo si illumina e chiede di entrare, poi torna normale: un richiamo
+  // che non smette diventa rumore.
+  const [appenaAperta, setAppenaAperta] = useState(false);
+  // L'apertura e' il momento in cui si puo' entrare davvero: evento avviato
+  // E ponte presente. Guardare solo il ponte perderebbe il caso piu' comune —
+  // il moderatore avvia con il ponte gia' caldo, e il ponte non e' mai stato
+  // «non pronto» agli occhi di chi aspettava.
+  const salaAperta = canEnterLive && salaPronta;
+  const eraAperta = useRef(salaAperta);
+  // Un tentativo d'ingresso con il modulo incompleto — il pulsante, il
+  // cancello della piazza, il ritorno dalla registrazione — trasforma
+  // l'indicazione in errore e porta il fuoco sul campo da completare.
+  const [ingressoTentato, setIngressoTentato] = useState(false);
+  const [campoDaCompletare, setCampoDaCompletare] = useState<{
+    blocco: BloccoModulo;
+    n: number;
+  } | null>(null);
+  // Sala non pronta e modulo incompleto sono due ragioni diverse per non
+  // entrare, con due risposte diverse: vedi lib/waiting-room/entry-state.
+  const { canEnter, bloccoModulo, nomeDaChiedere, nomeSegnalato, bloccoSpiegato } =
+    statoIngresso({
+      canEnterLive,
+      ingressoConsentito,
+      nameValid,
+      emailValid,
+      multitrackRequired,
+      multitrackConsent,
+      ingressoTentato,
+      nomeNoto,
+    });
+
+  useEffect(() => {
+    if (!salaAperta) {
+      // Se la sala si richiude — il ponte sparisce, la fotografia torna
+      // indietro — il richiamo va spento: resterebbe un invito a entrare
+      // dove non si entra.
+      setAppenaAperta(false);
+      eraAperta.current = false;
+      return undefined;
+    }
+    if (eraAperta.current) return undefined;
+    eraAperta.current = true;
+    setAppenaAperta(true);
+    const t = setTimeout(() => setAppenaAperta(false), 10_000);
+    return () => clearTimeout(t);
+  }, [salaAperta]);
+
+  // Il richiamo si vede solo se il pulsante fa davvero entrare. Lampeggiare di
+  // verde con il nome ancora da scrivere o il consenso non dato prometterebbe
+  // un ingresso che quel clic non dara': in quel caso compare, accanto al
+  // campo e sopra il pulsante, la richiesta di cio' che manca.
+  const evidenziaCta = appenaAperta && canEnter;
+  const annuncio = annuncioApertura({ appenaAperta, canEnter, bloccoModulo: bloccoSpiegato });
+
+  // Il fuoco va sul campo da completare DOPO il disegno: chi arriva dal
+  // riproduttore della registrazione non ha ancora il modulo sullo schermo.
+  useEffect(() => {
+    if (!campoDaCompletare || typeof document === 'undefined') return;
+    const el = document.getElementById(CAMPO_DEL_BLOCCO[campoDaCompletare.blocco]);
+    if (!el) return;
+    el.focus({ preventScroll: true });
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, [campoDaCompletare]);
 
   // Cronometro warm-up. Ci si ancora UNA volta per ciclo (identità =
   // warmup.startedAt): senza questo, ri-ancorarsi a ogni poll (3s) fa
@@ -365,6 +510,12 @@ export default function WaitingRoom({
     }
     const tick = () => {
       const now = Date.now();
+      if (now >= endsAtMs) {
+        setCountdown('');
+        setPulseCountdown(false);
+        setStartingSoon(false);
+        return;
+      }
       const diff = startsAtMs - now;
       if (diff <= 0) {
         setCountdown('');
@@ -388,7 +539,20 @@ export default function WaitingRoom({
     tick();
     const timer = setInterval(tick, 1000);
     return () => clearInterval(timer);
-  }, [isPublished, startsAtMs]);
+  }, [isPublished, startsAtMs, endsAtMs]);
+
+  // «Non si è tenuto»: vale per ogni stato da cui l'evento si potrebbe ancora
+  // avviare (vedi canStartManually), non solo per PUBLISHED.
+  useEffect(() => {
+    if (!canStartManually(event.status)) {
+      setNotHeld(false);
+      return;
+    }
+    const check = () => setNotHeld(Date.now() >= endsAtMs);
+    check();
+    const timer = setInterval(check, 1000);
+    return () => clearInterval(timer);
+  }, [event.status, endsAtMs]);
 
   // Detect the transition into LIVE while the user is still waiting. The
   // moderator who pressed "Avvia evento" doesn't need the cue (they know),
@@ -427,8 +591,23 @@ export default function WaitingRoom({
     }
   }, [onStartEvent, t]);
 
+  // Un tentativo con il modulo incompleto: si dice cosa manca e si porta la
+  // persona li'. Falso se il modulo e' a posto (a trattenere e' la sala).
+  const segnalaCampoMancante = useCallback((): boolean => {
+    if (!bloccoModulo) return false;
+    setIngressoTentato(true);
+    setCampoDaCompletare((prev) => ({ blocco: bloccoModulo, n: (prev?.n ?? 0) + 1 }));
+    return true;
+  }, [bloccoModulo]);
+
+  // L'unico cancello del modulo: il pulsante «Entra» resta premibile, quindi
+  // nome, email e consenso alla registrazione li trattiene questo controllo.
+  // Ogni ingresso passa di qui (waiting-room.test.tsx lo verifica).
   const handleEnterLive = useCallback(() => {
-    if (!canEnter) return;
+    if (!canEnter) {
+      segnalaCampoMancante();
+      return;
+    }
     // Persist the last-used identity so guests don't have to retype on
     // reconnects / accidental reloads.
     if (typeof window !== 'undefined') {
@@ -444,7 +623,7 @@ export default function WaitingRoom({
       }
     }
     onEnterLive(trimmedName, devicePrefs);
-  }, [canEnter, onEnterLive, trimmedName, trimmedEmail, devicePrefs]);
+  }, [canEnter, segnalaCampoMancante, onEnterLive, trimmedName, trimmedEmail, devicePrefs]);
 
   // Entry triggered from INSIDE the Phaser game (walking the avatar into the
   // open gate). It funnels through the SAME validated handleEnterLive as the
@@ -466,13 +645,15 @@ export default function WaitingRoom({
       handleEnterLive();
       return;
     }
-    if (typeof document !== 'undefined') {
-      const el = document.getElementById('waiting-name') as HTMLInputElement | null;
-      el?.focus();
-      el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    // Rete di sicurezza: il cancello della piazza non lascia passare mentre la
+    // sala si prepara, ma se un domani lo facesse, mandare la persona a
+    // sistemare il nome — che e' gia' a posto — le farebbe cercare un errore
+    // che non ha fatto.
+    if (!segnalaCampoMancante()) {
+      throw new Error(t('roomNotReadyButton'));
     }
     throw new Error('waiting-room: pre-join not complete');
-  }, [canEnter, handleEnterLive]);
+  }, [canEnter, handleEnterLive, segnalaCampoMancante, t]);
 
   const handleDeviceStateChange = useCallback(
     (s: WaitingRoomJoinPrefs) => setDevicePrefs(s),
@@ -484,6 +665,9 @@ export default function WaitingRoom({
   const gameDialogRef = useRef<HTMLDivElement>(null);
   const inviteRef = useRef<HTMLButtonElement>(null);
   const classicToggleRef = useRef<HTMLButtonElement>(null);
+  /** L'invito alla piazza mostrato mentre la sala si prepara: quando si entra
+   *  di li', e' li' che il fuoco deve tornare uscendo. */
+  const piazzaAttesaRef = useRef<HTMLButtonElement>(null);
   const returnFocusRef = useRef(false);
   useEffect(() => {
     if (!gameOpen) {
@@ -491,7 +675,7 @@ export default function WaitingRoom({
         returnFocusRef.current = false;
         // L'invito, se c'è ancora; passando alla versione classica sparisce, e
         // allora il posto giusto è il pulsante che riporta indietro.
-        (inviteRef.current ?? classicToggleRef.current)?.focus();
+        (inviteRef.current ?? piazzaAttesaRef.current ?? classicToggleRef.current)?.focus();
       }
       return;
     }
@@ -534,6 +718,10 @@ export default function WaitingRoom({
                 size="sm"
                 className="fw-semibold"
                 onClick={() => {
+                  // Tornare indietro deve funzionare SEMPRE: questi due
+                  // pulsanti sono l'unica strada fuori dal riproduttore, e
+                  // disabilitarli ci intrappolava dentro chi non ha ancora
+                  // scritto il nome o sta aspettando la sala.
                   setWatchingCatchUp(false);
                   handleEnterLive();
                 }}
@@ -613,6 +801,14 @@ export default function WaitingRoom({
 
   // ── Shared interactive pieces, reused by the arcade dock/drawer and the
   //   classic card so there's a single source of truth for the form + CTA.
+  // A sala aperta il pulsante «Entra» resta premibile anche senza nome: un
+  // pulsante spento non dice perche' lo e'. Qui si dice, accanto al campo —
+  // prima come indicazione, dopo un tentativo come errore — e il campo lo
+  // annuncia a chi usa un lettore di schermo.
+  const nameDescribedBy =
+    [isGuest ? 'waiting-name-help' : null, nomeDaChiedere ? MESSAGGIO_DEL_BLOCCO.name : null]
+      .filter(Boolean)
+      .join(' ') || undefined;
   const nameField = (
     <FormGroup className="mb-0">
       <Input
@@ -624,11 +820,29 @@ export default function WaitingRoom({
         required
         minLength={2}
         maxLength={100}
+        autoComplete="name"
+        valid={nomeSegnalato ? false : undefined}
+        aria-invalid={nomeSegnalato || undefined}
+        aria-describedby={nameDescribedBy}
       />
       {isGuest && (
-        <small className="text-muted" style={{ fontSize: '0.8rem' }}>
+        <small id="waiting-name-help" className="text-muted" style={{ fontSize: '0.8rem' }}>
           {t('nameHelp')}
         </small>
+      )}
+      {nomeDaChiedere && (
+        <div
+          id={MESSAGGIO_DEL_BLOCCO.name}
+          className="d-flex align-items-start rounded-2 px-2 py-1 mt-2"
+          style={
+            nomeSegnalato
+              ? { fontSize: '0.85rem', color: '#A1112E', background: '#FDF0F2', border: '1px solid #E8A3B0' }
+              : { fontSize: '0.85rem', color: '#6B4400', background: '#FFF8E6', border: '1px solid #E0C97A' }
+          }
+        >
+          <Icon icon="it-warning-circle" size="xs" className="me-1 mt-1 flex-shrink-0" style={{ fill: 'currentColor' }} />
+          <span>{t('nameRequiredToEnter')}</span>
+        </div>
       )}
     </FormGroup>
   );
@@ -643,20 +857,31 @@ export default function WaitingRoom({
         onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
         maxLength={200}
         aria-invalid={!emailValid}
+        aria-describedby={!emailValid ? MESSAGGIO_DEL_BLOCCO.email : undefined}
         autoComplete="email"
       />
       <small className="text-muted" style={{ fontSize: '0.8rem' }}>
         {t('emailHelp')}
       </small>
       {!emailValid && (
-        <div className="small text-danger mt-1" style={{ fontSize: '0.8rem' }}>
+        <div
+          id={MESSAGGIO_DEL_BLOCCO.email}
+          className="small text-danger mt-1"
+          style={{ fontSize: '0.8rem' }}
+        >
           {t('emailInvalid')}
         </div>
       )}
     </FormGroup>
   );
 
-  const deviceCheckField = <DeviceCheck compact onStateChange={handleDeviceStateChange} />;
+  const deviceCheckField = (
+    <DeviceCheck
+      compact
+      defaultOn={devicesOnByDefault}
+      onStateChange={handleDeviceStateChange}
+    />
+  );
 
   const netiquetteBlock = (
     <div className="waiting-netiquette rounded-3 p-3" style={{ backgroundColor: '#F5F7FA' }}>
@@ -674,9 +899,8 @@ export default function WaitingRoom({
   );
 
   // NIENTE <Icon> dentro <Alert>: Bootstrap Italia disegna già un'icona via
-  // ::before (padding-left:4em riservato) e un Icon inline si sovrappone
-  // (vedi memoria feedback_bootstrap-italia-alert). Solo testo, come
-  // aiNoticeBlock.
+  // ::before (padding-left:4em riservato) e un Icon inline si sovrappone.
+  // Solo testo, come aiNoticeBlock.
   const recordingNoticeBlock = event.recordingEnabled && !isEnded ? (
     <Alert color="warning" className="text-start mb-0" style={{ fontSize: '0.82rem' }}>
       {t('recordingNotice')}
@@ -686,8 +910,7 @@ export default function WaitingRoom({
   // Informativa AI in sala d'attesa: mostrata quando l'evento usa la
   // pipeline AI post-evento. Testo custom dell'admin (per-locale) con
   // fallback al testo generico i18n. NIENTE <Icon> dentro <Alert>:
-  // Bootstrap Italia ne disegna già una via ::before (vedi memoria
-  // feedback_bootstrap-italia-alert).
+  // Bootstrap Italia ne disegna già una via ::before.
   const aiConsentText =
     event.aiConsentDisclosure && event.aiConsentDisclosure.trim()
       ? event.aiConsentDisclosure
@@ -700,8 +923,9 @@ export default function WaitingRoom({
   ) : null;
 
   // Consenso esplicito alla registrazione per-partecipante (multitrack):
-  // hard-gate. Senza la spunta, `canEnter` è false e il CTA resta disabilitato
-  // → non si entra. Non è un <Alert> (serve un input + evita l'icona ::before).
+  // hard-gate. Senza la spunta, `canEnter` è false e il CTA non fa entrare —
+  // premerlo porta il fuoco sulla casella. Non è un <Alert> (serve un input +
+  // evita l'icona ::before).
   const multitrackConsentBlock = multitrackRequired ? (
     <div
       className="rounded-3 p-3 text-start"
@@ -720,6 +944,7 @@ export default function WaitingRoom({
           id="waiting-multitrack-consent"
           checked={multitrackConsent}
           onChange={(e) => setMultitrackConsent(e.target.checked)}
+          aria-describedby={!multitrackConsent ? MESSAGGIO_DEL_BLOCCO.consent : undefined}
         />
         <label
           className="form-check-label"
@@ -730,7 +955,11 @@ export default function WaitingRoom({
         </label>
       </div>
       {!multitrackConsent && (
-        <div className="small text-muted mt-2" style={{ fontSize: '0.78rem' }}>
+        <div
+          id={MESSAGGIO_DEL_BLOCCO.consent}
+          className="small text-muted mt-2"
+          style={{ fontSize: '0.78rem' }}
+        >
           {t('multitrackConsentRequired')}
         </div>
       )}
@@ -770,7 +999,7 @@ export default function WaitingRoom({
   ) : null;
 
   const backLinkBlock = isPublished ? (
-    <Link href={`/events/${event.slug}`}>
+    <Link href={percorso(`/events/${event.slug}`)}>
       <Button color="primary" outline tag="span" size="sm">
         <Icon icon="it-arrow-left" size="xs" className="me-1" />
         {tc('back')}
@@ -782,7 +1011,7 @@ export default function WaitingRoom({
   // time (warming-up implies not LIVE, JVB only LIVE). Rendered as plain
   // styled divs — NOT <Alert> — because Bootstrap Italia's .alert draws an
   // icon via ::before (reserved padding-left:4em) and the leading <Spinner>
-  // would collide with it (see feedback_bootstrap-italia-alert). The div
+  // would collide with it. The div
   // owns its own spinner+border layout, like multitrackConsentBlock.
   const statusBanners = (
     <>
@@ -810,17 +1039,25 @@ export default function WaitingRoom({
           aria-live="polite"
         >
           <div className="d-flex align-items-start">
-            <Spinner active small className="me-2 mt-1 flex-shrink-0" />
+            {/* Senza scaler non c'è niente in accensione: un orologio, non
+                uno spinner. */}
+            {warmup?.phase === 'scheduled' ? (
+              <Icon icon="it-clock" size="sm" className="me-2 mt-1 flex-shrink-0" />
+            ) : (
+              <Spinner active small className="me-2 mt-1 flex-shrink-0" />
+            )}
             <div className="flex-grow-1">
               <div className="d-flex justify-content-between align-items-baseline flex-wrap gap-2">
                 <strong>
-                  {warmup?.phase === 'ready'
-                    ? t('warmup.almostReady')
-                    : warmup?.phase === 'starting'
-                      ? (warmupElapsed ?? 0) >= 75
-                        ? t('warmup.provisioningNode')
-                        : t('warmup.startingBridge')
-                      : t('warmup.queued')}
+                  {warmup?.phase === 'scheduled'
+                    ? t('warmup.scheduled')
+                    : warmup?.phase === 'ready'
+                      ? t('warmup.almostReady')
+                      : warmup?.phase === 'starting'
+                        ? (warmupElapsed ?? 0) >= 75
+                          ? t('warmup.provisioningNode')
+                          : t('warmup.startingBridge')
+                        : t('warmup.queued')}
                 </strong>
                 {warmupElapsed !== null && warmupElapsed > 0 && (
                   // aria-hidden: la banda è una live region (role=status +
@@ -839,9 +1076,11 @@ export default function WaitingRoom({
                 )}
               </div>
               <div className="mt-1">
-                {warmup?.phase === 'ready'
-                  ? t('warmup.almostReadyDetail')
-                  : t('warmup.honestHint')}
+                {warmup?.phase === 'scheduled'
+                  ? t('warmup.scheduledDetail')
+                  : warmup?.phase === 'ready'
+                    ? t('warmup.almostReadyDetail')
+                    : t('warmup.honestHint')}
               </div>
             </div>
           </div>
@@ -873,7 +1112,10 @@ export default function WaitingRoom({
           <div className="display-6 fw-bold font-monospace lh-1">{liveCountdown}</div>
         </div>
       )}
-      {isPublished && isModerator && onStartEvent && (
+      {/* Anche in preparazione o in pausa: se nessuno porta la sala a LIVE (lo
+          scaler è fermo, o non c'è), il moderatore deve poterla aprire lui.
+          Non oltre la fine: l'evento non si è tenuto. */}
+      {canStartManually(event.status) && !notHeld && isModerator && onStartEvent && (
         <Button
           color="success"
           size="lg"
@@ -894,17 +1136,66 @@ export default function WaitingRoom({
           )}
         </Button>
       )}
-      {canEnterLive ? (
-        <Button
-          color="primary"
-          size="lg"
-          className="fw-semibold"
-          onClick={handleEnterLive}
-          disabled={!canEnter}
-        >
-          <Icon icon="it-video" size="sm" color="white" className="me-2" />
-          {t('joinNowBtn')}
-        </Button>
+      {canEnterLive && !ingressoConsentito ? (
+        // Entrare prima che il ponte video esista significa arrivare in una
+        // stanza che non c'e': si resta qui, e lo si dice. Passato il minuto
+        // si torna al pulsante normale — si entra, senza pero' promettere che
+        // dall'altra parte ci sia qualcuno.
+        <>
+          <Button color="primary" size="lg" className="fw-semibold" disabled>
+            <Spinner active small className="me-2" />
+            {t('roomNotReadyButton')}
+          </Button>
+          {canPlay && !gameOpen && (
+            <Button
+              color="primary"
+              outline
+              className="fw-semibold"
+              innerRef={piazzaAttesaRef}
+              onClick={() => setGameOpen(true)}
+            >
+              <span className="me-2" aria-hidden="true">🌿</span>
+              {t('roomNotReadyPiazza')}
+            </Button>
+          )}
+        </>
+      ) : canEnterLive ? (
+        <>
+          {/* Il colore e il battito non arrivano a chi non guarda lo schermo, e
+              l'etichetta che cambia dentro un pulsante non a fuoco non viene
+              letta: l'apertura va detta a voce, qui. */}
+          <p className="visually-hidden" role="status">
+            {annuncio ? t(annuncio) : ''}
+          </p>
+          {/* Il campo del nome sta sopra l'anteprima della fotocamera: chi
+              guarda il pulsante spesso non lo vede. Il motivo lo si ripete qui
+              per gli occhi; il lettore di schermo lo riceve una volta sola,
+              come descrizione del pulsante. Il consenso non serve ripeterlo:
+              il suo riquadro sta subito sopra. */}
+          {(bloccoSpiegato === 'name' || bloccoSpiegato === 'email') && (
+            <p
+              className="d-flex align-items-start justify-content-center text-center mb-0"
+              style={{ fontSize: '0.85rem', color: bloccoSpiegato === 'name' && !nomeSegnalato ? '#6B4400' : '#A1112E' }}
+              aria-hidden="true"
+            >
+              <Icon icon="it-warning-circle" size="xs" className="me-1 mt-1 flex-shrink-0" style={{ fill: 'currentColor' }} />
+              <span>{bloccoSpiegato === 'name' ? t('nameRequiredToEnter') : t('emailInvalid')}</span>
+            </p>
+          )}
+          {/* Premibile anche a modulo incompleto: premerlo dice cosa manca e
+              porta sul campo. Resta spento solo cio' che non dipende dalla
+              persona — la sala che si prepara, l'ora d'apertura. */}
+          <Button
+            color={evidenziaCta ? 'success' : 'primary'}
+            size="lg"
+            className={`fw-semibold${evidenziaCta ? ' wr-cta-pronta' : ''}`}
+            onClick={handleEnterLive}
+            aria-describedby={bloccoSpiegato ? MESSAGGIO_DEL_BLOCCO[bloccoSpiegato] : undefined}
+          >
+            <Icon icon="it-video" size="sm" color="white" className="me-2" />
+            {evidenziaCta ? t('roomJustOpened') : t('joinNowBtn')}
+          </Button>
+        </>
       ) : isWarmingUp ? (
         <Button color="primary" size="lg" className="fw-semibold" disabled>
           <Spinner active small className="me-2" />
@@ -934,7 +1225,7 @@ export default function WaitingRoom({
           verso la stessa pagina evento — evitiamo il doppione. */}
       {exitHref && !isEnded && !isPublished && (
         <Link
-          href={exitHref}
+          href={percorso(exitHref)}
           className="btn btn-outline-secondary btn-sm mt-1"
           style={{ justifySelf: 'center' }}
         >
@@ -959,7 +1250,6 @@ export default function WaitingRoom({
   // ingombrante per essere un ornamento) e la seconda ha smesso di stare in una
   // scatola: si apre a piena pagina, con dentro tutto il necessario — nome,
   // controlli, ingresso in call — e un'uscita che riporta qui.
-  const canPlay = !isEnded && !classicView && !multitrackRequired;
 
   // La piazza non è una pagina DIVERSA: è QUESTA pagina, ri-disposta accanto
   // alla scena. Il primo tentativo duplicava i controlli in un pannello
@@ -998,6 +1288,7 @@ export default function WaitingRoom({
           status={event.status}
           startsAtMs={startsAtMs}
           isHost={isModerator}
+          salaPronta={salaPronta}
           onEnterLive={handleGameEnter}
           onExitClassic={goClassic}
         />
@@ -1017,8 +1308,33 @@ export default function WaitingRoom({
           <button type="button" className="wr-piazza-btn" onClick={goClassic}>
             {t('classicVersion')}
           </button>
-          {isLive && (
-            <p className="wr-piazza-hint mb-0">{t('gardenGateHint')}</p>
+          {/* Chi e' nella piazza non vede la colonna dei controlli: se il
+              cancello e' chiuso, qui dentro non c'e' altra strada. Finche' la
+              stanza non risulta allestita il cordone resta — non si promette
+              cio' che non si sa — ma scaduta l'attesa si offre lo stesso
+              passaggio che ha chi e' rimasto nella sala classica. */}
+          {isLive && !salaPronta && (
+            <p className="wr-piazza-hint mb-0">{t('roomNotReadyButton')}</p>
+          )}
+          {/* Premibile anche a modulo incompleto, come «Entra» nella colonna:
+              premerlo porta sul campo che manca. */}
+          {isLive && !salaPronta && ingressoConsentito && (
+            <button
+              type="button"
+              className="wr-piazza-btn"
+              onClick={handleEnterLive}
+              aria-describedby={bloccoSpiegato ? MESSAGGIO_DEL_BLOCCO[bloccoSpiegato] : undefined}
+            >
+              {t('enterAnyway')}
+            </button>
+          )}
+          {/* Senza nome il cancello respinge: invece di invitare a camminarci
+              dentro, qui sopra la scena — dove la persona sta guardando — si
+              dice cosa manca. */}
+          {isLive && salaPronta && (
+            <p className="wr-piazza-hint mb-0">
+              {bloccoSpiegato === 'name' ? t('nameRequiredToEnter') : t('gardenGateHint')}
+            </p>
           )}
         </div>
       </div>
@@ -1039,7 +1355,10 @@ export default function WaitingRoom({
   // L'invito al gioco: un riquadro nella colonna principale, sotto i controlli.
   // È il "pulsante o infografica" chiesto — un gesto esplicito, non una scena
   // che parte addosso a chi è arrivato per prepararsi.
-  const gameInvite = canPlay && !gameOpen ? (
+  // L'invito alla piazza: uno solo per schermata. Finche' si resta in attesa la
+  // proposta sta gia' sotto al pulsante d'ingresso, dove serve — qui sarebbe la
+  // stessa cosa detta due volte.
+  const gameInvite = canPlay && !gameOpen && ingressoConsentito ? (
     <button
       type="button"
       className="wr-game-invite"
@@ -1099,7 +1418,7 @@ export default function WaitingRoom({
                 )}
                 {isEnded && (
                   <Badge color="" pill className="px-3 py-2 position-absolute" style={{ top: 12, right: 12, fontSize: '0.75rem', backgroundColor: '#E9ECEF', color: 'var(--app-muted)' }}>
-                    {t('endedTitle')}
+                    {notHeld ? t('notHeldBadge') : t('endedTitle')}
                   </Badge>
                 )}
               </div>
@@ -1168,6 +1487,10 @@ export default function WaitingRoom({
                   <div className="mb-4">{statusBanners}</div>
                 )}
 
+                {/* Da http:// il browser nega microfono e videocamera: lo si dice
+                    qui, con l'indirizzo sicuro, invece di una prova dei
+                    dispositivi che chiede un permesso impossibile. */}
+                {!isEnded && <InsecureContextNotice className="mb-3" />}
                 {!isEnded && <div className="mb-3">{nameField}</div>}
                 {/* Email: solo per gli ospiti (i registrati l'hanno già data,
                     per moderatori/speaker è irrilevante). Il valore non è ancora
@@ -1178,13 +1501,22 @@ export default function WaitingRoom({
                 )}
                 {!isEnded && <div className="mb-3">{deviceCheckField}</div>}
 
-                {isPublished && event.waitingRoomAudioUrl && (
+                {isPublished && !notHeld && event.waitingRoomAudioUrl && (
                   <div className="mb-4 d-flex justify-content-center">
                     <AudioPlayer audioUrl={event.waitingRoomAudioUrl} />
                   </div>
                 )}
 
-                {isEnded ? (
+                {notHeld ? (
+                  <div className="mb-3" role="status">
+                    <h2 className="h5 fw-semibold mb-1" style={{ color: 'var(--app-text)' }}>
+                      {t('notHeldTitle')}
+                    </h2>
+                    <p className="text-muted mb-0" style={{ fontSize: '0.9rem' }}>
+                      {t('notHeldDetail')}
+                    </p>
+                  </div>
+                ) : isEnded ? (
                   <div className="d-grid gap-2 mb-3">
                     <h2 className="h5 fw-semibold mb-1" style={{ color: 'var(--app-text)' }}>
                       {t('endedTitle')}
@@ -1246,7 +1578,7 @@ export default function WaitingRoom({
                 {aiNoticeBlock && <div className="mb-3">{aiNoticeBlock}</div>}
                 {backLinkBlock && <div className="text-center">{backLinkBlock}</div>}
 
-                {isPublished && !isModerator && (
+                {isPublished && !notHeld && !isModerator && (
                   <p className="text-center text-muted mt-3 mb-0" style={{ fontSize: '0.8rem' }}>
                     <Icon icon="it-refresh" size="xs" className="me-1" />
                     {t('autoRefreshHint')}

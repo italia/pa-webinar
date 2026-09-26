@@ -162,7 +162,7 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0] if __doc__ else "")
     ap.add_argument("--subscription", required=True, help="Azure subscription id")
     ap.add_argument("--resource-group", required=True, help="Resource group name")
-    ap.add_argument("--tenant", required=True, help="Tenant identifier (e.g. videocall-prod)")
+    ap.add_argument("--tenant", required=True, help="Tenant identifier (e.g. <tenant>)")
     ap.add_argument("--output", required=True, help="Path to write services JSON")
     args = ap.parse_args()
 

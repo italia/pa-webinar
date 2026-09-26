@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslations, useFormatter } from 'next-intl';
 import { Badge, Button, Card, CardBody, Input } from 'design-react-kit';
 
-import { Link } from '@/i18n/navigation';
+import { Link, percorso } from '@/i18n/navigation';
 import { useToast } from '@/components/ui/toast';
 import { SkeletonLines } from '@/components/ui/skeleton';
 
@@ -43,7 +43,7 @@ interface ApiResponse {
 
 type Tab = 'all' | 'scheduled' | 'instant' | 'legacy' | 'pending';
 
-export default function PublicationsDashboard({ locale }: { locale: string }) {
+export default function PublicationsDashboard() {
   const t = useTranslations('admin.publications');
   const tc = useTranslations('common');
   const fmt = useFormatter();
@@ -99,7 +99,6 @@ export default function PublicationsDashboard({ locale }: { locale: string }) {
 
   const counters = data?.counters;
 
-  const eventHrefBase = locale === 'en' ? '/events' : '/eventi';
 
   const tabs = useMemo<{ id: Tab; label: string; count?: number }[]>(
     () => [
@@ -253,12 +252,12 @@ export default function PublicationsDashboard({ locale }: { locale: string }) {
                         </p>
                       )}
                       <div className="d-flex gap-2 flex-wrap">
-                        <Link href={`/admin/events/${r.id}`}>
+                        <Link href={percorso(`/admin/events/${r.id}`)}>
                           <Button color="secondary" outline size="xs" tag="span">
                             {t('actions.edit')}
                           </Button>
                         </Link>
-                        <Link href={`${eventHrefBase}/${r.slug}`}>
+                        <Link href={percorso(`/events/${r.slug}`)}>
                           <Button color="secondary" outline size="xs" tag="span">
                             {t('actions.preview')}
                           </Button>

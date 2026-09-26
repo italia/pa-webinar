@@ -29,6 +29,20 @@ export type AdhocQuestionType =
   | 'LIKERT'
   | 'OPEN_TEXT';
 
+/**
+ * Il questionario com'è nel database, per le parti che questa schermata non
+ * mostra: le altre lingue, le etichette agli estremi delle scale, il titolo,
+ * l'obbligatorietà. Il wizard le trasporta senza toccarle, così salvare non
+ * cancella quello che non si è potuto nemmeno vedere — capita a un evento
+ * copiato, che eredita un questionario curato altrove.
+ */
+export interface AdhocQuestionOriginal {
+  prompt: Record<string, string>;
+  options?: unknown;
+  scaleMinLabel?: unknown;
+  scaleMaxLabel?: unknown;
+}
+
 export interface AdhocQuestionDraft {
   prompt: string;
   type: AdhocQuestionType;
@@ -36,11 +50,22 @@ export interface AdhocQuestionDraft {
   scaleMin: number | null;
   scaleMax: number | null;
   required: boolean;
+  /** Presente solo per una domanda caricata dal database. */
+  original?: AdhocQuestionOriginal;
+}
+
+export interface QuestionnaireOriginal {
+  title: unknown;
+  description: unknown;
+  required: boolean;
+  allowEdit: boolean;
 }
 
 export interface QuestionnaireBlock {
   templateIds: string[];
   adhocQuestions: AdhocQuestionDraft[];
+  /** Presente solo per un questionario già esistente. */
+  original?: QuestionnaireOriginal;
 }
 
 export interface Step4Value {
@@ -498,6 +523,7 @@ function MaterialsSection({
   onChange: (next: MaterialDraft[]) => void;
 }) {
   const t = useTranslations('admin.wizard.step4');
+  const tMaterials = useTranslations('admin.materials');
   const [draft, setDraft] = useState<MaterialDraft>({
     title: '',
     url: '',
@@ -602,6 +628,7 @@ function MaterialsSection({
             <select
               id="mat-vis"
               className="form-select"
+              aria-describedby="mat-vis-help"
               value={draft.visibility}
               onChange={(e) =>
                 setDraft({
@@ -615,6 +642,12 @@ function MaterialsSection({
               <option value="DURING">{t('visibility.DURING')}</option>
               <option value="AFTER">{t('visibility.AFTER')}</option>
             </select>
+            {/* Il predefinito non compare sulla pagina pubblica prima
+                dell'inizio: senza dirlo, chi carica le slide in anticipo si
+                aspetterebbe di vederle lì (lib/events/material-visibility). */}
+            <div id="mat-vis-help" className="form-text">
+              {tMaterials('visibilityHelp')}
+            </div>
           </div>
           <div className="col-md-6 d-flex align-items-end">
             <button

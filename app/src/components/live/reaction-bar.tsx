@@ -93,7 +93,7 @@ export default function ReactionBar({ eventSlug }: ReactionBarProps) {
         ))}
       </div>
 
-      {/* Always-visible reaction bar (F6) — no collapse, so it's findable at a
+      {/* Always-visible reaction bar — no collapse, so it's findable at a
           glance instead of hidden behind a 😊 trigger. */}
       <div className="reaction-overlay__bar" role="group" aria-label={t('title')}>
         {EMOJIS.map((emoji) => (

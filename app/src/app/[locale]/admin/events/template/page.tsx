@@ -1,17 +1,15 @@
-import { cookies } from 'next/headers';
-import { redirect } from 'next/navigation';
 import { getTranslations, getLocale } from 'next-intl/server';
 
-import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { soloAdmin } from '@/lib/auth/staff-page';
 import { prisma } from '@/lib/db';
+import { getPublicEnv } from '@/lib/env';
+import { resolveWhiteboardInfraReady } from '@/lib/jitsi/whiteboard';
 import TemplateManagement from '@/components/admin/template-management';
 
 export default async function TemplatesPage() {
   const locale = await getLocale();
-  const isAdmin = await isAdminAuthenticated(await cookies());
-  if (!isAdmin) {
-    redirect(`/${locale}/admin/login`);
-  }
+  const negato = await soloAdmin(locale);
+  if (negato) return negato;
 
   const t = await getTranslations('admin.templates');
 
@@ -35,7 +33,13 @@ export default async function TemplatesPage() {
         </h1>
         <p className="text-secondary mb-0">{t('subtitle')}</p>
       </div>
-      <TemplateManagement templates={serialized} />
+      <TemplateManagement
+        templates={serialized}
+        // Letto a runtime come nella sala (lib/jitsi/whiteboard.ts).
+        whiteboardInfraReady={resolveWhiteboardInfraReady(
+          getPublicEnv('NEXT_PUBLIC_WHITEBOARD_ENABLED'),
+        )}
+      />
     </div>
   );
 }

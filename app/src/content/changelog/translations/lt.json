@@ -1,4 +1,37 @@
 {
+  "0.12.0": {
+    "title": "Paruošta pakartotiniam naudojimui: įdiegiama viena komanda, o renginiai vyksta patys",
+    "notes": [
+      "Diegimas viena komanda: kompiuteryje su minikube bandymams ir kūrimui, k3s serveryje gamybinei aplinkai, su sertifikatais, bandomąja pašto dėžute, objektų saugykla, TURN ir suplanuotomis atsarginėmis kopijomis. Kiekvieną diegimą galima patikrinti viena komanda, duomenų bazės ir failų atsarginis kopijavimas ir atkūrimas turi savo scenarijus, o dokumentacijoje, dabar anglų kalba, yra vadovai minikube, k3s, AKS, GKE ir EKS bei kontroliniai sąrašai paleidimui į gamybą.",
+      "Renginiai atsidaro pradžios metu ir užsidaro pabaigoje net diegimuose, kuriuose vaizdo tiltai nepaleidžiami automatiškai. Mygtukas „Pradėti renginį“ visada pasiekiamas renginį vedančiam asmeniui, o renginys nebeužstringa būsenoje „Ruošiamasi“.",
+      "Vardinės paskyros personalui: administratoriai ir organizatoriai prisijungia asmenine nuoroda, gauta el. paštu, ir kiekvienas mato tik tai, ką leidžia jo vaidmuo. Egzemplioriaus raktas lieka pirmajam prisijungimui ir avariniams atvejams.",
+      "El. laiškai italų, anglų, prancūzų, vokiečių ir ispanų kalbomis, gavėjo kalba. Moderatorių ir pranešėjų asmeninės nuorodos siunčiamos el. paštu, priminimai nebeateina visi vienu metu, o kalendoriaus kvietimai nebesidubliuoja.",
+      "Vaizdo konferencijoje vaidmuo priklauso nuo nuorodos, kuria prisijungiama: svečiai ir užsiregistravusieji yra dalyviai ir nebegali nutildyti ar pašalinti moderatoriaus.",
+      "Salėje: klausimai, balsavimas ir žodžių debesis veikia ir svečiams bei pranešėjams; medžiaga priima ne tik nuorodas, bet ir failus; kas išeina pats, gali grįžti, užuot matęs „Renginys baigėsi“; jei vaizdo konferencija nepasiekiama, salė tai praneša ir siūlo „Bandyti dar kartą“; dalyvių kamera ir mikrofonas iš pradžių būna išjungti; virtualų foną galima pasirinkti jau laukiamajame.",
+      "Privatumas: pokalbis nebeperduoda esantiesiems svečių IP adreso; nuorodos savo duomenims eksportuoti ar ištrinti veda teisingu adresu; pranešimas apie įrašymą ir sutikimas rodomi visur, kur kas nors gali įrašinėti.",
+      "Būsenos puslapis tikrina paslaugas iš vidaus ir nebepraneša apie gedimą dėl neviešo sertifikato; diegimai su fiksuotu vaizdo tiltu rodomi teisingai.",
+      "Administravimas: antrinių moderatorių ir pranešėjų atšaukimas vediklyje dabar tikrai veikia, vediklis praneša, kas neišsaugota, o paskelbus patenkama į renginio puslapį. Greitieji skambučiai nebeturi viešo puslapio, o bendrinamos nuorodos rodo renginio peržiūrą.",
+      "Atnaujinantiems: Prosody, Jicofo, žiniatinklio konferencija ir vaizdo tiltas vieną kartą paleidžiami iš naujo, todėl verta atnaujinti, kai nevyksta renginiai; kas turi savų Prosody tomų ar modulių, turi pridėti ir chart pateikiamus; be mastelio keitiklio tiesioginiai renginiai dabar užsidaro pabaigoje, praėjus lengvatiniam laikui."
+    ]
+  },
+  "0.11.0": {
+    "title": "Salė dabar reaguoja tą akimirką, kai kas nors pasikeičia",
+    "notes": [
+      "Klausimai, apklausos, darbotvarkė ir žodžių debesis atnaujinami vos kam nors pasikeitus, užuot kas kelias sekundes kreipęsi į serverį: esantysis salėje mato klausimą iškart, o gausiame renginyje srautas smarkiai sumažėja.",
+      "Mažiau darbo ir serveriui: periodiniai salės patikrinimai dabar prašo tik reikalingų duomenų, o medžiaga — kuri keičiasi retai — tikrinama rečiau.",
+      "Jei tiesioginis ryšys neprieinamas, salė pati grįžta prie ankstesnio periodinio tikrinimo: dėl naujo mechanizmo nė viena funkcija nenustoja veikti.",
+      "Pataisymai: atvėrus du naujus žodžių debesis netrukus vienas po kito vienas jų galėjo likti nematomas, o ten išsiųsti žodžiai niekam nepasirodydavo; paslaugos būsenos puslapis visada skelbdavo tą patį versijos numerį, o ne tą, kuris iš tikrųjų veikė."
+    ]
+  },
+  "0.10.0": {
+    "title": "Klausimai pokalbyje, paprastesnės pasikartojančios serijos ir atkurtos institucinės spalvos",
+    "notes": [
+      "Rašantis pokalbyje gali pažymėti savo pranešimą kaip klausimą: moderatoriai jį pažymi kaip atsakytą arba atideda, o filtras parodo tik klausimus. Renginio metu nereikia stebėti antro kanalo.",
+      "Pokalbio klausimai kartu su gautomis reakcijomis atsiranda viešame renginio apžvalgos puslapyje ir lieka įskaitomi net ištrynus dalyvių asmens duomenis.",
+      "Pasirengti kitam serijos renginiui greičiau: renginio kopija perima gaires, organizatorius, bendramoderatorius (kiekvienam nauji prieigos duomenys), programą, klausimynus ir priminimus, o šablonai išsaugo įrašymo ir tolesnio apdorojimo nuostatas.",
+      "Pataisymai: institucinės spalvos vėl tokios, kokios turi būti – juosta svetainės viršuje atrodė balta –, renginio kopiją kuriantis mygtukas nebeveda į neegzistuojantį puslapį, o pasibaigus saugojimo laikui ištrinami ir pakviestųjų bei paskirtų moderatorių ir pranešėjų kontaktai."
+    ]
+  },
   "0.9.0": {
     "title": "Priklausomybių saugumas, suderinta dokumentacija ir pilna vietinė aplinka",
     "notes": [

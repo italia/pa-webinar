@@ -4,6 +4,8 @@ import { useState, useCallback, useEffect, useRef, type FormEvent } from 'react'
 import { useTranslations } from 'next-intl';
 import { Button, Alert } from 'design-react-kit';
 
+import { questionSubmitBody, questionSubmitError } from './question-request';
+
 const MAX_LENGTH = 500;
 const COOLDOWN_SECONDS = 30;
 
@@ -13,6 +15,10 @@ interface QuestionFormProps {
   /** Guest display name (from waiting-room). Used when `token` is empty
    *  so anonymous attendees can still post questions. */
   guestName?: string;
+  /** Identificativo stabile del browser, inviato insieme al nome quando
+   *  manca il token: è la chiave del limite di frequenza per persona. Senza,
+   *  il server ricade sull'indirizzo IP, condiviso da un ufficio intero. */
+  guestId?: string;
   onSubmitted: () => void;
 }
 
@@ -20,6 +26,7 @@ export default function QuestionForm({
   eventSlug,
   token,
   guestName,
+  guestId,
   onSubmitted,
 }: QuestionFormProps) {
   const t = useTranslations('qa');
@@ -67,19 +74,19 @@ export default function QuestionForm({
         const res = await fetch(`/api/events/${eventSlug}/questions`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            text: text.trim(),
-            ...(token ? { accessToken: token } : { guestName }),
-          }),
+          body: JSON.stringify(
+            questionSubmitBody(text.trim(), token, { guestName, guestId }),
+          ),
         });
 
-        if (res.status === 429) {
-          setError(t('errors.rateLimit'));
-          return;
-        }
-
         if (!res.ok) {
-          setError(t('errors.generic'));
+          let code: string | undefined;
+          try {
+            code = ((await res.json()) as { code?: string }).code;
+          } catch {
+            // Risposta non JSON (un proxy): conta solo lo stato.
+          }
+          setError(t(`errors.${questionSubmitError(res.status, code)}`));
           return;
         }
 
@@ -95,7 +102,7 @@ export default function QuestionForm({
         setSubmitting(false);
       }
     },
-    [text, eventSlug, token, guestName, t, startCooldown, onSubmitted],
+    [text, eventSlug, token, guestName, guestId, t, startCooldown, onSubmitted],
   );
 
   const remaining = MAX_LENGTH - text.length;

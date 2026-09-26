@@ -1,0 +1,179 @@
+# ============================================================================
+# k3s in sede (uno o tre nodi) — si sovrappone al profilo semplice
+# ============================================================================
+#
+# Il nodo si prepara con gli script di infra/onprem/k3s/ (k3s a versione
+# fissata, Traefik che vede l'indirizzo dei client, buffer UDP del bridge):
+# vedi infra/onprem/k3s/README.md. Poi, dalla radice del repository:
+#
+#   helm upgrade --install pa-webinar ./infra/helm/pa-webinar \
+#     -n pa-webinar --create-namespace \
+#     -f infra/helm/pa-webinar/examples/values-simple.yaml \
+#     -f infra/helm/pa-webinar/examples/values-k3s.yaml \
+#     -f <dominio.yaml> -f <segreti.yaml> \
+#     --wait --timeout 15m
+#
+# <dominio.yaml> porta i due nomi DNS, entrambi puntati sul nodo che serve
+# Traefik (con tre nodi: quello con l'etichetta di ServiceLB), e la versione
+# delle immagini. Lo stesso file va passato a preload-images.sh. Dai due nomi
+# il chart ricava gli indirizzi del portale e gli host dei due Ingress;
+# `publicURL` va scritto perché è un valore del sottochart della conferenza:
+#
+#   site:
+#     portalHost: <portale>
+#     conferenceHost: <conferenza>
+#   app:
+#     image:
+#       tag: "<X.Y.Z>"                # il rilascio, senza la v
+#     migration:
+#       image:
+#         tag: "v<X.Y.Z>-migrate"     # con la v del tag git
+#   jitsi-meet:
+#     publicURL: https://<conferenza>
+#
+# <segreti.yaml>, tenuto fuori dal repository: i segreti elencati in testa a
+# values-simple.yaml e le due password XMPP interne, generati una volta e
+# ripassati identici a ogni aggiornamento (qui sotto la resa si ferma se le
+# password mancano).
+#
+# Immagini: entrambi i tag si scrivono, sempre. Senza, il chart usa
+# appVersion e ne ricava per le migrazioni `<X.Y.Z>-migrate`, una forma che
+# esiste solo per i rilasci pubblicati da quando il flusso di rilascio la
+# produce; `v<X.Y.Z>-migrate` esiste per tutti. Con il tag sbagliato
+# l'initContainer delle migrazioni resta in ImagePullBackOff e l'installazione
+# arriva al timeout. Il registro oggi chiede credenziali anche in lettura:
+# preload-images.sh preleva le immagini su una macchina che le ha e le
+# importa nei nodi, che così non vedono mai una credenziale e possono anche
+# non avere accesso a Internet.
+# ============================================================================
+
+jitsi:
+  # Senza password XMPP fissate ogni `helm upgrade` riavvia Prosody, Jicofo e
+  # il bridge, e fa cadere le chiamate in corso: la resa si ferma finché non
+  # sono passate.
+  requirePinnedCredentials: true
+  # L'Ingress della conferenza lo rende il chart (quello del sottochart è
+  # spento più sotto): l'host viene da site.conferenceHost, e le annotazioni
+  # si tolgono davvero con null.
+  conferenceIngress:
+    enabled: true
+    className: traefik
+    annotations:
+      # Come per il portale, qui sotto.
+      cert-manager.io/cluster-issuer: null
+    # Come per il portale: vuoto = certificato autofirmato di Traefik. Per un
+    # evento vero, un certificato riconosciuto dai browser:
+    #   tls:
+    #     - secretName: <secret-tls-della-conferenza>
+    # (gli host si omettono: vale site.conferenceHost).
+    tls: []
+
+# ── Portale su Traefik ───────────────────────────────────────
+ingress:
+  # `traefik` è in ingress.nonNginxClassNames: il chart toglie da solo le
+  # annotazioni di ingress-nginx.
+  className: traefik
+  annotations:
+    # Senza cert-manager nel cluster l'annotazione non serve a nulla. Si
+    # toglie la riga se si installa cert-manager con un ClusterIssuer di
+    # questo nome.
+    cert-manager.io/cluster-issuer: null
+  # Vuoto: Traefik serve il suo certificato autofirmato, buono solo per una
+  # prova. Per un evento vero un certificato riconosciuto dai browser, per
+  # esempio quello dell'ente caricato in un Secret TLS:
+  #   kubectl -n pa-webinar create secret tls pa-webinar-tls \
+  #     --cert=<catena.pem> --key=<chiave.pem>
+  #   tls:
+  #     - secretName: pa-webinar-tls
+  # (gli host si omettono: vale site.portalHost).
+  tls: []
+
+# Traefik di k3s, con la HelmChartConfig di infra/onprem/k3s, riscrive
+# X-Forwarded-For con l'indirizzo del client: il valore predefinito di
+# TRUSTED_PROXY_HOPS (0) è quello giusto. Dietro un bilanciatore o un WAF che
+# aggiunge la propria voce, e che Traefik considera fidato
+# (forwardedHeaders.trustedIPs in traefik-config.yaml), uno in più per ogni
+# salto: sono le righe di `env` qui sotto.
+# Con tre nodi, il portale su un nodo noto (i CronJob lo ereditano): se quel
+# nodo si spegne, il portale va giù. Il nome è quello di `kubectl get nodes`,
+# cioè il nome dell'host in minuscolo. Togliendo il primo `# ` di ogni riga,
+# quelle di `env` restano commentate:
+# app:
+#   nodeSelector:
+#     kubernetes.io/hostname: <nodo-portale>
+#   # env:
+#   #   TRUSTED_PROXY_HOPS: "1"
+
+# ── Rete ─────────────────────────────────────────────────────
+# k3s applica le NetworkPolicy da sé (kube-router), e Traefik gira in
+# kube-system: è da lì che il portale deve accettare il traffico, ed è lì che
+# il portale va quando chiama i propri nomi pubblici.
+networkPolicy:
+  enabled: true
+  ingress:
+    fromNamespaceSelectors:
+      - kubernetes.io/metadata.name: kube-system
+    # Nessun Prometheus nel cluster di base.
+    allowMonitoring: false
+
+# ── Dati ─────────────────────────────────────────────────────
+postgresql:
+  primary:
+    persistence:
+      # Il provisioner di k3s: una cartella sul disco del nodo in cui il pod
+      # parte la prima volta (/var/lib/rancher/k3s/storage), a cui il volume
+      # resta legato. La dimensione non è un limite, e nessuno fa copie: il
+      # backup del database è dell'ente.
+      storageClass: local-path
+    # Con tre nodi, sullo stesso nodo del portale:
+    # nodeSelector:
+    #   kubernetes.io/hostname: <nodo-portale>
+# redis:
+#   master:
+#     nodeSelector:
+#       kubernetes.io/hostname: <nodo-portale>
+
+# ── Conferenza ───────────────────────────────────────────────
+jitsi-meet:
+  # Immagine web standard (sotto): nessun registro privato da cui prelevare.
+  imagePullSecrets: []
+
+  web:
+    # Immagine standard, alla versione di Jitsi del sottochart. La
+    # soppressione rumore avanzata resta spenta, come già è per impostazione
+    # predefinita dell'applicazione (vedi `jitsi-meet.web.image` in
+    # values.yaml).
+    image:
+      repository: jitsi/web
+      tag: null
+      pullPolicy: IfNotPresent
+    ingress:
+      # Lo rende il chart: jitsi.conferenceIngress, in testa al file.
+      enabled: false
+      ingressClassName: traefik
+      tls: []
+
+  jvb:
+    # Nessun server STUN di terzi: il bridge annuncia l'indirizzo del nodo
+    # (useNodeIP del profilo semplice), che deve essere quello che i
+    # partecipanti raggiungono sulla porta UDP 10000.
+    stunServers: ""
+    # Se il nodo ha un indirizzo privato e il firewall lo pubblica con un NAT
+    # 1:1 o un inoltro di porta, l'indirizzo pubblico va scritto qui, senza
+    # eccezioni: senza, chi è fuori dalla rete entra in sala ma non sente e
+    # non vede nessuno. La porta pubblica deve restare la 10000/udp.
+    # publicIPs: ["<ip-pubblico>"]
+    # Niente `JVB_ADVERTISE_PRIVATE_CANDIDATES: "false"` in extraEnvs: il
+    # bridge scarterebbe ogni indirizzo privato, compreso quello del nodo in
+    # una rete interna, e non annuncerebbe più nessun indirizzo. I
+    # partecipanti entrerebbero in sala senza audio né video.
+    # Con tre nodi, il bridge da solo sul nodo riservato da
+    # install-agent.sh --jvb (o da label-jvb-node.sh), che ha etichetta e
+    # taint `workload=jitsi-jvb`:
+    # nodeSelector:
+    #   workload: jitsi-jvb
+    # tolerations:
+    #   - key: workload
+    #     operator: Equal
+    #     value: jitsi-jvb
+    #     effect: NoSchedule

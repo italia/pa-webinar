@@ -18,7 +18,7 @@
  */
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useTranslations, useFormatter } from 'next-intl';
+import { useTranslations, useFormatter, useLocale } from 'next-intl';
 import {
   Alert,
   Badge,
@@ -28,7 +28,6 @@ import {
   Row,
 } from 'design-react-kit';
 
-const APP_LABEL = 'pa-webinar';
 const REFRESH_MS = 30_000;
 
 type Range = '24h' | '7d' | '30d';
@@ -341,20 +340,66 @@ interface PromSnapshot {
   redisMemorySeries: Array<[number, number]>;
 }
 
+/**
+ * I valori attuali del ponte video che calcola già /api/status: riempiono le
+ * schede della capacità quando Prometheus non c'è. Lo storico resta solo di
+ * Prometheus.
+ */
+interface LiveBridgeValues {
+  participants: number | null;
+  stress: number | null;
+  conferences: number | null;
+  octoSendBitrateBps: number | null;
+}
+
+async function fetchLiveBridgeValues(): Promise<LiveBridgeValues | null> {
+  try {
+    const res = await fetch('/api/status', { cache: 'no-store' });
+    if (!res.ok) return null;
+    const body = (await res.json()) as { metrics?: Record<string, unknown> };
+    const m = body.metrics ?? {};
+    const num = (v: unknown) => (typeof v === 'number' && Number.isFinite(v) ? v : null);
+    return {
+      participants: num(m.jvbParticipants),
+      stress: num(m.jvbStressLevel),
+      conferences: num(m.jvbConferences),
+      octoSendBitrateBps: num(m.jvbOctoSendBitrateBps),
+    };
+  } catch {
+    return null;
+  }
+}
+
 // ─── Main component ─────────────────────────────────────────────
 
-export default function MonitoringDashboard() {
+interface MonitoringDashboardProps {
+  /** L'etichetta `app` delle metriche dell'applicazione (METRICS_APP_LABEL). */
+  appLabel: string;
+  /** Il selettore della serie `up` dell'applicazione (job e namespace). */
+  uptimeSelector: string;
+  /** Uno scaler accende i bridge: senza, il riquadro dello scale-to-zero non ha senso. */
+  jvbScalerEnabled: boolean;
+}
+
+export default function MonitoringDashboard({
+  appLabel,
+  uptimeSelector,
+  jvbScalerEnabled,
+}: MonitoringDashboardProps) {
   const t = useTranslations('admin.monitoring');
   const fmt = useFormatter();
+  const locale = useLocale();
   const [range, setRange] = useState<Range>('7d');
   const [prom, setProm] = useState<PromSnapshot | null>(null);
+  const [live, setLive] = useState<LiveBridgeValues | null>(null);
   const [analytics, setAnalytics] = useState<AnalyticsResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const fetchAll = useCallback(async () => {
     setError(null);
     try {
-      const app = `app="${APP_LABEL}"`;
+      const app = `app="${appLabel}"`;
+      const up = uptimeSelector;
       const bucket = `http_request_duration_seconds_bucket{${app}}`;
       const total = `http_requests_total{${app}}`;
       const [
@@ -397,8 +442,8 @@ export default function MonitoringDashboard() {
         // analytics
         analyticsRes,
       ] = await Promise.all([
-        promQuery(`avg(avg_over_time(up{${app}}[24h])) * 100`),
-        promQuery(`avg(avg_over_time(up{${app}}[7d])) * 100`),
+        promQuery(`avg(avg_over_time(${up}[24h])) * 100`),
+        promQuery(`avg(avg_over_time(${up}[7d])) * 100`),
         promQuery(`histogram_quantile(0.50, sum by (le) (rate(${bucket}[5m])))`),
         promQuery(`histogram_quantile(0.95, sum by (le) (rate(${bucket}[5m])))`),
         promQuery(`histogram_quantile(0.99, sum by (le) (rate(${bucket}[5m])))`),
@@ -419,7 +464,7 @@ export default function MonitoringDashboard() {
         promRangeQuery(`eventi_jvb_participants{${app}}`, range),
         promRangeQuery(`rate(process_cpu_seconds_total{${app}}[5m])`, range),
         promRangeQuery(`process_resident_memory_bytes{${app}}`, range),
-        promRangeQuery(`avg(up{${app}}) * 100`, range),
+        promRangeQuery(`avg(${up}) * 100`, range),
         promRangeQuery(`eventi_jvb_octo_send_bitrate_bps{${app}}`, range),
         // Chat fan-out — app-level counters + the Bitnami redis-exporter.
         // Redis exporter labels the scrape target by the subchart service
@@ -433,7 +478,8 @@ export default function MonitoringDashboard() {
         promRangeQuery(`sum(rate(eventi_chat_messages_total{${app}}[5m])) * 60`, range),
         promRangeQuery(`sum(eventi_chat_sse_connections{${app}})`, range),
         promRangeQuery(`sum(redis_memory_used_bytes)`, range),
-        fetch(`/api/admin/monitoring/analytics?range=${range}`).then((r) => r.json() as Promise<AnalyticsResponse>),
+        fetch(`/api/admin/monitoring/analytics?range=${range}&locale=${encodeURIComponent(locale)}`)
+          .then((r) => r.json() as Promise<AnalyticsResponse>),
       ]);
 
       setProm({
@@ -473,16 +519,28 @@ export default function MonitoringDashboard() {
         redisMemorySeries: extractSeries(redisMemoryRange),
       });
       setAnalytics(analyticsRes);
+      // Senza Prometheus i valori attuali del ponte arrivano da /api/status.
+      setLive(uptime24hRes.available ? null : await fetchLiveBridgeValues());
     } catch (e) {
       setError(e instanceof Error ? e.message : 'fetch error');
     }
-  }, [range]);
+  }, [range, appLabel, uptimeSelector, locale]);
 
   useEffect(() => {
     fetchAll();
     const id = setInterval(fetchAll, REFRESH_MS);
     return () => clearInterval(id);
   }, [fetchAll]);
+
+  // I valori attuali della capacità: da Prometheus quando c'è, altrimenti
+  // quelli che /api/status legge dal ponte video.
+  const capacity = {
+    participants: prom?.jvbParticipants ?? live?.participants ?? null,
+    stress: prom?.jvbStress ?? live?.stress ?? null,
+    conferences: prom?.jvbConferences ?? live?.conferences ?? null,
+    // Lo stesso campo di /colibri/stats in entrambi i casi, nella stessa unità.
+    octoSendBitrate: prom?.jvbOctoSendBitrate ?? live?.octoSendBitrateBps ?? null,
+  };
 
   const bucketData = useMemo(() => {
     if (!analytics) return { events: [], regs: [], calls: [], peaks: [] };
@@ -628,11 +686,14 @@ export default function MonitoringDashboard() {
 
       {/* ─── Capacity / JVB ───────────────────────────────────── */}
       <h5 className="fw-semibold mb-3">{t('sectionCapacity')}</h5>
+      {live && (
+        <p className="text-muted mb-2" style={{ fontSize: '0.78rem' }}>{t('capacityFromStatus')}</p>
+      )}
       <Row className="g-3 mb-4">
         <Col md={3} sm={6}>
           <KpiCard
             title={t('participantsNow')}
-            value={prom?.jvbParticipants !== null && prom?.jvbParticipants !== undefined ? String(Math.round(prom.jvbParticipants)) : '—'}
+            value={capacity.participants !== null ? String(Math.round(capacity.participants)) : '—'}
             color="#008758"
             trend={prom?.participantSeries}
           />
@@ -640,21 +701,21 @@ export default function MonitoringDashboard() {
         <Col md={3} sm={6}>
           <KpiCard
             title={t('jvbStress')}
-            value={prom?.jvbStress !== null && prom?.jvbStress !== undefined ? `${(prom.jvbStress * 100).toFixed(1)}%` : '—'}
-            color={prom && (prom.jvbStress ?? 0) > 0.8 ? '#CC334D' : prom && (prom.jvbStress ?? 0) > 0.5 ? '#A66300' : '#008758'}
+            value={capacity.stress !== null ? `${(capacity.stress * 100).toFixed(1)}%` : '—'}
+            color={(capacity.stress ?? 0) > 0.8 ? '#CC334D' : (capacity.stress ?? 0) > 0.5 ? '#A66300' : '#008758'}
             trend={prom?.stressSeries}
           />
         </Col>
         <Col md={3} sm={6}>
           <KpiCard
             title={t('conferences')}
-            value={prom?.jvbConferences !== null && prom?.jvbConferences !== undefined ? String(Math.round(prom.jvbConferences)) : '—'}
+            value={capacity.conferences !== null ? String(Math.round(capacity.conferences)) : '—'}
           />
         </Col>
         <Col md={3} sm={6}>
           <KpiCard
             title={t('octoRelay')}
-            value={prom?.jvbOctoSendBitrate ? `${(prom.jvbOctoSendBitrate * 8 / 1_000_000).toFixed(1)} Mbps` : '0 Mbps'}
+            value={capacity.octoSendBitrate ? `${(capacity.octoSendBitrate * 8 / 1_000_000).toFixed(1)} Mbps` : '0 Mbps'}
             subtitle={t('interBridge')}
             trend={prom?.octoSeries}
           />
@@ -897,7 +958,9 @@ export default function MonitoringDashboard() {
       )}
 
       {/* ─── Scale-to-zero summary ────────────────────────────── */}
-      {analytics && (
+      {/* Solo con lo scaler: senza, IDLE e l'accensione prima dell'inizio non
+          esistono e il riquadro spiegherebbe un percorso che non c'è. */}
+      {analytics && jvbScalerEnabled && (
         <Card className="border-0 shadow-sm mb-4" style={{ background: '#F8FAFE' }}>
           <CardBody className="p-3">
             <div className="fw-semibold mb-2" style={{ fontSize: '0.88rem' }}>{t('scaleToZeroTitle')}</div>

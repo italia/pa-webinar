@@ -2,7 +2,7 @@ import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 
-import { withErrorHandling } from '@/lib/api-handler';
+import { parseJsonBody, withErrorHandling } from '@/lib/api-handler';
 import { prisma } from '@/lib/db';
 import { NotFoundError, RateLimitError, ValidationError } from '@/lib/errors';
 import { eventParamWhere } from '@/lib/events/event-param';
@@ -21,7 +21,7 @@ const bodySchema = z.object({ accessToken: z.string().min(1).max(256) });
  * as a beacon on intentional close (readyToClose) and on real unload (pagehide
  * with !persisted) while in-call — mirroring how joinedAt is written.
  *
- * Identity binding (F7): joinedAt is only written for the cookie-verified OWNER
+ * Identity binding: joinedAt is only written for the cookie-verified OWNER
  * of the personal link; leftAt must match. So we require the signed
  * `event_access` cookie to carry this same accessToken (sendBeacon sends the
  * same-origin cookie). A forwarded link opened without the cookie is a silent
@@ -39,7 +39,7 @@ export const POST = withErrorHandling(async (request, context) => {
     throw new RateLimitError((rl.resetAt - Date.now()) / 1000);
   }
 
-  const body = await request.json();
+  const body = await parseJsonBody(request);
   const parsed = bodySchema.safeParse(body);
   if (!parsed.success) {
     throw new ValidationError('Invalid leave payload');

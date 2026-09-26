@@ -1,4 +1,37 @@
 {
+  "0.12.0": {
+    "title": "Ready for reuse: one-command installation, and events run on their own",
+    "notes": [
+      "One-command installation: on a computer with minikube to evaluate and develop, on a k3s server for production, with certificates, a test mailbox, object storage, TURN and scheduled backups. Every installation can be checked with one command, database and file backup and restore have their own scripts, and the documentation, now in English, has guides for minikube, k3s, AKS, GKE and EKS and go-live checklists.",
+      "Events open at their start time and close at their end even on installations where video bridges are not started automatically. «Start event» is always available to whoever runs the event, and an event no longer stays stuck while the room is being set up.",
+      "Named staff accounts: administrators and organizers sign in with a personal link sent by email, and each sees only what their role allows. The instance key remains for first access and emergencies.",
+      "Emails in Italian, English, French, German and Spanish, in the recipient's language. Moderators and speakers receive their personal links by email, reminders no longer arrive all at once, and calendar invitations are no longer duplicated.",
+      "In the video conference, the role depends on the link used to join: guests and registrants are participants and can no longer mute or remove the moderator.",
+      "In the room: questions, votes and the word cloud also work for guests and speakers; materials accept files as well as links; people who leave on their own can rejoin instead of seeing «event ended»; if the video conference cannot be reached, the room says so and offers «Retry»; camera and microphone start off for participants; the virtual background can be chosen in the waiting room.",
+      "Privacy: the chat no longer sends guests' IP addresses to the other attendees; the links to export or erase one's data point to the right address; the recording notice and consent appear wherever something can record.",
+      "The status page checks the services from inside and no longer reports an outage because of a non-public certificate; installations with a fixed video bridge are shown correctly.",
+      "Administration: revoking co-moderators and speakers from the wizard really works, the wizard says what was not saved, and publishing lands on the event page. Instant calls no longer have a public page, and shared links show a preview of the event.",
+      "When upgrading: Prosody, Jicofo, the web conference and the video bridge restart once, so upgrade with no event in progress; installations with custom Prosody volumes or modules must add the chart's own; without the scaler, live events now close at their end plus the grace period."
+    ]
+  },
+  "0.11.0": {
+    "title": "The room now reacts the moment something changes",
+    "notes": [
+      "Questions, polls, the agenda and the word cloud update as soon as something changes, instead of re-checking the server every few seconds: people in the room see a question appear straight away, and on a busy event the traffic drops sharply.",
+      "Less work for the server too: the room's periodic checks now ask only for the data they need, and materials — which rarely change — are re-checked less often.",
+      "If the immediate connection is unavailable, the room falls back on its own to the previous periodic check: no feature stops working because of the new mechanism.",
+      "Fixes: opening two new word clouds in quick succession could leave one of them invisible, and words sent to it appeared to nobody; the service status page always reported the same version number instead of the one actually running."
+    ]
+  },
+  "0.10.0": {
+    "title": "Chat questions, simpler recurring series, and institutional colours restored",
+    "notes": [
+      "Anyone writing in the chat can mark their own message as a question: moderators mark it as answered or set it aside, and a filter shows only the questions. There is no second channel to watch during the event.",
+      "Chat questions, together with the reactions they received, now appear on the event's public summary page and stay readable even after participants' personal data has been deleted.",
+      "Preparing the next occurrence of a series is quicker: copying an event carries over tags, organisers, co-moderators (each with fresh access credentials), the agenda, questionnaires and reminders, and templates keep their recording and post-processing settings.",
+      "Fixes: the institutional colours are back to what they should be — the band at the top of the site was showing white —, the button that creates a copy of an event no longer leads to a missing page, and when retention expires the contact details of invitees, named moderators and speakers are deleted too."
+    ]
+  },
   "0.9.0": {
     "title": "Dependency security, documentation realigned, and a complete local stack",
     "notes": [

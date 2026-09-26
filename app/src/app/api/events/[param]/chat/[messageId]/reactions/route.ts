@@ -136,7 +136,7 @@ export const POST = withErrorHandling(async (request, context) => {
     eventId: auth.eventId,
     // Vuoto di proposito: questo envelope arriva a TUTTA la sala, e l'id di chi
     // reagisce non serve a nessun client (i conteggi bastano).
-    senderId: '',
+    senderKey: '',
     senderName: '',
     isModerator: false,
     text: '',

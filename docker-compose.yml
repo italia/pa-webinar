@@ -51,10 +51,23 @@ services:
       - CRON_API_KEY=dev_cron_key_change_in_production
       - ADMIN_API_KEY=dev_admin_key_2026
       - JVB_PRE_SCALE_MINUTES=30
-      - JVB_MAX_REPLICAS=4
+      # Senza scaler è il numero di bridge fissi (come lo scrive il chart):
+      # qui ne gira uno, il servizio jvb.
+      - JVB_MAX_REPLICAS=1
       # Edge-trigger del recorder multi-traccia (opt-in, profilo "recorder").
       # Punta al servizio controller; inerte se il controller non è avviato.
       - RECORDER_CONTROLLER_URL=http://recorder-controller:8080
+      # Sonde della pagina di stato sugli indirizzi interni dei servizi Jitsi,
+      # come le scrive il chart: senza, la sala web e Prosody si sondano
+      # sull'indirizzo pubblico (certificato autofirmato) e Jicofo resta
+      # «non monitorato».
+      - JITSI_WEB_INTERNAL_URL=http://jitsi-web
+      - PROSODY_INTERNAL_URL=http://prosody:5280
+      - JICOFO_HEALTH_URL=http://jicofo:8888
+      # /colibri/stats del bridge (COLIBRI_REST_ENABLED sul servizio jvb).
+      # Lo leggono la pagina di stato e il giro del ciclo di vita, che apre
+      # la sala solo se il bridge risponde.
+      - JVB_HEALTH_URL=http://jvb:8080
     depends_on:
       postgres:
         condition: service_healthy
@@ -105,9 +118,9 @@ services:
       retries: 5
 
   # ── Jitsi Meet Stack ─────────────────────────────────────
-  # NOTE: In production, Jitsi Web should NOT be directly accessible.
-  # Use Kubernetes Ingress rules to restrict access to IFrame API paths only.
-  # See docs/ARCHITECTURE.md for the recommended Ingress configuration.
+  # NOTE: local stack only. In Kubernetes the conference is served by the
+  # jitsi-meet subchart's own Ingress; what must stay reachable on the
+  # conference host is in docs/DEPLOYMENT.md, "The conference Ingress".
 
   jitsi-web:
     image: jitsi/web:stable
@@ -183,6 +196,10 @@ services:
       - JICOFO_CONF_INITIAL_PARTICIPANT_WAIT_TIMEOUT=30
       - JICOFO_CONF_SINGLE_PARTICIPANT_TIMEOUT=0
       - JICOFO_AUTH_LIFETIME=86400
+      # API REST sulla 8888 aperta alla rete di compose (di default ascolta
+      # solo su 127.0.0.1): la legge la pagina di stato (JICOFO_HEALTH_URL).
+      # Nessuna porta pubblicata sull'host.
+      - JICOFO_ENABLE_REST=1
     volumes:
       - jitsi_jicofo_config:/config
     depends_on:
@@ -203,6 +220,9 @@ services:
       - JVB_PORT=10000
       - JVB_STUN_SERVERS=stun.l.google.com:19302
       - DOCKER_HOST_ADDRESS=${DOCKER_HOST_ADDRESS:-host.docker.internal}
+      # /colibri/stats sulla 8080, letto dall'app (JVB_HEALTH_URL). La 8080
+      # resta nella rete di compose: nessuna porta pubblicata sull'host.
+      - COLIBRI_REST_ENABLED=true
     volumes:
       - jitsi_jvb_config:/config
     depends_on:
@@ -254,7 +274,9 @@ services:
     command:
       - |
         # tick=30s. I contatori replicano le cadenze del chart:
-        # email-outbox ogni minuto, reminders ogni 5, cleanup ogni ora.
+        # email-outbox e lifecycle ogni minuto, reminders ogni 5, cleanup
+        # ogni ora. lifecycle apre gli eventi all'ora di inizio e chiude quelli
+        # finiti: qui non c'è lo scaler dei bridge che lo farebbe.
         i=0
         while true; do
           call() {
@@ -263,6 +285,7 @@ services:
               && echo "[cron] $$1 ok" || echo "[cron] $$1 fallito (l'app sta partendo?)"
           }
           [ $$((i % 2)) -eq 0 ] && call email-outbox
+          [ $$((i % 2)) -eq 0 ] && call lifecycle
           [ $$((i % 10)) -eq 0 ] && call reminders
           [ $$((i % 120)) -eq 0 ] && call cleanup
           i=$$((i + 1))

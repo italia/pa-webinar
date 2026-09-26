@@ -16,7 +16,7 @@ describe('permission-matrix', () => {
   });
 
   it('defaults: guests see chat, not Q&A/mic/video/share/rec', () => {
-    // Chat is the primary channel (live feedback #10): a blank event defaults
+    // Chat is the primary channel: a blank event defaults
     // to chat-on / Q&A-off for guests.
     const m = defaultMatrix();
     expect(m.chat).toContain('GUEST');

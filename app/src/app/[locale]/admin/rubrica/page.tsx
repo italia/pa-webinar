@@ -1,16 +1,12 @@
-import { cookies } from 'next/headers';
-import { redirect } from 'next/navigation';
 import { getLocale, getTranslations } from 'next-intl/server';
 
+import { soloAdmin } from '@/lib/auth/staff-page';
 import RubricaList from '@/components/admin/rubrica-list';
-import { isAdminAuthenticated } from '@/lib/auth/admin-session';
 
 export default async function RubricaPage() {
   const locale = await getLocale();
-  const isAdmin = await isAdminAuthenticated(await cookies());
-  if (!isAdmin) {
-    redirect(`/${locale}/admin/login`);
-  }
+  const negato = await soloAdmin(locale);
+  if (negato) return negato;
 
   const t = await getTranslations('admin.rubrica');
 

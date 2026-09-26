@@ -17,7 +17,7 @@ import { useSearchParams } from 'next/navigation';
 import useSWR from 'swr';
 import { useTranslations } from 'next-intl';
 
-import { Link, useRouter } from '@/i18n/navigation';
+import { Link, useRouter, percorso } from '@/i18n/navigation';
 import { useToast } from '@/components/ui/toast';
 import { useConfirm } from '@/components/ui/confirm-dialog';
 import TranscriptEditor from './transcript-editor';
@@ -202,7 +202,7 @@ export default function PostprodDashboard() {
       // Deep-link da registrazioni/evento → pagina di gestione completa
       // del video (trascrizione + sintesi + traduzioni), non l'editor
       // inline cramped della lista.
-      router.push(`/admin/postprod/${match.id}`);
+      router.push(percorso(`/admin/postprod/${match.id}`));
     }
   }, [data, deepRecordingId, deepEventId, router]);
 
@@ -240,13 +240,15 @@ export default function PostprodDashboard() {
   async function updateSpeaker(
     speakerId: string,
     displayName: string | null,
-    personId: string | null,
+    personId?: string | null,
   ): Promise<void> {
     const r = await fetch(`/api/admin/postprod/speakers/${speakerId}`, {
       method: 'PUT',
       credentials: 'include',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ displayName, personId }),
+      // Il collegamento alla rubrica si manda solo quando si vuole cambiarlo:
+      // rinominare un relatore non deve scollegarlo in silenzio.
+      body: JSON.stringify(personId === undefined ? { displayName } : { displayName, personId }),
     });
     if (!r.ok) {
       toast.error(t('speakerUpdateFailed', { code: r.status }));
@@ -331,7 +333,7 @@ export default function PostprodDashboard() {
                     <td><ArtifactBadges artifacts={row.artifacts} /></td>
                     <td className="text-end">
                       <Link
-                        href={`/admin/postprod/${row.id}`}
+                        href={percorso(`/admin/postprod/${row.id}`)}
                         className="btn btn-sm btn-primary me-1"
                         onClick={(e) => e.stopPropagation()}
                       >
@@ -410,7 +412,7 @@ function RecordingDetails({
   onSpeakerSave: (
     speakerId: string,
     displayName: string | null,
-    personId: string | null,
+    personId?: string | null,
   ) => Promise<void>;
   onMutate: () => Promise<unknown>;
 }) {
@@ -499,7 +501,7 @@ function SpeakersEditor({
   onSave: (
     speakerId: string,
     displayName: string | null,
-    personId: string | null,
+    personId?: string | null,
   ) => Promise<void>;
 }) {
   const t = useTranslations('admin.postprod');
@@ -533,7 +535,7 @@ function SpeakersEditor({
                 className="btn btn-sm btn-primary"
                 disabled={!dirty}
                 onClick={() =>
-                  void onSave(s.id, current.trim() === '' ? null : current.trim(), null)
+                  void onSave(s.id, current.trim() === '' ? null : current.trim())
                 }
               >
                 {t('save')}

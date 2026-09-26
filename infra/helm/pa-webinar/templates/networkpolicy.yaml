@@ -1,19 +1,38 @@
 {{- if .Values.networkPolicy.enabled }}
+{{- $np := .Values.networkPolicy }}
+{{- /*
+  La porta del container dell'applicazione, non quella del Service: una
+  NetworkPolicy vede il traffico dopo la traduzione dell'indirizzo del Service.
+*/}}
+{{- $appPort := 3000 }}
+{{- /*
+  I pod dell'applicazione si riconoscono dalle etichette di selezione senza
+  `app.kubernetes.io/component`, che tutti gli altri pod della release hanno.
+  Se `app.podLabels` gliela aggiunge, si usa quel valore: altrimenti la
+  policy non selezionerebbe nessun pod e l'applicazione resterebbe senza
+  restrizioni, senza errori.
+*/}}
+{{- $componente := toString (dig "podLabels" "app.kubernetes.io/component" "" (.Values.app | default dict) | default "") }}
+{{- $jm := index .Values "jitsi-meet" | default dict }}
 # ─────────────────────────────────────────────────────────────
-# Default-deny + explicit allow-list for the pa-webinar pods.
+# Default-deny + explicit allow-list for the application pods.
 #
-# Egress is locked down to the small set of dependencies the app
-# actually needs: DNS, Postgres, Redis, Jitsi Prosody (XMPP for JWT
-# rooms), SMTP, recording object storage, and the HTTPS public web
-# (so jose can fetch its remote JWKS and the deployment can reach
-# external Jitsi instances when jitsi.enabled=false).
+# Selects ONLY the application Deployment. The other pods of the release
+# (CronJobs, JVB scaler, config-reload hook, recorder bot and controller,
+# post-production orchestrator and worker) carry the same selector labels
+# plus their own `app.kubernetes.io/component`, and are left out on
+# purpose: they talk to the Kubernetes API server, the bridges and the GPU
+# pool, which this allow-list does not describe. They still reach the
+# application, because its ingress admits every pod of the release, and so
+# do the Jibri pods when Jibri is enabled (end-of-recording upload).
 #
-# Ingress is allowed from the configured ingress controller namespace
-# and from Prometheus (so the ServiceMonitor scrape keeps working).
+# Egress is limited to DNS, PostgreSQL, Redis, the in-cluster Jitsi
+# components, the recorder controller, the ingress controller (for the
+# portal's own public hostnames), SMTP and HTTPS.
 #
-# CNI requirement: AKS clusters need the Azure Network Policy or
-# Calico engine enabled — otherwise the cluster ignores
-# NetworkPolicy objects. See docs/DEPLOYMENT.md.
+# CNI requirement: the cluster must enforce NetworkPolicy (Azure NPM,
+# Calico or Cilium on AKS, Dataplane V2 on GKE, the VPC CNI network
+# policy agent on EKS, kube-router on k3s), otherwise it is ignored.
 # ─────────────────────────────────────────────────────────────
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
@@ -25,53 +44,89 @@ spec:
   podSelector:
     matchLabels:
       {{- include "pa-webinar.selectorLabels" . | nindent 6 }}
+      {{- if $componente }}
+      app.kubernetes.io/component: {{ $componente | quote }}
+      {{- else }}
+    matchExpressions:
+      - key: app.kubernetes.io/component
+        operator: DoesNotExist
+      {{- end }}
   policyTypes:
     - Ingress
     - Egress
   ingress:
-    # Allow traffic from the configured ingress controller namespace.
+    {{- if or $np.ingress.fromNamespaceSelectors $np.ingress.fromPodSelectors }}
+    # The ingress controller.
     - from:
-        {{- range .Values.networkPolicy.ingress.fromNamespaceSelectors }}
+        {{- range $np.ingress.fromNamespaceSelectors }}
         - namespaceSelector:
             matchLabels:
               {{- toYaml . | nindent 14 }}
         {{- end }}
-        {{- with .Values.networkPolicy.ingress.fromPodSelectors }}
-        {{- range . }}
+        {{- range $np.ingress.fromPodSelectors }}
         - podSelector:
             matchLabels:
               {{- toYaml . | nindent 14 }}
         {{- end }}
-        {{- end }}
       ports:
         - protocol: TCP
-          port: {{ .Values.service.port | default 3000 }}
-    {{- if .Values.networkPolicy.ingress.allowMonitoring }}
-    # Prometheus scrape (ServiceMonitor) — only opens the metrics port
-    # which is the same as the service port; the /metrics endpoint is
+          port: {{ $appPort }}
+    {{- else }}
+    # No controller selector: any source may reach the application port,
+    # as with an empty `from`. Set ingress.fromNamespaceSelectors (or
+    # fromPodSelectors) to restrict it to the ingress controller.
+    - ports:
+        - protocol: TCP
+          port: {{ $appPort }}
+    {{- end }}
+    # Every other pod of this release: the CronJobs, the JVB scaler, the
+    # recorder bot and controller, the post-production jobs.
+    - from:
+        - podSelector:
+            matchLabels:
+              {{- include "pa-webinar.selectorLabels" . | nindent 14 }}
+      ports:
+        - protocol: TCP
+          port: {{ $appPort }}
+    {{- if and .Values.jitsi.enabled (dig "jibri" "enabled" false $jm) }}
+    # Jibri: at the end of a recording the finalize script asks the
+    # application for an upload URL and registers the file
+    # (APP_INTERNAL_URL).
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: {{ (dig "nameOverride" "" $jm | default "jitsi-meet") | trunc 63 | trimSuffix "-" | quote }}
+              app.kubernetes.io/instance: {{ .Release.Name | quote }}
+              app.kubernetes.io/component: jibri
+      ports:
+        - protocol: TCP
+          port: {{ $appPort }}
+    {{- end }}
+    {{- if $np.ingress.allowMonitoring }}
+    # Prometheus scrape (ServiceMonitor). The metrics endpoint is
     # auth-gated at the application layer.
     - from:
         - namespaceSelector:
             matchLabels:
-              {{- toYaml .Values.networkPolicy.ingress.monitoringNamespaceSelector | nindent 14 }}
+              {{- toYaml $np.ingress.monitoringNamespaceSelector | nindent 14 }}
       ports:
         - protocol: TCP
-          port: {{ .Values.service.port | default 3000 }}
+          port: {{ $appPort }}
+    {{- end }}
+    {{- with $np.ingress.extraRules }}
+    {{- toYaml . | nindent 4 }}
     {{- end }}
   egress:
     # DNS — required for everything else to resolve.
     - to:
-        - namespaceSelector: {}
-          podSelector:
-            matchLabels:
-              k8s-app: kube-dns
+        {{- toYaml (dig "dns" "to" list $np.egress) | nindent 8 }}
       ports:
         - protocol: UDP
           port: 53
         - protocol: TCP
           port: 53
     # Postgres
-    {{- with .Values.networkPolicy.egress.postgres }}
+    {{- with $np.egress.postgres }}
     - to:
         {{- toYaml .to | nindent 8 }}
       ports:
@@ -79,17 +134,17 @@ spec:
           port: {{ .port | default 5432 }}
     {{- end }}
     # Redis
-    {{- with .Values.networkPolicy.egress.redis }}
+    {{- with $np.egress.redis }}
     - to:
         {{- toYaml .to | nindent 8 }}
       ports:
         - protocol: TCP
           port: {{ .port | default 6379 }}
     {{- end }}
-    # Jitsi (Prosody for JWT-authenticated room creation + web for
-    # the IFrame source). Only effective when running in cluster;
-    # external Jitsi is reached via the generic HTTPS rule below.
-    {{- with .Values.networkPolicy.egress.jitsi }}
+    # In-cluster Jitsi: Prosody (XMPP), the bridge REST API
+    # (JVB_HEALTH_URL) and the Jibri health API. External Jitsi is
+    # reached via the generic HTTPS rule below.
+    {{- with $np.egress.jitsi }}
     - to:
         {{- toYaml .to | nindent 8 }}
       ports:
@@ -98,28 +153,99 @@ spec:
           port: {{ .port }}
         {{- end }}
     {{- end }}
+    {{- if and .Values.recorder.enabled .Values.recorder.controller.enabled }}
+    # Recorder controller: the application notifies it when an event
+    # goes live (RECORDER_CONTROLLER_URL).
+    - to:
+        - podSelector:
+            matchLabels:
+              {{- include "pa-webinar.selectorLabels" . | nindent 14 }}
+              app.kubernetes.io/component: recorder-controller
+      ports:
+        - protocol: TCP
+          port: {{ .Values.recorder.controller.port | default 8080 }}
+    {{- end }}
+    {{- $ic := $np.egress.ingressController | default dict }}
+    {{- if and (dig "enabled" false $ic) $np.ingress.fromNamespaceSelectors (dig "ports" list $ic) }}
+    # The ingress controller, for requests to the portal's and the
+    # conference's public hostnames. From inside the cluster those names
+    # often resolve to the controller's load balancer, and the traffic is
+    # translated to the controller pod: the destination the policy sees
+    # is that pod and its container port, not the public 443.
+    - to:
+        {{- range $np.ingress.fromNamespaceSelectors }}
+        - namespaceSelector:
+            matchLabels:
+              {{- toYaml . | nindent 14 }}
+        {{- end }}
+      ports:
+        {{- range (dig "ports" list $ic) }}
+        - protocol: TCP
+          port: {{ . }}
+        {{- end }}
+    {{- end }}
     # SMTP — outbound mail to the configured relay.
     - to:
         - ipBlock:
             cidr: 0.0.0.0/0
       ports:
         - protocol: TCP
-          port: {{ .Values.networkPolicy.egress.smtpPort | default 587 }}
-        {{- if .Values.networkPolicy.egress.allowImplicitTlsSmtp }}
+          port: {{ $np.egress.smtpPort | default 587 }}
+        {{- if $np.egress.allowImplicitTlsSmtp }}
         - protocol: TCP
           port: 465
         {{- end }}
-    # HTTPS — recording object storage (Azure Blob / S3 / GCS),
-    # remote Jitsi instances, JWKS endpoints, and any other outbound
-    # we depend on. Limited to TCP/443.
+    # HTTPS — object storage, external Jitsi instances, and any other
+    # outbound dependency. Limited to TCP/443.
     - to:
         - ipBlock:
             cidr: 0.0.0.0/0
+            {{- with $np.egress.httpsExcept }}
             except:
-              {{- with .Values.networkPolicy.egress.httpsExcept }}
               {{- toYaml . | nindent 14 }}
-              {{- end }}
+            {{- end }}
       ports:
         - protocol: TCP
           port: 443
+    {{- with $np.egress.extraRules }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+{{- if and (dig "enabled" false (.Values.backup | default dict)) (dig "enabled" false (.Values.postgresql | default dict)) }}
+---
+# ─────────────────────────────────────────────────────────────
+# The database copy (backup CronJob and the backup-tools pods created
+# from it): they hold the database password and the dumps, so nothing may
+# connect to them, and they reach only DNS and PostgreSQL.
+# ─────────────────────────────────────────────────────────────
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "pa-webinar.fullname" . }}-backup
+  labels:
+    {{- include "pa-webinar.labels" . | nindent 4 }}
+    app.kubernetes.io/component: backup
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "pa-webinar.backupSelectorLabels" . | nindent 6 }}
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress: []
+  egress:
+    - to:
+        {{- toYaml (dig "dns" "to" list $np.egress) | nindent 8 }}
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    {{- with $np.egress.postgres }}
+    - to:
+        {{- toYaml .to | nindent 8 }}
+      ports:
+        - protocol: TCP
+          port: {{ .port | default 5432 }}
+    {{- end }}
+{{- end }}
 {{- end }}

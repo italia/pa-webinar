@@ -1,4 +1,37 @@
 {
+  "0.12.0": {
+    "title": "Újrafelhasználásra kész: egyetlen paranccsal telepíthető, az események pedig maguktól haladnak",
+    "notes": [
+      "Telepítés egyetlen paranccsal: olyan számítógépre, amelyen minikube fut, kipróbáláshoz és fejlesztéshez, k3s-szerverre éles üzemhez, tanúsítványokkal, tesztpostafiókkal, objektumtárral, TURN-nel és ütemezett mentéssel. Minden telepítés egyetlen paranccsal ellenőrizhető, az adatbázis és a fájlok mentésének és visszaállításának saját szkriptjei vannak, a mostantól angol nyelvű dokumentáció pedig útmutatókat tartalmaz a minikube, a k3s, az AKS, a GKE és az EKS rendszerhez, valamint ellenőrzőlistákat az éles indításhoz.",
+      "Az események a kezdési időpontban megnyílnak és a végén bezárulnak azokon a telepítéseken is, ahol a videóhidak nem indulnak automatikusan. Az „Esemény indítása” mindig elérhető az eseményt vezető személy számára, és az esemény többé nem ragad be „Előkészítés” állapotban.",
+      "Névre szóló fiókok a munkatársaknak: az adminisztrátorok és a szervezők e-mailben kapott személyes hivatkozással lépnek be, és mindenki csak azt látja, amit a szerepköre megenged. A példány kulcsa megmarad az első belépéshez és vészhelyzetekre.",
+      "E-mailek olaszul, angolul, franciául, németül és spanyolul, a címzett nyelvén. A moderátorok és az előadók személyes hivatkozásai e-mailben érkeznek, az emlékeztetők már nem egyszerre érkeznek mind, és a naptármeghívók nem duplázódnak.",
+      "A videokonferencián a szerepkör attól a hivatkozástól függ, amellyel belépnek: a vendégek és a regisztráltak résztvevők, és már nem tudják lenémítani vagy eltávolítani a moderátort.",
+      "A teremben: a kérdések, a szavazások és a szófelhő a vendégeknek és az előadóknak is működnek; az anyagok a hivatkozások mellett fájlokat is elfogadnak; aki magától lép ki, visszaléphet ahelyett, hogy „Az esemény véget ért” üzenet fogadná; ha a videokonferencia nem érhető el, a terem ezt jelzi, és felajánlja az „Újrapróbálás” lehetőséget; a kamera és a mikrofon a résztvevőknél kikapcsolva indul; a virtuális hátteret már a váróteremben ki lehet választani.",
+      "Adatvédelem: a csevegés már nem továbbítja a jelenlévőknek a vendégek IP-címét; a saját adatok exportálására vagy törlésére szolgáló hivatkozások a helyes címre vezetnek; a felvételről szóló tájékoztatás és hozzájárulás mindenhol megjelenik, ahol valami felvételt készíthet.",
+      "Az állapotoldal belülről ellenőrzi a szolgáltatásokat, és már nem jelez hibát egy nem nyilvános tanúsítvány miatt; az állandó videóhíddal működő telepítések helyesen jelennek meg.",
+      "Adminisztráció: a társmoderátorok és az előadók visszavonása a varázslóból most tényleg működik, a varázsló jelzi, mi nem lett mentve, és a közzététel után az esemény oldalára jutunk. A gyorshívásoknak már nincs nyilvános oldaluk, a megosztott hivatkozások pedig előnézetet mutatnak az eseményről.",
+      "Frissítéskor: a Prosody, a Jicofo, a webes konferencia és a videóhíd egyszer újraindul, ezért érdemes folyamatban lévő esemény nélkül frissíteni; akinek egyéni kötetei vagy moduljai vannak a Prosodyhoz, annak hozzá kell adnia a chart saját köteteit és moduljait is; scaler nélkül az élő események mostantól a végük után, a türelmi idő leteltével zárulnak."
+    ]
+  },
+  "0.11.0": {
+    "title": "A terem mostantól abban a pillanatban reagál, amikor valami megváltozik",
+    "notes": [
+      "A kérdések, a szavazások, a program és a szófelhő azonnal frissülnek, amint valami megváltozik, ahelyett hogy néhány másodpercenként lekérdeznék a kiszolgálót: aki a teremben van, rögtön látja megjelenni a kérdést, egy népes eseményen pedig jelentősen csökken a forgalom.",
+      "Kevesebb munka a kiszolgálónak is: a terem időszakos ellenőrzései már csak a szükséges adatot kérik le, az anyagokat pedig — amelyek ritkán változnak — ritkábban ellenőrzi.",
+      "Ha az azonnali kapcsolat nem érhető el, a terem magától visszatér a korábbi időszakos ellenőrzéshez: az új megoldás miatt egyetlen funkció sem áll le.",
+      "Javítások: két új szófelhő rövid időn belüli megnyitása esetén az egyik láthatatlan maradhatott, és az oda küldött szavak senkinél nem jelentek meg; a szolgáltatás állapotoldala mindig ugyanazt a verziószámot mutatta a ténylegesen futó helyett."
+    ]
+  },
+  "0.10.0": {
+    "title": "Kérdések a csevegésben, egyszerűbb ismétlődő sorozatok és helyreállított intézményi színek",
+    "notes": [
+      "Aki a csevegésben ír, saját üzenetét kérdésként jelölheti meg: a moderátorok megválaszoltként jelölik vagy félreteszik, és egy szűrő csak a kérdéseket mutatja. Az esemény alatt nincs második csatorna, amit figyelni kell.",
+      "A csevegés kérdései a kapott reakciókkal együtt megjelennek az esemény nyilvános összefoglaló oldalán, és a résztvevők személyes adatainak törlése után is olvashatók maradnak.",
+      "Egy sorozat következő alkalmának előkészítése gyorsabb: az esemény másolata magával viszi a címkéket, a szervezőket, a társmoderátorokat (mindegyiket új belépési adatokkal), a programot, a kérdőíveket és az emlékeztetőket, a sablonok pedig megtartják a felvételi és az utólagos feldolgozási beállításokat.",
+      "Javítások: az intézményi színek ismét a megfelelőek – az oldal tetején lévő sáv fehérnek látszott –, az esemény másolatát létrehozó gomb már nem vezet nem létező oldalra, és a megőrzési idő lejártával a meghívottak, valamint a kijelölt moderátorok és előadók elérhetőségei is törlődnek."
+    ]
+  },
   "0.9.0": {
     "title": "Függőségek biztonsága, naprakész dokumentáció és teljes helyi környezet",
     "notes": [

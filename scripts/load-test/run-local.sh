@@ -6,10 +6,13 @@
 #   - l'immagine `pa-webinar-load-test` già built
 #       (altrimenti build automatico al primo run con --build)
 #
+# Nei comandi qui sotto `jitsi.example.com` sta per l'hostname Jitsi del deploy
+# da testare (stessa convenzione di segnaposto del README.md di questa cartella).
+#
 # Uso:
-#   JITSI_URL=https://jitsi-test.innovazione.gov.it \
+#   JITSI_URL=https://jitsi.example.com \
 #   JITSI_JWT_SECRET=<secret> \
-#   JITSI_JWT_SUBJECT=jitsi-test.innovazione.gov.it \
+#   JITSI_JWT_SUBJECT=jitsi.example.com \
 #   PARTICIPANTS=50 SENDERS=5 DURATION=300 \
 #     ./run-local.sh [--build]
 #
@@ -41,9 +44,9 @@ if [[ "${1:-}" == "--build" ]] || ! "$RUNTIME" image inspect "$IMAGE" >/dev/null
   "$RUNTIME" build -t "$IMAGE" "$SCRIPT_DIR"
 fi
 
-: "${JITSI_URL:?JITSI_URL required (e.g. https://jitsi-test.innovazione.gov.it)}"
+: "${JITSI_URL:?JITSI_URL required (e.g. https://jitsi.example.com)}"
 : "${JITSI_JWT_SECRET:?JITSI_JWT_SECRET required (HS256 secret from the Jitsi deploy)}"
-: "${JITSI_JWT_SUBJECT:?JITSI_JWT_SUBJECT required (Jitsi domain, e.g. jitsi-test.innovazione.gov.it)}"
+: "${JITSI_JWT_SUBJECT:?JITSI_JWT_SUBJECT required (Jitsi domain, e.g. jitsi.example.com)}"
 
 # Sulle macchine beefy (64+ GB, 16+ core) vale la pena alzare --shm-size per
 # far respirare i tanti Chrome

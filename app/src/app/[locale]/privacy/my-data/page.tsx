@@ -7,7 +7,6 @@ import {
   type FormEvent,
 } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
-import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import {
   Button,
@@ -16,9 +15,11 @@ import {
   FormGroup,
   Card,
   CardBody,
-  Icon,
 } from 'design-react-kit';
 
+import { Icon } from '@/components/ui/icon';
+import { Link, percorso } from '@/i18n/navigation';
+import { localizedPath } from '@/lib/utils/localized-url';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 
 interface ExportEventData {
@@ -205,7 +206,7 @@ export default function MyDataPage() {
                 </p>
                 <Link
                   className="btn btn-outline-danger"
-                  href={`/${locale}/privacy/my-data/erasure`}
+                  href={percorso('/privacy/my-data/erasure')}
                 >
                   {t('erasureCtaButton')}
                 </Link>
@@ -225,7 +226,7 @@ export default function MyDataPage() {
             <Alert color="danger">
               {error}
               <div className="mt-3">
-                <Button color="primary" outline href={`/${locale}/privacy/my-data`}>
+                <Button color="primary" outline href={localizedPath('/privacy/my-data', locale)}>
                   {t('requestNew')}
                 </Button>
               </div>

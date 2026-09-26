@@ -6,7 +6,6 @@ import {
   Button,
   Card,
   CardBody,
-  Icon,
   Input,
   TextArea,
   FormGroup,
@@ -16,6 +15,7 @@ import {
   Badge,
 } from 'design-react-kit';
 
+import { Icon } from '@/components/ui/icon';
 import ToggleSwitch from '@/components/ui/toggle-switch';
 import { useConfirm } from '@/components/ui/confirm-dialog';
 
@@ -26,6 +26,7 @@ interface SerializedTemplate {
   icon: string;
   qaEnabled: boolean;
   chatEnabled: boolean;
+  wordCloudEnabled: boolean;
   whiteboardEnabled: boolean;
   waitingRoomEngine: 'GARDEN' | 'GAME' | 'CLASSIC' | null;
   recordingEnabled: boolean;
@@ -37,6 +38,9 @@ interface SerializedTemplate {
   aiTranscriptEnabled: boolean;
   aiSummaryEnabled: boolean;
   aiTranslationEnabled: boolean;
+  aiDubbingEnabled: boolean;
+  multitrackRecordingEnabled: boolean;
+  retainParticipantTracks: boolean;
   descriptionTemplate: Record<string, string> | null;
   defaultRetentionDays: number | null;
   defaultExpectedSpeakers: number | null;
@@ -48,6 +52,9 @@ interface SerializedTemplate {
 
 interface TemplateManagementProps {
   templates: SerializedTemplate[];
+  /** Se l'installazione ha il servizio della lavagna di Jitsi: senza, il
+   *  modello non la offre (vedi lib/jitsi/whiteboard.ts). */
+  whiteboardInfraReady: boolean;
 }
 
 interface EditingTemplate {
@@ -56,6 +63,7 @@ interface EditingTemplate {
   icon: string;
   qaEnabled: boolean;
   chatEnabled: boolean;
+  wordCloudEnabled: boolean;
   whiteboardEnabled: boolean;
   waitingRoomEngine: 'GARDEN' | 'GAME' | 'CLASSIC' | null;
   recordingEnabled: boolean;
@@ -67,6 +75,9 @@ interface EditingTemplate {
   aiTranscriptEnabled: boolean;
   aiSummaryEnabled: boolean;
   aiTranslationEnabled: boolean;
+  aiDubbingEnabled: boolean;
+  multitrackRecordingEnabled: boolean;
+  retainParticipantTracks: boolean;
   descriptionTemplateIt: string;
   defaultRetentionDays: number | null;
   defaultExpectedSpeakers: number | null;
@@ -77,9 +88,11 @@ const DEFAULT_NEW: EditingTemplate = {
   description: '',
   icon: 'it-video',
   // Chat primaria, Q&A opt-in — stesso default di defaultMatrix() e dei
-  // template di sistema (live feedback #10: "tenere SOLO chat").
+  // template di sistema: la chat è il canale principale, la Q&A si attiva
+  // quando serve.
   qaEnabled: false,
   chatEnabled: true,
+  wordCloudEnabled: false,
   whiteboardEnabled: false,
   waitingRoomEngine: null,
   recordingEnabled: false,
@@ -91,6 +104,9 @@ const DEFAULT_NEW: EditingTemplate = {
   aiTranscriptEnabled: false,
   aiSummaryEnabled: false,
   aiTranslationEnabled: false,
+  aiDubbingEnabled: false,
+  multitrackRecordingEnabled: false,
+  retainParticipantTracks: false,
   descriptionTemplateIt: '',
   defaultRetentionDays: null,
   defaultExpectedSpeakers: null,
@@ -98,6 +114,7 @@ const DEFAULT_NEW: EditingTemplate = {
 
 export default function TemplateManagement({
   templates: initialTemplates,
+  whiteboardInfraReady,
 }: TemplateManagementProps) {
   const t = useTranslations('admin.templates');
   const tc = useTranslations('common');
@@ -122,6 +139,7 @@ export default function TemplateManagement({
       icon: tpl.icon,
       qaEnabled: tpl.qaEnabled,
       chatEnabled: tpl.chatEnabled,
+      wordCloudEnabled: tpl.wordCloudEnabled,
       whiteboardEnabled: tpl.whiteboardEnabled,
       waitingRoomEngine: tpl.waitingRoomEngine,
       recordingEnabled: tpl.recordingEnabled,
@@ -133,6 +151,9 @@ export default function TemplateManagement({
       aiTranscriptEnabled: tpl.aiTranscriptEnabled,
       aiSummaryEnabled: tpl.aiSummaryEnabled,
       aiTranslationEnabled: tpl.aiTranslationEnabled,
+      aiDubbingEnabled: tpl.aiDubbingEnabled,
+      multitrackRecordingEnabled: tpl.multitrackRecordingEnabled,
+      retainParticipantTracks: tpl.retainParticipantTracks,
       descriptionTemplateIt: tpl.descriptionTemplate?.it ?? '',
       defaultRetentionDays: tpl.defaultRetentionDays,
       defaultExpectedSpeakers: tpl.defaultExpectedSpeakers,
@@ -249,6 +270,7 @@ export default function TemplateManagement({
               saving={saving}
               t={t}
               tc={tc}
+              whiteboardInfraReady={whiteboardInfraReady}
             />
           </CardBody>
         </Card>
@@ -271,6 +293,7 @@ export default function TemplateManagement({
                     saving={saving}
                     t={t}
                     tc={tc}
+                    whiteboardInfraReady={whiteboardInfraReady}
                   />
                 </CardBody>
               </Card>
@@ -384,6 +407,7 @@ function TemplateForm({
   saving,
   t,
   tc,
+  whiteboardInfraReady,
 }: {
   form: EditingTemplate;
   setField: <K extends keyof EditingTemplate>(
@@ -395,7 +419,13 @@ function TemplateForm({
   saving: boolean;
   t: ReturnType<typeof useTranslations>;
   tc: ReturnType<typeof useTranslations>;
+  whiteboardInfraReady: boolean;
 }) {
+  // Etichette già esistenti del form evento: stessi flag, stessi nomi.
+  // Duplicarle sotto `admin.templates` vorrebbe dire due testi da tenere
+  // allineati in 24 lingue per la stessa cosa.
+  const ta = useTranslations('admin.form');
+
   return (
     <div>
       <FormGroup className="mb-3">
@@ -509,6 +539,7 @@ function TemplateForm({
           [
             ['qaEnabled', 'Q&A'],
             ['chatEnabled', 'Chat'],
+            ['wordCloudEnabled', ta('wordCloudEnabled')],
             ['whiteboardEnabled', t('whiteboardLabel')],
             ['recordingEnabled', t('recordingLabel')],
             ['participantsCanUnmute', t('unmute')],
@@ -517,24 +548,46 @@ function TemplateForm({
             ['aiTranscriptEnabled', t('aiTranscript')],
             ['aiSummaryEnabled', t('aiSummary')],
             ['aiTranslationEnabled', t('aiTranslation')],
+            // I flag di cattura che prima non si potevano impostare su un
+            // template: sono quelli che una serie ricorrente perde ricreando
+            // l'occorrenza a mano. Etichette riusate da admin.form — stessi
+            // flag, stessi nomi, un testo solo da mantenere in 24 lingue.
+            ['aiDubbingEnabled', ta('aiDubbingEnabled')],
+            ['multitrackRecordingEnabled', ta('multitrackRecordingEnabled')],
+            ['retainParticipantTracks', ta('retainParticipantTracks')],
           ] as const
-        ).map(([key, label]) => (
-          <div
-            key={key}
-            className="d-flex justify-content-between align-items-center py-2"
-            style={{ borderBottom: '1px solid #f0f0f0' }}
-          >
-            <span style={{ fontSize: '0.85rem' }}>{label}</span>
-            <ToggleSwitch
-              label=""
-              ariaLabel={label}
-              checked={form[key] as boolean}
-              onChange={() =>
-                setField(key, !form[key as keyof EditingTemplate])
-              }
-            />
-          </div>
-        ))}
+        ).map(([key, label]) => {
+          // La lavagna senza il servizio dell'installazione non comparirebbe
+          // in sala: non si accende, e la riga dice perche'. Resta spegnibile
+          // per togliere un valore gia' salvato.
+          const wbBloccata =
+            key === 'whiteboardEnabled' && !whiteboardInfraReady;
+          return (
+            <div
+              key={key}
+              className="d-flex justify-content-between align-items-center py-2"
+              style={{ borderBottom: '1px solid #f0f0f0' }}
+            >
+              <span style={{ fontSize: '0.85rem' }}>
+                {label}
+                {wbBloccata && (
+                  <small className="d-block text-secondary">
+                    {ta('whiteboardUnavailable')}
+                  </small>
+                )}
+              </span>
+              <ToggleSwitch
+                label=""
+                ariaLabel={label}
+                checked={form[key] as boolean}
+                disabled={wbBloccata && !form.whiteboardEnabled}
+                onChange={() =>
+                  setField(key, !form[key as keyof EditingTemplate])
+                }
+              />
+            </div>
+          );
+        })}
       </div>
 
       {/* Motore sala d'attesa pre-popolato nel wizard (null = default sito). */}

@@ -9,11 +9,11 @@ import { cookies } from 'next/headers';
 import { z } from 'zod';
 
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
-import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { requireEventManager } from '@/lib/auth/staff-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { encryptPII, encryptPIIOrNull, hashEmail, tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
-import { AppError, UnauthorizedError, ValidationError } from '@/lib/errors';
+import { AppError, ForbiddenError, ValidationError } from '@/lib/errors';
 
 export const dynamic = 'force-dynamic';
 
@@ -39,8 +39,9 @@ async function requireBelongs(eventId: string, invId: string) {
 }
 
 export const PATCH = withErrorHandling(async (request, context) => {
-  if (!(await isAdminAuthenticated(await cookies()))) throw new UnauthorizedError();
   const { id, invId } = await context.params;
+  // Dell'evento: l'admin, o l'organizzatore che l'ha creato (ADR-014).
+  const session = await requireEventManager(await cookies(), id);
   await requireBelongs(id, invId);
 
   const body = await parseJsonBody(request);
@@ -52,6 +53,9 @@ export const PATCH = withErrorHandling(async (request, context) => {
     );
   }
 
+  // Collegare una persona significa leggere la rubrica, che e'
+  // dell'amministrazione (ADR-014).
+  if (session.role !== 'admin' && parsed.data.personId) throw new ForbiddenError();
   const data: Record<string, unknown> = { ...parsed.data };
   if (typeof data.email === 'string') {
     const emailNorm = (data.email as string).trim().toLowerCase();
@@ -89,8 +93,9 @@ export const PATCH = withErrorHandling(async (request, context) => {
 });
 
 export const DELETE = withErrorHandling(async (request, context) => {
-  if (!(await isAdminAuthenticated(await cookies()))) throw new UnauthorizedError();
   const { id, invId } = await context.params;
+  // Dell'evento: l'admin, o l'organizzatore che l'ha creato (ADR-014).
+  await requireEventManager(await cookies(), id);
   await requireBelongs(id, invId);
 
   await prisma.eventInvitation.delete({ where: { id: invId } });

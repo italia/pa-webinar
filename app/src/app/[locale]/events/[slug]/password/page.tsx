@@ -1,12 +1,20 @@
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getLocale, getTranslations } from 'next-intl/server';
 
 import { prisma } from '@/lib/db';
+import { titoloEventoPubblico } from '@/lib/events/meta-title';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import PasswordGateClient from '@/components/events/password-gate-client';
 
 interface PageProps {
   params: Promise<{ slug: string }>;
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const titolo = await titoloEventoPubblico(slug);
+  return { ...(titolo ? { title: titolo } : {}), robots: { index: false } };
 }
 
 export default async function PasswordGatePage({ params }: PageProps) {
@@ -19,7 +27,9 @@ export default async function PasswordGatePage({ params }: PageProps) {
     select: { title: true, joinPasswordHash: true, status: true },
   });
 
-  if (!event || !event.joinPasswordHash) {
+  // Una bozza non si apre a nessuno: senza questo la pagina ne mostrerebbe
+  // il titolo a chiunque conosca lo slug.
+  if (!event || !event.joinPasswordHash || event.status === 'DRAFT') {
     // Only show the password gate for events that actually require one.
     notFound();
   }

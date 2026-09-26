@@ -1,6 +1,6 @@
 import { busOn, type LobbyBus } from '../bus';
 import type { MediaDevices } from '../ports/MediaDevices';
-import type { DeviceSelection } from '../ports/types';
+import type { DeviceSelection, EventStatus } from '../ports/types';
 import { formatClock } from '../util';
 import { clear, el } from './dom';
 
@@ -30,6 +30,7 @@ export class ConfigPanel {
 
   private open = false;
   private canEnter = false;
+  private status: EventStatus = 'scheduled';
   private remaining = 0;
   private vuTimer = 0;
   private enumerated = false;
@@ -106,6 +107,10 @@ export class ConfigPanel {
       }),
       busOn(bus, 'countdown', (ms) => {
         this.remaining = ms;
+        this.renderEnter();
+      }),
+      busOn(bus, 'statusChange', (s) => {
+        this.status = s;
         this.renderEnter();
       }),
       busOn(bus, 'joined', () => this.setOpen(false)),
@@ -189,14 +194,25 @@ export class ConfigPanel {
     this.vuFill.style.width = '0%';
   }
 
+  /**
+   * Chi aspetta deve capire COSA sta aspettando. L'ora d'inizio e la sala
+   * pronta sono due attese distinte: a evento avviato il conto alla rovescia
+   * e' fermo a zero, e riproporlo direbbe «Inizia tra 00:00» mentre in realta'
+   * si sta allestendo la stanza.
+   */
   private renderEnter(): void {
+    const inAllestimento = this.status === 'preparing';
     this.enterBtn.disabled = !this.canEnter;
     this.enterBtn.textContent = this.canEnter
       ? 'Entra'
-      : `Inizia tra ${formatClock(this.remaining)}`;
+      : inAllestimento
+        ? 'Fra poco'
+        : `Inizia tra ${formatClock(this.remaining)}`;
     this.note.textContent = this.canEnter
       ? ''
-      : "Per gli ospiti l'ingresso si apre all'avvio dell'evento.";
+      : inAllestimento
+        ? 'La sala si sta preparando: appena e\u2019 pronta si entra.'
+        : "Per gli ospiti l'ingresso si apre all'avvio dell'evento.";
   }
 
   destroy(): void {

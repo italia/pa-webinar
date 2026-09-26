@@ -1,4 +1,37 @@
 {
+  "0.12.0": {
+    "title": "Bereit zur Nachnutzung: Installation mit einem Befehl, und Veranstaltungen laufen von selbst",
+    "notes": [
+      "Installation mit einem Befehl: auf einem Rechner mit minikube zum Ausprobieren und Entwickeln, auf einem k3s-Server für den Produktivbetrieb, mit Zertifikaten, Test-Postfach, Object Storage, TURN und zeitgesteuerter Sicherung. Jede Installation lässt sich mit einem Befehl prüfen, Sicherung und Wiederherstellung von Datenbank und Dateien haben eigene Skripte, und die Dokumentation, jetzt auf Englisch, enthält Anleitungen für minikube, k3s, AKS, GKE und EKS sowie Checklisten für den Go-live.",
+      "Veranstaltungen öffnen zur Startzeit und schließen zum Ende, auch auf Installationen ohne automatisches Hochfahren der Video-Bridges. Wer die Veranstaltung leitet, hat „Veranstaltung starten“ immer zur Verfügung, und eine Veranstaltung bleibt nicht mehr „in Vorbereitung“ hängen.",
+      "Persönliche Konten für das Team: Administratoren und Veranstalter melden sich mit einem persönlichen Link an, den sie per E-Mail erhalten, und alle sehen nur, was ihre Rolle erlaubt. Der Instanzschlüssel bleibt für die erste Anmeldung und für Notfälle.",
+      "E-Mails auf Italienisch, Englisch, Französisch, Deutsch und Spanisch, jeweils in der Sprache der Empfangenden. Moderatoren sowie Referentinnen und Referenten erhalten ihre persönlichen Links per E-Mail, Erinnerungen kommen nicht mehr alle auf einmal, und Kalendereinladungen werden nicht mehr doppelt verschickt.",
+      "In der Videokonferenz hängt die Rolle vom Link ab, mit dem man beitritt: Gäste und Angemeldete sind Teilnehmende und können den Moderator nicht mehr stummschalten oder entfernen.",
+      "Im Raum: Fragen, Abstimmungen und Wortwolke funktionieren auch für Gäste sowie Referentinnen und Referenten; Materialien nehmen neben Links auch Dateien an; wer den Raum von sich aus verlässt, kann wieder beitreten, statt „Veranstaltung beendet“ zu sehen; ist die Videokonferenz nicht erreichbar, sagt der Raum das und bietet „Erneut versuchen“ an; Kamera und Mikrofon starten für Teilnehmende ausgeschaltet; der virtuelle Hintergrund lässt sich schon im Warteraum wählen.",
+      "Datenschutz: Der Chat übermittelt die IP-Adresse von Gästen nicht mehr an die Anwesenden; die Links zum Exportieren oder Löschen der eigenen Daten führen zur richtigen Adresse; Hinweis und Einwilligung zur Aufzeichnung erscheinen überall dort, wo etwas aufzeichnen kann.",
+      "Die Statusseite prüft die Dienste von innen und meldet wegen eines nicht öffentlichen Zertifikats keine Störung mehr; Installationen mit fester Video-Bridge werden korrekt angezeigt.",
+      "Verwaltung: Der Zugang von Co-Moderatoren sowie Referentinnen und Referenten lässt sich im Assistenten jetzt tatsächlich widerrufen, der Assistent zeigt an, was nicht gespeichert wurde, und nach der Veröffentlichung landet man auf der Seite der Veranstaltung. Sofortanrufe haben keine öffentliche Seite mehr, und geteilte Links zeigen eine Vorschau der Veranstaltung.",
+      "Beim Aktualisieren: Prosody, Jicofo, die Web-Konferenz und die Video-Bridge starten einmal neu, daher am besten ohne laufende Veranstaltungen aktualisieren; wer eigene Volumes oder Module für Prosody hat, muss die des Charts hinzufügen; ohne Scaler schließen Live-Veranstaltungen jetzt zum Ende zuzüglich der Karenzzeit."
+    ]
+  },
+  "0.11.0": {
+    "title": "Der Raum reagiert jetzt in dem Moment, in dem sich etwas ändert",
+    "notes": [
+      "Fragen, Umfragen, Ablaufplan und Wortwolke werden aktualisiert, sobald sich etwas ändert, statt alle paar Sekunden beim Server nachzufragen: Wer im Raum ist, sieht eine Frage sofort erscheinen, und bei einer gut besuchten Veranstaltung sinkt der Datenverkehr deutlich.",
+      "Auch weniger Arbeit für den Server: Die regelmäßigen Abfragen des Raums fordern jetzt nur noch die tatsächlich benötigten Daten an, und Materialien — die sich selten ändern — werden seltener geprüft.",
+      "Ist die unmittelbare Verbindung nicht verfügbar, kehrt der Raum von selbst zur bisherigen regelmäßigen Abfrage zurück: Keine Funktion fällt wegen des neuen Verfahrens aus.",
+      "Korrekturen: Wurden zwei neue Wortwolken kurz hintereinander geöffnet, konnte eine davon unsichtbar bleiben, und die dorthin gesendeten Wörter erschienen bei niemandem; die Statusseite des Dienstes meldete stets dieselbe Versionsnummer statt der tatsächlich laufenden."
+    ]
+  },
+  "0.10.0": {
+    "title": "Fragen im Chat, einfachere Veranstaltungsreihen und korrekte institutionelle Farben",
+    "notes": [
+      "Wer im Chat schreibt, kann die eigene Nachricht als Frage markieren: Moderatoren kennzeichnen sie als beantwortet oder stellen sie zurück, und ein Filter zeigt ausschließlich die Fragen. Während der Veranstaltung ist kein zweiter Kanal zu betreuen.",
+      "Die Fragen aus dem Chat erscheinen samt der erhaltenen Reaktionen auf der öffentlichen Zusammenfassungsseite der Veranstaltung und bleiben auch nach der Löschung der personenbezogenen Daten der Teilnehmenden lesbar.",
+      "Der nächste Termin einer Reihe ist schneller vorbereitet: Die Kopie einer Veranstaltung übernimmt Schlagwörter, Veranstalter, Co-Moderatoren (jeweils mit neuen Zugangsdaten), Ablaufplan, Fragebögen und Erinnerungen, und Vorlagen behalten ihre Einstellungen für Aufzeichnung und Nachbearbeitung.",
+      "Korrekturen: Die institutionellen Farben sind wieder wie vorgesehen — das Band am Seitenkopf erschien weiß —, die Schaltfläche für die Kopie einer Veranstaltung führt nicht mehr auf eine nicht vorhandene Seite, und mit Ablauf der Aufbewahrungsfrist werden auch die Kontaktdaten der Eingeladenen sowie benannter Moderatoren und Referentinnen und Referenten gelöscht."
+    ]
+  },
   "0.9.0": {
     "title": "Sicherheit der Abhängigkeiten, aktualisierte Dokumentation und ein vollständiger lokaler Stack",
     "notes": [

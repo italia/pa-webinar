@@ -1,17 +1,32 @@
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getTranslations, getLocale } from 'next-intl/server';
 
 import { prisma } from '@/lib/db';
-import { Link } from '@/i18n/navigation';
+import { Link, percorso } from '@/i18n/navigation';
 import RegistrationFormClient from '@/components/registration/registration-form-client';
 import EventTitle from '@/components/events/event-title';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import { resolveKickerEnabled } from '@/lib/utils/title-kicker';
 import { getSettings } from '@/lib/settings';
 import { isEventOpenForRegistration } from '@/lib/events/visibility';
+import { registrationAccessFor } from '@/lib/events/registration-access';
+import { titoloEventoPubblico } from '@/lib/events/meta-title';
 
 interface RegistrationPageProps {
   params: Promise<{ slug: string }>;
+}
+
+export async function generateMetadata({
+  params,
+}: RegistrationPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const t = await getTranslations('registration');
+  const titolo = await titoloEventoPubblico(slug, isEventOpenForRegistration);
+  return {
+    title: titolo ? `${t('title')}: ${titolo}` : t('title'),
+    robots: { index: false },
+  };
 }
 
 export default async function RegistrationPage({
@@ -45,6 +60,12 @@ export default async function RegistrationPage({
 
   const title = getLocalized(event.title as LocalizedField, locale);
   const settings = await getSettings();
+  // Con l'iscrizione pubblica spenta la pagina resta raggiungibile — ci
+  // arriva anche chi viene rimandato dalla sala — ma spiega chi può iscriversi.
+  const registrationAccess = await registrationAccessFor(
+    event.id,
+    settings.publicRegistrationEnabled,
+  );
 
   const privacyUrl =
     event.privacyPolicyUrl ??
@@ -68,7 +89,7 @@ export default async function RegistrationPage({
         <div className="col-lg-7">
           <div className="mb-3">
             <Link
-              href={`/events/${slug}`}
+              href={percorso(`/events/${slug}`)}
               className="text-decoration-none d-inline-flex align-items-center text-primary"
               style={{ fontSize: '0.9rem' }}
             >
@@ -98,6 +119,7 @@ export default async function RegistrationPage({
               requireOrganizationRole: event.requireOrganizationRole,
               requireOrganizationType: event.requireOrganizationType,
             }}
+            registrationAccess={registrationAccess}
           />
         </div>
       </div>

@@ -34,7 +34,7 @@ describe('isHumanParticipant', () => {
     ).toBe(false);
   });
 
-  it('excludes the bot despite whitespace or a formatted suffix (full-name prefix, feedback #2)', () => {
+  it('excludes the bot despite whitespace or a formatted suffix (full-name prefix)', () => {
     // The surfaced name can gain leading/trailing whitespace or a
     // "formattedDisplayName" suffix; an exact === match let these through and
     // the bot reappeared in the roster/count. The full-name prefix catches them.
@@ -94,7 +94,7 @@ describe('humanParticipantCount', () => {
     getParticipantsInfo: () => roster,
   });
 
-  it('counts the humans in the room and excludes the recording bot (F2)', () => {
+  it('counts the humans in the room and excludes the recording bot', () => {
     expect(
       humanParticipantCount(
         api([
@@ -108,11 +108,11 @@ describe('humanParticipantCount', () => {
     ).toBe(2);
   });
 
-  it('does NOT drop the local user — the "4 persone" off-by-one (feedback #4)', () => {
-    // Exactly the DevIt room: 6 endpoints on the bridge = 5 people + the bot.
+  it('does NOT drop the local user — the "4 persone" off-by-one', () => {
+    // A real room: 6 endpoints on the bridge = 5 people + the recording bot.
     // The old implementation seeded the dedup set with the local name and then
     // met that same name in the roster, scoring it as a duplicate: it reported
-    // 4. Since #4b that wrong number was also written to Event.peakParticipants.
+    // 4, and that wrong number was also written to Event.peakParticipants.
     const roster = [
       { participantId: 'me', displayName: 'Anna' },
       { participantId: 'b', displayName: 'Alex' },
@@ -126,7 +126,7 @@ describe('humanParticipantCount', () => {
     expect(humanParticipantCount(api(roster))).toBe(5);
   });
 
-  it('collapses same-name zombie endpoints (F4)', () => {
+  it('collapses same-name zombie endpoints', () => {
     // One live "Mario" plus two leftover endpoints from Back-button rejoins.
     expect(
       humanParticipantCount(
@@ -142,8 +142,8 @@ describe('humanParticipantCount', () => {
     ).toBe(2);
   });
 
-  it("collapses the local user's OWN zombie (F4)", () => {
-    // Alex rejoined: their live endpoint and the zombie share the name.
+  it("collapses the local user's OWN zombie", () => {
+    // The local user rejoined: their live endpoint and the zombie share the name.
     expect(
       humanParticipantCount(
         api([
@@ -156,7 +156,7 @@ describe('humanParticipantCount', () => {
     ).toBe(1);
   });
 
-  it('is case- and whitespace-insensitive when deduping (F4)', () => {
+  it('is case- and whitespace-insensitive when deduping', () => {
     expect(
       humanParticipantCount(
         api([
@@ -167,7 +167,7 @@ describe('humanParticipantCount', () => {
     ).toBe(1);
   });
 
-  it('never merges distinct anonymous (empty-name) endpoints (F4)', () => {
+  it('never merges distinct anonymous (empty-name) endpoints', () => {
     expect(
       humanParticipantCount(
         api([

@@ -1,4 +1,13 @@
-type Locale = 'it' | 'en';
+// Formato regionale per ogni lingua: `en` e' l'inglese europeo (giorno prima
+// del mese, orario a 24 ore). Le altre lingue usano il proprio codice.
+const REGIONE: Record<string, string> = {
+  it: 'it-IT',
+  en: 'en-GB',
+  fr: 'fr-FR',
+  de: 'de-DE',
+  es: 'es-ES',
+};
+const tagRegionale = (locale: string) => REGIONE[locale] ?? locale;
 
 export const DEFAULT_TIMEZONE = 'Europe/Rome';
 
@@ -11,8 +20,8 @@ export function formatDuration(startsAt: Date, endsAt: Date): string {
   return `${minutes}min`;
 }
 
-export function formatDate(date: Date, locale: Locale, timeZone?: string): string {
-  return date.toLocaleDateString(locale === 'it' ? 'it-IT' : 'en-GB', {
+export function formatDate(date: Date, locale: string, timeZone?: string): string {
+  return date.toLocaleDateString(tagRegionale(locale), {
     weekday: 'long',
     day: 'numeric',
     month: 'long',
@@ -21,8 +30,8 @@ export function formatDate(date: Date, locale: Locale, timeZone?: string): strin
   });
 }
 
-export function formatTime(date: Date, locale: Locale, timeZone?: string): string {
-  return date.toLocaleTimeString(locale === 'it' ? 'it-IT' : 'en-GB', {
+export function formatTime(date: Date, locale: string, timeZone?: string): string {
+  return date.toLocaleTimeString(tagRegionale(locale), {
     hour: '2-digit',
     minute: '2-digit',
     timeZone: timeZone ?? DEFAULT_TIMEZONE,

@@ -5,7 +5,6 @@ import { useTranslations } from 'next-intl';
 import {
   Button,
   Badge,
-  Icon,
   Modal,
   ModalHeader,
   ModalBody,
@@ -13,9 +12,11 @@ import {
   Spinner,
 } from 'design-react-kit';
 
+import { Icon } from '@/components/ui/icon';
+import type { FaseRegistratore } from '@/lib/jitsi/bridge-readiness';
 import type { JitsiMeetExternalAPI } from '@/types/jitsi';
 import { useJitsiEvents } from '@/hooks/use-jitsi-events';
-import { useRouter } from '@/i18n/navigation';
+import { useRouter, percorso } from '@/i18n/navigation';
 
 import RaisedHandsPanel from './raised-hands-panel';
 
@@ -24,12 +25,21 @@ interface ModeratorControlsProps {
   eventId: string;
   moderatorToken: string;
   recordingEnabled: boolean;
-  jibriAvailable?: boolean;
+  /** Stato del registratore letto dalla sonda di stato
+   *  (lib/jitsi/bridge-readiness#leggiFaseRegistratore). `null` = non lo so:
+   *  il pulsante resta usabile. */
+  recorderPhase?: FaseRegistratore | null;
   participantsCanUnmute?: boolean;
   participantsCanStartVideo?: boolean;
   /** Event opted into the native Jitsi/Excalidraw whiteboard → show the
    *  "Apri lavagna" toggle (desktop only, matching Jitsi's own gating). */
   whiteboardEnabled?: boolean;
+  /** The installation serves the whiteboard (Excalidraw backend + Jitsi
+   *  `config.whiteboard.enabled`). Without it the toggle stays hidden so it
+   *  never shows as a dead button. Resolved at RUNTIME by the live page's
+   *  Server Component (lib/jitsi/whiteboard.ts), never read from
+   *  `process.env` here: webpack would freeze it into the image at build. */
+  whiteboardInfraReady?: boolean;
   /** Local moderator's display name, forwarded to the raised-hands panel
    *  so it can resolve the current user's own raise-hand event. */
   localDisplayName?: string;
@@ -62,21 +72,16 @@ const BTN_DANGER: React.CSSProperties = {
   fontSize: '0.82rem',
 };
 
-// The native Jitsi/Excalidraw whiteboard needs a collab backend + Jitsi
-// `config.whiteboard.enabled` server-side, which is NOT deployed yet (no
-// excalidraw backend in any cluster). Keep the toggle hidden until the infra
-// lands and this build-time env is set, so it never shows as a dead button.
-const WHITEBOARD_INFRA_READY = process.env.NEXT_PUBLIC_WHITEBOARD_ENABLED === 'true';
-
 export default function ModeratorControls({
   api,
   eventId,
   moderatorToken,
   recordingEnabled,
-  jibriAvailable = true,
+  recorderPhase = null,
   participantsCanUnmute = false,
   participantsCanStartVideo = false,
   whiteboardEnabled = false,
+  whiteboardInfraReady = false,
   localDisplayName = '',
   isPrimaryModerator = false,
 }: ModeratorControlsProps) {
@@ -99,12 +104,55 @@ export default function ModeratorControls({
   const [recCooldown, setRecCooldown] = useState(false);
   const recTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const endNavigationTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     return () => {
       if (endNavigationTimerRef.current) clearTimeout(endNavigationTimerRef.current);
+      if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
     };
   }, []);
+
+  // Un avviso alla volta: il timer del precedente non deve spegnere il nuovo.
+  const mostraAvviso = useCallback((messaggio: string, durataMs = 4000) => {
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    setRecToast(messaggio);
+    toastTimerRef.current = setTimeout(() => setRecToast(''), durataMs);
+  }, []);
+
+  // Il registratore non si è acceso entro il tempo massimo: la sonda smette di
+  // dire «in avvio» e chi modera riceve un avviso esplicito, una volta per
+  // attesa (la fase non torna indietro: bridge-readiness#faseRegistratoreStabile).
+  // Chi entra quando il registratore è già dato per non partito riceve lo
+  // stesso avviso: tutti i moderatori leggono la stessa sonda. Nessun avviso
+  // mentre si registra: la sonda può non raggiungere l'API di salute di un
+  // registratore che sta lavorando, e il pulsante per fermarlo resta.
+  const fasePrecedenteRef = useRef<FaseRegistratore | null>(null);
+  const avvisoNonPartito = tl('recorderNotStartedDetail');
+  useEffect(() => {
+    const precedente = fasePrecedenteRef.current;
+    fasePrecedenteRef.current = recorderPhase;
+    if (
+      !recordingEnabled ||
+      isRecording ||
+      recorderPhase !== 'non-partito' ||
+      precedente === 'non-partito'
+    ) {
+      return;
+    }
+    mostraAvviso(avvisoNonPartito, 10_000);
+  }, [recorderPhase, recordingEnabled, isRecording, mostraAvviso, avvisoNonPartito]);
+
+  // Una registrazione in corso smentisce l'avviso: chi entra tardi può
+  // riceverlo prima che Jitsi gli comunichi la registrazione già avviata.
+  useEffect(() => {
+    if (isRecording) setRecToast((attuale) => (attuale === avvisoNonPartito ? '' : attuale));
+  }, [isRecording, avvisoNonPartito]);
+
+  const registratoreBloccato =
+    recorderPhase === 'in-avvio' ||
+    recorderPhase === 'non-partito' ||
+    recorderPhase === 'non-configurato';
 
   useEffect(() => {
     if (!api) return;
@@ -203,11 +251,10 @@ export default function ModeratorControls({
         recRetryRef.current = setTimeout(attemptStartRecording, delay);
       } else {
         recAttemptsRef.current = 0;
-        setRecToast(tl('jibriUnavailable'));
-        setTimeout(() => setRecToast(''), 4000);
+        mostraAvviso(tl('recorderStartFailed'), 8000);
       }
     }
-  }, [api, tl]);
+  }, [api, tl, mostraAvviso]);
 
   // Listen for recording errors (service-unavailable) and auto-retry
   useEffect(() => {
@@ -220,8 +267,7 @@ export default function ModeratorControls({
         recRetryRef.current = setTimeout(attemptStartRecording, delay);
       } else if (evt.error) {
         recAttemptsRef.current = 0;
-        setRecToast(tl('jibriUnavailable'));
-        setTimeout(() => setRecToast(''), 4000);
+        mostraAvviso(tl('recorderStartFailed'), 8000);
       } else if (evt.on !== undefined) {
         recAttemptsRef.current = 0;
       }
@@ -230,25 +276,22 @@ export default function ModeratorControls({
     return () => {
       api.removeListener('recordingStatusChanged', onRecordingLinkUpdate);
     };
-  }, [api, attemptStartRecording, tl]);
+  }, [api, attemptStartRecording, tl, mostraAvviso]);
 
   const handleToggleRecording = useCallback(() => {
-    if (!api || !jibriAvailable || recCooldown) {
-      if (!recCooldown) {
-        setRecToast(tl('jibriUnavailable'));
-        setTimeout(() => setRecToast(''), 3000);
-      }
-      return;
-    }
+    if (!api || recCooldown) return;
     if (isRecording) {
       api.executeCommand('stopRecording', 'file');
       setRecCooldown(true);
       setTimeout(() => setRecCooldown(false), 8000);
     } else {
+      // Il pulsante è disabilitato in queste fasi; la guardia resta per
+      // non avviare nulla da un click arrivato durante il cambio di fase.
+      if (registratoreBloccato) return;
       recAttemptsRef.current = 0;
       attemptStartRecording();
     }
-  }, [api, isRecording, tl, jibriAvailable, recCooldown, attemptStartRecording]);
+  }, [api, isRecording, recCooldown, registratoreBloccato, attemptStartRecording]);
 
   const handleEndEvent = useCallback(async () => {
     setEnding(true);
@@ -263,8 +306,7 @@ export default function ModeratorControls({
       });
       if (!res.ok) {
         setEnding(false);
-        setRecToast(tl('endEventError'));
-        setTimeout(() => setRecToast(''), 4000);
+        mostraAvviso(tl('endEventError'));
         return;
       }
       api?.executeCommand('hangup');
@@ -274,15 +316,14 @@ export default function ModeratorControls({
       // client turns into the "evento concluso" screen — no 404 redirect.
       if (isPrimaryModerator) {
         endNavigationTimerRef.current = setTimeout(() => {
-          router.push(`/admin/events/${eventId}?token=${moderatorToken}`);
+          router.push(percorso(`/admin/events/${eventId}?token=${moderatorToken}`));
         }, 2000);
       }
     } catch {
       setEnding(false);
-      setRecToast(tl('endEventError'));
-      setTimeout(() => setRecToast(''), 4000);
+      mostraAvviso(tl('endEventError'));
     }
-  }, [api, eventId, moderatorToken, router, tl]);
+  }, [api, eventId, moderatorToken, router, tl, mostraAvviso, isPrimaryModerator]);
 
   return (
     <>
@@ -344,9 +385,12 @@ export default function ModeratorControls({
             )}
           </Button>
 
-          {/* Recording */}
+          {/* Recording — il pulsante normale ogni volta che si può agire:
+              registrazione in corso (va sempre potuta fermare, qualunque cosa
+              dica la sonda), pausa dopo lo stop, registratore pronto o stato
+              sconosciuto. Le altre fasi lo sostituiscono con un indicatore. */}
           {recordingEnabled && (
-            jibriAvailable ? (
+            isRecording || recCooldown || !registratoreBloccato ? (
               <Button
                 color={isRecording ? 'danger' : 'secondary'}
                 size="sm"
@@ -388,7 +432,7 @@ export default function ModeratorControls({
                   </>
                 )}
               </Button>
-            ) : (
+            ) : recorderPhase === 'in-avvio' ? (
               <Button
                 color="secondary"
                 size="sm"
@@ -400,13 +444,31 @@ export default function ModeratorControls({
                 <Spinner active small className="me-1" style={{ width: 14, height: 14 }} />
                 {tl('jibriScaling')}
               </Button>
+            ) : (
+              <Button
+                color="secondary"
+                size="sm"
+                className={BTN_BASE}
+                disabled
+                style={{ ...BTN_DEFAULT, opacity: 0.6 }}
+                title={
+                  recorderPhase === 'non-partito'
+                    ? tl('recorderNotStartedDetail')
+                    : tl('jibriNotConfigured')
+                }
+              >
+                <Icon icon="it-warning-circle" size="sm" color="white" />
+                {recorderPhase === 'non-partito'
+                  ? tl('recorderNotStarted')
+                  : tl('jibriNotConfigured')}
+              </Button>
             )
           )}
 
           {/* Whiteboard — toggle the native Jitsi/Excalidraw board via the
               IFrame API. Desktop-only (matches Jitsi's own toolbar gating; the
               board doesn't render on mobile) and only when the event opted in. */}
-          {whiteboardEnabled && WHITEBOARD_INFRA_READY && (
+          {whiteboardEnabled && whiteboardInfraReady && (
             <Button
               color="secondary"
               size="sm"
@@ -481,7 +543,7 @@ export default function ModeratorControls({
 
       {/* End event confirmation modal */}
       <Modal isOpen={endModalOpen} toggle={() => setEndModalOpen(false)} centered>
-        <ModalHeader toggle={() => setEndModalOpen(false)}>
+        <ModalHeader closeAriaLabel={tc('close')} toggle={() => setEndModalOpen(false)}>
           {t('endEvent')}
         </ModalHeader>
         <ModalBody>

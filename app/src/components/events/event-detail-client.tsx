@@ -2,11 +2,12 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useTranslations, useFormatter } from 'next-intl';
-import { Alert, Button, Badge, Card, CardBody, Icon, Row, Col } from 'design-react-kit';
+import { Alert, Button, Badge, Card, CardBody, Row, Col } from 'design-react-kit';
 
-import { Link } from '@/i18n/navigation';
+import { Icon } from '@/components/ui/icon';
+import { Link, percorso } from '@/i18n/navigation';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
-import { REGISTRABLE_STATUSES } from '@/lib/events/visibility';
+import { youtubeWatchLink } from '@/lib/utils/youtube-link';
 import AddToCalendar from '@/components/events/add-to-calendar';
 import VideoPlayer, {
   type VideoPlayerHandle,
@@ -14,8 +15,10 @@ import VideoPlayer, {
   type AudioTrack,
 } from '@/components/events/video-player';
 import PostEventTabs from '@/components/events/post-event-tabs';
+import MaterialList from '@/components/materials/material-list';
 import PostEventRecap from '@/components/events/post-event-recap';
 import { isRecapEmpty, type EventRecap } from '@/lib/events/recap';
+import type { RegistrationAccess } from '@/lib/events/registration-access';
 import PostEventFeedbackInvite from '@/components/events/post-event-feedback-invite';
 import PostEventHero, {
   type StructuredSummary,
@@ -105,8 +108,13 @@ interface TagChip {
 interface EventDetailClientProps {
   event: EventData;
   locale: string;
+  /** Origine pubblica dell'app, per i link assoluti del calendario. */
+  appUrl: string;
   parseTitleKicker?: boolean;
   answeredQuestions?: AnsweredQuestion[];
+  /** Materiali già filtrati dal server per il pubblico: quelli della fase
+   *  «prima» prima dell'inizio, quelli post-evento a evento concluso,
+   *  nessuno nel mezzo (li elenca la sala). */
   materials?: MaterialData[];
   polls?: PollData[];
   feedbackSummary?: FeedbackSummary | null;
@@ -119,6 +127,17 @@ interface EventDetailClientProps {
   /** Il device ha il cookie d'accesso firmato per questo evento: il link
    *  "Entra nella sala" può re-identificarlo su /live. */
   hasRoomAccess?: boolean;
+  /** Chi può iscriversi (lib/events/registration-access). */
+  registrationAccess?: RegistrationAccess;
+  /** L'evento accetta iscrizioni adesso: `isEventOpenForRegistration`
+   *  (lib/events/visibility) calcolato dal server, che conosce l'ora. Falso su
+   *  un evento non concluso vuol dire che l'orario di fine è passato senza che
+   *  la sala si aprisse. */
+  registrationOpen: boolean;
+  /** In diretta si entra anche senza iscrizione (lib/events/guest-window). */
+  guestEntryOpen?: boolean;
+  /** L'evento ha un questionario post-evento: solo allora compare l'invito. */
+  hasPostEventQuestionnaire?: boolean;
 }
 
 const STATUS_COLOR: Record<string, string> = {
@@ -142,6 +161,7 @@ function localeDisplayName(lang: string): string {
 export default function EventDetailClient({
   event,
   locale,
+  appUrl,
   parseTitleKicker = false,
   answeredQuestions = [],
   materials = [],
@@ -151,9 +171,15 @@ export default function EventDetailClient({
   tags = [],
   invalidToken = false,
   hasRoomAccess = false,
+  registrationAccess = 'open',
+  registrationOpen,
+  guestEntryOpen = true,
+  hasPostEventQuestionnaire = false,
 }: EventDetailClientProps) {
   const t = useTranslations('events');
+  const tr = useTranslations('registration');
   const tv = useTranslations('video');
+  const tm = useTranslations('materials');
   const tPostprod = useTranslations('postprod');
   const format = useFormatter();
 
@@ -199,16 +225,20 @@ export default function EventDetailClient({
 
   const speakers = getLocalized(event.speakersInfo as LocalizedField, locale);
 
-  // PROVISIONING/IDLE = evento schedulato in pre-warm/pausa: registrazione
-  // aperta come per PUBLISHED. Il server ha già applicato i filtri veri
-  // (eventType/endsAt, vedi lib/events/visibility): qui basta lo stato.
-  const canRegister = (REGISTRABLE_STATUSES as string[]).includes(event.status);
+  const isEnded = event.status === 'ENDED';
+  // Evento non concluso che non accetta più iscrizioni: l'orario di fine è
+  // passato senza che la sala si aprisse, e la chiusura la farà il giro del
+  // ciclo di vita. Per il pubblico è già finito: niente iscrizione, niente
+  // ingresso, niente promemoria di calendario.
+  const pastEndNotHeld = !isEnded && !registrationOpen;
   // Per il pubblico il warm-up È "in programma": badge e colori non hanno
   // (né devono avere) varianti PROVISIONING/IDLE in 24 lingue.
-  const publicStatus = ['PROVISIONING', 'IDLE'].includes(event.status)
-    ? 'PUBLISHED'
-    : event.status;
-  const isEnded = event.status === 'ENDED';
+  const publicStatus = pastEndNotHeld
+    ? 'ENDED'
+    : ['PROVISIONING', 'IDLE'].includes(event.status)
+      ? 'PUBLISHED'
+      : event.status;
+  const youtubeLink = youtubeWatchLink(event.youtubeUrl);
   const isLive = event.status === 'LIVE';
   const accentColor = STATUS_COLOR[publicStatus] ?? STATUS_COLOR.PUBLISHED;
 
@@ -306,7 +336,11 @@ export default function EventDetailClient({
         <Alert color="warning" className="mb-4">
           <strong>{t('detail.invalidTokenTitle')}</strong>
           <div className="mt-1">
-            {isEnded ? t('detail.invalidTokenBodyEnded') : t('detail.invalidTokenBody')}
+            {isEnded
+              ? t('detail.invalidTokenBodyEnded')
+              : pastEndNotHeld
+                ? t('detail.registrationEnded')
+                : t('detail.invalidTokenBody')}
           </div>
         </Alert>
       )}
@@ -400,7 +434,7 @@ export default function EventDetailClient({
                 return (
                   <Link
                     key={tag.slug}
-                    href={`/events?tag=${tag.slug}`}
+                    href={percorso(`/events?tag=${tag.slug}`)}
                     className="text-decoration-none"
                     style={{
                       padding: '0.25rem 0.75rem',
@@ -531,16 +565,28 @@ export default function EventDetailClient({
             />
           )}
 
-          {/* Video player for ended events with a recording. YouTube
-              embed wins when set (legacy uploads / mirrored streams);
-              otherwise the self-hosted MP4 is served via our signed
-              /api/events/[slug]/recording route. */}
-          {isEnded && event.youtubeUrl && (
+          {/* Video di un evento concluso. La registrazione pubblicata passa
+              dal player del portale (/api/events/[slug]/recording). Il
+              `youtubeUrl` è solo un link esterno, mai un player incorporato:
+              un iframe di YouTube farebbe contattare un servizio terzo a
+              chiunque apra la pagina (lib/utils/youtube-link). */}
+          {isEnded && youtubeLink && (
             <div className="mb-4">
-              <YouTubeEmbed url={event.youtubeUrl} title={title} />
+              <a
+                href={youtubeLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary text-decoration-none d-inline-flex align-items-center gap-1 fw-semibold"
+              >
+                <Icon icon="it-external-link" size="sm" color="primary" />
+                {tv('watchOnYouTube')}
+              </a>
+              <div className="text-muted" style={{ fontSize: '0.82rem' }}>
+                {tv('externalSiteNote')}
+              </div>
             </div>
           )}
-          {isEnded && !event.youtubeUrl && event.recordingUrl && (
+          {isEnded && event.recordingUrl && (
             <div className="mb-4">
               <div ref={playerAnchorRef} style={{ position: 'relative' }}>
                 <VideoPlayer
@@ -593,7 +639,7 @@ export default function EventDetailClient({
                     padding: '8px 12px',
                   }}
                 >
-                  <Icon icon="it-volume-high" size="sm" color={undefined} />
+                  <Icon icon="it-hearing" size="sm" color={undefined} />
                   <span>
                     {tPostprod('dubAvailableHint', {
                       langs: postprodMeta.audioTracks
@@ -623,6 +669,19 @@ export default function EventDetailClient({
             {t('detail.description')}
           </h2>
           <MarkdownRenderer content={description} className="mb-4" />
+
+          {/* Materiali prima dell'inizio: il server manda qui solo quelli che
+              il pubblico può vedere in questa fase (sempre visibili e
+              preparatori), e nessuno da quando l'evento è iniziato. A evento
+              concluso l'elenco sta nelle tab post-evento. */}
+          {!isEnded && materials.length > 0 && (
+            <section className="mb-4">
+              <h2 className="h4 fw-semibold mb-3" style={{ color: 'var(--app-text)' }}>
+                {tm('title')}
+              </h2>
+              <MaterialList materials={materials} />
+            </section>
+          )}
 
           {/* Post-event recap: aggregate summary card above the detail tabs. */}
           {isEnded &&
@@ -703,11 +762,13 @@ export default function EventDetailClient({
             />
           )}
 
-          {/* Post-event feedback questionnaire invite (self-hides when the
-              event has no POST_EVENT questionnaire configured). */}
-          {isEnded && event.postEventShowFeedback !== false && (
-            <PostEventFeedbackInvite eventSlug={event.slug} />
-          )}
+          {/* Invito al questionario post-evento: solo se l'evento ne ha uno
+              (lo dice il server). */}
+          {isEnded &&
+            event.postEventShowFeedback !== false &&
+            hasPostEventQuestionnaire && (
+              <PostEventFeedbackInvite eventSlug={event.slug} />
+            )}
 
           {/* Feature diagram moved behind the admin UI — it's internal
               infra/capacity info, not something public attendees need. */}
@@ -724,9 +785,27 @@ export default function EventDetailClient({
                   event={event}
                   feedbackSummary={feedbackSummary}
                 />
+              ) : pastEndNotHeld ? (
+                // Iscrizione e ingresso porterebbero a una pagina che risponde
+                // 404 (iscrizione) o a una sala che non si apre più.
+                <div role="status">
+                  <h3
+                    className="h6 text-uppercase fw-semibold mb-2"
+                    style={{
+                      letterSpacing: '0.04em',
+                      color: 'var(--app-muted)',
+                      fontSize: '0.8rem',
+                    }}
+                  >
+                    {t('detail.eventEnded')}
+                  </h3>
+                  <p className="text-muted mb-0" style={{ fontSize: '0.88rem' }}>
+                    {t('detail.registrationEnded')}
+                  </p>
+                </div>
               ) : (
                 <>
-                  {/* F5: il numero di registrati NON è più mostrato
+                  {/* Il numero di registrati NON è mostrato
                       pubblicamente (né qui né nel listing). Resta visibile
                       agli amministratori nel pannello admin. Il pubblico vede
                       solo il conteggio dei presenti nella sala live. */}
@@ -735,8 +814,11 @@ export default function EventDetailClient({
                       {t('detail.registered')}
                     </p>
                   )}
-                  {canRegister && !(hasRoomAccess && !invalidToken) && (
-                    <Link href={`/events/${event.slug}/registration`}>
+                  {/* Da qui in giù l'evento accetta iscrizioni (registrationOpen):
+                      gli altri casi li coprono i due rami sopra. */}
+                  {!(hasRoomAccess && !invalidToken) &&
+                    registrationAccess !== 'closed' && (
+                    <Link href={percorso(`/events/${event.slug}/registration`)}>
                       <Button
                         color="primary"
                         size="lg"
@@ -749,10 +831,36 @@ export default function EventDetailClient({
                     </Link>
                   )}
 
-                  {canRegister && (isLive || (hasRoomAccess && !invalidToken)) && (
+                  {/* Iscrizione pubblica spenta: si dice prima del clic chi può
+                      iscriversi, o che non si può. Senza il pulsante, chi si
+                      era iscritto prima trova qui la via per farsi rimandare
+                      il link: la pagina d'iscrizione, che senza invitati
+                      offre solo quella. */}
+                  {!(hasRoomAccess && !invalidToken) &&
+                    registrationAccess !== 'open' && (
+                    <p className="text-muted mt-2 mb-0" style={{ fontSize: '0.85rem' }}>
+                      {registrationAccess === 'invitation' ? tr('invitationOnly') : tr('closed')}
+                    </p>
+                  )}
+                  {!(hasRoomAccess && !invalidToken) &&
+                    registrationAccess === 'closed' && (
+                    <p className="mt-2 mb-0" style={{ fontSize: '0.85rem' }}>
+                      <Link
+                        href={percorso(`/events/${event.slug}/registration`)}
+                        className="text-decoration-none fw-semibold text-primary"
+                      >
+                        {tr('lostLink')}
+                      </Link>
+                    </p>
+                  )}
+
+                  {((isLive && guestEntryOpen) || (hasRoomAccess && !invalidToken)) && (
                     // Via d'ingresso per chi si è già registrato: /live lo
                     // re-identifica dal cookie firmato (o lo fa entrare come
-                    // ospite se LIVE), evitando il loop registrazione → 409.
+                    // ospite se LIVE e l'amministrazione ammette ospiti),
+                    // evitando il loop registrazione → 409. Senza cookie e
+                    // senza ospiti /live rimanderebbe all'iscrizione: il link
+                    // non compare.
                     // Su evento non ancora LIVE il link appare SOLO se il device
                     // ha il cookie firmato valido: senza, /live rimbalzerebbe alla
                     // registrazione — esattamente il dead-end che questo link vuole
@@ -761,7 +869,7 @@ export default function EventDetailClient({
                     // link accanto all'alert creerebbe un ping-pong infinito.
                     <p className="text-center mt-3 mb-0" style={{ fontSize: '0.85rem' }}>
                       <Link
-                        href={`/events/${event.slug}/live`}
+                        href={percorso(`/events/${event.slug}/live`)}
                         className="text-decoration-none fw-semibold text-primary"
                         onMouseDown={() => {
                           // 1a: anticipa il risveglio del bridge (JVB) al
@@ -792,6 +900,7 @@ export default function EventDetailClient({
                     startsAt={event.startsAt}
                     endsAt={event.endsAt}
                     slug={event.slug}
+                    appUrl={appUrl}
                   />
                 </>
               )}
@@ -854,7 +963,7 @@ function PostEventSidebar({
         {t('detail.eventEnded')}
       </h3>
 
-      {/* F5: registrati non mostrati pubblicamente. Manteniamo solo il
+      {/* Registrati non mostrati pubblicamente. Manteniamo solo il
           conteggio dei presenti (picco) qui sotto. */}
       {event.peakParticipants !== undefined && event.peakParticipants > 0 && (
         <div
@@ -921,72 +1030,5 @@ function PostEventSidebar({
         </div>
       )}
     </>
-  );
-}
-
-/**
- * Normalize a YouTube watch/shortlink URL to an embed URL.
- * Accepts:
- *   - https://www.youtube.com/watch?v=VIDEO_ID
- *   - https://youtu.be/VIDEO_ID
- *   - https://www.youtube.com/embed/VIDEO_ID (already normalized)
- * Returns null for anything we can't confidently map to a video id.
- */
-function toYouTubeEmbed(url: string): string | null {
-  try {
-    const u = new URL(url);
-    if (u.hostname.includes('youtu.be')) {
-      const id = u.pathname.replace(/^\//, '').split('/')[0];
-      return id ? `https://www.youtube.com/embed/${id}` : null;
-    }
-    if (u.hostname.includes('youtube.com')) {
-      if (u.pathname.startsWith('/embed/')) return url;
-      const id = u.searchParams.get('v');
-      return id ? `https://www.youtube.com/embed/${id}` : null;
-    }
-  } catch {
-    /* fall through */
-  }
-  return null;
-}
-
-function YouTubeEmbed({ url, title }: { url: string; title: string }) {
-  const embed = toYouTubeEmbed(url);
-  if (!embed) {
-    // Fallback to a plain link if the URL didn't parse as a YouTube
-    // video — better than rendering nothing silently.
-    return (
-      <a href={url} target="_blank" rel="noopener noreferrer">
-        {url}
-      </a>
-    );
-  }
-  return (
-    <div
-      style={{
-        position: 'relative',
-        paddingBottom: '56.25%',
-        height: 0,
-        overflow: 'hidden',
-        borderRadius: 8,
-        background: '#000',
-      }}
-    >
-      <iframe
-        src={embed}
-        title={title}
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowFullScreen
-        loading="lazy"
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          border: 0,
-        }}
-      />
-    </div>
   );
 }

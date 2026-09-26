@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 
-import { useRouter } from '@/i18n/navigation';
+import { useRouter, percorso } from '@/i18n/navigation';
 import TemplatePicker from '@/components/admin/template-picker';
 import EventWizard from '@/components/admin/event-wizard/wizard-shell';
 import type { PermissionMatrix } from '@/lib/utils/permission-matrix';
@@ -34,6 +34,7 @@ interface TemplatePreset {
   recordingEnabled: boolean;
   autoStartRecording: boolean;
   agendaEnabled?: boolean;
+  wordCloudEnabled?: boolean;
   whiteboardEnabled?: boolean;
   waitingRoomEngine?: 'GARDEN' | 'GAME' | 'CLASSIC' | null;
   participantsCanUnmute: boolean;
@@ -45,6 +46,10 @@ interface TemplatePreset {
   aiTranscriptEnabled?: boolean;
   aiSummaryEnabled?: boolean;
   aiTranslationEnabled?: boolean;
+  aiDubbingEnabled?: boolean;
+  multitrackRecordingEnabled?: boolean;
+  retainParticipantTracks?: boolean;
+  aiTargetLocales?: string | null;
   descriptionTemplate?: Record<string, string> | null;
   defaultRetentionDays?: number | null;
   defaultExpectedSpeakers?: number | null;
@@ -58,11 +63,13 @@ interface Props {
   defaultLocale: string;
   defaultSenderRatioPct: number;
   defaultRetentionDays: number;
+  canUseRubrica: boolean;
   jvbSizingConfig: JvbSizingConfig;
   availableTags: Array<{ slug: string; name: Record<string, string>; color: string | null }>;
   gdprTemplates: Array<{ id: string; name: string; isDefault: boolean }>;
   siteDefaultParseTitleKicker: boolean;
   siteDefaultVideoQuality: VideoQualityPreset;
+  whiteboardInfraReady: boolean;
 }
 
 export default function CreateEventWithTemplate({
@@ -73,11 +80,13 @@ export default function CreateEventWithTemplate({
   defaultLocale,
   defaultSenderRatioPct,
   defaultRetentionDays,
+  canUseRubrica,
   jvbSizingConfig,
   availableTags,
   gdprTemplates,
   siteDefaultParseTitleKicker,
   siteDefaultVideoQuality,
+  whiteboardInfraReady,
 }: Props) {
   const t = useTranslations('admin.templates');
   const ti = useTranslations('admin.instantCall');
@@ -157,7 +166,7 @@ export default function CreateEventWithTemplate({
         <TemplatePicker
           templates={templates}
           onSelect={(tpl) => {
-            router.push(`/admin/events/new?template=${tpl.id}`);
+            router.push(percorso(`/admin/events/new?template=${tpl.id}`));
           }}
           onSkip={() => setSkipped(true)}
         />
@@ -173,11 +182,13 @@ export default function CreateEventWithTemplate({
       defaultLocale={defaultLocale}
       defaultSenderRatioPct={defaultSenderRatioPct}
       defaultRetentionDays={defaultRetentionDays}
+      canUseRubrica={canUseRubrica}
       jvbSizingConfig={jvbSizingConfig}
       availableTags={availableTags}
       gdprTemplates={gdprTemplates}
       siteDefaultParseTitleKicker={siteDefaultParseTitleKicker}
       siteDefaultVideoQuality={siteDefaultVideoQuality}
+      whiteboardInfraReady={whiteboardInfraReady}
     />
   );
 }

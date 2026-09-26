@@ -1,7 +1,9 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { Alert, Button, Icon } from 'design-react-kit';
+import { Alert, Button } from 'design-react-kit';
+
+import { Icon } from '@/components/ui/icon';
 
 interface ErrorFallbackProps {
   error: Error & { digest?: string };

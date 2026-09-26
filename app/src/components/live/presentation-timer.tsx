@@ -3,7 +3,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslations } from 'next-intl';
-import { Button, Icon } from 'design-react-kit';
+import { Button } from 'design-react-kit';
+
+import { Icon } from '@/components/ui/icon';
 
 interface PresentationTimerProps {
   eventSlug: string;
@@ -172,7 +174,7 @@ export default function PresentationTimer({ eventSlug, token, isModerator }: Pre
             aria-label={t('showToAll')}
             aria-pressed={timer.visible}
           >
-            <Icon icon={timer.visible ? 'it-eye' : 'it-password-invisible'} size="xs" color="white" />
+            <Icon icon={timer.visible ? 'it-password-visible' : 'it-password-invisible'} size="xs" color="white" />
           </button>
         </div>
       )}

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 
-import { withErrorHandling } from '@/lib/api-handler';
+import { parseJsonBody, withErrorHandling } from '@/lib/api-handler';
 import { prisma } from '@/lib/db';
 import { NotFoundError, RateLimitError, ValidationError } from '@/lib/errors';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
@@ -63,7 +63,7 @@ export const POST = withErrorHandling(async (request, context) => {
     throw new RateLimitError((rl.resetAt - Date.now()) / 1000);
   }
 
-  const body = await request.json();
+  const body = await parseJsonBody(request);
   const parsed = bodySchema.safeParse(body);
   if (!parsed.success) {
     throw new ValidationError('Invalid speaker-events payload');

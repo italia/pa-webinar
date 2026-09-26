@@ -176,7 +176,7 @@
       "subjects": ["tenant:<TENANT-ID>"],
       "annotator": { "organization": { "name": "<OPERATORE>" } },
       "timestamp": "2026-01-01T00:00:00Z",
-      "text": "Template di Service Inventory per un'istanza pa-webinar. Sostituisci i segnaposto <...> con i valori REALI del tuo ambiente (vedi docs/SERVICE-INVENTORY.md §4 per le ricette di discovery per Azure/AWS/GCP/on-prem), ospita il file su un URL HTTPS e impostalo in SERVICE_INVENTORY_URL. La parte components[] (DEV) può essere generata automaticamente a ogni release da cdxgen + syft."
+      "text": "Template di Service Inventory per un'istanza pa-webinar. Sostituisci i segnaposto <...> con i valori REALI del tuo ambiente (le ricette di discovery per Azure, Google Cloud, AWS e on-prem sono in docs/SERVICE-INVENTORY-GENERATION.md, \"The OPS half: operational services\"), ospita il file su un URL HTTPS e impostalo in SERVICE_INVENTORY_URL. La parte components[] (DEV) può essere generata automaticamente a ogni release da cdxgen + syft."
     }
   ]
 }

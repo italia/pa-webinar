@@ -2,7 +2,7 @@ import { withErrorHandling } from '@/lib/api-handler';
 import { prisma } from '@/lib/db';
 import { resolveLocale, getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import { getSettings } from '@/lib/settings';
-import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { eventScope, getStaffSession } from '@/lib/auth/staff-session';
 import { publicEventStatusWhere } from '@/lib/events/visibility';
 import { cookies } from 'next/headers';
 
@@ -19,9 +19,9 @@ export const GET = withErrorHandling(async (request) => {
   if (start) dateFilter.gte = new Date(start);
   if (end) dateFilter.lte = new Date(end);
 
-  const isAdmin =
-    mode === 'admin' &&
-    (await isAdminAuthenticated(await cookies()));
+  // Vista dell'area di amministrazione: tutti gli eventi per l'admin, i
+  // propri per l'organizzatore (ADR-014).
+  const staff = mode === 'admin' ? await getStaffSession(await cookies()) : null;
 
   if (mode === 'public') {
     const settings = await getSettings();
@@ -33,8 +33,11 @@ export const GET = withErrorHandling(async (request) => {
   // Pubblico: stessa regola di visibilità di listing/home/sitemap — un
   // evento in pre-warm (PROVISIONING/IDLE, ~30' prima dell'inizio) non deve
   // sparire dal calendario proprio quando i visitatori lo cercano.
-  const where = isAdmin
-    ? { startsAt: Object.keys(dateFilter).length ? dateFilter : undefined }
+  const where = staff
+    ? {
+        ...eventScope(staff),
+        startsAt: Object.keys(dateFilter).length ? dateFilter : undefined,
+      }
     : {
         ...publicEventStatusWhere({ includeEnded: false }),
         startsAt: Object.keys(dateFilter).length ? dateFilter : undefined,

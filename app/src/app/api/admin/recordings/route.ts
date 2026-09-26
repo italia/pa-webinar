@@ -17,10 +17,9 @@ import { cookies } from 'next/headers';
 import type { Prisma } from '@prisma/client';
 
 import { withErrorHandling } from '@/lib/api-handler';
-import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { eventScope, requireStaff } from '@/lib/auth/staff-session';
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
-import { UnauthorizedError } from '@/lib/errors';
 import { generateRecordingSasUrl } from '@/lib/storage/recordings';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 
@@ -77,8 +76,8 @@ function csvEscape(v: string | null | undefined): string {
 }
 
 export const GET = withErrorHandling(async (request) => {
-  const isAdmin = await isAdminAuthenticated(await cookies());
-  if (!isAdmin) throw new UnauthorizedError();
+  // Le registrazioni dei propri eventi, per l'organizzatore (ADR-014).
+  const session = await requireStaff(await cookies());
 
   const url = new URL(request.url);
   const sinceParam = url.searchParams.get('since');
@@ -101,6 +100,7 @@ export const GET = withErrorHandling(async (request) => {
   // can double as "which sessions never got recorded".
   const sessionWhere: Prisma.CallSessionWhereInput = {
     startedAt: { gte: since, lte: until },
+    ...(session.role === 'organizer' && { event: eventScope(session) }),
   };
   if (eventId) sessionWhere.eventId = eventId;
   if (hasRecording === 'yes') sessionWhere.recordingUrl = { not: null };
@@ -109,6 +109,7 @@ export const GET = withErrorHandling(async (request) => {
   const eventWhere: Prisma.EventWhereInput = {
     createdAt: { gte: since, lte: until },
     recordingUrl: { not: null },
+    ...eventScope(session),
   };
   if (eventId) eventWhere.id = eventId;
   // For "hasRecording=no" we deliberately skip the event source: an event

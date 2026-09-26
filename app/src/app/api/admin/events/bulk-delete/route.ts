@@ -1,11 +1,12 @@
 import { cookies } from 'next/headers';
 import { z } from 'zod';
 
+import { eventScope, requireStaff } from '@/lib/auth/staff-session';
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
-import { isAdminAuthenticated } from '@/lib/auth/admin-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { prisma } from '@/lib/db';
-import { UnauthorizedError, ValidationError } from '@/lib/errors';
+import { ValidationError } from '@/lib/errors';
+import { removeFilesOfEventsBeingDeleted } from '@/lib/events/material-files';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,8 +15,9 @@ const bulkDeleteSchema = z.object({
 });
 
 export const POST = withErrorHandling(async (request) => {
-  const isAdmin = await isAdminAuthenticated(await cookies());
-  if (!isAdmin) throw new UnauthorizedError();
+  // L'organizzatore agisce solo sui propri eventi: gli altri identificativi
+  // della selezione restano fuori dal filtro, e il conteggio lo dice (ADR-014).
+  const session = await requireStaff(await cookies());
 
   const body = await parseJsonBody(request);
   const parsed = bulkDeleteSchema.safeParse(body);
@@ -26,9 +28,12 @@ export const POST = withErrorHandling(async (request) => {
     );
   }
 
-  const result = await prisma.event.deleteMany({
-    where: { id: { in: parsed.data.ids } },
-  });
+  const where = { id: { in: parsed.data.ids }, ...eventScope(session) };
+  // I file degli eventi (materiali caricati, allegati di chat) se ne vanno
+  // prima: la cascata porta via le righe, e dopo nessuno saprebbe più quali
+  // blob cancellare. Se lo storage non risponde gli eventi restano (503).
+  await removeFilesOfEventsBeingDeleted(where);
+  const result = await prisma.event.deleteMany({ where });
 
   await logAdminAction({
     request,

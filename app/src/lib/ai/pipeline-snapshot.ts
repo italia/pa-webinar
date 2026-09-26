@@ -9,6 +9,8 @@
  * (solo la pipeline locale lo popolava).
  */
 
+import { getPublicEnv } from '@/lib/env';
+
 export interface SnapshotArtifact {
   type: string;
   language: string | null;
@@ -73,6 +75,7 @@ export function buildPipelineSnapshot(
       dubbing: distinctLangs('DUBBED_AUDIO'),
     },
     runAt: runAtIso,
-    pipelineVersion: process.env.GIT_SHA ?? process.env.NEXT_PUBLIC_APP_VERSION ?? 'cluster',
+    // A runtime: la lettura puntata di NEXT_PUBLIC_APP_VERSION la fissava il build.
+    pipelineVersion: process.env.GIT_SHA ?? (getPublicEnv('NEXT_PUBLIC_APP_VERSION') || 'cluster'),
   };
 }

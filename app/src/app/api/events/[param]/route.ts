@@ -1,3 +1,5 @@
+import type { Prisma } from '@prisma/client';
+
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import {
   NotFoundError,
@@ -7,7 +9,10 @@ import {
   AppError,
 } from '@/lib/errors';
 import { prisma } from '@/lib/db';
+import { publishEventStatus, publishFlagsIfChanged } from '@/lib/live-state/publish';
 import { reviveStatus } from '@/lib/events/lifecycle';
+import { closeOpenSessions } from '@/lib/events/call-sessions';
+import { removeFilesOfEventsBeingDeleted } from '@/lib/events/material-files';
 import { updateEventSchema } from '@/lib/validation/schemas';
 import { resolveLocale, localiseEvent, pruneEmptyTranslations, type LocalizedField } from '@/lib/utils/locale';
 import {
@@ -17,6 +22,8 @@ import {
   constantTimeEqual,
 } from '@/lib/auth/moderator';
 import { sendDateChangeNotifications } from '@/lib/email/notification';
+import { adminRequestLocale, sendPrimaryModeratorLink } from '@/lib/email/moderator-link';
+import { getSettings } from '@/lib/settings';
 import { encryptPIIOrNull, tryDecryptPII } from '@/lib/crypto/pii';
 import { calculateEstimates } from '@/lib/estimates';
 import { hashJoinPassword } from '@/lib/auth/password';
@@ -196,6 +203,31 @@ export const PUT = withErrorHandling(async (request, context) => {
 
   const data = parsed.data;
 
+  // L'indirizzo del moderatore principale lo cambia solo il principale: a quel
+  // cambio parte l'email con il suo link, che non scade e non si revoca. Un
+  // co-moderatore potrebbe altrimenti farselo spedire a un indirizzo suo e
+  // restare gestore dopo la revoca. Il wizard di un co-moderatore rimanda il
+  // campo vuoto (la GET non glielo mostra): si ignora, non si rifiuta.
+  const isPrimaryModerator = constantTimeEqual(event.moderatorToken, token);
+  if (!isPrimaryModerator) {
+    delete (data as Record<string, unknown>).moderatorEmail;
+  }
+
+  // Il modello dell'informativa è una chiave esterna: un id inesistente
+  // farebbe fallire la scrittura con un codice non mappato, cioè con un 500
+  // al posto di un errore sul campo.
+  if (data.gdprTemplateId) {
+    const modello = await prisma.gdprTemplate.findUnique({
+      where: { id: data.gdprTemplateId },
+      select: { id: true },
+    });
+    if (!modello) {
+      throw new ValidationError('Validation failed', [
+        { path: ['gdprTemplateId'], message: 'Unknown GDPR template' },
+      ]);
+    }
+  }
+
   // Guard against the illusion of post-event configurability. These flags govern
   // LIVE capture — once an event is ENDED/ARCHIVED nothing can be captured
   // retroactively, so writing them does nothing but mislead. Strip them from a
@@ -277,7 +309,7 @@ export const PUT = withErrorHandling(async (request, context) => {
   // future we flip the status back to PUBLISHED or LIVE instead of
   // leaving the row stuck in ENDED. Without this the call happens to
   // be terminated permanently from a single timing mistake — which
-  // is what happened on the caffettino dry-run.
+  // is what happened on a dry-run before a real event.
   const revivedStatus = reviveStatus({
     currentStatus: event.status,
     currentStartsAt: event.startsAt,
@@ -303,7 +335,7 @@ export const PUT = withErrorHandling(async (request, context) => {
         participantsCanShareScreen: data.participantsCanShareScreen,
       };
 
-  const updated = await prisma.event.update({
+  const updateArgs = {
     where: { id: eventId },
     data: {
       ...(revivedStatus && { status: revivedStatus }),
@@ -353,6 +385,25 @@ export const PUT = withErrorHandling(async (request, context) => {
       ...(data.privacyPolicyUrl !== undefined && {
         privacyPolicyUrl: data.privacyPolicyUrl,
       }),
+      // Accettati dallo schema e inviati dai moduli, ma finora mai scritti in
+      // modifica. Lo spread condizionato è obbligatorio: le modifiche parziali
+      // — un cambio di stato dalla sala, un flag di fine evento — non devono
+      // toccare campi che non hanno inviato.
+      ...(data.privacyPolicyText !== undefined && {
+        privacyPolicyText: data.privacyPolicyText,
+      }),
+      ...(data.gdprTemplateId !== undefined && {
+        gdprTemplateId: data.gdprTemplateId,
+      }),
+      ...(data.requireOrganization !== undefined && {
+        requireOrganization: data.requireOrganization,
+      }),
+      ...(data.requireOrganizationRole !== undefined && {
+        requireOrganizationRole: data.requireOrganizationRole,
+      }),
+      ...(data.requireOrganizationType !== undefined && {
+        requireOrganizationType: data.requireOrganizationType,
+      }),
       ...(data.moderatorName !== undefined && {
         moderatorName: data.moderatorName,
       }),
@@ -392,9 +443,9 @@ export const PUT = withErrorHandling(async (request, context) => {
           data.joinPassword.length > 0 ? hashJoinPassword(data.joinPassword) : null,
       }),
       ...(data.youtubeUrl !== undefined && { youtubeUrl: data.youtubeUrl }),
-      // The wizard sends the cadence back on every save; it used to be accepted
-      // by the schema and then dropped here, so editing an event silently wiped
-      // its recurrence (docs/ROADMAP.md, "Eventi ricorrenti / serie").
+      // The wizard sends the cadence back on every save: without this line the
+      // schema accepts it and the update drops it, so editing an event silently
+      // wipes its recurrence (docs/architecture/event-journey.md, "Recurrence").
       ...(data.recurrenceRule !== undefined && { recurrenceRule: data.recurrenceRule }),
       ...(data.libraryListed !== undefined && { libraryListed: data.libraryListed }),
       ...(data.coverImageUrl !== undefined && { coverImageUrl: data.coverImageUrl }),
@@ -441,11 +492,56 @@ export const PUT = withErrorHandling(async (request, context) => {
         expectedSpeakers: data.expectedSpeakers,
       }),
     },
-  });
+  } satisfies Prisma.EventUpdateArgs;
+
+  // Un evento che lascia LIVE, o che passa da in servizio a concluso o
+  // archiviato, chiude le sessioni di chiamata ancora aperte nella stessa
+  // transazione del cambio di stato: è così che finisce di solito un evento
+  // («Termina per tutti»), e senza questo la sessione resterebbe aperta per
+  // sempre e le statistiche riporterebbero la finestra programmata al posto
+  // della durata vera. Da ENDED ad ARCHIVED non si chiude «adesso»: le
+  // sessioni rimaste aperte su un evento già concluso le ripara il giro del
+  // ciclo di vita, con un orario stimato sulla chiusura (lib/events/call-sessions).
+  const nextStatus = data.status ?? revivedStatus ?? event.status;
+  const closesSessions =
+    nextStatus !== event.status &&
+    (event.status === 'LIVE' ||
+      (!isTerminalStatus && (nextStatus === 'ENDED' || nextStatus === 'ARCHIVED')));
+  const updated = closesSessions
+    ? await prisma.$transaction(async (tx) => {
+        const aggiornato = await tx.event.update(updateArgs);
+        await closeOpenSessions(tx, [eventId], new Date());
+        return aggiornato;
+      })
+    : await prisma.event.update(updateArgs);
 
   if (dateChanged && event.status === 'PUBLISHED') {
-    const locale = resolveLocale(request) as 'it' | 'en';
-    sendDateChangeNotifications({ eventId, locale });
+    // Ogni iscritto riceve l'avviso nella lingua in cui si e' iscritto.
+    sendDateChangeNotifications({ eventId });
+  }
+
+  // Il link personale del moderatore principale: alla pubblicazione, o quando
+  // cambia l'indirizzo. Una volta sola per indirizzo (vedi moderator-link):
+  // ripubblicare o risalvare dal wizard non rispedisce.
+  const moderatorEmailChanged =
+    data.moderatorEmail !== undefined &&
+    (data.moderatorEmail || null) !== (tryDecryptPII(event.moderatorEmail) || null);
+  if (
+    (updated.status === 'PUBLISHED' && event.status !== 'PUBLISHED') ||
+    moderatorEmailChanged
+  ) {
+    const { defaultLocale: predefinita } = await getSettings();
+    await sendPrimaryModeratorLink(eventId, {
+      locale: adminRequestLocale(request, predefinita),
+    });
+  }
+
+  // Chi è in sala vede subito una funzione accesa o spenta, senza aspettare il
+  // prossimo giro di interrogazione. Solo a flag realmente cambiati: questa
+  // rotta riceve anche i salvataggi del wizard, che rispedisce tutti i campi.
+  publishFlagsIfChanged(eventId, event, updated);
+  if (updated.status !== event.status) {
+    publishEventStatus(eventId, updated.status);
   }
 
   await logAdminAction({
@@ -477,6 +573,10 @@ export const DELETE = withErrorHandling(async (request, context) => {
   const event = await verifyModeratorToken(eventId, token);
   if (!event) throw new ForbiddenError('Invalid moderator token or event not found');
 
+  // I file dell'evento (materiali caricati, allegati di chat) se ne vanno
+  // prima: la cascata porta via le righe, e dopo nessuno saprebbe più quali
+  // blob cancellare. Se lo storage non risponde l'evento resta (503).
+  await removeFilesOfEventsBeingDeleted({ id: eventId });
   await prisma.event.delete({ where: { id: eventId } });
 
   await logAdminAction({

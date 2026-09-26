@@ -1,0 +1,11 @@
+# Cartella di lavoro, stato, piani e variabili locali di OpenTofu/Terraform:
+# lo stato contiene il segreto della chiave HMAC dello storage, le variabili
+# i dati dell'ente (progetto, reti degli amministratori). Il file dei lock dei
+# provider invece si versiona: fissa la versione con cui il modulo è provato.
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+crash.log
+*.tfvars
+!terraform.tfvars.example

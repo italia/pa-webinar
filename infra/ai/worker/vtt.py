@@ -52,7 +52,7 @@ def segments_to_vtt(
     reliable way to make sure the viewer can tell who's speaking.
 
     `speaker_names`: optional mapping ``diarLabel -> displayName``
-    (e.g. ``{'SPEAKER_00': 'Alex'}``). When present, the human name
+    (e.g. ``{'SPEAKER_00': 'Mario Rossi'}``). When present, the human name
     is used; otherwise the diar label is kept.
     """
     speaker_names = speaker_names or {}
@@ -83,12 +83,12 @@ def segments_to_plain_text(
 
     Used both for the .txt artifact and for the prompt to the LLM
     (summarisation / translation). `speaker_names` mappa diarLabel→nome reale
-    (es. {"SPEAKER_00": "Raffaele"}): se presente, il prefisso usa il NOME
-    invece dell'etichetta acustica, così la SINTESI dell'LLM cita "Raffaele"
+    (es. {"SPEAKER_00": "Mario Rossi"}): se presente, il prefisso usa il NOME
+    invece dell'etichetta acustica, così la SINTESI dell'LLM cita il nome
     e non "SPEAKER_00". Senza mappa (blind pre-mapping) resta il label. Format::
 
-        [00:01:23] Raffaele: Lorem ipsum
-        [00:01:27] Paolo: Dolor sit amet
+        [00:01:23] Mario Rossi: Lorem ipsum
+        [00:01:27] Anna Bianchi: Dolor sit amet
     """
     names = speaker_names or {}
     out: List[str] = []

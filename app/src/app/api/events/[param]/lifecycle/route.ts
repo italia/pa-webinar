@@ -14,6 +14,7 @@
 import { withErrorHandling } from '@/lib/api-handler';
 import { NotFoundError } from '@/lib/errors';
 import { prisma } from '@/lib/db';
+import { scalerDriverActive } from '@/lib/events/lifecycle-driver';
 import { readJvbSnapshot, type JvbSnapshot } from '@/lib/jvb-snapshot';
 
 export const dynamic = 'force-dynamic';
@@ -51,11 +52,16 @@ async function cachedSnapshot(nowMs: number): Promise<JvbSnapshot | null> {
  *     schedulato pre-scaldato resta 'starting' finché non scatta l'orario:
  *     il bridge è su ma l'utente non può ancora entrare, dire "ci siamo
  *     quasi" per 30 min sarebbe una bugia.
+ *   - scheduled: nessuno scaler conduce il ciclo di vita (bridge fisso): la
+ *     sala si apre all'orario d'inizio o quando il moderatore avvia l'evento.
+ *     La decide l'handler, non lo snapshot.
  */
+type JvbPhase = 'queued' | 'starting' | 'ready' | 'scheduled';
+
 function jvbPhase(
   snapshot: JvbSnapshot | null,
   startsInFuture: boolean,
-): 'queued' | 'starting' | 'ready' {
+): JvbPhase {
   if (!snapshot) return 'queued';
   if (snapshot.ready > 0 && !startsInFuture) return 'ready';
   if (snapshot.desired > 0 || snapshot.ready > 0) return 'starting';
@@ -85,15 +91,22 @@ export const GET = withErrorHandling(async (_request, context) => {
   // Lo snapshot serve solo mentre si aspetta il bridge: fuori dal warm-up
   // evitiamo la lettura Redis su ogni poll.
   const warming = event.status === 'IDLE' || event.status === 'PROVISIONING';
-  const snapshot = warming ? await cachedSnapshot(nowMs) : null;
+  // Senza lo scaler non c'è nessun riscaldamento da raccontare: il bridge è
+  // sempre acceso e la sala la apre il giro a bridge fisso all'orario
+  // d'inizio, o il moderatore prima. La fase 'scheduled' fa dire questo alla
+  // sala d'attesa, al posto della stima di accensione.
+  const scheduled = warming && !(await scalerDriverActive());
+  const snapshot = warming && !scheduled ? await cachedSnapshot(nowMs) : null;
 
   // Ancora del cronometro: solo mentre PROVISIONING (il flip di /wake scrive
   // provisioningStartedAt=now) e solo se recente. In IDLE il timestamp è un
   // residuo del ciclo precedente (lo scaler LIVE→IDLE tocca solo lo status):
-  // esporlo farebbe partire un cronometro da ore.
+  // esporlo farebbe partire un cronometro da ore. Senza scaler non c'è un
+  // riscaldamento da cronometrare.
   const provMs = event.provisioningStartedAt?.getTime() ?? null;
   const warmupStartedAt =
     event.status === 'PROVISIONING' &&
+    !scheduled &&
     provMs !== null &&
     nowMs - provMs < WARMUP_ANCHOR_MAX_MS
       ? event.provisioningStartedAt!.toISOString()
@@ -109,7 +122,7 @@ export const GET = withErrorHandling(async (_request, context) => {
       serverTime: new Date(nowMs).toISOString(),
       ...(warming && {
         jvb: {
-          phase: jvbPhase(snapshot, startsInFuture),
+          phase: scheduled ? 'scheduled' : jvbPhase(snapshot, startsInFuture),
           startedAt: warmupStartedAt,
           ready: snapshot?.ready ?? 0,
           desired: snapshot?.desired ?? 0,

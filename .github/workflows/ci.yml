@@ -106,6 +106,97 @@ jobs:
       - run: npm ci
       - run: npx tsc --noEmit -p lobby/tsconfig.json
 
+  # Il chart non aveva nessun controllo: i difetti che impediscono
+  # l'installazione si scoprivano applicandolo a un cluster, cioè addosso a chi
+  # stava installando. Due livelli: le invarianti che sappiamo enunciare
+  # (scripts/validate-chart.sh) e il giudizio dell'API server, che conosce
+  # regole che noi non riproduciamo — un percorso di Ingress deve essere
+  # assoluto, un nome deve stare nei 63 caratteri, un campo non esiste.
+  chart:
+    name: Helm Chart
+    runs-on: ${{ github.event_name == 'pull_request' && 'ubuntu-latest' || 'arc-runner-pa-webinar' }}
+    env:
+      # A livello di job perché un `if` di passo non vede il contesto `secrets`
+      # né una `env` dichiarata nel passo stesso.
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: azure/setup-helm@1a275c3b69536ee54be43f2070a358922e12c8d4 # v4
+        with:
+          # Fissata alla versione più bassa che dichiariamo di supportare: se
+          # il chart usa qualcosa che Helm 3 non ha, deve fallire qui e non da
+          # chi installa. Il formato del chart resta `apiVersion: v2`, che
+          # Helm 3 e Helm 4 installano entrambi.
+          version: "v3.16.3"
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: "3.12"
+      - name: PyYAML
+        # `validate-chart.sh` legge i manifesti resi con PyYAML e si ferma se
+        # non lo trova: senza questo passo il gate fallirebbe sul runner
+        # self-hosted, che è minimale.
+        run: pip install pyyaml
+      - name: Accesso a Docker Hub
+        # I sottocharts Bitnami arrivano da registry-1.docker.io e Helm 3 legge
+        # ~/.docker/config.json: senza credenziali la pull è anonima e il
+        # runner condiviso esaurisce spesso il limite per IP. Qui il gate è
+        # bloccante, quindi un 429 diventerebbe un rosso che non è una
+        # regressione. Senza i segreti il passo si salta e si riprova anonimi.
+        if: ${{ env.DOCKERHUB_USERNAME != '' }}
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Sottocharts
+        # Non sono versionati (`*.tgz` è ignorato): senza questo passo ogni
+        # resa fallisce su un checkout pulito.
+        # `build`, non `update`: rispetta le versioni di Chart.lock, che sono
+        # quelle che questo job convalida.
+        run: |
+          helm repo add bitnami https://charts.bitnami.com/bitnami
+          helm repo add jitsi-contrib https://jitsi-contrib.github.io/jitsi-helm/
+          helm dependency build infra/helm/pa-webinar
+      - name: Invarianti su tutti i profili
+        run: ./scripts/validate-chart.sh
+
+      - name: Cluster usa-e-getta
+        uses: helm/kind-action@ef37e7f390d99f746eb8b610417061a60e82a6cc # v1.14.0
+        with:
+          cluster_name: chart-check
+          # Immagine di nodo presa dal mirror, non da Docker Hub: il runner
+          # condiviso ne esaurisce il limite anonimo. Fissata per digest perché
+          # altrimenti la versione di Kubernetes contro cui si fa
+          # `apply --dry-run=server` cambierebbe da sola a ogni rilascio di
+          # kind, e il gate potrebbe virare senza che nel repo cambi nulla.
+          node_image: mirror.gcr.io/kindest/node:v1.32.2@sha256:142f543559cc55d64e1ab9341df08e5ced84bd2e893736da8f51320f26f5950b
+      - name: Il cluster accetta i manifesti
+        run: |
+          set -euo pipefail
+          reso="$(mktemp -d)"
+          kubectl create namespace videocall
+          for profilo in simple standard full; do
+            # Le risorse del Prometheus Operator si spengono invece di
+            # installare l'operatore: le loro definizioni non stanno in un
+            # cluster nudo, e qui interessa ciò che l'installazione crea
+            # comunque. Sono già coperte da `helm lint` e dalle invarianti.
+            helm template videocall ./infra/helm/pa-webinar \
+              -f "infra/helm/pa-webinar/examples/values-$profilo.yaml" -n videocall \
+              --set metrics.serviceMonitor.enabled=false \
+              --set metrics.prometheusRule.enabled=false \
+              --set jitsi-meet.jvb.metrics.serviceMonitor.enabled=false \
+              --set "secrets.generate.APP_SECRET=$(openssl rand -hex 32)" \
+              --set "secrets.generate.JITSI_JWT_SECRET=$(openssl rand -hex 32)" \
+              --set "secrets.generate.PII_ENCRYPTION_KEY=$(openssl rand -hex 32)" \
+              --set "secrets.generate.CRON_API_KEY=$(openssl rand -hex 32)" \
+              --set "secrets.generate.ADMIN_API_KEY=$(openssl rand -hex 32)" \
+              --set "secrets.generate.POSTGRES_PASSWORD=$(openssl rand -hex 24)" \
+              --set "secrets.generate.POSTGRES_ADMIN_PASSWORD=$(openssl rand -hex 24)" \
+              --set "secrets.generate.REDIS_PASSWORD=$(openssl rand -hex 24)" \
+              > "$reso/$profilo.yaml"
+            echo "== $profilo"
+            kubectl apply --dry-run=server -n videocall -f "$reso/$profilo.yaml"
+          done
+
   # Il worker della pipeline AI: 7 file pytest mai eseguiti. Nessuna GPU serve —
   # i test coprono logica pura (allineamento, VTT, silenzio, archivio).
   test-ai-worker:
@@ -215,6 +306,10 @@ jobs:
     # test is best-effort: a transient pull failure here doesn't
     # represent a code regression, so don't block PRs on it.
     continue-on-error: true
+    env:
+      # Vedi il job `chart`: a livello di job, altrimenti l'`if` del passo di
+      # accesso non la vede e il login non avviene mai.
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
@@ -238,8 +333,6 @@ jobs:
       - name: Login to Docker Hub (rate-limit lift)
         if: ${{ env.DOCKERHUB_USERNAME != '' }}
         uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
-        env:
-          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}

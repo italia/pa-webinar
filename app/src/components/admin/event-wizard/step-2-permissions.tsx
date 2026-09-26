@@ -28,6 +28,8 @@ export interface Step2Value {
   autoStartRecording: boolean;
   /** Agenda/note live (checklist opt-in). */
   agendaEnabled: boolean;
+  /** Nuvola di parole live (opt-in). */
+  wordCloudEnabled: boolean;
   /** Lavagna condivisa (whiteboard Excalidraw nativa) opt-in. */
   whiteboardEnabled: boolean;
   // ── Post-produzione AI (subordinata a recordingEnabled) ──
@@ -49,9 +51,21 @@ interface Props {
   value: Step2Value;
   onChange: (patch: Partial<Step2Value>) => void;
   fieldErrors?: Record<string, string>;
+  /**
+   * Se l'installazione ha il servizio della lavagna di Jitsi. Senza, la sala
+   * non mostra la lavagna qualunque cosa dica l'evento: l'interruttore non si
+   * accende e dice perche'. Resta spegnibile, per togliere un valore rimasto
+   * da un modello o da un evento precedente.
+   */
+  whiteboardInfraReady: boolean;
 }
 
-export default function Step2Permissions({ value, onChange, fieldErrors = {} }: Props) {
+export default function Step2Permissions({
+  value,
+  onChange,
+  fieldErrors = {},
+  whiteboardInfraReady,
+}: Props) {
   const t = useTranslations('admin.wizard.step2');
   const tAdmin = useTranslations('admin');
 
@@ -206,16 +220,41 @@ export default function Step2Permissions({ value, onChange, fieldErrors = {} }: 
         <div className="py-2 d-flex justify-content-between align-items-start">
           <div className="me-3">
             <div className="fw-semibold" style={{ color: 'var(--app-text)' }}>
+              {tAdmin('form.wordCloudEnabled')}
+            </div>
+            <div className="text-secondary" style={{ fontSize: '0.85rem' }}>
+              {tAdmin('form.wordCloudEnabledDesc')}
+            </div>
+          </div>
+          <ToggleSwitch
+            label=""
+            ariaLabel={tAdmin('form.wordCloudEnabled')}
+            checked={value.wordCloudEnabled}
+            onChange={() => onChange({ wordCloudEnabled: !value.wordCloudEnabled })}
+          />
+        </div>
+        <div className="py-2 d-flex justify-content-between align-items-start">
+          <div className="me-3">
+            <div className="fw-semibold" style={{ color: 'var(--app-text)' }}>
               {tAdmin('form.whiteboardEnabled')}
             </div>
             <div className="text-secondary" style={{ fontSize: '0.85rem' }}>
               {tAdmin('form.whiteboardEnabledDesc')}
             </div>
+            {!whiteboardInfraReady && (
+              <div
+                className="fw-semibold"
+                style={{ fontSize: '0.85rem', color: 'var(--app-text)' }}
+              >
+                {tAdmin('form.whiteboardUnavailable')}
+              </div>
+            )}
           </div>
           <ToggleSwitch
             label=""
             ariaLabel={tAdmin('form.whiteboardEnabled')}
             checked={value.whiteboardEnabled}
+            disabled={!whiteboardInfraReady && !value.whiteboardEnabled}
             onChange={() => onChange({ whiteboardEnabled: !value.whiteboardEnabled })}
           />
         </div>

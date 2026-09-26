@@ -183,11 +183,17 @@ export default function Step5Review({
             </label>
             <select
               id="rev-gdpr-template"
-              className="form-select"
+              className={`form-select${fieldErrors.gdprTemplateId ? ' is-invalid' : ''}`}
               value={form.gdprTemplateId ?? ''}
-              onChange={(e) =>
-                onChange({ gdprTemplateId: e.target.value || null })
-              }
+              onChange={(e) => {
+                const id = e.target.value || null;
+                // Scegliere un modello azzera il testo scritto a mano: la
+                // pagina di registrazione dà la precedenza al testo, e la
+                // casella che lo contiene sparisce appena un modello è
+                // scelto. Senza questo, il testo continuerebbe a vincere su
+                // una scelta che si vede fatta e non si può più disfare.
+                onChange({ gdprTemplateId: id, ...(id ? { privacyPolicyText: '' } : {}) });
+              }}
             >
               <option value="">{t('gdprTemplateNone')}</option>
               {gdprTemplates.map((g) => (
@@ -197,6 +203,11 @@ export default function Step5Review({
                 </option>
               ))}
             </select>
+            {fieldErrors.gdprTemplateId && (
+              <div className="invalid-feedback d-block">
+                {t('gdprTemplateUnknown')}
+              </div>
+            )}
           </div>
           {!form.gdprTemplateId && (
             <div className="col-12">

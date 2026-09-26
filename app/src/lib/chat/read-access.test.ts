@@ -12,6 +12,8 @@ vi.mock('@/lib/chat/sender', () => ({
 vi.mock('@/lib/events/join-grant', () => ({
   hasJoinGrant: vi.fn(),
 }));
+const { siteSettings } = vi.hoisted(() => ({ siteSettings: { guestAccessEnabled: true } }));
+vi.mock('@/lib/settings', () => ({ getSettings: async () => siteSettings }));
 
 import { resolveTokenSender } from '@/lib/chat/sender';
 import { prisma } from '@/lib/db';
@@ -34,26 +36,35 @@ describe('guestChatWindowOpen', () => {
   const instant = (status: string) => ({ status, eventType: 'INSTANT' });
 
   it('opens while the room is live, whatever the event type', () => {
-    expect(guestChatWindowOpen(scheduled('LIVE'))).toBe(true);
-    expect(guestChatWindowOpen(instant('LIVE'))).toBe(true);
+    expect(guestChatWindowOpen(scheduled('LIVE'), true)).toBe(true);
+    expect(guestChatWindowOpen(instant('LIVE'), true)).toBe(true);
   });
 
   it('opens during the bridge warm-up of an INSTANT call only', () => {
     // INSTANT rooms are opened by link with no time gate and show the chat while
     // the bridge scales up.
-    expect(guestChatWindowOpen(instant('PROVISIONING'))).toBe(true);
-    expect(guestChatWindowOpen(instant('IDLE'))).toBe(true);
+    expect(guestChatWindowOpen(instant('PROVISIONING'), true)).toBe(true);
+    expect(guestChatWindowOpen(instant('IDLE'), true)).toBe(true);
     // A scheduled event must not: /wake is unauthenticated, so anyone could flip
     // PUBLISHED→PROVISIONING and then read the room anonymously.
-    expect(guestChatWindowOpen(scheduled('PROVISIONING'))).toBe(false);
-    expect(guestChatWindowOpen(scheduled('IDLE'))).toBe(false);
+    expect(guestChatWindowOpen(scheduled('PROVISIONING'), true)).toBe(false);
+    expect(guestChatWindowOpen(scheduled('IDLE'), true)).toBe(false);
+  });
+
+  it('shuts on scheduled events when guest access is off, never on INSTANT calls', () => {
+    // An INSTANT call has no registration: the link is the invitation, so the
+    // site-wide switch cannot close it without locking everyone out.
+    expect(guestChatWindowOpen(scheduled('LIVE'), false)).toBe(false);
+    expect(guestChatWindowOpen(instant('LIVE'), false)).toBe(true);
+    expect(guestChatWindowOpen(instant('PROVISIONING'), false)).toBe(true);
   });
 
   it('stays shut before and after the event — including ENDED and ARCHIVED', () => {
-    // This is the hole that leaked the DevIt transcript days after the event.
+    // This is the hole that let anyone read a past event's chat transcript
+    // (real names + free text) days after it ended.
     for (const status of ['DRAFT', 'PUBLISHED', 'ENDED', 'ARCHIVED', 'CANCELLED']) {
-      expect(guestChatWindowOpen(scheduled(status)), status).toBe(false);
-      expect(guestChatWindowOpen(instant(status)), `INSTANT ${status}`).toBe(false);
+      expect(guestChatWindowOpen(scheduled(status), true), status).toBe(false);
+      expect(guestChatWindowOpen(instant(status), true), `INSTANT ${status}`).toBe(false);
     }
   });
 });
@@ -80,9 +91,26 @@ describe('authorizeChatRead', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    siteSettings.guestAccessEnabled = true;
     mockedEvent.mockResolvedValue(event());
     mockedSender.mockResolvedValue(null);
     mockedJoinGrant.mockResolvedValue(false);
+  });
+
+  it('rejects a tokenless reader on a LIVE scheduled event when guest access is off', async () => {
+    // Chi non puo' entrare nella sala non ne legge la chat.
+    siteSettings.guestAccessEnabled = false;
+    await expect(authorizeChatRead('evento', null)).rejects.toMatchObject({
+      statusCode: 403,
+    });
+  });
+
+  it('still admits a tokenless reader on an INSTANT call when guest access is off', async () => {
+    siteSettings.guestAccessEnabled = false;
+    mockedEvent.mockResolvedValue(event({ eventType: 'INSTANT' }));
+    await expect(authorizeChatRead('evento', null)).resolves.toMatchObject({
+      senderId: null,
+    });
   });
 
   it('404s on an unknown slug before looking at the token', async () => {

@@ -4,17 +4,19 @@ import type { EventStatus, Prisma } from '@prisma/client';
 import { cookies } from 'next/headers';
 
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
-import { UnauthorizedError, RateLimitError, ValidationError } from '@/lib/errors';
+import { RateLimitError, ValidationError } from '@/lib/errors';
 import { prisma } from '@/lib/db';
 import { createEventSchema } from '@/lib/validation/schemas';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
 import { generateUniqueSlug } from '@/lib/utils/slug';
 import { resolveLocale, localiseEvent, pruneEmptyTranslations, type LocalizedField } from '@/lib/utils/locale';
 import { localizedUrl } from '@/lib/utils/localized-url';
-import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { puoGestire, requireStaff } from '@/lib/auth/staff-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { encryptPIIOrNull } from '@/lib/crypto/pii';
 import { getPublicEnv } from '@/lib/env';
+import { adminRequestLocale, sendPrimaryModeratorLink } from '@/lib/email/moderator-link';
+import { getSettings } from '@/lib/settings';
 import { calculateEstimates } from '@/lib/estimates';
 import { hashJoinPassword } from '@/lib/auth/password';
 import { coerceMatrix, togglesFromMatrix } from '@/lib/utils/permission-matrix';
@@ -31,8 +33,9 @@ export const dynamic = 'force-dynamic';
 
 export const POST = withErrorHandling(async (request) => {
   const cookieStore = await cookies();
-  const isAdmin = await isAdminAuthenticated(cookieStore);
-  if (!isAdmin) throw new UnauthorizedError();
+  // Crea l'amministrazione e crea l'organizzatore; l'evento dell'organizzatore
+  // porta il suo nome, ed e' quello che gli permette di gestirlo (ADR-014).
+  const session = await requireStaff(cookieStore);
 
   const ip = getClientIp(request);
   const rl = rateLimit(`create-event:${ip}`, {
@@ -54,6 +57,22 @@ export const POST = withErrorHandling(async (request) => {
   }
 
   const data = parsed.data;
+
+  // Il modello dell'informativa è una chiave esterna: un id inesistente
+  // farebbe fallire la scrittura con un codice che `errorResponse` non mappa,
+  // quindi con un 500 al posto di un errore sul campo. La verifica costa una
+  // lettura solo quando un modello è stato scelto davvero.
+  if (data.gdprTemplateId) {
+    const modello = await prisma.gdprTemplate.findUnique({
+      where: { id: data.gdprTemplateId },
+      select: { id: true },
+    });
+    if (!modello) {
+      throw new ValidationError('Validation failed', [
+        { path: ['gdprTemplateId'], message: 'Unknown GDPR template' },
+      ]);
+    }
+  }
 
   // If the wizard supplied a permission matrix, keep the boolean toggles
   // in sync so legacy code paths stay correct. Matrix wins when both are
@@ -94,8 +113,17 @@ export const POST = withErrorHandling(async (request) => {
     expectedSenderRatioPct: data.expectedSenderRatioPct ?? null,
   });
 
+  // La serie e' un evento capostipite: agganciarsi a quella di un altro
+  // significherebbe entrare in un raggruppamento che non si gestisce (ADR-014).
+  if (data.recurrenceSeriesId && !(await puoGestire(session, data.recurrenceSeriesId))) {
+    throw new ValidationError('Validation failed', [
+      { path: ['recurrenceSeriesId'], message: 'series_not_manageable' },
+    ]);
+  }
+
   const event = await prisma.event.create({
     data: {
+      createdById: session.accountId,
       slug,
       jitsiRoomName,
       moderatorToken,
@@ -125,6 +153,31 @@ export const POST = withErrorHandling(async (request) => {
       dataRetentionDays: data.dataRetentionDays,
       privacyPolicyUrl: data.privacyPolicyUrl,
       privacyPolicyText: data.privacyPolicyText,
+      // Accettati dallo schema e inviati dai moduli, ma finora mai scritti:
+      // la scelta fatta in creazione non arrivava in banca dati e l'unico
+      // modo di valorizzare queste colonne era duplicare un evento che le
+      // aveva già.
+      gdprTemplateId: data.gdprTemplateId ?? null,
+      requireOrganization: data.requireOrganization,
+      requireOrganizationRole: data.requireOrganizationRole,
+      requireOrganizationType: data.requireOrganizationType,
+      postEventPublic: data.postEventPublic,
+      postEventShowRecap: data.postEventShowRecap,
+      postEventShowWordCloud: data.postEventShowWordCloud,
+      postEventEmailEnabled: data.postEventEmailEnabled,
+      postEventPublicUntil: data.postEventPublicUntil
+        ? new Date(data.postEventPublicUntil)
+        : null,
+      gracePeriodMinutes: data.gracePeriodMinutes ?? null,
+      coverImageUrl: data.coverImageUrl ?? null,
+      ...(data.youtubeUrl !== undefined && { youtubeUrl: data.youtubeUrl }),
+      ...(data.libraryListed !== undefined && { libraryListed: data.libraryListed }),
+      ...(data.recordingConsentText !== undefined && {
+        recordingConsentText: data.recordingConsentText,
+      }),
+      ...(data.wordCloudEnabled !== undefined && {
+        wordCloudEnabled: data.wordCloudEnabled,
+      }),
       moderatorName: data.moderatorName,
       moderatorEmail: encryptPIIOrNull(data.moderatorEmail),
       speakersInfo: data.speakersInfo,
@@ -234,12 +287,27 @@ export const POST = withErrorHandling(async (request) => {
     details: { slug: event.slug, fields: Object.keys(data) },
   });
 
+  // Il moderatore principale riceve il suo link personale per email, come
+  // promettono il wizard e la pagina di gestione. Atteso (non in background):
+  // il wizard pubblica subito dopo, e la pubblicazione deve trovare la riga
+  // gia' in coda per non spedire una seconda volta.
+  if (data.moderatorEmail) {
+    const { defaultLocale: predefinita } = await getSettings();
+    await sendPrimaryModeratorLink(event.id, {
+      locale: adminRequestLocale(request, predefinita),
+    });
+  }
+
   return Response.json(
     {
       ...event,
       links: {
         publicPage: localizedUrl(baseUrl, `/events/${event.slug}`, locale),
-        moderatorLink: `${baseUrl}/${locale}/admin/events/${event.id}?token=${event.moderatorToken}`,
+        moderatorLink: localizedUrl(
+          baseUrl,
+          `/admin/events/${event.id}?token=${event.moderatorToken}`,
+          locale,
+        ),
       },
     },
     { status: 201 }

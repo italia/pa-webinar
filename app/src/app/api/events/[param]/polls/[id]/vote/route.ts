@@ -7,7 +7,10 @@ import {
   ValidationError,
   AppError,
 } from '@/lib/errors';
+import { deleteCacheByPrefix } from '@/lib/cache';
 import { prisma } from '@/lib/db';
+import { authorizePanelRead } from '@/lib/events/panel-read-access';
+import { pokeLivePanel } from '@/lib/live-state/publish';
 import { pollVoteSchema } from '@/lib/validation/schemas';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
 
@@ -21,7 +24,10 @@ export const POST = withErrorHandling(async (request, context) => {
   const body = await parseJsonBody(request);
   const parsed = pollVoteSchema.safeParse(body);
   if (!parsed.success) {
-    throw new ValidationError('Validation failed', parsed.error.issues.map((i) => ({ path: i.path, message: i.message })));
+    throw new ValidationError(
+      'Validation failed',
+      parsed.error.issues.map((i) => ({ path: i.path, message: i.message }))
+    );
   }
 
   const { optionIndex, accessToken, guestId } = parsed.data;
@@ -76,6 +82,23 @@ export const POST = withErrorHandling(async (request, context) => {
     });
     if (existing) throw new ConflictError('Already voted');
   } else if (guestId) {
+    // Chi vota con l'identificativo del browser — ospiti, relatori e
+    // moderatori, che una registrazione non ce l'hanno — passa di qui, e
+    // deve superare lo stesso cancello della lettura: chi conduce lo fa col
+    // proprio token di sala (che NON è un'identità di voto, il server lo
+    // cerca fra le registrazioni), un ospite solo finché la stanza è aperta
+    // a chi arriva col link e non è protetta da password.
+    //
+    // Cosa questo NON garantisce: l'identificativo è scelto dal client,
+    // quindi la deduplica vale per browser onesto. È la stessa garanzia
+    // delle reazioni all'agenda, e un sondaggio in sala non è un'elezione;
+    // legarlo a un'identità firmata è un lavoro a sé.
+    const authHeader = request.headers.get('authorization');
+    const bearer = authHeader?.startsWith('Bearer ')
+      ? authHeader.slice(7).trim() || null
+      : null;
+    await authorizePanelRead(event, bearer);
+
     const rl = rateLimit(`poll-vote-guest:${guestId}`, { limit: 10, windowMs: 60_000 });
     if (!rl.allowed) throw new RateLimitError();
 
@@ -85,14 +108,28 @@ export const POST = withErrorHandling(async (request, context) => {
     if (existing) throw new ConflictError('Already voted');
   }
 
-  await prisma.pollVote.create({
-    data: {
-      pollId,
-      registrationId,
-      guestId: guestId || null,
-      optionIndex,
-    },
-  });
+  try {
+    await prisma.pollVote.create({
+      data: {
+        pollId,
+        registrationId,
+        guestId: guestId || null,
+        optionIndex,
+      },
+    });
+  } catch (e) {
+    // Il controllo qui sopra e la scrittura non sono un'operazione sola: due
+    // clic ravvicinati passano entrambi. È l'indice univoco a dire l'ultima
+    // parola, e quel rifiuto è lo stesso «hai già votato» — non un errore
+    // interno, che il pannello mostrerebbe come guasto.
+    if ((e as { code?: string })?.code === 'P2002') {
+      throw new ConflictError('Already voted');
+    }
+    throw e;
+  }
+
+  deleteCacheByPrefix(`polls:${event.id}`);
+  pokeLivePanel(event.id, 'polls');
 
   return Response.json({ ok: true, optionIndex }, { status: 201 });
 });

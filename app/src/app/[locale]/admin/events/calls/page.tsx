@@ -1,8 +1,6 @@
-import { cookies } from 'next/headers';
-import { redirect } from 'next/navigation';
 import { getTranslations, getLocale } from 'next-intl/server';
 
-import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { staffOLogin } from '@/lib/auth/staff-page';
 import { prisma } from '@/lib/db';
 import InstantCallsList from '@/components/admin/instant-calls-list';
 
@@ -10,8 +8,8 @@ export const dynamic = 'force-dynamic';
 
 export default async function InstantCallsPage() {
   const locale = await getLocale();
-  const isAdmin = await isAdminAuthenticated(await cookies());
-  if (!isAdmin) redirect(`/${locale}/admin/login`);
+  // Aperta anche agli organizzatori: l'elenco lo filtra la rotta (ADR-014).
+  await staffOLogin(locale);
 
   const t = await getTranslations('admin.instantCalls');
 

@@ -1,4 +1,37 @@
 {
+  "0.12.0": {
+    "title": "Připraveno k opětovnému použití: instalace jedním příkazem a události běží samy",
+    "notes": [
+      "Instalace jedním příkazem: na počítači s minikube pro vyzkoušení a vývoj, na serveru k3s pro produkci, s certifikáty, testovací poštovní schránkou, objektovým úložištěm, TURN a plánovanou zálohou. Každou instalaci lze ověřit jedním příkazem, záloha a obnova databáze a souborů mají vlastní skripty a dokumentace, nyní v angličtině, obsahuje návody pro minikube, k3s, AKS, GKE a EKS a kontrolní seznamy pro spuštění do provozu.",
+      "Události se otevírají v čase zahájení a zavírají na konci i v instalacích bez automatického spouštění videomostů. „Zahájit událost“ má ten, kdo událost vede, vždy k dispozici a událost už nezůstane zaseknutá ve stavu „Příprava“.",
+      "Jmenné účty pro tým: administrátoři a organizátoři se přihlašují osobním odkazem zaslaným e-mailem a každý vidí jen to, co mu jeho role dovoluje. Klíč instance zůstává pro první přístup a pro nouzové situace.",
+      "E-maily v italštině, angličtině, francouzštině, němčině a španělštině, v jazyce příjemce. Osobní odkazy moderátorů a řečníků přicházejí e-mailem, připomínky už nechodí všechny najednou a pozvánky do kalendáře se nezdvojují.",
+      "Ve videokonferenci závisí role na odkazu, kterým se vstupuje: hosté a registrovaní jsou účastníci a už nemohou moderátora ztlumit ani vyloučit.",
+      "V místnosti: otázky, hlasování a slovní mrak fungují i pro hosty a řečníky; materiály přijímají kromě odkazů i soubory; kdo odejde sám, může se vrátit, místo aby viděl „Událost skončila“; když videokonference není dostupná, místnost to oznámí a nabídne „Zkusit znovu“; kamera a mikrofon se účastníkům spouštějí vypnuté; virtuální pozadí lze zvolit už v čekárně.",
+      "Soukromí: chat už přítomným nepředává IP adresu hostů; odkazy pro export nebo smazání vlastních údajů vedou na správnou adresu; upozornění a souhlas s nahráváním se zobrazují všude, kde něco může nahrávat.",
+      "Stavová stránka kontroluje služby zevnitř a už nehlásí výpadek kvůli neveřejnému certifikátu; instalace s pevným videomostem se zobrazují správně.",
+      "Správa: odebrání spolumoderátorů a řečníků v průvodci opravdu funguje, průvodce řekne, co se neuložilo, a po zveřejnění se přejde na stránku události. Rychlé hovory už nemají veřejnou stránku a sdílené odkazy zobrazují náhled události.",
+      "Pro ty, kdo aktualizují: Prosody, Jicofo, webová konference a videomost se jednou restartují, proto je vhodné aktualizovat bez probíhajících událostí; kdo má vlastní svazky nebo moduly pro Prosody, musí přidat ty z chartu; bez scaleru se živé události nyní zavírají na konci po uplynutí tolerance."
+    ]
+  },
+  "0.11.0": {
+    "title": "Místnost nyní reaguje ve chvíli, kdy se něco změní",
+    "notes": [
+      "Otázky, ankety, program a slovní mrak se aktualizují, jakmile se něco změní, místo aby se každých pár sekund ptaly serveru: kdo je v místnosti, uvidí otázku objevit se okamžitě, a při hojně navštívené akci provoz výrazně klesne.",
+      "Méně práce i pro server: pravidelné kontroly místnosti si nyní vyžádají jen potřebná data a materiály — které se mění zřídka — se kontrolují méně často.",
+      "Pokud okamžité spojení není k dispozici, místnost se sama vrátí k dřívější pravidelné kontrole: kvůli novému mechanismu žádná funkce nepřestane fungovat.",
+      "Opravy: otevření dvou nových slovních mraků krátce po sobě mohlo jeden z nich nechat neviditelný a slova do něj poslaná se nikomu neobjevila; stránka se stavem služby vždy uváděla stejné číslo verze místo té skutečně běžící."
+    ]
+  },
+  "0.10.0": {
+    "title": "Otázky v chatu, jednodušší opakující se série a opravené institucionální barvy",
+    "notes": [
+      "Kdo píše v chatu, může svou zprávu označit jako otázku: moderátoři ji označí za vyřízenou nebo ji odloží a filtr zobrazí pouze otázky. Během akce není třeba hlídat druhý kanál.",
+      "Otázky z chatu se spolu s reakcemi, které získaly, objevují na veřejné souhrnné stránce akce a zůstávají čitelné i po smazání osobních údajů účastníků.",
+      "Příprava dalšího dílu série je rychlejší: kopie akce si bere štítky, organizátory, spolumoderátory (každý s novými přihlašovacími údaji), program, dotazníky a upomínky a šablony si zachovávají nastavení nahrávání a následného zpracování.",
+      "Opravy: institucionální barvy jsou zpět tak, jak mají být – pruh v horní části webu se zobrazoval bílý –, tlačítko, které vytvoří kopii akce, už nevede na neexistující stránku, a po uplynutí doby uchování se mažou i kontakty pozvaných a jmenovaných moderátorů a řečníků."
+    ]
+  },
   "0.9.0": {
     "title": "Bezpečnost závislostí, srovnaná dokumentace a kompletní lokální prostředí",
     "notes": [

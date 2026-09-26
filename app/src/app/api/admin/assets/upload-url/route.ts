@@ -33,13 +33,12 @@ import { randomUUID } from 'crypto';
 import { cookies } from 'next/headers';
 import type { NextRequest } from 'next/server';
 
+import { requireStaff } from '@/lib/auth/staff-session';
 import { withErrorHandling } from '@/lib/api-handler';
-import { isAdminAuthenticated } from '@/lib/auth/admin-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import {
   AppError,
   RateLimitError,
-  UnauthorizedError,
   ValidationError,
 } from '@/lib/errors';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
@@ -51,6 +50,10 @@ import {
   type AssetType,
 } from '@/lib/utils/asset-key';
 import { contentMatchesDeclaredMime } from '@/lib/utils/mime-sniff';
+import {
+  MATERIAL_FILE_MAX_BYTES,
+  MATERIAL_FILE_MIME_TYPES,
+} from '@/lib/validation/materials';
 
 export const dynamic = 'force-dynamic';
 
@@ -71,20 +74,15 @@ const ALLOWED_MIME: Record<AssetKind, ReadonlySet<string>> = {
     'audio/mp4',
     'audio/webm',
   ]),
-  document: new Set([
-    'application/pdf',
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
-    'application/vnd.openxmlformats-officedocument.presentationml.presentation', // .pptx
-    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
-    'text/plain',
-  ]),
+  // I documenti sono i materiali dell'evento: stessa regola della sala.
+  document: new Set<string>(MATERIAL_FILE_MIME_TYPES),
 };
 
 // Caps in bytes (MiB-based to match object-store dashboards).
 const MAX_SIZE: Record<AssetKind, number> = {
   image: 10 * 1024 * 1024,
   audio: 20 * 1024 * 1024,
-  document: 25 * 1024 * 1024,
+  document: MATERIAL_FILE_MAX_BYTES,
 };
 
 function assertAssetKind(raw: string | null): AssetKind {
@@ -95,8 +93,8 @@ function assertAssetKind(raw: string | null): AssetKind {
 }
 
 export const POST = withErrorHandling(async (request: NextRequest) => {
-  const isAdmin = await isAdminAuthenticated(await cookies());
-  if (!isAdmin) throw new UnauthorizedError();
+  // Locandine e immagini degli eventi: le carica anche l'organizzatore.
+  await requireStaff(await cookies());
 
   const ip = getClientIp(request);
   const rl = rateLimit(`asset-upload:${ip}`, { limit: 30, windowMs: 60_000 });
@@ -121,11 +119,16 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
 
   const storage = getFilesStorage();
   if (!storage) {
-    throw new AppError(
+    // Un'installazione senza storage per i file e' una configurazione
+    // ammessa, non un guasto: 503 per il client (che lo traduce dal codice),
+    // `warn` nel log.
+    const err = new AppError(
       'Files storage is not configured on this instance. Set STORAGE_FILES_* or AZURE_STORAGE_* env vars.',
       503,
       'STORAGE_UNAVAILABLE',
     );
+    err.expected = true;
+    throw err;
   }
 
   // Parse multipart/form-data. Next's route handlers accept Request.formData()

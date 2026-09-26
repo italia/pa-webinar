@@ -1,7 +1,7 @@
 # Run jitsi-meet-torture (MalleusJitsificus) as a Kubernetes Job inside the
 # same namespace as the pa-webinar / jitsi deployment.
 #
-# IMPORTANT (learned the hard way, 7 lug):
+# IMPORTANT (hard-won gotchas):
 #   * Jitsi web config.bosh is an ABSOLUTE public URL, so the browser always
 #     signals to the public domain — hitting the internal web ClusterIP does
 #     NOT bypass the ingress for signaling. Use the PUBLIC instance URL.
@@ -15,7 +15,7 @@
 #     audio_senders / room_name_prefix (see scripts/malleus.sh upstream).
 #   * Headless must be enabled explicitly: org.jitsi.malleus.enable.headless=true.
 #
-# STATUS / KNOWN LIMITATION (7 lug): with all of the above fixed, the run gets
+# STATUS / KNOWN LIMITATION: with all of the above fixed, the run gets
 # all the way to launching browsers — config parses, the JWT is accepted, and
 # MalleusJitsificus creates the participants — but Chrome then exits on startup
 # ("session not created: Chrome instance exited"). Upstream malleus ALWAYS runs
@@ -30,17 +30,22 @@
 # The JWT-auth + param + headless fixes below are all VERIFIED correct; only the
 # browser runtime needs the Selenium node.
 #
+# Placeholders (same convention as README.md): replace <namespace> with the
+# namespace of the deploy and jitsi.example.com with the Jitsi hostname you are
+# testing. The nodeSelector / tolerations below are an example of node placement:
+# adapt them to your own cluster (or drop them).
+#
 # Usage:
 #   1. Mint a JWT and create the secret:
 #        export JITSI_JWT_SECRET=... JITSI_JWT_ISSUER=pa-webinar \
 #               JITSI_JWT_AUDIENCE=jitsi \
-#               JITSI_JWT_SUBJECT=pa-webinar-jitsi.developers.italia.it
-#        kubectl -n pa-webinar create secret generic torture-jwt \
+#               JITSI_JWT_SUBJECT=jitsi.example.com
+#        kubectl -n <namespace> create secret generic torture-jwt \
 #          --from-literal=jwt="$(sh mint-jwt.sh)"
 #   2. Edit JITSI_URL / PARTICIPANTS / SENDERS below.
-#   3. kubectl -n pa-webinar apply -f k8s-job.yaml
-#   4. kubectl -n pa-webinar logs -f job/torture
-#   5. kubectl -n pa-webinar delete job torture
+#   3. kubectl -n <namespace> apply -f k8s-job.yaml
+#   4. kubectl -n <namespace> logs -f job/torture
+#   5. kubectl -n <namespace> delete job torture
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -84,7 +89,7 @@ spec:
             # PUBLIC instance URL (BOSH is absolute-public; internal ClusterIP
             # would only serve the HTML, not the signaling).
             - name: JITSI_URL
-              value: "https://pa-webinar-jitsi.developers.italia.it"
+              value: "https://jitsi.example.com"
             - name: JITSI_ROOM
               value: "loadtest"
             - name: PARTICIPANTS

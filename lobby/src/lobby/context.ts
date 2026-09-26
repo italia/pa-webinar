@@ -8,6 +8,7 @@ import type { PresenceClient } from './ports/PresenceClient';
 import type { PlayerProfile } from './ports/types';
 import type { AssetConfig } from './public-types';
 import type { AudioSystem } from './systems/AudioSystem';
+import type { GateLabels } from './public-types';
 
 export interface ResolvedConfig {
   worldSize: { w: number; h: number };
@@ -18,6 +19,7 @@ export interface ResolvedConfig {
   canExitClassic: boolean;
   /** Boxed-in-host mode: suppress the full-screen chrome (see LobbyConfig). */
   embed: boolean;
+  labels: GateLabels;
 }
 
 /**

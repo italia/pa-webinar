@@ -1,16 +1,21 @@
 import { NextResponse } from 'next/server';
 
 import { withErrorHandling } from '@/lib/api-handler';
+import { NotFoundError } from '@/lib/errors';
+import { ADMIN_ONLY_CACHE_CONTROL, statusDataAccess } from '@/lib/status-page';
 import {
   isPrometheusConfigured,
   queryPrometheusRange,
 } from '@/lib/prometheus';
 import { METRICS_APP_LABEL } from '@/lib/metrics';
+import { upSelector } from '@/lib/status/prometheus-selectors';
 
 export const dynamic = 'force-dynamic';
 
 const ALLOWED_QUERIES: Record<string, string> = {
-  uptime: `avg_over_time(up{job=~".*eventi.*"}[24h]) * 100`,
+  // `up` si seleziona per job e namespace, come le regole di allerta del
+  // chart (lib/status/prometheus-selectors).
+  uptime: `avg_over_time(${upSelector()}[24h]) * 100`,
   responseTime: `histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{app="${METRICS_APP_LABEL}"}[5m]))`,
   participants: `eventi_jvb_participants{app="${METRICS_APP_LABEL}"}`,
   conferences: `eventi_jvb_conferences{app="${METRICS_APP_LABEL}"}`,
@@ -18,6 +23,11 @@ const ALLOWED_QUERIES: Record<string, string> = {
 };
 
 export const GET = withErrorHandling(async (request) => {
+  // Pagina di stato spenta dall'amministrazione: questi dati servono solo a
+  // lei e alla mappa dell'infrastruttura dell'area admin (lib/status-page).
+  const access = await statusDataAccess();
+  if (access === 'none') throw new NotFoundError('Status page');
+
   if (!isPrometheusConfigured()) {
     return NextResponse.json({ available: false });
   }
@@ -42,7 +52,11 @@ export const GET = withErrorHandling(async (request) => {
       metric,
       data: result.data,
     }, {
-      headers: { 'Cache-Control': 'public, max-age=30' },
+      // Pubblica solo se lo è la pagina: altrimenti la risposta è quella
+      // dell'amministratore, e una cache condivisa la girerebbe a tutti.
+      headers: {
+        'Cache-Control': access === 'public' ? 'public, max-age=30' : ADMIN_ONLY_CACHE_CONTROL,
+      },
     });
   } catch {
     return NextResponse.json({ available: false });

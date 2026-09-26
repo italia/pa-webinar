@@ -35,12 +35,27 @@ function getJitsiJwtAudience(): string {
   return process.env.JITSI_JWT_AUDIENCE ?? 'jitsi';
 }
 
+/**
+ * Il claim `sub` quando `JITSI_JWT_SUBJECT` non è impostata.
+ *
+ * Il plugin token di Prosody pretende che `sub` ci sia, ma lo confronta con il
+ * dominio XMPP solo se la verifica del dominio è accesa
+ * (`JWT_ENABLE_DOMAIN_VERIFICATION`, spenta per default nelle immagini Jitsi;
+ * né il chart né docker compose la accendono). A verifica spenta conta solo
+ * il claim `room`.
+ *
+ * Il valore è quello che le immagini pubblicate hanno sempre inviato. Prima ci
+ * arrivava per caso: il fallback leggeva `process.env.NEXT_PUBLIC_JITSI_DOMAIN`
+ * in notazione puntata, che il build sostituisce con il default del Dockerfile.
+ * Ora è dichiarato qui, e le installazioni esistenti continuano ad
+ * autenticarsi con lo stesso token. Chi accende la verifica del dominio
+ * imposta `JITSI_JWT_SUBJECT` al dominio XMPP di Prosody, o a `*`.
+ */
+export const DEFAULT_JITSI_JWT_SUBJECT = 'localhost:8443';
+
 function getJitsiJwtSubject(): string {
-  return (
-    process.env.JITSI_JWT_SUBJECT ??
-    process.env.NEXT_PUBLIC_JITSI_DOMAIN ??
-    'localhost:8443'
-  );
+  // `||`: un valore vuoto (una chiave Helm lasciata vuota) vale come non impostato.
+  return process.env.JITSI_JWT_SUBJECT || DEFAULT_JITSI_JWT_SUBJECT;
 }
 
 import { generateAvatarDataUri } from '@/lib/avatar';

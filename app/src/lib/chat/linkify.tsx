@@ -28,7 +28,7 @@ function trimTrailingPunctuation(url: string): { url: string; trailing: string }
 
 /**
  * Turn a plain chat string into React nodes with http(s) URLs rendered as safe
- * anchors (F17). Non-URL text is returned as plain strings, so React still
+ * anchors. Non-URL text is returned as plain strings, so React still
  * escapes it — there is no `dangerouslySetInnerHTML`, hence no XSS surface.
  * Anchors carry `rel="noopener noreferrer nofollow"` and open in a new tab;
  * on a public PA room this blocks tab-nabbing and SEO-abuse, and the scheme

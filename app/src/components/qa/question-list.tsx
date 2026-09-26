@@ -3,11 +3,14 @@
 import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import useSWR from 'swr';
+import { Icon } from '@/components/ui/icon';
+import { useLivePush } from '@/hooks/use-live-state';
 import {
   Badge,
   Button,
-  Icon,
 } from 'design-react-kit';
+
+import { questionsReadUrl, upvoteInit, type QaVoter } from './question-request';
 
 interface PublicQuestion {
   id: string;
@@ -24,9 +27,12 @@ interface PublicQuestion {
 interface QuestionsResponse {
   questions: PublicQuestion[];
   totalCount: number;
+  /** Lo dice il server: il pollice in su richiede un'identità di voto, la
+   *  registrazione o l'identificativo del browser mandato con la lettura. */
+  canUpvote?: boolean;
 }
 
-interface QuestionListProps {
+interface QuestionListProps extends QaVoter {
   eventSlug: string;
   token: string;
   isModerator: boolean;
@@ -38,9 +44,11 @@ export default function QuestionList({
   eventSlug,
   token,
   isModerator,
+  voterAccessToken,
+  voterGuestId,
 }: QuestionListProps) {
   const t = useTranslations('qa');
-  const apiUrl = `/api/events/${eventSlug}/questions`;
+  const apiUrl = questionsReadUrl(`/api/events/${eventSlug}/questions`, { voterGuestId });
 
   // Send token via header instead of query param to avoid leaking in logs
   const fetcherWithAuth = useCallback(
@@ -54,15 +62,20 @@ export default function QuestionList({
     [token],
   );
 
+  const pushLive = useLivePush();
+
   const { data, mutate } = useSWR<QuestionsResponse>(apiUrl, fetcherWithAuth, {
-    refreshInterval: 3000,
+    // Spento quando il canale consegna: il pannello viene avvisato.
+    refreshInterval: pushLive ? 0 : 3000,
   });
 
   const [filter, setFilter] = useState<FilterTab>('ALL');
+  const [upvoteFailed, setUpvoteFailed] = useState(false);
   const prevHighlightedRef = useRef<string | null>(null);
   const topRef = useRef<HTMLDivElement>(null);
 
   const questions = useMemo(() => data?.questions ?? [], [data]);
+  const canUpvote = data?.canUpvote ?? false;
 
   useEffect(() => {
     const firstHighlighted = questions.find((q) => q.status === 'HIGHLIGHTED');
@@ -81,17 +94,23 @@ export default function QuestionList({
 
   const handleUpvote = useCallback(
     async (questionId: string) => {
-      await fetch(
-        `/api/events/${eventSlug}/questions/${questionId}/upvote`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ accessToken: token }),
-        },
-      );
+      const init = upvoteInit(token, { voterAccessToken, voterGuestId });
+      if (!init) return;
+      setUpvoteFailed(false);
+      try {
+        const res = await fetch(
+          `/api/events/${eventSlug}/questions/${questionId}/upvote`,
+          init,
+        );
+        // Un voto respinto (limite, stanza chiusa) non cambia niente sullo
+        // schermo: senza un messaggio sembrerebbe un pulsante rotto.
+        if (!res.ok) setUpvoteFailed(true);
+      } catch {
+        setUpvoteFailed(true);
+      }
       mutate();
     },
-    [eventSlug, token, mutate],
+    [eventSlug, token, voterAccessToken, voterGuestId, mutate],
   );
 
   const handleStatusChange = useCallback(
@@ -137,6 +156,12 @@ export default function QuestionList({
         </div>
       )}
 
+      {upvoteFailed && (
+        <p className="text-danger small mb-2" role="alert">
+          {t('errors.upvoteFailed')}
+        </p>
+      )}
+
       {filteredQuestions.length === 0 && (
         <p className="text-muted small text-center py-3">{t('noQuestions')}</p>
       )}
@@ -147,6 +172,7 @@ export default function QuestionList({
             key={q.id}
             question={q}
             isModerator={isModerator}
+            canUpvote={canUpvote}
             onUpvote={handleUpvote}
             onStatusChange={handleStatusChange}
           />
@@ -161,6 +187,7 @@ export default function QuestionList({
 interface QuestionCardProps {
   question: PublicQuestion;
   isModerator: boolean;
+  canUpvote: boolean;
   onUpvote: (id: string) => void;
   onStatusChange: (id: string, status: string) => void;
 }
@@ -168,6 +195,7 @@ interface QuestionCardProps {
 function QuestionCard({
   question,
   isModerator,
+  canUpvote,
   onUpvote,
   onStatusChange,
 }: QuestionCardProps) {
@@ -213,7 +241,7 @@ function QuestionCard({
           </p>
         </div>
 
-        {!isModerator && !isDismissed && (
+        {!isModerator && !isDismissed && canUpvote && (
           <button
             type="button"
             className={`btn btn-sm border-0 d-flex flex-column align-items-center ${
@@ -229,6 +257,18 @@ function QuestionCard({
             />
             <span style={{ fontSize: '0.75rem' }}>{question.upvoteCount}</span>
           </button>
+        )}
+
+        {/* Chi non può votare vede comunque quanto una domanda è sentita: un
+            pulsante che non funziona è peggio di un numero. */}
+        {!isModerator && !isDismissed && !canUpvote && (
+          <span
+            className="text-muted d-flex flex-column align-items-center"
+            style={{ minWidth: '36px', fontSize: '0.75rem' }}
+          >
+            <Icon icon="it-arrow-up" size="sm" />
+            {question.upvoteCount}
+          </span>
         )}
 
         {isModerator && (

@@ -28,13 +28,13 @@ import {
   type RefObject,
 } from 'react';
 import { useTranslations } from 'next-intl';
-import { Icon } from 'design-react-kit';
 import type React from 'react';
 
 import {
   speakerColor,
   initials as speakerInitials,
 } from '@/lib/utils/speaker-palette';
+import { Icon } from '@/components/ui/icon';
 import { useBookmarks } from '@/lib/utils/use-bookmarks';
 import { MarkdownRenderer } from '@/components/ui/markdown';
 

@@ -1,8 +1,5 @@
-import { jwtVerify } from 'jose';
 import type { NextResponse } from 'next/server';
 import type { ReadonlyRequestCookies } from 'next/dist/server/web/spec-extension/adapters/request-cookies';
-
-import { tryGetAppSecret } from './app-secret';
 
 /**
  * Admin session lifetime (JWT `exp`) — the ceiling for an IDLE session, i.e.
@@ -14,44 +11,24 @@ import { tryGetAppSecret } from './app-secret';
 export const ADMIN_SESSION_TTL_SECONDS = 6 * 60 * 60;
 
 /**
- * Cookie max-age, deliberately LONGER than the JWT lifetime. This makes the
- * cookie OUTLIVE the token it carries: once the JWT `exp` passes the session is
- * no longer authorized (isAdminAuthenticated returns false), but the cookie is
- * still PRESENT. The middleware uses that "present-but-invalid" state to tell an
- * admin whose session lapsed (redirect them to /admin/login) apart from a
- * genuine event moderator reaching a `?token=` page via magic link (who has NO
- * admin_session cookie at all and must NOT be bounced to an admin login they
- * can't pass). The lingering cookie grants no access — only the JWT is verified.
- * Logout clears it explicitly. Kept to ~1 day (not weeks) so the "lapsed admin"
- * marker clears reasonably fast — this bounds the minor friction where someone
- * who is BOTH an admin and an event moderator, having recently held an admin
- * session on this browser, is sent to /admin/login on their moderator magic link
- * instead of straight into the page (a pure external moderator has no cookie and
- * is never affected). The keepalive re-sets it on every slide, so an active
- * admin's cookie never actually decays.
+ * Cookie max-age, longer than the JWT lifetime. Access is always bounded by
+ * the JWT `exp` inside the token, never by this max-age: a cookie that outlives
+ * its token grants nothing. Logout clears it explicitly, and the keepalive
+ * re-sets it on every slide, so an active session's cookie never decays.
  */
 export const ADMIN_COOKIE_MAX_AGE_SECONDS = 24 * 60 * 60;
 
 /**
- * Verify the admin_session cookie and return whether it carries a
- * valid admin role. Centralised so the middleware and individual
- * route handlers share the same check.
+ * Vera se la sessione e' di un amministratore: la chiave dell'istanza o un
+ * account dello staff con ruolo ADMIN, attivo. Passa da `getStaffSession`,
+ * cosi' un amministratore disattivato o degradato perde l'accesso subito
+ * su ogni rotta, non alla scadenza del cookie.
  */
 export async function isAdminAuthenticated(
   cookies: ReadonlyRequestCookies,
 ): Promise<boolean> {
-  const appSecret = tryGetAppSecret();
-  if (!appSecret) return false;
-
-  const token = cookies.get('admin_session')?.value;
-  if (!token) return false;
-  try {
-    const secret = new TextEncoder().encode(appSecret);
-    const { payload } = await jwtVerify(token, secret);
-    return payload.role === 'admin';
-  } catch {
-    return false;
-  }
+  const { getStaffSession } = await import('./staff-session');
+  return (await getStaffSession(cookies))?.role === 'admin';
 }
 
 /**

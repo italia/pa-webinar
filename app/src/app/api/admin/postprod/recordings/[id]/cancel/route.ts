@@ -14,18 +14,17 @@
 import { cookies } from 'next/headers';
 
 import { withErrorHandling } from '@/lib/api-handler';
-import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { requireRecordingManager } from '@/lib/auth/staff-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { prisma } from '@/lib/db';
-import { NotFoundError, UnauthorizedError } from '@/lib/errors';
+import { NotFoundError } from '@/lib/errors';
 
 export const dynamic = 'force-dynamic';
 
 export const POST = withErrorHandling(async (request, context) => {
-  const isAdmin = await isAdminAuthenticated(await cookies());
-  if (!isAdmin) throw new UnauthorizedError();
-
   const { id } = (await (context as { params: Promise<{ id: string }> }).params);
+  // Dell'evento della registrazione: l'admin o chi l'ha creato (ADR-014).
+  await requireRecordingManager(await cookies(), id);
 
   const recording = await prisma.recording.findUnique({
     where: { id },

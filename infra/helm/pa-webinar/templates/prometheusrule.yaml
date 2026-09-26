@@ -19,10 +19,29 @@ spec:
         # lo stesso Prometheus e le serie di entrambi hanno app="pa-webinar", quindi senza
         # namespace ogni regola valuterebbe anche le serie dell'altro ambiente.
         - alert: PaWebinarDown
+          # Guardia sullo spegnimento programmato: i namespace di test vengono
+          # scalati a 0 ogni sera alle 21:00 Europe/Rome e per tutto il weekend
+          # (k8s-configuration/manifests/test-scale-scheduler.yaml). Senza questa
+          # condizione l'absent() qui sopra scattava ogni notte: 10 episodi
+          # notturni su 11 in 14 giorni, sempre 19:01 -> 06:31 UTC.
+          #
+          # min_over_time(...[15m]) e NON il valore istantaneo: allo scale-up
+          # spec_replicas torna a 1 alle 06:31 mentre il target di scrape ricompare
+          # solo alle 06:35, e con il valore istantaneo l'alert scatterebbe alle
+          # 06:33. Con la finestra di 15 minuti la guardia diventa vera solo a
+          # servizio gia' avviato, e il `for` resta corto: cosi' la sensibilita'
+          # diurna non si perde (un guasto reale di 180s continua a scattare).
+          #
+          # In produzione la guardia e' inerte: spec_replicas non e' mai stato 0
+          # in 15 giorni, quindi non cambia nulla.
           expr: |
-            up{namespace="{{ .Release.Namespace }}", job="{{ include "pa-webinar.fullname" . }}"} == 0
-            or
-            absent(up{namespace="{{ .Release.Namespace }}", job="{{ include "pa-webinar.fullname" . }}"})
+            (
+              up{namespace="{{ .Release.Namespace }}", job="{{ include "pa-webinar.fullname" . }}"} == 0
+              or
+              absent(up{namespace="{{ .Release.Namespace }}", job="{{ include "pa-webinar.fullname" . }}"})
+            )
+            and on (namespace)
+            (max by (namespace) (min_over_time(kube_deployment_spec_replicas{namespace="{{ .Release.Namespace }}", deployment="{{ include "pa-webinar.fullname" . }}"}[15m])) > 0)
           for: 2m
           labels:
             severity: critical
@@ -57,7 +76,12 @@ spec:
 
         # Database unreachable (metric disappears)
         - alert: PaWebinarDatabaseDown
-          expr: absent(eventi_active_events{namespace="{{ .Release.Namespace }}", app="pa-webinar"})
+          # Stessa guardia di PaWebinarDown: la metrica applicativa sparisce
+          # insieme al pod quando l'ambiente viene spento la sera.
+          expr: |
+            absent(eventi_active_events{namespace="{{ .Release.Namespace }}", app="pa-webinar"})
+            and on (namespace)
+            (max by (namespace) (min_over_time(kube_deployment_spec_replicas{namespace="{{ .Release.Namespace }}", deployment="{{ include "pa-webinar.fullname" . }}"}[15m])) > 0)
           for: 3m
           labels:
             severity: critical
@@ -121,7 +145,12 @@ spec:
             summary: "coturn (TURN/TURNS) giu' durante un evento LIVE"
             description: "coturn non ha repliche disponibili con eventi LIVE in corso: gli utenti dietro NAT/firewall (relay e fallback 443) non riescono a passare il media. Intervento immediato."
         - alert: CoturnAbsent
-          expr: max(kube_deployment_status_replicas_available{namespace="{{ .Release.Namespace }}", deployment=~".*coturn.*"}) == 0
+          # Stessa guardia: di notte coturn e' a 0 repliche per scelta, non per guasto.
+          # I due max() senza `by` scartano tutte le label, quindi non serve `on(...)`.
+          expr: |
+            max(kube_deployment_status_replicas_available{namespace="{{ .Release.Namespace }}", deployment=~".*coturn.*"}) == 0
+            and
+            max(min_over_time(kube_deployment_spec_replicas{namespace="{{ .Release.Namespace }}", deployment=~".*coturn.*"}[15m])) > 0
           for: 5m
           labels:
             severity: warning

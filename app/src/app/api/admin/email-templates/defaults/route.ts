@@ -12,12 +12,10 @@ import {
   baseConfirmationCopy,
   baseReminderCopy,
 } from '@/lib/email/templates';
+import { EMAIL_LOCALES, type EmailLocale } from '@/lib/email/lingua';
 
 export const dynamic = 'force-dynamic';
 
-type Locale = 'it' | 'en';
-
-const LOCALES: Locale[] = ['it', 'en'];
 
 // Sample input used to render defaults — placeholders are shown literally
 // so admins understand which tokens they can use.
@@ -35,9 +33,9 @@ export const GET = withErrorHandling(async () => {
   const isAdmin = await isAdminAuthenticated(await cookies());
   if (!isAdmin) throw new UnauthorizedError();
 
-  const confirmation: Record<Locale, unknown> = { it: null, en: null };
-  const reminder: Record<Locale, unknown> = { it: null, en: null };
-  for (const locale of LOCALES) {
+  const confirmation: Partial<Record<EmailLocale, unknown>> = {};
+  const reminder: Partial<Record<EmailLocale, unknown>> = {};
+  for (const locale of EMAIL_LOCALES) {
     confirmation[locale] = baseConfirmationCopy({ locale, ...SAMPLE_INPUT });
     reminder[locale] = baseReminderCopy({ locale, ...SAMPLE_INPUT });
   }

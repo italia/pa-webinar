@@ -13,7 +13,7 @@
   },
   "common": {
     "appName": "PA Webinar",
-    "appDescription": "Public digital event platform by the Department for Digital Transformation",
+    "appDescription": "Platform for public digital events",
     "loading": "Loading...",
     "error": "An error occurred",
     "errorMessage": "Something went wrong. Please try again.",
@@ -54,8 +54,6 @@
     "skipToFooter": "Skip to footer"
   },
   "header": {
-    "slimTitle": "Presidency of the Council of Ministers",
-    "slimSubtitle": "Department for Digital Transformation",
     "followUs": "Follow us on"
   },
   "events": {
@@ -86,7 +84,10 @@
       "votes": "{count, plural, =0 {no votes} one {1 vote} other {# votes}}",
       "topWords": "Most-shared words",
       "feedback": "Average rating",
-      "feedbackCount": "{count, plural, one {1 response} other {# responses}}"
+      "feedbackCount": "{count, plural, one {1 response} other {# responses}}",
+      "chatQuestions": "Questions from the chat",
+      "reactionsCount": "{count, plural, one {1 reaction} other {# reactions}}",
+      "answered": "answered"
     },
     "detail": {
       "title": "Event details",
@@ -126,20 +127,22 @@
         "outlook": "Outlook / Office 365",
         "yahoo": "Yahoo Calendar",
         "downloadIcs": "Download .ics file"
-      }
+      },
+      "registrationEnded": "The event has ended: registration is closed."
     },
     "manage": {
       "toggleChat": "Chat",
       "toggleQa": "Q&A",
       "toggleRecording": "Recording",
-      "settingsSection": "Event settings",
       "sessionsAndRecordings": "Sessions and video recordings",
       "postEventSection": "Post-event and feedback"
     },
     "status": {
       "DRAFT": "Draft",
       "PUBLISHED": "Published",
+      "PROVISIONING": "Setting up",
       "LIVE": "Live",
+      "IDLE": "Paused",
       "ENDED": "Ended",
       "ARCHIVED": "Archived"
     },
@@ -168,6 +171,12 @@
     "resendLink": "Resend my access link",
     "resending": "Sending…",
     "resendSent": "If the address is registered, we've re-sent the access link by email.",
+    "invitationOnly": "Registration is reserved for invited people: use the email address you were invited with. The link to enter will reach you by email.",
+    "closed": "Registration for this event is not open to the public.",
+    "lostLink": "Already registered? Get your personal link again",
+    "lostLinkHelp": "Enter the email address you registered with: if it is registered for this event, we will send you the link to enter again.",
+    "checkEmailTitle": "Check your email",
+    "checkEmail": "If the address is on the invitation list, you will shortly receive an email with your personal link to enter the room. If you cannot find it, check your spam folder.",
     "backToEvent": "Back to event",
     "organization": "Organization",
     "organizationPlaceholder": "e.g. AGID, Ministry of Economy, City of Rome",
@@ -276,11 +285,15 @@
     "guestJoinSubtitle": "Join the live event as a guest",
     "guestJoinButton": "Join as guest",
     "guestRedirectToRegister": "The event has not started yet. Register to receive your access link.",
+    "guestAccessDisabled": "This event requires registration: joining as a guest is not available.",
     "jibriUnavailable": "Recording unavailable — Jibri not configured",
     "endEventError": "Failed to end the event. Please try again.",
     "jibriNotConfigured": "Recording not configured in infrastructure",
     "jibriScaling": "Recording starting…",
     "jibriScalingTooltip": "The recording component is starting up. It will be available shortly.",
+    "recorderNotStarted": "Recording unavailable",
+    "recorderNotStartedDetail": "The recording service has not started yet: for now the event continues without recording. Let the platform administrators know.",
+    "recorderStartFailed": "The recording did not start. Try again in a few minutes; if the problem persists, let the platform administrators know.",
     "roomPreparing": "Setting up the room…",
     "roomPreparingDetail": "Video servers are starting up. This takes about 2 minutes. The room will activate automatically.",
     "recordingPromptTitle": "Start recording?",
@@ -339,7 +352,25 @@
       "exportChat": "Download the chat",
       "reactNotAllowed": "Reacting to messages needs your personal or moderator link.",
       "editNotAllowed": "This link is shared, so it cannot edit messages.",
-      "editExpired": "More than 15 minutes have passed: this message can no longer be edited."
+      "editExpired": "More than 15 minutes have passed: this message can no longer be edited.",
+      "askAsQuestionLabel": "Mark as a question",
+      "placeholderQuestion": "Write your question...",
+      "lensGroupLabel": "Filter messages",
+      "lensAll": "All",
+      "lensQuestions": "Questions ({count})",
+      "lensAnnounceAll": "Listing all messages",
+      "lensAnnounceQuestions": "Listing {count, plural, =0 {no questions} one {1 question} other {# questions}}",
+      "questionOpen": "Question",
+      "questionAnswered": "Answered",
+      "questionDismissed": "Won't be taken",
+      "questionMarkAnswered": "Mark answered",
+      "questionReopen": "Reopen",
+      "questionDismiss": "Dismiss",
+      "questionRestore": "Restore",
+      "questionStatusFailed": "Could not update the question",
+      "questionNeedsText": "Type the text of your question: an attachment alone does not enter the queue",
+      "lensTruncated": "Only the most recent messages are loaded: there may be older questions not listed.",
+      "attachUnavailable": "Attachments are not available on this installation."
     },
     "role": {
       "moderator": "Moderator",
@@ -360,7 +391,8 @@
         "unknown": "N/A"
       },
       "volume": "Volume",
-      "volumeFor": "Volume for {name}"
+      "volumeFor": "Volume for {name}",
+      "kickName": "Kick {name}"
     },
     "moderator": {
       "muteAll": "Mute all",
@@ -371,7 +403,7 @@
       "toggleChat": "Toggle chat",
       "endEvent": "End event",
       "endEventConfirm": "Are you sure you want to end the event for all participants?",
-      "participantCount": "{count} participants",
+      "participantCount": "{count, plural, one {# participant} other {# participants}}",
       "raisedHands": "Raised hands",
       "noRaisedHands": "No hands raised",
       "giveFloor": "Give floor",
@@ -400,6 +432,7 @@
       "live": "👥 {count, plural, one {# person} other {# people}}"
     },
     "sidebarTabChatUnread": "New unread messages",
+    "sidebarTabPollsOpen": "Open poll you have not voted in yet",
     "floatingControlsLabel": "Event controls",
     "screenshareActive": "🖥️ {name} is sharing their screen",
     "screenshareFallbackName": "A participant",
@@ -422,7 +455,19 @@
       "hide": "Hide the timer",
       "remainingLabel": "Time remaining (click for time elapsed)",
       "elapsedLabel": "Time elapsed (click for time remaining)"
-    }
+    },
+    "videoCallFrameTitle": "Event video call",
+    "insecureContextTitle": "Insecure address",
+    "insecureContextBody": "This page was opened over http://: the browser does not allow the microphone and camera, and the video call cannot start. Open the same page at the secure address.",
+    "insecureContextLink": "Open https://{host}",
+    "conferenceUnreachableTitle": "The video call service is not responding",
+    "conferenceUnreachableBody": "Your browser cannot reach the video call server ({host}). Open it in a new tab: if the browser shows a security warning, accept it, then come back here and try again. If the page does not open, the network you are connected to may be blocking it.",
+    "conferenceOpenHost": "Open {host} in a new tab",
+    "leftTitle": "You left the room",
+    "leftMessage": "The event is still in progress: you can rejoin whenever you like.",
+    "leftModeratorReminder": "The event stays open until someone ends it. When you have finished, rejoin and choose “{action}”.",
+    "rejoin": "Rejoin",
+    "backToHome": "Back to the home page"
   },
   "qa": {
     "title": "Questions & Answers",
@@ -457,7 +502,9 @@
       "textRequired": "Please write your question",
       "tooLong": "Question cannot exceed 500 characters",
       "rateLimit": "Please wait before submitting another question",
-      "generic": "Error submitting question"
+      "busy": "Many questions are arriving from your network right now: please try again in a few seconds",
+      "generic": "Error submitting question",
+      "upvoteFailed": "Your vote was not recorded: please try again in a few seconds."
     },
     "ctaTitle": "Ask the first question",
     "ctaBody": "Other attendees can upvote your question. Moderators will see it and can answer live or in writing.",
@@ -467,6 +514,79 @@
     "submitPrimary": "Send question"
   },
   "admin": {
+    "accessDenied": {
+      "title": "This section is not available for your role",
+      "body": "As an organizer you manage your own events: creating and publishing them, materials, questionnaires and post-production. Platform settings and data across all events stay with the administration.",
+      "back": "Go to your events"
+    },
+    "staffLogin": {
+      "title": "Sign in to the administration area",
+      "intro": "Organisers and administrators sign in with a link sent to their email: no password to remember.",
+      "emailLabel": "Your work email",
+      "send": "Send me the link",
+      "sending": "Sending…",
+      "sent": "If the address is enabled, you will shortly receive an email with the sign-in link. The link works only once and expires after {minutes} minutes.",
+      "error": "The request could not be sent. Please try again in a few minutes.",
+      "keySection": "Sign in with the instance key",
+      "accessTitle": "Enter the administration area",
+      "accessIntro": "Press the button to sign in. The link works only once.",
+      "enter": "Sign in",
+      "invalidLink": "The link is not valid: it may have expired or already been used.",
+      "newLink": "Request a new link"
+    },
+    "organizers": {
+      "title": "Staff accounts",
+      "intro": "People who work in the administration area under their own name. Organisers create and manage their own events; administrators manage the whole instance. They sign in with a link sent to their email, no password. The instance key remains for emergencies and automation.",
+      "newTitle": "Add a person",
+      "name": "Full name",
+      "email": "Email",
+      "add": "Add",
+      "sendNow": "Send the sign-in link now",
+      "listTitle": "Enabled people",
+      "loading": "Loading…",
+      "empty": "No accounts yet.",
+      "events": "Events",
+      "lastLogin": "Last sign-in",
+      "status": "Status",
+      "actions": "Actions",
+      "never": "Never",
+      "active": "Active",
+      "inactive": "Deactivated",
+      "invite": "Send link",
+      "inviteFor": "Send a sign-in link to {name}",
+      "deactivate": "Deactivate",
+      "deactivateFor": "Deactivate {name}",
+      "activate": "Reactivate",
+      "activateFor": "Reactivate {name}",
+      "delete": "Delete",
+      "deleteFor": "Delete {name}",
+      "deleteTitle": "Delete the account?",
+      "deleteMessage": "{name}’s account will be deleted. Their events ({count}) are not removed: they go back to the administration.",
+      "deactivateTitle": "Deactivate the account?",
+      "deactivateMessage": "{name} will no longer be able to sign in, and sign-in links already sent stop working. Their events stay as they are.",
+      "exists": "An account with this email already exists.",
+      "created": "Account added.",
+      "createdInvited": "Account added: the sign-in link is on its way.",
+      "invited": "Sign-in link sent.",
+      "deleted": "Account deleted.",
+      "updated": "Change saved.",
+      "actionError": "The operation failed. Please try again.",
+      "loadError": "The list could not be loaded.",
+      "inviteFailed": "Account added, but the link could not be sent: resend it from its row.",
+      "role": "Role",
+      "roleOrganizer": "Organiser",
+      "roleAdmin": "Administrator",
+      "roleHelp": "Organisers see and manage only their own events. Administrators manage everything: settings, everyone's events, address book and accounts.",
+      "roleFor": "Role of {name}",
+      "promoteTitle": "Make administrator?",
+      "promoteMessage": "{name} will be able to manage the whole instance: settings, everyone's events, address book and staff accounts.",
+      "promote": "Make administrator",
+      "demoteTitle": "Change back to organiser?",
+      "demoteMessage": "{name} will immediately lose access to settings and other people's events, and will see only their own.",
+      "demote": "Change to organiser",
+      "you": "you",
+      "selfLocked": "Your account is managed by another administrator"
+    },
     "fileOrUrl": {
       "tabUpload": "Upload file",
       "tabUrl": "Paste URL",
@@ -484,7 +604,8 @@
       "errorGeneric": "Error while uploading the file",
       "helpImage": "Supported formats: PNG, JPEG, WebP, SVG, GIF — max 10 MB",
       "helpAudio": "Supported formats: MP3, WAV, OGG, M4A, WebM — max 20 MB",
-      "helpDocument": "Supported formats: PDF, DOCX, PPTX, XLSX, TXT — max 25 MB"
+      "helpDocument": "Supported formats: PDF, DOCX, PPTX, XLSX, TXT — max 25 MB",
+      "uploadsUnavailable": "File uploads are not available on this installation: paste the file's URL instead."
     },
     "rubricaPicker": {
       "loading": "Searching…",
@@ -522,7 +643,9 @@
           "endsAt": "End date must be after start date.",
           "titleRequired": "Title is required (at least 3 characters).",
           "titleRequiredOtherLocale": "The title in the default language ({locale}) is required: switch to the {locale} tab.",
-          "maxParticipants": "Enter a number between 2 and 500."
+          "maxParticipants": "Enter a number between 2 and 500.",
+          "descriptionRequired": "The description is required (at least {min} characters).",
+          "descriptionRequiredOtherLocale": "The description in the default language ({locale}) is required: switch to the {locale} tab."
         },
         "senderRatioLabel": "Estimated active share",
         "senderRatioHelp": "How many participants you expect to have mic/camera active. Helps size the video server.",
@@ -604,7 +727,7 @@
         "speakerEmail": "Email",
         "speakerRequired": "Name and email are required.",
         "invitationsHeading": "Invitations",
-        "invitationsHelp": "Pre-registered attendees — each gets a personal join link.",
+        "invitationsHelp": "List of invited people. The platform does not send invitations: share the event link with them yourself. With public registration off, only these addresses can register, and the personal link to enter arrives by email after registering.",
         "invitationName": "Name (optional)",
         "invitationEmail": "Email",
         "invitationRole": "Role",
@@ -628,7 +751,7 @@
         "materialUrl": "File or link",
         "visibilityLabel": "Visibility",
         "visibility": {
-          "ALWAYS": "Always",
+          "ALWAYS": "In the room and after the event",
           "BEFORE": "Before the event",
           "DURING": "During the event",
           "AFTER": "After the event"
@@ -657,8 +780,6 @@
         "scaleMax": "Maximum",
         "required": "Required",
         "saveDraftAndGoQuestionnaires": "Save draft and go to questionnaire management",
-        "preQuestionnaire": "Pre-event questionnaire",
-        "postQuestionnaire": "Post-event questionnaire (feedback)",
         "none": "— None —"
       },
       "step5": {
@@ -687,6 +808,7 @@
         "retentionHelp": "After this threshold, personal data is automatically deleted.",
         "gdprTemplate": "Privacy template",
         "gdprTemplateNone": "— Use custom text —",
+        "gdprTemplateUnknown": "The selected privacy notice template no longer exists: pick another one or go back to custom text",
         "privacyText": "Privacy notice (text)",
         "moderatorHeading": "Primary moderator",
         "moderatorPublishHint": "Name and email are required to publish the event (used for the moderator link and confirmation email). Not required to save as draft.",
@@ -703,6 +825,8 @@
       },
       "validationFailed": "Please review the highlighted fields before continuing.",
       "partialFailure": "Event created, but some items weren't saved: {items}. You can add them from the event page.",
+      "partialFailureEdit": "The event changes were saved, but these could not be: {items}. Your work is still here: fix them and save again.",
+      "partialFailureEditDetail": "The event changes were saved, but these could not be: {items}. The server replied: {reason}. Your work is still here: fix them and save again.",
       "draftFound": "We found an unsaved draft of this event. Restore it?",
       "draftRestore": "Restore draft",
       "draftDiscard": "Dismiss",
@@ -711,8 +835,13 @@
         "invitations": "invitations",
         "moderators": "moderators",
         "speakers": "speakers",
-        "materials": "materials"
-      }
+        "materials": "materials",
+        "questionnaires": "questionnaires"
+      },
+      "revocationFailed": "Revoking access for {name} failed: their access link is still valid. Save again to retry, or revoke it from the “{tab}” tab of the event page.",
+      "validationFailedDetail": "The server rejected some data: {reason}. Fix it and try again.",
+      "publishFailed": "The event was created but not published: it is still a draft. Publish it from the event page.",
+      "publishFailedDetail": "The event was created but not published: it is still a draft. The server replied: {reason}. Publish it from the event page."
     },
     "nav": {
       "events": "Events",
@@ -753,6 +882,9 @@
       "eventQuestionnaires": "Questionnaires",
       "rubricaList": "List",
       "rubricaDetail": "Entry",
+      "organizers": "Accounts",
+      "people": "People",
+      "postprodDetail": "Recording",
       "recordingsPostprod": "Transcripts / AI",
       "feedbackDashboard": "Feedback"
     },
@@ -1126,12 +1258,14 @@
       "recordingEnabled": "Enable video recording",
       "agendaEnabled": "Live notes / checklist (agenda)",
       "agendaEnabledDesc": "A checklist of topics to cover that moderators tick off during the event. Feeds the automatic summary. Optional and can also be enabled during the event.",
+      "wordCloudEnabled": "Live word cloud",
+      "wordCloudEnabledDesc": "Participants send a word and the cloud updates live. Useful to open a discussion or gather a feeling in a few seconds.",
       "whiteboardEnabled": "Shared whiteboard",
-      "whiteboardEnabledDesc": "Enables the native collaborative whiteboard (Excalidraw): moderators can open it from the toolbar during the event. Always on for instant calls.",
+      "whiteboardEnabledDesc": "Enables the native collaborative whiteboard (Excalidraw): moderators can open it from the toolbar during the event. Requires the installation's whiteboard service; where it is available, it is always on for instant calls.",
       "autoStartRecording": "Start recording automatically",
       "autoStartRecordingDesc": "When the event starts, recording begins on its own (the moderator is not prompted). Late joiners immediately find a catch-up player available.",
       "aiSectionHeading": "Automatic post-production",
-      "aiSectionDesc": "After the event ends, the recording can be processed by an in-cluster AI pipeline to produce transcript, summary and — if requested — translations and dubbing. Everything runs on the Department's infrastructure, no data leaves to third parties.",
+      "aiSectionDesc": "After the event ends, the recording can be processed by an in-cluster AI pipeline to produce transcript, summary and — if requested — translations and dubbing. Everything runs on this installation's infrastructure, no data leaves to third parties.",
       "aiTranscriptEnabled": "Automatic transcription",
       "aiTranscriptEnabledDesc": "Speech recognition with speaker identification. Required to enable summary, translations and dubbing.",
       "aiSummaryEnabled": "Summary and chapters",
@@ -1203,7 +1337,8 @@
       "retentionPreviewRecordings": "Video recordings",
       "retentionPreviewKept": "Aggregate statistics and event metadata are retained.",
       "configPreview": "Configuration preview",
-      "templateApplied": "Template applied: {name}. You can modify all settings."
+      "templateApplied": "Template applied: {name}. You can modify all settings.",
+      "whiteboardUnavailable": "Not available on this installation: the Jitsi whiteboard service is missing, and the platform operator can enable it."
     },
     "links": {
       "title": "Event links",
@@ -1211,11 +1346,18 @@
       "publicPageHint": "Share this URL to collect new registrations.",
       "guestJoin": "Direct invite (no registration)",
       "guestJoinHint": "Quick link to invite a last-minute attendee: they join as a guest while the event is live, without filling in the registration form.",
+      "callInvite": "Participant link",
+      "callInviteHint": "Whoever receives it joins the call as a guest, without registering. An instant call has no public page: this is the link to share.",
       "moderatorLink": "Moderator link",
       "moderatorLinkHint": "Share this link only with moderators. Anyone with this link can manage the event.",
       "liveRoomHint": "Direct link to enter the live room as moderator.",
       "copyLink": "Copy link",
-      "copied": "Copied!"
+      "copied": "Copied!",
+      "reveal": "Show",
+      "hide": "Hide",
+      "warning": "Anyone with this link administers the event: do not show it while sharing your screen and do not paste it into a chat.",
+      "hidden": "Link hidden",
+      "copyFailed": "Copy failed: select the address below and copy it manually."
     },
     "feedbackAdmin": {
       "title": "Feedback Results",
@@ -1332,7 +1474,7 @@
         "jobMaxAttempts": "Attempts before failure",
         "jobMaxAttemptsHelp": "How many times the pipeline retries a job before marking it as failed. Backoff between attempts grows exponentially (from 30 seconds up to 2 hours). The typical value is 5.",
         "artifactRetentionDays": "Artifact retention (days)",
-        "artifactRetentionDaysHelp": "Left at 0, AI artifacts follow the event's own retention schedule. A positive value keeps them for the given number of days even after the event is closed, until a daily cron deletes them. Deletion includes speaker names and job payloads, consistent with docs/GDPR.md.",
+        "artifactRetentionDaysHelp": "At 0 there is no site-wide limit: AI artifacts follow the retention of their recording or event. A value greater than zero makes a daily job delete every artifact created more than that many days ago, published or not, so it can shorten retention but never extend it. Speaker names and job payloads are not covered: they follow the recording or event retention. Details in docs/privacy/recordings-and-ai.md.",
         "consentDisclosureSection": "AI notice in the waiting room",
         "consentDisclosureHelp": "Text shown to participants in the waiting room when the event uses AI post-production (transcription, summary, translation, dubbing). Customisable per language. Leave empty to use the built-in default text.",
         "consentDisclosurePlaceholder": "E.g. This event will be automatically transcribed and summarised with AI tools after the live session…"
@@ -1377,8 +1519,10 @@
         "slimBarTitle": "Top bar (Slim Header)",
         "slimBarDescription": "The thin bar at the top of the page identifying the parent organization.",
         "parentOrganization": "Parent organization",
-        "parentOrganizationHelp": "E.g. \"Presidency of the Council of Ministers\"",
+        "parentOrganizationHelp": "The body your organization reports to. Leave empty to name none.",
         "parentOrganizationUrl": "Parent organization URL",
+        "siteTagline": "Site tagline",
+        "siteTaglineHelp": "Shown in the top bar and footer when the parent organization is empty. Leave empty to show nothing. It is written per language: where one is missing, the English one is used, then any other.",
         "centerBarTitle": "Center header",
         "centerBarDescription": "The main header area with the application name and logo.",
         "appName": "Application name",
@@ -1393,18 +1537,22 @@
         "siteNameHelp": "Shown in the header, browser title and emails",
         "siteDescription": "Application description",
         "organizationName": "Organization name",
-        "organizationNameHelp": "e.g. Department for Digital Transformation",
+        "organizationNameHelp": "Name of the body that owns the platform: shown in the header, footer and legal texts (e.g. City of Example)",
         "organizationNameShort": "Organization short name",
         "organizationUrl": "Organization URL",
         "parentOrganization": "Parent organization",
-        "parentOrganizationHelp": "e.g. Presidency of the Council of Ministers",
+        "parentOrganizationHelp": "The body your organization reports to. Leave empty to name none.",
         "parentOrganizationUrl": "Parent organization URL",
         "logoUrl": "Custom logo URL",
         "logoUrlHelp": "Leave empty to use the default PA icon",
         "faviconUrl": "Favicon URL",
         "primaryColor": "Primary color",
         "defaultTimezone": "Default timezone",
-        "defaultTimezoneHelp": "Used for date display and new event creation."
+        "defaultTimezoneHelp": "Used for date display and new event creation.",
+        "waitingRoomEngine": "Waiting room (site default)",
+        "waitingRoomEngineGame": "Videogame (Phaser lobby)",
+        "waitingRoomEngineClassic": "Classic (static)",
+        "waitingRoomEngineHelp": "Default mode of the waiting room. It can be changed for a single event and, for one visit, with the {param} parameter in the address."
       },
       "watermark": {
         "title": "Video customization",
@@ -1427,7 +1575,19 @@
         "description": "SEO description",
         "descriptionHelp": "Description for search engines and social sharing",
         "image": "Open Graph image",
-        "imageHelp": "Default image for social sharing (1200x630 recommended)"
+        "imageHelp": "Default image for social sharing (1200x630 recommended)",
+        "ogSection": "Shared link preview",
+        "ogIntro": "When someone pastes an event link into a chat or a social network, the platform draws a preview image with the details inside it. Choose which ones: every extra field takes room away from the title.",
+        "ogCardEnabled": "Generate the preview",
+        "ogCardEnabledHelp": "When off, the link shows the poster as is (or the site logo if the event has none), with no readable title or date in the image.",
+        "ogShowPoster": "Poster as background",
+        "ogShowPosterHelp": "Uses the event cover as the preview background, dimmed so the text stays readable. With no poster, or with this off, the institutional colour and the logo remain.",
+        "ogShowDate": "Date and time",
+        "ogShowDateHelp": "In the platform's default time zone.",
+        "ogShowSpeakers": "Speakers",
+        "ogShowSpeakersHelp": "The event's speaker text, shortened when too long.",
+        "ogShowOrganization": "Organisation",
+        "ogShowOrganizationHelp": "The event organiser when set, otherwise the organisation name."
       },
       "homepage": {
         "modeLabel": "Home page mode",
@@ -1443,10 +1603,20 @@
           "CUSTOM": {
             "title": "Custom",
             "description": "Custom HTML content + event list"
+          },
+          "LANDING_ISTITUZIONALE": {
+            "title": "Institutional landing",
+            "description": "Organisation, next event in the spotlight and the others listed. No technical language"
+          },
+          "LANDING_SEMPLICE": {
+            "title": "Plain-language landing",
+            "description": "Few words and a single invitation, for people new to online events"
           }
         },
         "customHtmlLabel": "Custom HTML content",
-        "customHtmlHelp": "HTML shown in the main section of the home page"
+        "customHtmlHelp": "HTML shown in the main section of the home page",
+        "showProject": "Show the “The project” section",
+        "showProjectHelp": "The platform’s architecture, data sovereignty and open source: of interest to those evaluating reuse more than to event participants."
       },
       "pages": {
         "privacyTitle": "Privacy policy",
@@ -1473,11 +1643,11 @@
       },
       "features": {
         "statusPageEnabled": "Status page enabled",
-        "statusPageEnabledHelp": "Show the service status page",
+        "statusPageEnabledHelp": "Publishes the service status page. When off, the page does not exist and its data is visible to administrators only.",
         "guestAccessEnabled": "Guest access enabled",
-        "guestAccessEnabledHelp": "Allow guest access to live events",
+        "guestAccessEnabledHelp": "People who have not registered can join live events with just their name. When off, scheduled events can only be joined by registering or with a moderator or speaker link; instant video calls stay open to anyone with the link.",
         "publicRegistrationEnabled": "Public registration enabled",
-        "publicRegistrationEnabledHelp": "Anyone can create events (if disabled, only admins can)",
+        "publicRegistrationEnabledHelp": "Anyone can register for events. When off, only people on the event's invitation list can register, and the personal link to enter is sent only by email; people already registered and moderator or speaker links keep working.",
         "calendarPublic": "Public calendar",
         "calendarPublicHelp": "Publish the event calendar. Visitors can see scheduled events.",
         "parseTitleKicker": "Editorial title kicker",
@@ -1503,7 +1673,7 @@
         "jvbStressCriticalPercent": "Stress critical threshold (%)",
         "jvbStressCriticalPercentHelp": "Above this threshold the scaler adds 2 extra JVB replicas. Default 70. Must be higher than warn.",
         "jvbProvisioningTimeoutMinutes": "Provisioning timeout (minutes)",
-        "jvbProvisioningTimeoutMinutesHelp": "After how many minutes since startsAt an event without JVB ready is flagged as 'degraded' on the status page. Default 15. Covers node cold-start (~3-5 min) plus safety margin.",
+        "jvbProvisioningTimeoutMinutesHelp": "After how many minutes since startsAt an event without JVB ready is flagged as 'degraded' on the status page. Default 15. Covers node cold-start (~3-5 min) plus safety margin. Also applies to the recording service, counted from when an event with recording requests it: after this time without an answer, the live room stops showing it as starting and reports it as not started.",
         "statusPollIntervalSeconds": "Status page poll interval (seconds)",
         "statusPollIntervalSecondsHelp": "How often the /status page refreshes from the browser. Default 30. Lower values = fresher data but more load on the app.",
         "emailSenderTitle": "Email sender",
@@ -1646,7 +1816,7 @@
       "selectFile": "Select file",
       "fileTitle": "Title",
       "visibility": "Visibility",
-      "visibilityAlways": "Always visible",
+      "visibilityAlways": "In the room and after the event",
       "visibilityBefore": "Before event only",
       "visibilityDuring": "During event only",
       "visibilityAfter": "After event only",
@@ -1667,10 +1837,11 @@
       "titleLabel": "Title",
       "descriptionLabel": "Description (optional)",
       "visibilityLabel": "Visibility",
-      "visibilityAlways": "Always",
+      "visibilityAlways": "In the room and after the event",
       "visibilityBefore": "Before the event",
       "visibilityDuring": "During the event",
       "visibilityAfter": "After the event",
+      "visibilityHelp": "Before the start, the public event page lists only the materials set to “Before the event”. Materials set to “In the room and after the event” appear in the live room during the event and on the page of the concluded event.",
       "typeLabel": "Type",
       "fileUploaded": "File uploaded",
       "typeFile": "File",
@@ -1690,7 +1861,7 @@
         "newTitle": "New GDPR template",
         "editTitle": "Edit GDPR template",
         "name": "Internal name",
-        "namePlaceholder": "e.g. DTD standard privacy notice",
+        "namePlaceholder": "e.g. Standard privacy notice",
         "description": "Description (optional)",
         "descriptionPlaceholder": "Short notes to recognise the template",
         "bodyIt": "Privacy text (Italian)",
@@ -1776,9 +1947,9 @@
       "version": "Version",
       "environment": "Environment",
       "modes": {
-        "simple": "Simple (Docker Compose)",
-        "standard": "Standard (Kubernetes)",
-        "full": "Full (Kubernetes with scale-to-zero)",
+        "simple": "Simple",
+        "standard": "Standard",
+        "full": "Full (bridges with scale-to-zero)",
         "unknown": "Unknown"
       },
       "database": {
@@ -1792,7 +1963,9 @@
         "title": "Jitsi Meet",
         "reachable": "Reachable",
         "unreachable": "Unreachable",
-        "notConfigured": "Not configured"
+        "notConfigured": "Not configured",
+        "degraded": "Reachable, but responding with errors or slowly",
+        "publicCheckFailed": "Check at the public address failed ({code}): the portal server does not accept the certificate or the name. Conferences may still work."
       },
       "jvb": {
         "title": "Video Bridge (JVB)",
@@ -1800,7 +1973,9 @@
         "replicas": "{current}/{max} nodes",
         "preScale": "Pre-scale: {minutes} min",
         "fixedMode": "Fixed mode",
-        "scalerEnabled": "Scaler enabled"
+        "scalerEnabled": "Scaler enabled",
+        "fixedDown": "The video bridge is not responding",
+        "unmonitored": "Not monitored: the bridge address (JVB_HEALTH_URL) is not set"
       },
       "jibri": {
         "title": "Recording (Jibri)",
@@ -1822,7 +1997,11 @@
         "metrics": "Metrics endpoint"
       },
       "note": "Infrastructure changes are made through Helm values and the CI/CD pipeline.",
-      "deployDocs": "Deployment documentation"
+      "deployDocs": "Deployment documentation",
+      "platforms": {
+        "kubernetes": "On Kubernetes",
+        "other": "Outside Kubernetes (Docker Compose or a single server)"
+      }
     },
     "instantCalls": {
       "title": "Instant calls",
@@ -1927,9 +2106,9 @@
       "latencyP99": "Latency P99",
       "requestRate": "Requests/s",
       "chartLatencyQuantiles": "Application latency — P50 / P95 / P99",
-      "participantsNow": "Active participants",
+      "participantsNow": "Participants on the video bridge",
       "jvbStress": "JVB stress",
-      "conferences": "Active conferences",
+      "conferences": "Conferences on the video bridge",
       "octoRelay": "Octo inter-bridge relay",
       "interBridge": "Octo traffic",
       "chartCpu": "App pod CPU usage",
@@ -1956,7 +2135,8 @@
       "liveNow": "LIVE",
       "provisioningNow": "provisioning",
       "idleNow": "IDLE (paused)",
-      "scaleToZeroHelp": "IDLE is the normal state for an event with no traffic past the grace period. On the next user visit it transitions to PROVISIONING and then LIVE."
+      "scaleToZeroHelp": "IDLE is the normal state for an event with no traffic past the grace period. On the next user visit it transitions to PROVISIONING and then LIVE.",
+      "capacityFromStatus": "Current values read from the video bridge. History requires Prometheus."
     },
     "bulk": {
       "selectAll": "Select all",
@@ -1984,7 +2164,29 @@
       "resultsCount": "{count, plural, =0 {No events} one {# event} other {# events}}",
       "durationMinutes": "{minutes} min",
       "durationHoursMinutes": "{hours}h {minutes}min",
-      "moderatorsSpeakers": "{mods} moderators · {speakers} speakers",
+      "menu": {
+        "actionsFor": "Actions for “{title}”",
+        "manage": "Manage",
+        "edit": "Edit",
+        "openPublic": "Open public page",
+        "newTab": "(opens in a new tab)",
+        "copyLink": "Copy public link",
+        "linkCopied": "Link copied",
+        "publish": "Publish",
+        "unpublish": "Unpublish",
+        "unpublishTitle": "Unpublish the event?",
+        "unpublishMessage": "“{title}” will disappear from the public pages until you publish it again. Registrations already received are kept.",
+        "published": "Event published",
+        "unpublished": "Event unpublished",
+        "duplicate": "Duplicate as next occurrence",
+        "delete": "Delete",
+        "deleteTitle": "Delete the event?",
+        "deleteMessage": "“{title}” and all its data will be deleted. This cannot be undone.",
+        "deleted": "Event deleted",
+        "failed": "The operation failed. Please try again."
+      },
+      "instantBadge": "Instant call",
+      "moderatorsSpeakers": "{mods, plural, one {# moderator} other {# moderators}} · {speakers, plural, one {# speaker} other {# speakers}}",
       "postEventSummary": "{connected} joined · {registered} registered",
       "registeredCount": "{count, plural, =0 {No registrations} one {1 registration} other {# registrations}}"
     },
@@ -2026,15 +2228,19 @@
     },
     "eventDetail": {
       "copyPublicUrl": "Copy public link",
-      "copyModeratorUrl": "Copy moderator link",
-      "enterAsModerator": "Enter live",
+      "copyInviteUrl": "Copy invite link",
+      "enterAsParticipant": "Join as participant",
+      "openAsParticipant": "Open as participant",
+      "participantHintRoom": "Opens in a new tab: the room as a guest sees it, without moderator powers.",
+      "participantHintPassword": "Opens in a new tab: the room as a guest sees it, after the event password.",
+      "participantHintPage": "Opens in a new tab: the public page as participants see it.",
       "editEvent": "Edit event",
       "editSettings": "Edit settings",
       "featureSummary": "Active features",
       "organizers": "Organizers",
       "privacyGdpr": "Privacy & GDPR",
       "postEventTitle": "Post-event & feedback",
-      "recordingSection": "Recording",
+      "recordingSection": "Event video",
       "callSessions": "Sessions & telemetry",
       "questionnaires": "Questionnaires",
       "questionnaireCount": "{count, plural, =0 {No questionnaires linked} one {1 questionnaire linked} other {# questionnaires linked}}",
@@ -2042,12 +2248,10 @@
       "manageQuestionnaires": "Manage questionnaires",
       "tabs": {
         "overview": "Overview",
-        "settings": "Settings",
         "people": "People",
         "content": "Content",
-        "audit": "Recordings & Audit",
-        "postEvent": "Post-event",
-        "analytics": "Statistics"
+        "analytics": "Statistics",
+        "afterEvent": "After the event"
       },
       "toggles": {
         "unmute": "Participants can unmute",
@@ -2061,15 +2265,17 @@
         "recordingConsent": "Recording consent"
       },
       "sidebar": {
-        "registrations": "Registrations",
+        "registrations": "Sign-ups",
         "ofMax": "{current} of {max}",
         "capacityEstimate": "≈{jvbs} JVB · {ram} RAM",
         "noReminders": "No reminders configured",
         "tags": "Tags",
-        "postEventSummary": "{connected} joined of {registered} registrations (estimated {estimated})",
-        "estimatedAttendance": "Estimated: {estimated} attendees"
+        "postEventSummary": "{connected} connected out of {registered} sign-ups (capacity {estimated})",
+        "estimatedAttendance": "Maximum capacity: {estimated} participants",
+        "reminderScheduled": "Goes out on {when}",
+        "reminderMissed": "Not sent — the moment has passed",
+        "reminderSoon": "Any moment now"
       },
-      "copyGuestUrl": "Copy guest link",
       "aiManageTitle": "Transcript, summary and translations",
       "aiManageDesc": "Manage the AI post-production of this recording: fix the transcript and speaker attribution (who says what), edit the summary and manage translation languages.",
       "aiManageCta": "Open post-production management",
@@ -2084,7 +2290,11 @@
       "duplicateNext": "Duplicate for next time",
       "duplicateNextBusy": "Duplicating…",
       "duplicateNextHint": "Creates a draft carrying this event’s entire configuration (recording, separate tracks, AI, agenda, reminders). If the event has a cadence the date moves to the next occurrence; otherwise it is left for you to set.",
-      "duplicateNextError": "Could not duplicate. Please try again."
+      "duplicateNextError": "Could not duplicate. Please try again.",
+      "capacitySection": "Capacity and infrastructure",
+      "capacitySubtitle": "Configured for up to {max} participants",
+      "publishBlockedLive": "The event is already under way",
+      "publishBlockedEnded": "The event has ended"
     },
     "rubrica": {
       "title": "Address book",
@@ -2382,7 +2592,21 @@
       "manageRerunAlreadyQueued": "Processing is already queued: nothing new to start.",
       "generateAi": "Generate AI",
       "generateAiConfirm": "Run the AI pipeline (transcription and summary) on this recording. AI processing will be enabled for the event and starts in the background. Translations are added afterwards, one language at a time, from the “Translations” tab.",
-      "generateAiOk": "AI pipeline started."
+      "generateAiOk": "AI pipeline started.",
+      "originalToggle": "Show original text",
+      "originalToggleHint": "Show, under each corrected line, the text as the automatic transcription produced it",
+      "originalNotComparable": "The number of lines has changed from the original version: a line-by-line comparison is not possible",
+      "originalLabel": "Original text:",
+      "revisedBadge": "Edited by a person",
+      "revisedHint": "At least one line was corrected by a person after the automatic transcription",
+      "redactLabel": "Erase from the original too",
+      "redactHint": "Use for an erasure request: the changes also apply to the preserved machine text, which would otherwise keep the removed sentence",
+      "redactSave": "Save and erase from the original",
+      "redactSaved": "{n, plural, one {1 line also removed from the original text} other {# lines also removed from the original text}}",
+      "redactNothingRemoved": "The corrections were saved, but there was nothing to remove from the original text for the lines you touched",
+      "redactArchiveFailed": "The corrections were saved to the database, but rewriting the archived file failed: the removed sentence is still downloadable from there. Try the removal again",
+      "originalUncertain": "Origin not certain",
+      "originalUncertainHint": "The preserved text may already include corrections made before this feature existed: it cannot be proven to be what the automatic transcription produced"
     },
     "questionnairesPage": {
       "title": "Questionnaires",
@@ -2482,7 +2706,7 @@
     "projectTeaser": {
       "kicker": "The project",
       "title": "Open source and sovereign, built by government for government",
-      "body": "PA Webinar is the Department for Digital Transformation's platform for public digital events: the .italia design system, the Jitsi Meet video engine and a fully in-cluster AI pipeline. It is released as open source so any administration can reuse it.",
+      "body": "PA Webinar is an open-source platform for public digital events, developed by the Italian Department for Digital Transformation and released so any administration can reuse it: the .italia design system, the Jitsi Meet video engine and a fully in-cluster AI pipeline.",
       "sovereignty": {
         "title": "Data sovereignty",
         "desc": "Self-hosted on the administration's infrastructure: data never leaves and there is no CLOUD Act exposure."
@@ -2518,6 +2742,49 @@
         "title": "Audio dubbing",
         "desc": "A dubbed audio track with a neutral synthetic voice (no voice cloning), to listen to the event in another language."
       }
+    },
+    "institutional": {
+      "title": "Online meetings and events",
+      "nextTitle": "Next event",
+      "nextCta": "Go to the event and sign up",
+      "othersTitle": "Other events",
+      "pointsTitle": "How to take part",
+      "points": {
+        "noInstall": {
+          "title": "Join from your browser",
+          "body": "No software to install: just open the link you receive."
+        },
+        "accessible": {
+          "title": "Designed for everyone",
+          "body": "Captions, keyboard and screen readers: the room works without a mouse too."
+        },
+        "privacy": {
+          "title": "Your data, handled with care",
+          "body": "Only what sign-up requires is collected, and you can ask for it back or have it deleted."
+        }
+      }
+    },
+    "simple": {
+      "title": "Online meetings by {organization}",
+      "subtitle": "Join from your computer or phone, with nothing to install.",
+      "cta": "Join the next meeting",
+      "noEvents": "No meetings are scheduled right now. Check back soon.",
+      "stepsTitle": "How it works",
+      "steps": {
+        "choose": {
+          "title": "Pick a meeting",
+          "body": "Each one shows its date and time."
+        },
+        "name": {
+          "title": "Leave your name",
+          "body": "Your name and email address are all it takes to get the link."
+        },
+        "enter": {
+          "title": "Join",
+          "body": "At the right time, open the link: you are in."
+        }
+      },
+      "listTitle": "Upcoming meetings"
     }
   },
   "polls": {
@@ -2546,7 +2813,9 @@
     "errors": {
       "questionRequired": "Write the poll question",
       "minOptions": "At least 2 options are required",
-      "generic": "Error creating the poll"
+      "generic": "Error creating the poll",
+      "vote": "Vote not recorded. Try again.",
+      "alreadyVoted": "You have already voted in this poll."
     }
   },
   "materials": {
@@ -2565,10 +2834,29 @@
     "add": "Add",
     "adding": "Adding...",
     "cancel": "Cancel",
+    "modeLabel": "Material type",
+    "modeLink": "Link",
+    "modeFile": "File",
+    "titleOptional": "Title (optional: defaults to the file name)",
+    "fileLabel": "File to upload",
+    "fileHelp": "Supported formats: PDF, DOCX, PPTX, XLSX, TXT — max {maxMb} MB",
+    "upload": "Upload",
+    "uploading": "Uploading…",
     "errors": {
       "urlInvalid": "Please enter a valid URL",
-      "generic": "Error adding material"
-    }
+      "generic": "Error adding material",
+      "fileMissing": "Choose a file to upload",
+      "titleMissing": "Enter a title for the link",
+      "fileTooLarge": "The file exceeds the {maxMb} MB limit",
+      "fileTooLargeForServer": "The server does not accept a file this large: try a smaller file",
+      "fileType": "Unsupported file type (PDF, DOCX, PPTX, XLSX, TXT)",
+      "uploadUnavailable": "File upload is not available on this installation",
+      "uploadFailed": "Error while uploading the file",
+      "quotaExceeded": "This event has reached its upload limit ({maxFiles} files, {maxMb} MB in total): remove some files to upload more",
+      "uploadBusy": "Too many uploads at the moment: try again in a few seconds",
+      "deleteFailed": "Could not delete the material"
+    },
+    "addedByStaff": "Added by the organisers"
   },
   "reminders": {
     "title": "Notifications",
@@ -2596,8 +2884,8 @@
       "recordingRequired": "Recording consent is required to participate in this event",
       "multitrack": "I consent to recording a separate audio track of my voice, for the sole purpose of correctly attributing the transcript to each speaker. The track is temporary and deleted after transcription; it is not used to identify or reproduce my voice.",
       "multitrackRequired": "Consent to recording your audio track is required to participate in this event",
-      "futureCommunications": "I would like to receive information about future events organized by DTD",
-      "addressBook": "I want to be added to the DTD address book to be invited to similar events",
+      "futureCommunications": "I would like to receive information about upcoming events published on this platform",
+      "addressBook": "I want to be added to the events address book to be invited to similar events",
       "addressBookHelp": "Separate consent (GDPR art. 6.1.a). You can withdraw it at any time using the \"Remove me from the address book\" link in emails. Your name and organization are taken from your registration profile."
     },
     "export": {
@@ -2641,7 +2929,7 @@
       "requestSubmittedBody": "If this email matches a registration, we've sent you a link to confirm the erasure. The link is valid for 1 hour.",
       "linkInvalid": "This link is invalid or expired. Please request a new link.",
       "confirmWarning": "You are about to permanently erase all personal data tied to your email.",
-      "confirmBody": "Registrations, questions, poll votes, feedback and reminders will be deleted. This action is irreversible.",
+      "confirmBody": "Registrations, questions, poll votes, feedback, reminders and your entry in the events address book will be deleted. This action is irreversible.",
       "confirmButton": "Confirm erasure",
       "cancel": "Cancel",
       "processing": "Deleting...",
@@ -2660,7 +2948,7 @@
       "sections": {
         "controller": {
           "title": "Data controller",
-          "body": "Personal data is processed within the institutional activities of the Department for Digital Transformation to support the technical and organisational management of public online events."
+          "body": "Data controller: {organization}. Personal data is processed within its institutional activities to support the technical and organisational management of public online events."
         },
         "data": {
           "title": "Processed data and purposes",
@@ -2668,11 +2956,11 @@
         },
         "retention": {
           "title": "Retention and rights",
-          "body": "Data is retained for the period configured for each event and then automatically deleted, unless different legal obligations apply. Data subjects may exercise their GDPR rights at any time, including access, rectification and erasure, through the Department's institutional channels."
+          "body": "Data is retained for the period configured for each event and then automatically deleted, unless different legal obligations apply. Data subjects may exercise their GDPR rights at any time, including access, rectification and erasure, through the data controller's institutional channels."
         },
         "automatedProcessing": {
           "title": "AI-generated transcript, summary and dubbing",
-          "body": "For events that opt in, after the live session ends the recording is processed by an artificial-intelligence pipeline running entirely on the Department's own cluster infrastructure. The pipeline produces the transcript of the speech (with speaker separation), a plain-language summary, optional translations into other European languages and a dubbed version of the audio with a generic synthetic voice. The models used (WhisperX for transcription, Mistral-Small for summary and translation, Piper TTS for dubbing) all run on dedicated GPUs inside the cluster: no participant data is sent to third-party services. The voice of the participants is not cloned and is not stored as biometric data (Art. 9 GDPR): the dubbing uses pre-trained public synthetic voices, assigned to the different speakers in an arbitrary way. Each recording exposes the exact snapshot of the models used on the event page ('AI processing transparency'). Generated content may contain inaccuracies: the authoritative reference is always the original video (AI Act, Art. 50)."
+          "body": "For events that opt in, after the live session ends the recording is processed by an artificial-intelligence pipeline running entirely on the cluster infrastructure of this installation. The pipeline produces the transcript of the speech (with speaker separation), a plain-language summary, optional translations into other European languages and a dubbed version of the audio with a generic synthetic voice. The models used (WhisperX for transcription, Mistral-Small for summary and translation, Piper TTS for dubbing) all run on dedicated GPUs inside the cluster: no participant data is sent to third-party services. The voice of the participants is not cloned and is not stored as biometric data (Art. 9 GDPR): the dubbing uses pre-trained public synthetic voices, assigned to the different speakers in an arbitrary way. Each recording exposes the exact snapshot of the models used on the event page ('AI processing transparency'). Generated content may contain inaccuracies: the authoritative reference is always the original video (AI Act, Art. 50)."
         }
       },
       "note": {
@@ -2684,7 +2972,7 @@
     "accessibility": {
       "metaTitle": "Accessibility statement",
       "title": "Accessibility statement",
-      "intro": "The Department for Digital Transformation is committed to making PA Webinar accessible, in line with Italian Law 4/2004, EU Directive 2016/2102 and AgID's guidelines on the accessibility of ICT tools.",
+      "intro": "Responsible body: {organization}. The body is committed to making this platform accessible, in line with Italian Law 4/2004, EU Directive 2016/2102 and AgID's guidelines on the accessibility of ICT tools.",
       "sections": {
         "conformance": {
           "title": "Conformance status",
@@ -2723,7 +3011,7 @@
       "sections": {
         "ownership": {
           "title": "Service ownership",
-          "body": "The platform is promoted by the Department for Digital Transformation and made available for the organisation and participation in institutional public online events."
+          "body": "Platform owner: {organization}. The platform is made available for the organisation and participation in institutional public online events."
         },
         "usage": {
           "title": "Use of the service",
@@ -2731,7 +3019,7 @@
         },
         "liability": {
           "title": "Limitation of liability",
-          "body": "While appropriate technical and organisational measures are adopted, the Department cannot guarantee the complete absence of interruptions or malfunctions caused by unforeseen events, maintenance activities or external factors. Legal responsibilities remain governed by applicable law."
+          "body": "While appropriate technical and organisational measures are adopted, the platform owner cannot guarantee the complete absence of interruptions or malfunctions caused by unforeseen events, maintenance activities or external factors. Legal responsibilities remain governed by applicable law."
         }
       }
     },
@@ -2830,7 +3118,8 @@
         },
         "note": "The complete list of components and services, with versions, hashes and technical properties, is available in the sections above and in the downloadable JSON."
       }
-    }
+    },
+    "organizationNotConfigured": "organisation not yet set in the settings"
   },
   "status": {
     "title": "System status",
@@ -2863,7 +3152,7 @@
     "nodesReady": "nodes ready",
     "scaling": "scaling",
     "jvbStress": "JVB load",
-    "participantsConnected": "participants connected",
+    "participantsConnected": "participants on the video bridge",
     "videoInteractive": "interactive",
     "videoWebinar": "webinar",
     "participantsAvailable": "participants available",
@@ -2907,7 +3196,12 @@
       "lastFailure": "Last failure {when}",
       "artifactsProduced": "{count, plural, =0 {no artifacts} one {1 artifact produced} other {# artifacts produced}}",
       "eventsEnabled": "{count, plural, =0 {no AI-enabled events} one {1 event with AI active} other {# events with AI active}}"
-    }
+    },
+    "jvbFixedUp": "{count, plural, =1 {Video bridge up} other {Video bridge up · # bridges configured}}",
+    "jvbFixedDown": "The video bridge is not responding",
+    "jvbFixedDownDetail": "Participants receive no audio or video until the bridge is reachable again.",
+    "jvbUnmonitored": "Status not monitored",
+    "jvbUnmonitoredDetail": "This installation does not query the video bridge, so its status is not available here."
   },
   "infraMap": {
     "loading": "Loading infrastructure map...",
@@ -2915,8 +3209,8 @@
     "ariaLabel": "System infrastructure map",
     "title": "Infrastructure map",
     "subtitle": "Real-time visualization of the architecture and service status",
-    "participants": "Participants",
-    "conferences": "Conferences",
+    "participants": "Participants on the video bridge",
+    "conferences": "Conferences on the video bridge",
     "bandwidthIn": "Bandwidth in",
     "bandwidthOut": "Bandwidth out",
     "recordings": "Video recordings",
@@ -3002,23 +3296,33 @@
       "jitsiWeb": {
         "healthy": "The video conference room is reachable and ready for events.",
         "down": "The video conference room is not reachable. It is not possible to start or join events.",
-        "standby": "The video conference room is not configured."
+        "standby": "The video conference room is not configured.",
+        "degraded": "The video conference room responds, but with errors or slowly.",
+        "publicCheckFailed": "The portal cannot check the room at its public address: from the server, the certificate or the name is not valid. The room may still work for participants.",
+        "unmonitored": "The video conference room is not monitored on this installation."
       },
       "prosody": {
         "healthy": "Internal messaging between video services is working correctly.",
         "down": "Internal messaging is not reachable. Video services cannot communicate with each other.",
-        "standby": "The messaging service is not configured."
+        "standby": "The messaging service is not configured.",
+        "degraded": "Internal messaging responds, but with errors or slowly.",
+        "publicCheckFailed": "The portal cannot check internal messaging through the room's public address: from the server, the certificate or the name is not valid. Conferences may still work.",
+        "unmonitored": "Internal messaging is not monitored on this installation."
       },
       "jicofo": {
         "healthy": "The conference coordinator is active and managing sessions.",
         "down": "The conference coordinator is not reachable. It is not possible to create new conferences.",
-        "standby": "The conference coordinator is not configured."
+        "standby": "The conference coordinator is not configured.",
+        "degraded": "The conference coordinator responds, but with errors or slowly.",
+        "unmonitored": "The conference coordinator is not monitored on this installation."
       },
       "jvb": {
         "healthy": "The video bridge is active and transmitting audio/video to participants.",
         "scaling": "The video bridge is preparing for an upcoming event. Servers are being created automatically.",
         "standby": "The video bridge is on standby (scale-to-zero). No event currently needs the bridge — it will activate automatically before a scheduled event or on the first user join.",
-        "stale": "An event has been waiting for the video bridge longer than the configured timeout. Check the cluster autoscaler and JVB pod logs."
+        "stale": "An event has been waiting for the video bridge longer than the configured timeout. Check the cluster autoscaler and JVB pod logs.",
+        "fixedDown": "The video bridge is not responding. Conferences carry no audio or video until it is reachable again.",
+        "unmonitored": "The video bridge is not monitored on this installation: the portal has no address to query it."
       },
       "jibri": {
         "healthy": "The recording service is ready and available.",
@@ -3050,7 +3354,8 @@
       "jibri": "Events cannot be recorded. Participants can still join and participate.",
       "jibriStale": "An event with recording enabled has been waiting for Jibri past the timeout: the session is not being recorded.",
       "smtp": "Registration confirmation emails and reminders will not be sent.",
-      "postprodDegraded": "Transcripts and summaries for some recent recordings were not generated. Video recordings remain available."
+      "postprodDegraded": "Transcripts and summaries for some recent recordings were not generated. Video recordings remain available.",
+      "jvbDown": "Participants receive no audio or video."
     },
     "overallVerdicts": {
       "operational": "All services are working correctly. The platform is fully operational.",
@@ -3080,7 +3385,8 @@
       "degraded": "Degraded",
       "down": "Down",
       "standby": "Standby",
-      "scaling": "Preparing"
+      "scaling": "Preparing",
+      "unknown": "Not monitored"
     },
     "metrics": {
       "uptime24h": "Uptime 24h",
@@ -3091,7 +3397,8 @@
       "errorRate": "5xx errors",
       "requestRate": "Requests/s",
       "podUptime": "Pod uptime"
-    }
+    },
+    "probeDetail": "Check result"
   },
   "feedback": {
     "title": "How would you rate this event?",
@@ -3119,7 +3426,13 @@
     "noActiveRound": "No word cloud active at the moment.",
     "noWords": "Waiting for the first words...",
     "wordsSubmitted": "{count} words submitted",
-    "timeRemaining": "Time remaining"
+    "timeRemaining": "Time remaining",
+    "errors": {
+      "send": "Word not sent. Please try again.",
+      "closed": "This round is closed: no more words are accepted.",
+      "limit": "You have already sent the maximum number of words for this round.",
+      "rateLimited": "Too many submissions right now: wait a few seconds before trying again."
+    }
   },
   "timer": {
     "title": "Timer",
@@ -3165,8 +3478,6 @@
     }
   },
   "footer": {
-    "departmentName": "Department for Digital Transformation",
-    "presidencyName": "Presidency of the Council of Ministers",
     "privacy": "Privacy policy",
     "accessibility": "Accessibility statement",
     "openSource": "Open source software",
@@ -3250,7 +3561,9 @@
     "shortcutsF": "Toggle fullscreen",
     "shortcutsSpeed": "Decrease or increase speed",
     "captionsOn": "Captions on",
-    "captionsOff": "Captions off"
+    "captionsOff": "Captions off",
+    "watchOnYouTube": "Watch the video on YouTube",
+    "externalSiteNote": "Opens on YouTube, an external site with its own terms of use and privacy notice."
   },
   "postprod": {
     "loading": "Loading transcript…",
@@ -3410,7 +3723,9 @@
       "almostReady": "Video server up: almost there",
       "almostReadyDetail": "A few more moments and the join button will enable itself.",
       "honestHint": "Typical wait: under a minute when the infrastructure is warm, 3–5 minutes on a cold start. Meanwhile you can check your camera and microphone or use the chat.",
-      "elapsed": "preparing for {time}"
+      "elapsed": "preparing for {time}",
+      "scheduled": "The room opens at the start time",
+      "scheduledDetail": "Or earlier, when the organizer starts the event. Meanwhile you can check your camera and microphone or use the chat."
     },
     "exitWaiting": "Leave the waiting room",
     "warmingUp": "Room warming up",
@@ -3418,6 +3733,8 @@
     "warmingUpButton": "Room warming up...",
     "nameLabel": "Your name",
     "nameHelp": "Other participants will see this",
+    "nameRequiredToEnter": "To enter, type your name (at least 2 characters).",
+    "roomOpenNameMissing": "The room is open: type your name to enter.",
     "joinNowBtn": "Enter now",
     "roomOpen": "The room is open",
     "whileYouWait": "While you wait",
@@ -3451,7 +3768,23 @@
     "backToWaitingRoom": "Back to the waiting room",
     "gardenDialogLabel": "Waiting-room square",
     "gardenGateHint": "You can join from here, or walk your avatar to the gate.",
-    "classicVersion": "Classic version"
+    "classicVersion": "Classic version",
+    "roomNotReadyButton": "The room is getting ready…",
+    "roomNotReadyPiazza": "Head to the square meanwhile",
+    "gate": {
+      "gateOpen": "Entrance open",
+      "stageLive": "● LIVE",
+      "gatePreparing": "The room is getting ready…",
+      "stagePreparing": "Starting soon",
+      "ended": "Event ended",
+      "startsIn": "Starts in {time}",
+      "hostEarly": "Early entry (host)"
+    },
+    "roomJustOpened": "The room is ready — come in",
+    "enterAnyway": "Enter anyway",
+    "notHeldBadge": "Time passed",
+    "notHeldTitle": "The scheduled time for this event has passed",
+    "notHeldDetail": "The room was not opened. Check the event page for any updates."
   },
   "recording": {
     "management": "Video recording",
@@ -3525,8 +3858,8 @@
   },
   "rubrica": {
     "optOut": {
-      "title": "Remove me from the DTD address book",
-      "intro": "You are about to withdraw your consent to be listed in the DTD address book. After confirmation you will no longer be contacted for invitations to similar events.",
+      "title": "Remove me from the events address book",
+      "intro": "You are about to withdraw your consent to be listed in the events address book. After confirmation you will no longer be contacted for invitations to similar events.",
       "missingToken": "The link is invalid or incomplete. Please check the original email.",
       "invalidToken": "The link is expired or invalid. Contact the event organizer for help.",
       "notFound": "No person matches this link — they may already have been removed.",
@@ -3536,7 +3869,7 @@
       "confirm": "Confirm removal",
       "submitting": "Removing…",
       "successTitle": "Removal complete",
-      "successBody": "Your data is no longer in the DTD address book.",
+      "successBody": "Your data is no longer in the events address book.",
       "errors": {
         "generic": "Something went wrong. Please try again later."
       }
@@ -3556,7 +3889,17 @@
     "micToggleOn": "Microphone ON",
     "micToggleOff": "Microphone OFF",
     "cameraOffPreview": "Camera off",
-    "speakerTest": "🔊 Test audio"
+    "speakerTest": "🔊 Test audio",
+    "backgroundLabel": "Virtual background",
+    "backgroundNoneShort": "No",
+    "backgroundHint": "Applied when you enter the room. To blur your background use the backgrounds button once inside: the preview above shows the camera without effects.",
+    "background": {
+      "nessuno": "No background",
+      "ufficio-chiaro": "Light office",
+      "blu-istituzionale": "Institutional blue",
+      "verde-salvia": "Sage green",
+      "grafite": "Graphite"
+    }
   },
   "garden": {
     "enable": "Show the garden",
@@ -3577,6 +3920,16 @@
     "noFeedback": "No feedback received",
     "comments": "Comments",
     "noComments": "No comments",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "questionnaire": {
+    "loadFailed": "The questionnaire could not be loaded.",
+    "submit": "Send answers",
+    "submitFailed": "Sending failed. Please try again.",
+    "answersInvalid": "Some answers are missing or not valid: check the required questions and try again.",
+    "alreadySubmitted": "You have already sent your answers to this questionnaire.",
+    "thankYou": "Thank you for your answers.",
     "yes": "Yes",
     "no": "No"
   }

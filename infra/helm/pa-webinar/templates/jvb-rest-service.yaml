@@ -1,0 +1,36 @@
+{{- /*
+Service interno per l'API REST del bridge (porta 8080, /colibri/stats), letta
+dall'applicazione per la pagina di stato e le metriche (JVB_HEALTH_URL).
+
+Serve quando il sottochart non ne rende uno che la esponga: con `useHostPort`
+o `useHostNetwork` (il profilo semplice) il sottochart non rende alcun Service
+per il bridge, e senza `jvb.service.extraPorts` sulla 8080 quello che rende
+porta solo i media. Senza questo Service l'indirizzo predefinito non esisterebbe
+e le statistiche del bridge resterebbero vuote.
+
+Con piu' bridge il Service ne interroga uno alla volta: il dato e' un limite
+inferiore, come dice l'applicazione stessa. Il quadro completo lo da' lo
+scaler, che interroga ogni pod.
+*/}}
+{{- if and .Values.jitsi.enabled (not .Values.jitsi.jvbHealthUrl) (not (include "pa-webinar.jvbRestFromSubchart" .)) }}
+{{- $jm := index .Values "jitsi-meet" | default dict }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "pa-webinar.fullname" . }}-jvb-rest
+  labels:
+    {{- include "pa-webinar.labels" . | nindent 4 }}
+    app.kubernetes.io/component: jvb-rest
+spec:
+  type: ClusterIP
+  ports:
+    - name: http-rest
+      port: 8080
+      targetPort: 8080
+      protocol: TCP
+  selector:
+    {{- /* Le etichette di selezione del bridge nel sottochart jitsi-meet. */}}
+    app.kubernetes.io/name: {{ dig "nameOverride" "" $jm | default "jitsi-meet" | trunc 63 | trimSuffix "-" | quote }}
+    app.kubernetes.io/instance: {{ .Release.Name | quote }}
+    app.kubernetes.io/component: jvb
+{{- end }}

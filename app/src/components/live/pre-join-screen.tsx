@@ -7,9 +7,10 @@ import {
   Card,
   CardBody,
   FormGroup,
-  Icon,
   Input,
 } from 'design-react-kit';
+
+import { Icon } from '@/components/ui/icon';
 
 interface PreJoinScreenProps {
   eventTitle: string;

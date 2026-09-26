@@ -1,20 +1,21 @@
 'use client';
 
 import { useState, useCallback, useEffect, useRef, type FormEvent } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import {
   Button,
   Alert,
   Input,
   FormGroup,
   Label,
-  Icon,
   Spinner,
 } from 'design-react-kit';
 
-import { Link, useRouter } from '@/i18n/navigation';
+import { Icon } from '@/components/ui/icon';
+import { Link, useRouter, percorso } from '@/i18n/navigation';
 import QuestionnaireForm from '@/components/questionnaires/questionnaire-form';
 import { createRegistrationSchema, ORGANIZATION_TYPES } from '@/lib/validation/schemas';
+import type { RegistrationAccess } from '@/lib/events/registration-access';
 
 interface ProfilingConfig {
   requireOrganization: boolean;
@@ -32,16 +33,23 @@ interface RegistrationFormClientProps {
    *  screen must show it (and stay put) instead of auto-redirecting the
    *  user into the waiting room. */
   hasPreRegistrationQuestionnaire?: boolean;
-  /** Event start (ISO). Routing (#1): registering within waitingRoomLeadMinutes
+  /** Event start (ISO). Routing: registering within waitingRoomLeadMinutes
    *  of start → straight to the waiting room; registering earlier → thank-you. */
   startsAt: string;
   /** Minutes before startsAt inside which we route into the waiting room
    *  (SiteSetting.waitingRoomLeadMinutes). */
   waitingRoomLeadMinutes: number;
   profiling?: ProfilingConfig;
+  /** Chi può iscriversi (lib/events/registration-access): con l'iscrizione
+   *  pubblica spenta il modulo spiega che serve l'invito e che il link arriva
+   *  per email; senza invitati resta solo il rinvio del link a chi è iscritto. */
+  registrationAccess?: RegistrationAccess;
 }
 
 type FieldErrors = Partial<Record<string, string>>;
+
+/** Lo stesso controllo della rotta di rinvio del link. */
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function RegistrationFormClient({
   eventSlug,
@@ -53,6 +61,7 @@ export default function RegistrationFormClient({
   startsAt,
   waitingRoomLeadMinutes,
   profiling,
+  registrationAccess = 'open',
 }: RegistrationFormClientProps) {
   const t = useTranslations('registration');
   const tg = useTranslations('gdpr');
@@ -77,11 +86,22 @@ export default function RegistrationFormClient({
 
   const [orgSuggestions, setOrgSuggestions] = useState<string[]>([]);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // La lingua della pagina: decide la lingua delle email che seguiranno.
+  const locale = useLocale();
+  const formRef = useRef<HTMLFormElement>(null);
+  // Un campo corretto dopo un invio fallito smette subito di risultare
+  // sbagliato, invece di restare rosso fino all'invio successivo.
+  const pulisciErrore = useCallback((campo: string) => {
+    setErrors((prev) => (prev[campo] ? { ...prev, [campo]: undefined } : prev));
+  }, []);
 
   const [errors, setErrors] = useState<FieldErrors>({});
   const [serverError, setServerError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
+  // Solo su invito il server risponde allo stesso modo a chiunque e il link
+  // lo manda per email: qui non si sa se l'indirizzo era fra gli invitati.
+  const [linkByEmail, setLinkByEmail] = useState(false);
   const [registrationAccessToken, setRegistrationAccessToken] = useState<string | null>(null);
   // Duplicate sign-up: offer to re-send the original access link instead
   // of leaving the user stuck on a generic error.
@@ -169,7 +189,17 @@ export default function RegistrationFormClient({
       setAlreadyRegistered(false);
       setResent(false);
 
-      if (!validate()) return;
+      if (!validate()) {
+        // Dopo il rendering degli errori il focus va sul primo campo da
+        // correggere: restando sul pulsante, chi usa un lettore di schermo non
+        // saprebbe cosa non va.
+        requestAnimationFrame(() => {
+          formRef.current
+            ?.querySelector<HTMLElement>('[aria-invalid="true"], .is-invalid')
+            ?.focus();
+        });
+        return;
+      }
 
       setSubmitting(true);
       try {
@@ -177,6 +207,7 @@ export default function RegistrationFormClient({
           displayName, email, consentGiven,
           consentFutureCommunications,
           consentAddressBook,
+          locale,
         };
         if (recordingEnabled) body.consentRecording = consentRecording;
         if (multitrackRecordingEnabled) body.consentMultitrack = consentMultitrack;
@@ -210,6 +241,14 @@ export default function RegistrationFormClient({
           return;
         }
 
+        // 202: iscrizione solo su invito. Niente token: il link arriva
+        // nella casella dell'indirizzo, se è fra gli invitati.
+        if (res.status === 202) {
+          setLinkByEmail(true);
+          setSuccess(true);
+          return;
+        }
+
         const regData = await res.json().catch(() => ({}));
         if (regData?.accessToken) {
           setRegistrationAccessToken(regData.accessToken);
@@ -221,19 +260,20 @@ export default function RegistrationFormClient({
         setSubmitting(false);
       }
     },
-    [displayName, email, consentGiven, consentRecording, consentMultitrack, consentFutureCommunications, consentAddressBook, organization, organizationRole, organizationType, eventSlug, validate, t, showOrg, showRole, showType, recordingEnabled, multitrackRecordingEnabled],
+    [displayName, email, consentGiven, consentRecording, consentMultitrack, consentFutureCommunications, consentAddressBook, organization, organizationRole, organizationType, eventSlug, validate, t, showOrg, showRole, showType, recordingEnabled, multitrackRecordingEnabled, locale],
   );
 
   // Duplicate sign-up recovery: re-send the original confirmation email
   // (with the personal join link). The endpoint always answers 200 with a
   // neutral body, so this never reveals whether the address is registered.
   const handleResend = useCallback(async () => {
+    setResent(false);
     setResending(true);
     try {
       await fetch(`/api/events/${eventSlug}/registrations/resend`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, locale }),
       });
       setResent(true);
     } catch {
@@ -241,9 +281,9 @@ export default function RegistrationFormClient({
     } finally {
       setResending(false);
     }
-  }, [eventSlug, email]);
+  }, [eventSlug, email, locale]);
 
-  // Registration routing by time (#1): "near start" = the event begins within
+  // Registration routing by time: "near start" = the event begins within
   // waitingRoomLeadMinutes. Computed at call time so it stays correct while the
   // confirmation screen sits open across the threshold.
   const isNearStart = useCallback(
@@ -275,9 +315,23 @@ export default function RegistrationFormClient({
     if (!success || !registrationAccessToken || hasPreRegistrationQuestionnaire) return;
     if (!isNearStart()) return;
     const target = `/events/${eventSlug}/live?token=${registrationAccessToken}`;
-    const id = setTimeout(() => router.push(target), 1200);
+    const id = setTimeout(() => router.push(percorso(target)), 1200);
     return () => clearTimeout(id);
   }, [success, registrationAccessToken, hasPreRegistrationQuestionnaire, eventSlug, router, isNearStart, nowTick]);
+
+  if (success && linkByEmail) {
+    return (
+      <div className="py-4 text-center">
+        <h2 className="h3 mb-3">{t('checkEmailTitle')}</h2>
+        <p className="mb-4">{t('checkEmail')}</p>
+        <Link href={percorso(`/events/${eventSlug}`)}>
+          <Button color="primary" outline tag="span">
+            {t('backToEvent')}
+          </Button>
+        </Link>
+      </div>
+    );
+  }
 
   if (success) {
     // Auto-redirect straight into the waiting room when there's nothing
@@ -315,7 +369,9 @@ export default function RegistrationFormClient({
                 : t('successScheduledMessage')}
           </p>
         </div>
-        {registrationAccessToken && (
+        {/* Il server sa gia' se l'evento ha un questionario pre-iscrizione:
+            senza, non lo si chiede nemmeno (la richiesta finirebbe in 404). */}
+        {registrationAccessToken && hasPreRegistrationQuestionnaire && (
           <div className="mb-4">
             <QuestionnaireForm
               eventSlug={eventSlug}
@@ -329,8 +385,8 @@ export default function RegistrationFormClient({
             waiting room instead of forcing them to wait for the
             confirmation email. The /live token path renders the waiting
             room for any joinable status and auto-enables entry once the
-            event is LIVE — this is what was missing during the caffettino
-            run (people registered but had no on-screen way in). When we
+            event is LIVE — this is what was missing on a real run
+            (people registered but had no on-screen way in). When we
             auto-redirect, this button is the manual fallback. */}
         <div className="text-center d-flex flex-column align-items-center gap-2">
           {autoRedirecting && (
@@ -341,7 +397,7 @@ export default function RegistrationFormClient({
           )}
           {registrationAccessToken && nearStart && (
             <Link
-              href={`/events/${eventSlug}/live?token=${registrationAccessToken}`}
+              href={percorso(`/events/${eventSlug}/live?token=${registrationAccessToken}`)}
             >
               <Button color="primary" size="lg" tag="span">
                 {tlive('enterRoom')}
@@ -357,7 +413,7 @@ export default function RegistrationFormClient({
               {t('addToCalendar')}
             </a>
           )}
-          <Link href={`/events/${eventSlug}`}>
+          <Link href={percorso(`/events/${eventSlug}`)}>
             <Button color="primary" outline tag="span">
               {t('backToEvent')}
             </Button>
@@ -367,8 +423,90 @@ export default function RegistrationFormClient({
     );
   }
 
+  // Iscrizione pubblica spenta e nessun invitato per l'evento: nessun nuovo
+  // indirizzo verrebbe accettato, un modulo da compilare sarebbe un inganno.
+  // Resta la via per chi si era iscritto prima: farsi rimandare il link, che
+  // da questa pagina — dove la sala rimanda chi arriva senza — è l'unica.
+  if (registrationAccess === 'closed') {
+    return (
+      <>
+        <Alert color="info" className="mb-4">
+          {t('closed')}
+        </Alert>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (!EMAIL_RE.test(email.trim())) {
+              setErrors({ email: 'registration.errors.emailInvalid' });
+              return;
+            }
+            setErrors({});
+            void handleResend();
+          }}
+          noValidate
+        >
+          <h2 className="h5 fw-semibold mb-2">{t('lostLink')}</h2>
+          <p className="text-muted mb-3" style={{ fontSize: '0.9rem' }}>
+            {t('lostLinkHelp')}
+          </p>
+          <FormGroup className="mb-3">
+            <Input
+              type="email"
+              id="email"
+              wrapperClassName="mb-1"
+              label={t('email')}
+              autoComplete="email"
+              required
+              aria-invalid={errors.email ? true : undefined}
+              aria-describedby={errors.email ? 'emailError' : undefined}
+              value={email}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                setEmail(e.target.value);
+                setResent(false);
+                pulisciErrore('email');
+              }}
+              valid={errors.email ? false : undefined}
+            />
+            {errors.email && (
+              <div id="emailError" className="invalid-feedback d-block">
+                {t('errors.emailInvalid')}
+              </div>
+            )}
+          </FormGroup>
+          {resent ? (
+            <Alert color="success" className="mb-3">
+              {t('resendSent')}
+            </Alert>
+          ) : (
+            <Button color="primary" type="submit" disabled={resending} className="me-3">
+              {resending ? (
+                <>
+                  <Spinner active small className="me-2" />
+                  {t('resending')}
+                </>
+              ) : (
+                t('resendLink')
+              )}
+            </Button>
+          )}
+          <Link href={percorso(`/events/${eventSlug}`)}>
+            <Button color="secondary" outline tag="span">
+              {t('backToEvent')}
+            </Button>
+          </Link>
+        </form>
+      </>
+    );
+  }
+
   return (
-    <form onSubmit={handleSubmit} noValidate>
+    <form ref={formRef} onSubmit={handleSubmit} noValidate>
+      {registrationAccess === 'invitation' && (
+        <Alert color="info" className="mb-4">
+          {t('invitationOnly')}
+        </Alert>
+      )}
+
       {serverError && (
         <Alert color="danger" className="mb-4">
           {serverError}
@@ -406,30 +544,62 @@ export default function RegistrationFormClient({
         <Input
           type="text"
           id="displayName"
+          // Aiuto ed errore stanno subito sotto il campo, fuori dal contenitore
+          // del kit: il suo margine li staccherebbe dal campo.
+          wrapperClassName="mb-1"
           label={t('name')}
-          placeholder={t('namePlaceholder')}
+          autoComplete="name"
+          required
+          aria-invalid={errors.displayName ? true : undefined}
+          aria-describedby={errors.displayName ? 'displayNameHelp displayNameError' : 'displayNameHelp'}
           value={displayName}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setDisplayName(e.target.value)
-          }
-          valid={!errors.displayName && displayName.length > 0}
-          {...(errors.displayName ? { validationText: t('errors.nameRequired') } : {})}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+            setDisplayName(e.target.value);
+            pulisciErrore('displayName');
+          }}
+          // Rosso solo dopo un invio fallito: un campo ancora vuoto non e'
+          // sbagliato, e la spunta verde su un'email malformata mentirebbe.
+          valid={errors.displayName ? false : undefined}
         />
+        <small id="displayNameHelp" className="form-text">
+          {t('namePlaceholder')}
+        </small>
+        {errors.displayName && (
+          <div id="displayNameError" className="invalid-feedback d-block">
+            {t('errors.nameRequired')}
+          </div>
+        )}
       </FormGroup>
 
       <FormGroup className="mb-4">
         <Input
           type="email"
           id="email"
+          // Aiuto ed errore stanno subito sotto il campo, fuori dal contenitore
+          // del kit: il suo margine li staccherebbe dal campo.
+          wrapperClassName="mb-1"
           label={t('email')}
-          placeholder={t('emailPlaceholder')}
+          autoComplete="email"
+          required
+          aria-invalid={errors.email ? true : undefined}
+          aria-describedby={errors.email ? 'emailHelp emailError' : 'emailHelp'}
           value={email}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setEmail(e.target.value)
-          }
-          valid={!errors.email && email.length > 0}
-          {...(errors.email ? { validationText: t('errors.emailInvalid') } : {})}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+            setEmail(e.target.value);
+            pulisciErrore('email');
+          }}
+          // Rosso solo dopo un invio fallito: un campo ancora vuoto non e'
+          // sbagliato, e la spunta verde su un'email malformata mentirebbe.
+          valid={errors.email ? false : undefined}
         />
+        <small id="emailHelp" className="form-text">
+          {t('emailPlaceholder')}
+        </small>
+        {errors.email && (
+          <div id="emailError" className="invalid-feedback d-block">
+            {t('errors.emailInvalid')}
+          </div>
+        )}
       </FormGroup>
 
       {showOrg && (
@@ -440,8 +610,14 @@ export default function RegistrationFormClient({
             id="organization"
             className={`form-control${errors.organization ? ' is-invalid' : ''}`}
             placeholder={t('organizationPlaceholder')}
+            required
+            aria-invalid={errors.organization ? true : undefined}
+            aria-describedby={errors.organization ? 'organizationError' : undefined}
             value={organization}
-            onChange={(e) => setOrganization(e.target.value)}
+            onChange={(e) => {
+              setOrganization(e.target.value);
+              pulisciErrore('organization');
+            }}
             list="org-suggestions"
             autoComplete="organization"
           />
@@ -453,7 +629,7 @@ export default function RegistrationFormClient({
             </datalist>
           )}
           {errors.organization && (
-            <div className="invalid-feedback d-block">
+            <div id="organizationError" className="invalid-feedback d-block">
               {t('errors.organizationRequired')}
             </div>
           )}
@@ -533,17 +709,21 @@ export default function RegistrationFormClient({
         <Input
           type="checkbox"
           id="consentGiven"
+          aria-invalid={errors.consentGiven ? true : undefined}
+          aria-required="true"
+          aria-describedby={errors.consentGiven ? 'consentGivenError' : undefined}
           checked={consentGiven}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setConsentGiven(e.target.checked)
-          }
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+            setConsentGiven(e.target.checked);
+            pulisciErrore('consentGiven');
+          }}
         />
         <Label for="consentGiven" check>
           {t('gdprConsent')}
           {(showOrg || showRole || showType) && (' ' + t('gdprConsentProfiling'))}
         </Label>
         {errors.consentGiven && (
-          <div className="text-danger small mt-1">
+          <div id="consentGivenError" className="text-danger small mt-1">
             {t('errors.consentRequired')}
           </div>
         )}
@@ -555,38 +735,46 @@ export default function RegistrationFormClient({
           <Input
             type="checkbox"
             id="consentRecording"
+            aria-invalid={errors.consentRecording ? true : undefined}
+            aria-required="true"
+            aria-describedby={errors.consentRecording ? 'consentRecordingError' : undefined}
             checked={consentRecording}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setConsentRecording(e.target.checked)
-            }
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+              setConsentRecording(e.target.checked);
+              pulisciErrore('consentRecording');
+            }}
           />
           <Label for="consentRecording" check>
             {tg('consent.recording')}
           </Label>
           {errors.consentRecording && (
-            <div className="text-danger small mt-1">
+            <div id="consentRecordingError" className="text-danger small mt-1">
               {tg('consent.recordingRequired')}
             </div>
           )}
         </FormGroup>
       )}
 
-      {/* ── Consent 2b: Multitrack per-participant recording (ADR-013 F5) ── */}
+      {/* ── Consent 2b: Multitrack per-participant recording (ADR-013) ── */}
       {multitrackRecordingEnabled && (
         <FormGroup check className="mb-3">
           <Input
             type="checkbox"
             id="consentMultitrack"
+            aria-invalid={errors.consentMultitrack ? true : undefined}
+            aria-required="true"
+            aria-describedby={errors.consentMultitrack ? 'consentMultitrackError' : undefined}
             checked={consentMultitrack}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setConsentMultitrack(e.target.checked)
-            }
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+              setConsentMultitrack(e.target.checked);
+              pulisciErrore('consentMultitrack');
+            }}
           />
           <Label for="consentMultitrack" check>
             {tg('consent.multitrack')}
           </Label>
           {errors.consentMultitrack && (
-            <div className="text-danger small mt-1">
+            <div id="consentMultitrackError" className="text-danger small mt-1">
               {tg('consent.multitrackRequired')}
             </div>
           )}
@@ -635,7 +823,7 @@ export default function RegistrationFormClient({
         {submitting ? t('submitting') : t('submit')}
       </Button>
 
-      <Link href={`/events/${eventSlug}`}>
+      <Link href={percorso(`/events/${eventSlug}`)}>
         <Button color="secondary" outline tag="span">
           {tc('cancel')}
         </Button>

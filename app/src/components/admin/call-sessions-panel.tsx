@@ -8,9 +8,9 @@ import {
   Card,
   CardBody,
   Collapse,
-  Icon,
 } from 'design-react-kit';
 
+import { Icon } from '@/components/ui/icon';
 import { useConfirm } from '@/components/ui/confirm-dialog';
 import { SkeletonLines } from '@/components/ui/skeleton';
 import VideoPlayer from './video-player';

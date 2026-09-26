@@ -1,0 +1,9 @@
+# Cartella di lavoro, stato e variabili locali di OpenTofu/Terraform: lo stato
+# contiene la chiave segreta dello storage, le variabili i dati dell'ente.
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+crash.log
+*.tfvars
+!terraform.tfvars.example

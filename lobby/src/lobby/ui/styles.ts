@@ -33,6 +33,7 @@ export const LOBBY_CSS = `
 }
 .pawl-badge__dot { width: 10px; height: 10px; border-radius: 50%; background: #aebfce; }
 .pawl-badge--scheduled .pawl-badge__dot { background: var(--accent); }
+.pawl-badge--preparing .pawl-badge__dot { background: #E0A100; }
 .pawl-badge--live .pawl-badge__dot { background: #D9364F; box-shadow: 0 0 0 0 rgba(217,54,79,0.7); animation: pawl-pulse 1.6s infinite; }
 .pawl-badge--ended .pawl-badge__dot { background: #9aa6b4; }
 .pawl-badge__text { font-weight: 700; letter-spacing: .3px; font-size: 14px; }

@@ -1,6 +1,18 @@
-import { defineConfig } from 'vitest/config';
-import react from '@vitejs/plugin-react';
+import { existsSync } from 'fs';
+import { createRequire } from 'module';
 import path from 'path';
+
+import react from '@vitejs/plugin-react';
+import { defineConfig } from 'vitest/config';
+
+// design-react-kit dichiara nelle `exports` solo le condizioni `module` e
+// `main`, che Vite non riconosce, e il suo ESM importa file senza estensione,
+// che Node non carica. I test di componente usano il pacchetto CommonJS dello
+// stesso kit: gli stessi componenti che vede l'app.
+const designReactKit = createRequire(import.meta.url)
+  .resolve.paths('design-react-kit')
+  ?.map((dir) => path.join(dir, 'design-react-kit', 'dist', 'index.cjs'))
+  .find((file) => existsSync(file));
 
 export default defineConfig({
   plugins: [react()],
@@ -46,6 +58,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
+      ...(designReactKit ? { 'design-react-kit': designReactKit } : {}),
     },
   },
 });

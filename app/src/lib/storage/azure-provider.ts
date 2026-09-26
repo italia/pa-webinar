@@ -19,6 +19,8 @@ import type {
   UploadUrlOptions,
   DownloadUrlOptions,
   BlobEntry,
+  BrowserUpload,
+  BrowserUploadOptions,
 } from './provider';
 
 export interface AzureProviderConfig {
@@ -125,6 +127,27 @@ export class AzureStorageProvider implements StorageProvider {
     const publicUrl = this.publicUrl(key);
     return { uploadUrl: `${publicUrl}?${sas}`, publicUrl };
   }
+
+  /**
+   * Azure: lo stesso URL con SAS di `getUploadUrl`. I blocchi li carica e li
+   * ricompone l'SDK nel browser (Put Block + Put Block List), che manda anche
+   * il Content-Type: la dimensione non cambia il protocollo.
+   */
+  async createBrowserUpload(
+    key: string,
+    opts: BrowserUploadOptions,
+  ): Promise<BrowserUpload> {
+    const { uploadUrl } = await this.getUploadUrl(key, {
+      expiresInMinutes: opts.expiresInMinutes,
+    });
+    return { protocol: 'azure-block', url: uploadUrl };
+  }
+
+  // Put Block List chiude il caricamento dal browser; i blocchi mai
+  // ricomposti li scarta Azure da sé dopo sette giorni.
+  async completeBrowserUpload(): Promise<void> {}
+
+  async abortBrowserUpload(): Promise<void> {}
 
   async getDownloadUrl(
     key: string,

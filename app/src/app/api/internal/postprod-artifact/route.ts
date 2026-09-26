@@ -133,7 +133,19 @@ export const POST = withErrorHandling(async (request) => {
       watermarkType: parsed.watermarkType ?? null,
     };
     if (existing) {
-      await tx.postprodArtifact.update({ where: { id: existing.id }, data: writeData });
+      await tx.postprodArtifact.update({
+        where: { id: existing.id },
+        data: {
+          ...writeData,
+          // La macchina ha riparlato: questa versione non è più la revisione
+          // manuale di nulla.
+          revisedAt: null,
+        },
+      });
+      // E il testo originale conservato apparteneva alla corsa PRECEDENTE:
+      // lasciarlo accanto a un artefatto prodotto da un'altra esecuzione lo
+      // farebbe mentire su tempi e contenuti.
+      await tx.postprodOriginalBody.deleteMany({ where: { artifactId: existing.id } });
     } else {
       await tx.postprodArtifact.create({
         data: {

@@ -13,8 +13,9 @@
 
 import { useEffect, useState, type RefObject } from 'react';
 import { useTranslations } from 'next-intl';
-import { Badge, Icon } from 'design-react-kit';
+import { Badge } from 'design-react-kit';
 
+import { Icon } from '@/components/ui/icon';
 import type { VideoPlayerHandle } from '@/components/events/video-player';
 import PipelineProvenance, {
   type PipelineSnapshot,

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 
-import { withErrorHandling } from '@/lib/api-handler';
+import { parseJsonBody, withErrorHandling } from '@/lib/api-handler';
 import { prisma } from '@/lib/db';
 import { AppError, RateLimitError } from '@/lib/errors';
 import { extractModeratorToken, resolveGrantForEvent } from '@/lib/auth/moderator';
@@ -14,6 +14,8 @@ import { rateLimit, getClientIp } from '@/lib/rate-limit';
 // capacity + headroom bounds spoofing tightly while covering the extra roles.
 const PEAK_CAPACITY_HEADROOM = 50;
 const PEAK_FALLBACK_CAP = 500; // when maxParticipants is unset/0
+// Al più un aggiornamento di `lastActiveAt` al minuto per evento.
+const ACTIVITY_STAMP_INTERVAL_MS = 60_000;
 
 export const dynamic = 'force-dynamic';
 
@@ -54,7 +56,7 @@ export const GET = withErrorHandling(async (request, context) => {
 const peakSchema = z.object({
   count: z.number().int().min(0),
   // Any attendee of THIS event may report the live count so the peak isn't
-  // stuck at 0 in a moderator-less session (feedback #4b): a moderator/
+  // stuck at 0 in a moderator-less session: a moderator/
   // co-moderator/speaker grant token, or a participant access token. Rooms where
   // no token can exist are the tokenless case — see the authorization block.
   // Bounded so a caller cannot use it as an unbounded rate-limiter key.
@@ -64,7 +66,7 @@ const peakSchema = z.object({
 export const POST = withErrorHandling(async (request, context) => {
   const { param } = await context.params;
 
-  const body = await request.json();
+  const body = await parseJsonBody(request);
   const parsed = peakSchema.safeParse(body);
   if (!parsed.success) {
     throw new AppError('Invalid payload', 400, 'INVALID_BODY');
@@ -118,8 +120,8 @@ export const POST = withErrorHandling(async (request, context) => {
   // INSTANT room, or an event with zero registrations. The reported figure is
   // the whole-room headcount, so a single token-bearing attendee is enough to
   // track the peak for everyone; the anonymous path is needed only when there
-  // is no such attendee — which is exactly the moderator-less public-link case
-  // #4b was about. Keeping it that narrow matters because the figure is
+  // is no such attendee — which is exactly the moderator-less public-link case.
+  // Keeping it that narrow matters because the figure is
   // monotonic and publicly rendered: on an event that has registrations, a
   // public slug would otherwise let any anonymous caller pin it to the clamp.
   // `reporter` is the identity the per-event throttle is keyed on — resolved,
@@ -183,13 +185,36 @@ export const POST = withErrorHandling(async (request, context) => {
     select: { id: true },
   });
 
+  // Segno di vita della sala: ogni client in conferenza riferisce ogni 30
+  // secondi, quindi finché c'è qualcuno `lastActiveAt` avanza. È il segnale per
+  // sala che le regole di inattività usano anche senza scaler (una chiamata
+  // abbandonata si chiude, una occupata no), dove il conteggio del bridge è
+  // unico per tutte le sale. Solo con qualcuno in conferenza, e al più una
+  // volta al minuto per evento: la condizione sta nella WHERE, così i
+  // resoconti in eccesso non scrivono niente e non costano una lettura.
+  const now = new Date();
+  const activityStale = new Date(now.getTime() - ACTIVITY_STAMP_INTERVAL_MS);
+
   // Issued together: this runs twice a minute per client on a live event, and
-  // the two writes are independent.
+  // the writes are independent.
   await Promise.all([
     prisma.event.updateMany({
       where: { id: event.id, peakParticipants: { lt: capped } },
       data: { peakParticipants: capped },
     }),
+    // SQL diretto e non updateMany: Prisma aggiornerebbe anche updated_at,
+    // che deve restare l'ora dell'ultima modifica vera dell'evento (da lì
+    // derivano la SEQUENCE del calendario e l'ora di chiusura stimata delle
+    // sessioni rimaste aperte), non un battito ogni minuto.
+    ...(capped > 0
+      ? [
+          prisma.$executeRaw`
+            UPDATE "events" SET "last_active_at" = ${now}
+            WHERE "id" = ${event.id}::uuid
+              AND "status" = 'LIVE'
+              AND ("last_active_at" IS NULL OR "last_active_at" < ${activityStale})`,
+        ]
+      : []),
     ...(currentSession
       ? [
           prisma.callSession.updateMany({

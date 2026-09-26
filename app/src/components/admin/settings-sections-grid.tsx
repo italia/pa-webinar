@@ -3,6 +3,7 @@
 import { useTranslations } from 'next-intl';
 
 import { Link } from '@/i18n/navigation';
+import type { PercorsoStatico } from '@/i18n/percorsi';
 
 // Hand-inlined SVGs instead of design-react-kit <Icon> to avoid the
 // async icons cache triggering hydration mismatches on every settings
@@ -43,7 +44,7 @@ function IconTag() {
 }
 
 interface Section {
-  href: string;
+  href: PercorsoStatico;
   titleKey: string;
   descriptionKey: string;
   tone: 'primary' | 'warning';

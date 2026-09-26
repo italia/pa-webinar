@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
-import { Button, Icon, Spinner } from 'design-react-kit';
+import { Button, Spinner } from 'design-react-kit';
 
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -12,7 +12,8 @@ import listPlugin from '@fullcalendar/list';
 import interactionPlugin from '@fullcalendar/interaction';
 import type { EventInput, DatesSetArg, EventClickArg } from '@fullcalendar/core';
 
-import { useRouter } from '@/i18n/navigation';
+import { Icon } from '@/components/ui/icon';
+import { useRouter, percorso } from '@/i18n/navigation';
 
 const STATUS_COLORS: Record<string, { bg: string; border: string; text: string }> = {
   DRAFT: { bg: '#E9ECEF', border: 'var(--app-muted)', text: 'var(--app-muted)' },
@@ -76,9 +77,9 @@ export default function EventCalendar({ mode, initialEvents = [] }: EventCalenda
     const evt = info.event;
     const slug = evt.extendedProps.slug as string;
     if (mode === 'admin') {
-      router.push(`/admin/events/${evt.id}?token=`);
+      router.push(percorso(`/admin/events/${evt.id}?token=`));
     } else {
-      router.push(`/events/${slug}`);
+      router.push(percorso(`/events/${slug}`));
     }
   }, [mode, router]);
 

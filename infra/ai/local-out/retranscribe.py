@@ -2,16 +2,22 @@
 
 Salva transcript_raw.json (sovrascrive). Da rilanciare ogni volta che
 cambiamo il prompt o i filtri."""
-import json, time
+import json, os, time
 from faster_whisper import WhisperModel
 
-INITIAL_PROMPT = (
-    "Riunione interna del Dipartimento per la Trasformazione Digitale (DTD). "
-    "Partecipanti: Raffaele Vitiello, Alex, Paolo, Marco. "
+# Contesto testuale passato a Whisper: guida il vocabolario (sigle,
+# termini tecnici, nomi propri dei relatori). I nomi dei relatori NON
+# stanno nel codice (dati personali): passa il prompt completo da env
+# quando servono, es.
+#   INITIAL_PROMPT="Webinar X. Partecipanti: Mario Rossi, Anna Bianchi." \
+#     python retranscribe.py
+INITIAL_PROMPT = os.environ.get(
+    "INITIAL_PROMPT",
+    "Webinar pubblico di una Pubblica Amministrazione italiana. "
     "Argomenti trattati: piattaforma video pa-webinar, Jitsi Meet, "
     "Kubernetes, cluster Azure, PCM, OVH, Teams, registrazione delle call, "
     "calendario, moderazione, qualità della connessione, codec, "
-    "certificazione dell'accessibilità."
+    "certificazione dell'accessibilità.",
 )
 AVG_LOGPROB_TH = -1.0
 NO_SPEECH_TH = 0.6

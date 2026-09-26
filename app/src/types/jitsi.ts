@@ -39,7 +39,12 @@ export interface JitsiParticipant {
   displayName: string;
   formattedDisplayName: string;
   avatarURL?: string;
-  role: 'moderator' | 'participant';
+  /**
+   * Mai valorizzato da external_api.js: le righe di `getParticipantsInfo()`
+   * non portano il ruolo. Chi lo vuole lo legge da `getRoomsInfo()` o da
+   * `participantRoleChanged` (components/participants/participant-roles).
+   */
+  role?: string;
 }
 
 export interface JitsiChatMessage {
@@ -101,7 +106,7 @@ export interface JitsiMeetExternalAPI {
   executeCommand(command: 'approveAudio', participantId: string): void;
   executeCommand(command: 'approveVideo', participantId: string): void;
   executeCommand(command: 'setNoiseSuppressionEnabled', enabled: boolean): void;
-  /** F12: set a remote participant's playback volume for the LOCAL user only
+  /** Set a remote participant's playback volume for the LOCAL user only
    *  (0 = muted … 1 = 100%). Does not affect what other participants hear. */
   executeCommand(command: 'setParticipantVolume', participantId: string, level: number): void;
   executeCommand(command: string, ...args: unknown[]): void;
@@ -118,6 +123,9 @@ export interface JitsiMeetExternalAPI {
 
   // Queries
   getParticipantsInfo(): JitsiParticipant[];
+  /** Stanze e partecipanti con il loro ruolo nella conferenza. Forma non
+   *  garantita fra versioni: va letta in modo difensivo. */
+  getRoomsInfo?(): Promise<unknown>;
   getNumberOfParticipants(): number;
   /** displayName del partecipante per endpoint id (ADR-013 Fase 0). */
   getDisplayName(participantId: string): string | undefined;

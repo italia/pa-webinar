@@ -6,11 +6,17 @@ import { locales, defaultLocale, type Locale } from '@/i18n/config';
 import { routing } from '@/i18n/routing';
 import { tryGetAppSecret } from '@/lib/auth/app-secret';
 import { getPublicEnv } from '@/lib/env';
+import { storageCspHosts } from '@/lib/storage/provider-type';
+import { localizedPath } from '@/lib/utils/localized-url';
 
 const LOCALE_SEGMENT = locales.join('|');
 
 const ADMIN_PATH_RE = new RegExp(`^/(?:${LOCALE_SEGMENT})/admin(?:/|$)`);
-const ADMIN_LOGIN_RE = new RegExp(`^/(?:${LOCALE_SEGMENT})/admin/login(?:/|$)`);
+// Le pagine per entrare: il login con la chiave e l'atterraggio del link
+// d'accesso mandato per email (`/admin/access`, in italiano `/admin/accesso`).
+const ADMIN_LOGIN_RE = new RegExp(
+  `^/(?:${LOCALE_SEGMENT})/admin/(?:login|access|accesso)(?:/|$)`,
+);
 // Event pages under /admin reachable by a NON-admin event moderator via magic
 // link (moderatorLink = /admin/events/{id}?token=…): the shared management page
 // and its /edit. They authenticate on the event moderator token, not the admin
@@ -26,40 +32,6 @@ const LOCALE_PREFIX_RE = new RegExp(`^/(${LOCALE_SEGMENT})(?:/|$)`);
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 const intlMiddleware = createMiddleware(routing);
-
-/**
- * Hosts allowed by CSP `media-src` so the inline <video> player can stream
- * recordings directly from the configured object store. We resolve them at
- * request time from the recording-storage env vars — the platform supports
- * Azure Blob, S3, GCS and MinIO, each with a different hostname shape.
- *
- * RECORDING_MEDIA_CSP_HOSTS (space-separated) overrides/extends the set
- * for operators who terminate storage behind a custom domain or CDN.
- */
-function recordingMediaHosts(): string[] {
-  const hosts = new Set<string>();
-
-  const storageType = process.env.RECORDING_STORAGE_TYPE;
-  if (storageType === 'azure-blob') {
-    const conn = process.env.RECORDING_AZURE_CONNECTION_STRING ?? '';
-    const account = conn.match(/AccountName=([^;]+)/)?.[1];
-    if (account) hosts.add(`https://${account}.blob.core.windows.net`);
-  } else if (storageType === 's3') {
-    const endpoint = process.env.RECORDING_S3_ENDPOINT;
-    if (endpoint) {
-      try { hosts.add(new URL(endpoint).origin); } catch { /* ignore */ }
-    } else {
-      hosts.add('https://*.amazonaws.com');
-    }
-  } else if (storageType === 'gcs') {
-    hosts.add('https://storage.googleapis.com');
-  }
-
-  const extra = process.env.RECORDING_MEDIA_CSP_HOSTS;
-  if (extra) for (const h of extra.split(/\s+/).filter(Boolean)) hosts.add(h);
-
-  return [...hosts];
-}
 
 /**
  * Generate a fresh per-request nonce (16 random bytes, base64). Used in
@@ -79,15 +51,17 @@ function applySecurityHeaders(
   nonce: string,
 ): NextResponse {
   const jitsiDomain = getPublicEnv('NEXT_PUBLIC_JITSI_DOMAIN');
-  const mediaHosts = recordingMediaHosts();
-  const mediaSrc = ["'self'", 'blob:', ...mediaHosts].join(' ');
-  // connect-src needs the same storage hosts so the admin upload form
-  // can PUT directly to the SAS URL (browser-side Azure SDK / fetch).
+  // Host dello storage risolti a ogni richiesta con la stessa regola della
+  // factory dei provider (Azure Blob, S3, MinIO, GCS e i loro alias): il
+  // player riproduce le registrazioni da URL firmati (media-src) e i
+  // caricamenti dal browser vanno diretti allo storage (connect-src).
+  const storageHosts = storageCspHosts();
+  const mediaSrc = ["'self'", 'blob:', ...storageHosts.media].join(' ');
   const connectSrc = [
     "'self'",
     `https://${jitsiDomain}`,
     `wss://${jitsiDomain}`,
-    ...mediaHosts,
+    ...storageHosts.connect,
   ].join(' ');
 
   response.headers.set('X-Frame-Options', 'DENY');
@@ -102,10 +76,10 @@ function applySecurityHeaders(
     [
       "default-src 'self'",
       "frame-ancestors 'none'",
-      // Also allow YouTube for the public video-library embed (legacy
-      // events host their recordings on youtube.com before we owned
-      // Jibri infra). img-src mirrors this so YT preview thumbs load.
-      `frame-src 'self' https://${jitsiDomain} https://www.youtube.com https://www.youtube-nocookie.com`,
+      // Only the Jitsi room: no third-party player is embedded (the YouTube
+      // video of an ended event is an external link, not an iframe — see
+      // lib/utils/youtube-link).
+      `frame-src 'self' https://${jitsiDomain}`,
       // script-src: nonce-based + strict-dynamic. The nonce is set on
       // every Next.js-emitted inline script (App Router streaming
       // chunks, hydration markers), and strict-dynamic lets those
@@ -196,7 +170,11 @@ async function isValidAdminSession(request: NextRequest): Promise<boolean> {
   try {
     const secret = new TextEncoder().encode(appSecret);
     const { payload } = await jwtVerify(token, secret);
-    return payload.role === 'admin';
+    // Anche l'organizzatore entra nell'area (ADR-014): qui si controlla solo
+    // la firma, perche' il middleware non legge il database. Cosa vede lo
+    // decide ogni pagina, che rilegge l'account e il proprietario
+    // dell'evento.
+    return payload.role === 'admin' || payload.role === 'organizer';
   } catch {
     return false;
   }
@@ -239,27 +217,22 @@ export default async function middleware(request: NextRequest) {
     return applySecurityHeaders(response, nonce);
   }
 
-  // No valid admin session. Distinguish two very different visitors:
-  //  • an EVENT MODERATOR reaching a `?token=` management/edit page via magic
-  //    link — they have NO admin_session cookie at all and must keep access
-  //    (bouncing them to an admin-key login they can't pass would lock them out
-  //    of running their own event: moderatorLink = /admin/events/{id}?token=…);
-  //  • an ADMIN whose session LAPSED — the cookie outlives the JWT (see
-  //    ADMIN_COOKIE_MAX_AGE_SECONDS), so it is still PRESENT though invalid;
-  //    that "present-but-invalid" state means an admin, and they go to login.
+  // Nessuna sessione valida. Le pagine di gestione dell'evento col token nel
+  // link (`/admin/events/{id}?token=…`) passano comunque: il token le
+  // autentica da solo, e chi lo ha — un moderatore esterno, o l'organizzatore
+  // che modera il proprio evento con la sessione scaduta — non deve essere
+  // mandato a un login per fare cio' che il link gia' gli consente. Tutto il
+  // resto va al login.
   const tokenParam = request.nextUrl.searchParams.get('token');
   const isModeratorTokenPage =
-    ADMIN_EVENT_RE.test(pathname) &&
-    !!tokenParam &&
-    UUID_RE.test(tokenParam) &&
-    !hasAdminCookie;
+    ADMIN_EVENT_RE.test(pathname) && !!tokenParam && UUID_RE.test(tokenParam);
   if (isModeratorTokenPage) {
     return applySecurityHeaders(response, nonce);
   }
 
   const pathLocale = extractLocaleFromPath(pathname);
   const locale = pathLocale ?? getRuntimeDefaultLocale(request);
-  const loginUrl = new URL(`/${locale}/admin/login`, request.url);
+  const loginUrl = new URL(localizedPath('/admin/login', locale), request.url);
   return NextResponse.redirect(loginUrl);
 }
 

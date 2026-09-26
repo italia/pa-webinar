@@ -21,6 +21,10 @@
  * Two guards bound the cost: the per-IP limit below, and the pre-scale window
  * (see canWakeNow) — a room may only be warmed when the scaler would warm it
  * anyway, not hours or days ahead.
+ *
+ * Senza scaler (nessun battito, lib/events/lifecycle-driver) un evento
+ * PUBLISHED resta PUBLISHED: la risposta è 200 con lo stato invariato, e la
+ * sala la apre il giro a bridge fisso all'orario d'inizio, o il moderatore.
  */
 
 import { withErrorHandling } from '@/lib/api-handler';
@@ -28,6 +32,7 @@ import { NotFoundError, ConflictError, RateLimitError } from '@/lib/errors';
 import { prisma } from '@/lib/db';
 import { getSettings } from '@/lib/settings';
 import { canWakeNow, wakeWindowOpensAt } from '@/lib/events/lifecycle';
+import { scalerDriverActive } from '@/lib/events/lifecycle-driver';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
 
 export const dynamic = 'force-dynamic';
@@ -77,6 +82,19 @@ export const POST = withErrorHandling(async (request, context) => {
       status: event.status,
       provisioningStartedAt: event.provisioningStartedAt,
       alreadyProvisioning: true,
+    });
+  }
+
+  // Senza lo scaler nessuno porterebbe la sala da PROVISIONING a LIVE (il giro
+  // a bridge fisso apre gli eventi all'orario d'inizio, senza passare dal
+  // pre-riscaldamento), e un PROVISIONING incagliato nasconderebbe al
+  // moderatore l'avvio e rifiuterebbe il token a tutti. Non c'è un
+  // pre-riscaldamento da chiedere: si risponde con lo stato com'è.
+  if (event.status === 'PUBLISHED' && !(await scalerDriverActive())) {
+    return Response.json({
+      status: event.status,
+      provisioningStartedAt: event.provisioningStartedAt,
+      alreadyProvisioning: false,
     });
   }
 

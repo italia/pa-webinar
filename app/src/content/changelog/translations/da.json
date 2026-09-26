@@ -1,4 +1,37 @@
 {
+  "0.12.0": {
+    "title": "Klar til genbrug: installeres med én kommando, og arrangementerne kører af sig selv",
+    "notes": [
+      "Installation med én kommando: på en computer med minikube til afprøvning og udvikling, på en k3s-server til produktion, med certifikater, testpostkasse, objektlager, TURN og planlagt sikkerhedskopiering. Hver installation kan kontrolleres med én kommando, sikkerhedskopiering og gendannelse af database og filer har deres egne scripts, og dokumentationen, nu på engelsk, har vejledninger til minikube, k3s, AKS, GKE og EKS samt tjeklister til go-live.",
+      "Arrangementer åbner på starttidspunktet og lukker ved afslutningen, også på installationer uden automatisk opstart af videobroerne. »Start begivenhed« er altid tilgængelig for den, der leder arrangementet, og et arrangement sidder ikke længere fast på »Forbereder«.",
+      "Personlige konti til personalet: administratorer og arrangører logger ind med et personligt link, de modtager på e-mail, og hver enkelt ser kun det, rollen giver adgang til. Instansnøglen bevares til første login og til nødsituationer.",
+      "E-mails på italiensk, engelsk, fransk, tysk og spansk, på modtagerens sprog. Moderatorer og oplægsholdere får deres personlige links på e-mail, påmindelser kommer ikke længere alle på én gang, og kalenderinvitationer sendes ikke længere dobbelt.",
+      "I videokonferencen afhænger rollen af det link, man kommer ind med: gæster og tilmeldte er deltagere og kan ikke længere slå moderatorens lyd fra eller fjerne moderatoren.",
+      "I rummet: spørgsmål, afstemninger og ordsky virker også for gæster og oplægsholdere; materialer accepterer filer ud over links; den, der selv forlader rummet, kan gå ind igen i stedet for at se »Begivenheden er afsluttet«; hvis videokonferencen ikke kan nås, siger rummet det og tilbyder »Prøv igen«; kamera og mikrofon starter slukket for deltagerne; den virtuelle baggrund kan vælges allerede i venteværelset.",
+      "Privatliv: chatten sender ikke længere gæsters IP-adresse til de fremmødte; linkene til at eksportere eller slette sine egne data fører til den rigtige adresse; meddelelse og samtykke til optagelse vises overalt, hvor noget kan optage.",
+      "Statussiden kontrollerer tjenesterne indefra og melder ikke længere om nedbrud på grund af et ikke-offentligt certifikat; installationer med en fast videobro vises korrekt.",
+      "Administration: tilbagekaldelse af medmoderatorer og oplægsholdere fra guiden virker nu for alvor, guiden fortæller, hvad der ikke blev gemt, og efter udgivelsen lander man på arrangementets side. Hurtige opkald har ikke længere en offentlig side, og delte links viser en forhåndsvisning af arrangementet.",
+      "Ved opgradering: Prosody, Jicofo, webkonferencen og videobroen genstarter én gang, så det er bedst at opgradere, når der ikke er arrangementer i gang; har man egne volumener eller moduler til Prosody, skal chartets tilføjes; uden scaler lukker livearrangementer nu ved afslutningen plus henstandsperioden."
+    ]
+  },
+  "0.11.0": {
+    "title": "Rummet reagerer nu i det øjeblik, noget ændrer sig",
+    "notes": [
+      "Spørgsmål, afstemninger, program og ordsky opdateres, så snart noget ændrer sig, i stedet for at spørge serveren med få sekunders mellemrum: den, der er i rummet, ser et spørgsmål dukke op med det samme, og ved et velbesøgt arrangement falder trafikken markant.",
+      "Også mindre arbejde for serveren: rummets tilbagevendende kontroller henter nu kun de oplysninger, der er brug for, og materialer — som sjældent ændrer sig — kontrolleres sjældnere.",
+      "Er den umiddelbare forbindelse ikke tilgængelig, vender rummet af sig selv tilbage til den tidligere tilbagevendende kontrol: ingen funktion holder op med at virke på grund af den nye måde.",
+      "Rettelser: at åbne to nye ordskyer kort efter hinanden kunne efterlade den ene usynlig, og ordene sendt dertil kom ikke frem for nogen; tjenestens statusside angav altid det samme versionsnummer i stedet for det, der faktisk kørte."
+    ]
+  },
+  "0.10.0": {
+    "title": "Spørgsmål i chatten, enklere gentagne serier og rettede institutionelle farver",
+    "notes": [
+      "Den, der skriver i chatten, kan markere sin egen besked som et spørgsmål: moderatorerne markerer det som besvaret eller lægger det til side, og et filter viser kun spørgsmålene. Der er ingen ekstra kanal at holde øje med under arrangementet.",
+      "Spørgsmålene fra chatten vises sammen med de reaktioner, de har fået, på arrangementets offentlige opsummeringsside og kan stadig læses, efter at deltagernes personoplysninger er slettet.",
+      "Det går hurtigere at forberede næste gang i en serie: en kopi af et arrangement tager mærkater, arrangører, medmoderatorer (hver med nye adgangsoplysninger), program, spørgeskemaer og påmindelser med, og skabelonerne bevarer deres indstillinger for optagelse og efterbehandling.",
+      "Rettelser: de institutionelle farver er tilbage, som de skal være – bjælken øverst på sitet blev vist hvid –, knappen, der opretter en kopi af et arrangement, fører ikke længere til en side, der ikke findes, og når opbevaringsperioden udløber, slettes også kontaktoplysningerne på inviterede og på udpegede moderatorer og talere."
+    ]
+  },
   "0.9.0": {
     "title": "Sikkerhed i afhængigheder, opdateret dokumentation og en komplet lokal opsætning",
     "notes": [

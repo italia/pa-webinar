@@ -4,7 +4,7 @@ import { jitsiConfigOverwrite, jitsiInterfaceConfigOverwrite } from './config';
 /**
  * Theme validation for Jitsi configuration.
  *
- * The DTD color palette (customTheme) is now applied server-side via
+ * The .italia color palette (customTheme) is now applied server-side via
  * Jitsi's _custom_config_js in the Helm values — NOT in the IFrame API
  * configOverwrite. These tests validate that the IFrame config is clean
  * and that interface overrides are correctly set.

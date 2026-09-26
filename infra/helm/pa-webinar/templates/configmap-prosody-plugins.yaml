@@ -1,0 +1,26 @@
+{{- /*
+Moduli Prosody del progetto, montati in /prosody-plugins-custom dal volume che
+`jitsi-meet.prosody.extraVolumes` dichiara in values.yaml. Oggi uno solo:
+mod_token_affiliation_custom, che assegna il ruolo nella sala dal token del
+portale prima dell'ingresso (infra/jitsi/README.md).
+
+Il file è una copia di infra/jitsi/prosody-plugins/, lo stesso che monta lo
+stack Docker Compose: un chart non legge file fuori dalla propria cartella.
+scripts/validate-chart.sh controlla che le due copie siano identiche.
+
+Si rende solo quando un volume di Prosody lo nomina: chi sostituisce la lista
+senza questa voce non si ritrova un ConfigMap orfano, e la guardia
+pa-webinar.validateJitsiRoles ferma la resa se il modulo è comunque richiesto.
+*/}}
+{{- if and .Values.jitsi.enabled (include "pa-webinar.prosodyPluginsMounted" .) }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "pa-webinar.prosodyPluginsConfigMap" . }}
+  labels:
+    {{- include "pa-webinar.labels" . | nindent 4 }}
+    app.kubernetes.io/component: prosody-plugins
+data:
+  mod_token_affiliation_custom.lua: |
+    {{- .Files.Get "files/prosody-plugins/mod_token_affiliation_custom.lua" | nindent 4 }}
+{{- end }}

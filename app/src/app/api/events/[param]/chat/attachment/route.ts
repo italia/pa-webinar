@@ -58,7 +58,7 @@ export const POST = withErrorHandling(async (request, context) => {
   if (!event) throw new AppError('Event not found', 404, 'NOT_FOUND');
 
   // Authenticated members only (moderator/speaker grant or a registered
-  // participant). resolveTokenSender bakes in the F7 gate and returns the same
+  // participant). resolveTokenSender bakes in the identity gate and returns the same
   // reg-<id> seat the chat POST will (so the signed attachment token binds); a
   // forwarded-link opener can still upload, but the message it attaches to is
   // named from the opener's typed name — no registrant name leaks. Tokenless
@@ -76,7 +76,12 @@ export const POST = withErrorHandling(async (request, context) => {
 
   const storage = getFilesStorage();
   if (!storage) {
-    throw new AppError('Files storage is not configured', 503, 'STORAGE_UNAVAILABLE');
+    // Un'installazione senza storage per i file e' una configurazione
+    // ammessa, non un guasto: 503 per il client (che lo traduce dal codice),
+    // `warn` nel log.
+    const err = new AppError('Files storage is not configured', 503, 'STORAGE_UNAVAILABLE');
+    err.expected = true;
+    throw err;
   }
 
   // Early size guard BEFORE buffering the whole body. We require a
