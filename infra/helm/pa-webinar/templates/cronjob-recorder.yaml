@@ -68,7 +68,7 @@ spec:
                   mountPath: /recordings
               env:
                 - name: JITSI_DOMAIN
-                  value: {{ .Values.recorder.jitsiDomain | default (index .Values.app.env "NEXT_PUBLIC_JITSI_DOMAIN") | quote }}
+                  value: {{ .Values.recorder.jitsiDomain | default (include "pa-webinar.jitsiDomain" .) | quote }}
                 - name: PORTAL_URL
                   value: {{ include "pa-webinar.internalUrl" . | quote }}
                 - name: OUTPUT_DIR

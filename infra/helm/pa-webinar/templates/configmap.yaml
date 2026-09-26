@@ -6,7 +6,24 @@ metadata:
     {{- include "pa-webinar.labels" . | nindent 4 }}
 data:
   {{- $env := .Values.app.env | default dict }}
+  {{- /*
+    I due indirizzi pubblici vengono da site.* quando valorizzato: una chiave
+    esplicita diversa ferma la resa (pa-webinar.validateSite), e il valore di
+    esempio di values.yaml viene sostituito.
+  */}}
+  {{- $derivati := dict }}
+  {{- if include "pa-webinar.sitePortalHost" . }}
+  {{- $_ := set $derivati "NEXT_PUBLIC_APP_URL" (include "pa-webinar.appUrl" .) }}
+  {{- end }}
+  {{- if include "pa-webinar.siteConferenceHost" . }}
+  {{- $_ := set $derivati "NEXT_PUBLIC_JITSI_DOMAIN" (include "pa-webinar.jitsiDomain" .) }}
+  {{- end }}
   {{- range $key, $value := $env }}
+  {{- if not (hasKey $derivati $key) }}
+  {{ $key }}: {{ $value | quote }}
+  {{- end }}
+  {{- end }}
+  {{- range $key, $value := $derivati }}
   {{ $key }}: {{ $value | quote }}
   {{- end }}
   {{- /*

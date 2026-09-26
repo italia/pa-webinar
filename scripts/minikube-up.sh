@@ -24,7 +24,7 @@ CHART="$RADICE/infra/helm/pa-webinar"
 # Le dimensioni sono quelle provate: 4 CPU e 6 GB reggono dieci partecipanti
 # in video usando meno della metà del nodo; 2 CPU e 3 GB sono il minimo
 # provato, al limite con venti partecipanti in video (vedi
-# docs/INFRASTRUCTURE.md, "Evaluation: minikube").
+# docs/install/minikube.md, "Measured usage").
 PROFILO="pa-webinar"
 NAMESPACE="pa-webinar"
 RELEASE="pa-webinar"
@@ -41,6 +41,9 @@ DOMINIO="nip.io"
 MAILPIT="si"
 ATTESA="15m"
 STATO=""
+FIDUCIA_CA="no"
+NSSDB="$HOME/.pki/nssdb"
+VALORI_IN_PIU=()
 
 # Versioni minime: minikube 1.38.1 è la versione provata, e la prima che ha
 # Kubernetes v1.35.1 come predefinito (la 1.38.0 si ferma a v1.35.0); Helm
@@ -75,9 +78,26 @@ Installazione
                             (predefinito: nip.io; alternativa: sslip.io)
   --no-mailpit              niente casella di prova per le email del portale
   --timeout DURATA          attesa massima di helm (predefinito: 15m)
+  --values FILE             un file di valori in più, dopo quelli generati
+                            (ripetibile): per provare un'opzione del chart,
+                            per esempio backup.enabled. Va ripassato a ogni
+                            lancio, come per helm
   --state-dir DIR           dove tenere segreti e valori generati, fuori dal
                             repository (predefinito:
                             ~/.config/pa-webinar/minikube/<profilo>)
+
+Certificati
+  --trust-ca                aggiunge l'autorità locale del profilo alle
+                            autorità fidate di Chrome, Chromium ed Edge su
+                            Linux (database NSS dell'utente, creato se manca),
+                            con il nome "PA Webinar minikube (<profilo>)";
+                            sostituisce quella di un lancio precedente.
+                            Serve certutil (nss-tools su Fedora,
+                            libnss3-tools su Debian e Ubuntu).
+                            scripts/minikube-down.sh --purge la toglie
+  --nssdb DIR               il database NSS da usare (predefinito:
+                            ~/.pki/nssdb; Chromium da snap:
+                            ~/snap/chromium/current/.pki/nssdb)
 
 Immagini dell'applicazione
   (predefinito)             quelle pubblicate su ghcr.io se il nodo può
@@ -90,7 +110,14 @@ Immagini dell'applicazione
                             suo `docker login ghcr.io`) e le carica nel nodo
   --images local            le costruisce dai sorgenti di questo repository,
                             modifiche non salvate comprese, e le carica nel
-                            nodo (serve docker; la prima volta alcuni minuti)
+                            nodo (serve docker; la prima volta alcuni minuti).
+                            È la modalità per provare le proprie modifiche:
+                            con credenziali per il registro la scelta
+                            predefinita installa invece le immagini
+                            pubblicate. Tag sull'host: pa-webinar:local-<profilo>
+                            e pa-webinar:local-<profilo>-migrate; l'immagine
+                            delle migrazioni si ricarica nel nodo solo se
+                            cambiano Dockerfile, lockfile o app/prisma
   --tag TAG                 tag pubblicato (predefinito: dev). Il tag delle
                             migrazioni si ricava: dev -> dev-migrate,
                             dev-<sha> -> dev-migrate-<sha>, X.Y.Z -> vX.Y.Z-migrate
@@ -115,7 +142,17 @@ errore() {
   exit 1
 }
 
+# Ogni fase dice quanto è durata la precedente, per confrontare un lancio con
+# i tempi della documentazione e capire dove si è fermato.
+INIZIO_SCRIPT="$(date +%s)"
+INIZIO_PASSO=""
 passo() {
+  local ora
+  ora="$(date +%s)"
+  if [ -n "$INIZIO_PASSO" ]; then
+    printf '   (%s s)\n' "$(( ora - INIZIO_PASSO ))"
+  fi
+  INIZIO_PASSO="$ora"
   printf '\n── %s\n' "$*"
 }
 
@@ -142,6 +179,11 @@ while [ $# -gt 0 ]; do
     --tag) TAG="${2:?}"; shift 2 ;;
     --migrate-tag) TAG_MIGRAZIONE="${2:?}"; shift 2 ;;
     --pull-secret-file) FILE_SECRET_PULL="${2:?}"; shift 2 ;;
+    --trust-ca) FIDUCIA_CA="si"; shift ;;
+    --values)
+      [ -r "${2:?}" ] || errore "--values: non leggo $2."
+      VALORI_IN_PIU+=(-f "$2"); shift 2 ;;
+    --nssdb) NSSDB="${2:?}"; shift 2 ;;
     -h|--help) uso; exit 0 ;;
     *) uso >&2; errore "Opzione sconosciuta: $1" ;;
   esac
@@ -155,6 +197,16 @@ case "$CPUS" in
   ''|*[!0-9]*) errore "--cpus vuole un numero intero (non '$CPUS')." ;;
 esac
 [ "$CPUS" -ge 2 ] || errore "--cpus: minikube ne vuole almeno 2."
+
+# Immagini costruite dai sorgenti: un tag per profilo, così due profili (o due
+# copie del repository) sulla stessa macchina non si sovrascrivono le immagini.
+TAG_LOCALE="local-$(printf '%s' "$PROFILO" | tr -c 'A-Za-z0-9_.-' '-')"
+IMG_LOCALE="pa-webinar:$TAG_LOCALE"
+IMG_LOCALE_MIGRAZIONI="pa-webinar:$TAG_LOCALE-migrate"
+# Il nome dell'autorità locale nel database NSS del browser: uno per profilo,
+# come il nome comune del certificato. Con un nome fisso la seconda autorità
+# (un altro profilo, o la stessa installazione dopo --purge) non si aggiunge.
+NOME_CA="PA Webinar minikube ($PROFILO)"
 
 if [ -z "$TAG_MIGRAZIONE" ]; then
   case "$TAG" in
@@ -230,6 +282,10 @@ passo "Prerequisiti"
 for comando in minikube kubectl helm openssl curl; do
   command -v "$comando" >/dev/null 2>&1 || errore "Manca '$comando' nel PATH."
 done
+if [ "$FIDUCIA_CA" = "si" ]; then
+  command -v certutil >/dev/null 2>&1 \
+    || errore "--trust-ca usa certutil, che manca: pacchetto nss-tools su Fedora, libnss3-tools su Debian e Ubuntu."
+fi
 docker_pronto() {
   command -v docker >/dev/null 2>&1 && docker info >/dev/null 2>&1
 }
@@ -566,7 +622,9 @@ auth=""
 
 # Scelta da sé: le immagini pubblicate se il nodo può prelevarle, altrimenti
 # costruite dai sorgenti.
+scelta_da_se="no"
 if [ "$IMMAGINI" = "auto" ]; then
+  scelta_da_se="si"
   if [ "$secret_pull" = "si" ]; then
     IMMAGINI="registry"
   else
@@ -588,6 +646,16 @@ $ALTERNATIVE"
   fi
 fi
 nota "modalità: $IMMAGINI"
+# Con credenziali (nell'ambiente o in un Secret rimasto da un lancio
+# precedente) la scelta da sé installa le immagini pubblicate: chi sta
+# provando le proprie modifiche non le vedrebbe arrivare, senza altri indizi.
+if [ "$scelta_da_se" = "si" ] && [ "$IMMAGINI" = "registry" ]; then
+  nota "ATTENZIONE: installo le immagini pubblicate ($REPO_IMMAGINE:$TAG), non i sorgenti"
+  nota "di $RADICE. Per provare le tue modifiche: --images local."
+  if [ -n "$(git -C "$RADICE" status --porcelain 2>/dev/null || true)" ]; then
+    nota "In questa copia ci sono modifiche non salvate: così NON arrivano nel cluster."
+  fi
+fi
 
 carica_nel_nodo() {
   # Carica solo se il nodo non ha già la stessa immagine (stesso ID): la
@@ -608,6 +676,21 @@ carica_nel_nodo() {
     [ "$id_host" = "$id_nodo" ] \
       || errore "dopo il caricamento il nodo ha ancora un'altra versione di $img ($id_nodo invece di $id_host)."
   fi
+}
+
+# Impronta di ciò da cui dipendono le migrazioni: Dockerfile, manifesti e
+# lockfile dei pacchetti, app/prisma (nomi e contenuti dei file).
+impronta_migrazioni() {
+  (
+    cd "$RADICE" || exit 1
+    for f in Dockerfile .dockerignore package.json package-lock.json app/package.json; do
+      if [ -f "$f" ]; then printf '%s\n' "$f"; cat "$f"; fi
+    done
+    find app/prisma -type f | LC_ALL=C sort | while IFS= read -r f; do
+      printf '%s\n' "$f"
+      cat "$f"
+    done
+  ) | openssl dgst -sha256 | awk '{print $NF}'
 }
 
 case "$IMMAGINI" in
@@ -639,20 +722,60 @@ $ALTERNATIVE" ;;
     )
     ;;
   local)
-    nota "docker build dai sorgenti, modifiche non salvate comprese (la prima volta alcuni minuti)…"
-    docker build -q -t pa-webinar:local "$RADICE" >/dev/null \
-      || errore "docker build dell'applicazione non riuscito (l'errore è qui sopra)."
-    # Le migrazioni girano dallo stadio `builder`, come nell'immagine pubblicata.
-    docker build -q --target builder -t pa-webinar:local-migrate "$RADICE" >/dev/null \
-      || errore "docker build dell'immagine delle migrazioni non riuscito (l'errore è qui sopra)."
-    for img in pa-webinar:local pa-webinar:local-migrate; do
-      carica_nel_nodo "$img"
-    done
-    id_app="$(docker image inspect --format '{{.Id}}' pa-webinar:local)"
-    id_mig="$(docker image inspect --format '{{.Id}}' pa-webinar:local-migrate)"
+    # La revisione dentro l'immagine: /api/health la riporta e dice quale
+    # codice sta girando, con -dirty se c'erano modifiche non salvate. Solo
+    # l'identificativo del commit, niente data: un argomento che cambia a
+    # ogni lancio invaliderebbe la cache della build.
+    revisione="$(git -C "$RADICE" rev-parse --short=12 HEAD 2>/dev/null || true)"
+    if [ -n "$revisione" ] && [ -n "$(git -C "$RADICE" status --porcelain 2>/dev/null || true)" ]; then
+      revisione="$revisione-dirty"
+    fi
+    argomenti_build=(--build-arg NEXT_PUBLIC_BUILD_VERSION=local
+                     --build-arg "NEXT_PUBLIC_BUILD_SHA=$revisione")
+    # L'avanzamento riga per riga nel file di log è di BuildKit; il builder
+    # precedente (DOCKER_BUILDKIT=0) non conosce l'opzione e scrive comunque.
+    if docker build --help 2>/dev/null | grep -- '--progress' >/dev/null; then
+      argomenti_build=(--progress=plain "${argomenti_build[@]}")
+    fi
+    LOG_BUILD="$STATO/build.log"
+    nota "docker build dai sorgenti (revisione ${revisione:-sconosciuta}), modifiche non salvate comprese;"
+    nota "la prima volta alcuni minuti. Avanzamento: tail -f '$LOG_BUILD'"
+    inizio_build="$(date +%s)"
+    if ! docker build "${argomenti_build[@]}" -t "$IMG_LOCALE" "$RADICE" > "$LOG_BUILD" 2>&1; then
+      tail -n 30 "$LOG_BUILD" >&2
+      errore "docker build dell'applicazione non riuscito (ultime righe qui sopra, tutto in $LOG_BUILD)."
+    fi
+    # Le migrazioni girano dallo stadio `builder`, come nell'immagine
+    # pubblicata: stessi argomenti, quindi dalla cache in pochi secondi.
+    if ! docker build "${argomenti_build[@]}" --target builder -t "$IMG_LOCALE_MIGRAZIONI" "$RADICE" >> "$LOG_BUILD" 2>&1; then
+      tail -n 30 "$LOG_BUILD" >&2
+      errore "docker build dell'immagine delle migrazioni non riuscito (ultime righe qui sopra, tutto in $LOG_BUILD)."
+    fi
+    nota "immagini costruite in $(( $(date +%s) - inizio_build )) s"
+    carica_nel_nodo "$IMG_LOCALE"
+    id_app="$(docker image inspect --format '{{.Id}}' "$IMG_LOCALE")"
+    # L'immagine delle migrazioni pesa più di 2 GB, ma le migrazioni dipendono
+    # solo da Dockerfile, lockfile e app/prisma: se non sono cambiati e il nodo
+    # ha ancora quella caricata l'ultima volta, resta quella.
+    FILE_IMPRONTA="$STATO/migrazioni.impronta"
+    impronta_ingressi="$(impronta_migrazioni)"
+    id_mig=""
+    if [ -s "$FILE_IMPRONTA" ] && [ "$(cut -d' ' -f1 "$FILE_IMPRONTA")" = "$impronta_ingressi" ]; then
+      id_salvato="$(cut -d' ' -f2 "$FILE_IMPRONTA")"
+      id_nodo="$(mk ssh -- docker image inspect --format '{{.Id}}' "$IMG_LOCALE_MIGRAZIONI" 2>/dev/null | tr -d '\r' || true)"
+      if [ -n "$id_salvato" ] && [ "$id_nodo" = "$id_salvato" ]; then
+        id_mig="$id_salvato"
+        nota "$IMG_LOCALE_MIGRAZIONI: migrazioni invariate, resta quella già nel nodo"
+      fi
+    fi
+    if [ -z "$id_mig" ]; then
+      carica_nel_nodo "$IMG_LOCALE_MIGRAZIONI"
+      id_mig="$(docker image inspect --format '{{.Id}}' "$IMG_LOCALE_MIGRAZIONI")"
+      printf '%s %s\n' "$impronta_ingressi" "$id_mig" > "$FILE_IMPRONTA"
+    fi
     extra+=(
-      --set "app.image.repository=pa-webinar" --set-string "app.image.tag=local" --set "app.image.pullPolicy=Never"
-      --set "app.migration.image.repository=pa-webinar" --set-string "app.migration.image.tag=local-migrate"
+      --set "app.image.repository=pa-webinar" --set-string "app.image.tag=$TAG_LOCALE" --set "app.image.pullPolicy=Never"
+      --set "app.migration.image.repository=pa-webinar" --set-string "app.migration.image.tag=$TAG_LOCALE-migrate"
       --set "app.migration.image.pullPolicy=Never"
     )
     ;;
@@ -866,15 +989,14 @@ fi
 # ── Valori di questa macchina ───────────────────────────────────
 {
   printf '# Generato da scripts/minikube-up.sh: indirizzi del nodo %s. Si riscrive a ogni lancio.\n' "$IP"
-  printf 'app:\n  env:\n'
-  printf '    NEXT_PUBLIC_APP_URL: "https://%s"\n' "$APP_HOST"
-  printf '    NEXT_PUBLIC_JITSI_DOMAIN: "%s"\n' "$JITSI_HOST"
-  printf '  extraCaCerts:\n    configMapName: "%s"\n    key: ca.crt\n' "$SECRET_CA"
-  printf 'ingress:\n  hosts:\n    - host: "%s"\n      paths:\n        - path: /\n          pathType: Prefix\n' "$APP_HOST"
-  printf '  tls:\n    - secretName: app-tls\n      hosts: ["%s"]\n' "$APP_HOST"
+  # I due nomi: il chart ne ricava gli indirizzi del portale e gli host dei
+  # due Ingress. publicURL è un valore del sottochart della conferenza, che
+  # il chart non può ricavare: si scrive, e la resa lo confronta.
+  printf 'site:\n  portalHost: "%s"\n  conferenceHost: "%s"\n' "$APP_HOST" "$JITSI_HOST"
+  printf 'app:\n  extraCaCerts:\n    configMapName: "%s"\n    key: ca.crt\n' "$SECRET_CA"
+  printf 'ingress:\n  tls:\n    - secretName: app-tls\n'
+  printf 'jitsi:\n  conferenceIngress:\n    tls:\n      - secretName: jitsi-tls\n'
   printf 'jitsi-meet:\n  publicURL: "https://%s"\n' "$JITSI_HOST"
-  printf '  web:\n    ingress:\n      hosts:\n        - host: "%s"\n          paths: ["/"]\n' "$JITSI_HOST"
-  printf '      tls:\n        - secretName: jitsi-tls\n          hosts: ["%s"]\n' "$JITSI_HOST"
   if [ "$MAILPIT" = "si" ]; then
     printf 'secrets:\n  generate:\n'
     printf '    SMTP_HOST: "mailpit"\n    SMTP_PORT: "1025"\n    SMTP_SECURE: "false"\n'
@@ -908,6 +1030,7 @@ if ! helm --kube-context "$PROFILO" upgrade --install "$RELEASE" "$CHART" \
     -f "$CHART/examples/values-minikube.yaml" \
     -f "$LOCALI" \
     -f "$SEGRETI" \
+    ${VALORI_IN_PIU[@]+"${VALORI_IN_PIU[@]}"} \
     ${extra[@]+"${extra[@]}"} \
     --wait --timeout "$ATTESA" > "$STATO/helm-notes.txt"; then
   printf '\n' >&2
@@ -915,6 +1038,18 @@ if ! helm --kube-context "$PROFILO" upgrade --install "$RELEASE" "$CHART" \
   kc -n "$NAMESPACE" get events --sort-by=.lastTimestamp 2>/dev/null | tail -n 15 >&2 || true
   errore "helm non ha completato. Stato dei pod ed eventi recenti qui sopra."
 fi
+# Dopo l'attesa di helm, l'hook del chart (web-config-reload) riavvia il front
+# end della conferenza: finché il riavvio non è completo la conferenza risponde
+# 502, e scripts/verify-install.sh lo segnala. Si aspetta ogni rollout del
+# namespace, compreso quello.
+for risorsa in $(kc -n "$NAMESPACE" get deployment,statefulset -o name); do
+  if ! kc -n "$NAMESPACE" rollout status "$risorsa" --timeout="$ATTESA" >/dev/null; then
+    printf '\n' >&2
+    kc -n "$NAMESPACE" get pods >&2 || true
+    kc -n "$NAMESPACE" get events --sort-by=.lastTimestamp 2>/dev/null | tail -n 15 >&2 || true
+    errore "$risorsa non è pronto dopo $ATTESA. Stato dei pod ed eventi recenti qui sopra."
+  fi
+done
 nota "pronta in $(( $(date +%s) - inizio )) s"
 # Le note del chart segnalano ciò che resta da controllare (credenziali non
 # fissate, STUN di terzi, indirizzi di esempio): se ci sono, le si mostra.
@@ -931,12 +1066,23 @@ passo "Controlli"
 # --resolve: il controllo vale anche quando il DNS locale non risolve nip.io.
 # --cacert: i certificati devono verificarsi con l'autorità locale, come
 # succederà nel browser che la considera fidata.
-salute="$(curl -s --cacert "$CA_CRT" --max-time 20 --resolve "$APP_HOST:443:$IP" "https://$APP_HOST/api/health" 2>&1 || true)"
+# Appena finito un rollout il controller di ingress può mandare ancora qualche
+# richiesta al pod che se ne va (502 per un paio di secondi): portale e
+# conferenza devono rispondere cinque volte di fila, per al massimo due minuti.
+salute=""; codice=""; di_fila=0
+for _ in $(seq 1 120); do
+  salute="$(curl -s --cacert "$CA_CRT" --max-time 20 --resolve "$APP_HOST:443:$IP" "https://$APP_HOST/api/health" 2>&1 || true)"
+  codice="$(curl -s --cacert "$CA_CRT" --max-time 20 -o /dev/null -w '%{http_code}' --resolve "$JITSI_HOST:443:$IP" "https://$JITSI_HOST/config.js" 2>&1 || true)"
+  case "$salute:$codice" in
+    *'"status":"ok"'*:200) di_fila=$((di_fila + 1)); [ "$di_fila" -ge 5 ] && break ;;
+    *) di_fila=0 ;;
+  esac
+  sleep 1
+done
 case "$salute" in
   *'"status":"ok"'*) nota "portale: /api/health ok, certificato verificato" ;;
   *) errore "il portale non risponde come atteso su https://$APP_HOST/api/health: $salute" ;;
 esac
-codice="$(curl -s --cacert "$CA_CRT" --max-time 20 -o /dev/null -w '%{http_code}' --resolve "$JITSI_HOST:443:$IP" "https://$JITSI_HOST/config.js" 2>&1 || true)"
 [ "$codice" = "200" ] || errore "la conferenza risponde $codice su https://$JITSI_HOST/config.js"
 nota "conferenza: config.js 200, certificato verificato"
 # In http:// la pagina non è un contesto sicuro: il browser non dà microfono né
@@ -950,10 +1096,49 @@ for h in "$APP_HOST" "$JITSI_HOST"; do
 done
 nota "http rimanda a https su portale e conferenza"
 
+# ── Autorità locale nel browser (--trust-ca) ────────────────────
+fiducia_fatta="no"
+if [ "$FIDUCIA_CA" = "si" ]; then
+  passo "Autorità locale fra quelle fidate del browser ($NSSDB)"
+  # Il database lo crea Chrome al primo avvio: per un utente che non l'ha mai
+  # aperto, o che lo usa solo senza interfaccia, non c'è ancora, e certutil
+  # fallisce con SEC_ERROR_BAD_DATABASE.
+  if [ ! -f "$NSSDB/cert9.db" ]; then
+    (umask 077 && mkdir -p "$NSSDB")
+    certutil -d "sql:$NSSDB" -N --empty-password \
+      || errore "certutil non ha creato il database NSS in $NSSDB."
+    nota "database NSS creato in $NSSDB"
+  fi
+  # Una voce con lo stesso nome (un lancio precedente, un'autorità rigenerata)
+  # si sostituisce: con un certificato diverso sotto lo stesso nome
+  # l'aggiunta fallirebbe.
+  for _ in 1 2 3 4 5; do
+    certutil -d "sql:$NSSDB" -L -n "$NOME_CA" >/dev/null 2>&1 || break
+    certutil -d "sql:$NSSDB" -D -n "$NOME_CA" >/dev/null 2>&1 || break
+  done
+  certutil -d "sql:$NSSDB" -A -t "C,," -n "$NOME_CA" -i "$CA_CRT" \
+    || errore "certutil non ha aggiunto l'autorità locale a $NSSDB."
+  fiducia_fatta="si"
+  nota "\"$NOME_CA\" aggiunta: riapri Chrome, Chromium o Edge."
+fi
+
 # ── Riepilogo ───────────────────────────────────────────────────
+# Il controllo dell'installazione, pronto da copiare: gli argomenti con spazi
+# escono tra apici. --resolve solo se nip.io non si risolve da qui.
+argomenti_verifica=("$RADICE/scripts/verify-install.sh" --context "$PROFILO")
+[ "$NAMESPACE" = "pa-webinar" ] || argomenti_verifica+=(--namespace "$NAMESPACE")
+[ "$RELEASE" = "pa-webinar" ] || argomenti_verifica+=(--release "$RELEASE")
+argomenti_verifica+=(--ca-file "$CA_CRT" --secrets-file "$SEGRETI")
+if ! command -v getent >/dev/null 2>&1 || [ "$(getent ahostsv4 "$APP_HOST" 2>/dev/null | awk 'NR==1 {print $1}')" != "$IP" ]; then
+  argomenti_verifica+=(--resolve "$IP")
+fi
+CMD_VERIFICA=""
+for a in "${argomenti_verifica[@]}"; do CMD_VERIFICA="$CMD_VERIFICA$(printf '%q' "$a") "; done
+fine_script="$(date +%s)"
+printf '   (%s s)\n' "$(( fine_script - INIZIO_PASSO ))"
 cat <<FINE
 
-✓ PA Webinar è su minikube (profilo $PROFILO, namespace $NAMESPACE).
+✓ PA Webinar è su minikube (profilo $PROFILO, namespace $NAMESPACE), in $(( fine_script - INIZIO_SCRIPT )) s.
 
   Portale              https://$APP_HOST
   Amministrazione      https://$APP_HOST/it/admin/login
@@ -963,7 +1148,7 @@ FINE
 case "$IMMAGINI" in
   registry) printf '  Immagini             %s:%s, prelevate dal nodo\n' "$REPO_IMMAGINE" "$TAG" ;;
   host) printf '  Immagini             %s:%s, caricate nel nodo\n' "$REPO_IMMAGINE" "$TAG" ;;
-  local) printf '  Immagini             costruite dai sorgenti di %s\n' "$RADICE" ;;
+  local) printf '  Immagini             %s, dai sorgenti di %s (revisione %s)\n' "$IMG_LOCALE" "$RADICE" "${revisione:-sconosciuta}" ;;
 esac
 if [ "$secret_pull" = "si" ]; then
   printf '  Credenziali ghcr.io  nel Secret %s del namespace, finché esiste il profilo\n' "$SECRET_PULL"
@@ -984,9 +1169,10 @@ Prossimi passi
      $( [ "$nuova_ca" = "si" ] && printf '%s' "È stata appena creata: se ne avevi resa fidata una prima, sostituiscila." || printf '%s' "È la stessa dei lanci precedenti: se l'hai già resa fidata, non serve altro.")
      Firma solo nomi sotto nip.io e sslip.io (e il dominio scelto). Una delle
      strade, poi riapri il browser:
-     - Chrome, Chromium, Edge su Linux (serve certutil: pacchetto nss-tools su
-       Fedora, libnss3-tools su Debian e Ubuntu):
-         certutil -d sql:\$HOME/.pki/nssdb -A -t "C,," -n "PA Webinar minikube" -i '$CA_CRT'
+     - Chrome, Chromium, Edge su Linux: $( [ "$fiducia_fatta" = "si" ] && printf '%s' "fatto (--trust-ca, in $NSSDB)." || printf '%s' "rilancia con --trust-ca (serve
+       certutil: pacchetto nss-tools su Fedora, libnss3-tools su Debian e
+       Ubuntu), che crea il database del browser se manca e aggiunge
+       l'autorità con il nome \"$NOME_CA\"." )
      - Firefox, ogni sistema: Impostazioni > Privacy e sicurezza > Certificati >
        Mostra certificati > Autorità > Importa, e spunta l'identificazione dei siti.
      - Sistema (curl e gli altri programmi della macchina), su Fedora:
@@ -1003,7 +1189,10 @@ Prossimi passi
   4. I comandi usano il contesto del profilo in modo esplicito, ad esempio
        kubectl --context $PROFILO -n $NAMESPACE get pods
      Il contesto attivo resta quello di prima${CONTESTO_PRECEDENTE:+ ($CONTESTO_PRECEDENTE)}.
-  5. Rilancia questo script per aggiornare; scripts/minikube-down.sh per spegnere o cancellare.
+  5. Controllo dell'installazione, ora e dopo ogni aggiornamento (--call aggiunge
+     una chiamata di prova fra due browser headless):
+       $CMD_VERIFICA
+  6. Rilancia questo script per aggiornare; scripts/minikube-down.sh per spegnere o cancellare.
 FINE
 if [ "$IMMAGINI" = "registry" ] && [ "$TAG" = "dev" ]; then
   # Un tag mobile non cambia nel manifesto: helm non ha niente da aggiornare.
@@ -1013,7 +1202,7 @@ if [ "$IMMAGINI" = "registry" ] && [ "$TAG" = "dev" ]; then
     *) deployment="$RELEASE-pa-webinar" ;;
   esac
   cat <<FINE
-  6. Il tag $TAG si sposta a ogni pubblicazione, e rilanciare lo script non
+  7. Il tag $TAG si sposta a ogni pubblicazione, e rilanciare lo script non
      preleva l'immagine nuova. Per prenderla (o usa un tag fisso, dev-<sha>):
        kubectl --context $PROFILO -n $NAMESPACE rollout restart deployment/$deployment
 FINE

@@ -26,6 +26,16 @@ metadata:
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
+{{- /*
+  Con site.portalHost il nome viene da lì: gli host scritti devono coincidere
+  (lo controlla pa-webinar.validateSite), quelli di esempio si sostituiscono,
+  e una voce tls senza host prende il nome del portale.
+*/}}
+{{- $portale := include "pa-webinar.sitePortalHost" . }}
+{{- $regole := .Values.ingress.hosts | default list }}
+{{- if and $portale (not $regole) }}
+{{- $regole = list (dict "host" $portale "paths" (list (dict "path" "/" "pathType" "Prefix"))) }}
+{{- end }}
 spec:
   {{- if .Values.ingress.className }}
   ingressClassName: {{ .Values.ingress.className }}
@@ -34,18 +44,24 @@ spec:
   tls:
     {{- range .Values.ingress.tls }}
     - hosts:
+        {{- if $portale }}
+        - {{ $portale | quote }}
+        {{- else }}
         {{- range .hosts }}
         - {{ . | quote }}
         {{- end }}
-      secretName: {{ .secretName }}
+        {{- end }}
+      {{- with .secretName }}
+      secretName: {{ . }}
+      {{- end }}
     {{- end }}
   {{- end }}
   rules:
-    {{- range .Values.ingress.hosts }}
-    - host: {{ .host | quote }}
+    {{- range $regole }}
+    - host: {{ $portale | default .host | quote }}
       http:
         paths:
-          {{- range .paths }}
+          {{- range (.paths | default (list (dict "path" "/" "pathType" "Prefix"))) }}
           - path: {{ .path }}
             pathType: {{ .pathType }}
             backend:

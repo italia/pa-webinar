@@ -13,23 +13,15 @@
 #     -f <indirizzi.yaml> -f <segreti.yaml>
 #
 # <indirizzi.yaml> porta i nomi nip.io sull'IP del nodo (`minikube -p
-# pa-webinar ip`), che cambia da una macchina all'altra:
+# pa-webinar ip`), che cambia da una macchina all'altra. Il chart ne ricava
+# gli indirizzi del portale e gli host dei due Ingress; `publicURL` va
+# scritto perché è un valore del sottochart della conferenza:
 #
-#   app:
-#     env:
-#       NEXT_PUBLIC_APP_URL: https://app.<node-ip>.nip.io
-#       NEXT_PUBLIC_JITSI_DOMAIN: jitsi.<node-ip>.nip.io
-#   ingress:
-#     hosts:
-#       - host: app.<node-ip>.nip.io
-#         paths: [{ path: /, pathType: Prefix }]
+#   site:
+#     portalHost: app.<node-ip>.nip.io
+#     conferenceHost: jitsi.<node-ip>.nip.io
 #   jitsi-meet:
 #     publicURL: https://jitsi.<node-ip>.nip.io
-#     web:
-#       ingress:
-#         hosts:
-#           - host: jitsi.<node-ip>.nip.io
-#             paths: ["/"]
 #
 # <segreti.yaml>, tenuto fuori dal repository: i segreti elencati in testa a
 # values-simple.yaml e le due password XMPP interne, generati una volta e
@@ -41,9 +33,9 @@
 # script costruisce le immagini dai sorgenti e le carica nel nodo; con le
 # credenziali crea un Secret di prelievo, o preleva con il docker della
 # macchina (vedi `scripts/minikube-up.sh --help`). A mano, senza credenziali:
-# docs/INFRASTRUCTURE.md, "Install by hand".
+# docs/install/minikube.md, "Install by hand".
 #
-# Dimensioni provate: vedi docs/INFRASTRUCTURE.md, "Evaluation: minikube".
+# Dimensioni provate: docs/install/minikube.md, "Measured usage".
 # Le richieste qui sotto stanno in un nodo da 2 CPU e 3 GB, e il bridge ha la
 # memoria limitata perché su un nodo da 4 GB il valore predefinito
 # dell'immagine (heap fino a 3 GB) ha portato tutto il nodo allo stallo con 20
@@ -87,6 +79,24 @@ jitsi:
   # Lo script genera e conserva le password XMPP interne: senza, ogni `helm
   # upgrade` riavvierebbe la conferenza. Chi installa a mano deve passarle.
   requirePinnedCredentials: true
+  # L'Ingress della conferenza lo rende il chart (quello del sottochart è
+  # spento più sotto): host e host TLS vengono da site.conferenceHost.
+  conferenceIngress:
+    enabled: true
+    className: nginx
+    annotations:
+      # Niente cert-manager su minikube.
+      cert-manager.io/cluster-issuer: null
+      # In http:// il browser non dà microfono né videocamera alla pagina, e
+      # la sala resta a caricare senza dire perché: il controller rimanda
+      # sempre a https, anche senza una sezione `tls` (vale allora il suo
+      # certificato autofirmato).
+      nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    # Vuoto qui: lo script scrive nei valori della macchina il Secret TLS
+    # firmato dall'autorità locale che crea (vedi scripts/minikube-up.sh).
+    # Chi installa a mano senza certificati resta con quello autofirmato
+    # del controller, da accettare nel browser.
+    tls: []
 
 jitsi-meet:
   # Immagine web standard (vedi sotto): nessun registro privato da cui
@@ -94,19 +104,8 @@ jitsi-meet:
   # patchata del chart e il Secret per prelevarla.
   imagePullSecrets: []
 
-  jicofo:
-    # Solo richieste: senza, Jicofo e Prosody sono i primi a essere uccisi
-    # quando il nodo resta senza memoria, e lo scheduler non li vede.
-    resources:
-      requests:
-        cpu: 50m
-        memory: 320Mi
-
-  prosody:
-    resources:
-      requests:
-        cpu: 50m
-        memory: 128Mi
+  # Le richieste di Jicofo, Prosody e della parte web e la sonda tollerante
+  # del bridge sono ormai i valori predefiniti del chart (values.yaml).
 
   jvb:
     # Heap del bridge limitato a 1 GB: l'immagine lo lascia crescere fino a
@@ -125,16 +124,6 @@ jitsi-meet:
       limits:
         cpu: "2"
         memory: 2Gi
-    # Sonda più tollerante di quella del sottochart (1 s, tre tentativi): su
-    # una macchina di lavoro carica il bridge a riposo veniva riavviato, e il
-    # riavvio fa cadere ogni conferenza.
-    livenessProbe:
-      httpGet:
-        path: /about/health
-        port: 8080
-      periodSeconds: 10
-      timeoutSeconds: 5
-      failureThreshold: 6
     # Il bridge annuncia l'IP del nodo (`useNodeIP`, predefinito del chart in
     # values.yaml), che il browser sulla stessa macchina raggiunge
     # direttamente: nessun server STUN di terzi da interrogare.
@@ -148,27 +137,15 @@ jitsi-meet:
       repository: jitsi/web
       tag: null
       pullPolicy: IfNotPresent
-    resources:
-      requests:
-        cpu: 10m
-        memory: 64Mi
     ingress:
-      ingressClassName: nginx
-      # In http:// il browser non dà microfono né videocamera alla pagina, e
-      # la sala resta a caricare senza dire perché: il controller rimanda
-      # sempre a https, anche senza una sezione `tls` (vale allora il suo
-      # certificato autofirmato).
-      annotations:
-        nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
-      # Vuoto qui: lo script scrive nei valori della macchina i Secret TLS
-      # firmati dall'autorità locale che crea (vedi scripts/minikube-up.sh).
-      # Chi installa a mano senza certificati resta con quello autofirmato
-      # del controller, da accettare nel browser.
+      # Lo rende il chart: jitsi.conferenceIngress, sopra.
+      enabled: false
       tls: []
 
 ingress:
   className: nginx
   annotations:
+    cert-manager.io/cluster-issuer: null
     # Come per la conferenza: http:// rimanda sempre a https.
     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
   # Vedi sopra: i Secret TLS li indica lo script nei valori della macchina.

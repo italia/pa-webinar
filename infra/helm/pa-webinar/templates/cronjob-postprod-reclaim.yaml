@@ -56,7 +56,7 @@ spec:
                 - /bin/sh
                 - -c
                 - |
-                  curl -sf --retry 2 --retry-delay 2 --retry-connrefused --connect-timeout 5 \
+                  curl -sf {{ include "pa-webinar.cronCurlRetry" . }} \
                     -H "x-api-key: $(CRON_API_KEY)" \
                     {{ include "pa-webinar.internalUrl" . }}/api/cron/postprod-reclaim
               env:

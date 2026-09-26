@@ -3,6 +3,9 @@
 {{- include "pa-webinar.validateJitsiJwt" . }}
 {{- include "pa-webinar.validateJitsiCredentials" . }}
 {{- include "pa-webinar.validateIngressClass" . }}
+{{- include "pa-webinar.validateSite" . }}
+{{- include "pa-webinar.validateConferenceIngress" . }}
+{{- include "pa-webinar.validateBackup" . }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:

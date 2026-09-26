@@ -51,6 +51,17 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
+Etichette dei pod della copia del database (CronJob backup e backup-tools):
+diverse da selectorLabels, cosi' il PodDisruptionBudget, lo spread e la
+NetworkPolicy del portale non li contano fra i pod dell'applicazione.
+*/}}
+{{- define "pa-webinar.backupSelectorLabels" -}}
+app.kubernetes.io/name: {{ include "pa-webinar.name" . }}-backup
+app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/component: backup
+{{- end }}
+
+{{/*
 ServiceAccount name.
 */}}
 {{- define "pa-webinar.serviceAccountName" -}}
@@ -90,6 +101,100 @@ Defaults tag to Chart.appVersion + "-migrate" if not set.
 {{- $tag = printf "%s-migrate" (default .Chart.AppVersion .Values.app.image.tag) -}}
 {{- end -}}
 {{- printf "%s:%s" .Values.app.migration.image.repository $tag -}}
+{{- end }}
+
+{{/*
+Nomi pubblici dell'installazione (site.portalHost, site.conferenceHost).
+
+I valori di esempio di values.yaml contano come non scritti: chi valorizza
+`site.*` non deve anche ripulire le chiavi che il chart porta con sé.
+Restituisce "true" se il valore passato è uno di quei segnaposto.
+*/}}
+{{- define "pa-webinar.segnaposto" -}}
+{{- if has (trimSuffix "/" (toString .)) (list "videocall.example.com" "jitsi.videocall.example.com" "https://videocall.example.com" "https://jitsi.videocall.example.com") -}}
+true
+{{- end -}}
+{{- end }}
+
+{{/* Il nome del portale da site.portalHost, o niente. */}}
+{{- define "pa-webinar.sitePortalHost" -}}
+{{- trim (toString (dig "portalHost" "" (.Values.site | default dict) | default "")) -}}
+{{- end }}
+
+{{/* Il nome della conferenza da site.conferenceHost, o niente. */}}
+{{- define "pa-webinar.siteConferenceHost" -}}
+{{- trim (toString (dig "conferenceHost" "" (.Values.site | default dict) | default "")) -}}
+{{- end }}
+
+{{/*
+L'indirizzo del portale per l'applicazione (NEXT_PUBLIC_APP_URL): da
+site.portalHost se valorizzato, altrimenti quello scritto in app.env.
+*/}}
+{{- define "pa-webinar.appUrl" -}}
+{{- $sito := include "pa-webinar.sitePortalHost" . -}}
+{{- if $sito -}}
+{{- printf "https://%s" $sito -}}
+{{- else -}}
+{{- toString (index (.Values.app.env | default dict) "NEXT_PUBLIC_APP_URL" | default "") -}}
+{{- end -}}
+{{- end }}
+
+{{/*
+Il dominio della conferenza per l'applicazione (NEXT_PUBLIC_JITSI_DOMAIN): da
+site.conferenceHost se valorizzato, altrimenti quello scritto in app.env.
+*/}}
+{{- define "pa-webinar.jitsiDomain" -}}
+{{- $sito := include "pa-webinar.siteConferenceHost" . -}}
+{{- if $sito -}}
+{{- $sito -}}
+{{- else -}}
+{{- toString (index (.Values.app.env | default dict) "NEXT_PUBLIC_JITSI_DOMAIN" | default "") -}}
+{{- end -}}
+{{- end }}
+
+{{/*
+Il nome della conferenza per l'Ingress reso da questo chart: site.
+conferenceHost, altrimenti NEXT_PUBLIC_JITSI_DOMAIN. Il valore di esempio
+resta tale, come per le altre chiavi: le note dopo l'installazione lo
+segnalano.
+*/}}
+{{- define "pa-webinar.conferenceHost" -}}
+{{- include "pa-webinar.jitsiDomain" . -}}
+{{- end }}
+
+{{/*
+Il nome del portale da mostrare nelle note: site.portalHost, altrimenti il
+primo host dell'Ingress, altrimenti niente.
+*/}}
+{{- define "pa-webinar.portalHost" -}}
+{{- $sito := include "pa-webinar.sitePortalHost" . -}}
+{{- if $sito -}}
+{{- $sito -}}
+{{- else -}}
+{{- $primo := first (.Values.ingress.hosts | default list) | default dict -}}
+{{- toString (dig "host" "" $primo | default "") -}}
+{{- end -}}
+{{- end }}
+
+{{/*
+Le annotazioni di un Ingress reso da questo chart: le chiavi a null si
+tolgono, e con una classe di un controller che non è ingress-nginx
+(`ingress.nonNginxClassNames`) si tolgono anche quelle `nginx.ingress.
+kubernetes.io/*`, che quel controller ignorerebbe senza avviso.
+Argomenti: dict "annotazioni" (la mappa) "classe" (la classe) "root".
+Restituisce la mappa in YAML, vuota se non resta niente.
+*/}}
+{{- define "pa-webinar.ingressAnnotations" -}}
+{{- $altro := has (toString (.classe | default "")) (.root.Values.ingress.nonNginxClassNames | default list) -}}
+{{- $esito := dict -}}
+{{- range $chiave, $valore := (.annotazioni | default dict) -}}
+{{- if not (or (kindIs "invalid" $valore) (and $altro (hasPrefix "nginx.ingress.kubernetes.io/" $chiave))) -}}
+{{- $_ := set $esito $chiave $valore -}}
+{{- end -}}
+{{- end -}}
+{{- if $esito -}}
+{{- toYaml $esito -}}
+{{- end -}}
 {{- end }}
 
 {{/*

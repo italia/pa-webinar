@@ -3,16 +3,17 @@
 ╚══════════════════════════════════════════════════════════════╝
 
 ─── Portale ──────────────────────────────────────────────────
-{{- if .Values.ingress.enabled }}
-  URL:   https://{{ (index .Values.ingress.hosts 0).host }}
+{{- $portale := include "pa-webinar.portalHost" . }}
+{{- if and .Values.ingress.enabled $portale }}
+  URL:   https://{{ $portale }}
 {{- else }}
   kubectl port-forward svc/{{ include "pa-webinar.fullname" . }} {{ .Values.service.port }}:{{ .Values.service.port }} -n {{ .Release.Namespace }}
   URL:   http://localhost:{{ .Values.service.port }}
 {{- end }}
 
 ─── Area amministrazione ─────────────────────────────────────
-{{- if .Values.ingress.enabled }}
-  URL:   https://{{ (index .Values.ingress.hosts 0).host }}/it/admin/login
+{{- if and .Values.ingress.enabled $portale }}
+  URL:   https://{{ $portale }}/it/admin/login
 {{- else }}
   URL:   http://localhost:{{ .Values.service.port }}/it/admin/login
 {{- end }}
@@ -66,8 +67,9 @@
 {{- end }}
 {{- $avvisi := list }}
 {{- $segnaposto := list }}
+{{- $derivati := dict "NEXT_PUBLIC_APP_URL" (include "pa-webinar.appUrl" .) "NEXT_PUBLIC_JITSI_DOMAIN" (include "pa-webinar.jitsiDomain" .) }}
 {{- range $chiave, $valore := .Values.app.env }}
-{{- if contains "example.com" (toString $valore) }}
+{{- if contains "example.com" (toString (ternary (index $derivati $chiave) $valore (hasKey $derivati $chiave))) }}
 {{- $segnaposto = append $segnaposto (printf "app.env.%s" $chiave) }}
 {{- end }}
 {{- end }}
@@ -88,6 +90,14 @@
 {{- if and (not $stun) (not $stunInterno) (empty (dig "jvb" "publicIPs" list $jm)) }}
 {{- $avvisi = append $avvisi "Il bridge non usa STUN e non ha publicIPs: annuncia l'indirizzo del nodo (useNodeIP) o del pod. Se è un indirizzo privato dietro NAT, chi è fuori dalla rete entra in sala ma non sente e non vede nessuno. Indica jitsi-meet.jvb.publicIPs o un server STUN in jitsi-meet.jvb.stunServers." }}
 {{- end }}
+{{- $webIngress := dig "web" "ingress" dict $jm | default dict }}
+{{- if dig "enabled" false $webIngress }}
+{{- range $chiave, $valore := (dig "annotations" dict $webIngress | default dict) }}
+{{- if kindIs "invalid" $valore }}
+{{- $avvisi = append $avvisi (printf "jitsi-meet.web.ingress.annotations.%s è null: in una mappa del sottochart questa versione di Helm non toglie la chiave, e l'Ingress della conferenza la porta con valore vuoto. Per toglierla fai rendere l'Ingress a questo chart (jitsi.conferenceIngress.enabled: true e jitsi-meet.web.ingress.enabled: false), dove null toglie davvero, oppure imposta annotations: null per toglierle tutte." $chiave) }}
+{{- end }}
+{{- end }}
+{{- end }}
 {{- if and .Values.jitsi.webIngress.redirectUrl (has (toString .Values.jitsi.webIngress.ingressClassName) (dig "nonNginxClassNames" list (.Values.ingress | default dict))) }}
 {{- $avvisi = append $avvisi (printf "jitsi.webIngress.redirectUrl usa un'annotazione di ingress-nginx: con la classe %q il reindirizzamento dalla radice della conferenza non avviene." (toString .Values.jitsi.webIngress.ingressClassName)) }}
 {{- end }}
@@ -106,15 +116,76 @@
 {{- end }}
 {{- end }}
 
-─── Prossimi passi ───────────────────────────────────────────
-{{- if eq (default "existing" .Values.secrets.mode) "existing" }}
-  1. Crea il Secret "{{ include "pa-webinar.secretName" . }}" se non esiste
-{{- else }}
-  1. I secrets sono gestiti automaticamente (mode: {{ .Values.secrets.mode }})
+{{- $b := .Values.backup | default dict }}
+{{- if and (dig "enabled" false $b) (dig "enabled" false (.Values.postgresql | default dict)) }}
+{{- $fn := include "pa-webinar.fullname" . }}
+{{- $ns := .Release.Namespace }}
+{{- $claim := dig "persistence" "existingClaim" "" $b | default (printf "%s-backup" $fn) }}
+{{- /*
+  Il volume del chart, se non è ancora legato: con una classe che lega i
+  volumi al primo pod che li usa (WaitForFirstConsumer, come local-path su
+  k3s) resta Pending fino alla prima copia notturna, e `helm --wait` lo
+  aspetta fino alla scadenza. Si legge solo il PVC, nel namespace della
+  release: le classi di storage sono oggetti del cluster, che chi installa in
+  un solo namespace spesso non può leggere. In `helm template` lookup non
+  trova niente e la nota compare comunque, come alla prima installazione.
+*/}}
+{{- $inAttesa := false }}
+{{- if not (dig "persistence" "existingClaim" "" $b) }}
+{{- $pvc := lookup "v1" "PersistentVolumeClaim" $ns $claim | default dict }}
+{{- $inAttesa = ne (dig "status" "phase" "" $pvc) "Bound" }}
 {{- end }}
-  2. Le migrazioni del database vengono eseguite automaticamente
-     dall'initContainer db-migrate ad ogni deploy
-  3. Accedi al pannello admin e crea il primo evento
-  4. Configura i backup del database
+
+─── Copia del database ───────────────────────────────────────
+  CronJob {{ $fn }}-backup ({{ dig "schedule" "" $b }}, UTC): pg_dump nel volume
+  {{ $claim }}, ultime {{ dig "retention" 7 $b }} copie in /backup/pa-webinar-<data>.dump.
+  Contengono dati personali. Sullo stesso disco del database non
+  proteggono dalla perdita del nodo: copiale anche altrove.
+{{- if $inAttesa }}
+  Il volume {{ $claim }} non è ancora legato. Se la sua classe lo lega
+  al primo pod che lo usa (WaitForFirstConsumer, come local-path su k3s),
+  resta Pending fino alla prima copia, e `helm upgrade --wait` lo aspetta
+  fino alla scadenza. La copia qui sotto lo lega subito, e prova che le
+  copie funzionano.
+{{- end }}
+  Una copia subito:
+    kubectl -n {{ $ns }} create job {{ $fn }}-backup-$(date +%s) --from=cronjob/{{ $fn }}-backup
+  Un pod con il volume, per elencare le copie e portarle fuori dal nodo,
+  che si chiude da solo dopo {{ div (int (dig "activeDeadlineSeconds" 3600 $b | default 3600)) 60 }} minuti:
+    J={{ $fn }}-tools-$(date +%s)
+    kubectl -n {{ $ns }} create job $J --from=cronjob/{{ $fn }}-backup-tools
+    kubectl -n {{ $ns }} wait job/$J --for=jsonpath='{.status.ready}'=1
+    kubectl -n {{ $ns }} exec job/$J -- ls -l /backup
+    (umask 077; kubectl -n {{ $ns }} exec job/$J -- cat /backup/<file> > <file>)
+    kubectl -n {{ $ns }} delete job $J
+  Ripristino di una copia: scripts/restore.sh del repository, non un
+  pg_restore a mano. Ferma portale e lavori pianificati, ripristina in
+  una sola transazione e riaccende tutto nell'ordine giusto:
+    scripts/restore.sh --context <contesto> --namespace {{ $ns }} --release {{ .Release.Name }} \
+      --from-dump <file> --dry-run
+  e, se il piano va bene, lo stesso comando con --yes al posto di
+  --dry-run (--kubeconfig <file> al posto di --context, se serve).
+{{- end }}
+
+─── Prossimi passi ───────────────────────────────────────────
+{{- $passi := list }}
+{{- if eq (default "existing" .Values.secrets.mode) "existing" }}
+{{- /* Chi ha già creato il Secret (pa-webinar-up.sh, per esempio) non ha niente da fare qui. */}}
+{{- if not (lookup "v1" "Secret" .Release.Namespace (include "pa-webinar.secretName" .)) }}
+{{- $passi = append $passi (printf "Crea il Secret %q: senza, il portale non parte." (include "pa-webinar.secretName" .)) }}
+{{- end }}
+{{- else }}
+{{- $passi = append $passi (printf "I secrets sono gestiti automaticamente (mode: %s)" .Values.secrets.mode) }}
+{{- end }}
+{{- $passi = append $passi "Le migrazioni del database vengono eseguite automaticamente dall'initContainer db-migrate ad ogni deploy" }}
+{{- $passi = append $passi "Accedi al pannello admin e crea il primo evento" }}
+{{- if dig "enabled" false $b }}
+{{- $passi = append $passi "Porta le copie del database anche fuori dal nodo" }}
+{{- else }}
+{{- $passi = append $passi "Configura le copie del database (backup.enabled)" }}
+{{- end }}
+{{- range $i, $passo := $passi }}
+  {{ add1 $i }}. {{ wrapWith 60 "\n     " $passo }}
+{{- end }}
 
   Documentazione: docs/DEPLOYMENT.md, docs/CONFIGURATION.md

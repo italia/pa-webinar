@@ -18,11 +18,16 @@ helm dependency build infra/helm/pa-webinar
 
 | File | What it is for |
 |---|---|
-| `examples/values-simple.yaml` | Evaluation, everything in the cluster. |
+| `examples/values-simple.yaml` | Everything in the cluster, one fixed bridge. The base of the minikube and k3s overlays. |
+| `examples/values-minikube.yaml` | Overlay on the simple profile for evaluation on one workstation ([guide](https://github.com/italia/pa-webinar/blob/main/docs/install/minikube.md)). |
+| `examples/values-k3s.yaml` | Overlay on the simple profile for one k3s server, the small-production layout ([guide](https://github.com/italia/pa-webinar/blob/main/docs/install/k3s.md)). |
 | `examples/values-standard.yaml` | External database, Jibri. |
 | `examples/values-full.yaml` | Dedicated bridge node pool, scale to zero, JVB scaler. |
+| `examples/values-aks.yaml`, `values-gke.yaml`, `values-eks.yaml` | Overlays on the full profile for the managed clouds ([guides](https://github.com/italia/pa-webinar/blob/main/docs/install/README.md)). |
 | `examples/keda-jvb-scaler.yaml` | A KEDA sketch, [not a drop-in replacement](https://github.com/italia/pa-webinar/blob/main/docs/operations/jvb-scaler.md#keda) for the JVB scaler. |
 | `values-production.yaml`, `values-prod.yaml`, `values-dev.yaml` | Examples only, not the configuration of any environment. |
+
+Your own file names the two public hosts once, in `site.portalHost` and `site.conferenceHost`: the chart derives the portal and conference addresses and the Ingress hosts from them, and stops the render when an explicit key disagrees. `jitsi-meet.publicURL` (`https://<site.conferenceHost>`) still has to be written, because Helm passes subchart values as written; the render checks it. `jitsi.conferenceIngress` lets the chart render the conference Ingress instead of the subchart, with annotations that `null` removes. `backup.enabled` adds a nightly `pg_dump` of the in-cluster PostgreSQL to a volume; the post-install notes show how to list, copy and restore the dumps. Each key is described in `values.yaml`.
 
 ## Install
 

@@ -2,11 +2,11 @@
 # Modalità semplice — tutto nel cluster, ideale per test o piccole PA
 # ============================================================================
 #
-# Deploy:
-#   helm upgrade --install videocall ./infra/helm/pa-webinar \
+# Deploy (release e namespace come nelle guide di installazione):
+#   helm upgrade --install pa-webinar ./infra/helm/pa-webinar \
+#     -n pa-webinar --create-namespace \
 #     -f infra/helm/pa-webinar/examples/values-simple.yaml \
-#     -n videocall --create-namespace \
-#     -f <file con i tuoi domini e i segreti qui sotto>
+#     -f <file con i tuoi nomi> -f <file con i segreti qui sotto>
 #
 # Segreti da generare UNA volta e conservare, da ripassare identici a ogni
 # aggiornamento (in un file di valori tenuto fuori dal repository):
@@ -16,8 +16,15 @@
 #   jitsi-meet.jicofo.xmpp.password, jitsi-meet.jvb.xmpp.password
 #     (openssl rand -hex 16): se cambiano, ogni aggiornamento riavvia la
 #     conferenza e fa cadere le chiamate in corso.
-# Domini: app.env.NEXT_PUBLIC_APP_URL, app.env.NEXT_PUBLIC_JITSI_DOMAIN,
-#   jitsi-meet.publicURL, gli host di ingress e jitsi-meet.web.ingress.
+# Nomi: site.portalHost e site.conferenceHost, da cui il chart ricava gli
+#   indirizzi e gli host degli Ingress, più jitsi-meet.publicURL
+#   (https://<site.conferenceHost>), che il chart controlla ma non può
+#   ricavare. In alternativa le chiavi esplicite: app.env.NEXT_PUBLIC_APP_URL,
+#   app.env.NEXT_PUBLIC_JITSI_DOMAIN, jitsi-meet.publicURL, gli host di
+#   ingress e di jitsi-meet.web.ingress.
+# I segreti vanno nel file dei segreti, mai con --set: finirebbero nella
+# cronologia della shell. La modalità "generate" qui sotto è per la
+# valutazione; in produzione i Secret si creano fuori dal chart (existing).
 #
 # Cosa include:
 #   - 1 replica dell'app (no autoscaling)
@@ -67,17 +74,17 @@ secrets:
     # Il chart non le inventa di proposito — una password generata a ogni resa
     # verrebbe riscritta a ogni riconciliazione, mentre il database tiene
     # quella con cui è stato inizializzato. Finiscono in un Secret separato.
-    POSTGRES_PASSWORD: ""         # Set via --set
-    POSTGRES_ADMIN_PASSWORD: ""   # Set via --set
-    REDIS_PASSWORD: ""            # Set via --set
-    JITSI_JWT_SECRET: ""    # Set via --set
+    POSTGRES_PASSWORD: ""         # dal file dei segreti
+    POSTGRES_ADMIN_PASSWORD: ""   # dal file dei segreti
+    REDIS_PASSWORD: ""            # dal file dei segreti
+    JITSI_JWT_SECRET: ""    # dal file dei segreti
     JITSI_JWT_APP_ID: "pa_webinar"
     JITSI_JWT_ISSUER: "pa-webinar"
     JITSI_JWT_AUDIENCE: "jitsi"
-    APP_SECRET: ""          # Set via --set
-    ADMIN_API_KEY: ""       # Set via --set
-    PII_ENCRYPTION_KEY: ""  # Set via --set
-    CRON_API_KEY: ""        # Set via --set
+    APP_SECRET: ""          # dal file dei segreti
+    ADMIN_API_KEY: ""       # dal file dei segreti
+    PII_ENCRYPTION_KEY: ""  # dal file dei segreti
+    CRON_API_KEY: ""        # dal file dei segreti
     SMTP_HOST: ""
     SMTP_PORT: "587"
     SMTP_SECURE: "false"
@@ -119,13 +126,13 @@ jitsi-meet:
       existingSecretName: "videocall-jitsi-jwt"
   jicofo:
     xmpp:
-      password: ""  # Set via --set, fissa (openssl rand -hex 16)
+      password: ""  # dal file dei segreti, fissa (openssl rand -hex 16)
   jvb:
     replicaCount: 1  # Always 1, no autoscaling
     nodeSelector: {}  # Runs on any node
     tolerations: []
     xmpp:
-      password: ""  # Set via --set, fissa (openssl rand -hex 16)
+      password: ""  # dal file dei segreti, fissa (openssl rand -hex 16)
     # STUN: resta quello predefinito (un server di terzi, jitsi.net), con cui
     # il bridge scopre l'indirizzo pubblico del nodo. Per farne a meno indica
     # l'indirizzo che i partecipanti raggiungono sulla porta UDP 10000 in

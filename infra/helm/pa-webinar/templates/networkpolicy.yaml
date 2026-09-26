@@ -210,4 +210,42 @@ spec:
     {{- with $np.egress.extraRules }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
+{{- if and (dig "enabled" false (.Values.backup | default dict)) (dig "enabled" false (.Values.postgresql | default dict)) }}
+---
+# ─────────────────────────────────────────────────────────────
+# The database copy (backup CronJob and the backup-tools pods created
+# from it): they hold the database password and the dumps, so nothing may
+# connect to them, and they reach only DNS and PostgreSQL.
+# ─────────────────────────────────────────────────────────────
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "pa-webinar.fullname" . }}-backup
+  labels:
+    {{- include "pa-webinar.labels" . | nindent 4 }}
+    app.kubernetes.io/component: backup
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "pa-webinar.backupSelectorLabels" . | nindent 6 }}
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress: []
+  egress:
+    - to:
+        {{- toYaml (dig "dns" "to" list $np.egress) | nindent 8 }}
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    {{- with $np.egress.postgres }}
+    - to:
+        {{- toYaml .to | nindent 8 }}
+      ports:
+        - protocol: TCP
+          port: {{ .port | default 5432 }}
+    {{- end }}
+{{- end }}
 {{- end }}

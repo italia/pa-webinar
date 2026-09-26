@@ -15,28 +15,21 @@
 #
 # <dominio.yaml> porta i due nomi DNS, entrambi puntati sul nodo che serve
 # Traefik (con tre nodi: quello con l'etichetta di ServiceLB), e la versione
-# delle immagini. Lo stesso file va passato a preload-images.sh:
+# delle immagini. Lo stesso file va passato a preload-images.sh. Dai due nomi
+# il chart ricava gli indirizzi del portale e gli host dei due Ingress;
+# `publicURL` va scritto perché è un valore del sottochart della conferenza:
 #
+#   site:
+#     portalHost: <portale>
+#     conferenceHost: <conferenza>
 #   app:
 #     image:
 #       tag: "<X.Y.Z>"                # il rilascio, senza la v
 #     migration:
 #       image:
 #         tag: "v<X.Y.Z>-migrate"     # con la v del tag git
-#     env:
-#       NEXT_PUBLIC_APP_URL: https://<portale>
-#       NEXT_PUBLIC_JITSI_DOMAIN: <conferenza>
-#   ingress:
-#     hosts:
-#       - host: <portale>
-#         paths: [{ path: /, pathType: Prefix }]
 #   jitsi-meet:
 #     publicURL: https://<conferenza>
-#     web:
-#       ingress:
-#         hosts:
-#           - host: <conferenza>
-#             paths: ["/"]
 #
 # <segreti.yaml>, tenuto fuori dal repository: i segreti elencati in testa a
 # values-simple.yaml e le due password XMPP interne, generati una volta e
@@ -59,6 +52,21 @@ jitsi:
   # il bridge, e fa cadere le chiamate in corso: la resa si ferma finché non
   # sono passate.
   requirePinnedCredentials: true
+  # L'Ingress della conferenza lo rende il chart (quello del sottochart è
+  # spento più sotto): l'host viene da site.conferenceHost, e le annotazioni
+  # si tolgono davvero con null.
+  conferenceIngress:
+    enabled: true
+    className: traefik
+    annotations:
+      # Come per il portale, qui sotto.
+      cert-manager.io/cluster-issuer: null
+    # Come per il portale: vuoto = certificato autofirmato di Traefik. Per un
+    # evento vero, un certificato riconosciuto dai browser:
+    #   tls:
+    #     - secretName: <secret-tls-della-conferenza>
+    # (gli host si omettono: vale site.conferenceHost).
+    tls: []
 
 # ── Portale su Traefik ───────────────────────────────────────
 ingress:
@@ -77,7 +85,7 @@ ingress:
   #     --cert=<catena.pem> --key=<chiave.pem>
   #   tls:
   #     - secretName: pa-webinar-tls
-  #       hosts: [<portale>]
+  # (gli host si omettono: vale site.portalHost).
   tls: []
 
 # Traefik di k3s, con la HelmChartConfig di infra/onprem/k3s, riscrive
@@ -140,11 +148,9 @@ jitsi-meet:
       tag: null
       pullPolicy: IfNotPresent
     ingress:
-      # Solo la classe: niente annotazione `kubernetes.io/ingress.class`, che
-      # se diversa dalla classe fa fermare la resa.
+      # Lo rende il chart: jitsi.conferenceIngress, in testa al file.
+      enabled: false
       ingressClassName: traefik
-      # Come per il portale: vuoto = certificato autofirmato di Traefik; per
-      # un evento vero lo stesso Secret TLS, con il nome della conferenza.
       tls: []
 
   jvb:

@@ -15,6 +15,28 @@
 # Documentazione: docs/DEPLOYMENT.md, docs/CONFIGURATION.md
 # ============================================================================
 
+# ── Nomi pubblici ────────────────────────────────────────────
+# I due nomi DNS dell'installazione, senza schema, porta né percorso (per
+# esempio `webinar.ente.it` e `meet.ente.it`). Valorizzati, il chart ne ricava:
+#   - portalHost: app.env.NEXT_PUBLIC_APP_URL (https://<nome>), l'host
+#     dell'Ingress del portale e gli host delle sue voci `ingress.tls` che non
+#     ne indicano;
+#   - conferenceHost: app.env.NEXT_PUBLIC_JITSI_DOMAIN, l'host e gli host TLS
+#     di `jitsi.conferenceIngress` e quelli del reindirizzamento
+#     `jitsi.webIngress`.
+# Le chiavi esplicite restano valide: se sono scritte devono coincidere, e la
+# resa si ferma quando dicono altro. I valori di esempio di questo file
+# (videocall.example.com) contano come non scritti.
+# Due valori del sottochart della conferenza non si possono ricavare, perché
+# Helm passa i valori di un sottochart così come sono scritti: `jitsi-meet.
+# publicURL` va scritto (https://<conferenceHost>) e, se l'Ingress della
+# conferenza lo rende il sottochart, anche i suoi host. La resa li confronta
+# con conferenceHost e si ferma se non coincidono.
+# Vuoti = nessuna derivazione: valgono le chiavi esplicite, come prima.
+site:
+  portalHost: ""
+  conferenceHost: ""
+
 # ── Application ──────────────────────────────────────────────
 
 app:
@@ -644,6 +666,14 @@ cronjobs:
   # default 600s), invariato.
   jobTtlSeconds: 7200
   dailyJobTtlSeconds: 259200
+  # Per quanti secondi i CronJob che chiamano il portale riprovano (ogni 5 s,
+  # qualunque errore) prima di arrendersi. Copre l'avvio a freddo: dopo la
+  # prima installazione, un riavvio del nodo o un aggiornamento il portale
+  # risponde solo quando PostgreSQL e le migrazioni sono pronti, e con meno
+  # tentativi i primi giri lasciano pod in Error. Deve stare, con il lavoro
+  # vero, dentro activeDeadlineSeconds del CronJob più stretto (120 s:
+  # cleanup e rubrica-retention).
+  portalRetrySeconds: 90
 
   # Email reminders for upcoming events (runs every 15 minutes)
   reminders:
@@ -837,6 +867,36 @@ jitsi:
         hosts:
           - jitsi.videocall.example.com
 
+  # ── Ingress della conferenza reso da questo chart ──
+  # Spento (predefinito) = l'Ingress della conferenza lo rende il sottochart,
+  # da `jitsi-meet.web.ingress`, come sempre. Acceso, lo rende questo chart
+  # con il nome `<fullname>-conference`, e quello del sottochart va spento
+  # (`jitsi-meet.web.ingress.enabled: false`, altrimenti la resa si ferma:
+  # due Ingress per lo stesso host). Serve a due cose che dal sottochart non si
+  # possono fare:
+  #   - togliere un'annotazione predefinita: questa è una mappa del chart, e
+  #     una chiave impostata a null sparisce con ogni versione di Helm. In una
+  #     mappa del sottochart Helm 4 la lascia nel manifesto con valore nullo
+  #     (Helm 3 la toglie);
+  #   - ricavare host e host TLS da `site.conferenceHost` (o, se vuoto, da
+  #     app.env.NEXT_PUBLIC_JITSI_DOMAIN).
+  # Il servizio è quello web del sottochart (`<nome>-web`, porta
+  # `jitsi-meet.web.service.port`), sul percorso `/`. Con una classe elencata
+  # in `ingress.nonNginxClassNames` le annotazioni di ingress-nginx si
+  # tolgono, come per il portale. Resta `jitsi-meet.publicURL`, da scrivere.
+  conferenceIngress:
+    enabled: false
+    # Vuoto = la classe del portale (ingress.className).
+    className: ""
+    # Stessa annotazione predefinita del portale; per toglierla, null.
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+    # Voci {secretName, hosts}: senza `hosts` vale il nome della conferenza;
+    # senza `secretName` il controller usa il certificato che ha (per esempio
+    # quello di un risolutore ACME di Traefik). Vuoto = nessuna sezione tls.
+    tls:
+      - secretName: jitsi-tls
+
   # ── External Jitsi configuration (when jitsi.enabled=false) ──
   external:
     # Jitsi domain as seen by the browser (e.g. jitsi.example.com)
@@ -922,6 +982,11 @@ jitsi-meet:
     jwt:
       secret: ""
       existingSecretName: ""
+    # Solo richieste, come per Jicofo qui sotto.
+    resources:
+      requests:
+        cpu: 50m
+        memory: 128Mi
 
   # Jicofo senza autenticazione propria. Con l'autenticazione accesa (il
   # predefinito del sottochart con `enableAuth`) Jicofo rende moderatore
@@ -936,6 +1001,14 @@ jitsi-meet:
     extraEnvs:
       JICOFO_ENABLE_AUTH: "false"
       ENABLE_AUTO_OWNER: "false"
+    # Solo richieste, nessun limite: senza, lo scheduler non vede Jicofo e,
+    # quando il nodo resta senza memoria, Jicofo, Prosody e la parte web sono
+    # i primi processi uccisi, e la conferenza cade. Valori misurati a riposo
+    # e con una chiamata in corso.
+    resources:
+      requests:
+        cpu: 50m
+        memory: 320Mi
 
   # Lavagna condivisa: non inclusa. La sala la mostra solo se la conferenza ha
   # un server di collaborazione e se app.env.NEXT_PUBLIC_WHITEBOARD_ENABLED è
@@ -953,6 +1026,17 @@ jitsi-meet:
         memory: 4Gi
     nodeSelector: {}
     tolerations: []
+    # Sonda più tollerante di quella del sottochart (1 s, tre tentativi): su
+    # un nodo carico il bridge a riposo veniva riavviato, e il riavvio fa
+    # cadere ogni conferenza. Così un bridge bloccato si riavvia dopo circa un
+    # minuto invece di trenta secondi.
+    livenessProbe:
+      httpGet:
+        path: /about/health
+        port: 8080
+      periodSeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 6
     useHostPort: true
     useNodeIP: true
     UDPPort: 10000
@@ -1005,6 +1089,11 @@ jitsi-meet:
       repository: ghcr.io/italia/pa-webinar-jitsi-web
       tag: stable-10741-rnnoise
       pullPolicy: Always
+    # Solo richieste, come per Jicofo.
+    resources:
+      requests:
+        cpu: 10m
+        memory: 64Mi
     ingress:
       enabled: true
       # Per un altro controller si cambia solo la classe. Niente annotazione
@@ -1012,6 +1101,11 @@ jitsi-meet:
       # annotazione e classe non coincidono, e da qui non la si potrebbe
       # togliere (Helm fonde le mappe dei sottochart).
       ingressClassName: nginx
+      # Una sola chiave di questa mappa impostata a null: Helm 3 la toglie,
+      # Helm 4 la lascia nel manifesto con valore nullo (le note dopo
+      # l'installazione lo segnalano). `annotations: null` le toglie tutte con
+      # entrambi; per scegliere le annotazioni una per una, l'Ingress della
+      # conferenza lo rende il chart (`jitsi.conferenceIngress`).
       annotations:
         cert-manager.io/cluster-issuer: letsencrypt-prod
       hosts:
@@ -1109,6 +1203,44 @@ postgresql:
     # Pre-existing Secret containing DATABASE_URL
     existingSecret: ""
     secretKey: "DATABASE_URL"
+
+# ── Copia del database ───────────────────────────────────────
+# Un CronJob (`<fullname>-backup`) che fa `pg_dump -Fc` del PostgreSQL del
+# chart in un volume (`<fullname>-backup`, oppure `persistence.existingClaim`)
+# e tiene le ultime `retention` copie. Ogni file si chiama
+# `pa-webinar-<AAAAMMGG>T<hhmmss>Z.dump`, è leggibile solo dal proprietario e
+# contiene dati personali: va trattato come il database. Il volume ha
+# `helm.sh/resource-policy: keep`, quindi `helm uninstall` non lo cancella
+# (la cancellazione del namespace sì). Solo con il database del chart
+# (`postgresql.enabled`): un database gestito ha le copie del suo fornitore.
+# Una copia sullo stesso disco del database non protegge dalla perdita del
+# nodo: portala anche altrove. Il ripristino è nelle note dopo
+# l'installazione.
+backup:
+  enabled: false
+  # Ora UTC. Dopo la pulizia dei dati scaduti (cronjobs.cleanup, alle 3):
+  # la copia non conserva ciò che la pulizia ha appena tolto.
+  schedule: "30 3 * * *"
+  # Quante copie tenere, le più recenti. Un dato cancellato dal portale resta
+  # nelle copie per altrettanti giorni.
+  retention: 7
+  # Vuoto = la stessa immagine del PostgreSQL del chart: pg_dump deve essere
+  # della versione del server o più recente.
+  image: ""
+  activeDeadlineSeconds: 3600
+  persistence:
+    size: 10Gi
+    # Vuoto = la classe predefinita del cluster (local-path su k3s).
+    storageClass: ""
+    # Un PVC già presente nel namespace, al posto di quello del chart.
+    existingClaim: ""
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: "1"
+      memory: 512Mi
 
 # ── Redis ────────────────────────────────────────────────────
 #
