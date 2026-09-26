@@ -967,7 +967,7 @@ export default function EventWizard(props: WizardProps) {
 
         // Warn about any side resources that didn't save. The ToastProvider
         // lives in the admin layout, so this toast survives the redirect to
-        // the edit page where the admin can re-add the missing items.
+        // the event page, from where the admin can re-add the missing items.
         if (failed.size > 0) {
           toast.error(t('partialFailure', { items: [...failed].join(', ') }));
         }
@@ -981,7 +981,12 @@ export default function EventWizard(props: WizardProps) {
 
         clearDraft();
 
-        let destination = `/admin/events/${created.id}/edit?created=1`;
+        // La pagina dell'evento, con la sessione dello staff che ha appena
+        // creato l'evento (il wizard la richiede, e chi crea l'evento lo
+        // gestisce). Non la pagina di modifica, che senza il token del
+        // moderatore risponde 404; e il token, credenziale che non scade,
+        // resta fuori dalla barra degli indirizzi e dalla cronologia.
+        let destination = `/admin/events/${created.id}`;
         if (overrideRedirect === '__questionnaires__') {
           destination = `/admin/events/${created.id}/questionnaires`;
         } else if (overrideRedirect) {

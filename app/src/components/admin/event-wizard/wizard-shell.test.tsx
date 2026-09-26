@@ -416,3 +416,51 @@ describe('creazione — pubblicazione non riuscita', () => {
     expect(push).toHaveBeenCalledTimes(1);
   });
 });
+
+/**
+ * Dopo la creazione si arriva alla pagina dell'evento, che vale con la
+ * sessione dello staff. La pagina di modifica senza il token del moderatore
+ * risponde 404, e il primo evento di chi installa sembrava non creato.
+ */
+describe('creazione — dove si arriva', () => {
+  const CREATO = { id: 'evt-new', slug: 'evento-nuovo', moderatorToken: 'token-nuovo' };
+
+  function compila() {
+    renderWizard();
+    type(byId<HTMLInputElement>('ev-title'), 'Evento di prova');
+    type(byId<HTMLTextAreaElement>('ev-description-it'), 'Una descrizione valida per il wizard.');
+    goToStep(w.steps.review);
+    type(byId<HTMLInputElement>('rev-mod-name'), 'Mario Rossi');
+    type(byId<HTMLInputElement>('rev-mod-email'), 'mario@example.org');
+  }
+
+  beforeEach(() => {
+    fetchMock.mockImplementation(async (input: RequestInfo | URL, init: RequestInit = {}) => {
+      const url = String(input);
+      if (url === '/api/events' && init.method === 'POST') return json(201, CREATO);
+      if (url === `/api/events/${CREATO.id}` && init.method === 'PUT') {
+        return json(200, { ...CREATO, status: 'PUBLISHED' });
+      }
+      return json(200, {});
+    });
+  });
+
+  it('«Pubblica» porta alla pagina dell evento, senza il token nell indirizzo', async () => {
+    compila();
+    await press(button(w.publish));
+
+    expect(push).toHaveBeenCalledTimes(1);
+    expect(push).toHaveBeenCalledWith(`/admin/events/${CREATO.id}`);
+  });
+
+  it('«Salva bozza» porta alla stessa pagina', async () => {
+    compila();
+    await press(button(w.saveDraft));
+
+    expect(push).toHaveBeenCalledTimes(1);
+    const [destinazione] = push.mock.calls[0] as [string];
+    expect(destinazione).toBe(`/admin/events/${CREATO.id}`);
+    expect(destinazione).not.toContain('/edit');
+    expect(destinazione).not.toContain(CREATO.moderatorToken);
+  });
+});
