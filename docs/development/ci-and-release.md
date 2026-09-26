@@ -228,7 +228,7 @@ The migration image runs the database migrations in the `db-migrate` init contai
 - **`X.Y.Z-migrate`**, without the `v`. This is the tag the chart computes by itself when `app.migration.image.tag` is empty: it appends `-migrate` to `app.image.tag`, or to the chart's `appVersion` (`pa-webinar.migrationImage` in `infra/helm/pa-webinar/templates/_helpers.tpl`).
 - **`vX.Y.Z-migrate`**, with the `v` of the Git tag. Existing upgrade procedures use this form.
 
-Releases cut before `release.yml` published both forms carry only `vX.Y.Z-migrate`, and for them the chart's computed default does not resolve. Passing both image tags explicitly on every upgrade works for every release, which is what [the drift-safe procedure](../operations/upgrades.md#the-drift-safe-procedure) does.
+Releases cut before `release.yml` published both forms carry only `vX.Y.Z-migrate`, and for them the chart's computed default does not resolve. Passing both image tags explicitly on every upgrade works for every release, which is what [the upgrade procedure](../operations/upgrades.md#the-upgrade-procedure) does. The k3s installer derives both from the checked-out tag.
 
 ### Components published only from `dev`
 
@@ -425,7 +425,7 @@ The tag is strict Semantic Versioning, `vX.Y.Z` with no suffix. `release.yml` st
 
 ## CI builds, it never deploys
 
-No workflow applies anything to a cluster. `dev.yml` and `release.yml` stop at the registry and the GitHub Release, and each installation decides when to move. Operators upgrade with the drift-safe procedure in [Upgrades and rollback](../operations/upgrades.md): start from the values the installation already runs, pass the app and migration image tags explicitly, and check that every image can be pulled before the upgrade. A rollback restores the chart's manifests, not the database schema and not the components published only as `:dev` ([Rollback](../operations/upgrades.md#rollback)).
+No workflow applies anything to a cluster. `dev.yml` and `release.yml` stop at the registry and the GitHub Release, and each installation decides when to move. Operators upgrade with the procedure in [Upgrades and rollback](../operations/upgrades.md): the profile and overlay of the new release, then the installation's own site file, with the app and migration image tags passed explicitly, and a check that every image can be pulled before the upgrade. A rollback restores the chart's manifests, not the database schema and not the components published only as `:dev` ([Rollback](../operations/upgrades.md#rollback)).
 
 ## Related pages
 

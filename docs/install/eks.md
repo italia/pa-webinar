@@ -181,7 +181,7 @@ conference, without an AWS bill.
 ## Checklist
 
 Go through the platform-independent
-[Checklist before you install](README.md#checklist-before-you-install) as
+[Checklists](checklists.md) as
 well. The items below are specific to EKS.
 
 **Before you start**
@@ -215,7 +215,7 @@ well. The items below are specific to EKS.
 - [ ] A video uploaded from the administration area.
 - [ ] A registration email received.
 - [ ] With TURN: a participant joined from a network that blocks UDP.
-- [ ] Database backups arranged (the project has no backup procedure yet).
+- [ ] Database backups arranged, and a [restore drill](checklists.md#restore-drill) done.
 - [ ] Privacy notes updated: region, log retention, TURN.
 
 ## Install
@@ -646,10 +646,10 @@ check that the confirmation email arrives. If it does not, see
 - With the per-participant recorder bot and NetworkPolicy on (the
   `values-eks.yaml` default): add the rule its pods need
   ([Before enabling the NetworkPolicy](../architecture/background-jobs.md#before-enabling-the-networkpolicy)).
-- Arrange database backups: RDS snapshots, or your own procedure for the
-  in-cluster volume. The project has none yet, and the backup must be kept
-  together with `PII_ENCRYPTION_KEY`, without which personal data cannot be
-  read ([Checklist before you install](README.md#checklist-before-you-install)).
+- Arrange database backups: RDS snapshots, or `scripts/backup.sh` for the
+  in-cluster database. The backup must be kept together with
+  `PII_ENCRYPTION_KEY`, without which personal data cannot be read
+  ([Restore drill](checklists.md#restore-drill)).
 - Update your privacy notes: the AWS region, CloudWatch log retention
   (`cluster_log_retention_days`, 90 days by default, for the control-plane
   `api`, `audit` and `authenticator` logs) and, with TURN, the relay
@@ -826,8 +826,8 @@ hour ([Costs to plan for](../../infra/tofu/eks/README.md#costs-to-plan-for)).
 
 ## Upgrades
 
-- **PA Webinar releases.** Follow the drift-safe procedure in
-  [Upgrades and rollback](../operations/upgrades.md#the-drift-safe-procedure),
+- **PA Webinar releases.** Follow the upgrade procedure in
+  [Upgrades and rollback](../operations/upgrades.md#the-upgrade-procedure),
   passing the same five files, with both new image tags. An upgrade that
   changes the bridge's pod template starts the new bridge next to the old one
   behind the same address, and the conferences on the old bridge end when it
@@ -871,8 +871,8 @@ Controller created, and does not empty the bucket. In this order:
 - **Bridge upgrades end conferences.** See [Upgrades](#upgrades).
 - **The in-cluster database is zonal.** Its EBS volume binds it to one zone,
   and Cluster Autoscaler cannot always add a node in that zone to a
-  multi-zone group. Use RDS for production. The project has no backup
-  procedure yet.
+  multi-zone group. Use RDS for production. `scripts/backup.sh` and
+  `scripts/restore.sh` cover the in-cluster database, not the object store.
 - **Static storage keys only.** The secret key sits in the OpenTofu state.
 - **Images.** The portal images need a pull Secret or a copy in ECR. Docker
   Hub limits anonymous pulls per source address, and every private node

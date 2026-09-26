@@ -31,7 +31,7 @@ flowchart LR
 
   subgraph OPS["Install and operate"]
     direction TB
-    INSTD["install/<br/>minikube, k3s,<br/>AKS, GKE, EKS"]:::data
+    INSTD["install/<br/>minikube, k3s,<br/>AKS, GKE, EKS,<br/>checklists"]:::data
     INFRA["INFRASTRUCTURE.md<br/>sizing evidence, network,<br/>policies, images"]:::data
     DEP["DEPLOYMENT.md<br/>the Helm chart"]:::data
     OPSD["operations/<br/>upgrades, scaler, recording,<br/>monitoring, troubleshooting"]:::data
@@ -106,9 +106,10 @@ For the IT staff who install and run an installation. Start with [Installing PA 
 
 | Page | What it answers |
 |---|---|
-| [Installing PA Webinar](install/README.md) | Which platform to run (a workstation, one VM, three VMs, or managed Kubernetes on AKS, GKE or EKS), the checklist before you install, the measured requirements, how scaling works, and the known limitations: TURN, ingress controllers and proxies, UDP load balancers, network plugins, registry access and high availability. |
-| [Try PA Webinar on minikube](install/minikube.md) | The evaluation path: one command, `scripts/minikube-up.sh`, installs the chart on a workstation. First steps, measured usage, troubleshooting, the installation by hand and what the minikube overlay changes. |
-| [Installing on your own VMs with k3s](install/k3s.md) | One or three VMs with the scripts in `infra/onprem/k3s`: layouts, ports, proxies and air-gapped nodes, RHEL with SELinux, certificates, backups, failure behavior and measurements. |
+| [Installing PA Webinar](install/README.md) | What each platform is supported for (evaluation, small production on one k3s server, production on managed Kubernetes), the stack at a glance with every component's ports, state and failure impact, choosing a platform, the constraints by platform (NAT, blocked UDP, proxies, air gap, private CA, object storage, intranet, recordings), the measured requirements, how scaling works, and the known limitations. |
+| [Checklists](install/checklists.md) | Every checklist in one place, with an owner per item: pre-install checks by constraint, services and accounts, workstation and server preflight, post-install verification, go-live, security hardening for one server, the day-2 routine, upgrades per platform, the restore drill, secrets rotation and decommissioning. |
+| [Try PA Webinar on minikube](install/minikube.md) | The evaluation and development path: one command, `scripts/minikube-up.sh`, installs the chart on a workstation. First steps, the development loop, more than one profile, measured usage, troubleshooting, the installation by hand and what the minikube overlay changes. |
+| [Installing on your own VMs with k3s](install/k3s.md) | One server with one command, `infra/onprem/k3s/pa-webinar-up.sh`, or three nodes by hand: the support level, ports, certificates, images without registry access, object storage and TURN, checks, backup and restore, upgrades, removal, proxies and air-gapped nodes, RHEL with SELinux, failure behavior and measurements, and the manual procedure as an appendix. |
 | [Installing on AKS](install/aks.md), [GKE](install/gke.md) and [EKS](install/eks.md) | The full profile on a managed cluster, from the reference OpenTofu module to a first event: decisions, checklist, install steps, bridge and TURN exposure, storage, scaling, upgrades and what has been verified. |
 | [Infrastructure reference](INFRASTRUCTURE.md) | The evidence and the design behind the guides: how the lab measured capacity, what a participant costs on the bridge, node pools and bridge exposure on any cluster, ports, advertised addresses, TURN, TLS, ingress controllers and client addresses, the chart's NetworkPolicy, the published images and the chart issues the lab installs found. |
 | [Deploying with Helm](DEPLOYMENT.md) | The chart reference and install guide: what the chart renders, the `simple`, `standard` and `full` profiles, secrets, hostnames and ingress, the Jitsi keys, NetworkPolicy, metrics and first-run checks. |
@@ -117,7 +118,7 @@ For the IT staff who install and run an installation. Start with [Installing PA 
 
 | Page | What it answers |
 |---|---|
-| [Upgrades and rollback](operations/upgrades.md) | How to upgrade without drifting from the live values, how to roll back, and what a rollback does not restore. |
+| [Upgrades and rollback](operations/upgrades.md) | How to upgrade with the same layered files as the install, backups with `scripts/backup.sh` and the chart's CronJob, restoring with `scripts/restore.sh`, how to roll back, and what a rollback does not restore. |
 | [Running the JVB scaler](operations/jvb-scaler.md) | How to enable, tune, validate and pause the job that scales the bridges in the `full` profile. |
 | [Setting up recording](operations/recording-setup.md) | Which values turn on composite video (Jibri), per-speaker audio (the recorder bot), or both, and how to check that each works. |
 | [Monitoring and health](operations/monitoring.md) | Health probes, the status pages, metrics and their authentication, alert rules, Grafana dashboards and logs. |
@@ -234,7 +235,7 @@ Each of these files sits next to the code it describes.
 | [`infra/jitsi-web-patched/README.md`](../infra/jitsi-web-patched/README.md) | The patched `jitsi/web` image: the three fixes, patching by shape, building, bumping to a new Jitsi release and verification. |
 | [`infra/jitsi/README.md`](../infra/jitsi/README.md) | The custom Prosody module and the two Jibri finalize scripts, and which script the chart uses. |
 | [`infra/helm/pa-webinar/README.md`](../infra/helm/pa-webinar/README.md) | The short README that travels inside the packaged chart, pointing to the full documentation. |
-| [`infra/onprem/k3s/README.md`](../infra/onprem/k3s/README.md) | The reference for the k3s installation scripts: every option, proxies, registry mirrors, air-gapped nodes and SELinux. The procedure is in [Installing on your own VMs with k3s](install/k3s.md). |
+| [`infra/onprem/k3s/README.md`](../infra/onprem/k3s/README.md) | The reference for each k3s script: `pa-webinar-up.sh`, `pa-webinar-down.sh`, the node scripts and `preload-images.sh`, with their options. The object store and TURN add-ons have their own, [`infra/onprem/k3s/addons/README.md`](../infra/onprem/k3s/addons/README.md). The procedure is in [Installing on your own VMs with k3s](install/k3s.md). |
 | [`infra/tofu/aks/README.md`](../infra/tofu/aks/README.md), [`gke`](../infra/tofu/gke/README.md), [`eks`](../infra/tofu/eks/README.md) | The reference OpenTofu modules for the managed clouds: what each creates, its variables and outputs, network rules and what has been verified. |
 | [`infra/aks/node-pools.md`](../infra/aks/node-pools.md) | The JVB pool contract that every bridge pool must meet, and how to add the pool to an AKS cluster you already have. |
 | [`infra/service-inventory/azure/README.md`](../infra/service-inventory/azure/README.md) | The reference Azure automation for the operational half of the service inventory, and what it publishes. |
@@ -250,6 +251,9 @@ Each of these files sits next to the code it describes.
 |---|---|
 | Which platform fits our administration, and how large must it be? | [Installing PA Webinar: choose a platform](install/README.md#choose-a-platform) and [requirements](install/README.md#requirements) |
 | How do I try PA Webinar on my workstation? | [Try PA Webinar on minikube](install/minikube.md) |
+| How do I install PA Webinar on one server of my own? | [Install with one command](install/k3s.md#install-with-one-command) |
+| What do I check before, during and after an installation? | [Checklists](install/checklists.md) |
+| How do I back up and restore an installation? | [Backup and restore](install/k3s.md#backup-and-restore) and [Restore a backup](operations/upgrades.md#restore-a-backup) |
 | How many participants can one bridge carry? | [Load testing: reference measurements](LOAD-TESTING.md#reference-measurements) and [Scaling: sizing](architecture/scaling.md#sizing-from-an-event-to-a-number-of-bridges) |
 | Which ports must the firewall open? | [Infrastructure reference: ports and firewall](INFRASTRUCTURE.md#ports-and-firewall) |
 | How do I install on Kubernetes? | The guide for your platform, from [Installing PA Webinar](install/README.md#choose-a-platform), and [Deploying with Helm: install walkthroughs](DEPLOYMENT.md#install-walkthroughs) for any other cluster |

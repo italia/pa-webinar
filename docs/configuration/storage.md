@@ -282,7 +282,8 @@ Per service:
 | Service | Endpoint | Region | `RECORDING_STORAGE_TYPE` |
 |---|---|---|---|
 | AWS S3 | leave unset | the bucket's region | `s3` |
-| MinIO, on-premises or sovereign-cloud S3 | the service URL | as the service requires (MinIO accepts any value) | `s3` |
+| Garage on one k3s server, installed by [`infra/onprem/k3s/addons/storage.sh`](../../infra/onprem/k3s/addons/README.md) | `https://s3.<portal>`, through Traefik | `garage` | leave unset: without Jibri, the recordings domain is enabled by `RECORDING_S3_BUCKET` alone, for uploaded and published videos |
+| MinIO, on-premises or sovereign-cloud S3 | the service URL | as the service requires (MinIO accepts any value) | `s3`. The lab could not pull MinIO's images anonymously: check how they are distributed before you plan on them |
 | Google Cloud Storage | `https://storage.googleapis.com`, with HMAC keys from the bucket's interoperability settings | `auto` | `gcs` |
 | Cloudflare R2 | `https://<account-id>.r2.cloudflarestorage.com` | `auto` | `s3` |
 | Wasabi and other S3 services | the service URL | the service's region | `s3` |
@@ -709,8 +710,13 @@ Known gaps:
   per-participant audio but does not run AI post-production never reaches the
   purge step (see **Participant tracks without the post-production pipeline**
   in the [roadmap](../ROADMAP.md)).
-- **No backup.** Nothing backs up or restores the object store (see
-  **Backup and restore** in the [roadmap](../ROADMAP.md)).
+- **Backup only for a store in the cluster.** The `--include-storage`
+  option of `scripts/backup.sh` and `scripts/restore.sh` covers an object
+  store on a volume of the cluster, such as the Garage add-on of one k3s
+  server, and stops it for the whole copy
+  ([Backup and restore](../install/k3s.md#backup-and-restore)). A provider's
+  bucket is backed up with the provider's tools (see **Backup and restore of
+  the object store** in the [roadmap](../ROADMAP.md)).
 
 ## Changing provider or bucket
 

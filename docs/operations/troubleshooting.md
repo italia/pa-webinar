@@ -11,6 +11,12 @@ Other failure modes are documented next to the component they belong to:
 - upgrades and rollbacks: [upgrades.md](upgrades.md);
 - probes, status pages, metrics and alerts: [monitoring.md](monitoring.md).
 
+Whatever the symptom, `scripts/verify-install.sh` is a quick first look: it
+names the failing part among the pods, the certificates, the portal's
+components, the conference, the scheduled jobs, the email outbox and the
+database disk, and `--call` tests a call between two browsers
+([Post-install verification](../install/checklists.md#post-install-verification)).
+
 ## Before you start
 
 ### Names used on this page
@@ -22,7 +28,7 @@ Commands assume a release named `pa-webinar` in the namespace `pa-webinar`. With
 | App Deployment, Service (port 3000, named `http`) and Ingress | `<fullname>` | `pa-webinar` |
 | CronJobs | `<fullname>-<job>` | `pa-webinar-email-outbox`, `pa-webinar-jvb-scaler`, … |
 | Jitsi components | `<release>-jitsi-meet-<component>` | `pa-webinar-jitsi-meet-web`, `pa-webinar-jitsi-meet-jvb-0`, `pa-webinar-jitsi-meet-jicofo`, StatefulSet `pa-webinar-jitsi-meet-prosody` (pod `pa-webinar-jitsi-meet-prosody-0`) |
-| Application Secret | `secrets.existingSecretName` | `videocall-secrets`, the default in `values.yaml` |
+| Application Secret | `secrets.existingSecretName` | `videocall-secrets`, the default in `values.yaml`; `pa-webinar-secrets` with the k3s installer |
 
 Labels to select pods:
 
@@ -308,7 +314,7 @@ Green boxes are fixes; the red box means the cause is elsewhere, so collect the 
 
    The install notes warn when the bridge uses a third-party STUN server, and when it has neither STUN nor `publicIPs`. Choosing among these is covered in [INFRASTRUCTURE.md](../INFRASTRUCTURE.md#advertised-addresses-and-nat).
 4. **Each bridge has an address of its own.** When `kubectl -n pa-webinar get deploy pa-webinar-jitsi-meet-jvb-0` shows more than one replica and they advertise the same address (typically one load balancer), a participant's flows can land on a bridge that does not host their conference, and they drop. Cap the platform at one bridge until each bridge is reachable on its own address ([scaling.md](../architecture/scaling.md#the-single-ip-pitfall)). With the JVB scaler, set `app.env.JVB_MAX_REPLICAS: "1"`, which caps the replica count the scaler requests. Without the scaler, the count comes from `jitsi-meet.jvb.replicaCount`: set it to `1`.
-5. **Restrictive networks have a relay.** Participants on networks that allow only TCP 443 need TURN over TLS. coturn is off in the subchart's defaults (`jitsi-meet.coturn.enabled: false`). Check with `kubectl -n pa-webinar get pods,svc -l app.kubernetes.io/component=coturn`, and enable it with `jitsi-meet.turnHost` and `jitsi-meet.coturn.turns.enabled` ([DEPLOYMENT.md](../DEPLOYMENT.md)). Prosody announces the relay to the clients.
+5. **Restrictive networks have a relay.** Participants on networks that allow only TCP 443 need TURN over TLS. coturn is off in the subchart's defaults (`jitsi-meet.coturn.enabled: false`). Check with `kubectl -n pa-webinar get pods,svc -l app.kubernetes.io/component=coturn`, and enable it with `jitsi-meet.turnHost` and `jitsi-meet.coturn.turns.enabled` ([DEPLOYMENT.md](../DEPLOYMENT.md)). Prosody announces the relay to the clients. On one k3s server the relay comes from `pa-webinar-up.sh --turn` instead: coturn listens on UDP 3478, and Traefik ends TLS for `turn.<portal>` on the portal's port 443 and forwards to coturn, which holds no certificate ([Object storage and TURN](../install/k3s.md#object-storage-and-turn)).
 6. **The relay works.** The TURN host presents a valid certificate, and coturn may relay to the bridges:
 
    ```bash
@@ -316,7 +322,9 @@ Green boxes are fixes; the red box means the cause is elsewhere, so collect the 
      | openssl x509 -noout -subject -enddate
    ```
 
-   When coturn reaches the bridges on internal addresses, `jitsi-meet.coturn.allowedPeerIPs` must cover the node or pod range.
+   When coturn reaches the bridges on internal addresses, `jitsi-meet.coturn.allowedPeerIPs` must cover the node or pod range. On one k3s server, `infra/onprem/k3s/addons/turn.sh --check --host turn.<portal>` sends a STUN request to UDP 3478 and one inside TLS on 443, and both must answer; add `--cacert` with a private authority.
+
+   In `chrome://webrtc-internals` a participant who relays shows a selected candidate pair whose local candidate is of type `relay`, with relay protocol `udp` or `tls`. Chrome on a machine with several network interfaces (VPN adapters, virtualization or Docker bridges) can discard its TURN over TLS candidates, with "Address not associated with the desired network interface" in `chrome://webrtc-internals` or in an `icecandidateerror` event. It was seen on a lab host with several interfaces, and not on one with a single interface: test the relay from an ordinary client machine.
 
 A change to the web custom configuration (for example a relay-only `iceTransportPolicy` in `jitsi-meet.web.custom.configs._custom_config_js`) reaches browsers only after the web pod restarts. The chart's config-reload hook does that after every install and upgrade.
 
@@ -501,7 +509,7 @@ What the platform logs, and how long operators should keep it, is covered in [GD
 
 - [Deploying with Helm](../DEPLOYMENT.md): the chart reference and first-run checks.
 - [Installing PA Webinar](../install/README.md): choosing and sizing a platform; [Infrastructure](../INFRASTRUCTURE.md): network design, firewall and TURN.
-- [Upgrades and rollback](upgrades.md): the drift-safe procedure and what does not roll back.
+- [Upgrades and rollback](upgrades.md): the upgrade procedure, backups, restores, and what does not roll back.
 - [Monitoring and health](monitoring.md): probes, status pages, metrics, alerts and logs.
 - [Running the JVB scaler](jvb-scaler.md): enabling, tuning, validating and pausing the scaler.
 - [Setting up recording](recording-setup.md): values for Jibri and the recorder bot.

@@ -184,7 +184,7 @@ panel.
 | **Infra sizing** tab | Bridge sizing, default sender ratio, default grace period, default video quality | This page and [scaling](../architecture/scaling.md) |
 | **Post-event AI pipeline** tab | Kill switch, engines, default translation languages, limits, artifact retention, waiting-room AI notice | This page and [AI post-production](../POSTPROD.md) |
 | **Language management** page (`/en/admin/settings/languages`) | `defaultLocale`, `availableLocales`, `localeNames`, `translationOverrides` | [Languages and localization](../architecture/i18n.md#runtime-language-settings) |
-| No field in the panel | `orphanRecordingGraceDays` | Set it through `PUT /api/admin/settings` ([writing a field the panel does not show](#writing-a-field-the-panel-does-not-show)) |
+| No field in the panel | `orphanRecordingGraceDays` | Set it through `PUT /api/admin/settings` ([writing a field the panel does not show](#writing-a-field-the-panel-does-not-show)), or on a chart installation with `scripts/restore.sh --reset-orphan-grace <days>` ([Restore a backup](../operations/upgrades.md#restore-a-backup)) |
 
 ## Setting groups
 

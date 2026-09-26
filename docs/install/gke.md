@@ -130,7 +130,7 @@ README and `examples/values-full.yaml`, whose Secret names
 
 Tick every item in order. The details are in the sections that follow. The
 items that apply to every platform, and the organizational ones, are in
-[Checklist before you install](README.md#checklist-before-you-install).
+[Checklists](checklists.md).
 
 **Before `tofu apply`**
 
@@ -193,7 +193,8 @@ items that apply to every platform, and the organizational ones, are in
       ([Mount the finalize script](../operations/recording-setup.md#mount-the-finalize-script)).
 - [ ] A decision on TURN, and on where logs live
       ([Logs and personal data](#logs-and-personal-data)).
-- [ ] A database backup of your own: the project has no backup procedure yet
+- [ ] Database backups: Cloud SQL's, or `scripts/backup.sh` for the
+      in-cluster database, and a [restore drill](checklists.md#restore-drill)
       ([Backups](../REUSE.md#backups)).
 
 ## Minimum requirements

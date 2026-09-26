@@ -237,7 +237,7 @@ through values:
 | `successfulJobsHistoryLimit`, `failedJobsHistoryLimit` | `3`, `3` | The last three successful runs and the last three failed runs are kept, with their pods and logs. |
 | `ttlSecondsAfterFinished` | `cronjobs.jobTtlSeconds` (`7200` in `values.yaml`) | This one is configurable. It removes finished Jobs and their pods. |
 | Timeout for each bridge probe | `curl --max-time 3` inside the bridge | One slow bridge cannot stall the run. |
-| Call to the portal | `curl -sf --retry 3 --retry-delay 5 --retry-connrefused --connect-timeout 5` | `--retry-connrefused` also retries a refused connection, so short portal restarts are absorbed. `-f` turns an HTTP error, such as a rejected key or a 5xx, into an empty response. |
+| Call to the portal | `curl -sf --retry-connrefused`, every 5 seconds for up to `cronjobs.portalRetrySeconds` (`90` in `values.yaml`) | The same options as every CronJob that calls the portal (`pa-webinar.cronCurlRetry`). A refused connection, a timeout and the transient answers 408, 429, 500, 502, 503 and 504 are retried, so a portal restart or a cold start is absorbed. A 401, 403 or 404, such as a rejected key, fails at once. `-f` turns an HTTP error into an empty response. |
 
 Two behaviors affect alerting:
 

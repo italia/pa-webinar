@@ -16,7 +16,7 @@ guide for your platform:
 - <a id="choosing-a-setup"></a><a id="before-you-install"></a>**Choosing**:
   [Installing PA Webinar](install/README.md), with its
   [decision tree](install/README.md#choose-a-platform) and
-  [checklist](install/README.md#checklist-before-you-install).
+  [checklists](install/checklists.md).
 - <a id="evaluation-minikube"></a>**Evaluation on a workstation**:
   [Try PA Webinar on minikube](install/minikube.md).
 - <a id="single-node-k3s-on-one-vm"></a><a id="three-nodes-k3s-on-three-vms"></a>**Your own VMs**:
@@ -284,23 +284,11 @@ click through the application, or for small calls with the bridge heap
 capped.
 
 On a shared or overloaded host, an idle bridge was also restarted by its
-liveness probe (1 s timeout, three failures), and a bridge restart drops every
-conference on it. The subchart accepts a more tolerant probe, and
-`examples/values-minikube.yaml` uses it. In the minikube run on 2 CPU / 2 GB,
-where most other pods restarted, the bridge did not. It has not been tested on
-k3s or on a managed cluster:
-
-```yaml
-jitsi-meet:
-  jvb:
-    livenessProbe:
-      httpGet:
-        path: /about/health
-        port: 8080
-      periodSeconds: 10
-      timeoutSeconds: 5
-      failureThreshold: 6
-```
+liveness probe when the probe gave up after 1 s and three failures, and a
+bridge restart drops every conference on it. The chart's default probe is
+more tolerant: `/about/health` on port 8080, every 10 s, with a 5 s timeout
+and six failures (`jitsi-meet.jvb.livenessProbe`). In the minikube run on
+2 CPU / 2 GB, where most other pods restarted, the bridge did not.
 
 ## Node pools and bridge exposure
 
@@ -449,20 +437,22 @@ topology is not yet verified. It is the prerequisite for raising
 | 443 | TCP | Internet | Ingress | Portal and conference: HTTPS, the conference WebSocket and BOSH, the live-room event streams |
 | 80 | TCP | Internet | Ingress | Only for HTTP-01 certificate validation and the redirect to HTTPS |
 | 10000 | UDP | Internet | Each bridge node, or the bridge load balancer | Media, directly between browsers and the bridge |
-| 3478 | UDP | Internet | coturn, on its own IP | STUN and TURN. TCP instead of UDP only with `jitsi-meet.coturn.turn.transport: tcp` |
-| 443 | TCP | Internet | coturn, on its own IP | TURN over TLS, for networks that allow only 443 |
+| 3478 | UDP | Internet | coturn, on its own IP; on one k3s server, the server | STUN and TURN. TCP instead of UDP only with `jitsi-meet.coturn.turn.transport: tcp` |
+| 443 | TCP | Internet | coturn, on its own IP; on one k3s server, the ingress's 443, shared by name | TURN over TLS, for networks that allow only 443 |
 | 80 | TCP | Internet | coturn, on its own IP | Only for the subchart's ACME proxy, when coturn's certificate comes from HTTP-01 |
 | 6443 | TCP | Administrators and k3s agents only | k3s server | Kubernetes API. Never from the Internet |
 | 8472 and 10250 | UDP and TCP | Every k3s node | Every k3s node | Pod network (flannel VXLAN, UDP 8472) and kubelet (TCP 10250), with more than one node |
 | 587 (465) | TCP | Cluster | SMTP relay | Email |
 | 443 | TCP | Cluster | Object storage | Recordings, materials, AI outputs |
-| 443 | TCP | Browsers | Object storage | Video uploads from the administration area, and playback through signed URLs |
+| 443 | TCP | Browsers | Object storage | Video uploads from the administration area, and playback through signed URLs. On one k3s server with the Garage add-on, the ingress's 443 on `s3.<portal>` |
 
-Media never passes through the portal or the ingress:
+Media never passes through the portal. It passes through the ingress only
+with the TURN add-on of one k3s server, where Traefik carries TURN over TLS:
 
 ```text
 Open network:        browser --UDP 10000--> bridge
 UDP blocked:         browser --TLS 443--> coturn --UDP--> bridge
+UDP blocked, k3s:    browser --TLS 443--> Traefik --TCP 3478--> coturn --UDP--> bridge
 ```
 
 ### Advertised addresses and NAT
@@ -524,9 +514,22 @@ UDP blocked:         browser --TLS 443--> coturn --UDP--> bridge
 Participants behind firewalls that block UDP, which is common in public-sector
 networks, need TURN over TLS on port 443. The chart includes coturn as an
 option of the Jitsi subchart, configured as in
-[coturn (TURN and TURNS)](DEPLOYMENT.md#coturn-turn-and-turns). Only the AKS
-reference installation runs it; none of the lab setups did. What the topology
-needs:
+[coturn (TURN and TURNS)](DEPLOYMENT.md#coturn-turn-and-turns). The AKS
+reference installation runs it, and the k3s add-on was tested in lab.
+
+**On one k3s server**, `infra/onprem/k3s/addons/turn.sh` needs no second
+address: coturn listens on UDP 3478 through ServiceLB, and TURN over TLS
+shares port 443 with the portal. Traefik routes `turn.<domain>` by name
+(`IngressRouteTCP` with `HostSNI`), ends TLS with the same certificate mode as
+the portal, and forwards TURN over TCP to coturn, which holds no certificate
+and needs no restart on renewal. The script sets the relay address
+(`REAL_EXTERNAL_IP`), and limits coturn's outbound traffic to the bridge. In
+the lab, with the server's firewall dropping UDP 10000, two browsers relayed
+through TURN on UDP 3478; dropping UDP 10000 and 3478 as well, they relayed
+through TURN over TLS on 443. Both had audio and video
+([Object storage and TURN](install/k3s.md#object-storage-and-turn)).
+
+**On a managed cluster** the topology needs:
 
 - **Its own address and a third DNS name** (`turn.webinar.example.com`). The
   certificate cannot be validated with plain HTTP-01 through the ingress,
@@ -550,22 +553,29 @@ needs:
 - **Per platform.** On EKS, coturn's UDP needs a Network Load Balancer, and
   `values-eks.yaml` refuses to render an unpinned shared secret. On GKE, the
   reserved address and UDP with TCP on one Service need recent GKE versions
-  ([TURN on GKE](install/gke.md#turn-turn_enabled)). On k3s, ServiceLB cannot
-  bind 443 on a node where Traefik already holds it: use MetalLB with a second
-  IP. Not tested.
+  ([TURN on GKE](install/gke.md#turn-turn_enabled)).
+- **The relay address.** Without an Internet lookup from the pod, coturn
+  announces its relays as `0.0.0.0`, and relay-only participants get no media:
+  set `jitsi-meet.coturn.extraEnvs.REAL_EXTERNAL_IP`. The AKS, GKE and EKS
+  examples rely on coturn reaching the Internet.
 
 ### DNS and TLS
 
 - Two names are needed even in the simple profile: the portal and the
   conference are served by separate Ingresses. TURN over TLS needs a third.
 - The chart annotates both Ingresses for cert-manager with a ClusterIssuer named
-  `letsencrypt-prod`. If you use cert-manager, create an issuer with that name.
+  `letsencrypt-prod`, except where the k3s and minikube overlays remove the
+  annotation. If you use cert-manager, create an issuer with that name.
   HTTP-01 needs port 80 reachable from the Internet. Otherwise use DNS-01 with
   your DNS provider. Use DNS-01 as well where inbound sources are restricted,
   which closes port 80 to the certificate authority, and on k3s while
   `traefik-config.yaml` redirects port 80 to HTTPS, the challenge included.
+- On one k3s server, `pa-webinar-up.sh --tls acme` has Traefik ask for the
+  certificates itself, validated on port 443 (TLS-ALPN-01), with no
+  cert-manager and no DNS API ([Certificates](install/k3s.md#certificates)).
 - To use your own certificates, create TLS Secrets and reference them in
-  `ingress.tls` and `jitsi-meet.web.ingress.tls`:
+  `ingress.tls` and `jitsi.conferenceIngress.tls` (or
+  `jitsi-meet.web.ingress.tls` with the subchart's Ingress):
 
   ```bash
   kubectl -n pa-webinar create secret tls pa-webinar-portal-tls --cert=<portal.crt> --key=<portal.key>
@@ -588,10 +598,10 @@ needs:
   authority (an SMTP relay, object storage, an external Jitsi), mount the
   authority with `app.extraCaCerts`; the chart sets `NODE_EXTRA_CA_CERTS`
   ([Configuration reference](CONFIGURATION.md#extra-certificate-authorities)).
-- The minikube script signs the lab's certificates with a local certificate
-  authority of its own ([Try PA Webinar on minikube](install/minikube.md));
-  other lab setups used nip.io names and the ingress controller's self-signed
-  default certificate. Neither is suitable for real participants.
+- The minikube script, and the k3s installer with `--tls private-ca`, sign
+  the certificates with a certificate authority of the installation, which
+  browsers must be told to trust. That suits an intranet or a trial, not
+  external participants.
 
 ### Ingress controllers
 
@@ -767,10 +777,10 @@ namespace:
   | Cloud load balancers that send traffic straight to pods (GKE container-native, ALB IP targets) | Not a namespace: add an `ipBlock` rule for their ranges in `networkPolicy.ingress.extraRules` (not tested) |
 
 - **The recorder bots**, if you record per participant: their pods do not
-  carry the release's selector labels and need an `ingress.extraRules` entry
+  carry the release's selector labels and need a `networkPolicy.ingress.extraRules` entry
   ([Before enabling the NetworkPolicy](architecture/background-jobs.md#before-enabling-the-networkpolicy)).
 - **Services the portal calls inside the cluster**: an in-cluster Prometheus
-  (`PROMETHEUS_URL`) or S3 endpoint, in `egress.extraRules`; NodeLocal DNSCache
+  (`PROMETHEUS_URL`) or S3 endpoint, in `networkPolicy.egress.extraRules`; NodeLocal DNSCache
   or Cloud DNS in `egress.dns.to`.
 - **The Jitsi egress ports**, if you replace `egress.jitsi.ports`: keep 80 and
   8888, or the status page reports the conference's web page and Jicofo as
@@ -850,10 +860,11 @@ combination. See
   Secret when it has credentials, and otherwise builds your checkout and loads
   it into the node
   ([Choose how the images arrive](install/minikube.md#choose-how-the-images-arrive)).
-- k3s: `infra/onprem/k3s/preload-images.sh` saves every image the chart renders
-  into one archive, on a machine that has registry credentials, and imports it
-  on each node, which never sees the credentials and may have no Internet
-  access ([Installing on your own VMs with k3s](install/k3s.md)).
+- k3s: `pa-webinar-up.sh` builds the application images from the checkout and
+  imports them into the server over ssh. For servers with no Internet,
+  `infra/onprem/k3s/preload-images.sh build` builds them and bundles every
+  other image the chart renders into one archive, which `import` loads on each
+  node ([Images without registry access](install/k3s.md#images-without-registry-access)).
 - Any cluster: push to your own registry, then set `app.imagePullSecrets`, and
   `jitsi-meet.imagePullSecrets` if the Jitsi images come from it too.
 
@@ -899,19 +910,20 @@ roadmap. **Distributed rate limiting** is under [Later](ROADMAP.md#later).
 ### Chart issues found by the lab installs
 
 The chart still has the issues below. The last column gives the workaround,
-where there is one.
+where there is one. The requests of Jicofo, Prosody and Jitsi web, and a
+tolerant liveness probe for the bridge, are chart defaults on every profile.
 
 | Issue | Effect | Workaround |
 |---|---|---|
 | Internal Jitsi credentials left empty (Jicofo, bridge, and Jibri, the recorder and coturn when enabled) are random on every render | Every `helm upgrade` drops live conferences | Pin them. The post-install notes list the unpinned ones, and `jitsi.requirePinnedCredentials: true` makes the render fail ([Pin the conference's internal credentials](DEPLOYMENT.md#pin-the-conferences-internal-credentials)). The minikube, k3s, GKE and EKS overlays set it; on AKS it goes in your private values file |
-| `annotations: {}` clears nothing, including in the simple profile | Default annotations remain | Set each key to `null`. For classes in `ingress.nonNginxClassNames` the chart drops the ingress-nginx annotations itself |
-| The recorder bot's pods are not admitted by the NetworkPolicy | With the policy on, per-participant recording captures nothing | An `ingress.extraRules` entry ([Before enabling the NetworkPolicy](architecture/background-jobs.md#before-enabling-the-networkpolicy)) |
+| `annotations: {}` clears nothing, including in the simple profile: Helm merges maps | Default annotations remain | Set each key to `null`: on the portal Ingress and on `jitsi.conferenceIngress` that removes it with any Helm. On the subchart's `jitsi-meet.web.ingress.annotations`, Helm 3.16 removes a key-level `null` and Helm 4.2 keeps it as `null` (the notes warn): use `jitsi.conferenceIngress`, as the k3s and minikube overlays do, or `annotations: null` for the whole map. For classes in `ingress.nonNginxClassNames` the chart drops the ingress-nginx annotations itself |
+| The recorder bot's pods are not admitted by the NetworkPolicy | With the policy on, per-participant recording captures nothing | A `networkPolicy.ingress.extraRules` entry ([Before enabling the NetworkPolicy](architecture/background-jobs.md#before-enabling-the-networkpolicy)) |
 | The bridge heap is not capped | A 4 GiB node thrashes and drops the conference | [Bridge memory on small nodes](#bridge-memory-on-small-nodes). `examples/values-minikube.yaml` caps it |
-| Jicofo, Prosody and Jitsi web have no resource requests | First to be killed under memory pressure | Add small requests. `examples/values-minikube.yaml` sets Jicofo 50m / 320Mi, Prosody 50m / 128Mi and web 10m / 64Mi, tested on minikube |
 | The bridge's default STUN server is a third-party service | An outbound dependency, and an extra advertised address. The post-install notes warn | [Advertised addresses and NAT](#advertised-addresses-and-nat) |
 | `db-migrate` starts before PostgreSQL is ready | A few restarts on the first install; early jobs end in `Error` | Wait: it resolves on its own |
 | Jibri is enabled by the standard and full profiles, but the chart renders its finalize script without mounting it | Composite recordings are neither uploaded nor registered | [Mount the finalize script](operations/recording-setup.md#mount-the-finalize-script) |
 | The conference-root redirect is an ingress-nginx annotation | No redirect with other controllers; the notes warn when the redirect's class is in `ingress.nonNginxClassNames` | None |
 | Object storage accepts only static keys | IRSA, EKS Pod Identity and GKE or Azure workload identity cannot be used | Static keys |
 | `REDIS_URL` ends in `svc.cluster.local` | Chat fan-out fails on clusters with a custom cluster domain | Keep the default domain |
-| The bridge liveness probe times out after 1 s | An idle bridge restarts on an overloaded host | [Bridge memory on small nodes](#bridge-memory-on-small-nodes) |
+| Without an Internet lookup, coturn announces its relays as `0.0.0.0` | Participants who can use only TURN get no media | Set `jitsi-meet.coturn.extraEnvs.REAL_EXTERNAL_IP`; the k3s TURN add-on does ([TURN](#turn)) |
+| With `backup.enabled` on a storage class that binds volumes on first use (local-path), the backup volume stays `Pending` until the first nightly run | `helm upgrade --wait` hangs until its timeout | Install without `--wait` and wait with `kubectl rollout status`, as the k3s installer does ([Database backups](DEPLOYMENT.md#database-backups)) |

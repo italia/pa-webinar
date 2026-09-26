@@ -142,6 +142,7 @@ example profiles in `infra/helm/pa-webinar/examples/`.
 | PostgreSQL (Bitnami subchart) | `postgresql.enabled` | on | on | off, external database | off, external database |
 | Redis (Bitnami subchart) | `redis.enabled` | on | on | on | on |
 | Jitsi Meet (jitsi-contrib subchart): Prosody, Jicofo, JVB, web and the conference Ingress | `jitsi.enabled` | on | on | on | on |
+| Conference Ingress `<fullname>-conference`, rendered by this chart in place of the subchart's | `jitsi.conferenceIngress.enabled`, with `jitsi-meet.web.ingress.enabled: false` | off | off (on with the minikube and k3s overlays) | off | off |
 | Bridge REST Service `<fullname>-jvb-rest` (port 8080, for the status page and metrics) | `jitsi.enabled`, `jitsi.jvbHealthUrl` empty, and the subchart's bridge Service not exposing 8080 | on | on | on | on |
 | Jicofo REST Service `<fullname>-jicofo-rest` (port 8888, for the status page) | `jitsi.enabled` and `jitsi.jicofoHealthUrl` empty | on | on | on | on |
 | ConfigMap `pa-webinar-prosody-plugins` with the Prosody module that sets room roles from the token | `jitsi.enabled`, and a Prosody volume that names it (`jitsi-meet.prosody.extraVolumes`, set by default) | on | on | on | on |
@@ -155,6 +156,7 @@ example profiles in `infra/helm/pa-webinar/examples/`.
 | PrometheusRule | `metrics.prometheusRule.enabled` | off | off | off | off |
 | Grafana dashboard ConfigMap | `metrics.grafanaDashboard.enabled` | off | off | off | off |
 | NetworkPolicy for the chart's pods | `networkPolicy.enabled` | off | off | off | off |
+| Database backup: CronJob `<fullname>-backup`, its volume, the suspended `<fullname>-backup-tools` and, with the NetworkPolicy on, a policy of its own | `backup.enabled`, with `postgresql.enabled` | off | off | off | off |
 
 What each scheduled job does, and what breaks when it does not run, is in
 [Scheduled and background jobs](architecture/background-jobs.md).
@@ -203,7 +205,7 @@ using the measurements in [Load testing](LOAD-TESTING.md).
 
 | Keys the profile sets | `examples/values-simple.yaml` | `examples/values-standard.yaml` | `examples/values-full.yaml` |
 |---|---|---|---|
-| `secrets.mode` | `generate`, with `secrets.datastoreSecretName` and `secrets.jitsiJwtSecretName` set | `existing` | `existing` (an `external` block is commented out) |
+| `secrets.mode` | `generate`, with `secrets.datastoreSecretName` and `secrets.jitsiJwtSecretName` set, for evaluation. Production switches to `existing` in its site file ([Simple profile](#simple-profile)) | `existing` | `existing` (an `external` block is commented out) |
 | Database | In the cluster (`postgresql.enabled: true`, 5Gi volume) | External: `DATABASE_URL` in the application Secret | External |
 | App replicas | One, no HPA, no PDB | HPA from 2 to 4, PDB | HPA from 2 to 8, PDB, `app.nodeSelector: {}` (any untainted node; set your pool label to pin it) |
 | Bridge (`jitsi-meet.jvb`) | One replica on any node | One replica on any node | Zero replicas on nodes labeled and tainted `workload=jitsi-jvb`, with the bridge's Prometheus exporter and a ServiceMonitor |
@@ -216,7 +218,8 @@ using the measurements in [Load testing](LOAD-TESTING.md).
 | App ServiceMonitor | Off | Off | On |
 
 The Secret names (`videocall-secrets`, `videocall-datastore`, `videocall-jitsi-jwt`) are the example
-files' defaults. Any names work, as long as every key that refers to them agrees. The empty password
+files' defaults. Any names work, as long as every key that refers to them agrees: the k3s installer
+and the walkthroughs below use `pa-webinar-secrets`, `pa-webinar-datastore` and `pa-webinar-jitsi-jwt`. The empty password
 placeholders are for you to fill: see
 [Pin the conference's internal credentials](#pin-the-conferences-internal-credentials). The comments in
 each file list the alternatives to the third-party STUN default
@@ -225,7 +228,9 @@ each file list the alternatives to the third-party STUN default
 **Platform overlays.** Each installation guide layers a small file from the same folder on a profile:
 `examples/values-minikube.yaml` and `examples/values-k3s.yaml` on the simple profile, and
 `examples/values-aks.yaml`, `values-gke.yaml` and `values-eks.yaml` on the full profile, together with
-the values that the platform's OpenTofu module outputs. The guides explain each overlay:
+the values that the platform's OpenTofu module outputs. On k3s, `examples/values-k3s-storage.yaml` and
+`values-k3s-turn.yaml` add the object store and TURN of one server, each with the values file that its
+script writes ([Object storage and TURN](install/k3s.md#object-storage-and-turn)). The guides explain each overlay:
 [minikube](install/minikube.md#what-the-overlay-changes), [k3s](install/k3s.md),
 [AKS](install/aks.md), [GKE](install/gke.md) and [EKS](install/eks.md).
 `scripts/validate-chart.sh` renders the minikube and k3s overlays with every other profile.
@@ -314,16 +319,32 @@ are the ones CI validated; `update` resolves them again within the ranges of `Ch
 
 ### Where each hostname goes
 
-Each hostname appears in several keys, and they must agree.
+Two values name the installation, and the chart derives every other host key from them:
 
-| Hostname | Keys |
+```yaml
+site:
+  portalHost: webinar.example.com          # no scheme, port or path
+  conferenceHost: meet.webinar.example.com
+jitsi-meet:
+  publicURL: https://meet.webinar.example.com
+```
+
+| Value | What the chart derives from it |
 |---|---|
-| Portal, `webinar.example.com` | `app.env.NEXT_PUBLIC_APP_URL` (with `https://`), `ingress.hosts[].host`, `ingress.tls[].hosts`, and `jitsi.webIngress.redirectUrl` if you use the redirect |
-| Conference, `meet.webinar.example.com` | `app.env.NEXT_PUBLIC_JITSI_DOMAIN` (host only, no scheme), `jitsi-meet.publicURL` (with `https://`), `jitsi-meet.web.ingress.hosts[].host`, `jitsi-meet.web.ingress.tls[].hosts`, and `jitsi.webIngress.hosts` and `tls` if you use the redirect |
-| TURN, for example `turn.webinar.example.com` (optional) | `jitsi-meet.turnHost`. Its DNS record points at the coturn LoadBalancer, not at the ingress controller |
+| `site.portalHost` | `NEXT_PUBLIC_APP_URL` (`https://<portalHost>`), the host of the portal Ingress, and the `hosts` of every `ingress.tls` entry that has none |
+| `site.conferenceHost` | `NEXT_PUBLIC_JITSI_DOMAIN`, the host and TLS hosts of the conference Ingress rendered by the chart (`jitsi.conferenceIngress`), the hosts of the conference-root redirect, and the recorder bot's domain |
+| `jitsi-meet.publicURL` | Not derived: it is a value of the Jitsi subchart, which a parent chart cannot fill in. The chart checks it, and the render stops with the line to add when it is not `https://<conferenceHost>` |
 
-The recorder bot joins the conference through `NEXT_PUBLIC_JITSI_DOMAIN` unless `recorder.jitsiDomain`
-says otherwise.
+- **Format.** Lowercase DNS names only: `https://`, a port, a path or uppercase letters stop the render.
+  The portal and the conference need two different names.
+- **Explicit keys still work**: `app.env.NEXT_PUBLIC_APP_URL`, `app.env.NEXT_PUBLIC_JITSI_DOMAIN`,
+  `ingress.hosts[].host`, `ingress.tls[].hosts`, and `jitsi-meet.web.ingress.hosts` with the subchart's
+  Ingress. When `site.*` is set, a key that disagrees with it stops the render. The chart's placeholders
+  (`videocall.example.com`) count as not set; the post-install notes warn while any `example.com` name
+  remains.
+- **TURN**, for example `turn.webinar.example.com` (optional), goes in `jitsi-meet.turnHost`. Its DNS
+  record points at coturn's address, or, with the k3s add-on, at the ingress node
+  ([coturn (TURN and TURNS)](#coturn-turn-and-turns)).
 
 ### Portal Ingress defaults
 
@@ -347,15 +368,31 @@ controller running under a custom class name cannot be recognized by its name, a
 
 ### The conference Ingress
 
-The conference Ingress belongs to the jitsi-meet subchart and is configured under
-`jitsi-meet.web.ingress`. Two details differ from the portal Ingress:
+Two ways to render it:
 
-- It selects its controller with `jitsi-meet.web.ingress.ingressClassName` (default `nginx`), which the
-  subchart renders as `spec.ingressClassName`, and its only default annotation is the cert-manager
-  issuer.
-- `paths` is a list of strings (`paths: ["/"]`). The pinned subchart writes each entry directly into
-  `path:` and always adds `pathType: Prefix`. Writing `- path: /` as a map renders the map itself into
-  the field, and the API server rejects the Ingress.
+- **By this chart** (`jitsi.conferenceIngress.enabled: true`, with `jitsi-meet.web.ingress.enabled:
+  false`): an Ingress named `<fullname>-conference`, with the host from `site.conferenceHost`, the
+  class from `jitsi.conferenceIngress.className` (empty means `ingress.className`), and
+  `jitsi.conferenceIngress.annotations` and `tls`. Its annotations behave like the portal's: a key set
+  to `null` is removed, and the ingress-nginx annotations are dropped for the classes in
+  `ingress.nonNginxClassNames`. TLS entries may leave out `hosts` (the conference host) and
+  `secretName` (for an ACME resolver of the controller). The minikube and k3s overlays use it.
+- **By the Jitsi subchart** (`jitsi-meet.web.ingress`, the default for existing installations): it
+  selects its controller with `jitsi-meet.web.ingress.ingressClassName` (default `nginx`), and `paths`
+  is a list of strings (`paths: ["/"]`): a map there is rejected by the API server. Its only default
+  annotation is the cert-manager issuer. A key-level `null` in its `annotations` is removed by
+  Helm 3.16 and kept as `null` by Helm 4.2, which the post-install notes report; `annotations: null`
+  removes the whole map with both.
+
+The render stops when both are on, when the chart's Ingress has no host, and when settings left on the
+disabled subchart Ingress (a host, `tls`, annotations other than its default) would be ignored: the
+message names the `jitsi.conferenceIngress.*` key to move them to.
+
+Switching an existing installation to `jitsi.conferenceIngress` renames the Ingress. On Traefik the
+conference host answers 404 for a few seconds. On ingress-nginx with its validating webhook the upgrade
+fails, because the new Ingress is created before the old one is deleted and both claim the same host
+and path: delete the old one first (`kubectl -n pa-webinar delete ingress pa-webinar-jitsi-meet-web`),
+outside events, then upgrade.
 
 The room pages, `external_api.js`, the static assets and the XMPP transport must stay reachable on the
 conference host, because the embedded conference needs them. How to keep visitors off the Jitsi welcome
@@ -473,9 +510,9 @@ flowchart LR
 
 | Mode | Who creates the application Secret | Use it for |
 |---|---|---|
-| `existing` (default) | You, before the install | Production. The chart renders no Secret |
+| `existing` (default) | You, before the install, or the k3s installer `pa-webinar-up.sh`, which creates them from a secrets file it generates once | Production, one k3s server included. The chart renders no Secret, and no secret value passes through Helm |
 | `external` | The External Secrets Operator, from a SecretStore and an ExternalSecret that the chart renders for `azure-key-vault`, `aws-secrets-manager` or `gcp-secret-manager`. With `secrets.jitsiJwtSecretName` set, a second ExternalSecret writes the Prosody JWT Secret | Production with a cloud secret store |
-| `generate` | The chart, from `secrets.generate.*`, together with the datastore and Prosody JWT Secrets when `secrets.datastoreSecretName` and `secrets.jitsiJwtSecretName` are set | Evaluation and test only. The values end up in the Helm release record, readable by anyone who can read Secrets in the namespace |
+| `generate` | The chart, from `secrets.generate.*`, together with the datastore and Prosody JWT Secrets when `secrets.datastoreSecretName` and `secrets.jitsiJwtSecretName` are set | Evaluation only, as `scripts/minikube-up.sh` does. The values end up in the Helm release record, readable by anyone who can read Secrets in the namespace |
 
 What each key of the application Secret means, its format and whether it is required is in the
 [Configuration reference](CONFIGURATION.md). The install walkthroughs below show a complete command.
@@ -652,12 +689,19 @@ traffic.
 ### The values file for your installation
 
 Keep your installation's settings in one file, layered after the profile. This is the part that is the
-same for every profile. Commands below assume a clone of the repository at the release you install;
-with the packaged chart, use `./pa-webinar-<version>.tgz` as the chart and the example files from its
-`examples/` directory.
+same for every profile. Every install and every upgrade layers the same files, in the same order: the
+profile and the platform overlay of the release you install, then this site file, then the secrets,
+which stay in Secrets outside Helm (or in a private values file in `generate` mode). Keep every setting
+in a file, never in `--set`: the next upgrade would lose it
+([Upgrades and rollback](operations/upgrades.md)). Commands below assume a clone of the repository at
+the release you install; with the packaged chart, use `./pa-webinar-<version>.tgz` as the chart and
+the example files from its `examples/` directory.
 
 ```yaml
 # pa-webinar.values.yaml
+site:
+  portalHost: webinar.example.com
+  conferenceHost: meet.webinar.example.com
 app:
   image:
     tag: "<version>"               # release number, without a leading "v"
@@ -666,35 +710,21 @@ app:
       tag: "v<version>-migrate"    # with a leading "v": published for every release
   imagePullSecrets:                # the published images need credentials, see Prerequisites;
     - name: ghcr-secret            # inherited by the recorder, controller, AI worker and hook
-  env:
-    NEXT_PUBLIC_APP_URL: "https://webinar.example.com"
-    NEXT_PUBLIC_JITSI_DOMAIN: "meet.webinar.example.com"
 
 ingress:
-  hosts:
-    - host: webinar.example.com
-      paths:
-        - path: /
-          pathType: Prefix
   tls:
-    - secretName: pa-webinar-portal-tls
-      hosts:
-        - webinar.example.com
+    - secretName: pa-webinar-portal-tls   # hosts: site.portalHost
 
 jitsi:
   webIngress:                      # optional: redirect the conference root to the portal
     redirectUrl: "https://webinar.example.com"
-    hosts:
-      - host: meet.webinar.example.com
     tls:
-      - secretName: pa-webinar-meet-tls
-        hosts:
-          - meet.webinar.example.com
+      - secretName: pa-webinar-meet-tls   # hosts: site.conferenceHost
 
 jitsi-meet:
   publicURL: "https://meet.webinar.example.com"
   web:
-    ingress:
+    ingress:                       # the subchart's Ingress: its hosts cannot be derived
       hosts:
         - host: meet.webinar.example.com
           paths: ["/"]
@@ -703,6 +733,11 @@ jitsi-meet:
           hosts:
             - meet.webinar.example.com
 ```
+
+With `jitsi.conferenceIngress.enabled: true` and `jitsi-meet.web.ingress.enabled: false`, the chart
+renders the conference Ingress itself, and the `jitsi-meet.web.ingress` block shrinks to
+`jitsi.conferenceIngress.tls: [{secretName: pa-webinar-meet-tls}]`
+([The conference Ingress](#the-conference-ingress)).
 
 Pass both image tags explicitly. The app tag has no `v`. The migration tag `v<version>-migrate` exists
 for every release. The tag the chart derives when the value is empty (`<app tag>-migrate`) is not
@@ -725,59 +760,122 @@ kubectl create secret docker-registry ghcr-secret -n pa-webinar \
 
 ### Simple profile
 
-Everything runs in the cluster, and the chart renders the Secrets from values (`generate` mode). Use it
-to evaluate.
+Everything runs in the cluster: the portal, PostgreSQL, Redis and one bridge. On k3s,
+[`pa-webinar-up.sh`](install/k3s.md#install-with-one-command) runs these steps for you; they are also
+its reference, and the base of the manual k3s procedure.
 
-1. Generate the secret values **once**, into a file that you keep private and outside version control.
-   You need the same file for every later upgrade.
+1. **Generate the secrets once**, into a file that you keep private, outside version control, and with
+   every backup. Every later upgrade reuses it. The guard never overwrites an existing file:
 
    ```bash
+   D=~/.config/pa-webinar/k3s/webinar.example.com      # outside the repository
+   mkdir -p "$D" && chmod 700 "$D"
    umask 077
-   cat > pa-webinar.secrets.yaml <<EOF
-   secrets:
-     generate:
-       APP_SECRET: "$(openssl rand -hex 32)"
-       JITSI_JWT_SECRET: "$(openssl rand -hex 32)"
-       PII_ENCRYPTION_KEY: "$(openssl rand -hex 32)"
-       CRON_API_KEY: "$(openssl rand -hex 32)"
-       ADMIN_API_KEY: "$(openssl rand -hex 32)"
-       POSTGRES_PASSWORD: "$(openssl rand -hex 24)"
-       POSTGRES_ADMIN_PASSWORD: "$(openssl rand -hex 24)"
-       REDIS_PASSWORD: "$(openssl rand -hex 24)"
-       SMTP_HOST: "smtp.example.com"
-       SMTP_PORT: "587"
-       SMTP_SECURE: "false"
-       SMTP_USER: "<user>"
-       SMTP_PASSWORD: "<password>"
-       SMTP_FROM: "webinar@example.com"
-       SMTP_FROM_NAME: "<sender name>"
-   jitsi:
-     requirePinnedCredentials: true
-   jitsi-meet:
-     jicofo:
-       xmpp:
-         password: "$(openssl rand -hex 16)"
-     jvb:
-       xmpp:
-         password: "$(openssl rand -hex 16)"
+   h() { openssl rand -hex "$1"; }
+   [ -e "$D/secrets.env" ] || cat > "$D/secrets.env" <<EOF
+   APP_SECRET=$(h 32)
+   JITSI_JWT_SECRET=$(h 32)
+   PII_ENCRYPTION_KEY=$(h 32)
+   CRON_API_KEY=$(h 32)
+   ADMIN_API_KEY=$(h 32)
+   POSTGRES_PASSWORD=$(h 24)
+   POSTGRES_ADMIN_PASSWORD=$(h 24)
+   REDIS_PASSWORD=$(h 24)
+   JICOFO_AUTH_PASSWORD=$(h 16)
+   JVB_AUTH_PASSWORD=$(h 16)
    EOF
    ```
 
-   `SMTP_SECURE` means implicit TLS: use `"false"` with port 587, which upgrades with STARTTLS, and
-   `"true"` only with port 465 ([Email delivery](configuration/email.md)).
+   This is the file, with the same keys, that `pa-webinar-up.sh` writes. The SMTP settings live in a
+   file of their own, `$D/smtp.env`, with `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`,
+   `SMTP_PASSWORD`, `SMTP_FROM` and `SMTP_FROM_NAME`, one `KEY=value` per line and no quotes.
+   `SMTP_SECURE` means implicit TLS: use `false` with port 587, which upgrades with STARTTLS, and `true`
+   only with port 465 ([Email delivery](configuration/email.md)).
 
-2. Install:
+2. **Create the five Secrets** from those files. Server-side apply keeps the values out of the
+   `last-applied-configuration` annotation, and running the same commands again after a change updates
+   the Secrets:
+
+   ```bash
+   NS=pa-webinar; R=pa-webinar
+   v() { sed -n "s/^$1=//p" "$D/secrets.env"; }
+   secret() { kubectl -n "$NS" create secret generic "$1" --from-env-file="$2" --dry-run=client -o yaml \
+     | kubectl apply --server-side --field-manager=pa-webinar -f -; }
+   kubectl create namespace "$NS" --dry-run=client -o yaml | kubectl apply -f -
+   {
+     for k in APP_SECRET JITSI_JWT_SECRET PII_ENCRYPTION_KEY CRON_API_KEY ADMIN_API_KEY; do echo "$k=$(v $k)"; done
+     echo JITSI_JWT_APP_ID=pa_webinar; echo JITSI_JWT_ISSUER=pa-webinar; echo JITSI_JWT_AUDIENCE=jitsi
+     echo "DATABASE_URL=postgresql://eventi:$(v POSTGRES_PASSWORD)@$R-postgresql:5432/pa_webinar"
+     grep -E '^SMTP_[A-Z_]+=' "$D/smtp.env"
+   } > "$D/app.env"
+   secret "$R-secrets" "$D/app.env"
+   for k in POSTGRES_PASSWORD POSTGRES_ADMIN_PASSWORD REDIS_PASSWORD; do echo "$k=$(v $k)"; done > "$D/datastore.env"
+   secret "$R-datastore" "$D/datastore.env"
+   echo "JWT_APP_SECRET=$(v JITSI_JWT_SECRET)" > "$D/jwt.env";           secret "$R-jitsi-jwt" "$D/jwt.env"
+   echo "JICOFO_AUTH_PASSWORD=$(v JICOFO_AUTH_PASSWORD)" > "$D/jicofo.env"; secret "$R-jicofo-xmpp" "$D/jicofo.env"
+   printf 'JVB_AUTH_USER=jvb\nJVB_AUTH_PASSWORD=%s\n' "$(v JVB_AUTH_PASSWORD)" > "$D/jvb.env"; secret "$R-jvb-xmpp" "$D/jvb.env"
+   rm -f "$D/app.env" "$D/datastore.env" "$D/jwt.env" "$D/jicofo.env" "$D/jvb.env"
+   ```
+
+   | Secret | Keys | Read by |
+   |---|---|---|
+   | `pa-webinar-secrets` | The application keys, `JITSI_JWT_*`, `DATABASE_URL`, `SMTP_*`, and the storage keys when you add them | The portal, its migrations and its jobs |
+   | `pa-webinar-datastore` | `POSTGRES_PASSWORD`, `POSTGRES_ADMIN_PASSWORD`, `REDIS_PASSWORD` | PostgreSQL and Redis |
+   | `pa-webinar-jitsi-jwt` | `JWT_APP_SECRET`, the same value as `JITSI_JWT_SECRET` | Prosody |
+   | `pa-webinar-jicofo-xmpp`, `pa-webinar-jvb-xmpp` | `JICOFO_AUTH_PASSWORD`; `JVB_AUTH_USER`, `JVB_AUTH_PASSWORD` | Prosody, Jicofo and the bridge: the pinned internal credentials |
+
+   The portal does not restart when a Secret changes: after a change, run
+   `kubectl -n pa-webinar rollout restart deployment/pa-webinar`.
+
+3. **Name them in your site file**, next to the host names
+   ([The values file for your installation](#the-values-file-for-your-installation)):
+
+   ```yaml
+   secrets:
+     mode: existing
+     existingSecretName: pa-webinar-secrets
+     datastoreSecretName: pa-webinar-datastore
+     jitsiJwtSecretName: ""                     # created above, not by the chart
+   postgresql:
+     auth:
+       existingSecret: pa-webinar-datastore
+   redis:
+     auth:
+       existingSecret: pa-webinar-datastore
+   jitsi:
+     requirePinnedCredentials: true
+   jitsi-meet:
+     prosody:
+       jwt:
+         existingSecretName: pa-webinar-jitsi-jwt
+     jicofo:
+       xmpp:
+         existingSecretName: pa-webinar-jicofo-xmpp
+     jvb:
+       xmpp:
+         existingSecretName: pa-webinar-jvb-xmpp
+   ```
+
+4. **Install**:
 
    ```bash
    helm upgrade --install pa-webinar ./infra/helm/pa-webinar -n pa-webinar \
      -f infra/helm/pa-webinar/examples/values-simple.yaml \
      -f pa-webinar.values.yaml \
-     -f pa-webinar.secrets.yaml \
      --wait --timeout 15m
    ```
 
-The profile renders `videocall-secrets`, `videocall-datastore` and `videocall-jitsi-jwt` from these
-values. Keep the database passwords: see [Datastore passwords](#datastore-passwords).
+   With `backup.enabled: true` on a storage class that binds volumes only when a pod uses them, as
+   local-path on k3s does, leave out `--wait` and wait for the rollouts yourself
+   ([Database backups](#database-backups)).
+
+Keep the database passwords: see [Datastore passwords](#datastore-passwords).
+
+**For an evaluation only**, the chart can render the same Secrets itself (`generate` mode, the default
+of `examples/values-simple.yaml`): the values go under `secrets.generate.*`, with the Jicofo and bridge
+passwords in `jitsi-meet.jicofo.xmpp.password` and `jitsi-meet.jvb.xmpp.password`, and they end up in
+the Helm release record. `scripts/minikube-up.sh` does this; the keys are listed in the header of
+`values-simple.yaml`.
 
 ### Standard profile
 
@@ -1029,6 +1127,18 @@ jitsi-meet:
   through XMPP external service discovery (XEP-0215). The Certificate cannot render without it.
 - `allowedPeerIPs` is a **list** of ranges. Set it to the node or pod range through which coturn
   reaches the bridges, when coturn cannot reach them on their announced addresses.
+- **The relay address.** The subchart makes coturn listen on `0.0.0.0`, and the coturn image finds
+  its public address with a DNS lookup on the Internet. When the pod cannot make that lookup (an
+  egress policy, no Internet), coturn announces its relays as `0.0.0.0`, browsers drop them, and a
+  participant who can only use TURN gets no media: measured in the lab. Set the address participants
+  reach in `jitsi-meet.coturn.extraEnvs.REAL_EXTERNAL_IP`. The k3s add-on does it; the AKS, GKE and
+  EKS examples do not, and rely on coturn reaching the Internet.
+- **On one k3s server** coturn needs no address of its own:
+  [`infra/onprem/k3s/addons/turn.sh`](../infra/onprem/k3s/addons/README.md) publishes TURN on UDP
+  3478 through k3s's ServiceLB and TURN over TLS on port 443, shared with the portal: Traefik routes
+  `turn.<domain>` by name, ends TLS and forwards to coturn's TCP port, so coturn holds no certificate
+  and a renewal needs no restart. Use it with `examples/values-k3s-turn.yaml` and the values file the
+  script writes.
 - **Certificate validation.** With an HTTP-01 issuer, the ACME challenge for `turnHost` reaches the
   coturn address, not the ingress controller. The subchart can add a small proxy that forwards
   challenges to the controller: set `jitsi-meet.coturn.turns.certificate.acmeProxy.enabled: true`
@@ -1092,7 +1202,7 @@ The policy allows:
   - from the Jibri pods, when `jitsi-meet.jibri.enabled` is on, for the finalize script's calls at the
     end of a recording;
   - from the monitoring namespace (`monitoringNamespaceSelector`), when `allowMonitoring` is on;
-  - from anything in `ingress.extraRules`.
+  - from anything in `networkPolicy.ingress.extraRules`.
 - **Egress**:
   - DNS on port 53 to `egress.dns.to` (default: `k8s-app: kube-dns` pods in any namespace). With
     NodeLocal DNSCache, add its address, for example an `ipBlock` for `169.254.20.10/32`;
@@ -1108,7 +1218,7 @@ The policy allows:
   - SMTP on `egress.smtpPort`, plus 465 with `allowImplicitTlsSmtp`;
   - TCP 443 anywhere except `egress.httpsExcept` (default `169.254.0.0/16`, the cloud metadata
     endpoints);
-  - anything in `egress.extraRules`.
+  - anything in `networkPolicy.egress.extraRules`.
 
 Set what the defaults cannot know before you rely on the policy:
 
@@ -1116,7 +1226,7 @@ Set what the defaults cannot know before you rely on the policy:
   `kubernetes.io/metadata.name: kube-system` for Traefik on k3s, or `app-routing-system` for AKS
   application routing. With the wrong namespace, the portal is unreachable.
 - **In-cluster Prometheus.** If `app.env.PROMETHEUS_URL` points at a Prometheus in the cluster, add an
-  `egress.extraRules` entry for it; `values.yaml` has a commented example. The same applies to an
+  `networkPolicy.egress.extraRules` entry for it; `values.yaml` has a commented example. The same applies to an
   in-cluster S3 endpoint.
 - **External database or Redis.** Replace `egress.postgres.to` or `egress.redis.to` with an `ipBlock`
   for its address.
@@ -1181,7 +1291,43 @@ the storage they need and how to verify them: [Setting up recording](operations/
 What the metrics and alerts mean, the dashboard, and how to read the status pages are in
 [Monitoring and health](operations/monitoring.md).
 
+## Database backups
+
+`backup.enabled: true` adds a nightly dump of the in-cluster PostgreSQL, off by default:
+
+| Key | Default | What it does |
+|---|---|---|
+| `backup.enabled` | `false` | Renders the CronJob `<fullname>-backup`, its volume, a suspended `<fullname>-backup-tools` CronJob and, with the NetworkPolicy on, a policy that allows the dump only DNS and PostgreSQL. Needs `postgresql.enabled: true` |
+| `backup.schedule` | `"30 3 * * *"` | UTC, after the GDPR cleanup, so that a dump never holds what the cleanup has just removed |
+| `backup.retention` | `7` | The number of dumps kept, the newest ones |
+| `backup.persistence.size`, `storageClass`, `existingClaim` | `10Gi`, cluster default, empty | The volume `<fullname>-backup`, kept by `helm uninstall` (`helm.sh/resource-policy: keep`) but deleted with the namespace; or a claim of your own |
+| `backup.image` | empty | Empty means the chart's PostgreSQL image, so `pg_dump` matches the server |
+| `backup.activeDeadlineSeconds`, `backup.resources` | `3600`, small | Limits of the dump Job |
+
+Each dump is `pa-webinar-<YYYYmmddTHHMMSSZ>.dump` (`pg_dump -Fc`, mode 0600), checked with
+`pg_restore --list` before it replaces the oldest one. The dumps sit on the same storage as the
+database: copy them elsewhere, and remember that they keep personal data for as many days as they are
+kept. The post-install notes print, with your release's names, the commands to take a dump now, to
+list and copy the dumps through a Job made from `<fullname>-backup-tools` in a shell with `umask 077`,
+and to restore one with `scripts/restore.sh --from-dump`; the procedure is in
+[Backups with the chart's CronJob](operations/upgrades.md#backups-with-the-charts-cronjob).
+
+On a storage class that binds a volume only when a pod first uses it (`WaitForFirstConsumer`, as
+local-path on k3s), the backup volume stays `Pending` until the first nightly run. `helm --wait`
+waits for every volume, so it hangs until its timeout: install without `--wait` and wait for the
+rollouts with `kubectl rollout status`, as the k3s installer does.
+
 ## First-run checks
+
+`scripts/verify-install.sh` runs every check below that a script can run, from any machine with the
+kubeconfig: the pods, the image tags against the chart, both certificates and their expiry, the
+redirect to HTTPS, `/api/health`, `/api/ready`, the components on `/api/status`, the conference's
+`config.js`, the last run of every scheduled job, the email outbox and the database disk. With
+`--call`, two headless browsers join a throwaway call and check that audio and video arrive both
+ways. It reads the instance key from a file (`--secrets-file`) or from the cluster
+(`--keys-from-cluster`), never from the command line, and exits 0, 1 (a check failed) or 2 (cannot
+check). The options are in its `--help` and in
+[Post-install verification](install/checklists.md#post-install-verification). The steps by hand:
 
 1. **Post-install notes, pods and migrations.**
 
@@ -1242,7 +1388,7 @@ What the metrics and alerts mean, the dashboard, and how to read the status page
 
 ## Operations drill-downs
 
-- [Upgrades and rollback](operations/upgrades.md): the drift-safe upgrade, passing both image tags,
+- [Upgrades and rollback](operations/upgrades.md): the upgrade with the layered files, passing both image tags,
   `--reuse-values` and chart defaults, and what a rollback does not roll back.
 - [Running the JVB scaler](operations/jvb-scaler.md): enabling, tuning, validating and pausing the
   scaler. The mechanism is in [Scaling the media plane](architecture/scaling.md).

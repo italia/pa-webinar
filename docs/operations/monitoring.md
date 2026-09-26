@@ -18,14 +18,17 @@ Monitoring is layered. Each layer works without the ones below it.
 | Layer | What you get | What it needs |
 |---|---|---|
 | Probes and status | `/api/health`, `/api/ready`, the public **System status** page, the administrators' **Infrastructure** page | Nothing (the public page needs **Status page enabled**, on by default) |
+| Installation check | `scripts/verify-install.sh`: the pods, certificates and their expiry, the portal and its components, the conference, every scheduled job's last success, the email outbox and the database disk; with `--quiet`, output only when something is wrong | A kubeconfig, and cron or a timer ([Scheduled checks without Prometheus](#scheduled-checks-without-prometheus)) |
 | Metrics endpoint | `GET /api/metrics` in the Prometheus text format | `CRON_API_KEY` in the app Secret |
 | Scraping | A `ServiceMonitor` for the app | Prometheus Operator, `metrics.serviceMonitor.enabled` and `metrics.bearerTokenSecret` |
 | Alerting | A `PrometheusRule` with the bundled rules | Prometheus Operator and kube-state-metrics |
 | Dashboards | A ConfigMap with the Grafana dashboard | A Grafana sidecar that loads dashboards from ConfigMaps |
 | Charts inside the app | The **Monitoring** page, and the Prometheus figures and sparklines on the status pages | `PROMETHEUS_URL` |
 
-The Docker Compose stack stops at the first two layers. Its `app` health
-check calls `/api/health`, and it runs no Prometheus.
+The Docker Compose stack stops at the first layers. Its `app` health
+check calls `/api/health`, and it runs no Prometheus. Neither do minikube and
+k3s: there the installation check is what watches the parts that break
+silently.
 
 The diagram shows where each signal comes from and who reads it. Dashed
 arrows are optional or fallback paths: the single bridge probe is used only
@@ -88,6 +91,31 @@ flowchart LR
   ST --> ROOM
   class JVB optional
 ```
+
+### Scheduled checks without Prometheus
+
+`scripts/verify-install.sh --quiet` prints nothing while every check passes,
+and exits `1` with the failed checks otherwise, so cron mails only problems:
+
+```text
+*/15 * * * * /opt/pa-webinar/scripts/verify-install.sh --quiet
+```
+
+On a k3s server, as root, it finds `/etc/rancher/k3s/k3s.yaml` by itself;
+elsewhere pass `--kubeconfig` and `--context`. Copy the `scripts/` folder of
+the release you run to the machine that runs it. Without the instance key it
+reads the components from the public status page; `--keys-from-cluster`
+reads the key from the portal's Secret when the status page is off, and each
+run with it writes a sign-in row in the administration audit log. Its
+thresholds: `--disk-warn` and `--disk-fail` for the database disk (80 and
+90%), `--outbox-max-age` for emails waiting past their time (30 minutes),
+`--cert-min-days` for certificates (14 days), `--conference-wait` for the
+conference to come back after an upgrade (90 s). A scheduled job whose last
+success is older than twice its interval plus five minutes is an error. So is
+an object store left stopped by an interrupted backup or restore, which
+`scripts/restore.sh --resume --yes` brings back; a grace period of orphan
+recordings left at 0 by a restore is a warning
+([Monitoring on k3s](../install/k3s.md#monitoring)).
 
 ## Health probes
 
@@ -640,8 +668,10 @@ The thresholds in this table are the ones in `prometheusrule.yaml`.
 - **There is no `JibriUnavailable` alert.** Jibri exports no metrics, so no
   rule can see it. Its state appears only on the status pages.
 - Nothing covers the scheduled jobs, the email outbox, retention, disk or
-  object storage, the post-production queue or the recorder bot. The cleanup
-  job can report success even when it failed on individual events
+  object storage, the post-production queue or the recorder bot. The
+  installation check covers the scheduled jobs, the outbox and the database
+  disk from cron ([Scheduled checks without Prometheus](#scheduled-checks-without-prometheus)).
+  The cleanup job can report success even when it failed on individual events
   ([Scheduled and background jobs](../architecture/background-jobs.md)).
 
 Add your own rules with `metrics.prometheusRule.rules`. They are appended as

@@ -19,12 +19,12 @@ Run every command from the repository root unless a row or block says otherwise.
 | Migration integrity | Migrations apply to an empty database and match `schema.prisma` | `prisma migrate deploy`, then `prisma migrate diff --exit-code`, against a throwaway database | A disposable PostgreSQL | **Migration Integrity** |
 | End-to-end smoke | The browser path from registration to the waiting room, and the CSS color repair in the production build | In `app/`: `npx playwright test --project=chromium` | The running Docker Compose stack | **E2E Smoke Tests**: chromium only, non-blocking |
 | Patched `jitsi/web` bundle | Each bundle patch matches exactly one place in the upstream bundle, and the CSS rule's target selector still exists | `docker build infra/jitsi-web-patched` | Docker | Not in `ci.yml`: `jitsi-web.yml` |
-| Manual smoke script | API and page checks against a running instance | `./scripts/verify-features.sh [base-url] [admin-api-key] [cron-api-key]` | A running local or test instance, `curl`, `jq` | None |
+| Installation check | A running installation, from outside and from its cluster; with `--call`, a real call between two headless participants | `scripts/verify-install.sh` (`--help` lists the options) | A running installation and `kubectl` access to it (`--no-cluster` for the outside checks only); Node.js and Playwright for `--call` | None |
 | Load tests | Bridge and portal capacity | See [Load testing](../LOAD-TESTING.md) | A test installation | None |
 
 ### Where each test runs
 
-Each layer in the diagram runs twice: once on your machine as a local gate, and again as a CI job. The dashed layer is the non-blocking one. The patched bundle, the manual smoke script and the load tests are outside `ci.yml` and are left out.
+Each layer in the diagram runs twice: once on your machine as a local gate, and again as a CI job. The dashed layer is the non-blocking one. The patched bundle, the installation check and the load tests are outside `ci.yml` and are left out.
 
 ```mermaid
 flowchart LR
@@ -227,13 +227,15 @@ The local procedure with a throwaway database is in [How we develop PA Webinar](
 
 What each patch fixes, and how to build and bump the image, are in [Patched jitsi/web image](../../infra/jitsi-web-patched/README.md) and [ADR-017](../adr/017-patched-jitsi-web-image.md).
 
-### Manual smoke script
+### Installation check
 
-`./scripts/verify-features.sh [base-url] [admin-api-key] [cron-api-key]` runs `curl` and `jq` checks against a running instance and prints a pass or fail line for each. Without arguments it targets `http://localhost:3000` with the development keys set in `docker-compose.yml`.
+`scripts/verify-install.sh` checks a running Helm installation on any platform and exits non-zero when a check fails. From outside, it tests the portal (`/api/health`, `/api/ready`, component status), the conference `config.js`, the HTTP to HTTPS redirect, and certificate validity and days to expiry for both host names. From the cluster, it checks that the release's pods are ready, that the app and migration images match, the last successful run of each scheduled job, overdue and failed emails, and the free space on the database volume. It changes nothing, so it can also run from cron with `--quiet`, which prints only warnings and errors.
 
-The script signs in as administrator, creates a test event, registers participants and sets the event live. It then exercises the Jitsi tokens, Q&A, polls, materials, reminders, the calendar file, the monitoring and administration endpoints, the GDPR cleanup job and a few public pages, and deletes its test event at the end. Because it writes data and runs the cleanup job, point it only at a local or test instance.
+With `--call`, two headless browsers join a throwaway instant call and check that audio and video reach both of them; the call is deleted at the end. This needs Node.js, the root `npm ci` (for Playwright) and a Chromium (`npx playwright install chromium`, or `--browser <path>`).
 
-CI does not run the script, so nothing keeps its checks in step with the routes. Read a failure against the code before treating it as a regression.
+The administrator key comes from a secrets file or standard input (`--secrets-file`), or from the release's Secret (`--keys-from-cluster`), never from the command line. Every sign-in with the key is recorded in the administrator audit log.
+
+The script is not a feature test: feature behavior is covered by the route tests and the end-to-end suite above.
 
 ### Load tests
 

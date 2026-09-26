@@ -55,7 +55,8 @@ flowchart LR
 The operator sets environment variables through Helm values. The chart renders them in two places:
 
 - Keys under `app.env` go into a ConfigMap named after the release. They are for values that are not secret.
-- Secret values go into the application Secret. Its name is `secrets.existingSecretName`, and the chart's default is `videocall-secrets`. The three ways to provide it are described in [Deploying with Helm](DEPLOYMENT.md#secret-modes).
+- Secret values go into the application Secret. Its name is `secrets.existingSecretName`, and the chart's default is `videocall-secrets`; the k3s installer names it `pa-webinar-secrets`. The three ways to provide it are described in [Deploying with Helm](DEPLOYMENT.md#secret-modes): in production the Secret is created outside Helm (`existing`), and the chart renders it only for evaluation (`generate`).
+- Two chart values name the installation: `site.portalHost` and `site.conferenceHost`. The chart derives `NEXT_PUBLIC_APP_URL`, `NEXT_PUBLIC_JITSI_DOMAIN` and every Ingress host from them ([Where each hostname goes](DEPLOYMENT.md#where-each-hostname-goes)).
 
 The app container and the `db-migrate` init container load both through `envFrom`, so every key becomes an environment variable. Values are read when the process starts, and several modules keep what they read for the life of the process. A change therefore needs a restart:
 
@@ -132,8 +133,8 @@ Defaults: `app/src/lib/env.ts`. At startup, `app/src/instrumentation.ts` logs an
 
 | Name | Required | Default | Secret | Helm key | Description |
 |---|---|---|---|---|---|
-| `NEXT_PUBLIC_APP_URL` | Yes | `http://localhost:3000` | No | `app.env` | Public base URL of the portal, with the scheme: `https://webinar.example.com`. Used for links in emails and calendar files, moderator links, avatars, preview images, the sitemap and SEO metadata. A value without `http://` or `https://` counts as missing (`appBaseUrl()`) |
-| `NEXT_PUBLIC_JITSI_DOMAIN` | Yes | `localhost:8443` | No | `app.env` | Host of the conference front end, without the scheme: `meet.webinar.example.com`. Used by the IFrame API, the Content Security Policy, the `Permissions-Policy` header, the administration's **Infrastructure** page, and the status probes when the in-cluster addresses of the conference are not set ([Conference status probes](#conference-status-probes)) |
+| `NEXT_PUBLIC_APP_URL` | Yes | `http://localhost:3000` | No | Chart: `https://` and `site.portalHost`; or `app.env`, which must then agree | Public base URL of the portal, with the scheme: `https://webinar.example.com`. Used for links in emails and calendar files, moderator links, avatars, preview images, the sitemap and SEO metadata. A value without `http://` or `https://` counts as missing (`appBaseUrl()`) |
+| `NEXT_PUBLIC_JITSI_DOMAIN` | Yes | `localhost:8443` | No | Chart: `site.conferenceHost`; or `app.env`, which must then agree | Host of the conference front end, without the scheme: `meet.webinar.example.com`. Used by the IFrame API, the Content Security Policy, the `Permissions-Policy` header, the administration's **Infrastructure** page, and the status probes when the in-cluster addresses of the conference are not set ([Conference status probes](#conference-status-probes)) |
 | `DEFAULT_PRIVACY_POLICY_URL` | No | `/privacy` (`app/src/app/[locale]/events/[slug]/registration/page.tsx`) | No | `app.env` | Privacy link on the registration form when the event has none. Set it only to point at a privacy notice published elsewhere. `values.yaml` leaves it unset |
 
 ### Authentication and tokens
@@ -408,6 +409,9 @@ Who creates each Secret in each `secrets.mode`, how to separate the datastore pa
 | `REDIS_URL` | Application Secret, for an external Redis only | The managed Redis | From the provider | Restart the portal |
 | `SMTP_PASSWORD` | Application Secret | The mail relay | From the provider | Restart the portal |
 | Storage credentials: `AZURE_STORAGE_CONNECTION_STRING`, `RECORDING_AZURE_CONNECTION_STRING`, `*_S3_ACCESS_KEY_ID`, `*_S3_SECRET_ACCESS_KEY` | Application Secret | Access to the buckets | From the provider | Restart the portal |
+
+Which keys can be rotated on a running installation, and how, is in
+[Secrets rotation](install/checklists.md#secrets-rotation).
 
 The development placeholders in `.env.example` and `docker-compose.yml` are public. They are shaped to pass the production guards, or, for `PII_ENCRYPTION_KEY`, to be caught by them. Never copy them into a real installation. In production, a `PII_ENCRYPTION_KEY` that is a short block repeated to length raises an error on every read and write. Only the Compose stack sets `ALLOW_INSECURE_PII_KEY=true` to run with its dummy key, and `.env.example` deliberately does not carry that setting. The guard is intentional: replace the key, never the guard.
 

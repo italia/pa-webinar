@@ -817,7 +817,7 @@ the autoscaler from moving a bridge; it does not stop an upgrade's drain.
 
 ### Chart upgrades
 
-Follow [the drift-safe procedure](../operations/upgrades.md#the-drift-safe-procedure):
+Follow [the upgrade procedure](../operations/upgrades.md#the-upgrade-procedure):
 pass the same five files in the same order, with both image tags set, and do
 not rely on `--reuse-values`
 ([Why not `--reuse-values`](../operations/upgrades.md#why-not---reuse-values)).

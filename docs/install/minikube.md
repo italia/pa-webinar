@@ -2,9 +2,12 @@
 
 This page takes you from an empty workstation to a working PA Webinar
 installation on [minikube](https://minikube.sigs.k8s.io/), in one command and
-about five minutes when Docker's build cache is already warm (a first build
+three to five minutes when Docker's build cache is already warm (a first build
 takes longer). It is written for the IT staff of a public body who want to
-see the product and the Helm chart before they choose where to run it.
+see the product and the Helm chart before they choose where to run it, and
+for developers who work on the chart. minikube is supported for evaluation
+and development, not for events
+([Support levels](README.md#support-levels)).
 
 Status: **tested in lab**. Linux workstation (Fedora, cgroup v2), Docker
 driver, minikube 1.38.1, Kubernetes v1.35.1, Helm 4.2.2. The chart with the
@@ -21,6 +24,8 @@ On this page:
 - [Measured usage](#measured-usage)
 - [Troubleshooting](#troubleshooting)
 - [Update, stop and remove](#update-stop-and-remove)
+- [More than one profile](#more-than-one-profile)
+- [The development loop](#the-development-loop)
 - [Limits of this setup](#limits-of-this-setup)
 - [Related pages](#related-pages)
 
@@ -31,14 +36,17 @@ PA Webinar is built to run on Kubernetes. The Helm chart in
 to a managed cluster with node pools that scale to zero. minikube runs that
 same chart on one workstation, with the simple profile
 (`examples/values-simple.yaml`) and a small overlay for a small node
-(`examples/values-minikube.yaml`). The chart, the simple profile, the secrets
-file and the upgrade commands are the ones a single-node installation uses.
-The overlay lowers the resource requests, caps the bridge's memory, redirects
+(`examples/values-minikube.yaml`). The chart, the simple profile and the
+layered upgrade are the ones a single k3s server uses. The secrets differ: here
+the chart renders them from a values file (`generate` mode), which is for
+evaluation only, while a server for events keeps them in Secrets created
+outside Helm. The overlay lowers the resource requests, caps the bridge's
+memory, redirects
 plain HTTP to HTTPS, and leaves out third-party STUN. Instead of publicly
 trusted certificates, the script signs its own with a certificate authority
 it creates on your workstation. A real installation needs trusted
 certificates and STUN or a public address
-([Checklist before you install](README.md#checklist-before-you-install)).
+([Checklists](checklists.md)).
 
 The Docker Compose stack in the repository is for code work, not for
 evaluating an installation. Compared with it, minikube:
@@ -53,8 +61,10 @@ evaluating an installation. Compared with it, minikube:
 - runs the Jitsi release that the chart pins. Compose follows the floating
   `stable` tag.
 
-Compose is still the better choice for changing the code: minikube needed
-about 96 s after each rebuild to load the two images into the node. See
+Compose is still the better choice for changing the code: on minikube, a
+one-string change took 2 min 21 s from the edit to the running pod, most of
+it the Docker build. minikube is the place to work on the chart, its values
+and the Kubernetes jobs ([The development loop](#the-development-loop)). See
 [Local development](../DEVELOPMENT.md) and
 [Choose a platform](README.md#choose-a-platform).
 
@@ -164,7 +174,9 @@ profile and install again ([Update, stop and remove](#update-stop-and-remove)).
 - minikube 1.38.1 or later;
 - Helm 3.16.3 or later;
 - kubectl, openssl and curl;
-- Docker, for the Docker driver and for building the images.
+- Docker, for the Docker driver and for building the images;
+- `certutil`, only for `--trust-ca` (package `nss-tools` on Fedora,
+  `libnss3-tools` on Debian and Ubuntu).
 
 The script checks the versions. When kubectl is more than one minor version
 away from the cluster, it warns and suggests the kubectl that minikube
@@ -220,6 +232,15 @@ flowchart TD
 the node cannot pull. `host` pulls with the workstation's Docker, after
 `docker login ghcr.io`, and loads the images into the node; it was not
 exercised in the lab.
+
+**To see your own changes, always pass `--images local`.** With registry
+credentials, in the environment or in the `ghcr-pull` Secret that an earlier
+run left in the namespace, the automatic choice installs the published
+images, and your changes never reach the cluster. The script warns when it
+does so, and more loudly when the checkout has uncommitted changes. In local
+mode the images are tagged per profile, `pa-webinar:local-<profile>` and
+`pa-webinar:local-<profile>-migrate`, so two profiles or two checkouts do not
+overwrite each other's images.
 
 The published images come from the development branch. They are for
 evaluation, not for events: a real installation pins a release
@@ -294,7 +315,13 @@ this repository's sources".
    changes: every command the script runs names the profile's context. On
    some cgroup v2 hosts minikube ignores `--cpus`; the script then caps the
    node container itself with `docker update --cpus`.
-3. **Chooses the images**, as in the diagram above.
+3. **Chooses the images**, as in the diagram above. In local mode it builds
+   them with the commit of your checkout, so that `/api/health` answers
+   `"version":"local"` and that commit (with `-dirty` when the checkout has
+   uncommitted changes). The build's output goes to `build.log` in the state
+   folder (`tail -f` it while you wait), and the 2.4 GB migration image is
+   loaded into the node again only when the Dockerfile, the lockfiles or
+   `app/prisma` changed.
 4. **Creates a certificate authority once**, in the same folder: the key
    `ca.key` (EC P-256, 0600) and the certificate `ca.crt`, valid for ten
    years. Its name constraints let it sign only names under `nip.io`,
@@ -305,18 +332,26 @@ this repository's sources".
    ConfigMap `local-ca`, which the portal trusts for its own outbound
    connections (`app.extraCaCerts`). Later runs keep the authority, and
    re-sign a host's certificate only when the node IP changes or the
-   certificate nears its expiry.
+   certificate nears its expiry. With `--trust-ca`, it also adds the
+   authority to the browsers of the workstation
+   ([Trust the local certificate authority](#1-trust-the-local-certificate-authority)).
 5. **Writes `values-local.yaml`** next to the secrets, with the nip.io host
-   names, the TLS Secrets of both Ingresses, the `local-ca` ConfigMap and the
-   Mailpit SMTP settings. It is rewritten on every run.
+   names (`site.portalHost`, `site.conferenceHost` and
+   `jitsi-meet.publicURL`), the TLS Secrets of both Ingresses, the `local-ca`
+   ConfigMap and the Mailpit SMTP settings. It is rewritten on every run.
 6. **Installs the chart** with `helm upgrade --install` and four values files:
    `examples/values-simple.yaml`, `examples/values-minikube.yaml`,
-   `values-local.yaml` and `secrets.yaml`. The chart's post-install notes go
-   to `helm-notes.txt` in the same folder.
-7. **Checks** that `/api/health` answers `"status":"ok"` and the conference's
-   `config.js` answers 200, both with the certificates verified against the
-   local authority, and that `http://` on both names redirects to `https://`.
-   It then prints the addresses and how to trust the authority:
+   `values-local.yaml` and `secrets.yaml`, then the files you give with
+   `--values`, in order. The chart's post-install notes go to `helm-notes.txt`
+   in the same folder.
+7. **Checks** the result. It waits for every Deployment and StatefulSet to
+   finish its rollout, the conference's front end that the chart's hook
+   restarts included. It then needs `/api/health` to answer `"status":"ok"`
+   and the conference's `config.js` to answer 200 five times in a row, both
+   with the certificates verified against the local authority, and checks
+   that `http://` on both names redirects to `https://`. It then prints the
+   addresses, how to trust the authority, and the installation check with
+   the real paths:
 
    ```text
    ✓ PA Webinar è su minikube (profilo pa-webinar, namespace pa-webinar).
@@ -327,7 +362,8 @@ this repository's sources".
      Email inviate        https://mail.<node-ip>.nip.io
    ```
 
-   That is: portal, administration area, conference, sent emails.
+   That is: portal, administration area, conference, sent emails. Every phase
+   prints how long it took, and the summary the total.
 
 On a first install, the migrations init container restarts two or three times
 until PostgreSQL is up, and an email outbox job from the first minute can end
@@ -337,99 +373,111 @@ minikube that is expected, and the script says so.
 
 The script's other options are in `scripts/minikube-up.sh --help`. The ones you
 are most likely to need: `--cpus`, `--memory` and `--disk-size` for a new
-profile, and `--domain sslip.io` when your DNS resolver refuses nip.io names.
+profile, `--domain sslip.io` when your DNS resolver refuses nip.io names,
+`--trust-ca` to trust the local authority in the browser, `--profile` for a
+second installation ([More than one profile](#more-than-one-profile)), and
+`--values FILE`, repeatable, to try a chart option such as
+`backup.enabled: true`. Pass `--values` again on every run, as with Helm.
 The installation by hand, command by command, is in
 [Install by hand](#install-by-hand).
 
 ### Check it yourself
 
+The installation check tests the cluster, the certificates, the portal and
+its components, the conference, the scheduled jobs and the email outbox and,
+with `--call`, a call between two headless browsers:
+
 ```bash
-IP=$(minikube -p pa-webinar ip)
-CA=~/.config/pa-webinar/minikube/pa-webinar/ca.crt
-curl -s --cacert $CA https://app.$IP.nip.io/api/health                                    # {"status":"ok",...}
-curl -s --cacert $CA -o /dev/null -w '%{http_code}\n' https://jitsi.$IP.nip.io/config.js  # 200
-curl -s -o /dev/null -w '%{http_code} %{redirect_url}\n' http://app.$IP.nip.io/             # 308 https://app.…/
-kubectl --context pa-webinar -n pa-webinar get pods
+P=pa-webinar
+S=~/.config/pa-webinar/minikube/$P
+scripts/verify-install.sh --context $P --ca-file $S/ca.crt --secrets-file $S/secrets.yaml --call
+```
+
+It exits 0 when nothing failed. On a local build it warns that the images do
+not match the chart's appVersion, which is expected. `--call` needs `npm ci` at
+the repository root and a Chromium (`npx playwright install chromium`, or
+`--browser /usr/bin/google-chrome`); in the lab the whole check with the call
+took 23 s. It can run as soon as the script returns: the script waits for
+every rollout, the conference's front end that each upgrade restarts
+included, and the check retries the conference for up to 90 s
+(`--conference-wait`).
+The same by hand:
+
+```bash
+IP=$(minikube -p $P ip)
+curl -s --cacert $S/ca.crt https://app.$IP.nip.io/api/health                                    # {"status":"ok",...}
+curl -s --cacert $S/ca.crt -o /dev/null -w '%{http_code}\n' https://jitsi.$IP.nip.io/config.js  # 200
+curl -s -o /dev/null -w '%{http_code} %{redirect_url}\n' http://app.$IP.nip.io/                   # 308 https://app.…/
+kubectl --context $P -n pa-webinar get pods
 ```
 
 ### Install by hand
 
 These are the commands the script runs, in local mode, for a reader who wants
-to do each step alone. `<node-ip>` is the output of `minikube -p pa-webinar ip`.
-Fetch the subcharts first, from the repository root, as in the
-[checklist](README.md#checklist-before-you-install)
-(`helm repo add` for `bitnami` and `jitsi-contrib`, then
-`helm dependency build infra/helm/pa-webinar`).
+to do each step alone. `P` is the profile, and `<node-ip>` the output of
+`minikube -p $P ip`. Fetch the subcharts first, from the repository root, as
+in [A.2 Fetch the subcharts](k3s.md#a2-fetch-the-subcharts).
 
 ```bash
-minikube start -p pa-webinar --keep-context --driver=docker \
+P=pa-webinar
+minikube start -p $P --keep-context --driver=docker \
   --container-runtime=docker --cpus=4 --memory=6g --disk-size=30g \
   --kubernetes-version=v1.35.1
-minikube -p pa-webinar addons enable ingress
-minikube -p pa-webinar addons enable metrics-server
-kubectl --context pa-webinar -n ingress-nginx \
+minikube -p $P addons enable ingress
+minikube -p $P addons enable metrics-server
+kubectl --context $P -n ingress-nginx \
   rollout status deployment/ingress-nginx-controller
 
-docker build -t pa-webinar:local .
-docker build --target builder -t pa-webinar:local-migrate .
-minikube -p pa-webinar image load pa-webinar:local
-minikube -p pa-webinar image load pa-webinar:local-migrate
+docker build -t pa-webinar:local-$P .
+docker build --target builder -t pa-webinar:local-$P-migrate .
+docker save pa-webinar:local-$P | minikube -p $P image load -
+docker save pa-webinar:local-$P-migrate | minikube -p $P image load -
 ```
 
-Loading the two images into the node, the migration one about 2.4 GB, took
-between 1 minute and 96 s in the lab. If
-`minikube start` warned that the kernel does not support CPU cfs
+Load the images from `docker save`, as above, not by name: loading by name
+goes through minikube's own image cache, which keeps the previous image when
+the tag has not changed, and the node would run stale code. Loading the two
+images, the migration one about 2.4 GB, took between 1 minute and 96 s in
+the lab. If `minikube start` warned that the kernel does not support CPU cfs
 period/quota, cap the node container as the script does:
-`docker update --cpus=4 pa-webinar`, then check with
-`docker exec pa-webinar cat /sys/fs/cgroup/cpu.max` (4 CPUs show as
-`400000 100000`).
+`docker update --cpus=4 $P`, then check with
+`docker exec $P cat /sys/fs/cgroup/cpu.max` (4 CPUs show as `400000 100000`).
 
 Write two files in a folder outside the repository (`<dir>` below), readable
 only by you:
 
-- `pa-webinar.secrets.yaml`, written as in step 1 of
-  [Simple profile](../DEPLOYMENT.md#simple-profile): the application keys, the
-  datastore passwords and the pinned Jicofo and bridge XMPP passwords. The
-  overlay sets `jitsi.requirePinnedCredentials: true`, so the render stops
-  when those passwords are missing. Keep the file: the database keeps the
-  passwords it was first started with.
+- `pa-webinar.secrets.yaml`, with the application keys, the datastore
+  passwords and the pinned Jicofo and bridge XMPP passwords, in the chart's
+  `generate` mode: the keys are listed in the header of
+  `examples/values-simple.yaml`, and the overlay sets
+  `jitsi.requirePinnedCredentials: true`, so the render stops when a password
+  is missing. `generate` mode is for evaluation only
+  ([Secret modes](../DEPLOYMENT.md#secret-modes)). Keep the file: the
+  database keeps the passwords it was first started with.
 - `pa-webinar.minikube-hosts.yaml`, with the images and the host names:
 
 ```yaml
+site:
+  portalHost: app.<node-ip>.nip.io
+  conferenceHost: jitsi.<node-ip>.nip.io
+jitsi-meet:
+  publicURL: https://jitsi.<node-ip>.nip.io
 app:
   image:
     repository: pa-webinar
-    tag: local
+    tag: local-pa-webinar
     pullPolicy: Never
   migration:
     image:
       repository: pa-webinar
-      tag: local-migrate
+      tag: local-pa-webinar-migrate
       pullPolicy: Never
-  env:
-    NEXT_PUBLIC_APP_URL: https://app.<node-ip>.nip.io
-    NEXT_PUBLIC_JITSI_DOMAIN: jitsi.<node-ip>.nip.io
-
-ingress:
-  hosts:
-    - host: app.<node-ip>.nip.io
-      paths:
-        - path: /
-          pathType: Prefix
-
-jitsi-meet:
-  publicURL: https://jitsi.<node-ip>.nip.io
-  web:
-    ingress:
-      hosts:
-        - host: jitsi.<node-ip>.nip.io
-          paths: ["/"]
 ```
 
 Then install and check:
 
 ```bash
-helm --kube-context pa-webinar upgrade --install pa-webinar infra/helm/pa-webinar \
+helm --kube-context $P upgrade --install pa-webinar infra/helm/pa-webinar \
   -n pa-webinar --create-namespace \
   -f infra/helm/pa-webinar/examples/values-simple.yaml \
   -f infra/helm/pa-webinar/examples/values-minikube.yaml \
@@ -437,10 +485,14 @@ helm --kube-context pa-webinar upgrade --install pa-webinar infra/helm/pa-webina
   -f <dir>/pa-webinar.secrets.yaml \
   --wait --timeout 15m
 
-IP=$(minikube -p pa-webinar ip)
+IP=$(minikube -p $P ip)
 curl -sk https://app.$IP.nip.io/api/health                                   # JSON with "status":"ok"
 curl -sk -o /dev/null -w '%{http_code}\n' https://jitsi.$IP.nip.io/config.js   # 200
 ```
+
+After a rebuild with the same tag, the manifest does not change, so Helm does
+not restart the portal: restart it yourself once the new images are loaded,
+`kubectl --context $P -n pa-webinar rollout restart deployment/pa-webinar`.
 
 The manual path leaves out Mailpit, which the script installs next to the
 chart: without an SMTP relay in your values, no email is sent. It also leaves
@@ -448,20 +500,17 @@ out the local certificate authority: both Ingresses serve the ingress
 controller's self-signed certificate, which you accept in the browser, the
 conference's first ([Trust the local certificate authority](#1-trust-the-local-certificate-authority)
 describes both ways). To use certificates of your own, load each into a TLS
-Secret and name it in `ingress.tls` and `jitsi-meet.web.ingress.tls`, as the
-script's `values-local.yaml` does:
+Secret and name it on both Ingresses, as the script's `values-local.yaml`
+does; the hosts come from `site.*`:
 
 ```yaml
 ingress:
   tls:
     - secretName: app-tls
-      hosts: ["app.<node-ip>.nip.io"]
-jitsi-meet:
-  web:
-    ingress:
-      tls:
-        - secretName: jitsi-tls
-          hosts: ["jitsi.<node-ip>.nip.io"]
+jitsi:
+  conferenceIngress:
+    tls:
+      - secretName: jitsi-tls
 ```
 
 ### What the overlay changes
@@ -471,17 +520,16 @@ On top of the simple profile, `examples/values-minikube.yaml`:
 - uses the images of the development branch, with `pullPolicy: Always`;
 - lowers the requests: portal 100m and 256 MiB (limits 1 CPU and 512 MiB),
   PostgreSQL 100m and 128 MiB (limits 1 CPU and 512 MiB);
-- gives Jicofo (50m, 320 MiB), Prosody (50m, 128 MiB) and Jitsi web (10m,
-  64 MiB) the requests that the chart leaves out;
 - caps the bridge's Java heap at 1 GB (`VIDEOBRIDGE_MAX_MEMORY: "1024m"`),
   with requests of 250m and 1 GiB and limits of 2 CPU and 2 GiB
   ([Bridge memory on small nodes](../INFRASTRUCTURE.md#bridge-memory-on-small-nodes));
-- makes the bridge's liveness probe more tolerant (every 10 s, 5 s timeout,
-  six failures);
 - sets `stunServers: ""`: the bridge advertises the node IP, which browsers on
   the workstation reach directly, and asks no third-party STUN server;
 - uses the standard `jitsi/web` image at the subchart's Jitsi release, with no
   pull secrets;
+- renders the conference Ingress from the chart (`jitsi.conferenceIngress`,
+  with the subchart's Ingress off), and removes the cert-manager annotation
+  from both Ingresses;
 - selects the `nginx` ingress class and sets
   `nginx.ingress.kubernetes.io/force-ssl-redirect: "true"` on both Ingresses,
   so plain HTTP always redirects to HTTPS. A page opened over `http://` is not
@@ -491,6 +539,9 @@ On top of the simple profile, `examples/values-minikube.yaml`:
   `values-local.yaml`; without them the controller's self-signed certificate
   applies;
 - sets `jitsi.requirePinnedCredentials: true`.
+
+The requests of Jicofo, Prosody and Jitsi web, and the bridge's tolerant
+liveness probe, are the chart's defaults on every profile.
 
 The simple profile already caps the platform at its single bridge
 (`JVB_MAX_REPLICAS: "1"`), and the chart writes the same cap from
@@ -517,13 +568,20 @@ SHA-256 fingerprint; check it with
 `openssl x509 -in <file> -noout -fingerprint -sha256`. Trust it once, in one
 of these ways, then restart the browser:
 
-- **Chrome, Chromium or Edge on Linux** read the user's NSS database. With
-  `certutil` (package `nss-tools` on Fedora, `libnss3-tools` on Debian and
-  Ubuntu):
+- **Chrome, Chromium or Edge on Linux** read the user's NSS database. Run the
+  script with `--trust-ca`: it creates the database when it does not exist
+  yet (a new user, or a Chrome that has only run headless), and adds the
+  authority under the name `PA Webinar minikube (<profile>)`, replacing the
+  one of an earlier installation of the same profile. It needs `certutil`
+  (package `nss-tools` on Fedora, `libnss3-tools` on Debian and Ubuntu).
+  `--nssdb DIR` names another database, for example
+  `~/snap/chromium/current/.pki/nssdb` for the Chromium snap. By hand:
 
   ```bash
-  certutil -d sql:$HOME/.pki/nssdb -A -t "C,," -n "PA Webinar minikube" \
-    -i ~/.config/pa-webinar/minikube/pa-webinar/ca.crt
+  P=pa-webinar
+  [ -f ~/.pki/nssdb/cert9.db ] || { mkdir -p ~/.pki/nssdb && certutil -d sql:$HOME/.pki/nssdb -N --empty-password; }
+  certutil -d sql:$HOME/.pki/nssdb -A -t "C,," -n "PA Webinar minikube ($P)" \
+    -i ~/.config/pa-webinar/minikube/$P/ca.crt
   ```
 
   Or, in Chrome: **Settings** > **Privacy and security** > **Security** >
@@ -543,8 +601,11 @@ of these ways, then restart the browser:
 The authority can sign only names under `nip.io`, `sslip.io` and the domain
 given with `--domain`, so trusting it does not let its key impersonate any
 other site. Its key stays in the state folder, readable only by you. Running
-the script again keeps the same authority; `scripts/minikube-down.sh --purge`
-deletes it, and then you remove it from the browser or system too.
+the script again keeps the same authority. `scripts/minikube-down.sh --purge`
+deletes it and removes it from the NSS database (the same `--nssdb`); from
+Firefox and the system stores, remove it yourself: there its name is
+`PA Webinar minikube CA (<profile>, <date>)`. By hand, from the NSS database:
+`certutil -d sql:$HOME/.pki/nssdb -D -n "PA Webinar minikube (<profile>)"`.
 
 **Without trusting it**, accept the browser's warning on both names, the
 conference first: open `https://jitsi.<node-ip>.nip.io` and accept, then
@@ -552,8 +613,10 @@ conference first: open `https://jitsi.<node-ip>.nip.io` and accept, then
 people forget: the conference runs in a frame inside the portal page, and a
 frame does not show the certificate warning, it just fails to load. In Chrome
 with a new profile, after both warnings were accepted, a moderator joined the
-conference in the room; with only the portal's accepted, the room showed
-**Unable to connect to the room**.
+conference in the room. With only the portal's accepted, the room shows
+**The video call service is not responding**, with a link that opens the
+conference host in a new tab, where you accept the warning, and a retry
+button.
 
 In the lab, the script's checks verified the certificates against the
 authority with curl, and the portal verified the conference's certificate from
@@ -575,23 +638,28 @@ Open `https://app.<node-ip>.nip.io/en/admin/login`, expand **Sign in with the
 instance key**, enter the key in **Access key** and press **Sign in**.
 
 The instance key is for the first access, emergencies and automation. To work
-under your own name, open **Accounts**, add a person as **Administrator** or
-**Organiser**, and open the one-time sign-in link from Mailpit
+under your own name, open **People** > **Accounts**, add a person as
+**Administrator** or **Organiser**, and open the one-time sign-in link from
+Mailpit
 (`https://mail.<node-ip>.nip.io`, signed by the same local authority).
 [First access](../DEVELOPMENT.md#first-access) describes the same steps on the
 Compose stack.
 
 ### 3. Create a first event
 
-- **A scheduled event.** **New event** opens the event wizard, five steps from
-  **Basic information** to **Review and publish**. Publishing needs a
-  moderator's name and email, used for the moderator link and the
-  confirmation email; like every email of this setup, it lands in Mailpit.
-  The event detail page lists the **Event links**: the
-  **Public event page**, the **Direct invite (no registration)** and the
-  **Moderator link**.
-- **An instant call.** **Instant calls** creates a call that is live at once,
-  with no public page. **Create and join** takes you in as moderator, and
+- **A scheduled event.** **New event** first offers the event templates;
+  **Configure manually** skips them. The wizard has five steps: **Basics**,
+  **Permissions**, **People**, **Content** and **Review**. Publishing needs a
+  moderator's name and email, entered in **Review**, used for the moderator
+  link and the confirmation email; like every email of this setup, it lands
+  in Mailpit. After **Publish event**, or **Save as draft**, the wizard lands
+  on the event's page in the administration area, which lists the
+  **Event links**: the **Public event page**, the
+  **Direct invite (no registration)** and the **Moderator link**. The
+  default templates carry Italian names and descriptions in every language.
+- **An instant call.** **Instant calls** > **New call** creates a call that is
+  live at once, with no public page. **Create and join** opens its page:
+  **Join as moderator**, type your name and press **Enter now**.
   **Copy invite link** gives the link for guests.
 
 ### 4. Open the room
@@ -599,8 +667,9 @@ Compose stack.
 Open the **Moderator link**. The event lifecycle job, which runs every
 minute, opens a published event at its start time and ends it once its end
 time and the grace period have passed. Before the start time the moderator
-opens the room with **Start event**, and **End for everyone** closes it at any
-time ([Event lifecycle](../architecture/event-lifecycle.md)).
+opens the room with **Start event**, then enters with **Enter now**, and
+**End for everyone** closes it at any time
+([Event lifecycle](../architecture/event-lifecycle.md)).
 
 In the room, only moderator links make someone a moderator: the event's
 moderator link and those of named moderators. Registrants, guests and speakers
@@ -615,9 +684,10 @@ With the Docker driver, the node IP is an address of a Docker bridge on your
 workstation. Colleagues on other machines cannot reach it: not the portal, not
 the conference, not the audio and video. The links in the emails point at the
 same address. The script's summary says so too. To try PA Webinar with
-colleagues on their own computers, install it on a VM that they can reach:
-[Installing on your own VMs with k3s](k3s.md), with the scripts in
-[`infra/onprem/k3s`](../../infra/onprem/k3s/README.md).
+colleagues on their own computers, install it on a VM that they can reach,
+with one command from your workstation:
+`infra/onprem/k3s/pa-webinar-up.sh --host <user>@<vm> --portal <name> --meet <name> --tls private-ca --mailpit`
+([Install with one command](k3s.md#install-with-one-command)).
 
 On minikube, play the other participants yourself, with a second browser
 profile or a private window per participant. A new browser profile that does
@@ -686,21 +756,23 @@ nothing with the Docker driver, because the node reports the workstation's
 capacity. Memory pressure shows up as thrashing and restarts, not as evicted
 or pending pods.
 
-Timings, measured with `time` around the scripts:
+Timings, measured with `time` around the scripts, on a 4 CPU / 6 GB node unless
+the table says otherwise. The script prints the duration of each phase and the
+total, so you can compare your own runs:
 
-| Operation | Node | Time |
-|---|---|---|
-| First install, published images with a pull Secret | 4 CPU / 6 GB | 2 min 47 s, of which Helm 117 s |
-| First install, no credentials | 4 CPU / 6 GB | 4 min 56 s: about 50 s to start the node and the ingress, 2 min 26 s to build the images with Docker's build cache warm, 1 min to load them into the node, 69 s of Helm |
-| First install, no credentials | 2 CPU / 3 GB | 6 min 10 s, build cache state not recorded |
-| Running the script again, with a change | 4 CPU / 6 GB | 26 s |
-| Running the script again, nothing changed | 4 CPU / 6 GB | 8 s |
-| `scripts/minikube-down.sh --stop` | 4 CPU / 6 GB | 15 s |
-| Restarting a stopped profile with the script | 4 CPU / 6 GB | 1 min 18 s, data kept |
-| `scripts/minikube-down.sh --purge` | 4 CPU / 6 GB | 18 s |
+| Operation | Time |
+|---|---|
+| First install, published images with a pull Secret | 2 min 47 s, of which Helm 117 s |
+| First install, no credentials, Docker's build cache warm | 2 min 57 s to 4 min 56 s: about 50 s to start the node and the ingress, from a few seconds to 2 min 26 s to build the images, 50 s to 1 min to load them into the node, about 70 s of Helm |
+| First install, no credentials, 2 CPU / 3 GB node | 6 min 10 s, build cache state not recorded |
+| The development loop: one string changed in the portal, then the script again with `--images local` | 2 min 21 s: 1 min 50 s of build with a warm cache, the application image loaded into the node (the migration image unchanged, not loaded), 21 s of Helm |
+| Running the script again, nothing changed | 11 to 15 s |
+| `scripts/minikube-down.sh --stop` | 15 s |
+| Restarting a stopped profile with the script | 1 min 18 s, data kept |
+| `scripts/minikube-down.sh --purge` | 18 to 19 s |
 
-A first build on a machine with an empty build cache takes longer than the
-4 min 56 s above.
+A first build on a machine with an empty build cache takes several minutes
+more.
 
 ## Troubleshooting
 
@@ -728,11 +800,12 @@ to `/etc/hosts`. `--domain sslip.io` was not tried in the lab.
 
 ### The room does not load in the portal
 
-The page shows **Unable to connect to the room**, or the conference area stays
-empty. The browser does not trust the conference's certificate: trust the local
-authority ([Trust the local certificate authority](#1-trust-the-local-certificate-authority)),
-or open `https://jitsi.<node-ip>.nip.io` in the same browser profile, accept the
-warning, and reload the room.
+The room shows **The video call service is not responding**, or the conference
+area stays empty. The browser does not trust the conference's certificate:
+trust the local authority
+([Trust the local certificate authority](#1-trust-the-local-certificate-authority)),
+or follow the link in the message, which opens `https://jitsi.<node-ip>.nip.io`
+in a new tab, accept the warning there, and press the retry button.
 
 If the address bar shows `http://`, the page is not a secure context and the
 browser gives it no microphone or camera. The overlay redirects every `http://`
@@ -833,6 +906,32 @@ With `--no-mailpit` the script installs no test mailbox and leaves the SMTP
 host of the simple profile empty, so nothing can be delivered until you set a
 relay in the secrets file ([Email](../configuration/email.md)).
 
+### My changes do not show up
+
+The summary line `Immagini` ("images") names the images the node runs. If it
+names `ghcr.io/italia/pa-webinar`, the automatic choice took the published
+images because it found registry credentials: run the script again with
+`--images local`. `/api/health` shows the commit the portal was built from:
+
+```bash
+curl -s --cacert ~/.config/pa-webinar/minikube/pa-webinar/ca.crt https://app.<node-ip>.nip.io/api/health
+# {"status":"ok",...,"version":"local","commit":"<commit>-dirty",...}
+```
+
+### An upgrade stops on the conference Ingress
+
+"admission webhook "validate.nginx.ingress.kubernetes.io" denied the request:
+host … and path "/" is already defined in ingress
+pa-webinar/pa-webinar-jitsi-meet-web". A profile installed before the chart
+rendered the conference Ingress itself still has the subchart's Ingress, and
+ingress-nginx refuses a second one for the same host. Delete the old one, then
+run the script again:
+
+```bash
+kubectl --context pa-webinar -n pa-webinar delete ingress pa-webinar-jitsi-meet-web
+scripts/minikube-up.sh
+```
+
 ### kubectl behaves oddly
 
 When the script warns that kubectl is more than one minor version away from
@@ -852,7 +951,8 @@ other.
   `git pull`. It runs `helm upgrade` with the same secrets. The conference's
   internal passwords are pinned, so an upgrade does not restart Prosody,
   Jicofo or the bridge unless their own settings change. Jitsi web restarts on
-  every upgrade, through the chart's configuration-reload hook.
+  every upgrade, through the chart's configuration-reload hook. A release that
+  changes the chart's defaults for those components restarts them once.
 - **New development images.** In local mode the script rebuilds from your
   checkout and restarts the portal only when the images changed. In registry
   mode `:dev` is a moving tag, and running the script again does not pull a
@@ -863,19 +963,62 @@ other.
 - **Stop.** `scripts/minikube-down.sh --stop` stops the profile.
   `scripts/minikube-up.sh` starts it again with its data.
 - **Delete.** `scripts/minikube-down.sh` deletes the profile: the cluster, the
-  database, the loaded images and the pull Secret. It keeps the secrets file,
-  which the next install reuses.
+  database, the loaded images and the pull Secret. It asks you to type the
+  profile's name first; `--yes` skips the question, as in the k3s teardown.
+  It keeps the secrets file, which the next install reuses, and the images
+  built on your workstation: `--purge-images` removes those alone.
 - **Delete everything.** `scripts/minikube-down.sh --purge` also deletes the
   secrets file, the local certificate authority with its host certificates,
-  and the generated values. It refuses `--stop`, which would leave a database
-  whose passwords nobody has. If you trusted the authority, remove it from the
-  browser or the system as well: its key no longer exists, and the next
-  install creates a new one.
+  and the generated values; removes the authority from the browser's NSS
+  database (pass the same `--nssdb` as to `minikube-up.sh`); and deletes the
+  profile's images `pa-webinar:local-<profile>` and
+  `pa-webinar:local-<profile>-migrate` from your workstation's Docker. It
+  refuses `--stop`, which would leave a database whose passwords nobody has.
+  If you trusted the authority in Firefox or in the system store, remove it
+  there as well: its key no longer exists, and the next install creates a new
+  one.
 
-Local mode also leaves the images `pa-webinar:local` and
-`pa-webinar:local-migrate` in your workstation's Docker, and overwrites them on
-the next build. Remove them with `docker image rm` when you no longer need
-them.
+## More than one profile
+
+A second installation on the same workstation, for example to try a branch
+next to your usual profile, needs only `--profile`. The profile's name is
+also its kubectl context, the leaf of its state folder, the name of its node
+container, and part of its image tags and of its authority's name in the
+browser. The two profiles get separate networks and addresses:
+
+```bash
+P=pa-webinar-try
+scripts/minikube-up.sh --profile $P --images local --trust-ca
+kubectl --context $P -n pa-webinar get pods
+scripts/verify-install.sh --context $P --ca-file ~/.config/pa-webinar/minikube/$P/ca.crt \
+  --secrets-file ~/.config/pa-webinar/minikube/$P/secrets.yaml
+scripts/minikube-down.sh --profile $P --purge
+```
+
+The commands on this page use the default profile, `pa-webinar`: replace it
+with yours in `--context`, `minikube -p`, `docker exec` and the state folder.
+Each profile takes its own share of memory and disk
+([Size](#size)).
+
+## The development loop
+
+For code in `app/`, Docker Compose is faster ([Local development](../DEVELOPMENT.md)).
+minikube is the loop for the chart, its values and anything that runs as a
+Kubernetes job:
+
+1. Change the chart, a values file or the code.
+2. Run `scripts/minikube-up.sh --images local` (with `--values FILE` for a
+   chart option you are trying). Always force local mode: with registry
+   credentials around, the automatic choice installs the published images.
+3. Check the running build: `/api/health` answers `"version":"local"` and the
+   commit, with `-dirty` for uncommitted changes.
+4. Run `scripts/verify-install.sh --context pa-webinar ...` as the summary
+   prints it ([Check it yourself](#check-it-yourself)).
+
+A change to the portal's code took 2 min 21 s from the edit to the running
+pod, with Docker's build cache warm. A change to the chart or a values file
+alone skips the build and the image load, which leaves about half a minute
+for the Helm upgrade and the checks (derived from the measured phases).
 
 ## Limits of this setup
 

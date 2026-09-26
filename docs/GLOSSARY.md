@@ -556,6 +556,13 @@ Features call `enqueueEmail()`, and a scheduled job
 overrides of the subject and text of system emails, edited in the
 administration area. [Email and calendar](architecture/email.md)
 
+**Installation check** (`scripts/verify-install.sh`): the script that checks
+a running installation from outside and inside the cluster: pods,
+certificates, the portal and its components, the conference, the scheduled
+jobs, the email outbox and the database disk, and with `--call` a call
+between two headless browsers.
+[Post-install verification](install/checklists.md#post-install-verification)
+
 **Installation, instance**: one running deployment of PA Webinar, with its own
 database, settings and domain. [Reusing PA Webinar](REUSE.md)
 
@@ -569,9 +576,15 @@ events.
 [Scaling the media plane](architecture/scaling.md),
 [Running the JVB scaler](operations/jvb-scaler.md)
 
-**k3s**: a lightweight Kubernetes distribution that runs on ordinary VMs. The
-scripts in `infra/onprem/k3s` install it on one or three VMs, with the chart's
-`simple` profile. [Installing on your own VMs with k3s](install/k3s.md)
+**k3s**: a lightweight Kubernetes distribution that runs on ordinary VMs.
+`infra/onprem/k3s/pa-webinar-up.sh` installs it, and the chart's `simple`
+profile, on one server with one command; the node scripts next to it also
+cover three nodes. [Installing on your own VMs with k3s](install/k3s.md)
+
+**Layered values**: the order of the values files on every install and
+upgrade: the profile and the platform overlay of the release, then the site
+file, then the secrets, kept in Secrets outside Helm in production.
+[Upgrades and rollback](operations/upgrades.md#the-upgrade-procedure)
 
 **Lifecycle cron**, lifecycle job (`cronjobs.lifecycle`, `GET /api/cron/lifecycle`): the job
 that moves events through their statuses every minute where the JVB scaler is
@@ -582,8 +595,8 @@ while the scaler's heartbeat is in Redis. Docker Compose runs it from its
 [Event lifecycle](architecture/event-lifecycle.md#running-without-the-scaler)
 
 **minikube**: a single-node Kubernetes cluster on a workstation. The
-evaluation path: `scripts/minikube-up.sh` installs the same chart that runs in
-production. [Try PA Webinar on minikube](install/minikube.md)
+evaluation and development path: `scripts/minikube-up.sh` installs the same
+chart that runs in production. [Try PA Webinar on minikube](install/minikube.md)
 
 **Node pool**: a group of Kubernetes nodes of the same machine size. The
 `full` profile expects a dedicated pool for bridges, and AI post-production a
@@ -648,10 +661,21 @@ CronJobs in the chart; the Compose `cron` service runs only the email outbox,
 reminders and GDPR cleanup.
 [Scheduled and background jobs](architecture/background-jobs.md)
 
+**Secret modes** (`secrets.mode`: `existing`, `external`, `generate`): who
+creates the Secrets the chart reads. Production uses `existing`, where you or
+the k3s installer create them outside Helm, or `external`; `generate`, where
+the chart renders them from values, is for evaluation only.
+[Secret modes](DEPLOYMENT.md#secret-modes)
+
 **Service inventory** (`/service-inventory`, UI **Service inventory**): a
 public page listing the services and providers an installation runs on, read
 from a CycloneDX 1.6 document at `SERVICE_INVENTORY_URL`.
 [Service inventory: publishing](SERVICE-INVENTORY.md)
+
+**Site file**: the values file that holds what is yours in an installation and
+is not secret: `site.portalHost`, `site.conferenceHost`, the image tags, the
+TLS settings. The k3s installer writes it as `site.yaml` in its state folder.
+[The values file for your installation](DEPLOYMENT.md#the-values-file-for-your-installation)
 
 **Site settings** (`SiteSetting`, table `site_settings`, UI **Site
 settings**): the single-row runtime configuration of an installation
@@ -664,6 +688,12 @@ snapshot is sent only where every viewer gets the same answer (the live flags,
 the event status); otherwise the message is only a notice, and each client
 re-reads the panel through its own authorized request.
 [Live interaction and realtime](architecture/live-interaction.md#snapshot-or-reload)
+
+**State folder** (`~/.config/pa-webinar/k3s/<portal>`,
+`~/.config/pa-webinar/minikube/<profile>`): where the installation scripts keep
+the secrets they generate once, the certificate authority, the kubeconfig and
+the options, outside the repository and readable only by their owner.
+[The state folder](install/k3s.md#the-state-folder)
 
 **Status page** (`/status`, UI **System status**) and **infrastructure page**
 (`/admin/infrastructure`, UI **Infrastructure**): the public view of service

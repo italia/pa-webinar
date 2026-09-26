@@ -159,12 +159,12 @@ Dashed boxes are optional.
 
 | You need | What depends on it | Details |
 |---|---|---|
-| A Kubernetes cluster and Helm 3 or 4: minikube to evaluate the chart, k3s on one or three VMs for a small installation, managed Kubernetes for concurrent or large events. Docker Compose is only for changing the code | Everything | [Installing PA Webinar](install/README.md#choose-a-platform), [Deploying with Helm](DEPLOYMENT.md) |
-| Two DNS names with TLS certificates, one for the portal (`webinar.example.com`) and one for the conference (`meet.webinar.example.com`). TURN over TLS needs a third name on coturn's own IP, with a certificate issued through DNS-01 | The portal and the conference are served by separate ingresses. TURN does not go through the ingress | [DNS and TLS](INFRASTRUCTURE.md#dns-and-tls), [TURN](INFRASTRUCTURE.md#turn) |
+| A Kubernetes cluster and Helm 3 or 4: minikube to evaluate the chart, one k3s server (installed with one command) or three k3s nodes for a small production, managed Kubernetes for concurrent or large events. Docker Compose is only for changing the code | Everything | [Installing PA Webinar](install/README.md#support-levels), [Deploying with Helm](DEPLOYMENT.md) |
+| Two DNS names with TLS certificates, one for the portal (`webinar.example.com`) and one for the conference (`meet.webinar.example.com`). TURN over TLS needs a third name: on a managed cluster on coturn's own IP, with a certificate issued through DNS-01; on one k3s server on the same address and port as the portal. Object storage on one k3s server needs a fourth | The portal and the conference are served by separate ingresses | [DNS and TLS](INFRASTRUCTURE.md#dns-and-tls), [TURN](INFRASTRUCTURE.md#turn) |
 | A network path for media: a public IP on the bridge nodes with the bridge UDP port open, plus TURN over TLS on port 443 for participants behind restrictive firewalls | Audio and video. Media never passes through the portal | [Networking](INFRASTRUCTURE.md#networking), [Jitsi integration](architecture/jitsi-integration.md) |
 | PostgreSQL and Redis, in the cluster through the chart or as managed services | All state (PostgreSQL) and realtime fan-out in the live room (Redis) | [Deploying with Helm](DEPLOYMENT.md) |
 | An SMTP relay | Registration confirmations with the personal link (the only way it reaches registrants while public registration is off), reminders, staff sign-in links, confirmations of data-subject requests | [Email delivery](configuration/email.md), [Email and calendar](architecture/email.md) |
-| Object storage: Azure Blob Storage or an S3-compatible service (AWS S3, MinIO, Google Cloud Storage through its S3-compatible API) | Recordings, uploaded materials and videos, AI outputs. Evaluation does not need it | [Object storage](configuration/storage.md) |
+| Object storage: Azure Blob Storage or an S3-compatible service (AWS S3, Google Cloud Storage through its S3-compatible API, or Garage, which the k3s installer adds to one server) | Recordings, uploaded materials and videos, AI outputs. Evaluation does not need it | [Object storage](configuration/storage.md) |
 | Optional: a GPU node pool, model weights, and an LLM server (vLLM) that you deploy separately from the chart | AI post-production only | [AI post-production](POSTPROD.md) |
 
 The chart assumes a few components in the cluster:
@@ -420,8 +420,10 @@ Kubernetes API server. What is still unproven:
 - No managed-cloud installation has been walked from scratch on a clean
   cluster through to a working event.
 - No recurring test repeats any installation.
-- The lab installs used the simple profile with self-signed certificates, and
-  exercised neither TURN nor recording.
+- The lab installs used the simple profile, with certificates from a private
+  authority or from a test ACME server, and exercised neither Jibri recording
+  nor a real SMTP relay. TURN and object storage were exercised on one k3s
+  server.
 
 Plan the first installation as a project, not as a routine procedure.
 
@@ -431,15 +433,15 @@ Plan the first installation as a project, not as a routine procedure.
 | Kubernetes flavor | AKS exercised. minikube and k3s tested in lab. GKE and EKS not yet verified. OpenShift not covered | Expect to adapt node pools, load balancers and ingress to your provider ([Node pools and bridge exposure](INFRASTRUCTURE.md#node-pools-and-bridge-exposure)) |
 | Ingress | The values default to ingress-nginx and to a cert-manager ClusterIssuer named `letsencrypt-prod` | On another controller, set the Ingress classes and translate the ingress-nginx settings you need. Traefik is tested in lab. Controllers that speak only the Gateway API get no routes ([Ingress controllers](INFRASTRUCTURE.md#ingress-controllers)) |
 | Docker Compose | A development stack. Its placeholder secrets live in the tracked file. The portal is served without TLS, and the session cookie is `Secure`, so staff sign-in works only on `localhost`. It has no object storage and no TURN. It schedules only the `email-outbox`, `lifecycle`, `reminders` and `cleanup` jobs | For changing the code. It is not built to serve events ([Scheduled jobs](architecture/background-jobs.md)). To evaluate the chart, use [minikube](install/minikube.md) |
-| Single VM | k3s on one VM with the simple profile, tested in lab. The VM is a single point of failure, there is no Jibri, and object storage is yours to provide | The documented path for a single server ([Installing on your own VMs with k3s](install/k3s.md)) |
+| Single VM | One k3s server, installed with `infra/onprem/k3s/pa-webinar-up.sh`: a supported small-production layout, tested in lab. The VM is a single point of failure, there is no Jibri, and object storage and TURN are options of the installer | The documented path for a single server, with its limits stated once ([Installing on your own VMs with k3s](install/k3s.md)) |
 | Object storage | Azure Blob and S3-compatible providers are implemented, including video uploads from the administration area. Unit tests cover both providers with mocked SDKs. The S3 upload path has been exercised by hand against S3-compatible servers, but no automated test runs against a real storage service | The storage must accept uploads from browsers: CORS that allows `PUT` from the portal's origin and, on S3-compatible storage, an endpoint that is a public HTTPS address reachable by browsers and pods, and an access key with the permissions listed in [Object storage](configuration/storage.md#creating-buckets-and-containers). Test uploads and playback on your provider before the first event |
 | Composite recording (Jibri) | The standard and full profiles enable Jibri, but the chart does not wire the upload | The finalize script must be given to Jibri by hand, or composite recordings are neither uploaded nor registered ([Mount the finalize script](operations/recording-setup.md#mount-the-finalize-script)) |
-| TURN over TLS | coturn is an option of the Jitsi subchart. None of the lab setups exercised it | It needs its own IP, a third DNS name and a DNS-01 certificate. Test from a restrictive network before the first event ([TURN](INFRASTRUCTURE.md#turn)) |
+| TURN over TLS | coturn is an option of the Jitsi subchart, run by the AKS reference installation, and an add-on of the k3s installer tested in lab | On a managed cluster it needs its own IP, a third DNS name and a DNS-01 certificate; on one k3s server, `--turn` and a third DNS name. Test from a restrictive network before the first event ([TURN](INFRASTRUCTURE.md#turn)) |
 | Azure-specific tooling | `infra/tofu` holds only reference AKS node pools (bridges and GPU). The service-inventory generator in `infra/service-inventory/azure` reads Azure Resource Graph. The AI post-production setup procedure is written for AKS | Write the equivalents for your cloud |
 | Container images | The app and migration images are versioned per release and built only for `linux/amd64`. The recorder bot, recorder controller and AI worker images come only from the development branch, as `:dev` and `:dev-<sha>`, and the chart defaults to `:dev`. The patched `jitsi/web` image sits on a registry that needs a pull secret. Published images accept no anonymous pulls, and after publication they are neither scanned nor signed | Build from source or mirror into your own registry. Pin the auxiliary images to a `:dev-<sha>` you have tested, because rolling back the chart does not roll them back. The stock `jitsi/web` image also works, with advanced noise suppression off ([ADR-017](adr/017-patched-jitsi-web-image.md)) |
-| Backup and restore | Neither the chart nor the documentation provides them | You design them. See [Backups](#backups) |
-| Alerting | Alert rules cover the application, database, bridges, scaler and TURN. They do not cover scheduled jobs, the email outbox, retention or disk. The cleanup job reports success even when it fails on individual events | Add checks on job logs and outcomes ([Monitoring](operations/monitoring.md)) |
-| Post-install verification | There is no automated functional check. The [first-run checks](DEPLOYMENT.md#first-run-checks) end with a manual join from two networks, the only step that exercises the Jitsi JWT and the media path | Run that step, from outside your network, before you announce anything |
+| Backup and restore | `scripts/backup.sh` and `scripts/restore.sh` cover the database, the keys and an object store on a volume of the cluster, such as the Garage add-on of one k3s server, and the chart can take a nightly dump. An object store outside the cluster is backed up with its provider's tools | Schedule them, copy the backups away from the cluster, and run the restore drill. See [Backups](#backups) |
+| Alerting | Alert rules cover the application, database, bridges, scaler and TURN. They do not cover scheduled jobs, the email outbox, retention or disk. `scripts/verify-install.sh --quiet` checks those from cron. The cleanup job reports success even when it fails on individual events | Run the installation check on a schedule, and add checks on job outcomes ([Monitoring](operations/monitoring.md)) |
+| Post-install verification | `scripts/verify-install.sh` checks an installation from outside and inside the cluster, and with `--call` joins two headless browsers to a room and checks audio and video both ways | Run it after every install and upgrade, and hold a call from two real networks before you announce anything ([Post-install verification](install/checklists.md#post-install-verification)) |
 | Automated tests | Unit tests focus on library logic under a coverage ratchet. Browser tests do not enter a conference | See [Testing](development/testing.md) |
 | Accessibility | An accessibility-statement page is provided. Conformance has not been measured, and nothing checks accessibility automatically | Evaluate the platform before you publish your statement |
 | Participant identity | Registration by name and email. There is no SPID, CIE or eIDAS sign-in | SPID/CIE sign-in is a conditional roadmap item. eIDAS sign-in is not on the roadmap |
@@ -492,7 +494,7 @@ flowchart LR
   [security policy](../SECURITY.md).
 - Follow the repository's releases, and read the release notes in
   [`CHANGELOG.md`](../CHANGELOG.md) or on the in-app `/changelog` page.
-- Upgrade with the drift-safe procedure in [Upgrades and rollback](operations/upgrades.md).
+- Upgrade with the layered files, as in [Upgrades and rollback](operations/upgrades.md).
   Database migrations run automatically when the application pod starts (the
   `db-migrate` init container), and they are additive by policy.
 - The auxiliary `:dev` images change independently of releases. Pin them, and
@@ -538,8 +540,7 @@ software.
 
 ### Backups
 
-The chart creates no backup job. Its install notes only remind you to back up
-the database. Back up the following together, and test the restore:
+Back up the following together, and test the restore:
 
 - **PostgreSQL**, including the runtime configuration that lives in the
   database: site settings, templates and translation overrides.
@@ -549,17 +550,28 @@ the database. Back up the following together, and test the restore:
   first, encrypted personal data becomes unreadable. The second keys the email
   hashes that sign-in and data-subject requests look up.
 
+`scripts/backup.sh` covers all three when the object store runs on a volume
+of the cluster, as the Garage add-on of one k3s server does: an encrypted
+database dump with the installation's state folder and, with
+`--include-storage`, the store's files, a manifest and checksums. The store
+stops for the whole copy, so that it matches the database
+([Backup and restore](install/k3s.md#backup-and-restore)). A store outside the
+cluster is backed up with your provider's tools, at the same moment as the
+database. The chart's `backup.enabled` adds a nightly dump inside the
+cluster, which must still be copied elsewhere.
+
 Restore order matters. The recording reconciliation job deletes stored
 recordings that the database no longer references once a grace period expires
 (`orphanRecordingGraceDays` in `app/prisma/schema.prisma`). A database restored
-from a copy older than the storage can therefore delete recordings. Until the
-database and storage agree again, stop the job or disable its sweep:
-
-- set `cronjobs.recordingsReconcile.enabled: false`, or suspend the CronJob
-  `<fullname>-recordings-reconcile`, where `<fullname>` is the release name
-  when it contains `pa-webinar` and `<release>-pa-webinar` otherwise
-  (`pa-webinar-recordings-reconcile` for a release named `pa-webinar`);
-- or set the grace period to 0, which disables the automatic sweep.
+from a copy older than the storage can therefore delete recordings.
+`scripts/restore.sh` stops every scheduled job during the restore, restores
+the database and, with `--include-storage`, the store's files together, and
+sets the grace period to 0, which lists the unreferenced recordings without
+deleting them until you have reviewed them and run
+`scripts/restore.sh --reset-orphan-grace <days>`
+([Restore a backup](operations/upgrades.md#restore-a-backup)). The drill that
+proves a backup restores is in
+[Restore drill](install/checklists.md#restore-drill).
 
 ### Support
 
@@ -625,16 +637,12 @@ Before installing:
 
 - [ ] Platform and profile chosen ([Choose a platform](install/README.md#choose-a-platform)),
       and its [Known limitations](install/README.md#known-limitations) read.
-- [ ] The technical [checklist before you install](install/README.md#checklist-before-you-install)
-      is complete: DNS names and certificates, TURN, the bridge's public
-      address and UDP port, the ingress controller and the proxies in front
-      of it (`TRUSTED_PROXY_HOPS`), the SMTP relay, object storage with CORS
-      for browser uploads, access to the images with pinned tags, the
-      database, secrets generated once with `PII_ENCRYPTION_KEY` and
-      `APP_SECRET` kept with the backups, and the conference's internal
-      credentials pinned.
-- [ ] Backup and restore of database, storage and secrets are designed and
-      tested.
+- [ ] The technical checks are done: the
+      [pre-install checks by constraint](install/checklists.md#pre-install-checks-by-constraint),
+      the [services and accounts](install/checklists.md#services-and-accounts)
+      and the [preflight](install/checklists.md#workstation-and-server-preflight).
+- [ ] Backup and restore of database, storage and secrets are designed, and
+      a [restore drill](install/checklists.md#restore-drill) has passed.
 - [ ] Recording paths are decided. If you use Jibri, its finalize script is
       mounted. Per-participant audio is enabled only with AI post-production.
 - [ ] If you use AI: GPU quota, model weights, the vLLM server and the
@@ -642,15 +650,11 @@ Before installing:
 
 Before the first public event:
 
-- [ ] Branding, legal notice, privacy notice and accessibility statement are
-      filled in.
-- [ ] Languages are activated, and Italian stays active for event content.
-- [ ] Named administrators exist, and the instance key is in a vault.
-- [ ] Monitoring is in place, with extra checks on scheduled jobs.
-- [ ] A test event has passed end to end: registration email, joining from
-      outside your network, joining from a restrictive network (TURN),
-      recording, and cleanup.
-- [ ] Processor agreements are signed.
+- [ ] The [go-live checklist](install/checklists.md#go-live) is complete, with
+      its items for IT, the DPO and communications: certificates, networks
+      and TURN, email, backups, monitoring, named administrators, the privacy
+      notice, processor agreements, the site's content and a test event end
+      to end.
 
 Ongoing:
 

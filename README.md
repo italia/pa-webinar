@@ -208,8 +208,9 @@ PA Webinar is Kubernetes-native. One Helm chart, `infra/helm/pa-webinar`, instal
 
 | Platform | Start from | What you get | Status |
 |---|---|---|---|
-| minikube on a workstation | [Try PA Webinar on minikube](docs/install/minikube.md): `scripts/minikube-up.sh` | Evaluation: the whole chart in the `simple` profile, with a test mailbox. Browsers on the same workstation only | Tested in lab |
-| k3s on one or three VMs | [Installing on your own VMs with k3s](docs/install/k3s.md): the scripts in `infra/onprem/k3s` | Occasional events of about 20 participants on camera: one bridge, PostgreSQL and Redis in the cluster, no TURN. Not highly available | Tested in lab |
+| minikube on a workstation | [Try PA Webinar on minikube](docs/install/minikube.md): `scripts/minikube-up.sh` | Evaluation and development: the whole chart in the `simple` profile, with a test mailbox. Browsers on the same workstation only | Tested in lab |
+| One k3s server | [Installing on your own VMs with k3s](docs/install/k3s.md): `infra/onprem/k3s/pa-webinar-up.sh`, one command from your workstation | Small production: occasional events of about 20 participants on camera, one bridge, PostgreSQL and Redis on the server, object storage and TURN as options, a nightly database dump. Not highly available | Tested in lab |
+| Three k3s nodes | [Install on three nodes](docs/install/k3s.md#install-on-three-nodes), by hand | The same, with the bridge on its own VM. Not highly available | Tested in lab |
 | AKS | [Installing on AKS](docs/install/aks.md): the module in `infra/tofu/aks` | The `full` profile: bridges that scale to zero, coturn, Azure Blob storage | Exercised with real events; the module itself has not yet been applied |
 | GKE, EKS | [Installing on GKE](docs/install/gke.md), [Installing on EKS](docs/install/eks.md): the modules in `infra/tofu/gke` and `infra/tofu/eks` | The `full` profile on Google Cloud or AWS | Not yet verified |
 | Docker Compose | [Local development](docs/DEVELOPMENT.md) | The loop for changing the code. It is not an installation and does not serve events | Development only |
@@ -218,7 +219,7 @@ The chart's three example profiles are values files in `infra/helm/pa-webinar/ex
 
 Some capabilities need more than one machine. Bridge scale-to-zero and multi-node scaling need a cluster with an autoscaling node pool, and AI post-production needs a GPU node pool in the same cluster. Jibri needs the ALSA loopback kernel module on its node and elevated container privileges (the Jitsi subchart adds `SYS_ADMIN`).
 
-To choose a platform, go through the checklist and read the measured requirements and known limitations, start from [Installing PA Webinar](docs/install/README.md). The chart's keys are in [Deploying with Helm](docs/DEPLOYMENT.md), and the evidence behind the sizes and the network design is in the [Infrastructure reference](docs/INFRASTRUCTURE.md).
+To choose a platform, read the support levels, the stack at a glance, the constraints by platform, the measured requirements and the known limitations, start from [Installing PA Webinar](docs/install/README.md); every checklist, from the preflight to decommissioning, is in [Checklists](docs/install/checklists.md). The chart's keys are in [Deploying with Helm](docs/DEPLOYMENT.md), and the evidence behind the sizes and the network design is in the [Infrastructure reference](docs/INFRASTRUCTURE.md).
 
 ## Scalability
 
@@ -228,7 +229,7 @@ To choose a platform, go through the checklist and read the measured requirement
 - **Without a node autoscaler**, as on minikube and k3s, the `simple` profile runs one bridge at a fixed count, and growing means a bigger node.
 - **Sizing comes from what the organizer declared**: expected participants and the share expected to send video. The defaults assume 16-core bridges (`jvbCpuCoresPerPod` in `app/prisma/schema.prisma`; the formula is in `app/src/lib/jvb-sizing.ts`). Align them with your hardware. The measured requirements of each platform are in [Requirements](docs/install/README.md#requirements), and the bridge measurements in [Load testing](docs/LOAD-TESTING.md).
 - **The app tier is stateless.** Pods scale with a HorizontalPodAutoscaler (`autoscaling` in `infra/helm/pa-webinar/values.yaml`), and Redis delivers live updates to every replica.
-- **Where the limits are**, in the order you meet them: one bridge per event; the replica cap and the size of the bridge pool; one Prosody and one Jicofo shared by every conference; network egress, which in tile view grows with the square of the cameras; and a single PostgreSQL and Redis that scale vertically. Around them sit the limits of the network: participants whose networks block UDP need TURN (coturn, with its own address and DNS name), the chart's HTTP tuning is written for ingress-nginx, and proxies in front of the ingress must be declared so that per-IP limits see real clients. All of them are in [Known limitations](docs/install/README.md#known-limitations).
+- **Where the limits are**, in the order you meet them: one bridge per event; the replica cap and the size of the bridge pool; one Prosody and one Jicofo shared by every conference; network egress, which in tile view grows with the square of the cameras; and a single PostgreSQL and Redis that scale vertically. Around them sit the limits of the network: participants whose networks block UDP need TURN (coturn, with its own DNS name, and on managed clusters its own address), the chart's HTTP tuning is written for ingress-nginx, and proxies in front of the ingress must be declared so that per-IP limits see real clients. All of them are in [Known limitations](docs/install/README.md#known-limitations).
 
 ```mermaid
 stateDiagram-v2
@@ -317,7 +318,7 @@ The interface ships in the 24 official EU languages through next-intl, with Ital
 
 ### Try it on minikube
 
-To see the product and the Helm chart on one workstation, you need minikube, Helm, kubectl, openssl, curl and Docker (the minimum versions are `MINIKUBE_MIN` and `HELM_MIN` in `scripts/minikube-up.sh`). One command installs the same chart that runs in production, in the `simple` profile with a small overlay:
+To see the product and the Helm chart on one workstation, you need minikube 1.38.1 or later, Helm 3.16.3 or later, kubectl, openssl, curl and Docker (the script checks the versions). One command installs the same chart that runs in production, in the `simple` profile with a small overlay:
 
 ```bash
 git clone https://github.com/italia/pa-webinar.git
@@ -325,15 +326,30 @@ cd pa-webinar
 scripts/minikube-up.sh
 ```
 
-The script creates a minikube profile named `pa-webinar` (4 CPU and 6 GB by default) and never changes your current kubectl context. It generates the secrets once, in `~/.config/pa-webinar/minikube/pa-webinar/secrets.yaml`, outside the repository, and a local certificate authority that signs the certificates of the three addresses. It uses the images that the development branch publishes when the node can pull them; without registry credentials it builds them from your checkout, and in the lab the whole run took about five minutes with Docker's build cache already warm (a first build takes longer). At the end it prints the addresses:
+The script creates a minikube profile named `pa-webinar` (4 CPU and 6 GB by default) and never changes your current kubectl context. It generates the secrets once, in `~/.config/pa-webinar/minikube/pa-webinar/secrets.yaml`, outside the repository, and a local certificate authority that signs the certificates of the three addresses; `--trust-ca` adds it to the browsers of the workstation. It uses the images that the development branch publishes when the node can pull them; without registry credentials it builds them from your checkout, and in the lab the whole run took three to five minutes with Docker's build cache already warm (a first build takes longer). To see your own changes, pass `--images local`. At the end it prints the addresses:
 
 | Service | Address | Note |
 |---|---|---|
-| Conference | `https://jitsi.<node-ip>.nip.io` | Trust the local certificate authority once, as the script explains, or open this address first and accept the certificate warning: otherwise the room embedded in the portal does not load |
+| Conference | `https://jitsi.<node-ip>.nip.io` | Trust the local certificate authority once (`--trust-ca`, or as the script explains), or open this address first and accept the certificate warning: otherwise the room embedded in the portal does not load |
 | Portal | `https://app.<node-ip>.nip.io` | Without the authority trusted, accept its certificate too. The administration area is at `/en/admin/login`: **Sign in with the instance key**, with `ADMIN_API_KEY` from the secrets file |
 | Mailpit | `https://mail.<node-ip>.nip.io` | Every email the portal sends lands here |
 
-Join from browsers on the same workstation: with the Docker driver, other machines cannot reach the node. The installation has no demo data, so create an event: a lifecycle job opens it at its start time, and **Start event** opens it earlier. Every step, the measured usage and how to stop or remove the profile are in [Try PA Webinar on minikube](docs/install/minikube.md). For real events, continue with [Installing PA Webinar](docs/install/README.md).
+Join from browsers on the same workstation: with the Docker driver, other machines cannot reach the node. The installation has no demo data, so create an event: a lifecycle job opens it at its start time, and **Start event** opens it earlier. The script's summary prints the command that checks the installation, with the real paths; `--call` adds a call between two headless browsers. With the default profile: `scripts/verify-install.sh --context pa-webinar --ca-file ~/.config/pa-webinar/minikube/pa-webinar/ca.crt --secrets-file ~/.config/pa-webinar/minikube/pa-webinar/secrets.yaml --call`. Every step, the measured usage and how to stop or remove the profile are in [Try PA Webinar on minikube](docs/install/minikube.md).
+
+### Install on one server
+
+For a small production on a server of your own (4 vCPU, 8 GiB and 40 GB at least, reachable over ssh), one command from your workstation installs k3s and the chart, generates the secrets once outside the repository, gets the certificates and checks the result:
+
+```bash
+git clone https://github.com/italia/pa-webinar.git
+cd pa-webinar
+git checkout vX.Y.Z
+infra/onprem/k3s/pa-webinar-up.sh --host <user>@<server> \
+  --portal webinar.example.org --meet meet.example.org \
+  --tls acme --acme-email it@example.org --smtp-file <smtp-settings-file> --backup
+```
+
+`--storage garage` adds object storage for uploads and videos, and `--turn` TURN for participants whose networks block UDP. Run again with only `--portal`, after checking out a new release, it upgrades the installation. The support level, the options, the certificates, backups and removal are in [Installing on your own VMs with k3s](docs/install/k3s.md).
 
 ### Change the code with Docker Compose
 

@@ -13,16 +13,29 @@ target release. Replace them with your own values.
 
 ## In short
 
-- Upgrade from the values the release already runs with (`helm get values`), never from an example
-  file of this repository.
-- Pass the app image tag and the migration image tag explicitly, both of them, every time.
+- Upgrade with the same layered files as the install: the profile and the platform overlay of the
+  target release, then your site file, then your secrets, which stay in their Kubernetes Secrets.
+  Keep every setting in those files, never in `--set`. `helm get values` is only for recovering an
+  installation whose files were lost ([Recovering lost files](#recovering-lost-files)).
+- Take the chart, the example files and the images from the same release. Pass the app image tag and
+  the migration image tag explicitly, both of them, every time.
+- Take a backup first ([Take a backup](#take-a-backup)).
 - Upgrade when no event is live. The app itself rolls without downtime, but by default the Jitsi web
   pod restarts on every upgrade, and other Jitsi components can restart too.
 - Pin the credentials that the Jitsi subchart would otherwise generate at random on every render.
 - Watch the Jitsi web rollout yourself after the upgrade. Helm reports success before the restarted
   web pod is running.
+- Check the result with `scripts/verify-install.sh --call` once the rollouts are done. It retries the
+  conference for up to 90 s while the restarted web pod comes up (`--conference-wait`).
 - A rollback restores the chart's manifests. It does not restore the database schema, the data, or
   the components published only with the floating `:dev` tag.
+
+| Platform | How to upgrade |
+|---|---|
+| One k3s server, installed with `pa-webinar-up.sh` | `git checkout vX.Y.Z`, then `infra/onprem/k3s/pa-webinar-up.sh --portal <portal>`: it brings the new images, layers the files of the new release and runs the checks ([Upgrade](../install/k3s.md#upgrade)) |
+| k3s installed by hand, three nodes included | A new image archive imported on every node, then [the upgrade procedure](#the-upgrade-procedure) with the k3s layers ([A.10 Upgrade by hand](../install/k3s.md#a10-upgrade-by-hand)) |
+| minikube | `git pull` (or a checkout), then `scripts/minikube-up.sh` with the same `--profile` ([Update, stop and remove](../install/minikube.md#update-stop-and-remove)) |
+| AKS, GKE, EKS and other clusters | [The upgrade procedure](#the-upgrade-procedure), with the full profile, the platform overlay and the module's output before your site file |
 
 ## What an upgrade changes
 
@@ -44,7 +57,8 @@ Take the chart from the same release as the images. Two sources work:
 - **The packaged chart.** Each GitHub Release has the chart attached as `pa-webinar-X.Y.Z.tgz`, with
   its subcharts included and its `appVersion` set to the release.
 - **A source checkout.** Check out the tag `vX.Y.Z` and build the subcharts. They are not committed;
-  `Chart.lock` pins their versions.
+  `Chart.lock` pins their versions. The example files of the checkout are the ones to layer: an
+  overlay fixed in a release reaches your installation only if you pass the new file.
 
   ```bash
   helm repo add bitnami https://charts.bitnami.com/bitnami
@@ -105,29 +119,79 @@ The statuses are explained in [Event lifecycle](../architecture/event-lifecycle.
 
 ### Take a backup
 
-The chart has no backup job and no restore procedure; the gap is tracked in the
-[Roadmap](../ROADMAP.md). Migrations cannot be undone, so a database copy taken just before the
-upgrade is the only way back to the old schema.
-
-With the in-cluster PostgreSQL subchart:
+Migrations cannot be undone, so a database copy taken just before the upgrade is the only way back to
+the old schema. `scripts/backup.sh` takes it from the in-cluster PostgreSQL, from inside its pod, so
+the password never leaves it:
 
 ```bash
-kubectl exec -n pa-webinar pa-webinar-postgresql-0 -- sh -c \
-  'PGPASSWORD="$(cat "$POSTGRES_PASSWORD_FILE")" pg_dump -h 127.0.0.1 -U "$POSTGRES_USER" -d "$POSTGRES_DATABASE" -Fc' \
-  > pa-webinar-before-X.Y.Z.dump
+scripts/backup.sh --kubeconfig <kubeconfig> --state-dir <your-installation-folder> \
+  --age-recipient age1...
 ```
 
-With a managed database, take a snapshot through your provider, or run `pg_dump` against
-`DATABASE_URL`.
+- **What it writes**: a new folder `<release>-<UTC timestamp>/`, readable only by you, with the dump
+  (`database.dump`, `pg_dump -Fc`), your installation folder when you pass `--state-dir` or
+  `--include`, the object store with `--include-storage` (`storage.tar`), a `manifest.txt` with no
+  secrets (versions, the fingerprints of `PII_ENCRYPTION_KEY` and `APP_SECRET`, the row count of every
+  table) and `SHA256SUMS`. It is built in a hidden folder and renamed at the end, so a failed or
+  interrupted run leaves no half backup. A run killed outright leaves that hidden folder and the lock
+  folder `.backup-in-corso`, which the next run names: delete both by hand.
+- **Where**: `<state-dir>/backups` with `--state-dir`, otherwise
+  `~/.config/pa-webinar/backups/<namespace>-<release>`, or `--dir`. The fourteen newest are kept
+  (`--keep`). A destination inside the repository is refused.
+- **Encryption**, recommended: `--age-recipient` (repeatable), `--age-recipients-file` or
+  `--gpg-recipient`. With it the plaintext never touches the disk. Make the age key pair once, on the
+  machine that keeps the backups, with `(umask 077; age-keygen -o key.txt)`: it prints the public key
+  (`age1...`) to pass here. Keep `key.txt` away from the cluster, with a copy in your vault
+  ([An encryption key, once](../install/k3s.md#an-encryption-key-once)).
+- **The object store**, with `--include-storage`, when it runs on a volume of the cluster: the Garage
+  add-on of one k3s server by default, another store with `--storage-selector`. The store stops for the
+  whole copy, the database dump included, so that the two match; uploads and video playback fail
+  meanwhile, and the script refuses while an event is live (`--allow-live`). It comes back at the end,
+  after an error and after Ctrl-C; after a hard stop, `scripts/restore.sh --resume --yes` with the same
+  cluster options brings it back.
+- **A managed database**: `--database-url` (from the environment) or `--database-url-file FILE`, with a
+  local `pg_dump` of the server's major version or newer. A provider snapshot works too.
+- **What it needs**: `kubectl`, `curl`, `openssl`, `awk` and `tar`; `age` or `gpg` to encrypt. Every
+  file it writes is readable only by you (`umask 077`).
 
-Keep the application Secret with the dump, and above all `PII_ENCRYPTION_KEY`. Personal data is
-encrypted in the database, and a dump without that key cannot be read. The dump holds personal
-data: store it under the same protections as the database, and delete it when you no longer need
-it ([Privacy and data protection](../GDPR.md)).
+Keep the application Secret's keys with every dump, and above all `PII_ENCRYPTION_KEY`: personal data
+is encrypted in the database, and a dump without that key cannot be read. `--state-dir` does that for an
+installation made with the k3s installer. The dump holds personal data: store it under the same
+protections as the database, and delete it when you no longer need it
+([Privacy and data protection](../GDPR.md)).
 
-The dump does not cover the object store. Before you ever restore it, read how to keep recordings
-made after the dump from being deleted as orphans
+Without `--include-storage`, and for an object store outside the cluster, the backup does not cover
+the files: back those up with your provider's tools at the same moment. Before you ever restore a
+database alone, read how to keep recordings made after the dump from being deleted as orphans
 ([What a rollback restores and what it does not](#what-a-rollback-restores-and-what-it-does-not)).
+
+### Backups with the chart's CronJob
+
+With `backup.enabled: true` the chart dumps the database every night into a volume of the cluster
+([Database backups](../DEPLOYMENT.md#database-backups)). The dumps live next to the database, so copy
+them elsewhere. A Job created from the suspended `<fullname>-backup-tools` CronJob is a pod with the
+backup volume mounted at `/backup` and the PostgreSQL tools, which ends by itself after
+`backup.activeDeadlineSeconds`:
+
+```bash
+NS=pa-webinar; FN=pa-webinar
+kubectl -n $NS create job $FN-backup-$(date +%s) --from=cronjob/$FN-backup       # one dump now
+J=$FN-tools-$(date +%s)
+kubectl -n $NS create job $J --from=cronjob/$FN-backup-tools
+kubectl -n $NS wait job/$J --for=jsonpath='{.status.ready}'=1
+kubectl -n $NS exec job/$J -- ls -l /backup
+(umask 077; kubectl -n $NS exec job/$J -- cat /backup/<file> > <file>)           # copy it off the cluster
+kubectl -n $NS delete job $J
+```
+
+The copy holds personal data: `umask 077` keeps it readable by you alone. Job names carry a
+timestamp because a finished Job keeps its name for three days. On a storage class that binds a
+volume to the first pod using it (`WaitForFirstConsumer`, like local-path on k3s), the backup volume
+stays `Pending` until the first dump, and `helm upgrade --wait` waits for it until the timeout: the
+first command above binds it. `pa-webinar-up.sh --backup` runs that first dump itself. To restore one of
+these dumps, copy it off the cluster and use `scripts/restore.sh --from-dump <file>`
+([Restore a backup](#restore-a-backup)): it stops the writers and brings them back in order, which a
+bare `pg_restore` does not.
 
 ### Check that every image can be pulled
 
@@ -177,34 +241,44 @@ docker buildx imagetools inspect ghcr.io/italia/pa-webinar-postprod-worker:dev
 
 A pod that is running shows the digest it actually pulled in `.status.containerStatuses[*].imageID`.
 
-## The drift-safe procedure
+## The upgrade procedure
 
-The values of a running installation are whatever its last `helm install` or `helm upgrade`
-received, from files and `--set` flags alike. They are not the values in this repository:
-`values-production.yaml` and the `examples/` profiles are examples. An upgrade that starts from them
-silently drops every installation-specific setting and pin.
+<a id="the-drift-safe-procedure"></a>The values of a running installation are whatever its last
+`helm install` or `helm upgrade` received, from files and `--set` flags alike. An upgrade gives the
+same files again, from the target release and from your own folder, in the same order as the install:
+
+1. the profile (`examples/values-simple.yaml`, `values-standard.yaml` or `values-full.yaml`) of the
+   target release;
+2. the platform overlay of the same release (`values-k3s.yaml`, `values-aks.yaml`, ...), the add-on
+   overlays, and a cloud module's output;
+3. your site file: the host names, the image tags, the TLS settings and everything else that is yours;
+4. your secrets: in `existing` or `external` mode they stay in their Secrets and are not passed to
+   Helm; in `generate` mode, the private values file that holds them.
+
+Taking the profile and the overlay from the new release keeps their fixes; taking your site file last
+keeps your settings and pins. `values-production.yaml` and the chart's other top-level values files
+are examples: never upgrade from them.
 
 The commands and the Helm behavior on this page are those of Helm 3, the major version that CI
-pins in `.github/workflows/ci.yml`. `--dry-run=server` needs Helm 3.13 or later, and
-`--reset-then-reuse-values` needs Helm 3.14 or later. Helm 4 can upgrade with server-side apply; if
-yours does, check how your release treats the fields that the scaler changes at runtime
-([Bridge and Jibri replica counts](#bridge-and-jibri-replica-counts)).
+pins in `.github/workflows/ci.yml`. `--dry-run=server` needs Helm 3.13 or later. Helm 4 can upgrade
+with server-side apply; if yours does, check how your release treats the fields that the scaler
+changes at runtime ([Bridge and Jibri replica counts](#bridge-and-jibri-replica-counts)).
 
 ```mermaid
 flowchart TB
   subgraph P["1 · Prepare: nothing in the cluster changes yet"]
     direction LR
-    A["helm get values<br/>to current.yaml"]:::step --> B["Bump the app tag<br/>and the migration tag"]:::step
+    A["Check out vX.Y.Z<br/>and build its subcharts"]:::step --> B["Bump the app tag and<br/>the migration tag<br/>in your site file"]:::step
     B --> C{"Dry run renders,<br/>and the diff is<br/>what you expect?"}:::gate
     C -- "no" --> B
   end
   subgraph O["2 · Roll out: app pods are replaced one at a time"]
     direction LR
-    D["helm upgrade<br/>-f current.yaml --wait"]:::step --> E["Init container db-migrate:<br/>prisma migrate deploy"]:::data
+    D["helm upgrade<br/>profile, overlay,<br/>site file"]:::step --> E["Init container db-migrate:<br/>prisma migrate deploy"]:::data
     E --> F{"New pod passes<br/>/api/ready?"}:::gate
     F -- "yes" --> G["Old pods replaced;<br/>hook restarts Jitsi web;<br/>Helm reports success"]:::step
     G --> W{"Jitsi web rollout<br/>completes?<br/>(kubectl rollout status)"}:::gate
-    W -- "yes" --> H["Verify: version in<br/>/api/health, /status,<br/>a test room"]:::ok
+    W -- "yes" --> H["Verify:<br/>verify-install.sh --call"]:::ok
     F -- "no: rollout stalls,<br/>old pods keep serving" --> R["Read the db-migrate log;<br/>fix forward or helm rollback"]:::risk
     W -- "no: new web pod stuck,<br/>e.g. ImagePullBackOff" --> RW["Fix the cause, often<br/>the pull Secret, before<br/>the old web pod<br/>is evicted"]:::risk
     H -- "problem found" --> R
@@ -220,17 +294,20 @@ flowchart TB
   style O fill:#F5F7FA,stroke:#5C6F82,color:#17324D
 ```
 
-**1. Export the values the release runs with.**
+The commands below write `<layers>` for the `-f` files of steps 1 to 3 above, for example on the
+standard profile:
 
 ```bash
-helm get values pa-webinar -n pa-webinar -o yaml > current.yaml
+-f <chart>/examples/values-standard.yaml -f pa-webinar.values.yaml -f pa-webinar.private.yaml
 ```
 
-`helm get values` returns only the user-supplied values, not the chart defaults. The new chart's
-defaults therefore apply to every key you never set. The file can contain passwords, so keep it
-in your private configuration repository and never in a public one.
+With the packaged chart, take the example files from its `examples/` directory
+(`tar xzf pa-webinar-X.Y.Z.tgz pa-webinar/examples`).
 
-**2. Bump both image tags in `current.yaml`.**
+**1. Take the new release.** Check out the tag `vX.Y.Z` and build its subcharts, or download the
+packaged chart ([What an upgrade changes](#what-an-upgrade-changes)).
+
+**2. Bump both image tags in your site file.**
 
 ```yaml
 app:
@@ -247,7 +324,7 @@ app:
 - When `app.migration.image.tag` is empty, the chart computes `<app tag>-migrate` (the
   `pa-webinar.migrationImage` helper in `templates/_helpers.tpl`). Older releases never published
   that form.
-- Always set both tags. A `current.yaml` that already pins `app.migration.image.tag` keeps the old
+- Always set both tags. A site file that already pins `app.migration.image.tag` keeps the old
   migrations if only the app tag moves. When the new release adds migrations, its pods then fail
   their readiness check against the old schema, and the rollout stalls.
 
@@ -259,25 +336,29 @@ credentials ([Pin the generated credentials](#pin-the-generated-credentials)).
 
 ```bash
 helm get manifest pa-webinar -n pa-webinar > old.yaml
-helm template pa-webinar <chart> -n pa-webinar -f current.yaml > new.yaml
+helm template pa-webinar <chart> -n pa-webinar <layers> > new.yaml
 diff -u old.yaml new.yaml | less
 ```
 
 `helm template` also prints the hook resources, which `helm get manifest` leaves out. If you use
-the `helm-diff` plugin, `helm diff upgrade pa-webinar <chart> -n pa-webinar -f current.yaml` does
-the same comparison. `helm upgrade ... --dry-run=server` also validates the result against the API
-server. See [Reading the dry run](#reading-the-dry-run) for what to look for.
+the `helm-diff` plugin, `helm diff upgrade pa-webinar <chart> -n pa-webinar <layers>` does the same
+comparison. `helm upgrade ... --dry-run=server` also validates the result against the API server. A
+change you did not expect, such as a host, an image or a replica count, means that your files lack a
+setting the release runs with: find it with `helm get values pa-webinar -n pa-webinar` and add it to
+your site file. See [Reading the dry run](#reading-the-dry-run) for what else to look for.
 
 **4. Upgrade.**
 
 ```bash
-helm upgrade pa-webinar <chart> -n pa-webinar -f current.yaml --wait --timeout 10m
+helm upgrade pa-webinar <chart> -n pa-webinar <layers> --wait --timeout 10m
 ```
 
 `--wait` makes Helm wait until the new pods are ready. Only then does it run the post-upgrade
 hook that restarts the Jitsi web pod. The hook runs `kubectl rollout restart`, which only asks for
 the restart and returns at once. Helm therefore reports success before the new web pod is running,
-and it reports success even if that pod never starts, for example in `ImagePullBackOff`.
+and it reports success even if that pod never starts, for example in `ImagePullBackOff`. With
+`backup.enabled` on a storage class that binds volumes on first use, leave out `--wait` and rely on
+step 5 ([Database backups](../DEPLOYMENT.md#database-backups)).
 
 **5. Watch the rollouts, the app's and the Jitsi web pod's.**
 
@@ -292,18 +373,21 @@ If the web rollout does not complete, the previous web pod keeps serving only un
 or its node is drained. Fix the cause first
 ([Check that every image can be pulled](#check-that-every-image-can-be-pulled)).
 
-**6. Verify.**
+**6. Verify.** The check retries the conference for up to 90 s (`--conference-wait`), so it can run as
+soon as the rollouts are done, while the restarted web pod finishes starting:
 
-- `curl -s https://webinar.example.com/api/health` reports `"version":"X.Y.Z"`.
-- The status page (`/status`, **System status**) shows no component in outage. If the status page is
-  turned off in site settings, `/status` does not exist: check the same data at `/api/status` while
-  signed in as an administrator, or on the infrastructure page (`/admin/infrastructure`).
-- Open a test room from two devices, with audio and video. No automated check does this for you
-  yet ([Roadmap](../ROADMAP.md)). The first-run checks in [Deploying with Helm](../DEPLOYMENT.md)
-  apply after an upgrade as well.
-- Metrics and alerts are in [Monitoring and health](monitoring.md).
+```bash
+scripts/verify-install.sh --kubeconfig <kubeconfig> --context <context> --keys-from-cluster --call
+```
 
-Keep `current.yaml`, with the bumped tags, as the new record of the installation's values.
+It checks that the running image carries the version you set, that the certificates, the portal,
+its components, the conference and every scheduled job answer, and, with `--call`, that two browsers
+hear and see each other ([Post-install verification](../install/checklists.md#post-install-verification)).
+The status page (`/status`, **System status**) shows the same components. Metrics and alerts are in
+[Monitoring and health](monitoring.md).
+
+Commit the bumped site file to your private configuration repository: it is the record of the
+installation's values.
 
 ### Why not `--reuse-values`
 
@@ -315,9 +399,24 @@ ignored:
   or render a feature differently from the documented default;
 - a default that changed in this chart version keeps its old value.
 
-The exported `current.yaml` keeps the same pins and still applies the new defaults. Helm's
-`--reset-then-reuse-values` (Helm 3.14 or later) behaves the same way without a file, but the file
-can be reviewed, diffed and versioned.
+Your layered files keep the same pins and still apply the new defaults and the new overlays.
+
+### Recovering lost files
+
+When the files an installation was made with are lost, `helm get values` returns what the last
+install or upgrade received, every layer merged, without the chart defaults:
+
+```bash
+helm get values pa-webinar -n pa-webinar -o yaml > recovered.yaml
+```
+
+The file can hold passwords (in `generate` mode, or when a value was passed with `--set`): keep it in
+your private configuration repository. Split it back into a site file, dropping what the profile and
+the overlay of the release already set, and upgrade from then on with the layered files. Helm's
+`--reset-then-reuse-values` (Helm 3.14 or later) upgrades from the same values without a file, once,
+while you rebuild them. For an installation made with the k3s installer, run it again with every
+option and `--recover-secrets`, which rebuilds the secrets file from the cluster's Secrets
+([Upgrade](../install/k3s.md#upgrade)).
 
 ### Reading the dry run
 
@@ -360,7 +459,7 @@ can be reviewed, diffed and versioned.
 
   A server of a different major version refuses the existing data directory, and the database does
   not start again. A major-version change needs a dump and restore, not an upgrade. Until you have
-  done that, keep your current image pinned in `current.yaml` (`postgresql.image.tag`, with the
+  done that, keep your current image pinned in your site file (`postgresql.image.tag`, with the
   digest the running pod reports in `.status.containerStatuses[*].imageID`).
 - **Jitsi Secrets and checksum annotations change even though you touched nothing Jitsi-related.**
   The subchart credentials are not pinned ([Pin the generated credentials](#pin-the-generated-credentials)).
@@ -512,13 +611,13 @@ different hashes mean something is not pinned:
 
 ```bash
 for i in 1 2; do
-  helm template pa-webinar <chart> -n pa-webinar -f current.yaml \
+  helm template pa-webinar <chart> -n pa-webinar <layers> \
     | grep -E '_PASSWORD|TURN_CREDENTIALS' | sha256sum
 done
 ```
 
 **Pin them with the values that run now.** Read the current values from the live Secrets and add
-them to `current.yaml`, so the pins match what Prosody already knows. The names below follow the
+them to your site file, so the pins match what Prosody already knows. The names below follow the
 subchart's naming for a release called `pa-webinar`:
 
 ```bash
@@ -545,7 +644,7 @@ jitsi-meet:
 ```
 
 **Make the chart enforce the pins.** Once the notes list nothing, set
-`jitsi.requirePinnedCredentials: true` in `current.yaml` (the default in `values.yaml` is `false`).
+`jitsi.requirePinnedCredentials: true` in your site file (the default in `values.yaml` is `false`).
 From then on, a render that loses a pin fails with the list of missing keys, so the dry run of a
 later upgrade stops before anything reaches the cluster.
 
@@ -610,7 +709,7 @@ window.
      --from-literal=REDIS_PASSWORD="$(get REDIS_PASSWORD)"
    ```
 
-2. Point the chart and each enabled subchart at it in `current.yaml`. The render guard fails if an
+2. Point the chart and each enabled subchart at it in your site file. The render guard fails if an
    enabled subchart still points elsewhere.
 
    ```yaml
@@ -624,7 +723,7 @@ window.
        existingSecret: videocall-datastore
    ```
 
-3. Upgrade with the drift-safe procedure. The app pods read `REDIS_PASSWORD` from the new Secret
+3. Upgrade with [the upgrade procedure](#the-upgrade-procedure). The app pods read `REDIS_PASSWORD` from the new Secret
    from then on.
 
 4. Remove the old copies from the application Secret. They are no longer read there, and the
@@ -642,7 +741,7 @@ window.
    Secret holds exactly the keys listed in `secrets.external.<provider>.secretMappings` (the
    `azureKeyVault`, `awsSecretsManager` or `gcpSecretManager` block). Delete the
    `POSTGRES_PASSWORD`, `POSTGRES_ADMIN_PASSWORD` and `REDIS_PASSWORD` entries from those mappings in
-   `current.yaml` and upgrade. The External Secrets Operator rewrites the Secret without them when it
+   your site file and upgrade. The External Secrets Operator rewrites the Secret without them when it
    next reconciles. Delete the remote vault entries only after no mapping references them: a
    mapping that points at a missing entry makes the sync fail, and the application Secret then
    stops refreshing.
@@ -701,22 +800,70 @@ To return to the pre-upgrade schema, restore the backup taken before the upgrade
 written since then is lost, so do it only when the older release cannot run on the newer schema.
 Under the additive rule, that should not happen.
 
-A restore also puts recordings at risk. The object store is not part of the dump, so videos saved
-under `recordings/` after the backup lose the database rows that reference them. The
-`recordings-reconcile` job then lists them as orphans and deletes them once
-`orphanRecordingGraceDays` has passed (default 30 in `schema.prisma`). Before you restore, suspend
-the job:
+### Restore a backup
+
+`scripts/restore.sh` restores a backup of `scripts/backup.sh` (`--from DIR`), or a bare `pg_dump -Fc`
+archive such as a dump of the chart's CronJob copied off the cluster (`--from-dump FILE`, also `.age`
+or `.gpg`). It needs an explicit `--kubeconfig` or `--context`, and changes nothing without `--yes`:
 
 ```bash
-kubectl patch cronjob pa-webinar-recordings-reconcile -n pa-webinar -p '{"spec":{"suspend":true}}'
+scripts/restore.sh --kubeconfig <kubeconfig> --from <backup-folder> --identity key.txt --dry-run
+scripts/restore.sh --kubeconfig <kubeconfig> --from <backup-folder> --identity key.txt --yes -- --call
 ```
 
-After the restore, set `SiteSetting.orphanRecordingGraceDays` to `0` on the restored database
-(through `PUT /api/admin/settings`; the settings form has no field for it), then resume the job.
-With the grace period at `0` it lists the unreferenced videos in **Video recordings**, tab
-**Orphans**, without deleting them. Mark the ones to keep with **Keep** before you set the grace
-period back ([Orphans](recording-setup.md#orphans)). The missing backup and restore procedure is
-tracked in the [Roadmap](../ROADMAP.md#installation-and-operations).
+Add `--include-storage` when the backup holds the object store (`backup.sh --include-storage`). The
+full form for one k3s server is in [Backup and restore](../install/k3s.md#backup-and-restore).
+
+- **Before it touches anything** it verifies the checksums, that the archive decrypts, that the
+  fingerprints of `PII_ENCRYPTION_KEY` and `APP_SECRET` in the live Secret match the backup's, and
+  with `--include-storage` the object store's key too (`--allow-key-mismatch` to override), and that
+  no event is live or being provisioned (`--allow-live`). `--dry-run` stops there and prints the plan.
+- **Then it pauses the writers**: it records the original state as annotations
+  (`pa-webinar/restore-suspend` on each CronJob, `pa-webinar/restore-replicas` on the portal and the
+  recorder controller), suspends every CronJob of the release, `recordings-reconcile` included, waits
+  for their running Jobs, and scales the portal and the recorder controller to zero. Email and
+  lifecycle Jobs that were due in that window simply run later. With `--include-storage` it also
+  stops the store, then extracts the store's archive next to the current files and checks it against
+  the manifest: the volume needs free space for the archive, plus 5% and 64 MiB.
+- **It restores in one transaction.** By default (`--clean-mode schema`) it recreates the schema and
+  applies the whole archive, which also works when the database is at a newer version than the
+  backup, after an upgrade; a failure leaves the database unchanged ("Ripristino non riuscito,
+  database invariato"). `--clean-mode objects` runs
+  `pg_restore --clean --if-exists --no-owner --single-transaction` instead, for a database user that
+  does not own the schema. It then compares the row counts with the manifest. With
+  `--include-storage` it swaps in the restored files after the database; if that swap fails, the
+  database is restored and the store and `recordings-reconcile` stay stopped until the same command
+  runs again.
+- **It protects the recordings.** A database older than the object store no longer references the
+  videos saved after the backup, and the reconciliation job would delete them as orphans once
+  `orphanRecordingGraceDays` has passed (default 30 in `schema.prisma`). The script sets the grace
+  period to `0`, which lists the unreferenced videos in **Video recordings**, tab **Orphans**, without
+  deleting them, and ends by printing the command that puts the old value back. Mark the ones to keep
+  with **Keep**, then run it:
+
+  ```bash
+  scripts/restore.sh --reset-orphan-grace 30 --kubeconfig <kubeconfig>
+  ```
+
+  It does only that, needs no `--yes`, and with `--dry-run` shows the current value
+  ([Orphans](recording-setup.md#orphans)). Until then `verify-install.sh` warns that orphans are never
+  deleted. `--keep-orphan-grace` skips the change, only when the object store was restored to the
+  same moment, as `--include-storage` does.
+- **It resumes in order**: the store, the portal, whose migration init container brings the schema up
+  to the running release, then the recorder controller, then the CronJobs in their original state,
+  `recordings-reconcile` last. It then runs `scripts/verify-install.sh` with the same cluster options,
+  `--keys-from-cluster`, and the certificate authority of an installation made with the k3s
+  installer, taken from its state folder when the kubeconfig sits there (`--ca-file` for any other).
+  Whatever follows `--` goes to the check as well. Any failure after the pause resumes everything by
+  itself. After a hard stop, `scripts/restore.sh --resume --yes --kubeconfig <kubeconfig>` finishes
+  the job, also for a store left stopped by an interrupted backup, and `verify-install.sh` reports a
+  CronJob left "sospeso da un ripristino non concluso" (suspended by an unfinished restore), or a
+  stopped store, as an error.
+
+Restore in this order: the keys and the installation's files first, then the database and the object
+store, from the same moment. The state archive in a backup (`stato.tar`) is never restored by the
+script: it holds the keys and the files to reinstall with. The drill that proves your backups restore
+is in [Restore drill](../install/checklists.md#restore-drill).
 
 ### Making the `:dev` components roll back
 
