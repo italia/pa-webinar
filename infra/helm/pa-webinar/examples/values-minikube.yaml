@@ -154,12 +154,22 @@ jitsi-meet:
         memory: 64Mi
     ingress:
       ingressClassName: nginx
-      # Certificato autofirmato del controller: nessun cert-manager nel nodo.
-      # La pagina di stato del portale controlla la conferenza verificando il
-      # certificato, e qui segna Jitsi, Prosody e Jicofo come non raggiungibili
-      # anche quando la sala funziona.
+      # In http:// il browser non dà microfono né videocamera alla pagina, e
+      # la sala resta a caricare senza dire perché: il controller rimanda
+      # sempre a https, anche senza una sezione `tls` (vale allora il suo
+      # certificato autofirmato).
+      annotations:
+        nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+      # Vuoto qui: lo script scrive nei valori della macchina i Secret TLS
+      # firmati dall'autorità locale che crea (vedi scripts/minikube-up.sh).
+      # Chi installa a mano senza certificati resta con quello autofirmato
+      # del controller, da accettare nel browser.
       tls: []
 
 ingress:
   className: nginx
+  annotations:
+    # Come per la conferenza: http:// rimanda sempre a https.
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+  # Vedi sopra: i Secret TLS li indica lo script nei valori della macchina.
   tls: []

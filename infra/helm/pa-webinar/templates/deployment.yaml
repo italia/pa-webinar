@@ -98,8 +98,22 @@ spec:
             {{- if .Values.jitsi.enabled }}
             - name: JVB_HEALTH_URL
               value: {{ include "pa-webinar.jvbHealthUrl" . | quote }}
+            {{- /*
+              Solo con Jibri acceso, o con un indirizzo indicato: verso un
+              Service che non esiste ogni richiesta della pagina di stato
+              aspetterebbe la risoluzione del nome fallita.
+            */}}
+            {{- with include "pa-webinar.jibriHealthUrl" . }}
             - name: JIBRI_HEALTH_URL
-              value: {{ .Values.jitsi.jibriHealthUrl | default (printf "http://%s-jitsi-meet-jibri:2222" .Release.Name) | quote }}
+              value: {{ . | quote }}
+            {{- end }}
+            {{- end }}
+            {{- with include "pa-webinar.extraCaCerts" . }}
+            # Autorità di certificazione in più per le connessioni in uscita
+            # (SMTP, object storage, indirizzi pubblici del portale e della
+            # conferenza), aggiunte a quelle di sistema: app.extraCaCerts.
+            - name: NODE_EXTRA_CA_CERTS
+              value: {{ printf "%s/%s" (include "pa-webinar.extraCaCertsDir" $) (include "pa-webinar.extraCaCertsFile" $) | quote }}
             {{- end }}
             {{- if .Values.recorder.enabled }}
             # Edge-trigger del recorder (ADR-013 Fase 3): jvb-desired-replicas
@@ -148,9 +162,35 @@ spec:
           resources:
             {{- toYaml .Values.app.resources | nindent 12 }}
           volumeMounts:
-            {{- toYaml .Values.app.extraVolumeMounts | nindent 12 }}
+            {{- with .Values.app.extraVolumeMounts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+            {{- if include "pa-webinar.extraCaCerts" . }}
+            - name: extra-ca-certs
+              mountPath: {{ include "pa-webinar.extraCaCertsDir" . }}
+              readOnly: true
+            {{- end }}
       volumes:
-        {{- toYaml .Values.app.extraVolumes | nindent 8 }}
+        {{- with .Values.app.extraVolumes }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        {{- with include "pa-webinar.extraCaCerts" . }}
+        - name: extra-ca-certs
+          {{- $ca := $.Values.app.extraCaCerts }}
+          {{- if $ca.secretName }}
+          secret:
+            secretName: {{ $ca.secretName }}
+            items:
+              - key: {{ $ca.key | default "ca.crt" }}
+                path: {{ include "pa-webinar.extraCaCertsFile" $ }}
+          {{- else }}
+          configMap:
+            name: {{ $ca.configMapName }}
+            items:
+              - key: {{ $ca.key | default "ca.crt" }}
+                path: {{ include "pa-webinar.extraCaCertsFile" $ }}
+          {{- end }}
+        {{- end }}
       {{- with .Values.app.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

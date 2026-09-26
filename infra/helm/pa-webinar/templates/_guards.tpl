@@ -262,3 +262,50 @@ annotazioni a null non le rende.
 {{- end -}}
 {{- end -}}
 {{- end -}}
+
+{{/*
+Chi è moderatore nella sala lo decide il token del portale.
+
+Due pezzi lavorano insieme. Jicofo senza autenticazione propria
+(`jicofo.extraEnvs.JICOFO_ENABLE_AUTH: "false"`): con l'autenticazione accesa
+rende moderatore chiunque sia autenticato, cioè ogni partecipante con un token.
+E Prosody con i moduli che assegnano il ruolo dal token (`XMPP_MUC_MODULES`
+con `token_affiliation`, e il modulo del progetto `token_affiliation_custom`).
+
+Due incoerenze si vedono solo in sala, e qui diventano errori di resa:
+  - Jicofo senza autenticazione ma Prosody senza i moduli: nessuno sarebbe
+    moderatore, e il moderatore del portale non potrebbe silenziare né
+    espellere nessuno;
+  - il modulo del progetto richiesto ma non montato in /prosody-plugins-custom:
+    Prosody non lo troverebbe, e lo direbbe solo nel proprio log. Succede a chi
+    imposta `prosody.extraVolumes` o `extraVolumeMounts` in un proprio file di
+    valori: sono liste, e sostituiscono quelle del chart.
+*/}}
+{{- define "pa-webinar.validateJitsiRoles" -}}
+{{- if .Values.jitsi.enabled -}}
+{{- $jm := index .Values "jitsi-meet" | default dict -}}
+{{- $prosody := dig "prosody" dict $jm | default dict -}}
+{{- $envs := dig "extraEnvs" dict $prosody | default dict -}}
+{{- $comuni := dig "extraCommonEnvs" dict $jm | default dict -}}
+{{- $moduli := list -}}
+{{- range (splitList "," (toString (index $envs "XMPP_MUC_MODULES" | default (index $comuni "XMPP_MUC_MODULES") | default ""))) -}}
+{{- $moduli = append $moduli (trim .) -}}
+{{- end -}}
+{{- $jicofo := dig "jicofo" "extraEnvs" dict $jm | default dict -}}
+{{- $authJicofo := lower (toString (index $jicofo "JICOFO_ENABLE_AUTH" | default "")) -}}
+{{- if and (dig "enableAuth" false $jm) (has $authJicofo (list "false" "0")) (not (or (has "token_affiliation" $moduli) (has "token_affiliation_custom" $moduli))) -}}
+{{- fail "jitsi-meet.jicofo.extraEnvs.JICOFO_ENABLE_AUTH è \"false\" ma Prosody non assegna i ruoli dal token: jitsi-meet.prosody.extraEnvs.XMPP_MUC_MODULES non contiene token_affiliation. Nessuno sarebbe moderatore nella sala, e il moderatore del portale non potrebbe silenziare né espellere nessuno. Rimetti in XMPP_MUC_MODULES token_affiliation,token_affiliation_custom (più i tuoi moduli), come in values.yaml." -}}
+{{- end -}}
+{{- if has "token_affiliation_custom" $moduli -}}
+{{- $montato := false -}}
+{{- range (dig "extraVolumeMounts" list $prosody | default list) -}}
+{{- if and (kindIs "map" .) (hasPrefix "/prosody-plugins-custom" (toString (index . "mountPath" | default ""))) -}}
+{{- $montato = true -}}
+{{- end -}}
+{{- end -}}
+{{- if not $montato -}}
+{{- fail (printf "jitsi-meet.prosody.extraEnvs.XMPP_MUC_MODULES chiede il modulo token_affiliation_custom, ma nessun volume di Prosody è montato in /prosody-plugins-custom: Prosody non lo troverebbe. Succede quando un file di valori imposta jitsi-meet.prosody.extraVolumes o extraVolumeMounts, che sono liste e sostituiscono quelle del chart: aggiungi alle tue le due voci di values.yaml (il volume dal ConfigMap %s e il suo montaggio in /prosody-plugins-custom), oppure togli token_affiliation_custom da XMPP_MUC_MODULES." (include "pa-webinar.prosodyPluginsConfigMap" .)) -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}

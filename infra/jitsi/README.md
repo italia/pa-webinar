@@ -8,7 +8,7 @@ pieces sit on the Jitsi boundary.
 
 | Path | What it is | What runs it |
 |---|---|---|
-| `prosody-plugins/mod_token_affiliation_custom.lua` | A Prosody MUC module that sets each occupant's room affiliation from the portal's JWT | Only the Docker Compose stack. The Helm chart does not load it |
+| `prosody-plugins/mod_token_affiliation_custom.lua` | A Prosody MUC module that sets each occupant's room affiliation from the portal's JWT | The Docker Compose stack, from this folder, and the Helm chart, from an identical copy in `infra/helm/pa-webinar/files/prosody-plugins/` |
 | `jibri-finalize.sh` | A standalone Jibri finalize script | Nothing in the repository. The chart ships a different script, `infra/helm/pa-webinar/files/jibri-finalize.sh` |
 
 ## The Prosody module
@@ -31,64 +31,71 @@ module reads none of them. It logs every decision at `info` level with the occup
 themselves are documented in
 [Identity, access and tokens](../../docs/architecture/identity-and-access.md).
 
-The module is a safety net for the community `token_affiliation` module, which ships in the stock
+The module works next to the community `token_affiliation` module, which ships in the stock
 `jitsi/prosody` image (`/prosody-plugins-contrib`). That module reads the same `context.user` claims,
-also accepting `context.user.moderator`, and applies them after the join instead of before it. The
-token alone decides who is moderator only when Jicofo's auto-owner rule is off. With the rule on,
-Jicofo also makes a participant moderator whenever the room has no owner, for example the first to
-join, whatever the token says.
+also accepting `context.user.moderator`, and applies them after the join instead of before it. It then
+sets the affiliation again nine more times over about nine seconds, to undo any role that Jicofo
+assigns in between.
+
+The token alone decides who is moderator only when Jicofo assigns no roles of its own:
+
+- **Jicofo authentication on** (`ENABLE_AUTH` without `JICOFO_ENABLE_AUTH: "false"`): Jicofo makes
+  every authenticated member of the room a moderator. With the portal's tokens every participant is
+  authenticated, guests and registrants included. Setting Jicofo's `AUTH_TYPE` to `jwt` changes
+  nothing here.
+- **Jicofo authentication off, auto-owner rule on**: Jicofo makes a participant moderator whenever the
+  room has no owner, for example the first to join, whatever the token says.
+- **Both off**: Jicofo assigns no roles, and the Prosody modules decide from the token. Prosody still
+  refuses every connection without a valid token, so turning Jicofo's authentication off does not
+  let anyone in without one.
 
 ### Where it is loaded
 
-**Docker Compose.** `docker-compose.yml` is the reference wiring. It mounts `infra/jitsi/prosody-plugins/`
-read-only at `/prosody-plugins-custom` in the `prosody` service and sets
+**Docker Compose.** `docker-compose.yml` mounts `infra/jitsi/prosody-plugins/` read-only at
+`/prosody-plugins-custom` in the `prosody` service and sets
 `XMPP_MUC_MODULES=token_affiliation,token_affiliation_custom`. On the `jicofo` service it turns off the
-auto-owner rule with `ENABLE_AUTO_OWNER=false`.
+auto-owner rule with `ENABLE_AUTO_OWNER=false`, but leaves Jicofo authentication on: roles there rely on
+`token_affiliation` setting the affiliation again after Jicofo's promotion, so a participant can hold
+the moderator role for a moment after joining.
 
-**Helm chart: known limitation.** The chart does not mount the module, does not enable
-`token_affiliation` and does not turn off auto-owner. What that means inside a conference is described
-in [Server-side role enforcement](../../docs/architecture/jitsi-integration.md#server-side-role-enforcement),
-and the gap is tracked in the [roadmap](../../docs/ROADMAP.md). The example `values-production.yaml`
-sets `jitsi-meet.jicofo.env.JICOFO_ENABLE_AUTO_OWNER`, which has no effect: the subchart reads Jicofo
-variables only from `extraEnvs`, and Jicofo reads `ENABLE_AUTO_OWNER`.
+**Helm chart.** The chart's `values.yaml` sets the wiring by default, on every profile:
 
-To reproduce the Compose wiring on Kubernetes, create a ConfigMap from the module and mount it through
-the subchart's extension points:
+- `jitsi-meet.prosody.extraEnvs.XMPP_MUC_MODULES: token_affiliation,token_affiliation_custom`;
+- `jitsi-meet.prosody.extraVolumes` and `extraVolumeMounts`, which mount the ConfigMap
+  `pa-webinar-prosody-plugins` at `/prosody-plugins-custom`. The chart renders that ConfigMap from its
+  copy of the module, `infra/helm/pa-webinar/files/prosody-plugins/mod_token_affiliation_custom.lua`;
+  `scripts/validate-chart.sh` fails when the two copies differ;
+- `jitsi-meet.jicofo.extraEnvs.JICOFO_ENABLE_AUTH: "false"` and `ENABLE_AUTO_OWNER: "false"`, so Jicofo
+  assigns no roles.
 
-```bash
-kubectl -n pa-webinar create configmap prosody-token-affiliation \
-  --from-file=infra/jitsi/prosody-plugins/mod_token_affiliation_custom.lua
-```
+What to know when you change it:
 
-```yaml
-jitsi-meet:
-  prosody:
-    extraEnvs:
-      XMPP_MUC_MODULES: token_affiliation,token_affiliation_custom
-    extraVolumes:
-      - name: prosody-token-affiliation
-        configMap:
-          name: prosody-token-affiliation
-    extraVolumeMounts:
-      - name: prosody-token-affiliation
-        mountPath: /prosody-plugins-custom/mod_token_affiliation_custom.lua
-        subPath: mod_token_affiliation_custom.lua
-  jicofo:
-    extraEnvs:
-      ENABLE_AUTO_OWNER: "false"
-```
+- `extraEnvs` is a map, so your values merge with the chart's. `extraVolumes` and `extraVolumeMounts`
+  are lists: a values file that sets them replaces the chart's entries, and must repeat them. The render
+  stops when `XMPP_MUC_MODULES` asks for `token_affiliation_custom` and nothing is mounted at
+  `/prosody-plugins-custom`, and when Jicofo authentication is off but `XMPP_MUC_MODULES` has neither
+  module.
+- The ConfigMap name is fixed, because the subchart's values cannot compute it: one release per
+  namespace.
+- The first upgrade to a chart with this wiring restarts Prosody and Jicofo, and calls in progress
+  drop. Schedule it outside events.
+- A later change to the module file does not restart Prosody: the new file reaches the pod, and
+  Prosody loads it at its next start. Restart the Prosody StatefulSet when no call is running.
 
-- `extraEnvs` is a map, so it merges with the chart defaults. `extraVolumes` and `extraVolumeMounts`
-  are lists, so they replace any value set in an earlier values file.
-- The upgrade restarts Prosody and Jicofo because their configuration changes.
-- A later change to the module file does not restart anything: recreate the ConfigMap, then restart
-  Prosody.
+**Checked in the lab** on minikube with the simple profile, with two browsers using lib-jitsi-meet and
+tokens issued by the portal, in both join orders, and through the portal's room with a guest who joined
+from the direct invite link:
 
-Then check in a real call that a participant gets no moderator badge and cannot mute others, that a
-moderator can mute others, and that recording still starts.
+- the portal moderator is `moderator`, registrants and guests are `participant`, whoever joins first;
+- a participant's request to mute the moderator is refused (Jicofo logs `Mute not allowed`), and so is
+  a participant's attempt to kick the moderator. A guest's `muteEveryone` through the IFrame API does not
+  mute the moderator;
+- the moderator can still mute and kick a participant;
+- a conference starts when a participant joins before the moderator, and audio and video flow once
+  both are in.
 
-A smaller variant uses `token_affiliation` without this module. It is shown in
-[Server-side role enforcement](../../docs/architecture/jitsi-integration.md#server-side-role-enforcement).
+Recording was not part of the check: the simple profile has no Jibri. Jibri starts a recording only for
+a moderator, and the portal moderator is one.
 
 ## The Jibri finalize scripts
 
@@ -168,10 +175,14 @@ of the [Jitsi upgrade checklist](../../docs/architecture/jitsi-integration.md#ji
   - the session field `jitsi_meet_context_user`;
   - `room:set_affiliation`;
   - the `/prosody-plugins-custom` plugin path;
-  - the presence of `token_affiliation` in the `jitsi/prosody` image.
+  - the presence of `token_affiliation` in the `jitsi/prosody` image;
+  - the `jitsi/jicofo` image reading `JICOFO_ENABLE_AUTH` and `ENABLE_AUTO_OWNER` in its configuration
+    template: with the chart's values, the generated `/config/jicofo.conf` has no `authentication`
+    block and has `enable-auto-owner = false`.
 
   Wherever the module is loaded, check that Prosody logs `Set affiliation to ...` on each join. Then
-  repeat the moderator and participant call test above.
+  repeat the checks listed under **Checked in the lab** above, with the moderator link and with a
+  guest.
 - **Finalize script.** The chart's script relies on:
   - the subchart's finalize path (`/config/finalize.sh` through `JIBRI_FINALIZE_RECORDING_SCRIPT_PATH`)
     and its `jitsi-meet.jibri.custom.other._finalize_sh` slot;

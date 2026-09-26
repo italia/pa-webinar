@@ -5,7 +5,8 @@ metadata:
   labels:
     {{- include "pa-webinar.labels" . | nindent 4 }}
 data:
-  {{- range $key, $value := .Values.app.env }}
+  {{- $env := .Values.app.env | default dict }}
+  {{- range $key, $value := $env }}
   {{ $key }}: {{ $value | quote }}
   {{- end }}
   {{- /*
@@ -14,10 +15,53 @@ data:
     (stessa condizione di cronjob-jvb-scaler.yaml). Chi scala i bridge con un
     altro strumento, ad esempio KEDA, lo imposta a "true" in app.env.
   */}}
-  {{- if not (hasKey (.Values.app.env | default dict) "JVB_SCALER_ENABLED") }}
-  {{- if and .Values.jitsi.enabled (eq (default "simple" .Values.jitsi.mode) "full") .Values.jvbScaler.enabled }}
-  JVB_SCALER_ENABLED: "true"
-  {{- else }}
-  JVB_SCALER_ENABLED: "false"
+  {{- $scaler := include "pa-webinar.jvbScalerRendered" . }}
+  {{- if not (hasKey $env "JVB_SCALER_ENABLED") }}
+  JVB_SCALER_ENABLED: {{ ternary "true" "false" (not (empty $scaler)) | quote }}
+  {{- end }}
+  {{- /*
+    Bridge fissi, senza nessuno che li scali: il portale non deve aspettarsene
+    più di quanti ne girano. Senza tetto l'applicazione ne ammette fino a sei,
+    e un evento grande resterebbe in attesa di bridge che non arriveranno mai
+    (pagina di stato "in accensione", sala d'attesa chiusa). Chi scala i bridge
+    con un altro strumento imposta JVB_SCALER_ENABLED a "true" in app.env, e
+    qui non si scrive niente.
+  */}}
+  {{- $scalaAltrove := eq (lower (toString (index $env "JVB_SCALER_ENABLED" | default ""))) "true" }}
+  {{- $bridge := int (dig "jvb" "replicaCount" 1 (index .Values "jitsi-meet" | default dict)) }}
+  {{- if and .Values.jitsi.enabled (not $scaler) (not $scalaAltrove) (not (hasKey $env "JVB_MAX_REPLICAS")) (gt $bridge 0) }}
+  JVB_MAX_REPLICAS: {{ $bridge | toString | quote }}
+  {{- end }}
+  {{- /*
+    Come è installata la piattaforma, per la pagina di stato e il pannello
+    Infrastruttura: il profilo (jitsi.mode), se il database è quello del
+    chart, e il nome del job con cui Prometheus raccoglie le metriche
+    dell'applicazione (il ServiceMonitor usa il nome del Service).
+  */}}
+  {{- if not (hasKey $env "DEPLOY_PROFILE") }}
+  DEPLOY_PROFILE: {{ default "simple" .Values.jitsi.mode | quote }}
+  {{- end }}
+  {{- if not (hasKey $env "DATABASE_BUNDLED") }}
+  DATABASE_BUNDLED: {{ ternary "true" "false" (dig "enabled" false (.Values.postgresql | default dict)) | quote }}
+  {{- end }}
+  {{- if not (hasKey $env "METRICS_JOB") }}
+  METRICS_JOB: {{ include "pa-webinar.fullname" . | quote }}
+  {{- end }}
+  {{- /*
+    Indirizzi interni dei componenti della conferenza, per la pagina di stato:
+    la si interroga dove gira, non passando dal nome pubblico, che dall'interno
+    del cluster può non essere raggiungibile o avere un certificato che il
+    portale non riconosce. Solo con la conferenza installata dal chart.
+  */}}
+  {{- if .Values.jitsi.enabled }}
+  {{- if not (hasKey $env "JITSI_WEB_INTERNAL_URL") }}
+  JITSI_WEB_INTERNAL_URL: {{ include "pa-webinar.jitsiWebInternalUrl" . | quote }}
+  {{- end }}
+  {{- if not (hasKey $env "PROSODY_INTERNAL_URL") }}
+  PROSODY_INTERNAL_URL: {{ include "pa-webinar.prosodyInternalUrl" . | quote }}
+  {{- end }}
+  {{- if not (hasKey $env "JICOFO_HEALTH_URL") }}
+  JICOFO_HEALTH_URL: {{ include "pa-webinar.jicofoHealthUrl" . | quote }}
   {{- end }}
   {{- end }}
+{{- include "pa-webinar.validateJitsiRoles" . }}

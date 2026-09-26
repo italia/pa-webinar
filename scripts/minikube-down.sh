@@ -5,8 +5,9 @@
 # Uso:  scripts/minikube-down.sh [--profile NOME] [--stop] [--purge]
 #   (nessuna opzione)  cancella il profilo: cluster, database e immagini caricate
 #   --stop             lo ferma soltanto; minikube-up.sh lo riavvia com'era
-#   --purge            cancella anche segreti e valori generati (cartella di
-#                      stato): la prossima installazione ne genera di nuovi
+#   --purge            cancella anche segreti, autorità locale, certificati e
+#                      valori generati (cartella di stato): la prossima
+#                      installazione ne genera di nuovi
 #   --state-dir DIR    la cartella di stato, se a minikube-up.sh ne hai data una
 #
 # Il contesto di kubectl attivo prima del lancio resta quello; se era proprio
@@ -61,9 +62,18 @@ if [ "$PURGE" = "si" ]; then
   # un --state-dir sbagliato non deve poter cancellare altro.
   if [ -d "$STATO" ]; then
     rm -f "$STATO/secrets.yaml" "$STATO/secrets.yaml.tmp" "$STATO/values-local.yaml" "$STATO/helm-notes.txt"
+    # L'autorità locale e i certificati dei nomi.
+    rm -f "$STATO/ca.key" "$STATO/ca.crt"
+    if [ -d "$STATO/tls" ]; then
+      rm -f "$STATO/tls/app.key" "$STATO/tls/app.crt" "$STATO/tls/jitsi.key" "$STATO/tls/jitsi.crt" \
+            "$STATO/tls/mail.key" "$STATO/tls/mail.crt"
+      rmdir "$STATO/tls" 2>/dev/null || true
+    fi
     rmdir "$STATO" 2>/dev/null || echo "In $STATO restano altri file: non li tocco."
   fi
-  echo "Cancellati anche segreti e valori generati ($STATO)."
+  echo "Cancellati anche segreti, certificati e valori generati ($STATO)."
+  echo "Se avevi reso fidata l'autorità locale (\"PA Webinar minikube CA\"), toglila dal"
+  echo "browser o dal sistema: la sua chiave non c'è più, e la prossima installazione ne crea un'altra."
 elif [ -d "$STATO" ]; then
   echo "Segreti e valori generati restano in $STATO: la prossima installazione li riusa."
   echo "Per cancellarli: scripts/minikube-down.sh --profile $PROFILO --purge"

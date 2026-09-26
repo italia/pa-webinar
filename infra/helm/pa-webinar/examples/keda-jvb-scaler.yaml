@@ -14,6 +14,12 @@
 # Then set app.env.JVB_SCALER_ENABLED: "true", so that the administration's
 # infrastructure page still reports that the bridges scale to zero.
 #
+# Without the CronJob scaler, the chart renders the event lifecycle CronJob
+# (cronjobs.lifecycle, every minute): it opens events at their start time and
+# ends them after their end time and grace period. Keep it enabled. The query
+# below counts LIVE events, so without it events would stay LIVE and the
+# bridges would never scale back to zero.
+#
 apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
 metadata:

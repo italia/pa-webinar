@@ -1,4 +1,4 @@
-{{- if and .Values.jitsi.enabled (eq (default "simple" .Values.jitsi.mode) "full") .Values.jvbScaler.enabled }}
+{{- if include "pa-webinar.jvbScalerRendered" . }}
 apiVersion: batch/v1
 kind: CronJob
 metadata:

@@ -249,9 +249,12 @@ kubectl -n pa-webinar create secret tls pa-webinar-tls --cert=<chain.pem> --key=
 
 Then set `ingress.tls` and `jitsi-meet.web.ingress.tls` to that Secret, as the
 comments in `values-k3s.yaml` show. With a certificate from an internal CA,
-browsers must trust the CA, and the portal's status page must too: mount the
-CA into the portal and set `NODE_EXTRA_CA_CERTS`. Otherwise the status page
-reports the conference as down while calls work.
+browsers must trust the CA. The portal's status page checks the conference
+inside the cluster and does not need it; the portal needs it only to reach
+names behind that CA, such as an SMTP relay or object storage. Put the CA in
+a ConfigMap and name it in `app.extraCaCerts`, which mounts it and sets
+`NODE_EXTRA_CA_CERTS`
+([Certificates](../../../docs/install/k3s.md#certificates)).
 
 ## Three nodes
 
@@ -427,9 +430,6 @@ sudo firewall-cmd --reload
 
 - **No high availability**, on one node or on three (see above).
 - **No TURN** in the simple profile (see [Ports](#ports)).
-- **The status page and self-signed certificates.** With a self-signed or
-  internal-CA certificate, the status page shows the conference as down (see
-  TLS above).
 - **Never set `JVB_ADVERTISE_PRIVATE_CANDIDATES: "false"`** when the bridge
   announces a private address (an intranet, or a lab). The bridge then
   announces no address at all. Participants join, and the participant

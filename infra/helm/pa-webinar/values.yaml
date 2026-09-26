@@ -189,6 +189,22 @@ app:
     - name: next-cache
       mountPath: /app/.next/cache
 
+  # ── Autorità di certificazione in più ──
+  # Per SMTP, object storage o gli indirizzi pubblici del portale e della
+  # conferenza serviti con un certificato di un'autorità interna: il chart
+  # monta in sola lettura una chiave di un Secret o di un ConfigMap già
+  # presente nel namespace (certificati PEM, anche più d'uno concatenati) e la
+  # indica a Node con NODE_EXTRA_CA_CERTS, in aggiunta alle autorità di
+  # sistema. Uno solo fra secretName e configMapName. Node legge il file
+  # all'avvio: dopo averlo cambiato, riavvia il Deployment. Non vale per le
+  # migrazioni: la connessione TLS al database si configura in DATABASE_URL.
+  #   kubectl -n <namespace> create configmap ente-ca --from-file=ca.crt=<ca.pem>
+  #   extraCaCerts: { configMapName: ente-ca, key: ca.crt }
+  extraCaCerts:
+    secretName: ""
+    configMapName: ""
+    key: ca.crt
+
   # ── Health probes ──
 
   probes:
@@ -420,10 +436,12 @@ networkPolicy:
               app.kubernetes.io/name: redis
 
     # In-cluster Jitsi: Prosody (5222/5280, XMPP for JWT-authenticated
-    # room creation), the bridge REST API (8080, JVB_HEALTH_URL) and the
-    # Jibri health API (2222, JIBRI_HEALTH_URL). When jitsi.enabled=false
-    # this stays effectively empty and the HTTPS rule below covers the
-    # external instance.
+    # room creation, and BOSH for PROSODY_INTERNAL_URL), the bridge REST
+    # API (8080, JVB_HEALTH_URL), the Jibri health API (2222,
+    # JIBRI_HEALTH_URL), the web container (80, JITSI_WEB_INTERNAL_URL; the
+    # value of jitsi-meet.web.service.port) and the Jicofo REST API (8888,
+    # JICOFO_HEALTH_URL). When jitsi.enabled=false this stays effectively
+    # empty and the HTTPS rule below covers the external instance.
     jitsi:
       to:
         - podSelector:
@@ -437,6 +455,10 @@ networkPolicy:
         - port: 8080
           protocol: TCP
         - port: 2222
+          protocol: TCP
+        - port: 80
+          protocol: TCP
+        - port: 8888
           protocol: TCP
 
     # The ingress controller, reached when the application calls the
@@ -662,6 +684,17 @@ cronjobs:
     schedule: "*/1 * * * *"
     image: curlimages/curl:8.11.1
 
+  # Ciclo di vita degli eventi senza lo scaler dei bridge: apre gli eventi
+  # all'ora di inizio, chiude quelli finiti (dopo la tolleranza) e le sessioni
+  # di chiamata rimaste aperte. Reso solo quando lo scaler non lo è (profili
+  # semplice e standard, Jitsi esterno, bridge scalati con KEDA): con lo
+  # scaler il ciclo di vita lo porta avanti lui. Con `enabled: false`, e senza
+  # scaler, gli eventi cambiano stato solo a mano (Avvia / Termina per tutti).
+  lifecycle:
+    enabled: true
+    schedule: "*/1 * * * *"
+    image: curlimages/curl:8.11.1
+
 # ── Immagine kubectl ─────────────────────────────────────────
 # Usata dai lavori che parlano con l'API di Kubernetes (scaler dei bridge,
 # orchestratore della post-produzione, riavvio della configurazione web)
@@ -775,8 +808,18 @@ jitsi:
   # per stato e metriche. Vuoto = il Service del sottochart se espone la porta
   # 8080 (`jvb.service.extraPorts`), altrimenti un Service reso da questo chart.
   jvbHealthUrl: ""
-  # Indirizzo dell'API di salute di Jibri. Vuoto = il Service del sottochart.
+  # Indirizzo dell'API di salute di Jibri. Vuoto = il Service del sottochart,
+  # solo se `jitsi-meet.jibri.enabled`; senza Jibri la variabile non si scrive.
   jibriHealthUrl: ""
+  # Indirizzi interni che la pagina di stato interroga al posto del nome
+  # pubblico della conferenza. Vuoti = i Service della release: la parte web
+  # e Prosody (BOSH, 5280) del sottochart, e per Jicofo (API REST, 8888) un
+  # Service che questo chart rende apposta. Gli indirizzi calcolati usano il
+  # nome completo del Service (<servizio>.<namespace>.svc.<dominio>, con il
+  # dominio di global.clusterDomain, predefinito cluster.local).
+  webInternalUrl: ""
+  prosodyInternalUrl: ""
+  jicofoHealthUrl: ""
 
   # ── Jitsi root redirect ──
   # Creates an Exact / ingress that redirects to the portal URL (301).
@@ -840,6 +883,30 @@ jitsi-meet:
       JWT_APP_ID: pa_webinar
       JWT_ACCEPTED_ISSUERS: pa-webinar
       JWT_ACCEPTED_AUDIENCES: jitsi
+      # Ruoli nella sala decisi dal token del portale: `owner` (moderatore)
+      # per chi entra con il link di moderazione, `member` (partecipante) per
+      # tutti gli altri, relatori compresi. `token_affiliation` è il modulo
+      # dell'immagine; `token_affiliation_custom` è quello del progetto,
+      # montato qui sotto da un ConfigMap del chart, che assegna il ruolo
+      # prima dell'ingresso invece che dopo. Va in coppia con
+      # `jicofo.extraEnvs` più sotto. Per aggiungere moduli, tieni questi due.
+      XMPP_MUC_MODULES: token_affiliation,token_affiliation_custom
+    # Il modulo del progetto (infra/jitsi/prosody-plugins), dal ConfigMap
+    # `pa-webinar-prosody-plugins` che il chart rende quando questo volume lo
+    # nomina. Il nome è fisso: una sola release per namespace. Sono liste: se
+    # ne imposti di tue in un altro file di valori, sostituiscono queste, e
+    # queste due voci vanno ripetute (la resa si ferma se il modulo è
+    # richiesto ma non montato). Un cambio del modulo non riavvia Prosody:
+    # dopo l'aggiornamento, `kubectl rollout restart statefulset` di Prosody,
+    # a sale vuote.
+    extraVolumes:
+      - name: prosody-plugins-custom
+        configMap:
+          name: pa-webinar-prosody-plugins
+    extraVolumeMounts:
+      - name: prosody-plugins-custom
+        mountPath: /prosody-plugins-custom
+        readOnly: true
     # Il segreto arriva a Prosody come JWT_APP_SECRET. Una sola di queste strade:
     #   - `jwt.secret`: il valore, e il sottochart rende il Secret;
     #   - `jwt.existingSecretName`: un Secret con la chiave JWT_APP_SECRET,
@@ -855,6 +922,25 @@ jitsi-meet:
     jwt:
       secret: ""
       existingSecretName: ""
+
+  # Jicofo senza autenticazione propria. Con l'autenticazione accesa (il
+  # predefinito del sottochart con `enableAuth`) Jicofo rende moderatore
+  # ogni partecipante autenticato, e con i token del portale lo sono tutti:
+  # ospiti e iscritti potrebbero silenziare o espellere il moderatore.
+  # L'accesso resta protetto da Prosody, che rifiuta chi non ha un token
+  # valido; chi è moderatore lo decide solo il token (prosody.extraEnvs
+  # qui sopra). ENABLE_AUTO_OWNER spento: nessuno diventa moderatore perché
+  # è entrato per primo o perché il moderatore è uscito. La resa si ferma se
+  # l'autenticazione è spenta qui ma Prosody non assegna i ruoli dal token.
+  jicofo:
+    extraEnvs:
+      JICOFO_ENABLE_AUTH: "false"
+      ENABLE_AUTO_OWNER: "false"
+
+  # Lavagna condivisa: non inclusa. La sala la mostra solo se la conferenza ha
+  # un server di collaborazione e se app.env.NEXT_PUBLIC_WHITEBOARD_ENABLED è
+  # "true". Il sottochart ne ha uno facoltativo (`excalidraw.enabled`, spento),
+  # che questo chart non accende e con cui la lavagna non è stata provata.
 
   jvb:
     replicaCount: 1

@@ -230,8 +230,185 @@ rende apposta (templates/jvb-rest-service.yaml).
 {{- if .Values.jitsi.jvbHealthUrl -}}
 {{- .Values.jitsi.jvbHealthUrl -}}
 {{- else if include "pa-webinar.jvbRestFromSubchart" . -}}
-{{- printf "http://%s-jitsi-meet-jvb:8080" .Release.Name -}}
+{{- printf "http://%s:8080" (include "pa-webinar.inClusterHost" (dict "nome" (printf "%s-jvb" (include "pa-webinar.jitsiFullname" .)) "root" .)) -}}
 {{- else -}}
-{{- printf "http://%s-jvb-rest:8080" (include "pa-webinar.fullname" .) -}}
+{{- printf "http://%s:8080" (include "pa-webinar.inClusterHost" (dict "nome" (printf "%s-jvb-rest" (include "pa-webinar.fullname" .)) "root" .)) -}}
+{{- end -}}
+{{- end }}
+
+{{/*
+Lo scaler dei bridge viene reso? Stessa condizione di
+templates/cronjob-jvb-scaler.yaml, che la usa. Restituisce "true" oppure niente.
+
+Da qui dipendono JVB_SCALER_ENABLED, il tetto dei bridge scritto per un bridge
+fisso e il CronJob del ciclo di vita, che gira solo quando lo scaler non c'è.
+*/}}
+{{- define "pa-webinar.jvbScalerRendered" -}}
+{{- if and .Values.jitsi.enabled (eq (default "simple" .Values.jitsi.mode) "full") .Values.jvbScaler.enabled -}}
+true
+{{- end -}}
+{{- end }}
+
+{{/*
+Nome base delle risorse del sottochart jitsi-meet, calcolato come lo calcola
+lui (`jitsi-meet.fullname`), override compresi. I Service si chiamano
+`<nome base>-web`, `<nome base>-prosody`, `<nome base>-jvb` e così via.
+*/}}
+{{- define "pa-webinar.jitsiFullname" -}}
+{{- $jm := index .Values "jitsi-meet" | default dict -}}
+{{- $override := dig "fullnameOverride" "" $jm | default "" -}}
+{{- if $override -}}
+{{- $override | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- $nome := dig "nameOverride" "" $jm | default "jitsi-meet" -}}
+{{- if contains $nome .Release.Name -}}
+{{- .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- printf "%s-%s" .Release.Name $nome | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+{{- end -}}
+{{- end }}
+
+{{/*
+Nome di un Service della release nella forma completa
+`<nome>.<namespace>.svc.<dominio del cluster>`.
+
+Un Service che esiste si risolve subito in entrambe le forme. Uno che non
+esiste no: il nome breve passa per tutti i domini di ricerca, compresi quelli
+aziendali che il nodo eredita, e dove rispondono lenti la risoluzione fallita
+costa secondi invece di frazioni di secondo, abbastanza da mandare una sonda
+dell'applicazione al proprio limite di tempo.
+
+Il dominio è `global.clusterDomain`, come per il sottochart jitsi-meet:
+assente vale `cluster.local`, vuoto torna al nome breve.
+
+Argomenti: dict "nome" (il nome del Service) "root" (il contesto del chart).
+*/}}
+{{- define "pa-webinar.inClusterHost" -}}
+{{- $globale := .root.Values.global | default dict -}}
+{{- $dominio := "cluster.local" -}}
+{{- if hasKey $globale "clusterDomain" -}}
+{{- $dominio = toString (index $globale "clusterDomain" | default "") -}}
+{{- end -}}
+{{- if $dominio -}}
+{{- printf "%s.%s.svc.%s" .nome .root.Release.Namespace $dominio -}}
+{{- else -}}
+{{- .nome -}}
+{{- end -}}
+{{- end }}
+
+{{/*
+Indirizzi interni dei componenti della conferenza, per le sonde della pagina
+di stato. Ciascuno si può imporre con il valore corrispondente in `jitsi.*`.
+  - la parte web (external_api.js): il Service web del sottochart;
+  - Prosody (/http-bind): il Service di Prosody del sottochart, porta BOSH;
+  - Jicofo (/about/version): il Service che questo chart rende apposta
+    (templates/jicofo-rest-service.yaml), perché il sottochart non ne ha;
+  - Jibri: solo se Jibri è acceso o l'indirizzo è indicato, altrimenti
+    niente: una sonda verso un Service inesistente costa un'attesa a ogni
+    richiesta della pagina.
+*/}}
+{{- define "pa-webinar.jitsiWebInternalUrl" -}}
+{{- if .Values.jitsi.webInternalUrl -}}
+{{- .Values.jitsi.webInternalUrl -}}
+{{- else -}}
+{{- $jm := index .Values "jitsi-meet" | default dict -}}
+{{- $porta := toString (dig "web" "service" "port" 80 $jm | default 80) -}}
+{{- $host := include "pa-webinar.inClusterHost" (dict "nome" (printf "%s-web" (include "pa-webinar.jitsiFullname" .)) "root" .) -}}
+{{- if eq $porta "80" -}}
+{{- printf "http://%s" $host -}}
+{{- else -}}
+{{- printf "http://%s:%s" $host $porta -}}
+{{- end -}}
+{{- end -}}
+{{- end }}
+
+{{- define "pa-webinar.prosodyInternalUrl" -}}
+{{- if .Values.jitsi.prosodyInternalUrl -}}
+{{- .Values.jitsi.prosodyInternalUrl -}}
+{{- else -}}
+{{- $jm := index .Values "jitsi-meet" | default dict -}}
+{{- $porta := toString (dig "prosody" "service" "ports" "bosh-insecure" 5280 $jm | default 5280) -}}
+{{- printf "http://%s:%s" (include "pa-webinar.inClusterHost" (dict "nome" (printf "%s-prosody" (include "pa-webinar.jitsiFullname" .)) "root" .)) $porta -}}
+{{- end -}}
+{{- end }}
+
+{{- define "pa-webinar.jicofoHealthUrl" -}}
+{{- if .Values.jitsi.jicofoHealthUrl -}}
+{{- .Values.jitsi.jicofoHealthUrl -}}
+{{- else -}}
+{{- printf "http://%s:8888" (include "pa-webinar.inClusterHost" (dict "nome" (printf "%s-jicofo-rest" (include "pa-webinar.fullname" .)) "root" .)) -}}
+{{- end -}}
+{{- end }}
+
+{{- define "pa-webinar.jibriHealthUrl" -}}
+{{- if .Values.jitsi.jibriHealthUrl -}}
+{{- .Values.jitsi.jibriHealthUrl -}}
+{{- else if and (dig "jibri" "enabled" false (index .Values "jitsi-meet" | default dict)) (not (dig "jibri" "useExternalJibri" false (index .Values "jitsi-meet" | default dict))) -}}
+{{- printf "http://%s:2222" (include "pa-webinar.inClusterHost" (dict "nome" (printf "%s-jibri" (include "pa-webinar.jitsiFullname" .)) "root" .)) -}}
+{{- end -}}
+{{- end }}
+
+{{/*
+Autorità di certificazione in più per l'applicazione (app.extraCaCerts): un
+Secret o un ConfigMap già presente nel namespace, di cui si monta una sola
+chiave in sola lettura, indicata a Node con NODE_EXTRA_CA_CERTS. Serve a chi ha
+SMTP, object storage o gli indirizzi pubblici del portale e della conferenza
+dietro un'autorità interna. Node la legge all'avvio: dopo un cambio del file
+serve un riavvio del pod.
+
+Restituisce "true" se configurato, niente altrimenti; con Secret e ConfigMap
+insieme la resa si ferma, perché non si saprebbe quale dei due vale.
+*/}}
+{{- define "pa-webinar.extraCaCerts" -}}
+{{- $ca := dig "extraCaCerts" dict (.Values.app | default dict) | default dict -}}
+{{- $secret := dig "secretName" "" $ca | default "" -}}
+{{- $cm := dig "configMapName" "" $ca | default "" -}}
+{{- if and $secret $cm -}}
+{{- fail (printf "app.extraCaCerts indica sia secretName (%q) sia configMapName (%q): ne serve uno solo, quello che contiene il certificato dell'autorità (formato PEM, anche più certificati concatenati)." $secret $cm) -}}
+{{- end -}}
+{{- if or $secret $cm -}}
+true
+{{- end -}}
+{{- end }}
+
+{{- define "pa-webinar.extraCaCertsDir" -}}
+/etc/pa-webinar/extra-ca
+{{- end }}
+
+{{- define "pa-webinar.extraCaCertsFile" -}}
+ca-bundle.pem
+{{- end }}
+
+{{/*
+ConfigMap con i moduli Prosody del progetto (templates/configmap-prosody-plugins.yaml).
+Il nome è fisso perché lo nomina `jitsi-meet.prosody.extraVolumes` in
+values.yaml, e i valori di un sottochart non possono calcolarlo.
+*/}}
+{{- define "pa-webinar.prosodyPluginsConfigMap" -}}
+pa-webinar-prosody-plugins
+{{- end }}
+
+{{/*
+Un volume di Prosody monta quel ConfigMap in /prosody-plugins-custom?
+Restituisce "true" oppure niente.
+*/}}
+{{- define "pa-webinar.prosodyPluginsMounted" -}}
+{{- $prosody := dig "prosody" dict (index .Values "jitsi-meet" | default dict) | default dict -}}
+{{- $cm := include "pa-webinar.prosodyPluginsConfigMap" . -}}
+{{- $volumi := list -}}
+{{- range (dig "extraVolumes" list $prosody | default list) -}}
+{{- if and (kindIs "map" .) (eq (toString (dig "configMap" "name" "" .)) $cm) -}}
+{{- $volumi = append $volumi (toString (index . "name")) -}}
+{{- end -}}
+{{- end -}}
+{{- $montato := false -}}
+{{- range (dig "extraVolumeMounts" list $prosody | default list) -}}
+{{- if and (kindIs "map" .) (has (toString (index . "name" | default "")) $volumi) (hasPrefix "/prosody-plugins-custom" (toString (index . "mountPath" | default ""))) -}}
+{{- $montato = true -}}
+{{- end -}}
+{{- end -}}
+{{- if $montato -}}
+true
 {{- end -}}
 {{- end }}

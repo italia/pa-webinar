@@ -1,0 +1,90 @@
+{{- /*
+Ciclo di vita degli eventi quando nessuno scala i bridge: apre gli eventi
+all'ora di inizio, chiude quelli finiti e le sessioni rimaste aperte.
+
+Con lo scaler dei bridge (profilo completo) lo fa lo scaler a ogni giro, e
+questo CronJob non viene reso. Senza, lo chiama ogni minuto. Anche se i due
+girassero insieme (uno scaler esterno che chiama la stessa rotta, un
+aggiornamento a metà) l'applicazione sceglie un solo conduttore: la rotta
+esce subito quando lo scaler ha dato segni di vita di recente.
+*/}}
+{{- if and .Values.cronjobs.lifecycle.enabled (not (include "pa-webinar.jvbScalerRendered" .)) }}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "pa-webinar.fullname" . }}-lifecycle
+  labels:
+    {{- include "pa-webinar.labels" . | nindent 4 }}
+    app.kubernetes.io/component: cronjob-lifecycle
+spec:
+  schedule: {{ .Values.cronjobs.lifecycle.schedule | quote }}
+  # Un giro alla volta: le transizioni sono idempotenti, ma due giri
+  # sovrapposti leggerebbero lo stesso stato e scriverebbero due volte.
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      # GC dei Job terminati (successo E fallimento): senza TTL un Job fallito
+      # resta visibile per giorni (failedJobsHistoryLimit) e tiene acceso
+      # KubeJobFailed molto oltre il problema reale.
+      ttlSecondsAfterFinished: {{ .Values.cronjobs.jobTtlSeconds | default 7200 }}
+      backoffLimit: 1
+      {{- include "pa-webinar.disruptionTolerantFailurePolicy" . | nindent 6 }}
+      # Il giro dura pochi secondi; la deadline comprende anche l'attesa di
+      # schedulazione e il prelievo dell'immagine su un nodo nuovo, come per
+      # la coda delle email.
+      activeDeadlineSeconds: 240
+      template:
+        metadata:
+          labels:
+            {{- include "pa-webinar.selectorLabels" . | nindent 12 }}
+            app.kubernetes.io/component: cronjob-lifecycle
+        spec:
+          restartPolicy: Never
+          automountServiceAccountToken: false
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 100
+            runAsGroup: 101
+            seccompProfile:
+              type: RuntimeDefault
+          {{- if .Values.app.nodeSelector }}
+          nodeSelector:
+            {{- toYaml .Values.app.nodeSelector | nindent 12 }}
+          {{- end }}
+          {{- if .Values.app.tolerations }}
+          tolerations:
+            {{- toYaml .Values.app.tolerations | nindent 12 }}
+          {{- end }}
+          containers:
+            - name: lifecycle
+              image: {{ .Values.cronjobs.lifecycle.image }}
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  curl -sf --retry 3 --retry-delay 5 --retry-connrefused --connect-timeout 5 \
+                    -H "x-api-key: $(CRON_API_KEY)" \
+                    {{ include "pa-webinar.internalUrl" . }}/api/cron/lifecycle
+              env:
+                - name: CRON_API_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ include "pa-webinar.secretName" . }}
+                      key: CRON_API_KEY
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                runAsNonRoot: true
+                capabilities:
+                  drop:
+                    - ALL
+              resources:
+                requests:
+                  cpu: 50m
+                  memory: 32Mi
+                limits:
+                  cpu: 50m
+                  memory: 32Mi
+{{- end }}

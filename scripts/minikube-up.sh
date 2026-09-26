@@ -599,7 +599,14 @@ carica_nel_nodo() {
     nota "$img già nel nodo"
   else
     nota "carico $img nel nodo…"
-    mk image load "$img"
+    # Dall'archivio in ingresso, non per nome: per nome minikube riusa la
+    # copia che tiene in cache (~/.minikube/cache/images) e, con lo stesso
+    # tag, lascia nel nodo l'immagine del lancio precedente.
+    docker save "$img" | mk image load - \
+      || errore "caricamento di $img nel nodo non riuscito."
+    id_nodo="$(mk ssh -- docker image inspect --format '{{.Id}}' "$img" 2>/dev/null | tr -d '\r' || true)"
+    [ "$id_host" = "$id_nodo" ] \
+      || errore "dopo il caricamento il nodo ha ancora un'altra versione di $img ($id_nodo invece di $id_host)."
   fi
 }
 
@@ -668,6 +675,128 @@ if [ "$secret_pull" = "si" ]; then
   fi
 fi
 
+# ── Certificati: un'autorità locale, creata una volta ───────────
+# Un'autorità di certificazione tutta di questa installazione, nella cartella
+# di stato (chiave 0600, mai nel repository), firma i certificati del portale,
+# della conferenza e della casella di prova. Chi la aggiunge una volta alle
+# autorità fidate del browser apre i tre indirizzi senza avvisi; la conferenza,
+# che gira in un riquadro dentro il portale, non si blocca più su un
+# certificato mai accettato. Il portale la riceve in un ConfigMap
+# (app.extraCaCerts), per le connessioni che fa verso i propri nomi pubblici.
+#
+# L'autorità può firmare solo nomi sotto i domini indicati alla creazione
+# (nameConstraints): chi ne ottenesse la chiave non potrebbe spacciarsi per
+# nessun altro sito. Si rigenera solo se manca, scade o non copre il dominio
+# scelto; i certificati dei nomi si rifanno quando cambia l'IP del nodo o si
+# avvicina la scadenza. Rilanciare lo script non cambia l'autorità.
+passo "Certificati"
+CA_KEY="$STATO/ca.key"
+CA_CRT="$STATO/ca.crt"
+TLS_DIR="$STATO/tls"
+SECRET_CA="local-ca"
+(umask 077 && mkdir -p "$TLS_DIR")
+
+# Vero se il file PEM di un certificato scade fra più di $2 giorni.
+valido_per() {
+  openssl x509 -in "$1" -noout -checkend $(( $2 * 86400 )) >/dev/null 2>&1
+}
+# Vero se chiave privata ($1) e certificato ($2) sono una coppia.
+coppia() {
+  [ "$(openssl pkey -in "$1" -pubout 2>/dev/null)" = "$(openssl x509 -in "$2" -pubkey -noout 2>/dev/null)" ] \
+    && [ -n "$(openssl x509 -in "$2" -pubkey -noout 2>/dev/null)" ]
+}
+# Vero se l'autorità può firmare nomi sotto il dominio $1.
+ca_copre() {
+  openssl x509 -in "$CA_CRT" -noout -text 2>/dev/null | sed 's/^ *//' | grep -qxF "DNS:$1"
+}
+
+nuova_ca="no"
+if [ -s "$CA_KEY" ] && [ -s "$CA_CRT" ] && coppia "$CA_KEY" "$CA_CRT" && valido_per "$CA_CRT" 30; then
+  if ! ca_copre "$DOMINIO"; then
+    errore "L'autorità locale in $CA_CRT non copre il dominio '$DOMINIO' (creata per un altro --domain).
+  Per crearne una nuova: rm '$CA_KEY' '$CA_CRT' e rilancia; poi togli la vecchia dalle
+  autorità fidate del browser e aggiungi la nuova (le istruzioni arrivano alla fine)."
+  fi
+  nota "autorità locale riusata: $CA_CRT"
+else
+  domini="nip.io sslip.io"
+  case " $domini " in *" $DOMINIO "*) ;; *) domini="$domini $DOMINIO" ;; esac
+  permessi=""
+  for d in $domini; do permessi="${permessi:+$permessi,}permitted;DNS:$d"; done
+  cfg="$(mktemp "$STATO/ca.cnf.XXXXXX")"
+  cat > "$cfg" <<FINE
+[req]
+distinguished_name = dn
+prompt = no
+[dn]
+CN = PA Webinar minikube CA ($PROFILO, $(date -u +%Y-%m-%d))
+[v3_ca]
+basicConstraints = critical, CA:TRUE, pathlen:0
+keyUsage = critical, keyCertSign, cRLSign
+subjectKeyIdentifier = hash
+nameConstraints = critical, $permessi
+FINE
+  openssl ecparam -name prime256v1 -genkey -noout -out "$CA_KEY" 2>/dev/null
+  chmod 600 "$CA_KEY"
+  openssl req -new -x509 -key "$CA_KEY" -config "$cfg" -extensions v3_ca -sha256 \
+    -days 3650 -set_serial "0x$(openssl rand -hex 16)" -out "$CA_CRT" \
+    || { rm -f "$cfg"; errore "openssl non ha creato l'autorità locale."; }
+  rm -f "$cfg"
+  # Certificati firmati da un'autorità precedente: si rifanno tutti.
+  rm -f "$TLS_DIR"/*.crt "$TLS_DIR"/*.key
+  nuova_ca="si"
+  nota "autorità locale creata: $CA_CRT (valida 10 anni, solo per nomi sotto: $domini)"
+fi
+
+# Il certificato di un nome, rifatto solo quando serve.
+certificato() {
+  local nome="$1" host="$2" chiave="$TLS_DIR/$1.key" cert="$TLS_DIR/$1.crt" est csr
+  if [ -s "$chiave" ] && [ -s "$cert" ] && coppia "$chiave" "$cert" && valido_per "$cert" 30 \
+     && openssl verify -CAfile "$CA_CRT" "$cert" >/dev/null 2>&1 \
+     && openssl x509 -in "$cert" -noout -text | sed 's/^ *//' | grep -qxF "DNS:$host"; then
+    return 0
+  fi
+  est="$(mktemp "$STATO/leaf.cnf.XXXXXX")"
+  csr="$(mktemp "$STATO/leaf.csr.XXXXXX")"
+  cat > "$est" <<FINE
+[v3_leaf]
+basicConstraints = critical, CA:FALSE
+keyUsage = critical, digitalSignature
+extendedKeyUsage = serverAuth
+subjectAltName = DNS:$host
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid
+FINE
+  openssl ecparam -name prime256v1 -genkey -noout -out "$chiave" 2>/dev/null
+  chmod 600 "$chiave"
+  openssl req -new -key "$chiave" -subj "/CN=$host" -out "$csr" 2>/dev/null
+  # 397 giorni: il massimo che i browser accettano per un certificato di un
+  # sito, anche se firmato da un'autorità aggiunta a mano.
+  openssl x509 -req -in "$csr" -CA "$CA_CRT" -CAkey "$CA_KEY" -set_serial "0x$(openssl rand -hex 16)" \
+    -days 397 -sha256 -extfile "$est" -extensions v3_leaf -out "$cert" 2>/dev/null \
+    || { rm -f "$est" "$csr"; errore "openssl non ha firmato il certificato di $host."; }
+  rm -f "$est" "$csr"
+  nota "certificato per $host"
+}
+
+# Secret TLS e ConfigMap dell'autorità nel namespace: stessi nomi a ogni lancio,
+# riscritti con `apply`. Il controller di ingresso li ricarica da sé.
+secret_tls() {
+  kc -n "$NAMESPACE" create secret tls "$1" --cert="$TLS_DIR/$2.crt" --key="$TLS_DIR/$2.key" \
+    --dry-run=client -o yaml | kc apply -f - >/dev/null
+}
+certificato app "$APP_HOST"
+certificato jitsi "$JITSI_HOST"
+secret_tls app-tls app
+secret_tls jitsi-tls jitsi
+if [ "$MAILPIT" = "si" ]; then
+  certificato mail "$MAIL_HOST"
+  secret_tls mail-tls mail
+fi
+kc -n "$NAMESPACE" create configmap "$SECRET_CA" --from-file=ca.crt="$CA_CRT" \
+  --dry-run=client -o yaml | kc apply -f - >/dev/null
+IMPRONTA_CA="$(openssl x509 -in "$CA_CRT" -noout -fingerprint -sha256 | sed 's/^[^=]*=//')"
+
 # ── Casella di prova per le email ───────────────────────────────
 if [ "$MAILPIT" = "si" ]; then
   passo "Mailpit (email del portale)"
@@ -715,8 +844,13 @@ kind: Ingress
 metadata:
   name: mailpit
   labels: { app.kubernetes.io/name: mailpit, app.kubernetes.io/part-of: pa-webinar-minikube }
+  annotations:
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
 spec:
   ingressClassName: nginx
+  tls:
+    - hosts: ["$MAIL_HOST"]
+      secretName: mail-tls
   rules:
     - host: $MAIL_HOST
       http:
@@ -735,9 +869,12 @@ fi
   printf 'app:\n  env:\n'
   printf '    NEXT_PUBLIC_APP_URL: "https://%s"\n' "$APP_HOST"
   printf '    NEXT_PUBLIC_JITSI_DOMAIN: "%s"\n' "$JITSI_HOST"
+  printf '  extraCaCerts:\n    configMapName: "%s"\n    key: ca.crt\n' "$SECRET_CA"
   printf 'ingress:\n  hosts:\n    - host: "%s"\n      paths:\n        - path: /\n          pathType: Prefix\n' "$APP_HOST"
+  printf '  tls:\n    - secretName: app-tls\n      hosts: ["%s"]\n' "$APP_HOST"
   printf 'jitsi-meet:\n  publicURL: "https://%s"\n' "$JITSI_HOST"
   printf '  web:\n    ingress:\n      hosts:\n        - host: "%s"\n          paths: ["/"]\n' "$JITSI_HOST"
+  printf '      tls:\n        - secretName: jitsi-tls\n          hosts: ["%s"]\n' "$JITSI_HOST"
   if [ "$MAILPIT" = "si" ]; then
     printf 'secrets:\n  generate:\n'
     printf '    SMTP_HOST: "mailpit"\n    SMTP_PORT: "1025"\n    SMTP_SECURE: "false"\n'
@@ -792,14 +929,26 @@ fi
 # ── Controlli ───────────────────────────────────────────────────
 passo "Controlli"
 # --resolve: il controllo vale anche quando il DNS locale non risolve nip.io.
-salute="$(curl -sk --max-time 20 --resolve "$APP_HOST:443:$IP" "https://$APP_HOST/api/health" || true)"
+# --cacert: i certificati devono verificarsi con l'autorità locale, come
+# succederà nel browser che la considera fidata.
+salute="$(curl -s --cacert "$CA_CRT" --max-time 20 --resolve "$APP_HOST:443:$IP" "https://$APP_HOST/api/health" 2>&1 || true)"
 case "$salute" in
-  *'"status":"ok"'*) nota "portale: /api/health ok" ;;
+  *'"status":"ok"'*) nota "portale: /api/health ok, certificato verificato" ;;
   *) errore "il portale non risponde come atteso su https://$APP_HOST/api/health: $salute" ;;
 esac
-codice="$(curl -sk --max-time 20 -o /dev/null -w '%{http_code}' --resolve "$JITSI_HOST:443:$IP" "https://$JITSI_HOST/config.js" || true)"
+codice="$(curl -s --cacert "$CA_CRT" --max-time 20 -o /dev/null -w '%{http_code}' --resolve "$JITSI_HOST:443:$IP" "https://$JITSI_HOST/config.js" 2>&1 || true)"
 [ "$codice" = "200" ] || errore "la conferenza risponde $codice su https://$JITSI_HOST/config.js"
-nota "conferenza: config.js 200"
+nota "conferenza: config.js 200, certificato verificato"
+# In http:// la pagina non è un contesto sicuro: il browser non dà microfono né
+# videocamera, e la sala resta a caricare. Il controller deve rimandare a https.
+for h in "$APP_HOST" "$JITSI_HOST"; do
+  rinvio="$(curl -s --max-time 20 -o /dev/null -w '%{http_code} %{redirect_url}' --resolve "$h:80:$IP" "http://$h/" || true)"
+  case "$rinvio" in
+    30[178]" https://$h/"*) ;;
+    *) errore "http://$h/ non rimanda a https (risposta: $rinvio)" ;;
+  esac
+done
+nota "http rimanda a https su portale e conferenza"
 
 # ── Riepilogo ───────────────────────────────────────────────────
 cat <<FINE
@@ -829,8 +978,25 @@ cat <<FINE
   (grep ADMIN_API_KEY '$SEGRETI')
 
 Prossimi passi
-  1. Apri una volta https://$JITSI_HOST e accetta il certificato autofirmato,
-     poi fai lo stesso con il portale: senza, la sala non si carica nel portale.
+  1. Rendi fidata, una volta sola, l'autorità locale che firma i certificati:
+       $CA_CRT
+       impronta SHA-256 $IMPRONTA_CA
+     $( [ "$nuova_ca" = "si" ] && printf '%s' "È stata appena creata: se ne avevi resa fidata una prima, sostituiscila." || printf '%s' "È la stessa dei lanci precedenti: se l'hai già resa fidata, non serve altro.")
+     Firma solo nomi sotto nip.io e sslip.io (e il dominio scelto). Una delle
+     strade, poi riapri il browser:
+     - Chrome, Chromium, Edge su Linux (serve certutil: pacchetto nss-tools su
+       Fedora, libnss3-tools su Debian e Ubuntu):
+         certutil -d sql:\$HOME/.pki/nssdb -A -t "C,," -n "PA Webinar minikube" -i '$CA_CRT'
+     - Firefox, ogni sistema: Impostazioni > Privacy e sicurezza > Certificati >
+       Mostra certificati > Autorità > Importa, e spunta l'identificazione dei siti.
+     - Sistema (curl e gli altri programmi della macchina), su Fedora:
+         sudo cp '$CA_CRT' /etc/pki/ca-trust/source/anchors/pa-webinar-minikube.crt && sudo update-ca-trust
+       su Debian e Ubuntu:
+         sudo cp '$CA_CRT' /usr/local/share/ca-certificates/pa-webinar-minikube.crt && sudo update-ca-certificates
+       su macOS (vale per Chrome e Safari):
+         sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain '$CA_CRT'
+     Senza: apri una volta https://$JITSI_HOST e accetta l'avviso, poi fai lo
+     stesso con il portale. Solo il portale non basta: la sala non si carica.
   2. Entra nell'amministrazione con la chiave e crea un evento.
   3. I browser devono girare su questa macchina: l'IP del nodo ($IP) non è
      raggiungibile da altre.

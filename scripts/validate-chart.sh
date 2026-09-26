@@ -86,6 +86,11 @@ profili=(
   "produzione-rete:$CHART/values-production.yaml"
   "completo-segreti-esterni:$CHART/examples/values-full.yaml"
   "jitsi-esterno:"
+  "completo-keda:$CHART/examples/values-full.yaml"
+  "semplice-ca:$CHART/examples/values-simple.yaml"
+  "aks:$CHART/examples/values-full.yaml"
+  "eks:$CHART/examples/values-full.yaml"
+  "gke:$CHART/examples/values-full.yaml"
 )
 
 argomenti_profilo() {
@@ -121,8 +126,29 @@ argomenti_profilo() {
     # pretese (qui arrivano da `comuni`, come dal file dei segreti).
     semplice-minikube)
       printf '%s\n' -f "$CHART/examples/values-minikube.yaml" ;;
+    # Bridge scalati da KEDA al posto del CronJob (examples/keda-jvb-scaler.yaml):
+    # niente scaler reso, quindi il ciclo di vita tocca al suo CronJob, e
+    # nessun tetto fisso dei bridge.
+    completo-keda)
+      printf '%s\n' --set jvbScaler.enabled=false --set-string app.env.JVB_SCALER_ENABLED=true ;;
+    # Un'autorità di certificazione interna da un ConfigMap.
+    semplice-ca)
+      printf '%s\n' --set app.extraCaCerts.configMapName=ente-ca --set app.extraCaCerts.key=ca.crt ;;
+    # I profili dei cloud sopra al completo, senza i valori che escono da
+    # tofu: si rendono, e le invarianti valgono anche per loro.
+    aks|eks|gke)
+      printf '%s\n' -f "$CHART/examples/values-$1.yaml" ;;
   esac
 }
+
+# Il modulo Prosody che assegna i ruoli dal token esiste in due copie: quella
+# che monta lo stack Docker Compose e quella che il chart mette nel proprio
+# ConfigMap (un chart non legge file fuori dalla sua cartella). Devono restare
+# identiche.
+modulo="mod_token_affiliation_custom.lua"
+if ! cmp -s "infra/jitsi/prosody-plugins/$modulo" "$CHART/files/prosody-plugins/$modulo"; then
+  errore "infra/jitsi/prosody-plugins/$modulo e $CHART/files/prosody-plugins/$modulo sono diversi: aggiorna la copia del chart"
+fi
 
 echo "helm lint"
 # Con i soli valori predefiniti la resa si ferma alla guardia sul segreto JWT
@@ -416,17 +442,8 @@ for tipo, n, modello in carichi:
         if trovato and trovato.group(1) not in deployment:
             print(f"lo scaler cerca il Deployment {trovato.group(1)!r}, che non è reso")
 
-# Le statistiche del bridge: l'indirizzo deve essere un Service reso.
-for tipo, n, modello in carichi:
-    if tipo != "Deployment":
-        continue
-    for c in (modello.get("spec") or {}).get("containers") or []:
-        for e in c.get("env") or []:
-            if e.get("name") != "JVB_HEALTH_URL":
-                continue
-            trovato = re.match(r"https?://([^:/]+)", str(e.get("value", "")))
-            if trovato and "." not in trovato.group(1) and trovato.group(1) not in servizi:
-                print(f"JVB_HEALTH_URL punta all'host {trovato.group(1)!r}, che non è un Service reso")
+# Gli indirizzi interni dell'applicazione (JVB_HEALTH_URL e gli altri) sono
+# controllati più sotto, con le invarianti della conferenza.
 
 # Bitnami pubblica nel registro pubblico solo `latest`, che cambia contenuto:
 # un tag con la versione non esiste (ImagePullBackOff), e `latest` senza
@@ -445,11 +462,286 @@ PY
     [ -n "$problema" ] && errore "$problema"
   done <"$OUT/$nome.net"
 
+  # La conferenza e il ciclo di vita: indirizzi interni che l'applicazione
+  # interroga, ruoli nella sala, chi porta avanti gli eventi, quanti bridge il
+  # portale si aspetta. Tutti difetti che non fermano l'installazione e si
+  # vedono solo usandola: una pagina di stato rossa con le sale che
+  # funzionano, ospiti moderatori, eventi che non si chiudono mai.
+  if ! python3 - "$reso" "$nome" >"$OUT/$nome.conf" 2>"$OUT/$nome.conf.err" <<'PY'
+import re
+import sys
+
+import yaml
+
+docs = [d for d in yaml.safe_load_all(open(sys.argv[1])) if d]
+profilo = sys.argv[2]
+
+
+def del_chart(d):
+    return str((d["metadata"].get("labels") or {}).get("helm.sh/chart", "")).startswith("pa-webinar-")
+
+
+def modelli():
+    for d in docs:
+        tipo, spec = d.get("kind"), d.get("spec") or {}
+        if tipo in ("Deployment", "StatefulSet", "DaemonSet"):
+            yield tipo, d["metadata"]["name"], spec.get("template") or {}, spec
+        elif tipo == "CronJob":
+            job = (spec.get("jobTemplate") or {}).get("spec") or {}
+            yield tipo, d["metadata"]["name"], job.get("template") or {}, spec
+
+
+def seleziona(selettore, et):
+    return all(str(et.get(k)) == str(v) for k, v in (selettore or {}).items())
+
+
+carichi = list(modelli())
+servizi = {d["metadata"]["name"]: d for d in docs if d.get("kind") == "Service"}
+mappe = {d["metadata"]["name"]: d.get("data") or {} for d in docs if d.get("kind") == "ConfigMap"}
+
+# L'applicazione: il Deployment del chart senza componente, e il suo ConfigMap.
+app = next((d for d in docs if d.get("kind") == "Deployment" and del_chart(d)
+            and "app.kubernetes.io/component" not in (d["spec"]["template"]["metadata"].get("labels") or {})), None)
+if app is None:
+    print("nessun Deployment dell'applicazione reso")
+    sys.exit(0)
+nome_app = app["metadata"]["name"]
+contenitore = app["spec"]["template"]["spec"]["containers"][0]
+variabili = dict(mappe.get(nome_app, {}))
+for e in contenitore.get("env") or []:
+    if "value" in e:
+        variabili[e["name"]] = str(e["value"])
+
+
+def breve(host):
+    """Il nome del Service dentro un indirizzo di cluster, o None se è esterno."""
+    trovato = re.match(r"^([a-z0-9-]+)\.[a-z0-9-]+\.svc(\.[a-z0-9.-]+)?$", host)
+    if trovato:
+        return trovato.group(1)
+    return None if "." in host else host
+
+
+def pod_di(servizio):
+    """I modelli di pod che un Service seleziona."""
+    sel = (servizio.get("spec") or {}).get("selector") or {}
+    return [(t, n, m) for t, n, m, _ in carichi
+            if sel and seleziona(sel, (m.get("metadata") or {}).get("labels") or {})]
+
+
+def porta_pod(servizio, porta, modello):
+    """La porta del container dietro una porta del Service."""
+    for p in (servizio.get("spec") or {}).get("ports") or []:
+        if p.get("port") != porta:
+            continue
+        bersaglio = p.get("targetPort", porta)
+        if isinstance(bersaglio, int):
+            return bersaglio
+        for c in (modello.get("spec") or {}).get("containers") or []:
+            for cp in c.get("ports") or []:
+                if cp.get("name") == bersaglio:
+                    return cp.get("containerPort")
+        return None
+    return False
+
+
+# Ogni indirizzo interno punta a un Service reso, su una porta che il Service
+# espone, e con la NetworkPolicy accesa la policy dell'applicazione deve
+# lasciar passare il traffico verso quella porta dei pod: altrimenti la sonda
+# scade e la pagina di stato segna un guasto che non c'è.
+politica = next((d for d in docs if d.get("kind") == "NetworkPolicy" and del_chart(d)
+                 and d["metadata"]["name"] == nome_app), None)
+
+
+def uscita_ammessa(et, porta):
+    for regola in (politica.get("spec") or {}).get("egress") or []:
+        porte = regola.get("ports")
+        if porte and not any(p.get("port") == porta for p in porte):
+            continue
+        destinazioni = regola.get("to")
+        if not destinazioni:
+            return True
+        for dest in destinazioni:
+            if "podSelector" in dest and "namespaceSelector" not in dest \
+                    and seleziona((dest["podSelector"] or {}).get("matchLabels") or {}, et):
+                return True
+    return False
+
+
+interni = ["JVB_HEALTH_URL", "JIBRI_HEALTH_URL", "JITSI_WEB_INTERNAL_URL",
+           "PROSODY_INTERNAL_URL", "JICOFO_HEALTH_URL"]
+for chiave in interni:
+    url = variabili.get(chiave)
+    if not url:
+        continue
+    trovato = re.match(r"^http://([^:/]+)(?::(\d+))?", url)
+    if not trovato:
+        print(f"{chiave} non è un indirizzo http interno: {url!r}")
+        continue
+    nome_svc = breve(trovato.group(1))
+    if nome_svc is None:
+        continue
+    porta = int(trovato.group(2) or 80)
+    svc = servizi.get(nome_svc)
+    if svc is None:
+        print(f"{chiave} punta al Service {nome_svc!r}, che non è reso")
+        continue
+    pods = pod_di(svc)
+    if not pods:
+        print(f"{chiave}: il Service {nome_svc!r} non seleziona nessun pod reso")
+        continue
+    for t, n, m in pods:
+        cp = porta_pod(svc, porta, m)
+        if cp is False:
+            print(f"{chiave} usa la porta {porta}, che il Service {nome_svc!r} non espone")
+            break
+        if politica is not None and cp and not uscita_ammessa((m.get("metadata") or {}).get("labels") or {}, cp):
+            print(f"{chiave}: la NetworkPolicy {nome_app} non lascia uscire l'applicazione verso {t}/{n} sulla porta {cp}")
+
+# Conferenza nel cluster: le sonde della pagina di stato hanno i loro indirizzi
+# interni, e Jibri si interroga solo se c'è.
+web = [n for n in servizi if n.endswith("-web") and any(
+    (m.get("metadata") or {}).get("labels", {}).get("app.kubernetes.io/component") == "web"
+    for _, _, m in pod_di(servizi[n]))]
+jibri_reso = any(n.endswith("-jibri") for n in servizi)
+if web:
+    for chiave in ("JITSI_WEB_INTERNAL_URL", "PROSODY_INTERNAL_URL", "JICOFO_HEALTH_URL"):
+        if not variabili.get(chiave):
+            print(f"la conferenza è nel cluster ma l'applicazione non ha {chiave}: la pagina di stato passerebbe dal nome pubblico")
+if "JIBRI_HEALTH_URL" in variabili and not jibri_reso:
+    print(f"JIBRI_HEALTH_URL è impostato ({variabili['JIBRI_HEALTH_URL']}) ma Jibri non è reso: ogni richiesta della pagina di stato aspetterebbe un Service inesistente")
+if jibri_reso and "JIBRI_HEALTH_URL" not in variabili:
+    print("Jibri è reso ma l'applicazione non ha JIBRI_HEALTH_URL")
+
+# Come è installata la piattaforma, per la pagina di stato.
+if variabili.get("DEPLOY_PROFILE") not in ("simple", "standard", "full"):
+    print(f"DEPLOY_PROFILE è {variabili.get('DEPLOY_PROFILE')!r}: atteso simple, standard o full")
+pg_reso = any(t == "StatefulSet" and "postgresql" in n for t, n, _, _ in carichi)
+if variabili.get("DATABASE_BUNDLED") != ("true" if pg_reso else "false"):
+    print(f"DATABASE_BUNDLED è {variabili.get('DATABASE_BUNDLED')!r} ma il database del chart {'è' if pg_reso else 'non è'} reso")
+servizio_app = next((n for n, s in servizi.items() if del_chart(s)
+                     and seleziona((s.get("spec") or {}).get("selector") or {},
+                                   app["spec"]["template"]["metadata"].get("labels") or {})
+                     and any(p.get("port") == 3000 or p.get("targetPort") == "http" for p in s["spec"].get("ports") or [])), None)
+if variabili.get("METRICS_JOB") != servizio_app:
+    print(f"METRICS_JOB è {variabili.get('METRICS_JOB')!r} ma il Service dell'applicazione, che Prometheus usa come job, è {servizio_app!r}")
+
+# Il ciclo di vita degli eventi: esattamente uno fra lo scaler dei bridge e
+# il CronJob del ciclo di vita, altrimenti gli eventi non si aprono e non si
+# chiudono da soli.
+cron = {n for t, n, _, _ in carichi if t == "CronJob"}
+scaler = f"{nome_app}-jvb-scaler" in cron
+ciclo = f"{nome_app}-lifecycle" in cron
+if scaler == ciclo:
+    print("lo scaler dei bridge e il CronJob del ciclo di vita sono " + ("resi entrambi" if scaler else "assenti entrambi: nessuno porterebbe avanti gli eventi"))
+if ciclo:
+    for t, n, m, _ in carichi:
+        if n != f"{nome_app}-lifecycle":
+            continue
+        testo = " ".join(str(x) for c in (m.get("spec") or {}).get("containers") or []
+                         for x in (c.get("command") or []) + (c.get("args") or []))
+        if "/api/cron/lifecycle" not in testo or "CRON_API_KEY" not in testo:
+            print("il CronJob del ciclo di vita non chiama /api/cron/lifecycle con CRON_API_KEY")
+if variabili.get("JVB_SCALER_ENABLED") not in ("true", "false"):
+    print(f"JVB_SCALER_ENABLED è {variabili.get('JVB_SCALER_ENABLED')!r}")
+elif scaler and variabili["JVB_SCALER_ENABLED"] != "true":
+    print("lo scaler è reso ma JVB_SCALER_ENABLED non è \"true\"")
+
+# Bridge fissi: il portale non deve aspettarsene più di quanti ne girano,
+# altrimenti la sala d'attesa resta chiusa ad aspettare bridge che non
+# arriveranno.
+bridge = sum(int(spec.get("replicas") or 0) for t, n, m, spec in carichi
+             if t == "Deployment" and (m.get("metadata") or {}).get("labels", {}).get("app.kubernetes.io/component") == "jvb")
+if bridge > 0 and variabili.get("JVB_SCALER_ENABLED") == "false":
+    tetto = variabili.get("JVB_MAX_REPLICAS")
+    if not tetto:
+        print(f"{bridge} bridge fissi e nessuno scaler, ma JVB_MAX_REPLICAS non è impostato: il portale se ne aspetterebbe fino a sei")
+    elif int(tetto) > bridge:
+        print(f"JVB_MAX_REPLICAS è {tetto} ma i bridge fissi sono {bridge}")
+
+# Ruoli nella sala: con i token del portale e Jicofo autenticato, ogni
+# partecipante diventerebbe moderatore. Il chart spegne l'autenticazione di
+# Jicofo e fa assegnare i ruoli a Prosody dal token.
+comune = next((v for n, v in mappe.items() if n.endswith("-common") and "ENABLE_AUTH" in v), None)
+jicofo = next((v for n, v in mappe.items() if n.endswith("-jicofo") and "JICOFO_ENABLE_REST" in v), None)
+prosody = next((v for n, v in mappe.items() if n.endswith("-prosody") and "AUTH_TYPE" in v), None)
+if comune is not None and jicofo is not None and prosody is not None:
+    if str(comune.get("ENABLE_AUTH")) == "true" and str(prosody.get("AUTH_TYPE")) == "jwt":
+        if str(jicofo.get("JICOFO_ENABLE_AUTH", "")).lower() not in ("false", "0"):
+            print("Jicofo ha l'autenticazione accesa con i token del portale: ogni partecipante diventerebbe moderatore")
+        moduli = [m.strip() for m in str(prosody.get("XMPP_MUC_MODULES", "")).split(",") if m.strip()]
+        if "token_affiliation" not in moduli:
+            print("Prosody non carica token_affiliation: i ruoli nella sala non verrebbero dal token")
+        if str(jicofo.get("ENABLE_AUTO_OWNER", "")).lower() != "false":
+            print("Jicofo con ENABLE_AUTO_OWNER acceso: il primo a entrare diventerebbe moderatore")
+        if "token_affiliation_custom" in moduli:
+            sts = next((d for d in docs if d.get("kind") == "StatefulSet" and d["metadata"]["name"].endswith("-prosody")), None)
+            ok = False
+            if sts:
+                ps = sts["spec"]["template"]["spec"]
+                volumi = {v["name"]: v for v in ps.get("volumes") or []}
+                for c in ps.get("containers") or []:
+                    for vm in c.get("volumeMounts") or []:
+                        if not str(vm.get("mountPath", "")).startswith("/prosody-plugins-custom"):
+                            continue
+                        cm = ((volumi.get(vm["name"]) or {}).get("configMap") or {}).get("name")
+                        if cm in mappe and "mod_token_affiliation_custom.lua" in mappe[cm] \
+                                and "muc-occupant-pre-join" in mappe[cm]["mod_token_affiliation_custom.lua"]:
+                            ok = True
+            if not ok:
+                print("Prosody carica token_affiliation_custom ma nessun ConfigMap reso lo monta in /prosody-plugins-custom")
+
+# Autorità di certificazione in più: il file indicato a Node deve esistere nel
+# volume montato.
+ca = variabili.get("NODE_EXTRA_CA_CERTS")
+if profilo == "semplice-ca" and not ca:
+    print("app.extraCaCerts è impostato ma NODE_EXTRA_CA_CERTS no")
+if ca:
+    volumi = {v["name"]: v for v in app["spec"]["template"]["spec"].get("volumes") or []}
+    trovato = False
+    for vm in contenitore.get("volumeMounts") or []:
+        base = str(vm.get("mountPath", "")).rstrip("/") + "/"
+        if not ca.startswith(base):
+            continue
+        sorgente = volumi.get(vm["name"]) or {}
+        voci = ((sorgente.get("configMap") or sorgente.get("secret") or {}).get("items")) or []
+        if vm.get("readOnly") and any(base + i.get("path", "") == ca for i in voci):
+            trovato = True
+    if not trovato:
+        print(f"NODE_EXTRA_CA_CERTS è {ca} ma nessun volume in sola lettura monta quel file")
+PY
+  then
+    errore "controllo della conferenza non eseguito su $nome: $(head -3 "$OUT/$nome.conf.err" | tr '\n' ' ')"
+  fi
+  while read -r problema; do
+    [ -n "$problema" ] && errore "$problema"
+  done <"$OUT/$nome.conf"
+
   # Un nome di risorsa oltre i 63 caratteri viene rifiutato all'apply.
   while read -r n; do
     [ "${#n}" -le 63 ] || errore "nome oltre 63 caratteri: $n"
   done < <(sed -n 's/^  name: //p' "$reso" | sort -u)
 done
+
+# Le guardie che fermano la resa: una combinazione incoerente deve fallire, con
+# un messaggio che nomina il valore da correggere. Una guardia che non scatta
+# più non la nota nessun altro controllo.
+echo "guardie"
+deve_fallire() {
+  local descrizione="$1" atteso="$2"
+  shift 2
+  if helm template videocall "$CHART" -n videocall "${comuni[@]}" \
+      -f "$CHART/examples/values-simple.yaml" "$@" >/dev/null 2>"$OUT/guardia.err"; then
+    errore "guardia non scattata: $descrizione"
+  elif ! grep -q "$atteso" "$OUT/guardia.err"; then
+    errore "guardia su $descrizione: messaggio inatteso: $(head -2 "$OUT/guardia.err" | tr '\n' ' ')"
+  fi
+}
+deve_fallire "Secret e ConfigMap insieme in app.extraCaCerts" "app.extraCaCerts" \
+  --set app.extraCaCerts.secretName=a --set app.extraCaCerts.configMapName=b
+deve_fallire "Jicofo senza autenticazione e Prosody senza i ruoli dal token" "XMPP_MUC_MODULES" \
+  --set-string 'jitsi-meet.prosody.extraEnvs.XMPP_MUC_MODULES=muc_size'
+deve_fallire "modulo dei ruoli richiesto ma non montato" "/prosody-plugins-custom" \
+  --set 'jitsi-meet.prosody.extraVolumeMounts=null'
 
 echo
 if [ "$fallimenti" -gt 0 ]; then

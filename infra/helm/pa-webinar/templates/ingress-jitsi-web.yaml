@@ -10,7 +10,7 @@ The subchart's own ingress (jitsi-meet.web.ingress.enabled=true) must
 remain enabled to serve IFrame API, room pages, and static assets.
 */}}
 {{- if and .Values.jitsi.enabled .Values.jitsi.webIngress.redirectUrl }}
-{{- $svcName := printf "%s-jitsi-meet-web" .Release.Name }}
+{{- $svcName := printf "%s-web" (include "pa-webinar.jitsiFullname" .) }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:

@@ -60,6 +60,10 @@
   Connessione a Jitsi esterno: {{ .Values.jitsi.external.domain }}
   Verifica che JITSI_JWT_SECRET sia configurato nel Secret "{{ include "pa-webinar.secretName" . }}".
 {{- end }}
+{{- if and (not (include "pa-webinar.jvbScalerRendered" .)) .Values.cronjobs.lifecycle.enabled }}
+  Ciclo di vita degli eventi: CronJob {{ include "pa-webinar.fullname" . }}-lifecycle
+  ({{ .Values.cronjobs.lifecycle.schedule }}), apre e chiude gli eventi all'orario.
+{{- end }}
 {{- $avvisi := list }}
 {{- $segnaposto := list }}
 {{- range $chiave, $valore := .Values.app.env }}
@@ -90,6 +94,9 @@
 {{- end }}
 {{- if $segnaposto }}
 {{- $avvisi = append $avvisi (printf "Valori ancora di esempio (example.com): %s. Il portale genererebbe link e inviti verso un dominio che non è il tuo." (join ", " $segnaposto)) }}
+{{- end }}
+{{- if and (not (include "pa-webinar.jvbScalerRendered" .)) (not .Values.cronjobs.lifecycle.enabled) }}
+{{- $avvisi = append $avvisi "Né lo scaler dei bridge né il CronJob del ciclo di vita (cronjobs.lifecycle.enabled) sono resi: gli eventi non si aprono e non si chiudono da soli, solo con Avvia e Termina per tutti del moderatore. Se il ciclo di vita lo porta avanti un altro strumento che chiama /api/cron/lifecycle, ignora questo avviso." }}
 {{- end }}
 {{- if $avvisi }}
 
