@@ -1,17 +1,20 @@
-import { getTranslations } from 'next-intl/server';
+import { getLocale, getTranslations } from 'next-intl/server';
 
+import { staffOLogin } from '@/lib/auth/staff-page';
+import { eventScope } from '@/lib/auth/staff-session';
 import { prisma } from '@/lib/db';
 import { getSettings } from '@/lib/settings';
 import { Link } from '@/i18n/navigation';
 import AdminDashboardClient from '@/components/admin/admin-dashboard-client';
-import AdminLogoutButton from '@/components/admin/admin-logout-button';
 
 interface EventsListPageProps {
   searchParams: Promise<{ token?: string }>;
 }
 
-async function loadEvents(token?: string) {
-  const where = token ? { moderatorToken: token } : {};
+async function loadEvents(scope: { createdById?: string }, token?: string) {
+  // Col token si vede l'evento di quel token, chi lo possiede lo modera
+  // comunque; senza, quelli che la sessione puo' gestire (ADR-014).
+  const where = token ? { moderatorToken: token } : scope;
   const events = await prisma.event.findMany({
     where,
     include: {
@@ -69,22 +72,24 @@ export default async function EventsListPage({
   searchParams,
 }: EventsListPageProps) {
   const { token } = await searchParams;
+  const locale = await getLocale();
+  const session = await staffOLogin(locale);
   const t = await getTranslations('admin');
   const [events, availableTags, settings] = await Promise.all([
-    loadEvents(token),
+    loadEvents(eventScope(session), token),
     loadAvailableTags(),
     getSettings(),
   ]);
-  const showLogout = !token;
 
   return (
     <div className="container py-5">
       <div className="d-flex justify-content-between align-items-start mb-5 flex-wrap gap-3">
         <div>
+          {/* Niente sottotitolo «Pannello di amministrazione»: il menu sopra
+              dice gia' dove si e'. */}
           <h1 className="mb-1 fw-bold" style={{ color: 'var(--app-text)' }}>
             {t('title')}
           </h1>
-          <p className="text-secondary mb-0">{t('subtitle')}</p>
         </div>
         <div className="d-flex gap-2 align-items-center flex-shrink-0">
           <Link
@@ -94,7 +99,6 @@ export default async function EventsListPage({
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
             {t('createEvent')}
           </Link>
-          {showLogout && <AdminLogoutButton />}
         </div>
       </div>
 

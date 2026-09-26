@@ -75,18 +75,30 @@ export default function LiveShareButton({
   slug,
   locale,
   moderatorToken,
+  hasPublicPage = true,
+  hasCallLink = true,
   modalContainer,
 }: {
   slug: string;
   locale: string;
   moderatorToken?: string;
+  /** Falso per una chiamata istantanea: non ha una pagina pubblica, e
+   *  offrirne il link qui significherebbe far condividere un indirizzo che
+   *  risponde 404 a chi lo riceve. */
+  hasPublicPage?: boolean;
+  /** Falso per un evento in calendario quando l'amministrazione non ammette
+   *  ospiti: chi apre il link senza token finisce all'iscrizione, e il suo
+   *  suggerimento («entra direttamente») sarebbe falso. Resta la pagina
+   *  dell'evento, che porta lì dichiarandolo. */
+  hasCallLink?: boolean;
   /** Element to portal the modal into. The live client passes the fullscreen
-   *  element while app-owned fullscreen is active (#6) — a modal left in
+   *  element while app-owned fullscreen is active — a modal left in
    *  <body> would be outside the fullscreen subtree, i.e. invisible. Undefined
    *  keeps reactstrap's default (<body>). */
   modalContainer?: HTMLElement;
 }) {
   const t = useTranslations('live.share');
+  const tc = useTranslations('common');
   const [open, setOpen] = useState(false);
   const [origin, setOrigin] = useState('');
   const [copied, setCopied] = useState<RowKey | null>(null);
@@ -125,10 +137,21 @@ export default function LiveShareButton({
     setTimeout(() => setCopied((c) => (c === which ? null : c)), 2000);
   }, []);
 
-  const rows: Array<{ key: RowKey; icon: ReactNode; label: string; hint: string; url: string }> = [
-    { key: 'call', icon: <CallGlyph />, label: t('callLink'), hint: t('callLinkHint'), url: callUrl },
-    { key: 'event', icon: <EventGlyph />, label: t('eventLink'), hint: t('eventLinkHint'), url: eventUrl },
-  ];
+  const rows: Array<{ key: RowKey; icon: ReactNode; label: string; hint: string; url: string }> = [];
+  // Una chiamata istantanea ammette sempre chi ha il link e non ha una pagina
+  // pubblica: il link per partecipare, lì, è l'unico da condividere.
+  if (hasCallLink || !hasPublicPage) {
+    rows.push({ key: 'call', icon: <CallGlyph />, label: t('callLink'), hint: t('callLinkHint'), url: callUrl });
+  }
+  if (hasPublicPage) {
+    rows.push({
+      key: 'event',
+      icon: <EventGlyph />,
+      label: t('eventLink'),
+      hint: t('eventLinkHint'),
+      url: eventUrl,
+    });
+  }
 
   return (
     <>
@@ -145,7 +168,7 @@ export default function LiveShareButton({
       </Button>
 
       <Modal isOpen={open} toggle={() => setOpen(false)} centered container={modalContainer}>
-        <ModalHeader toggle={() => setOpen(false)}>{t('title')}</ModalHeader>
+        <ModalHeader closeAriaLabel={tc('close')} toggle={() => setOpen(false)}>{t('title')}</ModalHeader>
         <ModalBody>
           {rows.map((r) => (
             <div key={r.key} className="mb-3">

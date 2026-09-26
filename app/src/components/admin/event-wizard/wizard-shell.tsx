@@ -19,7 +19,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
-import { useRouter } from '@/i18n/navigation';
+import { useRouter, percorso } from '@/i18n/navigation';
 import { useToast } from '@/components/ui/toast';
 import {
   coerceMatrix,
@@ -32,15 +32,24 @@ import { toDatetimeLocalInTz, fromDatetimeLocalInTz } from '@/lib/utils/date-for
 import type { JvbSizingConfig } from '@/lib/jvb-sizing';
 import type { VideoQualityPreset } from '@/lib/jitsi/config';
 
+import { RubricaAccessContext } from '../rubrica-picker';
+
+import { fanoutEditDiff, newFanoutReport, submitQuestionnaire } from './edit-fanout';
 import Step1Base, { type Step1Value } from './step-1-base';
 import Step2Permissions, { type Step2Value } from './step-2-permissions';
 import Step3Invites, { type Step3Value } from './step-3-invites';
 import Step4Content, {
   type Step4Value,
   type QuestionnaireBlock,
-  type AdhocQuestionDraft,
 } from './step-4-content';
 import Step5Review from './step-5-review';
+import {
+  STEP_KEYS,
+  mapServerIssues,
+  validatePublish,
+  validateStep,
+  type StepKey,
+} from './validation';
 
 export interface WizardTemplatePreset {
   id: string;
@@ -50,6 +59,7 @@ export interface WizardTemplatePreset {
   recordingEnabled: boolean;
   autoStartRecording: boolean;
   agendaEnabled?: boolean;
+  wordCloudEnabled?: boolean;
   whiteboardEnabled?: boolean;
   waitingRoomEngine?: 'GARDEN' | 'GAME' | 'CLASSIC' | null;
   participantsCanUnmute: boolean;
@@ -62,6 +72,10 @@ export interface WizardTemplatePreset {
   aiTranscriptEnabled?: boolean;
   aiSummaryEnabled?: boolean;
   aiTranslationEnabled?: boolean;
+  aiDubbingEnabled?: boolean;
+  multitrackRecordingEnabled?: boolean;
+  retainParticipantTracks?: boolean;
+  aiTargetLocales?: string | null;
   descriptionTemplate?: Record<string, string> | null;
   defaultRetentionDays?: number | null;
   defaultExpectedSpeakers?: number | null;
@@ -74,6 +88,8 @@ export interface WizardProps {
   defaultLocale: string;
   defaultSenderRatioPct: number;
   defaultRetentionDays: number;
+  /** Mostrare la ricerca in rubrica negli inviti: solo all'amministrazione. */
+  canUseRubrica?: boolean;
   jvbSizingConfig: JvbSizingConfig;
   availableTags: Array<{ slug: string; name: Record<string, string>; color: string | null }>;
   gdprTemplates: Array<{ id: string; name: string; isDefault: boolean }>;
@@ -83,6 +99,10 @@ export interface WizardProps {
   /** Site-wide default video/audio quality, shown as the resolved value
    *  for the per-event override in step 1. */
   siteDefaultVideoQuality: VideoQualityPreset;
+  /** Se l'installazione ha il servizio della lavagna di Jitsi
+   *  (`resolveWhiteboardInfraReady`, letto dalla pagina server). Senza, la
+   *  sala non mostra la lavagna e il passo 2 non la offre. */
+  whiteboardInfraReady: boolean;
   /** When `'edit'`, the wizard seeds state from `initialEvent`, PUTs to
    *  /api/events/:id on submit, and redirects to the admin detail page.
    *  When `'create'` (default), it POSTs to /api/events and falls into the
@@ -127,6 +147,7 @@ export interface InitialEventShape {
     participantsCanShareScreen: boolean;
     recordingEnabled: boolean;
     agendaEnabled?: boolean | null;
+    wordCloudEnabled?: boolean | null;
     whiteboardEnabled?: boolean | null;
     autoStartRecording: boolean;
     aiTranscriptEnabled?: boolean | null;
@@ -195,17 +216,28 @@ export type WizardForm = Step1Value &
   Step4Value &
   Step5ReviewFields;
 
-const STEP_KEYS = ['base', 'permissions', 'invites', 'content', 'review'] as const;
-type StepKey = (typeof STEP_KEYS)[number];
-
 export default function EventWizard(props: WizardProps) {
   const t = useTranslations('admin.wizard');
   const tc = useTranslations('common');
+  const tDetail = useTranslations('admin.eventDetail');
   const router = useRouter();
   const toast = useToast();
 
   const mode: 'create' | 'edit' = props.mode ?? 'create';
   const initialEvent = props.initialEvent;
+  /**
+   * Lo scatto delle risorse collegate, aggiornato a ogni salvataggio riuscito.
+   *
+   * La prop e' la fotografia presa all'apertura della pagina e non viene mai
+   * riletta. Da quando un fallimento parziale lascia l'operatore sulla pagina
+   * a riprovare, servono due giri sulla stessa istanza: senza conservare qui
+   * cio' che e' andato a buon fine, il secondo giro ricreerebbe le righe del
+   * primo. Copia profonda, perche' il fan-out la modifica.
+   */
+  const snapshotRef = useRef<InitialEventShape | null>(null);
+  if (initialEvent && snapshotRef.current === null) {
+    snapshotRef.current = structuredClone(initialEvent);
+  }
 
   const defaultStart = new Date(Date.now() + 24 * 3600_000);
   // Durata predefinita dal template (semplificazione): l'utente meno esperto
@@ -260,6 +292,7 @@ export default function EventWizard(props: WizardProps) {
         permissionMatrix: matrix,
         recordingEnabled: ev.recordingEnabled,
         agendaEnabled: ev.agendaEnabled ?? false,
+        wordCloudEnabled: ev.wordCloudEnabled ?? false,
         whiteboardEnabled: ev.whiteboardEnabled ?? false,
         autoStartRecording: ev.autoStartRecording,
         aiTranscriptEnabled: ev.aiTranscriptEnabled ?? false,
@@ -376,6 +409,7 @@ export default function EventWizard(props: WizardProps) {
       permissionMatrix: matrix,
       recordingEnabled: tpl?.recordingEnabled ?? false,
       agendaEnabled: tpl?.agendaEnabled ?? false,
+      wordCloudEnabled: tpl?.wordCloudEnabled ?? false,
       whiteboardEnabled: tpl?.whiteboardEnabled ?? false,
       autoStartRecording: tpl?.autoStartRecording ?? false,
       // Default AI dal template (semplificazione): un template "registrato"
@@ -390,10 +424,23 @@ export default function EventWizard(props: WizardProps) {
         (tpl?.recordingEnabled ?? false) &&
         (tpl?.aiTranscriptEnabled ?? false) &&
         (tpl?.aiTranslationEnabled ?? false),
-      aiDubbingEnabled: false,
-      multitrackRecordingEnabled: false,
-      retainParticipantTracks: false,
-      aiTargetLocales: null,
+      // Presi dal template, non piu' cablati a false: e' qui che la
+      // configurazione di una serie si perdeva. La registrazione per
+      // partecipante resta subordinata alla registrazione video, come per la
+      // trascrizione qui sopra: catturare le tracce di chi parla senza che
+      // l'evento sia registrato non ha senso e sarebbe una raccolta di dati
+      // personali senza scopo.
+      aiDubbingEnabled:
+        (tpl?.recordingEnabled ?? false) &&
+        (tpl?.aiTranscriptEnabled ?? false) &&
+        (tpl?.aiDubbingEnabled ?? false),
+      multitrackRecordingEnabled:
+        (tpl?.recordingEnabled ?? false) && (tpl?.multitrackRecordingEnabled ?? false),
+      retainParticipantTracks:
+        (tpl?.recordingEnabled ?? false) &&
+        (tpl?.multitrackRecordingEnabled ?? false) &&
+        (tpl?.retainParticipantTracks ?? false),
+      aiTargetLocales: tpl?.aiTargetLocales ?? null,
       expectedSpeakers: tpl?.defaultExpectedSpeakers ?? null,
 
       // Step 3
@@ -409,7 +456,10 @@ export default function EventWizard(props: WizardProps) {
 
       // Step 5 fields written here so review can surface them
       dataRetentionDays: tpl?.defaultRetentionDays ?? props.defaultRetentionDays,
-      gdprTemplateId: null,
+      // Il modello marcato come predefinito esiste per essere pre-scelto sui
+      // nuovi eventi: senza questo la colonna resterebbe vuota su ogni evento
+      // creato da qui, e quella marcatura non avrebbe alcun effetto.
+      gdprTemplateId: props.gdprTemplates.find((g) => g.isDefault)?.id ?? null,
       privacyPolicyText: '',
       privacyPolicyUrl: null,
       moderatorName: '',
@@ -439,6 +489,22 @@ export default function EventWizard(props: WizardProps) {
     el.focus({ preventScroll: true });
     el.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, [activeStep]);
+
+  // L'avviso sta sopra il passo, mentre «Avanti» e «Pubblica» stanno in fondo:
+  // un errore mostrato senza portarlo in vista sembra un pulsante che non fa
+  // niente. Il contatore fa scorrere anche quando il testo non cambia (stesso
+  // errore al secondo tentativo). Dichiarato dopo l'effetto del cambio passo,
+  // cosi' quando cambiano insieme vince l'avviso.
+  const alertRef = useRef<HTMLDivElement>(null);
+  const [errorSeq, setErrorSeq] = useState(0);
+  const showError = useCallback((message: string) => {
+    setSubmitError(message);
+    setErrorSeq((n) => n + 1);
+  }, []);
+  useEffect(() => {
+    if (errorSeq === 0) return;
+    alertRef.current?.scrollIntoView?.({ behavior: 'smooth', block: 'start' });
+  }, [errorSeq]);
 
   const updateForm = useCallback((patch: Partial<WizardForm>) => {
     setForm((prev) => ({ ...prev, ...patch }));
@@ -512,13 +578,44 @@ export default function EventWizard(props: WizardProps) {
     const errs = validateStep(activeStep, form, props.defaultLocale);
     if (Object.keys(errs).length > 0) {
       setFieldErrors(errs);
-      setSubmitError(t('validationFailed'));
+      showError(t('validationFailed'));
       return;
     }
     setFieldErrors({});
     setSubmitError(null);
     if (stepIndex < STEP_KEYS.length - 1) setActiveStep(STEP_KEYS[stepIndex + 1]!);
   };
+
+  /**
+   * Il messaggio per una risposta di errore del server.
+   *
+   * Un 422 con `details` diventa campo evidenziato, salto al passo che lo
+   * contiene e messaggio localizzato: il testo del server e' in inglese e
+   * tecnico, e mostrato da solo in cima alla pagina non diceva ne' cosa ne'
+   * dove correggere. Resta, dentro una frase localizzata, solo per gli errori
+   * che nessun campo del wizard sa mostrare.
+   */
+  const serverErrorMessage = useCallback(
+    (err: { error?: string; message?: string; details?: unknown }, status: number): string => {
+      if (!Array.isArray(err.details)) {
+        return err.error ?? err.message ?? `HTTP ${status}`;
+      }
+      const mapped = mapServerIssues(err.details, props.defaultLocale);
+      setFieldErrors(mapped.fieldErrors);
+      if (mapped.step) setActiveStep(mapped.step);
+      const parti: string[] = [];
+      if (mapped.step) parti.push(t('validationFailed'));
+      if (mapped.unmapped.length > 0 || parti.length === 0) {
+        parti.push(
+          t('validationFailedDetail', {
+            reason: mapped.unmapped.join('; ') || err.error || `HTTP ${status}`,
+          }),
+        );
+      }
+      return parti.join('\n');
+    },
+    [props.defaultLocale, t],
+  );
 
   /**
    * POST to /api/events with the assembled payload, then fan out to
@@ -541,7 +638,7 @@ export default function EventWizard(props: WizardProps) {
       }
       if (Object.keys(aggregated).length > 0) {
         setFieldErrors(aggregated);
-        setSubmitError(t('validationFailed'));
+        showError(t('validationFailed'));
         // Jump to the first failing step. Gli errori di validatePublish
         // (moderatorName/moderatorEmail) non sono coperti da validateStep e
         // i campi vivono nello step 'review': se solo quelli falliscono,
@@ -594,6 +691,7 @@ export default function EventWizard(props: WizardProps) {
           participantsCanShareScreen: toggles.participantsCanShareScreen,
           recordingEnabled: form.recordingEnabled,
           agendaEnabled: form.agendaEnabled,
+          wordCloudEnabled: form.wordCloudEnabled,
           whiteboardEnabled: form.whiteboardEnabled,
           autoStartRecording: form.recordingEnabled && form.autoStartRecording,
 
@@ -631,7 +729,13 @@ export default function EventWizard(props: WizardProps) {
           // Review step
           dataRetentionDays: form.dataRetentionDays,
           gdprTemplateId: form.gdprTemplateId,
-          privacyPolicyText: form.privacyPolicyText?.trim() || undefined,
+          // La stringa vuota si spedisce, non si trasforma in `undefined`: il
+          // server scrive il campo solo quando è definito, e scegliere un
+          // modello di informativa deve poter CANCELLARE il testo scritto a
+          // mano. Altrimenti resterebbero valorizzati entrambi, e la pagina
+          // di iscrizione dà la precedenza al testo: il modello scelto non
+          // entrerebbe mai in vigore, senza che niente lo dica.
+          privacyPolicyText: form.privacyPolicyText?.trim() ?? undefined,
           privacyPolicyUrl: form.privacyPolicyUrl ?? undefined,
           moderatorName: form.moderatorName?.trim() || undefined,
           moderatorEmail: form.moderatorEmail?.trim() || undefined,
@@ -657,24 +761,49 @@ export default function EventWizard(props: WizardProps) {
           );
           if (!putRes.ok) {
             const err = await putRes.json().catch(() => ({}));
-            if (err.details) {
-              const next: Record<string, string> = {};
-              for (const d of err.details) {
-                const key = Array.isArray(d.path)
-                  ? d.path.join('.')
-                  : String(d.path ?? 'form');
-                next[key] = d.message ?? 'Invalid';
-              }
-              setFieldErrors(next);
-            }
-            throw new Error(err.error ?? err.message ?? `HTTP ${putRes.status}`);
+            throw new Error(serverErrorMessage(err, putRes.status));
           }
 
-          await fanoutEditDiff(eventId, moderatorToken, form, initialEvent, props.defaultLocale);
+          const report = await fanoutEditDiff(
+            eventId,
+            moderatorToken,
+            form,
+            snapshotRef.current ?? initialEvent,
+            props.defaultLocale,
+          );
+
+          // Non si cancella la bozza e non si naviga via: il testo digitato
+          // deve restare recuperabile, altrimenti l'avviso direbbe di
+          // sistemare qualcosa che non esiste piu'. L'errore viene reso
+          // come avviso persistente nella pagina, non come notifica che
+          // svanisce: dice che una modifica NON e' stata salvata.
+          //
+          // Le revoche mancate vengono prima e per nome: il collegamento di
+          // quella persona e' ancora valido, e un nuovo salvataggio la
+          // riprova (lo scatto non l'ha tolta).
+          const avvisi = report.revocationFailed.map((name) =>
+            t('revocationFailed', { name, tab: tDetail('tabs.people') }),
+          );
+          if (report.failed.length > 0) {
+            const risorse = [...new Set(report.failed)]
+              .map((r) => t(`resources.${r}` as 'resources.materials'))
+              .join(', ');
+            avvisi.push(
+              report.reason
+                ? t('partialFailureEditDetail', {
+                    items: risorse,
+                    reason: report.reason,
+                  })
+                : t('partialFailureEdit', { items: risorse }),
+            );
+          }
+          if (avvisi.length > 0) {
+            throw new Error(avvisi.join('\n'));
+          }
 
           clearDraft();
           router.push(
-            `/admin/events/${eventId}?token=${encodeURIComponent(moderatorToken)}`,
+            percorso(`/admin/events/${eventId}?token=${encodeURIComponent(moderatorToken)}`),
           );
           return;
         }
@@ -686,15 +815,7 @@ export default function EventWizard(props: WizardProps) {
         });
         if (!res.ok) {
           const err = await res.json().catch(() => ({}));
-          if (err.details) {
-            const next: Record<string, string> = {};
-            for (const d of err.details) {
-              const key = Array.isArray(d.path) ? d.path.join('.') : String(d.path ?? 'form');
-              next[key] = d.message ?? 'Invalid';
-            }
-            setFieldErrors(next);
-          }
-          throw new Error(err.error ?? err.message ?? `HTTP ${res.status}`);
+          throw new Error(serverErrorMessage(err, res.status));
         }
         const created = (await res.json()) as { id: string; slug: string };
 
@@ -794,57 +915,104 @@ export default function EventWizard(props: WizardProps) {
           if (!ok) failed.add(t('resources.materials'));
         }
 
-        // 5) Questionnaires (pre/post)
+        // 5) Questionnaires (pre/post). Il rifiuto confluisce nello stesso
+        //    elenco delle altre risorse: finora era l'unico del gruppo a
+        //    sparire in silenzio, ed e' quello che fallisce piu' spesso —
+        //    basta una domanda estemporanea incompleta.
+        const reportQ = newFanoutReport();
         await submitQuestionnaire(
+          reportQ,
           created.id,
           'PRE_REGISTRATION',
           form.preEventQuestionnaire,
           props.defaultLocale,
         );
         await submitQuestionnaire(
+          reportQ,
           created.id,
           'POST_EVENT',
           form.postEventQuestionnaire,
           props.defaultLocale,
         );
+        if (reportQ.failed.length > 0) failed.add(t('resources.questionnaires'));
 
         // 6) Promote from DRAFT → PUBLISHED if requested. The create
         //    endpoint currently doesn't accept status; use PUT on the
         //    detail route (the route only exports PUT, not PATCH).
+        //    Una pubblicazione rifiutata e' un fallimento parziale come gli
+        //    altri: l'evento esiste ma resta in bozza, e chi l'ha creato deve
+        //    saperlo invece di credere che sia online.
+        let publishProblem: { reason: string | null } | null = null;
         if (submitMode === 'publish') {
-          await fetch(`/api/events/${created.id}`, {
+          const pubRes = await fetch(`/api/events/${created.id}`, {
             method: 'PUT',
             headers: {
               'Content-Type': 'application/json',
               ...(moderatorToken ? { Authorization: `Bearer ${moderatorToken}` } : {}),
             },
             body: JSON.stringify({ status: 'PUBLISHED' }),
-          }).catch(() => {});
+          }).catch(() => null);
+          if (!pubRes) {
+            publishProblem = { reason: null };
+          } else if (!pubRes.ok) {
+            // La risposta del server, senza portare a un campo: la pagina sta
+            // per cambiare, l'avviso sopravvive solo come notifica.
+            const err = (await pubRes.json().catch(() => ({}))) as {
+              error?: string;
+              message?: string;
+            };
+            publishProblem = { reason: err.error ?? err.message ?? `HTTP ${pubRes.status}` };
+          }
         }
 
         // Warn about any side resources that didn't save. The ToastProvider
         // lives in the admin layout, so this toast survives the redirect to
-        // the edit page where the admin can re-add the missing items.
+        // the event page, from where the admin can re-add the missing items.
         if (failed.size > 0) {
           toast.error(t('partialFailure', { items: [...failed].join(', ') }));
+        }
+        if (publishProblem) {
+          toast.error(
+            publishProblem.reason
+              ? t('publishFailedDetail', { reason: publishProblem.reason })
+              : t('publishFailed'),
+          );
         }
 
         clearDraft();
 
-        let destination = `/admin/events/${created.id}/edit?created=1`;
+        // La pagina dell'evento, con la sessione dello staff che ha appena
+        // creato l'evento (il wizard la richiede, e chi crea l'evento lo
+        // gestisce). Non la pagina di modifica, che senza il token del
+        // moderatore risponde 404; e il token, credenziale che non scade,
+        // resta fuori dalla barra degli indirizzi e dalla cronologia.
+        let destination = `/admin/events/${created.id}`;
         if (overrideRedirect === '__questionnaires__') {
           destination = `/admin/events/${created.id}/questionnaires`;
         } else if (overrideRedirect) {
           destination = overrideRedirect;
         }
-        router.push(destination);
+        router.push(percorso(destination));
       } catch (e) {
-        setSubmitError(e instanceof Error ? e.message : 'Unknown error');
+        showError(e instanceof Error && e.message ? e.message : tc('errorGeneric'));
       } finally {
         setSubmitting(false);
       }
     },
-    [form, router, toast, clearDraft, props.defaultLocale, t, mode, initialEvent],
+    [
+      form,
+      router,
+      toast,
+      clearDraft,
+      props.defaultLocale,
+      t,
+      tc,
+      tDetail,
+      mode,
+      initialEvent,
+      showError,
+      serverErrorMessage,
+    ],
   );
 
   const saveDraftAndNavigate = useCallback(
@@ -888,7 +1056,13 @@ export default function EventWizard(props: WizardProps) {
       />
 
       {submitError && (
-        <div className="alert alert-danger mt-3" role="alert">
+        <div
+          ref={alertRef}
+          className="alert alert-danger mt-3"
+          role="alert"
+          // Piu' avvisi (una revoca mancata per persona) vanno su righe diverse.
+          style={{ whiteSpace: 'pre-line' }}
+        >
           {submitError}
         </div>
       )}
@@ -919,13 +1093,13 @@ export default function EventWizard(props: WizardProps) {
             value={form}
             onChange={updateForm}
             fieldErrors={fieldErrors}
+            whiteboardInfraReady={props.whiteboardInfraReady}
           />
         )}
         {activeStep === 'invites' && (
-          <Step3Invites
-            value={form}
-            onChange={updateForm}
-          />
+          <RubricaAccessContext.Provider value={props.canUseRubrica ?? false}>
+            <Step3Invites value={form} onChange={updateForm} />
+          </RubricaAccessContext.Provider>
         )}
         {activeStep === 'content' && (
           <Step4Content
@@ -1067,279 +1241,5 @@ function StepNav({
         })}
       </ol>
     </nav>
-  );
-}
-
-// ── Step validation ─────────────────────────────────────────────────────────
-// Client-side field checks that must pass before advancing. Keyed by
-// dot-path so Step components can surface per-field errors inline.
-
-function validateStep(
-  step: StepKey,
-  form: WizardForm,
-  defaultLocale: string,
-): Record<string, string> {
-  const errs: Record<string, string> = {};
-  if (step === 'base') {
-    const titleDef = (form.title[defaultLocale] ?? '').trim();
-    if (titleDef.length < 3) {
-      errs[`title.${defaultLocale}`] = 'required';
-    }
-    try {
-      const start = new Date(form.startsAt);
-      const end = new Date(form.endsAt);
-      if (Number.isNaN(start.getTime())) errs['startsAt'] = 'invalid';
-      if (Number.isNaN(end.getTime())) errs['endsAt'] = 'invalid';
-      if (!errs['startsAt'] && !errs['endsAt'] && end <= start) {
-        errs['endsAt'] = 'mustBeAfterStart';
-      }
-    } catch {
-      errs['startsAt'] = 'invalid';
-    }
-    if (
-      !Number.isFinite(form.maxParticipants) ||
-      form.maxParticipants < 2 ||
-      form.maxParticipants > 500
-    ) {
-      errs['maxParticipants'] = 'outOfRange';
-    }
-  }
-  if (step === 'permissions') {
-    // La traduzione automatica senza lingue target non produce nulla:
-    // richiediamo almeno una lingua. (Errore mostrato nello step 2.)
-    if (form.aiTranslationEnabled && !(form.aiTargetLocales ?? '').trim()) {
-      errs['aiTargetLocales'] = 'required';
-    }
-  }
-  return errs;
-}
-
-function validatePublish(form: WizardForm): Record<string, string> {
-  const errs: Record<string, string> = {};
-  const email = (form.moderatorEmail ?? '').trim();
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    errs['moderatorEmail'] = 'required';
-  }
-  const name = (form.moderatorName ?? '').trim();
-  if (name.length < 2) {
-    errs['moderatorName'] = 'required';
-  }
-  return errs;
-}
-
-// ── Questionnaire fan-out helpers ──────────────────────────────────────────
-
-type Placement = 'PRE_REGISTRATION' | 'POST_EVENT';
-
-const PLACEMENT_TITLES: Record<Placement, { it: string; en: string }> = {
-  PRE_REGISTRATION: { it: 'Pre-evento', en: 'Pre-event' },
-  POST_EVENT: { it: 'Post-evento', en: 'Post-event' },
-};
-
-function mapAdhocToApi(
-  draft: AdhocQuestionDraft,
-  index: number,
-  defaultLocale: string,
-) {
-  const prompt: Record<string, string> = { [defaultLocale]: draft.prompt.trim() };
-  const base: Record<string, unknown> = {
-    prompt,
-    type: draft.type,
-    required: draft.required,
-    sortOrder: index,
-  };
-  if (draft.type === 'SINGLE_CHOICE' || draft.type === 'MULTI_CHOICE') {
-    base.options = draft.options
-      .map((o) => o.trim())
-      .filter((o) => o.length > 0)
-      .map((o) => ({ [defaultLocale]: o }));
-  }
-  if (draft.type === 'LIKERT') {
-    if (draft.scaleMin != null) base.scaleMin = draft.scaleMin;
-    if (draft.scaleMax != null) base.scaleMax = draft.scaleMax;
-  }
-  return base;
-}
-
-async function submitQuestionnaire(
-  eventId: string,
-  placement: Placement,
-  block: QuestionnaireBlock,
-  defaultLocale: string,
-): Promise<void> {
-  if (block.templateIds.length === 0 && block.adhocQuestions.length === 0) {
-    return;
-  }
-  const body = {
-    placement,
-    title: PLACEMENT_TITLES[placement],
-    description: {},
-    required: false,
-    allowEdit: false,
-    templateIds: block.templateIds,
-    adhocItems: block.adhocQuestions.map((q, i) =>
-      mapAdhocToApi(q, i, defaultLocale),
-    ),
-  };
-  await fetch(
-    `/api/admin/events/${eventId}/questionnaires/${placement}`,
-    {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    },
-  ).catch(() => {
-    /* best-effort; admin can fix from the questionnaires page */
-  });
-}
-
-// ── Edit-mode fan-out: diff against the initial snapshot ────────────────────
-//
-// For each related collection (organizers / event moderators / invitations /
-// materials) we:
-//   – POST every row in `form` that is NOT in the initial snapshot (by a
-//     stable identity key), and
-//   – DELETE every initial row that is NOT in `form` by the same key.
-//
-// Identity keys:
-//   – organizers:        `${name}|${organization}`
-//   – moderators:        `${role}|${email}`
-//   – invitations:       `${email}` (invitations are event-scoped unique by email)
-//   – materials:         `${title}|${url}`
-//
-// Rows that exist on both sides are left untouched — the admin who only
-// wanted to rename/reorder would need a dedicated PATCH-each row flow,
-// which is out of scope for this refactor. Renaming effectively
-// "replaces" the row (delete + re-add) which is acceptable here.
-//
-// Questionnaires are handled differently: the upsert endpoint is PUT and
-// idempotently replaces templates + adhoc items, so we just call it.
-
-async function fanoutEditDiff(
-  eventId: string,
-  moderatorToken: string,
-  form: WizardForm,
-  initial: InitialEventShape,
-  defaultLocale: string,
-): Promise<void> {
-  // Organizers
-  const orgKey = (o: { name: string; organization: string }) =>
-    `${o.name}|${o.organization}`;
-  const initialOrgByKey = new Map(
-    initial.organizers.map((o) => [orgKey(o), o]),
-  );
-  const currentOrgKeys = new Set(form.organizers.map(orgKey));
-  for (const o of form.organizers) {
-    if (initialOrgByKey.has(orgKey(o))) continue;
-    await fetch(`/api/events/${eventId}/organizers`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${moderatorToken}`,
-      },
-      body: JSON.stringify({
-        name: o.name,
-        logoUrl: o.logoUrl,
-        websiteUrl: o.websiteUrl,
-      }),
-    }).catch(() => {});
-  }
-  for (const o of initial.organizers) {
-    if (currentOrgKeys.has(orgKey(o))) continue;
-    await fetch(`/api/events/${eventId}/organizers/${o.id}`, {
-      method: 'DELETE',
-      headers: { 'X-Moderator-Token': moderatorToken },
-    }).catch(() => {});
-  }
-
-  // EventModerators (MODERATOR + SPEAKER roles share one table)
-  const modKey = (
-    m: { email: string | null; role: 'MODERATOR' | 'SPEAKER' },
-  ) => `${m.role}|${(m.email ?? '').toLowerCase()}`;
-  const initialModByKey = new Map(
-    initial.eventModerators.map((m) => [modKey(m), m]),
-  );
-  const currentMods: Array<{ email: string; role: 'MODERATOR' | 'SPEAKER'; name: string }> = [
-    ...form.moderators.map((m) => ({ email: m.email, role: 'MODERATOR' as const, name: m.name })),
-    ...form.speakers.map((s) => ({ email: s.email, role: 'SPEAKER' as const, name: s.name })),
-  ];
-  const currentModKeys = new Set(currentMods.map(modKey));
-  for (const m of currentMods) {
-    if (initialModByKey.has(modKey(m))) continue;
-    await fetch(`/api/events/${eventId}/moderators`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${moderatorToken}`,
-      },
-      body: JSON.stringify({ name: m.name, email: m.email, role: m.role }),
-    }).catch(() => {});
-  }
-  for (const m of initial.eventModerators) {
-    if (currentModKeys.has(modKey(m))) continue;
-    await fetch(`/api/events/${eventId}/moderators/${m.id}`, {
-      method: 'DELETE',
-      headers: { 'X-Moderator-Token': moderatorToken },
-    }).catch(() => {});
-  }
-
-  // Invitations (admin-session auth, no moderator token)
-  const invKey = (i: { email: string }) => i.email.toLowerCase();
-  const initialInvByKey = new Map(initial.invitations.map((i) => [invKey(i), i]));
-  const currentInvKeys = new Set(form.invitations.map(invKey));
-  for (const i of form.invitations) {
-    if (initialInvByKey.has(invKey(i))) continue;
-    await fetch(`/api/admin/events/${eventId}/invitations`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        email: i.email,
-        name: i.name ?? undefined,
-        role: i.role,
-        personId: i.personId ?? undefined,
-      }),
-    }).catch(() => {});
-  }
-  for (const i of initial.invitations) {
-    if (currentInvKeys.has(invKey(i))) continue;
-    await fetch(`/api/admin/events/${eventId}/invitations/${i.id}`, {
-      method: 'DELETE',
-    }).catch(() => {});
-  }
-
-  // Materials
-  const matKey = (m: { title: string; url: string }) => `${m.title}|${m.url}`;
-  const initialMatByKey = new Map(initial.materials.map((m) => [matKey(m), m]));
-  const currentMatKeys = new Set(form.materials.map(matKey));
-  for (const m of form.materials) {
-    if (initialMatByKey.has(matKey(m))) continue;
-    await fetch(`/api/admin/events/${eventId}/materials`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(m),
-    }).catch(() => {});
-  }
-  for (const m of initial.materials) {
-    if (currentMatKeys.has(matKey(m))) continue;
-    await fetch(`/api/admin/events/${eventId}/materials/${m.id}`, {
-      method: 'DELETE',
-    }).catch(() => {});
-  }
-
-  // Questionnaires — PUT is idempotent (replaces templates + adhoc items).
-  // The server rejects with 409 if responses already exist; that failure is
-  // silently swallowed here, matching create-mode behaviour. TODO: surface
-  // this back to the admin (e.g. a toast) instead of just ignoring it.
-  await submitQuestionnaire(
-    eventId,
-    'PRE_REGISTRATION',
-    form.preEventQuestionnaire,
-    defaultLocale,
-  );
-  await submitQuestionnaire(
-    eventId,
-    'POST_EVENT',
-    form.postEventQuestionnaire,
-    defaultLocale,
   );
 }

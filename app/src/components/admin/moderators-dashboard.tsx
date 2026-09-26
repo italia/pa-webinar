@@ -2,11 +2,13 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslations, useFormatter } from 'next-intl';
-import { Badge, Card, CardBody, Icon, Input } from 'design-react-kit';
+import { Badge, Card, CardBody, Input } from 'design-react-kit';
 
-import { Link } from '@/i18n/navigation';
+import { Icon } from '@/components/ui/icon';
+import { Link, percorso } from '@/i18n/navigation';
 import { useToast } from '@/components/ui/toast';
 import { useConfirm } from '@/components/ui/confirm-dialog';
+import { localizedUrl } from '@/lib/utils/localized-url';
 
 interface ModeratorRow {
   id: string;
@@ -64,8 +66,9 @@ export default function ModeratorsDashboard({
 
   useEffect(() => { fetchRows(); }, [fetchRows]);
 
+  // Link da copiare: fuori dal router, i segmenti si traducono dalla mappa.
   function buildLink(row: ModeratorRow): string {
-    return `${appUrl}/${locale}/events/${row.slug}/live?token=${row.moderatorToken}`;
+    return localizedUrl(appUrl, `/events/${row.slug}/live?token=${row.moderatorToken}`, locale);
   }
 
   async function copyLink(row: ModeratorRow) {
@@ -138,7 +141,7 @@ export default function ModeratorsDashboard({
                   {data.rows.map((r) => (
                     <tr key={r.id}>
                       <td>
-                        <Link href={`/admin/events/${r.id}`} className="text-decoration-none fw-semibold">
+                        <Link href={percorso(`/admin/events/${r.id}`)} className="text-decoration-none fw-semibold">
                           {r.title}
                         </Link>
                         {r.eventType === 'INSTANT' && (

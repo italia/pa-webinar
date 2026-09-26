@@ -5,7 +5,9 @@ import {
   ForbiddenError,
   ValidationError,
 } from '@/lib/errors';
+import { deleteCacheByPrefix } from '@/lib/cache';
 import { prisma } from '@/lib/db';
+import { pokeLivePanel } from '@/lib/live-state/publish';
 import { updatePollStatusSchema } from '@/lib/validation/schemas';
 import { isEventModerator, extractModeratorToken } from '@/lib/auth/moderator';
 
@@ -27,7 +29,10 @@ export const PATCH = withErrorHandling(async (request, context) => {
   const body = await parseJsonBody(request);
   const parsed = updatePollStatusSchema.safeParse(body);
   if (!parsed.success) {
-    throw new ValidationError('Validation failed', parsed.error.issues.map((i) => ({ path: i.path, message: i.message })));
+    throw new ValidationError(
+      'Validation failed',
+      parsed.error.issues.map((i) => ({ path: i.path, message: i.message }))
+    );
   }
 
   const poll = await prisma.poll.findUnique({
@@ -46,6 +51,9 @@ export const PATCH = withErrorHandling(async (request, context) => {
       closedAt: parsed.data.status !== 'OPEN' ? new Date() : null,
     },
   });
+
+  deleteCacheByPrefix(`polls:${event.id}`);
+  pokeLivePanel(event.id, 'polls');
 
   return Response.json({
     id: updated.id,
@@ -77,6 +85,9 @@ export const DELETE = withErrorHandling(async (request, context) => {
   }
 
   await prisma.poll.delete({ where: { id: pollId } });
+
+  deleteCacheByPrefix(`polls:${event.id}`);
+  pokeLivePanel(event.id, 'polls');
 
   return Response.json({ ok: true });
 });

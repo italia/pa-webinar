@@ -17,7 +17,7 @@
  * layer, not a social graph. Nothing is written to Postgres.
  */
 
-import { getRedis, getRedisSubscriber } from '@/lib/redis';
+import { getRedis, getRedisSubscriber, withDeadline } from '@/lib/redis';
 
 export type GardenEmoteType = 'wave' | 'heart';
 
@@ -56,6 +56,16 @@ function channel(eventId: string): string {
 const PEER_TTL_SECONDS = 10;
 
 /**
+ * Cap on every Redis command the ping route runs.
+ *
+ * That route is called five times a second by EVERY client in the waiting
+ * room, and it waits for both the write and the read: one hung command turns
+ * into a pile of pending requests inside the pod. Half a second is already
+ * two and a half ticks of lag — past that, the data is no use to anyone.
+ */
+const REDIS_TIMEOUT_MS = 500;
+
+/**
  * Record this user's position and publish to peers. Idempotent: if
  * the same userId pings twice we overwrite.
  */
@@ -64,18 +74,28 @@ export async function publishGardenPing(
   peer: GardenPeer,
 ): Promise<void> {
   const redis = getRedis();
-  if (!redis) return;
+  // `status !== 'ready'`: the client is built with `maxRetriesPerRequest:
+  // null`, so with Redis unreachable it queues the command forever instead
+  // of rejecting it, and the ping POST hangs. Presence is transient by
+  // construction (10s TTL): skipping a round loses nothing.
+  if (!redis || redis.status !== 'ready') return;
   const key = posKey(eventId);
   const payload = JSON.stringify(peer);
 
   // Single pipeline for atomicity: HSET + expire on the hash, and a
   // separate PUBLISH on the channel.
-  await redis
-    .pipeline()
-    .hset(key, peer.userId, payload)
-    .expire(key, PEER_TTL_SECONDS)
-    .publish(channel(eventId), payload)
-    .exec();
+  // Capped because the route WAITS on this write before it even gets to the
+  // read: without a cap here, the cap on the read is never reached.
+  await withDeadline(
+    redis
+      .pipeline()
+      .hset(key, peer.userId, payload)
+      .expire(key, PEER_TTL_SECONDS)
+      .publish(channel(eventId), payload)
+      .exec(),
+    REDIS_TIMEOUT_MS,
+    null,
+  );
 }
 
 /**
@@ -83,11 +103,24 @@ export async function publishGardenPing(
  * the SSE stream on subscribe (initial snapshot) and by the HTTP
  * ping response (so the client always sees a fresh view even if the
  * SSE is slightly behind).
+ *
+ * `null` means "we don't know" (Redis not ready, or the read went past its
+ * deadline), which is NOT the same as `[]` = "the garden is empty". Callers
+ * use the list to take away peers that are no longer there: conflate the two
+ * and one slow second of Redis makes every avatar vanish and come back on
+ * the next tick.
  */
-export async function listGardenPeers(eventId: string): Promise<GardenPeer[]> {
+export async function listGardenPeers(eventId: string): Promise<GardenPeer[] | null> {
   const redis = getRedis();
-  if (!redis) return [];
-  const raw = await redis.hgetall(posKey(eventId));
+  if (!redis || redis.status !== 'ready') return null;
+  const raw = await withDeadline<Record<string, string> | null>(
+    redis.hgetall(posKey(eventId)),
+    REDIS_TIMEOUT_MS,
+    null,
+  );
+  // A missing hash comes back as `{}`, never `null`: this only catches the
+  // degraded read.
+  if (!raw) return null;
   const now = Date.now();
   const peers: GardenPeer[] = [];
   for (const v of Object.values(raw)) {
@@ -141,10 +174,16 @@ export async function subscribeGarden(
  */
 export async function removeGardenPeer(eventId: string, userId: string): Promise<void> {
   const redis = getRedis();
-  if (!redis) return;
-  await redis
-    .pipeline()
-    .hdel(posKey(eventId), userId)
-    .publish(channel(eventId), JSON.stringify({ userId, op: 'leave' }))
-    .exec();
+  if (!redis || redis.status !== 'ready') return;
+  // The route waits on this one too; if it expires, the TTL does the same
+  // job within 10s.
+  await withDeadline(
+    redis
+      .pipeline()
+      .hdel(posKey(eventId), userId)
+      .publish(channel(eventId), JSON.stringify({ userId, op: 'leave' }))
+      .exec(),
+    REDIS_TIMEOUT_MS,
+    null,
+  );
 }

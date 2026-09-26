@@ -2,10 +2,13 @@
 
 import { useCallback, useRef, useState, type ChangeEvent, type FormEvent } from 'react';
 import { useTranslations } from 'next-intl';
-import { BlockBlobClient } from '@azure/storage-blob';
 import { Alert, Button, Card, CardBody, Input, Label, Progress } from 'design-react-kit';
 
 import { useRouter } from '@/i18n/navigation';
+import {
+  RecordingUploadError,
+  uploadRecordingFile,
+} from '@/lib/storage/browser-upload';
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024 * 1024; // 5 GiB
 const ACCEPTED_MIME = ['video/mp4', 'video/webm', 'video/quicktime', 'video/x-m4v'];
@@ -74,37 +77,28 @@ export default function UploadPublicationForm() {
     setError(null);
     setPhase('requesting-url');
     try {
-      const res = await fetch(
-        `/api/admin/publications/upload-url?filename=${encodeURIComponent(file.name)}`,
-      );
-      if (!res.ok) {
-        const errData = await res.json().catch(() => ({}));
-        setError(errData.error ?? t('errors.signFailed'));
-        setPhase('idle');
-        return;
-      }
-      const { uploadUrl, recordingUrl } = await res.json();
-
-      setPhase('uploading');
-      setUploadProgress(0);
-
-      // Use BlockBlobClient directly — it chunks files > 256 MiB into
-      // blocks automatically, so MsTeams-sized (≈500 MB) recordings
-      // upload without hitting Azure's single-PUT limit.
-      const blob = new BlockBlobClient(uploadUrl);
-      await blob.uploadData(file, {
-        blockSize: 8 * 1024 * 1024,
-        concurrency: 4,
-        blobHTTPHeaders: { blobContentType: file.type || 'video/mp4' },
-        onProgress: (ev) => {
-          setUploadProgress(Math.min(99, Math.floor((ev.loadedBytes / file.size) * 100)));
+      // Firma e caricamento diretto nello storage, a blocchi o a parti
+      // secondo il fornitore: i file grandi (≈500 MB di una riunione
+      // esportata) non incontrano il limite del PUT singolo.
+      const { recordingUrl } = await uploadRecordingFile(file, {
+        onUploadStart: () => {
+          setPhase('uploading');
+          setUploadProgress(0);
         },
+        onProgress: setUploadProgress,
       });
-      setUploadProgress(100);
       setUploaded({ recordingUrl, sizeBytes: file.size, filename: file.name });
       setPhase('idle');
     } catch (e) {
-      setError(e instanceof Error ? e.message : t('errors.uploadFailed'));
+      if (e instanceof RecordingUploadError) {
+        setError(
+          e.step === 'sign'
+            ? (e.serverMessage ?? t('errors.signFailed'))
+            : t('errors.uploadFailed'),
+        );
+      } else {
+        setError(e instanceof Error ? e.message : t('errors.uploadFailed'));
+      }
       setPhase('idle');
     }
   }, [file, t]);

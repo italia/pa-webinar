@@ -5,8 +5,8 @@ Tre estensioni rispetto al pool naïve "una voce = un .onnx":
 
   1) **Catalogo gender-aware**. Ogni voce ha un attributo `gender` =
      `"M" | "F" | "N"`. Permette `assign_voices` di scegliere una voce
-     coerente col gender del nome reale dello speaker (Alex → M,
-     Ilaria → F). Voci `N` (neutre/sconosciute) usate come fallback
+     coerente col gender del nome reale dello speaker (Mario → M,
+     Anna → F). Voci `N` (neutre/sconosciute) usate come fallback
      per nomi neutri o non identificati.
 
   2) **Pitch variants**. Quando il pool non basta (es. lingue povere

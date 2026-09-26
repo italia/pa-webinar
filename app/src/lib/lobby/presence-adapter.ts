@@ -42,6 +42,17 @@ const PING_MS = 200;
 const DEFAULT_COLOR = '#48566a';
 
 /**
+ * Tetto di una singola richiesta di ping.
+ *
+ * Il tick non aspetta la risposta: con il server lento le richieste si
+ * accumulano, e ogni ping più vecchio di così porta comunque una posizione
+ * che il tick successivo ha già superato. Sta sopra al caso peggiore lecito
+ * del server — due comandi Redis con tetto a 500ms più la lettura
+ * dell'evento — così aborta solo quando qualcosa è davvero fermo.
+ */
+const PING_TIMEOUT_MS = 2000;
+
+/**
  * Per quanto tempo l'emote viene ri-allegata a ogni ping.
  *
  * Serve perché Redis tiene UN SOLO record per utente, l'ultimo: se l'emote
@@ -72,6 +83,8 @@ export class GardenPresenceClient implements PresenceClient {
   private selfId = '';
   private timer: ReturnType<typeof setInterval> | null = null;
   private connected = false;
+  /** Un solo ping in volo per volta: vedi PING_TIMEOUT_MS. */
+  private inFlight = false;
   private readonly latest = { x: 0, y: 0, facing: 'down' as Facing };
 
   private peers: PeerState[] = [];
@@ -226,18 +239,33 @@ export class GardenPresenceClient implements PresenceClient {
 
   private async ping(leave: boolean): Promise<void> {
     if (!this.connected && !leave) return;
+    // Il tetto da solo non basta: accodare un secondo ping mentre il primo è
+    // ancora in volo aggiunge carico al pod proprio quando è già in
+    // sofferenza, e saltare il giro costa 200ms di posizione, cioè niente.
+    if (this.inFlight) return;
+    this.inFlight = true;
     try {
       const res = await fetch(`/api/events/${this.slug}/garden/ping`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...this.wireBody(), ...(leave ? { leave: true } : {}) }),
+        signal: AbortSignal.timeout(PING_TIMEOUT_MS),
       });
       if (!res.ok) return;
-      const json = (await res.json()) as { peers?: GardenPeerWire[] };
+      const json = (await res.json()) as {
+        peers?: GardenPeerWire[];
+        degraded?: boolean;
+      };
       if (!this.connected) return;
+      // Snapshot degradata: non è «sono usciti tutti», è «non lo sappiamo».
+      // Passarla a ingest farebbe uscire dalla scena ogni avatar per poi
+      // farli rientrare tutti al giro dopo.
+      if (json.degraded) return;
       this.ingest(json.peers ?? []);
     } catch {
       /* next tick retries */
+    } finally {
+      this.inFlight = false;
     }
   }
 

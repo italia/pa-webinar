@@ -5,14 +5,15 @@
  * copied fields by hand, and every feature added afterwards was simply forgotten
  * — `multitrackRecordingEnabled`, `retainParticipantTracks`, the four AI flags,
  * `aiTargetLocales`, `expectedSpeakers`, `agendaEnabled`, `wordCloudEnabled`,
- * `autoStartRecording`, `videoQuality`, `recurrenceRule`. For the recurring calls
- * this endpoint exists for (Caffettino, DevIt sync) that silent loss surfaces
- * only after the event: no isolated audio tracks, no transcript, no summary.
+ * `autoStartRecording`, `videoQuality`, `recurrenceRule`. On the recurring calls
+ * this endpoint exists for, that silent loss surfaces only after the event is
+ * over: no isolated audio tracks, no transcript, no summary.
  *
  * Splitting the model into these two exhaustive lists lets a test assert, against
  * Prisma's own schema, that EVERY scalar column is classified. Add a column and
  * forget it here and the suite fails, instead of the next duplicated event
- * quietly losing it. See docs/ROADMAP.md, "Eventi ricorrenti / serie".
+ * quietly losing it. See docs/architecture/event-journey.md, "What a copy
+ * inherits".
  */
 
 /** Columns copied verbatim from the source event. */
@@ -104,6 +105,7 @@ export const NOT_DUPLICATED_EVENT_FIELDS: Record<string, string> = {
   endsAt: 'set by the caller (explicit date or projected occurrence)',
   status: 'a copy always starts as DRAFT',
   moderatorToken: 'a fresh secret — reusing it would grant the old link control of the new room',
+  createdById: 'the copy belongs to whoever creates it: an organizer duplicating their own event must be able to manage the copy (ADR-014)',
   jitsiRoomName: 'a fresh room — reusing it would drop the copy into the old conference',
   joinPasswordHash: 'a secret the operator cannot read back, so it cannot be knowingly inherited',
   recurrenceSeriesId: 'series membership is assigned deliberately, not inherited (v0.9)',

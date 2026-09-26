@@ -1,17 +1,29 @@
 import { z } from 'zod';
 
+import {
+  EVENT_DESCRIPTION_MIN_LENGTH,
+  EVENT_DESCRIPTION_REQUIRED_LOCALE,
+} from './event-description';
+
 // ── Event Schemas ────────────────────────────────────
 
 const localizedStringField = z.record(z.string(), z.string());
 
-const eventBaseSchema = z.object({
+export const eventBaseSchema = z.object({
   title: localizedStringField.refine(
     (obj) => typeof obj.it === 'string' && obj.it.length >= 3,
     { message: 'title.it is required and must be at least 3 characters' },
   ),
+  // Lingua e soglia condivise con il wizard (vedi event-description.ts per il
+  // motivo per cui la lingua resta fissa e non segue quella del sito).
   description: localizedStringField.refine(
-    (obj) => typeof obj.it === 'string' && obj.it.length >= 10,
-    { message: 'description.it is required and must be at least 10 characters' },
+    (obj) => {
+      const testo = obj[EVENT_DESCRIPTION_REQUIRED_LOCALE];
+      return typeof testo === 'string' && testo.length >= EVENT_DESCRIPTION_MIN_LENGTH;
+    },
+    {
+      message: `description.${EVENT_DESCRIPTION_REQUIRED_LOCALE} is required and must be at least ${EVENT_DESCRIPTION_MIN_LENGTH} characters`,
+    },
   ),
   startsAt: z.string().datetime(),
   endsAt: z.string().datetime(),
@@ -263,6 +275,9 @@ export const createRegistrationSchema = z.object({
   // false means: unchecked is "no", which is the GDPR-required starting
   // state for opt-in consent.
   consentAddressBook: z.boolean().default(false),
+  // Lingua della pagina da cui ci si iscrive: la lingua delle email
+  // successive. Un valore che non e' una lingua della piattaforma si ignora.
+  locale: z.string().max(10).optional(),
 });
 
 export type CreateRegistrationInput = z.infer<typeof createRegistrationSchema>;
@@ -274,10 +289,28 @@ export const createQuestionSchema = z.object({
     .string()
     .min(3, 'qa.errors.textRequired')
     .max(500, 'qa.errors.tooLong'),
+  /** Identificativo stabile del browser di chi chiede senza token (ospite):
+   *  e' la chiave del limite di frequenza per persona, al posto dell'IP che
+   *  un intero ufficio dietro lo stesso NAT condivide. */
+  guestId: z.string().trim().min(1).max(100).optional(),
 });
 
 export const updateQuestionStatusSchema = z.object({
   status: z.enum(['PENDING', 'HIGHLIGHTED', 'ANSWERED', 'DISMISSED']),
+});
+
+/**
+ * Il pollice in su a una domanda. L'identità è una sola, come nel voto dei
+ * sondaggi e nella nuvola di parole: l'`accessToken` di una registrazione di
+ * questo evento, oppure l'identificativo stabile del browser per chi una
+ * registrazione non ce l'ha (ospiti, relatori, moderatori); in quel caso il
+ * token di sala, se c'è, viaggia come `Authorization: Bearer` a prova di
+ * presenza. Il corpo può anche mancare: l'iscritto può passare il token come
+ * `?token=`.
+ */
+export const upvoteQuestionSchema = z.object({
+  accessToken: z.string().min(1).optional(),
+  guestId: z.string().trim().min(1).max(100).optional(),
 });
 
 export type CreateQuestionInput = z.infer<typeof createQuestionSchema>;
@@ -381,9 +414,13 @@ export const createWordCloudRoundSchema = z.object({
 });
 
 export const submitWordCloudSchema = z.object({
-  word: z.string().min(1).max(30),
+  word: z.string().trim().min(1).max(30),
+  /** L'accessToken di una registrazione di questo evento… */
   accessToken: z.string().min(1).optional(),
-  guestId: z.string().min(1).optional(),
+  /** …oppure l'identificativo stabile del browser, per chi una registrazione
+   *  non ce l'ha (ospiti, relatori, moderatori): in quel caso il token di
+   *  sala, se c'è, viaggia come `Authorization: Bearer` a prova di presenza. */
+  guestId: z.string().trim().min(1).max(100).optional(),
 }).refine(
   (data) => data.accessToken || data.guestId,
   { message: 'Either accessToken or guestId is required' },

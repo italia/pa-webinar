@@ -1,9 +1,10 @@
-import { cookies } from 'next/headers';
-import { notFound, redirect } from 'next/navigation';
+import { notFound } from 'next/navigation';
 import { getLocale, getTranslations } from 'next-intl/server';
 
 import EventQuestionnairesManager from '@/components/admin/event-questionnaires-manager';
-import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { staffOLogin } from '@/lib/auth/staff-page';
+import { puoGestire } from '@/lib/auth/staff-session';
+import AccessDenied from '@/components/admin/access-denied';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import { prisma } from '@/lib/db';
 
@@ -17,10 +18,7 @@ export default async function EventQuestionnairesPage({ params }: PageProps) {
   const { id } = await params;
   const locale = await getLocale();
 
-  const isAdmin = await isAdminAuthenticated(await cookies());
-  if (!isAdmin) {
-    redirect(`/${locale}/admin/login`);
-  }
+  const session = await staffOLogin(locale);
   if (!UUID_RE.test(id)) notFound();
 
   const event = await prisma.event.findUnique({
@@ -28,6 +26,7 @@ export default async function EventQuestionnairesPage({ params }: PageProps) {
     select: { id: true, slug: true, title: true },
   });
   if (!event) notFound();
+  if (!(await puoGestire(session, event.id))) return <AccessDenied />;
 
   const eventTitle = getLocalized(event.title as LocalizedField, locale) || event.slug;
   const t = await getTranslations('admin.eventQuestionnaires');

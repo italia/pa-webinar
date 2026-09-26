@@ -1,0 +1,18 @@
+# Cartella di lavoro, stato, piani e variabili locali di OpenTofu/Terraform:
+# lo stato contiene la chiave dello storage account, le variabili i dati
+# dell'ente. Il file dei lock dei provider invece si versiona: fissa la
+# versione con cui il modulo è provato.
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+crash.log
+*.tfvars
+!terraform.tfvars.example
+
+# File che i comandi del README generano, se finiscono qui invece che nella
+# cartella dell'installazione fuori dal repository: la connection string con
+# la chiave dello storage account, e i valori con indirizzi pubblici e
+# resource group dell'ente.
+storage.conn
+*.values.yaml

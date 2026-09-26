@@ -1,0 +1,53 @@
+# Mirror privato dei registri, per nodi che non escono su Internet ma vedono
+# un registro dell'ente (Harbor, Nexus, GitLab, Zot...). Si copia, si adatta
+# e si passa a install-server.sh / install-agent.sh con --registries: finisce
+# in /etc/rancher/k3s/registries.yaml, leggibile solo da root.
+#
+# I nomi a sinistra sono i registri come li scrivono le immagini del chart
+# (`preload-images.sh list` li elenca tutti). Attenzione a
+# registry-1.docker.io: il sottochart PostgreSQL scrive così il proprio
+# registro, e per containerd è un registro diverso da docker.io.
+#
+# Se il mirror non risponde, containerd prova il registro originale: per
+# vietarlo (nodi davvero isolati) aggiungi `disable-default-registry-endpoint:
+# true` alla configurazione di k3s.
+
+mirrors:
+  # Variante A: un solo mirror che fa da cache per tutti i registri con gli
+  # stessi percorsi (containerd gli dice quale registro intende con il
+  # parametro `ns`).
+  docker.io:
+    endpoint:
+      - "https://registry.example.internal"
+  registry-1.docker.io:
+    endpoint:
+      - "https://registry.example.internal"
+  ghcr.io:
+    endpoint:
+      - "https://registry.example.internal"
+
+  # Variante B: un progetto di cache per ogni registro (per esempio i
+  # progetti "proxy cache" di Harbor). `rewrite` aggiunge il prefisso del
+  # progetto al percorso dell'immagine.
+  # docker.io:
+  #   endpoint: ["https://harbor.example.internal"]
+  #   rewrite:
+  #     "^(.*)$": "dockerhub-cache/$1"
+  # registry-1.docker.io:
+  #   endpoint: ["https://harbor.example.internal"]
+  #   rewrite:
+  #     "^(.*)$": "dockerhub-cache/$1"
+  # ghcr.io:
+  #   endpoint: ["https://harbor.example.internal"]
+  #   rewrite:
+  #     "^(.*)$": "ghcr-cache/$1"
+
+# Credenziali di sola lettura, se il mirror le chiede, e la CA interna
+# dell'ente, se il certificato del mirror è firmato da lei.
+# configs:
+#   "registry.example.internal":
+#     auth:
+#       username: <utente>
+#       password: <password>
+#     tls:
+#       ca_file: /usr/local/share/ca-certificates/ente-ca.crt

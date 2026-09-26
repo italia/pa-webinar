@@ -30,9 +30,12 @@ vi.mock('@/lib/crypto/pii', () => ({
 }));
 vi.mock('@/lib/chat/pubsub', () => ({ publishChat: vi.fn() }));
 vi.mock('@/lib/events/join-grant', () => ({ hasJoinGrant: vi.fn() }));
+const { siteSettings } = vi.hoisted(() => ({ siteSettings: { guestAccessEnabled: true } }));
+vi.mock('@/lib/settings', () => ({ getSettings: async () => siteSettings }));
 vi.mock('@/lib/event-session', () => ({ readOwnedEventAccessToken: vi.fn() }));
 
 import { prisma } from '@/lib/db';
+import { publishChat } from '@/lib/chat/pubsub';
 import { senderColourKey } from '@/lib/chat/sender-key';
 import { readOwnedEventAccessToken } from '@/lib/event-session';
 import { hasJoinGrant } from '@/lib/events/join-grant';
@@ -49,6 +52,7 @@ const mockedGrantRow = prisma.eventModerator
   .findUnique as unknown as ReturnType<typeof vi.fn>;
 const mockedJoinGrant = hasJoinGrant as unknown as ReturnType<typeof vi.fn>;
 const mockedOwnedToken = readOwnedEventAccessToken as unknown as ReturnType<typeof vi.fn>;
+const mockedPublish = publishChat as unknown as ReturnType<typeof vi.fn>;
 
 const EVENT_ID = '11111111-1111-4111-8111-111111111111';
 const SLUG = 'evento-di-prova';
@@ -129,6 +133,7 @@ function postRequest(body: Record<string, unknown>, token?: string): NextRequest
 
 beforeEach(() => {
   vi.clearAllMocks();
+  siteSettings.guestAccessEnabled = true;
   mockedFindFirst.mockResolvedValue(eventRow());
   mockedFindUnique.mockResolvedValue(eventRow());
   mockedMessages.mockResolvedValue([]);
@@ -285,6 +290,13 @@ describe('POST /api/events/[param]/chat — write authorization', () => {
     expect(mockedCreate).not.toHaveBeenCalled();
   });
 
+  it('rejects a tokenless guest on a LIVE scheduled event when guest access is off', async () => {
+    siteSettings.guestAccessEnabled = false;
+    const res = await POST(postRequest({ text: 'ciao', guestName: 'Anna' }), ctx());
+    expect(res.status).toBe(403);
+    expect(mockedCreate).not.toHaveBeenCalled();
+  });
+
   it('rejects an unknown token instead of degrading it to a guest', async () => {
     // Evento LIVE: il ramo ospite accetterebbe. Un token scaduto/estraneo deve
     // fallire rumorosamente, altrimenti nessuno si accorge che è invalido.
@@ -306,6 +318,25 @@ describe('POST /api/events/[param]/chat — write authorization', () => {
     // Un ospite non è una persona identificata (l'id è base64 di ip:nome e
     // collide dietro un NAT): niente modifica dei propri messaggi.
     expect(body.canEdit).toBe(false);
+  });
+
+  it('never publishes the raw senderId on the live stream: every reader gets the envelope', async () => {
+    // L'envelope Redis arriva a TUTTI i lettori dello stream, ospiti senza
+    // token compresi: con l'id grezzo, un `base64 -d` restituiva l'IP
+    // dell'ospite a chiunque fosse in sala.
+    const res = await POST(postRequest({ text: 'ciao', guestName: 'Anna' }), ctx());
+    expect(res.status).toBe(201);
+    expect(mockedPublish).toHaveBeenCalledTimes(1);
+    const envelope = mockedPublish.mock.calls[0]![0] as Record<string, unknown>;
+    const payload = JSON.stringify(envelope);
+
+    expect(envelope).not.toHaveProperty('senderId');
+    expect(payload).not.toContain(GUEST_SENDER_ID);
+    expect(payload).not.toContain(GUEST_IP);
+    // Stessa chiave della cronologia e della risposta alla POST: una bolla ha
+    // lo stesso colore dal vivo e dopo un ricaricamento.
+    expect(envelope.senderKey).toBe(senderColourKey(GUEST_SENDER_ID));
+    expect(envelope.senderKey).toBe((await res.json()).senderKey);
   });
 });
 
@@ -347,7 +378,7 @@ describe('POST /api/events/[param]/chat — self-asserted names', () => {
     expect((await res.json()).canEdit).toBe(true);
   });
 
-  it('never auto-attributes the registrant name to a forwarded link (F7)', async () => {
+  it('never auto-attributes the registrant name to a forwarded link', async () => {
     // Il link personale inoltrato mantiene il posto reg-<id> (analytics e
     // rate-limit restano uniti) ma chi lo apre si chiama come ha digitato: il
     // nome vero della registrante non deve mai finire sotto le parole altrui.

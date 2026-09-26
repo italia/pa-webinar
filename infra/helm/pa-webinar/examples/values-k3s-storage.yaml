@@ -1,0 +1,45 @@
+# ============================================================================
+# k3s in sede — object storage sul nodo (Garage), sopra values-k3s.yaml
+# ============================================================================
+#
+# Lo storage lo installa infra/onprem/k3s/addons/storage.sh: Garage nel
+# namespace della release, i due bucket qui sotto, la chiave del portale, le
+# regole CORS per l'origine del portale e il nome pubblico https://s3.<...>
+# servito da Traefik. Lo script scrive nella sua cartella di stato
+# values-storage.yaml (l'indirizzo, che sostituisce l'esempio qui sotto) e
+# storage.env (le chiavi, da mettere nel Secret dell'applicazione). Poi,
+# dalla radice del repository:
+#
+#   helm upgrade --install pa-webinar ./infra/helm/pa-webinar \
+#     -n pa-webinar --create-namespace \
+#     -f infra/helm/pa-webinar/examples/values-simple.yaml \
+#     -f infra/helm/pa-webinar/examples/values-k3s.yaml \
+#     -f infra/helm/pa-webinar/examples/values-k3s-storage.yaml \
+#     -f <file del sito> -f <cartella di stato>/values-storage.yaml \
+#     --wait --timeout 15m
+#
+# Browser e pod usano lo stesso indirizzo: i video si caricano e le
+# registrazioni si riproducono direttamente dallo storage, quindi il nome
+# deve risolversi sia per i partecipanti sia dentro il cluster, con un
+# certificato valido per entrambi (per una CA privata: app.extraCaCerts). Il
+# portale lo raggiunge attraverso Traefik, già ammesso dalla NetworkPolicy di
+# values-k3s.yaml (networkPolicy.egress.ingressController).
+# ============================================================================
+
+app:
+  env:
+    STORAGE_FILES_PROVIDER: "s3"
+    # Segnaposto: lo sostituisce values-storage.yaml. Se resta, le note di
+    # helm lo segnalano fra i valori di esempio.
+    STORAGE_FILES_S3_ENDPOINT: "https://s3.webinar.example.com"
+    # La regione con cui Garage firma e verifica le richieste.
+    STORAGE_FILES_S3_REGION: "garage"
+    STORAGE_FILES_S3_BUCKET: "pa-webinar-files"
+    RECORDING_S3_ENDPOINT: "https://s3.webinar.example.com"
+    RECORDING_S3_REGION: "garage"
+    RECORDING_S3_BUCKET: "pa-webinar-recordings"
+    # RECORDING_STORAGE_TYPE resta non impostato di proposito: dice al portale
+    # che c'è Jibri, che su k3s non c'è, e la pagina di stato e il pulsante di
+    # registrazione aspetterebbero un servizio che non arriverà. Il dominio
+    # delle registrazioni si attiva comunque dal bucket: caricamento dei
+    # video dall'amministrazione e pubblicazioni.

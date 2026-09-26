@@ -2,7 +2,9 @@
 
 import { useState, useCallback, type FormEvent } from 'react';
 import { useTranslations } from 'next-intl';
-import { Button, Icon } from 'design-react-kit';
+import { Button } from 'design-react-kit';
+
+import { Icon } from '@/components/ui/icon';
 
 interface PollCreateFormProps {
   eventSlug: string;

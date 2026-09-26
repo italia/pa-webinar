@@ -2,7 +2,7 @@
 
 import { useRef, useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Alert, Spinner } from 'design-react-kit';
+import { Alert, Button, Spinner } from 'design-react-kit';
 
 import type { JitsiMeetExternalAPI as JitsiAPI } from '@/types/jitsi';
 import {
@@ -17,6 +17,14 @@ import {
   type VideoQualityPreset,
 } from '@/lib/jitsi/config';
 import { humanParticipantCount } from '@/lib/jitsi/participants';
+import {
+  dataUriSfondo,
+  leggiSfondo,
+  SFONDO_PREDEFINITO,
+} from '@/lib/jitsi/virtual-background';
+import { InsecureContextNotice, useInsecureContext } from '@/components/live/insecure-context';
+
+import { loadExternalApi } from './external-api-loader';
 
 interface WatermarkSettings {
   url?: string;
@@ -39,20 +47,23 @@ interface JitsiRoomProps {
   participantsCanStartVideo?: boolean;
   participantsCanShareScreen?: boolean;
   enableFileSharing?: boolean;
-  /** Per-event opt-in (Event.whiteboardEnabled): when true, moderators get the
-   *  native Jitsi/Excalidraw whiteboard button (desktop only). Jitsi still
-   *  feature-gates it on config.whiteboard.enabled (server-side, test only),
-   *  so it stays hidden on prod even for opted-in events. */
+  /** Scelta dell'evento (Event.whiteboardEnabled, sempre per le chiamate
+   *  istantanee): con `whiteboardInfraReady`, chi modera trova il pulsante
+   *  della lavagna nativa di Jitsi/Excalidraw (solo desktop). */
   whiteboardEnabled?: boolean;
+  /** L'installazione ha il backend della lavagna (lib/jitsi/whiteboard.ts),
+   *  risolto a runtime dal Server Component. Senza, il pulsante non entra
+   *  nella barra nemmeno per un evento che l'ha scelta. Default false. */
+  whiteboardInfraReady?: boolean;
   /** Video/audio quality preset (admin SiteSetting, per-event override).
    *  Drives resolution, bitrate caps, channelLastN and Opus settings, and is
    *  also enforced at runtime via setVideoQuality. Defaults to HIGH. */
   videoQuality?: VideoQualityPreset;
-  /** Reactions mode (admin SiteSetting, #7). 'NATIVE' → Jitsi's own reactions
+  /** Reactions mode (admin SiteSetting). 'NATIVE' → Jitsi's own reactions
    *  button in the toolbar (ephemeral, no app analytics); 'CUSTOM' → the app's
    *  ReactionBar overlay (persisted/aggregated). Default 'NATIVE'. */
   reactionsMode?: 'NATIVE' | 'CUSTOM';
-  /** F18 — se true (DEFAULT) l'app forza OFF la soppressione rumore avanzata
+  /** Se true (DEFAULT) l'app forza OFF la soppressione rumore avanzata
    *  (rnnoise) di Jitsi e la ri-spegne per tutta la call; se false la accende
    *  a ogni unmute. La soppressione WebRTC di base (AEC/NS/AGC) resta accesa
    *  in entrambi i casi via lib/jitsi/config.ts.
@@ -83,7 +94,10 @@ interface JitsiRoomProps {
   onApiReady?: (api: JitsiAPI) => void;
 }
 
-type LoadState = 'loading' | 'ready' | 'error';
+// 'unreachable': external_api.js non e' arrivato dal server della conferenza
+// (certificato non accettato, rete o proxy che lo bloccano). 'error': l'API e'
+// arrivata ma la sala non si e' creata.
+type LoadState = 'loading' | 'ready' | 'error' | 'unreachable';
 
 const DEFAULT_WATERMARK_URL = '/images/default-watermark.svg';
 
@@ -107,6 +121,7 @@ export default function JitsiRoom({
   participantsCanShareScreen = true,
   enableFileSharing = false,
   whiteboardEnabled = false,
+  whiteboardInfraReady = false,
   videoQuality,
   reactionsMode = 'NATIVE',
   // Default spento (= rnnoise forzata OFF): un chiamante che dimentica la prop
@@ -123,11 +138,22 @@ export default function JitsiRoom({
   onApiReady,
 }: JitsiRoomProps) {
   const t = useTranslations('live');
+  const tc = useTranslations('common');
   const containerRef = useRef<HTMLDivElement>(null);
   const apiRef = useRef<JitsiAPI | null>(null);
   const initializingRef = useRef(false);
   const disposedRef = useRef(false);
   const [loadState, setLoadState] = useState<LoadState>('loading');
+  // Ogni «Riprova» incrementa il contatore e fa ripartire l'effetto che carica
+  // l'API e crea la sala: rimontare non basterebbe, lo stato va riazzerato.
+  const [attempt, setAttempt] = useState(0);
+  // Fuori da un contesto sicuro il browser nega microfono e videocamera anche
+  // alla videochiamata incorporata: non la si carica, e si dice perche'.
+  const insecure = useInsecureContext();
+  const retry = () => {
+    setLoadState('loading');
+    setAttempt((n) => n + 1);
+  };
 
   const onReadyRef = useRef(onReady);
   const onLeftRef = useRef(onLeft);
@@ -173,7 +199,7 @@ export default function JitsiRoom({
   const myEndpointIdRef = useRef<string>('');
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined' || insecure) return;
     disposedRef.current = false;
     isMobileRef.current = window.matchMedia('(max-width: 767.98px)').matches;
 
@@ -211,16 +237,16 @@ export default function JitsiRoom({
         ...jitsiConfigOverwrite.remoteVideoMenu,
         disableKick: false,
       };
-      // Native whiteboard: per-event opt-in + moderator + desktop only. Jitsi
-      // additionally feature-gates the button on config.whiteboard.enabled
-      // (set server-side, test only), so it stays hidden on prod even when an
-      // event opted in — no client-side check for the server infra needed.
-      if (whiteboardEnabled && !isMobileRef.current) {
+      // Lavagna nativa: scelta dell'evento + backend dell'installazione +
+      // moderatore + desktop. Il controllo del backend sta qui e non solo nel
+      // `config.whiteboard.enabled` di Jitsi: un pulsante che apre una lavagna
+      // senza backend è peggio di nessun pulsante.
+      if (whiteboardEnabled && whiteboardInfraReady && !isMobileRef.current) {
         toolbarButtons.push('whiteboard');
       }
     }
 
-    // Reactions (#7): NATIVE mode surfaces Jitsi's own reactions button and
+    // Reactions: NATIVE mode surfaces Jitsi's own reactions button and
     // enables the feature (the base config disables it in favour of the custom
     // bar); CUSTOM mode leaves it disabled and the app renders its own
     // analytics-backed ReactionBar instead. `extraConfig` is spread AFTER
@@ -359,15 +385,6 @@ export default function JitsiRoom({
             ...extraConfig,
             toolbarButtons,
             ...(enableFileSharing ? { enableFileSharing: true } : {}),
-            // Force lib-jitsi-meet's _statsCurrentId to our display name.
-            // Without these, lib-jitsi-meet falls back to a random
-            // RandomUtil.randomElement(firstNames) + '-' + 3-char hex
-            // (e.g. "Judah-hqj"), which is what shows up in Jicofo logs
-            // as `stats-id` and in callstats/JaaS analytics. Keeping this
-            // tied to our portal-issued displayName makes ops logs
-            // traceable back to the registered participant.
-            statisticsId: displayName,
-            statisticsDisplayName: displayName,
           },
           interfaceConfigOverwrite: {
             ...jitsiInterfaceConfigOverwrite,
@@ -427,7 +444,7 @@ export default function JitsiRoom({
         // enable qui sotto.
         const enforceNoiseSuppressionOff = (): void => setNoiseSuppression(false);
 
-        // F18: enable advanced rnnoise noise-suppression — but ONLY when the
+        // Enable advanced rnnoise noise-suppression — but ONLY when the
         // served jitsi/web image is the 48 kHz-patched build AND the operator
         // opted in (`rnnoiseEnforceOff=false`, dall'env del pod). It's a no-op
         // with no local audio track, and everyone joins startWithAudioMuted, so
@@ -438,12 +455,43 @@ export default function JitsiRoom({
           setNoiseSuppression(true);
         };
 
+        // Sfondo virtuale scelto nella sala d'attesa.
+        //
+        // Si manda UNA volta sola, e la condizione e' «l'ho mandato», non «ci
+        // ho provato»: chi entra con la videocamera spenta non ha ancora una
+        // traccia su cui applicare l'effetto, e va riprovato quando la accende;
+        // chi invece lo sfondo l'ha gia' ricevuto e poi ne sceglie un altro dal
+        // pulsante nativo — dentro la sala — non deve vederselo sostituire al
+        // primo spegni-e-riaccendi della camera.
+        //
+        // «Nessuno» non e' l'assenza di un comando ma un comando: Jitsi ricorda
+        // l'effetto nel proprio spazio locale, sull'origine della conferenza,
+        // che l'applicazione non puo' leggere ne' svuotare. Senza lo spegnimento
+        // esplicito, chi la volta prima aveva acceso uno sfondo rientrerebbe con
+        // quello, mentre la sala d'attesa gli mostra «Nessuno sfondo» —
+        // l'interfaccia direbbe il contrario di quello che la stanza fa.
+        let sfondoConsegnato = false;
+        const applicaSfondoScelto = async (): Promise<void> => {
+          if (disposedRef.current || sfondoConsegnato) return;
+          const scelto = leggiSfondo();
+          const dataUri = await dataUriSfondo(scelto);
+          if (disposedRef.current) return;
+          // Immagine attesa e non arrivata (asset mancante, rete): non si
+          // consegna niente e si riprova alla prossima occasione, invece di
+          // spegnere uno sfondo che la persona aveva chiesto.
+          if (scelto !== SFONDO_PREDEFINITO && !dataUri) return;
+          // Solo IMMAGINE: il comando a distanza non sa impostare la
+          // sfocatura (vedi lib/jitsi/virtual-background).
+          api.executeCommand('setVirtualBackground', Boolean(dataUri), dataUri ?? undefined);
+          sfondoConsegnato = true;
+        };
+
         api.addListener('videoConferenceJoined', (evt: { id?: string }) => {
           if (disposedRef.current) return;
           // Il nostro endpoint id: usato per segnalare solo le nostre alzate.
           if (evt?.id) myEndpointIdRef.current = evt.id;
           setLoadState('ready');
-          // Seed iniziale del conteggio partecipanti (feedback #4b): i listener
+          // Seed iniziale del conteggio partecipanti: i listener
           // participantJoined/Left qui sotto scattano SOLO per i cambiamenti dopo
           // che ci siamo agganciati, quindi senza questo seed il conteggio parte
           // da 0 e sotto-riporta per chi entra in una sala già popolata (es. un
@@ -457,7 +505,7 @@ export default function JitsiRoom({
               nsEnforceTimerRef.current = setInterval(enforceNoiseSuppressionOff, 2000);
             }
           } else {
-            // F18: the served jitsi/web image is patched (noise-suppression
+            // The served jitsi/web image is patched (noise-suppression
             // AudioContext forced to 48 kHz), so rnnoise no longer silences
             // non-48 kHz mics — turn it ON for stronger background-noise removal.
             // The toolbar toggle is hidden, so we drive it via the IFrame API.
@@ -477,6 +525,7 @@ export default function JitsiRoom({
           // ADR-013 Fase 0 — t0 della timeline = momento del join. Gli atMs
           // accumulati sono relativi a questo istante.
           speakerT0Ref.current = Date.now();
+          void applicaSfondoScelto();
           onReadyRef.current?.();
         });
 
@@ -496,10 +545,13 @@ export default function JitsiRoom({
           }
         };
         api.addListener('videoMuteStatusChanged', (e: { muted?: boolean }) => {
-          if (e && e.muted === false) reapplyVideoQuality();
+          if (e && e.muted === false) {
+            reapplyVideoQuality();
+            void applicaSfondoScelto();
+          }
         });
 
-        // F18: (re)assert advanced rnnoise whenever the mic is unmuted — that's
+        // (Re)assert advanced rnnoise whenever the mic is unmuted — that's
         // when the local audio track exists, so the enable actually takes (the
         // join-time attempt is a no-op for the startWithAudioMuted majority).
         // No-op unless the served jitsi/web image is the 48 kHz-patched build.
@@ -584,41 +636,25 @@ export default function JitsiRoom({
       }
     }
 
-    let scriptLoadHandler: (() => void) | null = null;
-    let attachedScript: HTMLScriptElement | null = null;
-
     // Flush della timeline anche se la tab viene chiusa/messa in background.
     window.addEventListener('pagehide', handlePageHide);
 
-    if (window.JitsiMeetExternalAPI) {
-      initJitsi();
-    } else {
-      const existingScript = document.querySelector(
-        `script[src*="external_api.js"]`,
-      ) as HTMLScriptElement | null;
-
-      if (existingScript) {
-        scriptLoadHandler = initJitsi;
-        attachedScript = existingScript;
-        existingScript.addEventListener('load', scriptLoadHandler);
-      } else {
-        const script = document.createElement('script');
-        script.src = `https://${domain}/external_api.js`;
-        script.async = true;
-        script.onload = initJitsi;
-        script.onerror = () => { if (!disposedRef.current) setLoadState('error'); };
-        document.head.appendChild(script);
-      }
-    }
+    // L'API arriva dal server della conferenza, un host diverso dal portale:
+    // un certificato che il browser non ha accettato, o una rete che lo
+    // blocca, finiscono qui come 'unreachable' (vedi external-api-loader).
+    const detachLoader = loadExternalApi(domain, {
+      onLoad: initJitsi,
+      onError: () => {
+        if (!disposedRef.current) setLoadState('unreachable');
+      },
+    });
 
     return () => {
       disposedRef.current = true;
       initializingRef.current = false;
       observerRef.current?.disconnect();
       observerRef.current = null;
-      if (attachedScript && scriptLoadHandler) {
-        attachedScript.removeEventListener('load', scriptLoadHandler);
-      }
+      detachLoader();
       // ADR-013 Fase 0 — svuota il buffer residuo prima di staccare i
       // listener/iframe, così non perdiamo gli ultimi cambi di speaker.
       window.removeEventListener('pagehide', handlePageHide);
@@ -644,24 +680,60 @@ export default function JitsiRoom({
   // NOTE: locale is intentionally excluded from deps to prevent iframe
   // recreation (and user disconnection) when the user switches language.
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [domain, roomName, jwt, displayName, role, participantsCanUnmute, participantsCanStartVideo, participantsCanShareScreen, enableFileSharing, whiteboardEnabled, videoQuality, reactionsMode, rnnoiseEnforceOff, startWithVideoMuted, startWithAudioMuted]);
+  }, [domain, roomName, jwt, displayName, role, participantsCanUnmute, participantsCanStartVideo, participantsCanShareScreen, enableFileSharing, whiteboardEnabled, whiteboardInfraReady, videoQuality, reactionsMode, rnnoiseEnforceOff, startWithVideoMuted, startWithAudioMuted, attempt, insecure]);
 
   return (
     <div className="jitsi-wrapper position-relative">
-      {loadState === 'loading' && (
-        <div className="position-absolute top-50 start-50 translate-middle text-center">
-          <Spinner active double />
-          <p className="mt-3 text-white-50">{t('connecting')}</p>
-        </div>
-      )}
-
-      {loadState === 'error' && (
+      {insecure ? (
         <div
           className="position-absolute top-50 start-50 translate-middle"
           style={{ width: '90%', maxWidth: '500px' }}
         >
-          <Alert color="danger">{t('connectionError')}</Alert>
+          <InsecureContextNotice />
         </div>
+      ) : (
+        <>
+          {loadState === 'loading' && (
+            <div className="position-absolute top-50 start-50 translate-middle text-center">
+              <Spinner active double />
+              <p className="mt-3 text-white-50">{t('connecting')}</p>
+            </div>
+          )}
+
+          {(loadState === 'unreachable' || loadState === 'error') && (
+            <div
+              className="position-absolute top-50 start-50 translate-middle"
+              style={{ width: '90%', maxWidth: '500px' }}
+            >
+              {loadState === 'unreachable' ? (
+                // Niente <Icon> dentro <Alert>: Bootstrap Italia disegna gia'
+                // la sua. Il browser non dice se e' il certificato o la rete:
+                // il testo copre entrambi e porta all'host da aprire.
+                <Alert color="danger" className="text-start mb-0">
+                  <strong className="d-block mb-1">{t('conferenceUnreachableTitle')}</strong>
+                  <span className="d-block mb-2">
+                    {t('conferenceUnreachableBody', { host: domain })}
+                  </span>
+                  <a
+                    href={`https://${domain}/`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="fw-semibold"
+                  >
+                    {t('conferenceOpenHost', { host: domain })}
+                  </a>
+                </Alert>
+              ) : (
+                <Alert color="danger" className="mb-0">{t('connectionError')}</Alert>
+              )}
+              <div className="text-center mt-3">
+                <Button color="primary" onClick={retry}>
+                  {tc('retry')}
+                </Button>
+              </div>
+            </div>
+          )}
+        </>
       )}
 
       <div

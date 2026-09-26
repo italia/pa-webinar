@@ -17,8 +17,8 @@
  * announced to assistive tech via role="status" + aria-live="polite".
  *
  * We deliberately avoid design-react-kit's <Icon> here: it has caused
- * hydration mismatches in components that render on every page (see
- * project memory). Icons are inline SVG instead.
+ * hydration mismatches in components that render on every page. Icons
+ * are inline SVG instead.
  */
 
 import {

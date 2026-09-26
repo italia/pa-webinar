@@ -4,11 +4,12 @@
  * Background: the per-participant recorder (infra/recorder) once shipped a bug
  * where Chrome-headless subscribed to remote SFU audio tracks but MediaRecorder
  * wrote VALID BUT SILENT Opus — bytes strictly proportional to duration at the
- * ~234 B/s digital-silence floor, with no decoded samples (fixed in recorder
- * commit 9739d70, "render tracks through a playing element + virtual sink").
- * When that happened on the 2026-07-08 prod call, all 25 tracks were silent yet
- * the pipeline ran to "done" and produced empty transcripts — a failure that was
- * invisible until someone opened the (blank) subtitles.
+ * ~234 B/s digital-silence floor, with no decoded samples. The recorder fix was
+ * to render each track through a playing element into a virtual sink; an image
+ * built before that fix still captures silence. When it happened on a real
+ * production call every track was silent, yet the pipeline ran to "done" and
+ * produced empty transcripts — a failure that was invisible until someone
+ * opened the (blank) subtitles.
  *
  * This helper lets the manifest endpoint detect that class of failure up front
  * and skip a doomed TRANSCRIBE_MULTITRACK instead of burning GPU on unusable

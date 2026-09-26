@@ -100,7 +100,7 @@ export async function enqueuePostprodForRecording(
   // Multitrack recordings have no mixed/video source — the transcript must be
   // built from the per-speaker opus tracks (TRANSCRIBE_MULTITRACK). Only the
   // event-end manifest path passes `multitrack` explicitly; admin re-runs and
-  // the webhook don't, so fall back to auto-detection (F15). Without this an
+  // the webhook don't, so fall back to auto-detection. Without this an
   // admin-triggered run would enqueue a single-file TRANSCRIBE whose source
   // isn't a media object → the job fails at input download.
   let isMultitrack = opts.multitrack;

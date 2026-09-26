@@ -4,10 +4,24 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { Alert, Button } from 'design-react-kit';
 
+import {
+  SFONDI_VIRTUALI,
+  SFONDO_PREDEFINITO,
+  leggiSfondo,
+  scriviSfondo,
+} from '@/lib/jitsi/virtual-background';
+
 type PermissionState = 'idle' | 'requesting' | 'granted' | 'denied';
 
-const CAMERA_PREF_KEY = 'pawebinar.deviceCheck.cameraOn';
-const MIC_PREF_KEY = 'pawebinar.deviceCheck.micOn';
+// Una scelta per ruolo, non una sola per browser: chi ha acceso il microfono
+// conducendo un evento non deve ritrovarlo acceso quando partecipa a un altro.
+const prefKeys = (defaultOn: boolean) => {
+  const ruolo = defaultOn ? 'conduce' : 'partecipa';
+  return {
+    camera: `pawebinar.deviceCheck.${ruolo}.cameraOn`,
+    mic: `pawebinar.deviceCheck.${ruolo}.micOn`,
+  };
+};
 
 function readBoolPref(key: string, fallback: boolean): boolean {
   if (typeof window === 'undefined') return fallback;
@@ -40,13 +54,30 @@ interface DeviceCheckProps {
   /** true = vertical stacked layout (for narrow containers / mobile).
    *  false = horizontal with a 240x135 preview on the left. */
   compact?: boolean;
+  /** Stato iniziale di fotocamera e microfono se la persona non ha mai
+   *  scelto su questo browser. Spenti per chi partecipa, accesi per chi
+   *  conduce o interviene. */
+  defaultOn?: boolean;
 }
 
-export default function DeviceCheck({ onReady, onStateChange, compact = false }: DeviceCheckProps) {
+export default function DeviceCheck({
+  onReady,
+  onStateChange,
+  compact = false,
+  defaultOn = false,
+}: DeviceCheckProps) {
   const t = useTranslations('deviceCheck');
 
-  const [cameraOn, setCameraOn] = useState<boolean>(() => readBoolPref(CAMERA_PREF_KEY, true));
-  const [micOn, setMicOn] = useState<boolean>(() => readBoolPref(MIC_PREF_KEY, true));
+  // Si parte dal predefinito del ruolo e si legge la scelta memorizzata dopo
+  // il montaggio: il server non la conosce, e leggerla nell'inizializzatore
+  // farebbe divergere interruttori ed etichette fra server e browser.
+  const chiavi = prefKeys(defaultOn);
+  const [cameraOn, setCameraOn] = useState<boolean>(defaultOn);
+  const [micOn, setMicOn] = useState<boolean>(defaultOn);
+  useEffect(() => {
+    setCameraOn(readBoolPref(chiavi.camera, defaultOn));
+    setMicOn(readBoolPref(chiavi.mic, defaultOn));
+  }, [chiavi.camera, chiavi.mic, defaultOn]);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -55,6 +86,19 @@ export default function DeviceCheck({ onReady, onStateChange, compact = false }:
   const rafRef = useRef<number | null>(null);
   const meterRef = useRef<HTMLDivElement | null>(null);
   const disposedRef = useRef(false);
+
+  // Sfondo virtuale: la scelta vive nelle preferenze del browser e la applica
+  // la sala all'ingresso. Qui non si prova ad applicarlo all'anteprima —
+  // servirebbe un secondo motore di segmentazione accanto a quello di Jitsi.
+  //
+  // Si parte dal predefinito e si legge la preferenza DOPO il montaggio: il
+  // server non ha quelle preferenze, e disegnare subito la scelta memorizzata
+  // significherebbe consegnare al browser un riquadro evidenziato diverso da
+  // quello che il server ha appena prodotto.
+  const [sfondo, setSfondo] = useState<string>(SFONDO_PREDEFINITO);
+  useEffect(() => {
+    setSfondo(leggiSfondo());
+  }, []);
 
   const [permissionState, setPermissionState] = useState<PermissionState>('idle');
   const [videoDevices, setVideoDevices] = useState<MediaDeviceInfo[]>([]);
@@ -215,14 +259,14 @@ export default function DeviceCheck({ onReady, onStateChange, compact = false }:
   const handleCameraToggle = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const next = e.target.checked;
     setCameraOn(next);
-    writeBoolPref(CAMERA_PREF_KEY, next);
-  }, []);
+    writeBoolPref(chiavi.camera, next);
+  }, [chiavi.camera]);
 
   const handleMicToggle = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const next = e.target.checked;
     setMicOn(next);
-    writeBoolPref(MIC_PREF_KEY, next);
-  }, []);
+    writeBoolPref(chiavi.mic, next);
+  }, [chiavi.mic]);
 
   const handleVideoChange = useCallback(async (e: React.ChangeEvent<HTMLSelectElement>) => {
     const id = e.target.value;
@@ -402,7 +446,7 @@ export default function DeviceCheck({ onReady, onStateChange, compact = false }:
             onClick={() => {
               // Short chime so the user can confirm their speakers /
               // headphones actually play audio before joining. Several
-              // caffettino attendees "didn't hear" the call — probably
+              // attendees reported they "didn't hear" the call — probably
               // because they never verified audio output beforehand.
               try {
                 const ctx = new (window.AudioContext || (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext!)();
@@ -449,6 +493,82 @@ export default function DeviceCheck({ onReady, onStateChange, compact = false }:
         {previewBox}
         {controls}
       </div>
+
+      {/* Sfondo virtuale. Sta qui, accanto all'anteprima, perche' e' il momento
+          in cui ci si guarda: il pulsante nativo di Jitsi vive DENTRO la sala e
+          si trova solo quando gli altri stanno gia' guardando. */}
+      <fieldset className="mt-3">
+        <legend className="form-label small mb-1" id="device-check-bg-label">
+          {t('backgroundLabel')}
+        </legend>
+        {/* Scelta singola: un gruppo di opzioni, non cinque interruttori
+            indipendenti. Con `aria-pressed` chi usa un lettore di schermo
+            sentirebbe cinque comandi slegati e dovrebbe attraversarli tutti. */}
+        <div
+          className="d-flex flex-wrap gap-2"
+          role="radiogroup"
+          aria-labelledby="device-check-bg-label"
+        >
+          {SFONDI_VIRTUALI.map((s) => {
+            const scelto = s.id === sfondo;
+            return (
+              <button
+                key={s.id}
+                type="button"
+                role="radio"
+                aria-checked={scelto}
+                // Solo l'opzione scelta resta nel giro della tastiera: dentro
+                // un gruppo di opzioni ci si sposta con le frecce.
+                tabIndex={scelto ? 0 : -1}
+                className="btn p-0 border-0 bg-transparent"
+                title={t(`background.${s.id}`)}
+                onKeyDown={(e) => {
+                  const avanti = e.key === 'ArrowRight' || e.key === 'ArrowDown';
+                  const indietro = e.key === 'ArrowLeft' || e.key === 'ArrowUp';
+                  if (!avanti && !indietro) return;
+                  e.preventDefault();
+                  const i = SFONDI_VIRTUALI.findIndex((x) => x.id === sfondo);
+                  const prossimo =
+                    SFONDI_VIRTUALI[
+                      (i + (avanti ? 1 : SFONDI_VIRTUALI.length - 1)) % SFONDI_VIRTUALI.length
+                    ];
+                  if (!prossimo) return;
+                  setSfondo(prossimo.id);
+                  scriviSfondo(prossimo.id);
+                  const gruppo = e.currentTarget.parentElement;
+                  const bottoni = gruppo?.querySelectorAll<HTMLButtonElement>('[role="radio"]');
+                  bottoni?.[SFONDI_VIRTUALI.indexOf(prossimo)]?.focus();
+                }}
+                onClick={() => {
+                  setSfondo(s.id);
+                  scriviSfondo(s.id);
+                }}
+              >
+                <span
+                  className="d-flex align-items-center justify-content-center rounded"
+                  style={{
+                    width: 62,
+                    height: 36,
+                    backgroundImage: s.url ? `url(${s.url})` : undefined,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    backgroundColor: s.url ? undefined : '#e9ecef',
+                    // Il bordo c'e' sempre, cambia solo colore e spessore: un
+                    // bordo che compare sposta di due pixel tutte le miniature.
+                    border: scelto ? '3px solid #0066CC' : '3px solid #ced4da',
+                    color: '#5a6772',
+                    fontSize: '0.68rem',
+                  }}
+                >
+                  {!s.url && t('backgroundNoneShort')}
+                </span>
+                <span className="visually-hidden">{t(`background.${s.id}`)}</span>
+              </button>
+            );
+          })}
+        </div>
+        <small className="text-muted d-block mt-1">{t('backgroundHint')}</small>
+      </fieldset>
     </div>
   );
 }

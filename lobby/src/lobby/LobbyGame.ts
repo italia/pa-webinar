@@ -4,7 +4,7 @@ import { busOn, createBus, type LobbyBus } from './bus';
 import { DEFAULT_CAPACITY, DEFAULT_WORLD } from './constants';
 import { CONTEXT_KEY, type LobbyContext, type ResolvedConfig } from './context';
 import type { PlayerProfile } from './ports/types';
-import type { LobbyConfig, LobbyDeps } from './public-types';
+import { DEFAULT_GATE_LABELS, type LobbyConfig, type LobbyDeps } from './public-types';
 import { BootScene } from './scenes/BootScene';
 import { WorldScene } from './scenes/WorldScene';
 import { lobbyStorage } from './storage';
@@ -55,6 +55,7 @@ export class LobbyGame {
       assets: config.assets,
       canExitClassic: !!config.onExitToClassic,
       embed: config.embed ?? false,
+      labels: { ...DEFAULT_GATE_LABELS, ...config.labels },
     };
 
     this.onExitToClassic = config.onExitToClassic;

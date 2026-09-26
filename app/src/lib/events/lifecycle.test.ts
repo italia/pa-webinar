@@ -8,6 +8,8 @@ import {
   shouldDemoteLiveToIdle,
   canWakeNow,
   wakeWindowOpensAt,
+  shouldCloseAbandonedInstantCall,
+  canStartManually,
 } from './lifecycle';
 
 // Frozen reference time for deterministic comparisons.
@@ -339,7 +341,7 @@ describe('reviveStatus — event revival on endsAt extension', () => {
   });
 });
 
-describe('emptyCloseCutoff — authoritative empty-close (#12)', () => {
+describe('emptyCloseCutoff — authoritative empty-close', () => {
   it('returns null when disabled (minutes < 0)', () => {
     expect(emptyCloseCutoff(NOW, -1)).toBeNull();
   });
@@ -521,5 +523,52 @@ describe('wake window', () => {
     const early = { ...base, preScaleMinutes: 45, now: at('2026-07-22T08:40:00Z') };
     expect(canWakeNow(early)).toBe(true);
     expect(canWakeNow({ ...early, preScaleMinutes: 5 })).toBe(false);
+  });
+});
+
+describe('shouldCloseAbandonedInstantCall — giro a bridge fisso', () => {
+  const base = {
+    eventType: 'INSTANT',
+    lastActiveAt: null,
+    provisioningStartedAt: null,
+    startsAt: minutes(-120),
+    inactiveCutoff: minutes(-45),
+  };
+
+  it('chiude una chiamata istantanea senza segni di vita per tutta la finestra', () => {
+    expect(shouldCloseAbandonedInstantCall({ ...base, lastActiveAt: minutes(-46) })).toBe(true);
+    // Nessuno è mai entrato: conta la creazione.
+    expect(shouldCloseAbandonedInstantCall(base)).toBe(true);
+  });
+
+  it('non chiude una chiamata con attività recente', () => {
+    expect(shouldCloseAbandonedInstantCall({ ...base, lastActiveAt: minutes(-44) })).toBe(false);
+  });
+
+  it('una chiamata appena creata o riaperta è viva', () => {
+    expect(shouldCloseAbandonedInstantCall({ ...base, startsAt: minutes(-10) })).toBe(false);
+    expect(
+      shouldCloseAbandonedInstantCall({ ...base, provisioningStartedAt: minutes(-5) }),
+    ).toBe(false);
+  });
+
+  it('mai un evento a calendario: prima della fine una sala vuota è una pausa', () => {
+    expect(
+      shouldCloseAbandonedInstantCall({ ...base, eventType: 'SCHEDULED', lastActiveAt: minutes(-100) }),
+    ).toBe(false);
+  });
+});
+
+describe('canStartManually — «Avvia evento»', () => {
+  it('anche in preparazione o in pausa: nessuno deve restare chiuso fuori', () => {
+    for (const status of ['PUBLISHED', 'PROVISIONING', 'IDLE']) {
+      expect(canStartManually(status), status).toBe(true);
+    }
+  });
+
+  it('mai da LIVE, da concluso, da archiviato o da bozza', () => {
+    for (const status of ['LIVE', 'ENDED', 'ARCHIVED', 'DRAFT']) {
+      expect(canStartManually(status), status).toBe(false);
+    }
   });
 });

@@ -766,7 +766,7 @@ html.live-call-immersive body {
     pointer-events: none;
   }
 
-  // Always-visible reaction bar (F6): a horizontal pill of emoji buttons,
+  // Always-visible reaction bar: a horizontal pill of emoji buttons,
   // no collapse — findable at a glance without opening a picker.
   &__bar {
     // Re-enable pointer events on the pill only (the container is none), so the
@@ -916,7 +916,7 @@ html.live-call-immersive body {
     word-break: break-word;
   }
 
-  // Clickable links inside a chat message (F17). Long URLs wrap instead of
+  // Clickable links inside a chat message. Long URLs wrap instead of
   // overflowing the bubble.
   &__link {
     color: #0066CC;
@@ -2368,18 +2368,35 @@ html.live-call-immersive body {
 }
 
 .chat-panel__react-wrap {
-  position: relative;
   display: inline-block;
 }
 
 // Il selettore si apre SOPRA il messaggio: in fondo alla lista non deve
 // finire fuori dal pannello.
+//
+// E deve restare DENTRO la lista anche di lato. La lista scorre (overflow
+// auto), e cio' che sborda a sinistra di un contenitore che scorre viene
+// tagliato e non si raggiunge nemmeno scorrendo: ancorato a destra del
+// pulsante, il selettore di un messaggio altrui perderebbe le prime emoji,
+// e al loro posto si vedrebbe la videochiamata dietro la barra laterale. Lo
+// z-index non c'entra (il contenuto tagliato non si rialza): l'ancora e' la
+// riga dell'ora, larga quanto il messaggio e dal suo lato, e il selettore
+// parte dal bordo sinistro per i messaggi altrui, dal destro per i propri.
+.chat-panel__time--anchor {
+  position: relative;
+}
+
 .chat-panel__react-pop {
   position: absolute;
   bottom: 100%;
-  right: 0;
+  left: 0;
   z-index: 5;
   display: flex;
+  flex-wrap: wrap;
+  // Larghezza propria, non quella dell'ancora: un messaggio breve ha una riga
+  // stretta. Il tetto tiene il selettore dentro uno schermo di telefono.
+  width: max-content;
+  max-width: calc(100vw - 4rem);
   gap: 2px;
   padding: 4px;
   background: #fff;
@@ -2399,11 +2416,84 @@ html.live-call-immersive body {
     &:hover,
     &:focus-visible { background: rgba(0, 102, 204, 0.1); }
   }
+
+  &--own {
+    left: auto;
+    right: 0;
+  }
 }
 
 .chat-panel__edited {
   font-size: 0.7rem;
   color: var(--app-muted, #5c6f82);
+}
+
+// Domande in chat. Regola trasversale a questo blocco: nessuno stato è
+// affidato al solo colore (WCAG 1.4.1) — c'è sempre un'etichetta di testo
+// accanto, e il bottone di composizione cambia anche bordo e sfondo, non solo
+// tinta. Nessun `<Icon>` di design-react-kit: il pannello è sempre montato e
+// quel componente qui produce un errore di hydration.
+.chat-panel__lens {
+  display: flex;
+  gap: 6px;
+  padding: 6px 10px 0;
+}
+
+.chat-panel__lens-btn {
+  border: 1px solid var(--app-border, #c5c7c9);
+  background: transparent;
+  border-radius: 999px;
+  padding: 2px 10px;
+  font-size: 0.75rem;
+  color: var(--app-text, #17324d);
+
+  &.is-active {
+    // Attivo: non solo il colore di sfondo — il bordo diventa pieno e il testo
+    // passa in grassetto, così lo stato si legge anche senza percepire il colore.
+    background: var(--app-primary, #06c);
+    border-color: var(--app-primary, #06c);
+    color: #fff;
+    font-weight: 600;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--app-primary, #06c);
+    outline-offset: 2px;
+  }
+}
+
+// Interruttore "questo è una domanda" nella barra di composizione.
+.chat-panel__ask-btn {
+  border: 1px solid transparent;
+  background: transparent;
+  border-radius: 6px;
+  padding: 2px 6px;
+  color: var(--app-muted, #5c6f82);
+  line-height: 0;
+
+  &.is-on {
+    border-color: var(--app-primary, #06c);
+    background: rgba(0, 102, 204, 0.1);
+    color: var(--app-primary, #06c);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--app-primary, #06c);
+    outline-offset: 2px;
+  }
+
+  &:disabled { opacity: 0.5; }
+}
+
+// Marcatura sopra al testo del messaggio: icona + etichetta, mai icona sola.
+.chat-panel__question-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--app-primary, #06c);
+  margin-bottom: 2px;
 }
 
 // Chat: barra con l'export (A5). Discreta, in cima alla lista.
@@ -2625,4 +2715,47 @@ html.live-call-immersive body {
   }
 
   .wr-piazza-stage { flex: 0 0 45vh; }
+}
+
+// Avviso della lente: la coda mostra solo i messaggi caricati.
+.chat-panel__lens-note {
+  margin: 4px 10px 0;
+  font-size: 0.7rem;
+  color: var(--app-muted, #5c6f82);
+}
+
+/* ── La sala si e' appena aperta ──────────────────────────────────────────
+   Il pulsante passa da spento a premibile mentre la persona sta guardando
+   altrove — la piazza, la chat, il proprio riflesso nell'anteprima. Un
+   cambio di stato muto se lo perde: qui il pulsante si illumina per qualche
+   secondo, cioe' esattamente il tempo in cui serve accorgersene.
+
+   Il battito si ferma da solo: un elemento che pulsa per sempre diventa
+   rumore e, per chi ha disturbi dell'attenzione, un ostacolo. Con il moto
+   ridotto richiesto dal sistema resta il contorno, che dice la stessa cosa
+   senza muoversi. */
+@keyframes wr-cta-pronta-battito {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(0, 135, 88, 0.55); }
+  50% { box-shadow: 0 0 0 12px rgba(0, 135, 88, 0); }
+}
+
+// Il richiamo vive su uno strato suo. Se prendesse `outline` e `box-shadow` del
+// pulsante si mangerebbe l'anello di focus da tastiera, che deve restare
+// visibile proprio mentre il pulsante chiede di essere premuto.
+.wr-cta-pronta {
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border: 3px solid #008758;
+    border-radius: inherit;
+    animation: wr-cta-pronta-battito 1.6s ease-out 6;
+    pointer-events: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wr-cta-pronta::after { animation: none; }
 }

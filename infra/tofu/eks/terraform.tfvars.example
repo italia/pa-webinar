@@ -1,0 +1,30 @@
+# Copia in terraform.tfvars (ignorato da git) e sostituisci i segnaposto.
+
+region          = "eu-south-1"
+cluster_version = "1.36"
+
+# Uscita della rete da cui si amministra il cluster (VPN, ufficio).
+cluster_endpoint_public_access_cidrs = ["<cidr-della-rete-di-amministrazione>"]
+
+# Ruoli IAM degli amministratori, oltre a chi applica il modulo (che ha già
+# la sua voce di accesso: non ripeterlo qui).
+cluster_admin_principal_arns = [
+  # "arn:aws:iam::<account>:role/<ruolo-amministratori>",
+]
+
+# Origine del portale (NEXT_PUBLIC_APP_URL del chart), per il CORS del bucket.
+portal_origins = ["https://webinar.example.com"]
+
+# "nlb": un bridge dietro un bilanciatore UDP con IP fisso (predefinito).
+# "node-public-ip": un bridge per nodo, nodi con IP pubblico (non verificato).
+jvb_exposure = "nlb"
+
+# TURN su TLS 443 per le reti che bloccano l'UDP.
+turn_enabled = false
+
+# Zona Route 53 del dominio, per i certificati con verifica DNS-01.
+# cert_manager_route53_zone_ids = ["<id-della-zona>"]
+
+# Pool facoltativi, da zero nodi.
+jibri_enabled = false
+gpu_enabled   = false

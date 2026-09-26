@@ -21,9 +21,10 @@ export interface UploadUrlOptions {
   /** Presigned URL validity in minutes. Default: 30. */
   expiresInMinutes?: number;
   /**
-   * Content-Type the uploader will send. S3 presigned PUTs validate this
-   * against the signature — it must match the `Content-Type` header on
-   * the upload request exactly, otherwise the PUT is rejected.
+   * Content-Type che chi carica invierà. Su S3 la firma di questo URL copre
+   * solo l'host: il tipo registrato sull'oggetto è quello dell'header
+   * `Content-Type` della PUT, che quindi va inviato comunque. Il caricamento
+   * dal browser (`createBrowserUpload`) invece lo firma.
    */
   contentType?: string;
 }
@@ -36,6 +37,49 @@ export interface DownloadUrlOptions {
    * `Content-Disposition`. Useful for recording downloads.
    */
   downloadFilename?: string;
+}
+
+/**
+ * Come il browser deve caricare un file grande direttamente sullo storage,
+ * senza passare dall'app. Il server sceglie il protocollo in base al
+ * fornitore; il client lo esegue così com'è, senza indovinarlo dall'URL.
+ *
+ *   - `azure-block`   URL con SAS per il protocollo a blocchi di Azure
+ *                     (Put Block + Put Block List), guidato dall'SDK Azure.
+ *   - `s3-put`        un solo PUT firmato; `headers` va inviato identico,
+ *                     perché fa parte della firma.
+ *   - `s3-multipart`  caricamento a parti: la parte N (da 1) va in PUT su
+ *                     `partUrls[N-1]` con i byte `[(N-1)*partSize, N*partSize)`;
+ *                     alla fine il server chiude il caricamento.
+ */
+export type BrowserUpload =
+  | { protocol: 'azure-block'; url: string }
+  | { protocol: 's3-put'; url: string; headers: Record<string, string> }
+  | {
+      protocol: 's3-multipart';
+      uploadId: string;
+      partSize: number;
+      partUrls: string[];
+    };
+
+/**
+ * Le parti arrivate non compongono il file dichiarato (ne manca qualcuna o
+ * la dimensione non torna): l'oggetto non viene ricomposto.
+ */
+export class IncompleteUploadError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'IncompleteUploadError';
+  }
+}
+
+export interface BrowserUploadOptions {
+  /** Content-Type dell'oggetto, già validato dal chiamante. */
+  contentType: string;
+  /** Dimensione esatta del file: decide il protocollo e il numero di parti. */
+  sizeBytes: number;
+  /** Validità degli URL firmati in minuti. Default: 30. */
+  expiresInMinutes?: number;
 }
 
 export interface BlobEntry {
@@ -61,6 +105,33 @@ export interface StorageProvider {
     key: string,
     opts?: UploadUrlOptions,
   ): Promise<{ uploadUrl: string; publicUrl: string }>;
+
+  /**
+   * Prepara il caricamento diretto dal browser di un file grande (video).
+   * Per S3 oltre la dimensione di una parte apre un caricamento a parti,
+   * che va poi chiuso con `completeBrowserUpload` o annullato con
+   * `abortBrowserUpload`.
+   */
+  createBrowserUpload(
+    key: string,
+    opts: BrowserUploadOptions,
+  ): Promise<BrowserUpload>;
+
+  /**
+   * Chiude un caricamento `s3-multipart`: verifica che le parti arrivate
+   * coprano esattamente `sizeBytes` e le ricompone nell'oggetto finale.
+   * Idempotente: su un caricamento già chiuso riesce se l'oggetto c'è con
+   * la dimensione dichiarata, così il client può ritentare una chiusura
+   * di cui non ha ricevuto la risposta. Per gli altri protocolli non c'è
+   * niente da chiudere.
+   */
+  completeBrowserUpload(
+    key: string,
+    opts: { uploadId: string; sizeBytes: number },
+  ): Promise<void>;
+
+  /** Annulla un caricamento a parti e ne libera le parti già caricate. */
+  abortBrowserUpload(key: string, uploadId: string): Promise<void>;
 
   /**
    * Server-side upload — the app receives the bytes (e.g. from a

@@ -17,10 +17,10 @@
 import { cookies } from 'next/headers';
 
 import { withErrorHandling } from '@/lib/api-handler';
-import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { requireEventManager } from '@/lib/auth/staff-session';
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
-import { NotFoundError, UnauthorizedError } from '@/lib/errors';
+import { NotFoundError } from '@/lib/errors';
 import { buildRecap, ensureEventRecap } from '@/lib/events/recap';
 import {
   bucketTimeline,
@@ -54,10 +54,9 @@ function personKey(opts: { senderId?: string | null; registrationId?: string | n
 }
 
 export const GET = withErrorHandling(async (_request, context) => {
-  const isAdmin = await isAdminAuthenticated(await cookies());
-  if (!isAdmin) throw new UnauthorizedError();
-
   const { id } = await (context as { params: Promise<{ id: string }> }).params;
+  // Dell'evento: l'admin, o l'organizzatore che l'ha creato (ADR-014).
+  await requireEventManager(await cookies(), id);
 
   const event = await prisma.event.findUnique({
     where: { id },
@@ -65,7 +64,19 @@ export const GET = withErrorHandling(async (_request, context) => {
   });
   if (!event) throw new NotFoundError('Event');
 
-  const [recap, registrations, chat, questions, upvotes, pollVotes, words, recording, sessions, reactionRows] =
+  const [
+    recap,
+    registrations,
+    chat,
+    questions,
+    registrationUpvotes,
+    guestUpvotes,
+    pollVotes,
+    words,
+    recording,
+    sessions,
+    reactionRows,
+  ] =
     await Promise.all([
       // Persisted recap survives the retention cleanup (raw rows are deleted);
       // fall back to a live build for events that aren't concluded yet.
@@ -86,6 +97,14 @@ export const GET = withErrorHandling(async (_request, context) => {
       prisma.questionUpvote.findMany({
         where: { question: { eventId: id } },
         select: { createdAt: true, registrationId: true },
+        orderBy: { createdAt: 'asc' },
+        take: CAP,
+      }),
+      // I pollici in su di chi vota con l'identificativo del browser stanno in
+      // una tabella a parte: contano come quelli degli iscritti.
+      prisma.questionGuestUpvote.findMany({
+        where: { question: { eventId: id } },
+        select: { createdAt: true, guestId: true },
         orderBy: { createdAt: 'asc' },
         take: CAP,
       }),
@@ -129,6 +148,11 @@ export const GET = withErrorHandling(async (_request, context) => {
     ]);
 
   const callSession = sessions[0] ?? null;
+
+  const upvotes: { createdAt: Date; registrationId: string | null; guestId: string | null }[] = [
+    ...registrationUpvotes.map((u) => ({ ...u, guestId: null })),
+    ...guestUpvotes.map((u) => ({ ...u, registrationId: null })),
+  ];
 
   // ── Attendance / conversion ──
   const registered = registrations.length;
@@ -210,7 +234,7 @@ export const GET = withErrorHandling(async (_request, context) => {
   const addKey = (set: Set<string>, k: string | null): void => { if (k) set.add(k); };
   for (const m of chatAudience) addKey(interactorSet, personKey({ senderId: m.senderId }));
   for (const q of questions) addKey(interactorSet, personKey({ registrationId: q.registrationId }));
-  for (const u of upvotes) addKey(interactorSet, personKey({ registrationId: u.registrationId }));
+  for (const u of upvotes) addKey(interactorSet, personKey({ registrationId: u.registrationId, guestId: u.guestId }));
   for (const v of pollVotes) addKey(interactorSet, personKey({ registrationId: v.registrationId, guestId: v.guestId }));
   for (const w of words) addKey(interactorSet, personKey({ registrationId: w.registrationId, guestId: w.guestId }));
   const distinctInteractors = interactorSet.size;
@@ -280,7 +304,8 @@ export const GET = withErrorHandling(async (_request, context) => {
   const capped =
     chat.length >= CAP ||
     questions.length >= CAP ||
-    upvotes.length >= CAP ||
+    registrationUpvotes.length >= CAP ||
+    guestUpvotes.length >= CAP ||
     pollVotes.length >= CAP ||
     words.length >= CAP ||
     reactionRows.length >= CAP;

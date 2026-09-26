@@ -2,39 +2,56 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
-import { Badge, Icon } from 'design-react-kit';
+import { Badge } from 'design-react-kit';
 
+import { Icon } from '@/components/ui/icon';
 import type { JitsiMeetExternalAPI, JitsiParticipant } from '@/types/jitsi';
 import { useJitsiStats, qualityLabel, qualityColor } from '@/hooks/use-jitsi-stats';
 import { isHumanParticipant, participantIdentityKey } from '@/lib/jitsi/participants';
 
+import {
+  canKick,
+  normalizeRole,
+  rolesAreMeaningful,
+  rolesFromRoomsInfo,
+  type ConferenceRole,
+} from './participant-roles';
+
 interface ParticipantPanelProps {
   api: JitsiMeetExternalAPI | null;
+  /** Ruolo nel PORTALE di chi guarda: decide il pulsante per espellere. */
   isModerator: boolean;
+  /** Endpoint id di questo browser nella conferenza (da
+   *  `videoConferenceJoined`): la propria riga non si espelle. */
+  localParticipantId?: string | null;
   onCountChange?: (count: number) => void;
 }
 
 export default function ParticipantPanel({
   api,
   isModerator,
+  localParticipantId = null,
   onCountChange,
 }: ParticipantPanelProps) {
   const t = useTranslations('live.participants');
   const tr = useTranslations('live.role');
   const [participants, setParticipants] = useState<JitsiParticipant[]>([]);
-  // F12: per-participant LOCAL playback volume (0..1, default 1 = 100%) and
+  // Per-participant LOCAL playback volume (0..1, default 1 = 100%) and
   // which row currently has its slider expanded. Kept separate from
   // `participants` so the 5s roster refresh never resets a user's choices.
   const [volumes, setVolumes] = useState<Record<string, number>>({});
   const [openVolumeId, setOpenVolumeId] = useState<string | null>(null);
+  // Ruoli nella conferenza, dall'unica fonte che li porta (vedi
+  // participant-roles): `getParticipantsInfo()` non li ha.
+  const [roles, setRoles] = useState<Record<string, ConferenceRole>>({});
   const stats = useJitsiStats(api);
 
   const refresh = useCallback(() => {
     if (!api) return;
-    // Show EVERY human endpoint (F2: minus the recorder bot). We deliberately
+    // Show EVERY human endpoint (i.e. minus the recorder bot). We deliberately
     // do NOT hide same-named connections from the roster — a moderator must be
     // able to see and kick every participant, and two distinct people can share
-    // a name. But we REPORT a de-duplicated people-count (F4) so the header
+    // a name. But we REPORT a de-duplicated people-count so the header
     // matches the "N persone" pill: a person who re-entered (leftover "zombie"
     // endpoint from a Back-button rejoin) is counted once.
     const list = api.getParticipantsInfo().filter(isHumanParticipant);
@@ -45,6 +62,24 @@ export default function ParticipantPanel({
     // valeva `#undefined` per tutti e li collassava in una persona sola.
     list.forEach((p, i) => seen.add(participantIdentityKey(p) || `#anon-${i}`));
     onCountChange?.(seen.size);
+    // I ruoli arrivano a parte e in modo asincrono; se la versione di Jitsi non
+    // espone la richiesta, o fallisce, restano quelli noti e basta.
+    let roomsInfo: Promise<unknown> | undefined;
+    try {
+      roomsInfo = api.getRoomsInfo?.();
+    } catch {
+      roomsInfo = undefined;
+    }
+    if (roomsInfo) {
+      roomsInfo.then((info) => {
+        const letti = rolesFromRoomsInfo(info);
+        // Una risposta che non si sa leggere non cancella i ruoli gia' noti
+        // dagli eventi `participantRoleChanged`.
+        setRoles((prev) => (Object.keys(letti).length > 0 ? letti : prev));
+      }).catch(() => {
+        /* nessun ruolo nuovo: le etichette restano quelle note */
+      });
+    }
   }, [api, onCountChange]);
 
   useEffect(() => {
@@ -59,13 +94,20 @@ export default function ParticipantPanel({
     const onJoin = () => refresh();
     const onLeft = () => refresh();
     const onNameChange = () => refresh();
+    const onRoleChange = (evt: { id: string; role: string }) => {
+      const role = normalizeRole(evt?.role);
+      if (!evt?.id || !role) return;
+      setRoles((prev) => (prev[evt.id] === role ? prev : { ...prev, [evt.id]: role }));
+    };
     api.addListener('participantJoined', onJoin);
     api.addListener('participantLeft', onLeft);
     api.addListener('displayNameChange', onNameChange);
+    api.addListener('participantRoleChanged', onRoleChange);
     return () => {
       api.removeListener('participantJoined', onJoin);
       api.removeListener('participantLeft', onLeft);
       api.removeListener('displayNameChange', onNameChange);
+      api.removeListener('participantRoleChanged', onRoleChange);
     };
   }, [api, refresh]);
 
@@ -78,7 +120,7 @@ export default function ParticipantPanel({
     [api, t],
   );
 
-  // F12: setParticipantVolume adjusts a remote participant's audio *for this
+  // setParticipantVolume adjusts a remote participant's audio *for this
   // browser only* (a local gain on the received track — it never affects what
   // anyone else hears), so it's a per-user preference and is offered to every
   // attendee. Clamp to [0,1] to match the HTMLMediaElement volume range.
@@ -98,7 +140,16 @@ export default function ParticipantPanel({
     [api],
   );
 
-  const roleBadge = (role: string) => {
+  // Le etichette di ruolo solo se distinguono qualcuno: dove Jitsi fa
+  // moderatore chiunque abbia un token, «Moderatore» su ogni riga sarebbe falso
+  // quanto «Partecipante» su tutte (vedi participant-roles).
+  const showRoles = rolesAreMeaningful(
+    roles,
+    participants.map((p) => p.participantId),
+  );
+
+  const roleBadge = (role: ConferenceRole | undefined) => {
+    if (!showRoles || !role) return null;
     if (role === 'moderator') {
       return (
         <Badge color="" pill style={{ fontSize: '0.68rem', backgroundColor: '#E8F0FE', color: 'var(--app-primary)' }}>
@@ -163,12 +214,15 @@ export default function ParticipantPanel({
         </div>
       ) : (
         <div className="d-flex flex-column gap-1">
-          {/* Moderators first, then participants */}
-          {participants
+          {/* Moderatori prima (quando i ruoli distinguono qualcuno), poi per nome */}
+          {[...participants]
             .sort((a, b) => {
-              if (a.role === 'moderator' && b.role !== 'moderator') return -1;
-              if (a.role !== 'moderator' && b.role === 'moderator') return 1;
-              return a.displayName.localeCompare(b.displayName);
+              if (showRoles) {
+                const aMod = roles[a.participantId] === 'moderator';
+                const bMod = roles[b.participantId] === 'moderator';
+                if (aMod !== bMod) return aMod ? -1 : 1;
+              }
+              return (a.displayName ?? '').localeCompare(b.displayName ?? '');
             })
             .map((p) => {
               const vol = volumes[p.participantId] ?? 1;
@@ -187,10 +241,10 @@ export default function ParticipantPanel({
                       <span className="text-truncate fw-semibold" style={{ maxWidth: 140 }}>
                         {shownName}
                       </span>
-                      {roleBadge(p.role)}
+                      {roleBadge(roles[p.participantId])}
                     </div>
                     <div className="d-flex gap-2 flex-shrink-0 align-items-center">
-                      {/* F12: per-user local playback volume. It only changes what
+                      {/* Per-user local playback volume. It only changes what
                           THIS browser hears, so it's offered to every attendee.
                           NB: contrary to the upstream docs, the external_api.js
                           this platform serves DOES list the local user in
@@ -215,12 +269,16 @@ export default function ParticipantPanel({
                       >
                         <VolumeGlyph muted={volPct === 0} />
                       </button>
-                      {isModerator && p.role !== 'moderator' && (
+                      {/* Lo decide il ruolo nel PORTALE, non quello in Jitsi
+                          (che senza ruoli dal token fa moderatori tutti), e
+                          mai sulla propria riga. */}
+                      {canKick(isModerator, p.participantId, localParticipantId) && (
                         <button
                           type="button"
                           className="btn btn-sm p-0 text-danger border-0"
                           onClick={() => handleKick(p.participantId)}
                           title={t('kick')}
+                          aria-label={t('kickName', { name: shownName })}
                           style={{ fontSize: '0.75rem', lineHeight: 1 }}
                         >
                           <Icon icon="it-close-circle" size="xs" />

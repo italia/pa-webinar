@@ -98,6 +98,10 @@ async function purgeRecordingArtifacts(
       });
     }
   }
+  // I testi originali conservati muoiono con i loro artefatti. La chiave
+  // esterna li porterebbe via comunque, ma una cancellazione implicita non è
+  // verificabile da un test: qui è esplicita.
+  await prisma.postprodOriginalBody.deleteMany({ where: { recordingId } });
   const del = await prisma.postprodArtifact.deleteMany({ where: { recordingId } });
   await prisma.speaker.deleteMany({ where: { recordingId } });
 

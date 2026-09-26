@@ -106,7 +106,7 @@ describe('getLocalized', () => {
   // name anywhere — for every attendee who registered from an /en page of an
   // event titled only in Italian.
   it('treats an EMPTY translation as missing and falls back', () => {
-    expect(getLocalized({ it: 'Sync DesIt + DevIt', en: '' }, 'en')).toBe('Sync DesIt + DevIt');
+    expect(getLocalized({ it: 'Incontro di rete + domande', en: '' }, 'en')).toBe('Incontro di rete + domande');
   });
 
   it('treats a whitespace-only translation as missing', () => {
@@ -214,8 +214,8 @@ describe('pruneEmptyTranslations', () => {
   });
 
   it('is what makes the stored shape and the read fallback agree', () => {
-    const stored = pruneEmptyTranslations({ it: 'Sync DesIt + DevIt', en: '' });
-    expect(getLocalized(stored, 'en')).toBe('Sync DesIt + DevIt');
+    const stored = pruneEmptyTranslations({ it: 'Incontro di rete + domande', en: '' });
+    expect(getLocalized(stored, 'en')).toBe('Incontro di rete + domande');
     // …and a consumer reading the JSON directly no longer sees an empty string.
     expect(stored).not.toHaveProperty('en');
   });

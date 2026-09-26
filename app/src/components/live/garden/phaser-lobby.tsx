@@ -14,6 +14,7 @@
  * as the React waiting room hands off to the consent/Jitsi flow.
  */
 import { useEffect, useRef } from 'react';
+import { useTranslations } from 'next-intl';
 
 import { mountLobby, type LobbyHandle } from '@pa-webinar/lobby';
 
@@ -45,6 +46,10 @@ interface PhaserLobbyProps {
    * colonna a fianco della scena.
    */
   hostOwnsEntry?: boolean;
+  /** Falso mentre il ponte video si sta accendendo: la piazza tiene le porte
+   *  chiuse e ci mette davanti il cordone, invece di aprire su una stanza che
+   *  non c'e'. */
+  salaPronta?: boolean;
 }
 
 export default function PhaserLobby({
@@ -56,7 +61,9 @@ export default function PhaserLobby({
   onEnterLive,
   onExitClassic,
   hostOwnsEntry = false,
+  salaPronta = true,
 }: PhaserLobbyProps) {
+  const tGate = useTranslations('waiting.gate');
   const containerRef = useRef<HTMLDivElement>(null);
   const handleRef = useRef<LobbyHandle | null>(null);
   const scheduleRef = useRef<EventStatusSchedule | null>(null);
@@ -89,7 +96,7 @@ export default function PhaserLobby({
     const conference = new EnterLiveConference(shared, (name, prefs) =>
       onEnterRef.current(name, prefs),
     );
-    const schedule = new EventStatusSchedule(status, startsAtMs, isHost);
+    const schedule = new EventStatusSchedule(status, startsAtMs, isHost, salaPronta);
     scheduleRef.current = schedule;
     const media = new BrowserMediaDevices();
 
@@ -98,6 +105,16 @@ export default function PhaserLobby({
       {
         worldSize: world,
         embed: hostOwnsEntry,
+        labels: {
+          gateOpen: tGate('gateOpen'),
+          stageLive: tGate('stageLive'),
+          gatePreparing: tGate('gatePreparing'),
+          stagePreparing: tGate('stagePreparing'),
+          ended: tGate('ended'),
+          // Il segnaposto lo riempie la piazza a ogni secondo.
+          startsIn: tGate('startsIn', { time: '{time}' }),
+          hostEarly: tGate('hostEarly'),
+        },
         initialProfile: { name: displayName.trim() },
         onExitToClassic: () => onExitRef.current(),
       },
@@ -123,6 +140,7 @@ export default function PhaserLobby({
       window.clearTimeout(settle);
       handle.destroy();
       handleRef.current = null;
+      scheduleRef.current?.dispose();
       scheduleRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -130,8 +148,8 @@ export default function PhaserLobby({
 
   // Push event-status changes (gate opens on LIVE without a refresh).
   useEffect(() => {
-    scheduleRef.current?.update(status);
-  }, [status]);
+    scheduleRef.current?.update(status, salaPronta);
+  }, [status, salaPronta]);
 
   // Push name edits from the React side, if any.
   useEffect(() => {

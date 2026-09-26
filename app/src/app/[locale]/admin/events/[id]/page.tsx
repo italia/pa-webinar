@@ -2,11 +2,13 @@ import { cookies } from 'next/headers';
 import { notFound } from 'next/navigation';
 import { getTranslations, getLocale } from 'next-intl/server';
 
-import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { getStaffSession, puoGestire } from '@/lib/auth/staff-session';
+import AccessDenied from '@/components/admin/access-denied';
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { getPublicEnv } from '@/lib/env';
 import { getSettings } from '@/lib/settings';
+import { guestAccessAllowed } from '@/lib/events/guest-window';
 import EventManagementClient from '@/components/admin/event-management-client';
 
 interface EventManagePageProps {
@@ -25,12 +27,12 @@ export default async function EventManagePage({
   const t = await getTranslations('admin');
   const locale = await getLocale();
 
-  // Admins navigating from the admin UI (e.g. the recordings library) reach
-  // this page without a moderator token. Authenticate via the admin_session
-  // cookie instead and fall through to load the event.
-  const adminAuthenticated = token ? false : await isAdminAuthenticated(await cookies());
+  // Chi arriva dall'area di amministrazione (l'elenco, la libreria video)
+  // non ha il token nell'indirizzo: vale la sessione dello staff, e per
+  // l'organizzatore solo sui propri eventi (ADR-014).
+  const staff = token ? null : await getStaffSession(await cookies());
 
-  if (!token && !adminAuthenticated) {
+  if (!token && !staff) {
     return (
       <div className="container py-5">
         <h1 className="mb-4">{t('title')}</h1>
@@ -48,6 +50,7 @@ export default async function EventManagePage({
   if (!UUID_RE.test(id)) {
     notFound();
   }
+  if (staff && !(await puoGestire(staff, id))) return <AccessDenied />;
 
   const event = await prisma.event.findUnique({
     where: { id },
@@ -86,7 +89,7 @@ export default async function EventManagePage({
   if (!event) {
     notFound();
   }
-  if (!adminAuthenticated && event.moderatorToken !== token) {
+  if (!staff && event.moderatorToken !== token) {
     notFound();
   }
 
@@ -111,6 +114,10 @@ export default async function EventManagePage({
     participantsCanStartVideo: event.participantsCanStartVideo,
     participantsCanShareScreen: event.participantsCanShareScreen,
     status: event.status,
+    eventType: event.eventType,
+    // Solo se c'e', mai l'hash: serve a dire a chi organizza che la sala
+    // chiedera' la password a chi entra da ospite.
+    hasJoinPassword: event.joinPasswordHash !== null,
     coverImageUrl: event.coverImageUrl,
     imageUrl: event.imageUrl,
     parseTitleKicker: event.parseTitleKicker,
@@ -220,6 +227,11 @@ export default async function EventManagePage({
         baseUrl={baseUrl}
         locale={locale}
         kickerEnabled={effectiveKicker}
+        guestEntryOpen={guestAccessAllowed(event, settings.guestAccessEnabled)}
+        // L'istante di questo rendering: le finestre a tempo della pagina
+        // pubblica si valutano su questo finche' il browser non ha il suo
+        // orologio, cosi' la prima passata del client coincide col server.
+        renderedAt={Date.now()}
       />
     </div>
   );

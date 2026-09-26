@@ -12,7 +12,16 @@ import {
 
 import ToggleSwitch from '@/components/ui/toggle-switch';
 
+/** I due campi che decidono se la pagina post-evento e' pubblica. */
+export interface PostEventVisibility {
+  postEventPublic: boolean;
+  postEventPublicUntil: string | null;
+}
+
 interface PostEventConfigProps {
+  /** Chiamata quando il server ha accettato un cambio di visibilita' della
+   *  pagina: chi ospita il pannello mostra i pulsanti che la aprono. */
+  onPublicPageChange?: (patch: Partial<PostEventVisibility>) => void;
   event: {
     id: string;
     moderatorToken: string;
@@ -32,8 +41,11 @@ interface PostEventConfigProps {
   };
 }
 
-export default function PostEventConfig({ event }: PostEventConfigProps) {
+export default function PostEventConfig({ event, onPublicPageChange }: PostEventConfigProps) {
   const t = useTranslations('postEvent');
+  const tc = useTranslations('common');
+  // Un salvataggio non riuscito: l'interruttore torna com'era e lo si dice.
+  const [saveFailed, setSaveFailed] = useState(false);
 
   const [pageVisible, setPageVisible] = useState(event.postEventPublic);
   const [libraryListed, setLibraryListed] = useState(event.libraryListed);
@@ -54,24 +66,50 @@ export default function PostEventConfig({ event }: PostEventConfigProps) {
       : '',
   );
 
+  /** Salva e dice se il server ha accettato; un errore di rete vale un no. */
   const save = useCallback(
-    async (data: Record<string, unknown>) => {
-      await fetch(`/api/events/${event.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${event.moderatorToken}`,
-        },
-        body: JSON.stringify(data),
-      });
+    async (data: Record<string, unknown>): Promise<boolean> => {
+      setSaveFailed(false);
+      let res: Response;
+      try {
+        res = await fetch(`/api/events/${event.id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${event.moderatorToken}`,
+          },
+          body: JSON.stringify(data),
+        });
+      } catch {
+        setSaveFailed(true);
+        return false;
+      }
+      if (!res.ok) {
+        setSaveFailed(true);
+        return false;
+      }
+      if (!onPublicPageChange) return true;
+      const patch: Partial<PostEventVisibility> = {};
+      if (typeof data.postEventPublic === 'boolean') patch.postEventPublic = data.postEventPublic;
+      if ('postEventPublicUntil' in data) {
+        patch.postEventPublicUntil =
+          typeof data.postEventPublicUntil === 'string' ? data.postEventPublicUntil : null;
+      }
+      if (Object.keys(patch).length > 0) onPublicPageChange(patch);
+      return true;
     },
-    [event.id, event.moderatorToken],
+    [event.id, event.moderatorToken, onPublicPageChange],
   );
 
   const handleToggle = useCallback(
     (field: string, value: boolean, setter: (v: boolean) => void) => {
       setter(value);
-      save({ [field]: value });
+      // Rifiutato o non arrivato: l'interruttore torna com'era, così non
+      // contraddice la pagina che lo ospita (che cambia solo a salvataggio
+      // riuscito).
+      void save({ [field]: value }).then((ok) => {
+        if (!ok) setter(!value);
+      });
     },
     [save],
   );
@@ -81,7 +119,7 @@ export default function PostEventConfig({ event }: PostEventConfigProps) {
       setVisibilityMode(mode);
       if (mode === 'always') {
         setVisibleUntil('');
-        save({ postEventPublicUntil: null });
+        void save({ postEventPublicUntil: null });
       }
     },
     [save],
@@ -91,7 +129,7 @@ export default function PostEventConfig({ event }: PostEventConfigProps) {
     (dateStr: string) => {
       setVisibleUntil(dateStr);
       if (dateStr) {
-        save({ postEventPublicUntil: new Date(dateStr + 'T23:59:59Z').toISOString() });
+        void save({ postEventPublicUntil: new Date(dateStr + 'T23:59:59Z').toISOString() });
       }
     },
     [save],
@@ -103,6 +141,12 @@ export default function PostEventConfig({ event }: PostEventConfigProps) {
         <h5 className="fw-semibold mb-3" style={{ color: 'var(--app-text)' }}>
           {t('config')}
         </h5>
+
+        {saveFailed && (
+          <div className="text-danger small mb-3" role="alert">
+            {tc('errorGeneric')}
+          </div>
+        )}
 
         <div className="d-flex flex-column gap-3">
           <div>

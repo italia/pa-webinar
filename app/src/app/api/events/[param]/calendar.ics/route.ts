@@ -27,7 +27,12 @@ export const GET = withErrorHandling(async (request, context) => {
 
   const settings = await getSettings();
 
+  // Stesso UID degli allegati email: chi ha gia' importato la conferma non si
+  // ritrova una seconda voce. L'ORGANIZER e' l'indirizzo di piattaforma, mai
+  // l'email personale del moderatore (vedi calendarOrganizerEmail).
   const ics = generateEventICal({
+    eventId: event.id,
+    updatedAt: event.updatedAt,
     title,
     description,
     startsAt: event.startsAt,
@@ -35,12 +40,6 @@ export const GET = withErrorHandling(async (request, context) => {
     timezone: event.timezone,
     url: eventUrl,
     organizerName: event.moderatorName ?? (settings.siteName || 'PA Webinar'),
-    // Route PUBBLICA (anonima, Cache-Control public): l'email personale del
-    // moderatore (cifrata a riposo apposta) non deve finire come ORGANIZER
-    // nell'ICS scaricabile da chiunque. L'indirizzo di piattaforma basta per
-    // la validità del calendario; l'email col link personale resta il canale
-    // per il contatto organizzatore.
-    organizerEmail: process.env.SMTP_FROM ?? 'noreply@dominio.gov.it',
   });
 
   return new NextResponse(ics, {

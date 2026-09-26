@@ -16,9 +16,9 @@
  *
  * Localizes prompts/options using the current next-intl locale, falling
  * back to Italian then the first available locale. Chrome labels (submit,
- * thank-you, loading) are passed in by the caller so the surrounding UI
- * owns the translations; sensible Italian defaults keep the existing
- * registration flow unchanged.
+ * thank-you, loading) can be passed in by the caller so the surrounding UI
+ * owns the wording; otherwise they come from the `questionnaire` messages,
+ * like the error texts and the yes/no options.
  */
 
 import { useCallback, useEffect, useState } from 'react';
@@ -85,6 +85,7 @@ export default function QuestionnaireForm({
 }: QuestionnaireFormProps) {
   const locale = useLocale();
   const tc = useTranslations('common');
+  const tq = useTranslations('questionnaire');
 
   const [loading, setLoading] = useState(true);
   const [q, setQ] = useState<RenderedQuestionnaire | null>(null);
@@ -112,8 +113,12 @@ export default function QuestionnaireForm({
         if (res.ok) {
           setQ(await res.json());
         } else {
-          setError('Impossibile caricare il questionario.');
+          setError(tq('loadFailed'));
         }
+      } catch {
+        // Rete assente o risposta illeggibile: lo si dice invece di lasciare
+        // un riquadro vuoto.
+        if (!cancelled) setError(tq('loadFailed'));
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -121,7 +126,7 @@ export default function QuestionnaireForm({
     return () => {
       cancelled = true;
     };
-  }, [eventSlug, placement, onNotFound]);
+  }, [eventSlug, placement, onNotFound, tq]);
 
   const setValue = useCallback((id: string, v: Value) => {
     setValues((prev) => ({ ...prev, [id]: v }));
@@ -162,16 +167,26 @@ export default function QuestionnaireForm({
         }
       );
       if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        setError(err.error ?? 'Invio fallito');
+        // Il messaggio del server e' tecnico e in inglese: chi risponde legge
+        // una frase nella propria lingua, scelta dal codice dell'errore.
+        const err = (await res.json().catch(() => ({}))) as { code?: string };
+        setError(
+          err.code === 'VALIDATION_ERROR'
+            ? tq('answersInvalid')
+            : err.code === 'ALREADY_SUBMITTED'
+              ? tq('alreadySubmitted')
+              : tq('submitFailed'),
+        );
         return;
       }
       setSubmitted(true);
       onSubmitted?.();
+    } catch {
+      setError(tq('submitFailed'));
     } finally {
       setSubmitting(false);
     }
-  }, [q, values, eventSlug, placement, accessToken, guestId, onSubmitted]);
+  }, [q, values, eventSlug, placement, accessToken, guestId, onSubmitted, tq]);
 
   if (loading) return <div className="text-muted">{tc('loading')}</div>;
   // Surface a load failure (non-404 error) instead of returning null, which
@@ -187,7 +202,7 @@ export default function QuestionnaireForm({
   if (submitted) {
     return (
       <div className="alert alert-success" role="alert">
-        {submittedMessage ?? 'Grazie per le tue risposte.'}
+        {submittedMessage ?? tq('thankYou')}
       </div>
     );
   }
@@ -230,7 +245,7 @@ export default function QuestionnaireForm({
         <Button color="primary" onClick={submit} disabled={submitting}>
           {submitting
             ? (submittingLabel ?? tc('loading'))
-            : (submitLabel ?? 'Invia risposte')}
+            : (submitLabel ?? tq('submit'))}
         </Button>
       </div>
     </div>
@@ -250,6 +265,7 @@ function ItemInput({
   value: Value | undefined;
   onChange: (v: Value) => void;
 }) {
+  const tq = useTranslations('questionnaire');
   const prompt = localize(item.prompt, locale);
 
   switch (item.type) {
@@ -339,8 +355,8 @@ function ItemInput({
           </Label>
           <div className="d-flex gap-3">
             {[
-              { value: 1, label: 'Sì' },
-              { value: 0, label: 'No' },
+              { value: 1, label: tq('yes') },
+              { value: 0, label: tq('no') },
             ].map((opt) => (
               <div className="form-check" key={opt.value}>
                 <input

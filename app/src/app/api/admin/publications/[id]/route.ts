@@ -13,10 +13,10 @@ import { cookies } from 'next/headers';
 import { z } from 'zod';
 
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
-import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { requireEventManager } from '@/lib/auth/staff-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { prisma } from '@/lib/db';
-import { AppError, UnauthorizedError, ValidationError } from '@/lib/errors';
+import { AppError, ValidationError } from '@/lib/errors';
 
 export const dynamic = 'force-dynamic';
 
@@ -36,7 +36,7 @@ const updatePublicationSchema = z.object({
     .nullable()
     .optional(),
   // Attach an already-uploaded blob to the event as its primary
-  // recording. The admin reaches this after the direct-to-Azure upload
+  // recording. The admin reaches this after the direct-to-storage upload
   // has completed, so the URL is guaranteed to point at an existing
   // blob in our container. Setting recordingUrl implies publishing
   // unless the caller explicitly passes recordingPublished: false.
@@ -47,13 +47,12 @@ const updatePublicationSchema = z.object({
 });
 
 export const PATCH = withErrorHandling(async (request, context) => {
-  const isAdmin = await isAdminAuthenticated(await cookies());
-  if (!isAdmin) throw new UnauthorizedError();
-
   const { id } = await context.params;
   if (!UUID_RE.test(id)) {
     throw new AppError('id must be a UUID', 400, 'BAD_REQUEST');
   }
+  // La pubblicazione di un evento la decide chi lo gestisce (ADR-014).
+  await requireEventManager(await cookies(), id);
 
   const body = await parseJsonBody(request);
   const parsed = updatePublicationSchema.safeParse(body);

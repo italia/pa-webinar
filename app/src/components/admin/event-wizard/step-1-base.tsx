@@ -22,6 +22,7 @@ import {
   type RecurrenceValue,
 } from '@/lib/utils/recurrence';
 import { fromDatetimeLocalInTz } from '@/lib/utils/date-format';
+import { EVENT_DESCRIPTION_MIN_LENGTH } from '@/lib/validation/event-description';
 import type { VideoQualityPreset } from '@/lib/jitsi/config';
 
 export interface Step1Value {
@@ -88,6 +89,11 @@ export default function Step1Base({
   const t = useTranslations('admin.wizard.step1');
   const tAdmin = useTranslations('admin');
   const [contentLocale, setContentLocale] = useState(defaultLocale);
+  // Titolo e descrizione sono obbligatori solo nella lingua predefinita:
+  // l'asterisco compare sulla sua scheda, come quello della barra delle lingue.
+  const onDefaultTab = contentLocale === defaultLocale;
+  const requiredMark = onDefaultTab ? ' *' : '';
+  const descriptionError = fieldErrors[`description.${defaultLocale}`];
 
   const setLocalized = (
     field: 'title' | 'description',
@@ -174,6 +180,7 @@ export default function Step1Base({
         <div className="mb-3">
           <label className="form-label fw-semibold" htmlFor="ev-title">
             {tAdmin('form.titleLabel')}
+            {requiredMark}
           </label>
           <input
             id="ev-title"
@@ -189,7 +196,7 @@ export default function Step1Base({
           />
           {/* Validation targets the default-locale title. Show the inline
               invalid message on that tab; on any other tab, point the admin
-              back to the required locale so the error isn't invisible (#4). */}
+              back to the required locale so the error isn't invisible. */}
           {fieldErrors[`title.${defaultLocale}`] &&
             (contentLocale === defaultLocale ? (
               <div className="invalid-feedback">{t('validation.titleRequired')}</div>
@@ -306,11 +313,24 @@ export default function Step1Base({
         <div className="mb-3">
           <MarkdownEditor
             id={`ev-description-${contentLocale}`}
-            label={tAdmin('form.descriptionLabel')}
+            label={`${tAdmin('form.descriptionLabel')}${requiredMark}`}
             value={value.description[contentLocale] ?? ''}
             onChange={(v) => setLocalized('description', contentLocale, v)}
             rows={6}
+            invalid={onDefaultTab && Boolean(descriptionError)}
+            errorText={t('validation.descriptionRequired', {
+              min: EVENT_DESCRIPTION_MIN_LENGTH,
+            })}
           />
+          {/* Come per il titolo: su un'altra scheda l'errore non avrebbe un
+              campo visibile, quindi indica la scheda in cui correggere. */}
+          {descriptionError && !onDefaultTab && (
+            <div className="small text-danger mt-1">
+              {t('validation.descriptionRequiredOtherLocale', {
+                locale: defaultLocale.toUpperCase(),
+              })}
+            </div>
+          )}
         </div>
       </section>
 

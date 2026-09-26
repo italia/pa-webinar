@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """LLM post-correction sulla trascrizione.
 
-Passa la trascrizione a Mistral con un glossario di nomi propri e
-sigle dell'evento (DTD, Raffaele, PCM, OVH, ...). Mistral corregge
-SOLO ortografia/nomi/sigle, mantiene il senso, una riga per segmento
-in input → una per ognuno in output.
+Passa la trascrizione a Mistral con un glossario di sigle e termini
+tecnici (DTD, PCM, OVH, Jitsi, ...) più gli eventuali nomi dei relatori
+passati da env. Mistral corregge SOLO ortografia/nomi/sigle, mantiene il
+senso, una riga per segmento in input → una per ognuno in output.
 
 Input:  transcript_diarized.json
 Output: transcript_diarized.json (sovrascrive — aggiorna `text` su
@@ -23,15 +23,19 @@ import requests
 LLM_URL = os.environ.get("OLLAMA_URL", "http://localhost:11434/v1")
 LLM_MODEL = os.environ.get("LLM_MODEL", "mistral-small3.2:24b")
 TX_FILE = "transcript_diarized.json"
+# Glossario TECNICO: sigle e termini che l'ASR sbaglia più spesso.
 GLOSSARY = [
     "DTD", "Dipartimento per la Trasformazione Digitale",
-    "Raffaele", "Raffaele Vitiello", "Alex", "Paolo", "Marco",
     "Jitsi", "Jitsi Meet", "pa-webinar",
     "PCM", "Microsoft", "Azure", "OVH", "Teams",
     "Kubernetes", "container", "cluster", "endpoint",
     "moderatore", "webinar", "codec",
     "accessibilità", "certificazione",
 ]
+# I nomi dei relatori NON stanno nel codice (sono dati personali): si
+# passano dall'esterno, per evento. Es.:
+#   GLOSSARY_NAMES="Mario Rossi,Anna Bianchi" python correct.py
+GLOSSARY += [n.strip() for n in os.environ.get("GLOSSARY_NAMES", "").split(",") if n.strip()]
 BATCH = 40
 SYSTEM = (
     "Sei un editor che corregge una trascrizione automatica di una riunione "

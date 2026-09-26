@@ -9,6 +9,8 @@
  * whatever bucket/container the provider is pointed to.
  */
 
+import type { BrowserUpload } from './provider';
+
 import { getRecordingsStorage, recordingsProviderLabel } from './index';
 
 const KEY_PREFIX = 'recordings/';
@@ -35,9 +37,9 @@ function keyFromFilename(filename: string): string {
 }
 
 /**
- * Generate a presigned upload URL for a new recording blob. Used by:
- *   - Jibri finalize hook (via /api/internal/recording-upload-url)
- *   - manual publication upload from the admin UI
+ * Generate a presigned upload URL for a new recording blob, used by the
+ * Jibri finalize hook (via /api/internal/recording-upload-url). Manual
+ * uploads from the admin UI go through `createRecordingBrowserUpload`.
  *
  * Returns null when no recordings provider is configured (dev mode)
  * or when required credentials are missing.
@@ -55,6 +57,50 @@ export async function generateRecordingUploadUrl(
     contentType: 'video/mp4',
   });
   return { uploadUrl, recordingUrl: publicUrl };
+}
+
+/**
+ * Prepara il caricamento diretto dal browser di un video nel dominio
+ * registrazioni. Il protocollo (blocchi Azure, PUT singolo o a parti S3) lo
+ * sceglie il provider; `recordingUrl` è l'URL canonico da salvare dopo il
+ * caricamento. Null quando lo storage delle registrazioni non è configurato.
+ */
+export async function createRecordingBrowserUpload(
+  filename: string,
+  opts: { contentType: string; sizeBytes: number; expiresInMinutes: number },
+): Promise<{ recordingUrl: string; upload: BrowserUpload } | null> {
+  const provider = getRecordingsStorage();
+  if (!provider) return null;
+
+  const key = keyFromFilename(filename);
+  const upload = await provider.createBrowserUpload(key, opts);
+  return { recordingUrl: provider.publicUrl(key), upload };
+}
+
+/**
+ * Chiude un caricamento a parti aperto da `createRecordingBrowserUpload`.
+ * False quando lo storage non è configurato; lancia `IncompleteUploadError`
+ * se le parti arrivate non compongono il file dichiarato.
+ */
+export async function completeRecordingBrowserUpload(
+  filename: string,
+  opts: { uploadId: string; sizeBytes: number },
+): Promise<boolean> {
+  const provider = getRecordingsStorage();
+  if (!provider) return false;
+  await provider.completeBrowserUpload(keyFromFilename(filename), opts);
+  return true;
+}
+
+/** Annulla un caricamento a parti e ne libera le parti già caricate. */
+export async function abortRecordingBrowserUpload(
+  filename: string,
+  uploadId: string,
+): Promise<boolean> {
+  const provider = getRecordingsStorage();
+  if (!provider) return false;
+  await provider.abortBrowserUpload(keyFromFilename(filename), uploadId);
+  return true;
 }
 
 /**

@@ -12,6 +12,7 @@ import {
   createRegistrationSchema,
   createQuestionSchema,
   updateQuestionStatusSchema,
+  upvoteQuestionSchema,
   jitsiTokenRequestSchema,
   createPollSchema,
   updatePollStatusSchema,
@@ -24,6 +25,11 @@ import {
   timerActionSchema,
   sendReactionSchema,
 } from '@/lib/validation/schemas';
+import {
+  MATERIAL_FILE_MAX_BYTES,
+  MATERIAL_FILES_PER_EVENT_MAX,
+  MATERIAL_FILES_PER_EVENT_MAX_BYTES,
+} from '@/lib/validation/materials';
 
 extendZodWithOpenApi(z);
 
@@ -90,6 +96,10 @@ registry.registerPath({
   path: '/api/status',
   tags: ['Status'],
   summary: 'Public system status',
+  description:
+    'When the administration turns the status page off, callers other than an administrator ' +
+    'receive only the video bridge and recorder readiness the live room needs ' +
+    '(metrics.jvbStatus, jvbParticipants, jvbStale, jibriStatus).',
   responses: { 200: { description: 'System status with component health, metrics, upcoming events' } },
 });
 
@@ -98,7 +108,10 @@ registry.registerPath({
   path: '/api/status/infrastructure',
   tags: ['Status'],
   summary: 'Infrastructure map data',
-  responses: { 200: { description: 'Detailed infrastructure topology, service status, Prometheus data' } },
+  responses: {
+    200: { description: 'Detailed infrastructure topology, service status, Prometheus data' },
+    404: { description: 'Status page turned off by the administration (administrators still receive the data)' },
+  },
 });
 
 registry.registerPath({
@@ -107,7 +120,10 @@ registry.registerPath({
   tags: ['Status'],
   summary: 'Public Prometheus metric queries (predefined)',
   request: { query: z.object({ metric: z.enum(['uptime', 'responseTime', 'participants', 'conferences', 'stress']), hours: z.string().optional() }) },
-  responses: { 200: { description: 'Time series data' } },
+  responses: {
+    200: { description: 'Time series data' },
+    404: { description: 'Status page turned off by the administration (administrators still receive the data)' },
+  },
 });
 
 registry.registerPath({
@@ -182,7 +198,25 @@ registry.registerPath({
   tags: ['Registration'],
   summary: 'Register for an event',
   request: { params: z.object({ param: z.string() }), body: { content: { 'application/json': { schema: createRegistrationSchema } } } },
-  responses: { 201: { description: 'Registration created with access token and join URL' } },
+  responses: {
+    201: { description: 'Registration created with access token and join URL (public registration on)' },
+    202: { description: 'Public registration off: the same body ({ eventSlug, delivery: "email" }) for every address. An invited address is registered, and an already registered one gets its link again; either way the personal link goes only to that mailbox. No access token, join URL or access cookie in the response' },
+    409: { description: 'ALREADY_REGISTERED (public registration on only)' },
+  },
+});
+
+registry.registerPath({
+  method: 'get',
+  path: '/api/events/{param}/registrations/enter',
+  tags: ['Registration'],
+  summary: 'Personal link from the email when public registration is off',
+  request: {
+    params: z.object({ param: z.string() }),
+    query: z.object({ token: z.string(), sig: z.string(), lang: z.string().optional() }),
+  },
+  responses: {
+    303: { description: 'Redirect to the live page with the token. With a valid signature it also sets the event access cookie that binds the browser to the registration' },
+  },
 });
 
 registry.registerPath({
@@ -200,7 +234,10 @@ registry.registerPath({
   tags: ['Jitsi'],
   summary: 'Get Jitsi JWT for room join',
   request: { params: z.object({ param: z.string() }), body: { content: { 'application/json': { schema: jitsiTokenRequestSchema } } } },
-  responses: { 200: { description: 'JWT token, room name, display name, role' } },
+  responses: {
+    200: { description: 'JWT token, room name, display name, role' },
+    403: { description: 'Guest request refused: GUEST_ACCESS_DISABLED (guest access turned off, scheduled events only) or JOIN_PASSWORD_REQUIRED (password-protected event without the join grant cookie)' },
+  },
 });
 
 registry.registerPath({
@@ -208,6 +245,10 @@ registry.registerPath({
   path: '/api/events/{param}/questions',
   tags: ['Q&A'],
   summary: 'List questions',
+  description:
+    'Callers without a registration token can pass their stable browser id as `?guestId=` ' +
+    '(at most 100 characters): the response then marks the questions that id has upvoted ' +
+    '(`hasUpvoted`) and reports `canUpvote: true`.',
   request: { params: z.object({ param: z.string() }) },
   responses: { 200: { description: 'Questions array with upvote counts' } },
 });
@@ -236,8 +277,23 @@ registry.registerPath({
   path: '/api/events/{param}/questions/{id}/upvote',
   tags: ['Q&A'],
   summary: 'Toggle upvote on a question',
-  request: { params: z.object({ param: z.string(), id: z.string() }) },
-  responses: { 200: { description: 'Upvote toggled' } },
+  description:
+    'One upvote per question per identity: a registration (`accessToken` in the body, or ' +
+    '`?token=`) or a stable browser id (`guestId`) for guests, speakers and moderators. A ' +
+    'browser-id upvote passes the same gate as reading the Q&A panel: a room token as ' +
+    '`Authorization: Bearer`, or, without a token, only while the room is open to guests and ' +
+    'the event has no join password. Limits: 10 per minute per identity, and 300 per minute ' +
+    'per client address and event for browser-id upvotes (`NETWORK_RATE_LIMIT`).',
+  request: {
+    params: z.object({ param: z.string(), id: z.string() }),
+    body: { content: { 'application/json': { schema: upvoteQuestionSchema } } },
+  },
+  responses: {
+    200: { description: 'Upvote toggled: `{ upvoted, upvoteCount }`' },
+    401: { description: 'No identity, or a guest outside the guest window' },
+    403: { description: 'A token that does not belong to this event' },
+    429: { description: 'Rate limited' },
+  },
 });
 
 registry.registerPath({
@@ -283,6 +339,13 @@ registry.registerPath({
   path: '/api/events/{param}/materials',
   tags: ['Materials'],
   summary: 'List event materials',
+  description:
+    'Public callers receive the materials whose visibility matches the current phase of the event: ' +
+    'before the start only BEFORE; during the event ALWAYS and DURING; after it ALWAYS and AFTER ' +
+    '(ALWAYS means in the live room and after the event, never before the start). ' +
+    'A moderator token (Bearer) receives every material; ' +
+    'an admin session does not widen this list (the admin API lists everything). Only the list ' +
+    'is filtered: an uploaded file stays reachable at its URL.',
   request: { params: z.object({ param: z.string() }) },
   responses: { 200: { description: 'Materials array' } },
 });
@@ -295,6 +358,45 @@ registry.registerPath({
   security: [{ [moderatorToken.name]: [] }],
   request: { params: z.object({ param: z.string() }), body: { content: { 'application/json': { schema: createMaterialSchema } } } },
   responses: { 201: { description: 'Material created' } },
+});
+
+registry.registerPath({
+  method: 'post',
+  path: '/api/events/{param}/materials/upload',
+  tags: ['Materials'],
+  summary: 'Upload a file material (moderator)',
+  description:
+    'Multipart form with a `file` field and optional `title` (defaults to the file name) and ' +
+    '`description`. Same types and size cap as the admin document upload: PDF, DOCX, PPTX, XLSX, TXT ' +
+    `up to ${MATERIAL_FILE_MAX_BYTES / 1024 / 1024} MiB, checked against the file content. The file ` +
+    'is stored in the files storage and served from /api/assets; the material is created with ' +
+    `visibility ALWAYS. An event holds at most ${MATERIAL_FILES_PER_EVENT_MAX} uploaded files and ` +
+    `${MATERIAL_FILES_PER_EVENT_MAX_BYTES / 1024 / 1024} MiB in total.`,
+  security: [{ [moderatorToken.name]: [] }],
+  request: {
+    params: z.object({ param: z.string() }),
+    body: {
+      content: {
+        'multipart/form-data': {
+          schema: z.object({
+            file: z.string().openapi({ format: 'binary' }),
+            title: z.string().max(300).optional(),
+            description: z.string().max(500).optional(),
+          }),
+        },
+      },
+    },
+  },
+  responses: {
+    201: { description: 'Material created' },
+    403: { description: 'Not a moderator token for this event' },
+    411: { description: 'Content-Length missing' },
+    409: { description: 'The event already holds the maximum number or size of uploaded files (MATERIALS_QUOTA_EXCEEDED)' },
+    413: { description: 'File too large' },
+    415: { description: 'File type not allowed or content does not match it' },
+    429: { description: 'Too many uploads: per-minute limit, or the server is already receiving other files' },
+    503: { description: 'Files storage not configured' },
+  },
 });
 
 registry.registerPath({

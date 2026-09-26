@@ -1,15 +1,14 @@
 import type { Metadata } from 'next';
 import { getTranslations, getLocale } from 'next-intl/server';
 
-import { getSettings } from '@/lib/settings';
+import { getSettings, nomeEnte } from '@/lib/settings';
 import LegalDocumentPage from '@/components/layout/legal-document-page';
 import { getLocalizedExact, type LocalizedField } from '@/lib/utils/locale';
 
 // Official AgID references for the accessibility statement model. External,
 // so rendered as plain anchors (not the locale-prefixed <Link>).
 const AGID_FORM_URL = 'https://form.agid.gov.it/';
-const AGID_ACCESSIBILITY_URL =
-  'https://www.agid.gov.it/it/design-servizi/accessibilita';
+const AGID_ACCESSIBILITY_URL = 'https://www.agid.gov.it/it/design-servizi/accessibilita';
 
 interface AccessibilityPageProps {
   params: Promise<{ locale: string }>;
@@ -30,6 +29,7 @@ export default async function AccessibilityPage() {
   const t = await getTranslations('legal.accessibility');
   const locale = await getLocale();
   const settings = await getSettings();
+  const tLegal = await getTranslations('legal');
 
   // Each adopting PA can publish its own statement via SiteSetting; that
   // overrides the built-in AgID-model template below.
@@ -56,12 +56,20 @@ export default async function AccessibilityPage() {
         <div className="col-lg-9">
           <header className="mb-4">
             <h1 className="mb-3">{t('title')}</h1>
-            <p className="lead text-muted mb-0">{t('intro')}</p>
+            <p className="lead text-muted mb-0">
+              {t('intro', {
+                organization: nomeEnte(settings) ?? tLegal('organizationNotConfigured'),
+              })}
+            </p>
           </header>
 
           <div className="d-flex flex-column gap-3">
             {sections.map((key) => (
-              <div key={key} className="card shadow-sm border-0" style={{ borderRadius: 8 }}>
+              <div
+                key={key}
+                className="card shadow-sm border-0"
+                style={{ borderRadius: 8 }}
+              >
                 <div className="card-body p-4">
                   <h2 className="h4 mb-3">{t(`sections.${key}.title`)}</h2>
                   <p className="mb-0" style={{ whiteSpace: 'pre-line' }}>

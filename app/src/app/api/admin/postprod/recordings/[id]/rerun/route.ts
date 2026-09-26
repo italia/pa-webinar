@@ -12,19 +12,18 @@
 import { cookies } from 'next/headers';
 
 import { withErrorHandling } from '@/lib/api-handler';
-import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { requireRecordingManager } from '@/lib/auth/staff-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { enqueuePostprodForRecording } from '@/lib/ai/enqueue';
 import { prisma } from '@/lib/db';
-import { NotFoundError, UnauthorizedError, ValidationError } from '@/lib/errors';
+import { NotFoundError, ValidationError } from '@/lib/errors';
 
 export const dynamic = 'force-dynamic';
 
 export const POST = withErrorHandling(async (request, context) => {
-  const isAdmin = await isAdminAuthenticated(await cookies());
-  if (!isAdmin) throw new UnauthorizedError();
-
   const { id } = (await (context as { params: Promise<{ id: string }> }).params);
+  // Dell'evento della registrazione: l'admin o chi l'ha creato (ADR-014).
+  await requireRecordingManager(await cookies(), id);
 
   // Check the master kill-switch upfront so we don't bump runCount /
   // flip the recording into POSTPROD_QUEUED and then leave it stuck
@@ -56,7 +55,7 @@ export const POST = withErrorHandling(async (request, context) => {
     // enqueue no-ops. Throw BEFORE the status mutation so the recording stays
     // at READY and the "Genera AI" button (which enables the flag) remains
     // available — otherwise a mistaken Rerun strands it in POSTPROD_QUEUED with
-    // zero jobs and no way back. (review #1)
+    // zero jobs and no way back.
     if (!recording.event.aiTranscriptEnabled) {
       throw new ValidationError(
         'AI transcript is disabled for this event. Use "Genera AI" to enable AI processing and start the pipeline.',

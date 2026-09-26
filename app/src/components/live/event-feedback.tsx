@@ -2,7 +2,9 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
-import { Button, Icon } from 'design-react-kit';
+import { Button } from 'design-react-kit';
+
+import { Icon } from '@/components/ui/icon';
 
 interface EventFeedbackProps {
   eventSlug: string;

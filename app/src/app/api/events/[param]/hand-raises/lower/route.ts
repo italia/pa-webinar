@@ -1,7 +1,7 @@
 /**
  * POST /api/events/[param]/hand-raises/lower — moderator lowers ONE raised hand.
  *
- * F8: the Jitsi IFrame API cannot lower a REMOTE participant's hand (only the
+ * The Jitsi IFrame API cannot lower a REMOTE participant's hand (only the
  * local user's `toggleRaiseHand`). So this route does NOT change any Jitsi state
  * directly; it publishes a targeted `lowerHand` control signal on the event's
  * control channel. The addressed participant's own browser (subscribed to

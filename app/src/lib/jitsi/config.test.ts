@@ -49,7 +49,7 @@ describe('Jitsi config exports', () => {
     expect(baseToolbarButtons).not.toContain('chat');
   });
 
-  it('baseToolbarButtons excludes native fullscreen (app-owned fullscreen keeps chat, #6)', () => {
+  it('baseToolbarButtons excludes native fullscreen (app-owned fullscreen keeps chat)', () => {
     // The native Jitsi fullscreen fullscreens the iframe only, hiding our chat.
     // LiveTopBar provides an app-owned fullscreen on the whole live wrapper.
     expect(baseToolbarButtons).not.toContain('fullscreen');
@@ -130,7 +130,7 @@ describe('Jitsi config overwrite', () => {
     expect(jitsiConfigOverwrite.p2p.enabled).toBe(false);
   });
 
-  it('disables self-view settings so hiding your own tile is not a one-way trap (F10)', () => {
+  it('disables self-view settings so hiding your own tile is not a one-way trap', () => {
     expect(jitsiConfigOverwrite.disableSelfViewSettings).toBe(true);
   });
 
@@ -138,7 +138,7 @@ describe('Jitsi config overwrite', () => {
     expect(jitsiConfigOverwrite.disableReactions).toBe(true);
   });
 
-  it('keeps a raised hand up via the NESTED raisedHands flag (F8; flat form no-ops on stable 10741)', () => {
+  it('keeps a raised hand up via the NESTED raisedHands flag (flat form no-ops on stable 10741)', () => {
     // The served build reads ONLY config.raisedHands?.disableRemoveRaisedHandOnFocus;
     // flattening this would silently re-enable auto-lowering on dominant speaker.
     expect(jitsiConfigOverwrite.raisedHands).toEqual({
@@ -234,7 +234,7 @@ describe('Instant call config', () => {
   it('instant call config inherits base config properties', () => {
     expect(instantCallConfigOverwrite.disableDeepLinking).toBe(true);
     expect(instantCallConfigOverwrite.prejoinConfig.enabled).toBe(false);
-    // F8: inherited via the ...jitsiConfigOverwrite spread.
+    // Raised-hand persistence is inherited via the ...jitsiConfigOverwrite spread.
     expect(instantCallConfigOverwrite.raisedHands?.disableRemoveRaisedHandOnFocus).toBe(true);
   });
 
@@ -324,7 +324,7 @@ describe('Video quality presets', () => {
     expect(save.stereo).toBe(false);
   });
 
-  it('caps screenshare framerate to a detail-first 5fps on everyday presets, keeping motion headroom only on MAX (F13)', () => {
+  it('caps screenshare framerate to a detail-first 5fps on everyday presets, keeping motion headroom only on MAX', () => {
     const fps = (q: string) =>
       resolveVideoQualityConfig(q).desktopSharingFrameRate as { min: number; max: number };
     for (const q of VIDEO_QUALITY_PRESETS) {

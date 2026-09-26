@@ -9,7 +9,7 @@
  *
  * Channel naming: `control:<eventId>` (one per event, like chat).
  *
- * F8 — raise-hand auto-lower: the Jitsi IFrame API can lower ONLY the
+ * Raise-hand auto-lower: the Jitsi IFrame API can lower ONLY the
  * local user's hand (`toggleRaiseHand`), never a remote one. So a
  * moderator "lower this hand" must reach the raiser's OWN browser, which
  * then lowers its own hand; Jitsi then broadcasts `raiseHandUpdated(0)`
@@ -17,10 +17,11 @@
  * that carries that signal to the target's browser.
  *
  * Best-effort, exactly like chat: with REDIS_URL unset (dev docker-compose)
- * publish/subscribe are no-ops and the signal simply doesn't deliver.
+ * OR with Redis unreachable, publish/subscribe are no-ops and the signal
+ * simply doesn't deliver.
  */
 
-import { getRedis, getRedisSubscriber } from '@/lib/redis';
+import { getRedis, getRedisSubscriber, withDeadline } from '@/lib/redis';
 
 export interface ControlEnvelope {
   /** The only control op today: tell the addressed client to lower its hand. */
@@ -44,18 +45,32 @@ function channel(eventId: string): string {
   return `control:${eventId}`;
 }
 
+/** Cap on the one publish the lower-hand route waits for. */
+const PUBLISH_TIMEOUT_MS = 1000;
+
 /**
  * Fan a control envelope out to every open control stream in the cluster.
  * Returns the subscriber count Redis reached (telemetry only; delivery is
  * best-effort — there is no persistence and no replay for control ops).
+ *
+ * Never waits and never throws. With the connection not ready we give up at
+ * once, because the client is configured to queue commands forever
+ * (`maxRetriesPerRequest: null`) instead of rejecting them; with the
+ * connection ready but unresponsive the publish is capped, because the
+ * moderator's POST is waiting on it. Either way the outcome degrades to
+ * "signal not delivered", which the raised-hands panel already handles.
  */
 export async function publishControl(
   eventId: string,
   envelope: ControlEnvelope,
 ): Promise<number> {
   const redis = getRedis();
-  if (!redis) return 0;
-  return redis.publish(channel(eventId), JSON.stringify(envelope));
+  if (!redis || redis.status !== 'ready') return 0;
+  return withDeadline(
+    redis.publish(channel(eventId), JSON.stringify(envelope)),
+    PUBLISH_TIMEOUT_MS,
+    0,
+  );
 }
 
 /**

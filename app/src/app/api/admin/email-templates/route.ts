@@ -6,6 +6,7 @@
 import { cookies } from 'next/headers';
 import { z } from 'zod';
 
+import { EMAIL_LOCALES } from '@/lib/email/lingua';
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
@@ -20,7 +21,9 @@ export const dynamic = 'force-dynamic';
 
 const upsertSchema = z.object({
   key: z.enum(EMAIL_TEMPLATE_KEYS as unknown as [EmailTemplateKey, ...EmailTemplateKey[]]),
-  locale: z.string().regex(/^[a-z]{2}$/),
+  // Solo le lingue in cui le email partono davvero: un testo in un'altra
+  // lingua non verrebbe mai usato.
+  locale: z.enum(EMAIL_LOCALES),
   subject: z.string().max(200).nullish(),
   heading: z.string().max(200).nullish(),
   bodyIntro: z.string().max(2000).nullish(),
@@ -31,6 +34,8 @@ const upsertSchema = z.object({
 
 const deleteSchema = z.object({
   key: z.enum(EMAIL_TEMPLATE_KEYS as unknown as [EmailTemplateKey, ...EmailTemplateKey[]]),
+  // Cancellare resta possibile anche per le lingue salvate prima che
+  // l'elenco si restringesse: non restano righe che nessuno puo' togliere.
   locale: z.string().regex(/^[a-z]{2}$/),
 });
 

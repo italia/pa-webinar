@@ -21,6 +21,8 @@ import { AppError, ForbiddenError, RateLimitError, UnauthorizedError, Validation
 import { constantTimeEqual, extractModeratorToken } from '@/lib/auth/moderator';
 import { encryptPII, encryptPIIOrNull, tryDecryptPII } from '@/lib/crypto/pii';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
+import { adminRequestLocale, sendGrantModeratorLink } from '@/lib/email/moderator-link';
+import { getSettings } from '@/lib/settings';
 import { z } from 'zod';
 
 export const dynamic = 'force-dynamic';
@@ -112,6 +114,16 @@ export const POST = withErrorHandling(async (request, context) => {
       token: randomUUID(),
     },
   });
+
+  // Il link personale per email, con il testo del ruolo (co-moderatore o
+  // relatore): e' quello che il wizard e il pannello promettono. Una concessione
+  // nasce una volta sola, quindi parte una volta sola.
+  if (parsed.data.email) {
+    const { defaultLocale: predefinita } = await getSettings();
+    await sendGrantModeratorLink(created.id, {
+      locale: adminRequestLocale(request, predefinita),
+    });
+  }
 
   return Response.json(
     {

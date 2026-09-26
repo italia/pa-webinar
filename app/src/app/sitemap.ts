@@ -3,6 +3,7 @@ import type { MetadataRoute } from 'next';
 import { prisma } from '@/lib/db';
 import { getPublicEnv } from '@/lib/env';
 import { publicEventStatusWhere } from '@/lib/events/visibility';
+import { localizedUrl } from '@/lib/utils/localized-url';
 
 export const dynamic = 'force-dynamic';
 
@@ -40,14 +41,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   });
 
   const eventPages: MetadataRoute.Sitemap = events.map((event) => ({
-    url: `${baseUrl}/it/eventi/${event.slug}`,
+    url: localizedUrl(baseUrl, `/events/${event.slug}`, 'it'),
     lastModified: event.updatedAt,
     changeFrequency: 'weekly' as const,
     priority: 0.8,
     alternates: {
       languages: {
-        it: `${baseUrl}/it/eventi/${event.slug}`,
-        en: `${baseUrl}/en/events/${event.slug}`,
+        it: localizedUrl(baseUrl, `/events/${event.slug}`, 'it'),
+        en: localizedUrl(baseUrl, `/events/${event.slug}`, 'en'),
       },
     },
   }));

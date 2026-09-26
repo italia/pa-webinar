@@ -137,7 +137,7 @@ jobs:
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo 'Deploy to test cluster:' >> "$GITHUB_STEP_SUMMARY"
           echo '```sh' >> "$GITHUB_STEP_SUMMARY"
-          echo 'kubectl -n videocall-test rollout restart deploy/videocall-test-pa-webinar' >> "$GITHUB_STEP_SUMMARY"
+          echo 'kubectl -n <namespace> rollout restart deploy/<fullname>' >> "$GITHUB_STEP_SUMMARY"
           echo '```' >> "$GITHUB_STEP_SUMMARY"
 
   # Postprod AI worker: container Python con CUDA + WhisperX + pyannote
@@ -158,7 +158,9 @@ jobs:
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
-          fetch-depth: 2
+          # Serve la storia, non gli ultimi due commit: il confronto qui sotto
+          # copre l'intero intervallo del push.
+          fetch-depth: 0
       - name: Filter changed files
         id: filter
         run: |
@@ -173,7 +175,17 @@ jobs:
           # `infra/ai/local-out/` è una utility di sviluppo (pipeline
           # locale sul 5090) che NON entra nell'immagine worker (il
           # Dockerfile copia solo `worker/`) → la escludiamo dal trigger.
-          CHANGED=$(git diff --name-only HEAD~1 HEAD || git ls-files)
+          # Intervallo del PUSH, non ultimo commit: un push di piu' commit
+          # (o un merge) nascondeva le modifiche di tutti tranne l'ultimo, e
+          # l'immagine non veniva ricostruita pur essendo cambiata. `before` e'
+          # zero al primo push su un ramo nuovo, e li' si ricade sul confronto
+          # con il commit precedente.
+          PRIMA="${{ github.event.before }}"
+          if [ -z "$PRIMA" ] || [ "$PRIMA" = "0000000000000000000000000000000000000000" ] \
+             || ! git cat-file -e "$PRIMA^{commit}" 2>/dev/null; then
+            PRIMA="HEAD~1"
+          fi
+          CHANGED=$(git diff --name-only "$PRIMA" HEAD || git ls-files)
           RELEVANT=$(echo "$CHANGED" | grep -E '^(infra/ai/|infra/helm/pa-webinar/templates/cronjob-postprod-)' | grep -vE '^infra/ai/local-out/' || true)
           if [ -n "$RELEVANT" ]; then
             echo "worker=true" >> "$GITHUB_OUTPUT"
@@ -253,7 +265,7 @@ jobs:
           echo '```sh' >> "$GITHUB_STEP_SUMMARY"
           echo '# Nessuna azione: il CronJob orchestrator crea Job nuovi col tag :dev a ogni tick.' >> "$GITHUB_STEP_SUMMARY"
           echo '# Per forzare un re-pull dei nodi GPU già allocati:' >> "$GITHUB_STEP_SUMMARY"
-          echo 'kubectl -n videocall-test delete jobs -l app.kubernetes.io/component=postprod-worker' >> "$GITHUB_STEP_SUMMARY"
+          echo 'kubectl -n <namespace> delete jobs -l app.kubernetes.io/component=postprod-worker' >> "$GITHUB_STEP_SUMMARY"
           echo '```' >> "$GITHUB_STEP_SUMMARY"
 
   # ── Recorder multi-track (ADR-013, Fase 3) ────────────────────────────
@@ -269,7 +281,9 @@ jobs:
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
-          fetch-depth: 2
+          # Serve la storia, non gli ultimi due commit: il confronto qui sotto
+          # copre l'intero intervallo del push.
+          fetch-depth: 0
       - name: Filter changed files
         id: filter
         run: |
@@ -278,7 +292,17 @@ jobs:
             echo "recorder=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          CHANGED=$(git diff --name-only HEAD~1 HEAD || git ls-files)
+          # Intervallo del PUSH, non ultimo commit: un push di piu' commit
+          # (o un merge) nascondeva le modifiche di tutti tranne l'ultimo, e
+          # l'immagine non veniva ricostruita pur essendo cambiata. `before` e'
+          # zero al primo push su un ramo nuovo, e li' si ricade sul confronto
+          # con il commit precedente.
+          PRIMA="${{ github.event.before }}"
+          if [ -z "$PRIMA" ] || [ "$PRIMA" = "0000000000000000000000000000000000000000" ] \
+             || ! git cat-file -e "$PRIMA^{commit}" 2>/dev/null; then
+            PRIMA="HEAD~1"
+          fi
+          CHANGED=$(git diff --name-only "$PRIMA" HEAD || git ls-files)
           if echo "$CHANGED" | grep -qE '^infra/recorder/'; then
             echo "recorder=true" >> "$GITHUB_OUTPUT"
           else
@@ -359,7 +383,9 @@ jobs:
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
-          fetch-depth: 2
+          # Serve la storia, non gli ultimi due commit: il confronto qui sotto
+          # copre l'intero intervallo del push.
+          fetch-depth: 0
       - name: Filter changed files
         id: filter
         run: |
@@ -368,7 +394,17 @@ jobs:
             echo "changed=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          CHANGED=$(git diff --name-only HEAD~1 HEAD || git ls-files)
+          # Intervallo del PUSH, non ultimo commit: un push di piu' commit
+          # (o un merge) nascondeva le modifiche di tutti tranne l'ultimo, e
+          # l'immagine non veniva ricostruita pur essendo cambiata. `before` e'
+          # zero al primo push su un ramo nuovo, e li' si ricade sul confronto
+          # con il commit precedente.
+          PRIMA="${{ github.event.before }}"
+          if [ -z "$PRIMA" ] || [ "$PRIMA" = "0000000000000000000000000000000000000000" ] \
+             || ! git cat-file -e "$PRIMA^{commit}" 2>/dev/null; then
+            PRIMA="HEAD~1"
+          fi
+          CHANGED=$(git diff --name-only "$PRIMA" HEAD || git ls-files)
           if echo "$CHANGED" | grep -qE '^infra/recorder-controller/'; then
             echo "changed=true" >> "$GITHUB_OUTPUT"
           else

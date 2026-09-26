@@ -20,7 +20,6 @@ export default async function SecurityPage() {
   const settings = await getSettings();
   const repoUrl = settings.githubUrl || 'https://github.com/italia/pa-webinar';
   const repoPath = repoUrl.replace(/^https?:\/\/github\.com\//, '').replace(/\/$/, '');
-  const scorecardBadge = `https://api.scorecard.dev/projects/github.com/${repoPath}/badge`;
   const scorecardViewer = `https://scorecard.dev/viewer/?uri=github.com/${repoPath}`;
 
   const sections = [
@@ -37,16 +36,10 @@ export default async function SecurityPage() {
         <div className="col-lg-9">
           <header className="mb-4">
             <h1 className="mb-3">{t('title')}</h1>
+            {/* Nessun badge di terze parti: la pagina non fa contattare altri
+                server al browser di chi legge (e la CSP lo bloccherebbe). Il
+                punteggio si consulta dal link testuale piu' sotto. */}
             <p className="lead text-muted mb-3">{t('intro')}</p>
-            <a
-              href={scorecardViewer}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={t('links.scorecard')}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={scorecardBadge} alt={t('links.scorecard')} />
-            </a>
           </header>
 
           <div className="d-flex flex-column gap-3">

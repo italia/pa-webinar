@@ -3,12 +3,12 @@ import { randomUUID } from 'crypto';
 import { cookies } from 'next/headers';
 
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
-import { UnauthorizedError, RateLimitError, ValidationError } from '@/lib/errors';
+import { RateLimitError, ValidationError } from '@/lib/errors';
 import { prisma } from '@/lib/db';
 import { createInstantCallSchema } from '@/lib/validation/schemas';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
 import { generateUniqueSlug } from '@/lib/utils/slug';
-import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { requireStaff } from '@/lib/auth/staff-session';
 import { getPublicEnv } from '@/lib/env';
 import { resolveLocale } from '@/lib/utils/locale';
 import { localizedUrl } from '@/lib/utils/localized-url';
@@ -19,8 +19,8 @@ export const dynamic = 'force-dynamic';
 
 export const POST = withErrorHandling(async (request) => {
   const cookieStore = await cookies();
-  const isAdmin = await isAdminAuthenticated(cookieStore);
-  if (!isAdmin) throw new UnauthorizedError();
+  // Anche la chiamata rapida e' un evento dell'organizzatore (ADR-014).
+  const session = await requireStaff(cookieStore);
 
   const ip = getClientIp(request);
   const rl = rateLimit(`create-instant:${ip}`, {
@@ -74,6 +74,7 @@ export const POST = withErrorHandling(async (request) => {
 
   const event = await prisma.event.create({
     data: {
+      createdById: session.accountId,
       slug,
       jitsiRoomName,
       moderatorToken,
@@ -109,6 +110,11 @@ export const POST = withErrorHandling(async (request) => {
       // the IDLE-demotion fallback both depend on it being non-null.
       provisioningStartedAt: now,
       dataRetentionDays: 7,
+      // Usa e getta: finita la chiamata non resta una scheda pubblica in giro.
+      // Chi vuole pubblicare la registrazione accende la pagina post-evento
+      // dall'area di amministrazione, che è una scelta, non un'impostazione
+      // predefinita ereditata dagli eventi a calendario.
+      postEventPublic: false,
       capacityEstimateJson: {
         ...capacityEstimate,
         computedAt: now.toISOString(),

@@ -4,8 +4,9 @@
  */
 
 import type { ResolvedEmailTemplate } from './resolve-template';
+import type { EmailLocale } from './lingua';
 
-type Locale = 'it' | 'en';
+type Locale = EmailLocale;
 
 export function escapeHtml(str: string): string {
   return str
@@ -35,6 +36,12 @@ interface EmailTemplateInput {
   organizationFooter?: string;
   /** Immagine dell'evento (URL assoluto), mostrata come banner in cima. */
   eventImageUrl?: string | null;
+  /**
+   * Link firmato per uscire dalla rubrica (lib/persons/opt-out-link), solo per
+   * chi ci e' entrato. Quando c'e', la nota a pie' di pagina lo dice e il link
+   * compare sempre, anche se l'amministrazione ha personalizzato il testo.
+   */
+  addressBookOptOutUrl?: string | null;
 }
 
 interface LocaleCopy {
@@ -54,6 +61,10 @@ interface LocaleCopy {
   downloadIcs: string;
   footer: string;
   unsubscribe: string;
+  /** Al posto di `unsubscribe` per chi e' in rubrica: li' un'azione serve. */
+  unsubscribeAddressBook: string;
+  /** Testo del link di uscita, lo stesso promesso dal modulo di iscrizione. */
+  addressBookOptOut: string;
 }
 
 const copy: Record<Locale, LocaleCopy> = {
@@ -92,6 +103,9 @@ const copy: Record<Locale, LocaleCopy> = {
     footer: '',
     unsubscribe:
       'Ricevi questa email perch\u00e9 ti sei registrato all\u2019evento. Nessuna azione ulteriore \u00e8 necessaria per disiscriverti.',
+    unsubscribeAddressBook:
+      'Ricevi questa email perch\u00e9 ti sei registrato all\u2019evento. Hai anche scelto di entrare nella rubrica degli eventi, per essere invitato a eventi simili: puoi revocare il consenso in qualsiasi momento.',
+    addressBookOptOut: 'Rimuovi i miei dati dalla rubrica',
   },
   en: {
     confirmationSubject: (title) => `Registration confirmed: ${title}`,
@@ -128,6 +142,126 @@ const copy: Record<Locale, LocaleCopy> = {
     footer: '',
     unsubscribe:
       'You are receiving this email because you registered for the event. No further action is needed to unsubscribe.',
+    unsubscribeAddressBook:
+      'You are receiving this email because you registered for the event. You also chose to join the events address book, to be invited to similar events: you can withdraw your consent at any time.',
+    addressBookOptOut: 'Remove me from the address book',
+  },
+  fr: {
+    confirmationSubject: (title) => `Inscription confirmée : ${title}`,
+    reminderSubject: (title, offsetMinutes) => {
+      if (offsetMinutes >= 1440) return `Rappel : ${title} commence demain`;
+      if (offsetMinutes >= 60) {
+        const hours = Math.round(offsetMinutes / 60);
+        return `Rappel : ${title} commence dans ${hours} heure${hours === 1 ? '' : 's'}`;
+      }
+      return `Rappel : ${title} commence dans ${offsetMinutes} minute${offsetMinutes === 1 ? '' : 's'}`;
+    },
+    confirmationHeading: 'Inscription confirmée',
+    reminderHeading: 'Rappel de l’événement',
+    reminderNote: (offsetMinutes) => {
+      if (offsetMinutes >= 1440) {
+        return 'L’événement auquel vous êtes inscrit commence demain. Utilisez le lien ci-dessous pour y accéder.';
+      }
+      if (offsetMinutes >= 60) {
+        const hours = Math.round(offsetMinutes / 60);
+        return `L’événement auquel vous êtes inscrit commence dans ${hours} heure${hours === 1 ? '' : 's'}. Utilisez le lien ci-dessous pour y accéder.`;
+      }
+      return `L’événement auquel vous êtes inscrit commence dans ${offsetMinutes} minute${offsetMinutes === 1 ? '' : 's'}. Utilisez le lien ci-dessous pour y accéder.`;
+    },
+    eventLabel: 'Événement',
+    dateLabel: 'Date',
+    timeLabel: 'Heure',
+    durationLabel: 'Durée',
+    joinLabel: 'Accéder à l’événement',
+    keepNote:
+      'Conservez cet e-mail : il contient votre lien personnel pour accéder à l’événement.',
+    viewEvent: 'Voir la page de l’événement',
+    addToCalendar: 'Ajoutez-le à votre agenda :',
+    downloadIcs: 'Télécharger le fichier .ics',
+    footer: '',
+    unsubscribe:
+      'Vous recevez cet e-mail parce que vous vous êtes inscrit à l’événement. Aucune autre action n’est nécessaire pour vous désinscrire.',
+    unsubscribeAddressBook:
+      'Vous recevez cet e-mail parce que vous vous êtes inscrit à l’événement. Vous avez également choisi de figurer dans le carnet d’adresses des événements, pour être invité à des événements similaires : vous pouvez retirer votre consentement à tout moment.',
+    addressBookOptOut: 'Supprimer mes données du carnet d’adresses',
+  },
+  de: {
+    confirmationSubject: (title) => `Anmeldung bestätigt: ${title}`,
+    reminderSubject: (title, offsetMinutes) => {
+      if (offsetMinutes >= 1440) return `Erinnerung: ${title} beginnt morgen`;
+      if (offsetMinutes >= 60) {
+        const hours = Math.round(offsetMinutes / 60);
+        return `Erinnerung: ${title} beginnt in ${hours} Stunde${hours === 1 ? '' : 'n'}`;
+      }
+      return `Erinnerung: ${title} beginnt in ${offsetMinutes} Minute${offsetMinutes === 1 ? '' : 'n'}`;
+    },
+    confirmationHeading: 'Anmeldung bestätigt',
+    reminderHeading: 'Erinnerung an die Veranstaltung',
+    reminderNote: (offsetMinutes) => {
+      if (offsetMinutes >= 1440) {
+        return 'Die Veranstaltung, für die Sie angemeldet sind, beginnt morgen. Nutzen Sie den folgenden Link, um teilzunehmen.';
+      }
+      if (offsetMinutes >= 60) {
+        const hours = Math.round(offsetMinutes / 60);
+        return `Die Veranstaltung, für die Sie angemeldet sind, beginnt in ${hours} Stunde${hours === 1 ? '' : 'n'}. Nutzen Sie den folgenden Link, um teilzunehmen.`;
+      }
+      return `Die Veranstaltung, für die Sie angemeldet sind, beginnt in ${offsetMinutes} Minute${offsetMinutes === 1 ? '' : 'n'}. Nutzen Sie den folgenden Link, um teilzunehmen.`;
+    },
+    eventLabel: 'Veranstaltung',
+    dateLabel: 'Datum',
+    timeLabel: 'Uhrzeit',
+    durationLabel: 'Dauer',
+    joinLabel: 'An der Veranstaltung teilnehmen',
+    keepNote:
+      'Bitte bewahren Sie diese E-Mail auf: Sie enthält Ihren persönlichen Link zur Veranstaltung.',
+    viewEvent: 'Seite der Veranstaltung anzeigen',
+    addToCalendar: 'Zu Ihrem Kalender hinzufügen:',
+    downloadIcs: '.ics herunterladen',
+    footer: '',
+    unsubscribe:
+      'Sie erhalten diese E-Mail, weil Sie sich für die Veranstaltung angemeldet haben. Für eine Abmeldung ist keine weitere Aktion erforderlich.',
+    unsubscribeAddressBook:
+      'Sie erhalten diese E-Mail, weil Sie sich für die Veranstaltung angemeldet haben. Sie haben außerdem der Aufnahme in das Veranstaltungs-Adressbuch zugestimmt, um zu ähnlichen Veranstaltungen eingeladen zu werden: Sie können Ihre Einwilligung jederzeit widerrufen.',
+    addressBookOptOut: 'Meine Daten aus dem Adressbuch entfernen',
+  },
+  es: {
+    confirmationSubject: (title) => `Inscripción confirmada: ${title}`,
+    reminderSubject: (title, offsetMinutes) => {
+      if (offsetMinutes >= 1440) return `Recordatorio: ${title} comienza mañana`;
+      if (offsetMinutes >= 60) {
+        const hours = Math.round(offsetMinutes / 60);
+        return `Recordatorio: ${title} comienza en ${hours} hora${hours === 1 ? '' : 's'}`;
+      }
+      return `Recordatorio: ${title} comienza en ${offsetMinutes} minuto${offsetMinutes === 1 ? '' : 's'}`;
+    },
+    confirmationHeading: 'Inscripción confirmada',
+    reminderHeading: 'Recordatorio del evento',
+    reminderNote: (offsetMinutes) => {
+      if (offsetMinutes >= 1440) {
+        return 'El evento en el que está inscrito comienza mañana. Utilice el enlace que figura a continuación para acceder.';
+      }
+      if (offsetMinutes >= 60) {
+        const hours = Math.round(offsetMinutes / 60);
+        return `El evento en el que está inscrito comienza en ${hours} hora${hours === 1 ? '' : 's'}. Utilice el enlace que figura a continuación para acceder.`;
+      }
+      return `El evento en el que está inscrito comienza en ${offsetMinutes} minuto${offsetMinutes === 1 ? '' : 's'}. Utilice el enlace que figura a continuación para acceder.`;
+    },
+    eventLabel: 'Evento',
+    dateLabel: 'Fecha',
+    timeLabel: 'Hora',
+    durationLabel: 'Duración',
+    joinLabel: 'Acceder al evento',
+    keepNote:
+      'Conserve este correo electrónico: contiene su enlace personal para acceder al evento.',
+    viewEvent: 'Ver la página del evento',
+    addToCalendar: 'Añada el evento a su calendario:',
+    downloadIcs: 'Descargar .ics',
+    footer: '',
+    unsubscribe:
+      'Recibe este correo electrónico porque se ha inscrito en el evento. No es necesaria ninguna otra acción para darse de baja.',
+    unsubscribeAddressBook:
+      'Recibe este correo electrónico porque se ha inscrito en el evento. También ha elegido formar parte de la Agenda de eventos, para recibir invitaciones a eventos similares: puede revocar su consentimiento en cualquier momento.',
+    addressBookOptOut: 'Eliminar mis datos de la agenda',
   },
 };
 
@@ -261,6 +395,25 @@ function calendarLinksSection(
 </table>`;
 }
 
+/**
+ * Il link di uscita dalla rubrica nel pie' di pagina. Separato dalla nota
+ * (che l'amministrazione puo' personalizzare): il link c'e' sempre, per chi
+ * e' in rubrica, qualunque sia il testo.
+ */
+function addressBookOptOutHtml(c: LocaleCopy, url: string | null | undefined): string {
+  if (!url) return '';
+  return `<br><a href="${escapeHtml(url)}" style="color:#5c6f82;">${escapeHtml(c.addressBookOptOut)}</a>`;
+}
+
+function addressBookOptOutText(c: LocaleCopy, url: string | null | undefined): string[] {
+  return url ? [`${c.addressBookOptOut}: ${url}`] : [];
+}
+
+/** La nota a pie' di pagina predefinita: per chi e' in rubrica dice come uscirne. */
+function defaultFooterNote(c: LocaleCopy, input: { addressBookOptOutUrl?: string | null }): string {
+  return input.addressBookOptOutUrl ? c.unsubscribeAddressBook : c.unsubscribe;
+}
+
 function ctaButton(label: string, url: string): string {
   return `<table role="presentation" style="margin:24px 0;"><tr><td>
 <a href="${url}" style="display:inline-block;padding:12px 28px;background:#06c;color:#fff;text-decoration:none;border-radius:4px;font-weight:600;font-size:16px;">
@@ -292,7 +445,7 @@ export function baseConfirmationCopy(input: EmailTemplateInput): ResolvedEmailTe
     bodyIntro: null,
     ctaLabel: c.joinLabel,
     infoNote: c.keepNote,
-    footerNote: c.unsubscribe,
+    footerNote: defaultFooterNote(c, input),
   };
 }
 
@@ -305,7 +458,7 @@ export function baseReminderCopy(input: EmailTemplateInput): ResolvedEmailTempla
     bodyIntro: c.reminderNote(offset),
     ctaLabel: c.joinLabel,
     infoNote: null,
-    footerNote: c.unsubscribe,
+    footerNote: defaultFooterNote(c, input),
   };
 }
 
@@ -342,7 +495,7 @@ ${info}
   return layout(
     escapeHtml(r.heading),
     body,
-    `${footerText}<br>${escapeHtml(r.footerNote)}`,
+    `${footerText}<br>${escapeHtml(r.footerNote)}${addressBookOptOutHtml(c, input.addressBookOptOutUrl)}`,
     input.locale,
     input.siteName,
     eventBanner(input.eventImageUrl, input.eventTitle),
@@ -385,6 +538,7 @@ export function confirmationText(
     '',
     footerText,
     r.footerNote,
+    ...addressBookOptOutText(c, input.addressBookOptOutUrl),
   ].join('\n');
 }
 
@@ -421,7 +575,7 @@ ${info}
   return layout(
     escapeHtml(r.heading),
     body,
-    `${footerText}<br>${escapeHtml(r.footerNote)}`,
+    `${footerText}<br>${escapeHtml(r.footerNote)}${addressBookOptOutHtml(c, input.addressBookOptOutUrl)}`,
     input.locale,
     input.siteName,
     eventBanner(input.eventImageUrl, input.eventTitle),
@@ -464,6 +618,7 @@ export function reminderText(
     '',
     footerText,
     r.footerNote,
+    ...addressBookOptOutText(c, input.addressBookOptOutUrl),
   ].join('\n');
 }
 
@@ -476,6 +631,8 @@ interface PostEventParticipantInput {
   eventPageUrl: string;
   siteName?: string;
   organizationFooter?: string;
+  /** Vedi EmailTemplateInput.addressBookOptOutUrl. */
+  addressBookOptOutUrl?: string | null;
 }
 
 interface PostEventModeratorInput extends PostEventParticipantInput {
@@ -526,6 +683,45 @@ const postEventCopy: Record<
     moderatorCta: 'Open the event page',
     recordingCta: 'Watch the recording',
   },
+  fr: {
+    participantSubject: (t) => `Merci de votre participation : ${t}`,
+    participantHeading: 'Merci de votre participation',
+    participantIntro: (t) =>
+      `Merci d’avoir participé à « ${t} ». Sur la page de l’événement, vous trouverez le récapitulatif et pourrez laisser votre avis.`,
+    participantCta: 'Voir le récapitulatif et donner votre avis',
+    moderatorSubject: (t) => `Événement terminé : ${t}`,
+    moderatorHeading: 'Votre événement est terminé',
+    moderatorIntro: (t) => `L’événement « ${t} » est terminé. Voici un bref récapitulatif.`,
+    recapLabel: 'Récapitulatif',
+    moderatorCta: 'Ouvrir la page de l’événement',
+    recordingCta: 'Voir l’enregistrement',
+  },
+  de: {
+    participantSubject: (t) => `Vielen Dank für Ihre Teilnahme: ${t}`,
+    participantHeading: 'Vielen Dank für Ihre Teilnahme',
+    participantIntro: (t) =>
+      `Vielen Dank für Ihre Teilnahme an „${t}“. Auf der Seite der Veranstaltung finden Sie die Zusammenfassung und können eine Rückmeldung geben.`,
+    participantCta: 'Zusammenfassung ansehen und Rückmeldung geben',
+    moderatorSubject: (t) => `Veranstaltung beendet: ${t}`,
+    moderatorHeading: 'Ihre Veranstaltung ist beendet',
+    moderatorIntro: (t) => `Die Veranstaltung „${t}“ ist beendet. Hier eine kurze Zusammenfassung.`,
+    recapLabel: 'Zusammenfassung',
+    moderatorCta: 'Seite der Veranstaltung öffnen',
+    recordingCta: 'Aufzeichnung ansehen',
+  },
+  es: {
+    participantSubject: (t) => `Gracias por su participación: ${t}`,
+    participantHeading: 'Gracias por su participación',
+    participantIntro: (t) =>
+      `Gracias por participar en «${t}». En la página del evento encontrará el resumen y podrá dejar su opinión.`,
+    participantCta: 'Ver el resumen y dejar su opinión',
+    moderatorSubject: (t) => `Evento finalizado: ${t}`,
+    moderatorHeading: 'Su evento ha finalizado',
+    moderatorIntro: (t) => `El evento «${t}» ha finalizado. A continuación, un breve resumen.`,
+    recapLabel: 'Resumen',
+    moderatorCta: 'Abrir la página del evento',
+    recordingCta: 'Ver la grabación',
+  },
 };
 
 export function postEventParticipantEmail(input: PostEventParticipantInput): {
@@ -534,15 +730,20 @@ export function postEventParticipantEmail(input: PostEventParticipantInput): {
   text: string;
 } {
   const c = postEventCopy[input.locale];
-  const footer = input.organizationFooter || copy[input.locale].footer;
+  const base = copy[input.locale];
+  const footer = input.organizationFooter || base.footer;
   const subject = c.participantSubject(input.eventTitle);
   const body = `
 <p style="margin:0 0 16px;">${escapeHtml(c.participantIntro(input.eventTitle))}</p>
 ${ctaButton(c.participantCta, input.eventPageUrl)}`;
+  // Solo per chi e' in rubrica: la nota su come uscirne e il link firmato.
+  const optOutHtml = input.addressBookOptOutUrl
+    ? `${footer ? '<br>' : ''}${escapeHtml(base.unsubscribeAddressBook)}${addressBookOptOutHtml(base, input.addressBookOptOutUrl)}`
+    : '';
   const html = layout(
     escapeHtml(c.participantHeading),
     body,
-    footer,
+    `${footer}${optOutHtml}`,
     input.locale,
     input.siteName,
   );
@@ -554,6 +755,9 @@ ${ctaButton(c.participantCta, input.eventPageUrl)}`;
     `${c.participantCta}: ${input.eventPageUrl}`,
     '',
     footer,
+    ...(input.addressBookOptOutUrl
+      ? [base.unsubscribeAddressBook, ...addressBookOptOutText(base, input.addressBookOptOutUrl)]
+      : []),
   ].join('\n');
   return { subject, html, text };
 }
@@ -594,4 +798,100 @@ ${recordingHtml}`;
   }
   textLines.push('', footer);
   return { subject, html, text: textLines.join('\n') };
+}
+
+// ── Accesso dello staff (ADR-014) ───────────────────────────────────────
+
+export interface StaffLoginEmailInput {
+  locale: Locale;
+  name: string;
+  url: string;
+  minutes: number;
+  siteName?: string;
+}
+
+const staffLoginCopy: Record<
+  Locale,
+  {
+    subject: (site: string) => string;
+    heading: string;
+    intro: (name: string, site: string) => string;
+    cta: string;
+    expiry: (minutes: number) => string;
+    ignore: string;
+  }
+> = {
+  it: {
+    subject: (site) => `Il tuo link di accesso a ${site}`,
+    heading: 'Accedi all’area di amministrazione',
+    intro: (name, site) =>
+      `Ciao ${name}, ecco il tuo link per entrare nell’area di amministrazione di ${site}. Vale una sola volta.`,
+    cta: 'Entra',
+    expiry: (m) => `Il link scade tra ${m} minuti.`,
+    ignore: 'Se non aspettavi questo messaggio, ignoralo: senza il link non entra nessuno.',
+  },
+  en: {
+    subject: (site) => `Your sign-in link for ${site}`,
+    heading: 'Sign in to the administration area',
+    intro: (name, site) =>
+      `Hello ${name}, here is your link to sign in to the administration area of ${site}. It works only once.`,
+    cta: 'Sign in',
+    expiry: (m) => `The link expires in ${m} minutes.`,
+    ignore: 'If you were not expecting this message, ignore it: nobody can sign in without the link.',
+  },
+  fr: {
+    subject: (site) => `Votre lien de connexion à ${site}`,
+    heading: 'Connexion à l’espace d’administration',
+    intro: (name, site) =>
+      `Bonjour ${name}, voici votre lien pour accéder à l’espace d’administration de ${site}. Il n’est valable qu’une seule fois.`,
+    cta: 'Se connecter',
+    expiry: (m) => `Le lien expire dans ${m} minute${m === 1 ? '' : 's'}.`,
+    ignore:
+      'Si vous n’attendiez pas ce message, ignorez-le : personne ne peut se connecter sans le lien.',
+  },
+  de: {
+    subject: (site) => `Ihr Anmeldelink für ${site}`,
+    heading: 'Anmeldung im Verwaltungsbereich',
+    intro: (name, site) =>
+      `Guten Tag ${name}, hier ist Ihr Link zur Anmeldung im Verwaltungsbereich von ${site}. Er ist nur einmal gültig.`,
+    cta: 'Anmelden',
+    expiry: (m) => `Der Link läuft in ${m} Minute${m === 1 ? '' : 'n'} ab.`,
+    ignore:
+      'Falls Sie diese Nachricht nicht erwartet haben, ignorieren Sie sie: Ohne den Link kann sich niemand anmelden.',
+  },
+  es: {
+    subject: (site) => `Su enlace de acceso a ${site}`,
+    heading: 'Acceso al área de administración',
+    intro: (name, site) =>
+      `Hola, ${name}: este es su enlace para acceder al área de administración de ${site}. Solo es válido una vez.`,
+    cta: 'Acceder',
+    expiry: (m) => `El enlace caduca en ${m} minuto${m === 1 ? '' : 's'}.`,
+    ignore:
+      'Si no esperaba este mensaje, ignórelo: nadie puede acceder sin el enlace.',
+  },
+};
+
+export function staffLoginEmail(input: StaffLoginEmailInput): {
+  subject: string;
+  html: string;
+  text: string;
+} {
+  const c = staffLoginCopy[input.locale];
+  const site = input.siteName ?? 'PA Webinar';
+  const body = `
+<p style="margin:0 0 16px;">${escapeHtml(c.intro(input.name, site))}</p>
+${ctaButton(c.cta, input.url)}
+<p style="margin:16px 0 0;color:#5A768A;font-size:14px;">${escapeHtml(c.expiry(input.minutes))}<br>${escapeHtml(c.ignore)}</p>`;
+  const html = layout(escapeHtml(c.heading), body, '', input.locale, site);
+  const text = [
+    c.heading,
+    '',
+    c.intro(input.name, site),
+    '',
+    `${c.cta}: ${input.url}`,
+    '',
+    c.expiry(input.minutes),
+    c.ignore,
+  ].join('\n');
+  return { subject: c.subject(site), html, text };
 }

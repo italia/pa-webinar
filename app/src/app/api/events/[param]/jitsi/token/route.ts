@@ -21,6 +21,8 @@ import { decryptPII, tryDecryptPII } from '@/lib/crypto/pii';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
 import { cookies } from 'next/headers';
 import { verifyEventAccess, eventAccessCookieName } from '@/lib/event-session';
+import { guestAccessAllowed } from '@/lib/events/guest-window';
+import { hasJoinGrant } from '@/lib/events/join-grant';
 
 export const dynamic = 'force-dynamic';
 
@@ -105,7 +107,7 @@ export const POST = withErrorHandling(async (request, context) => {
     }
 
     // The accessToken lives in the personal join link, so a FORWARDED link would
-    // otherwise let the opener mint the registrant's identity (F7). Bind identity
+    // otherwise let the opener mint the registrant's identity. Bind identity
     // to the browser that registered: the signed `event_access` cookie must carry
     // this same token. A non-owner still gets in (possessing the shared token
     // authorizes entry), but under THEIR OWN typed name and a fresh guest
@@ -190,8 +192,25 @@ export const POST = withErrorHandling(async (request, context) => {
 
   // ── Guest flow (no registration, LIVE events only) ──
   if (guestName) {
+    // Sugli eventi a calendario l'ingresso senza iscrizione e' una scelta
+    // dell'amministrazione; la chiamata rapida resta aperta a chi ha il link
+    // (lib/events/guest-window). La pagina live non offre l'ingresso da
+    // ospite quando e' spento: qui si chiude la porta a chi chiama la rotta
+    // direttamente, o a chi era gia' in sala d'attesa quando e' stato spento.
+    if (!guestAccessAllowed(event, (await getSettings()).guestAccessEnabled)) {
+      throw new AppError('Guest access is disabled', 403, 'GUEST_ACCESS_DISABLED');
+    }
+
     if (event.status !== 'LIVE') {
       throw new ConflictError('Guest access is only available during live events');
+    }
+
+    // Evento protetto da password: la pagina live pretende il cookie di
+    // accesso prima di mostrare l'ingresso da ospite, e la chat lo pretende
+    // prima di farsi leggere. Senza lo stesso controllo qui, bastava chiamare
+    // la rotta col solo nome per avere il JWT della sala.
+    if (event.joinPasswordHash && !(await hasJoinGrant(event.id))) {
+      throw new AppError('Join password required', 403, 'JOIN_PASSWORD_REQUIRED');
     }
 
     // Default 120/min per IP to accommodate bursts of participants joining

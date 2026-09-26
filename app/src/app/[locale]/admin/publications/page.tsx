@@ -1,18 +1,14 @@
-import { cookies } from 'next/headers';
-import { redirect } from 'next/navigation';
 import { getTranslations, getLocale } from 'next-intl/server';
 
-import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { soloAdmin } from '@/lib/auth/staff-page';
 import PublicationsDashboard from '@/components/admin/publications-dashboard';
 
 export const dynamic = 'force-dynamic';
 
 export default async function PublicationsPage() {
   const locale = await getLocale();
-  const isAdmin = await isAdminAuthenticated(await cookies());
-  if (!isAdmin) {
-    redirect(`/${locale}/admin/login`);
-  }
+  const negato = await soloAdmin(locale);
+  if (negato) return negato;
 
   const t = await getTranslations('admin.publications');
 
@@ -26,7 +22,7 @@ export default async function PublicationsPage() {
           <p className="text-secondary mb-0">{t('subtitle')}</p>
         </div>
       </div>
-      <PublicationsDashboard locale={locale} />
+      <PublicationsDashboard />
     </div>
   );
 }

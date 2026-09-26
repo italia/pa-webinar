@@ -1,3 +1,11 @@
+{{- include "pa-webinar.validateRnnoise" . }}
+{{- include "pa-webinar.validateDatastoreSecret" . }}
+{{- include "pa-webinar.validateJitsiJwt" . }}
+{{- include "pa-webinar.validateJitsiCredentials" . }}
+{{- include "pa-webinar.validateIngressClass" . }}
+{{- include "pa-webinar.validateSite" . }}
+{{- include "pa-webinar.validateConferenceIngress" . }}
+{{- include "pa-webinar.validateBackup" . }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -92,9 +100,23 @@ spec:
                   fieldPath: metadata.name
             {{- if .Values.jitsi.enabled }}
             - name: JVB_HEALTH_URL
-              value: {{ .Values.jitsi.jvbHealthUrl | default (printf "http://%s-jitsi-meet-jvb:8080" .Release.Name) | quote }}
+              value: {{ include "pa-webinar.jvbHealthUrl" . | quote }}
+            {{- /*
+              Solo con Jibri acceso, o con un indirizzo indicato: verso un
+              Service che non esiste ogni richiesta della pagina di stato
+              aspetterebbe la risoluzione del nome fallita.
+            */}}
+            {{- with include "pa-webinar.jibriHealthUrl" . }}
             - name: JIBRI_HEALTH_URL
-              value: {{ .Values.jitsi.jibriHealthUrl | default (printf "http://%s-jitsi-meet-jibri:2222" .Release.Name) | quote }}
+              value: {{ . | quote }}
+            {{- end }}
+            {{- end }}
+            {{- with include "pa-webinar.extraCaCerts" . }}
+            # Autorità di certificazione in più per le connessioni in uscita
+            # (SMTP, object storage, indirizzi pubblici del portale e della
+            # conferenza), aggiunte a quelle di sistema: app.extraCaCerts.
+            - name: NODE_EXTRA_CA_CERTS
+              value: {{ printf "%s/%s" (include "pa-webinar.extraCaCertsDir" $) (include "pa-webinar.extraCaCertsFile" $) | quote }}
             {{- end }}
             {{- if .Values.recorder.enabled }}
             # Edge-trigger del recorder (ADR-013 Fase 3): jvb-desired-replicas
@@ -103,11 +125,30 @@ spec:
               value: {{ printf "http://%s-recorder-controller:%v" (include "pa-webinar.fullname" .) (.Values.recorder.controller.port | default 8080) | quote }}
             {{- end }}
             {{- if .Values.redis.enabled }}
-            # Derived at render time from the in-cluster redis subchart.
-            # Overridden by REDIS_URL from the Secret/envFrom block above
-            # if the operator set it explicitly (external / managed Redis).
+            # La password arriva dal Secret dei datastore, non da quello
+            # dell'applicazione: il container del database monta quest'ultimo
+            # per intero, e le due cose vanno tenute separate.
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "pa-webinar.datastoreSecretName" . }}
+                  key: REDIS_PASSWORD
+                  # Facoltativa di proposito. La chiave c'è in ogni
+                  # installazione con Redis in cluster, ma non è dichiarata
+                  # obbligatoria per i Secret creati a mano o sincronizzati da
+                  # un gestore esterno: pretenderla bloccherebbe l'avvio del
+                  # pod, trasformando una funzione degradata in un sito giù.
+                  optional: true
+            # Indirizzo del Redis in cluster, composto qui. Con il sottochart
+            # attivo questo valore VINCE su un REDIS_URL messo nel Secret,
+            # perché `env` ha la precedenza su `envFrom`: per puntare a un
+            # Redis gestito si spegne il sottochart (`redis.enabled: false`)
+            # e si passa REDIS_URL nel Secret.
+            {{- $redis := .Values.redis | default dict }}
+            {{- $redisHost := include "pa-webinar.subchartFullname" (dict "nome" "redis" "valori" $redis "release" .Release.Name) }}
+            {{- $redisPort := dig "master" "service" "ports" "redis" 6379 $redis }}
             - name: REDIS_URL
-              value: "redis://default:$(REDIS_PASSWORD)@{{ .Release.Name }}-redis-master.{{ .Release.Namespace }}.svc.cluster.local:6379/0"
+              value: "redis://default:$(REDIS_PASSWORD)@{{ $redisHost }}-master.{{ .Release.Namespace }}.svc.cluster.local:{{ $redisPort }}/0"
             {{- end }}
           {{- with .Values.app.probes.startup }}
           startupProbe:
@@ -124,9 +165,35 @@ spec:
           resources:
             {{- toYaml .Values.app.resources | nindent 12 }}
           volumeMounts:
-            {{- toYaml .Values.app.extraVolumeMounts | nindent 12 }}
+            {{- with .Values.app.extraVolumeMounts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+            {{- if include "pa-webinar.extraCaCerts" . }}
+            - name: extra-ca-certs
+              mountPath: {{ include "pa-webinar.extraCaCertsDir" . }}
+              readOnly: true
+            {{- end }}
       volumes:
-        {{- toYaml .Values.app.extraVolumes | nindent 8 }}
+        {{- with .Values.app.extraVolumes }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        {{- with include "pa-webinar.extraCaCerts" . }}
+        - name: extra-ca-certs
+          {{- $ca := $.Values.app.extraCaCerts }}
+          {{- if $ca.secretName }}
+          secret:
+            secretName: {{ $ca.secretName }}
+            items:
+              - key: {{ $ca.key | default "ca.crt" }}
+                path: {{ include "pa-webinar.extraCaCertsFile" $ }}
+          {{- else }}
+          configMap:
+            name: {{ $ca.configMapName }}
+            items:
+              - key: {{ $ca.key | default "ca.crt" }}
+                path: {{ include "pa-webinar.extraCaCertsFile" $ }}
+          {{- end }}
+        {{- end }}
       {{- with .Values.app.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

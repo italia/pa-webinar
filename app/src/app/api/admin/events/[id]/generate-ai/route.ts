@@ -20,19 +20,18 @@
 import { cookies } from 'next/headers';
 
 import { withErrorHandling } from '@/lib/api-handler';
-import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { requireEventManager } from '@/lib/auth/staff-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { enqueuePostprodForRecording } from '@/lib/ai/enqueue';
 import { prisma } from '@/lib/db';
-import { NotFoundError, UnauthorizedError, ValidationError } from '@/lib/errors';
+import { NotFoundError, ValidationError } from '@/lib/errors';
 
 export const dynamic = 'force-dynamic';
 
 export const POST = withErrorHandling(async (request, context) => {
-  const isAdmin = await isAdminAuthenticated(await cookies());
-  if (!isAdmin) throw new UnauthorizedError();
-
   const { id } = await (context as { params: Promise<{ id: string }> }).params;
+  // Dell'evento: l'admin, o l'organizzatore che l'ha creato (ADR-014).
+  await requireEventManager(await cookies(), id);
 
   // Master kill-switch first, so we never flip flags then leave nothing enqueued.
   const site = await prisma.siteSetting.findUnique({

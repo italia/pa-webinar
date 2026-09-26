@@ -10,6 +10,24 @@ public `/changelog` page, translated into every language the site ships.
 Versions follow [semantic versioning](https://semver.org/). Releases marked
 🔒 were primarily security or dependency hardening.
 
+## 0.11.0 — 2026-07-27
+
+**The room now reacts the moment something changes**
+
+- Questions, polls, the agenda and the word cloud update as soon as something changes, instead of re-checking the server every few seconds: people in the room see a question appear straight away, and on a busy event the traffic drops sharply.
+- Less work for the server too: the room's periodic checks now ask only for the data they need, and materials — which rarely change — are re-checked less often.
+- If the immediate connection is unavailable, the room falls back on its own to the previous periodic check: no feature stops working because of the new mechanism.
+- Fixes: opening two new word clouds in quick succession could leave one of them invisible, and words sent to it appeared to nobody; the service status page always reported the same version number instead of the one actually running.
+
+## 0.10.0 — 2026-07-27
+
+**Chat questions, simpler recurring series, and institutional colours restored**
+
+- Anyone writing in the chat can mark their own message as a question: moderators mark it as answered or set it aside, and a filter shows only the questions. There is no second channel to watch during the event.
+- Chat questions, together with the reactions they received, now appear on the event's public summary page and stay readable even after participants' personal data has been deleted.
+- Preparing the next occurrence of a series is quicker: copying an event carries over tags, organisers, co-moderators (each with fresh access credentials), the agenda, questionnaires and reminders, and templates keep their recording and post-processing settings.
+- Fixes: the institutional colours are back to what they should be — the band at the top of the site was showing white —, the button that creates a copy of an event no longer leads to a missing page, and when retention expires the contact details of invitees, named moderators and speakers are deleted too.
+
 ## 0.9.0 — 2026-07-26 🔒
 
 **Dependency security, documentation realigned, and a complete local stack**

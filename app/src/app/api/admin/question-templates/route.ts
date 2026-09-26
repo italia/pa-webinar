@@ -8,6 +8,7 @@
 
 import { cookies } from 'next/headers';
 
+import { requireStaff } from '@/lib/auth/staff-session';
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
@@ -19,8 +20,9 @@ import { createQuestionTemplateSchema } from '@/lib/validation/schemas';
 export const dynamic = 'force-dynamic';
 
 export const GET = withErrorHandling(async () => {
-  const isAdmin = await isAdminAuthenticated(await cookies());
-  if (!isAdmin) throw new UnauthorizedError();
+  // La libreria delle domande si usa per comporre i questionari dei propri
+  // eventi; modificarla resta dell'amministrazione.
+  await requireStaff(await cookies());
 
   const rows = await prisma.questionTemplate.findMany({
     orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],

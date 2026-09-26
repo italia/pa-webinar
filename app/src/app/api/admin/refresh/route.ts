@@ -9,8 +9,8 @@
  * the cookie itself lingers ~1 day (ADMIN_COOKIE_MAX_AGE_SECONDS) purely as
  * a "was an admin here" marker, granting no access.
  *
- * Returns 401 if the current cookie is missing or invalid (no
- * implicit privilege escalation). Intentionally writes NO audit-log row:
+ * Returns 401 if the current cookie is missing or invalid, and keeps the
+ * session's role (no implicit privilege escalation). Intentionally writes NO audit-log row:
  * this is a silent keepalive slide, not a meaningful admin action.
  */
 
@@ -23,17 +23,19 @@ import { UnauthorizedError, AppError } from '@/lib/errors';
 import { requireAppSecretKey } from '@/lib/auth/app-secret';
 import {
   ADMIN_SESSION_TTL_SECONDS,
-  isAdminAuthenticated,
   setAdminSessionCookie,
 } from '@/lib/auth/admin-session';
+import { getStaffSession, signStaffSession } from '@/lib/auth/staff-session';
 
 export const dynamic = 'force-dynamic';
 
 export const POST = withErrorHandling(async (_request) => {
   const cookieStore = await cookies();
-  if (!(await isAdminAuthenticated(cookieStore))) {
-    throw new UnauthorizedError();
-  }
+  // Si rinnova la sessione che c'e', con il suo ruolo: rinnovare tutti come
+  // `admin` darebbe all'organizzatore la chiave dell'istanza al primo
+  // rinnovo (ADR-014).
+  const session = await getStaffSession(cookieStore);
+  if (!session) throw new UnauthorizedError();
 
   let secret: Uint8Array;
   try {
@@ -42,11 +44,19 @@ export const POST = withErrorHandling(async (_request) => {
     throw new AppError('server_misconfigured', 500, 'INTERNAL_ERROR');
   }
 
-  const token = await new SignJWT({ role: 'admin' })
-    .setProtectedHeader({ alg: 'HS256' })
-    .setIssuedAt()
-    .setExpirationTime(`${ADMIN_SESSION_TTL_SECONDS}s`)
-    .sign(secret);
+  // Il ruolo del nuovo token e' quello dell'account adesso: un rinnovo dopo
+  // una nomina o un declassamento allinea anche il middleware.
+  const token =
+    session.accountId !== null
+      ? await signStaffSession({
+          id: session.accountId,
+          role: session.role === 'admin' ? 'ADMIN' : 'ORGANIZER',
+        })
+      : await new SignJWT({ role: 'admin' })
+          .setProtectedHeader({ alg: 'HS256' })
+          .setIssuedAt()
+          .setExpirationTime(`${ADMIN_SESSION_TTL_SECONDS}s`)
+          .sign(secret);
 
   // No audit-log row here: this is a silent keepalive slide (called every few
   // minutes per active tab by AdminSessionKeepAlive), not a meaningful admin

@@ -81,7 +81,7 @@ export function resolveLlmProvider(opts: {
           'http://pa-webinar-vllm:8000/v1',
         // Default: Mistral-Small-3.2-24B-Instruct-2506 (Mistral AI,
         // Parigi — vendor europeo, Apache 2.0, ~48GB in fp16 → entra
-        // in A100 80GB con ampio margine). Scelta DTD per privilegiare
+        // in A100 80GB con ampio margine). Scelta per privilegiare
         // un fornitore di modelli AI con sede in EU (sovranità sui
         // pesi + traineranno futuri update). Eccellente su IT/EN/FR
         // (Mistral trained specificamente su lingue europee).

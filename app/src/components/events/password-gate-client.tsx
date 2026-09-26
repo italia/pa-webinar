@@ -4,7 +4,7 @@ import { useCallback, useState, type FormEvent } from 'react';
 import { useTranslations } from 'next-intl';
 import { Alert, Button, Input, Label } from 'design-react-kit';
 
-import { useRouter } from '@/i18n/navigation';
+import { useRouter, percorso } from '@/i18n/navigation';
 
 export default function PasswordGateClient({ slug }: { slug: string }) {
   const t = useTranslations('live.password');
@@ -37,7 +37,7 @@ export default function PasswordGateClient({ slug }: { slug: string }) {
           setError(t('generic'));
           return;
         }
-        router.push(`/events/${slug}/live`);
+        router.push(percorso(`/events/${slug}/live`));
       } catch {
         setError(t('generic'));
       } finally {

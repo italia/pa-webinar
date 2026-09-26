@@ -10,14 +10,16 @@ import {
   CardBody,
   Col,
   FormGroup,
-  Icon,
   Input,
   Label,
   Row,
   Spinner,
 } from 'design-react-kit';
 import type { SiteSetting } from '@prisma/client';
+import { Icon } from '@/components/ui/icon';
 import ToggleSwitch from '@/components/ui/toggle-switch';
+import LocaleTabBar from '@/components/ui/locale-tab-bar';
+import { localeNames, type Locale } from '@/i18n/config';
 import FileOrUrlInput from '@/components/ui/file-or-url-input';
 import { videoQualityMaxHeight } from '@/lib/jitsi/config';
 
@@ -118,6 +120,7 @@ export default function SiteSettingsForm({
               onClick={() => setActiveTab(tab.id)}
               role="tab"
               aria-selected={activeTab === tab.id}
+              aria-label={tab.label}
               type="button"
             >
               <Icon icon={tab.icon} size="sm" />
@@ -279,7 +282,7 @@ function BrandingTab({ settings, updateField }: TabProps) {
           </FormGroup>
 
           <FormGroup>
-            <Label htmlFor="waitingRoomEngine">Sala d&apos;attesa (default)</Label>
+            <Label htmlFor="waitingRoomEngine">{t('waitingRoomEngine')}</Label>
             <select
               className="form-select"
               id="waitingRoomEngine"
@@ -294,12 +297,11 @@ function BrandingTab({ settings, updateField }: TabProps) {
                 )
               }
             >
-              <option value="GAME">Videogame (lobby Phaser)</option>
-              <option value="CLASSIC">Classica (statica)</option>
+              <option value="GAME">{t('waitingRoomEngineGame')}</option>
+              <option value="CLASSIC">{t('waitingRoomEngineClassic')}</option>
             </select>
             <small className="text-muted">
-              Modalità di default della sala d&apos;attesa; sovrascrivibile per
-              singolo evento e con <code>?engine=</code> nell&apos;URL.
+              {t('waitingRoomEngineHelp', { param: '?engine=' })}
             </small>
           </FormGroup>
         </Col>
@@ -553,6 +555,62 @@ function SeoTab({ settings, updateField }: TabProps) {
           helpText={t('imageHelp')}
         />
       </FormGroup>
+
+      <hr className="my-4" />
+
+      {/* Cosa entra nell'anteprima che compare quando qualcuno incolla il link
+          di un evento. Sono interruttori e non un modello libero perche' ogni
+          campo in piu' toglie spazio al titolo: la scelta e' quali tre cose
+          contano per questo ente, non quante se ne possono stipare. */}
+      <h5 className="fw-semibold mb-1" style={{ color: 'var(--app-text)' }}>
+        {t('ogSection')}
+      </h5>
+      <p className="text-muted mb-3" style={{ fontSize: '0.88rem' }}>
+        {t('ogIntro')}
+      </p>
+
+      <div className="mb-3">
+        <ToggleSwitch
+          label={t('ogCardEnabled')}
+          checked={settings.ogCardEnabled}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            updateField('ogCardEnabled', e.target.checked)
+          }
+        />
+        <small className="text-muted d-block mt-1">{t('ogCardEnabledHelp')}</small>
+      </div>
+
+      {/* Gli interruttori di dettaglio restano visibili ma inerti quando la
+          scheda e' spenta: nasconderli farebbe sparire la spiegazione di cosa
+          si sta rinunciando ad avere. */}
+      <div
+        className="ps-3"
+        style={{
+          borderLeft: '3px solid var(--app-border, #d4d8dd)',
+          opacity: settings.ogCardEnabled ? 1 : 0.55,
+        }}
+      >
+        {(
+          [
+            ['ogShowPoster', 'ogShowPosterHelp'],
+            ['ogShowDate', 'ogShowDateHelp'],
+            ['ogShowSpeakers', 'ogShowSpeakersHelp'],
+            ['ogShowOrganization', 'ogShowOrganizationHelp'],
+          ] as const
+        ).map(([campo, aiuto]) => (
+          <div className="mb-3" key={campo}>
+            <ToggleSwitch
+              label={t(campo)}
+              checked={settings[campo]}
+              disabled={!settings.ogCardEnabled}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                updateField(campo, e.target.checked)
+              }
+            />
+            <small className="text-muted d-block mt-1">{t(aiuto)}</small>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -563,7 +621,15 @@ function HomepageTab({ settings, updateField }: TabProps) {
     <div>
       <FormGroup tag="fieldset">
         <legend className="h6 fw-semibold mb-3">{t('modeLabel')}</legend>
-        {(['LANDING', 'EVENTS_LIST', 'CUSTOM'] as const).map((mode) => (
+        {(
+          [
+            'LANDING',
+            'LANDING_ISTITUZIONALE',
+            'LANDING_SEMPLICE',
+            'EVENTS_LIST',
+            'CUSTOM',
+          ] as const
+        ).map((mode) => (
           <FormGroup check key={mode} className="mb-2">
             <Input
               id={`mode-${mode}`}
@@ -581,6 +647,23 @@ function HomepageTab({ settings, updateField }: TabProps) {
             </Label>
           </FormGroup>
         ))}
+      </FormGroup>
+      <FormGroup check className="mt-4">
+        <Input
+          id="home-show-project"
+          type="checkbox"
+          checked={settings.homeShowProject}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            updateField('homeShowProject', e.target.checked)
+          }
+          aria-describedby="home-show-project-help"
+        />
+        <Label check htmlFor="home-show-project">
+          {t('showProject')}
+        </Label>
+        <small id="home-show-project-help" className="d-block text-muted">
+          {t('showProjectHelp')}
+        </small>
       </FormGroup>
       {settings.homePageMode === 'CUSTOM' && (
         <FormGroup className="mt-4">
@@ -880,6 +963,23 @@ function FooterTab({ settings, updateField }: TabProps) {
 
 function HeaderTab({ settings, updateField }: TabProps) {
   const t = useTranslations('admin.settings.header');
+  // Il motto si scrive per lingua, tra quelle attive del sito.
+  const lingueAttive =
+    Array.isArray(settings.availableLocales) && settings.availableLocales.length > 0
+      ? (settings.availableLocales as string[])
+      : ['it', 'en'];
+  const linguaPredefinita = settings.defaultLocale || 'it';
+  const [linguaMotto, setLinguaMotto] = useState(linguaPredefinita);
+  const motto = (
+    settings.siteTagline && typeof settings.siteTagline === 'object' && !Array.isArray(settings.siteTagline)
+      ? settings.siteTagline
+      : {}
+  ) as Record<string, string>;
+  const scriviMotto = (valore: string) => {
+    const nuovo = { ...motto, [linguaMotto]: valore };
+    if (!valore.trim()) delete nuovo[linguaMotto];
+    updateField('siteTagline', nuovo);
+  };
 
   return (
     <div>
@@ -915,6 +1015,29 @@ function HeaderTab({ settings, updateField }: TabProps) {
           </FormGroup>
         </Col>
       </Row>
+      <FormGroup>
+        <Label htmlFor="hdr-tagline">
+          {t('siteTagline')} — {localeNames[linguaMotto as Locale] ?? linguaMotto}
+        </Label>
+        <LocaleTabBar
+          enabledLocales={lingueAttive}
+          defaultLocale={linguaPredefinita}
+          activeLocale={linguaMotto}
+          onSelectLocale={setLinguaMotto}
+          filledLocales={Object.keys(motto).filter((k) => motto[k]?.trim())}
+        />
+        <Input
+          id="hdr-tagline"
+          lang={linguaMotto}
+          value={motto[linguaMotto] ?? ''}
+          maxLength={200}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => scriviMotto(e.target.value)}
+          aria-describedby="hdr-tagline-help"
+        />
+        <small id="hdr-tagline-help" className="text-muted">
+          {t('siteTaglineHelp')}
+        </small>
+      </FormGroup>
 
       <hr className="my-4" />
 
@@ -1339,8 +1462,8 @@ function FeaturesTab({ settings, updateField }: TabProps) {
 // ─── Scaling tab ────────────────────────────────────────────
 //
 // Per-cluster JVB/Jibri sizing knobs. Defaults are calibrated for
-// Azure F16s_v2 (16 vCPU / 32 GiB) which is what the DTD test and
-// prod environments use. Any PA reusing the platform tweaks these
+// Azure F16s_v2 (16 vCPU / 32 GiB), the node size of the reference
+// deployment. Any PA reusing the platform tweaks these
 // here instead of forking the scaler code.
 
 function ScalingTab({ settings, updateField }: TabProps) {
@@ -1366,8 +1489,9 @@ function ScalingTab({ settings, updateField }: TabProps) {
 
   return (
     <div>
+      {/* Nessuna <Icon> qui dentro: Bootstrap Italia disegna già la sua
+          nell'.alert, e la seconda comparirebbe accanto alla prima. */}
       <Alert color="info" className="mb-4">
-        <Icon icon="it-info-circle" className="me-2" />
         {t('intro')}
       </Alert>
 
@@ -1379,11 +1503,16 @@ function ScalingTab({ settings, updateField }: TabProps) {
         <Col md={5}>
           <FormGroup>
             <Label htmlFor="videoQuality">{t('videoQuality')}</Label>
-            <Input
+            {/* <select> nativo, non <Input type="select">: quel wrapper rende
+                un <input>, e un elemento vuoto con dei figli fa cadere React
+                (#137) portandosi via l'intera schermata delle impostazioni —
+                non solo questa scheda. È già successo, ed è per questo che il
+                resto del file usa il <select> nativo. */}
+            <select
+              className="form-select"
               id="videoQuality"
-              type="select"
               value={settings.videoQuality ?? 'HIGH'}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              onChange={(e) =>
                 updateField('videoQuality', e.target.value as SiteSetting['videoQuality'])
               }
             >
@@ -1393,7 +1522,7 @@ function ScalingTab({ settings, updateField }: TabProps) {
                   {t(`videoQualityOptions.${q}`)}
                 </option>
               ))}
-            </Input>
+            </select>
             <small className="text-muted d-block mt-1">{t('videoQualityHelp')}</small>
           </FormGroup>
         </Col>
@@ -1589,7 +1718,7 @@ function ScalingTab({ settings, updateField }: TabProps) {
  * (trascrizione, sintesi, traduzione, dubbing). Kill-switch generale
  * + provider routing + retention. La pipeline è disabled di default,
  * va attivata esplicitamente qui dopo aver verificato i prerequisiti
- * (vedi docs/POSTPROD.md per la checklist completa).
+ * (vedi docs/POSTPROD.md, "Operational checklist").
  *
  * Stile visivo coerente con FeaturesTab (toggle switch + small helper
  * text) e ScalingTab (number input per i parametri operativi).
@@ -1600,8 +1729,7 @@ function PostprodTab({ settings, updateField }: TabProps) {
   return (
     <div>
       {/* Prerequisiti operativi. NIENTE <Icon> nell'alert: Bootstrap
-          Italia ne disegna già una "i" via ::before — vedi memoria
-          feedback_bootstrap-italia-alert.md. */}
+          Italia ne disegna già una "i" via ::before. */}
       <div className="alert alert-info" role="note" style={{ fontSize: '0.88rem' }}>
         {t('prerequisitesNote')}
       </div>
@@ -1794,7 +1922,7 @@ function PostprodTab({ settings, updateField }: TabProps) {
         {t('voiceCloningSection')}
       </h6>
       {/* Nota stabile sull'esclusione del voice cloning. Stesso vincolo
-          della memoria progettuale: niente <Icon> dentro l'alert. */}
+          dell'alert sopra: niente <Icon> dentro l'alert. */}
       <div className="alert alert-warning" role="note" style={{ fontSize: '0.88rem' }}>
         {t('voiceCloningNote')}
       </div>

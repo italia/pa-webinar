@@ -9,6 +9,10 @@
  * Always responds 200 to avoid leaking which addresses are registered.
  */
 
+import { defaultLocale } from '@/i18n/config';
+import { linguaEmail, linguaPagina } from '@/lib/email/lingua';
+import { emailBaseUrl } from '@/lib/email/links';
+import { localizedUrl } from '@/lib/utils/localized-url';
 import { z } from 'zod';
 
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
@@ -27,14 +31,17 @@ const requestSchema = z.object({
 });
 
 function buildExportLink(baseUrl: string, locale: string, token: string): string {
-  const safeLocale = encodeURIComponent(locale);
-  const safeToken = encodeURIComponent(token);
-  return `${baseUrl}/${safeLocale}/privacy/my-data?t=${safeToken}`;
+  // Dalla mappa dei percorsi, come ogni altro link nelle email: la pagina
+  // esiste nella lingua di chi ha chiesto, con il suo indirizzo localizzato.
+  return localizedUrl(baseUrl, `/privacy/my-data?t=${encodeURIComponent(token)}`, locale);
 }
 
 const SUBJECTS: Record<string, string> = {
   it: 'Esportazione dei tuoi dati personali',
   en: 'Your personal-data export',
+  fr: 'Exportation de vos données personnelles',
+  de: 'Export Ihrer personenbezogenen Daten',
+  es: 'Exportación de sus datos personales',
 };
 
 const BODIES: Record<string, (link: string) => { html: string; text: string }> = {
@@ -60,6 +67,39 @@ const BODIES: Record<string, (link: string) => { html: string; text: string }> =
       `Open this link within one hour to download it:\n\n${link}\n\n` +
       `If you did not make this request, you can ignore this email.`,
   }),
+  fr: (link) => ({
+    html:
+      `<p>Vous avez demandé une copie de vos données personnelles. ` +
+      `Cliquez sur le lien ci-dessous dans un délai d’une heure pour les télécharger :</p>` +
+      `<p><a href="${escapeHtml(link)}">${escapeHtml(link)}</a></p>` +
+      `<p>Si vous n’êtes pas à l’origine de cette demande, vous pouvez ignorer cet e-mail.</p>`,
+    text:
+      `Vous avez demandé une copie de vos données personnelles. ` +
+      `Ouvrez ce lien dans un délai d’une heure pour les télécharger :\n\n${link}\n\n` +
+      `Si vous n’êtes pas à l’origine de cette demande, vous pouvez ignorer cet e-mail.`,
+  }),
+  de: (link) => ({
+    html:
+      `<p>Sie haben eine Kopie Ihrer personenbezogenen Daten angefordert. ` +
+      `Klicken Sie innerhalb einer Stunde auf den folgenden Link, um sie herunterzuladen:</p>` +
+      `<p><a href="${escapeHtml(link)}">${escapeHtml(link)}</a></p>` +
+      `<p>Falls Sie diese Anfrage nicht gestellt haben, können Sie diese E-Mail ignorieren.</p>`,
+    text:
+      `Sie haben eine Kopie Ihrer personenbezogenen Daten angefordert. ` +
+      `Öffnen Sie diesen Link innerhalb einer Stunde, um sie herunterzuladen:\n\n${link}\n\n` +
+      `Falls Sie diese Anfrage nicht gestellt haben, können Sie diese E-Mail ignorieren.`,
+  }),
+  es: (link) => ({
+    html:
+      `<p>Ha solicitado una copia de sus datos personales. ` +
+      `Haga clic en el enlace que figura a continuación en el plazo de una hora para descargarlos:</p>` +
+      `<p><a href="${escapeHtml(link)}">${escapeHtml(link)}</a></p>` +
+      `<p>Si no ha realizado usted esta solicitud, puede ignorar este correo electrónico.</p>`,
+    text:
+      `Ha solicitado una copia de sus datos personales. ` +
+      `Abra este enlace en el plazo de una hora para descargarlos:\n\n${link}\n\n` +
+      `Si no ha realizado usted esta solicitud, puede ignorar este correo electrónico.`,
+  }),
 };
 
 export const POST = withErrorHandling(async (request) => {
@@ -83,7 +123,10 @@ export const POST = withErrorHandling(async (request) => {
     throw new ValidationError('Validation failed', parsed.error.issues);
   }
   const email = parsed.data.email.trim();
-  const locale = (parsed.data.locale ?? 'it').toLowerCase();
+  // La lingua della pagina da cui arriva la richiesta, se e' una lingua della
+  // piattaforma; i testi nella lingua email corrispondente (fallback inglese).
+  const locale = linguaPagina(parsed.data.locale) ?? defaultLocale;
+  const testi = linguaEmail(locale);
 
   const emailHash = hashEmail(email);
   const emailRl = rateLimit(`gdpr-export-req-email:${emailHash}`, {
@@ -94,14 +137,13 @@ export const POST = withErrorHandling(async (request) => {
   // Silently drop further sends to the same mailbox; still return 200.
   if (emailRl.allowed) {
     const token = issueGdprToken('export', emailHash);
-    const baseUrl =
-      process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, '') ??
-      'http://localhost:3000';
-    const link = buildExportLink(baseUrl, locale, token);
+    // A runtime: la lettura puntata la fissava il build, e l'email portava
+    // `http://localhost:3000` su ogni istanza installata dall'immagine pubblicata.
+    const link = buildExportLink(emailBaseUrl(), locale, token);
 
     const body =
-      BODIES[locale] ?? BODIES.en!;
-    const subject = SUBJECTS[locale] ?? SUBJECTS.en!;
+      BODIES[testi] ?? BODIES.en!;
+    const subject = SUBJECTS[testi] ?? SUBJECTS.en!;
     const { html, text } = body(link);
 
     await enqueueEmail({

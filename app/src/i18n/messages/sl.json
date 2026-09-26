@@ -1,7 +1,19 @@
 {
+  "agenda": {
+    "title": "Zapiski / Kontrolni seznam",
+    "empty": "Točk še ni. Dodajte teme za obravnavo in jih sproti odkljukajte.",
+    "add": "Dodaj",
+    "addPlaceholder": "Nova točka…",
+    "remove": "Odstrani",
+    "inProgress": "v teku",
+    "agree": "Strinjam se",
+    "disagree": "Ne strinjam se",
+    "favorablePct": "{pct} % za",
+    "noReactions": "Povejte svoje mnenje"
+  },
   "common": {
-    "appName": "Dogodki DTD",
-    "appDescription": "Platforma za javne digitalne dogodke Oddelka za digitalno preobrazbo",
+    "appName": "PA Webinar",
+    "appDescription": "Platforma za javne digitalne dogodke",
     "loading": "Nalaganje...",
     "error": "Prišlo je do napake",
     "errorMessage": "Nekaj je šlo narobe. Prosimo, poskusite znova.",
@@ -42,8 +54,6 @@
     "skipToFooter": "Preskoči na nogo"
   },
   "header": {
-    "slimTitle": "Predsedstvo Sveta ministrov",
-    "slimSubtitle": "Oddelek za digitalno preobrazbo",
     "followUs": "Sledite nam na"
   },
   "events": {
@@ -52,6 +62,7 @@
     "past": "Pretekli dogodki",
     "noUpcoming": "Trenutno ni načrtovanih dogodkov. Preverite ponovno kmalu!",
     "noPast": "Ni preteklih dogodkov",
+    "wordCloudTitle": "Oblak besed",
     "card": {
       "publicEvent": "Javni dogodek",
       "readMore": "Več informacij",
@@ -61,6 +72,22 @@
       "ended": "Zaključeno",
       "occupiedSpots": "{registered}/{max} prijavljenih",
       "registeredCount": "{count, plural, =0 {Brez prijav} one {1 prijava} two {# prijavi} few {# prijave} other {# prijav}}"
+    },
+    "recap": {
+      "title": "Povzetek dogodka",
+      "intro": "Pregled tega, kar se je pojavilo med dogodkom.",
+      "participants": "Udeleženci (vrh)",
+      "registered": "Prijavljeni",
+      "topQuestions": "Najbolj podprta vprašanja",
+      "upvotes": "{count, plural, =0 {ni glasov} one {# glas} two {# glasova} few {# glasovi} other {# glasov}}",
+      "polls": "Rezultati anket",
+      "votes": "{count, plural, =0 {ni glasov} one {# glas} two {# glasova} few {# glasovi} other {# glasov}}",
+      "topWords": "Najpogosteje deljene besede",
+      "feedback": "Povprečna ocena",
+      "feedbackCount": "{count, plural, one {# odgovor} two {# odgovora} few {# odgovori} other {# odgovorov}}",
+      "chatQuestions": "Vprašanja iz klepeta",
+      "reactionsCount": "{count, plural, one {1 reakcija} two {# reakciji} few {# reakcije} other {# reakcij}}",
+      "answered": "odgovorjeno"
     },
     "detail": {
       "title": "Podrobnosti dogodka",
@@ -85,6 +112,10 @@
       "noRecording": "Video posnetek za ta dogodek ni na voljo.",
       "watchRecording": "Oglejte si posnetek",
       "backToEvents": "Nazaj na dogodke",
+      "alreadyRegisteredEnter": "Ste že prijavljeni? Vstopite v sobo",
+      "invalidTokenTitle": "Povezava za dostop ni več veljavna",
+      "invalidTokenBody": "Uporabljena povezava ni veljavna ali pa je potekla. Če ste se prijavili, poiščite svojo osebno povezavo v potrditvenem e-sporočilu ali pa se znova prijavite spodaj.",
+      "invalidTokenBodyEnded": "Uporabljena povezava ni več veljavna. Dogodek je končan: spodaj najdete posnetek in gradiva.",
       "speakers": "Govorci",
       "organizer": "Organizator",
       "chatNotSaved": "Sporočila iz klepeta niso shranjena po koncu dogodka.",
@@ -97,43 +128,27 @@
         "yahoo": "Yahoo Calendar",
         "downloadIcs": "Prenesi datoteko .ics"
       },
-      "alreadyRegisteredEnter": "Ste že prijavljeni? Vstopite v sobo",
-      "invalidTokenTitle": "Povezava za dostop ni več veljavna",
-      "invalidTokenBody": "Uporabljena povezava ni veljavna ali pa je potekla. Če ste se prijavili, poiščite svojo osebno povezavo v potrditvenem e-sporočilu ali pa se znova prijavite spodaj.",
-      "invalidTokenBodyEnded": "Uporabljena povezava ni več veljavna. Dogodek je končan: spodaj najdete posnetek in gradiva."
+      "registrationEnded": "Dogodek se je zaključil: prijave so zaprte."
     },
     "manage": {
       "toggleChat": "Klepet",
       "toggleQa": "Q&A",
       "toggleRecording": "Snemanje",
-      "settingsSection": "Nastavitve dogodka",
       "sessionsAndRecordings": "Seje in video posnetki",
       "postEventSection": "Po dogodku in povratne informacije"
     },
     "status": {
       "DRAFT": "Osnutek",
       "PUBLISHED": "Objavljeno",
+      "PROVISIONING": "V pripravi",
       "LIVE": "V živo",
+      "IDLE": "Na premoru",
       "ENDED": "Zaključeno",
       "ARCHIVED": "Arhivirano"
     },
     "list": {
       "filterByTag": "Filtriraj po kategoriji",
       "allTags": "Vse"
-    },
-    "wordCloudTitle": "Oblak besed",
-    "recap": {
-      "title": "Povzetek dogodka",
-      "intro": "Pregled tega, kar se je pojavilo med dogodkom.",
-      "participants": "Udeleženci (vrh)",
-      "registered": "Prijavljeni",
-      "topQuestions": "Najbolj podprta vprašanja",
-      "upvotes": "{count, plural, =0 {ni glasov} one {# glas} two {# glasova} few {# glasovi} other {# glasov}}",
-      "polls": "Rezultati anket",
-      "votes": "{count, plural, =0 {ni glasov} one {# glas} two {# glasova} few {# glasovi} other {# glasov}}",
-      "topWords": "Najpogosteje deljene besede",
-      "feedback": "Povprečna ocena",
-      "feedbackCount": "{count, plural, one {# odgovor} two {# odgovora} few {# odgovori} other {# odgovorov}}"
     }
   },
   "registration": {
@@ -148,12 +163,20 @@
     "submitting": "Prijava poteka...",
     "success": "Prijava zaključena!",
     "successMessage": "Prejeli boste potrditveno e-pošto s povezavo za dostop do dogodka.",
-    "enteringRoom": "We're taking you to the event waiting room.",
-    "enteringRoomHint": "Opening the room…",
+    "successScheduledMessage": "Prijavljeni ste! Poslali smo vam e-sporočilo z osebno povezavo za dostop. Dogodek dodajte v koledar in se vrnite malo pred začetkom.",
+    "addToCalendar": "Dodaj v koledar",
+    "enteringRoom": "Vodimo vas v čakalnico dogodka.",
+    "enteringRoomHint": "Odpiranje dvorane…",
     "alreadyRegistered": "Že ste prijavljeni na ta dogodek",
-    "resendLink": "Resend my access link",
-    "resending": "Sending…",
-    "resendSent": "If the address is registered, we've re-sent the access link by email.",
+    "resendLink": "Znova pošlji povezavo za dostop",
+    "resending": "Pošiljanje…",
+    "resendSent": "Če je naslov prijavljen, smo vam povezavo za dostop znova poslali po e-pošti.",
+    "invitationOnly": "Prijava je namenjena samo povabljenim: uporabite e-poštni naslov, s katerim ste bili povabljeni. Povezavo za vstop boste prejeli po e-pošti.",
+    "closed": "Prijava na ta dogodek ni odprta za javnost.",
+    "lostLink": "Ste že prijavljeni? Znova prejmite svojo osebno povezavo",
+    "lostLinkHelp": "Vpišite e-poštni naslov, s katerim ste se prijavili: če je prijavljen na ta dogodek, vam bomo znova poslali povezavo za vstop.",
+    "checkEmailTitle": "Preverite svojo e-pošto",
+    "checkEmail": "Če je naslov na seznamu povabljenih, boste kmalu prejeli e-pošto z osebno povezavo za vstop v sobo. Če je ne najdete, preverite mapo z neželeno pošto.",
     "backToEvent": "Nazaj na dogodek",
     "organization": "Organizacija",
     "organizationPlaceholder": "npr. AGID, Ministrstvo za gospodarstvo, Mestna občina Rim",
@@ -181,12 +204,10 @@
       "organizationRequired": "Vnesite svojo organizacijo",
       "consentRequired": "Soglasje z obdelavo podatkov je obvezno",
       "recordingConsentRequired": "Soglasje s snemanjem je obvezno za ta dogodek",
+      "multitrackConsentRequired": "Za ta dogodek je soglasje k snemanju vaše zvočne sledi obvezno",
       "eventFull": "Dogodek je dosegel največje število udeležencev",
-      "generic": "Napaka pri prijavi. Prosimo, poskusite znova.",
-      "multitrackConsentRequired": "Za ta dogodek je soglasje k snemanju vaše zvočne sledi obvezno"
-    },
-    "successScheduledMessage": "Prijavljeni ste! Poslali smo vam e-sporočilo z osebno povezavo za dostop. Dogodek dodajte v koledar in se vrnite malo pred začetkom.",
-    "addToCalendar": "Dodaj v koledar"
+      "generic": "Napaka pri prijavi. Prosimo, poskusite znova."
+    }
   },
   "videoLibrary": {
     "title": "Video knjižnica",
@@ -213,6 +234,8 @@
     "connecting": "Povezovanje...",
     "connectionError": "Povezava z dvorano ni mogoča. Preverite povezavo in poskusite znova.",
     "activeVsRegistered": "{active} aktivnih · {registered} prijavljenih",
+    "enterFullscreen": "Celozaslonski način",
+    "exitFullscreen": "Izhod iz celozaslonskega načina",
     "overtime": {
       "withCountdown": "Predvideni čas zaključka je potekel. Dogodek se bo samodejno zaključil čez {minutes, plural, one {# minuto} two {# minuti} few {# minute} other {# minut}}.",
       "closingNow": "Čas zaključka je dosežen. Dogodek se bo kmalu zaključil.",
@@ -224,6 +247,27 @@
     "declineRecording": "Ne želim sodelovati",
     "enterRoom": "Vstopite v dvorano",
     "leaveRoom": "Zapustite dvorano",
+    "leaveChoice": {
+      "title": "Kako želite oditi?",
+      "body": "Odidete lahko sami — klic za vse druge ostane aktiven — ali pa ga končate za vse udeležence.",
+      "leaveSelf": "Samo odidi",
+      "endForAll": "Končaj za vse",
+      "ending": "Zaključujem…",
+      "endError": "Klica ni bilo mogoče končati. Poskusite znova."
+    },
+    "endDestino": {
+      "title": "Usoda dogodka",
+      "body": "Dogodek boste končali za vse. Kaj naj se z njim zgodi po zaključku?",
+      "public": "Ohrani javno",
+      "publicHelp": "Stran končanega dogodka ostane vidna s povzetkom, vprašanji, anketami, gradivi in povratnimi informacijami.",
+      "library": "Objavi v knjižnici",
+      "libraryHelp": "Kot zgoraj, poleg tega pa dogodek prikaže v javni videoknjižnici (zahteva objavljen posnetek ali videoposnetek na YouTubu).",
+      "archive": "Arhiviraj (zasebno)",
+      "archiveHelp": "Stran končanega dogodka ne bo javna (404). Podatki se hranijo do izteka roka hrambe, nato se izbrišejo.",
+      "genAi": "Iz posnetka ustvari prepis in povzetek z AI (ko se obdelava konča)",
+      "back": "Nazaj",
+      "confirm": "Končaj dogodek"
+    },
     "eventNotStarted": "Dogodek se še ni začel",
     "eventStartsAt": "Dogodek se bo začel {date} ob {time}",
     "countdown": "Preostali čas",
@@ -241,11 +285,15 @@
     "guestJoinSubtitle": "Pridružite se dogodku v živo kot gost",
     "guestJoinButton": "Vstopi kot gost",
     "guestRedirectToRegister": "Dogodek se še ni začel. Prijavite se, da prejmete povezavo za dostop.",
+    "guestAccessDisabled": "Za ta dogodek je potrebna prijava: vstop kot gost ni mogoč.",
     "jibriUnavailable": "Snemanje ni na voljo — Jibri ni konfiguriran",
     "endEventError": "Napaka pri zaključevanju dogodka. Poskusite znova.",
     "jibriNotConfigured": "Snemanje ni konfigurirano v infrastrukturi",
     "jibriScaling": "Snemanje se zaganja …",
     "jibriScalingTooltip": "Komponenta za snemanje se zaganja. Na voljo bo kmalu.",
+    "recorderNotStarted": "Snemanje ni na voljo",
+    "recorderNotStartedDetail": "Storitev snemanja se še ni zagnala: dogodek se zaenkrat nadaljuje brez snemanja. Obvestite skrbnike platforme.",
+    "recorderStartFailed": "Snemanje se ni začelo. Poskusite znova čez nekaj minut; če se težava ponavlja, obvestite skrbnike platforme.",
     "roomPreparing": "Soba se pripravlja …",
     "roomPreparingDetail": "Video strežniki se zaganjajo. Postopek traja približno 2 minuti. Soba se bo aktivirala samodejno.",
     "recordingPromptTitle": "Začnem snemanje?",
@@ -263,8 +311,13 @@
     "qaSidebarPlaceholder": "Plošča Q&A bo na voljo, ko se dogodek začne.",
     "invalidToken": "Neveljavna povezava. Preverite povezavo, ki ste jo prejeli po e-pošti.",
     "sidebarTabQa": "Q&A",
+    "liveFeaturesLabel": "Funkcije:",
+    "whiteboardNotSavedHint": "Tabla se ne shranjuje samodejno. Če jo uporabljate, jo izvozite (meni table) in jo pripnite h gradivom dogodka, preden ga končate.",
     "sidebarTabChat": "Klepet",
     "sidebarTabPolls": "Ankete",
+    "sidebarTabWordcloud": "Oblak besed",
+    "sidebarTabAgenda": "Zapiski / Kontrolni seznam",
+    "liveToggleAgenda": "Zapiski / Kontrolni seznam (agenda)",
     "sidebarTabMaterials": "Gradiva",
     "sidebarTabParticipants": "Udeleženci",
     "chat": {
@@ -299,7 +352,25 @@
       "exportChat": "Prenesi klepet",
       "reactNotAllowed": "Za odzive na sporočila potrebujete osebno ali moderatorsko povezavo.",
       "editNotAllowed": "Ta povezava je deljena, zato z njo ni mogoče urejati sporočil.",
-      "editExpired": "Minilo je več kot 15 minut: tega sporočila ni več mogoče urediti."
+      "editExpired": "Minilo je več kot 15 minut: tega sporočila ni več mogoče urediti.",
+      "askAsQuestionLabel": "Označi kot vprašanje",
+      "placeholderQuestion": "Napišite svoje vprašanje...",
+      "lensGroupLabel": "Filtriraj sporočila",
+      "lensAll": "Vse",
+      "lensQuestions": "Vprašanja ({count})",
+      "lensAnnounceAll": "Na seznamu: vsa sporočila",
+      "lensAnnounceQuestions": "Na seznamu: {count, plural, =0 {ni vprašanj} one {1 vprašanje} two {# vprašanji} few {# vprašanja} other {# vprašanj}}",
+      "questionOpen": "Vprašanje",
+      "questionAnswered": "Odgovorjeno",
+      "questionDismissed": "Ne bo obravnavano",
+      "questionMarkAnswered": "Označi kot odgovorjeno",
+      "questionReopen": "Znova odpri",
+      "questionDismiss": "Zavrni",
+      "questionRestore": "Obnovi",
+      "questionStatusFailed": "Vprašanja ni bilo mogoče posodobiti",
+      "questionNeedsText": "Napišite besedilo vprašanja: sama priponka ne pride v čakalno vrsto",
+      "lensTruncated": "Naložena so le najnovejša sporočila: morda obstajajo starejša vprašanja, ki niso na seznamu.",
+      "attachUnavailable": "Priloge v tej namestitvi niso na voljo."
     },
     "role": {
       "moderator": "Moderator",
@@ -320,7 +391,8 @@
         "unknown": "N/A"
       },
       "volume": "Glasnost",
-      "volumeFor": "Glasnost za {name}"
+      "volumeFor": "Glasnost za {name}",
+      "kickName": "Odstrani: {name}"
     },
     "moderator": {
       "muteAll": "Utišaj vse",
@@ -331,7 +403,7 @@
       "toggleChat": "Klepet vkl./izkl.",
       "endEvent": "Zaključi dogodek",
       "endEventConfirm": "Ali ste prepričani, da želite zaključiti dogodek za vse udeležence?",
-      "participantCount": "{count} udeležencev",
+      "participantCount": "{count, plural, one {# udeleženec} two {# udeleženca} few {# udeleženci} other {# udeležencev}}",
       "raisedHands": "Dvignjene roke",
       "noRaisedHands": "Ni dvignjenih rok",
       "giveFloor": "Daj besedo",
@@ -339,27 +411,28 @@
       "approveVideo": "Daj besedo (video)",
       "approveAll": "Daj besedo",
       "audioOnly": "Samo zvok",
+      "lowerHand": "Spusti roko",
       "participantFallback": "Udeleženec",
       "audioModeration": "Mikrofon udeležencev",
       "micDisabled": "Mikrofon izklopljen",
       "videoModeration": "Video udeležencev",
       "videoDisabled": "Video izklopljen",
       "eventEndedSuccess": "Dogodek uspešno zaključen. Preusmerjanje...",
-      "whiteboard": "Tabla",
-      "lowerHand": "Spusti roko"
+      "whiteboard": "Tabla"
     },
     "closeDrawer": "Zapri",
     "hintBanner": {
+      "ariaLabel": "Namigi",
       "controls": "Krmilniki spodaj",
       "raiseHand": "Dvignite roko za besedo",
       "sidebar": "Q&A in klepet v stranski vrstici",
-      "dismiss": "Razumem",
-      "ariaLabel": "Namigi"
+      "dismiss": "Razumem"
     },
     "topBarCount": {
       "live": "👥 {count, plural, one {# oseba} two {# osebi} few {# osebe} other {# oseb}}"
     },
     "sidebarTabChatUnread": "Nova neprebrana sporočila",
+    "sidebarTabPollsOpen": "Odprta anketa, v kateri še niste glasovali",
     "floatingControlsLabel": "Krmilniki dogodka",
     "screenshareActive": "🖥️ {name} deli zaslon",
     "screenshareFallbackName": "Udeleženec",
@@ -377,40 +450,24 @@
       "moderatorLink": "Moderatorska povezava",
       "moderatorLinkHint": "Kdor odpre to povezavo, se pridruži kot moderator s polnim nadzorom nad sobo."
     },
-    "enterFullscreen": "Celozaslonski način",
-    "exitFullscreen": "Izhod iz celozaslonskega načina",
-    "leaveChoice": {
-      "title": "Kako želite oditi?",
-      "body": "Odidete lahko sami — klic za vse druge ostane aktiven — ali pa ga končate za vse udeležence.",
-      "leaveSelf": "Samo odidi",
-      "endForAll": "Končaj za vse",
-      "ending": "Zaključujem…",
-      "endError": "Klica ni bilo mogoče končati. Poskusite znova."
-    },
-    "endDestino": {
-      "title": "Usoda dogodka",
-      "body": "Dogodek boste končali za vse. Kaj naj se z njim zgodi po zaključku?",
-      "public": "Ohrani javno",
-      "publicHelp": "Stran končanega dogodka ostane vidna s povzetkom, vprašanji, anketami, gradivi in povratnimi informacijami.",
-      "library": "Objavi v knjižnici",
-      "libraryHelp": "Kot zgoraj, poleg tega pa dogodek prikaže v javni videoknjižnici (zahteva objavljen posnetek ali videoposnetek na YouTubu).",
-      "archive": "Arhiviraj (zasebno)",
-      "archiveHelp": "Stran končanega dogodka ne bo javna (404). Podatki se hranijo do izteka roka hrambe, nato se izbrišejo.",
-      "genAi": "Iz posnetka ustvari prepis in povzetek z AI (ko se obdelava konča)",
-      "back": "Nazaj",
-      "confirm": "Končaj dogodek"
-    },
-    "liveFeaturesLabel": "Funkcije:",
-    "whiteboardNotSavedHint": "Tabla se ne shranjuje samodejno. Če jo uporabljate, jo izvozite (meni table) in jo pripnite h gradivom dogodka, preden ga končate.",
-    "sidebarTabWordcloud": "Oblak besed",
-    "sidebarTabAgenda": "Zapiski / Kontrolni seznam",
-    "liveToggleAgenda": "Zapiski / Kontrolni seznam (agenda)",
     "timer": {
       "show": "Pokaži števec",
       "hide": "Skrij števec",
       "remainingLabel": "Preostali čas (kliknite za pretečeni čas)",
       "elapsedLabel": "Pretečeni čas (kliknite za preostali čas)"
-    }
+    },
+    "videoCallFrameTitle": "Videoklic dogodka",
+    "insecureContextTitle": "Nevarni naslov",
+    "insecureContextBody": "Ta stran je odprta prek http://: brskalnik ne dovoli uporabe mikrofona in kamere, zato se videoklic ne more začeti. Odprite isto stran na varnem naslovu.",
+    "insecureContextLink": "Odpri https://{host}",
+    "conferenceUnreachableTitle": "Storitev za videoklice se ne odziva",
+    "conferenceUnreachableBody": "Vaš brskalnik ne more doseči strežnika za videoklice ({host}). Odprite ga v novem zavihku: če brskalnik prikaže varnostno opozorilo, ga sprejmite, nato se vrnite sem in poskusite znova. Če se stran ne odpre, ga morda blokira omrežje, prek katerega se povezujete.",
+    "conferenceOpenHost": "Odpri {host} v novem zavihku",
+    "leftTitle": "Zapustili ste dvorano",
+    "leftMessage": "Dogodek še poteka: vrnete se lahko kadar koli.",
+    "leftModeratorReminder": "Dogodek ostane odprt, dokler ga kdo ne konča. Ko končate, se vrnite in izberite »{action}«.",
+    "rejoin": "Vrni se",
+    "backToHome": "Nazaj na začetno stran"
   },
   "qa": {
     "title": "Vprašanja in odgovori",
@@ -445,7 +502,9 @@
       "textRequired": "Napišite svoje vprašanje",
       "tooLong": "Vprašanje ne sme presegati 500 znakov",
       "rateLimit": "Počakajte, preden pošljete novo vprašanje",
-      "generic": "Napaka pri pošiljanju vprašanja"
+      "busy": "Iz vašega omrežja trenutno prihaja veliko vprašanj: poskusite znova čez nekaj sekund",
+      "generic": "Napaka pri pošiljanju vprašanja",
+      "upvoteFailed": "Vaš glas ni bil zabeležen: poskusite znova čez nekaj sekund."
     },
     "ctaTitle": "Postavite prvo vprašanje",
     "ctaBody": "Drugi udeleženci bodo lahko glasovali za vaše vprašanje. Moderatorji ga bodo videli in lahko nanj odgovorijo ustno ali pisno.",
@@ -455,6 +514,79 @@
     "submitPrimary": "Pošlji vprašanje"
   },
   "admin": {
+    "accessDenied": {
+      "title": "Ta razdelek za vašo vlogo ni na voljo",
+      "body": "Kot organizator upravljate svoje dogodke: ustvarjanje, objavo, gradiva, vprašalnike in postprodukcijo. Nastavitve platforme in podatki vseh dogodkov ostanejo administraciji.",
+      "back": "Pojdi na svoje dogodke"
+    },
+    "staffLogin": {
+      "title": "Prijava v administracijo",
+      "intro": "Organizatorji in administratorji se prijavijo s povezavo, poslano na njihov e-naslov: brez gesla, ki bi si ga morali zapomniti.",
+      "emailLabel": "Vaš službeni e-naslov",
+      "send": "Pošlji mi povezavo",
+      "sending": "Pošiljanje…",
+      "sent": "Če je naslov omogočen, boste kmalu prejeli e-sporočilo s povezavo za prijavo. Povezava velja samo enkrat in poteče po {minutes} minutah.",
+      "error": "Zahteve ni bilo mogoče poslati. Poskusite znova čez nekaj minut.",
+      "keySection": "Prijava s ključem instance",
+      "accessTitle": "Vstop v administracijo",
+      "accessIntro": "Za prijavo pritisnite gumb. Povezava velja samo enkrat.",
+      "enter": "Prijava",
+      "invalidLink": "Povezava ni veljavna: morda je potekla ali je že bila uporabljena.",
+      "newLink": "Zahtevaj novo povezavo"
+    },
+    "organizers": {
+      "title": "Računi osebja",
+      "intro": "Osebe, ki delajo v administraciji pod lastnim imenom. Organizatorji ustvarjajo in upravljajo lastne dogodke; administratorji upravljajo celotno instanco. Prijavijo se s povezavo, poslano na njihov e-naslov, brez gesla. Ključ instance ostaja za nujne primere in avtomatizacijo.",
+      "newTitle": "Dodaj osebo",
+      "name": "Ime in priimek",
+      "email": "E-pošta",
+      "add": "Dodaj",
+      "sendNow": "Takoj pošlji povezavo za prijavo",
+      "listTitle": "Osebe z dostopom",
+      "loading": "Nalaganje…",
+      "empty": "Računov še ni.",
+      "events": "Dogodki",
+      "lastLogin": "Zadnja prijava",
+      "status": "Stanje",
+      "actions": "Dejanja",
+      "never": "Nikoli",
+      "active": "Aktiven",
+      "inactive": "Onemogočen",
+      "invite": "Pošlji povezavo",
+      "inviteFor": "Pošlji povezavo za prijavo: {name}",
+      "deactivate": "Onemogoči",
+      "deactivateFor": "Onemogoči: {name}",
+      "activate": "Znova omogoči",
+      "activateFor": "Znova omogoči: {name}",
+      "delete": "Izbriši",
+      "deleteFor": "Izbriši: {name}",
+      "deleteTitle": "Izbrisati račun?",
+      "deleteMessage": "Račun {name} bo izbrisan. Njegovi dogodki ({count}) se ne izbrišejo: vrnejo se administraciji.",
+      "deactivateTitle": "Deaktivirati račun?",
+      "deactivateMessage": "{name} se ne bo več mogel prijaviti, že poslane povezave pa prenehajo delovati. Njegovi dogodki ostanejo nespremenjeni.",
+      "exists": "Račun s tem e-naslovom že obstaja.",
+      "created": "Račun dodan.",
+      "createdInvited": "Račun dodan: povezava za prijavo je na poti.",
+      "invited": "Povezava za prijavo poslana.",
+      "deleted": "Račun izbrisan.",
+      "updated": "Sprememba shranjena.",
+      "actionError": "Dejanje ni uspelo. Poskusite znova.",
+      "loadError": "Seznama ni bilo mogoče naložiti.",
+      "inviteFailed": "Račun dodan, vendar povezave ni bilo mogoče poslati: pošljite jo znova iz njegove vrstice.",
+      "role": "Vloga",
+      "roleOrganizer": "Organizator",
+      "roleAdmin": "Administrator",
+      "roleHelp": "Organizatorji vidijo in upravljajo samo lastne dogodke. Administratorji upravljajo vse: nastavitve, dogodke vseh, imenik in račune.",
+      "roleFor": "Vloga: {name}",
+      "promoteTitle": "Imenovati za administratorja?",
+      "promoteMessage": "{name} bo lahko upravljal celotno instanco: nastavitve, dogodke vseh, imenik in račune osebja.",
+      "promote": "Imenuj za administratorja",
+      "demoteTitle": "Vrniti med organizatorje?",
+      "demoteMessage": "{name} bo takoj izgubil dostop do nastavitev in dogodkov drugih ter bo videl samo svoje.",
+      "demote": "Vrni med organizatorje",
+      "you": "vi",
+      "selfLocked": "Vaš račun upravlja drug administrator"
+    },
     "fileOrUrl": {
       "tabUpload": "Naloži datoteko",
       "tabUrl": "Prilepi URL",
@@ -472,7 +604,8 @@
       "errorGeneric": "Napaka pri nalaganju datoteke",
       "helpImage": "Podprti formati: PNG, JPEG, WebP, SVG, GIF — največ 10 MB",
       "helpAudio": "Podprti formati: MP3, WAV, OGG, M4A, WebM — največ 20 MB",
-      "helpDocument": "Podprti formati: PDF, DOCX, PPTX, XLSX, TXT — največ 25 MB"
+      "helpDocument": "Podprti formati: PDF, DOCX, PPTX, XLSX, TXT — največ 25 MB",
+      "uploadsUnavailable": "Nalaganje datotek v tej namestitvi ni na voljo: namesto tega prilepite URL datoteke."
     },
     "rubricaPicker": {
       "loading": "Iskanje poteka …",
@@ -510,7 +643,9 @@
           "endsAt": "Datum zaključka mora biti za datumom začetka.",
           "titleRequired": "Naslov je obvezen (vsaj 3 znaki).",
           "titleRequiredOtherLocale": "Naslov v privzetem jeziku ({locale}) je obvezen: preklopite na zavihek {locale}.",
-          "maxParticipants": "Vnesite število med 2 in 500."
+          "maxParticipants": "Vnesite število med 2 in 500.",
+          "descriptionRequired": "Opis je obvezen (vsaj {min} znakov).",
+          "descriptionRequiredOtherLocale": "Opis v privzetem jeziku ({locale}) je obvezen: preklopite na zavihek {locale}."
         },
         "senderRatioLabel": "Ocenjen aktivni delež",
         "senderRatioHelp": "Koliko udeležencev naj bi imelo aktiven mikrofon/video. Pomaga pri dimenzioniranju video strežnika.",
@@ -579,6 +714,7 @@
         "organizerName": "Kontaktna oseba",
         "organizerOrganization": "Organizacija",
         "organizerWebsite": "Spletna stran",
+        "organizerLogo": "Logotip organizatorja",
         "organizerRequired": "Kontaktna oseba in organizacija sta obvezni.",
         "moderatorsHeading": "Moderatorji",
         "moderatorsHelp": "Moderatorji lahko upravljajo sejo in nadzorujejo dovoljenja med dogodkom.",
@@ -591,7 +727,7 @@
         "speakerEmail": "E-pošta",
         "speakerRequired": "Ime in e-pošta sta obvezna.",
         "invitationsHeading": "Vabila",
-        "invitationsHelp": "Vnaprej prijavljene osebe — prejmejo osebno povezavo za udeležbo.",
+        "invitationsHelp": "Seznam povabljenih oseb. Platforma ne pošilja vabil: povezavo do dogodka delite sami. Ko je javna registracija izklopljena, se lahko registrirajo le ti naslovi, osebna povezava za vstop pa po registraciji prispe po e-pošti.",
         "invitationName": "Ime (neobvezno)",
         "invitationEmail": "E-pošta",
         "invitationRole": "Vloga",
@@ -604,8 +740,7 @@
         "invalidEmail": "Neveljaven e-poštni naslov.",
         "duplicateEmail": "Naslov je že dodan.",
         "rubricaPick": "Iskanje iz imenika …",
-        "rubricaOrAdd": "ali dodajte ročno",
-        "organizerLogo": "Logotip organizatorja"
+        "rubricaOrAdd": "ali dodajte ročno"
       },
       "step4": {
         "heading": "Vsebine in gradiva",
@@ -616,7 +751,7 @@
         "materialUrl": "Datoteka ali povezava",
         "visibilityLabel": "Vidnost",
         "visibility": {
-          "ALWAYS": "Vedno",
+          "ALWAYS": "V sobi in po dogodku",
           "BEFORE": "Pred dogodkom",
           "DURING": "Med dogodkom",
           "AFTER": "Po dogodku"
@@ -645,8 +780,6 @@
         "scaleMax": "Največ",
         "required": "Obvezno",
         "saveDraftAndGoQuestionnaires": "Shrani osnutek in pojdi na upravljanje vprašalnikov",
-        "preQuestionnaire": "Vprašalnik pred dogodkom",
-        "postQuestionnaire": "Vprašalnik po dogodku (povratne informacije)",
         "none": "— Brez —"
       },
       "step5": {
@@ -675,22 +808,25 @@
         "retentionHelp": "Nad tem pragom se osebni podatki samodejno izbrišejo.",
         "gdprTemplate": "Predloga obvestila",
         "gdprTemplateNone": "— Uporabi prilagojeno besedilo —",
+        "gdprTemplateUnknown": "Izbrana predloga obvestila o zasebnosti ne obstaja več: izberite drugo ali se vrnite k besedilu po meri",
         "privacyText": "Obvestilo o zasebnosti (besedilo)",
         "moderatorHeading": "Stik moderatorja",
+        "moderatorPublishHint": "Ime in e-naslov sta za objavo dogodka obvezna (uporabita se za moderatorsko povezavo in potrditveno e-sporočilo). Za shranjevanje kot osnutek nista potrebna.",
+        "moderatorLinkNote": "Ta oseba je glavni moderator dogodka: po e-pošti prejme zasebno povezavo za upravljanje dogodka (začetek snemanja, moderiranje vprašanj, zagon anket …). To ni isto kot somoderatorji, dodani v koraku »Osebe«, od katerih vsak prejme svojo povezavo.",
+        "moderatorRequired": "Vnesite ime moderatorja",
+        "moderatorEmailRequired": "Vnesite veljaven e-naslov moderatorja",
         "moderatorName": "Ime",
         "moderatorEmail": "E-pošta",
         "capacityHeading": "Ocenjena zmogljivost",
         "featuresHeading": "Povzetek konfiguracije",
         "privacyDoc": "Dokument obvestila (PDF ali povezava)",
         "privacyDocHelp": "Naložite PDF ali prilepite URL nadomestnega obvestila. Prepiše predlogo GDPR, če je nastavljena.",
-        "privacyTextHelp": "Kratko besedilo, prikazano v prijavnem obrazcu; lahko dopolni ali nadomesti predlogo GDPR.",
-        "moderatorPublishHint": "Ime in e-naslov sta za objavo dogodka obvezna (uporabita se za moderatorsko povezavo in potrditveno e-sporočilo). Za shranjevanje kot osnutek nista potrebna.",
-        "moderatorLinkNote": "Ta oseba je glavni moderator dogodka: po e-pošti prejme zasebno povezavo za upravljanje dogodka (začetek snemanja, moderiranje vprašanj, zagon anket …). To ni isto kot somoderatorji, dodani v koraku »Osebe«, od katerih vsak prejme svojo povezavo.",
-        "moderatorRequired": "Vnesite ime moderatorja",
-        "moderatorEmailRequired": "Vnesite veljaven e-naslov moderatorja"
+        "privacyTextHelp": "Kratko besedilo, prikazano v prijavnem obrazcu; lahko dopolni ali nadomesti predlogo GDPR."
       },
       "validationFailed": "Pred nadaljevanjem preverite označena polja.",
       "partialFailure": "Dogodek je ustvarjen, vendar nekateri elementi niso bili shranjeni: {items}. Dodate jih lahko na strani dogodka.",
+      "partialFailureEdit": "Spremembe dogodka so shranjene, vendar ni bilo mogoče shraniti: {items}. Vaše delo je še vedno tukaj: popravite in znova shranite.",
+      "partialFailureEditDetail": "Spremembe dogodka so shranjene, vendar ni bilo mogoče shraniti: {items}. Strežnik je odgovoril: {reason}. Vaše delo je še vedno tukaj: popravite in znova shranite.",
       "draftFound": "Našli smo neshranjen osnutek tega dogodka. Ga želite obnoviti?",
       "draftRestore": "Obnovi osnutek",
       "draftDiscard": "Opusti",
@@ -699,8 +835,13 @@
         "invitations": "vabila",
         "moderators": "moderatorji",
         "speakers": "govorci",
-        "materials": "gradiva"
-      }
+        "materials": "gradiva",
+        "questionnaires": "vprašalniki"
+      },
+      "revocationFailed": "Preklic dostopa za {name} ni uspel: povezava za dostop še vedno velja. Znova shranite za nov poskus ali jo prekličite na zavihku »{tab}« na strani dogodka.",
+      "validationFailedDetail": "Strežnik je zavrnil nekatere podatke: {reason}. Popravite jih in poskusite znova.",
+      "publishFailed": "Dogodek je bil ustvarjen, vendar ni bil objavljen: ostaja osnutek. Objavite ga na strani dogodka.",
+      "publishFailedDetail": "Dogodek je bil ustvarjen, vendar ni bil objavljen: ostaja osnutek. Strežnik je odgovoril: {reason}. Objavite ga na strani dogodka."
     },
     "nav": {
       "events": "Upravljanje dogodkov",
@@ -741,8 +882,11 @@
       "eventQuestionnaires": "Vprašalniki",
       "rubricaList": "Seznam",
       "rubricaDetail": "Podrobnosti",
-      "feedbackDashboard": "Feedback",
-      "recordingsPostprod": "Prepisi / AI"
+      "organizers": "Računi",
+      "people": "Osebe",
+      "postprodDetail": "Posnetek",
+      "recordingsPostprod": "Prepisi / AI",
+      "feedbackDashboard": "Feedback"
     },
     "landing": {
       "title": "Administracijska plošča",
@@ -1112,8 +1256,35 @@
       "qaEnabled": "Omogoči Q&A",
       "chatEnabled": "Omogoči klepet",
       "recordingEnabled": "Omogoči video snemanje",
+      "agendaEnabled": "Zapiski / kontrolni seznam (agenda) v živo",
+      "agendaEnabledDesc": "Kontrolni seznam tem za obravnavo, ki jih moderatorji med dogodkom odkljukajo. Vključi se v samodejni povzetek. Neobvezno; vklopiti ga je mogoče tudi med dogodkom.",
+      "wordCloudEnabled": "Oblak besed v živo",
+      "wordCloudEnabledDesc": "Udeleženci pošljejo besedo in oblak se posodablja v živo. Uporabno za začetek razprave ali zajem razpoloženja v nekaj sekundah.",
+      "whiteboardEnabled": "Deljena tabla",
+      "whiteboardEnabledDesc": "Omogoči vgrajeno sodelovalno tablo (Excalidraw): moderatorji jo lahko med dogodkom odprejo iz orodne vrstice. Zahteva storitev table v namestitvi; kjer je na voljo, je pri takojšnjih klicih vedno vklopljena.",
       "autoStartRecording": "Samodejno začni snemanje",
       "autoStartRecordingDesc": "Ob začetku dogodka se snemanje začne samodejno (brez vprašanja moderatorju). Tako poznejši udeleženci takoj najdejo razpoložljiv predvajalnik.",
+      "aiSectionHeading": "Samodejna postprodukcija",
+      "aiSectionDesc": "Po koncu dogodka lahko posnetek obdela cevovod umetne inteligence v gruči in pripravi prepis, povzetek ter — če je tako zahtevano — prevode in sinhronizacijo. Vse poteka na infrastrukturi te namestitve, noben podatek ne odide k tretjim osebam.",
+      "aiTranscriptEnabled": "Samodejni prepis",
+      "aiTranscriptEnabledDesc": "Razpoznava govora s prepoznavanjem govorcev. Potrebna je za povzetek, prevode in sinhronizacijo.",
+      "aiSummaryEnabled": "Povzetek in poglavja",
+      "aiSummaryEnabledDesc": "Povzetek srečanja, sprejete odločitve, naloge in razdelitev na poglavja s časovnimi oznakami.",
+      "aiTranslationEnabled": "Prevod v druge jezike",
+      "aiTranslationEnabledDesc": "Prepis in povzetek, prevedena v spodaj navedene jezike.",
+      "aiTargetLocales": "Jeziki prevoda",
+      "aiTargetLocalesDesc": "Kode jezikov ISO (npr. en, fr, de), ločene z vejico. Pustite prazno, da se uporabijo jeziki, nastavljeni na ravni spletišča.",
+      "aiTargetLocalesRequired": "Navedite vsaj en jezik prevoda ali pa izklopite samodejno prevajanje.",
+      "aiDubbingEnabled": "Zvočna sinhronizacija",
+      "aiDubbingEnabledDesc": "Sinhroniziran zvok v ciljnih jezikih, ustvarjen s prednaučenimi sintetičnimi glasovi. Glasov udeležencev ne klonira.",
+      "consentBadge": "Izrecno soglasje",
+      "retentionBadge": "Podaljša hrambo",
+      "multitrackRecordingEnabled": "Snemanje po udeležencih (visoka natančnost)",
+      "multitrackRecordingEnabledDesc": "Za vsakega udeleženca posname ločeno zvočno sled, tako da prepis z gotovostjo pripiše, kdo je kaj rekel (nič več »Govorec 1/2«). Obdeluje izoliran zvok posameznega govorca (občutljiv osebni podatek): sledi so začasne in se izbrišejo takoj po prepisu. Zahteva soglasje k snemanju.",
+      "retainParticipantTracks": "Ohrani sledi posameznih udeležencev",
+      "retainParticipantTracksDesc": "Posamezne zvočne sledi ohrani tudi po prepisu, za arhiv za prenos in za poslušanje po govorcih. POZOR: to podaljša hrambo občutljivih osebnih podatkov (izoliran glas) do izteka roka hrambe dogodka. Vklopite le, če je res potrebno, in z ustreznim soglasjem oziroma obvestilom.",
+      "expectedSpeakers": "Pričakovano število govorcev",
+      "expectedSpeakersDesc": "Kadar je znano (npr. 3 govorci), ta podatek izboljša kakovost prepoznave govorcev. Pustite prazno, da odloči cevovod.",
       "dataRetentionDays": "Hramba podatkov (dni po dogodku)",
       "dataRetentionHint": "Po tem obdobju bodo prijave udeležencev, vprašanja Q&A in morebitni video posnetki samodejno izbrisani.",
       "privacyPolicyUrl": "URL politike zasebnosti",
@@ -1167,31 +1338,7 @@
       "retentionPreviewKept": "Agregirane statistike in metapodatki dogodka se ohranijo.",
       "configPreview": "Predogled konfiguracije",
       "templateApplied": "Predloga uporabljena: {name}. Vse nastavitve lahko spremenite.",
-      "agendaEnabled": "Zapiski / kontrolni seznam (agenda) v živo",
-      "agendaEnabledDesc": "Kontrolni seznam tem za obravnavo, ki jih moderatorji med dogodkom odkljukajo. Vključi se v samodejni povzetek. Neobvezno; vklopiti ga je mogoče tudi med dogodkom.",
-      "whiteboardEnabled": "Deljena tabla",
-      "whiteboardEnabledDesc": "Omogoči vgrajeno sodelovalno tablo (Excalidraw): moderatorji jo lahko med dogodkom odprejo iz orodne vrstice. Pri takojšnjih klicih je vedno vklopljena.",
-      "aiSectionHeading": "Samodejna postprodukcija",
-      "aiSectionDesc": "Po koncu dogodka lahko posnetek obdela cevovod umetne inteligence v gruči in pripravi prepis, povzetek ter — če je tako zahtevano — prevode in sinhronizacijo. Vse poteka na infrastrukturi Oddelka, noben podatek ne odide k tretjim osebam.",
-      "aiTranscriptEnabled": "Samodejni prepis",
-      "aiTranscriptEnabledDesc": "Razpoznava govora s prepoznavanjem govorcev. Potrebna je za povzetek, prevode in sinhronizacijo.",
-      "aiSummaryEnabled": "Povzetek in poglavja",
-      "aiSummaryEnabledDesc": "Povzetek srečanja, sprejete odločitve, naloge in razdelitev na poglavja s časovnimi oznakami.",
-      "aiTranslationEnabled": "Prevod v druge jezike",
-      "aiTranslationEnabledDesc": "Prepis in povzetek, prevedena v spodaj navedene jezike.",
-      "aiTargetLocales": "Jeziki prevoda",
-      "aiTargetLocalesDesc": "Kode jezikov ISO (npr. en, fr, de), ločene z vejico. Pustite prazno, da se uporabijo jeziki, nastavljeni na ravni spletišča.",
-      "aiTargetLocalesRequired": "Navedite vsaj en jezik prevoda ali pa izklopite samodejno prevajanje.",
-      "aiDubbingEnabled": "Zvočna sinhronizacija",
-      "aiDubbingEnabledDesc": "Sinhroniziran zvok v ciljnih jezikih, ustvarjen s prednaučenimi sintetičnimi glasovi. Glasov udeležencev ne klonira.",
-      "consentBadge": "Izrecno soglasje",
-      "retentionBadge": "Podaljša hrambo",
-      "multitrackRecordingEnabled": "Snemanje po udeležencih (visoka natančnost)",
-      "multitrackRecordingEnabledDesc": "Za vsakega udeleženca posname ločeno zvočno sled, tako da prepis z gotovostjo pripiše, kdo je kaj rekel (nič več »Govorec 1/2«). Obdeluje izoliran zvok posameznega govorca (občutljiv osebni podatek): sledi so začasne in se izbrišejo takoj po prepisu. Zahteva soglasje k snemanju.",
-      "retainParticipantTracks": "Ohrani sledi posameznih udeležencev",
-      "retainParticipantTracksDesc": "Posamezne zvočne sledi ohrani tudi po prepisu, za arhiv za prenos in za poslušanje po govorcih. POZOR: to podaljša hrambo občutljivih osebnih podatkov (izoliran glas) do izteka roka hrambe dogodka. Vklopite le, če je res potrebno, in z ustreznim soglasjem oziroma obvestilom.",
-      "expectedSpeakers": "Pričakovano število govorcev",
-      "expectedSpeakersDesc": "Kadar je znano (npr. 3 govorci), ta podatek izboljša kakovost prepoznave govorcev. Pustite prazno, da odloči cevovod."
+      "whiteboardUnavailable": "V tej namestitvi ni na voljo: manjka Jitsijeva storitev table, ki jo lahko vklopi upravljavec platforme."
     },
     "links": {
       "title": "Povezave dogodka",
@@ -1199,11 +1346,18 @@
       "publicPageHint": "Stran, ki jo delite za zbiranje novih prijav.",
       "guestJoin": "Neposredno povabilo (brez prijave)",
       "guestJoinHint": "Hitra povezava za povabilo udeleženca v zadnjem trenutku: pridruži se kot gost med dogodkom v živo, brez izpolnjevanja prijavnega obrazca.",
+      "callInvite": "Povezava za udeležence",
+      "callInviteHint": "Kdor jo prejme, se klicu pridruži kot gost, brez prijave. Hitri klic nima javne strani: deliti je treba to povezavo.",
       "moderatorLink": "Moderatorska povezava",
       "moderatorLinkHint": "To povezavo delite samo z moderatorji. Kdor koli jo ima, lahko upravlja dogodek.",
       "liveRoomHint": "Povezava za neposreden vstop v sobo kot moderator.",
       "copyLink": "Kopiraj povezavo",
-      "copied": "Kopirano!"
+      "copied": "Kopirano!",
+      "reveal": "Prikaži",
+      "hide": "Skrij",
+      "warning": "Kdor koli ima to povezavo, upravlja dogodek: ne prikazujte je med deljenjem zaslona in je ne lepite v klepet.",
+      "hidden": "Povezava je skrita",
+      "copyFailed": "Kopiranje ni uspelo: izberite spodnji naslov in ga kopirajte ročno."
     },
     "feedbackAdmin": {
       "title": "Rezultati povratnih informacij",
@@ -1294,185 +1448,6 @@
         "scaling": "Dimenzioniranje infrastrukture",
         "postprod": "Cevovod AI po dogodku"
       },
-      "scaling": {
-        "intro": "Parametri, ki opisujejo zmogljivost gruče, na kateri teče platforma. Privzete vrednosti so umerjene za Azure F16s_v2 (16 vCPU / 32 GiB) za JVB in F4s_v2 (4 vCPU / 8 GiB) za Jibri. Pri drugačni strojni opremi spremenite tukaj — skalator nemudoma preračuna.",
-        "jvbSection": "Zmogljivost video mostu (JVB)",
-        "jvbCpuCoresPerPod": "vCPU na pod JVB",
-        "jvbCpuCoresPerPodHelp": "Število jeder CPE, zahtevanih za vsebnik JVB (resources.requests.cpu). Azure F16s_v2 = 16.",
-        "jvbReceiversPerCore": "Pasivni udeleženci na jedro",
-        "jvbReceiversPerCoreHelp": "Koliko gledalcev, ki samo prejemajo, sodi v 1 vCPU. Umerjeno na 18,75 (300 webinar ÷ 16 jeder) na F16s_v2.",
-        "jvbSendersPerCore": "Aktivni pošiljatelji na jedro",
-        "jvbSendersPerCoreHelp": "Koliko pošiljateljev (mikrofon + kamera) sodi v 1 vCPU. Umerjeno na 3,125 (50 vseh-pošiljateljev ÷ 16 jeder) na F16s_v2.",
-        "jvbMaxReplicas": "Največ replik JVB",
-        "jvbMaxReplicasHelp": "Trda zgornja meja za preprečitev nenadzorovanega skaliranja. Privzeto 6.",
-        "jibriCpuCoresPerPod": "vCPU na pod Jibri",
-        "jibriCpuCoresPerPodHelp": "Jedra, zahtevana za vsebnik Jibri (ffmpeg + headless Chrome). Azure F4s_v2 = 4.",
-        "defaultSenderRatioPct": "Privzeto razmerje pošiljateljev",
-        "defaultSenderRatioPctHelp": "Odstotek udeležencev, pričakovanih kot pošiljatelji (mikrofon + kamera), kadar dogodek tega ne določa. Webinar 10–30 %, okrogla miza 50–100 %.",
-        "previewTitle": "Predogled izračuna",
-        "previewBody": "Dogodek z {participants} ocenjenimi udeleženci pri {ratio} % pošiljateljev → {senders} pošiljateljev + {receivers} pasivnih → {cores} ocenjenih jeder → {jvbs} JVB.",
-        "graceSection": "Mehki izhod (konec dogodka)",
-        "eventGracePeriodMinutes": "Privzete minute dodatka po endsAt",
-        "eventGracePeriodMinutesHelp": "Dodaten čas po predvidenem koncu pred zaprtjem klica. 0 = trdo zaprtje, -1 = brez samodejnega zaprtja (prepusti čiščenju neaktivnosti), 15 = pasica in zaprtje po 15 min. Vsak dogodek lahko prepiše.",
-        "videoQualitySection": "Video/audio quality",
-        "videoQuality": "Default quality",
-        "videoQualityHelp": "Preset applied to every event (overridable per event). Higher quality needs more bandwidth — “High” is the best trade-off. Takes effect immediately, no restart.",
-        "videoQualityOptions": {
-          "MAX": "Maximum — 1080p",
-          "HIGH": "High — 720p (recommended)",
-          "BALANCED": "Balanced — 540p",
-          "SAVE_DATA": "Save data — 360p"
-        },
-        "videoQualityDesc": {
-          "MAX": "Full HD 1080p, up to ~4 Mbps, stereo Opus 510 kbps audio. Top fidelity for small high-stakes calls — uses more bandwidth and loads the bridge more.",
-          "HIGH": "720p with a capped bitrate (~2.2 Mbps peak) and 96 kbps Opus audio. Great quality without maxing bandwidth: the recommended production trade-off.",
-          "BALANCED": "540p with a contained bitrate (~1 Mbps) and fewer simultaneous incoming videos. Good for large audiences or weak networks.",
-          "SAVE_DATA": "360p at minimal bitrate (~600 kbps) with unused-layer suspension. For very slow connections."
-        }
-      },
-      "header": {
-        "slimBarTitle": "Zgornja vrstica (Slim Header)",
-        "slimBarDescription": "Tanka vrstica na vrhu strani, ki identificira nadrejeno ustanovo.",
-        "parentOrganization": "Nadrejena ustanova",
-        "parentOrganizationHelp": "Npr. \"Predsedstvo Sveta ministrov\"",
-        "parentOrganizationUrl": "URL nadrejene ustanove",
-        "centerBarTitle": "Osrednja glava",
-        "centerBarDescription": "Glavno območje glave z imenom aplikacije in logotipom.",
-        "appName": "Ime aplikacije",
-        "appNameHelp": "Prikazano v glavi in naslovu brskalnika",
-        "organizationShort": "Kratko ime ustanove",
-        "logoUrl": "URL logotipa",
-        "logoUrlHelp": "Pustite prazno za privzeto ikono javne uprave",
-        "organizationUrl": "URL spletne strani ustanove"
-      },
-      "branding": {
-        "siteName": "Ime aplikacije",
-        "siteNameHelp": "Prikazano v glavi, naslovu brskalnika in e-pošti",
-        "siteDescription": "Opis aplikacije",
-        "organizationName": "Ime organizacije",
-        "organizationNameHelp": "npr. Oddelek za digitalno preobrazbo",
-        "organizationNameShort": "Kratica organizacije",
-        "organizationUrl": "URL organizacije",
-        "parentOrganization": "Nadrejena organizacija",
-        "parentOrganizationHelp": "npr. Predsedstvo Sveta ministrov",
-        "parentOrganizationUrl": "URL nadrejene organizacije",
-        "logoUrl": "URL prilagojenega logotipa",
-        "logoUrlHelp": "Pustite prazno za privzeto ikono javne uprave",
-        "faviconUrl": "URL favicona",
-        "primaryColor": "Primarna barva",
-        "defaultTimezone": "Privzeti časovni pas",
-        "defaultTimezoneHelp": "Uporablja se za prikaz datumov in ustvarjanje novih dogodkov."
-      },
-      "watermark": {
-        "title": "Prilagoditev videa",
-        "enabled": "Vodni žig aktiven",
-        "url": "URL vodnega žiga",
-        "urlHelp": "URL prosojne slike SVG ali PNG. Pustite prazno za logotip organizacije.",
-        "opacity": "Prosojnost",
-        "position": "Položaj",
-        "previewLabel": "Predogled video območja",
-        "positions": {
-          "bottomLeft": "Spodaj levo",
-          "bottomRight": "Spodaj desno",
-          "topLeft": "Zgoraj levo",
-          "topRight": "Zgoraj desno"
-        }
-      },
-      "seo": {
-        "title": "SEO naslov",
-        "titleHelp": "Naslov, prikazan v rezultatih iskanja in zavihku brskalnika",
-        "description": "SEO opis",
-        "descriptionHelp": "Opis za iskalnike in deljenje na družbenih omrežjih",
-        "image": "Open Graph slika",
-        "imageHelp": "Privzeta slika za deljenje na družbenih omrežjih (priporočeno 1200x630)"
-      },
-      "homepage": {
-        "modeLabel": "Način domače strani",
-        "modes": {
-          "LANDING": {
-            "title": "Predstavitvena stran",
-            "description": "Hero, funkcionalnosti, prihajajoči dogodki in kako deluje"
-          },
-          "EVENTS_LIST": {
-            "title": "Seznam dogodkov",
-            "description": "Neposredno prikaži seznam dogodkov"
-          },
-          "CUSTOM": {
-            "title": "Prilagojeno",
-            "description": "Prilagojena HTML vsebina + seznam dogodkov"
-          }
-        },
-        "customHtmlLabel": "Prilagojena HTML vsebina",
-        "customHtmlHelp": "HTML, prikazan v glavnem razdelku domače strani"
-      },
-      "pages": {
-        "privacyTitle": "Politika zasebnosti",
-        "privacyIt": "Vsebina (italijansko)",
-        "privacyEn": "Vsebina (angleško)",
-        "privacyLabel": "Vsebina obvestila o zasebnosti",
-        "accessibilityTitle": "Izjava o dostopnosti",
-        "accessibilityIt": "Vsebina (italijansko)",
-        "accessibilityEn": "Vsebina (angleško)",
-        "accessibilityLabel": "Vsebina izjave o dostopnosti",
-        "preview": "Predogled"
-      },
-      "footer": {
-        "linksTitle": "Povezave v nogi",
-        "addLink": "Dodaj povezavo",
-        "noLinks": "Ni konfiguriranih povezav. Uporabljene bodo privzete.",
-        "linkTitle": "Naslov",
-        "linkSection": "Razdelek",
-        "sectionLegal": "Pravna obvestila",
-        "sectionMain": "Glavni",
-        "moveUp": "Premakni gor",
-        "moveDown": "Premakni dol",
-        "removeLink": "Odstrani povezavo"
-      },
-      "features": {
-        "statusPageEnabled": "Stran stanja aktivna",
-        "statusPageEnabledHelp": "Prikaži stran stanja storitve",
-        "guestAccessEnabled": "Dostop gostom aktiven",
-        "guestAccessEnabledHelp": "Dovoli dostop gostom na dogodke v živo",
-        "publicRegistrationEnabled": "Javna registracija aktivna",
-        "publicRegistrationEnabledHelp": "Kdor koli lahko ustvari dogodke (če je onemogočeno, samo administratorji)",
-        "calendarPublic": "Javni koledar",
-        "calendarPublicHelp": "Objavi koledar dogodkov. Obiskovalci lahko vidijo načrtovane dogodke.",
-        "parseTitleKicker": "Naslovi z uredniškim podnaslovom",
-        "parseTitleKickerHelp": "Če naslov dogodka vsebuje znak \"|\", se del pred njim prikaže kot majhna velika oznaka nad glavnim naslovom. Primer: \"Caffettino | Prova OSS\" → oznaka \"CAFFETTINO\" + naslov \"Prova OSS\".",
-        "githubUrl": "URL repozitorija GitHub",
-        "supportEmail": "E-pošta za podporo",
-        "jvbScalingTitle": "Skaliranje video mostu (JVB)",
-        "jvbScalingHelp": "Določa, koliko časa počakati pred izklopom neaktivnega video vozlišča in kako zgodaj ga zagnati pred načrtovanim dogodkom.",
-        "jvbInactiveGraceMinutes": "Minute neaktivnosti pred izklopom",
-        "jvbInactiveGraceMinutesHelp": "Po koliko časa prazne konference se video vozlišče zaustavi. Priporočeno 45 minut. Razpon 5–240.",
-        "jvbPreScaleMinutes": "Minute predčasnega zagona",
-        "jvbPreScaleMinutesHelp": "Koliko pred startsAt zagnati video vozlišče za načrtovan dogodek. Priporočeno 10 minut.",
-        "jvbStressWarnPercent": "Prag opozorila za stres (%)",
-        "jvbStressWarnPercentHelp": "Nad tem pragom skalator doda 1 repliko JVB, tudi če je napovedna analiza ne zahteva. Privzeto 50.",
-        "jvbStressCriticalPercent": "Prag kritičnega stresa (%)",
-        "jvbStressCriticalPercentHelp": "Nad tem pragom skalator doda 2 repliki JVB. Privzeto 70. Mora biti večji od opozorila.",
-        "jvbProvisioningTimeoutMinutes": "Časovna omejitev priprave (minute)",
-        "jvbProvisioningTimeoutMinutesHelp": "Po koliko minutah od startsAt se dogodek z JVB, ki še ni pripravljen, na strani stanja označi kot 'degraded'. Privzeto 15. Pokriva hladni zagon vozlišča (~3–5 min) + varnostno mejo.",
-        "statusPollIntervalSeconds": "Interval poizvedb strani stanja (sekunde)",
-        "statusPollIntervalSecondsHelp": "Vsakih koliko sekund stran /status osveži podatke v brskalniku. Privzeto 30. Nižje vrednosti = svežejši podatki, vendar večja obremenitev aplikacije.",
-        "jvbEmptyCloseMinutes": "Minute prazne sobe pred dokončnim zaprtjem",
-        "jvbEmptyCloseMinutesHelp": "Če soba v stanju LIVE, ki je že imela udeležence, ostane prazna toliko minut, se dokončno zapre (ENDED) — tako se dogodek brez moderatorja sam zapre zaradi nedejavnosti, ne da bi čakal na predvideni konec. Privzeto 15 (vklopljeno). -1 = izklopljeno. 0 = zapri ob prvem preverjanju prazne sobe.",
-        "waitingRoomLeadMinutes": "Okno za usmerjanje v čakalnico (minute)",
-        "waitingRoomLeadMinutesHelp": "Prijava v tolikih minutah pred začetkom vodi naravnost v čakalnico; zgodnejše prijave vidijo potrditev s povezavo do koledarja. 0 = do začetka vedno prikaži potrditev. Priporočeno 15.",
-        "reactionsMode": "Odzivi (emodži)",
-        "reactionsModeNative": "Vgrajeni v Jitsi (v orodni vrstici, minljivi)",
-        "reactionsModeCustom": "Prilagojeni v aplikaciji (leva vrstica, s statistiko)",
-        "reactionsModeHelp": "Vgrajeni = Jitsijev gumb za odzive v vrstici s kontrolniki, lahek in minljiv (odzivi se ne štejejo). Prilagojeni = vrstica z odzivi v aplikaciji spodaj levo, s števci in statistiko. Privzeto: vgrajeni.",
-        "emailSenderTitle": "Pošiljatelj e-sporočil",
-        "emailSenderHelp": "Kako je pošiljatelj prikazan v nabiralniku prijavljenih. Naslov, s katerega se pošilja, ostaja v nastavitvah namestitve (ujemati se mora s tistim, ki ga dovoljuje strežnik SMTP).",
-        "emailFromName": "Ime pošiljatelja",
-        "emailFromNameHelp": "Prazno = uporabi se ime, nastavljeno v namestitvi (SMTP_FROM_NAME). E-sporočila se še naprej pošiljajo s sistemskega naslova.",
-        "emailReplyTo": "Naslov za odgovore",
-        "emailReplyToHelp": "E-sporočila prihajajo z naslova, ki ne sprejema odgovorov: brez tega odgovor ne doseže nikogar.",
-        "avatarTitle": "Slike udeležencev",
-        "gravatarEnabled": "Uporabi Gravatar, kadar je na voljo",
-        "gravatarEnabledHelp": "Kdor se je prijavil z e-naslovom, ki ima Gravatar, ga bo v sobi videl kot sliko; pri vseh drugih ostanejo začetnice, ki jih ustvari platforma. Slika gre prek našega strežnika, zato brskalniki udeležencev ne stopijo v stik z gravatar.com — platforma pa: to navedite v obvestilu o zasebnosti."
-      },
       "postprod": {
         "prerequisitesNote": "Postprodukcija obdela celoten posnetek po koncu dogodka. Namenski nabor GPU se prebudi, ko v čakalno vrsto pride prvo opravilo, in se ugasne, ko se vrsta izprazni, da so stroški nižji. Pred vklopom cevovoda preverite, da ima gruča nastavljen nabor GPU, nameščen operator NVIDIA, poverilnice HuggingFace na voljo v imenskem prostoru in uteži modelov vnaprej naložene na namenskem nosilcu. Operativni kontrolni seznam je v docs/POSTPROD.md.",
         "pipelineEnabled": "Cevovod po dogodku je aktiven",
@@ -1499,10 +1474,217 @@
         "jobMaxAttempts": "Poskusi pred neuspehom",
         "jobMaxAttemptsHelp": "Kolikokrat cevovod ponovi opravilo, preden ga označi kot neuspešno. Zamik med poskusi narašča eksponentno (od 30 sekund do 2 ur). Običajna vrednost je 5.",
         "artifactRetentionDays": "Hramba artefaktov (dnevi)",
-        "artifactRetentionDaysHelp": "Pri vrednosti 0 artefakti AI sledijo istemu roku hrambe kot dogodek. Vrednost, večja od nič, jih ohrani navedeno število dni tudi po zaprtju dogodka, dokler jih dnevni cron ne izbriše. Izbris vključuje imena govorcev in vsebino opravil, skladno z docs/GDPR.md.",
+        "artifactRetentionDaysHelp": "Pri vrednosti 0 ni omejitve za celotno spletno mesto: artefakti AI sledijo roku hrambe svojega posnetka ali dogodka. Vrednost, večja od nič, poskrbi, da dnevno opravilo izbriše vsak artefakt, ustvarjen pred več kot toliko dnevi, objavljen ali ne: rok hrambe lahko skrajša, nikoli pa ga ne podaljša. Imena govorcev in vsebina opravil niso zajeti: sledijo roku hrambe posnetka ali dogodka. Podrobnosti v docs/privacy/recordings-and-ai.md.",
         "consentDisclosureSection": "Obvestilo o AI v čakalnici",
         "consentDisclosureHelp": "Besedilo, prikazano udeležencem v čakalnici, kadar dogodek uporablja postprodukcijo z AI (prepis, povzetek, prevod, sinhronizacija). Prilagodljivo po jezikih. Pustite prazno, da se uporabi privzeto sistemsko besedilo.",
         "consentDisclosurePlaceholder": "Npr. Ta dogodek bo po prenosu v živo samodejno prepisan in povzet z orodji umetne inteligence …"
+      },
+      "scaling": {
+        "intro": "Parametri, ki opisujejo zmogljivost gruče, na kateri teče platforma. Privzete vrednosti so umerjene za Azure F16s_v2 (16 vCPU / 32 GiB) za JVB in F4s_v2 (4 vCPU / 8 GiB) za Jibri. Pri drugačni strojni opremi spremenite tukaj — skalator nemudoma preračuna.",
+        "jvbSection": "Zmogljivost video mostu (JVB)",
+        "jvbCpuCoresPerPod": "vCPU na pod JVB",
+        "jvbCpuCoresPerPodHelp": "Število jeder CPE, zahtevanih za vsebnik JVB (resources.requests.cpu). Azure F16s_v2 = 16.",
+        "jvbReceiversPerCore": "Pasivni udeleženci na jedro",
+        "jvbReceiversPerCoreHelp": "Koliko gledalcev, ki samo prejemajo, sodi v 1 vCPU. Umerjeno na 18,75 (300 webinar ÷ 16 jeder) na F16s_v2.",
+        "jvbSendersPerCore": "Aktivni pošiljatelji na jedro",
+        "jvbSendersPerCoreHelp": "Koliko pošiljateljev (mikrofon + kamera) sodi v 1 vCPU. Umerjeno na 3,125 (50 vseh-pošiljateljev ÷ 16 jeder) na F16s_v2.",
+        "jvbMaxReplicas": "Največ replik JVB",
+        "jvbMaxReplicasHelp": "Trda zgornja meja za preprečitev nenadzorovanega skaliranja. Privzeto 6.",
+        "jibriCpuCoresPerPod": "vCPU na pod Jibri",
+        "jibriCpuCoresPerPodHelp": "Jedra, zahtevana za vsebnik Jibri (ffmpeg + headless Chrome). Azure F4s_v2 = 4.",
+        "defaultSenderRatioPct": "Privzeto razmerje pošiljateljev",
+        "defaultSenderRatioPctHelp": "Odstotek udeležencev, pričakovanih kot pošiljatelji (mikrofon + kamera), kadar dogodek tega ne določa. Webinar 10–30 %, okrogla miza 50–100 %.",
+        "previewTitle": "Predogled izračuna",
+        "previewBody": "Dogodek z {participants} ocenjenimi udeleženci pri {ratio} % pošiljateljev → {senders} pošiljateljev + {receivers} pasivnih → {cores} ocenjenih jeder → {jvbs} JVB.",
+        "graceSection": "Mehki izhod (konec dogodka)",
+        "eventGracePeriodMinutes": "Privzete minute dodatka po endsAt",
+        "eventGracePeriodMinutesHelp": "Dodaten čas po predvidenem koncu pred zaprtjem klica. 0 = trdo zaprtje, -1 = brez samodejnega zaprtja (prepusti čiščenju neaktivnosti), 15 = pasica in zaprtje po 15 min. Vsak dogodek lahko prepiše.",
+        "videoQualitySection": "Kakovost videa/zvoka",
+        "videoQuality": "Privzeta kakovost",
+        "videoQualityHelp": "Prednastavitev, uporabljena za vse dogodke (za posamezen dogodek jo je mogoče spremeniti). Višja kot je kakovost, več pasovne širine je potrebne: »Visoka« je najboljši kompromis. Uveljavi se takoj, brez ponovnega zagona.",
+        "videoQualityOptions": {
+          "MAX": "Največja — 1080p",
+          "HIGH": "Visoka — 720p (priporočeno)",
+          "BALANCED": "Uravnotežena — 540p",
+          "SAVE_DATA": "Varčevanje s podatki — 360p"
+        },
+        "videoQualityDesc": {
+          "MAX": "Full HD 1080p, bitna hitrost do ~4 Mb/s, stereo zvok Opus 510 kb/s. Največja zvestoba za majhne, pomembne klice — porabi več pasovne širine in bolj obremeni video most.",
+          "HIGH": "720p z omejeno bitno hitrostjo (~2,2 Mb/s na vrhuncu) in zvokom Opus 96 kb/s. Odlična kakovost brez zasičenja pasovne širine: priporočeni kompromis za produkcijo.",
+          "BALANCED": "540p z zmerno bitno hitrostjo (~1 Mb/s) in manj hkrati prejetimi videi. Primerno za številno občinstvo ali šibka omrežja.",
+          "SAVE_DATA": "360p z najmanjšo bitno hitrostjo (~600 kb/s) in začasno ustavitvijo neuporabljenih plasti. Za zelo počasne povezave."
+        }
+      },
+      "header": {
+        "slimBarTitle": "Zgornja vrstica (Slim Header)",
+        "slimBarDescription": "Tanka vrstica na vrhu strani, ki identificira nadrejeno ustanovo.",
+        "parentOrganization": "Nadrejena ustanova",
+        "parentOrganizationHelp": "Organ, pod katerega spada vaša uprava. Pustite prazno, da ne navedete nobenega.",
+        "parentOrganizationUrl": "URL nadrejene ustanove",
+        "siteTagline": "Moto spletnega mesta",
+        "siteTaglineHelp": "Prikaže se v zgornji vrstici in nogi, ko je nadrejeni organ prazen. Pustite prazno, da se ne prikaže nič. Vpiše se za vsak jezik: kjer manjka, se uporabi angleški, nato katerikoli drug.",
+        "centerBarTitle": "Osrednja glava",
+        "centerBarDescription": "Glavno območje glave z imenom aplikacije in logotipom.",
+        "appName": "Ime aplikacije",
+        "appNameHelp": "Prikazano v glavi in naslovu brskalnika",
+        "organizationShort": "Kratko ime ustanove",
+        "logoUrl": "URL logotipa",
+        "logoUrlHelp": "Pustite prazno za privzeto ikono javne uprave",
+        "organizationUrl": "URL spletne strani ustanove"
+      },
+      "branding": {
+        "siteName": "Ime aplikacije",
+        "siteNameHelp": "Prikazano v glavi, naslovu brskalnika in e-pošti",
+        "siteDescription": "Opis aplikacije",
+        "organizationName": "Ime organizacije",
+        "organizationNameHelp": "Ime organa, ki je lastnik platforme: prikazano v glavi, nogi in pravnih besedilih (npr. Občina Primer)",
+        "organizationNameShort": "Kratica organizacije",
+        "organizationUrl": "URL organizacije",
+        "parentOrganization": "Nadrejena organizacija",
+        "parentOrganizationHelp": "Organ, pod katerega spada vaša uprava. Pustite prazno, da ne navedete nobenega.",
+        "parentOrganizationUrl": "URL nadrejene organizacije",
+        "logoUrl": "URL prilagojenega logotipa",
+        "logoUrlHelp": "Pustite prazno za privzeto ikono javne uprave",
+        "faviconUrl": "URL favicona",
+        "primaryColor": "Primarna barva",
+        "defaultTimezone": "Privzeti časovni pas",
+        "defaultTimezoneHelp": "Uporablja se za prikaz datumov in ustvarjanje novih dogodkov.",
+        "waitingRoomEngine": "Čakalnica (privzeto za spletišče)",
+        "waitingRoomEngineGame": "Videoigra (lobi Phaser)",
+        "waitingRoomEngineClassic": "Klasična (statična)",
+        "waitingRoomEngineHelp": "Privzeti način čakalnice. Spremeniti ga je mogoče za posamezen dogodek, za en obisk pa s parametrom {param} v naslovu."
+      },
+      "watermark": {
+        "title": "Prilagoditev videa",
+        "enabled": "Vodni žig aktiven",
+        "url": "URL vodnega žiga",
+        "urlHelp": "URL prosojne slike SVG ali PNG. Pustite prazno za logotip organizacije.",
+        "opacity": "Prosojnost",
+        "position": "Položaj",
+        "previewLabel": "Predogled video območja",
+        "positions": {
+          "bottomLeft": "Spodaj levo",
+          "bottomRight": "Spodaj desno",
+          "topLeft": "Zgoraj levo",
+          "topRight": "Zgoraj desno"
+        }
+      },
+      "seo": {
+        "title": "SEO naslov",
+        "titleHelp": "Naslov, prikazan v rezultatih iskanja in zavihku brskalnika",
+        "description": "SEO opis",
+        "descriptionHelp": "Opis za iskalnike in deljenje na družbenih omrežjih",
+        "image": "Open Graph slika",
+        "imageHelp": "Privzeta slika za deljenje na družbenih omrežjih (priporočeno 1200x630)",
+        "ogSection": "Predogled deljenih povezav",
+        "ogIntro": "Ko nekdo prilepi povezavo do dogodka v klepet ali na družbeno omrežje, platforma izriše predogledno sliko s podatki v njej. Izberite, katere: vsako dodatno polje vzame prostor naslovu.",
+        "ogCardEnabled": "Ustvari predogled",
+        "ogCardEnabledHelp": "Ko je izklopljeno, povezava prikaže plakat, kakršen je (ali logotip spletnega mesta, če dogodek plakata nima), brez berljivega naslova ali datuma na sliki.",
+        "ogShowPoster": "Plakat kot ozadje",
+        "ogShowPosterHelp": "Uporabi naslovnico dogodka kot ozadje predogleda, zatemnjeno, da besedilo ostane berljivo. Brez plakata ali z izklopljeno to možnostjo ostaneta institucionalna barva in logotip.",
+        "ogShowDate": "Datum in ura",
+        "ogShowDateHelp": "V privzetem časovnem pasu platforme.",
+        "ogShowSpeakers": "Govorci",
+        "ogShowSpeakersHelp": "Besedilo o govornikih dogodka, skrajšano, če je predolgo.",
+        "ogShowOrganization": "Organizacija",
+        "ogShowOrganizationHelp": "Organizator dogodka, če je naveden, sicer ime organizacije."
+      },
+      "homepage": {
+        "modeLabel": "Način domače strani",
+        "modes": {
+          "LANDING": {
+            "title": "Predstavitvena stran",
+            "description": "Hero, funkcionalnosti, prihajajoči dogodki in kako deluje"
+          },
+          "EVENTS_LIST": {
+            "title": "Seznam dogodkov",
+            "description": "Neposredno prikaži seznam dogodkov"
+          },
+          "CUSTOM": {
+            "title": "Prilagojeno",
+            "description": "Prilagojena HTML vsebina + seznam dogodkov"
+          },
+          "LANDING_ISTITUZIONALE": {
+            "title": "Institucionalna predstavitvena stran",
+            "description": "Ustanova, izpostavljen naslednji dogodek in ostali na seznamu. Brez tehničnega jezika"
+          },
+          "LANDING_SEMPLICE": {
+            "title": "Predstavitvena stran v preprostem jeziku",
+            "description": "Malo besed in eno samo povabilo, za tiste, ki niso vajeni spletnih dogodkov"
+          }
+        },
+        "customHtmlLabel": "Prilagojena HTML vsebina",
+        "customHtmlHelp": "HTML, prikazan v glavnem razdelku domače strani",
+        "showProject": "Prikaži razdelek »Projekt«",
+        "showProjectHelp": "Arhitektura, suverenost podatkov in odprta koda platforme: zanimivo za tiste, ki razmišljajo o ponovni uporabi, bolj kot za udeležence."
+      },
+      "pages": {
+        "privacyTitle": "Politika zasebnosti",
+        "privacyIt": "Vsebina (italijansko)",
+        "privacyEn": "Vsebina (angleško)",
+        "privacyLabel": "Vsebina obvestila o zasebnosti",
+        "accessibilityTitle": "Izjava o dostopnosti",
+        "accessibilityIt": "Vsebina (italijansko)",
+        "accessibilityEn": "Vsebina (angleško)",
+        "accessibilityLabel": "Vsebina izjave o dostopnosti",
+        "preview": "Predogled"
+      },
+      "footer": {
+        "linksTitle": "Povezave v nogi",
+        "addLink": "Dodaj povezavo",
+        "noLinks": "Ni konfiguriranih povezav. Uporabljene bodo privzete.",
+        "linkTitle": "Naslov",
+        "linkSection": "Razdelek",
+        "sectionLegal": "Pravna obvestila",
+        "sectionMain": "Glavni",
+        "moveUp": "Premakni gor",
+        "moveDown": "Premakni dol",
+        "removeLink": "Odstrani povezavo"
+      },
+      "features": {
+        "statusPageEnabled": "Stran stanja aktivna",
+        "statusPageEnabledHelp": "Objavi stran stanja storitve. Ko je izklopljena, stran ne obstaja, njene podatke pa vidijo samo skrbniki.",
+        "guestAccessEnabled": "Dostop gostom aktiven",
+        "guestAccessEnabledHelp": "Neprijavljeni se lahko pridružijo dogodkom v teku samo s svojim imenom. Ko je izklopljeno, se na načrtovane dogodke vstopi samo s prijavo ali s povezavo za moderatorja ali govorca; takojšnji video klici ostanejo odprti za vse, ki imajo povezavo.",
+        "publicRegistrationEnabled": "Javna registracija aktivna",
+        "publicRegistrationEnabledHelp": "Na dogodke se lahko prijavi kdorkoli. Ko je izklopljena, se lahko prijavijo samo osebe s seznama povabljenih na dogodek, osebna povezava za vstop pa se pošlje samo po e-pošti; že prijavljeni ter povezave moderatorjev in govorcev še naprej delujejo.",
+        "calendarPublic": "Javni koledar",
+        "calendarPublicHelp": "Objavi koledar dogodkov. Obiskovalci lahko vidijo načrtovane dogodke.",
+        "parseTitleKicker": "Naslovi z uredniškim podnaslovom",
+        "parseTitleKickerHelp": "Če naslov dogodka vsebuje znak \"|\", se del pred njim prikaže kot majhna velika oznaka nad glavnim naslovom. Primer: \"Kavica | Test OSS\" → oznaka \"KAVICA\" + naslov \"Test OSS\".",
+        "githubUrl": "URL repozitorija GitHub",
+        "supportEmail": "E-pošta za podporo",
+        "jvbScalingTitle": "Skaliranje video mostu (JVB)",
+        "jvbScalingHelp": "Določa, koliko časa počakati pred izklopom neaktivnega video vozlišča in kako zgodaj ga zagnati pred načrtovanim dogodkom.",
+        "jvbInactiveGraceMinutes": "Minute neaktivnosti pred izklopom",
+        "jvbInactiveGraceMinutesHelp": "Po koliko časa prazne konference se video vozlišče zaustavi. Priporočeno 45 minut. Razpon 5–240.",
+        "jvbPreScaleMinutes": "Minute predčasnega zagona",
+        "jvbPreScaleMinutesHelp": "Koliko pred startsAt zagnati video vozlišče za načrtovan dogodek. Priporočeno 10 minut.",
+        "jvbEmptyCloseMinutes": "Minute prazne sobe pred dokončnim zaprtjem",
+        "jvbEmptyCloseMinutesHelp": "Če soba v stanju LIVE, ki je že imela udeležence, ostane prazna toliko minut, se dokončno zapre (ENDED) — tako se dogodek brez moderatorja sam zapre zaradi nedejavnosti, ne da bi čakal na predvideni konec. Privzeto 15 (vklopljeno). -1 = izklopljeno. 0 = zapri ob prvem preverjanju prazne sobe.",
+        "waitingRoomLeadMinutes": "Okno za usmerjanje v čakalnico (minute)",
+        "waitingRoomLeadMinutesHelp": "Prijava v tolikih minutah pred začetkom vodi naravnost v čakalnico; zgodnejše prijave vidijo potrditev s povezavo do koledarja. 0 = do začetka vedno prikaži potrditev. Priporočeno 15.",
+        "reactionsMode": "Odzivi (emodži)",
+        "reactionsModeNative": "Vgrajeni v Jitsi (v orodni vrstici, minljivi)",
+        "reactionsModeCustom": "Prilagojeni v aplikaciji (leva vrstica, s statistiko)",
+        "reactionsModeHelp": "Vgrajeni = Jitsijev gumb za odzive v vrstici s kontrolniki, lahek in minljiv (odzivi se ne štejejo). Prilagojeni = vrstica z odzivi v aplikaciji spodaj levo, s števci in statistiko. Privzeto: vgrajeni.",
+        "jvbStressWarnPercent": "Prag opozorila za stres (%)",
+        "jvbStressWarnPercentHelp": "Nad tem pragom skalator doda 1 repliko JVB, tudi če je napovedna analiza ne zahteva. Privzeto 50.",
+        "jvbStressCriticalPercent": "Prag kritičnega stresa (%)",
+        "jvbStressCriticalPercentHelp": "Nad tem pragom skalator doda 2 repliki JVB. Privzeto 70. Mora biti večji od opozorila.",
+        "jvbProvisioningTimeoutMinutes": "Časovna omejitev priprave (minute)",
+        "jvbProvisioningTimeoutMinutesHelp": "Po koliko minutah od startsAt se dogodek z JVB, ki še ni pripravljen, na strani stanja označi kot 'degraded'. Privzeto 15. Pokriva hladni zagon vozlišča (~3–5 min) + varnostno mejo. Velja tudi za storitev snemanja, šteto od trenutka, ko jo zahteva dogodek s snemanjem: če v tem času ne odgovori, je soba v živo ne prikazuje več kot »se zaganja« in jo označi kot nezagnano.",
+        "statusPollIntervalSeconds": "Interval poizvedb strani stanja (sekunde)",
+        "statusPollIntervalSecondsHelp": "Vsakih koliko sekund stran /status osveži podatke v brskalniku. Privzeto 30. Nižje vrednosti = svežejši podatki, vendar večja obremenitev aplikacije.",
+        "emailSenderTitle": "Pošiljatelj e-sporočil",
+        "emailSenderHelp": "Kako je pošiljatelj prikazan v nabiralniku prijavljenih. Naslov, s katerega se pošilja, ostaja v nastavitvah namestitve (ujemati se mora s tistim, ki ga dovoljuje strežnik SMTP).",
+        "emailFromName": "Ime pošiljatelja",
+        "emailFromNameHelp": "Prazno = uporabi se ime, nastavljeno v namestitvi (SMTP_FROM_NAME). E-sporočila se še naprej pošiljajo s sistemskega naslova.",
+        "emailReplyTo": "Naslov za odgovore",
+        "emailReplyToHelp": "E-sporočila prihajajo z naslova, ki ne sprejema odgovorov: brez tega odgovor ne doseže nikogar.",
+        "avatarTitle": "Slike udeležencev",
+        "gravatarEnabled": "Uporabi Gravatar, kadar je na voljo",
+        "gravatarEnabledHelp": "Kdor se je prijavil z e-naslovom, ki ima Gravatar, ga bo v sobi videl kot sliko; pri vseh drugih ostanejo začetnice, ki jih ustvari platforma. Slika gre prek našega strežnika, zato brskalniki udeležencev ne stopijo v stik z gravatar.com — platforma pa: to navedite v obvestilu o zasebnosti."
       }
     },
     "analytics": {
@@ -1583,20 +1765,17 @@
       "descriptionLabel": "Opis",
       "maxParticipantsLabel": "Najv. udeležencev",
       "featuresLabel": "Funkcionalnosti",
-      "recordingLabel": "Snemanje",
-      "unmute": "Mikrofon udeležencev",
-      "video": "Video udeležencev",
-      "screen": "Deljenje zaslona",
-      "pickerTitle": "Izberite predlogo",
-      "pickerSubtitle": "Izberite predlogo za predkonfiguracijo nastavitev dogodka ali preskočite za ročno konfiguracijo.",
-      "skipTemplate": "Konfiguriraj ročno",
       "whiteboardLabel": "Tabla",
+      "recordingLabel": "Snemanje",
       "waitingRoomEngineLabel": "Čakalnica (privzeto za predlogo)",
       "waitingRoomEngineSiteDefault": "Privzeto za spletišče",
       "waitingRoomEngineGarden": "Vrt (standardna)",
       "waitingRoomEngineGame": "Videoigra (lobi Phaser)",
       "waitingRoomEngineClassic": "Klasična (statična)",
       "waitingRoomEngineHelp": "Vnaprej nastavi pogon čakalnice za dogodke, ustvarjene iz te predloge. V čarovniku ga je še vedno mogoče spremeniti.",
+      "unmute": "Mikrofon udeležencev",
+      "video": "Video udeležencev",
+      "screen": "Deljenje zaslona",
       "durationLabel": "Privzeto trajanje (minute)",
       "durationHint": "Vnaprej izpolni konec dogodka (začetek + trajanje). Uporabnik ga lahko spremeni. Prazno = 2 uri.",
       "retentionLabel": "Privzeta hramba podatkov (dnevi)",
@@ -1605,7 +1784,10 @@
       "descriptionTemplateHint": "Besedilo, vnaprej vneseno v opis dogodka (mogoče ga je urediti).",
       "aiTranscript": "Samodejni prepis (privzeto)",
       "aiSummary": "Samodejni povzetek (privzeto)",
-      "aiTranslation": "Samodejno prevajanje (privzeto)"
+      "aiTranslation": "Samodejno prevajanje (privzeto)",
+      "pickerTitle": "Izberite predlogo",
+      "pickerSubtitle": "Izberite predlogo za predkonfiguracijo nastavitev dogodka ali preskočite za ročno konfiguracijo.",
+      "skipTemplate": "Konfiguriraj ročno"
     },
     "instantCall": {
       "title": "Takojšnji video klic",
@@ -1634,7 +1816,7 @@
       "selectFile": "Izberi datoteko",
       "fileTitle": "Naslov",
       "visibility": "Vidnost",
-      "visibilityAlways": "Vedno vidno",
+      "visibilityAlways": "V sobi in po dogodku",
       "visibilityBefore": "Samo pred dogodkom",
       "visibilityDuring": "Samo med dogodkom",
       "visibilityAfter": "Samo po dogodku",
@@ -1655,10 +1837,11 @@
       "titleLabel": "Naslov",
       "descriptionLabel": "Opis (neobvezno)",
       "visibilityLabel": "Vidnost",
-      "visibilityAlways": "Vedno",
+      "visibilityAlways": "V sobi in po dogodku",
       "visibilityBefore": "Pred dogodkom",
       "visibilityDuring": "Med dogodkom",
       "visibilityAfter": "Po dogodku",
+      "visibilityHelp": "Pred začetkom javna stran dogodka prikazuje samo gradiva z oznako »Pred dogodkom«. Gradiva z oznako »V sobi in po dogodku« so vidna v sobi med dogodkom in na strani zaključenega dogodka.",
       "typeLabel": "Tip",
       "fileUploaded": "Naložena datoteka",
       "typeFile": "Datoteka",
@@ -1678,7 +1861,7 @@
         "newTitle": "Nova predloga GDPR",
         "editTitle": "Uredi predlogo GDPR",
         "name": "Interno ime",
-        "namePlaceholder": "npr. Standardno obvestilo DTD",
+        "namePlaceholder": "npr. Standardno obvestilo o zasebnosti",
         "description": "Opis (neobvezno)",
         "descriptionPlaceholder": "Kratke opombe za prepoznavanje predloge",
         "bodyIt": "Besedilo obvestila (italijansko)",
@@ -1764,9 +1947,9 @@
       "version": "Različica",
       "environment": "Okolje",
       "modes": {
-        "simple": "Preprosto (Docker Compose)",
-        "standard": "Standardno (Kubernetes)",
-        "full": "Popolno (Kubernetes s scale-to-zero)",
+        "simple": "Preprosto",
+        "standard": "Standardno",
+        "full": "Popolno (mostovi s scale-to-zero)",
         "unknown": "Neznano"
       },
       "database": {
@@ -1780,7 +1963,9 @@
         "title": "Jitsi Meet",
         "reachable": "Dosegljivo",
         "unreachable": "Nedosegljivo",
-        "notConfigured": "Ni konfigurirano"
+        "notConfigured": "Ni konfigurirano",
+        "degraded": "Dosegljivo, vendar se odziva z napakami ali počasi",
+        "publicCheckFailed": "Preverjanje na javnem naslovu ni uspelo ({code}): strežnik portala ne sprejme potrdila ali imena. Konference lahko vseeno delujejo."
       },
       "jvb": {
         "title": "Video Bridge (JVB)",
@@ -1788,7 +1973,9 @@
         "replicas": "{current}/{max} vozlišč",
         "preScale": "Predhodno skaliranje: {minutes} min",
         "fixedMode": "Fiksni način",
-        "scalerEnabled": "Scaler omogočen"
+        "scalerEnabled": "Scaler omogočen",
+        "fixedDown": "Video most se ne odziva",
+        "unmonitored": "Ni spremljano: naslov mosta (JVB_HEALTH_URL) ni nastavljen"
       },
       "jibri": {
         "title": "Snemanje (Jibri)",
@@ -1810,7 +1997,11 @@
         "metrics": "Končna točka metrik"
       },
       "note": "Infrastrukturne spremembe se izvajajo prek Helm vrednosti in CI/CD cevovoda.",
-      "deployDocs": "Dokumentacija namestitve"
+      "deployDocs": "Dokumentacija namestitve",
+      "platforms": {
+        "kubernetes": "Na Kubernetesu",
+        "other": "Zunaj Kubernetesa (Docker Compose ali en strežnik)"
+      }
     },
     "instantCalls": {
       "title": "Hitri klici",
@@ -1915,9 +2106,9 @@
       "latencyP99": "Latenca P99",
       "requestRate": "Zahtevki/s",
       "chartLatencyQuantiles": "Latenca aplikacije — P50 / P95 / P99",
-      "participantsNow": "Aktivni udeleženci",
+      "participantsNow": "Udeleženci na video mostu",
       "jvbStress": "Obremenitev JVB",
-      "conferences": "Aktivne konference",
+      "conferences": "Konference na video mostu",
       "octoRelay": "Octo medmostni relej",
       "interBridge": "Promet Octo",
       "chartCpu": "CPU usage",
@@ -1944,7 +2135,8 @@
       "liveNow": "LIVE",
       "provisioningNow": "v pripravi",
       "idleNow": "IDLE (ustavljeno)",
-      "scaleToZeroHelp": "IDLE je običajno stanje za dogodek brez prometa po izteku obdobja dodatka. Ob naslednjem obisku uporabnika preide v PROVISIONING in nato LIVE."
+      "scaleToZeroHelp": "IDLE je običajno stanje za dogodek brez prometa po izteku obdobja dodatka. Ob naslednjem obisku uporabnika preide v PROVISIONING in nato LIVE.",
+      "capacityFromStatus": "Trenutne vrednosti, prebrane z video mosta. Zgodovina zahteva Prometheus."
     },
     "bulk": {
       "selectAll": "Izberite vse",
@@ -1972,7 +2164,29 @@
       "resultsCount": "{count, plural, =0 {Brez dogodkov} one {# dogodek} two {# dogodka} few {# dogodki} other {# dogodkov}}",
       "durationMinutes": "{minutes} min",
       "durationHoursMinutes": "{hours} h {minutes} min",
-      "moderatorsSpeakers": "{mods} moderatorjev · {speakers} govornikov",
+      "menu": {
+        "actionsFor": "Dejanja za »{title}«",
+        "manage": "Upravljaj",
+        "edit": "Uredi",
+        "openPublic": "Odpri javno stran",
+        "newTab": "(odpre se v novem zavihku)",
+        "copyLink": "Kopiraj javno povezavo",
+        "linkCopied": "Povezava kopirana",
+        "publish": "Objavi",
+        "unpublish": "Umakni objavo",
+        "unpublishTitle": "Umakniti dogodek?",
+        "unpublishMessage": "»{title}« bo izginil z javnih strani, dokler ga ponovno ne objavite. Že prejete prijave ostanejo.",
+        "published": "Dogodek objavljen",
+        "unpublished": "Dogodek umaknjen",
+        "duplicate": "Podvoji kot naslednjo izvedbo",
+        "delete": "Izbriši",
+        "deleteTitle": "Izbrisati dogodek?",
+        "deleteMessage": "»{title}« in vsi njegovi podatki bodo izbrisani. Dejanja ni mogoče razveljaviti.",
+        "deleted": "Dogodek izbrisan",
+        "failed": "Dejanje ni uspelo. Poskusite znova."
+      },
+      "instantBadge": "Hitri klic",
+      "moderatorsSpeakers": "{mods, plural, one {# moderator} two {# moderatorja} few {# moderatorji} other {# moderatorjev}} · {speakers, plural, one {# govornik} two {# govornika} few {# govorniki} other {# govornikov}}",
       "postEventSummary": "{connected} povezanih · {registered} prijav",
       "registeredCount": "{count, plural, =0 {Brez prijav} one {1 prijava} two {# prijavi} few {# prijave} other {# prijav}}"
     },
@@ -2014,15 +2228,19 @@
     },
     "eventDetail": {
       "copyPublicUrl": "Kopiraj javno povezavo",
-      "copyModeratorUrl": "Kopiraj povezavo moderatorja",
-      "enterAsModerator": "Vstopi v živo",
+      "copyInviteUrl": "Kopiraj povezavo za povabilo",
+      "enterAsParticipant": "Vstopi kot udeleženec",
+      "openAsParticipant": "Odpri kot udeleženec",
+      "participantHintRoom": "Odpre se v novem zavihku: soba, kot jo vidi gost, brez moderatorskih pooblastil.",
+      "participantHintPassword": "Odpre se v novem zavihku: soba, kot jo vidi gost, po vnosu gesla dogodka.",
+      "participantHintPage": "Odpre se v novem zavihku: javna stran, kot jo vidijo udeleženci.",
       "editEvent": "Uredi dogodek",
       "editSettings": "Uredi nastavitve",
       "featureSummary": "Aktivne funkcije",
       "organizers": "Organizatorji",
       "privacyGdpr": "Zasebnost in GDPR",
       "postEventTitle": "Po dogodku in povratne informacije",
-      "recordingSection": "Snemanje",
+      "recordingSection": "Videoposnetek dogodka",
       "callSessions": "Seje in telemetrija",
       "questionnaires": "Vprašalniki",
       "questionnaireCount": "{count, plural, =0 {Brez povezanih vprašalnikov} one {1 povezan vprašalnik} two {# povezana vprašalnika} few {# povezani vprašalniki} other {# povezanih vprašalnikov}}",
@@ -2030,12 +2248,10 @@
       "manageQuestionnaires": "Upravljaj vprašalnike",
       "tabs": {
         "overview": "Pregled",
-        "settings": "Nastavitve",
         "people": "Osebe",
         "content": "Vsebine",
-        "audit": "Posnetki in pregled",
-        "postEvent": "Po dogodku",
-        "analytics": "Statistika"
+        "analytics": "Statistika",
+        "afterEvent": "Po dogodku"
       },
       "toggles": {
         "unmute": "Udeleženci lahko govorijo",
@@ -2054,10 +2270,12 @@
         "capacityEstimate": "≈{jvbs} JVB · {ram} RAM",
         "noReminders": "Ni nastavljenih opomnikov",
         "tags": "Oznake",
-        "postEventSummary": "{connected} povezanih od {registered} prijav (ocena {estimated})",
-        "estimatedAttendance": "Ocena: {estimated} udeležencev"
+        "postEventSummary": "{connected} povezanih od {registered} prijav (zmogljivost {estimated})",
+        "estimatedAttendance": "Največja zmogljivost: {estimated} udeležencev",
+        "reminderScheduled": "Odide {when}",
+        "reminderMissed": "Ni poslano — trenutek je minil",
+        "reminderSoon": "Vsak trenutek"
       },
-      "copyGuestUrl": "Kopiraj povezavo za goste",
       "aiManageTitle": "Prepis, povzetek in prevodi",
       "aiManageDesc": "Upravljajte postprodukcijo AI za ta posnetek: popravite prepis in pripis govorcev (kdo kaj pove), uredite povzetek in upravljajte jezike prevoda.",
       "aiManageCta": "Odpri upravljanje postprodukcije",
@@ -2072,24 +2290,16 @@
       "duplicateNext": "Podvoji za naslednjič",
       "duplicateNextBusy": "Podvajanje…",
       "duplicateNextHint": "Ustvari osnutek s celotno nastavitvijo tega dogodka (snemanje, ločene sledi, AI, agenda, opomniki). Če ima dogodek ponavljanje, se datum premakne na naslednjo ponovitev; sicer ga nastavite sami.",
-      "duplicateNextError": "Podvajanje ni uspelo. Poskusite znova."
+      "duplicateNextError": "Podvajanje ni uspelo. Poskusite znova.",
+      "capacitySection": "Zmogljivost in infrastruktura",
+      "capacitySubtitle": "Nastavljeno za največ {max} udeležencev",
+      "publishBlockedLive": "Dogodek že poteka",
+      "publishBlockedEnded": "Dogodek se je končal"
     },
     "rubrica": {
       "title": "Imenik",
       "subtitle": "Osebe, ki so privolile v vključitev v imenik (čl. 6.1.a GDPR). Profilne informacije se ob vsaki ponovni prijavi samodejno posodobijo.",
       "backToList": "← Nazaj v imenik"
-    },
-    "questionnairesPage": {
-      "title": "Vprašalniki",
-      "subtitle": "Predloge vprašanj za večkratno uporabo za vprašalnike pred prijavo in po dogodku."
-    },
-    "questionnaireResponses": {
-      "title": "Odgovori vprašalnikov",
-      "subtitle": "Združevanja po vprašanju, filtrljiva po dogodku, fazi in razponu datumov."
-    },
-    "eventQuestionnaires": {
-      "title": "Vprašalniki — {eventTitle}",
-      "subtitle": "Konfigurirajte vprašalnik pred prijavo in/ali po dogodku z združevanjem predlog in posebnih vprašanj."
     },
     "eventAnalytics": {
       "title": "Statistika",
@@ -2238,11 +2448,6 @@
       "manageSource": "Izvorni jezik",
       "manageOpenPublic": "Javna stran",
       "manageRerunOk": "Ponovni zagon cevovoda se je začel.",
-      "manageRerunNoop": "Nobeno opravilo ni bilo zagnano: AI je za ta dogodek izklopljena ali pa je cevovod začasno ustavljen. Uporabite »Ustvari z AI«.",
-      "manageRerunAlreadyQueued": "Obdelava je že v čakalni vrsti: ničesar novega ni za zagnati.",
-      "generateAi": "Ustvari z AI",
-      "generateAiConfirm": "Zaženite cevovod AI (prepis in povzetek) na tem posnetku. Obdelava z AI se bo za dogodek vklopila in se zažene v ozadju. Prevodi se dodajo pozneje, po en jezik naenkrat, na zavihku »Prevodi«.",
-      "generateAiOk": "Cevovod AI se je zagnal.",
       "manageOpen": "Upravljaj",
       "cancelConfirmTitle": "Prekliči postprodukcijo",
       "speakerUpdateSuccess": "Govorec je posodobljen",
@@ -2382,7 +2587,38 @@
       },
       "archiveSourceTitle": "Izvorni posnetek",
       "archiveSourceHint": "Izvirni videoposnetek dogodka. Ločene sledi po udeležencih in arhiv MKV zahtevajo večsledno snemanje (za ta dogodek ni vklopljeno).",
-      "archiveSourceDownload": "Prenesi izvirni videoposnetek"
+      "archiveSourceDownload": "Prenesi izvirni videoposnetek",
+      "manageRerunNoop": "Nobeno opravilo ni bilo zagnano: AI je za ta dogodek izklopljena ali pa je cevovod začasno ustavljen. Uporabite »Ustvari z AI«.",
+      "manageRerunAlreadyQueued": "Obdelava je že v čakalni vrsti: ničesar novega ni za zagnati.",
+      "generateAi": "Ustvari z AI",
+      "generateAiConfirm": "Zaženite cevovod AI (prepis in povzetek) na tem posnetku. Obdelava z AI se bo za dogodek vklopila in se zažene v ozadju. Prevodi se dodajo pozneje, po en jezik naenkrat, na zavihku »Prevodi«.",
+      "generateAiOk": "Cevovod AI se je zagnal.",
+      "originalToggle": "Prikaži izvirno besedilo",
+      "originalToggleHint": "Pod vsako popravljeno vrstico prikaže besedilo, kot ga je ustvaril samodejni prepis",
+      "originalNotComparable": "Število vrstic se je glede na izvirno različico spremenilo: primerjava po vrsticah ni mogoča",
+      "originalLabel": "Izvirno besedilo:",
+      "revisedBadge": "Ročno pregledano",
+      "revisedHint": "Vsaj eno vrstico je po samodejnem prepisu popravila oseba",
+      "redactLabel": "Izbriši tudi iz izvirnika",
+      "redactHint": "Za uporabo pri zahtevi za izbris: spremembe se uveljavijo tudi v shranjenem strojnem besedilu, ki bi sicer ohranilo odstranjeni stavek",
+      "redactSave": "Shrani in izbriši iz izvirnika",
+      "redactSaved": "{n, plural, one {# vrstica izbrisana tudi iz izvirnega besedila} two {# vrstici izbrisani tudi iz izvirnega besedila} few {# vrstice izbrisane tudi iz izvirnega besedila} other {# vrstic izbrisanih tudi iz izvirnega besedila}}",
+      "redactNothingRemoved": "Popravki so shranjeni, vendar v izvirnem besedilu za spremenjene vrstice ni bilo ničesar za izbris",
+      "redactArchiveFailed": "Popravki so shranjeni v podatkovni bazi, vendar ponovni zapis arhivirane datoteke ni uspel: odstranjeni stavek je od tam še vedno mogoče prenesti. Poskusite izbris znova",
+      "originalUncertain": "Izvor ni zanesljiv",
+      "originalUncertainHint": "Shranjeno besedilo morda že vsebuje popravke, narejene pred obstojem te funkcije: ni mogoče dokazati, da gre za besedilo, ki ga je ustvaril samodejni prepis"
+    },
+    "questionnairesPage": {
+      "title": "Vprašalniki",
+      "subtitle": "Predloge vprašanj za večkratno uporabo za vprašalnike pred prijavo in po dogodku."
+    },
+    "questionnaireResponses": {
+      "title": "Odgovori vprašalnikov",
+      "subtitle": "Združevanja po vprašanju, filtrljiva po dogodku, fazi in razponu datumov."
+    },
+    "eventQuestionnaires": {
+      "title": "Vprašalniki — {eventTitle}",
+      "subtitle": "Konfigurirajte vprašalnik pred prijavo in/ali po dogodku z združevanjem predlog in posebnih vprašanj."
     }
   },
   "email": {
@@ -2470,7 +2706,7 @@
     "projectTeaser": {
       "kicker": "Projekt",
       "title": "Odprtokoden in suveren, ki ga je javna uprava zgradila za javno upravo",
-      "body": "PA Webinar je platforma Oddelka za digitalno preobrazbo za javne digitalne dogodke: oblikovni sistem .italia, video pogon Jitsi Meet in povsem in-cluster cevovod AI. Izdana je kot odprtokodna, da jo lahko ponovno uporabi vsaka uprava.",
+      "body": "PA Webinar je odprtokodna platforma za javne digitalne dogodke, ki jo je razvil italijanski Oddelek za digitalno preobrazbo in jo izdal, da jo lahko ponovno uporabi vsaka uprava: oblikovni sistem .italia, video pogon Jitsi Meet in povsem in-cluster cevovod AI.",
       "sovereignty": {
         "title": "Suverenost podatkov",
         "desc": "Self-hosted na infrastrukturi uprave: podatki nikoli ne zapustijo okolja in ni izpostavljenosti CLOUD Act."
@@ -2506,6 +2742,49 @@
         "title": "Zvočna sinhronizacija",
         "desc": "Sinhronizirana zvočna sled z nevtralnim sintetičnim glasom (brez kloniranja glasu), za poslušanje dogodka v drugem jeziku."
       }
+    },
+    "institutional": {
+      "title": "Spletna srečanja in dogodki",
+      "nextTitle": "Naslednji dogodek",
+      "nextCta": "Pojdi na dogodek in se prijavi",
+      "othersTitle": "Drugi dogodki",
+      "pointsTitle": "Kako sodelovati",
+      "points": {
+        "noInstall": {
+          "title": "Sodelovanje iz brskalnika",
+          "body": "Namestitev programov ni potrebna: dovolj je, da odprete povezavo, ki jo prejmete."
+        },
+        "accessible": {
+          "title": "Zasnovano za vse",
+          "body": "Podnapisi, tipkovnica in bralniki zaslona: dvorano je mogoče uporabljati tudi brez miške."
+        },
+        "privacy": {
+          "title": "Skrbno obravnavani podatki",
+          "body": "Zbirajo se le podatki, potrebni za prijavo, in lahko zahtevate njihovo vrnitev ali izbris."
+        }
+      }
+    },
+    "simple": {
+      "title": "Spletna srečanja: {organization}",
+      "subtitle": "Sodelujete lahko z računalnika ali telefona, brez nameščanja česar koli.",
+      "cta": "Pridružite se naslednjemu srečanju",
+      "noEvents": "Trenutno ni načrtovanih srečanj. Vrnite se kmalu.",
+      "stepsTitle": "Kako poteka",
+      "steps": {
+        "choose": {
+          "title": "Izberite srečanje",
+          "body": "Pri vsakem srečanju sta navedena datum in ura."
+        },
+        "name": {
+          "title": "Pustite svoje ime",
+          "body": "Za prejem povezave zadostujeta ime in e-poštni naslov."
+        },
+        "enter": {
+          "title": "Vstopite",
+          "body": "Ob pravem času odprite povezavo: ste notri."
+        }
+      },
+      "listTitle": "Prihajajoča srečanja"
     }
   },
   "polls": {
@@ -2534,7 +2813,9 @@
     "errors": {
       "questionRequired": "Napišite vprašanje ankete",
       "minOptions": "Potrebni sta vsaj 2 možnosti",
-      "generic": "Napaka pri ustvarjanju ankete"
+      "generic": "Napaka pri ustvarjanju ankete",
+      "vote": "Glas ni bil zabeležen. Poskusite znova.",
+      "alreadyVoted": "V tej anketi ste že glasovali."
     }
   },
   "materials": {
@@ -2553,10 +2834,29 @@
     "add": "Dodaj",
     "adding": "Dodajanje...",
     "cancel": "Prekliči",
+    "modeLabel": "Vrsta gradiva",
+    "modeLink": "Povezava",
+    "modeFile": "Datoteka",
+    "titleOptional": "Naslov (neobvezno, sicer ime datoteke)",
+    "fileLabel": "Datoteka za nalaganje",
+    "fileHelp": "Podprti formati: PDF, DOCX, PPTX, XLSX, TXT — največ {maxMb} MB",
+    "upload": "Naloži",
+    "uploading": "Nalaganje poteka …",
     "errors": {
       "urlInvalid": "Vnesite veljaven URL",
-      "generic": "Napaka pri dodajanju gradiva"
-    }
+      "generic": "Napaka pri dodajanju gradiva",
+      "fileMissing": "Izberite datoteko za nalaganje",
+      "titleMissing": "Vnesite naslov povezave",
+      "fileTooLarge": "Datoteka presega omejitev {maxMb} MB",
+      "fileTooLargeForServer": "Strežnik ne sprejme tako velike datoteke: poskusite z manjšo datoteko",
+      "fileType": "Vrsta datoteke ni podprta (PDF, DOCX, PPTX, XLSX, TXT)",
+      "uploadUnavailable": "Nalaganje datotek v tej namestitvi ni na voljo",
+      "uploadFailed": "Napaka pri nalaganju datoteke",
+      "quotaExceeded": "Ta dogodek je dosegel omejitev naloženih datotek ({maxFiles} datotek, skupaj {maxMb} MB): odstranite nekaj datotek, da naložite nove",
+      "uploadBusy": "Trenutno je preveč nalaganj: poskusite znova čez nekaj sekund",
+      "deleteFailed": "Gradiva ni bilo mogoče izbrisati"
+    },
+    "addedByStaff": "Dodali organizatorji"
   },
   "reminders": {
     "title": "Obvestila",
@@ -2582,11 +2882,11 @@
     "consent": {
       "recording": "Soglašam z avdio/video snemanjem dogodka",
       "recordingRequired": "Soglasje s snemanjem je obvezno za udeležbo na tem dogodku",
-      "futureCommunications": "Želim prejemati informacije o prihodnjih dogodkih, ki jih organizira DTD",
-      "addressBook": "Želim biti vključen v imenik DTD za prejemanje vabil na podobne dogodke",
-      "addressBookHelp": "Ločeno soglasje (čl. 6.1.a GDPR). Prekličete ga lahko kadar koli prek povezave „Odstrani moje podatke iz imenika“ v prejetih e-poštnih sporočilih. Ime in organizacija se prevzameta iz profila prijave.",
       "multitrack": "Soglašam s snemanjem ločene zvočne sledi svojega glasu izključno za namen pravilnega pripisa prepisa posameznim govorcem. Sled je začasna in se po prepisu izbriše; ne uporablja se za prepoznavo ali predvajanje mojega glasu.",
-      "multitrackRequired": "Soglasje za snemanje vaše zvočne sledi je za udeležbo na tem dogodku obvezno"
+      "multitrackRequired": "Soglasje za snemanje vaše zvočne sledi je za udeležbo na tem dogodku obvezno",
+      "futureCommunications": "Želim prejemati informacije o prihodnjih dogodkih, objavljenih na tej platformi",
+      "addressBook": "Želim biti vključen v imenik dogodkov za prejemanje vabil na podobne dogodke",
+      "addressBookHelp": "Ločeno soglasje (čl. 6.1.a GDPR). Prekličete ga lahko kadar koli prek povezave „Odstrani moje podatke iz imenika“ v prejetih e-poštnih sporočilih. Ime in organizacija se prevzameta iz profila prijave."
     },
     "export": {
       "title": "Moji podatki",
@@ -2596,10 +2896,10 @@
       "emailInvalid": "Vnesite veljaven e-poštni naslov",
       "submit": "Zahtevaj moje podatke",
       "loading": "Iskanje...",
-      "requestSubmittedTitle": "Check your inbox",
-      "requestSubmittedBody": "If this email matches a registration, we've sent you a link to download your data. The link is valid for 1 hour.",
-      "linkInvalid": "This link is invalid or expired. Please request a new link.",
-      "requestNew": "Request a new link",
+      "requestSubmittedTitle": "Preverite svoj e-poštni predal",
+      "requestSubmittedBody": "Če se ta e-poštni naslov ujema s prijavo, smo vam poslali povezavo za prenos vaših podatkov. Povezava velja 1 uro.",
+      "linkInvalid": "Povezava ni veljavna ali je potekla. Zahtevajte novo povezavo.",
+      "requestNew": "Zahtevaj novo povezavo",
       "noData": "Za ta e-poštni naslov ni najdenih podatkov.",
       "error": "Prišlo je do napake. Prosimo, poskusite znova pozneje.",
       "rateLimited": "Preveč zahtevkov. Prosimo, poskusite znova čez eno uro.",
@@ -2614,30 +2914,30 @@
       "questionsTitle": "Vprašanja Q&A",
       "pollVotesTitle": "Glasovi v anketah",
       "optionLabel": "Možnost",
-      "erasureCtaTitle": "Want to delete your data?",
-      "erasureCtaBody": "You can request full erasure of the data tied to your email (GDPR Art. 17).",
-      "erasureCtaButton": "Request erasure"
+      "erasureCtaTitle": "Želite izbrisati svoje podatke?",
+      "erasureCtaBody": "Zahtevate lahko popoln izbris podatkov, povezanih z vašim e-poštnim naslovom (čl. 17 GDPR).",
+      "erasureCtaButton": "Zahtevaj izbris"
     },
     "erasure": {
-      "title": "Erase your data",
-      "subtitle": "Confirm the erasure of the personal data tied to your email address (GDPR Art. 17).",
-      "emailLabel": "Your email address",
-      "emailPlaceholder": "Enter the email used for registration",
-      "emailInvalid": "Please enter a valid email address",
-      "submit": "Request erasure",
-      "requestSubmittedTitle": "Check your inbox",
-      "requestSubmittedBody": "If this email matches a registration, we've sent you a link to confirm the erasure. The link is valid for 1 hour.",
-      "linkInvalid": "This link is invalid or expired. Please request a new link.",
-      "confirmWarning": "You are about to permanently erase all personal data tied to your email.",
-      "confirmBody": "Registrations, questions, poll votes, feedback and reminders will be deleted. This action is irreversible.",
-      "confirmButton": "Confirm erasure",
-      "cancel": "Cancel",
-      "processing": "Deleting...",
-      "doneTitle": "Erasure completed",
-      "doneBody": "{count} registrations and the linked data have been deleted.",
-      "error": "An error occurred. Please try again later.",
-      "rateLimited": "Too many requests. Please try again in one hour.",
-      "back": "Back to my data"
+      "title": "Izbris vaših podatkov",
+      "subtitle": "Potrdite izbris osebnih podatkov, povezanih z vašim e-poštnim naslovom (čl. 17 GDPR).",
+      "emailLabel": "Vaš e-poštni naslov",
+      "emailPlaceholder": "Vnesite e-pošto, uporabljeno pri prijavi",
+      "emailInvalid": "Vnesite veljaven e-poštni naslov",
+      "submit": "Zahtevaj izbris",
+      "requestSubmittedTitle": "Preverite svoj e-poštni predal",
+      "requestSubmittedBody": "Če se ta e-poštni naslov ujema s prijavo, smo vam poslali povezavo za potrditev izbrisa. Povezava velja 1 uro.",
+      "linkInvalid": "Povezava ni veljavna ali je potekla. Zahtevajte novo povezavo.",
+      "confirmWarning": "Dokončno boste izbrisali vse osebne podatke, povezane z vašim e-poštnim naslovom.",
+      "confirmBody": "Izbrisani bodo prijave, vprašanja, glasovi v anketah, povratne informacije, opomniki in vaš vnos v imeniku dogodkov. Postopka ni mogoče razveljaviti.",
+      "confirmButton": "Potrdi izbris",
+      "cancel": "Prekliči",
+      "processing": "Brisanje poteka...",
+      "doneTitle": "Izbris zaključen",
+      "doneBody": "Izbrisane prijave: {count}, skupaj s povezanimi podatki.",
+      "error": "Prišlo je do napake. Poskusite znova pozneje.",
+      "rateLimited": "Preveč zahtev. Poskusite znova čez eno uro.",
+      "back": "Nazaj na moje podatke"
     }
   },
   "legal": {
@@ -2648,7 +2948,7 @@
       "sections": {
         "controller": {
           "title": "Upravljavec podatkov",
-          "body": "Obdelava osebnih podatkov poteka v okviru institucionalnih dejavnosti Oddelka za digitalno preobrazbo za omogočanje tehničnega in organizacijskega upravljanja javnih spletnih dogodkov."
+          "body": "Upravljavec podatkov: {organization}. Obdelava osebnih podatkov poteka v okviru njegovih institucionalnih dejavnosti za omogočanje tehničnega in organizacijskega upravljanja javnih spletnih dogodkov."
         },
         "data": {
           "title": "Obdelani podatki in nameni",
@@ -2656,11 +2956,11 @@
         },
         "retention": {
           "title": "Hramba podatkov in pravice",
-          "body": "Podatki se hranijo za obdobje, konfigurirano za vsak dogodek, nato pa se samodejno izbrišejo, razen če veljajo drugačne zakonske obveznosti. Kadarkoli je mogoče uveljavljati pravice, predvidene z GDPR, vključno z dostopom, popravkom in izbrisom, prek institucionalnih kanalov Oddelka."
+          "body": "Podatki se hranijo za obdobje, konfigurirano za vsak dogodek, nato pa se samodejno izbrišejo, razen če veljajo drugačne zakonske obveznosti. Kadarkoli je mogoče uveljavljati pravice, predvidene z GDPR, vključno z dostopom, popravkom in izbrisom, prek institucionalnih kanalov upravljavca podatkov."
         },
         "automatedProcessing": {
           "title": "Prepis, povzetek in sinhronizacija, ustvarjeni z umetno inteligenco",
-          "body": "Pri dogodkih, ki to zahtevajo, se posnetek po koncu prenosa obdela z verigo umetne inteligence, ki teče v celoti na gruči Oddelka. Ustvari prepis govora (z ločevanjem posameznih govorcev), poljuden povzetek, morebitne prevode v druge evropske jezike in sinhronizirano zvočno različico s splošnim sintetičnim glasom. Vsi uporabljeni modeli (WhisperX za prepis, Mistral-Small za povzetek in prevod, Piper TTS za sinhronizacijo) tečejo na namenskih GPU znotraj gruče: nobenih podatkov udeležencev ne pošiljamo storitvam tretjih oseb. Glas udeležencev se ne klonira in se ne hrani kot biometrični podatek (9. člen GDPR): sinhronizacija uporablja javne vnaprej naučene sintetične glasove, ki se govorcem dodelijo poljubno. Za vsak posnetek stran dogodka prikaže natančen posnetek stanja uporabljenih modelov (»Preglednost obdelave z UI«). Ustvarjena vsebina lahko vsebuje netočnosti: merodajen vir ostaja vedno izvirni videoposnetek (Akt o UI, 50. člen)."
+          "body": "Pri dogodkih, ki to zahtevajo, se posnetek po koncu prenosa obdela z verigo umetne inteligence, ki teče v celoti na infrastrukturi gruče te namestitve. Ustvari prepis govora (z ločevanjem posameznih govorcev), poljuden povzetek, morebitne prevode v druge evropske jezike in sinhronizirano zvočno različico s splošnim sintetičnim glasom. Vsi uporabljeni modeli (WhisperX za prepis, Mistral-Small za povzetek in prevod, Piper TTS za sinhronizacijo) tečejo na namenskih GPU znotraj gruče: nobenih podatkov udeležencev ne pošiljamo storitvam tretjih oseb. Glas udeležencev se ne klonira in se ne hrani kot biometrični podatek (9. člen GDPR): sinhronizacija uporablja javne vnaprej naučene sintetične glasove, ki se govorcem dodelijo poljubno. Za vsak posnetek stran dogodka prikaže natančen posnetek stanja uporabljenih modelov (»Preglednost obdelave z UI«). Ustvarjena vsebina lahko vsebuje netočnosti: merodajen vir ostaja vedno izvirni videoposnetek (Akt o UI, 50. člen)."
         }
       },
       "note": {
@@ -2672,7 +2972,7 @@
     "accessibility": {
       "metaTitle": "Izjava o dostopnosti",
       "title": "Izjava o dostopnosti",
-      "intro": "Oddelek za digitalno preobrazbo se zavezuje, da bo platformo PA Webinar naredil dostopno v skladu z italijanskim zakonom 4/2004, Direktivo (EU) 2016/2102 in smernicami AgID o dostopnosti informacijskih orodij.",
+      "intro": "Odgovorni organ: {organization}. Organ se zavezuje, da bo to platformo naredil dostopno v skladu z italijanskim zakonom 4/2004, Direktivo (EU) 2016/2102 in smernicami AgID o dostopnosti informacijskih orodij.",
       "sections": {
         "conformance": {
           "title": "Stanje skladnosti",
@@ -2711,7 +3011,7 @@
       "sections": {
         "ownership": {
           "title": "Lastništvo storitve",
-          "body": "Platformo spodbuja Oddelek za digitalno preobrazbo in je na voljo za organizacijo in izvedbo institucionalnih javnih spletnih dogodkov."
+          "body": "Lastnik platforme: {organization}. Platforma je na voljo za organizacijo in izvedbo institucionalnih javnih spletnih dogodkov."
         },
         "usage": {
           "title": "Način uporabe",
@@ -2719,7 +3019,7 @@
         },
         "liability": {
           "title": "Omejitev odgovornosti",
-          "body": "Kljub sprejetju ustreznih tehničnih in organizacijskih ukrepov Oddelek ne zagotavlja popolne odsotnosti prekinitev ali okvar, ki jih povzročijo nepredvideni dogodki, vzdrževalna dela ali zunanji dejavniki. Zakonske odgovornosti ureja veljavna zakonodaja."
+          "body": "Kljub sprejetju ustreznih tehničnih in organizacijskih ukrepov lastnik platforme ne zagotavlja popolne odsotnosti prekinitev ali okvar, ki jih povzročijo nepredvideni dogodki, vzdrževalna dela ali zunanji dejavniki. Zakonske odgovornosti ureja veljavna zakonodaja."
         }
       }
     },
@@ -2818,7 +3118,8 @@
         },
         "note": "Popoln seznam komponent in storitev, z različicami, zgoščenimi vrednostmi in tehničnimi lastnostmi, je na voljo v zgornjih razdelkih in v JSON, ki ga lahko prenesete."
       }
-    }
+    },
+    "organizationNotConfigured": "organizacija v nastavitvah še ni navedena"
   },
   "status": {
     "title": "Stanje sistema",
@@ -2851,7 +3152,7 @@
     "nodesReady": "vozlišč pripravljenih",
     "scaling": "skaliranje",
     "jvbStress": "Obremenitev JVB",
-    "participantsConnected": "udeležencev povezanih",
+    "participantsConnected": "udeležencev na video mostu",
     "videoInteractive": "interaktivno",
     "videoWebinar": "spletni seminar",
     "participantsAvailable": "udeležencev na voljo",
@@ -2874,13 +3175,13 @@
     "systemStatus": "Stanje sistema",
     "postprod": {
       "title": "Cevovod po dogodku",
-      "subtitle": "Prepis, povzetek, prevod in sinhronizacija posnetka",
-      "whatItDoes": "Ko se dogodek konča, gre posnetek skozi notranji cevovod: prepis ustvari WhisperX, povzetek in prevode pripravi model Mistral, sinhroniziran zvok ustvari Piper TTS. Vsi modeli tečejo na GPU v gruči, ki je vklopljen samo za čas obdelave, tako da poraba energije sledi dejanski obremenitvi.",
       "status": {
         "idle": "Nedejaven",
         "running": "V izvajanju",
         "degraded": "Poslabšano delovanje"
       },
+      "subtitle": "Prepis, povzetek, prevod in sinhronizacija posnetka",
+      "whatItDoes": "Ko se dogodek konča, gre posnetek skozi notranji cevovod: prepis ustvari WhisperX, povzetek in prevode pripravi model Mistral, sinhroniziran zvok ustvari Piper TTS. Vsi modeli tečejo na GPU v gruči, ki je vklopljen samo za čas obdelave, tako da poraba energije sledi dejanski obremenitvi.",
       "aiBadge": "Prepis, povzetek in sinhronizacija tega dogodka so ustvarjeni z modeli umetne inteligence in lahko vsebujejo netočnosti. Kadar potrebujete popolno gotovost, si vedno oglejte izvirni videoposnetek.",
       "idleMessage": "Cevovod je pripravljen, trenutno ni posnetkov za obdelavo.",
       "queueAriaLabel": "Sestava čakalne vrste za postprodukcijo",
@@ -2895,7 +3196,12 @@
       "lastFailure": "Zadnja napaka {when}",
       "artifactsProduced": "{count, plural, =0 {ni artefaktov} one {# ustvarjen artefakt} two {# ustvarjena artefakta} few {# ustvarjeni artefakti} other {# ustvarjenih artefaktov}}",
       "eventsEnabled": "{count, plural, =0 {ni dogodkov z AI} one {# dogodek z vklopljeno AI} two {# dogodka z vklopljeno AI} few {# dogodki z vklopljeno AI} other {# dogodkov z vklopljeno AI}}"
-    }
+    },
+    "jvbFixedUp": "{count, plural, =1 {Video most deluje} other {Video most deluje · predvideni mostovi: #}}",
+    "jvbFixedDown": "Video most se ne odziva",
+    "jvbFixedDownDetail": "Udeleženci ne prejemajo zvoka in slike, dokler most ni znova dosegljiv.",
+    "jvbUnmonitored": "Stanje ni spremljano",
+    "jvbUnmonitoredDetail": "Ta namestitev ne poizveduje video mosta, zato njegovo stanje tukaj ni na voljo."
   },
   "infraMap": {
     "loading": "Nalaganje zemljevida infrastrukture...",
@@ -2903,8 +3209,8 @@
     "ariaLabel": "Zemljevid sistemske infrastrukture",
     "title": "Zemljevid infrastrukture",
     "subtitle": "Vizualizacija arhitekture in stanja storitev v realnem času",
-    "participants": "Udeleženci",
-    "conferences": "Konference",
+    "participants": "Udeleženci na video mostu",
+    "conferences": "Konference na video mostu",
     "bandwidthIn": "Vhodna pasovna širina",
     "bandwidthOut": "Izhodna pasovna širina",
     "recordings": "Posnetki",
@@ -2947,6 +3253,7 @@
     "connMedia": "video prenos",
     "connRecording": "snemanje",
     "connUpload": "nalaganje",
+    "connPostprod": "postprodukcija AI",
     "connPubSub": "klepet pub/sub",
     "services": {
       "app": "Spletni portal",
@@ -2989,23 +3296,33 @@
       "jitsiWeb": {
         "healthy": "Video konferenčna soba je dosegljiva in pripravljena za dogodke.",
         "down": "Video konferenčna soba ni dosegljiva. Ni mogoče začeti ali se pridružiti dogodkom.",
-        "standby": "Video konferenčna soba ni konfigurirana."
+        "standby": "Video konferenčna soba ni konfigurirana.",
+        "degraded": "Video konferenčna soba se odziva, vendar z napakami ali počasi.",
+        "publicCheckFailed": "Portal ne more preveriti sobe na njenem javnem naslovu: s strežnika potrdilo ali ime ni veljavno. Za udeležence soba lahko vseeno deluje.",
+        "unmonitored": "Stanje video konferenčne sobe v tej namestitvi ni spremljano."
       },
       "prosody": {
         "healthy": "Interno sporočanje med video storitvami deluje pravilno.",
         "down": "Interno sporočanje ni dosegljivo. Video storitve ne morejo medsebojno komunicirati.",
-        "standby": "Storitev sporočanja ni konfigurirana."
+        "standby": "Storitev sporočanja ni konfigurirana.",
+        "degraded": "Interno sporočanje se odziva, vendar z napakami ali počasi.",
+        "publicCheckFailed": "Portal ne more preveriti internega sporočanja prek javnega naslova sobe: s strežnika potrdilo ali ime ni veljavno. Konference lahko vseeno delujejo.",
+        "unmonitored": "Stanje internega sporočanja v tej namestitvi ni spremljano."
       },
       "jicofo": {
         "healthy": "Koordinator konferenc je aktiven in upravlja seje.",
         "down": "Koordinator konferenc ni dosegljiv. Ni mogoče ustvariti novih konferenc.",
-        "standby": "Koordinator konferenc ni konfiguriran."
+        "standby": "Koordinator konferenc ni konfiguriran.",
+        "degraded": "Koordinator konferenc se odziva, vendar z napakami ali počasi.",
+        "unmonitored": "Stanje koordinatorja konferenc v tej namestitvi ni spremljano."
       },
       "jvb": {
         "healthy": "Video most je aktiven in prenaša zvok/video udeležencem.",
         "scaling": "Video most se pripravlja na prihajajoči dogodek. Strežniki se samodejno ustvarjajo.",
         "standby": "Video most je v pripravljenosti. Samodejno se bo aktiviral pred začetkom načrtovanega dogodka.",
-        "stale": "Dogodek čaka video most dlje od nastavljene časovne omejitve. Preverite samodejni skalator gruče in dnevnike JVB podov."
+        "stale": "Dogodek čaka video most dlje od nastavljene časovne omejitve. Preverite samodejni skalator gruče in dnevnike JVB podov.",
+        "fixedDown": "Video most se ne odziva. Konference ne prenašajo zvoka in slike, dokler ni znova dosegljiv.",
+        "unmonitored": "Stanje video mosta v tej namestitvi ni spremljano: portal nima naslova, prek katerega bi ga poizvedel."
       },
       "jibri": {
         "healthy": "Storitev snemanja je pripravljena in na voljo.",
@@ -3037,7 +3354,8 @@
       "jibri": "Dogodkov ni mogoče snemati. Udeleženci se lahko še vedno pridružijo in sodelujejo.",
       "jibriStale": "Dogodek z aktivnim snemanjem čaka Jibri dlje od časovne omejitve: seja se ne snema.",
       "smtp": "Potrditvena e-sporočila in opomniki za registracijo ne bodo poslani.",
-      "postprodDegraded": "Prepisi in zapisniki za nekatere nedavne posnetke niso bili ustvarjeni. Videoposnetki so kljub temu na voljo."
+      "postprodDegraded": "Prepisi in zapisniki za nekatere nedavne posnetke niso bili ustvarjeni. Videoposnetki so kljub temu na voljo.",
+      "jvbDown": "Udeleženci ne prejemajo zvoka in slike."
     },
     "overallVerdicts": {
       "operational": "Vse storitve delujejo pravilno. Platforma je v celoti operativna.",
@@ -3067,7 +3385,8 @@
       "degraded": "Upočasnjeno",
       "down": "Nedosegljivo",
       "standby": "V pripravljenosti",
-      "scaling": "Priprava"
+      "scaling": "Priprava",
+      "unknown": "Ni spremljano"
     },
     "metrics": {
       "uptime24h": "Čas delovanja 24 h",
@@ -3079,7 +3398,7 @@
       "requestRate": "Zahtevki/s",
       "podUptime": "Čas delovanja poda"
     },
-    "connPostprod": "postprodukcija AI"
+    "probeDetail": "Rezultat preverjanja"
   },
   "feedback": {
     "title": "Kako ocenjujete ta dogodek?",
@@ -3107,7 +3426,13 @@
     "noActiveRound": "Trenutno ni aktivnega word clouda.",
     "noWords": "Čakamo na prve besede...",
     "wordsSubmitted": "{count} besed poslanih",
-    "timeRemaining": "Preostali čas"
+    "timeRemaining": "Preostali čas",
+    "errors": {
+      "send": "Beseda ni bila poslana. Poskusite znova.",
+      "closed": "Ta krog je zaprt: novih besed ni več mogoče oddati.",
+      "limit": "V tem krogu ste že poslali največje dovoljeno število besed.",
+      "rateLimited": "Trenutno je preveč pošiljanj: počakajte nekaj sekund, preden poskusite znova."
+    }
   },
   "timer": {
     "title": "Časovnik",
@@ -3153,8 +3478,6 @@
     }
   },
   "footer": {
-    "departmentName": "Oddelek za digitalno preobrazbo",
-    "presidencyName": "Predsedstvo Sveta ministrov",
     "privacy": "Politika zasebnosti",
     "accessibility": "Izjava o dostopnosti",
     "openSource": "Odprtokodna programska oprema",
@@ -3169,8 +3492,38 @@
     "buildInfoDev": "razvojna zgradba",
     "viewCommit": "Oglejte si commit na GitHubu",
     "viewRelease": "Oglejte si izdajo na GitHubu",
-    "buildDatePrefix": "Zgrajeno",
-    "viewChangelog": "Oglejte si novosti (dnevnik sprememb)"
+    "viewChangelog": "Oglejte si novosti (dnevnik sprememb)",
+    "buildDatePrefix": "Zgrajeno"
+  },
+  "changelog": {
+    "metaTitle": "Novosti in dnevnik sprememb",
+    "title": "Novosti in dnevnik sprememb",
+    "intro": "Vse različice platforme, od najnovejše naprej. Vsak vnos povzema glavne novosti, popravke in izboljšave.",
+    "current": "Trenutna različica",
+    "sourceNote": "Opombe so pripravljene na podlagi oznak (tag), zahtevkov pull request in commitov v projektu.",
+    "sourceLink": "Oglejte si vse izdaje na GitHubu",
+    "rawChangelog": "CHANGELOG.md v repozitoriju",
+    "transparencyNote": "Za vsako različico: kaj teče in s katerimi komponentami, v",
+    "transparencyInventory": "preglednosti storitev",
+    "transparencySecurity": "varnosti in SBOM",
+    "technicalDetail": "Tehnične podrobnosti",
+    "releaseLink": "Release",
+    "securityBadge": "Varnost",
+    "sbomButton": "SBOM",
+    "pipelineLink": "Pipeline",
+    "scorecardLink": "OpenSSF Scorecard",
+    "sbomClose": "Zapri",
+    "sbomLoading": "Nalaganje…",
+    "sbomError": "SBOM ni bilo mogoče naložiti.",
+    "sbomComponents": "sestavin",
+    "sbomSearch": "iskanje sestavine…",
+    "sbomColName": "Sestavina",
+    "sbomColVersion": "Različica",
+    "sbomColEcosystem": "Ekosistem",
+    "sbomNoMatch": "Ni ujemajoče sestavine.",
+    "sbomDownload": "Prenesi celoten SBOM (SPDX)",
+    "sourcesLink": "Viri",
+    "codeScanningLink": "Pregled kode (CodeQL)"
   },
   "pages": {
     "privacyTitle": "Politika zasebnosti",
@@ -3208,281 +3561,9 @@
     "shortcutsF": "Preklopi celozaslonski način",
     "shortcutsSpeed": "Zmanjšaj ali povečaj hitrost",
     "captionsOn": "Podnapisi so vklopljeni",
-    "captionsOff": "Podnapisi so izklopljeni"
-  },
-  "diagram": {
-    "title": "Konfiguracija dogodka",
-    "topology": "Topologija",
-    "features": "Aktivne funkcionalnosti",
-    "estimates": "Ocena virov",
-    "moderator": "Moderator",
-    "participants": "Udeleženci",
-    "bridge": "Video Bridge",
-    "jvb": "Video Bridge",
-    "jibri": "Snemanje",
-    "occupancy": "Zasedenost",
-    "sizedForRegistrations": "Na podlagi {count} trenutnih prijav",
-    "sizedForCapacity": "Na podlagi največje zmogljivosti {count}",
-    "chips": {
-      "mic": "Mikrofon",
-      "video": "Spletna kamera",
-      "screen": "Deljenje zaslona"
-    },
-    "bandwidth": {
-      "moderator": "Pasovna širina moderatorja",
-      "participant": "Pasovna širina na udeleženca",
-      "total": "Ocenjena skupna pasovna širina"
-    },
-    "jvbCount": "Potrebni JVB-ji",
-    "jvbRam": "Ocenjen RAM JVB",
-    "storage": "Shramba posnetkov",
-    "duration": "Ocenjeno trajanje",
-    "viewOnly": "Samo ogled",
-    "preview": "Predogled konfiguracije"
-  },
-  "waiting": {
-    "startsIn": "Dogodek se začne čez",
-    "eventLive": "Dogodek je v živo!",
-    "connectedParticipants": "{count, plural, =0 {Ni udeležencev} =1 {1 udeleženec povezan} other {{count} udeležencev povezanih}}",
-    "elapsedTime": "V teku že {minutes} minut",
-    "youAreLate": "Dogodek se je začel pred {minutes} minutami",
-    "chooseHowToJoin": "Izberite, kako želite sodelovati:",
-    "enterLive": "Vstopite V ŽIVO",
-    "enterLiveDesc": "Sodelujte v živo. Do posnetka lahko vedno dostopate po dogodku.",
-    "enterNow": "Vstopite zdaj",
-    "watchFromStart": "Glejte od začetka",
-    "watchFromStartDesc": "Oglejte si posnetek od začetka in se kadarkoli pridružite prenosu v živo.",
-    "watchNow": "Glejte",
-    "switchToLive": "Preklopi na živo",
-    "enterRoom": "Vstopite v dvorano",
-    "recordingNotice": "Ta dogodek se snema.",
-    "recordingAvailableAfter": "Posnetek bo na voljo po dogodku.",
-    "autoRefreshHint": "Stran se bo samodejno osvežila, ko se bo dogodek začel.",
-    "startEventButton": "Zaženi dogodek",
-    "startingEvent": "Zagon...",
-    "peopleWaiting": "{count, plural, =0 {} =1 {1 oseba čaka} other {{count} oseb čaka}}",
-    "jvbScaling": "Priprava dvorane...",
-    "jvbScalingDetail": "Video strežniki se zaganjajo. Postopek traja približno 2 minuti.",
-    "jvbReady": "Dvorana je pripravljena!",
-    "warmingUp": "Soba se pripravlja",
-    "warmingUpDetail": "Zaganjamo video strežnike. Medtem se lahko pripravite — vse bo nared v 2–3 minutah in boste lahko vstopili.",
-    "warmingUpButton": "Soba se pripravlja ...",
-    "nameLabel": "Vaše ime",
-    "nameHelp": "Vidno bo drugim udeležencem",
-    "joinNowBtn": "Vstopi zdaj",
-    "roomOpen": "The room is open",
-    "whileYouWait": "While you wait",
-    "openingAt": "Odprto ob {time}",
-    "netiquetteTitle": "Dobre prakse za sodelovanje",
-    "netiquetteBullet1": "Pridite nekaj minut prej za preizkus mikrofona in spletne kamere",
-    "netiquetteBullet2": "Spletno kamero in mikrofon vklopite šele, ko želite govoriti — dvignite roko za prošnjo za besedo",
-    "netiquetteBullet3": "Klepet uporabite za hitre izmenjave, Q&A za vprašanja govornikom",
-    "netiquetteBullet4": "Snemanje, če je aktivno, upravljajo samo moderatorji in je označeno z rdečim znakom",
-    "watchCatchup": "Glej od začetka",
-    "watchCatchupDesc": "Oglejte si delni posnetek in se v živo pridružite, kadar želite",
-    "chatPreviewTitle": "Klepet dogodka",
-    "chatPreviewHint": "Berite, kaj govorijo drugi udeleženci, medtem ko se pripravljate",
-    "endedTitle": "Dogodek zaključen",
-    "endedWatchRecording": "Oglej si posnetek",
-    "endedLeaveFeedback": "Pustite povratno informacijo",
-    "moderatedBy": "Moderira {name}",
-    "startEventError": "Napaka pri zagonu dogodka. Poskusite znova.",
-    "emailLabel": "E-pošta (neobvezno)",
-    "emailHelp": "Samo za morebitno naknadno sporočilo po dogodku",
-    "emailInvalid": "Vnesite veljaven e-poštni naslov",
-    "chatLockedMessage": "Vnesite ime za sodelovanje v klepetu dogodka.",
-    "classicView": "Classic view",
-    "backToGarden": "Back to the park",
-    "startingSoon": "Dogodek se bo začel vsak hip, počakajte organizatorje…",
-    "exitWaiting": "Zapusti čakalnico",
-    "aiNoticeTitle": "Obdelava z UI po dogodku",
-    "aiNotice": "Ob koncu bo posnetek obdelan z orodji umetne inteligence za izdelavo prepisa, povzetka ter morebitnih prevodov in sinhronizacij. Rezultati lahko vsebujejo netočnosti; merodajen ostaja videoposnetek.",
-    "multitrackConsentTitle": "Snemanje po udeležencih",
-    "multitrackConsentRequired": "Za vstop morate privoliti v snemanje svoje zvočne sledi",
-    "enterGardenTitle": "Vstopi na trg",
-    "enterGardenHint": "Prostor za sprehod med čakanjem: od tam lahko nastaviš tudi ime in mikrofon ter se pridružiš dogodku.",
-    "backToWaitingRoom": "Nazaj v čakalnico",
-    "gardenDialogLabel": "Trg čakalnice",
-    "gardenGateHint": "Pridružiš se lahko od tu ali pa svojega avatarja pripelješ do vrat.",
-    "classicVersion": "Klasična različica",
-    "warmup": {
-      "queued": "Zahteva sprejeta",
-      "startingBridge": "Zaganjamo videostrežnik…",
-      "provisioningNode": "Ustvarjamo namenski videostrežnik",
-      "almostReady": "Videostrežnik teče: skoraj smo",
-      "almostReadyDetail": "Še trenutek in gumb za vstop se bo vklopil sam.",
-      "honestHint": "Običajno čakanje: manj kot minuto, če je infrastruktura že ogreta, 3–5 minut ob prvem zagonu. Medtem lahko preveriš kamero in mikrofon ali uporabiš klepet.",
-      "elapsed": "v pripravi že {time}"
-    }
-  },
-  "recording": {
-    "management": "Video posnetek",
-    "inProgress": "V teku",
-    "available": "Posnetek na voljo",
-    "duration": "Trajanje",
-    "fileSize": "Velikost",
-    "startedAt": "Začeto",
-    "automatic": "samodejno",
-    "publish": "Objavi posnetek",
-    "publishDesc": "Naredite video dostopen na strani dogodka",
-    "retentionLabel": "Hramba",
-    "retention": {
-      "24h": "24 ur (začasno)",
-      "7d": "7 dni",
-      "30d": "30 dni",
-      "90d": "90 dni",
-      "forever": "Nikoli (do poteka dogodka)"
-    },
-    "retentionNote": "Video bo v vsakem primeru upošteval GDPR hrambo dogodka",
-    "delete": "Izbriši posnetek",
-    "deleteConfirm": "Ali ste prepričani? Video bo trajno izbrisan.",
-    "notConfigured": "Jibri ni konfiguriran v infrastrukturi. Video snemanje ni na voljo.",
-    "disabledHint": "Video snemanje za ta dogodek ni omogočeno. Za vklop odprite zgornji razdelek Nastavitve in vklopite stikalo „Snemanje“.",
-    "play": "Predvajaj",
-    "download": "Prenesi",
-    "transcriptManage": "Prepis / AI",
-    "deleteConfirmTitle": "Izbriši posnetek",
-    "deleteFailed": "Brisanje ni uspelo",
-    "deleteSuccess": "Posnetek je izbrisan"
-  },
-  "postEvent": {
-    "config": "Konfiguracija po dogodku",
-    "pageVisible": "Stran dogodka vidna po zaključku",
-    "showQA": "Prikaži vprašanja Q&A",
-    "showMaterials": "Prikaži deljena gradiva",
-    "showPolls": "Prikaži rezultate anket",
-    "showFeedback": "Prikaži povratne informacije",
-    "feedbackEnabled": "Anketa o povratnih informacijah aktivna ob koncu dogodka",
-    "visibilityAlways": "Vedno vidno",
-    "visibilityUntil": "Vidno do:",
-    "dataRetentionNote": "Osebni podatki udeležencev bodo izbrisani v skladu s hrambo dogodka ({days} dni). Vsebina dogodka bo ostala na voljo, dokler je stran vidna.",
-    "availableUntil": "Ta dogodek in njegova vsebina bodo na voljo do {date}.",
-    "tabs": {
-      "qa": "Vprašanja in odgovori",
-      "materials": "Gradiva",
-      "polls": "Ankete",
-      "feedback": "Povratne informacije",
-      "transcript": "Prepis AI"
-    },
-    "pageVisibleHelp": "Če je izklopljeno (ali ko se okno vidnosti izteče), javna stran končanega dogodka vrne 404, dogodek pa izgine s seznamov in iz zemljevida spletišča.",
-    "libraryListed": "Objavi v videoknjižnici",
-    "libraryListedHelp": "Ta dogodek prikaže v javni knjižnici (/video-library). Zahteva objavljen posnetek ali videoposnetek na YouTubu in vidno stran dogodka.",
-    "libraryListedNoRecording": "Ni objavljenega posnetka: dogodek se v knjižnici ne bo prikazal, dokler ne objavite posnetka ali dodate videoposnetka na YouTubu.",
-    "showRecap": "Prikaži povzetek dogodka",
-    "showWordCloud": "Prikaži oblak besed",
-    "emailEnabled": "Ob koncu dogodka pošlji e-sporočilo s povzetkom",
-    "emailEnabledHelp": "Ob zaključku prijavljenim udeležencem pošlje zahvalno e-sporočilo s povezavama do povzetka in povratnih informacij, moderatorju pa kratek povzetek. Pošlje se samo enkrat."
-  },
-  "provisioning": {
-    "loading": "Nalaganje",
-    "titleFromIdle": "Soba se ponovno aktivira",
-    "titleColdStart": "Soba se pripravlja",
-    "descriptionFromIdle": "Soba je bila zaradi neaktivnosti zaustavljena zaradi varčevanja z energijo. Zaganjamo jo znova: traja približno 2–3 minute.",
-    "descriptionColdStart": "Pripravljamo virtualno sobo za ta dogodek. Postopek traja približno 2–3 minute: ko bo vse pripravljeno, boste samodejno preusmerjeni.",
-    "progressLabel": "{seconds} s",
-    "retry": "Ponovno naloži",
-    "tempError": "Znova poskušamo doseči strežnik, nobeno dejanje ni potrebno.",
-    "ended": "Dogodek se je zaključil.",
-    "scaleToZeroNote": "Za zmanjšanje okoljskega vpliva se video vozlišča izklopijo, ko nihče ni v klicu. Ponovni zagon je samodejen ob prvem vstopu."
-  },
-  "rubrica": {
-    "optOut": {
-      "title": "Odstranitev iz imenika DTD",
-      "intro": "Preklicali boste soglasje za vključitev v imenik DTD. Po potrditvi vas ne bomo več kontaktirali za vabila na podobne dogodke.",
-      "missingToken": "Povezava ni veljavna ali je nepopolna. Preverite izvirno e-poštno sporočilo.",
-      "invalidToken": "Povezava je potekla ali ni veljavna. Za pomoč se obrnite na skrbnika dogodka.",
-      "notFound": "Nobena oseba ne ustreza povezavi. Morda je bila že odstranjena.",
-      "loading": "Nalaganje …",
-      "previewHeader": "Iz imenika boste odstranili:",
-      "warning": "Postopek ne izbriše zgodovine prijav na posamezne dogodke.",
-      "confirm": "Potrdi odstranitev",
-      "submitting": "Odstranjevanje poteka …",
-      "successTitle": "Odstranitev zaključena",
-      "successBody": "Vaših podatkov ni več v imeniku DTD.",
-      "errors": {
-        "generic": "Prišlo je do napake. Poskusite znova pozneje."
-      }
-    }
-  },
-  "deviceCheck": {
-    "preview": "Predogled videa",
-    "micLevel": "Raven mikrofona",
-    "cameraLabel": "Kamera",
-    "micLabel": "Mikrofon",
-    "permissionNeeded": "Dovolite mikrofon in spletno kamero za preizkus. Vstopiti je mogoče tudi brez.",
-    "noVideo": "Brez videa",
-    "noAudio": "Mikrofon ni na voljo",
-    "retry": "Poskusi znova",
-    "cameraToggleOn": "Kamera ON",
-    "cameraToggleOff": "Kamera OFF",
-    "micToggleOn": "Mikrofon ON",
-    "micToggleOff": "Mikrofon OFF",
-    "cameraOffPreview": "Kamera ugasnjena",
-    "speakerTest": "🔊 Test zvoka"
-  },
-  "garden": {
-    "enable": "Pokaži vrt",
-    "classicView": "Klasičen pogled",
-    "changeAvatar": "Zamenjaj avatar",
-    "peopleInGarden": "{count, plural, =0 {Nikogar na vrtu} one {1 oseba na vrtu} two {# osebi na vrtu} few {# osebe na vrtu} other {# oseb na vrtu}}",
-    "guestName": "Guest",
-    "hintKeyboard": "Premikajte se s WASD ali puščicami",
-    "pickerTitle": "Izberite svoj avatar",
-    "pickerHelp": "Lik vas predstavlja v čakalnem vrtu. Spremenite ga lahko kadar koli.",
-    "close": "Zapri",
-    "hintBanner": "Pritisnite puščice za sprehod po vrtu",
-    "hintJoystick": "Povlecite za premikanje"
-  },
-  "feedbackAdmin": {
-    "title": "Feedback results",
-    "totalVotes": "responses",
-    "noFeedback": "No feedback received",
-    "comments": "Comments",
-    "noComments": "No comments",
-    "yes": "Da",
-    "no": "Ne"
-  },
-  "agenda": {
-    "title": "Zapiski / Kontrolni seznam",
-    "empty": "Točk še ni. Dodajte teme za obravnavo in jih sproti odkljukajte.",
-    "add": "Dodaj",
-    "addPlaceholder": "Nova točka…",
-    "remove": "Odstrani",
-    "inProgress": "v teku",
-    "agree": "Strinjam se",
-    "disagree": "Ne strinjam se",
-    "favorablePct": "{pct} % za",
-    "noReactions": "Povejte svoje mnenje"
-  },
-  "changelog": {
-    "metaTitle": "Novosti in dnevnik sprememb",
-    "title": "Novosti in dnevnik sprememb",
-    "intro": "Vse različice platforme, od najnovejše naprej. Vsak vnos povzema glavne novosti, popravke in izboljšave.",
-    "current": "Trenutna različica",
-    "sourceNote": "Opombe so pripravljene na podlagi oznak (tag), zahtevkov pull request in commitov v projektu.",
-    "sourceLink": "Oglejte si vse izdaje na GitHubu",
-    "rawChangelog": "CHANGELOG.md v repozitoriju",
-    "transparencyNote": "Za vsako različico: kaj teče in s katerimi komponentami, v",
-    "transparencyInventory": "preglednosti storitev",
-    "transparencySecurity": "varnosti in SBOM",
-    "technicalDetail": "Tehnične podrobnosti",
-    "releaseLink": "Release",
-    "securityBadge": "Varnost",
-    "sbomButton": "SBOM",
-    "pipelineLink": "Pipeline",
-    "scorecardLink": "OpenSSF Scorecard",
-    "sbomClose": "Zapri",
-    "sbomLoading": "Nalaganje…",
-    "sbomError": "SBOM ni bilo mogoče naložiti.",
-    "sbomComponents": "sestavin",
-    "sbomSearch": "iskanje sestavine…",
-    "sbomColName": "Sestavina",
-    "sbomColVersion": "Različica",
-    "sbomColEcosystem": "Ekosistem",
-    "sbomNoMatch": "Ni ujemajoče sestavine.",
-    "sbomDownload": "Prenesi celoten SBOM (SPDX)",
-    "sourcesLink": "Viri",
-    "codeScanningLink": "Pregled kode (CodeQL)"
+    "captionsOff": "Podnapisi so izklopljeni",
+    "watchOnYouTube": "Oglejte si videoposnetek na YouTubu",
+    "externalSiteNote": "Odpre se na YouTubu, zunanjem spletišču z lastnimi pogoji uporabe in obvestilom o zasebnosti."
   },
   "postprod": {
     "loading": "Nalaganje prepisa…",
@@ -3579,5 +3660,277 @@
     },
     "overlapBadge": "hkratno",
     "overlapTitle": "Hkraten govor: v tem odseku govori več oseb hkrati."
+  },
+  "diagram": {
+    "title": "Konfiguracija dogodka",
+    "topology": "Topologija",
+    "features": "Aktivne funkcionalnosti",
+    "estimates": "Ocena virov",
+    "moderator": "Moderator",
+    "participants": "Udeleženci",
+    "bridge": "Video Bridge",
+    "jvb": "Video Bridge",
+    "jibri": "Snemanje",
+    "occupancy": "Zasedenost",
+    "sizedForRegistrations": "Na podlagi {count} trenutnih prijav",
+    "sizedForCapacity": "Na podlagi največje zmogljivosti {count}",
+    "chips": {
+      "mic": "Mikrofon",
+      "video": "Spletna kamera",
+      "screen": "Deljenje zaslona"
+    },
+    "bandwidth": {
+      "moderator": "Pasovna širina moderatorja",
+      "participant": "Pasovna širina na udeleženca",
+      "total": "Ocenjena skupna pasovna širina"
+    },
+    "jvbCount": "Potrebni JVB-ji",
+    "jvbRam": "Ocenjen RAM JVB",
+    "storage": "Shramba posnetkov",
+    "duration": "Ocenjeno trajanje",
+    "viewOnly": "Samo ogled",
+    "preview": "Predogled konfiguracije"
+  },
+  "waiting": {
+    "startsIn": "Dogodek se začne čez",
+    "startingSoon": "Dogodek se bo začel vsak hip, počakajte organizatorje…",
+    "eventLive": "Dogodek je v živo!",
+    "connectedParticipants": "{count, plural, =0 {Ni udeležencev} =1 {1 udeleženec povezan} other {{count} udeležencev povezanih}}",
+    "elapsedTime": "V teku že {minutes} minut",
+    "youAreLate": "Dogodek se je začel pred {minutes} minutami",
+    "chooseHowToJoin": "Izberite, kako želite sodelovati:",
+    "enterLive": "Vstopite V ŽIVO",
+    "enterLiveDesc": "Sodelujte v živo. Do posnetka lahko vedno dostopate po dogodku.",
+    "enterNow": "Vstopite zdaj",
+    "watchFromStart": "Glejte od začetka",
+    "watchFromStartDesc": "Oglejte si posnetek od začetka in se kadarkoli pridružite prenosu v živo.",
+    "watchNow": "Glejte",
+    "switchToLive": "Preklopi na živo",
+    "enterRoom": "Vstopite v dvorano",
+    "recordingNotice": "Ta dogodek se snema.",
+    "recordingAvailableAfter": "Posnetek bo na voljo po dogodku.",
+    "autoRefreshHint": "Stran se bo samodejno osvežila, ko se bo dogodek začel.",
+    "startEventButton": "Zaženi dogodek",
+    "startingEvent": "Zagon...",
+    "peopleWaiting": "{count, plural, =0 {} =1 {1 oseba čaka} other {{count} oseb čaka}}",
+    "jvbScaling": "Priprava dvorane...",
+    "jvbScalingDetail": "Video strežniki se zaganjajo. Postopek traja približno 2 minuti.",
+    "jvbReady": "Dvorana je pripravljena!",
+    "warmup": {
+      "queued": "Zahteva sprejeta",
+      "startingBridge": "Zaganjamo videostrežnik…",
+      "provisioningNode": "Ustvarjamo namenski videostrežnik",
+      "almostReady": "Videostrežnik teče: skoraj smo",
+      "almostReadyDetail": "Še trenutek in gumb za vstop se bo vklopil sam.",
+      "honestHint": "Običajno čakanje: manj kot minuto, če je infrastruktura že ogreta, 3–5 minut ob prvem zagonu. Medtem lahko preveriš kamero in mikrofon ali uporabiš klepet.",
+      "elapsed": "v pripravi že {time}",
+      "scheduled": "Dvorana se odpre ob začetku",
+      "scheduledDetail": "Ali prej, ko organizator zažene dogodek. Medtem lahko preveriš kamero in mikrofon ali uporabiš klepet."
+    },
+    "exitWaiting": "Zapusti čakalnico",
+    "warmingUp": "Soba se pripravlja",
+    "warmingUpDetail": "Zaganjamo video strežnike. Medtem se lahko pripravite — vse bo nared v 2–3 minutah in boste lahko vstopili.",
+    "warmingUpButton": "Soba se pripravlja ...",
+    "nameLabel": "Vaše ime",
+    "nameHelp": "Vidno bo drugim udeležencem",
+    "nameRequiredToEnter": "Za vstop vnesite svoje ime (vsaj 2 znaka).",
+    "roomOpenNameMissing": "Dvorana je odprta: za vstop vnesite svoje ime.",
+    "joinNowBtn": "Vstopi zdaj",
+    "roomOpen": "Dvorana je odprta",
+    "whileYouWait": "Medtem ko čakate",
+    "openingAt": "Odprto ob {time}",
+    "netiquetteTitle": "Dobre prakse za sodelovanje",
+    "netiquetteBullet1": "Pridite nekaj minut prej za preizkus mikrofona in spletne kamere",
+    "netiquetteBullet2": "Spletno kamero in mikrofon vklopite šele, ko želite govoriti — dvignite roko za prošnjo za besedo",
+    "netiquetteBullet3": "Klepet uporabite za hitre izmenjave, Q&A za vprašanja govornikom",
+    "netiquetteBullet4": "Snemanje, če je aktivno, upravljajo samo moderatorji in je označeno z rdečim znakom",
+    "watchCatchup": "Glej od začetka",
+    "watchCatchupDesc": "Oglejte si delni posnetek in se v živo pridružite, kadar želite",
+    "chatPreviewTitle": "Klepet dogodka",
+    "chatPreviewHint": "Berite, kaj govorijo drugi udeleženci, medtem ko se pripravljate",
+    "endedTitle": "Dogodek zaključen",
+    "endedWatchRecording": "Oglej si posnetek",
+    "endedLeaveFeedback": "Pustite povratno informacijo",
+    "moderatedBy": "Moderira {name}",
+    "startEventError": "Napaka pri zagonu dogodka. Poskusite znova.",
+    "emailLabel": "E-pošta (neobvezno)",
+    "emailHelp": "Samo za morebitno naknadno sporočilo po dogodku",
+    "emailInvalid": "Vnesite veljaven e-poštni naslov",
+    "chatLockedMessage": "Vnesite ime za sodelovanje v klepetu dogodka.",
+    "classicView": "Klasični pogled",
+    "backToGarden": "Nazaj v park",
+    "aiNoticeTitle": "Obdelava z UI po dogodku",
+    "aiNotice": "Ob koncu bo posnetek obdelan z orodji umetne inteligence za izdelavo prepisa, povzetka ter morebitnih prevodov in sinhronizacij. Rezultati lahko vsebujejo netočnosti; merodajen ostaja videoposnetek.",
+    "multitrackConsentTitle": "Snemanje po udeležencih",
+    "multitrackConsentRequired": "Za vstop morate privoliti v snemanje svoje zvočne sledi",
+    "enterGardenTitle": "Vstopi na trg",
+    "enterGardenHint": "Prostor za sprehod med čakanjem: od tam lahko nastaviš tudi ime in mikrofon ter se pridružiš dogodku.",
+    "backToWaitingRoom": "Nazaj v čakalnico",
+    "gardenDialogLabel": "Trg čakalnice",
+    "gardenGateHint": "Pridružiš se lahko od tu ali pa svojega avatarja pripelješ do vrat.",
+    "classicVersion": "Klasična različica",
+    "roomNotReadyButton": "Soba se pripravlja…",
+    "roomNotReadyPiazza": "Med tem skoči na trg",
+    "gate": {
+      "gateOpen": "Vhod je odprt",
+      "stageLive": "● V ŽIVO",
+      "gatePreparing": "Dvorana se pripravlja…",
+      "stagePreparing": "Kmalu",
+      "ended": "Dogodek se je končal",
+      "startsIn": "Začetek čez {time}",
+      "hostEarly": "Zgodnji vstop (gostitelj)"
+    },
+    "roomJustOpened": "Soba je pripravljena — vstopi",
+    "enterAnyway": "Vseeno vstopi",
+    "notHeldBadge": "Čas je potekel",
+    "notHeldTitle": "Predvideni čas dogodka je minil",
+    "notHeldDetail": "Dvorana ni bila odprta. Morebitne novice preveri na strani dogodka."
+  },
+  "recording": {
+    "management": "Video posnetek",
+    "inProgress": "V teku",
+    "available": "Posnetek na voljo",
+    "duration": "Trajanje",
+    "fileSize": "Velikost",
+    "startedAt": "Začeto",
+    "automatic": "samodejno",
+    "publish": "Objavi posnetek",
+    "publishDesc": "Naredite video dostopen na strani dogodka",
+    "retentionLabel": "Hramba",
+    "retention": {
+      "24h": "24 ur (začasno)",
+      "7d": "7 dni",
+      "30d": "30 dni",
+      "90d": "90 dni",
+      "forever": "Nikoli (do poteka dogodka)"
+    },
+    "retentionNote": "Video bo v vsakem primeru upošteval GDPR hrambo dogodka",
+    "delete": "Izbriši posnetek",
+    "deleteConfirm": "Ali ste prepričani? Video bo trajno izbrisan.",
+    "notConfigured": "Jibri ni konfiguriran v infrastrukturi. Video snemanje ni na voljo.",
+    "disabledHint": "Video snemanje za ta dogodek ni omogočeno. Za vklop odprite zgornji razdelek Nastavitve in vklopite stikalo „Snemanje“.",
+    "play": "Predvajaj",
+    "download": "Prenesi",
+    "transcriptManage": "Prepis / AI",
+    "deleteConfirmTitle": "Izbriši posnetek",
+    "deleteFailed": "Brisanje ni uspelo",
+    "deleteSuccess": "Posnetek je izbrisan"
+  },
+  "postEvent": {
+    "config": "Konfiguracija po dogodku",
+    "pageVisible": "Stran dogodka vidna po zaključku",
+    "pageVisibleHelp": "Če je izklopljeno (ali ko se okno vidnosti izteče), javna stran končanega dogodka vrne 404, dogodek pa izgine s seznamov in iz zemljevida spletišča.",
+    "libraryListed": "Objavi v videoknjižnici",
+    "libraryListedHelp": "Ta dogodek prikaže v javni knjižnici (/video-library). Zahteva objavljen posnetek ali videoposnetek na YouTubu in vidno stran dogodka.",
+    "libraryListedNoRecording": "Ni objavljenega posnetka: dogodek se v knjižnici ne bo prikazal, dokler ne objavite posnetka ali dodate videoposnetka na YouTubu.",
+    "showQA": "Prikaži vprašanja Q&A",
+    "showMaterials": "Prikaži deljena gradiva",
+    "showPolls": "Prikaži rezultate anket",
+    "showFeedback": "Prikaži povratne informacije",
+    "showRecap": "Prikaži povzetek dogodka",
+    "showWordCloud": "Prikaži oblak besed",
+    "emailEnabled": "Ob koncu dogodka pošlji e-sporočilo s povzetkom",
+    "emailEnabledHelp": "Ob zaključku prijavljenim udeležencem pošlje zahvalno e-sporočilo s povezavama do povzetka in povratnih informacij, moderatorju pa kratek povzetek. Pošlje se samo enkrat.",
+    "feedbackEnabled": "Anketa o povratnih informacijah aktivna ob koncu dogodka",
+    "visibilityAlways": "Vedno vidno",
+    "visibilityUntil": "Vidno do:",
+    "dataRetentionNote": "Osebni podatki udeležencev bodo izbrisani v skladu s hrambo dogodka ({days} dni). Vsebina dogodka bo ostala na voljo, dokler je stran vidna.",
+    "availableUntil": "Ta dogodek in njegova vsebina bodo na voljo do {date}.",
+    "tabs": {
+      "qa": "Vprašanja in odgovori",
+      "materials": "Gradiva",
+      "polls": "Ankete",
+      "feedback": "Povratne informacije",
+      "transcript": "Prepis AI"
+    }
+  },
+  "provisioning": {
+    "loading": "Nalaganje",
+    "titleFromIdle": "Soba se ponovno aktivira",
+    "titleColdStart": "Soba se pripravlja",
+    "descriptionFromIdle": "Soba je bila zaradi neaktivnosti zaustavljena zaradi varčevanja z energijo. Zaganjamo jo znova: traja približno 2–3 minute.",
+    "descriptionColdStart": "Pripravljamo virtualno sobo za ta dogodek. Postopek traja približno 2–3 minute: ko bo vse pripravljeno, boste samodejno preusmerjeni.",
+    "progressLabel": "{seconds} s",
+    "retry": "Ponovno naloži",
+    "tempError": "Znova poskušamo doseči strežnik, nobeno dejanje ni potrebno.",
+    "ended": "Dogodek se je zaključil.",
+    "scaleToZeroNote": "Za zmanjšanje okoljskega vpliva se video vozlišča izklopijo, ko nihče ni v klicu. Ponovni zagon je samodejen ob prvem vstopu."
+  },
+  "rubrica": {
+    "optOut": {
+      "title": "Odstranitev iz imenika dogodkov",
+      "intro": "Preklicali boste soglasje za vključitev v imenik dogodkov. Po potrditvi vas ne bomo več kontaktirali za vabila na podobne dogodke.",
+      "missingToken": "Povezava ni veljavna ali je nepopolna. Preverite izvirno e-poštno sporočilo.",
+      "invalidToken": "Povezava je potekla ali ni veljavna. Za pomoč se obrnite na skrbnika dogodka.",
+      "notFound": "Nobena oseba ne ustreza povezavi. Morda je bila že odstranjena.",
+      "loading": "Nalaganje …",
+      "previewHeader": "Iz imenika boste odstranili:",
+      "warning": "Postopek ne izbriše zgodovine prijav na posamezne dogodke.",
+      "confirm": "Potrdi odstranitev",
+      "submitting": "Odstranjevanje poteka …",
+      "successTitle": "Odstranitev zaključena",
+      "successBody": "Vaših podatkov ni več v imeniku dogodkov.",
+      "errors": {
+        "generic": "Prišlo je do napake. Poskusite znova pozneje."
+      }
+    }
+  },
+  "deviceCheck": {
+    "preview": "Predogled videa",
+    "micLevel": "Raven mikrofona",
+    "cameraLabel": "Kamera",
+    "micLabel": "Mikrofon",
+    "permissionNeeded": "Dovolite mikrofon in spletno kamero za preizkus. Vstopiti je mogoče tudi brez.",
+    "noVideo": "Brez videa",
+    "noAudio": "Mikrofon ni na voljo",
+    "retry": "Poskusi znova",
+    "cameraToggleOn": "Kamera ON",
+    "cameraToggleOff": "Kamera OFF",
+    "micToggleOn": "Mikrofon ON",
+    "micToggleOff": "Mikrofon OFF",
+    "cameraOffPreview": "Kamera ugasnjena",
+    "speakerTest": "🔊 Test zvoka",
+    "backgroundLabel": "Navidezno ozadje",
+    "backgroundNoneShort": "No",
+    "backgroundHint": "Uveljavi se, ko vstopite v dvorano. Za zameglitev ozadja po vstopu uporabite gumb za ozadja: zgornji predogled prikazuje kamero brez učinka.",
+    "background": {
+      "nessuno": "Brez ozadja",
+      "ufficio-chiaro": "Svetla pisarna",
+      "blu-istituzionale": "Institucionalna modra",
+      "verde-salvia": "Žajbljevo zelena",
+      "grafite": "Grafitna"
+    }
+  },
+  "garden": {
+    "enable": "Pokaži vrt",
+    "classicView": "Klasičen pogled",
+    "changeAvatar": "Zamenjaj avatar",
+    "peopleInGarden": "{count, plural, =0 {Nikogar na vrtu} one {1 oseba na vrtu} two {# osebi na vrtu} few {# osebe na vrtu} other {# oseb na vrtu}}",
+    "guestName": "Gost",
+    "hintKeyboard": "Premikajte se s WASD ali puščicami",
+    "pickerTitle": "Izberite svoj avatar",
+    "pickerHelp": "Lik vas predstavlja v čakalnem vrtu. Spremenite ga lahko kadar koli.",
+    "close": "Zapri",
+    "hintBanner": "Pritisnite puščice za sprehod po vrtu",
+    "hintJoystick": "Povlecite za premikanje"
+  },
+  "feedbackAdmin": {
+    "title": "Rezultati povratnih informacij",
+    "totalVotes": "odgovori",
+    "noFeedback": "Ni prejetih povratnih informacij",
+    "comments": "Komentarji",
+    "noComments": "Ni komentarjev",
+    "yes": "Da",
+    "no": "Ne"
+  },
+  "questionnaire": {
+    "loadFailed": "Vprašalnika ni bilo mogoče naložiti.",
+    "submit": "Pošlji odgovore",
+    "submitFailed": "Pošiljanje ni uspelo. Poskusite znova.",
+    "answersInvalid": "Nekateri odgovori manjkajo ali niso veljavni: preverite obvezna vprašanja in poskusite znova.",
+    "alreadySubmitted": "Na ta vprašalnik ste že odgovorili.",
+    "thankYou": "Hvala za vaše odgovore.",
+    "yes": "Da",
+    "no": "Ne"
   }
 }

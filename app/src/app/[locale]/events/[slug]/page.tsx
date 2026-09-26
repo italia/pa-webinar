@@ -5,10 +5,13 @@ import { getLocale } from 'next-intl/server';
 
 import { prisma } from '@/lib/db';
 import { eventAccessCookieName, verifyEventAccess } from '@/lib/event-session';
-import { isEventPubliclyVisible } from '@/lib/events/visibility';
+import { isEventOpenForRegistration, isEventPageVisible } from '@/lib/events/visibility';
+import { guestAccessAllowed } from '@/lib/events/guest-window';
+import { registrationAccessFor } from '@/lib/events/registration-access';
+import { materialPhase, materialVisibilityWhere } from '@/lib/events/material-visibility';
 import { ensureEventRecap, type EventRecap } from '@/lib/events/recap';
 import EventDetailClient from '@/components/events/event-detail-client';
-import { getPublicEnv } from '@/lib/env';
+import { appBaseUrl, getPublicEnv } from '@/lib/env';
 import { getSettings } from '@/lib/settings';
 import { localizedUrl } from '@/lib/utils/localized-url';
 import { openGraphImages, twitterImageCard } from '@/lib/seo';
@@ -30,18 +33,34 @@ export async function generateMetadata({
   const settings = await (await import('@/lib/settings')).getSettings();
 
   const event = await prisma.event.findUnique({ where: { slug } });
-  if (!event) return { title: 'Not found' };
+  // Come la pagina: un evento non pubblico non espone titolo, descrizione
+  // e immagine nemmeno nei metadati della risposta «non trovato».
+  if (!event || !isEventPageVisible(event)) return { robots: { index: false } };
 
   const title = getLocalized(event.title as LocalizedField, locale);
   const description = getLocalized(event.description as LocalizedField, locale);
 
   const baseUrl = getPublicEnv('NEXT_PUBLIC_APP_URL');
   const pageUrl = localizedUrl(baseUrl, `/events/${slug}`, locale);
+  // Assoluta: i servizi che mostrano le anteprime leggono il tag senza avere
+  // un'origine su cui risolvere un percorso relativo. Porta con se' il momento
+  // dell'ultima modifica perche' quei servizi tengono in cache l'immagine per
+  // INDIRIZZO, anche per giorni: senza, correggere un titolo o sostituire la
+  // locandina la mattina dell'evento non cambierebbe nulla di cio' che vede
+  // chi riceve il link. Lo slug si codifica: da qui in poi e' un indirizzo con
+  // una parte di interrogazione, e un carattere speciale se la mangerebbe.
+  const scheda = settings.ogCardEnabled
+    ? `${baseUrl}/api/og/event/${encodeURIComponent(slug)}` +
+      `?locale=${locale}&v=${event.updatedAt.getTime()}`
+    : null;
 
   return {
     title,
     description: description.slice(0, 160),
-    // Immagine dell'anteprima: la copertina dell'evento se c'è (è la più
+    // Immagine dell'anteprima: la scheda composta dal server quando
+    // l'amministrazione la vuole (titolo, data e relatori DENTRO l'immagine,
+    // che e' l'unica cosa che molte applicazioni mostrano di un link), oppure
+    // il comportamento storico: la copertina dell'evento se c'è (è la più
     // pertinente per un link condiviso), altrimenti il logo di default. Va
     // messa QUI e non ereditata dal layout: Next sostituisce l'openGraph per
     // segmento, non lo fonde (vedi lib/seo). La copertina 16:9 (`coverImageUrl`)
@@ -55,18 +74,20 @@ export async function generateMetadata({
       type: 'website',
       locale: locale === 'en' ? 'en_GB' : 'it_IT',
       siteName: settings.siteName || 'PA Webinar',
-      images: openGraphImages(event.coverImageUrl ?? event.imageUrl),
+      images: scheda
+        ? [{ url: scheda, width: 1200, height: 630 }]
+        : openGraphImages(event.coverImageUrl ?? event.imageUrl),
     },
     twitter: twitterImageCard(
       title,
       description.slice(0, 160),
-      event.coverImageUrl ?? event.imageUrl,
+      scheda ?? event.coverImageUrl ?? event.imageUrl,
     ),
     alternates: {
       canonical: pageUrl,
       languages: {
-        it: `${baseUrl}/it/eventi/${slug}`,
-        en: `${baseUrl}/en/events/${slug}`,
+        it: localizedUrl(baseUrl, `/events/${slug}`, 'it'),
+        en: localizedUrl(baseUrl, `/events/${slug}`, 'en'),
       },
     },
   };
@@ -95,7 +116,7 @@ export default async function EventDetailPage({
   // PROVISIONING/IDLE (pre-warm/pausa di un evento schedulato) restano
   // raggiungibili: chi apre il link pubblico poco prima dell'inizio non
   // deve trovare un 404. Vedi lib/events/visibility.ts.
-  if (!event || !isEventPubliclyVisible(event)) {
+  if (!event || !isEventPageVisible(event)) {
     notFound();
   }
 
@@ -110,6 +131,19 @@ export default async function EventDetailPage({
     event.id,
     cookieStore.get(eventAccessCookieName(event.id))?.value,
   ));
+
+  // Le due scelte dell'amministrazione che decidono i pulsanti della scheda:
+  // chi può iscriversi, e se in diretta si entra anche senza iscrizione.
+  const registrationAccess = await registrationAccessFor(
+    event.id,
+    settings.publicRegistrationEnabled,
+  );
+  const guestEntryOpen = guestAccessAllowed(event, settings.guestAccessEnabled);
+  // Stessa regola della pagina d'iscrizione e della POST: un evento mai aperto
+  // oltre il suo orario di fine non accetta iscrizioni, qualunque stato abbia
+  // ancora. Deciso qui con l'orologio del server, così il pulsante non porta a
+  // una pagina che risponde 404.
+  const registrationOpen = isEventOpenForRegistration(event);
 
   const title = getLocalized(event.title as LocalizedField, locale);
   const description = getLocalized(event.description as LocalizedField, locale);
@@ -169,6 +203,9 @@ export default async function EventDetailPage({
     distribution: { rating: number; count: number }[];
   } | null = null;
   let recap: EventRecap | null = null;
+  // L'invito al questionario post-evento compare solo se l'evento ne ha uno:
+  // senza, il modulo chiederebbe al server un questionario che non c'è.
+  let hasPostEventQuestionnaire = false;
 
   if (event.status === 'ENDED') {
     // Generate + persist the aggregate recap on first view (idempotent). Done
@@ -176,45 +213,69 @@ export default async function EventDetailPage({
     // follow-up email; the page gates DISPLAY on postEventShowRecap below.
     recap = await ensureEventRecap(event.id);
 
-    const [materialsRaw, questionsRaw, pollsRaw, feedbackAgg, feedbackDist] =
-      await Promise.all([
-        event.postEventShowMaterials
-          ? prisma.eventMaterial.findMany({
-              where: { eventId: event.id },
-              orderBy: { createdAt: 'desc' },
-            })
-          : Promise.resolve([]),
-        event.postEventShowQA && event.qaEnabled
-          ? prisma.question.findMany({
-              where: {
-                eventId: event.id,
-                status: { in: ['ANSWERED', 'HIGHLIGHTED'] },
-              },
-              orderBy: { upvoteCount: 'desc' },
-            })
-          : Promise.resolve([]),
-        event.postEventShowPolls
-          ? prisma.poll.findMany({
-              where: { eventId: event.id, status: 'PUBLISHED' },
-              include: { votes: { select: { optionIndex: true } } },
-            })
-          : Promise.resolve([]),
-        event.postEventShowFeedback
-          ? prisma.eventFeedback.aggregate({
-              where: { eventId: event.id },
-              _avg: { rating: true },
-              _count: true,
-            })
-          : Promise.resolve(null),
-        event.postEventShowFeedback
-          ? prisma.eventFeedback.groupBy({
-              by: ['rating'],
-              where: { eventId: event.id },
-              _count: true,
-              orderBy: { rating: 'desc' },
-            })
-          : Promise.resolve([]),
-      ]);
+    const [
+      materialsRaw,
+      questionsRaw,
+      pollsRaw,
+      feedbackAgg,
+      feedbackDist,
+      postEventQuestionnaire,
+    ] = await Promise.all([
+      // Vista del pubblico: la visibilità del singolo materiale
+      // (lib/events/material-visibility) vale anche qui, come nell'API della
+      // sala — un materiale «solo durante l'evento» non resta nell'archivio.
+      event.postEventShowMaterials
+        ? prisma.eventMaterial.findMany({
+            where: {
+              eventId: event.id,
+              ...materialVisibilityWhere(materialPhase(event)),
+            },
+            orderBy: { createdAt: 'desc' },
+          })
+        : Promise.resolve([]),
+      event.postEventShowQA && event.qaEnabled
+        ? prisma.question.findMany({
+            where: {
+              eventId: event.id,
+              status: { in: ['ANSWERED', 'HIGHLIGHTED'] },
+            },
+            orderBy: { upvoteCount: 'desc' },
+          })
+        : Promise.resolve([]),
+      event.postEventShowPolls
+        ? prisma.poll.findMany({
+            where: { eventId: event.id, status: 'PUBLISHED' },
+            include: { votes: { select: { optionIndex: true } } },
+          })
+        : Promise.resolve([]),
+      event.postEventShowFeedback
+        ? prisma.eventFeedback.aggregate({
+            where: { eventId: event.id },
+            _avg: { rating: true },
+            _count: true,
+          })
+        : Promise.resolve(null),
+      event.postEventShowFeedback
+        ? prisma.eventFeedback.groupBy({
+            by: ['rating'],
+            where: { eventId: event.id },
+            _count: true,
+            orderBy: { rating: 'desc' },
+          })
+        : Promise.resolve([]),
+      // Il toggle del feedback governa anche l'invito: spento, non serve
+      // nemmeno sapere se il questionario c'è.
+      event.postEventShowFeedback
+        ? prisma.eventQuestionnaire.findUnique({
+            where: {
+              eventId_placement: { eventId: event.id, placement: 'POST_EVENT' },
+            },
+            select: { id: true },
+          })
+        : Promise.resolve(null),
+    ]);
+
+    hasPostEventQuestionnaire = !!postEventQuestionnaire;
 
     eventMaterials = materialsRaw.map((m) => ({
       id: m.id,
@@ -310,6 +371,28 @@ export default async function EventDetailPage({
     }
   }
 
+  // Prima dell'inizio la scheda è l'unica superficie in cui il pubblico trova
+  // i materiali: in sala si entra solo in diretta, dove la fase è già
+  // «durante». Qui la vista del pubblico della fase «prima»: SOLO i materiali
+  // marcati «Prima dell'evento». Il predefinito vale «in sala e dopo
+  // l'evento» e qui non compare (lib/events/material-visibility). Dall'inizio
+  // in poi li elencano la sala e, a evento concluso, la scheda post-evento qui
+  // sopra.
+  if (materialPhase(event) === 'BEFORE') {
+    const preEventRaw = await prisma.eventMaterial.findMany({
+      where: { eventId: event.id, ...materialVisibilityWhere('BEFORE') },
+      orderBy: { createdAt: 'desc' },
+    });
+    eventMaterials = preEventRaw.map((m) => ({
+      id: m.id,
+      title: m.title,
+      url: m.url,
+      description: m.description,
+      addedBy: m.addedBy,
+      createdAt: m.createdAt.toISOString(),
+    }));
+  }
+
   const serialised = {
     id: event.id,
     slug: event.slug,
@@ -356,8 +439,13 @@ export default async function EventDetailPage({
       <EventDetailClient
         event={serialised}
         locale={locale}
+        appUrl={appBaseUrl()?.href.replace(/\/$/, '') ?? ''}
         invalidToken={invalidToken}
         hasRoomAccess={hasRoomAccess}
+        registrationAccess={registrationAccess}
+        registrationOpen={registrationOpen}
+        guestEntryOpen={guestEntryOpen}
+        hasPostEventQuestionnaire={hasPostEventQuestionnaire}
         parseTitleKicker={resolveKickerEnabled(event, settings.parseTitleKicker)}
         answeredQuestions={answeredQuestions}
         materials={eventMaterials}

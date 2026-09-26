@@ -2,9 +2,10 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Button, Input, FormGroup, Label, Alert, Spinner, Icon } from 'design-react-kit';
+import { Button, Input, FormGroup, Label, Alert, Spinner } from 'design-react-kit';
 
-import { useRouter } from '@/i18n/navigation';
+import { Icon } from '@/components/ui/icon';
+import { useRouter, percorso } from '@/i18n/navigation';
 
 export default function CreateInstantCall() {
   const t = useTranslations('admin.instantCall');
@@ -55,7 +56,7 @@ export default function CreateInstantCall() {
 
       const data = await res.json();
       setShareLink(data.links.shareLink);
-      router.push(`/events/${data.slug}/live?token=${data.moderatorToken}`);
+      router.push(percorso(`/events/${data.slug}/live?token=${data.moderatorToken}`));
     } catch {
       setError(tc('error'));
       setLoading(false);

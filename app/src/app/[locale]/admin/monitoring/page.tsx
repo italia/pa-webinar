@@ -1,17 +1,15 @@
-import { cookies } from 'next/headers';
-import { redirect } from 'next/navigation';
 import { getTranslations, getLocale } from 'next-intl/server';
 
-import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { soloAdmin } from '@/lib/auth/staff-page';
+import { METRICS_APP_LABEL } from '@/lib/metrics';
+import { bridgeMode } from '@/lib/status/bridge';
+import { upSelector } from '@/lib/status/prometheus-selectors';
 import MonitoringDashboard from '@/components/admin/monitoring-dashboard';
 
 export default async function MonitoringPage() {
   const locale = await getLocale();
-  const isAdmin = await isAdminAuthenticated(await cookies());
-
-  if (!isAdmin) {
-    redirect(`/${locale}/admin/login`);
-  }
+  const negato = await soloAdmin(locale);
+  if (negato) return negato;
 
   const t = await getTranslations('admin.monitoring');
 
@@ -19,7 +17,13 @@ export default async function MonitoringPage() {
     <div className="container py-5">
       <h1 className="mb-2">{t('title')}</h1>
       <p className="text-secondary mb-4">{t('subtitle')}</p>
-      <MonitoringDashboard />
+      {/* Le etichette delle serie e la modalità del ponte le conosce solo il
+          server: lette nel componente client resterebbero quelle del build. */}
+      <MonitoringDashboard
+        appLabel={METRICS_APP_LABEL}
+        uptimeSelector={upSelector()}
+        jvbScalerEnabled={bridgeMode() === 'scaler'}
+      />
     </div>
   );
 }

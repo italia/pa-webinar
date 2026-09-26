@@ -27,7 +27,7 @@ export function getPostprodStorage(): StorageProvider {
     throw new Error(
       'Postprod storage requires the recordings domain to be configured ' +
         '(RECORDING_STORAGE_TYPE + RECORDING_{AZURE,S3}_* env). See ' +
-        'docs/POSTPROD.md.',
+        'docs/configuration/storage.md.',
     );
   }
   return provider;
@@ -70,6 +70,39 @@ export async function presignArtifactDownload(opts: {
     expiresInMinutes: opts.expiresInMinutes ?? 60,
     ...(opts.downloadFilename && { downloadFilename: opts.downloadFilename }),
   });
+}
+
+/**
+ * Riscrive il contenuto di un artefatto già presente nell'archivio.
+ *
+ * Serve alla cancellazione di un contenuto da una trascrizione: il testo vive
+ * in due posti — la copia cifrata nella banca dati e il file nell'archivio — e
+ * riscrivere solo la prima lascerebbe la frase rimossa dentro il file, che una
+ * rotta di ripiego può ancora servire. L'app non carica i file di norma (lo fa
+ * il worker con un indirizzo firmato), ma per una cancellazione l'eccezione è
+ * giustificata: la scrittura è piccola e deve avvenire adesso.
+ *
+ * Non solleva: la cancellazione nella banca dati è già avvenuta e non va
+ * annullata perché l'archivio non risponde. Restituisce false, e chi chiama
+ * decide come dirlo.
+ */
+export async function rewritePostprodBlob(
+  blobKey: string,
+  body: string,
+  contentType: string,
+): Promise<boolean> {
+  if (!blobKey.startsWith(`${POSTPROD_PREFIX}/`)) return false;
+  try {
+    const { uploadUrl } = await presignArtifactUpload({ blobKey, contentType, expiresInMinutes: 5 });
+    const res = await fetch(uploadUrl, {
+      method: 'PUT',
+      headers: { 'content-type': contentType },
+      body,
+    });
+    return res.ok;
+  } catch {
+    return false;
+  }
 }
 
 /** Delete a postprod artifact blob. Returns false if not found. */

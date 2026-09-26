@@ -3,7 +3,14 @@
 #
 # Usage:
 #   helm install videocall ./infra/helm/pa-webinar \
-#     -f values.yaml -f values-dev.yaml -n videocall-test
+#     -f values.yaml -f values-dev.yaml -n <namespace> \
+#     --set jitsi-meet.prosody.jwt.secret=$JITSI_JWT_SECRET
+#
+# The conference needs the same secret as JITSI_JWT_SECRET in the
+# application Secret to verify its tokens: pass it as above, or name a
+# Secret with the single key JWT_APP_SECRET in
+# jitsi-meet.prosody.jwt.existingSecretName (never both: the chart refuses
+# to render when both are set).
 # ─────────────────────────────────────────────────────────────
 
 app:

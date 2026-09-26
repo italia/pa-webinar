@@ -1,4 +1,4 @@
-{{- if and .Values.jitsi.enabled (eq (default "simple" .Values.jitsi.mode) "full") .Values.jvbScaler.enabled }}
+{{- if include "pa-webinar.jvbScalerRendered" . }}
 apiVersion: batch/v1
 kind: CronJob
 metadata:
@@ -17,7 +17,14 @@ spec:
       # resta visibile per giorni (failedJobsHistoryLimit) e tiene acceso
       # KubeJobFailed molto oltre il problema reale.
       ttlSecondsAfterFinished: {{ .Values.cronjobs.jobTtlSeconds | default 7200 }}
-      activeDeadlineSeconds: 120
+      # 240s: il lavoro vero dura secondi, ma la deadline parte dalla creazione
+      # del Job e comprende l'attesa di schedulazione e il pull dell'immagine su
+      # un nodo nuovo del pool applications, che scala fra 0 e 10. Con i valori
+      # precedenti erano 149 fallimenti DeadlineExceeded in quattordici giorni su
+      # endpoint sani, cioe' una decina di allarmi falsi al giorno.
+      # concurrencyPolicy: Forbid resta la guardia contro l'accumulo: una run
+      # lunga fa saltare i tick successivi, non li accoda.
+      activeDeadlineSeconds: 240
       backoffLimit: 1
       template:
         metadata:
@@ -44,7 +51,7 @@ spec:
           {{- end }}
           containers:
             - name: scaler
-              image: {{ .Values.jvbScaler.image | default "bitnami/kubectl:latest" }}
+              image: {{ .Values.jvbScaler.image | default .Values.kubectlImage }}
               command:
                 - /bin/sh
                 - -c
@@ -208,7 +215,7 @@ spec:
                   # /api/status reads that snapshot instead of guessing from a
                   # single /colibri/stats hit (which only ever sees 1 pod).
                   APP_URL="{{ include "pa-webinar.internalUrl" . }}"
-                  RESPONSE=$(curl -sf --retry 3 --retry-delay 5 --retry-connrefused --connect-timeout 5 \
+                  RESPONSE=$(curl -sf {{ include "pa-webinar.cronCurlRetry" . }} \
                     -H "x-api-key: $CRON_API_KEY" \
                     "${APP_URL}/api/internal/jvb-desired-replicas?current=${CURRENT}&ready=${READY}${AGG_PARAMS}" 2>/dev/null)
 

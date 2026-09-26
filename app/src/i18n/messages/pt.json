@@ -1,7 +1,19 @@
 {
+  "agenda": {
+    "title": "Notas / Lista de verificação",
+    "empty": "Ainda não há pontos. Adicione os temas a tratar e assinale-os à medida que avança.",
+    "add": "Adicionar",
+    "addPlaceholder": "Novo ponto…",
+    "remove": "Remover",
+    "inProgress": "em curso",
+    "agree": "Concordo",
+    "disagree": "Não concordo",
+    "favorablePct": "{pct}% a favor",
+    "noReactions": "Partilhe a sua opinião"
+  },
   "common": {
-    "appName": "Eventos DTD",
-    "appDescription": "Plataforma para eventos públicos digitais do Departamento para a Transformação Digital",
+    "appName": "PA Webinar",
+    "appDescription": "Plataforma para eventos públicos digitais",
     "loading": "A carregar...",
     "error": "Ocorreu um erro",
     "errorMessage": "Algo correu mal. Por favor, tente novamente.",
@@ -42,8 +54,6 @@
     "skipToFooter": "Ir para o rodapé"
   },
   "header": {
-    "slimTitle": "Presidência do Conselho de Ministros",
-    "slimSubtitle": "Departamento para a Transformação Digital",
     "followUs": "Siga-nos em"
   },
   "events": {
@@ -52,6 +62,7 @@
     "past": "Eventos anteriores",
     "noUpcoming": "Nenhum evento programado de momento. Volte em breve!",
     "noPast": "Nenhum evento anterior",
+    "wordCloudTitle": "Nuvem de palavras",
     "card": {
       "publicEvent": "Evento público",
       "readMore": "Saber mais",
@@ -61,6 +72,22 @@
       "ended": "Terminado",
       "occupiedSpots": "{registered}/{max} inscritos",
       "registeredCount": "{count, plural, =0 {Nenhuma inscrição} one {1 inscrição} other {# inscrições}}"
+    },
+    "recap": {
+      "title": "Resumo do evento",
+      "intro": "Uma síntese do que surgiu durante o evento.",
+      "participants": "Participantes (pico)",
+      "registered": "Inscritos",
+      "topQuestions": "Perguntas mais votadas",
+      "upvotes": "{count, plural, =0 {nenhum voto} one {1 voto} other {# votos}}",
+      "polls": "Resultados das sondagens",
+      "votes": "{count, plural, =0 {nenhum voto} one {1 voto} other {# votos}}",
+      "topWords": "Palavras mais partilhadas",
+      "feedback": "Avaliação média",
+      "feedbackCount": "{count, plural, one {1 resposta} other {# respostas}}",
+      "chatQuestions": "Perguntas do chat",
+      "reactionsCount": "{count, plural, one {1 reação} other {# reações}}",
+      "answered": "respondida"
     },
     "detail": {
       "title": "Detalhes do evento",
@@ -85,6 +112,10 @@
       "noRecording": "A gravação de vídeo não está disponível para este evento.",
       "watchRecording": "Ver gravação",
       "backToEvents": "Voltar aos eventos",
+      "alreadyRegisteredEnter": "Já está inscrito? Entre na sala",
+      "invalidTokenTitle": "Ligação de acesso já não válida",
+      "invalidTokenBody": "A ligação que utilizou não é válida ou expirou. Se se inscreveu, consulte o e-mail de confirmação para encontrar a sua ligação pessoal ou volte a inscrever-se aqui em baixo.",
+      "invalidTokenBodyEnded": "A ligação que utilizou já não é válida. O evento terminou: em baixo encontra a gravação e os materiais.",
       "speakers": "Oradores",
       "organizer": "Organizador",
       "chatNotSaved": "As mensagens do chat não são guardadas após o fim do evento.",
@@ -97,43 +128,27 @@
         "yahoo": "Yahoo Calendar",
         "downloadIcs": "Transferir ficheiro .ics"
       },
-      "alreadyRegisteredEnter": "Já está inscrito? Entre na sala",
-      "invalidTokenTitle": "Ligação de acesso já não válida",
-      "invalidTokenBody": "A ligação que utilizou não é válida ou expirou. Se se inscreveu, consulte o e-mail de confirmação para encontrar a sua ligação pessoal ou volte a inscrever-se aqui em baixo.",
-      "invalidTokenBodyEnded": "A ligação que utilizou já não é válida. O evento terminou: em baixo encontra a gravação e os materiais."
+      "registrationEnded": "O evento terminou: as inscrições estão encerradas."
     },
     "manage": {
       "toggleChat": "Chat",
       "toggleQa": "Q&A",
       "toggleRecording": "Gravação",
-      "settingsSection": "Definições do evento",
       "sessionsAndRecordings": "Sessões e gravações de vídeo",
       "postEventSection": "Pós-evento e feedback"
     },
     "status": {
       "DRAFT": "Rascunho",
       "PUBLISHED": "Publicado",
+      "PROVISIONING": "Em preparação",
       "LIVE": "Em direto",
+      "IDLE": "Em pausa",
       "ENDED": "Terminado",
       "ARCHIVED": "Arquivado"
     },
     "list": {
       "filterByTag": "Filtrar por categoria",
       "allTags": "Todas"
-    },
-    "wordCloudTitle": "Nuvem de palavras",
-    "recap": {
-      "title": "Resumo do evento",
-      "intro": "Uma síntese do que surgiu durante o evento.",
-      "participants": "Participantes (pico)",
-      "registered": "Inscritos",
-      "topQuestions": "Perguntas mais votadas",
-      "upvotes": "{count, plural, =0 {nenhum voto} one {1 voto} other {# votos}}",
-      "polls": "Resultados das sondagens",
-      "votes": "{count, plural, =0 {nenhum voto} one {1 voto} other {# votos}}",
-      "topWords": "Palavras mais partilhadas",
-      "feedback": "Avaliação média",
-      "feedbackCount": "{count, plural, one {1 resposta} other {# respostas}}"
     }
   },
   "registration": {
@@ -148,12 +163,20 @@
     "submitting": "A inscrever...",
     "success": "Inscrição concluída!",
     "successMessage": "Receberá um email de confirmação com a ligação de acesso ao evento.",
-    "enteringRoom": "We're taking you to the event waiting room.",
-    "enteringRoomHint": "Opening the room…",
+    "successScheduledMessage": "Está inscrito! Enviámos-lhe um e-mail com a ligação pessoal de acesso. Adicione o evento ao calendário e volte aqui pouco antes do início.",
+    "addToCalendar": "Adicionar ao calendário",
+    "enteringRoom": "Estamos a levá-lo para a sala de espera do evento.",
+    "enteringRoomHint": "A abrir a sala…",
     "alreadyRegistered": "Já está inscrito neste evento",
-    "resendLink": "Resend my access link",
-    "resending": "Sending…",
-    "resendSent": "If the address is registered, we've re-sent the access link by email.",
+    "resendLink": "Enviar novamente a ligação de acesso",
+    "resending": "A enviar…",
+    "resendSent": "Se o endereço estiver registado, enviámos-lhe novamente a ligação de acesso por email.",
+    "invitationOnly": "A inscrição está reservada às pessoas convidadas: utilize o endereço de email com que foi convidado. A ligação para entrar ser-lhe-á enviada por email.",
+    "closed": "A inscrição neste evento não está aberta ao público.",
+    "lostLink": "Já se inscreveu? Receba novamente a sua ligação pessoal",
+    "lostLinkHelp": "Escreva o endereço de email com que se inscreveu: se estiver inscrito neste evento, voltamos a enviar-lhe a ligação para entrar.",
+    "checkEmailTitle": "Consulte o seu email",
+    "checkEmail": "Se o endereço constar da lista de convidados, receberá em breve um email com a sua ligação pessoal para entrar na sala. Se não o encontrar, verifique a pasta de spam.",
     "backToEvent": "Voltar ao evento",
     "organization": "Organismo de pertença",
     "organizationPlaceholder": "ex. AGID, Ministério da Economia, Câmara Municipal de Roma",
@@ -181,12 +204,10 @@
       "organizationRequired": "Introduza o seu organismo de pertença",
       "consentRequired": "O consentimento para o tratamento de dados é obrigatório",
       "recordingConsentRequired": "O consentimento para a gravação é obrigatório para este evento",
+      "multitrackConsentRequired": "O consentimento para a gravação da sua faixa de áudio é obrigatório neste evento",
       "eventFull": "O evento atingiu o número máximo de participantes",
-      "generic": "Erro durante a inscrição. Tente novamente.",
-      "multitrackConsentRequired": "O consentimento para a gravação da sua faixa de áudio é obrigatório neste evento"
-    },
-    "successScheduledMessage": "Está inscrito! Enviámos-lhe um e-mail com a ligação pessoal de acesso. Adicione o evento ao calendário e volte aqui pouco antes do início.",
-    "addToCalendar": "Adicionar ao calendário"
+      "generic": "Erro durante a inscrição. Tente novamente."
+    }
   },
   "videoLibrary": {
     "title": "Biblioteca de vídeo",
@@ -213,6 +234,8 @@
     "connecting": "A ligar...",
     "connectionError": "Não foi possível ligar à sala. Verifique a ligação e tente novamente.",
     "activeVsRegistered": "{active} ativos · {registered} inscritos",
+    "enterFullscreen": "Ecrã inteiro",
+    "exitFullscreen": "Sair do ecrã inteiro",
     "overtime": {
       "withCountdown": "A hora de fim prevista já passou. O evento será encerrado automaticamente dentro de {minutes, plural, one {# minuto} other {# minutos}}.",
       "closingNow": "Hora de fim atingida. O evento está prestes a ser encerrado.",
@@ -224,6 +247,27 @@
     "declineRecording": "Não participar",
     "enterRoom": "Entrar na sala",
     "leaveRoom": "Sair da sala",
+    "leaveChoice": {
+      "title": "Como pretende sair?",
+      "body": "Pode apenas sair — a chamada continua ativa para os restantes — ou terminá-la para todos os participantes.",
+      "leaveSelf": "Sair apenas eu",
+      "endForAll": "Terminar para todos",
+      "ending": "A terminar…",
+      "endError": "Não foi possível terminar a chamada. Tente novamente."
+    },
+    "endDestino": {
+      "title": "Destino do evento",
+      "body": "Está prestes a terminar o evento para todos. O que pretende fazer com ele depois de concluído?",
+      "public": "Manter público",
+      "publicHelp": "A página do evento concluído continua visível com o resumo, as perguntas e respostas, as sondagens, os materiais e o feedback.",
+      "library": "Publicar na biblioteca",
+      "libraryHelp": "Como acima e, além disso, mostra o evento na biblioteca de vídeos pública (requer uma gravação publicada ou um vídeo do YouTube).",
+      "archive": "Arquivar (privado)",
+      "archiveHelp": "A página do evento concluído não será pública (404). Os dados são conservados até ao termo do prazo de retenção e depois são eliminados.",
+      "genAi": "Gerar transcrição e resumo com IA a partir da gravação (no final do processamento)",
+      "back": "Voltar",
+      "confirm": "Terminar o evento"
+    },
     "eventNotStarted": "O evento ainda não começou",
     "eventStartsAt": "O evento terá início em {date} às {time}",
     "countdown": "Tempo restante",
@@ -241,11 +285,15 @@
     "guestJoinSubtitle": "Entre como convidado no evento em curso",
     "guestJoinButton": "Entrar como convidado",
     "guestRedirectToRegister": "O evento ainda não começou. Inscreva-se para receber a ligação de acesso.",
+    "guestAccessDisabled": "Este evento requer inscrição: não é possível entrar sem se inscrever.",
     "jibriUnavailable": "Gravação indisponível — Jibri não configurado",
     "endEventError": "Erro ao terminar o evento. Tente novamente.",
     "jibriNotConfigured": "Gravação não configurada na infraestrutura",
     "jibriScaling": "A iniciar gravação…",
     "jibriScalingTooltip": "O componente de gravação está a iniciar. Estará disponível em breve.",
+    "recorderNotStarted": "Gravação indisponível",
+    "recorderNotStartedDetail": "O serviço de gravação ainda não iniciou: por agora, o evento continua sem gravação. Avise os responsáveis pela plataforma.",
+    "recorderStartFailed": "A gravação não iniciou. Tente novamente dentro de alguns minutos; se o problema persistir, avise os responsáveis pela plataforma.",
     "roomPreparing": "A preparar a sala…",
     "roomPreparingDetail": "Os servidores de vídeo estão a iniciar. A operação demora cerca de 2 minutos. A sala ficará ativa automaticamente.",
     "recordingPromptTitle": "Iniciar a gravação?",
@@ -263,8 +311,13 @@
     "qaSidebarPlaceholder": "O painel Q&A estará disponível quando o evento começar.",
     "invalidToken": "Ligação inválida. Verifique a ligação recebida por email.",
     "sidebarTabQa": "Q&A",
+    "liveFeaturesLabel": "Funcionalidades:",
+    "whiteboardNotSavedHint": "O quadro branco não é guardado automaticamente. Se o utilizar, exporte-o (menu do quadro) e anexe-o aos Materiais do evento antes de terminar.",
     "sidebarTabChat": "Chat",
     "sidebarTabPolls": "Sondagens",
+    "sidebarTabWordcloud": "Nuvem de palavras",
+    "sidebarTabAgenda": "Notas / Lista de verificação",
+    "liveToggleAgenda": "Notas / Lista de verificação (agenda)",
     "sidebarTabMaterials": "Materiais",
     "sidebarTabParticipants": "Participantes",
     "chat": {
@@ -299,7 +352,25 @@
       "exportChat": "Descarregar o chat",
       "reactNotAllowed": "Para reagir às mensagens é necessária a ligação pessoal ou de moderador.",
       "editNotAllowed": "Esta ligação é partilhada: não permite editar as mensagens.",
-      "editExpired": "Passaram mais de 15 minutos: a mensagem já não pode ser editada."
+      "editExpired": "Passaram mais de 15 minutos: a mensagem já não pode ser editada.",
+      "askAsQuestionLabel": "Marcar como pergunta",
+      "placeholderQuestion": "Escreva a sua pergunta...",
+      "lensGroupLabel": "Filtrar mensagens",
+      "lensAll": "Todas",
+      "lensQuestions": "Perguntas ({count})",
+      "lensAnnounceAll": "Na lista: todas as mensagens",
+      "lensAnnounceQuestions": "Na lista: {count, plural, =0 {nenhuma pergunta} one {1 pergunta} other {# perguntas}}",
+      "questionOpen": "Pergunta",
+      "questionAnswered": "Respondida",
+      "questionDismissed": "Não será tratada",
+      "questionMarkAnswered": "Marcar como respondida",
+      "questionReopen": "Reabrir",
+      "questionDismiss": "Descartar",
+      "questionRestore": "Restaurar",
+      "questionStatusFailed": "Não foi possível atualizar a pergunta",
+      "questionNeedsText": "Escreva o texto da pergunta: um anexo sozinho não entra na fila",
+      "lensTruncated": "Apenas as mensagens mais recentes estão carregadas: podem existir perguntas mais antigas que não constam da lista.",
+      "attachUnavailable": "Os anexos não estão disponíveis nesta instalação."
     },
     "role": {
       "moderator": "Moderador",
@@ -320,7 +391,8 @@
         "unknown": "N/D"
       },
       "volume": "Volume",
-      "volumeFor": "Volume de {name}"
+      "volumeFor": "Volume de {name}",
+      "kickName": "Expulsar {name}"
     },
     "moderator": {
       "muteAll": "Silenciar todos",
@@ -331,7 +403,7 @@
       "toggleChat": "Chat on/off",
       "endEvent": "Terminar evento",
       "endEventConfirm": "Tem a certeza de que pretende terminar o evento para todos os participantes?",
-      "participantCount": "{count} participantes",
+      "participantCount": "{count, plural, one {# participante} other {# participantes}}",
       "raisedHands": "Mãos levantadas",
       "noRaisedHands": "Nenhuma mão levantada",
       "giveFloor": "Dar a palavra",
@@ -339,27 +411,28 @@
       "approveVideo": "Dar a palavra (vídeo)",
       "approveAll": "Dar a palavra",
       "audioOnly": "Apenas áudio",
+      "lowerHand": "Baixar a mão",
       "participantFallback": "Participante",
       "audioModeration": "Microfone participantes",
       "micDisabled": "Microfone desativado",
       "videoModeration": "Vídeo participantes",
       "videoDisabled": "Vídeo desativado",
       "eventEndedSuccess": "Evento terminado com sucesso. A redirecionar...",
-      "whiteboard": "Quadro branco",
-      "lowerHand": "Baixar a mão"
+      "whiteboard": "Quadro branco"
     },
     "closeDrawer": "Fechar",
     "hintBanner": {
+      "ariaLabel": "Sugestões",
       "controls": "Controlos em baixo",
       "raiseHand": "Levante a mão para falar",
       "sidebar": "Q&A e chat na barra lateral",
-      "dismiss": "Compreendi",
-      "ariaLabel": "Sugestões"
+      "dismiss": "Compreendi"
     },
     "topBarCount": {
       "live": "👥 {count, plural, one {# pessoa} other {# pessoas}}"
     },
     "sidebarTabChatUnread": "Novas mensagens não lidas",
+    "sidebarTabPollsOpen": "Sondagem aberta em que ainda não votou",
     "floatingControlsLabel": "Controlos do evento",
     "screenshareActive": "🖥️ {name} está a partilhar o ecrã",
     "screenshareFallbackName": "Um participante",
@@ -377,40 +450,24 @@
       "moderatorLink": "Ligação de moderador",
       "moderatorLinkHint": "Quem abrir esta ligação entra como moderador, com pleno controlo da sala."
     },
-    "enterFullscreen": "Ecrã inteiro",
-    "exitFullscreen": "Sair do ecrã inteiro",
-    "leaveChoice": {
-      "title": "Como pretende sair?",
-      "body": "Pode apenas sair — a chamada continua ativa para os restantes — ou terminá-la para todos os participantes.",
-      "leaveSelf": "Sair apenas eu",
-      "endForAll": "Terminar para todos",
-      "ending": "A terminar…",
-      "endError": "Não foi possível terminar a chamada. Tente novamente."
-    },
-    "endDestino": {
-      "title": "Destino do evento",
-      "body": "Está prestes a terminar o evento para todos. O que pretende fazer com ele depois de concluído?",
-      "public": "Manter público",
-      "publicHelp": "A página do evento concluído continua visível com o resumo, as perguntas e respostas, as sondagens, os materiais e o feedback.",
-      "library": "Publicar na biblioteca",
-      "libraryHelp": "Como acima e, além disso, mostra o evento na biblioteca de vídeos pública (requer uma gravação publicada ou um vídeo do YouTube).",
-      "archive": "Arquivar (privado)",
-      "archiveHelp": "A página do evento concluído não será pública (404). Os dados são conservados até ao termo do prazo de retenção e depois são eliminados.",
-      "genAi": "Gerar transcrição e resumo com IA a partir da gravação (no final do processamento)",
-      "back": "Voltar",
-      "confirm": "Terminar o evento"
-    },
-    "liveFeaturesLabel": "Funcionalidades:",
-    "whiteboardNotSavedHint": "O quadro branco não é guardado automaticamente. Se o utilizar, exporte-o (menu do quadro) e anexe-o aos Materiais do evento antes de terminar.",
-    "sidebarTabWordcloud": "Nuvem de palavras",
-    "sidebarTabAgenda": "Notas / Lista de verificação",
-    "liveToggleAgenda": "Notas / Lista de verificação (agenda)",
     "timer": {
       "show": "Mostrar o cronómetro",
       "hide": "Ocultar o cronómetro",
       "remainingLabel": "Tempo restante (clique para ver o tempo decorrido)",
       "elapsedLabel": "Tempo decorrido (clique para ver o tempo restante)"
-    }
+    },
+    "videoCallFrameTitle": "Videochamada do evento",
+    "insecureContextTitle": "Endereço não seguro",
+    "insecureContextBody": "Esta página foi aberta com http://: o navegador não permite usar o microfone nem a câmara, e a videochamada não pode começar. Abra a mesma página no endereço seguro.",
+    "insecureContextLink": "Abrir https://{host}",
+    "conferenceUnreachableTitle": "O serviço de videochamada não responde",
+    "conferenceUnreachableBody": "O seu navegador não consegue contactar o servidor de videochamada ({host}). Abra-o num novo separador: se o navegador mostrar um aviso de segurança, aceite-o, depois volte aqui e tente novamente. Se a página não abrir, a rede a partir da qual se liga pode estar a bloqueá-lo.",
+    "conferenceOpenHost": "Abrir {host} num novo separador",
+    "leftTitle": "Saiu da sala",
+    "leftMessage": "O evento ainda está a decorrer: pode voltar a entrar quando quiser.",
+    "leftModeratorReminder": "O evento continua aberto até alguém o terminar. Quando terminarem, volte a entrar e escolha «{action}».",
+    "rejoin": "Voltar a entrar",
+    "backToHome": "Voltar à página inicial"
   },
   "qa": {
     "title": "Perguntas e Respostas",
@@ -445,7 +502,9 @@
       "textRequired": "Escreva a sua pergunta",
       "tooLong": "A pergunta não pode exceder 500 caracteres",
       "rateLimit": "Aguarde antes de enviar outra pergunta",
-      "generic": "Erro ao enviar a pergunta"
+      "busy": "Neste momento chegam muitas perguntas da sua rede: tente novamente dentro de alguns segundos",
+      "generic": "Erro ao enviar a pergunta",
+      "upvoteFailed": "O voto não foi registado: tente novamente dentro de alguns segundos."
     },
     "ctaTitle": "Faça a primeira pergunta",
     "ctaBody": "Os outros participantes poderão votar a sua pergunta. Os moderadores irão vê-la e poderão responder por voz ou por escrito.",
@@ -455,6 +514,79 @@
     "submitPrimary": "Enviar pergunta"
   },
   "admin": {
+    "accessDenied": {
+      "title": "Esta secção não está disponível para a sua função",
+      "body": "Como organizador, gere os seus próprios eventos: criá-los, publicá-los, os materiais, os questionários e a pós-produção. As definições da plataforma e os dados de todos os eventos ficam com a administração.",
+      "back": "Ir para os seus eventos"
+    },
+    "staffLogin": {
+      "title": "Aceder à área de administração",
+      "intro": "Organizadores e administradores entram com uma ligação enviada para o seu e-mail: sem palavras-passe para lembrar.",
+      "emailLabel": "O seu e-mail profissional",
+      "send": "Enviar-me a ligação",
+      "sending": "A enviar…",
+      "sent": "Se o endereço estiver autorizado, receberá em breve um e-mail com a ligação de acesso. A ligação só funciona uma vez e expira ao fim de {minutes} minutos.",
+      "error": "Não foi possível enviar o pedido. Tente novamente dentro de alguns minutos.",
+      "keySection": "Acesso com a chave da instância",
+      "accessTitle": "Entrar na área de administração",
+      "accessIntro": "Prima o botão para entrar. A ligação só funciona uma vez.",
+      "enter": "Entrar",
+      "invalidLink": "A ligação não é válida: pode ter expirado ou já ter sido usada.",
+      "newLink": "Pedir uma nova ligação"
+    },
+    "organizers": {
+      "title": "Contas da equipa",
+      "intro": "Pessoas que trabalham na área de administração com o seu próprio nome. Os organizadores criam e gerem os seus próprios eventos; os administradores gerem toda a instância. Entram com uma ligação enviada para o seu e-mail, sem palavra-passe. A chave da instância mantém-se para emergências e automatização.",
+      "newTitle": "Adicionar uma pessoa",
+      "name": "Nome completo",
+      "email": "E-mail",
+      "add": "Adicionar",
+      "sendNow": "Enviar já a ligação de acesso",
+      "listTitle": "Pessoas autorizadas",
+      "loading": "A carregar…",
+      "empty": "Ainda não há contas.",
+      "events": "Eventos",
+      "lastLogin": "Último acesso",
+      "status": "Estado",
+      "actions": "Ações",
+      "never": "Nunca",
+      "active": "Ativo",
+      "inactive": "Desativado",
+      "invite": "Enviar ligação",
+      "inviteFor": "Enviar uma ligação de acesso a {name}",
+      "deactivate": "Desativar",
+      "deactivateFor": "Desativar {name}",
+      "activate": "Reativar",
+      "activateFor": "Reativar {name}",
+      "delete": "Eliminar",
+      "deleteFor": "Eliminar {name}",
+      "deleteTitle": "Eliminar a conta?",
+      "deleteMessage": "A conta de {name} será eliminada. Os seus eventos ({count}) não são apagados: voltam para a administração.",
+      "deactivateTitle": "Desativar a conta?",
+      "deactivateMessage": "{name} deixará de poder entrar e as ligações de acesso já enviadas deixam de funcionar. Os seus eventos ficam como estão.",
+      "exists": "Já existe uma conta com este e-mail.",
+      "created": "Conta adicionada.",
+      "createdInvited": "Conta adicionada: a ligação de acesso está a caminho.",
+      "invited": "Ligação de acesso enviada.",
+      "deleted": "Conta eliminada.",
+      "updated": "Alteração guardada.",
+      "actionError": "A operação falhou. Tente novamente.",
+      "loadError": "Não foi possível carregar a lista.",
+      "inviteFailed": "Conta adicionada, mas não foi possível enviar a ligação: reenvie-a a partir da respetiva linha.",
+      "role": "Função",
+      "roleOrganizer": "Organizador",
+      "roleAdmin": "Administrador",
+      "roleHelp": "Os organizadores veem e gerem apenas os seus próprios eventos. Os administradores gerem tudo: definições, eventos de todos, agenda e contas.",
+      "roleFor": "Função de {name}",
+      "promoteTitle": "Nomear administrador?",
+      "promoteMessage": "{name} poderá gerir toda a instância: definições, eventos de todos, agenda e contas da equipa.",
+      "promote": "Nomear administrador",
+      "demoteTitle": "Voltar a organizador?",
+      "demoteMessage": "{name} perderá de imediato o acesso às definições e aos eventos dos outros, e verá apenas os seus.",
+      "demote": "Voltar a organizador",
+      "you": "você",
+      "selfLocked": "A sua conta é gerida por outro administrador"
+    },
     "fileOrUrl": {
       "tabUpload": "Carregar ficheiro",
       "tabUrl": "Colar URL",
@@ -472,7 +604,8 @@
       "errorGeneric": "Erro ao carregar o ficheiro",
       "helpImage": "Formatos suportados: PNG, JPEG, WebP, SVG, GIF — máx. 10 MB",
       "helpAudio": "Formatos suportados: MP3, WAV, OGG, M4A, WebM — máx. 20 MB",
-      "helpDocument": "Formatos suportados: PDF, DOCX, PPTX, XLSX, TXT — máx. 25 MB"
+      "helpDocument": "Formatos suportados: PDF, DOCX, PPTX, XLSX, TXT — máx. 25 MB",
+      "uploadsUnavailable": "O carregamento de ficheiros não está disponível nesta instalação: cole antes o URL do ficheiro."
     },
     "rubricaPicker": {
       "loading": "A pesquisar…",
@@ -510,7 +643,9 @@
           "endsAt": "A data de fim deve ser posterior à data de início.",
           "titleRequired": "O título é obrigatório (pelo menos 3 caracteres).",
           "titleRequiredOtherLocale": "O título no idioma predefinido ({locale}) é obrigatório: mude para o separador {locale}.",
-          "maxParticipants": "Introduza um número entre 2 e 500."
+          "maxParticipants": "Introduza um número entre 2 e 500.",
+          "descriptionRequired": "A descrição é obrigatória (pelo menos {min} caracteres).",
+          "descriptionRequiredOtherLocale": "A descrição no idioma predefinido ({locale}) é obrigatória: mude para o separador {locale}."
         },
         "senderRatioLabel": "Percentagem ativa estimada",
         "senderRatioHelp": "Quantos participantes se espera que tenham microfone/vídeo ativo. Ajuda a dimensionar o servidor de vídeo.",
@@ -579,6 +714,7 @@
         "organizerName": "Responsável",
         "organizerOrganization": "Organização",
         "organizerWebsite": "Sítio web",
+        "organizerLogo": "Logótipo do organizador",
         "organizerRequired": "Responsável e organização são obrigatórios.",
         "moderatorsHeading": "Moderadores",
         "moderatorsHelp": "Os moderadores podem gerir a sessão e controlar as permissões durante o evento.",
@@ -591,7 +727,7 @@
         "speakerEmail": "E-mail",
         "speakerRequired": "Nome e e-mail são obrigatórios.",
         "invitationsHeading": "Convites",
-        "invitationsHelp": "Pessoas pré-inscritas — receberão uma ligação pessoal para participar.",
+        "invitationsHelp": "Lista de pessoas convidadas. A plataforma não envia convites: partilhe a ligação do evento. Com a inscrição pública desativada, só estes endereços se podem inscrever, e a ligação pessoal para entrar chega por e-mail depois da inscrição.",
         "invitationName": "Nome (facultativo)",
         "invitationEmail": "E-mail",
         "invitationRole": "Função",
@@ -604,8 +740,7 @@
         "invalidEmail": "Endereço de e-mail inválido.",
         "duplicateEmail": "Endereço já presente.",
         "rubricaPick": "Pesquisar na agenda…",
-        "rubricaOrAdd": "ou adicione manualmente",
-        "organizerLogo": "Logótipo do organizador"
+        "rubricaOrAdd": "ou adicione manualmente"
       },
       "step4": {
         "heading": "Conteúdos e materiais",
@@ -616,7 +751,7 @@
         "materialUrl": "Ficheiro ou ligação",
         "visibilityLabel": "Visibilidade",
         "visibility": {
-          "ALWAYS": "Sempre",
+          "ALWAYS": "Na sala e depois do evento",
           "BEFORE": "Antes do evento",
           "DURING": "Durante o evento",
           "AFTER": "Depois do evento"
@@ -645,8 +780,6 @@
         "scaleMax": "Máximo",
         "required": "Obrigatória",
         "saveDraftAndGoQuestionnaires": "Guardar rascunho e ir para a gestão de questionários",
-        "preQuestionnaire": "Questionário pré-evento",
-        "postQuestionnaire": "Questionário pós-evento (feedback)",
         "none": "— Nenhum —"
       },
       "step5": {
@@ -675,22 +808,25 @@
         "retentionHelp": "Após este limite, os dados pessoais são eliminados automaticamente.",
         "gdprTemplate": "Modelo da política de privacidade",
         "gdprTemplateNone": "— Utilizar texto personalizado —",
+        "gdprTemplateUnknown": "O modelo de informação sobre privacidade escolhido já não existe: escolha outro ou volte ao texto personalizado",
         "privacyText": "Política de privacidade (texto)",
         "moderatorHeading": "Contacto do moderador",
+        "moderatorPublishHint": "O nome e o e-mail são obrigatórios para publicar o evento (são necessários para a ligação de moderador e para o e-mail de confirmação). Para guardar como rascunho não são exigidos.",
+        "moderatorLinkNote": "Esta pessoa é o moderador principal do evento: receberá por e-mail uma ligação privada para o gerir (iniciar a gravação, moderar as perguntas, lançar sondagens…). É diferente dos comoderadores adicionados no passo «Pessoas», que recebem cada um a sua própria ligação.",
+        "moderatorRequired": "Introduza o nome do moderador",
+        "moderatorEmailRequired": "Introduza um e-mail válido do moderador",
         "moderatorName": "Nome",
         "moderatorEmail": "E-mail",
         "capacityHeading": "Capacidade estimada",
         "featuresHeading": "Configuração resumida",
         "privacyDoc": "Documento da política de privacidade (PDF ou ligação)",
         "privacyDocHelp": "Carregue um PDF ou cole o URL de uma política alternativa. Substitui o modelo RGPD se estiver definido.",
-        "privacyTextHelp": "Texto resumido apresentado no formulário de inscrição; pode complementar ou substituir o modelo RGPD.",
-        "moderatorPublishHint": "O nome e o e-mail são obrigatórios para publicar o evento (são necessários para a ligação de moderador e para o e-mail de confirmação). Para guardar como rascunho não são exigidos.",
-        "moderatorLinkNote": "Esta pessoa é o moderador principal do evento: receberá por e-mail uma ligação privada para o gerir (iniciar a gravação, moderar as perguntas, lançar sondagens…). É diferente dos comoderadores adicionados no passo «Pessoas», que recebem cada um a sua própria ligação.",
-        "moderatorRequired": "Introduza o nome do moderador",
-        "moderatorEmailRequired": "Introduza um e-mail válido do moderador"
+        "privacyTextHelp": "Texto resumido apresentado no formulário de inscrição; pode complementar ou substituir o modelo RGPD."
       },
       "validationFailed": "Verifique os campos assinalados antes de prosseguir.",
       "partialFailure": "Evento criado, mas alguns elementos não foram guardados: {items}. Pode adicioná-los a partir da página do evento.",
+      "partialFailureEdit": "As alterações ao evento foram guardadas, mas não foi possível guardar: {items}. O seu trabalho continua aqui: corrija e guarde novamente.",
+      "partialFailureEditDetail": "As alterações ao evento foram guardadas, mas não foi possível guardar: {items}. O servidor respondeu: {reason}. O seu trabalho continua aqui: corrija e guarde novamente.",
       "draftFound": "Encontrámos um rascunho não guardado deste evento. Pretende restaurá-lo?",
       "draftRestore": "Restaurar o rascunho",
       "draftDiscard": "Ignorar",
@@ -699,8 +835,13 @@
         "invitations": "convites",
         "moderators": "moderadores",
         "speakers": "oradores",
-        "materials": "materiais"
-      }
+        "materials": "materiais",
+        "questionnaires": "questionários"
+      },
+      "revocationFailed": "Não foi possível revogar o acesso de {name}: a ligação de acesso continua válida. Guarde novamente para tentar outra vez ou revogue-a no separador «{tab}» da página do evento.",
+      "validationFailedDetail": "O servidor rejeitou alguns dados: {reason}. Corrija-os e tente novamente.",
+      "publishFailed": "O evento foi criado, mas não foi publicado: continua a ser um rascunho. Publique-o a partir da página do evento.",
+      "publishFailedDetail": "O evento foi criado, mas não foi publicado: continua a ser um rascunho. O servidor respondeu: {reason}. Publique-o a partir da página do evento."
     },
     "nav": {
       "events": "Gestão de eventos",
@@ -741,8 +882,11 @@
       "eventQuestionnaires": "Questionários",
       "rubricaList": "Lista",
       "rubricaDetail": "Entrada",
-      "feedbackDashboard": "Feedback",
-      "recordingsPostprod": "Transcrições / IA"
+      "organizers": "Contas",
+      "people": "Pessoas",
+      "postprodDetail": "Gravação",
+      "recordingsPostprod": "Transcrições / IA",
+      "feedbackDashboard": "Feedback"
     },
     "landing": {
       "title": "Painel de administração",
@@ -1112,8 +1256,35 @@
       "qaEnabled": "Ativar Q&A",
       "chatEnabled": "Ativar chat",
       "recordingEnabled": "Ativar gravação de vídeo",
+      "agendaEnabled": "Notas / Lista de verificação (agenda) em direto",
+      "agendaEnabledDesc": "Uma lista de verificação dos pontos a tratar que os moderadores assinalam durante o evento. Alimenta o resumo automático. Opcional e também ativável durante o evento.",
+      "wordCloudEnabled": "Nuvem de palavras ao vivo",
+      "wordCloudEnabledDesc": "Os participantes enviam uma palavra e a nuvem atualiza-se em direto. Útil para abrir um debate ou recolher um sentimento em poucos segundos.",
+      "whiteboardEnabled": "Quadro branco partilhado",
+      "whiteboardEnabledDesc": "Ativa o quadro branco colaborativo nativo (Excalidraw): os moderadores podem abri-lo a partir da barra de ferramentas durante o evento. Requer o serviço de quadro branco da instalação; onde existe, está sempre ativo nas chamadas instantâneas.",
       "autoStartRecording": "Iniciar a gravação automaticamente",
       "autoStartRecordingDesc": "No início do evento, a gravação começa automaticamente (sem pedir confirmação ao moderador). Assim, eventuais retardatários encontram já o leitor disponível.",
+      "aiSectionHeading": "Pós-produção automática",
+      "aiSectionDesc": "Depois do fim do evento, a gravação pode ser processada por uma pipeline de inteligência artificial no cluster para produzir transcrição, resumo e, se for pedido, traduções e dobragem. Tudo acontece na infraestrutura desta instalação; nenhum dado sai para terceiros.",
+      "aiTranscriptEnabled": "Transcrição automática",
+      "aiTranscriptEnabledDesc": "Reconhecimento da fala com identificação dos oradores. Necessária para ativar o resumo, as traduções e a dobragem.",
+      "aiSummaryEnabled": "Resumo e capítulos",
+      "aiSummaryEnabledDesc": "Resumo da reunião, decisões tomadas, tarefas a realizar e divisão em capítulos com marcação temporal.",
+      "aiTranslationEnabled": "Tradução para outros idiomas",
+      "aiTranslationEnabledDesc": "Transcrição e resumo traduzidos para os idiomas indicados em baixo.",
+      "aiTargetLocales": "Idiomas de tradução",
+      "aiTargetLocalesDesc": "Códigos de idioma ISO (p. ex. en, fr, de) separados por vírgula. Deixe vazio para utilizar os idiomas definidos ao nível do site.",
+      "aiTargetLocalesRequired": "Indique pelo menos um idioma de tradução ou desative a tradução automática.",
+      "aiDubbingEnabled": "Dobragem de áudio",
+      "aiDubbingEnabledDesc": "Áudio dobrado nos idiomas de destino, gerado com vozes sintéticas pré-treinadas. Não clona a voz dos participantes.",
+      "consentBadge": "Consentimento explícito",
+      "retentionBadge": "Prolonga a retenção",
+      "multitrackRecordingEnabled": "Gravação por participante (alta precisão)",
+      "multitrackRecordingEnabledDesc": "Grava uma faixa de áudio separada para cada participante, para que a transcrição atribua com certeza quem diz o quê (deixa de haver «Orador 1/2»). Trata o áudio isolado de um único orador (dado pessoal sensível): as faixas são temporárias e eliminadas logo após a transcrição. Requer o consentimento para a gravação.",
+      "retainParticipantTracks": "Conservar as faixas por participante",
+      "retainParticipantTracksDesc": "Mantém as faixas de áudio individuais para além da transcrição, para o arquivo descarregável e a reprodução por orador. ATENÇÃO: prolonga a conservação de dados pessoais sensíveis (voz isolada) até ao termo da retenção do evento. Ative apenas se for necessário e com consentimento/informação adequados.",
+      "expectedSpeakers": "Número de oradores previstos",
+      "expectedSpeakersDesc": "Quando o souber (p. ex. 3 oradores), indicá-lo melhora a qualidade da identificação dos oradores. Deixe vazio para que seja a pipeline a decidir.",
       "dataRetentionDays": "Conservação de dados (dias após o evento)",
       "dataRetentionHint": "Após este período, as inscrições dos participantes, as perguntas Q&A e eventuais gravações de vídeo serão automaticamente eliminadas.",
       "privacyPolicyUrl": "URL da política de privacidade",
@@ -1167,31 +1338,7 @@
       "retentionPreviewKept": "As estatísticas agregadas e os metadados do evento são mantidos.",
       "configPreview": "Pré-visualização da configuração",
       "templateApplied": "Modelo aplicado: {name}. Pode modificar todas as definições.",
-      "agendaEnabled": "Notas / Lista de verificação (agenda) em direto",
-      "agendaEnabledDesc": "Uma lista de verificação dos pontos a tratar que os moderadores assinalam durante o evento. Alimenta o resumo automático. Opcional e também ativável durante o evento.",
-      "whiteboardEnabled": "Quadro branco partilhado",
-      "whiteboardEnabledDesc": "Ativa o quadro branco colaborativo nativo (Excalidraw): os moderadores podem abri-lo a partir da barra de ferramentas durante o evento. Sempre ativo nas chamadas instantâneas.",
-      "aiSectionHeading": "Pós-produção automática",
-      "aiSectionDesc": "Depois do fim do evento, a gravação pode ser processada por uma pipeline de inteligência artificial no cluster para produzir transcrição, resumo e, se for pedido, traduções e dobragem. Tudo acontece na infraestrutura do Departamento; nenhum dado sai para terceiros.",
-      "aiTranscriptEnabled": "Transcrição automática",
-      "aiTranscriptEnabledDesc": "Reconhecimento da fala com identificação dos oradores. Necessária para ativar o resumo, as traduções e a dobragem.",
-      "aiSummaryEnabled": "Resumo e capítulos",
-      "aiSummaryEnabledDesc": "Resumo da reunião, decisões tomadas, tarefas a realizar e divisão em capítulos com marcação temporal.",
-      "aiTranslationEnabled": "Tradução para outros idiomas",
-      "aiTranslationEnabledDesc": "Transcrição e resumo traduzidos para os idiomas indicados em baixo.",
-      "aiTargetLocales": "Idiomas de tradução",
-      "aiTargetLocalesDesc": "Códigos de idioma ISO (p. ex. en, fr, de) separados por vírgula. Deixe vazio para utilizar os idiomas definidos ao nível do site.",
-      "aiTargetLocalesRequired": "Indique pelo menos um idioma de tradução ou desative a tradução automática.",
-      "aiDubbingEnabled": "Dobragem de áudio",
-      "aiDubbingEnabledDesc": "Áudio dobrado nos idiomas de destino, gerado com vozes sintéticas pré-treinadas. Não clona a voz dos participantes.",
-      "consentBadge": "Consentimento explícito",
-      "retentionBadge": "Prolonga a retenção",
-      "multitrackRecordingEnabled": "Gravação por participante (alta precisão)",
-      "multitrackRecordingEnabledDesc": "Grava uma faixa de áudio separada para cada participante, para que a transcrição atribua com certeza quem diz o quê (deixa de haver «Orador 1/2»). Trata o áudio isolado de um único orador (dado pessoal sensível): as faixas são temporárias e eliminadas logo após a transcrição. Requer o consentimento para a gravação.",
-      "retainParticipantTracks": "Conservar as faixas por participante",
-      "retainParticipantTracksDesc": "Mantém as faixas de áudio individuais para além da transcrição, para o arquivo descarregável e a reprodução por orador. ATENÇÃO: prolonga a conservação de dados pessoais sensíveis (voz isolada) até ao termo da retenção do evento. Ative apenas se for necessário e com consentimento/informação adequados.",
-      "expectedSpeakers": "Número de oradores previstos",
-      "expectedSpeakersDesc": "Quando o souber (p. ex. 3 oradores), indicá-lo melhora a qualidade da identificação dos oradores. Deixe vazio para que seja a pipeline a decidir."
+      "whiteboardUnavailable": "Não disponível nesta instalação: falta o serviço de quadro branco do Jitsi, que o operador da plataforma pode ativar."
     },
     "links": {
       "title": "Ligações do evento",
@@ -1199,11 +1346,18 @@
       "publicPageHint": "A página a partilhar para recolher novas inscrições.",
       "guestJoin": "Convite direto (sem inscrição)",
       "guestJoinHint": "Ligação rápida para convidar um participante de última hora: entra como convidado quando o evento está em direto, sem preencher o formulário de inscrição.",
+      "callInvite": "Ligação para os participantes",
+      "callInviteHint": "Quem a recebe entra na chamada como convidado, sem inscrição. Uma chamada rápida não tem página pública: esta é a ligação a partilhar.",
       "moderatorLink": "Ligação de moderador",
       "moderatorLinkHint": "Partilhe esta ligação apenas com os moderadores. Qualquer pessoa com esta ligação pode gerir o evento.",
       "liveRoomHint": "Ligação para entrar diretamente na sala como moderador.",
       "copyLink": "Copiar ligação",
-      "copied": "Copiado!"
+      "copied": "Copiado!",
+      "reveal": "Mostrar",
+      "hide": "Ocultar",
+      "warning": "Quem tiver esta ligação administra o evento: não a mostre durante a partilha de ecrã e não a cole numa conversa.",
+      "hidden": "Ligação oculta",
+      "copyFailed": "Não foi possível copiar: selecione o endereço abaixo e copie-o manualmente."
     },
     "feedbackAdmin": {
       "title": "Resultados do Feedback",
@@ -1294,185 +1448,6 @@
         "scaling": "Dimensionamento da infra",
         "postprod": "Pipeline de IA pós-evento"
       },
-      "scaling": {
-        "intro": "Parâmetros que descrevem a capacidade do cluster onde a plataforma é executada. Os valores predefinidos estão calibrados para Azure F16s_v2 (16 vCPU / 32 GiB) para JVB e F4s_v2 (4 vCPU / 8 GiB) para Jibri. Se utilizar hardware diferente, atualize aqui — o scaler recalcula imediatamente.",
-        "jvbSection": "Capacidade do bridge de vídeo (JVB)",
-        "jvbCpuCoresPerPod": "vCPU por pod JVB",
-        "jvbCpuCoresPerPodHelp": "Número de núcleos de CPU pedidos pelo contentor JVB (resources.requests.cpu). Azure F16s_v2 = 16.",
-        "jvbReceiversPerCore": "Participantes passivos por núcleo",
-        "jvbReceiversPerCoreHelp": "Quantos espectadores receive-only cabem em 1 vCPU. Calibrado a 18,75 (300 webinar ÷ 16 núcleos) em F16s_v2.",
-        "jvbSendersPerCore": "Participantes ativos por núcleo",
-        "jvbSendersPerCoreHelp": "Quantos emissores (microfone+câmara) cabem em 1 vCPU. Calibrado a 3,125 (50 all-sender ÷ 16 núcleos) em F16s_v2.",
-        "jvbMaxReplicas": "Máx. de réplicas JVB",
-        "jvbMaxReplicasHelp": "Limite rígido para evitar scale-up descontrolado. Predefinição 6.",
-        "jibriCpuCoresPerPod": "vCPU por pod Jibri",
-        "jibriCpuCoresPerPodHelp": "Núcleos pedidos pelo contentor Jibri (ffmpeg + Chrome headless). Azure F4s_v2 = 4.",
-        "defaultSenderRatioPct": "Rácio de emissores predefinido",
-        "defaultSenderRatioPctHelp": "Percentagem de participantes esperados como emissores (microfone+câmara) quando o evento não a especifica. Webinar 10-30%, mesa redonda 50-100%.",
-        "previewTitle": "Pré-visualização do cálculo",
-        "previewBody": "Evento com {participants} participantes estimados a {ratio}% de emissores → {senders} emissores + {receivers} passivos → {cores} núcleos estimados → {jvbs} JVB.",
-        "graceSection": "Saída suave (fim do evento)",
-        "eventGracePeriodMinutes": "Minutos de tolerância após endsAt (predefinição)",
-        "eventGracePeriodMinutesHelp": "Tempo extra concedido após a hora de fim prevista antes de fechar a chamada. 0 = encerramento imediato, -1 = não fechar automaticamente (deixa à limpeza por inatividade), 15 = banner e encerramento após 15 min. Cada evento pode substituir.",
-        "videoQualitySection": "Video/audio quality",
-        "videoQuality": "Default quality",
-        "videoQualityHelp": "Preset applied to every event (overridable per event). Higher quality needs more bandwidth — “High” is the best trade-off. Takes effect immediately, no restart.",
-        "videoQualityOptions": {
-          "MAX": "Maximum — 1080p",
-          "HIGH": "High — 720p (recommended)",
-          "BALANCED": "Balanced — 540p",
-          "SAVE_DATA": "Save data — 360p"
-        },
-        "videoQualityDesc": {
-          "MAX": "Full HD 1080p, up to ~4 Mbps, stereo Opus 510 kbps audio. Top fidelity for small high-stakes calls — uses more bandwidth and loads the bridge more.",
-          "HIGH": "720p with a capped bitrate (~2.2 Mbps peak) and 96 kbps Opus audio. Great quality without maxing bandwidth: the recommended production trade-off.",
-          "BALANCED": "540p with a contained bitrate (~1 Mbps) and fewer simultaneous incoming videos. Good for large audiences or weak networks.",
-          "SAVE_DATA": "360p at minimal bitrate (~600 kbps) with unused-layer suspension. For very slow connections."
-        }
-      },
-      "header": {
-        "slimBarTitle": "Barra superior (Slim Header)",
-        "slimBarDescription": "A barra fina no topo da página que identifica o organismo de pertença.",
-        "parentOrganization": "Organismo superior",
-        "parentOrganizationHelp": "Ex. \"Presidência do Conselho de Ministros\"",
-        "parentOrganizationUrl": "URL do organismo superior",
-        "centerBarTitle": "Cabeçalho central",
-        "centerBarDescription": "A área principal do cabeçalho com o nome da aplicação e o logótipo.",
-        "appName": "Nome da aplicação",
-        "appNameHelp": "Apresentado no cabeçalho e no título do navegador",
-        "organizationShort": "Nome abreviado do organismo",
-        "logoUrl": "URL do logótipo",
-        "logoUrlHelp": "Deixe vazio para utilizar o ícone AP predefinido",
-        "organizationUrl": "URL do sítio do organismo"
-      },
-      "branding": {
-        "siteName": "Nome da aplicação",
-        "siteNameHelp": "Apresentado no cabeçalho, no título do navegador e nos emails",
-        "siteDescription": "Descrição da aplicação",
-        "organizationName": "Nome da organização",
-        "organizationNameHelp": "ex. Departamento para a Transformação Digital",
-        "organizationNameShort": "Sigla da organização",
-        "organizationUrl": "URL da organização",
-        "parentOrganization": "Organização superior",
-        "parentOrganizationHelp": "ex. Presidência do Conselho de Ministros",
-        "parentOrganizationUrl": "URL da organização superior",
-        "logoUrl": "URL do logótipo personalizado",
-        "logoUrlHelp": "Deixe vazio para utilizar o ícone AP predefinido",
-        "faviconUrl": "URL do favicon",
-        "primaryColor": "Cor primária",
-        "defaultTimezone": "Fuso horário predefinido",
-        "defaultTimezoneHelp": "Utilizado para a apresentação de datas e a criação de novos eventos."
-      },
-      "watermark": {
-        "title": "Personalização do vídeo",
-        "enabled": "Marca de água ativa",
-        "url": "URL da marca de água",
-        "urlHelp": "URL de uma imagem SVG ou PNG transparente. Deixe vazio para utilizar o logótipo da organização.",
-        "opacity": "Opacidade",
-        "position": "Posição",
-        "previewLabel": "Pré-visualização da área de vídeo",
-        "positions": {
-          "bottomLeft": "Inferior esquerdo",
-          "bottomRight": "Inferior direito",
-          "topLeft": "Superior esquerdo",
-          "topRight": "Superior direito"
-        }
-      },
-      "seo": {
-        "title": "Título SEO",
-        "titleHelp": "Título apresentado nos resultados de pesquisa e no separador do navegador",
-        "description": "Descrição SEO",
-        "descriptionHelp": "Descrição para motores de pesquisa e partilhas em redes sociais",
-        "image": "Imagem Open Graph",
-        "imageHelp": "Imagem predefinida para partilhas em redes sociais (1200x630 recomendado)"
-      },
-      "homepage": {
-        "modeLabel": "Modo da página inicial",
-        "modes": {
-          "LANDING": {
-            "title": "Página de apresentação",
-            "description": "Hero, funcionalidades, próximos eventos e como funciona"
-          },
-          "EVENTS_LIST": {
-            "title": "Lista de eventos",
-            "description": "Apresenta diretamente a lista de eventos"
-          },
-          "CUSTOM": {
-            "title": "Personalizada",
-            "description": "Conteúdo HTML personalizado + lista de eventos"
-          }
-        },
-        "customHtmlLabel": "Conteúdo HTML personalizado",
-        "customHtmlHelp": "HTML apresentado na secção principal da página inicial"
-      },
-      "pages": {
-        "privacyTitle": "Política de privacidade",
-        "privacyIt": "Conteúdo (italiano)",
-        "privacyEn": "Conteúdo (inglês)",
-        "privacyLabel": "Conteúdo da política de privacidade",
-        "accessibilityTitle": "Declaração de acessibilidade",
-        "accessibilityIt": "Conteúdo (italiano)",
-        "accessibilityEn": "Conteúdo (inglês)",
-        "accessibilityLabel": "Conteúdo da declaração de acessibilidade",
-        "preview": "Pré-visualização"
-      },
-      "footer": {
-        "linksTitle": "Ligações do rodapé",
-        "addLink": "Adicionar ligação",
-        "noLinks": "Nenhuma ligação configurada. Serão utilizadas as predefinidas.",
-        "linkTitle": "Título",
-        "linkSection": "Secção",
-        "sectionLegal": "Notas legais",
-        "sectionMain": "Principal",
-        "moveUp": "Mover para cima",
-        "moveDown": "Mover para baixo",
-        "removeLink": "Remover ligação"
-      },
-      "features": {
-        "statusPageEnabled": "Página de estado ativa",
-        "statusPageEnabledHelp": "Apresentar a página de estado do serviço",
-        "guestAccessEnabled": "Acesso de convidados ativo",
-        "guestAccessEnabledHelp": "Permitir o acesso como convidado aos eventos em direto",
-        "publicRegistrationEnabled": "Inscrição pública ativa",
-        "publicRegistrationEnabledHelp": "Qualquer pessoa pode criar eventos (se desativado, apenas os administradores)",
-        "calendarPublic": "Calendário público",
-        "calendarPublicHelp": "Publicar o calendário de eventos. Os visitantes podem ver os eventos programados.",
-        "parseTitleKicker": "Títulos com sobretítulo editorial",
-        "parseTitleKickerHelp": "Se o título de um evento contiver o caráter \"|\", a parte anterior é apresentada como uma pequena etiqueta em maiúsculas acima do título principal. Exemplo: \"Cafezinho | Teste de OSS\" → etiqueta \"CAFEZINHO\" + título \"Teste de OSS\".",
-        "githubUrl": "URL do repositório GitHub",
-        "supportEmail": "Email de suporte",
-        "jvbScalingTitle": "Escalonamento do bridge de vídeo (JVB)",
-        "jvbScalingHelp": "Regule quanto tempo aguardar antes de desligar um nó de vídeo inativo e com que antecedência iniciá-lo em relação ao começo de um evento agendado.",
-        "jvbInactiveGraceMinutes": "Minutos de inatividade antes do encerramento",
-        "jvbInactiveGraceMinutesHelp": "Após quanto tempo de conferência vazia o nó de vídeo é colocado em pausa. Recomendado 45 minutos. Intervalo 5-240.",
-        "jvbPreScaleMinutes": "Minutos de antecedência para arranque agendado",
-        "jvbPreScaleMinutesHelp": "Quanto antes de startsAt iniciar o nó de vídeo para um evento agendado. Recomendado 10 minutos.",
-        "jvbStressWarnPercent": "Limiar de aviso de stress (%)",
-        "jvbStressWarnPercentHelp": "Acima deste limiar, o scaler adiciona 1 réplica JVB mesmo que o predictive não a peça. Predefinição 50.",
-        "jvbStressCriticalPercent": "Limiar crítico de stress (%)",
-        "jvbStressCriticalPercentHelp": "Acima deste limiar, o scaler adiciona 2 réplicas JVB. Predefinição 70. Deve ser superior ao de aviso.",
-        "jvbProvisioningTimeoutMinutes": "Tempo limite de provisionamento (minutos)",
-        "jvbProvisioningTimeoutMinutesHelp": "Após quantos minutos desde startsAt um evento sem JVB pronto é assinalado como 'degradado' na página de estado. Predefinição 15. Cobre o cold-start do nó (~3-5 min) + margem de segurança.",
-        "statusPollIntervalSeconds": "Intervalo de polling da página de estado (segundos)",
-        "statusPollIntervalSecondsHelp": "De quantos em quantos segundos a página /status atualiza os dados do lado do navegador. Predefinição 30. Valores mais baixos = dados mais frescos mas mais carga na aplicação.",
-        "jvbEmptyCloseMinutes": "Minutos de sala vazia antes do encerramento definitivo",
-        "jvbEmptyCloseMinutesHelp": "Se uma sala LIVE que já teve participantes ficar vazia durante estes minutos, é encerrada definitivamente (ENDED) — assim, um evento sem moderador encerra-se sozinho por inatividade, sem esperar pela hora de fim. Predefinição 15 (ativo). -1 = desativado. 0 = encerrar na primeira verificação com a sala vazia.",
-        "waitingRoomLeadMinutes": "Antecedência de entrada na sala (minutos)",
-        "waitingRoomLeadMinutesHelp": "Ao inscrever-se dentro destes minutos antes do início, entra-se logo na sala de espera; com maior antecedência é apresentada a confirmação com a ligação para o calendário. 0 = mostrar sempre o ecrã de confirmação até ao início. Recomendado: 15.",
-        "reactionsMode": "Reações (emoji)",
-        "reactionsModeNative": "Nativas do Jitsi (na barra, efémeras)",
-        "reactionsModeCustom": "Personalizadas da aplicação (barra à esquerda, com estatísticas)",
-        "reactionsModeHelp": "Nativas = botão de reações do Jitsi na barra de controlos, leves e efémeras (não contabilizadas). Personalizadas = barra de reações da aplicação no canto inferior esquerdo, com contagens e estatísticas. Predefinição: Nativas.",
-        "emailSenderTitle": "Remetente dos e-mails",
-        "emailSenderHelp": "Como aparece o remetente no correio de quem se inscreve. O endereço de envio continua configurado na implementação (tem de corresponder ao que está autorizado pelo servidor SMTP).",
-        "emailFromName": "Nome do remetente",
-        "emailFromNameHelp": "Vazio = é utilizado o nome configurado na implementação (SMTP_FROM_NAME). Os e-mails continuam a ser enviados a partir do endereço do sistema.",
-        "emailReplyTo": "Endereço para as respostas",
-        "emailReplyToHelp": "Os e-mails partem de um endereço no-reply: sem isto, quem responder não chega a ninguém.",
-        "avatarTitle": "Imagens dos participantes",
-        "gravatarEnabled": "Utilizar o Gravatar quando estiver disponível",
-        "gravatarEnabledHelp": "Quem se inscreveu com um e-mail que tem um Gravatar vê-lo-á como imagem na sala; para todos os outros ficam as iniciais geradas pela plataforma. A imagem passa pelo nosso servidor, pelo que o navegador dos participantes não contacta o gravatar.com — mas a plataforma sim: deve ser declarado na política de privacidade."
-      },
       "postprod": {
         "prerequisitesNote": "A pós-produção trabalha sobre a gravação completa, depois do fim do evento. O pool de GPU dedicado é ativado quando chega o primeiro trabalho à fila e desliga-se quando a fila fica vazia, para conter os custos. Antes de ativar a pipeline, verifique se o cluster tem o pool de GPU configurado, o operador NVIDIA instalado, as credenciais HuggingFace presentes no namespace e o volume com os pesos dos modelos pré-carregado. A lista de verificação operacional está em docs/POSTPROD.md.",
         "pipelineEnabled": "Pipeline pós-evento ativa",
@@ -1499,10 +1474,217 @@
         "jobMaxAttempts": "Tentativas antes da falha",
         "jobMaxAttemptsHelp": "Quantas vezes a pipeline repete uma tarefa antes de a marcar como falhada. O intervalo entre tentativas cresce exponencialmente (de 30 segundos até 2 horas). O valor típico é 5.",
         "artifactRetentionDays": "Conservação dos artefactos (dias)",
-        "artifactRetentionDaysHelp": "Deixado a 0, os artefactos de IA seguem o mesmo prazo do evento. Um valor superior a zero conserva-os durante o número de dias indicado, mesmo depois do encerramento do evento, até que um cron diário os elimine. A eliminação inclui os nomes dos oradores e os payloads das tarefas, em linha com docs/GDPR.md.",
+        "artifactRetentionDaysHelp": "Com 0 não há limite para todo o sítio: os artefactos de IA seguem a conservação da sua gravação ou do evento. Um valor superior a zero faz com que uma tarefa diária elimine todos os artefactos criados há mais desse número de dias, publicados ou não: pode encurtar a conservação, nunca prolongá-la. Os nomes dos oradores e os payloads das tarefas não estão abrangidos: seguem a conservação da gravação ou do evento. Detalhes em docs/privacy/recordings-and-ai.md.",
         "consentDisclosureSection": "Informação sobre IA na sala de espera",
         "consentDisclosureHelp": "Texto mostrado aos participantes na sala de espera quando o evento utiliza a pós-produção com IA (transcrição, resumo, tradução, dobragem). Personalizável por idioma. Deixe vazio para utilizar o texto predefinido do sistema.",
         "consentDisclosurePlaceholder": "P. ex. Este evento será transcrito e resumido automaticamente com ferramentas de IA depois da transmissão em direto…"
+      },
+      "scaling": {
+        "intro": "Parâmetros que descrevem a capacidade do cluster onde a plataforma é executada. Os valores predefinidos estão calibrados para Azure F16s_v2 (16 vCPU / 32 GiB) para JVB e F4s_v2 (4 vCPU / 8 GiB) para Jibri. Se utilizar hardware diferente, atualize aqui — o scaler recalcula imediatamente.",
+        "jvbSection": "Capacidade do bridge de vídeo (JVB)",
+        "jvbCpuCoresPerPod": "vCPU por pod JVB",
+        "jvbCpuCoresPerPodHelp": "Número de núcleos de CPU pedidos pelo contentor JVB (resources.requests.cpu). Azure F16s_v2 = 16.",
+        "jvbReceiversPerCore": "Participantes passivos por núcleo",
+        "jvbReceiversPerCoreHelp": "Quantos espectadores receive-only cabem em 1 vCPU. Calibrado a 18,75 (300 webinar ÷ 16 núcleos) em F16s_v2.",
+        "jvbSendersPerCore": "Participantes ativos por núcleo",
+        "jvbSendersPerCoreHelp": "Quantos emissores (microfone+câmara) cabem em 1 vCPU. Calibrado a 3,125 (50 all-sender ÷ 16 núcleos) em F16s_v2.",
+        "jvbMaxReplicas": "Máx. de réplicas JVB",
+        "jvbMaxReplicasHelp": "Limite rígido para evitar scale-up descontrolado. Predefinição 6.",
+        "jibriCpuCoresPerPod": "vCPU por pod Jibri",
+        "jibriCpuCoresPerPodHelp": "Núcleos pedidos pelo contentor Jibri (ffmpeg + Chrome headless). Azure F4s_v2 = 4.",
+        "defaultSenderRatioPct": "Rácio de emissores predefinido",
+        "defaultSenderRatioPctHelp": "Percentagem de participantes esperados como emissores (microfone+câmara) quando o evento não a especifica. Webinar 10-30%, mesa redonda 50-100%.",
+        "previewTitle": "Pré-visualização do cálculo",
+        "previewBody": "Evento com {participants} participantes estimados a {ratio}% de emissores → {senders} emissores + {receivers} passivos → {cores} núcleos estimados → {jvbs} JVB.",
+        "graceSection": "Saída suave (fim do evento)",
+        "eventGracePeriodMinutes": "Minutos de tolerância após endsAt (predefinição)",
+        "eventGracePeriodMinutesHelp": "Tempo extra concedido após a hora de fim prevista antes de fechar a chamada. 0 = encerramento imediato, -1 = não fechar automaticamente (deixa à limpeza por inatividade), 15 = banner e encerramento após 15 min. Cada evento pode substituir.",
+        "videoQualitySection": "Qualidade de vídeo/áudio",
+        "videoQuality": "Qualidade predefinida",
+        "videoQualityHelp": "Predefinição aplicada a todos os eventos (pode ser alterada em cada evento). Quanto maior a qualidade, mais largura de banda é necessária: «Alta» é o melhor compromisso. Aplica-se de imediato, sem reinícios.",
+        "videoQualityOptions": {
+          "MAX": "Máxima — 1080p",
+          "HIGH": "Alta — 720p (recomendada)",
+          "BALANCED": "Equilibrada — 540p",
+          "SAVE_DATA": "Poupança de dados — 360p"
+        },
+        "videoQualityDesc": {
+          "MAX": "Full HD 1080p, débito até ~4 Mbps, áudio Opus estéreo 510 kbps. Máxima fidelidade para chamadas pequenas e importantes — consome mais largura de banda e sobrecarrega mais a ponte de vídeo.",
+          "HIGH": "720p com débito limitado (~2,2 Mbps de pico) e áudio Opus 96 kbps. Ótima qualidade sem saturar a largura de banda: o compromisso recomendado para produção.",
+          "BALANCED": "540p com débito contido (~1 Mbps) e menos vídeos recebidos em simultâneo. Adequado para públicos numerosos ou redes fracas.",
+          "SAVE_DATA": "360p com débito mínimo (~600 kbps) e suspensão das camadas não utilizadas. Para ligações muito lentas."
+        }
+      },
+      "header": {
+        "slimBarTitle": "Barra superior (Slim Header)",
+        "slimBarDescription": "A barra fina no topo da página que identifica o organismo de pertença.",
+        "parentOrganization": "Organismo superior",
+        "parentOrganizationHelp": "O organismo do qual depende a sua administração. Deixe vazio para não nomear nenhum.",
+        "parentOrganizationUrl": "URL do organismo superior",
+        "siteTagline": "Lema do site",
+        "siteTaglineHelp": "Aparece na faixa superior e no rodapé quando o organismo superior está vazio. Deixe vazio para não mostrar nada. Escreve-se por língua: onde faltar, usa-se o inglês e, depois, qualquer outro.",
+        "centerBarTitle": "Cabeçalho central",
+        "centerBarDescription": "A área principal do cabeçalho com o nome da aplicação e o logótipo.",
+        "appName": "Nome da aplicação",
+        "appNameHelp": "Apresentado no cabeçalho e no título do navegador",
+        "organizationShort": "Nome abreviado do organismo",
+        "logoUrl": "URL do logótipo",
+        "logoUrlHelp": "Deixe vazio para utilizar o ícone AP predefinido",
+        "organizationUrl": "URL do sítio do organismo"
+      },
+      "branding": {
+        "siteName": "Nome da aplicação",
+        "siteNameHelp": "Apresentado no cabeçalho, no título do navegador e nos emails",
+        "siteDescription": "Descrição da aplicação",
+        "organizationName": "Nome da organização",
+        "organizationNameHelp": "Nome da entidade titular da plataforma: aparece no cabeçalho, no rodapé e nos textos legais (ex. Município de Exemplo)",
+        "organizationNameShort": "Sigla da organização",
+        "organizationUrl": "URL da organização",
+        "parentOrganization": "Organização superior",
+        "parentOrganizationHelp": "O organismo do qual depende a sua administração. Deixe vazio para não nomear nenhum.",
+        "parentOrganizationUrl": "URL da organização superior",
+        "logoUrl": "URL do logótipo personalizado",
+        "logoUrlHelp": "Deixe vazio para utilizar o ícone AP predefinido",
+        "faviconUrl": "URL do favicon",
+        "primaryColor": "Cor primária",
+        "defaultTimezone": "Fuso horário predefinido",
+        "defaultTimezoneHelp": "Utilizado para a apresentação de datas e a criação de novos eventos.",
+        "waitingRoomEngine": "Sala de espera (predefinição do site)",
+        "waitingRoomEngineGame": "Videojogo (lobby Phaser)",
+        "waitingRoomEngineClassic": "Clássica (estática)",
+        "waitingRoomEngineHelp": "Modo predefinido da sala de espera. Pode ser alterado para cada evento e, para uma única visita, com o parâmetro {param} no endereço."
+      },
+      "watermark": {
+        "title": "Personalização do vídeo",
+        "enabled": "Marca de água ativa",
+        "url": "URL da marca de água",
+        "urlHelp": "URL de uma imagem SVG ou PNG transparente. Deixe vazio para utilizar o logótipo da organização.",
+        "opacity": "Opacidade",
+        "position": "Posição",
+        "previewLabel": "Pré-visualização da área de vídeo",
+        "positions": {
+          "bottomLeft": "Inferior esquerdo",
+          "bottomRight": "Inferior direito",
+          "topLeft": "Superior esquerdo",
+          "topRight": "Superior direito"
+        }
+      },
+      "seo": {
+        "title": "Título SEO",
+        "titleHelp": "Título apresentado nos resultados de pesquisa e no separador do navegador",
+        "description": "Descrição SEO",
+        "descriptionHelp": "Descrição para motores de pesquisa e partilhas em redes sociais",
+        "image": "Imagem Open Graph",
+        "imageHelp": "Imagem predefinida para partilhas em redes sociais (1200x630 recomendado)",
+        "ogSection": "Pré-visualização das ligações partilhadas",
+        "ogIntro": "Quando alguém cola a ligação de um evento num chat ou numa rede social, a plataforma desenha uma imagem de pré-visualização com as informações lá dentro. Escolha quais: cada campo a mais tira espaço ao título.",
+        "ogCardEnabled": "Gerar a pré-visualização",
+        "ogCardEnabledHelp": "Desativada, a ligação mostra o cartaz tal como está (ou o logótipo do site se o evento não tiver cartaz), sem título nem data legíveis na imagem.",
+        "ogShowPoster": "Cartaz como fundo",
+        "ogShowPosterHelp": "Usa a capa do evento como fundo da pré-visualização, escurecida para que o texto continue legível. Sem cartaz, ou com esta opção desativada, mantêm-se a cor institucional e o logótipo.",
+        "ogShowDate": "Data e hora",
+        "ogShowDateHelp": "No fuso horário predefinido da plataforma.",
+        "ogShowSpeakers": "Oradores",
+        "ogShowSpeakersHelp": "O texto dos oradores do evento, encurtado se for demasiado longo.",
+        "ogShowOrganization": "Organismo",
+        "ogShowOrganizationHelp": "O organizador do evento, se indicado; caso contrário, o nome da organização."
+      },
+      "homepage": {
+        "modeLabel": "Modo da página inicial",
+        "modes": {
+          "LANDING": {
+            "title": "Página de apresentação",
+            "description": "Hero, funcionalidades, próximos eventos e como funciona"
+          },
+          "EVENTS_LIST": {
+            "title": "Lista de eventos",
+            "description": "Apresenta diretamente a lista de eventos"
+          },
+          "CUSTOM": {
+            "title": "Personalizada",
+            "description": "Conteúdo HTML personalizado + lista de eventos"
+          },
+          "LANDING_ISTITUZIONALE": {
+            "title": "Página de apresentação institucional",
+            "description": "Entidade, próximo evento em destaque e os restantes em lista. Sem linguagem técnica"
+          },
+          "LANDING_SEMPLICE": {
+            "title": "Página de apresentação em linguagem simples",
+            "description": "Poucas palavras e um único convite, para quem não costuma participar em eventos online"
+          }
+        },
+        "customHtmlLabel": "Conteúdo HTML personalizado",
+        "customHtmlHelp": "HTML apresentado na secção principal da página inicial",
+        "showProject": "Mostrar a secção «O projeto»",
+        "showProjectHelp": "Arquitetura, soberania dos dados e código aberto da plataforma: interessa mais a quem avalia a reutilização do que a quem participa nos eventos."
+      },
+      "pages": {
+        "privacyTitle": "Política de privacidade",
+        "privacyIt": "Conteúdo (italiano)",
+        "privacyEn": "Conteúdo (inglês)",
+        "privacyLabel": "Conteúdo da política de privacidade",
+        "accessibilityTitle": "Declaração de acessibilidade",
+        "accessibilityIt": "Conteúdo (italiano)",
+        "accessibilityEn": "Conteúdo (inglês)",
+        "accessibilityLabel": "Conteúdo da declaração de acessibilidade",
+        "preview": "Pré-visualização"
+      },
+      "footer": {
+        "linksTitle": "Ligações do rodapé",
+        "addLink": "Adicionar ligação",
+        "noLinks": "Nenhuma ligação configurada. Serão utilizadas as predefinidas.",
+        "linkTitle": "Título",
+        "linkSection": "Secção",
+        "sectionLegal": "Notas legais",
+        "sectionMain": "Principal",
+        "moveUp": "Mover para cima",
+        "moveDown": "Mover para baixo",
+        "removeLink": "Remover ligação"
+      },
+      "features": {
+        "statusPageEnabled": "Página de estado ativa",
+        "statusPageEnabledHelp": "Publica a página de estado do serviço. Quando desativada, a página não existe e os seus dados só são visíveis para os administradores.",
+        "guestAccessEnabled": "Acesso de convidados ativo",
+        "guestAccessEnabledHelp": "Quem não está inscrito pode entrar nos eventos em curso indicando apenas o nome. Quando desativado, nos eventos agendados só se entra com inscrição ou com a ligação de moderador ou orador; as videochamadas instantâneas continuam abertas a quem tiver a ligação.",
+        "publicRegistrationEnabled": "Inscrição pública ativa",
+        "publicRegistrationEnabledHelp": "Qualquer pessoa pode inscrever-se nos eventos. Quando desativado, só se podem inscrever as pessoas da lista de convidados do evento e a ligação pessoal para entrar é enviada apenas por email; quem já está inscrito e as ligações de moderadores e oradores continuam a funcionar.",
+        "calendarPublic": "Calendário público",
+        "calendarPublicHelp": "Publicar o calendário de eventos. Os visitantes podem ver os eventos programados.",
+        "parseTitleKicker": "Títulos com sobretítulo editorial",
+        "parseTitleKickerHelp": "Se o título de um evento contiver o caráter \"|\", a parte anterior é apresentada como uma pequena etiqueta em maiúsculas acima do título principal. Exemplo: \"Cafezinho | Teste de OSS\" → etiqueta \"CAFEZINHO\" + título \"Teste de OSS\".",
+        "githubUrl": "URL do repositório GitHub",
+        "supportEmail": "Email de suporte",
+        "jvbScalingTitle": "Escalonamento do bridge de vídeo (JVB)",
+        "jvbScalingHelp": "Regule quanto tempo aguardar antes de desligar um nó de vídeo inativo e com que antecedência iniciá-lo em relação ao começo de um evento agendado.",
+        "jvbInactiveGraceMinutes": "Minutos de inatividade antes do encerramento",
+        "jvbInactiveGraceMinutesHelp": "Após quanto tempo de conferência vazia o nó de vídeo é colocado em pausa. Recomendado 45 minutos. Intervalo 5-240.",
+        "jvbPreScaleMinutes": "Minutos de antecedência para arranque agendado",
+        "jvbPreScaleMinutesHelp": "Quanto antes de startsAt iniciar o nó de vídeo para um evento agendado. Recomendado 10 minutos.",
+        "jvbEmptyCloseMinutes": "Minutos de sala vazia antes do encerramento definitivo",
+        "jvbEmptyCloseMinutesHelp": "Se uma sala LIVE que já teve participantes ficar vazia durante estes minutos, é encerrada definitivamente (ENDED) — assim, um evento sem moderador encerra-se sozinho por inatividade, sem esperar pela hora de fim. Predefinição 15 (ativo). -1 = desativado. 0 = encerrar na primeira verificação com a sala vazia.",
+        "waitingRoomLeadMinutes": "Antecedência de entrada na sala (minutos)",
+        "waitingRoomLeadMinutesHelp": "Ao inscrever-se dentro destes minutos antes do início, entra-se logo na sala de espera; com maior antecedência é apresentada a confirmação com a ligação para o calendário. 0 = mostrar sempre o ecrã de confirmação até ao início. Recomendado: 15.",
+        "reactionsMode": "Reações (emoji)",
+        "reactionsModeNative": "Nativas do Jitsi (na barra, efémeras)",
+        "reactionsModeCustom": "Personalizadas da aplicação (barra à esquerda, com estatísticas)",
+        "reactionsModeHelp": "Nativas = botão de reações do Jitsi na barra de controlos, leves e efémeras (não contabilizadas). Personalizadas = barra de reações da aplicação no canto inferior esquerdo, com contagens e estatísticas. Predefinição: Nativas.",
+        "jvbStressWarnPercent": "Limiar de aviso de stress (%)",
+        "jvbStressWarnPercentHelp": "Acima deste limiar, o scaler adiciona 1 réplica JVB mesmo que o predictive não a peça. Predefinição 50.",
+        "jvbStressCriticalPercent": "Limiar crítico de stress (%)",
+        "jvbStressCriticalPercentHelp": "Acima deste limiar, o scaler adiciona 2 réplicas JVB. Predefinição 70. Deve ser superior ao de aviso.",
+        "jvbProvisioningTimeoutMinutes": "Tempo limite de provisionamento (minutos)",
+        "jvbProvisioningTimeoutMinutesHelp": "Após quantos minutos desde startsAt um evento sem JVB pronto é assinalado como 'degradado' na página de estado. Predefinição 15. Cobre o cold-start do nó (~3-5 min) + margem de segurança. Aplica-se também ao serviço de gravação, contando a partir do momento em que um evento com gravação o solicita: passado este tempo sem resposta, a sala em direto deixa de o mostrar como «a iniciar» e assinala-o como não iniciado.",
+        "statusPollIntervalSeconds": "Intervalo de polling da página de estado (segundos)",
+        "statusPollIntervalSecondsHelp": "De quantos em quantos segundos a página /status atualiza os dados do lado do navegador. Predefinição 30. Valores mais baixos = dados mais frescos mas mais carga na aplicação.",
+        "emailSenderTitle": "Remetente dos e-mails",
+        "emailSenderHelp": "Como aparece o remetente no correio de quem se inscreve. O endereço de envio continua configurado na implementação (tem de corresponder ao que está autorizado pelo servidor SMTP).",
+        "emailFromName": "Nome do remetente",
+        "emailFromNameHelp": "Vazio = é utilizado o nome configurado na implementação (SMTP_FROM_NAME). Os e-mails continuam a ser enviados a partir do endereço do sistema.",
+        "emailReplyTo": "Endereço para as respostas",
+        "emailReplyToHelp": "Os e-mails partem de um endereço no-reply: sem isto, quem responder não chega a ninguém.",
+        "avatarTitle": "Imagens dos participantes",
+        "gravatarEnabled": "Utilizar o Gravatar quando estiver disponível",
+        "gravatarEnabledHelp": "Quem se inscreveu com um e-mail que tem um Gravatar vê-lo-á como imagem na sala; para todos os outros ficam as iniciais geradas pela plataforma. A imagem passa pelo nosso servidor, pelo que o navegador dos participantes não contacta o gravatar.com — mas a plataforma sim: deve ser declarado na política de privacidade."
       }
     },
     "analytics": {
@@ -1583,20 +1765,17 @@
       "descriptionLabel": "Descrição",
       "maxParticipantsLabel": "Máx. participantes",
       "featuresLabel": "Funcionalidades",
-      "recordingLabel": "Gravação",
-      "unmute": "Microfone participantes",
-      "video": "Vídeo participantes",
-      "screen": "Partilha de ecrã",
-      "pickerTitle": "Escolher um modelo",
-      "pickerSubtitle": "Selecione um modelo para pré-configurar as definições do evento ou ignore para configurar tudo manualmente.",
-      "skipTemplate": "Configurar manualmente",
       "whiteboardLabel": "Quadro branco",
+      "recordingLabel": "Gravação",
       "waitingRoomEngineLabel": "Sala de espera (predefinição do modelo)",
       "waitingRoomEngineSiteDefault": "Predefinição do site",
       "waitingRoomEngineGarden": "Jardim (normal)",
       "waitingRoomEngineGame": "Videojogo (lobby Phaser)",
       "waitingRoomEngineClassic": "Clássica (estática)",
       "waitingRoomEngineHelp": "Pré-preenche o motor da sala de espera nos eventos criados a partir deste modelo. Continua editável no assistente.",
+      "unmute": "Microfone participantes",
+      "video": "Vídeo participantes",
+      "screen": "Partilha de ecrã",
       "durationLabel": "Duração predefinida (minutos)",
       "durationHint": "Pré-preenche o fim do evento (início + duração). O utilizador pode alterá-la. Vazio = 2 horas.",
       "retentionLabel": "Conservação de dados predefinida (dias)",
@@ -1605,7 +1784,10 @@
       "descriptionTemplateHint": "Texto pré-preenchido na descrição do evento (editável).",
       "aiTranscript": "Transcrição automática (predefinição)",
       "aiSummary": "Resumo automático (predefinição)",
-      "aiTranslation": "Tradução automática (predefinição)"
+      "aiTranslation": "Tradução automática (predefinição)",
+      "pickerTitle": "Escolher um modelo",
+      "pickerSubtitle": "Selecione um modelo para pré-configurar as definições do evento ou ignore para configurar tudo manualmente.",
+      "skipTemplate": "Configurar manualmente"
     },
     "instantCall": {
       "title": "Videochamada instantânea",
@@ -1634,7 +1816,7 @@
       "selectFile": "Selecionar ficheiro",
       "fileTitle": "Título",
       "visibility": "Visibilidade",
-      "visibilityAlways": "Sempre visível",
+      "visibilityAlways": "Na sala e depois do evento",
       "visibilityBefore": "Apenas antes do evento",
       "visibilityDuring": "Apenas durante o evento",
       "visibilityAfter": "Apenas após o evento",
@@ -1655,10 +1837,11 @@
       "titleLabel": "Título",
       "descriptionLabel": "Descrição (facultativa)",
       "visibilityLabel": "Visibilidade",
-      "visibilityAlways": "Sempre",
+      "visibilityAlways": "Na sala e depois do evento",
       "visibilityBefore": "Antes do evento",
       "visibilityDuring": "Durante o evento",
       "visibilityAfter": "Depois do evento",
+      "visibilityHelp": "Antes do início, a página pública do evento mostra apenas os materiais marcados como «Antes do evento». Os marcados como «Na sala e depois do evento» aparecem na sala durante o evento e na página do evento concluído.",
       "typeLabel": "Tipo",
       "fileUploaded": "Ficheiro carregado",
       "typeFile": "Ficheiro",
@@ -1678,7 +1861,7 @@
         "newTitle": "Novo modelo RGPD",
         "editTitle": "Editar modelo RGPD",
         "name": "Nome interno",
-        "namePlaceholder": "ex.: Política padrão DTD",
+        "namePlaceholder": "ex.: Política de privacidade padrão",
         "description": "Descrição (facultativa)",
         "descriptionPlaceholder": "Notas breves para reconhecer o modelo",
         "bodyIt": "Texto da política (italiano)",
@@ -1764,9 +1947,9 @@
       "version": "Versão",
       "environment": "Ambiente",
       "modes": {
-        "simple": "Simples (Docker Compose)",
-        "standard": "Standard (Kubernetes)",
-        "full": "Completa (Kubernetes com scale-to-zero)",
+        "simple": "Simples",
+        "standard": "Standard",
+        "full": "Completa (bridges com scale-to-zero)",
         "unknown": "Desconhecida"
       },
       "database": {
@@ -1780,7 +1963,9 @@
         "title": "Jitsi Meet",
         "reachable": "Acessível",
         "unreachable": "Inacessível",
-        "notConfigured": "Não configurado"
+        "notConfigured": "Não configurado",
+        "degraded": "Acessível, mas responde com erros ou lentamente",
+        "publicCheckFailed": "Falhou a verificação no endereço público ({code}): o servidor do portal não aceita o certificado ou o nome. As conferências podem funcionar na mesma."
       },
       "jvb": {
         "title": "Video Bridge (JVB)",
@@ -1788,7 +1973,9 @@
         "replicas": "{current}/{max} nós",
         "preScale": "Pré-escalonamento: {minutes} min",
         "fixedMode": "Modo fixo",
-        "scalerEnabled": "Scaler ativado"
+        "scalerEnabled": "Scaler ativado",
+        "fixedDown": "A ponte de vídeo não responde",
+        "unmonitored": "Não monitorizado: falta o endereço da ponte (JVB_HEALTH_URL)"
       },
       "jibri": {
         "title": "Gravação (Jibri)",
@@ -1810,7 +1997,11 @@
         "metrics": "Endpoint de métricas"
       },
       "note": "As alterações à infraestrutura são efetuadas através de Helm values e da pipeline CI/CD.",
-      "deployDocs": "Documentação de implementação"
+      "deployDocs": "Documentação de implementação",
+      "platforms": {
+        "kubernetes": "Em Kubernetes",
+        "other": "Fora do Kubernetes (Docker Compose ou servidor único)"
+      }
     },
     "instantCalls": {
       "title": "Chamadas rápidas",
@@ -1915,9 +2106,9 @@
       "latencyP99": "Latência P99",
       "requestRate": "Pedidos/s",
       "chartLatencyQuantiles": "Latência da aplicação — P50 / P95 / P99",
-      "participantsNow": "Participantes ativos",
+      "participantsNow": "Participantes na ponte de vídeo",
       "jvbStress": "Carga JVB",
-      "conferences": "Conferências ativas",
+      "conferences": "Conferências na ponte de vídeo",
       "octoRelay": "Relay inter-bridge Octo",
       "interBridge": "Tráfego Octo",
       "chartCpu": "CPU usage",
@@ -1944,7 +2135,8 @@
       "liveNow": "LIVE",
       "provisioningNow": "em preparação",
       "idleNow": "IDLE (em pausa)",
-      "scaleToZeroHelp": "IDLE é o estado normal para um evento sem tráfego há mais do que o grace period. À próxima visita de um utilizador, regressa a PROVISIONING e depois LIVE."
+      "scaleToZeroHelp": "IDLE é o estado normal para um evento sem tráfego há mais do que o grace period. À próxima visita de um utilizador, regressa a PROVISIONING e depois LIVE.",
+      "capacityFromStatus": "Valores atuais lidos da ponte de vídeo. O histórico requer o Prometheus."
     },
     "bulk": {
       "selectAll": "Selecionar todos",
@@ -1972,7 +2164,29 @@
       "resultsCount": "{count, plural, =0 {Nenhum evento} one {# evento} other {# eventos}}",
       "durationMinutes": "{minutes} min",
       "durationHoursMinutes": "{hours}h {minutes}min",
-      "moderatorsSpeakers": "{mods} moderadores · {speakers} oradores",
+      "menu": {
+        "actionsFor": "Ações para «{title}»",
+        "manage": "Gerir",
+        "edit": "Editar",
+        "openPublic": "Abrir a página pública",
+        "newTab": "(abre num novo separador)",
+        "copyLink": "Copiar a ligação pública",
+        "linkCopied": "Ligação copiada",
+        "publish": "Publicar",
+        "unpublish": "Retirar da publicação",
+        "unpublishTitle": "Retirar o evento?",
+        "unpublishMessage": "«{title}» desaparecerá das páginas públicas até voltar a publicá-lo. As inscrições já recebidas mantêm-se.",
+        "published": "Evento publicado",
+        "unpublished": "Evento retirado",
+        "duplicate": "Duplicar como próxima edição",
+        "delete": "Eliminar",
+        "deleteTitle": "Eliminar o evento?",
+        "deleteMessage": "«{title}» e todos os seus dados serão eliminados. Esta ação não pode ser anulada.",
+        "deleted": "Evento eliminado",
+        "failed": "A operação falhou. Tente novamente."
+      },
+      "instantBadge": "Chamada rápida",
+      "moderatorsSpeakers": "{mods, plural, one {# moderador} other {# moderadores}} · {speakers, plural, one {# orador} other {# oradores}}",
       "postEventSummary": "{connected} ligados · {registered} inscrições",
       "registeredCount": "{count, plural, =0 {Nenhuma inscrição} one {1 inscrição} other {# inscrições}}"
     },
@@ -2014,15 +2228,19 @@
     },
     "eventDetail": {
       "copyPublicUrl": "Copiar ligação pública",
-      "copyModeratorUrl": "Copiar ligação de moderador",
-      "enterAsModerator": "Entrar em direto",
+      "copyInviteUrl": "Copiar ligação de convite",
+      "enterAsParticipant": "Entrar como participante",
+      "openAsParticipant": "Abrir como participante",
+      "participantHintRoom": "Abre num novo separador: a sala tal como um convidado a vê, sem poderes de moderação.",
+      "participantHintPassword": "Abre num novo separador: a sala tal como um convidado a vê, após a palavra-passe do evento.",
+      "participantHintPage": "Abre num novo separador: a página pública tal como os participantes a veem.",
       "editEvent": "Editar evento",
       "editSettings": "Editar definições",
       "featureSummary": "Funcionalidades ativas",
       "organizers": "Organizadores",
       "privacyGdpr": "Privacidade e RGPD",
       "postEventTitle": "Pós-evento e feedback",
-      "recordingSection": "Gravação",
+      "recordingSection": "Vídeo do evento",
       "callSessions": "Sessões e telemetria",
       "questionnaires": "Questionários",
       "questionnaireCount": "{count, plural, =0 {Nenhum questionário associado} one {1 questionário associado} other {# questionários associados}}",
@@ -2030,12 +2248,10 @@
       "manageQuestionnaires": "Gerir questionários",
       "tabs": {
         "overview": "Vista geral",
-        "settings": "Definições",
         "people": "Pessoas",
         "content": "Conteúdos",
-        "audit": "Gravações e auditoria",
-        "postEvent": "Pós-evento",
-        "analytics": "Estatísticas"
+        "analytics": "Estatísticas",
+        "afterEvent": "Depois do evento"
       },
       "toggles": {
         "unmute": "Participantes podem falar",
@@ -2054,10 +2270,12 @@
         "capacityEstimate": "≈{jvbs} JVB · {ram} RAM",
         "noReminders": "Nenhum lembrete configurado",
         "tags": "Etiquetas",
-        "postEventSummary": "{connected} ligados em {registered} inscrições (estimadas {estimated})",
-        "estimatedAttendance": "Estimados: {estimated} participantes"
+        "postEventSummary": "{connected} ligados em {registered} inscrições (capacidade {estimated})",
+        "estimatedAttendance": "Capacidade máxima: {estimated} participantes",
+        "reminderScheduled": "Sai a {when}",
+        "reminderMissed": "Não enviada — o momento já passou",
+        "reminderSoon": "A qualquer momento"
       },
-      "copyGuestUrl": "Copiar ligação para convidados",
       "aiManageTitle": "Transcrição, resumo e traduções",
       "aiManageDesc": "Faça a gestão da pós-produção com IA desta gravação: corrija a transcrição e a atribuição dos oradores (quem diz o quê), edite o resumo e faça a gestão dos idiomas de tradução.",
       "aiManageCta": "Abrir a gestão da pós-produção",
@@ -2072,24 +2290,16 @@
       "duplicateNext": "Duplicar para a próxima",
       "duplicateNextBusy": "A duplicar…",
       "duplicateNextHint": "Cria um rascunho com toda a configuração deste evento (gravação, faixas separadas, IA, agenda, lembretes). Se o evento tiver uma cadência, a data avança para a ocorrência seguinte; caso contrário, fica por definir.",
-      "duplicateNextError": "Não foi possível duplicar. Tente novamente."
+      "duplicateNextError": "Não foi possível duplicar. Tente novamente.",
+      "capacitySection": "Capacidade e infraestrutura",
+      "capacitySubtitle": "Configurado para um máximo de {max} participantes",
+      "publishBlockedLive": "O evento já está a decorrer",
+      "publishBlockedEnded": "O evento terminou"
     },
     "rubrica": {
       "title": "Agenda",
       "subtitle": "Pessoas que deram consentimento para constarem na agenda (art. 6.1.a RGPD). As informações de perfil são atualizadas automaticamente em cada nova inscrição.",
       "backToList": "← Voltar à agenda"
-    },
-    "questionnairesPage": {
-      "title": "Questionários",
-      "subtitle": "Modelos reutilizáveis de perguntas para os questionários de pré-inscrição e pós-evento."
-    },
-    "questionnaireResponses": {
-      "title": "Respostas dos questionários",
-      "subtitle": "Agregações por pergunta, filtráveis por evento, fase e intervalo de datas."
-    },
-    "eventQuestionnaires": {
-      "title": "Questionários — {eventTitle}",
-      "subtitle": "Configure um questionário de pré-inscrição e/ou pós-evento, combinando modelos e perguntas ad-hoc."
     },
     "eventAnalytics": {
       "title": "Estatísticas",
@@ -2238,11 +2448,6 @@
       "manageSource": "Idioma de origem",
       "manageOpenPublic": "Página pública",
       "manageRerunOk": "Pipeline relançada.",
-      "manageRerunNoop": "Nenhuma tarefa iniciada: a IA está desativada para este evento ou a pipeline está em pausa. Utilize «Gerar IA».",
-      "manageRerunAlreadyQueued": "Processamento já em fila: não há nada de novo para iniciar.",
-      "generateAi": "Gerar IA",
-      "generateAiConfirm": "Executa a pipeline de IA (transcrição e resumo) sobre esta gravação. O processamento de IA será ativado para o evento e arranca em segundo plano. As traduções são acrescentadas depois, idioma a idioma, no separador «Traduções».",
-      "generateAiOk": "Pipeline de IA iniciada.",
       "manageOpen": "Gerir",
       "cancelConfirmTitle": "Cancelar a pós-produção",
       "speakerUpdateSuccess": "Orador atualizado",
@@ -2382,7 +2587,38 @@
       },
       "archiveSourceTitle": "Gravação de origem",
       "archiveSourceHint": "Vídeo original do evento. As faixas separadas por participante e o arquivo MKV requerem a gravação multifaixa (não ativa neste evento).",
-      "archiveSourceDownload": "Descarregar o vídeo original"
+      "archiveSourceDownload": "Descarregar o vídeo original",
+      "manageRerunNoop": "Nenhuma tarefa iniciada: a IA está desativada para este evento ou a pipeline está em pausa. Utilize «Gerar IA».",
+      "manageRerunAlreadyQueued": "Processamento já em fila: não há nada de novo para iniciar.",
+      "generateAi": "Gerar IA",
+      "generateAiConfirm": "Executa a pipeline de IA (transcrição e resumo) sobre esta gravação. O processamento de IA será ativado para o evento e arranca em segundo plano. As traduções são acrescentadas depois, idioma a idioma, no separador «Traduções».",
+      "generateAiOk": "Pipeline de IA iniciada.",
+      "originalToggle": "Mostrar texto original",
+      "originalToggleHint": "Mostra, sob cada linha corrigida, o texto tal como foi produzido pela transcrição automática",
+      "originalNotComparable": "O número de linhas mudou em relação à versão original: não é possível comparar linha a linha",
+      "originalLabel": "Texto original:",
+      "revisedBadge": "Revista manualmente",
+      "revisedHint": "Pelo menos uma linha foi corrigida por uma pessoa após a transcrição automática",
+      "redactLabel": "Eliminar também do original",
+      "redactHint": "A utilizar num pedido de eliminação: as alterações aplicam-se também ao texto da máquina conservado, que de outro modo manteria a frase removida",
+      "redactSave": "Guardar e eliminar do original",
+      "redactSaved": "{n, plural, one {1 linha eliminada também do texto original} other {# linhas eliminadas também do texto original}}",
+      "redactNothingRemoved": "As correções foram guardadas, mas no texto original não havia nada a eliminar para as linhas alteradas",
+      "redactArchiveFailed": "As correções foram guardadas na base de dados, mas a reescrita do ficheiro arquivado falhou: a frase removida continua a poder ser descarregada a partir daí. Tente novamente a eliminação",
+      "originalUncertain": "Origem incerta",
+      "originalUncertainHint": "O texto conservado pode já incluir correções feitas antes de esta funcionalidade existir: não é possível demonstrar que seja o produzido pela transcrição automática"
+    },
+    "questionnairesPage": {
+      "title": "Questionários",
+      "subtitle": "Modelos reutilizáveis de perguntas para os questionários de pré-inscrição e pós-evento."
+    },
+    "questionnaireResponses": {
+      "title": "Respostas dos questionários",
+      "subtitle": "Agregações por pergunta, filtráveis por evento, fase e intervalo de datas."
+    },
+    "eventQuestionnaires": {
+      "title": "Questionários — {eventTitle}",
+      "subtitle": "Configure um questionário de pré-inscrição e/ou pós-evento, combinando modelos e perguntas ad-hoc."
     }
   },
   "email": {
@@ -2470,7 +2706,7 @@
     "projectTeaser": {
       "kicker": "O projeto",
       "title": "Open source e soberano, construído pela administração pública para a administração pública",
-      "body": "PA Webinar é a plataforma do Departamento para a Transformação Digital para eventos públicos digitais: o sistema de design .italia, o motor de vídeo Jitsi Meet e uma pipeline de AI totalmente in-cluster. É lançada como open source para que qualquer administração a possa reutilizar.",
+      "body": "PA Webinar é uma plataforma open source para eventos públicos digitais, desenvolvida pelo Departamento para a Transformação Digital italiano e disponibilizada para que qualquer administração a possa reutilizar: o sistema de design .italia, o motor de vídeo Jitsi Meet e uma pipeline de AI totalmente in-cluster.",
       "sovereignty": {
         "title": "Soberania dos dados",
         "desc": "Self-hosted na infraestrutura da administração: os dados nunca saem e não há exposição ao CLOUD Act."
@@ -2506,6 +2742,49 @@
         "title": "Dobragem de áudio",
         "desc": "Uma faixa de áudio dobrada com uma voz sintética neutra (sem clonagem de voz), para ouvir o evento noutra língua."
       }
+    },
+    "institutional": {
+      "title": "Encontros e eventos online",
+      "nextTitle": "Próximo evento",
+      "nextCta": "Ir para o evento e inscrever-se",
+      "othersTitle": "Outros eventos",
+      "pointsTitle": "Como participar",
+      "points": {
+        "noInstall": {
+          "title": "Participa-se a partir do navegador",
+          "body": "Não é preciso instalar programas: basta abrir a ligação que receberá."
+        },
+        "accessible": {
+          "title": "Pensado para todos",
+          "body": "Legendas, teclado e leitores de ecrã: a sala pode ser utilizada também sem rato."
+        },
+        "privacy": {
+          "title": "Dados tratados com cuidado",
+          "body": "Recolhem-se apenas os dados necessários à inscrição, e pode pedir a sua devolução ou eliminação."
+        }
+      }
+    },
+    "simple": {
+      "title": "Os encontros online de {organization}",
+      "subtitle": "Participa-se a partir do computador ou do telemóvel, sem instalar nada.",
+      "cta": "Participe no próximo encontro",
+      "noEvents": "De momento não há encontros agendados. Volte a visitar-nos em breve.",
+      "stepsTitle": "Como funciona",
+      "steps": {
+        "choose": {
+          "title": "Escolha o encontro",
+          "body": "Encontra a data e a hora de cada encontro."
+        },
+        "name": {
+          "title": "Deixe o seu nome",
+          "body": "Basta o nome e o endereço de email para receber a ligação."
+        },
+        "enter": {
+          "title": "Entre",
+          "body": "À hora certa, abra a ligação: já está dentro."
+        }
+      },
+      "listTitle": "Próximos encontros"
     }
   },
   "polls": {
@@ -2534,7 +2813,9 @@
     "errors": {
       "questionRequired": "Escreva a pergunta da sondagem",
       "minOptions": "São necessárias pelo menos 2 opções",
-      "generic": "Erro ao criar a sondagem"
+      "generic": "Erro ao criar a sondagem",
+      "vote": "Voto não registado. Tente novamente.",
+      "alreadyVoted": "Já votou nesta sondagem."
     }
   },
   "materials": {
@@ -2553,10 +2834,29 @@
     "add": "Adicionar",
     "adding": "A adicionar...",
     "cancel": "Cancelar",
+    "modeLabel": "Tipo de material",
+    "modeLink": "Ligação",
+    "modeFile": "Ficheiro",
+    "titleOptional": "Título (opcional; caso contrário, o nome do ficheiro)",
+    "fileLabel": "Ficheiro a carregar",
+    "fileHelp": "Formatos suportados: PDF, DOCX, PPTX, XLSX, TXT — máx. {maxMb} MB",
+    "upload": "Carregar",
+    "uploading": "A carregar…",
     "errors": {
       "urlInvalid": "Introduza um URL válido",
-      "generic": "Erro ao adicionar o material"
-    }
+      "generic": "Erro ao adicionar o material",
+      "fileMissing": "Escolha um ficheiro para carregar",
+      "titleMissing": "Introduza um título para a ligação",
+      "fileTooLarge": "O ficheiro excede o limite de {maxMb} MB",
+      "fileTooLargeForServer": "O servidor não aceita um ficheiro tão grande: experimente um ficheiro mais leve",
+      "fileType": "Tipo de ficheiro não suportado (PDF, DOCX, PPTX, XLSX, TXT)",
+      "uploadUnavailable": "O carregamento de ficheiros não está disponível nesta instalação",
+      "uploadFailed": "Erro ao carregar o ficheiro",
+      "quotaExceeded": "Este evento atingiu o limite de ficheiros carregados ({maxFiles} ficheiros, {maxMb} MB no total): remova alguns para carregar outros",
+      "uploadBusy": "Demasiados carregamentos neste momento: tente novamente dentro de alguns segundos",
+      "deleteFailed": "Não foi possível eliminar o material"
+    },
+    "addedByStaff": "Adicionado pela organização"
   },
   "reminders": {
     "title": "Notificações",
@@ -2582,11 +2882,11 @@
     "consent": {
       "recording": "Autorizo a gravação áudio/vídeo do evento",
       "recordingRequired": "O consentimento para a gravação é obrigatório para participar neste evento",
-      "futureCommunications": "Desejo receber informações sobre futuros eventos organizados pelo DTD",
-      "addressBook": "Quero ser inserido na Agenda DTD para ser convidado para eventos semelhantes",
-      "addressBookHelp": "Consentimento separado (art. 6.1.a RGPD). Poderá revogá-lo a qualquer momento através da ligação \"Remover os meus dados da agenda\" presente nos e-mails que receber. O nome e a organização serão obtidos a partir do perfil de inscrição.",
       "multitrack": "Consinto a gravação de uma faixa de áudio separada da minha voz, com o único objetivo de atribuir corretamente a transcrição a cada pessoa que fala. A faixa é temporária e eliminada após a transcrição; não é usada para identificar nem reproduzir a minha voz.",
-      "multitrackRequired": "O consentimento para a gravação da sua faixa de áudio é obrigatório para participar neste evento"
+      "multitrackRequired": "O consentimento para a gravação da sua faixa de áudio é obrigatório para participar neste evento",
+      "futureCommunications": "Desejo receber informações sobre os próximos eventos publicados nesta plataforma",
+      "addressBook": "Quero ser inserido na agenda de eventos para ser convidado para eventos semelhantes",
+      "addressBookHelp": "Consentimento separado (art. 6.1.a RGPD). Poderá revogá-lo a qualquer momento através da ligação \"Remover os meus dados da agenda\" presente nos e-mails que receber. O nome e a organização serão obtidos a partir do perfil de inscrição."
     },
     "export": {
       "title": "Os meus dados",
@@ -2596,10 +2896,10 @@
       "emailInvalid": "Introduza um endereço de email válido",
       "submit": "Solicitar os meus dados",
       "loading": "A pesquisar...",
-      "requestSubmittedTitle": "Check your inbox",
-      "requestSubmittedBody": "If this email matches a registration, we've sent you a link to download your data. The link is valid for 1 hour.",
-      "linkInvalid": "This link is invalid or expired. Please request a new link.",
-      "requestNew": "Request a new link",
+      "requestSubmittedTitle": "Verifique a sua caixa de correio",
+      "requestSubmittedBody": "Se este endereço de email corresponder a uma inscrição, enviámos-lhe uma ligação para descarregar os seus dados. A ligação é válida durante 1 hora.",
+      "linkInvalid": "A ligação não é válida ou expirou. Solicite uma nova ligação.",
+      "requestNew": "Solicitar nova ligação",
       "noData": "Nenhum dado encontrado para este endereço de email.",
       "error": "Ocorreu um erro. Tente novamente mais tarde.",
       "rateLimited": "Demasiados pedidos. Tente novamente dentro de uma hora.",
@@ -2614,30 +2914,30 @@
       "questionsTitle": "Perguntas Q&A",
       "pollVotesTitle": "Votos em sondagens",
       "optionLabel": "Opção",
-      "erasureCtaTitle": "Want to delete your data?",
-      "erasureCtaBody": "You can request full erasure of the data tied to your email (GDPR Art. 17).",
-      "erasureCtaButton": "Request erasure"
+      "erasureCtaTitle": "Pretende eliminar os seus dados?",
+      "erasureCtaBody": "Pode solicitar a eliminação completa dos dados associados ao seu endereço de email (Art.º 17 do GDPR).",
+      "erasureCtaButton": "Solicitar eliminação"
     },
     "erasure": {
-      "title": "Erase your data",
-      "subtitle": "Confirm the erasure of the personal data tied to your email address (GDPR Art. 17).",
-      "emailLabel": "Your email address",
-      "emailPlaceholder": "Enter the email used for registration",
-      "emailInvalid": "Please enter a valid email address",
-      "submit": "Request erasure",
-      "requestSubmittedTitle": "Check your inbox",
-      "requestSubmittedBody": "If this email matches a registration, we've sent you a link to confirm the erasure. The link is valid for 1 hour.",
-      "linkInvalid": "This link is invalid or expired. Please request a new link.",
-      "confirmWarning": "You are about to permanently erase all personal data tied to your email.",
-      "confirmBody": "Registrations, questions, poll votes, feedback and reminders will be deleted. This action is irreversible.",
-      "confirmButton": "Confirm erasure",
-      "cancel": "Cancel",
-      "processing": "Deleting...",
-      "doneTitle": "Erasure completed",
-      "doneBody": "{count} registrations and the linked data have been deleted.",
-      "error": "An error occurred. Please try again later.",
-      "rateLimited": "Too many requests. Please try again in one hour.",
-      "back": "Back to my data"
+      "title": "Eliminação dos seus dados",
+      "subtitle": "Confirme a eliminação dos dados pessoais associados ao seu endereço de email (Art.º 17 do GDPR).",
+      "emailLabel": "O seu endereço de email",
+      "emailPlaceholder": "Introduza o email utilizado na inscrição",
+      "emailInvalid": "Introduza um endereço de email válido",
+      "submit": "Solicitar eliminação",
+      "requestSubmittedTitle": "Verifique a sua caixa de correio",
+      "requestSubmittedBody": "Se este endereço de email corresponder a uma inscrição, enviámos-lhe uma ligação para confirmar a eliminação. A ligação é válida durante 1 hora.",
+      "linkInvalid": "A ligação não é válida ou expirou. Solicite uma nova ligação.",
+      "confirmWarning": "Está prestes a eliminar definitivamente todos os dados pessoais associados ao seu endereço de email.",
+      "confirmBody": "Serão eliminadas as inscrições, as perguntas, os votos nas sondagens, os feedbacks, os lembretes e o seu registo na agenda de eventos. A operação é irreversível.",
+      "confirmButton": "Confirmar eliminação",
+      "cancel": "Cancelar",
+      "processing": "A eliminar...",
+      "doneTitle": "Eliminação concluída",
+      "doneBody": "Inscrições eliminadas: {count}, juntamente com os dados associados.",
+      "error": "Ocorreu um erro. Tente novamente mais tarde.",
+      "rateLimited": "Demasiados pedidos. Tente novamente dentro de uma hora.",
+      "back": "Voltar aos meus dados"
     }
   },
   "legal": {
@@ -2648,7 +2948,7 @@
       "sections": {
         "controller": {
           "title": "Responsável pelo tratamento",
-          "body": "O tratamento dos dados pessoais ocorre no âmbito das atividades institucionais do Departamento para a Transformação Digital, para permitir a gestão técnica e organizativa dos eventos públicos online."
+          "body": "Responsável pelo tratamento: {organization}. O tratamento dos dados pessoais ocorre no âmbito das suas atividades institucionais, para permitir a gestão técnica e organizativa dos eventos públicos online."
         },
         "data": {
           "title": "Dados tratados e finalidades",
@@ -2656,11 +2956,11 @@
         },
         "retention": {
           "title": "Conservação dos dados e direitos",
-          "body": "Os dados são conservados pelo período configurado para cada evento e depois eliminados automaticamente, salvo obrigações legais diferentes. Em qualquer momento é possível exercer os direitos previstos pelo GDPR, incluindo acesso, retificação e eliminação, através dos canais institucionais do Departamento."
+          "body": "Os dados são conservados pelo período configurado para cada evento e depois eliminados automaticamente, salvo obrigações legais diferentes. Em qualquer momento é possível exercer os direitos previstos pelo GDPR, incluindo acesso, retificação e eliminação, através dos canais institucionais do responsável pelo tratamento."
         },
         "automatedProcessing": {
           "title": "Transcrição, síntese e dobragem gerados por inteligência artificial",
-          "body": "Nos eventos que o solicitam, terminada a emissão a gravação é processada por uma cadeia de inteligência artificial executada inteiramente na infraestrutura do cluster do Departamento. Produz a transcrição do discurso (com separação das diferentes pessoas que falam), uma síntese divulgativa, eventuais traduções para outras línguas europeias e uma versão dobrada do áudio com voz sintética genérica. Todos os modelos utilizados (WhisperX para a transcrição, Mistral-Small para a síntese e a tradução, Piper TTS para a dobragem) são executados em GPU dedicadas dentro do cluster: nenhum dado dos participantes é enviado a serviços de terceiros. A voz dos participantes não é clonada nem conservada como dado biométrico (art. 9.º do RGPD): a dobragem usa vozes sintéticas públicas pré-treinadas, atribuídas de forma arbitrária a cada pessoa. Para cada gravação, a página do evento mostra o retrato exato dos modelos usados («Transparência do processamento com IA»). Os conteúdos gerados podem conter imprecisões: a referência autorizada continua a ser sempre o vídeo original (Regulamento da IA, art. 50.º)."
+          "body": "Nos eventos que o solicitam, terminada a emissão a gravação é processada por uma cadeia de inteligência artificial executada inteiramente na infraestrutura de cluster desta instalação. Produz a transcrição do discurso (com separação das diferentes pessoas que falam), uma síntese divulgativa, eventuais traduções para outras línguas europeias e uma versão dobrada do áudio com voz sintética genérica. Todos os modelos utilizados (WhisperX para a transcrição, Mistral-Small para a síntese e a tradução, Piper TTS para a dobragem) são executados em GPU dedicadas dentro do cluster: nenhum dado dos participantes é enviado a serviços de terceiros. A voz dos participantes não é clonada nem conservada como dado biométrico (art. 9.º do RGPD): a dobragem usa vozes sintéticas públicas pré-treinadas, atribuídas de forma arbitrária a cada pessoa. Para cada gravação, a página do evento mostra o retrato exato dos modelos usados («Transparência do processamento com IA»). Os conteúdos gerados podem conter imprecisões: a referência autorizada continua a ser sempre o vídeo original (Regulamento da IA, art. 50.º)."
         }
       },
       "note": {
@@ -2672,7 +2972,7 @@
     "accessibility": {
       "metaTitle": "Declaração de acessibilidade",
       "title": "Declaração de acessibilidade",
-      "intro": "O Departamento para a Transformação Digital compromete-se a tornar o PA Webinar acessível, em conformidade com a Lei italiana 4/2004, a Diretiva (UE) 2016/2102 e as orientações da AgID sobre a acessibilidade dos instrumentos informáticos.",
+      "intro": "Entidade responsável: {organization}. A entidade compromete-se a tornar esta plataforma acessível, em conformidade com a Lei italiana 4/2004, a Diretiva (UE) 2016/2102 e as orientações da AgID sobre a acessibilidade dos instrumentos informáticos.",
       "sections": {
         "conformance": {
           "title": "Estado de conformidade",
@@ -2711,7 +3011,7 @@
       "sections": {
         "ownership": {
           "title": "Titularidade do serviço",
-          "body": "A plataforma é promovida pelo Departamento para a Transformação Digital e disponibilizada para a organização e fruição de eventos públicos online de interesse institucional."
+          "body": "Titular da plataforma: {organization}. A plataforma é disponibilizada para a organização e fruição de eventos públicos online de interesse institucional."
         },
         "usage": {
           "title": "Modalidades de utilização",
@@ -2719,7 +3019,7 @@
         },
         "liability": {
           "title": "Limitações de responsabilidade",
-          "body": "Apesar da adoção de medidas técnicas e organizativas adequadas, o Departamento não garante a ausência absoluta de interrupções ou avarias devidas a causas imprevisíveis, manutenções ou fatores externos. As responsabilidades previstas por lei mantêm-se em vigor."
+          "body": "Apesar da adoção de medidas técnicas e organizativas adequadas, o titular da plataforma não garante a ausência absoluta de interrupções ou avarias devidas a causas imprevisíveis, manutenções ou fatores externos. As responsabilidades previstas por lei mantêm-se em vigor."
         }
       }
     },
@@ -2818,7 +3118,8 @@
         },
         "note": "A lista completa de componentes e serviços, com versões, hashes e propriedades técnicas, está disponível nas secções anteriores e no JSON descarregável."
       }
-    }
+    },
+    "organizationNotConfigured": "organismo ainda não indicado nas definições"
   },
   "status": {
     "title": "Estado do sistema",
@@ -2851,7 +3152,7 @@
     "nodesReady": "nós prontos",
     "scaling": "a escalonar",
     "jvbStress": "Carga JVB",
-    "participantsConnected": "participantes ligados",
+    "participantsConnected": "participantes na ponte de vídeo",
     "videoInteractive": "interativo",
     "videoWebinar": "webinar",
     "participantsAvailable": "participantes disponíveis",
@@ -2874,13 +3175,13 @@
     "systemStatus": "Estado do sistema",
     "postprod": {
       "title": "Pipeline pós-evento",
-      "subtitle": "Transcrição, resumo, tradução e dobragem da gravação",
-      "whatItDoes": "Quando um evento termina, a gravação passa por uma pipeline interna: a transcrição é gerada pelo WhisperX, o resumo e as traduções por um modelo Mistral, o áudio dobrado pelo Piper TTS. Todos os modelos são executados numa GPU do cluster que fica ligada apenas durante o tempo de processamento, para que a energia consumida acompanhe a carga efetiva.",
       "status": {
         "idle": "Em espera",
         "running": "Em execução",
         "degraded": "Degradada"
       },
+      "subtitle": "Transcrição, resumo, tradução e dobragem da gravação",
+      "whatItDoes": "Quando um evento termina, a gravação passa por uma pipeline interna: a transcrição é gerada pelo WhisperX, o resumo e as traduções por um modelo Mistral, o áudio dobrado pelo Piper TTS. Todos os modelos são executados numa GPU do cluster que fica ligada apenas durante o tempo de processamento, para que a energia consumida acompanhe a carga efetiva.",
       "aiBadge": "A transcrição, o resumo e a dobragem deste evento são gerados por modelos de inteligência artificial e podem conter imprecisões. Para um esclarecimento definitivo, consulte sempre o vídeo original.",
       "idleMessage": "Pipeline pronta, nenhuma gravação para processar neste momento.",
       "queueAriaLabel": "Composição da fila de pós-produção",
@@ -2895,7 +3196,12 @@
       "lastFailure": "Último erro {when}",
       "artifactsProduced": "{count, plural, =0 {nenhum artefacto} one {1 artefacto produzido} other {# artefactos produzidos}}",
       "eventsEnabled": "{count, plural, =0 {nenhum evento com IA} one {1 evento com IA ativa} other {# eventos com IA ativa}}"
-    }
+    },
+    "jvbFixedUp": "{count, plural, =1 {Ponte de vídeo ativa} other {Ponte de vídeo ativa · # bridges previstos}}",
+    "jvbFixedDown": "A ponte de vídeo não responde",
+    "jvbFixedDownDetail": "Os participantes não recebem áudio nem vídeo até a ponte voltar a estar acessível.",
+    "jvbUnmonitored": "Estado não monitorizado",
+    "jvbUnmonitoredDetail": "Esta instalação não consulta a ponte de vídeo: o seu estado não está disponível aqui."
   },
   "infraMap": {
     "loading": "A carregar mapa de infraestrutura...",
@@ -2903,8 +3209,8 @@
     "ariaLabel": "Mapa da infraestrutura do sistema",
     "title": "Mapa de infraestrutura",
     "subtitle": "Visualização em tempo real da arquitetura e do estado dos serviços",
-    "participants": "Participantes",
-    "conferences": "Conferências",
+    "participants": "Participantes na ponte de vídeo",
+    "conferences": "Conferências na ponte de vídeo",
     "bandwidthIn": "Largura de banda entrada",
     "bandwidthOut": "Largura de banda saída",
     "recordings": "Gravações",
@@ -2932,7 +3238,7 @@
     "iceSuccess": "Ligações bem-sucedidas",
     "totalConferences": "Total de conferências",
     "octoConferences": "Conferências Octo (multi-bridge)",
-    "octoEndpoints": "Endpoints via relay",
+    "octoEndpoints": "Endpoints através de relay",
     "octoSend": "Saída de relay inter-bridge",
     "octoReceive": "Entrada de relay inter-bridge",
     "lastUpdated": "Última atualização",
@@ -2947,6 +3253,7 @@
     "connMedia": "fluxo de vídeo",
     "connRecording": "gravação",
     "connUpload": "carregamento",
+    "connPostprod": "pós-produção de IA",
     "connPubSub": "chat pub/sub",
     "services": {
       "app": "Portal web",
@@ -2989,23 +3296,33 @@
       "jitsiWeb": {
         "healthy": "A sala de videoconferência está acessível e pronta para eventos.",
         "down": "A sala de videoconferência não está acessível. Não é possível iniciar ou entrar em eventos.",
-        "standby": "A sala de videoconferência não está configurada."
+        "standby": "A sala de videoconferência não está configurada.",
+        "degraded": "A sala de videoconferência responde, mas com erros ou lentamente.",
+        "publicCheckFailed": "O portal não consegue verificar a sala no seu endereço público: a partir do servidor, o certificado ou o nome não são válidos. A sala pode funcionar na mesma para os participantes.",
+        "unmonitored": "O estado da sala de videoconferência não é monitorizado nesta instalação."
       },
       "prosody": {
         "healthy": "As mensagens internas entre os serviços de vídeo estão a funcionar corretamente.",
         "down": "As mensagens internas não estão acessíveis. Os serviços de vídeo não conseguem comunicar entre si.",
-        "standby": "O serviço de mensagens não está configurado."
+        "standby": "O serviço de mensagens não está configurado.",
+        "degraded": "As mensagens internas respondem, mas com erros ou lentamente.",
+        "publicCheckFailed": "O portal não consegue verificar as mensagens internas através do endereço público da sala: a partir do servidor, o certificado ou o nome não são válidos. As conferências podem funcionar na mesma.",
+        "unmonitored": "O estado das mensagens internas não é monitorizado nesta instalação."
       },
       "jicofo": {
         "healthy": "O coordenador de conferências está ativo e a gerir sessões.",
         "down": "O coordenador de conferências não está acessível. Não é possível criar novas conferências.",
-        "standby": "O coordenador de conferências não está configurado."
+        "standby": "O coordenador de conferências não está configurado.",
+        "degraded": "O coordenador de conferências responde, mas com erros ou lentamente.",
+        "unmonitored": "O estado do coordenador de conferências não é monitorizado nesta instalação."
       },
       "jvb": {
         "healthy": "A ponte de vídeo está ativa e a transmitir áudio/vídeo aos participantes.",
         "scaling": "A ponte de vídeo está a preparar-se para um evento futuro. Os servidores estão a ser criados automaticamente.",
         "standby": "A ponte de vídeo está em espera. Será ativada automaticamente antes do início de um evento programado.",
-        "stale": "Um evento aguarda pelo bridge de vídeo há mais do que o tempo limite configurado. Verifique o cluster autoscaler e os logs dos pods JVB."
+        "stale": "Um evento aguarda pelo bridge de vídeo há mais do que o tempo limite configurado. Verifique o cluster autoscaler e os logs dos pods JVB.",
+        "fixedDown": "A ponte de vídeo não responde. As conferências não transmitem áudio nem vídeo até voltar a estar acessível.",
+        "unmonitored": "O estado da ponte de vídeo não é monitorizado nesta instalação: o portal não tem um endereço para a consultar."
       },
       "jibri": {
         "healthy": "O serviço de gravação está pronto e disponível.",
@@ -3037,7 +3354,8 @@
       "jibri": "Não é possível gravar eventos. Os participantes podem continuar a entrar e a participar.",
       "jibriStale": "Um evento com gravação ativa aguarda pelo Jibri há mais do que o tempo limite: a sessão não está a ser gravada.",
       "smtp": "Não serão enviados emails de confirmação de inscrição nem lembretes.",
-      "postprodDegraded": "As transcrições e os resumos de algumas gravações recentes não foram gerados. As gravações de vídeo continuam disponíveis."
+      "postprodDegraded": "As transcrições e os resumos de algumas gravações recentes não foram gerados. As gravações de vídeo continuam disponíveis.",
+      "jvbDown": "Os participantes não recebem áudio nem vídeo."
     },
     "overallVerdicts": {
       "operational": "Todos os serviços estão a funcionar corretamente. A plataforma está totalmente operacional.",
@@ -3067,7 +3385,8 @@
       "degraded": "Degradado",
       "down": "Indisponível",
       "standby": "Em espera",
-      "scaling": "Em preparação"
+      "scaling": "Em preparação",
+      "unknown": "Não monitorizado"
     },
     "metrics": {
       "uptime24h": "Uptime 24h",
@@ -3079,7 +3398,7 @@
       "requestRate": "Pedidos/s",
       "podUptime": "Uptime do pod"
     },
-    "connPostprod": "pós-produção de IA"
+    "probeDetail": "Resultado da verificação"
   },
   "feedback": {
     "title": "Como avalia este evento?",
@@ -3107,7 +3426,13 @@
     "noActiveRound": "Nenhuma word cloud ativa de momento.",
     "noWords": "À espera das primeiras palavras...",
     "wordsSubmitted": "{count} palavras enviadas",
-    "timeRemaining": "Tempo restante"
+    "timeRemaining": "Tempo restante",
+    "errors": {
+      "send": "Palavra não enviada. Tente novamente.",
+      "closed": "Esta ronda está fechada: não são aceites mais palavras.",
+      "limit": "Já enviou o número máximo de palavras para esta ronda.",
+      "rateLimited": "Demasiados envios neste momento: aguarde alguns segundos antes de tentar novamente."
+    }
   },
   "timer": {
     "title": "Temporizador",
@@ -3153,8 +3478,6 @@
     }
   },
   "footer": {
-    "departmentName": "Departamento para a Transformação Digital",
-    "presidencyName": "Presidência do Conselho de Ministros",
     "privacy": "Política de privacidade",
     "accessibility": "Declaração de acessibilidade",
     "openSource": "Software de código aberto",
@@ -3169,8 +3492,38 @@
     "buildInfoDev": "build de desenvolvimento",
     "viewCommit": "Ver o commit no GitHub",
     "viewRelease": "Ver a versão no GitHub",
-    "buildDatePrefix": "Compilado em",
-    "viewChangelog": "Ver as novidades (changelog)"
+    "viewChangelog": "Ver as novidades (changelog)",
+    "buildDatePrefix": "Compilado em"
+  },
+  "changelog": {
+    "metaTitle": "Novidades e changelog",
+    "title": "Novidades e changelog",
+    "intro": "Todas as versões da plataforma, da mais recente para a mais antiga. Cada entrada resume as principais novidades, correções e melhorias.",
+    "current": "Versão atual",
+    "sourceNote": "As notas são elaboradas a partir das tags, dos pull requests e dos commits do projeto.",
+    "sourceLink": "Ver todas as versões no GitHub",
+    "rawChangelog": "CHANGELOG.md no repositório",
+    "transparencyNote": "Para cada versão: o que corre e com que componentes, na",
+    "transparencyInventory": "transparência dos serviços",
+    "transparencySecurity": "segurança e SBOM",
+    "technicalDetail": "Detalhe técnico",
+    "releaseLink": "Release",
+    "securityBadge": "Segurança",
+    "sbomButton": "SBOM",
+    "pipelineLink": "Pipeline",
+    "scorecardLink": "OpenSSF Scorecard",
+    "sbomClose": "Fechar",
+    "sbomLoading": "A carregar…",
+    "sbomError": "Não foi possível carregar o SBOM.",
+    "sbomComponents": "componentes",
+    "sbomSearch": "procurar componente…",
+    "sbomColName": "Componente",
+    "sbomColVersion": "Versão",
+    "sbomColEcosystem": "Ecossistema",
+    "sbomNoMatch": "Nenhum componente corresponde.",
+    "sbomDownload": "Transferir SBOM completo (SPDX)",
+    "sourcesLink": "Código-fonte",
+    "codeScanningLink": "Análise de código (CodeQL)"
   },
   "pages": {
     "privacyTitle": "Política de privacidade",
@@ -3208,281 +3561,9 @@
     "shortcutsF": "Ecrã inteiro",
     "shortcutsSpeed": "Diminuir ou aumentar a velocidade",
     "captionsOn": "Legendas ativas",
-    "captionsOff": "Legendas desativadas"
-  },
-  "diagram": {
-    "title": "Configuração do evento",
-    "topology": "Topologia",
-    "features": "Funcionalidades ativas",
-    "estimates": "Estimativa de recursos",
-    "moderator": "Moderador",
-    "participants": "Participantes",
-    "bridge": "Video Bridge",
-    "jvb": "Video Bridge",
-    "jibri": "Gravação",
-    "occupancy": "Ocupação",
-    "sizedForRegistrations": "Baseado em {count} inscritos atuais",
-    "sizedForCapacity": "Baseado na capacidade máxima de {count}",
-    "chips": {
-      "mic": "Microfone",
-      "video": "Câmara",
-      "screen": "Partilha de ecrã"
-    },
-    "bandwidth": {
-      "moderator": "Largura de banda do moderador",
-      "participant": "Largura de banda por participante",
-      "total": "Largura de banda total estimada"
-    },
-    "jvbCount": "JVB necessários",
-    "jvbRam": "RAM JVB estimada",
-    "storage": "Armazenamento da gravação",
-    "duration": "Duração estimada",
-    "viewOnly": "Apenas visualização",
-    "preview": "Pré-visualização da configuração"
-  },
-  "waiting": {
-    "startsIn": "O evento começa em",
-    "eventLive": "O evento está em direto!",
-    "connectedParticipants": "{count, plural, =0 {Nenhum participante} =1 {1 participante ligado} other {{count} participantes ligados}}",
-    "elapsedTime": "Em curso há {minutes} minutos",
-    "youAreLate": "O evento começou há {minutes} minutos",
-    "chooseHowToJoin": "Escolha como participar:",
-    "enterLive": "Entrar em DIRETO",
-    "enterLiveDesc": "Participe em direto. Pode sempre aceder à gravação após o evento.",
-    "enterNow": "Entrar agora",
-    "watchFromStart": "Ver desde o início",
-    "watchFromStartDesc": "Veja a gravação desde o início e junte-se ao direto quando quiser.",
-    "watchNow": "Ver",
-    "switchToLive": "Mudar para o direto",
-    "enterRoom": "Entrar na sala",
-    "recordingNotice": "Este evento está a ser gravado.",
-    "recordingAvailableAfter": "A gravação estará disponível após o evento.",
-    "autoRefreshHint": "A página será atualizada automaticamente quando o evento começar.",
-    "startEventButton": "Iniciar evento",
-    "startingEvent": "A iniciar...",
-    "peopleWaiting": "{count, plural, =0 {} =1 {1 pessoa à espera} other {{count} pessoas à espera}}",
-    "jvbScaling": "Sala em preparação...",
-    "jvbScalingDetail": "Os servidores de vídeo estão a arrancar. A operação demora cerca de 2 minutos.",
-    "jvbReady": "Sala pronta!",
-    "warmingUp": "Sala em preparação",
-    "warmingUpDetail": "Estamos a ligar os servidores de vídeo. Entretanto, pode preparar-se — estará tudo pronto dentro de 2-3 minutos e poderá entrar.",
-    "warmingUpButton": "Sala em preparação...",
-    "nameLabel": "O seu nome",
-    "nameHelp": "Aparecerá aos outros participantes",
-    "joinNowBtn": "Entrar agora",
-    "roomOpen": "The room is open",
-    "whileYouWait": "While you wait",
-    "openingAt": "Abertura às {time}",
-    "netiquetteTitle": "Boas práticas para participar",
-    "netiquetteBullet1": "Chegue alguns minutos antes para testar o microfone e a câmara",
-    "netiquetteBullet2": "Ligue a câmara e o microfone apenas quando quiser intervir — levante a mão para pedir a palavra",
-    "netiquetteBullet3": "Use o chat para trocas rápidas, Q&A para perguntas aos oradores",
-    "netiquetteBullet4": "A gravação, se ativa, é gerida apenas pelos moderadores e é assinalada com um indicador vermelho",
-    "watchCatchup": "Ver desde o início",
-    "watchCatchupDesc": "Veja a gravação parcial e alcance a transmissão em direto quando quiser",
-    "chatPreviewTitle": "Chat do evento",
-    "chatPreviewHint": "Leia o que os outros participantes estão a dizer enquanto se prepara",
-    "endedTitle": "Evento concluído",
-    "endedWatchRecording": "Ver a gravação",
-    "endedLeaveFeedback": "Deixar feedback",
-    "moderatedBy": "Moderado por {name}",
-    "startEventError": "Erro ao iniciar o evento. Tente novamente.",
-    "emailLabel": "E-mail (facultativo)",
-    "emailHelp": "Apenas para eventual seguimento pós-evento",
-    "emailInvalid": "Introduza um endereço de e-mail válido",
-    "chatLockedMessage": "Introduza o seu nome para participar no chat do evento.",
-    "classicView": "Classic view",
-    "backToGarden": "Back to the park",
-    "startingSoon": "O evento está prestes a começar, aguarde a organização…",
-    "exitWaiting": "Sair da sala de espera",
-    "aiNoticeTitle": "Processamento por IA depois do evento",
-    "aiNotice": "No final, a gravação será processada por ferramentas de inteligência artificial para gerar transcrição, resumo e eventuais traduções e dobragens. Os resultados podem conter imprecisões; o vídeo continua a ser a fonte autoritativa.",
-    "multitrackConsentTitle": "Gravação por participante",
-    "multitrackConsentRequired": "Tem de aceitar a gravação da sua faixa de áudio para entrar",
-    "enterGardenTitle": "Entrar na praça",
-    "enterGardenHint": "Um espaço para percorrer enquanto espera: a partir dali também pode acertar o nome e o microfone e entrar no evento.",
-    "backToWaitingRoom": "Voltar à sala de espera",
-    "gardenDialogLabel": "Praça da sala de espera",
-    "gardenGateHint": "Pode entrar a partir daqui, ou levar o seu avatar até ao portão.",
-    "classicVersion": "Versão clássica",
-    "warmup": {
-      "queued": "Pedido recebido",
-      "startingBridge": "A iniciar o servidor de vídeo…",
-      "provisioningNode": "A criar um servidor de vídeo dedicado",
-      "almostReady": "Servidor de vídeo ativo: falta pouco",
-      "almostReadyDetail": "Mais um instante e o botão de entrada ativa-se sozinho.",
-      "honestHint": "Espera habitual: menos de um minuto se a infraestrutura já estiver quente, 3–5 minutos no primeiro arranque. Entretanto pode verificar câmara e microfone ou usar o chat.",
-      "elapsed": "em preparação há {time}"
-    }
-  },
-  "recording": {
-    "management": "Gravação de vídeo",
-    "inProgress": "Em curso",
-    "available": "Gravação disponível",
-    "duration": "Duração",
-    "fileSize": "Tamanho",
-    "startedAt": "Iniciada",
-    "automatic": "automática",
-    "publish": "Publicar gravação",
-    "publishDesc": "Tornar o vídeo acessível na página do evento",
-    "retentionLabel": "Conservação",
-    "retention": {
-      "24h": "24 horas (temporária)",
-      "7d": "7 dias",
-      "30d": "30 dias",
-      "90d": "90 dias",
-      "forever": "Nunca (até à expiração do evento)"
-    },
-    "retentionNote": "O vídeo seguirá igualmente a retenção GDPR do evento",
-    "delete": "Eliminar gravação",
-    "deleteConfirm": "Tem a certeza? O vídeo será eliminado definitivamente.",
-    "notConfigured": "Jibri não está configurado na infraestrutura. A gravação de vídeo não está disponível.",
-    "disabledHint": "A gravação de vídeo não está ativada para este evento. Para a ativar, abra a secção Definições acima e ligue o interruptor \"Gravação\".",
-    "play": "Reproduzir",
-    "download": "Transferir",
-    "transcriptManage": "Transcrição / IA",
-    "deleteConfirmTitle": "Eliminar a gravação",
-    "deleteFailed": "A eliminação falhou",
-    "deleteSuccess": "Gravação eliminada"
-  },
-  "postEvent": {
-    "config": "Configuração pós-evento",
-    "pageVisible": "Página do evento visível após o fim",
-    "showQA": "Mostrar perguntas Q&A",
-    "showMaterials": "Mostrar materiais partilhados",
-    "showPolls": "Mostrar resultados das sondagens",
-    "showFeedback": "Mostrar feedback",
-    "feedbackEnabled": "Inquérito de feedback ativo no fim do evento",
-    "visibilityAlways": "Sempre visível",
-    "visibilityUntil": "Visível até:",
-    "dataRetentionNote": "Os dados pessoais dos participantes serão eliminados de acordo com a retenção do evento ({days} dias). O conteúdo do evento permanecerá disponível enquanto a página estiver visível.",
-    "availableUntil": "Este evento e os respetivos conteúdos estarão disponíveis até {date}.",
-    "tabs": {
-      "qa": "Perguntas e Respostas",
-      "materials": "Materiais",
-      "polls": "Sondagens",
-      "feedback": "Feedback",
-      "transcript": "Transcrição de IA"
-    },
-    "pageVisibleHelp": "Se estiver desativada (ou se a janela de visibilidade tiver expirado), a página pública do evento concluído devolve 404 e o evento desaparece das listagens e do sitemap.",
-    "libraryListed": "Publicar na biblioteca de vídeos",
-    "libraryListedHelp": "Mostra este evento na biblioteca pública (/video-library). Requer uma gravação publicada ou um vídeo do YouTube e que a página do evento esteja visível.",
-    "libraryListedNoRecording": "Nenhuma gravação publicada: o evento não aparecerá na biblioteca enquanto não publicar a gravação ou acrescentar um vídeo do YouTube.",
-    "showRecap": "Mostrar o resumo do evento",
-    "showWordCloud": "Mostrar a nuvem de palavras",
-    "emailEnabled": "Enviar e-mail de resumo no fim do evento",
-    "emailEnabledHelp": "Na conclusão, envia aos participantes inscritos um e-mail de agradecimento com a ligação para o resumo e para o feedback, e ao moderador um resumo sintético. É enviado apenas uma vez."
-  },
-  "provisioning": {
-    "loading": "A carregar",
-    "titleFromIdle": "Sala a ser reativada",
-    "titleColdStart": "Sala em preparação",
-    "descriptionFromIdle": "A sala tinha sido colocada em pausa por inatividade para conter os consumos energéticos. Estamos a reiniciá-la: demora cerca de 2-3 minutos.",
-    "descriptionColdStart": "Estamos a preparar a sala virtual para este evento. A operação demora cerca de 2-3 minutos: será reencaminhado automaticamente assim que tudo estiver pronto.",
-    "progressLabel": "{seconds} s",
-    "retry": "Recarregar",
-    "tempError": "Estamos a tentar novamente contactar o servidor, nenhuma ação é necessária.",
-    "ended": "O evento terminou.",
-    "scaleToZeroNote": "Para reduzir o impacto ambiental, os nós de vídeo são desligados quando ninguém está em chamada. O reinício é automático na primeira entrada."
-  },
-  "rubrica": {
-    "optOut": {
-      "title": "Remoção da Agenda DTD",
-      "intro": "Está prestes a revogar o consentimento para constar na Agenda DTD. Após a confirmação, deixará de ser contactado para ser convidado para eventos semelhantes.",
-      "missingToken": "A ligação não é válida ou está incompleta. Verifique o e-mail original.",
-      "invalidToken": "A ligação está expirada ou não é válida. Contacte o responsável do evento para obter assistência.",
-      "notFound": "Nenhuma pessoa corresponde à ligação. Pode já ter sido removida.",
-      "loading": "A carregar…",
-      "previewHeader": "Está prestes a remover da agenda:",
-      "warning": "A operação não elimina o histórico das inscrições nos eventos individuais.",
-      "confirm": "Confirmar a remoção",
-      "submitting": "A remover…",
-      "successTitle": "Remoção concluída",
-      "successBody": "Os seus dados já não estão presentes na Agenda DTD.",
-      "errors": {
-        "generic": "Ocorreu um erro. Tente novamente mais tarde."
-      }
-    }
-  },
-  "deviceCheck": {
-    "preview": "Pré-visualização de vídeo",
-    "micLevel": "Nível do microfone",
-    "cameraLabel": "Câmara",
-    "micLabel": "Microfone",
-    "permissionNeeded": "Autorize o microfone e a câmara para os testar. Poderá entrar mesmo sem.",
-    "noVideo": "Sem vídeo",
-    "noAudio": "Microfone indisponível",
-    "retry": "Tentar novamente",
-    "cameraToggleOn": "Câmara LIGADA",
-    "cameraToggleOff": "Câmara DESLIGADA",
-    "micToggleOn": "Microfone LIGADO",
-    "micToggleOff": "Microfone DESLIGADO",
-    "cameraOffPreview": "Câmara desligada",
-    "speakerTest": "🔊 Testar áudio"
-  },
-  "garden": {
-    "enable": "Mostrar o jardim",
-    "classicView": "Vista clássica",
-    "changeAvatar": "Mudar avatar",
-    "peopleInGarden": "{count, plural, =0 {Ninguém no jardim} one {1 pessoa no jardim} other {# pessoas no jardim}}",
-    "guestName": "Guest",
-    "hintKeyboard": "Mova-se com WASD ou as setas",
-    "pickerTitle": "Escolha o seu avatar",
-    "pickerHelp": "A personagem representa-o no jardim de espera. Pode mudá-la quando quiser.",
-    "close": "Fechar",
-    "hintBanner": "Carregue nas setas para caminhar pelo jardim",
-    "hintJoystick": "Arraste para se mover"
-  },
-  "feedbackAdmin": {
-    "title": "Resultados do feedback",
-    "totalVotes": "respostas",
-    "noFeedback": "Nenhum feedback recebido",
-    "comments": "Comentários",
-    "noComments": "Sem comentários",
-    "yes": "Sim",
-    "no": "Não"
-  },
-  "agenda": {
-    "title": "Notas / Lista de verificação",
-    "empty": "Ainda não há pontos. Adicione os temas a tratar e assinale-os à medida que avança.",
-    "add": "Adicionar",
-    "addPlaceholder": "Novo ponto…",
-    "remove": "Remover",
-    "inProgress": "em curso",
-    "agree": "Concordo",
-    "disagree": "Não concordo",
-    "favorablePct": "{pct}% a favor",
-    "noReactions": "Partilhe a sua opinião"
-  },
-  "changelog": {
-    "metaTitle": "Novidades e changelog",
-    "title": "Novidades e changelog",
-    "intro": "Todas as versões da plataforma, da mais recente para a mais antiga. Cada entrada resume as principais novidades, correções e melhorias.",
-    "current": "Versão atual",
-    "sourceNote": "As notas são elaboradas a partir das tags, dos pull requests e dos commits do projeto.",
-    "sourceLink": "Ver todas as versões no GitHub",
-    "rawChangelog": "CHANGELOG.md no repositório",
-    "transparencyNote": "Para cada versão: o que corre e com que componentes, na",
-    "transparencyInventory": "transparência dos serviços",
-    "transparencySecurity": "segurança e SBOM",
-    "technicalDetail": "Detalhe técnico",
-    "releaseLink": "Release",
-    "securityBadge": "Segurança",
-    "sbomButton": "SBOM",
-    "pipelineLink": "Pipeline",
-    "scorecardLink": "OpenSSF Scorecard",
-    "sbomClose": "Fechar",
-    "sbomLoading": "A carregar…",
-    "sbomError": "Não foi possível carregar o SBOM.",
-    "sbomComponents": "componentes",
-    "sbomSearch": "procurar componente…",
-    "sbomColName": "Componente",
-    "sbomColVersion": "Versão",
-    "sbomColEcosystem": "Ecossistema",
-    "sbomNoMatch": "Nenhum componente corresponde.",
-    "sbomDownload": "Transferir SBOM completo (SPDX)",
-    "sourcesLink": "Código-fonte",
-    "codeScanningLink": "Análise de código (CodeQL)"
+    "captionsOff": "Legendas desativadas",
+    "watchOnYouTube": "Ver o vídeo no YouTube",
+    "externalSiteNote": "Abre no YouTube, um site externo com os seus próprios termos de utilização e aviso de privacidade."
   },
   "postprod": {
     "loading": "A carregar a transcrição…",
@@ -3579,5 +3660,277 @@
     },
     "overlapBadge": "simultâneo",
     "overlapTitle": "Fala simultânea: neste intervalo fala mais do que uma pessoa ao mesmo tempo."
+  },
+  "diagram": {
+    "title": "Configuração do evento",
+    "topology": "Topologia",
+    "features": "Funcionalidades ativas",
+    "estimates": "Estimativa de recursos",
+    "moderator": "Moderador",
+    "participants": "Participantes",
+    "bridge": "Video Bridge",
+    "jvb": "Video Bridge",
+    "jibri": "Gravação",
+    "occupancy": "Ocupação",
+    "sizedForRegistrations": "Baseado em {count} inscritos atuais",
+    "sizedForCapacity": "Baseado na capacidade máxima de {count}",
+    "chips": {
+      "mic": "Microfone",
+      "video": "Câmara",
+      "screen": "Partilha de ecrã"
+    },
+    "bandwidth": {
+      "moderator": "Largura de banda do moderador",
+      "participant": "Largura de banda por participante",
+      "total": "Largura de banda total estimada"
+    },
+    "jvbCount": "JVB necessários",
+    "jvbRam": "RAM JVB estimada",
+    "storage": "Armazenamento da gravação",
+    "duration": "Duração estimada",
+    "viewOnly": "Apenas visualização",
+    "preview": "Pré-visualização da configuração"
+  },
+  "waiting": {
+    "startsIn": "O evento começa em",
+    "startingSoon": "O evento está prestes a começar, aguarde a organização…",
+    "eventLive": "O evento está em direto!",
+    "connectedParticipants": "{count, plural, =0 {Nenhum participante} =1 {1 participante ligado} other {{count} participantes ligados}}",
+    "elapsedTime": "Em curso há {minutes} minutos",
+    "youAreLate": "O evento começou há {minutes} minutos",
+    "chooseHowToJoin": "Escolha como participar:",
+    "enterLive": "Entrar em DIRETO",
+    "enterLiveDesc": "Participe em direto. Pode sempre aceder à gravação após o evento.",
+    "enterNow": "Entrar agora",
+    "watchFromStart": "Ver desde o início",
+    "watchFromStartDesc": "Veja a gravação desde o início e junte-se ao direto quando quiser.",
+    "watchNow": "Ver",
+    "switchToLive": "Mudar para o direto",
+    "enterRoom": "Entrar na sala",
+    "recordingNotice": "Este evento está a ser gravado.",
+    "recordingAvailableAfter": "A gravação estará disponível após o evento.",
+    "autoRefreshHint": "A página será atualizada automaticamente quando o evento começar.",
+    "startEventButton": "Iniciar evento",
+    "startingEvent": "A iniciar...",
+    "peopleWaiting": "{count, plural, =0 {} =1 {1 pessoa à espera} other {{count} pessoas à espera}}",
+    "jvbScaling": "Sala em preparação...",
+    "jvbScalingDetail": "Os servidores de vídeo estão a arrancar. A operação demora cerca de 2 minutos.",
+    "jvbReady": "Sala pronta!",
+    "warmup": {
+      "queued": "Pedido recebido",
+      "startingBridge": "A iniciar o servidor de vídeo…",
+      "provisioningNode": "A criar um servidor de vídeo dedicado",
+      "almostReady": "Servidor de vídeo ativo: falta pouco",
+      "almostReadyDetail": "Mais um instante e o botão de entrada ativa-se sozinho.",
+      "honestHint": "Espera habitual: menos de um minuto se a infraestrutura já estiver quente, 3–5 minutos no primeiro arranque. Entretanto pode verificar câmara e microfone ou usar o chat.",
+      "elapsed": "em preparação há {time}",
+      "scheduled": "A sala abre à hora de início",
+      "scheduledDetail": "Ou antes, quando a organização iniciar o evento. Entretanto pode verificar câmara e microfone ou usar o chat."
+    },
+    "exitWaiting": "Sair da sala de espera",
+    "warmingUp": "Sala em preparação",
+    "warmingUpDetail": "Estamos a ligar os servidores de vídeo. Entretanto, pode preparar-se — estará tudo pronto dentro de 2-3 minutos e poderá entrar.",
+    "warmingUpButton": "Sala em preparação...",
+    "nameLabel": "O seu nome",
+    "nameHelp": "Aparecerá aos outros participantes",
+    "nameRequiredToEnter": "Para entrar, introduza o seu nome (pelo menos 2 caracteres).",
+    "roomOpenNameMissing": "A sala está aberta: introduza o seu nome para entrar.",
+    "joinNowBtn": "Entrar agora",
+    "roomOpen": "A sala está aberta",
+    "whileYouWait": "Enquanto espera",
+    "openingAt": "Abertura às {time}",
+    "netiquetteTitle": "Boas práticas para participar",
+    "netiquetteBullet1": "Chegue alguns minutos antes para testar o microfone e a câmara",
+    "netiquetteBullet2": "Ligue a câmara e o microfone apenas quando quiser intervir — levante a mão para pedir a palavra",
+    "netiquetteBullet3": "Use o chat para trocas rápidas, Q&A para perguntas aos oradores",
+    "netiquetteBullet4": "A gravação, se ativa, é gerida apenas pelos moderadores e é assinalada com um indicador vermelho",
+    "watchCatchup": "Ver desde o início",
+    "watchCatchupDesc": "Veja a gravação parcial e alcance a transmissão em direto quando quiser",
+    "chatPreviewTitle": "Chat do evento",
+    "chatPreviewHint": "Leia o que os outros participantes estão a dizer enquanto se prepara",
+    "endedTitle": "Evento concluído",
+    "endedWatchRecording": "Ver a gravação",
+    "endedLeaveFeedback": "Deixar feedback",
+    "moderatedBy": "Moderado por {name}",
+    "startEventError": "Erro ao iniciar o evento. Tente novamente.",
+    "emailLabel": "E-mail (facultativo)",
+    "emailHelp": "Apenas para eventual seguimento pós-evento",
+    "emailInvalid": "Introduza um endereço de e-mail válido",
+    "chatLockedMessage": "Introduza o seu nome para participar no chat do evento.",
+    "classicView": "Vista clássica",
+    "backToGarden": "Voltar ao parque",
+    "aiNoticeTitle": "Processamento por IA depois do evento",
+    "aiNotice": "No final, a gravação será processada por ferramentas de inteligência artificial para gerar transcrição, resumo e eventuais traduções e dobragens. Os resultados podem conter imprecisões; o vídeo continua a ser a fonte autoritativa.",
+    "multitrackConsentTitle": "Gravação por participante",
+    "multitrackConsentRequired": "Tem de aceitar a gravação da sua faixa de áudio para entrar",
+    "enterGardenTitle": "Entrar na praça",
+    "enterGardenHint": "Um espaço para percorrer enquanto espera: a partir dali também pode acertar o nome e o microfone e entrar no evento.",
+    "backToWaitingRoom": "Voltar à sala de espera",
+    "gardenDialogLabel": "Praça da sala de espera",
+    "gardenGateHint": "Pode entrar a partir daqui, ou levar o seu avatar até ao portão.",
+    "classicVersion": "Versão clássica",
+    "roomNotReadyButton": "A sala está a preparar-se…",
+    "roomNotReadyPiazza": "Entretanto, vai até à praça",
+    "gate": {
+      "gateOpen": "Entrada aberta",
+      "stageLive": "● EM DIRETO",
+      "gatePreparing": "A sala está a ser preparada…",
+      "stagePreparing": "Em breve",
+      "ended": "Evento terminado",
+      "startsIn": "Começa dentro de {time}",
+      "hostEarly": "Entrada antecipada (anfitrião)"
+    },
+    "roomJustOpened": "A sala está pronta — entra",
+    "enterAnyway": "Entrar mesmo assim",
+    "notHeldBadge": "Hora ultrapassada",
+    "notHeldTitle": "A hora prevista do evento já passou",
+    "notHeldDetail": "A sala não foi aberta. Consulte a página do evento para eventuais atualizações."
+  },
+  "recording": {
+    "management": "Gravação de vídeo",
+    "inProgress": "Em curso",
+    "available": "Gravação disponível",
+    "duration": "Duração",
+    "fileSize": "Tamanho",
+    "startedAt": "Iniciada",
+    "automatic": "automática",
+    "publish": "Publicar gravação",
+    "publishDesc": "Tornar o vídeo acessível na página do evento",
+    "retentionLabel": "Conservação",
+    "retention": {
+      "24h": "24 horas (temporária)",
+      "7d": "7 dias",
+      "30d": "30 dias",
+      "90d": "90 dias",
+      "forever": "Nunca (até à expiração do evento)"
+    },
+    "retentionNote": "O vídeo seguirá igualmente a retenção GDPR do evento",
+    "delete": "Eliminar gravação",
+    "deleteConfirm": "Tem a certeza? O vídeo será eliminado definitivamente.",
+    "notConfigured": "Jibri não está configurado na infraestrutura. A gravação de vídeo não está disponível.",
+    "disabledHint": "A gravação de vídeo não está ativada para este evento. Para a ativar, abra a secção Definições acima e ligue o interruptor \"Gravação\".",
+    "play": "Reproduzir",
+    "download": "Transferir",
+    "transcriptManage": "Transcrição / IA",
+    "deleteConfirmTitle": "Eliminar a gravação",
+    "deleteFailed": "A eliminação falhou",
+    "deleteSuccess": "Gravação eliminada"
+  },
+  "postEvent": {
+    "config": "Configuração pós-evento",
+    "pageVisible": "Página do evento visível após o fim",
+    "pageVisibleHelp": "Se estiver desativada (ou se a janela de visibilidade tiver expirado), a página pública do evento concluído devolve 404 e o evento desaparece das listagens e do sitemap.",
+    "libraryListed": "Publicar na biblioteca de vídeos",
+    "libraryListedHelp": "Mostra este evento na biblioteca pública (/video-library). Requer uma gravação publicada ou um vídeo do YouTube e que a página do evento esteja visível.",
+    "libraryListedNoRecording": "Nenhuma gravação publicada: o evento não aparecerá na biblioteca enquanto não publicar a gravação ou acrescentar um vídeo do YouTube.",
+    "showQA": "Mostrar perguntas Q&A",
+    "showMaterials": "Mostrar materiais partilhados",
+    "showPolls": "Mostrar resultados das sondagens",
+    "showFeedback": "Mostrar feedback",
+    "showRecap": "Mostrar o resumo do evento",
+    "showWordCloud": "Mostrar a nuvem de palavras",
+    "emailEnabled": "Enviar e-mail de resumo no fim do evento",
+    "emailEnabledHelp": "Na conclusão, envia aos participantes inscritos um e-mail de agradecimento com a ligação para o resumo e para o feedback, e ao moderador um resumo sintético. É enviado apenas uma vez.",
+    "feedbackEnabled": "Inquérito de feedback ativo no fim do evento",
+    "visibilityAlways": "Sempre visível",
+    "visibilityUntil": "Visível até:",
+    "dataRetentionNote": "Os dados pessoais dos participantes serão eliminados de acordo com a retenção do evento ({days} dias). O conteúdo do evento permanecerá disponível enquanto a página estiver visível.",
+    "availableUntil": "Este evento e os respetivos conteúdos estarão disponíveis até {date}.",
+    "tabs": {
+      "qa": "Perguntas e Respostas",
+      "materials": "Materiais",
+      "polls": "Sondagens",
+      "feedback": "Feedback",
+      "transcript": "Transcrição de IA"
+    }
+  },
+  "provisioning": {
+    "loading": "A carregar",
+    "titleFromIdle": "Sala a ser reativada",
+    "titleColdStart": "Sala em preparação",
+    "descriptionFromIdle": "A sala tinha sido colocada em pausa por inatividade para conter os consumos energéticos. Estamos a reiniciá-la: demora cerca de 2-3 minutos.",
+    "descriptionColdStart": "Estamos a preparar a sala virtual para este evento. A operação demora cerca de 2-3 minutos: será reencaminhado automaticamente assim que tudo estiver pronto.",
+    "progressLabel": "{seconds} s",
+    "retry": "Recarregar",
+    "tempError": "Estamos a tentar novamente contactar o servidor, nenhuma ação é necessária.",
+    "ended": "O evento terminou.",
+    "scaleToZeroNote": "Para reduzir o impacto ambiental, os nós de vídeo são desligados quando ninguém está em chamada. O reinício é automático na primeira entrada."
+  },
+  "rubrica": {
+    "optOut": {
+      "title": "Remoção da agenda de eventos",
+      "intro": "Está prestes a revogar o consentimento para constar na agenda de eventos. Após a confirmação, deixará de ser contactado para ser convidado para eventos semelhantes.",
+      "missingToken": "A ligação não é válida ou está incompleta. Verifique o e-mail original.",
+      "invalidToken": "A ligação está expirada ou não é válida. Contacte o responsável do evento para obter assistência.",
+      "notFound": "Nenhuma pessoa corresponde à ligação. Pode já ter sido removida.",
+      "loading": "A carregar…",
+      "previewHeader": "Está prestes a remover da agenda:",
+      "warning": "A operação não elimina o histórico das inscrições nos eventos individuais.",
+      "confirm": "Confirmar a remoção",
+      "submitting": "A remover…",
+      "successTitle": "Remoção concluída",
+      "successBody": "Os seus dados já não estão presentes na agenda de eventos.",
+      "errors": {
+        "generic": "Ocorreu um erro. Tente novamente mais tarde."
+      }
+    }
+  },
+  "deviceCheck": {
+    "preview": "Pré-visualização de vídeo",
+    "micLevel": "Nível do microfone",
+    "cameraLabel": "Câmara",
+    "micLabel": "Microfone",
+    "permissionNeeded": "Autorize o microfone e a câmara para os testar. Poderá entrar mesmo sem.",
+    "noVideo": "Sem vídeo",
+    "noAudio": "Microfone indisponível",
+    "retry": "Tentar novamente",
+    "cameraToggleOn": "Câmara LIGADA",
+    "cameraToggleOff": "Câmara DESLIGADA",
+    "micToggleOn": "Microfone LIGADO",
+    "micToggleOff": "Microfone DESLIGADO",
+    "cameraOffPreview": "Câmara desligada",
+    "speakerTest": "🔊 Testar áudio",
+    "backgroundLabel": "Fundo virtual",
+    "backgroundNoneShort": "No",
+    "backgroundHint": "Aplica-se quando entrar na sala. Para desfocar o fundo, use o botão dos fundos uma vez lá dentro: a pré-visualização acima mostra a câmara sem efeito.",
+    "background": {
+      "nessuno": "Sem fundo",
+      "ufficio-chiaro": "Escritório claro",
+      "blu-istituzionale": "Azul institucional",
+      "verde-salvia": "Verde-salva",
+      "grafite": "Grafite"
+    }
+  },
+  "garden": {
+    "enable": "Mostrar o jardim",
+    "classicView": "Vista clássica",
+    "changeAvatar": "Mudar avatar",
+    "peopleInGarden": "{count, plural, =0 {Ninguém no jardim} one {1 pessoa no jardim} other {# pessoas no jardim}}",
+    "guestName": "Convidado",
+    "hintKeyboard": "Mova-se com WASD ou as setas",
+    "pickerTitle": "Escolha o seu avatar",
+    "pickerHelp": "A personagem representa-o no jardim de espera. Pode mudá-la quando quiser.",
+    "close": "Fechar",
+    "hintBanner": "Carregue nas setas para caminhar pelo jardim",
+    "hintJoystick": "Arraste para se mover"
+  },
+  "feedbackAdmin": {
+    "title": "Resultados do feedback",
+    "totalVotes": "respostas",
+    "noFeedback": "Nenhum feedback recebido",
+    "comments": "Comentários",
+    "noComments": "Sem comentários",
+    "yes": "Sim",
+    "no": "Não"
+  },
+  "questionnaire": {
+    "loadFailed": "Não foi possível carregar o questionário.",
+    "submit": "Enviar respostas",
+    "submitFailed": "O envio falhou. Tente novamente.",
+    "answersInvalid": "Algumas respostas estão em falta ou não são válidas: verifique as perguntas obrigatórias e tente novamente.",
+    "alreadySubmitted": "Já enviou as suas respostas a este questionário.",
+    "thankYou": "Obrigado pelas suas respostas.",
+    "yes": "Sim",
+    "no": "Não"
   }
 }

@@ -13,6 +13,7 @@
 import { cookies } from 'next/headers';
 import { z } from 'zod';
 
+import { requireStaff } from '@/lib/auth/staff-session';
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { isAdminAuthenticated } from '@/lib/auth/admin-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
@@ -35,7 +36,9 @@ const createSchema = z.object({
 });
 
 export const GET = withErrorHandling(async () => {
-  if (!(await isAdminAuthenticated(await cookies()))) throw new UnauthorizedError();
+  // Leggere l'elenco serve a chiunque etichetti un evento; scriverlo resta
+  // dell'amministrazione.
+  await requireStaff(await cookies());
 
   const rows = await prisma.tag.findMany({
     orderBy: [{ sortOrder: 'asc' }, { slug: 'asc' }],

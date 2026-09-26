@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { Badge, Collapse } from 'design-react-kit';
 
 import type { InfraMapData } from '@/app/api/status/infrastructure/route';
+
 import PrometheusSparkline, { UptimeBadge, ResponseTimeBadge } from './prometheus-chart';
 
 const POLL_MS = 15_000;
@@ -15,6 +16,8 @@ const STATUS_COLORS: Record<string, string> = {
   down: '#CC334D',
   standby: 'var(--app-muted)',
   scaling: 'var(--app-primary)',
+  // Non monitorato: né bene né male, nessun colore d'allarme.
+  unknown: '#5A768A',
 };
 
 const STATUS_BG: Record<string, string> = {
@@ -23,6 +26,7 @@ const STATUS_BG: Record<string, string> = {
   down: '#fce4ec',
   standby: '#eceff1',
   scaling: '#e3f2fd',
+  unknown: '#eceff1',
 };
 
 const SERVICE_ICONS: Record<string, string> = {
@@ -212,7 +216,9 @@ export default function InfrastructureMap() {
     if (!data) return false;
     const fromSvc = data.services.find((s) => s.id === from);
     const toSvc = data.services.find((s) => s.id === to);
-    const okStatus = (s?: string) => s === 'healthy' || s === 'scaling';
+    // Un componente non monitorato non spegne i collegamenti: non se ne sa
+    // niente, non è giù.
+    const okStatus = (s?: string) => s === 'healthy' || s === 'scaling' || s === 'unknown';
     return (
       (okStatus(fromSvc?.status) || from.startsWith('endpoint')) &&
       (okStatus(toSvc?.status) || to === 'storage')
@@ -225,8 +231,9 @@ export default function InfrastructureMap() {
   //                      with a non-alarming colour, so the user sees a
   //                      line explaining why JVB/Jibri are "grey" instead
   //                      of assuming something is broken.
+  //   - unknown        → not monitored on this install: the card says why.
   const issueServices = data?.services.filter(s =>
-    s.status === 'down' || s.status === 'degraded' || s.status === 'standby',
+    s.status === 'down' || s.status === 'degraded' || s.status === 'standby' || s.status === 'unknown',
   ) ?? [];
 
   return (
@@ -388,7 +395,7 @@ export default function InfrastructureMap() {
                   {label}
                 </text>
                 <text x={p.x} y={p.y + 34} textAnchor="middle" className="infra-map__endpoint-label">
-                  {ep.host ? ep.host.replace(/\.innovazione\.gov\.it$/, '') : ep.protocol}
+                  {ep.host || ep.protocol}
                 </text>
               </g>
             );
@@ -893,6 +900,10 @@ function ServiceDetailPanel({ service, data, t, onClose }: {
               </>
             )}
           </>
+        )}
+
+        {service.metadata.probeDetail != null && (
+          <DRow label={t('probeDetail')} value={String(service.metadata.probeDetail)} />
         )}
 
         {service.id === 'jibri' && service.metadata.busyStatus != null && (

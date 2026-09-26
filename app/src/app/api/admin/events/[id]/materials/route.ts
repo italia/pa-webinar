@@ -12,10 +12,13 @@
 import { cookies } from 'next/headers';
 
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
-import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { requireEventManager } from '@/lib/auth/staff-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { prisma } from '@/lib/db';
-import { AppError, NotFoundError, UnauthorizedError, ValidationError } from '@/lib/errors';
+import { AppError, NotFoundError, ValidationError } from '@/lib/errors';
+import { materialAddedBy } from '@/lib/events/material-author';
+import { materialBlobClaimProblem, materialBlobPathProblem } from '@/lib/events/material-files';
+import { pokeLivePanel } from '@/lib/live-state/publish';
 import { createMaterialAdminSchema } from '@/lib/validation/materials';
 
 export const dynamic = 'force-dynamic';
@@ -60,10 +63,9 @@ function serializeMaterial(m: MaterialRow) {
 // ── GET /api/admin/events/[id]/materials ───────────────────
 
 export const GET = withErrorHandling(async (_request, context) => {
-  const isAdmin = await isAdminAuthenticated(await cookies());
-  if (!isAdmin) throw new UnauthorizedError();
-
   const { id } = await context.params;
+  // Dell'evento: l'admin, o l'organizzatore che l'ha creato (ADR-014).
+  await requireEventManager(await cookies(), id);
   if (!UUID_RE.test(id)) {
     throw new AppError('Event ID must be a UUID', 400, 'BAD_REQUEST');
   }
@@ -88,17 +90,16 @@ export const GET = withErrorHandling(async (_request, context) => {
 // ── POST /api/admin/events/[id]/materials ──────────────────
 
 export const POST = withErrorHandling(async (request, context) => {
-  const isAdmin = await isAdminAuthenticated(await cookies());
-  if (!isAdmin) throw new UnauthorizedError();
-
   const { id } = await context.params;
+  // Dell'evento: l'admin, o l'organizzatore che l'ha creato (ADR-014).
+  await requireEventManager(await cookies(), id);
   if (!UUID_RE.test(id)) {
     throw new AppError('Event ID must be a UUID', 400, 'BAD_REQUEST');
   }
 
   const event = await prisma.event.findUnique({
     where: { id },
-    select: { id: true, moderatorName: true },
+    select: { id: true },
   });
   if (!event) throw new NotFoundError('Event');
 
@@ -111,6 +112,21 @@ export const POST = withErrorHandling(async (request, context) => {
     );
   }
 
+  // Il file di un materiale si cancella con il materiale: lo tiene solo un
+  // FILE, la chiave deve essere quella di un documento caricato, il file che
+  // l'URL serve, e un file che nessun altro usa già (lib/events/material-files),
+  // non un blob qualunque dello storage.
+  if (parsed.data.blobPath) {
+    const problem =
+      parsed.data.type !== 'FILE'
+        ? 'Only a FILE material holds an uploaded file'
+        : (materialBlobPathProblem(parsed.data.blobPath, parsed.data.url) ??
+          (await materialBlobClaimProblem(parsed.data.blobPath)));
+    if (problem) {
+      throw new ValidationError('Validation failed', [{ path: ['blobPath'], message: problem }]);
+    }
+  }
+
   const material = await prisma.eventMaterial.create({
     data: {
       eventId: id,
@@ -118,7 +134,9 @@ export const POST = withErrorHandling(async (request, context) => {
       title: parsed.data.title,
       url: parsed.data.url,
       description: parsed.data.description ?? null,
-      addedBy: event.moderatorName ?? 'Admin',
+      // Chi lo aggiunge da qui e' lo staff, non chi conduce: nessun nome, e
+      // ogni superficie mostra la dicitura tradotta (lib/events/material-author).
+      addedBy: materialAddedBy(null),
       fileName: parsed.data.fileName ?? null,
       fileSize: parsed.data.fileSize != null ? BigInt(parsed.data.fileSize) : null,
       mimeType: parsed.data.mimeType ?? null,
@@ -133,6 +151,9 @@ export const POST = withErrorHandling(async (request, context) => {
     target: material.id,
     details: { eventId: id, type: material.type },
   });
+
+  // Se la sala è aperta, il pannello «Materiali» rilegge subito.
+  pokeLivePanel(id, 'materials');
 
   return Response.json(serializeMaterial(material), { status: 201 });
 });

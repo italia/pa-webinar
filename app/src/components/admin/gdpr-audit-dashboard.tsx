@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useTranslations, useFormatter } from 'next-intl';
 import { Badge, Card, CardBody, Label } from 'design-react-kit';
 
-import { Link } from '@/i18n/navigation';
+import { Link, percorso } from '@/i18n/navigation';
 import { SkeletonLines } from '@/components/ui/skeleton';
 
 interface AuditRow {
@@ -149,7 +149,7 @@ export default function GdprAuditDashboard() {
                         </Badge>
                       </td>
                       <td>
-                        <Link href={`/admin/events/${r.eventId}`} className="text-decoration-none">
+                        <Link href={percorso(`/admin/events/${r.eventId}`)} className="text-decoration-none">
                           {r.eventTitle}
                         </Link>
                       </td>

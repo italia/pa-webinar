@@ -86,7 +86,7 @@ spec:
       {{- end }}
       containers:
         - name: reload
-          image: {{ .Values.configReloadHook.image | default .Values.jvbScaler.image | default "bitnami/kubectl:latest" }}
+          image: {{ .Values.configReloadHook.image | default .Values.jvbScaler.image | default .Values.kubectlImage }}
           imagePullPolicy: IfNotPresent
           command: ["/bin/sh", "-c"]
           args:

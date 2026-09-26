@@ -22,8 +22,9 @@
 
 import { useEffect, useRef, useState, type RefObject } from 'react';
 import { useTranslations } from 'next-intl';
-import { Icon } from 'design-react-kit';
 
+import { Icon } from '@/components/ui/icon';
+import { GlyphIcon } from '@/components/ui/glyph-icon';
 import type { VideoPlayerHandle } from '@/components/events/video-player';
 
 interface Props {
@@ -178,7 +179,7 @@ export default function VideoMiniPlayer({
           flexShrink: 0,
         }}
       >
-        <Icon icon={isPlaying ? 'it-pause' : 'it-play'} size="sm" color="white" />
+        <GlyphIcon glyph={isPlaying ? 'pause' : 'play'} size="sm" color="white" />
       </button>
       <button
         type="button"

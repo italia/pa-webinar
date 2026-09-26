@@ -73,18 +73,20 @@ spec:
                 - name: RESOURCE_GROUP
                   value: "REPLACE_WITH_RESOURCE_GROUP"
                 - name: TENANT_NAME
-                  value: "videocall-prod"
+                  value: "REPLACE_WITH_TENANT_NAME"
                 - name: BLOB_ACCOUNT
                   value: "REPLACE_WITH_STORAGE_ACCOUNT"
                 - name: BLOB_CONTAINER
                   value: "service-inventory"
                 - name: BLOB_NAME
-                  value: "videocall-prod/service-inventory.json"
+                  value: "$(TENANT_NAME)/service-inventory.json"
                 - name: DEV_HALF_URL
                   # Where to fetch the DEV half (components[] + declarations[])
                   # produced by the release pipeline. Typically a GitHub raw URL
-                  # or a separate Blob path maintained per app version.
-                  value: "https://raw.githubusercontent.com/italia/pa-webinar/main/app/public/tenants/videocall-test/service-inventory.json"
+                  # or a separate Blob path maintained per app version. Start
+                  # from docs/examples/service-inventory.example.json with the
+                  # placeholders filled in for your installation.
+                  value: "REPLACE_WITH_DEV_HALF_URL"
               command:
                 - /bin/bash
                 - -euo

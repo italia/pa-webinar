@@ -14,7 +14,8 @@
  *     speaker) or a registration accessToken for THIS event → allowed in any
  *     status, so moderators keep post-event access to the archive;
  *   • no token → only while the room is genuinely open to guests, i.e. the same
- *     LIVE / INSTANT-warm-up window that lets a guest POST, AND only when the
+ *     LIVE / INSTANT-warm-up window that lets a guest POST (closed on scheduled
+ *     events when the administration turns guest access off), AND only when the
  *     event is not password-protected. The password check is the one place the
  *     read side is deliberately STRICTER than the write side: posting injects a
  *     message, reading exfiltrates everyone else's, so "I have the URL" cannot
@@ -29,20 +30,15 @@ import { resolveTokenSender } from '@/lib/chat/sender';
 import { prisma } from '@/lib/db';
 import { AppError, ForbiddenError } from '@/lib/errors';
 import { eventParamWhere } from '@/lib/events/event-param';
+import { guestWindowOpen } from '@/lib/events/guest-window';
 import { hasJoinGrant } from '@/lib/events/join-grant';
+import { getSettings } from '@/lib/settings';
 
 /** Status window in which an anonymous reader may follow the chat. Mirrors the
- *  guest POST branch exactly — if you may write here, you may read here. */
-export function guestChatWindowOpen(event: {
-  status: string;
-  eventType: string;
-}): boolean {
-  return (
-    event.status === 'LIVE' ||
-    (event.eventType === 'INSTANT' &&
-      (event.status === 'PROVISIONING' || event.status === 'IDLE'))
-  );
-}
+ *  guest POST branch exactly — if you may write here, you may read here.
+ *  La condizione vive in `events/guest-window`: la stessa finestra vale per
+ *  Q&A e sondaggi, e due copie divergono. */
+export const guestChatWindowOpen = guestWindowOpen;
 
 /**
  * Resolve read access or throw. Returns the event id so callers don't repeat
@@ -88,7 +84,7 @@ export async function authorizeChatRead(
     throw new ForbiddenError('Invalid token for this event');
   }
 
-  if (!guestChatWindowOpen(event)) {
+  if (!guestChatWindowOpen(event, (await getSettings()).guestAccessEnabled)) {
     throw new ForbiddenError('Chat requires a participant or moderator token');
   }
 

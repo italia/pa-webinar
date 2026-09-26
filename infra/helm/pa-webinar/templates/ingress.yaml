@@ -1,14 +1,41 @@
 {{- if .Values.ingress.enabled }}
+{{- /*
+  Le annotazioni `nginx.ingress.kubernetes.io/*` si tolgono solo quando la
+  classe e' quella di un controller che non e' ingress-nginx
+  (`ingress.nonNginxClassNames`), dove verrebbero ignorate. Con qualunque
+  altra classe, o senza classe, restano: una classe di ingress-nginx con un
+  nome personalizzato non si riconosce dal nome, e togliere `proxy-body-size`
+  riporterebbe il limite delle richieste a 1 MB senza avviso.
+*/}}
+{{- $classe := toString (.Values.ingress.className | default "") }}
+{{- $altroController := has $classe (.Values.ingress.nonNginxClassNames | default list) }}
+{{- $annotations := dict }}
+{{- range $chiave, $valore := (.Values.ingress.annotations | default dict) }}
+{{- /* Una chiave a null senza valore predefinito arriva fin qui: vuol dire "toglila". */}}
+{{- if not (or (kindIs "invalid" $valore) (and $altroController (hasPrefix "nginx.ingress.kubernetes.io/" $chiave))) }}
+{{- $_ := set $annotations $chiave $valore }}
+{{- end }}
+{{- end }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ include "pa-webinar.fullname" . }}
   labels:
     {{- include "pa-webinar.labels" . | nindent 4 }}
-  {{- with .Values.ingress.annotations }}
+  {{- with $annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
+{{- /*
+  Con site.portalHost il nome viene da lì: gli host scritti devono coincidere
+  (lo controlla pa-webinar.validateSite), quelli di esempio si sostituiscono,
+  e una voce tls senza host prende il nome del portale.
+*/}}
+{{- $portale := include "pa-webinar.sitePortalHost" . }}
+{{- $regole := .Values.ingress.hosts | default list }}
+{{- if and $portale (not $regole) }}
+{{- $regole = list (dict "host" $portale "paths" (list (dict "path" "/" "pathType" "Prefix"))) }}
+{{- end }}
 spec:
   {{- if .Values.ingress.className }}
   ingressClassName: {{ .Values.ingress.className }}
@@ -17,18 +44,24 @@ spec:
   tls:
     {{- range .Values.ingress.tls }}
     - hosts:
+        {{- if $portale }}
+        - {{ $portale | quote }}
+        {{- else }}
         {{- range .hosts }}
         - {{ . | quote }}
         {{- end }}
-      secretName: {{ .secretName }}
+        {{- end }}
+      {{- with .secretName }}
+      secretName: {{ . }}
+      {{- end }}
     {{- end }}
   {{- end }}
   rules:
-    {{- range .Values.ingress.hosts }}
-    - host: {{ .host | quote }}
+    {{- range $regole }}
+    - host: {{ $portale | default .host | quote }}
       http:
         paths:
-          {{- range .paths }}
+          {{- range (.paths | default (list (dict "path" "/" "pathType" "Prefix"))) }}
           - path: {{ .path }}
             pathType: {{ .pathType }}
             backend:

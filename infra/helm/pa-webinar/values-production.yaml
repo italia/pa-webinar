@@ -1,15 +1,25 @@
 # ─────────────────────────────────────────────────────────────
-# pa-webinar — Production values for developers-italia-prod cluster
+# pa-webinar — Example production overrides
 #
-# This is DTD's own production config. It builds on examples/values-full.yaml
-# with DTD-specific domains, resources, and Azure Key Vault integration.
+# Builds on examples/values-full.yaml with per-instance domains, resources and
+# an externally managed Secret. Domains below use example.com placeholders: the
+# real values of a running instance (domains, cluster, node pool labels, Secret
+# names) live in the configuration repository of whoever operates it, not here.
 #
 # Usage:
 #   helm upgrade --install videocall ./infra/helm/pa-webinar \
 #     -f values.yaml \
 #     -f values-production.yaml \
 #     -n videocall \
-#     --set jitsi-meet.prosody.auth.jwt.appSecret=$JITSI_JWT_SECRET
+#     --set jitsi-meet.prosody.jwt.secret=$JITSI_JWT_SECRET \
+#     -f <file with the pinned internal Jitsi passwords>
+#
+# The conference verifies the portal's tokens with the same value as
+# JITSI_JWT_SECRET in the application Secret. The internal XMPP passwords
+# (jitsi-meet.jicofo.xmpp.password, jitsi-meet.jvb.xmpp.password,
+# jitsi-meet.jibri.xmpp.password, jitsi-meet.jibri.recorder.password) are
+# generated once and passed on every upgrade: the chart refuses to render
+# without them (jitsi.requirePinnedCredentials below).
 # ─────────────────────────────────────────────────────────────
 
 app:
@@ -33,8 +43,8 @@ app:
     agentpool: applications
 
   env:
-    NEXT_PUBLIC_JITSI_DOMAIN: "jitsi.eventi.developers.italia.it"
-    NEXT_PUBLIC_APP_URL: "https://eventi.developers.italia.it"
+    NEXT_PUBLIC_JITSI_DOMAIN: "jitsi.videocall.example.com"
+    NEXT_PUBLIC_APP_URL: "https://videocall.example.com"
     NEXT_PUBLIC_DEFAULT_LOCALE: "it"
     # rnnoise ACCESO in produzione. Qui gira l'immagine jitsi/web patchata a
     # 48 kHz, dove la soppressione avanzata del rumore funziona; su dev/test
@@ -44,7 +54,7 @@ app:
     # prod, in silenzio, al primo deploy.
     NEXT_PUBLIC_JITSI_RNNOISE_ENFORCE: "false"
     DEFAULT_DATA_RETENTION_DAYS: "90"
-    DEFAULT_PRIVACY_POLICY_URL: "https://eventi.developers.italia.it/it/privacy"
+    DEFAULT_PRIVACY_POLICY_URL: "https://videocall.example.com/it/privacy"
 
 # ── Secrets ──────────────────────────────────────────────────
 
@@ -59,7 +69,7 @@ ingress:
   className: nginx
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
-    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+    nginx.ingress.kubernetes.io/proxy-body-size: "30m"  # vedi values.yaml
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
     # Rate limiting: 10 req/s per IP, burst up to 50 (5x multiplier)
@@ -70,14 +80,14 @@ ingress:
     nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
   hosts:
-    - host: eventi.developers.italia.it
+    - host: videocall.example.com
       paths:
         - path: /
           pathType: Prefix
   tls:
     - secretName: videocall-tls
       hosts:
-        - eventi.developers.italia.it
+        - videocall.example.com
 
 # ── Autoscaling ──────────────────────────────────────────────
 
@@ -96,7 +106,7 @@ podDisruptionBudget:
 postgresql:
   enabled: false
   external:
-    host: "pa-webinar-db.postgres.database.azure.com"
+    host: "<db-server>.postgres.database.azure.com"
     port: 5432
     database: "pa_webinar"
     existingSecret: "videocall-secrets"
@@ -124,21 +134,20 @@ recorder:
 jitsi:
   enabled: true
   mode: full
+  requirePinnedCredentials: true
 
 jitsi-meet:
-  publicURL: "https://jitsi.eventi.developers.italia.it"
+  publicURL: "https://jitsi.videocall.example.com"
   enableAuth: true
   enableGuests: false
 
-  prosody:
-    auth:
-      type: jwt
-      jwt:
-        appId: "pa_webinar"
-        appSecret: ""
-        acceptedIssuers: "pa-webinar"
-        acceptedAudiences: "jitsi"
+  # L'immagine web patchata qui sotto è privata: serve la credenziale di
+  # prelievo, che deve già esistere nel namespace.
+  imagePullSecrets:
+    - name: ghcr-secret
 
+  prosody:
+    # The JWT secret is passed at install time (see the header).
     extraEnvs:
       # Il bot recorder entra come `recorder@hidden.meet.jitsi` invece che col
       # JWT del portale: e' cosi' che jitsi-meet lo nasconde NATIVAMENTE (ogni
@@ -182,6 +191,9 @@ jitsi-meet:
 
   jvb:
     replicaCount: 0
+    # STUN stays on the default (a third-party server, jitsi.net). To drop
+    # it set `publicIPs` (one bridge behind a fixed IP) and `stunServers: ""`,
+    # or point `stunServers` to your own server (see values.yaml).
     nodeSelector:
       workload: jitsi-jvb
     tolerations:
@@ -221,30 +233,46 @@ jitsi-meet:
         memory: 4Gi
 
   web:
+    # Questo profilo accende la soppressione rumore avanzata
+    # (`NEXT_PUBLIC_JITSI_RNNOISE_ENFORCE: "false"` nell'env dell'app, sopra), e
+    # quella funziona SOLO con l'immagine patchata a 48 kHz: sull'immagine stock
+    # ammutolisce i microfoni, e il danno si scopre a evento iniziato. Le due
+    # impostazioni si cambiano insieme, sempre nella stessa direzione.
+    # `pullPolicy: Always` perché il tag viene riscritto sul posto quando la
+    # patch cambia: un nodo che serve una copia vecchia ammutolirebbe in
+    # silenzio, mentre un prelievo fallito è un guasto visibile e reversibile.
+    # Il tag porta una revisione che sale a ogni modifica della patch: è
+    # `IMAGE_TAG` in .github/workflows/jitsi-web.yml, e va riallineato qui
+    # quando quella cambia, altrimenti si torna indietro di una revisione senza
+    # accorgersene.
+    image:
+      repository: ghcr.io/italia/pa-webinar-jitsi-web
+      tag: stable-10741-rnnoise-r3
+      pullPolicy: Always
     ingress:
       enabled: true
+      ingressClassName: nginx
       annotations:
-        kubernetes.io/ingress.class: nginx
         cert-manager.io/cluster-issuer: letsencrypt-prod
         nginx.ingress.kubernetes.io/server-snippet: |
           location = / { return 403; }
           location = /index.html { return 403; }
       hosts:
-        - host: jitsi.eventi.developers.italia.it
-          paths:
-            - path: /
-              pathType: Prefix
+        # Lista di stringhe: il sottochart fissato le rende direttamente in
+        # `path:` e aggiunge da sé `pathType: Prefix`. Vedi values.yaml.
+        - host: jitsi.videocall.example.com
+          paths: ["/"]
       tls:
         - secretName: jitsi-tls
           hosts:
-            - jitsi.eventi.developers.italia.it
+            - jitsi.videocall.example.com
 
 # ── JVB auto-scaler ─────────────────────────────────────────
 
 jvbScaler:
   enabled: true
   schedule: "*/2 * * * *"
-  image: bitnami/kubectl:1.29
+  # Image: the chart's pinned kubectlImage.
   jvbDeploymentName: ""  # Auto-detect by label
 
 # ── CronJobs ─────────────────────────────────────────────────

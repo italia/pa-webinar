@@ -1,0 +1,25 @@
+# Copia in terraform.tfvars (escluso dal repository) e sostituisci i segnaposto.
+# Le altre variabili, con i loro valori predefiniti, sono in variables.tf.
+
+subscription_id = "00000000-0000-0000-0000-000000000000"
+location        = "italynorth"
+name_prefix     = "pa-webinar"
+
+# Origine del portale: lo storage accetta da qui i caricamenti diretti dal
+# browser (video dall'area di amministrazione, materiali dalla sala).
+cors_allowed_origins = ["https://webinar.example.com"]
+
+# Chi amministra il cluster (object ID Entra di utenti o gruppi). Vuoto =
+# l'identità che esegue OpenTofu.
+# cluster_admin_object_ids = ["00000000-0000-0000-0000-000000000000"]
+
+# Reti da cui si raggiunge l'API server. Vuoto = nessuna restrizione di rete.
+# api_server_authorized_ip_ranges = ["198.51.100.0/24"]
+
+# Topologia dei bridge: load_balancer (un bridge dietro un indirizzo fisso)
+# oppure node_public_ip (un indirizzo pubblico per nodo, più bridge).
+# jvb_exposure = "load_balancer"
+
+# Pool facoltativi.
+# jibri_pool = { enabled = true }
+# gpu_pool   = { enabled = true, max_count = 2 }

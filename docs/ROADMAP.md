@@ -1,227 +1,120 @@
-# Roadmap — pa-webinar
+# Roadmap
 
-Allineata al 2026-07-25, **verificata contro il codice** (non contro gli stati dichiarati). In produzione: **v0.8.9**.
+This page lists **only what is missing**. For what PA Webinar already does, see the [README](../README.md) and the [feature tour](FEATURES.md). For what was released and when, see the [changelog](../CHANGELOG.md) or the public `/changelog` page of any installation.
 
-Le versioni spedite sono riassunte in forma compatta; le voci pianificate sono ri-organizzate in bucket realistici rispetto a ciò che il codice fa davvero oggi.
+## How this roadmap works
 
-> Nota di metodo: la revisione del 22 luglio ha trovato questo documento sbagliato **in entrambe le direzioni** — voci spedite ancora marcate "in corso" e sottosistemi marcati ✅ con un buco strutturale dentro. Le seconde sono le pericolose: chi legge decide di non guardarci. Dove un ✅ ha un limite noto, adesso il limite è scritto accanto.
+- **No version numbers.** A version number is a promise with an implied date, and when the date slips the document starts to lie. Planned items, those under [Installation and operations](#installation-and-operations), [Next](#next) and [Later](#later), carry the month they were opened instead, as *open since \<Month YYYY\>*. A delay stays visible instead of being quietly absorbed. Items under [Further out](#further-out) and [Conditional](#conditional) are not planned and carry no date.
+- **Shipped items leave at release time.** The same change that writes the release notes removes the items it ships. From then on, the changelog records that they shipped, and the README and the feature tour describe what they do.
+- **Slipped items move, and never disappear.** An item that is not done changes position. It leaves this page only when it ships.
+- **Known limitations are collected here.** Each owner page lists its own known limitations. The [table below](#known-limitations-of-shipped-features) collects those worth knowing before you rely on a feature, and links the page that owns each one.
 
-## v0.1.0 — MVP ✅
+How roadmap decisions are made is described in [Governance](../GOVERNANCE.md). The documentation rules are part of the method in [How we develop PA Webinar](development/methodology.md).
 
-Core platform:
+## Installation and operations
 
-- Layout PA con design system .italia (Bootstrap Italia, design-react-kit)
-- Admin panel con autenticazione API key
-- CRUD eventi (con modifica e notifica cambio data)
-- Registrazione partecipanti GDPR-compliant (PII cifrate AES-256-GCM)
-- Sala live con Jitsi Meet (IFrame API, JWT auth)
-- Ruoli Jitsi enforced server-side (plugin Prosody custom)
-- Controlli AV per evento (mic/video/screen share per ruolo) + AV Moderation live
-- Q&A con upvote, moderazione, persistenza post-evento
-- Sala d'attesa con countdown, pre-join screen, accesso guest
-- Email conferma/reminder, integrazione calendario (Google, Outlook, Yahoo, iCal)
-- GDPR cleanup cron, metriche Prometheus
-- Helm chart production-grade, Docker non-root/read-only, CI/CD GitHub Actions, publiccode.yml
+This is the work in progress, and it is the area furthest behind what the project claims to be. One server is now an installation path that another administration can follow on its own: `infra/onprem/k3s/pa-webinar-up.sh` installs k3s and the chart with one command, with object storage and TURN as options, and `scripts/verify-install.sh`, `scripts/backup.sh` and `scripts/restore.sh` check, back up and restore it; it has been tested in lab, not yet at a real event. No path yet takes another administration on its own from an empty managed cluster to a working event. Until one does, "reusable software" remains a statement of intent for larger installations. [Reusing PA Webinar](REUSE.md) shows what is proven today. [Installing PA Webinar](install/README.md) and [Deploying with Helm](DEPLOYMENT.md) cover what can be installed.
 
-## v0.2.0 — Feedback DTD ✅
+All items in this section are **open since July 2026**.
 
-- Profilazione partecipanti in registrazione (ente, ruolo, tipologia — configurabili per evento, export CSV, statistiche aggregate)
-- Reminder configurabili (modello `EventReminder`, N offsets, email differenziate)
-- Consolidamento ruoli Moderatore / Auditore (UI e permessi distinti)
-- GDPR improvements: privacy policy per evento (URL o rich text), retention UI chiara, audit log cancellazioni, consensi granulari (partecipazione / registrazione video / comunicazioni), export dati Art.15
-- Reaction Jitsi native riabilitate
-- Polling/sondaggi (modelli `Poll`/`PollVote`, risultati real-time, export CSV)
-- Gestione materiali sessione (link in v0.2; file in v0.5+)
-- Audit licenze dipendenze (`license-report`, compatibilità EUPL-1.2, step CI)
-- Miglioramento grafica iframe Jitsi (branding config, watermark)
-
-## v0.3.0 — Platform ✅ (tag v0.3.7)
-
-- Site settings (PA reuse, zero hardcoding: branding, colori, favicon, SEO, footer, home mode, privacy/accessibilità)
-- Dashboard analytics
-- Pannello admin infrastruttura
-- 3 modalità deploy Helm (simple / standard / full)
-- JVB scale-to-zero con CronJob (nodepool dedicato, autoscaler min=0)
-- Jibri pipeline multi-cloud (Azure Blob / S3 / GCS / MinIO / local)
-- Watermark Jitsi configurabile
-- 210+ test unitari Vitest
-- Error handling centralizzato, migrations formali, caching, rate limiting
-- OpenSSF Scorecard, Dependabot, SBOM dipendenze (`sbomLatest`)
-
-### v0.3.x — Incrementi post-v0.3.7 ✅
-
-Rilasciati tra v0.3.8 e v0.3.44, a seguito del feedback post-demo 2026-04-16.
-
-- **Hotfix 2026-04-16**
-  - Lista mani alzate ordinata FIFO + mappatura `jitsi-participant-id → registration.displayName`
-  - Moderatori multipli con mute-all (permessi JWT/Prosody legati al ruolo, non alla sessione)
-  - Magic-link moderatore: display name non pre-popolato in pre-join
-- **Breadcrumb admin + public** (componente `AdminBreadcrumb` su ogni pagina)
-- **Password opzionale per call** (gating su join page, utile per instant call privata)
-- **Multi-moderator magic links** (modello `EventModerator` — token individuale, nome, email, revoca granulare)
-- **Chat in-app real-time** — v0.3.43 (Postgres + Redis pub/sub + SSE; sostituisce chat XMPP Jitsi; late-join, archivio, audit, rate-limit server-side; subchart Bitnami `redis` standalone)
-- **Storage provider agnostico** — v0.3.44 (interfaccia `StorageProvider` + adapter `azure` e `s3`; copre AWS S3, MinIO path-style, Cloudflare R2, GCS HMAC, Wasabi, PSN on-prem)
-- **Autoscaling orizzontale app multi-nodo** — HPA `autoscaling/v2` (min 2 / max 6 pod, target 70% CPU). Fan-out Redis pub/sub della chat SSE rende l'app pronta a girare su più pod/nodi senza sticky session. Lato video: cluster autoscaler AKS su nodepool JVB dedicato (ADR-007)
-
-## v0.4.0 — Engagement & Lifecycle ✅ (corrente)
-
-- Feedback post-evento
-- Word cloud live
-- Presentation timer
-- Reaction counter
-- Video player con speed controls
-- Diagramma configurazione evento (topology SVG)
-- Sala d'attesa ridisegnata (3 scenari: early / countdown / started)
-- Catch-up ritardatari
-- Recording lifecycle (temporanea → pubblicata, retention differenziata)
-- Admin recording management (preview, pubblica, elimina)
-- Post-event page con tabs (recording, Q&A archive, poll results, feedback, materiali)
-- Post-event config per admin (cosa esporre e quando)
-- GDPR cleanup 3 fasi (immediate PII / retention content / hard delete)
-- **Two-phase JVB autoscaling** (Redis snapshot per status page; skip LIVE→IDLE quando replicas > 1 per evitare race su `/colibri/stats` multi-pod)
-- **Libreria video pubblica** `/video-library` — filtri per data/argomento/tipo, import YouTube per legacy, nuove registrazioni Jibri pubblicate automaticamente
-- **Trasparenza `/service-inventory`** — CycloneDX 1.6 per-tenant (DEV: npm+OCI; OPS: servizi Azure/AKS/Postgres/Blob/GHCR/Mailgun/coturn/…); `components[]` + `services[]` + `declarations[]` + `compositions[]` + `vulnerabilities[]` (VEX-ready) + `formulation[]` + `annotations[]`; stack diagram "Architettura in breve" data-driven da property `pa-webinar:layer`/`stack-label`; artefatto per-tenant servito via `SERVICE_INVENTORY_URL` (file locale su test, Blob pubblico su prod). Reference implementation per OPS half: CronJob AKS + Azure Resource Graph + Workload Identity → upload Blob (`infra/service-inventory/azure/`)
-- Footer build-date con HH:MM UTC
-- **5-step event wizard** ✅ — creazione/edit evento in 5 step (Base, Permessi, Inviti, Contenuti, Revisione) con stato condiviso `WizardForm`; sostituisce il form monolitico precedente (`app/src/components/admin/event-wizard/`)
-- **Title-kicker (pipe split)** ✅ — `SiteSetting.parseTitleKicker` + override per-evento `Event.parseTitleKicker`; rendering editoriale di titoli tipo `Serie | Episodio` con kicker + titolo principale
-- **Tag taxonomy** ✅ — modelli `Tag` + `EventTagLink`, CRUD admin in `/admin/settings/tags`, filtri pubblici `/eventi?tag=<slug>`, tag chips su lista/detail/admin
-- **Rubrica (Person)** ✅ — modello `Person` (emailHash, opt-in esplicito separato, retention inactivity-based), RubricaPicker multi-select nel wizard (step Inviti), pagina admin `/admin/rubrica`, opt-out via signed HMAC token in `src/lib/persons/opt-out-token.ts` (vedi ADR-011)
-- **Auto-start recording** ✅ — flag `autoStartRecording` per-evento (+ template), Jibri viene avviato automaticamente all'ingresso del primo moderatore
-- **Waiting-room unificata** ✅ — front-door unica per guest / partecipante / moderatore (`app/src/components/live/waiting-room.tsx`): email opzionale, name gate, device check (cam/mic toggle + chime test altoparlante), chat preview, netiquette, countdown, catch-up recording
-- **Guest Q&A** ✅ — `Question.registrationId` nullable; i guest (senza Registration) possono porre domande durante eventi open-attendance
-- **Meet-style live controls** ✅ — floating bar sopra il video (desktop), bottom tab strip (<992px mobile), drawer per Q&A/Chat/Polls/Materials/Participants (`app/src/components/live/live-event-client.tsx`)
-- **RaisedHandsPanel read-only** ✅ — coda mani alzate ordinata FIFO visibile a tutti; i moderatori mantengono i controlli approve-mic/video
-- **Screenshare banner** ✅ — banner arancione quando un partecipante remoto inizia a condividere lo schermo
-- **CallSession always-on** ✅ — ogni evento live produce una `CallSession` anche senza recording, aperta al primo `videoConferenceJoined` via `POST /api/events/:slug/sessions` e chiusa dallo scaler su `LIVE→IDLE` / `*→ENDED`
-
-## v0.5.0 – v0.7.x — Spedite ✅
-
-Rilasciate in produzione tra v0.5 e v0.7.1. Voci che le versioni precedenti di questa roadmap elencavano ancora come "pianificate/in corso" ma che sono **live**:
-
-- **Servizio AI post-evento** ✅ — pipeline in-cluster (vincolo sovranità, nessuna API esterna): trascrizione WhisperX + speaker attribution (pyannote 3.1), sintesi "verbale PA" (vLLM Qwen3-32B), traduzione EN/FR di transcript + sintesi, **sottotitoli WebVTT multilingua nel player**, dubbing (Piper). Coda Postgres-outbox + orchestrator CronJob + GPU nodepool A100 scale-to-zero. Vedi [`docs/POSTPROD.md`](POSTPROD.md)
-- **Editor trascrizione post-evento** ✅ — correzione testo + riassegnazione speaker per segmento, **timeline + waveform** (`WAVEFORM_JSON`), export WebVTT/SRT/TXT. (Resta: rigenerazione automatica di traduzioni/dub dopo un edit → v0.9)
-- **Recorder multi-traccia (ADR-013)** ✅ — cattura audio per-partecipante per speaker attribution reale; **metrica di affidabilità** dell'elaborazione AI nel pannello admin (v0.6.9)
-- **Roster relatori editabile + player solo-audio** ✅ (v0.7.0) — rinomina degli speaker riconosciuti; se manca il video, player solo-audio per correggere testo/speaker
-- **Ruolo Relatore (SPEAKER)** ✅ — `EventModeratorRole.SPEAKER`: mic/camera/share senza poteri di moderazione, cablato nel JWT Jitsi
-- **Questionari pre/post evento** ✅ e **Rubrica/Person** ✅ — vedi v0.4 (fase A/B completate)
-- **Upload materiali (FILE) + immagine cover evento** ✅ — upload diretto via `StorageProvider` (non più solo link/URL esterni)
-- **Statistiche post-evento** ✅ (v0.7.1) — tab "Statistiche" per evento: andamento interazione nel tempo (picco), classifica di chi ha parlato di più, grado di attenzione, **alzate di mano**, **reazioni**, **permanenza media** (dwell/retention). Route admin + `lib/analytics` puro
-- **Dashboard Grafana** ✅ — template `infra/grafana/pa-webinar-dashboard.json` deployabile via Helm, su metriche prom-client
-- **Trasparenza service-inventory su prod** ✅ — pubblicata via ConfigMap + `SERVICE_INVENTORY_URL` relativo (l'automazione Azure CronJob → Blob pubblico resta opzionale)
-- **Changelog pubblico** ✅ — `/changelog` allineato alle release, evidenzia la "Versione attuale"
-
-## Da fare prima del rilascio pubblico
-
-| Item | Stato |
+| Item | Where things stand |
 |---|---|
-| Smoke test su AKS reale | ✅ fatto (prod live con eventi reali) |
-| Evento pilota interno DTD | ✅ fatto (Caffettino + eventi v0.6/v0.7) |
-| Ritocco testi e layout | ✅ in gran parte (passaggi UX v0.6.x) |
-| Test E2E Playwright (batteria flussi critici) | 🟡 parziale (1 file / 7 test, `continue-on-error`) → **v0.8** |
-| Screenshot per README | ✅ fatto — schermate reali dell'istanza in produzione in `docs/screenshots/`, referenziate da README, README.en e `publiccode.yml` |
+| **An installation exercised from scratch** | The chart renders on every profile and the manifests it produces are valid. The simple profile has been installed from scratch in lab, on minikube and on k3s with one and with three VMs, through to a working event ([What has been exercised](install/README.md#what-has-been-exercised-and-what-is-only-validated)); on one server the one-command installer repeats that install, with locally built images, and checks it with a call between two browsers. What is missing is a from-scratch walk of the standard and full profiles on a managed cluster, a first real event on one server, and a recurring test that keeps every path working. A one-off install does not stay valid: certificate issuance, reachability of the bridge, email delivery and everything else that depends on the environment need to be checked again as the chart changes. |
+| **Chart defects found by the lab installs** | The lab installs found chart defects. The chart fixes or guards against most of them, and [Chart issues found by the lab installs](INFRASTRUCTURE.md#chart-issues-found-by-the-lab-installs) lists them with their workarounds. Two still have the widest effect:<br/>- **Composite recording is not wired.** The standard and full profiles, and `infra/helm/pa-webinar/values-production.yaml`, turn Jibri on, but the chart does not mount the finalize script it renders (the ConfigMap `<fullname>-jibri-finalize`). Unless the operator mounts it by hand, as [Setting up recording](operations/recording-setup.md#mount-the-finalize-script) explains, composite recordings are neither uploaded nor registered.<br/>- **Conference credentials are not stable by default.** On every render, the Jitsi subchart regenerates any internal conference credential that is not pinned (XMPP passwords, the TURN secret), so an upgrade restarts Prosody, Jicofo and the bridge and drops live conferences. The post-install notes list the unpinned ones, and `jitsi.requirePinnedCredentials` makes the chart refuse to render until they are pinned. `infra/helm/pa-webinar/values-production.yaml` turns that guard on; the chart defaults and the example profiles list the keys to pin but leave the guard off. |
+| **Images that can be pulled, verified and pinned to a version** | None of the published images accepts an anonymous pull, so someone who clones the repository cannot download any of them. The recorder bot, the recorder controller and the AI post-production worker have no release version. They are published only with development tags, the floating `:dev` and an immutable `:dev-<sha>`, and the chart defaults to `:dev`, which every change to the development branch overwrites. Whoever installs a given chart version with its defaults gets whatever was last built for these three components, and rolling back to an earlier release does not bring them back. The published images are neither scanned nor signed: the security scan in CI runs on a local, unpublished build of the app image. They are built for a single architecture (`linux/amd64`). The in-cluster PostgreSQL and Redis images are pinned by digest, because their public catalog keeps only a `latest` tag, and no procedure yet says how to move those pins forward. |
+| **Portability across providers** | The object-storage layer is written for several providers ([Object storage](configuration/storage.md)), and video uploads from the administration area choose their protocol per provider: Azure block upload, or a signed S3 upload in one request or in parts. The S3 path has been exercised by hand against S3-compatible servers, but no automated test runs against a real storage service: the unit tests replace the provider SDKs with mocks, so the compatibility matrix is stated, not verified. Storage access also needs static keys: workload identities and managed identities are not used. Below the application, `infra/tofu` has reference modules for AKS, GKE and EKS, but only the AKS topology has run events: the GKE and EKS modules, their GPU pools included, have been validated only without a cloud account. The project needs to state what is actually portable and fix the places where it is not. |
+| **Ingress beyond ingress-nginx** | The chart expresses several settings only as ingress-nginx annotations. For the portal it drops them when the Ingress class is listed in `ingress.nonNginxClassNames` and renders them for any other class, and the redirect of the conference domain's root is an ingress-nginx annotation in any case. On any other controller, these are lost:<br/>- the header buffers sized for Next.js, without which administration pages answer 502;<br/>- HSTS;<br/>- the maximum upload size;<br/>- the redirect of the conference domain's root.<br/>The timeout for long-lived connections, which the room's live channels depend on, and the rate limit are not in the chart defaults at all. They appear only in example profiles: the rate limit in `infra/helm/pa-webinar/values-production.yaml` and `infra/helm/pa-webinar/examples/values-full.yaml`, the timeout in `infra/helm/pa-webinar/values-production.yaml` alone. Whoever copies them loses them on another controller in the same way, and whoever does not copy them goes without. Inherited annotations are also hard to remove: Helm merges maps, so an empty `annotations: {}` in an override clears nothing, and each key has to be set to `null`. With a controller that speaks only Gateway API, the chart produces nothing usable, because it has no routing resources. Two changes would fix this: making configurable what is now written as annotations, and adding Gateway API routes alongside the `Ingress` resources. |
+| **Backup and restore of the object store** | The database, the installation's keys and an object store on a volume of the cluster are covered: `scripts/backup.sh --include-storage` copies the Garage add-on of one server together with an encrypted dump and the state folder, and `scripts/restore.sh --include-storage` puts both back with the writers stopped ([Backup and restore](install/k3s.md#backup-and-restore)). What is missing is the rest. A provider's bucket (Azure Blob, S3, Google Cloud Storage) is backed up with that provider's tools, with no procedure here that takes it at the same moment as the database. The Garage copy stops the store for its whole duration, uploads and playback included, and it was measured only on a small store, so how long a real one stays down is unknown. The order still matters: after restoring a database copy that is older than the object store, recording reconciliation deletes the recordings it no longer finds referenced once its grace period expires, and for a store it did not restore the script can only pause that sweep, not reconcile the two. |
+| **Noticing when something breaks** | `scripts/verify-install.sh --quiet`, run from cron, reports scheduled jobs that stopped succeeding, the email outbox, the database disk and certificates close to expiry, and prints nothing while all is well. The Prometheus alert rules still cover only the application, the database, the bridges and TURN, so an installation that relies on them does not see the scheduled jobs, the email outbox, retention or disk space, which are the things that break silently. The cleanup of expired data also reports success even when it fails for every event. It handles errors event by event and returns a positive result regardless, so a fault that blocks it everywhere still produces a green job. This needs alerts on that perimeter, and scheduled routes that fail when they fail. See [Monitoring and health](operations/monitoring.md) and [Scheduled and background jobs](architecture/background-jobs.md). |
+| **Being able to go back** | After an installation or an upgrade, `scripts/verify-install.sh --call` checks that two participants can join a room and hear and see each other, but nothing runs it automatically, in CI or on a schedule, against a real installation. Rollback is described in [Upgrades and rollback](operations/upgrades.md), but it cannot be complete yet. Migrations are additive by policy, so a rollback leaves the newer schema in place under the older release; the way back to the older schema is the backup taken before the upgrade. The three components without a release version are not rolled back by a change of release tag (see the image item above). |
 
-Flussi critici Playwright ancora da coprire: login admin + creazione + pubblicazione evento, ingresso sala (moderatore + partecipante), Q&A (invio/upvote/moderazione), polling, cambio lingua senza reload, GDPR cleanup, download `.ics`, responsive mobile, chat in-app real-time multi-pod.
+## Next
 
-## Limiti noti dietro un ✅
-
-Voci spedite e funzionanti, ognuna con un confine che vale la pena conoscere prima di appoggiarcisi. Sono state trovate verificando il codice il 22 luglio, non segnalate da utenti.
-
-| Sottosistema | Il limite |
+| Item | Where things stand |
 |---|---|
-| **Allegati in chat (F16)** | Capability-URL: la protezione è l'UUID non indovinabile + cancellazione del blob alla moderazione/retention, non un controllo d'accesso. Un ACL vero — che rilegga lo stato vivo dell'evento a ogni richiesta — richiede un **cookie con ambito sulla rotta** (un `<img>` non manda header). Due tentativi con un token nell'URL sono falliti: la credenziale durevole trapelava nella condivisione schermo, la capability firmata ignorava la chiusura dell'evento per tutta la durata. È la strada da fare, ma è una feature |
-| **Recorder multitraccia (ADR-013)** | Nessuna riconnessione dopo `CONFERENCE_FAILED`: una caduta a metà evento chiude la registrazione con quello che ha già catturato. L'errore finisce nei log del Job, non nel pannello admin |
-| **Scale-to-zero JVB (ADR-007)** | `/colibri/stats` è aggregato per pod: due eventi LIVE sullo stesso bridge tengono acceso il nodepool anche se uno si è svuotato |
-| **i18n a 24 lingue (ADR-008)** | Il fallback delle chiavi mancanti ricade sull'**italiano**, non sull'inglese |
-| **Piazza della sala d'attesa** | Le emote sono locali: chi le usa vede la propria animazione, gli altri no |
-| **Copertura dei test** | 1284 casi in 75 file, di cui **7 su handler API** (JWT Jitsi, chat, cleanup GDPR, presign upload, asset, garden ping, SBOM changelog). Le due falle già trovate (impersonazione in chat, `/chat` senza auth) stavano entrambe in un handler: la copertura è partita da lì, ma le restanti route non hanno test |
+| **Erasure on request erases everything**<br/>*open since July 2026* | The route that carries out the right to erasure (Art. 17) deletes the person's registrations and relies on cascades, but the cascades do not reach everywhere:<br/>- chat messages have no key to the registration, so the sender's name and the text remain;<br/>- questionnaire responses lose the link but keep the respondent's name and email hash;<br/>- invitations and per-participant audio tracks also remain;<br/>- the email outbox rows addressed to them remain, and they never expire (see the next item).<br/>The person who exercises the right receives a confirmation while part of their data survives: some of it until the event's retention expires, and the outbox rows indefinitely. See [Privacy and data protection](GDPR.md). |
+| **The email outbox is never emptied**<br/>*open since July 2026* | Outbox rows (`EmailOutbox`) keep the recipient and the body, including personal access links, encrypted, and the calendar attachment, with the event contact's name, unencrypted. They end as sent or failed, and nothing ever deletes them: there is no expiry and no retention. Because they are not tied to an event, they also escape the guard test that checks the cleanup is exhaustive, which works per event. |
+| **The audit log keeps IP addresses forever**<br/>*open since September 2026* | The audit log of privileged actions (`AdminAuditLog`) stores the IP address and user agent of every write made by staff or through a moderator link. No job deletes its rows and no screen shows them, so the addresses accumulate for as long as the installation runs. It needs a retention period and a purge. See [Audit trails](GDPR.md#audit-trails). |
+| **Guest chat identifiers carry the IP address**<br/>*open since September 2026* | The sender identifier of a guest's chat message is a truncated base64 encoding of the client IP address and the typed name. It is stored in plain text with the message until the event's retention ends, and it decodes back to the whole of an IPv4 address or the start of an IPv6 one. That is more than a display hint needs. A keyed hash would keep messages grouped by sender without keeping the address, at the cost of changing guests' identifiers once. See [Known limitations](GDPR.md#known-limitations). |
+| **Participant tracks without the post-production pipeline**<br/>*open since July 2026* | The raw per-participant audio is deleted once the multitrack transcription has completed. An installation that records but does not run AI post-production never reaches that step, and what happens next is not governed by the event's retention. In a chart installation, recording reconciliation treats the track objects as orphans and deletes them after its grace period (`orphanRecordingGraceDays`, default in `app/prisma/schema.prisma`), unless an administrator keeps them. The track rows (`RecordingTrack`), with their encrypted display names, stay, because the GDPR cleanup deletes only rows whose audio was purged. Under Docker Compose, where reconciliation does not run, the audio stays indefinitely. Recording without post-production is the most likely configuration for an administration that reuses the platform. See [Recordings, voice data and AI outputs](privacy/recordings-and-ai.md). |
+| **Transcripts above the replication threshold**<br/>*open since July 2026* | The pipeline copies its text into the database only when it is below a size threshold; above it, the text lives only in the object store. The public transcript panel and the editor read only the database copy and do not fall back to the object store. For an event of realistic length, the panel therefore opens empty and the editor does not find the text. It hits long recordings, which are exactly the ones that make up the record of a real meeting. |
+| **Accessibility: a measurement, not a statement**<br/>*open since July 2026* | The accessibility statement page (`/accessibility`) exists and follows the required model. But it defers the actual conformance status to an evaluation that has not been carried out. The project has no automated accessibility checker, and the browser tests contain no accessibility assertion. The product is subject to legal accessibility obligations (Legge Stanca, the Italian accessibility law). For such a product, "designed to conform" without a measurement is the one claim that cannot be defended. |
+| **Granular consent to automated processing**<br/>*open since July 2026* | The `Registration` model has three fields for each participant's consent to transcription, summary and translation: `aiConsentTranscript`, `aiConsentSummary` and `aiConsentTranslation`. Nothing writes them and nothing reads them. What actually governs the pipeline is the event configuration. Either consent becomes per person, as the schema promises, or the fields go. As things stand, the data model declares a guarantee the product does not give. |
+| **Playwright E2E suite**<br/>*open since March 2026* | The browser tests cover the way into the waiting room up to the join button: after registration, with a personal or moderator link, on re-entry through the event cookie, and through the guest name form on a `LIVE` event. They also guard the color of the institutional top band. None of them enters the conference, and the administration area is exercised only through the API. Q&A, polls, language switching, erasure on request, the `.ics` download and chat across several replicas are not covered. The E2E job is non-blocking, like CodeQL static analysis and Scorecard, so today none of the three protects against a regression. See [Testing](development/testing.md). |
 
-## Copertura dei test — stato reale
+## Later
 
-Misurata, non stimata (`npm run test:coverage --workspace=app`): **5,5% per riga** sull'intero `src/**`. Il numero è basso perché il denominatore è tutto: 153 route API e ~49.000 righe di componenti senza un test, contro una `lib/` coperta bene.
-
-Le soglie in `app/vitest.config.ts` sono un **cricchetto sul pavimento misurato** — impediscono che scenda, non dichiarano che vada bene. In CI girano con `--coverage`, quindi da ora una regressione di copertura fa fallire la build.
-
-Si sale dai punti in cui vivono le guardie, non dai più facili. I primi quattro
-sono stati coperti (conio del JWT Jitsi, autorizzazione della chat, cleanup GDPR,
-presign dell'upload); i prossimi sono le route di registrazione, il webhook di
-registrazione video e le rotte admin.
-
-## v0.8.0 — In corso / prossima
-
-| Feature | Note |
+| Item | Where things stand |
 |---|---|
-| **Upload completi + hardening** ✅ (v0.7.2) | Upload immagini ovunque (logo/favicon/OG/watermark/organizzatore), materiali salvati come `FILE` con `blobPath` (sblocca il cleanup dei blob), hardening sicurezza (nosniff + `Content-Disposition` sul serving, sniff magic-byte, rate-limit, pre-check `Content-Length`), fix `DELETE` recording/session sul dominio storage corretto |
-| **Allegati in chat (F16)** ✅ (v0.7.2) — ma il serving è una *capability-URL*, non un ACL: chi conosce il link vede l'allegato | Upload allegati (immagini/documenti) in chat live: gating a soli utenti autenticati (no guest anonimi), allowlist MIME stretta + size + rate-limit dedicati, rotta di moderazione (`hiddenAt` + `op:'delete'` già previsti nell'envelope), serving con accesso controllato, cleanup blob in retention |
-| **Chat: @menziona + rispondi/quote** ✅ (v0.7.2, esteso in v0.8.5) — l'autocomplete pesca da chi ha già scritto, non dalla roster | `@nome` con autocomplete + rendering evidenziato; `replyToId` con citazione dello snippet del messaggio padre |
-| **SSE/WebSocket per Q&A** | Sostituire il polling SWR 3s riusando l'infra SSE già provata per la chat (scala a 300+) |
-| **Eventi ricorrenti — quick win** 🟡 quasi chiuso | ✅ `duplicate` copia tutta la config + i reminder; ✅ `PUT /api/events/[param]` persiste `recurrenceRule`; ✅ affordance admin "Duplica come prossima occorrenza". ❌ **resta**: `EventTemplate` non porta ancora `multitrackRecordingEnabled`, `retainParticipantTracks`, `aiTargetLocales`, `aiDubbingEnabled`, `wordCloudEnabled`; e `duplicate` copia gli scalari ma **non le relazioni** (tag, organizzatori, co-moderatori, agenda, questionari) |
-| **Batteria E2E Playwright** | Oggi è **1 file, 7 test** (`app/e2e/live-flow.spec.ts`) con `continue-on-error` per i rate-limit di Docker Hub sul runner condiviso: non protegge da regressioni. Scoperti: Q&A, sondaggi, cambio lingua, cleanup GDPR, download `.ics`, chat SSE multi-pod, e il click reale su "Entra ora" (oggi l'ingresso è coperto solo via API) |
-| **SSE per Q&A** | vedi riga sopra: oggi `useSWR(refreshInterval: 3000)` in `qa/question-list.tsx`, stesso polling in `polls/poll-panel.tsx` e `live/agenda-panel.tsx` |
+| **Access control on chat attachments**<br/>*open since July 2026* | Today an attachment is protected by an address that cannot be guessed (see [known limitations](#known-limitations-of-shipped-features)). The route that serves it evaluates no authorization. Real access control needs a cookie scoped to that route and re-read on every request, so that an added password or a closed event takes effect at once. A token in the URL is not enough. It would be either the reader's durable credential, which leaks during screen sharing, or a self-contained capability that ignores the event's live state. See [Security architecture](architecture/security.md). |
+| **Distributed rate limiting**<br/>*open since July 2026* | The rate-limit counter lives in the memory of a single process, while the chart runs more than one application replica by default. Every limit is effectively multiplied by the number of replicas. The fix is a shared counter on Redis, plus a decision on what to do when Redis does not answer. Redis is already on the realtime path, so this choice brings in the high-availability item under [Conditional](#conditional). |
+| **Client addresses behind proxies and over IPv6**<br/>*open since September 2026* | Per-IP limits key on one `X-Forwarded-For` entry chosen by counting hops (`TRUSTED_PROXY_HOPS`), not by matching a list of trusted proxy addresses. A request that skips the front proxy and reaches an ingress that appends to the header can therefore choose its own entry, so the chain must not be skippable ([Configuration reference](CONFIGURATION.md#client-address-and-rate-limits)). Keys are also whole addresses: a client that controls an IPv6 `/64` can rotate through it and escape every per-IP limit. Grouping IPv6 keys by prefix changes the audit log and the guest chat identifiers too, so it needs a key function of its own. |
+| **Machine text and revised text, distinguished everywhere**<br/>*open since July 2026* | For transcripts, the machine version is kept and the editor shows the two side by side. The summary and translation editor does not keep it: the first correction rewrites the artifact, and the original is gone. The distinction also stops at the administration area. Readers of the transcript on the public site see corrected text without knowing that a person changed it, or which lines. |
+| **Event report export**<br/>*open since March 2026* | This would put statistics, Q&A, polls and participants in a single downloadable document. The data is already aggregated on the server, where it feeds the public post-event page and the recap email, but it never ends up in a file. There are several partial exports in CSV, text and subtitle formats, and none of them is the report. The project has no PDF library yet. |
+| **Full-text search in transcripts**<br/>*open since April 2026* | Today the video library searches only titles and descriptions, and search inside a transcript runs in the browser over what has already been downloaded. Adding an index is not enough. The text lives in the object store, and the copy in the database is encrypted, so a plaintext index would be a new surface of personal data. A design decision has to come first. |
+| **Moderator markers and chapters**<br/>*open since April 2026* | Automatically generated chapters exist. What is missing are chapters set by whoever runs the event, during the event. Personal bookmarks already exist, but they live in the browser of the person who sets them. Moderator markers are something else: shared and persisted. |
+| **Documented public API**<br/>*open since March 2026* | The OpenAPI document is served publicly at `/api/openapi.json`, readable cross-origin, and the operations it declares are accurate. But it covers only a minority of the routes, with whole route families missing, and its version is simply the application's version. A documentation interface can be published only after better coverage and a versioning policy: an API declared public is a commitment to stability. See [API surface](architecture/api.md). |
 
-## v0.9.0 — Pianificata
+## Recurring events and series
 
-| Feature | Note |
+There are two typical cases, with different needs:
+
+- a **fixed-cadence series**: a stable weekday, with the date confirmed each time;
+- a **moving-date series**: periodic, but often rescheduled by a few days.
+
+Today an occurrence is created by duplicating the previous one, and a recurrence rule only proposes its date (see [From creation to recap](architecture/event-journey.md#duplication-and-series)). The series does not exist as an entity: nothing owns the canonical configuration and no scheduler consumes the rule.
+
+The guiding idea is that the **series owns the configuration** (capture flags, retention, languages, permissions) and each occurrence inherits it, with the option to depart from it case by case. That way, flags are not lost through oversight. The cadence remains a *suggestion*, not a rigid schedule. The next occurrence is created as a draft (`DRAFT`) with a proposed date, which the organizer confirms, moves or skips.
+
+Recording and AI post-production stay per occurrence. The series adds configuration inheritance and an aggregated view. It does not change the capture model.
+
+## Known limitations of shipped features
+
+These features have shipped. Each one has an edge worth knowing about before you rely on it.
+
+| Area | The limitation |
 |---|---|
-| **ACL allegati chat (via cookie)** | Oggi gli allegati sono capability-URL (vedi "Limiti noti"). Il gate vero: la pagina live imposta un cookie httpOnly con ambito su `/api/assets/chat/<eventId>/`, rinnovato; la rotta lo rilegge e ri-autorizza con `authorizeChatRead` a OGNI richiesta, così una password aggiunta o un evento chiuso hanno effetto subito. Niente token nell'URL |
-| **Export report PDF** | Statistiche evento + Q&A + poll + partecipanti in un documento scaricabile (naturale seguito della tab Statistiche) |
-| **Rate-limiting distribuito (Redis)** | Il limiter è in-memory per-pod; con HPA multi-replica serve un contatore globale |
-| **Ricerca full-text trascrizioni** | `tsvector` PostgreSQL per la libreria video (oggi solo ricerca client dentro una singola trascrizione) |
-| **Tagging e capitoli video (live)** | Marker del moderatore durante l'evento → capitoli nel player (i capitoli AI esistono già; mancano quelli autoriali live) |
-| **API pubblica documentata** | Lo spec OpenAPI 3.1 è già servito da `/api/openapi.json`; restano docs UI (Swagger/Redoc), garanzie di stabilità e storia auth |
-| **Rigenerazione AI dopo edit trascrizione** | Rigenerare automaticamente traduzioni/dub quando un segmento viene corretto |
+| **Chat attachments** | Protection comes from an address that cannot be guessed and from deleting the file on moderation or when retention expires. It is not access control evaluated on every request, so whoever has the link can see the attachment, even after the event has closed. |
+| **Multitrack recording** | If the conference drops mid-event, capture closes with what it has collected and does not reconnect. The truncated recording is then processed like any other. The administration area shows a partial recording **with no sign** that it was interrupted. See [Recording](architecture/recording.md). |
+| **Keeping per-participant tracks** | An event set to keep its per-participant tracks (`retainParticipantTracks`) loses them anyway in a chart installation. Recording reconciliation does not recognize the track objects or their `tracks.json` manifest, so it deletes them as orphans after its grace period unless an administrator marks them **Keep** on the **Orphans** tab. See [Recording](architecture/recording.md#known-limitations). |
+| **Transcript reliability index** | It is computed from the scores produced by speech recognition, read from the current artifact. After a manual revision, those scores are still attached to a text that a person has rewritten, so the percentage no longer describes what is on screen. |
+| **Idle detection** | Part of the activity signal is platform-wide: bridge statistics are not broken down by room, and a participant on any bridge counts as activity for every `LIVE` event. While one event has people in it, other live events whose rooms are empty do not reach `IDLE` and keep counting toward the desired number of bridges. See [Scaling the media plane](architecture/scaling.md#known-limitations). |
+| **Interface in 24 languages** | If a translation key is missing, the text falls back to **Italian**, not English. See [Languages and localization](architecture/i18n.md). |
+| **Waiting-room square** | Presence is rate-limited per IP address and per app pod, so in an office behind one NAT address only a few people at a time stay visible in the square. Presence is also unauthenticated: the names in the square can be read by anyone who knows the event's address. See [The waiting room and the square](architecture/waiting-room.md#known-limitations). |
+| **Invitations** | The wizard's **Invitations** list says each invitee gets a personal join link, but nothing sends one: no route generates the personal link or queues an invitation email. When public registration is turned off in the site settings, the list serves as the set of addresses allowed to register, and the organizer has to tell the invitees by other means. In that mode the pre-registration questionnaire is not shown, and guests can still join a live event unless guest access is also turned off. See [From creation to recap](architecture/event-journey.md#invitation-only-registration). |
+| **Material visibility** | Visibility decides which lists show a material, not who can open it. An uploaded file stays downloadable from its `/api/assets/…` URL by anyone who has the URL, in every phase. The waiting room lists no materials. See [From creation to recap](architecture/event-journey.md#materials-and-agenda). |
+| **Event wizard** | Materials added in the wizard are rejected: it sends their type in lowercase (`link`, `file`), and the materials API accepts only `LINK` and `FILE`. The failure is reported after saving. Materials can be added on the event's **Materials** page. See [From creation to recap](architecture/event-journey.md#known-limitations). |
+| **Event tags** | Tags are set when the event is created and cannot be changed from the administration area afterward. The edit form loads them already checked and lets you click them, but saving silently discards them and still reports success. They are the only field the form sends that the update route does not write. The route that replaces an event's tags (`/api/admin/events/[id]/tags`) exists and works, but no screen calls it. |
+| **Organization data at registration** | The three switches (`requireOrganization`, `requireOrganizationRole`, `requireOrganizationType`) show the fields in the form but do not make them mandatory. Only the check in the browser requires the organization: a request sent directly to the registration route is accepted without it. Role and type are not required anywhere, not even in the form. Turning them on adds a field, not a guaranteed value. |
+| **Event questionnaires** | Once responses have been collected, editing is protected and the save is refused. Emptying is not protected. Removing both the question templates and the ad-hoc questions in the event edit form deletes the questionnaire and every response received. There is no confirmation, and that form never shows how many responses have been collected: the count and the confirmation exist only on the dedicated questionnaires page. The questions step also has no check before submission. A question left incomplete makes the server reject the whole questionnaire, including the question templates selected alongside it. |
+| **Content always in Italian** | The default language and the active languages can be changed from the administration area. But an event's title and description, and a question's text, are accepted only if the Italian version exists. The translation tabs show only the active languages. If Italian is not among them, the tab to write it in does not appear, and the event cannot be created. |
+| **Per-event privacy notice document** | The document can be replaced, but not removed. Clearing the field is the same as leaving it untouched: the save omits the empty value, and the validation schema would reject a null or an empty string anyway. The last address given remains the one the event serves, and it keeps taking precedence over the installation's default privacy notice even when it is no longer the right one. The privacy notice text, by contrast, can be cleared normally. |
+| **Email in five languages** | The interface is in 24 languages, but emails come in Italian, English, French, German and Spanish (`EMAIL_LOCALES` in `app/src/lib/email/lingua.ts`). People who use another language receive English, with links to the page in their own language. The texts that can be customized from the administration area cover the same five languages. See [Email and calendar](architecture/email.md). |
+| **Test coverage** | Coverage is concentrated on library logic. Few routes have their own tests, and among the components only the waiting room has a rendering test. The thresholds in `app/vitest.config.ts` are a ratchet on the measured value: they stop coverage from falling, but they do not claim it is good enough. |
 
-## Eventi ricorrenti / serie — nuova (Caffettino, DevIt)
+## Further out
 
-Due call ricorrenti reali, cadenze diverse: **Caffettino** (ogni venerdì mattina — cadenza fissa ma **data da confermare**) e **DevIt sync** (periodica ma **spesso rimandata di qualche giorno**). Oggi ogni occorrenza si crea a mano (duplica → rimetti la data → **ri-attiva i flag di cattura**): flusso fragile perché la duplicazione **perde silenziosamente** proprio i flag che per queste call devono restare accesi (multitraccia, trascrizione AI, agenda, retention, lingue, speaker attesi).
-
-**Stato attuale del codice** (per chi implementa):
-- **WIRED**: picker RRULE nel wizard (`recurrence-picker.tsx` + `lib/utils/recurrence.ts` + libreria `rrule`); `recurrenceRule` persistito alla creazione; anteprima "prossime 5 date" (solo display).
-- **DORMANT**: `recurrenceRule` dopo il salvataggio (nessuno lo consuma); `recurrenceSeriesId` + relazione `EventRecurrenceSeries` (mai scritti/letti); endpoint `POST /api/admin/events/[id]/duplicate` (nessun caller UI).
-- **ABSENT**: qualsiasi job di materializzazione delle occorrenze da RRULE; "crea da template" server-side; raggruppamento per serie di registrazioni/trascrizioni/libreria; reminder consapevoli della ricorrenza; qualsiasi affordance "programma prossima".
-- **Bug latenti da chiudere comunque**: `PUT /api/events/[param]` **scarta** `recurrenceRule` (round-trip: modifichi la ricorrenza nel wizard, al salvataggio sparisce); `duplicate` scarta `aiTranscript/Summary/Translation/Dubbing`, `multitrackRecordingEnabled`, `retainParticipantTracks`, `aiTargetLocales`, `expectedSpeakers`, `agendaEnabled`, `wordCloudEnabled`, `autoStartRecording`, `recurrenceRule` **e i reminder**; `EventTemplate` non porta `multitrackRecordingEnabled` / `retainParticipantTracks` / `aiTargetLocales` / `aiDubbingEnabled` / `wordCloudEnabled`.
-
-**Idea portante** — una **Serie** possiede la configurazione canonica (flag di cattura/AI, retention, lingue, speaker attesi, permessi, descrizione, immagine) e **ogni occorrenza la eredita**: così i flag non possono più essere persi per dimenticanza. La cadenza è un *suggerimento*, non una schedulazione rigida: **occorrenze provvisorie** (bozza con data proiettata) che l'operatore **conferma / sposta / salta** — esattamente ciò che serve quando "le date non sono sempre confermate". Riprogrammare = spostare la data della singola occorrenza senza toccare la serie.
-
-**Fasi:**
-
-- **Quick win (v0.8 — bassa spesa, alto valore)** — togliere i footgun senza ancora introdurre la Serie:
-  - `duplicate` copia **tutta** la config (inclusi i flag AI/multitraccia/agenda/wordcloud/ricorrenza) + crea i reminder di default → un clone è fedele all'originale.
-  - `PUT /api/events/[param]` persiste `recurrenceRule` (fix del round-trip).
-  - `EventTemplate` porta anche i flag mancanti (multitraccia, retain-tracks, lingue, dubbing, wordcloud).
-  - Affordance admin **"Duplica come prossima occorrenza"** (avanza la data, eredita la config) — attiva l'endpoint `duplicate` oggi dormiente. Copre già gran parte del bisogno DevIt (data mobile) e Caffettino con un click.
-- **v0.9 — Serie vera e propria**:
-  - Entità `EventSeries` (attiva `recurrenceSeriesId` + relazione): la serie è la source-of-truth della config; le occorrenze ereditano con override puntuale possibile.
-  - **"Programma prossima occorrenza"**: materializza la prossima occorrenza in **bozza** con data proiettata dalla RRULE; l'operatore conferma (→ PUBLISHED) / sposta (DevIt rimandata) / salta.
-  - Reminder consapevoli della serie (per-occorrenza, non una tantum sul parent).
-- **v0.9 / v1.0 — Post-prod & libreria per serie**:
-  - Rollup: registrazioni/trascrizioni/recap di tutte le occorrenze di una serie in un'unica vista admin + una card "serie" in libreria (oggi ogni evento è una card isolata; `Recording` non ha chiave cross-evento).
-  - **Auto-materializzazione** a cadenza fissa (Caffettino, venerdì) via CronJob che crea la prossima occorrenza provvisoria N giorni prima — sempre **confermabile prima di andare pubblica**, così una settimana saltata non pubblica nulla per sbaglio.
-
-Registrazione e post-prod restano **per-occorrenza** (ogni call è la sua `Recording` + pipeline AI): corretto e già funzionante. La serie aggiunge *ereditarietà della config* (i flag giusti sempre accesi) e *aggregazione della vista*, non cambia il modello di cattura.
-
-## v1.0.0 — Visione
-
-| Feature | Note |
+| Item | Note |
 |---|---|
-| **Sottotitoli live** | Real-time (Jigasi + Whisper streaming). Oggi i sottotitoli sono solo post-evento (WebVTT) per scelta |
-| **Multi-tenancy** | Più enti su un unico portale con branding separato (oggi: white-label singola istanza via `SiteSetting` + deploy separati per tenant) |
-| **Questionario AI-assisted** | Pre-compilazione del questionario post-evento dai temi della trascrizione (prerequisiti — AI + questionari — già presenti) |
-| **Runbook operativo on-call** | Guida consolidata di troubleshooting produzione (oggi frammenti in DEPLOYMENT/POSTPROD) |
+| **Live subtitles** | Subtitles are post-event only today, by choice. Live subtitles need a streaming speech-recognition engine running next to the conference. |
+| **Several public bodies on one installation** | Today an instance belongs to a single public body and can be customized in depth. The configuration is a single row (`SiteSetting`), and no data is partitioned by body. Hosting several separate bodies needs data isolation and per-body branding. |
+| **Assisted post-event questionnaire** | This would pre-fill the questions from the themes that come up in the transcript. Both pieces, questionnaires and transcripts, already exist; what is missing is the link between them. |
+| **Consolidated operations guide** | Troubleshooting is split by audience: [running installations](operations/troubleshooting.md), the [local stack](DEVELOPMENT.md) and the [AI pipeline](POSTPROD.md). What is missing is a guide to the failure modes of a first installation, walked end to end. It depends on the exercised installation described [above](#installation-and-operations). |
 
-## Backlog / condizionale
+## Conditional
 
-Voci reali ma non pianificate a breve (grandi, di nicchia, o attivate solo da un trigger):
+These items are real but not planned. They are large, niche, or triggered only by a specific need.
 
-- **SPID/CIE** — autenticazione partecipanti con identità digitale italiana
-- **Microsoft Graph API** — Outlook RSVP → auto-registrazione, sync calendario Teams
-- **Breakout rooms** — sottogruppi (Jitsi nativo oggi *disabilitato*, non esposto)
-- **Offuscamento video** — blur volti/voci pre-pubblicazione (GDPR-by-design)
-- **HLS live streaming** — audience passiva illimitata senza caricare JVB (Jibri → RTMP → HLS → Blob → player)
-- **App mobile** — React Native + Jitsi SDK (oggi: web responsive)
-- **Registrazione multi-camera** — speaker + slide separati (il multi-traccia attuale è audio per attribution)
-- **Marketplace template eventi** — catalogo condivisibile cross-PA (oggi: template interni riusabili)
-- **HA Redis / migrazione Valkey** — solo se Redis entra in un path critico (rate-limit distribuito, cache sessione)
+- **SPID/CIE**: sign-in for participants with the Italian public digital identity systems.
+- **Calendar invitations with a reply**: add-to-calendar links cover Google, Outlook and Yahoo, and the event downloads as `.ics`, but the calendar invitation attached to the confirmation and reminder emails does not ask for a reply. What is missing is a reply that becomes a registration, and synchronization with organizational calendars.
+- **Breakout rooms**: Jitsi's native breakout rooms are hidden in the interface, not disabled on the server. Exposing them is a product decision rather than new development, but it has to settle what chat, Q&A and controls do when participants are in different sub-rooms.
+- **Blurring faces and voices** before a recording is published.
+- **View-only live stream** for an unlimited audience, without loading the bridges.
+- **Mobile app**: the web interface is responsive and works on a phone today.
+- **Multi-camera recording**: speaker and slides as separate recordings. The current multitrack recording is audio only, and exists to attribute speech.
+- **Event-template catalog shared across public bodies**: event templates are internal to one installation today, and this item depends on the multi-body item above.
+- **High availability for the Redis tier**: Redis is already on the realtime path (chat, live controls, bridge state). When Redis is unavailable, that path degrades without blocking mutations: a publish on a connection that is not ready gives up at once, and a wait for a response has a deadline. Some commands can still wait without limit, including the write of the bridge-state snapshot. High availability becomes a requirement once distributed rate limiting also relies on Redis.
 
-## Contribuire
+## Contributing
 
-Vedi [CONTRIBUTING.md](../CONTRIBUTING.md) per come proporre nuove funzionalità o segnalare bug.
+To propose a feature, report a problem or pick up an item from this page, see [CONTRIBUTING.md](../CONTRIBUTING.md). Changes that alter the architecture are recorded as [Architecture Decision Records](adr/README.md).

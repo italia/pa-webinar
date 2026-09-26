@@ -1,11 +1,13 @@
 # =============================================================================
 # Selenium 4 distributed Grid (hub + node-chrome) for jitsi-meet-torture
-# Namespace: pa-webinar   |   app.kubernetes.io/component=load-test
+# The `namespace:` below is an EXAMPLE value: set it to the namespace of your
+# own deploy (`<namespace>` in README.md). Everything carries
+# app.kubernetes.io/component=load-test so one selector cleans it all up.
 # 6 node replicas x SE_NODE_MAX_SESSIONS=5 = 30 concurrent browser sessions.
-# CHANGE vs proposal: removed the fragile prepare-fake-video initContainer and
-# the jitsi-resources volume (Malleus default = synthetic --use-fake-device-for-
-# media-stream; no y4m needed, and the GitHub fetch could hard-block the grid).
-# Cleanup: kubectl -n pa-webinar delete deploy,svc -l app.kubernetes.io/component=load-test
+# On purpose there is NO prepare-fake-video initContainer and no jitsi-resources
+# volume: Malleus defaults to the synthetic --use-fake-device-for-media-stream
+# (no y4m needed) and fetching the sample from GitHub could hard-block the grid.
+# Cleanup: kubectl -n <namespace> delete deploy,svc -l app.kubernetes.io/component=load-test
 # =============================================================================
 apiVersion: apps/v1
 kind: Deployment

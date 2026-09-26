@@ -2,14 +2,26 @@
 # Modalità completa — multi-pool, scale-to-zero, monitoraggio
 # ============================================================================
 #
-# Per DTD e grandi PA con cluster Kubernetes dedicati.
-# Funziona su AKS, GKE, EKS, o qualsiasi cluster con node pool dedicati.
+# Per grandi PA con cluster Kubernetes dedicati.
+# Pensato per un cluster con node pool dedicati (AKS, GKE, EKS o k3s): le
+# etichette dei pool vanno adattate al provider, vedi i nodeSelector qui sotto.
 #
 # Deploy:
 #   kubectl create namespace videocall
 #   kubectl create secret generic videocall-secrets -n videocall --from-literal=...
+#   # Il segreto con cui la conferenza verifica i token: la sola chiave
+#   # JWT_APP_SECRET, con lo stesso valore di JITSI_JWT_SECRET qui sopra.
+#   kubectl create secret generic videocall-jitsi-jwt -n videocall \
+#     --from-literal=JWT_APP_SECRET=<stesso valore di JITSI_JWT_SECRET>
 #   helm upgrade --install videocall ./infra/helm/pa-webinar \
-#     -f examples/values-full.yaml -n videocall
+#     -f infra/helm/pa-webinar/examples/values-full.yaml -n videocall \
+#     -f <file con i tuoi domini e le password XMPP qui sotto>
+#
+# Password XMPP interne da generare UNA volta (openssl rand -hex 16) e
+# ripassare identiche a ogni aggiornamento: jitsi-meet.jicofo.xmpp.password,
+# jitsi-meet.jvb.xmpp.password, jitsi-meet.jibri.xmpp.password,
+# jitsi-meet.jibri.recorder.password. Se cambiano, ogni aggiornamento
+# riavvia la conferenza e fa cadere le chiamate in corso.
 #
 # Cosa include:
 #   - 2+ repliche dell'app con HPA (2-8)
@@ -38,13 +50,17 @@ app:
       cpu: "2"
       memory: 1Gi
 
-  # Deploy on general-purpose pool — customize label per cloud provider:
+  # Pool general-purpose. Vuoto = qualunque nodo senza taint, cioè fuori dai
+  # pool dedicati di bridge e GPU, che hanno un taint. Per fissare il pool si
+  # usa l'etichetta del provider (sono diverse fra loro):
   #   AKS:  { agentpool: applications }
   #   GKE:  { cloud.google.com/gke-nodepool: applications }
-  #   EKS:  { eks.amazonaws.com/nodegroup: applications }
-  #   k3s:  {}
-  nodeSelector:
-    agentpool: applications
+  #   EKS:  { eks.amazonaws.com/nodegroup: applications }  (solo managed node group)
+  #   k3s / on-premise: un'etichetta messa a mano, per esempio
+  #         kubectl label node <nodo> workload=applications
+  # CronJob, scaler e controller della registrazione ereditano questo valore:
+  # un'etichetta che nessun nodo porta li lascia tutti in Pending.
+  nodeSelector: {}
 
 autoscaling:
   enabled: true
@@ -60,8 +76,10 @@ podDisruptionBudget:
 secrets:
   mode: "existing"
   existingSecretName: "videocall-secrets"
-  # Uncomment for External Secrets Operator:
+  # Uncomment for External Secrets Operator (il Secret videocall-jitsi-jwt lo
+  # produce allora il chart, dalla stessa voce remota di JITSI_JWT_SECRET):
   # mode: "external"
+  # jitsiJwtSecretName: "videocall-jitsi-jwt"
   # external:
   #   provider: "azure-key-vault"
   #   azureKeyVault:
@@ -79,10 +97,30 @@ postgresql:
 jitsi:
   enabled: true
   mode: full
+  # Con `true` la resa si ferma se le password XMPP interne qui sotto non sono
+  # fissate; senza, le note dopo l'installazione le elencano. Accendilo nel
+  # tuo file di valori insieme alle password.
+  requirePinnedCredentials: false
 
 jitsi-meet:
+  prosody:
+    jwt:
+      # Secret creato insieme a videocall-secrets (vedi sopra), con la sola
+      # chiave JWT_APP_SECRET = stesso valore di JITSI_JWT_SECRET.
+      existingSecretName: "videocall-jitsi-jwt"
+  jicofo:
+    xmpp:
+      password: ""  # Set via --set, fissa
   jvb:
     replicaCount: 0  # Scale-to-zero, managed by jvbScaler CronJob
+    xmpp:
+      password: ""  # Set via --set, fissa
+    # STUN: resta quello predefinito (jitsi.net). Il bridge annuncia
+    # l'indirizzo del nodo e, dietro un NAT, lo scopre con STUN. Per fare a
+    # meno di un server di terzi usa il coturn del chart (`coturn.enabled`,
+    # `turnHost`, `useInternalStun: true`) o un tuo server in `stunServers`;
+    # con un solo bridge dietro un IP fisso basta `publicIPs` con
+    # `stunServers: ""`.
     nodeSelector:
       workload: jitsi-jvb
     tolerations:
@@ -107,6 +145,10 @@ jitsi-meet:
     enabled: true
     replicaCount: 0  # Scaled up only when recording
     singleUseMode: true
+    xmpp:
+      password: ""  # Set via --set, fissa
+    recorder:
+      password: ""  # Set via --set, fissa
     nodeSelector:
       workload: jitsi-jvb
     tolerations:
@@ -125,17 +167,23 @@ jitsi-meet:
 jvbScaler:
   enabled: true
   schedule: "*/5 * * * *"
-  image: bitnami/kubectl:1.29
-  jvbDeploymentName: "videocall-jitsi-meet-jvb"
+  # Immagine: quella fissata dal chart (kubectlImage). Nome del bridge:
+  # trovato per etichetta (app.kubernetes.io/component=jvb).
+  jvbDeploymentName: ""
 
 ingress:
   enabled: true
   className: nginx
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
-    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
-    nginx.ingress.kubernetes.io/rate-limit: "20"
-    nginx.ingress.kubernetes.io/rate-limit-window: "1m"
+    nginx.ingress.kubernetes.io/proxy-body-size: "30m"  # vedi values.yaml
+    # Limiti veri di ingress-nginx: i nomi `rate-limit`/`rate-limit-window`
+    # che stavano qui non esistono e non facevano nulla. Il valore va tarato
+    # sul traffico reale prima di alzarlo a protezione: la sala in diretta
+    # apre più connessioni per partecipante.
+    nginx.ingress.kubernetes.io/limit-rps: "20"
+    nginx.ingress.kubernetes.io/limit-burst-multiplier: "5"
+    nginx.ingress.kubernetes.io/limit-connections: "20"
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
   hosts:

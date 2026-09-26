@@ -1,7 +1,8 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import { Icon } from 'design-react-kit';
+
+import { Icon } from '@/components/ui/icon';
 
 interface VideoPlayerProps {
   src: string;

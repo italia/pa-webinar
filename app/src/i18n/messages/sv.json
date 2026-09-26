@@ -1,7 +1,19 @@
 {
+  "agenda": {
+    "title": "Anteckningar / Checklista",
+    "empty": "Inga punkter ännu. Lägg till ämnena som ska tas upp och bocka av dem efter hand.",
+    "add": "Lägg till",
+    "addPlaceholder": "Ny punkt…",
+    "remove": "Ta bort",
+    "inProgress": "pågår",
+    "agree": "Instämmer",
+    "disagree": "Instämmer inte",
+    "favorablePct": "{pct} % instämmer",
+    "noReactions": "Dela din åsikt"
+  },
   "common": {
-    "appName": "DTD Evenemang",
-    "appDescription": "Plattform för offentliga digitala evenemang från Avdelningen för digital omvandling",
+    "appName": "PA Webinar",
+    "appDescription": "Plattform för offentliga digitala evenemang",
     "loading": "Laddar...",
     "error": "Ett fel uppstod",
     "errorMessage": "Något gick fel. Försök igen.",
@@ -42,8 +54,6 @@
     "skipToFooter": "Gå till sidfot"
   },
   "header": {
-    "slimTitle": "Ministerrådets kansli",
-    "slimSubtitle": "Avdelningen för digital omvandling",
     "followUs": "Följ oss på"
   },
   "events": {
@@ -52,6 +62,7 @@
     "past": "Tidigare evenemang",
     "noUpcoming": "Inga kommande evenemang för tillfället. Kom tillbaka snart!",
     "noPast": "Inga tidigare evenemang",
+    "wordCloudTitle": "Ordmoln",
     "card": {
       "publicEvent": "Offentligt evenemang",
       "readMore": "Läs mer",
@@ -61,6 +72,22 @@
       "ended": "Avslutat",
       "occupiedSpots": "{registered}/{max} anmälda",
       "registeredCount": "{count, plural, =0 {Inga anmälningar} one {1 anmälan} other {# anmälningar}}"
+    },
+    "recap": {
+      "title": "Sammanfattning av evenemanget",
+      "intro": "En sammanfattning av vad som kom upp under evenemanget.",
+      "participants": "Deltagare (som mest)",
+      "registered": "Anmälda",
+      "topQuestions": "Frågor med flest röster",
+      "upvotes": "{count, plural, =0 {inga röster} one {1 röst} other {# röster}}",
+      "polls": "Resultat av omröstningarna",
+      "votes": "{count, plural, =0 {inga röster} one {1 röst} other {# röster}}",
+      "topWords": "Mest delade ord",
+      "feedback": "Genomsnittligt betyg",
+      "feedbackCount": "{count, plural, one {1 svar} other {# svar}}",
+      "chatQuestions": "Frågor från chatten",
+      "reactionsCount": "{count, plural, one {1 reaktion} other {# reaktioner}}",
+      "answered": "besvarad"
     },
     "detail": {
       "title": "Evenemangsdetaljer",
@@ -85,6 +112,10 @@
       "noRecording": "Videoinspelning är inte tillgänglig för detta evenemang.",
       "watchRecording": "Se inspelningen",
       "backToEvents": "Tillbaka till evenemang",
+      "alreadyRegisteredEnter": "Redan anmäld? Gå in i rummet",
+      "invalidTokenTitle": "Åtkomstlänken gäller inte längre",
+      "invalidTokenBody": "Länken du använde är ogiltig eller har gått ut. Om du har anmält dig, leta upp din personliga länk i bekräftelsemejlet, eller anmäl dig igen nedan.",
+      "invalidTokenBodyEnded": "Länken du använde gäller inte längre. Evenemanget är avslutat: nedan hittar du inspelningen och materialet.",
       "speakers": "Talare",
       "organizer": "Arrangör",
       "chatNotSaved": "Chattmeddelanden sparas inte efter evenemangets slut.",
@@ -97,43 +128,27 @@
         "yahoo": "Yahoo Kalender",
         "downloadIcs": "Ladda ned .ics-fil"
       },
-      "alreadyRegisteredEnter": "Redan anmäld? Gå in i rummet",
-      "invalidTokenTitle": "Åtkomstlänken gäller inte längre",
-      "invalidTokenBody": "Länken du använde är ogiltig eller har gått ut. Om du har anmält dig, leta upp din personliga länk i bekräftelsemejlet, eller anmäl dig igen nedan.",
-      "invalidTokenBodyEnded": "Länken du använde gäller inte längre. Evenemanget är avslutat: nedan hittar du inspelningen och materialet."
+      "registrationEnded": "Evenemanget är avslutat: anmälan är stängd."
     },
     "manage": {
       "toggleChat": "Chatt",
       "toggleQa": "Q&A",
       "toggleRecording": "Inspelning",
-      "settingsSection": "Evenemangsinställningar",
       "sessionsAndRecordings": "Sessioner och videoinspelningar",
       "postEventSection": "Efterhantering och feedback"
     },
     "status": {
       "DRAFT": "Utkast",
       "PUBLISHED": "Publicerat",
+      "PROVISIONING": "Förbereds",
       "LIVE": "Pågår",
+      "IDLE": "Pausad",
       "ENDED": "Avslutat",
       "ARCHIVED": "Arkiverat"
     },
     "list": {
       "filterByTag": "Filtrera efter kategori",
       "allTags": "Alla"
-    },
-    "wordCloudTitle": "Ordmoln",
-    "recap": {
-      "title": "Sammanfattning av evenemanget",
-      "intro": "En sammanfattning av vad som kom upp under evenemanget.",
-      "participants": "Deltagare (som mest)",
-      "registered": "Anmälda",
-      "topQuestions": "Frågor med flest röster",
-      "upvotes": "{count, plural, =0 {inga röster} one {1 röst} other {# röster}}",
-      "polls": "Resultat av omröstningarna",
-      "votes": "{count, plural, =0 {inga röster} one {1 röst} other {# röster}}",
-      "topWords": "Mest delade ord",
-      "feedback": "Genomsnittligt betyg",
-      "feedbackCount": "{count, plural, one {1 svar} other {# svar}}"
     }
   },
   "registration": {
@@ -148,12 +163,20 @@
     "submitting": "Anmäler...",
     "success": "Anmälan genomförd!",
     "successMessage": "Du kommer att få ett bekräftelsemeddelande med länken till evenemanget.",
-    "enteringRoom": "We're taking you to the event waiting room.",
-    "enteringRoomHint": "Opening the room…",
+    "successScheduledMessage": "Du är anmäld! Vi har skickat ett mejl med din personliga åtkomstlänk. Lägg till evenemanget i kalendern och kom tillbaka hit strax innan det börjar.",
+    "addToCalendar": "Lägg till i kalendern",
+    "enteringRoom": "Vi tar dig till evenemangets väntrum.",
+    "enteringRoomHint": "Rummet öppnas…",
     "alreadyRegistered": "Du är redan anmäld till detta evenemang",
-    "resendLink": "Resend my access link",
-    "resending": "Sending…",
-    "resendSent": "If the address is registered, we've re-sent the access link by email.",
+    "resendLink": "Skicka åtkomstlänken igen",
+    "resending": "Skickar…",
+    "resendSent": "Om adressen är anmäld har vi skickat åtkomstlänken igen via e-post.",
+    "invitationOnly": "Anmälan är förbehållen inbjudna: använd den e-postadress som du bjöds in med. Länken för att delta skickas till dig via e-post.",
+    "closed": "Anmälan till det här evenemanget är inte öppen för allmänheten.",
+    "lostLink": "Redan anmäld? Få din personliga länk igen",
+    "lostLinkHelp": "Skriv den e-postadress som du anmälde dig med: om den är anmäld till det här evenemanget skickar vi länken för att delta igen.",
+    "checkEmailTitle": "Kontrollera din e-post",
+    "checkEmail": "Om adressen finns på inbjudningslistan får du snart ett e-postmeddelande med din personliga länk till rummet. Hittar du det inte, kontrollera skräppostmappen.",
     "backToEvent": "Tillbaka till evenemanget",
     "organization": "Organisation",
     "organizationPlaceholder": "t.ex. AGID, Ekonomiministeriet, Roms kommun",
@@ -181,12 +204,10 @@
       "organizationRequired": "Ange din organisation",
       "consentRequired": "Samtycke till databehandling krävs",
       "recordingConsentRequired": "Samtycke till inspelning krävs för detta evenemang",
+      "multitrackConsentRequired": "Samtycke till inspelning av ditt ljudspår är obligatoriskt för det här evenemanget",
       "eventFull": "Evenemanget har nått maximalt antal deltagare",
-      "generic": "Fel vid anmälan. Försök igen.",
-      "multitrackConsentRequired": "Samtycke till inspelning av ditt ljudspår är obligatoriskt för det här evenemanget"
-    },
-    "successScheduledMessage": "Du är anmäld! Vi har skickat ett mejl med din personliga åtkomstlänk. Lägg till evenemanget i kalendern och kom tillbaka hit strax innan det börjar.",
-    "addToCalendar": "Lägg till i kalendern"
+      "generic": "Fel vid anmälan. Försök igen."
+    }
   },
   "videoLibrary": {
     "title": "Videobibliotek",
@@ -213,6 +234,8 @@
     "connecting": "Ansluter...",
     "connectionError": "Det gick inte att ansluta till rummet. Kontrollera anslutningen och försök igen.",
     "activeVsRegistered": "{active} aktiva · {registered} anmälda",
+    "enterFullscreen": "Helskärm",
+    "exitFullscreen": "Avsluta helskärm",
     "overtime": {
       "withCountdown": "Den planerade sluttiden har passerats. Evenemanget avslutas automatiskt om {minutes, plural, one {# minut} other {# minuter}}.",
       "closingNow": "Sluttiden har nåtts. Evenemanget håller på att avslutas.",
@@ -224,6 +247,27 @@
     "declineRecording": "Delta inte",
     "enterRoom": "Gå in i rummet",
     "leaveRoom": "Lämna rummet",
+    "leaveChoice": {
+      "title": "Hur vill du lämna?",
+      "body": "Du kan lämna själv – samtalet fortsätter för alla andra – eller avsluta det för alla deltagare.",
+      "leaveSelf": "Lämna själv",
+      "endForAll": "Avsluta för alla",
+      "ending": "Avslutar…",
+      "endError": "Det gick inte att avsluta samtalet. Försök igen."
+    },
+    "endDestino": {
+      "title": "Evenemangets öde",
+      "body": "Du är på väg att avsluta evenemanget för alla. Vad ska hända med det när det är slut?",
+      "public": "Behåll det publikt",
+      "publicHelp": "Sidan för det avslutade evenemanget förblir synlig med sammanfattning, frågor och svar, omröstningar, material och feedback.",
+      "library": "Publicera i biblioteket",
+      "libraryHelp": "Som ovan, och dessutom visas evenemanget i det publika videobiblioteket (kräver en publicerad inspelning eller en YouTube-video).",
+      "archive": "Arkivera (privat)",
+      "archiveHelp": "Sidan för det avslutade evenemanget blir inte publik (404). Uppgifterna sparas tills lagringstiden går ut och raderas sedan.",
+      "genAi": "Generera AI-transkription och sammanfattning från inspelningen (när bearbetningen är klar)",
+      "back": "Tillbaka",
+      "confirm": "Avsluta evenemanget"
+    },
     "eventNotStarted": "Evenemanget har inte börjat ännu",
     "eventStartsAt": "Evenemanget börjar den {date} kl. {time}",
     "countdown": "Tid kvar",
@@ -241,11 +285,15 @@
     "guestJoinSubtitle": "Delta som gäst i det pågående evenemanget",
     "guestJoinButton": "Delta som gäst",
     "guestRedirectToRegister": "Evenemanget har inte börjat ännu. Anmäl dig för att få din åtkomstlänk.",
+    "guestAccessDisabled": "Det här evenemanget kräver anmälan: det går inte att delta som gäst.",
     "jibriUnavailable": "Inspelning ej tillgänglig — Jibri ej konfigurerat",
     "endEventError": "Det gick inte att avsluta evenemanget. Försök igen.",
     "jibriNotConfigured": "Inspelning ej konfigurerad i infrastrukturen",
     "jibriScaling": "Inspelning startar…",
     "jibriScalingTooltip": "Inspelningskomponenten startar. Den blir tillgänglig inom kort.",
+    "recorderNotStarted": "Inspelning inte tillgänglig",
+    "recorderNotStartedDetail": "Inspelningstjänsten har inte startat än: tills vidare fortsätter evenemanget utan inspelning. Meddela plattformens administratörer.",
+    "recorderStartFailed": "Inspelningen startade inte. Försök igen om några minuter; om problemet kvarstår, meddela plattformens administratörer.",
     "roomPreparing": "Rummet förbereds…",
     "roomPreparingDetail": "Videoservrarna startar. Detta tar cirka 2 minuter. Rummet aktiveras automatiskt.",
     "recordingPromptTitle": "Starta inspelningen?",
@@ -263,8 +311,13 @@
     "qaSidebarPlaceholder": "Q&A-panelen blir tillgänglig när evenemanget startar.",
     "invalidToken": "Ogiltig länk. Kontrollera länken du fick via e-post.",
     "sidebarTabQa": "Q&A",
+    "liveFeaturesLabel": "Funktioner:",
+    "whiteboardNotSavedHint": "Whiteboarden sparas inte automatiskt. Om du använder den, exportera den (whiteboardens meny) och bifoga den till evenemangets material innan du avslutar.",
     "sidebarTabChat": "Chatt",
     "sidebarTabPolls": "Omröstningar",
+    "sidebarTabWordcloud": "Ordmoln",
+    "sidebarTabAgenda": "Anteckningar / Checklista",
+    "liveToggleAgenda": "Anteckningar / Checklista (agenda)",
     "sidebarTabMaterials": "Material",
     "sidebarTabParticipants": "Deltagare",
     "chat": {
@@ -299,7 +352,25 @@
       "exportChat": "Ladda ner chatten",
       "reactNotAllowed": "För att reagera på meddelanden krävs din personliga länk eller moderatorlänken.",
       "editNotAllowed": "Den här länken är delad och kan därför inte redigera meddelanden.",
-      "editExpired": "Mer än 15 minuter har gått: meddelandet går inte längre att redigera."
+      "editExpired": "Mer än 15 minuter har gått: meddelandet går inte längre att redigera.",
+      "askAsQuestionLabel": "Markera som fråga",
+      "placeholderQuestion": "Skriv din fråga...",
+      "lensGroupLabel": "Filtrera meddelanden",
+      "lensAll": "Alla",
+      "lensQuestions": "Frågor ({count})",
+      "lensAnnounceAll": "Visar: alla meddelanden",
+      "lensAnnounceQuestions": "Visar: {count, plural, =0 {inga frågor} one {1 fråga} other {# frågor}}",
+      "questionOpen": "Fråga",
+      "questionAnswered": "Besvarad",
+      "questionDismissed": "Kommer inte att tas upp",
+      "questionMarkAnswered": "Markera som besvarad",
+      "questionReopen": "Öppna igen",
+      "questionDismiss": "Avfärda",
+      "questionRestore": "Återställ",
+      "questionStatusFailed": "Det gick inte att uppdatera frågan",
+      "questionNeedsText": "Skriv texten till din fråga: en bilaga ensam hamnar inte i kön",
+      "lensTruncated": "Endast de senaste meddelandena är inlästa: det kan finnas äldre frågor som inte visas i listan.",
+      "attachUnavailable": "Bilagor är inte tillgängliga i den här installationen."
     },
     "role": {
       "moderator": "Moderator",
@@ -320,7 +391,8 @@
         "unknown": "Okänd"
       },
       "volume": "Volym",
-      "volumeFor": "Volym för {name}"
+      "volumeFor": "Volym för {name}",
+      "kickName": "Ta bort {name}"
     },
     "moderator": {
       "muteAll": "Tysta alla",
@@ -331,7 +403,7 @@
       "toggleChat": "Chatt på/av",
       "endEvent": "Avsluta evenemang",
       "endEventConfirm": "Är du säker på att du vill avsluta evenemanget för alla deltagare?",
-      "participantCount": "{count} deltagare",
+      "participantCount": "{count, plural, one {# deltagare} other {# deltagare}}",
       "raisedHands": "Handuppräckning",
       "noRaisedHands": "Ingen handuppräckning",
       "giveFloor": "Ge ordet",
@@ -339,27 +411,28 @@
       "approveVideo": "Godkänn video",
       "approveAll": "Ge ordet",
       "audioOnly": "Enbart ljud",
+      "lowerHand": "Sänk handen",
       "participantFallback": "Deltagare",
       "audioModeration": "Deltagarens mikrofon",
       "micDisabled": "Mikrofon avstängd",
       "videoModeration": "Deltagarens video",
       "videoDisabled": "Video avstängd",
       "eventEndedSuccess": "Evenemanget avslutat. Omdirigerar...",
-      "whiteboard": "Whiteboard",
-      "lowerHand": "Sänk handen"
+      "whiteboard": "Whiteboard"
     },
     "closeDrawer": "Stäng",
     "hintBanner": {
+      "ariaLabel": "Tips",
       "controls": "Kontroller längst ned",
       "raiseHand": "Räck upp handen för att tala",
       "sidebar": "Q&A och chatt i sidopanelen",
-      "dismiss": "Uppfattat",
-      "ariaLabel": "Tips"
+      "dismiss": "Uppfattat"
     },
     "topBarCount": {
       "live": "👥 {count, plural, one {# person} other {# personer}}"
     },
     "sidebarTabChatUnread": "Nya olästa meddelanden",
+    "sidebarTabPollsOpen": "Öppen omröstning där du ännu inte har röstat",
     "floatingControlsLabel": "Evenemangskontroller",
     "screenshareActive": "🖥️ {name} delar sin skärm",
     "screenshareFallbackName": "En deltagare",
@@ -377,40 +450,24 @@
       "moderatorLink": "Moderatorlänk",
       "moderatorLinkHint": "Den som öppnar den här länken kommer in som moderator med full kontroll över rummet."
     },
-    "enterFullscreen": "Helskärm",
-    "exitFullscreen": "Avsluta helskärm",
-    "leaveChoice": {
-      "title": "Hur vill du lämna?",
-      "body": "Du kan lämna själv – samtalet fortsätter för alla andra – eller avsluta det för alla deltagare.",
-      "leaveSelf": "Lämna själv",
-      "endForAll": "Avsluta för alla",
-      "ending": "Avslutar…",
-      "endError": "Det gick inte att avsluta samtalet. Försök igen."
-    },
-    "endDestino": {
-      "title": "Evenemangets öde",
-      "body": "Du är på väg att avsluta evenemanget för alla. Vad ska hända med det när det är slut?",
-      "public": "Behåll det publikt",
-      "publicHelp": "Sidan för det avslutade evenemanget förblir synlig med sammanfattning, frågor och svar, omröstningar, material och feedback.",
-      "library": "Publicera i biblioteket",
-      "libraryHelp": "Som ovan, och dessutom visas evenemanget i det publika videobiblioteket (kräver en publicerad inspelning eller en YouTube-video).",
-      "archive": "Arkivera (privat)",
-      "archiveHelp": "Sidan för det avslutade evenemanget blir inte publik (404). Uppgifterna sparas tills lagringstiden går ut och raderas sedan.",
-      "genAi": "Generera AI-transkription och sammanfattning från inspelningen (när bearbetningen är klar)",
-      "back": "Tillbaka",
-      "confirm": "Avsluta evenemanget"
-    },
-    "liveFeaturesLabel": "Funktioner:",
-    "whiteboardNotSavedHint": "Whiteboarden sparas inte automatiskt. Om du använder den, exportera den (whiteboardens meny) och bifoga den till evenemangets material innan du avslutar.",
-    "sidebarTabWordcloud": "Ordmoln",
-    "sidebarTabAgenda": "Anteckningar / Checklista",
-    "liveToggleAgenda": "Anteckningar / Checklista (agenda)",
     "timer": {
       "show": "Visa timern",
       "hide": "Dölj timern",
       "remainingLabel": "Återstående tid (klicka för förfluten tid)",
       "elapsedLabel": "Förfluten tid (klicka för återstående tid)"
-    }
+    },
+    "videoCallFrameTitle": "Evenemangets videosamtal",
+    "insecureContextTitle": "Osäker adress",
+    "insecureContextBody": "Den här sidan har öppnats via http://: webbläsaren tillåter inte mikrofon och kamera, och videosamtalet kan inte starta. Öppna samma sida på den säkra adressen.",
+    "insecureContextLink": "Öppna https://{host}",
+    "conferenceUnreachableTitle": "Tjänsten för videosamtal svarar inte",
+    "conferenceUnreachableBody": "Din webbläsare når inte servern för videosamtal ({host}). Öppna den i en ny flik: om webbläsaren visar en säkerhetsvarning, godkänn den, kom sedan tillbaka hit och försök igen. Om sidan inte öppnas kan nätverket du är ansluten till blockera den.",
+    "conferenceOpenHost": "Öppna {host} i en ny flik",
+    "leftTitle": "Du har lämnat rummet",
+    "leftMessage": "Evenemanget pågår fortfarande: du kan gå in igen när du vill.",
+    "leftModeratorReminder": "Evenemanget förblir öppet tills någon avslutar det. När ni är klara, gå in igen och välj ”{action}”.",
+    "rejoin": "Gå in igen",
+    "backToHome": "Tillbaka till startsidan"
   },
   "qa": {
     "title": "Frågor och svar",
@@ -445,7 +502,9 @@
       "textRequired": "Skriv din fråga",
       "tooLong": "Frågan får inte överstiga 500 tecken",
       "rateLimit": "Vänta innan du skickar en ny fråga",
-      "generic": "Fel vid sändning av fråga"
+      "busy": "Just nu kommer många frågor från ditt nätverk: försök igen om några sekunder",
+      "generic": "Fel vid sändning av fråga",
+      "upvoteFailed": "Din röst registrerades inte: försök igen om några sekunder."
     },
     "ctaTitle": "Ställ den första frågan",
     "ctaBody": "Andra deltagare kan rösta på din fråga. Moderatorerna ser den och kan svara muntligt eller skriftligt.",
@@ -455,6 +514,79 @@
     "submitPrimary": "Skicka fråga"
   },
   "admin": {
+    "accessDenied": {
+      "title": "Den här delen är inte tillgänglig för din roll",
+      "body": "Som arrangör hanterar du dina egna evenemang: skapa och publicera dem, material, enkäter och efterbearbetning. Plattformens inställningar och data för alla evenemang ligger kvar hos administrationen.",
+      "back": "Till dina evenemang"
+    },
+    "staffLogin": {
+      "title": "Logga in i administrationen",
+      "intro": "Arrangörer och administratörer loggar in med en länk som skickas till deras e-post: inget lösenord att komma ihåg.",
+      "emailLabel": "Din e-postadress i tjänsten",
+      "send": "Skicka länken",
+      "sending": "Skickar…",
+      "sent": "Om adressen är behörig får du snart ett e-postmeddelande med inloggningslänken. Länken fungerar bara en gång och upphör efter {minutes} minuter.",
+      "error": "Begäran kunde inte skickas. Försök igen om några minuter.",
+      "keySection": "Logga in med instansnyckeln",
+      "accessTitle": "Gå till administrationen",
+      "accessIntro": "Tryck på knappen för att logga in. Länken fungerar bara en gång.",
+      "enter": "Logga in",
+      "invalidLink": "Länken är inte giltig: den kan ha gått ut eller redan använts.",
+      "newLink": "Begär en ny länk"
+    },
+    "organizers": {
+      "title": "Personalkonton",
+      "intro": "Personer som arbetar i administrationen under eget namn. Arrangörer skapar och hanterar sina egna evenemang; administratörer hanterar hela instansen. De loggar in med en länk som skickas till deras e-post, utan lösenord. Instansnyckeln finns kvar för nödfall och automatisering.",
+      "newTitle": "Lägg till en person",
+      "name": "För- och efternamn",
+      "email": "E-post",
+      "add": "Lägg till",
+      "sendNow": "Skicka inloggningslänken direkt",
+      "listTitle": "Personer med åtkomst",
+      "loading": "Laddar…",
+      "empty": "Inga konton ännu.",
+      "events": "Evenemang",
+      "lastLogin": "Senaste inloggning",
+      "status": "Status",
+      "actions": "Åtgärder",
+      "never": "Aldrig",
+      "active": "Aktiv",
+      "inactive": "Inaktiverad",
+      "invite": "Skicka länk",
+      "inviteFor": "Skicka en inloggningslänk till {name}",
+      "deactivate": "Inaktivera",
+      "deactivateFor": "Inaktivera {name}",
+      "activate": "Återaktivera",
+      "activateFor": "Återaktivera {name}",
+      "delete": "Ta bort",
+      "deleteFor": "Ta bort {name}",
+      "deleteTitle": "Ta bort kontot?",
+      "deleteMessage": "Kontot för {name} tas bort. Evenemangen ({count}) raderas inte: de går tillbaka till administrationen.",
+      "deactivateTitle": "Inaktivera kontot?",
+      "deactivateMessage": "{name} kan inte längre logga in, och redan skickade inloggningslänkar slutar fungera. Evenemangen förblir som de är.",
+      "exists": "Det finns redan ett konto med den här e-postadressen.",
+      "created": "Konto tillagt.",
+      "createdInvited": "Konto tillagt: inloggningslänken är på väg.",
+      "invited": "Inloggningslänk skickad.",
+      "deleted": "Konto borttaget.",
+      "updated": "Ändringen har sparats.",
+      "actionError": "Åtgärden misslyckades. Försök igen.",
+      "loadError": "Listan kunde inte laddas.",
+      "inviteFailed": "Kontot har lagts till, men länken kunde inte skickas: skicka den igen från raden.",
+      "role": "Roll",
+      "roleOrganizer": "Arrangör",
+      "roleAdmin": "Administratör",
+      "roleHelp": "Arrangörer ser och hanterar bara sina egna evenemang. Administratörer hanterar allt: inställningar, allas evenemang, adressbok och konton.",
+      "roleFor": "Roll för {name}",
+      "promoteTitle": "Gör till administratör?",
+      "promoteMessage": "{name} kommer att kunna hantera hela instansen: inställningar, allas evenemang, adressbok och personalkonton.",
+      "promote": "Gör till administratör",
+      "demoteTitle": "Ändra tillbaka till arrangör?",
+      "demoteMessage": "{name} förlorar genast åtkomsten till inställningarna och till andras evenemang och ser bara sina egna.",
+      "demote": "Ändra till arrangör",
+      "you": "du",
+      "selfLocked": "Ditt konto hanteras av en annan administratör"
+    },
     "fileOrUrl": {
       "tabUpload": "Ladda upp fil",
       "tabUrl": "Klistra in URL",
@@ -472,7 +604,8 @@
       "errorGeneric": "Fel vid uppladdning av filen",
       "helpImage": "Format som stöds: PNG, JPEG, WebP, SVG, GIF — max 10 MB",
       "helpAudio": "Format som stöds: MP3, WAV, OGG, M4A, WebM — max 20 MB",
-      "helpDocument": "Format som stöds: PDF, DOCX, PPTX, XLSX, TXT — max 25 MB"
+      "helpDocument": "Format som stöds: PDF, DOCX, PPTX, XLSX, TXT — max 25 MB",
+      "uploadsUnavailable": "Filuppladdning är inte tillgänglig i den här installationen: klistra in filens URL i stället."
     },
     "rubricaPicker": {
       "loading": "Söker…",
@@ -510,7 +643,9 @@
           "endsAt": "Slutdatumet måste vara efter startdatumet.",
           "titleRequired": "Titeln är obligatorisk (minst 3 tecken).",
           "titleRequiredOtherLocale": "Titeln på standardspråket ({locale}) är obligatorisk: byt till fliken {locale}.",
-          "maxParticipants": "Ange ett tal mellan 2 och 500."
+          "maxParticipants": "Ange ett tal mellan 2 och 500.",
+          "descriptionRequired": "Beskrivningen är obligatorisk (minst {min} tecken).",
+          "descriptionRequiredOtherLocale": "Beskrivningen på standardspråket ({locale}) är obligatorisk: byt till fliken {locale}."
         },
         "senderRatioLabel": "Uppskattad andel aktiva",
         "senderRatioHelp": "Hur många deltagare som förväntas ha mikrofon/video aktiv. Hjälper till att dimensionera videoservern.",
@@ -579,6 +714,7 @@
         "organizerName": "Kontaktperson",
         "organizerOrganization": "Organisation",
         "organizerWebsite": "Webbplats",
+        "organizerLogo": "Arrangörens logotyp",
         "organizerRequired": "Kontaktperson och organisation är obligatoriska.",
         "moderatorsHeading": "Moderatorer",
         "moderatorsHelp": "Moderatorer kan styra sessionen och kontrollera behörigheter under evenemanget.",
@@ -591,7 +727,7 @@
         "speakerEmail": "E-post",
         "speakerRequired": "Namn och e-post är obligatoriska.",
         "invitationsHeading": "Inbjudningar",
-        "invitationsHelp": "Förregistrerade personer — får en personlig anslutningslänk.",
+        "invitationsHelp": "Lista över inbjudna personer. Plattformen skickar inga inbjudningar: dela länken till evenemanget själv. När offentlig registrering är avstängd kan bara dessa adresser registrera sig, och den personliga länken för att delta kommer via e-post efter registreringen.",
         "invitationName": "Namn (valfritt)",
         "invitationEmail": "E-post",
         "invitationRole": "Roll",
@@ -604,8 +740,7 @@
         "invalidEmail": "Ogiltig e-postadress.",
         "duplicateEmail": "Adressen finns redan.",
         "rubricaPick": "Sök i adressboken…",
-        "rubricaOrAdd": "eller lägg till manuellt",
-        "organizerLogo": "Arrangörens logotyp"
+        "rubricaOrAdd": "eller lägg till manuellt"
       },
       "step4": {
         "heading": "Innehåll och material",
@@ -616,7 +751,7 @@
         "materialUrl": "Fil eller länk",
         "visibilityLabel": "Synlighet",
         "visibility": {
-          "ALWAYS": "Alltid",
+          "ALWAYS": "I rummet och efter evenemanget",
           "BEFORE": "Före evenemanget",
           "DURING": "Under evenemanget",
           "AFTER": "Efter evenemanget"
@@ -645,8 +780,6 @@
         "scaleMax": "Maximum",
         "required": "Obligatorisk",
         "saveDraftAndGoQuestionnaires": "Spara utkast och gå till enkäthantering",
-        "preQuestionnaire": "Förmöteenkät",
-        "postQuestionnaire": "Eftermöteenkät (feedback)",
         "none": "— Ingen —"
       },
       "step5": {
@@ -675,22 +808,25 @@
         "retentionHelp": "Efter denna gräns raderas personuppgifter automatiskt.",
         "gdprTemplate": "Integritetsmall",
         "gdprTemplateNone": "— Använd anpassad text —",
+        "gdprTemplateUnknown": "Den valda mallen för integritetsmeddelandet finns inte längre: välj en annan eller gå tillbaka till anpassad text",
         "privacyText": "Integritetspolicy (text)",
         "moderatorHeading": "Moderatorkontakt",
+        "moderatorPublishHint": "Namn och e-postadress krävs för att publicera evenemanget (de används för moderatorlänken och bekräftelsemejlet). De krävs inte för att spara som utkast.",
+        "moderatorLinkNote": "Den här personen är evenemangets huvudmoderator: hen får en privat länk via e-post för att sköta det (starta inspelningen, moderera frågorna, starta omröstningar …). Det är något annat än de medmoderatorer som läggs till i steget Personer, som var och en får sin egen länk.",
+        "moderatorRequired": "Ange moderatorns namn",
+        "moderatorEmailRequired": "Ange en giltig e-postadress till moderatorn",
         "moderatorName": "Namn",
         "moderatorEmail": "E-post",
         "capacityHeading": "Uppskattad kapacitet",
         "featuresHeading": "Konfigurationssammanfattning",
         "privacyDoc": "Integritetspolicydokument (PDF eller länk)",
         "privacyDocHelp": "Ladda upp en PDF eller klistra in URL:en till en alternativ integritetspolicy. Ersätter GDPR-mallen om angiven.",
-        "privacyTextHelp": "Kort text som visas på registreringsformuläret; kan komplettera eller ersätta GDPR-mallen.",
-        "moderatorPublishHint": "Namn och e-postadress krävs för att publicera evenemanget (de används för moderatorlänken och bekräftelsemejlet). De krävs inte för att spara som utkast.",
-        "moderatorLinkNote": "Den här personen är evenemangets huvudmoderator: hen får en privat länk via e-post för att sköta det (starta inspelningen, moderera frågorna, starta omröstningar …). Det är något annat än de medmoderatorer som läggs till i steget Personer, som var och en får sin egen länk.",
-        "moderatorRequired": "Ange moderatorns namn",
-        "moderatorEmailRequired": "Ange en giltig e-postadress till moderatorn"
+        "privacyTextHelp": "Kort text som visas på registreringsformuläret; kan komplettera eller ersätta GDPR-mallen."
       },
       "validationFailed": "Kontrollera de markerade fälten innan du fortsätter.",
       "partialFailure": "Evenemanget skapades, men vissa delar sparades inte: {items}. Du kan lägga till dem från evenemangets sida.",
+      "partialFailureEdit": "Ändringarna av evenemanget har sparats, men följande kunde inte sparas: {items}. Ditt arbete finns kvar här: rätta till och spara igen.",
+      "partialFailureEditDetail": "Ändringarna av evenemanget har sparats, men följande kunde inte sparas: {items}. Servern svarade: {reason}. Ditt arbete finns kvar här: rätta till och spara igen.",
       "draftFound": "Vi hittade ett osparat utkast av det här evenemanget. Vill du återställa det?",
       "draftRestore": "Återställ utkastet",
       "draftDiscard": "Ignorera",
@@ -699,8 +835,13 @@
         "invitations": "inbjudningar",
         "moderators": "moderatorer",
         "speakers": "talare",
-        "materials": "material"
-      }
+        "materials": "material",
+        "questionnaires": "enkäter"
+      },
+      "revocationFailed": "Återkallelsen av åtkomsten för {name} misslyckades: åtkomstlänken är fortfarande giltig. Spara igen för att försöka på nytt, eller återkalla den under fliken ”{tab}” på evenemangets sida.",
+      "validationFailedDetail": "Servern avvisade vissa uppgifter: {reason}. Rätta dem och försök igen.",
+      "publishFailed": "Evenemanget har skapats men inte publicerats: det är fortfarande ett utkast. Publicera det från evenemangets sida.",
+      "publishFailedDetail": "Evenemanget har skapats men inte publicerats: det är fortfarande ett utkast. Servern svarade: {reason}. Publicera det från evenemangets sida."
     },
     "nav": {
       "events": "Evenemangshantering",
@@ -741,8 +882,11 @@
       "eventQuestionnaires": "Enkäter",
       "rubricaList": "Lista",
       "rubricaDetail": "Post",
-      "feedbackDashboard": "Feedback",
-      "recordingsPostprod": "Transkriptioner / AI"
+      "organizers": "Konton",
+      "people": "Personer",
+      "postprodDetail": "Inspelning",
+      "recordingsPostprod": "Transkriptioner / AI",
+      "feedbackDashboard": "Feedback"
     },
     "landing": {
       "title": "Administrationspanel",
@@ -1112,8 +1256,35 @@
       "qaEnabled": "Aktivera Q&A",
       "chatEnabled": "Aktivera chatt",
       "recordingEnabled": "Aktivera videoinspelning",
+      "agendaEnabled": "Live-anteckningar / checklista (agenda)",
+      "agendaEnabledDesc": "En checklista över ämnen som ska tas upp och som moderatorerna bockar av under evenemanget. Den används i den automatiska sammanfattningen. Valfri och kan aktiveras även under evenemanget.",
+      "wordCloudEnabled": "Ordmoln live",
+      "wordCloudEnabledDesc": "Deltagarna skickar ett ord och molnet uppdateras live. Användbart för att öppna en diskussion eller fånga en stämning på några sekunder.",
+      "whiteboardEnabled": "Delad whiteboard",
+      "whiteboardEnabledDesc": "Aktiverar den inbyggda samarbetswhiteboarden (Excalidraw): moderatorerna kan öppna den från verktygsfältet under evenemanget. Kräver installationens whiteboardtjänst; där den finns är den alltid på i snabbsamtal.",
       "autoStartRecording": "Starta inspelningen automatiskt",
       "autoStartRecordingDesc": "När evenemanget startar börjar inspelningen av sig själv (utan att fråga moderatorn). Eventuella sena anslutare hittar då redan en spelare tillgänglig.",
+      "aiSectionHeading": "Automatisk efterproduktion",
+      "aiSectionDesc": "När evenemanget är slut kan inspelningen bearbetas av en AI-pipeline i klustret som tar fram transkription, sammanfattning och – om det efterfrågas – översättningar och dubbning. Allt sker på den här installationens infrastruktur, inga uppgifter lämnas till tredje part.",
+      "aiTranscriptEnabled": "Automatisk transkribering",
+      "aiTranscriptEnabledDesc": "Taligenkänning med identifiering av talare. Krävs för att kunna aktivera sammanfattning, översättningar och dubbning.",
+      "aiSummaryEnabled": "Sammanfattning och kapitel",
+      "aiSummaryEnabledDesc": "Sammanfattning av mötet, fattade beslut, att göra-punkter och indelning i kapitel med tidsangivelser.",
+      "aiTranslationEnabled": "Översättning till andra språk",
+      "aiTranslationEnabledDesc": "Transkription och sammanfattning översatta till språken som anges nedan.",
+      "aiTargetLocales": "Översättningsspråk",
+      "aiTargetLocalesDesc": "ISO-språkkoder (t.ex. en, fr, de) åtskilda med kommatecken. Lämna tomt för att använda språken som är inställda för hela webbplatsen.",
+      "aiTargetLocalesRequired": "Ange minst ett översättningsspråk, eller stäng av den automatiska översättningen.",
+      "aiDubbingEnabled": "Ljuddubbning",
+      "aiDubbingEnabledDesc": "Dubbat ljud på målspråken, genererat med förtränade syntetiska röster. Deltagarnas röster klonas inte.",
+      "consentBadge": "Uttryckligt samtycke",
+      "retentionBadge": "Förlänger lagringstiden",
+      "multitrackRecordingEnabled": "Inspelning per deltagare (hög precision)",
+      "multitrackRecordingEnabledDesc": "Spelar in ett separat ljudspår för varje deltagare, så att transkriptionen med säkerhet kan ange vem som säger vad (inga fler ”Talare 1/2”). Den behandlar isolerat ljud från en enskild talare (känsliga personuppgifter): spåren är tillfälliga och raderas direkt efter transkriberingen. Kräver samtycke till inspelning.",
+      "retainParticipantTracks": "Behåll spåren per deltagare",
+      "retainParticipantTracksDesc": "Behåller de enskilda ljudspåren efter transkriberingen, för det nedladdningsbara arkivet och uppspelning per talare. OBS: detta förlänger lagringen av känsliga personuppgifter (isolerad röst) fram till att evenemangets lagringstid går ut. Aktivera bara om det behövs och med adekvat samtycke och information.",
+      "expectedSpeakers": "Förväntat antal talare",
+      "expectedSpeakersDesc": "När du vet det (t.ex. 3 talare) förbättrar en angivelse kvaliteten på identifieringen av talare. Lämna tomt för att låta pipelinen avgöra.",
       "dataRetentionDays": "Datalagring (dagar efter evenemang)",
       "dataRetentionHint": "Efter denna period raderas anmälningar, Q&A-frågor och eventuella videoinspelningar automatiskt.",
       "privacyPolicyUrl": "URL till integritetspolicy",
@@ -1167,31 +1338,7 @@
       "retentionPreviewKept": "Aggregerad statistik och evenemangsmetadata bevaras.",
       "configPreview": "Förhandsgranskning av konfiguration",
       "templateApplied": "Mall tillämpad: {name}. Du kan ändra alla inställningar.",
-      "agendaEnabled": "Live-anteckningar / checklista (agenda)",
-      "agendaEnabledDesc": "En checklista över ämnen som ska tas upp och som moderatorerna bockar av under evenemanget. Den används i den automatiska sammanfattningen. Valfri och kan aktiveras även under evenemanget.",
-      "whiteboardEnabled": "Delad whiteboard",
-      "whiteboardEnabledDesc": "Aktiverar den inbyggda samarbetswhiteboarden (Excalidraw): moderatorerna kan öppna den från verktygsfältet under evenemanget. Alltid på i snabbsamtal.",
-      "aiSectionHeading": "Automatisk efterproduktion",
-      "aiSectionDesc": "När evenemanget är slut kan inspelningen bearbetas av en AI-pipeline i klustret som tar fram transkription, sammanfattning och – om det efterfrågas – översättningar och dubbning. Allt sker på departementets egen infrastruktur, inga uppgifter lämnas till tredje part.",
-      "aiTranscriptEnabled": "Automatisk transkribering",
-      "aiTranscriptEnabledDesc": "Taligenkänning med identifiering av talare. Krävs för att kunna aktivera sammanfattning, översättningar och dubbning.",
-      "aiSummaryEnabled": "Sammanfattning och kapitel",
-      "aiSummaryEnabledDesc": "Sammanfattning av mötet, fattade beslut, att göra-punkter och indelning i kapitel med tidsangivelser.",
-      "aiTranslationEnabled": "Översättning till andra språk",
-      "aiTranslationEnabledDesc": "Transkription och sammanfattning översatta till språken som anges nedan.",
-      "aiTargetLocales": "Översättningsspråk",
-      "aiTargetLocalesDesc": "ISO-språkkoder (t.ex. en, fr, de) åtskilda med kommatecken. Lämna tomt för att använda språken som är inställda för hela webbplatsen.",
-      "aiTargetLocalesRequired": "Ange minst ett översättningsspråk, eller stäng av den automatiska översättningen.",
-      "aiDubbingEnabled": "Ljuddubbning",
-      "aiDubbingEnabledDesc": "Dubbat ljud på målspråken, genererat med förtränade syntetiska röster. Deltagarnas röster klonas inte.",
-      "consentBadge": "Uttryckligt samtycke",
-      "retentionBadge": "Förlänger lagringstiden",
-      "multitrackRecordingEnabled": "Inspelning per deltagare (hög precision)",
-      "multitrackRecordingEnabledDesc": "Spelar in ett separat ljudspår för varje deltagare, så att transkriptionen med säkerhet kan ange vem som säger vad (inga fler ”Talare 1/2”). Den behandlar isolerat ljud från en enskild talare (känsliga personuppgifter): spåren är tillfälliga och raderas direkt efter transkriberingen. Kräver samtycke till inspelning.",
-      "retainParticipantTracks": "Behåll spåren per deltagare",
-      "retainParticipantTracksDesc": "Behåller de enskilda ljudspåren efter transkriberingen, för det nedladdningsbara arkivet och uppspelning per talare. OBS: detta förlänger lagringen av känsliga personuppgifter (isolerad röst) fram till att evenemangets lagringstid går ut. Aktivera bara om det behövs och med adekvat samtycke och information.",
-      "expectedSpeakers": "Förväntat antal talare",
-      "expectedSpeakersDesc": "När du vet det (t.ex. 3 talare) förbättrar en angivelse kvaliteten på identifieringen av talare. Lämna tomt för att låta pipelinen avgöra."
+      "whiteboardUnavailable": "Inte tillgängligt i den här installationen: Jitsis whiteboardtjänst saknas, och plattformens driftansvarige kan aktivera den."
     },
     "links": {
       "title": "Evenemangslänkar",
@@ -1199,11 +1346,18 @@
       "publicPageHint": "Sidan att dela för att samla nya anmälningar.",
       "guestJoin": "Direktinbjudan (utan anmälan)",
       "guestJoinHint": "Snabb länk för att bjuda in en deltagare i sista minuten: ansluter som gäst medan evenemanget är live, utan att fylla i anmälningsformuläret.",
+      "callInvite": "Länk för deltagare",
+      "callInviteHint": "Den som får den ansluter till samtalet som gäst, utan anmälan. Ett snabbsamtal har ingen offentlig sida: det här är länken att dela.",
       "moderatorLink": "Moderatorlänk",
       "moderatorLinkHint": "Dela enbart denna länk med moderatorer. Alla med denna länk kan hantera evenemanget.",
       "liveRoomHint": "Direktlänk för att gå direkt in i rummet som moderator.",
       "copyLink": "Kopiera länk",
-      "copied": "Kopierat!"
+      "copied": "Kopierat!",
+      "reveal": "Visa",
+      "hide": "Dölj",
+      "warning": "Alla som har den här länken administrerar evenemanget: visa den inte när du delar skärm och klistra inte in den i en chatt.",
+      "hidden": "Länken är dold",
+      "copyFailed": "Kopieringen misslyckades: markera adressen nedan och kopiera den manuellt."
     },
     "feedbackAdmin": {
       "title": "Feedbackresultat",
@@ -1294,185 +1448,6 @@
         "scaling": "Infrastrukturdimensionering",
         "postprod": "AI-pipeline efter evenemanget"
       },
-      "scaling": {
-        "intro": "Parametrar som beskriver kapaciteten i klustret där plattformen körs. Standardvärdena är kalibrerade för Azure F16s_v2 (16 vCPU / 32 GiB) för JVB och F4s_v2 (4 vCPU / 8 GiB) för Jibri. Vid annan hårdvara, uppdatera här — skalern räknar om direkt.",
-        "jvbSection": "Videobridgens (JVB) kapacitet",
-        "jvbCpuCoresPerPod": "vCPU per JVB-pod",
-        "jvbCpuCoresPerPodHelp": "Antal CPU-kärnor som JVB-containern begär (resources.requests.cpu). Azure F16s_v2 = 16.",
-        "jvbReceiversPerCore": "Passiva tittare per kärna",
-        "jvbReceiversPerCoreHelp": "Hur många receive-only-tittare som ryms i 1 vCPU. Kalibrerat till 18,75 (300 webinar ÷ 16 kärnor) på F16s_v2.",
-        "jvbSendersPerCore": "Aktiva sender per kärna",
-        "jvbSendersPerCoreHelp": "Hur många sender (mic+webbkamera) som ryms i 1 vCPU. Kalibrerat till 3,125 (50 all-sender ÷ 16 kärnor) på F16s_v2.",
-        "jvbMaxReplicas": "Max JVB-repliker",
-        "jvbMaxReplicasHelp": "Hårt tak för att förhindra skenande uppskalning. Standard 6.",
-        "jibriCpuCoresPerPod": "vCPU per Jibri-pod",
-        "jibriCpuCoresPerPodHelp": "Kärnor som Jibri-containern begär (ffmpeg + headless Chrome). Azure F4s_v2 = 4.",
-        "defaultSenderRatioPct": "Standard sender-andel",
-        "defaultSenderRatioPctHelp": "Andel av förväntade deltagare som faktiskt sänder media (mic+webbkamera) när evenemanget inte anger något. Webinar 10–30 %, paneldebatt 50–100 %.",
-        "previewTitle": "Förhandsgranskning av dimensionering",
-        "previewBody": "Evenemang med {participants} förväntade deltagare med {ratio}% sender → {senders} sender + {receivers} passiva → {cores} uppskattade kärnor → {jvbs} JVB.",
-        "graceSection": "Mjuk avslutning (slut på evenemang)",
-        "eventGracePeriodMinutes": "Minuter respit efter endsAt (standard)",
-        "eventGracePeriodMinutesHelp": "Extra tid som ges efter den planerade sluttiden innan samtalet stängs. 0 = hård stopp, -1 = aldrig auto-stäng (lämnas till idle-cleanup), 15 = banner och stängning efter 15 min. Varje evenemang kan åsidosätta.",
-        "videoQualitySection": "Video/audio quality",
-        "videoQuality": "Default quality",
-        "videoQualityHelp": "Preset applied to every event (overridable per event). Higher quality needs more bandwidth — “High” is the best trade-off. Takes effect immediately, no restart.",
-        "videoQualityOptions": {
-          "MAX": "Maximum — 1080p",
-          "HIGH": "High — 720p (recommended)",
-          "BALANCED": "Balanced — 540p",
-          "SAVE_DATA": "Save data — 360p"
-        },
-        "videoQualityDesc": {
-          "MAX": "Full HD 1080p, up to ~4 Mbps, stereo Opus 510 kbps audio. Top fidelity for small high-stakes calls — uses more bandwidth and loads the bridge more.",
-          "HIGH": "720p with a capped bitrate (~2.2 Mbps peak) and 96 kbps Opus audio. Great quality without maxing bandwidth: the recommended production trade-off.",
-          "BALANCED": "540p with a contained bitrate (~1 Mbps) and fewer simultaneous incoming videos. Good for large audiences or weak networks.",
-          "SAVE_DATA": "360p at minimal bitrate (~600 kbps) with unused-layer suspension. For very slow connections."
-        }
-      },
-      "header": {
-        "slimBarTitle": "Topplisten (Slim Header)",
-        "slimBarDescription": "Det tunna fältet längst upp på sidan som identifierar den överordnade organisationen.",
-        "parentOrganization": "Överordnad organisation",
-        "parentOrganizationHelp": "T.ex. \"Ministerrådets kansli\"",
-        "parentOrganizationUrl": "URL för överordnad organisation",
-        "centerBarTitle": "Centralt sidhuvud",
-        "centerBarDescription": "Huvudområdet i sidhuvudet med applikationsnamn och logotyp.",
-        "appName": "Applikationsnamn",
-        "appNameHelp": "Visas i sidhuvudet och webbläsartiteln",
-        "organizationShort": "Kort organisationsnamn",
-        "logoUrl": "Logotyp-URL",
-        "logoUrlHelp": "Lämna tomt för att använda standardikonen",
-        "organizationUrl": "URL till organisationens webbplats"
-      },
-      "branding": {
-        "siteName": "Applikationsnamn",
-        "siteNameHelp": "Visas i sidhuvudet, webbläsartiteln och e-postmeddelanden",
-        "siteDescription": "Applikationsbeskrivning",
-        "organizationName": "Organisationsnamn",
-        "organizationNameHelp": "t.ex. Avdelningen för digital omvandling",
-        "organizationNameShort": "Organisationsförkortning",
-        "organizationUrl": "Organisations-URL",
-        "parentOrganization": "Överordnad organisation",
-        "parentOrganizationHelp": "t.ex. Ministerrådets kansli",
-        "parentOrganizationUrl": "URL för överordnad organisation",
-        "logoUrl": "Anpassad logotyp-URL",
-        "logoUrlHelp": "Lämna tomt för att använda standardikonen",
-        "faviconUrl": "Favicon-URL",
-        "primaryColor": "Primärfärg",
-        "defaultTimezone": "Standardtidszon",
-        "defaultTimezoneHelp": "Används för datumvisning och skapande av nya evenemang."
-      },
-      "watermark": {
-        "title": "Videoanpassning",
-        "enabled": "Vattenstämpel aktiverad",
-        "url": "Vattenstämpel-URL",
-        "urlHelp": "URL till en transparent SVG- eller PNG-bild. Lämna tomt för att använda organisationens logotyp.",
-        "opacity": "Genomskinlighet",
-        "position": "Position",
-        "previewLabel": "Förhandsgranskning av videoområde",
-        "positions": {
-          "bottomLeft": "Nedre vänster",
-          "bottomRight": "Nedre höger",
-          "topLeft": "Övre vänster",
-          "topRight": "Övre höger"
-        }
-      },
-      "seo": {
-        "title": "SEO-titel",
-        "titleHelp": "Titel som visas i sökresultat och webbläsarfliken",
-        "description": "SEO-beskrivning",
-        "descriptionHelp": "Beskrivning för sökmotorer och delning på sociala medier",
-        "image": "Open Graph-bild",
-        "imageHelp": "Standardbild för delning på sociala medier (1200x630 rekommenderat)"
-      },
-      "homepage": {
-        "modeLabel": "Startsideläge",
-        "modes": {
-          "LANDING": {
-            "title": "Landningssida",
-            "description": "Hero, funktioner, kommande evenemang och hur det fungerar"
-          },
-          "EVENTS_LIST": {
-            "title": "Evenemangslista",
-            "description": "Visa evenemangslistan direkt"
-          },
-          "CUSTOM": {
-            "title": "Anpassad",
-            "description": "Anpassat HTML-innehåll + evenemangslista"
-          }
-        },
-        "customHtmlLabel": "Anpassat HTML-innehåll",
-        "customHtmlHelp": "HTML som visas i startsidans huvudsektion"
-      },
-      "pages": {
-        "privacyTitle": "Integritetspolicy",
-        "privacyIt": "Innehåll (italienska)",
-        "privacyEn": "Innehåll (engelska)",
-        "privacyLabel": "Innehåll i integritetspolicy",
-        "accessibilityTitle": "Tillgänglighetsförklaring",
-        "accessibilityIt": "Innehåll (italienska)",
-        "accessibilityEn": "Innehåll (engelska)",
-        "accessibilityLabel": "Innehåll i tillgänglighetsförklaring",
-        "preview": "Förhandsgranskning"
-      },
-      "footer": {
-        "linksTitle": "Sidfotslänkar",
-        "addLink": "Lägg till länk",
-        "noLinks": "Inga länkar konfigurerade. Standardlänkar kommer att användas.",
-        "linkTitle": "Titel",
-        "linkSection": "Sektion",
-        "sectionLegal": "Juridiskt",
-        "sectionMain": "Huvudsektion",
-        "moveUp": "Flytta upp",
-        "moveDown": "Flytta ned",
-        "removeLink": "Ta bort länk"
-      },
-      "features": {
-        "statusPageEnabled": "Statussida aktiverad",
-        "statusPageEnabledHelp": "Visa tjänstens statussida",
-        "guestAccessEnabled": "Gäståtkomst aktiverad",
-        "guestAccessEnabledHelp": "Tillåt gäståtkomst till pågående evenemang",
-        "publicRegistrationEnabled": "Offentlig registrering aktiverad",
-        "publicRegistrationEnabledHelp": "Alla kan skapa evenemang (om inaktiverat, enbart administratörer)",
-        "calendarPublic": "Offentlig kalender",
-        "calendarPublicHelp": "Publicera evenemangskalendern. Besökare kan se schemalagda evenemang.",
-        "parseTitleKicker": "Titlar med redaktionell övertitel",
-        "parseTitleKickerHelp": "Om en evenemangstitel innehåller tecknet \"|\" visas delen före som en liten versaletikett ovanför huvudtiteln. Exempel: \"Fika | Test av OSS\" → etikett \"FIKA\" + titel \"Test av OSS\".",
-        "githubUrl": "URL till GitHub-förråd",
-        "supportEmail": "Support-e-post",
-        "jvbScalingTitle": "Videobridge-skalning (JVB)",
-        "jvbScalingHelp": "Justera hur länge en inaktiv videonod ska vänta innan den stängs av och hur långt före ett schemalagt evenemang den ska startas.",
-        "jvbInactiveGraceMinutes": "Minuters inaktivitet före avstängning",
-        "jvbInactiveGraceMinutesHelp": "Hur länge konferensen måste vara tom innan videonoden skalas ned. Rekommenderat 45 minuter. Intervall 5–240.",
-        "jvbPreScaleMinutes": "Minuters förvarning för schemalagd start",
-        "jvbPreScaleMinutesHelp": "Hur många minuter före startsAt som videonoden ska startas för ett schemalagt evenemang. Rekommenderat 10 minuter.",
-        "jvbStressWarnPercent": "Tröskel stress warning (%)",
-        "jvbStressWarnPercentHelp": "Över denna tröskel lägger skalern till 1 extra JVB-replik även om prediktiv dimensionering inte kräver det. Standard 50.",
-        "jvbStressCriticalPercent": "Tröskel stress critical (%)",
-        "jvbStressCriticalPercentHelp": "Över denna tröskel lägger skalern till 2 extra JVB-repliker. Standard 70. Måste vara högre än warn.",
-        "jvbProvisioningTimeoutMinutes": "Provisioning-timeout (minuter)",
-        "jvbProvisioningTimeoutMinutesHelp": "Efter hur många minuter från startsAt ett evenemang utan JVB redo flaggas som 'degraded' på statussidan. Standard 15. Täcker nodens cold-start (~3–5 min) plus säkerhetsmarginal.",
-        "statusPollIntervalSeconds": "Pollningsintervall för statussida (sekunder)",
-        "statusPollIntervalSecondsHelp": "Hur ofta /status-sidan uppdateras från webbläsaren. Standard 30. Lägre värden = färskare data men mer belastning på appen.",
-        "jvbEmptyCloseMinutes": "Minuter med tomt rum före definitiv stängning",
-        "jvbEmptyCloseMinutesHelp": "Om ett LIVE-rum som redan har haft deltagare står tomt i så här många minuter stängs det definitivt (ENDED) – så att ett evenemang utan moderator stänger sig självt vid inaktivitet, utan att vänta på den schemalagda sluttiden. Standard 15 (på). -1 = avstängt. 0 = stäng vid första kontrollen med tomt rum.",
-        "waitingRoomLeadMinutes": "Tidsfönster för väntrummet (minuter)",
-        "waitingRoomLeadMinutesHelp": "Den som anmäler sig inom så här många minuter från starten kommer direkt till väntrummet; tidigare anmälningar får en bekräftelse med kalenderlänk. 0 = visa alltid bekräftelsen fram till starten. Rekommenderat 15.",
-        "reactionsMode": "Reaktioner (emoji)",
-        "reactionsModeNative": "Jitsis egna (i verktygsfältet, flyktiga)",
-        "reactionsModeCustom": "Appens egna (fältet till vänster, med statistik)",
-        "reactionsModeHelp": "Jitsis egna = Jitsis reaktionsknapp i kontrollfältet, lätt och flyktig (räknas inte). Appens egna = appens reaktionsfält nere till vänster, med räknare och statistik. Standard: Jitsis egna.",
-        "emailSenderTitle": "Avsändare för e-post",
-        "emailSenderHelp": "Hur avsändaren visas i inkorgen hos den som anmäler sig. Avsändaradressen ställs in i driftsättningen (den måste stämma med den som SMTP-servern tillåter).",
-        "emailFromName": "Avsändarens namn",
-        "emailFromNameHelp": "Tomt = namnet som är konfigurerat i driftsättningen (SMTP_FROM_NAME) används. Mejlen skickas fortfarande från systemadressen.",
-        "emailReplyTo": "Adress för svar",
-        "emailReplyToHelp": "Mejlen skickas från en no-reply-adress: utan detta når svaren ingen.",
-        "avatarTitle": "Deltagarnas bilder",
-        "gravatarEnabled": "Använd Gravatar när det finns",
-        "gravatarEnabledHelp": "Den som har anmält sig med en e-postadress som har en Gravatar får den som bild i rummet; för alla andra visas initialerna som plattformen genererar. Bilden hämtas via vår egen server, så deltagarnas webbläsare kontaktar aldrig gravatar.com – men plattformen gör det: det måste anges i integritetspolicyn."
-      },
       "postprod": {
         "prerequisitesNote": "Efterproduktionen arbetar med hela inspelningen, efter att evenemanget är slut. Den dedikerade GPU-poolen startar när det första jobbet hamnar i kön och stängs av när kön är tom, för att hålla nere kostnaden. Innan du aktiverar pipelinen, kontrollera att klustret har GPU-poolen konfigurerad, NVIDIA-operatorn installerad, HuggingFace-uppgifterna tillgängliga i namespacet och volymen med modellvikterna förladdad. Den operativa checklistan finns i docs/POSTPROD.md.",
         "pipelineEnabled": "Pipelinen efter evenemang är aktiv",
@@ -1499,10 +1474,217 @@
         "jobMaxAttempts": "Försök före misslyckande",
         "jobMaxAttemptsHelp": "Hur många gånger pipelinen gör om ett jobb innan det markeras som misslyckat. Väntetiden mellan försöken växer exponentiellt (från 30 sekunder upp till 2 timmar). Typiskt värde är 5.",
         "artifactRetentionDays": "Lagring av artefakter (dagar)",
-        "artifactRetentionDaysHelp": "Lämnat på 0 följer AI-artefakterna evenemangets egen lagringstid. Ett värde större än noll behåller dem i angivet antal dagar även efter att evenemanget är stängt, tills ett dagligt cron-jobb raderar dem. Raderingen omfattar talarnas namn och jobbens payload, i linje med docs/GDPR.md.",
+        "artifactRetentionDaysHelp": "Vid 0 finns ingen gräns för hela webbplatsen: AI-artefakterna följer lagringstiden för sin inspelning eller sitt evenemang. Ett värde större än noll får ett dagligt jobb att radera varje artefakt som skapades för mer än så många dagar sedan, publicerad eller inte: det kan förkorta lagringen men aldrig förlänga den. Talarnas namn och jobbens payload omfattas inte: de följer inspelningens eller evenemangets lagringstid. Detaljer i docs/privacy/recordings-and-ai.md.",
         "consentDisclosureSection": "AI-information i väntrummet",
         "consentDisclosureHelp": "Text som visas för deltagarna i väntrummet när evenemanget använder AI-efterproduktion (transkription, sammanfattning, översättning, dubbning). Kan anpassas per språk. Lämna tomt för att använda systemets standardtext.",
         "consentDisclosurePlaceholder": "T.ex. Det här evenemanget kommer att transkriberas och sammanfattas automatiskt med AI-verktyg efter direktsändningen…"
+      },
+      "scaling": {
+        "intro": "Parametrar som beskriver kapaciteten i klustret där plattformen körs. Standardvärdena är kalibrerade för Azure F16s_v2 (16 vCPU / 32 GiB) för JVB och F4s_v2 (4 vCPU / 8 GiB) för Jibri. Vid annan hårdvara, uppdatera här — skalern räknar om direkt.",
+        "jvbSection": "Videobridgens (JVB) kapacitet",
+        "jvbCpuCoresPerPod": "vCPU per JVB-pod",
+        "jvbCpuCoresPerPodHelp": "Antal CPU-kärnor som JVB-containern begär (resources.requests.cpu). Azure F16s_v2 = 16.",
+        "jvbReceiversPerCore": "Passiva tittare per kärna",
+        "jvbReceiversPerCoreHelp": "Hur många receive-only-tittare som ryms i 1 vCPU. Kalibrerat till 18,75 (300 webinar ÷ 16 kärnor) på F16s_v2.",
+        "jvbSendersPerCore": "Aktiva sender per kärna",
+        "jvbSendersPerCoreHelp": "Hur många sender (mic+webbkamera) som ryms i 1 vCPU. Kalibrerat till 3,125 (50 all-sender ÷ 16 kärnor) på F16s_v2.",
+        "jvbMaxReplicas": "Max JVB-repliker",
+        "jvbMaxReplicasHelp": "Hårt tak för att förhindra skenande uppskalning. Standard 6.",
+        "jibriCpuCoresPerPod": "vCPU per Jibri-pod",
+        "jibriCpuCoresPerPodHelp": "Kärnor som Jibri-containern begär (ffmpeg + headless Chrome). Azure F4s_v2 = 4.",
+        "defaultSenderRatioPct": "Standard sender-andel",
+        "defaultSenderRatioPctHelp": "Andel av förväntade deltagare som faktiskt sänder media (mic+webbkamera) när evenemanget inte anger något. Webinar 10–30 %, paneldebatt 50–100 %.",
+        "previewTitle": "Förhandsgranskning av dimensionering",
+        "previewBody": "Evenemang med {participants} förväntade deltagare med {ratio}% sender → {senders} sender + {receivers} passiva → {cores} uppskattade kärnor → {jvbs} JVB.",
+        "graceSection": "Mjuk avslutning (slut på evenemang)",
+        "eventGracePeriodMinutes": "Minuter respit efter endsAt (standard)",
+        "eventGracePeriodMinutesHelp": "Extra tid som ges efter den planerade sluttiden innan samtalet stängs. 0 = hård stopp, -1 = aldrig auto-stäng (lämnas till idle-cleanup), 15 = banner och stängning efter 15 min. Varje evenemang kan åsidosätta.",
+        "videoQualitySection": "Video-/ljudkvalitet",
+        "videoQuality": "Standardkvalitet",
+        "videoQualityHelp": "Förinställning som tillämpas på alla evenemang (kan ändras per evenemang). Ju högre kvalitet, desto mer bandbredd krävs: ”Hög” är den bästa avvägningen. Gäller direkt, utan omstart.",
+        "videoQualityOptions": {
+          "MAX": "Maximal — 1080p",
+          "HIGH": "Hög — 720p (rekommenderas)",
+          "BALANCED": "Balanserad — 540p",
+          "SAVE_DATA": "Spara data — 360p"
+        },
+        "videoQualityDesc": {
+          "MAX": "Full HD 1080p, bithastighet upp till ~4 Mbit/s, Opus-stereoljud 510 kbit/s. Högsta återgivning för små, viktiga samtal — använder mer bandbredd och belastar videobryggan mer.",
+          "HIGH": "720p med begränsad bithastighet (~2,2 Mbit/s i topp) och Opus-ljud 96 kbit/s. Mycket bra kvalitet utan att mätta bandbredden: den rekommenderade avvägningen för produktion.",
+          "BALANCED": "540p med måttlig bithastighet (~1 Mbit/s) och färre samtidigt mottagna videoströmmar. Lämpligt för stor publik eller svaga nätverk.",
+          "SAVE_DATA": "360p med minimal bithastighet (~600 kbit/s) och vilande oanvända lager. För mycket långsamma anslutningar."
+        }
+      },
+      "header": {
+        "slimBarTitle": "Topplisten (Slim Header)",
+        "slimBarDescription": "Det tunna fältet längst upp på sidan som identifierar den överordnade organisationen.",
+        "parentOrganization": "Överordnad organisation",
+        "parentOrganizationHelp": "Den myndighet er organisation lyder under. Lämna tomt för att inte ange någon.",
+        "parentOrganizationUrl": "URL för överordnad organisation",
+        "siteTagline": "Webbplatsens slogan",
+        "siteTaglineHelp": "Visas i det övre fältet och i sidfoten när den överordnade organisationen är tom. Lämna tomt för att inte visa något. Skrivs per språk: saknas den används den engelska, därefter vilken som helst.",
+        "centerBarTitle": "Centralt sidhuvud",
+        "centerBarDescription": "Huvudområdet i sidhuvudet med applikationsnamn och logotyp.",
+        "appName": "Applikationsnamn",
+        "appNameHelp": "Visas i sidhuvudet och webbläsartiteln",
+        "organizationShort": "Kort organisationsnamn",
+        "logoUrl": "Logotyp-URL",
+        "logoUrlHelp": "Lämna tomt för att använda standardikonen",
+        "organizationUrl": "URL till organisationens webbplats"
+      },
+      "branding": {
+        "siteName": "Applikationsnamn",
+        "siteNameHelp": "Visas i sidhuvudet, webbläsartiteln och e-postmeddelanden",
+        "siteDescription": "Applikationsbeskrivning",
+        "organizationName": "Organisationsnamn",
+        "organizationNameHelp": "Namnet på den organisation som äger plattformen: visas i sidhuvudet, sidfoten och de juridiska texterna (t.ex. Exempels kommun)",
+        "organizationNameShort": "Organisationsförkortning",
+        "organizationUrl": "Organisations-URL",
+        "parentOrganization": "Överordnad organisation",
+        "parentOrganizationHelp": "Den myndighet er organisation lyder under. Lämna tomt för att inte ange någon.",
+        "parentOrganizationUrl": "URL för överordnad organisation",
+        "logoUrl": "Anpassad logotyp-URL",
+        "logoUrlHelp": "Lämna tomt för att använda standardikonen",
+        "faviconUrl": "Favicon-URL",
+        "primaryColor": "Primärfärg",
+        "defaultTimezone": "Standardtidszon",
+        "defaultTimezoneHelp": "Används för datumvisning och skapande av nya evenemang.",
+        "waitingRoomEngine": "Väntrum (webbplatsens standard)",
+        "waitingRoomEngineGame": "Videospel (Phaser-lobby)",
+        "waitingRoomEngineClassic": "Klassiskt (statiskt)",
+        "waitingRoomEngineHelp": "Väntrummets standardläge. Det kan ändras för ett enskilt evenemang och, för ett enda besök, med parametern {param} i adressen."
+      },
+      "watermark": {
+        "title": "Videoanpassning",
+        "enabled": "Vattenstämpel aktiverad",
+        "url": "Vattenstämpel-URL",
+        "urlHelp": "URL till en transparent SVG- eller PNG-bild. Lämna tomt för att använda organisationens logotyp.",
+        "opacity": "Genomskinlighet",
+        "position": "Position",
+        "previewLabel": "Förhandsgranskning av videoområde",
+        "positions": {
+          "bottomLeft": "Nedre vänster",
+          "bottomRight": "Nedre höger",
+          "topLeft": "Övre vänster",
+          "topRight": "Övre höger"
+        }
+      },
+      "seo": {
+        "title": "SEO-titel",
+        "titleHelp": "Titel som visas i sökresultat och webbläsarfliken",
+        "description": "SEO-beskrivning",
+        "descriptionHelp": "Beskrivning för sökmotorer och delning på sociala medier",
+        "image": "Open Graph-bild",
+        "imageHelp": "Standardbild för delning på sociala medier (1200x630 rekommenderat)",
+        "ogSection": "Förhandsvisning av delade länkar",
+        "ogIntro": "När någon klistrar in länken till ett evenemang i en chatt eller på sociala medier ritar plattformen en förhandsvisningsbild med uppgifterna i. Välj vilka: varje extra fält tar plats från titeln.",
+        "ogCardEnabled": "Skapa förhandsvisningen",
+        "ogCardEnabledHelp": "Avstängt visar länken affischen som den är (eller webbplatsens logotyp om evenemanget saknar affisch), utan läsbar titel eller datum i bilden.",
+        "ogShowPoster": "Affisch som bakgrund",
+        "ogShowPosterHelp": "Använder evenemangets omslag som bakgrund för förhandsvisningen, nedtonat så att texten förblir läsbar. Utan affisch, eller med detta avstängt, visas den institutionella färgen med logotypen.",
+        "ogShowDate": "Datum och tid",
+        "ogShowDateHelp": "I plattformens standardtidszon.",
+        "ogShowSpeakers": "Talare",
+        "ogShowSpeakersHelp": "Evenemangets text om talare, förkortad om den är för lång.",
+        "ogShowOrganization": "Organisation",
+        "ogShowOrganizationHelp": "Evenemangets arrangör om den anges, annars organisationens namn."
+      },
+      "homepage": {
+        "modeLabel": "Startsideläge",
+        "modes": {
+          "LANDING": {
+            "title": "Landningssida",
+            "description": "Hero, funktioner, kommande evenemang och hur det fungerar"
+          },
+          "EVENTS_LIST": {
+            "title": "Evenemangslista",
+            "description": "Visa evenemangslistan direkt"
+          },
+          "CUSTOM": {
+            "title": "Anpassad",
+            "description": "Anpassat HTML-innehåll + evenemangslista"
+          },
+          "LANDING_ISTITUZIONALE": {
+            "title": "Institutionell landningssida",
+            "description": "Organisationen, nästa evenemang framhävt och övriga i en lista. Inget tekniskt språk"
+          },
+          "LANDING_SEMPLICE": {
+            "title": "Landningssida på klarspråk",
+            "description": "Få ord och en enda inbjudan, för den som inte är van vid onlineevenemang"
+          }
+        },
+        "customHtmlLabel": "Anpassat HTML-innehåll",
+        "customHtmlHelp": "HTML som visas i startsidans huvudsektion",
+        "showProject": "Visa avsnittet ”Projektet”",
+        "showProjectHelp": "Plattformens arkitektur, datasuveränitet och öppna källkod: intressant för den som överväger återanvändning snarare än för deltagare."
+      },
+      "pages": {
+        "privacyTitle": "Integritetspolicy",
+        "privacyIt": "Innehåll (italienska)",
+        "privacyEn": "Innehåll (engelska)",
+        "privacyLabel": "Innehåll i integritetspolicy",
+        "accessibilityTitle": "Tillgänglighetsförklaring",
+        "accessibilityIt": "Innehåll (italienska)",
+        "accessibilityEn": "Innehåll (engelska)",
+        "accessibilityLabel": "Innehåll i tillgänglighetsförklaring",
+        "preview": "Förhandsgranskning"
+      },
+      "footer": {
+        "linksTitle": "Sidfotslänkar",
+        "addLink": "Lägg till länk",
+        "noLinks": "Inga länkar konfigurerade. Standardlänkar kommer att användas.",
+        "linkTitle": "Titel",
+        "linkSection": "Sektion",
+        "sectionLegal": "Juridiskt",
+        "sectionMain": "Huvudsektion",
+        "moveUp": "Flytta upp",
+        "moveDown": "Flytta ned",
+        "removeLink": "Ta bort länk"
+      },
+      "features": {
+        "statusPageEnabled": "Statussida aktiverad",
+        "statusPageEnabledHelp": "Publicerar tjänstens statussida. När den är avstängd finns sidan inte och dess data visas bara för administratörer.",
+        "guestAccessEnabled": "Gäståtkomst aktiverad",
+        "guestAccessEnabledHelp": "Personer som inte har anmält sig kan delta i pågående evenemang med bara sitt namn. När det är avstängt kan man bara delta i schemalagda evenemang med anmälan eller med en moderator- eller talarlänk; omedelbara videosamtal förblir öppna för alla som har länken.",
+        "publicRegistrationEnabled": "Offentlig registrering aktiverad",
+        "publicRegistrationEnabledHelp": "Vem som helst kan anmäla sig till evenemang. När det är avstängt kan bara personer på evenemangets inbjudningslista anmäla sig, och den personliga länken för att delta skickas bara via e-post; redan anmälda och moderator- och talarlänkar fungerar fortfarande.",
+        "calendarPublic": "Offentlig kalender",
+        "calendarPublicHelp": "Publicera evenemangskalendern. Besökare kan se schemalagda evenemang.",
+        "parseTitleKicker": "Titlar med redaktionell övertitel",
+        "parseTitleKickerHelp": "Om en evenemangstitel innehåller tecknet \"|\" visas delen före som en liten versaletikett ovanför huvudtiteln. Exempel: \"Fika | Test av OSS\" → etikett \"FIKA\" + titel \"Test av OSS\".",
+        "githubUrl": "URL till GitHub-förråd",
+        "supportEmail": "Support-e-post",
+        "jvbScalingTitle": "Videobridge-skalning (JVB)",
+        "jvbScalingHelp": "Justera hur länge en inaktiv videonod ska vänta innan den stängs av och hur långt före ett schemalagt evenemang den ska startas.",
+        "jvbInactiveGraceMinutes": "Minuters inaktivitet före avstängning",
+        "jvbInactiveGraceMinutesHelp": "Hur länge konferensen måste vara tom innan videonoden skalas ned. Rekommenderat 45 minuter. Intervall 5–240.",
+        "jvbPreScaleMinutes": "Minuters förvarning för schemalagd start",
+        "jvbPreScaleMinutesHelp": "Hur många minuter före startsAt som videonoden ska startas för ett schemalagt evenemang. Rekommenderat 10 minuter.",
+        "jvbEmptyCloseMinutes": "Minuter med tomt rum före definitiv stängning",
+        "jvbEmptyCloseMinutesHelp": "Om ett LIVE-rum som redan har haft deltagare står tomt i så här många minuter stängs det definitivt (ENDED) – så att ett evenemang utan moderator stänger sig självt vid inaktivitet, utan att vänta på den schemalagda sluttiden. Standard 15 (på). -1 = avstängt. 0 = stäng vid första kontrollen med tomt rum.",
+        "waitingRoomLeadMinutes": "Tidsfönster för väntrummet (minuter)",
+        "waitingRoomLeadMinutesHelp": "Den som anmäler sig inom så här många minuter från starten kommer direkt till väntrummet; tidigare anmälningar får en bekräftelse med kalenderlänk. 0 = visa alltid bekräftelsen fram till starten. Rekommenderat 15.",
+        "reactionsMode": "Reaktioner (emoji)",
+        "reactionsModeNative": "Jitsis egna (i verktygsfältet, flyktiga)",
+        "reactionsModeCustom": "Appens egna (fältet till vänster, med statistik)",
+        "reactionsModeHelp": "Jitsis egna = Jitsis reaktionsknapp i kontrollfältet, lätt och flyktig (räknas inte). Appens egna = appens reaktionsfält nere till vänster, med räknare och statistik. Standard: Jitsis egna.",
+        "jvbStressWarnPercent": "Tröskel stress warning (%)",
+        "jvbStressWarnPercentHelp": "Över denna tröskel lägger skalern till 1 extra JVB-replik även om prediktiv dimensionering inte kräver det. Standard 50.",
+        "jvbStressCriticalPercent": "Tröskel stress critical (%)",
+        "jvbStressCriticalPercentHelp": "Över denna tröskel lägger skalern till 2 extra JVB-repliker. Standard 70. Måste vara högre än warn.",
+        "jvbProvisioningTimeoutMinutes": "Provisioning-timeout (minuter)",
+        "jvbProvisioningTimeoutMinutesHelp": "Efter hur många minuter från startsAt ett evenemang utan JVB redo flaggas som 'degraded' på statussidan. Standard 15. Täcker nodens cold-start (~3–5 min) plus säkerhetsmarginal. Gäller även inspelningstjänsten, räknat från när ett evenemang med inspelning begär den: utan svar inom denna tid slutar live-rummet visa den som ”startar” och anger den som inte startad.",
+        "statusPollIntervalSeconds": "Pollningsintervall för statussida (sekunder)",
+        "statusPollIntervalSecondsHelp": "Hur ofta /status-sidan uppdateras från webbläsaren. Standard 30. Lägre värden = färskare data men mer belastning på appen.",
+        "emailSenderTitle": "Avsändare för e-post",
+        "emailSenderHelp": "Hur avsändaren visas i inkorgen hos den som anmäler sig. Avsändaradressen ställs in i driftsättningen (den måste stämma med den som SMTP-servern tillåter).",
+        "emailFromName": "Avsändarens namn",
+        "emailFromNameHelp": "Tomt = namnet som är konfigurerat i driftsättningen (SMTP_FROM_NAME) används. Mejlen skickas fortfarande från systemadressen.",
+        "emailReplyTo": "Adress för svar",
+        "emailReplyToHelp": "Mejlen skickas från en no-reply-adress: utan detta når svaren ingen.",
+        "avatarTitle": "Deltagarnas bilder",
+        "gravatarEnabled": "Använd Gravatar när det finns",
+        "gravatarEnabledHelp": "Den som har anmält sig med en e-postadress som har en Gravatar får den som bild i rummet; för alla andra visas initialerna som plattformen genererar. Bilden hämtas via vår egen server, så deltagarnas webbläsare kontaktar aldrig gravatar.com – men plattformen gör det: det måste anges i integritetspolicyn."
       }
     },
     "analytics": {
@@ -1583,20 +1765,17 @@
       "descriptionLabel": "Beskrivning",
       "maxParticipantsLabel": "Max deltagare",
       "featuresLabel": "Funktioner",
-      "recordingLabel": "Inspelning",
-      "unmute": "Deltagarens mikrofon",
-      "video": "Deltagarens video",
-      "screen": "Skärmdelning",
-      "pickerTitle": "Välj en mall",
-      "pickerSubtitle": "Välj en mall för att förkonfigurera evenemangsinställningarna, eller hoppa över för att konfigurera allt manuellt.",
-      "skipTemplate": "Konfigurera manuellt",
       "whiteboardLabel": "Whiteboard",
+      "recordingLabel": "Inspelning",
       "waitingRoomEngineLabel": "Väntrum (mallens standard)",
       "waitingRoomEngineSiteDefault": "Webbplatsens standard",
       "waitingRoomEngineGarden": "Trädgård (standard)",
       "waitingRoomEngineGame": "Videospel (Phaser-lobby)",
       "waitingRoomEngineClassic": "Klassiskt (statiskt)",
       "waitingRoomEngineHelp": "Förifyller väntrumsmotorn i evenemang som skapas från den här mallen. Går fortfarande att ändra i guiden.",
+      "unmute": "Deltagarens mikrofon",
+      "video": "Deltagarens video",
+      "screen": "Skärmdelning",
       "durationLabel": "Standardlängd (minuter)",
       "durationHint": "Förifyller evenemangets sluttid (start + längd). Användaren kan ändra den. Tomt = 2 timmar.",
       "retentionLabel": "Standardlagring av data (dagar)",
@@ -1605,7 +1784,10 @@
       "descriptionTemplateHint": "Text som förifylls i evenemangets beskrivning (går att ändra).",
       "aiTranscript": "Automatisk transkribering (standard)",
       "aiSummary": "Automatisk sammanfattning (standard)",
-      "aiTranslation": "Automatisk översättning (standard)"
+      "aiTranslation": "Automatisk översättning (standard)",
+      "pickerTitle": "Välj en mall",
+      "pickerSubtitle": "Välj en mall för att förkonfigurera evenemangsinställningarna, eller hoppa över för att konfigurera allt manuellt.",
+      "skipTemplate": "Konfigurera manuellt"
     },
     "instantCall": {
       "title": "Omedelbart videosamtal",
@@ -1634,7 +1816,7 @@
       "selectFile": "Välj fil",
       "fileTitle": "Titel",
       "visibility": "Synlighet",
-      "visibilityAlways": "Alltid synlig",
+      "visibilityAlways": "I rummet och efter evenemanget",
       "visibilityBefore": "Enbart före evenemanget",
       "visibilityDuring": "Enbart under evenemanget",
       "visibilityAfter": "Enbart efter evenemanget",
@@ -1655,10 +1837,11 @@
       "titleLabel": "Titel",
       "descriptionLabel": "Beskrivning (valfritt)",
       "visibilityLabel": "Synlighet",
-      "visibilityAlways": "Alltid",
+      "visibilityAlways": "I rummet och efter evenemanget",
       "visibilityBefore": "Före evenemanget",
       "visibilityDuring": "Under evenemanget",
       "visibilityAfter": "Efter evenemanget",
+      "visibilityHelp": "Före starten visar evenemangets offentliga sida bara material markerat ”Före evenemanget”. Material markerat ”I rummet och efter evenemanget” visas i rummet under evenemanget och på sidan för det avslutade evenemanget.",
       "typeLabel": "Typ",
       "fileUploaded": "Fil uppladdad",
       "typeFile": "Fil",
@@ -1678,7 +1861,7 @@
         "newTitle": "Ny GDPR-mall",
         "editTitle": "Redigera GDPR-mall",
         "name": "Internt namn",
-        "namePlaceholder": "t.ex. DTD standardpolicy",
+        "namePlaceholder": "t.ex. Standardpolicy för personuppgifter",
         "description": "Beskrivning (valfritt)",
         "descriptionPlaceholder": "Korta noteringar för att känna igen mallen",
         "bodyIt": "Integritetstext (italienska)",
@@ -1764,9 +1947,9 @@
       "version": "Version",
       "environment": "Miljö",
       "modes": {
-        "simple": "Enkel (Docker Compose)",
-        "standard": "Standard (Kubernetes)",
-        "full": "Fullständig (Kubernetes med scale-to-zero)",
+        "simple": "Enkel",
+        "standard": "Standard",
+        "full": "Fullständig (bryggor med scale-to-zero)",
         "unknown": "Okänd"
       },
       "database": {
@@ -1780,7 +1963,9 @@
         "title": "Jitsi Meet",
         "reachable": "Nåbar",
         "unreachable": "Ej nåbar",
-        "notConfigured": "Ej konfigurerad"
+        "notConfigured": "Ej konfigurerad",
+        "degraded": "Nåbar, men svarar med fel eller långsamt",
+        "publicCheckFailed": "Kontrollen på den offentliga adressen misslyckades ({code}): portalservern godtar inte certifikatet eller namnet. Konferenserna kan ändå fungera."
       },
       "jvb": {
         "title": "Video Bridge (JVB)",
@@ -1788,7 +1973,9 @@
         "replicas": "{current}/{max} noder",
         "preScale": "Pre-scale: {minutes} min",
         "fixedMode": "Fast läge",
-        "scalerEnabled": "Scaler aktiverad"
+        "scalerEnabled": "Scaler aktiverad",
+        "fixedDown": "Videobryggan svarar inte",
+        "unmonitored": "Övervakas inte: bryggans adress (JVB_HEALTH_URL) är inte angiven"
       },
       "jibri": {
         "title": "Inspelning (Jibri)",
@@ -1810,7 +1997,11 @@
         "metrics": "Mätpunktsendpunkt"
       },
       "note": "Infrastrukturändringar görs via Helm values och CI/CD-pipelinen.",
-      "deployDocs": "Driftsdokumentation"
+      "deployDocs": "Driftsdokumentation",
+      "platforms": {
+        "kubernetes": "På Kubernetes",
+        "other": "Utanför Kubernetes (Docker Compose eller en enskild server)"
+      }
     },
     "instantCalls": {
       "title": "Snabbsamtal",
@@ -1896,7 +2087,7 @@
       "chatSseConnections": "SSE-anslutningar",
       "chatSseSubtitle": "aktiva prenumeranter",
       "redisConnectedClients": "Redis-klienter",
-      "redisConnectedSubtitle": "publishers + subscribers",
+      "redisConnectedSubtitle": "utgivare + prenumeranter",
       "redisPubsubChannels": "Pub/sub-kanaler",
       "redisPubsubSubtitle": "= evenemang med aktiv chatt",
       "chartRedisMemory": "Redis-minne",
@@ -1915,9 +2106,9 @@
       "latencyP99": "Latens P99",
       "requestRate": "Förfrågningar/s",
       "chartLatencyQuantiles": "Applikationslatens — P50 / P95 / P99",
-      "participantsNow": "Aktiva deltagare",
+      "participantsNow": "Deltagare på videobryggan",
       "jvbStress": "JVB-belastning",
-      "conferences": "Aktiva konferenser",
+      "conferences": "Konferenser på videobryggan",
       "octoRelay": "Octo inter-bridge-relä",
       "interBridge": "Octo-trafik",
       "chartCpu": "CPU usage",
@@ -1944,7 +2135,8 @@
       "liveNow": "LIVE",
       "provisioningNow": "förbereds",
       "idleNow": "IDLE (pausad)",
-      "scaleToZeroHelp": "IDLE är normalt tillstånd för ett evenemang utan trafik längre än grace-perioden. Vid nästa användarbesök övergår det till PROVISIONING och sedan LIVE."
+      "scaleToZeroHelp": "IDLE är normalt tillstånd för ett evenemang utan trafik längre än grace-perioden. Vid nästa användarbesök övergår det till PROVISIONING och sedan LIVE.",
+      "capacityFromStatus": "Aktuella värden lästa från videobryggan. Historiken kräver Prometheus."
     },
     "bulk": {
       "selectAll": "Markera alla",
@@ -1972,7 +2164,29 @@
       "resultsCount": "{count, plural, =0 {Inga evenemang} one {# evenemang} other {# evenemang}}",
       "durationMinutes": "{minutes} min",
       "durationHoursMinutes": "{hours} tim {minutes} min",
-      "moderatorsSpeakers": "{mods} moderatorer · {speakers} talare",
+      "menu": {
+        "actionsFor": "Åtgärder för ”{title}”",
+        "manage": "Hantera",
+        "edit": "Redigera",
+        "openPublic": "Öppna den offentliga sidan",
+        "newTab": "(öppnas i en ny flik)",
+        "copyLink": "Kopiera den offentliga länken",
+        "linkCopied": "Länken kopierad",
+        "publish": "Publicera",
+        "unpublish": "Avpublicera",
+        "unpublishTitle": "Avpublicera evenemanget?",
+        "unpublishMessage": "”{title}” försvinner från de offentliga sidorna tills du publicerar det igen. Redan mottagna anmälningar sparas.",
+        "published": "Evenemanget publicerat",
+        "unpublished": "Evenemanget avpublicerat",
+        "duplicate": "Duplicera som nästa tillfälle",
+        "delete": "Ta bort",
+        "deleteTitle": "Ta bort evenemanget?",
+        "deleteMessage": "”{title}” och alla dess data tas bort. Det går inte att ångra.",
+        "deleted": "Evenemanget borttaget",
+        "failed": "Åtgärden misslyckades. Försök igen."
+      },
+      "instantBadge": "Snabbsamtal",
+      "moderatorsSpeakers": "{mods, plural, one {# moderator} other {# moderatorer}} · {speakers, plural, one {# talare} other {# talare}}",
       "postEventSummary": "{connected} anslöt · {registered} anmälda",
       "registeredCount": "{count, plural, =0 {Inga anmälningar} one {1 anmälan} other {# anmälningar}}"
     },
@@ -2014,15 +2228,19 @@
     },
     "eventDetail": {
       "copyPublicUrl": "Kopiera publik länk",
-      "copyModeratorUrl": "Kopiera moderatorlänk",
-      "enterAsModerator": "Gå in live",
+      "copyInviteUrl": "Kopiera inbjudningslänk",
+      "enterAsParticipant": "Gå in som deltagare",
+      "openAsParticipant": "Öppna som deltagare",
+      "participantHintRoom": "Öppnas i en ny flik: rummet som en gäst ser det, utan moderatorbehörighet.",
+      "participantHintPassword": "Öppnas i en ny flik: rummet som en gäst ser det, efter evenemangets lösenord.",
+      "participantHintPage": "Öppnas i en ny flik: den offentliga sidan som deltagarna ser den.",
       "editEvent": "Redigera evenemang",
       "editSettings": "Redigera inställningar",
       "featureSummary": "Aktiva funktioner",
       "organizers": "Arrangörer",
       "privacyGdpr": "Integritet och GDPR",
       "postEventTitle": "Efter evenemanget och feedback",
-      "recordingSection": "Inspelning",
+      "recordingSection": "Evenemangets video",
       "callSessions": "Sessioner och telemetri",
       "questionnaires": "Enkäter",
       "questionnaireCount": "{count, plural, =0 {Inga enkäter kopplade} one {1 enkät kopplad} other {# enkäter kopplade}}",
@@ -2030,12 +2248,10 @@
       "manageQuestionnaires": "Hantera enkäter",
       "tabs": {
         "overview": "Översikt",
-        "settings": "Inställningar",
         "people": "Personer",
         "content": "Innehåll",
-        "audit": "Inspelningar och revision",
-        "postEvent": "Efter evenemanget",
-        "analytics": "Statistik"
+        "analytics": "Statistik",
+        "afterEvent": "Efter evenemanget"
       },
       "toggles": {
         "unmute": "Deltagare får tala",
@@ -2054,10 +2270,12 @@
         "capacityEstimate": "≈{jvbs} JVB · {ram} RAM",
         "noReminders": "Inga påminnelser konfigurerade",
         "tags": "Taggar",
-        "postEventSummary": "{connected} anslöt av {registered} anmälningar (uppskattat {estimated})",
-        "estimatedAttendance": "Uppskattat: {estimated} deltagare"
+        "postEventSummary": "{connected} anslutna av {registered} anmälningar (kapacitet {estimated})",
+        "estimatedAttendance": "Maximal kapacitet: {estimated} deltagare",
+        "reminderScheduled": "Skickas den {when}",
+        "reminderMissed": "Inte skickad — tidpunkten har passerat",
+        "reminderSoon": "När som helst"
       },
-      "copyGuestUrl": "Kopiera gästlänk",
       "aiManageTitle": "Transkription, sammanfattning och översättningar",
       "aiManageDesc": "Hantera AI-efterproduktionen av den här inspelningen: rätta transkriptionen och tilldelningen av talare (vem som säger vad), redigera sammanfattningen och hantera översättningsspråken.",
       "aiManageCta": "Öppna hanteringen av efterproduktionen",
@@ -2072,24 +2290,16 @@
       "duplicateNext": "Duplicera till nästa gång",
       "duplicateNextBusy": "Duplicerar…",
       "duplicateNextHint": "Skapar ett utkast med hela konfigurationen från det här evenemanget (inspelning, separata spår, AI, agenda, påminnelser). Om evenemanget är återkommande flyttas datumet till nästa tillfälle; annars får du ange det själv.",
-      "duplicateNextError": "Dupliceringen misslyckades. Försök igen."
+      "duplicateNextError": "Dupliceringen misslyckades. Försök igen.",
+      "capacitySection": "Kapacitet och infrastruktur",
+      "capacitySubtitle": "Konfigurerad för högst {max} deltagare",
+      "publishBlockedLive": "Evenemanget pågår redan",
+      "publishBlockedEnded": "Evenemanget är avslutat"
     },
     "rubrica": {
       "title": "Adressbok",
       "subtitle": "Personer som har samtyckt till att läggas till i adressboken (GDPR art. 6.1.a). Profilinformation uppdateras automatiskt vid varje ny anmälan.",
       "backToList": "← Tillbaka till adressboken"
-    },
-    "questionnairesPage": {
-      "title": "Enkäter",
-      "subtitle": "Återanvändbara frågemallar för förregistrerings- och eftermöteenkäter."
-    },
-    "questionnaireResponses": {
-      "title": "Enkätsvar",
-      "subtitle": "Aggregeringar per fråga, filtrerbara efter evenemang, fas och datumintervall."
-    },
-    "eventQuestionnaires": {
-      "title": "Enkäter — {eventTitle}",
-      "subtitle": "Konfigurera en förregistrerings- och/eller eftermöteenkät genom att kombinera mallar och ad hoc-frågor."
     },
     "eventAnalytics": {
       "title": "Statistik",
@@ -2238,11 +2448,6 @@
       "manageSource": "Källspråk",
       "manageOpenPublic": "Publik sida",
       "manageRerunOk": "Omkörningen av pipelinen har startat.",
-      "manageRerunNoop": "Inget jobb startades: AI är avstängt för det här evenemanget, eller så är pipelinen pausad. Använd ”Generera AI”.",
-      "manageRerunAlreadyQueued": "Bearbetningen ligger redan i kö: inget nytt att starta.",
-      "generateAi": "Generera AI",
-      "generateAiConfirm": "Kör AI-pipelinen (transkription och sammanfattning) på den här inspelningen. AI-bearbetning aktiveras för evenemanget och startar i bakgrunden. Översättningar läggs till efteråt, ett språk i taget, från fliken ”Översättningar”.",
-      "generateAiOk": "AI-pipelinen har startat.",
       "manageOpen": "Hantera",
       "cancelConfirmTitle": "Avbryt efterproduktionen",
       "speakerUpdateSuccess": "Talaren har uppdaterats",
@@ -2382,7 +2587,38 @@
       },
       "archiveSourceTitle": "Källinspelning",
       "archiveSourceHint": "Evenemangets originalvideo. Separata spår per deltagare och MKV-arkivet kräver flerspårsinspelning (inte aktiverad för det här evenemanget).",
-      "archiveSourceDownload": "Ladda ner originalvideon"
+      "archiveSourceDownload": "Ladda ner originalvideon",
+      "manageRerunNoop": "Inget jobb startades: AI är avstängt för det här evenemanget, eller så är pipelinen pausad. Använd ”Generera AI”.",
+      "manageRerunAlreadyQueued": "Bearbetningen ligger redan i kö: inget nytt att starta.",
+      "generateAi": "Generera AI",
+      "generateAiConfirm": "Kör AI-pipelinen (transkription och sammanfattning) på den här inspelningen. AI-bearbetning aktiveras för evenemanget och startar i bakgrunden. Översättningar läggs till efteråt, ett språk i taget, från fliken ”Översättningar”.",
+      "generateAiOk": "AI-pipelinen har startat.",
+      "originalToggle": "Visa originaltext",
+      "originalToggleHint": "Visar under varje korrigerad rad texten så som den automatiska transkriberingen hade tagit fram den",
+      "originalNotComparable": "Antalet rader har ändrats jämfört med originalversionen: en jämförelse rad för rad är inte möjlig",
+      "originalLabel": "Originaltext:",
+      "revisedBadge": "Manuellt granskad",
+      "revisedHint": "Minst en rad har korrigerats av en person efter den automatiska transkriberingen",
+      "redactLabel": "Radera även från originalet",
+      "redactHint": "Används vid en begäran om radering: ändringarna tillämpas även på den bevarade maskintexten, som annars skulle behålla den borttagna meningen",
+      "redactSave": "Spara och radera från originalet",
+      "redactSaved": "{n, plural, one {1 rad raderad även från originaltexten} other {# rader raderade även från originaltexten}}",
+      "redactNothingRemoved": "Korrigeringarna har sparats, men i originaltexten fanns inget att radera för de ändrade raderna",
+      "redactArchiveFailed": "Korrigeringarna har sparats i databasen, men omskrivningen av den arkiverade filen misslyckades: den borttagna meningen kan fortfarande laddas ned därifrån. Försök radera igen",
+      "originalUncertain": "Osäkert ursprung",
+      "originalUncertainHint": "Den bevarade texten kan redan innehålla korrigeringar gjorda innan den här funktionen fanns: det går inte att visa att det är den text som den automatiska transkriberingen tog fram"
+    },
+    "questionnairesPage": {
+      "title": "Enkäter",
+      "subtitle": "Återanvändbara frågemallar för förregistrerings- och eftermöteenkäter."
+    },
+    "questionnaireResponses": {
+      "title": "Enkätsvar",
+      "subtitle": "Aggregeringar per fråga, filtrerbara efter evenemang, fas och datumintervall."
+    },
+    "eventQuestionnaires": {
+      "title": "Enkäter — {eventTitle}",
+      "subtitle": "Konfigurera en förregistrerings- och/eller eftermöteenkät genom att kombinera mallar och ad hoc-frågor."
     }
   },
   "email": {
@@ -2470,7 +2706,7 @@
     "projectTeaser": {
       "kicker": "Projektet",
       "title": "Öppen källkod och suverän, byggd av offentlig förvaltning för offentlig förvaltning",
-      "body": "PA Webinar är Avdelningen för digital omställnings plattform för offentliga digitala evenemang: designsystemet .italia, videomotorn Jitsi Meet och en helt in-cluster AI-pipeline. Den släpps som öppen källkod så att alla förvaltningar kan återanvända den.",
+      "body": "PA Webinar är en plattform med öppen källkod för offentliga digitala evenemang, utvecklad av Italiens departement för digital omställning och släppt så att alla förvaltningar kan återanvända den: designsystemet .italia, videomotorn Jitsi Meet och en helt in-cluster AI-pipeline.",
       "sovereignty": {
         "title": "Datasuveränitet",
         "desc": "Self-hosted på förvaltningens infrastruktur: data lämnar aldrig miljön och det finns ingen exponering mot CLOUD Act."
@@ -2506,6 +2742,49 @@
         "title": "Ljuddubbning",
         "desc": "Ett dubbat ljudspår med en neutral syntetisk röst (utan röstkloning), för att lyssna på evenemanget på ett annat språk."
       }
+    },
+    "institutional": {
+      "title": "Onlinemöten och evenemang",
+      "nextTitle": "Nästa evenemang",
+      "nextCta": "Gå till evenemanget och anmäl dig",
+      "othersTitle": "Övriga evenemang",
+      "pointsTitle": "Så deltar du",
+      "points": {
+        "noInstall": {
+          "title": "Delta från webbläsaren",
+          "body": "Du behöver inte installera några program: öppna bara länken du får."
+        },
+        "accessible": {
+          "title": "Utformat för alla",
+          "body": "Undertexter, tangentbord och skärmläsare: rummet går att använda även utan mus."
+        },
+        "privacy": {
+          "title": "Uppgifter som hanteras med omsorg",
+          "body": "Endast de uppgifter som krävs för anmälan samlas in, och du kan begära att få ut dem eller få dem raderade."
+        }
+      }
+    },
+    "simple": {
+      "title": "Onlinemöten från {organization}",
+      "subtitle": "Delta från datorn eller telefonen, utan att installera något.",
+      "cta": "Delta i nästa möte",
+      "noEvents": "Just nu finns inga möten planerade. Titta in igen snart.",
+      "stepsTitle": "Så går det till",
+      "steps": {
+        "choose": {
+          "title": "Välj ett möte",
+          "body": "Vid varje möte står datum och tid."
+        },
+        "name": {
+          "title": "Lämna ditt namn",
+          "body": "Det räcker med namn och e-postadress för att få länken."
+        },
+        "enter": {
+          "title": "Delta",
+          "body": "Öppna länken vid rätt tid: du är inne."
+        }
+      },
+      "listTitle": "Kommande möten"
     }
   },
   "polls": {
@@ -2534,7 +2813,9 @@
     "errors": {
       "questionRequired": "Skriv omröstningsfrågan",
       "minOptions": "Minst 2 alternativ krävs",
-      "generic": "Fel vid skapande av omröstning"
+      "generic": "Fel vid skapande av omröstning",
+      "vote": "Rösten registrerades inte. Försök igen.",
+      "alreadyVoted": "Du har redan röstat i den här omröstningen."
     }
   },
   "materials": {
@@ -2553,10 +2834,29 @@
     "add": "Lägg till",
     "adding": "Lägger till...",
     "cancel": "Avbryt",
+    "modeLabel": "Typ av material",
+    "modeLink": "Länk",
+    "modeFile": "Fil",
+    "titleOptional": "Titel (valfri, annars filnamnet)",
+    "fileLabel": "Fil att ladda upp",
+    "fileHelp": "Format som stöds: PDF, DOCX, PPTX, XLSX, TXT — max {maxMb} MB",
+    "upload": "Ladda upp",
+    "uploading": "Laddar upp…",
     "errors": {
       "urlInvalid": "Ange en giltig URL",
-      "generic": "Fel vid tillägg av material"
-    }
+      "generic": "Fel vid tillägg av material",
+      "fileMissing": "Välj en fil att ladda upp",
+      "titleMissing": "Ange en titel för länken",
+      "fileTooLarge": "Filen överskrider gränsen på {maxMb} MB",
+      "fileTooLargeForServer": "Servern tar inte emot en så stor fil: försök med en mindre fil",
+      "fileType": "Filtypen stöds inte (PDF, DOCX, PPTX, XLSX, TXT)",
+      "uploadUnavailable": "Filuppladdning är inte tillgänglig i den här installationen",
+      "uploadFailed": "Fel vid uppladdning av filen",
+      "quotaExceeded": "Det här evenemanget har nått gränsen för uppladdade filer ({maxFiles} filer, {maxMb} MB totalt): ta bort några för att ladda upp fler",
+      "uploadBusy": "För många uppladdningar just nu: försök igen om några sekunder",
+      "deleteFailed": "Materialet kunde inte tas bort"
+    },
+    "addedByStaff": "Tillagt av arrangörerna"
   },
   "reminders": {
     "title": "Påminnelser",
@@ -2582,11 +2882,11 @@
     "consent": {
       "recording": "Jag samtycker till ljud-/videoinspelning av detta evenemang",
       "recordingRequired": "Samtycke till inspelning krävs för att delta i detta evenemang",
-      "futureCommunications": "Jag vill ta emot information om framtida evenemang arrangerade av DTD",
-      "addressBook": "Jag vill läggas till i DTD-adressboken för att bli inbjuden till liknande evenemang",
-      "addressBookHelp": "Separat samtycke (GDPR art. 6.1.a). Du kan återkalla det när som helst via länken \"Ta bort mina uppgifter från adressboken\" i de mejl du får. Namn och organisation hämtas från din anmälningsprofil.",
       "multitrack": "Jag samtycker till inspelning av ett separat ljudspår med min röst, enbart för att transkriptionen ska kunna tillskrivas rätt talare. Spåret är tillfälligt och raderas efter transkriptionen; det används inte för att identifiera eller återge min röst.",
-      "multitrackRequired": "Samtycke till inspelning av ditt ljudspår krävs för att delta i detta evenemang"
+      "multitrackRequired": "Samtycke till inspelning av ditt ljudspår krävs för att delta i detta evenemang",
+      "futureCommunications": "Jag vill ta emot information om kommande evenemang som publiceras på den här plattformen",
+      "addressBook": "Jag vill läggas till i evenemangsadressboken för att bli inbjuden till liknande evenemang",
+      "addressBookHelp": "Separat samtycke (GDPR art. 6.1.a). Du kan återkalla det när som helst via länken \"Ta bort mina uppgifter från adressboken\" i de mejl du får. Namn och organisation hämtas från din anmälningsprofil."
     },
     "export": {
       "title": "Mina uppgifter",
@@ -2596,10 +2896,10 @@
       "emailInvalid": "Ange en giltig e-postadress",
       "submit": "Begär mina uppgifter",
       "loading": "Söker...",
-      "requestSubmittedTitle": "Check your inbox",
-      "requestSubmittedBody": "If this email matches a registration, we've sent you a link to download your data. The link is valid for 1 hour.",
-      "linkInvalid": "This link is invalid or expired. Please request a new link.",
-      "requestNew": "Request a new link",
+      "requestSubmittedTitle": "Kontrollera din inkorg",
+      "requestSubmittedBody": "Om e-postadressen motsvarar en anmälan har vi skickat en länk för att ladda ned dina uppgifter. Länken är giltig i 1 timme.",
+      "linkInvalid": "Länken är ogiltig eller har gått ut. Begär en ny länk.",
+      "requestNew": "Begär en ny länk",
       "noData": "Inga uppgifter hittades för denna e-postadress.",
       "error": "Ett fel uppstod. Försök igen senare.",
       "rateLimited": "För många förfrågningar. Försök igen om en timme.",
@@ -2614,30 +2914,30 @@
       "questionsTitle": "Q&A-frågor",
       "pollVotesTitle": "Omröstningsröster",
       "optionLabel": "Alternativ",
-      "erasureCtaTitle": "Want to delete your data?",
-      "erasureCtaBody": "You can request full erasure of the data tied to your email (GDPR Art. 17).",
-      "erasureCtaButton": "Request erasure"
+      "erasureCtaTitle": "Vill du radera dina uppgifter?",
+      "erasureCtaBody": "Du kan begära fullständig radering av de uppgifter som är kopplade till din e-postadress (GDPR art. 17).",
+      "erasureCtaButton": "Begär radering"
     },
     "erasure": {
-      "title": "Erase your data",
-      "subtitle": "Confirm the erasure of the personal data tied to your email address (GDPR Art. 17).",
-      "emailLabel": "Your email address",
-      "emailPlaceholder": "Enter the email used for registration",
-      "emailInvalid": "Please enter a valid email address",
-      "submit": "Request erasure",
-      "requestSubmittedTitle": "Check your inbox",
-      "requestSubmittedBody": "If this email matches a registration, we've sent you a link to confirm the erasure. The link is valid for 1 hour.",
-      "linkInvalid": "This link is invalid or expired. Please request a new link.",
-      "confirmWarning": "You are about to permanently erase all personal data tied to your email.",
-      "confirmBody": "Registrations, questions, poll votes, feedback and reminders will be deleted. This action is irreversible.",
-      "confirmButton": "Confirm erasure",
-      "cancel": "Cancel",
-      "processing": "Deleting...",
-      "doneTitle": "Erasure completed",
-      "doneBody": "{count} registrations and the linked data have been deleted.",
-      "error": "An error occurred. Please try again later.",
-      "rateLimited": "Too many requests. Please try again in one hour.",
-      "back": "Back to my data"
+      "title": "Radering av dina uppgifter",
+      "subtitle": "Bekräfta raderingen av de personuppgifter som är kopplade till din e-postadress (GDPR art. 17).",
+      "emailLabel": "Din e-postadress",
+      "emailPlaceholder": "Ange den e-post du använde vid anmälan",
+      "emailInvalid": "Ange en giltig e-postadress",
+      "submit": "Begär radering",
+      "requestSubmittedTitle": "Kontrollera din inkorg",
+      "requestSubmittedBody": "Om e-postadressen motsvarar en anmälan har vi skickat en länk för att bekräfta raderingen. Länken är giltig i 1 timme.",
+      "linkInvalid": "Länken är ogiltig eller har gått ut. Begär en ny länk.",
+      "confirmWarning": "Du håller på att permanent radera alla personuppgifter som är kopplade till din e-postadress.",
+      "confirmBody": "Anmälningar, frågor, röster i omröstningar, återkoppling, påminnelser och din post i evenemangsadressboken raderas. Åtgärden kan inte ångras.",
+      "confirmButton": "Bekräfta radering",
+      "cancel": "Avbryt",
+      "processing": "Raderar...",
+      "doneTitle": "Raderingen är klar",
+      "doneBody": "Raderade anmälningar: {count}, tillsammans med tillhörande uppgifter.",
+      "error": "Ett fel uppstod. Försök igen senare.",
+      "rateLimited": "För många förfrågningar. Försök igen om en timme.",
+      "back": "Tillbaka till mina uppgifter"
     }
   },
   "legal": {
@@ -2648,7 +2948,7 @@
       "sections": {
         "controller": {
           "title": "Personuppgiftsansvarig",
-          "body": "Personuppgifter behandlas inom ramen för Avdelningen för digital omvandlings institutionella verksamhet för att stödja den tekniska och organisatoriska hanteringen av offentliga onlineevenemang."
+          "body": "Personuppgiftsansvarig: {organization}. Personuppgifter behandlas inom ramen för dess institutionella verksamhet för att stödja den tekniska och organisatoriska hanteringen av offentliga onlineevenemang."
         },
         "data": {
           "title": "Behandlade uppgifter och ändamål",
@@ -2656,11 +2956,11 @@
         },
         "retention": {
           "title": "Lagring och rättigheter",
-          "body": "Uppgifter lagras under den period som konfigurerats för varje evenemang och raderas därefter automatiskt, om inte annan lagstiftning kräver annat. Registrerade kan när som helst utöva sina GDPR-rättigheter, inklusive tillgång, rättelse och radering, via avdelningens institutionella kanaler."
+          "body": "Uppgifter lagras under den period som konfigurerats för varje evenemang och raderas därefter automatiskt, om inte annan lagstiftning kräver annat. Registrerade kan när som helst utöva sina GDPR-rättigheter, inklusive tillgång, rättelse och radering, via den personuppgiftsansvariges institutionella kanaler."
         },
         "automatedProcessing": {
           "title": "Transkription, sammanfattning och dubbning genererade av artificiell intelligens",
-          "body": "För evenemang som begär det behandlas inspelningen efter sändningens slut av en AI-kedja som körs helt på avdelningens egen klusterinfrastruktur. Den tar fram transkription av det talade (med separering av de olika talarna), en lättläst sammanfattning, eventuella översättningar till andra europeiska språk och en dubbad ljudversion med en generisk syntetisk röst. Alla modeller som används (WhisperX för transkription, Mistral-Small för sammanfattning och översättning, Piper TTS för dubbning) körs på dedikerade GPU:er inuti klustret: inga deltagardata skickas till tredjepartstjänster. Deltagarnas röst klonas inte och lagras inte som biometriska uppgifter (art. 9 GDPR): dubbningen använder offentliga förtränade syntetiska röster som tilldelas talarna godtyckligt. För varje inspelning visar evenemangssidan den exakta ögonblicksbilden av de modeller som använts (”Transparens i AI-behandlingen”). Det genererade innehållet kan innehålla felaktigheter: den auktoritativa källan är alltid originalvideon (AI-förordningen, art. 50)."
+          "body": "För evenemang som begär det behandlas inspelningen efter sändningens slut av en AI-kedja som körs helt på den här installationens klusterinfrastruktur. Den tar fram transkription av det talade (med separering av de olika talarna), en lättläst sammanfattning, eventuella översättningar till andra europeiska språk och en dubbad ljudversion med en generisk syntetisk röst. Alla modeller som används (WhisperX för transkription, Mistral-Small för sammanfattning och översättning, Piper TTS för dubbning) körs på dedikerade GPU:er inuti klustret: inga deltagardata skickas till tredjepartstjänster. Deltagarnas röst klonas inte och lagras inte som biometriska uppgifter (art. 9 GDPR): dubbningen använder offentliga förtränade syntetiska röster som tilldelas talarna godtyckligt. För varje inspelning visar evenemangssidan den exakta ögonblicksbilden av de modeller som använts (”Transparens i AI-behandlingen”). Det genererade innehållet kan innehålla felaktigheter: den auktoritativa källan är alltid originalvideon (AI-förordningen, art. 50)."
         }
       },
       "note": {
@@ -2672,7 +2972,7 @@
     "accessibility": {
       "metaTitle": "Tillgänglighetsutlåtande",
       "title": "Tillgänglighetsutlåtande",
-      "intro": "Departementet för digital omvandling åtar sig att göra PA Webinar tillgängligt, i enlighet med italiensk lag 4/2004, EU-direktiv 2016/2102 och AgID:s riktlinjer om tillgänglighet för IT-verktyg.",
+      "intro": "Ansvarig myndighet: {organization}. Myndigheten åtar sig att göra den här plattformen tillgänglig, i enlighet med italiensk lag 4/2004, EU-direktiv 2016/2102 och AgID:s riktlinjer om tillgänglighet för IT-verktyg.",
       "sections": {
         "conformance": {
           "title": "Överensstämmelsestatus",
@@ -2711,7 +3011,7 @@
       "sections": {
         "ownership": {
           "title": "Tjänsteägande",
-          "body": "Plattformen drivs av Avdelningen för digital omvandling och tillhandahålls för anordnande av och deltagande i institutionella offentliga onlineevenemang."
+          "body": "Plattformens ägare: {organization}. Plattformen tillhandahålls för anordnande av och deltagande i institutionella offentliga onlineevenemang."
         },
         "usage": {
           "title": "Användning av tjänsten",
@@ -2719,7 +3019,7 @@
         },
         "liability": {
           "title": "Ansvarsbegränsning",
-          "body": "Trots att lämpliga tekniska och organisatoriska åtgärder vidtas kan avdelningen inte garantera fullständig frånvaro av avbrott eller störningar orsakade av oförutsedda händelser, underhåll eller externa faktorer. Rättsligt ansvar regleras av tillämplig lag."
+          "body": "Trots att lämpliga tekniska och organisatoriska åtgärder vidtas kan plattformens ägare inte garantera fullständig frånvaro av avbrott eller störningar orsakade av oförutsedda händelser, underhåll eller externa faktorer. Rättsligt ansvar regleras av tillämplig lag."
         }
       }
     },
@@ -2818,7 +3118,8 @@
         },
         "note": "Den fullständiga listan över komponenter och tjänster, med versioner, hash och tekniska egenskaper, finns i tidigare avsnitt och i den nedladdningsbara JSON."
       }
-    }
+    },
+    "organizationNotConfigured": "organisationen har ännu inte angetts i inställningarna"
   },
   "status": {
     "title": "Systemstatus",
@@ -2851,7 +3152,7 @@
     "nodesReady": "noder redo",
     "scaling": "skalar",
     "jvbStress": "JVB-belastning",
-    "participantsConnected": "deltagare anslutna",
+    "participantsConnected": "deltagare på videobryggan",
     "videoInteractive": "interaktiv",
     "videoWebinar": "webbinarium",
     "participantsAvailable": "deltagare tillgängliga",
@@ -2874,13 +3175,13 @@
     "systemStatus": "Systemstatus",
     "postprod": {
       "title": "Pipeline efter evenemanget",
-      "subtitle": "Transkription, sammanfattning, översättning och dubbning av inspelningen",
-      "whatItDoes": "När ett evenemang är slut går inspelningen genom en intern pipeline: transkriptionen tas fram av WhisperX, sammanfattningen och översättningarna av en Mistral-modell, det dubbade ljudet av Piper TTS. Alla modeller körs på en GPU i klustret som bara är påslagen så länge arbetet pågår, så att energiförbrukningen följer den faktiska belastningen.",
       "status": {
         "idle": "Väntar",
         "running": "Körs",
         "degraded": "Försämrad"
       },
+      "subtitle": "Transkription, sammanfattning, översättning och dubbning av inspelningen",
+      "whatItDoes": "När ett evenemang är slut går inspelningen genom en intern pipeline: transkriptionen tas fram av WhisperX, sammanfattningen och översättningarna av en Mistral-modell, det dubbade ljudet av Piper TTS. Alla modeller körs på en GPU i klustret som bara är påslagen så länge arbetet pågår, så att energiförbrukningen följer den faktiska belastningen.",
       "aiBadge": "Transkriptionen, sammanfattningen och dubbningen för det här evenemanget är genererade av AI-modeller och kan innehålla felaktigheter. Utgå alltid från originalvideon när du behöver full säkerhet.",
       "idleMessage": "Pipelinen är redo, inga inspelningar att bearbeta just nu.",
       "queueAriaLabel": "Sammansättningen av efterproduktionskön",
@@ -2895,7 +3196,12 @@
       "lastFailure": "Senast misslyckad {when}",
       "artifactsProduced": "{count, plural, =0 {inga artefakter} one {1 artefakt producerad} other {# artefakter producerade}}",
       "eventsEnabled": "{count, plural, =0 {inga evenemang med AI} one {1 evenemang med aktiv AI} other {# evenemang med aktiv AI}}"
-    }
+    },
+    "jvbFixedUp": "{count, plural, =1 {Videobrygga aktiv} other {Videobrygga aktiv · # bryggor planerade}}",
+    "jvbFixedDown": "Videobryggan svarar inte",
+    "jvbFixedDownDetail": "Deltagarna får varken ljud eller video förrän bryggan går att nå igen.",
+    "jvbUnmonitored": "Status övervakas inte",
+    "jvbUnmonitoredDetail": "Den här installationen frågar inte videobryggan, så dess status är inte tillgänglig här."
   },
   "infraMap": {
     "loading": "Laddar infrastrukturkarta...",
@@ -2903,8 +3209,8 @@
     "ariaLabel": "Systeminfrastrukturkarta",
     "title": "Infrastrukturkarta",
     "subtitle": "Realtidsvisualisering av arkitekturen och tjänsternas status",
-    "participants": "Deltagare",
-    "conferences": "Konferenser",
+    "participants": "Deltagare på videobryggan",
+    "conferences": "Konferenser på videobryggan",
     "bandwidthIn": "Inkommande bandbredd",
     "bandwidthOut": "Utgående bandbredd",
     "recordings": "Inspelningar",
@@ -2947,6 +3253,7 @@
     "connMedia": "videoström",
     "connRecording": "inspelning",
     "connUpload": "uppladdning",
+    "connPostprod": "AI-efterproduktion",
     "connPubSub": "chatt pub/sub",
     "services": {
       "app": "Webbportal",
@@ -2989,23 +3296,33 @@
       "jitsiWeb": {
         "healthy": "Videokonferensrummet är nåbart och redo för evenemang.",
         "down": "Videokonferensrummet är inte nåbart. Det går inte att starta eller ansluta till evenemang.",
-        "standby": "Videokonferensrummet är inte konfigurerat."
+        "standby": "Videokonferensrummet är inte konfigurerat.",
+        "degraded": "Videokonferensrummet svarar, men med fel eller långsamt.",
+        "publicCheckFailed": "Portalen kan inte kontrollera rummet på dess offentliga adress: sett från servern är certifikatet eller namnet inte giltigt. Rummet kan ändå fungera för deltagarna.",
+        "unmonitored": "Videokonferensrummets status övervakas inte i den här installationen."
       },
       "prosody": {
         "healthy": "Intern meddelandehantering mellan videotjänster fungerar korrekt.",
         "down": "Intern meddelandehantering är inte nåbar. Videotjänster kan inte kommunicera med varandra.",
-        "standby": "Meddelandetjänsten är inte konfigurerad."
+        "standby": "Meddelandetjänsten är inte konfigurerad.",
+        "degraded": "Den interna meddelandehanteringen svarar, men med fel eller långsamt.",
+        "publicCheckFailed": "Portalen kan inte kontrollera den interna meddelandehanteringen via rummets offentliga adress: sett från servern är certifikatet eller namnet inte giltigt. Konferenserna kan ändå fungera.",
+        "unmonitored": "Den interna meddelandehanteringens status övervakas inte i den här installationen."
       },
       "jicofo": {
         "healthy": "Konferenskoordinatorn är aktiv och hanterar sessioner.",
         "down": "Konferenskoordinatorn är inte nåbar. Det går inte att skapa nya konferenser.",
-        "standby": "Konferenskoordinatorn är inte konfigurerad."
+        "standby": "Konferenskoordinatorn är inte konfigurerad.",
+        "degraded": "Konferenskoordinatorn svarar, men med fel eller långsamt.",
+        "unmonitored": "Konferenskoordinatorns status övervakas inte i den här installationen."
       },
       "jvb": {
         "healthy": "Videobryggan är aktiv och överför ljud/video till deltagare.",
         "scaling": "Videobryggan förbereder sig för ett kommande evenemang. Servrar skapas automatiskt.",
         "standby": "Videobryggan är i standby. Den aktiveras automatiskt innan ett schemalagt evenemang börjar.",
-        "stale": "Ett evenemang väntar på videobridgen längre än konfigurerad timeout. Kontrollera cluster autoscaler och JVB-poddarnas loggar."
+        "stale": "Ett evenemang väntar på videobridgen längre än konfigurerad timeout. Kontrollera cluster autoscaler och JVB-poddarnas loggar.",
+        "fixedDown": "Videobryggan svarar inte. Konferenserna överför varken ljud eller video förrän den går att nå igen.",
+        "unmonitored": "Videobryggans status övervakas inte i den här installationen: portalen har ingen adress att fråga den på."
       },
       "jibri": {
         "healthy": "Inspelningstjänsten är redo och tillgänglig.",
@@ -3037,7 +3354,8 @@
       "jibri": "Evenemang kan inte spelas in. Deltagare kan fortfarande ansluta och delta.",
       "jibriStale": "Ett evenemang med aktiv inspelning väntar på Jibri längre än timeouten: sessionen spelas inte in.",
       "smtp": "Bekräftelsemeddelanden och påminnelser skickas inte.",
-      "postprodDegraded": "Transkriptioner och sammanfattningar för några av de senaste inspelningarna har inte genererats. Videoinspelningarna är ändå tillgängliga."
+      "postprodDegraded": "Transkriptioner och sammanfattningar för några av de senaste inspelningarna har inte genererats. Videoinspelningarna är ändå tillgängliga.",
+      "jvbDown": "Deltagarna får varken ljud eller video."
     },
     "overallVerdicts": {
       "operational": "Alla tjänster fungerar korrekt. Plattformen är fullt operativ.",
@@ -3067,7 +3385,8 @@
       "degraded": "Försämrad",
       "down": "Otillgänglig",
       "standby": "I standby",
-      "scaling": "Förbereder"
+      "scaling": "Förbereder",
+      "unknown": "Övervakas inte"
     },
     "metrics": {
       "uptime24h": "Drifttid 24h",
@@ -3079,7 +3398,7 @@
       "requestRate": "Förfrågningar/s",
       "podUptime": "Pod-drifttid"
     },
-    "connPostprod": "AI-efterproduktion"
+    "probeDetail": "Resultat av kontrollen"
   },
   "feedback": {
     "title": "Hur bedömer du detta evenemang?",
@@ -3107,7 +3426,13 @@
     "noActiveRound": "Ingen aktiv word cloud just nu.",
     "noWords": "Väntar på de första orden...",
     "wordsSubmitted": "{count} ord inskickade",
-    "timeRemaining": "Tid kvar"
+    "timeRemaining": "Tid kvar",
+    "errors": {
+      "send": "Ordet skickades inte. Försök igen.",
+      "closed": "Omgången är stängd: inga fler ord tas emot.",
+      "limit": "Du har redan skickat det högsta antalet ord för den här omgången.",
+      "rateLimited": "För många inskick just nu: vänta några sekunder innan du försöker igen."
+    }
   },
   "timer": {
     "title": "Timer",
@@ -3153,8 +3478,6 @@
     }
   },
   "footer": {
-    "departmentName": "Avdelningen för digital omvandling",
-    "presidencyName": "Ministerrådets kansli",
     "privacy": "Integritetspolicy",
     "accessibility": "Tillgänglighetsförklaring",
     "openSource": "Öppen källkod",
@@ -3169,8 +3492,38 @@
     "buildInfoDev": "utvecklingsbygge",
     "viewCommit": "Visa commit på GitHub",
     "viewRelease": "Visa version på GitHub",
-    "buildDatePrefix": "Byggd den",
-    "viewChangelog": "Se vad som är nytt (changelog)"
+    "viewChangelog": "Se vad som är nytt (changelog)",
+    "buildDatePrefix": "Byggd den"
+  },
+  "changelog": {
+    "metaTitle": "Nyheter och changelog",
+    "title": "Nyheter och changelog",
+    "intro": "Alla versioner av plattformen, med den senaste först. Varje post sammanfattar de viktigaste nyheterna, rättningarna och förbättringarna.",
+    "current": "Aktuell version",
+    "sourceNote": "Noteringarna är sammanställda utifrån projektets taggar, pull requests och commits.",
+    "sourceLink": "Se alla releaser på GitHub",
+    "rawChangelog": "CHANGELOG.md i förvaret",
+    "transparencyNote": "För varje version: vad som körs och med vilka komponenter, i",
+    "transparencyInventory": "tjänstetransparensen",
+    "transparencySecurity": "säkerhet och SBOM",
+    "technicalDetail": "Tekniska detaljer",
+    "releaseLink": "Release",
+    "securityBadge": "Säkerhet",
+    "sbomButton": "SBOM",
+    "pipelineLink": "Pipeline",
+    "scorecardLink": "OpenSSF Scorecard",
+    "sbomClose": "Stäng",
+    "sbomLoading": "Läser in…",
+    "sbomError": "Det gick inte att läsa in SBOM.",
+    "sbomComponents": "komponenter",
+    "sbomSearch": "sök komponent…",
+    "sbomColName": "Komponent",
+    "sbomColVersion": "Version",
+    "sbomColEcosystem": "Ekosystem",
+    "sbomNoMatch": "Ingen matchande komponent.",
+    "sbomDownload": "Ladda ner fullständig SBOM (SPDX)",
+    "sourcesLink": "Källkod",
+    "codeScanningLink": "Kodskanning (CodeQL)"
   },
   "pages": {
     "privacyTitle": "Integritetspolicy",
@@ -3208,281 +3561,9 @@
     "shortcutsF": "Helskärm",
     "shortcutsSpeed": "Sänk eller höj hastigheten",
     "captionsOn": "Undertexter på",
-    "captionsOff": "Undertexter av"
-  },
-  "diagram": {
-    "title": "Evenemangskonfiguration",
-    "topology": "Topologi",
-    "features": "Aktiva funktioner",
-    "estimates": "Resursuppskattning",
-    "moderator": "Moderator",
-    "participants": "Deltagare",
-    "bridge": "Video Bridge",
-    "jvb": "Video Bridge",
-    "jibri": "Inspelning",
-    "occupancy": "Beläggning",
-    "sizedForRegistrations": "Baserat på {count} aktuella anmälningar",
-    "sizedForCapacity": "Baserat på maxkapacitet {count}",
-    "chips": {
-      "mic": "Mikrofon",
-      "video": "Webbkamera",
-      "screen": "Skärmdelning"
-    },
-    "bandwidth": {
-      "moderator": "Moderatorns bandbredd",
-      "participant": "Bandbredd per deltagare",
-      "total": "Uppskattad total bandbredd"
-    },
-    "jvbCount": "Nödvändiga JVB:er",
-    "jvbRam": "Uppskattat JVB-RAM",
-    "storage": "Inspelningslagring",
-    "duration": "Uppskattad längd",
-    "viewOnly": "Enbart visning",
-    "preview": "Förhandsgranskning av konfiguration"
-  },
-  "waiting": {
-    "startsIn": "Evenemanget börjar om",
-    "eventLive": "Evenemanget pågår!",
-    "connectedParticipants": "{count, plural, =0 {Inga deltagare} =1 {1 deltagare ansluten} other {{count} deltagare anslutna}}",
-    "elapsedTime": "Pågår sedan {minutes} minuter",
-    "youAreLate": "Evenemanget startade för {minutes} minuter sedan",
-    "chooseHowToJoin": "Välj hur du vill delta:",
-    "enterLive": "Gå med LIVE",
-    "enterLiveDesc": "Delta live. Du kan alltid se inspelningen efter evenemanget.",
-    "enterNow": "Gå med nu",
-    "watchFromStart": "Se från början",
-    "watchFromStartDesc": "Se inspelningen från början och anslut live när du vill.",
-    "watchNow": "Se",
-    "switchToLive": "Byt till live",
-    "enterRoom": "Gå in i rummet",
-    "recordingNotice": "Detta evenemang spelas in.",
-    "recordingAvailableAfter": "Inspelningen blir tillgänglig efter evenemanget.",
-    "autoRefreshHint": "Sidan uppdateras automatiskt när evenemanget startar.",
-    "startEventButton": "Starta evenemang",
-    "startingEvent": "Startar...",
-    "peopleWaiting": "{count, plural, =0 {} =1 {1 person väntar} other {{count} personer väntar}}",
-    "jvbScaling": "Förbereder rummet...",
-    "jvbScalingDetail": "Videoservrarna startar upp. Det tar ungefär 2 minuter.",
-    "jvbReady": "Rummet är redo!",
-    "warmingUp": "Rummet förbereds",
-    "warmingUpDetail": "Vi startar videoservrarna. Förbered dig under tiden — allt är klart om 2–3 minuter och du kan ansluta.",
-    "warmingUpButton": "Rummet förbereds...",
-    "nameLabel": "Ditt namn",
-    "nameHelp": "Visas för andra deltagare",
-    "joinNowBtn": "Anslut nu",
-    "roomOpen": "The room is open",
-    "whileYouWait": "While you wait",
-    "openingAt": "Öppnas {time}",
-    "netiquetteTitle": "Goda råd för deltagande",
-    "netiquetteBullet1": "Kom några minuter tidigare för att testa mikrofon och webbkamera",
-    "netiquetteBullet2": "Slå på webbkamera och mikrofon endast när du vill säga något — räck upp handen för att begära ordet",
-    "netiquetteBullet3": "Använd chatten för korta utbyten, Q&A för frågor till talarna",
-    "netiquetteBullet4": "Inspelning, om aktiverad, hanteras endast av moderatorerna och markeras med en röd indikator",
-    "watchCatchup": "Titta från början",
-    "watchCatchupDesc": "Titta på den partiella inspelningen och kom ikapp livesändningen när du vill",
-    "chatPreviewTitle": "Evenemangets chatt",
-    "chatPreviewHint": "Läs vad andra deltagare säger medan du förbereder dig",
-    "endedTitle": "Evenemanget är avslutat",
-    "endedWatchRecording": "Titta på inspelningen",
-    "endedLeaveFeedback": "Lämna feedback",
-    "moderatedBy": "Modererat av {name}",
-    "startEventError": "Det gick inte att starta evenemanget. Försök igen.",
-    "emailLabel": "E-post (valfritt)",
-    "emailHelp": "Endast för eventuell uppföljning efter evenemanget",
-    "emailInvalid": "Ange en giltig e-postadress",
-    "chatLockedMessage": "Ange ditt namn för att delta i evenemangets chatt.",
-    "classicView": "Classic view",
-    "backToGarden": "Back to the park",
-    "startingSoon": "Evenemanget börjar strax, vänta på arrangören…",
-    "exitWaiting": "Lämna väntrummet",
-    "aiNoticeTitle": "AI-bearbetning efter evenemanget",
-    "aiNotice": "När det är slut bearbetas inspelningen av AI-verktyg för att skapa transkription, sammanfattning och eventuella översättningar och dubbning. Resultaten kan innehålla felaktigheter; videon är fortfarande den auktoritativa källan.",
-    "multitrackConsentTitle": "Inspelning per deltagare",
-    "multitrackConsentRequired": "Du måste godkänna inspelningen av ditt ljudspår för att komma in",
-    "enterGardenTitle": "Gå in på torget",
-    "enterGardenHint": "En plats att strosa på medan du väntar — där kan du också ställa in namn och mikrofon och gå med i evenemanget.",
-    "backToWaitingRoom": "Tillbaka till väntrummet",
-    "gardenDialogLabel": "Väntrummets torg",
-    "gardenGateHint": "Du kan gå med härifrån, eller gå med din avatar fram till porten.",
-    "classicVersion": "Klassisk version",
-    "warmup": {
-      "queued": "Förfrågan mottagen",
-      "startingBridge": "Startar videoservern…",
-      "provisioningNode": "Skapar en dedikerad videoserver",
-      "almostReady": "Videoservern igång: snart klart",
-      "almostReadyDetail": "Ett ögonblick till, sedan aktiveras anslutningsknappen av sig själv.",
-      "honestHint": "Vanlig väntetid: under en minut om infrastrukturen redan är varm, 3–5 minuter vid första starten. Under tiden kan du kontrollera kamera och mikrofon eller använda chatten.",
-      "elapsed": "förbereds sedan {time}"
-    }
-  },
-  "recording": {
-    "management": "Videoinspelning",
-    "inProgress": "Pågår",
-    "available": "Inspelning tillgänglig",
-    "duration": "Längd",
-    "fileSize": "Filstorlek",
-    "startedAt": "Startad",
-    "automatic": "automatisk",
-    "publish": "Publicera inspelning",
-    "publishDesc": "Gör videon tillgänglig på evenemangssidan",
-    "retentionLabel": "Lagring",
-    "retention": {
-      "24h": "24 timmar (tillfällig)",
-      "7d": "7 dagar",
-      "30d": "30 dagar",
-      "90d": "90 dagar",
-      "forever": "Aldrig (tills evenemanget löper ut)"
-    },
-    "retentionNote": "Videon följer fortfarande evenemangets GDPR-lagringspolicy",
-    "delete": "Radera inspelning",
-    "deleteConfirm": "Är du säker? Videon raderas permanent.",
-    "notConfigured": "Jibri är inte konfigurerat. Videoinspelning är inte tillgänglig.",
-    "disabledHint": "Videoinspelning är inte aktiverad för detta evenemang. För att aktivera, öppna avsnittet Inställningar ovan och slå på \"Inspelning\".",
-    "play": "Spela upp",
-    "download": "Ladda ned",
-    "transcriptManage": "Transkription / AI",
-    "deleteConfirmTitle": "Ta bort inspelning",
-    "deleteFailed": "Borttagningen misslyckades",
-    "deleteSuccess": "Inspelningen har tagits bort"
-  },
-  "postEvent": {
-    "config": "Konfiguration efter evenemang",
-    "pageVisible": "Evenemangssida synlig efter avslut",
-    "showQA": "Visa Q&A-frågor",
-    "showMaterials": "Visa delat material",
-    "showPolls": "Visa omröstningsresultat",
-    "showFeedback": "Visa feedback",
-    "feedbackEnabled": "Feedbackundersökning aktiv vid evenemangets slut",
-    "visibilityAlways": "Alltid synlig",
-    "visibilityUntil": "Synlig till:",
-    "dataRetentionNote": "Deltagarnas personuppgifter raderas enligt evenemangets lagringspolicy ({days} dagar). Evenemangets innehåll förblir tillgängligt så länge sidan är synlig.",
-    "availableUntil": "Detta evenemang och dess innehåll kommer att vara tillgängligt till {date}.",
-    "tabs": {
-      "qa": "Frågor och svar",
-      "materials": "Material",
-      "polls": "Omröstningar",
-      "feedback": "Feedback",
-      "transcript": "AI-transkription"
-    },
-    "pageVisibleHelp": "Om den är avstängd (eller när synlighetsfönstret har gått ut) returnerar det avslutade evenemangets publika sida 404 och evenemanget försvinner från listor och sitemap.",
-    "libraryListed": "Publicera i videobiblioteket",
-    "libraryListedHelp": "Visa det här evenemanget i det publika biblioteket (/video-library). Kräver en publicerad inspelning eller en YouTube-video, och att evenemangssidan är synlig.",
-    "libraryListedNoRecording": "Ingen publicerad inspelning: evenemanget visas inte i biblioteket förrän du publicerar inspelningen eller lägger till en YouTube-video.",
-    "showRecap": "Visa sammanfattningen av evenemanget",
-    "showWordCloud": "Visa ordmoln",
-    "emailEnabled": "Skicka sammanfattningsmejl när evenemanget avslutas",
-    "emailEnabledHelp": "Vid avslutningen skickas ett tackmejl till de anmälda deltagarna med länkar till sammanfattningen och feedbacken, och en kort sammanfattning till moderatorn. Skickas bara en gång."
-  },
-  "provisioning": {
-    "loading": "Laddar",
-    "titleFromIdle": "Rummet återaktiveras",
-    "titleColdStart": "Rummet förbereds",
-    "descriptionFromIdle": "Rummet hade pausats på grund av inaktivitet för att minska energiförbrukningen. Vi startar om det nu: det tar cirka 2–3 minuter.",
-    "descriptionColdStart": "Vi förbereder det virtuella rummet för detta evenemang. Det tar cirka 2–3 minuter: du omdirigeras automatiskt så snart allt är klart.",
-    "progressLabel": "{seconds} s",
-    "retry": "Ladda om",
-    "tempError": "Vi försöker nå servern igen, ingen åtgärd krävs.",
-    "ended": "Evenemanget är avslutat.",
-    "scaleToZeroNote": "För att minska miljöpåverkan stängs videonoder av när ingen är i ett samtal. Återstart sker automatiskt vid första anslutning."
-  },
-  "rubrica": {
-    "optOut": {
-      "title": "Borttagning från DTD-adressboken",
-      "intro": "Du är på väg att återkalla samtycket till att vara med i DTD-adressboken. Efter bekräftelse kommer du inte längre att kontaktas för inbjudningar till liknande evenemang.",
-      "missingToken": "Länken är ogiltig eller ofullständig. Kontrollera ursprungsmejlet.",
-      "invalidToken": "Länken har gått ut eller är ogiltig. Kontakta evenemangsansvarig för hjälp.",
-      "notFound": "Ingen person matchar länken. Personen kan redan ha tagits bort.",
-      "loading": "Laddar…",
-      "previewHeader": "Du är på väg att ta bort från adressboken:",
-      "warning": "Åtgärden raderar inte historiken över anmälningar till enskilda evenemang.",
-      "confirm": "Bekräfta borttagningen",
-      "submitting": "Tar bort…",
-      "successTitle": "Borttagning klar",
-      "successBody": "Dina uppgifter finns inte längre i DTD-adressboken.",
-      "errors": {
-        "generic": "Ett fel uppstod. Försök igen senare."
-      }
-    }
-  },
-  "deviceCheck": {
-    "preview": "Videoförhandsgranskning",
-    "micLevel": "Mikrofonnivå",
-    "cameraLabel": "Kamera",
-    "micLabel": "Mikrofon",
-    "permissionNeeded": "Tillåt mikrofon och webbkamera för att testa dem. Du kan ansluta utan dem ändå.",
-    "noVideo": "Ingen video",
-    "noAudio": "Mikrofon ej tillgänglig",
-    "retry": "Försök igen",
-    "cameraToggleOn": "Kamera PÅ",
-    "cameraToggleOff": "Kamera AV",
-    "micToggleOn": "Mikrofon PÅ",
-    "micToggleOff": "Mikrofon AV",
-    "cameraOffPreview": "Kamera avstängd",
-    "speakerTest": "🔊 Testa ljud"
-  },
-  "garden": {
-    "enable": "Visa trädgården",
-    "classicView": "Klassisk vy",
-    "changeAvatar": "Byt avatar",
-    "peopleInGarden": "{count, plural, =0 {Ingen i trädgården} one {1 person i trädgården} other {# personer i trädgården}}",
-    "guestName": "Guest",
-    "hintKeyboard": "Rör dig med WASD eller piltangenterna",
-    "pickerTitle": "Välj din avatar",
-    "pickerHelp": "Karaktären representerar dig i väntrummets trädgård. Du kan byta när du vill.",
-    "close": "Stäng",
-    "hintBanner": "Tryck på piltangenterna för att gå runt i trädgården",
-    "hintJoystick": "Dra för att röra dig"
-  },
-  "feedbackAdmin": {
-    "title": "Feedback results",
-    "totalVotes": "responses",
-    "noFeedback": "No feedback received",
-    "comments": "Comments",
-    "noComments": "No comments",
-    "yes": "Ja",
-    "no": "Nej"
-  },
-  "agenda": {
-    "title": "Anteckningar / Checklista",
-    "empty": "Inga punkter ännu. Lägg till ämnena som ska tas upp och bocka av dem efter hand.",
-    "add": "Lägg till",
-    "addPlaceholder": "Ny punkt…",
-    "remove": "Ta bort",
-    "inProgress": "pågår",
-    "agree": "Instämmer",
-    "disagree": "Instämmer inte",
-    "favorablePct": "{pct} % instämmer",
-    "noReactions": "Dela din åsikt"
-  },
-  "changelog": {
-    "metaTitle": "Nyheter och changelog",
-    "title": "Nyheter och changelog",
-    "intro": "Alla versioner av plattformen, med den senaste först. Varje post sammanfattar de viktigaste nyheterna, rättningarna och förbättringarna.",
-    "current": "Aktuell version",
-    "sourceNote": "Noteringarna är sammanställda utifrån projektets taggar, pull requests och commits.",
-    "sourceLink": "Se alla releaser på GitHub",
-    "rawChangelog": "CHANGELOG.md i förvaret",
-    "transparencyNote": "För varje version: vad som körs och med vilka komponenter, i",
-    "transparencyInventory": "tjänstetransparensen",
-    "transparencySecurity": "säkerhet och SBOM",
-    "technicalDetail": "Tekniska detaljer",
-    "releaseLink": "Release",
-    "securityBadge": "Säkerhet",
-    "sbomButton": "SBOM",
-    "pipelineLink": "Pipeline",
-    "scorecardLink": "OpenSSF Scorecard",
-    "sbomClose": "Stäng",
-    "sbomLoading": "Läser in…",
-    "sbomError": "Det gick inte att läsa in SBOM.",
-    "sbomComponents": "komponenter",
-    "sbomSearch": "sök komponent…",
-    "sbomColName": "Komponent",
-    "sbomColVersion": "Version",
-    "sbomColEcosystem": "Ekosystem",
-    "sbomNoMatch": "Ingen matchande komponent.",
-    "sbomDownload": "Ladda ner fullständig SBOM (SPDX)",
-    "sourcesLink": "Källkod",
-    "codeScanningLink": "Kodskanning (CodeQL)"
+    "captionsOff": "Undertexter av",
+    "watchOnYouTube": "Se videon på YouTube",
+    "externalSiteNote": "Öppnas på YouTube, en extern webbplats med egna användarvillkor och en egen integritetspolicy."
   },
   "postprod": {
     "loading": "Läser in transkriptionen…",
@@ -3579,5 +3660,277 @@
     },
     "overlapBadge": "samtidigt",
     "overlapTitle": "Samtidigt tal: i det här intervallet talar mer än en person samtidigt."
+  },
+  "diagram": {
+    "title": "Evenemangskonfiguration",
+    "topology": "Topologi",
+    "features": "Aktiva funktioner",
+    "estimates": "Resursuppskattning",
+    "moderator": "Moderator",
+    "participants": "Deltagare",
+    "bridge": "Video Bridge",
+    "jvb": "Video Bridge",
+    "jibri": "Inspelning",
+    "occupancy": "Beläggning",
+    "sizedForRegistrations": "Baserat på {count} aktuella anmälningar",
+    "sizedForCapacity": "Baserat på maxkapacitet {count}",
+    "chips": {
+      "mic": "Mikrofon",
+      "video": "Webbkamera",
+      "screen": "Skärmdelning"
+    },
+    "bandwidth": {
+      "moderator": "Moderatorns bandbredd",
+      "participant": "Bandbredd per deltagare",
+      "total": "Uppskattad total bandbredd"
+    },
+    "jvbCount": "Nödvändiga JVB:er",
+    "jvbRam": "Uppskattat JVB-RAM",
+    "storage": "Inspelningslagring",
+    "duration": "Uppskattad längd",
+    "viewOnly": "Enbart visning",
+    "preview": "Förhandsgranskning av konfiguration"
+  },
+  "waiting": {
+    "startsIn": "Evenemanget börjar om",
+    "startingSoon": "Evenemanget börjar strax, vänta på arrangören…",
+    "eventLive": "Evenemanget pågår!",
+    "connectedParticipants": "{count, plural, =0 {Inga deltagare} =1 {1 deltagare ansluten} other {{count} deltagare anslutna}}",
+    "elapsedTime": "Pågår sedan {minutes} minuter",
+    "youAreLate": "Evenemanget startade för {minutes} minuter sedan",
+    "chooseHowToJoin": "Välj hur du vill delta:",
+    "enterLive": "Gå med LIVE",
+    "enterLiveDesc": "Delta live. Du kan alltid se inspelningen efter evenemanget.",
+    "enterNow": "Gå med nu",
+    "watchFromStart": "Se från början",
+    "watchFromStartDesc": "Se inspelningen från början och anslut live när du vill.",
+    "watchNow": "Se",
+    "switchToLive": "Byt till live",
+    "enterRoom": "Gå in i rummet",
+    "recordingNotice": "Detta evenemang spelas in.",
+    "recordingAvailableAfter": "Inspelningen blir tillgänglig efter evenemanget.",
+    "autoRefreshHint": "Sidan uppdateras automatiskt när evenemanget startar.",
+    "startEventButton": "Starta evenemang",
+    "startingEvent": "Startar...",
+    "peopleWaiting": "{count, plural, =0 {} =1 {1 person väntar} other {{count} personer väntar}}",
+    "jvbScaling": "Förbereder rummet...",
+    "jvbScalingDetail": "Videoservrarna startar upp. Det tar ungefär 2 minuter.",
+    "jvbReady": "Rummet är redo!",
+    "warmup": {
+      "queued": "Förfrågan mottagen",
+      "startingBridge": "Startar videoservern…",
+      "provisioningNode": "Skapar en dedikerad videoserver",
+      "almostReady": "Videoservern igång: snart klart",
+      "almostReadyDetail": "Ett ögonblick till, sedan aktiveras anslutningsknappen av sig själv.",
+      "honestHint": "Vanlig väntetid: under en minut om infrastrukturen redan är varm, 3–5 minuter vid första starten. Under tiden kan du kontrollera kamera och mikrofon eller använda chatten.",
+      "elapsed": "förbereds sedan {time}",
+      "scheduled": "Rummet öppnas vid starttiden",
+      "scheduledDetail": "Eller tidigare, när arrangören startar evenemanget. Under tiden kan du kontrollera kamera och mikrofon eller använda chatten."
+    },
+    "exitWaiting": "Lämna väntrummet",
+    "warmingUp": "Rummet förbereds",
+    "warmingUpDetail": "Vi startar videoservrarna. Förbered dig under tiden — allt är klart om 2–3 minuter och du kan ansluta.",
+    "warmingUpButton": "Rummet förbereds...",
+    "nameLabel": "Ditt namn",
+    "nameHelp": "Visas för andra deltagare",
+    "nameRequiredToEnter": "Ange ditt namn för att komma in (minst 2 tecken).",
+    "roomOpenNameMissing": "Rummet är öppet: ange ditt namn för att komma in.",
+    "joinNowBtn": "Anslut nu",
+    "roomOpen": "Rummet är öppet",
+    "whileYouWait": "Medan du väntar",
+    "openingAt": "Öppnas {time}",
+    "netiquetteTitle": "Goda råd för deltagande",
+    "netiquetteBullet1": "Kom några minuter tidigare för att testa mikrofon och webbkamera",
+    "netiquetteBullet2": "Slå på webbkamera och mikrofon endast när du vill säga något — räck upp handen för att begära ordet",
+    "netiquetteBullet3": "Använd chatten för korta utbyten, Q&A för frågor till talarna",
+    "netiquetteBullet4": "Inspelning, om aktiverad, hanteras endast av moderatorerna och markeras med en röd indikator",
+    "watchCatchup": "Titta från början",
+    "watchCatchupDesc": "Titta på den partiella inspelningen och kom ikapp livesändningen när du vill",
+    "chatPreviewTitle": "Evenemangets chatt",
+    "chatPreviewHint": "Läs vad andra deltagare säger medan du förbereder dig",
+    "endedTitle": "Evenemanget är avslutat",
+    "endedWatchRecording": "Titta på inspelningen",
+    "endedLeaveFeedback": "Lämna feedback",
+    "moderatedBy": "Modererat av {name}",
+    "startEventError": "Det gick inte att starta evenemanget. Försök igen.",
+    "emailLabel": "E-post (valfritt)",
+    "emailHelp": "Endast för eventuell uppföljning efter evenemanget",
+    "emailInvalid": "Ange en giltig e-postadress",
+    "chatLockedMessage": "Ange ditt namn för att delta i evenemangets chatt.",
+    "classicView": "Klassisk vy",
+    "backToGarden": "Tillbaka till parken",
+    "aiNoticeTitle": "AI-bearbetning efter evenemanget",
+    "aiNotice": "När det är slut bearbetas inspelningen av AI-verktyg för att skapa transkription, sammanfattning och eventuella översättningar och dubbning. Resultaten kan innehålla felaktigheter; videon är fortfarande den auktoritativa källan.",
+    "multitrackConsentTitle": "Inspelning per deltagare",
+    "multitrackConsentRequired": "Du måste godkänna inspelningen av ditt ljudspår för att komma in",
+    "enterGardenTitle": "Gå in på torget",
+    "enterGardenHint": "En plats att strosa på medan du väntar — där kan du också ställa in namn och mikrofon och gå med i evenemanget.",
+    "backToWaitingRoom": "Tillbaka till väntrummet",
+    "gardenDialogLabel": "Väntrummets torg",
+    "gardenGateHint": "Du kan gå med härifrån, eller gå med din avatar fram till porten.",
+    "classicVersion": "Klassisk version",
+    "roomNotReadyButton": "Rummet förbereds…",
+    "roomNotReadyPiazza": "Gå till torget under tiden",
+    "gate": {
+      "gateOpen": "Ingången är öppen",
+      "stageLive": "● DIREKT",
+      "gatePreparing": "Rummet förbereds…",
+      "stagePreparing": "Snart",
+      "ended": "Evenemanget har avslutats",
+      "startsIn": "Börjar om {time}",
+      "hostEarly": "Tidigt insläpp (värd)"
+    },
+    "roomJustOpened": "Rummet är redo — kom in",
+    "enterAnyway": "Gå in ändå",
+    "notHeldBadge": "Tiden har passerat",
+    "notHeldTitle": "Den planerade tiden för evenemanget har passerat",
+    "notHeldDetail": "Rummet öppnades inte. Se evenemangets sida för eventuella uppdateringar."
+  },
+  "recording": {
+    "management": "Videoinspelning",
+    "inProgress": "Pågår",
+    "available": "Inspelning tillgänglig",
+    "duration": "Längd",
+    "fileSize": "Filstorlek",
+    "startedAt": "Startad",
+    "automatic": "automatisk",
+    "publish": "Publicera inspelning",
+    "publishDesc": "Gör videon tillgänglig på evenemangssidan",
+    "retentionLabel": "Lagring",
+    "retention": {
+      "24h": "24 timmar (tillfällig)",
+      "7d": "7 dagar",
+      "30d": "30 dagar",
+      "90d": "90 dagar",
+      "forever": "Aldrig (tills evenemanget löper ut)"
+    },
+    "retentionNote": "Videon följer fortfarande evenemangets GDPR-lagringspolicy",
+    "delete": "Radera inspelning",
+    "deleteConfirm": "Är du säker? Videon raderas permanent.",
+    "notConfigured": "Jibri är inte konfigurerat. Videoinspelning är inte tillgänglig.",
+    "disabledHint": "Videoinspelning är inte aktiverad för detta evenemang. För att aktivera, öppna avsnittet Inställningar ovan och slå på \"Inspelning\".",
+    "play": "Spela upp",
+    "download": "Ladda ned",
+    "transcriptManage": "Transkription / AI",
+    "deleteConfirmTitle": "Ta bort inspelning",
+    "deleteFailed": "Borttagningen misslyckades",
+    "deleteSuccess": "Inspelningen har tagits bort"
+  },
+  "postEvent": {
+    "config": "Konfiguration efter evenemang",
+    "pageVisible": "Evenemangssida synlig efter avslut",
+    "pageVisibleHelp": "Om den är avstängd (eller när synlighetsfönstret har gått ut) returnerar det avslutade evenemangets publika sida 404 och evenemanget försvinner från listor och sitemap.",
+    "libraryListed": "Publicera i videobiblioteket",
+    "libraryListedHelp": "Visa det här evenemanget i det publika biblioteket (/video-library). Kräver en publicerad inspelning eller en YouTube-video, och att evenemangssidan är synlig.",
+    "libraryListedNoRecording": "Ingen publicerad inspelning: evenemanget visas inte i biblioteket förrän du publicerar inspelningen eller lägger till en YouTube-video.",
+    "showQA": "Visa Q&A-frågor",
+    "showMaterials": "Visa delat material",
+    "showPolls": "Visa omröstningsresultat",
+    "showFeedback": "Visa feedback",
+    "showRecap": "Visa sammanfattningen av evenemanget",
+    "showWordCloud": "Visa ordmoln",
+    "emailEnabled": "Skicka sammanfattningsmejl när evenemanget avslutas",
+    "emailEnabledHelp": "Vid avslutningen skickas ett tackmejl till de anmälda deltagarna med länkar till sammanfattningen och feedbacken, och en kort sammanfattning till moderatorn. Skickas bara en gång.",
+    "feedbackEnabled": "Feedbackundersökning aktiv vid evenemangets slut",
+    "visibilityAlways": "Alltid synlig",
+    "visibilityUntil": "Synlig till:",
+    "dataRetentionNote": "Deltagarnas personuppgifter raderas enligt evenemangets lagringspolicy ({days} dagar). Evenemangets innehåll förblir tillgängligt så länge sidan är synlig.",
+    "availableUntil": "Detta evenemang och dess innehåll kommer att vara tillgängligt till {date}.",
+    "tabs": {
+      "qa": "Frågor och svar",
+      "materials": "Material",
+      "polls": "Omröstningar",
+      "feedback": "Feedback",
+      "transcript": "AI-transkription"
+    }
+  },
+  "provisioning": {
+    "loading": "Laddar",
+    "titleFromIdle": "Rummet återaktiveras",
+    "titleColdStart": "Rummet förbereds",
+    "descriptionFromIdle": "Rummet hade pausats på grund av inaktivitet för att minska energiförbrukningen. Vi startar om det nu: det tar cirka 2–3 minuter.",
+    "descriptionColdStart": "Vi förbereder det virtuella rummet för detta evenemang. Det tar cirka 2–3 minuter: du omdirigeras automatiskt så snart allt är klart.",
+    "progressLabel": "{seconds} s",
+    "retry": "Ladda om",
+    "tempError": "Vi försöker nå servern igen, ingen åtgärd krävs.",
+    "ended": "Evenemanget är avslutat.",
+    "scaleToZeroNote": "För att minska miljöpåverkan stängs videonoder av när ingen är i ett samtal. Återstart sker automatiskt vid första anslutning."
+  },
+  "rubrica": {
+    "optOut": {
+      "title": "Borttagning från evenemangsadressboken",
+      "intro": "Du är på väg att återkalla samtycket till att vara med i evenemangsadressboken. Efter bekräftelse kommer du inte längre att kontaktas för inbjudningar till liknande evenemang.",
+      "missingToken": "Länken är ogiltig eller ofullständig. Kontrollera ursprungsmejlet.",
+      "invalidToken": "Länken har gått ut eller är ogiltig. Kontakta evenemangsansvarig för hjälp.",
+      "notFound": "Ingen person matchar länken. Personen kan redan ha tagits bort.",
+      "loading": "Laddar…",
+      "previewHeader": "Du är på väg att ta bort från adressboken:",
+      "warning": "Åtgärden raderar inte historiken över anmälningar till enskilda evenemang.",
+      "confirm": "Bekräfta borttagningen",
+      "submitting": "Tar bort…",
+      "successTitle": "Borttagning klar",
+      "successBody": "Dina uppgifter finns inte längre i evenemangsadressboken.",
+      "errors": {
+        "generic": "Ett fel uppstod. Försök igen senare."
+      }
+    }
+  },
+  "deviceCheck": {
+    "preview": "Videoförhandsgranskning",
+    "micLevel": "Mikrofonnivå",
+    "cameraLabel": "Kamera",
+    "micLabel": "Mikrofon",
+    "permissionNeeded": "Tillåt mikrofon och webbkamera för att testa dem. Du kan ansluta utan dem ändå.",
+    "noVideo": "Ingen video",
+    "noAudio": "Mikrofon ej tillgänglig",
+    "retry": "Försök igen",
+    "cameraToggleOn": "Kamera PÅ",
+    "cameraToggleOff": "Kamera AV",
+    "micToggleOn": "Mikrofon PÅ",
+    "micToggleOff": "Mikrofon AV",
+    "cameraOffPreview": "Kamera avstängd",
+    "speakerTest": "🔊 Testa ljud",
+    "backgroundLabel": "Virtuell bakgrund",
+    "backgroundNoneShort": "No",
+    "backgroundHint": "Tillämpas när du går in i rummet. För att göra bakgrunden suddig använder du bakgrundsknappen när du är inne: förhandsvisningen ovan visar kameran utan effekt.",
+    "background": {
+      "nessuno": "Ingen bakgrund",
+      "ufficio-chiaro": "Ljust kontor",
+      "blu-istituzionale": "Institutionell blå",
+      "verde-salvia": "Salviagrön",
+      "grafite": "Grafit"
+    }
+  },
+  "garden": {
+    "enable": "Visa trädgården",
+    "classicView": "Klassisk vy",
+    "changeAvatar": "Byt avatar",
+    "peopleInGarden": "{count, plural, =0 {Ingen i trädgården} one {1 person i trädgården} other {# personer i trädgården}}",
+    "guestName": "Gäst",
+    "hintKeyboard": "Rör dig med WASD eller piltangenterna",
+    "pickerTitle": "Välj din avatar",
+    "pickerHelp": "Karaktären representerar dig i väntrummets trädgård. Du kan byta när du vill.",
+    "close": "Stäng",
+    "hintBanner": "Tryck på piltangenterna för att gå runt i trädgården",
+    "hintJoystick": "Dra för att röra dig"
+  },
+  "feedbackAdmin": {
+    "title": "Återkopplingsresultat",
+    "totalVotes": "svar",
+    "noFeedback": "Ingen återkoppling mottagen",
+    "comments": "Kommentarer",
+    "noComments": "Inga kommentarer",
+    "yes": "Ja",
+    "no": "Nej"
+  },
+  "questionnaire": {
+    "loadFailed": "Det gick inte att läsa in enkäten.",
+    "submit": "Skicka svar",
+    "submitFailed": "Det gick inte att skicka. Försök igen.",
+    "answersInvalid": "Några svar saknas eller är ogiltiga: kontrollera de obligatoriska frågorna och försök igen.",
+    "alreadySubmitted": "Du har redan skickat dina svar på den här enkäten.",
+    "thankYou": "Tack för dina svar.",
+    "yes": "Ja",
+    "no": "Nej"
   }
 }

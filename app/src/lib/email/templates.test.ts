@@ -18,7 +18,7 @@ import {
  */
 const base = () => ({
   locale: 'it' as const,
-  eventTitle: 'Sync DesIt + DevIt',
+  eventTitle: 'Incontro di rete + domande',
   eventDate: 'mercoledì 22 luglio 2026',
   eventTime: '11:15',
   eventDuration: '45 min',
@@ -29,19 +29,19 @@ const base = () => ({
 
 describe('confirmation email', () => {
   it('puts the event name in the subject', () => {
-    expect(baseConfirmationCopy(base()).subject).toContain('Sync DesIt + DevIt');
-    expect(baseConfirmationCopy({ ...base(), locale: 'en' }).subject).toContain('Sync DesIt + DevIt');
+    expect(baseConfirmationCopy(base()).subject).toContain('Incontro di rete + domande');
+    expect(baseConfirmationCopy({ ...base(), locale: 'en' }).subject).toContain('Incontro di rete + domande');
   });
 
   it('shows the event name prominently in the body, not just in the table', () => {
     const html = confirmationHtml(base());
     // Once as the headline under the heading, once in the details table.
-    const occurrences = html.split('Sync DesIt + DevIt').length - 1;
+    const occurrences = html.split('Incontro di rete + domande').length - 1;
     expect(occurrences).toBeGreaterThanOrEqual(2);
   });
 
   it('keeps the event name in the plain-text part', () => {
-    expect(confirmationText(base())).toContain('Sync DesIt + DevIt');
+    expect(confirmationText(base())).toContain('Incontro di rete + domande');
   });
 
   it('renders the event banner when the event has an image', () => {
@@ -50,7 +50,7 @@ describe('confirmation email', () => {
       eventImageUrl: 'https://example.gov.it/api/assets/image/2026/07/banner.png',
     });
     expect(html).toContain('<img src="https://example.gov.it/api/assets/image/2026/07/banner.png"');
-    expect(html).toContain('alt="Sync DesIt + DevIt"');
+    expect(html).toContain('alt="Incontro di rete + domande"');
   });
 
   it('renders no banner when the event has no image', () => {
@@ -111,5 +111,81 @@ describe('absoluteEventImage', () => {
   it('returns null when the event has no image', () => {
     expect(absoluteEventImage({}, BASE)).toBeNull();
     expect(absoluteEventImage({ imageUrl: null, coverImageUrl: null }, BASE)).toBeNull();
+  });
+});
+
+describe('email di accesso dello staff', () => {
+  it('il nome non diventa markup', async () => {
+    const { staffLoginEmail } = await import('./templates');
+    const m = staffLoginEmail({
+      locale: 'it',
+      name: '<img src=x onerror=alert(1)>',
+      url: 'https://esempio.it/it/admin/accesso?t=abc',
+      minutes: 20,
+    });
+    expect(m.html).not.toContain('<img src=x');
+    expect(m.html).toContain('&lt;img');
+    expect(m.text).toContain('https://esempio.it/it/admin/accesso?t=abc');
+  });
+});
+
+describe('uscita dalla rubrica nelle email', () => {
+  const OPT_OUT = 'https://example.gov.it/it/rubrica/opt-out?token=abc.def';
+
+  it('senza rubrica resta la nota di sempre, senza link', async () => {
+    const { baseReminderCopy, reminderText } = await import('./templates');
+    expect(baseConfirmationCopy(base()).footerNote).toContain('Nessuna azione ulteriore');
+    expect(confirmationHtml(base())).not.toContain('rubrica/opt-out');
+    expect(reminderText(base(), baseReminderCopy(base()))).not.toContain('rubrica/opt-out');
+  });
+
+  it('per chi e in rubrica sostituisce «nessuna azione» e porta il link firmato', async () => {
+    const { baseReminderCopy, reminderHtml: html, reminderText } = await import('./templates');
+    const input = { ...base(), addressBookOptOutUrl: OPT_OUT };
+    for (const copy of [baseConfirmationCopy(input), baseReminderCopy(input)]) {
+      expect(copy.footerNote).not.toContain('Nessuna azione ulteriore');
+      expect(copy.footerNote).toContain('rubrica');
+    }
+    expect(confirmationHtml(input)).toContain(`href="${OPT_OUT}"`);
+    expect(confirmationHtml(input)).toContain('Rimuovi i miei dati dalla rubrica');
+    expect(confirmationText(input)).toContain(`Rimuovi i miei dati dalla rubrica: ${OPT_OUT}`);
+    expect(html(input)).toContain(`href="${OPT_OUT}"`);
+    expect(reminderText(input)).toContain(OPT_OUT);
+  });
+
+  it('il link resta anche quando la nota e personalizzata dall amministrazione', () => {
+    const input = { ...base(), addressBookOptOutUrl: OPT_OUT };
+    const resolved = { ...baseConfirmationCopy(input), footerNote: 'Testo dell ente' };
+    const out = confirmationHtml(input, resolved);
+    expect(out).toContain('Testo dell ente');
+    expect(out).toContain(`href="${OPT_OUT}"`);
+  });
+
+  it('ha un testo in ogni lingua delle email', async () => {
+    const { EMAIL_LOCALES } = await import('./lingua');
+    for (const locale of EMAIL_LOCALES) {
+      const input = { ...base(), locale, addressBookOptOutUrl: OPT_OUT };
+      const note = baseConfirmationCopy(input).footerNote;
+      expect(note).not.toBe(baseConfirmationCopy({ ...base(), locale }).footerNote);
+      expect(confirmationText(input)).toContain(OPT_OUT);
+    }
+  });
+
+  it('arriva anche nell email di ringraziamento dopo l evento', async () => {
+    const { postEventParticipantEmail } = await import('./templates');
+    const mail = postEventParticipantEmail({
+      locale: 'en',
+      eventTitle: 'Evento',
+      eventPageUrl: 'https://example.gov.it/en/events/x',
+      addressBookOptOutUrl: OPT_OUT,
+    });
+    expect(mail.html).toContain(`href="${OPT_OUT}"`);
+    expect(mail.text).toContain(`Remove me from the address book: ${OPT_OUT}`);
+    const without = postEventParticipantEmail({
+      locale: 'en',
+      eventTitle: 'Evento',
+      eventPageUrl: 'https://example.gov.it/en/events/x',
+    });
+    expect(without.html).not.toContain('opt-out');
   });
 });

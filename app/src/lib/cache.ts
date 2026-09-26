@@ -43,3 +43,21 @@ export function setCache<T>(key: string, data: T, ttlMs: number): void {
 export function deleteCache(key: string): void {
   store.delete(key);
 }
+
+/**
+ * Invalidazione per prefisso, per quando le voci sono una famiglia e non una
+ * sola: la stessa lista può essere in cache in più varianti (per esempio un
+ * filtro di stato per pannello), e cancellarne una lascerebbe le altre a
+ * rispondere con il contenuto di prima. Stesso limite di `deleteCache`: agisce
+ * sul processo locale, sugli altri resta il TTL.
+ */
+export function deleteCacheByPrefix(prefix: string): number {
+  let cancellate = 0;
+  for (const key of store.keys()) {
+    if (key.startsWith(prefix)) {
+      store.delete(key);
+      cancellate += 1;
+    }
+  }
+  return cancellate;
+}

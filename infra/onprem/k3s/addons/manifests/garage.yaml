@@ -1,0 +1,195 @@
+# Garage, object storage S3 su un solo nodo, per PA Webinar su k3s.
+# Modello di storage.sh: i segnaposto @@...@@ li sostituisce lo script.
+# I segreti (RPC, token di amministrazione e delle metriche) arrivano dal
+# Secret @@NAME@@, creato dallo script dalla cartella di stato.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: @@NAME@@-config
+  labels:
+    app.kubernetes.io/name: garage
+    app.kubernetes.io/instance: @@RELEASE@@
+    app.kubernetes.io/part-of: pa-webinar
+    app.kubernetes.io/managed-by: pa-webinar-addons
+data:
+  garage.toml: |
+    # Un nodo solo: replica 1. Senza copie su altri nodi, fsync su metadati e
+    # dati: dopo un'interruzione di corrente il database dei metadati resta
+    # coerente. Le istantanee dei metadati ogni 6 ore permettono di
+    # ripartire da una copia buona se il database si guasta.
+    metadata_dir = "/var/lib/garage/meta"
+    data_dir = "/var/lib/garage/data"
+    db_engine = "lmdb"
+    metadata_fsync = true
+    data_fsync = true
+    metadata_auto_snapshot_interval = "6h"
+    replication_factor = 1
+
+    # L'RPC fra nodi resta dentro il pod: con un nodo solo serve soltanto
+    # alla riga di comando (kubectl exec).
+    rpc_bind_addr = "127.0.0.1:3901"
+    rpc_public_addr = "127.0.0.1:3901"
+
+    [s3_api]
+    s3_region = "garage"
+    api_bind_addr = "0.0.0.0:3900"
+
+    [admin]
+    api_bind_addr = "0.0.0.0:3903"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: @@NAME@@-data
+  labels:
+    app.kubernetes.io/name: garage
+    app.kubernetes.io/instance: @@RELEASE@@
+    app.kubernetes.io/part-of: pa-webinar
+    app.kubernetes.io/managed-by: pa-webinar-addons
+spec:
+  accessModes: [ReadWriteOnce]
+  storageClassName: @@STORAGE_CLASS@@
+  resources:
+    requests:
+      storage: @@SIZE@@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: @@NAME@@
+  labels:
+    app.kubernetes.io/name: garage
+    app.kubernetes.io/instance: @@RELEASE@@
+    app.kubernetes.io/part-of: pa-webinar
+    app.kubernetes.io/managed-by: pa-webinar-addons
+spec:
+  replicas: 1
+  # Il volume è ReadWriteOnce e il database dei metadati non va aperto da due
+  # processi: il pod vecchio si ferma prima che parta il nuovo.
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: garage
+      app.kubernetes.io/instance: @@RELEASE@@
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: garage
+        app.kubernetes.io/instance: @@RELEASE@@
+        app.kubernetes.io/part-of: pa-webinar
+      annotations:
+        # Cambia quando cambiano la configurazione o i segreti: il pod
+        # riparte e li rilegge.
+        checksum/config: "@@CONFIG_HASH@@"
+    spec:
+      automountServiceAccountToken: false
+      enableServiceLinks: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: garage
+          image: @@IMAGE@@
+          imagePullPolicy: IfNotPresent
+          args: ["/garage", "server"]
+          envFrom:
+            - secretRef:
+                name: @@NAME@@
+          env:
+            - name: RUST_LOG
+              value: garage=info
+          ports:
+            - name: s3
+              containerPort: 3900
+            - name: admin
+              containerPort: 3903
+          # /health risponde 503 finché il layout non è applicato, cioè alla
+          # prima installazione prima che storage.sh lo configuri: la
+          # prontezza guarda solo che l'API S3 ascolti.
+          readinessProbe:
+            tcpSocket:
+              port: s3
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: admin
+            initialDelaySeconds: 30
+            periodSeconds: 30
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              memory: 1Gi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: [ALL]
+          volumeMounts:
+            - name: config
+              mountPath: /etc/garage.toml
+              subPath: garage.toml
+              readOnly: true
+            - name: data
+              mountPath: /var/lib/garage
+      volumes:
+        - name: config
+          configMap:
+            name: @@NAME@@-config
+        - name: data
+          persistentVolumeClaim:
+            claimName: @@NAME@@-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: @@NAME@@
+  labels:
+    app.kubernetes.io/name: garage
+    app.kubernetes.io/instance: @@RELEASE@@
+    app.kubernetes.io/part-of: pa-webinar
+    app.kubernetes.io/managed-by: pa-webinar-addons
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: garage
+    app.kubernetes.io/instance: @@RELEASE@@
+  ports:
+    - name: s3
+      port: 3900
+      targetPort: s3
+---
+# Solo Traefik (kube-system) raggiunge l'API S3, e solo quella: il portale e
+# i browser passano dal nome pubblico. L'API di amministrazione resta
+# raggiungibile soltanto con kubectl port-forward. Nessuna uscita: un nodo
+# solo non parla con nessuno.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: @@NAME@@
+  labels:
+    app.kubernetes.io/name: garage
+    app.kubernetes.io/instance: @@RELEASE@@
+    app.kubernetes.io/part-of: pa-webinar
+    app.kubernetes.io/managed-by: pa-webinar-addons
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: garage
+      app.kubernetes.io/instance: @@RELEASE@@
+  policyTypes: [Ingress, Egress]
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+      ports:
+        - protocol: TCP
+          port: 3900
+  egress: []

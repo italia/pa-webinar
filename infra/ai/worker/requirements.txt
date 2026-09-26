@@ -57,7 +57,7 @@ webvtt-py==0.5.1
 # è solo per costruire prompt, e non scarichiamo modelli arbitrari,
 # evita il blocco del security scan).
 #
-# 24 lug 2026: 4.48.3 → 4.57.6, l'ULTIMA della major 4. Chiude 7 advisory
+# Bump 4.48.3 → 4.57.6, l'ULTIMA della major 4. Chiude 7 advisory
 # (ReDoS fixate in 4.51/4.52.1/4.53, improper input validation) restando
 # compatibile con lo stack pinnato: whisperx chiede `transformers>=4.48.0`
 # (nessun cap) e 4.57.6 vuole `numpy>=1.17`, quindi il pin `numpy<2` regge.

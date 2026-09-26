@@ -5,6 +5,7 @@ import {
   parseRRule,
   describeRRule,
   nextOccurrences,
+  nextOccurrenceAfter,
   jsWeekdayToRRule,
 } from './recurrence';
 
@@ -32,7 +33,7 @@ describe('buildRRule + parseRRule roundtrip', () => {
     expect(parsed?.preset).toBe('weekly');
   });
 
-  it('preset weekly with explicit byWeekday=FR (caffettino!) roundtrips', () => {
+  it('preset weekly with explicit byWeekday=FR roundtrips', () => {
     // 4 = Friday in RRULE convention (Mon=0..Sun=6)
     const body = buildRRule({ preset: 'weekly', dtstart: WED_10, byWeekday: [4] });
     expect(body).toContain('FREQ=WEEKLY');
@@ -199,5 +200,74 @@ describe('jsWeekdayToRRule', () => {
   });
   it('maps Friday (JS=5) → 4 (RRULE)', () => {
     expect(jsWeekdayToRRule(5)).toBe(4);
+  });
+});
+
+// ── nextOccurrenceAfter ────────────────────────────────────────────────────
+
+describe('nextOccurrenceAfter', () => {
+  // Le 11:00 di Roma, il 21 ottobre 2026: un mercoledì prima del cambio d'ora.
+  const MER_11_ROMA = new Date('2026-10-21T09:00:00.000Z');
+
+  it("mantiene l'ora locale attraverso il cambio d'ora", () => {
+    // `rrule` avanza sulle componenti UTC: una regola settimanale aggiunge
+    // esattamente 7x24h, quindi senza il fuso l'occorrenza dopo il cambio
+    // d'ora del 25 ottobre cadrebbe alle 10:00 di Roma invece che alle 11:00.
+    const hit = nextOccurrenceAfter(
+      'FREQ=WEEKLY;BYDAY=WE',
+      MER_11_ROMA,
+      MER_11_ROMA,
+      'Europe/Rome',
+    );
+    // Stesse 11:00 locali, che in UTC dopo il cambio sono le 10:00.
+    expect(hit?.toISOString()).toBe('2026-10-28T10:00:00.000Z');
+  });
+
+  it("avanza di sette giorni esatti quando il cambio d'ora non c'è di mezzo", () => {
+    const hit = nextOccurrenceAfter(
+      'FREQ=WEEKLY;BYDAY=WE',
+      MER_11_ROMA,
+      MER_11_ROMA,
+      'Europe/Rome',
+    );
+    const dopo = nextOccurrenceAfter(
+      'FREQ=WEEKLY;BYDAY=WE',
+      MER_11_ROMA,
+      hit!,
+      'Europe/Rome',
+    );
+    expect(dopo?.toISOString()).toBe('2026-11-04T10:00:00.000Z');
+  });
+
+  it('restituisce null quando la regola è esaurita', () => {
+    expect(
+      nextOccurrenceAfter('FREQ=WEEKLY;COUNT=1', MER_11_ROMA, MER_11_ROMA, 'Europe/Rome'),
+    ).toBeNull();
+  });
+
+  it('restituisce null su una regola vuota o illeggibile', () => {
+    expect(nextOccurrenceAfter('', WED_10, WED_10, 'UTC')).toBeNull();
+    expect(nextOccurrenceAfter('FREQ=NONSENSE', WED_10, WED_10, 'UTC')).toBeNull();
+  });
+
+  it('restituisce null su un fuso inesistente, invece di far lanciare Intl', () => {
+    // Un fuso non valido in banca dati deve diventare un ripiego, non un 500
+    // sulla rotta che chiama questa funzione.
+    expect(
+      nextOccurrenceAfter('FREQ=WEEKLY', WED_10, WED_10, 'Terra/Di/Mezzo'),
+    ).toBeNull();
+  });
+
+  it('cerca oltre le occorrenze già passate di una serie lunga', () => {
+    // È la differenza con l'enumerazione da DTSTART: una serie che va avanti
+    // da mesi restituirebbe solo date passate.
+    const inizio = new Date('2026-01-14T10:00:00.000Z');
+    const hit = nextOccurrenceAfter(
+      'FREQ=DAILY',
+      inizio,
+      new Date('2026-10-01T08:00:00.000Z'),
+      'UTC',
+    );
+    expect(hit!.getTime()).toBeGreaterThan(new Date('2026-10-01T08:00:00.000Z').getTime());
   });
 });

@@ -1,26 +1,37 @@
+import type { Metadata } from 'next';
 import { cookies } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
 import { getLocale } from 'next-intl/server';
 
 import { prisma } from '@/lib/db';
+import { titoloEventoPubblico } from '@/lib/events/meta-title';
 import { getPublicEnv } from '@/lib/env';
 import { getSettings } from '@/lib/settings';
-import { isJibriAvailable } from '@/lib/infrastructure';
+import { recordingAvailable } from '@/lib/recording/availability';
 import LiveEventClient from '@/components/live/live-event-client';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import { resolveKickerEnabled } from '@/lib/utils/title-kicker';
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import { eventAccessCookieName, verifyEventAccess } from '@/lib/event-session';
 import { resolveGrantForEvent } from '@/lib/auth/moderator';
-import { isEventPubliclyVisible } from '@/lib/events/visibility';
+import { isEventPageVisible } from '@/lib/events/visibility';
 import { hasJoinGrant } from '@/lib/events/join-grant';
+import { guestAccessAllowed, guestWindowOpen } from '@/lib/events/guest-window';
 import { resolveRnnoiseEnforceOff } from '@/lib/jitsi/rnnoise';
+import { resolveWhiteboardInfraReady } from '@/lib/jitsi/whiteboard';
+import { localizedPath } from '@/lib/utils/localized-url';
 
 export const dynamic = 'force-dynamic';
 
 interface LivePageProps {
   params: Promise<{ slug: string }>;
   searchParams: Promise<{ token?: string }>;
+}
+
+export async function generateMetadata({ params }: LivePageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const titolo = await titoloEventoPubblico(slug);
+  return { ...(titolo ? { title: titolo } : {}), robots: { index: false } };
 }
 
 export default async function LivePage({ params, searchParams }: LivePageProps) {
@@ -51,7 +62,10 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
   // LiveEventClient on mount when the initial status is IDLE.
 
   const settings = await getSettings();
-  const jibriAvailable = await isJibriAvailable();
+  // Se qualcosa puo' registrare (Jibri o il registratore per partecipante):
+  // senza, a chi partecipa non si dice «questo evento viene registrato» e non
+  // si chiede il consenso (lib/recording/availability).
+  const canRecord = recordingAvailable();
 
   const watermark = {
     url:
@@ -65,14 +79,22 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
   // site default (SiteSetting.videoQuality) when null. Flows down to JitsiRoom.
   const videoQuality = event.videoQuality ?? settings.videoQuality;
 
-  // F18 — rnnoise ON/OFF si decide QUI, in un Server Component, e scende come
-  // prop: la stessa lettura dentro JitsiRoom (client) verrebbe sostituita da
-  // webpack a build time e resterebbe congelata nell'immagine, rendendo il
-  // flag non modificabile da Helm. Default = forzata OFF: si accende con
-  // NEXT_PUBLIC_JITSI_RNNOISE_ENFORCE="false" nell'env del pod, e solo con il
-  // jitsi/web patchato a 48 kHz (vedi lib/jitsi/rnnoise.ts).
+  // La soppressione rumore avanzata (rnnoise) di Jitsi si accende/spegne QUI,
+  // in un Server Component, e scende come prop: la stessa lettura dentro
+  // JitsiRoom (client) verrebbe sostituita da webpack a build time e
+  // resterebbe congelata nell'immagine, rendendo il flag non modificabile da
+  // Helm. Default = forzata OFF: si accende con
+  // NEXT_PUBLIC_JITSI_RNNOISE_ENFORCE="false" nell'env del pod, e solo con
+  // il jitsi/web patchato a 48 kHz (vedi lib/jitsi/rnnoise.ts).
   const rnnoiseEnforceOff = resolveRnnoiseEnforceOff(
     getPublicEnv('NEXT_PUBLIC_JITSI_RNNOISE_ENFORCE'),
+  );
+
+  // Lavagna di Jitsi: il pulsante del moderatore compare solo se
+  // l'installazione ne ha il backend. Letto qui a runtime per lo stesso motivo
+  // di rnnoise (lib/jitsi/whiteboard.ts).
+  const whiteboardInfraReady = resolveWhiteboardInfraReady(
+    getPublicEnv('NEXT_PUBLIC_WHITEBOARD_ENABLED'),
   );
 
   // Informativa AI per la sala d'attesa (AI Act / GDPR trasparenza): la
@@ -94,9 +116,16 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
 
   // No token: guest access or redirect. Password-protected events
   // require a cleared join-grant cookie before we issue the guest JWT.
+  // La password protegge l'ingresso da ospite: se l'amministrazione non
+  // ammette ospiti (eventi a calendario, lib/events/guest-window), chiederla
+  // sarebbe un passaggio a vuoto prima del rimando all'iscrizione.
   if (!token) {
-    if (event.joinPasswordHash && !(await hasJoinGrant(event.id))) {
-      redirect(`/${locale}/events/${slug}/password`);
+    if (
+      guestAccessAllowed(event, settings.guestAccessEnabled) &&
+      event.joinPasswordHash &&
+      !(await hasJoinGrant(event.id))
+    ) {
+      redirect(localizedPath(`/events/${slug}/password`, locale));
     }
     // Re-establish a registered participant from the signed per-event access
     // cookie (set at registration) BEFORE falling back to guest access or the
@@ -115,8 +144,9 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
       // for any joinable status (LIVE / IDLE / PROVISIONING) so the user lands
       // on the waiting room even while the bridge warms up. SCHEDULED events
       // still require a personal token for any non-LIVE status — via
-      // /registration.
-      (isInstant ? ['LIVE', 'IDLE', 'PROVISIONING'] : ['LIVE']).includes(event.status)
+      // /registration — and for LIVE too when the administration turns guest
+      // access off. La regola e' la stessa di chat e pannelli.
+      guestWindowOpen(event, settings.guestAccessEnabled)
     ) {
       const title = getLocalized(event.title as LocalizedField, locale);
       return (
@@ -169,9 +199,10 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
           locale={locale}
           jitsiDomain={getPublicEnv('NEXT_PUBLIC_JITSI_DOMAIN')}
           watermark={watermark}
-          jibriAvailable={jibriAvailable}
+          recordingAvailable={canRecord}
           reactionsMode={settings.reactionsMode === 'CUSTOM' ? 'CUSTOM' : 'NATIVE'}
           rnnoiseEnforceOff={rnnoiseEnforceOff}
+          whiteboardInfraReady={whiteboardInfraReady}
         />
       );
     } else if (isInstant) {
@@ -180,9 +211,9 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
       // Evento concluso senza token (link della sala salvato, cookie scaduto):
       // manda alla pagina evento — registrazione video, archivio Q&A, feedback —
       // invece che a /registration, che per stati ≠ PUBLISHED/LIVE fa 404.
-      redirect(`/${locale}/events/${slug}`);
+      redirect(localizedPath(`/events/${slug}`, locale));
     } else {
-      redirect(`/${locale}/events/${slug}/registration`);
+      redirect(localizedPath(`/events/${slug}/registration`, locale));
     }
   }
 
@@ -214,15 +245,15 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
       // Solo per stati in cui la pagina evento è raggiungibile (stesso check
       // della destinazione, lib/events/visibility): per DRAFT/ARCHIVED fa
       // notFound() a sua volta, e un redirect verso un 404 è peggio del 404.
-      if (isEventPubliclyVisible(event)) {
-        redirect(`/${locale}/events/${slug}?invalidToken=1`);
+      if (isEventPageVisible(event)) {
+        redirect(localizedPath(`/events/${slug}?invalidToken=1`, locale));
       }
       notFound();
     }
     // Only the browser that REGISTERED (matching signed event_access cookie)
     // inherits the registrant's name/consent. A forwarded personal link →
     // blank the pre-join name so the opener types their OWN and enters as a
-    // named guest; the JWT route enforces the same rule server-side (F7).
+    // named guest; the JWT route enforces the same rule server-side.
     const cookieStore = await cookies();
     const ownsToken =
       (await verifyEventAccess(
@@ -251,6 +282,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
         endsAt: event.endsAt.toISOString(),
         status: event.status,
         eventType: event.eventType,
+        guestEntryOpen: guestAccessAllowed(event, settings.guestAccessEnabled),
         postEventPublic: event.postEventPublic,
         libraryListed: event.libraryListed,
         recordingEnabled: event.recordingEnabled,
@@ -300,9 +332,10 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
       locale={locale}
       jitsiDomain={getPublicEnv('NEXT_PUBLIC_JITSI_DOMAIN')}
       watermark={watermark}
-      jibriAvailable={jibriAvailable}
+      recordingAvailable={canRecord}
       reactionsMode={settings.reactionsMode === 'CUSTOM' ? 'CUSTOM' : 'NATIVE'}
       rnnoiseEnforceOff={rnnoiseEnforceOff}
+      whiteboardInfraReady={whiteboardInfraReady}
     />
   );
 }

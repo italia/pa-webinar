@@ -2,6 +2,12 @@
 
 export class AppError extends Error {
   public headers?: Record<string, string>;
+  /**
+   * Condizione prevista dalla configurazione dell'installazione (una funzione
+   * non attivata, uno storage non configurato), non un guasto: la riga di log
+   * della richiesta resta a livello `warn` anche con uno stato 5xx.
+   */
+  public expected?: boolean;
 
   constructor(
     message: string,
@@ -58,8 +64,10 @@ export class AlreadyRegisteredError extends AppError {
 }
 
 export class RateLimitError extends AppError {
-  constructor(retryAfterSeconds?: number) {
-    super('Too many requests', 429, 'RATE_LIMIT');
+  /** `code` distingue un limite dall'altro quando il client deve dire cose
+   *  diverse (il limite della persona o quello condiviso da una rete). */
+  constructor(retryAfterSeconds?: number, code = 'RATE_LIMIT') {
+    super('Too many requests', 429, code);
     if (retryAfterSeconds !== undefined) {
       this.headers = {
         'Retry-After': String(Math.ceil(retryAfterSeconds)),

@@ -1,0 +1,275 @@
+# ============================================================================
+# Google Kubernetes Engine — si sovrappone al profilo completo
+# ============================================================================
+#
+# Infrastruttura: infra/tofu/gke/ (cluster Standard, pool di nodi, bucket di
+# Cloud Storage, indirizzi fissi). Etichette e taint dei pool qui sotto sono
+# quelli che crea quel modulo. Non ancora verificato su un progetto reale:
+# vedi infra/tofu/gke/README.md.
+#
+# Dalla radice del repository, dopo `tofu apply`, con i file dell'ente in una
+# cartella fuori dal repository (<config>):
+#
+#   tofu -chdir=infra/tofu/gke output -raw helm_values > <config>/gke-infra.yaml
+#   # Solo con l'Ingress di GKE: BackendConfig, FrontendConfig e certificati.
+#   tofu -chdir=infra/tofu/gke output -raw gce_ingress_manifest \
+#     | kubectl -n videocall apply -f -
+#   helm upgrade --install videocall ./infra/helm/pa-webinar -n videocall \
+#     -f infra/helm/pa-webinar/examples/values-full.yaml \
+#     -f infra/helm/pa-webinar/examples/values-gke.yaml \
+#     -f <config>/gke-infra.yaml \
+#     -f <config>/segreti.yaml \
+#     --wait --timeout 15m
+#
+# gke-infra.yaml porta i nomi DNS, gli indirizzi prenotati e i nomi dei
+# bucket; con ingress-nginx anche i nomi dei certificati (tls), che nel
+# profilo completo sono di esempio. segreti.yaml porta le password XMPP
+# interne elencate in testa a values-full.yaml e, con il TURN acceso, il
+# segreto di coturn: la resa si ferma se mancano.
+# I Secret videocall-secrets e videocall-jitsi-jwt si creano prima, come dice
+# values-full.yaml; in videocall-secrets vanno anche le chiavi dello storage
+# (vedi «Storage» qui sotto).
+#
+# Tre scelte, fatte qui e da cambiare insieme a tofu:
+#   1. Ingresso HTTP. Attivo: l'Ingress di GKE (ingress_mode = "gce"). Con
+#      ingress-nginx (ingress_mode = "nginx") si tolgono i blocchi marcati
+#      [Ingress GCE]: il profilo completo ha già i valori per ingress-nginx.
+#   2. Bridge. Attivo: un bridge dietro un bilanciatore di rete con indirizzo
+#      fisso (jvb_exposure = "load_balancer"). Un indirizzo pubblico per nodo
+#      (jvb_exposure = "node_public_ip") è il blocco commentato
+#      [Un indirizzo per nodo].
+#   3. TURN. Il coturn del chart è spento, come turn_enabled in tofu; il
+#      blocco commentato ha le chiavi che servono su GKE. Si accendono
+#      insieme.
+# ============================================================================
+
+jitsi:
+  # Senza password XMPP fissate ogni `helm upgrade` riavvia Prosody, Jicofo e
+  # il bridge, e fa cadere le chiamate in corso.
+  requirePinnedCredentials: true
+
+app:
+  # Il pool delle applicazioni del modulo tofu. CronJob, scaler dei bridge e
+  # controller della registrazione ereditano questo selettore: un'etichetta
+  # che nessun nodo porta li lascia tutti in Pending. Senza il modulo:
+  #   gcloud container node-pools create ... --node-labels=workload=applications
+  # oppure l'etichetta di GKE, { cloud.google.com/gke-nodepool: <pool> }.
+  nodeSelector:
+    workload: applications
+
+  env:
+    # Un solo bridge: dietro un unico indirizzo un secondo bridge riceverebbe
+    # i pacchetti del primo, e i partecipanti cadrebbero. Con un indirizzo per
+    # nodo si toglie, o si alza fino al massimo del pool.
+    JVB_MAX_REPLICAS: "1"
+
+    # [Ingress GCE] Il bilanciatore di Google aggiunge due voci a
+    # X-Forwarded-For, "<client>,<bilanciatore>": il client è la seconda da
+    # destra. Con ingress-nginx il valore torna 0 (si toglie la riga).
+    TRUSTED_PROXY_HOPS: "1"
+
+    # ── Storage ──
+    # Cloud Storage attraverso la sua API compatibile con S3, firmata con la
+    # chiave HMAC creata da tofu. Workload Identity non è supportata
+    # dall'applicazione per lo storage. I bucket arrivano da gke-infra.yaml.
+    # Nel Secret videocall-secrets:
+    #   STORAGE_FILES_S3_ACCESS_KEY_ID, RECORDING_S3_ACCESS_KEY_ID
+    #     = tofu output -raw storage_hmac_access_id
+    #   STORAGE_FILES_S3_SECRET_ACCESS_KEY, RECORDING_S3_SECRET_ACCESS_KEY
+    #     = tofu output -raw storage_hmac_secret
+    # Con l'endpoint impostato gli indirizzi sono sempre in stile percorso
+    # (<endpoint>/<bucket>/<chiave>), quello che Cloud Storage accetta.
+    STORAGE_FILES_PROVIDER: "s3"
+    STORAGE_FILES_S3_ENDPOINT: "https://storage.googleapis.com"
+    STORAGE_FILES_S3_REGION: "auto"
+    RECORDING_STORAGE_TYPE: "gcs"
+    RECORDING_S3_ENDPOINT: "https://storage.googleapis.com"
+    RECORDING_S3_REGION: "auto"
+
+# [Ingress GCE] Il bilanciatore prende timeout e controllo di salute dalla
+# BackendConfig collegata al Service. Senza, chiude ogni risposta dopo 30
+# secondi: i flussi di eventi della sala in diretta si interrompono di
+# continuo. La BackendConfig è in gce_ingress_manifest (tofu).
+service:
+  annotations:
+    cloud.google.com/backend-config: '{"default": "pa-webinar-portal"}'
+    # Bilanciamento verso i pod (NEG), senza passare dai NodePort. GKE lo
+    # sceglie da sé su un cluster VPC nativo, non su una VPC condivisa:
+    # scriverlo lo rende uguale ovunque.
+    cloud.google.com/neg: '{"ingress": true}'
+
+# [Ingress GCE] GKE sceglie gli Ingress SOLO dall'annotazione
+# kubernetes.io/ingress.class: con la sola classe (`className: gce`) nessun
+# controller li serve e il portale non risponde. La classe resta uguale
+# all'annotazione: il chart lo pretende, e con `gce` toglie da sé le
+# annotazioni di ingress-nginx del profilo completo.
+ingress:
+  className: gce
+  annotations:
+    kubernetes.io/ingress.class: gce
+    # L'indirizzo globale prenotato arriva da gke-infra.yaml
+    # (kubernetes.io/ingress.global-static-ip-name).
+    networking.gke.io/managed-certificates: pa-webinar-portal
+    networking.gke.io/v1beta1.FrontendConfig: pa-webinar-https-redirect
+    # Certificato gestito da Google, non cert-manager.
+    cert-manager.io/cluster-issuer: null
+  # Il certificato lo porta la ManagedCertificate, non un Secret TLS.
+  tls: []
+
+# Il bot della registrazione per partecipante, se lo accendi.
+recorder:
+  nodeSelector:
+    workload: applications
+
+jitsi-meet:
+  # [Ingress GCE] La conferenza: stesso schema del portale, con il proprio
+  # indirizzo globale (da gke-infra.yaml) e il proprio certificato.
+  # L'annotazione di cert-manager del chart resta: con `tls: []` cert-manager
+  # non chiede nessun certificato. Il reindirizzamento della radice della
+  # conferenza al portale (jitsi.webIngress.redirectUrl) è un'annotazione di
+  # ingress-nginx: con l'Ingress di GKE resta spento.
+  web:
+    ingress:
+      ingressClassName: gce
+      annotations:
+        kubernetes.io/ingress.class: gce
+        networking.gke.io/managed-certificates: pa-webinar-conference
+        networking.gke.io/v1beta1.FrontendConfig: pa-webinar-https-redirect
+      tls: []
+    service:
+      annotations:
+        cloud.google.com/backend-config: '{"default": "pa-webinar-conference"}'
+        cloud.google.com/neg: '{"ingress": true}'
+
+  # ── Bridge dietro un bilanciatore di rete (jvb_exposure = load_balancer) ──
+  # Un bilanciatore passthrough UDP con l'indirizzo fisso prenotato da tofu:
+  # gke-infra.yaml porta `publicIPs` (l'indirizzo che il bridge annuncia) e
+  # `service.loadBalancerIP`. Nessuna porta dell'host: i nodi del pool restano
+  # privati, e le regole firewall del bilanciatore le crea GKE.
+  jvb:
+    useHostPort: false
+    useNodeIP: false
+    # L'indirizzo annunciato è noto: nessun server STUN, nemmeno di terzi.
+    stunServers: ""
+    extraEnvs:
+      # Gli indirizzi del pod non servono a nessun partecipante.
+      JVB_ADVERTISE_PRIVATE_CANDIDATES: "false"
+    service:
+      enabled: true
+      type: LoadBalancer
+      # Solo il nodo che ospita il bridge riceve i pacchetti, e il bridge vede
+      # l'indirizzo vero del partecipante.
+      externalTrafficPolicy: Local
+    # L'autoscaler dei nodi non sposta un bridge per consolidare: farebbe
+    # cadere la conferenza. Il nodo si libera quando lo scaler porta il bridge
+    # a zero.
+    podAnnotations:
+      cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
+    metrics:
+      # Nessun Prometheus Operator in un cluster GKE appena creato: un
+      # ServiceMonitor senza la sua CRD fa fallire l'installazione. Vedi
+      # infra/tofu/gke/README.md per Managed Service for Prometheus.
+      serviceMonitor:
+        enabled: false
+
+  # [Un indirizzo per nodo] (jvb_exposure = node_public_ip, non ancora
+  # verificato). Al posto del blocco `jvb` qui sopra: la porta dell'host sul
+  # nodo, che ha un indirizzo pubblico suo; il bridge lo scopre con STUN
+  # (gke-infra.yaml porta `stunServers`: un server fuori da questo cluster).
+  # Più bridge, uno per nodo: JVB_MAX_REPLICAS si toglie o si alza fino al
+  # massimo del pool. La porta dell'host va nel livello privileged di Pod
+  # Security.
+  # jvb:
+  #   useHostPort: true
+  #   useNodeIP: false
+  #   extraEnvs:
+  #     JVB_ADVERTISE_PRIVATE_CANDIDATES: "false"
+  #   podAnnotations:
+  #     cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
+  #   metrics:
+  #     serviceMonitor:
+  #       enabled: false
+
+  jibri:
+    podAnnotations:
+      cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
+    # Chromium, dentro Jibri, registra usando la memoria condivisa: con i
+    # 64 MiB predefiniti di un container la registrazione può fallire. 2Gi è
+    # il valore della guida Docker di Jitsi; è memoria del pod, e conta nel
+    # limite di memoria di Jibri (4Gi nel profilo completo).
+    shm:
+      enabled: true
+      size: 2Gi
+    # Con il pool dedicato (jibri_enabled = true in tofu), al posto del pool
+    # dei bridge che gli dà il profilo completo:
+    # nodeSelector:
+    #   workload: jitsi-jibri
+    # tolerations:
+    #   - key: workload
+    #     operator: Equal
+    #     value: jitsi-jibri
+    #     effect: NoSchedule
+
+  # ── TURN (coturn del chart) ──
+  # Per chi sta dietro reti che bloccano UDP: TURN su TLS sulla porta 443, su
+  # un terzo nome DNS (turn_hostname in tofu). Si accende insieme a
+  # turn_enabled = true in tofu, che prenota l'indirizzo.
+  # L'indirizzo prenotato arriva da gke-infra.yaml, con l'annotazione
+  # networking.gke.io/load-balancer-ip-addresses: su un Service esterno GKE la
+  # legge solo con la classe qui sotto (GKE 1.33.1-gke.1779000 o successiva),
+  # e il sottochart non ha altro modo di passare l'indirizzo. La classe resta
+  # quindi sempre. UDP 3478 e TCP 443 sullo stesso Service chiedono in più il
+  # bilanciatore misto (GKE 1.36.2-gke.1498000 o successiva); tra le due
+  # versioni si tiene la classe e si toglie l'UDP con
+  # `coturn.turn.transport: tcp`.
+  # Il certificato del nome TURN non si ottiene con HTTP-01: serve cert-manager
+  # con la sfida DNS-01 (Cloud DNS, con Workload Identity) o un Secret TLS
+  # tuo. Il resto della configurazione: docs/DEPLOYMENT.md, "coturn (TURN and
+  # TURNS)".
+  # turnHost: <turn.dominio>
+  # coturn:
+  #   enabled: true
+  #   service:
+  #     loadBalancerClass: networking.gke.io/l4-regional-external
+  #   turns:
+  #     enabled: true
+  #     certificate:
+  #       create: true
+  #       issuerRef:
+  #         name: <clusterissuer-dns01>
+  #         kind: ClusterIssuer
+  #         group: cert-manager.io
+
+# Nessun Prometheus Operator per impostazione predefinita (vedi sopra).
+metrics:
+  serviceMonitor:
+    enabled: false
+
+# Post-produzione AI (gpu_enabled in tofu). Le richieste del worker nel chart
+# (8 CPU, 32Gi) stanno nel nodo GPU predefinito del modulo, g2-standard-16:
+# circa 15,9 CPU e 58 GiB allocabili. I limiti del chart (22 CPU, 200Gi) sono
+# per un nodo più grande: portali sotto quello che il nodo offre. Un nodo più
+# piccolo della richiesta non si accende mai, e il worker resta Pending.
+# postprod:
+#   worker:
+#     resources:
+#       requests: { cpu: "8", memory: 32Gi }
+#       limits: { cpu: "15", memory: 56Gi }
+#       # Con g2-standard-8 (circa 7,9 CPU e 28 GiB allocabili):
+#       # requests: { cpu: "6", memory: 24Gi }
+#       # limits: { cpu: "7", memory: 26Gi }
+
+# NetworkPolicy: Dataplane V2 (cluster del modulo tofu) le applica. Con
+# l'Ingress di GKE il traffico arriva ai pod direttamente dai front-end e dai
+# controlli di salute di Google, non da un namespace: vanno ammessi i loro
+# intervalli. Il selettore di namespace predefinito (ingress-nginx) non
+# corrisponde a nulla e resta innocuo. Non ancora verificato.
+# networkPolicy:
+#   enabled: true
+#   ingress:
+#     extraRules:
+#       - from:
+#           - ipBlock: { cidr: 35.191.0.0/16 }
+#           - ipBlock: { cidr: 130.211.0.0/22 }
+#         ports:
+#           - { protocol: TCP, port: 3000 }

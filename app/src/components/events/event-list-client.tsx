@@ -5,14 +5,13 @@ import {
   Card,
   CardBody,
   CardText,
-  CardReadMore,
   Badge,
   Row,
   Col,
-  Icon,
 } from 'design-react-kit';
 
-import { Link } from '@/i18n/navigation';
+import { Icon } from '@/components/ui/icon';
+import { Link, percorso } from '@/i18n/navigation';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import EventTitle from '@/components/events/event-title';
 import { resolveKickerEnabled } from '@/lib/utils/title-kicker';
@@ -155,7 +154,7 @@ export default function EventListClient({
                   style={{ color: 'var(--app-text)' }}
                   wrapMain={(main) => (
                     <Link
-                      href={`/events/${event.slug}`}
+                      href={percorso(`/events/${event.slug}`)}
                       className="text-decoration-none"
                       style={{ color: 'var(--app-text)' }}
                     >
@@ -254,7 +253,7 @@ export default function EventListClient({
                   className="d-flex justify-content-between align-items-center mt-auto pt-3"
                   style={{ borderTop: '1px solid #e8e8e8' }}
                 >
-                  {/* F5: il conteggio dei registrati non è più esposto
+                  {/* Il conteggio dei registrati non è esposto
                       pubblicamente sulle card. Manteniamo solo il badge
                       "registrazione disponibile" per gli eventi conclusi. */}
                   {isEnded && event.recordingUrl ? (
@@ -265,12 +264,14 @@ export default function EventListClient({
                   ) : (
                     <span />
                   )}
-                  <CardReadMore
-                    tag={Link}
-                    href={`/events/${event.slug}`}
-                    text={t('card.readMore')}
-                    iconName="it-arrow-right"
-                  />
+                  {/* Il markup di `CardReadMore`, scritto qui: il componente di
+                      design-react-kit passa l'indirizzo senza localizzarlo e
+                      disegna la freccia con l'icona che sparisce
+                      all'idratazione. */}
+                  <Link className="read-more" href={percorso(`/events/${event.slug}`)}>
+                    <span className="text">{t('card.readMore')}</span>
+                    <Icon icon="it-arrow-right" />
+                  </Link>
                 </div>
               </CardBody>
             </Card>

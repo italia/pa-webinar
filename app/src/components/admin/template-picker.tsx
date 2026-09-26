@@ -1,7 +1,9 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { Card, CardBody, Icon, Badge } from 'design-react-kit';
+import { Card, CardBody, Badge } from 'design-react-kit';
+
+import { Icon } from '@/components/ui/icon';
 
 interface TemplateSummary {
   id: string;

@@ -3,7 +3,9 @@
 # Conia un JWT, lancia Malleus Jitsificus con i parametri passati via env.
 #
 # Env richieste:
-#   JITSI_URL               URL pubblico Jitsi (es. https://jitsi-test.innovazione.gov.it)
+#   JITSI_URL               URL pubblico Jitsi (es. https://jitsi.example.com —
+#                           `jitsi.example.com` è il segnaposto per l'hostname
+#                           Jitsi del deploy da testare, come nel README.md)
 #   JITSI_JWT_SECRET        secret HS256 (dallo stesso deploy Jitsi che stai testando)
 #   JITSI_JWT_SUBJECT       sub claim (il Jitsi domain)
 #
@@ -21,7 +23,7 @@
 #   SENDER_TABS_PER_BROWSER   (1)
 set -euo pipefail
 
-: "${JITSI_URL:?JITSI_URL required (e.g. https://jitsi-test.innovazione.gov.it)}"
+: "${JITSI_URL:?JITSI_URL required (e.g. https://jitsi.example.com)}"
 : "${JITSI_JWT_SECRET:?JITSI_JWT_SECRET required}"
 : "${JITSI_JWT_SUBJECT:?JITSI_JWT_SUBJECT required}"
 

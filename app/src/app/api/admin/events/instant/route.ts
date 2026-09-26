@@ -11,9 +11,8 @@ import { cookies } from 'next/headers';
 import type { Prisma, EventStatus } from '@prisma/client';
 
 import { withErrorHandling } from '@/lib/api-handler';
-import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { eventScope, requireStaff } from '@/lib/auth/staff-session';
 import { prisma } from '@/lib/db';
-import { UnauthorizedError } from '@/lib/errors';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 
 export const dynamic = 'force-dynamic';
@@ -32,8 +31,8 @@ const STATUS_VALUES: EventStatus[] = [
 ];
 
 export const GET = withErrorHandling(async (request) => {
-  const isAdmin = await isAdminAuthenticated(await cookies());
-  if (!isAdmin) throw new UnauthorizedError();
+  // Le chiamate rapide dell'organizzatore sono le sue (ADR-014).
+  const session = await requireStaff(await cookies());
 
   const url = new URL(request.url);
   const q = url.searchParams.get('q')?.trim() ?? '';
@@ -47,7 +46,7 @@ export const GET = withErrorHandling(async (request) => {
   );
   const offset = Math.max(parseInt(url.searchParams.get('offset') ?? '0', 10) || 0, 0);
 
-  const where: Prisma.EventWhereInput = { eventType: 'INSTANT' };
+  const where: Prisma.EventWhereInput = { eventType: 'INSTANT', ...eventScope(session) };
 
   if (q) {
     // Title is stored as JSONB keyed by locale. Prisma doesn't support

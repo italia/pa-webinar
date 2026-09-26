@@ -1,7 +1,19 @@
 {
+  "agenda": {
+    "title": "Užrašai / kontrolinis sąrašas",
+    "empty": "Kol kas punktų nėra. Pridėkite aptartinas temas ir žymėkite jas eigoje.",
+    "add": "Pridėti",
+    "addPlaceholder": "Naujas punktas…",
+    "remove": "Pašalinti",
+    "inProgress": "vykdoma",
+    "agree": "Pritariu",
+    "disagree": "Nepritariu",
+    "favorablePct": "{pct} % pritaria",
+    "noReactions": "Išsakykite savo nuomonę"
+  },
   "common": {
-    "appName": "DTD Renginiai",
-    "appDescription": "Skaitmeninių viešųjų renginių platforma, sukurta Skaitmeninės transformacijos departamento",
+    "appName": "PA Webinar",
+    "appDescription": "Viešųjų skaitmeninių renginių platforma",
     "loading": "Įkeliama...",
     "error": "Įvyko klaida",
     "errorMessage": "Kažkas nepavyko. Bandykite dar kartą.",
@@ -42,8 +54,6 @@
     "skipToFooter": "Pereiti prie poraštės"
   },
   "header": {
-    "slimTitle": "Ministrų Tarybos Pirmininkystė",
-    "slimSubtitle": "Skaitmeninės transformacijos departamentas",
     "followUs": "Sekite mus"
   },
   "events": {
@@ -52,6 +62,7 @@
     "past": "Praėję renginiai",
     "noUpcoming": "Šiuo metu nėra suplanuotų renginių. Užsukite vėliau!",
     "noPast": "Praėjusių renginių nėra",
+    "wordCloudTitle": "Žodžių debesis",
     "card": {
       "publicEvent": "Viešas renginys",
       "readMore": "Sužinoti daugiau",
@@ -61,6 +72,22 @@
       "ended": "Pasibaigė",
       "occupiedSpots": "{registered}/{max} užsiregistravusių",
       "registeredCount": "{count, plural, =0 {Nėra registracijų} one {1 registracija} other {# registracijų}}"
+    },
+    "recap": {
+      "title": "Renginio suvestinė",
+      "intro": "Trumpa apžvalga to, kas nuskambėjo per renginį.",
+      "participants": "Dalyviai (didžiausias skaičius)",
+      "registered": "Užsiregistravusieji",
+      "topQuestions": "Daugiausiai balsų surinkę klausimai",
+      "upvotes": "{count, plural, =0 {balsų nėra} one {# balsas} few {# balsai} other {# balsų}}",
+      "polls": "Apklausų rezultatai",
+      "votes": "{count, plural, =0 {balsų nėra} one {# balsas} few {# balsai} other {# balsų}}",
+      "topWords": "Dažniausiai minėti žodžiai",
+      "feedback": "Vidutinis įvertinimas",
+      "feedbackCount": "{count, plural, one {# atsakymas} few {# atsakymai} other {# atsakymų}}",
+      "chatQuestions": "Klausimai iš pokalbio",
+      "reactionsCount": "{count, plural, one {# reakcija} few {# reakcijos} other {# reakcijų}}",
+      "answered": "atsakyta"
     },
     "detail": {
       "title": "Renginio informacija",
@@ -85,6 +112,10 @@
       "noRecording": "Šio renginio vaizdo įrašas neprieinamas.",
       "watchRecording": "Žiūrėti įrašą",
       "backToEvents": "Grįžti prie renginių",
+      "alreadyRegisteredEnter": "Jau užsiregistravote? Įeikite į salę",
+      "invalidTokenTitle": "Prisijungimo nuoroda nebegalioja",
+      "invalidTokenBody": "Jūsų naudota nuoroda neteisinga arba nebegalioja. Jei užsiregistravote, patikrinkite patvirtinimo laišką – jame rasite asmeninę nuorodą; arba užsiregistruokite dar kartą žemiau.",
+      "invalidTokenBodyEnded": "Jūsų naudota nuoroda nebegalioja. Renginys baigėsi: žemiau rasite įrašą ir medžiagą.",
       "speakers": "Pranešėjai",
       "organizer": "Organizatorius",
       "chatNotSaved": "Pokalbių pranešimai nėra saugomi po renginio pabaigos.",
@@ -97,43 +128,27 @@
         "yahoo": "Yahoo kalendorius",
         "downloadIcs": "Atsisiųsti .ics failą"
       },
-      "alreadyRegisteredEnter": "Jau užsiregistravote? Įeikite į salę",
-      "invalidTokenTitle": "Prisijungimo nuoroda nebegalioja",
-      "invalidTokenBody": "Jūsų naudota nuoroda neteisinga arba nebegalioja. Jei užsiregistravote, patikrinkite patvirtinimo laišką – jame rasite asmeninę nuorodą; arba užsiregistruokite dar kartą žemiau.",
-      "invalidTokenBodyEnded": "Jūsų naudota nuoroda nebegalioja. Renginys baigėsi: žemiau rasite įrašą ir medžiagą."
+      "registrationEnded": "Renginys baigėsi: registracija uždaryta."
     },
     "manage": {
       "toggleChat": "Pokalbiai",
       "toggleQa": "Q&A",
       "toggleRecording": "Įrašymas",
-      "settingsSection": "Renginio nustatymai",
       "sessionsAndRecordings": "Sesijos ir vaizdo įrašai",
       "postEventSection": "Po renginio ir atsiliepimai"
     },
     "status": {
       "DRAFT": "Juodraštis",
       "PUBLISHED": "Paskelbtas",
+      "PROVISIONING": "Ruošiama",
       "LIVE": "Vyksta",
+      "IDLE": "Pristabdyta",
       "ENDED": "Pasibaigė",
       "ARCHIVED": "Archyvuotas"
     },
     "list": {
       "filterByTag": "Filtruoti pagal kategoriją",
       "allTags": "Visos"
-    },
-    "wordCloudTitle": "Žodžių debesis",
-    "recap": {
-      "title": "Renginio suvestinė",
-      "intro": "Trumpa apžvalga to, kas nuskambėjo per renginį.",
-      "participants": "Dalyviai (didžiausias skaičius)",
-      "registered": "Užsiregistravusieji",
-      "topQuestions": "Daugiausiai balsų surinkę klausimai",
-      "upvotes": "{count, plural, =0 {balsų nėra} one {# balsas} few {# balsai} other {# balsų}}",
-      "polls": "Apklausų rezultatai",
-      "votes": "{count, plural, =0 {balsų nėra} one {# balsas} few {# balsai} other {# balsų}}",
-      "topWords": "Dažniausiai minėti žodžiai",
-      "feedback": "Vidutinis įvertinimas",
-      "feedbackCount": "{count, plural, one {# atsakymas} few {# atsakymai} other {# atsakymų}}"
     }
   },
   "registration": {
@@ -148,12 +163,20 @@
     "submitting": "Registruojama...",
     "success": "Registracija baigta!",
     "successMessage": "Gausite patvirtinimo el. laišką su nuoroda prisijungti prie renginio.",
-    "enteringRoom": "We're taking you to the event waiting room.",
-    "enteringRoomHint": "Opening the room…",
+    "successScheduledMessage": "Registracija baigta! Išsiuntėme jums el. laišką su asmenine prisijungimo nuoroda. Įtraukite renginį į kalendorių ir grįžkite čia prieš pat pradžią.",
+    "addToCalendar": "Įtraukti į kalendorių",
+    "enteringRoom": "Nukreipiame jus į renginio laukiamąjį.",
+    "enteringRoomHint": "Salė atidaroma…",
     "alreadyRegistered": "Jūs jau esate užsiregistravę į šį renginį",
-    "resendLink": "Resend my access link",
-    "resending": "Sending…",
-    "resendSent": "If the address is registered, we've re-sent the access link by email.",
+    "resendLink": "Išsiųsti prieigos nuorodą dar kartą",
+    "resending": "Siunčiama…",
+    "resendSent": "Jei adresas užregistruotas, dar kartą išsiuntėme prieigos nuorodą el. paštu.",
+    "invitationOnly": "Registracija skirta tik pakviestiems asmenims: naudokite el. pašto adresą, kuriuo buvote pakviesti. Nuorodą prisijungti gausite el. paštu.",
+    "closed": "Registracija į šį renginį nėra vieša.",
+    "lostLink": "Jau užsiregistravote? Gaukite asmeninę nuorodą dar kartą",
+    "lostLinkHelp": "Įveskite el. pašto adresą, kuriuo registravotės: jei jis užregistruotas į šį renginį, dar kartą atsiųsime nuorodą prisijungti.",
+    "checkEmailTitle": "Patikrinkite el. paštą",
+    "checkEmail": "Jei adresas yra pakviestųjų sąraše, netrukus gausite el. laišką su asmenine nuoroda patekti į kambarį. Jei jo nerandate, patikrinkite brukalo aplanką.",
     "backToEvent": "Grįžti prie renginio",
     "organization": "Organizacija",
     "organizationPlaceholder": "pvz. AGID, Ekonomikos ministerija, Romos savivaldybė",
@@ -181,12 +204,10 @@
       "organizationRequired": "Įveskite savo organizaciją",
       "consentRequired": "Sutikimas dėl duomenų tvarkymo yra privalomas",
       "recordingConsentRequired": "Šiam renginiui būtinas sutikimas dėl įrašymo",
+      "multitrackConsentRequired": "Šiame renginyje būtina sutikti, kad būtų įrašomas jūsų garso takelis",
       "eventFull": "Renginys pasiekė maksimalų dalyvių skaičių",
-      "generic": "Registracijos klaida. Bandykite dar kartą.",
-      "multitrackConsentRequired": "Šiame renginyje būtina sutikti, kad būtų įrašomas jūsų garso takelis"
-    },
-    "successScheduledMessage": "Registracija baigta! Išsiuntėme jums el. laišką su asmenine prisijungimo nuoroda. Įtraukite renginį į kalendorių ir grįžkite čia prieš pat pradžią.",
-    "addToCalendar": "Įtraukti į kalendorių"
+      "generic": "Registracijos klaida. Bandykite dar kartą."
+    }
   },
   "videoLibrary": {
     "title": "Vaizdo įrašų biblioteka",
@@ -213,6 +234,8 @@
     "connecting": "Jungiamasi...",
     "connectionError": "Nepavyko prisijungti prie salės. Patikrinkite ryšį ir bandykite dar kartą.",
     "activeVsRegistered": "{active} aktyvūs · {registered} registruoti",
+    "enterFullscreen": "Visas ekranas",
+    "exitFullscreen": "Išjungti viso ekrano režimą",
     "overtime": {
       "withCountdown": "Numatytas pabaigos laikas praėjo. Renginys bus automatiškai uždarytas po {minutes, plural, one {# minutės} other {# minučių}}.",
       "closingNow": "Pabaigos laikas pasiektas. Renginys netrukus bus uždarytas.",
@@ -224,6 +247,27 @@
     "declineRecording": "Nedalyvauti",
     "enterRoom": "Įeiti į salę",
     "leaveRoom": "Išeiti iš salės",
+    "leaveChoice": {
+      "title": "Kaip norite išeiti?",
+      "body": "Galite išeiti tik jūs – skambutis kitiems liks aktyvus – arba užbaigti jį visiems dalyviams.",
+      "leaveSelf": "Išeiti tik man",
+      "endForAll": "Užbaigti visiems",
+      "ending": "Baigiama…",
+      "endError": "Nepavyko užbaigti skambučio. Bandykite dar kartą."
+    },
+    "endDestino": {
+      "title": "Renginio likimas",
+      "body": "Ketinate užbaigti renginį visiems. Kas su juo turėtų nutikti pasibaigus?",
+      "public": "Palikti viešą",
+      "publicHelp": "Pasibaigusio renginio puslapis lieka matomas su suvestine, klausimais, apklausomis, medžiaga ir atsiliepimais.",
+      "library": "Paskelbti bibliotekoje",
+      "libraryHelp": "Kaip pirmiau, o be to renginys rodomas viešoje vaizdo įrašų bibliotekoje (reikia paskelbto įrašo arba „YouTube“ vaizdo įrašo).",
+      "archive": "Archyvuoti (privatu)",
+      "archiveHelp": "Pasibaigusio renginio puslapis nebus viešas (404). Duomenys saugomi iki saugojimo termino pabaigos, paskui ištrinami.",
+      "genAi": "Generuoti DI transkripciją ir santrauką iš įrašo (kai baigsis apdorojimas)",
+      "back": "Atgal",
+      "confirm": "Užbaigti renginį"
+    },
     "eventNotStarted": "Renginys dar neprasidėjo",
     "eventStartsAt": "Renginys prasidės {date}, {time}",
     "countdown": "Liko laiko",
@@ -241,11 +285,15 @@
     "guestJoinSubtitle": "Prisijunkite prie vykstančio renginio kaip svečias",
     "guestJoinButton": "Prisijungti kaip svečias",
     "guestRedirectToRegister": "Renginys dar neprasidėjo. Užsiregistruokite, kad gautumėte prieigos nuorodą.",
+    "guestAccessDisabled": "Šiam renginiui reikia registracijos: prisijungti kaip svečias negalima.",
     "jibriUnavailable": "Įrašymas neprieinamas — Jibri nesukonfigūruotas",
     "endEventError": "Klaida užbaigiant renginį. Bandykite dar kartą.",
     "jibriNotConfigured": "Įrašymas nesukonfigūruotas infrastruktūroje",
     "jibriScaling": "Įrašymas pradedamas…",
     "jibriScalingTooltip": "Įrašymo komponentas paleidžiamas. Netrukus bus prieinamas.",
+    "recorderNotStarted": "Įrašymas nepasiekiamas",
+    "recorderNotStartedDetail": "Įrašymo paslauga dar nepasileido: kol kas renginys tęsiamas be įrašymo. Praneškite platformos administratoriams.",
+    "recorderStartFailed": "Įrašymas neprasidėjo. Bandykite dar kartą po kelių minučių; jei problema kartojasi, praneškite platformos administratoriams.",
     "roomPreparing": "Salė ruošiama…",
     "roomPreparingDetail": "Vaizdo serveriai paleidžiami. Operacija užtrunka apie 2 minutes. Salė bus aktyvuota automatiškai.",
     "recordingPromptTitle": "Pradėti įrašymą?",
@@ -263,8 +311,13 @@
     "qaSidebarPlaceholder": "Q&A skydelis bus prieinamas, kai renginys prasidės.",
     "invalidToken": "Negaliojanti nuoroda. Patikrinkite nuorodą, gautą el. paštu.",
     "sidebarTabQa": "Q&A",
+    "liveFeaturesLabel": "Funkcijos:",
+    "whiteboardNotSavedHint": "Lenta automatiškai neišsaugoma. Jei ja naudojatės, prieš užbaigdami eksportuokite ją (lentos meniu) ir pridėkite prie renginio medžiagos.",
     "sidebarTabChat": "Pokalbis",
     "sidebarTabPolls": "Apklausos",
+    "sidebarTabWordcloud": "Žodžių debesis",
+    "sidebarTabAgenda": "Užrašai / kontrolinis sąrašas",
+    "liveToggleAgenda": "Užrašai / kontrolinis sąrašas (darbotvarkė)",
     "sidebarTabMaterials": "Medžiaga",
     "sidebarTabParticipants": "Dalyviai",
     "chat": {
@@ -299,7 +352,25 @@
       "exportChat": "Atsisiųsti pokalbį",
       "reactNotAllowed": "Norint reaguoti į žinutes, reikia asmeninės arba moderatoriaus nuorodos.",
       "editNotAllowed": "Ši nuoroda yra bendrinama, todėl ja redaguoti žinučių negalima.",
-      "editExpired": "Praėjo daugiau nei 15 minučių: šios žinutės redaguoti nebegalima."
+      "editExpired": "Praėjo daugiau nei 15 minučių: šios žinutės redaguoti nebegalima.",
+      "askAsQuestionLabel": "Pažymėti kaip klausimą",
+      "placeholderQuestion": "Rašykite savo klausimą...",
+      "lensGroupLabel": "Filtruoti žinutes",
+      "lensAll": "Visos",
+      "lensQuestions": "Klausimai ({count})",
+      "lensAnnounceAll": "Rodomos visos žinutės",
+      "lensAnnounceQuestions": "Sąraše: {count, plural, =0 {klausimų nėra} one {# klausimas} few {# klausimai} other {# klausimų}}",
+      "questionOpen": "Klausimas",
+      "questionAnswered": "Atsakyta",
+      "questionDismissed": "Nebus nagrinėjamas",
+      "questionMarkAnswered": "Pažymėti kaip atsakytą",
+      "questionReopen": "Atidaryti iš naujo",
+      "questionDismiss": "Atmesti",
+      "questionRestore": "Atkurti",
+      "questionStatusFailed": "Nepavyko atnaujinti klausimo",
+      "questionNeedsText": "Įrašykite klausimo tekstą: vien priedas į eilę nepatenka",
+      "lensTruncated": "Įkeltos tik naujausios žinutės: senesnių klausimų sąraše gali nebūti.",
+      "attachUnavailable": "Priedai šiame diegime neprieinami."
     },
     "role": {
       "moderator": "Moderatorius",
@@ -320,7 +391,8 @@
         "unknown": "N/D"
       },
       "volume": "Garsumas",
-      "volumeFor": "Garsumas: {name}"
+      "volumeFor": "Garsumas: {name}",
+      "kickName": "Pašalinti: {name}"
     },
     "moderator": {
       "muteAll": "Nutildyti visus",
@@ -331,7 +403,7 @@
       "toggleChat": "Pokalbiai įjungti/išjungti",
       "endEvent": "Baigti renginį",
       "endEventConfirm": "Ar tikrai norite baigti renginį visiems dalyviams?",
-      "participantCount": "{count} dalyvių",
+      "participantCount": "{count, plural, one {# dalyvis} few {# dalyviai} many {# dalyvio} other {# dalyvių}}",
       "raisedHands": "Pakeltos rankos",
       "noRaisedHands": "Nėra pakeltų rankų",
       "giveFloor": "Suteikti žodį",
@@ -339,27 +411,28 @@
       "approveVideo": "Suteikti žodį (vaizdas)",
       "approveAll": "Suteikti žodį",
       "audioOnly": "Tik garsas",
+      "lowerHand": "Nuleisti ranką",
       "participantFallback": "Dalyvis",
       "audioModeration": "Dalyvių mikrofonas",
       "micDisabled": "Mikrofonas išjungtas",
       "videoModeration": "Dalyvių vaizdo kamera",
       "videoDisabled": "Vaizdas išjungtas",
       "eventEndedSuccess": "Renginys sėkmingai baigtas. Nukreipiama...",
-      "whiteboard": "Lenta",
-      "lowerHand": "Nuleisti ranką"
+      "whiteboard": "Lenta"
     },
     "closeDrawer": "Uždaryti",
     "hintBanner": {
+      "ariaLabel": "Patarimai",
       "controls": "Valdikliai apačioje",
       "raiseHand": "Pakelkite ranką, jei norite kalbėti",
       "sidebar": "Q&A ir pokalbis šoninėje juostoje",
-      "dismiss": "Supratau",
-      "ariaLabel": "Patarimai"
+      "dismiss": "Supratau"
     },
     "topBarCount": {
       "live": "👥 {count, plural, one {# asmuo} other {# asmenys}}"
     },
     "sidebarTabChatUnread": "Naujos neperskaitytos žinutės",
+    "sidebarTabPollsOpen": "Atvira apklausa, kurioje dar nebalsavote",
     "floatingControlsLabel": "Renginio valdikliai",
     "screenshareActive": "🖥️ {name} dalijasi ekranu",
     "screenshareFallbackName": "Dalyvis",
@@ -377,40 +450,24 @@
       "moderatorLink": "Moderatoriaus nuoroda",
       "moderatorLinkHint": "Kas atidaro šią nuorodą, prisijungia kaip moderatorius su visomis valdymo teisėmis."
     },
-    "enterFullscreen": "Visas ekranas",
-    "exitFullscreen": "Išjungti viso ekrano režimą",
-    "leaveChoice": {
-      "title": "Kaip norite išeiti?",
-      "body": "Galite išeiti tik jūs – skambutis kitiems liks aktyvus – arba užbaigti jį visiems dalyviams.",
-      "leaveSelf": "Išeiti tik man",
-      "endForAll": "Užbaigti visiems",
-      "ending": "Baigiama…",
-      "endError": "Nepavyko užbaigti skambučio. Bandykite dar kartą."
-    },
-    "endDestino": {
-      "title": "Renginio likimas",
-      "body": "Ketinate užbaigti renginį visiems. Kas su juo turėtų nutikti pasibaigus?",
-      "public": "Palikti viešą",
-      "publicHelp": "Pasibaigusio renginio puslapis lieka matomas su suvestine, klausimais, apklausomis, medžiaga ir atsiliepimais.",
-      "library": "Paskelbti bibliotekoje",
-      "libraryHelp": "Kaip pirmiau, o be to renginys rodomas viešoje vaizdo įrašų bibliotekoje (reikia paskelbto įrašo arba „YouTube“ vaizdo įrašo).",
-      "archive": "Archyvuoti (privatu)",
-      "archiveHelp": "Pasibaigusio renginio puslapis nebus viešas (404). Duomenys saugomi iki saugojimo termino pabaigos, paskui ištrinami.",
-      "genAi": "Generuoti DI transkripciją ir santrauką iš įrašo (kai baigsis apdorojimas)",
-      "back": "Atgal",
-      "confirm": "Užbaigti renginį"
-    },
-    "liveFeaturesLabel": "Funkcijos:",
-    "whiteboardNotSavedHint": "Lenta automatiškai neišsaugoma. Jei ja naudojatės, prieš užbaigdami eksportuokite ją (lentos meniu) ir pridėkite prie renginio medžiagos.",
-    "sidebarTabWordcloud": "Žodžių debesis",
-    "sidebarTabAgenda": "Užrašai / kontrolinis sąrašas",
-    "liveToggleAgenda": "Užrašai / kontrolinis sąrašas (darbotvarkė)",
     "timer": {
       "show": "Rodyti laikmatį",
       "hide": "Slėpti laikmatį",
       "remainingLabel": "Likęs laikas (spustelėkite, kad matytumėte praėjusį)",
       "elapsedLabel": "Praėjęs laikas (spustelėkite, kad matytumėte likusį)"
-    }
+    },
+    "videoCallFrameTitle": "Renginio vaizdo skambutis",
+    "insecureContextTitle": "Nesaugus adresas",
+    "insecureContextBody": "Šis puslapis atidarytas per http://: naršyklė neleidžia naudoti mikrofono ir kameros, todėl vaizdo skambutis negali prasidėti. Atidarykite tą patį puslapį saugiu adresu.",
+    "insecureContextLink": "Atidaryti https://{host}",
+    "conferenceUnreachableTitle": "Vaizdo skambučių paslauga neatsako",
+    "conferenceUnreachableBody": "Jūsų naršyklė negali pasiekti vaizdo skambučių serverio ({host}). Atidarykite jį naujame skirtuke: jei naršyklė parodys saugos įspėjimą, jį priimkite, tada grįžkite čia ir bandykite dar kartą. Jei puslapis neatsidaro, jį gali blokuoti tinklas, per kurį jungiatės.",
+    "conferenceOpenHost": "Atidaryti {host} naujame skirtuke",
+    "leftTitle": "Išėjote iš salės",
+    "leftMessage": "Renginys vis dar vyksta: galite grįžti bet kada.",
+    "leftModeratorReminder": "Renginys lieka atviras, kol kas nors jo neužbaigia. Kai baigsite, grįžkite ir pasirinkite „{action}“.",
+    "rejoin": "Grįžti",
+    "backToHome": "Grįžti į pradžios puslapį"
   },
   "qa": {
     "title": "Klausimai ir atsakymai",
@@ -445,7 +502,9 @@
       "textRequired": "Parašykite savo klausimą",
       "tooLong": "Klausimas negali viršyti 500 simbolių",
       "rateLimit": "Palaukite prieš pateikdami kitą klausimą",
-      "generic": "Klaida pateikiant klausimą"
+      "busy": "Šiuo metu iš jūsų tinklo gaunama daug klausimų: bandykite dar kartą po kelių sekundžių",
+      "generic": "Klaida pateikiant klausimą",
+      "upvoteFailed": "Jūsų balsas neužregistruotas: bandykite dar kartą po kelių sekundžių."
     },
     "ctaTitle": "Užduokite pirmą klausimą",
     "ctaBody": "Kiti dalyviai galės balsuoti už jūsų klausimą. Moderatoriai jį matys ir galės atsakyti balsu arba raštu.",
@@ -455,6 +514,79 @@
     "submitPrimary": "Siųsti klausimą"
   },
   "admin": {
+    "accessDenied": {
+      "title": "Šis skyrius jūsų vaidmeniui nepasiekiamas",
+      "body": "Kaip organizatorius tvarkote savo renginius: jų kūrimą ir skelbimą, medžiagą, klausimynus ir postprodukciją. Platformos nustatymai ir visų renginių duomenys lieka administracijai.",
+      "back": "Eiti į savo renginius"
+    },
+    "staffLogin": {
+      "title": "Prisijungimas prie administravimo srities",
+      "intro": "Organizatoriai ir administratoriai prisijungia nuoroda, išsiųsta jų el. paštu: nereikia prisiminti slaptažodžio.",
+      "emailLabel": "Jūsų darbo el. paštas",
+      "send": "Atsiųskite man nuorodą",
+      "sending": "Siunčiama…",
+      "sent": "Jei adresas leidžiamas, netrukus gausite el. laišką su prisijungimo nuoroda. Nuoroda veikia tik kartą ir nustoja galioti po {minutes} minučių.",
+      "error": "Užklausos išsiųsti nepavyko. Bandykite dar kartą po kelių minučių.",
+      "keySection": "Prisijungimas su egzemplioriaus raktu",
+      "accessTitle": "Įeiti į administravimo sritį",
+      "accessIntro": "Paspauskite mygtuką, kad prisijungtumėte. Nuoroda veikia tik kartą.",
+      "enter": "Prisijungti",
+      "invalidLink": "Nuoroda negalioja: ji galėjo nustoti galioti arba jau buvo panaudota.",
+      "newLink": "Prašyti naujos nuorodos"
+    },
+    "organizers": {
+      "title": "Darbuotojų paskyros",
+      "intro": "Asmenys, dirbantys administravimo srityje savo vardu. Organizatoriai kuria ir valdo savo renginius; administratoriai valdo visą egzempliorių. Jie prisijungia nuoroda, išsiųsta jų el. paštu, be slaptažodžio. Egzemplioriaus raktas lieka avarinėms situacijoms ir automatizavimui.",
+      "newTitle": "Pridėti asmenį",
+      "name": "Vardas ir pavardė",
+      "email": "El. paštas",
+      "add": "Pridėti",
+      "sendNow": "Iškart siųsti prisijungimo nuorodą",
+      "listTitle": "Asmenys su prieiga",
+      "loading": "Įkeliama…",
+      "empty": "Paskyrų dar nėra.",
+      "events": "Renginiai",
+      "lastLogin": "Paskutinis prisijungimas",
+      "status": "Būsena",
+      "actions": "Veiksmai",
+      "never": "Niekada",
+      "active": "Aktyvus",
+      "inactive": "Išjungtas",
+      "invite": "Siųsti nuorodą",
+      "inviteFor": "Siųsti prisijungimo nuorodą: {name}",
+      "deactivate": "Išjungti",
+      "deactivateFor": "Išjungti: {name}",
+      "activate": "Vėl įjungti",
+      "activateFor": "Vėl įjungti: {name}",
+      "delete": "Ištrinti",
+      "deleteFor": "Ištrinti: {name}",
+      "deleteTitle": "Ištrinti paskyrą?",
+      "deleteMessage": "{name} paskyra bus ištrinta. Jo renginiai ({count}) neištrinami: jie grąžinami administracijai.",
+      "deactivateTitle": "Išjungti paskyrą?",
+      "deactivateMessage": "{name} nebegalės prisijungti, o jau išsiųstos nuorodos nustos veikti. Jo renginiai lieka nepakitę.",
+      "exists": "Paskyra su šiuo el. paštu jau yra.",
+      "created": "Paskyra pridėta.",
+      "createdInvited": "Paskyra pridėta: prisijungimo nuoroda jau siunčiama.",
+      "invited": "Prisijungimo nuoroda išsiųsta.",
+      "deleted": "Paskyra ištrinta.",
+      "updated": "Pakeitimas išsaugotas.",
+      "actionError": "Veiksmas nepavyko. Bandykite dar kartą.",
+      "loadError": "Sąrašo įkelti nepavyko.",
+      "inviteFailed": "Paskyra pridėta, bet nuorodos išsiųsti nepavyko: išsiųskite ją dar kartą iš jos eilutės.",
+      "role": "Vaidmuo",
+      "roleOrganizer": "Organizatorius",
+      "roleAdmin": "Administratorius",
+      "roleHelp": "Organizatoriai mato ir valdo tik savo renginius. Administratoriai valdo viską: nustatymus, visų renginius, adresų knygą ir paskyras.",
+      "roleFor": "{name} vaidmuo",
+      "promoteTitle": "Paskirti administratoriumi?",
+      "promoteMessage": "{name} galės valdyti visą egzempliorių: nustatymus, visų renginius, adresų knygą ir darbuotojų paskyras.",
+      "promote": "Paskirti administratoriumi",
+      "demoteTitle": "Grąžinti organizatoriaus vaidmenį?",
+      "demoteMessage": "{name} iš karto neteks prieigos prie nustatymų ir kitų asmenų renginių ir matys tik savo.",
+      "demote": "Grąžinti organizatoriaus vaidmenį",
+      "you": "jūs",
+      "selfLocked": "Jūsų paskyrą valdo kitas administratorius"
+    },
     "fileOrUrl": {
       "tabUpload": "Įkelti failą",
       "tabUrl": "Įklijuoti URL",
@@ -472,7 +604,8 @@
       "errorGeneric": "Klaida įkeliant failą",
       "helpImage": "Palaikomi formatai: PNG, JPEG, WebP, SVG, GIF — iki 10 MB",
       "helpAudio": "Palaikomi formatai: MP3, WAV, OGG, M4A, WebM — iki 20 MB",
-      "helpDocument": "Palaikomi formatai: PDF, DOCX, PPTX, XLSX, TXT — iki 25 MB"
+      "helpDocument": "Palaikomi formatai: PDF, DOCX, PPTX, XLSX, TXT — iki 25 MB",
+      "uploadsUnavailable": "Failų įkėlimas šiame diegime nepasiekiamas: vietoj to įklijuokite failo URL."
     },
     "rubricaPicker": {
       "loading": "Ieškoma…",
@@ -510,7 +643,9 @@
           "endsAt": "Pabaigos data turi būti vėlesnė už pradžios datą.",
           "titleRequired": "Pavadinimas privalomas (bent 3 simboliai).",
           "titleRequiredOtherLocale": "Pavadinimas numatytąja kalba ({locale}) yra privalomas: pereikite į kortelę {locale}.",
-          "maxParticipants": "Įveskite skaičių nuo 2 iki 500."
+          "maxParticipants": "Įveskite skaičių nuo 2 iki 500.",
+          "descriptionRequired": "Aprašymas yra privalomas (bent {min} simbolių).",
+          "descriptionRequiredOtherLocale": "Aprašymas numatytąja kalba ({locale}) yra privalomas: pereikite į kortelę {locale}."
         },
         "senderRatioLabel": "Numatoma aktyvių dalis",
         "senderRatioHelp": "Kiek dalyvių turės įjungtą mikrofoną ar vaizdo kamerą. Padeda parinkti vaizdo serverio dydį.",
@@ -579,6 +714,7 @@
         "organizerName": "Kontaktinis asmuo",
         "organizerOrganization": "Organizacija",
         "organizerWebsite": "Svetainė",
+        "organizerLogo": "Organizatoriaus logotipas",
         "organizerRequired": "Kontaktinis asmuo ir organizacija yra privalomi.",
         "moderatorsHeading": "Moderatoriai",
         "moderatorsHelp": "Moderatoriai gali valdyti sesiją ir leidimus renginio metu.",
@@ -591,7 +727,7 @@
         "speakerEmail": "El. paštas",
         "speakerRequired": "Vardas ir el. paštas yra privalomi.",
         "invitationsHeading": "Kvietimai",
-        "invitationsHelp": "Iš anksto registruoti asmenys — gaus asmeninę prisijungimo nuorodą.",
+        "invitationsHelp": "Pakviestų asmenų sąrašas. Platforma kvietimų nesiunčia: renginio nuoroda pasidalykite patys. Kai viešoji registracija išjungta, užsiregistruoti gali tik šie adresai, o asmeninė prisijungimo nuoroda po registracijos atsiunčiama el. paštu.",
         "invitationName": "Vardas (neprivaloma)",
         "invitationEmail": "El. paštas",
         "invitationRole": "Vaidmuo",
@@ -604,8 +740,7 @@
         "invalidEmail": "Neteisingas el. pašto adresas.",
         "duplicateEmail": "Adresas jau pridėtas.",
         "rubricaPick": "Ieškoti adresų knygoje…",
-        "rubricaOrAdd": "arba pridėti rankiniu būdu",
-        "organizerLogo": "Organizatoriaus logotipas"
+        "rubricaOrAdd": "arba pridėti rankiniu būdu"
       },
       "step4": {
         "heading": "Turinys ir medžiaga",
@@ -616,7 +751,7 @@
         "materialUrl": "Failas arba nuoroda",
         "visibilityLabel": "Matomumas",
         "visibility": {
-          "ALWAYS": "Visada",
+          "ALWAYS": "Salėje ir po renginio",
           "BEFORE": "Prieš renginį",
           "DURING": "Renginio metu",
           "AFTER": "Po renginio"
@@ -645,8 +780,6 @@
         "scaleMax": "Didžiausia",
         "required": "Privaloma",
         "saveDraftAndGoQuestionnaires": "Įrašyti juodraštį ir eiti į klausimynų valdymą",
-        "preQuestionnaire": "Klausimynas prieš renginį",
-        "postQuestionnaire": "Klausimynas po renginio (atsiliepimas)",
         "none": "— Nė vieno —"
       },
       "step5": {
@@ -675,22 +808,25 @@
         "retentionHelp": "Praėjus šiam laikotarpiui asmens duomenys automatiškai pašalinami.",
         "gdprTemplate": "Informacijos šablonas",
         "gdprTemplateNone": "— Naudoti pritaikytą tekstą —",
+        "gdprTemplateUnknown": "Pasirinkto informacijos apie privatumą šablono nebėra: pasirinkite kitą arba grįžkite prie pasirinktinio teksto",
         "privacyText": "Privatumo informacija (tekstas)",
         "moderatorHeading": "Moderatoriaus kontaktas",
+        "moderatorPublishHint": "Norint paskelbti renginį, privaloma nurodyti vardą ir el. pašto adresą (jie reikalingi moderatoriaus nuorodai ir patvirtinimo laiškui). Išsaugant juodraštį jų nereikia.",
+        "moderatorLinkNote": "Šis asmuo yra pagrindinis renginio moderatorius: el. paštu jis gaus privačią nuorodą renginiui valdyti (pradėti įrašymą, moderuoti klausimus, paleisti apklausas…). Tai skiriasi nuo bendramoderatorių, pridėtų žingsnyje „Žmonės“ – kiekvienas jų gauna savo nuorodą.",
+        "moderatorRequired": "Įveskite moderatoriaus vardą",
+        "moderatorEmailRequired": "Įveskite galiojantį moderatoriaus el. pašto adresą",
         "moderatorName": "Vardas",
         "moderatorEmail": "El. paštas",
         "capacityHeading": "Numatoma talpa",
         "featuresHeading": "Konfigūracijos santrauka",
         "privacyDoc": "Informacijos dokumentas (PDF arba nuoroda)",
         "privacyDocHelp": "Įkelkite PDF arba įklijuokite alternatyvios privatumo informacijos URL. Pakeičia GDPR/BDAR šabloną, jei nustatyta.",
-        "privacyTextHelp": "Trumpas tekstas, rodomas registracijos formoje; gali papildyti arba pakeisti GDPR/BDAR šabloną.",
-        "moderatorPublishHint": "Norint paskelbti renginį, privaloma nurodyti vardą ir el. pašto adresą (jie reikalingi moderatoriaus nuorodai ir patvirtinimo laiškui). Išsaugant juodraštį jų nereikia.",
-        "moderatorLinkNote": "Šis asmuo yra pagrindinis renginio moderatorius: el. paštu jis gaus privačią nuorodą renginiui valdyti (pradėti įrašymą, moderuoti klausimus, paleisti apklausas…). Tai skiriasi nuo bendramoderatorių, pridėtų žingsnyje „Žmonės“ – kiekvienas jų gauna savo nuorodą.",
-        "moderatorRequired": "Įveskite moderatoriaus vardą",
-        "moderatorEmailRequired": "Įveskite galiojantį moderatoriaus el. pašto adresą"
+        "privacyTextHelp": "Trumpas tekstas, rodomas registracijos formoje; gali papildyti arba pakeisti GDPR/BDAR šabloną."
       },
       "validationFailed": "Patikrinkite paryškintus laukus prieš tęsdami.",
       "partialFailure": "Renginys sukurtas, tačiau kai kurie elementai neišsaugoti: {items}. Galite juos pridėti renginio puslapyje.",
+      "partialFailureEdit": "Renginio pakeitimai išsaugoti, tačiau nepavyko išsaugoti: {items}. Jūsų darbas vis dar čia: pataisykite ir išsaugokite dar kartą.",
+      "partialFailureEditDetail": "Renginio pakeitimai išsaugoti, tačiau nepavyko išsaugoti: {items}. Serverio atsakymas: {reason}. Jūsų darbas vis dar čia: pataisykite ir išsaugokite dar kartą.",
       "draftFound": "Radome neišsaugotą šio renginio juodraštį. Ar norite jį atkurti?",
       "draftRestore": "Atkurti juodraštį",
       "draftDiscard": "Atmesti",
@@ -699,8 +835,13 @@
         "invitations": "kvietimai",
         "moderators": "moderatoriai",
         "speakers": "pranešėjai",
-        "materials": "medžiaga"
-      }
+        "materials": "medžiaga",
+        "questionnaires": "klausimynai"
+      },
+      "revocationFailed": "Nepavyko atšaukti prieigos ({name}): prieigos nuoroda vis dar galioja. Išsaugokite dar kartą, kad bandytumėte iš naujo, arba atšaukite ją renginio puslapio kortelėje „{tab}“.",
+      "validationFailedDetail": "Serveris atmetė kai kuriuos duomenis: {reason}. Pataisykite ir bandykite dar kartą.",
+      "publishFailed": "Renginys sukurtas, bet nepaskelbtas: jis tebėra juodraštis. Paskelbkite jį renginio puslapyje.",
+      "publishFailedDetail": "Renginys sukurtas, bet nepaskelbtas: jis tebėra juodraštis. Serverio atsakymas: {reason}. Paskelbkite jį renginio puslapyje."
     },
     "nav": {
       "events": "Renginių valdymas",
@@ -741,8 +882,11 @@
       "eventQuestionnaires": "Klausimynai",
       "rubricaList": "Sąrašas",
       "rubricaDetail": "Įrašas",
-      "feedbackDashboard": "Feedback",
-      "recordingsPostprod": "Transkripcijos / DI"
+      "organizers": "Paskyros",
+      "people": "Asmenys",
+      "postprodDetail": "Įrašas",
+      "recordingsPostprod": "Transkripcijos / DI",
+      "feedbackDashboard": "Feedback"
     },
     "landing": {
       "title": "Administravimo skydelis",
@@ -1112,8 +1256,35 @@
       "qaEnabled": "Įjungti Q&A",
       "chatEnabled": "Įjungti pokalbius",
       "recordingEnabled": "Įjungti vaizdo įrašymą",
+      "agendaEnabled": "Tiesioginiai užrašai / kontrolinis sąrašas (darbotvarkė)",
+      "agendaEnabledDesc": "Aptartinų temų sąrašas, kurį moderatoriai žymi renginio metu. Įtraukiamas į automatinę santrauką. Neprivalomas ir gali būti įjungtas net renginio metu.",
+      "wordCloudEnabled": "Tiesioginis žodžių debesis",
+      "wordCloudEnabledDesc": "Dalyviai siunčia žodį, o debesis atnaujinamas tiesiogiai. Naudinga pradedant diskusiją arba per kelias sekundes surenkant nuotaikas.",
+      "whiteboardEnabled": "Bendra lenta",
+      "whiteboardEnabledDesc": "Įjungia integruotą bendradarbiavimo lentą (Excalidraw): moderatoriai gali ją atverti iš įrankių juostos renginio metu. Reikalinga diegimo lentos paslauga; kur ji yra, momentiniuose skambučiuose lenta visada įjungta.",
       "autoStartRecording": "Pradėti įrašymą automatiškai",
       "autoStartRecordingDesc": "Renginiui prasidėjus, įrašymas paleidžiamas savaime (moderatoriaus neklausiama). Vėluojantieji iš karto randa prieinamą grotuvą.",
+      "aiSectionHeading": "Automatinis apdorojimas po renginio",
+      "aiSectionDesc": "Pasibaigus renginiui įrašą gali apdoroti klasteryje veikianti dirbtinio intelekto grandinė ir parengti transkripciją, santrauką, o pageidaujant – vertimus ir įgarsinimą. Viskas vyksta šio diegimo infrastruktūroje, jokie duomenys neperduodami tretiesiems asmenims.",
+      "aiTranscriptEnabled": "Automatinė transkripcija",
+      "aiTranscriptEnabledDesc": "Kalbos atpažinimas su kalbėtojų identifikavimu. Būtina norint įjungti santrauką, vertimus ir įgarsinimą.",
+      "aiSummaryEnabled": "Santrauka ir skyriai",
+      "aiSummaryEnabledDesc": "Susitikimo santrauka, priimti sprendimai, atliktini darbai ir suskirstymas į skyrius su laiko žymomis.",
+      "aiTranslationEnabled": "Vertimas į kitas kalbas",
+      "aiTranslationEnabledDesc": "Transkripcija ir santrauka, išverstos į toliau nurodytas kalbas.",
+      "aiTargetLocales": "Vertimo kalbos",
+      "aiTargetLocalesDesc": "ISO kalbų kodai (pvz., en, fr, de), atskirti kableliais. Palikite tuščią, kad būtų naudojamos visai svetainei nustatytos kalbos.",
+      "aiTargetLocalesRequired": "Nurodykite bent vieną vertimo kalbą arba išjunkite automatinį vertimą.",
+      "aiDubbingEnabled": "Įgarsinimas",
+      "aiDubbingEnabledDesc": "Įgarsintas garsas tikslinėmis kalbomis, sukurtas iš anksto apmokytais sintetiniais balsais. Dalyvių balsai neklonuojami.",
+      "consentBadge": "Aiškus sutikimas",
+      "retentionBadge": "Pratęsia saugojimo terminą",
+      "multitrackRecordingEnabled": "Atskirų dalyvių įrašymas (didelis tikslumas)",
+      "multitrackRecordingEnabledDesc": "Įrašo atskirą kiekvieno dalyvio garso takelį, kad transkripcijoje būtų tiksliai nurodyta, kas ką pasakė (nebelieka „1/2 kalbėtojas“). Apdorojamas atskirto kalbėtojo garsas (jautrūs asmens duomenys): takeliai yra laikini ir ištrinami iškart po transkripcijos. Būtinas sutikimas dėl įrašymo.",
+      "retainParticipantTracks": "Išsaugoti atskirų dalyvių takelius",
+      "retainParticipantTracksDesc": "Atskiri garso takeliai išsaugomi ir po transkripcijos – atsisiunčiamam archyvui ir perklausai pagal kalbėtoją. DĖMESIO: taip jautrūs asmens duomenys (atskirtas balsas) saugomi iki renginio saugojimo termino pabaigos. Įjunkite tik esant būtinybei ir turėdami tinkamą sutikimą bei informavimo pranešimą.",
+      "expectedSpeakers": "Numatomas kalbėtojų skaičius",
+      "expectedSpeakersDesc": "Kai skaičius žinomas (pvz., 3 pranešėjai), jo nurodymas pagerina kalbėtojų atpažinimo kokybę. Palikite tuščią, kad nuspręstų pati grandinė.",
       "dataRetentionDays": "Duomenų saugojimas (dienomis po renginio)",
       "dataRetentionHint": "Po šio laikotarpio dalyvių registracijos, Q&A klausimai ir vaizdo įrašai bus automatiškai ištrinti.",
       "privacyPolicyUrl": "Privatumo politikos URL",
@@ -1167,31 +1338,7 @@
       "retentionPreviewKept": "Suvestinė statistika ir renginio metaduomenys yra saugomi.",
       "configPreview": "Konfigūracijos peržiūra",
       "templateApplied": "Pritaikytas šablonas: {name}. Galite keisti visus nustatymus.",
-      "agendaEnabled": "Tiesioginiai užrašai / kontrolinis sąrašas (darbotvarkė)",
-      "agendaEnabledDesc": "Aptartinų temų sąrašas, kurį moderatoriai žymi renginio metu. Įtraukiamas į automatinę santrauką. Neprivalomas ir gali būti įjungtas net renginio metu.",
-      "whiteboardEnabled": "Bendra lenta",
-      "whiteboardEnabledDesc": "Įjungia integruotą bendradarbiavimo lentą (Excalidraw): moderatoriai gali ją atverti iš įrankių juostos renginio metu. Momentiniuose skambučiuose visada įjungta.",
-      "aiSectionHeading": "Automatinis apdorojimas po renginio",
-      "aiSectionDesc": "Pasibaigus renginiui įrašą gali apdoroti klasteryje veikianti dirbtinio intelekto grandinė ir parengti transkripciją, santrauką, o pageidaujant – vertimus ir įgarsinimą. Viskas vyksta Departamento infrastruktūroje, jokie duomenys neperduodami tretiesiems asmenims.",
-      "aiTranscriptEnabled": "Automatinė transkripcija",
-      "aiTranscriptEnabledDesc": "Kalbos atpažinimas su kalbėtojų identifikavimu. Būtina norint įjungti santrauką, vertimus ir įgarsinimą.",
-      "aiSummaryEnabled": "Santrauka ir skyriai",
-      "aiSummaryEnabledDesc": "Susitikimo santrauka, priimti sprendimai, atliktini darbai ir suskirstymas į skyrius su laiko žymomis.",
-      "aiTranslationEnabled": "Vertimas į kitas kalbas",
-      "aiTranslationEnabledDesc": "Transkripcija ir santrauka, išverstos į toliau nurodytas kalbas.",
-      "aiTargetLocales": "Vertimo kalbos",
-      "aiTargetLocalesDesc": "ISO kalbų kodai (pvz., en, fr, de), atskirti kableliais. Palikite tuščią, kad būtų naudojamos visai svetainei nustatytos kalbos.",
-      "aiTargetLocalesRequired": "Nurodykite bent vieną vertimo kalbą arba išjunkite automatinį vertimą.",
-      "aiDubbingEnabled": "Įgarsinimas",
-      "aiDubbingEnabledDesc": "Įgarsintas garsas tikslinėmis kalbomis, sukurtas iš anksto apmokytais sintetiniais balsais. Dalyvių balsai neklonuojami.",
-      "consentBadge": "Aiškus sutikimas",
-      "retentionBadge": "Pratęsia saugojimo terminą",
-      "multitrackRecordingEnabled": "Atskirų dalyvių įrašymas (didelis tikslumas)",
-      "multitrackRecordingEnabledDesc": "Įrašo atskirą kiekvieno dalyvio garso takelį, kad transkripcijoje būtų tiksliai nurodyta, kas ką pasakė (nebelieka „1/2 kalbėtojas“). Apdorojamas atskirto kalbėtojo garsas (jautrūs asmens duomenys): takeliai yra laikini ir ištrinami iškart po transkripcijos. Būtinas sutikimas dėl įrašymo.",
-      "retainParticipantTracks": "Išsaugoti atskirų dalyvių takelius",
-      "retainParticipantTracksDesc": "Atskiri garso takeliai išsaugomi ir po transkripcijos – atsisiunčiamam archyvui ir perklausai pagal kalbėtoją. DĖMESIO: taip jautrūs asmens duomenys (atskirtas balsas) saugomi iki renginio saugojimo termino pabaigos. Įjunkite tik esant būtinybei ir turėdami tinkamą sutikimą bei informavimo pranešimą.",
-      "expectedSpeakers": "Numatomas kalbėtojų skaičius",
-      "expectedSpeakersDesc": "Kai skaičius žinomas (pvz., 3 pranešėjai), jo nurodymas pagerina kalbėtojų atpažinimo kokybę. Palikite tuščią, kad nuspręstų pati grandinė."
+      "whiteboardUnavailable": "Šiame diegime neprieinama: trūksta Jitsi lentos paslaugos, kurią gali įjungti platformos administratorius."
     },
     "links": {
       "title": "Renginio nuorodos",
@@ -1199,11 +1346,18 @@
       "publicPageHint": "Puslapis, kurį dalykitės naujoms registracijoms surinkti.",
       "guestJoin": "Tiesioginis kvietimas (be registracijos)",
       "guestJoinHint": "Greita nuoroda paskutinę minutę pakviesti dalyvį: jis prisijungia kaip svečias, kai renginys tiesiogiai vyksta, nepildydamas registracijos formos.",
+      "callInvite": "Nuoroda dalyviams",
+      "callInviteHint": "Ją gavęs asmuo prisijungia prie skambučio kaip svečias, be registracijos. Greitasis skambutis neturi viešo puslapio: dalytis reikia šia nuoroda.",
       "moderatorLink": "Moderatoriaus nuoroda",
       "moderatorLinkHint": "Dalykitės šia nuoroda tik su moderatoriais. Bet kas, turintis šią nuorodą, gali valdyti renginį.",
       "liveRoomHint": "Nuoroda tiesiogiai įeiti į salę kaip moderatorius.",
       "copyLink": "Kopijuoti nuorodą",
-      "copied": "Nukopijuota!"
+      "copied": "Nukopijuota!",
+      "reveal": "Rodyti",
+      "hide": "Slėpti",
+      "warning": "Kiekvienas, turintis šią nuorodą, administruoja renginį: nerodykite jos bendrinant ekraną ir neįklijuokite jos į pokalbį.",
+      "hidden": "Nuoroda paslėpta",
+      "copyFailed": "Nepavyko nukopijuoti: pasirinkite toliau pateiktą adresą ir nukopijuokite jį ranka."
     },
     "feedbackAdmin": {
       "title": "Atsiliepimų rezultatai",
@@ -1294,185 +1448,6 @@
         "scaling": "Infrastruktūros dydis",
         "postprod": "DI grandinė po renginio"
       },
-      "scaling": {
-        "intro": "Parametrai, apibūdinantys klasterio, kuriame veikia platforma, talpą. Numatytosios reikšmės pritaikytos Azure F16s_v2 (16 vCPU / 32 GiB) JVB ir F4s_v2 (4 vCPU / 8 GiB) Jibri. Naudojant kitokį aparatūrą, atnaujinkite čia — masteliuotojas iškart perskaičiuos.",
-        "jvbSection": "Vaizdo tilto (JVB) talpa",
-        "jvbCpuCoresPerPod": "vCPU vienam JVB pod",
-        "jvbCpuCoresPerPodHelp": "JVB konteineriui reikalingų CPU branduolių skaičius (resources.requests.cpu). Azure F16s_v2 = 16.",
-        "jvbReceiversPerCore": "Pasyvūs dalyviai vienam branduoliui",
-        "jvbReceiversPerCoreHelp": "Kiek tik priimančių žiūrovų telpa 1 vCPU. Sukalibruota iki 18,75 (300 vebinaras ÷ 16 branduolių) ant F16s_v2.",
-        "jvbSendersPerCore": "Aktyvūs dalyviai vienam branduoliui",
-        "jvbSendersPerCoreHelp": "Kiek siuntėjų (mik+kamera) telpa 1 vCPU. Sukalibruota iki 3,125 (50 visi siuntėjai ÷ 16 branduolių) ant F16s_v2.",
-        "jvbMaxReplicas": "Daugiausia JVB replikų",
-        "jvbMaxReplicasHelp": "Griežta riba, kad būtų išvengta nekontroliuojamo augimo. Numatytoji 6.",
-        "jibriCpuCoresPerPod": "vCPU vienam Jibri pod",
-        "jibriCpuCoresPerPodHelp": "Jibri konteineriui reikalingų branduolių skaičius (ffmpeg + Chrome headless). Azure F4s_v2 = 4.",
-        "defaultSenderRatioPct": "Numatytasis siuntėjų santykis",
-        "defaultSenderRatioPctHelp": "Numatomų dalyvių, kurie iš tiesų siųs medijos turinį (mik+kamera), procentinė dalis, kai renginys to nenurodo. Vebinaras 10–30 %, apskritasis stalas 50–100 %.",
-        "previewTitle": "Skaičiavimo peržiūra",
-        "previewBody": "Renginys su {participants} numatomais dalyviais, esant {ratio}% siuntėjų → {senders} siuntėjų + {receivers} pasyvūs → {cores} numatomi branduoliai → {jvbs} JVB.",
-        "graceSection": "Švelnus išėjimas (renginio pabaiga)",
-        "eventGracePeriodMinutes": "Numatytasis malonės minutės po endsAt",
-        "eventGracePeriodMinutesHelp": "Papildomas laikas po numatytos pabaigos prieš uždarant skambutį. 0 = griežtas uždarymas, -1 = neuždaryti automatiškai (palikti neaktyvumo valymui), 15 = reklamjuostė ir uždarymas po 15 min. Kiekvienas renginys gali pakeisti.",
-        "videoQualitySection": "Video/audio quality",
-        "videoQuality": "Default quality",
-        "videoQualityHelp": "Preset applied to every event (overridable per event). Higher quality needs more bandwidth — “High” is the best trade-off. Takes effect immediately, no restart.",
-        "videoQualityOptions": {
-          "MAX": "Maximum — 1080p",
-          "HIGH": "High — 720p (recommended)",
-          "BALANCED": "Balanced — 540p",
-          "SAVE_DATA": "Save data — 360p"
-        },
-        "videoQualityDesc": {
-          "MAX": "Full HD 1080p, up to ~4 Mbps, stereo Opus 510 kbps audio. Top fidelity for small high-stakes calls — uses more bandwidth and loads the bridge more.",
-          "HIGH": "720p with a capped bitrate (~2.2 Mbps peak) and 96 kbps Opus audio. Great quality without maxing bandwidth: the recommended production trade-off.",
-          "BALANCED": "540p with a contained bitrate (~1 Mbps) and fewer simultaneous incoming videos. Good for large audiences or weak networks.",
-          "SAVE_DATA": "360p at minimal bitrate (~600 kbps) with unused-layer suspension. For very slow connections."
-        }
-      },
-      "header": {
-        "slimBarTitle": "Viršutinė juosta (Slim Header)",
-        "slimBarDescription": "Plona juosta puslapio viršuje, nurodanti patronuojančią organizaciją.",
-        "parentOrganization": "Patronuojanti organizacija",
-        "parentOrganizationHelp": "Pvz. \"Ministrų Tarybos Pirmininkystė\"",
-        "parentOrganizationUrl": "Patronuojančios organizacijos URL",
-        "centerBarTitle": "Centrinė antraštė",
-        "centerBarDescription": "Pagrindinė antraštės zona su programos pavadinimu ir logotipu.",
-        "appName": "Programos pavadinimas",
-        "appNameHelp": "Rodomas antraštėje ir naršyklės pavadinime",
-        "organizationShort": "Trumpas organizacijos pavadinimas",
-        "logoUrl": "Logotipo URL",
-        "logoUrlHelp": "Palikite tuščią, kad būtų naudojama numatytoji VA piktograma",
-        "organizationUrl": "Organizacijos svetainės URL"
-      },
-      "branding": {
-        "siteName": "Programos pavadinimas",
-        "siteNameHelp": "Rodomas antraštėje, naršyklės pavadinime ir el. laiškuose",
-        "siteDescription": "Programos aprašymas",
-        "organizationName": "Organizacijos pavadinimas",
-        "organizationNameHelp": "pvz. Skaitmeninės transformacijos departamentas",
-        "organizationNameShort": "Organizacijos santrumpa",
-        "organizationUrl": "Organizacijos URL",
-        "parentOrganization": "Patronuojanti organizacija",
-        "parentOrganizationHelp": "pvz. Ministrų Tarybos Pirmininkystė",
-        "parentOrganizationUrl": "Patronuojančios organizacijos URL",
-        "logoUrl": "Pasirinktinio logotipo URL",
-        "logoUrlHelp": "Palikite tuščią, kad būtų naudojama numatytoji VA piktograma",
-        "faviconUrl": "Favicon URL",
-        "primaryColor": "Pagrindinė spalva",
-        "defaultTimezone": "Numatytoji laiko juosta",
-        "defaultTimezoneHelp": "Naudojama datų rodymui ir naujų renginių kūrimui."
-      },
-      "watermark": {
-        "title": "Vaizdo tinkinimas",
-        "enabled": "Vandens ženklas įjungtas",
-        "url": "Vandens ženklo URL",
-        "urlHelp": "Skaidraus SVG arba PNG vaizdo URL. Palikite tuščią, kad būtų naudojamas organizacijos logotipas.",
-        "opacity": "Nepermatomumas",
-        "position": "Pozicija",
-        "previewLabel": "Vaizdo srities peržiūra",
-        "positions": {
-          "bottomLeft": "Apačioje kairėje",
-          "bottomRight": "Apačioje dešinėje",
-          "topLeft": "Viršuje kairėje",
-          "topRight": "Viršuje dešinėje"
-        }
-      },
-      "seo": {
-        "title": "SEO pavadinimas",
-        "titleHelp": "Pavadinimas, rodomas paieškos rezultatuose ir naršyklės kortelėje",
-        "description": "SEO aprašymas",
-        "descriptionHelp": "Aprašymas paieškos varikliams ir socialiniam dalijimuisi",
-        "image": "Open Graph vaizdas",
-        "imageHelp": "Numatytasis vaizdas socialiniam dalijimuisi (rekomenduojama 1200x630)"
-      },
-      "homepage": {
-        "modeLabel": "Pradžios puslapio režimas",
-        "modes": {
-          "LANDING": {
-            "title": "Nukreipimo puslapis",
-            "description": "Pagrindinis blokas, funkcijos, artėjantys renginiai ir kaip tai veikia"
-          },
-          "EVENTS_LIST": {
-            "title": "Renginių sąrašas",
-            "description": "Tiesiogiai rodyti renginių sąrašą"
-          },
-          "CUSTOM": {
-            "title": "Pasirinktinis",
-            "description": "Pasirinktinis HTML turinys + renginių sąrašas"
-          }
-        },
-        "customHtmlLabel": "Pasirinktinis HTML turinys",
-        "customHtmlHelp": "HTML, rodomas pagrindinėje pradžios puslapio dalyje"
-      },
-      "pages": {
-        "privacyTitle": "Privatumo politika",
-        "privacyIt": "Turinys (italų k.)",
-        "privacyEn": "Turinys (anglų k.)",
-        "privacyLabel": "Privatumo informacijos turinys",
-        "accessibilityTitle": "Prieinamumo deklaracija",
-        "accessibilityIt": "Turinys (italų k.)",
-        "accessibilityEn": "Turinys (anglų k.)",
-        "accessibilityLabel": "Prieinamumo deklaracijos turinys",
-        "preview": "Peržiūra"
-      },
-      "footer": {
-        "linksTitle": "Poraštės nuorodos",
-        "addLink": "Pridėti nuorodą",
-        "noLinks": "Nuorodų nesukonfigūruota. Bus naudojamos numatytosios nuorodos.",
-        "linkTitle": "Pavadinimas",
-        "linkSection": "Skyrius",
-        "sectionLegal": "Teisinė informacija",
-        "sectionMain": "Pagrindinė",
-        "moveUp": "Perkelti aukštyn",
-        "moveDown": "Perkelti žemyn",
-        "removeLink": "Pašalinti nuorodą"
-      },
-      "features": {
-        "statusPageEnabled": "Būsenos puslapis įjungtas",
-        "statusPageEnabledHelp": "Rodyti paslaugos būsenos puslapį",
-        "guestAccessEnabled": "Svečio prieiga įjungta",
-        "guestAccessEnabledHelp": "Leisti svečiams prisijungti prie vykstančių renginių",
-        "publicRegistrationEnabled": "Viešoji registracija įjungta",
-        "publicRegistrationEnabledHelp": "Bet kas gali kurti renginius (jei išjungta, tik administratoriai)",
-        "calendarPublic": "Viešas kalendorius",
-        "calendarPublicHelp": "Paskelbti renginių kalendorių. Lankytojai gali matyti suplanuotus renginius.",
-        "parseTitleKicker": "Pavadinimai su redakcine antrašte",
-        "parseTitleKickerHelp": "Jei renginio pavadinime yra simbolis „|“, dalis prieš jį rodoma kaip maža mažųjų raidžių etiketė virš pagrindinio pavadinimo. Pavyzdys: „Kavutė | OSS bandymas“ → etiketė „KAVUTĖ“ + pavadinimas „OSS bandymas“.",
-        "githubUrl": "GitHub saugyklos URL",
-        "supportEmail": "Pagalbos el. paštas",
-        "jvbScalingTitle": "Vaizdo tilto (JVB) mastelis",
-        "jvbScalingHelp": "Reguliuokite, kiek laiko laukti prieš išjungiant neaktyvų vaizdo mazgą ir kaip anksti jį paleisti prieš suplanuoto renginio pradžią.",
-        "jvbInactiveGraceMinutes": "Neaktyvumo minutės iki išjungimo",
-        "jvbInactiveGraceMinutesHelp": "Po kiek laiko tuščios konferencijos vaizdo mazgas pristabdomas. Rekomenduojama 45 minutės. Diapazonas 5–240.",
-        "jvbPreScaleMinutes": "Iš anksto paleidimo laikas (minutės)",
-        "jvbPreScaleMinutesHelp": "Kiek minučių prieš startsAt paleisti vaizdo mazgą suplanuotam renginiui. Rekomenduojama 10 minučių.",
-        "jvbStressWarnPercent": "Įtampos įspėjimo riba (%)",
-        "jvbStressWarnPercentHelp": "Viršijus šią ribą, masteliuotojas prideda 1 papildomą JVB repliką, net jei prognozavimas to nereikalauja. Numatytoji 50.",
-        "jvbStressCriticalPercent": "Įtampos kritinė riba (%)",
-        "jvbStressCriticalPercentHelp": "Viršijus šią ribą, masteliuotojas prideda 2 papildomas JVB replikas. Numatytoji 70. Turi būti didesnė už įspėjimo.",
-        "jvbProvisioningTimeoutMinutes": "Paruošimo laiko limitas (minutės)",
-        "jvbProvisioningTimeoutMinutesHelp": "Po kiek minučių nuo startsAt renginys, kurio JVB dar nepasiruošęs, pažymimas kaip „degradavęs“ būsenos puslapyje. Numatyta 15. Apima šaltą mazgo paleidimą (~3–5 min) ir saugumo atsargą.",
-        "statusPollIntervalSeconds": "Būsenos puslapio atnaujinimo intervalas (sekundėmis)",
-        "statusPollIntervalSecondsHelp": "Kas kiek sekundžių /status puslapis atnaujina duomenis naršyklės pusėje. Numatyta 30. Mažesnės reikšmės = šviežesni duomenys, bet didesnė programos apkrova.",
-        "jvbEmptyCloseMinutes": "Tuščios salės minutės iki galutinio uždarymo",
-        "jvbEmptyCloseMinutesHelp": "Jei LIVE būsenos salė, kurioje jau buvo dalyvių, tiek minučių lieka tuščia, ji galutinai uždaroma (ENDED) – taip renginys be moderatoriaus užsidaro dėl neveiklumo, nelaukdamas numatyto pabaigos laiko. Numatyta 15 (įjungta). -1 = išjungta. 0 = uždaryti per pirmą patikrą radus tuščią salę.",
-        "waitingRoomLeadMinutes": "Nukreipimo į laukiamąjį laikotarpis (minutėmis)",
-        "waitingRoomLeadMinutesHelp": "Užsiregistravus likus tiek minučių iki pradžios, iškart patenkama į laukiamąjį; užsiregistravusieji anksčiau mato patvirtinimą su kalendoriaus nuoroda. 0 = iki pat pradžios visada rodomas patvirtinimas. Rekomenduojama 15.",
-        "reactionsMode": "Reakcijos (jaustukai)",
-        "reactionsModeNative": "Jitsi savosios (įrankių juostoje, laikinos)",
-        "reactionsModeCustom": "Programos individualios (kairiojoje juostoje, su statistika)",
-        "reactionsModeHelp": "Savosios = Jitsi reakcijų mygtukas valdymo juostoje, lengvos ir laikinos (neskaičiuojamos). Individualios = programos reakcijų juosta apačioje kairėje, su skaičiavimu ir statistika. Numatyta: savosios.",
-        "emailSenderTitle": "El. laiškų siuntėjas",
-        "emailSenderHelp": "Kaip siuntėjas atrodo užsiregistravusiojo pašto dėžutėje. Siuntimo adresas lieka nurodytas diegimo konfigūracijoje (jis turi sutapti su adresu, kurį leidžia naudoti SMTP serveris).",
-        "emailFromName": "Siuntėjo vardas",
-        "emailFromNameHelp": "Tuščia = naudojamas diegime nustatytas vardas (SMTP_FROM_NAME). Laiškai vis tiek siunčiami iš sistemos adreso.",
-        "emailReplyTo": "Atsakymų adresas",
-        "emailReplyToHelp": "Laiškai siunčiami iš adreso, į kurį atsakyti negalima: be šio nustatymo atsakymas nieko nepasieks.",
-        "avatarTitle": "Dalyvių nuotraukos",
-        "gravatarEnabled": "Naudoti Gravatar, kai jis yra",
-        "gravatarEnabledHelp": "Užsiregistravusieji el. pašto adresu, turinčiu Gravatar, matys jį kaip nuotrauką salėje; visiems kitiems lieka platformos sugeneruoti inicialai. Paveikslėlis parsiunčiamas per mūsų serverį, todėl dalyvių naršyklės su gravatar.com nesusisiekia – bet platforma susisiekia: tai reikia nurodyti privatumo pranešime."
-      },
       "postprod": {
         "prerequisitesNote": "Postprodukcija dirba su visu įrašu pasibaigus renginiui. Skirtasis GPU telkinys įsijungia, kai į eilę patenka pirmoji užduotis, ir išsijungia, kai eilė ištuštėja, kad būtų taupomos sąnaudos. Prieš įjungdami grandinę įsitikinkite, kad klasteryje sukonfigūruotas GPU telkinys, įdiegtas NVIDIA operatorius, vardų srityje yra HuggingFace prisijungimo duomenys, o skirtajame tome iš anksto įkelti modelių svoriai. Veiklos kontrolinis sąrašas pateiktas docs/POSTPROD.md.",
         "pipelineEnabled": "Grandinė po renginio įjungta",
@@ -1499,10 +1474,217 @@
         "jobMaxAttempts": "Bandymai iki nesėkmės",
         "jobMaxAttemptsHelp": "Kiek kartų grandinė kartoja užduotį, prieš pažymėdama ją kaip nepavykusią. Pertrauka tarp bandymų auga eksponentiškai (nuo 30 sekundžių iki 2 valandų). Įprasta reikšmė – 5.",
         "artifactRetentionDays": "Artefaktų saugojimas (dienomis)",
-        "artifactRetentionDaysHelp": "Palikus 0, DI artefaktams taikomas toks pat terminas kaip ir renginiui. Už nulį didesnė reikšmė juos išsaugo nurodytą dienų skaičių net ir uždarius renginį, kol kasdienis cron jų neištrina. Ištrinami ir kalbėtojų vardai bei užduočių duomenys, kaip numatyta docs/GDPR.md.",
+        "artifactRetentionDaysHelp": "Esant 0, visai svetainei taikomos ribos nėra: DI artefaktams taikomas jų įrašo arba renginio saugojimo terminas. Už nulį didesnė reikšmė lemia, kad kasdienė užduotis ištrina kiekvieną artefaktą, sukurtą anksčiau nei prieš tiek dienų, paskelbtą ar ne: ji gali sutrumpinti saugojimą, bet niekada jo nepailgina. Kalbėtojų vardams ir užduočių duomenims tai netaikoma: jiems taikomas įrašo arba renginio saugojimo terminas. Išsamiau: docs/privacy/recordings-and-ai.md.",
         "consentDisclosureSection": "DI pranešimas laukiamajame",
         "consentDisclosureHelp": "Tekstas, rodomas dalyviams laukiamajame, kai renginyje naudojama DI postprodukcija (transkripcija, santrauka, vertimas, įgarsinimas). Pritaikomas kiekvienai kalbai. Palikite tuščią, kad būtų naudojamas numatytasis sistemos tekstas.",
         "consentDisclosurePlaceholder": "Pvz. Šis renginys po tiesioginės transliacijos bus automatiškai transkribuotas ir apibendrintas DI įrankiais…"
+      },
+      "scaling": {
+        "intro": "Parametrai, apibūdinantys klasterio, kuriame veikia platforma, talpą. Numatytosios reikšmės pritaikytos Azure F16s_v2 (16 vCPU / 32 GiB) JVB ir F4s_v2 (4 vCPU / 8 GiB) Jibri. Naudojant kitokį aparatūrą, atnaujinkite čia — masteliuotojas iškart perskaičiuos.",
+        "jvbSection": "Vaizdo tilto (JVB) talpa",
+        "jvbCpuCoresPerPod": "vCPU vienam JVB pod",
+        "jvbCpuCoresPerPodHelp": "JVB konteineriui reikalingų CPU branduolių skaičius (resources.requests.cpu). Azure F16s_v2 = 16.",
+        "jvbReceiversPerCore": "Pasyvūs dalyviai vienam branduoliui",
+        "jvbReceiversPerCoreHelp": "Kiek tik priimančių žiūrovų telpa 1 vCPU. Sukalibruota iki 18,75 (300 vebinaras ÷ 16 branduolių) ant F16s_v2.",
+        "jvbSendersPerCore": "Aktyvūs dalyviai vienam branduoliui",
+        "jvbSendersPerCoreHelp": "Kiek siuntėjų (mik+kamera) telpa 1 vCPU. Sukalibruota iki 3,125 (50 visi siuntėjai ÷ 16 branduolių) ant F16s_v2.",
+        "jvbMaxReplicas": "Daugiausia JVB replikų",
+        "jvbMaxReplicasHelp": "Griežta riba, kad būtų išvengta nekontroliuojamo augimo. Numatytoji 6.",
+        "jibriCpuCoresPerPod": "vCPU vienam Jibri pod",
+        "jibriCpuCoresPerPodHelp": "Jibri konteineriui reikalingų branduolių skaičius (ffmpeg + Chrome headless). Azure F4s_v2 = 4.",
+        "defaultSenderRatioPct": "Numatytasis siuntėjų santykis",
+        "defaultSenderRatioPctHelp": "Numatomų dalyvių, kurie iš tiesų siųs medijos turinį (mik+kamera), procentinė dalis, kai renginys to nenurodo. Vebinaras 10–30 %, apskritasis stalas 50–100 %.",
+        "previewTitle": "Skaičiavimo peržiūra",
+        "previewBody": "Renginys su {participants} numatomais dalyviais, esant {ratio}% siuntėjų → {senders} siuntėjų + {receivers} pasyvūs → {cores} numatomi branduoliai → {jvbs} JVB.",
+        "graceSection": "Švelnus išėjimas (renginio pabaiga)",
+        "eventGracePeriodMinutes": "Numatytasis malonės minutės po endsAt",
+        "eventGracePeriodMinutesHelp": "Papildomas laikas po numatytos pabaigos prieš uždarant skambutį. 0 = griežtas uždarymas, -1 = neuždaryti automatiškai (palikti neaktyvumo valymui), 15 = reklamjuostė ir uždarymas po 15 min. Kiekvienas renginys gali pakeisti.",
+        "videoQualitySection": "Vaizdo / garso kokybė",
+        "videoQuality": "Numatytoji kokybė",
+        "videoQualityHelp": "Išankstinė nuostata, taikoma visiems renginiams (galima pakeisti kiekvienam renginiui atskirai). Kuo aukštesnė kokybė, tuo daugiau pralaidumo reikia: „Aukšta“ yra geriausias kompromisas. Įsigalioja iš karto, be paleidimo iš naujo.",
+        "videoQualityOptions": {
+          "MAX": "Didžiausia — 1080p",
+          "HIGH": "Aukšta — 720p (rekomenduojama)",
+          "BALANCED": "Subalansuota — 540p",
+          "SAVE_DATA": "Duomenų taupymas — 360p"
+        },
+        "videoQualityDesc": {
+          "MAX": "Full HD 1080p, sparta iki ~4 Mbps, stereofoninis 510 kbps Opus garsas. Didžiausia kokybė mažiems ir svarbiems skambučiams — naudoja daugiau pralaidumo ir labiau apkrauna vaizdo tiltą.",
+          "HIGH": "720p su apribota sparta (~2,2 Mbps piko metu) ir 96 kbps Opus garsu. Puiki kokybė neperkraunant pralaidumo: rekomenduojamas kompromisas gamybinei aplinkai.",
+          "BALANCED": "540p su ribota sparta (~1 Mbps) ir mažiau vienu metu gaunamų vaizdo srautų. Tinka didelei auditorijai ar silpniems tinklams.",
+          "SAVE_DATA": "360p su minimalia sparta (~600 kbps), nenaudojami sluoksniai sustabdomi. Labai lėtiems ryšiams."
+        }
+      },
+      "header": {
+        "slimBarTitle": "Viršutinė juosta (Slim Header)",
+        "slimBarDescription": "Plona juosta puslapio viršuje, nurodanti patronuojančią organizaciją.",
+        "parentOrganization": "Patronuojanti organizacija",
+        "parentOrganizationHelp": "Institucija, kuriai pavaldi jūsų administracija. Palikite tuščią, kad nebūtų nurodyta jokia.",
+        "parentOrganizationUrl": "Patronuojančios organizacijos URL",
+        "siteTagline": "Svetainės šūkis",
+        "siteTaglineHelp": "Rodomas viršutinėje juostoje ir poraštėje, kai aukštesnioji institucija tuščia. Palikite tuščią, kad nieko nebūtų rodoma. Rašomas kiekvienai kalbai: kur trūksta, naudojamas anglų, paskui bet kuris kitas.",
+        "centerBarTitle": "Centrinė antraštė",
+        "centerBarDescription": "Pagrindinė antraštės zona su programos pavadinimu ir logotipu.",
+        "appName": "Programos pavadinimas",
+        "appNameHelp": "Rodomas antraštėje ir naršyklės pavadinime",
+        "organizationShort": "Trumpas organizacijos pavadinimas",
+        "logoUrl": "Logotipo URL",
+        "logoUrlHelp": "Palikite tuščią, kad būtų naudojama numatytoji VA piktograma",
+        "organizationUrl": "Organizacijos svetainės URL"
+      },
+      "branding": {
+        "siteName": "Programos pavadinimas",
+        "siteNameHelp": "Rodomas antraštėje, naršyklės pavadinime ir el. laiškuose",
+        "siteDescription": "Programos aprašymas",
+        "organizationName": "Organizacijos pavadinimas",
+        "organizationNameHelp": "Platformai priklausančios institucijos pavadinimas: rodomas antraštėje, poraštėje ir teisiniuose tekstuose (pvz., Pavyzdžio miesto savivaldybė)",
+        "organizationNameShort": "Organizacijos santrumpa",
+        "organizationUrl": "Organizacijos URL",
+        "parentOrganization": "Patronuojanti organizacija",
+        "parentOrganizationHelp": "Institucija, kuriai pavaldi jūsų administracija. Palikite tuščią, kad nebūtų nurodyta jokia.",
+        "parentOrganizationUrl": "Patronuojančios organizacijos URL",
+        "logoUrl": "Pasirinktinio logotipo URL",
+        "logoUrlHelp": "Palikite tuščią, kad būtų naudojama numatytoji VA piktograma",
+        "faviconUrl": "Favicon URL adresas",
+        "primaryColor": "Pagrindinė spalva",
+        "defaultTimezone": "Numatytoji laiko juosta",
+        "defaultTimezoneHelp": "Naudojama datų rodymui ir naujų renginių kūrimui.",
+        "waitingRoomEngine": "Laukiamasis (svetainės numatytasis)",
+        "waitingRoomEngineGame": "Vaizdo žaidimas (Phaser fojė)",
+        "waitingRoomEngineClassic": "Klasikinis (statinis)",
+        "waitingRoomEngineHelp": "Numatytasis laukiamojo režimas. Jį galima pakeisti atskiram renginiui, o vienam apsilankymui – adreso parametru {param}."
+      },
+      "watermark": {
+        "title": "Vaizdo tinkinimas",
+        "enabled": "Vandens ženklas įjungtas",
+        "url": "Vandens ženklo URL",
+        "urlHelp": "Skaidraus SVG arba PNG vaizdo URL. Palikite tuščią, kad būtų naudojamas organizacijos logotipas.",
+        "opacity": "Nepermatomumas",
+        "position": "Pozicija",
+        "previewLabel": "Vaizdo srities peržiūra",
+        "positions": {
+          "bottomLeft": "Apačioje kairėje",
+          "bottomRight": "Apačioje dešinėje",
+          "topLeft": "Viršuje kairėje",
+          "topRight": "Viršuje dešinėje"
+        }
+      },
+      "seo": {
+        "title": "SEO pavadinimas",
+        "titleHelp": "Pavadinimas, rodomas paieškos rezultatuose ir naršyklės kortelėje",
+        "description": "SEO aprašymas",
+        "descriptionHelp": "Aprašymas paieškos varikliams ir socialiniam dalijimuisi",
+        "image": "Open Graph vaizdas",
+        "imageHelp": "Numatytasis vaizdas socialiniam dalijimuisi (rekomenduojama 1200x630)",
+        "ogSection": "Bendrinamų nuorodų peržiūra",
+        "ogIntro": "Kai kas nors įklijuoja renginio nuorodą pokalbyje ar socialiniame tinkle, platforma sukuria peržiūros paveikslėlį su informacija. Pasirinkite, kokia: kiekvienas papildomas laukas atima vietos iš pavadinimo.",
+        "ogCardEnabled": "Kurti peržiūrą",
+        "ogCardEnabledHelp": "Išjungus nuoroda rodo plakatą tokį, koks jis yra (arba svetainės logotipą, jei renginys plakato neturi), be paveikslėlyje įskaitomo pavadinimo ar datos.",
+        "ogShowPoster": "Plakatas kaip fonas",
+        "ogShowPosterHelp": "Renginio viršelis naudojamas kaip peržiūros fonas, pritemdytas, kad tekstas liktų įskaitomas. Jei plakato nėra arba ši parinktis išjungta, lieka institucinė spalva ir logotipas.",
+        "ogShowDate": "Data ir laikas",
+        "ogShowDateHelp": "Numatytojoje platformos laiko juostoje.",
+        "ogShowSpeakers": "Pranešėjai",
+        "ogShowSpeakersHelp": "Renginio pranešėjų tekstas, sutrumpintas, jei per ilgas.",
+        "ogShowOrganization": "Organizacija",
+        "ogShowOrganizationHelp": "Renginio organizatorius, jei nurodytas, kitu atveju – organizacijos pavadinimas."
+      },
+      "homepage": {
+        "modeLabel": "Pradžios puslapio režimas",
+        "modes": {
+          "LANDING": {
+            "title": "Nukreipimo puslapis",
+            "description": "Pagrindinis blokas, funkcijos, artėjantys renginiai ir kaip tai veikia"
+          },
+          "EVENTS_LIST": {
+            "title": "Renginių sąrašas",
+            "description": "Tiesiogiai rodyti renginių sąrašą"
+          },
+          "CUSTOM": {
+            "title": "Pasirinktinis",
+            "description": "Pasirinktinis HTML turinys + renginių sąrašas"
+          },
+          "LANDING_ISTITUZIONALE": {
+            "title": "Institucinis nukreipimo puslapis",
+            "description": "Institucija, išskirtas artimiausias renginys ir kiti sąraše. Jokios techninės kalbos"
+          },
+          "LANDING_SEMPLICE": {
+            "title": "Nukreipimo puslapis paprasta kalba",
+            "description": "Nedaug žodžių ir vienas kvietimas tiems, kuriems nuotoliniai renginiai yra naujovė"
+          }
+        },
+        "customHtmlLabel": "Pasirinktinis HTML turinys",
+        "customHtmlHelp": "HTML, rodomas pagrindinėje pradžios puslapio dalyje",
+        "showProject": "Rodyti skyrių „Projektas“",
+        "showProjectHelp": "Platformos architektūra, duomenų suverenumas ir atvirasis kodas: aktualu svarstantiems pakartotinį naudojimą labiau nei dalyviams."
+      },
+      "pages": {
+        "privacyTitle": "Privatumo politika",
+        "privacyIt": "Turinys (italų k.)",
+        "privacyEn": "Turinys (anglų k.)",
+        "privacyLabel": "Privatumo informacijos turinys",
+        "accessibilityTitle": "Prieinamumo deklaracija",
+        "accessibilityIt": "Turinys (italų k.)",
+        "accessibilityEn": "Turinys (anglų k.)",
+        "accessibilityLabel": "Prieinamumo deklaracijos turinys",
+        "preview": "Peržiūra"
+      },
+      "footer": {
+        "linksTitle": "Poraštės nuorodos",
+        "addLink": "Pridėti nuorodą",
+        "noLinks": "Nuorodų nesukonfigūruota. Bus naudojamos numatytosios nuorodos.",
+        "linkTitle": "Pavadinimas",
+        "linkSection": "Skyrius",
+        "sectionLegal": "Teisinė informacija",
+        "sectionMain": "Pagrindinė",
+        "moveUp": "Perkelti aukštyn",
+        "moveDown": "Perkelti žemyn",
+        "removeLink": "Pašalinti nuorodą"
+      },
+      "features": {
+        "statusPageEnabled": "Būsenos puslapis įjungtas",
+        "statusPageEnabledHelp": "Paskelbia paslaugos būsenos puslapį. Išjungus puslapio nėra, o jo duomenis mato tik administratoriai.",
+        "guestAccessEnabled": "Svečio prieiga įjungta",
+        "guestAccessEnabledHelp": "Neužsiregistravę asmenys gali prisijungti prie vykstančių renginių nurodę tik savo vardą. Išjungus prie suplanuotų renginių galima prisijungti tik užsiregistravus arba su moderatoriaus ar pranešėjo nuoroda; momentiniai vaizdo skambučiai lieka atviri visiems, kas turi nuorodą.",
+        "publicRegistrationEnabled": "Viešoji registracija įjungta",
+        "publicRegistrationEnabledHelp": "Į renginius gali registruotis bet kas. Išjungus registruotis gali tik renginio pakviestųjų sąraše esantys asmenys, o asmeninė prisijungimo nuoroda siunčiama tik el. paštu; jau užsiregistravusieji ir moderatorių bei pranešėjų nuorodos veikia toliau.",
+        "calendarPublic": "Viešas kalendorius",
+        "calendarPublicHelp": "Paskelbti renginių kalendorių. Lankytojai gali matyti suplanuotus renginius.",
+        "parseTitleKicker": "Pavadinimai su redakcine antrašte",
+        "parseTitleKickerHelp": "Jei renginio pavadinime yra simbolis „|“, dalis prieš jį rodoma kaip maža mažųjų raidžių etiketė virš pagrindinio pavadinimo. Pavyzdys: „Kavutė | OSS bandymas“ → etiketė „KAVUTĖ“ + pavadinimas „OSS bandymas“.",
+        "githubUrl": "GitHub saugyklos URL",
+        "supportEmail": "Pagalbos el. paštas",
+        "jvbScalingTitle": "Vaizdo tilto (JVB) mastelis",
+        "jvbScalingHelp": "Reguliuokite, kiek laiko laukti prieš išjungiant neaktyvų vaizdo mazgą ir kaip anksti jį paleisti prieš suplanuoto renginio pradžią.",
+        "jvbInactiveGraceMinutes": "Neaktyvumo minutės iki išjungimo",
+        "jvbInactiveGraceMinutesHelp": "Po kiek laiko tuščios konferencijos vaizdo mazgas pristabdomas. Rekomenduojama 45 minutės. Diapazonas 5–240.",
+        "jvbPreScaleMinutes": "Iš anksto paleidimo laikas (minutės)",
+        "jvbPreScaleMinutesHelp": "Kiek minučių prieš startsAt paleisti vaizdo mazgą suplanuotam renginiui. Rekomenduojama 10 minučių.",
+        "jvbEmptyCloseMinutes": "Tuščios salės minutės iki galutinio uždarymo",
+        "jvbEmptyCloseMinutesHelp": "Jei LIVE būsenos salė, kurioje jau buvo dalyvių, tiek minučių lieka tuščia, ji galutinai uždaroma (ENDED) – taip renginys be moderatoriaus užsidaro dėl neveiklumo, nelaukdamas numatyto pabaigos laiko. Numatyta 15 (įjungta). -1 = išjungta. 0 = uždaryti per pirmą patikrą radus tuščią salę.",
+        "waitingRoomLeadMinutes": "Nukreipimo į laukiamąjį laikotarpis (minutėmis)",
+        "waitingRoomLeadMinutesHelp": "Užsiregistravus likus tiek minučių iki pradžios, iškart patenkama į laukiamąjį; užsiregistravusieji anksčiau mato patvirtinimą su kalendoriaus nuoroda. 0 = iki pat pradžios visada rodomas patvirtinimas. Rekomenduojama 15.",
+        "reactionsMode": "Reakcijos (jaustukai)",
+        "reactionsModeNative": "Jitsi savosios (įrankių juostoje, laikinos)",
+        "reactionsModeCustom": "Programos individualios (kairiojoje juostoje, su statistika)",
+        "reactionsModeHelp": "Savosios = Jitsi reakcijų mygtukas valdymo juostoje, lengvos ir laikinos (neskaičiuojamos). Individualios = programos reakcijų juosta apačioje kairėje, su skaičiavimu ir statistika. Numatyta: savosios.",
+        "jvbStressWarnPercent": "Įtampos įspėjimo riba (%)",
+        "jvbStressWarnPercentHelp": "Viršijus šią ribą, masteliuotojas prideda 1 papildomą JVB repliką, net jei prognozavimas to nereikalauja. Numatytoji 50.",
+        "jvbStressCriticalPercent": "Įtampos kritinė riba (%)",
+        "jvbStressCriticalPercentHelp": "Viršijus šią ribą, masteliuotojas prideda 2 papildomas JVB replikas. Numatytoji 70. Turi būti didesnė už įspėjimo.",
+        "jvbProvisioningTimeoutMinutes": "Paruošimo laiko limitas (minutės)",
+        "jvbProvisioningTimeoutMinutesHelp": "Po kiek minučių nuo startsAt renginys, kurio JVB dar nepasiruošęs, pažymimas kaip „degradavęs“ būsenos puslapyje. Numatyta 15. Apima šaltą mazgo paleidimą (~3–5 min) ir saugumo atsargą. Taikoma ir įrašymo paslaugai, skaičiuojant nuo to, kai renginys su įrašymu jos paprašo: praėjus šiam laikui be atsakymo, tiesioginė salė neberodo jos kaip „paleidžiamos“ ir pažymi kaip nepasileidusią.",
+        "statusPollIntervalSeconds": "Būsenos puslapio atnaujinimo intervalas (sekundėmis)",
+        "statusPollIntervalSecondsHelp": "Kas kiek sekundžių /status puslapis atnaujina duomenis naršyklės pusėje. Numatyta 30. Mažesnės reikšmės = šviežesni duomenys, bet didesnė programos apkrova.",
+        "emailSenderTitle": "El. laiškų siuntėjas",
+        "emailSenderHelp": "Kaip siuntėjas atrodo užsiregistravusiojo pašto dėžutėje. Siuntimo adresas lieka nurodytas diegimo konfigūracijoje (jis turi sutapti su adresu, kurį leidžia naudoti SMTP serveris).",
+        "emailFromName": "Siuntėjo vardas",
+        "emailFromNameHelp": "Tuščia = naudojamas diegime nustatytas vardas (SMTP_FROM_NAME). Laiškai vis tiek siunčiami iš sistemos adreso.",
+        "emailReplyTo": "Atsakymų adresas",
+        "emailReplyToHelp": "Laiškai siunčiami iš adreso, į kurį atsakyti negalima: be šio nustatymo atsakymas nieko nepasieks.",
+        "avatarTitle": "Dalyvių nuotraukos",
+        "gravatarEnabled": "Naudoti Gravatar, kai jis yra",
+        "gravatarEnabledHelp": "Užsiregistravusieji el. pašto adresu, turinčiu Gravatar, matys jį kaip nuotrauką salėje; visiems kitiems lieka platformos sugeneruoti inicialai. Paveikslėlis parsiunčiamas per mūsų serverį, todėl dalyvių naršyklės su gravatar.com nesusisiekia – bet platforma susisiekia: tai reikia nurodyti privatumo pranešime."
       }
     },
     "analytics": {
@@ -1583,20 +1765,17 @@
       "descriptionLabel": "Aprašymas",
       "maxParticipantsLabel": "Maks. dalyvių",
       "featuresLabel": "Funkcijos",
-      "recordingLabel": "Įrašymas",
-      "unmute": "Dalyvių mikrofonas",
-      "video": "Dalyvių vaizdo kamera",
-      "screen": "Ekrano bendrinimas",
-      "pickerTitle": "Pasirinkite šabloną",
-      "pickerSubtitle": "Pasirinkite šabloną iš anksto konfigūruoti renginio nustatymams arba praleiskite, kad viską sukonfigūruotumėte patys.",
-      "skipTemplate": "Konfigūruoti rankiniu būdu",
       "whiteboardLabel": "Lenta",
+      "recordingLabel": "Įrašymas",
       "waitingRoomEngineLabel": "Laukiamasis (šablono numatytasis)",
       "waitingRoomEngineSiteDefault": "Svetainės numatytasis",
       "waitingRoomEngineGarden": "Sodas (įprastas)",
       "waitingRoomEngineGame": "Vaizdo žaidimas (Phaser fojė)",
       "waitingRoomEngineClassic": "Klasikinis (statinis)",
       "waitingRoomEngineHelp": "Iš anksto nustato laukiamojo variklį renginiams, sukurtiems pagal šį šabloną. Vedikyje jį vis tiek galima pakeisti.",
+      "unmute": "Dalyvių mikrofonas",
+      "video": "Dalyvių vaizdo kamera",
+      "screen": "Ekrano bendrinimas",
       "durationLabel": "Numatytoji trukmė (minutėmis)",
       "durationHint": "Iš anksto užpildo renginio pabaigą (pradžia + trukmė). Naudotojas gali ją pakeisti. Tuščia = 2 valandos.",
       "retentionLabel": "Numatytasis duomenų saugojimas (dienomis)",
@@ -1605,7 +1784,10 @@
       "descriptionTemplateHint": "Tekstas, iš anksto įrašomas į renginio aprašymą (redaguojamas).",
       "aiTranscript": "Automatinė transkripcija (numatytoji)",
       "aiSummary": "Automatinė santrauka (numatytoji)",
-      "aiTranslation": "Automatinis vertimas (numatytasis)"
+      "aiTranslation": "Automatinis vertimas (numatytasis)",
+      "pickerTitle": "Pasirinkite šabloną",
+      "pickerSubtitle": "Pasirinkite šabloną iš anksto konfigūruoti renginio nustatymams arba praleiskite, kad viską sukonfigūruotumėte patys.",
+      "skipTemplate": "Konfigūruoti rankiniu būdu"
     },
     "instantCall": {
       "title": "Momentinis vaizdo skambutis",
@@ -1634,7 +1816,7 @@
       "selectFile": "Pasirinkti failą",
       "fileTitle": "Pavadinimas",
       "visibility": "Matomumas",
-      "visibilityAlways": "Visada matomas",
+      "visibilityAlways": "Salėje ir po renginio",
       "visibilityBefore": "Tik prieš renginį",
       "visibilityDuring": "Tik renginio metu",
       "visibilityAfter": "Tik po renginio",
@@ -1655,10 +1837,11 @@
       "titleLabel": "Pavadinimas",
       "descriptionLabel": "Aprašymas (neprivaloma)",
       "visibilityLabel": "Matomumas",
-      "visibilityAlways": "Visada",
+      "visibilityAlways": "Salėje ir po renginio",
       "visibilityBefore": "Prieš renginį",
       "visibilityDuring": "Renginio metu",
       "visibilityAfter": "Po renginio",
+      "visibilityHelp": "Prieš pradžią viešajame renginio puslapyje rodoma tik medžiaga, pažymėta „Prieš renginį“. Medžiaga, pažymėta „Salėje ir po renginio“, rodoma salėje renginio metu ir pasibaigusio renginio puslapyje.",
       "typeLabel": "Tipas",
       "fileUploaded": "Failas įkeltas",
       "typeFile": "Failas",
@@ -1678,7 +1861,7 @@
         "newTitle": "Naujas GDPR/BDAR šablonas",
         "editTitle": "Redaguoti GDPR/BDAR šabloną",
         "name": "Vidinis pavadinimas",
-        "namePlaceholder": "pvz., DTD standartinė informacija",
+        "namePlaceholder": "pvz., Standartinė privatumo informacija",
         "description": "Aprašymas (neprivaloma)",
         "descriptionPlaceholder": "Trumpos pastabos šablonui atpažinti",
         "bodyIt": "Privatumo informacijos tekstas (italų k.)",
@@ -1764,9 +1947,9 @@
       "version": "Versija",
       "environment": "Aplinka",
       "modes": {
-        "simple": "Paprasta (Docker Compose)",
-        "standard": "Standartinė (Kubernetes)",
-        "full": "Pilna (Kubernetes su scale-to-zero)",
+        "simple": "Paprasta",
+        "standard": "Standartinė",
+        "full": "Pilna (tiltai su scale-to-zero)",
         "unknown": "Nežinoma"
       },
       "database": {
@@ -1780,7 +1963,9 @@
         "title": "Jitsi Meet",
         "reachable": "Pasiekiamas",
         "unreachable": "Nepasiekiamas",
-        "notConfigured": "Nesukonfigūruotas"
+        "notConfigured": "Nesukonfigūruotas",
+        "degraded": "Pasiekiamas, bet atsako su klaidomis arba lėtai",
+        "publicCheckFailed": "Patikra viešuoju adresu nepavyko ({code}): portalo serveris nepriima sertifikato arba pavadinimo. Konferencijos vis tiek gali veikti."
       },
       "jvb": {
         "title": "Video Bridge (JVB)",
@@ -1788,7 +1973,9 @@
         "replicas": "{current}/{max} mazgų",
         "preScale": "Išankstinis mastelio keitimas: {minutes} min.",
         "fixedMode": "Fiksuotas režimas",
-        "scalerEnabled": "Mastelio keitiklis įjungtas"
+        "scalerEnabled": "Mastelio keitiklis įjungtas",
+        "fixedDown": "Vaizdo tiltas neatsako",
+        "unmonitored": "Nestebima: nenustatytas tilto adresas (JVB_HEALTH_URL)"
       },
       "jibri": {
         "title": "Įrašymas (Jibri)",
@@ -1810,7 +1997,11 @@
         "metrics": "Metrikų prieigos taškas"
       },
       "note": "Infrastruktūros pakeitimai atliekami per Helm konfigūraciją ir CI/CD vamzdyną.",
-      "deployDocs": "Diegimo dokumentacija"
+      "deployDocs": "Diegimo dokumentacija",
+      "platforms": {
+        "kubernetes": "Kubernetes aplinkoje",
+        "other": "Ne Kubernetes aplinkoje (Docker Compose arba vienas serveris)"
+      }
     },
     "instantCalls": {
       "title": "Greitieji skambučiai",
@@ -1915,9 +2106,9 @@
       "latencyP99": "Delsa P99",
       "requestRate": "Užklausos/s",
       "chartLatencyQuantiles": "Programos delsa — P50 / P95 / P99",
-      "participantsNow": "Aktyvūs dalyviai",
+      "participantsNow": "Dalyviai vaizdo tilte",
       "jvbStress": "JVB apkrova",
-      "conferences": "Aktyvios konferencijos",
+      "conferences": "Konferencijos vaizdo tilte",
       "octoRelay": "Octo tarpinis tiltų ryšys",
       "interBridge": "Octo srautas",
       "chartCpu": "CPU usage",
@@ -1944,7 +2135,8 @@
       "liveNow": "LIVE",
       "provisioningNow": "ruošiama",
       "idleNow": "IDLE (pristabdyta)",
-      "scaleToZeroHelp": "IDLE yra normali būsena renginiui be srauto ilgiau nei malonės laikotarpis. Kitam vartotojui apsilankius, grįžtama į PROVISIONING ir tada LIVE."
+      "scaleToZeroHelp": "IDLE yra normali būsena renginiui be srauto ilgiau nei malonės laikotarpis. Kitam vartotojui apsilankius, grįžtama į PROVISIONING ir tada LIVE.",
+      "capacityFromStatus": "Dabartinės reikšmės nuskaitytos iš vaizdo tilto. Istorijai reikia Prometheus."
     },
     "bulk": {
       "selectAll": "Pažymėti visus",
@@ -1972,7 +2164,29 @@
       "resultsCount": "{count, plural, =0 {Renginių nėra} one {# renginys} other {# renginiai}}",
       "durationMinutes": "{minutes} min",
       "durationHoursMinutes": "{hours} val. {minutes} min",
-      "moderatorsSpeakers": "{mods} moderatorių · {speakers} pranešėjų",
+      "menu": {
+        "actionsFor": "Veiksmai: „{title}“",
+        "manage": "Tvarkyti",
+        "edit": "Redaguoti",
+        "openPublic": "Atverti viešąjį puslapį",
+        "newTab": "(atsidaro naujame skirtuke)",
+        "copyLink": "Kopijuoti viešąją nuorodą",
+        "linkCopied": "Nuoroda nukopijuota",
+        "publish": "Paskelbti",
+        "unpublish": "Atšaukti paskelbimą",
+        "unpublishTitle": "Atšaukti renginio paskelbimą?",
+        "unpublishMessage": "„{title}“ išnyks iš viešųjų puslapių, kol vėl jį paskelbsite. Jau gautos registracijos išsaugomos.",
+        "published": "Renginys paskelbtas",
+        "unpublished": "Paskelbimas atšauktas",
+        "duplicate": "Dubliuoti kaip kitą renginį",
+        "delete": "Ištrinti",
+        "deleteTitle": "Ištrinti renginį?",
+        "deleteMessage": "„{title}“ ir visi jo duomenys bus ištrinti. Šio veiksmo atšaukti negalima.",
+        "deleted": "Renginys ištrintas",
+        "failed": "Veiksmas nepavyko. Bandykite dar kartą."
+      },
+      "instantBadge": "Greitasis skambutis",
+      "moderatorsSpeakers": "{mods, plural, one {# moderatorius} few {# moderatoriai} many {# moderatoriaus} other {# moderatorių}} · {speakers, plural, one {# pranešėjas} few {# pranešėjai} many {# pranešėjo} other {# pranešėjų}}",
       "postEventSummary": "{connected} prisijungę · {registered} registracijų",
       "registeredCount": "{count, plural, =0 {Registracijų nėra} one {1 registracija} other {# registracijų}}"
     },
@@ -2014,15 +2228,19 @@
     },
     "eventDetail": {
       "copyPublicUrl": "Kopijuoti viešą nuorodą",
-      "copyModeratorUrl": "Kopijuoti moderatoriaus nuorodą",
-      "enterAsModerator": "Įeiti į live",
+      "copyInviteUrl": "Kopijuoti kvietimo nuorodą",
+      "enterAsParticipant": "Prisijungti kaip dalyvis",
+      "openAsParticipant": "Atidaryti kaip dalyvis",
+      "participantHintRoom": "Atsidaro naujame skirtuke: kambarys taip, kaip jį mato svečias, be moderatoriaus teisių.",
+      "participantHintPassword": "Atsidaro naujame skirtuke: kambarys taip, kaip jį mato svečias, įvedus renginio slaptažodį.",
+      "participantHintPage": "Atsidaro naujame skirtuke: viešas puslapis taip, kaip jį mato dalyviai.",
       "editEvent": "Redaguoti renginį",
       "editSettings": "Redaguoti nustatymus",
       "featureSummary": "Aktyvios funkcijos",
       "organizers": "Organizatoriai",
       "privacyGdpr": "Privatumas ir GDPR/BDAR",
       "postEventTitle": "Po renginio ir atsiliepimai",
-      "recordingSection": "Įrašymas",
+      "recordingSection": "Renginio vaizdo įrašas",
       "callSessions": "Sesijos ir telemetrija",
       "questionnaires": "Klausimynai",
       "questionnaireCount": "{count, plural, =0 {Susieto klausimyno nėra} one {1 susietas klausimynas} other {# susieti klausimynai}}",
@@ -2030,12 +2248,10 @@
       "manageQuestionnaires": "Valdyti klausimynus",
       "tabs": {
         "overview": "Apžvalga",
-        "settings": "Nustatymai",
         "people": "Asmenys",
         "content": "Turinys",
-        "audit": "Įrašai ir auditas",
-        "postEvent": "Po renginio",
-        "analytics": "Statistika"
+        "analytics": "Statistika",
+        "afterEvent": "Po renginio"
       },
       "toggles": {
         "unmute": "Dalyviai gali kalbėti",
@@ -2054,10 +2270,12 @@
         "capacityEstimate": "≈{jvbs} JVB · {ram} RAM",
         "noReminders": "Priminimų nesukonfigūruota",
         "tags": "Žymos",
-        "postEventSummary": "{connected} prisijungę iš {registered} registracijų (numatomi {estimated})",
-        "estimatedAttendance": "Numatomi: {estimated} dalyviai"
+        "postEventSummary": "{connected} prisijungę iš {registered} registracijų (talpa {estimated})",
+        "estimatedAttendance": "Didžiausia talpa: {estimated} dalyvių",
+        "reminderScheduled": "Išsiunčiama {when}",
+        "reminderMissed": "Neišsiųsta — momentas praėjo",
+        "reminderSoon": "Bet kurią akimirką"
       },
-      "copyGuestUrl": "Kopijuoti svečių nuorodą",
       "aiManageTitle": "Transkripcija, santrauka ir vertimai",
       "aiManageDesc": "Tvarkykite šio įrašo DI postprodukciją: taisykite transkripciją ir kalbėtojų priskyrimą (kas ką pasakė), redaguokite santrauką ir tvarkykite vertimo kalbas.",
       "aiManageCta": "Atverti postprodukcijos valdymą",
@@ -2072,24 +2290,16 @@
       "duplicateNext": "Dubliuoti kitam kartui",
       "duplicateNextBusy": "Dubliuojama…",
       "duplicateNextHint": "Sukuria juodraštį su visa šio renginio konfigūracija (įrašymas, atskiri takeliai, DI, darbotvarkė, priminimai). Jei renginys yra periodinis, data perkeliama į kitą kartą; kitu atveju ją reikia nustatyti patiems.",
-      "duplicateNextError": "Nepavyko dubliuoti. Bandykite dar kartą."
+      "duplicateNextError": "Nepavyko dubliuoti. Bandykite dar kartą.",
+      "capacitySection": "Talpa ir infrastruktūra",
+      "capacitySubtitle": "Sukonfigūruota iki {max} dalyvių",
+      "publishBlockedLive": "Renginys jau vyksta",
+      "publishBlockedEnded": "Renginys baigėsi"
     },
     "rubrica": {
       "title": "Adresų knyga",
       "subtitle": "Asmenys, davę sutikimą būti įtraukti į adresų knygą (GDPR/BDAR str. 6.1.a). Profilio informacija automatiškai atnaujinama kiekvieną kartą iš naujo registruojantis.",
       "backToList": "← Atgal į adresų knygą"
-    },
-    "questionnairesPage": {
-      "title": "Klausimynai",
-      "subtitle": "Daugkartinio naudojimo klausimų šablonai išankstinės registracijos ir po renginio pildomiems klausimynams."
-    },
-    "questionnaireResponses": {
-      "title": "Klausimynų atsakymai",
-      "subtitle": "Suvestinės pagal klausimą, filtruojamos pagal renginį, etapą ir datų intervalą."
-    },
-    "eventQuestionnaires": {
-      "title": "Klausimynai — {eventTitle}",
-      "subtitle": "Sukonfigūruokite išankstinės registracijos ir (arba) po renginio pildomą klausimyną, derindami šablonus ir ad-hoc klausimus."
     },
     "eventAnalytics": {
       "title": "Statistika",
@@ -2238,11 +2448,6 @@
       "manageSource": "Šaltinio kalba",
       "manageOpenPublic": "Viešasis puslapis",
       "manageRerunOk": "Grandinė paleista iš naujo.",
-      "manageRerunNoop": "Nepaleista nė viena užduotis: šiam renginiui DI išjungtas arba grandinė pristabdyta. Naudokite „Generuoti DI“.",
-      "manageRerunAlreadyQueued": "Apdorojimas jau eilėje: naujų darbų paleisti nereikia.",
-      "generateAi": "Generuoti DI",
-      "generateAiConfirm": "Paleisti DI grandinę (transkripciją ir santrauką) šiam įrašui. DI apdorojimas bus įjungtas renginiui ir pradės veikti fone. Vertimai pridedami vėliau, po vieną kalbą, kortelėje „Vertimai“.",
-      "generateAiOk": "DI grandinė paleista.",
       "manageOpen": "Tvarkyti",
       "cancelConfirmTitle": "Atšaukti postprodukciją",
       "speakerUpdateSuccess": "Kalbėtojas atnaujintas",
@@ -2382,7 +2587,38 @@
       },
       "archiveSourceTitle": "Šaltinio įrašas",
       "archiveSourceHint": "Originalus renginio vaizdo įrašas. Atskiriems dalyvių takeliams ir MKV archyvui reikia kelių takelių įrašymo (šiam renginiui neįjungta).",
-      "archiveSourceDownload": "Atsisiųsti originalų vaizdo įrašą"
+      "archiveSourceDownload": "Atsisiųsti originalų vaizdo įrašą",
+      "manageRerunNoop": "Nepaleista nė viena užduotis: šiam renginiui DI išjungtas arba grandinė pristabdyta. Naudokite „Generuoti DI“.",
+      "manageRerunAlreadyQueued": "Apdorojimas jau eilėje: naujų darbų paleisti nereikia.",
+      "generateAi": "Generuoti DI",
+      "generateAiConfirm": "Paleisti DI grandinę (transkripciją ir santrauką) šiam įrašui. DI apdorojimas bus įjungtas renginiui ir pradės veikti fone. Vertimai pridedami vėliau, po vieną kalbą, kortelėje „Vertimai“.",
+      "generateAiOk": "DI grandinė paleista.",
+      "originalToggle": "Rodyti originalų tekstą",
+      "originalToggleHint": "Po kiekviena pataisyta eilute rodo tekstą tokį, kokį sukūrė automatinė transkripcija",
+      "originalNotComparable": "Eilučių skaičius pasikeitė, palyginti su originalia versija: palyginti eilutę po eilutės neįmanoma",
+      "originalLabel": "Originalus tekstas:",
+      "revisedBadge": "Peržiūrėta rankiniu būdu",
+      "revisedHint": "Bent vieną eilutę po automatinės transkripcijos pataisė žmogus",
+      "redactLabel": "Ištrinti ir iš originalo",
+      "redactHint": "Naudokite gavę prašymą ištrinti duomenis: pakeitimai taikomi ir išsaugotam automatiškai sukurtam tekstui, kuriame kitaip liktų pašalintas sakinys",
+      "redactSave": "Išsaugoti ir ištrinti iš originalo",
+      "redactSaved": "{n, plural, one {# eilutė ištrinta ir iš originalaus teksto} few {# eilutės ištrintos ir iš originalaus teksto} many {# eilutės ištrinta ir iš originalaus teksto} other {# eilučių ištrinta ir iš originalaus teksto}}",
+      "redactNothingRemoved": "Pataisymai išsaugoti, tačiau originaliame tekste pakeistose eilutėse nebuvo ko ištrinti",
+      "redactArchiveFailed": "Pataisymai išsaugoti duomenų bazėje, tačiau archyvuoto failo perrašyti nepavyko: pašalintą sakinį vis dar galima atsisiųsti iš ten. Bandykite ištrinti dar kartą",
+      "originalUncertain": "Kilmė neaiški",
+      "originalUncertainHint": "Išsaugotame tekste jau gali būti pataisymų, padarytų prieš atsirandant šiai funkcijai: neįmanoma įrodyti, kad tai automatinės transkripcijos sukurtas tekstas"
+    },
+    "questionnairesPage": {
+      "title": "Klausimynai",
+      "subtitle": "Daugkartinio naudojimo klausimų šablonai išankstinės registracijos ir po renginio pildomiems klausimynams."
+    },
+    "questionnaireResponses": {
+      "title": "Klausimynų atsakymai",
+      "subtitle": "Suvestinės pagal klausimą, filtruojamos pagal renginį, etapą ir datų intervalą."
+    },
+    "eventQuestionnaires": {
+      "title": "Klausimynai — {eventTitle}",
+      "subtitle": "Sukonfigūruokite išankstinės registracijos ir (arba) po renginio pildomą klausimyną, derindami šablonus ir ad-hoc klausimus."
     }
   },
   "email": {
@@ -2470,7 +2706,7 @@
     "projectTeaser": {
       "kicker": "Projektas",
       "title": "Atvirojo kodo ir suverenus, sukurtas valdžios institucijų valdžios institucijoms",
-      "body": "PA Webinar yra Skaitmeninės transformacijos departamento platforma viešiems skaitmeniniams renginiams: .italia dizaino sistema, Jitsi Meet vaizdo variklis ir visiškai in-cluster AI procesas. Ji išleista kaip atvirojo kodo, kad bet kuri administracija galėtų ją pakartotinai naudoti.",
+      "body": "PA Webinar yra atvirojo kodo platforma viešiems skaitmeniniams renginiams, sukurta Italijos Skaitmeninės transformacijos departamento ir išleista tam, kad bet kuri administracija galėtų ją pakartotinai naudoti: .italia dizaino sistema, Jitsi Meet vaizdo variklis ir visiškai in-cluster AI procesas.",
       "sovereignty": {
         "title": "Duomenų suverenumas",
         "desc": "Self-hosted administracijos infrastruktūroje: duomenys niekur neišeina ir nėra CLOUD Act poveikio."
@@ -2506,6 +2742,49 @@
         "title": "Garso įgarsinimas",
         "desc": "Įgarsinta garso takelis su neutraliu sintetiniu balsu (be balso klonavimo), kad galėtumėte klausytis renginio kita kalba."
       }
+    },
+    "institutional": {
+      "title": "Nuotoliniai susitikimai ir renginiai",
+      "nextTitle": "Artimiausias renginys",
+      "nextCta": "Eiti į renginį ir užsiregistruoti",
+      "othersTitle": "Kiti renginiai",
+      "pointsTitle": "Kaip dalyvauti",
+      "points": {
+        "noInstall": {
+          "title": "Dalyvaukite naršyklėje",
+          "body": "Nereikia diegti jokių programų: pakanka atidaryti gautą nuorodą."
+        },
+        "accessible": {
+          "title": "Sukurta visiems",
+          "body": "Subtitrai, klaviatūra ir ekrano skaitytuvai: sale galima naudotis ir be pelės."
+        },
+        "privacy": {
+          "title": "Rūpestingai tvarkomi duomenys",
+          "body": "Renkami tik registracijai būtini duomenys, o juos galima susigrąžinti arba paprašyti ištrinti."
+        }
+      }
+    },
+    "simple": {
+      "title": "Nuotoliniai susitikimai – {organization}",
+      "subtitle": "Dalyvaukite iš kompiuterio ar telefono, nieko nediegdami.",
+      "cta": "Dalyvaukite kitame susitikime",
+      "noEvents": "Šiuo metu susitikimų nesuplanuota. Užsukite vėliau.",
+      "stepsTitle": "Kaip tai veikia",
+      "steps": {
+        "choose": {
+          "title": "Pasirinkite susitikimą",
+          "body": "Prie kiekvieno nurodyta data ir laikas."
+        },
+        "name": {
+          "title": "Nurodykite savo vardą",
+          "body": "Nuorodai gauti pakanka vardo ir el. pašto adreso."
+        },
+        "enter": {
+          "title": "Prisijunkite",
+          "body": "Nustatytu laiku atidarykite nuorodą – ir jūs jau viduje."
+        }
+      },
+      "listTitle": "Artėjantys susitikimai"
     }
   },
   "polls": {
@@ -2534,7 +2813,9 @@
     "errors": {
       "questionRequired": "Parašykite apklausos klausimą",
       "minOptions": "Reikia bent 2 variantų",
-      "generic": "Klaida kuriant apklausą"
+      "generic": "Klaida kuriant apklausą",
+      "vote": "Balsas neužregistruotas. Bandykite dar kartą.",
+      "alreadyVoted": "Šioje apklausoje jau balsavote."
     }
   },
   "materials": {
@@ -2553,10 +2834,29 @@
     "add": "Pridėti",
     "adding": "Pridedama...",
     "cancel": "Atšaukti",
+    "modeLabel": "Medžiagos tipas",
+    "modeLink": "Nuoroda",
+    "modeFile": "Failas",
+    "titleOptional": "Pavadinimas (neprivalomas; kitaip – failo pavadinimas)",
+    "fileLabel": "Įkeliamas failas",
+    "fileHelp": "Palaikomi formatai: PDF, DOCX, PPTX, XLSX, TXT — iki {maxMb} MB",
+    "upload": "Įkelti",
+    "uploading": "Įkeliama…",
     "errors": {
       "urlInvalid": "Įveskite galiojantį URL",
-      "generic": "Klaida pridedant medžiagą"
-    }
+      "generic": "Klaida pridedant medžiagą",
+      "fileMissing": "Pasirinkite įkeliamą failą",
+      "titleMissing": "Įveskite nuorodos pavadinimą",
+      "fileTooLarge": "Failas viršija {maxMb} MB ribą",
+      "fileTooLargeForServer": "Serveris nepriima tokio didelio failo: bandykite mažesnį failą",
+      "fileType": "Failo tipas nepalaikomas (PDF, DOCX, PPTX, XLSX, TXT)",
+      "uploadUnavailable": "Failų įkėlimas šiame diegime negalimas",
+      "uploadFailed": "Klaida įkeliant failą",
+      "quotaExceeded": "Šis renginys pasiekė įkeltų failų ribą ({maxFiles} failų, iš viso {maxMb} MB): pašalinkite kelis, kad galėtumėte įkelti daugiau",
+      "uploadBusy": "Šiuo metu per daug įkėlimų: bandykite dar kartą po kelių sekundžių",
+      "deleteFailed": "Medžiagos ištrinti nepavyko"
+    },
+    "addedByStaff": "Pridėjo organizatoriai"
   },
   "reminders": {
     "title": "Pranešimai",
@@ -2582,11 +2882,11 @@
     "consent": {
       "recording": "Sutinku su šio renginio garso/vaizdo įrašymu",
       "recordingRequired": "Norint dalyvauti šiame renginyje, būtinas sutikimas dėl įrašymo",
-      "futureCommunications": "Noriu gauti informaciją apie būsimus DTD organizuojamus renginius",
-      "addressBook": "Noriu būti įtrauktas į DTD adresų knygą, kad būčiau kviečiamas į panašius renginius",
-      "addressBookHelp": "Atskiras sutikimas (GDPR/BDAR str. 6.1.a). Galite jį atšaukti bet kada per nuorodą „Pašalinkite mano duomenis iš adresų knygos“ gautuose el. laiškuose. Vardas ir organizacija bus paimti iš registracijos profilio.",
       "multitrack": "Sutinku, kad mano balsas būtų įrašomas atskiru garso takeliu vien tam, kad transkripcija būtų teisingai priskirta kiekvienam kalbėtojui. Takelis yra laikinas ir po transkripcijos ištrinamas; jis nenaudojamas mano balsui atpažinti ar atkurti.",
-      "multitrackRequired": "Sutikimas įrašyti jūsų garso takelį yra privalomas norint dalyvauti šiame renginyje"
+      "multitrackRequired": "Sutikimas įrašyti jūsų garso takelį yra privalomas norint dalyvauti šiame renginyje",
+      "futureCommunications": "Noriu gauti informaciją apie būsimus šioje platformoje skelbiamus renginius",
+      "addressBook": "Noriu būti įtrauktas į renginių adresų knygą, kad būčiau kviečiamas į panašius renginius",
+      "addressBookHelp": "Atskiras sutikimas (GDPR/BDAR str. 6.1.a). Galite jį atšaukti bet kada per nuorodą „Pašalinkite mano duomenis iš adresų knygos“ gautuose el. laiškuose. Vardas ir organizacija bus paimti iš registracijos profilio."
     },
     "export": {
       "title": "Mano duomenys",
@@ -2596,10 +2896,10 @@
       "emailInvalid": "Įveskite galiojantį el. pašto adresą",
       "submit": "Prašyti mano duomenų",
       "loading": "Ieškoma...",
-      "requestSubmittedTitle": "Check your inbox",
-      "requestSubmittedBody": "If this email matches a registration, we've sent you a link to download your data. The link is valid for 1 hour.",
-      "linkInvalid": "This link is invalid or expired. Please request a new link.",
-      "requestNew": "Request a new link",
+      "requestSubmittedTitle": "Patikrinkite el. pašto dėžutę",
+      "requestSubmittedBody": "Jei šis el. pašto adresas atitinka registraciją, išsiuntėme jums nuorodą duomenims atsisiųsti. Nuoroda galioja 1 valandą.",
+      "linkInvalid": "Nuoroda negalioja arba baigėsi jos galiojimas. Paprašykite naujos nuorodos.",
+      "requestNew": "Prašyti naujos nuorodos",
       "noData": "Šiam el. pašto adresui duomenų nerasta.",
       "error": "Įvyko klaida. Bandykite vėliau.",
       "rateLimited": "Per daug užklausų. Bandykite dar kartą po valandos.",
@@ -2614,30 +2914,30 @@
       "questionsTitle": "Q&A klausimai",
       "pollVotesTitle": "Apklausų balsai",
       "optionLabel": "Variantas",
-      "erasureCtaTitle": "Want to delete your data?",
-      "erasureCtaBody": "You can request full erasure of the data tied to your email (GDPR Art. 17).",
-      "erasureCtaButton": "Request erasure"
+      "erasureCtaTitle": "Norite ištrinti savo duomenis?",
+      "erasureCtaBody": "Galite paprašyti visiškai ištrinti su jūsų el. pašto adresu susietus duomenis (GDPR 17 straipsnis).",
+      "erasureCtaButton": "Prašyti ištrinti"
     },
     "erasure": {
-      "title": "Erase your data",
-      "subtitle": "Confirm the erasure of the personal data tied to your email address (GDPR Art. 17).",
-      "emailLabel": "Your email address",
-      "emailPlaceholder": "Enter the email used for registration",
-      "emailInvalid": "Please enter a valid email address",
-      "submit": "Request erasure",
-      "requestSubmittedTitle": "Check your inbox",
-      "requestSubmittedBody": "If this email matches a registration, we've sent you a link to confirm the erasure. The link is valid for 1 hour.",
-      "linkInvalid": "This link is invalid or expired. Please request a new link.",
-      "confirmWarning": "You are about to permanently erase all personal data tied to your email.",
-      "confirmBody": "Registrations, questions, poll votes, feedback and reminders will be deleted. This action is irreversible.",
-      "confirmButton": "Confirm erasure",
-      "cancel": "Cancel",
-      "processing": "Deleting...",
-      "doneTitle": "Erasure completed",
-      "doneBody": "{count} registrations and the linked data have been deleted.",
-      "error": "An error occurred. Please try again later.",
-      "rateLimited": "Too many requests. Please try again in one hour.",
-      "back": "Back to my data"
+      "title": "Jūsų duomenų ištrynimas",
+      "subtitle": "Patvirtinkite su jūsų el. pašto adresu susietų asmens duomenų ištrynimą (GDPR 17 straipsnis).",
+      "emailLabel": "Jūsų el. pašto adresas",
+      "emailPlaceholder": "Įveskite el. paštą, naudotą registracijai",
+      "emailInvalid": "Įveskite galiojantį el. pašto adresą",
+      "submit": "Prašyti ištrinti",
+      "requestSubmittedTitle": "Patikrinkite el. pašto dėžutę",
+      "requestSubmittedBody": "Jei šis el. pašto adresas atitinka registraciją, išsiuntėme jums nuorodą ištrynimui patvirtinti. Nuoroda galioja 1 valandą.",
+      "linkInvalid": "Nuoroda negalioja arba baigėsi jos galiojimas. Paprašykite naujos nuorodos.",
+      "confirmWarning": "Ketinate visam laikui ištrinti visus su jūsų el. pašto adresu susietus asmens duomenis.",
+      "confirmBody": "Bus ištrintos registracijos, klausimai, balsai apklausose, atsiliepimai, priminimai ir jūsų įrašas renginių adresų knygoje. Šio veiksmo atšaukti negalima.",
+      "confirmButton": "Patvirtinti ištrynimą",
+      "cancel": "Atšaukti",
+      "processing": "Trinama...",
+      "doneTitle": "Ištrynimas baigtas",
+      "doneBody": "Ištrinta registracijų: {count}. Ištrinti ir susiję duomenys.",
+      "error": "Įvyko klaida. Bandykite vėliau.",
+      "rateLimited": "Per daug užklausų. Bandykite dar kartą po valandos.",
+      "back": "Grįžti į mano duomenis"
     }
   },
   "legal": {
@@ -2648,7 +2948,7 @@
       "sections": {
         "controller": {
           "title": "Duomenų valdytojas",
-          "body": "Asmens duomenys tvarkomi vykdant Skaitmeninės transformacijos departamento institucinę veiklą, siekiant užtikrinti techninį ir organizacinį viešų internetinių renginių valdymą."
+          "body": "Duomenų valdytojas: {organization}. Asmens duomenys tvarkomi vykdant jo institucinę veiklą, siekiant užtikrinti techninį ir organizacinį viešų internetinių renginių valdymą."
         },
         "data": {
           "title": "Tvarkomi duomenys ir tikslai",
@@ -2656,11 +2956,11 @@
         },
         "retention": {
           "title": "Duomenų saugojimas ir teisės",
-          "body": "Duomenys saugomi kiekvienam renginiui sukonfigūruotą laikotarpį, po kurio automatiškai ištrinami, nebent taikomi kiti teisiniai įsipareigojimai. Duomenų subjektai gali bet kada pasinaudoti savo GDPR teisėmis, įskaitant prieigą, ištaisymą ir ištrynimą, per departamento institucinius kanalus."
+          "body": "Duomenys saugomi kiekvienam renginiui sukonfigūruotą laikotarpį, po kurio automatiškai ištrinami, nebent taikomi kiti teisiniai įsipareigojimai. Duomenų subjektai gali bet kada pasinaudoti savo GDPR teisėmis, įskaitant prieigą, ištaisymą ir ištrynimą, per duomenų valdytojo institucinius kanalus."
         },
         "automatedProcessing": {
           "title": "Dirbtinio intelekto sukurta transkripcija, santrauka ir įgarsinimas",
-          "body": "Renginiuose, kurie to prašo, pasibaigus transliacijai įrašas apdorojamas dirbtinio intelekto grandine, veikiančia vien tik Departamento klasterio infrastruktūroje. Ji parengia kalbos transkripciją (atskiriant skirtingus kalbėtojus), suprantamą santrauką, galimus vertimus į kitas Europos kalbas ir įgarsintą garso versiją su bendriniu sintetiniu balsu. Visi naudojami modeliai (WhisperX transkripcijai, Mistral-Small santraukai ir vertimui, Piper TTS įgarsinimui) veikia klasterio viduje esančiuose skirtuose GPU: jokie dalyvių duomenys nesiunčiami trečiųjų šalių paslaugoms. Dalyvių balsas neklonuojamas ir nesaugomas kaip biometrinis duomuo (BDAR 9 straipsnis): įgarsinimui naudojami vieši iš anksto apmokyti sintetiniai balsai, kalbėtojams priskiriami savavališkai. Kiekvieno įrašo atveju renginio puslapyje rodoma tiksli naudotų modelių nuotrauka („DI apdorojimo skaidrumas“). Sukurtas turinys gali turėti netikslumų: autoritetingas šaltinis visada lieka originalus vaizdo įrašas (DI aktas, 50 straipsnis)."
+          "body": "Renginiuose, kurie to prašo, pasibaigus transliacijai įrašas apdorojamas dirbtinio intelekto grandine, veikiančia vien tik šio diegimo klasterio infrastruktūroje. Ji parengia kalbos transkripciją (atskiriant skirtingus kalbėtojus), suprantamą santrauką, galimus vertimus į kitas Europos kalbas ir įgarsintą garso versiją su bendriniu sintetiniu balsu. Visi naudojami modeliai (WhisperX transkripcijai, Mistral-Small santraukai ir vertimui, Piper TTS įgarsinimui) veikia klasterio viduje esančiuose skirtuose GPU: jokie dalyvių duomenys nesiunčiami trečiųjų šalių paslaugoms. Dalyvių balsas neklonuojamas ir nesaugomas kaip biometrinis duomuo (BDAR 9 straipsnis): įgarsinimui naudojami vieši iš anksto apmokyti sintetiniai balsai, kalbėtojams priskiriami savavališkai. Kiekvieno įrašo atveju renginio puslapyje rodoma tiksli naudotų modelių nuotrauka („DI apdorojimo skaidrumas“). Sukurtas turinys gali turėti netikslumų: autoritetingas šaltinis visada lieka originalus vaizdo įrašas (DI aktas, 50 straipsnis)."
         }
       },
       "note": {
@@ -2672,7 +2972,7 @@
     "accessibility": {
       "metaTitle": "Prieinamumo deklaracija",
       "title": "Prieinamumo deklaracija",
-      "intro": "Skaitmeninės transformacijos departamentas įsipareigoja užtikrinti, kad „PA Webinar“ būtų prieinama, laikantis Italijos 2004 m. įstatymo Nr. 4, ES direktyvos 2016/2102 ir AgID gairių dėl IRT priemonių prieinamumo.",
+      "intro": "Atsakinga institucija: {organization}. Institucija įsipareigoja užtikrinti, kad ši platforma būtų prieinama, laikantis Italijos 2004 m. įstatymo Nr. 4, ES direktyvos 2016/2102 ir AgID gairių dėl IRT priemonių prieinamumo.",
       "sections": {
         "conformance": {
           "title": "Atitikties būklė",
@@ -2711,7 +3011,7 @@
       "sections": {
         "ownership": {
           "title": "Paslaugos nuosavybė",
-          "body": "Platformą remia Skaitmeninės transformacijos departamentas, ir ji yra prieinama institucinio pobūdžio viešų internetinių renginių organizavimui ir dalyvavimui juose."
+          "body": "Platformos savininkas: {organization}. Platforma yra prieinama institucinio pobūdžio viešų internetinių renginių organizavimui ir dalyvavimui juose."
         },
         "usage": {
           "title": "Paslaugos naudojimas",
@@ -2719,7 +3019,7 @@
         },
         "liability": {
           "title": "Atsakomybės apribojimai",
-          "body": "Nors taikomos tinkamos techninės ir organizacinės priemonės, departamentas negali garantuoti visiško pertrūkių ar gedimų dėl nenumatytų aplinkybių, priežiūros darbų ar išorinių veiksnių nebuvimo. Teisinė atsakomybė reglamentuojama galiojančiais teisės aktais."
+          "body": "Nors taikomos tinkamos techninės ir organizacinės priemonės, platformos savininkas negali garantuoti visiško pertrūkių ar gedimų dėl nenumatytų aplinkybių, priežiūros darbų ar išorinių veiksnių nebuvimo. Teisinė atsakomybė reglamentuojama galiojančiais teisės aktais."
         }
       }
     },
@@ -2818,7 +3118,8 @@
         },
         "note": "Pilnas komponentų ir paslaugų sąrašas su versijomis, hash reikšmėmis ir techninėmis savybėmis pateikiamas pirmesnėse skiltyse ir atsisiunčiamame JSON faile."
       }
-    }
+    },
+    "organizationNotConfigured": "organizacija nustatymuose dar nenurodyta"
   },
   "status": {
     "title": "Sistemos būsena",
@@ -2851,7 +3152,7 @@
     "nodesReady": "paruošti mazgai",
     "scaling": "mastelio keitimas",
     "jvbStress": "JVB apkrova",
-    "participantsConnected": "prisijungę dalyviai",
+    "participantsConnected": "dalyviai vaizdo tilte",
     "videoInteractive": "interaktyvus",
     "videoWebinar": "internetinis seminaras",
     "participantsAvailable": "galimų dalyvių",
@@ -2874,13 +3175,13 @@
     "systemStatus": "Sistemos būsena",
     "postprod": {
       "title": "Grandinė po renginio",
-      "subtitle": "Įrašo transkripcija, santrauka, vertimas ir įgarsinimas",
-      "whatItDoes": "Pasibaigus renginiui įrašas apdorojamas vidine grandine: transkripciją sukuria WhisperX, santrauką ir vertimus – Mistral modelis, įgarsintą garsą – Piper TTS. Visi modeliai veikia klasterio GPU, kuris būna įjungtas tik apdorojimo metu, todėl suvartojama energija atitinka faktinį krūvį.",
       "status": {
         "idle": "Laukiama",
         "running": "Vykdoma",
         "degraded": "Pablogėjusi"
       },
+      "subtitle": "Įrašo transkripcija, santrauka, vertimas ir įgarsinimas",
+      "whatItDoes": "Pasibaigus renginiui įrašas apdorojamas vidine grandine: transkripciją sukuria WhisperX, santrauką ir vertimus – Mistral modelis, įgarsintą garsą – Piper TTS. Visi modeliai veikia klasterio GPU, kuris būna įjungtas tik apdorojimo metu, todėl suvartojama energija atitinka faktinį krūvį.",
       "aiBadge": "Šio renginio transkripciją, santrauką ir įgarsinimą sukūrė dirbtinio intelekto modeliai, todėl juose gali būti netikslumų. Kai reikia visiško tikrumo, visada remkitės originaliu vaizdo įrašu.",
       "idleMessage": "Grandinė parengta, šiuo metu apdoroti nėra ko.",
       "queueAriaLabel": "Postprodukcijos eilės sudėtis",
@@ -2895,7 +3196,12 @@
       "lastFailure": "Paskutinė klaida: {when}",
       "artifactsProduced": "{count, plural, =0 {artefaktų nėra} one {sukurtas # artefaktas} few {sukurti # artefaktai} other {sukurta # artefaktų}}",
       "eventsEnabled": "{count, plural, =0 {nėra renginių su DI} one {# renginys su įjungtu DI} few {# renginiai su įjungtu DI} other {# renginių su įjungtu DI}}"
-    }
+    },
+    "jvbFixedUp": "{count, plural, =1 {Vaizdo tiltas veikia} other {Vaizdo tiltas veikia · numatyta tiltų: #}}",
+    "jvbFixedDown": "Vaizdo tiltas neatsako",
+    "jvbFixedDownDetail": "Dalyviai negauna nei garso, nei vaizdo, kol tiltas vėl nebus pasiekiamas.",
+    "jvbUnmonitored": "Būsena nestebima",
+    "jvbUnmonitoredDetail": "Šis diegimas neužklausia vaizdo tilto, todėl jo būsena čia nepateikiama."
   },
   "infraMap": {
     "loading": "Infrastruktūros žemėlapio įkėlimas...",
@@ -2903,8 +3209,8 @@
     "ariaLabel": "Sistemos infrastruktūros žemėlapis",
     "title": "Infrastruktūros žemėlapis",
     "subtitle": "Architektūros ir paslaugų būsenos vizualizacija realiuoju laiku",
-    "participants": "Dalyviai",
-    "conferences": "Konferencijos",
+    "participants": "Dalyviai vaizdo tilte",
+    "conferences": "Konferencijos vaizdo tilte",
     "bandwidthIn": "Įeinantis pralaidumas",
     "bandwidthOut": "Išeinantis pralaidumas",
     "recordings": "Įrašai",
@@ -2947,6 +3253,7 @@
     "connMedia": "vaizdo srautas",
     "connRecording": "įrašymas",
     "connUpload": "įkėlimas",
+    "connPostprod": "DI postprodukcija",
     "connPubSub": "pokalbio pub/sub",
     "services": {
       "app": "Žiniatinklio portalas",
@@ -2989,23 +3296,33 @@
       "jitsiWeb": {
         "healthy": "Vaizdo konferencijų kambarys pasiekiamas ir paruoštas renginiams.",
         "down": "Vaizdo konferencijų kambarys nepasiekiamas. Negalima pradėti ar prisijungti prie renginių.",
-        "standby": "Vaizdo konferencijų kambarys nesukonfigūruotas."
+        "standby": "Vaizdo konferencijų kambarys nesukonfigūruotas.",
+        "degraded": "Vaizdo konferencijų kambarys atsako, bet su klaidomis arba lėtai.",
+        "publicCheckFailed": "Portalas negali patikrinti kambario jo viešuoju adresu: serverio požiūriu sertifikatas arba pavadinimas negalioja. Dalyviams kambarys vis tiek gali veikti.",
+        "unmonitored": "Vaizdo konferencijų kambario būsena šiame diegime nestebima."
       },
       "prosody": {
         "healthy": "Vidiniai pranešimai tarp vaizdo paslaugų veikia teisingai.",
         "down": "Vidiniai pranešimai nepasiekiami. Vaizdo paslaugos negali tarpusavyje bendrauti.",
-        "standby": "Pranešimų paslauga nesukonfigūruota."
+        "standby": "Pranešimų paslauga nesukonfigūruota.",
+        "degraded": "Vidiniai pranešimai atsako, bet su klaidomis arba lėtai.",
+        "publicCheckFailed": "Portalas negali patikrinti vidinių pranešimų per viešąjį kambario adresą: serverio požiūriu sertifikatas arba pavadinimas negalioja. Konferencijos vis tiek gali veikti.",
+        "unmonitored": "Vidinių pranešimų būsena šiame diegime nestebima."
       },
       "jicofo": {
         "healthy": "Konferencijų koordinatorius aktyvus ir valdo sesijas.",
         "down": "Konferencijų koordinatorius nepasiekiamas. Negalima kurti naujų konferencijų.",
-        "standby": "Konferencijų koordinatorius nesukonfigūruotas."
+        "standby": "Konferencijų koordinatorius nesukonfigūruotas.",
+        "degraded": "Konferencijų koordinatorius atsako, bet su klaidomis arba lėtai.",
+        "unmonitored": "Konferencijų koordinatoriaus būsena šiame diegime nestebima."
       },
       "jvb": {
         "healthy": "Vaizdo tiltas aktyvus ir perduoda garsą/vaizdą dalyviams.",
         "scaling": "Vaizdo tiltas ruošiasi artėjančiam renginiui. Serveriai kuriami automatiškai.",
         "standby": "Vaizdo tiltas budėjimo režime. Automatiškai aktyvuosis prieš suplanuoto renginio pradžią.",
-        "stale": "Renginys laukia vaizdo tilto ilgiau nei sukonfigūruotas laikas. Patikrinkite klasterio masteliuotoją ir JVB pod žurnalus."
+        "stale": "Renginys laukia vaizdo tilto ilgiau nei sukonfigūruotas laikas. Patikrinkite klasterio masteliuotoją ir JVB pod žurnalus.",
+        "fixedDown": "Vaizdo tiltas neatsako. Konferencijos neperduoda nei garso, nei vaizdo, kol jis vėl nebus pasiekiamas.",
+        "unmonitored": "Vaizdo tilto būsena šiame diegime nestebima: portalas neturi adreso, kuriuo galėtų jį užklausti."
       },
       "jibri": {
         "healthy": "Įrašymo paslauga paruošta ir prieinama.",
@@ -3037,7 +3354,8 @@
       "jibri": "Renginių negalima įrašyti. Dalyviai vis tiek gali prisijungti ir dalyvauti.",
       "jibriStale": "Renginys su aktyviu įrašymu laukia Jibri ilgiau nei laikas: sesija neįrašoma.",
       "smtp": "Registracijos patvirtinimo el. laiškai ir priminimai nebus siunčiami.",
-      "postprodDegraded": "Kai kurių naujausių įrašų transkripcijos ir santraukos nebuvo sukurtos. Vaizdo įrašai vis tiek pasiekiami."
+      "postprodDegraded": "Kai kurių naujausių įrašų transkripcijos ir santraukos nebuvo sukurtos. Vaizdo įrašai vis tiek pasiekiami.",
+      "jvbDown": "Dalyviai negauna nei garso, nei vaizdo."
     },
     "overallVerdicts": {
       "operational": "Visos paslaugos veikia teisingai. Platforma visiškai veikia.",
@@ -3067,7 +3385,8 @@
       "degraded": "Sulėtėjęs",
       "down": "Nepasiekiamas",
       "standby": "Budėjimo režimas",
-      "scaling": "Ruošiamasi"
+      "scaling": "Ruošiamasi",
+      "unknown": "Nestebima"
     },
     "metrics": {
       "uptime24h": "Veikimas 24 val.",
@@ -3079,7 +3398,7 @@
       "requestRate": "Užklausos/s",
       "podUptime": "Pod veikimas"
     },
-    "connPostprod": "DI postprodukcija"
+    "probeDetail": "Patikros rezultatas"
   },
   "feedback": {
     "title": "Kaip vertinate šį renginį?",
@@ -3107,7 +3426,13 @@
     "noActiveRound": "Šiuo metu \"Word Cloud\" neaktyvus.",
     "noWords": "Laukiama pirmųjų žodžių...",
     "wordsSubmitted": "{count} žodžių pateikta",
-    "timeRemaining": "Liko laiko"
+    "timeRemaining": "Liko laiko",
+    "errors": {
+      "send": "Žodis neišsiųstas. Bandykite dar kartą.",
+      "closed": "Šis raundas uždarytas: daugiau žodžių nepriimama.",
+      "limit": "Šiame raunde jau išsiuntėte didžiausią leistiną žodžių skaičių.",
+      "rateLimited": "Šiuo metu per daug siuntimų: palaukite kelias sekundes ir bandykite dar kartą."
+    }
   },
   "timer": {
     "title": "Laikmatis",
@@ -3153,8 +3478,6 @@
     }
   },
   "footer": {
-    "departmentName": "Skaitmeninės transformacijos departamentas",
-    "presidencyName": "Ministrų Tarybos Pirmininkystė",
     "privacy": "Privatumo politika",
     "accessibility": "Prieinamumo deklaracija",
     "openSource": "Atvirojo kodo programinė įranga",
@@ -3169,8 +3492,38 @@
     "buildInfoDev": "kūrimo versija",
     "viewCommit": "Peržiūrėti commit'ą „GitHub“",
     "viewRelease": "Peržiūrėti leidimą „GitHub“",
-    "buildDatePrefix": "Sukurta",
-    "viewChangelog": "Žiūrėti naujienas (pakeitimų sąrašą)"
+    "viewChangelog": "Žiūrėti naujienas (pakeitimų sąrašą)",
+    "buildDatePrefix": "Sukurta"
+  },
+  "changelog": {
+    "metaTitle": "Naujienos ir pakeitimų sąrašas",
+    "title": "Naujienos ir pakeitimų sąrašas",
+    "intro": "Visos platformos versijos, pradedant naujausia. Kiekvienas įrašas apibendrina svarbiausias naujoves, pataisymus ir patobulinimus.",
+    "current": "Dabartinė versija",
+    "sourceNote": "Pastabos rengiamos pagal projekto žymas, sujungimo užklausas ir kodo pakeitimus (commits).",
+    "sourceLink": "Žiūrėti visas laidas „GitHub“ svetainėje",
+    "rawChangelog": "CHANGELOG.md saugykloje",
+    "transparencyNote": "Kiekvienai versijai: kas veikia ir su kokiais komponentais,",
+    "transparencyInventory": "paslaugų skaidrume",
+    "transparencySecurity": "sauga ir SBOM",
+    "technicalDetail": "Techninė informacija",
+    "releaseLink": "Release",
+    "securityBadge": "Sauga",
+    "sbomButton": "SBOM",
+    "pipelineLink": "Pipeline",
+    "scorecardLink": "OpenSSF Scorecard",
+    "sbomClose": "Uždaryti",
+    "sbomLoading": "Įkeliama…",
+    "sbomError": "Nepavyko įkelti SBOM.",
+    "sbomComponents": "komponentų",
+    "sbomSearch": "ieškoti komponento…",
+    "sbomColName": "Komponentas",
+    "sbomColVersion": "Versija",
+    "sbomColEcosystem": "Ekosistema",
+    "sbomNoMatch": "Nėra atitinkančio komponento.",
+    "sbomDownload": "Atsisiųsti visą SBOM (SPDX)",
+    "sourcesLink": "Pirminis kodas",
+    "codeScanningLink": "Kodo nuskaitymas (CodeQL)"
   },
   "pages": {
     "privacyTitle": "Privatumo politika",
@@ -3208,281 +3561,9 @@
     "shortcutsF": "Įjungti arba išjungti visą ekraną",
     "shortcutsSpeed": "Sumažinti arba padidinti greitį",
     "captionsOn": "Subtitrai įjungti",
-    "captionsOff": "Subtitrai išjungti"
-  },
-  "diagram": {
-    "title": "Renginio konfigūracija",
-    "topology": "Topologija",
-    "features": "Aktyvios funkcijos",
-    "estimates": "Išteklių sąmata",
-    "moderator": "Moderatorius",
-    "participants": "Dalyviai",
-    "bridge": "Vaizdo tiltas",
-    "jvb": "Vaizdo tiltas",
-    "jibri": "Įrašymas",
-    "occupancy": "Užimtumas",
-    "sizedForRegistrations": "Pagal {count} dabartinių registracijų",
-    "sizedForCapacity": "Pagal didžiausią talpą {count}",
-    "chips": {
-      "mic": "Mikrofonas",
-      "video": "Vaizdo kamera",
-      "screen": "Ekrano bendrinimas"
-    },
-    "bandwidth": {
-      "moderator": "Moderatoriaus pralaidumas",
-      "participant": "Dalyvio pralaidumas",
-      "total": "Numatomas bendras pralaidumas"
-    },
-    "jvbCount": "Reikiamų JVB skaičius",
-    "jvbRam": "Numatoma JVB RAM",
-    "storage": "Įrašymo saugykla",
-    "duration": "Numatoma trukmė",
-    "viewOnly": "Tik peržiūra",
-    "preview": "Konfigūracijos peržiūra"
-  },
-  "waiting": {
-    "startsIn": "Renginys prasidės po",
-    "eventLive": "Renginys vyksta!",
-    "connectedParticipants": "{count, plural, =0 {Dalyvių nėra} =1 {1 prisijungęs dalyvis} one {# prisijungęs dalyvis} few {# prisijungę dalyviai} many {# prisijungusių dalyvių} other {# prisijungusių dalyvių}}",
-    "elapsedTime": "Vyksta jau {minutes} minučių",
-    "youAreLate": "Renginys prasidėjo prieš {minutes} minučių",
-    "chooseHowToJoin": "Pasirinkite, kaip dalyvauti:",
-    "enterLive": "Prisijungti TIESIOGIAI",
-    "enterLiveDesc": "Dalyvaukite tiesiogiai. Įrašą galėsite peržiūrėti po renginio.",
-    "enterNow": "Prisijungti dabar",
-    "watchFromStart": "Žiūrėti nuo pradžių",
-    "watchFromStartDesc": "Žiūrėkite įrašą nuo pradžių ir prisijunkite prie transliacijos bet kada.",
-    "watchNow": "Žiūrėti",
-    "switchToLive": "Perjungti į tiesioginę transliaciją",
-    "enterRoom": "Įeiti į salę",
-    "recordingNotice": "Šis renginys yra įrašomas.",
-    "recordingAvailableAfter": "Įrašas bus prieinamas po renginio.",
-    "autoRefreshHint": "Puslapis bus automatiškai atnaujintas, kai renginys prasidės.",
-    "startEventButton": "Pradėti renginį",
-    "startingEvent": "Paleidžiama...",
-    "peopleWaiting": "{count, plural, =0 {} =1 {1 laukiantis asmuo} one {# laukiantis asmuo} few {# laukiantys asmenys} many {# laukiančių asmenų} other {# laukiančių asmenų}}",
-    "jvbScaling": "Salė ruošiama...",
-    "jvbScalingDetail": "Vaizdo serveriai paleidžiami. Tai trunka apie 2 minutes.",
-    "jvbReady": "Salė paruošta!",
-    "warmingUp": "Salė ruošiama",
-    "warmingUpDetail": "Įjungiame vaizdo serverius. Tuo tarpu galite pasiruošti — viskas bus parengta per 2–3 minutes ir galėsite įeiti.",
-    "warmingUpButton": "Salė ruošiama...",
-    "nameLabel": "Jūsų vardas",
-    "nameHelp": "Jį matys kiti dalyviai",
-    "joinNowBtn": "Įeiti dabar",
-    "roomOpen": "The room is open",
-    "whileYouWait": "While you wait",
-    "openingAt": "Atidaroma {time}",
-    "netiquetteTitle": "Geroji dalyvavimo praktika",
-    "netiquetteBullet1": "Atvykite kelias minutes anksčiau, kad galėtumėte išbandyti mikrofoną ir kamerą",
-    "netiquetteBullet2": "Įjunkite kamerą ir mikrofoną tik norėdami kalbėti — pakelkite ranką, jei norite gauti žodį",
-    "netiquetteBullet3": "Naudokite pokalbį greitiems pokalbiams, Q&A — klausimams pranešėjams",
-    "netiquetteBullet4": "Įrašymą, jei jis aktyvus, valdo tik moderatoriai ir jis žymimas raudonu indikatoriumi",
-    "watchCatchup": "Žiūrėti nuo pradžios",
-    "watchCatchupDesc": "Žiūrėkite dalinį įrašą ir prisijunkite prie tiesioginės transliacijos, kai panorėsite",
-    "chatPreviewTitle": "Renginio pokalbis",
-    "chatPreviewHint": "Skaitykite, ką sako kiti dalyviai, kol ruošiatės",
-    "endedTitle": "Renginys baigtas",
-    "endedWatchRecording": "Žiūrėti įrašą",
-    "endedLeaveFeedback": "Palikti atsiliepimą",
-    "moderatedBy": "Moderavo {name}",
-    "startEventError": "Klaida pradedant renginį. Bandykite dar kartą.",
-    "emailLabel": "El. paštas (neprivaloma)",
-    "emailHelp": "Tik galimam susisiekimui po renginio",
-    "emailInvalid": "Įveskite teisingą el. pašto adresą",
-    "chatLockedMessage": "Įveskite savo vardą, kad galėtumėte dalyvauti renginio pokalbyje.",
-    "classicView": "Classic view",
-    "backToGarden": "Back to the park",
-    "startingSoon": "Renginys tuoj prasidės, palaukite organizatorių…",
-    "exitWaiting": "Išeiti iš laukiamojo",
-    "aiNoticeTitle": "DI apdorojimas po renginio",
-    "aiNotice": "Pabaigoje įrašas bus apdorotas dirbtinio intelekto įrankiais, kad būtų sukurtas transkriptas, santrauka ir galimi vertimai bei įgarsinimai. Rezultatuose gali pasitaikyti netikslumų; vaizdo įrašas lieka autoritetingas šaltinis.",
-    "multitrackConsentTitle": "Įrašymas pagal dalyvį",
-    "multitrackConsentRequired": "Kad įeitumėte, turite sutikti su savo garso takelio įrašymu",
-    "enterGardenTitle": "Įeik į aikštę",
-    "enterGardenHint": "Vieta pasivaikščioti belaukiant: iš ten taip pat nusistatysi vardą ir mikrofoną bei prisijungsi prie renginio.",
-    "backToWaitingRoom": "Atgal į laukiamąjį",
-    "gardenDialogLabel": "Laukiamojo aikštė",
-    "gardenGateHint": "Gali prisijungti iš čia arba nuvesti savo avatarą iki vartų.",
-    "classicVersion": "Klasikinė versija",
-    "warmup": {
-      "queued": "Užklausa priimta",
-      "startingBridge": "Paleidžiame vaizdo serverį…",
-      "provisioningNode": "Kuriame skirtą vaizdo serverį",
-      "almostReady": "Vaizdo serveris veikia: beveik viskas",
-      "almostReadyDetail": "Dar akimirka ir prisijungimo mygtukas įsijungs pats.",
-      "honestHint": "Įprastas laukimas: mažiau nei minutė, jei infrastruktūra jau įšilusi, 3–5 minutės pirmo paleidimo metu. Tuo tarpu gali patikrinti kamerą ir mikrofoną arba naudotis pokalbiais.",
-      "elapsed": "ruošiama jau {time}"
-    }
-  },
-  "recording": {
-    "management": "Vaizdo įrašas",
-    "inProgress": "Vyksta",
-    "available": "Įrašas prieinamas",
-    "duration": "Trukmė",
-    "fileSize": "Failo dydis",
-    "startedAt": "Pradėtas",
-    "automatic": "automatinis",
-    "publish": "Paskelbti įrašą",
-    "publishDesc": "Padaryti vaizdo įrašą prieinamą renginio puslapyje",
-    "retentionLabel": "Saugojimas",
-    "retention": {
-      "24h": "24 valandos (laikinas)",
-      "7d": "7 dienos",
-      "30d": "30 dienų",
-      "90d": "90 dienų",
-      "forever": "Niekada (iki renginio galiojimo pabaigos)"
-    },
-    "retentionNote": "Vaizdo įrašas vis tiek bus taikomas renginio GDPR saugojimo politikai",
-    "delete": "Ištrinti įrašą",
-    "deleteConfirm": "Ar esate tikri? Vaizdo įrašas bus ištrintas negrįžtamai.",
-    "notConfigured": "Jibri nesukonfigūruotas infrastruktūroje. Vaizdo įrašymas neprieinamas.",
-    "disabledHint": "Vaizdo įrašymas šiam renginiui neįjungtas. Norėdami įjungti, atidarykite Nustatymų skiltį aukščiau ir įjunkite jungiklį „Įrašymas“.",
-    "play": "Atkurti",
-    "download": "Atsisiųsti",
-    "transcriptManage": "Transkripcija / DI",
-    "deleteConfirmTitle": "Ištrinti įrašą",
-    "deleteFailed": "Ištrinti nepavyko",
-    "deleteSuccess": "Įrašas ištrintas"
-  },
-  "postEvent": {
-    "config": "Po renginio konfigūracija",
-    "pageVisible": "Renginio puslapis matomas po pabaigos",
-    "showQA": "Rodyti Q&A klausimus",
-    "showMaterials": "Rodyti pasidalintą medžiagą",
-    "showPolls": "Rodyti apklausų rezultatus",
-    "showFeedback": "Rodyti atsiliepimus",
-    "feedbackEnabled": "Atsiliepimų apklausa aktyvi renginio pabaigoje",
-    "visibilityAlways": "Visada matomas",
-    "visibilityUntil": "Matomas iki:",
-    "dataRetentionNote": "Dalyvių asmens duomenys bus ištrinti pagal renginio saugojimo politiką ({days} dienų). Renginio turinys bus prieinamas, kol puslapis matomas.",
-    "availableUntil": "Šis renginys ir jo turinys bus prieinami iki {date}.",
-    "tabs": {
-      "qa": "Klausimai ir atsakymai",
-      "materials": "Medžiaga",
-      "polls": "Apklausos",
-      "feedback": "Atsiliepimai",
-      "transcript": "DI transkripcija"
-    },
-    "pageVisibleHelp": "Kai išjungta (arba pasibaigus matomumo langui), pasibaigusio renginio viešasis puslapis grąžina 404, o renginys dingsta iš sąrašų ir svetainės struktūros žemėlapio.",
-    "libraryListed": "Paskelbti vaizdo įrašų bibliotekoje",
-    "libraryListedHelp": "Rodyti šį renginį viešojoje bibliotekoje (/video-library). Reikia paskelbto įrašo arba „YouTube“ vaizdo įrašo ir kad renginio puslapis būtų matomas.",
-    "libraryListedNoRecording": "Paskelbto įrašo nėra: renginys bibliotekoje nepasirodys, kol nepaskelbsite įrašo arba nepridėsite „YouTube“ vaizdo įrašo.",
-    "showRecap": "Rodyti renginio suvestinę",
-    "showWordCloud": "Rodyti žodžių debesį",
-    "emailEnabled": "Pasibaigus renginiui siųsti suvestinės el. laišką",
-    "emailEnabledHelp": "Pasibaigus renginiui užsiregistravusiems dalyviams išsiunčiamas padėkos laiškas su nuorodomis į suvestinę ir atsiliepimų formą, o moderatoriui – trumpa suvestinė. Siunčiama tik vieną kartą."
-  },
-  "provisioning": {
-    "loading": "Įkeliama",
-    "titleFromIdle": "Salė vėl aktyvinama",
-    "titleColdStart": "Salė ruošiama",
-    "descriptionFromIdle": "Salė buvo pristabdyta dėl neaktyvumo, siekiant taupyti energiją. Dabar ją iš naujo paleidžiame: tai užtrunka apie 2–3 minutes.",
-    "descriptionColdStart": "Ruošiame virtualią salę šiam renginiui. Operacija užtrunka apie 2–3 minutes: būsite automatiškai nukreiptas, kai tik viskas bus parengta.",
-    "progressLabel": "{seconds} s",
-    "retry": "Įkelti iš naujo",
-    "tempError": "Bandome iš naujo susisiekti su serveriu, jokio veiksmo nereikia.",
-    "ended": "Renginys baigtas.",
-    "scaleToZeroNote": "Siekiant sumažinti poveikį aplinkai, vaizdo mazgai išjungiami, kai niekas nedalyvauja skambutyje. Pirmam vartotojui prisijungus, jie automatiškai paleidžiami iš naujo."
-  },
-  "rubrica": {
-    "optOut": {
-      "title": "Pašalinimas iš DTD adresų knygos",
-      "intro": "Ketinate atšaukti sutikimą būti įtrauktu į DTD adresų knygą. Po patvirtinimo nebebūsite kviečiamas į panašius renginius.",
-      "missingToken": "Nuoroda neteisinga arba nepilna. Patikrinkite originalų el. laišką.",
-      "invalidToken": "Nuoroda nebegalioja arba neteisinga. Susisiekite su renginio atstovu pagalbai.",
-      "notFound": "Pagal nuorodą nė vienas asmuo neatitinka. Galbūt jis jau pašalintas.",
-      "loading": "Įkeliama…",
-      "previewHeader": "Ketinate pašalinti iš adresų knygos:",
-      "warning": "Operacija nepanaikina atskirų renginių registracijų istorijos.",
-      "confirm": "Patvirtinti pašalinimą",
-      "submitting": "Šalinama…",
-      "successTitle": "Pašalinimas baigtas",
-      "successBody": "Jūsų duomenų DTD adresų knygoje nebėra.",
-      "errors": {
-        "generic": "Įvyko klaida. Bandykite vėliau."
-      }
-    }
-  },
-  "deviceCheck": {
-    "preview": "Vaizdo peržiūra",
-    "micLevel": "Mikrofono lygis",
-    "cameraLabel": "Kamera",
-    "micLabel": "Mikrofonas",
-    "permissionNeeded": "Leiskite naudoti mikrofoną ir kamerą, kad galėtumėte juos išbandyti. Galite prisijungti ir be jų.",
-    "noVideo": "Vaizdo nėra",
-    "noAudio": "Mikrofonas neprieinamas",
-    "retry": "Bandyti dar kartą",
-    "cameraToggleOn": "Kamera ON",
-    "cameraToggleOff": "Kamera OFF",
-    "micToggleOn": "Mikrofonas ON",
-    "micToggleOff": "Mikrofonas OFF",
-    "cameraOffPreview": "Kamera išjungta",
-    "speakerTest": "🔊 Garso testas"
-  },
-  "garden": {
-    "enable": "Rodyti sodą",
-    "classicView": "Klasikinis vaizdas",
-    "changeAvatar": "Keisti avatarą",
-    "peopleInGarden": "{count, plural, =0 {Sode nieko nėra} one {1 asmuo sode} other {# asmenys sode}}",
-    "guestName": "Guest",
-    "hintKeyboard": "Judėkite WASD arba rodyklėmis",
-    "pickerTitle": "Pasirinkite avatarą",
-    "pickerHelp": "Personažas atstovauja jus laukiamajame sode. Galite jį keisti bet kada.",
-    "close": "Uždaryti",
-    "hintBanner": "Spauskite rodykles, kad vaikštinėtumėte sode",
-    "hintJoystick": "Vilkite, kad judėtumėte"
-  },
-  "feedbackAdmin": {
-    "title": "Feedback results",
-    "totalVotes": "responses",
-    "noFeedback": "No feedback received",
-    "comments": "Comments",
-    "noComments": "No comments",
-    "yes": "Taip",
-    "no": "Ne"
-  },
-  "agenda": {
-    "title": "Užrašai / kontrolinis sąrašas",
-    "empty": "Kol kas punktų nėra. Pridėkite aptartinas temas ir žymėkite jas eigoje.",
-    "add": "Pridėti",
-    "addPlaceholder": "Naujas punktas…",
-    "remove": "Pašalinti",
-    "inProgress": "vykdoma",
-    "agree": "Pritariu",
-    "disagree": "Nepritariu",
-    "favorablePct": "{pct} % pritaria",
-    "noReactions": "Išsakykite savo nuomonę"
-  },
-  "changelog": {
-    "metaTitle": "Naujienos ir pakeitimų sąrašas",
-    "title": "Naujienos ir pakeitimų sąrašas",
-    "intro": "Visos platformos versijos, pradedant naujausia. Kiekvienas įrašas apibendrina svarbiausias naujoves, pataisymus ir patobulinimus.",
-    "current": "Dabartinė versija",
-    "sourceNote": "Pastabos rengiamos pagal projekto žymas, sujungimo užklausas ir kodo pakeitimus (commits).",
-    "sourceLink": "Žiūrėti visas laidas „GitHub“ svetainėje",
-    "rawChangelog": "CHANGELOG.md saugykloje",
-    "transparencyNote": "Kiekvienai versijai: kas veikia ir su kokiais komponentais,",
-    "transparencyInventory": "paslaugų skaidrume",
-    "transparencySecurity": "sauga ir SBOM",
-    "technicalDetail": "Techninė informacija",
-    "releaseLink": "Release",
-    "securityBadge": "Sauga",
-    "sbomButton": "SBOM",
-    "pipelineLink": "Pipeline",
-    "scorecardLink": "OpenSSF Scorecard",
-    "sbomClose": "Uždaryti",
-    "sbomLoading": "Įkeliama…",
-    "sbomError": "Nepavyko įkelti SBOM.",
-    "sbomComponents": "komponentų",
-    "sbomSearch": "ieškoti komponento…",
-    "sbomColName": "Komponentas",
-    "sbomColVersion": "Versija",
-    "sbomColEcosystem": "Ekosistema",
-    "sbomNoMatch": "Nėra atitinkančio komponento.",
-    "sbomDownload": "Atsisiųsti visą SBOM (SPDX)",
-    "sourcesLink": "Pirminis kodas",
-    "codeScanningLink": "Kodo nuskaitymas (CodeQL)"
+    "captionsOff": "Subtitrai išjungti",
+    "watchOnYouTube": "Žiūrėti vaizdo įrašą „YouTube“",
+    "externalSiteNote": "Atsidaro „YouTube“ – išorinėje svetainėje, turinčioje savo naudojimo sąlygas ir privatumo pranešimą."
   },
   "postprod": {
     "loading": "Įkeliama transkripcija…",
@@ -3579,5 +3660,277 @@
     },
     "overlapBadge": "vienu metu",
     "overlapTitle": "Kalbėjimas vienu metu: šiame intervale kalba daugiau nei vienas asmuo."
+  },
+  "diagram": {
+    "title": "Renginio konfigūracija",
+    "topology": "Topologija",
+    "features": "Aktyvios funkcijos",
+    "estimates": "Išteklių sąmata",
+    "moderator": "Moderatorius",
+    "participants": "Dalyviai",
+    "bridge": "Vaizdo tiltas",
+    "jvb": "Vaizdo tiltas",
+    "jibri": "Įrašymas",
+    "occupancy": "Užimtumas",
+    "sizedForRegistrations": "Pagal {count} dabartinių registracijų",
+    "sizedForCapacity": "Pagal didžiausią talpą {count}",
+    "chips": {
+      "mic": "Mikrofonas",
+      "video": "Vaizdo kamera",
+      "screen": "Ekrano bendrinimas"
+    },
+    "bandwidth": {
+      "moderator": "Moderatoriaus pralaidumas",
+      "participant": "Dalyvio pralaidumas",
+      "total": "Numatomas bendras pralaidumas"
+    },
+    "jvbCount": "Reikiamų JVB skaičius",
+    "jvbRam": "Numatoma JVB RAM",
+    "storage": "Įrašymo saugykla",
+    "duration": "Numatoma trukmė",
+    "viewOnly": "Tik peržiūra",
+    "preview": "Konfigūracijos peržiūra"
+  },
+  "waiting": {
+    "startsIn": "Renginys prasidės po",
+    "startingSoon": "Renginys tuoj prasidės, palaukite organizatorių…",
+    "eventLive": "Renginys vyksta!",
+    "connectedParticipants": "{count, plural, =0 {Dalyvių nėra} =1 {1 prisijungęs dalyvis} one {# prisijungęs dalyvis} few {# prisijungę dalyviai} many {# prisijungusių dalyvių} other {# prisijungusių dalyvių}}",
+    "elapsedTime": "Vyksta jau {minutes} minučių",
+    "youAreLate": "Renginys prasidėjo prieš {minutes} minučių",
+    "chooseHowToJoin": "Pasirinkite, kaip dalyvauti:",
+    "enterLive": "Prisijungti TIESIOGIAI",
+    "enterLiveDesc": "Dalyvaukite tiesiogiai. Įrašą galėsite peržiūrėti po renginio.",
+    "enterNow": "Prisijungti dabar",
+    "watchFromStart": "Žiūrėti nuo pradžių",
+    "watchFromStartDesc": "Žiūrėkite įrašą nuo pradžių ir prisijunkite prie transliacijos bet kada.",
+    "watchNow": "Žiūrėti",
+    "switchToLive": "Perjungti į tiesioginę transliaciją",
+    "enterRoom": "Įeiti į salę",
+    "recordingNotice": "Šis renginys yra įrašomas.",
+    "recordingAvailableAfter": "Įrašas bus prieinamas po renginio.",
+    "autoRefreshHint": "Puslapis bus automatiškai atnaujintas, kai renginys prasidės.",
+    "startEventButton": "Pradėti renginį",
+    "startingEvent": "Paleidžiama...",
+    "peopleWaiting": "{count, plural, =0 {} =1 {1 laukiantis asmuo} one {# laukiantis asmuo} few {# laukiantys asmenys} many {# laukiančių asmenų} other {# laukiančių asmenų}}",
+    "jvbScaling": "Salė ruošiama...",
+    "jvbScalingDetail": "Vaizdo serveriai paleidžiami. Tai trunka apie 2 minutes.",
+    "jvbReady": "Salė paruošta!",
+    "warmup": {
+      "queued": "Užklausa priimta",
+      "startingBridge": "Paleidžiame vaizdo serverį…",
+      "provisioningNode": "Kuriame skirtą vaizdo serverį",
+      "almostReady": "Vaizdo serveris veikia: beveik viskas",
+      "almostReadyDetail": "Dar akimirka ir prisijungimo mygtukas įsijungs pats.",
+      "honestHint": "Įprastas laukimas: mažiau nei minutė, jei infrastruktūra jau įšilusi, 3–5 minutės pirmo paleidimo metu. Tuo tarpu gali patikrinti kamerą ir mikrofoną arba naudotis pokalbiais.",
+      "elapsed": "ruošiama jau {time}",
+      "scheduled": "Salė atsidaro pradžios metu",
+      "scheduledDetail": "Arba anksčiau, kai organizatorius pradeda renginį. Tuo tarpu gali patikrinti kamerą ir mikrofoną arba naudotis pokalbiais."
+    },
+    "exitWaiting": "Išeiti iš laukiamojo",
+    "warmingUp": "Salė ruošiama",
+    "warmingUpDetail": "Įjungiame vaizdo serverius. Tuo tarpu galite pasiruošti — viskas bus parengta per 2–3 minutes ir galėsite įeiti.",
+    "warmingUpButton": "Salė ruošiama...",
+    "nameLabel": "Jūsų vardas",
+    "nameHelp": "Jį matys kiti dalyviai",
+    "nameRequiredToEnter": "Kad įeitumėte, įveskite savo vardą (bent 2 simboliai).",
+    "roomOpenNameMissing": "Salė atidaryta: kad įeitumėte, įveskite savo vardą.",
+    "joinNowBtn": "Įeiti dabar",
+    "roomOpen": "Salė atidaryta",
+    "whileYouWait": "Kol laukiate",
+    "openingAt": "Atidaroma {time}",
+    "netiquetteTitle": "Geroji dalyvavimo praktika",
+    "netiquetteBullet1": "Atvykite kelias minutes anksčiau, kad galėtumėte išbandyti mikrofoną ir kamerą",
+    "netiquetteBullet2": "Įjunkite kamerą ir mikrofoną tik norėdami kalbėti — pakelkite ranką, jei norite gauti žodį",
+    "netiquetteBullet3": "Naudokite pokalbį greitiems pokalbiams, Q&A — klausimams pranešėjams",
+    "netiquetteBullet4": "Įrašymą, jei jis aktyvus, valdo tik moderatoriai ir jis žymimas raudonu indikatoriumi",
+    "watchCatchup": "Žiūrėti nuo pradžios",
+    "watchCatchupDesc": "Žiūrėkite dalinį įrašą ir prisijunkite prie tiesioginės transliacijos, kai panorėsite",
+    "chatPreviewTitle": "Renginio pokalbis",
+    "chatPreviewHint": "Skaitykite, ką sako kiti dalyviai, kol ruošiatės",
+    "endedTitle": "Renginys baigtas",
+    "endedWatchRecording": "Žiūrėti įrašą",
+    "endedLeaveFeedback": "Palikti atsiliepimą",
+    "moderatedBy": "Moderavo {name}",
+    "startEventError": "Klaida pradedant renginį. Bandykite dar kartą.",
+    "emailLabel": "El. paštas (neprivaloma)",
+    "emailHelp": "Tik galimam susisiekimui po renginio",
+    "emailInvalid": "Įveskite teisingą el. pašto adresą",
+    "chatLockedMessage": "Įveskite savo vardą, kad galėtumėte dalyvauti renginio pokalbyje.",
+    "classicView": "Klasikinis vaizdas",
+    "backToGarden": "Grįžti į parką",
+    "aiNoticeTitle": "DI apdorojimas po renginio",
+    "aiNotice": "Pabaigoje įrašas bus apdorotas dirbtinio intelekto įrankiais, kad būtų sukurtas transkriptas, santrauka ir galimi vertimai bei įgarsinimai. Rezultatuose gali pasitaikyti netikslumų; vaizdo įrašas lieka autoritetingas šaltinis.",
+    "multitrackConsentTitle": "Įrašymas pagal dalyvį",
+    "multitrackConsentRequired": "Kad įeitumėte, turite sutikti su savo garso takelio įrašymu",
+    "enterGardenTitle": "Įeik į aikštę",
+    "enterGardenHint": "Vieta pasivaikščioti belaukiant: iš ten taip pat nusistatysi vardą ir mikrofoną bei prisijungsi prie renginio.",
+    "backToWaitingRoom": "Atgal į laukiamąjį",
+    "gardenDialogLabel": "Laukiamojo aikštė",
+    "gardenGateHint": "Gali prisijungti iš čia arba nuvesti savo avatarą iki vartų.",
+    "classicVersion": "Klasikinė versija",
+    "roomNotReadyButton": "Salė ruošiama…",
+    "roomNotReadyPiazza": "Tuo tarpu užsuk į aikštę",
+    "gate": {
+      "gateOpen": "Įėjimas atviras",
+      "stageLive": "● TIESIOGIAI",
+      "gatePreparing": "Salė ruošiama…",
+      "stagePreparing": "Netrukus",
+      "ended": "Renginys baigėsi",
+      "startsIn": "Prasideda po {time}",
+      "hostEarly": "Ankstyvas įėjimas (šeimininkas)"
+    },
+    "roomJustOpened": "Salė paruošta — užeik",
+    "enterAnyway": "Vis tiek įeiti",
+    "notHeldBadge": "Laikas praėjo",
+    "notHeldTitle": "Numatytas renginio laikas jau praėjo",
+    "notHeldDetail": "Salė nebuvo atidaryta. Naujienų ieškok renginio puslapyje."
+  },
+  "recording": {
+    "management": "Vaizdo įrašas",
+    "inProgress": "Vyksta",
+    "available": "Įrašas prieinamas",
+    "duration": "Trukmė",
+    "fileSize": "Failo dydis",
+    "startedAt": "Pradėtas",
+    "automatic": "automatinis",
+    "publish": "Paskelbti įrašą",
+    "publishDesc": "Padaryti vaizdo įrašą prieinamą renginio puslapyje",
+    "retentionLabel": "Saugojimas",
+    "retention": {
+      "24h": "24 valandos (laikinas)",
+      "7d": "7 dienos",
+      "30d": "30 dienų",
+      "90d": "90 dienų",
+      "forever": "Niekada (iki renginio galiojimo pabaigos)"
+    },
+    "retentionNote": "Vaizdo įrašas vis tiek bus taikomas renginio GDPR saugojimo politikai",
+    "delete": "Ištrinti įrašą",
+    "deleteConfirm": "Ar esate tikri? Vaizdo įrašas bus ištrintas negrįžtamai.",
+    "notConfigured": "Jibri nesukonfigūruotas infrastruktūroje. Vaizdo įrašymas neprieinamas.",
+    "disabledHint": "Vaizdo įrašymas šiam renginiui neįjungtas. Norėdami įjungti, atidarykite Nustatymų skiltį aukščiau ir įjunkite jungiklį „Įrašymas“.",
+    "play": "Atkurti",
+    "download": "Atsisiųsti",
+    "transcriptManage": "Transkripcija / DI",
+    "deleteConfirmTitle": "Ištrinti įrašą",
+    "deleteFailed": "Ištrinti nepavyko",
+    "deleteSuccess": "Įrašas ištrintas"
+  },
+  "postEvent": {
+    "config": "Po renginio konfigūracija",
+    "pageVisible": "Renginio puslapis matomas po pabaigos",
+    "pageVisibleHelp": "Kai išjungta (arba pasibaigus matomumo langui), pasibaigusio renginio viešasis puslapis grąžina 404, o renginys dingsta iš sąrašų ir svetainės struktūros žemėlapio.",
+    "libraryListed": "Paskelbti vaizdo įrašų bibliotekoje",
+    "libraryListedHelp": "Rodyti šį renginį viešojoje bibliotekoje (/video-library). Reikia paskelbto įrašo arba „YouTube“ vaizdo įrašo ir kad renginio puslapis būtų matomas.",
+    "libraryListedNoRecording": "Paskelbto įrašo nėra: renginys bibliotekoje nepasirodys, kol nepaskelbsite įrašo arba nepridėsite „YouTube“ vaizdo įrašo.",
+    "showQA": "Rodyti Q&A klausimus",
+    "showMaterials": "Rodyti pasidalintą medžiagą",
+    "showPolls": "Rodyti apklausų rezultatus",
+    "showFeedback": "Rodyti atsiliepimus",
+    "showRecap": "Rodyti renginio suvestinę",
+    "showWordCloud": "Rodyti žodžių debesį",
+    "emailEnabled": "Pasibaigus renginiui siųsti suvestinės el. laišką",
+    "emailEnabledHelp": "Pasibaigus renginiui užsiregistravusiems dalyviams išsiunčiamas padėkos laiškas su nuorodomis į suvestinę ir atsiliepimų formą, o moderatoriui – trumpa suvestinė. Siunčiama tik vieną kartą.",
+    "feedbackEnabled": "Atsiliepimų apklausa aktyvi renginio pabaigoje",
+    "visibilityAlways": "Visada matomas",
+    "visibilityUntil": "Matomas iki:",
+    "dataRetentionNote": "Dalyvių asmens duomenys bus ištrinti pagal renginio saugojimo politiką ({days} dienų). Renginio turinys bus prieinamas, kol puslapis matomas.",
+    "availableUntil": "Šis renginys ir jo turinys bus prieinami iki {date}.",
+    "tabs": {
+      "qa": "Klausimai ir atsakymai",
+      "materials": "Medžiaga",
+      "polls": "Apklausos",
+      "feedback": "Atsiliepimai",
+      "transcript": "DI transkripcija"
+    }
+  },
+  "provisioning": {
+    "loading": "Įkeliama",
+    "titleFromIdle": "Salė vėl aktyvinama",
+    "titleColdStart": "Salė ruošiama",
+    "descriptionFromIdle": "Salė buvo pristabdyta dėl neaktyvumo, siekiant taupyti energiją. Dabar ją iš naujo paleidžiame: tai užtrunka apie 2–3 minutes.",
+    "descriptionColdStart": "Ruošiame virtualią salę šiam renginiui. Operacija užtrunka apie 2–3 minutes: būsite automatiškai nukreiptas, kai tik viskas bus parengta.",
+    "progressLabel": "{seconds} s",
+    "retry": "Įkelti iš naujo",
+    "tempError": "Bandome iš naujo susisiekti su serveriu, jokio veiksmo nereikia.",
+    "ended": "Renginys baigtas.",
+    "scaleToZeroNote": "Siekiant sumažinti poveikį aplinkai, vaizdo mazgai išjungiami, kai niekas nedalyvauja skambutyje. Pirmam vartotojui prisijungus, jie automatiškai paleidžiami iš naujo."
+  },
+  "rubrica": {
+    "optOut": {
+      "title": "Pašalinimas iš renginių adresų knygos",
+      "intro": "Ketinate atšaukti sutikimą būti įtrauktu į renginių adresų knygą. Po patvirtinimo nebebūsite kviečiamas į panašius renginius.",
+      "missingToken": "Nuoroda neteisinga arba nepilna. Patikrinkite originalų el. laišką.",
+      "invalidToken": "Nuoroda nebegalioja arba neteisinga. Susisiekite su renginio atstovu pagalbai.",
+      "notFound": "Pagal nuorodą nė vienas asmuo neatitinka. Galbūt jis jau pašalintas.",
+      "loading": "Įkeliama…",
+      "previewHeader": "Ketinate pašalinti iš adresų knygos:",
+      "warning": "Operacija nepanaikina atskirų renginių registracijų istorijos.",
+      "confirm": "Patvirtinti pašalinimą",
+      "submitting": "Šalinama…",
+      "successTitle": "Pašalinimas baigtas",
+      "successBody": "Jūsų duomenų renginių adresų knygoje nebėra.",
+      "errors": {
+        "generic": "Įvyko klaida. Bandykite vėliau."
+      }
+    }
+  },
+  "deviceCheck": {
+    "preview": "Vaizdo peržiūra",
+    "micLevel": "Mikrofono lygis",
+    "cameraLabel": "Kamera",
+    "micLabel": "Mikrofonas",
+    "permissionNeeded": "Leiskite naudoti mikrofoną ir kamerą, kad galėtumėte juos išbandyti. Galite prisijungti ir be jų.",
+    "noVideo": "Vaizdo nėra",
+    "noAudio": "Mikrofonas neprieinamas",
+    "retry": "Bandyti dar kartą",
+    "cameraToggleOn": "Kamera ON",
+    "cameraToggleOff": "Kamera OFF",
+    "micToggleOn": "Mikrofonas ON",
+    "micToggleOff": "Mikrofonas OFF",
+    "cameraOffPreview": "Kamera išjungta",
+    "speakerTest": "🔊 Garso testas",
+    "backgroundLabel": "Virtualus fonas",
+    "backgroundNoneShort": "No",
+    "backgroundHint": "Taikoma įėjus į salę. Norėdami sulieti foną, viduje naudokite fonų mygtuką: aukščiau esanti peržiūra rodo kamerą be efekto.",
+    "background": {
+      "nessuno": "Be fono",
+      "ufficio-chiaro": "Šviesus biuras",
+      "blu-istituzionale": "Institucinė mėlyna",
+      "verde-salvia": "Šalavijų žalia",
+      "grafite": "Grafitas"
+    }
+  },
+  "garden": {
+    "enable": "Rodyti sodą",
+    "classicView": "Klasikinis vaizdas",
+    "changeAvatar": "Keisti avatarą",
+    "peopleInGarden": "{count, plural, =0 {Sode nieko nėra} one {1 asmuo sode} other {# asmenys sode}}",
+    "guestName": "Svečias",
+    "hintKeyboard": "Judėkite WASD arba rodyklėmis",
+    "pickerTitle": "Pasirinkite avatarą",
+    "pickerHelp": "Personažas atstovauja jus laukiamajame sode. Galite jį keisti bet kada.",
+    "close": "Uždaryti",
+    "hintBanner": "Spauskite rodykles, kad vaikštinėtumėte sode",
+    "hintJoystick": "Vilkite, kad judėtumėte"
+  },
+  "feedbackAdmin": {
+    "title": "Atsiliepimų rezultatai",
+    "totalVotes": "atsakymų",
+    "noFeedback": "Atsiliepimų negauta",
+    "comments": "Komentarai",
+    "noComments": "Komentarų nėra",
+    "yes": "Taip",
+    "no": "Ne"
+  },
+  "questionnaire": {
+    "loadFailed": "Nepavyko įkelti klausimyno.",
+    "submit": "Siųsti atsakymus",
+    "submitFailed": "Išsiųsti nepavyko. Bandykite dar kartą.",
+    "answersInvalid": "Kai kurių atsakymų trūksta arba jie netinkami: patikrinkite privalomus klausimus ir bandykite dar kartą.",
+    "alreadySubmitted": "Į šį klausimyną jau atsakėte.",
+    "thankYou": "Dėkojame už atsakymus.",
+    "yes": "Taip",
+    "no": "Ne"
   }
 }

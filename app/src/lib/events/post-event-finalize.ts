@@ -12,6 +12,7 @@
  * first is safe — the actual SMTP send + retry is the email-outbox cron's job.
  */
 
+import { lingueIscrizione } from '@/lib/email/lingua';
 import { decryptPII, tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { enqueueEmail } from '@/lib/email/outbox';
@@ -20,6 +21,7 @@ import {
   postEventModeratorEmail,
 } from '@/lib/email/templates';
 import { ensureEventRecap, formatRecapSummary } from '@/lib/events/recap';
+import { rubricaOptOutUrl } from '@/lib/persons/opt-out-link';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import { localizedUrl } from '@/lib/utils/localized-url';
 
@@ -31,10 +33,12 @@ export async function finalizePostEventEmails(opts: {
   now: Date;
   baseUrl: string;
   siteName: string;
+  /** Lingua dell'istanza: quella dell'email a chi conduce, che non ha
+   *  un'iscrizione da cui ricavarla. */
+  defaultLocale?: string;
 }): Promise<{ eventsFinalized: number; emailsSent: number; emailsFailed: number }> {
   const { now, baseUrl, siteName } = opts;
   const cutoff = new Date(now.getTime() - MAX_AGE_DAYS * 86_400_000);
-  const locale: 'it' | 'en' = 'it';
 
   const events = await prisma.event.findMany({
     where: {
@@ -67,26 +71,32 @@ export async function finalizePostEventEmails(opts: {
     if (claim.count === 0) continue;
     eventsFinalized++;
 
-    const title = getLocalized(event.title as LocalizedField, locale);
-    const eventPageUrl = localizedUrl(baseUrl, `/events/${event.slug}`, locale);
-
     // Ensure the recap exists (covers events nobody opened) for the summary.
     const recap = await ensureEventRecap(event.id);
-    const recapSummary = recap ? formatRecapSummary(recap, locale) : '';
 
     // Participant thank-you + recap/feedback link.
     const registrations = await prisma.registration.findMany({
       where: { eventId: event.id },
-      select: { id: true, email: true },
+      select: {
+        id: true,
+        email: true,
+        locale: true,
+        // Chi e' in rubrica riceve anche qui il link per uscirne.
+        person: { select: { id: true, optedInToAddressBook: true } },
+      },
     });
     for (const reg of registrations) {
       try {
+        // Nella lingua in cui ci si e' iscritti (link e titolo nella lingua
+        // della pagina, testi nella lingua email corrispondente).
+        const { pagina, testi } = lingueIscrizione(reg.locale, opts.defaultLocale);
         const to = decryptPII(reg.email);
         const mail = postEventParticipantEmail({
-          locale,
-          eventTitle: title,
-          eventPageUrl,
+          locale: testi,
+          eventTitle: getLocalized(event.title as LocalizedField, pagina),
+          eventPageUrl: localizedUrl(baseUrl, `/events/${event.slug}`, pagina),
           siteName,
+          addressBookOptOutUrl: rubricaOptOutUrl(reg.person, baseUrl, pagina),
         });
         await enqueueEmail({
           to,
@@ -113,12 +123,13 @@ export async function finalizePostEventEmails(opts: {
     const moderatorEmail = tryDecryptPII(event.moderatorEmail);
     if (moderatorEmail) {
       try {
+        const { pagina, testi } = lingueIscrizione(opts.defaultLocale);
         const mail = postEventModeratorEmail({
-          locale,
-          eventTitle: title,
-          eventPageUrl,
+          locale: testi,
+          eventTitle: getLocalized(event.title as LocalizedField, pagina),
+          eventPageUrl: localizedUrl(baseUrl, `/events/${event.slug}`, pagina),
           siteName,
-          recapSummary,
+          recapSummary: recap ? formatRecapSummary(recap, testi) : '',
           recordingUrl: event.recordingPublished ? event.recordingUrl : null,
         });
         await enqueueEmail({

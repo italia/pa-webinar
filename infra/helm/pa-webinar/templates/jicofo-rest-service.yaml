@@ -1,0 +1,32 @@
+{{- /*
+Service interno per l'API REST di Jicofo (porta 8888), letta dalla pagina di
+stato dell'applicazione (JICOFO_HEALTH_URL). Il sottochart accende l'API
+(JICOFO_ENABLE_REST) ma non rende un Service che la esponga.
+
+La sonda chiede /about/version: /about/health risponde 404 finché i controlli
+di salute interni di Jicofo sono spenti, com'è nell'immagine predefinita.
+
+Non serve quando l'indirizzo è indicato a mano in `jitsi.jicofoHealthUrl`.
+*/}}
+{{- if and .Values.jitsi.enabled (not .Values.jitsi.jicofoHealthUrl) }}
+{{- $jm := index .Values "jitsi-meet" | default dict }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "pa-webinar.fullname" . }}-jicofo-rest
+  labels:
+    {{- include "pa-webinar.labels" . | nindent 4 }}
+    app.kubernetes.io/component: jicofo-rest
+spec:
+  type: ClusterIP
+  ports:
+    - name: http-rest
+      port: 8888
+      targetPort: 8888
+      protocol: TCP
+  selector:
+    {{- /* Le etichette di selezione di Jicofo nel sottochart jitsi-meet. */}}
+    app.kubernetes.io/name: {{ dig "nameOverride" "" $jm | default "jitsi-meet" | trunc 63 | trimSuffix "-" | quote }}
+    app.kubernetes.io/instance: {{ .Release.Name | quote }}
+    app.kubernetes.io/component: jicofo
+{{- end }}

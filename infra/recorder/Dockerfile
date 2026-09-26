@@ -13,8 +13,23 @@ WORKDIR /app
 # /app/.cache così lo stage runtime può copiarlo (default sarebbe ~/.cache).
 ENV PUPPETEER_CACHE_DIR=/app/.cache/puppeteer
 
+# `unzip` serve a scompattare quel Chrome. Da @puppeteer/browsers 3 lo
+# scompattatore incluso non c'è più e si usa quello di sistema: senza, il
+# download riesce, la cartella della versione viene creata VUOTA e
+# l'installazione esce con successo. Il guasto si vede solo all'avvio del bot,
+# che non trova l'eseguibile — cioè a evento iniziato.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends unzip \
+    && rm -rf /var/lib/apt/lists/*
+
 COPY package.json package-lock.json* ./
 RUN npm ci --no-audit --no-fund || npm install --no-audit --no-fund
+
+# Il download di Chrome non fallisce da solo: se lo scompattamento non
+# avviene, `npm ci` esce comunque con successo e lascia una cartella vuota.
+# Qui l'assenza dell'eseguibile diventa un errore di costruzione.
+RUN test -x "$(find /app/.cache/puppeteer -name chrome -type f | head -1)" \
+    || (echo "Chrome non scompattato in $PUPPETEER_CACHE_DIR" && exit 1)
 
 COPY tsconfig.json ./
 COPY src ./src

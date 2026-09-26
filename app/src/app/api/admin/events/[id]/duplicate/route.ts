@@ -8,39 +8,48 @@
  * What we copy: the ENTIRE configuration — titles (with "(copia)" appended),
  * description, schedule, every feature toggle, the capture/AI flags,
  * registration rules, privacy text, speakers/organiser info, GDPR template
- * link, cover image, event type, sizing overrides — plus the reminder schedule.
+ * link, cover image, event type, sizing overrides. The scalar side is
+ * enumerated in lib/events/duplicate-fields.
  *
- * The capture flags matter more than they look: this endpoint used to drop
- * `multitrackRecordingEnabled`, `retainParticipantTracks`, the four AI flags,
- * `aiTargetLocales`, `expectedSpeakers`, `agendaEnabled`, `wordCloudEnabled`,
- * `autoStartRecording`, `videoQuality` and `recurrenceRule` on the floor. For a
- * recurring call (Caffettino, DevIt sync) that is the whole point of duplicating:
- * the operator would only discover the loss after the event, with no multitrack
- * audio and no transcript. See docs/ROADMAP.md, "Eventi ricorrenti / serie".
+ * Relations follow the same rule — the copy inherits the configuration, not the
+ * life of the occurrence: tags, organisers, named moderator/speaker grants (each
+ * with a fresh token), the agenda, questionnaires and the reminder schedule.
+ * Which ones, and why the others are left behind, is enumerated in
+ * lib/events/duplicate-relations.
  *
  * What we reset: status (→ DRAFT), moderatorToken, jitsiRoomName, slug,
  * runtime/analytics state (lastActiveAt, provisioningStartedAt,
  * peakParticipants, recording URLs/metadata, capacityEstimateJson) and the join
  * password — a fresh copy must not inherit a secret the operator cannot see.
  *
- * What we skip: the other relations (registrations, questions, polls,
- * materials, feedback, sessions) — those belong to the occurrence that ran.
- *
  * Optional body:
- *   { "nextOccurrence": true }        project the date from the source's RRULE
+ *   { "nextOccurrence": true }        project the date from the source's RRULE,
+ *                                     in the event's timezone, to the first
+ *                                     occurrence after the source that is not
+ *                                     in the past (minute resolution)
  *   { "startsAt": ISO, "endsAt": ISO } explicit reschedule
- * Neither → same dates as the source (historic behaviour).
+ * Neither, or an exhausted rule → same dates as the source, and the response
+ * says so with `scheduleProjected: false`. The 201 carries `startsAt`/`endsAt`.
  */
 import { randomUUID } from 'crypto';
 
 import { cookies } from 'next/headers';
+import { z } from 'zod';
 
 import { withErrorHandling } from '@/lib/api-handler';
-import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { requireEventManager } from '@/lib/auth/staff-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { prisma } from '@/lib/db';
-import { AppError, NotFoundError, UnauthorizedError } from '@/lib/errors';
+import {
+  AppError,
+  NotFoundError,
+  ValidationError,
+} from '@/lib/errors';
 import { duplicatedConfig } from '@/lib/events/duplicate-fields';
+import {
+  DUPLICATE_SOURCE_INCLUDE,
+  duplicatedRelations,
+} from '@/lib/events/duplicate-relations';
 import { nextOccurrenceAfter } from '@/lib/utils/recurrence';
 import { generateUniqueSlug } from '@/lib/utils/slug';
 import type { LocalizedField } from '@/lib/utils/locale';
@@ -68,79 +77,148 @@ function suffixTitle(title: LocalizedField): Record<string, string> {
   return out;
 }
 
-interface DuplicateOptions {
-  nextOccurrence?: boolean;
-  startsAt?: string;
-  endsAt?: string;
-}
+/**
+ * The body is validated rather than cast: `{ "startsAt": 1 }` used to reach
+ * `new Date(1)` and return a 201 for a copy dated 1970, and a truthy string
+ * `"false"` in `nextOccurrence` used to silently reschedule the copy.
+ */
+const duplicateOptionsSchema = z
+  .object({
+    nextOccurrence: z.boolean().optional(),
+    // `local: true` accetta anche un ISO senza fuso (`2026-09-01T10:00:00`):
+    // rifiutarlo restringerebbe ciò che l'endpoint accettava prima.
+    startsAt: z.string().datetime({ offset: true, local: true }).optional(),
+    endsAt: z.string().datetime({ offset: true, local: true }).optional(),
+  })
+  .strict()
+  // Le date si validano anche fra loro, non solo una per una: da sole
+  // passavano richieste che l'endpoint poi ignorava, rispondendo 201 con le
+  // date dell'originale — cioè programmando la copia dove nessuno ha chiesto.
+  .refine((o) => !(o.endsAt && !o.startsAt), {
+    message: 'endsAt requires startsAt',
+    path: ['startsAt'],
+  })
+  .refine((o) => !(o.startsAt && o.endsAt && new Date(o.endsAt) <= new Date(o.startsAt)), {
+    message: 'endsAt must be after startsAt',
+    path: ['endsAt'],
+  });
 
-/** Body is optional: an empty POST keeps the historic "same dates" behaviour. */
+type DuplicateOptions = z.infer<typeof duplicateOptionsSchema>;
+
+/**
+ * Body is optional: an empty POST (no body at all, or `{}`) keeps the historic
+ * "same dates as the source" behaviour. A body that IS present must be valid —
+ * silently ignoring a malformed one would schedule the copy somewhere the
+ * operator never asked for.
+ */
 async function readOptions(request: Request): Promise<DuplicateOptions> {
+  const raw = await request.text();
+  if (raw.trim().length === 0) return {};
+
+  let parsed: unknown;
   try {
-    const raw = await request.json();
-    return raw && typeof raw === 'object' ? (raw as DuplicateOptions) : {};
+    parsed = JSON.parse(raw);
   } catch {
-    return {};
+    throw new AppError('Invalid JSON body', 400, 'INVALID_BODY');
   }
+
+  const result = duplicateOptionsSchema.safeParse(parsed);
+  if (!result.success) {
+    throw new ValidationError(result.error.issues[0]?.message ?? 'Invalid body');
+  }
+  return result.data;
 }
 
 /**
  * Dates for the copy. Explicit values win; `nextOccurrence` projects the first
- * date the source's RRULE yields strictly after now, keeping the original
- * duration and time of day. With no rule to project from we fall back to the
- * source dates rather than inventing a cadence — the operator can still edit
- * the draft, and a wrong guessed date is worse than an obvious placeholder.
+ * date the source's RRULE yields strictly after the source occurrence, and
+ * never in the past, keeping the original duration and the original time of day
+ * in the event's own timezone. With no rule to project from — or a rule already
+ * exhausted by COUNT/UNTIL — we fall back to the source dates rather than
+ * inventing a cadence, and report it as `projected: false`: a wrong guessed date
+ * is worse than an obvious placeholder, but only if the caller can tell it is
+ * one.
+ *
+ * The copy inherits the rule verbatim while its own start moves forward, so a
+ * COUNT restarts on the copy, and it is deliberately not linked to the series
+ * (see lib/events/duplicate-fields).
  */
 function resolveSchedule(
-  source: { startsAt: Date; endsAt: Date; recurrenceRule: string | null },
+  source: {
+    startsAt: Date;
+    endsAt: Date;
+    recurrenceRule: string | null;
+    timezone: string;
+  },
   options: DuplicateOptions,
-): { startsAt: Date; endsAt: Date } {
+): { startsAt: Date; endsAt: Date; projected: boolean } {
   const durationMs = source.endsAt.getTime() - source.startsAt.getTime();
 
-  const explicitStart = options.startsAt ? new Date(options.startsAt) : null;
-  if (explicitStart && !Number.isNaN(explicitStart.getTime())) {
-    const explicitEnd = options.endsAt ? new Date(options.endsAt) : null;
+  // Le date arrivano già validate dallo schema: sono ISO parsabili, `endsAt`
+  // non viaggia mai da solo ed è sempre successivo a `startsAt`. Qui resta solo
+  // la scelta della durata quando la fine non è stata indicata.
+  if (options.startsAt) {
+    const explicitStart = new Date(options.startsAt);
     return {
       startsAt: explicitStart,
-      endsAt:
-        explicitEnd && !Number.isNaN(explicitEnd.getTime()) && explicitEnd > explicitStart
-          ? explicitEnd
-          : new Date(explicitStart.getTime() + durationMs),
+      endsAt: options.endsAt
+        ? new Date(options.endsAt)
+        : new Date(explicitStart.getTime() + durationMs),
+      projected: false,
     };
   }
 
   if (options.nextOccurrence && source.recurrenceRule) {
-    // Seek past the occurrences already held rather than enumerating a window:
-    // a daily series running for months would otherwise yield only past dates,
-    // and the copy would silently keep the source's (past) schedule.
-    const upcoming = nextOccurrenceAfter(source.recurrenceRule, source.startsAt, new Date());
+    // The anchor is not "now": `after()` returns the first occurrence STRICTLY
+    // later, and with a source in the future — the normal case for this route —
+    // the first occurrence after now is the source itself. The copy was born
+    // with the original's dates, and since the value wasn't null the fallback
+    // below was never reached either: a 201, no signal, and the operator ended
+    // up with two events at the same time.
+    // The max with the current time covers the opposite extreme: on a series
+    // running for months, the occurrence after the source is still in the past.
+    const anchor = new Date(Math.max(source.startsAt.getTime(), Date.now()));
+    const upcoming = nextOccurrenceAfter(
+      source.recurrenceRule,
+      source.startsAt,
+      anchor,
+      source.timezone,
+    );
     if (upcoming) {
-      return { startsAt: upcoming, endsAt: new Date(upcoming.getTime() + durationMs) };
+      // The duration stays additive across a daylight-saving change: an hour
+      // of meeting lasts an hour.
+      return {
+        startsAt: upcoming,
+        endsAt: new Date(upcoming.getTime() + durationMs),
+        projected: true,
+      };
     }
   }
 
-  return { startsAt: source.startsAt, endsAt: source.endsAt };
+  return { startsAt: source.startsAt, endsAt: source.endsAt, projected: false };
 }
 
 export const POST = withErrorHandling(async (request, context) => {
-  const isAdmin = await isAdminAuthenticated(await cookies());
-  if (!isAdmin) throw new UnauthorizedError();
-
   const { id } = await context.params;
+  // Dell'evento: l'admin, o l'organizzatore che l'ha creato (ADR-014).
+  const session = await requireEventManager(await cookies(), id);
   if (typeof id !== 'string' || !UUID_RE.test(id)) {
     throw new AppError('id must be a UUID', 400, 'BAD_REQUEST');
   }
 
-  const source = await prisma.event.findUnique({ where: { id } });
+  // L'include e il costruttore delle relazioni vivono insieme in
+  // lib/events/duplicate-relations.ts: separarli significherebbe poter
+  // aggiungere una relazione da copiare senza caricarla, e perderla in silenzio.
+  const source = await prisma.event.findUnique({
+    where: { id },
+    include: DUPLICATE_SOURCE_INCLUDE,
+  });
   if (!source) throw new NotFoundError('Event not found');
 
-  const reminders = await prisma.eventReminder.findMany({
-    where: { eventId: source.id },
-    select: { offsetMinutes: true, label: true },
-    orderBy: { offsetMinutes: 'desc' },
-  });
-
-  const { startsAt, endsAt } = resolveSchedule(source, await readOptions(request));
+  const { startsAt, endsAt, projected } = resolveSchedule(
+    source,
+    await readOptions(request),
+  );
 
   const newTitle = suffixTitle(source.title as LocalizedField);
   const newSlug = await generateUniqueSlug(newTitle);
@@ -149,6 +227,9 @@ export const POST = withErrorHandling(async (request, context) => {
 
   const duplicate = await prisma.event.create({
     data: {
+      // La copia e' di chi la crea: l'organizzatore che duplica il proprio
+      // evento deve poterla gestire (ADR-014).
+      createdById: session.accountId,
       // Everything the copy inherits, from the single classified list — see
       // lib/events/duplicate-fields.ts for why this is not spelled out inline.
       ...duplicatedConfig(source),
@@ -162,16 +243,11 @@ export const POST = withErrorHandling(async (request, context) => {
       startsAt,
       endsAt,
 
-      // Reminder schedule: a duplicate with no reminders quietly stops warning
-      // registrants, which is exactly the kind of loss nobody notices in time.
-      ...(reminders.length > 0 && {
-        reminders: {
-          create: reminders.map((r) => ({
-            offsetMinutes: r.offsetMinutes,
-            label: r.label,
-          })),
-        },
-      }),
+      // Le relazioni ereditate, dallo stesso elenco classificato: tag,
+      // organizzatori, co-moderatori (con token NUOVI), scaletta, questionari e
+      // promemoria. Prima qui c'erano solo i promemoria, scritti a mano — ed è
+      // per questo che tutto il resto si perdeva a ogni duplicazione.
+      ...duplicatedRelations(source),
     },
   });
 
@@ -187,6 +263,14 @@ export const POST = withErrorHandling(async (request, context) => {
       id: duplicate.id,
       slug: duplicate.slug,
       moderatorToken: duplicate.moderatorToken,
+      // The dates actually written, and whether they were really projected:
+      // without this an exhausted rule returned the source's dates with the
+      // same 201 as a successful projection, and the caller had no way to tell
+      // the two apart. Read from the local values, not from the created row:
+      // that keeps the response independent of what `create` selects back.
+      startsAt: startsAt.toISOString(),
+      endsAt: endsAt.toISOString(),
+      scheduleProjected: projected,
     },
     { status: 201 },
   );

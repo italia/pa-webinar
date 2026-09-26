@@ -3,8 +3,8 @@
  *
  * The multitrack recording bot subscribes to every track, so it has to be in
  * the room. Left unfiltered it inflates the "N persone" headcount and shows up
- * in the roster (F2: "il count dovrebbe essere solo delle persone vere non
- * recording"). These helpers are the single source of truth for excluding it.
+ * in the roster: the count must report only real people, never the recorder.
+ * These helpers are the single source of truth for excluding it.
  *
  * SECONDA LINEA, non la prima: quando il deployment configura
  * `recorder.hiddenDomain` (vedi il chart), il bot si autentica sul dominio
@@ -23,7 +23,7 @@ function isRecorderName(s?: string | null): boolean {
   // Match the FULL bot name as a prefix, not just the '📼' emoji. This still
   // catches whitespace and formatted-suffix variants ("📼 Recorder (me)",
   // " 📼 Recorder ") that an exact `=== '📼 Recorder'` comparison let slip
-  // through (live feedback #2), but does NOT hide a real attendee whose name
+  // through, but does NOT hide a real attendee whose name
   // merely begins with 📼 (e.g. "📼 Mia") — a bare '📼'-prefix match would have
   // wrongly filtered such a person from the roster and headcount, and would let
   // a griefer go invisible to moderation by prefixing their name with 📼.
@@ -35,7 +35,7 @@ function isRecorderName(s?: string | null): boolean {
  *
  *  The Jitsi IFrame API can leave `displayName` empty and surface the shown
  *  name in `formattedDisplayName` instead, so we exclude the bot if EITHER
- *  field is the recorder name — otherwise the whole F2 filter could silently
+ *  field is the recorder name — otherwise the whole bot filter could silently
  *  no-op and the bot would reappear in the count/roster. A plain "Recorder"
  *  with no '📼' marker is still treated as a human (the emoji is the signal). */
 export function isHumanParticipant(p: {
@@ -46,9 +46,9 @@ export function isHumanParticipant(p: {
 }
 
 /**
- * Stable-per-person key used to collapse duplicate endpoints (F4: "quando
- * qualcuno entra ed esce — Back del browser — rientra ma viene contato come
- * nuovo utente. Alex è entrato 3 volte, risulta 3!").
+ * Stable-per-person key used to collapse duplicate endpoints: someone who
+ * leaves and re-enters (typically with the browser Back button) must not be
+ * counted as a new attendee — three re-entries are still one person.
  *
  * The IFrame API does NOT surface our JWT identity (`context.user.id`) on a
  * client-side participant — only the endpoint id (a fresh per-connection value),
@@ -78,8 +78,8 @@ export function participantIdentityKey(p: {
 
 /**
  * Human headcount for a Jitsi IFrame API instance: the number of DISTINCT human
- * identities in the room, bot excluded (F2) and re-entry "zombies" collapsed
- * (F4: "Alex è entrato 3 volte, risulta 3!").
+ * identities in the room, recording bot excluded and re-entry "zombies"
+ * collapsed (three re-entries by the same person are still one person).
  *
  * We count the roster directly instead of subtracting corrections from
  * `getNumberOfParticipants()`. The old subtract-from-total form was off by one:
@@ -89,9 +89,9 @@ export function participantIdentityKey(p: {
  * `case "participant-joined"`, which writes the LOCAL user's displayName into
  * `_participants`. The local user is therefore IN the roster, matched the seeded
  * key, and was counted as a duplicate — so every client under-reported by one.
- * That is exactly the "4 persone" of live feedback #4 (6 endpoints − 1 bot −
- * 1 self), and since #4b it was also the number persisted to
- * `Event.peakParticipants`.
+ * A room of 6 endpoints (5 people + the recording bot) was shown as "4 persone"
+ * instead of 5, and because clients also report their peak, that wrong number
+ * was persisted to `Event.peakParticipants`.
  *
  * Counting the union of {roster identities} ∪ {local identity} is correct under
  * BOTH shapes: where the roster includes the local user the union is a no-op,
@@ -138,7 +138,7 @@ export function humanParticipantCount(
     if (localEndpointId && (p.participantId ?? p.id) === localEndpointId) {
       sawLocal = true;
     }
-    if (!isHumanParticipant(p)) return; // the recording bot (F2)
+    if (!isHumanParticipant(p)) return; // the recording bot is not a person
     // participantIdentityKey falls back to the endpoint id for nameless
     // endpoints (distinct anonymous users never merge); `#anon-${i}` covers the
     // rare both-name-and-id-empty case so it still can't collide with another.

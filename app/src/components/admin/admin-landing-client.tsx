@@ -1,9 +1,11 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { Card, CardBody, Icon } from 'design-react-kit';
+import { Card, CardBody } from 'design-react-kit';
 
+import { Icon } from '@/components/ui/icon';
 import { Link } from '@/i18n/navigation';
+import type { PercorsoStatico } from '@/i18n/percorsi';
 
 interface AdminLandingClientProps {
   upcomingCount: number;
@@ -25,7 +27,7 @@ function AdminCard({
   description,
   children,
 }: {
-  href: string;
+  href: PercorsoStatico;
   icon: string;
   title: string;
   description: string;

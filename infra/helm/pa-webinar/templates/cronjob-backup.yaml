@@ -1,0 +1,210 @@
+{{- /*
+  Copia del database: un CronJob che fa pg_dump del PostgreSQL del chart in un
+  volume e tiene le ultime `backup.retention` copie, più un CronJob sospeso
+  (`-backup-tools`) da cui si crea a mano un pod con lo stesso volume e gli
+  stessi strumenti, per elencare, copiare altrove o ripristinare una copia.
+  Quel CronJob non ha una programmazione che scatti da sola e non contiene
+  nessuna azione: il pod aspetta i comandi di chi lo apre. Le istruzioni sono
+  nelle note dopo l'installazione.
+*/}}
+{{- $b := .Values.backup | default dict }}
+{{- if and (dig "enabled" false $b) (dig "enabled" false (.Values.postgresql | default dict)) }}
+{{- $pg := .Values.postgresql | default dict }}
+{{- $fullname := include "pa-webinar.fullname" . }}
+{{- $claim := dig "persistence" "existingClaim" "" $b | default (printf "%s-backup" $fullname) }}
+{{- /*
+  L'immagine del PostgreSQL del chart, composta come la compone il sottochart
+  (registro globale, registro, repository, digest o tag): pg_dump deve essere
+  della stessa versione del server.
+*/}}
+{{- $img := dig "image" dict $pg | default dict }}
+{{- $registro := dig "imageRegistry" "" (.Values.global | default dict) | default (dig "registry" "registry-1.docker.io" $img) }}
+{{- $repo := dig "repository" "bitnami/postgresql" $img | default "bitnami/postgresql" }}
+{{- $digest := dig "digest" "" $img | default "" }}
+{{- $immaginePg := ternary (printf "%s/%s@%s" $registro $repo $digest) (printf "%s/%s:%s" $registro $repo (toString (dig "tag" "latest" $img))) (not (empty $digest)) }}
+{{- $immagine := dig "image" "" $b | default $immaginePg }}
+{{- $pullPolicy := dig "pullPolicy" "IfNotPresent" $img | default "IfNotPresent" }}
+{{- $pullSecrets := list }}
+{{- range (concat (dig "imagePullSecrets" list (.Values.global | default dict) | default list) (dig "pullSecrets" list $img | default list)) }}
+{{- if kindIs "map" . }}
+{{- $pullSecrets = append $pullSecrets (toString (index . "name")) }}
+{{- else }}
+{{- $pullSecrets = append $pullSecrets (toString .) }}
+{{- end }}
+{{- end }}
+{{- /*
+  Credenziali: l'utente dell'applicazione, proprietario del database, con la
+  password dal Secret da cui la legge il sottochart. Senza un Secret indicato
+  il sottochart ne crea uno suo, con la chiave `password`.
+*/}}
+{{- $utente := default "eventi" (dig "auth" "username" "" $pg) }}
+{{- $database := default "pa_webinar" (dig "auth" "database" "" $pg) }}
+{{- $pgHost := include "pa-webinar.subchartFullname" (dict "nome" "postgresql" "valori" $pg "release" .Release.Name) }}
+{{- $pgPort := dig "primary" "service" "ports" "postgresql" 5432 $pg }}
+{{- $segreto := dig "auth" "existingSecret" "" $pg | default "" }}
+{{- $chiave := "password" }}
+{{- if $segreto }}
+{{- $chiave = dig "auth" "secretKeys" "userPasswordKey" "password" $pg | default "password" }}
+{{- else }}
+{{- $segreto = $pgHost }}
+{{- end }}
+{{- if not (dig "persistence" "existingClaim" "" $b) }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ $claim }}
+  labels:
+    {{- include "pa-webinar.labels" . | nindent 4 }}
+    app.kubernetes.io/component: backup
+  annotations:
+    # Le copie sopravvivono a `helm uninstall`: si cancellano solo a mano.
+    helm.sh/resource-policy: keep
+spec:
+  accessModes:
+    - ReadWriteOnce
+  {{- with (dig "persistence" "storageClass" "" $b) }}
+  storageClassName: {{ . | quote }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ dig "persistence" "size" "10Gi" $b | default "10Gi" }}
+---
+{{- end }}
+{{- range $ruolo := list "backup" "backup-tools" }}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ $fullname }}-{{ $ruolo }}
+  labels:
+    {{- include "pa-webinar.labels" $ | nindent 4 }}
+    app.kubernetes.io/component: {{ $ruolo }}
+spec:
+  {{- if eq $ruolo "backup" }}
+  schedule: {{ dig "schedule" "30 3 * * *" $b | quote }}
+  {{- else }}
+  # Sospeso per sempre: da qui si crea un pod a mano, con
+  # `kubectl create job <nome> --from=cronjob/{{ $fullname }}-backup-tools`.
+  schedule: "0 0 1 1 *"
+  suspend: true
+  {{- end }}
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      {{- $durata := int (dig "activeDeadlineSeconds" 3600 $b | default 3600) }}
+      {{- if eq $ruolo "backup" }}
+      ttlSecondsAfterFinished: {{ $.Values.cronjobs.dailyJobTtlSeconds | default 259200 }}
+      backoffLimit: 1
+      activeDeadlineSeconds: {{ $durata }}
+      {{- else }}
+      # Il pod aspetta `$durata` secondi e finisce con successo prima della
+      # scadenza del Job: nessun Job fallito, nessun avviso.
+      ttlSecondsAfterFinished: 600
+      backoffLimit: 0
+      activeDeadlineSeconds: {{ add $durata 300 }}
+      {{- end }}
+      {{- include "pa-webinar.disruptionTolerantFailurePolicy" $ | nindent 6 }}
+      template:
+        metadata:
+          # Etichette proprie, non quelle dell'app: il PodDisruptionBudget, lo
+          # spread e la NetworkPolicy del portale non devono contare questi pod.
+          labels:
+            {{- include "pa-webinar.backupSelectorLabels" $ | nindent 12 }}
+        spec:
+          restartPolicy: Never
+          automountServiceAccountToken: false
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1001
+            runAsGroup: 1001
+            fsGroup: 1001
+            seccompProfile:
+              type: RuntimeDefault
+          {{- with $pullSecrets }}
+          imagePullSecrets:
+            {{- range . }}
+            - name: {{ . }}
+            {{- end }}
+          {{- end }}
+          containers:
+            - name: {{ $ruolo }}
+              image: {{ $immagine }}
+              imagePullPolicy: {{ $pullPolicy }}
+              {{- if eq $ruolo "backup" }}
+              command:
+                - /bin/bash
+                - -c
+                - |
+                  set -euo pipefail
+                  # Le copie contengono dati personali: leggibili solo dal proprietario.
+                  umask 077
+                  cd /backup
+                  # Resti di una copia interrotta (pod ucciso a metà): mai contati fra le
+                  # copie. Solo quelli più vecchi della scadenza di un Job: un Job creato a
+                  # mano può girare insieme a quello programmato, e il suo parziale è vivo.
+                  find /backup -maxdepth 1 -name '.in-corso-*' -type f -mmin +{{ div (add $durata 360) 60 }} -delete
+                  ora="$(date -u +%Y%m%dT%H%M%SZ)"
+                  parziale="/backup/.in-corso-$ora.dump"
+                  finale="/backup/pa-webinar-$ora.dump"
+                  trap 'rm -f "$parziale"' EXIT
+                  pg_dump --format=custom --file="$parziale"
+                  # Un archivio che pg_restore non sa leggere non è una copia.
+                  pg_restore --list "$parziale" > /dev/null
+                  mv "$parziale" "$finale"
+                  echo "copia: $finale ($(du -h "$finale" | cut -f1))"
+                  # Le ultime RETENTION copie; il nome ordina per data.
+                  find /backup -maxdepth 1 -name 'pa-webinar-*.dump' -type f | sort -r \
+                    | tail -n +"$((RETENTION + 1))" | while read -r vecchia; do
+                        rm -f -- "$vecchia"
+                        echo "tolta: $vecchia"
+                      done
+              {{- else }}
+              # Nessuna azione: il pod resta in attesa dei comandi di chi lo apre
+              # (kubectl exec), e si chiude da solo alla scadenza del Job.
+              command: ["/bin/bash", "-c", "sleep {{ $durata }}"]
+              {{- end }}
+              env:
+                - name: PGHOST
+                  value: {{ $pgHost | quote }}
+                - name: PGPORT
+                  value: {{ $pgPort | toString | quote }}
+                - name: PGUSER
+                  value: {{ $utente | quote }}
+                - name: PGDATABASE
+                  value: {{ $database | quote }}
+                - name: PGPASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ $segreto }}
+                      key: {{ $chiave }}
+                - name: RETENTION
+                  value: {{ dig "retention" 7 $b | toString | quote }}
+                - name: HOME
+                  value: /tmp
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                runAsNonRoot: true
+                capabilities:
+                  drop:
+                    - ALL
+              {{- with (dig "resources" dict $b) }}
+              resources:
+                {{- toYaml . | nindent 16 }}
+              {{- end }}
+              volumeMounts:
+                - name: backup
+                  mountPath: /backup
+                - name: tmp
+                  mountPath: /tmp
+          volumes:
+            - name: backup
+              persistentVolumeClaim:
+                claimName: {{ $claim }}
+            - name: tmp
+              emptyDir:
+                sizeLimit: 64Mi
+---
+{{- end }}
+{{- end }}

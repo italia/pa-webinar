@@ -205,7 +205,8 @@ def transcribe_with_whisperx(
     Quality knobs:
       - `initial_prompt`: contesto testuale passato a Whisper (nomi
         propri, sigle, termini tecnici dell'evento). Migliora
-        drasticamente trascrizione di "PCM", "OVH", "Raffaele", etc.
+        drasticamente sigle e nomi propri (es. "PCM", "OVH", i nomi
+        dei relatori dell'evento).
       - `expected_speakers`: quando noto, forza k nel clustering di
         diarization invece dell'auto-detect. Risolve i casi
         "abbiamo 3 speaker ma il modello ne trova 6 (con outlier)".
@@ -504,9 +505,10 @@ def build_initial_prompt(
     solo "memoria" del modello durante la decodifica. Tipico contenuto:
     nome evento, organizzazione, nomi propri dei relatori, sigle.
 
-    Esempio:
+    Esempio (nomi segnaposto — i valori reali arrivano dai metadati
+    dell'evento, non dal codice):
       "Riunione del Dipartimento per la Trasformazione Digitale.
-       Partecipanti: Raffaele Vitiello, Alex Marchetti, Paolo Rossi.
+       Partecipanti: Mario Rossi, Anna Bianchi, Luca Verdi.
        Argomenti: piattaforma video, Kubernetes, Azure, OVH, PCM."
     """
     parts: List[str] = []

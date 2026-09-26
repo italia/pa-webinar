@@ -15,11 +15,11 @@ import { cookies } from 'next/headers';
 import { z } from 'zod';
 
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
-import { isAdminAuthenticated } from '@/lib/auth/admin-session';
+import { requireEventManager } from '@/lib/auth/staff-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { encryptPII, encryptPIIOrNull, hashEmail, tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
-import { AppError, UnauthorizedError, ValidationError } from '@/lib/errors';
+import { AppError, ForbiddenError, ValidationError } from '@/lib/errors';
 
 export const dynamic = 'force-dynamic';
 
@@ -41,8 +41,12 @@ async function loadEvent(id: string) {
 }
 
 export const GET = withErrorHandling(async (_request, context) => {
-  if (!(await isAdminAuthenticated(await cookies()))) throw new UnauthorizedError();
   const { id } = await context.params;
+  // Dell'evento: l'admin, o l'organizzatore che l'ha creato (ADR-014).
+  const session = await requireEventManager(await cookies(), id);
+  // La rubrica e' dell'amministrazione (ADR-014): l'organizzatore vede e
+  // scrive l'invito, non il profilo della persona collegata.
+  const conRubrica = session.role === 'admin';
   const event = await loadEvent(id);
 
   const rows = await prisma.eventInvitation.findMany({
@@ -62,7 +66,7 @@ export const GET = withErrorHandling(async (_request, context) => {
       email: tryDecryptPII(r.email),
       // Person.displayName is encrypted at rest; decrypt for the response
       // so the rubrica-linked invitation row shows a readable name.
-      person: r.person
+      person: conRubrica && r.person
         ? { ...r.person, displayName: tryDecryptPII(r.person.displayName) }
         : null,
     })),
@@ -70,8 +74,12 @@ export const GET = withErrorHandling(async (_request, context) => {
 });
 
 export const POST = withErrorHandling(async (request, context) => {
-  if (!(await isAdminAuthenticated(await cookies()))) throw new UnauthorizedError();
   const { id } = await context.params;
+  // Dell'evento: l'admin, o l'organizzatore che l'ha creato (ADR-014).
+  const session = await requireEventManager(await cookies(), id);
+  // La rubrica e' dell'amministrazione (ADR-014): l'organizzatore vede e
+  // scrive l'invito, non il profilo della persona collegata.
+  const conRubrica = session.role === 'admin';
   const event = await loadEvent(id);
 
   const body = await parseJsonBody(request);
@@ -82,6 +90,7 @@ export const POST = withErrorHandling(async (request, context) => {
       parsed.error.issues.map((i) => ({ path: i.path, message: i.message })),
     );
   }
+  if (!conRubrica && parsed.data.personId) throw new ForbiddenError();
 
   // Normalize the email for the deterministic hash. The plaintext is
   // never stored — only its encryption and its HMAC fingerprint.
@@ -117,7 +126,7 @@ export const POST = withErrorHandling(async (request, context) => {
         ...created,
         name: tryDecryptPII(created.name),
         email: emailNorm,
-        person: created.person
+        person: conRubrica && created.person
           ? { ...created.person, displayName: tryDecryptPII(created.person.displayName) }
           : null,
       },

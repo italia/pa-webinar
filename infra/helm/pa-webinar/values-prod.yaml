@@ -6,7 +6,13 @@
 #
 # Usage:
 #   helm install videocall ./infra/helm/pa-webinar \
-#     -f values.yaml -f values-prod.yaml -n videocall
+#     -f values.yaml -f values-prod.yaml -n videocall \
+#     --set jitsi-meet.prosody.jwt.secret=$JITSI_JWT_SECRET
+#
+# The conference needs the same secret as JITSI_JWT_SECRET in the
+# application Secret (see values-dev.yaml for the alternatives), and the
+# internal XMPP passwords should be pinned: see
+# jitsi.requirePinnedCredentials in values.yaml.
 # ─────────────────────────────────────────────────────────────
 
 app:
