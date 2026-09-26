@@ -37,12 +37,15 @@ pipeline cannot run unless the recordings domain is configured.
 A domain that is not configured is disabled, and the features that depend on
 it degrade:
 
-- **Files domain disabled.** Uploads in the administration area and chat
-  attachments answer `503` with `STORAGE_UNAVAILABLE`, the live room does not
-  offer file upload for materials, and `/api/assets/…` answers `404`.
+- **Files domain disabled.** The administration area offers only the URL
+  field for its file inputs, with the note "File uploads are not available on
+  this installation: paste the file's URL instead.", the live room offers no file upload for materials, and
+  the chat shows no attachment button. Called directly, the upload endpoints
+  answer `503` with `STORAGE_UNAVAILABLE`, logged at `warn`, not `error`. `/api/assets/…` answers `404`.
   Materials given as links keep working.
 - **Recordings domain disabled.** Jibri and the recorder bot cannot get upload
-  URLs, video upload answers `503`, AI post-production cannot start, and the
+  URLs, video upload answers `503` with `STORAGE_UNAVAILABLE` (logged at
+  `warn`), AI post-production cannot start, and the
   recordings reconcile job skips its run.
 
 Both domains may point to the same bucket. Their key prefixes do not overlap
@@ -729,7 +732,7 @@ change the settings and restart the portal.
 
 | Symptom | Cause | Fix |
 |---|---|---|
-| Uploads in the administration area answer `503` "Files storage is not configured on this instance" | The files domain resolved to disabled | Check `STORAGE_FILES_PROVIDER` (`azure` or `s3`, not `azure-blob`), the bucket and both keys, then restart the portal |
+| The file fields in the administration area show only a URL box, with the note "File uploads are not available on this installation: paste the file's URL instead."; a direct call to the upload route answers `503` "Files storage is not configured on this instance" | The files domain resolved to disabled | Check `STORAGE_FILES_PROVIDER` (`azure` or `s3`, not `azure-blob`), the bucket and both keys, then restart the portal |
 | The moderator's recording button reads **Recording not configured in infrastructure** | Jibri is not expected: `RECORDING_STORAGE_TYPE` is unset or `local`, or no recordings provider resolved | Set `RECORDING_STORAGE_TYPE` and the recordings credentials, then restart the portal |
 | Recordings do not play and the console shows a `media-src` violation | The recordings are served from an origin the policy cannot derive from the provider: a CDN, a custom domain, or a stored URL outside the configured account or bucket | Add the origin to `RECORDING_MEDIA_CSP_HOSTS` |
 | Video upload from the administration area fails with a CORS error in the browser console | The bucket's or storage account's CORS rules do not allow `PUT` from the portal origin | Add the CORS rule in [Creating buckets and containers](#creating-buckets-and-containers) |

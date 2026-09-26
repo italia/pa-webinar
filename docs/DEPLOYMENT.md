@@ -69,7 +69,7 @@ flowchart LR
   subgraph PORTAL["Portal and jobs: on by default"]
     APP["App Deployment<br/>db-migrate initContainer,<br/>Service, ConfigMap"]:::portal
     ING["Portal Ingress<br/>ingress.enabled"]:::portal
-    CRON["Scheduled jobs<br/>cronjobs.*.enabled"]:::job
+    CRON["Scheduled jobs<br/>cronjobs.*.enabled<br/>(lifecycle: only<br/>without the scaler)"]:::job
     HOOK["Config-reload hook Job<br/>configReloadHook.enabled"]:::job
   end
 
@@ -79,9 +79,11 @@ flowchart LR
     T_RD{{"redis.enabled"}}:::toggle
     RD[("Redis")]:::data
     T_JM{{"jitsi.enabled"}}:::toggle
-    JM["Jitsi Meet<br/>Prosody, Jicofo, JVB,<br/>web + conference Ingress"]:::media
+    JM["Jitsi Meet<br/>Prosody, Jicofo, JVB,<br/>web + conference Ingress,<br/>Prosody module ConfigMap"]:::media
     T_JR{{"jitsi.jvbHealthUrl empty and<br/>no subchart Service on 8080"}}:::toggle
     JR["Bridge REST Service<br/>port 8080, read through<br/>JVB_HEALTH_URL"]:::media
+    T_JC{{"jitsi.jicofoHealthUrl empty"}}:::toggle
+    JC["Jicofo REST Service<br/>port 8888, read through<br/>JICOFO_HEALTH_URL"]:::media
     T_JB{{"jitsi-meet.jibri.enabled"}}:::toggle
     JB["Jibri<br/>+ finalize ConfigMap"]:::media
     T_CT{{"jitsi-meet.coturn.enabled"}}:::toggle
@@ -109,6 +111,7 @@ flowchart LR
   REL --> T_RD -->|"true"| RD
   REL --> T_JM -->|"true"| JM
   JM --> T_JR -->|"true"| JR
+  JM --> T_JC -->|"true"| JC
   JM --> T_JB -->|"true"| JB
   JM --> T_CT -->|"true"| CT
   JM --> T_SC -->|"true"| SC
@@ -134,11 +137,14 @@ example profiles in `infra/helm/pa-webinar/examples/`.
 | PodDisruptionBudget for the app | `podDisruptionBudget.enabled` | on | off | on | on |
 | Application Secrets | `secrets.mode`: `generate` renders them, `external` renders a SecretStore and ExternalSecrets, `existing` renders nothing | `existing` | `generate` | `existing` | `existing` |
 | Scheduled jobs `reminders`, `email-outbox`, `cleanup`, `recordings-reconcile`, `rubrica-retention` | `cronjobs.<key>.enabled`, with the keys `reminders`, `emailOutbox`, `cleanup`, `recordingsReconcile`, `rubricaRetention` | on | on | on | on |
+| Event lifecycle CronJob `<fullname>-lifecycle`, every minute | `cronjobs.lifecycle.enabled`, and the JVB scaler CronJob not rendered | on | on | on | off |
 | Config-reload hook: a post-install and post-upgrade Job with its RBAC | `configReloadHook.enabled` | on | on | on | on |
 | PostgreSQL (Bitnami subchart) | `postgresql.enabled` | on | on | off, external database | off, external database |
 | Redis (Bitnami subchart) | `redis.enabled` | on | on | on | on |
 | Jitsi Meet (jitsi-contrib subchart): Prosody, Jicofo, JVB, web and the conference Ingress | `jitsi.enabled` | on | on | on | on |
 | Bridge REST Service `<fullname>-jvb-rest` (port 8080, for the status page and metrics) | `jitsi.enabled`, `jitsi.jvbHealthUrl` empty, and the subchart's bridge Service not exposing 8080 | on | on | on | on |
+| Jicofo REST Service `<fullname>-jicofo-rest` (port 8888, for the status page) | `jitsi.enabled` and `jitsi.jicofoHealthUrl` empty | on | on | on | on |
+| ConfigMap `pa-webinar-prosody-plugins` with the Prosody module that sets room roles from the token | `jitsi.enabled`, and a Prosody volume that names it (`jitsi-meet.prosody.extraVolumes`, set by default) | on | on | on | on |
 | Conference-root redirect Ingress | `jitsi.webIngress.redirectUrl` is not empty | off | off | off | off |
 | Jibri (subchart) and the chart's finalize-script ConfigMap | `jitsi-meet.jibri.enabled` | off | off | on | on |
 | coturn (subchart) and its PodDisruptionBudget | `jitsi-meet.coturn.enabled`; the PDB also needs `coturnPodDisruptionBudget.enabled` | off | off | off | off |
@@ -161,8 +167,20 @@ Things the table does not show:
   `pa-webinar-postgresql` and `pa-webinar-redis-master`. The bridge Deployment is
   `pa-webinar-jitsi-meet-jvb-0`: the subchart adds an index to the name.
 - **`jitsi.mode` does less than its name suggests.** It gates only the JVB scaler (with
-  `jvbScaler.enabled`) and the text of the post-install notes. Bridge placement, Jibri and replica
-  counts come from the values in the profile file, not from the mode.
+  `jvbScaler.enabled`), and through it the lifecycle CronJob, the text of the post-install notes, and
+  the `DEPLOY_PROFILE` that the status pages show. Bridge placement, Jibri and replica counts come from
+  the values in the profile file, not from the mode.
+- **Values the chart writes into the app ConfigMap.** Besides `app.env`, the ConfigMap carries
+  `JVB_SCALER_ENABLED`, `DEPLOY_PROFILE`, `DATABASE_BUNDLED`, `METRICS_JOB` and, with `jitsi.enabled`,
+  the in-cluster addresses of the conference's components (`JITSI_WEB_INTERNAL_URL`,
+  `PROSODY_INTERNAL_URL`, `JICOFO_HEALTH_URL`). Without the scaler it also writes `JVB_MAX_REPLICAS`
+  from `jitsi-meet.jvb.replicaCount`, when that is above zero and `app.env` does not declare that
+  another tool scales the bridges (`JVB_SCALER_ENABLED: "true"`). A key set in `app.env` always wins
+  ([Configuration reference](CONFIGURATION.md#videobridge-and-scaler)).
+- **In-cluster addresses use full Service names**, `<service>.<namespace>.svc.<global.clusterDomain>`,
+  with `cluster.local` when `global.clusterDomain` is unset and the short name when it is empty. A full
+  name resolves at once even when the Service does not exist, where a short name first walks every
+  search domain the node inherits.
 - **Keys that no template reads.** `postgresql.external.*` and `jitsi.external.*` are not used by any
   template, except that the install notes print `jitsi.external.domain`. An external database is
   configured through `DATABASE_URL`, and recording storage through `app.env` and Secret keys
@@ -903,9 +921,12 @@ open and whether you need TURN is in [Networking](INFRASTRUCTURE.md#networking).
 ### Authentication
 
 `jitsi-meet.enableAuth: true` and `jitsi-meet.enableGuests: false` make every room require a portal
-JWT; the secret is covered in [The Prosody JWT secret](#the-prosody-jwt-secret). The chart's values do
-not switch on token-based moderator roles on the Prosody side. The two values to add, and how to check
-them in a call, are in
+JWT; the secret is covered in [The Prosody JWT secret](#the-prosody-jwt-secret). The chart's values
+also make the token decide the room role: Prosody loads `token_affiliation` and the project's
+`token_affiliation_custom` module (mounted from the ConfigMap `pa-webinar-prosody-plugins`), and Jicofo
+runs without its own authentication and auto-owner rule. Keep those entries if you set your own
+`jitsi-meet.prosody.extraVolumes`, `extraVolumeMounts` or `XMPP_MUC_MODULES`: the
+`pa-webinar.validateJitsiRoles` guard stops the render otherwise. Details in
 [Server-side role enforcement](architecture/jitsi-integration.md#server-side-role-enforcement).
 
 ### Web image and pull secrets
@@ -964,8 +985,17 @@ The app probes the bridge and Jibri for its status page and metrics at `JVB_HEAL
   without `useHostPort` and `useHostNetwork`, the chart uses that Service instead.
 - **Several bridges.** The scaler's snapshot aggregates every bridge, and the status page prefers it.
   Without the scaler, the status page reads `/colibri/stats` from whichever bridge the Service picks,
-  so with more than one bridge the figures are a lower bound.
-- **Jibri.** `jitsi.jibriHealthUrl` defaults to `http://<release>-jitsi-meet-jibri:2222`.
+  so with more than one bridge the figures are a lower bound, and the page reports one bridge running
+  out of the `JVB_MAX_REPLICAS` expected.
+- **Jibri.** With `jitsi-meet.jibri.enabled` (and not `useExternalJibri`), `JIBRI_HEALTH_URL` defaults
+  to the subchart's Jibri Service on port 2222. Without Jibri the chart writes no `JIBRI_HEALTH_URL`,
+  unless `jitsi.jibriHealthUrl` sets one.
+- **The other components.** The status page probes the conference's web container, Prosody and Jicofo
+  at their in-cluster addresses, so the public certificate plays no part there:
+  `JITSI_WEB_INTERNAL_URL` (the subchart's web Service), `PROSODY_INTERNAL_URL` (Prosody's BOSH port,
+  5280) and `JICOFO_HEALTH_URL` (the chart's `<fullname>-jicofo-rest` Service on 8888).
+  `jitsi.webInternalUrl`, `jitsi.prosodyInternalUrl` and `jitsi.jicofoHealthUrl` override them; with
+  the last one set, the chart renders no Jicofo REST Service.
 
 How to read the status page is in [Monitoring and health](operations/monitoring.md).
 
@@ -1067,8 +1097,10 @@ The policy allows:
   - DNS on port 53 to `egress.dns.to` (default: `k8s-app: kube-dns` pods in any namespace). With
     NodeLocal DNSCache, add its address, for example an `ipBlock` for `169.254.20.10/32`;
   - PostgreSQL (`egress.postgres`) and Redis (`egress.redis`) pods;
-  - the Jitsi pods on 5222 and 5280 (Prosody), 8080 (the bridge REST API) and 2222 (the Jibri health
-    API), through `egress.jitsi`;
+  - the Jitsi pods on 5222 and 5280 (Prosody), 8080 (the bridge REST API), 2222 (the Jibri health
+    API), 80 (the web container, the value of `jitsi-meet.web.service.port`) and 8888 (the Jicofo REST
+    API), through `egress.jitsi`. The last two carry the status page's in-cluster probes: a values file
+    that replaces `egress.jitsi.ports` must keep them, or the web page and Jicofo appear down;
   - the recorder controller, when `recorder.enabled` and `recorder.controller.enabled` are on;
   - the ingress controller's namespaces (the same `fromNamespaceSelectors`) on 443 and 8443
     (`egress.ingressController`). The app calls the portal's and the conference's public hostnames,
@@ -1088,6 +1120,9 @@ Set what the defaults cannot know before you rely on the policy:
   in-cluster S3 endpoint.
 - **External database or Redis.** Replace `egress.postgres.to` or `egress.redis.to` with an `ipBlock`
   for its address.
+- **An internal certificate authority.** The app's outbound TLS (SMTP, object storage, an external
+  Jitsi) trusts only the system authorities. Give it yours with `app.extraCaCerts`
+  ([Configuration reference](CONFIGURATION.md#extra-certificate-authorities)).
 - **Per-participant recording.** The recorder controller gives each bot pod only its own labels, not the
   release's selector labels, so the policy drops the bot's calls to the app unless
   `fromNamespaceSelectors` and `fromPodSelectors` are both empty. Admit the bots with a `networkPolicy.ingress.extraRules` entry for pods labeled
@@ -1158,7 +1193,9 @@ What the metrics and alerts mean, the dashboard, and how to read the status page
 
    When the chart detects a problem, the notes (in Italian) include a checks section, headed
    `Da controllare`, that lists it: values still on `example.com`, unpinned conference credentials, a
-   third-party STUN server, no STUN and no `publicIPs`, or a redirect Ingress on a class that ignores it.
+   third-party STUN server, no STUN and no `publicIPs`, a redirect Ingress on a class that ignores it,
+   or neither the JVB scaler nor the lifecycle CronJob rendered, so that events would open and close only
+   by hand. Outside the checks, the notes name the lifecycle CronJob when it is rendered.
    Resolve every item.
    An app pod in `Init:ImagePullBackOff` means an image tag that does not exist, most often the
    migration tag: `kubectl describe pod` names the image. A pod that stays in `Init` otherwise points
@@ -1196,7 +1233,9 @@ What the metrics and alerts mean, the dashboard, and how to read the status page
    proves that SMTP and the `email-outbox` job work.
 
 5. **Enter a room.** Create a test event, open its room with **Start event** and join from two devices
-   on different networks.
+   on different networks. Without the scaler, check also that the lifecycle CronJob runs
+   (`kubectl get cronjob pa-webinar-lifecycle -n pa-webinar`): it opens published events at their start
+   time and ends them after their end time and grace.
    This is the only check that exercises the Prosody JWT and the media path. A room that never opens
    points at the JWT settings; a room with no audio or video points at the bridge's address and port.
    Symptoms and fixes are in [Troubleshooting](operations/troubleshooting.md).

@@ -1,6 +1,6 @@
 # Email and calendar
 
-PA Webinar sends a small, fixed set of transactional emails: registration confirmations, reminders, date-change notices, post-event follow-ups, staff sign-in links and the verification links of data-subject requests. It never sends marketing mail, and there is no mailing-list feature. Every message goes through one durable queue, the email outbox, and leaves over SMTP from a single scheduled job.
+PA Webinar sends a small, fixed set of transactional emails: registration confirmations, reminders, date-change notices, post-event follow-ups, moderator and speaker links, staff sign-in links and the verification links of data-subject requests. It never sends marketing mail, and there is no mailing-list feature. Every message goes through one durable queue, the email outbox, and leaves over SMTP from a single scheduled job.
 
 This page owns outgoing email behavior: the outbox pattern, the catalog of emails, their languages, reminders, calendar files, the sender identity and the editable templates, and the known gaps. It is written for developers who add or change an email and for operators who need to find out why a message did not arrive.
 
@@ -21,7 +21,7 @@ It does not repeat the neighboring topics:
 | In which language does an email arrive? | Italian, English, French, German or Spanish. Anyone whose language is not one of those five receives English text, with links that open the pages in their own language. |
 | Can the wording be changed? | Only for the registration confirmation and the reminder, per language, in **Email templates**. Every other email has fixed text. |
 | Can the sender be changed? | The display name and the reply-to address, yes, from the administration area. The sending address comes only from the deployment (`SMTP_FROM`). |
-| Do moderators, speakers or invited guests get their link by email? | Moderators and speakers, no. Invited people receive nothing until they register themselves; their personal link then arrives in the confirmation, like everyone else's. See [What the platform does not email](#what-the-platform-does-not-email). |
+| Do moderators, speakers or invited guests get their link by email? | Moderators and speakers, yes, when their address is given: the event's primary contact when the event is created or published, and named co-moderators and speakers when they are added ([Moderator and speaker links](#moderator-and-speaker-links)). Invited people receive nothing until they register themselves; their personal link then arrives in the confirmation, like everyone else's. See [What the platform does not email](#what-the-platform-does-not-email). |
 
 ## The outbox pattern
 
@@ -138,10 +138,12 @@ This is the complete list of producers: every call to `enqueueEmail()` in the ap
 | Email | Sent when | To | Carries | Editable | `metadata.kind` |
 |---|---|---|---|---|---|
 | Registration confirmation | A registration is created (`POST /api/events/<slug>/registrations`), or someone presses **Resend my access link** after the form reports that the address is already registered (`POST /api/events/<slug>/registrations/resend`). When public registration is off, also whenever the form is submitted again for an address that is already registered ([Invitation-only registration](#invitation-only-registration)) | The registrant | Personal join link, event page link, add-to-calendar links, `event.ics` attachment | Yes, **Registration confirmation** | `confirmation` |
-| Reminder | The reminders job finds one of the event's reminders due ([Reminders](#reminders)) | Every registrant who has not received that reminder | The same as the confirmation, plus a "starts tomorrow / in N hours / in N minutes" note | Yes, **Event reminder** | `reminder` |
+| Reminder | The reminders job finds the event's current reminder due ([Reminders](#reminders)) | Every registrant who had registered by the reminder's moment and has not received it | The same as the confirmation, plus a "starts tomorrow / in N hours / in N minutes" note | Yes, **Event reminder** | `reminder` |
 | Date-change notice | An edit of the event (`PUT /api/events/<id>`) changes its start or end time while the event is `PUBLISHED` | Every registrant | The new date and time and an `event-updated.ics` attachment. No link: it says that the personal join link is unchanged | No | `date-change-notification` |
 | Post-event thank-you | The reminders job finalizes an event that opted in (see [After the event](#after-the-event)) | Every registrant, whether or not they attended | Event page link, where the recap and the feedback form are | No | `post_event_participant` |
 | Post-event recap | The same run | The event's moderator contact (`moderatorEmail`), if set | Headcount, registrations, questions, polls and average feedback; event page link; recording link if the recording is published | No | `post_event_moderator` |
+| Moderator link | An event with a primary contact address (`moderatorEmail`) is created (`POST /api/events`, even as a draft) or published (`PUT /api/events/<id>`), or that address changes; once per address | The event's primary contact | The event's management link and the room link, both with the primary moderator token, and the warning that the link is personal and must not be shared | No | `moderator-link` |
+| Co-moderator or speaker link | A named grant with an email address is created (`POST /api/events/<id>/moderators`) | The grant's address | The room link with the grant's token, a text for the role (co-moderator or speaker) and the same warning | No | `moderator-link` |
 | Staff sign-in link | A request from the sign-in page (`POST /api/staff/login-link`), an administrator creating a staff account with the invitation option, or re-sending the link from **Accounts** | An active staff account | One-time sign-in link ([lifetime](#what-each-link-is)) | No | `staff-login` |
 | Data export link | A data subject asks for a copy of their data (`POST /api/gdpr/export/request`, right of access, Art. 15) | The address typed in the form | Signed link to `/privacy/my-data` ([lifetime](#what-each-link-is)) | No | `gdpr-export-request` |
 | Erasure link | A data subject asks for erasure (`POST /api/gdpr/erasure/request`, right to erasure, Art. 17) | The address typed in the form | Signed link to `/privacy/my-data/erasure` ([lifetime](#what-each-link-is)) | No | `gdpr-erasure-request` |
@@ -174,7 +176,7 @@ The confirmation contains, in order:
 - add-to-calendar links for Google, Outlook and Yahoo, and a **Download .ics** link;
 - the note "Keep this email — it contains your personal link to access the event";
 - a **View event page** link;
-- a footer note, then the `event.ics` attachment.
+- a footer note, then the `event.ics` attachment. For registrants in the address book, the default footer note says how to leave the address book, and the signed opt-out link (**Remove me from the address book**, valid 90 days) follows the note even when an administrator has customized it ([Privacy and data protection](../GDPR.md#the-address-book)).
 
 A reminder has the same layout, with the "starts in…" sentence as its introduction and no note under the button.
 
@@ -191,23 +193,32 @@ The access model behind this is in [Identity, access and tokens](identity-and-ac
 
 ### After the event
 
-When an event has **Send recap email when the event ends** turned on (`Event.postEventEmailEnabled`), the reminders job finalizes it once it is `ENDED`. The logic is in `app/src/lib/events/post-event-finalize.ts`:
+When an event has **Send recap email when the event ends** turned on (`Event.postEventEmailEnabled`), the reminders job finalizes it once it is `ENDED`. Events reach `ENDED` by themselves at the end of their grace period, through the JVB scaler or the lifecycle job, so the follow-up needs no manual end ([Event lifecycle](event-lifecycle.md#running-without-the-scaler)). The logic is in `app/src/lib/events/post-event-finalize.ts`:
 
 - only events that ended within the last seven days (`MAX_AGE_DAYS`) are considered, so turning the option on for an old event sends nothing;
 - historical events created from **Publications** (type `LEGACY`) are skipped;
 - the event is claimed first by setting `postEventEmailSentAt`, with a conditional update, so two overlapping runs cannot both send; the follow-up goes out at most once per event;
 - the recap is computed if nobody has opened it yet, and its figures go into the moderator's email.
 
-The thank-you links to the event page. An `ENDED` event's page answers 404 unless **Event page visible after end** is on and its **Visible until:** date (`postEventPublicUntil`), if set, has not passed ([Event lifecycle](event-lifecycle.md)). The finalization checks neither, so the two options should be turned on together, with an end date that leaves registrants time to open the link ([Known gaps](#known-gaps)).
+The thank-you links to the event page, and for registrants in the address book it carries the same opt-out link as the confirmation. An `ENDED` event's page answers 404 unless **Event page visible after end** is on and its **Visible until:** date (`postEventPublicUntil`), if set, has not passed ([Event lifecycle](event-lifecycle.md)). The finalization checks neither, so the two options should be turned on together, with an end date that leaves registrants time to open the link ([Known gaps](#known-gaps)).
+
+### Moderator and speaker links
+
+The people who run an event receive their own link by email when an address is known (`app/src/lib/email/moderator-link.ts`):
+
+- **The primary contact** (`Event.moderatorEmail`) receives the management link and the room link, both with the event's primary moderator token. The email goes out when the event is created, including as a draft, when it is published, and when the address changes. It is sent once per address: the outbox row carries a deduplication key (the event and an HMAC of the address, never the token) in the unique column `email_outbox.dedup_key`, so a later publication or save, or two concurrent requests, queue nothing more (`enqueueEmailOnce()` in `app/src/lib/email/outbox.ts`). A co-moderator cannot change the primary contact address: `PUT /api/events/<id>` ignores `moderatorEmail` unless it comes with the primary token.
+- **Named co-moderators and speakers** (`EventModerator`) receive the room link with their own grant's token, once, when the grant is created with an address. The text depends on the role and promises a speaker no moderation powers.
+- **The language** is the one of the administration page that made the request: `?locale=`, then the language segment of the page in the `Referer`, then the site default. The text follows the five email languages.
+- **The link is a durable credential.** Each email says it is personal and must not be forwarded, pasted in a chat or shown while sharing the screen. The subject, which the outbox stores in plain text, never contains it, and errors log only the error's name. Nothing is sent for `ENDED` or `ARCHIVED` events or revoked grants.
+
+Staff can still copy the links from the administration area (**Copy moderator link**) and pass them on, for example to a grant created without an address.
 
 ### What the platform does not email
 
-- **Moderator and speaker links.** Neither the event's moderator link nor the links of named grants (`EventModerator`) are ever emailed. Staff copy them from the administration area (**Copy moderator link**) and pass them on. The email address stored with a grant is contact information only.
 - **Invitations.** `EventInvitation` rows are the allow-list for invitation-only registration ([Invitation-only registration](#invitation-only-registration); [From creation to recap](event-journey.md#invitations-and-named-grants)). The model has `token` and `sentAt` columns, but nothing sets them, and no email goes out: staff must send invited people the event page themselves.
 - **Announcements of future events.** The registration form can collect consent to receive information about upcoming events (`consentFutureCommunications`), but the platform sends nothing based on it. The flag is included in the **Export CSV** file of **Sign-ups** and in the data subject's own data export, for the controller to use outside the platform ([Privacy and data protection](../GDPR.md)).
 - **The outcome of a data-subject request.** The export is delivered in the browser that opens the signed link, and a completed erasure is confirmed on screen only.
 - **Event cancellation.** Archiving or deleting an event notifies nobody.
-- **Address-book opt-out links.** See [Known gaps](#known-gaps).
 
 Several texts in the administration area say otherwise; they are listed under [Known gaps](#known-gaps).
 
@@ -250,6 +261,7 @@ The language is stored once, at registration, and every later email to that regi
 | Confirmation | The page the person registered from, as above; a resend uses the stored `Registration.locale` |
 | Reminder, date-change notice, post-event thank-you | `Registration.locale`; for registrations that have none, the installation's default language (`SiteSetting.defaultLocale`) |
 | Post-event recap to the moderator | The installation's default language (`SiteSetting.defaultLocale`) |
+| Moderator and speaker links | The administration page that made the request: `?locale=`, then the language of the page in the `Referer`, then the installation's default language |
 | Staff sign-in link | The page the link was requested from: the sign-in page, or the administration page of the administrator who sent it |
 | Data-subject links | The page the request was made from, otherwise Italian |
 
@@ -273,16 +285,17 @@ A reminder is stored as `EventReminder` (`offsetMinutes`, `label`), and each del
 On each run, the reminders job (`GET /api/cron/reminders`) does the following:
 
 1. It loads the reminders of every event that is `PUBLISHED`, `LIVE`, `PROVISIONING` or `IDLE`. Drafts receive nothing, and neither do ended or archived events.
-2. It keeps the reminders that are due: `startsAt − offset ≤ now < startsAt`.
-3. For each due reminder, it takes every registration of the event with no `ReminderSent` row for it, queues the email, then writes the `ReminderSent` row.
+2. For each event that has not started, it picks the **current** reminder: among those that are due (`startsAt − offset ≤ now`), the one with the smallest offset, whose wording ("in 30 minutes") is closest to the time actually left. Larger due reminders are superseded and are not sent (`app/src/lib/email/reminder-plan.ts`).
+3. A current reminder that was created after its own moment goes to nobody. Otherwise it goes to every registration created by that moment with no `ReminderSent` row for it: the job queues the email, then writes the `ReminderSent` row.
 4. It runs the post-event finalization ([After the event](#after-the-event)).
 
 What follows from these rules:
 
-- **Late registrants catch up.** Someone who registers after a reminder's moment still receives it at the next run, as long as the event has not started. With the defaults, a person who registers in the last hour receives the confirmation and both reminders, including the one that says the event "starts tomorrow".
-- **Publishing late sends every overdue reminder at once**, for the same reason.
-- **The start closes the window.** A reminder that has not gone out when the event starts never goes out; the **Notifications** panel then shows "Not sent — the moment has passed".
-- **Rescheduling does not reset anything.** `ReminderSent` rows are kept when the date changes, so after an event is postponed, reminders that already went out are not sent again for the new date. Registrants learn about the change from the date-change notice, which is sent only while the event is `PUBLISHED`.
+- **At most one reminder per registrant per run**, never a burst of "starts tomorrow", "in one hour" and "in 30 minutes" together.
+- **Late registrants get only what is still ahead.** Someone who registers after a reminder's moment does not receive it: they have just received the confirmation. With the defaults, a person who registers in the last hour receives no reminder.
+- **Events created late skip the reminders already past.** An event created less than a day before its start never sends the one-day reminder, and a reminder added after its moment never goes out.
+- **The start closes the window.** A reminder that has not gone out when the event starts never goes out; the **Notifications** panel then shows "Not sent — the moment has passed". Before the start, a superseded reminder that never went out is shown as still pending.
+- **Rescheduling does not re-send.** `ReminderSent` rows are kept when the date changes, so after an event is postponed, reminders that already went out are not sent again. A superseded reminder that never went out can become current again at the new date and go out then. Registrants learn about the change from the date-change notice, which is sent only while the event is `PUBLISHED`. If the start moves earlier, into its last day, the one-day reminder can still be the current one and go out with its "starts tomorrow" wording.
 - **Precision depends on the schedule.** A reminder is queued by the first run of the reminders job after its moment, so it leaves up to one run interval late ([default schedules](#throughput-and-timing)), plus the outbox's minute and the [throughput](#throughput-and-timing) limit. With the chart default, the fifteen-minute preset can arrive at, or just after, the start: for an event that starts at 10:00:30, the only run inside the window is the one at 10:00, and the outbox sends the message at 10:01.
 - **At least once.** The email is queued before its `ReminderSent` row is written, so a failure between the two repeats the reminder at the next run.
 
@@ -294,9 +307,11 @@ Reminders go to registrants only. Moderators and speakers receive none.
 
 | Where | File | Organizer (`ORGANIZER`) |
 |---|---|---|
-| Attached to the confirmation and to every reminder | `event.ics`, `text/calendar; method=REQUEST` | The event's moderator contact (`moderatorName`, `moderatorEmail`), falling back to `SMTP_FROM` |
-| Attached to the date-change notice | `event-updated.ics` | The same |
-| Public download, `GET /api/events/<slug>/calendar.ics`, linked from emails, the registration confirmation screen and the add-to-calendar menu on the event page (**Download .ics file**) | `evento-<slug>.ics`, cached publicly for an hour (`app/src/app/api/events/[param]/calendar.ics/route.ts`) | Always `SMTP_FROM`, never the moderator's address |
+| Attached to the confirmation and to every reminder | `event.ics`, `text/calendar; charset=utf-8; method=PUBLISH` | `SMTP_FROM` |
+| Attached to the date-change notice | `event-updated.ics` | `SMTP_FROM` |
+| Public download, `GET /api/events/<slug>/calendar.ics`, linked from emails, the registration confirmation screen and the add-to-calendar menu on the event page (**Download .ics file**) | `evento-<slug>.ics`, cached publicly for an hour (`app/src/app/api/events/[param]/calendar.ics/route.ts`) | `SMTP_FROM` |
+
+The organizer address is always the platform's (`calendarOrganizerEmail()`), never the moderator's personal address; an empty `SMTP_FROM` counts as unset and gives the built-in placeholder. Every file uses `METHOD:PUBLISH`, as does the `method` of the attachment's content type: calendar clients add the event without asking for a reply, and send no RSVP to the organizer.
 
 The organizer column gives the address. The organizer name is `moderatorName`; when it is not set, the name is "PA Webinar" in confirmation and date-change files, and the site name in reminder files and in the public download.
 
@@ -313,10 +328,11 @@ A `TZID` label must not be added without a matching `VTIMEZONE` and a real conve
 - `SUMMARY`: the event title in the recipient's page language.
 - `DESCRIPTION`: the event description as stored, which is Markdown source, not rendered text.
 - `URL`: the public event page. The personal join link is **not** in the file.
-- `ORGANIZER`: as in the table above. In emailed files, every registrant therefore receives the moderator contact's address.
-- `UID`: generated at random for every file, with `SEQUENCE:0`.
+- `ORGANIZER`: the platform address, with the organizer name above.
+- `UID`: `<event id>@<portal host>`, the same in every file for the event (`icsUid()`).
+- `SEQUENCE`: the seconds from 2024-01-01 UTC to the event's last update (`Event.updatedAt`), which grows with every change of the event, dates included (`icsSequence()`).
 
-Because the `UID` is new each time, a calendar client cannot tell that `event-updated.ics` describes the event it already holds from the confirmation. The update arrives as a second, separate entry rather than as a change to the first.
+Because the `UID` is stable and the `SEQUENCE` grows, a calendar client recognizes `event-updated.ics`, a later reminder or the public download as the event it already holds, and updates that entry instead of adding a second one.
 
 ### Add-to-calendar links
 
@@ -336,7 +352,7 @@ Confirmation and reminder emails also carry links that open a pre-filled entry i
 
 - **The address is not editable from the administration area** on purpose. The relay authorizes a specific sender, and an address typed in by hand would silently break SPF and DKIM alignment instead of rebranding anything.
 - **Set a reply-to address.** The sending address is normally a no-reply mailbox, so without **Reply-to address** a registrant's reply reaches nobody.
-- **An empty `SMTP_FROM` is not the same as an absent one.** The built-in fallback address applies only when the variable is not set at all. An empty value, which is the placeholder in the chart's `values.yaml`, produces an empty sender address, and calendar files get an empty organizer.
+- **An empty `SMTP_FROM` is not the same as an absent one.** The built-in fallback address applies only when the variable is not set at all. An empty value, which is the placeholder in the chart's `values.yaml`, produces an empty sender address; calendar files, which treat it as unset, name the built-in placeholder address as organizer.
 - **If the settings cannot be read** (a database blip), the display name falls back to `SMTP_FROM_NAME`, then to "PA Webinar", no Reply-To is set, and a warning is logged. The send is not blocked.
 
 The display name is passed to the mail library as a structured value, which quotes and encodes it, so no character in a configured name can corrupt the `From` header.
@@ -463,13 +479,12 @@ On a local stack, every message is captured by Mailpit instead of being delivere
 
 | Gap | Effect | Tracked in |
 |---|---|---|
-| **The outbox is never emptied.** No job deletes `SENT` or `FAILED` rows, and erasure on request does not touch them. | Encrypted addresses and bodies, including personal join links, stay in the database indefinitely. The plain-text calendar attachments keep the moderator contact's address. | [Roadmap: the email outbox is never emptied](../ROADMAP.md#next) |
-| **The address-book opt-out link is never emitted.** `issueRubricaOptOutToken()` (`app/src/lib/persons/opt-out-token.ts`) has no caller, although the opt-out page and `POST /api/rubrica/opt-out` accept its tokens. | The registration form says consent to the address book can be withdrawn "using the 'Remove me from the address book' link in emails", but no email carries that link. | [Privacy and data protection](../GDPR.md) |
-| **Texts promise emails that are not sent.** The event wizard says speakers "receive a moderator link via email", that invited guests each get "a personal join link", and that the primary moderator receives "a private link by email". | Nobody receives those links unless staff copy and send them. | Not yet tracked |
+| **The outbox is never emptied.** No job deletes `SENT` or `FAILED` rows, and erasure on request does not touch them. | Encrypted addresses and bodies, including personal join links and moderator links, stay in the database indefinitely. The plain-text calendar attachments keep the moderator contact's name. The `moderator-link` rows are also what prevents a primary link from being sent twice: a purge that deletes them lets a later publication send it again. | [Roadmap: the email outbox is never emptied](../ROADMAP.md#next) |
+| **Texts promise emails that are not sent.** The event wizard says that invited guests each get "a personal join link". | Invited guests receive nothing until they register; staff must send them the event page. | Not yet tracked |
 | **Confirmations and reminders ignore the site name in their header.** No caller passes the site name to these two templates. | The header band always reads "PA Webinar", and `{{siteName}}` renders empty in confirmation overrides (it works in reminder overrides). | Not yet tracked |
 | **The date-change notice always names PA Webinar.** Its footer text is fixed in `app/src/lib/email/notification.ts`. | A white-labeled installation still tells registrants that the email was sent automatically by PA Webinar. | Not yet tracked |
 | **The button label of the confirmation and reminder is not escaped.** `ctaButton()` in `app/src/lib/email/templates.ts` inserts it into the HTML as is. | An override, or an event title placed in it through `{{eventTitle}}`, can add markup to the email. | Not yet tracked |
-| **Rescheduling does not reset reminders, and the updated calendar file has a new identity.** | After a postponement, reminders already sent are not sent again, and `event-updated.ics` creates a second calendar entry instead of moving the first. | Not yet tracked |
+| **Rescheduling does not reset reminders.** | After a postponement, reminders already sent are not sent again for the new date ([When a reminder goes out](#when-a-reminder-goes-out)). | Not yet tracked |
 | **The post-event thank-you does not check page visibility.** | With **Event page visible after end** off, or its end date already passed, every registrant receives a link that answers 404. | Not yet tracked |
 | **Emails in five languages.** | Registrants in any other interface language receive English text. | [Roadmap: known limitations](../ROADMAP.md#known-limitations-of-shipped-features) |
 | **Outbox throughput is fixed.** | At about 50 messages a minute, large mailings drain slowly and short-offset reminders can arrive late ([Throughput and timing](#throughput-and-timing)). | Not yet tracked |
@@ -484,6 +499,9 @@ On a local stack, every message is captured by Mailpit instead of being delivere
 | Draining the queue | `app/src/app/api/cron/email-outbox/route.ts` |
 | Reminders and post-event run | `app/src/app/api/cron/reminders/route.ts`, `app/src/lib/events/post-event-finalize.ts` |
 | Confirmation | `app/src/lib/email/confirmation.ts` |
+| Moderator and speaker links | `app/src/lib/email/moderator-link.ts` |
+| Which reminder is current | `app/src/lib/email/reminder-plan.ts` |
+| Address-book opt-out link in emails | `app/src/lib/persons/opt-out-link.ts` |
 | Personal join link and invitation-only registration | `app/src/lib/events/registration-link.ts`, `app/src/lib/events/registration-access.ts` |
 | Date-change notice | `app/src/lib/email/notification.ts` |
 | Built-in texts and layouts | `app/src/lib/email/templates.ts` |

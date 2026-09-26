@@ -44,7 +44,8 @@ can verify.
   guest, meaning someone who joins a `LIVE` event without registering, still holds a portal-signed token.
 
 Three values must agree between the two sides: the signing secret, the issuer and the audience. A
-fourth, the app ID, is kept aligned by convention.
+fourth, the app ID, is kept aligned by convention, and the subject matters only when Prosody verifies
+the domain.
 
 | Value | Portal environment | Prosody environment | Default |
 |---|---|---|---|
@@ -52,6 +53,7 @@ fourth, the app ID, is kept aligned by convention.
 | Issuer (`iss`) | `JITSI_JWT_ISSUER` | Must appear in `JWT_ACCEPTED_ISSUERS`, a comma-separated list | `pa-webinar` |
 | Audience (`aud`) | `JITSI_JWT_AUDIENCE` | Must appear in `JWT_ACCEPTED_AUDIENCES`, a comma-separated list | `jitsi` |
 | App ID | `JITSI_JWT_APP_ID` | `JWT_APP_ID`. Kept aligned by convention: the portal uses it only as the prefix of the `jti` claim | `pa_webinar` |
+| Subject (`sub`) | `JITSI_JWT_SUBJECT` (an empty value counts as unset) | Prosody requires a non-empty `sub`, and compares it with its XMPP domain only when `JWT_ENABLE_DOMAIN_VERIFICATION` is on, which the chart and Docker Compose leave off. Whoever turns it on sets `JITSI_JWT_SUBJECT` to the XMPP domain or `*` | `localhost:8443` (`DEFAULT_JITSI_JWT_SUBJECT`) |
 
 The defaults come from `app/src/lib/auth/jwt.ts`, `infra/helm/pa-webinar/values.yaml` and
 `docker-compose.yml`, and they agree.
@@ -94,9 +96,8 @@ other participant sees it on screen anyway. The portal controls where the name c
 - The shared primary moderator link requires a typed name, so that moderators do not all appear under
   one generic name.
 - The client passes Jitsi nothing else about the person. In `app/src/components/jitsi/jitsi-room.tsx`,
-  `userInfo` carries only the display name. The display name also serves as the conference statistics
-  ID (`statisticsId`), so it appears in the logs of Jitsi's components, such as Jicofo's. Those logs
-  must be handled as personal data.
+  `userInfo` carries only the display name. The portal sets no conference statistics ID, so the logs of
+  Jitsi's components, such as Jicofo's and the bridge's, carry a random one.
 
 ### Avatars without a third party in the browser
 
@@ -173,9 +174,10 @@ The rules on who gets a token and when are in
   external Jitsi. Review these
   values by hand, and join a test room after every change. Details:
   [Deploying with Helm](../DEPLOYMENT.md#the-prosody-jwt-secret).
-- **The token states the role, but the conference may not enforce it.** Whether Jitsi turns
-  `affiliation: owner` into conference-level moderator rights depends on Prosody and Jicofo modules.
-  The Docker Compose stack wires them. The chart's default values do not. See
+- **The token states the role; the conference enforces it only with the right wiring.** Whether Jitsi
+  turns `affiliation: owner` into conference-level moderator rights depends on Prosody modules and on
+  Jicofo assigning no roles of its own. The chart's default values and the Docker Compose stack wire
+  them; an external Jitsi, or values that replace the chart's Prosody volumes, must provide them. See
   [Server-side role enforcement](../architecture/jitsi-integration.md#server-side-role-enforcement).
 - **The user context is public to the room.** Adding a field to `context.user`, or a parameter to the
   avatar URL, is a privacy decision, and it must respect this record.

@@ -77,14 +77,14 @@ The wizard (`app/src/components/admin/event-wizard/`, shell in `wizard-shell.tsx
 | Step | What it sets |
 |---|---|
 | 1. **Basics** | Title and Markdown description for each enabled language; start, end and time zone (the site's default time zone; a new event starts tomorrow and lasts the template's default duration, or 120 minutes); expected participants; one cover image, stored both as the library cover and as the event image; waiting-room audio; tags; recurrence; per-event overrides for the title kicker, the waiting-room engine, the video quality preset and the expected share of participants who send audio or video. |
-| 2. **Permissions** | The role-by-feature permission matrix (the moderator column is always on), recording and automatic start, agenda, word cloud and whiteboard, and the AI post-production options. The options depend on each other: transcription needs recording; summary and translation need transcription; dubbing needs translation; per-participant recording needs recording and transcription; keeping participant tracks needs per-participant recording. Translation requires at least one target language. |
+| 2. **Permissions** | The role-by-feature permission matrix (the moderator column is always on), recording and automatic start, agenda, word cloud and whiteboard, and the AI post-production options. The whiteboard can be switched on only when the installation declares the whiteboard service (`NEXT_PUBLIC_WHITEBOARD_ENABLED`, read by the page at request time); otherwise the switch says why, and a value already on can only be switched off. The options depend on each other: transcription needs recording; summary and translation need transcription; dubbing needs translation; per-participant recording needs recording and transcription; keeping participant tracks needs per-participant recording. Translation requires at least one target language. |
 | 3. **People** | Co-organizing organizations, co-moderators and speakers ([named grants](#invitations-and-named-grants)), and [invitations](#invitations-and-named-grants). The address-book picker appears only to administrators. |
 | 4. **Content** | [Materials](#materials-and-agenda) and the pre-registration and post-event [questionnaires](#questionnaires-and-post-event-feedback). **Save draft and go to questionnaire management** creates the event as a draft and opens its questionnaire page. |
-| 5. **Review** | A summary, a configuration diagram and an estimated-capacity preview computed from the site's bridge-sizing settings ([scaling.md](scaling.md)); the data retention in days, with a one-line reminder that personal data is deleted after that threshold; the privacy notice template (the one marked as default is preselected), a custom privacy text and a privacy document; the primary moderator's name and email. |
+| 5. **Review** | A summary, a configuration diagram and an estimated-capacity preview computed from the site's bridge-sizing settings ([scaling.md](scaling.md)); the data retention in days, with a one-line reminder that personal data is deleted after that threshold; the privacy notice template (the one marked as default is preselected), a custom privacy text and a privacy document; the primary moderator's name and email, to which the moderator link is emailed ([email.md](email.md#moderator-and-speaker-links)). |
 
-Client-side checks run before moving on: a title of at least three characters in the default language, an end after the start, 2 to 500 expected participants, and target languages when translation is on. **Publish event** also requires the moderator name and a valid moderator email; **Save as draft** does not.
+Client-side checks run before moving on (`app/src/components/admin/event-wizard/validation.ts`): a title of at least three characters and a description of at least 10 characters, both in the site's default language and with leading and trailing spaces ignored; an end after the start; 2 to 500 expected participants; and target languages when translation is on. Title and description carry a `*` on the default language's tab, and when another language tab is open the error says which tab to switch to. The step 1 checks apply to **Save as draft** too, because the server stores drafts under the same rules. **Publish event** also requires the moderator name and a valid moderator email; **Save as draft** does not.
 
-The events API also requires an Italian title of at least 3 characters and an Italian description of at least 10 characters (`eventBaseSchema` in `app/src/lib/validation/schemas.ts`), whatever the site's default language, on creation and on every edit that sends them. The wizard checks only the title, and only in the site's default language, so a missing Italian text or a short description is reported only after submit, as `400 Validation failed`.
+The events API also requires an Italian title of at least 3 characters and an Italian description of at least 10 characters (`eventBaseSchema` in `app/src/lib/validation/schemas.ts`, with the threshold in `app/src/lib/validation/event-description.ts`), whatever the site's default language, on creation and on every edit that sends them. When the server still refuses the data (`422 VALIDATION_ERROR`), the wizard maps each issue to its step and field, jumps there and shows the localized message asking to check the highlighted fields. An issue that no field can show, such as a missing Italian text on a site whose default language is another, is quoted in the alert. The alert scrolls into view.
 
 `maxParticipants` is an estimate of attendance used for capacity planning, not a cap: registrations beyond it are accepted. The events API accepts up to 10,000 as a sanity bound (`app/src/lib/validation/schemas.ts`); the wizard stops at 500.
 
@@ -121,8 +121,8 @@ sequenceDiagram
     W->>E: PUT /api/events/{id} status PUBLISHED (Bearer moderatorToken)
     E->>DB: UPDATE status
   end
-  opt any side resource failed
-    W-->>O: toast naming the side resources that failed
+  opt any side resource or the publishing failed
+    W-->>O: toast naming what failed
   end
   W->>O: navigate to /admin/events/{id}/edit?created=1
 ```
@@ -148,7 +148,7 @@ sequenceDiagram
 
    A failure does not stop the sequence: the wizard collects the names of the resources that failed.
 3. **Publishing.** With **Publish event**, the wizard sends `PUT /api/events/{id}` with `{ "status": "PUBLISHED" }` and the moderator token.
-4. **Outcome.** If any side resource failed, a toast names it ("Event created, but some items weren't saved: …"). The toast lives in the administration layout, so it survives navigation. The wizard then clears its saved draft and navigates to `/admin/events/{id}/edit?created=1`, or to the event's questionnaire page when the organizer came from **Save draft and go to questionnaire management**.
+4. **Outcome.** If any side resource failed, a toast names it ("Event created, but some items weren't saved: …"). If the publishing request fails, the event stays a draft and a second toast says so, with the server's answer when there is one ("The event was created but not published: it is still a draft. …"). The toast lives in the administration layout, so it survives navigation. The wizard then clears its saved draft and navigates to `/admin/events/{id}/edit?created=1`, or to the event's questionnaire page when the organizer came from **Save draft and go to questionnaire management**.
 
 The browser keeps an unsaved copy of the form in `localStorage` under `pa-wizard-draft:new` (or `pa-wizard-draft:<eventId>` when editing), written 800 ms after the last change. When the wizard opens and finds one, it offers to restore or discard it.
 
@@ -163,7 +163,8 @@ The browser keeps an unsaved copy of the form in `localStorage` under `pa-wizard
    - queues a date-change email to registrants when the dates of a `PUBLISHED` event change ([email.md](email.md)).
 2. Related records are reconciled by difference against a snapshot taken when the page opened. A row is identified by a stable key: `name|organization` for organizations, `role|email` for named grants, the email for invitations, `title|url` for materials. Rows present only in the form are created and rows present only in the snapshot are deleted; rows on both sides are left untouched, so renaming one amounts to deleting it and adding it again.
 3. Questionnaires are written only if they changed, because the upsert rewrites fields the wizard does not show (title, required flag, extra languages). The upsert is refused with `409` once responses exist. An emptied questionnaire is deleted, together with all its responses: the wizard asks for no confirmation and shows no response count. Only the event's **Questionnaires** page shows the count and asks before deleting.
-4. If anything fails, the wizard stays on the page with a persistent alert that names the resources and the server's first reason, and keeps the local draft. The snapshot records every creation that succeeded, so saving again does not create a second copy of anything; a duplicated named grant would otherwise be one more working credential. A removal, however, leaves the snapshot even when it failed, so saving again does not retry it ([known limitations](#known-limitations)).
+   Every request of this reconciliation carries the primary moderator link as `Authorization: Bearer` (`app/src/components/admin/event-wizard/edit-fanout.ts`). Each ends as done, already done (a `404` on a removal, a `409` on an invitation that exists) or failed.
+4. If anything fails, the wizard stays on the page with a persistent alert that names the resources and the server's first reason, and keeps the local draft. The snapshot changes only for requests that are done or already done: saving again creates no second copy of anything (a duplicated named grant would otherwise be one more working credential), and retries whatever failed, removals included. A failed revocation of a co-moderator or speaker is named in the alert, one line per person, saying that their link is still valid and that it can be revoked from the **People** tab of the event page.
 5. On success, the wizard navigates to the event page, `/admin/events/{id}?token=<moderatorToken>`.
 
 ## Templates
@@ -251,7 +252,7 @@ Tags are managed by administrators in **Tag management** (`/admin/settings/tags`
 
 ## Registration
 
-The registration page is `/events/{slug}/registration`. It is reachable while the event is open for registration: `PUBLISHED` or `LIVE`, and for scheduled events also `PROVISIONING` or `IDLE` until `endsAt`.
+The registration page is `/events/{slug}/registration`. It is reachable while the event is open for registration: `PUBLISHED` until `endsAt`, `LIVE` also past it, and for scheduled events also `PROVISIONING` or `IDLE` until `endsAt` (`isEventOpenForRegistration()` in `app/src/lib/events/visibility.ts`). Past that point the page answers 404 and the registration API `409`.
 
 ```mermaid
 sequenceDiagram
@@ -344,7 +345,7 @@ Registrations are listed in the administration area under **Sign-ups**, both acr
 
 Step 3 of the wizard handles two different things.
 
-**Named grants** are co-moderators (role `MODERATOR`) and speakers (role `SPEAKER`), stored as `EventModerator` rows, each with its own magic-link token. The wizard creates them through `POST /api/events/{id}/moderators` with the primary moderator token. Each person's link, `/events/{slug}/live?token=<grant token>`, is copied from the **Co-moderators and speakers** panel on the event page, where each grant can also be revoked. What each seat can do is described in [identity-and-access.md](identity-and-access.md#moderator-and-speaker-links).
+**Named grants** are co-moderators (role `MODERATOR`) and speakers (role `SPEAKER`), stored as `EventModerator` rows, each with its own magic-link token. The wizard creates them through `POST /api/events/{id}/moderators` with the primary moderator token. Each person's link, `/events/{slug}/live?token=<grant token>`, is emailed once when the grant is created with an address ([email.md](email.md#moderator-and-speaker-links)), and can be copied from the **Co-moderators and speakers** panel on the event page, where each grant can also be revoked. The panel builds the links with the localized path of the page language. What each seat can do is described in [identity-and-access.md](identity-and-access.md#moderator-and-speaker-links).
 
 **Invitations** (`EventInvitation`) are a per-event list of people to invite, with role `GUEST` or `SPEAKER`:
 
@@ -507,11 +508,9 @@ Instant calls do not get the bridge pre-scaling of scheduled events, so a large 
 These describe the current code. Planned work is tracked in [ROADMAP.md](../ROADMAP.md).
 
 - **Invitations are not sent.** No route generates `EventInvitation.token` or queues an invitation email, although step 3 describes invitees as receiving a personal link.
-- **Links are not emailed.** The review step says the primary moderator receives the event link by email, and step 3 says the same of speakers. Nothing sends either: the links are copied from the event page's **Event links** and **Co-moderators and speakers** sections. The moderator's email is the organizer of the calendar attachment in the confirmation, reminder and date-change emails, and receives the post-event recap email.
-- **Content must exist in Italian.** The events API refuses a title or description without an Italian version, whatever the site's default language, and the wizard does not check the description before submit ([ROADMAP.md](../ROADMAP.md#known-limitations-of-shipped-features)).
+- **Content must exist in Italian.** The events API refuses a title or description without an Italian version, whatever the site's default language. The wizard checks the default language; on a site whose default is another language, the Italian requirement appears in the alert only after submit ([ROADMAP.md](../ROADMAP.md#known-limitations-of-shipped-features)).
 - **Post-create navigation.** After creating an event, the wizard opens `/admin/events/{id}/edit?created=1` without the moderator token, and the edit page answers `404` without it. The event itself exists and is reachable from the event list.
 - **Materials in the wizard.** Step 4 sends the material type in lowercase (`link`, `file`) while the materials API accepts only `LINK` and `FILE`, so materials added in the wizard are rejected and reported as not saved. The event's **Materials** page works.
-- **Removals in edit mode.** When editing, removing a co-organizing organization or a named grant sends the moderator token in a custom `X-Moderator-Token` header, which those routes do not read, so the request fails with `401`. The first save reports the failure, but the row has already left the wizard's snapshot: a second **Update event** reports success without removing anything, and the organization or grant still exists. Revoke grants in the **Co-moderators and speakers** panel on the event page. No screen removes a co-organizing organization; only the API does, with `DELETE /api/events/{id}/organizers/{orgId}` and the primary moderator link as `Authorization: Bearer`.
 - **Emptying a questionnaire deletes its responses.** In the edit wizard, removing every template and question from a questionnaire deletes it with all collected responses, without a confirmation or a response count ([ROADMAP.md](../ROADMAP.md#known-limitations-of-shipped-features)).
 - **Tags in edit mode.** `PUT /api/events/{id}` does not write `tagSlugs`, and the wizard does not call `/api/admin/events/{id}/tags`, so tag changes made while editing are not saved.
 - **Unchecked publication.** On **Publish event**, the wizard does not check the result of the publishing request: if it fails, the event stays a `DRAFT` without any message.

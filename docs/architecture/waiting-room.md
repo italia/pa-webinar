@@ -23,7 +23,7 @@ A password-protected event sends a visitor without a token to its password page 
 
 ### How the page stays current
 
-- Every 3 seconds the waiting room polls `GET /api/events/[param]/lifecycle`. It accepts a new status only if it is one the page can render (`PUBLISHED`, `PROVISIONING`, `IDLE`, `LIVE`, `ENDED`). During `IDLE` and `PROVISIONING` the response also carries warm-up telemetry: phase and a timer anchor.
+- As soon as it opens, and then every 3 seconds, the waiting room polls `GET /api/events/[param]/lifecycle`. It accepts a new status only if it is one the page can render (`PUBLISHED`, `PROVISIONING`, `IDLE`, `LIVE`, `ENDED`). During `IDLE` and `PROVISIONING` the response also carries warm-up telemetry: phase and a timer anchor. When the scaler is not driving the lifecycle ([Running without the scaler](event-lifecycle.md#running-without-the-scaler)), nothing is warming up: the phase is `scheduled` and there is no timer anchor. A phase the client does not know is dropped, and the room shows the generic waiting message (`app/src/components/live/lifecycle-warmup.ts`).
 - The first time the page sees the event `IDLE` (on load or from the status poll), the client sends `POST /api/events/[param]/wake` once, so the bridge starts while the visitor waits.
 - While the event is `LIVE`, the client polls `/api/status` every 3 seconds to learn whether the bridge is ready (`app/src/lib/jitsi/bridge-readiness.ts`).
 
@@ -35,8 +35,10 @@ Statuses, wake and overtime are owned by [the event lifecycle](event-lifecycle.m
 |---|---|---|
 | `PUBLISHED` | `startsAt` in the future | Countdown (it pulses during the last minute) and a disabled button **Opens at {time}**. Moderators also get **Start event** |
 | `PUBLISHED` | `startsAt` has passed | "The event is about to start, please wait for the organizer…" (not shown to moderators), above the same disabled **Opens at {time}** button, which still shows the scheduled time. Moderators also see **Start event** |
+| `PUBLISHED` | `endsAt` has passed | **The scheduled time for this event has passed**, with the badge **Time passed** and a pointer to the event page. Like the ended view, it has no name field, device check or entry button, and no **Start event** |
 | `IDLE` | Bridge scaled to zero | Same as `PROVISIONING`. The page sends the wake request once |
 | `PROVISIONING` | Bridge starting | Warm-up banner with a phase (**Request received**, **Starting the video server…**, **Provisioning a dedicated video server** after 75 seconds, **Video server up: almost there**) and an elapsed-time counter. Disabled button **Room warming up...** |
+| `PROVISIONING`, `IDLE` | The scaler is not driving the lifecycle | **The room opens at the start time**, with a clock instead of the spinner and no timer: the room opens at the start time or when the organizer starts it |
 | `LIVE` | Bridge reported as starting, for less than 60 seconds | Banner **Preparing room...** and a disabled button **The room is getting ready…**, with **Head to the square meanwhile** below it |
 | `LIVE` | Bridge ready or unknown | **Enter now**, which can always be pressed. With an incomplete form, pressing it marks the first missing field (the name, then the email, then the per-participant recording consent when it is asked), shows why and moves focus there. While the name is missing, **To enter, type your name (at least 2 characters).** already shows next to the field and above the button |
 | `LIVE` | Bridge still reported as starting after 60 seconds | **Enter now** behaves the same way, but the **Preparing room...** banner stays and the room is not announced as ready |
@@ -44,7 +46,7 @@ Statuses, wake and overtime are owned by [the event lifecycle](event-lifecycle.m
 
 Any other status (`DRAFT`, `ARCHIVED`) reached with a valid link shows the disabled **Opens at {time}** button.
 
-**Start event** is available to moderators for the whole `PUBLISHED` period. It sends `PUT /api/events/[id]` with `status: LIVE` and the moderator token.
+**Start event** is available to moderators while the event is `PUBLISHED`, `PROVISIONING` or `IDLE`, until `endsAt` (`canStartManually()` in `app/src/lib/events/lifecycle.ts`). It sends `PUT /api/events/[id]` with `status: LIVE` and the moderator token. Entry still waits for the bridge as described below.
 
 ```mermaid
 flowchart TD
@@ -52,12 +54,13 @@ flowchart TD
 
     STATUS -->|PUBLISHED| TIME{"startsAt still<br/>in the future?"}
     TIME -->|yes| COUNTDOWN["Countdown<br/>disabled 'Opens at {time}'"]
-    TIME -->|no| SOON["'The event is about to start…'<br/>+ disabled 'Opens at {time}'"]
-    STATUS -->|PUBLISHED, moderator| START["'Start event' button<br/>(any time before LIVE)"]
+    TIME -->|"no, endsAt ahead"| SOON["'The event is about to start…'<br/>+ disabled 'Opens at {time}'"]
+    TIME -->|"no, endsAt passed"| NOTHELD["'The scheduled time for<br/>this event has passed'<br/>no entry, no 'Start event'"]
+    STATUS -->|"PUBLISHED, PROVISIONING<br/>or IDLE, moderator"| START["'Start event' button<br/>(until endsAt)"]
 
     STATUS -->|IDLE| WAKE["POST /wake sent once,<br/>the first time IDLE is seen"]
     WAKE --> WARM
-    STATUS -->|PROVISIONING| WARM["Warm-up banner with phase and timer<br/>disabled 'Room warming up...'"]
+    STATUS -->|PROVISIONING| WARM["Warm-up banner with phase and timer,<br/>or 'The room opens at the start time'<br/>without the scaler<br/>disabled 'Room warming up...'"]
 
     STATUS -->|LIVE| BRIDGE{"Bridge reported<br/>as starting?"}
     BRIDGE -->|yes, under 60 s| PREP["'The room is getting ready…'<br/>(disabled)"]
@@ -78,12 +81,12 @@ flowchart TD
     class COUNTDOWN,SOON wait
     class WAKE,WARM,PREP prep
     class START,ENTER go
-    class ENDED done
+    class ENDED,NOTHELD done
 ```
 
 ### Bridge readiness: "no" is different from "don't know"
 
-The bridge value has three states. It is `false` only when the status page reports the bridge as scaling. It is `null` when the snapshot is stale, missing or in error, and `true` when the bridge is ready or already carrying participants. Only `false` closes the door. A stale snapshot does not lock people out of a healthy conference.
+The bridge value has three states. It is `false` only when the status page reports the bridge as scaling. It is `null` when the snapshot is stale, missing or in error, and `true` when the bridge is ready or already carrying participants. Only `false` closes the door. A stale snapshot does not lock people out of a healthy conference. Only the scaler reports a bridge as scaling: with fixed bridges the value is `true` while `JVB_HEALTH_URL` answers and `null` otherwise, and without `JVB_HEALTH_URL` it is always `null`, so the door never waits there ([Monitoring and health](../operations/monitoring.md#get-apistatus)).
 
 The door does not stay closed forever. After 60 seconds of "starting", the normal entry button returns. The **Preparing room...** banner stays, and the page does not announce that the room is ready, because the only evidence it has says otherwise.
 
@@ -101,6 +104,7 @@ All of these pieces live in one React tree. The classic view and the open square
 | Status banners | `IDLE`, `PROVISIONING`, or `LIVE` with the bridge starting | See [What each state shows](#what-each-state-shows) |
 | **Your name** | Every status except `ENDED` | At least 2 characters. Pre-filled for a registrant on the browser that registered and for a named grant. Empty for the shared primary moderator link, so each person types their own name |
 | **Email (optional)** | Guests only | Validated if filled in. It stays in the browser and is never sent to the server |
+| **Insecure address** | The page was opened over `http://` other than `localhost`, which is not a secure context | The browser gives such a page no microphone or camera, so the video call cannot start. The notice says so, above the name field, and links to the same page over `https://`. The link text shows only the host, never the personal token in the address. The room shows the same notice instead of loading Jitsi ([How PA Webinar extends Jitsi Meet](jitsi-integration.md)) |
 | Device check | Every status except `ENDED` | See [Device check and virtual backgrounds](#device-check-and-virtual-backgrounds) |
 | Music toggle | `PUBLISHED`, and only if the event has its own waiting-room audio | See [Waiting-room music](#waiting-room-music) |
 | Per-participant recording consent | When the event records per-participant audio and this visitor has not consented yet | A required checkbox. See [Consent and transparency notices](#consent-and-transparency-notices) |
@@ -109,7 +113,7 @@ All of these pieces live in one React tree. The classic view and the open square
 | **Leave the waiting room** | Every status except `PUBLISHED` and `ENDED` | Goes to the event page, or to the home page for an instant call. During `PUBLISHED` a **Back** link to the event page is shown instead |
 | Square invitation | See [Engines](#engines-classic-view-and-the-square) | **Step into the square** |
 | **How to take part** | Always | A short etiquette list from the i18n catalogs |
-| Recording notice | Recording is enabled and the event has not ended | "This event is being recorded." |
+| Recording notice | Recording is enabled, the installation can record (Jibri is expected, or the per-participant recorder is configured: `app/src/lib/recording/availability.ts`) and the event has not ended | "This event is being recorded." |
 | AI notice | AI post-production is on for the event | See [Consent and transparency notices](#consent-and-transparency-notices) |
 | **Event chat**, under **While you wait** | `LIVE`, `IDLE` or `PROVISIONING`, with chat enabled and readable | Readable before `LIVE` only with a token or on an instant call, the same rule the server applies. It unlocks once the name has 2 characters. See [live interaction](live-interaction.md) |
 

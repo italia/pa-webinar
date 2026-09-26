@@ -181,7 +181,7 @@ The conventions in full are in [API surface](../architecture/api.md#conventions)
 
 ### Reading configuration
 
-- **Read `NEXT_PUBLIC_*` only through `getPublicEnv()`** (`app/src/lib/env.ts`), in Server Components and route handlers. Pass the value to Client Components as a prop. A dot-notation read (`process.env.NEXT_PUBLIC_X`) is replaced when the image is built. The value is then frozen into the image, which breaks the single image that serves every installation. The few variables that are deliberately build-time are listed under [Build-time values](../CONFIGURATION.md#build-time-values).
+- **Read `NEXT_PUBLIC_*` only through `getPublicEnv()`** (`app/src/lib/env.ts`), in Server Components and route handlers. Pass the value to Client Components as a prop. A dot-notation read (`process.env.NEXT_PUBLIC_X`) is replaced when the image is built. The value is then frozen into the image, which breaks the single image that serves every installation. ESLint rejects that form outside `app/src/lib/env.ts` and the tests. The few variables that are deliberately build-time are listed under [Build-time values](../CONFIGURATION.md#build-time-values).
 - **Get the portal's absolute origin from `appBaseUrl()`**, in the same file. It returns `null` for a malformed `NEXT_PUBLIC_APP_URL`. Calling `new URL()` on the raw value instead throws, and turns a configuration mistake into a 500.
 - **Read site settings through `getSettings()`** (`app/src/lib/settings.ts`). It keeps a copy of the row in each process for 60 seconds.
 

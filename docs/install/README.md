@@ -127,9 +127,11 @@ them into the node. In the lab, that run took about five minutes with
 Docker's build cache already warm; a first build on a new machine takes
 longer.
 
-Then accept the conference's self-signed certificate first and the portal's
-second, sign in with the instance key, and join from browsers on the same
-workstation. Every step, the credentials for the published images, the
+The script also creates a certificate authority of its own, once, and signs
+the portal's and the conference's certificates with it. Trust that authority
+in your browser (or accept the conference's certificate warning first and the
+portal's second), sign in with the instance key, and join from browsers on the
+same workstation. Every step, the credentials for the published images, the
 installation by hand, what the overlay changes, the measured usage and how to
 stop or remove the profile are in
 [Try PA Webinar on minikube](minikube.md).
@@ -139,8 +141,8 @@ stop or remove the profile are in
 This is the technical checklist. The organizational one, from the license to
 the privacy notice, is the [Adoption checklist](../REUSE.md#adoption-checklist)
 in Reusing PA Webinar. The minikube evaluation needs none of the items below:
-the script provides nip.io names, self-signed certificates and a test
-mailbox.
+the script provides nip.io names, certificates from a local authority and a
+test mailbox.
 
 **Platform and chart**
 
@@ -167,10 +169,13 @@ mailbox.
       ingress. The portal and the conference are served by separate Ingresses
       in every profile. TURN over TLS needs a third name
       (`turn.webinar.example.com`) on coturn's own address.
-- [ ] **TLS certificates that browsers trust**, for both names. The portal's
-      status page also fetches the conference host from inside the cluster:
-      with a self-signed or internal-CA certificate it reports the conference
-      as down while calls work, unless the portal trusts the CA. With
+- [ ] **TLS certificates that browsers trust**, for both names. With the
+      conference in the cluster, the portal's status page checks its
+      components at their in-cluster addresses, so the certificate plays no
+      part there. When the portal calls a service behind an internal
+      certificate authority (SMTP, object storage, an external Jitsi), give
+      it the authority with `app.extraCaCerts`
+      ([Configuration](../CONFIGURATION.md)). With
       cert-manager, the chart expects a ClusterIssuer named
       `letsencrypt-prod`. HTTP-01 needs port 80 open from the Internet. On
       k3s, port 80 redirects every request to HTTPS, the challenge included:
@@ -415,7 +420,17 @@ The full sizing, per component and per meeting pattern, is in
   removes the nodes. The pre-scale window must cover node boot, image pull
   and bridge start, which have not been measured on GKE or EKS. k3s and
   minikube have no node autoscaler: there the simple profile runs one bridge
-  at a fixed count.
+  at a fixed count. The portal expects no more bridges than the fixed count:
+  without the scaler the chart writes `JVB_MAX_REPLICAS` from
+  `jitsi-meet.jvb.replicaCount`, unless `app.env` sets it.
+- **Events open and close by themselves in every profile.** With the scaler,
+  its CronJob also moves events through their statuses. Without it (the
+  simple and standard profiles, an external Jitsi, bridges scaled by KEDA),
+  the chart runs the `<release>-lifecycle` CronJob every minute
+  (`cronjobs.lifecycle`): it opens a published event at its start time, ends
+  it once its end time and the grace period have passed, and closes the call
+  sessions left open
+  ([Event lifecycle](../architecture/event-lifecycle.md)).
 - **The portal scales horizontally.** It keeps no state in the pod: a
   HorizontalPodAutoscaler adds replicas on CPU and memory (`autoscaling` in
   `infra/helm/pa-webinar/values.yaml`, which needs metrics-server), and Redis
@@ -627,13 +642,13 @@ send traffic straight to pods need an `ipBlock` rule for their ranges. See
 
 | Path | Status | What ran | What did not |
 |---|---|---|---|
-| minikube, `scripts/minikube-up.sh` | Tested in lab | A from-scratch install with no flags and locally built images, upgrades, stop, restart and purge; up to 20 participants on camera on 2 CPU / 3 GB; a moderator joining the embedded room in Chrome after both certificates were accepted | VM drivers, macOS, Windows, NetworkPolicy, participants on other machines, the recorder |
+| minikube, `scripts/minikube-up.sh` | Tested in lab | A from-scratch install with no flags and locally built images, upgrades, stop, restart and purge; up to 20 participants on camera on 2 CPU / 3 GB; a moderator joining the embedded room in Chrome after both certificates were accepted. An upgrade with the local certificate authority: certificates verified with curl, from inside the portal and by Chrome on Linux with the authority added, HTTP redirected to HTTPS, a guest who opened `http://` joining the room over HTTPS. Room roles with two lib-jitsi-meet clients in both join orders and through the portal's room: moderator link as moderator, registrant and guest as participants, a participant's mute and kick of the moderator refused | VM drivers, macOS, Windows, NetworkPolicy, participants on other machines, the recorder, the authority in Firefox or a system store |
 | k3s on one VM | Tested in lab | 20 participants on camera on 4 vCPU / 8 GiB, installed by hand. The scripts on a Debian 12 VM with no direct Internet access: install through a proxy, images from the bundle, 5 participants on camera over direct UDP | A publicly trusted certificate, a real SMTP relay, cert-manager |
 | k3s on several VMs | Tested in lab | Three VMs installed by hand: 20 participants on camera, and a node powered off during a call. The scripts on two nodes, a Rocky Linux 9 server with SELinux enforcing and a Debian 12 bridge node: 3 participants on camera over direct UDP, real client addresses in the audit log | A first air-gapped install, arm64, registry mirrors |
 | AKS | Exercised | Real events with one bridge behind a fixed address, the bridge scaler, coturn, Azure Blob storage, ingress-nginx and cert-manager | The multi-bridge topology. The module in `infra/tofu/aks` has been validated and tested with mocked providers, not applied |
 | GKE | Not yet verified | Module validation and tests with a mocked provider, a security scan of the configuration, `helm template` of the values it outputs | Anything on Google Cloud |
 | EKS | Not yet verified | The same checks as GKE | Anything on AWS |
-| The chart | Validated in CI on every push and pull request to `main` | `scripts/validate-chart.sh`, with Helm 3.16.3, renders the simple, standard and full profiles, the minikube and k3s overlays included, and checks invariants; CI also applies the simple, standard and full profiles to a disposable cluster with a server-side dry run | The managed-cloud overlays are rendered only by hand, with each module's output. No CI runs on the development branch |
+| The chart | Validated in CI on every push and pull request to `main` | `scripts/validate-chart.sh`, with Helm 3.16.3, renders the simple, standard and full profiles, the minikube and k3s overlays and the AKS, EKS and GKE overlays (without each module's output) included, checks invariants on every one of them, and checks that the render guards still stop inconsistent values; CI also applies the simple, standard and full profiles to a disposable cluster with a server-side dry run | The managed-cloud overlays with each module's output are rendered only by hand. No CI runs on the development branch |
 | Docker Compose | Development | Used to develop the code | Not load-tested. Not for events |
 
 No lab setup exercised TURN, Jibri recording or AI post-production, and
@@ -641,7 +656,14 @@ nothing checks after an installation that a room can actually be joined.
 
 ### Gaps you fill yourself
 
-- **Object storage**: the chart ships none.
+- **Object storage**: the chart ships none. Without it the portal hides its
+  upload controls, and materials given as links still work.
+- **The shared whiteboard**: Jitsi's whiteboard needs a collaboration server,
+  and the chart neither installs nor configures one, so rooms have no
+  whiteboard. The Jitsi subchart has an optional one
+  (`jitsi-meet.excalidraw.enabled`); the portal also needs
+  `app.env.NEXT_PUBLIC_WHITEBOARD_ENABLED: "true"`. That combination has not
+  been tested.
 - **Composite recording with Jibri**: the standard and full profiles turn
   Jibri on, but its upload script must be mounted by hand
   ([Mount the finalize script](../operations/recording-setup.md#mount-the-finalize-script)).

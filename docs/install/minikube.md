@@ -33,9 +33,12 @@ same chart on one workstation, with the simple profile
 (`examples/values-simple.yaml`) and a small overlay for a small node
 (`examples/values-minikube.yaml`). The chart, the simple profile, the secrets
 file and the upgrade commands are the ones a single-node installation uses.
-The overlay lowers the resource requests, caps the bridge's memory, and
-leaves out TLS certificates and third-party STUN, which a real installation
-needs ([Checklist before you install](README.md#checklist-before-you-install)).
+The overlay lowers the resource requests, caps the bridge's memory, redirects
+plain HTTP to HTTPS, and leaves out third-party STUN. Instead of publicly
+trusted certificates, the script signs its own with a certificate authority
+it creates on your workstation. A real installation needs trusted
+certificates and STUN or a public address
+([Checklist before you install](README.md#checklist-before-you-install)).
 
 The Docker Compose stack in the repository is for code work, not for
 evaluating an installation. Compared with it, minikube:
@@ -68,7 +71,7 @@ flowchart TB
   subgraph WS["Your workstation"]
     BR(["Browsers<br/>moderator and<br/>test participants"]):::ext
     subgraph NODE["minikube node: a Docker container at the node IP"]
-      ING["ingress-nginx<br/>HTTPS 443,<br/>self-signed certificate"]:::portal
+      ING["ingress-nginx<br/>HTTPS 443, certificates<br/>from a local CA"]:::portal
       APP["Portal<br/>(app)"]:::portal
       MP["Mailpit<br/>test mailbox"]:::ext
       subgraph JM["Jitsi Meet"]
@@ -79,7 +82,7 @@ flowchart TB
       end
       PG[("PostgreSQL")]:::data
       RD[("Redis")]:::data
-      JOBS["CronJobs<br/>email outbox,<br/>reminders, retention"]:::job
+      JOBS["CronJobs<br/>event lifecycle,<br/>email outbox,<br/>reminders, retention"]:::job
     end
   end
   style WS fill:#F7F9FB,stroke:#5C6F82,color:#17324D
@@ -106,23 +109,33 @@ On the node:
   directly, and asks no third-party STUN server.
 - **The scheduled jobs of the simple profile.**
   `kubectl --context pa-webinar -n pa-webinar get cronjobs` lists them. The
-  email outbox runs every minute.
+  event lifecycle and the email outbox run every minute.
 - **Mailpit**, a test mailbox that catches every email the portal sends. The
   script installs it next to the chart. Nothing leaves the workstation.
 - **Host names** on [nip.io](https://nip.io), which resolve to the address they
   contain: `app.<node-ip>.nip.io`, `jitsi.<node-ip>.nip.io` and
   `mail.<node-ip>.nip.io`.
+- **HTTPS on all three names**, with certificates signed by a certificate
+  authority that the script creates once on your workstation. Plain HTTP
+  redirects to HTTPS. Trust the authority once and the browser opens the
+  three names without warnings
+  ([Trust the local certificate authority](#1-trust-the-local-certificate-authority)).
 
 Not included, by design of the evaluation setup:
 
-- **Bridge scale-to-zero.** The bridge runs at a fixed count of one. Nobody
-  starts events for you: the moderator presses **Start event**. The
-  administration area's **Infrastructure** page shows **Fixed mode**.
+- **Bridge scale-to-zero.** The bridge runs at a fixed count of one. The
+  event lifecycle job opens a published event at its start time and ends it
+  once its end time and the grace period have passed; the moderator can still
+  press **Start event** earlier and **End for everyone**. The administration
+  area's **Infrastructure** page shows **Fixed mode**.
 - **Recording, file uploads and AI post-production.** They need object
-  storage, which the chart does not ship. Materials given as links work;
-  uploads answer with an error
+  storage, which the chart does not ship. Materials given as links work.
+  Without storage the portal hides the upload controls
   ([Two storage domains](../configuration/storage.md#two-storage-domains)).
-- **Jibri, TURN and trusted certificates.**
+- **The shared whiteboard.** Jitsi's whiteboard needs a collaboration server
+  that the chart does not install or configure, so rooms have no whiteboard
+  ([Gaps you fill yourself](README.md#gaps-you-fill-yourself)).
+- **Jibri, TURN and publicly trusted certificates.**
 - **Participants on other machines.** See
   [Invite colleagues](#5-invite-colleagues).
 - **NetworkPolicy enforcement.** The default network plugin ignores it.
@@ -282,14 +295,28 @@ this repository's sources".
    some cgroup v2 hosts minikube ignores `--cpus`; the script then caps the
    node container itself with `docker update --cpus`.
 3. **Chooses the images**, as in the diagram above.
-4. **Writes `values-local.yaml`** next to the secrets, with the nip.io host
-   names and the Mailpit SMTP settings. It is rewritten on every run.
-5. **Installs the chart** with `helm upgrade --install` and four values files:
+4. **Creates a certificate authority once**, in the same folder: the key
+   `ca.key` (EC P-256, 0600) and the certificate `ca.crt`, valid for ten
+   years. Its name constraints let it sign only names under `nip.io`,
+   `sslip.io` and the `--domain` given when it was created, so its key could
+   not impersonate any other site. With it the script signs one certificate per host name (under
+   `tls/`, valid 397 days) and loads them into the TLS Secrets `app-tls`,
+   `jitsi-tls` and `mail-tls`. It also puts the authority's certificate in the
+   ConfigMap `local-ca`, which the portal trusts for its own outbound
+   connections (`app.extraCaCerts`). Later runs keep the authority, and
+   re-sign a host's certificate only when the node IP changes or the
+   certificate nears its expiry.
+5. **Writes `values-local.yaml`** next to the secrets, with the nip.io host
+   names, the TLS Secrets of both Ingresses, the `local-ca` ConfigMap and the
+   Mailpit SMTP settings. It is rewritten on every run.
+6. **Installs the chart** with `helm upgrade --install` and four values files:
    `examples/values-simple.yaml`, `examples/values-minikube.yaml`,
    `values-local.yaml` and `secrets.yaml`. The chart's post-install notes go
    to `helm-notes.txt` in the same folder.
-6. **Checks** that `/api/health` answers `"status":"ok"` and the conference's
-   `config.js` answers 200, then prints the addresses:
+7. **Checks** that `/api/health` answers `"status":"ok"` and the conference's
+   `config.js` answers 200, both with the certificates verified against the
+   local authority, and that `http://` on both names redirects to `https://`.
+   It then prints the addresses and how to trust the authority:
 
    ```text
    ✓ PA Webinar è su minikube (profilo pa-webinar, namespace pa-webinar).
@@ -318,8 +345,10 @@ The installation by hand, command by command, is in
 
 ```bash
 IP=$(minikube -p pa-webinar ip)
-curl -sk https://app.$IP.nip.io/api/health                                    # {"status":"ok",...}
-curl -sk -o /dev/null -w '%{http_code}\n' https://jitsi.$IP.nip.io/config.js  # 200
+CA=~/.config/pa-webinar/minikube/pa-webinar/ca.crt
+curl -s --cacert $CA https://app.$IP.nip.io/api/health                                    # {"status":"ok",...}
+curl -s --cacert $CA -o /dev/null -w '%{http_code}\n' https://jitsi.$IP.nip.io/config.js  # 200
+curl -s -o /dev/null -w '%{http_code} %{redirect_url}\n' http://app.$IP.nip.io/             # 308 https://app.…/
 kubectl --context pa-webinar -n pa-webinar get pods
 ```
 
@@ -414,7 +443,26 @@ curl -sk -o /dev/null -w '%{http_code}\n' https://jitsi.$IP.nip.io/config.js   #
 ```
 
 The manual path leaves out Mailpit, which the script installs next to the
-chart: without an SMTP relay in your values, no email is sent.
+chart: without an SMTP relay in your values, no email is sent. It also leaves
+out the local certificate authority: both Ingresses serve the ingress
+controller's self-signed certificate, which you accept in the browser, the
+conference's first ([Trust the local certificate authority](#1-trust-the-local-certificate-authority)
+describes both ways). To use certificates of your own, load each into a TLS
+Secret and name it in `ingress.tls` and `jitsi-meet.web.ingress.tls`, as the
+script's `values-local.yaml` does:
+
+```yaml
+ingress:
+  tls:
+    - secretName: app-tls
+      hosts: ["app.<node-ip>.nip.io"]
+jitsi-meet:
+  web:
+    ingress:
+      tls:
+        - secretName: jitsi-tls
+          hosts: ["jitsi.<node-ip>.nip.io"]
+```
 
 ### What the overlay changes
 
@@ -434,14 +482,22 @@ On top of the simple profile, `examples/values-minikube.yaml`:
   the workstation reach directly, and asks no third-party STUN server;
 - uses the standard `jitsi/web` image at the subchart's Jitsi release, with no
   pull secrets;
-- selects the `nginx` ingress class, with no TLS section, so the controller's
-  self-signed certificate applies;
+- selects the `nginx` ingress class and sets
+  `nginx.ingress.kubernetes.io/force-ssl-redirect: "true"` on both Ingresses,
+  so plain HTTP always redirects to HTTPS. A page opened over `http://` is not
+  a secure context: the browser gives it no microphone or camera, and the room
+  keeps loading without saying why;
+- leaves `tls` empty on both Ingresses. The script adds its TLS Secrets in
+  `values-local.yaml`; without them the controller's self-signed certificate
+  applies;
 - sets `jitsi.requirePinnedCredentials: true`.
 
 The simple profile already caps the platform at its single bridge
-(`JVB_MAX_REPLICAS: "1"`). Without that cap, two live events at the same time
-would each ask for a bridge, and the waiting room would keep the join button
-disabled, showing that the video servers are starting.
+(`JVB_MAX_REPLICAS: "1"`), and the chart writes the same cap from
+`jitsi-meet.jvb.replicaCount` for any profile with fixed bridges and no
+scaler. Without that cap, two live events at the same time would each ask
+for a bridge, and the waiting room would keep the join button disabled,
+showing that the video servers are starting.
 
 `scripts/validate-chart.sh` renders the simple profile with this overlay, as
 the `semplice-minikube` profile. CI runs it on every push and pull request to
@@ -452,17 +508,60 @@ the `semplice-minikube` profile. CI runs it on every push and pull request to
 The screens are in Italian by default. The steps below use the English
 interface, under `/en/`, so that the labels match this page.
 
-### 1. Accept the two certificates
+### 1. Trust the local certificate authority
 
-The ingress controller serves a self-signed certificate. In your browser,
-open `https://jitsi.<node-ip>.nip.io` first and accept the warning, then do the
-same on `https://app.<node-ip>.nip.io`. The conference's certificate is the one
-that people forget: the conference runs in a frame inside the portal page, and
-a frame does not show the certificate warning, it just fails to load. This was
-tested in Chrome with a new profile. After both
-certificates were accepted, a moderator joined the conference in the room.
-With only the portal's certificate accepted, the room showed **Unable to
-connect to the room**.
+The portal, the conference and Mailpit present certificates signed by the
+authority that the script created,
+`~/.config/pa-webinar/minikube/pa-webinar/ca.crt`. The script prints its
+SHA-256 fingerprint; check it with
+`openssl x509 -in <file> -noout -fingerprint -sha256`. Trust it once, in one
+of these ways, then restart the browser:
+
+- **Chrome, Chromium or Edge on Linux** read the user's NSS database. With
+  `certutil` (package `nss-tools` on Fedora, `libnss3-tools` on Debian and
+  Ubuntu):
+
+  ```bash
+  certutil -d sql:$HOME/.pki/nssdb -A -t "C,," -n "PA Webinar minikube" \
+    -i ~/.config/pa-webinar/minikube/pa-webinar/ca.crt
+  ```
+
+  Or, in Chrome: **Settings** > **Privacy and security** > **Security** >
+  **Manage certificates**, and import it as an authority.
+- **Firefox**, on any system, keeps its own store: **Settings** >
+  **Privacy & Security** > **Certificates** > **View Certificates** >
+  **Authorities** > **Import**, and tick **Trust this CA to identify
+  websites**.
+- **The system store**, for curl and the other programs on the workstation.
+  Fedora:
+  `sudo cp <ca.crt> /etc/pki/ca-trust/source/anchors/pa-webinar-minikube.crt && sudo update-ca-trust`.
+  Debian and Ubuntu:
+  `sudo cp <ca.crt> /usr/local/share/ca-certificates/pa-webinar-minikube.crt && sudo update-ca-certificates`.
+- **macOS**, for Chrome and Safari:
+  `sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain <ca.crt>`.
+
+The authority can sign only names under `nip.io`, `sslip.io` and the domain
+given with `--domain`, so trusting it does not let its key impersonate any
+other site. Its key stays in the state folder, readable only by you. Running
+the script again keeps the same authority; `scripts/minikube-down.sh --purge`
+deletes it, and then you remove it from the browser or system too.
+
+**Without trusting it**, accept the browser's warning on both names, the
+conference first: open `https://jitsi.<node-ip>.nip.io` and accept, then
+`https://app.<node-ip>.nip.io`. The conference's certificate is the one that
+people forget: the conference runs in a frame inside the portal page, and a
+frame does not show the certificate warning, it just fails to load. In Chrome
+with a new profile, after both warnings were accepted, a moderator joined the
+conference in the room; with only the portal's accepted, the room showed
+**Unable to connect to the room**.
+
+In the lab, the script's checks verified the certificates against the
+authority with curl, and the portal verified the conference's certificate from
+inside the cluster. Chrome on Linux, with the authority added by the
+`certutil` command above to a new profile's database, opened the three names
+without warnings and loaded the conference's script from the portal page;
+without it, it refused them. Firefox, the system stores and macOS were not
+tried.
 
 ### 2. Sign in to the administration area
 
@@ -478,7 +577,7 @@ instance key**, enter the key in **Access key** and press **Sign in**.
 The instance key is for the first access, emergencies and automation. To work
 under your own name, open **Accounts**, add a person as **Administrator** or
 **Organiser**, and open the one-time sign-in link from Mailpit
-(`https://mail.<node-ip>.nip.io`, which also needs its certificate accepted).
+(`https://mail.<node-ip>.nip.io`, signed by the same local authority).
 [First access](../DEVELOPMENT.md#first-access) describes the same steps on the
 Compose stack.
 
@@ -497,10 +596,18 @@ Compose stack.
 
 ### 4. Open the room
 
-Open the **Moderator link**. On minikube no scheduler moves events through
-their statuses, so the room opens when the moderator presses **Start event**,
-and closes with **End for everyone**
-([Event lifecycle](../architecture/event-lifecycle.md)).
+Open the **Moderator link**. The event lifecycle job, which runs every
+minute, opens a published event at its start time and ends it once its end
+time and the grace period have passed. Before the start time the moderator
+opens the room with **Start event**, and **End for everyone** closes it at any
+time ([Event lifecycle](../architecture/event-lifecycle.md)).
+
+In the room, only moderator links make someone a moderator: the event's
+moderator link and those of named moderators. Registrants, guests and speakers
+join as participants, whoever enters first: they cannot mute, remove or
+promote anyone. The token that the portal signs decides the
+role; Jicofo, the conference's focus component, assigns none of its own
+([Jitsi extras](../../infra/jitsi/README.md#where-it-is-loaded)).
 
 ### 5. Invite colleagues
 
@@ -513,8 +620,9 @@ colleagues on their own computers, install it on a VM that they can reach:
 [`infra/onprem/k3s`](../../infra/onprem/k3s/README.md).
 
 On minikube, play the other participants yourself, with a second browser
-profile or a private window per participant. If the browser shows the
-certificate warning again, accept it on the conference host first.
+profile or a private window per participant. A new browser profile that does
+not trust the local authority shows the certificate warning again: accept it
+on the conference host first.
 
 - **Registrants.** Open the **Public event page**, register with any address,
   for example `colleague@example.com`, and open **Sign-ups** in the
@@ -532,9 +640,15 @@ yourself.
 
 ### 6. Look around
 
-- **System status** reports Jitsi, Prosody and Jicofo as down. The status page
-  checks the conference with certificate verification, and the certificate is
-  self-signed. Rooms work regardless.
+- **System status** checks the conference web front end, Prosody and Jicofo
+  at their addresses inside the cluster, which the chart gives the portal
+  (`JITSI_WEB_INTERNAL_URL`, `PROSODY_INTERNAL_URL`, `JICOFO_HEALTH_URL`), so
+  the certificates play no part there. Jibri is not deployed, and the portal
+  does not check it.
+- **Bridge counts stay at zero with one person in a room.** Jicofo places a
+  conference on the bridge when the second participant joins; until then the
+  bridge's statistics, and the pages that read them, show no conference and no
+  participants.
 - The site settings, branding and languages are in the administration area,
   and take effect without a reinstall
   ([Runtime settings](../configuration/runtime-settings.md)).
@@ -615,9 +729,15 @@ to `/etc/hosts`. `--domain sslip.io` was not tried in the lab.
 ### The room does not load in the portal
 
 The page shows **Unable to connect to the room**, or the conference area stays
-empty. The browser has not accepted the conference's certificate: open
-`https://jitsi.<node-ip>.nip.io` in the same browser profile, accept the
+empty. The browser does not trust the conference's certificate: trust the local
+authority ([Trust the local certificate authority](#1-trust-the-local-certificate-authority)),
+or open `https://jitsi.<node-ip>.nip.io` in the same browser profile, accept the
 warning, and reload the room.
+
+If the address bar shows `http://`, the page is not a secure context and the
+browser gives it no microphone or camera. The overlay redirects every `http://`
+request to `https://`; a bookmark or a proxy that keeps you on `http://` does
+not work.
 
 ### Audio and video do not flow
 
@@ -628,7 +748,28 @@ see
 
 ### The status page reports the conference as down
 
-Expected with self-signed certificates. See [Look around](#6-look-around).
+The portal checks the conference's components inside the cluster, so a
+certificate is not the cause. Check that their pods are running, and that the
+portal reaches them:
+
+```bash
+kubectl --context pa-webinar -n pa-webinar get pods -l app.kubernetes.io/name=jitsi-meet
+kubectl --context pa-webinar -n pa-webinar exec deploy/pa-webinar -c pa-webinar -- \
+  node -e 'fetch(process.env.JICOFO_HEALTH_URL + "/about/version").then(r => console.log(r.status))'   # 200
+```
+
+### An event does not open or close by itself
+
+The event lifecycle job opens and closes events. Check that it runs and that
+its jobs complete:
+
+```bash
+kubectl --context pa-webinar -n pa-webinar get cronjob pa-webinar-lifecycle
+kubectl --context pa-webinar -n pa-webinar get jobs | grep lifecycle
+```
+
+An event that should open stays closed while the bridge does not answer. The
+moderator can always open the room with **Start event**.
 
 ### Pods restart, or the node is slow
 
@@ -725,8 +866,11 @@ other.
   database, the loaded images and the pull Secret. It keeps the secrets file,
   which the next install reuses.
 - **Delete everything.** `scripts/minikube-down.sh --purge` also deletes the
-  secrets file and the generated values. It refuses `--stop`, which would leave
-  a database whose passwords nobody has.
+  secrets file, the local certificate authority with its host certificates,
+  and the generated values. It refuses `--stop`, which would leave a database
+  whose passwords nobody has. If you trusted the authority, remove it from the
+  browser or the system as well: its key no longer exists, and the next
+  install creates a new one.
 
 Local mode also leaves the images `pa-webinar:local` and
 `pa-webinar:local-migrate` in your workstation's Docker, and overwrites them on
@@ -739,14 +883,27 @@ them.
   driver with bridged networking, or UDP 10000 forwarded to the node, would
   also need host names on an address that other machines reach. The script
   does not do this, and it was not tested.
-- **Self-signed certificates.** Every browser profile accepts them by hand,
-  and the status page reports the conference as down.
+- **Certificates from a local authority.** They work only where you trusted
+  it; other browser profiles accept the warnings by hand, the conference's
+  first.
 - **Development images need credentials** until the packages are public.
   Without them the script builds the checkout, which takes a few minutes and
   needs Docker.
 - **One bridge, fixed.** One conference always runs on one bridge; the
   measured limits are in [Measured usage](#measured-usage).
-- **No object storage, recording, Jibri, TURN or AI post-production.**
+- **No object storage, recording, Jibri, TURN, AI post-production or shared
+  whiteboard.** Without object storage the portal hides the upload controls.
+- **Bridge counts stay at zero** until a room has two participants
+  ([Look around](#6-look-around)).
+- **No Prometheus.** The chart does not install one and `PROMETHEUS_URL` is
+  empty, so the administration's monitoring page has none of the series that
+  come from Prometheus.
+- **One client address for every browser.** All browsers on the workstation
+  reach the portal from the same address, so they share every per-address
+  limit: several people signing in or registering at once can get "too many
+  requests" ([Client address and rate limits](../CONFIGURATION.md#client-address-and-rate-limits)).
+- **Links in emails** point at the node's address, which only this
+  workstation reaches.
 - **The bridge keeps its memory** after load: about 1.4 GiB after a
   20-participant run.
 - **No NetworkPolicy enforcement** with the default network plugin. Starting

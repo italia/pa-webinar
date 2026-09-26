@@ -160,7 +160,7 @@ A fork would turn every upstream security fix into a merge project for each admi
 
 - **An IFrame API wrapper.** `JitsiRoom` is the only place that creates the Jitsi API object. Around the iframe, the portal draws its own control bar, drawer, raised-hand queue and leave prompt, and it sets the Jitsi toolbar and features per role and per device through configuration overrides.
 - **A portal-signed JWT without email addresses.** The portal decides who may enter and signs a short-lived token carrying a display name, a role, the room and an expiry, never an email address or a usable hash of one. Prosody verifies it, and Jitsi's own guest access stays off.
-- **A Prosody module** that takes the room role from the token, so moderator rights follow the portal's decision. The Docker Compose stack loads it. The Helm chart does not ship that wiring, so a Helm installation adds it through values.
+- **A Prosody module** that takes the room role from the token, so moderator rights follow the portal's decision. The Helm chart and the Docker Compose stack load it, and the chart also stops Jicofo from assigning roles of its own.
 - **A patched `jitsi/web` image.** It fixes three defects that have no configuration point: noise suppression on microphones that do not run at 48 kHz, a hidden self view that cannot be recovered, and reaction emoji that block clicks. The patches find their targets by shape, not by minified names, and the build fails if a shape is missing.
 - **A hidden XMPP domain for the recorder bot.** The per-participant recorder, headless Chrome running `lib-jitsi-meet`, signs in on that domain when it is configured, so it gets no tile and is not counted.
 - **Bridges driven by the event calendar** (see [Scalability](#scalability)).
@@ -224,7 +224,7 @@ To choose a platform, go through the checklist and read the measured requirement
 
 - **Capacity is two numbers.** Per event, the chart does not enable Jitsi's bridge cascading, so a conference stays on one bridge and a bigger event needs a bigger bridge. Across events, more bridges carry more conferences, up to the replica caps and the size of the node pool. Each extra bridge needs its own public address.
 - **Bridges scale to zero, opt-in, in the `full` profile only** (`jitsi.mode: full` with `jvbScaler.enabled: true`). A CronJob reads every bridge's statistics, and the portal decides from the event calendar how many bridges should run and moves events through their statuses. Bridges start before a scheduled event, and the node pool shrinks to zero between events.
-- **Without the scaler**, bridges run at a fixed count, and moderators start and end events themselves with **Start event** and **End for everyone**.
+- **Without the scaler**, bridges run at a fixed count, and a lifecycle job moves events every minute: it opens a published event at its start time and ends it after its end time and grace period. Moderators can still start an event early with **Start event** and end it with **End for everyone**.
 - **Without a node autoscaler**, as on minikube and k3s, the `simple` profile runs one bridge at a fixed count, and growing means a bigger node.
 - **Sizing comes from what the organizer declared**: expected participants and the share expected to send video. The defaults assume 16-core bridges (`jvbCpuCoresPerPod` in `app/prisma/schema.prisma`; the formula is in `app/src/lib/jvb-sizing.ts`). Align them with your hardware. The measured requirements of each platform are in [Requirements](docs/install/README.md#requirements), and the bridge measurements in [Load testing](docs/LOAD-TESTING.md).
 - **The app tier is stateless.** Pods scale with a HorizontalPodAutoscaler (`autoscaling` in `infra/helm/pa-webinar/values.yaml`), and Redis delivers live updates to every replica.
@@ -238,16 +238,18 @@ stateDiagram-v2
   classDef terminal fill:#EEF1F4,stroke:#5C6F82,stroke-width:2px,color:#17324D
   [*] --> PUBLISHED : moderator: Publish
   PUBLISHED --> PROVISIONING : scaler: pre-scale before the start
-  PUBLISHED --> LIVE : moderator: Start event
+  PUBLISHED --> LIVE : moderator: Start event<br/>lifecycle job: start reached
   PROVISIONING --> LIVE : scaler: bridge ready, start passed
   LIVE --> IDLE : scaler: room empty, bridge released
   IDLE --> PROVISIONING : wake: someone opens the room
-  LIVE --> ENDED : moderator: End for everyone<br/>scaler: grace period over
+  LIVE --> ENDED : moderator: End for everyone<br/>scaler or lifecycle job: grace period over
   ENDED --> ARCHIVED : daily cleanup: retention over
   note right of LIVE
     Scaler transitions
     need the full profile
-    with the scaler on
+    with the scaler on;
+    elsewhere the lifecycle
+    job opens and ends events
   end note
   class PUBLISHED human
   class PROVISIONING,IDLE auto
@@ -323,15 +325,15 @@ cd pa-webinar
 scripts/minikube-up.sh
 ```
 
-The script creates a minikube profile named `pa-webinar` (4 CPU and 6 GB by default) and never changes your current kubectl context. It generates the secrets once, in `~/.config/pa-webinar/minikube/pa-webinar/secrets.yaml`, outside the repository. It uses the images that the development branch publishes when the node can pull them; without registry credentials it builds them from your checkout, and in the lab the whole run took about five minutes with Docker's build cache already warm (a first build takes longer). At the end it prints the addresses:
+The script creates a minikube profile named `pa-webinar` (4 CPU and 6 GB by default) and never changes your current kubectl context. It generates the secrets once, in `~/.config/pa-webinar/minikube/pa-webinar/secrets.yaml`, outside the repository, and a local certificate authority that signs the certificates of the three addresses. It uses the images that the development branch publishes when the node can pull them; without registry credentials it builds them from your checkout, and in the lab the whole run took about five minutes with Docker's build cache already warm (a first build takes longer). At the end it prints the addresses:
 
 | Service | Address | Note |
 |---|---|---|
-| Conference | `https://jitsi.<node-ip>.nip.io` | Open it first and accept its self-signed certificate, or the room embedded in the portal does not load |
-| Portal | `https://app.<node-ip>.nip.io` | Accept its certificate too. The administration area is at `/en/admin/login`: **Sign in with the instance key**, with `ADMIN_API_KEY` from the secrets file |
+| Conference | `https://jitsi.<node-ip>.nip.io` | Trust the local certificate authority once, as the script explains, or open this address first and accept the certificate warning: otherwise the room embedded in the portal does not load |
+| Portal | `https://app.<node-ip>.nip.io` | Without the authority trusted, accept its certificate too. The administration area is at `/en/admin/login`: **Sign in with the instance key**, with `ADMIN_API_KEY` from the secrets file |
 | Mailpit | `https://mail.<node-ip>.nip.io` | Every email the portal sends lands here |
 
-Join from browsers on the same workstation: with the Docker driver, other machines cannot reach the node. The installation has no demo data and no scaler, so create an event and open its room with **Start event**. Every step, the measured usage and how to stop or remove the profile are in [Try PA Webinar on minikube](docs/install/minikube.md). For real events, continue with [Installing PA Webinar](docs/install/README.md).
+Join from browsers on the same workstation: with the Docker driver, other machines cannot reach the node. The installation has no demo data, so create an event: a lifecycle job opens it at its start time, and **Start event** opens it earlier. Every step, the measured usage and how to stop or remove the profile are in [Try PA Webinar on minikube](docs/install/minikube.md). For real events, continue with [Installing PA Webinar](docs/install/README.md).
 
 ### Change the code with Docker Compose
 

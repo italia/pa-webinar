@@ -389,8 +389,8 @@ under **Accounts**, then keep the key in a vault
 ### Transparency pages
 
 The public status page (`/status`) is on by default. It shows component
-health, replica counts, the deployment mode and the namespace, but no personal
-data. Turning off **Status page enabled** removes the page and keeps its data
+health, replica counts, the deployment mode, the namespace and the titles of
+upcoming public events, but no personal data. Turning off **Status page enabled** removes the page and keeps its data
 for administrators, while the live room still learns whether the bridge is
 ready. The service inventory
 (`/service-inventory`) publishes a CycloneDX document that describes what runs
@@ -430,7 +430,7 @@ Plan the first installation as a project, not as a routine procedure.
 | Helm chart | Rendered for every profile and validated in CI (invariant checks and a server-side dry run on kind) | The manifests are valid. That does not prove the installation works. [Chart issues found by the lab installs](INFRASTRUCTURE.md#chart-issues-found-by-the-lab-installs) lists them with their workarounds |
 | Kubernetes flavor | AKS exercised. minikube and k3s tested in lab. GKE and EKS not yet verified. OpenShift not covered | Expect to adapt node pools, load balancers and ingress to your provider ([Node pools and bridge exposure](INFRASTRUCTURE.md#node-pools-and-bridge-exposure)) |
 | Ingress | The values default to ingress-nginx and to a cert-manager ClusterIssuer named `letsencrypt-prod` | On another controller, set the Ingress classes and translate the ingress-nginx settings you need. Traefik is tested in lab. Controllers that speak only the Gateway API get no routes ([Ingress controllers](INFRASTRUCTURE.md#ingress-controllers)) |
-| Docker Compose | A development stack. Its placeholder secrets live in the tracked file. The portal is served without TLS, and the session cookie is `Secure`, so staff sign-in works only on `localhost`. It has no object storage and no TURN. It schedules only the `email-outbox`, `reminders` and `cleanup` jobs | For changing the code. It is not built to serve events ([Scheduled jobs](architecture/background-jobs.md)). To evaluate the chart, use [minikube](install/minikube.md) |
+| Docker Compose | A development stack. Its placeholder secrets live in the tracked file. The portal is served without TLS, and the session cookie is `Secure`, so staff sign-in works only on `localhost`. It has no object storage and no TURN. It schedules only the `email-outbox`, `lifecycle`, `reminders` and `cleanup` jobs | For changing the code. It is not built to serve events ([Scheduled jobs](architecture/background-jobs.md)). To evaluate the chart, use [minikube](install/minikube.md) |
 | Single VM | k3s on one VM with the simple profile, tested in lab. The VM is a single point of failure, there is no Jibri, and object storage is yours to provide | The documented path for a single server ([Installing on your own VMs with k3s](install/k3s.md)) |
 | Object storage | Azure Blob and S3-compatible providers are implemented, including video uploads from the administration area. Unit tests cover both providers with mocked SDKs. The S3 upload path has been exercised by hand against S3-compatible servers, but no automated test runs against a real storage service | The storage must accept uploads from browsers: CORS that allows `PUT` from the portal's origin and, on S3-compatible storage, an endpoint that is a public HTTPS address reachable by browsers and pods, and an access key with the permissions listed in [Object storage](configuration/storage.md#creating-buckets-and-containers). Test uploads and playback on your provider before the first event |
 | Composite recording (Jibri) | The standard and full profiles enable Jibri, but the chart does not wire the upload | The finalize script must be given to Jibri by hand, or composite recordings are neither uploaded nor registered ([Mount the finalize script](operations/recording-setup.md#mount-the-finalize-script)) |
@@ -529,7 +529,7 @@ software.
 
   The roadmap lists the narrow erasure as an open item, so account for it in
   your procedures. Rectification, portability and objection come to you. The
-  address book has an opt-out page, but no email carries its link yet. See
+  address book has its own opt-out link in the emails its members receive. See
   [What erasure deletes](GDPR.md#what-erasure-deletes).
 - Public bodies in the EU must publish an accessibility statement for their
   websites (Directive (EU) 2016/2102). In Italy, the Legge Stanca (Italian

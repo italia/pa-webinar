@@ -231,7 +231,11 @@ The whiteboard has no switch in the site settings. It is an opt-in on each event
 a whiteboard backend on the Jitsi side. The portal shows its **Whiteboard** button and the reminder
 to export the whiteboard only when the app environment sets `NEXT_PUBLIC_WHITEBOARD_ENABLED=true`
 for the whole installation. The live room reads that variable at request time, so a change needs a
-pod restart, not a new image (see the
+pod restart, not a new image. The same value drives the administration forms: when it is not `true`,
+the whiteboard switch of the event wizard (step 2) and of the event-template form cannot be switched
+on and says why, while a value already on can still be switched off. The chart installs no whiteboard
+server: the Jitsi subchart has an optional one (`jitsi-meet.excalidraw.enabled`, off), and that
+combination with the variable has not been tested (see the
 [Configuration reference](../CONFIGURATION.md#public-variables-next_public_) and
 [reactions, whiteboard and instant calls](../architecture/jitsi-integration.md#reactions-whiteboard-and-instant-calls)).
 
@@ -248,13 +252,18 @@ may send as. See [sender identity](email.md#sender-identity) for the transport a
 
 ### Event lifecycle and bridge timing
 
-The first four settings in this table are read by the JVB scaler. They have no effect unless the
-scaler runs: in the chart it runs only in the `full` profile with `jvbScaler.enabled: true`, which is
-off by default in `infra/helm/pa-webinar/values.yaml`, and Docker Compose has no scaler. See
-[running without the scaler](../architecture/event-lifecycle.md#running-without-the-scaler). Three
-uses apply without a scaler: `jvbPreScaleMinutes` still bounds the `/wake` window,
-`eventGracePeriodMinutes` still drives the overtime banner in the browser (which then counts down to a
-close that never comes), and `jvbProvisioningTimeoutMinutes` is read by the status pages.
+The first four settings in this table are read by the JVB scaler, in the chart's `full` profile with
+`jvbScaler.enabled: true` (off by default in `infra/helm/pa-webinar/values.yaml`), and three of them
+by the lifecycle cron that replaces it everywhere else, Docker Compose included
+([running without the scaler](../architecture/event-lifecycle.md#running-without-the-scaler)).
+Without a scaler:
+
+- `eventGracePeriodMinutes` ends `LIVE` rooms at `endsAt` plus grace, and drives the overtime banner;
+- `jvbInactiveGraceMinutes` ends open-ended rooms past `endsAt`, and instant calls, after that long
+  without activity; there is no `IDLE`;
+- `jvbEmptyCloseMinutes` applies only while `JVB_HEALTH_URL` answers;
+- `jvbPreScaleMinutes` bounds nothing, because `/wake` leaves a `PUBLISHED` event unchanged;
+- `jvbProvisioningTimeoutMinutes` marks no bridge as stale; it still applies to Jibri.
 
 Defaults are those of `app/prisma/schema.prisma`; accepted ranges are those of
 `app/src/lib/validation/site-settings.ts`. What each setting does to an event's status is described
@@ -263,18 +272,18 @@ in [event lifecycle](../architecture/event-lifecycle.md#lifecycle-settings).
 | Setting | Label and tab | Default | Accepted | Meaning |
 |---|---|---|---|---|
 | `jvbPreScaleMinutes` | **Pre-scale lead time (minutes)**, **Features** | `15` | 1 to 60 | How long before `startsAt` the scaler starts the bridge ([pre-scale window](../architecture/event-lifecycle.md#pre-scale-window)); the larger of this and `waitingRoomLeadMinutes` bounds how early a visitor can [wake](../architecture/event-lifecycle.md#wake) a room |
-| `jvbInactiveGraceMinutes` | **Inactivity minutes before shutdown**, **Features** | `45` | 5 to 240 | Empty time before a `LIVE` room goes `IDLE`, and before an open-ended room past `endsAt` is ended ([inactivity grace](../architecture/event-lifecycle.md#inactivity-grace-live-to-idle)) |
+| `jvbInactiveGraceMinutes` | **Inactivity minutes before shutdown**, **Features** | `45` | 5 to 240 | Empty time before a `LIVE` room goes `IDLE`, and before an open-ended room past `endsAt` is ended; without the scaler, also before an abandoned instant call is ended ([inactivity grace](../architecture/event-lifecycle.md#inactivity-grace-live-to-idle)) |
 | `eventGracePeriodMinutes` | **Default grace minutes past endsAt**, **Infra sizing** | `15` | -1 to 240 | Overtime after `endsAt`, where `-1` never ends the room on the clock; an event can override it ([grace period and overtime](../architecture/event-lifecycle.md#grace-period-and-overtime)) |
 | `jvbEmptyCloseMinutes` | **Empty-room minutes before definitive close**, **Features** | `-1` (off) | -1 to 240 | Opt-in: empty time after which a room that had participants is ended before `endsAt` ([opt-in empty close](../architecture/event-lifecycle.md#opt-in-empty-close)) |
 | `jvbProvisioningTimeoutMinutes` | **Provisioning timeout (minutes)**, **Features** | `15` | 1 to 120 | Wait for a bridge after which the status pages report it as stale. The same wait applies to Jibri: past it, `/api/status` reports the recorder as `failed` and the moderator's recording button stops reading **Recording starting…** ([moderator control bar](../architecture/jitsi-integration.md#app-owned-controls-around-the-iframe)). It never changes the event's status ([only a signal](../architecture/event-lifecycle.md#the-provisioning-timeout-is-only-a-signal)) |
 | `statusPollIntervalSeconds` | **Status page poll interval (seconds)**, **Features** | `30` | 5 to 600 | How often the public status page refreshes in the browser |
 | `orphanRecordingGraceDays` | Not in the panel ([set it through the API](#writing-a-field-the-panel-does-not-show)) | `30` | 0 to 365 | Days an unreferenced blob in recording storage waits before the `recordings-reconcile` CronJob deletes it. The job exists only in the chart. `0` turns automatic deletion off; blobs an administrator marks for immediate deletion are still removed ([recordings-reconcile](../architecture/background-jobs.md#recordings-reconcile)) |
 
-Automatic transitions happen on scaler ticks, so they lag their nominal time by up to one tick
-interval. Timing semantics, overtime and revival are in
+Automatic transitions happen on the ticks of the scaler or of the lifecycle cron, so they lag their
+nominal time by up to one tick interval (two minutes and one minute by default). Timing semantics, overtime and revival are in
 [event lifecycle](../architecture/event-lifecycle.md#timing-semantics).
 
-The scaler route also reads `JVB_PRE_SCALE_MINUTES`, `JVB_INACTIVE_GRACE_MIN` and
+The scaler route and the lifecycle cron also read `JVB_PRE_SCALE_MINUTES`, `JVB_INACTIVE_GRACE_MIN` and
 `JVB_EMPTY_CLOSE_MIN` from the environment, but only when the matching column is null. The columns
 are `NOT NULL`, so these variables have no effect, including the `JVB_PRE_SCALE_MINUTES` value set in
 `docker-compose.yml` and `.env.example`. Change the timing in the panel.
@@ -370,7 +379,9 @@ empty in `app/prisma/schema.prisma`:
   `aiDubbingEnabled` and the expected number of speakers, `expectedSpeakers`. A template can pre-fill
   them (the speakers from its `defaultExpectedSpeakers`). They have an effect only while
   `aiPipelineEnabled` is on;
-- live features such as `whiteboardEnabled`, which a template can pre-fill;
+- live features such as `whiteboardEnabled`, which a template can pre-fill; the wizard and the template
+  form offer the whiteboard only when the installation declares the whiteboard service
+  (`NEXT_PUBLIC_WHITEBOARD_ENABLED`);
 - the waiting-room music, `waitingRoomAudioUrl` (**Waiting-room audio (optional)** in **Basics**),
   offered only while the event is `PUBLISHED` (see
   [waiting-room music](../architecture/waiting-room.md#waiting-room-music)). There is no site-wide

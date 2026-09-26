@@ -97,7 +97,7 @@ sequenceDiagram
   APP-->>You: session under your own name and role
 ```
 
-To act as a moderator of a demo event, open one of the moderator links that the seed printed. There is no scaler in the local stack, so a room opens only when a moderator presses **Start event** (see [Local stack vs cluster](#local-stack-vs-cluster)).
+To act as a moderator of a demo event, open one of the moderator links that the seed printed. The `cron` service opens a published event at its start time and ends it after its end time and grace period; a moderator can open it earlier with **Start event** (see [Local stack vs cluster](#local-stack-vs-cluster)).
 
 ## Local services
 
@@ -110,16 +110,17 @@ To act as a moderator of a demo event, open one of the moderator links that the 
 | `redis` | `redis` (Alpine) | none | Realtime fan-out (chat, raised hands, live panels, square presence). Runs without persistence |
 | `jitsi-web` | `jitsi/web` | 8443 (HTTPS, self-signed) | Jitsi Meet web app and IFrame API |
 | `prosody` | `jitsi/prosody` | none | XMPP server. Verifies the portal's JWT and loads the custom module from `infra/jitsi/prosody-plugins/` |
-| `jicofo` | `jitsi/jicofo` | none | Conference focus |
-| `jvb` | `jitsi/jvb` | 10000/udp | Jitsi Videobridge. Carries the audio and video |
+| `jicofo` | `jitsi/jicofo` | none | Conference focus. Its REST API (port 8888) answers inside the Compose network, for the status probe |
+| `jvb` | `jitsi/jvb` | 10000/udp | Jitsi Videobridge. Carries the audio and video. Its REST API (port 8080, `/colibri/stats`) answers inside the Compose network, for the status probe and the lifecycle tick |
 | `mailpit` | `axllent/mailpit` | 8025 (web), 1025 (SMTP) | Captures every outgoing email, so nothing reaches a real inbox |
-| `cron` | `curlimages/curl` | none | Calls three `/api/cron/*` routes of `app` with the `x-api-key` header |
+| `cron` | `curlimages/curl` | none | Calls four `/api/cron/*` routes of `app` with the `x-api-key` header |
 | `db-migrate` (profile `setup`) | The `builder` stage of the root `Dockerfile` | none | One-shot: `prisma migrate deploy`, then the seed |
 | `recorder-controller` (profile `recorder`) | Built from `infra/recorder-controller/` | none | Starts one recorder bot container per recording (the per-participant recording path) through the Docker socket |
 
 A few details matter when something does not work:
 
-- **The `cron` loop.** It ticks every 30 seconds. It calls `email-outbox` every minute, `reminders` every 5 minutes and `cleanup` every hour, all three once at start-up. Each call logs `[cron] <route> ok` or a failure line (`docker compose logs cron`). Calls fail while the app is still starting, which is harmless. The cluster runs more jobs, at other cadences: see the parity matrix below and [Scheduled and background jobs](architecture/background-jobs.md).
+- **The `cron` loop.** It ticks every 30 seconds. It calls `email-outbox` and `lifecycle` every minute, `reminders` every 5 minutes and `cleanup` every hour, all four once at start-up. Each call logs `[cron] <route> ok` or a failure line (`docker compose logs cron`). Calls fail while the app is still starting, which is harmless. The cluster runs more jobs, at other cadences: see the parity matrix below and [Scheduled and background jobs](architecture/background-jobs.md).
+- **The status probes.** The `app` service reads the Jitsi components at their service names, as the chart does in a cluster: `JITSI_WEB_INTERNAL_URL` (`jitsi-web`), `PROSODY_INTERNAL_URL` (`prosody:5280`), `JICOFO_HEALTH_URL` (`jicofo:8888`) and `JVB_HEALTH_URL` (`jvb:8080`). The `jicofo` service sets `JICOFO_ENABLE_REST=1` and the `jvb` service `COLIBRI_REST_ENABLED=true` for this, the same switches the Jitsi subchart sets; neither port is published on the host. **System status** therefore shows every component probed, and the bridge as fixed bridges with `JVB_MAX_REPLICAS=1`, the one `jvb` service ([Monitoring and health](operations/monitoring.md#get-apistatus)).
 - **The bridge address.** The `jvb` service advertises `DOCKER_HOST_ADDRESS` (default `host.docker.internal`) as its address, and asks a public STUN server (`JVB_STUN_SERVERS` in `docker-compose.yml`) for its public address. Browsers on the same machine connect without changes. Other devices need more than this: see [Testing from another device](#testing-from-another-device).
 - **Shared placeholders.** `JITSI_JWT_SECRET` (default `s3cr3t_dev_only`) must be the same for `app`, `jitsi-web` and `prosody`, and `CRON_API_KEY` must be the same for `app`, `cron` and `recorder-controller`. Only `JITSI_JWT_SECRET`, `DOCKER_HOST_ADDRESS` and `COMPOSE_PROJECT_NAME` are read from your shell or from a `.env` file next to `docker-compose.yml` (ignored by Git). Every other value, `CRON_API_KEY` and `ADMIN_API_KEY` included, is written literally in each service, and changes only through an override file that updates every service that uses it.
 - **The PII key escape hatch.** The Compose `app` runs the production image with a dummy `PII_ENCRYPTION_KEY`, so it sets `ALLOW_INSECURE_PII_KEY=true`. Only `docker-compose.yml` sets it; `.env.example` deliberately does not. The reason is in [Development placeholders](../SECURITY.md#development-placeholders).
@@ -131,7 +132,7 @@ flowchart LR
   subgraph PORTAL["Portal"]
     direction TB
     APP["app<br/>PA Webinar portal and API<br/>host port 3000"]:::portal
-    CRON["cron<br/>calls three /api/cron routes<br/>with x-api-key"]:::job
+    CRON["cron<br/>calls four /api/cron routes<br/>with x-api-key"]:::job
   end
 
   subgraph JITSI["Jitsi Meet"]
@@ -205,12 +206,12 @@ Legend:
 | Portal, registration, live room, Q&A, polls, word cloud, reactions, timer, waiting room | **Same** | Same |
 | Realtime fan-out: chat, raised hands, live panels, the square | **Same**, with Redis running without persistence. When Next.js runs on the host without `REDIS_URL`, fan-out degrades as described in [Redis availability](architecture/live-interaction.md#redis-availability) | Redis subchart or managed Redis |
 | Email: confirmations, reminders, calendar files, sign-in links | **Same** outbox path. Mailpit captures the messages, and the `cron` service drains the outbox | CronJob `email-outbox` and a real SMTP relay |
-| Scheduled jobs | **Partial**: only `email-outbox` (every minute), `reminders` (every 5 minutes) and `cleanup` (hourly). `recordings-reconcile`, `rubrica-retention`, `multitrack-purge`, the post-production jobs and the JVB scaler never run. Call a `/api/cron/*` route by hand with the same header if you need it | CronJobs, at the schedules in `infra/helm/pa-webinar/values.yaml` ([catalog](architecture/background-jobs.md)) |
-| Event lifecycle automation: pre-start provisioning, `IDLE`, automatic end | **Manual**: a moderator opens the room with **Start event** and closes it with **End for everyone**. Without an end, an event stays `LIVE` ([Running without the scaler](architecture/event-lifecycle.md#running-without-the-scaler)) | Automatic with the `full` profile and the JVB scaler |
+| Scheduled jobs | **Partial**: only `email-outbox` and `lifecycle` (every minute), `reminders` (every 5 minutes) and `cleanup` (hourly). `recordings-reconcile`, `rubrica-retention`, `multitrack-purge`, the post-production jobs and the JVB scaler never run. Call a `/api/cron/*` route by hand with the same header if you need it | CronJobs, at the schedules in `infra/helm/pa-webinar/values.yaml` ([catalog](architecture/background-jobs.md)) |
+| Event lifecycle automation: automatic opening and end, pre-start provisioning, `IDLE` | **Partial**: the `cron` service calls `/api/cron/lifecycle` every minute, which opens a published event at its start time, provided the `jvb` service answers `/colibri/stats` at `JVB_HEALTH_URL`, and ends it at its end time plus grace. There is no pre-start provisioning and no `IDLE` ([Running without the scaler](architecture/event-lifecycle.md#running-without-the-scaler)) | The lifecycle CronJob, or the JVB scaler in the `full` profile, which adds pre-start provisioning and `IDLE` |
 | JVB scale-to-zero | **Not applicable**: the bridge is always on | JVB scaler CronJob and a dedicated node pool ([Scaling the media plane](architecture/scaling.md)) |
 | Jitsi images | **Partial**: stock `jitsi/*` images on the moving `stable` tag. Advanced noise suppression stays off, which is the application default | Versions pinned by the Jitsi subchart, plus the patched web image ([ADR-017](adr/017-patched-jitsi-web-image.md)) |
 | TURN relay for restrictive networks | **Not included**: browsers must reach UDP port 10000 directly | Optional coturn from the Jitsi subchart, off by default (`jitsi-meet.coturn.enabled`; keys in [Deploying with Helm](DEPLOYMENT.md#coturn-turn-and-turns), when TURN is needed in [Infrastructure](INFRASTRUCTURE.md#turn)) |
-| Object storage: uploads, recordings, AI outputs | **Not included**: Compose ships no object store. Uploads in the administration area and chat attachments answer `503`, while materials given as links keep working. To test them, add an S3-compatible store and configure both domains ([Object storage](configuration/storage.md)) | Azure Blob Storage or an S3-compatible service |
+| Object storage: uploads, recordings, AI outputs | **Not included**: Compose ships no object store. The administration area offers only the URL field for files and the chat shows no attachment button, while materials given as links keep working. To test them, add an S3-compatible store and configure both domains ([Object storage](configuration/storage.md)) | Azure Blob Storage or an S3-compatible service |
 | Composite video recording (Jibri) | **Not included**. Pressing the record control shows **Recording unavailable — Jibri not configured** | Optional (`jitsi-meet.jibri.enabled`), on in the standard and full example profiles ([Deploying with Helm](DEPLOYMENT.md)) |
 | Per-participant recording | **Partial**: the `recorder` profile starts the controller and its Docker runner. As shipped, the Compose file does not complete a recording: see [the `recorder` profile](operations/recording-setup.md#docker-compose-the-recorder-profile) | Recorder controller and one Job per recording |
 | AI post-production | **Not included**: no GPU, no worker, no orchestrator, no vLLM | GPU node pool that scales to zero ([AI post-production](POSTPROD.md)) |
@@ -439,7 +440,7 @@ The interface ships in 24 languages, with catalogs in `app/src/i18n/messages/`. 
 
 ### The live room shows no call
 
-The embedded conference stays empty or shows a connection error. The browser has not accepted the self-signed certificate of the local Jitsi. Open <https://localhost:8443>, accept the warning, and reload the live room. The Content Security Policy also allows frames only from the host in `NEXT_PUBLIC_JITSI_DOMAIN` (`localhost:8443` locally): if you changed it, the browser console names the blocked source ([Content Security Policy](SECURITY-CSP.md)).
+The embedded conference stays empty, or the room says **The video call service is not responding**. The browser has not accepted the self-signed certificate of the local Jitsi. Open <https://localhost:8443> (the room links to it), accept the warning, and press **Retry** or reload the live room. The Content Security Policy also allows frames only from the host in `NEXT_PUBLIC_JITSI_DOMAIN` (`localhost:8443` locally): if you changed it, the browser console names the blocked source ([Content Security Policy](SECURITY-CSP.md)).
 
 ### A port is already in use
 
@@ -517,11 +518,11 @@ Compose and the host server use different keys: `dev_admin_key_2026` from `docke
 The local stack is addressed as `localhost`, so a phone or a second computer cannot use it as it is. Everything below points at the development machine:
 
 - `NEXT_PUBLIC_APP_URL` (`http://localhost:3000`): links in emails and redirects;
-- `NEXT_PUBLIC_JITSI_DOMAIN` (`localhost:8443`): the host of the embedded conference, the frame source allowed by the Content Security Policy, and the default subject of the Jitsi token;
+- `NEXT_PUBLIC_JITSI_DOMAIN` (`localhost:8443`): the host of the embedded conference and the frame source allowed by the Content Security Policy. The Jitsi token's default subject is the same string, but as a fixed constant that does not follow this variable;
 - `PUBLIC_URL` of `jitsi-web` (`https://localhost:8443`);
 - `DOCKER_HOST_ADDRESS` of `jvb` (default `host.docker.internal`): the address the bridge advertises for media;
 - the self-signed certificate, which every device must accept;
-- camera and microphone: browsers grant them only in a secure context (HTTPS, or `localhost`), and the conference frame inherits the portal page's context, so over plain HTTP from another device no one can join with audio or video;
+- camera and microphone: browsers grant them only in a secure context (HTTPS, or `localhost`), and the conference frame inherits the portal page's context, so over plain HTTP from another device no one can join with audio or video. The waiting room and the room say so, with a link to the `https://` address, instead of loading the call;
 - the staff session cookie (`app/src/lib/auth/admin-session.ts`) and the participants' event-access cookie (`app/src/lib/event-session.ts`). The all-containers mode runs the production image, which marks both cookies `Secure`. Browsers drop a `Secure` cookie sent over plain HTTP, and most make an exception only for `localhost`, so a registrant who returns to the live room without `?token=` in the link is not recognized. The dev overlay and Next.js on the host run with `NODE_ENV=development` and do not mark them.
 
 Media also needs UDP port 10000 open on the host, and there is no TURN relay, so a network that blocks UDP carries no audio or video. There is no ready-made recipe for changing all of these together. For tests with several real devices, install on a VM that they can reach ([Installing on your own VMs with k3s](install/k3s.md)): minikube with the Docker driver is reachable only from the workstation.

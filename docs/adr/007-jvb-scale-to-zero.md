@@ -89,14 +89,15 @@ the full-profile example turns it on.
 | Installation | Bridges | Who moves event statuses |
 |---|---|---|
 | Helm full profile with `jvbScaler.enabled: true` | From zero up to the caps, following events | The scaler tick, plus manual actions |
-| Helm full profile with the scaler disabled | Fixed `jitsi-meet.jvb.replicaCount` (the full-profile example sets `0`: raise it to at least `1`) | Manual actions only |
-| Helm simple and standard profiles | Fixed `jitsi-meet.jvb.replicaCount` (`1` in `values.yaml`) | Manual actions only |
-| Docker Compose | One bridge, always on | Manual actions only |
-| External Jitsi (`jitsi.enabled: false`) | Run by whoever operates that Jitsi | Manual actions only |
+| Helm full profile with the scaler disabled | Fixed `jitsi-meet.jvb.replicaCount` (the full-profile example sets `0`: raise it to at least `1`), or scaled by another tool such as KEDA | The lifecycle cron, plus manual actions |
+| Helm simple and standard profiles | Fixed `jitsi-meet.jvb.replicaCount` (`1` in `values.yaml`) | The lifecycle cron, plus manual actions |
+| Docker Compose | One bridge, always on | The lifecycle cron (the `cron` service), plus manual actions |
+| External Jitsi (`jitsi.enabled: false`) | Run by whoever operates that Jitsi | The lifecycle cron, plus manual actions |
 
 Manual actions are taken by moderators in the room, or by staff from the event's page in the
-administration area. In every installation, the daily GDPR cleanup also moves `ENDED` events to
-`ARCHIVED` once their retention has passed.
+administration area. The lifecycle cron (`GET /api/cron/lifecycle`, every minute) applies the same time
+rules as the scaler tick, without pre-scale and `IDLE`. In every installation, the daily GDPR cleanup
+also moves events to `ARCHIVED` once their retention has passed.
 
 `jitsi.mode: full` alone does not scale anything, and it does not move the bridges to a dedicated pool.
 Both come from the values described above.
@@ -124,19 +125,23 @@ and keeps a bridge node running. When the count cannot be trusted, the route ski
 depend on it. The rules err toward keeping a bridge up for longer than needed rather than toward
 closing a room that has people in it ([known limitations](../architecture/scaling.md#known-limitations)).
 
-### Without the scaler, the lifecycle is manual
+### Lifecycle and scaling are separate concerns
 
-The scaler tick is the only automatic driver of the live statuses. Without it, nothing moves an event
-to `LIVE` at its start, nothing demotes an empty room to `IDLE`, and nothing ends an event at `endsAt`
-plus its grace period. Moderators open the room with **Start event**, which staff can also press on the
-event's page in the administration area, and close it with **End for everyone**. A visitor's wake still
-moves the event to `PROVISIONING`, and with no scaler it stays there
-([a wake without a scaler](../architecture/event-lifecycle.md#pitfall-a-wake-without-a-scaler)).
-Retention only starts once an event is `ENDED` or `ARCHIVED`, so an event that nobody ends or archives
-keeps its registrations. This holds in every installation without the scaler, and also while the
-CronJob is suspended
-([running without the scaler](../architecture/event-lifecycle.md#running-without-the-scaler),
-[pausing the scaler](../operations/jvb-scaler.md#pausing-for-maintenance-or-load-tests)).
+The scaler tick drives the live statuses only where it runs, and it adds the two statuses that exist
+for scale-to-zero: the pre-scale to `PROVISIONING` and the demotion of an empty room to `IDLE`. Every
+other installation, including bridges scaled by another tool such as KEDA, runs the lifecycle cron
+instead: it opens a room at `startsAt`, ends it at `endsAt` plus its grace period, and ends inactive
+open-ended rooms and abandoned instant calls, with the same time rules and without the two
+scale-to-zero statuses. The two drivers never run together: the scaler writes a heartbeat to Redis on
+every tick, and the lifecycle cron stands down while it is fresh. Without the scaler, a visitor's wake
+does not move a `PUBLISHED` event to `PROVISIONING`, because nothing would warm it
+([running without the scaler](../architecture/event-lifecycle.md#running-without-the-scaler)).
+
+While the scaler CronJob is suspended, the lifecycle stops: the chart renders the lifecycle cron only
+where it does not render the scaler. Moderators then open the room with **Start event** and close it
+with **End for everyone**
+([pausing the scaler](../operations/jvb-scaler.md#pausing-for-maintenance-or-load-tests)). Retention
+does not depend on the lifecycle: the cleanup also deletes the data of events that were never ended.
 
 ### Failures freeze the bridge count
 
@@ -213,7 +218,7 @@ stateless portal, which the chart scales from `autoscaling` in `values.yaml`
 - [Scaling the media plane](../architecture/scaling.md): the capacity model, the sizing formula, one
   tick step by step, the snapshot and the node pools.
 - [Event lifecycle](../architecture/event-lifecycle.md): the statuses that the tick moves, grace,
-  overtime, wake, and life without the scaler.
+  overtime, wake, and the lifecycle cron that replaces the tick without the scaler.
 - [Running the JVB scaler](../operations/jvb-scaler.md): enabling, tuning, validating and pausing it.
 - [Installing PA Webinar](../install/README.md): choosing a platform and sizing the bridge pool.
 - [Runtime settings](../configuration/runtime-settings.md): the sizing and lifecycle settings with

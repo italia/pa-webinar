@@ -115,11 +115,14 @@ The Jitsi token endpoint maps the role onto the conference token: moderator seat
 speakers become `member`. The claims are described in
 [The Jitsi JWT](../architecture/identity-and-access.md#the-jitsi-jwt).
 
-### People hand out the links
+### How the links reach people
 
-The platform does not email moderator or grant links. Staff copy them from the administration area
-and pass them on, and a moderator in the live room can reveal the link they entered with. Getting each
-link to the right person is up to the organizer.
+When an address is known, the platform emails the link once: the primary moderator link to the event's
+contact address when the event is created or published, or when the address changes, and a grant's link
+to the grant's address when the grant is created
+([Email and calendar](../architecture/email.md#moderator-and-speaker-links)). Each email says that the
+link is personal and must not be shared. Otherwise staff copy the links from the administration area and
+pass them on, and a moderator in the live room can reveal the link they entered with.
 
 ## Consequences
 

@@ -334,8 +334,10 @@ latter is `true` by default), the chart renders:
 app can notify the controller when an event goes `LIVE`. With
 `recorder.controller.enabled: false` no bot starts: the controller and the
 template are not rendered, and the app's notification fails harmlessly with a
-logged warning (`[jvb] dispatch recorder best-effort fallito`) on each
-`PROVISIONING` to `LIVE` transition.
+logged warning (`[jvb] dispatch recorder best-effort fallito`) each time the
+scaler or the lifecycle cron opens a room. Setting `RECORDER_CONTROLLER_URL`
+also makes the live room treat the installation as able to record, so events
+with recording on show the recording notice and ask for consent.
 
 A bot starts only when all of these hold:
 

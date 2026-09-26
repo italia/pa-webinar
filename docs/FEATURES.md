@@ -131,7 +131,7 @@ An administrator picks one of five layouts under **Home page mode**: **Landing p
 
 - **Event list.** The **Events** (Eventi) page lists **Upcoming events** (Prossimi eventi) and **Past events** (Eventi passati). Tags can filter it (**Filter by tag**). Each tag has an Italian and an English name, a color and a sort order. Events that are warming up (`PROVISIONING`, `IDLE`) stay listed, so a visitor who arrives a few minutes early still finds the event.
 - **Calendar.** *Optional.* A public calendar with day, week, month, year and list views, turned on by **Public calendar**. It is off by default. When it is off, its page returns "not found".
-- **Event page.** The page shows the title and Markdown description in the visitor's language, the date and time zone, the cover image, the tags, the speakers and organizer when set, and the registration button. It also offers add-to-calendar links (Google, Outlook, Yahoo, and an `.ics` download). The page carries schema.org `Event` data and appears in the sitemap. When the event is live, it offers a link into the room.
+- **Event page.** The page shows the title and Markdown description in the visitor's language, the date and time zone, the cover image, the tags, the speakers and organizer when set, and the registration button. It also offers add-to-calendar links (Google, Outlook, Yahoo, and an `.ics` download). The page carries schema.org `Event` data and appears in the sitemap. When the event is live, it offers a link into the room. When the end time has passed without the room opening, the page shows the event as ended and says that registration is closed, instead of the registration button and the calendar links.
   - **Before the start**, it also lists the event's materials marked **Before the event**. Materials left on the default, **In the room and after the event**, are not listed. The list disappears at the scheduled start time.
   - **With public registration off**, it says that registration is reserved for invited people and that the link to enter arrives by email. When the event has no invitees, it removes the registration button, says that registration is not open to the public, and links to **Already registered? Get your personal link again**.
 - **Link previews.** When someone shares an event link, the preview image is a card that the server draws with the title, date, speakers, poster and organization. An administrator chooses which of these appear, or turns the card off.
@@ -155,7 +155,7 @@ The **Video library** (Libreria video) lists concluded events whose public page 
 - **Legal notes.** They name the organization that the site settings define.
 - **Privacy policy.** The site-wide notice. Each event can link its own notice or a reusable privacy notice template.
 - **My data.** Anyone can request a copy of their data (right of access, Art. 15) or its erasure (right to erasure, Art. 17). The platform emails a confirmation link that is valid for one hour, so nobody can read or delete another person's data by typing their address.
-- **Address book opt-out.** The `/rubrica/opt-out` page removes a person from the address book when opened with a signed opt-out link. The platform's emails do not include such a link yet, so otherwise an administrator deletes the entry in **Address book**. An erasure request under **My data** deletes registrations but not the address-book entry. See [Privacy and data protection](GDPR.md#the-address-book).
+- **Address book opt-out.** The `/rubrica/opt-out` page removes a person from the address book when opened with the signed opt-out link that the confirmation, reminder and post-event emails carry for people in the address book. An administrator can also delete the entry in **Address book**, and an erasure request under **My data** deletes it together with the registrations. See [Privacy and data protection](GDPR.md#the-address-book).
 
 ### Screenshots
 
@@ -207,8 +207,10 @@ Configured in: [From creation to recap: the event journey](architecture/event-jo
 
 The waiting room is the single front door. Personal links and magic links always land there, whatever the event's status. The public room link lands there while guests are admitted, and otherwise sends the visitor to registration, or to the event page once the event has ended. The room adapts to the event's status: see [Event lifecycle](architecture/event-lifecycle.md) for the states.
 
-- **Before the start.** It shows a countdown, a short netiquette and who moderates the event. A moderator sees **Start event**.
-- **While the room warms up.** When the event is `IDLE` or `PROVISIONING`, a progress indicator shows how long the preparation has taken. Entry opens when the event goes live. The first visitor to an `IDLE` event wakes it.
+- **Before the start.** It shows a countdown, a short netiquette and who moderates the event. A moderator sees **Start event**. The room opens by itself at the start time, or earlier when a moderator starts it.
+- **While the room warms up.** When the event is `IDLE` or `PROVISIONING`, a progress indicator shows how long the preparation has taken, and moderators can still press **Start event**. Entry opens when the event goes live. The first visitor to an `IDLE` event wakes it. Without bridges that scale to zero there is nothing to warm up: the room says it opens at the start time.
+- **When the time has passed.** A published event that never opened shows that its scheduled time has passed, with no entry.
+- **Over plain `http://`.** The browser gives the page no microphone or camera, so the waiting room and the room show a notice with the `https://` address instead of trying to start the call.
 - **When the bridge lags.** If the event is live but the bridge still reports not ready after a minute, the room offers **Enter anyway**, so a stale readiness signal never locks people out.
 - **When live.** A short cue announces that the room is open, and the join button turns on.
 - **After the end.** It links to the recording and the feedback.
@@ -251,13 +253,13 @@ The drawer is a column on the right on desktop and a sheet from the bottom on sm
 
 | Panel | What it does | Default |
 |---|---|---|
-| **Chat** | Messages with replies, @mentions (with a browser notification), emoji reactions, image and PDF attachments up to 10 MB, and edits within 15 minutes. **Mark as a question** feeds a questions filter. Moderators can hide messages. Anyone who can read the chat can **Download the chat**. | On |
+| **Chat** | Messages with replies, @mentions (with a browser notification), emoji reactions, image and PDF attachments up to 10 MB where the installation has files storage, and edits within 15 minutes. **Mark as a question** feeds a questions filter. Moderators can hide messages. Anyone who can read the chat can **Download the chat**. | On |
 | **Q&A** | Questions of up to 500 characters with upvotes. Registrants, guests and speakers can upvote. Moderators **Highlight**, **Mark as answered** or **Dismiss**. | Off |
 | **Polls** | Moderators create a poll, then **Close voting**, **Publish results** or **Reopen**. Each person votes once. | Always shown |
 | **Word cloud** | A moderator starts a round with a topic and a duration, and participants send words. | Off |
 | **Notes / Checklist** | Moderators list and tick off topics. The audience can mark **Agree** or **Disagree** on each item. | Off |
-| **Materials** | Links and files shared for the event. The audience sees the materials marked **In the room and after the event** or **During the event**. Moderators see every material, with its visibility marked on the restricted ones, and can add more during the call. | Always shown |
-| **Participants** | Who is present, with a volume control for each person that changes only what you hear. Moderators also see their own connection quality and can remove people. | Always shown |
+| **Materials** | Links and files shared for the event. Files can be uploaded only where the installation has files storage; each item shows who added it, or "Added by the organisers". The audience sees the materials marked **In the room and after the event** or **During the event**. Moderators see every material, with its visibility marked on the restricted ones, and can add more during the call. | Always shown |
+| **Participants** | Who is present, with a volume control for each person that changes only what you hear. Moderators also see their own connection quality and can remove anyone but themselves. Role badges appear when the conference's roles tell moderators from participants. | Always shown |
 
 Moderators can switch Q&A, chat, **Notes / Checklist** and **Word cloud** on and off during the event. Everyone's panels update within seconds. See [Live interaction and realtime](architecture/live-interaction.md).
 
@@ -274,7 +276,7 @@ Moderators can switch Q&A, chat, **Notes / Checklist** and **Word cloud** on and
 
 *Optional*, and only when the event enables recording.
 
-- Participants and guests see a **Recording consent** dialog before they enter. They can choose **Do not participate**.
+- Participants and guests see a **Recording consent** dialog before they enter, when the installation can record (Jibri, or the per-participant recorder). They can choose **Do not participate**. The waiting room's recording notice follows the same rule.
 - While recording is running, a banner stays visible to everyone.
 - Moderators start and stop the recording. With **Start recording automatically**, it starts on its own.
 
@@ -282,10 +284,10 @@ The two capture paths (a composite video from Jibri, and per-participant audio f
 
 ### Whiteboard
 
-*Optional.* This is the native Jitsi whiteboard (Excalidraw). It is opt-in per event and always on in instant calls, and only moderators on desktop can open it.
+*Optional.* This is the native Jitsi whiteboard (Excalidraw). It is opt-in per event and on in instant calls where the installation has the whiteboard service, and only moderators on desktop can open it.
 
-- It needs a whiteboard backend on the Jitsi side (`config.whiteboard.enabled`). The chart does not deploy one.
-- The app's own **Whiteboard** button and the reminder to export the board also need `NEXT_PUBLIC_WHITEBOARD_ENABLED=true` in the app's runtime environment. It is read at request time, so no rebuild is needed. See [Configuration reference](CONFIGURATION.md).
+- It needs a whiteboard backend on the Jitsi side (`config.whiteboard.enabled`). The chart neither installs nor configures one: the Jitsi subchart has an optional backend (`jitsi-meet.excalidraw.enabled`, off), and it has not been tested with PA Webinar.
+- Every whiteboard button in the room, Jitsi's toolbar button and the app's own **Whiteboard** button, and the reminder to export the board also need `NEXT_PUBLIC_WHITEBOARD_ENABLED=true` in the app's runtime environment. It is read at request time, so no rebuild is needed. Without it, the event wizard and the template form do not let anyone switch the whiteboard on. See [Configuration reference](CONFIGURATION.md).
 
 Its content is not saved: moderators are reminded to export it and attach it as a material.
 
@@ -295,12 +297,12 @@ Below 992 px, the layout is a full-screen video with a floating control bar, and
 
 ### Leaving
 
-**Leave room** takes participants out. Moderators get a choice:
+**Leave room** takes participants out, to a screen that says the event is still in progress and offers **Rejoin**. Moderators get a choice:
 
-- **Just leave.** The call goes on for everyone else.
+- **Just leave.** The call goes on for everyone else. The leaving screen reminds the moderator that the event stays open until someone chooses **End for everyone**.
 - **End for everyone.** This opens **Event destiny**, which offers **Keep it public**, **Publish to the library** or **Archive (private)**. When the event records and AI post-production is on for it, it also offers a checkbox to generate the transcript and summary.
 
-When the event ends, participants get the feedback form, unless feedback is turned off for the event.
+When the event ends, participants get the feedback form, unless feedback is turned off for the event. The closing screen appears only when the event has really ended; someone who leaves or loses the connection sees the leaving screen instead.
 
 Configured in: [Runtime settings](configuration/runtime-settings.md) · [Configuration reference](CONFIGURATION.md) · [From creation to recap: the event journey](architecture/event-journey.md).
 
@@ -452,6 +454,6 @@ This is a summary. Each item links to the page that covers it.
   See [Monitoring and health](operations/monitoring.md).
 - **Supply chain.** Every release attaches an SPDX SBOM for the container image and, when its generation succeeds, a CycloneDX SBOM for the npm dependencies. The changelog page can browse the SPDX one. See [SECURITY.md](../SECURITY.md).
 - **Service inventory.** The installation publishes a CycloneDX 1.6 document of its software and operational services at `/service-inventory`. See [Service inventory: generating the document](SERVICE-INVENTORY-GENERATION.md).
-- **Scheduled work.** Email delivery, reminders, GDPR cleanup, the JVB scaler, recording reconciliation and the AI pipeline run as scheduled jobs. See [Scheduled and background jobs](architecture/background-jobs.md).
+- **Scheduled work.** Email delivery, reminders, the event lifecycle (the JVB scaler, or a lifecycle job without it), GDPR cleanup, recording reconciliation and the AI pipeline run as scheduled jobs. See [Scheduled and background jobs](architecture/background-jobs.md).
 
 Configured in: [Installing PA Webinar](install/README.md) · [Deploying with Helm](DEPLOYMENT.md) · [Configuration reference](CONFIGURATION.md) · [Infrastructure reference](INFRASTRUCTURE.md).

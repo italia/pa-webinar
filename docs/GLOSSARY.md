@@ -201,8 +201,9 @@ open yet. [The waiting room and the square](architecture/waiting-room.md#what-ea
 
 **Wake**: the transition `IDLE` to `PROVISIONING`, requested by
 `POST /api/events/<slug>/wake` when someone opens an idle room, which shows
-the same warm-up band as a `PROVISIONING` one. Inside the wake window, the
-same request also starts a bridge early for a `PUBLISHED` event.
+the same warm-up band as a `PROVISIONING` one. Inside the wake window, and
+only while the JVB scaler drives the lifecycle, the same request also starts a
+bridge early for a `PUBLISHED` event.
 [Event lifecycle](architecture/event-lifecycle.md#wake)
 
 ### Organizing an event
@@ -385,7 +386,8 @@ as `Reaction` rows and counted in event analytics).
 [Live interaction and realtime](architecture/live-interaction.md)
 
 **Start event** (UI **Start event**): the moderator action that moves a
-`PUBLISHED` event to `LIVE`. [Event lifecycle](architecture/event-lifecycle.md)
+`PUBLISHED`, `PROVISIONING` or `IDLE` event to `LIVE` before the automatic
+opening. [Event lifecycle](architecture/event-lifecycle.md)
 
 **Temporary recording** (`tempRecordingUrl`, UI **Watch from the start**): an
 optional catch-up recording offered while the event is live, before any
@@ -559,15 +561,25 @@ database, settings and domain. [Reusing PA Webinar](REUSE.md)
 
 **JVB scaler** (`jvbScaler`): the Kubernetes CronJob that, on each tick, asks
 the portal (`/api/internal/jvb-desired-replicas`) how many bridges are needed
-and scales the JVB Deployment to match. It is rendered only in the `full`
-profile and only when `jvbScaler.enabled` is true (off by default in
-`infra/helm/pa-webinar/values.yaml`).
+and scales the JVB Deployment to match. The same call moves events through
+their statuses. It is rendered only in the `full` profile and only when
+`jvbScaler.enabled` is true (off by default in
+`infra/helm/pa-webinar/values.yaml`); elsewhere the lifecycle cron moves the
+events.
 [Scaling the media plane](architecture/scaling.md),
 [Running the JVB scaler](operations/jvb-scaler.md)
 
 **k3s**: a lightweight Kubernetes distribution that runs on ordinary VMs. The
 scripts in `infra/onprem/k3s` install it on one or three VMs, with the chart's
 `simple` profile. [Installing on your own VMs with k3s](install/k3s.md)
+
+**Lifecycle cron**, lifecycle job (`cronjobs.lifecycle`, `GET /api/cron/lifecycle`): the job
+that moves events through their statuses every minute where the JVB scaler is
+not rendered: it opens a published event at its start time and ends it after
+its end time and grace period, with no pre-scale and no `IDLE`. It stands down
+while the scaler's heartbeat is in Redis. Docker Compose runs it from its
+`cron` service.
+[Event lifecycle](architecture/event-lifecycle.md#running-without-the-scaler)
 
 **minikube**: a single-node Kubernetes cluster on a workstation. The
 evaluation path: `scripts/minikube-up.sh` installs the same chart that runs in

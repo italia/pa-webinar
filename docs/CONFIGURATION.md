@@ -69,7 +69,7 @@ On a single VM, Docker Compose sets the same variables in the `environment:` blo
 
 Next.js normally copies `process.env.NEXT_PUBLIC_*` into the bundle when the image is built. PA Webinar does not rely on that. Server code reads these variables at run time through `getPublicEnv()` in `app/src/lib/env.ts`, and Client Components receive the values as props. The published image is built with neutral local defaults, and one image serves every installation.
 
-`getPublicEnv()` is the only correct way to read a `NEXT_PUBLIC_*` variable. A dot-notation read (`process.env.NEXT_PUBLIC_X`) of a variable that the build defines is replaced with its build-time value, in server code as well as in the browser, and changing the Helm value then has no effect. The build identity is read that way on purpose. A few dot-notation reads also remain in server code, where they see the `Dockerfile` defaults (`http://localhost:3000` and `localhost:8443`) whatever the Helm values say: the `JITSI_JWT_SUBJECT` fallback, the link in the emails that confirm a data-subject request, and the conference domain on the infrastructure page. These are known limitations. [Build-time values](#build-time-values) lists the deliberate build-time values and these reads.
+`getPublicEnv()` is the only correct way to read a `NEXT_PUBLIC_*` variable. A dot-notation read (`process.env.NEXT_PUBLIC_X`) of a variable that the build defines is replaced with its build-time value, in server code as well as in the browser, and changing the Helm value then has no effect. An ESLint rule (`no-restricted-syntax` in `app/eslint.config.mjs`) forbids that form outside `app/src/lib/env.ts` and the test files. The build identity, `NEXT_PUBLIC_BUILD_*`, is allowed by name, because it is read that way on purpose ([Build-time values](#build-time-values)).
 
 ### Run time: site settings
 
@@ -132,8 +132,8 @@ Defaults: `app/src/lib/env.ts`. At startup, `app/src/instrumentation.ts` logs an
 
 | Name | Required | Default | Secret | Helm key | Description |
 |---|---|---|---|---|---|
-| `NEXT_PUBLIC_APP_URL` | Yes | `http://localhost:3000` | No | `app.env` | Public base URL of the portal, with the scheme: `https://webinar.example.com`. Used for links in emails and calendar files, moderator links, avatars, preview images, the sitemap and SEO metadata. A value without `http://` or `https://` counts as missing (`appBaseUrl()`). Known limitation: the link in the emails that confirm a data-subject request ignores this value (see [Build-time values](#build-time-values)) |
-| `NEXT_PUBLIC_JITSI_DOMAIN` | Yes | `localhost:8443` | No | `app.env` | Host of the conference front end, without the scheme: `meet.webinar.example.com`. Used by the IFrame API, the Content Security Policy, the `Permissions-Policy` header and the status probes. Known limitation: the administration's infrastructure page ignores this value and shows `localhost:8443` (see [Build-time values](#build-time-values)) |
+| `NEXT_PUBLIC_APP_URL` | Yes | `http://localhost:3000` | No | `app.env` | Public base URL of the portal, with the scheme: `https://webinar.example.com`. Used for links in emails and calendar files, moderator links, avatars, preview images, the sitemap and SEO metadata. A value without `http://` or `https://` counts as missing (`appBaseUrl()`) |
+| `NEXT_PUBLIC_JITSI_DOMAIN` | Yes | `localhost:8443` | No | `app.env` | Host of the conference front end, without the scheme: `meet.webinar.example.com`. Used by the IFrame API, the Content Security Policy, the `Permissions-Policy` header, the administration's **Infrastructure** page, and the status probes when the in-cluster addresses of the conference are not set ([Conference status probes](#conference-status-probes)) |
 | `DEFAULT_PRIVACY_POLICY_URL` | No | `/privacy` (`app/src/app/[locale]/events/[slug]/registration/page.tsx`) | No | `app.env` | Privacy link on the registration form when the event has none. Set it only to point at a privacy notice published elsewhere. `values.yaml` leaves it unset |
 
 ### Authentication and tokens
@@ -150,7 +150,7 @@ Defaults: `app/src/lib/auth/jwt.ts` and `app/src/app/api/events/[param]/jitsi/to
 | `JITSI_JWT_ISSUER` | No | `pa-webinar` | No | Secret | `iss` claim. It must be accepted by Prosody (`JWT_ACCEPTED_ISSUERS` in the `jitsi-meet.prosody.extraEnvs` values) |
 | `JITSI_JWT_AUDIENCE` | No | `jitsi` | No | Secret | `aud` claim. It must be accepted by Prosody (`JWT_ACCEPTED_AUDIENCES`) |
 | `JITSI_JWT_APP_ID` | No | `pa_webinar` | No | Secret | Prefix of the token id (`jti`). The chart examples keep it equal to Prosody's `JWT_APP_ID` |
-| `JITSI_JWT_SUBJECT` | No | see description | No | Secret or `app.env` | `sub` claim. When unset, the code falls back to `NEXT_PUBLIC_JITSI_DOMAIN`, but through a dot-notation read that the build fixes. Images built from the repository's `Dockerfile` therefore send `localhost:8443`. Set it explicitly if your Prosody checks the subject |
+| `JITSI_JWT_SUBJECT` | No | `localhost:8443` | No | Secret or `app.env` | `sub` claim. When unset or empty, the portal sends the constant `DEFAULT_JITSI_JWT_SUBJECT` in `app/src/lib/auth/jwt.ts`, the value every published image has always sent. Prosody requires a non-empty `sub`, but compares it with its XMPP domain only when `JWT_ENABLE_DOMAIN_VERIFICATION` is on, which the chart and Docker Compose leave off. If you turn that on, set this variable to the XMPP domain or to `*` |
 | `ALLOW_INSECURE_PII_KEY` | No | unset | No | never | `true` lets a placeholder-shaped `PII_ENCRYPTION_KEY` work in production mode. Only `docker-compose.yml` sets it, for the local stack. Never set it on a real installation |
 
 ### Client address and rate limits
@@ -253,19 +253,31 @@ How the two capture paths work is described in [Recording](architecture/recordin
 | Name | Required | Default | Secret | Helm key | Description |
 |---|---|---|---|---|---|
 | `RECORDING_WEBHOOK_SECRET` | Recommended with Jibri | unset | Yes | Secret | HMAC-SHA256 key for the body of `POST /api/webhooks/recording`. The body is signed in the `X-Webhook-Signature: sha256=<hex>` header. When set, a request needs both the signature and the `CRON_API_KEY` bearer. When unset, the bearer alone is accepted and the app logs a warning once. The Jibri finalize script must receive the same value (`app/src/app/api/webhooks/recording/route.ts`) |
-| `RECORDER_CONTROLLER_URL` | Conditional | none | No | Chart, when `recorder.enabled`: `http://<fullname>-recorder-controller:<recorder.controller.port>`, default port `8080`. With the literal names, `http://pa-webinar-recorder-controller:8080` | When a scaler tick promotes an event from `PROVISIONING` to `LIVE`, the portal calls `POST <url>/dispatch`, so the per-participant recorder starts without waiting for the controller's next reconcile (`app/src/app/api/internal/jvb-desired-replicas/route.ts`). Other paths to `LIVE`, such as instant calls, which are created `LIVE`, rely on that reconcile. A failed call does no harm |
+| `RECORDER_CONTROLLER_URL` | Conditional | none | No | Chart, when `recorder.enabled`: `http://<fullname>-recorder-controller:<recorder.controller.port>`, default port `8080`. With the literal names, `http://pa-webinar-recorder-controller:8080` | When a tick of the scaler or of the lifecycle cron opens an event (`LIVE`), the portal calls `POST <url>/dispatch`, so the per-participant recorder starts without waiting for the controller's next reconcile (`dispatchRecorder()` in `app/src/lib/events/lifecycle-tick.ts`). Other paths to `LIVE`, such as **Start event** and instant calls, which are created `LIVE`, rely on that reconcile. A failed call does no harm. Its presence also tells the live room that the installation can record, so the recording notice and consent are shown for events with recording on. They are left out only when the chart installs Jitsi without Jibri, no recordings storage is declared and this variable is unset (`app/src/lib/recording/availability.ts`). Docker Compose always sets it, even when its `recorder` profile is not started |
 
 ### Videobridge and scaler
 
-The sizing model and the scaler tick are described in [Scaling the media plane](architecture/scaling.md). Enabling and tuning the scaler is described in [Running the JVB scaler](operations/jvb-scaler.md). Defaults: `app/src/lib/jvb-sizing.ts` and `app/src/app/api/internal/jvb-desired-replicas/route.ts`.
+The sizing model and the scaler tick are described in [Scaling the media plane](architecture/scaling.md). Enabling and tuning the scaler is described in [Running the JVB scaler](operations/jvb-scaler.md). Defaults: `app/src/lib/jvb-sizing.ts`, `app/src/lib/events/lifecycle-tick.ts` and `app/src/app/api/internal/jvb-desired-replicas/route.ts`. How the portal reads the bridge without a scaler is in [Monitoring and health](operations/monitoring.md#get-apistatus).
 
 | Name | Required | Default | Secret | Helm key | Description |
 |---|---|---|---|---|---|
-| `JVB_MAX_REPLICAS` | No | `6` | No | `app.env` | **Global** cap on the number of bridges the scaler asks for, applied to the final sum. It is read once when the process starts. The per-event cap is the runtime setting `jvbMaxReplicas`. The chart's defaults do not set it. The simple profile sets it to `1`, its single fixed bridge, and so do the examples for managed clusters. The administration's infrastructure page shows it as the bridge maximum, with a default of `0` (`app/src/lib/infrastructure.ts`) |
-| `JVB_SCALER_ENABLED` | No | `false` | No | Chart, in the application ConfigMap: `"true"` when it renders the scaler (`jitsi.mode: full` and `jvbScaler.enabled`), `"false"` otherwise. A value in `app.env` takes its place | Tells the administration's infrastructure page whether the bridges scale to zero. Display only. Set it to `"true"` in `app.env` when another tool, such as KEDA, scales the bridges (`app/src/lib/infrastructure.ts`) |
-| `JVB_HEALTH_URL` | Conditional | none | No | Chart, when `jitsi.enabled`: `jitsi.jvbHealthUrl`. When it is empty, the chart uses the subchart's bridge Service (`http://<release>-jitsi-meet-jvb:8080`) if that Service exists and exposes port 8080 in `jitsi-meet.jvb.service.extraPorts`. Otherwise it renders a Service for this purpose and uses `http://<fullname>-jvb-rest:8080` (`templates/jvb-rest-service.yaml`). The defaults in `values.yaml` set `jitsi-meet.jvb.useHostPort`, and the subchart then renders no bridge Service, so a default install is in the second case | Base URL of the bridge's REST interface (`/colibri/stats`). Used by the status page, the bridge gauges of `/api/metrics` and the scaler's single-bridge fallback. With several bridges, the Service reaches one pod at a time, so the figures read through it are a lower bound |
-| `JIBRI_HEALTH_URL` | Conditional | none | No | Chart, when `jitsi.enabled`: `jitsi.jibriHealthUrl`, default `http://<release>-jitsi-meet-jibri:2222` | Base URL of the Jibri health API. When it is unset in a cluster, Jibri is reported as not running |
-| `JVB_PRE_SCALE_MINUTES`, `JVB_INACTIVE_GRACE_MIN`, `JVB_EMPTY_CLOSE_MIN` | No | unused | No | none | Fallbacks for the runtime settings `jvbPreScaleMinutes`, `jvbInactiveGraceMinutes` and `jvbEmptyCloseMinutes`. Those columns cannot be null, so the fallbacks never apply. Set the values in [Runtime settings](configuration/runtime-settings.md). The administration's infrastructure page still displays `JVB_PRE_SCALE_MINUTES` |
+| `JVB_MAX_REPLICAS` | No | `6` | No | `app.env`, or chart | **Global** cap on the number of bridges the scaler asks for, applied to the final sum. Without the scaler it is also the number of fixed bridges that the status pages and the **Infrastructure** page expect. It is read once when the process starts. The per-event cap is the runtime setting `jvbMaxReplicas`. When the chart does not render the scaler, it writes the value from `jitsi-meet.jvb.replicaCount` into the application ConfigMap, if that count is above zero and `app.env` neither sets this variable nor sets `JVB_SCALER_ENABLED` to `"true"`. The examples for managed clusters set it in `app.env` |
+| `JVB_SCALER_ENABLED` | No | `false` | No | Chart, in the application ConfigMap: `"true"` when it renders the scaler (`jitsi.mode: full` and `jvbScaler.enabled`), `"false"` otherwise. A value in `app.env` takes its place | Says that something scales the bridges. Together with `JVB_HEALTH_URL` it chooses how `/api/status`, the infrastructure map, the **Infrastructure** page and the waiting room read the bridge: scale-to-zero (`true`), fixed bridges (`false` with `JVB_HEALTH_URL`) or not monitored (`false` without it) ([Monitoring and health](operations/monitoring.md#get-apistatus)). It is also the lifecycle driver's fallback when Redis does not answer ([Event lifecycle](architecture/event-lifecycle.md#which-driver-runs)). Set it to `"true"` in `app.env` when another tool, such as KEDA, scales the bridges (`app/src/lib/infrastructure.ts`, `app/src/lib/status/bridge.ts`) |
+| `JVB_HEALTH_URL` | Conditional | none | No | Chart, when `jitsi.enabled`: `jitsi.jvbHealthUrl`. When it is empty, the chart uses the subchart's bridge Service (`http://<release>-jitsi-meet-jvb:8080`) if that Service exists and exposes port 8080 in `jitsi-meet.jvb.service.extraPorts`. Otherwise it renders a Service for this purpose and uses `http://<fullname>-jvb-rest:8080` (`templates/jvb-rest-service.yaml`). The defaults in `values.yaml` set `jitsi-meet.jvb.useHostPort`, and the subchart then renders no bridge Service, so a default install is in the second case | Base URL of the bridge's REST interface (`/colibri/stats`). Used by the status page, the bridge gauges of `/api/metrics`, the scaler's single-bridge fallback and the lifecycle cron, which opens a room only while the bridge answers (without the variable, the bridge is assumed present). With several bridges, the Service reaches one pod at a time, so the figures read through it are a lower bound. The chart writes full Service names (see [Conference status probes](#conference-status-probes)) |
+| `JIBRI_HEALTH_URL` | Conditional | none | No | Chart, when `jitsi.enabled`: `jitsi.jibriHealthUrl`, or, only when `jitsi-meet.jibri.enabled` is on and `useExternalJibri` off, the subchart's Jibri Service on port 2222. Without Jibri the chart does not write it | Base URL of the Jibri health API. It is probed only when Jibri is expected (`RECORDING_STORAGE_TYPE` declared, `jibriRecordingExpected()`). When it is unset while Jibri is expected, Jibri is reported as not running |
+| `JVB_PRE_SCALE_MINUTES`, `JVB_INACTIVE_GRACE_MIN`, `JVB_EMPTY_CLOSE_MIN` | No | unused | No | none | Fallbacks for the runtime settings `jvbPreScaleMinutes`, `jvbInactiveGraceMinutes` and `jvbEmptyCloseMinutes`. Those columns cannot be null, so the fallbacks never apply. Set the values in [Runtime settings](configuration/runtime-settings.md) |
+
+### Conference status probes
+
+The status page, the infrastructure map and the **Infrastructure** page probe the conference's web container, Prosody and Jicofo where they run (`app/src/lib/status/jitsi-health.ts`). A probe waits at most 3 seconds for an in-cluster address and 5 seconds for the public host, and every result is kept in memory for 5 seconds per pod. With the conference installed by the chart (`jitsi.enabled`), the chart writes the three addresses into the application ConfigMap, unless `app.env` sets them; `jitsi.webInternalUrl`, `jitsi.prosodyInternalUrl` and `jitsi.jicofoHealthUrl` override the computed values. The chart builds every in-cluster address, `JVB_HEALTH_URL` and `JIBRI_HEALTH_URL` included, from the full Service name `<service>.<namespace>.svc.<global.clusterDomain>` (`cluster.local` by default; an empty `global.clusterDomain` gives the short name). The Docker Compose stack sets the three addresses and `JVB_HEALTH_URL` to its service names ([Local services](DEVELOPMENT.md#local-services)).
+
+| Name | Required | Default | Secret | Helm key | Description |
+|---|---|---|---|---|---|
+| `JITSI_WEB_INTERNAL_URL` | No | none | No | Chart, with `jitsi.enabled`: `http://<release>-jitsi-meet-web.<namespace>.svc.<clusterDomain>`, plus `:<port>` when `jitsi-meet.web.service.port` is not 80 | The status page fetches `<url>/external_api.js`. When unset, it fetches the same file from the public conference host (`NEXT_PUBLIC_JITSI_DOMAIN`); there a certificate or name the app pod does not accept counts as `degraded` with the error code, not as an outage |
+| `PROSODY_INTERNAL_URL` | No | none | No | Chart, with `jitsi.enabled`: Prosody's Service on its BOSH port, 5280 | The status page asks `<url>/http-bind`; a `405` also counts as an answer. When unset, it asks `/http-bind` on the public conference host, through the web container |
+| `JICOFO_HEALTH_URL` | No | none | No | Chart, with `jitsi.enabled`: `http://<fullname>-jicofo-rest.<namespace>.svc.<clusterDomain>:8888`, a Service the chart renders for this purpose | The status page asks `<url>/about/version`. When unset, Jicofo is reported as `unknown` (**Not monitored**) |
+
+With `networkPolicy.enabled`, the app's egress must reach ports 80 and 8888 of the Jitsi pods; the chart's defaults allow both ([NetworkPolicy](DEPLOYMENT.md#networkpolicy)). With an external Jitsi, leave the three unset or point them at addresses the app pod can reach.
 
 ### AI post-production
 
@@ -288,7 +300,7 @@ The switches that turn the pipeline on belong to the site settings (`aiPipelineE
 
 | Name | Required | Default | Secret | Helm key | Description |
 |---|---|---|---|---|---|
-| `NEXT_PUBLIC_WHITEBOARD_ENABLED` | No | unset, which hides the whiteboard | No | `app.env` | Only `true` (case and spaces ignored) shows the moderator's whiteboard button and the reminder to export the whiteboard (`app/src/lib/jitsi/whiteboard.ts`). The live room's Server Component reads it at request time and passes it down as a prop, so a change needs a pod restart, not a new image. Set it only when the Jitsi installation has the whiteboard collaboration backend and `config.whiteboard.enabled` |
+| `NEXT_PUBLIC_WHITEBOARD_ENABLED` | No | unset, which hides the whiteboard | No | `app.env` | Only `true` (case and spaces ignored) shows the whiteboard button in Jitsi's toolbar and in the moderator's control bar, and the reminder to export the whiteboard (`app/src/lib/jitsi/whiteboard.ts`); this applies to instant calls too. It also drives the administration forms: when it is not `true`, the whiteboard switch in step 2 of the event wizard and in the event-template form cannot be switched on and shows a one-line reason, while a value already on can still be switched off. The live room's Server Component and the new-event, edit-event and templates pages read it at request time, so a change needs a pod restart, not a new image. Set it only when the Jitsi installation has the whiteboard collaboration backend and `config.whiteboard.enabled`. The chart installs none: the Jitsi subchart has an optional one (`jitsi-meet.excalidraw.enabled`, off), and that combination has not been tested |
 | `NEXT_PUBLIC_JITSI_RNNOISE_ENFORCE` | No | unset, which forces advanced noise suppression off | No | `app.env` | Only the exact value `false` (case and spaces ignored) lets Jitsi's advanced noise suppression run (`app/src/lib/jitsi/rnnoise.ts`). It is safe only with the patched `jitsi/web` image. The chart refuses to render `false` with an image it does not recognize as patched, unless `jitsi.patchedWebImage: true` declares it. See [How PA Webinar extends Jitsi Meet](architecture/jitsi-integration.md) |
 
 #### Build-time values
@@ -297,16 +309,9 @@ These values are fixed when the image is built. They are not configuration: do n
 
 | Name | Set by | Effect |
 |---|---|---|
-| `NEXT_PUBLIC_BUILD_VERSION`, `NEXT_PUBLIC_BUILD_SHA`, `NEXT_PUBLIC_BUILD_CHANNEL`, `NEXT_PUBLIC_BUILD_DATE` | Build arguments passed by the release and development workflows (`Dockerfile`) | The build identity shown in the footer, in `/api/health`, on the release-notes page and in the OpenAPI document |
-| `NEXT_PUBLIC_JVB_MAX_REPLICAS` | Nothing | Read in a Client Component (`app/src/components/status/status-dashboard.tsx`). The capacity bar of the status page assumes `6` bridges |
+| `NEXT_PUBLIC_BUILD_VERSION`, `NEXT_PUBLIC_BUILD_SHA`, `NEXT_PUBLIC_BUILD_CHANNEL`, `NEXT_PUBLIC_BUILD_DATE` | Build arguments passed by the release and development workflows (`Dockerfile`) | The build identity shown in the footer, in `/api/health`, on the release-notes page and in the OpenAPI document. `NEXT_PUBLIC_BUILD_VERSION` is also the version on the **Infrastructure** page and the infrastructure map; the page shows `—` when it is empty |
 
-The following server-side reads also use dot notation, so the build fixes their values to the `Dockerfile` defaults, whatever the Helm values say. They are known limitations and defects against the runtime-configuration rule of [ADR-002](adr/002-nextjs-fullstack.md), not configuration:
-
-| Where | Variable read | What an installation gets |
-|---|---|---|
-| The `sub` claim fallback of conference tokens (`app/src/lib/auth/jwt.ts`) | `NEXT_PUBLIC_JITSI_DOMAIN` | `localhost:8443` while `JITSI_JWT_SUBJECT` is unset. Set `JITSI_JWT_SUBJECT` if your Prosody checks the subject |
-| The emails that confirm a data-subject export or erasure request (`app/src/app/api/gdpr/export/request/route.ts`, `app/src/app/api/gdpr/erasure/request/route.ts`) | `NEXT_PUBLIC_APP_URL` | Links that start with `http://localhost:3000`. No run-time value changes them. Only an image built with the `NEXT_PUBLIC_APP_URL` build argument set to the portal's URL sends working links |
-| The conference card of the administration's infrastructure page (`app/src/lib/infrastructure.ts`) | `NEXT_PUBLIC_JITSI_DOMAIN` | The page shows `localhost:8443` and probes it, so the conference appears unreachable |
+The status page reads the number of bridges it expects from the server (`jvbMaxReplicas` in `/api/status`), not from a public variable.
 
 ### Observability
 
@@ -315,8 +320,11 @@ Probes, metrics and alerts are described in [Monitoring and health](operations/m
 | Name | Required | Default | Secret | Helm key | Description |
 |---|---|---|---|---|---|
 | `PROMETHEUS_URL` | No | empty | No | `app.env` | Prometheus base URL for the PromQL queries behind the status and infrastructure pages. When it is empty, those pages use direct probes only (`app/src/lib/prometheus.ts`) |
-| `METRICS_APP_LABEL` | No | `pa-webinar` | No | `app.env` | Value of the `app` label on every application metric and in the portal's own PromQL queries (`app/src/lib/metrics.ts`). The chart's alert rules and dashboard match `app="pa-webinar"`, so change it only if you adapt them too |
-| `APP_VERSION` | No | unset | No | `app.env` | Version shown on the administration's infrastructure page, read after `npm_package_version` (`app/src/lib/infrastructure.ts`). Nothing sets either variable in the published image: `npm_package_version` exists only when a process starts through an npm script, and the container starts the server directly. The page therefore shows `0.0.0` unless you set `APP_VERSION`. The real build version is in the footer and in `/api/health` (`NEXT_PUBLIC_BUILD_VERSION`) |
+| `METRICS_APP_LABEL` | No | `pa-webinar` | No | `app.env` | Value of the `app` label on every application metric and in the portal's own PromQL queries (`app/src/lib/metrics.ts`). The chart's alert rules and dashboard match `app="pa-webinar"`, so change it only if you adapt them too. The **Monitoring** page receives it from the server |
+| `METRICS_JOB` | No | unset | No | Chart: the app's full name, which is the scrape `job` of the chart's ServiceMonitor | The Prometheus job whose `up` series the sparklines, the infrastructure map and the **Monitoring** page read, as `up{namespace="<POD_NAMESPACE>",job="<METRICS_JOB>"}` (`app/src/lib/status/prometheus-selectors.ts`). When unset, they select `job=~".*eventi.*"` |
+| `DEPLOY_PROFILE` | No | unset | No | Chart: the value of `jitsi.mode` | `simple`, `standard` or `full`: the deployment mode shown on the **Infrastructure** page and the map. When unset, the mode is inferred: `simple` outside Kubernetes; inside, `full` when `JVB_MAX_REPLICAS` is greater than 1 and `standard` otherwise (`deploymentMode()` in `app/src/lib/infrastructure.ts`) |
+| `DATABASE_BUNDLED` | No | unset | No | Chart: the value of `postgresql.enabled` | `true` when the database is the one installed with the platform, `false` when it is external: the database type on the **Infrastructure** page and the map. When unset, a host name without a dot that contains `postgres` counts as bundled (`databaseBundled()`) |
+| `APP_VERSION` | No | unset | No | `app.env` | Version shown on the infrastructure map only when the image carries no `NEXT_PUBLIC_BUILD_VERSION`. Published images carry it, so this is a fallback for local builds |
 
 `/api/metrics` requires `Authorization: Bearer <CRON_API_KEY>`. To let the ServiceMonitor present it, set `metrics.bearerTokenSecret` in the Helm values.
 
@@ -335,7 +343,24 @@ Do not set these by hand.
 | `NODE_ENV` | Image and chart: `production` | Enables the production guards (`APP_SECRET` length, placeholder `PII_ENCRYPTION_KEY`, `Secure` cookies) |
 | `PORT`, `HOSTNAME` | Image and chart: `3000`, `0.0.0.0` | Where the server listens |
 | `POD_NAMESPACE`, `POD_NAME` | Chart, from the pod metadata | `POD_NAMESPACE` scopes the PromQL queries. Without it they use `default` and return nothing |
-| `KUBERNETES_SERVICE_HOST` | Kubernetes | Its presence tells the status and infrastructure pages that they run in a cluster and not on a single VM |
+| `KUBERNETES_SERVICE_HOST` | Kubernetes | Its presence tells the status and infrastructure pages that they run in a cluster and not on a single VM (the **Infrastructure** page's platform line, and the fallback for `DEPLOY_PROFILE`) |
+| `NODE_EXTRA_CA_CERTS` | Chart, when `app.extraCaCerts` is set: `/etc/pa-webinar/extra-ca/ca-bundle.pem` | Extra certificate authorities that Node.js trusts for the app's outbound TLS, besides the system ones (see below) |
+
+### Extra certificate authorities
+
+When the portal calls a service whose certificate comes from an internal certificate authority (an SMTP relay, object storage, an external Jitsi, or the portal's and the conference's own public names), give it that authority with `app.extraCaCerts`. The chart mounts one key of an existing Secret or ConfigMap read-only in the app container, and points `NODE_EXTRA_CA_CERTS` at it:
+
+```yaml
+app:
+  extraCaCerts:
+    configMapName: ente-ca     # or secretName, never both: the render stops
+    key: ca.crt                # PEM, one or more certificates
+```
+
+- Node.js reads the file when the process starts: after changing it, restart the Deployment.
+- The `db-migrate` init container does not use it. TLS to the database is configured in `DATABASE_URL`.
+- Browsers need the authority too, and that is outside the chart: participants whose devices do not trust it cannot load the conference ([Installing on your own VMs with k3s](install/k3s.md)).
+- With the conference installed by the chart, the status page does not need it: it probes the components in the cluster ([Conference status probes](#conference-status-probes)).
 
 ### Variables that have no effect
 
@@ -349,7 +374,9 @@ Older examples and templates still set the variables below, but the application 
 | `NEXT_PUBLIC_WATERMARK_URL` | `.env.example` | The video watermark is set under **Settings**. See [Branding and white-labeling](configuration/branding.md) |
 | `NEXT_PUBLIC_GUEST_ACCESS` | Nowhere by default | Display only, on the infrastructure page. Guest access is the site setting `guestAccessEnabled` |
 | `METRICS_ENABLED` | Nowhere by default | Display only. `false` does not turn `/api/metrics` off |
-| `JVB_DESIRED_REPLICAS`, `JWT_SECRET` | Nowhere by default | Display only, on the infrastructure page |
+| `JWT_SECRET` | Nowhere by default | Display only, on the infrastructure page |
+| `JVB_DESIRED_REPLICAS` | Nowhere by default | Nothing: the application does not read it. The **Infrastructure** page computes the bridges wanted by the events |
+| `NEXT_PUBLIC_JVB_MAX_REPLICAS` | Nowhere by default | Nothing. The status page reads the expected bridges from the server (`JVB_MAX_REPLICAS`) |
 | `AZURE_STORAGE_CONTAINER`, `AWS_S3_BUCKET`, `GCS_BUCKET` | `infra/k8s/secret-template.yaml`, `.env.example` | `AZURE_STORAGE_CONTAINER_NAME`, `STORAGE_FILES_S3_BUCKET`, `RECORDING_S3_BUCKET` |
 | `DOCKER_HOST_ADDRESS` | `.env.example` | Read by Docker Compose for the local bridge, not by the application |
 
@@ -369,7 +396,7 @@ Who creates each Secret in each `secrets.mode`, how to separate the datastore pa
 
 | Key | Held by | Protects | Generate with | Changing it |
 |---|---|---|---|---|
-| `APP_SECRET` | Application Secret | The staff session cookie, event access and join cookies, signed links sent by email (data-subject requests, address-book opt-out, the entry links of invitation-only registration), chat attachment links. It is also the HMAC key of every stored email hash | `openssl rand -hex 32` | Signs every staff member out and voids every event cookie and signed link. Stored email hashes stop matching, so staff accounts, registrations and address-book entries can no longer be found by email address, and duplicate registrations are no longer detected. Treat it as a permanent key |
+| `APP_SECRET` | Application Secret | The staff session cookie, event access and join cookies, signed links sent by email (data-subject requests, address-book opt-out, the entry links of invitation-only registration), chat attachment links. It is also the HMAC key of every stored email hash, of the chat sender key that colors chat bubbles, and of the deduplication key of moderator-link emails | `openssl rand -hex 32` | Signs every staff member out and voids every event cookie and signed link. Stored email hashes stop matching, so staff accounts, registrations and address-book entries can no longer be found by email address, and duplicate registrations are no longer detected. Chat bubble colors change once, which is harmless. Treat it as a permanent key |
 | `PII_ENCRYPTION_KEY` | Application Secret | Personal data encrypted at rest (AES-256-GCM), and the Gravatar reference in conference tokens | `openssl rand -hex 32` | There is no re-encryption: data written with the old key can no longer be read. Do not change it on an installation that holds data. See [Security architecture](architecture/security.md) |
 | `JITSI_JWT_SECRET` | Application Secret, plus the conference JWT Secret as `JWT_APP_SECRET` | Admission to the conference | `openssl rand -hex 32` | Change both copies in the same rollout. Tokens already issued stop verifying. A participant who reconnects gets a new token from the portal |
 | `ADMIN_API_KEY` | Application Secret | Sign-in with the instance key | `openssl rand -hex 32` | New sign-ins need the new key. Existing sessions continue |

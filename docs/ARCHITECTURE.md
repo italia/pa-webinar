@@ -170,7 +170,7 @@ flowchart LR
   style RUN fill:#F7F9FB,stroke:#5C6F82,color:#17324D
 
   SCL -->|"bridge stats in,<br/>desired replicas out"| APP
-  CRON -->|"outbox, reminders,<br/>retention, reconcile"| APP
+  CRON -->|"outbox, reminders, lifecycle,<br/>retention, reconcile"| APP
   RCT -->|"which events<br/>need a recorder"| APP
   ORC -->|"pending jobs"| APP
   APP ~~~ REC
@@ -196,12 +196,12 @@ In the table, the "Default" column gives the chart default from `infra/helm/pa-w
 | coturn | TURN/TURNS relay for networks that block UDP | `jitsi-meet.coturn` in the subchart | Upstream | Off | [TURN](INFRASTRUCTURE.md#turn), [DEPLOYMENT](DEPLOYMENT.md#coturn-turn-and-turns) |
 | Jibri | Composite MP4 recording of the conference | `jitsi-meet.jibri` in the subchart, with the finalize script from a chart ConfigMap | Upstream | Off | [Recording](architecture/recording.md) |
 | PostgreSQL | All durable application state | Bitnami subchart, or external (`postgresql.enabled: false`) | Upstream | On | [Data model](architecture/data-model.md) |
-| Redis | Pub/sub fan-out, the JVB snapshot and square presence | Bitnami subchart, standalone with no persistence, or external | Upstream | On | [Live interaction](architecture/live-interaction.md) |
+| Redis | Pub/sub fan-out, the JVB snapshot, the scaler's lifecycle heartbeat and square presence | Bitnami subchart, standalone with no persistence, or external | Upstream | On | [Live interaction](architecture/live-interaction.md) |
 | Object storage | Materials, recordings, audio tracks and AI outputs | External service: Azure Blob or S3-compatible | n/a | Configured per installation | [Object storage](configuration/storage.md) |
 | Recorder bot (`pa-webinar-recorder`) | Joins as a receive-only client and saves one audio track per participant. It is invisible to participants only when the hidden Prosody domain is configured (`recorder.hiddenDomain`); otherwise it appears under a reserved name | A Job from the suspended CronJob template `recorder`. In Compose, a container started through the Docker socket | `dev.yml` (`:dev`) | Off (`recorder.enabled`) | [Recording](architecture/recording.md), [recorder README](../infra/recorder/README.md) |
 | Recorder controller (`pa-webinar-recorder-controller`) | Keeps one recorder running per `LIVE` event that has recording, AI transcription and per-participant recording all enabled | Deployment. Compose service (profile `recorder`) | `dev.yml` (`:dev`) | Off (follows `recorder.enabled`) | [Recording](architecture/recording.md), [controller README](../infra/recorder-controller/README.md) |
 | JVB scaler | Aggregates bridge statistics, drives automatic event status changes and scales JVB and Jibri | CronJob running `kubectl` | Upstream kubectl image | Off (`jvbScaler.enabled`, which also needs `jitsi.mode: full`) | [Scaling](architecture/scaling.md), [Running the JVB scaler](operations/jvb-scaler.md) |
-| Scheduled jobs | Email outbox, reminders, GDPR cleanup, address-book retention, recording reconciliation and post-production housekeeping | CronJobs calling `/api/cron/*`. The Compose `cron` service calls a subset | Upstream curl image | Core jobs on | [Scheduled and background jobs](architecture/background-jobs.md) |
+| Scheduled jobs | Email outbox, reminders, the event lifecycle where the JVB scaler is not rendered, GDPR cleanup, address-book retention, recording reconciliation and post-production housekeeping | CronJobs calling `/api/cron/*`. The Compose `cron` service calls a subset | Upstream curl image | Core jobs on | [Scheduled and background jobs](architecture/background-jobs.md) |
 | Post-production orchestrator | Turns queued post-production jobs into worker Jobs | CronJob running `kubectl` | Upstream kubectl image | Off (`postprod.enabled`) | [AI post-production](POSTPROD.md) |
 | Post-production worker (`pa-webinar-postprod-worker`) | Transcription, diarization, subtitles, summaries, translations and dubbing | A Job on the GPU node pool, from a suspended CronJob template | `dev.yml` (`:dev`) | Off | [AI post-production](POSTPROD.md), [worker README](../infra/ai/worker/README.md) |
 | vLLM | OpenAI-compatible LLM server for summaries and translations | A GPU Deployment that the chart does not render | Upstream | Not installed by the chart | [AI post-production](POSTPROD.md) |
@@ -303,7 +303,7 @@ sequenceDiagram
   APP-->>PT: personal link, calendar file, reminders
   Note over PT,APP: Steps 4-5: wait, then the event goes live
   PT->>APP: open personal link, waiting room
-  Note over APP,JIT: event turns LIVE: JVB scaler or Start event
+  Note over APP,JIT: event turns LIVE: JVB scaler, lifecycle job or Start event
   Note over PT,JIT: Step 6: join
   PT->>APP: request conference token
   APP-->>PT: Jitsi JWT: name, role, room, expiry
@@ -315,7 +315,7 @@ sequenceDiagram
   Note over JIT,OBJ: Step 8: record
   CAP->>JIT: capture the conference
   CAP->>OBJ: upload through a presigned URL
-  Note over PT,JIT: Step 9: End for everyone, or the scaler after the grace period
+  Note over PT,JIT: Step 9: End for everyone, or the scaler or lifecycle job after the grace period
   Note over APP,WRK: Step 10: post-produce
   CAP->>APP: webhook or track manifest
   APP->>DB: Recording, tracks, PostprodJob rows
@@ -333,11 +333,11 @@ sequenceDiagram
 2. **Emails leave through the outbox.** Code never sends mail directly. It adds rows to `EmailOutbox`, and the `email-outbox` job delivers them over SMTP. See [Email and calendar](architecture/email.md) and [background jobs](architecture/background-jobs.md).
 3. **Register.** The registration form collects a name, an email address and consent that is never pre-ticked. The email is encrypted at rest and looked up by hash. The confirmation carries the personal link and a calendar file. Reminders follow. While public registration is off, the form answers every address in the same way and the personal link reaches the registrant only by email. See [the event journey](architecture/event-journey.md) and [Privacy and data protection](GDPR.md).
 4. **Wait.** Everyone arrives at the same front door, `/events/[slug]/live`. The waiting room offers a device check, virtual backgrounds, waiting-room music and, unless the classic view is in use, the square. What it shows depends on the event status and the time. See [The waiting room and the square](architecture/waiting-room.md).
-5. **Go live.** The event reaches `LIVE`. Where the JVB scaler runs, it moves the event there through `PROVISIONING`, once a bridge is ready and the start time has passed. Otherwise a moderator presses **Start event**. See [Event lifecycle](architecture/event-lifecycle.md) and [Scaling the media plane](architecture/scaling.md).
+5. **Go live.** The event reaches `LIVE`. Where the JVB scaler runs, it moves the event there through `PROVISIONING`, once a bridge is ready and the start time has passed. Elsewhere the lifecycle job opens it at the start time. A moderator can open it earlier with **Start event**. See [Event lifecycle](architecture/event-lifecycle.md) and [Scaling the media plane](architecture/scaling.md).
 6. **Join.** The page asks the portal for a Jitsi JWT for this seat, and `JitsiRoom` opens the conference with it. See [Identity, access and tokens](architecture/identity-and-access.md) and [Jitsi integration](architecture/jitsi-integration.md).
 7. **Interact.** Q&A, chat, polls, the word cloud, reactions from the app's bar, the raised-hand queue and live-toggleable features are REST calls. Server-Sent Events fan out through Redis. See [Live interaction and realtime](architecture/live-interaction.md).
 8. **Record.** Jibri records a composite video when a moderator starts it, or automatically if the event is set to. The recorder controller starts the recorder bot for `LIVE` events that have recording, AI transcription and per-participant recording all enabled. On those events, participants must give explicit consent to it before they enter, either at registration or in the waiting room. See [Recording](architecture/recording.md) and [Recordings, voice data and AI outputs](privacy/recordings-and-ai.md).
-9. **End.** **End for everyone** closes the room. The moderator chooses where the event goes next (archived, a public post-event page, or also the video library) and can request AI outputs. Otherwise the scaler ends the event after its end time plus the grace period. See [Event lifecycle](architecture/event-lifecycle.md).
+9. **End.** **End for everyone** closes the room. The moderator chooses where the event goes next (archived, a public post-event page, or also the video library) and can request AI outputs. Otherwise the scaler, or the lifecycle job where there is no scaler, ends the event after its end time plus the grace period. See [Event lifecycle](architecture/event-lifecycle.md).
 10. **Post-produce.** The Jibri webhook creates a `Recording` row and queues post-production jobs in PostgreSQL. For per-participant recording, the row already exists from the moment the recorder was dispatched: the Jibri webhook only adds the composite video to it, and the track manifest adds the tracks and queues the jobs. Jobs are queued only when the event has AI transcription on and post-production is enabled for the installation. The orchestrator starts GPU worker Jobs. They claim work, transcribe, summarize, translate, subtitle and dub, then register every output as an artifact. See [AI post-production](POSTPROD.md).
 11. **Publish.** Staff review and edit the outputs, then publish. The recording appears on the event's post-event page and, when listed, in the public **Video library**. See [the event journey](architecture/event-journey.md).
 12. **Forget.** Retention jobs delete personal data and recordings when their retention periods expire. See [Privacy and data protection](GDPR.md).
@@ -356,12 +356,12 @@ sequenceDiagram
 **All state is in PostgreSQL. Redis is not storage.** Everything that must survive a restart lives in PostgreSQL. Binary content (materials, recordings, tracks, AI outputs) lives in object storage. Redis runs without persistence and carries only short-lived data:
 
 - the fan-out channels `chat:<eventId>`, `control:<eventId>`, `live:<eventId>` and `garden:<eventId>`;
-- the JVB snapshot;
+- the JVB snapshot, and the heartbeat with which the scaler tells the lifecycle job to stand down;
 - positions in the square, which expire in seconds.
 
 Losing Redis loses no data. Real-time delivery degrades until it returns ([Live interaction and realtime](architecture/live-interaction.md)).
 
-**Configuration without rebuilds.** The code reads `NEXT_PUBLIC_*` variables at request time with `getPublicEnv()` (`app/src/lib/env.ts`), and client components receive the values as props, so one image can serve every installation. Build metadata is baked in on purpose. Known limitation: a few call sites still use the build-inlined `process.env.NEXT_PUBLIC_*` form and see the image's build-time value. They include the links in GDPR export and erasure emails (`NEXT_PUBLIC_APP_URL`), the Jitsi reachability check on the infrastructure page and the JWT `sub` fallback (`NEXT_PUBLIC_JITSI_DOMAIN`), and the bridge maximum on the status page ([Build-time values](CONFIGURATION.md#build-time-values)). Branding, languages, feature toggles and the scaler's knobs live in the `SiteSetting` singleton ([ADR-010](adr/010-site-settings-singleton.md)), editable from the administration area. See [Configuration reference](CONFIGURATION.md), [Runtime settings](configuration/runtime-settings.md) and [Branding and white-labeling](configuration/branding.md).
+**Configuration without rebuilds.** The code reads `NEXT_PUBLIC_*` variables at request time with `getPublicEnv()` (`app/src/lib/env.ts`), and client components receive the values as props, so one image can serve every installation. Build metadata is baked in on purpose. An ESLint rule forbids the build-inlined `process.env.NEXT_PUBLIC_*` form everywhere else ([Public variables are read at run time](CONFIGURATION.md#public-variables-are-read-at-run-time)). Branding, languages, feature toggles and the scaler's knobs live in the `SiteSetting` singleton ([ADR-010](adr/010-site-settings-singleton.md)), editable from the administration area. See [Configuration reference](CONFIGURATION.md), [Runtime settings](configuration/runtime-settings.md) and [Branding and white-labeling](configuration/branding.md).
 
 **Optional capabilities are additive.** Composite recording, per-participant recording, AI post-production, the JVB scaler and coturn are all off in the chart defaults. The portal works without any of them, and each one is enabled with its own values.
 

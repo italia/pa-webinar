@@ -41,7 +41,7 @@ footing:
 | Legal basis | Chosen by the controller for the event. This record assumes Art. 6(1)(b) | Consent, Art. 6(1)(a) |
 | Model | `Registration` | `Person` |
 | Lifetime | Event retention (`Event.dataRetentionDays`) | Inactivity window (`Person.retentionMonths`) |
-| Ended by | The daily GDPR cleanup, or self-service erasure | Deletion by an administrator, or the daily `rubrica-retention` job after an opt-out or once the inactivity window has passed |
+| Ended by | The daily GDPR cleanup, or self-service erasure | Deletion by an administrator, self-service erasure, or the daily `rubrica-retention` job after an opt-out or once the inactivity window has passed |
 
 ## Decision
 
@@ -284,6 +284,7 @@ flowchart LR
 | Opt-out | `optedOutAt` on the record, until the record is deleted. No audit row |
 | Deletion by an administrator | `RUBRICA_PERSON_DELETE` in `AdminAuditLog`, with the record id, the actor, the client IP and the user agent |
 | Deletion by the retention job | No audit row. A log line and the job's JSON response give the counts |
+| Deletion by self-service erasure | `addressBookDeleted` in the details of the erasure's `DATA_DELETED` rows in `GdprAuditLog`, written only when the person also had registrations; the response carries the same flag |
 
 Once a record is deleted, nothing refers to it except the `AdminAuditLog` entry, if an administrator
 deleted it. The `CONSENT_RECORDED` rows still show that an opt-in happened at a given event, without
@@ -291,16 +292,16 @@ pointing to the record.
 
 ### Deletion paths
 
-There are three ways a record ends:
+There are four ways a record ends:
 
-- **An administrator deletes it.** The deletion takes effect at once. It is the only immediate way.
+- **An administrator deletes it.** The deletion takes effect at once.
+- **The person erases their data.** The self-service erasure at `/api/gdpr/erasure` deletes the
+  registrations that match the email hash and, at once, the person record with the same hash.
 - **The person opts out.** The record is flagged, and the daily job deletes it.
 - **The record goes inactive.** The daily job deletes it once its window has passed.
 
-No public path deletes the record at once. The opt-out page only flags the record. The self-service
-erasure at `/api/gdpr/erasure` deletes the registrations that match the email hash and leaves the person
-record in place. The self-service export at `/api/gdpr/export` does not include the record
-([GDPR.md](../GDPR.md#data-subject-rights)).
+The opt-out page only flags the record. The self-service export at `/api/gdpr/export` does not include
+the record ([GDPR.md](../GDPR.md#data-subject-rights)).
 
 Each run of the retention job deletes a bounded batch of opted-out records. It also checks a bounded batch
 of opted-in records, oldest activity first, and deletes the expired ones. The batch size is `BATCH_SIZE`
@@ -313,7 +314,7 @@ flowchart LR
     IN["<b>Opt-in</b><br/>address-book box ticked<br/>at registration"]:::portal
     ACT["<b>Activity</b><br/>every later registration<br/>refreshes lastActiveAt"]:::portal
     P["<b>Person record</b><br/>emailHash, encrypted name,<br/>organization fields"]:::data
-    OUT["<b>Opt-out</b><br/>signed link flags the record<br/>no email carries the link yet"]:::job
+    OUT["<b>Opt-out</b><br/>signed link in the emails<br/>flags the record"]:::job
     IDLE["<b>Inactivity</b><br/>no registration for<br/>retentionMonths, default 24"]:::job
     ADM["<b>Administrator deletes</b><br/>Address book page, at once<br/>RUBRICA_PERSON_DELETE"]:::staff
     JOB["<b>Daily rubrica-retention job</b><br/>deletes flagged and<br/>expired records"]:::job
@@ -343,12 +344,6 @@ flowchart LR
 
 These parts of the decision are not built:
 
-- **The opt-out link in emails.** `issueRubricaOptOutToken()` exists, but no code calls it. No email
-  carries the link, so nobody ever receives a token. The help text under the box still says: "You can
-  withdraw it at any time using the 'Remove me from the address book' link in emails." In practice a
-  person withdraws by asking the controller, and an administrator deletes the record
-  ([known gaps](../GDPR.md#known-gaps)). The roadmap tracks it as "The address-book opt-out link is never
-  sent" ([roadmap](../ROADMAP.md#next)).
 - **Retention as a site setting.** `retentionMonths` is a per-record column with a schema default. No
   screen, no API and no `SiteSetting` field ([ADR-010](010-site-settings-singleton.md)) changes it.
   Changing the window takes a schema change and a data update.
@@ -358,9 +353,8 @@ These parts of the decision are not built:
   (`EventInvitation.token`), but nothing sends invitations yet
   ([event journey](../architecture/event-journey.md#known-limitations)).
 - **CSV export** of the address book.
-- **Self-service rights over the record.** The self-service export and erasure do not reach the record.
-  See [Deletion paths](#deletion-paths). The roadmap tracks erasure as "Erasure on request erases
-  everything" ([roadmap](../ROADMAP.md#next)).
+- **The record in the self-service export.** The self-service erasure deletes the record, but the export
+  does not include it. See [Deletion paths](#deletion-paths).
 
 ## Related
 

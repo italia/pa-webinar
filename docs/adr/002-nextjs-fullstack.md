@@ -81,7 +81,7 @@ An installation also runs upstream images: the Jitsi components, PostgreSQL and 
 
 ### What it costs
 
-- **The runtime-configuration rule is a convention.** No lint rule and no repository-wide test enforces it. Guard tests cover individual variables only. A dot-notation read of `NEXT_PUBLIC_*` compiles and works in local development, where build and runtime values match. It then silently freezes a value in the published image. Code review has to catch it. The codebase still contains a few such reads. Those with a visible effect are described in the configuration reference, under [Public variables are read at run time](../CONFIGURATION.md#public-variables-are-read-at-run-time) and [Build-time values](../CONFIGURATION.md#build-time-values). Each one is a defect against this decision, not a precedent.
+- **The runtime-configuration rule needs a guard.** A dot-notation read of `NEXT_PUBLIC_*` compiles and works in local development, where build and runtime values match. It then silently freezes a value in the published image. An ESLint rule (`no-restricted-syntax` in `app/eslint.config.mjs`) therefore forbids it outside `app/src/lib/env.ts` and the test files, and allows only the build identity, `NEXT_PUBLIC_BUILD_*`, by name ([Public variables are read at run time](../CONFIGURATION.md#public-variables-are-read-at-run-time), [Build-time values](../CONFIGURATION.md#build-time-values)).
 - **More plumbing.** Without Server Actions, every administration form calls a route and handles its errors explicitly.
 - **Shared processes.** Server-Sent Events connections are held by the same processes that render pages, so app-tier sizing has to account for open streams.
 - **One framework couples everything.** A major Next.js upgrade touches pages, API and middleware at once.
@@ -138,7 +138,7 @@ Baking each installation's `NEXT_PUBLIC_*` values into its own build was rejecte
 - `getPublicEnv()` in `app/src/lib/env.ts` falls back to development defaults, defined in that file, for a few keys.
 - Parse `NEXT_PUBLIC_APP_URL` only through `appBaseUrl()`, in the same file. It returns `null` for an empty or malformed value instead of throwing, so a misconfigured value cannot break a page or a route.
 - The workflows pass the build-identity variables as build arguments. The `Dockerfile` gives the few other `NEXT_PUBLIC_*` variables it declares generic placeholder defaults and leaves the rest unset, so an image carries no installation's values. How the build identity is set and shown is described in [CI, images and releases](../development/ci-and-release.md#build-identity).
-- Guard tests fail on a dot-notation read of a specific variable, for example `app/src/lib/jitsi/rnnoise.test.ts` and `app/src/lib/jitsi/whiteboard.test.ts`. `app/eslint.config.mjs` has no such rule.
+- `app/eslint.config.mjs` forbids a dot-notation read of `NEXT_PUBLIC_*` outside `app/src/lib/env.ts` and the tests, except `NEXT_PUBLIC_BUILD_*`. Guard tests also fail on a dot-notation read of specific variables, for example `app/src/lib/jitsi/rnnoise.test.ts` and `app/src/lib/jitsi/whiteboard.test.ts`.
 
 **The square.**
 

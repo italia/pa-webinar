@@ -41,8 +41,8 @@ owner:
 |---|---|---|
 | Registration form of an event | The event's notice, inline or as a link, above the consent boxes | Event wizard, step **Review**, section **Privacy and data retention**; see [Which notice the registration form shows](#which-notice-the-registration-form-shows) |
 | Site privacy page, `/<locale>/privacy`, linked from the footer as **Privacy policy** | Your site-wide text, or the built-in generic text | **Settings** > **General** > **Pages** > **Privacy policy** |
-| Waiting room | **This event is being recorded.** when recording is enabled; an **AI processing after the event** notice when AI post-production applies | Event flags; **Settings** > **General** > **Post-event AI pipeline** > **AI notice in the waiting room** |
-| Before entering the live room | A full-screen **Recording consent** screen with **Enter room** and **Do not participate**, for registrants and guests of events with recording enabled | Built-in text (`live.recordingConsent`) |
+| Waiting room | **This event is being recorded.** when recording is enabled and the installation can record (Jibri, or the per-participant recorder); an **AI processing after the event** notice when AI post-production applies | Event flags; **Settings** > **General** > **Post-event AI pipeline** > **AI notice in the waiting room** |
+| Before entering the live room | A full-screen **Recording consent** screen with **Enter room** and **Do not participate**, for registrants and guests of events with recording enabled, when the installation can record | Built-in text (`live.recordingConsent`) |
 | During the call | A **Recording in progress** banner for everyone while a recording runs | Automatic |
 
 The event page and the waiting room do not link the event's notice. Guests,
@@ -291,9 +291,10 @@ Retention depends on scheduled jobs. On Helm installations the cleanup runs
 daily (`cronjobs.cleanup`), the address-book retention daily
 (`cronjobs.rubricaRetention`), and the post-production purges only when
 `postprod.enabled` is on. The Docker Compose scheduler calls only the email
-outbox, reminders and cleanup, so address-book retention never runs there
-unless you schedule it. The cleanup handles only events in `ENDED` or
-`ARCHIVED`: an event that never ends is never cleaned
+outbox, the event lifecycle, reminders and cleanup, so address-book retention
+never runs there unless you schedule it. The cleanup also handles events that
+were never ended, once their end (or their last activity, if later) plus the
+retention days has passed; drafts are never cleaned
 ([Scheduled and background jobs](../architecture/background-jobs.md#cleanup)).
 What each job deletes is in the
 [data inventory](../GDPR.md#data-inventory-and-retention).
@@ -365,12 +366,13 @@ Your notice should state at least:
   last registration with the same email address, ticked or not (see
   [Retention and where to change it](#retention-and-where-to-change-it)).
 - **Objection.** The registration form says consent can be withdrawn with a
-  "Remove me from the address book" link in emails, but no email carries that
-  link. Handle objections by request: an administrator deletes the entry under
-  **Address book**, and the deletion is written to the administration audit
-  log. Change the promise with the key `gdpr.consent.addressBookHelp` until the
-  link is sent.
-- Self-service erasure does not touch the address book.
+  "Remove me from the address book" link in emails. The confirmation, reminder
+  and post-event thank-you emails of people in the address book carry that
+  signed link, valid for 90 days. An erasure request also deletes the entry.
+  Objections by other means are handled by request: an administrator deletes
+  the entry under **Address book**, and the deletion is written to the
+  administration audit log.
+- Self-service erasure also deletes the person's address-book entry.
 
 ### Rights and the self-service URLs
 
@@ -448,9 +450,8 @@ The same differences are tracked in [Known gaps](../GDPR.md#known-gaps).
 
 | Where | Text | What actually happens | Key |
 |---|---|---|---|
-| Registration form | "…using the "Remove me from the address book" link in emails." | No email carries the link | `gdpr.consent.addressBookHelp` |
 | Waiting room, guests | **Email (optional)**, "Only for post-event follow-up" | The address never leaves the browser | `waiting.emailHelp` |
-| Erasure confirmation | "Registrations, questions, poll votes, feedback and reminders will be deleted." | Feedback and questionnaire answers are unlinked from the registration and kept until the event's retention | `gdpr.erasure.confirmBody` |
+| Erasure confirmation | "Registrations, questions, poll votes, feedback, reminders and your entry in the events address book will be deleted." | Feedback and questionnaire answers are unlinked from the registration and kept until the event's retention | `gdpr.erasure.confirmBody` |
 | Recording panel | **Never (until event expiry)** and "The video will still follow the event's GDPR retention" | A published recording is not deleted by the event's retention | `recording.retention.forever`, `recording.retentionNote` |
 | AI pipeline settings | **Artifact retention (days)**: "A positive value keeps them for the given number of days even after the event is closed" | A positive value only adds a deletion date; it never extends retention | `admin.settings.postprod.artifactRetentionDaysHelp` |
 | Site privacy page | The built-in generic text | Describes AI processing and specific models on every installation | `legal.privacy.*` |
@@ -477,8 +478,8 @@ The same differences are tracked in [Known gaps](../GDPR.md#known-gaps).
 6. **Jobs.** Check that `cleanup` and `rubrica-retention` run, and, when
    recording per-participant audio or running AI, that `postprod.enabled` is on
    so the purges run ([Scheduled and background jobs](../architecture/background-jobs.md)).
-   Make sure someone ends events: without the JVB scaler, only a moderator or
-   an administrator does.
+   Check that events end on time: the lifecycle job, or the JVB scaler in the
+   full profile, ends them after their end time and grace period.
 7. **Third parties.** Leave **Use Gravatar when available** off unless your
    notice names Gravatar.
 8. **Guests.** **Guest access enabled** (**Settings** > **General** >

@@ -572,13 +572,26 @@ needs:
   kubectl -n pa-webinar create secret tls pa-webinar-meet-tls --cert=<jitsi.crt> --key=<jitsi.key>
   ```
 
-- The conference name needs a publicly trusted certificate, and not only for
-  browsers. The portal's status page fetches the conference host from inside
-  the cluster. With a self-signed certificate that request fails
-  (`DEPTH_ZERO_SELF_SIGNED_CERT`), and the status page reports the conference
-  as down.
-- The lab setups used nip.io names and the ingress controller's self-signed
-  default certificate. That is not suitable for real participants.
+- Browsers must trust both certificates. A participant whose device does not
+  trust the conference's certificate sees **The video call service is not
+  responding** in the room, with a link to the conference host where the
+  warning can be accepted; external participants on their own devices will
+  not trust an internal authority, so public events need a publicly trusted
+  certificate on the conference host.
+- With the conference installed by the chart, the portal's status page checks
+  the conference's components at their in-cluster addresses, so the
+  certificate plays no part there. With an external Jitsi it checks the public
+  host, and a certificate the portal does not trust shows as `degraded` with
+  the TLS error code, not as an outage
+  ([Monitoring and health](operations/monitoring.md#get-apistatus)).
+- For the portal's own outbound calls to names behind an internal certificate
+  authority (an SMTP relay, object storage, an external Jitsi), mount the
+  authority with `app.extraCaCerts`; the chart sets `NODE_EXTRA_CA_CERTS`
+  ([Configuration reference](CONFIGURATION.md#extra-certificate-authorities)).
+- The minikube script signs the lab's certificates with a local certificate
+  authority of its own ([Try PA Webinar on minikube](install/minikube.md));
+  other lab setups used nip.io names and the ingress controller's self-signed
+  default certificate. Neither is suitable for real participants.
 
 ### Ingress controllers
 
@@ -699,7 +712,7 @@ selected, so their own traffic is not restricted.
 | Direction | Allowed |
 |---|---|
 | Ingress, on TCP 3000 | The ingress controller: namespaces in `networkPolicy.ingress.fromNamespaceSelectors` (default: `ingress-nginx`) and pods in `fromPodSelectors`; with both lists empty, any source. Every pod carrying the release's selector labels, which admits the scheduled jobs, the scaler, the recorder controller and the post-production worker. The Jibri pods when Jibri is enabled. The `monitoring` namespace when `allowMonitoring` is on. Anything in `ingress.extraRules` |
-| Egress | DNS on port 53 to `egress.dns.to` (default: `k8s-app: kube-dns` pods); PostgreSQL and Redis pods; the Jitsi pods on 5222 and 5280 (Prosody), 8080 (the bridge statistics) and 2222 (Jibri health); the recorder controller when it is enabled; the ingress controller's namespaces on 443 and 8443, for the portal's calls to its own public hostnames; TCP 587 anywhere (465 with `allowImplicitTlsSmtp`); TCP 443 anywhere except `169.254.0.0/16` (`httpsExcept`); anything in `egress.extraRules` |
+| Egress | DNS on port 53 to `egress.dns.to` (default: `k8s-app: kube-dns` pods); PostgreSQL and Redis pods; the Jitsi pods on 5222 and 5280 (Prosody), 8080 (the bridge statistics), 2222 (Jibri health), 80 (the web container) and 8888 (Jicofo's REST API), the last two for the status page's in-cluster probes; the recorder controller when it is enabled; the ingress controller's namespaces on 443 and 8443, for the portal's calls to its own public hostnames; TCP 587 anywhere (465 with `allowImplicitTlsSmtp`); TCP 443 anywhere except `169.254.0.0/16` (`httpsExcept`); anything in `egress.extraRules` |
 
 [NetworkPolicy](DEPLOYMENT.md#networkpolicy) in Deploying with Helm describes
 each key. The PostgreSQL and Redis subcharts render their own permissive
@@ -735,6 +748,11 @@ namespace:
   so these paths need no extra rule.
 - With the default `fromNamespaceSelectors` (`ingress-nginx`), Traefik in
   `kube-system` got 502 from the portal.
+- **Not exercised under an enforcing policy:** the status page's in-cluster
+  probes of the conference's web container (port 80) and of Jicofo (8888),
+  which the chart's egress rule allows by default. `scripts/validate-chart.sh`
+  checks on every profile that each in-cluster address points to a rendered
+  Service and that the egress rule allows its port.
 
 ### What you still set
 
@@ -754,9 +772,9 @@ namespace:
 - **Services the portal calls inside the cluster**: an in-cluster Prometheus
   (`PROMETHEUS_URL`) or S3 endpoint, in `egress.extraRules`; NodeLocal DNSCache
   or Cloud DNS in `egress.dns.to`.
-- **A publicly trusted certificate on the conference host.** The policy lets
-  the status check through, but with a self-signed certificate the status page
-  still reports the conference as down (see [DNS and TLS](#dns-and-tls)).
+- **The Jitsi egress ports**, if you replace `egress.jitsi.ports`: keep 80 and
+  8888, or the status page reports the conference's web page and Jicofo as
+  down while calls work.
 
 ### Checking a policy
 
@@ -893,7 +911,6 @@ where there is one.
 | The bridge's default STUN server is a third-party service | An outbound dependency, and an extra advertised address. The post-install notes warn | [Advertised addresses and NAT](#advertised-addresses-and-nat) |
 | `db-migrate` starts before PostgreSQL is ready | A few restarts on the first install; early jobs end in `Error` | Wait: it resolves on its own |
 | Jibri is enabled by the standard and full profiles, but the chart renders its finalize script without mounting it | Composite recordings are neither uploaded nor registered | [Mount the finalize script](operations/recording-setup.md#mount-the-finalize-script) |
-| The status check fetches the conference host with the cluster's trust store | With a self-signed or internal-CA certificate the status page reports the conference as down | A publicly trusted certificate ([DNS and TLS](#dns-and-tls)) |
 | The conference-root redirect is an ingress-nginx annotation | No redirect with other controllers; the notes warn when the redirect's class is in `ingress.nonNginxClassNames` | None |
 | Object storage accepts only static keys | IRSA, EKS Pod Identity and GKE or Azure workload identity cannot be used | Static keys |
 | `REDIS_URL` ends in `svc.cluster.local` | Chat fan-out fails on clusters with a custom cluster domain | Keep the default domain |

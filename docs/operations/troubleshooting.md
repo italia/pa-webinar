@@ -49,7 +49,7 @@ The app pods and the pods of the chart's CronJobs, controllers and post-producti
 | [502 on administration pages](#502-bad-gateway-on-administration-pages) | Response headers larger than a proxy's buffer | Keep the chart's buffer annotations; raise the buffer of any proxy in front |
 | [Chat or live panels drop after about 60 s](#chat-and-live-panels-drop-after-about-60-seconds) | A proxy buffers the event stream or times out before the 25-second keepalive | Turn off buffering for event streams; lengthen idle timeouts |
 | [Nobody can enter a room](#nobody-can-enter-a-room) | JWT secret, app id, issuer or audience differ between the app and Prosody | Compare both sides, then restart what changed |
-| [Guests cannot join, or the event is stuck in `PROVISIONING`](#guests-cannot-join-or-the-event-is-stuck-in-provisioning) | The event is not `LIVE`; outside the `full` profile nothing starts it. Or **Guest access enabled** is off | **Start event**; reset a stuck `PROVISIONING` event with **Publish**; check the site setting |
+| [Guests cannot join, or the event is stuck in `PROVISIONING`](#guests-cannot-join-or-the-event-is-stuck-in-provisioning) | The event is not `LIVE`: the lifecycle job or the scaler is not running, or the bridge does not answer. Or **Guest access enabled** is off | **Start event**; check the lifecycle job or the scaler; check the site setting |
 | [Rooms take minutes to open](#slow-cold-start) | Bridge cold start longer than the pre-scale window, or a bridge pod stuck in `Pending` | Raise **Pre-scale lead time (minutes)**; fix the node pool |
 | [No audio or video](#no-audio-or-video) | UDP 10000 closed, unreachable advertised address, several bridges behind one address, no TURN relay | Follow the decision tree |
 | [The call breaks when a participant leaves](#the-call-breaks-when-a-participant-leaves) | The bridge channel runs over SCTP | Move the bridge channel to the Colibri WebSocket |
@@ -107,7 +107,7 @@ FROM _prisma_migrations ORDER BY started_at DESC LIMIT 5;
 
 ### Pods Ready but requests return 500
 
-**Symptom.** Every pod is `Ready`, but some pages or API calls answer 500. An API call handled by the shared route wrapper (`withErrorHandling` in `app/src/lib/api-handler.ts`) leaves a JSON log line with `"level":"error"` and `"status":500`, and its unexpected errors are logged as `Unhandled error:` followed by the cause. Server-rendered pages, and the few routes outside the wrapper (the event streams and `/api/ready` among them), leave no JSON line: their errors appear as plain Next.js error output, for example a Prisma error with its `P20xx` code.
+**Symptom.** Every pod is `Ready`, but some pages or API calls answer 500. An API call handled by the shared route wrapper (`withErrorHandling` in `app/src/lib/api-handler.ts`) leaves a JSON log line with `"level":"error"` and `"status":500` (a 5xx marked as expected, such as `STORAGE_UNAVAILABLE` from an upload route on an installation without storage, is logged at `warn`), and its unexpected errors are logged as `Unhandled error:` followed by the cause. Server-rendered pages, and the few routes outside the wrapper (the event streams and `/api/ready` among them), leave no JSON line: their errors appear as plain Next.js error output, for example a Prisma error with its `P20xx` code.
 
 ```bash
 kubectl -n pa-webinar logs -l 'app.kubernetes.io/instance=pa-webinar,app.kubernetes.io/name=pa-webinar,!app.kubernetes.io/component' \
@@ -203,17 +203,24 @@ Only a `LIVE` event lets anyone into the conference, and only a `LIVE` event adm
 
 **Symptom: guests are sent to registration.** A guest who opens the room link is redirected to the event's registration page. With **Public registration enabled** off, that page accepts only addresses on the event's invitation list ([Runtime settings](../configuration/runtime-settings.md#public-features)). Registrants and moderators wait in the waiting room at a countdown or at "The event is about to start, please wait for the organizer…".
 
-- **Cause.** The event is still `PUBLISHED`. Outside the Helm `full` profile with the JVB scaler enabled, nothing moves an event to `LIVE` at its start time. That covers the `simple` and `standard` profiles, `full` with `jvbScaler.enabled: false`, and external Jitsi ([Running without the scaler](../architecture/event-lifecycle.md#running-without-the-scaler)).
-- **Fix.** A moderator presses **Start event** in the waiting room or on the event's management page, and ends the event with **End for everyone** afterwards. Without the scaler nothing ends it either, and the retention of participant data starts only once an event is ended or archived.
+- **Cause.** The event is still `PUBLISHED` after its start time. Outside the Helm `full` profile with the JVB scaler, the lifecycle job opens it within a minute of `startsAt` ([Running without the scaler](../architecture/event-lifecycle.md#running-without-the-scaler)). If it does not, either the job is not running (the `<release>-lifecycle` CronJob, or the `cron` service in Docker Compose), or `JVB_HEALTH_URL` is set and the bridge does not answer `/colibri/stats`:
+
+  ```bash
+  kubectl -n pa-webinar get cronjob pa-webinar-lifecycle
+  kubectl -n pa-webinar logs -l app.kubernetes.io/component=cronjob-lifecycle --tail=5
+  ```
+
+  The job's answer says `"bridgeProbed":true,"bridgeReachable":false` when the bridge is the cause, and `{"skipped":"scaler"}` when a scaler heartbeat is still in Redis. In the `full` profile the scaler opens the event instead (see the `PROVISIONING` symptom below).
+- **Fix.** A moderator can always press **Start event** in the waiting room or on the event's management page. Then fix the job or the bridge, so that the next events open on time.
 
 **Symptom: the event is `LIVE`, and guests are still sent to registration.**
 
 - **Cause.** **Guest access enabled** is off in the site settings (**Features** tab). Scheduled events then admit only registrants and moderator or speaker links, and the Jitsi token endpoint refuses guest tokens with `403` and the code `GUEST_ACCESS_DISABLED`. Instant calls stay open to anyone with the link ([Runtime settings](../configuration/runtime-settings.md#public-features)).
 - **Fix.** Turn the setting back on if the event is meant to be open, or send the people concerned the registration link. With **Public registration enabled** off, first add their addresses to the event's invitation list: the platform does not email invitations.
 
-**Symptom: the event is stuck in `PROVISIONING`.** The event does not leave `PROVISIONING`, the waiting room shows **Room warming up**, and **Start event** is gone.
+**Symptom: the event is stuck in `PROVISIONING`.** The event does not leave `PROVISIONING`, and the waiting room shows **Room warming up**, or **The room opens at the start time** when no scaler drives the lifecycle. A moderator can open it at any time with **Start event**.
 
-- **Without the scaler.** A registrant opened the room link inside the wake window, and `POST /wake` moved the event from `PUBLISHED` to `PROVISIONING`. Nothing will promote it. On the management page, press **Publish**, which sets the event back to `PUBLISHED`, then **Start event** ([the pitfall](../architecture/event-lifecycle.md#pitfall-a-wake-without-a-scaler)).
+- **Without the scaler.** The lifecycle job opens a `PROVISIONING` event at its start time like a `PUBLISHED` one, so the cause is the one above: the job does not run, or the bridge does not answer. An event can be in `PROVISIONING` without the scaler only if it was moved there while a scaler was running, for example before a scaler was paused.
 - **With the scaler.** No bridge has answered yet. The event becomes `LIVE` at the first tick after `startsAt` in which a bridge answers `/colibri/stats`, and stays `PROVISIONING` until then or until `endsAt`. Check the bridge pods and the scaler's log:
 
   ```bash
@@ -406,6 +413,7 @@ Every path outside these rules is blocked. The keys are described in [DEPLOYMENT
 | `EAI_AGAIN` or `ENOTFOUND` for every host name | DNS is served by NodeLocal DNSCache, or by pods without the `k8s-app: kube-dns` label | `networkPolicy.egress.dns.to`, for example an `ipBlock` for `169.254.20.10/32` |
 | Emails stay `PENDING` with `Connection timeout` or `ECONNREFUSED` in `last_error` | A relay on a port other than `networkPolicy.egress.smtpPort` (587 by default) | `networkPolicy.egress.smtpPort`, `allowImplicitTlsSmtp` for 465, or `networkPolicy.egress.extraRules` |
 | The bridge or Jibri shows as down on the status pages | `jitsi-meet.nameOverride` is set, while the default Jitsi egress peers match `app.kubernetes.io/name: jitsi-meet` | `networkPolicy.egress.jitsi.to` |
+| The conference web page or Jicofo shows as down on the status pages, with `TIMEOUT` as the probe detail, while calls work | A values file replaced `networkPolicy.egress.jitsi.ports` without 80 (the web container) and 8888 (Jicofo's REST API), which the in-cluster probes use | `networkPolicy.egress.jitsi.ports` |
 | The metrics target is down | Prometheus runs in a namespace other than `monitoring` | `networkPolicy.ingress.monitoringNamespaceSelector` ([Metrics scrape returns 401](#metrics-scrape-returns-401)) |
 
 Then run each job once ([background-jobs.md](../architecture/background-jobs.md#run-a-job-once)), record a test event with per-participant recording on ([recording-setup.md](recording-setup.md#check-that-the-recorder-works)), and open the infrastructure page. How to check that the policy is enforced at all is in [DEPLOYMENT.md](../DEPLOYMENT.md#networkpolicy).

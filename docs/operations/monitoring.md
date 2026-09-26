@@ -162,22 +162,29 @@ container before the app container starts
 | Component | Health signal | Read by |
 |---|---|---|
 | Recorder controller | `GET /healthz` on its `ctrl` port. It answers `ok` whenever the process runs | Its own liveness and readiness probes |
-| Jibri | `GET /jibri/api/v1.0/health` on port 2222 | The status endpoints, through `JIBRI_HEALTH_URL` |
-| Bridges | `/colibri/stats` on port 8080 | The JVB scaler, and the status endpoints as a fallback through `JVB_HEALTH_URL` |
+| Jibri | `GET /jibri/api/v1.0/health` on port 2222 | The status endpoints, through `JIBRI_HEALTH_URL`, only when Jibri is expected |
+| Bridges | `/colibri/stats` on port 8080 | The JVB scaler, the lifecycle cron, and the status endpoints through `JVB_HEALTH_URL` |
+| Conference web container, Prosody, Jicofo | `/external_api.js` on the web Service, BOSH `/http-bind` on Prosody's port 5280, `/about/version` on Jicofo's REST port 8888 | The status endpoints, through `JITSI_WEB_INTERNAL_URL`, `PROSODY_INTERNAL_URL` and `JICOFO_HEALTH_URL` |
 | Recorder bot, AI worker, scheduled jobs | Kubernetes Job status | kube-state-metrics, if you alert on it ([Scheduled and background jobs](../architecture/background-jobs.md)) |
 
-With `jitsi.enabled` on, the chart sets `JIBRI_HEALTH_URL` to
-`http://<release>-jitsi-meet-jibri:2222`. It sets `JVB_HEALTH_URL` to the
-subchart's bridge Service when that Service is rendered and exposes port 8080
+With `jitsi.enabled` on, the chart sets `JVB_HEALTH_URL` to the subchart's
+bridge Service when that Service is rendered and exposes port 8080
 (`jitsi-meet.jvb.service.extraPorts`, with neither host port nor host
 network). Otherwise it uses a `<fullname>-jvb-rest` Service that the chart
-renders for this purpose (`templates/jvb-rest-service.yaml`).
-`jitsi.jibriHealthUrl` and `jitsi.jvbHealthUrl` override both values. With
-several bridges the probe reaches one of them, and with the bridges scaled to
-zero nothing answers, which is expected
+renders for this purpose (`templates/jvb-rest-service.yaml`). It sets
+`JIBRI_HEALTH_URL` to the subchart's Jibri Service on port 2222 only when
+Jibri is enabled. It also writes the in-cluster addresses of the web
+container, Prosody and Jicofo, the last through a `<fullname>-jicofo-rest`
+Service (`templates/jicofo-rest-service.yaml`). Every address uses the full
+Service name (`<service>.<namespace>.svc.cluster.local` by default).
+`jitsi.jvbHealthUrl`, `jitsi.jibriHealthUrl`, `jitsi.webInternalUrl`,
+`jitsi.prosodyInternalUrl` and `jitsi.jicofoHealthUrl` override them
+([Configuration reference](../CONFIGURATION.md#conference-status-probes)).
+With several bridges the probe reaches one of them, and with the bridges
+scaled to zero nothing answers, which is expected
 ([Scaling the media plane](../architecture/scaling.md)). With an external
-Jitsi (`jitsi.enabled: false`) the chart sets neither variable: set them in
-`app.env`.
+Jitsi (`jitsi.enabled: false`) the chart sets none of these variables: set
+the ones you can reach in `app.env`.
 
 ## Status endpoints and pages
 
@@ -210,16 +217,46 @@ below are constants in `app/src/app/api/status/route.ts`.
 |---|---|---|---|
 | `app` | The route answered | Never | Always `operational` |
 | `database` | `SELECT 1` | It takes longer than 1 s | `outage` when it fails |
-| `jitsi` | Fetches `external_api.js` from `NEXT_PUBLIC_JITSI_DOMAIN`, with a 5 s timeout | Slower than 3 s, or a non-2xx answer | `outage` when there is no answer. `unknown` when the domain is not set |
-| `prosody`, `jicofo` | Not probed. They copy the `jitsi` result | As `jitsi` | As `jitsi` |
-| `jvb` | Ready bridges from the Redis snapshot, or else one probe of `JVB_HEALTH_URL` | Fewer bridges are ready than needed: scaling, or stale | `standby` when no event needs a bridge. `unknown` on error |
-| `jibri` | The Jibri health endpoint at `JIBRI_HEALTH_URL` | A `LIVE` or `PROVISIONING` event has recording on and no Jibri answers | `standby` when the installation does not expect Jibri (`RECORDING_STORAGE_TYPE` unset, or no recordings storage), or when nothing needs recording |
+| `jitsi` | Fetches `<JITSI_WEB_INTERNAL_URL>/external_api.js`, 3 s timeout. Without that variable, `external_api.js` from the public host `NEXT_PUBLIC_JITSI_DOMAIN`, 5 s timeout | In the cluster slower than 1.5 s, on the public host slower than 3 s, or a non-2xx answer. On the public host also a TLS or DNS failure, with its error code in `details` | `outage` with the error code when the connection is refused or times out. `unknown` when neither the variable nor the domain is set |
+| `prosody` | `<PROSODY_INTERNAL_URL>/http-bind` (BOSH, where `405` also counts as an answer). Without that variable, `/http-bind` on the public host, through the web container | As `jitsi` | As `jitsi` |
+| `jicofo` | `<JICOFO_HEALTH_URL>/about/version`, 3 s timeout | Slower than 1.5 s, or a non-2xx answer | `outage` when it does not answer. `unknown` (**Not monitored**) without `JICOFO_HEALTH_URL`: Jicofo has no public address |
+| `jvb` | Depends on the bridge mode, below | With the scaler: fewer bridges are ready than needed, scaling or stale | See the bridge modes |
+| `jibri` | The Jibri health endpoint at `JIBRI_HEALTH_URL`, called only when the installation expects Jibri | A `LIVE` or `PROVISIONING` event has recording on and no Jibri answers | `standby` when the installation does not expect Jibri (`RECORDING_STORAGE_TYPE` unset, or no recordings storage), or when nothing needs recording |
 | `smtp` | Not probed. `operational` when `SMTP_HOST` is set | Never | `unknown` when `SMTP_HOST` is not set |
 | `redis` | `PING`, with a 2 s timeout | Slower than 500 ms | `outage` when `REDIS_URL` is not set or no `PONG` comes back |
 
-The `jitsi` probe goes to the public conference hostname
-(`meet.webinar.example.com` in the examples), so from inside the cluster it
-also exercises DNS, TLS and the ingress.
+**Where the conference is probed.** With the conference installed by the
+chart, and in the Docker Compose stack, the three probes go to the
+components' internal addresses, so a self-signed or internal-CA certificate
+on the conference host plays no part and each component has a status of its
+own. No separate check of the public host is made there: an expired public
+certificate does not show on the status page. Without the internal addresses
+(an external Jitsi), the web and Prosody probes go to the public conference hostname
+(`meet.webinar.example.com` in the examples), and exercise DNS, TLS and the
+ingress from the app pod. A certificate that the app pod does not accept, or
+a name it cannot resolve, then turns them `degraded`, with the error code,
+and the pages say that the portal could not check the room while the room
+may still work. An internal authority can be given to the app with
+`app.extraCaCerts` ([Configuration reference](../CONFIGURATION.md#extra-certificate-authorities)).
+
+**Bridge modes.** How the `jvb` component and `metrics.jvbStatus` are read
+depends on `JVB_SCALER_ENABLED` and `JVB_HEALTH_URL`
+(`app/src/lib/status/bridge.ts`):
+
+| Mode | When | `jvb` component | `metrics.jvbStatus` |
+|---|---|---|---|
+| Scale-to-zero | `JVB_SCALER_ENABLED` is `true` | Ready bridges from the Redis snapshot, or else one probe of `JVB_HEALTH_URL`. `standby` when no event needs a bridge, `degraded` while scaling or stale, `unknown` on error | `ready`, `scaling` or `standby` |
+| Fixed bridges | No scaler, `JVB_HEALTH_URL` set | `operational` when `/colibri/stats` answers, `outage` when it does not, whatever the events. Never `standby`, scaling or stale | `ready` when the bridge answers, otherwise `standby` |
+| Not monitored | No scaler, no `JVB_HEALTH_URL` (an external Jitsi) | `unknown` (**Not monitored**), never an outage | `standby` |
+
+The live room waits for the bridge only when `jvbStatus` is `scaling`
+([The waiting room](../architecture/waiting-room.md)), which only the scaler
+reports, so without the scaler it never holds people back. The route also
+returns `metrics.jvbScalerEnabled`, `metrics.jvbMonitored` (false in the last
+mode), `metrics.jvbMaxReplicas` (`JVB_MAX_REPLICAS`: the scaler's cap, or the
+fixed bridges expected) and `metrics.jvbConferences`. The status page reads
+the expected bridges from these fields and has a separate card for fixed
+bridges.
 
 **Overall status.** It is `outage` when any component is `outage`, otherwise
 `degraded` when any is `degraded`, otherwise `operational`. `standby` and
@@ -227,7 +264,7 @@ also exercises DNS, TLS and the ingress.
 realtime fan-out breaks
 ([Live interaction and realtime](../architecture/live-interaction.md)).
 
-**Stale provisioning.** The route computes how many bridges are needed. It
+**Stale provisioning.** It applies only with the scaler. The route computes how many bridges are needed. It
 counts every `LIVE` or `PROVISIONING` event, plus every `PUBLISHED` event
 that starts within `jvbPreScaleMinutes`, sizes them with the formula in
 [Scaling the media plane](../architecture/scaling.md), and caps the total at
@@ -236,31 +273,43 @@ that starts within `jvbPreScaleMinutes`, sizes them with the formula in
 `startsAt` when that is not set). If a stale event exists and fewer bridges
 are ready than needed, `jvb` turns `degraded` with a "Stale" message and
 `metrics.jvbStale` is `true`. Jibri gets the same treatment for events with
-recording on. These flags only change the page: nothing moves the event
+recording on, only when Jibri is expected (`metrics.jibriStale`). These flags only change the page: nothing moves the event
 ([Event lifecycle](../architecture/event-lifecycle.md)). Both settings are
 described in [Runtime settings](../configuration/runtime-settings.md).
 
 **Counters.** The `metrics` block counts `LIVE`, `PROVISIONING` and `IDLE`
-events (`IDLE` only before their `endsAt`), and registrations since midnight
-server time. It carries the bridge figures (needed, ready, stress,
-participants, Octo), the Jibri state, and the number of orphan recordings
-that wait for an operator decision ([Recording](../architecture/recording.md)).
+events, and registrations since midnight server time. One rule applies to
+these counters, to the map's `events.active` and `upcomingCount`, and to the
+scale-to-zero block of **Monitoring** (`app/src/lib/status/event-activity.ts`):
+a `LIVE` event counts whatever its `endsAt`, because a room in overtime or an
+open-ended room is still running; `PROVISIONING`, `IDLE` and `PUBLISHED`
+events count only while `endsAt` has not passed. The counters include instant
+calls, as aggregates. The block also carries the bridge figures (needed,
+ready, stress, participants, conferences, Octo), the Jibri state, and the
+number of orphan recordings that wait for an operator decision
+([Recording](../architecture/recording.md)).
 
-**Next events.** `upcomingEvents` lists the next five events that have not
-ended and are `PUBLISHED`, `PROVISIONING`, `LIVE` or `IDLE`. Each entry has
-the title in Italian (or the first language available), the start time, the
-status, the capacity and whether participants may start their camera. The
-list does not filter by event type or access mode, so instant calls and
-password-protected events appear in it.
+**Next events.** `upcomingEvents` applies the visibility rules of the public
+listings (`publicEventStatusWhere`), so instant calls are not listed, while
+password-protected scheduled events are, as on the public pages. `LIVE`
+events come first, also past their `endsAt`, then `PROVISIONING` ones (at
+most 20 together), then up to five future `PUBLISHED` or `IDLE` events. Each
+entry has the title in the language of `?locale=` or of `Accept-Language`
+(the status page passes its own), the start time, the status, the capacity
+and whether participants may start their camera.
 
 **Who calls it.** The **System status** page polls it every
 `statusPollIntervalSeconds`. Every open live-room client also polls it every
 few seconds while its event is `LIVE`, to learn whether the bridge and Jibri
 are ready. The interval is in `app/src/components/live/live-event-client.tsx`.
 During events this route carries a large share of the app's requests, and
-participants feel its latency. Each call runs several database queries, a
-Redis ping and a fetch of the public conference hostname. With the status
-page off, the reduced answer skips the component checks and the counters.
+participants feel its latency. Each call runs several database queries and a
+Redis ping. The probes of the conference components, of `/colibri/stats` and
+of Jibri are kept in memory for 5 seconds per pod, and concurrent requests
+share one probe in flight, so the load on those components does not grow
+with the audience. With the conference installed by the chart, no call goes
+to the public conference hostname. With the status page off, the reduced
+answer skips the component checks and the counters.
 
 ### `GET /api/status/infrastructure`
 
@@ -268,28 +317,41 @@ This route feeds the **Infrastructure map**. The map appears on both
 `/status` and `/admin/infrastructure`, and it polls every 15 seconds
 (`app/src/components/status/infrastructure-map.tsx`).
 
-- Each service node has a status (`healthy`, `degraded`, `down`, `standby`
-  or `scaling`), a verdict, replica counts and ports.
+- Each service node has a status (`healthy`, `degraded`, `down`, `standby`,
+  `scaling` or `unknown`, for a component that is not monitored), a verdict,
+  replica counts and ports. `unknown` is drawn in grey and does not dim the
+  connections. The Jitsi nodes carry `metadata.probe` (`internal`, `public`
+  or `none`) and `metadata.probeDetail` (the error code of a failed probe).
 - Redis is `down` when `REDIS_URL` is not set or the ping fails.
 - The `postprod` node appears only when `aiPipelineEnabled` is on. It turns
   `degraded` when a post-production job failed in the last 24 hours.
 - Bridge traffic, participants and conferences come from the Redis snapshot
   across all bridges. Round-trip time, jitter, packet loss and ICE success
-  come from the single bridge that `JVB_HEALTH_URL` reaches.
+  come from the single bridge that `JVB_HEALTH_URL` reaches. With fixed
+  bridges the `jvb` node has no replica bars, and its verdict says whether
+  the bridge answers; its running count is a lower bound, because the Service
+  reaches one bridge. Without `JVB_HEALTH_URL` its status is `unknown`.
+- Jibri is probed only when the installation expects it, so an installation
+  without Jibri does not wait for a name that does not resolve.
 - When `PROMETHEUS_URL` is set, a `prometheus` block adds uptime, latency
   percentiles, error and request rates, and pod uptime. The queries are
   scoped to `POD_NAMESPACE`, which the chart sets from the pod's metadata.
-- The deployment mode shown is inferred, not read from `jitsi.mode`. Outside
-  Kubernetes it is `simple`. Inside Kubernetes it is `full` when
-  `JVB_MAX_REPLICAS` is greater than 1, and `standard` otherwise.
-- The version field reads `APP_VERSION`, which the image does not set. Use
-  `/api/health` for the running version.
+- The deployment mode is `DEPLOY_PROFILE`, which the chart writes from
+  `jitsi.mode`. Without it, the mode is inferred: `simple` outside
+  Kubernetes; inside, `full` when `JVB_MAX_REPLICAS` is greater than 1, and
+  `standard` otherwise.
+- The database node's type comes from `DATABASE_BUNDLED`, which the chart
+  writes from `postgresql.enabled`; without it, a host name with no dot that
+  contains `postgres` counts as bundled. App replicas are not reported.
+- The version field reads `NEXT_PUBLIC_BUILD_VERSION`, the build identity of
+  the image, as `/api/health` does.
 
 While the status page is enabled, this route is public and discloses the
-inferred mode, the namespace, the public hostnames and ports, the replica
+deployment mode, the namespace, the public hostnames and ports, the replica
 counts, the Node.js version, the email provider inferred from `SMTP_HOST` and
-its port, the storage type, the recording count, the database latency and,
-with the pipeline on, the AI providers.
+its port, the storage type, the recording count, the database latency, the
+error codes of failed component probes and, with the pipeline on, the AI
+providers.
 
 ### `GET /api/status/postprod`
 
@@ -324,12 +386,22 @@ or Prometheus fails.
 | Page | Who can open it | What it shows | Data |
 |---|---|---|---|
 | `/status`, **System status** | Anyone, while **Status page enabled** is on. Otherwise it answers 404 | The infrastructure map, the component list, the next events and the post-production card | The four endpoints above |
-| `/admin/infrastructure`, **Infrastructure** | Administrators only. Organizers see an access-denied page | The same map, plus a panel of the environment's configuration: mode, bridge settings, Jibri, storage, email provider and features | `/api/status/infrastructure`, and `getInfrastructureInfo()` in `app/src/lib/infrastructure.ts` (also served by `GET /api/admin/infrastructure`) |
+| `/admin/infrastructure`, **Infrastructure** | Administrators only. Organizers see an access-denied page | The same map, plus a panel of the environment's configuration: mode and platform (on Kubernetes or not), version, bridge settings, Jibri, storage, email provider and features. With the scaler, the desired bridges are those the events need now; with fixed bridges, the number expected; the running bridges come from a probe | `/api/status/infrastructure`, and `getInfrastructureInfo()` in `app/src/lib/infrastructure.ts` (also served by `GET /api/admin/infrastructure`) |
 | `/admin/monitoring`, **Monitoring** | Administrators only | **Service availability**, **Quality of service (latency)**, **Capacity & JVB**, **Hardware resources**, **In-app chat & Redis**, **Events & calls analytics** and **Recent calls**, over 24 hours, 7 days or 30 days, refreshed every 30 seconds | The PromQL proxy, and `GET /api/admin/monitoring/analytics` for the database figures |
 
 Without `PROMETHEUS_URL`, **Monitoring** shows a warning and keeps the
-database analytics. The Redis figures of **In-app chat & Redis** also need
-the Redis exporter ([Exporters for the rest of the stack](#exporters-for-the-rest-of-the-stack)).
+database analytics. Its capacity tiles then show the current participants,
+stress, conferences and Octo from `/api/status`, with a note that history
+needs Prometheus; the history charts stay Prometheus-only. The scale-to-zero
+block appears only with the scaler. Event titles follow the page's language.
+The Redis figures of **In-app chat & Redis** also need the Redis exporter
+([Exporters for the rest of the stack](#exporters-for-the-rest-of-the-stack)).
+
+**Reading the bridge figures.** Participants and conferences are the
+bridge's own endpoints, and the pages label them "on the video bridge".
+Jicofo allocates a conference on the bridge only when the second participant
+joins, so a person alone in a room is not counted, and a room with one
+person shows no conference.
 
 ## Metrics
 
@@ -421,10 +493,13 @@ sum(rate(eventi_postprod_jobs_completed_total{namespace="pa-webinar", status="DO
 ### Settings that shape the metrics
 
 - `METRICS_APP_LABEL` sets the value of the `app` label. The bundled alert
-  rules, both Grafana dashboards and the **Monitoring** page query
-  `app="pa-webinar"` literally. Only `/api/status/metrics` and the
-  infrastructure map read the variable. Keep the default unless you adapt
-  all of them.
+  rules and both Grafana dashboards query `app="pa-webinar"` literally.
+  `/api/status/metrics`, the infrastructure map and the **Monitoring** page
+  read the variable. Keep the default unless you adapt the rules and
+  dashboards too.
+- `METRICS_JOB` names the scrape job whose `up` series the uptime figures
+  read. The chart writes it from its full name, which is also the job of its
+  ServiceMonitor ([Configuration reference](../CONFIGURATION.md#observability)).
 - `METRICS_ENABLED=false` only removes the metrics entry from the features
   list on the **Infrastructure** page. It does not disable `/api/metrics`,
   which is always served and always requires the token.
@@ -551,7 +626,7 @@ The thresholds in this table are the ones in `prometheusrule.yaml`.
 |---|---|---|---|
 | `PaWebinarDown` | critical | The app target is down or missing for 2 minutes | Check the app pods: readiness, the latest rollout, the `db-migrate` init container's logs. If the pods are Ready, the scrape itself fails: a 401 means a missing or wrong token, a 500 comes with `PaWebinarDatabaseDown` |
 | `PaWebinarHighLatency` | warning | The p95 of one request series is above 2 s for 5 minutes | The alert's `route` label names the endpoint. Check the database latency on **System status**, `HighEventLoopLag` and the pods' CPU |
-| `PaWebinarHighErrorRate` | warning | Written as a 5xx share above 5% for 5 minutes. The ratio is computed per series, so in practice it fires when **one route keeps answering 5xx**, whatever its share of the traffic | The `route` label names the endpoint. Filter the app log for `"level":"error"` on that path |
+| `PaWebinarHighErrorRate` | warning | Written as a 5xx share above 5% for 5 minutes. The ratio is computed per series, so in practice it fires when **one route keeps answering 5xx**, whatever its share of the traffic | The `route` label names the endpoint. Filter the app log for `"level":"error"` on that path (an expected `STORAGE_UNAVAILABLE` is logged at `warn`) |
 | `PaWebinarDatabaseDown` | critical | `eventi_active_events` has been absent for 3 minutes. The series disappears when scrapes fail, and a database error makes the metrics route answer 500 | Call `/api/health` in a pod: 503 means the database is unreachable. Check the database and the `DATABASE_URL` in the Secret. If `PaWebinarDown` fires too, start there |
 | `JvbHighStress` | warning | `eventi_jvb_stress_level` is above 0.8 for 3 minutes | Open **Capacity & JVB**. In the full profile, check whether the scaler has reached `JVB_MAX_REPLICAS` and whether the node pool can add nodes. The event's declared capacity may be too low |
 | `JvbScalingStuck` | critical | Participants are present and stress is above 0.9 for 5 minutes | The scaler is not adding bridges or cannot. Check that its CronJob is not suspended and runs, read its logs, compare the JVB Deployment's desired and ready replicas, and look for pending pods on the bridge node pool ([Running the JVB scaler](jvb-scaler.md)) |
@@ -682,7 +757,10 @@ The app writes to standard output. It ships no log collector, and **log
 retention is the operator's decision**.
 
 - Every API call through the shared handler writes one JSON line, at level
-  `error` for 5xx, `warn` for 4xx and `info` otherwise. That includes the
+  `error` for 5xx, `warn` for 4xx and `info` otherwise. A 5xx that stems
+  from the installation's configuration and is marked as expected, today
+  `STORAGE_UNAVAILABLE` from the upload routes, is logged at
+  `warn`. That includes the
   liveness calls to `/api/health` and every Prometheus scrape of
   `/api/metrics`. `/api/ready` writes a line only when it fails.
 - During events the request log is dominated by `/api/status`: every open
@@ -729,19 +807,20 @@ More symptoms are in [Troubleshooting](troubleshooting.md).
 
 ## Known limitations
 
-- **Uptime figures stay empty.** The sparkline route's `uptime` series and
-  the infrastructure map select `up{job=~".*eventi.*"}`, while the chart names
-  the job after its fullname. They return no data unless the release name
-  contains `eventi`. The **Monitoring** page and both Grafana dashboards filter
-  `up` on `app`, a label that Prometheus does not attach to `up`. Those uptime
-  figures stay empty too, unless your scrape configuration adds an `app`
-  target label. For the same reason the dashboards' `namespace` variable,
-  which reads `up{app="pa-webinar"}`, lists nothing. The chart dashboard
-  presets the release namespace. After importing the manual one, set the
-  variable to your namespace, or point its query at a series that carries
-  the label, such as `eventi_active_events`.
-- **Monitoring and the sparklines are not scoped by namespace.** Their PromQL
-  filters on `app="pa-webinar"` only, and the Redis figures of **In-app chat
+- **Uptime in the Grafana dashboards stays empty.** The sparkline route, the
+  infrastructure map and the **Monitoring** page select
+  `up{namespace="<POD_NAMESPACE>",job="<METRICS_JOB>"}`, which the chart
+  fills in; without `METRICS_JOB` they fall back to `job=~".*eventi.*"`, which
+  matches only a release whose name contains `eventi`. Both Grafana
+  dashboards still filter `up` on `app`, a label that Prometheus does not
+  attach to `up`, so their uptime figures stay empty unless your scrape
+  configuration adds an `app` target label. For the same reason the
+  dashboards' `namespace` variable, which reads `up{app="pa-webinar"}`, lists
+  nothing. The chart dashboard presets the release namespace. After
+  importing the manual one, set the variable to your namespace, or point its
+  query at a series that carries the label, such as `eventi_active_events`.
+- **Monitoring and the sparklines are not scoped by namespace.** Apart from
+  uptime, their PromQL filters on the `app` label only, and the Redis figures of **In-app chat
   & Redis** are not filtered at all. With one Prometheus shared by several
   installations they mix the figures of all of them, and the Redis section
   adds up every Redis exporter. The alert rules, the chart dashboard and the
@@ -750,8 +829,9 @@ More symptoms are in [Troubleshooting](troubleshooting.md).
   share of the traffic (see [Alert rules](#alert-rules)).
 - **Some series never change** (see [Metric families](#metric-families)).
 - **While the status page is enabled, the status routes are public**, and
-  they disclose deployment details and the titles of upcoming and live events
-  of every type ([Status endpoints and pages](#status-endpoints-and-pages)).
+  they disclose deployment details, the error codes of failed probes and the
+  titles of upcoming and live events, instant calls excepted
+  ([Status endpoints and pages](#status-endpoints-and-pages)).
   Turn off **Status page enabled** to restrict them to administrators. Only
   the bridge and Jibri readiness fields of `/api/status` stay public, for the
   live room ([Runtime settings](../configuration/runtime-settings.md#public-features)).

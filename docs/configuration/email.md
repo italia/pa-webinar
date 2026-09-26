@@ -2,7 +2,7 @@
 
 PA Webinar hands every outgoing email to one SMTP relay that the operator provides. It has no mail server of its own and no provider-specific API integration. Any relay that accepts SMTP submission works, from a commercial service to the public body's own mail server.
 
-A working relay is required. Registration confirmations with the personal join link, reminders, date-change notices, post-event follow-ups, the one-time sign-in links of staff accounts and the verification links of data-subject requests all travel by email. Without a relay, none of them arrives. Only the instance API key (`ADMIN_API_KEY`) signs in to the administration area without email.
+A working relay is required. Registration confirmations with the personal join link, reminders, date-change notices, post-event follow-ups, the links of moderators and speakers, the one-time sign-in links of staff accounts and the verification links of data-subject requests all travel by email. Without a relay, none of them arrives. Only the instance API key (`ADMIN_API_KEY`) signs in to the administration area without email.
 
 This page covers the transport: the settings, where they live, provider examples and problems on the relay side. How mail moves inside the platform (the outbox, the catalog of emails, languages, the sender identity and how to trace a missing message) is in [Email and calendar](../architecture/email.md). The schedule of the job that sends the mail is in [Scheduled and background jobs](../architecture/background-jobs.md#email-outbox).
 

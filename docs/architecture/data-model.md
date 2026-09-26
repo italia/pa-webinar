@@ -110,7 +110,7 @@ Most personal data is encrypted, but these fields are stored in plaintext. Reten
 | `Question.authorName` | The name shown on a Q&A question. It is copied from the registration or the named grant, or typed by a guest. |
 | `QuestionnaireResponse.respondentName` | A snapshot of the respondent's name at submission. |
 | `CallSession.dominantSpeakerLog` | The live speaker timeline, including display names as the room showed them. |
-| `Event.moderatorName`, `EventMaterial.addedBy`, `Speaker.displayName` | The primary moderator's name, a copy of that name on added materials (file uploads from the room store a fixed label instead), and the name attached to a transcript speaker label. `Event.moderatorEmail` is encrypted. |
+| `Event.moderatorName`, `EventMaterial.addedBy`, `Speaker.displayName` | The primary moderator's name, a copy of that name on materials added from the room with the primary moderator link (links and file uploads alike; additions by named co-moderators and from the administration area store an empty string, shown as a translated "Added by the organisers"), and the name attached to a transcript speaker label. `Event.moderatorEmail` is encrypted. |
 | `Registration.organization`, `Registration.organizationRole`, `Person.organization` | Optional profiling fields. They stay searchable on purpose. |
 | `Question.text`, `EventFeedback.comment`, `QuestionnaireAnswer.valueText`, `WordCloudSubmission.word` | Free text typed by participants. |
 | `EmailOutbox.subject`, `EmailOutbox.attachments`, `EmailOutbox.lastError` | The subject (the public event title), the calendar attachment (which names the event contact and gives their email address), and the last SMTP error (which can quote the recipient). The recipient and both bodies are encrypted. |
@@ -373,7 +373,7 @@ The values below are copied from `schema.prisma`. The owner page explains what e
 
 | Enum | Values | Where it is used | Owner page |
 |---|---|---|---|
-| `EventStatus` | `DRAFT`, `PUBLISHED`, `PROVISIONING`, `LIVE`, `IDLE`, `ENDED`, `ARCHIVED` | `Event.status`. The scaler and the API move it. | [event-lifecycle.md](event-lifecycle.md) |
+| `EventStatus` | `DRAFT`, `PUBLISHED`, `PROVISIONING`, `LIVE`, `IDLE`, `ENDED`, `ARCHIVED` | `Event.status`. The scaler or the lifecycle cron, the API and the cleanup job move it. | [event-lifecycle.md](event-lifecycle.md) |
 | `EventType` | `SCHEDULED`, `INSTANT`, `LEGACY` | A scheduled event, an instant call, or a historical entry with no room and no registrations (metadata and a `youtubeUrl` only). | [event-journey.md](event-journey.md) |
 | `EventModeratorRole` | `MODERATOR`, `SPEAKER` | The role of a named grant. | [identity-and-access.md](identity-and-access.md) |
 | `StaffRole` | `ORGANIZER`, `ADMIN` | A staff account manages its own events, or the whole instance under a name. The instance API key is not an account. | [identity-and-access.md](identity-and-access.md), [ADR-014](../adr/014-organizer-role.md), [ADR-015](../adr/015-named-administrators.md) |

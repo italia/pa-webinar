@@ -83,8 +83,10 @@ flowchart LR
 `JitsiRoom` (`app/src/components/jitsi/jitsi-room.tsx`) is a Client Component. On mount it:
 
 1. loads `external_api.js` from the conference host (for example
-   `https://meet.webinar.example.com/external_api.js`), or reuses the script if it is already on the
-   page;
+   `https://meet.webinar.example.com/external_api.js`) through
+   `app/src/components/jitsi/external-api-loader.ts`. It reuses a script tag only if the loader created
+   it and it is still loading, and listens for both its load and its error. A tag that failed is
+   removed, and a script that loads without defining the API counts as a failure;
 2. works out the configuration for this role, device and event (see
    [Configuration applied to every room](#configuration-applied-to-every-room));
 3. creates `JitsiMeetExternalAPI` with the room name, the portal-issued JWT, the display name and the UI
@@ -94,6 +96,14 @@ flowchart LR
 5. registers its listeners and hands the API object to the rest of the live room.
 
 On unmount it flushes its pending analytics buffers, clears its timers and calls `dispose()`.
+
+When the API cannot be loaded, the room shows **The video call service is not responding**. The message
+names the conference host and links to `https://<host>/` in a new tab, where the visitor can accept a
+certificate warning and come back: a browser reports an untrusted certificate and an unreachable network
+in the same way. Its **Retry** button injects a fresh script tag. A page opened over `http://` other than
+`localhost` is not a secure context, and the browser gives it no microphone or camera: there `JitsiRoom`
+does not load Jitsi at all and shows **Insecure address**, with a link to the same page over `https://`.
+The waiting room shows the same notice ([the waiting room](waiting-room.md)).
 
 Two behaviors matter to anyone changing the live room:
 
@@ -160,7 +170,7 @@ wait is covered in [the waiting room](waiting-room.md); the status machine itsel
 | `startRecording`, `stopRecording` (`mode: 'file'`) | Moderator control bar; the live room's recording prompt, or automatically on join when `autoStartRecording` is set | Composite recording through Jibri; see [recording](recording.md) |
 | `muteEveryone` + `toggleModeration` | Moderator control bar | **Participant mic** mutes everyone and turns on Jitsi's audio moderation; **Participant video** toggles video moderation |
 | `askToUnmute`, `approveVideo` | Raised-hand queue | **Give the floor** (audio and video) or **Audio only** for someone with a raised hand |
-| `kickParticipant` | Participants panel | Remove a participant (moderators) |
+| `kickParticipant` | Participants panel | Remove a participant (portal moderators, anyone except themselves) |
 | `setParticipantVolume` | Participants panel | Change how loud one participant sounds in this browser only |
 | `toggleRaiseHand` | Live room | Lower your own hand when a moderator asks for it (see below) |
 | `toggleWhiteboard` | Moderator control bar | Open Jitsi's whiteboard, when enabled (see [below](#reactions-whiteboard-and-instant-calls)) |
@@ -238,7 +248,8 @@ Moderators get a larger set of buttons than other participants.
 | `mobileModeratorToolbarButtons` | the mobile set plus `participants-pane` | Moderators below 768 px |
 
 On top of these, `JitsiRoom` adds `reactions` when the reactions mode is native, and `whiteboard` for
-moderators on desktop when the event has opted in.
+moderators on desktop when the event has opted in and the installation declares the whiteboard
+service (`NEXT_PUBLIC_WHITEBOARD_ENABLED`).
 
 What is deliberately missing, for every role:
 
@@ -257,8 +268,8 @@ What is deliberately missing, for every role:
 Speakers join with the participant role in Jitsi. The event's participant restrictions do not apply to
 them: the portal keeps their microphone, camera and screen-share buttons. Jitsi's audio and video
 moderation, when a moderator turns it on, applies to them like any other participant. Their JWT carries
-the `member` affiliation, so where [server-side role enforcement](#server-side-role-enforcement) is in
-place, Jitsi itself refuses them moderator-only actions.
+the `member` affiliation, so with [server-side role enforcement](#server-side-role-enforcement), which
+the chart and Docker Compose both wire, Jitsi itself refuses them moderator-only actions.
 
 The app's own drawer switches to its mobile layout at a different width, 992 px. Between 768 and 991 px
 people therefore see the desktop Jitsi toolbar with the mobile drawer.
@@ -279,7 +290,6 @@ people therefore see the desktop Jitsi toolbar with the mobile drawer.
 | Avatars | `gravatar.disabled: true` | The browser never contacts Gravatar; an avatar in the JWT is used instead ([identity and access](identity-and-access.md)) |
 | Audio processing | `disableAEC`, `disableNS`, `disableAGC: false`; `enableTalkWhileMuted: true`; `enableNoisyMicDetection: false` | Echo cancellation, noise suppression and gain control stay on; people are told when they speak while muted |
 | Start state | `startWithAudioMuted`, `startWithVideoMuted` | Desktop follows the device check in the waiting room; mobile always starts muted, because the browser needs a fresh tap to open the camera inside an iframe |
-| Diagnostics | `statisticsId`, `statisticsDisplayName` | Jitsi-side logs show the portal display name instead of a random name |
 
 One key is added outside `config.ts`: `JitsiRoom` passes an experimental `paFaceFx: true` when the page
 URL has `?facefx=1` or `?facefx=true`. It has an effect only with a custom Jitsi-side script that reads
@@ -367,18 +377,20 @@ Blur is not available from outside the iframe (see [Limits of the boundary](#lim
   and **App custom (left-hand bar, with stats)**, which keeps Jitsi's reactions off and renders the
   portal's reaction bar.
 - **Whiteboard in Jitsi's toolbar.** The button appears for moderators on desktop when the event opts
-  in (`Event.whiteboardEnabled`, always on for instant calls) and the Jitsi web configuration enables
+  in (`Event.whiteboardEnabled`, always on for instant calls), the app's environment declares the
+  whiteboard service (`NEXT_PUBLIC_WHITEBOARD_ENABLED=true`) and the Jitsi web configuration enables
   `config.whiteboard` with a collaboration backend. Neither the chart's values nor Docker Compose
   enables one; the pinned subchart offers `jitsi-meet.excalidraw.enabled` (off by default), which is
   not tested with PA Webinar.
 - **The portal's whiteboard controls.** The **Whiteboard** button in the moderator control bar (desktop
-  widths) and the drawer's reminder to export the board before the event ends also need
-  `NEXT_PUBLIC_WHITEBOARD_ENABLED=true` in the app's environment. It is read at runtime with
-  `getPublicEnv()` in the live page's Server Component (`app/src/lib/jitsi/whiteboard.ts`), so
-  changing it needs a pod restart, not a rebuild. Set it only when the Jitsi side has a backend: the
-  button toggles Jitsi's whiteboard and does nothing without one.
+  widths) and the drawer's reminder to export the board before the event ends follow the same two
+  app-side conditions. `NEXT_PUBLIC_WHITEBOARD_ENABLED` is read at runtime with `getPublicEnv()` in the
+  live page's Server Component (`app/src/lib/jitsi/whiteboard.ts`) and passed down to the toolbar, the
+  control bar and the drawer, so changing it needs a pod restart, not a rebuild. Set it only when the
+  Jitsi side has a backend: the buttons toggle Jitsi's whiteboard and do nothing without one.
 - **Instant calls** use the same `JitsiRoom`, toolbars and configuration as events, with
-  `enableFileSharing: true` and the whiteboard opt-in forced on. `config.ts` also exports
+  `enableFileSharing: true` and the whiteboard opt-in forced on where the installation declares the
+  whiteboard service. `config.ts` also exports
   `instantCallToolbarButtons`, `instantCallModeratorToolbarButtons` and `instantCallConfigOverwrite`;
   `JitsiRoom` does not use them.
 
@@ -426,7 +438,13 @@ and `app/src/components/jitsi/`):
   participants. It is a side drawer from 992 px up and a bottom sheet with a tab strip below that. The
   panels themselves are documented in [live interaction](live-interaction.md).
 - **Participants panel.** The roster from `getParticipantsInfo()` with the recorder bot filtered out, a
-  per-listener volume slider, and removal for moderators.
+  per-listener volume slider, and removal. The remove button follows the portal: people who are
+  moderators in the portal see it on every row except their own (the local endpoint id comes from
+  `videoConferenceJoined`), and it carries the person's name as its accessible label. Role badges, and
+  the moderators-first order, come from Jitsi's roles (`getRoomsInfo()` and `participantRoleChanged`;
+  `getParticipantsInfo()` carries none), and appear only when those roles distinguish someone: at least
+  one moderator and one participant in the list. Without token-based roles every token holder is a
+  Jitsi moderator, and no badge is shown.
 - **Raised-hand queue.** A read-only queue in order of raising, shown to every non-moderator so the
   room can see who is next. It stays hidden while no hand is up.
 - **Screen-share banner.** A banner that announces who started sharing; the presenter does not see it.
@@ -435,10 +453,13 @@ and `app/src/components/jitsi/`):
 
 ### Leaving the room and readyToClose
 
-Every role leaves through **Leave room**. Participants, guests and speakers hang up straight away.
-Moderators get the prompt **How do you want to leave?**:
+Every role leaves through **Leave room**. Participants, guests and speakers hang up straight away and
+see **You left the room**: the event is still in progress, and **Rejoin** takes them back in with a new
+token. Moderators get the prompt **How do you want to leave?**:
 
-- **Just leave** hangs up this moderator only. The call continues for everyone else.
+- **Just leave** hangs up this moderator only. The call continues for everyone else. The leaving
+  screen also reminds the moderator that the event stays open until someone chooses **End for
+  everyone**.
 - **End for everyone** asks where the event goes next (**Keep it public**, **Publish to the library**
   or **Archive (private)**), sets the event to `ENDED` through the event API with the moderator's
   token, and then hangs up. When the event has recording and AI post-production enabled, the same
@@ -455,7 +476,12 @@ does not trust it alone. `readyToClose` fires only after an intentional hangup, 
 authoritative signal: it cancels any pending reconnect. When `videoConferenceLeft` arrives without
 it, the room waits a short grace window (`LEAVE_RECONNECT_GRACE_MS`), then asks
 `/api/events/{slug}/lifecycle`. If the event has ended, it shows the closing screen. Otherwise it
-treats the leave as a drop and reconnects, up to `MAX_RECONNECT_ATTEMPTS` times.
+treats the leave as a drop and reconnects, up to `MAX_RECONNECT_ATTEMPTS` times. A person who gives up
+the reconnection, or runs out of attempts, reaches the same leaving screen. The closing screen appears
+only when the event really is `ENDED` (`closingPhase()` in `app/src/components/live/live-phase.ts`).
+A `409` from the token endpoint on **Rejoin** is resolved through `/lifecycle` too: an ended event shows
+the closing screen, and a `PUBLISHED`, `PROVISIONING` or `IDLE` one returns to the waiting room. For
+instant calls, the links on the closing, leaving and error screens go to the home page.
 
 ## Authentication bridge: the Prosody side
 
@@ -484,54 +510,52 @@ who joins a `LIVE` event without registering, and they still hold a portal-signe
 ### Server-side role enforcement
 
 The JWT carries `context.user.affiliation`: `owner` for moderators and `member` for everyone else.
-Jitsi grants moderator rights to room owners. For that to come from the token and not from Jicofo's
-default "auto-owner" rule, three pieces work together in the Docker Compose stack:
+Jitsi grants moderator rights to room owners. Jicofo, the conference focus, has rules of its own that
+would override the token. With Jicofo's authentication on (the subchart's `enableAuth`), Jicofo makes
+every authenticated participant an owner, and with portal tokens every participant is authenticated;
+setting Jicofo's `AUTH_TYPE=jwt` does not change this. Its auto-owner rule also promotes someone when no
+owner is present. For roles to come from the token, three pieces work together:
 
 - the community `token_affiliation` module, which ships in the stock `jitsi/prosody` image and is
   enabled through `XMPP_MUC_MODULES`;
-- this repository's `mod_token_affiliation_custom.lua`, a safety net that sets the affiliation again
-  just before the join: `owner` only when the token says `owner`, `member` otherwise, including
+- this repository's `mod_token_affiliation_custom.lua`, which sets the affiliation from the token
+  before the join, not after: `owner` only when the token says `owner`, `member` otherwise, including
   sessions without a token context;
-- Jicofo's auto-owner rule switched off (`ENABLE_AUTO_OWNER=false`).
+- Jicofo assigning no roles of its own.
 
-Compose mounts `infra/jitsi/prosody-plugins/` into the Prosody container at `/prosody-plugins-custom`
-and enables both modules.
-
-**Known limitation: the Helm chart does not ship this wiring.** Its default values pass only the JWT
-settings to Prosody. They do not enable `token_affiliation` or mount the custom module, and they do not
-turn off Jicofo's auto-owner rule. The token's affiliation then plays no part in conference-level
-rights, and Jicofo's default applies (`enable-auto-owner = true` in Jicofo's reference configuration):
-the first participant to join the conference becomes its owner, and when the owner leaves, the next
-participant in line is promoted. On a default Helm install this means:
-
-- whoever enters the conference first, a registrant or a guest included, holds Jitsi moderator rights
-  whatever their portal role, and can use the moderator actions Jitsi's own interface still offers,
-  such as muting another participant from their tile;
-- a portal moderator who joins while that owner is still there is not a Jitsi moderator, so the
-  control-bar actions that Jitsi reserves for moderators (moderation, muting everyone, recording) do not
-  take effect for them;
-- the portal's per-role configuration hides Jitsi's kick action and moderator toolbar buttons from
-  non-moderators, but it is applied in the browser, so it is not an access control.
-
-This follows from Jicofo's documented rule; check it in a call on your installation before relying on
-it. The consequence for the trust boundary is listed in [security architecture](security.md#known-gaps).
-
-To get the Compose behavior on Kubernetes, add both settings; the pinned subchart reads Jicofo
-variables only from `extraEnvs`:
+**Helm chart.** The chart's default values carry this wiring on every profile:
 
 ```yaml
 jitsi-meet:
   prosody:
     extraEnvs:
-      XMPP_MUC_MODULES: token_affiliation
+      XMPP_MUC_MODULES: token_affiliation,token_affiliation_custom
+    extraVolumes:          # the ConfigMap pa-webinar-prosody-plugins, rendered by the chart
+    extraVolumeMounts:     # mounted read-only at /prosody-plugins-custom
   jicofo:
     extraEnvs:
+      JICOFO_ENABLE_AUTH: "false"
       ENABLE_AUTO_OWNER: "false"
 ```
 
-Then check in a real call that a participant gets no moderator badge and cannot mute others, and that a
-moderator can. The custom safety-net module can also be mounted through the subchart's
-`prosody.extraVolumes` and `prosody.extraVolumeMounts`.
+Access stays protected with Jicofo's authentication off: Prosody refuses anyone without a valid token.
+The `pa-webinar.validateJitsiRoles` render guard stops the render when Jicofo's authentication is off
+and Prosody loads neither module, or when the custom module is asked for and nothing is mounted at
+`/prosody-plugins-custom`. `extraVolumes` and `extraVolumeMounts` are lists: a values file that sets
+its own replaces the chart's entries and must repeat them. The ConfigMap name is fixed, so one release
+per namespace. The first upgrade to a chart with this wiring restarts Prosody and Jicofo
+([Upgrades and rollback](../operations/upgrades.md)).
+
+**Docker Compose** mounts `infra/jitsi/prosody-plugins/` into the Prosody container at
+`/prosody-plugins-custom`, enables both modules and turns off Jicofo's auto-owner rule, but leaves
+Jicofo's authentication on. Roles there rely on `token_affiliation` setting the affiliation again after
+Jicofo's promotion, so a participant can hold the moderator role for a moment after joining.
+
+The wiring, and what was checked on a lab cluster (moderator links as moderators, registrants and
+guests as participants whoever joins first, a participant's mute or kick of the moderator refused), are
+in [Jitsi extras](../../infra/jitsi/README.md#where-it-is-loaded). Recording through Jibri was not part
+of that check. The portal decides separately who sees its moderator controls, and its per-role
+configuration of Jitsi's interface is applied in the browser, so it is not an access control.
 
 ### The hidden domain for the recorder bot
 
@@ -750,7 +774,8 @@ order, and roll out through [upgrades and rollback](../operations/upgrades.md).
 3. **Align the web image tag** in `jitsi-meet.web.image.tag` with the new `IMAGE_TAG`, and check that the
    web pod can pull it (`jitsi-meet.imagePullSecrets`) before the upgrade.
 4. **Re-verify the Prosody side.** Token authentication still accepts portal JWTs. `token_affiliation` is
-   still in the image and `mod_token_affiliation_custom` still loads. The recorder account on the hidden
+   still in the image and `mod_token_affiliation_custom` still loads. Jicofo still reads
+   `JICOFO_ENABLE_AUTH` and `ENABLE_AUTO_OWNER` from its environment. The recorder account on the hidden
    domain is still allow-listed.
 5. **Check the configuration keys and API surface the app relies on.** Toolbar button names, the nested
    `raisedHands.disableRemoveRaisedHandOnFocus`, `disableSelfView`, the IFrame API commands and events

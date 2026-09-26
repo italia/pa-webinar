@@ -82,8 +82,12 @@ Other setups, for comparison:
 | **Three nodes**: a server that serves the ingress, a node for the portal and database, a node reserved for the bridge | A body that wants the bridge's CPU spikes kept away from the portal and the database | 20 participants all on camera; bridge node at 1.8 cores peak and 2.6 GiB | Still not highly available (see [What is not highly available](#what-is-not-highly-available)). No node autoscaling. Jibri, TURN |
 
 Both run the simple profile: one portal replica, PostgreSQL and Redis in the
-cluster, one bridge, no Jibri. Recording and video uploads need object storage
-that you provide ([Storage](../configuration/storage.md)).
+cluster, one bridge, no Jibri. Recording and uploads need object storage that
+you provide ([Storage](../configuration/storage.md)); without it the portal
+hides its upload controls. The chart installs no whiteboard server, so rooms
+have no shared whiteboard. A CronJob opens and closes events on time, and in
+the room only the moderator links make someone a moderator
+([How it scales](#how-it-scales)).
 
 ```mermaid
 flowchart LR
@@ -714,12 +718,28 @@ on k3s in the lab:
   leaves `tls` empty, and cert-manager issues certificates only for the
   Secrets that an Ingress names.
 
-With a self-signed certificate, or one from an internal certificate
-authority, the portal's status page reports the conference as down while
-calls work: the status check fetches the conference host with the portal's
-own trust store. A publicly trusted certificate avoids it. With an internal
-CA, browsers must trust the CA, and the portal would need it too, mounted and
-named in `NODE_EXTRA_CA_CERTS` (not tested). The rest is in
+The portal's status page checks the conference's components at their
+addresses inside the cluster, which the chart gives the portal, so a
+self-signed or internal-CA certificate does not affect it. With an internal
+certificate authority, browsers must trust it. The portal needs it only for
+its own connections to names behind that authority, such as an SMTP relay or
+object storage: put the authority's certificate (PEM) in a ConfigMap or a
+Secret, and name it in `app.extraCaCerts`. The chart mounts it and sets
+`NODE_EXTRA_CA_CERTS` (tested on minikube, not on k3s):
+
+```bash
+kubectl -n pa-webinar create configmap ente-ca --from-file=ca.crt=<ca.pem>
+```
+
+```yaml
+app:
+  extraCaCerts:
+    configMapName: ente-ca
+    key: ca.crt
+```
+
+Node reads the file when the portal starts: after changing it, run
+`kubectl -n pa-webinar rollout restart deployment/pa-webinar`. The rest is in
 [DNS and TLS](../INFRASTRUCTURE.md#dns-and-tls).
 
 ## Behind a load balancer, reverse proxy or WAF
@@ -775,9 +795,19 @@ bridge scaler. The administration's infrastructure page shows **Fixed mode**.
   webinar with three speakers on camera took 0.64 bridge cores on minikube,
   less than 20 participants all on camera
   ([Larger rooms and meeting patterns](../INFRASTRUCTURE.md#larger-rooms-and-meeting-patterns)).
-- **No scale to zero.** The bridge runs all the time. Events move between
-  statuses without the scaler as described in
-  [Running without the scaler](../architecture/event-lifecycle.md#running-without-the-scaler).
+- **No scale to zero.** The bridge runs all the time. The chart's
+  `pa-webinar-lifecycle` CronJob moves events through their statuses every
+  minute: it opens a published event at its start time, ends it once its end
+  time and the grace period have passed, and closes the call sessions left
+  open ([Running without the scaler](../architecture/event-lifecycle.md#running-without-the-scaler)).
+  The portal expects one bridge: the chart writes `JVB_MAX_REPLICAS` from
+  `jitsi-meet.jvb.replicaCount`.
+- **Roles come from the portal.** Only the moderator links make someone a
+  moderator in the room; registrants, guests and speakers are participants,
+  whoever joins first. The chart turns off Jicofo's own authentication and
+  loads the Prosody modules that read the role from the portal's token
+  ([Jitsi extras](../../infra/jitsi/README.md#where-it-is-loaded)). Checked on
+  minikube, not on k3s.
 - **The portal is small.** At 20 participants it used under 0.1 core. Its rate
   limits count per process, and there is one process.
 - **A second bridge** is not covered by the scripts and was not tested on k3s.
@@ -831,9 +861,9 @@ What you can watch without them:
 
 - **Disk space** on the node that holds PostgreSQL:
   `df -h /var/lib/rancher/k3s/storage`.
-- **The status page**, `/status`, while **Status page enabled** is on. With
-  a self-signed or internal-CA certificate it reports the conference as down
-  while calls work.
+- **The status page**, `/status`, while **Status page enabled** is on. It
+  checks the conference's components inside the cluster, so the certificate
+  does not affect it.
 
 The portal writes its logs to standard output, and the chart ships no log
 collector: `kubectl logs` shows only what the node still keeps
@@ -1028,8 +1058,6 @@ agent.
 - **No high availability**, on one node or on three.
 - **No TURN** in the simple profile. On k3s it needs a second IP address.
 - **One bridge**: the largest event is what one node's bridge carries.
-- **The status page** reports the conference as down with a self-signed or
-  internal-CA certificate.
 - **Traefik does not read the ingress-nginx annotations**: no HSTS header, no
   redirect of the conference root to the portal, and no rate limit at the
   ingress ([Ingress controllers](../INFRASTRUCTURE.md#ingress-controllers)).
@@ -1061,3 +1089,8 @@ agent.
 - The loss of the server node or of the bridge node, and any backup restore.
 - Helm 3 for the install itself, and any k3s version other than the pinned
   one.
+- On k3s itself: the event lifecycle CronJob, the chart's room-role wiring,
+  the status page's in-cluster checks under kube-router's NetworkPolicy, and
+  `app.extraCaCerts`. They were checked on minikube, without NetworkPolicy
+  enforcement; the NetworkPolicy rules they need are checked on the rendered
+  chart by `scripts/validate-chart.sh`.

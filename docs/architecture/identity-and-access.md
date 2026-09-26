@@ -97,8 +97,8 @@ The dotted edge from the session matters. Core edits to an event made from the a
 | Staff account, role `ADMIN` or `ORGANIZER` (`StaffAccount`) | Created by an administrator on **Accounts** | Never carried directly. It is the identity behind the one-time link and the session | Until deleted | **Deactivate** or **Delete**, effective on the next request |
 | One-time sign-in link (`StaffLoginToken`) | Emailed on request, on account creation, or by an administrator | `?t=` on `/admin/access`, then JSON body of `POST /api/staff/login-link/verify` | 20 minutes, single use | Use, expiry, or deactivation of the account (unused links are deleted) |
 | Staff session (`admin_session` cookie) | Minted at sign-in | HttpOnly cookie | 6-hour JWT, slid while in use. The cookie itself lasts 24 hours | Logout, expiry, account deactivation, `APP_SECRET` change |
-| Primary moderator link (`Event.moderatorToken`) | Generated with the event (a duplicate gets a fresh one) | `?token=` on landing pages, then `Authorization: Bearer` | No expiry. It lives as long as the event row | **Regenerate** on **Moderators** (administrators), or automatic rotation when the owning staff account is deactivated or deleted |
-| Named grant (`EventModerator`, role `MODERATOR` or `SPEAKER`) | Created by the holder of the primary link, in the wizard or under **Co-moderators and speakers** | Same as the primary link | No expiry | Individual revocation (`revokedAt`), and row deletion by the GDPR cleanup |
+| Primary moderator link (`Event.moderatorToken`) | Generated with the event (a duplicate gets a fresh one). Emailed once to the event's contact address, when there is one ([Email and calendar](email.md#moderator-and-speaker-links)) | `?token=` on landing pages, then `Authorization: Bearer` | No expiry. It lives as long as the event row | **Regenerate** on **Moderators** (administrators), or automatic rotation when the owning staff account is deactivated or deleted |
+| Named grant (`EventModerator`, role `MODERATOR` or `SPEAKER`) | Created by the holder of the primary link, in the wizard or under **Co-moderators and speakers**. Emailed once to the grant's address, when there is one | Same as the primary link | No expiry | Individual revocation (`revokedAt`), and row deletion by the GDPR cleanup |
 | Registrant access token (`Registration.accessToken`) | Issued at registration and sent in the confirmation email. **Resend my access link** sends it again | `?token=` on `/events/{slug}/live`, or with a signature on the entry link of invitation-only registration ([Registrants](#registrants)); `Authorization: Bearer` on chat requests and panel reads; `accessToken` in the JSON body of the Jitsi token, poll-vote, question, upvote and feedback requests; a path segment in `GET /api/events/{slug}/registrations/{accessToken}` | As long as the registration exists | Deletion of the registration by the GDPR cleanup or an erasure request, or deletion of the event |
 | `event_access_<eventId>` cookie | Set in the browser that registered, or, with public registration off, in the browser that opened the signed entry link from the email | HttpOnly cookie | Until 6 hours after the event ends, clamped between 1 hour and 30 days | Expiry, `APP_SECRET` change |
 | Guest | Nothing is issued. The guest types a name | Name in the Jitsi token request | Nothing persists; each join mints a 2-hour guest Jitsi token | Not applicable |
@@ -423,7 +423,7 @@ The portal signs every conference token. Prosody verifies it and derives the par
   "moderator": false,
   "affiliation": "member",
   "room": "<jitsiRoomName>",
-  "sub": "meet.webinar.example.com",
+  "sub": "localhost:8443",
   "iss": "pa-webinar",
   "aud": "jitsi",
   "jti": "pa_webinar:reg-<registrationId>-1a2b3c4d",
@@ -440,7 +440,7 @@ The portal signs every conference token. Prosody verifies it and derives the par
 | `context.user.affiliation`, `moderator` and the top-level copies | `owner`/`true` for moderators, `member`/`false` for everyone else |
 | `context.features` | `recording` is true for moderators only. `screen-sharing` is true for everyone. `livestreaming` and `outbound-call` are false for everyone (`app/src/lib/jitsi/config.ts`) |
 | `room` | The event's `jitsiRoomName`, a UUID |
-| `sub` | `JITSI_JWT_SUBJECT`, falling back to `NEXT_PUBLIC_JITSI_DOMAIN` |
+| `sub` | `JITSI_JWT_SUBJECT`, or the constant `localhost:8443` (`DEFAULT_JITSI_JWT_SUBJECT`) when it is unset or empty. Prosody requires the claim but compares it with its XMPP domain only when `JWT_ENABLE_DOMAIN_VERIFICATION` is on, which the chart and Docker Compose leave off |
 | `iss`, `aud` | `JITSI_JWT_ISSUER` (default `pa-webinar`) and `JITSI_JWT_AUDIENCE` (default `jitsi`). They must match Prosody's `JWT_ACCEPTED_ISSUERS` and `JWT_ACCEPTED_AUDIENCES` |
 | `jti` | `<JITSI_JWT_APP_ID>:<session id>`. The app id defaults to `pa_webinar` |
 | `iat`, `exp` | Issue time and expiry (TTLs below) |

@@ -49,9 +49,11 @@ Scale to zero exists only in the full profile, that is `jitsi.mode: full`
 with `jvbScaler.enabled: true` (it defaults to `false` in
 `infra/helm/pa-webinar/values.yaml`). In the simple and standard profiles
 the chart renders no scaler. The bridge runs at the fixed
-`jitsi-meet.jvb.replicaCount`, and nothing in the chart or in Docker
-Compose calls the lifecycle endpoint. [Event lifecycle](event-lifecycle.md)
-describes what this means for event statuses. `jitsi.mode: full` does not
+`jitsi-meet.jvb.replicaCount`, and the chart renders the lifecycle CronJob
+instead, which moves events on the same time rules without pre-scale or
+`IDLE`; Docker Compose calls the same route every minute.
+[Event lifecycle](event-lifecycle.md#running-without-the-scaler) describes
+what this means for event statuses. `jitsi.mode: full` does not
 move the bridges to a dedicated pool by itself. That comes from
 `jitsi-meet.jvb.nodeSelector` and `tolerations`, which the full-profile
 example sets (see [The dedicated pool](#the-dedicated-pool)).
@@ -455,7 +457,11 @@ When the snapshot is missing or has no aggregates, the status pages and the
 metrics fall back to the single `JVB_HEALTH_URL` probe described above,
 which reaches one bridge per request and is complete only with one bridge.
 The waiting room has no fallback: without a snapshot, its warm-up banner
-stays at the first phase. Probes, pages and metrics are covered in
+stays at the first phase. Where the scaler is not rendered nothing writes the snapshot:
+the status pages read the bridge only through `JVB_HEALTH_URL`, as fixed
+bridges or, without the variable, as not monitored, and the waiting room
+shows **The room opens at the start time** instead of the warm-up
+([Monitoring and health](../operations/monitoring.md#get-apistatus)). Probes, pages and metrics are covered in
 [Monitoring](../operations/monitoring.md).
 
 ## Node-pool scale to zero
@@ -620,7 +626,9 @@ The chart does not use KEDA, for these reasons:
 - **Scaling is only half of the tick.** The same call runs the event
   lifecycle, closes `CallSession` rows, writes the Redis snapshot and
   notifies the recorder controller. The example tells you to disable the
-  CronJob, and all of that stops with it.
+  CronJob. The chart then renders the lifecycle CronJob, which keeps the
+  lifecycle, the closing of sessions and the recorder notification, without
+  pre-scale and `IDLE`; the snapshot is lost.
 - **Statistics come from each bridge.** The job reads `/colibri/stats` on
   every bridge through `pods/exec`. The example reads only the database, so
   it sees no bridge load and cannot add a stress margin.
@@ -681,11 +689,12 @@ The portal scales in the usual way for a stateless web application:
 
 ## Known limitations
 
-- **Activity is measured across the platform, not per room.**
-  `/colibri/stats` reports per bridge, and the route treats a participant
-  on any bridge as activity for every `LIVE` event. While one event has
-  people in it, other `LIVE` events whose rooms are empty do not reach
-  `IDLE`, and they keep counting toward `desired`.
+- **Part of the activity signal is platform-wide.** Each room reports its
+  own headcount from the clients in the call, but `/colibri/stats` reports
+  per bridge, and the route also treats a participant on any bridge as
+  activity for every `LIVE` event. While one event has people in it, other
+  `LIVE` events whose rooms are empty do not reach `IDLE`, and they keep
+  counting toward `desired`.
 - **Reachability is global.** `PROVISIONING` becomes `LIVE` when any bridge
   answers, not when a newly started one does.
 - **Scale-down does not know which bridge is busy.** Kubernetes chooses

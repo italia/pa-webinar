@@ -56,8 +56,8 @@ that does not match fails when the bot joins the room. In every case no bot join
 
 - be signed with HS256 using the installation's `JITSI_JWT_SECRET`;
 - carry the same `iss` and `aud` as the portal's tokens (`JITSI_JWT_ISSUER` and `JITSI_JWT_AUDIENCE`,
-  which Prosody accepts as issuer and audience), and `sub` set as the portal sets it
-  (`JITSI_JWT_SUBJECT`, the conference host);
+  which Prosody accepts as issuer and audience), and a non-empty `sub`, set as the portal sets it
+  (`JITSI_JWT_SUBJECT`, or `localhost:8443` when it is unset);
 - carry a `room` claim of `*`, or the exact room name. Malleus appends the conference index to the room
   prefix, so the prefix `load-test` becomes the room `load-test0`, and a token for `load-test` does not
   match it.

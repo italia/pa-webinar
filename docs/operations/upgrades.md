@@ -333,6 +333,13 @@ can be reviewed, diffed and versioned.
     `jitsi-meet.prosody.extraEnvs`, or, in `generate` mode, an app issuer or audience that Prosody
     does not accept;
   - unpinned conference credentials, when `jitsi.requirePinnedCredentials` is `true`;
+  - room roles that Prosody would not take from the token: Jicofo's authentication off while
+    `XMPP_MUC_MODULES` loads neither `token_affiliation` nor `token_affiliation_custom`, or
+    `token_affiliation_custom` asked for with nothing mounted at `/prosody-plugins-custom`. The second
+    happens when your values set `jitsi-meet.prosody.extraVolumes` or `extraVolumeMounts`: they are
+    lists, so they replace the chart's entries, and must repeat them
+    ([Server-side role enforcement](../architecture/jitsi-integration.md#server-side-role-enforcement));
+  - `app.extraCaCerts` with both a `secretName` and a `configMapName`;
   - an Ingress class that disagrees with a `kubernetes.io/ingress.class` annotation.
 
   Each error message names the values to align. The file is the authoritative list.
@@ -463,6 +470,13 @@ Prosody, Jicofo, the bridge and Jibri carry checksum annotations of their config
 Secrets that hold their internal XMPP credentials. They restart when any of these changes, or when
 their image does. That happens with a Jitsi subchart or image bump, and with a change to their
 configuration values. With pinned credentials and no such change, an upgrade leaves them running.
+
+The room-role wiring is such a change: Prosody's module volume and `XMPP_MUC_MODULES`, and Jicofo's
+`JICOFO_ENABLE_AUTH` and `ENABLE_AUTO_OWNER`
+([Server-side role enforcement](../architecture/jitsi-integration.md#server-side-role-enforcement)).
+The upgrade that first brings them to an installation restarts Prosody and Jicofo, and calls in
+progress drop: run it outside events. A later change to the module file alone does not restart
+Prosody; restart its StatefulSet when no call is running.
 
 Upgrading Jitsi itself follows the
 [Jitsi upgrade checklist](../architecture/jitsi-integration.md#jitsi-upgrade-checklist).

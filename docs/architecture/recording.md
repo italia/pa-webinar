@@ -85,9 +85,11 @@ options that were weighed.
 
 Both capture paths rely on consent that the portal collects before a person
 reaches the conference; neither filters what it records. `Event.recordingEnabled`
-adds a recording consent to registration and a consent dialog before the room
-loads; `Event.multitrackRecordingEnabled` adds `consentMultitrack` and a
-waiting-room gate. Holders of moderator and speaker links skip the dialog, yet
+adds a recording consent to registration and, when the installation can record
+(Jibri is expected, or `RECORDER_CONTROLLER_URL` is set:
+`app/src/lib/recording/availability.ts`), a consent dialog before the room loads
+and a notice in the waiting room; `Event.multitrackRecordingEnabled` adds
+`consentMultitrack` and a waiting-room gate. Holders of moderator and speaker links skip the dialog, yet
 the recorder captures every remote audio track, theirs included. The consent
 model and exact texts are in [GDPR](../GDPR.md#consent-model), the gate in
 [The waiting room](waiting-room.md#consent-and-transparency-notices), and the
@@ -248,7 +250,8 @@ Events that become `LIVE` another way (an instant call, or **Start event** from
 the room or the administration area, which sets `LIVE` directly; see
 [Event lifecycle](event-lifecycle.md)) are picked up by the next tick. A woken
 event (`POST /wake`) returns to `PROVISIONING` and reaches `LIVE` through the
-scaler's step, which fires the edge trigger. Reconciles are serialized: a
+scaler's step, which fires the edge trigger. Without the scaler, the lifecycle
+cron fires the same trigger when it opens a room at its start time. Reconciles are serialized: a
 trigger that arrives while one is running is dropped, and the next tick covers
 it. The controller also serves `GET /healthz`.
 

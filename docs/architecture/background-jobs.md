@@ -1,12 +1,12 @@
 # Scheduled and background jobs
 
-PA Webinar has no scheduler inside the application. Everything that must happen on a clock, such as sending queued email, reminding registrants, deleting expired personal data, scaling the bridges or starting AI workers, is triggered from outside the portal. On Kubernetes, the Helm chart renders CronJobs, a long-running controller and a deploy hook. On a single VM, a small `cron` service in Docker Compose calls a subset of the same routes.
+PA Webinar has no scheduler inside the application. Everything that must happen on a clock, such as sending queued email, reminding registrants, opening and closing events, deleting expired personal data, scaling the bridges or starting AI workers, is triggered from outside the portal. On Kubernetes, the Helm chart renders CronJobs, a long-running controller and a deploy hook. On a single VM, a small `cron` service in Docker Compose calls a subset of the same routes.
 
 This page is the catalog of that work: what each job does, where it runs, which Helm key holds its schedule, how it authenticates and what breaks when it does not run. It is written for operators running the chart or the Compose stack, and for developers adding a job.
 
 Related pages:
 
-- the event statuses that the JVB scaler moves: [event-lifecycle.md](event-lifecycle.md);
+- the event statuses that the JVB scaler and the lifecycle job move: [event-lifecycle.md](event-lifecycle.md);
 - how the scaler computes bridge capacity: [scaling.md](scaling.md); enabling, tuning and pausing it: [operations/jvb-scaler.md](../operations/jvb-scaler.md);
 - what the emails say, in which language, and how SMTP is configured: [email.md](email.md) and [configuration/email.md](../configuration/email.md);
 - what the cleanup deletes and after how long: [GDPR.md](../GDPR.md) and [privacy/recordings-and-ai.md](../privacy/recordings-and-ai.md);
@@ -28,11 +28,11 @@ Every scheduled job follows the same model:
 flowchart LR
   subgraph K8S["Kubernetes CronJobs rendered by the chart"]
     direction TB
-    CURL["curl jobs<br/>email-outbox · reminders · cleanup<br/>recordings-reconcile · rubrica-retention<br/>postprod-reclaim · postprod-retention<br/>multitrack-purge"]:::job
+    CURL["curl jobs<br/>email-outbox · lifecycle · reminders · cleanup<br/>recordings-reconcile · rubrica-retention<br/>postprod-reclaim · postprod-retention<br/>multitrack-purge"]:::job
     SCALER["jvb-scaler<br/>kubectl + curl"]:::job
     ORCH["postprod-orchestrator<br/>kubectl + curl"]:::job
   end
-  COMPOSE["Compose cron service<br/>email-outbox · reminders · cleanup"]:::job
+  COMPOSE["Compose cron service<br/>email-outbox · lifecycle<br/>reminders · cleanup"]:::job
 
   subgraph PORTAL["Portal: the only decision maker and writer"]
     direction TB
@@ -103,6 +103,7 @@ Every CronJob is named `<release>-<job>`, where `<release>` is the chart's full 
 | Job | Calls | Schedule key (default) | Rendered when |
 |---|---|---|---|
 | `email-outbox` | `GET /api/cron/email-outbox` | `cronjobs.emailOutbox.schedule` (`*/1 * * * *`) | `cronjobs.emailOutbox.enabled` (default `true`) |
+| `lifecycle` | `GET /api/cron/lifecycle` | `cronjobs.lifecycle.schedule` (`*/1 * * * *`) | `cronjobs.lifecycle.enabled` (default `true`), and only when `jvb-scaler` is not rendered |
 | `reminders` | `GET /api/cron/reminders` | `cronjobs.reminders.schedule` (`*/15 * * * *`) | `cronjobs.reminders.enabled` (default `true`) |
 | `cleanup` | `GET /api/cron/cleanup` | `cronjobs.cleanup.schedule` (`0 3 * * *`) | `cronjobs.cleanup.enabled` (default `true`) |
 | `recordings-reconcile` | `POST /api/cron/recordings-reconcile` | `cronjobs.recordingsReconcile.schedule` (`17 */6 * * *`) | `cronjobs.recordingsReconcile.enabled` (default `true`) |
@@ -122,11 +123,17 @@ Two more objects render as CronJobs but never run on a schedule: `postprod-worke
 
 **Does.** Every piece of code that sends mail only inserts a row into `EmailOutbox` through `enqueueEmail()`. This job delivers the rows. It claims a batch of due `PENDING` rows with `FOR UPDATE SKIP LOCKED` and pushes their next attempt a few minutes ahead as a lease, so an overlapping run cannot pick them up. It sends them over the pooled SMTP transport a few at a time, then marks each row `SENT` or schedules a retry with backoff. After the last attempt, the row becomes `FAILED`. Batch size, parallelism, lease and backoff are constants in `app/src/app/api/cron/email-outbox/route.ts` and `app/src/lib/email/outbox.ts`. Delivery semantics and the catalog of emails are in [email.md](email.md).
 
-**If it does not run.** No email leaves the platform, yet every page that queues one still reports success. Registration confirmations with personal join links, reminders, date-change notices, post-event follow-ups, staff one-time sign-in links and the verification links of data-subject requests all wait in `email_outbox`. When mail does not arrive, check this job first, then SMTP ([configuration/email.md](../configuration/email.md)).
+**If it does not run.** No email leaves the platform, yet every page that queues one still reports success. Registration confirmations with personal join links, reminders, date-change notices, post-event follow-ups, moderator and speaker links, staff one-time sign-in links and the verification links of data-subject requests all wait in `email_outbox`. When mail does not arrive, check this job first, then SMTP ([configuration/email.md](../configuration/email.md)).
+
+### lifecycle
+
+**Does.** The event lifecycle of every installation without the JVB scaler. Every minute it opens published events at their start time, provided the bridge answers `JVB_HEALTH_URL` when that is set, ends events never opened once their `endsAt` has passed, ends `LIVE` rooms at `endsAt` plus the grace period, and ends open-ended rooms past `endsAt` and abandoned instant calls after `jvbInactiveGraceMinutes` without activity. Each event that leaves `LIVE` closes its call sessions in the same transaction, and the run also closes the sessions still open on ended events. When it opens a room and `RECORDER_CONTROLLER_URL` is set, it notifies the recorder controller. While the JVB scaler's heartbeat in Redis is fresh, it answers `{"skipped":"scaler"}` and does nothing, so a leftover schedule never competes with the scaler. The rules are in [event-lifecycle.md](event-lifecycle.md#running-without-the-scaler).
+
+**If it does not run.** Events move only by hand: nobody enters a published event until a moderator presses **Start event**, rooms are not closed after their grace period, events never opened stay `PUBLISHED`, and call sessions stay open. Retention still applies, because the cleanup also selects events that were never ended. The chart's post-install notes warn when neither this job nor the scaler is rendered.
 
 ### reminders
 
-**Does.** The job looks at each configured reminder of an event in `PUBLISHED`, `LIVE`, `PROVISIONING` or `IDLE`. When the send time (`startsAt` minus `offsetMinutes`) has passed and `startsAt` is still ahead, it queues one reminder for each registration that has no `ReminderSent` row for it yet. Each reminder goes out in the registrant's language with an `.ics` attachment, and the job records a `ReminderSent` row. The same run also sends the opt-in post-event follow-up emails, for events that ended within the previous seven days (`app/src/lib/events/post-event-finalize.ts`). It claims each event before queueing, so no event is emailed twice. The job only queues; `email-outbox` delivers.
+**Does.** The job looks at the configured reminders of each event in `PUBLISHED`, `LIVE`, `PROVISIONING` or `IDLE` that has not started. Of the reminders whose send time (`startsAt` minus `offsetMinutes`) has passed, only the one with the smallest offset counts; the others are superseded. It queues that reminder for each registration created by its send time that has no `ReminderSent` row for it yet, and a reminder created after its own send time goes to nobody ([email.md](email.md#when-a-reminder-goes-out)). Each reminder goes out in the registrant's language with an `.ics` attachment, and the job records a `ReminderSent` row. The same run also sends the opt-in post-event follow-up emails, for events that ended within the previous seven days (`app/src/lib/events/post-event-finalize.ts`). It claims each event before queueing, so no event is emailed twice. The job only queues; `email-outbox` delivers.
 
 **Cadence matters.** A reminder is sent only by a run that falls between its send time and the event start. The shortest reminder offset the API accepts is 15 minutes (`REMINDER_PRESETS` in `app/src/lib/validation/schemas.ts`), which equals the default schedule. A slower schedule lets short reminders fall between two runs, and they are then never sent.
 
@@ -138,11 +145,11 @@ Two more objects render as CronJobs but never run on a schedule: `postprod-worke
 
 1. It deletes temporary recordings that were never published, 24 hours after they started.
 2. It deletes published recordings whose own retention (`recordingDeleteAfterDays`, counted from publication) has expired.
-3. For every `ENDED` or `ARCHIVED` event past `endsAt` plus `dataRetentionDays`, it deletes the participant data (registrations, Q&A, polls, chat, questionnaire responses, invitations, named grants and more) in one transaction. It scrubs the personal fields of call sessions and deletes the related files. Then it **sets the event to `ARCHIVED`**, so title, description and dates remain as a historical record.
+3. For every `ENDED` or `ARCHIVED` event past `endsAt` plus `dataRetentionDays`, it deletes the participant data (registrations, Q&A, polls, chat, questionnaire responses, invitations, named grants and more) in one transaction. It scrubs the personal fields of call sessions and deletes the related files. Then it **sets the event to `ARCHIVED`**, so title, description and dates remain as a historical record. Events never ended (`PUBLISHED`, `PROVISIONING`, `IDLE`, `LIVE`) are handled the same way once the later of `endsAt` and their last activity, plus `dataRetentionDays`, has passed; their open call sessions are closed in the same transaction, and the response counts them as `unfinishedEventsArchived`. Drafts are never cleaned.
 
 It also deletes staff sign-in link rows one day after they were used or expired. Each phase writes an entry to the GDPR audit log. The full list of what is deleted, and when, is in [GDPR.md](../GDPR.md).
 
-**If it does not run.** Personal data outlives the retention the controller has declared, and ended events are never archived. The cleanup selects only `ENDED` and `ARCHIVED` events. An event that never reaches `ENDED` is therefore never cleaned, whether or not this job runs. Without the JVB scaler, only a moderator or an administrator ends events ([event-lifecycle.md](event-lifecycle.md#running-without-the-scaler)).
+**If it does not run.** Personal data outlives the retention the controller has declared, and ended events are never archived.
 
 ### recordings-reconcile
 
@@ -158,9 +165,9 @@ It also deletes staff sign-in link rows one day after they were used or expired.
 
 ### jvb-scaler
 
-**Does.** Every tick, the job finds the JVB Deployment and reads its requested and ready replica counts. It runs `kubectl exec` into each running bridge to read `/colibri/stats`, then calls `/api/internal/jvb-desired-replicas` with the aggregated figures. The portal applies every automatic event-status transition in one transaction, writes the bridge snapshot to Redis for the status pages, and returns the desired number of bridges and Jibri replicas. The job then scales the JVB Deployment and, if one exists, the Jibri Deployment or StatefulSet. When the tick promotes an event to `LIVE`, the portal also notifies the recorder controller. The job runs under its own ServiceAccount (`<release>-scaler`) with a namespaced Role. Mechanics, permissions and failure handling are in [scaling.md](scaling.md#one-scaler-tick).
+**Does.** Every tick, the job finds the JVB Deployment and reads its requested and ready replica counts. It runs `kubectl exec` into each running bridge to read `/colibri/stats`, then calls `/api/internal/jvb-desired-replicas` with the aggregated figures. The portal applies every automatic event-status transition in one transaction, writes the bridge snapshot and the lifecycle heartbeat to Redis, and returns the desired number of bridges and Jibri replicas. The job then scales the JVB Deployment and, if one exists, the Jibri Deployment or StatefulSet. When the tick promotes an event to `LIVE`, the portal also notifies the recorder controller. The job runs under its own ServiceAccount (`<release>-scaler`) with a namespaced Role. Mechanics, permissions and failure handling are in [scaling.md](scaling.md#one-scaler-tick).
 
-**If it does not run.** This job is also the clock of the event lifecycle. Without it, events do not move from `PUBLISHED` to `PROVISIONING` or `LIVE` on their own, rooms are not closed after their grace period and nothing goes `IDLE`. Bridges also stay at their last replica count: an idle cluster keeps paying for bridges, or an event starts with none. Manual actions (**Start event**, **End for everyone**) keep working. See [event-lifecycle.md](event-lifecycle.md#running-without-the-scaler) and, for pausing it on purpose, [operations/jvb-scaler.md](../operations/jvb-scaler.md).
+**If it does not run.** Where it is rendered, this job is also the clock of the event lifecycle, and the chart renders no `lifecycle` job next to it. Without it, events do not move from `PUBLISHED` to `PROVISIONING` or `LIVE` on their own, rooms are not closed after their grace period and nothing goes `IDLE`. Three minutes after its last tick the heartbeat expires, and `/wake` stops moving published events to `PROVISIONING`. Bridges also stay at their last replica count: an idle cluster keeps paying for bridges, or an event starts with none. Manual actions (**Start event**, **End for everyone**) keep working. See [event-lifecycle.md](event-lifecycle.md#automatic-transitions-the-scaler-tick) and, for pausing it on purpose, [operations/jvb-scaler.md](../operations/jvb-scaler.md).
 
 ### postprod-orchestrator
 
@@ -196,7 +203,7 @@ It also deletes staff sign-in link rows one day after they were used or expired.
 
 The CronJob templates (`infra/helm/pa-webinar/templates/cronjob-*.yaml`) share these settings:
 
-- **History and garbage collection.** Each CronJob keeps three successful and three failed Jobs. Finished Jobs are deleted after `cronjobs.jobTtlSeconds` for the frequent jobs (`email-outbox`, `reminders`, `multitrack-purge`, `postprod-reclaim`, `jvb-scaler`, `postprod-orchestrator`). The daily and six-hourly jobs (`cleanup`, `recordings-reconcile`, `rubrica-retention`, `postprod-retention`) use `cronjobs.dailyJobTtlSeconds`, which is long enough for a night-time failure to still be visible on the next working day. The worker and recorder templates have their own TTL keys (`postprod.worker.ttlSecondsAfterFinished`, `recorder.ttlSecondsAfterFinished`).
+- **History and garbage collection.** Each CronJob keeps three successful and three failed Jobs. Finished Jobs are deleted after `cronjobs.jobTtlSeconds` for the frequent jobs (`email-outbox`, `lifecycle`, `reminders`, `multitrack-purge`, `postprod-reclaim`, `jvb-scaler`, `postprod-orchestrator`). The daily and six-hourly jobs (`cleanup`, `recordings-reconcile`, `rubrica-retention`, `postprod-retention`) use `cronjobs.dailyJobTtlSeconds`, which is long enough for a night-time failure to still be visible on the next working day. The worker and recorder templates have their own TTL keys (`postprod.worker.ttlSecondsAfterFinished`, `recorder.ttlSecondsAfterFinished`).
 - **Deadlines.** Each template sets `activeDeadlineSeconds`. The deadline counts from Job creation, so it includes waiting for a node and pulling the image on a freshly scaled node, not only the HTTP call. The frequent jobs therefore allow several minutes for a call that normally takes seconds.
 - **Disruptions are not failures.** The `curl` jobs, the worker and the recorder set a `podFailurePolicy` that ignores pods killed by a node drain, an eviction or a spot preemption (`pa-webinar.disruptionTolerantFailurePolicy` in `_helpers.tpl`), so these interruptions do not use up `backoffLimit` or leave a Failed Job behind. That policy requires `restartPolicy: Never`. The scaler and the orchestrator use `restartPolicy: OnFailure` and do not have it.
 - **Hardening.** The scheduled jobs, the worker and the recorder controller run as non-root with a read-only root filesystem, all capabilities dropped and the `RuntimeDefault` seccomp profile. The recorder bot runs as non-root with capabilities dropped but a writable root filesystem. The config-reload hook sets no security context. The `curl` jobs mount no ServiceAccount token. The scaler, the orchestrator and the recorder controller each have their own ServiceAccount, bound to a namespaced Role that grants only what they need.
@@ -206,15 +213,16 @@ The CronJob templates (`infra/helm/pa-webinar/templates/cronjob-*.yaml`) share t
 
 ## Docker Compose
 
-The Compose stack is the development loop, not an installation, and it has no CronJobs. Its `cron` service is a shell loop in a `curl` container. The loop ticks every 30 seconds and calls three routes with the same `x-api-key` header (`docker-compose.yml`):
+The Compose stack is the development loop, not an installation, and it has no CronJobs. Its `cron` service is a shell loop in a `curl` container. The loop ticks every 30 seconds and calls four routes with the same `x-api-key` header (`docker-compose.yml`):
 
 | Job | Chart default | Compose |
 |---|---|---|
 | `email-outbox` | every minute | every minute |
+| `lifecycle` | every minute, without the scaler | every minute |
 | `reminders` | every 15 minutes | every 5 minutes |
 | `cleanup` | daily at 03:00 | every hour |
 
-The cadences differ from the chart's. All three routes also run once when the service starts. The calls run one after another with a 30-second timeout each, so the intervals are approximate. `docker compose logs cron` prints one line per call. The routes' JSON responses are discarded.
+Some cadences differ from the chart's. All four routes also run once when the service starts. The calls run one after another with a 30-second timeout each, so the intervals are approximate. `docker compose logs cron` prints one line per call. The routes' JSON responses are discarded.
 
 Running the cleanup every hour does not delete anything earlier: retention is computed per event, so data is removed within an hour of expiry instead of within a day. It does add a GDPR audit entry per archived event on every run (see [Known limitations](#known-limitations)).
 
@@ -224,7 +232,7 @@ Nothing else runs on a schedule on a single VM:
 |---|---|
 | `rubrica-retention` | Opted-out and inactive address-book records are never deleted. |
 | `recordings-reconcile` | Orphan recording files are never listed or swept. |
-| `jvb-scaler` | No automatic event lifecycle: events start and end only by moderator or administrator action ([event-lifecycle.md](event-lifecycle.md#running-without-the-scaler)). There is no bridge scaling to lose, because the Compose stack runs one bridge. |
+| `jvb-scaler` | Nothing to lose: the `lifecycle` route opens and closes events, without pre-scale or `IDLE` ([event-lifecycle.md](event-lifecycle.md#running-without-the-scaler)), and the Compose stack runs one bridge. |
 | `multitrack-purge`, `postprod-retention` | With the `recorder` profile, per-participant tracks are never deleted by a job. |
 | `postprod-orchestrator`, `postprod-reclaim` | Nothing to do: AI post-production does not run on a single VM. |
 | `web-config-reload` hook | Restart `jitsi-web` yourself after changing its configuration. |
@@ -329,7 +337,7 @@ kubectl patch cronjob pa-webinar-reminders -n pa-webinar -p '{"spec":{"suspend":
 kubectl patch cronjob pa-webinar-reminders -n pa-webinar -p '{"spec":{"suspend":false}}'
 ```
 
-A patch is a runtime change that the chart does not declare, so check it again after each upgrade. To switch a job off durably, set its `enabled` key to `false`; the next upgrade then removes the CronJob. Suspending `jvb-scaler` also pauses the automatic event lifecycle ([operations/jvb-scaler.md](../operations/jvb-scaler.md)). Never unsuspend `postprod-worker` or `recorder`.
+A patch is a runtime change that the chart does not declare, so check it again after each upgrade. To switch a job off durably, set its `enabled` key to `false`; the next upgrade then removes the CronJob. Suspending `jvb-scaler` also pauses the automatic event lifecycle ([operations/jvb-scaler.md](../operations/jvb-scaler.md)), and so does suspending `lifecycle` where the scaler is not rendered. Never unsuspend `postprod-worker` or `recorder`.
 
 ### Before enabling the NetworkPolicy
 

@@ -41,7 +41,7 @@ Each handler is wrapped: `export const POST = withErrorHandling(async (request, 
 
 - catches anything the handler throws and turns it into a response through `errorResponse`, described in [Error shape](#error-shape);
 - records the request in the `http_request_duration_seconds` histogram and the `http_requests_total` counter, with the labels `method`, `route` and `status_code`. The `route` label replaces UUIDs and numeric segments with `:id`, but leaves every other segment as it is. Each event slug is therefore its own series, and so is a token carried in a path ([Where tokens end up](#where-tokens-end-up));
-- writes one JSON log line per request with the level (`error` for 5xx, `warn` for 4xx, `info` otherwise), method, path, status and duration. The path excludes the query string, and no client IP address is logged, so a `?token=` never reaches the application log. A token in the path does.
+- writes one JSON log line per request with the level (`error` for 5xx, `warn` for 4xx, `info` otherwise), method, path, status and duration. A 5xx from an `AppError` marked `expected`, a condition of the installation's configuration rather than a fault, is logged at `warn`; today every `STORAGE_UNAVAILABLE`, the answer of the upload routes on an installation without files or recordings storage. The metrics still count it as a 5xx. The path excludes the query string, and no client IP address is logged, so a `?token=` never reaches the application log. A token in the path does.
 
 Handlers therefore throw typed errors, such as `NotFoundError` or `ForbiddenError`, instead of building error responses themselves.
 
@@ -131,7 +131,7 @@ Providers, key layout and access patterns are covered in [Object storage](../con
 
 ### Machine routes that change data on GET
 
-The `/api/cron/*` routes run on `GET`, even though they change data. `GET /api/cron/cleanup`, for example, deletes personal data. `GET /api/internal/jvb-desired-replicas` also moves events through their lifecycle while it computes the bridge count. The callers are `curl` commands in CronJobs. Never link to these routes from a page, and never put them behind a cache.
+The `/api/cron/*` routes run on `GET`, even though they change data. `GET /api/cron/cleanup`, for example, deletes personal data. `GET /api/internal/jvb-desired-replicas` also moves events through their lifecycle while it computes the bridge count, and `GET /api/cron/lifecycle` does the same where there is no scaler. The callers are `curl` commands in CronJobs. Never link to these routes from a page, and never put them behind a cache.
 
 ## Route families
 

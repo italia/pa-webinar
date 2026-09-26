@@ -623,11 +623,18 @@ Suspending the CronJob stops much more than scaling:
 - **Bridge and Jibri counts freeze** at whatever they are. A running bridge
   keeps its node, and a bridge at zero stays at zero.
 - **The automatic lifecycle stops.** No event moves to `PROVISIONING`,
-  `LIVE`, `IDLE` or `ENDED` by itself, and call sessions are not closed.
-  Manual actions such as **Start event** and **End for everyone** keep
-  working. A visitor who wakes a room moves it to `PROVISIONING`, where it
-  stays until the scaler runs again (see
-  [Pitfall: a wake without a scaler](../architecture/event-lifecycle.md#pitfall-a-wake-without-a-scaler)).
+  `LIVE`, `IDLE` or `ENDED` by itself, and call sessions left open on ended
+  events are not repaired. The chart renders no lifecycle CronJob in this
+  profile, so nothing takes over. Manual actions such as **Start event** and
+  **End for everyone** keep working, and **Start event** also opens a
+  `PROVISIONING` or `IDLE` event.
+- **The lifecycle heartbeat expires** 3 minutes after the last tick. From
+  then on `/wake` no longer moves a `PUBLISHED` event to `PROVISIONING`, and
+  the waiting room of a `PROVISIONING` or `IDLE` event shows **The room
+  opens at the start time** instead of the warm-up (see
+  [Which driver runs](../architecture/event-lifecycle.md#which-driver-runs)).
+  A visitor who opens an `IDLE` room still moves it to `PROVISIONING`, where
+  it stays until the scaler runs again or a moderator starts it.
 - **The snapshot expires** 300 seconds after the last tick. The status pages
   and `/api/metrics` then fall back to a single probe of `JVB_HEALTH_URL`,
   which reads one bridge through the `<fullname>-jvb-rest` Service
@@ -640,9 +647,9 @@ Suspending the CronJob stops much more than scaling:
 
 **Never pause during a scheduled event**, inside its pre-scale window, or
 while anyone may join an `IDLE` room or start an instant call. Rooms would
-not open, and a new call would have no bridge. What each status does
-without the scaler is described in
-[Running without the scaler](../architecture/event-lifecycle.md#running-without-the-scaler).
+not open, and a new call would have no bridge. What the lifecycle does
+while the scaler is paused is described in
+[Automatic transitions: the scaler tick](../architecture/event-lifecycle.md#automatic-transitions-the-scaler-tick).
 
 ### Procedure
 
@@ -702,10 +709,18 @@ described in [Find the run and read its log](#find-the-run-and-read-its-log).
 ScaledObject. The chart does not use KEDA, and the full profile is not built
 around it. The example is not a drop-in replacement:
 
-- its header tells you to disable the CronJob. Doing so also disables the
-  automatic lifecycle, the closing of call sessions, the snapshot and the
-  recorder notification. Events then behave as in
-  [Running without the scaler](../architecture/event-lifecycle.md#running-without-the-scaler);
+- its header tells you to disable the CronJob (`jvbScaler.enabled: false`).
+  The chart then renders the lifecycle CronJob (`cronjobs.lifecycle`), which
+  keeps the automatic lifecycle and the closing of call sessions working, as
+  in [Running without the scaler](../architecture/event-lifecycle.md#running-without-the-scaler):
+  events open at their start time and end after their end time and grace,
+  with no pre-scale and no `IDLE`. Keep it enabled: the example's query
+  counts `LIVE` events, so without it events would stay `LIVE` and the
+  bridges would never scale back to zero. The bridge snapshot and the
+  scaler's notification of the recorder controller are lost; the lifecycle
+  CronJob notifies the recorder when it opens a room. Set
+  `JVB_SCALER_ENABLED: "true"` in `app.env` so that the status pages read the
+  bridges as scaled;
 - it targets the Deployment `videocall-jitsi-meet-jvb-0`, the name for a
   release called `videocall`. Change it to `<release>-jitsi-meet-jvb-0`. Its
   namespace (`videocall`) and Secret names are hard-coded too;
