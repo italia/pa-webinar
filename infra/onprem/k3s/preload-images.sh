@@ -9,7 +9,14 @@
 #              modelli da cui nascono i Job del registratore e della
 #              post-produzione)
 #   save       le preleva su una macchina che raggiunge i registri, con le
-#              credenziali di quella macchina, in un unico archivio OCI
+#              credenziali di quella macchina, in un unico archivio OCI. Le
+#              immagini che il registro non dà e il docker di questa macchina
+#              ha (costruite qui) si prendono da docker
+#   build      costruisce con docker le immagini dell'applicazione da questo
+#              checkout, poi fa come save con quelle al posto delle
+#              pubblicate: la strada per chi non ha accesso al registro del
+#              progetto. Scrive accanto all'archivio i valori delle immagini
+#              da passare a helm (<archivio>.values.yaml)
 #   import     sul nodo: importa l'archivio in k3s, fissa le immagini contro
 #              la pulizia automatica del kubelet e controlla che ogni
 #              riferimento del chart si risolva
@@ -17,7 +24,8 @@
 #              provata, per install-*.sh --airgap-dir
 #
 # Uso:  ./preload-images.sh list [--chart DIR] [-- <argomenti di helm template>]
-#       ./preload-images.sh save --out FILE [--arch amd64] [--list FILE] [--chart DIR] [-- <argomenti>]
+#       ./preload-images.sh save --out FILE [--arch amd64] [--list FILE] [--from-docker] [--chart DIR] [-- <argomenti>]
+#       ./preload-images.sh build --out FILE [--tag TAG] [--chart DIR] [-- <argomenti>]
 #       sudo ./preload-images.sh import FILE
 #       ./preload-images.sh fetch-k3s --out DIR [--version V] [--arch amd64]
 #
@@ -26,9 +34,20 @@
 # componenti, e quindi quali immagini, esistono. Senza argomenti: profilo
 # semplice + values-k3s.yaml, con le immagini alla versione del chart.
 #
-# Dove: list, save e fetch-k3s su Linux o macOS (bash 3.2 o successiva, con
-# helm; save vuole anche skopeo e python3); import sul nodo, come root. Il
-# chart va preparato prima con `helm dependency build`.
+# save --from-docker prende dal docker di questa macchina ogni immagine con
+# tag che ci trova, le altre dal registro. Senza, docker serve solo per le
+# immagini che il registro rifiuta.
+#
+# build: su un tag di rilascio vX.Y.Z le immagini si chiamano
+# pa-webinar:X.Y.Z e pa-webinar:vX.Y.Z-migrate, su un altro commit
+# pa-webinar:local-<sha> e pa-webinar:local-<sha>-migrate (--tag per un altro
+# nome). Le immagini costruite hanno l'architettura di questa macchina, che
+# deve essere quella dei nodi.
+#
+# Dove: list, save, build e fetch-k3s su Linux o macOS (bash 3.2 o
+# successiva, con helm; save e build vogliono anche skopeo e python3, build e
+# --from-docker anche docker); import sul nodo, come root. Il chart va
+# preparato prima con `helm dependency build`.
 #
 # Ciò che l'archivio fissa: un riferimento con digest (`repo@sha256:…`)
 # viene copiato con l'indice multi-architettura originale, perché il kubelet
@@ -41,14 +60,23 @@ set -euo pipefail
 CARTELLA_SCRIPT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CHART="$CARTELLA_SCRIPT/../../helm/pa-webinar"
 ARCH="amd64"
+# Il nome delle immagini dell'applicazione costruite da build.
+REPO_LOCALE="pa-webinar"
 # Il binario di k3s, per percorso: su RHEL e derivate sudo toglie
 # /usr/local/bin dal PATH (secure_path).
 K3S="${K3S:-}"
 
+# Funzioni e versioni comuni agli script della cartella (versione provata di
+# k3s, download, tag delle immagini dal checkout). Prima delle funzioni di
+# questo script: log e fine sono quelle qui sotto.
+# shellcheck source=common.sh
+. "$CARTELLA_SCRIPT/common.sh"
+
 log()  { printf '[immagini] %s\n' "$*" >&2; }
 fine() { printf '[immagini] ERRORE: %s\n' "$*" >&2; exit 1; }
 
-uso() { sed -n '3,38p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; }
+# L'aiuto è il commento in testa al file, fino alla prima riga di codice.
+uso() { awk 'NR < 3 { next } /^#/ { sub(/^# ?/, ""); print; next } { exit }' "${BASH_SOURCE[0]}"; }
 
 # Riferimento nella forma completa che usa containerd: registro esplicito
 # (docker.io per Docker Hub), `library/` per le immagini ufficiali, `latest`
@@ -238,13 +266,29 @@ for v in voci:
 PY
 }
 
+# Vero se il docker di questa macchina ha l'immagine $1 (per tag).
+in_docker() {
+  command -v docker >/dev/null 2>&1 && docker image inspect "$1" >/dev/null 2>&1
+}
+
+# Copia l'immagine $1 dal docker di questa macchina nella cartella $2, se è
+# dell'architettura dei nodi.
+copia_da_docker() {
+  local ref="$1" dest="$2" arch
+  arch="$(docker image inspect --format '{{.Architecture}}' "$ref" 2>/dev/null || true)"
+  [ "$arch" = "$ARCH" ] || fine "$ref nel docker di questa macchina è linux/${arch:-?}, i nodi sono linux/$ARCH"
+  rm -rf "$dest"
+  skopeo copy --quiet "docker-daemon:$ref" "dir:$dest" || fine "copia dal docker di questa macchina non riuscita: $ref"
+}
+
 cmd_save() {
-  local out="" file_elenco="" argomenti=()
+  local out="" file_elenco="" argomenti=() da_docker="no"
   while [ $# -gt 0 ]; do
     case "$1" in
       --out) out="${2:?manca il valore di --out}"; shift 2 ;;
       --arch) ARCH="${2:?manca il valore di --arch}"; shift 2 ;;
       --list) file_elenco="${2:?manca il valore di --list}"; shift 2 ;;
+      --from-docker) da_docker="si"; shift ;;
       --chart) CHART="${2:?manca il valore di --chart}"; shift 2 ;;
       --) shift; argomenti=("$@"); break ;;
       -h|--help) uso; exit 0 ;;
@@ -254,6 +298,10 @@ cmd_save() {
   [ -n "$out" ] || fine "manca --out <archivio.tar>"
   command -v skopeo >/dev/null || fine "serve skopeo (pacchetto skopeo di Debian, Ubuntu, Fedora, RHEL)"
   command -v python3 >/dev/null || fine "serve python3"
+  if [ "$da_docker" = si ]; then
+    command -v docker >/dev/null || fine "--from-docker: serve docker"
+    docker info >/dev/null 2>&1 || fine "--from-docker: il demone docker non risponde (docker info)"
+  fi
 
   local elenco
   if [ -n "$file_elenco" ]; then
@@ -280,10 +328,24 @@ cmd_save() {
       log "[$n] $ref (tutte le architetture, digest conservato)"
       skopeo copy --retry-times 3 --quiet --multi-arch all --preserve-digests \
         "docker://$nome" "dir:$copie/$etichetta" || fine "copia non riuscita: $ref"
+    elif [ "$da_docker" = si ] && in_docker "$ref"; then
+      log "[$n] $ref (dal docker di questa macchina)"
+      copia_da_docker "$ref" "$copie/$etichetta"
     else
       log "[$n] $ref (linux/$ARCH)"
-      skopeo copy --retry-times 3 --quiet --override-os linux --override-arch "$ARCH" \
-        "docker://$ref" "dir:$copie/$etichetta" || fine "copia non riuscita: $ref$(suggerimento "$ref")"
+      # Un'immagine costruita qui (pa-webinar:<tag>, senza registro) non è in
+      # nessun registro: se il docker di questa macchina ce l'ha, si prende
+      # da lì.
+      if ! skopeo copy --retry-times 3 --quiet --override-os linux --override-arch "$ARCH" \
+          "docker://$ref" "dir:$copie/$etichetta" 2> "$LAVORO/errore"; then
+        if in_docker "$ref"; then
+          log "    il registro non la dà, il docker di questa macchina sì: uso quella"
+          copia_da_docker "$ref" "$copie/$etichetta"
+        else
+          cat "$LAVORO/errore" >&2
+          fine "copia non riuscita: $ref$(suggerimento "$ref")"
+        fi
+      fi
     fi
     printf '%s\t%s\t%s\n' "$etichetta" "$nome" "$ref" >> "$mappa"
   done <<< "$elenco"
@@ -292,6 +354,78 @@ cmd_save() {
   tar -C "$layout" -cf "$out" oci-layout index.json blobs
   log "archivio: $out ($(du -h "$out" | cut -f1), $n immagini); elenco con i digest: $out.images.txt"
   log "sul nodo: sudo ./preload-images.sh import $(basename "$out")"
+}
+
+# Architettura di questa macchina, nei nomi dei nodi (amd64, arm64).
+arch_locale() {
+  case "$(uname -m)" in
+    x86_64|amd64) echo amd64 ;;
+    aarch64|arm64) echo arm64 ;;
+    *) uname -m ;;
+  esac
+}
+
+cmd_build() {
+  local out="" tag="" argomenti=() radice tag_mig tags commit
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --out) out="${2:?manca il valore di --out}"; shift 2 ;;
+      --tag) tag="${2:?manca il valore di --tag}"; shift 2 ;;
+      --arch) ARCH="${2:?manca il valore di --arch}"; shift 2 ;;
+      --chart) CHART="${2:?manca il valore di --chart}"; shift 2 ;;
+      --) shift; argomenti=("$@"); break ;;
+      -h|--help) uso; exit 0 ;;
+      *) fine "opzione sconosciuta per build: $1" ;;
+    esac
+  done
+  [ -n "$out" ] || fine "manca --out <archivio.tar>"
+  command -v docker >/dev/null || fine "serve docker"
+  docker info >/dev/null 2>&1 || fine "il demone docker non risponde (docker info): avvialo, o controlla i permessi dell'utente"
+  [ "$(arch_locale)" = "$ARCH" ] \
+    || fine "questa macchina è $(arch_locale), i nodi $ARCH: costruisci le immagini su una macchina della stessa architettura dei nodi"
+  radice="$(cd "$CARTELLA_SCRIPT/../../.." && pwd)"
+  [ -f "$radice/Dockerfile" ] || fine "Dockerfile non trovato in $radice: build si lancia da una copia del repository"
+
+  # I nomi delle due immagini: dal tag di rilascio del checkout, o dal commit.
+  if [ -n "$tag" ]; then
+    [[ "$tag" =~ ^[A-Za-z0-9_][A-Za-z0-9._-]{0,120}$ ]] || fine "--tag non è un tag valido: $tag"
+    case "$tag" in
+      [0-9]*.[0-9]*.[0-9]*) tag_mig="v$tag-migrate" ;;
+      *) tag_mig="$tag-migrate" ;;
+    esac
+  else
+    tags="$(tag_da_checkout "$radice")" || fine "non ricavo la versione del checkout (git o Chart.yaml): passala con --tag"
+    read -r tag tag_mig <<< "$tags"
+  fi
+  if checkout_modificato "$radice"; then
+    log "ATTENZIONE: il checkout ha modifiche non salvate: finiscono nelle immagini $REPO_LOCALE:$tag"
+  fi
+  commit="$(git -C "$radice" rev-parse --short=12 HEAD 2>/dev/null || echo '?')"
+
+  log "costruisco $REPO_LOCALE:$tag e $REPO_LOCALE:$tag_mig da $radice (commit $commit; la prima volta alcuni minuti)"
+  costruisci_immagini "$radice" "$REPO_LOCALE:$tag" "$REPO_LOCALE:$tag_mig" "" \
+    || fine "docker build non riuscito (l'errore è qui sopra)"
+
+  # I valori delle immagini, per helm e per l'elenco dell'archivio: pullPolicy
+  # Never, perché il nodo non potrebbe prelevarle da nessuna parte e un'immagine
+  # mancante deve essere un errore chiaro (ErrImageNeverPull), non un tentativo
+  # di prelievo da Docker Hub.
+  local valori="$out.values.yaml"
+  {
+    printf '# Scritto da preload-images.sh build: immagini costruite da %s (commit %s).\n' "$(basename "$radice")" "$commit"
+    printf '# Da passare a helm con gli altri valori, dopo i file di esempio.\n'
+    printf 'app:\n  image:\n    repository: %s\n    tag: "%s"\n    pullPolicy: Never\n' "$REPO_LOCALE" "$tag"
+    printf '  migration:\n    image:\n      repository: %s\n      tag: "%s"\n      pullPolicy: Never\n' "$REPO_LOCALE" "$tag_mig"
+  } > "$valori"
+
+  if [ "${#argomenti[@]}" -eq 0 ]; then
+    argomenti=(-f "$CHART/examples/values-simple.yaml" -f "$CHART/examples/values-k3s.yaml")
+    log "nessun argomento per helm: profilo semplice + values-k3s.yaml"
+  fi
+  # Le immagini pubblicate dal registro, come in save; quelle appena
+  # costruite il registro non le ha, e save le prende dal docker di qui.
+  cmd_save --out "$out" --arch "$ARCH" --chart "$CHART" -- "${argomenti[@]}" -f "$valori"
+  log "valori delle immagini per helm: $valori (-f, dopo i file di esempio e prima dei tuoi)"
 }
 
 cmd_import() {
@@ -354,12 +488,10 @@ controlla_aiutante_local_path() {
     case "$immagini" in *mirrored-library-busybox*) return 0 ;; esac
     aiuto="l'immagine"
   fi
-  log "ATTENZIONE: manca $aiuto con cui local-path crea i volumi. Se il nodo non raggiunge un registro, copia in /var/lib/rancher/k3s/agent/images/ le immagini di sistema di k3s (preload-images.sh fetch-k3s) e riavvia k3s (o k3s-agent)"
+  log "ATTENZIONE: manca $aiuto con cui local-path crea i volumi. Conta solo se il nodo non raggiunge nessun registro, nemmeno attraverso un proxy o un mirror (con un proxy o un mirror k3s la preleva da sé al primo volume). In quel caso copia in /var/lib/rancher/k3s/agent/images/ le immagini di sistema di k3s (preload-images.sh fetch-k3s) e riavvia k3s (o k3s-agent)"
 }
 
 cmd_fetch_k3s() {
-  # shellcheck source=common.sh
-  . "$CARTELLA_SCRIPT/common.sh"
   local out="" versione="$K3S_VERSIONE_PROVATA"
   while [ $# -gt 0 ]; do
     case "$1" in
@@ -397,8 +529,9 @@ azione="${1:-}"
 case "$azione" in
   list)      cmd_list "$@" ;;
   save)      cmd_save "$@" ;;
+  build)     cmd_build "$@" ;;
   import)    cmd_import "$@" ;;
   fetch-k3s) cmd_fetch_k3s "$@" ;;
   -h|--help|"") uso ;;
-  *) fine "azione sconosciuta: $azione (list, save, import, fetch-k3s)" ;;
+  *) fine "azione sconosciuta: $azione (list, save, build, import, fetch-k3s)" ;;
 esac

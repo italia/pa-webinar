@@ -1,0 +1,23 @@
+# TURNS sulla 443 condivisa con il portale: Traefik riconosce il nome nella
+# negoziazione TLS (SNI), termina il TLS con il certificato del Secret e
+# inoltra TURN su TCP a coturn. Le altre connessioni sulla 443 non
+# corrispondono a questa regola e vanno agli Ingress di sempre.
+# Modello di turn.sh (--tls-secret).
+apiVersion: traefik.io/v1alpha1
+kind: IngressRouteTCP
+metadata:
+  name: @@RELEASE@@-turns
+  labels:
+    app.kubernetes.io/name: coturn
+    app.kubernetes.io/instance: @@RELEASE@@
+    app.kubernetes.io/part-of: pa-webinar
+    app.kubernetes.io/managed-by: pa-webinar-addons
+spec:
+  entryPoints: [websecure]
+  routes:
+    - match: HostSNI(`@@HOST@@`)
+      services:
+        - name: @@RELEASE@@-turn-tcp
+          port: 3478
+  tls:
+    secretName: @@TLS_SECRET@@

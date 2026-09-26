@@ -9,7 +9,9 @@
 #   - buffer UDP del bridge (90-pa-webinar-jvb.conf);
 #   - proxy solo per prelevare le immagini, oppure un mirror
 #     (registries.yaml), oppure nessun download (--airgap-dir);
-#   - Secret cifrati nel datastore di k3s.
+#   - Secret cifrati nel datastore di k3s;
+#   - con --acme-email, certificati ACME chiesti e rinnovati da Traefik
+#     (verifica TLS-ALPN-01, senza cert-manager).
 # Rilanciato con le stesse opzioni, riscrive la configurazione e riavvia k3s:
 # le modifiche a traefik-config.yaml si fanno nella copia accanto allo script,
 # non in quella installata, che a ogni lancio viene sostituita.
@@ -32,6 +34,14 @@ DEST_TRAEFIK=/var/lib/rancher/k3s/server/manifests/traefik-config.yaml
 ETICHETTA_LB="svccontroller.k3s.cattle.io/enablelb"
 # Token con cui si uniscono gli agent, distinto da quello del server.
 FILE_TOKEN_AGENT=/etc/rancher/k3s/pa-webinar-agent-token
+# Certificati da un server ACME (Let's Encrypt o l'ACME dell'ente) chiesti da
+# Traefik stesso, con la verifica TLS-ALPN-01 sulla porta 443: niente
+# cert-manager, e il reindirizzamento della porta 80 non intralcia.
+EMAIL_ACME=""
+SERVER_ACME=""
+CA_SERVER_ACME=""
+RESOLVER_ACME="pa-webinar"
+DEST_CA_ACME=/var/lib/rancher/k3s/server/manifests/pa-webinar-acme-ca.yaml
 
 uso() {
   cat <<'FINE'
@@ -43,6 +53,22 @@ Server
   --traefik-config FILE    HelmChartConfig di Traefik da installare
                            (predefinito: traefik-config.yaml accanto allo script)
   --no-traefik-config      lasciare Traefik come lo configura k3s
+
+Certificati ACME (Traefik li chiede e li rinnova da sé, verifica TLS-ALPN-01
+sulla porta 443, che deve essere raggiungibile dal server ACME; i nomi DNS
+devono già puntare al nodo)
+  --acme-email EMAIL       attiva il resolver "pa-webinar" di Traefik, con
+                           questo indirizzo di contatto
+  --acme-server URL        directory ACME (predefinito: Let's Encrypt,
+                           https://acme-v02.api.letsencrypt.org/directory;
+                           per le prove quella di staging, o l'ACME dell'ente)
+  --acme-server-ca FILE    autorità (PEM) del certificato HTTPS del server
+                           ACME, se non è tra quelle pubbliche
+  Gli Ingress usano il resolver con le annotazioni
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    traefik.ingress.kubernetes.io/router.tls.certresolver: pa-webinar
+  (pa-webinar-up.sh --tls acme le scrive da sé). I certificati restano nel
+  volume di Traefik (local-path) e sopravvivono ai riavvii.
 
 FINE
   uso_opzioni_comuni
@@ -63,6 +89,9 @@ while [ $# -gt 0 ]; do
     --tls-san) TLS_SAN+=("${2:?manca il valore di --tls-san}"); shift 2 ;;
     --traefik-config) CONFIG_TRAEFIK="${2:?manca il valore di --traefik-config}"; shift 2 ;;
     --no-traefik-config) CONFIG_TRAEFIK=""; shift ;;
+    --acme-email) EMAIL_ACME="${2:?manca il valore di --acme-email}"; shift 2 ;;
+    --acme-server) SERVER_ACME="${2:?manca il valore di --acme-server}"; shift 2 ;;
+    --acme-server-ca) CA_SERVER_ACME="${2:?manca il valore di --acme-server-ca}"; shift 2 ;;
     *)
       opzione_comune "$@" || fine "opzione sconosciuta: $1 (vedi --help)"
       shift "$CONSUMATI" ;;
@@ -72,6 +101,61 @@ done
 richiedi_root
 controlla_opzioni_comuni
 [ -z "$CONFIG_TRAEFIK" ] || [ -r "$CONFIG_TRAEFIK" ] || fine "file non leggibile: $CONFIG_TRAEFIK"
+
+# ── ACME: controlli prima di toccare il nodo ────────────────────
+if [ -n "$SERVER_ACME$CA_SERVER_ACME" ] && [ -z "$EMAIL_ACME" ]; then
+  fine "--acme-server e --acme-server-ca valgono solo con --acme-email"
+fi
+if [ -n "$EMAIL_ACME" ]; then
+  [ -n "$CONFIG_TRAEFIK" ] || fine "--acme-email configura Traefik: non si usa con --no-traefik-config"
+  # Finiscono in un file YAML tra virgolette: niente virgolette né spazi.
+  [[ "$EMAIL_ACME" =~ ^[^[:space:]\"\\@]+@[^[:space:]\"\\@]+$ ]] || fine "--acme-email non sembra un indirizzo: $EMAIL_ACME"
+  if [ -n "$SERVER_ACME" ]; then
+    [[ "$SERVER_ACME" =~ ^https://[^[:space:]\"\\]+$ ]] || fine "--acme-server va scritto come https://<server>/<directory>"
+  fi
+  if [ -n "$CA_SERVER_ACME" ]; then
+    [ -r "$CA_SERVER_ACME" ] || fine "file non leggibile: $CA_SERVER_ACME"
+    grep -q -- '-----BEGIN CERTIFICATE-----' "$CA_SERVER_ACME" || fine "$CA_SERVER_ACME non contiene un certificato PEM"
+  fi
+  # Il blocco ACME si aggiunge in coda a valuesContent: deve essere l'ultima
+  # chiave del file, e un blocco letterale (`|` o `|-`). Una configurazione
+  # scritta in un'altra forma si completa a mano.
+  awk '
+    /^[[:space:]]*#/ || /^[[:space:]]*$/ { next }
+    /^  valuesContent:[[:space:]]*\|-?[[:space:]]*$/ { dentro = 1; next }
+    dentro && !/^    / { fuori = 1 }
+    END { exit (dentro && !fuori) ? 0 : 1 }
+  ' "$CONFIG_TRAEFIK" \
+    || fine "$CONFIG_TRAEFIK non finisce con il blocco \`valuesContent: |-\`: aggiungi a mano la configurazione ACME (vedi --help) oppure parti da traefik-config.yaml del repository"
+  if grep -qE '^    (certificatesResolvers|persistence):' "$CONFIG_TRAEFIK"; then
+    fine "$CONFIG_TRAEFIK ha già certificatesResolvers o persistence: togli --acme-email, o togli quei blocchi dal file"
+  fi
+fi
+
+# La configurazione di Traefik da installare: il file indicato, più il blocco
+# ACME se richiesto. Il resolver tiene account e certificati in /data, un
+# volume local-path del nodo: un certificato già emesso non si richiede di
+# nuovo a ogni riavvio (i limiti di Let's Encrypt sono per settimana).
+componi_traefik() {
+  local dest="$1"
+  cp "$CONFIG_TRAEFIK" "$dest"
+  [ -n "$EMAIL_ACME" ] || return 0
+  {
+    printf '\n    # ── Certificati ACME (install-server.sh --acme-email) ─────\n'
+    printf '    persistence:\n      enabled: true\n      size: 128Mi\n      path: /data\n'
+    printf '    certificatesResolvers:\n      %s:\n        acme:\n' "$RESOLVER_ACME"
+    printf '          email: "%s"\n' "$EMAIL_ACME"
+    printf '          storage: /data/acme.json\n'
+    [ -n "$SERVER_ACME" ] && printf '          caServer: "%s"\n' "$SERVER_ACME"
+    # true, non {}: il chart di Traefik trasforma in argomenti solo i valori
+    # non vuoti, e una mappa vuota lascerebbe il resolver senza verifica.
+    printf '          tlsChallenge: true\n'
+    if [ -n "$CA_SERVER_ACME" ]; then
+      printf '    env:\n      - name: LEGO_CA_CERTIFICATES\n        value: /etc/pa-webinar-acme/ca.crt\n'
+      printf '    volumes:\n      - name: pa-webinar-acme-ca\n        mountPath: /etc/pa-webinar-acme\n        type: configMap\n'
+    fi
+  } >> "$dest"
+}
 
 # Il nodeSelector di traefik-config.yaml porta Traefik sui nodi con
 # l'etichetta di ServiceLB: se nessun nodo ce l'ha, Traefik resta in Pending
@@ -125,14 +209,26 @@ scrivi_configurazione "$config"
 # con externalTrafficPolicy Local, senza una seconda installazione. A ogni
 # lancio la copia installata viene sostituita con quella accanto allo script;
 # se era stata modificata a mano, la versione precedente resta da parte.
+# L'autorità del server ACME arriva a Traefik in un ConfigMap, applicato da k3s
+# dalla stessa cartella dei manifesti.
 if [ -n "$CONFIG_TRAEFIK" ]; then
   mkdir -p "$(dirname "$DEST_TRAEFIK")"
-  if [ -f "$DEST_TRAEFIK" ] && ! cmp -s "$CONFIG_TRAEFIK" "$DEST_TRAEFIK"; then
-    cp -p "$DEST_TRAEFIK" /var/lib/rancher/k3s/server/traefik-config.yaml.precedente
-    log "ATTENZIONE: la configurazione di Traefik installata era diversa da $CONFIG_TRAEFIK, che la sostituisce. La precedente è in /var/lib/rancher/k3s/server/traefik-config.yaml.precedente: le modifiche vanno fatte nella copia accanto allo script"
+  if [ -n "$CA_SERVER_ACME" ]; then
+    {
+      printf '# Scritto da install-server.sh --acme-server-ca: rilanciare lo script per cambiarlo.\n'
+      printf 'apiVersion: v1\nkind: ConfigMap\nmetadata:\n  name: pa-webinar-acme-ca\n  namespace: kube-system\ndata:\n  ca.crt: |\n'
+      sed 's/^/    /' "$CA_SERVER_ACME"
+    } > "$LAVORO/acme-ca.yaml"
+    install -m 0600 "$LAVORO/acme-ca.yaml" "$DEST_CA_ACME"
+    log "autorità del server ACME: $DEST_CA_ACME"
   fi
-  install -m 0600 "$CONFIG_TRAEFIK" "$DEST_TRAEFIK"
-  log "configurazione di Traefik: $DEST_TRAEFIK"
+  componi_traefik "$LAVORO/traefik-config.yaml"
+  if [ -f "$DEST_TRAEFIK" ] && ! cmp -s "$LAVORO/traefik-config.yaml" "$DEST_TRAEFIK"; then
+    cp -p "$DEST_TRAEFIK" /var/lib/rancher/k3s/server/traefik-config.yaml.precedente
+    log "ATTENZIONE: la configurazione di Traefik installata era diversa da quella che la sostituisce ora ($CONFIG_TRAEFIK${EMAIL_ACME:+ con il blocco ACME}). La precedente è in /var/lib/rancher/k3s/server/traefik-config.yaml.precedente: le modifiche vanno fatte nella copia accanto allo script, o con le opzioni dello script"
+  fi
+  install -m 0600 "$LAVORO/traefik-config.yaml" "$DEST_TRAEFIK"
+  log "configurazione di Traefik: $DEST_TRAEFIK${EMAIL_ACME:+ (certificati ACME, resolver $RESOLVER_ACME${SERVER_ACME:+, $SERVER_ACME})}"
 fi
 
 # Il token viene dall'ambiente, se c'è (K3S_TOKEN); altrimenti lo genera k3s.

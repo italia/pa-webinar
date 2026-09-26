@@ -1,6 +1,7 @@
 # shellcheck shell=bash
 #
-# Funzioni comuni a install-server.sh e install-agent.sh: non si esegue da
+# Funzioni comuni a install-server.sh e install-agent.sh (sul nodo), e a
+# preload-images.sh e pa-webinar-up.sh (sulla postazione): non si esegue da
 # solo. Gli script si lanciano da una copia dell'intera cartella
 # infra/onprem/k3s, perché leggono questo file e i file di configurazione
 # accanto a sé.
@@ -369,4 +370,60 @@ aspetta_nodo() {
   done
   log "il nodo $NODE_IP non è Ready dopo 5 minuti: journalctl -u k3s (o k3s-agent)"
   return 1
+}
+
+# ── Immagini dell'applicazione e versione del checkout ──────────
+# Chart, file di esempio e immagini vengono dallo stesso tag git: i tag delle
+# due immagini si ricavano dal checkout del repository in $1.
+#   - su un tag di rilascio vX.Y.Z: "X.Y.Z vX.Y.Z-migrate", i tag pubblicati
+#     (l'immagine senza la v, le migrazioni con la v del tag git);
+#   - su qualunque altro commit: "local-<sha> local-<sha>-migrate", con le
+#     prime 12 cifre del commit, per immagini costruite da questo checkout;
+#   - senza git (un archivio dei sorgenti): la versione del chart
+#     (appVersion), come su un tag di rilascio.
+# Stampa i due tag separati da uno spazio; esce con 1 se non li ricava.
+# shellcheck disable=SC2034  # li leggono gli script che includono questo file
+REPO_IMMAGINE_PUBBLICATA="ghcr.io/italia/pa-webinar"
+# shellcheck disable=SC2034
+REPO_IMMAGINE_LOCALE="pa-webinar"
+
+tag_da_checkout() {
+  local radice="$1" tag sha versione
+  if command -v git >/dev/null 2>&1 && git -C "$radice" rev-parse --git-dir >/dev/null 2>&1; then
+    tag="$(git -C "$radice" describe --tags --exact-match --match 'v[0-9]*' HEAD 2>/dev/null || true)"
+    if [[ "$tag" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+      printf '%s %s\n' "${tag#v}" "$tag-migrate"
+      return 0
+    fi
+    sha="$(git -C "$radice" rev-parse --short=12 HEAD 2>/dev/null || true)"
+    [ -n "$sha" ] || return 1
+    printf 'local-%s local-%s-migrate\n' "$sha" "$sha"
+    return 0
+  fi
+  versione="$(sed -nE 's/^appVersion:[[:space:]]*"?([0-9]+\.[0-9]+\.[0-9]+)"?[[:space:]]*$/\1/p' \
+    "$radice/infra/helm/pa-webinar/Chart.yaml" 2>/dev/null | head -n1)"
+  [ -n "$versione" ] || return 1
+  printf '%s v%s-migrate\n' "$versione" "$versione"
+}
+
+# Vero se il checkout in $1 ha modifiche non salvate (file tracciati).
+checkout_modificato() {
+  command -v git >/dev/null 2>&1 || return 1
+  git -C "$1" rev-parse --git-dir >/dev/null 2>&1 || return 1
+  ! git -C "$1" diff --quiet HEAD -- 2>/dev/null
+}
+
+# Costruisce con docker le due immagini dai sorgenti in $1: l'applicazione
+# ($2) e le migrazioni ($3), che girano dallo stadio `builder` come
+# nell'immagine pubblicata. L'uscita di docker va in $4 (un file di log), o
+# sull'uscita di errore se $4 è vuoto.
+costruisci_immagini() {
+  local radice="$1" app="$2" migrazioni="$3" registro="${4:-}"
+  if [ -n "$registro" ]; then
+    docker build --progress=plain -t "$app" "$radice" >> "$registro" 2>&1 || return 1
+    docker build --progress=plain --target builder -t "$migrazioni" "$radice" >> "$registro" 2>&1 || return 1
+  else
+    docker build -t "$app" "$radice" >&2 || return 1
+    docker build --target builder -t "$migrazioni" "$radice" >&2 || return 1
+  fi
 }

@@ -23,10 +23,15 @@ spec:
     # Tutto il traffico in chiaro sulla porta 80 viene reindirizzato a HTTPS:
     # senza, portale e conferenza rispondono anche in chiaro, e chi scrive
     # http://<portale>/admin manderebbe la chiave di amministrazione senza
-    # cifratura. Con cert-manager e la verifica HTTP-01 il reindirizzamento
-    # fa fallire il controllo che cert-manager fa prima di chiedere il
-    # certificato: usa la verifica DNS-01, oppure togli questo blocco e
-    # tieni chiusa la porta 80 quando non serve. Le chiavi sono quelle del
+    # cifratura. I certificati ACME chiesti da Traefik stesso
+    # (install-server.sh --acme-email) usano la verifica TLS-ALPN-01 sulla
+    # porta 443, che il reindirizzamento non tocca. Con cert-manager e la
+    # verifica HTTP-01 invece il reindirizzamento fa fallire il controllo che
+    # cert-manager fa prima di chiedere il certificato: usa la verifica
+    # DNS-01, oppure togli questo blocco e tieni chiusa la porta 80 quando
+    # non serve. Il blocco ACME, se richiesto, install-server.sh lo aggiunge
+    # in coda alla copia installata: valuesContent resta l'ultima chiave
+    # del file. Le chiavi sono quelle del
     # chart di Traefik incluso nella versione di k3s provata: una chiave che
     # il chart non conosce viene ignorata senza errori, quindi dopo un cambio
     # di versione di k3s si controlla che `curl -I http://<portale>/`

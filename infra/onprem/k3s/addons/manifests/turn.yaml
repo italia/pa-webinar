@@ -1,0 +1,62 @@
+# TURN su un nodo k3s: gli oggetti che il chart non rende. Modello di
+# turn.sh: i segnaposto @@...@@ li sostituisce lo script. coturn lo rende il
+# chart (examples/values-k3s-turn.yaml): UDP 3478 sull'indirizzo del nodo
+# tramite ServiceLB, TCP 3478 solo dentro il cluster, per Traefik.
+apiVersion: v1
+kind: Service
+metadata:
+  name: @@RELEASE@@-turn-tcp
+  labels:
+    app.kubernetes.io/name: coturn
+    app.kubernetes.io/instance: @@RELEASE@@
+    app.kubernetes.io/part-of: pa-webinar
+    app.kubernetes.io/managed-by: pa-webinar-addons
+spec:
+  type: ClusterIP
+  # TURN su TCP, verso cui Traefik inoltra le connessioni TURNS (TLS sulla
+  # 443) dopo averle decifrate. Il Service del chart pubblica solo UDP.
+  selector:
+    app.kubernetes.io/name: @@JITSI_NAME@@
+    app.kubernetes.io/instance: @@RELEASE@@
+    app.kubernetes.io/component: coturn
+  ports:
+    - name: turn-tcp
+      protocol: TCP
+      port: 3478
+      targetPort: 3478
+---
+# Ogni partecipante riceve credenziali TURN, e coturn inoltra verso qualunque
+# indirizzo pubblico e verso i privati che gli sono permessi (allowedPeerIPs:
+# la rete dei pod e i nodi, dove sta il bridge). Qui l'uscita si restringe al
+# bridge: i suoi pod, le stesse reti di allowedPeerIPs e l'indirizzo pubblico
+# del nodo, e solo la porta dei media. Il relay non può diventare una via
+# verso altri servizi del nodo o del cluster (DNS, rete overlay, API), né
+# verso host di Internet. Le risposte ai client restano permesse, perché
+# appartengono a connessioni già stabilite.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: @@RELEASE@@-coturn-egress
+  labels:
+    app.kubernetes.io/name: coturn
+    app.kubernetes.io/instance: @@RELEASE@@
+    app.kubernetes.io/part-of: pa-webinar
+    app.kubernetes.io/managed-by: pa-webinar-addons
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: @@JITSI_NAME@@
+      app.kubernetes.io/instance: @@RELEASE@@
+      app.kubernetes.io/component: coturn
+  policyTypes: [Egress]
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: @@JITSI_NAME@@
+              app.kubernetes.io/instance: @@RELEASE@@
+              app.kubernetes.io/component: jvb
+@@PEER_BLOCKS@@
+      ports:
+        - protocol: UDP
+          port: @@JVB_PORT@@

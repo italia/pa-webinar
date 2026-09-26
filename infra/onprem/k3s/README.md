@@ -1,458 +1,196 @@
 # PA Webinar on k3s, on your own VMs
 
-Ready-made scripts and configuration to run PA Webinar on one or three VMs with
-[k3s](https://docs.k3s.io/), with the Helm chart's simple profile. Use them
-when you have no managed Kubernetes and want a production installation for
-events of up to about 20 participants on camera per node, or larger webinars
-where most of the audience is muted. The procedure, sizing, measurements and
-failure behavior are in
-[Installing on your own VMs with k3s](../../../docs/install/k3s.md), and the
-alternatives in [Installing PA Webinar](../../../docs/install/README.md). This
-page is the reference for the scripts.
-
-Run every script from a copy of this whole directory: the install scripts read
-`common.sh` and the configuration files next to them. Each script has a
-`--help`.
+Scripts and configuration to install PA Webinar with [k3s](https://docs.k3s.io/)
+on one server, with one command, or on three nodes by hand. **The procedure is
+[Installing on your own VMs with k3s](../../../docs/install/k3s.md)**: support
+level, requirements, the one ports table, certificates, images, backups,
+upgrades, removal and measurements. The checklists are in
+[Checklists](../../../docs/install/checklists.md). This page is the reference
+for each script. Each script also has a `--help`, which is authoritative, and
+prints its messages in Italian.
 
 | File | Runs on | What it does |
 |---|---|---|
-| `install-server.sh` | The server node (the only node, with one VM) | Installs k3s at the tested version and verifies the binary's checksum. Configures Traefik, the bridge's UDP buffers, a proxy or a registry mirror, SELinux on RHEL-family systems, encryption of Secrets in the k3s datastore, and a join token for agents only |
+| `pa-webinar-up.sh` | The workstation (`--host`), or the server (`--local`) | Installs or upgrades PA Webinar on one server: preflight, k3s, secrets, certificates, images, add-ons, the chart, the checks |
+| `pa-webinar-down.sh` | Same | Removes an installation made with `pa-webinar-up.sh`, and optionally k3s and the state folder |
+| `install-server.sh` | The server node (the only node, with one VM) | Installs k3s at the tested version and verifies the binary's checksum. Configures Traefik (with its ACME resolver, on request), the bridge's UDP buffers, a proxy or a registry mirror, SELinux on RHEL-family systems, encryption of Secrets at rest, and a join token for agents only |
 | `install-agent.sh` | Each further node | Joins the node to the server with a token read from a file. `--jvb` reserves it for the bridge from the first boot |
-| `preload-images.sh` | A machine that reaches the registries (`list`, `save`, `fetch-k3s`), then each node (`import`) | Lists every image the chart renders with your values, bundles them into one archive, imports it on the node and pins it against image garbage collection. Downloads the k3s air-gap files |
-| `label-jvb-node.sh` | Your workstation, with the kubeconfig | Three nodes: reserves the bridge node and chooses the node that serves ports 80 and 443 |
-| `traefik-config.yaml` | Installed by `install-server.sh` | Traefik sees the real client address (`externalTrafficPolicy: Local`) and redirects HTTP to HTTPS. Optional: trusted front proxies, Traefik pinned to the ingress node |
+| `preload-images.sh` | A machine that reaches the registries (`list`, `save`, `build`, `fetch-k3s`), then each node (`import`) | Lists every image the chart renders with your values, bundles them into one archive (building the application images from the checkout with `build`), imports the archive on the node and pins it against image garbage collection. Downloads the k3s air-gap files |
+| `label-jvb-node.sh` | The workstation, with the kubeconfig | Three nodes: reserves the bridge node and chooses the node that serves ports 80 and 443 |
+| `common.sh` | Sourced by the scripts above | The tested k3s version, the image tags derived from the checkout, the image build. Not run alone |
+| `traefik-config.yaml` | Installed by `install-server.sh` | Traefik sees the real client address (`externalTrafficPolicy: Local`) and redirects HTTP to HTTPS. Commented: trusted front proxies, Traefik pinned to the ingress node. To change it, copy it out of the repository and pass the copy with `--traefik-config` |
 | `90-pa-webinar-jvb.conf` | Installed by both install scripts | `net.core.rmem_max` and `wmem_max` at 10 MiB, the buffer the bridge asks for |
-| `registries.yaml.example` | Passed with `--registries` | A registry mirror inside your network |
-| `../../helm/pa-webinar/examples/values-k3s.yaml` | Helm, on top of `values-simple.yaml` | Traefik ingress classes, the NetworkPolicy peers for Traefik in `kube-system`, local-path storage, the bridge without third-party STUN. The three-node settings are commented blocks |
+| `registries.yaml.example` | Passed with `--registries` | A registry mirror inside your network, with its credentials or certificate authority |
+| `addons/` | The workstation, or the server | Object storage (`storage.sh`, Garage) and TURN (`turn.sh`) for one server: see [the add-ons' reference](addons/README.md) |
+| `../../helm/pa-webinar/examples/values-k3s.yaml` | Helm, on top of `values-simple.yaml` | Traefik ingress classes, the conference Ingress rendered by the chart, the NetworkPolicy peers for Traefik in `kube-system`, local-path storage, the bridge without third-party STUN, pinned conference credentials required |
 
-## Checklist
+Run the node scripts from a copy of this whole directory: they read
+`common.sh` and the configuration files next to them. `pa-webinar-up.sh` copies
+what it needs to the server by itself.
 
-Before you start:
+## pa-webinar-up.sh
 
-- [ ] **VMs.** x86_64 with systemd. Tested on Debian 12, and on Rocky Linux 9
-  with SELinux enforcing (see [RHEL and SELinux](#rhel-and-selinux)). The
-  scripts also handle arm64, which was not tested.
-
-  | Layout | Node | Minimum | Recommended |
-  |---|---|---|---|
-  | One node | Everything | 4 vCPU, 8 GiB, 40 GB disk | 8 vCPU, 16 GiB for webinars of about 50 people (estimated) |
-  | Three nodes | Server (control plane, Traefik) | 2 vCPU, 4 GiB, 30 GB | same |
-  | | Portal and database | 2 vCPU, 4 GiB, 30 GB | same |
-  | | Bridge | 4 vCPU, 4 GiB, 20 GB | 4 vCPU, 8 GiB |
-
-- [ ] **Network.** Each node that serves clients has a public address on its
-  interface, or a 1:1 NAT or port forward that keeps port numbers. Uplink:
-  about 50 Mbit/s out for 20 people on camera at thumbnail quality, more with
-  720p speakers (see [Measured numbers](../../../docs/install/k3s.md#measured-numbers)).
-- [ ] **Firewall** as in [Ports](#ports).
-- [ ] **Two DNS names**, one for the portal and one for the conference, both
-  pointing at the node that serves 80 and 443.
-- [ ] **A TLS certificate** that browsers trust, for both names: your
-  organization's certificate, or cert-manager with Let's Encrypt (see the
-  note on port 80 in [Ports](#ports)).
-- [ ] **An SMTP relay** reachable from the node. Without it no email is
-  sent: registration confirmations, reminders, staff sign-in links.
-- [ ] **A workstation** with the repository checkout, `helm` (3.16 or later)
-  and `kubectl`. The repository does not contain the chart's subcharts: fetch
-  them once, from the repository root, before any other step:
-
-  ```bash
-  helm repo add bitnami https://charts.bitnami.com/bitnami
-  helm repo add jitsi-contrib https://jitsi-contrib.github.io/jitsi-helm/
-  helm dependency build infra/helm/pa-webinar
-  ```
-
-  Use `build`, not `update`: `build` installs exactly the versions pinned in
-  `Chart.lock`.
-- [ ] **A machine that prepares the images**, often the workstation itself:
-  Linux or macOS, bash 3.2 or later, `helm`, `skopeo` and `python3`, and a
-  login to the project's registry (`docker login ghcr.io` or
-  `skopeo login ghcr.io`).
-- [ ] **A database backup plan.** The database lives on one node's disk
-  (local-path), and nothing copies it.
-
-## Ports
-
-| Port | Protocol | From | To | Purpose |
-|---|---|---|---|---|
-| 443 | TCP | Clients | The ingress node | Portal and conference |
-| 80 | TCP | Clients | The ingress node | Redirect to HTTPS only (`traefik-config.yaml`). You can keep it closed |
-| 10000 | UDP | Clients | The bridge node | Audio and video. Without it participants join with no media |
-| 6443 | TCP | Administrators, agents | Server | Kubernetes API. Never from the Internet |
-| 8472 | UDP | Every node | Every node | Pod network (flannel VXLAN). Three nodes only |
-| 10250 | TCP | Every node | Every node | Kubelet (logs, exec, metrics). Three nodes only |
-| 587 | TCP | Nodes | SMTP relay | Email (465 if your relay uses implicit TLS) |
-| 443 | TCP | Nodes | Registries, GitHub | Only if the nodes pull images or k3s themselves |
-
-On port 80 Traefik answers every request with a permanent redirect to
-HTTPS (301 for `GET`, 308 for other methods): a browser moves to HTTPS before
-any page loads or any form is sent. A script that posts directly to an
-`http://` address has already sent its request in clear text, so always
-configure clients with `https://`.
-
-The redirect also catches certificate validation requests. With
-cert-manager, use the DNS-01 challenge, or remove the
-`ports.web.http.redirections` block from your copy of `traefik-config.yaml`
-while you use HTTP-01. After a change of k3s version, check that the redirect
-is still there (`curl -I http://<portal>/` answers 308): Traefik's chart
-ignores keys it does not know, without an error.
-
-The bridge needs no STUN server: it announces the node address (see
-`jitsi-meet.jvb` in `values-k3s.yaml`). If a host firewall runs on the nodes
-(firewalld, ufw), also allow the pod and Service networks, `10.42.0.0/16`
-and `10.43.0.0/16`, as the k3s documentation requires.
-
-The simple profile has no TURN server. Participants on networks that block
-UDP towards port 10000 get no audio or video. For them you need TURN, which
-on k3s needs a second IP address (see
-[TURN](../../../docs/INFRASTRUCTURE.md#turn)).
-
-## One node
-
-1. **Choose the version**, on the workstation. Write `domain.yaml`, kept
-   outside the repository, from the header of `values-k3s.yaml`: your two
-   names and the image tags.
-
-   ```yaml
-   app:
-     image:
-       tag: "<X.Y.Z>"               # the release, without the v
-     migration:
-       image:
-         tag: "v<X.Y.Z>-migrate"    # with the v of the git tag
-   ```
-
-   Always set both tags. Without them the chart uses its `appVersion` and
-   derives `<X.Y.Z>-migrate` for the migrations. That form exists only for
-   releases published after the release workflow started producing it,
-   while `v<X.Y.Z>-migrate` exists for every release. With a tag that does
-   not exist, the migration initContainer stays in `ImagePullBackOff` and
-   the installation runs into its timeout. For the development images use
-   `dev` and `dev-migrate`.
-
-2. **Prepare the images**, on the machine that reaches the registries.
-   Pass the same values files you will install with:
-
-   ```bash
-   cd infra/onprem/k3s
-   ./preload-images.sh list -- \
-     -f ../../helm/pa-webinar/examples/values-simple.yaml \
-     -f ../../helm/pa-webinar/examples/values-k3s.yaml -f <path>/domain.yaml
-   ./preload-images.sh save --out pa-webinar-images.tar -- <same arguments>
-   ```
-
-   Check that `list` shows both tags you chose. `save` writes
-   `pa-webinar-images.tar.images.txt` next to the archive, with the digest of
-   every image it bundled. The project's registry requires credentials even
-   to read today. This machine uses its own, and the node never sees them.
-   Skip this step only if the node can pull from the registries itself, with
-   credentials in `--registries`.
-
-3. **Copy** this directory and the archive to the node, then **install k3s**:
-
-   ```bash
-   sudo ./install-server.sh                      # direct Internet access
-   sudo ./install-server.sh --proxy http://<proxy>:<port> --no-proxy <node-subnet>
-   sudo ./install-server.sh --registries registries.yaml
-   sudo ./install-server.sh --airgap-dir <dir>   # no Internet at all, see below
-   ```
-
-   The script waits until the node, CoreDNS and Traefik are ready, and prints
-   the next commands. On RHEL, Rocky or AlmaLinux, read
-   [RHEL and SELinux](#rhel-and-selinux) first.
-
-4. **Import the images** on the node:
-
-   ```bash
-   sudo ./preload-images.sh import pa-webinar-images.tar
-   ```
-
-   It checks every reference the chart uses, exactly as the kubelet asks for
-   it, and fails if one is missing.
-
-5. **Get the kubeconfig** on your workstation:
-
-   ```bash
-   ssh <user>@<node-ip> sudo cat /etc/rancher/k3s/k3s.yaml \
-     | sed 's#https://127.0.0.1:6443#https://<node-ip>:6443#' > kubeconfig-pa-webinar
-   export KUBECONFIG=$PWD/kubeconfig-pa-webinar
-   ```
-
-6. **Write `secrets.yaml`**, also kept outside the repository. It holds
-   values you generate once and pass unchanged to every upgrade:
-
-   ```bash
-   h() { openssl rand -hex "$1"; }
-   cat > secrets.yaml <<EOF
-   secrets:
-     generate:
-       APP_SECRET: "$(h 32)"
-       JITSI_JWT_SECRET: "$(h 32)"
-       PII_ENCRYPTION_KEY: "$(h 32)"
-       CRON_API_KEY: "$(h 32)"
-       ADMIN_API_KEY: "$(h 32)"
-       POSTGRES_PASSWORD: "$(h 24)"
-       POSTGRES_ADMIN_PASSWORD: "$(h 24)"
-       REDIS_PASSWORD: "$(h 24)"
-       SMTP_HOST: "<smtp-relay>"
-       SMTP_FROM: "<sender address>"
-   jitsi-meet:
-     jicofo:
-       xmpp:
-         password: "$(h 16)"
-     jvb:
-       xmpp:
-         password: "$(h 16)"
-   EOF
-   chmod 600 secrets.yaml
-   ```
-
-   Losing `POSTGRES_PASSWORD` or `PII_ENCRYPTION_KEY` means losing access to
-   the data. The two XMPP passwords keep upgrades from restarting the
-   conference: `values-k3s.yaml` refuses to render without them.
-
-7. **Install**, from the repository root:
-
-   ```bash
-   helm upgrade --install pa-webinar ./infra/helm/pa-webinar \
-     -n pa-webinar --create-namespace \
-     -f infra/helm/pa-webinar/examples/values-simple.yaml \
-     -f infra/helm/pa-webinar/examples/values-k3s.yaml \
-     -f <path>/domain.yaml -f <path>/secrets.yaml \
-     --wait --timeout 15m
-   ```
-
-   Read the notes Helm prints at the end. The section *Da controllare*
-   ("to check") lists what is still an example value or a risk in your
-   setup.
-
-8. **Check** (add `-k` to `curl` while the certificate is self-signed):
-
-   ```bash
-   curl -s https://<portal>/api/health                              # "status":"ok"
-   curl -s -o /dev/null -w '%{http_code}\n' https://<conference>/config.js   # 200
-   curl -s -o /dev/null -w '%{http_code} %{redirect_url}\n' http://<portal>/  # 301 https://<portal>/
-   kubectl -n pa-webinar create job --from=cronjob/pa-webinar-email-outbox outbox-check
-   kubectl -n pa-webinar get job outbox-check                       # Complete
-   ```
-
-   Then hold a short call with two devices on different networks. A
-   participant list that fills up is not enough: check that you hear and
-   see each other. Media problems show up only there.
-
-**TLS.** Until you configure a certificate, Traefik serves its own
-self-signed one. With your organization's certificate:
-
-```bash
-kubectl -n pa-webinar create secret tls pa-webinar-tls --cert=<chain.pem> --key=<key.pem>
+```text
+pa-webinar-up.sh --portal FQDN --meet FQDN (--host USER@SERVER | --local) [options]
+pa-webinar-up.sh --portal FQDN [--state-dir DIR]        # a later run: upgrade or change
 ```
 
-Then set `ingress.tls` and `jitsi-meet.web.ingress.tls` to that Secret, as the
-comments in `values-k3s.yaml` show. With a certificate from an internal CA,
-browsers must trust the CA. The portal's status page checks the conference
-inside the cluster and does not need it; the portal needs it only to reach
-names behind that CA, such as an SMTP relay or object storage. Put the CA in
-a ConfigMap and name it in `app.extraCaCerts`, which mounts it and sets
-`NODE_EXTRA_CA_CERTS`
-([Certificates](../../../docs/install/k3s.md#certificates)).
+Run it from a checkout of the release you install: the chart, the example
+files and both image tags (`X.Y.Z`, `vX.Y.Z-migrate`) come from it; on any
+other commit it builds images tagged `local-<commit>`. Options given once are
+remembered in `install.conf` in the state folder
+(`~/.config/pa-webinar/k3s/<portal>` by default). The secrets are generated once
+into `secrets.env` there, never overwritten, and the Kubernetes Secrets are
+created from it in the chart's `existing` mode.
 
-## Three nodes
+| Group | Options |
+|---|---|
+| Server | `--host USER@SERVER` or `--local`; `--ssh-key FILE`, `--ssh-port N`, `--ssh-option OPTION`; `--tunnel-port N` (default 6443) |
+| Names and network | `--portal FQDN`, `--meet FQDN`, `--public-ip IP` or `none`, `--node-ip IP` |
+| Installation | `--name NAME`, `--state-dir DIR`, `--namespace NAME`, `--release NAME` |
+| Certificates | `--tls acme` with `--acme-email EMAIL` [`--acme-server URL`] [`--acme-server-ca FILE`]; `--tls private-ca`; `--tls own` with `--cert FILE --key FILE` or `--cert-dir DIR`; `--ca-file FILE` |
+| Images | `--images registry`, `local`, or `archive` with `--archive FILE`; `--tag X.Y.Z` or `local-<commit>` |
+| Email | `--smtp-file FILE` (mode 0600), `--mailpit`, `--no-mailpit` |
+| Add-ons | `--storage garage` or `none`, `--storage-host FQDN`; `--turn`, `--no-turn`, `--turn-host FQDN`; `--backup`, `--no-backup` |
+| Node | `--proxy URL` or `none`, `--no-proxy LIST`, `--proxy-scope containerd` or `all`, `--registries FILE`, `--airgap-dir DIR`, `--reinstall-k3s` |
+| Run | `--timeout 15m`, `--dry-run`, `--yes`, `--ignore-preflight`, `--recover-secrets` |
+| Call test | `--verify-call`, `--no-verify-call`; `--verify-browser FILE` or `none` |
 
-Three VMs keep the bridge's CPU spikes away from the portal and database.
-They are **not** highly available: one server with its embedded SQLite
-datastore, and a database on one node's disk. In the lab, powering off the
-portal and database node left a running call alive, but it stopped new joins
-and registrations until the VM came back.
+Only `--tag`, `--timeout`, `--dry-run`, `--yes`, `--ignore-preflight`,
+`--recover-secrets` and `--reinstall-k3s` apply to the run that has them;
+every other option, `--verify-call` included, is remembered. The script
+writes `kubeconfig` and `kubeconfig.tunnel` into the state folder, and its
+summary prints the ssh tunnel to the API, the installation check and the
+encrypted backup, each with the real paths. What it does, step by step, and
+what each option means:
+[Install with one command](../../../docs/install/k3s.md#install-with-one-command).
 
-The layout below makes the server the ingress node: both DNS names point at
-it, and it runs Traefik.
+## pa-webinar-down.sh
 
-1. **Server**, as in step 3 above, as the ingress node from its first boot.
-   In your copy of `traefik-config.yaml`, uncomment the `nodeSelector`
-   block, then:
-
-   ```bash
-   sudo ./install-server.sh --node-label svccontroller.k3s.cattle.io/enablelb=true [other options]
-   ```
-
-   With the label, ServiceLB answers on 80 and 443 only from the server, and
-   the `nodeSelector` keeps Traefik there, so the portal sees the real client
-   addresses. The script stops if the `nodeSelector` is on and no node has
-   the label: Traefik would stay `Pending`.
-2. **Agents.** Each agent joins with the agent token, which the server keeps
-   in `/var/lib/rancher/k3s/server/agent-token`. That token can add agent
-   nodes, but not another server, which would read the datastore and the
-   cluster keys. Copy it into a file that only you can read, never onto a
-   command line:
-
-   ```bash
-   # on each agent
-   (umask 077; ssh <user>@<server-ip> sudo cat /var/lib/rancher/k3s/server/agent-token > agent-token)
-   sudo ./install-agent.sh --server https://<server-ip>:6443 --token-file agent-token          # portal and database
-   sudo ./install-agent.sh --server https://<server-ip>:6443 --token-file agent-token --jvb    # bridge
-   rm agent-token
-   ```
-
-   `--jvb` labels and taints the node `workload=jitsi-jvb` from its first
-   boot, so nothing else lands there. On VMs with more than one interface, add
-   `--node-ip` and `--flannel-iface` for the interface the nodes share.
-   `install-server.sh` creates a separate agent token only on a new cluster.
-   On a cluster installed with an earlier version of the script,
-   `agent-token` holds the server token.
-3. **Import the images** on every node (`preload-images.sh import`). The bridge
-   node needs only the bridge image, but a full import costs nothing more.
-4. **If the bridge node joined without `--jvb`**, reserve it from your
-   workstation:
-
-   ```bash
-   ./label-jvb-node.sh <bridge-node>
-   ```
-
-   It lists the pods already there. With `--evict` it moves the ones a
-   controller recreates, and it never touches a pod whose volume is on that
-   node.
-5. **Uncomment the three-node blocks** in your copy of `values-k3s.yaml`:
-   `jitsi-meet.jvb.nodeSelector` and `tolerations` put the bridge on its node.
-   `app.nodeSelector`, `postgresql.primary.nodeSelector` and
-   `redis.master.nodeSelector` keep the portal and its data together on one
-   known node. Node names are the host names in lowercase, as
-   `kubectl get nodes` shows them. Then install as in step 7.
-6. **Open** UDP 10000 on the bridge node only, and the ports between nodes
-   from [Ports](#ports).
-
-To serve 80 and 443 from a node other than the server, install the server
-without `--node-label` and with the `nodeSelector` still commented out. Once
-the agents have joined, run
-`./label-jvb-node.sh <bridge-node> --ingress-node <node>`, point the DNS
-names at that node, uncomment the `nodeSelector` in your copy of
-`traefik-config.yaml`, and run `install-server.sh` again with the same
-options.
-
-## Proxies, mirrors, no Internet
-
-The scripts support three ways for nodes to get what they need. You can
-combine them.
-
-- **HTTP proxy** (`--proxy`, or `HTTPS_PROXY` in the environment). The
-  install scripts download k3s through it. By default containerd uses it
-  only to pull images, and k3s and the kubelet do not. `--proxy-scope all`
-  gives it to them as well. `NO_PROXY` always contains the pod and
-  Service networks, `.svc`, `.cluster.local`, the node itself and, on an
-  agent, the server. Add your node subnet and any internal registry with
-  `--no-proxy`. `sudo` drops the environment, so pass the proxy with
-  `--proxy` or with `sudo env HTTPS_PROXY=... ./install-server.sh`.
-
-  A proxy URL with a user and password works too. The scripts keep it off
-  the command lines they run and write it to their logs without the
-  credentials. k3s needs it in the service's environment file, which only
-  root can read. Keep it off your own command line as well: read it into
-  the environment and let `sudo` keep it.
-
-  ```bash
-  read -rsp 'Proxy URL: ' HTTPS_PROXY; export HTTPS_PROXY
-  sudo --preserve-env=HTTPS_PROXY ./install-server.sh --no-proxy <node-subnet>
-  unset HTTPS_PROXY
-  ```
-- **Registry mirror** (`--registries`, from `registries.yaml.example`). List
-  `registry-1.docker.io` as well as `docker.io`: the PostgreSQL image is
-  written with that registry name, and containerd treats the two as
-  different registries.
-- **No Internet at all.** On a connected machine:
-
-  ```bash
-  ./preload-images.sh fetch-k3s --out k3s-airgap    # binary, install.sh, checksums, k3s system images
-  ./preload-images.sh save --out pa-webinar-images.tar -- <your values>
-  ```
-
-  Copy both to every node, run `install-*.sh --airgap-dir k3s-airgap`, then
-  `preload-images.sh import`. Both kinds of images are needed. k3s pulls
-  some of its own images only when first used: local-path creates each volume
-  with a helper image the first time a volume is requested. Without the k3s
-  air-gap images, the database volume would wait forever. `import` warns
-  when that helper image is missing, on the server and on agents.
-
-These settings cover only what the nodes download. They do not proxy the
-portal's own outbound connections, such as the SMTP relay or object storage:
-the node must reach those directly.
-
-## RHEL and SELinux
-
-On RHEL, Rocky Linux and AlmaLinux the scripts keep SELinux enforcing. k3s
-then needs its policy, the `k3s-selinux` package, which requires
-`container-selinux`.
-
-- **With network access**, `install-*.sh` lets the k3s installer add both
-  packages, as a standard k3s installation does. `dnf` must reach the
-  distribution's repositories and `rpm.rancher.io`. Behind a proxy, `dnf`
-  uses its own configuration (`proxy=` in `/etc/dnf/dnf.conf`), not the
-  scripts' `--proxy`.
-- **With `--airgap-dir`**, install `container-selinux` from your
-  distribution mirror and `k3s-selinux` from a mirror of `rpm.rancher.io`
-  first. With SELinux enforcing and no policy, the script stops before it
-  changes anything on the node.
-- **Once the policy is installed**, re-runs download no packages, with or
-  without a network.
-- `INSTALL_K3S_SKIP_SELINUX_RPM=true` skips the policy entirely and
-  `INSTALL_K3S_SELINUX_WARN=true` turns the missing policy into a warning.
-  Both work as in the k3s installer. Pass them with
-  `sudo env INSTALL_K3S_SELINUX_WARN=true ./install-server.sh ...`.
-
-If firewalld runs on the nodes, open the ports from [Ports](#ports) and trust
-the pod and Service networks:
-
-```bash
-sudo firewall-cmd --permanent --zone=trusted --add-source=10.42.0.0/16 --add-source=10.43.0.0/16
-sudo firewall-cmd --reload
+```text
+pa-webinar-down.sh --portal FQDN [--name NAME] [--state-dir DIR] [--k3s] [--purge] [--purge-images] [--yes|-y]
 ```
 
-## Upgrades and changes
+Removes the Helm release and the namespace, with the database, the volumes,
+the test mailbox and the add-ons: the data is deleted. `--k3s` also
+uninstalls k3s from the server, `--purge` also deletes the files of the state
+folder (its `backups/` stays), and `--purge-images` the images that
+`pa-webinar-up.sh` built on the workstation. The server, the ssh user, the
+namespace and the release come from `install.conf`
+([Remove the installation](../../../docs/install/k3s.md#remove-the-installation)).
 
-- **Chart and application.** Put the new tags in `domain.yaml`, prepare a new
-  image archive (`list` shows what changes), import it on the nodes, then run
-  the same `helm upgrade` with the same `secrets.yaml`. With the XMPP
-  passwords pinned, an upgrade restarts the Jitsi web front end and whatever
-  changed, but not Prosody, Jicofo or the bridge, which carry the calls.
-  Still, avoid upgrading during an event.
-- **Scripts.** Running an install script again with the same options rewrites
-  its configuration and restarts k3s. Running pods keep running. Running it
-  without `--proxy` removes the proxy from k3s.
-- **Traefik configuration.** Edit `traefik-config.yaml` in your copy of this
-  directory, then run `install-server.sh` again with the same options. Each
-  run replaces the copy k3s reads, in
-  `/var/lib/rancher/k3s/server/manifests/`. If that copy was edited in place,
-  the script says so and keeps it as
-  `/var/lib/rancher/k3s/server/traefik-config.yaml.precedente`.
-- **k3s version.** The scripts install the tested version. Another version
-  goes through `--version`, at your own risk: Traefik, ServiceLB and the
-  policy controller change with k3s.
+## install-server.sh
 
-## Known limits
+```text
+sudo ./install-server.sh [options]
+```
 
-- **No high availability**, on one node or on three (see above).
-- **No TURN** in the simple profile (see [Ports](#ports)).
-- **Never set `JVB_ADVERTISE_PRIVATE_CANDIDATES: "false"`** when the bridge
-  announces a private address (an intranet, or a lab). The bridge then
-  announces no address at all. Participants join, and the participant
-  list fills up, but nobody hears or sees anyone.
-- **Behind a NAT**, `jitsi-meet.jvb.publicIPs` must hold the public address.
-  If it is missing, outside participants get no media.
-- **Images float on the development tag** if you install `:dev`. An archive
-  fixes the copy of the day it was made. Released versions have fixed tags.
+| Group | Options |
+|---|---|
+| Server | `--tls-san NAME` (repeatable), `--traefik-config FILE`, `--no-traefik-config` |
+| ACME | `--acme-email EMAIL`, `--acme-server URL`, `--acme-server-ca FILE`: Traefik's resolver `pa-webinar`, TLS-ALPN-01 on port 443 |
+| Node network | `--node-ip IP`, `--flannel-iface NAME`, `--cluster-cidr CIDR`, `--service-cidr CIDR`, `--node-label K=V`, `--node-taint K=V:EFFECT` |
+| Proxy, registry, no Internet | `--proxy URL`, `--no-proxy LIST`, `--proxy-scope containerd` or `all`, `--registries FILE`, `--airgap-dir DIR` |
+| Other | `--version V`, `--no-sysctl`, `--no-wait` |
+
+Running it again with the same options rewrites its configuration and
+restarts k3s; running pods keep running, and running it without `--proxy`
+removes the proxy. Each run replaces the Traefik configuration that k3s reads
+in `/var/lib/rancher/k3s/server/manifests/`; an in-place edit of that copy is
+kept as `/var/lib/rancher/k3s/server/traefik-config.yaml.precedente`. The
+details are in
+[Proxy, registry mirror or no Internet](../../../docs/install/k3s.md#proxy-registry-mirror-or-no-internet),
+[RHEL, Rocky Linux and AlmaLinux](../../../docs/install/k3s.md#rhel-rocky-linux-and-almalinux)
+and [Certificates](../../../docs/install/k3s.md#certificates).
+
+## install-agent.sh
+
+```text
+sudo ./install-agent.sh --server URL --token-file FILE [--jvb] [options]
+```
+
+The same node, proxy and registry options as `install-server.sh`. The agent
+token is read from a file created with `umask 077`, never from the command
+line ([Install on three nodes](../../../docs/install/k3s.md#install-on-three-nodes)).
+
+## preload-images.sh
+
+```text
+./preload-images.sh list [--chart DIR] [-- <helm template arguments>]
+./preload-images.sh save --out FILE [--arch amd64] [--list FILE] [--from-docker] [--chart DIR] [-- <arguments>]
+./preload-images.sh build --out FILE [--tag TAG] [--chart DIR] [-- <arguments>]
+sudo ./preload-images.sh import FILE
+./preload-images.sh fetch-k3s --out DIR [--version V] [--arch amd64]
+```
+
+- `list` prints every image the chart renders with the values you pass, the
+  same `-f` files as the install.
+- `save` bundles them into one OCI archive, with the credentials of the
+  machine that runs it; images that no registry gives and that the local
+  Docker has, such as local builds, come from Docker (`--from-docker` takes
+  every tagged image from there). `--list FILE` adds images outside the chart,
+  such as Mailpit's and Garage's.
+- `build` builds the application images from the checkout (`X.Y.Z` and
+  `vX.Y.Z-migrate` on a release tag, `local-<commit>` otherwise) and bundles
+  them with every other image. It writes `<archive>.values.yaml` with the
+  image block for Helm.
+- `import` loads an archive into k3s on the node, pins the images against the
+  kubelet's image cleanup and checks every reference the chart uses.
+- `fetch-k3s` downloads the k3s binary, installer, checksums and system
+  images for `--airgap-dir`.
+
+`list`, `save`, `build` and `fetch-k3s` run on Linux or macOS with bash 3.2 or
+later and `helm`; `save` and `build` also need `skopeo` and `python3`, and
+`build` Docker. Every archive comes with `<archive>.images.txt`, the digest and
+reference of each image
+([Images without registry access](../../../docs/install/k3s.md#images-without-registry-access)).
+
+## label-jvb-node.sh
+
+```text
+./label-jvb-node.sh <bridge-node> [--ingress-node <node>] [--evict] [--context CTX]
+./label-jvb-node.sh <bridge-node> --undo [--ingress-node <node>] [--context CTX]
+```
+
+Labels and taints the bridge node `workload=jitsi-jvb`, the selector and
+toleration that the three-node values file gives the bridge. `--evict`
+deletes the pods already there that a controller recreates elsewhere, never
+those with a local volume. `--ingress-node` gives a node the ServiceLB label
+`svccontroller.k3s.cattle.io/enablelb=true`, so that only it serves 80 and
+443. Neither `--evict` nor serving 80 and 443 from an agent has been tested.
 
 ## What was tested
 
-In labs of KVM VMs with k3s v1.36.4+k3s1 and images from the development
-branch.
+In labs of KVM VMs with the k3s version that `common.sh` pins, and images from
+the development branch.
 
-**One node**, a fresh 4 vCPU / 8 GiB Debian 12 VM with no Internet access:
+**`pa-webinar-up.sh`**, from a Linux workstation to fresh 4 vCPU / 8 GiB
+Debian 12 VMs with no direct Internet access, through an HTTP proxy:
+
+- First installs in 2 min 40 s to 3 min 50 s with Docker's build cache warm;
+  re-runs and upgrades in 30 to 54 s; `pa-webinar-down.sh` in 32 to 54 s.
+- The certificate modes `private-ca`, `own` and `acme` (against a test ACME
+  server in the cluster), locally built images over ssh, an archive of
+  `preload-images.sh` with `--local` on the server, the test mailbox (a
+  sign-in email received), the nightly dump, the object store and TURN
+  add-ons. `scripts/backup.sh` and `scripts/restore.sh` from the workstation,
+  with the object store (under 1 MiB in the lab): a deleted event, its
+  material and a deleted object came back, and the installation check with
+  its two-browser call passed.
+- After each install, re-run and upgrade, `scripts/verify-install.sh` with its
+  two-browser call: moderator and participant roles, 720p video, audio and
+  video both ways over UDP.
+
+**The node scripts by hand, one node**, a fresh 4 vCPU / 8 GiB Debian 12 VM
+with no Internet access:
 
 - `install-server.sh` ran through an HTTP proxy in 47 s. Then the proxy was
   removed.
 - The chart was installed from the image archive (10 images, 1.6 GB,
-  imported in 29 s) plus the k3s air-gap images. The first attempt, without
-  the air-gap images, left the database volume `Pending`, because the
-  local-path helper image was missing. A clean install then took 38 s, and an
-  upgrade left Prosody, Jicofo and the bridge running.
+  imported in 29 s) plus the k3s air-gap images; without the air-gap images
+  the database volume stays `Pending`, because the local-path helper image is
+  missing. The install took 38 s, and an upgrade left Prosody, Jicofo and the
+  bridge running.
 - Five participants on camera: every connection went directly over UDP to
   the node address, with no packet loss at 180p. The node peaked at 0.65 of
   its 4 cores and 2.5 GiB.
@@ -482,7 +220,7 @@ each node's address routed through it.
 - `preload-images.sh import` ran under `sudo` on Rocky, where `k3s` is not
   on `sudo`'s path, in 32 s, and on the agent, which has no kubeconfig, in
   29 s. Both warned about the missing local-path helper image and finished.
-- The chart installed in 60 s, with the three-node blocks uncommented: portal,
+- The chart installed in 60 s, with the node placement of the three-node layout: portal,
   database and Redis on the server, the bridge on the agent. SELinux logged
   no denials.
 - Three participants on camera had audio and video over direct UDP to the
@@ -505,6 +243,7 @@ bash 3.2, the version macOS ships, on Linux.
 
 Not tested: macOS itself, arm64, `--proxy-scope all`, a registry mirror,
 `--flannel-iface`, a first installation with `--airgap-dir` on a node that
-never had network, `label-jvb-node.sh --evict`, a publicly trusted
-certificate, delivery through a real SMTP relay, and cert-manager with the
-redirect on port 80.
+never had network, `label-jvb-node.sh --evict`, certificates from Let's
+Encrypt itself, delivery through a real SMTP relay, and cert-manager with the
+redirect on port 80. The full list is in
+[Not tested](../../../docs/install/k3s.md#not-tested).
