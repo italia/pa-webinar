@@ -48,7 +48,17 @@ vi.mock('@/lib/db', () => ({
   },
 }));
 
+vi.mock('@/lib/settings', () => ({
+  getSettings: vi.fn(async () => ({ defaultLocale: 'it' })),
+}));
+
+vi.mock('@/lib/email/moderator-link', async (importOriginal) => ({
+  ...(await importOriginal<Record<string, unknown>>()),
+  sendPrimaryModeratorLink: vi.fn(async () => true),
+}));
+
 import { prisma } from '@/lib/db';
+import { sendPrimaryModeratorLink } from '@/lib/email/moderator-link';
 
 import { POST } from './route';
 
@@ -165,5 +175,45 @@ describe('POST /api/events — persistenza dei campi accettati', () => {
 
     expect(mocked.gdprTemplate.findUnique).not.toHaveBeenCalled();
     expect(datiScritti().gdprTemplateId).toBeNull();
+  });
+});
+
+describe('POST /api/events — link del moderatore principale', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocked.event.create.mockImplementation(
+      async ({ data }: { data: Record<string, unknown> }) => ({
+        id: '9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d',
+        slug: data.slug,
+        moderatorToken: data.moderatorToken,
+        status: 'DRAFT',
+      }),
+    );
+  });
+
+  it("lo accoda alla creazione, nella lingua della pagina d'amministrazione", async () => {
+    const req = new Request('http://localhost/api/events', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        referer: 'http://localhost/fr/admin/events/new',
+      },
+      body: JSON.stringify(corpo({ moderatorEmail: 'moderatore@example.test' })),
+    }) as unknown as NextRequest;
+    const r = await POST(req, { params: Promise.resolve({}) } as never);
+    expect(r.status).toBe(201);
+    expect(sendPrimaryModeratorLink).toHaveBeenCalledWith('9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d', {
+      locale: 'fr',
+    });
+    // Il link di gestione nella risposta passa dalla mappa dei percorsi.
+    const body = (await r.json()) as { links: { moderatorLink: string } };
+    expect(body.links.moderatorLink).toMatch(
+      /\/it\/admin\/eventi\/9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d\?token=/,
+    );
+  });
+
+  it('non accoda nulla senza indirizzo del moderatore', async () => {
+    await POST(richiesta(corpo()), { params: Promise.resolve({}) } as never);
+    expect(sendPrimaryModeratorLink).not.toHaveBeenCalled();
   });
 });

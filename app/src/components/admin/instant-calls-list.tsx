@@ -16,6 +16,7 @@ import {
 } from 'design-react-kit';
 
 import { Icon } from '@/components/ui/icon';
+import { GlyphIcon } from '@/components/ui/glyph-icon';
 import { Link, percorso } from '@/i18n/navigation';
 import CopyButton from '@/components/admin/copy-button';
 import { localizedPath } from '@/lib/utils/localized-url';
@@ -115,7 +116,7 @@ function StatusBadge({
         style={{ fontSize: '0.7rem' }}
         title={title}
       >
-        <Icon icon="it-pause" size="xs" className="me-1" color="white" />
+        <GlyphIcon glyph="pause" size="xs" className="me-1" color="white" />
         {t('status.idle')}
       </Badge>
     );

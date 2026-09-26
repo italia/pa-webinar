@@ -16,6 +16,7 @@ import { requireEventManager } from '@/lib/auth/staff-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { prisma } from '@/lib/db';
 import { AppError, NotFoundError, ValidationError } from '@/lib/errors';
+import { materialAddedBy } from '@/lib/events/material-author';
 import { materialBlobClaimProblem, materialBlobPathProblem } from '@/lib/events/material-files';
 import { pokeLivePanel } from '@/lib/live-state/publish';
 import { createMaterialAdminSchema } from '@/lib/validation/materials';
@@ -98,7 +99,7 @@ export const POST = withErrorHandling(async (request, context) => {
 
   const event = await prisma.event.findUnique({
     where: { id },
-    select: { id: true, moderatorName: true },
+    select: { id: true },
   });
   if (!event) throw new NotFoundError('Event');
 
@@ -133,7 +134,9 @@ export const POST = withErrorHandling(async (request, context) => {
       title: parsed.data.title,
       url: parsed.data.url,
       description: parsed.data.description ?? null,
-      addedBy: event.moderatorName ?? 'Admin',
+      // Chi lo aggiunge da qui e' lo staff, non chi conduce: nessun nome, e
+      // ogni superficie mostra la dicitura tradotta (lib/events/material-author).
+      addedBy: materialAddedBy(null),
       fileName: parsed.data.fileName ?? null,
       fileSize: parsed.data.fileSize != null ? BigInt(parsed.data.fileSize) : null,
       mimeType: parsed.data.mimeType ?? null,

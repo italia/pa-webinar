@@ -38,7 +38,7 @@ vi.mock('@/lib/db', () => ({
     event: { findUnique: vi.fn() },
     registration: { findUnique: vi.fn(), update: vi.fn() },
     eventModerator: { findUnique: vi.fn() },
-    siteSetting: { upsert: vi.fn() },
+    siteSetting: { findUnique: vi.fn() },
   },
 }));
 
@@ -114,7 +114,7 @@ let siteSettings = { ...DEFAULT_SETTINGS };
 
 function applySettings(overrides: Partial<typeof DEFAULT_SETTINGS>) {
   siteSettings = { ...siteSettings, ...overrides };
-  vi.mocked(prisma.siteSetting.upsert).mockResolvedValue({
+  vi.mocked(prisma.siteSetting.findUnique).mockResolvedValue({
     id: 'singleton',
     ...siteSettings,
   } as never);

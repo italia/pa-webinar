@@ -35,6 +35,7 @@ vi.mock('@/lib/settings', () => ({ getSettings: async () => siteSettings }));
 vi.mock('@/lib/event-session', () => ({ readOwnedEventAccessToken: vi.fn() }));
 
 import { prisma } from '@/lib/db';
+import { publishChat } from '@/lib/chat/pubsub';
 import { senderColourKey } from '@/lib/chat/sender-key';
 import { readOwnedEventAccessToken } from '@/lib/event-session';
 import { hasJoinGrant } from '@/lib/events/join-grant';
@@ -51,6 +52,7 @@ const mockedGrantRow = prisma.eventModerator
   .findUnique as unknown as ReturnType<typeof vi.fn>;
 const mockedJoinGrant = hasJoinGrant as unknown as ReturnType<typeof vi.fn>;
 const mockedOwnedToken = readOwnedEventAccessToken as unknown as ReturnType<typeof vi.fn>;
+const mockedPublish = publishChat as unknown as ReturnType<typeof vi.fn>;
 
 const EVENT_ID = '11111111-1111-4111-8111-111111111111';
 const SLUG = 'evento-di-prova';
@@ -316,6 +318,25 @@ describe('POST /api/events/[param]/chat — write authorization', () => {
     // Un ospite non è una persona identificata (l'id è base64 di ip:nome e
     // collide dietro un NAT): niente modifica dei propri messaggi.
     expect(body.canEdit).toBe(false);
+  });
+
+  it('never publishes the raw senderId on the live stream: every reader gets the envelope', async () => {
+    // L'envelope Redis arriva a TUTTI i lettori dello stream, ospiti senza
+    // token compresi: con l'id grezzo, un `base64 -d` restituiva l'IP
+    // dell'ospite a chiunque fosse in sala.
+    const res = await POST(postRequest({ text: 'ciao', guestName: 'Anna' }), ctx());
+    expect(res.status).toBe(201);
+    expect(mockedPublish).toHaveBeenCalledTimes(1);
+    const envelope = mockedPublish.mock.calls[0]![0] as Record<string, unknown>;
+    const payload = JSON.stringify(envelope);
+
+    expect(envelope).not.toHaveProperty('senderId');
+    expect(payload).not.toContain(GUEST_SENDER_ID);
+    expect(payload).not.toContain(GUEST_IP);
+    // Stessa chiave della cronologia e della risposta alla POST: una bolla ha
+    // lo stesso colore dal vivo e dopo un ricaricamento.
+    expect(envelope.senderKey).toBe(senderColourKey(GUEST_SENDER_ID));
+    expect(envelope.senderKey).toBe((await res.json()).senderKey);
   });
 });
 

@@ -62,3 +62,25 @@ describe('GET /api/status/metrics', () => {
     expect(res.headers.get('Cache-Control')).toBe('private, no-store');
   });
 });
+
+describe('GET /api/status/metrics — uptime', () => {
+  it('seleziona `up` per job e namespace del chart, non per un nome di job di un tempo', async () => {
+    vi.resetModules();
+    vi.stubEnv('METRICS_JOB', 'pa-webinar');
+    vi.stubEnv('POD_NAMESPACE', 'webinar');
+    try {
+      const { GET: get2 } = await import('./route');
+      access.mockResolvedValue('public');
+      configured.mockReturnValue(true);
+      await get2(
+        new Request('http://localhost:3000/api/status/metrics?metric=uptime') as never,
+        { params: Promise.resolve({}) },
+      );
+      expect(query.mock.calls[0]?.[0]).toBe(
+        'avg_over_time(up{namespace="webinar",job="pa-webinar"}[24h]) * 100',
+      );
+    } finally {
+      vi.unstubAllEnvs();
+    }
+  });
+});

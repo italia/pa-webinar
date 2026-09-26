@@ -127,7 +127,8 @@
         "outlook": "Outlook / Office 365",
         "yahoo": "Yahoo Calendar",
         "downloadIcs": "Íoslódáil comhad .ics"
-      }
+      },
+      "registrationEnded": "Tá an t-imeacht críochnaithe: tá an clárú dúnta."
     },
     "manage": {
       "toggleChat": "Comhrá",
@@ -368,7 +369,8 @@
       "questionRestore": "Athchóirigh",
       "questionStatusFailed": "Níorbh fhéidir an cheist a nuashonrú",
       "questionNeedsText": "Clóscríobh téacs na ceiste: ní théann ceangaltán leis féin isteach sa scuaine",
-      "lensTruncated": "Níl ach na teachtaireachtaí is déanaí luchtaithe: d'fhéadfadh ceisteanna níos sine a bheith ann nach bhfuil liostaithe."
+      "lensTruncated": "Níl ach na teachtaireachtaí is déanaí luchtaithe: d'fhéadfadh ceisteanna níos sine a bheith ann nach bhfuil liostaithe.",
+      "attachUnavailable": "Níl ceangaltáin ar fáil ar an suiteáil seo."
     },
     "role": {
       "moderator": "Modhnóir",
@@ -389,7 +391,8 @@
         "unknown": "N/B"
       },
       "volume": "Airde",
-      "volumeFor": "Airde {name}"
+      "volumeFor": "Airde {name}",
+      "kickName": "Díbir {name}"
     },
     "moderator": {
       "muteAll": "Balbhaigh gach duine",
@@ -453,7 +456,18 @@
       "remainingLabel": "An t-am atá fágtha (cliceáil chun an t-am caite a fheiceáil)",
       "elapsedLabel": "An t-am caite (cliceáil chun an t-am atá fágtha a fheiceáil)"
     },
-    "videoCallFrameTitle": "Físghlao an imeachta"
+    "videoCallFrameTitle": "Físghlao an imeachta",
+    "insecureContextTitle": "Seoladh neamhshlán",
+    "insecureContextBody": "Osclaíodh an leathanach seo le http://: ní cheadaíonn an brabhsálaí an micreafón ná an ceamara, agus ní féidir leis an bhfísghlao tosú. Oscail an leathanach céanna ag an seoladh slán.",
+    "insecureContextLink": "Oscail https://{host}",
+    "conferenceUnreachableTitle": "Níl an tseirbhís fhísghlaonna ag freagairt",
+    "conferenceUnreachableBody": "Ní féidir leis an mbrabhsálaí freastalaí na bhfísghlaonna ({host}) a bhaint amach. Oscail é i gcluaisín nua: má thaispeánann an brabhsálaí rabhadh slándála, glac leis, ansin fill anseo agus bain triail eile as. Mura n-osclaíonn an leathanach, b'fhéidir go bhfuil an líonra lena bhfuil tú ceangailte á bhac.",
+    "conferenceOpenHost": "Oscail {host} i gcluaisín nua",
+    "leftTitle": "D'fhág tú an seomra",
+    "leftMessage": "Tá an t-imeacht fós ar siúl: is féidir leat filleadh isteach am ar bith.",
+    "leftModeratorReminder": "Fanann an t-imeacht oscailte go dtí go gcuireann duine éigin deireadh leis. Nuair a bheidh sibh réidh, fill isteach agus roghnaigh “{action}”.",
+    "rejoin": "Fill isteach",
+    "backToHome": "Ar ais go dtí an leathanach baile"
   },
   "qa": {
     "title": "Ceisteanna agus Freagraí",
@@ -590,7 +604,8 @@
       "errorGeneric": "Earráid agus an comhad á uaslódáil",
       "helpImage": "Formáidí tacaithe: PNG, JPEG, WebP, SVG, GIF — uasmhéid 10 MB",
       "helpAudio": "Formáidí tacaithe: MP3, WAV, OGG, M4A, WebM — uasmhéid 20 MB",
-      "helpDocument": "Formáidí tacaithe: PDF, DOCX, PPTX, XLSX, TXT — uasmhéid 25 MB"
+      "helpDocument": "Formáidí tacaithe: PDF, DOCX, PPTX, XLSX, TXT — uasmhéid 25 MB",
+      "uploadsUnavailable": "Níl uaslódáil comhad ar fáil ar an suiteáil seo: greamaigh URL an chomhaid ina ionad sin."
     },
     "rubricaPicker": {
       "loading": "Á chuardach…",
@@ -628,7 +643,9 @@
           "endsAt": "Caithfidh an dáta críochnaithe a bheith tar éis an dáta tosaithe.",
           "titleRequired": "Tá an teideal riachtanach (3 charachtar ar a laghad).",
           "titleRequiredOtherLocale": "Tá an teideal sa teanga réamhshocraithe ({locale}) riachtanach: téigh go dtí an cluaisín {locale}.",
-          "maxParticipants": "Cuir isteach uimhir idir 2 agus 500."
+          "maxParticipants": "Cuir isteach uimhir idir 2 agus 500.",
+          "descriptionRequired": "Tá an tuairisc riachtanach (ar a laghad {min} carachtar).",
+          "descriptionRequiredOtherLocale": "Tá an tuairisc sa teanga réamhshocraithe ({locale}) riachtanach: téigh go dtí an cluaisín {locale}."
         },
         "senderRatioLabel": "Céatadán gníomhach measta",
         "senderRatioHelp": "Cé mhéad rannpháirtí a bhfuiltear ag súil leis go mbeidh micreafón/físeán gníomhach acu. Cabhraíonn sé an freastalaí físe a thomhas.",
@@ -820,7 +837,11 @@
         "speakers": "cainteoirí",
         "materials": "ábhair",
         "questionnaires": "ceistneoirí"
-      }
+      },
+      "revocationFailed": "Theip ar an gcúlghairm rochtana do {name}: tá an nasc rochtana bailí i gcónaí. Sábháil arís chun iarracht eile a dhéanamh, nó cúlghair é ón gcluaisín “{tab}” ar leathanach an imeachta.",
+      "validationFailedDetail": "Dhiúltaigh an freastalaí do roinnt sonraí: {reason}. Ceartaigh iad agus bain triail eile as.",
+      "publishFailed": "Cruthaíodh an t-imeacht ach níor foilsíodh é: is dréacht é fós. Foilsigh é ó leathanach an imeachta.",
+      "publishFailedDetail": "Cruthaíodh an t-imeacht ach níor foilsíodh é: is dréacht é fós. D'fhreagair an freastalaí: {reason}. Foilsigh é ó leathanach an imeachta."
     },
     "nav": {
       "events": "Bainistíocht imeachtaí",
@@ -1240,7 +1261,7 @@
       "wordCloudEnabled": "Scamall focal beo",
       "wordCloudEnabledDesc": "Seolann na rannpháirtithe focal agus nuashonraítear an scamall beo. Úsáideach chun plé a oscailt nó chun mothú a bhailiú i gceann cúpla soicind.",
       "whiteboardEnabled": "Clár bán comhroinnte",
-      "whiteboardEnabledDesc": "Cumasaíonn sé an clár bán comhoibríoch dúchasach (Excalidraw): is féidir le modhnóirí é a oscailt ón mbarra uirlisí le linn an imeachta. Ar siúl i gcónaí i nglaonna láithreacha.",
+      "whiteboardEnabledDesc": "Cumasaíonn sé an clár bán comhoibríoch dúchasach (Excalidraw): is féidir le modhnóirí é a oscailt ón mbarra uirlisí le linn an imeachta. Teastaíonn seirbhís chlár bán na suiteála; nuair atá sí ar fáil, bíonn sé ar siúl i gcónaí i nglaonna láithreacha.",
       "autoStartRecording": "Tosaigh an taifeadadh go huathoibríoch",
       "autoStartRecordingDesc": "Nuair a thosaíonn an t-imeacht, tosaíonn an taifeadadh leis féin (ní iarrtar deimhniú ón modhnóir). Mar sin aimseoidh daoine déanacha seinnteoir ar fáil láithreach.",
       "aiSectionHeading": "Iarléiriú uathoibríoch",
@@ -1316,7 +1337,8 @@
       "retentionPreviewRecordings": "Taifeadtaí físe",
       "retentionPreviewKept": "Coinnítear staitisticí comhiomlánaithe agus meiteashonraí an imeachta.",
       "configPreview": "Réamhamharc cumraíochta",
-      "templateApplied": "Teimpléad curtha i bhfeidhm: {name}. Is féidir libh gach socrú a athrú."
+      "templateApplied": "Teimpléad curtha i bhfeidhm: {name}. Is féidir libh gach socrú a athrú.",
+      "whiteboardUnavailable": "Níl sé ar fáil sa suiteáil seo: tá seirbhís chlár bán Jitsi in easnamh, agus is féidir le hoibreoir an ardáin í a chumasú."
     },
     "links": {
       "title": "Naisc an imeachta",
@@ -1925,9 +1947,9 @@
       "version": "Leagan",
       "environment": "Comhshaol",
       "modes": {
-        "simple": "Simplí (Docker Compose)",
-        "standard": "Caighdeánach (Kubernetes)",
-        "full": "Iomlán (Kubernetes le scála-go-nialas)",
+        "simple": "Simplí",
+        "standard": "Caighdeánach",
+        "full": "Iomlán (droichid le scála-go-nialas)",
         "unknown": "Anaithnid"
       },
       "database": {
@@ -1941,7 +1963,9 @@
         "title": "Jitsi Meet",
         "reachable": "Inrochtana",
         "unreachable": "Dorochtana",
-        "notConfigured": "Gan chumrú"
+        "notConfigured": "Gan chumrú",
+        "degraded": "Inrochtana, ach freagraíonn le hearráidí nó go mall",
+        "publicCheckFailed": "Theip ar an seiceáil ag an seoladh poiblí ({code}): ní ghlacann freastalaí na tairsí leis an teastas ná leis an ainm. D'fhéadfadh na comhdhálacha oibriú mar sin féin."
       },
       "jvb": {
         "title": "Droichead Físe (JVB)",
@@ -1949,7 +1973,9 @@
         "replicas": "{current}/{max} nód",
         "preScale": "Réamhscálú: {minutes} nóim",
         "fixedMode": "Mód seasta",
-        "scalerEnabled": "Scálóir cumasaithe"
+        "scalerEnabled": "Scálóir cumasaithe",
+        "fixedDown": "Níl an droichead físeáin ag freagairt",
+        "unmonitored": "Gan monatóiriú: níl seoladh an droichid (JVB_HEALTH_URL) socraithe"
       },
       "jibri": {
         "title": "Taifeadadh (Jibri)",
@@ -1971,7 +1997,11 @@
         "metrics": "Críochphointe méadrachta"
       },
       "note": "Déantar athruithe ar an mbonneagar trí luachanna Helm agus an píblíne CI/CD.",
-      "deployDocs": "Doiciméadú imlonnaithe"
+      "deployDocs": "Doiciméadú imlonnaithe",
+      "platforms": {
+        "kubernetes": "Ar Kubernetes",
+        "other": "Lasmuigh de Kubernetes (Docker Compose nó freastalaí aonair)"
+      }
     },
     "instantCalls": {
       "title": "Glaonna tapa",
@@ -2076,9 +2106,9 @@
       "latencyP99": "Folaigh P99",
       "requestRate": "Iarratais/s",
       "chartLatencyQuantiles": "Folaigh feidhmchláir — P50 / P95 / P99",
-      "participantsNow": "Rannpháirtithe gníomhacha",
+      "participantsNow": "Rannpháirtithe ar an droichead físeáin",
       "jvbStress": "Lucht JVB",
-      "conferences": "Comhdhálacha gníomhacha",
+      "conferences": "Comhdhálacha ar an droichead físeáin",
       "octoRelay": "Sealaíocht idir-dhroichid Octo",
       "interBridge": "Trácht Octo",
       "chartCpu": "CPU usage",
@@ -2105,7 +2135,8 @@
       "liveNow": "LIVE",
       "provisioningNow": "á sholáthar",
       "idleNow": "IDLE (ar sos)",
-      "scaleToZeroHelp": "Is é IDLE an gnáthstádas d'imeacht gan trácht thar an tréimhse mhaithiúnais. Ag an gcéad chuairt eile ó úsáideoir, athraíonn sé go PROVISIONING agus ansin go LIVE."
+      "scaleToZeroHelp": "Is é IDLE an gnáthstádas d'imeacht gan trácht thar an tréimhse mhaithiúnais. Ag an gcéad chuairt eile ó úsáideoir, athraíonn sé go PROVISIONING agus ansin go LIVE.",
+      "capacityFromStatus": "Luachanna reatha léite ón droichead físeáin. Tá Prometheus ag teastáil don stair."
     },
     "bulk": {
       "selectAll": "Roghnaigh uile",
@@ -2824,7 +2855,8 @@
       "quotaExceeded": "Tá teorainn na gcomhad uaslódáilte bainte amach ag an imeacht seo ({maxFiles} comhad, {maxMb} MB san iomlán): bain cuid acu chun tuilleadh a uaslódáil",
       "uploadBusy": "An iomarca uaslódálacha faoi láthair: bain triail eile as i gceann cúpla soicind",
       "deleteFailed": "Níorbh fhéidir an t-ábhar a scriosadh"
-    }
+    },
+    "addedByStaff": "Curtha leis ag lucht eagraithe"
   },
   "reminders": {
     "title": "Fógraí",
@@ -2897,7 +2929,7 @@
       "requestSubmittedBody": "Má mheaitseálann an seoladh ríomhphoist seo clárúchán, sheolamar nasc chugaibh chun an scriosadh a dheimhniú. Beidh an nasc bailí ar feadh uair an chloig.",
       "linkInvalid": "Tá an nasc neamhbhailí nó imithe in éag. Iarr nasc nua.",
       "confirmWarning": "Tá sibh ar tí na sonraí pearsanta go léir a bhaineann le bhur seoladh ríomhphoist a scriosadh go buan.",
-      "confirmBody": "Scriosfar clárúcháin, ceisteanna, vótaí pobalbhreithe, aiseolas agus meabhrúcháin. Ní féidir an gníomh seo a chealú.",
+      "confirmBody": "Scriosfar clárúcháin, ceisteanna, vótaí pobalbhreithe, aiseolas, meabhrúcháin agus d’iontráil i leabhar seoltaí na n-imeachtaí. Ní féidir an gníomh seo a chealú.",
       "confirmButton": "Deimhnigh an scriosadh",
       "cancel": "Cealaigh",
       "processing": "Á scriosadh...",
@@ -3120,7 +3152,7 @@
     "nodesReady": "nóid réidh",
     "scaling": "ag scálú",
     "jvbStress": "Ualach JVB",
-    "participantsConnected": "rannpháirtithe nasctha",
+    "participantsConnected": "rannpháirtithe ar an droichead físeáin",
     "videoInteractive": "idirghníomhach",
     "videoWebinar": "seimineár gréasáin",
     "participantsAvailable": "rannpháirtithe ar fáil",
@@ -3164,7 +3196,12 @@
       "lastFailure": "Teip dheireanach {when}",
       "artifactsProduced": "{count, plural, =0 {gan déantán} one {1 déantán cruthaithe} two {2 dhéantán cruthaithe} few {# dhéantán cruthaithe} many {# ndéantán cruthaithe} other {# déantán cruthaithe}}",
       "eventsEnabled": "{count, plural, =0 {gan imeacht le AI} one {1 imeacht le AI gníomhach} two {2 imeacht le AI gníomhach} few {# imeacht le AI gníomhach} many {# n-imeacht le AI gníomhach} other {# imeacht le AI gníomhach}}"
-    }
+    },
+    "jvbFixedUp": "{count, plural, =1 {Droichead físeáin ag obair} other {Droichead físeáin ag obair · droichid beartaithe: #}}",
+    "jvbFixedDown": "Níl an droichead físeáin ag freagairt",
+    "jvbFixedDownDetail": "Ní fhaigheann rannpháirtithe fuaim ná físeán go dtí go mbeidh an droichead inrochtana arís.",
+    "jvbUnmonitored": "Níl an stádas á mhonatóiriú",
+    "jvbUnmonitoredDetail": "Ní fhiosraíonn an tsuiteáil seo an droichead físeáin, mar sin níl a stádas ar fáil anseo."
   },
   "infraMap": {
     "loading": "Léarscáil bhonneagair á lódáil...",
@@ -3172,8 +3209,8 @@
     "ariaLabel": "Léarscáil bhonneagar an chórais",
     "title": "Léarscáil bhonneagair",
     "subtitle": "Léirshamhlú fíor-ama ar ailtireacht agus stádas na seirbhísí",
-    "participants": "Rannpháirtithe",
-    "conferences": "Comhdhálacha",
+    "participants": "Rannpháirtithe ar an droichead físeáin",
+    "conferences": "Comhdhálacha ar an droichead físeáin",
     "bandwidthIn": "Bandaleithead isteach",
     "bandwidthOut": "Bandaleithead amach",
     "recordings": "Taifeadtaí",
@@ -3259,23 +3296,33 @@
       "jitsiWeb": {
         "healthy": "Tá an seomra físchomhdhála inrochtana agus réidh d'imeachtaí.",
         "down": "Níl an seomra físchomhdhála inrochtana. Ní féidir imeachtaí a thosú ná dul isteach iontu.",
-        "standby": "Níl an seomra físchomhdhála cumraithe."
+        "standby": "Níl an seomra físchomhdhála cumraithe.",
+        "degraded": "Freagraíonn an seomra físchomhdhála, ach le hearráidí nó go mall.",
+        "publicCheckFailed": "Ní féidir leis an tairseach an seomra a sheiceáil ag a sheoladh poiblí: ón bhfreastalaí, níl an teastas ná an t-ainm bailí. D'fhéadfadh an seomra oibriú mar sin féin do rannpháirtithe.",
+        "unmonitored": "Níl stádas an tseomra físchomhdhála á mhonatóiriú sa tsuiteáil seo."
       },
       "prosody": {
         "healthy": "Tá teachtaireachtaí inmheánacha idir seirbhísí físeáin ag obair i gceart.",
         "down": "Níl na teachtaireachtaí inmheánacha inrochtana. Ní féidir le seirbhísí físeáin cumarsáid a dhéanamh le chéile.",
-        "standby": "Níl an tseirbhís teachtaireachtaí cumraithe."
+        "standby": "Níl an tseirbhís teachtaireachtaí cumraithe.",
+        "degraded": "Freagraíonn na teachtaireachtaí inmheánacha, ach le hearráidí nó go mall.",
+        "publicCheckFailed": "Ní féidir leis an tairseach na teachtaireachtaí inmheánacha a sheiceáil trí sheoladh poiblí an tseomra: ón bhfreastalaí, níl an teastas ná an t-ainm bailí. D'fhéadfadh na comhdhálacha oibriú mar sin féin.",
+        "unmonitored": "Níl stádas na dteachtaireachtaí inmheánacha á mhonatóiriú sa tsuiteáil seo."
       },
       "jicofo": {
         "healthy": "Tá an comhordaitheoir comhdhála gníomhach agus ag bainistiú seisiún.",
         "down": "Níl an comhordaitheoir comhdhála inrochtana. Ní féidir comhdhálacha nua a chruthú.",
-        "standby": "Níl an comhordaitheoir comhdhála cumraithe."
+        "standby": "Níl an comhordaitheoir comhdhála cumraithe.",
+        "degraded": "Freagraíonn an comhordaitheoir comhdhála, ach le hearráidí nó go mall.",
+        "unmonitored": "Níl stádas an chomhordaitheora comhdhála á mhonatóiriú sa tsuiteáil seo."
       },
       "jvb": {
         "healthy": "Tá an droichead físeáin gníomhach agus ag tarchur fuaime/físeáin chuig rannpháirtithe.",
         "scaling": "Tá an droichead físeáin ag ullmhú d'imeacht atá le teacht. Tá freastalaithe á gcruthú go huathoibríoch.",
         "standby": "Tá an droichead físeáin ar fuireachas. Gníomhachtófar go huathoibríoch é roimh thús imeachta sceidealaithe.",
-        "stale": "Tá imeacht ag fanacht ar an droichead físe níos faide ná an teorainn ama chumraithe. Seiceáil an cluster autoscaler agus logaí na pod JVB."
+        "stale": "Tá imeacht ag fanacht ar an droichead físe níos faide ná an teorainn ama chumraithe. Seiceáil an cluster autoscaler agus logaí na pod JVB.",
+        "fixedDown": "Níl an droichead físeáin ag freagairt. Ní tharchuireann na comhdhálacha fuaim ná físeán go dtí go mbeidh sé inrochtana arís.",
+        "unmonitored": "Níl stádas an droichid físeáin á mhonatóiriú sa tsuiteáil seo: níl seoladh ag an tairseach chun é a fhiosrú."
       },
       "jibri": {
         "healthy": "Tá an tseirbhís taifeadta réidh agus ar fáil.",
@@ -3307,7 +3354,8 @@
       "jibri": "Ní féidir imeachtaí a thaifeadadh. Is féidir le rannpháirtithe páirt a ghlacadh fós.",
       "jibriStale": "Tá imeacht le taifeadadh gníomhach ag fanacht ar Jibri thar an teorainn ama: níl an seisiún á thaifeadadh.",
       "smtp": "Ní sheolfar ríomhphoist deimhnithe clárúcháin ná meabhrúcháin.",
-      "postprodDegraded": "Níor cruthaíodh na tras-scríbhinní ná na hachoimrí do roinnt taifeadtaí le déanaí. Tá na taifeadtaí físe ar fáil mar sin féin."
+      "postprodDegraded": "Níor cruthaíodh na tras-scríbhinní ná na hachoimrí do roinnt taifeadtaí le déanaí. Tá na taifeadtaí físe ar fáil mar sin féin.",
+      "jvbDown": "Ní fhaigheann rannpháirtithe fuaim ná físeán."
     },
     "overallVerdicts": {
       "operational": "Tá gach seirbhís ag obair i gceart. Tá an t-ardán ag feidhmiú go hiomlán.",
@@ -3337,7 +3385,8 @@
       "degraded": "Laghdaithe",
       "down": "Gan fáil",
       "standby": "Ar fuireachas",
-      "scaling": "Ag ullmhú"
+      "scaling": "Ag ullmhú",
+      "unknown": "Gan monatóiriú"
     },
     "metrics": {
       "uptime24h": "Aimsir 24u",
@@ -3348,7 +3397,8 @@
       "errorRate": "Earráidí 5xx",
       "requestRate": "Iarratais/s",
       "podUptime": "Aimsir pod"
-    }
+    },
+    "probeDetail": "Toradh an tseiceála"
   },
   "feedback": {
     "title": "Conas a mheasann sibh an t-imeacht seo?",
@@ -3673,7 +3723,9 @@
       "almostReady": "Freastalaí físe ag rith: beagnach réidh",
       "almostReadyDetail": "Nóiméad eile agus beidh an cnaipe iontrála gníomhach as a stuaim féin.",
       "honestHint": "Gnáthfhanacht: faoi bhun nóiméid má tá an bonneagar te cheana, 3–5 nóiméad ag an gcéad tosú. Idir an dá linn is féidir leat an ceamara agus an micreafón a sheiceáil nó an comhrá a úsáid.",
-      "elapsed": "á ullmhú le {time}"
+      "elapsed": "á ullmhú le {time}",
+      "scheduled": "Osclaíonn an seomra ag an am tosaigh",
+      "scheduledDetail": "Nó níos luaithe, nuair a thosaíonn an t-eagraí an t-imeacht. Idir an dá linn is féidir leat an ceamara agus an micreafón a sheiceáil nó an comhrá a úsáid."
     },
     "exitWaiting": "Fág an seomra feithimh",
     "warmingUp": "Seomra á ullmhú",
@@ -3729,7 +3781,10 @@
       "hostEarly": "Iontráil luath (óstach)"
     },
     "roomJustOpened": "Tá an seomra réidh — tar isteach",
-    "enterAnyway": "Téigh isteach mar sin féin"
+    "enterAnyway": "Téigh isteach mar sin féin",
+    "notHeldBadge": "Tá an t-am thart",
+    "notHeldTitle": "Tá an t-am sceidealaithe don imeacht thart",
+    "notHeldDetail": "Níor osclaíodh an seomra. Féach ar leathanach an imeachta le haghaidh aon nuashonruithe."
   },
   "recording": {
     "management": "Taifeadadh físe",
@@ -3865,6 +3920,16 @@
     "noFeedback": "Níor fuarthas aon aiseolas",
     "comments": "Tráchtanna",
     "noComments": "Gan tráchtanna",
+    "yes": "Tá",
+    "no": "Níl"
+  },
+  "questionnaire": {
+    "loadFailed": "Níorbh fhéidir an ceistneoir a lódáil.",
+    "submit": "Seol freagraí",
+    "submitFailed": "Theip ar an seoladh. Bain triail eile as.",
+    "answersInvalid": "Tá roinnt freagraí in easnamh nó neamhbhailí: seiceáil na ceisteanna éigeantacha agus bain triail eile as.",
+    "alreadySubmitted": "Sheol tú do chuid freagraí ar an gceistneoir seo cheana féin.",
+    "thankYou": "Go raibh maith agat as do chuid freagraí.",
     "yes": "Tá",
     "no": "Níl"
   }

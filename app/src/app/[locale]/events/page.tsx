@@ -4,6 +4,7 @@ import { getTranslations, getLocale } from 'next-intl/server';
 
 import { prisma } from '@/lib/db';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
+import { localizedPath } from '@/lib/utils/localized-url';
 import { getSettings } from '@/lib/settings';
 import { publicEventStatusWhere } from '@/lib/events/visibility';
 import EventListClient from '@/components/events/event-list-client';
@@ -142,9 +143,9 @@ async function TagFilterRow({ tags, activeTag, locale }: TagFilterRowProps) {
       </div>
       <div className="d-flex flex-wrap gap-2">
         <a
-          href={`/${locale}/events`}
+          href={localizedPath('/events', locale)}
           className="btn btn-sm"
-          aria-pressed={!activeTag}
+          aria-current={!activeTag ? 'true' : undefined}
           style={{
             borderRadius: 20,
             border: '1px solid #0066CC',
@@ -164,9 +165,9 @@ async function TagFilterRow({ tags, activeTag, locale }: TagFilterRowProps) {
           return (
             <a
               key={tag.slug}
-              href={`/${locale}/events?tag=${encodeURIComponent(tag.slug)}`}
+              href={localizedPath(`/events?tag=${encodeURIComponent(tag.slug)}`, locale)}
               className="btn btn-sm"
-              aria-pressed={active}
+              aria-current={active ? 'true' : undefined}
               style={{
                 borderRadius: 20,
                 border: `1px solid ${color}`,

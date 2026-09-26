@@ -7,6 +7,7 @@ import { routing } from '@/i18n/routing';
 import { tryGetAppSecret } from '@/lib/auth/app-secret';
 import { getPublicEnv } from '@/lib/env';
 import { storageCspHosts } from '@/lib/storage/provider-type';
+import { localizedPath } from '@/lib/utils/localized-url';
 
 const LOCALE_SEGMENT = locales.join('|');
 
@@ -231,7 +232,7 @@ export default async function middleware(request: NextRequest) {
 
   const pathLocale = extractLocaleFromPath(pathname);
   const locale = pathLocale ?? getRuntimeDefaultLocale(request);
-  const loginUrl = new URL(`/${locale}/admin/login`, request.url);
+  const loginUrl = new URL(localizedPath('/admin/login', locale), request.url);
   return NextResponse.redirect(loginUrl);
 }
 

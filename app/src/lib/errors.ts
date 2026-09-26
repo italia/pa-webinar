@@ -2,6 +2,12 @@
 
 export class AppError extends Error {
   public headers?: Record<string, string>;
+  /**
+   * Condizione prevista dalla configurazione dell'installazione (una funzione
+   * non attivata, uno storage non configurato), non un guasto: la riga di log
+   * della richiesta resta a livello `warn` anche con uno stato 5xx.
+   */
+  public expected?: boolean;
 
   constructor(
     message: string,

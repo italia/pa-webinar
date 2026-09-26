@@ -17,6 +17,7 @@ import {
 import { Icon } from '@/components/ui/icon';
 import { Link, percorso } from '@/i18n/navigation';
 import { resolveWaitingRoomMode } from '@/lib/waiting-room/resolve-engine';
+import { canStartManually } from '@/lib/events/lifecycle';
 import {
   annuncioApertura,
   statoIngresso,
@@ -25,6 +26,7 @@ import {
 import AudioPlayer from '@/components/live/audio-player';
 import ChatPanel from '@/components/live/chat-panel';
 import DeviceCheck from '@/components/live/device-check';
+import { InsecureContextNotice } from '@/components/live/insecure-context';
 import VideoPlayer from '@/components/events/video-player';
 import EventTitle from '@/components/events/event-title';
 
@@ -101,6 +103,8 @@ interface WaitingRoomEvent {
   imageUrl?: string | null;
   coverImageUrl?: string | null;
   maxParticipants: number;
+  /** Mostra l'avviso di registrazione: l'evento registra E l'installazione
+   *  ha qualcosa che puo' farlo (lo combina LiveEventClient). */
   recordingEnabled: boolean;
   tempRecordingUrl?: string | null;
   recordingUrl?: string | null;
@@ -129,7 +133,10 @@ export interface WaitingRoomJoinPrefs {
 /** Telemetria warm-up dal poll /lifecycle: alimenta il pannello di attesa
  *  onesto (fase + tempo trascorso) al posto dello spinner cieco. */
 export interface WaitingRoomWarmup {
-  phase: 'queued' | 'starting' | 'ready';
+  /** 'scheduled': nessuno scaler, il bridge è fisso — la sala si apre
+   *  all'orario d'inizio o quando il moderatore avvia l'evento, e non c'è
+   *  nessun riscaldamento da stimare. */
+  phase: 'queued' | 'starting' | 'ready' | 'scheduled';
   /** Stopwatch anchor, già ripulito lato server: valorizzato solo mentre
    *  PROVISIONING e recente (null in IDLE / se residuo di un ciclo passato),
    *  così il cronometro non parte mai da un timestamp stantìo. */
@@ -225,6 +232,13 @@ export default function WaitingRoom({
   // premuto "Avvia evento": mostriamo uno stato dedicato invece del countdown
   // vuoto + CTA "Apertura alle {ora passata}" (incoerente e sfiduciante).
   const [startingSoon, setStartingSoon] = useState(false);
+  // Mai aperto (PUBLISHED, in preparazione o in pausa) e oltre la fine
+  // programmata: l'evento non si è tenuto. Il giro del ciclo di vita lo
+  // chiuderà a momenti; fino ad allora «attendi l'organizzatore», la
+  // preparazione in corso o «Avvia evento» sarebbero promesse false.
+  // Calcolato in un effetto (non nel rendering) perché server e prima passata
+  // del client coincidano.
+  const [notHeld, setNotHeld] = useState(false);
   const [name, setName] = useState(defaultName);
   // Diventa vero dopo aver letto il nome salvato nel browser: fino ad allora
   // un campo vuoto non vuol dire che il nome manchi.
@@ -312,15 +326,19 @@ export default function WaitingRoom({
   }, [event.waitingRoomEngine]);
 
   const startsAtMs = new Date(event.startsAt).getTime();
+  const endsAtMs = new Date(event.endsAt).getTime();
   const isLive = event.status === 'LIVE';
-  const isEnded = event.status === 'ENDED';
+  // Un evento mai aperto oltre la sua fine si presenta come concluso: niente
+  // modulo d'ingresso, niente piazza, niente avvio.
+  const isEnded = event.status === 'ENDED' || notHeld;
   const isPublished = event.status === 'PUBLISHED';
   // IDLE = bridge scaled to zero, /wake just fired from LiveEventClient.
   // PROVISIONING = scaler picked up the wake, JVB is starting.
   // Both are short-lived "warming up" states — show a non-blocking
   // banner so the user knows entry is gated, and let them keep using
   // the rest of the room (garden, name input, device check, chat).
-  const isWarmingUp = event.status === 'IDLE' || event.status === 'PROVISIONING';
+  const isWarmingUp =
+    (event.status === 'IDLE' || event.status === 'PROVISIONING') && !notHeld;
   const isGuest = role === 'guest';
   const isModerator = role === 'moderator';
   const heroUrl = event.imageUrl ?? event.coverImageUrl ?? null;
@@ -492,6 +510,12 @@ export default function WaitingRoom({
     }
     const tick = () => {
       const now = Date.now();
+      if (now >= endsAtMs) {
+        setCountdown('');
+        setPulseCountdown(false);
+        setStartingSoon(false);
+        return;
+      }
       const diff = startsAtMs - now;
       if (diff <= 0) {
         setCountdown('');
@@ -515,7 +539,20 @@ export default function WaitingRoom({
     tick();
     const timer = setInterval(tick, 1000);
     return () => clearInterval(timer);
-  }, [isPublished, startsAtMs]);
+  }, [isPublished, startsAtMs, endsAtMs]);
+
+  // «Non si è tenuto»: vale per ogni stato da cui l'evento si potrebbe ancora
+  // avviare (vedi canStartManually), non solo per PUBLISHED.
+  useEffect(() => {
+    if (!canStartManually(event.status)) {
+      setNotHeld(false);
+      return;
+    }
+    const check = () => setNotHeld(Date.now() >= endsAtMs);
+    check();
+    const timer = setInterval(check, 1000);
+    return () => clearInterval(timer);
+  }, [event.status, endsAtMs]);
 
   // Detect the transition into LIVE while the user is still waiting. The
   // moderator who pressed "Avvia evento" doesn't need the cue (they know),
@@ -1002,17 +1039,25 @@ export default function WaitingRoom({
           aria-live="polite"
         >
           <div className="d-flex align-items-start">
-            <Spinner active small className="me-2 mt-1 flex-shrink-0" />
+            {/* Senza scaler non c'è niente in accensione: un orologio, non
+                uno spinner. */}
+            {warmup?.phase === 'scheduled' ? (
+              <Icon icon="it-clock" size="sm" className="me-2 mt-1 flex-shrink-0" />
+            ) : (
+              <Spinner active small className="me-2 mt-1 flex-shrink-0" />
+            )}
             <div className="flex-grow-1">
               <div className="d-flex justify-content-between align-items-baseline flex-wrap gap-2">
                 <strong>
-                  {warmup?.phase === 'ready'
-                    ? t('warmup.almostReady')
-                    : warmup?.phase === 'starting'
-                      ? (warmupElapsed ?? 0) >= 75
-                        ? t('warmup.provisioningNode')
-                        : t('warmup.startingBridge')
-                      : t('warmup.queued')}
+                  {warmup?.phase === 'scheduled'
+                    ? t('warmup.scheduled')
+                    : warmup?.phase === 'ready'
+                      ? t('warmup.almostReady')
+                      : warmup?.phase === 'starting'
+                        ? (warmupElapsed ?? 0) >= 75
+                          ? t('warmup.provisioningNode')
+                          : t('warmup.startingBridge')
+                        : t('warmup.queued')}
                 </strong>
                 {warmupElapsed !== null && warmupElapsed > 0 && (
                   // aria-hidden: la banda è una live region (role=status +
@@ -1031,9 +1076,11 @@ export default function WaitingRoom({
                 )}
               </div>
               <div className="mt-1">
-                {warmup?.phase === 'ready'
-                  ? t('warmup.almostReadyDetail')
-                  : t('warmup.honestHint')}
+                {warmup?.phase === 'scheduled'
+                  ? t('warmup.scheduledDetail')
+                  : warmup?.phase === 'ready'
+                    ? t('warmup.almostReadyDetail')
+                    : t('warmup.honestHint')}
               </div>
             </div>
           </div>
@@ -1065,7 +1112,10 @@ export default function WaitingRoom({
           <div className="display-6 fw-bold font-monospace lh-1">{liveCountdown}</div>
         </div>
       )}
-      {isPublished && isModerator && onStartEvent && (
+      {/* Anche in preparazione o in pausa: se nessuno porta la sala a LIVE (lo
+          scaler è fermo, o non c'è), il moderatore deve poterla aprire lui.
+          Non oltre la fine: l'evento non si è tenuto. */}
+      {canStartManually(event.status) && !notHeld && isModerator && onStartEvent && (
         <Button
           color="success"
           size="lg"
@@ -1368,7 +1418,7 @@ export default function WaitingRoom({
                 )}
                 {isEnded && (
                   <Badge color="" pill className="px-3 py-2 position-absolute" style={{ top: 12, right: 12, fontSize: '0.75rem', backgroundColor: '#E9ECEF', color: 'var(--app-muted)' }}>
-                    {t('endedTitle')}
+                    {notHeld ? t('notHeldBadge') : t('endedTitle')}
                   </Badge>
                 )}
               </div>
@@ -1437,6 +1487,10 @@ export default function WaitingRoom({
                   <div className="mb-4">{statusBanners}</div>
                 )}
 
+                {/* Da http:// il browser nega microfono e videocamera: lo si dice
+                    qui, con l'indirizzo sicuro, invece di una prova dei
+                    dispositivi che chiede un permesso impossibile. */}
+                {!isEnded && <InsecureContextNotice className="mb-3" />}
                 {!isEnded && <div className="mb-3">{nameField}</div>}
                 {/* Email: solo per gli ospiti (i registrati l'hanno già data,
                     per moderatori/speaker è irrilevante). Il valore non è ancora
@@ -1447,13 +1501,22 @@ export default function WaitingRoom({
                 )}
                 {!isEnded && <div className="mb-3">{deviceCheckField}</div>}
 
-                {isPublished && event.waitingRoomAudioUrl && (
+                {isPublished && !notHeld && event.waitingRoomAudioUrl && (
                   <div className="mb-4 d-flex justify-content-center">
                     <AudioPlayer audioUrl={event.waitingRoomAudioUrl} />
                   </div>
                 )}
 
-                {isEnded ? (
+                {notHeld ? (
+                  <div className="mb-3" role="status">
+                    <h2 className="h5 fw-semibold mb-1" style={{ color: 'var(--app-text)' }}>
+                      {t('notHeldTitle')}
+                    </h2>
+                    <p className="text-muted mb-0" style={{ fontSize: '0.9rem' }}>
+                      {t('notHeldDetail')}
+                    </p>
+                  </div>
+                ) : isEnded ? (
                   <div className="d-grid gap-2 mb-3">
                     <h2 className="h5 fw-semibold mb-1" style={{ color: 'var(--app-text)' }}>
                       {t('endedTitle')}
@@ -1515,7 +1578,7 @@ export default function WaitingRoom({
                 {aiNoticeBlock && <div className="mb-3">{aiNoticeBlock}</div>}
                 {backLinkBlock && <div className="text-center">{backLinkBlock}</div>}
 
-                {isPublished && !isModerator && (
+                {isPublished && !notHeld && !isModerator && (
                   <p className="text-center text-muted mt-3 mb-0" style={{ fontSize: '0.8rem' }}>
                     <Icon icon="it-refresh" size="xs" className="me-1" />
                     {t('autoRefreshHint')}

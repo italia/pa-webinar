@@ -20,6 +20,20 @@ import {
 
 import { POST } from './route';
 
+/** Il livello della riga di log che withErrorHandling scrive per la risposta. */
+function livelloDelLog(spia: { mock: { calls: unknown[][] } }, status: number): string | undefined {
+  for (const [riga] of spia.mock.calls) {
+    if (typeof riga !== 'string') continue;
+    try {
+      const j = JSON.parse(riga) as { level?: string; status?: number };
+      if (j.status === status) return j.level;
+    } catch {
+      /* non e' la riga della richiesta */
+    }
+  }
+  return undefined;
+}
+
 const staff = requireStaff as unknown as ReturnType<typeof vi.fn>;
 const create = createRecordingBrowserUpload as unknown as ReturnType<typeof vi.fn>;
 const configured = isRecordingStorageConfigured as unknown as ReturnType<typeof vi.fn>;
@@ -79,11 +93,16 @@ describe('POST /api/admin/publications/upload-url', () => {
     expect(create).not.toHaveBeenCalled();
   });
 
-  it('senza storage delle registrazioni risponde 503', async () => {
+  it('senza storage delle registrazioni risponde 503, registrato come warn', async () => {
+    const log = vi.spyOn(console, 'log').mockImplementation(() => undefined);
     configured.mockReturnValue(false);
     const res = await post({ filename: 'a.mp4', sizeBytes: 10 });
     expect(res.status).toBe(503);
+    expect(((await res.json()) as { code?: string }).code).toBe('STORAGE_UNAVAILABLE');
     expect(create).not.toHaveBeenCalled();
+    // Una configurazione ammessa, non un guasto.
+    expect(livelloDelLog(log, 503)).toBe('warn');
+    log.mockRestore();
   });
 
   it.each([

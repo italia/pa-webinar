@@ -160,3 +160,16 @@ describe('POST /api/admin/events/[id]/materials — il file del materiale', () =
     expect(mockedCreate).not.toHaveBeenCalled();
   });
 });
+
+/**
+ * Chi aggiunge un materiale dall'area admin e' lo staff: la riga non porta un
+ * nome (ne' quello di chi conduce, ne' una parola fissa), e ogni superficie
+ * mostra la dicitura tradotta (lib/events/material-author).
+ */
+describe('POST /api/admin/events/[id]/materials — autore', () => {
+  it('nessun nome salvato, anche con un conduttore sull evento', async () => {
+    const res = await POST(post({ title: 'Sito', url: 'https://example.org' }), ctx());
+    expect(res.status).toBe(201);
+    expect(mockedCreate.mock.calls[0]![0].data.addedBy).toBe('');
+  });
+});

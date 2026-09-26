@@ -19,10 +19,12 @@ export function withErrorHandling(handler: RouteHandler): RouteHandler {
   return async (request, context) => {
     const start = Date.now();
     let response: Response;
+    let previsto = false;
     try {
       response = await handler(request, context);
     } catch (error) {
       response = errorResponse(error);
+      previsto = error instanceof AppError && error.expected === true;
     }
     const duration = Date.now() - start;
     const url = new URL(request.url);
@@ -37,8 +39,10 @@ export function withErrorHandling(handler: RouteHandler): RouteHandler {
 
     console.log(
       JSON.stringify({
+        // Un 5xx previsto dalla configurazione (AppError.expected) non e' un
+        // guasto da allarme: resta `warn`, come i 4xx.
         level:
-          response.status >= 500
+          response.status >= 500 && !previsto
             ? 'error'
             : response.status >= 400
               ? 'warn'

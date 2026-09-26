@@ -8,24 +8,32 @@ let cacheExpiry = 0;
 const CACHE_TTL_MS = 60_000;
 
 /**
- * La riga delle impostazioni, creata al primo uso. `upsert` di Prisma non e'
- * atomico — legge e poi scrive — e su un'installazione nuova le prime
- * richieste arrivano insieme: una crea la riga, le altre urtano il vincolo
- * di unicita'. Per loro la riga ora esiste, e basta rileggerla.
+ * La riga delle impostazioni, creata al primo uso. Di norma esiste gia' e
+ * basta leggerla. Su un'installazione nuova le prime richieste arrivano
+ * insieme: la creazione e' un `INSERT ... ON CONFLICT DO NOTHING`
+ * (`skipDuplicates`), che non fallisce se un'altra richiesta l'ha appena
+ * creata. Un `upsert` di Prisma invece legge e poi scrive: chi perde la gara
+ * urta il vincolo di unicita', e il client registra l'errore nel log anche
+ * quando qui viene gestito — a ogni primo avvio, un errore che non c'e'.
+ *
+ * Senza cache: chi deve leggere il valore appena scritto (il pannello delle
+ * impostazioni) la chiama direttamente invece di `getSettings`.
  */
-async function leggiOCrea(): Promise<SiteSetting> {
+export async function leggiOCrea(): Promise<SiteSetting> {
+  const esistente = await prisma.siteSetting.findUnique({ where: { id: 'singleton' } });
+  if (esistente) return esistente;
   try {
-    return await prisma.siteSetting.upsert({
-      where: { id: 'singleton' },
-      create: { id: 'singleton' },
-      update: {},
+    await prisma.siteSetting.createMany({
+      data: [{ id: 'singleton' }],
+      skipDuplicates: true,
     });
   } catch (err) {
-    if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
-      return prisma.siteSetting.findUniqueOrThrow({ where: { id: 'singleton' } });
+    // Rete di sicurezza: se il vincolo scatta comunque, la riga ora esiste.
+    if (!(err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002')) {
+      throw err;
     }
-    throw err;
   }
+  return prisma.siteSetting.findUniqueOrThrow({ where: { id: 'singleton' } });
 }
 
 export async function getSettings(): Promise<SiteSetting> {

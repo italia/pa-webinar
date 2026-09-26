@@ -21,6 +21,7 @@ import {
   postEventModeratorEmail,
 } from '@/lib/email/templates';
 import { ensureEventRecap, formatRecapSummary } from '@/lib/events/recap';
+import { rubricaOptOutUrl } from '@/lib/persons/opt-out-link';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import { localizedUrl } from '@/lib/utils/localized-url';
 
@@ -76,7 +77,13 @@ export async function finalizePostEventEmails(opts: {
     // Participant thank-you + recap/feedback link.
     const registrations = await prisma.registration.findMany({
       where: { eventId: event.id },
-      select: { id: true, email: true, locale: true },
+      select: {
+        id: true,
+        email: true,
+        locale: true,
+        // Chi e' in rubrica riceve anche qui il link per uscirne.
+        person: { select: { id: true, optedInToAddressBook: true } },
+      },
     });
     for (const reg of registrations) {
       try {
@@ -89,6 +96,7 @@ export async function finalizePostEventEmails(opts: {
           eventTitle: getLocalized(event.title as LocalizedField, pagina),
           eventPageUrl: localizedUrl(baseUrl, `/events/${event.slug}`, pagina),
           siteName,
+          addressBookOptOutUrl: rubricaOptOutUrl(reg.person, baseUrl, pagina),
         });
         await enqueueEmail({
           to,

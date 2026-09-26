@@ -11,6 +11,7 @@
 
 import { defaultLocale } from '@/i18n/config';
 import { linguaEmail, linguaPagina } from '@/lib/email/lingua';
+import { emailBaseUrl } from '@/lib/email/links';
 import { localizedUrl } from '@/lib/utils/localized-url';
 import { z } from 'zod';
 
@@ -150,10 +151,9 @@ export const POST = withErrorHandling(async (request) => {
 
   if (emailRl.allowed) {
     const token = issueGdprToken('erasure', emailHash);
-    const baseUrl =
-      process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, '') ??
-      'http://localhost:3000';
-    const link = buildErasureLink(baseUrl, locale, token);
+    // A runtime: la lettura puntata la fissava il build, e l'email portava
+    // `http://localhost:3000` su ogni istanza installata dall'immagine pubblicata.
+    const link = buildErasureLink(emailBaseUrl(), locale, token);
 
     const body = BODIES[testi] ?? BODIES.en!;
     const subject = SUBJECTS[testi] ?? SUBJECTS.en!;

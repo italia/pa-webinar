@@ -127,7 +127,8 @@
         "outlook": "Outlook / Office 365",
         "yahoo": "Yahoo Calendar",
         "downloadIcs": ".ics-bestand downloaden"
-      }
+      },
+      "registrationEnded": "Het evenement is afgelopen: de inschrijving is gesloten."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -368,7 +369,8 @@
       "questionRestore": "Herstellen",
       "questionStatusFailed": "De vraag kon niet worden bijgewerkt",
       "questionNeedsText": "Typ de tekst van uw vraag: een bijlage alleen komt niet in de wachtrij",
-      "lensTruncated": "Alleen de meest recente berichten zijn geladen: er kunnen oudere vragen zijn die niet in de lijst staan."
+      "lensTruncated": "Alleen de meest recente berichten zijn geladen: er kunnen oudere vragen zijn die niet in de lijst staan.",
+      "attachUnavailable": "Bijlagen zijn niet beschikbaar op deze installatie."
     },
     "role": {
       "moderator": "Moderator",
@@ -389,7 +391,8 @@
         "unknown": "n.v.t."
       },
       "volume": "Volume",
-      "volumeFor": "Volume van {name}"
+      "volumeFor": "Volume van {name}",
+      "kickName": "{name} verwijderen"
     },
     "moderator": {
       "muteAll": "Iedereen dempen",
@@ -453,7 +456,18 @@
       "remainingLabel": "Resterende tijd (klik voor de verstreken tijd)",
       "elapsedLabel": "Verstreken tijd (klik voor de resterende tijd)"
     },
-    "videoCallFrameTitle": "Videogesprek van het evenement"
+    "videoCallFrameTitle": "Videogesprek van het evenement",
+    "insecureContextTitle": "Onveilig adres",
+    "insecureContextBody": "Deze pagina is geopend via http://: de browser staat microfoon en camera niet toe, en het videogesprek kan niet starten. Open dezelfde pagina op het beveiligde adres.",
+    "insecureContextLink": "https://{host} openen",
+    "conferenceUnreachableTitle": "De videogesprekdienst reageert niet",
+    "conferenceUnreachableBody": "Uw browser kan de server voor videogesprekken ({host}) niet bereiken. Open deze in een nieuw tabblad: als de browser een beveiligingswaarschuwing toont, accepteer die, kom dan hier terug en probeer het opnieuw. Als de pagina niet opent, wordt de server mogelijk geblokkeerd door het netwerk waarmee u verbonden bent.",
+    "conferenceOpenHost": "{host} openen in een nieuw tabblad",
+    "leftTitle": "U hebt de zaal verlaten",
+    "leftMessage": "Het evenement is nog bezig: u kunt op elk moment terugkeren.",
+    "leftModeratorReminder": "Het evenement blijft open tot iemand het beëindigt. Als u klaar bent, keer dan terug en kies ‘{action}’.",
+    "rejoin": "Terugkeren",
+    "backToHome": "Terug naar de startpagina"
   },
   "qa": {
     "title": "Vragen en Antwoorden",
@@ -590,7 +604,8 @@
       "errorGeneric": "Fout bij het uploaden van het bestand",
       "helpImage": "Ondersteunde formaten: PNG, JPEG, WebP, SVG, GIF — max. 10 MB",
       "helpAudio": "Ondersteunde formaten: MP3, WAV, OGG, M4A, WebM — max. 20 MB",
-      "helpDocument": "Ondersteunde formaten: PDF, DOCX, PPTX, XLSX, TXT — max. 25 MB"
+      "helpDocument": "Ondersteunde formaten: PDF, DOCX, PPTX, XLSX, TXT — max. 25 MB",
+      "uploadsUnavailable": "Bestanden uploaden is op deze installatie niet beschikbaar: plak in plaats daarvan de URL van het bestand."
     },
     "rubricaPicker": {
       "loading": "Bezig met zoeken…",
@@ -628,7 +643,9 @@
           "endsAt": "Einddatum moet na startdatum liggen.",
           "titleRequired": "De titel is verplicht (minimaal 3 tekens).",
           "titleRequiredOtherLocale": "De titel in de standaardtaal ({locale}) is verplicht: ga naar het tabblad {locale}.",
-          "maxParticipants": "Voer een getal tussen 2 en 500 in."
+          "maxParticipants": "Voer een getal tussen 2 en 500 in.",
+          "descriptionRequired": "De beschrijving is verplicht (minimaal {min} tekens).",
+          "descriptionRequiredOtherLocale": "De beschrijving in de standaardtaal ({locale}) is verplicht: ga naar het tabblad {locale}."
         },
         "senderRatioLabel": "Geschat percentage actief",
         "senderRatioHelp": "Hoeveel deelnemers naar verwachting microfoon/video aan zullen hebben. Helpt bij het dimensioneren van de videoserver.",
@@ -820,7 +837,11 @@
         "speakers": "sprekers",
         "materials": "materiaal",
         "questionnaires": "vragenlijsten"
-      }
+      },
+      "revocationFailed": "Het intrekken van de toegang van {name} is mislukt: de toegangslink is nog steeds geldig. Sla opnieuw op om het nogmaals te proberen, of trek hem in via het tabblad “{tab}” op de pagina van het evenement.",
+      "validationFailedDetail": "De server heeft enkele gegevens geweigerd: {reason}. Corrigeer ze en probeer het opnieuw.",
+      "publishFailed": "Het evenement is aangemaakt maar niet gepubliceerd: het is nog een concept. Publiceer het vanaf de pagina van het evenement.",
+      "publishFailedDetail": "Het evenement is aangemaakt maar niet gepubliceerd: het is nog een concept. De server antwoordde: {reason}. Publiceer het vanaf de pagina van het evenement."
     },
     "nav": {
       "events": "Evenementbeheer",
@@ -1240,7 +1261,7 @@
       "wordCloudEnabled": "Live woordwolk",
       "wordCloudEnabledDesc": "Deelnemers sturen een woord en de wolk wordt live bijgewerkt. Handig om een discussie te openen of in enkele seconden een stemming te peilen.",
       "whiteboardEnabled": "Gedeeld whiteboard",
-      "whiteboardEnabledDesc": "Schakelt het ingebouwde samenwerkingswhiteboard (Excalidraw) in: de moderatoren kunnen het tijdens het evenement openen via de werkbalk. Altijd actief bij directe calls.",
+      "whiteboardEnabledDesc": "Schakelt het ingebouwde samenwerkingswhiteboard (Excalidraw) in: de moderatoren kunnen het tijdens het evenement openen via de werkbalk. Vereist de whiteboarddienst van de installatie; waar die beschikbaar is, is het bij directe calls altijd actief.",
       "autoStartRecording": "Opname automatisch starten",
       "autoStartRecordingDesc": "Bij de start van het evenement begint de opname vanzelf (zonder bevestiging te vragen aan de moderator). Zo vinden eventuele laatkomers de speler direct beschikbaar.",
       "aiSectionHeading": "Automatische postproductie",
@@ -1316,7 +1337,8 @@
       "retentionPreviewRecordings": "Video-opnamen",
       "retentionPreviewKept": "Geaggregeerde statistieken en metadata van het evenement blijven bewaard.",
       "configPreview": "Configuratievoorbeeld",
-      "templateApplied": "Sjabloon toegepast: {name}. U kunt alle instellingen wijzigen."
+      "templateApplied": "Sjabloon toegepast: {name}. U kunt alle instellingen wijzigen.",
+      "whiteboardUnavailable": "Niet beschikbaar op deze installatie: de whiteboarddienst van Jitsi ontbreekt; de beheerder van het platform kan die inschakelen."
     },
     "links": {
       "title": "Evenementlinks",
@@ -1925,9 +1947,9 @@
       "version": "Versie",
       "environment": "Omgeving",
       "modes": {
-        "simple": "Eenvoudig (Docker Compose)",
-        "standard": "Standaard (Kubernetes)",
-        "full": "Volledig (Kubernetes met scale-to-zero)",
+        "simple": "Eenvoudig",
+        "standard": "Standaard",
+        "full": "Volledig (bridges met scale-to-zero)",
         "unknown": "Onbekend"
       },
       "database": {
@@ -1941,7 +1963,9 @@
         "title": "Jitsi Meet",
         "reachable": "Bereikbaar",
         "unreachable": "Onbereikbaar",
-        "notConfigured": "Niet geconfigureerd"
+        "notConfigured": "Niet geconfigureerd",
+        "degraded": "Bereikbaar, maar reageert met fouten of traag",
+        "publicCheckFailed": "Controle op het openbare adres mislukt ({code}): de portaalserver accepteert het certificaat of de naam niet. Conferenties kunnen toch werken."
       },
       "jvb": {
         "title": "Video Bridge (JVB)",
@@ -1949,7 +1973,9 @@
         "replicas": "{current}/{max} knooppunten",
         "preScale": "Pre-scale: {minutes} min",
         "fixedMode": "Vaste modus",
-        "scalerEnabled": "Scaler ingeschakeld"
+        "scalerEnabled": "Scaler ingeschakeld",
+        "fixedDown": "De videobridge reageert niet",
+        "unmonitored": "Niet bewaakt: het adres van de bridge (JVB_HEALTH_URL) is niet ingesteld"
       },
       "jibri": {
         "title": "Opname (Jibri)",
@@ -1971,7 +1997,11 @@
         "metrics": "Metrics-endpoint"
       },
       "note": "Infrastructuurwijzigingen worden uitgevoerd via Helm values en de CI/CD-pipeline.",
-      "deployDocs": "Implementatiedocumentatie"
+      "deployDocs": "Implementatiedocumentatie",
+      "platforms": {
+        "kubernetes": "Op Kubernetes",
+        "other": "Buiten Kubernetes (Docker Compose of één server)"
+      }
     },
     "instantCalls": {
       "title": "Snelgesprekken",
@@ -2076,9 +2106,9 @@
       "latencyP99": "Latentie P99",
       "requestRate": "Verzoeken/s",
       "chartLatencyQuantiles": "Applicatielatentie — P50 / P95 / P99",
-      "participantsNow": "Actieve deelnemers",
+      "participantsNow": "Deelnemers op de videobridge",
       "jvbStress": "JVB-belasting",
-      "conferences": "Actieve vergaderingen",
+      "conferences": "Conferenties op de videobridge",
       "octoRelay": "Octo-relay tussen bridges",
       "interBridge": "Octo-verkeer",
       "chartCpu": "CPU usage",
@@ -2105,7 +2135,8 @@
       "liveNow": "LIVE",
       "provisioningNow": "in voorbereiding",
       "idleNow": "IDLE (gepauzeerd)",
-      "scaleToZeroHelp": "IDLE is de normale staat voor een evenement zonder verkeer langer dan de respijtperiode. Bij het volgende bezoek van een gebruiker keert het terug naar PROVISIONING en daarna LIVE."
+      "scaleToZeroHelp": "IDLE is de normale staat voor een evenement zonder verkeer langer dan de respijtperiode. Bij het volgende bezoek van een gebruiker keert het terug naar PROVISIONING en daarna LIVE.",
+      "capacityFromStatus": "Actuele waarden, gelezen van de videobridge. De geschiedenis vereist Prometheus."
     },
     "bulk": {
       "selectAll": "Alles selecteren",
@@ -2824,7 +2855,8 @@
       "quotaExceeded": "Dit evenement heeft de limiet voor geüploade bestanden bereikt ({maxFiles} bestanden, {maxMb} MB in totaal): verwijder er enkele om meer te uploaden",
       "uploadBusy": "Te veel uploads op dit moment: probeer het over een paar seconden opnieuw",
       "deleteFailed": "Het materiaal kon niet worden verwijderd"
-    }
+    },
+    "addedByStaff": "Toegevoegd door de organisatie"
   },
   "reminders": {
     "title": "Meldingen",
@@ -2897,7 +2929,7 @@
       "requestSubmittedBody": "Als dit e-mailadres overeenkomt met een inschrijving, hebben we u een link gestuurd om de verwijdering te bevestigen. De link is 1 uur geldig.",
       "linkInvalid": "Deze link is ongeldig of verlopen. Vraag een nieuwe link aan.",
       "confirmWarning": "U staat op het punt alle persoonsgegevens die aan uw e-mailadres zijn gekoppeld definitief te verwijderen.",
-      "confirmBody": "Inschrijvingen, vragen, stemmen in peilingen, feedback en herinneringen worden verwijderd. Deze handeling kan niet ongedaan worden gemaakt.",
+      "confirmBody": "Inschrijvingen, vragen, stemmen in peilingen, feedback, herinneringen en uw vermelding in het evenementenadresboek worden verwijderd. Deze handeling kan niet ongedaan worden gemaakt.",
       "confirmButton": "Verwijdering bevestigen",
       "cancel": "Annuleren",
       "processing": "Bezig met verwijderen...",
@@ -3120,7 +3152,7 @@
     "nodesReady": "gereedstaande nodes",
     "scaling": "opschaling",
     "jvbStress": "JVB-belasting",
-    "participantsConnected": "deelnemers verbonden",
+    "participantsConnected": "deelnemers op de videobridge",
     "videoInteractive": "interactief",
     "videoWebinar": "webinar",
     "participantsAvailable": "deelnemers beschikbaar",
@@ -3164,7 +3196,12 @@
       "lastFailure": "Laatste fout {when}",
       "artifactsProduced": "{count, plural, =0 {geen artefacten} one {1 artefact geproduceerd} other {# artefacten geproduceerd}}",
       "eventsEnabled": "{count, plural, =0 {geen evenementen met AI} one {1 evenement met AI actief} other {# evenementen met AI actief}}"
-    }
+    },
+    "jvbFixedUp": "{count, plural, =1 {Videobridge actief} other {Videobridge actief · # bridges voorzien}}",
+    "jvbFixedDown": "De videobridge reageert niet",
+    "jvbFixedDownDetail": "Deelnemers ontvangen geen audio of video totdat de bridge weer bereikbaar is.",
+    "jvbUnmonitored": "Status niet bewaakt",
+    "jvbUnmonitoredDetail": "Deze installatie bevraagt de videobridge niet, dus de status is hier niet beschikbaar."
   },
   "infraMap": {
     "loading": "Infrastructuurkaart laden...",
@@ -3172,8 +3209,8 @@
     "ariaLabel": "Systeeminfrastructuurkaart",
     "title": "Infrastructuurkaart",
     "subtitle": "Realtime visualisatie van de architectuur en servicestatus",
-    "participants": "Deelnemers",
-    "conferences": "Conferenties",
+    "participants": "Deelnemers op de videobridge",
+    "conferences": "Conferenties op de videobridge",
     "bandwidthIn": "Inkomende bandbreedte",
     "bandwidthOut": "Uitgaande bandbreedte",
     "recordings": "Opnames",
@@ -3259,23 +3296,33 @@
       "jitsiWeb": {
         "healthy": "De videoconferentiekamer is bereikbaar en klaar voor evenementen.",
         "down": "De videoconferentiekamer is niet bereikbaar. Het is niet mogelijk om evenementen te starten of bij te wonen.",
-        "standby": "De videoconferentiekamer is niet geconfigureerd."
+        "standby": "De videoconferentiekamer is niet geconfigureerd.",
+        "degraded": "De videoconferentiekamer reageert, maar met fouten of traag.",
+        "publicCheckFailed": "Het portaal kan de kamer niet controleren op het openbare adres: vanaf de server is het certificaat of de naam niet geldig. Voor deelnemers kan de kamer toch werken.",
+        "unmonitored": "De status van de videoconferentiekamer wordt in deze installatie niet bewaakt."
       },
       "prosody": {
         "healthy": "Interne berichtgeving tussen videodiensten werkt correct.",
         "down": "Interne berichtgeving is niet bereikbaar. Videodiensten kunnen niet met elkaar communiceren.",
-        "standby": "De berichtendienst is niet geconfigureerd."
+        "standby": "De berichtendienst is niet geconfigureerd.",
+        "degraded": "De interne berichtgeving reageert, maar met fouten of traag.",
+        "publicCheckFailed": "Het portaal kan de interne berichtgeving niet controleren via het openbare adres van de kamer: vanaf de server is het certificaat of de naam niet geldig. Conferenties kunnen toch werken.",
+        "unmonitored": "De status van de interne berichtgeving wordt in deze installatie niet bewaakt."
       },
       "jicofo": {
         "healthy": "De conferentiecoördinator is actief en beheert sessies.",
         "down": "De conferentiecoördinator is niet bereikbaar. Het is niet mogelijk om nieuwe conferenties aan te maken.",
-        "standby": "De conferentiecoördinator is niet geconfigureerd."
+        "standby": "De conferentiecoördinator is niet geconfigureerd.",
+        "degraded": "De conferentiecoördinator reageert, maar met fouten of traag.",
+        "unmonitored": "De status van de conferentiecoördinator wordt in deze installatie niet bewaakt."
       },
       "jvb": {
         "healthy": "De videobridge is actief en verzendt audio/video naar deelnemers.",
         "scaling": "De videobridge bereidt zich voor op een aankomend evenement. Servers worden automatisch aangemaakt.",
         "standby": "De videobridge is in stand-by. Deze wordt automatisch geactiveerd vóór de start van een gepland evenement.",
-        "stale": "Een evenement wacht langer dan de geconfigureerde timeout op de videobridge. Controleer de cluster autoscaler en de logs van de JVB-pods."
+        "stale": "Een evenement wacht langer dan de geconfigureerde timeout op de videobridge. Controleer de cluster autoscaler en de logs van de JVB-pods.",
+        "fixedDown": "De videobridge reageert niet. Conferenties verzenden geen audio of video totdat hij weer bereikbaar is.",
+        "unmonitored": "De status van de videobridge wordt in deze installatie niet bewaakt: het portaal heeft geen adres om hem te bevragen."
       },
       "jibri": {
         "healthy": "De opnamedienst is gereed en beschikbaar.",
@@ -3307,7 +3354,8 @@
       "jibri": "Evenementen kunnen niet worden opgenomen. Deelnemers kunnen nog steeds deelnemen.",
       "jibriStale": "Een evenement met actieve opname wacht langer dan de timeout op Jibri: de sessie wordt niet opgenomen.",
       "smtp": "Bevestigingsmails en herinneringen voor inschrijvingen worden niet verstuurd.",
-      "postprodDegraded": "De transcripties en de samenvattingen van enkele recente opnamen zijn niet gegenereerd. De video-opnamen blijven wel beschikbaar."
+      "postprodDegraded": "De transcripties en de samenvattingen van enkele recente opnamen zijn niet gegenereerd. De video-opnamen blijven wel beschikbaar.",
+      "jvbDown": "Deelnemers ontvangen geen audio of video."
     },
     "overallVerdicts": {
       "operational": "Alle diensten werken correct. Het platform is volledig operationeel.",
@@ -3337,7 +3385,8 @@
       "degraded": "Vertraagd",
       "down": "Niet beschikbaar",
       "standby": "Stand-by",
-      "scaling": "Voorbereiden"
+      "scaling": "Voorbereiden",
+      "unknown": "Niet bewaakt"
     },
     "metrics": {
       "uptime24h": "Uptime 24u",
@@ -3348,7 +3397,8 @@
       "errorRate": "5xx-fouten",
       "requestRate": "Verzoeken/s",
       "podUptime": "Pod uptime"
-    }
+    },
+    "probeDetail": "Resultaat van de controle"
   },
   "feedback": {
     "title": "Hoe beoordeelt u dit evenement?",
@@ -3673,7 +3723,9 @@
       "almostReady": "Videoserver actief: bijna klaar",
       "almostReadyDetail": "Nog even en de deelnameknop wordt vanzelf actief.",
       "honestHint": "Gebruikelijke wachttijd: minder dan een minuut als de infrastructuur al warm is, 3–5 minuten bij de eerste start. Ondertussen kun je camera en microfoon controleren of de chat gebruiken.",
-      "elapsed": "in voorbereiding sinds {time}"
+      "elapsed": "in voorbereiding sinds {time}",
+      "scheduled": "De zaal gaat open op het starttijdstip",
+      "scheduledDetail": "Of eerder, wanneer de organisatie het evenement start. Ondertussen kun je camera en microfoon controleren of de chat gebruiken."
     },
     "exitWaiting": "Wachtruimte verlaten",
     "warmingUp": "Ruimte wordt voorbereid",
@@ -3729,7 +3781,10 @@
       "hostEarly": "Vroege toegang (host)"
     },
     "roomJustOpened": "De ruimte is klaar — kom binnen",
-    "enterAnyway": "Toch binnengaan"
+    "enterAnyway": "Toch binnengaan",
+    "notHeldBadge": "Tijd verstreken",
+    "notHeldTitle": "Het geplande tijdstip van het evenement is verstreken",
+    "notHeldDetail": "De zaal is niet geopend. Kijk op de evenementpagina voor eventuele updates."
   },
   "recording": {
     "management": "Video-opname",
@@ -3865,6 +3920,16 @@
     "noFeedback": "Geen feedback ontvangen",
     "comments": "Opmerkingen",
     "noComments": "Geen opmerkingen",
+    "yes": "Ja",
+    "no": "Nee"
+  },
+  "questionnaire": {
+    "loadFailed": "De vragenlijst kon niet worden geladen.",
+    "submit": "Antwoorden verzenden",
+    "submitFailed": "Verzenden mislukt. Probeer het opnieuw.",
+    "answersInvalid": "Sommige antwoorden ontbreken of zijn ongeldig: controleer de verplichte vragen en probeer het opnieuw.",
+    "alreadySubmitted": "U hebt uw antwoorden op deze vragenlijst al verzonden.",
+    "thankYou": "Bedankt voor uw antwoorden.",
     "yes": "Ja",
     "no": "Nee"
   }

@@ -369,7 +369,9 @@ export default function RegistrationFormClient({
                 : t('successScheduledMessage')}
           </p>
         </div>
-        {registrationAccessToken && (
+        {/* Il server sa gia' se l'evento ha un questionario pre-iscrizione:
+            senza, non lo si chiede nemmeno (la richiesta finirebbe in 404). */}
+        {registrationAccessToken && hasPreRegistrationQuestionnaire && (
           <div className="mb-4">
             <QuestionnaireForm
               eventSlug={eventSlug}

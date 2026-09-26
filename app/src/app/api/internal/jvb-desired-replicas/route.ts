@@ -15,6 +15,13 @@
  *        LIVE          → IDLE       if lastActiveAt < now - graceMinutes
  *        *             → ENDED      if endsAt < now (terminal)
  *   3. Compute desired JVB + Jibri replica counts from the resulting state.
+ *   4. Scrive il battito dello scaler (lib/events/lifecycle-driver): finché
+ *      è fresco, il giro a bridge fisso (/api/cron/lifecycle) si fa da parte
+ *      e /wake continua a scaldare le sale.
+ *
+ * Le transizioni stanno in lib/events/lifecycle-tick (modo 'scaler'),
+ * accanto al giro a bridge fisso; ogni evento che lascia LIVE chiude le
+ * proprie CallSession nella stessa transazione.
  *
  * Grace/lookahead windows are read from SiteSetting (admin-configurable),
  * with env fallbacks:
@@ -33,12 +40,13 @@
 import { withErrorHandling } from '@/lib/api-handler';
 import { assertCronApiKey } from '@/lib/auth/cron';
 import { prisma } from '@/lib/db';
+import { recordScalerHeartbeat } from '@/lib/events/lifecycle-driver';
 import {
-  shouldDemoteLiveToIdle,
-  shouldEndLiveEvent,
-  shouldReclaimEmptyOvertime,
-  emptyCloseCutoff,
-} from '@/lib/events/lifecycle';
+  dispatchRecorder,
+  lifecycleWindows,
+  probeBridge,
+  runLifecycleTick,
+} from '@/lib/events/lifecycle-tick';
 import {
   JVB_SNAPSHOT_KEY,
   JVB_SNAPSHOT_TTL_SECONDS,
@@ -56,66 +64,22 @@ function clampPct(v: number): number {
   return Math.max(0, Math.min(100, v));
 }
 
-type JvbStats = {
-  participants: number;
-  conferences: number;
-  stressLevel: number;
-  reachable: boolean;
-};
-
-async function fetchJvbStats(): Promise<JvbStats> {
-  const url = process.env.JVB_HEALTH_URL;
-  if (!url) {
-    return { participants: 0, conferences: 0, stressLevel: 0, reachable: false };
-  }
-  try {
-    const res = await fetch(`${url}/colibri/stats`, {
-      signal: AbortSignal.timeout(3000),
-    });
-    if (!res.ok) {
-      return { participants: 0, conferences: 0, stressLevel: 0, reachable: false };
-    }
-    const s = (await res.json()) as Record<string, unknown>;
-    return {
-      participants: typeof s.participants === 'number' ? s.participants : 0,
-      conferences: typeof s.conferences === 'number' ? s.conferences : 0,
-      stressLevel: typeof s.stress_level === 'number' ? s.stress_level : 0,
-      reachable: true,
-    };
-  } catch {
-    return { participants: 0, conferences: 0, stressLevel: 0, reachable: false };
-  }
-}
-
 export const GET = withErrorHandling(async (request) => {
   assertCronApiKey(request);
 
   const settings = await getSettings();
-  const inactiveGraceMin =
-    settings.jvbInactiveGraceMinutes ??
-    parseInt(process.env.JVB_INACTIVE_GRACE_MIN || '45', 10);
-  const preScaleMin =
-    settings.jvbPreScaleMinutes ??
-    parseInt(process.env.JVB_PRE_SCALE_MINUTES || '10', 10);
-  // Authoritative empty-conference close. Minutes a LIVE room
-  // that HAD traffic may stay COMPLETELY empty (moderator included) before we
-  // flip it straight to ENDED — terminal, distinct from the scale-to-zero
-  // inactivity grace. DISABLED by default (-1); opt-in admin setting only,
-  // because a terminal close on a stale participants=0 reading would eject a
-  // still-populated room. The column is NOT NULL so the env fallback only
-  // guards a hypothetical null (unreachable on a provisioned singleton).
-  const emptyCloseMin =
-    settings.jvbEmptyCloseMinutes ??
-    parseInt(process.env.JVB_EMPTY_CLOSE_MIN || '-1', 10);
+  // Finestre del ciclo di vita (inattività, pre-riscaldamento, chiusura
+  // anticipata, grace): le stesse del giro a bridge fisso, vedi
+  // lib/events/lifecycle-tick.
+  const windows = lifecycleWindows(settings);
+  const inactiveGraceMin = windows.inactiveGraceMin;
+  const preScaleMin = windows.preScaleMin;
   // Reactive scale-up thresholds, 0-100 percent. Stored as integer in DB
   // for the admin form; compared against the 0..1 fraction from JVB stats.
   const stressWarn = clampPct(settings.jvbStressWarnPercent ?? 50) / 100;
   const stressCritical = clampPct(settings.jvbStressCriticalPercent ?? 70) / 100;
 
   const now = new Date();
-  const preScaleWindow = new Date(now.getTime() + preScaleMin * 60_000);
-  const inactiveCutoff = new Date(now.getTime() - inactiveGraceMin * 60_000);
-  const emptyCloseCut = emptyCloseCutoff(now, emptyCloseMin);
 
   const searchParams = new URL(request.url).searchParams;
   const numParam = (name: string): number | null => {
@@ -145,7 +109,7 @@ export const GET = withErrorHandling(async (request) => {
   const stressFromCaller = numParam('stress_level');
   const jvb = scalerAggregated
     ? { participants: 0, conferences: 0, stressLevel: 0, reachable: false }
-    : await fetchJvbStats();
+    : await probeBridge();
 
   const participants = scalerAggregated
     ? numParam('participants') ?? 0
@@ -163,261 +127,18 @@ export const GET = withErrorHandling(async (request) => {
   const jvbReachable = scalerAggregated ? true : jvb.reachable;
 
   // ── Lifecycle transitions (applied as an atomic batch) ───────────
-  // Order matters: first refresh LIVE activity, then demote stale LIVE→IDLE,
-  // then terminal ENDED, then schedule/promote new events.
-  const transitions = await prisma.$transaction(async (tx) => {
-    const counts = {
-      liveRefreshed: 0,
-      liveEmptyClosed: 0,
-      liveToIdle: 0,
-      toEnded: 0,
-      publishedToProvisioning: 0,
-      provisioningToLive: 0,
-    };
-
-    // 1) Refresh lastActiveAt for LIVE events when bridge has traffic.
-    if (jvbReachable && participants > 0) {
-      const r = await tx.event.updateMany({
-        where: { status: 'LIVE' },
-        data: { lastActiveAt: now },
-      });
-      counts.liveRefreshed = r.count;
-    }
-
-    // Shared reliability guard for participant-count-driven demotion/close.
-    // /colibri/stats is served by whichever JVB pod the Service VIP routes to
-    // on this tick; with >1 replica and no cross-pod aggregation a
-    // `participants=0` reading is unreliable (the probe may hit a fresh empty
-    // sibling while real traffic lives on another), so we skip BOTH the
-    // empty-close AND the IDLE demotion this tick. When the scaler provided
-    // aggregated cross-pod stats the count is correct and the guard is dropped.
-    const skipIdleDemotion = !scalerAggregated && (currentReplicas ?? 1) > 1;
-
-    // The LIVE-before-endsAt set, shared by the empty-close (1b) and the IDLE
-    // demotion (2). Both decide in `shouldDemoteLiveToIdle` rather than in a
-    // WHERE clause: the rule needs the LATEST of several timestamps (SQL would
-    // need GREATEST, which Prisma cannot express here) and it is worth
-    // unit-testing on its own. The set is at most a handful of rows.
-    const liveEvents = await tx.event.findMany({
-      where: { status: 'LIVE', endsAt: { gt: now } },
-      select: {
-        id: true,
-        lastActiveAt: true,
-        provisioningStartedAt: true,
-        startsAt: true,
-      },
-    });
-
-    // 1b) LIVE → ENDED — authoritative empty-conference close.
-    //     Runs BEFORE the IDLE demotion so, when both would match, ENDED wins
-    //     (terminal) over IDLE (revivable). Fires only for rooms that HAD
-    //     traffic then emptied: lastActiveAt non-null AND older than the
-    //     admin-tunable cutoff, with endsAt still in the future (an EARLY
-    //     close; past-endsAt LIVE rooms are handled by the grace path below).
-    //     DISABLED by default (jvbEmptyCloseMinutes = -1 → emptyCloseCut null);
-    //     opt-in only. Because it keys on `participants=0` it fires only when
-    //     EVERYONE — moderator included — has left (a moderated break where the
-    //     host keeps the tab open never triggers it). Still a known residual: a
-    //     sustained stale participants=0 (degraded /colibri/stats) could close a
-    //     populated room, which is why it stays off by default.
-    //     `jvbReachable` is required: a terminal close must never fire on a
-    //     stale reading during a bridge blip — stricter than the IDLE path on
-    //     purpose, since ENDED is NOT auto-revived on rejoin (only IDLE is, via
-    //     /wake). Honours the same multi-replica skipIdleDemotion guard.
-    if (!skipIdleDemotion && emptyCloseCut && jvbReachable) {
-      // `lastActiveAt !== null` keeps the "had traffic, then emptied" meaning;
-      // the shared predicate adds the freshness guards. Without them this
-      // TERMINAL close inherits the bug fixed one branch below: a room revived
-      // hours later still carries the OLD lastActiveAt (the demotion writes only
-      // `status`, and /wake refreshes provisioningStartedAt), so it would be
-      // ENDed — irreversibly — before anyone could join.
-      const emptyCloseCandidates = liveEvents.filter(
-        (e) =>
-          e.lastActiveAt !== null &&
-          shouldDemoteLiveToIdle({
-            lastActiveAt: e.lastActiveAt,
-            provisioningStartedAt: e.provisioningStartedAt,
-            startsAt: e.startsAt,
-            inactiveCutoff: emptyCloseCut,
-            now,
-          }),
-      );
-      if (emptyCloseCandidates.length > 0) {
-        const closedIds = emptyCloseCandidates.map((e) => e.id);
-        const r = await tx.event.updateMany({
-          where: { id: { in: closedIds } },
-          data: { status: 'ENDED' },
-        });
-        counts.liveEmptyClosed = r.count;
-        await closeOpenSessions(tx, closedIds, now);
-      }
-    }
-
-    // 2) LIVE → IDLE when the conference has been empty for ≥ grace.
-    //    "Empty for how long" is the LATEST of lastActiveAt, provisioningStartedAt
-    //    and (once past) startsAt — see shouldDemoteLiveToIdle, which also
-    //    documents why a room with no signal at all is left alone. Uses the
-    //    shared skipIdleDemotion guard computed above (multi-replica staleness).
-    //    NOTE: this is a REVIVABLE, future-endsAt demotion, so it intentionally
-    //    uses simpler empty-detection than the terminal past-endsAt reclaim in
-    //    step 3b (shouldReclaimEmptyOvertime), which adds max-of-signals +
-    //    endsAt fallback + a stricter reliability gate BECAUSE it closes to
-    //    ENDED. The two are deliberately NOT the same predicate — don't unify.
-    if (!skipIdleDemotion) {
-      const idleCandidates = liveEvents.filter((e) =>
-        shouldDemoteLiveToIdle({
-          lastActiveAt: e.lastActiveAt,
-          provisioningStartedAt: e.provisioningStartedAt,
-          startsAt: e.startsAt,
-          inactiveCutoff,
-          now,
-        }),
-      );
-      if (idleCandidates.length > 0) {
-        const demotedIds = idleCandidates.map((e) => e.id);
-        const r = await tx.event.updateMany({
-          where: { id: { in: demotedIds } },
-          data: { status: 'IDLE' },
-        });
-        counts.liveToIdle = r.count;
-        // Close any CallSession still open on these events. The client
-        // opened them on first `videoConferenceJoined`; we never know
-        // exactly when the last participant disconnected, so we use
-        // `now` (capped by `endsAt` when set — see below) as the close
-        // time. Tradeoff: a bit of extra "duration" equal to the 45-min
-        // inactivity grace, acceptable for post-event analytics.
-        await closeOpenSessions(tx, demotedIds, now);
-      }
-    }
-
-    // 3) Past endsAt:
-    //    - PUBLISHED / PROVISIONING / IDLE past endsAt → ENDED (they
-    //      never really served anyone; nothing to grace).
-    //    - LIVE past endsAt respects the grace period: the event gets
-    //      a soft "overtime" window, then we flip to ENDED. Grace
-    //      of -1 means "never auto-close" — the inactivity cleanup in
-    //      step (2) will eventually catch it.
-    const endedByTimeoutCandidates = await tx.event.findMany({
-      where: {
-        status: { in: ['PUBLISHED', 'PROVISIONING', 'IDLE'] },
-        endsAt: { lt: now },
-      },
-      select: { id: true },
-    });
-    const r3a = await tx.event.updateMany({
-      where: { id: { in: endedByTimeoutCandidates.map((e) => e.id) } },
-      data: { status: 'ENDED' },
-    });
-    counts.toEnded = r3a.count;
-    if (endedByTimeoutCandidates.length > 0) {
-      await closeOpenSessions(tx, endedByTimeoutCandidates.map((e) => e.id), now);
-    }
-
-    const liveOvertime = await tx.event.findMany({
-      where: { status: 'LIVE', endsAt: { lt: now } },
-      select: {
-        id: true,
-        endsAt: true,
-        gracePeriodMinutes: true,
-        lastActiveAt: true,
-        provisioningStartedAt: true,
-      },
-    });
-    const siteGrace = settings.eventGracePeriodMinutes ?? 15;
-    // A LIVE room past endsAt ends when EITHER of two things is true:
-    //   (a) its grace window elapsed (shouldEndLiveEvent) — a time-based close
-    //       that fires regardless of who's present, including grace=0/N; OR
-    //   (b) it has sat EMPTY for the inactivity grace (shouldReclaimEmptyOvertime)
-    //       — this reclaims the JVB even under grace=-1 ("never auto-close"), so
-    //       an open-ended call people forgot to close doesn't pin a bridge
-    //       forever. Step (2) above only demotes EMPTY rooms whose endsAt is
-    //       still in the FUTURE; without (b) an emptied OVERTIME room with
-    //       grace=-1 matched no branch at all and leaked a JVB node indefinitely.
-    // A past-endsAt LIVE room ends on EITHER the time-based grace close
-    // (shouldEndLiveEvent, ungated — it never looks at the count) OR, for
-    // OPEN-ENDED rooms only, once it has sat empty for the inactivity grace
-    // (shouldReclaimEmptyOvertime — see its JSDoc for the full rationale:
-    // grace<0-only scope, MAX-of-signals /wake-race safety, co-hosted-bridge
-    // caveat, and why terminal ENDED is safe past endsAt).
-    //
-    // canReclaimEmpty gates the empty path: before we TERMINALLY close on
-    // participants=0 the reading must be POSITIVELY known reliable — cross-pod
-    // aggregated, or an explicitly-reported single replica. This is STRICTER
-    // than step 2's `!skipIdleDemotion` guard (which only drops the unreliable
-    // multi-replica-without-aggregation case): an older scaler image that omits
-    // `current` (currentReplicas=null, assumed 1) passes !skipIdleDemotion but
-    // NOT this, so it can't terminally evict an occupied call off a single-pod
-    // probe. countReliableForClose already implies !skipIdleDemotion, so the
-    // latter is intentionally omitted here as redundant. The grace close needs
-    // none of this — it never looks at the count.
-    const countReliableForClose = scalerAggregated || currentReplicas === 1;
-    const canReclaimEmpty = jvbReachable && countReliableForClose;
-    const toEndIds: string[] = [];
-    for (const ev of liveOvertime) {
-      const graceClose = shouldEndLiveEvent({
-        endsAt: ev.endsAt,
-        gracePeriodMinutes: ev.gracePeriodMinutes,
-        siteGraceMinutes: siteGrace,
-        now,
-      });
-      const emptyReclaim = shouldReclaimEmptyOvertime({
-        gracePeriodMinutes: ev.gracePeriodMinutes,
-        siteGraceMinutes: siteGrace,
-        lastActiveAt: ev.lastActiveAt,
-        provisioningStartedAt: ev.provisioningStartedAt,
-        endsAt: ev.endsAt,
-        inactiveCutoff,
-        canReclaimEmpty,
-      });
-      if (graceClose || emptyReclaim) {
-        toEndIds.push(ev.id);
-      }
-    }
-    if (toEndIds.length > 0) {
-      const r3b = await tx.event.updateMany({
-        where: { id: { in: toEndIds } },
-        data: { status: 'ENDED' },
-      });
-      counts.toEnded += r3b.count;
-      await closeOpenSessions(tx, toEndIds, now);
-    }
-
-    // 4) PUBLISHED → PROVISIONING when startsAt enters the pre-scale window,
-    //    or when startsAt has already passed and nobody moved the state yet.
-    const r4 = await tx.event.updateMany({
-      where: {
-        status: 'PUBLISHED',
-        startsAt: { lte: preScaleWindow },
-        endsAt: { gt: now },
-      },
-      data: { status: 'PROVISIONING', provisioningStartedAt: now },
-    });
-    counts.publishedToProvisioning = r4.count;
-
-    // 5) PROVISIONING → LIVE when the bridge is up AND the event has started.
-    //    We wait on bridge reachability so the first joining user doesn't
-    //    land on a still-cold JVB.
-    if (jvbReachable) {
-      const r5 = await tx.event.updateMany({
-        where: {
-          status: 'PROVISIONING',
-          startsAt: { lte: now },
-          endsAt: { gt: now },
-        },
-        data: {
-          status: 'LIVE',
-          // Re-stamp the warm-up time: the room became reachable NOW, whatever
-          // hour a visitor's /wake first warmed it. Without this the value stays
-          // the (possibly hours-old) wake time, which made the status pages
-          // report "stale provisioning" on a perfectly healthy bridge and left
-          // the inactivity signals looking older than the room actually is.
-          provisioningStartedAt: now,
-        },
-      });
-      counts.provisioningToLive = r5.count;
-    }
-
-    return counts;
+  // Le regole stanno in lib/events/lifecycle-tick (modo 'scaler'): prima
+  // l'attività delle sale LIVE, poi la pausa LIVE→IDLE, poi le chiusure, infine
+  // il pre-riscaldamento e l'apertura. Ogni evento che lascia LIVE chiude le
+  // proprie sessioni nella stessa transazione.
+  const { transitions } = await runLifecycleTick({
+    mode: 'scaler',
+    now,
+    windows,
+    jvbReachable,
+    participants,
+    scalerAggregated,
+    currentReplicas,
   });
 
   // ── Edge-trigger del recorder (ADR-013 Fase 3) ───────────────────
@@ -427,11 +148,8 @@ export const GET = withErrorHandling(async (request) => {
   // è impostato (deployment senza recorder), non facciamo nulla. Un errore
   // qui non deve mai compromettere lo scaler: il reconcile level-triggered
   // dell'operator recupera comunque.
-  if (transitions.provisioningToLive > 0 && process.env.RECORDER_CONTROLLER_URL) {
-    const url = `${process.env.RECORDER_CONTROLLER_URL.replace(/\/+$/, '')}/dispatch`;
-    void fetch(url, { method: 'POST' }).catch((err) => {
-      console.warn('[jvb] dispatch recorder best-effort fallito:', err);
-    });
+  if (transitions.provisioningToLive > 0) {
+    dispatchRecorder();
   }
 
   // ── Compute desired replicas from the updated state ──────────────
@@ -577,6 +295,11 @@ export const GET = withErrorHandling(async (request) => {
     }
   }
 
+  // Battito del conduttore: finché c'è, il giro a bridge fisso
+  // (/api/cron/lifecycle) si fa da parte e /wake scalda la sala come sempre.
+  // Mai un errore: il giro è già fatto (lib/events/lifecycle-driver).
+  await recordScalerHeartbeat();
+
   return Response.json({
     desired,
     jibriDesired,
@@ -598,62 +321,3 @@ export const GET = withErrorHandling(async (request) => {
     checkedAt: now.toISOString(),
   });
 });
-
-/**
- * Close any still-open CallSession rows for a batch of events. Called
- * from the scaler when events transition LIVE → IDLE (empty for 45+
- * min) or anything → ENDED (past endsAt). Runs inside the outer
- * `prisma.$transaction` so the status flip + session close are
- * atomic.
- *
- * The session's own peakParticipants is written live by the analytics/peak
- * route. Here we only FILL it when the session never received one (an older
- * row, or a session nobody reported for), using the event-wide peak as the best
- * available estimate — overwriting it would replace a real per-session figure
- * with a high-water mark across all sessions.
- */
-async function closeOpenSessions(
-  tx: Parameters<Parameters<typeof prisma.$transaction>[0]>[0],
-  eventIds: string[],
-  now: Date,
-) {
-  if (eventIds.length === 0) return;
-  const openSessions = await tx.callSession.findMany({
-    where: { eventId: { in: eventIds }, endedAt: null },
-    select: { id: true, eventId: true, startedAt: true, peakParticipants: true },
-  });
-  if (openSessions.length === 0) return;
-
-  const events = await tx.event.findMany({
-    where: { id: { in: openSessions.map((s) => s.eventId) } },
-    select: { id: true, peakParticipants: true },
-  });
-  const peakById = new Map(events.map((e) => [e.id, e.peakParticipants]));
-
-  await Promise.all(
-    openSessions.map((s) => {
-      const durationSeconds = Math.max(
-        0,
-        Math.floor((now.getTime() - s.startedAt.getTime()) / 1000),
-      );
-      return tx.callSession.update({
-        where: { id: s.id },
-        data: {
-          endedAt: now,
-          duration: durationSeconds,
-          // Only FILL a session that never got its own figure — never overwrite
-          // one. The event-wide peak is a high-water mark across every session,
-          // so stamping it here turned a room that peaked at 6 and then refilled
-          // with 2 into "6 participants" for the second session too, and the
-          // admin analytics reads the newest session as the event headcount:
-          // a believable wrong number is worse than the obvious 0 it replaced.
-          // Sessions that predate the live per-session write still inherit it,
-          // which is the best estimate available for them.
-          ...(s.peakParticipants > 0
-            ? {}
-            : { peakParticipants: peakById.get(s.eventId) ?? 0 }),
-        },
-      });
-    }),
-  );
-}

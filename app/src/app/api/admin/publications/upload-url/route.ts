@@ -55,11 +55,11 @@ export const POST = withErrorHandling(async (request) => {
   await requireStaff(await cookies());
 
   if (!isRecordingStorageConfigured()) {
-    throw new AppError(
-      'Recording storage not configured',
-      503,
-      'STORAGE_UNAVAILABLE',
-    );
+    // Un'installazione senza storage delle registrazioni e' una
+    // configurazione ammessa, non un guasto: 503 per il client, `warn` nel log.
+    const err = new AppError('Recording storage not configured', 503, 'STORAGE_UNAVAILABLE');
+    err.expected = true;
+    throw err;
   }
 
   const parsed = startUploadSchema.safeParse(await parseJsonBody(request));

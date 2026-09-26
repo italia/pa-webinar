@@ -2,7 +2,7 @@
 
 import { useRef, useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Alert, Spinner } from 'design-react-kit';
+import { Alert, Button, Spinner } from 'design-react-kit';
 
 import type { JitsiMeetExternalAPI as JitsiAPI } from '@/types/jitsi';
 import {
@@ -22,6 +22,9 @@ import {
   leggiSfondo,
   SFONDO_PREDEFINITO,
 } from '@/lib/jitsi/virtual-background';
+import { InsecureContextNotice, useInsecureContext } from '@/components/live/insecure-context';
+
+import { loadExternalApi } from './external-api-loader';
 
 interface WatermarkSettings {
   url?: string;
@@ -44,11 +47,14 @@ interface JitsiRoomProps {
   participantsCanStartVideo?: boolean;
   participantsCanShareScreen?: boolean;
   enableFileSharing?: boolean;
-  /** Per-event opt-in (Event.whiteboardEnabled): when true, moderators get the
-   *  native Jitsi/Excalidraw whiteboard button (desktop only). Jitsi still
-   *  feature-gates it on config.whiteboard.enabled (server-side, test only),
-   *  so it stays hidden on prod even for opted-in events. */
+  /** Scelta dell'evento (Event.whiteboardEnabled, sempre per le chiamate
+   *  istantanee): con `whiteboardInfraReady`, chi modera trova il pulsante
+   *  della lavagna nativa di Jitsi/Excalidraw (solo desktop). */
   whiteboardEnabled?: boolean;
+  /** L'installazione ha il backend della lavagna (lib/jitsi/whiteboard.ts),
+   *  risolto a runtime dal Server Component. Senza, il pulsante non entra
+   *  nella barra nemmeno per un evento che l'ha scelta. Default false. */
+  whiteboardInfraReady?: boolean;
   /** Video/audio quality preset (admin SiteSetting, per-event override).
    *  Drives resolution, bitrate caps, channelLastN and Opus settings, and is
    *  also enforced at runtime via setVideoQuality. Defaults to HIGH. */
@@ -88,7 +94,10 @@ interface JitsiRoomProps {
   onApiReady?: (api: JitsiAPI) => void;
 }
 
-type LoadState = 'loading' | 'ready' | 'error';
+// 'unreachable': external_api.js non e' arrivato dal server della conferenza
+// (certificato non accettato, rete o proxy che lo bloccano). 'error': l'API e'
+// arrivata ma la sala non si e' creata.
+type LoadState = 'loading' | 'ready' | 'error' | 'unreachable';
 
 const DEFAULT_WATERMARK_URL = '/images/default-watermark.svg';
 
@@ -112,6 +121,7 @@ export default function JitsiRoom({
   participantsCanShareScreen = true,
   enableFileSharing = false,
   whiteboardEnabled = false,
+  whiteboardInfraReady = false,
   videoQuality,
   reactionsMode = 'NATIVE',
   // Default spento (= rnnoise forzata OFF): un chiamante che dimentica la prop
@@ -128,11 +138,22 @@ export default function JitsiRoom({
   onApiReady,
 }: JitsiRoomProps) {
   const t = useTranslations('live');
+  const tc = useTranslations('common');
   const containerRef = useRef<HTMLDivElement>(null);
   const apiRef = useRef<JitsiAPI | null>(null);
   const initializingRef = useRef(false);
   const disposedRef = useRef(false);
   const [loadState, setLoadState] = useState<LoadState>('loading');
+  // Ogni «Riprova» incrementa il contatore e fa ripartire l'effetto che carica
+  // l'API e crea la sala: rimontare non basterebbe, lo stato va riazzerato.
+  const [attempt, setAttempt] = useState(0);
+  // Fuori da un contesto sicuro il browser nega microfono e videocamera anche
+  // alla videochiamata incorporata: non la si carica, e si dice perche'.
+  const insecure = useInsecureContext();
+  const retry = () => {
+    setLoadState('loading');
+    setAttempt((n) => n + 1);
+  };
 
   const onReadyRef = useRef(onReady);
   const onLeftRef = useRef(onLeft);
@@ -178,7 +199,7 @@ export default function JitsiRoom({
   const myEndpointIdRef = useRef<string>('');
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined' || insecure) return;
     disposedRef.current = false;
     isMobileRef.current = window.matchMedia('(max-width: 767.98px)').matches;
 
@@ -216,11 +237,11 @@ export default function JitsiRoom({
         ...jitsiConfigOverwrite.remoteVideoMenu,
         disableKick: false,
       };
-      // Native whiteboard: per-event opt-in + moderator + desktop only. Jitsi
-      // additionally feature-gates the button on config.whiteboard.enabled
-      // (set server-side, test only), so it stays hidden on prod even when an
-      // event opted in — no client-side check for the server infra needed.
-      if (whiteboardEnabled && !isMobileRef.current) {
+      // Lavagna nativa: scelta dell'evento + backend dell'installazione +
+      // moderatore + desktop. Il controllo del backend sta qui e non solo nel
+      // `config.whiteboard.enabled` di Jitsi: un pulsante che apre una lavagna
+      // senza backend è peggio di nessun pulsante.
+      if (whiteboardEnabled && whiteboardInfraReady && !isMobileRef.current) {
         toolbarButtons.push('whiteboard');
       }
     }
@@ -364,15 +385,6 @@ export default function JitsiRoom({
             ...extraConfig,
             toolbarButtons,
             ...(enableFileSharing ? { enableFileSharing: true } : {}),
-            // Force lib-jitsi-meet's _statsCurrentId to our display name.
-            // Without these, lib-jitsi-meet falls back to a random
-            // RandomUtil.randomElement(firstNames) + '-' + 3-char hex
-            // (e.g. "Judah-hqj"), which is what shows up in Jicofo logs
-            // as `stats-id` and in callstats/JaaS analytics. Keeping this
-            // tied to our portal-issued displayName makes ops logs
-            // traceable back to the registered participant.
-            statisticsId: displayName,
-            statisticsDisplayName: displayName,
           },
           interfaceConfigOverwrite: {
             ...jitsiInterfaceConfigOverwrite,
@@ -624,41 +636,25 @@ export default function JitsiRoom({
       }
     }
 
-    let scriptLoadHandler: (() => void) | null = null;
-    let attachedScript: HTMLScriptElement | null = null;
-
     // Flush della timeline anche se la tab viene chiusa/messa in background.
     window.addEventListener('pagehide', handlePageHide);
 
-    if (window.JitsiMeetExternalAPI) {
-      initJitsi();
-    } else {
-      const existingScript = document.querySelector(
-        `script[src*="external_api.js"]`,
-      ) as HTMLScriptElement | null;
-
-      if (existingScript) {
-        scriptLoadHandler = initJitsi;
-        attachedScript = existingScript;
-        existingScript.addEventListener('load', scriptLoadHandler);
-      } else {
-        const script = document.createElement('script');
-        script.src = `https://${domain}/external_api.js`;
-        script.async = true;
-        script.onload = initJitsi;
-        script.onerror = () => { if (!disposedRef.current) setLoadState('error'); };
-        document.head.appendChild(script);
-      }
-    }
+    // L'API arriva dal server della conferenza, un host diverso dal portale:
+    // un certificato che il browser non ha accettato, o una rete che lo
+    // blocca, finiscono qui come 'unreachable' (vedi external-api-loader).
+    const detachLoader = loadExternalApi(domain, {
+      onLoad: initJitsi,
+      onError: () => {
+        if (!disposedRef.current) setLoadState('unreachable');
+      },
+    });
 
     return () => {
       disposedRef.current = true;
       initializingRef.current = false;
       observerRef.current?.disconnect();
       observerRef.current = null;
-      if (attachedScript && scriptLoadHandler) {
-        attachedScript.removeEventListener('load', scriptLoadHandler);
-      }
+      detachLoader();
       // ADR-013 Fase 0 — svuota il buffer residuo prima di staccare i
       // listener/iframe, così non perdiamo gli ultimi cambi di speaker.
       window.removeEventListener('pagehide', handlePageHide);
@@ -684,24 +680,60 @@ export default function JitsiRoom({
   // NOTE: locale is intentionally excluded from deps to prevent iframe
   // recreation (and user disconnection) when the user switches language.
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [domain, roomName, jwt, displayName, role, participantsCanUnmute, participantsCanStartVideo, participantsCanShareScreen, enableFileSharing, whiteboardEnabled, videoQuality, reactionsMode, rnnoiseEnforceOff, startWithVideoMuted, startWithAudioMuted]);
+  }, [domain, roomName, jwt, displayName, role, participantsCanUnmute, participantsCanStartVideo, participantsCanShareScreen, enableFileSharing, whiteboardEnabled, whiteboardInfraReady, videoQuality, reactionsMode, rnnoiseEnforceOff, startWithVideoMuted, startWithAudioMuted, attempt, insecure]);
 
   return (
     <div className="jitsi-wrapper position-relative">
-      {loadState === 'loading' && (
-        <div className="position-absolute top-50 start-50 translate-middle text-center">
-          <Spinner active double />
-          <p className="mt-3 text-white-50">{t('connecting')}</p>
-        </div>
-      )}
-
-      {loadState === 'error' && (
+      {insecure ? (
         <div
           className="position-absolute top-50 start-50 translate-middle"
           style={{ width: '90%', maxWidth: '500px' }}
         >
-          <Alert color="danger">{t('connectionError')}</Alert>
+          <InsecureContextNotice />
         </div>
+      ) : (
+        <>
+          {loadState === 'loading' && (
+            <div className="position-absolute top-50 start-50 translate-middle text-center">
+              <Spinner active double />
+              <p className="mt-3 text-white-50">{t('connecting')}</p>
+            </div>
+          )}
+
+          {(loadState === 'unreachable' || loadState === 'error') && (
+            <div
+              className="position-absolute top-50 start-50 translate-middle"
+              style={{ width: '90%', maxWidth: '500px' }}
+            >
+              {loadState === 'unreachable' ? (
+                // Niente <Icon> dentro <Alert>: Bootstrap Italia disegna gia'
+                // la sua. Il browser non dice se e' il certificato o la rete:
+                // il testo copre entrambi e porta all'host da aprire.
+                <Alert color="danger" className="text-start mb-0">
+                  <strong className="d-block mb-1">{t('conferenceUnreachableTitle')}</strong>
+                  <span className="d-block mb-2">
+                    {t('conferenceUnreachableBody', { host: domain })}
+                  </span>
+                  <a
+                    href={`https://${domain}/`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="fw-semibold"
+                  >
+                    {t('conferenceOpenHost', { host: domain })}
+                  </a>
+                </Alert>
+              ) : (
+                <Alert color="danger" className="mb-0">{t('connectionError')}</Alert>
+              )}
+              <div className="text-center mt-3">
+                <Button color="primary" onClick={retry}>
+                  {tc('retry')}
+                </Button>
+              </div>
+            </div>
+          )}
+        </>
       )}
 
       <div

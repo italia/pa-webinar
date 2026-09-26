@@ -127,7 +127,8 @@
         "outlook": "Outlook / Office 365",
         "yahoo": "Yahoo Calendar",
         "downloadIcs": "Download .ics-fil"
-      }
+      },
+      "registrationEnded": "Begivenheden er afsluttet: tilmeldingen er lukket."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -368,7 +369,8 @@
       "questionRestore": "Gendan",
       "questionStatusFailed": "Spørgsmålet kunne ikke opdateres",
       "questionNeedsText": "Skriv teksten til dit spørgsmål: en vedhæftet fil alene kommer ikke i køen",
-      "lensTruncated": "Kun de nyeste beskeder er indlæst: der kan være ældre spørgsmål, som ikke er på listen."
+      "lensTruncated": "Kun de nyeste beskeder er indlæst: der kan være ældre spørgsmål, som ikke er på listen.",
+      "attachUnavailable": "Vedhæftede filer er ikke tilgængelige på denne installation."
     },
     "role": {
       "moderator": "Moderator",
@@ -389,7 +391,8 @@
         "unknown": "Ikke tilgængelig"
       },
       "volume": "Lydstyrke",
-      "volumeFor": "Lydstyrke for {name}"
+      "volumeFor": "Lydstyrke for {name}",
+      "kickName": "Fjern {name}"
     },
     "moderator": {
       "muteAll": "Slå alle fra",
@@ -453,7 +456,18 @@
       "remainingLabel": "Resterende tid (klik for forbrugt tid)",
       "elapsedLabel": "Forbrugt tid (klik for resterende tid)"
     },
-    "videoCallFrameTitle": "Arrangementets videoopkald"
+    "videoCallFrameTitle": "Arrangementets videoopkald",
+    "insecureContextTitle": "Usikker adresse",
+    "insecureContextBody": "Denne side er åbnet via http://: browseren tillader ikke brug af mikrofon og kamera, og videoopkaldet kan ikke starte. Åbn den samme side på den sikre adresse.",
+    "insecureContextLink": "Åbn https://{host}",
+    "conferenceUnreachableTitle": "Tjenesten til videoopkald svarer ikke",
+    "conferenceUnreachableBody": "Din browser kan ikke nå serveren til videoopkald ({host}). Åbn den i en ny fane: hvis browseren viser en sikkerhedsadvarsel, så accepter den, vend derefter tilbage hertil og prøv igen. Hvis siden ikke åbner, blokerer det netværk, du er forbundet til, den muligvis.",
+    "conferenceOpenHost": "Åbn {host} i en ny fane",
+    "leftTitle": "Du har forladt rummet",
+    "leftMessage": "Begivenheden er stadig i gang: du kan gå ind igen, når du vil.",
+    "leftModeratorReminder": "Begivenheden forbliver åben, indtil nogen afslutter den. Når I er færdige, så gå ind igen og vælg »{action}«.",
+    "rejoin": "Gå ind igen",
+    "backToHome": "Tilbage til forsiden"
   },
   "qa": {
     "title": "Spørgsmål og svar",
@@ -590,7 +604,8 @@
       "errorGeneric": "Fejl under upload af filen",
       "helpImage": "Understøttede formater: PNG, JPEG, WebP, SVG, GIF — maks. 10 MB",
       "helpAudio": "Understøttede formater: MP3, WAV, OGG, M4A, WebM — maks. 20 MB",
-      "helpDocument": "Understøttede formater: PDF, DOCX, PPTX, XLSX, TXT — maks. 25 MB"
+      "helpDocument": "Understøttede formater: PDF, DOCX, PPTX, XLSX, TXT — maks. 25 MB",
+      "uploadsUnavailable": "Upload af filer er ikke tilgængelig i denne installation: indsæt i stedet filens URL."
     },
     "rubricaPicker": {
       "loading": "Søger…",
@@ -628,7 +643,9 @@
           "endsAt": "Slutdatoen skal være efter startdatoen.",
           "titleRequired": "Titlen er obligatorisk (mindst 3 tegn).",
           "titleRequiredOtherLocale": "Titlen på standardsproget ({locale}) er obligatorisk: skift til fanen {locale}.",
-          "maxParticipants": "Indtast et tal mellem 2 og 500."
+          "maxParticipants": "Indtast et tal mellem 2 og 500.",
+          "descriptionRequired": "Beskrivelsen er obligatorisk (mindst {min} tegn).",
+          "descriptionRequiredOtherLocale": "Beskrivelsen på standardsproget ({locale}) er obligatorisk: skift til fanen {locale}."
         },
         "senderRatioLabel": "Estimeret andel aktive",
         "senderRatioHelp": "Hvor mange deltagere forventes at have mikrofon/video aktiveret. Hjælper med at dimensionere videoserveren.",
@@ -820,7 +837,11 @@
         "speakers": "talere",
         "materials": "materialer",
         "questionnaires": "spørgeskemaer"
-      }
+      },
+      "revocationFailed": "Tilbagekaldelsen af adgangen for {name} mislykkedes: adgangslinket er stadig gyldigt. Gem igen for at prøve igen, eller tilbagekald det under fanen »{tab}« på arrangementets side.",
+      "validationFailedDetail": "Serveren afviste nogle data: {reason}. Ret dem, og prøv igen.",
+      "publishFailed": "Arrangementet blev oprettet, men ikke offentliggjort: det er stadig en kladde. Offentliggør det fra arrangementets side.",
+      "publishFailedDetail": "Arrangementet blev oprettet, men ikke offentliggjort: det er stadig en kladde. Serveren svarede: {reason}. Offentliggør det fra arrangementets side."
     },
     "nav": {
       "events": "Begivenhedsstyring",
@@ -1240,7 +1261,7 @@
       "wordCloudEnabled": "Live-ordsky",
       "wordCloudEnabledDesc": "Deltagerne sender et ord, og skyen opdateres live. Nyttigt til at åbne en drøftelse eller indsamle en stemning på få sekunder.",
       "whiteboardEnabled": "Delt whiteboard",
-      "whiteboardEnabledDesc": "Aktiverer det indbyggede whiteboard til samarbejde (Excalidraw): moderatorerne kan åbne det fra værktøjslinjen under arrangementet. Altid slået til ved øjeblikkelige opkald.",
+      "whiteboardEnabledDesc": "Aktiverer det indbyggede whiteboard til samarbejde (Excalidraw): moderatorerne kan åbne det fra værktøjslinjen under arrangementet. Kræver installationens whiteboard-tjeneste; hvor den findes, er det altid slået til ved øjeblikkelige opkald.",
       "autoStartRecording": "Start optagelsen automatisk",
       "autoStartRecordingDesc": "Når arrangementet starter, går optagelsen i gang af sig selv (uden at spørge moderatoren). På den måde finder evt. forsinkede deltagere afspilleren klar.",
       "aiSectionHeading": "Automatisk efterbehandling",
@@ -1316,7 +1337,8 @@
       "retentionPreviewRecordings": "Videooptagelser",
       "retentionPreviewKept": "Aggregerede statistikker og begivenhedsmetadata bevares.",
       "configPreview": "Forhåndsvisning af konfiguration",
-      "templateApplied": "Skabelon anvendt: {name}. Du kan ændre alle indstillinger."
+      "templateApplied": "Skabelon anvendt: {name}. Du kan ændre alle indstillinger.",
+      "whiteboardUnavailable": "Ikke tilgængelig på denne installation: Jitsis whiteboard-tjeneste mangler, og platformens administrator kan aktivere den."
     },
     "links": {
       "title": "Begivenhedslinks",
@@ -1925,9 +1947,9 @@
       "version": "Version",
       "environment": "Miljø",
       "modes": {
-        "simple": "Simpel (Docker Compose)",
-        "standard": "Standard (Kubernetes)",
-        "full": "Fuld (Kubernetes med scale-to-zero)",
+        "simple": "Simpel",
+        "standard": "Standard",
+        "full": "Fuld (bridges med scale-to-zero)",
         "unknown": "Ukendt"
       },
       "database": {
@@ -1941,7 +1963,9 @@
         "title": "Jitsi Meet",
         "reachable": "Tilgængelig",
         "unreachable": "Ikke tilgængelig",
-        "notConfigured": "Ikke konfigureret"
+        "notConfigured": "Ikke konfigureret",
+        "degraded": "Tilgængelig, men svarer med fejl eller langsomt",
+        "publicCheckFailed": "Kontrollen på den offentlige adresse mislykkedes ({code}): portalserveren accepterer ikke certifikatet eller navnet. Konferencerne kan stadig fungere."
       },
       "jvb": {
         "title": "Video Bridge (JVB)",
@@ -1949,7 +1973,9 @@
         "replicas": "{current}/{max} noder",
         "preScale": "Pre-scale: {minutes} min",
         "fixedMode": "Fast tilstand",
-        "scalerEnabled": "Scaler aktiveret"
+        "scalerEnabled": "Scaler aktiveret",
+        "fixedDown": "Videobroen svarer ikke",
+        "unmonitored": "Ikke overvåget: broens adresse (JVB_HEALTH_URL) er ikke angivet"
       },
       "jibri": {
         "title": "Optagelse (Jibri)",
@@ -1971,7 +1997,11 @@
         "metrics": "Metrikendepunkt"
       },
       "note": "Infrastrukturændringer foretages via Helm values og CI/CD-pipelinen.",
-      "deployDocs": "Implementeringsdokumentation"
+      "deployDocs": "Implementeringsdokumentation",
+      "platforms": {
+        "kubernetes": "På Kubernetes",
+        "other": "Uden for Kubernetes (Docker Compose eller en enkelt server)"
+      }
     },
     "instantCalls": {
       "title": "Hurtige opkald",
@@ -2076,9 +2106,9 @@
       "latencyP99": "Latens P99",
       "requestRate": "Anmodninger/s",
       "chartLatencyQuantiles": "Applikationslatens — P50 / P95 / P99",
-      "participantsNow": "Aktive deltagere",
+      "participantsNow": "Deltagere på videobroen",
       "jvbStress": "JVB-belastning",
-      "conferences": "Aktive konferencer",
+      "conferences": "Konferencer på videobroen",
       "octoRelay": "Octo inter-bridge-relay",
       "interBridge": "Octo-trafik",
       "chartCpu": "CPU usage",
@@ -2105,7 +2135,8 @@
       "liveNow": "LIVE",
       "provisioningNow": "under klargøring",
       "idleNow": "IDLE (på pause)",
-      "scaleToZeroHelp": "IDLE er normaltilstanden for et arrangement uden trafik ud over henstandsperioden. Ved næste brugerbesøg går det tilbage til PROVISIONING og derefter LIVE."
+      "scaleToZeroHelp": "IDLE er normaltilstanden for et arrangement uden trafik ud over henstandsperioden. Ved næste brugerbesøg går det tilbage til PROVISIONING og derefter LIVE.",
+      "capacityFromStatus": "Aktuelle værdier læst fra videobroen. Historikken kræver Prometheus."
     },
     "bulk": {
       "selectAll": "Vælg alle",
@@ -2824,7 +2855,8 @@
       "quotaExceeded": "Denne begivenhed har nået grænsen for uploadede filer ({maxFiles} filer, {maxMb} MB i alt): fjern nogle for at uploade flere",
       "uploadBusy": "For mange uploads lige nu: prøv igen om et par sekunder",
       "deleteFailed": "Materialet kunne ikke slettes"
-    }
+    },
+    "addedByStaff": "Tilføjet af arrangørerne"
   },
   "reminders": {
     "title": "Påmindelser",
@@ -2897,7 +2929,7 @@
       "requestSubmittedBody": "Hvis e-mailadressen svarer til en tilmelding, har vi sendt dig et link til at bekræfte sletningen. Linket er gyldigt i 1 time.",
       "linkInvalid": "Linket er ugyldigt eller udløbet. Anmod om et nyt link.",
       "confirmWarning": "Du er ved at slette alle personoplysninger tilknyttet din e-mailadresse permanent.",
-      "confirmBody": "Tilmeldinger, spørgsmål, afstemningsstemmer, feedback og påmindelser slettes. Handlingen kan ikke fortrydes.",
+      "confirmBody": "Tilmeldinger, spørgsmål, afstemningsstemmer, feedback, påmindelser og din post i arrangementsadressebogen slettes. Handlingen kan ikke fortrydes.",
       "confirmButton": "Bekræft sletning",
       "cancel": "Annuller",
       "processing": "Sletter...",
@@ -3120,7 +3152,7 @@
     "nodesReady": "noder klar",
     "scaling": "skalerer",
     "jvbStress": "JVB-belastning",
-    "participantsConnected": "deltagere forbundet",
+    "participantsConnected": "deltagere på videobroen",
     "videoInteractive": "interaktiv",
     "videoWebinar": "webinar",
     "participantsAvailable": "deltagere tilgængelige",
@@ -3164,7 +3196,12 @@
       "lastFailure": "Seneste fejl {when}",
       "artifactsProduced": "{count, plural, =0 {ingen artefakter} one {1 artefakt produceret} other {# artefakter produceret}}",
       "eventsEnabled": "{count, plural, =0 {ingen arrangementer med AI} one {1 arrangement med AI slået til} other {# arrangementer med AI slået til}}"
-    }
+    },
+    "jvbFixedUp": "{count, plural, =1 {Videobro aktiv} other {Videobro aktiv · # bridges planlagt}}",
+    "jvbFixedDown": "Videobroen svarer ikke",
+    "jvbFixedDownDetail": "Deltagerne modtager hverken lyd eller video, før broen er tilgængelig igen.",
+    "jvbUnmonitored": "Status ikke overvåget",
+    "jvbUnmonitoredDetail": "Denne installation forespørger ikke videobroen, så dens status er ikke tilgængelig her."
   },
   "infraMap": {
     "loading": "Indlæser infrastrukturkort...",
@@ -3172,8 +3209,8 @@
     "ariaLabel": "Systeminfrastrukturkort",
     "title": "Infrastrukturkort",
     "subtitle": "Realtidsvisualisering af arkitekturen og servicestatus",
-    "participants": "Deltagere",
-    "conferences": "Konferencer",
+    "participants": "Deltagere på videobroen",
+    "conferences": "Konferencer på videobroen",
     "bandwidthIn": "Indgående båndbredde",
     "bandwidthOut": "Udgående båndbredde",
     "recordings": "Optagelser",
@@ -3259,23 +3296,33 @@
       "jitsiWeb": {
         "healthy": "Videokonferencerummet er tilgængeligt og klar til begivenheder.",
         "down": "Videokonferencerummet er ikke tilgængeligt. Det er ikke muligt at starte eller deltage i begivenheder.",
-        "standby": "Videokonferencerummet er ikke konfigureret."
+        "standby": "Videokonferencerummet er ikke konfigureret.",
+        "degraded": "Videokonferencerummet svarer, men med fejl eller langsomt.",
+        "publicCheckFailed": "Portalen kan ikke kontrollere rummet på dets offentlige adresse: set fra serveren er certifikatet eller navnet ikke gyldigt. Rummet kan stadig fungere for deltagerne.",
+        "unmonitored": "Videokonferencerummets status overvåges ikke i denne installation."
       },
       "prosody": {
         "healthy": "Intern beskedhåndtering mellem videotjenester fungerer korrekt.",
         "down": "Intern beskedhåndtering er ikke tilgængelig. Videotjenester kan ikke kommunikere med hinanden.",
-        "standby": "Beskedtjenesten er ikke konfigureret."
+        "standby": "Beskedtjenesten er ikke konfigureret.",
+        "degraded": "Den interne beskedhåndtering svarer, men med fejl eller langsomt.",
+        "publicCheckFailed": "Portalen kan ikke kontrollere den interne beskedhåndtering via rummets offentlige adresse: set fra serveren er certifikatet eller navnet ikke gyldigt. Konferencerne kan stadig fungere.",
+        "unmonitored": "Den interne beskedhåndterings status overvåges ikke i denne installation."
       },
       "jicofo": {
         "healthy": "Konferencekoordinatoren er aktiv og styrer sessioner.",
         "down": "Konferencekoordinatoren er ikke tilgængelig. Det er ikke muligt at oprette nye konferencer.",
-        "standby": "Konferencekoordinatoren er ikke konfigureret."
+        "standby": "Konferencekoordinatoren er ikke konfigureret.",
+        "degraded": "Konferencekoordinatoren svarer, men med fejl eller langsomt.",
+        "unmonitored": "Konferencekoordinatorens status overvåges ikke i denne installation."
       },
       "jvb": {
         "healthy": "Videobroen er aktiv og overfører lyd/video til deltagere.",
         "scaling": "Videobroen forbereder sig til en kommende begivenhed. Servere oprettes automatisk.",
         "standby": "Videobroen er på standby. Den aktiveres automatisk, inden en planlagt begivenhed starter.",
-        "stale": "Et arrangement venter på videobridgen længere end den konfigurerede timeout. Kontrollér cluster-autoskaleren og JVB-poddenes logs."
+        "stale": "Et arrangement venter på videobridgen længere end den konfigurerede timeout. Kontrollér cluster-autoskaleren og JVB-poddenes logs.",
+        "fixedDown": "Videobroen svarer ikke. Konferencerne overfører hverken lyd eller video, før den er tilgængelig igen.",
+        "unmonitored": "Videobroens status overvåges ikke i denne installation: portalen har ingen adresse at forespørge den på."
       },
       "jibri": {
         "healthy": "Optagelsestjenesten er klar og tilgængelig.",
@@ -3307,7 +3354,8 @@
       "jibri": "Begivenheder kan ikke optages. Deltagere kan stadig deltage.",
       "jibriStale": "Et arrangement med optagelse aktiveret venter på Jibri ud over timeout: sessionen optages ikke.",
       "smtp": "Bekræftelsesmails og påmindelser vil ikke blive sendt.",
-      "postprodDegraded": "Transskriptionerne og resuméerne for nogle nylige optagelser blev ikke genereret. Videooptagelserne er stadig tilgængelige."
+      "postprodDegraded": "Transskriptionerne og resuméerne for nogle nylige optagelser blev ikke genereret. Videooptagelserne er stadig tilgængelige.",
+      "jvbDown": "Deltagerne modtager hverken lyd eller video."
     },
     "overallVerdicts": {
       "operational": "Alle tjenester fungerer korrekt. Platformen er fuldt operationel.",
@@ -3337,7 +3385,8 @@
       "degraded": "Forringet",
       "down": "Nede",
       "standby": "I standby",
-      "scaling": "Forbereder"
+      "scaling": "Forbereder",
+      "unknown": "Ikke overvåget"
     },
     "metrics": {
       "uptime24h": "Oppetid 24t",
@@ -3348,7 +3397,8 @@
       "errorRate": "5xx-fejl",
       "requestRate": "Anmodninger/s",
       "podUptime": "Pod-oppetid"
-    }
+    },
+    "probeDetail": "Resultat af kontrollen"
   },
   "feedback": {
     "title": "Hvordan vurderer du denne begivenhed?",
@@ -3673,7 +3723,9 @@
       "almostReady": "Videoserveren kører: næsten klar",
       "almostReadyDetail": "Et øjeblik endnu, så aktiveres deltagelsesknappen af sig selv.",
       "honestHint": "Sædvanlig ventetid: under et minut hvis infrastrukturen allerede er varm, 3–5 minutter ved første opstart. I mellemtiden kan du tjekke kamera og mikrofon eller bruge chatten.",
-      "elapsed": "under forberedelse i {time}"
+      "elapsed": "under forberedelse i {time}",
+      "scheduled": "Rummet åbner på starttidspunktet",
+      "scheduledDetail": "Eller tidligere, når arrangøren starter begivenheden. I mellemtiden kan du tjekke kamera og mikrofon eller bruge chatten."
     },
     "exitWaiting": "Forlad venteværelset",
     "warmingUp": "Lokalet klargøres",
@@ -3729,7 +3781,10 @@
       "hostEarly": "Tidlig adgang (vært)"
     },
     "roomJustOpened": "Rummet er klar — kom ind",
-    "enterAnyway": "Gå ind alligevel"
+    "enterAnyway": "Gå ind alligevel",
+    "notHeldBadge": "Tidspunktet er passeret",
+    "notHeldTitle": "Det planlagte tidspunkt for begivenheden er passeret",
+    "notHeldDetail": "Rummet blev ikke åbnet. Se begivenhedens side for eventuelle opdateringer."
   },
   "recording": {
     "management": "Videooptagelse",
@@ -3865,6 +3920,16 @@
     "noFeedback": "Ingen feedback modtaget",
     "comments": "Kommentarer",
     "noComments": "Ingen kommentarer",
+    "yes": "Ja",
+    "no": "Nej"
+  },
+  "questionnaire": {
+    "loadFailed": "Spørgeskemaet kunne ikke indlæses.",
+    "submit": "Send svar",
+    "submitFailed": "Afsendelsen mislykkedes. Prøv igen.",
+    "answersInvalid": "Nogle svar mangler eller er ugyldige: kontrollér de obligatoriske spørgsmål, og prøv igen.",
+    "alreadySubmitted": "Du har allerede sendt dine svar på dette spørgeskema.",
+    "thankYou": "Tak for dine svar.",
     "yes": "Ja",
     "no": "Nej"
   }

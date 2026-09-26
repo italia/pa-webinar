@@ -67,7 +67,6 @@ interface ChatMessage {
   id: string;
   /** Chiave opaca per il colore della bolla: mai l'id reale (vedi sender-key). */
   senderKey?: string;
-  senderId?: string;
   /** Deciso dal SERVER: un posto è condiviso, il client non può dedurlo. */
   mine?: boolean;
   canEdit?: boolean;
@@ -87,6 +86,13 @@ interface ChatMessage {
   /** Stato dato dal moderatore. Entrambi assenti = domanda ancora aperta. */
   answeredAt?: string | null;
   dismissedAt?: string | null;
+}
+
+/** Risposta di GET /chat: la cronologia e cosa questa installazione consente. */
+interface ChatHistoryResponse {
+  messages: ChatMessage[];
+  /** C'e' uno storage per i file: gli allegati possono riuscire. */
+  attachmentsEnabled?: boolean;
 }
 
 // Small static emoji set for the compose-box picker. Plain string
@@ -160,7 +166,12 @@ export default function ChatPanel({
   const needsFullReadRef = useRef(false);
 
   // Compose extras (authenticated members only).
-  const canAttach = !isGuest && !!token;
+  // Gli allegati servono uno storage per i file: lo dice `attachmentsEnabled`
+  // nella risposta di GET /chat. Finche' non lo si sa la graffetta resta
+  // nascosta — offrirla dove il caricamento risponde sempre 503 chiederebbe di
+  // riprovare qualcosa che non puo' riuscire.
+  const [attachmentsEnabled, setAttachmentsEnabled] = useState(false);
+  const canAttach = !isGuest && !!token && attachmentsEnabled;
   const [replyTo, setReplyTo] = useState<ChatReply | null>(null);
   /**
    * Chi scrive dichiara che il messaggio è una domanda. Si azzera dopo l'invio:
@@ -498,7 +509,8 @@ export default function ChatPanel({
         });
         if (res.status === 403 && !cancelled) setReadDenied(true);
         if (!res.ok || cancelled) return;
-        const data = (await res.json()) as { messages: ChatMessage[] };
+        const data = (await res.json()) as ChatHistoryResponse;
+        setAttachmentsEnabled(data.attachmentsEnabled === true);
         const mine: Record<string, Set<string>> = {};
         data.messages.forEach((m) => {
           seenIdsRef.current.add(m.id);
@@ -567,7 +579,8 @@ export default function ChatPanel({
           return 0;
         }
         if (!res.ok) return 0;
-        const data = (await res.json()) as { messages: ChatMessage[] };
+        const data = (await res.json()) as ChatHistoryResponse;
+        setAttachmentsEnabled(data.attachmentsEnabled === true);
         // Count messages the stream never delivered (still unseen) BEFORE upsert
         // marks them seen. A non-zero count on the POLL path means the SSE is
         // buffered, not merely quiet.
@@ -826,6 +839,16 @@ export default function ChatPanel({
         body: form,
       });
       if (!res.ok) {
+        const code = res.status === 503
+          ? ((await res.json().catch(() => null)) as { code?: string } | null)?.code
+          : undefined;
+        if (code === 'STORAGE_UNAVAILABLE') {
+          // Il server dice che lo storage per i file non c'e': «riprova» non
+          // servirebbe, quindi lo si dice e la graffetta si toglie.
+          setAttachmentsEnabled(false);
+          setComposeError(t('attachUnavailable'));
+          return;
+        }
         setComposeError(res.status === 413 ? t('attachTooLarge') : t('attachFailed'));
         return;
       }
@@ -1240,7 +1263,10 @@ export default function ChatPanel({
                       </div>
                     )}
                   </div>
-                  <div className="chat-panel__time">
+                  {/* La riga dell'ora fa da ancora al selettore delle reazioni:
+                      e' larga quanto il messaggio e sta dal suo lato, quindi il
+                      selettore si apre dentro la lista (vedi globals.scss). */}
+                  <div className="chat-panel__time chat-panel__time--anchor">
                     {formatTime(m.createdAt)}
                     {!isGuest && token && (
                       <button
@@ -1284,7 +1310,11 @@ export default function ChatPanel({
                         </svg>
                       </button>
                       {reactingId === m.id && (
-                        <span className="chat-panel__react-pop" role="group" aria-label={t('react')}>
+                        <span
+                          className={`chat-panel__react-pop${isOwn ? ' chat-panel__react-pop--own' : ''}`}
+                          role="group"
+                          aria-label={t('react')}
+                        >
                           {CHAT_REACTION_EMOJIS.map((e) => (
                             <button key={e} type="button" onClick={() => void toggleReaction(m.id, e)}>
                               {e}

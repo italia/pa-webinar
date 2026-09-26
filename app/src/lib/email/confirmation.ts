@@ -9,8 +9,8 @@
  */
 
 import { prisma } from '@/lib/db';
-import { decryptPII, tryDecryptPII } from '@/lib/crypto/pii';
-import { generateEventICal } from '@/lib/ical/generate';
+import { decryptPII } from '@/lib/crypto/pii';
+import { generateEventICal, ICS_ATTACHMENT_CONTENT_TYPE } from '@/lib/ical/generate';
 import {
   generateGoogleCalendarUrl,
   generateOutlookCalendarUrl,
@@ -32,6 +32,7 @@ import { formatDate, formatTime, formatDuration } from '@/lib/utils/date-format'
 import { getPublicEnv } from '@/lib/env';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import { linguaEmail } from '@/lib/email/lingua';
+import { rubricaOptOutUrl } from '@/lib/persons/opt-out-link';
 
 interface ConfirmationEmailInput {
   registrationId: string;
@@ -62,7 +63,11 @@ export async function sendConfirmationEmail(input: ConfirmationEmailInput): Prom
   try {
     const registration = await prisma.registration.findUnique({
       where: { id: input.registrationId },
-      include: { event: true },
+      include: {
+        event: true,
+        // Chi e' entrato in rubrica riceve il link per uscirne.
+        person: { select: { id: true, optedInToAddressBook: true } },
+      },
     });
 
     if (!registration) return;
@@ -101,9 +106,14 @@ export async function sendConfirmationEmail(input: ConfirmationEmailInput): Prom
       // Banner dell'evento in cima all'email (l'immagine c'era sulla pagina
       // pubblica ma non è mai arrivata in posta).
       eventImageUrl: absoluteEventImage(event, baseUrl),
+      addressBookOptOutUrl: rubricaOptOutUrl(registration.person, baseUrl, input.locale),
     };
 
+    // UID stabile e SEQUENCE dall'ultima modifica: la conferma, i promemoria e
+    // l'avviso di cambio data aggiornano la stessa voce di calendario.
     const icsContent = generateEventICal({
+      eventId: event.id,
+      updatedAt: event.updatedAt,
       title,
       description,
       startsAt: event.startsAt,
@@ -111,13 +121,6 @@ export async function sendConfirmationEmail(input: ConfirmationEmailInput): Prom
       timezone: event.timezone,
       url: input.eventPageUrl,
       organizerName: event.moderatorName ?? 'PA Webinar',
-      // moderatorEmail is stored AES-256-GCM encrypted — decrypt it before it
-      // becomes the iCal ORGANIZER mailto, otherwise calendar clients receive
-      // base64 ciphertext as the organizer address. (tryDecryptPII returns the
-      // decrypted email, leaves legacy plaintext as-is, and yields null only
-      // when the value is absent — so SMTP_FROM is the fallback for no organizer.)
-      organizerEmail:
-        tryDecryptPII(event.moderatorEmail) ?? process.env.SMTP_FROM ?? 'noreply@dominio.gov.it',
     });
 
     const override = await loadEmailTemplateOverride('confirmation', testi);
@@ -144,7 +147,7 @@ export async function sendConfirmationEmail(input: ConfirmationEmailInput): Prom
         {
           filename: 'event.ics',
           content: icsContent,
-          contentType: 'text/calendar; charset=utf-8; method=REQUEST',
+          contentType: ICS_ATTACHMENT_CONTENT_TYPE,
         },
       ],
       metadata: {

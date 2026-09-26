@@ -47,10 +47,10 @@ export const moderatorToolbarButtons = [
   'mute-everyone',
   'security',
   'participants-pane',
-  // NB: 'whiteboard' is NOT here — it's per-event opt-in (Event.whiteboardEnabled)
-  // and appended conditionally for moderators on desktop in JitsiRoom. Jitsi
-  // additionally feature-gates it on config.whiteboard.enabled (set server-side,
-  // test only), so it stays hidden on prod even when an event opted in.
+  // NB: 'whiteboard' NON è qui: JitsiRoom lo aggiunge solo per chi modera, da
+  // desktop, quando l'evento l'ha scelta (Event.whiteboardEnabled) E
+  // l'installazione ha il backend della lavagna (lib/jitsi/whiteboard.ts).
+  // Jitsi lo nasconde comunque se il suo config.whiteboard.enabled è spento.
 ];
 
 /**

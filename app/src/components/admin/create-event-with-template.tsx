@@ -69,6 +69,7 @@ interface Props {
   gdprTemplates: Array<{ id: string; name: string; isDefault: boolean }>;
   siteDefaultParseTitleKicker: boolean;
   siteDefaultVideoQuality: VideoQualityPreset;
+  whiteboardInfraReady: boolean;
 }
 
 export default function CreateEventWithTemplate({
@@ -85,6 +86,7 @@ export default function CreateEventWithTemplate({
   gdprTemplates,
   siteDefaultParseTitleKicker,
   siteDefaultVideoQuality,
+  whiteboardInfraReady,
 }: Props) {
   const t = useTranslations('admin.templates');
   const ti = useTranslations('admin.instantCall');
@@ -186,6 +188,7 @@ export default function CreateEventWithTemplate({
       gdprTemplates={gdprTemplates}
       siteDefaultParseTitleKicker={siteDefaultParseTitleKicker}
       siteDefaultVideoQuality={siteDefaultVideoQuality}
+      whiteboardInfraReady={whiteboardInfraReady}
     />
   );
 }

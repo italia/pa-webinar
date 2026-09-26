@@ -43,7 +43,11 @@ import { randomUUID } from 'crypto';
 import { z } from 'zod';
 
 import { withErrorHandling } from '@/lib/api-handler';
-import { extractModeratorToken, isEventModerator } from '@/lib/auth/moderator';
+import {
+  extractModeratorToken,
+  isEventModerator,
+  resolveGrantForEvent,
+} from '@/lib/auth/moderator';
 import { prisma } from '@/lib/db';
 import {
   AppError,
@@ -54,6 +58,7 @@ import {
   ValidationError,
 } from '@/lib/errors';
 import { eventParamWhere } from '@/lib/events/event-param';
+import { materialAddedBy, materialAuthorName } from '@/lib/events/material-author';
 import { discardUploadedBlob, materialFileUrl } from '@/lib/events/material-files';
 import { pokeLivePanel } from '@/lib/live-state/publish';
 import { getClientIp, rateLimit } from '@/lib/rate-limit';
@@ -140,7 +145,12 @@ export const POST = withErrorHandling(async (request, context) => {
 
   const storage = getFilesStorage();
   if (!storage) {
-    throw new AppError('Files storage is not configured', 503, 'STORAGE_UNAVAILABLE');
+    // Un'installazione senza storage per i file e' una configurazione
+    // ammessa, non un guasto: 503 per il client (che lo traduce dal codice),
+    // `warn` nel log.
+    const err = new AppError('Files storage is not configured', 503, 'STORAGE_UNAVAILABLE');
+    err.expected = true;
+    throw err;
   }
 
   // Il limite si controlla PRIMA di leggere il corpo in memoria. Il
@@ -170,7 +180,9 @@ export const POST = withErrorHandling(async (request, context) => {
   if (caricamentiInCorso >= CARICAMENTI_IN_CORSO_MAX) throw new RateLimitError(5);
   caricamentiInCorso++;
   try {
-    return await riceviECrea(request, event, storage, giaCaricati.bytes);
+    // Come per i link: un nome solo se gia' pubblico (lib/events/material-author).
+    const addedBy = materialAddedBy(await resolveGrantForEvent(event, token));
+    return await riceviECrea(request, event, addedBy, storage, giaCaricati.bytes);
   } finally {
     caricamentiInCorso--;
   }
@@ -183,7 +195,8 @@ export const POST = withErrorHandling(async (request, context) => {
  */
 async function riceviECrea(
   request: Request,
-  event: { id: string; moderatorName: string | null },
+  event: { id: string },
+  addedBy: string,
   storage: NonNullable<ReturnType<typeof getFilesStorage>>,
   bytesGiaCaricati: number,
 ): Promise<Response> {
@@ -265,9 +278,7 @@ async function riceviECrea(
         title,
         url: materialFileUrl(request, key),
         description: fields.data.description || null,
-        // Come per i link: il nome del conduttore dell'evento, mai quello
-        // (cifrato) di un co-moderatore, che qui finirebbe in chiaro.
-        addedBy: event.moderatorName ?? 'Moderator',
+        addedBy,
         fileName,
         fileSize: BigInt(buffer.byteLength),
         mimeType: mime,
@@ -294,7 +305,7 @@ async function riceviECrea(
       fileSize: buffer.byteLength,
       mimeType: material.mimeType,
       visibility: material.visibility,
-      addedBy: material.addedBy,
+      addedBy: materialAuthorName(material.addedBy),
       createdAt: material.createdAt.toISOString(),
     },
     { status: 201 },

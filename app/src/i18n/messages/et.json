@@ -127,7 +127,8 @@
         "outlook": "Outlook / Office 365",
         "yahoo": "Yahoo Calendar",
         "downloadIcs": "Laadi alla .ics fail"
-      }
+      },
+      "registrationEnded": "Üritus on lõppenud: registreerumine on suletud."
     },
     "manage": {
       "toggleChat": "Vestlus",
@@ -368,7 +369,8 @@
       "questionRestore": "Taasta",
       "questionStatusFailed": "Küsimust ei õnnestunud uuendada",
       "questionNeedsText": "Kirjutage küsimuse tekst: ainult manus järjekorda ei lähe",
-      "lensTruncated": "Laaditud on ainult uusimad sõnumid: vanemaid küsimusi ei pruugi loendis olla."
+      "lensTruncated": "Laaditud on ainult uusimad sõnumid: vanemaid küsimusi ei pruugi loendis olla.",
+      "attachUnavailable": "Manused ei ole selles paigalduses saadaval."
     },
     "role": {
       "moderator": "Moderaator",
@@ -389,7 +391,8 @@
         "unknown": "Pole saadaval"
       },
       "volume": "Helitugevus",
-      "volumeFor": "{name} helitugevus"
+      "volumeFor": "{name} helitugevus",
+      "kickName": "Eemalda {name}"
     },
     "moderator": {
       "muteAll": "Vaigista kõik",
@@ -453,7 +456,18 @@
       "remainingLabel": "Järelejäänud aeg (klõpsa, et näha kulunud aega)",
       "elapsedLabel": "Kulunud aeg (klõpsa, et näha järelejäänud aega)"
     },
-    "videoCallFrameTitle": "Sündmuse videokõne"
+    "videoCallFrameTitle": "Sündmuse videokõne",
+    "insecureContextTitle": "Turvamata aadress",
+    "insecureContextBody": "See leht on avatud http:// kaudu: brauser ei luba mikrofoni ja kaamerat kasutada ning videokõne ei saa alata. Avage sama leht turvalisel aadressil.",
+    "insecureContextLink": "Ava https://{host}",
+    "conferenceUnreachableTitle": "Videokõne teenus ei vasta",
+    "conferenceUnreachableBody": "Teie brauser ei saa videokõne serveriga ({host}) ühendust. Avage see uuel vahelehel: kui brauser näitab turvahoiatust, nõustuge sellega, seejärel tulge siia tagasi ja proovige uuesti. Kui leht ei avane, võib võrk, mille kaudu te ühendute, seda blokeerida.",
+    "conferenceOpenHost": "Ava {host} uuel vahelehel",
+    "leftTitle": "Lahkusite ruumist",
+    "leftMessage": "Üritus käib veel: võite igal ajal tagasi tulla.",
+    "leftModeratorReminder": "Üritus jääb avatuks, kuni keegi selle lõpetab. Kui olete lõpetanud, tulge tagasi ja valige „{action}“.",
+    "rejoin": "Tule tagasi",
+    "backToHome": "Tagasi avalehele"
   },
   "qa": {
     "title": "Küsimused ja vastused",
@@ -590,7 +604,8 @@
       "errorGeneric": "Faili üleslaadimisel tekkis viga",
       "helpImage": "Toetatud vormingud: PNG, JPEG, WebP, SVG, GIF — max 10 MB",
       "helpAudio": "Toetatud vormingud: MP3, WAV, OGG, M4A, WebM — max 20 MB",
-      "helpDocument": "Toetatud vormingud: PDF, DOCX, PPTX, XLSX, TXT — max 25 MB"
+      "helpDocument": "Toetatud vormingud: PDF, DOCX, PPTX, XLSX, TXT — max 25 MB",
+      "uploadsUnavailable": "Failide üleslaadimine ei ole selles paigalduses saadaval: kleepige selle asemel faili URL."
     },
     "rubricaPicker": {
       "loading": "Otsin…",
@@ -628,7 +643,9 @@
           "endsAt": "Lõpukuupäev peab olema pärast alguskuupäeva.",
           "titleRequired": "Pealkiri on kohustuslik (vähemalt 3 tähemärki).",
           "titleRequiredOtherLocale": "Pealkiri vaikekeeles ({locale}) on kohustuslik: mine vahekaardile {locale}.",
-          "maxParticipants": "Sisesta arv vahemikus 2 kuni 500."
+          "maxParticipants": "Sisesta arv vahemikus 2 kuni 500.",
+          "descriptionRequired": "Kirjeldus on kohustuslik (vähemalt {min} märki).",
+          "descriptionRequiredOtherLocale": "Kirjeldus vaikekeeles ({locale}) on kohustuslik: mine vahekaardile {locale}."
         },
         "senderRatioLabel": "Hinnanguline aktiivsete osakaal",
         "senderRatioHelp": "Mitu osalejat eeldatavasti aktiveerib mikrofoni/video. Aitab kohandada videoserveri mahtu.",
@@ -820,7 +837,11 @@
         "speakers": "esinejad",
         "materials": "materjalid",
         "questionnaires": "küsimustikud"
-      }
+      },
+      "revocationFailed": "Ligipääsu tühistamine ebaõnnestus ({name}): ligipääsulink kehtib endiselt. Salvesta uuesti, et uuesti proovida, või tühista see sündmuse lehe vahekaardil „{tab}“.",
+      "validationFailedDetail": "Server lükkas osa andmetest tagasi: {reason}. Paranda ja proovi uuesti.",
+      "publishFailed": "Sündmus loodi, kuid seda ei avaldatud: see on endiselt mustand. Avalda see sündmuse lehelt.",
+      "publishFailedDetail": "Sündmus loodi, kuid seda ei avaldatud: see on endiselt mustand. Server vastas: {reason}. Avalda see sündmuse lehelt."
     },
     "nav": {
       "events": "Ürituste haldus",
@@ -1240,7 +1261,7 @@
       "wordCloudEnabled": "Reaalajas sõnapilv",
       "wordCloudEnabledDesc": "Osalejad saadavad sõna ja pilv uueneb reaalajas. Kasulik arutelu avamiseks või meeleolu kogumiseks mõne sekundiga.",
       "whiteboardEnabled": "Jagatud tahvel",
-      "whiteboardEnabledDesc": "Lubab sisseehitatud koostöötahvli (Excalidraw): moderaatorid saavad selle sündmuse ajal tööriistaribalt avada. Kiirkõnedes alati sees.",
+      "whiteboardEnabledDesc": "Lubab sisseehitatud koostöötahvli (Excalidraw): moderaatorid saavad selle sündmuse ajal tööriistaribalt avada. Nõuab paigalduse tahvliteenust; kus see on olemas, on tahvel kiirkõnedes alati sees.",
       "autoStartRecording": "Käivita salvestus automaatselt",
       "autoStartRecordingDesc": "Sündmuse alguses käivitub salvestus iseseisvalt (moderaatorilt kinnitust ei küsita). Hilinejad leiavad kohe järelejõudmismängija saadaval.",
       "aiSectionHeading": "Automaatne järeltöötlus",
@@ -1316,7 +1337,8 @@
       "retentionPreviewRecordings": "Videosalvestised",
       "retentionPreviewKept": "Koondstatistika ja ürituse metaandmed säilitatakse.",
       "configPreview": "Seadistuse eelvaade",
-      "templateApplied": "Mall rakendatud: {name}. Saate kõiki seadeid muuta."
+      "templateApplied": "Mall rakendatud: {name}. Saate kõiki seadeid muuta.",
+      "whiteboardUnavailable": "Selles paigalduses pole saadaval: puudub Jitsi tahvliteenus, mille saab sisse lülitada platvormi haldaja."
     },
     "links": {
       "title": "Ürituse lingid",
@@ -1925,9 +1947,9 @@
       "version": "Versioon",
       "environment": "Keskkond",
       "modes": {
-        "simple": "Lihtne (Docker Compose)",
-        "standard": "Standardne (Kubernetes)",
-        "full": "Täielik (Kubernetes koos scale-to-zero)",
+        "simple": "Lihtne",
+        "standard": "Standardne",
+        "full": "Täielik (sillad koos scale-to-zero'ga)",
         "unknown": "Tundmatu"
       },
       "database": {
@@ -1941,7 +1963,9 @@
         "title": "Jitsi Meet",
         "reachable": "Kättesaadav",
         "unreachable": "Kättesaamatu",
-        "notConfigured": "Seadistamata"
+        "notConfigured": "Seadistamata",
+        "degraded": "Kättesaadav, kuid vastab vigadega või aeglaselt",
+        "publicCheckFailed": "Kontroll avalikul aadressil ebaõnnestus ({code}): portaali server ei aktsepteeri sertifikaati või nime. Konverentsid võivad siiski töötada."
       },
       "jvb": {
         "title": "Video Bridge (JVB)",
@@ -1949,7 +1973,9 @@
         "replicas": "{current}/{max} sõlme",
         "preScale": "Eelskaala: {minutes} min",
         "fixedMode": "Fikseeritud režiim",
-        "scalerEnabled": "Skaleerija lubatud"
+        "scalerEnabled": "Skaleerija lubatud",
+        "fixedDown": "Videosild ei vasta",
+        "unmonitored": "Ei jälgita: silla aadress (JVB_HEALTH_URL) pole määratud"
       },
       "jibri": {
         "title": "Salvestamine (Jibri)",
@@ -1971,7 +1997,11 @@
         "metrics": "Mõõdikute lõpp-punkt"
       },
       "note": "Infrastruktuuri muudatused tehakse Helmi konfiguratsiooni ja CI/CD torustiku kaudu.",
-      "deployDocs": "Juurutusdokumentatsioon"
+      "deployDocs": "Juurutusdokumentatsioon",
+      "platforms": {
+        "kubernetes": "Kubernetesis",
+        "other": "Väljaspool Kubernetest (Docker Compose või üksik server)"
+      }
     },
     "instantCalls": {
       "title": "Kiirkõned",
@@ -2076,9 +2106,9 @@
       "latencyP99": "Latentsus P99",
       "requestRate": "Päringud/s",
       "chartLatencyQuantiles": "Rakenduse latentsus — P50 / P95 / P99",
-      "participantsNow": "Aktiivsed osalejad",
+      "participantsNow": "Osalejad videosillal",
       "jvbStress": "JVB koormus",
-      "conferences": "Aktiivsed konverentsid",
+      "conferences": "Konverentsid videosillal",
       "octoRelay": "Octo sildadevaheline relee",
       "interBridge": "Octo liiklus",
       "chartCpu": "CPU usage",
@@ -2105,7 +2135,8 @@
       "liveNow": "LIVE",
       "provisioningNow": "ettevalmistus",
       "idleNow": "IDLE (pausil)",
-      "scaleToZeroHelp": "IDLE on tavaline olek sündmusele, millel pole liiklust kauem kui ajapikenduse jooksul. Järgmise kasutaja külastusel läheb see PROVISIONING-i ja seejärel LIVE-iks."
+      "scaleToZeroHelp": "IDLE on tavaline olek sündmusele, millel pole liiklust kauem kui ajapikenduse jooksul. Järgmise kasutaja külastusel läheb see PROVISIONING-i ja seejärel LIVE-iks.",
+      "capacityFromStatus": "Praegused väärtused on loetud videosillalt. Ajalugu nõuab Prometheust."
     },
     "bulk": {
       "selectAll": "Vali kõik",
@@ -2824,7 +2855,8 @@
       "quotaExceeded": "See sündmus on jõudnud üleslaaditud failide piirini ({maxFiles} faili, kokku {maxMb} MB): eemaldage mõni, et rohkem üles laadida",
       "uploadBusy": "Praegu on liiga palju üleslaadimisi: proovige mõne sekundi pärast uuesti",
       "deleteFailed": "Materjali ei õnnestunud kustutada"
-    }
+    },
+    "addedByStaff": "Lisasid korraldajad"
   },
   "reminders": {
     "title": "Teavitused",
@@ -2897,7 +2929,7 @@
       "requestSubmittedBody": "Kui see e-posti aadress vastab registreeringule, saatsime teile lingi kustutamise kinnitamiseks. Link kehtib 1 tund.",
       "linkInvalid": "See link on kehtetu või aegunud. Palun taotlege uus link.",
       "confirmWarning": "Olete jäädavalt kustutamas kõiki teie e-posti aadressiga seotud isikuandmeid.",
-      "confirmBody": "Kustutatakse registreeringud, küsimused, küsitluste hääled, tagasiside ja meeldetuletused. Toiming on pöördumatu.",
+      "confirmBody": "Kustutatakse registreeringud, küsimused, küsitluste hääled, tagasiside, meeldetuletused ja teie kirje ürituste aadressraamatus. Toiming on pöördumatu.",
       "confirmButton": "Kinnita kustutamine",
       "cancel": "Tühista",
       "processing": "Kustutamine...",
@@ -3120,7 +3152,7 @@
     "nodesReady": "valmis sõlmed",
     "scaling": "skaleerimine",
     "jvbStress": "JVB koormus",
-    "participantsConnected": "ühendatud osalejad",
+    "participantsConnected": "osalejat videosillal",
     "videoInteractive": "interaktiivne",
     "videoWebinar": "veebiseminar",
     "participantsAvailable": "saadaolevad osalejad",
@@ -3164,7 +3196,12 @@
       "lastFailure": "Viimane tõrge {when}",
       "artifactsProduced": "{count, plural, =0 {artefakte pole} one {1 artefakt loodud} other {# artefakti loodud}}",
       "eventsEnabled": "{count, plural, =0 {AI-ga sündmusi pole} one {1 sündmus aktiivse AI-ga} other {# sündmust aktiivse AI-ga}}"
-    }
+    },
+    "jvbFixedUp": "{count, plural, =1 {Videosild töötab} other {Videosild töötab · # silda ette nähtud}}",
+    "jvbFixedDown": "Videosild ei vasta",
+    "jvbFixedDownDetail": "Osalejad ei saa heli ega videot, kuni sild on taas kättesaadav.",
+    "jvbUnmonitored": "Olekut ei jälgita",
+    "jvbUnmonitoredDetail": "See paigaldus ei päri videosilla olekut, seega pole see siin saadaval."
   },
   "infraMap": {
     "loading": "Infrastruktuuri kaardi laadimine...",
@@ -3172,8 +3209,8 @@
     "ariaLabel": "Süsteemi infrastruktuuri kaart",
     "title": "Infrastruktuuri kaart",
     "subtitle": "Arhitektuuri ja teenuste oleku reaalajas visualiseerimine",
-    "participants": "Osalejad",
-    "conferences": "Konverentsid",
+    "participants": "Osalejad videosillal",
+    "conferences": "Konverentsid videosillal",
     "bandwidthIn": "Sissetulev ribalaius",
     "bandwidthOut": "Väljaminev ribalaius",
     "recordings": "Salvestused",
@@ -3259,23 +3296,33 @@
       "jitsiWeb": {
         "healthy": "Videokonverentsi ruum on kättesaadav ja sündmusteks valmis.",
         "down": "Videokonverentsi ruum ei ole kättesaadav. Sündmusi ei saa alustada ega nendega liituda.",
-        "standby": "Videokonverentsi ruum ei ole seadistatud."
+        "standby": "Videokonverentsi ruum ei ole seadistatud.",
+        "degraded": "Videokonverentsi ruum vastab, kuid vigadega või aeglaselt.",
+        "publicCheckFailed": "Portaal ei saa ruumi selle avalikul aadressil kontrollida: serveri vaatest pole sertifikaat või nimi kehtiv. Osalejate jaoks võib ruum siiski töötada.",
+        "unmonitored": "Videokonverentsi ruumi olekut selles paigalduses ei jälgita."
       },
       "prosody": {
         "healthy": "Sisemine sõnumivahetus videoteenuste vahel töötab korrektselt.",
         "down": "Sisemine sõnumivahetus ei ole kättesaadav. Videoteenused ei saa omavahel suhelda.",
-        "standby": "Sõnumivahetusteenus ei ole seadistatud."
+        "standby": "Sõnumivahetusteenus ei ole seadistatud.",
+        "degraded": "Sisemine sõnumivahetus vastab, kuid vigadega või aeglaselt.",
+        "publicCheckFailed": "Portaal ei saa sisemist sõnumivahetust ruumi avaliku aadressi kaudu kontrollida: serveri vaatest pole sertifikaat või nimi kehtiv. Konverentsid võivad siiski töötada.",
+        "unmonitored": "Sisemise sõnumivahetuse olekut selles paigalduses ei jälgita."
       },
       "jicofo": {
         "healthy": "Konverentside koordinaator on aktiivne ja haldab seansse.",
         "down": "Konverentside koordinaator ei ole kättesaadav. Uusi konverentse ei saa luua.",
-        "standby": "Konverentside koordinaator ei ole seadistatud."
+        "standby": "Konverentside koordinaator ei ole seadistatud.",
+        "degraded": "Konverentside koordinaator vastab, kuid vigadega või aeglaselt.",
+        "unmonitored": "Konverentside koordinaatori olekut selles paigalduses ei jälgita."
       },
       "jvb": {
         "healthy": "Videosild on aktiivne ja edastab heli/videot osalejatele.",
         "scaling": "Videosild valmistub eelseisvaks sündmuseks. Servereid luuakse automaatselt.",
         "standby": "Videosild on ooterežiimis. See aktiveerub automaatselt enne planeeritud sündmuse algust.",
-        "stale": "Sündmus ootab videosilda kauem kui konfigureeritud ajalimiit. Kontrollige klastri autoskaleerijat ja JVB podide logisid."
+        "stale": "Sündmus ootab videosilda kauem kui konfigureeritud ajalimiit. Kontrollige klastri autoskaleerijat ja JVB podide logisid.",
+        "fixedDown": "Videosild ei vasta. Konverentsid ei edasta heli ega videot, kuni see on taas kättesaadav.",
+        "unmonitored": "Videosilla olekut selles paigalduses ei jälgita: portaalil pole aadressi, mille kaudu seda pärida."
       },
       "jibri": {
         "healthy": "Salvestusteenus on valmis ja saadaval.",
@@ -3307,7 +3354,8 @@
       "jibri": "Sündmusi ei saa salvestada. Osalejad saavad endiselt liituda ja osaleda.",
       "jibriStale": "Aktiivse salvestusega sündmus ootab Jibrit kauem kui ajalimiit: sessiooni ei salvestata.",
       "smtp": "Registreerimise kinnitusmeile ja meeldetuletusi ei saadeta.",
-      "postprodDegraded": "Mõne hiljutise salvestise transkriptsioone ja kokkuvõtteid ei loodud. Videosalvestised on siiski saadaval."
+      "postprodDegraded": "Mõne hiljutise salvestise transkriptsioone ja kokkuvõtteid ei loodud. Videosalvestised on siiski saadaval.",
+      "jvbDown": "Osalejad ei saa heli ega videot."
     },
     "overallVerdicts": {
       "operational": "Kõik teenused töötavad korrektselt. Platvorm on täielikult töökorras.",
@@ -3337,7 +3385,8 @@
       "degraded": "Aeglustatud",
       "down": "Pole saadaval",
       "standby": "Ooterežiimis",
-      "scaling": "Ettevalmistus"
+      "scaling": "Ettevalmistus",
+      "unknown": "Ei jälgita"
     },
     "metrics": {
       "uptime24h": "Töötamisaeg 24h",
@@ -3348,7 +3397,8 @@
       "errorRate": "5xx vead",
       "requestRate": "Päringud/s",
       "podUptime": "Podi töötamisaeg"
-    }
+    },
+    "probeDetail": "Kontrolli tulemus"
   },
   "feedback": {
     "title": "Kuidas hindate seda üritust?",
@@ -3673,7 +3723,9 @@
       "almostReady": "Videoserver töötab: peaaegu valmis",
       "almostReadyDetail": "Veel hetk ja liitumisnupp aktiveerub ise.",
       "honestHint": "Tavaline ootus: alla minuti, kui taristu on juba soe, 3–5 minutit esmakäivitusel. Vahepeal saad kontrollida kaamerat ja mikrofoni või kasutada vestlust.",
-      "elapsed": "ettevalmistuses {time}"
+      "elapsed": "ettevalmistuses {time}",
+      "scheduled": "Ruum avaneb algusajal",
+      "scheduledDetail": "Või varem, kui korraldaja sündmuse käivitab. Vahepeal saad kontrollida kaamerat ja mikrofoni või kasutada vestlust."
     },
     "exitWaiting": "Lahku ooteruumist",
     "warmingUp": "Ruum valmistub",
@@ -3729,7 +3781,10 @@
       "hostEarly": "Varajane sissepääs (korraldaja)"
     },
     "roomJustOpened": "Ruum on valmis — tule sisse",
-    "enterAnyway": "Sisene siiski"
+    "enterAnyway": "Sisene siiski",
+    "notHeldBadge": "Aeg on möödas",
+    "notHeldTitle": "Sündmuse kavandatud aeg on möödas",
+    "notHeldDetail": "Ruumi ei avatud. Vaata sündmuse lehelt, kas on uudiseid."
   },
   "recording": {
     "management": "Videosalvestis",
@@ -3865,6 +3920,16 @@
     "noFeedback": "Tagasisidet ei ole saadud",
     "comments": "Kommentaarid",
     "noComments": "Kommentaare pole",
+    "yes": "Jah",
+    "no": "Ei"
+  },
+  "questionnaire": {
+    "loadFailed": "Küsimustikku ei õnnestunud laadida.",
+    "submit": "Saada vastused",
+    "submitFailed": "Saatmine ebaõnnestus. Proovi uuesti.",
+    "answersInvalid": "Mõned vastused puuduvad või ei ole kehtivad: kontrolli kohustuslikke küsimusi ja proovi uuesti.",
+    "alreadySubmitted": "Oled sellele küsimustikule juba vastanud.",
+    "thankYou": "Täname vastuste eest.",
     "yes": "Jah",
     "no": "Ei"
   }

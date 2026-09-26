@@ -16,12 +16,13 @@ interface InfrastructurePanelProps {
   info: InfrastructureInfo;
 }
 
-type StatusColor = 'success' | 'secondary' | 'danger';
+type StatusColor = 'success' | 'secondary' | 'warning' | 'danger';
 
 function statusDot(color: StatusColor) {
   const colorMap: Record<StatusColor, string> = {
     success: '#28a745',
     secondary: '#adb5bd',
+    warning: '#A66300',
     danger: '#dc3545',
   };
   return (
@@ -64,6 +65,24 @@ export default function InfrastructurePanel({ info }: InfrastructurePanelProps) 
     unknown: t('modes.unknown'),
   };
 
+  // La sala: verde se risponde, ambra se risponde male o se la sola verifica
+  // possibile (l'indirizzo pubblico) non riconosce il certificato o il nome.
+  const jitsiColor: StatusColor = !info.jitsi.domain
+    ? 'secondary'
+    : info.jitsi.status === 'operational'
+      ? 'success'
+      : info.jitsi.status === 'degraded'
+        ? 'warning'
+        : info.jitsi.status === 'outage'
+          ? 'danger'
+          : 'secondary';
+  const jvbColor: StatusColor =
+    info.jvb.mode === 'unmonitored'
+      ? 'secondary'
+      : info.jvb.runningReplicas === 0 && info.jvb.mode === 'fixed'
+        ? 'danger'
+        : 'success';
+
   return (
     <div>
       {/* Deployment overview */}
@@ -72,10 +91,11 @@ export default function InfrastructurePanel({ info }: InfrastructurePanelProps) 
           <Col md={4}>
             <div className="small text-muted">{t('deploymentMode')}</div>
             <div className="fw-semibold">{modeLabels[info.deployment.mode] ?? info.deployment.mode}</div>
+            <div className="small text-muted">{t(`platforms.${info.deployment.platform}`)}</div>
           </Col>
           <Col md={4}>
             <div className="small text-muted">{t('version')}</div>
-            <div className="fw-semibold">{info.deployment.version}</div>
+            <div className="fw-semibold">{info.deployment.version || '—'}</div>
           </Col>
           <Col md={4}>
             <div className="small text-muted">{t('environment')}</div>
@@ -107,18 +127,26 @@ export default function InfrastructurePanel({ info }: InfrastructurePanelProps) 
 
         {/* Jitsi */}
         <Col md={6} lg={4}>
-          <InfraCard
-            title={t('jitsi.title')}
-            status={info.jitsi.reachable ? 'success' : info.jitsi.domain ? 'danger' : 'secondary'}
-          >
+          <InfraCard title={t('jitsi.title')} status={jitsiColor}>
             {info.jitsi.domain ? (
               <>
                 <p className="mb-1 text-truncate" title={info.jitsi.domain}>
                   {info.jitsi.domain}
                 </p>
                 <p className="mb-1">
-                  {info.jitsi.reachable ? t('jitsi.reachable') : t('jitsi.unreachable')}
+                  {info.jitsi.publicCheckFailed
+                    ? t('jitsi.publicCheckFailed', { code: info.jitsi.detail ?? '—' })
+                    : info.jitsi.status === 'degraded'
+                      ? t('jitsi.degraded')
+                      : info.jitsi.reachable
+                        ? t('jitsi.reachable')
+                        : t('jitsi.unreachable')}
                 </p>
+                {info.jitsi.detail && !info.jitsi.publicCheckFailed && (
+                  <p className="mb-1 text-truncate" title={info.jitsi.detail}>
+                    <code>{info.jitsi.detail}</code>
+                  </p>
+                )}
                 <p className="mb-0">
                   JWT: {info.jitsi.jwtConfigured ? '\u2713' : '\u2717'}
                 </p>
@@ -131,11 +159,8 @@ export default function InfrastructurePanel({ info }: InfrastructurePanelProps) 
 
         {/* JVB */}
         <Col md={6} lg={4}>
-          <InfraCard
-            title={t('jvb.title')}
-            status={info.jvb.scalerEnabled ? 'success' : 'secondary'}
-          >
-            {info.jvb.scalerEnabled ? (
+          <InfraCard title={t('jvb.title')} status={jvbColor}>
+            {info.jvb.mode === 'scaler' ? (
               <>
                 <p className="mb-1">{t('jvb.scaleToZero')}</p>
                 <p className="mb-1">
@@ -145,8 +170,25 @@ export default function InfrastructurePanel({ info }: InfrastructurePanelProps) 
                   {t('jvb.preScale', { minutes: info.jvb.preScaleMinutes })}
                 </p>
               </>
+            ) : info.jvb.mode === 'fixed' ? (
+              <>
+                <p className="mb-1">{t('jvb.fixedMode')}</p>
+                {info.jvb.runningReplicas === 0 ? (
+                  <p className="mb-0">{t('jvb.fixedDown')}</p>
+                ) : (
+                  <p className="mb-0">
+                    {t('jvb.replicas', {
+                      current: info.jvb.runningReplicas ?? 0,
+                      max: info.jvb.maxReplicas,
+                    })}
+                  </p>
+                )}
+              </>
             ) : (
-              <p className="mb-0">{t('jvb.fixedMode')}</p>
+              <>
+                <p className="mb-1">{t('jvb.fixedMode')}</p>
+                <p className="mb-0">{t('jvb.unmonitored')}</p>
+              </>
             )}
           </InfraCard>
         </Col>
@@ -191,10 +233,12 @@ export default function InfrastructurePanel({ info }: InfrastructurePanelProps) 
         <Col md={6} lg={4}>
           <InfraCard title={t('features.title')} status="success">
             <ul className="list-unstyled mb-0">
-              <li className="mb-1">
-                <Icon icon="it-check" size="xs" className="me-1" />
-                {t('features.statusPage')}
-              </li>
+              {info.features.statusPage && (
+                <li className="mb-1">
+                  <Icon icon="it-check" size="xs" className="me-1" />
+                  {t('features.statusPage')}
+                </li>
+              )}
               {info.features.guestAccess && (
                 <li className="mb-1">
                   <Icon icon="it-check" size="xs" className="me-1" />

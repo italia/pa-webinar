@@ -127,7 +127,8 @@
         "outlook": "Outlook / Office 365",
         "yahoo": "Yahoo Calendar",
         "downloadIcs": "Lataa .ics-tiedosto"
-      }
+      },
+      "registrationEnded": "Tapahtuma on päättynyt: ilmoittautuminen on suljettu."
     },
     "manage": {
       "toggleChat": "Keskustelu",
@@ -368,7 +369,8 @@
       "questionRestore": "Palauta",
       "questionStatusFailed": "Kysymystä ei voitu päivittää",
       "questionNeedsText": "Kirjoita kysymyksen teksti: pelkkä liite ei pääse jonoon",
-      "lensTruncated": "Vain uusimmat viestit on ladattu: vanhempia kysymyksiä voi puuttua luettelosta."
+      "lensTruncated": "Vain uusimmat viestit on ladattu: vanhempia kysymyksiä voi puuttua luettelosta.",
+      "attachUnavailable": "Liitteet eivät ole käytettävissä tässä asennuksessa."
     },
     "role": {
       "moderator": "Moderaattori",
@@ -389,7 +391,8 @@
         "unknown": "Ei tietoa"
       },
       "volume": "Äänenvoimakkuus",
-      "volumeFor": "Osallistujan {name} äänenvoimakkuus"
+      "volumeFor": "Osallistujan {name} äänenvoimakkuus",
+      "kickName": "Poista {name}"
     },
     "moderator": {
       "muteAll": "Mykistä kaikki",
@@ -453,7 +456,18 @@
       "remainingLabel": "Aikaa jäljellä (napsauta nähdäksesi kuluneen ajan)",
       "elapsedLabel": "Kulunut aika (napsauta nähdäksesi jäljellä olevan ajan)"
     },
-    "videoCallFrameTitle": "Tapahtuman videopuhelu"
+    "videoCallFrameTitle": "Tapahtuman videopuhelu",
+    "insecureContextTitle": "Suojaamaton osoite",
+    "insecureContextBody": "Tämä sivu on avattu http://-osoitteella: selain ei salli mikrofonin ja kameran käyttöä, eikä videopuhelu voi alkaa. Avaa sama sivu suojatussa osoitteessa.",
+    "insecureContextLink": "Avaa https://{host}",
+    "conferenceUnreachableTitle": "Videopuhelupalvelu ei vastaa",
+    "conferenceUnreachableBody": "Selaimesi ei saa yhteyttä videopuhelupalvelimeen ({host}). Avaa se uudessa välilehdessä: jos selain näyttää suojausvaroituksen, hyväksy se, palaa sitten tänne ja yritä uudelleen. Jos sivu ei aukea, verkko, jonka kautta olet yhteydessä, saattaa estää sen.",
+    "conferenceOpenHost": "Avaa {host} uudessa välilehdessä",
+    "leftTitle": "Poistuit huoneesta",
+    "leftMessage": "Tapahtuma on yhä käynnissä: voit palata milloin haluat.",
+    "leftModeratorReminder": "Tapahtuma pysyy avoimena, kunnes joku päättää sen. Kun olette valmiita, palaa huoneeseen ja valitse ”{action}”.",
+    "rejoin": "Palaa huoneeseen",
+    "backToHome": "Takaisin etusivulle"
   },
   "qa": {
     "title": "Kysymykset ja vastaukset",
@@ -590,7 +604,8 @@
       "errorGeneric": "Virhe tiedoston latauksessa",
       "helpImage": "Tuetut muodot: PNG, JPEG, WebP, SVG, GIF — enint. 10 MB",
       "helpAudio": "Tuetut muodot: MP3, WAV, OGG, M4A, WebM — enint. 20 MB",
-      "helpDocument": "Tuetut muodot: PDF, DOCX, PPTX, XLSX, TXT — enint. 25 MB"
+      "helpDocument": "Tuetut muodot: PDF, DOCX, PPTX, XLSX, TXT — enint. 25 MB",
+      "uploadsUnavailable": "Tiedostojen lataaminen ei ole käytettävissä tässä asennuksessa: liitä sen sijaan tiedoston URL."
     },
     "rubricaPicker": {
       "loading": "Haetaan…",
@@ -628,7 +643,9 @@
           "endsAt": "Päättymispäivän on oltava alkamispäivän jälkeen.",
           "titleRequired": "Otsikko on pakollinen (vähintään 3 merkkiä).",
           "titleRequiredOtherLocale": "Otsikko oletuskielellä ({locale}) on pakollinen: siirry välilehdelle {locale}.",
-          "maxParticipants": "Anna luku väliltä 2–500."
+          "maxParticipants": "Anna luku väliltä 2–500.",
+          "descriptionRequired": "Kuvaus on pakollinen (vähintään {min} merkkiä).",
+          "descriptionRequiredOtherLocale": "Kuvaus oletuskielellä ({locale}) on pakollinen: siirry välilehdelle {locale}."
         },
         "senderRatioLabel": "Arvioitu aktiivinen osuus",
         "senderRatioHelp": "Kuinka monella osallistujalla odotetaan olevan mikrofoni tai kamera päällä. Auttaa videopalvelimen mitoituksessa.",
@@ -820,7 +837,11 @@
         "speakers": "puhujat",
         "materials": "materiaalit",
         "questionnaires": "kyselyt"
-      }
+      },
+      "revocationFailed": "Käyttöoikeuden peruminen epäonnistui ({name}): pääsylinkki on edelleen voimassa. Tallenna uudelleen yrittääksesi uudestaan tai peru se tapahtumasivun välilehdellä ”{tab}”.",
+      "validationFailedDetail": "Palvelin hylkäsi osan tiedoista: {reason}. Korjaa ja yritä uudelleen.",
+      "publishFailed": "Tapahtuma luotiin, mutta sitä ei julkaistu: se on yhä luonnos. Julkaise se tapahtuman sivulta.",
+      "publishFailedDetail": "Tapahtuma luotiin, mutta sitä ei julkaistu: se on yhä luonnos. Palvelin vastasi: {reason}. Julkaise se tapahtuman sivulta."
     },
     "nav": {
       "events": "Tapahtumien hallinta",
@@ -1240,7 +1261,7 @@
       "wordCloudEnabled": "Reaaliaikainen sanapilvi",
       "wordCloudEnabledDesc": "Osallistujat lähettävät sanan, ja sanapilvi päivittyy reaaliajassa. Hyödyllinen keskustelun avaamiseen tai tunnelman kartoittamiseen muutamassa sekunnissa.",
       "whiteboardEnabled": "Jaettu piirtotaulu",
-      "whiteboardEnabledDesc": "Ottaa käyttöön natiivin yhteiskäyttöisen piirtotaulun (Excalidraw): moderaattorit voivat avata sen työkalupalkista tapahtuman aikana. Aina käytössä pikapuheluissa.",
+      "whiteboardEnabledDesc": "Ottaa käyttöön natiivin yhteiskäyttöisen piirtotaulun (Excalidraw): moderaattorit voivat avata sen työkalupalkista tapahtuman aikana. Edellyttää asennuksen piirtotaulupalvelua; kun se on käytettävissä, piirtotaulu on aina käytössä pikapuheluissa.",
       "autoStartRecording": "Aloita tallennus automaattisesti",
       "autoStartRecordingDesc": "Tapahtuman alkaessa tallennus käynnistyy itsestään (moderaattorilta ei pyydetä vahvistusta). Näin myöhässä tulijat löytävät catch-up-toistimen heti käytettävissä.",
       "aiSectionHeading": "Automaattinen jälkituotanto",
@@ -1316,7 +1337,8 @@
       "retentionPreviewRecordings": "Videotallenteet",
       "retentionPreviewKept": "Koostetilastot ja tapahtuman metatiedot säilytetään.",
       "configPreview": "Kokoonpanon esikatselu",
-      "templateApplied": "Malli otettu käyttöön: {name}. Kaikkia asetuksia voi muokata."
+      "templateApplied": "Malli otettu käyttöön: {name}. Kaikkia asetuksia voi muokata.",
+      "whiteboardUnavailable": "Ei käytettävissä tässä asennuksessa: Jitsin piirtotaulupalvelu puuttuu, ja alustan ylläpitäjä voi ottaa sen käyttöön."
     },
     "links": {
       "title": "Tapahtuman linkit",
@@ -1925,9 +1947,9 @@
       "version": "Versio",
       "environment": "Ympäristö",
       "modes": {
-        "simple": "Yksinkertainen (Docker Compose)",
-        "standard": "Standardi (Kubernetes)",
-        "full": "Täysi (Kubernetes ja scale-to-zero)",
+        "simple": "Yksinkertainen",
+        "standard": "Standardi",
+        "full": "Täysi (sillat ja scale-to-zero)",
         "unknown": "Tuntematon"
       },
       "database": {
@@ -1941,7 +1963,9 @@
         "title": "Jitsi Meet",
         "reachable": "Tavoitettavissa",
         "unreachable": "Ei tavoitettavissa",
-        "notConfigured": "Ei määritetty"
+        "notConfigured": "Ei määritetty",
+        "degraded": "Tavoitettavissa, mutta vastaa virheillä tai hitaasti",
+        "publicCheckFailed": "Tarkistus julkisessa osoitteessa epäonnistui ({code}): portaalin palvelin ei hyväksy varmennetta tai nimeä. Konferenssit voivat silti toimia."
       },
       "jvb": {
         "title": "Video Bridge (JVB)",
@@ -1949,7 +1973,9 @@
         "replicas": "{current}/{max} solmua",
         "preScale": "Ennakkoskaalaus: {minutes} min",
         "fixedMode": "Kiinteä tila",
-        "scalerEnabled": "Skaalain käytössä"
+        "scalerEnabled": "Skaalain käytössä",
+        "fixedDown": "Videosilta ei vastaa",
+        "unmonitored": "Ei valvottu: sillan osoitetta (JVB_HEALTH_URL) ei ole asetettu"
       },
       "jibri": {
         "title": "Tallennus (Jibri)",
@@ -1971,7 +1997,11 @@
         "metrics": "Mittareiden päätepiste"
       },
       "note": "Infrastruktuurimuutokset tehdään Helm values -tiedostojen ja CI/CD-putken kautta.",
-      "deployDocs": "Käyttöönottodokumentaatio"
+      "deployDocs": "Käyttöönottodokumentaatio",
+      "platforms": {
+        "kubernetes": "Kubernetesissa",
+        "other": "Kubernetesin ulkopuolella (Docker Compose tai yksittäinen palvelin)"
+      }
     },
     "instantCalls": {
       "title": "Pikapuhelut",
@@ -2076,9 +2106,9 @@
       "latencyP99": "Latenssi P99",
       "requestRate": "Pyynnöt/s",
       "chartLatencyQuantiles": "Sovelluksen latenssi — P50 / P95 / P99",
-      "participantsNow": "Aktiiviset osallistujat",
+      "participantsNow": "Osallistujat videosillalla",
       "jvbStress": "JVB-kuorma",
-      "conferences": "Aktiiviset konferenssit",
+      "conferences": "Konferenssit videosillalla",
       "octoRelay": "Octo-välityssilta bridgejen välillä",
       "interBridge": "Octo-liikenne",
       "chartCpu": "CPU usage",
@@ -2105,7 +2135,8 @@
       "liveNow": "LIVE",
       "provisioningNow": "valmistellaan",
       "idleNow": "JOUTILAS (tauolla)",
-      "scaleToZeroHelp": "JOUTILAS on normaali tila tapahtumalle, jossa ei ole liikennettä armonaikaa kauempaa. Seuraavalla käyttäjän vierailulla siirrytään tilaan PROVISIONING ja sitten LIVE."
+      "scaleToZeroHelp": "JOUTILAS on normaali tila tapahtumalle, jossa ei ole liikennettä armonaikaa kauempaa. Seuraavalla käyttäjän vierailulla siirrytään tilaan PROVISIONING ja sitten LIVE.",
+      "capacityFromStatus": "Nykyiset arvot luettu videosillalta. Historia edellyttää Prometheusta."
     },
     "bulk": {
       "selectAll": "Valitse kaikki",
@@ -2824,7 +2855,8 @@
       "quotaExceeded": "Tämä tapahtuma on saavuttanut ladattujen tiedostojen rajan ({maxFiles} tiedostoa, yhteensä {maxMb} MB): poista joitakin ladataksesi lisää",
       "uploadBusy": "Liian monta latausta juuri nyt: yritä uudelleen muutaman sekunnin kuluttua",
       "deleteFailed": "Materiaalia ei voitu poistaa"
-    }
+    },
+    "addedByStaff": "Järjestäjien lisäämä"
   },
   "reminders": {
     "title": "Muistutukset",
@@ -2897,7 +2929,7 @@
       "requestSubmittedBody": "Jos sähköpostiosoite vastaa ilmoittautumista, lähetimme sinulle linkin poiston vahvistamista varten. Linkki on voimassa 1 tunnin.",
       "linkInvalid": "Linkki on virheellinen tai vanhentunut. Pyydä uusi linkki.",
       "confirmWarning": "Olet poistamassa pysyvästi kaikki sähköpostiosoitteeseesi liittyvät henkilötiedot.",
-      "confirmBody": "Ilmoittautumiset, kysymykset, kyselyjen äänet, palautteet ja muistutukset poistetaan. Toimintoa ei voi perua.",
+      "confirmBody": "Ilmoittautumiset, kysymykset, kyselyjen äänet, palautteet, muistutukset ja tietosi tapahtumien osoitekirjassa poistetaan. Toimintoa ei voi perua.",
       "confirmButton": "Vahvista poisto",
       "cancel": "Peruuta",
       "processing": "Poistetaan...",
@@ -3120,7 +3152,7 @@
     "nodesReady": "solmua valmiina",
     "scaling": "skaalaus",
     "jvbStress": "JVB-kuorma",
-    "participantsConnected": "osallistujaa yhdistettynä",
+    "participantsConnected": "osallistujaa videosillalla",
     "videoInteractive": "interaktiivinen",
     "videoWebinar": "webinaari",
     "participantsAvailable": "osallistujaa saatavilla",
@@ -3164,7 +3196,12 @@
       "lastFailure": "Viimeisin virhe {when}",
       "artifactsProduced": "{count, plural, =0 {ei tuotoksia} one {1 tuotos luotu} other {# tuotosta luotu}}",
       "eventsEnabled": "{count, plural, =0 {ei tapahtumia, joissa tekoäly on käytössä} one {1 tapahtuma, jossa tekoäly on käytössä} other {# tapahtumaa, joissa tekoäly on käytössä}}"
-    }
+    },
+    "jvbFixedUp": "{count, plural, =1 {Videosilta toiminnassa} other {Videosilta toiminnassa · # siltaa määritetty}}",
+    "jvbFixedDown": "Videosilta ei vastaa",
+    "jvbFixedDownDetail": "Osallistujat eivät saa ääntä eikä kuvaa ennen kuin silta on taas tavoitettavissa.",
+    "jvbUnmonitored": "Tilaa ei valvota",
+    "jvbUnmonitoredDetail": "Tämä asennus ei kysy videosillan tilaa, joten se ei ole saatavilla tässä."
   },
   "infraMap": {
     "loading": "Ladataan infrastruktuurikarttaa...",
@@ -3172,8 +3209,8 @@
     "ariaLabel": "Järjestelmän infrastruktuurikartta",
     "title": "Infrastruktuurikartta",
     "subtitle": "Arkkitehtuurin ja palveluiden tilan reaaliaikainen visualisointi",
-    "participants": "Osallistujat",
-    "conferences": "Konferenssit",
+    "participants": "Osallistujat videosillalla",
+    "conferences": "Konferenssit videosillalla",
     "bandwidthIn": "Saapuva kaistanleveys",
     "bandwidthOut": "Lähtevä kaistanleveys",
     "recordings": "Tallenteet",
@@ -3259,23 +3296,33 @@
       "jitsiWeb": {
         "healthy": "Videoneuvotteluhuone on tavoitettavissa ja valmis tapahtumiin.",
         "down": "Videoneuvotteluhuone ei ole tavoitettavissa. Tapahtumia ei voi käynnistää eikä niihin voi liittyä.",
-        "standby": "Videoneuvotteluhuonetta ei ole määritetty."
+        "standby": "Videoneuvotteluhuonetta ei ole määritetty.",
+        "degraded": "Videoneuvotteluhuone vastaa, mutta virheillä tai hitaasti.",
+        "publicCheckFailed": "Portaali ei pysty tarkistamaan huonetta sen julkisesta osoitteesta: palvelimelta katsottuna varmenne tai nimi ei ole kelvollinen. Huone voi silti toimia osallistujille.",
+        "unmonitored": "Videoneuvotteluhuoneen tilaa ei valvota tässä asennuksessa."
       },
       "prosody": {
         "healthy": "Sisäinen viestintä videopalveluiden välillä toimii oikein.",
         "down": "Sisäinen viestintä ei ole tavoitettavissa. Videopalvelut eivät voi kommunikoida keskenään.",
-        "standby": "Viestintäpalvelua ei ole määritetty."
+        "standby": "Viestintäpalvelua ei ole määritetty.",
+        "degraded": "Sisäinen viestintä vastaa, mutta virheillä tai hitaasti.",
+        "publicCheckFailed": "Portaali ei pysty tarkistamaan sisäistä viestintää huoneen julkisen osoitteen kautta: palvelimelta katsottuna varmenne tai nimi ei ole kelvollinen. Konferenssit voivat silti toimia.",
+        "unmonitored": "Sisäisen viestinnän tilaa ei valvota tässä asennuksessa."
       },
       "jicofo": {
         "healthy": "Konferenssikoordinaattori on aktiivinen ja hallitsee istuntoja.",
         "down": "Konferenssikoordinaattori ei ole tavoitettavissa. Uusia konferensseja ei voi luoda.",
-        "standby": "Konferenssikoordinaattoria ei ole määritetty."
+        "standby": "Konferenssikoordinaattoria ei ole määritetty.",
+        "degraded": "Konferenssikoordinaattori vastaa, mutta virheillä tai hitaasti.",
+        "unmonitored": "Konferenssikoordinaattorin tilaa ei valvota tässä asennuksessa."
       },
       "jvb": {
         "healthy": "Videosilta on aktiivinen ja välittää ääntä/videota osallistujille.",
         "scaling": "Videosilta valmistautuu tulevaan tapahtumaan. Palvelimia luodaan automaattisesti.",
         "standby": "Videosilta on valmiustilassa. Se aktivoituu automaattisesti ennen ajoitetun tapahtuman alkua.",
-        "stale": "Tapahtuma odottaa videosiltaa konfiguroitua aikakatkaisua kauemmin. Tarkista cluster autoscaler ja JVB-podien lokit."
+        "stale": "Tapahtuma odottaa videosiltaa konfiguroitua aikakatkaisua kauemmin. Tarkista cluster autoscaler ja JVB-podien lokit.",
+        "fixedDown": "Videosilta ei vastaa. Konferenssit eivät välitä ääntä eikä kuvaa ennen kuin se on taas tavoitettavissa.",
+        "unmonitored": "Videosillan tilaa ei valvota tässä asennuksessa: portaalilla ei ole osoitetta, josta sitä voisi kysyä."
       },
       "jibri": {
         "healthy": "Tallennuspalvelu on valmis ja käytettävissä.",
@@ -3307,7 +3354,8 @@
       "jibri": "Tapahtumia ei voi tallentaa. Osallistujat voivat silti liittyä ja osallistua.",
       "jibriStale": "Tapahtuma, jossa tallennus on käytössä, odottaa Jibriä yli aikakatkaisun: istuntoa ei tallenneta.",
       "smtp": "Vahvistusviestejä ja muistutuksia ei lähetetä.",
-      "postprodDegraded": "Joidenkin viimeaikaisten tallenteiden litterointeja ja yhteenvetoja ei luotu. Videotallenteet ovat kuitenkin saatavilla."
+      "postprodDegraded": "Joidenkin viimeaikaisten tallenteiden litterointeja ja yhteenvetoja ei luotu. Videotallenteet ovat kuitenkin saatavilla.",
+      "jvbDown": "Osallistujat eivät saa ääntä eikä kuvaa."
     },
     "overallVerdicts": {
       "operational": "Kaikki palvelut toimivat oikein. Alusta on täysin toiminnassa.",
@@ -3337,7 +3385,8 @@
       "degraded": "Hidastunut",
       "down": "Ei saatavilla",
       "standby": "Valmiustilassa",
-      "scaling": "Valmistellaan"
+      "scaling": "Valmistellaan",
+      "unknown": "Ei valvottu"
     },
     "metrics": {
       "uptime24h": "Käyttöaika 24h",
@@ -3348,7 +3397,8 @@
       "errorRate": "5xx-virheet",
       "requestRate": "Pyynnöt/s",
       "podUptime": "Podin käyttöaika"
-    }
+    },
+    "probeDetail": "Tarkistuksen tulos"
   },
   "feedback": {
     "title": "Miten arvioisit tämän tapahtuman?",
@@ -3673,7 +3723,9 @@
       "almostReady": "Videopalvelin käynnissä: melkein valmista",
       "almostReadyDetail": "Vielä hetki, ja liittymispainike aktivoituu itsestään.",
       "honestHint": "Tavallinen odotus: alle minuutti, jos infrastruktuuri on jo lämmin, 3–5 minuuttia ensimmäisellä käynnistyksellä. Sillä välin voit tarkistaa kameran ja mikrofonin tai käyttää keskustelua.",
-      "elapsed": "valmistelussa {time}"
+      "elapsed": "valmistelussa {time}",
+      "scheduled": "Sali avautuu alkamisaikaan",
+      "scheduledDetail": "Tai aiemmin, kun järjestäjä käynnistää tapahtuman. Sillä välin voit tarkistaa kameran ja mikrofonin tai käyttää keskustelua."
     },
     "exitWaiting": "Poistu odotustilasta",
     "warmingUp": "Huone valmistautuu",
@@ -3729,7 +3781,10 @@
       "hostEarly": "Ennakkopääsy (isäntä)"
     },
     "roomJustOpened": "Huone on valmis — tule sisään",
-    "enterAnyway": "Siirry silti sisään"
+    "enterAnyway": "Siirry silti sisään",
+    "notHeldBadge": "Aika on mennyt",
+    "notHeldTitle": "Tapahtuman suunniteltu aika on mennyt",
+    "notHeldDetail": "Salia ei avattu. Tarkista mahdolliset päivitykset tapahtuman sivulta."
   },
   "recording": {
     "management": "Videotallenne",
@@ -3865,6 +3920,16 @@
     "noFeedback": "Palautetta ei ole vastaanotettu",
     "comments": "Kommentit",
     "noComments": "Ei kommentteja",
+    "yes": "Kyllä",
+    "no": "Ei"
+  },
+  "questionnaire": {
+    "loadFailed": "Kyselyä ei voitu ladata.",
+    "submit": "Lähetä vastaukset",
+    "submitFailed": "Lähetys epäonnistui. Yritä uudelleen.",
+    "answersInvalid": "Joitakin vastauksia puuttuu tai ne eivät kelpaa: tarkista pakolliset kysymykset ja yritä uudelleen.",
+    "alreadySubmitted": "Olet jo lähettänyt vastauksesi tähän kyselyyn.",
+    "thankYou": "Kiitos vastauksistasi.",
     "yes": "Kyllä",
     "no": "Ei"
   }

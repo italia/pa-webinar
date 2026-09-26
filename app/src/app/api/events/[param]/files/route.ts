@@ -5,10 +5,17 @@ import { z } from 'zod';
 import { prisma } from '@/lib/db';
 import {
   extractModeratorToken,
+  resolveGrantForEvent,
   verifyModeratorToken,
 } from '@/lib/auth/moderator';
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
-import { RateLimitError, UnauthorizedError, ValidationError, NotFoundError } from '@/lib/errors';
+import {
+  AppError,
+  RateLimitError,
+  UnauthorizedError,
+  ValidationError,
+  NotFoundError,
+} from '@/lib/errors';
 import {
   isAzureConfigured,
   generateUploadSasUrl,
@@ -19,6 +26,7 @@ import { rateLimit, getClientIp } from '@/lib/rate-limit';
 import { getFilesStorage } from '@/lib/storage';
 import { isEventPubliclyVisible } from '@/lib/events/visibility';
 import { MATERIAL_ACCESS_EVENT_SELECT, materialsWhereFor } from '@/lib/events/material-access';
+import { materialAddedBy, materialAuthorName } from '@/lib/events/material-author';
 import { fileDeletionFailed, removeMaterialBlob } from '@/lib/events/material-files';
 
 const uploadRequestSchema = z.object({
@@ -83,7 +91,9 @@ export const GET = withErrorHandling(
         fileSize: m.fileSize?.toString() ?? null,
         mimeType: m.mimeType,
         visibility: m.visibility,
-        addedBy: m.addedBy,
+        // Null quando la riga non porta un nome: chi legge mostra la dicitura
+        // tradotta (lib/events/material-author).
+        addedBy: materialAuthorName(m.addedBy),
         createdAt: m.createdAt.toISOString(),
       })),
       { headers: { 'Cache-Control': 'private, no-store' } },
@@ -113,10 +123,11 @@ export const POST = withErrorHandling(
     }
 
     if (!isAzureConfigured()) {
-      return NextResponse.json(
-        { error: 'Azure Blob Storage is not configured' },
-        { status: 503 },
-      );
+      // Configurazione ammessa, non un guasto: 503 con il codice che i client
+      // traducono, `warn` nel log.
+      const err = new AppError('Azure Blob Storage is not configured', 503, 'STORAGE_UNAVAILABLE');
+      err.expected = true;
+      throw err;
     }
 
     const body = await parseJsonBody(request);
@@ -139,7 +150,9 @@ export const POST = withErrorHandling(
         title: parsed.data.title,
         url: '',
         description: parsed.data.description,
-        addedBy: 'moderator',
+        // Un nome solo se gia' pubblico, mai una parola fissa
+        // (lib/events/material-author).
+        addedBy: materialAddedBy(await resolveGrantForEvent(event, token)),
         fileName: parsed.data.fileName,
         fileSize: parsed.data.fileSize
           ? BigInt(parsed.data.fileSize)
@@ -152,7 +165,11 @@ export const POST = withErrorHandling(
 
     return NextResponse.json(
       {
-        material: { ...material, fileSize: material.fileSize?.toString() },
+        material: {
+          ...material,
+          fileSize: material.fileSize?.toString(),
+          addedBy: materialAuthorName(material.addedBy),
+        },
         uploadUrl,
         // Header da mandare con la PUT su `uploadUrl`, oltre al Content-Type:
         // Azure pretende il tipo di blob, S3 non vuole header in più (ognuno

@@ -44,12 +44,13 @@ vi.mock('@/lib/auth/staff-session', async (importOriginal) => ({
 import type * as StaffSessionModule from '@/lib/auth/staff-session';
 import { prisma } from '@/lib/db';
 
-import { GET } from './route';
+import { GET, POST } from './route';
 
 const mockedEvent = prisma.event.findUnique as unknown as ReturnType<typeof vi.fn>;
 const mockedMaterials = prisma.eventMaterial.findMany as unknown as ReturnType<typeof vi.fn>;
 const mockedGrant = prisma.eventModerator.findUnique as unknown as ReturnType<typeof vi.fn>;
 const mockedRegistration = prisma.registration.findUnique as unknown as ReturnType<typeof vi.fn>;
+const mockedCreate = prisma.eventMaterial.create as unknown as ReturnType<typeof vi.fn>;
 
 const EVENT_ID = '22222222-2222-4222-8222-222222222222';
 const OWNER_ID = '33333333-3333-4333-8333-333333333333';
@@ -315,5 +316,73 @@ describe('GET /api/events/[slug]/materials — evento protetto da password', () 
     const res = await GET(get({ Authorization: `Bearer ${PRIMARY_TOKEN}` }), ctx());
     expect(res.status).toBe(200);
     expect(whereInterrogato()).toEqual({ eventId: EVENT_ID });
+  });
+});
+
+/**
+ * «Aggiunto da …»: un nome solo se è già pubblico (il conduttore scritto
+ * sull'evento), mai una parola fissa in inglese e mai il nome cifrato di un
+ * co-moderatore. Senza nome la risposta porta null e la sala traduce.
+ */
+describe('/api/events/[slug]/materials — chi ha aggiunto il materiale', () => {
+  function post(token: string): NextRequest {
+    return new Request(`https://webinar.example.gov.it/api/events/${SLUG}/materials`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ title: 'Slide', url: 'https://example.org/slide.pdf' }),
+    }) as unknown as NextRequest;
+  }
+
+  beforeEach(() => {
+    mockedCreate.mockImplementation(async ({ data }: { data: Record<string, unknown> }) => ({
+      id: 'mat-nuovo',
+      type: 'LINK',
+      description: null,
+      createdAt: new Date('2026-09-25T10:00:00.000Z'),
+      ...data,
+    }));
+  });
+
+  it('link principale su un evento con conduttore: il suo nome', async () => {
+    mockedEvent.mockResolvedValue(eventRow({ moderatorName: 'Conduzione' }));
+    const res = await POST(post(PRIMARY_TOKEN), ctx());
+    expect(res.status).toBe(201);
+    expect(mockedCreate.mock.calls[0]![0].data).toMatchObject({ addedBy: 'Conduzione' });
+    expect(await res.json()).toMatchObject({ addedBy: 'Conduzione' });
+  });
+
+  it('link principale senza conduttore: niente «Moderator», risposta null', async () => {
+    mockedEvent.mockResolvedValue(eventRow({ moderatorName: null }));
+    const res = await POST(post(PRIMARY_TOKEN), ctx());
+    expect(res.status).toBe(201);
+    expect(mockedCreate.mock.calls[0]![0].data).toMatchObject({ addedBy: '' });
+    expect(await res.json()).toMatchObject({ addedBy: null });
+  });
+
+  it('co-moderatore: il nome del grant non finisce in chiaro nella riga', async () => {
+    mockedEvent.mockResolvedValue(eventRow({ moderatorName: 'Conduzione' }));
+    mockedGrant.mockResolvedValue({
+      id: 'grant-1',
+      eventId: EVENT_ID,
+      revokedAt: null,
+      role: 'MODERATOR',
+      name: 'Nome Cognome',
+      email: null,
+    });
+    const res = await POST(post('TOKEN_DEL_COMODERATORE'), ctx());
+    expect(res.status).toBe(201);
+    expect(mockedCreate.mock.calls[0]![0].data).toMatchObject({ addedBy: '' });
+  });
+
+  it('l’elenco legge i segnaposto scritti in passato come «nessun nome»', async () => {
+    mockedMaterials.mockResolvedValue([
+      { ...materialRow('ALWAYS'), id: 'a', addedBy: 'Moderator' },
+      { ...materialRow('ALWAYS'), id: 'b', addedBy: '' },
+      { ...materialRow('ALWAYS'), id: 'c', addedBy: 'Conduzione' },
+    ]);
+    const body = (await (await GET(get(), ctx())).json()) as {
+      materials: Array<{ addedBy: string | null }>;
+    };
+    expect(body.materials.map((m) => m.addedBy)).toEqual([null, null, 'Conduzione']);
   });
 });

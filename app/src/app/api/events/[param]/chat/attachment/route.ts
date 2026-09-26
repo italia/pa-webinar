@@ -76,7 +76,12 @@ export const POST = withErrorHandling(async (request, context) => {
 
   const storage = getFilesStorage();
   if (!storage) {
-    throw new AppError('Files storage is not configured', 503, 'STORAGE_UNAVAILABLE');
+    // Un'installazione senza storage per i file e' una configurazione
+    // ammessa, non un guasto: 503 per il client (che lo traduce dal codice),
+    // `warn` nel log.
+    const err = new AppError('Files storage is not configured', 503, 'STORAGE_UNAVAILABLE');
+    err.expected = true;
+    throw err;
   }
 
   // Early size guard BEFORE buffering the whole body. We require a

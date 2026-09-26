@@ -2,6 +2,8 @@ import { getTranslations, getLocale } from 'next-intl/server';
 
 import { soloAdmin } from '@/lib/auth/staff-page';
 import { prisma } from '@/lib/db';
+import { getPublicEnv } from '@/lib/env';
+import { resolveWhiteboardInfraReady } from '@/lib/jitsi/whiteboard';
 import TemplateManagement from '@/components/admin/template-management';
 
 export default async function TemplatesPage() {
@@ -31,7 +33,13 @@ export default async function TemplatesPage() {
         </h1>
         <p className="text-secondary mb-0">{t('subtitle')}</p>
       </div>
-      <TemplateManagement templates={serialized} />
+      <TemplateManagement
+        templates={serialized}
+        // Letto a runtime come nella sala (lib/jitsi/whiteboard.ts).
+        whiteboardInfraReady={resolveWhiteboardInfraReady(
+          getPublicEnv('NEXT_PUBLIC_WHITEBOARD_ENABLED'),
+        )}
+      />
     </div>
   );
 }

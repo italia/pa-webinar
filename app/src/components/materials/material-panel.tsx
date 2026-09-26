@@ -7,6 +7,7 @@ import { Button } from 'design-react-kit';
 
 import { Icon } from '@/components/ui/icon';
 import { useLivePush } from '@/hooks/use-live-state';
+import { materialAuthorName } from '@/lib/events/material-author';
 import {
   MATERIAL_FILE_MAX_BYTES,
   MATERIAL_FILE_MIME_TYPES,
@@ -33,7 +34,9 @@ interface MaterialData {
   /** ALWAYS | BEFORE | DURING | AFTER. Il server filtra già per il pubblico;
    *  al moderatore, che vede tutto, serve a sapere cosa la sala NON vede. */
   visibility?: string;
-  addedBy: string;
+  /** Il nome di chi l'ha aggiunto, o null quando la riga non ne porta uno
+   *  (lib/events/material-author): allora si mostra una dicitura tradotta. */
+  addedBy: string | null;
   createdAt: string;
 }
 
@@ -65,6 +68,13 @@ export default function MaterialPanel({ eventSlug, token, isModerator }: Materia
     if (v === 'DURING') return tv('visibilityDuring');
     if (v === 'AFTER') return tv('visibilityAfter');
     return null;
+  };
+
+  // «Aggiunto da …»: il nome quando la riga ne porta uno, altrimenti una
+  // dicitura nella lingua di chi legge (mai una parola fissa del database).
+  const authorLine = (addedBy: string | null): string => {
+    const name = materialAuthorName(addedBy);
+    return name ? t('addedBy', { name }) : t('addedByStaff');
   };
 
   const fileSizeLabel = (bytes: number): string =>
@@ -473,7 +483,7 @@ export default function MaterialPanel({ eventSlug, token, isModerator }: Materia
                     </span>
                   )}
                   <div className="text-muted" style={{ fontSize: '0.72rem' }}>
-                    {t('addedBy', { name: m.addedBy })} ·{' '}
+                    {authorLine(m.addedBy)} ·{' '}
                     {format.dateTime(new Date(m.createdAt), {
                       hour: '2-digit',
                       minute: '2-digit',

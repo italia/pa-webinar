@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useTranslations, useFormatter } from 'next-intl';
+import { useTranslations, useFormatter, useLocale } from 'next-intl';
 import {
   Badge,
   Card,
@@ -10,9 +10,9 @@ import {
   Col,
 } from 'design-react-kit';
 
-import PostprodStatusCard from './postprod-status-card';
-
 import { Icon } from '@/components/ui/icon';
+
+import PostprodStatusCard from './postprod-status-card';
 
 interface SystemStatus {
   overall: 'operational' | 'degraded' | 'outage';
@@ -25,6 +25,12 @@ interface SystemStatus {
     jvbDesiredReplicas: number;
     jvbRunningReplicas: number;
     jvbStatus: 'ready' | 'scaling' | 'standby';
+    /** Uno scaler accende i bridge (scale-to-zero); altrimenti sono fissi. */
+    jvbScalerEnabled: boolean;
+    /** Il ponte si può interrogare: senza, il suo stato non si sa. */
+    jvbMonitored: boolean;
+    /** Con lo scaler il tetto dei bridge; senza, quanti ne sono previsti. */
+    jvbMaxReplicas: number;
     jvbStressLevel: number | null;
     jvbParticipants: number | null;
     jvbStale: boolean;
@@ -53,12 +59,14 @@ const DEFAULT_POLL_INTERVAL_MS = 30_000;
 export default function StatusDashboard() {
   const t = useTranslations('status');
   const format = useFormatter();
+  const locale = useLocale();
   const [data, setData] = useState<SystemStatus | null>(null);
   const [error, setError] = useState(false);
 
   const fetchStatus = useCallback(async () => {
     try {
-      const res = await fetch('/api/status', {
+      // I titoli degli eventi nella lingua della pagina.
+      const res = await fetch(`/api/status?locale=${encodeURIComponent(locale)}`, {
         cache: 'no-store',
         signal: AbortSignal.timeout(10_000),
       });
@@ -68,7 +76,7 @@ export default function StatusDashboard() {
     } catch {
       setError(true);
     }
-  }, []);
+  }, [locale]);
 
   // Poll interval comes from SiteSetting (admin-configurable, default 30s).
   // Until the first fetch lands we fall back to the compile-time default.
@@ -100,9 +108,12 @@ export default function StatusDashboard() {
 
   if (!data) return null;
 
-  const jvbMaxReplicas = parseInt(process.env.NEXT_PUBLIC_JVB_MAX_REPLICAS ?? '6', 10) || 6;
+  // Il tetto (o il numero dei bridge fissi) lo dice il server: una variabile
+  // letta qui resterebbe quella del build.
+  const jvbMaxReplicas = Math.max(1, data.metrics.jvbMaxReplicas || 1);
   const jvbRunning = data.metrics.jvbRunningReplicas;
   const jvbDesired = data.metrics.jvbDesiredReplicas;
+  const scaler = data.metrics.jvbScalerEnabled;
 
   const jvbCapacityColor = data.metrics.jvbStatus === 'scaling'
     ? '#A66300'
@@ -120,6 +131,49 @@ export default function StatusDashboard() {
         : '#008758';
 
   const anyStale = data.metrics.jvbStale || data.metrics.jibriStale;
+
+  // Carico e traffico del ponte: gli stessi con o senza scaler. I conteggi
+  // sono quelli del ponte video — chi è da solo in una stanza non ci arriva.
+  const bridgeTraffic = (
+    <>
+      {stressLevel !== null && (
+        <div className="mt-3">
+          <div className="d-flex justify-content-between align-items-center mb-1">
+            <span style={{ fontSize: '0.8rem', color: 'var(--app-muted)' }}>{t('jvbStress')}</span>
+            <span style={{ fontSize: '0.8rem', fontWeight: 600, color: stressColor }}>
+              {Math.round(stressLevel * 100)}%
+            </span>
+          </div>
+          <div className="progress" style={{ height: 6, borderRadius: 3 }}>
+            <div
+              className="progress-bar"
+              style={{
+                width: `${Math.min(100, stressLevel * 100)}%`,
+                backgroundColor: stressColor,
+                borderRadius: 3,
+              }}
+            />
+          </div>
+        </div>
+      )}
+
+      {data.metrics.jvbParticipants !== null && data.metrics.jvbParticipants > 0 && (
+        <p className="mt-2 mb-0" style={{ fontSize: '0.82rem', color: 'var(--app-muted)' }}>
+          {data.metrics.jvbParticipants} {t('participantsConnected')}
+        </p>
+      )}
+
+      {data.metrics.jvbOctoEnabled && (
+        <p className="mt-2 mb-0" style={{ fontSize: '0.82rem', color: 'var(--app-primary)' }}>
+          <Icon icon="it-link" size="xs" className="me-1" />
+          {t('jvbOctoActive', {
+            bridges: (data.metrics.jvbOctoConferences ?? 0) + 1,
+            relayMbps: Math.round((data.metrics.jvbOctoSendBitrateBps ?? 0) / 1000),
+          })}
+        </p>
+      )}
+    </>
+  );
 
   return (
     <>
@@ -147,7 +201,32 @@ export default function StatusDashboard() {
                 <Icon icon="it-video" size="sm" className="me-2" />
                 {t('jvbCapacity')}
               </h5>
-              {data.metrics.jvbStatus === 'standby' ? (
+              {!scaler ? (
+                // Bridge fissi: il ponte risponde o no, a prescindere dagli
+                // eventi. Nessuno scale-to-zero, nessuna accensione in corso.
+                !data.metrics.jvbMonitored ? (
+                  <div>
+                    <p className="text-muted mb-2">{t('jvbUnmonitored')}</p>
+                    <p className="mb-0" style={{ fontSize: '0.82rem', color: 'var(--app-muted)' }}>
+                      {t('jvbUnmonitoredDetail')}
+                    </p>
+                  </div>
+                ) : jvbRunning === 0 ? (
+                  <div>
+                    <p className="fw-semibold mb-2" style={{ color: '#CC334D' }}>{t('jvbFixedDown')}</p>
+                    <p className="mb-0" style={{ fontSize: '0.82rem', color: 'var(--app-muted)' }}>
+                      {t('jvbFixedDownDetail')}
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    <p className="fw-semibold mb-0" style={{ color: '#008758', fontSize: '0.92rem' }}>
+                      {t('jvbFixedUp', { count: jvbMaxReplicas })}
+                    </p>
+                    {bridgeTraffic}
+                  </>
+                )
+              ) : data.metrics.jvbStatus === 'standby' ? (
                 <div>
                   <p className="text-muted mb-2">{t('jvbStandby')}</p>
                   <p className="mb-0" style={{ fontSize: '0.82rem', color: 'var(--app-muted)' }}>
@@ -161,7 +240,7 @@ export default function StatusDashboard() {
                       className="progress-bar"
                       role="progressbar"
                       style={{
-                        width: `${(jvbRunning / jvbMaxReplicas) * 100}%`,
+                        width: `${Math.min(100, (jvbRunning / jvbMaxReplicas) * 100)}%`,
                         backgroundColor: jvbCapacityColor,
                         borderRadius: 6,
                       }}
@@ -174,7 +253,7 @@ export default function StatusDashboard() {
                         className="progress-bar progress-bar-striped progress-bar-animated"
                         role="progressbar"
                         style={{
-                          width: `${((jvbDesired - jvbRunning) / jvbMaxReplicas) * 100}%`,
+                          width: `${Math.min(100, ((jvbDesired - jvbRunning) / jvbMaxReplicas) * 100)}%`,
                           backgroundColor: '#A66300',
                         }}
                         aria-valuenow={jvbDesired - jvbRunning}
@@ -196,43 +275,7 @@ export default function StatusDashboard() {
                       </>
                     )}
                   </p>
-
-                  {stressLevel !== null && (
-                    <div className="mt-3">
-                      <div className="d-flex justify-content-between align-items-center mb-1">
-                        <span style={{ fontSize: '0.8rem', color: 'var(--app-muted)' }}>{t('jvbStress')}</span>
-                        <span style={{ fontSize: '0.8rem', fontWeight: 600, color: stressColor }}>
-                          {Math.round(stressLevel * 100)}%
-                        </span>
-                      </div>
-                      <div className="progress" style={{ height: 6, borderRadius: 3 }}>
-                        <div
-                          className="progress-bar"
-                          style={{
-                            width: `${stressLevel * 100}%`,
-                            backgroundColor: stressColor,
-                            borderRadius: 3,
-                          }}
-                        />
-                      </div>
-                    </div>
-                  )}
-
-                  {data.metrics.jvbParticipants !== null && data.metrics.jvbParticipants > 0 && (
-                    <p className="mt-2 mb-0" style={{ fontSize: '0.82rem', color: 'var(--app-muted)' }}>
-                      {data.metrics.jvbParticipants} {t('participantsConnected')}
-                    </p>
-                  )}
-
-                  {data.metrics.jvbOctoEnabled && (
-                    <p className="mt-2 mb-0" style={{ fontSize: '0.82rem', color: 'var(--app-primary)' }}>
-                      <Icon icon="it-link" size="xs" className="me-1" />
-                      {t('jvbOctoActive', {
-                        bridges: (data.metrics.jvbOctoConferences ?? 0) + 1,
-                        relayMbps: Math.round((data.metrics.jvbOctoSendBitrateBps ?? 0) / 1000),
-                      })}
-                    </p>
-                  )}
+                  {bridgeTraffic}
                 </>
               )}
             </CardBody>
@@ -253,10 +296,7 @@ export default function StatusDashboard() {
                 <ul className="list-unstyled mb-0">
                   {data.upcomingEvents.map((event, i) => {
                     const startsAt = new Date(event.startsAt);
-                    const minutesUntil = Math.max(
-                      0,
-                      Math.round((startsAt.getTime() - Date.now()) / 60_000),
-                    );
+                    const minutesUntil = Math.round((startsAt.getTime() - Date.now()) / 60_000);
 
                     // Badge/label driven by lifecycle state. IDLE and
                     // PROVISIONING are new states introduced with
@@ -272,7 +312,9 @@ export default function StatusDashboard() {
                         case 'IDLE':
                           return <Badge color="secondary" className="ms-2 flex-shrink-0">{t('idle')}</Badge>;
                         default:
-                          return minutesUntil <= 30 ? (
+                          // Solo dove uno scaler accende il ponte prima
+                          // dell'inizio, e solo per un inizio ancora futuro.
+                          return scaler && minutesUntil > 0 && minutesUntil <= 30 ? (
                             <span className="text-warning flex-shrink-0" style={{ fontSize: '0.8rem' }}>
                               {t('jvbActivatesIn', { minutes: minutesUntil })}
                             </span>

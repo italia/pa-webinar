@@ -1,6 +1,6 @@
 import { withErrorHandling } from '@/lib/api-handler';
 import { assertCronApiKey } from '@/lib/auth/cron';
-import { decryptPII, tryDecryptPII } from '@/lib/crypto/pii';
+import { decryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { enqueueEmail } from '@/lib/email/outbox';
 import { getSettings } from '@/lib/settings';
@@ -20,7 +20,7 @@ import {
   generateYahooCalendarUrl,
   generateIcsDownloadUrl,
 } from '@/lib/ical/calendar-links';
-import { generateEventICal } from '@/lib/ical/generate';
+import { generateEventICal, ICS_ATTACHMENT_CONTENT_TYPE } from '@/lib/ical/generate';
 import { formatDate, formatTime, formatDuration } from '@/lib/utils/date-format';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import { getPublicEnv } from '@/lib/env';
@@ -28,6 +28,8 @@ import { WARMUP_STATUSES } from '@/lib/events/visibility';
 import { finalizePostEventEmails } from '@/lib/events/post-event-finalize';
 import { localizedUrl } from '@/lib/utils/localized-url';
 import { registrationJoinUrl } from '@/lib/events/registration-link';
+import { currentReminder } from '@/lib/email/reminder-plan';
+import { rubricaOptOutUrl } from '@/lib/persons/opt-out-link';
 
 export const dynamic = 'force-dynamic';
 
@@ -36,10 +38,14 @@ import { lingueIscrizione } from '@/lib/email/lingua';
 /**
  * GET /api/cron/reminders
  *
- * Configurable reminder system. For each EventReminder:
- *   - Check if event.startsAt - offsetMinutes <= NOW()
- *   - Find registrations that don't have a ReminderSent entry for this reminder
- *   - Send reminder email, create ReminderSent record
+ * Configurable reminder system. For each event that has not started, only
+ * its CURRENT reminder counts: the due one (startsAt - offsetMinutes <= NOW())
+ * with the smallest offset (lib/email/reminder-plan). Larger due reminders are
+ * superseded and never go out, so an overdue "starts tomorrow" is never sent
+ * minutes before the start. The current reminder goes to every registration
+ * created by its trigger time that has no ReminderSent row for it; a reminder
+ * created after its own trigger time (event created less than a day ahead)
+ * goes to nobody. At most one reminder per registrant per run.
  *
  * Protected by CRON_API_KEY.
  * In production, called by a Kubernetes CronJob every 5 minutes.
@@ -55,7 +61,7 @@ export const GET = withErrorHandling(async (request) => {
         // PROVISIONING/IDLE inclusi: lo scaler mette l'evento in pre-warm
         // PRIMA dell'inizio (anche overnight) — è esattamente la finestra
         // in cui i reminder T-1h/T-10m devono partire, non essere saltati.
-        // (Il filtro dueReminders sotto richiede startsAt futuro, quindi un
+        // (Il filtro dei promemoria scattati sotto richiede startsAt futuro, quindi un
         // evento incagliato in IDLE dopo la fine non riceve comunque nulla.)
         status: { in: ['PUBLISHED', 'LIVE', ...WARMUP_STATUSES] },
       },
@@ -65,10 +71,15 @@ export const GET = withErrorHandling(async (request) => {
     },
   });
 
-  const dueReminders = reminders.filter((r) => {
-    const triggerAt = new Date(r.event.startsAt.getTime() - r.offsetMinutes * 60_000);
-    return triggerAt <= now && r.event.startsAt > now;
-  });
+  // Per evento conta solo il promemoria CORRENTE: quello scattato con
+  // l'anticipo minore (lib/email/reminder-plan). Gli altri scattati sono
+  // superati e non partono piu'.
+  const perEvento = new Map<string, typeof reminders>();
+  for (const r of reminders) {
+    const lista = perEvento.get(r.eventId) ?? [];
+    lista.push(r);
+    perEvento.set(r.eventId, lista);
+  }
 
   const baseUrl = getPublicEnv('NEXT_PUBLIC_APP_URL');
   const settings = await getSettings();
@@ -77,15 +88,23 @@ export const GET = withErrorHandling(async (request) => {
   let emailsFailed = 0;
 
   const overridePerLingua = new Map<string, Awaited<ReturnType<typeof loadEmailTemplateOverride>>>();
-  for (const reminder of dueReminders) {
-    const event = reminder.event;
+  for (const promemoria of perEvento.values()) {
+    const event = promemoria[0]!.event;
+    const corrente = currentReminder(promemoria, event.startsAt, now);
+    if (!corrente) continue;
+    const { reminder, registeredBy } = corrente;
 
+    // Chi era gia' iscritto quando il promemoria e' scattato e non l'ha
+    // ancora ricevuto. Chi si e' iscritto dopo ha appena avuto la conferma.
     const registrations = await prisma.registration.findMany({
       where: {
         eventId: event.id,
-        remindersSent: {
-          none: { reminderId: reminder.id },
-        },
+        createdAt: { lte: registeredBy },
+        remindersSent: { none: { reminderId: reminder.id } },
+      },
+      include: {
+        // Chi e' entrato in rubrica riceve il link per uscirne.
+        person: { select: { id: true, optedInToAddressBook: true } },
       },
     });
 
@@ -145,9 +164,14 @@ export const GET = withErrorHandling(async (request) => {
             icsDownload: generateIcsDownloadUrl(event.slug, baseUrl),
           },
           eventImageUrl: absoluteEventImage(event, baseUrl),
+          addressBookOptOutUrl: rubricaOptOutUrl(reg.person, baseUrl, locale),
         };
 
+        // Stesso UID della conferma: il promemoria aggiorna la voce di
+        // calendario gia' importata invece di aggiungerne un'altra.
         const icsContent = generateEventICal({
+          eventId: event.id,
+          updatedAt: event.updatedAt,
           title,
           description,
           startsAt: event.startsAt,
@@ -155,10 +179,6 @@ export const GET = withErrorHandling(async (request) => {
           timezone: event.timezone,
           url: eventPageUrl,
           organizerName: event.moderatorName ?? (settings.siteName || 'PA Webinar'),
-          organizerEmail:
-            tryDecryptPII(event.moderatorEmail) ??
-            process.env.SMTP_FROM ??
-            'noreply@dominio.gov.it',
         });
 
         // Una lettura per lingua, non una per iscritto.
@@ -191,7 +211,7 @@ export const GET = withErrorHandling(async (request) => {
             {
               filename: 'event.ics',
               content: icsContent,
-              contentType: 'text/calendar; charset=utf-8; method=REQUEST',
+              contentType: ICS_ATTACHMENT_CONTENT_TYPE,
             },
           ],
           metadata: {

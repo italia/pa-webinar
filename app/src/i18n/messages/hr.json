@@ -127,7 +127,8 @@
         "outlook": "Outlook / Office 365",
         "yahoo": "Yahoo Calendar",
         "downloadIcs": "Preuzmi .ics datoteku"
-      }
+      },
+      "registrationEnded": "Događaj je završen: prijave su zatvorene."
     },
     "manage": {
       "toggleChat": "Razgovor",
@@ -368,7 +369,8 @@
       "questionRestore": "Vrati",
       "questionStatusFailed": "Pitanje nije bilo moguće ažurirati",
       "questionNeedsText": "Upišite tekst pitanja: sam privitak ne ulazi u red",
-      "lensTruncated": "Učitane su samo najnovije poruke: starija pitanja možda nisu na popisu."
+      "lensTruncated": "Učitane su samo najnovije poruke: starija pitanja možda nisu na popisu.",
+      "attachUnavailable": "Privici nisu dostupni u ovoj instalaciji."
     },
     "role": {
       "moderator": "Moderator",
@@ -389,7 +391,8 @@
         "unknown": "N/D"
       },
       "volume": "Glasnoća",
-      "volumeFor": "Glasnoća za {name}"
+      "volumeFor": "Glasnoća za {name}",
+      "kickName": "Izbaci: {name}"
     },
     "moderator": {
       "muteAll": "Utišaj sve",
@@ -453,7 +456,18 @@
       "remainingLabel": "Preostalo vrijeme (klikni za proteklo vrijeme)",
       "elapsedLabel": "Proteklo vrijeme (klikni za preostalo vrijeme)"
     },
-    "videoCallFrameTitle": "Videopoziv događaja"
+    "videoCallFrameTitle": "Videopoziv događaja",
+    "insecureContextTitle": "Nesigurna adresa",
+    "insecureContextBody": "Ova je stranica otvorena putem http://: preglednik ne dopušta upotrebu mikrofona i kamere, pa videopoziv ne može započeti. Otvorite istu stranicu na sigurnoj adresi.",
+    "insecureContextLink": "Otvori https://{host}",
+    "conferenceUnreachableTitle": "Usluga videopoziva ne odgovara",
+    "conferenceUnreachableBody": "Vaš preglednik ne može doći do poslužitelja za videopozive ({host}). Otvorite ga u novoj kartici: ako preglednik prikaže sigurnosno upozorenje, prihvatite ga, zatim se vratite ovamo i pokušajte ponovno. Ako se stranica ne otvori, možda ga blokira mreža s koje se povezujete.",
+    "conferenceOpenHost": "Otvori {host} u novoj kartici",
+    "leftTitle": "Izašli ste iz dvorane",
+    "leftMessage": "Događaj je još u tijeku: možete se vratiti kad god želite.",
+    "leftModeratorReminder": "Događaj ostaje otvoren dok ga netko ne završi. Kad završite, vratite se i odaberite „{action}”.",
+    "rejoin": "Vrati se",
+    "backToHome": "Natrag na početnu stranicu"
   },
   "qa": {
     "title": "Pitanja i odgovori",
@@ -590,7 +604,8 @@
       "errorGeneric": "Pogreška pri učitavanju datoteke",
       "helpImage": "Podržani formati: PNG, JPEG, WebP, SVG, GIF — maks. 10 MB",
       "helpAudio": "Podržani formati: MP3, WAV, OGG, M4A, WebM — maks. 20 MB",
-      "helpDocument": "Podržani formati: PDF, DOCX, PPTX, XLSX, TXT — maks. 25 MB"
+      "helpDocument": "Podržani formati: PDF, DOCX, PPTX, XLSX, TXT — maks. 25 MB",
+      "uploadsUnavailable": "Učitavanje datoteka nije dostupno na ovoj instalaciji: umjesto toga zalijepite URL datoteke."
     },
     "rubricaPicker": {
       "loading": "Pretraživanje u tijeku…",
@@ -628,7 +643,9 @@
           "endsAt": "Datum završetka mora biti nakon datuma početka.",
           "titleRequired": "Naslov je obvezan (najmanje 3 znaka).",
           "titleRequiredOtherLocale": "Naslov na zadanom jeziku ({locale}) je obvezan: prijeđi na karticu {locale}.",
-          "maxParticipants": "Unesi broj između 2 i 500."
+          "maxParticipants": "Unesi broj između 2 i 500.",
+          "descriptionRequired": "Opis je obvezan (najmanje {min} znakova).",
+          "descriptionRequiredOtherLocale": "Opis na zadanom jeziku ({locale}) je obvezan: prijeđi na karticu {locale}."
         },
         "senderRatioLabel": "Procijenjeni postotak aktivnih",
         "senderRatioHelp": "Koliko sudionika očekujete da će imati uključen mikrofon ili videokameru. Pomaže pri dimenzioniranju videoposlužitelja.",
@@ -820,7 +837,11 @@
         "speakers": "govornici",
         "materials": "materijali",
         "questionnaires": "upitnici"
-      }
+      },
+      "revocationFailed": "Opoziv pristupa za {name} nije uspio: poveznica za pristup i dalje vrijedi. Spremi ponovno za novi pokušaj ili je opozovi na kartici „{tab}” na stranici događaja.",
+      "validationFailedDetail": "Poslužitelj je odbio neke podatke: {reason}. Ispravi ih i pokušaj ponovno.",
+      "publishFailed": "Događaj je stvoren, ali nije objavljen: i dalje je nacrt. Objavite ga sa stranice događaja.",
+      "publishFailedDetail": "Događaj je stvoren, ali nije objavljen: i dalje je nacrt. Poslužitelj je odgovorio: {reason}. Objavite ga sa stranice događaja."
     },
     "nav": {
       "events": "Upravljanje događajima",
@@ -1240,7 +1261,7 @@
       "wordCloudEnabled": "Oblak riječi uživo",
       "wordCloudEnabledDesc": "Sudionici šalju riječ, a oblak se ažurira uživo. Korisno za otvaranje rasprave ili prikupljanje dojmova u nekoliko sekundi.",
       "whiteboardEnabled": "Zajednička ploča",
-      "whiteboardEnabledDesc": "Omogućuje ugrađenu zajedničku ploču (Excalidraw): moderatori je tijekom događaja mogu otvoriti s alatne trake. Uvijek je uključena u trenutačnim pozivima.",
+      "whiteboardEnabledDesc": "Omogućuje ugrađenu zajedničku ploču (Excalidraw): moderatori je tijekom događaja mogu otvoriti s alatne trake. Zahtijeva uslugu ploče u instalaciji; gdje postoji, uvijek je uključena u trenutačnim pozivima.",
       "autoStartRecording": "Automatski pokreni snimanje",
       "autoStartRecordingDesc": "U trenutku početka događaja snimanje se pokreće samostalno (bez traženja potvrde od moderatora). Tako kasniji pridošli korisnici odmah pronalaze player.",
       "aiSectionHeading": "Automatska postprodukcija",
@@ -1316,7 +1337,8 @@
       "retentionPreviewRecordings": "Video snimke",
       "retentionPreviewKept": "Agregirane statistike i metapodaci događaja se zadržavaju.",
       "configPreview": "Pregled konfiguracije",
-      "templateApplied": "Predložak primijenjen: {name}. Možete promijeniti sve postavke."
+      "templateApplied": "Predložak primijenjen: {name}. Možete promijeniti sve postavke.",
+      "whiteboardUnavailable": "Nije dostupno u ovoj instalaciji: nedostaje Jitsijeva usluga ploče, koju može uključiti upravitelj platforme."
     },
     "links": {
       "title": "Poveznice događaja",
@@ -1925,9 +1947,9 @@
       "version": "Verzija",
       "environment": "Okruženje",
       "modes": {
-        "simple": "Jednostavno (Docker Compose)",
-        "standard": "Standardno (Kubernetes)",
-        "full": "Potpuno (Kubernetes sa scale-to-zero)",
+        "simple": "Jednostavno",
+        "standard": "Standardno",
+        "full": "Potpuno (mostovi sa scale-to-zero)",
         "unknown": "Nepoznato"
       },
       "database": {
@@ -1941,7 +1963,9 @@
         "title": "Jitsi Meet",
         "reachable": "Dostupno",
         "unreachable": "Nedostupno",
-        "notConfigured": "Nije konfigurirano"
+        "notConfigured": "Nije konfigurirano",
+        "degraded": "Dostupno, ali odgovara s pogreškama ili sporo",
+        "publicCheckFailed": "Provjera na javnoj adresi nije uspjela ({code}): poslužitelj portala ne prihvaća certifikat ili naziv. Konferencije ipak mogu raditi."
       },
       "jvb": {
         "title": "Video Bridge (JVB)",
@@ -1949,7 +1973,9 @@
         "replicas": "{current}/{max} čvorova",
         "preScale": "Predzbiranje: {minutes} min",
         "fixedMode": "Fiksni način",
-        "scalerEnabled": "Scaler omogućen"
+        "scalerEnabled": "Scaler omogućen",
+        "fixedDown": "Video most ne odgovara",
+        "unmonitored": "Ne prati se: adresa mosta (JVB_HEALTH_URL) nije postavljena"
       },
       "jibri": {
         "title": "Snimanje (Jibri)",
@@ -1971,7 +1997,11 @@
         "metrics": "Endpoint metrika"
       },
       "note": "Infrastrukturne promjene provode se putem Helm vrijednosti i CI/CD pipeline-a.",
-      "deployDocs": "Dokumentacija implementacije"
+      "deployDocs": "Dokumentacija implementacije",
+      "platforms": {
+        "kubernetes": "Na Kubernetesu",
+        "other": "Izvan Kubernetesa (Docker Compose ili jedan poslužitelj)"
+      }
     },
     "instantCalls": {
       "title": "Brzi pozivi",
@@ -2076,9 +2106,9 @@
       "latencyP99": "Latencija P99",
       "requestRate": "Zahtjeva/s",
       "chartLatencyQuantiles": "Latencija aplikacije — P50 / P95 / P99",
-      "participantsNow": "Aktivni sudionici",
+      "participantsNow": "Sudionici na video mostu",
       "jvbStress": "Opterećenje JVB",
-      "conferences": "Aktivne konferencije",
+      "conferences": "Konferencije na video mostu",
       "octoRelay": "Inter-bridge relej Octo",
       "interBridge": "Octo promet",
       "chartCpu": "CPU usage",
@@ -2105,7 +2135,8 @@
       "liveNow": "LIVE",
       "provisioningNow": "u pripremi",
       "idleNow": "IDLE (na čekanju)",
-      "scaleToZeroHelp": "IDLE je normalno stanje za događaj bez prometa duže od grace perioda. Pri sljedećem posjetu korisnika prelazi u PROVISIONING, a zatim u LIVE."
+      "scaleToZeroHelp": "IDLE je normalno stanje za događaj bez prometa duže od grace perioda. Pri sljedećem posjetu korisnika prelazi u PROVISIONING, a zatim u LIVE.",
+      "capacityFromStatus": "Trenutačne vrijednosti očitane s video mosta. Povijest zahtijeva Prometheus."
     },
     "bulk": {
       "selectAll": "Označi sve",
@@ -2824,7 +2855,8 @@
       "quotaExceeded": "Ovaj je događaj dosegao ograničenje učitanih datoteka ({maxFiles} datoteka, ukupno {maxMb} MB): uklonite neke da biste učitali nove",
       "uploadBusy": "Trenutačno ima previše učitavanja: pokušajte ponovno za nekoliko sekundi",
       "deleteFailed": "Materijal nije moguće izbrisati"
-    }
+    },
+    "addedByStaff": "Dodali organizatori"
   },
   "reminders": {
     "title": "Obavijesti",
@@ -2897,7 +2929,7 @@
       "requestSubmittedBody": "Ako email adresa odgovara prijavi, poslali smo vam poveznicu za potvrdu brisanja. Poveznica vrijedi 1 sat.",
       "linkInvalid": "Poveznica nije valjana ili je istekla. Zatražite novu poveznicu.",
       "confirmWarning": "Upravo ćete trajno izbrisati sve osobne podatke povezane s vašom email adresom.",
-      "confirmBody": "Bit će izbrisane prijave, pitanja, glasovi u anketama, povratne informacije i podsjetnici. Radnja je nepovratna.",
+      "confirmBody": "Bit će izbrisane prijave, pitanja, glasovi u anketama, povratne informacije, podsjetnici i vaš unos u imeniku događaja. Radnja je nepovratna.",
       "confirmButton": "Potvrdi brisanje",
       "cancel": "Odustani",
       "processing": "Brisanje u tijeku...",
@@ -3120,7 +3152,7 @@
     "nodesReady": "čvorova spremno",
     "scaling": "skaliranje",
     "jvbStress": "Opterećenje JVB",
-    "participantsConnected": "sudionika povezano",
+    "participantsConnected": "sudionika na video mostu",
     "videoInteractive": "interaktivno",
     "videoWebinar": "webinar",
     "participantsAvailable": "sudionika dostupno",
@@ -3164,7 +3196,12 @@
       "lastFailure": "Zadnja pogreška {when}",
       "artifactsProduced": "{count, plural, =0 {nema artefakata} one {# izrađen artefakt} few {# izrađena artefakta} other {# izrađenih artefakata}}",
       "eventsEnabled": "{count, plural, =0 {nema događaja s AI-jem} one {# događaj s aktivnim AI-jem} few {# događaja s aktivnim AI-jem} other {# događaja s aktivnim AI-jem}}"
-    }
+    },
+    "jvbFixedUp": "{count, plural, =1 {Video most radi} other {Video most radi · predviđeni mostovi: #}}",
+    "jvbFixedDown": "Video most ne odgovara",
+    "jvbFixedDownDetail": "Sudionici ne primaju zvuk ni sliku dok most ponovno ne postane dostupan.",
+    "jvbUnmonitored": "Stanje se ne prati",
+    "jvbUnmonitoredDetail": "Ova instalacija ne ispituje video most pa njegovo stanje ovdje nije dostupno."
   },
   "infraMap": {
     "loading": "Učitavanje karte infrastrukture...",
@@ -3172,8 +3209,8 @@
     "ariaLabel": "Karta sistemske infrastrukture",
     "title": "Karta infrastrukture",
     "subtitle": "Vizualizacija arhitekture i stanja usluga u stvarnom vremenu",
-    "participants": "Sudionici",
-    "conferences": "Konferencije",
+    "participants": "Sudionici na video mostu",
+    "conferences": "Konferencije na video mostu",
     "bandwidthIn": "Dolazna propusnost",
     "bandwidthOut": "Odlazna propusnost",
     "recordings": "Snimke",
@@ -3259,23 +3296,33 @@
       "jitsiWeb": {
         "healthy": "Video konferencijska soba je dostupna i spremna za događaje.",
         "down": "Video konferencijska soba nije dostupna. Nije moguće pokrenuti ili se pridružiti događajima.",
-        "standby": "Video konferencijska soba nije konfigurirana."
+        "standby": "Video konferencijska soba nije konfigurirana.",
+        "degraded": "Video konferencijska soba odgovara, ali s pogreškama ili sporo.",
+        "publicCheckFailed": "Portal ne može provjeriti sobu na njezinoj javnoj adresi: s poslužitelja certifikat ili naziv nisu valjani. Sudionicima soba ipak može raditi.",
+        "unmonitored": "Stanje video konferencijske sobe ne prati se u ovoj instalaciji."
       },
       "prosody": {
         "healthy": "Interno slanje poruka između video usluga radi ispravno.",
         "down": "Interno slanje poruka nije dostupno. Video usluge ne mogu međusobno komunicirati.",
-        "standby": "Usluga slanja poruka nije konfigurirana."
+        "standby": "Usluga slanja poruka nije konfigurirana.",
+        "degraded": "Interno slanje poruka odgovara, ali s pogreškama ili sporo.",
+        "publicCheckFailed": "Portal ne može provjeriti interno slanje poruka putem javne adrese sobe: s poslužitelja certifikat ili naziv nisu valjani. Konferencije ipak mogu raditi.",
+        "unmonitored": "Stanje internog slanja poruka ne prati se u ovoj instalaciji."
       },
       "jicofo": {
         "healthy": "Koordinator konferencija je aktivan i upravlja sesijama.",
         "down": "Koordinator konferencija nije dostupan. Nije moguće kreirati nove konferencije.",
-        "standby": "Koordinator konferencija nije konfiguriran."
+        "standby": "Koordinator konferencija nije konfiguriran.",
+        "degraded": "Koordinator konferencija odgovara, ali s pogreškama ili sporo.",
+        "unmonitored": "Stanje koordinatora konferencija ne prati se u ovoj instalaciji."
       },
       "jvb": {
         "healthy": "Video most je aktivan i prenosi zvuk/video sudionicima.",
         "scaling": "Video most se priprema za nadolazeći događaj. Serveri se automatski stvaraju.",
         "standby": "Video most je u pripravnosti. Automatski će se aktivirati prije početka zakazanog događaja.",
-        "stale": "Događaj čeka videomost duže od konfiguriranog vremena. Provjerite cluster autoscaler i logove JVB poda."
+        "stale": "Događaj čeka videomost duže od konfiguriranog vremena. Provjerite cluster autoscaler i logove JVB poda.",
+        "fixedDown": "Video most ne odgovara. Konferencije ne prenose zvuk ni sliku dok ponovno ne postane dostupan.",
+        "unmonitored": "Stanje video mosta ne prati se u ovoj instalaciji: portal nema adresu na kojoj bi ga ispitao."
       },
       "jibri": {
         "healthy": "Usluga snimanja je spremna i dostupna.",
@@ -3307,7 +3354,8 @@
       "jibri": "Događaji se ne mogu snimati. Sudionici se i dalje mogu pridružiti i sudjelovati.",
       "jibriStale": "Događaj s aktivnim snimanjem čeka Jibri preko vremenskog ograničenja: sesija se ne snima.",
       "smtp": "Potvrdne e-poruke i podsjetnici za registraciju neće biti poslani.",
-      "postprodDegraded": "Transkripti i zapisnici za neke nedavne snimke nisu izrađeni. Videosnimke su i dalje dostupne."
+      "postprodDegraded": "Transkripti i zapisnici za neke nedavne snimke nisu izrađeni. Videosnimke su i dalje dostupne.",
+      "jvbDown": "Sudionici ne primaju zvuk ni sliku."
     },
     "overallVerdicts": {
       "operational": "Sve usluge rade ispravno. Platforma je potpuno operativna.",
@@ -3337,7 +3385,8 @@
       "degraded": "Usporen",
       "down": "Nedostupan",
       "standby": "U pripravnosti",
-      "scaling": "Priprema"
+      "scaling": "Priprema",
+      "unknown": "Ne prati se"
     },
     "metrics": {
       "uptime24h": "Uptime 24h",
@@ -3348,7 +3397,8 @@
       "errorRate": "5xx pogreške",
       "requestRate": "Zahtjeva/s",
       "podUptime": "Uptime poda"
-    }
+    },
+    "probeDetail": "Rezultat provjere"
   },
   "feedback": {
     "title": "Kako ocjenjujete ovaj događaj?",
@@ -3673,7 +3723,9 @@
       "almostReady": "Videoposlužitelj radi: skoro smo gotovi",
       "almostReadyDetail": "Još trenutak i gumb za ulazak uključit će se sam.",
       "honestHint": "Uobičajeno čekanje: manje od minute ako je infrastruktura već zagrijana, 3–5 minuta pri prvom pokretanju. U međuvremenu možeš provjeriti kameru i mikrofon ili koristiti razgovor.",
-      "elapsed": "priprema traje {time}"
+      "elapsed": "priprema traje {time}",
+      "scheduled": "Soba se otvara u vrijeme početka",
+      "scheduledDetail": "Ili ranije, kada organizator pokrene događaj. U međuvremenu možeš provjeriti kameru i mikrofon ili koristiti razgovor."
     },
     "exitWaiting": "Izađi iz čekaonice",
     "warmingUp": "Soba se priprema",
@@ -3729,7 +3781,10 @@
       "hostEarly": "Raniji ulaz (domaćin)"
     },
     "roomJustOpened": "Dvorana je spremna — uđi",
-    "enterAnyway": "Svejedno uđi"
+    "enterAnyway": "Svejedno uđi",
+    "notHeldBadge": "Vrijeme je prošlo",
+    "notHeldTitle": "Predviđeno vrijeme događaja je prošlo",
+    "notHeldDetail": "Soba nije otvorena. Provjeri stranicu događaja za eventualne novosti."
   },
   "recording": {
     "management": "Video snimka",
@@ -3865,6 +3920,16 @@
     "noFeedback": "Nije primljena nijedna povratna informacija",
     "comments": "Komentari",
     "noComments": "Nema komentara",
+    "yes": "Da",
+    "no": "Ne"
+  },
+  "questionnaire": {
+    "loadFailed": "Upitnik nije bilo moguće učitati.",
+    "submit": "Pošalji odgovore",
+    "submitFailed": "Slanje nije uspjelo. Pokušajte ponovno.",
+    "answersInvalid": "Neki odgovori nedostaju ili nisu valjani: provjerite obavezna pitanja i pokušajte ponovno.",
+    "alreadySubmitted": "Već ste poslali svoje odgovore na ovaj upitnik.",
+    "thankYou": "Hvala na vašim odgovorima.",
     "yes": "Da",
     "no": "Ne"
   }

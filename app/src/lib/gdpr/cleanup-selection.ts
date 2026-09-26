@@ -32,6 +32,22 @@ const DAY_MS = 86_400_000;
 export const CLEANABLE_EVENT_STATUSES = ['ENDED', 'ARCHIVED'] as const;
 
 /**
+ * Stati di un evento che non risulta concluso ma a cui la finestra di
+ * conservazione si applica lo stesso (fase 3).
+ *
+ * La retention decorre dalla fine dell'evento, non dal suo stato: un evento
+ * rimasto PUBLISHED o LIVE settimane dopo la fine — nessuno lo ha chiuso, il
+ * conduttore del ciclo di vita era fermo — è finito a ogni effetto, e
+ * l'informativa promette la cancellazione comunque. Il cron lo archivia e lo
+ * ripulisce nello stesso giro.
+ *
+ * DRAFT è escluso di proposito: una bozza non ha mai raccolto iscrizioni, e la
+ * sua configurazione (scaletta, relatori, promemoria) è ciò che una copia
+ * eredita — ripulirla la svuoterebbe per chi la tiene come modello.
+ */
+export const UNFINISHED_EVENT_STATUSES = ['PUBLISHED', 'PROVISIONING', 'IDLE', 'LIVE'] as const;
+
+/**
  * Vita della registrazione temporanea non pubblicata: 24 ore
  * (`docs/GDPR.md` → "The daily GDPR cleanup", fase 1). È un video grezzo che
  * la sala d'attesa offre ai ritardatari per il catch-up; nessun flusso
@@ -101,6 +117,35 @@ export interface EventRetentionRow {
 export function isEventDataRetentionExpired(evt: EventRetentionRow, now: Date): boolean {
   const retentionExpiry = evt.endsAt.getTime() + evt.dataRetentionDays * DAY_MS;
   return retentionExpiry < now.getTime();
+}
+
+export interface CleanupCandidateRow extends EventRetentionRow {
+  status: string;
+  /** Ultimo segno di vita della sala (resoconti dei client, bridge). */
+  lastActiveAt: Date | null;
+}
+
+/** L'evento risulta concluso (ENDED o ARCHIVED). */
+export function isFinishedEventStatus(status: string): boolean {
+  return (CLEANABLE_EVENT_STATUSES as readonly string[]).includes(status);
+}
+
+/**
+ * I dati di questo evento vanno cancellati in questo giro (fase 3)?
+ *
+ * Per un evento concluso decide `isEventDataRetentionExpired`. Per uno mai
+ * concluso (UNFINISHED_EVENT_STATUSES) la finestra decorre dal più tardo fra
+ * `endsAt` e l'ultima attività: una sala a tempo indefinito ancora usata dopo
+ * la fine programmata non si svuota mentre qualcuno ci sta. Una bozza, mai.
+ */
+export function isEventEligibleForCleanup(evt: CleanupCandidateRow, now: Date): boolean {
+  if (isFinishedEventStatus(evt.status)) return isEventDataRetentionExpired(evt, now);
+  if (!(UNFINISHED_EVENT_STATUSES as readonly string[]).includes(evt.status)) return false;
+  const lastSign = Math.max(evt.endsAt.getTime(), evt.lastActiveAt?.getTime() ?? 0);
+  return isEventDataRetentionExpired(
+    { endsAt: new Date(lastSign), dataRetentionDays: evt.dataRetentionDays },
+    now,
+  );
 }
 
 export interface RecordingBlobRow {

@@ -34,9 +34,12 @@ vi.mock('@/lib/db', () => ({
     eventInvitation: { deleteMany: vi.fn() },
     eventModerator: { deleteMany: vi.fn() },
     recordingTrack: { deleteMany: vi.fn() },
-    callSession: { updateMany: vi.fn() },
+    callSession: { updateMany: vi.fn(), findMany: vi.fn(), update: vi.fn() },
     $transaction: vi.fn(),
   },
+}));
+vi.mock('@/lib/settings', () => ({
+  getSettings: vi.fn(async () => ({ eventGracePeriodMinutes: 15 })),
 }));
 vi.mock('@/lib/storage/recordings', () => ({ deleteRecordingBlob: vi.fn() }));
 vi.mock('@/lib/azure/blob-storage', () => ({
@@ -85,7 +88,7 @@ const db = prisma as unknown as {
   eventInvitation: { deleteMany: Mock };
   eventModerator: { deleteMany: Mock };
   recordingTrack: { deleteMany: Mock };
-  callSession: { updateMany: Mock };
+  callSession: { updateMany: Mock; findMany: Mock; update: Mock };
   $transaction: Mock;
 };
 const deleteRecordingBlobMock = deleteRecordingBlob as unknown as Mock;
@@ -103,6 +106,7 @@ function endedEvent(over: Partial<Record<string, unknown>> = {}) {
     id: '11111111-1111-1111-1111-111111111111',
     slug: 'vecchio',
     endsAt: daysAgo(60),
+    lastActiveAt: null,
     dataRetentionDays: 30,
     status: 'ENDED',
     recordingUrl: null,
@@ -312,9 +316,15 @@ describe('GET /api/cron/cleanup', () => {
     const res = await runCleanup();
     const body = await res.json();
 
-    // La query parte già ristretta agli eventi finiti…
+    // La query parte già ristretta agli eventi finiti, o mai conclusi ma
+    // oltre la loro fine…
     const phase3Args = db.event.findMany.mock.calls[2]?.[0];
-    expect(phase3Args.where).toEqual({ status: { in: ['ENDED', 'ARCHIVED'] } });
+    expect(phase3Args.where).toEqual({
+      OR: [
+        { status: { in: ['ENDED', 'ARCHIVED'] } },
+        { status: { in: ['PUBLISHED', 'PROVISIONING', 'IDLE', 'LIVE'] }, endsAt: { lt: NOW } },
+      ],
+    });
 
     // …e il filtro sulla retention scarta l'evento di ieri: i suoi dati
     // servono ancora (recap, pubblicazione del video, feedback) e
@@ -323,6 +333,94 @@ describe('GET /api/cron/cleanup', () => {
     expect(body.registrationsDeleted).toBe(12);
     expect(everyDbCall()).toContain('evt-vecchio');
     expect(everyDbCall()).not.toContain('evt-ieri');
+  });
+
+  it('fase 3: un evento mai concluso oltre fine + retention viene archiviato e ripulito', async () => {
+    // Rimasto PUBLISHED o LIVE settimane dopo la fine (nessuno lo ha chiuso):
+    // l'informativa promette la cancellazione comunque.
+    const incagliato = endedEvent({ id: 'evt-incagliato', status: 'LIVE', endsAt: daysAgo(40) });
+    stubEventQueries({ ended: [incagliato] });
+    db.registration.deleteMany.mockResolvedValue({ count: 3 });
+
+    const res = await runCleanup();
+    const body = await res.json();
+
+    expect(body.eventsProcessed).toBe(1);
+    expect(body.unfinishedEventsArchived).toBe(1);
+    expect(db.registration.deleteMany).toHaveBeenCalledWith({
+      where: { eventId: 'evt-incagliato' },
+    });
+    expect(db.event.update).toHaveBeenCalledWith({
+      where: { id: 'evt-incagliato' },
+      data: { status: 'ARCHIVED' },
+    });
+    // Le sessioni rimaste aperte si chiudono nella stessa transazione.
+    expect(db.callSession.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { eventId: { in: ['evt-incagliato'] }, endedAt: null } }),
+    );
+  });
+
+  it('fase 3: la sessione di un evento mai concluso si chiude sulla fine della sala, non su oggi', async () => {
+    const fine = daysAgo(40);
+    const incagliato = endedEvent({
+      id: 'evt-incagliato',
+      status: 'PUBLISHED',
+      endsAt: fine,
+      updatedAt: daysAgo(35),
+      gracePeriodMinutes: 0,
+    });
+    stubEventQueries({ ended: [incagliato] });
+    db.callSession.findMany.mockResolvedValue([
+      {
+        id: 'sess-1',
+        eventId: 'evt-incagliato',
+        startedAt: new Date(fine.getTime() - 3_600_000),
+        peakParticipants: 4,
+      },
+    ]);
+
+    await runCleanup();
+
+    expect(db.callSession.update).toHaveBeenCalledWith({
+      where: { id: 'sess-1' },
+      data: { endedAt: fine, duration: 3600 },
+    });
+  });
+
+  it('fase 3: un evento mai concluso resta intatto se la sala è stata usata di recente', async () => {
+    // Sala a tempo indefinito ancora in uso dopo la fine programmata: la
+    // finestra decorre dall'ultima attività.
+    const inUso = endedEvent({
+      id: 'evt-in-uso',
+      status: 'LIVE',
+      endsAt: daysAgo(40),
+      lastActiveAt: daysAgo(2),
+    });
+    stubEventQueries({ ended: [inUso] });
+
+    const res = await runCleanup();
+    const body = await res.json();
+
+    expect(body.eventsProcessed).toBe(0);
+    expect(db.$transaction).not.toHaveBeenCalled();
+  });
+
+  it('fase 3: una bozza non viene mai ripulita', async () => {
+    stubEventQueries({ ended: [endedEvent({ id: 'evt-bozza', status: 'DRAFT' })] });
+
+    const res = await runCleanup();
+    const body = await res.json();
+
+    expect(body.eventsProcessed).toBe(0);
+    expect(everyDbCall()).not.toContain('"evt-bozza"');
+  });
+
+  it('fase 3: un evento concluso non riapre né richiude le sessioni (le ripara il giro del ciclo di vita)', async () => {
+    stubEventQueries({ ended: [endedEvent({ id: 'evt-vecchio', status: 'ENDED' })] });
+
+    await runCleanup();
+
+    expect(db.callSession.findMany).not.toHaveBeenCalled();
   });
 
   it('fase 3: cancella tutte le entità con PII dell’evento scaduto', async () => {
@@ -670,6 +768,7 @@ describe('GET /api/cron/cleanup', () => {
       tempRecordingsCleaned: 0,
       publishedRecordingsCleaned: 0,
       eventsProcessed: 0,
+      unfinishedEventsArchived: 0,
       registrationsDeleted: 0,
       questionsDeleted: 0,
       pollsDeleted: 0,

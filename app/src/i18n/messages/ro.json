@@ -127,7 +127,8 @@
         "outlook": "Outlook / Office 365",
         "yahoo": "Yahoo Calendar",
         "downloadIcs": "Descărcați fișierul .ics"
-      }
+      },
+      "registrationEnded": "Evenimentul s-a încheiat: înregistrarea este închisă."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -368,7 +369,8 @@
       "questionRestore": "Restaurați",
       "questionStatusFailed": "Întrebarea nu a putut fi actualizată",
       "questionNeedsText": "Scrieți textul întrebării: un atașament singur nu intră în coadă",
-      "lensTruncated": "Sunt încărcate doar mesajele cele mai recente: pot exista întrebări mai vechi care nu apar în listă."
+      "lensTruncated": "Sunt încărcate doar mesajele cele mai recente: pot exista întrebări mai vechi care nu apar în listă.",
+      "attachUnavailable": "Atașamentele nu sunt disponibile în această instalare."
     },
     "role": {
       "moderator": "Moderator",
@@ -389,7 +391,8 @@
         "unknown": "N/A"
       },
       "volume": "Volum",
-      "volumeFor": "Volumul pentru {name}"
+      "volumeFor": "Volumul pentru {name}",
+      "kickName": "Eliminați-l pe {name}"
     },
     "moderator": {
       "muteAll": "Dezactivați sunetul tuturor",
@@ -453,7 +456,18 @@
       "remainingLabel": "Timp rămas (faceți clic pentru timpul scurs)",
       "elapsedLabel": "Timp scurs (faceți clic pentru timpul rămas)"
     },
-    "videoCallFrameTitle": "Apelul video al evenimentului"
+    "videoCallFrameTitle": "Apelul video al evenimentului",
+    "insecureContextTitle": "Adresă nesigură",
+    "insecureContextBody": "Această pagină a fost deschisă prin http://: browserul nu permite folosirea microfonului și a camerei, iar apelul video nu poate începe. Deschideți aceeași pagină la adresa securizată.",
+    "insecureContextLink": "Deschideți https://{host}",
+    "conferenceUnreachableTitle": "Serviciul de apeluri video nu răspunde",
+    "conferenceUnreachableBody": "Browserul nu poate accesa serverul de apeluri video ({host}). Deschideți-l într-o filă nouă: dacă browserul afișează un avertisment de securitate, acceptați-l, apoi reveniți aici și încercați din nou. Dacă pagina nu se deschide, este posibil ca rețeaua de la care vă conectați să îl blocheze.",
+    "conferenceOpenHost": "Deschideți {host} într-o filă nouă",
+    "leftTitle": "Ați ieșit din sală",
+    "leftMessage": "Evenimentul este încă în desfășurare: puteți reveni oricând.",
+    "leftModeratorReminder": "Evenimentul rămâne deschis până când cineva îl încheie. Când ați terminat, reveniți și alegeți „{action}”.",
+    "rejoin": "Reveniți în sală",
+    "backToHome": "Înapoi la pagina principală"
   },
   "qa": {
     "title": "Întrebări și Răspunsuri",
@@ -590,7 +604,8 @@
       "errorGeneric": "Eroare la încărcarea fișierului",
       "helpImage": "Formate acceptate: PNG, JPEG, WebP, SVG, GIF — max 10 MB",
       "helpAudio": "Formate acceptate: MP3, WAV, OGG, M4A, WebM — max 20 MB",
-      "helpDocument": "Formate acceptate: PDF, DOCX, PPTX, XLSX, TXT — max 25 MB"
+      "helpDocument": "Formate acceptate: PDF, DOCX, PPTX, XLSX, TXT — max 25 MB",
+      "uploadsUnavailable": "Încărcarea fișierelor nu este disponibilă în această instalare: lipiți în schimb URL-ul fișierului."
     },
     "rubricaPicker": {
       "loading": "Se caută…",
@@ -628,7 +643,9 @@
           "endsAt": "Data de încheiere trebuie să fie ulterioară datei de început.",
           "titleRequired": "Titlul este obligatoriu (cel puțin 3 caractere).",
           "titleRequiredOtherLocale": "Titlul în limba implicită ({locale}) este obligatoriu: treceți la fila {locale}.",
-          "maxParticipants": "Introduceți un număr între 2 și 500."
+          "maxParticipants": "Introduceți un număr între 2 și 500.",
+          "descriptionRequired": "Descrierea este obligatorie (cel puțin {min} caractere).",
+          "descriptionRequiredOtherLocale": "Descrierea în limba implicită ({locale}) este obligatorie: treceți la fila {locale}."
         },
         "senderRatioLabel": "Procent activ estimat",
         "senderRatioHelp": "Câți participanți se așteaptă să aibă microfonul/camera activă. Ajută la dimensionarea serverului video.",
@@ -820,7 +837,11 @@
         "speakers": "vorbitori",
         "materials": "materiale",
         "questionnaires": "chestionare"
-      }
+      },
+      "revocationFailed": "Revocarea accesului pentru {name} nu a reușit: linkul de acces este încă valabil. Salvați din nou pentru a reîncerca sau revocați-l din fila „{tab}” a paginii evenimentului.",
+      "validationFailedDetail": "Serverul a respins unele date: {reason}. Corectați-le și încercați din nou.",
+      "publishFailed": "Evenimentul a fost creat, dar nu a fost publicat: rămâne ciornă. Publicați-l din pagina evenimentului.",
+      "publishFailedDetail": "Evenimentul a fost creat, dar nu a fost publicat: rămâne ciornă. Serverul a răspuns: {reason}. Publicați-l din pagina evenimentului."
     },
     "nav": {
       "events": "Gestionare evenimente",
@@ -1240,7 +1261,7 @@
       "wordCloudEnabled": "Nor de cuvinte în direct",
       "wordCloudEnabledDesc": "Participanții trimit un cuvânt, iar norul se actualizează în direct. Util pentru a deschide o discuție sau a surprinde o stare de spirit în câteva secunde.",
       "whiteboardEnabled": "Tablă partajată",
-      "whiteboardEnabledDesc": "Activează tabla colaborativă nativă (Excalidraw): moderatorii o pot deschide din bara de instrumente în timpul evenimentului. Întotdeauna activă în apelurile instantanee.",
+      "whiteboardEnabledDesc": "Activează tabla colaborativă nativă (Excalidraw): moderatorii o pot deschide din bara de instrumente în timpul evenimentului. Necesită serviciul de tablă al instalării; acolo unde există, este întotdeauna activă în apelurile instantanee.",
       "autoStartRecording": "Porniți înregistrarea automat",
       "autoStartRecordingDesc": "La începutul evenimentului, înregistrarea pornește singură (fără a cere confirmare moderatorului). Astfel eventualii întârziați găsesc deja player-ul disponibil.",
       "aiSectionHeading": "Post-producție automată",
@@ -1316,7 +1337,8 @@
       "retentionPreviewRecordings": "Înregistrările video",
       "retentionPreviewKept": "Statisticile agregate și metadatele evenimentului sunt păstrate.",
       "configPreview": "Previzualizare configurație",
-      "templateApplied": "Șablon aplicat: {name}. Puteți modifica toate setările."
+      "templateApplied": "Șablon aplicat: {name}. Puteți modifica toate setările.",
+      "whiteboardUnavailable": "Indisponibil în această instalare: lipsește serviciul de tablă al Jitsi, pe care îl poate activa operatorul platformei."
     },
     "links": {
       "title": "Linkurile evenimentului",
@@ -1925,9 +1947,9 @@
       "version": "Versiune",
       "environment": "Mediu",
       "modes": {
-        "simple": "Simplu (Docker Compose)",
-        "standard": "Standard (Kubernetes)",
-        "full": "Complet (Kubernetes cu scale-to-zero)",
+        "simple": "Simplu",
+        "standard": "Standard",
+        "full": "Complet (punți cu scale-to-zero)",
         "unknown": "Necunoscut"
       },
       "database": {
@@ -1941,7 +1963,9 @@
         "title": "Jitsi Meet",
         "reachable": "Accesibil",
         "unreachable": "Inaccesibil",
-        "notConfigured": "Neconfigurat"
+        "notConfigured": "Neconfigurat",
+        "degraded": "Accesibil, dar răspunde cu erori sau lent",
+        "publicCheckFailed": "Verificarea la adresa publică a eșuat ({code}): serverul portalului nu acceptă certificatul sau numele. Conferințele pot funcționa totuși."
       },
       "jvb": {
         "title": "Video Bridge (JVB)",
@@ -1949,7 +1973,9 @@
         "replicas": "{current}/{max} noduri",
         "preScale": "Pre-scale: {minutes} min",
         "fixedMode": "Mod fix",
-        "scalerEnabled": "Scaler activat"
+        "scalerEnabled": "Scaler activat",
+        "fixedDown": "Puntea video nu răspunde",
+        "unmonitored": "Nemonitorizat: adresa punții (JVB_HEALTH_URL) nu este setată"
       },
       "jibri": {
         "title": "Înregistrare (Jibri)",
@@ -1971,7 +1997,11 @@
         "metrics": "Endpoint metrici"
       },
       "note": "Modificările de infrastructură se efectuează prin Helm values și pipeline-ul CI/CD.",
-      "deployDocs": "Documentație implementare"
+      "deployDocs": "Documentație implementare",
+      "platforms": {
+        "kubernetes": "Pe Kubernetes",
+        "other": "În afara Kubernetes (Docker Compose sau un singur server)"
+      }
     },
     "instantCalls": {
       "title": "Apeluri rapide",
@@ -2076,9 +2106,9 @@
       "latencyP99": "Latență P99",
       "requestRate": "Cereri/s",
       "chartLatencyQuantiles": "Latență aplicație — P50 / P95 / P99",
-      "participantsNow": "Participanți activi",
+      "participantsNow": "Participanți pe puntea video",
       "jvbStress": "Încărcare JVB",
-      "conferences": "Conferințe active",
+      "conferences": "Conferințe pe puntea video",
       "octoRelay": "Relay inter-bridge Octo",
       "interBridge": "Trafic Octo",
       "chartCpu": "CPU usage",
@@ -2105,7 +2135,8 @@
       "liveNow": "LIVE",
       "provisioningNow": "în pregătire",
       "idleNow": "IDLE (în pauză)",
-      "scaleToZeroHelp": "IDLE este starea normală pentru un eveniment fără trafic de mai mult timp decât grace period. La următoarea vizită a unui utilizator revine la PROVISIONING și apoi LIVE."
+      "scaleToZeroHelp": "IDLE este starea normală pentru un eveniment fără trafic de mai mult timp decât grace period. La următoarea vizită a unui utilizator revine la PROVISIONING și apoi LIVE.",
+      "capacityFromStatus": "Valori curente citite de pe puntea video. Istoricul necesită Prometheus."
     },
     "bulk": {
       "selectAll": "Selectați tot",
@@ -2824,7 +2855,8 @@
       "quotaExceeded": "Acest eveniment a atins limita de fișiere încărcate ({maxFiles} fișiere, {maxMb} MB în total): eliminați câteva pentru a încărca altele",
       "uploadBusy": "Prea multe încărcări în acest moment: încercați din nou în câteva secunde",
       "deleteFailed": "Materialul nu a putut fi șters"
-    }
+    },
+    "addedByStaff": "Adăugat de organizatori"
   },
   "reminders": {
     "title": "Notificări",
@@ -2897,7 +2929,7 @@
       "requestSubmittedBody": "Dacă adresa de email corespunde unei înregistrări, v-am trimis un link pentru a confirma ștergerea. Linkul este valabil 1 oră.",
       "linkInvalid": "Linkul nu este valid sau a expirat. Solicitați un link nou.",
       "confirmWarning": "Sunteți pe cale să ștergeți definitiv toate datele personale asociate adresei dumneavoastră de email.",
-      "confirmBody": "Vor fi șterse înregistrările, întrebările, voturile din sondaje, feedbackul și mementourile. Operațiunea este ireversibilă.",
+      "confirmBody": "Vor fi șterse înregistrările, întrebările, voturile din sondaje, feedbackul, mementourile și înscrierea dumneavoastră în agenda de evenimente. Operațiunea este ireversibilă.",
       "confirmButton": "Confirmați ștergerea",
       "cancel": "Anulați",
       "processing": "Ștergere în curs...",
@@ -3120,7 +3152,7 @@
     "nodesReady": "noduri pregătite",
     "scaling": "scalare",
     "jvbStress": "Încărcare JVB",
-    "participantsConnected": "participanți conectați",
+    "participantsConnected": "participanți pe puntea video",
     "videoInteractive": "interactiv",
     "videoWebinar": "webinar",
     "participantsAvailable": "participanți disponibili",
@@ -3164,7 +3196,12 @@
       "lastFailure": "Ultima eroare {when}",
       "artifactsProduced": "{count, plural, =0 {niciun artefact} one {1 artefact produs} few {# artefacte produse} other {# de artefacte produse}}",
       "eventsEnabled": "{count, plural, =0 {niciun eveniment cu AI} one {1 eveniment cu AI activ} few {# evenimente cu AI activ} other {# de evenimente cu AI activ}}"
-    }
+    },
+    "jvbFixedUp": "{count, plural, =1 {Puntea video funcționează} other {Puntea video funcționează · # punți prevăzute}}",
+    "jvbFixedDown": "Puntea video nu răspunde",
+    "jvbFixedDownDetail": "Participanții nu primesc nici audio, nici video până când puntea nu devine din nou accesibilă.",
+    "jvbUnmonitored": "Stare nemonitorizată",
+    "jvbUnmonitoredDetail": "Această instalare nu interoghează puntea video, deci starea ei nu este disponibilă aici."
   },
   "infraMap": {
     "loading": "Se încarcă harta infrastructurii...",
@@ -3172,8 +3209,8 @@
     "ariaLabel": "Harta infrastructurii sistemului",
     "title": "Harta infrastructurii",
     "subtitle": "Vizualizare în timp real a arhitecturii și stării serviciilor",
-    "participants": "Participanți",
-    "conferences": "Conferințe",
+    "participants": "Participanți pe puntea video",
+    "conferences": "Conferințe pe puntea video",
     "bandwidthIn": "Lățime de bandă intrare",
     "bandwidthOut": "Lățime de bandă ieșire",
     "recordings": "Înregistrări",
@@ -3259,23 +3296,33 @@
       "jitsiWeb": {
         "healthy": "Sala de videoconferință este accesibilă și pregătită pentru evenimente.",
         "down": "Sala de videoconferință nu este accesibilă. Nu este posibil să porniți sau să vă alăturați evenimentelor.",
-        "standby": "Sala de videoconferință nu este configurată."
+        "standby": "Sala de videoconferință nu este configurată.",
+        "degraded": "Sala de videoconferință răspunde, dar cu erori sau lent.",
+        "publicCheckFailed": "Portalul nu poate verifica sala la adresa ei publică: din perspectiva serverului, certificatul sau numele nu sunt valide. Pentru participanți sala poate funcționa totuși.",
+        "unmonitored": "Starea sălii de videoconferință nu este monitorizată în această instalare."
       },
       "prosody": {
         "healthy": "Mesageria internă între serviciile video funcționează corect.",
         "down": "Mesageria internă nu este accesibilă. Serviciile video nu pot comunica între ele.",
-        "standby": "Serviciul de mesagerie nu este configurat."
+        "standby": "Serviciul de mesagerie nu este configurat.",
+        "degraded": "Mesageria internă răspunde, dar cu erori sau lent.",
+        "publicCheckFailed": "Portalul nu poate verifica mesageria internă prin adresa publică a sălii: din perspectiva serverului, certificatul sau numele nu sunt valide. Conferințele pot funcționa totuși.",
+        "unmonitored": "Starea mesageriei interne nu este monitorizată în această instalare."
       },
       "jicofo": {
         "healthy": "Coordonatorul de conferințe este activ și gestionează sesiunile.",
         "down": "Coordonatorul de conferințe nu este accesibil. Nu este posibil să creați conferințe noi.",
-        "standby": "Coordonatorul de conferințe nu este configurat."
+        "standby": "Coordonatorul de conferințe nu este configurat.",
+        "degraded": "Coordonatorul de conferințe răspunde, dar cu erori sau lent.",
+        "unmonitored": "Starea coordonatorului de conferințe nu este monitorizată în această instalare."
       },
       "jvb": {
         "healthy": "Puntea video este activă și transmite audio/video către participanți.",
         "scaling": "Puntea video se pregătește pentru un eveniment viitor. Serverele sunt create automat.",
         "standby": "Puntea video este în așteptare. Se va activa automat înainte de începerea unui eveniment programat.",
-        "stale": "Un eveniment așteaptă puntea video de mai mult timp decât timeout-ul configurat. Verificați cluster autoscaler-ul și logurile pod-urilor JVB."
+        "stale": "Un eveniment așteaptă puntea video de mai mult timp decât timeout-ul configurat. Verificați cluster autoscaler-ul și logurile pod-urilor JVB.",
+        "fixedDown": "Puntea video nu răspunde. Conferințele nu transmit nici audio, nici video până când nu devine din nou accesibilă.",
+        "unmonitored": "Starea punții video nu este monitorizată în această instalare: portalul nu are o adresă prin care să o interogheze."
       },
       "jibri": {
         "healthy": "Serviciul de înregistrare este pregătit și disponibil.",
@@ -3307,7 +3354,8 @@
       "jibri": "Evenimentele nu pot fi înregistrate. Participanții se pot alătura și participa în continuare.",
       "jibriStale": "Un eveniment cu înregistrare activă așteaptă Jibri peste timeout: sesiunea nu este înregistrată.",
       "smtp": "Emailurile de confirmare a înregistrării și mementourile nu vor fi trimise.",
-      "postprodDegraded": "Transcrierile și rezumatele pentru unele înregistrări recente nu au fost generate. Înregistrările video rămân disponibile."
+      "postprodDegraded": "Transcrierile și rezumatele pentru unele înregistrări recente nu au fost generate. Înregistrările video rămân disponibile.",
+      "jvbDown": "Participanții nu primesc nici audio, nici video."
     },
     "overallVerdicts": {
       "operational": "Toate serviciile funcționează corect. Platforma este complet operațională.",
@@ -3337,7 +3385,8 @@
       "degraded": "Degradat",
       "down": "Indisponibil",
       "standby": "În așteptare",
-      "scaling": "Pregătire"
+      "scaling": "Pregătire",
+      "unknown": "Nemonitorizat"
     },
     "metrics": {
       "uptime24h": "Uptime 24h",
@@ -3348,7 +3397,8 @@
       "errorRate": "Erori 5xx",
       "requestRate": "Cereri/s",
       "podUptime": "Pod uptime"
-    }
+    },
+    "probeDetail": "Rezultatul verificării"
   },
   "feedback": {
     "title": "Cum evaluați acest eveniment?",
@@ -3673,7 +3723,9 @@
       "almostReady": "Server video activ: aproape gata",
       "almostReadyDetail": "Încă o clipă și butonul de intrare se va activa singur.",
       "honestHint": "Așteptare obișnuită: sub un minut dacă infrastructura este deja caldă, 3–5 minute la prima pornire. Între timp poți verifica camera și microfonul sau folosi conversația.",
-      "elapsed": "în pregătire de {time}"
+      "elapsed": "în pregătire de {time}",
+      "scheduled": "Sala se deschide la ora de început",
+      "scheduledDetail": "Sau mai devreme, când organizatorul pornește evenimentul. Între timp poți verifica camera și microfonul sau folosi conversația."
     },
     "exitWaiting": "Ieși din sala de așteptare",
     "warmingUp": "Sala se pregătește",
@@ -3729,7 +3781,10 @@
       "hostEarly": "Intrare anticipată (gazdă)"
     },
     "roomJustOpened": "Sala e gata — intră",
-    "enterAnyway": "Intră oricum"
+    "enterAnyway": "Intră oricum",
+    "notHeldBadge": "Ora a trecut",
+    "notHeldTitle": "Ora programată a evenimentului a trecut",
+    "notHeldDetail": "Sala nu a fost deschisă. Verifică pagina evenimentului pentru eventuale noutăți."
   },
   "recording": {
     "management": "Înregistrare video",
@@ -3865,6 +3920,16 @@
     "noFeedback": "Niciun feedback primit",
     "comments": "Comentarii",
     "noComments": "Niciun comentariu",
+    "yes": "Da",
+    "no": "Nu"
+  },
+  "questionnaire": {
+    "loadFailed": "Chestionarul nu a putut fi încărcat.",
+    "submit": "Trimiteți răspunsurile",
+    "submitFailed": "Trimiterea nu a reușit. Încercați din nou.",
+    "answersInvalid": "Unele răspunsuri lipsesc sau nu sunt valide: verificați întrebările obligatorii și încercați din nou.",
+    "alreadySubmitted": "Ați trimis deja răspunsurile la acest chestionar.",
+    "thankYou": "Vă mulțumim pentru răspunsuri.",
     "yes": "Da",
     "no": "Nu"
   }

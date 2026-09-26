@@ -127,7 +127,8 @@
         "outlook": "Outlook / Office 365",
         "yahoo": "Yahoo Calendar",
         "downloadIcs": "Niżżel fajl .ics"
-      }
+      },
+      "registrationEnded": "L-avveniment intemm: ir-reġistrazzjoni hija magħluqa."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -368,7 +369,8 @@
       "questionRestore": "Irrestawra",
       "questionStatusFailed": "Ma kienx possibbli li l-mistoqsija tiġi aġġornata",
       "questionNeedsText": "Ikteb it-test tal-mistoqsija: attachment waħdu ma jidħolx fil-kju",
-      "lensTruncated": "Huma mgħobbija biss l-aktar messaġġi reċenti: jista' jkun hemm mistoqsijiet eqdem li mhumiex elenkati."
+      "lensTruncated": "Huma mgħobbija biss l-aktar messaġġi reċenti: jista' jkun hemm mistoqsijiet eqdem li mhumiex elenkati.",
+      "attachUnavailable": "L-annessi mhumiex disponibbli f'din l-installazzjoni."
     },
     "role": {
       "moderator": "Moderatur",
@@ -389,7 +391,8 @@
         "unknown": "M/D"
       },
       "volume": "Volum",
-      "volumeFor": "Volum ta' {name}"
+      "volumeFor": "Volum ta' {name}",
+      "kickName": "Keċċi lil {name}"
     },
     "moderator": {
       "muteAll": "Iskot lil kulħadd",
@@ -453,7 +456,18 @@
       "remainingLabel": "Ħin li fadal (ikklikkja għall-ħin li għadda)",
       "elapsedLabel": "Ħin li għadda (ikklikkja għall-ħin li fadal)"
     },
-    "videoCallFrameTitle": "Sejħa bil-vidjo tal-avveniment"
+    "videoCallFrameTitle": "Sejħa bil-vidjo tal-avveniment",
+    "insecureContextTitle": "Indirizz mhux sigur",
+    "insecureContextBody": "Din il-paġna nfetħet b'http://: il-browser ma jħallix jintużaw il-mikrofonu u l-kamera, u s-sejħa bil-vidjo ma tistax tibda. Iftaħ l-istess paġna fuq l-indirizz sigur.",
+    "insecureContextLink": "Iftaħ https://{host}",
+    "conferenceUnreachableTitle": "Is-servizz tas-sejħiet bil-vidjo mhux qed iwieġeb",
+    "conferenceUnreachableBody": "Il-browser tiegħek ma jistax jilħaq is-server tas-sejħiet bil-vidjo ({host}). Iftħu f'tab ġdida: jekk il-browser juri twissija ta' sigurtà, aċċettaha, imbagħad erġa' lura hawn u erġa' pprova. Jekk il-paġna ma tiftaħx, jista' jkun li n-netwerk li qed tikkonnettja minnu qed jimblokkah.",
+    "conferenceOpenHost": "Iftaħ {host} f'tab ġdida",
+    "leftTitle": "Ħriġt mis-sala",
+    "leftMessage": "L-avveniment għadu għaddej: tista' terġa' tidħol meta trid.",
+    "leftModeratorReminder": "L-avveniment jibqa' miftuħ sakemm xi ħadd itemmu. Meta tkunu lestejtu, erġa' idħol u agħżel “{action}”.",
+    "rejoin": "Erġa' idħol",
+    "backToHome": "Lura lejn il-paġna ewlenija"
   },
   "qa": {
     "title": "Mistoqsijiet u Tweġibiet",
@@ -590,7 +604,8 @@
       "errorGeneric": "Żball waqt il-caricament tal-fajl",
       "helpImage": "Formati appoġġjati: PNG, JPEG, WebP, SVG, GIF — massimu 10 MB",
       "helpAudio": "Formati appoġġjati: MP3, WAV, OGG, M4A, WebM — massimu 20 MB",
-      "helpDocument": "Formati appoġġjati: PDF, DOCX, PPTX, XLSX, TXT — massimu 25 MB"
+      "helpDocument": "Formati appoġġjati: PDF, DOCX, PPTX, XLSX, TXT — massimu 25 MB",
+      "uploadsUnavailable": "It-tlugħ tal-fajls mhuwiex disponibbli f'din l-installazzjoni: minflok, waħħal il-URL tal-fajl."
     },
     "rubricaPicker": {
       "loading": "Tfittxija għaddejja…",
@@ -628,7 +643,9 @@
           "endsAt": "Id-data tat-tmiem trid tkun wara d-data tal-bidu.",
           "titleRequired": "It-titolu huwa obbligatorju (mill-inqas 3 karattri).",
           "titleRequiredOtherLocale": "It-titolu fil-lingwa prestabbilita ({locale}) huwa obbligatorju: aqleb għall-iskeda {locale}.",
-          "maxParticipants": "Daħħal numru bejn 2 u 500."
+          "maxParticipants": "Daħħal numru bejn 2 u 500.",
+          "descriptionRequired": "Id-deskrizzjoni hija obbligatorja (mill-inqas {min} karattru).",
+          "descriptionRequiredOtherLocale": "Id-deskrizzjoni fil-lingwa prestabbilita ({locale}) hija obbligatorja: aqleb għall-iskeda {locale}."
         },
         "senderRatioLabel": "Persentaġġ attiv stmat",
         "senderRatioHelp": "Kemm parteċipanti huma mistennija li jkollhom il-mikrofonu/vidjo attivi. Jgħin biex jiġi ddimensjonat is-server tal-vidjo.",
@@ -820,7 +837,11 @@
         "speakers": "kelliema",
         "materials": "materjali",
         "questionnaires": "kwestjonarji"
-      }
+      },
+      "revocationFailed": "Ir-revoka tal-aċċess għal {name} ma rnexxietx: il-link tal-aċċess għadu validu. Erġa’ ssejvja biex terġa’ tipprova, jew irrevokah mill-iskeda “{tab}” tal-paġna tal-avveniment.",
+      "validationFailedDetail": "Is-server irrifjuta xi data: {reason}. Ikkoreġiha u erġa’ pprova.",
+      "publishFailed": "L-avveniment inħoloq iżda ma ġiex ippubblikat: għadu abbozz. Ippubblikah mill-paġna tal-avveniment.",
+      "publishFailedDetail": "L-avveniment inħoloq iżda ma ġiex ippubblikat: għadu abbozz. Is-server wieġeb: {reason}. Ippubblikah mill-paġna tal-avveniment."
     },
     "nav": {
       "events": "Ġestjoni tal-avvenimenti",
@@ -1240,7 +1261,7 @@
       "wordCloudEnabled": "Sħaba ta' kliem f'ħin reali",
       "wordCloudEnabledDesc": "Il-parteċipanti jibagħtu kelma u s-sħaba tiġi aġġornata f'ħin reali. Utli biex tiftaħ diskussjoni jew tiġbor sentiment fi ftit sekondi.",
       "whiteboardEnabled": "Whiteboard kondiviża",
-      "whiteboardEnabledDesc": "Tattiva l-whiteboard kollaborattiva nattiva (Excalidraw): il-moderaturi jistgħu jiftħuha mit-toolbar matul l-avveniment. Dejjem attiva fis-sejħiet istantanji.",
+      "whiteboardEnabledDesc": "Tattiva l-whiteboard kollaborattiva nattiva (Excalidraw): il-moderaturi jistgħu jiftħuha mit-toolbar matul l-avveniment. Teħtieġ is-servizz tal-whiteboard tal-installazzjoni; fejn ikun disponibbli, hija dejjem attiva fis-sejħiet istantanji.",
       "autoStartRecording": "Ibda la reġistrazzjoni awtomatikament",
       "autoStartRecordingDesc": "Al momento tal-bidu tal-avveniment il-reġistrazzjoni partu da sola (senza chiederu ikkonferma lill-moderatur). Hekk eventuali ritardatari trovano diġà il player disponibbli.",
       "aiSectionHeading": "Post-produzzjoni awtomatika",
@@ -1316,7 +1337,8 @@
       "retentionPreviewRecordings": "Reġistrazzjonijiet bil-vidjo",
       "retentionPreviewKept": "L-istatistika aggregata u l-metadejta tal-avveniment jinżammu.",
       "configPreview": "Preview tal-konfigurazzjoni",
-      "templateApplied": "Template applikat: {name}. Tista' timmodifika s-settings kollha."
+      "templateApplied": "Template applikat: {name}. Tista' timmodifika s-settings kollha.",
+      "whiteboardUnavailable": "Mhux disponibbli f’din l-installazzjoni: is-servizz tal-whiteboard ta’ Jitsi nieqes, u l-operatur tal-pjattaforma jista’ jattivah."
     },
     "links": {
       "title": "Links tal-avveniment",
@@ -1925,9 +1947,9 @@
       "version": "Verżjoni",
       "environment": "Ambjent",
       "modes": {
-        "simple": "Sempliċi (Docker Compose)",
-        "standard": "Standard (Kubernetes)",
-        "full": "Sħiħa (Kubernetes b'scale-to-zero)",
+        "simple": "Sempliċi",
+        "standard": "Standard",
+        "full": "Sħiħa (pontijiet b'scale-to-zero)",
         "unknown": "Mhux magħrufa"
       },
       "database": {
@@ -1941,7 +1963,9 @@
         "title": "Jitsi Meet",
         "reachable": "Aċċessibbli",
         "unreachable": "Mhux aċċessibbli",
-        "notConfigured": "Mhux ikkonfigurat"
+        "notConfigured": "Mhux ikkonfigurat",
+        "degraded": "Aċċessibbli, iżda qed iwieġeb bi żbalji jew bil-mod",
+        "publicCheckFailed": "Il-verifika fl-indirizz pubbliku falliet ({code}): is-server tal-portal ma jaċċettax iċ-ċertifikat jew l-isem. Il-konferenzi xorta jistgħu jaħdmu."
       },
       "jvb": {
         "title": "Vidjo Bridge (JVB)",
@@ -1949,7 +1973,9 @@
         "replicas": "{current}/{max} nodi",
         "preScale": "Pre-scale: {minutes} min",
         "fixedMode": "Mod fiss",
-        "scalerEnabled": "Scaler attivat"
+        "scalerEnabled": "Scaler attivat",
+        "fixedDown": "Il-pont tal-vidjo mhux qed iwieġeb",
+        "unmonitored": "Mhux immonitorjat: l-indirizz tal-pont (JVB_HEALTH_URL) mhuwiex issettjat"
       },
       "jibri": {
         "title": "Reġistrazzjoni (Jibri)",
@@ -1971,7 +1997,11 @@
         "metrics": "Endpoint tal-metriċi"
       },
       "note": "Il-bidliet fl-infrastruttura jsiru permezz tal-Helm values u l-pipeline CI/CD.",
-      "deployDocs": "Dokumentazzjoni tad-deployment"
+      "deployDocs": "Dokumentazzjoni tad-deployment",
+      "platforms": {
+        "kubernetes": "Fuq Kubernetes",
+        "other": "Barra minn Kubernetes (Docker Compose jew server wieħed)"
+      }
     },
     "instantCalls": {
       "title": "Telefonati rapidi",
@@ -2076,9 +2106,9 @@
       "latencyP99": "Latenza P99",
       "requestRate": "Richieste/s",
       "chartLatencyQuantiles": "Latenza applicazionu — P50 / P95 / P99",
-      "participantsNow": "Parteċipanti attivi",
+      "participantsNow": "Parteċipanti fuq il-pont tal-vidjo",
       "jvbStress": "Carico JVB",
-      "conferences": "Conferenzu attive",
+      "conferences": "Konferenzi fuq il-pont tal-vidjo",
       "octoRelay": "Relay inter-bridge Octo",
       "interBridge": "Traffico Octo",
       "chartCpu": "CPU usage",
@@ -2105,7 +2135,8 @@
       "liveNow": "LIVE",
       "provisioningNow": "in allestimento",
       "idleNow": "IDLE (in pausa)",
-      "scaleToZeroHelp": "IDLE huwa lo stato normalu per wieħed avveniment mingħajr traffico minn aktar tal-gracu period. Alla li jmiss visita ta' wieħed utentità erġa' a PROVISIONING u poi LIVE."
+      "scaleToZeroHelp": "IDLE huwa lo stato normalu per wieħed avveniment mingħajr traffico minn aktar tal-gracu period. Alla li jmiss visita ta' wieħed utentità erġa' a PROVISIONING u poi LIVE.",
+      "capacityFromStatus": "Valuri attwali moqrija mill-pont tal-vidjo. L-istorja teħtieġ Prometheus."
     },
     "bulk": {
       "selectAll": "Agħżel kollha",
@@ -2824,7 +2855,8 @@
       "quotaExceeded": "Dan l-avveniment laħaq il-limitu tal-fajls imtella' ({maxFiles} fajl, {maxMb} MB b'kollox): neħħi xi wħud biex ittella' oħrajn",
       "uploadBusy": "Wisq fajls qed jitellgħu bħalissa: erġa' pprova fi ftit sekondi",
       "deleteFailed": "Ma setax jitħassar il-materjal"
-    }
+    },
+    "addedByStaff": "Miżjud mill-organizzaturi"
   },
   "reminders": {
     "title": "Notifiki",
@@ -2897,7 +2929,7 @@
       "requestSubmittedBody": "Jekk l-indirizz email jaqbel ma' reġistrazzjoni, bgħatnielek link biex tikkonferma t-tħassir. Il-link ikun validu għal siegħa.",
       "linkInvalid": "Il-link mhuwiex validu jew skada. Jekk jogħġbok itlob link ġdid.",
       "confirmWarning": "Se tħassar b'mod permanenti d-dejta personali kollha assoċjata mal-indirizz email tiegħek.",
-      "confirmBody": "Se jitħassru r-reġistrazzjonijiet, il-mistoqsijiet, il-voti fl-istħarriġiet, il-feedback u t-tfakkiriet. L-operazzjoni hija irriversibbli.",
+      "confirmBody": "Se jitħassru r-reġistrazzjonijiet, il-mistoqsijiet, il-voti fl-istħarriġiet, il-feedback, it-tfakkiriet u l-entrata tiegħek fid-direttorju tal-avvenimenti. L-operazzjoni hija irriversibbli.",
       "confirmButton": "Ikkonferma t-tħassir",
       "cancel": "Ikkanċella",
       "processing": "Qed jitħassar...",
@@ -3120,7 +3152,7 @@
     "nodesReady": "nodi lesti",
     "scaling": "qed jiskala",
     "jvbStress": "Tagħbija tal-JVB",
-    "participantsConnected": "parteċipanti konnessi",
+    "participantsConnected": "parteċipanti fuq il-pont tal-vidjo",
     "videoInteractive": "interattiv",
     "videoWebinar": "webinar",
     "participantsAvailable": "parteċipanti disponibbli",
@@ -3164,7 +3196,12 @@
       "lastFailure": "L-aħħar żball {when}",
       "artifactsProduced": "{count, plural, =0 {l-ebda artefatt} one {artefatt wieħed prodott} two {# artefatti prodotti} few {# artefatti prodotti} many {#-il artefatt prodott} other {# artefatt prodott}}",
       "eventsEnabled": "{count, plural, =0 {l-ebda avveniment bl-AI} one {avveniment wieħed bl-AI attiva} two {# avvenimenti bl-AI attiva} few {# avvenimenti bl-AI attiva} many {#-il avveniment bl-AI attiva} other {# avveniment bl-AI attiva}}"
-    }
+    },
+    "jvbFixedUp": "{count, plural, =1 {Il-pont tal-vidjo qed jaħdem} other {Il-pont tal-vidjo qed jaħdem · pontijiet previsti: #}}",
+    "jvbFixedDown": "Il-pont tal-vidjo mhux qed iwieġeb",
+    "jvbFixedDownDetail": "Il-parteċipanti ma jirċievu la awdjo u lanqas vidjo sakemm il-pont jerġa' jkun aċċessibbli.",
+    "jvbUnmonitored": "L-istat mhux immonitorjat",
+    "jvbUnmonitoredDetail": "Din l-installazzjoni ma tistaqsix lill-pont tal-vidjo, għalhekk l-istat tiegħu mhux disponibbli hawn."
   },
   "infraMap": {
     "loading": "Qed jitgħabba l-mappa tal-infrastruttura...",
@@ -3172,8 +3209,8 @@
     "ariaLabel": "Mappa tal-infrastruttura tas-sistema",
     "title": "Mappa tal-infrastruttura",
     "subtitle": "Viżwalizzazzjoni f'ħin reali tal-arkitettura u l-istatus tas-servizzi",
-    "participants": "Parteċipanti",
-    "conferences": "Konferenzi",
+    "participants": "Parteċipanti fuq il-pont tal-vidjo",
+    "conferences": "Konferenzi fuq il-pont tal-vidjo",
     "bandwidthIn": "Bandwidth dieħel",
     "bandwidthOut": "Bandwidth ħiereġ",
     "recordings": "Reġistrazzjonijiet",
@@ -3259,23 +3296,33 @@
       "jitsiWeb": {
         "healthy": "Is-sala tal-vidjokonferenza hija aċċessibbli u lesta għall-avvenimenti.",
         "down": "Is-sala tal-vidjokonferenza mhijiex aċċessibbli. Mhuwiex possibbli tibda jew tidħol fl-avvenimenti.",
-        "standby": "Is-sala tal-vidjokonferenza mhijiex ikkonfigurata."
+        "standby": "Is-sala tal-vidjokonferenza mhijiex ikkonfigurata.",
+        "degraded": "Is-sala tal-vidjokonferenza qed twieġeb, iżda bi żbalji jew bil-mod.",
+        "publicCheckFailed": "Il-portal ma jistax jivverifika s-sala fl-indirizz pubbliku tagħha: mis-server, iċ-ċertifikat jew l-isem mhumiex validi. Għall-parteċipanti s-sala xorta tista' taħdem.",
+        "unmonitored": "L-istat tas-sala tal-vidjokonferenza mhuwiex immonitorjat f'din l-installazzjoni."
       },
       "prosody": {
         "healthy": "Il-messaġġistika interna bejn is-servizzi tal-vidjo qed taħdem korrettament.",
         "down": "Il-messaġġistika interna mhijiex aċċessibbli. Is-servizzi tal-vidjo ma jistgħux jikkomunikaw ma' xulxin.",
-        "standby": "Is-servizz tal-messaġġistika mhuwiex ikkonfigurat."
+        "standby": "Is-servizz tal-messaġġistika mhuwiex ikkonfigurat.",
+        "degraded": "Il-messaġġistika interna qed twieġeb, iżda bi żbalji jew bil-mod.",
+        "publicCheckFailed": "Il-portal ma jistax jivverifika l-messaġġistika interna permezz tal-indirizz pubbliku tas-sala: mis-server, iċ-ċertifikat jew l-isem mhumiex validi. Il-konferenzi xorta jistgħu jaħdmu.",
+        "unmonitored": "L-istat tal-messaġġistika interna mhuwiex immonitorjat f'din l-installazzjoni."
       },
       "jicofo": {
         "healthy": "Il-koordinatur tal-konferenzi huwa attiv u qed jimmaniġġja s-sessjonijiet.",
         "down": "Il-koordinatur tal-konferenzi mhuwiex aċċessibbli. Mhuwiex possibbli toħloq konferenzi ġodda.",
-        "standby": "Il-koordinatur tal-konferenzi mhuwiex ikkonfigurat."
+        "standby": "Il-koordinatur tal-konferenzi mhuwiex ikkonfigurat.",
+        "degraded": "Il-koordinatur tal-konferenzi qed iwieġeb, iżda bi żbalji jew bil-mod.",
+        "unmonitored": "L-istat tal-koordinatur tal-konferenzi mhuwiex immonitorjat f'din l-installazzjoni."
       },
       "jvb": {
         "healthy": "Il-pont tal-vidjo huwa attiv u qed jittrażmetti l-awdjo/vidjo lill-parteċipanti.",
         "scaling": "Il-pont tal-vidjo qed jipprepara għal avveniment li ġej. Is-servers qed jinħolqu awtomatikament.",
         "standby": "Il-pont tal-vidjo huwa standby. Se jiġi attivat awtomatikament qabel ma jibda avveniment skedat.",
-        "stale": "Wieħed avveniment attendu il pontu vidjo minn aktar tal-timeout configurato. Iċċekkjaru il cluster autoscaler u i log tal-pod JVB."
+        "stale": "Wieħed avveniment attendu il pontu vidjo minn aktar tal-timeout configurato. Iċċekkjaru il cluster autoscaler u i log tal-pod JVB.",
+        "fixedDown": "Il-pont tal-vidjo mhux qed iwieġeb. Il-konferenzi ma jittrażmettux la awdjo u lanqas vidjo sakemm jerġa' jkun aċċessibbli.",
+        "unmonitored": "L-istat tal-pont tal-vidjo mhuwiex immonitorjat f'din l-installazzjoni: il-portal m'għandux indirizz biex jistaqsih."
       },
       "jibri": {
         "healthy": "Is-servizz tar-reġistrazzjoni huwa lest u disponibbli.",
@@ -3307,7 +3354,8 @@
       "jibri": "L-avvenimenti ma jistgħux jiġu rreġistrati. Il-parteċipanti jistgħu xorta jipparteċipaw.",
       "jibriStale": "Wieħed avveniment ma' reġistrazzjoni attiva attendu Jibri minn aktar tal-timeout: il-sessjoni mhux vienu reġistrata.",
       "smtp": "L-emails ta' konferma tar-reġistrazzjoni u t-tfakkiriet mhux se jintbagħtu.",
-      "postprodDegraded": "It-traskrizzjonijiet u s-sommarji ta' xi reġistrazzjonijiet reċenti ma ġewx iġġenerati. Ir-reġistrazzjonijiet tal-vidjow xorta huma disponibbli."
+      "postprodDegraded": "It-traskrizzjonijiet u s-sommarji ta' xi reġistrazzjonijiet reċenti ma ġewx iġġenerati. Ir-reġistrazzjonijiet tal-vidjow xorta huma disponibbli.",
+      "jvbDown": "Il-parteċipanti ma jirċievu la awdjo u lanqas vidjo."
     },
     "overallVerdicts": {
       "operational": "Is-servizzi kollha qed jaħdmu korrettament. Il-pjattaforma hija kompletament operattiva.",
@@ -3337,7 +3385,8 @@
       "degraded": "Imnaqqas",
       "down": "Mhux disponibbli",
       "standby": "Fi standby",
-      "scaling": "Qed jipprepara"
+      "scaling": "Qed jipprepara",
+      "unknown": "Mhux immonitorjat"
     },
     "metrics": {
       "uptime24h": "Uptimu 24h",
@@ -3348,7 +3397,8 @@
       "errorRate": "Errori 5xx",
       "requestRate": "Richieste/s",
       "podUptime": "Pod uptime"
-    }
+    },
+    "probeDetail": "Riżultat tal-verifika"
   },
   "feedback": {
     "title": "Kif tevalwa dan l-avveniment?",
@@ -3673,7 +3723,9 @@
       "almostReady": "Is-server tal-vidjo qed jaħdem: kważi lesti",
       "almostReadyDetail": "Mument ieħor u l-buttuna tad-dħul tinxtegħel waħidha.",
       "honestHint": "Stennija tas-soltu: inqas minn minuta jekk l-infrastruttura diġà sħuna, 3–5 minuti mal-ewwel tħaddim. Sadanittant tista' tiċċekkja l-kamera u l-mikrofonu jew tuża ċ-chat.",
-      "elapsed": "qed jitħejja minn {time}"
+      "elapsed": "qed jitħejja minn {time}",
+      "scheduled": "Is-sala tinfetaħ fil-ħin tal-bidu",
+      "scheduledDetail": "Jew qabel, meta l-organizzatur jibda l-avveniment. Sadanittant tista' tiċċekkja l-kamera u l-mikrofonu jew tuża ċ-chat."
     },
     "exitWaiting": "Oħroġ mill-kamra tal-istennija",
     "warmingUp": "Sala in allestimento",
@@ -3729,7 +3781,10 @@
       "hostEarly": "Dħul kmieni (ospitant)"
     },
     "roomJustOpened": "Il-kamra lesta — idħol",
-    "enterAnyway": "Idħol xorta"
+    "enterAnyway": "Idħol xorta",
+    "notHeldBadge": "Il-ħin għadda",
+    "notHeldTitle": "Il-ħin ippjanat għall-avveniment għadda",
+    "notHeldDetail": "Is-sala ma nfetħitx. Iċċekkja l-paġna tal-avveniment għal xi aġġornamenti."
   },
   "recording": {
     "management": "Reġistrazzjoni bil-vidjo",
@@ -3865,6 +3920,16 @@
     "noFeedback": "Ma wasal l-ebda feedback",
     "comments": "Kummenti",
     "noComments": "L-ebda kumment",
+    "yes": "Iva",
+    "no": "Le"
+  },
+  "questionnaire": {
+    "loadFailed": "Il-kwestjonarju ma setax jitgħabba.",
+    "submit": "Ibgħat it-tweġibiet",
+    "submitFailed": "Il-bgħit ma rnexxiex. Erġa' pprova.",
+    "answersInvalid": "Xi tweġibiet huma nieqsa jew mhumiex validi: iċċekkja l-mistoqsijiet obbligatorji u erġa' pprova.",
+    "alreadySubmitted": "Diġà bgħatt it-tweġibiet tiegħek għal dan il-kwestjonarju.",
+    "thankYou": "Grazzi tat-tweġibiet tiegħek.",
     "yes": "Iva",
     "no": "Le"
   }

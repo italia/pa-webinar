@@ -127,7 +127,8 @@
         "outlook": "Outlook / Office 365",
         "yahoo": "Yahoo Calendar",
         "downloadIcs": "Descargar archivo .ics"
-      }
+      },
+      "registrationEnded": "El evento ha finalizado: la inscripción está cerrada."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -368,7 +369,8 @@
       "questionRestore": "Restaurar",
       "questionStatusFailed": "No se ha podido actualizar la pregunta",
       "questionNeedsText": "Escribe el texto de la pregunta: un archivo adjunto por sí solo no entra en la cola",
-      "lensTruncated": "Solo se han cargado los mensajes más recientes: puede haber preguntas más antiguas que no aparecen en la lista."
+      "lensTruncated": "Solo se han cargado los mensajes más recientes: puede haber preguntas más antiguas que no aparecen en la lista.",
+      "attachUnavailable": "Los archivos adjuntos no están disponibles en esta instalación."
     },
     "role": {
       "moderator": "Moderador",
@@ -389,7 +391,8 @@
         "unknown": "N/D"
       },
       "volume": "Volumen",
-      "volumeFor": "Volumen de {name}"
+      "volumeFor": "Volumen de {name}",
+      "kickName": "Expulsar a {name}"
     },
     "moderator": {
       "muteAll": "Silenciar a todos",
@@ -453,7 +456,18 @@
       "remainingLabel": "Tiempo restante (haz clic para ver el tiempo transcurrido)",
       "elapsedLabel": "Tiempo transcurrido (haz clic para ver el tiempo restante)"
     },
-    "videoCallFrameTitle": "Videollamada del evento"
+    "videoCallFrameTitle": "Videollamada del evento",
+    "insecureContextTitle": "Dirección no segura",
+    "insecureContextBody": "Esta página se ha abierto con http://: el navegador no permite usar el micrófono ni la cámara, y la videollamada no puede iniciarse. Abra la misma página en la dirección segura.",
+    "insecureContextLink": "Abrir https://{host}",
+    "conferenceUnreachableTitle": "El servicio de videollamada no responde",
+    "conferenceUnreachableBody": "Su navegador no consigue conectar con el servidor de videollamada ({host}). Ábralo en una pestaña nueva: si el navegador muestra un aviso de seguridad, acéptelo, vuelva aquí e inténtelo de nuevo. Si la página no se abre, es posible que la red desde la que se conecta lo esté bloqueando.",
+    "conferenceOpenHost": "Abrir {host} en una pestaña nueva",
+    "leftTitle": "Ha salido de la sala",
+    "leftMessage": "El evento sigue en curso: puede volver a entrar cuando quiera.",
+    "leftModeratorReminder": "El evento sigue abierto hasta que alguien lo termine. Cuando hayan terminado, vuelva a entrar y elija «{action}».",
+    "rejoin": "Volver a entrar",
+    "backToHome": "Volver a la página de inicio"
   },
   "qa": {
     "title": "Preguntas y Respuestas",
@@ -590,7 +604,8 @@
       "errorGeneric": "Error al subir el archivo",
       "helpImage": "Formatos admitidos: PNG, JPEG, WebP, SVG, GIF — máx. 10 MB",
       "helpAudio": "Formatos admitidos: MP3, WAV, OGG, M4A, WebM — máx. 20 MB",
-      "helpDocument": "Formatos admitidos: PDF, DOCX, PPTX, XLSX, TXT — máx. 25 MB"
+      "helpDocument": "Formatos admitidos: PDF, DOCX, PPTX, XLSX, TXT — máx. 25 MB",
+      "uploadsUnavailable": "La subida de archivos no está disponible en esta instalación: pegue la URL del archivo."
     },
     "rubricaPicker": {
       "loading": "Buscando…",
@@ -628,7 +643,9 @@
           "endsAt": "La fecha de finalización debe ser posterior a la de inicio.",
           "titleRequired": "El título es obligatorio (al menos 3 caracteres).",
           "titleRequiredOtherLocale": "El título en el idioma predeterminado ({locale}) es obligatorio: cambia a la pestaña {locale}.",
-          "maxParticipants": "Introduce un número entre 2 y 500."
+          "maxParticipants": "Introduce un número entre 2 y 500.",
+          "descriptionRequired": "La descripción es obligatoria (al menos {min} caracteres).",
+          "descriptionRequiredOtherLocale": "La descripción en el idioma predeterminado ({locale}) es obligatoria: cambia a la pestaña {locale}."
         },
         "senderRatioLabel": "Porcentaje activo estimado",
         "senderRatioHelp": "Cuántos participantes se prevé que tengan micrófono o vídeo activos. Ayuda a dimensionar el servidor de vídeo.",
@@ -820,7 +837,11 @@
         "speakers": "ponentes",
         "materials": "materiales",
         "questionnaires": "cuestionarios"
-      }
+      },
+      "revocationFailed": "No se ha podido revocar el acceso de {name}: su enlace sigue siendo válido. Guarda de nuevo para reintentarlo o revócalo desde la pestaña «{tab}» de la página del evento.",
+      "validationFailedDetail": "El servidor ha rechazado algunos datos: {reason}. Corrígelos y vuelve a intentarlo.",
+      "publishFailed": "El evento se ha creado, pero no se ha publicado: sigue siendo un borrador. Publícalo desde la página del evento.",
+      "publishFailedDetail": "El evento se ha creado, pero no se ha publicado: sigue siendo un borrador. El servidor ha respondido: {reason}. Publícalo desde la página del evento."
     },
     "nav": {
       "events": "Gestión de eventos",
@@ -1240,7 +1261,7 @@
       "wordCloudEnabled": "Nube de palabras en directo",
       "wordCloudEnabledDesc": "Los participantes envían una palabra y la nube se actualiza en directo. Útil para abrir un debate o recoger una impresión en pocos segundos.",
       "whiteboardEnabled": "Pizarra compartida",
-      "whiteboardEnabledDesc": "Activa la pizarra colaborativa nativa (Excalidraw): los moderadores pueden abrirla desde la barra de herramientas durante el evento. Siempre activa en las llamadas instantáneas.",
+      "whiteboardEnabledDesc": "Activa la pizarra colaborativa nativa (Excalidraw): los moderadores pueden abrirla desde la barra de herramientas durante el evento. Requiere el servicio de pizarra de la instalación; donde está disponible, siempre está activa en las llamadas instantáneas.",
       "autoStartRecording": "Iniciar la grabación automáticamente",
       "autoStartRecordingDesc": "Al iniciar el evento, la grabación arranca por sí sola (sin pedir confirmación al moderador). Así los rezagados encontrarán el reproductor ya disponible.",
       "aiSectionHeading": "Posproducción automática",
@@ -1316,7 +1337,8 @@
       "retentionPreviewRecordings": "Grabaciones de vídeo",
       "retentionPreviewKept": "Las estadísticas agregadas y los metadatos del evento se conservan.",
       "configPreview": "Vista previa de la configuración",
-      "templateApplied": "Plantilla aplicada: {name}. Puede modificar todos los ajustes."
+      "templateApplied": "Plantilla aplicada: {name}. Puede modificar todos los ajustes.",
+      "whiteboardUnavailable": "No disponible en esta instalación: falta el servicio de pizarra de Jitsi, que puede activar quien gestiona la plataforma."
     },
     "links": {
       "title": "Enlaces del evento",
@@ -1925,9 +1947,9 @@
       "version": "Versión",
       "environment": "Entorno",
       "modes": {
-        "simple": "Simple (Docker Compose)",
-        "standard": "Estándar (Kubernetes)",
-        "full": "Completa (Kubernetes con scale-to-zero)",
+        "simple": "Simple",
+        "standard": "Estándar",
+        "full": "Completa (bridges con scale-to-zero)",
         "unknown": "Desconocida"
       },
       "database": {
@@ -1941,7 +1963,9 @@
         "title": "Jitsi Meet",
         "reachable": "Accesible",
         "unreachable": "No accesible",
-        "notConfigured": "No configurado"
+        "notConfigured": "No configurado",
+        "degraded": "Accesible, pero responde con errores o lentamente",
+        "publicCheckFailed": "Ha fallado la comprobación en la dirección pública ({code}): el servidor del portal no acepta el certificado o el nombre. Las conferencias pueden funcionar igualmente."
       },
       "jvb": {
         "title": "Video Bridge (JVB)",
@@ -1949,7 +1973,9 @@
         "replicas": "{current}/{max} nodos",
         "preScale": "Pre-escalado: {minutes} min",
         "fixedMode": "Modo fijo",
-        "scalerEnabled": "Scaler activado"
+        "scalerEnabled": "Scaler activado",
+        "fixedDown": "El puente de vídeo no responde",
+        "unmonitored": "No supervisado: falta la dirección del puente (JVB_HEALTH_URL)"
       },
       "jibri": {
         "title": "Grabación (Jibri)",
@@ -1971,7 +1997,11 @@
         "metrics": "Endpoint de métricas"
       },
       "note": "Los cambios de infraestructura se realizan a través de los valores de Helm y el pipeline CI/CD.",
-      "deployDocs": "Documentación de despliegue"
+      "deployDocs": "Documentación de despliegue",
+      "platforms": {
+        "kubernetes": "En Kubernetes",
+        "other": "Fuera de Kubernetes (Docker Compose o servidor único)"
+      }
     },
     "instantCalls": {
       "title": "Llamadas rápidas",
@@ -2076,9 +2106,9 @@
       "latencyP99": "Latencia P99",
       "requestRate": "Solicitudes/s",
       "chartLatencyQuantiles": "Latencia de aplicación — P50 / P95 / P99",
-      "participantsNow": "Participantes activos",
+      "participantsNow": "Participantes en el puente de vídeo",
       "jvbStress": "Carga JVB",
-      "conferences": "Conferencias activas",
+      "conferences": "Conferencias en el puente de vídeo",
       "octoRelay": "Relay inter-bridge Octo",
       "interBridge": "Tráfico Octo",
       "chartCpu": "CPU usage",
@@ -2105,7 +2135,8 @@
       "liveNow": "LIVE",
       "provisioningNow": "aprovisionando",
       "idleNow": "IDLE (en pausa)",
-      "scaleToZeroHelp": "IDLE es el estado normal para un evento sin tráfico durante más del periodo de cortesía. En la próxima visita de un usuario vuelve a PROVISIONING y luego a LIVE."
+      "scaleToZeroHelp": "IDLE es el estado normal para un evento sin tráfico durante más del periodo de cortesía. En la próxima visita de un usuario vuelve a PROVISIONING y luego a LIVE.",
+      "capacityFromStatus": "Valores actuales leídos del puente de vídeo. El historial requiere Prometheus."
     },
     "bulk": {
       "selectAll": "Seleccionar todos",
@@ -2824,7 +2855,8 @@
       "quotaExceeded": "Este evento ha alcanzado el límite de archivos subidos ({maxFiles} archivos, {maxMb} MB en total): elimine algunos para subir otros",
       "uploadBusy": "Demasiadas subidas en este momento: inténtelo de nuevo en unos segundos",
       "deleteFailed": "No se pudo eliminar el material"
-    }
+    },
+    "addedByStaff": "Añadido por la organización"
   },
   "reminders": {
     "title": "Notificaciones",
@@ -2897,7 +2929,7 @@
       "requestSubmittedBody": "Si esta dirección de correo electrónico corresponde a una inscripción, le hemos enviado un enlace para confirmar la supresión. El enlace será válido durante 1 hora.",
       "linkInvalid": "Este enlace no es válido o ha caducado. Solicite un nuevo enlace.",
       "confirmWarning": "Está a punto de suprimir de forma definitiva todos los datos personales asociados a su dirección de correo electrónico.",
-      "confirmBody": "Se suprimirán las inscripciones, las preguntas, los votos en las encuestas, las valoraciones y los recordatorios. La operación es irreversible.",
+      "confirmBody": "Se suprimirán las inscripciones, las preguntas, los votos en las encuestas, las valoraciones, los recordatorios y su registro en la Agenda de eventos. La operación es irreversible.",
       "confirmButton": "Confirmar la supresión",
       "cancel": "Cancelar",
       "processing": "Eliminando...",
@@ -3120,7 +3152,7 @@
     "nodesReady": "nodos listos",
     "scaling": "escalando",
     "jvbStress": "Carga JVB",
-    "participantsConnected": "participantes conectados",
+    "participantsConnected": "participantes en el puente de vídeo",
     "videoInteractive": "interactivo",
     "videoWebinar": "seminario web",
     "participantsAvailable": "participantes disponibles",
@@ -3164,7 +3196,12 @@
       "lastFailure": "Último error {when}",
       "artifactsProduced": "{count, plural, =0 {ningún artefacto} one {1 artefacto producido} other {# artefactos producidos}}",
       "eventsEnabled": "{count, plural, =0 {ningún evento con IA} one {1 evento con IA activa} other {# eventos con IA activa}}"
-    }
+    },
+    "jvbFixedUp": "{count, plural, =1 {Puente de vídeo activo} other {Puente de vídeo activo · # bridges previstos}}",
+    "jvbFixedDown": "El puente de vídeo no responde",
+    "jvbFixedDownDetail": "Los participantes no reciben audio ni vídeo hasta que el puente vuelva a estar accesible.",
+    "jvbUnmonitored": "Estado no supervisado",
+    "jvbUnmonitoredDetail": "Esta instalación no consulta el puente de vídeo: su estado no está disponible aquí."
   },
   "infraMap": {
     "loading": "Cargando mapa de infraestructura...",
@@ -3172,8 +3209,8 @@
     "ariaLabel": "Mapa de infraestructura del sistema",
     "title": "Mapa de infraestructura",
     "subtitle": "Visualización en tiempo real de la arquitectura y el estado de los servicios",
-    "participants": "Participantes",
-    "conferences": "Conferencias",
+    "participants": "Participantes en el puente de vídeo",
+    "conferences": "Conferencias en el puente de vídeo",
     "bandwidthIn": "Ancho de banda entrante",
     "bandwidthOut": "Ancho de banda saliente",
     "recordings": "Grabaciones",
@@ -3259,23 +3296,33 @@
       "jitsiWeb": {
         "healthy": "La sala de videoconferencia es accesible y está lista para los eventos.",
         "down": "La sala de videoconferencia no es accesible. No es posible iniciar ni unirse a eventos.",
-        "standby": "La sala de videoconferencia no está configurada."
+        "standby": "La sala de videoconferencia no está configurada.",
+        "degraded": "La sala de videoconferencia responde, pero con errores o lentamente.",
+        "publicCheckFailed": "El portal no puede comprobar la sala en su dirección pública: desde el servidor, el certificado o el nombre no son válidos. La sala puede funcionar igualmente para los participantes.",
+        "unmonitored": "El estado de la sala de videoconferencia no se supervisa en esta instalación."
       },
       "prosody": {
         "healthy": "La mensajería interna entre los servicios de vídeo funciona correctamente.",
         "down": "La mensajería interna no es accesible. Los servicios de vídeo no pueden comunicarse entre sí.",
-        "standby": "El servicio de mensajería no está configurado."
+        "standby": "El servicio de mensajería no está configurado.",
+        "degraded": "La mensajería interna responde, pero con errores o lentamente.",
+        "publicCheckFailed": "El portal no puede comprobar la mensajería interna a través de la dirección pública de la sala: desde el servidor, el certificado o el nombre no son válidos. Las conferencias pueden funcionar igualmente.",
+        "unmonitored": "El estado de la mensajería interna no se supervisa en esta instalación."
       },
       "jicofo": {
         "healthy": "El coordinador de conferencias está activo y gestionando sesiones.",
         "down": "El coordinador de conferencias no es accesible. No es posible crear nuevas conferencias.",
-        "standby": "El coordinador de conferencias no está configurado."
+        "standby": "El coordinador de conferencias no está configurado.",
+        "degraded": "El coordinador de conferencias responde, pero con errores o lentamente.",
+        "unmonitored": "El estado del coordinador de conferencias no se supervisa en esta instalación."
       },
       "jvb": {
         "healthy": "El puente de vídeo está activo y transmitiendo audio/vídeo a los participantes.",
         "scaling": "El puente de vídeo se está preparando para un evento próximo. Los servidores se están creando automáticamente.",
         "standby": "El puente de vídeo está en espera. Se activará automáticamente antes del inicio de un evento programado.",
-        "stale": "Un evento espera el puente de vídeo desde hace más del timeout configurado. Compruebe el cluster autoscaler y los logs de los pods JVB."
+        "stale": "Un evento espera el puente de vídeo desde hace más del timeout configurado. Compruebe el cluster autoscaler y los logs de los pods JVB.",
+        "fixedDown": "El puente de vídeo no responde. Las conferencias no transmiten audio ni vídeo hasta que vuelva a estar accesible.",
+        "unmonitored": "El estado del puente de vídeo no se supervisa en esta instalación: el portal no tiene una dirección para consultarlo."
       },
       "jibri": {
         "healthy": "El servicio de grabación está listo y disponible.",
@@ -3307,7 +3354,8 @@
       "jibri": "Los eventos no pueden ser grabados. Los participantes pueden seguir uniéndose y participando.",
       "jibriStale": "Un evento con grabación activa espera Jibri desde hace más del timeout: la sesión no se está grabando.",
       "smtp": "Los correos de confirmación de inscripción y los recordatorios no se enviarán.",
-      "postprodDegraded": "Las transcripciones y las actas de algunas grabaciones recientes no se han generado. Las grabaciones de vídeo siguen estando disponibles."
+      "postprodDegraded": "Las transcripciones y las actas de algunas grabaciones recientes no se han generado. Las grabaciones de vídeo siguen estando disponibles.",
+      "jvbDown": "Los participantes no reciben audio ni vídeo."
     },
     "overallVerdicts": {
       "operational": "Todos los servicios funcionan correctamente. La plataforma está plenamente operativa.",
@@ -3337,7 +3385,8 @@
       "degraded": "Degradado",
       "down": "No disponible",
       "standby": "En espera",
-      "scaling": "En preparación"
+      "scaling": "En preparación",
+      "unknown": "No supervisado"
     },
     "metrics": {
       "uptime24h": "Uptime 24h",
@@ -3348,7 +3397,8 @@
       "errorRate": "Errores 5xx",
       "requestRate": "Solicitudes/s",
       "podUptime": "Pod uptime"
-    }
+    },
+    "probeDetail": "Resultado de la comprobación"
   },
   "feedback": {
     "title": "¿Cómo valora este evento?",
@@ -3673,7 +3723,9 @@
       "almostReady": "Servidor de vídeo activo: ya casi está",
       "almostReadyDetail": "Un momento más y el botón de entrada se activará solo.",
       "honestHint": "Espera habitual: menos de un minuto si la infraestructura ya está caliente, 3–5 minutos en el primer arranque. Mientras tanto puedes revisar cámara y micrófono o usar el chat.",
-      "elapsed": "en preparación desde hace {time}"
+      "elapsed": "en preparación desde hace {time}",
+      "scheduled": "La sala se abre a la hora de inicio",
+      "scheduledDetail": "O antes, cuando la organización inicie el evento. Mientras tanto puedes revisar cámara y micrófono o usar el chat."
     },
     "exitWaiting": "Salir de la sala de espera",
     "warmingUp": "Sala preparándose",
@@ -3729,7 +3781,10 @@
       "hostEarly": "Entrada anticipada (anfitrión)"
     },
     "roomJustOpened": "La sala está lista — entra",
-    "enterAnyway": "Entrar de todos modos"
+    "enterAnyway": "Entrar de todos modos",
+    "notHeldBadge": "Hora pasada",
+    "notHeldTitle": "La hora prevista del evento ya ha pasado",
+    "notHeldDetail": "La sala no se abrió. Consulta la página del evento para ver si hay novedades."
   },
   "recording": {
     "management": "Grabación de vídeo",
@@ -3865,6 +3920,16 @@
     "noFeedback": "No se ha recibido feedback",
     "comments": "Comentarios",
     "noComments": "Sin comentarios",
+    "yes": "Sí",
+    "no": "No"
+  },
+  "questionnaire": {
+    "loadFailed": "No se ha podido cargar el cuestionario.",
+    "submit": "Enviar respuestas",
+    "submitFailed": "El envío no se ha realizado. Inténtalo de nuevo.",
+    "answersInvalid": "Faltan algunas respuestas o no son válidas: revisa las preguntas obligatorias e inténtalo de nuevo.",
+    "alreadySubmitted": "Ya has enviado tus respuestas a este cuestionario.",
+    "thankYou": "Gracias por tus respuestas.",
     "yes": "Sí",
     "no": "No"
   }

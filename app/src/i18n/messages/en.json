@@ -127,7 +127,8 @@
         "outlook": "Outlook / Office 365",
         "yahoo": "Yahoo Calendar",
         "downloadIcs": "Download .ics file"
-      }
+      },
+      "registrationEnded": "The event has ended: registration is closed."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -368,7 +369,8 @@
       "questionRestore": "Restore",
       "questionStatusFailed": "Could not update the question",
       "questionNeedsText": "Type the text of your question: an attachment alone does not enter the queue",
-      "lensTruncated": "Only the most recent messages are loaded: there may be older questions not listed."
+      "lensTruncated": "Only the most recent messages are loaded: there may be older questions not listed.",
+      "attachUnavailable": "Attachments are not available on this installation."
     },
     "role": {
       "moderator": "Moderator",
@@ -389,7 +391,8 @@
         "unknown": "N/A"
       },
       "volume": "Volume",
-      "volumeFor": "Volume for {name}"
+      "volumeFor": "Volume for {name}",
+      "kickName": "Kick {name}"
     },
     "moderator": {
       "muteAll": "Mute all",
@@ -453,7 +456,18 @@
       "remainingLabel": "Time remaining (click for time elapsed)",
       "elapsedLabel": "Time elapsed (click for time remaining)"
     },
-    "videoCallFrameTitle": "Event video call"
+    "videoCallFrameTitle": "Event video call",
+    "insecureContextTitle": "Insecure address",
+    "insecureContextBody": "This page was opened over http://: the browser does not allow the microphone and camera, and the video call cannot start. Open the same page at the secure address.",
+    "insecureContextLink": "Open https://{host}",
+    "conferenceUnreachableTitle": "The video call service is not responding",
+    "conferenceUnreachableBody": "Your browser cannot reach the video call server ({host}). Open it in a new tab: if the browser shows a security warning, accept it, then come back here and try again. If the page does not open, the network you are connected to may be blocking it.",
+    "conferenceOpenHost": "Open {host} in a new tab",
+    "leftTitle": "You left the room",
+    "leftMessage": "The event is still in progress: you can rejoin whenever you like.",
+    "leftModeratorReminder": "The event stays open until someone ends it. When you have finished, rejoin and choose “{action}”.",
+    "rejoin": "Rejoin",
+    "backToHome": "Back to the home page"
   },
   "qa": {
     "title": "Questions & Answers",
@@ -590,7 +604,8 @@
       "errorGeneric": "Error while uploading the file",
       "helpImage": "Supported formats: PNG, JPEG, WebP, SVG, GIF — max 10 MB",
       "helpAudio": "Supported formats: MP3, WAV, OGG, M4A, WebM — max 20 MB",
-      "helpDocument": "Supported formats: PDF, DOCX, PPTX, XLSX, TXT — max 25 MB"
+      "helpDocument": "Supported formats: PDF, DOCX, PPTX, XLSX, TXT — max 25 MB",
+      "uploadsUnavailable": "File uploads are not available on this installation: paste the file's URL instead."
     },
     "rubricaPicker": {
       "loading": "Searching…",
@@ -628,7 +643,9 @@
           "endsAt": "End date must be after start date.",
           "titleRequired": "Title is required (at least 3 characters).",
           "titleRequiredOtherLocale": "The title in the default language ({locale}) is required: switch to the {locale} tab.",
-          "maxParticipants": "Enter a number between 2 and 500."
+          "maxParticipants": "Enter a number between 2 and 500.",
+          "descriptionRequired": "The description is required (at least {min} characters).",
+          "descriptionRequiredOtherLocale": "The description in the default language ({locale}) is required: switch to the {locale} tab."
         },
         "senderRatioLabel": "Estimated active share",
         "senderRatioHelp": "How many participants you expect to have mic/camera active. Helps size the video server.",
@@ -820,7 +837,11 @@
         "speakers": "speakers",
         "materials": "materials",
         "questionnaires": "questionnaires"
-      }
+      },
+      "revocationFailed": "Revoking access for {name} failed: their access link is still valid. Save again to retry, or revoke it from the “{tab}” tab of the event page.",
+      "validationFailedDetail": "The server rejected some data: {reason}. Fix it and try again.",
+      "publishFailed": "The event was created but not published: it is still a draft. Publish it from the event page.",
+      "publishFailedDetail": "The event was created but not published: it is still a draft. The server replied: {reason}. Publish it from the event page."
     },
     "nav": {
       "events": "Events",
@@ -1240,7 +1261,7 @@
       "wordCloudEnabled": "Live word cloud",
       "wordCloudEnabledDesc": "Participants send a word and the cloud updates live. Useful to open a discussion or gather a feeling in a few seconds.",
       "whiteboardEnabled": "Shared whiteboard",
-      "whiteboardEnabledDesc": "Enables the native collaborative whiteboard (Excalidraw): moderators can open it from the toolbar during the event. Always on for instant calls.",
+      "whiteboardEnabledDesc": "Enables the native collaborative whiteboard (Excalidraw): moderators can open it from the toolbar during the event. Requires the installation's whiteboard service; where it is available, it is always on for instant calls.",
       "autoStartRecording": "Start recording automatically",
       "autoStartRecordingDesc": "When the event starts, recording begins on its own (the moderator is not prompted). Late joiners immediately find a catch-up player available.",
       "aiSectionHeading": "Automatic post-production",
@@ -1316,7 +1337,8 @@
       "retentionPreviewRecordings": "Video recordings",
       "retentionPreviewKept": "Aggregate statistics and event metadata are retained.",
       "configPreview": "Configuration preview",
-      "templateApplied": "Template applied: {name}. You can modify all settings."
+      "templateApplied": "Template applied: {name}. You can modify all settings.",
+      "whiteboardUnavailable": "Not available on this installation: the Jitsi whiteboard service is missing, and the platform operator can enable it."
     },
     "links": {
       "title": "Event links",
@@ -1925,9 +1947,9 @@
       "version": "Version",
       "environment": "Environment",
       "modes": {
-        "simple": "Simple (Docker Compose)",
-        "standard": "Standard (Kubernetes)",
-        "full": "Full (Kubernetes with scale-to-zero)",
+        "simple": "Simple",
+        "standard": "Standard",
+        "full": "Full (bridges with scale-to-zero)",
         "unknown": "Unknown"
       },
       "database": {
@@ -1941,7 +1963,9 @@
         "title": "Jitsi Meet",
         "reachable": "Reachable",
         "unreachable": "Unreachable",
-        "notConfigured": "Not configured"
+        "notConfigured": "Not configured",
+        "degraded": "Reachable, but responding with errors or slowly",
+        "publicCheckFailed": "Check at the public address failed ({code}): the portal server does not accept the certificate or the name. Conferences may still work."
       },
       "jvb": {
         "title": "Video Bridge (JVB)",
@@ -1949,7 +1973,9 @@
         "replicas": "{current}/{max} nodes",
         "preScale": "Pre-scale: {minutes} min",
         "fixedMode": "Fixed mode",
-        "scalerEnabled": "Scaler enabled"
+        "scalerEnabled": "Scaler enabled",
+        "fixedDown": "The video bridge is not responding",
+        "unmonitored": "Not monitored: the bridge address (JVB_HEALTH_URL) is not set"
       },
       "jibri": {
         "title": "Recording (Jibri)",
@@ -1971,7 +1997,11 @@
         "metrics": "Metrics endpoint"
       },
       "note": "Infrastructure changes are made through Helm values and the CI/CD pipeline.",
-      "deployDocs": "Deployment documentation"
+      "deployDocs": "Deployment documentation",
+      "platforms": {
+        "kubernetes": "On Kubernetes",
+        "other": "Outside Kubernetes (Docker Compose or a single server)"
+      }
     },
     "instantCalls": {
       "title": "Instant calls",
@@ -2076,9 +2106,9 @@
       "latencyP99": "Latency P99",
       "requestRate": "Requests/s",
       "chartLatencyQuantiles": "Application latency — P50 / P95 / P99",
-      "participantsNow": "Active participants",
+      "participantsNow": "Participants on the video bridge",
       "jvbStress": "JVB stress",
-      "conferences": "Active conferences",
+      "conferences": "Conferences on the video bridge",
       "octoRelay": "Octo inter-bridge relay",
       "interBridge": "Octo traffic",
       "chartCpu": "App pod CPU usage",
@@ -2105,7 +2135,8 @@
       "liveNow": "LIVE",
       "provisioningNow": "provisioning",
       "idleNow": "IDLE (paused)",
-      "scaleToZeroHelp": "IDLE is the normal state for an event with no traffic past the grace period. On the next user visit it transitions to PROVISIONING and then LIVE."
+      "scaleToZeroHelp": "IDLE is the normal state for an event with no traffic past the grace period. On the next user visit it transitions to PROVISIONING and then LIVE.",
+      "capacityFromStatus": "Current values read from the video bridge. History requires Prometheus."
     },
     "bulk": {
       "selectAll": "Select all",
@@ -2824,7 +2855,8 @@
       "quotaExceeded": "This event has reached its upload limit ({maxFiles} files, {maxMb} MB in total): remove some files to upload more",
       "uploadBusy": "Too many uploads at the moment: try again in a few seconds",
       "deleteFailed": "Could not delete the material"
-    }
+    },
+    "addedByStaff": "Added by the organisers"
   },
   "reminders": {
     "title": "Notifications",
@@ -2897,7 +2929,7 @@
       "requestSubmittedBody": "If this email matches a registration, we've sent you a link to confirm the erasure. The link is valid for 1 hour.",
       "linkInvalid": "This link is invalid or expired. Please request a new link.",
       "confirmWarning": "You are about to permanently erase all personal data tied to your email.",
-      "confirmBody": "Registrations, questions, poll votes, feedback and reminders will be deleted. This action is irreversible.",
+      "confirmBody": "Registrations, questions, poll votes, feedback, reminders and your entry in the events address book will be deleted. This action is irreversible.",
       "confirmButton": "Confirm erasure",
       "cancel": "Cancel",
       "processing": "Deleting...",
@@ -3120,7 +3152,7 @@
     "nodesReady": "nodes ready",
     "scaling": "scaling",
     "jvbStress": "JVB load",
-    "participantsConnected": "participants connected",
+    "participantsConnected": "participants on the video bridge",
     "videoInteractive": "interactive",
     "videoWebinar": "webinar",
     "participantsAvailable": "participants available",
@@ -3164,7 +3196,12 @@
       "lastFailure": "Last failure {when}",
       "artifactsProduced": "{count, plural, =0 {no artifacts} one {1 artifact produced} other {# artifacts produced}}",
       "eventsEnabled": "{count, plural, =0 {no AI-enabled events} one {1 event with AI active} other {# events with AI active}}"
-    }
+    },
+    "jvbFixedUp": "{count, plural, =1 {Video bridge up} other {Video bridge up · # bridges configured}}",
+    "jvbFixedDown": "The video bridge is not responding",
+    "jvbFixedDownDetail": "Participants receive no audio or video until the bridge is reachable again.",
+    "jvbUnmonitored": "Status not monitored",
+    "jvbUnmonitoredDetail": "This installation does not query the video bridge, so its status is not available here."
   },
   "infraMap": {
     "loading": "Loading infrastructure map...",
@@ -3172,8 +3209,8 @@
     "ariaLabel": "System infrastructure map",
     "title": "Infrastructure map",
     "subtitle": "Real-time visualization of the architecture and service status",
-    "participants": "Participants",
-    "conferences": "Conferences",
+    "participants": "Participants on the video bridge",
+    "conferences": "Conferences on the video bridge",
     "bandwidthIn": "Bandwidth in",
     "bandwidthOut": "Bandwidth out",
     "recordings": "Video recordings",
@@ -3259,23 +3296,33 @@
       "jitsiWeb": {
         "healthy": "The video conference room is reachable and ready for events.",
         "down": "The video conference room is not reachable. It is not possible to start or join events.",
-        "standby": "The video conference room is not configured."
+        "standby": "The video conference room is not configured.",
+        "degraded": "The video conference room responds, but with errors or slowly.",
+        "publicCheckFailed": "The portal cannot check the room at its public address: from the server, the certificate or the name is not valid. The room may still work for participants.",
+        "unmonitored": "The video conference room is not monitored on this installation."
       },
       "prosody": {
         "healthy": "Internal messaging between video services is working correctly.",
         "down": "Internal messaging is not reachable. Video services cannot communicate with each other.",
-        "standby": "The messaging service is not configured."
+        "standby": "The messaging service is not configured.",
+        "degraded": "Internal messaging responds, but with errors or slowly.",
+        "publicCheckFailed": "The portal cannot check internal messaging through the room's public address: from the server, the certificate or the name is not valid. Conferences may still work.",
+        "unmonitored": "Internal messaging is not monitored on this installation."
       },
       "jicofo": {
         "healthy": "The conference coordinator is active and managing sessions.",
         "down": "The conference coordinator is not reachable. It is not possible to create new conferences.",
-        "standby": "The conference coordinator is not configured."
+        "standby": "The conference coordinator is not configured.",
+        "degraded": "The conference coordinator responds, but with errors or slowly.",
+        "unmonitored": "The conference coordinator is not monitored on this installation."
       },
       "jvb": {
         "healthy": "The video bridge is active and transmitting audio/video to participants.",
         "scaling": "The video bridge is preparing for an upcoming event. Servers are being created automatically.",
         "standby": "The video bridge is on standby (scale-to-zero). No event currently needs the bridge — it will activate automatically before a scheduled event or on the first user join.",
-        "stale": "An event has been waiting for the video bridge longer than the configured timeout. Check the cluster autoscaler and JVB pod logs."
+        "stale": "An event has been waiting for the video bridge longer than the configured timeout. Check the cluster autoscaler and JVB pod logs.",
+        "fixedDown": "The video bridge is not responding. Conferences carry no audio or video until it is reachable again.",
+        "unmonitored": "The video bridge is not monitored on this installation: the portal has no address to query it."
       },
       "jibri": {
         "healthy": "The recording service is ready and available.",
@@ -3307,7 +3354,8 @@
       "jibri": "Events cannot be recorded. Participants can still join and participate.",
       "jibriStale": "An event with recording enabled has been waiting for Jibri past the timeout: the session is not being recorded.",
       "smtp": "Registration confirmation emails and reminders will not be sent.",
-      "postprodDegraded": "Transcripts and summaries for some recent recordings were not generated. Video recordings remain available."
+      "postprodDegraded": "Transcripts and summaries for some recent recordings were not generated. Video recordings remain available.",
+      "jvbDown": "Participants receive no audio or video."
     },
     "overallVerdicts": {
       "operational": "All services are working correctly. The platform is fully operational.",
@@ -3337,7 +3385,8 @@
       "degraded": "Degraded",
       "down": "Down",
       "standby": "Standby",
-      "scaling": "Preparing"
+      "scaling": "Preparing",
+      "unknown": "Not monitored"
     },
     "metrics": {
       "uptime24h": "Uptime 24h",
@@ -3348,7 +3397,8 @@
       "errorRate": "5xx errors",
       "requestRate": "Requests/s",
       "podUptime": "Pod uptime"
-    }
+    },
+    "probeDetail": "Check result"
   },
   "feedback": {
     "title": "How would you rate this event?",
@@ -3673,7 +3723,9 @@
       "almostReady": "Video server up: almost there",
       "almostReadyDetail": "A few more moments and the join button will enable itself.",
       "honestHint": "Typical wait: under a minute when the infrastructure is warm, 3–5 minutes on a cold start. Meanwhile you can check your camera and microphone or use the chat.",
-      "elapsed": "preparing for {time}"
+      "elapsed": "preparing for {time}",
+      "scheduled": "The room opens at the start time",
+      "scheduledDetail": "Or earlier, when the organizer starts the event. Meanwhile you can check your camera and microphone or use the chat."
     },
     "exitWaiting": "Leave the waiting room",
     "warmingUp": "Room warming up",
@@ -3729,7 +3781,10 @@
       "hostEarly": "Early entry (host)"
     },
     "roomJustOpened": "The room is ready — come in",
-    "enterAnyway": "Enter anyway"
+    "enterAnyway": "Enter anyway",
+    "notHeldBadge": "Time passed",
+    "notHeldTitle": "The scheduled time for this event has passed",
+    "notHeldDetail": "The room was not opened. Check the event page for any updates."
   },
   "recording": {
     "management": "Video recording",
@@ -3865,6 +3920,16 @@
     "noFeedback": "No feedback received",
     "comments": "Comments",
     "noComments": "No comments",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "questionnaire": {
+    "loadFailed": "The questionnaire could not be loaded.",
+    "submit": "Send answers",
+    "submitFailed": "Sending failed. Please try again.",
+    "answersInvalid": "Some answers are missing or not valid: check the required questions and try again.",
+    "alreadySubmitted": "You have already sent your answers to this questionnaire.",
+    "thankYou": "Thank you for your answers.",
     "yes": "Yes",
     "no": "No"
   }

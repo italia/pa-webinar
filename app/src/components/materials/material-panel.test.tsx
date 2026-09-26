@@ -30,7 +30,7 @@ let elenco: {
   title: string;
   url: string;
   description: null;
-  addedBy: string;
+  addedBy: string | null;
   createdAt: string;
   visibility?: string;
 }[];
@@ -236,5 +236,20 @@ describe('MaterialPanel — quando il pubblico vede un materiale', () => {
     elenco = [{ ...materiale('m1'), visibility: 'ALWAYS' }];
     await render({ isModerator: false });
     expect(etichette()).toEqual([]);
+  });
+});
+
+describe('MaterialPanel — chi ha aggiunto il materiale', () => {
+  it('un nome si mostra; nessun nome, o una parola fissa del passato, diventa la dicitura tradotta', async () => {
+    elenco = [
+      { ...materiale('a'), title: 'Con nome', addedBy: 'Conduzione' },
+      { ...materiale('b'), title: 'Senza nome', addedBy: null },
+      { ...materiale('c'), title: 'Parola fissa', addedBy: 'Moderator' },
+    ];
+    await render({ isModerator: false });
+    const testo = container.textContent ?? '';
+    expect(testo).toContain(t.addedBy.replace('{name}', 'Conduzione'));
+    expect(testo).not.toContain(t.addedBy.replace('{name}', 'Moderator'));
+    expect(testo.split(t.addedByStaff).length - 1).toBe(2);
   });
 });

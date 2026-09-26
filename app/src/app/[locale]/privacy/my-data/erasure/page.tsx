@@ -13,6 +13,7 @@ import {
 } from 'design-react-kit';
 
 import { Icon } from '@/components/ui/icon';
+import { localizedPath } from '@/lib/utils/localized-url';
 
 type Phase = 'idle' | 'submitting' | 'requestSent' | 'confirmed' | 'error';
 
@@ -149,7 +150,7 @@ export default function ErasurePage() {
                   <Button color="danger" onClick={handleConfirm}>
                     {t('confirmButton')}
                   </Button>
-                  <Button color="secondary" outline href={`/${locale}/privacy/my-data`}>
+                  <Button color="secondary" outline href={localizedPath('/privacy/my-data', locale)}>
                     {t('cancel')}
                   </Button>
                 </div>
@@ -175,7 +176,11 @@ export default function ErasurePage() {
             <Alert color="danger">
               {error}
               <div className="mt-3">
-                <Button color="primary" outline href={`/${locale}/privacy/my-data/erasure`}>
+                <Button
+                  color="primary"
+                  outline
+                  href={localizedPath('/privacy/my-data/erasure', locale)}
+                >
                   {t('back')}
                 </Button>
               </div>

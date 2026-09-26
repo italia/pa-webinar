@@ -15,11 +15,10 @@ import type { EventStatus, Prisma } from '@prisma/client';
  * - le instant call (eventType INSTANT) restano fuori dalle superfici
  *   pubbliche quando sono parcheggiate: sono chiamate link-only, non
  *   eventi a calendario;
- * - endsAt deve essere nel futuro: la transizione IDLE→ENDED la fa lo
- *   scaler, e se lo scaler è giù o sospeso (successo in prod il 12 giu)
- *   un evento FINITO ma incagliato in IDLE non deve tornare "in arrivo"
- *   e registrabile — prima di questo rollout era semplicemente
- *   invisibile, e quella garanzia va mantenuta.
+ * - endsAt deve essere nel futuro: la transizione a ENDED la fa il giro
+ *   del ciclo di vita (lib/events/lifecycle-tick), e se il suo conduttore
+ *   è fermo o sospeso un evento FINITO ma incagliato in IDLE non deve
+ *   tornare "in arrivo" e registrabile.
  */
 
 /** Stati sempre visibili pubblicamente, per qualunque tipo di evento. */
@@ -128,10 +127,24 @@ export function isEventPubliclyVisible(
   );
 }
 
-/** True se l'evento accetta nuove registrazioni (pagina + POST API). */
-export function isEventOpenForRegistration(event: EventLike): boolean {
-  if (event.status === 'PUBLISHED' || event.status === 'LIVE') return true;
-  return isWarmupPubliclyVisible(event);
+/**
+ * True se l'evento accetta nuove registrazioni (pagina + POST API).
+ *
+ * Un evento non ancora aperto (PUBLISHED, o in warm-up) la accetta solo fino a
+ * `endsAt`: oltre, è un evento che non si è tenuto, qualunque stato abbia
+ * ancora — la chiusura la fa il giro del ciclo di vita, e fra la fine e il suo
+ * passaggio nessuno deve potersi iscrivere né ricevere una conferma. Un evento
+ * LIVE resta aperto anche oltre `endsAt`: la grace e le sale a tempo
+ * indefinito lo tengono legittimamente in corso, e a chiuderlo è lo stesso
+ * giro.
+ */
+export function isEventOpenForRegistration(
+  event: EventLike,
+  now: number = Date.now(),
+): boolean {
+  if (event.status === 'LIVE') return true;
+  if (event.status === 'PUBLISHED') return new Date(event.endsAt).getTime() > now;
+  return isWarmupPubliclyVisible(event, now);
 }
 
 /**
@@ -143,17 +156,32 @@ export function isEventOpenForRegistration(event: EventLike): boolean {
 export function publicEventStatusWhere(opts?: {
   includeEnded?: boolean;
 }): Prisma.EventWhereInput {
-  const or: Prisma.EventWhereInput[] = [
-    // Le istantanee restano fuori: sono chiamate link-only, e una in corso
-    // comparirebbe in home, negli elenchi, nella sitemap e nel calendario
-    // pubblico come se fosse un evento a cui iscriversi.
-    { status: { in: ['PUBLISHED', 'LIVE'] }, eventType: { not: 'INSTANT' } },
-    {
-      status: { in: WARMUP_STATUSES },
-      eventType: { not: 'INSTANT' },
-      endsAt: { gt: new Date() },
-    },
-  ];
+  const now = new Date();
+  // Le superfici solo-futuro (home, calendario pubblico) non mostrano un
+  // evento mai aperto oltre la sua fine: fra `endsAt` e il passaggio del giro
+  // del ciclo di vita che lo chiude, occuperebbe il posto di un evento vero
+  // in arrivo. LIVE resta: è in corso (grace compresa), e lo chiude il giro.
+  const onlyUpcoming = opts?.includeEnded === false;
+  const or: Prisma.EventWhereInput[] = onlyUpcoming
+    ? [
+        { status: 'LIVE', eventType: { not: 'INSTANT' } },
+        {
+          status: { in: ['PUBLISHED', ...WARMUP_STATUSES] },
+          eventType: { not: 'INSTANT' },
+          endsAt: { gt: now },
+        },
+      ]
+    : [
+        // Le istantanee restano fuori: sono chiamate link-only, e una in corso
+        // comparirebbe in home, negli elenchi, nella sitemap e nel calendario
+        // pubblico come se fosse un evento a cui iscriversi.
+        { status: { in: ['PUBLISHED', 'LIVE'] }, eventType: { not: 'INSTANT' } },
+        {
+          status: { in: WARMUP_STATUSES },
+          eventType: { not: 'INSTANT' },
+          endsAt: { gt: now },
+        },
+      ];
   // ENDED events are public only while the post-event page is enabled and its
   // (optional) window hasn't expired — same gate as isEventPubliclyVisible, so
   // an event hidden on its page also drops out of listings/sitemap/API.
@@ -163,7 +191,7 @@ export function publicEventStatusWhere(opts?: {
       postEventPublic: true,
       OR: [
         { postEventPublicUntil: null },
-        { postEventPublicUntil: { gt: new Date() } },
+        { postEventPublicUntil: { gt: now } },
       ],
     });
   }

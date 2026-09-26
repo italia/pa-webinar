@@ -8,7 +8,6 @@ import { Icon } from '@/components/ui/icon';
 import { Link, percorso } from '@/i18n/navigation';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import { youtubeWatchLink } from '@/lib/utils/youtube-link';
-import { REGISTRABLE_STATUSES } from '@/lib/events/visibility';
 import AddToCalendar from '@/components/events/add-to-calendar';
 import VideoPlayer, {
   type VideoPlayerHandle,
@@ -130,8 +129,15 @@ interface EventDetailClientProps {
   hasRoomAccess?: boolean;
   /** Chi può iscriversi (lib/events/registration-access). */
   registrationAccess?: RegistrationAccess;
+  /** L'evento accetta iscrizioni adesso: `isEventOpenForRegistration`
+   *  (lib/events/visibility) calcolato dal server, che conosce l'ora. Falso su
+   *  un evento non concluso vuol dire che l'orario di fine è passato senza che
+   *  la sala si aprisse. */
+  registrationOpen: boolean;
   /** In diretta si entra anche senza iscrizione (lib/events/guest-window). */
   guestEntryOpen?: boolean;
+  /** L'evento ha un questionario post-evento: solo allora compare l'invito. */
+  hasPostEventQuestionnaire?: boolean;
 }
 
 const STATUS_COLOR: Record<string, string> = {
@@ -166,7 +172,9 @@ export default function EventDetailClient({
   invalidToken = false,
   hasRoomAccess = false,
   registrationAccess = 'open',
+  registrationOpen,
   guestEntryOpen = true,
+  hasPostEventQuestionnaire = false,
 }: EventDetailClientProps) {
   const t = useTranslations('events');
   const tr = useTranslations('registration');
@@ -217,16 +225,19 @@ export default function EventDetailClient({
 
   const speakers = getLocalized(event.speakersInfo as LocalizedField, locale);
 
-  // PROVISIONING/IDLE = evento schedulato in pre-warm/pausa: registrazione
-  // aperta come per PUBLISHED. Il server ha già applicato i filtri veri
-  // (eventType/endsAt, vedi lib/events/visibility): qui basta lo stato.
-  const canRegister = (REGISTRABLE_STATUSES as string[]).includes(event.status);
+  const isEnded = event.status === 'ENDED';
+  // Evento non concluso che non accetta più iscrizioni: l'orario di fine è
+  // passato senza che la sala si aprisse, e la chiusura la farà il giro del
+  // ciclo di vita. Per il pubblico è già finito: niente iscrizione, niente
+  // ingresso, niente promemoria di calendario.
+  const pastEndNotHeld = !isEnded && !registrationOpen;
   // Per il pubblico il warm-up È "in programma": badge e colori non hanno
   // (né devono avere) varianti PROVISIONING/IDLE in 24 lingue.
-  const publicStatus = ['PROVISIONING', 'IDLE'].includes(event.status)
-    ? 'PUBLISHED'
-    : event.status;
-  const isEnded = event.status === 'ENDED';
+  const publicStatus = pastEndNotHeld
+    ? 'ENDED'
+    : ['PROVISIONING', 'IDLE'].includes(event.status)
+      ? 'PUBLISHED'
+      : event.status;
   const youtubeLink = youtubeWatchLink(event.youtubeUrl);
   const isLive = event.status === 'LIVE';
   const accentColor = STATUS_COLOR[publicStatus] ?? STATUS_COLOR.PUBLISHED;
@@ -325,7 +336,11 @@ export default function EventDetailClient({
         <Alert color="warning" className="mb-4">
           <strong>{t('detail.invalidTokenTitle')}</strong>
           <div className="mt-1">
-            {isEnded ? t('detail.invalidTokenBodyEnded') : t('detail.invalidTokenBody')}
+            {isEnded
+              ? t('detail.invalidTokenBodyEnded')
+              : pastEndNotHeld
+                ? t('detail.registrationEnded')
+                : t('detail.invalidTokenBody')}
           </div>
         </Alert>
       )}
@@ -624,7 +639,7 @@ export default function EventDetailClient({
                     padding: '8px 12px',
                   }}
                 >
-                  <Icon icon="it-volume-high" size="sm" color={undefined} />
+                  <Icon icon="it-hearing" size="sm" color={undefined} />
                   <span>
                     {tPostprod('dubAvailableHint', {
                       langs: postprodMeta.audioTracks
@@ -747,11 +762,13 @@ export default function EventDetailClient({
             />
           )}
 
-          {/* Post-event feedback questionnaire invite (self-hides when the
-              event has no POST_EVENT questionnaire configured). */}
-          {isEnded && event.postEventShowFeedback !== false && (
-            <PostEventFeedbackInvite eventSlug={event.slug} />
-          )}
+          {/* Invito al questionario post-evento: solo se l'evento ne ha uno
+              (lo dice il server). */}
+          {isEnded &&
+            event.postEventShowFeedback !== false &&
+            hasPostEventQuestionnaire && (
+              <PostEventFeedbackInvite eventSlug={event.slug} />
+            )}
 
           {/* Feature diagram moved behind the admin UI — it's internal
               infra/capacity info, not something public attendees need. */}
@@ -768,6 +785,24 @@ export default function EventDetailClient({
                   event={event}
                   feedbackSummary={feedbackSummary}
                 />
+              ) : pastEndNotHeld ? (
+                // Iscrizione e ingresso porterebbero a una pagina che risponde
+                // 404 (iscrizione) o a una sala che non si apre più.
+                <div role="status">
+                  <h3
+                    className="h6 text-uppercase fw-semibold mb-2"
+                    style={{
+                      letterSpacing: '0.04em',
+                      color: 'var(--app-muted)',
+                      fontSize: '0.8rem',
+                    }}
+                  >
+                    {t('detail.eventEnded')}
+                  </h3>
+                  <p className="text-muted mb-0" style={{ fontSize: '0.88rem' }}>
+                    {t('detail.registrationEnded')}
+                  </p>
+                </div>
               ) : (
                 <>
                   {/* Il numero di registrati NON è mostrato
@@ -779,8 +814,9 @@ export default function EventDetailClient({
                       {t('detail.registered')}
                     </p>
                   )}
-                  {canRegister &&
-                    !(hasRoomAccess && !invalidToken) &&
+                  {/* Da qui in giù l'evento accetta iscrizioni (registrationOpen):
+                      gli altri casi li coprono i due rami sopra. */}
+                  {!(hasRoomAccess && !invalidToken) &&
                     registrationAccess !== 'closed' && (
                     <Link href={percorso(`/events/${event.slug}/registration`)}>
                       <Button
@@ -800,15 +836,13 @@ export default function EventDetailClient({
                       era iscritto prima trova qui la via per farsi rimandare
                       il link: la pagina d'iscrizione, che senza invitati
                       offre solo quella. */}
-                  {canRegister &&
-                    !(hasRoomAccess && !invalidToken) &&
+                  {!(hasRoomAccess && !invalidToken) &&
                     registrationAccess !== 'open' && (
                     <p className="text-muted mt-2 mb-0" style={{ fontSize: '0.85rem' }}>
                       {registrationAccess === 'invitation' ? tr('invitationOnly') : tr('closed')}
                     </p>
                   )}
-                  {canRegister &&
-                    !(hasRoomAccess && !invalidToken) &&
+                  {!(hasRoomAccess && !invalidToken) &&
                     registrationAccess === 'closed' && (
                     <p className="mt-2 mb-0" style={{ fontSize: '0.85rem' }}>
                       <Link
@@ -820,8 +854,7 @@ export default function EventDetailClient({
                     </p>
                   )}
 
-                  {canRegister &&
-                    ((isLive && guestEntryOpen) || (hasRoomAccess && !invalidToken)) && (
+                  {((isLive && guestEntryOpen) || (hasRoomAccess && !invalidToken)) && (
                     // Via d'ingresso per chi si è già registrato: /live lo
                     // re-identifica dal cookie firmato (o lo fa entrare come
                     // ospite se LIVE e l'amministrazione ammette ospiti),

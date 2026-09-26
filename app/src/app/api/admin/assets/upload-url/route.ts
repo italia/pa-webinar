@@ -119,11 +119,16 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
 
   const storage = getFilesStorage();
   if (!storage) {
-    throw new AppError(
+    // Un'installazione senza storage per i file e' una configurazione
+    // ammessa, non un guasto: 503 per il client (che lo traduce dal codice),
+    // `warn` nel log.
+    const err = new AppError(
       'Files storage is not configured on this instance. Set STORAGE_FILES_* or AZURE_STORAGE_* env vars.',
       503,
       'STORAGE_UNAVAILABLE',
     );
+    err.expected = true;
+    throw err;
   }
 
   // Parse multipart/form-data. Next's route handlers accept Request.formData()

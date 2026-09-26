@@ -19,7 +19,7 @@ const { storage } = vi.hoisted(() => ({
 vi.mock('@/lib/db', () => ({
   prisma: {
     event: { findFirst: vi.fn(), findUnique: vi.fn() },
-    eventMaterial: { findMany: vi.fn(), findFirst: vi.fn(), delete: vi.fn() },
+    eventMaterial: { findMany: vi.fn(), findFirst: vi.fn(), delete: vi.fn(), create: vi.fn() },
     eventModerator: { findUnique: vi.fn() },
   },
 }));
@@ -48,9 +48,10 @@ vi.mock('@/lib/azure/blob-storage', () => ({
 }));
 
 import type * as StaffSessionModule from '@/lib/auth/staff-session';
+import * as blob from '@/lib/azure/blob-storage';
 import { prisma } from '@/lib/db';
 
-import { DELETE, GET } from './route';
+import { DELETE, GET, POST } from './route';
 
 const mockedEvent = prisma.event.findFirst as unknown as ReturnType<typeof vi.fn>;
 const mockedMaterials = prisma.eventMaterial.findMany as unknown as ReturnType<typeof vi.fn>;
@@ -139,6 +140,15 @@ describe('GET /api/events/[slug]/files', () => {
     expect(res.headers.get('Cache-Control')).toBe('private, no-store');
   });
 
+  it('una parola fissa salvata in passato non esce come nome; un nome si', async () => {
+    mockedMaterials.mockResolvedValue([
+      FILE_ROW,
+      { ...FILE_ROW, id: 'file-2', addedBy: 'Maria Rossi' },
+    ]);
+    const body = (await (await GET(get(), ctx())).json()) as { addedBy: string | null }[];
+    expect(body.map((m) => m.addedBy)).toEqual([null, 'Maria Rossi']);
+  });
+
   it('un evento senza pagina pubblica resta 404', async () => {
     mockedEvent.mockResolvedValue(eventRow({ status: 'DRAFT' }));
     expect((await GET(get(), ctx())).status).toBe(404);
@@ -217,5 +227,91 @@ describe('DELETE /api/events/[slug]/files', () => {
     const res = await DELETE(del(), ctx());
     expect(res.status).toBe(503);
     expect(mockedDelete).not.toHaveBeenCalled();
+  });
+});
+
+/**
+ * Chi carica un file con il caricamento per evento: un nome solo se gia'
+ * pubblico (il conduttore scritto sull'evento, per il link principale), mai
+ * una parola fissa — lib/events/material-author.
+ */
+describe('POST /api/events/[slug]/files — autore', () => {
+  const mockedFindUnique = prisma.event.findUnique as unknown as ReturnType<typeof vi.fn>;
+  const mockedCreate = prisma.eventMaterial.create as unknown as ReturnType<typeof vi.fn>;
+  const COMOD_TOKEN = 'COMOD_TOKEN';
+
+  function post(token: string): NextRequest {
+    return new Request(`https://webinar.example.gov.it/api/events/${SLUG}/files`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fileName: 'slide.pdf', title: 'Slide', fileSize: 10 }),
+    }) as unknown as NextRequest;
+  }
+
+  beforeEach(() => {
+    vi.mocked(blob.isAzureConfigured).mockReturnValue(true);
+    vi.mocked(blob.getBlobPath).mockReturnValue(`events/${EVENT_ID}/files/slide.pdf`);
+    vi.mocked(blob.generateUploadSasUrl).mockResolvedValue('https://storage.example/sas');
+    mockedFindUnique.mockResolvedValue(eventRow({ slug: SLUG, moderatorName: 'Maria Rossi' }));
+    mockedCreate.mockImplementation(async ({ data }: { data: Record<string, unknown> }) => ({
+      id: 'file-new',
+      createdAt: new Date('2026-09-01T09:00:00.000Z'),
+      ...data,
+    }));
+  });
+
+  it('il link principale salva il nome del conduttore', async () => {
+    const res = await POST(post(PRIMARY_TOKEN), ctx());
+    expect(res.status).toBe(201);
+    expect(mockedCreate.mock.calls[0]![0].data.addedBy).toBe('Maria Rossi');
+    const body = (await res.json()) as { material: { addedBy: string | null } };
+    expect(body.material.addedBy).toBe('Maria Rossi');
+  });
+
+  it('un co-moderatore non lascia un nome in chiaro', async () => {
+    mockedGrant.mockResolvedValue({
+      id: 'grant-1',
+      eventId: EVENT_ID,
+      token: COMOD_TOKEN,
+      role: 'MODERATOR',
+      revokedAt: null,
+      name: 'Anna Bianchi',
+      email: null,
+    });
+    const res = await POST(post(COMOD_TOKEN), ctx());
+    expect(res.status).toBe(201);
+    expect(mockedCreate.mock.calls[0]![0].data.addedBy).toBe('');
+    const body = (await res.json()) as { material: { addedBy: string | null } };
+    expect(body.material.addedBy).toBeNull();
+  });
+});
+
+describe('POST /api/events/[slug]/files — senza storage', () => {
+  it('503 STORAGE_UNAVAILABLE, registrato come warn', async () => {
+    const mockedFindUnique = prisma.event.findUnique as unknown as ReturnType<typeof vi.fn>;
+    mockedFindUnique.mockResolvedValue(eventRow({ slug: SLUG }));
+    vi.mocked(blob.isAzureConfigured).mockReturnValue(false);
+    const log = vi.spyOn(console, 'log').mockImplementation(() => undefined);
+    const res = await POST(
+      new Request(`https://webinar.example.gov.it/api/events/${SLUG}/files`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${PRIMARY_TOKEN}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fileName: 'slide.pdf', title: 'Slide' }),
+      }) as unknown as NextRequest,
+      ctx(),
+    );
+    expect(res.status).toBe(503);
+    expect(((await res.json()) as { code?: string }).code).toBe('STORAGE_UNAVAILABLE');
+    const livello = (log.mock.calls as unknown[][])
+      .map(([riga]) => {
+        try {
+          return JSON.parse(String(riga)) as { level?: string; status?: number };
+        } catch {
+          return null;
+        }
+      })
+      .find((j) => j?.status === 503)?.level;
+    expect(livello).toBe('warn');
+    log.mockRestore();
   });
 });

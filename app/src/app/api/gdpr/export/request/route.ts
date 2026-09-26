@@ -11,6 +11,7 @@
 
 import { defaultLocale } from '@/i18n/config';
 import { linguaEmail, linguaPagina } from '@/lib/email/lingua';
+import { emailBaseUrl } from '@/lib/email/links';
 import { localizedUrl } from '@/lib/utils/localized-url';
 import { z } from 'zod';
 
@@ -136,10 +137,9 @@ export const POST = withErrorHandling(async (request) => {
   // Silently drop further sends to the same mailbox; still return 200.
   if (emailRl.allowed) {
     const token = issueGdprToken('export', emailHash);
-    const baseUrl =
-      process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, '') ??
-      'http://localhost:3000';
-    const link = buildExportLink(baseUrl, locale, token);
+    // A runtime: la lettura puntata la fissava il build, e l'email portava
+    // `http://localhost:3000` su ogni istanza installata dall'immagine pubblicata.
+    const link = buildExportLink(emailBaseUrl(), locale, token);
 
     const body =
       BODIES[testi] ?? BODIES.en!;

@@ -7,6 +7,7 @@ import { jwtVerify } from 'jose';
 import { readGravatarRef } from '@/lib/gravatar-ref';
 
 import {
+  DEFAULT_JITSI_JWT_SUBJECT,
   generateJitsiJwt,
   moderatorJitsiId,
   participantJitsiId,
@@ -19,13 +20,17 @@ import {
 const JWT_SECRET = 'test-secret-for-jwt-tests';
 const JWT_ISSUER = 'pa-webinar';
 const JWT_AUDIENCE = 'jitsi';
-const JWT_SUBJECT = 'jitsi.test.local';
+// Il `sub` predefinito è quello che le immagini pubblicate hanno sempre
+// inviato; il dominio della conferenza (anche se impostato a runtime) non lo
+// cambia, altrimenti un aggiornamento cambierebbe il token sotto i piedi di
+// un'installazione esistente.
+const JWT_SUBJECT = DEFAULT_JITSI_JWT_SUBJECT;
 
 beforeAll(() => {
   process.env.JITSI_JWT_SECRET = JWT_SECRET;
   process.env.APP_SECRET = 'test-app-secret';
   process.env.PII_ENCRYPTION_KEY = 'a'.repeat(64);
-  process.env.NEXT_PUBLIC_JITSI_DOMAIN = JWT_SUBJECT;
+  process.env.NEXT_PUBLIC_JITSI_DOMAIN = 'jitsi.test.local';
 });
 
 async function decodeJwt(token: string) {
@@ -141,6 +146,21 @@ describe('generateJitsiJwt', () => {
     const payload = await decodeJwt(jwt);
     expect(payload.sub).toBe('meet.jitsi');
 
+    delete process.env.JITSI_JWT_SUBJECT;
+  });
+
+  it('keeps the historical subject when JITSI_JWT_SUBJECT is unset or empty', async () => {
+    // Le immagini pubblicate hanno sempre firmato `sub: localhost:8443`: è il
+    // valore con cui le installazioni esistenti si autenticano oggi.
+    expect(DEFAULT_JITSI_JWT_SUBJECT).toBe('localhost:8443');
+    process.env.JITSI_JWT_SUBJECT = '';
+    const jwt = await generateJitsiJwt({
+      roomName: 'room',
+      displayName: 'Guest',
+      uniqueId: 'guest-2',
+      isModerator: false,
+    });
+    expect((await decodeJwt(jwt)).sub).toBe('localhost:8443');
     delete process.env.JITSI_JWT_SUBJECT;
   });
 

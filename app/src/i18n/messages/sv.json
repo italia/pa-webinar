@@ -127,7 +127,8 @@
         "outlook": "Outlook / Office 365",
         "yahoo": "Yahoo Kalender",
         "downloadIcs": "Ladda ned .ics-fil"
-      }
+      },
+      "registrationEnded": "Evenemanget är avslutat: anmälan är stängd."
     },
     "manage": {
       "toggleChat": "Chatt",
@@ -368,7 +369,8 @@
       "questionRestore": "Återställ",
       "questionStatusFailed": "Det gick inte att uppdatera frågan",
       "questionNeedsText": "Skriv texten till din fråga: en bilaga ensam hamnar inte i kön",
-      "lensTruncated": "Endast de senaste meddelandena är inlästa: det kan finnas äldre frågor som inte visas i listan."
+      "lensTruncated": "Endast de senaste meddelandena är inlästa: det kan finnas äldre frågor som inte visas i listan.",
+      "attachUnavailable": "Bilagor är inte tillgängliga i den här installationen."
     },
     "role": {
       "moderator": "Moderator",
@@ -389,7 +391,8 @@
         "unknown": "Okänd"
       },
       "volume": "Volym",
-      "volumeFor": "Volym för {name}"
+      "volumeFor": "Volym för {name}",
+      "kickName": "Ta bort {name}"
     },
     "moderator": {
       "muteAll": "Tysta alla",
@@ -453,7 +456,18 @@
       "remainingLabel": "Återstående tid (klicka för förfluten tid)",
       "elapsedLabel": "Förfluten tid (klicka för återstående tid)"
     },
-    "videoCallFrameTitle": "Evenemangets videosamtal"
+    "videoCallFrameTitle": "Evenemangets videosamtal",
+    "insecureContextTitle": "Osäker adress",
+    "insecureContextBody": "Den här sidan har öppnats via http://: webbläsaren tillåter inte mikrofon och kamera, och videosamtalet kan inte starta. Öppna samma sida på den säkra adressen.",
+    "insecureContextLink": "Öppna https://{host}",
+    "conferenceUnreachableTitle": "Tjänsten för videosamtal svarar inte",
+    "conferenceUnreachableBody": "Din webbläsare når inte servern för videosamtal ({host}). Öppna den i en ny flik: om webbläsaren visar en säkerhetsvarning, godkänn den, kom sedan tillbaka hit och försök igen. Om sidan inte öppnas kan nätverket du är ansluten till blockera den.",
+    "conferenceOpenHost": "Öppna {host} i en ny flik",
+    "leftTitle": "Du har lämnat rummet",
+    "leftMessage": "Evenemanget pågår fortfarande: du kan gå in igen när du vill.",
+    "leftModeratorReminder": "Evenemanget förblir öppet tills någon avslutar det. När ni är klara, gå in igen och välj ”{action}”.",
+    "rejoin": "Gå in igen",
+    "backToHome": "Tillbaka till startsidan"
   },
   "qa": {
     "title": "Frågor och svar",
@@ -590,7 +604,8 @@
       "errorGeneric": "Fel vid uppladdning av filen",
       "helpImage": "Format som stöds: PNG, JPEG, WebP, SVG, GIF — max 10 MB",
       "helpAudio": "Format som stöds: MP3, WAV, OGG, M4A, WebM — max 20 MB",
-      "helpDocument": "Format som stöds: PDF, DOCX, PPTX, XLSX, TXT — max 25 MB"
+      "helpDocument": "Format som stöds: PDF, DOCX, PPTX, XLSX, TXT — max 25 MB",
+      "uploadsUnavailable": "Filuppladdning är inte tillgänglig i den här installationen: klistra in filens URL i stället."
     },
     "rubricaPicker": {
       "loading": "Söker…",
@@ -628,7 +643,9 @@
           "endsAt": "Slutdatumet måste vara efter startdatumet.",
           "titleRequired": "Titeln är obligatorisk (minst 3 tecken).",
           "titleRequiredOtherLocale": "Titeln på standardspråket ({locale}) är obligatorisk: byt till fliken {locale}.",
-          "maxParticipants": "Ange ett tal mellan 2 och 500."
+          "maxParticipants": "Ange ett tal mellan 2 och 500.",
+          "descriptionRequired": "Beskrivningen är obligatorisk (minst {min} tecken).",
+          "descriptionRequiredOtherLocale": "Beskrivningen på standardspråket ({locale}) är obligatorisk: byt till fliken {locale}."
         },
         "senderRatioLabel": "Uppskattad andel aktiva",
         "senderRatioHelp": "Hur många deltagare som förväntas ha mikrofon/video aktiv. Hjälper till att dimensionera videoservern.",
@@ -820,7 +837,11 @@
         "speakers": "talare",
         "materials": "material",
         "questionnaires": "enkäter"
-      }
+      },
+      "revocationFailed": "Återkallelsen av åtkomsten för {name} misslyckades: åtkomstlänken är fortfarande giltig. Spara igen för att försöka på nytt, eller återkalla den under fliken ”{tab}” på evenemangets sida.",
+      "validationFailedDetail": "Servern avvisade vissa uppgifter: {reason}. Rätta dem och försök igen.",
+      "publishFailed": "Evenemanget har skapats men inte publicerats: det är fortfarande ett utkast. Publicera det från evenemangets sida.",
+      "publishFailedDetail": "Evenemanget har skapats men inte publicerats: det är fortfarande ett utkast. Servern svarade: {reason}. Publicera det från evenemangets sida."
     },
     "nav": {
       "events": "Evenemangshantering",
@@ -1240,7 +1261,7 @@
       "wordCloudEnabled": "Ordmoln live",
       "wordCloudEnabledDesc": "Deltagarna skickar ett ord och molnet uppdateras live. Användbart för att öppna en diskussion eller fånga en stämning på några sekunder.",
       "whiteboardEnabled": "Delad whiteboard",
-      "whiteboardEnabledDesc": "Aktiverar den inbyggda samarbetswhiteboarden (Excalidraw): moderatorerna kan öppna den från verktygsfältet under evenemanget. Alltid på i snabbsamtal.",
+      "whiteboardEnabledDesc": "Aktiverar den inbyggda samarbetswhiteboarden (Excalidraw): moderatorerna kan öppna den från verktygsfältet under evenemanget. Kräver installationens whiteboardtjänst; där den finns är den alltid på i snabbsamtal.",
       "autoStartRecording": "Starta inspelningen automatiskt",
       "autoStartRecordingDesc": "När evenemanget startar börjar inspelningen av sig själv (utan att fråga moderatorn). Eventuella sena anslutare hittar då redan en spelare tillgänglig.",
       "aiSectionHeading": "Automatisk efterproduktion",
@@ -1316,7 +1337,8 @@
       "retentionPreviewRecordings": "Videoinspelningar",
       "retentionPreviewKept": "Aggregerad statistik och evenemangsmetadata bevaras.",
       "configPreview": "Förhandsgranskning av konfiguration",
-      "templateApplied": "Mall tillämpad: {name}. Du kan ändra alla inställningar."
+      "templateApplied": "Mall tillämpad: {name}. Du kan ändra alla inställningar.",
+      "whiteboardUnavailable": "Inte tillgängligt i den här installationen: Jitsis whiteboardtjänst saknas, och plattformens driftansvarige kan aktivera den."
     },
     "links": {
       "title": "Evenemangslänkar",
@@ -1925,9 +1947,9 @@
       "version": "Version",
       "environment": "Miljö",
       "modes": {
-        "simple": "Enkel (Docker Compose)",
-        "standard": "Standard (Kubernetes)",
-        "full": "Fullständig (Kubernetes med scale-to-zero)",
+        "simple": "Enkel",
+        "standard": "Standard",
+        "full": "Fullständig (bryggor med scale-to-zero)",
         "unknown": "Okänd"
       },
       "database": {
@@ -1941,7 +1963,9 @@
         "title": "Jitsi Meet",
         "reachable": "Nåbar",
         "unreachable": "Ej nåbar",
-        "notConfigured": "Ej konfigurerad"
+        "notConfigured": "Ej konfigurerad",
+        "degraded": "Nåbar, men svarar med fel eller långsamt",
+        "publicCheckFailed": "Kontrollen på den offentliga adressen misslyckades ({code}): portalservern godtar inte certifikatet eller namnet. Konferenserna kan ändå fungera."
       },
       "jvb": {
         "title": "Video Bridge (JVB)",
@@ -1949,7 +1973,9 @@
         "replicas": "{current}/{max} noder",
         "preScale": "Pre-scale: {minutes} min",
         "fixedMode": "Fast läge",
-        "scalerEnabled": "Scaler aktiverad"
+        "scalerEnabled": "Scaler aktiverad",
+        "fixedDown": "Videobryggan svarar inte",
+        "unmonitored": "Övervakas inte: bryggans adress (JVB_HEALTH_URL) är inte angiven"
       },
       "jibri": {
         "title": "Inspelning (Jibri)",
@@ -1971,7 +1997,11 @@
         "metrics": "Mätpunktsendpunkt"
       },
       "note": "Infrastrukturändringar görs via Helm values och CI/CD-pipelinen.",
-      "deployDocs": "Driftsdokumentation"
+      "deployDocs": "Driftsdokumentation",
+      "platforms": {
+        "kubernetes": "På Kubernetes",
+        "other": "Utanför Kubernetes (Docker Compose eller en enskild server)"
+      }
     },
     "instantCalls": {
       "title": "Snabbsamtal",
@@ -2076,9 +2106,9 @@
       "latencyP99": "Latens P99",
       "requestRate": "Förfrågningar/s",
       "chartLatencyQuantiles": "Applikationslatens — P50 / P95 / P99",
-      "participantsNow": "Aktiva deltagare",
+      "participantsNow": "Deltagare på videobryggan",
       "jvbStress": "JVB-belastning",
-      "conferences": "Aktiva konferenser",
+      "conferences": "Konferenser på videobryggan",
       "octoRelay": "Octo inter-bridge-relä",
       "interBridge": "Octo-trafik",
       "chartCpu": "CPU usage",
@@ -2105,7 +2135,8 @@
       "liveNow": "LIVE",
       "provisioningNow": "förbereds",
       "idleNow": "IDLE (pausad)",
-      "scaleToZeroHelp": "IDLE är normalt tillstånd för ett evenemang utan trafik längre än grace-perioden. Vid nästa användarbesök övergår det till PROVISIONING och sedan LIVE."
+      "scaleToZeroHelp": "IDLE är normalt tillstånd för ett evenemang utan trafik längre än grace-perioden. Vid nästa användarbesök övergår det till PROVISIONING och sedan LIVE.",
+      "capacityFromStatus": "Aktuella värden lästa från videobryggan. Historiken kräver Prometheus."
     },
     "bulk": {
       "selectAll": "Markera alla",
@@ -2824,7 +2855,8 @@
       "quotaExceeded": "Det här evenemanget har nått gränsen för uppladdade filer ({maxFiles} filer, {maxMb} MB totalt): ta bort några för att ladda upp fler",
       "uploadBusy": "För många uppladdningar just nu: försök igen om några sekunder",
       "deleteFailed": "Materialet kunde inte tas bort"
-    }
+    },
+    "addedByStaff": "Tillagt av arrangörerna"
   },
   "reminders": {
     "title": "Påminnelser",
@@ -2897,7 +2929,7 @@
       "requestSubmittedBody": "Om e-postadressen motsvarar en anmälan har vi skickat en länk för att bekräfta raderingen. Länken är giltig i 1 timme.",
       "linkInvalid": "Länken är ogiltig eller har gått ut. Begär en ny länk.",
       "confirmWarning": "Du håller på att permanent radera alla personuppgifter som är kopplade till din e-postadress.",
-      "confirmBody": "Anmälningar, frågor, röster i omröstningar, återkoppling och påminnelser raderas. Åtgärden kan inte ångras.",
+      "confirmBody": "Anmälningar, frågor, röster i omröstningar, återkoppling, påminnelser och din post i evenemangsadressboken raderas. Åtgärden kan inte ångras.",
       "confirmButton": "Bekräfta radering",
       "cancel": "Avbryt",
       "processing": "Raderar...",
@@ -3120,7 +3152,7 @@
     "nodesReady": "noder redo",
     "scaling": "skalar",
     "jvbStress": "JVB-belastning",
-    "participantsConnected": "deltagare anslutna",
+    "participantsConnected": "deltagare på videobryggan",
     "videoInteractive": "interaktiv",
     "videoWebinar": "webbinarium",
     "participantsAvailable": "deltagare tillgängliga",
@@ -3164,7 +3196,12 @@
       "lastFailure": "Senast misslyckad {when}",
       "artifactsProduced": "{count, plural, =0 {inga artefakter} one {1 artefakt producerad} other {# artefakter producerade}}",
       "eventsEnabled": "{count, plural, =0 {inga evenemang med AI} one {1 evenemang med aktiv AI} other {# evenemang med aktiv AI}}"
-    }
+    },
+    "jvbFixedUp": "{count, plural, =1 {Videobrygga aktiv} other {Videobrygga aktiv · # bryggor planerade}}",
+    "jvbFixedDown": "Videobryggan svarar inte",
+    "jvbFixedDownDetail": "Deltagarna får varken ljud eller video förrän bryggan går att nå igen.",
+    "jvbUnmonitored": "Status övervakas inte",
+    "jvbUnmonitoredDetail": "Den här installationen frågar inte videobryggan, så dess status är inte tillgänglig här."
   },
   "infraMap": {
     "loading": "Laddar infrastrukturkarta...",
@@ -3172,8 +3209,8 @@
     "ariaLabel": "Systeminfrastrukturkarta",
     "title": "Infrastrukturkarta",
     "subtitle": "Realtidsvisualisering av arkitekturen och tjänsternas status",
-    "participants": "Deltagare",
-    "conferences": "Konferenser",
+    "participants": "Deltagare på videobryggan",
+    "conferences": "Konferenser på videobryggan",
     "bandwidthIn": "Inkommande bandbredd",
     "bandwidthOut": "Utgående bandbredd",
     "recordings": "Inspelningar",
@@ -3259,23 +3296,33 @@
       "jitsiWeb": {
         "healthy": "Videokonferensrummet är nåbart och redo för evenemang.",
         "down": "Videokonferensrummet är inte nåbart. Det går inte att starta eller ansluta till evenemang.",
-        "standby": "Videokonferensrummet är inte konfigurerat."
+        "standby": "Videokonferensrummet är inte konfigurerat.",
+        "degraded": "Videokonferensrummet svarar, men med fel eller långsamt.",
+        "publicCheckFailed": "Portalen kan inte kontrollera rummet på dess offentliga adress: sett från servern är certifikatet eller namnet inte giltigt. Rummet kan ändå fungera för deltagarna.",
+        "unmonitored": "Videokonferensrummets status övervakas inte i den här installationen."
       },
       "prosody": {
         "healthy": "Intern meddelandehantering mellan videotjänster fungerar korrekt.",
         "down": "Intern meddelandehantering är inte nåbar. Videotjänster kan inte kommunicera med varandra.",
-        "standby": "Meddelandetjänsten är inte konfigurerad."
+        "standby": "Meddelandetjänsten är inte konfigurerad.",
+        "degraded": "Den interna meddelandehanteringen svarar, men med fel eller långsamt.",
+        "publicCheckFailed": "Portalen kan inte kontrollera den interna meddelandehanteringen via rummets offentliga adress: sett från servern är certifikatet eller namnet inte giltigt. Konferenserna kan ändå fungera.",
+        "unmonitored": "Den interna meddelandehanteringens status övervakas inte i den här installationen."
       },
       "jicofo": {
         "healthy": "Konferenskoordinatorn är aktiv och hanterar sessioner.",
         "down": "Konferenskoordinatorn är inte nåbar. Det går inte att skapa nya konferenser.",
-        "standby": "Konferenskoordinatorn är inte konfigurerad."
+        "standby": "Konferenskoordinatorn är inte konfigurerad.",
+        "degraded": "Konferenskoordinatorn svarar, men med fel eller långsamt.",
+        "unmonitored": "Konferenskoordinatorns status övervakas inte i den här installationen."
       },
       "jvb": {
         "healthy": "Videobryggan är aktiv och överför ljud/video till deltagare.",
         "scaling": "Videobryggan förbereder sig för ett kommande evenemang. Servrar skapas automatiskt.",
         "standby": "Videobryggan är i standby. Den aktiveras automatiskt innan ett schemalagt evenemang börjar.",
-        "stale": "Ett evenemang väntar på videobridgen längre än konfigurerad timeout. Kontrollera cluster autoscaler och JVB-poddarnas loggar."
+        "stale": "Ett evenemang väntar på videobridgen längre än konfigurerad timeout. Kontrollera cluster autoscaler och JVB-poddarnas loggar.",
+        "fixedDown": "Videobryggan svarar inte. Konferenserna överför varken ljud eller video förrän den går att nå igen.",
+        "unmonitored": "Videobryggans status övervakas inte i den här installationen: portalen har ingen adress att fråga den på."
       },
       "jibri": {
         "healthy": "Inspelningstjänsten är redo och tillgänglig.",
@@ -3307,7 +3354,8 @@
       "jibri": "Evenemang kan inte spelas in. Deltagare kan fortfarande ansluta och delta.",
       "jibriStale": "Ett evenemang med aktiv inspelning väntar på Jibri längre än timeouten: sessionen spelas inte in.",
       "smtp": "Bekräftelsemeddelanden och påminnelser skickas inte.",
-      "postprodDegraded": "Transkriptioner och sammanfattningar för några av de senaste inspelningarna har inte genererats. Videoinspelningarna är ändå tillgängliga."
+      "postprodDegraded": "Transkriptioner och sammanfattningar för några av de senaste inspelningarna har inte genererats. Videoinspelningarna är ändå tillgängliga.",
+      "jvbDown": "Deltagarna får varken ljud eller video."
     },
     "overallVerdicts": {
       "operational": "Alla tjänster fungerar korrekt. Plattformen är fullt operativ.",
@@ -3337,7 +3385,8 @@
       "degraded": "Försämrad",
       "down": "Otillgänglig",
       "standby": "I standby",
-      "scaling": "Förbereder"
+      "scaling": "Förbereder",
+      "unknown": "Övervakas inte"
     },
     "metrics": {
       "uptime24h": "Drifttid 24h",
@@ -3348,7 +3397,8 @@
       "errorRate": "5xx-fel",
       "requestRate": "Förfrågningar/s",
       "podUptime": "Pod-drifttid"
-    }
+    },
+    "probeDetail": "Resultat av kontrollen"
   },
   "feedback": {
     "title": "Hur bedömer du detta evenemang?",
@@ -3673,7 +3723,9 @@
       "almostReady": "Videoservern igång: snart klart",
       "almostReadyDetail": "Ett ögonblick till, sedan aktiveras anslutningsknappen av sig själv.",
       "honestHint": "Vanlig väntetid: under en minut om infrastrukturen redan är varm, 3–5 minuter vid första starten. Under tiden kan du kontrollera kamera och mikrofon eller använda chatten.",
-      "elapsed": "förbereds sedan {time}"
+      "elapsed": "förbereds sedan {time}",
+      "scheduled": "Rummet öppnas vid starttiden",
+      "scheduledDetail": "Eller tidigare, när arrangören startar evenemanget. Under tiden kan du kontrollera kamera och mikrofon eller använda chatten."
     },
     "exitWaiting": "Lämna väntrummet",
     "warmingUp": "Rummet förbereds",
@@ -3729,7 +3781,10 @@
       "hostEarly": "Tidigt insläpp (värd)"
     },
     "roomJustOpened": "Rummet är redo — kom in",
-    "enterAnyway": "Gå in ändå"
+    "enterAnyway": "Gå in ändå",
+    "notHeldBadge": "Tiden har passerat",
+    "notHeldTitle": "Den planerade tiden för evenemanget har passerat",
+    "notHeldDetail": "Rummet öppnades inte. Se evenemangets sida för eventuella uppdateringar."
   },
   "recording": {
     "management": "Videoinspelning",
@@ -3865,6 +3920,16 @@
     "noFeedback": "Ingen återkoppling mottagen",
     "comments": "Kommentarer",
     "noComments": "Inga kommentarer",
+    "yes": "Ja",
+    "no": "Nej"
+  },
+  "questionnaire": {
+    "loadFailed": "Det gick inte att läsa in enkäten.",
+    "submit": "Skicka svar",
+    "submitFailed": "Det gick inte att skicka. Försök igen.",
+    "answersInvalid": "Några svar saknas eller är ogiltiga: kontrollera de obligatoriska frågorna och försök igen.",
+    "alreadySubmitted": "Du har redan skickat dina svar på den här enkäten.",
+    "thankYou": "Tack för dina svar.",
     "yes": "Ja",
     "no": "Nej"
   }

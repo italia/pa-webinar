@@ -128,3 +128,64 @@ describe('email di accesso dello staff', () => {
     expect(m.text).toContain('https://esempio.it/it/admin/accesso?t=abc');
   });
 });
+
+describe('uscita dalla rubrica nelle email', () => {
+  const OPT_OUT = 'https://example.gov.it/it/rubrica/opt-out?token=abc.def';
+
+  it('senza rubrica resta la nota di sempre, senza link', async () => {
+    const { baseReminderCopy, reminderText } = await import('./templates');
+    expect(baseConfirmationCopy(base()).footerNote).toContain('Nessuna azione ulteriore');
+    expect(confirmationHtml(base())).not.toContain('rubrica/opt-out');
+    expect(reminderText(base(), baseReminderCopy(base()))).not.toContain('rubrica/opt-out');
+  });
+
+  it('per chi e in rubrica sostituisce «nessuna azione» e porta il link firmato', async () => {
+    const { baseReminderCopy, reminderHtml: html, reminderText } = await import('./templates');
+    const input = { ...base(), addressBookOptOutUrl: OPT_OUT };
+    for (const copy of [baseConfirmationCopy(input), baseReminderCopy(input)]) {
+      expect(copy.footerNote).not.toContain('Nessuna azione ulteriore');
+      expect(copy.footerNote).toContain('rubrica');
+    }
+    expect(confirmationHtml(input)).toContain(`href="${OPT_OUT}"`);
+    expect(confirmationHtml(input)).toContain('Rimuovi i miei dati dalla rubrica');
+    expect(confirmationText(input)).toContain(`Rimuovi i miei dati dalla rubrica: ${OPT_OUT}`);
+    expect(html(input)).toContain(`href="${OPT_OUT}"`);
+    expect(reminderText(input)).toContain(OPT_OUT);
+  });
+
+  it('il link resta anche quando la nota e personalizzata dall amministrazione', () => {
+    const input = { ...base(), addressBookOptOutUrl: OPT_OUT };
+    const resolved = { ...baseConfirmationCopy(input), footerNote: 'Testo dell ente' };
+    const out = confirmationHtml(input, resolved);
+    expect(out).toContain('Testo dell ente');
+    expect(out).toContain(`href="${OPT_OUT}"`);
+  });
+
+  it('ha un testo in ogni lingua delle email', async () => {
+    const { EMAIL_LOCALES } = await import('./lingua');
+    for (const locale of EMAIL_LOCALES) {
+      const input = { ...base(), locale, addressBookOptOutUrl: OPT_OUT };
+      const note = baseConfirmationCopy(input).footerNote;
+      expect(note).not.toBe(baseConfirmationCopy({ ...base(), locale }).footerNote);
+      expect(confirmationText(input)).toContain(OPT_OUT);
+    }
+  });
+
+  it('arriva anche nell email di ringraziamento dopo l evento', async () => {
+    const { postEventParticipantEmail } = await import('./templates');
+    const mail = postEventParticipantEmail({
+      locale: 'en',
+      eventTitle: 'Evento',
+      eventPageUrl: 'https://example.gov.it/en/events/x',
+      addressBookOptOutUrl: OPT_OUT,
+    });
+    expect(mail.html).toContain(`href="${OPT_OUT}"`);
+    expect(mail.text).toContain(`Remove me from the address book: ${OPT_OUT}`);
+    const without = postEventParticipantEmail({
+      locale: 'en',
+      eventTitle: 'Evento',
+      eventPageUrl: 'https://example.gov.it/en/events/x',
+    });
+    expect(without.html).not.toContain('opt-out');
+  });
+});

@@ -20,6 +20,7 @@ import { extractModeratorToken, verifyModeratorToken } from '@/lib/auth/moderato
 import { authenticateChatSender } from '@/lib/chat/authenticate';
 import { encryptPII } from '@/lib/crypto/pii';
 import { publishChat } from '@/lib/chat/pubsub';
+import { senderColourKey } from '@/lib/chat/sender-key';
 import { prisma } from '@/lib/db';
 import { ForbiddenError, NotFoundError, RateLimitError, ValidationError } from '@/lib/errors';
 import { rateLimit } from '@/lib/rate-limit';
@@ -68,7 +69,7 @@ export const DELETE = withErrorHandling(async (request, context) => {
   void publishChat({
     id: message.id,
     eventId: event.id,
-    senderId: '',
+    senderKey: '',
     senderName: '',
     isModerator: false,
     text: '',
@@ -168,7 +169,7 @@ export const PATCH = withErrorHandling(async (request, context) => {
   void publishChat({
     id: messageId,
     eventId: auth.eventId,
-    senderId: auth.senderId,
+    senderKey: senderColourKey(auth.senderId),
     senderName: auth.senderName,
     isModerator: auth.isModerator,
     text: parsed.data.text,

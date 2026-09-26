@@ -127,7 +127,8 @@
         "outlook": "Outlook / Office 365",
         "yahoo": "Yahoo Calendar",
         "downloadIcs": "Lejupielādēt .ics failu"
-      }
+      },
+      "registrationEnded": "Pasākums ir beidzies: reģistrācija ir slēgta."
     },
     "manage": {
       "toggleChat": "Tērzēšana",
@@ -368,7 +369,8 @@
       "questionRestore": "Atjaunot",
       "questionStatusFailed": "Neizdevās atjaunināt jautājumu",
       "questionNeedsText": "Ierakstiet jautājuma tekstu: pielikums vien rindā netiek ievietots",
-      "lensTruncated": "Ielādēti tikai jaunākie ziņojumi: sarakstā var nebūt vecāku jautājumu."
+      "lensTruncated": "Ielādēti tikai jaunākie ziņojumi: sarakstā var nebūt vecāku jautājumu.",
+      "attachUnavailable": "Pielikumi šajā instalācijā nav pieejami."
     },
     "role": {
       "moderator": "Moderators",
@@ -389,7 +391,8 @@
         "unknown": "N/P"
       },
       "volume": "Skaļums",
-      "volumeFor": "{name} skaļums"
+      "volumeFor": "{name} skaļums",
+      "kickName": "Izslēgt: {name}"
     },
     "moderator": {
       "muteAll": "Izslēgt skaņu visiem",
@@ -453,7 +456,18 @@
       "remainingLabel": "Atlikušais laiks (noklikšķiniet, lai redzētu pagājušo laiku)",
       "elapsedLabel": "Pagājušais laiks (noklikšķiniet, lai redzētu atlikušo laiku)"
     },
-    "videoCallFrameTitle": "Pasākuma videozvans"
+    "videoCallFrameTitle": "Pasākuma videozvans",
+    "insecureContextTitle": "Nedroša adrese",
+    "insecureContextBody": "Šī lapa ir atvērta, izmantojot http://: pārlūkprogramma neļauj izmantot mikrofonu un kameru, tāpēc videozvans nevar sākties. Atveriet to pašu lapu drošajā adresē.",
+    "insecureContextLink": "Atvērt https://{host}",
+    "conferenceUnreachableTitle": "Videozvanu pakalpojums neatbild",
+    "conferenceUnreachableBody": "Jūsu pārlūkprogramma nevar sasniegt videozvanu serveri ({host}). Atveriet to jaunā cilnē: ja pārlūkprogramma parāda drošības brīdinājumu, pieņemiet to, pēc tam atgriezieties šeit un mēģiniet vēlreiz. Ja lapa neatveras, iespējams, to bloķē tīkls, no kura pieslēdzaties.",
+    "conferenceOpenHost": "Atvērt {host} jaunā cilnē",
+    "leftTitle": "Jūs izgājāt no telpas",
+    "leftMessage": "Pasākums joprojām notiek: varat atgriezties jebkurā laikā.",
+    "leftModeratorReminder": "Pasākums paliek atvērts, līdz kāds to beidz. Kad esat beiguši, atgriezieties un izvēlieties “{action}”.",
+    "rejoin": "Atgriezties",
+    "backToHome": "Atpakaļ uz sākumlapu"
   },
   "qa": {
     "title": "Jautājumi un atbildes",
@@ -590,7 +604,8 @@
       "errorGeneric": "Kļūda, augšupielādējot failu",
       "helpImage": "Atbalstītie formāti: PNG, JPEG, WebP, SVG, GIF — maks. 10 MB",
       "helpAudio": "Atbalstītie formāti: MP3, WAV, OGG, M4A, WebM — maks. 20 MB",
-      "helpDocument": "Atbalstītie formāti: PDF, DOCX, PPTX, XLSX, TXT — maks. 25 MB"
+      "helpDocument": "Atbalstītie formāti: PDF, DOCX, PPTX, XLSX, TXT — maks. 25 MB",
+      "uploadsUnavailable": "Failu augšupielāde šajā instalācijā nav pieejama: tā vietā ielīmējiet faila URL."
     },
     "rubricaPicker": {
       "loading": "Notiek meklēšana…",
@@ -628,7 +643,9 @@
           "endsAt": "Beigu datumam jābūt pēc sākuma datuma.",
           "titleRequired": "Nosaukums ir obligāts (vismaz 3 rakstzīmes).",
           "titleRequiredOtherLocale": "Nosaukums noklusējuma valodā ({locale}) ir obligāts: pārejiet uz cilni {locale}.",
-          "maxParticipants": "Ievadiet skaitli no 2 līdz 500."
+          "maxParticipants": "Ievadiet skaitli no 2 līdz 500.",
+          "descriptionRequired": "Apraksts ir obligāts (vismaz {min} rakstzīmes).",
+          "descriptionRequiredOtherLocale": "Apraksts noklusējuma valodā ({locale}) ir obligāts: pārejiet uz cilni {locale}."
         },
         "senderRatioLabel": "Aplēstā aktīvā daļa",
         "senderRatioHelp": "Cik daudz dalībnieku, sagaidāms, izmantos mikrofonu/kameru. Palīdz noteikt video servera apjomu.",
@@ -820,7 +837,11 @@
         "speakers": "runātāji",
         "materials": "materiāli",
         "questionnaires": "anketas"
-      }
+      },
+      "revocationFailed": "Neizdevās atsaukt piekļuvi ({name}): piekļuves saite joprojām ir derīga. Saglabājiet vēlreiz, lai mēģinātu atkārtoti, vai atsauciet to pasākuma lapas cilnē “{tab}”.",
+      "validationFailedDetail": "Serveris noraidīja dažus datus: {reason}. Izlabojiet un mēģiniet vēlreiz.",
+      "publishFailed": "Pasākums ir izveidots, bet nav publicēts: tas joprojām ir melnraksts. Publicējiet to pasākuma lapā.",
+      "publishFailedDetail": "Pasākums ir izveidots, bet nav publicēts: tas joprojām ir melnraksts. Serveris atbildēja: {reason}. Publicējiet to pasākuma lapā."
     },
     "nav": {
       "events": "Pasākumu pārvaldība",
@@ -1240,7 +1261,7 @@
       "wordCloudEnabled": "Tiešraides vārdu mākonis",
       "wordCloudEnabledDesc": "Dalībnieki nosūta vārdu, un mākonis atjaunojas tiešraidē. Noderīgi, lai uzsāktu diskusiju vai dažās sekundēs apkopotu noskaņojumu.",
       "whiteboardEnabled": "Koplietojamā tāfele",
-      "whiteboardEnabledDesc": "Iespējo iebūvēto sadarbības tāfeli (Excalidraw): moderatori to pasākuma laikā var atvērt no rīkjoslas. Tūlītējos zvanos tā ir vienmēr ieslēgta.",
+      "whiteboardEnabledDesc": "Iespējo iebūvēto sadarbības tāfeli (Excalidraw): moderatori to pasākuma laikā var atvērt no rīkjoslas. Nepieciešams instalācijas tāfeles pakalpojums; kur tas ir pieejams, tūlītējos zvanos tāfele ir vienmēr ieslēgta.",
       "autoStartRecording": "Sākt ierakstīšanu automātiski",
       "autoStartRecordingDesc": "Pasākuma sākumā ieraksts sākas pats (moderatoram netiek prasīts apstiprinājums). Vēlīni dalībnieki uzreiz atrod pieejamu atskaņotāju.",
       "aiSectionHeading": "Automātiskā pēcapstrāde",
@@ -1316,7 +1337,8 @@
       "retentionPreviewRecordings": "Video ieraksti",
       "retentionPreviewKept": "Apkopotā statistika un pasākuma metadati tiek saglabāti.",
       "configPreview": "Konfigurācijas priekšskatījums",
-      "templateApplied": "Veidne piemērota: {name}. Jūs varat mainīt visus iestatījumus."
+      "templateApplied": "Veidne piemērota: {name}. Jūs varat mainīt visus iestatījumus.",
+      "whiteboardUnavailable": "Šajā instalācijā nav pieejams: trūkst Jitsi tāfeles pakalpojuma, ko var ieslēgt platformas uzturētājs."
     },
     "links": {
       "title": "Pasākuma saites",
@@ -1925,9 +1947,9 @@
       "version": "Versija",
       "environment": "Vide",
       "modes": {
-        "simple": "Vienkārša (Docker Compose)",
-        "standard": "Standarta (Kubernetes)",
-        "full": "Pilna (Kubernetes ar scale-to-zero)",
+        "simple": "Vienkārša",
+        "standard": "Standarta",
+        "full": "Pilna (tilti ar scale-to-zero)",
         "unknown": "Nezināma"
       },
       "database": {
@@ -1941,7 +1963,9 @@
         "title": "Jitsi Meet",
         "reachable": "Sasniedzams",
         "unreachable": "Nesasniedzams",
-        "notConfigured": "Nav konfigurēts"
+        "notConfigured": "Nav konfigurēts",
+        "degraded": "Sasniedzams, bet atbild ar kļūdām vai lēni",
+        "publicCheckFailed": "Pārbaude publiskajā adresē neizdevās ({code}): portāla serveris nepieņem sertifikātu vai nosaukumu. Konferences var tomēr darboties."
       },
       "jvb": {
         "title": "Video Bridge (JVB)",
@@ -1949,7 +1973,9 @@
         "replicas": "{current}/{max} mezgli",
         "preScale": "Priekšmērogošana: {minutes} min",
         "fixedMode": "Fiksēts režīms",
-        "scalerEnabled": "Mērogotājs iespējots"
+        "scalerEnabled": "Mērogotājs iespējots",
+        "fixedDown": "Video tilts neatbild",
+        "unmonitored": "Netiek uzraudzīts: nav iestatīta tilta adrese (JVB_HEALTH_URL)"
       },
       "jibri": {
         "title": "Ierakstīšana (Jibri)",
@@ -1971,7 +1997,11 @@
         "metrics": "Metriku galapunkts"
       },
       "note": "Infrastruktūras izmaiņas tiek veiktas, izmantojot Helm konfigurāciju un CI/CD cauruļvadu.",
-      "deployDocs": "Izvietošanas dokumentācija"
+      "deployDocs": "Izvietošanas dokumentācija",
+      "platforms": {
+        "kubernetes": "Kubernetes vidē",
+        "other": "Ārpus Kubernetes (Docker Compose vai viens serveris)"
+      }
     },
     "instantCalls": {
       "title": "Ātrie zvani",
@@ -2076,9 +2106,9 @@
       "latencyP99": "Latentums P99",
       "requestRate": "Pieprasījumi/s",
       "chartLatencyQuantiles": "Lietotnes latentums — P50 / P95 / P99",
-      "participantsNow": "Aktīvie dalībnieki",
+      "participantsNow": "Dalībnieki video tiltā",
       "jvbStress": "JVB slodze",
-      "conferences": "Aktīvās konferences",
+      "conferences": "Konferences video tiltā",
       "octoRelay": "Octo starpbrigāžu pārraide",
       "interBridge": "Octo trafiks",
       "chartCpu": "CPU usage",
@@ -2105,7 +2135,8 @@
       "liveNow": "LIVE",
       "provisioningNow": "iestatīšanā",
       "idleNow": "IDLE (pauzē)",
-      "scaleToZeroHelp": "IDLE ir parastais stāvoklis pasākumam bez trafika ilgāk par žēlastības periodu. Nākamajā lietotāja apmeklējumā tas atgriežas uz PROVISIONING un pēc tam LIVE."
+      "scaleToZeroHelp": "IDLE ir parastais stāvoklis pasākumam bez trafika ilgāk par žēlastības periodu. Nākamajā lietotāja apmeklējumā tas atgriežas uz PROVISIONING un pēc tam LIVE.",
+      "capacityFromStatus": "Pašreizējās vērtības nolasītas no video tilta. Vēsturei nepieciešams Prometheus."
     },
     "bulk": {
       "selectAll": "Atlasīt visus",
@@ -2824,7 +2855,8 @@
       "quotaExceeded": "Šis pasākums ir sasniedzis augšupielādēto failu ierobežojumu ({maxFiles} faili, kopā {maxMb} MB): noņemiet dažus, lai augšupielādētu citus",
       "uploadBusy": "Pašlaik ir pārāk daudz augšupielāžu: mēģiniet vēlreiz pēc dažām sekundēm",
       "deleteFailed": "Materiālu neizdevās dzēst"
-    }
+    },
+    "addedByStaff": "Pievienoja organizatori"
   },
   "reminders": {
     "title": "Paziņojumi",
@@ -2897,7 +2929,7 @@
       "requestSubmittedBody": "Ja šī e-pasta adrese atbilst reģistrācijai, mēs jums nosūtījām saiti dzēšanas apstiprināšanai. Saite ir derīga 1 stundu.",
       "linkInvalid": "Saite nav derīga vai tai ir beidzies derīguma termiņš. Pieprasiet jaunu saiti.",
       "confirmWarning": "Jūs grasāties neatgriezeniski dzēst visus ar jūsu e-pasta adresi saistītos personas datus.",
-      "confirmBody": "Tiks dzēstas reģistrācijas, jautājumi, balsojumi aptaujās, atsauksmes un atgādinājumi. Darbība ir neatgriezeniska.",
+      "confirmBody": "Tiks dzēstas reģistrācijas, jautājumi, balsojumi aptaujās, atsauksmes, atgādinājumi un jūsu ieraksts pasākumu kontaktu grāmatā. Darbība ir neatgriezeniska.",
       "confirmButton": "Apstiprināt dzēšanu",
       "cancel": "Atcelt",
       "processing": "Notiek dzēšana...",
@@ -3120,7 +3152,7 @@
     "nodesReady": "gatavi mezgli",
     "scaling": "mērogošana",
     "jvbStress": "JVB slodze",
-    "participantsConnected": "pievienotie dalībnieki",
+    "participantsConnected": "dalībnieki video tiltā",
     "videoInteractive": "interaktīvs",
     "videoWebinar": "tīmekļseminārs",
     "participantsAvailable": "pieejamie dalībnieki",
@@ -3164,7 +3196,12 @@
       "lastFailure": "Pēdējā kļūda {when}",
       "artifactsProduced": "{count, plural, =0 {nav artefaktu} zero {# izveidotu artefaktu} one {# izveidots artefakts} other {# izveidoti artefakti}}",
       "eventsEnabled": "{count, plural, =0 {nav pasākumu ar MI} zero {# pasākumu ar aktīvu MI} one {# pasākums ar aktīvu MI} other {# pasākumi ar aktīvu MI}}"
-    }
+    },
+    "jvbFixedUp": "{count, plural, =1 {Video tilts darbojas} other {Video tilts darbojas · paredzēti # tilti}}",
+    "jvbFixedDown": "Video tilts neatbild",
+    "jvbFixedDownDetail": "Dalībnieki nesaņem ne audio, ne video, līdz tilts atkal ir sasniedzams.",
+    "jvbUnmonitored": "Statuss netiek uzraudzīts",
+    "jvbUnmonitoredDetail": "Šī instalācija nevaicā video tilta statusu, tāpēc tas šeit nav pieejams."
   },
   "infraMap": {
     "loading": "Infrastruktūras kartes ielāde...",
@@ -3172,8 +3209,8 @@
     "ariaLabel": "Sistēmas infrastruktūras karte",
     "title": "Infrastruktūras karte",
     "subtitle": "Arhitektūras un pakalpojumu statusa reāllaika vizualizācija",
-    "participants": "Dalībnieki",
-    "conferences": "Konferences",
+    "participants": "Dalībnieki video tiltā",
+    "conferences": "Konferences video tiltā",
     "bandwidthIn": "Ienākošais joslas platums",
     "bandwidthOut": "Izejošais joslas platums",
     "recordings": "Ieraksti",
@@ -3259,23 +3296,33 @@
       "jitsiWeb": {
         "healthy": "Videokonferenču telpa ir sasniedzama un gatava pasākumiem.",
         "down": "Videokonferenču telpa nav sasniedzama. Nav iespējams sākt vai pievienoties pasākumiem.",
-        "standby": "Videokonferenču telpa nav konfigurēta."
+        "standby": "Videokonferenču telpa nav konfigurēta.",
+        "degraded": "Videokonferenču telpa atbild, bet ar kļūdām vai lēni.",
+        "publicCheckFailed": "Portāls nevar pārbaudīt telpu tās publiskajā adresē: no servera puses sertifikāts vai nosaukums nav derīgs. Dalībniekiem telpa var tomēr darboties.",
+        "unmonitored": "Videokonferenču telpas statuss šajā instalācijā netiek uzraudzīts."
       },
       "prosody": {
         "healthy": "Iekšējā ziņapmaiņa starp video pakalpojumiem darbojas pareizi.",
         "down": "Iekšējā ziņapmaiņa nav sasniedzama. Video pakalpojumi nevar savstarpēji sazināties.",
-        "standby": "Ziņapmaiņas pakalpojums nav konfigurēts."
+        "standby": "Ziņapmaiņas pakalpojums nav konfigurēts.",
+        "degraded": "Iekšējā ziņapmaiņa atbild, bet ar kļūdām vai lēni.",
+        "publicCheckFailed": "Portāls nevar pārbaudīt iekšējo ziņapmaiņu caur telpas publisko adresi: no servera puses sertifikāts vai nosaukums nav derīgs. Konferences var tomēr darboties.",
+        "unmonitored": "Iekšējās ziņapmaiņas statuss šajā instalācijā netiek uzraudzīts."
       },
       "jicofo": {
         "healthy": "Konferenču koordinators ir aktīvs un pārvalda sesijas.",
         "down": "Konferenču koordinators nav sasniedzams. Nav iespējams izveidot jaunas konferences.",
-        "standby": "Konferenču koordinators nav konfigurēts."
+        "standby": "Konferenču koordinators nav konfigurēts.",
+        "degraded": "Konferenču koordinators atbild, bet ar kļūdām vai lēni.",
+        "unmonitored": "Konferenču koordinatora statuss šajā instalācijā netiek uzraudzīts."
       },
       "jvb": {
         "healthy": "Video tilts ir aktīvs un pārraida audio/video dalībniekiem.",
         "scaling": "Video tilts gatavojas gaidāmajam pasākumam. Serveri tiek veidoti automātiski.",
         "standby": "Video tilts ir gaidstāvē. Tas automātiski aktivizēsies pirms plānotā pasākuma sākuma.",
-        "stale": "Pasākums gaida video tiltu ilgāk par konfigurēto noildzi. Pārbaudiet klastera autoscaler un JVB pod žurnālus."
+        "stale": "Pasākums gaida video tiltu ilgāk par konfigurēto noildzi. Pārbaudiet klastera autoscaler un JVB pod žurnālus.",
+        "fixedDown": "Video tilts neatbild. Konferences nepārraida ne audio, ne video, līdz tas atkal ir sasniedzams.",
+        "unmonitored": "Video tilta statuss šajā instalācijā netiek uzraudzīts: portālam nav adreses, lai to vaicātu."
       },
       "jibri": {
         "healthy": "Ierakstīšanas pakalpojums ir gatavs un pieejams.",
@@ -3307,7 +3354,8 @@
       "jibri": "Pasākumus nevar ierakstīt. Dalībnieki joprojām var pievienoties un piedalīties.",
       "jibriStale": "Pasākums ar aktīvu ierakstīšanu gaida Jibri ilgāk par noildzi: sesija netiek ierakstīta.",
       "smtp": "Reģistrācijas apstiprinājuma e-pasti un atgādinājumi netiks nosūtīti.",
-      "postprodDegraded": "Dažiem nesenajiem ierakstiem netika izveidotas transkripcijas un protokoli. Video ieraksti joprojām ir pieejami."
+      "postprodDegraded": "Dažiem nesenajiem ierakstiem netika izveidotas transkripcijas un protokoli. Video ieraksti joprojām ir pieejami.",
+      "jvbDown": "Dalībnieki nesaņem ne audio, ne video."
     },
     "overallVerdicts": {
       "operational": "Visi pakalpojumi darbojas pareizi. Platforma ir pilnībā funkcionāla.",
@@ -3337,7 +3385,8 @@
       "degraded": "Palēnināts",
       "down": "Nav pieejams",
       "standby": "Gaidstāvē",
-      "scaling": "Sagatavošana"
+      "scaling": "Sagatavošana",
+      "unknown": "Netiek uzraudzīts"
     },
     "metrics": {
       "uptime24h": "Darbības laiks 24h",
@@ -3348,7 +3397,8 @@
       "errorRate": "5xx kļūdas",
       "requestRate": "Pieprasījumi/s",
       "podUptime": "Pod darbības laiks"
-    }
+    },
+    "probeDetail": "Pārbaudes rezultāts"
   },
   "feedback": {
     "title": "Kā jūs vērtējat šo pasākumu?",
@@ -3673,7 +3723,9 @@
       "almostReady": "Video serveris darbojas: gandrīz gatavs",
       "almostReadyDetail": "Vēl mirklis, un pievienošanās poga ieslēgsies pati.",
       "honestHint": "Parastā gaidīšana: mazāk par minūti, ja infrastruktūra jau ir uzsilusi, 3–5 minūtes pirmajā startā. Pa to laiku vari pārbaudīt kameru un mikrofonu vai izmantot tērzēšanu.",
-      "elapsed": "sagatavošanā jau {time}"
+      "elapsed": "sagatavošanā jau {time}",
+      "scheduled": "Telpa atveras sākuma laikā",
+      "scheduledDetail": "Vai agrāk, kad rīkotājs sāk pasākumu. Pa to laiku vari pārbaudīt kameru un mikrofonu vai izmantot tērzēšanu."
     },
     "exitWaiting": "Iziet no uzgaidāmās telpas",
     "warmingUp": "Telpa tiek sagatavota",
@@ -3729,7 +3781,10 @@
       "hostEarly": "Agrīna ieeja (vadītājs)"
     },
     "roomJustOpened": "Telpa ir gatava — nāc iekšā",
-    "enterAnyway": "Tomēr ienākt"
+    "enterAnyway": "Tomēr ienākt",
+    "notHeldBadge": "Laiks ir pagājis",
+    "notHeldTitle": "Pasākuma plānotais laiks ir pagājis",
+    "notHeldDetail": "Telpa netika atvērta. Jaunumus meklē pasākuma lapā."
   },
   "recording": {
     "management": "Video ieraksts",
@@ -3865,6 +3920,16 @@
     "noFeedback": "Atsauksmes nav saņemtas",
     "comments": "Komentāri",
     "noComments": "Nav komentāru",
+    "yes": "Jā",
+    "no": "Nē"
+  },
+  "questionnaire": {
+    "loadFailed": "Aptauju neizdevās ielādēt.",
+    "submit": "Nosūtīt atbildes",
+    "submitFailed": "Nosūtīšana neizdevās. Mēģiniet vēlreiz.",
+    "answersInvalid": "Dažas atbildes trūkst vai nav derīgas: pārbaudiet obligātos jautājumus un mēģiniet vēlreiz.",
+    "alreadySubmitted": "Jūsu atbildes uz šo aptauju jau ir nosūtītas.",
+    "thankYou": "Paldies par jūsu atbildēm.",
     "yes": "Jā",
     "no": "Nē"
   }

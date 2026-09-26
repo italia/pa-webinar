@@ -117,6 +117,34 @@ describe('isEventOpenForRegistration', () => {
     }
   });
 
+  it('un evento mai aperto oltre la sua fine non accetta iscrizioni, qualunque stato abbia ancora', () => {
+    // Fra `endsAt` e il giro del ciclo di vita che lo chiude, un PUBLISHED
+    // rimasto tale non deve accettare iscrizioni né mandare conferme.
+    expect(
+      isEventOpenForRegistration({ status: 'PUBLISHED', eventType: 'SCHEDULED', endsAt: PAST }),
+    ).toBe(false);
+    // Il confine è stretto: alla fine esatta è già chiuso.
+    const fine = new Date('2027-01-01T10:00:00Z');
+    expect(
+      isEventOpenForRegistration(
+        { status: 'PUBLISHED', eventType: 'SCHEDULED', endsAt: fine },
+        fine.getTime(),
+      ),
+    ).toBe(false);
+    expect(
+      isEventOpenForRegistration(
+        { status: 'PUBLISHED', eventType: 'SCHEDULED', endsAt: fine },
+        fine.getTime() - 1,
+      ),
+    ).toBe(true);
+  });
+
+  it('un evento LIVE oltre la fine resta aperto: la grace e le sale a tempo indefinito sono legittime', () => {
+    expect(
+      isEventOpenForRegistration({ status: 'LIVE', eventType: 'SCHEDULED', endsAt: PAST }),
+    ).toBe(true);
+  });
+
   it('REGISTRABLE_STATUSES (per il client) coincide con gli stati aperti lato server', () => {
     expect(REGISTRABLE_STATUSES).toEqual(['PUBLISHED', 'PROVISIONING', 'IDLE', 'LIVE']);
   });
@@ -156,12 +184,32 @@ describe('publicEventStatusWhere', () => {
   it('includeEnded: false esclude del tutto gli ENDED', () => {
     const where = publicEventStatusWhere({ includeEnded: false });
     expect(where.OR).toHaveLength(2);
+    const serialized = (where.OR ?? []).map((c) => JSON.stringify(c));
+    expect(serialized.some((s) => s.includes('ENDED'))).toBe(false);
+  });
+
+  it('includeEnded: false mostra un evento mai aperto solo prima della sua fine; LIVE sempre', () => {
+    // Home e calendario pubblico: un PUBLISHED oltre la fine, non ancora
+    // chiuso dal giro del ciclo di vita, non deve occupare il posto di un
+    // evento in arrivo. Un evento LIVE è in corso (grace compresa).
+    const where = publicEventStatusWhere({ includeEnded: false });
+    expect(where.OR?.[0]).toEqual({ status: 'LIVE', eventType: { not: 'INSTANT' } });
+    const futuri = where.OR?.[1] as {
+      status: { in: string[] };
+      eventType: { not: string };
+      endsAt: { gt: Date };
+    };
+    expect(futuri.status).toEqual({ in: ['PUBLISHED', 'PROVISIONING', 'IDLE'] });
+    expect(futuri.eventType).toEqual({ not: 'INSTANT' });
+    expect(futuri.endsAt.gt).toBeInstanceOf(Date);
+  });
+
+  it('senza opzioni il PUBLISHED resta senza vincolo di tempo (elenchi, sitemap, API)', () => {
+    const where = publicEventStatusWhere();
     expect(where.OR?.[0]).toEqual({
       status: { in: ['PUBLISHED', 'LIVE'] },
       eventType: { not: 'INSTANT' },
     });
-    const serialized = (where.OR ?? []).map((c) => JSON.stringify(c));
-    expect(serialized.some((s) => s.includes('ENDED'))).toBe(false);
   });
 });
 

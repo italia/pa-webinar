@@ -20,6 +20,20 @@ import {
 
 import { DELETE, POST } from './route';
 
+/** Il livello della riga di log che withErrorHandling scrive per la risposta. */
+function livelloDelLog(spia: { mock: { calls: unknown[][] } }, status: number): string | undefined {
+  for (const [riga] of spia.mock.calls) {
+    if (typeof riga !== 'string') continue;
+    try {
+      const j = JSON.parse(riga) as { level?: string; status?: number };
+      if (j.status === status) return j.level;
+    } catch {
+      /* non e' la riga della richiesta */
+    }
+  }
+  return undefined;
+}
+
 const staff = requireStaff as unknown as ReturnType<typeof vi.fn>;
 const complete = completeRecordingBrowserUpload as unknown as ReturnType<typeof vi.fn>;
 const abort = abortRecordingBrowserUpload as unknown as ReturnType<typeof vi.fn>;
@@ -87,11 +101,15 @@ describe('POST: chiusura del caricamento a parti', () => {
     expect(complete).not.toHaveBeenCalled();
   });
 
-  it('senza storage delle registrazioni risponde 503', async () => {
+  it('senza storage delle registrazioni risponde 503, registrato come warn', async () => {
+    const log = vi.spyOn(console, 'log').mockImplementation(() => undefined);
     configured.mockReturnValue(false);
     const res = await call(POST, 'POST', { objectName: OBJECT, uploadId: 'up-1', sizeBytes: 40 });
     expect(res.status).toBe(503);
     expect(complete).not.toHaveBeenCalled();
+    // Una configurazione ammessa, non un guasto.
+    expect(livelloDelLog(log, 503)).toBe('warn');
+    log.mockRestore();
   });
 });
 

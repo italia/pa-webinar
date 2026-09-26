@@ -2368,18 +2368,35 @@ html.live-call-immersive body {
 }
 
 .chat-panel__react-wrap {
-  position: relative;
   display: inline-block;
 }
 
 // Il selettore si apre SOPRA il messaggio: in fondo alla lista non deve
 // finire fuori dal pannello.
+//
+// E deve restare DENTRO la lista anche di lato. La lista scorre (overflow
+// auto), e cio' che sborda a sinistra di un contenitore che scorre viene
+// tagliato e non si raggiunge nemmeno scorrendo: ancorato a destra del
+// pulsante, il selettore di un messaggio altrui perderebbe le prime emoji,
+// e al loro posto si vedrebbe la videochiamata dietro la barra laterale. Lo
+// z-index non c'entra (il contenuto tagliato non si rialza): l'ancora e' la
+// riga dell'ora, larga quanto il messaggio e dal suo lato, e il selettore
+// parte dal bordo sinistro per i messaggi altrui, dal destro per i propri.
+.chat-panel__time--anchor {
+  position: relative;
+}
+
 .chat-panel__react-pop {
   position: absolute;
   bottom: 100%;
-  right: 0;
+  left: 0;
   z-index: 5;
   display: flex;
+  flex-wrap: wrap;
+  // Larghezza propria, non quella dell'ancora: un messaggio breve ha una riga
+  // stretta. Il tetto tiene il selettore dentro uno schermo di telefono.
+  width: max-content;
+  max-width: calc(100vw - 4rem);
   gap: 2px;
   padding: 4px;
   background: #fff;
@@ -2398,6 +2415,11 @@ html.live-call-immersive body {
 
     &:hover,
     &:focus-visible { background: rgba(0, 102, 204, 0.1); }
+  }
+
+  &--own {
+    left: auto;
+    right: 0;
   }
 }
 

@@ -8,11 +8,14 @@ import {
   queryPrometheusRange,
 } from '@/lib/prometheus';
 import { METRICS_APP_LABEL } from '@/lib/metrics';
+import { upSelector } from '@/lib/status/prometheus-selectors';
 
 export const dynamic = 'force-dynamic';
 
 const ALLOWED_QUERIES: Record<string, string> = {
-  uptime: `avg_over_time(up{job=~".*eventi.*"}[24h]) * 100`,
+  // `up` si seleziona per job e namespace, come le regole di allerta del
+  // chart (lib/status/prometheus-selectors).
+  uptime: `avg_over_time(${upSelector()}[24h]) * 100`,
   responseTime: `histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{app="${METRICS_APP_LABEL}"}[5m]))`,
   participants: `eventi_jvb_participants{app="${METRICS_APP_LABEL}"}`,
   conferences: `eventi_jvb_conferences{app="${METRICS_APP_LABEL}"}`,

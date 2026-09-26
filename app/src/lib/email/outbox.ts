@@ -28,6 +28,9 @@ export interface EnqueueEmailInput {
   // Free-form metadata — e.g. { kind: 'confirmation', registrationId }
   // — kept purely for audit/debug; the processor never reads it.
   metadata?: Record<string, unknown>;
+  // Email da spedire una volta sola: con la stessa chiave, una seconda
+  // richiesta non accoda nulla (vedi enqueueEmailOnce).
+  dedupKey?: string;
 }
 
 export async function enqueueEmail(input: EnqueueEmailInput): Promise<string> {
@@ -52,10 +55,31 @@ export async function enqueueEmail(input: EnqueueEmailInput): Promise<string> {
       metadata: input.metadata
         ? (input.metadata as unknown as Prisma.InputJsonValue)
         : Prisma.JsonNull,
+      dedupKey: input.dedupKey ?? null,
     },
     select: { id: true },
   });
   return row.id;
+}
+
+/**
+ * Come enqueueEmail, ma una volta sola per `dedupKey`: se una riga con la
+ * stessa chiave esiste già (anche spedita da tempo), non accoda e restituisce
+ * false. Il controllo è l'indice unico della colonna, quindi regge anche due
+ * richieste concorrenti.
+ */
+export async function enqueueEmailOnce(
+  input: EnqueueEmailInput & { dedupKey: string },
+): Promise<boolean> {
+  try {
+    await enqueueEmail(input);
+    return true;
+  } catch (err) {
+    if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
+      return false;
+    }
+    throw err;
+  }
 }
 
 /**

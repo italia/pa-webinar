@@ -4,12 +4,14 @@ import { statusDataVisible } from '@/lib/status-page';
 import { prisma } from '@/lib/db';
 import { getPublicEnv } from '@/lib/env';
 import {
+  databaseBundled,
+  deploymentMode,
   jibriRecordingExpected,
   recordingStorageConfigured,
   recordingStorageLabel,
 } from '@/lib/infrastructure';
 import { readJvbSnapshot } from '@/lib/jvb-snapshot';
-import { jvbsForEvent, jvbMaxReplicasFromEnv, JVB_BILLABLE_STATUSES } from '@/lib/jvb-sizing';
+import { JVB_BILLABLE_STATUSES } from '@/lib/jvb-sizing';
 import { getAppProcessMetrics } from '@/lib/metrics';
 import {
   isPrometheusConfigured,
@@ -18,10 +20,23 @@ import {
 } from '@/lib/prometheus';
 import { METRICS_APP_LABEL } from '@/lib/metrics';
 import { getSettings } from '@/lib/settings';
+import {
+  bridgeMode,
+  fetchColibriStats,
+  fetchJibriHealth,
+  loadJvbDemand,
+} from '@/lib/status/bridge';
+import { activeOrUpcomingWhere, activeStatusWhere } from '@/lib/status/event-activity';
+import { getJitsiHealth, type JitsiComponentHealth } from '@/lib/status/jitsi-health';
+import { upSelector } from '@/lib/status/prometheus-selectors';
 
 export const dynamic = 'force-dynamic';
 
-type ServiceStatus = 'healthy' | 'degraded' | 'down' | 'standby' | 'scaling';
+/**
+ * `unknown`: il componente non si può interrogare da qui (nessun indirizzo
+ * interno, nessuna sonda) — né bene né male, «non monitorato».
+ */
+type ServiceStatus = 'healthy' | 'degraded' | 'down' | 'standby' | 'scaling' | 'unknown';
 
 interface ServiceNode {
   id: string;
@@ -124,25 +139,44 @@ export interface InfraMapData {
   lastUpdated: string;
 }
 
-function inferDeploymentMode(): InfraMapData['cluster']['mode'] {
-  if (process.env.KUBERNETES_SERVICE_HOST) {
-    const maxReplicas = parseInt(process.env.JVB_MAX_REPLICAS || '0', 10);
-    return maxReplicas > 1 ? 'full' : 'standard';
+/** Lo stato di un componente di Jitsi nel vocabolario della mappa. */
+function jitsiServiceStatus(health: JitsiComponentHealth, configured: boolean): ServiceStatus {
+  if (!configured) return 'standby';
+  switch (health.status) {
+    case 'operational':
+      return 'healthy';
+    case 'degraded':
+      return 'degraded';
+    case 'outage':
+      return 'down';
+    default:
+      return 'unknown';
   }
-  return 'simple';
 }
 
-async function probeService(
-  url: string,
-  timeoutMs = 3000,
-): Promise<{ ok: boolean; responseMs: number }> {
-  const start = Date.now();
-  try {
-    const res = await fetch(url, { signal: AbortSignal.timeout(timeoutMs) });
-    return { ok: res.ok || res.status === 405, responseMs: Date.now() - start };
-  } catch {
-    return { ok: false, responseMs: Date.now() - start };
+/**
+ * Verdetto e conseguenza di un componente di Jitsi. Una verifica fallita
+ * sull'indirizzo pubblico per certificato o nome non dice che le conferenze
+ * non funzionano: dice che il server dell'applicazione non riesce a
+ * verificarle.
+ */
+function jitsiVerdict(
+  id: 'jitsiWeb' | 'prosody' | 'jicofo',
+  health: JitsiComponentHealth,
+  status: ServiceStatus,
+): { verdict: string; impact: string | null } {
+  if (status === 'standby') return { verdict: `infraMap.verdicts.${id}.standby`, impact: null };
+  if (status === 'unknown') return { verdict: `infraMap.verdicts.${id}.unmonitored`, impact: null };
+  if (status === 'healthy') return { verdict: `infraMap.verdicts.${id}.healthy`, impact: null };
+  if (status === 'degraded') {
+    return {
+      verdict: health.publicCheckFailed
+        ? `infraMap.verdicts.${id}.publicCheckFailed`
+        : `infraMap.verdicts.${id}.degraded`,
+      impact: null,
+    };
   }
+  return { verdict: `infraMap.verdicts.${id}.down`, impact: `infraMap.impacts.${id}` };
 }
 
 interface JvbFullStats {
@@ -195,41 +229,33 @@ const EMPTY_JVB: JvbFullStats = {
 
 
 async function getJvbStats(): Promise<JvbFullStats> {
-  const url = process.env.JVB_HEALTH_URL;
-  if (!url) return { ...EMPTY_JVB };
-
-  try {
-    const res = await fetch(`${url}/colibri/stats`, { signal: AbortSignal.timeout(3000) });
-    if (!res.ok) return { ...EMPTY_JVB };
-
-    const s = await res.json() as Record<string, unknown>;
-    const num = (k: string) => typeof s[k] === 'number' ? s[k] as number : null;
-    return {
-      healthy: s.healthy !== false,
-      stressLevel: num('stress_level'),
-      participants: num('participants'),
-      conferences: num('conferences'),
-      videochannels: num('videochannels'),
-      bitRateDown: num('bit_rate_download'),
-      bitRateUp: num('bit_rate_upload'),
-      largestConference: num('largest_conference'),
-      rttAggregateMs: num('rtt_aggregate'),
-      jitterAggregateMs: num('jitter_aggregate'),
-      lossRateDownload: num('loss_rate_download'),
-      lossRateUpload: num('loss_rate_upload'),
-      endpointsSendingAudio: num('endpoints_sending_audio'),
-      endpointsSendingVideo: num('endpoints_sending_video'),
-      totalConferencesCreated: num('total_conferences_created'),
-      iceSucceeded: num('total_ice_succeeded'),
-      iceFailed: num('total_ice_failed'),
-      octoConferences: num('octo_conferences'),
-      octoEndpoints: num('octo_endpoints'),
-      octoSendBitrateBps: num('octo_send_bitrate'),
-      octoReceiveBitrateBps: num('octo_receive_bitrate'),
-    };
-  } catch {
-    return { ...EMPTY_JVB };
-  }
+  // La stessa lettura di /api/status, riusata per qualche secondo.
+  const s = await fetchColibriStats();
+  if (!s) return { ...EMPTY_JVB };
+  const num = (k: string) => typeof s[k] === 'number' ? s[k] as number : null;
+  return {
+    healthy: s.healthy !== false,
+    stressLevel: num('stress_level'),
+    participants: num('participants'),
+    conferences: num('conferences'),
+    videochannels: num('videochannels'),
+    bitRateDown: num('bit_rate_download'),
+    bitRateUp: num('bit_rate_upload'),
+    largestConference: num('largest_conference'),
+    rttAggregateMs: num('rtt_aggregate'),
+    jitterAggregateMs: num('jitter_aggregate'),
+    lossRateDownload: num('loss_rate_download'),
+    lossRateUpload: num('loss_rate_upload'),
+    endpointsSendingAudio: num('endpoints_sending_audio'),
+    endpointsSendingVideo: num('endpoints_sending_video'),
+    totalConferencesCreated: num('total_conferences_created'),
+    iceSucceeded: num('total_ice_succeeded'),
+    iceFailed: num('total_ice_failed'),
+    octoConferences: num('octo_conferences'),
+    octoEndpoints: num('octo_endpoints'),
+    octoSendBitrateBps: num('octo_send_bitrate'),
+    octoReceiveBitrateBps: num('octo_receive_bitrate'),
+  };
 }
 
 async function getJibriInfo(): Promise<{
@@ -237,22 +263,13 @@ async function getJibriInfo(): Promise<{
   busy: boolean;
   busyStatus: string | null;
 }> {
-  const url = process.env.JIBRI_HEALTH_URL;
-  if (!url) return { healthy: false, busy: false, busyStatus: null };
-
-  try {
-    const res = await fetch(`${url}/jibri/api/v1.0/health`, { signal: AbortSignal.timeout(3000) });
-    if (!res.ok) return { healthy: false, busy: false, busyStatus: null };
-
-    const data = await res.json() as {
-      status?: { busyStatus?: string; health?: { healthStatus?: string } };
-    };
-    const healthy = data.status?.health?.healthStatus === 'HEALTHY';
-    const busyStatus = data.status?.busyStatus ?? null;
-    return { healthy, busy: busyStatus === 'BUSY', busyStatus };
-  } catch {
-    return { healthy: false, busy: false, busyStatus: null };
-  }
+  // Come /api/status: senza Jibri previsto non si interroga niente. Il chart
+  // imposta l'indirizzo anche a Jibri spento, e un nome che non si risolve
+  // costava secondi a ogni richiesta.
+  if (!jibriRecordingExpected()) return { healthy: false, busy: false, busyStatus: null };
+  const health = await fetchJibriHealth();
+  if (!health) return { healthy: false, busy: false, busyStatus: null };
+  return { healthy: health.healthy, busy: health.busyStatus === 'BUSY', busyStatus: health.busyStatus };
 }
 
 function computeIceSuccessRate(succeeded: number | null, failed: number | null): number | null {
@@ -291,6 +308,9 @@ async function fetchPrometheusData(namespace: string): Promise<PrometheusData> {
 
   const NS = namespace;
   const APP = METRICS_APP_LABEL;
+  // `up` ha solo le etichette del bersaglio: si seleziona per job, come le
+  // regole di allerta del chart (lib/status/prometheus-selectors).
+  const UP = upSelector({ ...process.env, POD_NAMESPACE: namespace });
   // Uptime uses up{}. Quantiles go through `sum by (le)` so we collapse
   // all pods/routes before running the histogram_quantile — gives a single
   // meaningful number instead of one per label combination.
@@ -309,8 +329,8 @@ async function fetchPrometheusData(namespace: string): Promise<PrometheusData> {
       podUptimeRes,
       participantsRes,
     ] = await Promise.all([
-      queryPrometheus(`avg(avg_over_time(up{namespace="${NS}",job=~".*eventi.*"}[24h])) * 100`).catch(() => null),
-      queryPrometheus(`avg(avg_over_time(up{namespace="${NS}",job=~".*eventi.*"}[7d])) * 100`).catch(() => null),
+      queryPrometheus(`avg(avg_over_time(${UP}[24h])) * 100`).catch(() => null),
+      queryPrometheus(`avg(avg_over_time(${UP}[7d])) * 100`).catch(() => null),
       queryPrometheus(`histogram_quantile(0.50, sum by (le) (rate(${durationBucket}[5m])))`).catch(() => null),
       queryPrometheus(`histogram_quantile(0.95, sum by (le) (rate(${durationBucket}[5m])))`).catch(() => null),
       queryPrometheus(`histogram_quantile(0.99, sum by (le) (rate(${durationBucket}[5m])))`).catch(() => null),
@@ -379,12 +399,9 @@ export const GET = withErrorHandling(async () => {
   // lei e alla mappa dell'infrastruttura dell'area admin (lib/status-page).
   if (!(await statusDataVisible())) throw new NotFoundError('Status page');
 
-  const mode = inferDeploymentMode();
-  const jitsiDomain = getPublicEnv('NEXT_PUBLIC_JITSI_DOMAIN') || '';
+  const mode = deploymentMode();
   const appDomain = getPublicEnv('NEXT_PUBLIC_APP_URL') || '';
-  const maxJvb = jvbMaxReplicasFromEnv();
   const settings = await getSettings();
-  const preScaleMinutes = settings.jvbPreScaleMinutes ?? 10;
   const provisioningTimeoutMinutes = settings.jvbProvisioningTimeoutMinutes ?? 15;
   // Lo storage: stessa regola della factory, tipo esplicito o credenziali.
   const storageType = recordingStorageLabel();
@@ -392,13 +409,18 @@ export const GET = withErrorHandling(async () => {
   // Jibri: stessa regola di /api/status, solo con lo storage dichiarato
   // (lib/infrastructure#jibriRecordingExpected).
   const jibriExpected = jibriRecordingExpected();
+  // Chi accende i bridge (lib/status/bridge): con lo scaler vale la lettura
+  // scale-to-zero, senza il bridge risponde o no.
+  const jvbMode = bridgeMode();
   const namespace = process.env.POD_NAMESPACE || 'default';
+  const now = new Date();
 
   const [
-    jitsiProbe,
+    jitsiHealth,
     jvbStats,
     jvbSnapshot,
     jibriInfo,
+    demand,
     activeEventCount,
     todayRegCount,
     upcomingCount,
@@ -406,17 +428,23 @@ export const GET = withErrorHandling(async () => {
     appMetricsRaw,
     prometheusData,
   ] = await Promise.all([
-    jitsiDomain ? probeService(`${jitsiDomain.includes('localhost') ? 'http' : 'https'}://${jitsiDomain}/external_api.js`, 5000) : Promise.resolve({ ok: false, responseMs: 0 }),
+    getJitsiHealth(),
     getJvbStats(),
-    readJvbSnapshot(),
+    // La fotografia la scrive solo lo scaler: senza, una rimasta in Redis
+    // racconterebbe bridge di un'altra configurazione.
+    jvbMode === 'scaler' ? readJvbSnapshot() : Promise.resolve(null),
     getJibriInfo(),
-    prisma.event.count({ where: { status: 'LIVE' } }),
+    loadJvbDemand(settings, now),
+    // Una regola sola per i contatori (lib/status/event-activity): le
+    // dirette anche oltre l'orario di fine.
+    prisma.event.count({ where: activeStatusWhere('LIVE', now) }),
     prisma.registration.count({ where: { createdAt: { gte: new Date(new Date().setHours(0, 0, 0, 0)) } } }),
-    prisma.event.count({ where: { status: { in: ['PUBLISHED', 'PROVISIONING', 'LIVE', 'IDLE'] }, endsAt: { gte: new Date() } } }),
+    prisma.event.count({ where: activeOrUpcomingWhere(now) }),
     prisma.event.count({ where: { recordingUrl: { not: null } } }),
     getAppProcessMetrics(),
     fetchPrometheusData(namespace),
   ]);
+  const jitsiDomain = jitsiHealth.domain;
 
   // The scaler CronJob polls every JVB pod individually (app pod lacks the
   // RBAC) and writes the per-tick aggregate here. When present it's the
@@ -460,48 +488,12 @@ export const GET = withErrorHandling(async () => {
     }
   } catch { /* redisOk stays false */ }
 
-  const now = new Date();
-  const preScaleWindow = new Date(now.getTime() + preScaleMinutes * 60 * 1000);
   const staleCutoff = new Date(now.getTime() - provisioningTimeoutMinutes * 60 * 1000);
   // Same filter as /api/internal/jvb-desired-replicas: count LIVE,
-  // PROVISIONING and PUBLISHED-within-pre-scale. IDLE is excluded so the
-  // infrastructure view reflects current billable capacity, not historical.
-  // We also pull provisioningStartedAt + recordingEnabled to compute the
-  // stale-provisioning flag (same rule as /api/status).
-  const soonEvents = await prisma.event.findMany({
-    where: {
-      OR: [
-        { status: { in: [...JVB_BILLABLE_STATUSES] } },
-        { status: 'PUBLISHED', startsAt: { lte: preScaleWindow }, endsAt: { gte: now } },
-      ],
-    },
-    select: {
-      id: true,
-      status: true,
-      startsAt: true,
-      provisioningStartedAt: true,
-      maxParticipants: true,
-      expectedSenderRatioPct: true,
-      participantsCanStartVideo: true,
-      recordingEnabled: true,
-    },
-  });
-
-  const sizing = {
-    cpuCoresPerPod: settings.jvbCpuCoresPerPod ?? 16,
-    receiversPerCore: settings.jvbReceiversPerCore ?? 18.75,
-    sendersPerCore: settings.jvbSendersPerCore ?? 3.125,
-    maxReplicas: maxJvb,
-  };
-  const defaultRatio = settings.defaultSenderRatioPct ?? 30;
-
-  let jvbDesired = 0;
-  for (const ev of soonEvents) {
-    const ratio = ev.expectedSenderRatioPct ?? defaultRatio;
-    jvbDesired += jvbsForEvent(ev.maxParticipants, ratio, ev.participantsCanStartVideo, sizing);
-  }
-  jvbDesired = Math.min(jvbDesired, maxJvb);
-  if (soonEvents.length > 0 && jvbDesired === 0) jvbDesired = 1;
+  // PROVISIONING and PUBLISHED-within-pre-scale (lib/status/bridge).
+  const soonEvents = demand.events;
+  const maxJvb = demand.maxReplicas;
+  const jvbDesired = demand.desired;
 
   // Running = status.readyReplicas from the Deployment (authoritative, written
   // by the scaler CronJob). `jvbStats.healthy` only tells us "≥1 pod answered
@@ -555,11 +547,12 @@ export const GET = withErrorHandling(async () => {
   // bridge longer than the configured timeout. Reference timestamp is
   // provisioningStartedAt when set (populated by the scaler on PUBLISHED→
   // PROVISIONING transition) else startsAt (fallback for already-LIVE
-  // events that skipped the provisioning phase).
+  // events that skipped the provisioning phase). Only with a scaler: a fixed
+  // bridge is up or down, nobody is "bringing it up".
   const billableEvents = soonEvents.filter((e) =>
     (JVB_BILLABLE_STATUSES as readonly string[]).includes(e.status),
   );
-  const jvbStale = jvbRunning < jvbDesired && billableEvents.some((e) => {
+  const jvbStale = jvbMode === 'scaler' && jvbRunning < jvbDesired && billableEvents.some((e) => {
     const since = e.provisioningStartedAt ?? e.startsAt;
     return since <= staleCutoff;
   });
@@ -568,16 +561,43 @@ export const GET = withErrorHandling(async () => {
   // Without a billable+recording event, Jibri can legitimately be at 0.
   const recordingEvents = billableEvents.filter((e) => e.recordingEnabled);
   const recordingNeeded = recordingEvents.length > 0;
-  const jibriStale = recordingNeeded && !jibriInfo.healthy && recordingEvents.some((e) => {
+  const jibriStale = jibriExpected && recordingNeeded && !jibriInfo.healthy && recordingEvents.some((e) => {
     const since = e.provisioningStartedAt ?? e.startsAt;
     return since <= staleCutoff;
   });
 
-  const jvbStatus: ServiceStatus =
-    jvbDesired === 0 ? 'standby'
-      : jvbStale ? 'degraded'
-        : jvbRunning >= jvbDesired ? 'healthy'
-          : 'scaling';
+  // Il nodo del ponte video secondo chi lo accende (lib/status/bridge).
+  let jvbStatus: ServiceStatus;
+  let jvbVerdict: string;
+  let jvbImpact: string | null = null;
+  let jvbReplicas: ServiceNode['replicas'];
+  if (jvbMode === 'scaler') {
+    jvbStatus =
+      jvbDesired === 0 ? 'standby'
+        : jvbStale ? 'degraded'
+          : jvbRunning >= jvbDesired ? 'healthy'
+            : 'scaling';
+    jvbVerdict = jvbStale
+      ? 'infraMap.verdicts.jvb.stale'
+      : jvbDesired === 0
+        ? 'infraMap.verdicts.jvb.standby'
+        : jvbRunning >= jvbDesired
+          ? 'infraMap.verdicts.jvb.healthy'
+          : 'infraMap.verdicts.jvb.scaling';
+    jvbReplicas = { running: jvbRunning, desired: jvbDesired, max: maxJvb };
+  } else if (jvbMode === 'fixed') {
+    // Bridge fissi: risponde o no, a prescindere dagli eventi. Dietro un
+    // Service ne risponde uno: il numero acceso è un limite inferiore, e le
+    // barre delle repliche racconterebbero una scalata che non c'è.
+    jvbStatus = jvbStats.healthy ? 'healthy' : 'down';
+    jvbVerdict = jvbStats.healthy ? 'infraMap.verdicts.jvb.healthy' : 'infraMap.verdicts.jvb.fixedDown';
+    jvbImpact = jvbStats.healthy ? null : 'infraMap.impacts.jvbDown';
+    jvbReplicas = { running: jvbStats.healthy ? 1 : 0, desired: null, max: null };
+  } else {
+    jvbStatus = 'unknown';
+    jvbVerdict = 'infraMap.verdicts.jvb.unmonitored';
+    jvbReplicas = { running: null, desired: null, max: null };
+  }
 
   const nextEventMin = soonEvents
     .filter(e => e.startsAt > now)
@@ -594,7 +614,16 @@ export const GET = withErrorHandling(async () => {
   const redisStatus: ServiceStatus = redisConfigured && redisOk
     ? (redisLatencyMs > 500 ? 'degraded' : 'healthy')
     : 'down';
-  const jitsiWebStatus: ServiceStatus = jitsiProbe.ok ? 'healthy' : jitsiDomain ? 'down' : 'standby';
+  // Ogni componente di Jitsi con la sua sonda (lib/status/jitsi-health).
+  const jitsiConfigured = !!jitsiDomain;
+  const jitsiWebStatus = jitsiServiceStatus(jitsiHealth.web, jitsiConfigured);
+  const prosodyStatus = jitsiServiceStatus(jitsiHealth.prosody, jitsiConfigured);
+  const jicofoStatus = jitsiServiceStatus(jitsiHealth.jicofo, jitsiConfigured);
+  const jitsiWebVerdict = jitsiVerdict('jitsiWeb', jitsiHealth.web, jitsiWebStatus);
+  const prosodyVerdict = jitsiVerdict('prosody', jitsiHealth.prosody, prosodyStatus);
+  const jicofoVerdict = jitsiVerdict('jicofo', jitsiHealth.jicofo, jicofoStatus);
+  const runningIf = (status: ServiceStatus): number | null =>
+    status === 'unknown' ? null : status === 'healthy' || status === 'degraded' ? 1 : 0;
   // Jibri status reflects scale-to-zero semantics, mirroring /api/status:
   //   - unconfigured (Jibri not expected)  → standby with unconfigured verdict
   //   - healthy pod reachable              → healthy / busy
@@ -621,7 +650,9 @@ export const GET = withErrorHandling(async () => {
       status: 'healthy',
       verdict: 'infraMap.verdicts.app.healthy',
       impact: null,
-      replicas: { running: 1, desired: null, max: null },
+      // Quante repliche dell'applicazione girano lo sa il Deployment, che
+      // da qui non si legge: meglio nessun numero che uno inventato.
+      replicas: { running: null, desired: null, max: null },
       ports: [{ name: 'http', port: 3000, protocol: 'TCP' }],
       metadata: { runtime: `Node.js ${process.version}`, uptimeHours: appMetricsRaw.uptimeHours, heapUsedMB: appMetricsRaw.heapUsedMB, eventLoopLagMs: appMetricsRaw.eventLoopLagMs },
     },
@@ -637,7 +668,7 @@ export const GET = withErrorHandling(async () => {
       impact: dbOk ? null : 'infraMap.impacts.database',
       replicas: { running: dbOk ? 1 : 0, desired: null, max: null },
       ports: [{ name: 'postgresql', port: 5432, protocol: 'TCP' }],
-      metadata: { type: mode === 'simple' ? 'in-cluster' : 'external', latencyMs: dbLatencyMs },
+      metadata: { type: databaseBundled() ? 'in-cluster' : 'external', latencyMs: dbLatencyMs },
     },
     {
       id: 'redis',
@@ -659,45 +690,52 @@ export const GET = withErrorHandling(async () => {
       technicalName: 'Jitsi Meet Web',
       description: 'infraMap.descriptions.jitsiWeb',
       status: jitsiWebStatus,
-      verdict: jitsiProbe.ok
-        ? 'infraMap.verdicts.jitsiWeb.healthy'
-        : jitsiDomain ? 'infraMap.verdicts.jitsiWeb.down' : 'infraMap.verdicts.jitsiWeb.standby',
-      impact: jitsiWebStatus === 'down' ? 'infraMap.impacts.jitsiWeb' : null,
-      replicas: { running: jitsiProbe.ok ? 1 : 0, desired: null, max: null },
+      verdict: jitsiWebVerdict.verdict,
+      impact: jitsiWebVerdict.impact,
+      replicas: { running: runningIf(jitsiWebStatus), desired: null, max: null },
       ports: [{ name: 'https', port: 443, protocol: 'TCP' }],
-      metadata: { domain: jitsiDomain, responseMs: jitsiProbe.responseMs },
+      metadata: {
+        domain: jitsiDomain,
+        responseMs: jitsiHealth.web.responseMs,
+        probe: jitsiHealth.web.via,
+        probeDetail: jitsiHealth.web.details ?? null,
+      },
     },
     {
       id: 'prosody',
       name: 'infraMap.services.prosody',
       technicalName: 'Prosody (XMPP)',
       description: 'infraMap.descriptions.prosody',
-      status: jitsiWebStatus,
-      verdict: jitsiProbe.ok
-        ? 'infraMap.verdicts.prosody.healthy'
-        : jitsiDomain ? 'infraMap.verdicts.prosody.down' : 'infraMap.verdicts.prosody.standby',
-      impact: jitsiWebStatus === 'down' ? 'infraMap.impacts.prosody' : null,
-      replicas: { running: jitsiProbe.ok ? 1 : 0, desired: null, max: null },
+      status: prosodyStatus,
+      verdict: prosodyVerdict.verdict,
+      impact: prosodyVerdict.impact,
+      replicas: { running: runningIf(prosodyStatus), desired: null, max: null },
       ports: [
         { name: 'xmpp-c2s', port: 5222, protocol: 'TCP' },
         { name: 'xmpp-s2s', port: 5269, protocol: 'TCP' },
         { name: 'bosh', port: 5280, protocol: 'TCP' },
       ],
-      metadata: {},
+      metadata: {
+        responseMs: jitsiHealth.prosody.responseMs,
+        probe: jitsiHealth.prosody.via,
+        probeDetail: jitsiHealth.prosody.details ?? null,
+      },
     },
     {
       id: 'jicofo',
       name: 'infraMap.services.jicofo',
       technicalName: 'Jicofo (Focus Component)',
       description: 'infraMap.descriptions.jicofo',
-      status: jitsiWebStatus,
-      verdict: jitsiProbe.ok
-        ? 'infraMap.verdicts.jicofo.healthy'
-        : jitsiDomain ? 'infraMap.verdicts.jicofo.down' : 'infraMap.verdicts.jicofo.standby',
-      impact: jitsiWebStatus === 'down' ? 'infraMap.impacts.jicofo' : null,
-      replicas: { running: jitsiProbe.ok ? 1 : 0, desired: null, max: null },
+      status: jicofoStatus,
+      verdict: jicofoVerdict.verdict,
+      impact: jicofoVerdict.impact,
+      replicas: { running: runningIf(jicofoStatus), desired: null, max: null },
       ports: [{ name: 'http', port: 8888, protocol: 'TCP' }],
-      metadata: {},
+      metadata: {
+        responseMs: jitsiHealth.jicofo.responseMs,
+        probe: jitsiHealth.jicofo.via,
+        probeDetail: jitsiHealth.jicofo.details ?? null,
+      },
     },
     {
       id: 'jvb',
@@ -705,24 +743,20 @@ export const GET = withErrorHandling(async () => {
       technicalName: 'Jitsi Videobridge (JVB)',
       description: 'infraMap.descriptions.jvb',
       status: jvbStatus,
-      verdict: jvbStale
-        ? 'infraMap.verdicts.jvb.stale'
-        : jvbDesired === 0
-          ? 'infraMap.verdicts.jvb.standby'
-          : jvbRunning >= jvbDesired
-            ? 'infraMap.verdicts.jvb.healthy'
-            : 'infraMap.verdicts.jvb.scaling',
-      impact: jvbStale
-        ? 'infraMap.impacts.jvbStale'
-        : jvbStatus === 'scaling' && nextEventMin !== null
-          ? 'infraMap.impacts.jvbScaling'
-          : null,
-      replicas: { running: jvbRunning, desired: jvbDesired, max: maxJvb },
+      verdict: jvbVerdict,
+      impact: jvbImpact
+        ?? (jvbStale
+          ? 'infraMap.impacts.jvbStale'
+          : jvbStatus === 'scaling' && nextEventMin !== null
+            ? 'infraMap.impacts.jvbScaling'
+            : null),
+      replicas: jvbReplicas,
       ports: [
         { name: 'media', port: 10000, protocol: 'UDP' },
         { name: 'colibri', port: 8080, protocol: 'TCP' },
       ],
       metadata: {
+        mode: jvbMode,
         stressLevel: aggregatedStress,
         participants: aggregatedParticipants,
         conferences: aggregatedConferences,
@@ -880,7 +914,8 @@ export const GET = withErrorHandling(async () => {
   const data: InfraMapData = {
     cluster: {
       mode,
-      version: process.env.npm_package_version || process.env.APP_VERSION || '0.0.0',
+      // La stessa versione di /api/health, letta a runtime.
+      version: getPublicEnv('NEXT_PUBLIC_BUILD_VERSION') || process.env.APP_VERSION || '',
       environment: process.env.NODE_ENV || 'development',
       namespace,
     },

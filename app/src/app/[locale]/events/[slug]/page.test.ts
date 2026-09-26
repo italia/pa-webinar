@@ -228,3 +228,95 @@ describe('scheda dell’evento — materiali per il pubblico', () => {
     });
   });
 });
+
+describe('scheda dell’evento — iscrizione decisa dal server', () => {
+  it('un evento in programma accetta iscrizioni', async () => {
+    mockedEvent.mockResolvedValue(eventRow());
+    const props = await clientProps();
+    expect(props.registrationOpen).toBe(true);
+  });
+
+  it('oltre l’orario di fine senza che la sala si sia aperta: iscrizione chiusa', async () => {
+    // Stato ancora PUBLISHED perché il giro del ciclo di vita non è passato:
+    // la pagina d'iscrizione risponde 404 e la POST 409, il pulsante non deve
+    // portarci.
+    mockedEvent.mockResolvedValue(
+      eventRow({
+        startsAt: new Date(Date.now() - 3 * HOUR),
+        endsAt: new Date(Date.now() - HOUR),
+      }),
+    );
+    const props = await clientProps();
+    expect(props.registrationOpen).toBe(false);
+  });
+
+  it('in diretta resta aperta anche oltre l’orario di fine', async () => {
+    mockedEvent.mockResolvedValue(
+      eventRow({
+        status: 'LIVE',
+        startsAt: new Date(Date.now() - 3 * HOUR),
+        endsAt: new Date(Date.now() - 10 * 60_000),
+      }),
+    );
+    const props = await clientProps();
+    expect(props.registrationOpen).toBe(true);
+  });
+});
+
+describe('scheda dell’evento — invito al questionario post-evento', () => {
+  const mockedQuestionnaire = prisma.eventQuestionnaire.findUnique as unknown as ReturnType<
+    typeof vi.fn
+  >;
+
+  function concluso(over: Record<string, unknown> = {}) {
+    return eventRow({
+      status: 'ENDED',
+      startsAt: new Date(Date.now() - 4 * HOUR),
+      endsAt: new Date(Date.now() - 2 * HOUR),
+      postEventShowFeedback: true,
+      ...over,
+    });
+  }
+
+  /** Il questionario esiste: risponde alla domanda «c'è?» (select id) e non
+   *  ha risposte per il riepilogo delle stelle. */
+  function conQuestionario() {
+    mockedQuestionnaire.mockImplementation(async (args: { select?: { id?: boolean } }) =>
+      args.select?.id ? { id: 'questionario-1' } : { _count: { responses: 0 }, responses: [] },
+    );
+  }
+
+  it('evento concluso con questionario: la pagina lo dice al client', async () => {
+    conQuestionario();
+    mockedEvent.mockResolvedValue(concluso());
+    const props = await clientProps();
+    expect(props.hasPostEventQuestionnaire).toBe(true);
+    expect(mockedQuestionnaire).toHaveBeenCalledWith({
+      where: { eventId_placement: { eventId: EVENT_ID, placement: 'POST_EVENT' } },
+      select: { id: true },
+    });
+  });
+
+  it('senza questionario niente invito, quindi nessuna richiesta che finisce in 404', async () => {
+    mockedQuestionnaire.mockResolvedValue(null);
+    mockedEvent.mockResolvedValue(concluso());
+    const props = await clientProps();
+    expect(props.hasPostEventQuestionnaire).toBe(false);
+  });
+
+  it('con il feedback pubblico spento non chiede nemmeno se il questionario c’è', async () => {
+    conQuestionario();
+    mockedEvent.mockResolvedValue(concluso({ postEventShowFeedback: false }));
+    const props = await clientProps();
+    expect(props.hasPostEventQuestionnaire).toBe(false);
+    expect(mockedQuestionnaire).not.toHaveBeenCalled();
+  });
+
+  it('prima della fine non serve', async () => {
+    conQuestionario();
+    mockedEvent.mockResolvedValue(eventRow({ postEventShowFeedback: true }));
+    const props = await clientProps();
+    expect(props.hasPostEventQuestionnaire).toBe(false);
+    expect(mockedQuestionnaire).not.toHaveBeenCalled();
+  });
+});

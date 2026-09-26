@@ -29,6 +29,10 @@ import {
   shareLink,
 } from '@/lib/events/participant-entry';
 import { isEventPageVisible } from '@/lib/events/visibility';
+import { canStartManually } from '@/lib/events/lifecycle';
+import { materialAuthorName } from '@/lib/events/material-author';
+import { reminderTriggerAt } from '@/lib/email/reminder-plan';
+import { unsentReminderState } from '@/lib/email/reminder-status';
 import { localizedUrl } from '@/lib/utils/localized-url';
 
 import CallSessionsPanel from './call-sessions-panel';
@@ -221,6 +225,10 @@ export default function EventManagementClient({
     const t = setInterval(() => setAdesso(Date.now()), 60_000);
     return () => clearInterval(t);
   }, []);
+  // Promemoria e iscrizioni nella forma che usa il cron, per dire di ogni
+  // promemoria non spedito se partira' (lib/email/reminder-status).
+  const promemoria = event.reminders.map((r) => ({ ...r, createdAt: new Date(r.createdAt) }));
+  const iscrittiIl = event.registrations.map((r) => new Date(r.createdAt));
   const router = useRouter();
 
   const [activeTab, setActiveTab] = useState<TabId>('panoramica');
@@ -617,16 +625,23 @@ export default function EventManagementClient({
                   {event.reminders.map((r) => {
                     const sent = r.sentCount > 0;
                     // «Non inviata» da solo non distingue «deve ancora partire»
-                    // da «non partira' piu'». Il cron manda finche' l'evento
-                    // non e' cominciato, anche se il momento del promemoria e'
-                    // gia' passato — chi si iscrive nel frattempo lo riceve al
-                    // giro successivo. Quindi cio' che chiude la finestra e'
-                    // l'INIZIO dell'evento, non l'ora del promemoria.
-                    const quando = new Date(
-                      new Date(event.startsAt).getTime() - r.offsetMinutes * 60_000,
-                    );
-                    const iniziato = adesso !== null && new Date(event.startsAt).getTime() <= adesso;
-                    const imminente = adesso !== null && !iniziato && quando.getTime() <= adesso;
+                    // da «non partira' piu'»: lo stato viene dalle stesse
+                    // regole del cron (lib/email/reminder-status). Parte solo
+                    // il promemoria corrente, a chi era iscritto quando e'
+                    // scattato; uno superato da un promemoria piu' vicino
+                    // all'inizio, o scaduto gia' alla creazione, non parte piu'.
+                    const inizio = new Date(event.startsAt);
+                    const quando = reminderTriggerAt(inizio, r.offsetMinutes);
+                    const stato =
+                      adesso === null
+                        ? null
+                        : unsentReminderState(
+                            { ...r, createdAt: new Date(r.createdAt) },
+                            promemoria,
+                            inizio,
+                            new Date(adesso),
+                            iscrittiIl,
+                          );
                     return (
                       <li key={r.id} className="d-flex align-items-center gap-2"
                           style={{ fontSize: '0.85rem', color: C_INK }}>
@@ -637,11 +652,11 @@ export default function EventManagementClient({
                         <span style={{ color: C_MUTED, fontSize: '0.75rem' }}>
                           {sent
                             ? tr('sentStatus', { count: r.sentCount })
-                            : adesso === null
+                            : stato === null
                               ? tr('notSent')
-                              : iniziato
+                              : stato === 'missed'
                                 ? td('sidebar.reminderMissed')
-                                : imminente
+                                : stato === 'soon'
                                   ? td('sidebar.reminderSoon')
                                   : td('sidebar.reminderScheduled', {
                                       when: format.dateTime(quando, {
@@ -676,7 +691,10 @@ export default function EventManagementClient({
             {/* Actions */}
             <div className="p-4 mb-3" style={CARD}>
               <div className="d-grid gap-2">
-                {status === 'PUBLISHED' && (
+                {/* Anche in preparazione o in pausa: se nessuno porta la sala a
+                    LIVE (lo scaler è fermo, o non c'è), l'avvio resta a chi
+                    organizza. */}
+                {canStartManually(status) && (
                   <button type="button"
                           className="btn btn-success d-flex align-items-center justify-content-center gap-2"
                           onClick={startEvent} disabled={updating}>
@@ -1032,6 +1050,12 @@ function PeopleTab({ event, baseUrl, locale, onExportCsv }: {
 
 function ContentTab({ event }: { event: EventData }) {
   const tm = useTranslations('materials');
+  // Senza un nome (aggiunto dallo staff, da un co-moderatore, o una parola
+  // fissa salvata in passato) la dicitura tradotta: lib/events/material-author.
+  const autore = (addedBy: string): string => {
+    const nome = materialAuthorName(addedBy);
+    return nome ? tm('addedBy', { name: nome }) : tm('addedByStaff');
+  };
   const td = useTranslations('admin.eventDetail');
   const format = useFormatter();
 
@@ -1069,7 +1093,7 @@ function ContentTab({ event }: { event: EventData }) {
                     <div style={CAPTION}>{m.description}</div>
                   )}
                   <div style={{ ...CAPTION, fontSize: '0.78rem' }}>
-                    {tm('addedBy', { name: m.addedBy })} ·{' '}
+                    {autore(m.addedBy)} ·{' '}
                     {format.dateTime(new Date(m.createdAt), {
                       day: 'numeric', month: 'short',
                       hour: '2-digit', minute: '2-digit',

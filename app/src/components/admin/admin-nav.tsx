@@ -98,7 +98,7 @@ const MONITORING_SUB_NAV: NavItem[] = [
     labelKey: 'monitoringDashboard',
     exact: true,
   },
-  { href: '/admin/infrastructure', icon: 'it-server', labelKey: 'infrastructure' },
+  { href: '/admin/infrastructure', icon: 'it-piattaforme', labelKey: 'infrastructure' },
 ];
 
 const SETTINGS_SUB_NAV: NavItem[] = [

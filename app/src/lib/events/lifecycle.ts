@@ -121,6 +121,59 @@ export function shouldReclaimEmptyOvertime(input: OvertimeReclaimInput): boolean
   return aliveUntil < input.inactiveCutoff.getTime();
 }
 
+/**
+ * Stati da cui chi conduce può avviare l'evento a mano («Avvia evento»).
+ *
+ * Non solo PUBLISHED: un evento rimasto in preparazione (PROVISIONING) o in
+ * pausa (IDLE) senza nessuno che lo porti a LIVE — lo scaler fermo, o assente
+ * — altrimenti non si aprirebbe più, e il token di sala verrebbe rifiutato a
+ * tutti. PUT /api/events/[id] accetta LIVE da ciascuno di questi stati.
+ */
+export const MANUALLY_STARTABLE_STATUSES = ['PUBLISHED', 'PROVISIONING', 'IDLE'] as const;
+
+export function canStartManually(status: string): boolean {
+  return (MANUALLY_STARTABLE_STATUSES as readonly string[]).includes(status);
+}
+
+export interface AbandonedInstantCallInput {
+  eventType: string;
+  /** Ultimo segnale di attività della sala (resoconti dei client, bridge). */
+  lastActiveAt: Date | null;
+  /** Quando la sala è stata aperta o riaperta l'ultima volta. */
+  provisioningStartedAt: Date | null;
+  /** Per una chiamata istantanea, il momento della creazione. */
+  startsAt: Date;
+  /** now - jvbInactiveGraceMinutes. */
+  inactiveCutoff: Date;
+}
+
+/**
+ * Una chiamata istantanea LIVE, ancora prima del suo `endsAt`, è stata
+ * abbandonata?
+ *
+ * Vale solo senza scaler (giro a bridge fisso). Lo scaler mette una sala vuota
+ * in pausa (IDLE) e la riaccende alla visita successiva; senza scaler la pausa
+ * non esiste e una chiamata lasciata aperta resterebbe LIVE per tutto il suo
+ * `endsAt`, che per le istantanee è solo un segnaposto di quattro ore: il link
+ * condiviso continuerebbe ad ammettere ospiti in una stanza che nessuno
+ * presidia. Si chiude quando la sala non dà segni di vita per tutta la finestra
+ * di inattività.
+ *
+ * Gli eventi a calendario sono esclusi di proposito: prima della loro fine
+ * programmata una sala vuota è una pausa, non un abbandono, e chiuderla
+ * sarebbe definitivo.
+ *
+ * «Viva fino a» è il più recente dei segnali: ultima attività, ultima apertura
+ * e creazione.
+ */
+export function shouldCloseAbandonedInstantCall(input: AbandonedInstantCallInput): boolean {
+  if (input.eventType !== 'INSTANT') return false;
+  const signals = [input.startsAt.getTime()];
+  if (input.lastActiveAt) signals.push(input.lastActiveAt.getTime());
+  if (input.provisioningStartedAt) signals.push(input.provisioningStartedAt.getTime());
+  return Math.max(...signals) < input.inactiveCutoff.getTime();
+}
+
 export interface WakeWindowInput {
   /** Scheduled start of the event. */
   startsAt: Date;

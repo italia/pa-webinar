@@ -127,7 +127,8 @@
         "outlook": "Outlook / Office 365",
         "yahoo": "Yahoo Calendar",
         "downloadIcs": "Stáhnout soubor .ics"
-      }
+      },
+      "registrationEnded": "Událost skončila: registrace je uzavřena."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -368,7 +369,8 @@
       "questionRestore": "Obnovit",
       "questionStatusFailed": "Otázku se nepodařilo aktualizovat",
       "questionNeedsText": "Napište text otázky: samotná příloha do fronty nepostoupí",
-      "lensTruncated": "Načteny jsou pouze nejnovější zprávy: starší otázky nemusí být v seznamu."
+      "lensTruncated": "Načteny jsou pouze nejnovější zprávy: starší otázky nemusí být v seznamu.",
+      "attachUnavailable": "Přílohy nejsou v této instalaci k dispozici."
     },
     "role": {
       "moderator": "Moderátor",
@@ -389,7 +391,8 @@
         "unknown": "N/A"
       },
       "volume": "Hlasitost",
-      "volumeFor": "Hlasitost pro {name}"
+      "volumeFor": "Hlasitost pro {name}",
+      "kickName": "Vyloučit {name}"
     },
     "moderator": {
       "muteAll": "Ztlumit všechny",
@@ -453,7 +456,18 @@
       "remainingLabel": "Zbývající čas (kliknutím zobrazíte uplynulý čas)",
       "elapsedLabel": "Uplynulý čas (kliknutím zobrazíte zbývající čas)"
     },
-    "videoCallFrameTitle": "Videohovor události"
+    "videoCallFrameTitle": "Videohovor události",
+    "insecureContextTitle": "Nezabezpečená adresa",
+    "insecureContextBody": "Tato stránka je otevřena přes http://: prohlížeč nepovolí použití mikrofonu a kamery a videohovor nemůže začít. Otevřete stejnou stránku na zabezpečené adrese.",
+    "insecureContextLink": "Otevřít https://{host}",
+    "conferenceUnreachableTitle": "Služba videohovorů neodpovídá",
+    "conferenceUnreachableBody": "Prohlížeč se nemůže spojit se serverem videohovorů ({host}). Otevřete ho na nové kartě: pokud prohlížeč zobrazí bezpečnostní upozornění, přijměte ho, pak se sem vraťte a zkuste to znovu. Pokud se stránka neotevře, síť, ze které se připojujete, ho možná blokuje.",
+    "conferenceOpenHost": "Otevřít {host} na nové kartě",
+    "leftTitle": "Opustili jste místnost",
+    "leftMessage": "Událost stále probíhá: můžete se kdykoli vrátit.",
+    "leftModeratorReminder": "Událost zůstane otevřená, dokud ji někdo neukončí. Až skončíte, vraťte se a zvolte „{action}“.",
+    "rejoin": "Vrátit se",
+    "backToHome": "Zpět na úvodní stránku"
   },
   "qa": {
     "title": "Otázky a odpovědi",
@@ -590,7 +604,8 @@
       "errorGeneric": "Chyba při nahrávání souboru",
       "helpImage": "Podporované formáty: PNG, JPEG, WebP, SVG, GIF — max 10 MB",
       "helpAudio": "Podporované formáty: MP3, WAV, OGG, M4A, WebM — max 20 MB",
-      "helpDocument": "Podporované formáty: PDF, DOCX, PPTX, XLSX, TXT — max 25 MB"
+      "helpDocument": "Podporované formáty: PDF, DOCX, PPTX, XLSX, TXT — max 25 MB",
+      "uploadsUnavailable": "Nahrávání souborů není v této instalaci k dispozici: vložte URL adresu souboru."
     },
     "rubricaPicker": {
       "loading": "Probíhá vyhledávání…",
@@ -628,7 +643,9 @@
           "endsAt": "Datum konce musí být po datu začátku.",
           "titleRequired": "Název je povinný (alespoň 3 znaky).",
           "titleRequiredOtherLocale": "Název ve výchozím jazyce ({locale}) je povinný: přepněte na kartu {locale}.",
-          "maxParticipants": "Zadejte číslo mezi 2 a 500."
+          "maxParticipants": "Zadejte číslo mezi 2 a 500.",
+          "descriptionRequired": "Popis je povinný (alespoň {min} znaků).",
+          "descriptionRequiredOtherLocale": "Popis ve výchozím jazyce ({locale}) je povinný: přepněte na kartu {locale}."
         },
         "senderRatioLabel": "Odhadovaný podíl aktivních",
         "senderRatioHelp": "Kolik účastníků očekáváte se zapnutým mikrofonem/videem. Pomáhá dimenzovat videoserver.",
@@ -820,7 +837,11 @@
         "speakers": "řečníci",
         "materials": "materiály",
         "questionnaires": "dotazníky"
-      }
+      },
+      "revocationFailed": "Zrušení přístupu pro {name} se nezdařilo: přístupový odkaz stále platí. Uložte znovu pro další pokus, nebo jej zrušte na kartě „{tab}“ na stránce události.",
+      "validationFailedDetail": "Server odmítl některé údaje: {reason}. Opravte je a zkuste to znovu.",
+      "publishFailed": "Událost byla vytvořena, ale nebyla zveřejněna: zůstává jako koncept. Zveřejněte ji ze stránky události.",
+      "publishFailedDetail": "Událost byla vytvořena, ale nebyla zveřejněna: zůstává jako koncept. Server odpověděl: {reason}. Zveřejněte ji ze stránky události."
     },
     "nav": {
       "events": "Správa událostí",
@@ -1240,7 +1261,7 @@
       "wordCloudEnabled": "Živý slovní mrak",
       "wordCloudEnabledDesc": "Účastníci posílají slovo a mrak se aktualizuje živě. Hodí se k zahájení diskuse nebo k zachycení nálady během několika sekund.",
       "whiteboardEnabled": "Sdílená tabule",
-      "whiteboardEnabledDesc": "Zapne nativní společnou tabuli (Excalidraw): moderátoři ji mohou během události otevřít z panelu nástrojů. U okamžitých hovorů je vždy zapnutá.",
+      "whiteboardEnabledDesc": "Zapne nativní společnou tabuli (Excalidraw): moderátoři ji mohou během události otevřít z panelu nástrojů. Vyžaduje službu tabule v instalaci; kde je k dispozici, je u okamžitých hovorů vždy zapnutá.",
       "autoStartRecording": "Automaticky spustit záznam",
       "autoStartRecordingDesc": "Při zahájení události se záznam spustí sám (bez dotazu na moderátora). Pozdě příchozí tak najdou přehrávač již dostupný.",
       "aiSectionHeading": "Automatická postprodukce",
@@ -1316,7 +1337,8 @@
       "retentionPreviewRecordings": "Videozáznamy",
       "retentionPreviewKept": "Souhrnné statistiky a metadata události jsou uchovány.",
       "configPreview": "Náhled konfigurace",
-      "templateApplied": "Šablona použita: {name}. Můžete upravit všechna nastavení."
+      "templateApplied": "Šablona použita: {name}. Můžete upravit všechna nastavení.",
+      "whiteboardUnavailable": "V této instalaci není k dispozici: chybí služba tabule Jitsi, kterou může zapnout správce platformy."
     },
     "links": {
       "title": "Odkazy události",
@@ -1925,9 +1947,9 @@
       "version": "Verze",
       "environment": "Prostředí",
       "modes": {
-        "simple": "Jednoduchý (Docker Compose)",
-        "standard": "Standardní (Kubernetes)",
-        "full": "Plný (Kubernetes se scale-to-zero)",
+        "simple": "Jednoduchý",
+        "standard": "Standardní",
+        "full": "Plný (mosty se scale-to-zero)",
         "unknown": "Neznámý"
       },
       "database": {
@@ -1941,7 +1963,9 @@
         "title": "Jitsi Meet",
         "reachable": "Dostupné",
         "unreachable": "Nedostupné",
-        "notConfigured": "Nenakonfigurováno"
+        "notConfigured": "Nenakonfigurováno",
+        "degraded": "Dostupné, ale odpovídá s chybami nebo pomalu",
+        "publicCheckFailed": "Kontrola na veřejné adrese selhala ({code}): server portálu nepřijímá certifikát nebo název. Konference mohou přesto fungovat."
       },
       "jvb": {
         "title": "Video Bridge (JVB)",
@@ -1949,7 +1973,9 @@
         "replicas": "{current}/{max} uzlů",
         "preScale": "Pre-scale: {minutes} min",
         "fixedMode": "Pevný režim",
-        "scalerEnabled": "Scaler povolen"
+        "scalerEnabled": "Scaler povolen",
+        "fixedDown": "Videomost neodpovídá",
+        "unmonitored": "Nesledováno: není nastavena adresa mostu (JVB_HEALTH_URL)"
       },
       "jibri": {
         "title": "Nahrávání (Jibri)",
@@ -1971,7 +1997,11 @@
         "metrics": "Endpoint metrik"
       },
       "note": "Změny infrastruktury se provádějí prostřednictvím Helm values a CI/CD pipeline.",
-      "deployDocs": "Dokumentace nasazení"
+      "deployDocs": "Dokumentace nasazení",
+      "platforms": {
+        "kubernetes": "Na Kubernetes",
+        "other": "Mimo Kubernetes (Docker Compose nebo jeden server)"
+      }
     },
     "instantCalls": {
       "title": "Rychlé hovory",
@@ -2076,9 +2106,9 @@
       "latencyP99": "Latence P99",
       "requestRate": "Požadavky/s",
       "chartLatencyQuantiles": "Latence aplikace — P50 / P95 / P99",
-      "participantsNow": "Aktivní účastníci",
+      "participantsNow": "Účastníci na videomostu",
       "jvbStress": "Zátěž JVB",
-      "conferences": "Aktivní konference",
+      "conferences": "Konference na videomostu",
       "octoRelay": "Relay mezi bridgi Octo",
       "interBridge": "Provoz Octo",
       "chartCpu": "CPU usage",
@@ -2105,7 +2135,8 @@
       "liveNow": "LIVE",
       "provisioningNow": "připravuje se",
       "idleNow": "IDLE (pozastaveno)",
-      "scaleToZeroHelp": "IDLE je normální stav pro událost bez provozu po dobu delší než tolerance. Při další návštěvě uživatele se vrátí do PROVISIONING a poté LIVE."
+      "scaleToZeroHelp": "IDLE je normální stav pro událost bez provozu po dobu delší než tolerance. Při další návštěvě uživatele se vrátí do PROVISIONING a poté LIVE.",
+      "capacityFromStatus": "Aktuální hodnoty načtené z videomostu. Historie vyžaduje Prometheus."
     },
     "bulk": {
       "selectAll": "Vybrat vše",
@@ -2824,7 +2855,8 @@
       "quotaExceeded": "Tato akce dosáhla limitu nahraných souborů ({maxFiles} souborů, celkem {maxMb} MB): odstraňte některé, abyste mohli nahrát další",
       "uploadBusy": "Právě probíhá příliš mnoho nahrávání: zkuste to znovu za několik sekund",
       "deleteFailed": "Materiál se nepodařilo smazat"
-    }
+    },
+    "addedByStaff": "Přidali organizátoři"
   },
   "reminders": {
     "title": "Upozornění",
@@ -2897,7 +2929,7 @@
       "requestSubmittedBody": "Pokud tato e-mailová adresa odpovídá registraci, poslali jsme vám odkaz k potvrzení výmazu. Odkaz platí 1 hodinu.",
       "linkInvalid": "Tento odkaz je neplatný nebo vypršel. Požádejte o nový odkaz.",
       "confirmWarning": "Chystáte se trvale vymazat všechny osobní údaje spojené s vaší e-mailovou adresou.",
-      "confirmBody": "Budou vymazány registrace, otázky, hlasy v anketách, zpětná vazba a připomenutí. Tato operace je nevratná.",
+      "confirmBody": "Budou vymazány registrace, otázky, hlasy v anketách, zpětná vazba, připomenutí a váš záznam v adresáři událostí. Tato operace je nevratná.",
       "confirmButton": "Potvrdit výmaz",
       "cancel": "Zrušit",
       "processing": "Probíhá výmaz...",
@@ -3120,7 +3152,7 @@
     "nodesReady": "uzlů připravených",
     "scaling": "škálování",
     "jvbStress": "Zátěž JVB",
-    "participantsConnected": "připojených účastníků",
+    "participantsConnected": "účastníků na videomostu",
     "videoInteractive": "interaktivní",
     "videoWebinar": "webinář",
     "participantsAvailable": "dostupných účastníků",
@@ -3164,7 +3196,12 @@
       "lastFailure": "Poslední chyba {when}",
       "artifactsProduced": "{count, plural, =0 {žádné artefakty} one {1 vytvořený artefakt} few {# vytvořené artefakty} many {# vytvořeného artefaktu} other {# vytvořených artefaktů}}",
       "eventsEnabled": "{count, plural, =0 {žádná událost s AI} one {1 událost s aktivní AI} few {# události s aktivní AI} many {# události s aktivní AI} other {# událostí s aktivní AI}}"
-    }
+    },
+    "jvbFixedUp": "{count, plural, =1 {Videomost je v provozu} other {Videomost je v provozu · plánované mosty: #}}",
+    "jvbFixedDown": "Videomost neodpovídá",
+    "jvbFixedDownDetail": "Účastníci nedostávají zvuk ani obraz, dokud nebude most znovu dostupný.",
+    "jvbUnmonitored": "Stav není sledován",
+    "jvbUnmonitoredDetail": "Tato instalace se videomostu nedotazuje, proto zde jeho stav není k dispozici."
   },
   "infraMap": {
     "loading": "Načítání mapy infrastruktury...",
@@ -3172,8 +3209,8 @@
     "ariaLabel": "Mapa systémové infrastruktury",
     "title": "Mapa infrastruktury",
     "subtitle": "Vizualizace architektury a stavu služeb v reálném čase",
-    "participants": "Účastníci",
-    "conferences": "Konference",
+    "participants": "Účastníci na videomostu",
+    "conferences": "Konference na videomostu",
     "bandwidthIn": "Příchozí šířka pásma",
     "bandwidthOut": "Odchozí šířka pásma",
     "recordings": "Nahrávky",
@@ -3259,23 +3296,33 @@
       "jitsiWeb": {
         "healthy": "Videokonferenční místnost je dostupná a připravena na události.",
         "down": "Videokonferenční místnost není dostupná. Není možné zahájit ani se připojit k událostem.",
-        "standby": "Videokonferenční místnost není nakonfigurována."
+        "standby": "Videokonferenční místnost není nakonfigurována.",
+        "degraded": "Videokonferenční místnost odpovídá, ale s chybami nebo pomalu.",
+        "publicCheckFailed": "Portál nemůže ověřit místnost na její veřejné adrese: ze serveru není certifikát nebo název platný. Pro účastníky může místnost přesto fungovat.",
+        "unmonitored": "Stav videokonferenční místnosti není v této instalaci sledován."
       },
       "prosody": {
         "healthy": "Interní komunikace mezi video službami funguje správně.",
         "down": "Interní komunikace není dostupná. Video služby spolu nemohou komunikovat.",
-        "standby": "Komunikační služba není nakonfigurována."
+        "standby": "Komunikační služba není nakonfigurována.",
+        "degraded": "Interní komunikace odpovídá, ale s chybami nebo pomalu.",
+        "publicCheckFailed": "Portál nemůže ověřit interní komunikaci přes veřejnou adresu místnosti: ze serveru není certifikát nebo název platný. Konference mohou přesto fungovat.",
+        "unmonitored": "Stav interní komunikace není v této instalaci sledován."
       },
       "jicofo": {
         "healthy": "Koordinátor konferencí je aktivní a spravuje relace.",
         "down": "Koordinátor konferencí není dostupný. Není možné vytvářet nové konference.",
-        "standby": "Koordinátor konferencí není nakonfigurován."
+        "standby": "Koordinátor konferencí není nakonfigurován.",
+        "degraded": "Koordinátor konferencí odpovídá, ale s chybami nebo pomalu.",
+        "unmonitored": "Stav koordinátora konferencí není v této instalaci sledován."
       },
       "jvb": {
         "healthy": "Video bridge je aktivní a přenáší zvuk/video účastníkům.",
         "scaling": "Video bridge se připravuje na nadcházející událost. Servery se vytvářejí automaticky.",
         "standby": "Video bridge je v pohotovostním režimu. Automaticky se aktivuje před začátkem naplánované události.",
-        "stale": "Událost čeká na video bridge déle než nakonfigurovaný časový limit. Zkontrolujte cluster autoscaler a logy podů JVB."
+        "stale": "Událost čeká na video bridge déle než nakonfigurovaný časový limit. Zkontrolujte cluster autoscaler a logy podů JVB.",
+        "fixedDown": "Videomost neodpovídá. Konference nepřenášejí zvuk ani obraz, dokud nebude znovu dostupný.",
+        "unmonitored": "Stav videomostu není v této instalaci sledován: portál nemá adresu, na které by se ho mohl dotázat."
       },
       "jibri": {
         "healthy": "Služba nahrávání je připravena a dostupná.",
@@ -3307,7 +3354,8 @@
       "jibri": "Události nelze nahrávat. Účastníci se stále mohou připojit a účastnit.",
       "jibriStale": "Událost s aktivním záznamem čeká na Jibri déle než časový limit: relace není zaznamenávána.",
       "smtp": "Potvrzovací e-maily registrací a upozornění nebudou odesílány.",
-      "postprodDegraded": "Přepisy a shrnutí u některých nedávných záznamů nebyly vytvořeny. Videozáznamy jsou i tak k dispozici."
+      "postprodDegraded": "Přepisy a shrnutí u některých nedávných záznamů nebyly vytvořeny. Videozáznamy jsou i tak k dispozici.",
+      "jvbDown": "Účastníci nedostávají zvuk ani obraz."
     },
     "overallVerdicts": {
       "operational": "Všechny služby fungují správně. Platforma je plně funkční.",
@@ -3337,7 +3385,8 @@
       "degraded": "Zpomalený",
       "down": "Nedostupný",
       "standby": "V pohotovosti",
-      "scaling": "Příprava"
+      "scaling": "Příprava",
+      "unknown": "Nesledováno"
     },
     "metrics": {
       "uptime24h": "Uptime 24 h",
@@ -3348,7 +3397,8 @@
       "errorRate": "Chyby 5xx",
       "requestRate": "Požadavky/s",
       "podUptime": "Pod uptime"
-    }
+    },
+    "probeDetail": "Výsledek kontroly"
   },
   "feedback": {
     "title": "Jak hodnotíte tuto událost?",
@@ -3673,7 +3723,9 @@
       "almostReady": "Videoserver běží: už to bude",
       "almostReadyDetail": "Ještě okamžik a tlačítko pro vstup se samo aktivuje.",
       "honestHint": "Obvyklé čekání: méně než minuta, pokud je infrastruktura zahřátá, 3–5 minut při prvním spuštění. Zatím si můžete zkontrolovat kameru a mikrofon nebo použít chat.",
-      "elapsed": "připravuje se {time}"
+      "elapsed": "připravuje se {time}",
+      "scheduled": "Místnost se otevře v čase zahájení",
+      "scheduledDetail": "Nebo dříve, když organizátor událost spustí. Zatím si můžete zkontrolovat kameru a mikrofon nebo použít chat."
     },
     "exitWaiting": "Opustit čekárnu",
     "warmingUp": "Místnost se připravuje",
@@ -3729,7 +3781,10 @@
       "hostEarly": "Dřívější vstup (hostitel)"
     },
     "roomJustOpened": "Místnost je připravená — vstup",
-    "enterAnyway": "Přesto vstoupit"
+    "enterAnyway": "Přesto vstoupit",
+    "notHeldBadge": "Čas uplynul",
+    "notHeldTitle": "Plánovaný čas události již uplynul",
+    "notHeldDetail": "Místnost nebyla otevřena. Případné novinky najdete na stránce události."
   },
   "recording": {
     "management": "Videozáznam",
@@ -3865,6 +3920,16 @@
     "noFeedback": "Nebyla přijata žádná zpětná vazba",
     "comments": "Komentáře",
     "noComments": "Žádné komentáře",
+    "yes": "Ano",
+    "no": "Ne"
+  },
+  "questionnaire": {
+    "loadFailed": "Dotazník se nepodařilo načíst.",
+    "submit": "Odeslat odpovědi",
+    "submitFailed": "Odeslání se nezdařilo. Zkuste to znovu.",
+    "answersInvalid": "Některé odpovědi chybějí nebo nejsou platné: zkontrolujte povinné otázky a zkuste to znovu.",
+    "alreadySubmitted": "Na tento dotazník jste již odpověděli.",
+    "thankYou": "Děkujeme za vaše odpovědi.",
     "yes": "Ano",
     "no": "Ne"
   }

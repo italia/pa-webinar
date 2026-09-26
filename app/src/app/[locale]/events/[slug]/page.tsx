@@ -5,7 +5,7 @@ import { getLocale } from 'next-intl/server';
 
 import { prisma } from '@/lib/db';
 import { eventAccessCookieName, verifyEventAccess } from '@/lib/event-session';
-import { isEventPageVisible } from '@/lib/events/visibility';
+import { isEventOpenForRegistration, isEventPageVisible } from '@/lib/events/visibility';
 import { guestAccessAllowed } from '@/lib/events/guest-window';
 import { registrationAccessFor } from '@/lib/events/registration-access';
 import { materialPhase, materialVisibilityWhere } from '@/lib/events/material-visibility';
@@ -139,6 +139,11 @@ export default async function EventDetailPage({
     settings.publicRegistrationEnabled,
   );
   const guestEntryOpen = guestAccessAllowed(event, settings.guestAccessEnabled);
+  // Stessa regola della pagina d'iscrizione e della POST: un evento mai aperto
+  // oltre il suo orario di fine non accetta iscrizioni, qualunque stato abbia
+  // ancora. Deciso qui con l'orologio del server, così il pulsante non porta a
+  // una pagina che risponde 404.
+  const registrationOpen = isEventOpenForRegistration(event);
 
   const title = getLocalized(event.title as LocalizedField, locale);
   const description = getLocalized(event.description as LocalizedField, locale);
@@ -198,6 +203,9 @@ export default async function EventDetailPage({
     distribution: { rating: number; count: number }[];
   } | null = null;
   let recap: EventRecap | null = null;
+  // L'invito al questionario post-evento compare solo se l'evento ne ha uno:
+  // senza, il modulo chiederebbe al server un questionario che non c'è.
+  let hasPostEventQuestionnaire = false;
 
   if (event.status === 'ENDED') {
     // Generate + persist the aggregate recap on first view (idempotent). Done
@@ -205,51 +213,69 @@ export default async function EventDetailPage({
     // follow-up email; the page gates DISPLAY on postEventShowRecap below.
     recap = await ensureEventRecap(event.id);
 
-    const [materialsRaw, questionsRaw, pollsRaw, feedbackAgg, feedbackDist] =
-      await Promise.all([
-        // Vista del pubblico: la visibilità del singolo materiale
-        // (lib/events/material-visibility) vale anche qui, come nell'API della
-        // sala — un materiale «solo durante l'evento» non resta nell'archivio.
-        event.postEventShowMaterials
-          ? prisma.eventMaterial.findMany({
-              where: {
-                eventId: event.id,
-                ...materialVisibilityWhere(materialPhase(event)),
-              },
-              orderBy: { createdAt: 'desc' },
-            })
-          : Promise.resolve([]),
-        event.postEventShowQA && event.qaEnabled
-          ? prisma.question.findMany({
-              where: {
-                eventId: event.id,
-                status: { in: ['ANSWERED', 'HIGHLIGHTED'] },
-              },
-              orderBy: { upvoteCount: 'desc' },
-            })
-          : Promise.resolve([]),
-        event.postEventShowPolls
-          ? prisma.poll.findMany({
-              where: { eventId: event.id, status: 'PUBLISHED' },
-              include: { votes: { select: { optionIndex: true } } },
-            })
-          : Promise.resolve([]),
-        event.postEventShowFeedback
-          ? prisma.eventFeedback.aggregate({
-              where: { eventId: event.id },
-              _avg: { rating: true },
-              _count: true,
-            })
-          : Promise.resolve(null),
-        event.postEventShowFeedback
-          ? prisma.eventFeedback.groupBy({
-              by: ['rating'],
-              where: { eventId: event.id },
-              _count: true,
-              orderBy: { rating: 'desc' },
-            })
-          : Promise.resolve([]),
-      ]);
+    const [
+      materialsRaw,
+      questionsRaw,
+      pollsRaw,
+      feedbackAgg,
+      feedbackDist,
+      postEventQuestionnaire,
+    ] = await Promise.all([
+      // Vista del pubblico: la visibilità del singolo materiale
+      // (lib/events/material-visibility) vale anche qui, come nell'API della
+      // sala — un materiale «solo durante l'evento» non resta nell'archivio.
+      event.postEventShowMaterials
+        ? prisma.eventMaterial.findMany({
+            where: {
+              eventId: event.id,
+              ...materialVisibilityWhere(materialPhase(event)),
+            },
+            orderBy: { createdAt: 'desc' },
+          })
+        : Promise.resolve([]),
+      event.postEventShowQA && event.qaEnabled
+        ? prisma.question.findMany({
+            where: {
+              eventId: event.id,
+              status: { in: ['ANSWERED', 'HIGHLIGHTED'] },
+            },
+            orderBy: { upvoteCount: 'desc' },
+          })
+        : Promise.resolve([]),
+      event.postEventShowPolls
+        ? prisma.poll.findMany({
+            where: { eventId: event.id, status: 'PUBLISHED' },
+            include: { votes: { select: { optionIndex: true } } },
+          })
+        : Promise.resolve([]),
+      event.postEventShowFeedback
+        ? prisma.eventFeedback.aggregate({
+            where: { eventId: event.id },
+            _avg: { rating: true },
+            _count: true,
+          })
+        : Promise.resolve(null),
+      event.postEventShowFeedback
+        ? prisma.eventFeedback.groupBy({
+            by: ['rating'],
+            where: { eventId: event.id },
+            _count: true,
+            orderBy: { rating: 'desc' },
+          })
+        : Promise.resolve([]),
+      // Il toggle del feedback governa anche l'invito: spento, non serve
+      // nemmeno sapere se il questionario c'è.
+      event.postEventShowFeedback
+        ? prisma.eventQuestionnaire.findUnique({
+            where: {
+              eventId_placement: { eventId: event.id, placement: 'POST_EVENT' },
+            },
+            select: { id: true },
+          })
+        : Promise.resolve(null),
+    ]);
+
+    hasPostEventQuestionnaire = !!postEventQuestionnaire;
 
     eventMaterials = materialsRaw.map((m) => ({
       id: m.id,
@@ -417,7 +443,9 @@ export default async function EventDetailPage({
         invalidToken={invalidToken}
         hasRoomAccess={hasRoomAccess}
         registrationAccess={registrationAccess}
+        registrationOpen={registrationOpen}
         guestEntryOpen={guestEntryOpen}
+        hasPostEventQuestionnaire={hasPostEventQuestionnaire}
         parseTitleKicker={resolveKickerEnabled(event, settings.parseTitleKicker)}
         answeredQuestions={answeredQuestions}
         materials={eventMaterials}

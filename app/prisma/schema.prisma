@@ -1848,6 +1848,11 @@ model EmailOutbox {
   // owns the shape.
   metadata Json? @db.JsonB
 
+  // Chiave di unicità per le email che devono partire una volta sola (per
+  // esempio il link del moderatore per un certo indirizzo). L'indice unico fa
+  // da controllo e da guardia contro due richieste concorrenti.
+  dedupKey String? @unique @map("dedup_key")
+
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 

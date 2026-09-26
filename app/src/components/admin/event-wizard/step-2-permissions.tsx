@@ -51,9 +51,21 @@ interface Props {
   value: Step2Value;
   onChange: (patch: Partial<Step2Value>) => void;
   fieldErrors?: Record<string, string>;
+  /**
+   * Se l'installazione ha il servizio della lavagna di Jitsi. Senza, la sala
+   * non mostra la lavagna qualunque cosa dica l'evento: l'interruttore non si
+   * accende e dice perche'. Resta spegnibile, per togliere un valore rimasto
+   * da un modello o da un evento precedente.
+   */
+  whiteboardInfraReady: boolean;
 }
 
-export default function Step2Permissions({ value, onChange, fieldErrors = {} }: Props) {
+export default function Step2Permissions({
+  value,
+  onChange,
+  fieldErrors = {},
+  whiteboardInfraReady,
+}: Props) {
   const t = useTranslations('admin.wizard.step2');
   const tAdmin = useTranslations('admin');
 
@@ -229,11 +241,20 @@ export default function Step2Permissions({ value, onChange, fieldErrors = {} }: 
             <div className="text-secondary" style={{ fontSize: '0.85rem' }}>
               {tAdmin('form.whiteboardEnabledDesc')}
             </div>
+            {!whiteboardInfraReady && (
+              <div
+                className="fw-semibold"
+                style={{ fontSize: '0.85rem', color: 'var(--app-text)' }}
+              >
+                {tAdmin('form.whiteboardUnavailable')}
+              </div>
+            )}
           </div>
           <ToggleSwitch
             label=""
             ariaLabel={tAdmin('form.whiteboardEnabled')}
             checked={value.whiteboardEnabled}
+            disabled={!whiteboardInfraReady && !value.whiteboardEnabled}
             onChange={() => onChange({ whiteboardEnabled: !value.whiteboardEnabled })}
           />
         </div>

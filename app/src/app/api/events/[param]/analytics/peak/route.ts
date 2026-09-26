@@ -14,6 +14,8 @@ import { rateLimit, getClientIp } from '@/lib/rate-limit';
 // capacity + headroom bounds spoofing tightly while covering the extra roles.
 const PEAK_CAPACITY_HEADROOM = 50;
 const PEAK_FALLBACK_CAP = 500; // when maxParticipants is unset/0
+// Al più un aggiornamento di `lastActiveAt` al minuto per evento.
+const ACTIVITY_STAMP_INTERVAL_MS = 60_000;
 
 export const dynamic = 'force-dynamic';
 
@@ -183,13 +185,36 @@ export const POST = withErrorHandling(async (request, context) => {
     select: { id: true },
   });
 
+  // Segno di vita della sala: ogni client in conferenza riferisce ogni 30
+  // secondi, quindi finché c'è qualcuno `lastActiveAt` avanza. È il segnale per
+  // sala che le regole di inattività usano anche senza scaler (una chiamata
+  // abbandonata si chiude, una occupata no), dove il conteggio del bridge è
+  // unico per tutte le sale. Solo con qualcuno in conferenza, e al più una
+  // volta al minuto per evento: la condizione sta nella WHERE, così i
+  // resoconti in eccesso non scrivono niente e non costano una lettura.
+  const now = new Date();
+  const activityStale = new Date(now.getTime() - ACTIVITY_STAMP_INTERVAL_MS);
+
   // Issued together: this runs twice a minute per client on a live event, and
-  // the two writes are independent.
+  // the writes are independent.
   await Promise.all([
     prisma.event.updateMany({
       where: { id: event.id, peakParticipants: { lt: capped } },
       data: { peakParticipants: capped },
     }),
+    // SQL diretto e non updateMany: Prisma aggiornerebbe anche updated_at,
+    // che deve restare l'ora dell'ultima modifica vera dell'evento (da lì
+    // derivano la SEQUENCE del calendario e l'ora di chiusura stimata delle
+    // sessioni rimaste aperte), non un battito ogni minuto.
+    ...(capped > 0
+      ? [
+          prisma.$executeRaw`
+            UPDATE "events" SET "last_active_at" = ${now}
+            WHERE "id" = ${event.id}::uuid
+              AND "status" = 'LIVE'
+              AND ("last_active_at" IS NULL OR "last_active_at" < ${activityStale})`,
+        ]
+      : []),
     ...(currentSession
       ? [
           prisma.callSession.updateMany({

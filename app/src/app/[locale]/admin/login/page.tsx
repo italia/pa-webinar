@@ -5,6 +5,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import { Button, Alert, Input, FormGroup, Label } from 'design-react-kit';
 
 import { DURATA_LINK_MINUTI } from '@/lib/auth/staff-link-config';
+import { localizedPath } from '@/lib/utils/localized-url';
 
 export default function AdminLoginPage() {
   const t = useTranslations('admin');
@@ -54,7 +55,7 @@ export default function AdminLoginPage() {
         // so a soft push renders nothing until a manual reload. A full
         // document request re-runs middleware with the fresh admin_session
         // cookie and lands on the real admin page.
-        window.location.assign(`/${locale}/admin`);
+        window.location.assign(localizedPath('/admin', locale));
         return;
       } else {
         setError(true);

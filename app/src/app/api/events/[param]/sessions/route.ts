@@ -52,29 +52,30 @@ export const GET = withErrorHandling(async (request, context) => {
 /**
  * POST /api/events/[slug]/sessions
  *
- * Idempotently "open" a CallSession for the event. Called by the live
- * page immediately after the first Jitsi `videoConferenceJoined` event,
- * so every live event has a row in `call_sessions` with real start/end
- * timestamps — even when no recording is ever started. Prior to this
- * route the only code-path creating a CallSession was the Jibri
- * recording webhook, so non-recorded calls left no analytics trail.
+ * Apre, in modo idempotente, una CallSession per l'evento. La chiama la
+ * pagina live subito dopo il primo `videoConferenceJoined` di Jitsi, così ogni
+ * evento andato in onda ha una riga in `call_sessions` con inizio e fine
+ * reali, anche senza registrazione.
  *
- * Behavior:
- *   - If an open session (`endedAt IS NULL`) already exists for the
- *     event, returns its id (no DB write).
- *   - Otherwise creates a new row with startedAt=now, endedAt=null,
- *     peakParticipants=0.
- *   - Rate limited by IP (first-joiner call) to protect against loop
- *     abuse; idempotent so retries are safe.
+ * Comportamento:
+ *   - se l'evento ha già una sessione aperta (`endedAt IS NULL`) ne
+ *     restituisce l'id, senza scrivere;
+ *   - altrimenti crea una riga con startedAt=adesso, endedAt=null,
+ *     peakParticipants=0;
+ *   - limitata per IP contro i cicli; idempotente, quindi i tentativi
+ *     ripetuti sono sicuri.
  *
- * Closing: the scaler closes open sessions when an event transitions
- * LIVE → IDLE or anything → ENDED (scaler route handles the update).
- * The recording webhook, if a recording finishes mid-session, updates
- * the same row with the recording URL / size / duration instead of
- * creating a second row.
+ * Chiusura: la sessione si chiude a ogni uscita dell'evento da LIVE, nella
+ * stessa transazione del cambio di stato (lib/events/call-sessions.ts): lo
+ * fanno entrambi i giri del ciclo di vita — quello dello scaler
+ * (GET /api/internal/jvb-desired-replicas) e quello a bridge fisso
+ * (GET /api/cron/lifecycle) — la modifica di stato manuale
+ * (PUT /api/events/[id]), l'archiviazione in blocco e il cleanup GDPR. A fine
+ * giro, entrambi i giri chiudono anche le sessioni rimaste aperte su eventi
+ * già ENDED o ARCHIVED.
  *
- * No auth: anyone who got as far as opening the live URL of a LIVE
- * event can signal that they've joined.
+ * Nessuna autenticazione: chiunque sia arrivato alla pagina live di un
+ * evento LIVE può segnalare di essere entrato.
  */
 export const POST = withErrorHandling(async (request, context) => {
   const { param } = await context.params;
@@ -99,11 +100,11 @@ export const POST = withErrorHandling(async (request, context) => {
     throw new AppError('Event not live', 409, 'CONFLICT');
   }
 
-  // Idempotency: reuse the open session if one already exists. We can't
-  // use an @@unique constraint on (eventId, endedAt) because Postgres
-  // treats NULLs as distinct; this findFirst + create sequence is
-  // effectively single-writer under our traffic levels and races just
-  // produce an extra row (cleanup script merges them).
+  // Idempotenza: si riusa la sessione aperta, se c'e'. Un vincolo @@unique su
+  // (eventId, endedAt) non servirebbe, perche' Postgres considera distinti i
+  // NULL. Due primi ingressi simultanei possono aprire una riga in piu': nessuno
+  // la unisce all'altra, ma si chiude con lei, perche' l'uscita da LIVE chiude
+  // tutte le sessioni aperte dell'evento (lib/events/call-sessions.ts).
   const existing = await prisma.callSession.findFirst({
     where: { eventId: event.id, endedAt: null },
     select: { id: true, startedAt: true },

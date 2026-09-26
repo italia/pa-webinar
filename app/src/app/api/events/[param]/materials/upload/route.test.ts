@@ -53,6 +53,20 @@ import {
 
 import { POST } from './route';
 
+/** Il livello della riga di log che withErrorHandling scrive per la risposta. */
+function livelloDelLog(spia: { mock: { calls: unknown[][] } }, status: number): string | undefined {
+  for (const [riga] of spia.mock.calls) {
+    if (typeof riga !== 'string') continue;
+    try {
+      const j = JSON.parse(riga) as { level?: string; status?: number };
+      if (j.status === status) return j.level;
+    } catch {
+      /* non e' la riga della richiesta */
+    }
+  }
+  return undefined;
+}
+
 const mockedEvent = prisma.event.findFirst as unknown as ReturnType<typeof vi.fn>;
 const mockedCreate = prisma.eventMaterial.create as unknown as ReturnType<typeof vi.fn>;
 const mockedGrant = prisma.eventModerator.findUnique as unknown as ReturnType<typeof vi.fn>;
@@ -173,6 +187,29 @@ describe('POST /materials/upload — chi può caricare', () => {
     expect(res.status).toBe(201);
   });
 
+  it('il nome (cifrato) del co-moderatore non finisce in chiaro nella riga', async () => {
+    mockedGrant.mockResolvedValue({
+      id: 'grant-1',
+      eventId: EVENT_ID,
+      revokedAt: null,
+      role: 'MODERATOR',
+      name: 'Nome Cognome',
+      email: null,
+    });
+    const res = await POST(await upload({ token: 'TOKEN_DEL_COMODERATORE' }), ctx());
+    expect(res.status).toBe(201);
+    expect(mockedCreate.mock.calls[0]![0].data).toMatchObject({ addedBy: '' });
+    // Senza nome la risposta porta null: la sala mostra la dicitura tradotta.
+    expect(await res.json()).toMatchObject({ addedBy: null });
+  });
+
+  it('evento senza conduttore: nessuna parola fissa al posto del nome', async () => {
+    mockedEvent.mockResolvedValue({ id: EVENT_ID, moderatorToken: PRIMARY_TOKEN, moderatorName: null });
+    const res = await POST(await upload(), ctx());
+    expect(res.status).toBe(201);
+    expect(mockedCreate.mock.calls[0]![0].data).toMatchObject({ addedBy: '' });
+  });
+
   it('evento inesistente: 404', async () => {
     mockedEvent.mockResolvedValue(null);
     const res = await POST(await upload(), ctx());
@@ -267,11 +304,16 @@ describe('POST /materials/upload — il file', () => {
     expect(storage.current!.put).not.toHaveBeenCalled();
   });
 
-  it('senza storage configurato: 503', async () => {
+  it('senza storage configurato: 503, registrato come warn', async () => {
+    const log = vi.spyOn(console, 'log').mockImplementation(() => undefined);
     storage.current = null;
     const res = await POST(await upload(), ctx());
     expect(res.status).toBe(503);
+    expect(((await res.json()) as { code?: string }).code).toBe('STORAGE_UNAVAILABLE');
     expect(mockedCreate).not.toHaveBeenCalled();
+    // Una configurazione ammessa, non un guasto.
+    expect(livelloDelLog(log, 503)).toBe('warn');
+    log.mockRestore();
   });
 
   it('se lo storage non scrive: 502 e nessuna riga', async () => {

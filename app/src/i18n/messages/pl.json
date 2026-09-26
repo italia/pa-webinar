@@ -127,7 +127,8 @@
         "outlook": "Outlook / Office 365",
         "yahoo": "Yahoo Calendar",
         "downloadIcs": "Pobierz plik .ics"
-      }
+      },
+      "registrationEnded": "Wydarzenie zakończyło się: rejestracja jest zamknięta."
     },
     "manage": {
       "toggleChat": "Czat",
@@ -368,7 +369,8 @@
       "questionRestore": "Przywróć",
       "questionStatusFailed": "Nie udało się zaktualizować pytania",
       "questionNeedsText": "Wpisz treść pytania: sam załącznik nie trafia do kolejki",
-      "lensTruncated": "Wczytano tylko najnowsze wiadomości: mogą istnieć starsze pytania, których nie ma na liście."
+      "lensTruncated": "Wczytano tylko najnowsze wiadomości: mogą istnieć starsze pytania, których nie ma na liście.",
+      "attachUnavailable": "Załączniki nie są dostępne w tej instalacji."
     },
     "role": {
       "moderator": "Moderator",
@@ -389,7 +391,8 @@
         "unknown": "Nd."
       },
       "volume": "Głośność",
-      "volumeFor": "Głośność: {name}"
+      "volumeFor": "Głośność: {name}",
+      "kickName": "Usuń: {name}"
     },
     "moderator": {
       "muteAll": "Wycisz wszystkich",
@@ -453,7 +456,18 @@
       "remainingLabel": "Pozostały czas (kliknij, aby zobaczyć czas, który upłynął)",
       "elapsedLabel": "Czas, który upłynął (kliknij, aby zobaczyć pozostały czas)"
     },
-    "videoCallFrameTitle": "Wideorozmowa wydarzenia"
+    "videoCallFrameTitle": "Wideorozmowa wydarzenia",
+    "insecureContextTitle": "Niezabezpieczony adres",
+    "insecureContextBody": "Ta strona została otwarta przez http://: przeglądarka nie pozwala na użycie mikrofonu i kamery, więc rozmowa wideo nie może się rozpocząć. Proszę otworzyć tę samą stronę pod bezpiecznym adresem.",
+    "insecureContextLink": "Otwórz https://{host}",
+    "conferenceUnreachableTitle": "Usługa rozmów wideo nie odpowiada",
+    "conferenceUnreachableBody": "Przeglądarka nie może połączyć się z serwerem rozmów wideo ({host}). Proszę otworzyć go w nowej karcie: jeśli przeglądarka wyświetli ostrzeżenie o bezpieczeństwie, należy je zaakceptować, a następnie wrócić tutaj i spróbować ponownie. Jeśli strona się nie otwiera, sieć, z której się Państwo łączą, może go blokować.",
+    "conferenceOpenHost": "Otwórz {host} w nowej karcie",
+    "leftTitle": "Opuszczono salę",
+    "leftMessage": "Wydarzenie wciąż trwa: można wrócić w dowolnym momencie.",
+    "leftModeratorReminder": "Wydarzenie pozostaje otwarte, dopóki ktoś go nie zakończy. Po zakończeniu proszę wrócić i wybrać „{action}”.",
+    "rejoin": "Wróć do sali",
+    "backToHome": "Powrót do strony głównej"
   },
   "qa": {
     "title": "Pytania i odpowiedzi",
@@ -590,7 +604,8 @@
       "errorGeneric": "Błąd podczas przesyłania pliku",
       "helpImage": "Obsługiwane formaty: PNG, JPEG, WebP, SVG, GIF — maks. 10 MB",
       "helpAudio": "Obsługiwane formaty: MP3, WAV, OGG, M4A, WebM — maks. 20 MB",
-      "helpDocument": "Obsługiwane formaty: PDF, DOCX, PPTX, XLSX, TXT — maks. 25 MB"
+      "helpDocument": "Obsługiwane formaty: PDF, DOCX, PPTX, XLSX, TXT — maks. 25 MB",
+      "uploadsUnavailable": "Przesyłanie plików nie jest dostępne w tej instalacji: zamiast tego wklej adres URL pliku."
     },
     "rubricaPicker": {
       "loading": "Wyszukiwanie…",
@@ -628,7 +643,9 @@
           "endsAt": "Data zakończenia musi być późniejsza niż data rozpoczęcia.",
           "titleRequired": "Tytuł jest wymagany (co najmniej 3 znaki).",
           "titleRequiredOtherLocale": "Tytuł w języku domyślnym ({locale}) jest wymagany: przejdź do karty {locale}.",
-          "maxParticipants": "Wprowadź liczbę od 2 do 500."
+          "maxParticipants": "Wprowadź liczbę od 2 do 500.",
+          "descriptionRequired": "Opis jest wymagany (co najmniej {min} znaków).",
+          "descriptionRequiredOtherLocale": "Opis w języku domyślnym ({locale}) jest wymagany: przejdź do karty {locale}."
         },
         "senderRatioLabel": "Szacunkowy odsetek aktywnych",
         "senderRatioHelp": "Ilu uczestników będzie miało aktywny mikrofon/kamerę. Pomaga określić rozmiar serwera wideo.",
@@ -820,7 +837,11 @@
         "speakers": "prelegenci",
         "materials": "materiały",
         "questionnaires": "kwestionariusze"
-      }
+      },
+      "revocationFailed": "Nie udało się cofnąć dostępu ({name}): link dostępu nadal jest ważny. Zapisz ponownie, aby spróbować jeszcze raz, lub cofnij go na karcie „{tab}” na stronie wydarzenia.",
+      "validationFailedDetail": "Serwer odrzucił niektóre dane: {reason}. Popraw je i spróbuj ponownie.",
+      "publishFailed": "Wydarzenie zostało utworzone, ale nie zostało opublikowane: pozostaje wersją roboczą. Opublikuj je na stronie wydarzenia.",
+      "publishFailedDetail": "Wydarzenie zostało utworzone, ale nie zostało opublikowane: pozostaje wersją roboczą. Odpowiedź serwera: {reason}. Opublikuj je na stronie wydarzenia."
     },
     "nav": {
       "events": "Zarządzanie wydarzeniami",
@@ -1240,7 +1261,7 @@
       "wordCloudEnabled": "Chmura słów na żywo",
       "wordCloudEnabledDesc": "Uczestnicy wysyłają słowo, a chmura aktualizuje się na żywo. Przydatne do rozpoczęcia dyskusji lub zebrania nastrojów w kilka sekund.",
       "whiteboardEnabled": "Tablica współdzielona",
-      "whiteboardEnabledDesc": "Włącza natywną tablicę do pracy zespołowej (Excalidraw): moderatorzy mogą ją otworzyć z paska narzędzi podczas wydarzenia. Zawsze aktywna w połączeniach natychmiastowych.",
+      "whiteboardEnabledDesc": "Włącza natywną tablicę do pracy zespołowej (Excalidraw): moderatorzy mogą ją otworzyć z paska narzędzi podczas wydarzenia. Wymaga usługi tablicy w instalacji; tam, gdzie jest dostępna, w połączeniach natychmiastowych jest zawsze aktywna.",
       "autoStartRecording": "Uruchom nagrywanie automatycznie",
       "autoStartRecordingDesc": "W momencie rozpoczęcia wydarzenia nagrywanie startuje samo (bez pytania moderatora o potwierdzenie). Dzięki temu spóźnialscy od razu znajdą dostępny odtwarzacz.",
       "aiSectionHeading": "Automatyczna postprodukcja",
@@ -1316,7 +1337,8 @@
       "retentionPreviewRecordings": "Nagrania wideo",
       "retentionPreviewKept": "Statystyki zagregowane i metadane wydarzenia są zachowywane.",
       "configPreview": "Podgląd konfiguracji",
-      "templateApplied": "Zastosowano szablon: {name}. Możesz zmodyfikować wszystkie ustawienia."
+      "templateApplied": "Zastosowano szablon: {name}. Możesz zmodyfikować wszystkie ustawienia.",
+      "whiteboardUnavailable": "Niedostępne w tej instalacji: brakuje usługi tablicy Jitsi, którą może włączyć administrator platformy."
     },
     "links": {
       "title": "Linki wydarzenia",
@@ -1925,9 +1947,9 @@
       "version": "Wersja",
       "environment": "Środowisko",
       "modes": {
-        "simple": "Prosty (Docker Compose)",
-        "standard": "Standardowy (Kubernetes)",
-        "full": "Pełny (Kubernetes ze scale-to-zero)",
+        "simple": "Prosty",
+        "standard": "Standardowy",
+        "full": "Pełny (mosty ze scale-to-zero)",
         "unknown": "Nieznany"
       },
       "database": {
@@ -1941,7 +1963,9 @@
         "title": "Jitsi Meet",
         "reachable": "Osiągalny",
         "unreachable": "Nieosiągalny",
-        "notConfigured": "Nie skonfigurowany"
+        "notConfigured": "Nie skonfigurowany",
+        "degraded": "Osiągalny, ale odpowiada z błędami lub powoli",
+        "publicCheckFailed": "Sprawdzenie pod adresem publicznym nie powiodło się ({code}): serwer portalu nie akceptuje certyfikatu lub nazwy. Konferencje mogą mimo to działać."
       },
       "jvb": {
         "title": "Video Bridge (JVB)",
@@ -1949,7 +1973,9 @@
         "replicas": "{current}/{max} węzłów",
         "preScale": "Wstępne skalowanie: {minutes} min",
         "fixedMode": "Tryb stały",
-        "scalerEnabled": "Scaler włączony"
+        "scalerEnabled": "Scaler włączony",
+        "fixedDown": "Most wideo nie odpowiada",
+        "unmonitored": "Niemonitorowany: nie ustawiono adresu mostu (JVB_HEALTH_URL)"
       },
       "jibri": {
         "title": "Nagrywanie (Jibri)",
@@ -1971,7 +1997,11 @@
         "metrics": "Endpoint metryk"
       },
       "note": "Zmiany infrastrukturalne realizowane są za pośrednictwem Helm values i pipeline CI/CD.",
-      "deployDocs": "Dokumentacja wdrożenia"
+      "deployDocs": "Dokumentacja wdrożenia",
+      "platforms": {
+        "kubernetes": "Na Kubernetes",
+        "other": "Poza Kubernetes (Docker Compose lub pojedynczy serwer)"
+      }
     },
     "instantCalls": {
       "title": "Szybkie połączenia",
@@ -2076,9 +2106,9 @@
       "latencyP99": "Opóźnienie P99",
       "requestRate": "Żądania/s",
       "chartLatencyQuantiles": "Opóźnienie aplikacji — P50 / P95 / P99",
-      "participantsNow": "Aktywni uczestnicy",
+      "participantsNow": "Uczestnicy na moście wideo",
       "jvbStress": "Obciążenie JVB",
-      "conferences": "Aktywne konferencje",
+      "conferences": "Konferencje na moście wideo",
       "octoRelay": "Relay między mostkami Octo",
       "interBridge": "Ruch Octo",
       "chartCpu": "CPU usage",
@@ -2105,7 +2135,8 @@
       "liveNow": "LIVE",
       "provisioningNow": "w przygotowaniu",
       "idleNow": "IDLE (wstrzymane)",
-      "scaleToZeroHelp": "IDLE jest normalnym stanem dla wydarzenia bez ruchu przez czas dłuższy niż okres karencji. Przy następnej wizycie użytkownika przechodzi do PROVISIONING, a następnie LIVE."
+      "scaleToZeroHelp": "IDLE jest normalnym stanem dla wydarzenia bez ruchu przez czas dłuższy niż okres karencji. Przy następnej wizycie użytkownika przechodzi do PROVISIONING, a następnie LIVE.",
+      "capacityFromStatus": "Bieżące wartości odczytane z mostu wideo. Historia wymaga Prometheusa."
     },
     "bulk": {
       "selectAll": "Zaznacz wszystkie",
@@ -2824,7 +2855,8 @@
       "quotaExceeded": "To wydarzenie osiągnęło limit przesłanych plików ({maxFiles} plików, łącznie {maxMb} MB): usuń część, aby przesłać kolejne",
       "uploadBusy": "Zbyt wiele przesyłań w tej chwili: spróbuj ponownie za kilka sekund",
       "deleteFailed": "Nie udało się usunąć materiału"
-    }
+    },
+    "addedByStaff": "Dodane przez organizatorów"
   },
   "reminders": {
     "title": "Powiadomienia",
@@ -2897,7 +2929,7 @@
       "requestSubmittedBody": "Jeśli ten adres e-mail odpowiada rejestracji, wysłaliśmy link do potwierdzenia usunięcia. Link jest ważny przez 1 godzinę.",
       "linkInvalid": "Link jest nieprawidłowy lub wygasł. Poproś o nowy link.",
       "confirmWarning": "Za chwilę trwale usuniesz wszystkie dane osobowe powiązane z Twoim adresem e-mail.",
-      "confirmBody": "Zostaną usunięte rejestracje, pytania, głosy w ankietach, opinie i przypomnienia. Tej operacji nie można cofnąć.",
+      "confirmBody": "Zostaną usunięte rejestracje, pytania, głosy w ankietach, opinie, przypomnienia oraz Twój wpis w książce adresowej wydarzeń. Tej operacji nie można cofnąć.",
       "confirmButton": "Potwierdź usunięcie",
       "cancel": "Anuluj",
       "processing": "Usuwanie...",
@@ -3120,7 +3152,7 @@
     "nodesReady": "gotowych węzłów",
     "scaling": "skalowanie",
     "jvbStress": "Obciążenie JVB",
-    "participantsConnected": "połączonych uczestników",
+    "participantsConnected": "uczestników na moście wideo",
     "videoInteractive": "interaktywny",
     "videoWebinar": "webinar",
     "participantsAvailable": "dostępnych uczestników",
@@ -3164,7 +3196,12 @@
       "lastFailure": "Ostatni błąd {when}",
       "artifactsProduced": "{count, plural, =0 {brak artefaktów} one {wytworzono 1 artefakt} few {wytworzono # artefakty} many {wytworzono # artefaktów} other {wytworzono # artefaktu}}",
       "eventsEnabled": "{count, plural, =0 {brak wydarzeń z AI} one {1 wydarzenie z aktywnym AI} few {# wydarzenia z aktywnym AI} many {# wydarzeń z aktywnym AI} other {# wydarzenia z aktywnym AI}}"
-    }
+    },
+    "jvbFixedUp": "{count, plural, =1 {Most wideo działa} other {Most wideo działa · przewidziane mosty: #}}",
+    "jvbFixedDown": "Most wideo nie odpowiada",
+    "jvbFixedDownDetail": "Uczestnicy nie otrzymują dźwięku ani obrazu, dopóki most nie będzie znów osiągalny.",
+    "jvbUnmonitored": "Stan niemonitorowany",
+    "jvbUnmonitoredDetail": "Ta instalacja nie odpytuje mostu wideo, więc jego stan nie jest tu dostępny."
   },
   "infraMap": {
     "loading": "Ładowanie mapy infrastruktury...",
@@ -3172,8 +3209,8 @@
     "ariaLabel": "Mapa infrastruktury systemu",
     "title": "Mapa infrastruktury",
     "subtitle": "Wizualizacja architektury i statusu usług w czasie rzeczywistym",
-    "participants": "Uczestnicy",
-    "conferences": "Konferencje",
+    "participants": "Uczestnicy na moście wideo",
+    "conferences": "Konferencje na moście wideo",
     "bandwidthIn": "Przepustowość przychodząca",
     "bandwidthOut": "Przepustowość wychodząca",
     "recordings": "Nagrania",
@@ -3259,23 +3296,33 @@
       "jitsiWeb": {
         "healthy": "Sala wideokonferencyjna jest dostępna i gotowa na wydarzenia.",
         "down": "Sala wideokonferencyjna jest niedostępna. Nie można rozpoczynać ani dołączać do wydarzeń.",
-        "standby": "Sala wideokonferencyjna nie jest skonfigurowana."
+        "standby": "Sala wideokonferencyjna nie jest skonfigurowana.",
+        "degraded": "Sala wideokonferencyjna odpowiada, ale z błędami lub powoli.",
+        "publicCheckFailed": "Portal nie może sprawdzić sali pod jej publicznym adresem: z perspektywy serwera certyfikat lub nazwa są nieprawidłowe. Dla uczestników sala może mimo to działać.",
+        "unmonitored": "Stan sali wideokonferencyjnej nie jest monitorowany w tej instalacji."
       },
       "prosody": {
         "healthy": "Wewnętrzna komunikacja między usługami wideo działa prawidłowo.",
         "down": "Wewnętrzna komunikacja jest niedostępna. Usługi wideo nie mogą się ze sobą komunikować.",
-        "standby": "Usługa komunikacji nie jest skonfigurowana."
+        "standby": "Usługa komunikacji nie jest skonfigurowana.",
+        "degraded": "Wewnętrzna komunikacja odpowiada, ale z błędami lub powoli.",
+        "publicCheckFailed": "Portal nie może sprawdzić wewnętrznej komunikacji przez publiczny adres sali: z perspektywy serwera certyfikat lub nazwa są nieprawidłowe. Konferencje mogą mimo to działać.",
+        "unmonitored": "Stan wewnętrznej komunikacji nie jest monitorowany w tej instalacji."
       },
       "jicofo": {
         "healthy": "Koordynator konferencji jest aktywny i zarządza sesjami.",
         "down": "Koordynator konferencji jest niedostępny. Nie można tworzyć nowych konferencji.",
-        "standby": "Koordynator konferencji nie jest skonfigurowany."
+        "standby": "Koordynator konferencji nie jest skonfigurowany.",
+        "degraded": "Koordynator konferencji odpowiada, ale z błędami lub powoli.",
+        "unmonitored": "Stan koordynatora konferencji nie jest monitorowany w tej instalacji."
       },
       "jvb": {
         "healthy": "Most wideo jest aktywny i przesyła audio/wideo do uczestników.",
         "scaling": "Most wideo przygotowuje się do nadchodzącego wydarzenia. Serwery są tworzone automatycznie.",
         "standby": "Most wideo jest w trybie gotowości. Aktywuje się automatycznie przed rozpoczęciem zaplanowanego wydarzenia.",
-        "stale": "Wydarzenie czeka na ponton wideo dłużej niż skonfigurowany limit czasu. Sprawdź autoskaler klastra i logi podów JVB."
+        "stale": "Wydarzenie czeka na ponton wideo dłużej niż skonfigurowany limit czasu. Sprawdź autoskaler klastra i logi podów JVB.",
+        "fixedDown": "Most wideo nie odpowiada. Konferencje nie przesyłają dźwięku ani obrazu, dopóki nie będzie znów osiągalny.",
+        "unmonitored": "Stan mostu wideo nie jest monitorowany w tej instalacji: portal nie ma adresu, pod którym mógłby go odpytać."
       },
       "jibri": {
         "healthy": "Usługa nagrywania jest gotowa i dostępna.",
@@ -3307,7 +3354,8 @@
       "jibri": "Nie można nagrywać wydarzeń. Uczestnicy mogą nadal dołączać i uczestniczyć.",
       "jibriStale": "Wydarzenie z aktywnym nagrywaniem czeka na Jibri dłużej niż limit czasu: sesja nie jest nagrywana.",
       "smtp": "E-maile z potwierdzeniami rejestracji i przypomnienia nie będą wysyłane.",
-      "postprodDegraded": "Transkrypcje i podsumowania niektórych ostatnich nagrań nie zostały wygenerowane. Nagrania wideo są nadal dostępne."
+      "postprodDegraded": "Transkrypcje i podsumowania niektórych ostatnich nagrań nie zostały wygenerowane. Nagrania wideo są nadal dostępne.",
+      "jvbDown": "Uczestnicy nie otrzymują dźwięku ani obrazu."
     },
     "overallVerdicts": {
       "operational": "Wszystkie usługi działają prawidłowo. Platforma jest w pełni operacyjna.",
@@ -3337,7 +3385,8 @@
       "degraded": "Spowolniony",
       "down": "Niedostępny",
       "standby": "W gotowości",
-      "scaling": "Przygotowywanie"
+      "scaling": "Przygotowywanie",
+      "unknown": "Niemonitorowany"
     },
     "metrics": {
       "uptime24h": "Uptime 24h",
@@ -3348,7 +3397,8 @@
       "errorRate": "Błędy 5xx",
       "requestRate": "Żądania/s",
       "podUptime": "Uptime poda"
-    }
+    },
+    "probeDetail": "Wynik sprawdzenia"
   },
   "feedback": {
     "title": "Jak oceniasz to wydarzenie?",
@@ -3673,7 +3723,9 @@
       "almostReady": "Serwer wideo działa: już prawie",
       "almostReadyDetail": "Jeszcze chwila i przycisk wejścia włączy się sam.",
       "honestHint": "Typowe oczekiwanie: poniżej minuty, jeśli infrastruktura jest już rozgrzana, 3–5 minut przy pierwszym uruchomieniu. W międzyczasie sprawdź kamerę i mikrofon albo skorzystaj z czatu.",
-      "elapsed": "w przygotowaniu od {time}"
+      "elapsed": "w przygotowaniu od {time}",
+      "scheduled": "Sala otworzy się o godzinie rozpoczęcia",
+      "scheduledDetail": "Albo wcześniej, gdy organizator uruchomi wydarzenie. W międzyczasie sprawdź kamerę i mikrofon albo skorzystaj z czatu."
     },
     "exitWaiting": "Opuść poczekalnię",
     "warmingUp": "Sala w przygotowaniu",
@@ -3729,7 +3781,10 @@
       "hostEarly": "Wcześniejsze wejście (gospodarz)"
     },
     "roomJustOpened": "Sala gotowa — wejdź",
-    "enterAnyway": "Wejdź mimo to"
+    "enterAnyway": "Wejdź mimo to",
+    "notHeldBadge": "Czas minął",
+    "notHeldTitle": "Zaplanowany czas wydarzenia już minął",
+    "notHeldDetail": "Sala nie została otwarta. Sprawdź stronę wydarzenia, czy są nowe informacje."
   },
   "recording": {
     "management": "Nagranie wideo",
@@ -3865,6 +3920,16 @@
     "noFeedback": "Brak otrzymanych opinii",
     "comments": "Komentarze",
     "noComments": "Brak komentarzy",
+    "yes": "Tak",
+    "no": "Nie"
+  },
+  "questionnaire": {
+    "loadFailed": "Nie udało się wczytać kwestionariusza.",
+    "submit": "Wyślij odpowiedzi",
+    "submitFailed": "Wysyłanie nie powiodło się. Spróbuj ponownie.",
+    "answersInvalid": "Brakuje niektórych odpowiedzi lub są nieprawidłowe: sprawdź pytania obowiązkowe i spróbuj ponownie.",
+    "alreadySubmitted": "Twoje odpowiedzi na ten kwestionariusz zostały już wysłane.",
+    "thankYou": "Dziękujemy za odpowiedzi.",
     "yes": "Tak",
     "no": "Nie"
   }

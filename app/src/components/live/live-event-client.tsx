@@ -53,6 +53,8 @@ import WaitingRoom, {
   type WaitingRoomJoinPrefs,
   type WaitingRoomWarmup,
 } from '@/components/live/waiting-room';
+import { closingPhase, exitDestination, phaseAfterTokenConflict } from '@/components/live/live-phase';
+import { warmupFromLifecycle } from '@/components/live/lifecycle-warmup';
 import { splitTitleKicker } from '@/lib/utils/title-kicker';
 import { useSettings } from '@/lib/settings-context';
 
@@ -141,7 +143,12 @@ interface LiveEventClientProps {
   locale: string;
   jitsiDomain: string;
   watermark?: WatermarkSettings;
-  jibriAvailable?: boolean;
+  /** L'installazione puo' registrare (lib/recording/availability), risolto dal
+   *  Server Component. Senza, l'avviso «questo evento viene registrato» e il
+   *  consenso prima di entrare non si mostrano: prometterebbero una
+   *  registrazione che nulla puo' fare. Default true: nel dubbio il consenso
+   *  si chiede. */
+  recordingAvailable?: boolean;
   /** Reactions mode (admin SiteSetting): 'NATIVE' = Jitsi's own reactions
    *  button (ephemeral); 'CUSTOM' = the app's analytics-backed ReactionBar.
    *  Default 'NATIVE'. */
@@ -153,8 +160,9 @@ interface LiveEventClientProps {
    *  componente client webpack lo congela nel bundle a build time. */
   rnnoiseEnforceOff?: boolean;
   /** L'installazione ha il backend della lavagna (Excalidraw) e
-   *  `config.whiteboard.enabled` lato Jitsi. Senza, il pulsante del moderatore
-   *  e il promemoria di esportazione restano nascosti — insieme. Risolto a
+   *  `config.whiteboard.enabled` lato Jitsi. Senza, il pulsante nella barra di
+   *  Jitsi, quello del moderatore e il promemoria di esportazione restano
+   *  nascosti — insieme, anche per le chiamate istantanee. Risolto a
    *  RUNTIME dal Server Component (lib/jitsi/whiteboard.ts), per lo stesso
    *  motivo di `rnnoiseEnforceOff`. Default false. */
   whiteboardInfraReady?: boolean;
@@ -167,12 +175,15 @@ type LivePhase =
   | 'fetching_jwt'
   | 'ready'
   | 'reconnecting'
+  // Uscito dalla conferenza con l'evento ancora aperto: si puo' rientrare.
+  | 'left'
   | 'ended'
   | 'error';
 
 // Maximum number of automatic rejoin attempts after a network-induced
 // `videoConferenceLeft`. After this many failures we fall through to the
-// "Evento concluso" screen so the user can decide what to do manually.
+// closing screen ("Sei uscito dalla sala", with a way back in, unless the
+// event ended) so the user can decide what to do manually.
 const MAX_RECONNECT_ATTEMPTS = 3;
 
 // Grace window after an UNFLAGGED `videoConferenceLeft` before we commit to
@@ -220,7 +231,7 @@ export default function LiveEventClient({
   locale,
   jitsiDomain,
   watermark,
-  jibriAvailable: _jibriAvailable = true,
+  recordingAvailable = true,
   reactionsMode = 'NATIVE',
   rnnoiseEnforceOff = true,
   whiteboardInfraReady = false,
@@ -261,6 +272,21 @@ export default function LiveEventClient({
   const [jitsiJoined, setJitsiJoined] = useState(false);
 
   const [eventStatus, setEventStatus] = useState(event.status);
+  // Letto dai gestori di uscita, che non devono ricrearsi a ogni cambio di
+  // stato: decide fra «Evento concluso» e «Sei uscito dalla sala».
+  const eventStatusRef = useRef(event.status);
+  useEffect(() => {
+    eventStatusRef.current = eventStatus;
+  }, [eventStatus]);
+  // La fine vera dell'evento: il ref si aggiorna subito, perche' un
+  // `videoConferenceLeft` in arrivo non trovi ancora lo stato vecchio.
+  const markEnded = useCallback(() => {
+    eventStatusRef.current = 'ENDED';
+    setEventStatus('ENDED');
+  }, []);
+  // Endpoint id di questo browser nella conferenza: il pannello partecipanti
+  // non offre di espellere la propria riga.
+  const [localEndpointId, setLocalEndpointId] = useState<string | null>(null);
 
   // If the event was IDLE when this page rendered, the bridge has
   // been scaled to zero. Fire /wake once on mount so the scaler can
@@ -397,8 +423,9 @@ export default function LiveEventClient({
   // speaker) lands on the unified waiting room first regardless of
   // status (PUBLISHED / LIVE / ENDED) — the waiting room itself shows
   // the right content (countdown / join CTA / recording + feedback).
-  // `phase='ended'` is now only reached mid-session when the Jitsi
-  // connection ends, for the legacy "evento concluso" thank-you screen.
+  // `phase='ended'` is now only reached mid-session when the event really
+  // ends, for the "evento concluso" thank-you screen; `phase='left'` when
+  // this client leaves a call that is still open.
   // We also preserve `reconnecting` and `fetching_jwt` so a network blip
   // mid-event doesn't get clobbered back to the waiting room when the
   // LIVE→LIVE eventStatus poll re-fires this effect.
@@ -406,6 +433,7 @@ export default function LiveEventClient({
     setPhase((prev) =>
       prev === 'ready' ||
       prev === 'ended' ||
+      prev === 'left' ||
       prev === 'reconnecting' ||
       prev === 'fetching_jwt'
         ? prev
@@ -429,11 +457,13 @@ export default function LiveEventClient({
   // mostrare una stima onesta invece dello spinner cieco.
   useEffect(() => {
     if (phase !== 'waiting') return;
-    const pollInterval = setInterval(async () => {
+    let cancelled = false;
+    const poll = async () => {
       try {
         const res = await fetch(`/api/events/${event.slug}/lifecycle`);
-        if (!res.ok) return;
+        if (!res.ok || cancelled) return;
         const data = await res.json();
+        if (cancelled) return;
         // /lifecycle has no visibility filter (unlike the public GET, which
         // 404s DRAFT/ARCHIVED). Ignore those transitions so an event archived
         // mid-view doesn't clobber the ENDED recap into the blank
@@ -445,20 +475,22 @@ export default function LiveEventClient({
         ) {
           setEventStatus(data.status);
         }
-        setWarmup(
-          data.jvb
-            ? {
-                phase: data.jvb.phase as 'queued' | 'starting' | 'ready',
-                startedAt: data.jvb.startedAt ?? null,
-                serverTime: data.serverTime,
-              }
-            : null
-        );
+        // Tutte le fasi, 'scheduled' compresa (nessuno scaler: la sala si
+        // apre all'orario d'inizio); una fase sconosciuta diventa null.
+        setWarmup(warmupFromLifecycle(data));
       } catch {
         /* retry */
       }
-    }, 3000);
-    return () => clearInterval(pollInterval);
+    };
+    // Subito, non dopo il primo intervallo: senza scaler la fase 'scheduled'
+    // sostituisce la stima di accensione, e tre secondi di «in coda» prima
+    // dell'orologio racconterebbero un'accensione che non c'è.
+    void poll();
+    const pollInterval = setInterval(poll, 3000);
+    return () => {
+      cancelled = true;
+      clearInterval(pollInterval);
+    };
   }, [phase, event.slug, eventStatus]);
 
   // Fetch JWT. Shape of the request depends on the caller:
@@ -508,6 +540,31 @@ export default function LiveEventClient({
           router.replace(percorso(`/events/${event.slug}/password`));
           return;
         }
+        // L'evento non ammette piu' ingressi (concluso, o tornato in attesa
+        // dopo l'inattivita') mentre si rientrava o si aspettava: lo stato
+        // vero lo dice /lifecycle, e la schermata giusta non e' un errore.
+        if (res.status === 409) {
+          try {
+            const lc = await fetch(`/api/events/${event.slug}/lifecycle`);
+            const lcData = lc.ok ? ((await lc.json()) as { status?: string }) : null;
+            const next = phaseAfterTokenConflict(lcData?.status);
+            if (next === 'ended') {
+              markEnded();
+              setPhase('ended');
+              return;
+            }
+            if (next === 'waiting' && lcData?.status) {
+              // Tornando in sala d'attesa la si lascia risvegliare il bridge.
+              wokeOnceRef.current = false;
+              eventStatusRef.current = lcData.status;
+              setEventStatus(lcData.status);
+              setPhase('waiting');
+              return;
+            }
+          } catch {
+            /* resta l'errore qui sotto */
+          }
+        }
         // L'amministrazione ha chiuso l'ingresso da ospite mentre si era in
         // sala d'attesa: il testo del server non e' tradotto, e «Riprova»
         // non cambierebbe l'esito.
@@ -537,6 +594,7 @@ export default function LiveEventClient({
     initialDisplayName,
     router,
     t,
+    markEnded,
   ]);
 
   useEffect(() => {
@@ -571,8 +629,9 @@ export default function LiveEventClient({
       setJoinPrefs(prefs);
       // Moderator + speaker magic-links skip the participant recording-
       // consent modal (they're the ones driving recording). Guests and
-      // registered participants see it when recording is enabled.
-      if (event.recordingEnabled && !isModerator && !isSpeaker) {
+      // registered participants see it when recording is enabled AND the
+      // installation has something that can record.
+      if (event.recordingEnabled && recordingAvailable && !isModerator && !isSpeaker) {
         setPhase('consent_pending');
       } else {
         // The waiting room has already collected the name + device
@@ -580,7 +639,7 @@ export default function LiveEventClient({
         setPhase('fetching_jwt');
       }
     },
-    [event.recordingEnabled, isModerator, isSpeaker]
+    [event.recordingEnabled, recordingAvailable, isModerator, isSpeaker]
   );
 
   // Poll event status during ready phase to detect ENDED
@@ -596,7 +655,7 @@ export default function LiveEventClient({
         if (!res.ok) return;
         const data = await res.json();
         if (data.status === 'ENDED' && eventStatus !== 'ENDED') {
-          setEventStatus('ENDED');
+          markEnded();
           // Drive the in-app "Evento concluso" closing screen instead of
           // leaving phase='ready' (which keeps repainting the JVB warming
           // overlay over a dead iframe — "Sala in preparazione"). Mark this
@@ -613,7 +672,7 @@ export default function LiveEventClient({
       }
     }, 5000);
     return () => clearInterval(pollInterval);
-  }, [phase, event.slug, eventStatus, isModerator]);
+  }, [phase, event.slug, eventStatus, isModerator, markEnded]);
 
   // While in the reconnecting phase, schedule an automatic re-init of
   // the JitsiRoom by flipping back to `fetching_jwt` (which already
@@ -647,7 +706,17 @@ export default function LiveEventClient({
       clearTimeout(reconnectTimerRef.current);
       reconnectTimerRef.current = null;
     }
-    setPhase('ended');
+    setPhase(closingPhase(eventStatusRef.current));
+  }, []);
+
+  // «Rientra» dalla schermata di uscita: di nuovo il token e la sala, come dopo
+  // una riconnessione. Il consenso alla registrazione e' gia' stato dato.
+  const handleRejoin = useCallback(() => {
+    userHangupRef.current = false;
+    reconnectAttemptsRef.current = 0;
+    setCredentials(null);
+    setJitsiJoined(false);
+    setPhase('fetching_jwt');
   }, []);
 
   const handleFeedbackClose = useCallback(() => {
@@ -812,7 +881,7 @@ export default function LiveEventClient({
       clearTimeout(reconnectTimerRef.current);
       reconnectTimerRef.current = null;
     }
-    if (!showFeedback) setPhase('ended');
+    if (!showFeedback) setPhase(closingPhase(eventStatusRef.current));
   }, [showFeedback, sendLeaveBeacon]);
 
   // P1 analytics — beacon leave time on tab close / navigation away, but only
@@ -833,9 +902,11 @@ export default function LiveEventClient({
 
   const handleJitsiLeft = useCallback(() => {
     // Intentional leave already flagged (app "Esci dalla sala" button /
-    // feedback flow / ENDED poll): show the post-event screen right away.
+    // feedback flow / ENDED poll): show the closing screen right away —
+    // «Evento concluso» only if the event really ended, otherwise the
+    // «you left» screen with a way back in.
     if (userHangupRef.current) {
-      if (!showFeedback) setPhase('ended');
+      if (!showFeedback) setPhase(closingPhase(eventStatusRef.current));
       return;
     }
 
@@ -849,7 +920,7 @@ export default function LiveEventClient({
       pendingLeaveTimerRef.current = null;
       // A readyToClose arrived during the grace window → intentional close.
       if (userHangupRef.current) {
-        if (!showFeedback) setPhase('ended');
+        if (!showFeedback) setPhase(closingPhase(eventStatusRef.current));
         return;
       }
       // No intentional-close signal — ask the server whether the event
@@ -859,13 +930,13 @@ export default function LiveEventClient({
           const res = await fetch(`/api/events/${event.slug}/lifecycle`);
           // readyToClose may still land while the fetch is in flight.
           if (userHangupRef.current) {
-            setPhase('ended');
+            setPhase(closingPhase(eventStatusRef.current));
             return;
           }
           if (res.ok) {
             const data = await res.json();
             if (data.status === 'ENDED') {
-              setEventStatus('ENDED');
+              markEnded();
               setPhase('ended');
               return;
             }
@@ -876,26 +947,26 @@ export default function LiveEventClient({
             reconnectAttemptsRef.current += 1;
             setPhase('reconnecting');
           } else {
-            setPhase('ended');
+            setPhase(closingPhase(eventStatusRef.current));
           }
         } catch {
           // Network error reaching our own API — most likely the user is
           // still offline. Treat as a transient drop and keep retrying
           // until we exhaust the attempt budget.
           if (userHangupRef.current) {
-            setPhase('ended');
+            setPhase(closingPhase(eventStatusRef.current));
             return;
           }
           if (reconnectAttemptsRef.current < MAX_RECONNECT_ATTEMPTS) {
             reconnectAttemptsRef.current += 1;
             setPhase('reconnecting');
           } else {
-            setPhase('ended');
+            setPhase(closingPhase(eventStatusRef.current));
           }
         }
       })();
     }, LEAVE_RECONNECT_GRACE_MS);
-  }, [showFeedback, event.slug]);
+  }, [showFeedback, event.slug, markEnded]);
   const handleParticipantCountChanged = useCallback((count: number) => {
     setParticipantCount(count);
   }, []);
@@ -938,11 +1009,18 @@ export default function LiveEventClient({
   // tokenless report only where nobody could hold a token (INSTANT room, or an
   // event with no registrations) — elsewhere it answers 401, and we then stop
   // rather than re-posting a request that will be refused for the whole event.
+  //
+  // Only while THIS client is in the conference: the API handle outlives the
+  // call (it is never reset), so gating on it alone would keep a page left on
+  // the closing screen posting every 30 s for as long as the tab stays open.
+  // A 404 means the event is no longer LIVE — nothing more to record for this
+  // session; a rejoin starts a fresh reporter.
+  const inConference = phase === 'ready' && jitsiJoined;
   useEffect(() => {
-    if (!jitsiApi) return;
-    let refused = false;
+    if (!jitsiApi || !inConference) return;
+    let stopped = false;
     const report = () => {
-      if (refused) return;
+      if (stopped) return;
       const count = participantCountRef.current;
       if (count > 0) {
         fetch(`/api/events/${event.slug}/analytics/peak`, {
@@ -951,15 +1029,18 @@ export default function LiveEventClient({
           body: JSON.stringify(token ? { count, token } : { count }),
         })
           .then((res) => {
-            if (res.status === 401 || res.status === 403) refused = true;
+            if (res.status === 401 || res.status === 403 || res.status === 404) stopped = true;
           })
           .catch(() => {});
       }
     };
     report();
     const interval = setInterval(report, 30000);
-    return () => clearInterval(interval);
-  }, [jitsiApi, event.slug, token]);
+    return () => {
+      stopped = true;
+      clearInterval(interval);
+    };
+  }, [jitsiApi, inConference, event.slug, token]);
 
   // Receive a moderator "lower your hand" control signal and lower our OWN
   // hand. The Jitsi IFrame API can lower only the local hand (toggleRaiseHand),
@@ -982,7 +1063,10 @@ export default function LiveEventClient({
     if (!jitsiApi) return;
 
     const onJoined = (evt: { id?: string }) => {
-      if (evt?.id) myEndpointIdRef.current = evt.id;
+      if (evt?.id) {
+        myEndpointIdRef.current = evt.id;
+        setLocalEndpointId(evt.id);
+      }
     };
     // Authoritative own-hand identity — sourced ONLY from Jitsi's broadcast for
     // OUR endpoint, never inferred. Also gates whether we hold the control SSE.
@@ -1055,7 +1139,7 @@ export default function LiveEventClient({
     if (jitsiApi) {
       jitsiApi.executeCommand('hangup');
     } else {
-      setPhase('ended');
+      setPhase(closingPhase(eventStatusRef.current));
     }
   }, [jitsiApi]);
 
@@ -1140,7 +1224,7 @@ export default function LiveEventClient({
         return;
       }
       userHangupRef.current = true;
-      setEventStatus('ENDED');
+      markEnded();
       setShowLeaveChoice(false);
       setShowEndDestino(false);
       setEndingForAll(false);
@@ -1150,7 +1234,7 @@ export default function LiveEventClient({
       setEndingForAll(false);
       setEndForAllError(t('leaveChoice.endError'));
     }
-  }, [event.id, token, jitsiApi, t, endDestino, endGenAi]);
+  }, [event.id, token, jitsiApi, t, endDestino, endGenAi, markEnded]);
 
   const handleStartEvent = useCallback(async () => {
     const res = await fetch(`/api/events/${event.id}`, {
@@ -1205,7 +1289,9 @@ export default function LiveEventClient({
             imageUrl: event.imageUrl,
             coverImageUrl: event.coverImageUrl,
             maxParticipants: event.maxParticipants ?? 300,
-            recordingEnabled: event.recordingEnabled,
+            // L'avviso «questo evento viene registrato» solo dove qualcosa puo'
+            // registrare: vedi `recordingAvailable`.
+            recordingEnabled: event.recordingEnabled && recordingAvailable,
             tempRecordingUrl: event.tempRecordingUrl,
             recordingUrl: event.recordingUrl,
             waitingRoomAudioUrl: event.waitingRoomAudioUrl,
@@ -1224,7 +1310,7 @@ export default function LiveEventClient({
           warmup={warmup}
           // Uscita esplicita dalla sala d'attesa: le instant call non hanno una
           // pagina evento pubblica (404), quindi tornano alla home.
-          exitHref={event.eventType === 'INSTANT' ? '/' : `/events/${event.slug}`}
+          exitHref={exitDestination(event.eventType, event.slug)}
           chatToken={token}
           eventType={event.eventType === 'INSTANT' ? 'INSTANT' : 'SCHEDULED'}
           defaultName={chosenName || initialDisplayName}
@@ -1244,6 +1330,25 @@ export default function LiveEventClient({
     );
   }
 
+  // Il ritorno dalle schermate di uscita. Il moderatore principale torna al
+  // pannello dell'evento; co-moderatori, relatori e partecipanti alla pagina
+  // evento (il pannello accetta solo il token primario), o alla home per una
+  // chiamata istantanea, che una pagina evento non ce l'ha.
+  const exitHref = exitDestination(event.eventType, event.slug);
+  const backLink = isPrimaryModerator ? (
+    <Link href={percorso(`/admin/events/${event.id}?token=${token}`)}>
+      <Button color="primary" outline tag="span">
+        {tc('back')}
+      </Button>
+    </Link>
+  ) : (
+    <Link href={percorso(exitHref)}>
+      <Button color="primary" outline tag="span">
+        {exitHref === '/' ? t('backToHome') : t('backToEvent')}
+      </Button>
+    </Link>
+  );
+
   // ── Ended ──
   if (phase === 'ended') {
     return (
@@ -1256,21 +1361,36 @@ export default function LiveEventClient({
             setShowFeedback(true)) sopra questa schermata di chiusura. */}
         {feedbackModal}
 
-        {isPrimaryModerator ? (
-          <Link href={percorso(`/admin/events/${event.id}?token=${token}`)}>
-            <Button color="primary" outline tag="span">
-              {tc('back')}
-            </Button>
-          </Link>
-        ) : (
-          // Co-moderatori, speaker e partecipanti: il pannello admin accetta
-          // solo il token primario, quindi torniamo alla pagina evento.
-          <Link href={percorso(`/events/${event.slug}`)}>
-            <Button color="primary" outline tag="span">
-              {t('backToEvent')}
-            </Button>
-          </Link>
+        {backLink}
+      </div>
+    );
+  }
+
+  // ── Uscito, evento ancora aperto ──
+  // «Esci dalla sala», «Esci solo tu» o una riconnessione abbandonata: l'evento
+  // continua, e dire «terminato» avrebbe fatto credere a chi modera di averlo
+  // chiuso — senza lo scaler nessuno lo chiuderebbe al posto suo.
+  if (phase === 'left') {
+    return (
+      <div className="container py-5 text-center">
+        <Icon icon="it-info-circle" size="xl" className="text-primary mb-3" />
+        <h1 className="h3 mb-3">{t('leftTitle')}</h1>
+        <p className="mb-3">{t('leftMessage')}</p>
+        {isModerator && (
+          <p className="mb-4 mx-auto text-muted" style={{ maxWidth: 560 }}>
+            {t('leftModeratorReminder', { action: t('leaveChoice.endForAll') })}
+          </p>
         )}
+
+        {feedbackModal}
+
+        <div className="d-flex flex-wrap justify-content-center gap-3 mt-4">
+          <Button color="primary" onClick={handleRejoin}>
+            <Icon icon="it-video" size="sm" color="white" className="me-2" />
+            {t('rejoin')}
+          </Button>
+          {backLink}
+        </div>
       </div>
     );
   }
@@ -1291,9 +1411,9 @@ export default function LiveEventClient({
           >
             {tc('retry')}
           </Button>
-          <Link href={percorso(`/events/${event.slug}`)}>
+          <Link href={percorso(exitHref)}>
             <Button color="secondary" outline tag="span">
-              {t('backToEvent')}
+              {exitHref === '/' ? t('backToHome') : t('backToEvent')}
             </Button>
           </Link>
         </div>
@@ -1391,6 +1511,11 @@ export default function LiveEventClient({
   // ── Ready: Jitsi room ──
   const isActualModerator = credentials.role === 'moderator';
   const isInstantCall = event.eventType === 'INSTANT';
+  // Lavagna in sala: scelta dell'evento (le chiamate istantanee l'hanno
+  // sempre) E backend presente nell'installazione. Senza backend nessuna
+  // delle tre superfici la offre: pulsante della barra di Jitsi, pulsante del
+  // moderatore e promemoria di esportazione.
+  const whiteboardOn = whiteboardInfraReady && (event.whiteboardEnabled || isInstantCall);
   // Only ever show the "warming up" overlay while the event is genuinely
   // LIVE and the bridge isn't ready yet. Once the event is ENDED we render
   // the closing screen (phase='ended'); guarding here is belt-and-braces so
@@ -1445,7 +1570,7 @@ export default function LiveEventClient({
           recorderPhase={recorderPhase}
           participantsCanUnmute={event.participantsCanUnmute}
           participantsCanStartVideo={event.participantsCanStartVideo}
-          whiteboardEnabled={event.whiteboardEnabled || isInstantCall}
+          whiteboardEnabled={whiteboardOn}
           whiteboardInfraReady={whiteboardInfraReady}
           localDisplayName={credentials?.displayName ?? chosenName ?? ''}
           isPrimaryModerator={isPrimaryModerator}
@@ -1513,7 +1638,8 @@ export default function LiveEventClient({
               participantsCanStartVideo={event.participantsCanStartVideo || isSpeaker}
               participantsCanShareScreen={event.participantsCanShareScreen || isSpeaker}
               enableFileSharing={isInstantCall}
-              whiteboardEnabled={event.whiteboardEnabled || isInstantCall}
+              whiteboardEnabled={whiteboardOn}
+              whiteboardInfraReady={whiteboardInfraReady}
               videoQuality={event.videoQuality}
               reactionsMode={reactionsMode}
               rnnoiseEnforceOff={rnnoiseEnforceOff}
@@ -1548,9 +1674,10 @@ export default function LiveEventClient({
           qaEnabled={event.qaEnabled}
           chatEnabled={event.chatEnabled}
           agendaEnabled={event.agendaEnabled}
-          whiteboardEnabled={event.whiteboardEnabled || isInstantCall}
+          whiteboardEnabled={whiteboardOn}
           whiteboardInfraReady={whiteboardInfraReady}
           jitsiApi={jitsiApi}
+          localParticipantId={localEndpointId}
           displayName={credentials.displayName}
           canReactAgenda={!isModerator && !isSpeaker}
           guestId={isGuest ? guestId : undefined}
@@ -1741,6 +1868,8 @@ interface LiveSidebarProps {
   /** …and the installation actually serves it (see LiveEventClientProps). */
   whiteboardInfraReady: boolean;
   jitsiApi: JitsiMeetExternalAPI | null;
+  /** Endpoint id di questo browser nella conferenza (vedi ParticipantPanel). */
+  localParticipantId: string | null;
   displayName: string;
   /** Audience (guests + registered participants) may react to agenda items;
    *  presenters (moderators/speakers) only see the tallies. */
@@ -1767,6 +1896,7 @@ function LiveSidebar({
   whiteboardEnabled,
   whiteboardInfraReady,
   jitsiApi,
+  localParticipantId,
   displayName,
   canReactAgenda = false,
   guestId,
@@ -2373,6 +2503,7 @@ function LiveSidebar({
             <ParticipantPanel
               api={jitsiApi}
               isModerator={isModerator}
+              localParticipantId={localParticipantId}
               onCountChange={setParticipantCount}
             />
           )}

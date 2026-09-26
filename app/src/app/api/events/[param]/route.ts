@@ -1,3 +1,5 @@
+import type { Prisma } from '@prisma/client';
+
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import {
   NotFoundError,
@@ -9,6 +11,7 @@ import {
 import { prisma } from '@/lib/db';
 import { publishEventStatus, publishFlagsIfChanged } from '@/lib/live-state/publish';
 import { reviveStatus } from '@/lib/events/lifecycle';
+import { closeOpenSessions } from '@/lib/events/call-sessions';
 import { removeFilesOfEventsBeingDeleted } from '@/lib/events/material-files';
 import { updateEventSchema } from '@/lib/validation/schemas';
 import { resolveLocale, localiseEvent, pruneEmptyTranslations, type LocalizedField } from '@/lib/utils/locale';
@@ -19,6 +22,8 @@ import {
   constantTimeEqual,
 } from '@/lib/auth/moderator';
 import { sendDateChangeNotifications } from '@/lib/email/notification';
+import { adminRequestLocale, sendPrimaryModeratorLink } from '@/lib/email/moderator-link';
+import { getSettings } from '@/lib/settings';
 import { encryptPIIOrNull, tryDecryptPII } from '@/lib/crypto/pii';
 import { calculateEstimates } from '@/lib/estimates';
 import { hashJoinPassword } from '@/lib/auth/password';
@@ -198,6 +203,16 @@ export const PUT = withErrorHandling(async (request, context) => {
 
   const data = parsed.data;
 
+  // L'indirizzo del moderatore principale lo cambia solo il principale: a quel
+  // cambio parte l'email con il suo link, che non scade e non si revoca. Un
+  // co-moderatore potrebbe altrimenti farselo spedire a un indirizzo suo e
+  // restare gestore dopo la revoca. Il wizard di un co-moderatore rimanda il
+  // campo vuoto (la GET non glielo mostra): si ignora, non si rifiuta.
+  const isPrimaryModerator = constantTimeEqual(event.moderatorToken, token);
+  if (!isPrimaryModerator) {
+    delete (data as Record<string, unknown>).moderatorEmail;
+  }
+
   // Il modello dell'informativa è una chiave esterna: un id inesistente
   // farebbe fallire la scrittura con un codice non mappato, cioè con un 500
   // al posto di un errore sul campo.
@@ -320,7 +335,7 @@ export const PUT = withErrorHandling(async (request, context) => {
         participantsCanShareScreen: data.participantsCanShareScreen,
       };
 
-  const updated = await prisma.event.update({
+  const updateArgs = {
     where: { id: eventId },
     data: {
       ...(revivedStatus && { status: revivedStatus }),
@@ -477,11 +492,48 @@ export const PUT = withErrorHandling(async (request, context) => {
         expectedSpeakers: data.expectedSpeakers,
       }),
     },
-  });
+  } satisfies Prisma.EventUpdateArgs;
+
+  // Un evento che lascia LIVE, o che passa da in servizio a concluso o
+  // archiviato, chiude le sessioni di chiamata ancora aperte nella stessa
+  // transazione del cambio di stato: è così che finisce di solito un evento
+  // («Termina per tutti»), e senza questo la sessione resterebbe aperta per
+  // sempre e le statistiche riporterebbero la finestra programmata al posto
+  // della durata vera. Da ENDED ad ARCHIVED non si chiude «adesso»: le
+  // sessioni rimaste aperte su un evento già concluso le ripara il giro del
+  // ciclo di vita, con un orario stimato sulla chiusura (lib/events/call-sessions).
+  const nextStatus = data.status ?? revivedStatus ?? event.status;
+  const closesSessions =
+    nextStatus !== event.status &&
+    (event.status === 'LIVE' ||
+      (!isTerminalStatus && (nextStatus === 'ENDED' || nextStatus === 'ARCHIVED')));
+  const updated = closesSessions
+    ? await prisma.$transaction(async (tx) => {
+        const aggiornato = await tx.event.update(updateArgs);
+        await closeOpenSessions(tx, [eventId], new Date());
+        return aggiornato;
+      })
+    : await prisma.event.update(updateArgs);
 
   if (dateChanged && event.status === 'PUBLISHED') {
     // Ogni iscritto riceve l'avviso nella lingua in cui si e' iscritto.
     sendDateChangeNotifications({ eventId });
+  }
+
+  // Il link personale del moderatore principale: alla pubblicazione, o quando
+  // cambia l'indirizzo. Una volta sola per indirizzo (vedi moderator-link):
+  // ripubblicare o risalvare dal wizard non rispedisce.
+  const moderatorEmailChanged =
+    data.moderatorEmail !== undefined &&
+    (data.moderatorEmail || null) !== (tryDecryptPII(event.moderatorEmail) || null);
+  if (
+    (updated.status === 'PUBLISHED' && event.status !== 'PUBLISHED') ||
+    moderatorEmailChanged
+  ) {
+    const { defaultLocale: predefinita } = await getSettings();
+    await sendPrimaryModeratorLink(eventId, {
+      locale: adminRequestLocale(request, predefinita),
+    });
   }
 
   // Chi è in sala vede subito una funzione accesa o spenta, senza aspettare il

@@ -127,7 +127,8 @@
         "outlook": "Outlook / Office 365",
         "yahoo": "Yahoo Calendar",
         "downloadIcs": "Scarica file .ics"
-      }
+      },
+      "registrationEnded": "L'evento è terminato: la registrazione è chiusa."
     },
     "manage": {
       "toggleChat": "Chat",
@@ -382,7 +383,8 @@
       "questionRestore": "Ripristina",
       "questionStatusFailed": "Non è stato possibile aggiornare la domanda",
       "questionNeedsText": "Scrivi il testo della domanda: un allegato da solo non entra in coda",
-      "lensTruncated": "Sono caricati i messaggi più recenti: potrebbero esserci domande più vecchie non in elenco."
+      "lensTruncated": "Sono caricati i messaggi più recenti: potrebbero esserci domande più vecchie non in elenco.",
+      "attachUnavailable": "Gli allegati non sono disponibili su questa installazione."
     },
     "role": {
       "moderator": "Moderatore",
@@ -403,7 +405,8 @@
         "unknown": "N/D"
       },
       "volume": "Volume",
-      "volumeFor": "Volume di {name}"
+      "volumeFor": "Volume di {name}",
+      "kickName": "Espelli {name}"
     },
     "moderator": {
       "muteAll": "Silenzia tutti",
@@ -453,7 +456,18 @@
       "remainingLabel": "Tempo rimanente (clicca per il tempo trascorso)",
       "elapsedLabel": "Tempo trascorso (clicca per il tempo rimanente)"
     },
-    "videoCallFrameTitle": "Videochiamata dell’evento"
+    "videoCallFrameTitle": "Videochiamata dell’evento",
+    "insecureContextTitle": "Indirizzo non sicuro",
+    "insecureContextBody": "Questa pagina è aperta con http://: il browser non consente di usare microfono e videocamera, e la videochiamata non può partire. Apri la stessa pagina all'indirizzo sicuro.",
+    "insecureContextLink": "Apri https://{host}",
+    "conferenceUnreachableTitle": "Il servizio di videochiamata non risponde",
+    "conferenceUnreachableBody": "Il browser non riesce a raggiungere il server della videochiamata ({host}). Aprilo in una nuova scheda: se il browser mostra un avviso di sicurezza, accettalo, poi torna qui e riprova. Se la pagina non si apre, la rete da cui ti colleghi potrebbe bloccarlo.",
+    "conferenceOpenHost": "Apri {host} in una nuova scheda",
+    "leftTitle": "Sei uscito dalla sala",
+    "leftMessage": "L'evento è ancora in corso: puoi rientrare quando vuoi.",
+    "leftModeratorReminder": "L'evento resta aperto finché qualcuno non lo termina. A evento finito, rientra e scegli «{action}».",
+    "rejoin": "Rientra",
+    "backToHome": "Torna alla home page"
   },
   "qa": {
     "title": "Domande e Risposte",
@@ -567,7 +581,8 @@
       "quotaExceeded": "Questo evento ha raggiunto il limite dei file caricati ({maxFiles} file, {maxMb} MB in tutto): rimuovine qualcuno per caricarne altri",
       "uploadBusy": "Troppi caricamenti in questo momento: riprova tra qualche secondo",
       "deleteFailed": "Impossibile eliminare il materiale"
-    }
+    },
+    "addedByStaff": "Aggiunto dall'organizzazione"
   },
   "reminders": {
     "title": "Notifiche",
@@ -680,7 +695,8 @@
       "errorGeneric": "Errore durante il caricamento del file",
       "helpImage": "Formati supportati: PNG, JPEG, WebP, SVG, GIF — max 10 MB",
       "helpAudio": "Formati supportati: MP3, WAV, OGG, M4A, WebM — max 20 MB",
-      "helpDocument": "Formati supportati: PDF, DOCX, PPTX, XLSX, TXT — max 25 MB"
+      "helpDocument": "Formati supportati: PDF, DOCX, PPTX, XLSX, TXT — max 25 MB",
+      "uploadsUnavailable": "Il caricamento di file non è disponibile su questa installazione: incolla l'URL del file."
     },
     "rubricaPicker": {
       "loading": "Ricerca in corso…",
@@ -718,7 +734,9 @@
           "endsAt": "La data di fine deve essere successiva alla data di inizio.",
           "titleRequired": "Il titolo è obbligatorio (almeno 3 caratteri).",
           "titleRequiredOtherLocale": "Il titolo nella lingua predefinita ({locale}) è obbligatorio: passa alla scheda {locale}.",
-          "maxParticipants": "Inserisci un numero tra 2 e 500."
+          "maxParticipants": "Inserisci un numero tra 2 e 500.",
+          "descriptionRequired": "La descrizione è obbligatoria (almeno {min} caratteri).",
+          "descriptionRequiredOtherLocale": "La descrizione nella lingua predefinita ({locale}) è obbligatoria: passa alla scheda {locale}."
         },
         "senderRatioLabel": "Percentuale attiva stimata",
         "senderRatioHelp": "Quanti partecipanti si aspettano di avere microfono/video attivo. Aiuta a dimensionare il server video.",
@@ -910,7 +928,11 @@
         "speakers": "relatori",
         "materials": "materiali",
         "questionnaires": "questionari"
-      }
+      },
+      "revocationFailed": "La revoca di {name} non è riuscita: il suo link è ancora valido. Salva di nuovo per riprovare, oppure revocalo dalla scheda «{tab}» della pagina dell'evento.",
+      "validationFailedDetail": "Il server ha rifiutato alcuni dati: {reason}. Correggi e riprova.",
+      "publishFailed": "L'evento è stato creato ma non pubblicato: resta in bozza. Pubblicalo dalla pagina dell'evento.",
+      "publishFailedDetail": "L'evento è stato creato ma non pubblicato: resta in bozza. Il server ha risposto: {reason}. Pubblicalo dalla pagina dell'evento."
     },
     "nav": {
       "events": "Eventi",
@@ -1330,7 +1352,7 @@
       "wordCloudEnabled": "Nuvola di parole live",
       "wordCloudEnabledDesc": "Chi partecipa manda una parola e la nuvola si aggiorna in diretta. Utile per aprire un confronto o raccogliere un sentimento in pochi secondi.",
       "whiteboardEnabled": "Lavagna condivisa",
-      "whiteboardEnabledDesc": "Abilita la lavagna collaborativa (Excalidraw) nativa: i moderatori possono aprirla dalla toolbar durante l'evento. Sempre attiva nelle chiamate istantanee.",
+      "whiteboardEnabledDesc": "Abilita la lavagna collaborativa (Excalidraw) nativa: i moderatori possono aprirla dalla toolbar durante l'evento. Richiede il servizio lavagna dell'installazione; dove c'è, nelle chiamate istantanee è sempre attiva.",
       "autoStartRecording": "Avvia la registrazione automaticamente",
       "autoStartRecordingDesc": "Al momento dell'inizio dell'evento la registrazione parte da sola (senza chiedere conferma al moderatore). Così eventuali ritardatari trovano già il player disponibile.",
       "aiSectionHeading": "Post-produzione automatica",
@@ -1406,7 +1428,8 @@
       "retentionPreviewRecordings": "Registrazioni video",
       "retentionPreviewKept": "Le statistiche aggregate e i metadati dell'evento vengono mantenuti.",
       "configPreview": "Anteprima configurazione",
-      "templateApplied": "Template applicato: {name}. Puoi modificare tutte le impostazioni."
+      "templateApplied": "Template applicato: {name}. Puoi modificare tutte le impostazioni.",
+      "whiteboardUnavailable": "Non disponibile su questa installazione: manca il servizio lavagna di Jitsi, che chi gestisce la piattaforma può attivare."
     },
     "links": {
       "title": "Link dell'evento",
@@ -2015,9 +2038,9 @@
       "version": "Versione",
       "environment": "Ambiente",
       "modes": {
-        "simple": "Semplice (Docker Compose)",
-        "standard": "Standard (Kubernetes)",
-        "full": "Completa (Kubernetes con scale-to-zero)",
+        "simple": "Semplice",
+        "standard": "Standard",
+        "full": "Completa (bridge con scale-to-zero)",
         "unknown": "Sconosciuta"
       },
       "database": {
@@ -2031,7 +2054,9 @@
         "title": "Jitsi Meet",
         "reachable": "Raggiungibile",
         "unreachable": "Non raggiungibile",
-        "notConfigured": "Non configurato"
+        "notConfigured": "Non configurato",
+        "degraded": "Raggiungibile, ma risponde con errori o lentamente",
+        "publicCheckFailed": "Verifica dall'indirizzo pubblico non riuscita ({code}): il server del portale non riconosce il certificato o il nome. Le conferenze possono funzionare comunque."
       },
       "jvb": {
         "title": "Video Bridge (JVB)",
@@ -2039,7 +2064,9 @@
         "replicas": "{current}/{max} nodi",
         "preScale": "Pre-scale: {minutes} min",
         "fixedMode": "Modalità fissa",
-        "scalerEnabled": "Scaler abilitato"
+        "scalerEnabled": "Scaler abilitato",
+        "fixedDown": "Il ponte video non risponde",
+        "unmonitored": "Stato non monitorato: manca l'indirizzo del ponte (JVB_HEALTH_URL)"
       },
       "jibri": {
         "title": "Registrazione (Jibri)",
@@ -2061,7 +2088,11 @@
         "metrics": "Endpoint metriche"
       },
       "note": "Le modifiche infrastrutturali si effettuano tramite Helm values e la pipeline CI/CD.",
-      "deployDocs": "Documentazione deploy"
+      "deployDocs": "Documentazione deploy",
+      "platforms": {
+        "kubernetes": "Su Kubernetes",
+        "other": "Fuori da Kubernetes (Docker Compose o server singolo)"
+      }
     },
     "instantCalls": {
       "title": "Chiamate rapide",
@@ -2166,9 +2197,9 @@
       "latencyP99": "Latenza P99",
       "requestRate": "Richieste/s",
       "chartLatencyQuantiles": "Latenza applicazione — P50 / P95 / P99",
-      "participantsNow": "Partecipanti attivi",
+      "participantsNow": "Partecipanti sul ponte video",
       "jvbStress": "Carico JVB",
-      "conferences": "Conferenze attive",
+      "conferences": "Conferenze sul ponte video",
       "octoRelay": "Relay inter-bridge Octo",
       "interBridge": "Traffico Octo",
       "chartCpu": "Utilizzo CPU pod applicazione",
@@ -2195,7 +2226,8 @@
       "liveNow": "LIVE",
       "provisioningNow": "in allestimento",
       "idleNow": "IDLE (in pausa)",
-      "scaleToZeroHelp": "IDLE è lo stato normale per un evento senza traffico da più del grace period. Alla prossima visita di un utente torna a PROVISIONING e poi LIVE."
+      "scaleToZeroHelp": "IDLE è lo stato normale per un evento senza traffico da più del grace period. Alla prossima visita di un utente torna a PROVISIONING e poi LIVE.",
+      "capacityFromStatus": "Valori attuali letti dal ponte video. Lo storico richiede Prometheus."
     },
     "bulk": {
       "selectAll": "Seleziona tutti",
@@ -2897,7 +2929,7 @@
       "requestSubmittedBody": "Se l'indirizzo email corrisponde a una registrazione, ti abbiamo inviato un link per confermare la cancellazione. Il link sarà valido per 1 ora.",
       "linkInvalid": "Il link non è valido o è scaduto. Richiedi un nuovo link.",
       "confirmWarning": "Stai per cancellare in modo definitivo tutti i dati personali associati al tuo indirizzo email.",
-      "confirmBody": "Verranno cancellate le registrazioni, le domande, i voti ai sondaggi, i feedback e i reminder. L'operazione è irreversibile.",
+      "confirmBody": "Verranno cancellate le registrazioni, le domande, i voti ai sondaggi, i feedback, i reminder e la tua voce nella rubrica degli eventi. L'operazione è irreversibile.",
       "confirmButton": "Conferma cancellazione",
       "cancel": "Annulla",
       "processing": "Cancellazione in corso...",
@@ -2919,7 +2951,7 @@
           "body": "Titolare del trattamento: {organization}. Il trattamento dei dati personali avviene nell'ambito delle sue attività istituzionali, per consentire la gestione tecnica e organizzativa degli eventi pubblici online."
         },
         "data": {
-          "title": "Dati trattati e finalita",
+          "title": "Dati trattati e finalità",
           "body": "La piattaforma tratta i dati strettamente necessari alla registrazione e partecipazione agli eventi, come nome, email e gli eventuali campi facoltativi configurati dall'organizzatore. I dati sono usati per inviare il link personale di accesso, gestire la partecipazione all'evento, eventuali promemoria e gli adempimenti collegati alla sicurezza del servizio."
         },
         "retention": {
@@ -2933,7 +2965,7 @@
       },
       "note": {
         "title": "Richiesta dei propri dati",
-        "body": "Se hai partecipato a un evento e vuoi verificare quali dati personali risultano associati al tuo indirizzo email, puoi usare la funzionalita dedicata disponibile sulla piattaforma.",
+        "body": "Se hai partecipato a un evento e vuoi verificare quali dati personali risultano associati al tuo indirizzo email, puoi usare la funzionalità dedicata disponibile sulla piattaforma.",
         "linkLabel": "Richiedi i miei dati"
       }
     },
@@ -2982,8 +3014,8 @@
           "body": "Titolare della piattaforma: {organization}. La piattaforma è resa disponibile per l'organizzazione e la fruizione di eventi pubblici online di interesse istituzionale."
         },
         "usage": {
-          "title": "Modalita di utilizzo",
-          "body": "Gli utenti sono tenuti a utilizzare il servizio in modo corretto, senza compromettere la sicurezza della piattaforma, la disponibilita delle funzionalita o il regolare svolgimento degli eventi. Eventuali abusi o usi impropri possono comportare limitazioni di accesso al servizio."
+          "title": "Modalità di utilizzo",
+          "body": "Gli utenti sono tenuti a utilizzare il servizio in modo corretto, senza compromettere la sicurezza della piattaforma, la disponibilità delle funzionalità o il regolare svolgimento degli eventi. Eventuali abusi o usi impropri possono comportare limitazioni di accesso al servizio."
         },
         "liability": {
           "title": "Limitazioni di responsabilità",
@@ -2994,27 +3026,27 @@
     "security": {
       "metaTitle": "Sicurezza e trasparenza",
       "title": "Sicurezza e trasparenza",
-      "intro": "Il codice sorgente di questa piattaforma e pubblico e sottoposto a controlli automatici di sicurezza. Questa pagina riassume gli strumenti di trasparenza disponibili per chi utilizza il servizio.",
+      "intro": "Il codice sorgente di questa piattaforma è pubblico e sottoposto a controlli automatici di sicurezza. Questa pagina riassume gli strumenti di trasparenza disponibili per chi utilizza il servizio.",
       "sections": {
         "openSource": {
           "title": "Software open source",
-          "body": "L'intera piattaforma e rilasciata come software libero. Il codice sorgente e consultabile, scaricabile e auditabile da chiunque, coerentemente con i principi di trasparenza della Pubblica Amministrazione italiana."
+          "body": "L'intera piattaforma è rilasciata come software libero. Il codice sorgente è consultabile, scaricabile e auditabile da chiunque, coerentemente con i principi di trasparenza della Pubblica Amministrazione italiana."
         },
         "sbom": {
           "title": "SBOM (Software Bill of Materials)",
-          "body": "Ogni release pubblicata su GitHub include un SBOM in formato SPDX per l'immagine container e un SBOM CycloneDX per le dipendenze npm dell'applicazione. I file sono allegati direttamente alla release e possono essere utilizzati per audit di sicurezza e conformita."
+          "body": "Ogni release pubblicata su GitHub include un SBOM in formato SPDX per l'immagine container e un SBOM CycloneDX per le dipendenze npm dell'applicazione. I file sono allegati direttamente alla release e possono essere utilizzati per audit di sicurezza e conformità."
         },
         "scorecard": {
           "title": "OpenSSF Scorecard",
-          "body": "Il repository e analizzato periodicamente da OpenSSF Scorecard, che valuta automaticamente decine di pratiche di sicurezza del progetto (protezione del branch, workflow con permessi minimi, firma dei commit, gestione delle dipendenze). Il punteggio aggiornato e pubblico."
+          "body": "Il repository è analizzato periodicamente da OpenSSF Scorecard, che valuta automaticamente decine di pratiche di sicurezza del progetto (protezione del branch, workflow con permessi minimi, firma dei commit, gestione delle dipendenze). Il punteggio aggiornato è pubblico."
         },
         "scanning": {
           "title": "Scansioni automatiche",
           "body": "Le dipendenze vengono monitorate in continuo tramite Dependabot e npm audit. La pipeline di release genera immagini firmate e tracciabili tramite la label org.opencontainers.image.revision, che lega ogni immagine al commit esatto da cui proviene."
         },
         "disclosure": {
-          "title": "Segnalazione di vulnerabilita",
-          "body": "La politica di disclosure responsabile delle vulnerabilita e descritta nel file SECURITY.md del repository. Eventuali problemi di sicurezza possono essere segnalati in modo confidenziale secondo le istruzioni riportate."
+          "title": "Segnalazione di vulnerabilità",
+          "body": "La politica di disclosure responsabile delle vulnerabilità è descritta nel file SECURITY.md del repository. Eventuali problemi di sicurezza possono essere segnalati in modo confidenziale secondo le istruzioni riportate."
         }
       },
       "links": {
@@ -3120,7 +3152,7 @@
     "nodesReady": "nodi pronti",
     "scaling": "in scala",
     "jvbStress": "Carico JVB",
-    "participantsConnected": "partecipanti connessi",
+    "participantsConnected": "partecipanti sul ponte video",
     "videoInteractive": "interattivo",
     "videoWebinar": "webinar",
     "participantsAvailable": "partecipanti disponibili",
@@ -3164,7 +3196,12 @@
       "lastFailure": "Ultimo errore {when}",
       "artifactsProduced": "{count, plural, =0 {nessun artefatto} one {1 artefatto prodotto} other {# artefatti prodotti}}",
       "eventsEnabled": "{count, plural, =0 {nessun evento con AI} one {1 evento con AI attiva} other {# eventi con AI attiva}}"
-    }
+    },
+    "jvbFixedUp": "{count, plural, =1 {Ponte video attivo} other {Ponte video attivo · # bridge previsti}}",
+    "jvbFixedDown": "Il ponte video non risponde",
+    "jvbFixedDownDetail": "I partecipanti non ricevono audio e video finché il ponte non torna raggiungibile.",
+    "jvbUnmonitored": "Stato non monitorato",
+    "jvbUnmonitoredDetail": "Questa installazione non interroga il ponte video: il suo stato non è disponibile qui."
   },
   "infraMap": {
     "loading": "Caricamento mappa infrastruttura...",
@@ -3172,8 +3209,8 @@
     "ariaLabel": "Mappa dell'infrastruttura del sistema",
     "title": "Mappa infrastruttura",
     "subtitle": "Visualizzazione in tempo reale dell'architettura e dello stato dei servizi",
-    "participants": "Partecipanti",
-    "conferences": "Conferenze",
+    "participants": "Partecipanti sul ponte video",
+    "conferences": "Conferenze sul ponte video",
     "bandwidthIn": "Banda in entrata",
     "bandwidthOut": "Banda in uscita",
     "recordings": "Videoregistrazioni",
@@ -3259,23 +3296,33 @@
       "jitsiWeb": {
         "healthy": "La sala videoconferenza è raggiungibile e pronta per gli eventi.",
         "down": "La sala videoconferenza non è raggiungibile. Non è possibile avviare o partecipare agli eventi.",
-        "standby": "La sala videoconferenza non è configurata."
+        "standby": "La sala videoconferenza non è configurata.",
+        "degraded": "La sala videoconferenza risponde, ma con errori o lentamente.",
+        "publicCheckFailed": "Il portale non riesce a verificare la sala dal suo indirizzo pubblico: dal server il certificato o il nome non risultano validi. Per i partecipanti la sala può funzionare comunque.",
+        "unmonitored": "Lo stato della sala videoconferenza non è monitorato su questa installazione."
       },
       "prosody": {
         "healthy": "La messaggistica interna tra i servizi video funziona correttamente.",
         "down": "La messaggistica interna non è raggiungibile. I servizi video non possono comunicare tra loro.",
-        "standby": "Il servizio di messaggistica non è configurato."
+        "standby": "Il servizio di messaggistica non è configurato.",
+        "degraded": "La messaggistica interna risponde, ma con errori o lentamente.",
+        "publicCheckFailed": "Il portale non riesce a verificare la messaggistica interna dall'indirizzo pubblico della sala: dal server il certificato o il nome non risultano validi. Le conferenze possono funzionare comunque.",
+        "unmonitored": "Lo stato della messaggistica interna non è monitorato su questa installazione."
       },
       "jicofo": {
         "healthy": "Il coordinatore conferenze è attivo e gestisce le sessioni.",
         "down": "Il coordinatore conferenze non è raggiungibile. Non è possibile creare nuove conferenze.",
-        "standby": "Il coordinatore conferenze non è configurato."
+        "standby": "Il coordinatore conferenze non è configurato.",
+        "degraded": "Il coordinatore conferenze risponde, ma con errori o lentamente.",
+        "unmonitored": "Lo stato del coordinatore conferenze non è monitorato su questa installazione."
       },
       "jvb": {
         "healthy": "Il ponte video è attivo e trasmette audio/video ai partecipanti.",
         "scaling": "Il ponte video si sta preparando per un evento imminente. I server vengono creati automaticamente.",
         "standby": "Il ponte video è in standby (scale-to-zero). Nessun evento richiede il bridge al momento — si attiva automaticamente prima dell'inizio o al primo ingresso di un utente.",
-        "stale": "Un evento attende il ponte video da più del timeout configurato. Controllare il cluster autoscaler e i log dei pod JVB."
+        "stale": "Un evento attende il ponte video da più del timeout configurato. Controllare il cluster autoscaler e i log dei pod JVB.",
+        "fixedDown": "Il ponte video non risponde. Le conferenze non trasmettono audio e video finché non torna raggiungibile.",
+        "unmonitored": "Lo stato del ponte video non è monitorato su questa installazione: il portale non ha un indirizzo per interrogarlo."
       },
       "jibri": {
         "healthy": "Il servizio di registrazione è pronto e disponibile.",
@@ -3307,7 +3354,8 @@
       "jibri": "Non è possibile registrare gli eventi. I partecipanti possono comunque partecipare.",
       "jibriStale": "Un evento con registrazione attiva attende Jibri da più del timeout: la sessione non viene registrata.",
       "smtp": "Le email di conferma registrazione e i promemoria non verranno inviati.",
-      "postprodDegraded": "Le trascrizioni e i verbali per alcune registrazioni recenti non sono stati generati. Le registrazioni video sono comunque disponibili."
+      "postprodDegraded": "Le trascrizioni e i verbali per alcune registrazioni recenti non sono stati generati. Le registrazioni video sono comunque disponibili.",
+      "jvbDown": "I partecipanti non ricevono audio e video."
     },
     "overallVerdicts": {
       "operational": "Tutti i servizi funzionano correttamente. La piattaforma è pienamente operativa.",
@@ -3337,7 +3385,8 @@
       "degraded": "Rallentato",
       "down": "Non disponibile",
       "standby": "In standby",
-      "scaling": "In preparazione"
+      "scaling": "In preparazione",
+      "unknown": "Non monitorato"
     },
     "metrics": {
       "uptime24h": "Uptime 24h",
@@ -3348,7 +3397,8 @@
       "errorRate": "Errori 5xx",
       "requestRate": "Richieste/s",
       "podUptime": "Pod uptime"
-    }
+    },
+    "probeDetail": "Esito della verifica"
   },
   "feedback": {
     "title": "Come valuti questo evento?",
@@ -3673,7 +3723,9 @@
       "almostReady": "Server video attivo: ci siamo quasi",
       "almostReadyDetail": "Ancora qualche istante e il pulsante di ingresso si attiverà da solo.",
       "honestHint": "Tempo tipico: meno di un minuto se l'infrastruttura è già calda, 3–5 minuti alla prima accensione. Nel frattempo puoi controllare camera e microfono o usare la chat.",
-      "elapsed": "in preparazione da {time}"
+      "elapsed": "in preparazione da {time}",
+      "scheduled": "La sala si apre all'orario d'inizio",
+      "scheduledDetail": "Oppure prima, quando l'organizzatore avvia l'evento. Nel frattempo puoi controllare camera e microfono o usare la chat."
     },
     "exitWaiting": "Esci dalla sala d'attesa",
     "warmingUp": "Sala in allestimento",
@@ -3729,7 +3781,10 @@
       "hostEarly": "Ingresso anticipato (host)"
     },
     "roomJustOpened": "La sala è pronta — entra",
-    "enterAnyway": "Entra comunque"
+    "enterAnyway": "Entra comunque",
+    "notHeldBadge": "Orario passato",
+    "notHeldTitle": "L'orario previsto per l'evento è passato",
+    "notHeldDetail": "La sala non è stata aperta. Controlla la pagina dell'evento per eventuali aggiornamenti."
   },
   "recording": {
     "management": "Registrazione video",
@@ -3865,6 +3920,16 @@
     "noFeedback": "Nessun feedback ricevuto",
     "comments": "Commenti",
     "noComments": "Nessun commento",
+    "yes": "Sì",
+    "no": "No"
+  },
+  "questionnaire": {
+    "loadFailed": "Impossibile caricare il questionario.",
+    "submit": "Invia risposte",
+    "submitFailed": "Invio non riuscito. Riprova.",
+    "answersInvalid": "Alcune risposte mancano o non sono valide: controlla le domande obbligatorie e riprova.",
+    "alreadySubmitted": "Hai già inviato le tue risposte a questo questionario.",
+    "thankYou": "Grazie per le tue risposte.",
     "yes": "Sì",
     "no": "No"
   }

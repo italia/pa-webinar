@@ -34,7 +34,11 @@ export interface ChatReplyRef {
 export interface ChatEnvelope {
   id: string;
   eventId: string;
-  senderId: string;
+  // Chiave opaca per il colore della bolla: senderColourKey(senderId), mai
+  // l'id grezzo. Questo envelope arriva a OGNI lettore della chat, ospiti
+  // senza token compresi, e l'id di un ospite contiene il suo indirizzo IP.
+  // Vuota sugli envelope che non riguardano un autore (delete, reaction).
+  senderKey: string;
   senderName: string;
   isModerator: boolean;
   text: string;
@@ -70,6 +74,22 @@ export interface ChatEnvelope {
 
 function channel(eventId: string): string {
   return `chat:${eventId}`;
+}
+
+/**
+ * Toglie un eventuale `senderId` grezzo da un envelope ricevuto.
+ *
+ * Le versioni correnti pubblicano solo `senderKey`. Durante un rolling update,
+ * però, un pod della versione precedente pubblica ancora l'id grezzo sullo
+ * stesso canale Redis, e lo stream SSE lo rimanderebbe tale e quale a tutta la
+ * sala: per un ospite è il base64 di `ip:nome`. Il filtro sta sul lato di
+ * ricezione, così vale qualunque sia il pod che ha pubblicato.
+ */
+export function withoutRawSenderId(envelope: ChatEnvelope): ChatEnvelope {
+  if (!('senderId' in envelope)) return envelope;
+  const rest: Record<string, unknown> = { ...envelope };
+  delete rest.senderId;
+  return rest as unknown as ChatEnvelope;
 }
 
 /**
@@ -115,7 +135,7 @@ export async function subscribeChat(
     if (receivedChannel !== ch) return;
     try {
       const envelope = JSON.parse(payload) as ChatEnvelope;
-      onMessage(envelope);
+      onMessage(withoutRawSenderId(envelope));
     } catch {
       // Malformed payload — drop silently. Real-time guarantees are
       // best-effort; clients can always refetch history.

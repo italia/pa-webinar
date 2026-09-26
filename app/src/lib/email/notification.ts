@@ -4,8 +4,8 @@
  */
 
 import { prisma } from '@/lib/db';
-import { decryptPII, tryDecryptPII } from '@/lib/crypto/pii';
-import { generateEventICal } from '@/lib/ical/generate';
+import { decryptPII } from '@/lib/crypto/pii';
+import { generateEventICal, ICS_ATTACHMENT_CONTENT_TYPE } from '@/lib/ical/generate';
 import { enqueueEmail } from '@/lib/email/outbox';
 import { lingueIscrizione } from '@/lib/email/lingua';
 import { getSettings } from '@/lib/settings';
@@ -133,7 +133,12 @@ export function sendDateChangeNotifications(input: DateChangeNotificationInput):
         const date = formatDate(event.startsAt, testi, event.timezone);
         const time = formatTime(event.startsAt, testi, event.timezone);
         const eventPageUrl = localizedUrl(baseUrl, `/events/${event.slug}`, pagina);
+        // Stesso UID della conferma e SEQUENCE piu' alta (l'evento e' appena
+        // stato modificato): il calendario sposta la voce esistente invece di
+        // aggiungerne una seconda alla nuova data.
         const ics = generateEventICal({
+          eventId: event.id,
+          updatedAt: event.updatedAt,
           title,
           description,
           startsAt: event.startsAt,
@@ -141,11 +146,6 @@ export function sendDateChangeNotifications(input: DateChangeNotificationInput):
           timezone: event.timezone,
           url: eventPageUrl,
           organizerName: event.moderatorName ?? 'PA Webinar',
-          // moderatorEmail is stored AES-256-GCM encrypted — decrypt before it
-          // becomes the iCal ORGANIZER mailto (otherwise calendar clients get
-          // base64 ciphertext). Mirrors confirmation.ts / calendar.ics.
-          organizerEmail:
-            tryDecryptPII(event.moderatorEmail) ?? process.env.SMTP_FROM ?? 'noreply@dominio.gov.it',
         });
         const nuovo = {
           subject: COPY[testi].subject(title),
@@ -170,7 +170,7 @@ export function sendDateChangeNotifications(input: DateChangeNotificationInput):
             attachments: [{
               filename: 'event-updated.ics',
               content: mail.ics,
-              contentType: 'text/calendar; charset=utf-8; method=REQUEST',
+              contentType: ICS_ATTACHMENT_CONTENT_TYPE,
             }],
             metadata: {
               kind: 'date-change-notification',

@@ -36,6 +36,12 @@ interface EmailTemplateInput {
   organizationFooter?: string;
   /** Immagine dell'evento (URL assoluto), mostrata come banner in cima. */
   eventImageUrl?: string | null;
+  /**
+   * Link firmato per uscire dalla rubrica (lib/persons/opt-out-link), solo per
+   * chi ci e' entrato. Quando c'e', la nota a pie' di pagina lo dice e il link
+   * compare sempre, anche se l'amministrazione ha personalizzato il testo.
+   */
+  addressBookOptOutUrl?: string | null;
 }
 
 interface LocaleCopy {
@@ -55,6 +61,10 @@ interface LocaleCopy {
   downloadIcs: string;
   footer: string;
   unsubscribe: string;
+  /** Al posto di `unsubscribe` per chi e' in rubrica: li' un'azione serve. */
+  unsubscribeAddressBook: string;
+  /** Testo del link di uscita, lo stesso promesso dal modulo di iscrizione. */
+  addressBookOptOut: string;
 }
 
 const copy: Record<Locale, LocaleCopy> = {
@@ -93,6 +103,9 @@ const copy: Record<Locale, LocaleCopy> = {
     footer: '',
     unsubscribe:
       'Ricevi questa email perch\u00e9 ti sei registrato all\u2019evento. Nessuna azione ulteriore \u00e8 necessaria per disiscriverti.',
+    unsubscribeAddressBook:
+      'Ricevi questa email perch\u00e9 ti sei registrato all\u2019evento. Hai anche scelto di entrare nella rubrica degli eventi, per essere invitato a eventi simili: puoi revocare il consenso in qualsiasi momento.',
+    addressBookOptOut: 'Rimuovi i miei dati dalla rubrica',
   },
   en: {
     confirmationSubject: (title) => `Registration confirmed: ${title}`,
@@ -129,6 +142,9 @@ const copy: Record<Locale, LocaleCopy> = {
     footer: '',
     unsubscribe:
       'You are receiving this email because you registered for the event. No further action is needed to unsubscribe.',
+    unsubscribeAddressBook:
+      'You are receiving this email because you registered for the event. You also chose to join the events address book, to be invited to similar events: you can withdraw your consent at any time.',
+    addressBookOptOut: 'Remove me from the address book',
   },
   fr: {
     confirmationSubject: (title) => `Inscription confirmée : ${title}`,
@@ -165,6 +181,9 @@ const copy: Record<Locale, LocaleCopy> = {
     footer: '',
     unsubscribe:
       'Vous recevez cet e-mail parce que vous vous êtes inscrit à l’événement. Aucune autre action n’est nécessaire pour vous désinscrire.',
+    unsubscribeAddressBook:
+      'Vous recevez cet e-mail parce que vous vous êtes inscrit à l’événement. Vous avez également choisi de figurer dans le carnet d’adresses des événements, pour être invité à des événements similaires : vous pouvez retirer votre consentement à tout moment.',
+    addressBookOptOut: 'Supprimer mes données du carnet d’adresses',
   },
   de: {
     confirmationSubject: (title) => `Anmeldung bestätigt: ${title}`,
@@ -201,6 +220,9 @@ const copy: Record<Locale, LocaleCopy> = {
     footer: '',
     unsubscribe:
       'Sie erhalten diese E-Mail, weil Sie sich für die Veranstaltung angemeldet haben. Für eine Abmeldung ist keine weitere Aktion erforderlich.',
+    unsubscribeAddressBook:
+      'Sie erhalten diese E-Mail, weil Sie sich für die Veranstaltung angemeldet haben. Sie haben außerdem der Aufnahme in das Veranstaltungs-Adressbuch zugestimmt, um zu ähnlichen Veranstaltungen eingeladen zu werden: Sie können Ihre Einwilligung jederzeit widerrufen.',
+    addressBookOptOut: 'Meine Daten aus dem Adressbuch entfernen',
   },
   es: {
     confirmationSubject: (title) => `Inscripción confirmada: ${title}`,
@@ -237,6 +259,9 @@ const copy: Record<Locale, LocaleCopy> = {
     footer: '',
     unsubscribe:
       'Recibe este correo electrónico porque se ha inscrito en el evento. No es necesaria ninguna otra acción para darse de baja.',
+    unsubscribeAddressBook:
+      'Recibe este correo electrónico porque se ha inscrito en el evento. También ha elegido formar parte de la Agenda de eventos, para recibir invitaciones a eventos similares: puede revocar su consentimiento en cualquier momento.',
+    addressBookOptOut: 'Eliminar mis datos de la agenda',
   },
 };
 
@@ -370,6 +395,25 @@ function calendarLinksSection(
 </table>`;
 }
 
+/**
+ * Il link di uscita dalla rubrica nel pie' di pagina. Separato dalla nota
+ * (che l'amministrazione puo' personalizzare): il link c'e' sempre, per chi
+ * e' in rubrica, qualunque sia il testo.
+ */
+function addressBookOptOutHtml(c: LocaleCopy, url: string | null | undefined): string {
+  if (!url) return '';
+  return `<br><a href="${escapeHtml(url)}" style="color:#5c6f82;">${escapeHtml(c.addressBookOptOut)}</a>`;
+}
+
+function addressBookOptOutText(c: LocaleCopy, url: string | null | undefined): string[] {
+  return url ? [`${c.addressBookOptOut}: ${url}`] : [];
+}
+
+/** La nota a pie' di pagina predefinita: per chi e' in rubrica dice come uscirne. */
+function defaultFooterNote(c: LocaleCopy, input: { addressBookOptOutUrl?: string | null }): string {
+  return input.addressBookOptOutUrl ? c.unsubscribeAddressBook : c.unsubscribe;
+}
+
 function ctaButton(label: string, url: string): string {
   return `<table role="presentation" style="margin:24px 0;"><tr><td>
 <a href="${url}" style="display:inline-block;padding:12px 28px;background:#06c;color:#fff;text-decoration:none;border-radius:4px;font-weight:600;font-size:16px;">
@@ -401,7 +445,7 @@ export function baseConfirmationCopy(input: EmailTemplateInput): ResolvedEmailTe
     bodyIntro: null,
     ctaLabel: c.joinLabel,
     infoNote: c.keepNote,
-    footerNote: c.unsubscribe,
+    footerNote: defaultFooterNote(c, input),
   };
 }
 
@@ -414,7 +458,7 @@ export function baseReminderCopy(input: EmailTemplateInput): ResolvedEmailTempla
     bodyIntro: c.reminderNote(offset),
     ctaLabel: c.joinLabel,
     infoNote: null,
-    footerNote: c.unsubscribe,
+    footerNote: defaultFooterNote(c, input),
   };
 }
 
@@ -451,7 +495,7 @@ ${info}
   return layout(
     escapeHtml(r.heading),
     body,
-    `${footerText}<br>${escapeHtml(r.footerNote)}`,
+    `${footerText}<br>${escapeHtml(r.footerNote)}${addressBookOptOutHtml(c, input.addressBookOptOutUrl)}`,
     input.locale,
     input.siteName,
     eventBanner(input.eventImageUrl, input.eventTitle),
@@ -494,6 +538,7 @@ export function confirmationText(
     '',
     footerText,
     r.footerNote,
+    ...addressBookOptOutText(c, input.addressBookOptOutUrl),
   ].join('\n');
 }
 
@@ -530,7 +575,7 @@ ${info}
   return layout(
     escapeHtml(r.heading),
     body,
-    `${footerText}<br>${escapeHtml(r.footerNote)}`,
+    `${footerText}<br>${escapeHtml(r.footerNote)}${addressBookOptOutHtml(c, input.addressBookOptOutUrl)}`,
     input.locale,
     input.siteName,
     eventBanner(input.eventImageUrl, input.eventTitle),
@@ -573,6 +618,7 @@ export function reminderText(
     '',
     footerText,
     r.footerNote,
+    ...addressBookOptOutText(c, input.addressBookOptOutUrl),
   ].join('\n');
 }
 
@@ -585,6 +631,8 @@ interface PostEventParticipantInput {
   eventPageUrl: string;
   siteName?: string;
   organizationFooter?: string;
+  /** Vedi EmailTemplateInput.addressBookOptOutUrl. */
+  addressBookOptOutUrl?: string | null;
 }
 
 interface PostEventModeratorInput extends PostEventParticipantInput {
@@ -682,15 +730,20 @@ export function postEventParticipantEmail(input: PostEventParticipantInput): {
   text: string;
 } {
   const c = postEventCopy[input.locale];
-  const footer = input.organizationFooter || copy[input.locale].footer;
+  const base = copy[input.locale];
+  const footer = input.organizationFooter || base.footer;
   const subject = c.participantSubject(input.eventTitle);
   const body = `
 <p style="margin:0 0 16px;">${escapeHtml(c.participantIntro(input.eventTitle))}</p>
 ${ctaButton(c.participantCta, input.eventPageUrl)}`;
+  // Solo per chi e' in rubrica: la nota su come uscirne e il link firmato.
+  const optOutHtml = input.addressBookOptOutUrl
+    ? `${footer ? '<br>' : ''}${escapeHtml(base.unsubscribeAddressBook)}${addressBookOptOutHtml(base, input.addressBookOptOutUrl)}`
+    : '';
   const html = layout(
     escapeHtml(c.participantHeading),
     body,
-    footer,
+    `${footer}${optOutHtml}`,
     input.locale,
     input.siteName,
   );
@@ -702,6 +755,9 @@ ${ctaButton(c.participantCta, input.eventPageUrl)}`;
     `${c.participantCta}: ${input.eventPageUrl}`,
     '',
     footer,
+    ...(input.addressBookOptOutUrl
+      ? [base.unsubscribeAddressBook, ...addressBookOptOutText(base, input.addressBookOptOutUrl)]
+      : []),
   ].join('\n');
   return { subject, html, text };
 }

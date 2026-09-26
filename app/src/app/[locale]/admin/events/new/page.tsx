@@ -1,6 +1,8 @@
 import { getLocale, getTranslations } from 'next-intl/server';
 
 import { staffOLogin } from '@/lib/auth/staff-page';
+import { getPublicEnv } from '@/lib/env';
+import { resolveWhiteboardInfraReady } from '@/lib/jitsi/whiteboard';
 import { prisma } from '@/lib/db';
 import { jvbMaxReplicasFromEnv } from '@/lib/jvb-sizing';
 import { getSettings } from '@/lib/settings';
@@ -145,6 +147,11 @@ export default async function CreateEventPage({
         gdprTemplates={gdprTemplates}
         siteDefaultParseTitleKicker={siteSettings.parseTitleKicker}
         siteDefaultVideoQuality={siteSettings.videoQuality}
+        // Letto a runtime come nella sala (lib/jitsi/whiteboard.ts): il
+        // passo 2 offre la lavagna solo se l'installazione ne ha il servizio.
+        whiteboardInfraReady={resolveWhiteboardInfraReady(
+          getPublicEnv('NEXT_PUBLIC_WHITEBOARD_ENABLED'),
+        )}
       />
     </div>
   );

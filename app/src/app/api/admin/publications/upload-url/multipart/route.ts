@@ -50,11 +50,11 @@ async function authorizeAndParse<T>(
   // Stessa guardia della rotta che apre il caricamento (ADR-014).
   await requireStaff(await cookies());
   if (!isRecordingStorageConfigured()) {
-    throw new AppError(
-      'Recording storage not configured',
-      503,
-      'STORAGE_UNAVAILABLE',
-    );
+    // Configurazione ammessa, non un guasto: `warn` nel log (vedi la rotta che
+    // apre il caricamento).
+    const err = new AppError('Recording storage not configured', 503, 'STORAGE_UNAVAILABLE');
+    err.expected = true;
+    throw err;
   }
   const parsed = schema.safeParse(await parseJsonBody(request));
   if (!parsed.success) {

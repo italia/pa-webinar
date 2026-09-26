@@ -284,3 +284,121 @@ describe('sala d\'attesa — il cancello della piazza', () => {
     expect(onEnterLive).toHaveBeenCalledWith('Relatore 1', { cameraOn: false, micOn: false });
   });
 });
+
+describe('sala d\'attesa — pagina aperta da http://', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('fuori da un contesto sicuro lo dice, con il link all\'indirizzo https', () => {
+    vi.stubGlobal('isSecureContext', false);
+    render({ defaultName: 'Relatore 1' });
+    const tl = messages.live;
+    expect(container.textContent).toContain(tl.insecureContextTitle);
+    const link = Array.from(container.querySelectorAll<HTMLAnchorElement>('a')).find((a) =>
+      a.href.startsWith('https://'),
+    );
+    expect(link?.href).toBe(`https://${window.location.hostname}${window.location.pathname}`);
+    // Il testo mostra solo l'host: l'indirizzo completo può portare un token.
+    expect(link?.textContent).toBe(
+      tl.insecureContextLink.replace('{host}', window.location.hostname),
+    );
+  });
+
+  it('in un contesto sicuro nessun avviso', () => {
+    vi.stubGlobal('isSecureContext', true);
+    render({ defaultName: 'Relatore 1' });
+    expect(container.textContent).not.toContain(messages.live.insecureContextTitle);
+  });
+});
+
+describe('sala d\'attesa — avviso di registrazione', () => {
+  it('compare solo quando la registrazione può avvenire (lo decide LiveEventClient)', () => {
+    render({ event: { ...eventoLive, recordingEnabled: true } });
+    expect(container.textContent).toContain(t.recordingNotice);
+    render({ event: { ...eventoLive, recordingEnabled: false } });
+    expect(container.textContent).not.toContain(t.recordingNotice);
+  });
+});
+
+/**
+ * Il ciclo di vita visto dalla sala d'attesa: il moderatore può sempre aprire
+ * la sala, anche quando è rimasta in preparazione o in pausa senza nessuno che
+ * la porti a LIVE; senza scaler non si promette un'accensione che non c'è; e
+ * un evento mai aperto oltre la sua fine non dice «attendi l'organizzatore».
+ */
+describe('sala d\'attesa — ciclo di vita', () => {
+  const avvio = vi.fn(async () => undefined);
+  const inPreparazione: Evento = {
+    ...eventoLive,
+    status: 'PROVISIONING',
+    startsAt: oraPiu(-1),
+    endsAt: oraPiu(59),
+  };
+
+  it.each(['PROVISIONING', 'IDLE'] as const)(
+    'in %s il moderatore ha «Avvia evento»',
+    (status) => {
+      render({ event: { ...inPreparazione, status }, role: 'moderator', onStartEvent: avvio });
+      expect(pulsante(t.startEventButton).disabled).toBe(false);
+    },
+  );
+
+  it('chi partecipa non ha «Avvia evento»', () => {
+    render({ event: inPreparazione, role: 'participant', onStartEvent: avvio });
+    expect(() => pulsante(t.startEventButton)).toThrow();
+  });
+
+  it('senza scaler dice quando si apre la sala, non una stima di accensione', () => {
+    render({
+      event: inPreparazione,
+      warmup: { phase: 'scheduled', startedAt: null, serverTime: new Date().toISOString() },
+    });
+    expect(container.textContent).toContain(t.warmup.scheduled);
+    expect(container.textContent).toContain(t.warmup.scheduledDetail);
+    expect(container.textContent).not.toContain(t.warmup.honestHint);
+  });
+
+  it('con lo scaler resta la stima di accensione', () => {
+    render({
+      event: inPreparazione,
+      warmup: { phase: 'queued', startedAt: null, serverTime: new Date().toISOString() },
+    });
+    expect(container.textContent).toContain(t.warmup.honestHint);
+  });
+
+  it('un evento mai aperto oltre la sua fine: nessuna attesa, nessun avvio', () => {
+    render({
+      event: { ...eventoLive, status: 'PUBLISHED', startsAt: oraPiu(-90), endsAt: oraPiu(-30) },
+      role: 'moderator',
+      onStartEvent: avvio,
+    });
+    expect(container.textContent).toContain(t.notHeldTitle);
+    expect(container.textContent).not.toContain(t.startingSoon);
+    expect(() => pulsante(t.startEventButton)).toThrow();
+    expect($('#waiting-name')).toBeNull();
+  });
+
+  it.each(['PROVISIONING', 'IDLE'] as const)(
+    'anche %s oltre la fine: niente preparazione in corso, nessun avvio',
+    (status) => {
+      render({
+        event: { ...eventoLive, status, startsAt: oraPiu(-90), endsAt: oraPiu(-30) },
+        role: 'moderator',
+        onStartEvent: avvio,
+        warmup: { phase: 'queued', startedAt: null, serverTime: new Date().toISOString() },
+      });
+      expect(container.textContent).toContain(t.notHeldTitle);
+      expect(container.textContent).not.toContain(t.warmup.honestHint);
+      expect(() => pulsante(t.startEventButton)).toThrow();
+    },
+  );
+
+  it('prima della fine resta l\'attesa di sempre', () => {
+    render({
+      event: { ...eventoLive, status: 'PUBLISHED', startsAt: oraPiu(-5), endsAt: oraPiu(55) },
+    });
+    expect(container.textContent).toContain(t.startingSoon);
+    expect(container.textContent).not.toContain(t.notHeldTitle);
+  });
+});

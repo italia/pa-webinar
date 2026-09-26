@@ -127,7 +127,8 @@
         "outlook": "Outlook / Office 365",
         "yahoo": "Yahoo Calendar",
         "downloadIcs": ".ics fájl letöltése"
-      }
+      },
+      "registrationEnded": "Az esemény véget ért: a regisztráció lezárult."
     },
     "manage": {
       "toggleChat": "Csevegés",
@@ -368,7 +369,8 @@
       "questionRestore": "Visszaállítás",
       "questionStatusFailed": "Nem sikerült frissíteni a kérdést",
       "questionNeedsText": "Írja be a kérdés szövegét: önmagában egy melléklet nem kerül a sorba",
-      "lensTruncated": "Csak a legfrissebb üzenetek vannak betöltve: régebbi kérdések hiányozhatnak a listából."
+      "lensTruncated": "Csak a legfrissebb üzenetek vannak betöltve: régebbi kérdések hiányozhatnak a listából.",
+      "attachUnavailable": "A mellékletek ebben a telepítésben nem érhetők el."
     },
     "role": {
       "moderator": "Moderátor",
@@ -389,7 +391,8 @@
         "unknown": "N/A"
       },
       "volume": "Hangerő",
-      "volumeFor": "{name} hangereje"
+      "volumeFor": "{name} hangereje",
+      "kickName": "Eltávolítás: {name}"
     },
     "moderator": {
       "muteAll": "Mindenki némítása",
@@ -453,7 +456,18 @@
       "remainingLabel": "Hátralévő idő (kattintson az eltelt időért)",
       "elapsedLabel": "Eltelt idő (kattintson a hátralévő időért)"
     },
-    "videoCallFrameTitle": "Az esemény videohívása"
+    "videoCallFrameTitle": "Az esemény videohívása",
+    "insecureContextTitle": "Nem biztonságos cím",
+    "insecureContextBody": "Ez az oldal http:// címen nyílt meg: a böngésző nem engedi a mikrofon és a kamera használatát, így a videohívás nem indulhat el. Nyissa meg ugyanezt az oldalt a biztonságos címen.",
+    "insecureContextLink": "https://{host} megnyitása",
+    "conferenceUnreachableTitle": "A videohívás-szolgáltatás nem válaszol",
+    "conferenceUnreachableBody": "A böngésző nem éri el a videohívás-kiszolgálót ({host}). Nyissa meg egy új lapon: ha a böngésző biztonsági figyelmeztetést jelenít meg, fogadja el, majd térjen vissza ide, és próbálja újra. Ha az oldal nem nyílik meg, lehet, hogy az a hálózat blokkolja, amelyről csatlakozik.",
+    "conferenceOpenHost": "{host} megnyitása új lapon",
+    "leftTitle": "Kilépett a szobából",
+    "leftMessage": "Az esemény még tart: bármikor visszaléphet.",
+    "leftModeratorReminder": "Az esemény nyitva marad, amíg valaki le nem zárja. Ha végeztek, lépjen vissza, és válassza ezt: „{action}”.",
+    "rejoin": "Visszalépés",
+    "backToHome": "Vissza a kezdőlapra"
   },
   "qa": {
     "title": "Kérdések és válaszok",
@@ -590,7 +604,8 @@
       "errorGeneric": "Hiba a fájl feltöltése során",
       "helpImage": "Támogatott formátumok: PNG, JPEG, WebP, SVG, GIF — max. 10 MB",
       "helpAudio": "Támogatott formátumok: MP3, WAV, OGG, M4A, WebM — max. 20 MB",
-      "helpDocument": "Támogatott formátumok: PDF, DOCX, PPTX, XLSX, TXT — max. 25 MB"
+      "helpDocument": "Támogatott formátumok: PDF, DOCX, PPTX, XLSX, TXT — max. 25 MB",
+      "uploadsUnavailable": "A fájlfeltöltés ezen a telepítésen nem érhető el: illessze be helyette a fájl URL-jét."
     },
     "rubricaPicker": {
       "loading": "Keresés folyamatban…",
@@ -628,7 +643,9 @@
           "endsAt": "A befejezési dátumnak a kezdési dátum utáninak kell lennie.",
           "titleRequired": "A cím megadása kötelező (legalább 3 karakter).",
           "titleRequiredOtherLocale": "Az alapértelmezett nyelvű ({locale}) cím kötelező: váltson a(z) {locale} fülre.",
-          "maxParticipants": "Adjon meg egy 2 és 500 közötti számot."
+          "maxParticipants": "Adjon meg egy 2 és 500 közötti számot.",
+          "descriptionRequired": "A leírás kötelező (legalább {min} karakter).",
+          "descriptionRequiredOtherLocale": "Az alapértelmezett nyelvű ({locale}) leírás kötelező: váltson a(z) {locale} fülre."
         },
         "senderRatioLabel": "Becsült aktív arány",
         "senderRatioHelp": "Hány résztvevő várhatóan aktív mikrofonnal vagy videóval. Segít a videószerver méretezésében.",
@@ -820,7 +837,11 @@
         "speakers": "előadók",
         "materials": "anyagok",
         "questionnaires": "kérdőívek"
-      }
+      },
+      "revocationFailed": "Nem sikerült visszavonni {name} hozzáférését: a hozzáférési link továbbra is érvényes. Mentsen újra az újrapróbálkozáshoz, vagy vonja vissza az esemény oldalának „{tab}” lapján.",
+      "validationFailedDetail": "A szerver elutasított néhány adatot: {reason}. Javítsa ki, és próbálja újra.",
+      "publishFailed": "Az esemény létrejött, de nem lett közzétéve: továbbra is piszkozat. Tegye közzé az esemény oldaláról.",
+      "publishFailedDetail": "Az esemény létrejött, de nem lett közzétéve: továbbra is piszkozat. A szerver válasza: {reason}. Tegye közzé az esemény oldaláról."
     },
     "nav": {
       "events": "Események kezelése",
@@ -1240,7 +1261,7 @@
       "wordCloudEnabled": "Élő szófelhő",
       "wordCloudEnabledDesc": "A résztvevők beküldenek egy szót, és a felhő élőben frissül. Hasznos egy beszélgetés elindításához vagy a hangulat néhány másodperc alatti felméréséhez.",
       "whiteboardEnabled": "Megosztott tábla",
-      "whiteboardEnabledDesc": "Bekapcsolja a beépített, együttműködésre szolgáló táblát (Excalidraw): a moderátorok az esemény alatt az eszköztárból nyithatják meg. Az azonnali hívásokban mindig aktív.",
+      "whiteboardEnabledDesc": "Bekapcsolja a beépített, együttműködésre szolgáló táblát (Excalidraw): a moderátorok az esemény alatt az eszköztárból nyithatják meg. A telepítés táblaszolgáltatását igényli; ahol elérhető, az azonnali hívásokban mindig aktív.",
       "autoStartRecording": "Felvétel automatikus indítása",
       "autoStartRecordingDesc": "Az esemény kezdetekor a felvétel automatikusan elindul (a moderátortól nem kér megerősítést). Így a később csatlakozók azonnal elérhető lejátszót találnak.",
       "aiSectionHeading": "Automatikus utómunka",
@@ -1316,7 +1337,8 @@
       "retentionPreviewRecordings": "Videofelvételek",
       "retentionPreviewKept": "Az összesített statisztikák és az esemény metaadatai megmaradnak.",
       "configPreview": "Konfiguráció előnézete",
-      "templateApplied": "Sablon alkalmazva: {name}. Minden beállítás módosítható."
+      "templateApplied": "Sablon alkalmazva: {name}. Minden beállítás módosítható.",
+      "whiteboardUnavailable": "Ebben a telepítésben nem érhető el: hiányzik a Jitsi táblaszolgáltatása, amelyet a platform üzemeltetője kapcsolhat be."
     },
     "links": {
       "title": "Esemény linkjei",
@@ -1925,9 +1947,9 @@
       "version": "Verzió",
       "environment": "Környezet",
       "modes": {
-        "simple": "Egyszerű (Docker Compose)",
-        "standard": "Szabvány (Kubernetes)",
-        "full": "Teljes (Kubernetes scale-to-zero-val)",
+        "simple": "Egyszerű",
+        "standard": "Szabvány",
+        "full": "Teljes (hidak scale-to-zeróval)",
         "unknown": "Ismeretlen"
       },
       "database": {
@@ -1941,7 +1963,9 @@
         "title": "Jitsi Meet",
         "reachable": "Elérhető",
         "unreachable": "Nem elérhető",
-        "notConfigured": "Nincs konfigurálva"
+        "notConfigured": "Nincs konfigurálva",
+        "degraded": "Elérhető, de hibákkal vagy lassan válaszol",
+        "publicCheckFailed": "A nyilvános címen végzett ellenőrzés sikertelen ({code}): a portál szervere nem fogadja el a tanúsítványt vagy a nevet. A konferenciák ettől még működhetnek."
       },
       "jvb": {
         "title": "Video Bridge (JVB)",
@@ -1949,7 +1973,9 @@
         "replicas": "{current}/{max} csomópont",
         "preScale": "Pre-scale: {minutes} perc",
         "fixedMode": "Fix mód",
-        "scalerEnabled": "Scaler engedélyezve"
+        "scalerEnabled": "Scaler engedélyezve",
+        "fixedDown": "A videóhíd nem válaszol",
+        "unmonitored": "Nincs figyelve: a híd címe (JVB_HEALTH_URL) nincs beállítva"
       },
       "jibri": {
         "title": "Felvétel (Jibri)",
@@ -1971,7 +1997,11 @@
         "metrics": "Metrika végpont"
       },
       "note": "Az infrastruktúra módosításai a Helm values és a CI/CD pipeline segítségével történnek.",
-      "deployDocs": "Telepítési dokumentáció"
+      "deployDocs": "Telepítési dokumentáció",
+      "platforms": {
+        "kubernetes": "Kubernetesen",
+        "other": "Kubernetesen kívül (Docker Compose vagy egyetlen szerver)"
+      }
     },
     "instantCalls": {
       "title": "Gyorshívások",
@@ -2076,9 +2106,9 @@
       "latencyP99": "P99 késleltetés",
       "requestRate": "Kérések/mp",
       "chartLatencyQuantiles": "Alkalmazáskésleltetés — P50 / P95 / P99",
-      "participantsNow": "Aktív résztvevők",
+      "participantsNow": "Résztvevők a videóhídon",
       "jvbStress": "JVB-terhelés",
-      "conferences": "Aktív konferenciák",
+      "conferences": "Konferenciák a videóhídon",
       "octoRelay": "Octo bridge-ek közötti relay",
       "interBridge": "Octo forgalom",
       "chartCpu": "CPU usage",
@@ -2105,7 +2135,8 @@
       "liveNow": "LIVE",
       "provisioningNow": "előkészítés alatt",
       "idleNow": "IDLE (szüneteltetve)",
-      "scaleToZeroHelp": "Az IDLE a normál állapot olyan eseménynél, amelynek a türelmi időnél hosszabb ideje nincs forgalma. A következő felhasználói látogatáskor PROVISIONING, majd LIVE állapotba vált."
+      "scaleToZeroHelp": "Az IDLE a normál állapot olyan eseménynél, amelynek a türelmi időnél hosszabb ideje nincs forgalma. A következő felhasználói látogatáskor PROVISIONING, majd LIVE állapotba vált.",
+      "capacityFromStatus": "A videóhídról olvasott aktuális értékek. Az előzményekhez Prometheus szükséges."
     },
     "bulk": {
       "selectAll": "Összes kijelölése",
@@ -2824,7 +2855,8 @@
       "quotaExceeded": "Ez az esemény elérte a feltöltött fájlok korlátját ({maxFiles} fájl, összesen {maxMb} MB): távolítson el néhányat, hogy újakat tölthessen fel",
       "uploadBusy": "Jelenleg túl sok a feltöltés: próbálja újra néhány másodperc múlva",
       "deleteFailed": "Az anyagot nem sikerült törölni"
-    }
+    },
+    "addedByStaff": "A szervezők adták hozzá"
   },
   "reminders": {
     "title": "Értesítések",
@@ -2897,7 +2929,7 @@
       "requestSubmittedBody": "Ha az e-mail cím egy regisztrációhoz tartozik, elküldtük Önnek a törlés megerősítésére szolgáló linket. A link 1 óráig érvényes.",
       "linkInvalid": "A link érvénytelen vagy lejárt. Kérjen új linket.",
       "confirmWarning": "Az e-mail címéhez társított összes személyes adat végleges törlésére készül.",
-      "confirmBody": "Törlésre kerülnek a regisztrációk, a kérdések, a szavazatok, a visszajelzések és az emlékeztetők. A művelet visszavonhatatlan.",
+      "confirmBody": "Törlésre kerülnek a regisztrációk, a kérdések, a szavazatok, a visszajelzések, az emlékeztetők és az Ön bejegyzése az események címjegyzékében. A művelet visszavonhatatlan.",
       "confirmButton": "Törlés megerősítése",
       "cancel": "Mégse",
       "processing": "Törlés folyamatban...",
@@ -3120,7 +3152,7 @@
     "nodesReady": "kész csomópont",
     "scaling": "skálázás",
     "jvbStress": "JVB terhelés",
-    "participantsConnected": "csatlakozott résztvevő",
+    "participantsConnected": "résztvevő a videóhídon",
     "videoInteractive": "interaktív",
     "videoWebinar": "webinárium",
     "participantsAvailable": "elérhető résztvevő",
@@ -3164,7 +3196,12 @@
       "lastFailure": "Utolsó hiba: {when}",
       "artifactsProduced": "{count, plural, =0 {nincs artefaktum} one {1 artefaktum készült} other {# artefaktum készült}}",
       "eventsEnabled": "{count, plural, =0 {nincs AI-t használó esemény} one {1 esemény aktív AI-val} other {# esemény aktív AI-val}}"
-    }
+    },
+    "jvbFixedUp": "{count, plural, =1 {A videóhíd működik} other {A videóhíd működik · # híd tervezve}}",
+    "jvbFixedDown": "A videóhíd nem válaszol",
+    "jvbFixedDownDetail": "A résztvevők nem kapnak hangot és képet, amíg a híd újra elérhető nem lesz.",
+    "jvbUnmonitored": "Az állapot nincs figyelve",
+    "jvbUnmonitoredDetail": "Ez a telepítés nem kérdezi le a videóhidat, ezért az állapota itt nem érhető el."
   },
   "infraMap": {
     "loading": "Infrastruktúra térkép betöltése...",
@@ -3172,8 +3209,8 @@
     "ariaLabel": "Rendszer infrastruktúra térkép",
     "title": "Infrastruktúra térkép",
     "subtitle": "Az architektúra és a szolgáltatások állapotának valós idejű megjelenítése",
-    "participants": "Résztvevők",
-    "conferences": "Konferenciák",
+    "participants": "Résztvevők a videóhídon",
+    "conferences": "Konferenciák a videóhídon",
     "bandwidthIn": "Bejövő sávszélesség",
     "bandwidthOut": "Kimenő sávszélesség",
     "recordings": "Felvételek",
@@ -3259,23 +3296,33 @@
       "jitsiWeb": {
         "healthy": "A videokonferencia-szoba elérhető és készen áll az eseményekre.",
         "down": "A videokonferencia-szoba nem elérhető. Nem lehet eseményeket indítani vagy csatlakozni hozzájuk.",
-        "standby": "A videokonferencia-szoba nincs konfigurálva."
+        "standby": "A videokonferencia-szoba nincs konfigurálva.",
+        "degraded": "A videokonferencia-szoba válaszol, de hibákkal vagy lassan.",
+        "publicCheckFailed": "A portál nem tudja ellenőrizni a szobát a nyilvános címén: a szerver felől a tanúsítvány vagy a név nem érvényes. A résztvevők számára a szoba ettől még működhet.",
+        "unmonitored": "A videokonferencia-szoba állapota ebben a telepítésben nincs figyelve."
       },
       "prosody": {
         "healthy": "A videószolgáltatások közötti belső üzenetkezelés megfelelően működik.",
         "down": "A belső üzenetkezelés nem elérhető. A videószolgáltatások nem tudnak egymással kommunikálni.",
-        "standby": "Az üzenetkezelő szolgáltatás nincs konfigurálva."
+        "standby": "Az üzenetkezelő szolgáltatás nincs konfigurálva.",
+        "degraded": "A belső üzenetkezelés válaszol, de hibákkal vagy lassan.",
+        "publicCheckFailed": "A portál nem tudja ellenőrizni a belső üzenetkezelést a szoba nyilvános címén keresztül: a szerver felől a tanúsítvány vagy a név nem érvényes. A konferenciák ettől még működhetnek.",
+        "unmonitored": "A belső üzenetkezelés állapota ebben a telepítésben nincs figyelve."
       },
       "jicofo": {
         "healthy": "A konferencia-koordinátor aktív és kezeli a munkameneteket.",
         "down": "A konferencia-koordinátor nem elérhető. Nem lehet új konferenciákat létrehozni.",
-        "standby": "A konferencia-koordinátor nincs konfigurálva."
+        "standby": "A konferencia-koordinátor nincs konfigurálva.",
+        "degraded": "A konferencia-koordinátor válaszol, de hibákkal vagy lassan.",
+        "unmonitored": "A konferencia-koordinátor állapota ebben a telepítésben nincs figyelve."
       },
       "jvb": {
         "healthy": "A videóhíd aktív, és hangot/videót továbbít a résztvevőknek.",
         "scaling": "A videóhíd előkészül egy közelgő eseményre. A szerverek automatikusan létrejönnek.",
         "standby": "A videóhíd készenléti módban van. Automatikusan aktiválódik egy tervezett esemény kezdete előtt.",
-        "stale": "Egy esemény a beállított időkorlátnál hosszabb ideje várja a videóhidat. Ellenőrizze a fürt autoscalerét és a JVB pod naplóit."
+        "stale": "Egy esemény a beállított időkorlátnál hosszabb ideje várja a videóhidat. Ellenőrizze a fürt autoscalerét és a JVB pod naplóit.",
+        "fixedDown": "A videóhíd nem válaszol. A konferenciák nem továbbítanak hangot és képet, amíg újra elérhető nem lesz.",
+        "unmonitored": "A videóhíd állapota ebben a telepítésben nincs figyelve: a portálnak nincs címe a lekérdezéséhez."
       },
       "jibri": {
         "healthy": "A felvételi szolgáltatás készen áll és elérhető.",
@@ -3307,7 +3354,8 @@
       "jibri": "Az eseményeket nem lehet rögzíteni. A résztvevők továbbra is csatlakozhatnak és részt vehetnek.",
       "jibriStale": "Egy aktív felvétellel rendelkező esemény az időkorláton túl várja a Jibrit: a munkamenet nem kerül rögzítésre.",
       "smtp": "A regisztrációs visszaigazoló e-mailek és emlékeztetők nem kerülnek elküldésre.",
-      "postprodDegraded": "Néhány friss felvételhez nem készült átirat és összefoglaló. A videofelvételek továbbra is elérhetők."
+      "postprodDegraded": "Néhány friss felvételhez nem készült átirat és összefoglaló. A videofelvételek továbbra is elérhetők.",
+      "jvbDown": "A résztvevők nem kapnak hangot és képet."
     },
     "overallVerdicts": {
       "operational": "Minden szolgáltatás megfelelően működik. A platform teljesen üzemképes.",
@@ -3337,7 +3385,8 @@
       "degraded": "Lassult",
       "down": "Nem elérhető",
       "standby": "Készenlétben",
-      "scaling": "Előkészítés"
+      "scaling": "Előkészítés",
+      "unknown": "Nincs figyelve"
     },
     "metrics": {
       "uptime24h": "24 órás uptime",
@@ -3348,7 +3397,8 @@
       "errorRate": "5xx hibák",
       "requestRate": "Kérések/mp",
       "podUptime": "Pod uptime"
-    }
+    },
+    "probeDetail": "Az ellenőrzés eredménye"
   },
   "feedback": {
     "title": "Hogyan értékeli ezt az eseményt?",
@@ -3673,7 +3723,9 @@
       "almostReady": "A videokiszolgáló fut: mindjárt kész",
       "almostReadyDetail": "Még egy pillanat, és a belépés gomb magától aktiválódik.",
       "honestHint": "Szokásos várakozás: egy percnél kevesebb, ha az infrastruktúra már meleg, első indításnál 3–5 perc. Addig ellenőrizheted a kamerát és a mikrofont, vagy használhatod a csevegést.",
-      "elapsed": "{time} óta készül"
+      "elapsed": "{time} óta készül",
+      "scheduled": "A terem a kezdési időpontban nyílik meg",
+      "scheduledDetail": "Vagy korábban, amikor a szervező elindítja az eseményt. Addig ellenőrizheted a kamerát és a mikrofont, vagy használhatod a csevegést."
     },
     "exitWaiting": "Kilépés a váróteremből",
     "warmingUp": "Terem előkészítése",
@@ -3729,7 +3781,10 @@
       "hostEarly": "Korai belépés (házigazda)"
     },
     "roomJustOpened": "A terem kész — gyere be",
-    "enterAnyway": "Belépés ennek ellenére"
+    "enterAnyway": "Belépés ennek ellenére",
+    "notHeldBadge": "Lejárt időpont",
+    "notHeldTitle": "Az esemény tervezett időpontja már elmúlt",
+    "notHeldDetail": "A terem nem nyílt meg. Az esetleges frissítéseket az esemény oldalán találod."
   },
   "recording": {
     "management": "Videofelvétel",
@@ -3865,6 +3920,16 @@
     "noFeedback": "Nem érkezett visszajelzés",
     "comments": "Megjegyzések",
     "noComments": "Nincsenek megjegyzések",
+    "yes": "Igen",
+    "no": "Nem"
+  },
+  "questionnaire": {
+    "loadFailed": "A kérdőívet nem sikerült betölteni.",
+    "submit": "Válaszok elküldése",
+    "submitFailed": "A küldés nem sikerült. Próbálja újra.",
+    "answersInvalid": "Néhány válasz hiányzik vagy érvénytelen: ellenőrizze a kötelező kérdéseket, és próbálja újra.",
+    "alreadySubmitted": "Erre a kérdőívre már elküldte a válaszait.",
+    "thankYou": "Köszönjük a válaszait.",
     "yes": "Igen",
     "no": "Nem"
   }

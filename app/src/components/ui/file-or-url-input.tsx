@@ -13,6 +13,11 @@
  * multipart body containing the chosen file. On 2xx the response `url`
  * is handed to `onChange`.
  *
+ * Senza storage per i file (lo dice il server, vedi `uploads-availability`)
+ * il campo offre solo l'URL: un caricamento che fallirebbe comunque non si
+ * propone. Se il server risponde STORAGE_UNAVAILABLE lo si dice nella lingua
+ * della pagina, non con il messaggio tecnico destinato all'operatore.
+ *
  * Icons: we inline SVGs rather than using <Icon /> from design-react-kit
  * because that component ships sprite refs that can hydrate differently
  * between server and client in some layouts.
@@ -21,6 +26,7 @@
 import { useCallback, useId, useMemo, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
+import { useUploadsAvailable } from '@/components/ui/uploads-availability';
 import { MATERIAL_FILE_MIME_TYPES } from '@/lib/validation/materials';
 import type { AssetUploadResponse } from '@/lib/validation/schemas';
 
@@ -47,6 +53,11 @@ export interface FileOrUrlInputProps {
   disabled?: boolean;
   /** Kept for backwards-compat with earlier placeholder callers. */
   required?: boolean;
+  /**
+   * Se il caricamento di file e' disponibile. Di norma non serve passarlo:
+   * lo fornisce l'area admin dal server (`UploadsAvailabilityProvider`).
+   */
+  uploadsEnabled?: boolean;
 }
 
 const DEFAULT_ACCEPT: Record<FileOrUrlAssetType, string> = {
@@ -154,6 +165,7 @@ export default function FileOrUrlInput({
   helpText,
   disabled,
   required,
+  uploadsEnabled,
 }: FileOrUrlInputProps) {
   const t = useTranslations('admin.fileOrUrl');
   const reactId = useId();
@@ -161,11 +173,24 @@ export default function FileOrUrlInput({
   const urlInputId = `${id}-url-${reactId}`;
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [mode, setMode] = useState<Mode>('upload');
+  const uploadsFromServer = useUploadsAvailable();
+  const uploadsAvailable = uploadsEnabled ?? uploadsFromServer;
+  const [modeScelto, setMode] = useState<Mode>(uploadsAvailable ? 'upload' : 'url');
+  // Senza storage resta solo l'URL, qualunque cosa sia stata scelta prima.
+  const mode: Mode = uploadsAvailable ? modeScelto : 'url';
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [urlDraft, setUrlDraft] = useState<string>(value ?? '');
   const [urlError, setUrlError] = useState<string | null>(null);
+
+  // Il valore puo' cambiare da fuori (dati del modulo arrivati dopo il primo
+  // disegno, un caricamento riuscito): la casella dell'URL lo segue, a meno
+  // che non sia gia' quello che l'utente sta scrivendo.
+  const [valoreVisto, setValoreVisto] = useState(value);
+  if (value !== valoreVisto) {
+    setValoreVisto(value);
+    if ((value ?? '') !== urlDraft.trim()) setUrlDraft(value ?? '');
+  }
 
   const effectiveAccept = accept ?? DEFAULT_ACCEPT[assetType];
   const defaultHelp = useMemo(() => {
@@ -192,8 +217,9 @@ export default function FileOrUrlInput({
           else if (res.status === 415) message = t('errorMime');
           else {
             try {
-              const j = (await res.json()) as { error?: string };
-              if (j?.error) message = j.error;
+              const j = (await res.json()) as { error?: string; code?: string };
+              if (j?.code === 'STORAGE_UNAVAILABLE') message = t('uploadsUnavailable');
+              else if (j?.error) message = j.error;
             } catch {
               /* ignore */
             }
@@ -278,38 +304,40 @@ export default function FileOrUrlInput({
         </label>
       </div>
 
-      {/* Segmented control */}
-      <div
-        className="btn-group btn-group-sm mb-2"
-        role="tablist"
-        aria-label={label}
-      >
-        <button
-          type="button"
-          role="tab"
-          aria-selected={mode === 'upload'}
-          className={`btn ${mode === 'upload' ? 'btn-primary' : 'btn-outline-primary'}`}
-          onClick={() => setMode('upload')}
-          disabled={disabled}
+      {/* Segmented control: solo se c'e' davvero una scelta. */}
+      {uploadsAvailable && (
+        <div
+          className="btn-group btn-group-sm mb-2"
+          role="tablist"
+          aria-label={label}
         >
-          <InlineIcon name="upload" className="me-1" />
-          {t('tabUpload')}
-        </button>
-        <button
-          type="button"
-          role="tab"
-          aria-selected={mode === 'url'}
-          className={`btn ${mode === 'url' ? 'btn-primary' : 'btn-outline-primary'}`}
-          onClick={() => {
-            setMode('url');
-            setUrlDraft(value ?? '');
-          }}
-          disabled={disabled}
-        >
-          <InlineIcon name="link" className="me-1" />
-          {t('tabUrl')}
-        </button>
-      </div>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={mode === 'upload'}
+            className={`btn ${mode === 'upload' ? 'btn-primary' : 'btn-outline-primary'}`}
+            onClick={() => setMode('upload')}
+            disabled={disabled}
+          >
+            <InlineIcon name="upload" className="me-1" />
+            {t('tabUpload')}
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={mode === 'url'}
+            className={`btn ${mode === 'url' ? 'btn-primary' : 'btn-outline-primary'}`}
+            onClick={() => {
+              setMode('url');
+              setUrlDraft(value ?? '');
+            }}
+            disabled={disabled}
+          >
+            <InlineIcon name="link" className="me-1" />
+            {t('tabUrl')}
+          </button>
+        </div>
+      )}
 
       {mode === 'upload' && (
         <div
@@ -381,6 +409,9 @@ export default function FileOrUrlInput({
             <div className="text-danger small mt-2" role="alert" aria-live="polite">
               {urlError}
             </div>
+          )}
+          {!uploadsAvailable && (
+            <div className="form-text text-muted mt-2">{t('uploadsUnavailable')}</div>
           )}
           {defaultHelp && !urlError && (
             <div className="form-text text-muted mt-2">{defaultHelp}</div>

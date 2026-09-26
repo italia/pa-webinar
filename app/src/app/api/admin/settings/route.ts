@@ -1,7 +1,6 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-
 import type { Prisma } from '@prisma/client';
 
 import { prisma } from '@/lib/db';
@@ -11,32 +10,18 @@ import { updateSettingsSchema } from '@/lib/validation/site-settings';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { UnauthorizedError, ValidationError } from '@/lib/errors';
-import { invalidateSettingsCache } from '@/lib/settings';
+import { invalidateSettingsCache, leggiOCrea } from '@/lib/settings';
 
 
 export const GET = withErrorHandling(async () => {
   const cookieStore = await cookies();
   const isAdmin = await isAdminAuthenticated(cookieStore);
 
-  const settings = await prisma.siteSetting.findUnique({
-    where: { id: 'singleton' },
-  });
-
-  if (!settings) {
-    const created = await prisma.siteSetting.create({
-      data: { id: 'singleton' },
-    });
-
-    if (isAdmin) {
-      return NextResponse.json(created);
-    }
-
-    return NextResponse.json(publicSettings(created), {
-      headers: {
-        'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
-      },
-    });
-  }
+  // Letta senza cache (il pannello rilegge subito cio' che ha appena
+  // salvato) e creata al primo uso con la stessa creazione idempotente di
+  // getSettings: su un'installazione nuova le prime richieste arrivano
+  // insieme, e una sola crea la riga.
+  const settings = await leggiOCrea();
 
   if (isAdmin) {
     return NextResponse.json(settings);

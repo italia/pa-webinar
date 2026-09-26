@@ -7,7 +7,7 @@ import { prisma } from '@/lib/db';
 import { titoloEventoPubblico } from '@/lib/events/meta-title';
 import { getPublicEnv } from '@/lib/env';
 import { getSettings } from '@/lib/settings';
-import { isJibriAvailable } from '@/lib/infrastructure';
+import { recordingAvailable } from '@/lib/recording/availability';
 import LiveEventClient from '@/components/live/live-event-client';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import { resolveKickerEnabled } from '@/lib/utils/title-kicker';
@@ -62,7 +62,10 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
   // LiveEventClient on mount when the initial status is IDLE.
 
   const settings = await getSettings();
-  const jibriAvailable = await isJibriAvailable();
+  // Se qualcosa puo' registrare (Jibri o il registratore per partecipante):
+  // senza, a chi partecipa non si dice «questo evento viene registrato» e non
+  // si chiede il consenso (lib/recording/availability).
+  const canRecord = recordingAvailable();
 
   const watermark = {
     url:
@@ -196,7 +199,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
           locale={locale}
           jitsiDomain={getPublicEnv('NEXT_PUBLIC_JITSI_DOMAIN')}
           watermark={watermark}
-          jibriAvailable={jibriAvailable}
+          recordingAvailable={canRecord}
           reactionsMode={settings.reactionsMode === 'CUSTOM' ? 'CUSTOM' : 'NATIVE'}
           rnnoiseEnforceOff={rnnoiseEnforceOff}
           whiteboardInfraReady={whiteboardInfraReady}
@@ -329,7 +332,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
       locale={locale}
       jitsiDomain={getPublicEnv('NEXT_PUBLIC_JITSI_DOMAIN')}
       watermark={watermark}
-      jibriAvailable={jibriAvailable}
+      recordingAvailable={canRecord}
       reactionsMode={settings.reactionsMode === 'CUSTOM' ? 'CUSTOM' : 'NATIVE'}
       rnnoiseEnforceOff={rnnoiseEnforceOff}
       whiteboardInfraReady={whiteboardInfraReady}

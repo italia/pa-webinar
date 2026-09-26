@@ -26,6 +26,7 @@ import { z } from 'zod';
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { extractModeratorToken, verifyModeratorToken } from '@/lib/auth/moderator';
 import { publishChat } from '@/lib/chat/pubsub';
+import { senderColourKey } from '@/lib/chat/sender-key';
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { ForbiddenError, NotFoundError, RateLimitError, ValidationError } from '@/lib/errors';
@@ -115,7 +116,8 @@ export const PATCH = withErrorHandling(async (request, context) => {
   void publishChat({
     id: message.id,
     eventId: event.id,
-    senderId: message.senderId,
+    // Mai l'id grezzo: la domanda di un ospite porterebbe il suo IP a tutta la sala.
+    senderKey: senderColourKey(message.senderId),
     senderName: tryDecryptPII(message.senderName) ?? message.senderName,
     isModerator: message.isModerator,
     text: tryDecryptPII(message.text) ?? message.text,

@@ -53,6 +53,7 @@ import {
 } from '@/lib/chat/attachment-token';
 import { chatMessagesTotal } from '@/lib/metrics';
 import { rateLimit } from '@/lib/rate-limit';
+import { getFilesStorage } from '@/lib/storage';
 
 export const dynamic = 'force-dynamic';
 
@@ -208,6 +209,11 @@ export const GET = withErrorHandling(async (request, context) => {
         ...(replyTo ? { replyTo } : {}),
       };
     }),
+    // Se questa installazione ha uno storage per i file: la graffetta e
+    // l'incolla-per-allegare compaiono solo quando il caricamento
+    // (POST ./attachment) puo' riuscire. Stessa regola di `uploadsEnabled`
+    // nell'elenco dei materiali.
+    attachmentsEnabled: getFilesStorage() !== null,
   }, {
     headers: { 'Cache-Control': 'no-store' },
   });
@@ -342,7 +348,9 @@ export const POST = withErrorHandling(async (request, context) => {
   void publishChat({
     id: created.id,
     eventId: created.eventId,
-    senderId: created.senderId,
+    // La stessa chiave della cronologia: una bolla ha lo stesso colore dal vivo
+    // e dopo un ricaricamento, e l'id grezzo non esce dal server.
+    senderKey: senderColourKey(created.senderId),
     senderName: plaintextSenderName,
     isModerator: created.isModerator,
     text: plaintextText,

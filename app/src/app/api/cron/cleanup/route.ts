@@ -4,13 +4,17 @@ import { assertCronApiKey } from '@/lib/auth/cron';
 import { deleteRecordingBlob } from '@/lib/storage/recordings';
 import { deleteBlob, isAzureConfigured } from '@/lib/azure/blob-storage';
 import { materialBlobsOfEvents, removeMaterialBlobs } from '@/lib/events/material-files';
+import { closeStaleSessions } from '@/lib/events/call-sessions';
 import {
   CLEANABLE_EVENT_STATUSES,
-  isEventDataRetentionExpired,
+  UNFINISHED_EVENT_STATUSES,
+  isEventEligibleForCleanup,
+  isFinishedEventStatus,
   isRecordingRetentionExpired,
   shouldPurgeRecordingBlob,
   tempRecordingExpiryCutoff,
 } from '@/lib/gdpr/cleanup-selection';
+import { getSettings } from '@/lib/settings';
 
 export const dynamic = 'force-dynamic';
 
@@ -20,6 +24,10 @@ export const dynamic = 'force-dynamic';
  * GDPR data cleanup: deletes participant PII — registrations, questions,
  * upvotes, poll votes, questionnaire responses, chat messages (encrypted),
  * agenda reactions — for events whose retention period has expired.
+ *
+ * Vale anche per gli eventi mai conclusi (PUBLISHED, PROVISIONING, IDLE, LIVE
+ * oltre la fine più la retention): vengono archiviati, con le sessioni di
+ * chiamata chiuse, e ripuliti nello stesso giro.
  *
  * Protected by CRON_API_KEY.
  * In production, called daily at 03:00 UTC via a Kubernetes CronJob.
@@ -131,14 +139,20 @@ export const GET = withErrorHandling(async (request) => {
   }
 
   // ── Phase 3: Full event data retention cleanup ──
+  // Gli eventi conclusi, e quelli mai conclusi oltre la loro fine: la
+  // retention decorre da `endsAt`, non dallo stato (lib/gdpr/cleanup-selection).
   const expiredEvents = await prisma.event.findMany({
     where: {
-      status: { in: [...CLEANABLE_EVENT_STATUSES] },
+      OR: [
+        { status: { in: [...CLEANABLE_EVENT_STATUSES] } },
+        { status: { in: [...UNFINISHED_EVENT_STATUSES] }, endsAt: { lt: now } },
+      ],
     },
     select: {
       id: true,
       slug: true,
       endsAt: true,
+      lastActiveAt: true,
       dataRetentionDays: true,
       status: true,
       recordingUrl: true,
@@ -148,7 +162,13 @@ export const GET = withErrorHandling(async (request) => {
     },
   });
 
-  const toClean = expiredEvents.filter((evt) => isEventDataRetentionExpired(evt, now));
+  const toClean = expiredEvents.filter((evt) => isEventEligibleForCleanup(evt, now));
+  // La grace di sito serve solo a stimare la fine delle sessioni rimaste
+  // aperte sugli eventi mai conclusi: la si legge solo se ce n'è uno.
+  const unfinished = toClean.filter((evt) => !isFinishedEventStatus(evt.status));
+  const siteGrace =
+    unfinished.length > 0 ? ((await getSettings()).eventGracePeriodMinutes ?? 15) : 15;
+  let unfinishedArchived = 0;
 
   let totalRegistrationsDeleted = 0;
   let totalQuestionsDeleted = 0;
@@ -318,6 +338,13 @@ export const GET = withErrorHandling(async (request) => {
           data: { dominantSpeakerLog: [], handRaiseLog: [], participants: [] },
         });
 
+        // Un evento mai concluso (rimasto PUBLISHED o LIVE oltre la fine)
+        // lascia il servizio adesso: le sue sessioni di chiamata si chiudono
+        // con l'orario stimato sulla fine della sala, non su oggi.
+        if (!isFinishedEventStatus(evt.status)) {
+          await closeStaleSessions(tx, [evt.id], now, siteGrace);
+        }
+
         if (evt.status !== 'ARCHIVED') {
           await tx.event.update({
             where: { id: evt.id },
@@ -392,6 +419,7 @@ export const GET = withErrorHandling(async (request) => {
       totalQuestionsDeleted += result.questions;
       totalPollsDeleted += result.polls;
       eventsProcessed++;
+      if (!isFinishedEventStatus(evt.status)) unfinishedArchived++;
     } catch (err) {
       console.error(`[cron/cleanup] Failed to clean event ${evt.id} (${evt.slug}):`, err);
     }
@@ -415,6 +443,7 @@ export const GET = withErrorHandling(async (request) => {
       isRecordingRetentionExpired(evt, now)
     ).length,
     eventsProcessed,
+    unfinishedEventsArchived: unfinishedArchived,
     registrationsDeleted: totalRegistrationsDeleted,
     questionsDeleted: totalQuestionsDeleted,
     pollsDeleted: totalPollsDeleted,

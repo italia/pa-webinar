@@ -52,6 +52,9 @@ interface SerializedTemplate {
 
 interface TemplateManagementProps {
   templates: SerializedTemplate[];
+  /** Se l'installazione ha il servizio della lavagna di Jitsi: senza, il
+   *  modello non la offre (vedi lib/jitsi/whiteboard.ts). */
+  whiteboardInfraReady: boolean;
 }
 
 interface EditingTemplate {
@@ -111,6 +114,7 @@ const DEFAULT_NEW: EditingTemplate = {
 
 export default function TemplateManagement({
   templates: initialTemplates,
+  whiteboardInfraReady,
 }: TemplateManagementProps) {
   const t = useTranslations('admin.templates');
   const tc = useTranslations('common');
@@ -266,6 +270,7 @@ export default function TemplateManagement({
               saving={saving}
               t={t}
               tc={tc}
+              whiteboardInfraReady={whiteboardInfraReady}
             />
           </CardBody>
         </Card>
@@ -288,6 +293,7 @@ export default function TemplateManagement({
                     saving={saving}
                     t={t}
                     tc={tc}
+                    whiteboardInfraReady={whiteboardInfraReady}
                   />
                 </CardBody>
               </Card>
@@ -401,6 +407,7 @@ function TemplateForm({
   saving,
   t,
   tc,
+  whiteboardInfraReady,
 }: {
   form: EditingTemplate;
   setField: <K extends keyof EditingTemplate>(
@@ -412,6 +419,7 @@ function TemplateForm({
   saving: boolean;
   t: ReturnType<typeof useTranslations>;
   tc: ReturnType<typeof useTranslations>;
+  whiteboardInfraReady: boolean;
 }) {
   // Etichette già esistenti del form evento: stessi flag, stessi nomi.
   // Duplicarle sotto `admin.templates` vorrebbe dire due testi da tenere
@@ -548,23 +556,38 @@ function TemplateForm({
             ['multitrackRecordingEnabled', ta('multitrackRecordingEnabled')],
             ['retainParticipantTracks', ta('retainParticipantTracks')],
           ] as const
-        ).map(([key, label]) => (
-          <div
-            key={key}
-            className="d-flex justify-content-between align-items-center py-2"
-            style={{ borderBottom: '1px solid #f0f0f0' }}
-          >
-            <span style={{ fontSize: '0.85rem' }}>{label}</span>
-            <ToggleSwitch
-              label=""
-              ariaLabel={label}
-              checked={form[key] as boolean}
-              onChange={() =>
-                setField(key, !form[key as keyof EditingTemplate])
-              }
-            />
-          </div>
-        ))}
+        ).map(([key, label]) => {
+          // La lavagna senza il servizio dell'installazione non comparirebbe
+          // in sala: non si accende, e la riga dice perche'. Resta spegnibile
+          // per togliere un valore gia' salvato.
+          const wbBloccata =
+            key === 'whiteboardEnabled' && !whiteboardInfraReady;
+          return (
+            <div
+              key={key}
+              className="d-flex justify-content-between align-items-center py-2"
+              style={{ borderBottom: '1px solid #f0f0f0' }}
+            >
+              <span style={{ fontSize: '0.85rem' }}>
+                {label}
+                {wbBloccata && (
+                  <small className="d-block text-secondary">
+                    {ta('whiteboardUnavailable')}
+                  </small>
+                )}
+              </span>
+              <ToggleSwitch
+                label=""
+                ariaLabel={label}
+                checked={form[key] as boolean}
+                disabled={wbBloccata && !form.whiteboardEnabled}
+                onChange={() =>
+                  setField(key, !form[key as keyof EditingTemplate])
+                }
+              />
+            </div>
+          );
+        })}
       </div>
 
       {/* Motore sala d'attesa pre-popolato nel wizard (null = default sito). */}

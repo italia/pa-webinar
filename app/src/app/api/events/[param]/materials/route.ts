@@ -6,10 +6,15 @@ import {
   RateLimitError,
   ValidationError,
 } from '@/lib/errors';
-import { isEventModerator, extractModeratorToken } from '@/lib/auth/moderator';
+import {
+  isEventModerator,
+  extractModeratorToken,
+  resolveGrantForEvent,
+} from '@/lib/auth/moderator';
 import { prisma } from '@/lib/db';
 import { isEventPubliclyVisible } from '@/lib/events/visibility';
 import { MATERIAL_ACCESS_EVENT_SELECT, materialsWhereFor } from '@/lib/events/material-access';
+import { materialAddedBy, materialAuthorName } from '@/lib/events/material-author';
 import { pokeLivePanel } from '@/lib/live-state/publish';
 import { getFilesStorage } from '@/lib/storage';
 import { createMaterialSchema } from '@/lib/validation/schemas';
@@ -58,7 +63,9 @@ export const GET = withErrorHandling(async (request, context) => {
         // Solo per i file caricati (type FILE): il peso da mostrare accanto.
         fileSize: m.fileSize != null ? Number(m.fileSize) : null,
         visibility: m.visibility,
-        addedBy: m.addedBy,
+        // Null quando la riga non porta un nome: la sala mostra una dicitura
+        // tradotta (lib/events/material-author).
+        addedBy: materialAuthorName(m.addedBy),
         createdAt: m.createdAt.toISOString(),
       })),
       // Se questa installazione ha uno storage per i file: il pannello della
@@ -104,7 +111,9 @@ export const POST = withErrorHandling(async (request, context) => {
       title: parsed.data.title,
       url: parsed.data.url,
       description: parsed.data.description ?? null,
-      addedBy: event.moderatorName ?? 'Moderator',
+      // Un nome solo se gia' pubblico, mai una parola fissa: vedi
+      // lib/events/material-author.
+      addedBy: materialAddedBy(await resolveGrantForEvent(event, token)),
     },
   });
 
@@ -118,7 +127,7 @@ export const POST = withErrorHandling(async (request, context) => {
       title: material.title,
       url: material.url,
       description: material.description,
-      addedBy: material.addedBy,
+      addedBy: materialAuthorName(material.addedBy),
       createdAt: material.createdAt.toISOString(),
     },
     { status: 201 },

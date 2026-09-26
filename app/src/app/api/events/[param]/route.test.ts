@@ -45,11 +45,17 @@ const { files } = vi.hoisted(() => ({
 }));
 vi.mock('@/lib/events/material-files', () => files);
 
+const { sessioni } = vi.hoisted(() => ({
+  sessioni: { closeOpenSessions: vi.fn(async () => 0) },
+}));
+vi.mock('@/lib/events/call-sessions', () => sessioni);
+
 vi.mock('@/lib/db', () => ({
   prisma: {
     event: { findUnique: vi.fn(), update: vi.fn(), delete: vi.fn() },
     gdprTemplate: { findUnique: vi.fn() },
     registration: { count: vi.fn(async () => 0) },
+    $transaction: vi.fn(),
   },
 }));
 
@@ -68,6 +74,7 @@ const mocked = prisma as unknown as {
     delete: ReturnType<typeof vi.fn>;
   };
   gdprTemplate: { findUnique: ReturnType<typeof vi.fn> };
+  $transaction: ReturnType<typeof vi.fn>;
 };
 
 /** Evento in stato pubblicato, con una configurazione di profilazione attiva. */
@@ -200,6 +207,69 @@ describe('PUT /api/events/[param] — le modifiche parziali restano parziali', (
 
     expect(r.status).toBe(422);
     expect(mocked.event.update).not.toHaveBeenCalled();
+  });
+});
+
+/**
+ * «Termina per tutti» e «Termina evento» sono il modo normale di chiudere un
+ * evento: la sessione di chiamata aperta si chiude nella stessa transazione,
+ * altrimenti resterebbe aperta per sempre e le statistiche riporterebbero la
+ * finestra programmata al posto della durata vera.
+ */
+describe('PUT /api/events/[param] — cambio di stato e sessioni di chiamata', () => {
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    mocked.event.update.mockImplementation(
+      async ({ data }: { data: Record<string, unknown> }) => ({ ...eventoEsistente(), ...data }),
+    );
+    mocked.$transaction.mockImplementation(async (fn: (tx: unknown) => unknown) => fn(prisma));
+  });
+
+  async function conStato(attuale: string, corpo: Record<string, unknown>) {
+    const { verifyModeratorToken } = await import('@/lib/auth/moderator');
+    vi.mocked(verifyModeratorToken).mockResolvedValueOnce(
+      eventoEsistente(attuale) as unknown as Awaited<ReturnType<typeof verifyModeratorToken>>,
+    );
+    return PUT(richiesta(corpo), contesto as never);
+  }
+
+  it.each([
+    ['LIVE', 'ENDED'],
+    ['LIVE', 'DRAFT'],
+    ['IDLE', 'ENDED'],
+    ['PROVISIONING', 'ENDED'],
+    ['PUBLISHED', 'ENDED'],
+  ])('da %s a %s chiude le sessioni nella stessa transazione', async (attuale, nuovo) => {
+    const r = await conStato(attuale, { status: nuovo });
+
+    expect(r.status).toBe(200);
+    expect(mocked.$transaction).toHaveBeenCalledTimes(1);
+    expect(sessioni.closeOpenSessions).toHaveBeenCalledWith(prisma, [EVENT_ID], expect.any(Date));
+  });
+
+  it.each([
+    ['PUBLISHED', 'LIVE'],
+    ['PROVISIONING', 'LIVE'],
+    ['IDLE', 'LIVE'],
+    // Un evento già concluso: le sue sessioni le ripara il giro del ciclo di
+    // vita, con un orario stimato sulla chiusura, non «adesso».
+    ['ENDED', 'LIVE'],
+    ['LIVE', 'LIVE'],
+  ])('da %s a %s non tocca le sessioni', async (attuale, nuovo) => {
+    const r = await conStato(attuale, { status: nuovo });
+
+    expect(r.status).toBe(200);
+    expect(mocked.$transaction).not.toHaveBeenCalled();
+    expect(sessioni.closeOpenSessions).not.toHaveBeenCalled();
+    expect(mocked.event.update).toHaveBeenCalledTimes(1);
+  });
+
+  it('avviare da preparazione o pausa scrive LIVE', async () => {
+    for (const attuale of ['PROVISIONING', 'IDLE']) {
+      mocked.event.update.mockClear();
+      await conStato(attuale, { status: 'LIVE' });
+      expect(datiScritti().status).toBe('LIVE');
+    }
   });
 });
 

@@ -127,7 +127,8 @@
         "outlook": "Outlook / Office 365",
         "yahoo": "Yahoo kalendorius",
         "downloadIcs": "Atsisiųsti .ics failą"
-      }
+      },
+      "registrationEnded": "Renginys baigėsi: registracija uždaryta."
     },
     "manage": {
       "toggleChat": "Pokalbiai",
@@ -368,7 +369,8 @@
       "questionRestore": "Atkurti",
       "questionStatusFailed": "Nepavyko atnaujinti klausimo",
       "questionNeedsText": "Įrašykite klausimo tekstą: vien priedas į eilę nepatenka",
-      "lensTruncated": "Įkeltos tik naujausios žinutės: senesnių klausimų sąraše gali nebūti."
+      "lensTruncated": "Įkeltos tik naujausios žinutės: senesnių klausimų sąraše gali nebūti.",
+      "attachUnavailable": "Priedai šiame diegime neprieinami."
     },
     "role": {
       "moderator": "Moderatorius",
@@ -389,7 +391,8 @@
         "unknown": "N/D"
       },
       "volume": "Garsumas",
-      "volumeFor": "Garsumas: {name}"
+      "volumeFor": "Garsumas: {name}",
+      "kickName": "Pašalinti: {name}"
     },
     "moderator": {
       "muteAll": "Nutildyti visus",
@@ -453,7 +456,18 @@
       "remainingLabel": "Likęs laikas (spustelėkite, kad matytumėte praėjusį)",
       "elapsedLabel": "Praėjęs laikas (spustelėkite, kad matytumėte likusį)"
     },
-    "videoCallFrameTitle": "Renginio vaizdo skambutis"
+    "videoCallFrameTitle": "Renginio vaizdo skambutis",
+    "insecureContextTitle": "Nesaugus adresas",
+    "insecureContextBody": "Šis puslapis atidarytas per http://: naršyklė neleidžia naudoti mikrofono ir kameros, todėl vaizdo skambutis negali prasidėti. Atidarykite tą patį puslapį saugiu adresu.",
+    "insecureContextLink": "Atidaryti https://{host}",
+    "conferenceUnreachableTitle": "Vaizdo skambučių paslauga neatsako",
+    "conferenceUnreachableBody": "Jūsų naršyklė negali pasiekti vaizdo skambučių serverio ({host}). Atidarykite jį naujame skirtuke: jei naršyklė parodys saugos įspėjimą, jį priimkite, tada grįžkite čia ir bandykite dar kartą. Jei puslapis neatsidaro, jį gali blokuoti tinklas, per kurį jungiatės.",
+    "conferenceOpenHost": "Atidaryti {host} naujame skirtuke",
+    "leftTitle": "Išėjote iš salės",
+    "leftMessage": "Renginys vis dar vyksta: galite grįžti bet kada.",
+    "leftModeratorReminder": "Renginys lieka atviras, kol kas nors jo neužbaigia. Kai baigsite, grįžkite ir pasirinkite „{action}“.",
+    "rejoin": "Grįžti",
+    "backToHome": "Grįžti į pradžios puslapį"
   },
   "qa": {
     "title": "Klausimai ir atsakymai",
@@ -590,7 +604,8 @@
       "errorGeneric": "Klaida įkeliant failą",
       "helpImage": "Palaikomi formatai: PNG, JPEG, WebP, SVG, GIF — iki 10 MB",
       "helpAudio": "Palaikomi formatai: MP3, WAV, OGG, M4A, WebM — iki 20 MB",
-      "helpDocument": "Palaikomi formatai: PDF, DOCX, PPTX, XLSX, TXT — iki 25 MB"
+      "helpDocument": "Palaikomi formatai: PDF, DOCX, PPTX, XLSX, TXT — iki 25 MB",
+      "uploadsUnavailable": "Failų įkėlimas šiame diegime nepasiekiamas: vietoj to įklijuokite failo URL."
     },
     "rubricaPicker": {
       "loading": "Ieškoma…",
@@ -628,7 +643,9 @@
           "endsAt": "Pabaigos data turi būti vėlesnė už pradžios datą.",
           "titleRequired": "Pavadinimas privalomas (bent 3 simboliai).",
           "titleRequiredOtherLocale": "Pavadinimas numatytąja kalba ({locale}) yra privalomas: pereikite į kortelę {locale}.",
-          "maxParticipants": "Įveskite skaičių nuo 2 iki 500."
+          "maxParticipants": "Įveskite skaičių nuo 2 iki 500.",
+          "descriptionRequired": "Aprašymas yra privalomas (bent {min} simbolių).",
+          "descriptionRequiredOtherLocale": "Aprašymas numatytąja kalba ({locale}) yra privalomas: pereikite į kortelę {locale}."
         },
         "senderRatioLabel": "Numatoma aktyvių dalis",
         "senderRatioHelp": "Kiek dalyvių turės įjungtą mikrofoną ar vaizdo kamerą. Padeda parinkti vaizdo serverio dydį.",
@@ -820,7 +837,11 @@
         "speakers": "pranešėjai",
         "materials": "medžiaga",
         "questionnaires": "klausimynai"
-      }
+      },
+      "revocationFailed": "Nepavyko atšaukti prieigos ({name}): prieigos nuoroda vis dar galioja. Išsaugokite dar kartą, kad bandytumėte iš naujo, arba atšaukite ją renginio puslapio kortelėje „{tab}“.",
+      "validationFailedDetail": "Serveris atmetė kai kuriuos duomenis: {reason}. Pataisykite ir bandykite dar kartą.",
+      "publishFailed": "Renginys sukurtas, bet nepaskelbtas: jis tebėra juodraštis. Paskelbkite jį renginio puslapyje.",
+      "publishFailedDetail": "Renginys sukurtas, bet nepaskelbtas: jis tebėra juodraštis. Serverio atsakymas: {reason}. Paskelbkite jį renginio puslapyje."
     },
     "nav": {
       "events": "Renginių valdymas",
@@ -1240,7 +1261,7 @@
       "wordCloudEnabled": "Tiesioginis žodžių debesis",
       "wordCloudEnabledDesc": "Dalyviai siunčia žodį, o debesis atnaujinamas tiesiogiai. Naudinga pradedant diskusiją arba per kelias sekundes surenkant nuotaikas.",
       "whiteboardEnabled": "Bendra lenta",
-      "whiteboardEnabledDesc": "Įjungia integruotą bendradarbiavimo lentą (Excalidraw): moderatoriai gali ją atverti iš įrankių juostos renginio metu. Momentiniuose skambučiuose visada įjungta.",
+      "whiteboardEnabledDesc": "Įjungia integruotą bendradarbiavimo lentą (Excalidraw): moderatoriai gali ją atverti iš įrankių juostos renginio metu. Reikalinga diegimo lentos paslauga; kur ji yra, momentiniuose skambučiuose lenta visada įjungta.",
       "autoStartRecording": "Pradėti įrašymą automatiškai",
       "autoStartRecordingDesc": "Renginiui prasidėjus, įrašymas paleidžiamas savaime (moderatoriaus neklausiama). Vėluojantieji iš karto randa prieinamą grotuvą.",
       "aiSectionHeading": "Automatinis apdorojimas po renginio",
@@ -1316,7 +1337,8 @@
       "retentionPreviewRecordings": "Vaizdo įrašai",
       "retentionPreviewKept": "Suvestinė statistika ir renginio metaduomenys yra saugomi.",
       "configPreview": "Konfigūracijos peržiūra",
-      "templateApplied": "Pritaikytas šablonas: {name}. Galite keisti visus nustatymus."
+      "templateApplied": "Pritaikytas šablonas: {name}. Galite keisti visus nustatymus.",
+      "whiteboardUnavailable": "Šiame diegime neprieinama: trūksta Jitsi lentos paslaugos, kurią gali įjungti platformos administratorius."
     },
     "links": {
       "title": "Renginio nuorodos",
@@ -1925,9 +1947,9 @@
       "version": "Versija",
       "environment": "Aplinka",
       "modes": {
-        "simple": "Paprasta (Docker Compose)",
-        "standard": "Standartinė (Kubernetes)",
-        "full": "Pilna (Kubernetes su scale-to-zero)",
+        "simple": "Paprasta",
+        "standard": "Standartinė",
+        "full": "Pilna (tiltai su scale-to-zero)",
         "unknown": "Nežinoma"
       },
       "database": {
@@ -1941,7 +1963,9 @@
         "title": "Jitsi Meet",
         "reachable": "Pasiekiamas",
         "unreachable": "Nepasiekiamas",
-        "notConfigured": "Nesukonfigūruotas"
+        "notConfigured": "Nesukonfigūruotas",
+        "degraded": "Pasiekiamas, bet atsako su klaidomis arba lėtai",
+        "publicCheckFailed": "Patikra viešuoju adresu nepavyko ({code}): portalo serveris nepriima sertifikato arba pavadinimo. Konferencijos vis tiek gali veikti."
       },
       "jvb": {
         "title": "Video Bridge (JVB)",
@@ -1949,7 +1973,9 @@
         "replicas": "{current}/{max} mazgų",
         "preScale": "Išankstinis mastelio keitimas: {minutes} min.",
         "fixedMode": "Fiksuotas režimas",
-        "scalerEnabled": "Mastelio keitiklis įjungtas"
+        "scalerEnabled": "Mastelio keitiklis įjungtas",
+        "fixedDown": "Vaizdo tiltas neatsako",
+        "unmonitored": "Nestebima: nenustatytas tilto adresas (JVB_HEALTH_URL)"
       },
       "jibri": {
         "title": "Įrašymas (Jibri)",
@@ -1971,7 +1997,11 @@
         "metrics": "Metrikų prieigos taškas"
       },
       "note": "Infrastruktūros pakeitimai atliekami per Helm konfigūraciją ir CI/CD vamzdyną.",
-      "deployDocs": "Diegimo dokumentacija"
+      "deployDocs": "Diegimo dokumentacija",
+      "platforms": {
+        "kubernetes": "Kubernetes aplinkoje",
+        "other": "Ne Kubernetes aplinkoje (Docker Compose arba vienas serveris)"
+      }
     },
     "instantCalls": {
       "title": "Greitieji skambučiai",
@@ -2076,9 +2106,9 @@
       "latencyP99": "Delsa P99",
       "requestRate": "Užklausos/s",
       "chartLatencyQuantiles": "Programos delsa — P50 / P95 / P99",
-      "participantsNow": "Aktyvūs dalyviai",
+      "participantsNow": "Dalyviai vaizdo tilte",
       "jvbStress": "JVB apkrova",
-      "conferences": "Aktyvios konferencijos",
+      "conferences": "Konferencijos vaizdo tilte",
       "octoRelay": "Octo tarpinis tiltų ryšys",
       "interBridge": "Octo srautas",
       "chartCpu": "CPU usage",
@@ -2105,7 +2135,8 @@
       "liveNow": "LIVE",
       "provisioningNow": "ruošiama",
       "idleNow": "IDLE (pristabdyta)",
-      "scaleToZeroHelp": "IDLE yra normali būsena renginiui be srauto ilgiau nei malonės laikotarpis. Kitam vartotojui apsilankius, grįžtama į PROVISIONING ir tada LIVE."
+      "scaleToZeroHelp": "IDLE yra normali būsena renginiui be srauto ilgiau nei malonės laikotarpis. Kitam vartotojui apsilankius, grįžtama į PROVISIONING ir tada LIVE.",
+      "capacityFromStatus": "Dabartinės reikšmės nuskaitytos iš vaizdo tilto. Istorijai reikia Prometheus."
     },
     "bulk": {
       "selectAll": "Pažymėti visus",
@@ -2824,7 +2855,8 @@
       "quotaExceeded": "Šis renginys pasiekė įkeltų failų ribą ({maxFiles} failų, iš viso {maxMb} MB): pašalinkite kelis, kad galėtumėte įkelti daugiau",
       "uploadBusy": "Šiuo metu per daug įkėlimų: bandykite dar kartą po kelių sekundžių",
       "deleteFailed": "Medžiagos ištrinti nepavyko"
-    }
+    },
+    "addedByStaff": "Pridėjo organizatoriai"
   },
   "reminders": {
     "title": "Pranešimai",
@@ -2897,7 +2929,7 @@
       "requestSubmittedBody": "Jei šis el. pašto adresas atitinka registraciją, išsiuntėme jums nuorodą ištrynimui patvirtinti. Nuoroda galioja 1 valandą.",
       "linkInvalid": "Nuoroda negalioja arba baigėsi jos galiojimas. Paprašykite naujos nuorodos.",
       "confirmWarning": "Ketinate visam laikui ištrinti visus su jūsų el. pašto adresu susietus asmens duomenis.",
-      "confirmBody": "Bus ištrintos registracijos, klausimai, balsai apklausose, atsiliepimai ir priminimai. Šio veiksmo atšaukti negalima.",
+      "confirmBody": "Bus ištrintos registracijos, klausimai, balsai apklausose, atsiliepimai, priminimai ir jūsų įrašas renginių adresų knygoje. Šio veiksmo atšaukti negalima.",
       "confirmButton": "Patvirtinti ištrynimą",
       "cancel": "Atšaukti",
       "processing": "Trinama...",
@@ -3120,7 +3152,7 @@
     "nodesReady": "paruošti mazgai",
     "scaling": "mastelio keitimas",
     "jvbStress": "JVB apkrova",
-    "participantsConnected": "prisijungę dalyviai",
+    "participantsConnected": "dalyviai vaizdo tilte",
     "videoInteractive": "interaktyvus",
     "videoWebinar": "internetinis seminaras",
     "participantsAvailable": "galimų dalyvių",
@@ -3164,7 +3196,12 @@
       "lastFailure": "Paskutinė klaida: {when}",
       "artifactsProduced": "{count, plural, =0 {artefaktų nėra} one {sukurtas # artefaktas} few {sukurti # artefaktai} other {sukurta # artefaktų}}",
       "eventsEnabled": "{count, plural, =0 {nėra renginių su DI} one {# renginys su įjungtu DI} few {# renginiai su įjungtu DI} other {# renginių su įjungtu DI}}"
-    }
+    },
+    "jvbFixedUp": "{count, plural, =1 {Vaizdo tiltas veikia} other {Vaizdo tiltas veikia · numatyta tiltų: #}}",
+    "jvbFixedDown": "Vaizdo tiltas neatsako",
+    "jvbFixedDownDetail": "Dalyviai negauna nei garso, nei vaizdo, kol tiltas vėl nebus pasiekiamas.",
+    "jvbUnmonitored": "Būsena nestebima",
+    "jvbUnmonitoredDetail": "Šis diegimas neužklausia vaizdo tilto, todėl jo būsena čia nepateikiama."
   },
   "infraMap": {
     "loading": "Infrastruktūros žemėlapio įkėlimas...",
@@ -3172,8 +3209,8 @@
     "ariaLabel": "Sistemos infrastruktūros žemėlapis",
     "title": "Infrastruktūros žemėlapis",
     "subtitle": "Architektūros ir paslaugų būsenos vizualizacija realiuoju laiku",
-    "participants": "Dalyviai",
-    "conferences": "Konferencijos",
+    "participants": "Dalyviai vaizdo tilte",
+    "conferences": "Konferencijos vaizdo tilte",
     "bandwidthIn": "Įeinantis pralaidumas",
     "bandwidthOut": "Išeinantis pralaidumas",
     "recordings": "Įrašai",
@@ -3259,23 +3296,33 @@
       "jitsiWeb": {
         "healthy": "Vaizdo konferencijų kambarys pasiekiamas ir paruoštas renginiams.",
         "down": "Vaizdo konferencijų kambarys nepasiekiamas. Negalima pradėti ar prisijungti prie renginių.",
-        "standby": "Vaizdo konferencijų kambarys nesukonfigūruotas."
+        "standby": "Vaizdo konferencijų kambarys nesukonfigūruotas.",
+        "degraded": "Vaizdo konferencijų kambarys atsako, bet su klaidomis arba lėtai.",
+        "publicCheckFailed": "Portalas negali patikrinti kambario jo viešuoju adresu: serverio požiūriu sertifikatas arba pavadinimas negalioja. Dalyviams kambarys vis tiek gali veikti.",
+        "unmonitored": "Vaizdo konferencijų kambario būsena šiame diegime nestebima."
       },
       "prosody": {
         "healthy": "Vidiniai pranešimai tarp vaizdo paslaugų veikia teisingai.",
         "down": "Vidiniai pranešimai nepasiekiami. Vaizdo paslaugos negali tarpusavyje bendrauti.",
-        "standby": "Pranešimų paslauga nesukonfigūruota."
+        "standby": "Pranešimų paslauga nesukonfigūruota.",
+        "degraded": "Vidiniai pranešimai atsako, bet su klaidomis arba lėtai.",
+        "publicCheckFailed": "Portalas negali patikrinti vidinių pranešimų per viešąjį kambario adresą: serverio požiūriu sertifikatas arba pavadinimas negalioja. Konferencijos vis tiek gali veikti.",
+        "unmonitored": "Vidinių pranešimų būsena šiame diegime nestebima."
       },
       "jicofo": {
         "healthy": "Konferencijų koordinatorius aktyvus ir valdo sesijas.",
         "down": "Konferencijų koordinatorius nepasiekiamas. Negalima kurti naujų konferencijų.",
-        "standby": "Konferencijų koordinatorius nesukonfigūruotas."
+        "standby": "Konferencijų koordinatorius nesukonfigūruotas.",
+        "degraded": "Konferencijų koordinatorius atsako, bet su klaidomis arba lėtai.",
+        "unmonitored": "Konferencijų koordinatoriaus būsena šiame diegime nestebima."
       },
       "jvb": {
         "healthy": "Vaizdo tiltas aktyvus ir perduoda garsą/vaizdą dalyviams.",
         "scaling": "Vaizdo tiltas ruošiasi artėjančiam renginiui. Serveriai kuriami automatiškai.",
         "standby": "Vaizdo tiltas budėjimo režime. Automatiškai aktyvuosis prieš suplanuoto renginio pradžią.",
-        "stale": "Renginys laukia vaizdo tilto ilgiau nei sukonfigūruotas laikas. Patikrinkite klasterio masteliuotoją ir JVB pod žurnalus."
+        "stale": "Renginys laukia vaizdo tilto ilgiau nei sukonfigūruotas laikas. Patikrinkite klasterio masteliuotoją ir JVB pod žurnalus.",
+        "fixedDown": "Vaizdo tiltas neatsako. Konferencijos neperduoda nei garso, nei vaizdo, kol jis vėl nebus pasiekiamas.",
+        "unmonitored": "Vaizdo tilto būsena šiame diegime nestebima: portalas neturi adreso, kuriuo galėtų jį užklausti."
       },
       "jibri": {
         "healthy": "Įrašymo paslauga paruošta ir prieinama.",
@@ -3307,7 +3354,8 @@
       "jibri": "Renginių negalima įrašyti. Dalyviai vis tiek gali prisijungti ir dalyvauti.",
       "jibriStale": "Renginys su aktyviu įrašymu laukia Jibri ilgiau nei laikas: sesija neįrašoma.",
       "smtp": "Registracijos patvirtinimo el. laiškai ir priminimai nebus siunčiami.",
-      "postprodDegraded": "Kai kurių naujausių įrašų transkripcijos ir santraukos nebuvo sukurtos. Vaizdo įrašai vis tiek pasiekiami."
+      "postprodDegraded": "Kai kurių naujausių įrašų transkripcijos ir santraukos nebuvo sukurtos. Vaizdo įrašai vis tiek pasiekiami.",
+      "jvbDown": "Dalyviai negauna nei garso, nei vaizdo."
     },
     "overallVerdicts": {
       "operational": "Visos paslaugos veikia teisingai. Platforma visiškai veikia.",
@@ -3337,7 +3385,8 @@
       "degraded": "Sulėtėjęs",
       "down": "Nepasiekiamas",
       "standby": "Budėjimo režimas",
-      "scaling": "Ruošiamasi"
+      "scaling": "Ruošiamasi",
+      "unknown": "Nestebima"
     },
     "metrics": {
       "uptime24h": "Veikimas 24 val.",
@@ -3348,7 +3397,8 @@
       "errorRate": "5xx klaidos",
       "requestRate": "Užklausos/s",
       "podUptime": "Pod veikimas"
-    }
+    },
+    "probeDetail": "Patikros rezultatas"
   },
   "feedback": {
     "title": "Kaip vertinate šį renginį?",
@@ -3673,7 +3723,9 @@
       "almostReady": "Vaizdo serveris veikia: beveik viskas",
       "almostReadyDetail": "Dar akimirka ir prisijungimo mygtukas įsijungs pats.",
       "honestHint": "Įprastas laukimas: mažiau nei minutė, jei infrastruktūra jau įšilusi, 3–5 minutės pirmo paleidimo metu. Tuo tarpu gali patikrinti kamerą ir mikrofoną arba naudotis pokalbiais.",
-      "elapsed": "ruošiama jau {time}"
+      "elapsed": "ruošiama jau {time}",
+      "scheduled": "Salė atsidaro pradžios metu",
+      "scheduledDetail": "Arba anksčiau, kai organizatorius pradeda renginį. Tuo tarpu gali patikrinti kamerą ir mikrofoną arba naudotis pokalbiais."
     },
     "exitWaiting": "Išeiti iš laukiamojo",
     "warmingUp": "Salė ruošiama",
@@ -3729,7 +3781,10 @@
       "hostEarly": "Ankstyvas įėjimas (šeimininkas)"
     },
     "roomJustOpened": "Salė paruošta — užeik",
-    "enterAnyway": "Vis tiek įeiti"
+    "enterAnyway": "Vis tiek įeiti",
+    "notHeldBadge": "Laikas praėjo",
+    "notHeldTitle": "Numatytas renginio laikas jau praėjo",
+    "notHeldDetail": "Salė nebuvo atidaryta. Naujienų ieškok renginio puslapyje."
   },
   "recording": {
     "management": "Vaizdo įrašas",
@@ -3865,6 +3920,16 @@
     "noFeedback": "Atsiliepimų negauta",
     "comments": "Komentarai",
     "noComments": "Komentarų nėra",
+    "yes": "Taip",
+    "no": "Ne"
+  },
+  "questionnaire": {
+    "loadFailed": "Nepavyko įkelti klausimyno.",
+    "submit": "Siųsti atsakymus",
+    "submitFailed": "Išsiųsti nepavyko. Bandykite dar kartą.",
+    "answersInvalid": "Kai kurių atsakymų trūksta arba jie netinkami: patikrinkite privalomus klausimus ir bandykite dar kartą.",
+    "alreadySubmitted": "Į šį klausimyną jau atsakėte.",
+    "thankYou": "Dėkojame už atsakymus.",
     "yes": "Taip",
     "no": "Ne"
   }

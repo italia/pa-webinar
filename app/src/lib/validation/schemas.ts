@@ -1,5 +1,10 @@
 import { z } from 'zod';
 
+import {
+  EVENT_DESCRIPTION_MIN_LENGTH,
+  EVENT_DESCRIPTION_REQUIRED_LOCALE,
+} from './event-description';
+
 // ── Event Schemas ────────────────────────────────────
 
 const localizedStringField = z.record(z.string(), z.string());
@@ -9,9 +14,16 @@ export const eventBaseSchema = z.object({
     (obj) => typeof obj.it === 'string' && obj.it.length >= 3,
     { message: 'title.it is required and must be at least 3 characters' },
   ),
+  // Lingua e soglia condivise con il wizard (vedi event-description.ts per il
+  // motivo per cui la lingua resta fissa e non segue quella del sito).
   description: localizedStringField.refine(
-    (obj) => typeof obj.it === 'string' && obj.it.length >= 10,
-    { message: 'description.it is required and must be at least 10 characters' },
+    (obj) => {
+      const testo = obj[EVENT_DESCRIPTION_REQUIRED_LOCALE];
+      return typeof testo === 'string' && testo.length >= EVENT_DESCRIPTION_MIN_LENGTH;
+    },
+    {
+      message: `description.${EVENT_DESCRIPTION_REQUIRED_LOCALE} is required and must be at least ${EVENT_DESCRIPTION_MIN_LENGTH} characters`,
+    },
   ),
   startsAt: z.string().datetime(),
   endsAt: z.string().datetime(),

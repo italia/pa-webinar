@@ -6,6 +6,7 @@ import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { prisma } from '@/lib/db';
 import { ValidationError } from '@/lib/errors';
+import { closeOpenSessions } from '@/lib/events/call-sessions';
 
 export const dynamic = 'force-dynamic';
 
@@ -27,9 +28,21 @@ export const POST = withErrorHandling(async (request) => {
     );
   }
 
-  const result = await prisma.event.updateMany({
-    where: { id: { in: parsed.data.ids }, ...eventScope(session) },
-    data: { status: 'ARCHIVED' },
+  // Archiviare un evento ancora in servizio (LIVE, in pausa, in
+  // preparazione) chiude anche le sue sessioni di chiamata, nella stessa
+  // transazione: altrimenti resterebbero senza fine (lib/events/call-sessions).
+  // Quelle di un evento già concluso le chiude il giro del ciclo di vita, con
+  // un orario stimato sulla chiusura invece che su adesso.
+  const where = { id: { in: parsed.data.ids }, ...eventScope(session) };
+  const result = await prisma.$transaction(async (tx) => {
+    const targets = await tx.event.findMany({ where, select: { id: true, status: true } });
+    const archived = await tx.event.updateMany({ where, data: { status: 'ARCHIVED' } });
+    await closeOpenSessions(
+      tx,
+      targets.filter((e) => e.status !== 'ENDED' && e.status !== 'ARCHIVED').map((e) => e.id),
+      new Date(),
+    );
+    return archived;
   });
 
   await logAdminAction({

@@ -8,6 +8,7 @@ import { Icon } from '@/components/ui/icon';
 import { Link, percorso } from '@/i18n/navigation';
 import { useToast } from '@/components/ui/toast';
 import { useConfirm } from '@/components/ui/confirm-dialog';
+import { localizedUrl } from '@/lib/utils/localized-url';
 
 interface ModeratorRow {
   id: string;
@@ -65,8 +66,9 @@ export default function ModeratorsDashboard({
 
   useEffect(() => { fetchRows(); }, [fetchRows]);
 
+  // Link da copiare: fuori dal router, i segmenti si traducono dalla mappa.
   function buildLink(row: ModeratorRow): string {
-    return `${appUrl}/${locale}/events/${row.slug}/live?token=${row.moderatorToken}`;
+    return localizedUrl(appUrl, `/events/${row.slug}/live?token=${row.moderatorToken}`, locale);
   }
 
   async function copyLink(row: ModeratorRow) {

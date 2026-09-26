@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { Button } from 'design-react-kit';
 
 import { Icon } from '@/components/ui/icon';
+import { GlyphIcon } from '@/components/ui/glyph-icon';
 import type { JitsiMeetExternalAPI } from '@/types/jitsi';
 
 import { resolveDisplayName, RETRY_DELAYS_MS } from './raised-hands-resolve';
@@ -291,7 +292,7 @@ export default function RaisedHandsPanel({
                     title={t('approveAll')}
                     style={{ lineHeight: 1 }}
                   >
-                    <Icon icon="it-microphone" size="xs" />
+                    <GlyphIcon glyph="microphone" size="xs" />
                   </Button>
                   <Button
                     color="light"

@@ -36,6 +36,7 @@ describe('resolveWhiteboardInfraReady', () => {
 const SRC = path.resolve(__dirname, '../..');
 const LIVE_PAGE = path.join(SRC, 'app/[locale]/events/[slug]/live/page.tsx');
 const LIVE_CLIENT = path.join(SRC, 'components/live/live-event-client.tsx');
+const JITSI_ROOM = path.join(SRC, 'components/jitsi/jitsi-room.tsx');
 
 function sourceFiles(dir: string): string[] {
   return fs.readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
@@ -96,5 +97,34 @@ describe('cablaggio del flag della lavagna (deve restare a RUNTIME)', () => {
     expect(jsxElement(client, 'LiveSidebar')).toContain(
       'whiteboardInfraReady={whiteboardInfraReady}',
     );
+  });
+});
+
+describe('lavagna in sala solo con il backend', () => {
+  it('LiveEventClient non offre la lavagna senza backend, nemmeno nelle chiamate istantanee', () => {
+    // Le istantanee la hanno sempre, ma solo dove l'installazione ne ha il
+    // backend: nessuna delle tre superfici riceve la scelta dell'evento nuda.
+    const client = stripComments(fs.readFileSync(LIVE_CLIENT, 'utf8'));
+    expect(client).toContain(
+      'whiteboardInfraReady && (event.whiteboardEnabled || isInstantCall)',
+    );
+    expect(client).not.toContain('whiteboardEnabled={event.whiteboardEnabled');
+    for (const tag of ['JitsiRoom', 'ModeratorControls', 'LiveSidebar']) {
+      expect(jsxElement(client, tag), tag).toContain('whiteboardEnabled={whiteboardOn}');
+    }
+    expect(jsxElement(client, 'JitsiRoom')).toContain(
+      'whiteboardInfraReady={whiteboardInfraReady}',
+    );
+  });
+
+  it('JitsiRoom aggiunge il pulsante alla barra solo con il backend', () => {
+    // Il pulsante nativo di Jitsi aprirebbe una lavagna che non si collega a
+    // niente: la condizione che lo aggiunge deve contenere anche il backend.
+    const room = stripComments(fs.readFileSync(JITSI_ROOM, 'utf8'));
+    const push = room.indexOf("toolbarButtons.push('whiteboard')");
+    expect(push).toBeGreaterThan(0);
+    const condition = room.slice(room.lastIndexOf('if (', push), push);
+    expect(condition).toContain('whiteboardEnabled');
+    expect(condition).toContain('whiteboardInfraReady');
   });
 });
