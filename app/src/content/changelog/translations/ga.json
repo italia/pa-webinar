@@ -1,4 +1,19 @@
 {
+  "0.12.0": {
+    "title": "Réidh le hathúsáid: suiteáil le hordú amháin, agus leanann na himeachtaí ar aghaidh leo féin",
+    "notes": [
+      "Suiteáil le hordú amháin: ar ríomhaire le minikube chun triail a bhaint as agus chun forbairt a dhéanamh, ar fhreastalaí k3s le haghaidh táirgthe, le deimhnithe, bosca poist tástála, stóráil oibiachtaí, TURN agus cúltaca sceidealta. Is féidir gach suiteáil a sheiceáil le hordú amháin, tá a scripteanna féin ag cúltaca agus athchóiriú an bhunachair sonraí agus na gcomhad, agus sa doiciméadú, atá i mBéarla anois, tá treoracha do minikube, k3s, AKS, GKE agus EKS agus seicliostaí don dul beo.",
+      "Osclaítear imeachtaí ag an am tosaithe agus dúntar iad ag an deireadh, fiú ar shuiteálacha gan tosú uathoibríoch na ndroichead físeáin. Bíonn “Tosaigh an t-imeacht” ar fáil i gcónaí don té a stiúrann an t-imeacht, agus ní fhanann imeacht greamaithe “ag ullmhú” a thuilleadh.",
+      "Cuntais ainmnithe don fhoireann: síníonn riarthóirí agus eagraithe isteach le nasc pearsanta a fhaigheann siad trí ríomhphost, agus ní fheiceann gach duine ach an méid a cheadaíonn a ról. Fanann eochair an ásc don chéad rochtain agus d'éigeandálaí.",
+      "Ríomhphoist in Iodáilis, i mBéarla, i bhFraincis, i nGearmáinis agus i Spáinnis, i dteanga an fhaighteora. Tagann naisc phearsanta na modhnóirí agus na gcainteoirí trí ríomhphost, ní thagann na meabhrúcháin go léir le chéile a thuilleadh, agus ní dhéantar cuirí féilire a dhúbailt.",
+      "Sa chomhdháil físe, braitheann an ról ar an nasc a úsáidtear chun dul isteach: is rannpháirtithe iad aíonna agus daoine cláraithe agus ní féidir leo an modhnóir a bhalbhú ná a bhaint amach a thuilleadh.",
+      "Sa seomra: oibríonn ceisteanna, vótaí agus an scamall focal d'aíonna agus do chainteoirí freisin; glacann na hábhair le comhaid chomh maith le naisc; is féidir le duine a fhágann as a stuaim féin filleadh isteach, in ionad “Imeacht críochnaithe” a fheiceáil; mura féidir teacht ar an gcomhdháil físe, deir an seomra é sin agus tairgeann sé “Bain triail eile as”; tosaíonn an ceamara agus an micreafón múchta do rannpháirtithe; is féidir an cúlra fíorúil a roghnú sa seomra feithimh cheana féin.",
+      "Príobháideachas: ní sheolann an comhrá seoladh IP na n-aíonna chuig na daoine atá i láthair a thuilleadh; téann na naisc chun do shonraí féin a easpórtáil nó a scriosadh chuig an seoladh ceart; feictear an fógra agus an toiliú maidir le taifeadadh áit ar bith ar féidir le rud éigin taifeadadh.",
+      "Seiceálann an leathanach stádais na seirbhísí ón taobh istigh agus ní thuairiscíonn sé briseadh seirbhíse a thuilleadh mar gheall ar dheimhniú neamhphoiblí; taispeántar suiteálacha le droichead físeáin seasta i gceart.",
+      "Riarachán: oibríonn cúlghairm comhmhodhnóirí agus cainteoirí ón draoi i ndáiríre anois, insíonn an draoi cad nár sábháladh, agus tar éis an fhoilsithe sroichtear leathanach an imeachta. Níl leathanach poiblí ag glaonna tapa a thuilleadh, agus taispeánann naisc chomhroinnte réamhamharc ar an imeacht.",
+      "Dóibh siúd a uasghrádaíonn: atosaíonn Prosody, Jicofo, an chomhdháil ghréasáin agus an droichead físeáin uair amháin, mar sin is fearr uasghrádú nuair nach bhfuil imeacht ar siúl; ní mór dóibh siúd a bhfuil imleabhair nó modúil shaincheaptha acu ar Prosody na cinn atá sa chart a chur leo; gan an scálóir, dúntar imeachtaí beo anois ag an deireadh móide an t-am cairde."
+    ]
+  },
   "0.11.0": {
     "title": "Freagraíonn an seomra anois an nóiméad a athraíonn rud éigin",
     "notes": [

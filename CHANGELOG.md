@@ -10,6 +10,21 @@ public `/changelog` page, translated into every language the site ships.
 Versions follow [semantic versioning](https://semver.org/). Releases marked
 🔒 were primarily security or dependency hardening.
 
+## 0.12.0 — 2026-09-26
+
+**Ready for reuse: one-command installation, and events run on their own**
+
+- One-command installation: on a computer with minikube to evaluate and develop, on a k3s server for production, with certificates, a test mailbox, object storage, TURN and scheduled backups. Every installation can be checked with one command, database and file backup and restore have their own scripts, and the documentation, now in English, has guides for minikube, k3s, AKS, GKE and EKS and go-live checklists.
+- Events open at their start time and close at their end even on installations where video bridges are not started automatically. «Start event» is always available to whoever runs the event, and an event no longer stays stuck while the room is being set up.
+- Named staff accounts: administrators and organizers sign in with a personal link sent by email, and each sees only what their role allows. The instance key remains for first access and emergencies.
+- Emails in Italian, English, French, German and Spanish, in the recipient's language. Moderators and speakers receive their personal links by email, reminders no longer arrive all at once, and calendar invitations are no longer duplicated.
+- In the video conference, the role depends on the link used to join: guests and registrants are participants and can no longer mute or remove the moderator.
+- In the room: questions, votes and the word cloud also work for guests and speakers; materials accept files as well as links; people who leave on their own can rejoin instead of seeing «event ended»; if the video conference cannot be reached, the room says so and offers «Retry»; camera and microphone start off for participants; the virtual background can be chosen in the waiting room.
+- Privacy: the chat no longer sends guests' IP addresses to the other attendees; the links to export or erase one's data point to the right address; the recording notice and consent appear wherever something can record.
+- The status page checks the services from inside and no longer reports an outage because of a non-public certificate; installations with a fixed video bridge are shown correctly.
+- Administration: revoking co-moderators and speakers from the wizard really works, the wizard says what was not saved, and publishing lands on the event page. Instant calls no longer have a public page, and shared links show a preview of the event.
+- When upgrading: Prosody, Jicofo, the web conference and the video bridge restart once, so upgrade with no event in progress; installations with custom Prosody volumes or modules must add the chart's own; without the scaler, live events now close at their end plus the grace period.
+
 ## 0.11.0 — 2026-07-27
 
 **The room now reacts the moment something changes**

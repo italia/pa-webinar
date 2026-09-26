@@ -1,4 +1,19 @@
 {
+  "0.12.0": {
+    "title": "Spremno za ponovnu upotrebu: instalacija jednom naredbom, a događaji teku sami",
+    "notes": [
+      "Instalacija jednom naredbom: na računalu s alatom minikube za isprobavanje i razvoj, na poslužitelju s k3s za produkciju, s certifikatima, testnim poštanskim sandučićem, objektnom pohranom, TURN-om i zakazanim sigurnosnim kopiranjem. Svaka se instalacija provjerava jednom naredbom, sigurnosno kopiranje i vraćanje baze podataka i datoteka imaju vlastite skripte, a dokumentacija, sada na engleskom, ima vodiče za minikube, k3s, AKS, GKE i EKS te kontrolne popise za puštanje u rad.",
+      "Događaji se otvaraju u vrijeme početka i zatvaraju na kraju i na instalacijama bez automatskog pokretanja video mostova. „Pokreni događaj” uvijek je na raspolaganju onome tko vodi događaj, a događaj više ne ostaje zaglavljen u stanju „Priprema”.",
+      "Imenski računi za osoblje: administratori i organizatori prijavljuju se osobnom poveznicom primljenom e-poštom, a svatko vidi samo ono što mu uloga dopušta. Ključ instance ostaje za prvi pristup i za hitne slučajeve.",
+      "E-poruke na talijanskom, engleskom, francuskom, njemačkom i španjolskom, na jeziku primatelja. Osobne poveznice moderatora i govornika stižu e-poštom, podsjetnici više ne stižu svi odjednom, a pozivnice za kalendar više se ne dupliciraju.",
+      "U videokonferenciji uloga ovisi o poveznici kojom se ulazi: gosti i prijavljeni su sudionici i više ne mogu utišati ili udaljiti moderatora.",
+      "U dvorani: pitanja, glasanje i oblak riječi rade i za goste i govornike; materijali uz poveznice primaju i datoteke; tko sam izađe, može se vratiti umjesto da vidi „Događaj je završen”; ako videokonferencija nije dostupna, dvorana to kaže i nudi „Pokušajte ponovno”; kamera i mikrofon za sudionike se pokreću isključeni; virtualna pozadina bira se već u čekaonici.",
+      "Privatnost: razgovor više ne prenosi prisutnima IP adresu gostiju; poveznice za izvoz ili brisanje vlastitih podataka vode na pravu adresu; obavijest i privola za snimanje pojavljuju se svugdje gdje nešto može snimati.",
+      "Stranica stanja provjerava usluge iznutra i više ne javlja kvar zbog nejavnog certifikata; instalacije s fiksnim video mostom prikazuju se ispravno.",
+      "Administracija: opoziv sumoderatora i govornika iz čarobnjaka sada zaista radi, čarobnjak kaže što nije spremljeno, a nakon objave stiže se na stranicu događaja. Brzi pozivi više nemaju javnu stranicu, a dijeljene poveznice prikazuju pretpregled događaja.",
+      "Za one koji nadograđuju: Prosody, Jicofo, web-konferencija i video most jednom se ponovno pokreću, pa je bolje nadograditi kad nema događaja u tijeku; tko ima prilagođene volumene ili module za Prosody, mora dodati one iz charta; bez scalera se događaji uživo sada zatvaraju na kraju nakon isteka odgode."
+    ]
+  },
   "0.11.0": {
     "title": "Dvorana sada reagira u trenutku kad se nešto promijeni",
     "notes": [

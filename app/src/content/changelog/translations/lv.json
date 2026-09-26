@@ -1,4 +1,19 @@
 {
+  "0.12.0": {
+    "title": "Gatavs atkalizmantošanai: instalē ar vienu komandu, un pasākumi norit paši",
+    "notes": [
+      "Instalēšana ar vienu komandu: datorā ar minikube izmēģināšanai un izstrādei, k3s serverī produkcijai, ar sertifikātiem, testa pastkastīti, objektu krātuvi, TURN un plānotu dublēšanu. Katru instalāciju var pārbaudīt ar vienu komandu, datubāzes un failu dublēšanai un atjaunošanai ir savi skripti, un dokumentācijā, kas tagad ir angļu valodā, ir ceļveži minikube, k3s, AKS, GKE un EKS, kā arī kontrolsaraksti darbības uzsākšanai.",
+      "Pasākumi atveras sākuma laikā un aizveras beigās arī instalācijās bez automātiskas video tiltu palaišanas. „Sākt pasākumu“ vienmēr ir pieejams pasākuma vadītājam, un pasākums vairs neiestrēgst statusā „Sagatavošana“.",
+      "Personalizēti konti personālam: administratori un organizatori piesakās ar personīgu saiti, kas saņemta e-pastā, un katrs redz tikai to, ko atļauj viņa loma. Instances atslēga saglabājas pirmajai piekļuvei un ārkārtas situācijām.",
+      "E-pasti itāļu, angļu, franču, vācu un spāņu valodā, saņēmēja valodā. Moderatoru un runātāju personīgās saites pienāk e-pastā, atgādinājumi vairs nepienāk visi reizē, un kalendāra ielūgumi vairs nedublējas.",
+      "Videokonferencē loma ir atkarīga no saites, ar kuru pievienojas: viesi un reģistrētie ir dalībnieki un vairs nevar izslēgt moderatora skaņu vai viņu izraidīt.",
+      "Telpā: jautājumi, balsojumi un vārdu mākonis darbojas arī viesiem un runātājiem; materiāli pieņem ne tikai saites, bet arī failus; kas iziet pats, var atgriezties, nevis redzēt „Pasākums beidzies“; ja videokonference nav sasniedzama, telpa to pasaka un piedāvā „Mēģināt vēlreiz“; dalībniekiem kamera un mikrofons sākumā ir izslēgti; virtuālo fonu var izvēlēties jau uzgaidāmajā telpā.",
+      "Privātums: tērzēšana vairs nenodod klātesošajiem viesu IP adresi; saites savu datu eksportēšanai vai dzēšanai ved uz pareizo adresi; paziņojums un piekrišana ierakstīšanai parādās visur, kur kaut kas var ierakstīt.",
+      "Statusa lapa pārbauda pakalpojumus no iekšpuses un vairs neziņo par kļūmi nepubliska sertifikāta dēļ; instalācijas ar fiksētu video tiltu tiek parādītas pareizi.",
+      "Administrēšana: līdzmoderatoru un runātāju atsaukšana vednī tagad tiešām darbojas, vednis pasaka, kas netika saglabāts, un pēc publicēšanas nonāk pasākuma lapā. Ātrajiem zvaniem vairs nav publiskas lapas, un kopīgotās saites rāda pasākuma priekšskatījumu.",
+      "Tiem, kas atjaunina: Prosody, Jicofo, tīmekļa konference un video tilts vienreiz restartējas, tāpēc ieteicams atjaunināt, kad nenotiek pasākumi; kam ir pielāgoti Prosody sējumi vai moduļi, tiem jāpievieno arī chart iekļautie; bez mērogotāja tiešraides pasākumi tagad aizveras beigās, pieskaitot papildlaiku."
+    ]
+  },
   "0.11.0": {
     "title": "Telpa tagad reaģē brīdī, kad kaut kas mainās",
     "notes": [

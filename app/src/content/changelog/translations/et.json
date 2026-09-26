@@ -1,4 +1,19 @@
 {
+  "0.12.0": {
+    "title": "Valmis taaskasutuseks: paigaldus ühe käsuga ja üritused kulgevad iseenesest",
+    "notes": [
+      "Paigaldus ühe käsuga: arvutisse, kus töötab minikube, proovimiseks ja arendamiseks, k3s-serverisse tootmiseks, koos sertifikaatide, testpostkasti, objektisalvestuse, TURN-i ja ajastatud varundusega. Iga paigaldust saab kontrollida ühe käsuga, andmebaasi ja failide varundamisel ja taastamisel on oma skriptid ning dokumentatsioonis, mis on nüüd inglise keeles, on juhendid keskkondadele minikube, k3s, AKS, GKE ja EKS ning kontroll-loendid tootmisse viimiseks.",
+      "Üritused avanevad algusajal ja sulguvad lõpus ka paigaldustes, kus videosildu ei käivitata automaatselt. „Käivita üritus“ on üritust juhtivale inimesele alati kättesaadav ning üritus ei jää enam kinni olekusse „Ettevalmistus“.",
+      "Isikustatud kontod töötajatele: administraatorid ja korraldajad logivad sisse e-postiga saadud isikliku lingiga ning igaüks näeb ainult seda, mida tema roll lubab. Instantsi võti jääb esmaseks sisselogimiseks ja hädaolukordadeks.",
+      "E-kirjad itaalia, inglise, prantsuse, saksa ja hispaania keeles, saaja keeles. Moderaatorite ja esinejate isiklikud lingid saabuvad e-postiga, meeldetuletused ei saabu enam kõik korraga ning kalendrikutsed ei dubleeru.",
+      "Videokonverentsis sõltub roll lingist, millega sisenetakse: külalised ja registreerunud on osalejad ega saa enam moderaatorit vaigistada ega eemaldada.",
+      "Saalis: küsimused, hääletused ja sõnapilv töötavad ka külalistele ja esinejatele; materjalidesse saab lisada linkide kõrval ka faile; kes lahkub ise, saab tagasi tulla, selle asemel et näha teadet „Üritus on lõppenud“; kui videokonverents pole kättesaadav, ütleb saal seda ja pakub „Proovi uuesti“; osalejatel on kaamera ja mikrofon alguses välja lülitatud; virtuaalse tausta saab valida juba ooteruumis.",
+      "Privaatsus: vestlus ei edasta enam kohalolijatele külaliste IP-aadressi; lingid oma andmete eksportimiseks või kustutamiseks viivad õigele aadressile; salvestamise teade ja nõusolek ilmuvad kõikjal, kus miski võib salvestada.",
+      "Olekuleht kontrollib teenuseid seestpoolt ega teata enam rikkest mitteavaliku sertifikaadi tõttu; püsiva videosillaga paigaldused kuvatakse õigesti.",
+      "Haldus: kaasmoderaatorite ja esinejate tagasivõtmine viisardis töötab nüüd päriselt, viisard ütleb, mis jäi salvestamata, ja pärast avaldamist jõutakse ürituse lehele. Kiirkõnedel pole enam avalikku lehte ning jagatud lingid näitavad ürituse eelvaadet.",
+      "Uuendajatele: Prosody, Jicofo, veebikonverents ja videosild taaskäivituvad ühe korra, seega tasub uuendada siis, kui üritusi ei toimu; kui Prosodyl on kohandatud köiteid või mooduleid, tuleb lisada ka chart'i omad; ilma skaleerijata sulguvad otseüritused nüüd lõpuaja ja ajapikenduse möödudes."
+    ]
+  },
   "0.11.0": {
     "title": "Saal reageerib nüüd hetkel, mil midagi muutub",
     "notes": [

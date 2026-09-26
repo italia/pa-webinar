@@ -1,4 +1,19 @@
 {
+  "0.12.0": {
+    "title": "Redo för återanvändning: installeras med ett kommando, och evenemangen sköter sig själva",
+    "notes": [
+      "Installation med ett kommando: på en dator med minikube för att prova och utveckla, på en k3s-server för produktion, med certifikat, testbrevlåda, objektlagring, TURN och schemalagd säkerhetskopiering. Varje installation kan kontrolleras med ett kommando, säkerhetskopiering och återställning av databas och filer har egna skript, och dokumentationen, nu på engelska, har guider för minikube, k3s, AKS, GKE och EKS samt checklistor för driftsättning.",
+      "Evenemang öppnar vid starttiden och stänger vid sluttiden, även på installationer utan automatisk start av videobryggorna. ”Starta evenemang” finns alltid tillgängligt för den som leder evenemanget, och ett evenemang fastnar inte längre på ”Förbereder”.",
+      "Personliga konton för personalen: administratörer och arrangörer loggar in med en personlig länk som skickas via e-post, och var och en ser bara det som rollen tillåter. Instansnyckeln finns kvar för den första inloggningen och för nödlägen.",
+      "E-post på italienska, engelska, franska, tyska och spanska, på mottagarens språk. Moderatorer och talare får sina personliga länkar via e-post, påminnelser kommer inte längre alla på en gång och kalenderinbjudningar dubbleras inte längre.",
+      "I videokonferensen beror rollen på länken man ansluter med: gäster och anmälda är deltagare och kan inte längre stänga av ljudet för moderatorn eller ta bort moderatorn.",
+      "I rummet: frågor, röstningar och ordmoln fungerar även för gäster och talare; material tar emot filer utöver länkar; den som lämnar på egen hand kan gå in igen i stället för att se ”Evenemanget avslutat”; om videokonferensen inte går att nå säger rummet det och erbjuder ”Försök igen”; kamera och mikrofon startar avstängda för deltagarna; den virtuella bakgrunden kan väljas redan i väntrummet.",
+      "Integritet: chatten skickar inte längre gästers IP-adress till de närvarande; länkarna för att exportera eller radera sina egna uppgifter leder till rätt adress; meddelande och samtycke till inspelning visas överallt där något kan spela in.",
+      "Statussidan kontrollerar tjänsterna inifrån och rapporterar inte längre ett avbrott på grund av ett icke-offentligt certifikat; installationer med en fast videobrygga visas korrekt.",
+      "Administration: att återkalla medmoderatorer och talare i guiden fungerar nu på riktigt, guiden visar vad som inte sparades, och efter publiceringen hamnar man på evenemangets sida. Snabbsamtal har inte längre någon offentlig sida, och delade länkar visar en förhandsvisning av evenemanget.",
+      "Vid uppgradering: Prosody, Jicofo, webbkonferensen och videobryggan startas om en gång, så uppgradera helst när inga evenemang pågår; den som har egna volymer eller moduler för Prosody måste lägga till chartens; utan scaler stänger direktsända evenemang nu vid sluttiden plus respittiden."
+    ]
+  },
   "0.11.0": {
     "title": "Rummet reagerar nu i samma stund som något ändras",
     "notes": [

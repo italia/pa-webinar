@@ -1,4 +1,19 @@
 {
+  "0.12.0": {
+    "title": "Prêt pour la réutilisation : installation en une commande, et les événements avancent tout seuls",
+    "notes": [
+      "Installation en une commande : sur un ordinateur avec minikube pour essayer et développer, sur un serveur k3s pour la production, avec certificats, boîte aux lettres de test, stockage objet, TURN et sauvegarde planifiée. Chaque installation se vérifie en une commande, la sauvegarde et la restauration de la base de données et des fichiers ont leurs propres scripts, et la documentation, désormais en anglais, propose des guides pour minikube, k3s, AKS, GKE et EKS ainsi que des listes de contrôle pour la mise en production.",
+      "Les événements s'ouvrent à l'heure de début et se ferment à la fin, même sur les installations sans démarrage automatique des ponts vidéo. « Démarrer l'événement » est toujours à la disposition de la personne qui anime l'événement, et un événement ne reste plus bloqué « en préparation ».",
+      "Comptes nominatifs pour l'équipe : administrateurs et organisateurs se connectent avec un lien personnel reçu par e-mail, et chacun ne voit que ce que son rôle autorise. La clé de l'instance reste disponible pour le premier accès et pour les urgences.",
+      "E-mails en italien, anglais, français, allemand et espagnol, dans la langue du destinataire. Les liens personnels des modérateurs et des intervenants arrivent par e-mail, les rappels n'arrivent plus tous en même temps, et les invitations d'agenda ne sont plus dupliquées.",
+      "Dans la visioconférence, le rôle dépend du lien utilisé pour entrer : invités et inscrits sont participants et ne peuvent plus couper le micro du modérateur ni l'exclure.",
+      "Dans la salle : questions, votes et nuage de mots fonctionnent aussi pour les invités et les intervenants ; les documents acceptent des fichiers en plus des liens ; qui quitte la salle de son propre chef peut y revenir, au lieu de voir « Événement terminé » ; si la visioconférence est injoignable, la salle le signale et propose « Réessayer » ; caméra et micro démarrent désactivés pour les participants ; l'arrière-plan virtuel se choisit dès la salle d'attente.",
+      "Vie privée : le chat ne transmet plus l'adresse IP des invités aux personnes présentes ; les liens pour exporter ou supprimer ses propres données mènent à la bonne adresse ; l'avis et le consentement à l'enregistrement apparaissent partout où quelque chose peut enregistrer.",
+      "La page de statut vérifie les services de l'intérieur et ne signale plus de panne à cause d'un certificat non public ; les installations avec un pont vidéo fixe s'affichent correctement.",
+      "Administration : la révocation des co-modérateurs et des intervenants depuis l'assistant fonctionne vraiment, l'assistant indique ce qui n'a pas été enregistré, et après la publication on arrive sur la page de l'événement. Les appels rapides n'ont plus de page publique, et les liens partagés affichent un aperçu de l'événement.",
+      "Pour la mise à jour : Prosody, Jicofo, la conférence web et le pont vidéo redémarrent une fois, il vaut donc mieux mettre à jour sans événement en cours ; les installations avec des volumes ou des modules Prosody personnalisés doivent y ajouter ceux du chart ; sans scaler, les événements en direct se ferment désormais à leur fin plus le délai de tolérance."
+    ]
+  },
   "0.11.0": {
     "title": "La salle réagit désormais au moment où quelque chose change",
     "notes": [

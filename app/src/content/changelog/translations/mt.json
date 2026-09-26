@@ -1,4 +1,19 @@
 {
+  "0.12.0": {
+    "title": "Lest għall-użu mill-ġdid: jiġi installat b'kmand wieħed, u l-avvenimenti jimxu waħedhom",
+    "notes": [
+      "Installazzjoni b'kmand wieħed: fuq kompjuter b'minikube biex tipprova u tiżviluppa, fuq server k3s għall-produzzjoni, b'ċertifikati, kaxxa postali tat-test, ħażna tal-oġġetti, TURN u backup skedat. Kull installazzjoni tiġi vverifikata b'kmand wieħed, il-backup u r-restawr tad-database u tal-fajls għandhom l-iskripts tagħhom, u d-dokumentazzjoni, issa bl-Ingliż, għandha gwidi għal minikube, k3s, AKS, GKE u EKS u listi ta' kontroll għat-tnedija fil-produzzjoni.",
+      "L-avvenimenti jinfetħu fil-ħin tal-bidu u jingħalqu fit-tmiem anke fuq installazzjonijiet mingħajr tqabbid awtomatiku tal-pontijiet tal-vidjo. “Ibda l-avveniment” jibqa' dejjem disponibbli għal min imexxi l-avveniment, u avveniment ma jibqax aktar imwaħħal fuq “Qed jipprepara”.",
+      "Kontijiet nominali għall-persunal: l-amministraturi u l-organizzaturi jidħlu b'link personali li jirċievu bl-email, u kull wieħed jara biss dak li jippermetti r-rwol tiegħu. Iċ-ċavetta tal-istanza tibqa' għall-ewwel aċċess u għall-emerġenzi.",
+      "Emails bit-Taljan, bl-Ingliż, bil-Franċiż, bil-Ġermaniż u bl-Ispanjol, fil-lingwa ta' min jirċevihom. Il-links personali tal-moderaturi u tal-kelliema jaslu bl-email, it-tfakkiriet ma jaslux aktar kollha f'daqqa, u l-istediniet tal-kalendarju ma jiġux duplikati aktar.",
+      "Fil-vidjokonferenza r-rwol jiddependi mil-link li bih tidħol: il-mistednin u l-irreġistrati huma parteċipanti u ma jistgħux aktar isikktu jew ikeċċu lill-moderatur.",
+      "Fis-sala: il-mistoqsijiet, il-voti u s-sħaba tal-kliem jaħdmu wkoll għall-mistednin u l-kelliema; il-materjali jaċċettaw fajls minbarra links; min joħroġ waħdu jista' jerġa' jidħol, minflok ma jara “Avveniment intemm”; jekk il-vidjokonferenza ma tkunx tista' tintlaħaq, is-sala tgħid hekk u tipproponi “Erġa' pprova”; il-kamera u l-mikrofonu jibdew mitfija għall-parteċipanti; l-isfond virtwali jintgħażel diġà fil-kamra tal-istennija.",
+      "Privatezza: iċ-chat ma tibgħatx aktar l-indirizz IP tal-mistednin lill-preżenti; il-links biex tesporta jew tħassar id-data tiegħek iwasslu għall-indirizz it-tajjeb; l-avviż u l-kunsens għar-reġistrazzjoni jidhru kull fejn xi ħaġa tista' tirreġistra.",
+      "Il-paġna tal-istatus tiċċekkja s-servizzi minn ġewwa u ma tirrapportax aktar ħsara minħabba ċertifikat mhux pubbliku; l-installazzjonijiet b'pont tal-vidjo fiss jintwerew b'mod korrett.",
+      "Amministrazzjoni: ir-revoka tal-ko-moderaturi u tal-kelliema mill-wizard issa taħdem tassew, il-wizard jgħid x'ma ġiex salvat, u wara l-pubblikazzjoni tasal fil-paġna tal-avveniment. It-telefonati rapidi m'għandhomx aktar paġna pubblika, u l-links kondiviżi juru ħarsa minn qabel lejn l-avveniment.",
+      "Għal min jaġġorna: Prosody, Jicofo, il-konferenza web u l-pont tal-vidjo jerġgħu jibdew darba, għalhekk aħjar taġġorna meta ma jkun hemm l-ebda avveniment għaddej; min għandu volumi jew moduli personalizzati fuq Prosody irid iżid dawk taċ-chart; mingħajr scaler, l-avvenimenti fid-dirett issa jingħalqu fit-tmiem flimkien mal-ħin ta' grazzja."
+    ]
+  },
   "0.11.0": {
     "title": "Is-sala issa tirreaġixxi fil-mument li xi ħaġa tinbidel",
     "notes": [

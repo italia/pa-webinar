@@ -1,4 +1,19 @@
 {
+  "0.12.0": {
+    "title": "Klaar voor hergebruik: installatie met één opdracht, en evenementen lopen vanzelf",
+    "notes": [
+      "Installatie met één opdracht: op een computer met minikube om uit te proberen en te ontwikkelen, op een k3s-server voor productie, met certificaten, testmailbox, objectopslag, TURN en geplande back-up. Elke installatie is met één opdracht te controleren, back-up en herstel van database en bestanden hebben eigen scripts, en de documentatie, nu in het Engels, bevat handleidingen voor minikube, k3s, AKS, GKE en EKS en checklists voor de livegang.",
+      "Evenementen gaan open op de begintijd en sluiten aan het einde, ook op installaties zonder automatisch opstarten van de videobridges. ‘Evenement starten’ blijft altijd beschikbaar voor wie het evenement leidt, en een evenement blijft niet langer hangen op ‘Voorbereiden’.",
+      "Persoonlijke accounts voor medewerkers: beheerders en organisatoren melden zich aan met een persoonlijke link die ze per e-mail ontvangen, en iedereen ziet alleen wat de eigen rol toestaat. De instantiesleutel blijft voor de eerste toegang en voor noodgevallen.",
+      "E-mails in het Italiaans, Engels, Frans, Duits en Spaans, in de taal van de ontvanger. Moderatoren en sprekers krijgen hun persoonlijke links per e-mail, herinneringen komen niet meer allemaal tegelijk binnen en agenda-uitnodigingen worden niet meer dubbel verstuurd.",
+      "In de videoconferentie hangt de rol af van de link waarmee je binnenkomt: gasten en ingeschrevenen zijn deelnemers en kunnen de moderator niet langer dempen of verwijderen.",
+      "In de ruimte: vragen, stemmen en woordwolk werken ook voor gasten en sprekers; materialen accepteren naast links ook bestanden; wie zelf vertrekt, kan terugkeren in plaats van ‘Evenement afgelopen’ te zien; als de videoconferentie niet bereikbaar is, meldt de ruimte dat en biedt ‘Opnieuw proberen’ aan; camera en microfoon starten uitgeschakeld voor deelnemers; de virtuele achtergrond kies je al in de wachtruimte.",
+      "Privacy: de chat stuurt het IP-adres van gasten niet meer door naar de aanwezigen; de links om je eigen gegevens te exporteren of te wissen leiden naar het juiste adres; de melding en de toestemming voor opname verschijnen overal waar iets kan opnemen.",
+      "De statuspagina controleert de diensten van binnenuit en meldt geen storing meer vanwege een niet-openbaar certificaat; installaties met een vaste videobridge worden correct weergegeven.",
+      "Beheer: co-moderators en sprekers intrekken vanuit de wizard werkt nu echt, de wizard laat zien wat niet is opgeslagen, en na publicatie kom je op de pagina van het evenement. Snelgesprekken hebben geen openbare pagina meer, en gedeelde links tonen een voorbeeld van het evenement.",
+      "Bij het bijwerken: Prosody, Jicofo, de webconferentie en de videobridge herstarten één keer, dus werk bij zonder lopende evenementen; wie eigen volumes of modules voor Prosody heeft, moet die van de chart toevoegen; zonder scaler sluiten live-evenementen nu aan het einde plus de respijttijd."
+    ]
+  },
   "0.11.0": {
     "title": "De ruimte reageert nu op het moment dat er iets verandert",
     "notes": [

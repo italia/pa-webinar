@@ -1,4 +1,19 @@
 {
+  "0.12.0": {
+    "title": "Pripravené na opätovné použitie: inštalácia jedným príkazom a udalosti bežia samy",
+    "notes": [
+      "Inštalácia jedným príkazom: na počítači s minikube na vyskúšanie a vývoj, na serveri k3s na produkciu, s certifikátmi, testovacou poštovou schránkou, objektovým úložiskom, TURN a plánovanou zálohou. Každú inštaláciu možno overiť jedným príkazom, záloha a obnova databázy a súborov majú vlastné skripty a dokumentácia, teraz v angličtine, obsahuje návody pre minikube, k3s, AKS, GKE a EKS a kontrolné zoznamy na spustenie do prevádzky.",
+      "Udalosti sa otvárajú v čase začiatku a zatvárajú na konci aj v inštaláciách bez automatického spúšťania videomostov. „Začať udalosť“ má ten, kto udalosť vedie, vždy k dispozícii a udalosť už nezostane zaseknutá v stave „Príprava“.",
+      "Menné účty pre tím: administrátori a organizátori sa prihlasujú osobným odkazom doručeným e-mailom a každý vidí len to, čo mu jeho rola dovoľuje. Kľúč inštancie zostáva na prvý prístup a na núdzové situácie.",
+      "E-maily v taliančine, angličtine, francúzštine, nemčine a španielčine, v jazyku príjemcu. Osobné odkazy moderátorov a rečníkov prichádzajú e-mailom, pripomienky už nechodia všetky naraz a pozvánky do kalendára sa nezdvojujú.",
+      "Vo videokonferencii závisí rola od odkazu, ktorým sa vstupuje: hostia a registrovaní sú účastníci a už nemôžu moderátora stlmiť ani vylúčiť.",
+      "V miestnosti: otázky, hlasovanie a slovný mrak fungujú aj pre hostí a rečníkov; materiály prijímajú okrem odkazov aj súbory; kto odíde sám, môže sa vrátiť namiesto toho, aby videl „Udalosť skončila“; ak videokonferencia nie je dostupná, miestnosť to oznámi a ponúkne „Skúsiť znova“; kamera a mikrofón sa účastníkom spúšťajú vypnuté; virtuálne pozadie sa dá zvoliť už v čakárni.",
+      "Súkromie: chat už prítomným neposiela IP adresu hostí; odkazy na export alebo vymazanie vlastných údajov vedú na správnu adresu; upozornenie a súhlas s nahrávaním sa zobrazujú všade, kde niečo môže nahrávať.",
+      "Stavová stránka kontroluje služby zvnútra a už nehlási výpadok pre neverejný certifikát; inštalácie s pevným videomostom sa zobrazujú správne.",
+      "Správa: odobratie spolumoderátorov a rečníkov v sprievodcovi naozaj funguje, sprievodca povie, čo sa neuložilo, a po zverejnení sa prejde na stránku udalosti. Rýchle hovory už nemajú verejnú stránku a zdieľané odkazy zobrazujú náhľad udalosti.",
+      "Pre tých, ktorí aktualizujú: Prosody, Jicofo, webová konferencia a videomost sa raz reštartujú, preto je vhodné aktualizovať bez prebiehajúcich udalostí; kto má vlastné zväzky alebo moduly pre Prosody, musí pridať tie z chartu; bez scalera sa živé udalosti teraz zatvárajú na konci po uplynutí odkladu."
+    ]
+  },
   "0.11.0": {
     "title": "Miestnosť teraz reaguje vo chvíli, keď sa niečo zmení",
     "notes": [
