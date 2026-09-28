@@ -1,4 +1,13 @@
 {
+  "0.13.0": {
+    "title": "Privatezza aktar sħiħa u traskrizzjonijiet ta' avvenimenti twal",
+    "notes": [
+      "Talba biex titħassar id-data tiegħek issa tħassarha kollha: minbarra l-iskrizzjoni, anke l-messaġġi taċ-chat, it-tweġibiet għall-kwestjonarji, ir-rispons, l-istediniet u l-emails fil-kju. L-emails mibgħuta jitħassru wara 30 jum, l-indirizzi IP fir-reġistru tal-attività wara 90, u l-identifikatur tal-mistednin fiċ-chat ma fihx aktar l-indirizz IP tagħhom.",
+      "Fil-formola tal-iskrizzjoni, il-kunsens għall-irrekordjar tal-vidjo ma jistax jibqa' jitħawwad mal-iskrizzjoni, u s-sala turi t-test tal-kunsens magħżul għall-avveniment. L-avviż ta' privatezza ta' avveniment issa jista' jitneħħa wkoll, mhux biss jinbidel.",
+      "It-traskrizzjonijiet, is-sottotitoli u s-sommarji ta' avvenimenti twal issa jidhru fil-paġna tal-avveniment u fl-editur: lil hinn minn ċertu tul kienu jibqgħu vojta.",
+      "Il-bidu ta' avveniment issa jitlob konferma qabel ma s-sala tinfetaħ għal kull min għandu l-link, u l-avvenimenti li qatt ma saru ma jibqgħux jidhru fost dawk li ġejjin. Ir-rekorder, il-kontrollur tiegħu u l-worker tal-IA issa għandhom il-verżjoni ta' kull rilaxx, għalhekk aġġornament jew rollback jeħodhom miegħu."
+    ]
+  },
   "0.12.0": {
     "title": "Lest għall-użu mill-ġdid: jiġi installat b'kmand wieħed, u l-avvenimenti jimxu waħedhom",
     "notes": [

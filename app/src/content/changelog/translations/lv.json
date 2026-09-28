@@ -1,4 +1,13 @@
 {
+  "0.13.0": {
+    "title": "Pilnīgāka privātuma aizsardzība un garu pasākumu atšifrējumi",
+    "notes": [
+      "Pieprasījums dzēst datus tagad izdzēš visu: papildus reģistrācijai arī tērzēšanas ziņas, atbildes uz anketām, atsauksmes, ielūgumus un rindā esošos e-pastus. Nosūtītie e-pasti tiek dzēsti pēc 30 dienām, IP adreses darbību žurnālā – pēc 90, un viesu tērzēšanas identifikators vairs nesatur viņu IP adresi.",
+      "Reģistrācijas veidlapā piekrišanu videoierakstam vairs nevar sajaukt ar reģistrāciju, un telpā tiek parādīts pasākumam izvēlētais piekrišanas teksts. Pasākuma privātuma paziņojumu tagad var arī noņemt, ne tikai aizstāt.",
+      "Garu pasākumu atšifrējumi, subtitri un kopsavilkumi tagad tiek parādīti pasākuma lapā un redaktorā: virs noteikta garuma tie palika tukši.",
+      "Pasākuma sākšana tagad prasa apstiprinājumu, pirms telpa tiek atvērta ikvienam ar saiti, un nenotikuši pasākumi vairs netiek rādīti starp gaidāmajiem. Ierakstītājam, tā kontrolierim un MI apstrādātājam tagad ir katra laidiena versija, tāpēc atjauninājums vai atgriešana tos paņem līdzi."
+    ]
+  },
   "0.12.0": {
     "title": "Gatavs atkalizmantošanai: instalē ar vienu komandu, un pasākumi norit paši",
     "notes": [

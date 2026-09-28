@@ -1,4 +1,13 @@
 {
+  "0.13.0": {
+    "title": "Vollediger privacybeheer en transcripties van lange evenementen",
+    "notes": [
+      "Wie om verwijdering van zijn gegevens vraagt, ziet ze nu allemaal verdwijnen: naast de inschrijving ook chatberichten, antwoorden op vragenlijsten, feedback, uitnodigingen en e-mails in de wachtrij. Verzonden e-mails worden na 30 dagen verwijderd, IP-adressen in het activiteitenlogboek na 90, en de chat-ID van gasten bevat hun IP-adres niet meer.",
+      "In het inschrijvingsformulier is de toestemming voor video-opname niet meer te verwarren met de inschrijving, en de zaal toont de toestemmingstekst die voor het evenement is gekozen. De privacyverklaring van een evenement kan nu ook worden verwijderd, niet alleen vervangen.",
+      "Transcripties, ondertitels en samenvattingen van lange evenementen verschijnen nu op de evenementpagina en in de editor: boven een bepaalde lengte bleven ze leeg.",
+      "Een evenement starten vraagt nu om bevestiging voordat de zaal opengaat voor iedereen met de link, en evenementen die nooit hebben plaatsgevonden staan niet meer bij de komende. De recorder, de controller en de AI-worker hebben nu de versie van elke release, zodat een update of een terugdraaiing ze meeneemt."
+    ]
+  },
   "0.12.0": {
     "title": "Klaar voor hergebruik: installatie met één opdracht, en evenementen lopen vanzelf",
     "notes": [

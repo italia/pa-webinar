@@ -1,4 +1,13 @@
 {
+  "0.13.0": {
+    "title": "Une confidentialité plus complète, et les transcriptions des longs événements",
+    "notes": [
+      "Demander la suppression de ses données les efface désormais toutes : outre l'inscription, les messages du chat, les réponses aux questionnaires, les avis, les invitations et les e-mails en attente. Les e-mails envoyés sont supprimés après 30 jours, les adresses IP du journal d'activité après 90, et l'identifiant des invités dans le chat ne contient plus leur adresse IP.",
+      "Dans le formulaire d'inscription, le consentement à l'enregistrement vidéo ne se confond plus avec l'inscription, et la salle affiche le texte de consentement choisi pour l'événement. La notice de confidentialité d'un événement peut désormais être retirée, et pas seulement remplacée.",
+      "Les transcriptions, sous-titres et synthèses des longs événements s'affichent désormais sur la page de l'événement et dans l'éditeur : au-delà d'une certaine longueur, ils restaient vides.",
+      "Démarrer un événement demande désormais une confirmation avant d'ouvrir la salle à toute personne disposant du lien, et les événements qui n'ont jamais eu lieu n'apparaissent plus parmi les événements à venir. L'enregistreur, son contrôleur et le worker IA portent désormais la version de chaque release : une mise à jour ou un retour en arrière les emporte avec elle."
+    ]
+  },
   "0.12.0": {
     "title": "Prêt pour la réutilisation : installation en une commande, et les événements avancent tout seuls",
     "notes": [

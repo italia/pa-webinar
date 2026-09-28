@@ -1,4 +1,13 @@
 {
+  "0.13.0": {
+    "title": "Príobháideachas níos iomláine agus tras-scríbhinní imeachtaí fada",
+    "notes": [
+      "Scriosann iarratas ar do shonraí a scriosadh gach rud anois: chomh maith leis an gclárú, teachtaireachtaí comhrá, freagraí ar cheistneoirí, aiseolas, cuirí agus ríomhphoist sa scuaine. Scriostar ríomhphoist a seoladh tar éis 30 lá, seoltaí IP sa loga gníomhaíochta tar éis 90, agus ní bhíonn seoladh IP na n-aíonna ina n-aitheantóir comhrá a thuilleadh.",
+      "Ar an bhfoirm chlárúcháin, ní féidir an toiliú le taifeadadh físe a mheascadh leis an gclárú a thuilleadh, agus taispeánann an seomra an téacs toilithe a roghnaíodh don imeacht. Is féidir fógra príobháideachais imeachta a bhaint anois freisin, ní hamháin a athsholáthar.",
+      "Taispeántar tras-scríbhinní, fotheidil agus achoimrí imeachtaí fada anois ar leathanach an imeachta agus san eagarthóir: os cionn fad áirithe d'fhanaidís folamh.",
+      "Iarrann tosú imeachta deimhniú anois sula n-osclaítear an seomra do dhuine ar bith a bhfuil an nasc aige, agus ní thaispeántar imeachtaí nár tionóladh riamh i measc na n-imeachtaí atá le teacht a thuilleadh. Tá leagan gach eisiúna anois ag an taifeadán, a rialaitheoir agus an t-oibrí IS, mar sin tugann nuashonrú nó filleadh siar leo iad."
+    ]
+  },
   "0.12.0": {
     "title": "Réidh le hathúsáid: suiteáil le hordú amháin, agus leanann na himeachtaí ar aghaidh leo féin",
     "notes": [

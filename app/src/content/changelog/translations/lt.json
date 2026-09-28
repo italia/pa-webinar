@@ -1,4 +1,13 @@
 {
+  "0.13.0": {
+    "title": "Išsamesnė privatumo apsauga ir ilgų renginių nuorašai",
+    "notes": [
+      "Prašymas ištrinti duomenis dabar ištrina viską: be registracijos, taip pat pokalbių žinutes, klausimynų atsakymus, atsiliepimus, kvietimus ir eilėje laukiančius el. laiškus. Išsiųsti el. laiškai ištrinami po 30 dienų, IP adresai veiklos žurnale – po 90, o svečių pokalbių identifikatoriuje nebėra jų IP adreso.",
+      "Registracijos formoje sutikimo dėl vaizdo įrašymo nebegalima supainioti su registracija, o kambaryje rodomas renginiui pasirinktas sutikimo tekstas. Renginio privatumo pranešimą dabar galima ir pašalinti, ne tik pakeisti.",
+      "Ilgų renginių nuorašai, subtitrai ir santraukos dabar rodomi renginio puslapyje ir redaktoriuje: viršijus tam tikrą ilgį jie likdavo tušti.",
+      "Renginio pradžia dabar prašo patvirtinimo, prieš atveriant kambarį visiems, turintiems nuorodą, o neįvykę renginiai nebėra rodomi tarp būsimų. Įrašymo įrankis, jo valdiklis ir DI apdorojimo modulis dabar turi kiekvieno leidimo versiją, todėl atnaujinimas ar grąžinimas juos pasiima kartu."
+    ]
+  },
   "0.12.0": {
     "title": "Paruošta pakartotiniam naudojimui: įdiegiama viena komanda, o renginiai vyksta patys",
     "notes": [

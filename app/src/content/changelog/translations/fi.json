@@ -1,4 +1,13 @@
 {
+  "0.13.0": {
+    "title": "Kattavampi yksityisyydensuoja ja pitkien tapahtumien litteroinnit",
+    "notes": [
+      "Tietojen poistopyyntö poistaa nyt kaiken: ilmoittautumisen lisäksi myös chat-viestit, kyselyvastaukset, palautteet, kutsut ja jonossa olevat sähköpostit. Lähetetyt sähköpostit poistetaan 30 päivän kuluttua, toimintalokin IP-osoitteet 90 päivän kuluttua, eikä vieraiden chat-tunniste enää sisällä heidän IP-osoitettaan.",
+      "Ilmoittautumislomakkeessa suostumusta videotallennukseen ei voi enää sekoittaa ilmoittautumiseen, ja huoneessa näkyy tapahtumaa varten valittu suostumusteksti. Tapahtuman tietosuojaseloste voidaan nyt myös poistaa, ei vain korvata.",
+      "Pitkien tapahtumien litteroinnit, tekstitykset ja yhteenvedot näkyvät nyt tapahtumasivulla ja editorissa: tietyn pituuden ylittyessä ne jäivät tyhjiksi.",
+      "Tapahtuman aloittaminen pyytää nyt vahvistusta ennen kuin huone avautuu kaikille, joilla on linkki, eikä pitämättä jääneitä tapahtumia enää näytetä tulevien joukossa. Tallentimella, sen ohjaimella ja tekoälytyöntekijällä on nyt kunkin julkaisun versio, joten päivitys tai palautus vie ne mukanaan."
+    ]
+  },
   "0.12.0": {
     "title": "Valmis uudelleenkäyttöön: asennus yhdellä komennolla, ja tapahtumat etenevät itsestään",
     "notes": [

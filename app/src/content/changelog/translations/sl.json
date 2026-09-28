@@ -1,4 +1,13 @@
 {
+  "0.13.0": {
+    "title": "Popolnejša zasebnost in prepisi dolgih dogodkov",
+    "notes": [
+      "Zahteva za izbris podatkov jih zdaj izbriše vse: poleg prijave tudi sporočila v klepetu, odgovore na vprašalnike, povratne informacije, vabila in e-pošto v čakalni vrsti. Poslana e-pošta se izbriše po 30 dneh, naslovi IP v dnevniku dejavnosti po 90, identifikator gostov v klepetu pa ne vsebuje več njihovega naslova IP.",
+      "V obrazcu za prijavo privolitve v video snemanje ni več mogoče zamenjati s prijavo, v sobi pa se prikaže besedilo privolitve, izbrano za dogodek. Obvestilo o zasebnosti dogodka je zdaj mogoče tudi odstraniti, ne le zamenjati.",
+      "Prepisi, podnapisi in povzetki dolgih dogodkov se zdaj prikažejo na strani dogodka in v urejevalniku: nad določeno dolžino so ostali prazni.",
+      "Začetek dogodka zdaj zahteva potrditev, preden se soba odpre vsakomur s povezavo, dogodki, ki niso bili izvedeni, pa se ne prikazujejo več med prihajajočimi. Snemalnik, njegov krmilnik in AI worker imajo zdaj različico vsake izdaje, zato jih posodobitev ali vrnitev nazaj vzame s seboj."
+    ]
+  },
   "0.12.0": {
     "title": "Pripravljeno za ponovno uporabo: namestitev z enim ukazom, dogodki pa tečejo sami",
     "notes": [

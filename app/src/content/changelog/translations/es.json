@@ -1,4 +1,13 @@
 {
+  "0.13.0": {
+    "title": "Privacidad más completa y transcripciones de eventos largos",
+    "notes": [
+      "Solicitar la supresión de tus datos ahora los elimina todos: además de la inscripción, los mensajes del chat, las respuestas a cuestionarios, las valoraciones, las invitaciones y los correos en cola. Los correos enviados se eliminan a los 30 días, las direcciones IP del registro de actividad a los 90, y el identificador de los invitados en el chat ya no contiene su dirección IP.",
+      "En el formulario de inscripción, el consentimiento a la grabación de vídeo ya no se confunde con la inscripción, y la sala muestra el texto de consentimiento elegido para el evento. El aviso de privacidad de un evento ahora también se puede quitar, no solo sustituir.",
+      "Las transcripciones, subtítulos y resúmenes de los eventos largos se muestran ahora en la página del evento y en el editor: a partir de cierta extensión se quedaban vacíos.",
+      "Iniciar un evento pide ahora confirmación antes de abrir la sala a quien tenga el enlace, y los eventos que nunca se celebraron ya no aparecen entre los próximos. El grabador, su controlador y el worker de IA llevan ahora la versión de cada lanzamiento, así que una actualización o una vuelta atrás los incluye."
+    ]
+  },
   "0.12.0": {
     "title": "Listo para la reutilización: se instala con un comando y los eventos avanzan solos",
     "notes": [
