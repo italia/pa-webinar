@@ -69,7 +69,7 @@ interface LocaleCopy {
 
 const copy: Record<Locale, LocaleCopy> = {
   it: {
-    confirmationSubject: (title) => `Conferma registrazione: ${title}`,
+    confirmationSubject: (title) => `Conferma iscrizione: ${title}`,
     reminderSubject: (title, offsetMinutes) => {
       if (offsetMinutes >= 1440) return `Promemoria: ${title} inizia domani`;
       if (offsetMinutes >= 60) {
@@ -78,7 +78,7 @@ const copy: Record<Locale, LocaleCopy> = {
       }
       return `Promemoria: ${title} inizia tra ${offsetMinutes} minuti`;
     },
-    confirmationHeading: 'Registrazione confermata',
+    confirmationHeading: 'Iscrizione confermata',
     reminderHeading: 'Promemoria evento',
     reminderNote: (offsetMinutes) => {
       if (offsetMinutes >= 1440) {
