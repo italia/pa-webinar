@@ -6,7 +6,7 @@ import { prisma } from '@/lib/db';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import { localizedPath } from '@/lib/utils/localized-url';
 import { getSettings } from '@/lib/settings';
-import { publicEventStatusWhere } from '@/lib/events/visibility';
+import { isUpcomingPublicEvent, publicEventStatusWhere } from '@/lib/events/visibility';
 import EventListClient from '@/components/events/event-list-client';
 
 export const revalidate = 60;
@@ -51,12 +51,17 @@ export default async function EventiPage({ searchParams }: EventsPageProps) {
     }),
   ]);
 
+  // Prossimi: in corso o non ancora finiti, in ordine di inizio. Passati: i
+  // conclusi, dal più recente. Un evento mai aperto oltre la fine non sta in
+  // nessuna delle due liste (lib/events/visibility).
+  const now = Date.now();
   const upcoming = events
-    .filter((e) => e.status !== 'ENDED')
+    .filter((e) => isUpcomingPublicEvent(e, now))
     .map((e) => serialise(e, locale));
 
   const past = events
     .filter((e) => e.status === 'ENDED')
+    .reverse()
     .map((e) => serialise(e, locale));
 
   const tagList = availableTags.map((tag) => ({
