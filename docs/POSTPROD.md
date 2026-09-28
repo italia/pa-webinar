@@ -519,7 +519,7 @@ authoritative completion signal. It recomputes the canonical key from
 worker cannot point a row at an arbitrary object. It also rejects a MIME type
 that does not match the artifact type. It encrypts `inlineBody` with the PII
 key, and for `TRANSCRIPT_JSON` it upserts one `Speaker` row per speaker label.
-The worker sends an inline copy only for text and JSON files of at most 64 KiB.
+The worker sends an inline copy for text and JSON files of at most 8 MiB (`INLINE_MAX_BYTES` in `infra/ai/worker/main.py`), enough for the transcript of an event of several hours.
 
 ### Waiting for a cold language model
 
@@ -1486,14 +1486,12 @@ Several of these are tracked in the [Roadmap](ROADMAP.md).
 - **Every recording is transcribed as Italian.** The source language is
   `Recording.sourceLanguage`, which no screen or API sets, so it falls back to
   `it`. Translations therefore never target Italian.
-- **Long transcripts are not shown.** The worker keeps an inline copy only
-  for files up to 64 KiB. The transcript panel, the editor and the `.txt` and
-  `.srt` downloads read only that copy, so for a recording of realistic length
-  they find no text.
-- **Long subtitle files may not load.** Above the same size, the subtitle
-  endpoint redirects to storage. The player's `<video>` has no `crossorigin`
-  attribute, and browsers load a subtitle track for such an element only from
-  the page's own origin.
+- **Transcripts processed before the 8 MiB inline copy.** Recordings processed
+  when the worker kept an inline copy only up to 64 KiB have no copy of a long
+  transcript in the database: the transcript panel, the editor and the `.txt`
+  and `.srt` downloads find no text, and the subtitle endpoint redirects to
+  storage, which the player cannot load. Run the post-production again to give
+  them an inline copy.
 - **URLs and leases are tied to 30 minutes.** Presigned upload URLs are not
   renewed when a long job refreshes its lease, and a stage that runs for more
   than half an hour without a progress report is reclaimed while it is still

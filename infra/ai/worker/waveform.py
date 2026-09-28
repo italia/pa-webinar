@@ -19,7 +19,7 @@ Output JSON shape (kept small — 2-decimal floats, ~5 bytes each):
         "peaks": [0.0, 0.42, 1.0, ...]   # len == buckets, each 0..1
     }
 
-At the 64 KB inline cap, 4000 buckets * ~5 chars ≈ 20 KB → comfortably
+Well under the inline cap, 4000 buckets * ~5 chars ≈ 20 KB → comfortably
 inlined by the artifact endpoint, so the app serves it from Postgres
 without a storage round-trip.
 """

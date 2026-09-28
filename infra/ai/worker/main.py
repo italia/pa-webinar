@@ -42,6 +42,10 @@ from . import waveform as wfmod
 
 log = logging.getLogger("postprod-worker")
 
+# Copia nel database dei testi prodotti (trascrizione, sottotitoli, sintesi):
+# deve restare allineata al limite di `inlineBody` in app/src/lib/ai/schemas.ts.
+INLINE_MAX_BYTES = 8 * 1024 * 1024
+
 
 def configure_logging() -> None:
     level = os.environ.get("LOG_LEVEL", "INFO").upper()
@@ -79,15 +83,16 @@ def _write_and_upload(
     body_bytes: bytes,
     model_id: Optional[str] = None,
     model_version: Optional[str] = None,
-    inline_max_bytes: int = 64 * 1024,
+    inline_max_bytes: int = INLINE_MAX_BYTES,
     speaker_map: Optional[List[Dict[str, Any]]] = None,
     watermark_type: Optional[str] = None,
 ) -> None:
     """Upload bytes via presigned PUT and register the artifact."""
     cli.upload_bytes(target.url, body_bytes, content_type=target.contentType)
     inline = None
-    # Only inline small text payloads — the migration limits the
-    # column to TEXT but the schema documents 64KB as the convention.
+    # Solo testo e JSON. La soglia copre la trascrizione di un evento di
+    # durata reale: il pannello pubblico, l'editor e i download leggono
+    # solo la copia nel database, e sotto una soglia bassa restavano vuoti.
     if (
         target.contentType.startswith("text/")
         or target.contentType.startswith("application/json")
