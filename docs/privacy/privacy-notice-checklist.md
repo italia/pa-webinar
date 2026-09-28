@@ -129,11 +129,12 @@ What follows from that order:
 ### Custom recording consent text
 
 Events have a `recordingConsentText` field. It can be set only through the
-events API (`POST /api/events`, `PUT /api/events/<slug>`) and appears only on
-the event page of the administration area. The **Recording consent** screen that
-participants see always shows the built-in text (`live.recordingConsent`). Put
-any event-specific wording about recording in the event's notice, or change the
-built-in text for the whole installation with that custom translation key.
+events API (`POST /api/events`, `PUT /api/events/<slug>`) and appears on the
+event page of the administration area. When it is set, the **Recording consent**
+screen in the live room shows it in place of the built-in text
+(`live.recordingConsent`), as written and in every language, because the field
+is not translated. When it is empty, the built-in text is shown; change it for
+the whole installation with that custom translation key.
 
 ### The consent boxes on the registration form
 

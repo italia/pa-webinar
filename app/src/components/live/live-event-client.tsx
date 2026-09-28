@@ -106,6 +106,8 @@ interface EventInfo {
   postEventPublic?: boolean;
   libraryListed?: boolean;
   feedbackEnabled?: boolean;
+  /** Testo di consenso alla registrazione scelto per l'evento; null = quello predefinito. */
+  recordingConsentText?: string | null;
   timezone?: string;
   /** True quando il master switch AI è attivo e l'evento usa almeno una
    *  feature di post-produzione AI — abilita l'informativa in sala d'attesa. */
@@ -1476,6 +1478,7 @@ export default function LiveEventClient({
         <RecordingConsent
           onAccept={handleConsentAccept}
           onDecline={handleConsentDecline}
+          customConsentText={event.recordingConsentText}
         />
       </>
     );

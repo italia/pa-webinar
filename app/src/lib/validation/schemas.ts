@@ -149,6 +149,8 @@ export const updateEventSchema = eventBaseSchema.partial().extend({
     .enum(['DRAFT', 'PUBLISHED', 'LIVE', 'ENDED'])
     .optional(),
   recordingPublished: z.boolean().optional(),
+  // In modifica null toglie il documento dell'informativa dell'evento.
+  privacyPolicyUrl: z.string().url().nullable().optional(),
   recordingDeleteAfterDays: z.number().int().min(1).max(365).nullable().optional(),
   recordingUrl: z.string().url().nullable().optional(),
   tempRecordingUrl: z.string().url().nullable().optional(),

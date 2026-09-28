@@ -736,7 +736,11 @@ export default function EventWizard(props: WizardProps) {
           // di iscrizione dà la precedenza al testo: il modello scelto non
           // entrerebbe mai in vigore, senza che niente lo dica.
           privacyPolicyText: form.privacyPolicyText?.trim() ?? undefined,
-          privacyPolicyUrl: form.privacyPolicyUrl ?? undefined,
+          // In modifica, togliere il documento dell'informativa manda null:
+          // altrimenti l'ultimo indirizzo resterebbe in vigore e avrebbe la
+          // precedenza sull'informativa predefinita dell'installazione.
+          privacyPolicyUrl:
+            form.privacyPolicyUrl || (mode === 'edit' ? null : undefined),
           moderatorName: form.moderatorName?.trim() || undefined,
           moderatorEmail: form.moderatorEmail?.trim() || undefined,
         };

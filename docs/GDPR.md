@@ -447,7 +447,7 @@ These are the English texts, quoted from `app/src/i18n/messages/en.json`. Italia
 | `gdpr.consent.addressBookHelp` | Help under the address-book box | Separate consent (GDPR art. 6.1.a). You can withdraw it at any time using the "Remove me from the address book" link in emails. Your name and organization are taken from your registration profile. |
 | `registration.errors.consentRequired` | Error when participation consent is missing | Consent to data processing is required |
 | `live.recordingConsentTitle` | Live room dialog, title | Recording consent |
-| `live.recordingConsent` | Live room dialog, text | This event is being recorded. By entering, you consent to audio/video recording. |
+| `live.recordingConsent` | Live room dialog, text, unless the event sets its own `recordingConsentText` | This event is being recorded. By entering, you consent to audio/video recording. |
 | `live.enterRoom`, `live.declineRecording` | Live room dialog, buttons | Enter room / Do not participate |
 | `waiting.multitrackConsentTitle` | Waiting-room gate, title | Per-participant recording |
 | `waiting.multitrackConsentRequired` | Waiting-room gate, hint | You must accept the recording of your audio track to enter |
@@ -463,7 +463,6 @@ These are verified differences between what a reader might expect and what the c
 | Limitation | Effect | What an operator can do |
 |---|---|---|
 | The primary event contact survives archiving | `Event.moderatorName` and the encrypted `Event.moderatorEmail` stay on archived events, and the name stays public as the organizer of the event's calendar file | Leave the fields empty, or use a role mailbox and a role name |
-| The event's custom recording consent text is not shown | `recordingConsentText` is stored and editable, but the room dialog always shows the default text | Put event-specific wording in the privacy notice |
 | The waiting-room multitrack consent is not recorded | Guests, speakers and registrants on another browser leave no trace of their consent | Rely on the registration consent where proof matters |
 | Erasure and export are narrower than a reader might assume | See [What the export contains](#what-the-export-contains) and [What erasure deletes](#what-erasure-deletes) | Handle the remainder by hand |
 | No tool to edit or delete a single registration | Rectification and requests from people who cannot receive the email need database access | Document the internal procedure |
