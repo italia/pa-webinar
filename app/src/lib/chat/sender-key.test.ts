@@ -3,12 +3,10 @@ import { createHash } from 'crypto';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { withoutRawSenderId, type ChatEnvelope } from './pubsub';
-import { senderColourKey } from './sender-key';
+import { guestSenderId, senderColourKey } from './sender-key';
 
 const GUEST_IP = '198.51.100.23';
-const GUEST_SENDER_ID = `guest-${Buffer.from(`${GUEST_IP}:Gina`)
-  .toString('base64url')
-  .slice(0, 24)}`;
+const GUEST_SENDER_ID = guestSenderId(GUEST_IP, 'Gina');
 
 const previousSecret = process.env.APP_SECRET;
 afterEach(() => {
@@ -71,5 +69,27 @@ describe('withoutRawSenderId', () => {
       createdAt: '2026-07-22T10:00:00.000Z',
     };
     expect(withoutRawSenderId(current)).toBe(current);
+  });
+});
+
+describe('guestSenderId', () => {
+  it('is stable for the same address and name, and does not contain the address', () => {
+    process.env.APP_SECRET = 'segreto-di-prova-lungo-almeno-trentadue-byte';
+    const id = guestSenderId(GUEST_IP, 'Gina');
+    expect(id).toMatch(/^guest-[0-9a-f]{24}$/);
+    expect(guestSenderId(GUEST_IP, 'Gina')).toBe(id);
+    expect(guestSenderId(GUEST_IP, 'Anna')).not.toBe(id);
+    const encoded = Buffer.from(GUEST_IP).toString('base64url');
+    expect(id).not.toContain(encoded.slice(0, 8));
+  });
+
+  it('cannot be recomputed without APP_SECRET', () => {
+    process.env.APP_SECRET = 'segreto-di-prova-lungo-almeno-trentadue-byte';
+    const keyed = guestSenderId(GUEST_IP, 'Gina');
+    const unkeyed = `guest-${createHash('sha256')
+      .update(`chat-guest-id:${GUEST_IP}:Gina`)
+      .digest('hex')
+      .slice(0, 24)}`;
+    expect(keyed).not.toBe(unkeyed);
   });
 });

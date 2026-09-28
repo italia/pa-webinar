@@ -1,3 +1,5 @@
+import { Prisma } from '@prisma/client';
+
 import { withErrorHandling } from '@/lib/api-handler';
 import { prisma } from '@/lib/db';
 import { assertCronApiKey } from '@/lib/auth/cron';
@@ -15,6 +17,11 @@ import {
   tempRecordingExpiryCutoff,
 } from '@/lib/gdpr/cleanup-selection';
 import { getSettings } from '@/lib/settings';
+import {
+  AUDIT_ACTIONS_WITH_NAMES,
+  auditLogPersonalDataRetentionDays,
+  emailOutboxRetentionDays,
+} from '@/lib/gdpr/log-retention';
 
 export const dynamic = 'force-dynamic';
 
@@ -29,6 +36,14 @@ export const dynamic = 'force-dynamic';
  * oltre la fine più la retention): vengono archiviati, con le sessioni di
  * chiamata chiuse, e ripuliti nello stesso giro.
  *
+ * Fuori dagli eventi: svuota la coda delle email inviate o fallite e toglie
+ * IP, user agent e nomi dal registro audit oltre la loro conservazione
+ * (lib/gdpr/log-retention).
+ *
+ * Se una parte fallisce risponde 500 con `ok: false` e l'elenco delle parti
+ * fallite: il CronJob fallisce e si vede, invece di dare un esito verde a una
+ * conservazione che non e' avvenuta.
+ *
  * Protected by CRON_API_KEY.
  * In production, called daily at 03:00 UTC via a Kubernetes CronJob.
  */
@@ -36,6 +51,7 @@ export const GET = withErrorHandling(async (request) => {
   assertCronApiKey(request);
 
   const now = new Date();
+  const failures: string[] = [];
 
   // ── Phase 1: Clean up expired temporary recordings (24h) ──
   const tempRecordingEvents = await prisma.event.findMany({
@@ -78,6 +94,7 @@ export const GET = withErrorHandling(async (request) => {
         `[cron/cleanup] Failed to clear temp recording for event ${evt.id}:`,
         err
       );
+      failures.push(`temp-recording:${evt.id}`);
     }
   }
 
@@ -135,6 +152,7 @@ export const GET = withErrorHandling(async (request) => {
       );
     } catch (err) {
       console.error(`[cron/cleanup] Failed to clear recording for event ${evt.id}:`, err);
+      failures.push(`recording:${evt.id}`);
     }
   }
 
@@ -422,6 +440,7 @@ export const GET = withErrorHandling(async (request) => {
       if (!isFinishedEventStatus(evt.status)) unfinishedArchived++;
     } catch (err) {
       console.error(`[cron/cleanup] Failed to clean event ${evt.id} (${evt.slug}):`, err);
+      failures.push(`event:${evt.id}`);
     }
   }
 
@@ -435,19 +454,94 @@ export const GET = withErrorHandling(async (request) => {
     where: { OR: [{ usedAt: { lt: unGiornoFa } }, { expiresAt: { lt: unGiornoFa } }] },
   });
 
-  return Response.json({
-    ok: true,
-    staffLoginLinksDeleted: staffLinks.count,
-    tempRecordingsCleaned: tempRecordingEvents.length,
-    publishedRecordingsCleaned: recordingRetentionEvents.filter((evt) =>
-      isRecordingRetentionExpired(evt, now)
-    ).length,
-    eventsProcessed,
-    unfinishedEventsArchived: unfinishedArchived,
-    registrationsDeleted: totalRegistrationsDeleted,
-    questionsDeleted: totalQuestionsDeleted,
-    pollsDeleted: totalPollsDeleted,
-    recordingBlobsDeleted: totalRecordingBlobsDeleted,
-    materialBlobsDeleted: totalMaterialBlobsDeleted,
-  });
+  // ── Coda delle email ──
+  // Una riga inviata o fallita conserva destinatario, testo (con i link
+  // personali) e allegato .ics: non serve piu' a nulla dopo la conservazione.
+  // Le righe con una chiave di deduplica (il link del moderatore) restano come
+  // promemoria di "gia' inviato", svuotate del contenuto: cancellarle farebbe
+  // ripartire il link a una pubblicazione successiva.
+  const outboxCutoff = new Date(now.getTime() - emailOutboxRetentionDays() * 86_400_000);
+  let outboxDeleted = 0;
+  let outboxScrubbed = 0;
+  try {
+    const concluse = {
+      status: { in: ['SENT' as const, 'FAILED' as const] },
+      updatedAt: { lt: outboxCutoff },
+    };
+    outboxDeleted = (
+      await prisma.emailOutbox.deleteMany({ where: { ...concluse, dedupKey: null } })
+    ).count;
+    outboxScrubbed = (
+      await prisma.emailOutbox.updateMany({
+        where: { ...concluse, dedupKey: { not: null }, NOT: { html: '' } },
+        data: {
+          toAddress: '',
+          html: '',
+          text: null,
+          attachments: Prisma.DbNull,
+          lastError: null,
+        },
+      })
+    ).count;
+  } catch (err) {
+    console.error('[cron/cleanup] Failed to purge the email outbox:', err);
+    failures.push('email-outbox');
+  }
+
+  // ── Registro audit ──
+  // Le righe restano (chi ha fatto cosa, per rendicontare), ma oltre la
+  // conservazione perdono IP e user agent, e il dettaglio delle azioni che
+  // riportano nomi di persone.
+  const auditCutoff = new Date(
+    now.getTime() - auditLogPersonalDataRetentionDays() * 86_400_000
+  );
+  let auditScrubbed = 0;
+  try {
+    auditScrubbed = (
+      await prisma.adminAuditLog.updateMany({
+        where: {
+          createdAt: { lt: auditCutoff },
+          OR: [{ ip: { not: null } }, { userAgent: { not: null } }],
+        },
+        data: { ip: null, userAgent: null },
+      })
+    ).count;
+    auditScrubbed += (
+      await prisma.adminAuditLog.updateMany({
+        where: {
+          createdAt: { lt: auditCutoff },
+          action: { in: [...AUDIT_ACTIONS_WITH_NAMES] },
+          details: { not: null },
+        },
+        data: { details: null },
+      })
+    ).count;
+  } catch (err) {
+    console.error('[cron/cleanup] Failed to scrub the audit log:', err);
+    failures.push('audit-log');
+  }
+
+  const ok = failures.length === 0;
+  return Response.json(
+    {
+      ok,
+      ...(!ok && { failures }),
+      staffLoginLinksDeleted: staffLinks.count,
+      emailOutboxDeleted: outboxDeleted,
+      emailOutboxScrubbed: outboxScrubbed,
+      auditLogRowsScrubbed: auditScrubbed,
+      tempRecordingsCleaned: tempRecordingEvents.length,
+      publishedRecordingsCleaned: recordingRetentionEvents.filter((evt) =>
+        isRecordingRetentionExpired(evt, now)
+      ).length,
+      eventsProcessed,
+      unfinishedEventsArchived: unfinishedArchived,
+      registrationsDeleted: totalRegistrationsDeleted,
+      questionsDeleted: totalQuestionsDeleted,
+      pollsDeleted: totalPollsDeleted,
+      recordingBlobsDeleted: totalRecordingBlobsDeleted,
+      materialBlobsDeleted: totalMaterialBlobsDeleted,
+    },
+    { status: ok ? 200 : 500 }
+  );
 });

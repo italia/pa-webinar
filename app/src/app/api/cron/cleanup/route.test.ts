@@ -13,6 +13,11 @@ vi.mock('@/lib/db', () => ({
   prisma: {
     event: { findMany: vi.fn(), findFirst: vi.fn(), update: vi.fn() },
     staffLoginToken: { deleteMany: vi.fn(async () => ({ count: 0 })) },
+    emailOutbox: {
+      deleteMany: vi.fn(async () => ({ count: 0 })),
+      updateMany: vi.fn(async () => ({ count: 0 })),
+    },
+    adminAuditLog: { updateMany: vi.fn(async () => ({ count: 0 })) },
     gdprAuditLog: { create: vi.fn() },
     eventMaterial: { findMany: vi.fn(), findFirst: vi.fn(), deleteMany: vi.fn() },
     chatMessage: { findMany: vi.fn(), deleteMany: vi.fn() },
@@ -73,6 +78,8 @@ type Mock = ReturnType<typeof vi.fn>;
 const db = prisma as unknown as {
   event: { findMany: Mock; findFirst: Mock; update: Mock };
   staffLoginToken: { deleteMany: Mock };
+  emailOutbox: { deleteMany: Mock; updateMany: Mock };
+  adminAuditLog: { updateMany: Mock };
   gdprAuditLog: { create: Mock };
   eventMaterial: { findMany: Mock; findFirst: Mock; deleteMany: Mock };
   chatMessage: { findMany: Mock; deleteMany: Mock };
@@ -728,10 +735,12 @@ describe('GET /api/cron/cleanup', () => {
     const body = await res.json();
 
     expect(realImpl).toBeDefined();
-    // La risposta resta 200 (il cron non va in retry cieco) ma conta solo
-    // l'evento davvero ripulito: quello rotto tornerà al giro dopo.
-    expect(res.status).toBe(200);
-    expect(body.ok).toBe(true);
+    // L'evento sano viene ripulito lo stesso; quello rotto fa fallire il
+    // giro (500, ok: false) invece di lasciare un esito verde, e torna al
+    // giro dopo.
+    expect(res.status).toBe(500);
+    expect(body.ok).toBe(false);
+    expect(body.failures).toEqual([expect.stringMatching(/^event:/)]);
     expect(body.eventsProcessed).toBe(1);
     expect(db.chatMessage.deleteMany).toHaveBeenCalledWith({
       where: { eventId: 'evt-sano' },
@@ -753,6 +762,47 @@ describe('GET /api/cron/cleanup', () => {
     expect(chiamata.where.OR).toHaveLength(2);
   });
 
+  it('svuota la coda delle email concluse oltre la conservazione, tenendo le chiavi di deduplica', async () => {
+    stubEventQueries({});
+    await runCleanup();
+    const del = db.emailOutbox.deleteMany.mock.calls[0]?.[0] as {
+      where: { status: { in: string[] }; updatedAt: { lt: Date }; dedupKey: null };
+    };
+    expect(del.where.status.in).toEqual(['SENT', 'FAILED']);
+    expect(del.where.dedupKey).toBeNull();
+    expect(Date.now() - del.where.updatedAt.lt.getTime()).toBeGreaterThanOrEqual(
+      30 * 86_400_000 - 1000,
+    );
+    const scrub = db.emailOutbox.updateMany.mock.calls[0]?.[0] as {
+      where: { dedupKey: unknown };
+      data: Record<string, unknown>;
+    };
+    expect(scrub.where.dedupKey).toEqual({ not: null });
+    expect(scrub.data).toMatchObject({ toAddress: '', html: '', text: null });
+  });
+
+  it("toglie IP, user agent e nomi dal registro audit oltre la conservazione", async () => {
+    stubEventQueries({});
+    await runCleanup();
+    const [ipCall, namesCall] = db.adminAuditLog.updateMany.mock.calls.map(
+      (c) => c[0] as { where: Record<string, unknown>; data: Record<string, unknown> },
+    );
+    expect(ipCall!.data).toEqual({ ip: null, userAgent: null });
+    expect(namesCall!.where.action).toEqual({ in: ['POSTPROD_SPEAKER_MAP'] });
+    expect(namesCall!.data).toEqual({ details: null });
+    const cutoff = (ipCall!.where.createdAt as { lt: Date }).lt.getTime();
+    expect(Date.now() - cutoff).toBeGreaterThanOrEqual(90 * 86_400_000 - 1000);
+  });
+
+  it('fallisce con 500 se la pulizia della coda email non riesce', async () => {
+    stubEventQueries({});
+    db.emailOutbox.deleteMany.mockRejectedValueOnce(new Error('db down'));
+    const res = await runCleanup();
+    const body = await res.json();
+    expect(res.status).toBe(500);
+    expect(body).toMatchObject({ ok: false, failures: ['email-outbox'] });
+  });
+
   it('non fa nulla quando nessun evento ha superato la retention', async () => {
     stubEventQueries({ ended: [endedEvent({ id: 'evt-ieri', endsAt: daysAgo(1) })] });
 
@@ -765,6 +815,9 @@ describe('GET /api/cron/cleanup', () => {
     expect(body).toEqual({
       ok: true,
       staffLoginLinksDeleted: 0,
+      emailOutboxDeleted: 0,
+      emailOutboxScrubbed: 0,
+      auditLogRowsScrubbed: 0,
       tempRecordingsCleaned: 0,
       publishedRecordingsCleaned: 0,
       eventsProcessed: 0,

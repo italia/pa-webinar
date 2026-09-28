@@ -71,7 +71,7 @@ The routes are not restricted at the network level. The chart's ingress forwards
 
 ### What a successful job means
 
-A `curl` job succeeds when the route answers with a 2xx status. Routes handle errors item by item and carry on; most report failures in their JSON counts (`cleanup` reports only successes). A green Job therefore means that the route ran. It does not mean that every item succeeded. `curl` prints the JSON response, so the counts can be read in the pod log for as long as the Job is kept.
+A `curl` job succeeds when the route answers with a 2xx status. Routes handle errors item by item and carry on; most report failures in their JSON counts. `cleanup` is stricter: when any part fails it answers 500 with `ok: false` and the list of failed parts, so its Job fails. For the other routes a green Job means that the route ran, not that every item succeeded. `curl` prints the JSON response, so the counts can be read in the pod log for as long as the Job is kept.
 
 ```mermaid
 flowchart TD
@@ -147,7 +147,7 @@ Two more objects render as CronJobs but never run on a schedule: `postprod-worke
 2. It deletes published recordings whose own retention (`recordingDeleteAfterDays`, counted from publication) has expired.
 3. For every `ENDED` or `ARCHIVED` event past `endsAt` plus `dataRetentionDays`, it deletes the participant data (registrations, Q&A, polls, chat, questionnaire responses, invitations, named grants and more) in one transaction. It scrubs the personal fields of call sessions and deletes the related files. Then it **sets the event to `ARCHIVED`**, so title, description and dates remain as a historical record. Events never ended (`PUBLISHED`, `PROVISIONING`, `IDLE`, `LIVE`) are handled the same way once the later of `endsAt` and their last activity, plus `dataRetentionDays`, has passed; their open call sessions are closed in the same transaction, and the response counts them as `unfinishedEventsArchived`. Drafts are never cleaned.
 
-It also deletes staff sign-in link rows one day after they were used or expired. Each phase writes an entry to the GDPR audit log. The full list of what is deleted, and when, is in [GDPR.md](../GDPR.md).
+It also deletes staff sign-in link rows one day after they were used or expired, deletes sent and failed outbox rows after `EMAIL_OUTBOX_RETENTION_DAYS` (rows with a deduplication key are emptied instead), and empties the IP address, the user agent and the speaker-naming detail of `AdminAuditLog` rows after `AUDIT_LOG_PERSONAL_DATA_RETENTION_DAYS`. Each event phase writes an entry to the GDPR audit log. When any part fails, the route answers 500 with `ok: false` and a `failures` list, and `curl` retries within `cronjobs.portalRetrySeconds` before the Job fails. The full list of what is deleted, and when, is in [GDPR.md](../GDPR.md).
 
 **If it does not run.** Personal data outlives the retention the controller has declared, and ended events are never archived.
 

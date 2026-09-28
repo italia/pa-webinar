@@ -11,6 +11,7 @@ import { prisma } from '@/lib/db';
 import { AppError, ForbiddenError, ValidationError } from '@/lib/errors';
 import { resolveTokenSender } from '@/lib/chat/sender';
 import { guestChatWindowOpen } from '@/lib/chat/read-access';
+import { guestSenderId } from '@/lib/chat/sender-key';
 import { getClientIp } from '@/lib/rate-limit';
 import { getSettings } from '@/lib/settings';
 
@@ -99,12 +100,11 @@ export async function authenticateChatSender(
   const ip = getClientIp(req);
   return {
     eventId: event.id,
-    senderId: `guest-${Buffer.from(`${ip}:${name}`).toString('base64url').slice(0, 24)}`,
+    senderId: guestSenderId(ip, name),
     senderName: name,
     isModerator: false,
-    // Truncated base64 of ip:name — it collides for two people behind one NAT
-    // with similar names, and for IPv6 the address alone fills the budget. It
-    // is a display hint, never a credential.
+    // Keyed hash of ip:name (lib/chat/sender-key): two people behind one NAT
+    // with the same name share it. It is a display hint, never a credential.
     isPerPersonIdentity: false,
   };
 }
