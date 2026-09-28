@@ -566,8 +566,9 @@ runs).
 ### Images
 
 The bot and controller images are `ghcr.io/italia/pa-webinar-recorder` and
-`ghcr.io/italia/pa-webinar-recorder-controller`, published with a moving
-`:dev` tag (see [CI, images and releases](../development/ci-and-release.md)).
+`ghcr.io/italia/pa-webinar-recorder-controller`, published with each release
+version and, from the development branch, with a moving `:dev` tag (see
+[CI, images and releases](../development/ci-and-release.md)).
 The chart's default `imagePullPolicy` is `IfNotPresent`, so a node can keep
 serving an old image under the same tag; pin a digest or use `Always` when the
 cluster can reach the registry.

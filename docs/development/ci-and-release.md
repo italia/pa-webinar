@@ -230,14 +230,11 @@ The migration image runs the database migrations in the `db-migrate` init contai
 
 Releases cut before `release.yml` published both forms carry only `vX.Y.Z-migrate`, and for them the chart's computed default does not resolve. Passing both image tags explicitly on every upgrade works for every release, which is what [the upgrade procedure](../operations/upgrades.md#the-upgrade-procedure) does. The k3s installer derives both from the checked-out tag.
 
-### Components published only from `dev`
+### Auxiliary components
 
-The recorder, the recorder controller and the post-production worker have no release tags, and the chart's defaults in `values.yaml` (`recorder.image`, `recorder.controller.image`, `postprod.worker.image`) point to `:dev`. Two consequences follow:
+`release.yml` also builds the recorder, the recorder controller and the post-production worker for each tag, as `ghcr.io/italia/pa-webinar-<component>:X.Y.Z`; `dev.yml` builds them as `:dev` and `:dev-<sha>` when their folders change. In `values.yaml`, `recorder.image`, `recorder.controller.image` and `postprod.worker.image` are empty by default: the chart then uses `<app.image.repository>-<component>` with the app image's tag (`pa-webinar.auxImage` in `templates/_helpers.tpl`). A release installs the components of the same release and a rollback brings them back; an environment that runs the app as `:dev` gets them as `:dev`.
 
-- Whoever installs a given chart version gets whatever was last built from `dev` for these components.
-- Rolling the app back to an earlier release does not roll them back. Pin a `:dev-<sha>` tag or a digest to make them reproducible, as described in [Upgrades and rollback](../operations/upgrades.md#making-the-dev-components-roll-back).
-
-Versioned, verifiable images for every component are an open item in the [roadmap](../ROADMAP.md#installation-and-operations).
+Releases before 0.13.0 have no versioned auxiliary images: for them, pin a `:dev-<sha>` tag or a digest, as described in [Upgrades and rollback](../operations/upgrades.md#making-the-dev-components-roll-back).
 
 ### Build identity
 

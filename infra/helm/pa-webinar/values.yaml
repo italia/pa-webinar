@@ -1367,7 +1367,9 @@ postprod:
   # spec defined here (image, nodeSelector, tolerations, resources).
   worker:
     enabled: true
-    image: ghcr.io/italia/pa-webinar-postprod-worker:dev
+    # Vuoto: `<app.image.repository>-postprod-worker` con il tag dell'app
+    # (la versione del rilascio, o `dev` dove l'app usa `dev`).
+    image: ""
     imagePullPolicy: IfNotPresent
     # Pull credentials for the (private) worker image. The worker lands
     # on a fresh scale-from-zero GPU node with no cached image, so it
@@ -1446,7 +1448,9 @@ recorder:
 
   # Immagine del bot recorder (Puppeteer + lib-jitsi-meet, un'audio-track per
   # partecipante). Gira sul pool NORMALE, non GPU.
-  image: ghcr.io/italia/pa-webinar-recorder:dev
+  # Vuoto: `<app.image.repository>-recorder` con il tag dell'app (la versione
+  # del rilascio, o `dev` dove l'app usa `dev`).
+  image: ""
   # NOTE on stale images: with a MUTABLE tag like `:dev`, IfNotPresent may reuse
   # a node's cached (possibly outdated) layer for that tag. Set `Always` via a
   # values override so each recorder Job re-pulls the current `:dev`: a cached
@@ -1518,7 +1522,8 @@ recorder:
   # Operator riconciliante (pod fisso) che orchestra i Job recorder.
   controller:
     enabled: true
-    image: ghcr.io/italia/pa-webinar-recorder-controller:dev
+    # Vuoto: `<app.image.repository>-recorder-controller` con il tag dell'app.
+    image: ""
     imagePullPolicy: IfNotPresent
     imagePullSecrets: []
     port: 8080

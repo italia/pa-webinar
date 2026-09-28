@@ -27,8 +27,8 @@ target release. Replace them with your own values.
   web pod is running.
 - Check the result with `scripts/verify-install.sh --call` once the rollouts are done. It retries the
   conference for up to 90 s while the restarted web pod comes up (`--conference-wait`).
-- A rollback restores the chart's manifests. It does not restore the database schema, the data, or
-  the components published only with the floating `:dev` tag.
+- A rollback restores the chart's manifests. It does not restore the database schema or the data.
+  The recorder, controller and worker follow it only when their image values are empty or pinned.
 
 | Platform | How to upgrade |
 |---|---|
@@ -47,7 +47,7 @@ An upgrade moves several parts, each with its own value in the chart:
 | Migration image | `app.migration.image.tag` | The `builder` stage of the same build. It runs the database migrations before each app pod starts. |
 | Chart | the chart you pass to `helm upgrade` | Templates, defaults, the pinned subcharts (PostgreSQL, Redis, Jitsi Meet) and the third-party images `values.yaml` pins, the PostgreSQL server image among them. A new PostgreSQL major version needs care: see [Reading the dry run](#reading-the-dry-run). |
 | Patched Jitsi web image | `jitsi-meet.web.image.tag` | Built by its own workflow. Changing it is a conference-image rollout. See [The patched web image](../architecture/jitsi-integration.md#the-patched-web-image). |
-| Recorder bot, recorder controller, AI post-production worker | `recorder.image`, `recorder.controller.image`, `postprod.worker.image` | Published only as `:dev` and `:dev-<sha>`. The chart defaults to `:dev`. See [Rollback](#making-the-dev-components-roll-back). |
+| Recorder bot, recorder controller, AI post-production worker | `recorder.image`, `recorder.controller.image`, `postprod.worker.image` | Empty by default: the chart uses the app image's tag, and each release from 0.13.0 publishes them with its version. See [Rollback](#making-the-dev-components-roll-back). |
 
 The tag each image carries for a release is listed in the image-tag table of
 [CI, images and releases](../development/ci-and-release.md).
@@ -867,13 +867,14 @@ is in [Restore drill](../install/checklists.md#restore-drill).
 
 ### Making the `:dev` components roll back
 
-The recorder bot, the recorder controller and the AI post-production worker are published only by
-the development workflow, with the floating `:dev` tag and an immutable `:dev-<sha>` tag per build.
-The chart defaults to `:dev`, and the recorder bot and worker Jobs are created from suspended CronJob
-templates. A tag rollback therefore leaves them on whatever `:dev` points to at that moment.
+From 0.13.0 each release publishes the recorder bot, the recorder controller and the AI
+post-production worker with its version, and with their image values empty the chart uses the app
+image's tag: they move with an upgrade and with `helm rollback` like the app. Values that still set
+them to `:dev` (older installations often do) leave them on whatever `:dev` points to: empty them.
 
-To make them follow a rollback, pin an immutable reference in your values: the `:dev-<sha>` tag of
-the build you validated, or the digest you recorded before the upgrade.
+For releases before 0.13.0, which have no versioned auxiliary images, pin an immutable reference in
+your values: the `:dev-<sha>` tag of the build you validated, or the digest you recorded before the
+upgrade.
 
 ```yaml
 recorder:
@@ -886,8 +887,7 @@ postprod:
 ```
 
 With a pinned reference, these components change only when you bump the value. They then move with
-`helm rollback` like everything else the chart renders. Versioned release images for them are on
-the [Roadmap](../ROADMAP.md).
+`helm rollback` like everything else the chart renders.
 
 ## Docker Compose stack
 

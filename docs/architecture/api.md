@@ -357,7 +357,7 @@ No test checks that a route is registered, or that a registered path still exist
   - `/api/webhooks/recording`;
   - the response of `/api/status/infrastructure`.
 
-  The recorder, the controller and the worker are published with a floating `:dev` tag, so rolling the app back does not bring them back with it ([CI, images and releases](../development/ci-and-release.md), [Upgrades and rollback](../operations/upgrades.md)).
+  The recorder, the controller and the worker are published with the release version and, from the development branch, with `:dev`; the chart gives them the app image's tag unless their value is set ([CI, images and releases](../development/ci-and-release.md), [Upgrades and rollback](../operations/upgrades.md)).
 - **The most dependable surfaces for integrators** are the public read routes: event listing, and the routes the public pages call themselves (the calendar feed, the `.ics` file, the video library and the status routes). While the status page is off, the status routes serve their full answer only to an administrator ([Route families](#route-families)). Nothing about them is guaranteed.
 - **No per-integrator credentials.** There are no API keys for third parties and no OAuth. Automation that needs to write signs in with the instance API key and uses the resulting session ([Staff session](#staff-session)).
 

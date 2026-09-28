@@ -197,6 +197,70 @@ jobs:
             sbom.spdx.json
             npm-sbom.json
 
+  # I componenti ausiliari con la stessa versione dell'app. Il chart li
+  # preleva con il tag dell'app (pa-webinar.auxImage in _helpers.tpl): senza
+  # questo job una release installava i `:dev` del momento, e tornare a una
+  # release precedente non li riportava indietro.
+  build-aux-images:
+    env:
+      DOCKER_BUILD_SUMMARY: "false"
+      DOCKER_BUILD_RECORD_UPLOAD: "false"
+    name: Build & Push ${{ matrix.name }}
+    runs-on: arc-runner-pa-webinar
+    permissions:
+      contents: read
+      packages: write
+    # Il worker AI parte da un'immagine CUDA di ~10 GB: a freddo ~30 minuti.
+    timeout-minutes: 75
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: recorder
+            context: ./infra/recorder
+            file: ./infra/recorder/Dockerfile
+            cache: release-recorder
+          - name: recorder-controller
+            context: ./infra/recorder-controller
+            file: ./infra/recorder-controller/Dockerfile
+            cache: release-recorder-controller
+          - name: postprod-worker
+            context: ./infra/ai
+            file: ./infra/ai/Dockerfile.worker
+            # Stessa cache del build di sviluppo: il worker cambia di rado.
+            cache: dev-postprod-worker
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
+
+      - name: Login to GHCR
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Compute version
+        id: v
+        run: echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Build and push ${{ matrix.name }}
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
+        with:
+          context: ${{ matrix.context }}
+          file: ${{ matrix.file }}
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-${{ matrix.name }}:${{ steps.v.outputs.version }}
+          platforms: linux/amd64
+          cache-from: type=gha,scope=${{ matrix.cache }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.cache }}
+          labels: |
+            org.opencontainers.image.title=pa-webinar-${{ matrix.name }}
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.version=${{ steps.v.outputs.version }}
+
   helm-package:
     name: Package Helm Chart
     runs-on: arc-runner-pa-webinar

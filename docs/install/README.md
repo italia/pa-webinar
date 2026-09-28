@@ -531,10 +531,9 @@ send traffic straight to pods need an `ipBlock` rule for their ranges. See
   carry, while `v<X.Y.Z>-migrate` exists for every release. A missing tag
   leaves the migration init container in `ImagePullBackOff` until Helm times
   out ([Pinning versions](../INFRASTRUCTURE.md#pinning-versions)).
-- **The recorder bot, the recorder controller and the AI worker** have only
-  development tags: the floating `:dev` and an immutable `:dev-<sha>`. Pin a
-  `:dev-<sha>` you have tested, because rolling the chart back does not roll
-  them back.
+- **The recorder bot, the recorder controller and the AI worker** follow the
+  app image's tag when their image values are empty, and each release from
+  0.13.0 publishes them with its version.
 - **The patched Jitsi web image** needs a pull Secret. The standard
   `jitsi/web` image works, with advanced noise suppression off, which is the
   application's default.
