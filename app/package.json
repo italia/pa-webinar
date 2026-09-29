@@ -43,7 +43,7 @@
     "date-fns": "^4.4.0",
     "design-react-kit": "^5.1.0",
     "ical-generator": "^8.0.0",
-    "ioredis": "^5.11.1",
+    "ioredis": "^6.0.0",
     "isomorphic-dompurify": "^3.19.0",
     "jose": "^6.2.4",
     "marked": "^18.0.7",
