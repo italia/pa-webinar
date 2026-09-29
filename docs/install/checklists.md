@@ -402,8 +402,8 @@ Before every upgrade, on every platform:
       then your site file.
 - [ ] The pull of the web image checked with the pull Secret
       ([Check that every image can be pulled](../operations/upgrades.md#check-that-every-image-can-be-pulled)).
-- [ ] The digests of the floating `:dev` components recorded, or those
-      components pinned.
+- [ ] The recorder, controller and worker images left empty in the values,
+      so that they follow the app tag, or pinned on purpose.
 - [ ] On ingress-nginx, when you switch to the chart's conference Ingress:
       the old Ingress deleted first
       ([The conference Ingress](../DEPLOYMENT.md#the-conference-ingress)).

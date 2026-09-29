@@ -186,7 +186,7 @@ test.describe('Registration → waiting room (one-step access)', () => {
     // Bootstrap Italia styles the checkbox so the <label> intercepts the
     // click — toggle it the way a user does, via the label.
     await page.locator('label[for="consentGiven"]').click();
-    await page.getByRole('button', { name: /conferma registrazione/i }).click();
+    await page.getByRole('button', { name: /conferma iscrizione/i }).click();
 
     // The success screen issues a client redirect (~1.2s) straight to /live
     // with the personal token — no manual "Entra nella sala" click.
@@ -203,7 +203,7 @@ test.describe('Registration → waiting room (one-step access)', () => {
     // Bootstrap Italia styles the checkbox so the <label> intercepts the
     // click — toggle it the way a user does, via the label.
     await page.locator('label[for="consentGiven"]').click();
-    await page.getByRole('button', { name: /conferma registrazione/i }).click();
+    await page.getByRole('button', { name: /conferma iscrizione/i }).click();
 
     // Previously this fell through to errors.generic (the client matched a
     // `already_registered` error string the API never sent). Now it shows
@@ -222,7 +222,7 @@ test.describe('Registration → waiting room (one-step access)', () => {
     await page.locator('#displayName').fill('Cookie Tester');
     await page.locator('#email').fill(cookieEmail);
     await page.locator('label[for="consentGiven"]').click();
-    await page.getByRole('button', { name: /conferma registrazione/i }).click();
+    await page.getByRole('button', { name: /conferma iscrizione/i }).click();
     await page.waitForURL(/\/eventi\/.+\/live\?token=/, { timeout: 15_000 });
 
     // Navigate to /live WITHOUT the token. The signed per-event cookie set at

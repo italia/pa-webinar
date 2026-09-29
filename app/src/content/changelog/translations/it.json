@@ -1,4 +1,13 @@
 {
+  "0.13.0": {
+    "title": "Privacy più completa e trascrizioni degli eventi lunghi",
+    "notes": [
+      "Chi chiede di cancellare i propri dati ora li vede sparire tutti: oltre all'iscrizione, anche messaggi in chat, risposte ai questionari, feedback, inviti ed email in coda. Le email inviate si cancellano dopo 30 giorni, gli indirizzi IP del registro delle attività dopo 90, e in chat l'identificativo degli ospiti non contiene più il loro indirizzo IP.",
+      "Nel modulo di iscrizione il consenso alla videoregistrazione non si confonde più con l'iscrizione, e in sala compare il testo di consenso scelto per l'evento. L'informativa di un evento ora si può anche togliere, non solo sostituire.",
+      "Trascrizioni, sottotitoli e sintesi degli eventi lunghi ora compaiono nella pagina dell'evento e nell'editor: oltre una certa lunghezza restavano vuoti.",
+      "Avviare un evento ora chiede conferma prima di aprire la sala a chi ha il link, e gli eventi mai tenuti non compaiono più tra i prossimi. Registratore, controller e worker AI hanno ora la versione di ogni rilascio, così un aggiornamento o un ritorno indietro li porta con sé."
+    ]
+  },
   "0.12.0": {
     "title": "Pronto per il riuso: si installa in un comando, e gli eventi vanno avanti da soli",
     "notes": [

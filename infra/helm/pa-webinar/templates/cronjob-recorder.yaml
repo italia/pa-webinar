@@ -57,7 +57,7 @@ spec:
                 sizeLimit: {{ .Values.recorder.workSizeLimit | default "10Gi" }}
           containers:
             - name: recorder
-              image: {{ .Values.recorder.image }}
+              image: {{ include "pa-webinar.auxImage" (list . .Values.recorder.image "recorder") }}
               imagePullPolicy: {{ .Values.recorder.imagePullPolicy | default "IfNotPresent" }}
               securityContext:
                 allowPrivilegeEscalation: false

@@ -182,6 +182,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
             recordingUrl: event.recordingUrl,
             tempRecordingUrl: event.tempRecordingUrl,
             feedbackEnabled: event.feedbackEnabled,
+            recordingConsentText: isInstant ? null : event.recordingConsentText,
             timezone: event.timezone,
             registrationCount: event._count.registrations,
             effectiveGraceMinutes:
@@ -303,6 +304,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
         recordingUrl: event.recordingUrl,
         tempRecordingUrl: event.tempRecordingUrl,
         feedbackEnabled: event.feedbackEnabled,
+        recordingConsentText: event.recordingConsentText,
         timezone: event.timezone,
         registrationCount: event._count.registrations,
         effectiveGraceMinutes:

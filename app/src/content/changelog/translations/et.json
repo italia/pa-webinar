@@ -1,4 +1,13 @@
 {
+  "0.13.0": {
+    "title": "Täielikum privaatsus ja pikkade ürituste transkriptsioonid",
+    "notes": [
+      "Andmete kustutamise taotlus kustutab nüüd kõik: lisaks registreerumisele ka vestlussõnumid, küsimustike vastused, tagasiside, kutsed ja järjekorras olevad e-kirjad. Saadetud e-kirjad kustutatakse 30 päeva pärast, tegevuslogi IP-aadressid 90 päeva pärast ja külaliste vestlustunnus ei sisalda enam nende IP-aadressi.",
+      "Registreerumisvormil ei saa videosalvestuse nõusolekut enam registreerumisega segi ajada ning ruumis kuvatakse üritusele valitud nõusolekutekst. Ürituse privaatsusteate saab nüüd ka eemaldada, mitte ainult asendada.",
+      "Pikkade ürituste transkriptsioonid, subtiitrid ja kokkuvõtted kuvatakse nüüd ürituse lehel ja redaktoris: teatud pikkusest alates jäid need tühjaks.",
+      "Ürituse alustamine küsib nüüd kinnitust enne, kui ruum avatakse kõigile, kellel on link, ja toimumata jäänud üritusi ei kuvata enam eelseisvate hulgas. Salvestaja, selle kontroller ja tehisintellekti töötleja kannavad nüüd iga väljalaske versiooni, nii et uuendus või tagasipööramine võtab need kaasa."
+    ]
+  },
   "0.12.0": {
     "title": "Valmis taaskasutuseks: paigaldus ühe käsuga ja üritused kulgevad iseenesest",
     "notes": [

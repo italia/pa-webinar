@@ -82,6 +82,25 @@ Defaults tag to Chart.appVersion if not set.
 {{- end }}
 
 {{/*
+Immagine di un componente ausiliario (recorder, recorder-controller,
+postprod-worker): il valore esplicito se c'è, altrimenti il repository
+dell'app con il suffisso del componente e lo STESSO tag dell'app. Così una
+release installa i componenti della stessa release, e chi usa `:dev` per
+l'app (ambiente di test) prende i `:dev` anche per questi.
+Uso: include "pa-webinar.auxImage" (list . .Values.recorder.image "recorder")
+*/}}
+{{- define "pa-webinar.auxImage" -}}
+{{- $root := index . 0 -}}
+{{- $value := index . 1 -}}
+{{- $name := index . 2 -}}
+{{- if $value -}}
+{{- $value -}}
+{{- else -}}
+{{- printf "%s-%s:%s" $root.Values.app.image.repository $name (default $root.Chart.AppVersion $root.Values.app.image.tag) -}}
+{{- end -}}
+{{- end }}
+
+{{/*
 Migration container image reference: "repository:tag-migrate"
 Uses the builder-stage image that includes npm/prisma CLI.
 Defaults tag to Chart.appVersion + "-migrate" if not set.

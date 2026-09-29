@@ -658,3 +658,15 @@ describe('createInstantCallSchema', () => {
     }
   });
 });
+
+describe('updateEventSchema privacyPolicyUrl', () => {
+  it('accepts null, so the per-event privacy notice document can be removed', () => {
+    const result = updateEventSchema.safeParse({ privacyPolicyUrl: null });
+    expect(result.success).toBe(true);
+  });
+
+  it('still rejects a value that is not a URL', () => {
+    const result = updateEventSchema.safeParse({ privacyPolicyUrl: 'not-a-url' });
+    expect(result.success).toBe(false);
+  });
+});

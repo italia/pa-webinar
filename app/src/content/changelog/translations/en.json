@@ -1,4 +1,13 @@
 {
+  "0.13.0": {
+    "title": "More complete privacy, and transcripts of long events",
+    "notes": [
+      "Asking to delete your data now removes all of it: besides the registration, also chat messages, questionnaire answers, feedback, invitations and queued emails. Sent emails are deleted after 30 days, IP addresses in the activity log after 90, and a guest's chat identifier no longer contains their IP address.",
+      "On the registration form, consent to video recording can no longer be confused with signing up, and the live room shows the consent text chosen for the event. An event's privacy notice can now be removed, not only replaced.",
+      "Transcripts, subtitles and summaries of long events now show on the event page and in the editor: beyond a certain length they used to stay empty.",
+      "Starting an event now asks for confirmation before the room opens to anyone with the link, and events that never took place no longer appear among upcoming events. The recorder, its controller and the AI worker now carry the version of each release, so an upgrade or a rollback takes them along."
+    ]
+  },
   "0.12.0": {
     "title": "Ready for reuse: one-command installation, and events run on their own",
     "notes": [

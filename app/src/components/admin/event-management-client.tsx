@@ -18,6 +18,8 @@ import { useCallback, useEffect, useState, type CSSProperties, type ReactNode } 
 import { useFormatter, useTranslations } from 'next-intl';
 
 import { Link, useRouter, percorso } from '@/i18n/navigation';
+import { useConfirm } from '@/components/ui/confirm-dialog';
+import { useToast } from '@/components/ui/toast';
 import EventTitle from '@/components/events/event-title';
 import { MarkdownRenderer } from '@/components/ui/markdown';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
@@ -216,6 +218,9 @@ export default function EventManagementClient({
   const te = useTranslations('events');
   const tr = useTranslations('reminders');
   const format = useFormatter();
+  const tc = useTranslations('common');
+  const confirm = useConfirm();
+  const toast = useToast();
   // Null finche' non siamo nel browser: il server e il client valutano
   // «adesso» in due istanti diversi, e un promemoria proprio sul confine
   // renderebbe due testi diversi. Finche' e' null si dice il minimo vero.
@@ -303,7 +308,22 @@ export default function EventManagementClient({
 
   const isEarlyStart = startsAt.getTime() > Date.now() + 30 * 60_000;
 
+  // Avviare apre la sala a chiunque abbia il link (un evento LIVE ammette gli
+  // ospiti) e accende il bridge: si chiede conferma dicendo quando l'evento
+  // era previsto, e l'esito negativo si vede invece di sparire.
   const startEvent = useCallback(async () => {
+    const when = format.dateTime(new Date(event.startsAt), {
+      weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit',
+    });
+    const ok = await confirm({
+      title: t('startEventConfirmTitle'),
+      message: isEarlyStart
+        ? `${t('startEventConfirmMessage', { when })} ${t('startEventConfirmEarly')}`
+        : t('startEventConfirmMessage', { when }),
+      confirmLabel: t('startEvent'),
+      cancelLabel: tc('cancel'),
+    });
+    if (!ok) return;
     setUpdating(true); setFeedback('');
     try {
       const res = await fetch(`/api/events/${event.id}`, {
@@ -314,9 +334,13 @@ export default function EventManagementClient({
       if (res.ok) {
         setStatus('LIVE');
         setFeedback(isEarlyStart ? `${t('startEventSuccess')} ${t('jvbWarmupWarning')}` : t('startEventSuccess'));
+      } else {
+        toast.error(t('startEventFailed'));
       }
+    } catch {
+      toast.error(t('startEventFailed'));
     } finally { setUpdating(false); }
-  }, [event.id, event.moderatorToken, isEarlyStart, t]);
+  }, [event.id, event.moderatorToken, event.startsAt, isEarlyStart, t, tc, confirm, toast, format]);
 
   const handleDeleted = useCallback(() => { router.push('/admin'); }, [router]);
 
@@ -696,7 +720,7 @@ export default function EventManagementClient({
                     organizza. */}
                 {canStartManually(status) && (
                   <button type="button"
-                          className="btn btn-success d-flex align-items-center justify-content-center gap-2"
+                          className={`btn ${isEarlyStart ? 'btn-outline-success' : 'btn-success'} d-flex align-items-center justify-content-center gap-2`}
                           onClick={startEvent} disabled={updating}>
                     <Svg name="video" size={14} /> {t('startEvent')}
                   </button>

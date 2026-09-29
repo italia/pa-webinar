@@ -81,7 +81,7 @@ spec:
           {{- end }}
           containers:
             - name: worker
-              image: {{ .Values.postprod.worker.image }}
+              image: {{ include "pa-webinar.auxImage" (list . .Values.postprod.worker.image "postprod-worker") }}
               imagePullPolicy: {{ .Values.postprod.worker.imagePullPolicy | default "IfNotPresent" }}
               env:
                 - name: APP_INTERNAL_URL

@@ -148,6 +148,25 @@ export function isEventOpenForRegistration(
 }
 
 /**
+ * True se un evento dell'elenco pubblico va tra i "Prossimi": in corso, oppure
+ * non ancora aperto e con la fine nel futuro. È la stessa regola di
+ * `publicEventStatusWhere({ includeEnded: false })` (home), applicata in
+ * memoria alla pagina degli eventi, che legge l'elenco completo. Un evento
+ * pubblicato e mai aperto oltre la sua fine non è né prossimo né passato: non
+ * si è tenuto, e la sua pagina resta raggiungibile dal link.
+ */
+export function isUpcomingPublicEvent(
+  event: Pick<EventLike, 'status' | 'endsAt'>,
+  now: number = Date.now(),
+): boolean {
+  if (event.status === 'LIVE') return true;
+  if (event.status === 'PUBLISHED' || (WARMUP_STATUSES as string[]).includes(event.status)) {
+    return new Date(event.endsAt).getTime() > now;
+  }
+  return false;
+}
+
+/**
  * Frammento Prisma `where` per le superfici pubbliche (listing, home,
  * sitemap, calendario, API pubblica). `includeEnded: false` per le
  * superfici solo-futuro (home). Da combinare con altre condizioni via

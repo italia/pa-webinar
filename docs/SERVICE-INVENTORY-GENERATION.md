@@ -102,7 +102,7 @@ The release SBOMs cover only the application image. An installation runs more im
 - the Jitsi images, including the patched `jitsi/web` image if you use it, and coturn;
 - the database and Redis images, when they run in the cluster;
 - the images of the scheduled jobs: a `curl` image for the application's cron jobs and for the post-production reclaim and retention jobs, and a `kubectl` image for the JVB scaler, the post-production orchestrator and the config-reload hook (`cronjobs.*.image`, `postprod.*.image`, `jvbScaler.image`, `configReloadHook.image` and `kubectlImage` in `infra/helm/pa-webinar/values.yaml`);
-- when their features are on, the recorder bot, the recorder controller and the AI post-production worker. These three are built only from the development branch, as `:dev` and `:dev-<sha>` ([CI, images and releases](development/ci-and-release.md)).
+- when their features are on, the recorder bot, the recorder controller and the AI post-production worker. Each release publishes these three with its version, and the development branch as `:dev` and `:dev-<sha>` ([CI, images and releases](development/ci-and-release.md)).
 
 Several of these run only some of the time: the bridge has no pod while it is scaled to zero, and the recorder bot and the AI worker run as Jobs created from suspended CronJob templates. Use two sources, so that the list does not depend on when you take it.
 

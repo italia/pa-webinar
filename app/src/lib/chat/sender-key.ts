@@ -3,11 +3,9 @@ import { createHash, createHmac } from 'crypto';
 /**
  * A stable, one-way key derived from a chat `senderId`, for the client.
  *
- * The raw id must never leave the server: a guest one is
- * `guest-${base64url('<ip>:<name>')}`, so it decodes straight back to the
- * attendee's public IP — a silent participant who only tapped an emoji would
- * have been handing their address to anyone reading the payload, and the chat
- * export would have written it into a downloadable file. This holds for every
+ * The raw id must never leave the server: it names the seat behind the
+ * message (`reg-<registrationId>`, a grant id, or a guest id derived from the
+ * client address, see `guestSenderId`). This holds for every
  * channel that reaches a client: the history, the POST response, the export
  * and the live stream (the Redis envelope carries this key, never the id).
  *
@@ -31,4 +29,22 @@ export function senderColourKey(senderId: string): string {
     ? createHmac('sha256', secret).update(input).digest('hex')
     : createHash('sha256').update(input).digest('hex');
   return digest.slice(0, 16);
+}
+
+/**
+ * The stored id of a guest's chat messages, derived from the client address
+ * and the typed name so that a reload keeps the same bubble colour.
+ *
+ * Keyed with APP_SECRET, like `senderColourKey`: the id is stored in plain
+ * text with every message until the event's retention ends, and a reversible
+ * encoding of the address would keep the guest's IP in the database for that
+ * long. The prefix separates this use of the secret from the others.
+ */
+export function guestSenderId(ip: string, name: string): string {
+  const input = `chat-guest-id:${ip}:${name}`;
+  const secret = process.env.APP_SECRET;
+  const digest = secret
+    ? createHmac('sha256', secret).update(input).digest('hex')
+    : createHash('sha256').update(input).digest('hex');
+  return `guest-${digest.slice(0, 24)}`;
 }

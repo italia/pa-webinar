@@ -114,7 +114,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: controller
-          image: {{ .Values.recorder.controller.image }}
+          image: {{ include "pa-webinar.auxImage" (list . .Values.recorder.controller.image "recorder-controller") }}
           imagePullPolicy: {{ .Values.recorder.controller.imagePullPolicy | default "IfNotPresent" }}
           securityContext:
             allowPrivilegeEscalation: false

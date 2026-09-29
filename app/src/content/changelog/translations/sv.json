@@ -1,4 +1,13 @@
 {
+  "0.13.0": {
+    "title": "Mer fullständig integritet och transkriptioner av långa evenemang",
+    "notes": [
+      "En begäran om radering av dina uppgifter tar nu bort allt: utöver anmälan även chattmeddelanden, enkätsvar, återkoppling, inbjudningar och e-post i kö. Skickad e-post raderas efter 30 dagar, IP-adresser i aktivitetsloggen efter 90, och gästers chatt-id innehåller inte längre deras IP-adress.",
+      "I anmälningsformuläret kan samtycket till videoinspelning inte längre förväxlas med anmälan, och rummet visar den samtyckestext som valts för evenemanget. Ett evenemangs integritetsmeddelande kan nu också tas bort, inte bara ersättas.",
+      "Transkriptioner, undertexter och sammanfattningar av långa evenemang visas nu på evenemangssidan och i redigeraren: över en viss längd förblev de tomma.",
+      "Att starta ett evenemang kräver nu en bekräftelse innan rummet öppnas för alla med länken, och evenemang som aldrig hölls visas inte längre bland de kommande. Inspelaren, dess styrenhet och AI-arbetaren har nu versionen från varje utgåva, så en uppdatering eller en återställning tar med dem."
+    ]
+  },
   "0.12.0": {
     "title": "Redo för återanvändning: installeras med ett kommando, och evenemangen sköter sig själva",
     "notes": [

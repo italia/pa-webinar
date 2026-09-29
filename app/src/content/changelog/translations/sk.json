@@ -1,4 +1,13 @@
 {
+  "0.13.0": {
+    "title": "Úplnejšia ochrana súkromia a prepisy dlhých podujatí",
+    "notes": [
+      "Žiadosť o vymazanie údajov ich teraz odstráni všetky: okrem registrácie aj správy v chate, odpovede v dotazníkoch, spätnú väzbu, pozvánky a e-maily v poradí. Odoslané e-maily sa mažú po 30 dňoch, IP adresy v denníku aktivít po 90 a identifikátor hostí v chate už neobsahuje ich IP adresu.",
+      "Vo formulári registrácie si už nemožno pomýliť súhlas s videozáznamom s registráciou a v miestnosti sa zobrazuje text súhlasu zvolený pre podujatie. Informáciu o ochrane súkromia podujatia možno teraz aj odstrániť, nielen nahradiť.",
+      "Prepisy, titulky a zhrnutia dlhých podujatí sa teraz zobrazujú na stránke podujatia a v editore: nad určitou dĺžkou zostávali prázdne.",
+      "Spustenie podujatia teraz vyžaduje potvrdenie, kým sa miestnosť otvorí každému s odkazom, a podujatia, ktoré sa nekonali, sa už nezobrazujú medzi nadchádzajúcimi. Nahrávač, jeho ovládač a AI worker majú teraz verziu každého vydania, takže ich aktualizácia aj návrat späť vezmú so sebou."
+    ]
+  },
   "0.12.0": {
     "title": "Pripravené na opätovné použitie: inštalácia jedným príkazom a udalosti bežia samy",
     "notes": [

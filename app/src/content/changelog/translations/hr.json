@@ -1,4 +1,13 @@
 {
+  "0.13.0": {
+    "title": "Potpunija privatnost i transkripti dugih događaja",
+    "notes": [
+      "Zahtjev za brisanje podataka sada ih briše sve: osim prijave, i poruke u chatu, odgovore na upitnike, povratne informacije, pozivnice i e-poruke u redu čekanja. Poslane e-poruke brišu se nakon 30 dana, IP adrese u zapisniku aktivnosti nakon 90, a identifikator gostiju u chatu više ne sadrži njihovu IP adresu.",
+      "U obrascu za prijavu privola za video snimanje više se ne može zamijeniti s prijavom, a u sobi se prikazuje tekst privole odabran za događaj. Obavijest o privatnosti događaja sada se može i ukloniti, ne samo zamijeniti.",
+      "Transkripti, titlovi i sažeci dugih događaja sada se prikazuju na stranici događaja i u uređivaču: iznad određene duljine ostajali su prazni.",
+      "Pokretanje događaja sada traži potvrdu prije nego što se soba otvori svima s poveznicom, a događaji koji nikada nisu održani više se ne prikazuju među nadolazećima. Snimač, njegov upravljač i AI worker sada imaju verziju svakog izdanja, pa ih ažuriranje ili vraćanje unatrag uzima sa sobom."
+    ]
+  },
   "0.12.0": {
     "title": "Spremno za ponovnu upotrebu: instalacija jednom naredbom, a događaji teku sami",
     "notes": [

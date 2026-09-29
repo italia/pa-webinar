@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 
 import {
+  isUpcomingPublicEvent,
   isEventPageVisible,
   isEventPubliclyVisible,
   isEventOpenForRegistration,
@@ -254,5 +255,27 @@ describe('isEventPageVisible', () => {
     });
     expect(isEventPageVisible(finita(false))).toBe(false);
     expect(isEventPageVisible(finita(true))).toBe(true);
+  });
+});
+
+describe('isUpcomingPublicEvent', () => {
+  const now = Date.parse('2026-09-28T12:00:00Z');
+  const ev = (status: string, endsAt: string) => ({ status, endsAt: new Date(endsAt) }) as never;
+
+  it('keeps live events, also past their end', () => {
+    expect(isUpcomingPublicEvent(ev('LIVE', '2026-09-28T11:40:00Z'), now)).toBe(true);
+  });
+
+  it('keeps published and warming-up events that have not ended', () => {
+    expect(isUpcomingPublicEvent(ev('PUBLISHED', '2026-09-29T10:00:00Z'), now)).toBe(true);
+    expect(isUpcomingPublicEvent(ev('PROVISIONING', '2026-09-28T13:00:00Z'), now)).toBe(true);
+  });
+
+  it('drops a published event that ended without being held', () => {
+    expect(isUpcomingPublicEvent(ev('PUBLISHED', '2026-09-27T10:00:00Z'), now)).toBe(false);
+  });
+
+  it('drops ended events', () => {
+    expect(isUpcomingPublicEvent(ev('ENDED', '2026-09-29T10:00:00Z'), now)).toBe(false);
   });
 });

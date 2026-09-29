@@ -1,4 +1,13 @@
 {
+  "0.13.0": {
+    "title": "Mere fuldstændigt privatliv og transskriptioner af lange begivenheder",
+    "notes": [
+      "En anmodning om sletning af dine data sletter nu det hele: ud over tilmeldingen også chatbeskeder, svar på spørgeskemaer, feedback, invitationer og e-mails i kø. Sendte e-mails slettes efter 30 dage, IP-adresser i aktivitetsloggen efter 90, og gæsters chat-id indeholder ikke længere deres IP-adresse.",
+      "I tilmeldingsformularen kan samtykket til videooptagelse ikke længere forveksles med tilmeldingen, og rummet viser den samtykketekst, der er valgt til begivenheden. En begivenheds privatlivserklæring kan nu også fjernes, ikke kun udskiftes.",
+      "Transskriptioner, undertekster og resuméer af lange begivenheder vises nu på begivenhedssiden og i editoren: over en vis længde forblev de tomme.",
+      "At starte en begivenhed kræver nu en bekræftelse, før rummet åbnes for alle med linket, og begivenheder, der aldrig fandt sted, vises ikke længere blandt de kommende. Optageren, dens controller og AI-workeren har nu versionen fra hver udgivelse, så en opdatering eller en tilbagerulning tager dem med."
+    ]
+  },
   "0.12.0": {
     "title": "Klar til genbrug: installeres med én kommando, og arrangementerne kører af sig selv",
     "notes": [

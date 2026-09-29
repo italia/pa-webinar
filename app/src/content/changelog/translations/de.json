@@ -1,4 +1,13 @@
 {
+  "0.13.0": {
+    "title": "Vollständigerer Datenschutz und Transkripte langer Veranstaltungen",
+    "notes": [
+      "Wer die Löschung seiner Daten verlangt, erhält jetzt eine vollständige Löschung: neben der Anmeldung auch Chatnachrichten, Antworten auf Fragebögen, Feedback, Einladungen und E-Mails in der Warteschlange. Versendete E-Mails werden nach 30 Tagen gelöscht, IP-Adressen im Aktivitätsprotokoll nach 90, und die Chat-Kennung von Gästen enthält ihre IP-Adresse nicht mehr.",
+      "Im Anmeldeformular lässt sich die Einwilligung zur Videoaufzeichnung nicht mehr mit der Anmeldung verwechseln, und im Raum erscheint der für die Veranstaltung gewählte Einwilligungstext. Die Datenschutzhinweise einer Veranstaltung lassen sich jetzt auch entfernen, nicht nur ersetzen.",
+      "Transkripte, Untertitel und Zusammenfassungen langer Veranstaltungen erscheinen jetzt auf der Veranstaltungsseite und im Editor: ab einer gewissen Länge blieben sie bisher leer.",
+      "Der Start einer Veranstaltung verlangt jetzt eine Bestätigung, bevor der Raum für alle mit dem Link geöffnet wird, und nie abgehaltene Veranstaltungen erscheinen nicht mehr unter den kommenden. Aufzeichnungsbot, Controller und KI-Worker tragen jetzt die Version jedes Releases, sodass ein Update oder ein Zurücksetzen sie mitnimmt."
+    ]
+  },
   "0.12.0": {
     "title": "Bereit zur Nachnutzung: Installation mit einem Befehl, und Veranstaltungen laufen von selbst",
     "notes": [

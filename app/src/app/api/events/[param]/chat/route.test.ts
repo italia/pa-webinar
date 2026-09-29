@@ -36,7 +36,7 @@ vi.mock('@/lib/event-session', () => ({ readOwnedEventAccessToken: vi.fn() }));
 
 import { prisma } from '@/lib/db';
 import { publishChat } from '@/lib/chat/pubsub';
-import { senderColourKey } from '@/lib/chat/sender-key';
+import { guestSenderId, senderColourKey } from '@/lib/chat/sender-key';
 import { readOwnedEventAccessToken } from '@/lib/event-session';
 import { hasJoinGrant } from '@/lib/events/join-grant';
 
@@ -61,11 +61,9 @@ const CO_MOD_TOKEN = 'CO_MOD_TOKEN';
 const GRANT_ID = 'g-77';
 const ACCESS_TOKEN = 'ALICE_ACCESS_TOKEN';
 
-/** IP dell'ospite: il senderId lo contiene in chiaro (base64url di `ip:nome`). */
+/** IP dell'ospite: il senderId ne deriva con una chiave, e non deve comparire nelle risposte. */
 const GUEST_IP = '203.0.113.7';
-const GUEST_SENDER_ID = `guest-${Buffer.from(`${GUEST_IP}:Anna`)
-  .toString('base64url')
-  .slice(0, 24)}`;
+const GUEST_SENDER_ID = guestSenderId(GUEST_IP, 'Anna');
 
 function eventRow(over: Record<string, unknown> = {}) {
   return {

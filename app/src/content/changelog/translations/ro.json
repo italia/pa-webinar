@@ -1,4 +1,13 @@
 {
+  "0.13.0": {
+    "title": "Confidențialitate mai completă și transcrierile evenimentelor lungi",
+    "notes": [
+      "Cererea de ștergere a datelor le șterge acum pe toate: pe lângă înscriere, și mesajele din chat, răspunsurile la chestionare, feedbackul, invitațiile și e-mailurile din coadă. E-mailurile trimise se șterg după 30 de zile, adresele IP din jurnalul de activitate după 90, iar identificatorul invitaților în chat nu mai conține adresa lor IP.",
+      "În formularul de înscriere, consimțământul pentru înregistrarea video nu se mai confundă cu înscrierea, iar în sală apare textul de consimțământ ales pentru eveniment. Nota de informare privind confidențialitatea unui eveniment poate fi acum și eliminată, nu doar înlocuită.",
+      "Transcrierile, subtitrările și rezumatele evenimentelor lungi apar acum pe pagina evenimentului și în editor: peste o anumită lungime rămâneau goale.",
+      "Pornirea unui eveniment cere acum confirmare înainte ca sala să se deschidă oricui are linkul, iar evenimentele care nu au avut loc nu mai apar printre cele viitoare. Înregistratorul, controlerul său și workerul AI au acum versiunea fiecărei lansări, astfel încât o actualizare sau o revenire le ia cu ea."
+    ]
+  },
   "0.12.0": {
     "title": "Gata pentru reutilizare: se instalează cu o singură comandă, iar evenimentele merg singure",
     "notes": [

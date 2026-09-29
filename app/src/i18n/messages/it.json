@@ -152,16 +152,16 @@
     }
   },
   "registration": {
-    "title": "Registrazione all'evento",
+    "title": "Iscrizione all'evento",
     "name": "Nome e cognome",
     "namePlaceholder": "Il nome verrà mostrato nella sala dell'evento",
     "email": "Email",
     "emailPlaceholder": "Riceverai il link per accedere all'evento",
     "gdprConsent": "Acconsento al trattamento dei miei dati personali (nome, email) ai sensi del Regolamento UE 2016/679 (GDPR) per la partecipazione a questo evento.",
     "gdprLink": "Leggi l'informativa completa sulla privacy",
-    "submit": "Conferma registrazione",
-    "submitting": "Registrazione in corso...",
-    "success": "Registrazione completata!",
+    "submit": "Conferma iscrizione",
+    "submitting": "Iscrizione in corso...",
+    "success": "Iscrizione completata!",
     "successMessage": "Riceverai un'email di conferma con il link per accedere all'evento.",
     "successScheduledMessage": "Sei registrato! Ti abbiamo inviato un'email con il link personale per accedere. Aggiungi l'evento al calendario e torna qui poco prima dell'inizio.",
     "addToCalendar": "Aggiungi al calendario",
@@ -171,8 +171,8 @@
     "resendLink": "Invia di nuovo il link di accesso",
     "resending": "Invio in corso…",
     "resendSent": "Se l'indirizzo è registrato, ti abbiamo inviato di nuovo il link di accesso via email.",
-    "invitationOnly": "La registrazione è riservata alle persone invitate: usa l'indirizzo email con cui ti hanno invitato. Il link per entrare ti arriverà via email.",
-    "closed": "La registrazione a questo evento non è aperta al pubblico.",
+    "invitationOnly": "L'iscrizione è riservata alle persone invitate: usa l'indirizzo email con cui ti hanno invitato. Il link per entrare ti arriverà via email.",
+    "closed": "L'iscrizione a questo evento non è aperta al pubblico.",
     "lostLink": "Ti eri già registrato? Ricevi di nuovo il tuo link personale",
     "lostLinkHelp": "Scrivi l'indirizzo email con cui ti sei registrato: se risulta iscritto a questo evento, ti rimandiamo il link per entrare.",
     "checkEmailTitle": "Controlla la tua email",
@@ -203,10 +203,10 @@
       "emailInvalid": "Inserisci un'email valida",
       "organizationRequired": "Inserisci il tuo ente di appartenenza",
       "consentRequired": "Il consenso al trattamento dati è obbligatorio",
-      "recordingConsentRequired": "Il consenso alla registrazione è obbligatorio per questo evento",
+      "recordingConsentRequired": "Il consenso alla videoregistrazione è obbligatorio per questo evento",
       "multitrackConsentRequired": "Il consenso alla registrazione della tua traccia audio è obbligatorio per questo evento",
       "eventFull": "L'evento ha raggiunto il numero massimo di partecipanti",
-      "generic": "Errore durante la registrazione. Riprova."
+      "generic": "Errore durante l'iscrizione. Riprova."
     }
   },
   "videoLibrary": {
@@ -1284,6 +1284,10 @@
     "unpublishSuccess": "Evento rimosso dalla pubblicazione",
     "startEvent": "Avvia evento",
     "startEventSuccess": "Evento avviato! I partecipanti in attesa verranno reindirizzati automaticamente.",
+    "startEventConfirmTitle": "Avviare l'evento?",
+    "startEventConfirmMessage": "Inizio previsto: {when}. Chi ha il link potrà entrare da subito e la sala video si accende ora.",
+    "startEventConfirmEarly": "Mancano più di 30 minuti all'inizio.",
+    "startEventFailed": "L'evento non si è avviato. Riprova.",
     "jvbWarmupWarning": "I server video si stanno avviando (circa 2 minuti). I partecipanti vedranno un avviso nella sala d'attesa.",
     "eventIsLive": "L'evento è in corso",
     "liveParticipants": "{count} in stanza / {max} max",
@@ -2880,8 +2884,8 @@
   },
   "gdpr": {
     "consent": {
-      "recording": "Acconsento alla registrazione audio/video dell'evento",
-      "recordingRequired": "Il consenso alla registrazione è obbligatorio per partecipare a questo evento",
+      "recording": "Acconsento alla videoregistrazione dell'evento (audio e video)",
+      "recordingRequired": "Il consenso alla videoregistrazione è obbligatorio per partecipare a questo evento",
       "multitrack": "Acconsento alla registrazione di una traccia audio separata della mia voce, al solo scopo di attribuire correttamente la trascrizione a chi parla. La traccia è temporanea e cancellata dopo la trascrizione; non viene usata per identificare o riprodurre la mia voce.",
       "multitrackRequired": "Il consenso alla registrazione della tua traccia audio è obbligatorio per partecipare a questo evento",
       "futureCommunications": "Desidero ricevere informazioni sui prossimi eventi pubblicati su questa piattaforma",

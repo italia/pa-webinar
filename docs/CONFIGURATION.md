@@ -217,6 +217,8 @@ Defaults: `app/src/lib/email/send.ts`. Provider examples and delivery troublesho
 | `SMTP_FROM_NAME` | No | none | No | Secret (chart examples) | Sender display name. The **Settings** value wins when set (see [Precedence](#precedence)) |
 | `SMTP_POOL_MAX_CONNECTIONS` | No | `5` | No | `app.env` | Pooled SMTP connections per pod |
 | `SMTP_POOL_MAX_MESSAGES` | No | `100` | No | `app.env` | Messages sent on one connection before it is replaced |
+| `EMAIL_OUTBOX_RETENTION_DAYS` | No | `30` | No | `app.env` | Days after which the GDPR cleanup deletes sent and failed outbox rows, or empties them when they carry a deduplication key. Default in `app/src/lib/gdpr/log-retention.ts` |
+| `AUDIT_LOG_PERSONAL_DATA_RETENTION_DAYS` | No | `90` | No | `app.env` | Days after which the GDPR cleanup empties the IP address, the user agent and the speaker-naming detail of `AdminAuditLog` rows. The rows themselves are kept. Default in `app/src/lib/gdpr/log-retention.ts` |
 
 ### Object storage
 

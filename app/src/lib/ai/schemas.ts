@@ -262,10 +262,11 @@ export const artifactRegisterSchema = z.object({
   /** SHA-256 hex string. */
   contentHash: z.string().regex(/^[a-f0-9]{64}$/, 'must be sha256 hex'),
   /**
-   * When ≤ 64KB, the worker may inline the body so the app can render
-   * without a storage fetch. Will be encrypted at rest via encryptPII.
+   * Text and JSON outputs up to 8 MiB are inlined by the worker, so the app
+   * renders them without a storage fetch (INLINE_MAX_BYTES in
+   * infra/ai/worker/main.py). Encrypted at rest via encryptPII.
    */
-  inlineBody: z.string().max(64 * 1024).optional(),
+  inlineBody: z.string().max(8 * 1024 * 1024).optional(),
   modelId: z.string().max(120).optional(),
   modelVersion: z.string().max(80).optional(),
   /**

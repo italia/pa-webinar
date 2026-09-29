@@ -1,4 +1,13 @@
 {
+  "0.13.0": {
+    "title": "Privacidade mais completa e transcrições de eventos longos",
+    "notes": [
+      "Pedir o apagamento dos seus dados remove agora todos: além da inscrição, as mensagens do chat, as respostas a questionários, as avaliações, os convites e os e-mails em fila. Os e-mails enviados são apagados após 30 dias, os endereços IP do registo de atividade após 90, e o identificador dos convidados no chat já não contém o seu endereço IP.",
+      "No formulário de inscrição, o consentimento para a gravação de vídeo já não se confunde com a inscrição, e a sala mostra o texto de consentimento escolhido para o evento. O aviso de privacidade de um evento pode agora ser removido, e não apenas substituído.",
+      "As transcrições, legendas e sínteses de eventos longos aparecem agora na página do evento e no editor: a partir de certa extensão ficavam vazias.",
+      "Iniciar um evento pede agora confirmação antes de abrir a sala a quem tiver o link, e os eventos que nunca se realizaram deixam de aparecer entre os próximos. O gravador, o seu controlador e o worker de IA têm agora a versão de cada lançamento, pelo que uma atualização ou uma reversão os leva consigo."
+    ]
+  },
   "0.12.0": {
     "title": "Pronto para reutilização: instala-se com um comando, e os eventos avançam sozinhos",
     "notes": [

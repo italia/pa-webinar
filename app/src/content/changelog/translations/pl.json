@@ -1,4 +1,13 @@
 {
+  "0.13.0": {
+    "title": "Pełniejsza ochrona prywatności i transkrypcje długich wydarzeń",
+    "notes": [
+      "Prośba o usunięcie danych usuwa teraz wszystkie: oprócz zgłoszenia także wiadomości na czacie, odpowiedzi na ankiety, opinie, zaproszenia i e-maile w kolejce. Wysłane e-maile są usuwane po 30 dniach, adresy IP w dzienniku aktywności po 90, a identyfikator gości na czacie nie zawiera już ich adresu IP.",
+      "W formularzu zgłoszenia zgody na nagranie wideo nie da się już pomylić ze zgłoszeniem, a w sali wyświetla się tekst zgody wybrany dla wydarzenia. Informację o prywatności wydarzenia można teraz także usunąć, a nie tylko zastąpić.",
+      "Transkrypcje, napisy i podsumowania długich wydarzeń pojawiają się teraz na stronie wydarzenia i w edytorze: powyżej pewnej długości pozostawały puste.",
+      "Rozpoczęcie wydarzenia wymaga teraz potwierdzenia przed otwarciem sali dla każdego, kto ma link, a wydarzenia, które się nie odbyły, nie pojawiają się już wśród nadchodzących. Rejestrator, jego kontroler i worker AI mają teraz wersję każdego wydania, więc aktualizacja lub wycofanie obejmuje także je."
+    ]
+  },
   "0.12.0": {
     "title": "Gotowe do ponownego wykorzystania: instalacja jednym poleceniem, a wydarzenia toczą się same",
     "notes": [

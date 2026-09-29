@@ -1,4 +1,13 @@
 {
+  "0.13.0": {
+    "title": "Úplnější ochrana soukromí a přepisy dlouhých událostí",
+    "notes": [
+      "Žádost o výmaz údajů je nyní odstraní všechny: kromě registrace také zprávy v chatu, odpovědi v dotaznících, zpětnou vazbu, pozvánky a e-maily ve frontě. Odeslané e-maily se mažou po 30 dnech, IP adresy v protokolu činnosti po 90 a identifikátor hostů v chatu už neobsahuje jejich IP adresu.",
+      "Ve formuláři registrace si už nelze splést souhlas s videozáznamem s registrací a v místnosti se zobrazuje text souhlasu zvolený pro událost. Informace o ochraně soukromí události lze nyní i odebrat, nejen nahradit.",
+      "Přepisy, titulky a shrnutí dlouhých událostí se nyní zobrazují na stránce události a v editoru: nad určitou délkou zůstávaly prázdné.",
+      "Spuštění události nyní vyžaduje potvrzení, než se místnost otevře každému s odkazem, a události, které se nekonaly, se už nezobrazují mezi nadcházejícími. Nahrávač, jeho řadič a AI worker mají nyní verzi každého vydání, takže je aktualizace i návrat zpět vezmou s sebou."
+    ]
+  },
   "0.12.0": {
     "title": "Připraveno k opětovnému použití: instalace jedním příkazem a události běží samy",
     "notes": [

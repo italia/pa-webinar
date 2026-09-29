@@ -1,4 +1,13 @@
 {
+  "0.13.0": {
+    "title": "Teljesebb adatvédelem és a hosszú események átiratai",
+    "notes": [
+      "Az adatok törlésének kérése most már mindent töröl: a regisztráción kívül a csevegőüzeneteket, a kérdőívekre adott válaszokat, a visszajelzéseket, a meghívókat és a sorban álló e-maileket is. Az elküldött e-mailek 30 nap után törlődnek, a tevékenységnapló IP-címei 90 nap után, a vendégek csevegőazonosítója pedig már nem tartalmazza az IP-címüket.",
+      "A regisztrációs űrlapon a videofelvételhez adott hozzájárulás már nem téveszthető össze a regisztrációval, a teremben pedig az eseményhez választott hozzájárulási szöveg jelenik meg. Az esemény adatvédelmi tájékoztatója most már el is távolítható, nem csak lecserélhető.",
+      "A hosszú események átiratai, feliratai és összefoglalói most megjelennek az esemény oldalán és a szerkesztőben: egy bizonyos hossz felett üresek maradtak.",
+      "Az esemény indítása most megerősítést kér, mielőtt a terem megnyílik mindenki számára, akinek megvan a link, és a meg nem tartott események már nem jelennek meg a közelgők között. A rögzítő, a vezérlője és az MI-feldolgozó most minden kiadás verzióját viseli, így egy frissítés vagy visszaállítás őket is viszi."
+    ]
+  },
   "0.12.0": {
     "title": "Újrafelhasználásra kész: egyetlen paranccsal telepíthető, az események pedig maguktól haladnak",
     "notes": [

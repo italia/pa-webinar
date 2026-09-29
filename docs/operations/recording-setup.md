@@ -393,8 +393,10 @@ the value the bot uses when the variable is empty (`infra/recorder/src/capture.t
 | `recorder.controller.reconcileIntervalMs` | `30000` | How often the controller compares wanted and running bots |
 | `recorder.controller.resources` | 50m CPU and 64 MiB requested | |
 
-The bot and controller images are published by the development workflow, not
-by a release tag, so a rollback of the app image does not roll them back
+The bot and controller images are published with each release version (from
+0.13.0) and, by the development workflow, as `:dev`. With `recorder.image` and
+`recorder.controller.image` empty, the chart uses the app image's tag, so they
+follow an upgrade or a rollback of the app
 ([CI, images and releases](../development/ci-and-release.md)).
 
 ### What the bot must reach
