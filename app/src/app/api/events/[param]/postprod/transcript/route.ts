@@ -10,6 +10,7 @@
  * only.
  */
 
+import { AI_GENERATED_HEADER, AI_GENERATED_HEADER_VALUE } from '@/lib/ai/marking';
 import { withErrorHandling } from '@/lib/api-handler';
 import { prisma } from '@/lib/db';
 import { NotFoundError } from '@/lib/errors';
@@ -69,7 +70,15 @@ export const GET = withErrorHandling(async (_request, context) => {
             ],
           },
         },
-        select: { id: true, type: true, language: true, inlineBody: true, blobKey: true },
+        select: {
+          id: true,
+          type: true,
+          language: true,
+          inlineBody: true,
+          blobKey: true,
+          revisedAt: true,
+          original: { select: { id: true } },
+        },
       },
       speakers: {
         select: {
@@ -219,7 +228,24 @@ export const GET = withErrorHandling(async (_request, context) => {
       src: `/api/events/${slug}/postprod/dubbed-audio/${a.language}`,
     }));
 
+  // Marcatura AI Act art. 50 leggibile da macchina, e se una persona ha
+  // corretto la trascrizione o una sintesi dopo la generazione automatica.
+  // Solo il Markdown: e' cio' che il pannello mostra. Il JSON strutturato si
+  // riscrive a ogni salvataggio dell'editor anche quando il testo non cambia.
+  const revisedSummaries = recording.artifacts
+    .filter(
+      (a) =>
+        (a.type === 'SUMMARY_MD' || a.type === 'TRANSLATION_MD') && (!!a.revisedAt || !!a.original),
+    )
+    .map((a) => a.language)
+    .filter((l): l is string => !!l);
+
   return Response.json({
+    aiGenerated: true,
+    revised: {
+      transcript: !!transcriptJson?.revisedAt || !!transcriptJson?.original,
+      summaries: [...new Set(revisedSummaries)],
+    },
     recordingId: recording.id,
     sourceLanguage: recording.sourceLanguage ?? transcript.language ?? 'it',
     segments,
@@ -229,5 +255,5 @@ export const GET = withErrorHandling(async (_request, context) => {
     summariesStructured,
     dubbedAudio,
     pipelineSnapshot: recording.pipelineSnapshot ?? {},
-  });
+  }, { headers: { [AI_GENERATED_HEADER]: AI_GENERATED_HEADER_VALUE } });
 });

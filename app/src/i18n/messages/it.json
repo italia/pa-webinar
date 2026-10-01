@@ -3577,6 +3577,7 @@
     "tabSummary": "Sintesi",
     "aiBadgeLabel": "Contenuto generato da AI",
     "aiBadgeBody": "Trascrizione e sintesi sono prodotte automaticamente dalla pipeline AI in cluster. Possono contenere errori; il video resta la fonte autoritativa.",
+    "revisedByPerson": "Il testo è stato rivisto da una persona dopo la generazione automatica.",
     "searchPlaceholder": "Cerca nella trascrizione…",
     "searchLabel": "Cerca nella trascrizione",
     "searchClear": "Pulisci ricerca",

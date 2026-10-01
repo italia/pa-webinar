@@ -18,6 +18,7 @@
 import { z } from 'zod';
 import { cookies } from 'next/headers';
 
+import { conservaOriginali } from '@/lib/ai/original-body';
 import { withErrorHandling } from '@/lib/api-handler';
 import { requireRecordingManager } from '@/lib/auth/staff-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
@@ -33,10 +34,22 @@ async function loadRecording(id: string) {
     where: { id },
     select: {
       id: true,
+      eventId: true,
       sourceLanguage: true,
       artifacts: {
         where: { type: { in: ['SUMMARY_MD', 'TRANSLATION_MD', 'SUMMARY_JSON'] } },
-        select: { id: true, type: true, language: true, inlineBody: true },
+        select: {
+          id: true,
+          recordingId: true,
+          type: true,
+          language: true,
+          inlineBody: true,
+          contentHash: true,
+          sizeBytes: true,
+          modelId: true,
+          modelVersion: true,
+          revisedAt: true,
+        },
       },
     },
   });
@@ -144,7 +157,20 @@ export const PUT = withErrorHandling(async (request, context) => {
     updates.push({ artifactId: art.id, body: JSON.stringify(body.structured) });
   }
 
+  // Come per la trascrizione: alla prima correzione si conserva il testo della
+  // macchina, cosi' la versione automatica non va persa e la pagina pubblica
+  // puo' dire che il testo e' stato rivisto. Si decide artefatto per artefatto:
+  // `revisedAt` si azzera a ogni nuova esecuzione della pipeline, quindi se e'
+  // vuoto il testo e' ancora quello della macchina; se non lo e', qualcuno lo
+  // aveva gia' corretto prima che esistesse questa conservazione, e lo si dichiara.
+  const daConservare = recording.artifacts.filter((a) =>
+    updates.some((u) => u.artifactId === a.id),
+  );
+
   await prisma.$transaction(async (tx) => {
+    for (const a of daConservare) {
+      await conservaOriginali(tx, [a], recording.eventId, a.revisedAt === null);
+    }
     for (const u of updates) {
       await tx.postprodArtifact.update({
         where: { id: u.artifactId },
@@ -152,6 +178,7 @@ export const PUT = withErrorHandling(async (request, context) => {
           inlineBody: encryptPII(u.body),
           contentHash: sha256Hex(u.body),
           sizeBytes: BigInt(Buffer.byteLength(u.body, 'utf8')),
+          revisedAt: new Date(),
         },
       });
     }

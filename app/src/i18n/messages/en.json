@@ -3577,6 +3577,7 @@
     "tabSummary": "Summary",
     "aiBadgeLabel": "AI-generated content",
     "aiBadgeBody": "Transcript and summary are produced automatically by the in-cluster AI pipeline. They may contain errors; the video remains the authoritative source.",
+    "revisedByPerson": "The text was reviewed by a person after it was generated automatically.",
     "searchPlaceholder": "Search transcript…",
     "searchLabel": "Search transcript",
     "searchClear": "Clear search",

@@ -3577,6 +3577,7 @@
     "tabSummary": "Shrnutí",
     "aiBadgeLabel": "Obsah generovaný AI",
     "aiBadgeBody": "Přepis a shrnutí vytváří automaticky AI pipeline v clusteru. Mohou obsahovat chyby; závazným zdrojem zůstává video.",
+    "revisedByPerson": "Text po automatickém vygenerování zkontroloval člověk.",
     "searchPlaceholder": "Hledat v přepisu…",
     "searchLabel": "Hledat v přepisu",
     "searchClear": "Vymazat hledání",

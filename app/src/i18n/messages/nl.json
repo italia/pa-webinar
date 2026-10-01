@@ -3577,6 +3577,7 @@
     "tabSummary": "Samenvatting",
     "aiBadgeLabel": "Door AI gegenereerde inhoud",
     "aiBadgeBody": "De transcriptie en de samenvatting worden automatisch geproduceerd door de AI-pijplijn in het cluster. Ze kunnen fouten bevatten; de video blijft de gezaghebbende bron.",
+    "revisedByPerson": "De tekst is na de automatische generatie door een persoon nagekeken.",
     "searchPlaceholder": "Zoek in de transcriptie…",
     "searchLabel": "Zoek in de transcriptie",
     "searchClear": "Zoekopdracht wissen",

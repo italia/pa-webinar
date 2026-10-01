@@ -3577,6 +3577,7 @@
     "tabSummary": "Achoimre",
     "aiBadgeLabel": "Ábhar cruthaithe ag AI",
     "aiBadgeBody": "Cruthaíonn an phíblíne AI sa bhraisle an tras-scríbhinn agus an achoimre go huathoibríoch. D'fhéadfadh earráidí a bheith iontu; is é an físeán an fhoinse údarásach i gcónaí.",
+    "revisedByPerson": "D'athbhreithnigh duine an téacs tar éis é a ghiniúint go huathoibríoch.",
     "searchPlaceholder": "Cuardaigh sa tras-scríbhinn…",
     "searchLabel": "Cuardaigh sa tras-scríbhinn",
     "searchClear": "Glan an cuardach",

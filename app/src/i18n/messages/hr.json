@@ -3577,6 +3577,7 @@
     "tabSummary": "Sažetak",
     "aiBadgeLabel": "Sadržaj generiran AI-jem",
     "aiBadgeBody": "Transkript i sažetak automatski izrađuje AI pipeline u klasteru. Mogu sadržavati pogreške; videozapis ostaje mjerodavan izvor.",
+    "revisedByPerson": "Tekst je nakon automatskog generiranja pregledala osoba.",
     "searchPlaceholder": "Pretraži transkript…",
     "searchLabel": "Pretraži transkript",
     "searchClear": "Očisti pretragu",

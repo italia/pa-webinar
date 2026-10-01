@@ -3577,6 +3577,7 @@
     "tabSummary": "Podsumowanie",
     "aiBadgeLabel": "Treść wygenerowana przez AI",
     "aiBadgeBody": "Transkrypcja i podsumowanie powstają automatycznie w potoku AI działającym w klastrze. Mogą zawierać błędy; źródłem miarodajnym pozostaje nagranie.",
+    "revisedByPerson": "Tekst został sprawdzony przez człowieka po automatycznym wygenerowaniu.",
     "searchPlaceholder": "Szukaj w transkrypcji…",
     "searchLabel": "Szukaj w transkrypcji",
     "searchClear": "Wyczyść wyszukiwanie",

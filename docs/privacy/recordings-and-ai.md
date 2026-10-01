@@ -345,8 +345,10 @@ watermark and the waiting-room notice) is described in
 [AI post-production](../POSTPROD.md#transparency-ai-act-article-50). The gaps
 that matter for a privacy notice:
 
-- the disclaimer lives in the interface only: subtitles in the player and the
-  downloaded files (`.txt`, `.srt`, `.vtt`, `.md`) carry no AI marker;
+- the `.srt` download and the dubbed audio carry the AI marker only in the
+  HTTP response header, because the formats have no place for it (the audio
+  also carries its watermark); subtitles served from storage instead of the
+  database copy, which happens only above the 8 MiB inline limit, carry none;
 - the public transparency panel appears only on events with a summary (see
   [Processing transparency](#processing-transparency));
 - the panel names a fixed language-model vendor and license, constants in

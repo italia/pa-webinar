@@ -3577,6 +3577,7 @@
     "tabSummary": "Kopsavilkums",
     "aiBadgeLabel": "MI ģenerēts saturs",
     "aiBadgeBody": "Transkripciju un kopsavilkumu automātiski izveido klasterī izvietotais MI konveijers. Tajos var būt kļūdas; autoritatīvais avots ir video.",
+    "revisedByPerson": "Tekstu pēc automātiskās ģenerēšanas ir pārskatījis cilvēks.",
     "searchPlaceholder": "Meklēt transkripcijā…",
     "searchLabel": "Meklēt transkripcijā",
     "searchClear": "Notīrīt meklēšanu",

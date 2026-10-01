@@ -3577,6 +3577,7 @@
     "tabSummary": "Synthèse",
     "aiBadgeLabel": "Contenu généré par IA",
     "aiBadgeBody": "La transcription et la synthèse sont produites automatiquement par la chaîne de traitement IA dans le cluster. Elles peuvent contenir des erreurs ; la vidéo reste la source de référence.",
+    "revisedByPerson": "Le texte a été relu par une personne après sa génération automatique.",
     "searchPlaceholder": "Rechercher dans la transcription…",
     "searchLabel": "Rechercher dans la transcription",
     "searchClear": "Effacer la recherche",

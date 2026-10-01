@@ -3577,6 +3577,7 @@
     "tabSummary": "Összefoglaló",
     "aiBadgeLabel": "AI által generált tartalom",
     "aiBadgeBody": "Az átiratot és az összefoglalót automatikusan a fürtön belüli AI pipeline készíti. Hibákat tartalmazhatnak; a hiteles forrás továbbra is a videó.",
+    "revisedByPerson": "A szöveget az automatikus előállítás után egy személy átnézte.",
     "searchPlaceholder": "Keresés az átiratban…",
     "searchLabel": "Keresés az átiratban",
     "searchClear": "Keresés törlése",

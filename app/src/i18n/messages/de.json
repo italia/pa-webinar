@@ -3577,6 +3577,7 @@
     "tabSummary": "Zusammenfassung",
     "aiBadgeLabel": "Von KI erzeugter Inhalt",
     "aiBadgeBody": "Transkript und Zusammenfassung werden automatisch von der KI-Pipeline im Cluster erzeugt. Sie können Fehler enthalten; maßgebliche Quelle bleibt das Video.",
+    "revisedByPerson": "Der Text wurde nach der automatischen Erstellung von einer Person überarbeitet.",
     "searchPlaceholder": "Im Transkript suchen…",
     "searchLabel": "Im Transkript suchen",
     "searchClear": "Suche zurücksetzen",

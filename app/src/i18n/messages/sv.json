@@ -3577,6 +3577,7 @@
     "tabSummary": "Sammanfattning",
     "aiBadgeLabel": "AI-genererat innehåll",
     "aiBadgeBody": "Transkription och sammanfattning tas fram automatiskt av AI-pipelinen i klustret. De kan innehålla fel; videon förblir den auktoritativa källan.",
+    "revisedByPerson": "Texten har granskats av en person efter den automatiska genereringen.",
     "searchPlaceholder": "Sök i transkriptionen…",
     "searchLabel": "Sök i transkriptionen",
     "searchClear": "Rensa sökningen",

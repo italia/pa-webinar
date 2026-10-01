@@ -3577,6 +3577,7 @@
     "tabSummary": "Yhteenveto",
     "aiBadgeLabel": "Tekoälyn luomaa sisältöä",
     "aiBadgeBody": "Litterointi ja yhteenveto tuotetaan automaattisesti klusterissa toimivalla tekoälyputkella. Ne voivat sisältää virheitä; video on edelleen ensisijainen lähde.",
+    "revisedByPerson": "Ihminen on tarkistanut tekstin automaattisen tuottamisen jälkeen.",
     "searchPlaceholder": "Hae litteroinnista…",
     "searchLabel": "Hae litteroinnista",
     "searchClear": "Tyhjennä haku",

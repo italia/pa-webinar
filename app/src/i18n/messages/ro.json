@@ -3577,6 +3577,7 @@
     "tabSummary": "Rezumat",
     "aiBadgeLabel": "Conținut generat de AI",
     "aiBadgeBody": "Transcrierea și rezumatul sunt produse automat de pipeline-ul AI în cluster. Pot conține erori; videoul rămâne sursa de referință.",
+    "revisedByPerson": "Textul a fost revizuit de o persoană după generarea automată.",
     "searchPlaceholder": "Caută în transcriere…",
     "searchLabel": "Caută în transcriere",
     "searchClear": "Șterge căutarea",

@@ -3577,6 +3577,7 @@
     "tabSummary": "Kokkuvõte",
     "aiBadgeLabel": "AI loodud sisu",
     "aiBadgeBody": "Transkriptsiooni ja kokkuvõtte koostab automaatselt klastrisisene AI töövoog. Need võivad sisaldada vigu; autoriteetne allikas on video.",
+    "revisedByPerson": "Inimene on teksti pärast automaatset loomist üle vaadanud.",
     "searchPlaceholder": "Otsi transkriptsioonist…",
     "searchLabel": "Otsi transkriptsioonist",
     "searchClear": "Tühjenda otsing",

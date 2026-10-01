@@ -3577,6 +3577,7 @@
     "tabSummary": "Resumen",
     "aiBadgeLabel": "Contenido generado por IA",
     "aiBadgeBody": "La transcripción y el resumen los produce automáticamente el pipeline de IA en el clúster. Pueden contener errores; el vídeo sigue siendo la fuente autorizada.",
+    "revisedByPerson": "Una persona ha revisado el texto después de su generación automática.",
     "searchPlaceholder": "Buscar en la transcripción…",
     "searchLabel": "Buscar en la transcripción",
     "searchClear": "Borrar la búsqueda",

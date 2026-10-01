@@ -3577,6 +3577,7 @@
     "tabSummary": "Sommarju",
     "aiBadgeLabel": "Kontenut iġġenerat bl-AI",
     "aiBadgeBody": "It-traskrizzjoni u s-sommarju huma prodotti awtomatikament mill-pipeline tal-AI fil-cluster. Jista' jkun fihom żbalji; il-vidjow jibqa' s-sors awtorevoli.",
+    "revisedByPerson": "It-test ġie rivedut minn persuna wara li ġie ġġenerat awtomatikament.",
     "searchPlaceholder": "Fittex fit-traskrizzjoni…",
     "searchLabel": "Fittex fit-traskrizzjoni",
     "searchClear": "Naddaf it-tfittxija",

@@ -3577,6 +3577,7 @@
     "tabSummary": "Povzetek",
     "aiBadgeLabel": "Vsebina, ustvarjena z AI",
     "aiBadgeBody": "Prepis in povzetek samodejno ustvari cevovod AI v gruči. Lahko vsebujeta napake; videoposnetek ostaja verodostojni vir.",
+    "revisedByPerson": "Besedilo je po samodejnem nastanku pregledala oseba.",
     "searchPlaceholder": "Iskanje po prepisu…",
     "searchLabel": "Iskanje po prepisu",
     "searchClear": "Počisti iskanje",

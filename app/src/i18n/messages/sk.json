@@ -3577,6 +3577,7 @@
     "tabSummary": "Zhrnutie",
     "aiBadgeLabel": "Obsah vygenerovaný AI",
     "aiBadgeBody": "Prepis a zhrnutie vytvára automaticky AI pipeline v klastri. Môžu obsahovať chyby; smerodajným zdrojom zostáva video.",
+    "revisedByPerson": "Text po automatickom vygenerovaní skontroloval človek.",
     "searchPlaceholder": "Hľadať v prepise…",
     "searchLabel": "Hľadať v prepise",
     "searchClear": "Vymazať vyhľadávanie",

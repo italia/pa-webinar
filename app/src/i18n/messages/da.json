@@ -3577,6 +3577,7 @@
     "tabSummary": "Resumé",
     "aiBadgeLabel": "AI-genereret indhold",
     "aiBadgeBody": "Transskriptionen og resuméet produceres automatisk af AI-pipelinen i klyngen. De kan indeholde fejl; videoen er fortsat den autoritative kilde.",
+    "revisedByPerson": "Teksten er blevet gennemgået af en person efter den automatiske generering.",
     "searchPlaceholder": "Søg i transskriptionen…",
     "searchLabel": "Søg i transskriptionen",
     "searchClear": "Ryd søgningen",

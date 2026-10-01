@@ -3577,6 +3577,7 @@
     "tabSummary": "Santrauka",
     "aiBadgeLabel": "DI sugeneruotas turinys",
     "aiBadgeBody": "Transkripciją ir santrauką automatiškai parengia klasteryje veikianti DI grandinė. Juose gali būti klaidų; autoritetingas šaltinis lieka vaizdo įrašas.",
+    "revisedByPerson": "Tekstą po automatinio sugeneravimo peržiūrėjo žmogus.",
     "searchPlaceholder": "Ieškoti transkripcijoje…",
     "searchLabel": "Ieškoti transkripcijoje",
     "searchClear": "Išvalyti paiešką",

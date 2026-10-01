@@ -23,6 +23,7 @@
  * pubblicate, esattamente come il subtitle endpoint.
  */
 
+import { AI_GENERATED_HEADER, AI_GENERATED_HEADER_VALUE, markMarkdown, markPlainText } from '@/lib/ai/marking';
 import { withErrorHandling } from '@/lib/api-handler';
 import { prisma } from '@/lib/db';
 import { NotFoundError, ValidationError } from '@/lib/errors';
@@ -142,6 +143,10 @@ export const GET = withErrorHandling(async (request, context) => {
           type: true,
           language: true,
           inlineBody: true,
+          // Rivisto da una persona: la data di revisione, o il testo della
+          // macchina conservato alla prima correzione.
+          revisedAt: true,
+          original: { select: { id: true } },
         },
       },
       speakers: {
@@ -178,9 +183,10 @@ export const GET = withErrorHandling(async (request, context) => {
     const body = tryDecryptPII(candidate.inlineBody);
     if (!body) throw new NotFoundError('Summary');
 
-    return new Response(body, {
+    return new Response(markMarkdown(body, { revised: !!candidate.revisedAt || !!candidate.original }), {
       status: 200,
       headers: {
+        [AI_GENERATED_HEADER]: AI_GENERATED_HEADER_VALUE,
         'content-type': 'text/markdown; charset=utf-8',
         'content-disposition': `attachment; filename="${safeSlug}-summary.${candidate.language ?? lang}.md"`,
         'cache-control': 'private, max-age=60',
@@ -194,9 +200,11 @@ export const GET = withErrorHandling(async (request, context) => {
   // per la sorgente) — per il txt/srt servono i segmenti puri.
   let segments: Segment[] = [];
   let effectiveLang = recording.sourceLanguage ?? lang;
+  let revised = false;
 
   if (!requestedLang || requestedLang === recording.sourceLanguage) {
     const json = recording.artifacts.find((a) => a.type === 'TRANSCRIPT_JSON');
+    revised = !!json?.revisedAt || !!json?.original;
     if (json?.inlineBody) {
       const decoded = tryDecryptPII(json.inlineBody);
       if (decoded) {
@@ -219,6 +227,7 @@ export const GET = withErrorHandling(async (request, context) => {
         a.language === lang,
     );
     const body = vtt?.inlineBody ? tryDecryptPII(vtt.inlineBody) : null;
+    revised = !!vtt?.revisedAt || !!vtt?.original;
     if (body) {
       segments = parseVtt(body);
       effectiveLang = lang;
@@ -228,10 +237,11 @@ export const GET = withErrorHandling(async (request, context) => {
   if (segments.length === 0) throw new NotFoundError('Transcript');
 
   if (fmt === 'transcript.txt') {
-    const body = toTxt(segments, speakerMap);
+    const body = markPlainText(toTxt(segments, speakerMap), { revised });
     return new Response(body, {
       status: 200,
       headers: {
+        [AI_GENERATED_HEADER]: AI_GENERATED_HEADER_VALUE,
         'content-type': 'text/plain; charset=utf-8',
         'content-disposition': `attachment; filename="${safeSlug}-transcript.${effectiveLang}.txt"`,
         'cache-control': 'private, max-age=60',
@@ -239,11 +249,12 @@ export const GET = withErrorHandling(async (request, context) => {
     });
   }
 
-  // transcript.srt
+  // transcript.srt — SubRip non ha commenti: la marcatura sta nell'intestazione.
   const body = toSrt(segments, speakerMap);
   return new Response(body, {
     status: 200,
     headers: {
+      [AI_GENERATED_HEADER]: AI_GENERATED_HEADER_VALUE,
       'content-type': 'application/x-subrip; charset=utf-8',
       'content-disposition': `attachment; filename="${safeSlug}-subtitles.${effectiveLang}.srt"`,
       'cache-control': 'private, max-age=60',
