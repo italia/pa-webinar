@@ -1,5 +1,5 @@
 import { cookies } from 'next/headers';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { getTranslations, getLocale } from 'next-intl/server';
 
 import { getStaffSession, puoGestire } from '@/lib/auth/staff-session';
@@ -10,6 +10,7 @@ import { getPublicEnv } from '@/lib/env';
 import { getSettings } from '@/lib/settings';
 import { guestAccessAllowed } from '@/lib/events/guest-window';
 import EventManagementClient from '@/components/admin/event-management-client';
+import { localizedPath } from '@/lib/utils/localized-url';
 
 interface EventManagePageProps {
   params: Promise<{ id: string }>;
@@ -30,7 +31,16 @@ export default async function EventManagePage({
   // Chi arriva dall'area di amministrazione (l'elenco, la libreria video)
   // non ha il token nell'indirizzo: vale la sessione dello staff, e per
   // l'organizzatore solo sui propri eventi (ADR-014).
-  const staff = token ? null : await getStaffSession(await cookies());
+  const session = await getStaffSession(await cookies());
+
+  // Con una sessione che puo' gestire l'evento il token nell'indirizzo non
+  // serve: si torna all'indirizzo pulito, che non lo espone a cronologia,
+  // log e condivisioni dello schermo. Chi ha solo il link del moderatore
+  // (anche un organizzatore su un evento altrui) continua a entrare col token.
+  if (token && session && UUID_RE.test(id) && (await puoGestire(session, id))) {
+    redirect(localizedPath(`/admin/events/${id}`, locale));
+  }
+  const staff = token ? null : session;
 
   if (!token && !staff) {
     return (
@@ -232,6 +242,7 @@ export default async function EventManagePage({
         // pubblica si valutano su questo finche' il browser non ha il suo
         // orologio, cosi' la prima passata del client coincide col server.
         renderedAt={Date.now()}
+        viaToken={staff ? null : (token ?? null)}
       />
     </div>
   );

@@ -3936,5 +3936,11 @@
     "thankYou": "Täname vastuste eest.",
     "yes": "Jah",
     "no": "Ei"
+  },
+  "notFound": {
+    "title": "Lehte ei leitud",
+    "text": "Aadress võib olla vale või lehte enam ei ole.",
+    "home": "Avalehele",
+    "staffArea": "Tagasi suletud alasse"
   }
 }

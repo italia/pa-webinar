@@ -3936,5 +3936,11 @@
     "thankYou": "Bedankt voor uw antwoorden.",
     "yes": "Ja",
     "no": "Nee"
+  },
+  "notFound": {
+    "title": "Pagina niet gevonden",
+    "text": "Het adres is misschien onjuist, of de pagina bestaat niet meer.",
+    "home": "Naar de startpagina",
+    "staffArea": "Terug naar het beheergedeelte"
   }
 }

@@ -3936,5 +3936,11 @@
     "thankYou": "Grazzi tat-tweġibiet tiegħek.",
     "yes": "Iva",
     "no": "Le"
+  },
+  "notFound": {
+    "title": "Il-paġna ma nstabitx",
+    "text": "L-indirizz jista' jkun ħażin, jew il-paġna ma għadhiex teżisti.",
+    "home": "Mur fil-paġna ewlenija",
+    "staffArea": "Lura fiż-żona riżervata"
   }
 }

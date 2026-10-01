@@ -1,8 +1,11 @@
 import { cookies } from 'next/headers';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 
-import { getStaffSession } from '@/lib/auth/staff-session';
+import { getStaffSession, puoGestire } from '@/lib/auth/staff-session';
+import AccessDenied from '@/components/admin/access-denied';
+import { localizedPath } from '@/lib/utils/localized-url';
+import { eventAdminPath } from '@/lib/events/admin-links';
 import { getPublicEnv } from '@/lib/env';
 import { resolveWhiteboardInfraReady } from '@/lib/jitsi/whiteboard';
 import { tryDecryptPII } from '@/lib/crypto/pii';
@@ -89,8 +92,20 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
   const { token } = await searchParams;
   const t = await getTranslations({ locale, namespace: 'admin' });
 
-  if (!token) notFound();
   if (!UUID_RE.test(id)) notFound();
+
+  // Come la pagina di gestione: lo staff entra con la propria sessione (per
+  // l'organizzatore solo sui propri eventi, ADR-014) e il token
+  // nell'indirizzo si toglie; chi ha solo il link del moderatore entra col token.
+  const session = await getStaffSession(await cookies());
+  const staffCanManage = session ? await puoGestire(session, id) : false;
+  if (token && staffCanManage) {
+    redirect(localizedPath(`/admin/events/${id}/edit`, locale));
+  }
+  if (!token) {
+    if (!session) notFound();
+    if (!staffCanManage) return <AccessDenied />;
+  }
 
   const [event, siteSettings, tags, gdprTemplates] = await Promise.all([
     prisma.event.findUnique({
@@ -120,7 +135,7 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
     }),
   ]);
 
-  if (!event || event.moderatorToken !== token) {
+  if (!event || (token && event.moderatorToken !== token)) {
     notFound();
   }
 
@@ -247,7 +262,7 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
     <div className="container py-4">
       <div className="mb-2">
         <Link
-          href={percorso(`/admin/events/${id}?token=${token}`)}
+          href={percorso(eventAdminPath(id, { viaToken: staffCanManage ? null : token }))}
           className="text-decoration-none d-inline-flex align-items-center text-primary"
           style={{ fontSize: '0.9rem' }}
         >
@@ -261,7 +276,8 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
 
       <EventWizard
         mode="edit"
-        canUseRubrica={(await getStaffSession(await cookies()))?.role === 'admin'}
+        canUseRubrica={session?.role === 'admin'}
+        viaToken={staffCanManage ? null : (token ?? null)}
         initialEvent={initialEvent}
         siteTimezone={event.timezone}
         enabledLocales={

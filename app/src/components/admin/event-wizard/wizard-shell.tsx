@@ -21,6 +21,7 @@ import { useTranslations } from 'next-intl';
 
 import { useRouter, percorso } from '@/i18n/navigation';
 import { useToast } from '@/components/ui/toast';
+import { eventAdminPath } from '@/lib/events/admin-links';
 import {
   coerceMatrix,
   defaultMatrix,
@@ -90,6 +91,9 @@ export interface WizardProps {
   defaultRetentionDays: number;
   /** Mostrare la ricerca in rubrica negli inviti: solo all'amministrazione. */
   canUseRubrica?: boolean;
+  /** In modifica, il token con cui si e' entrati se non c'e' una sessione dello
+   *  staff: solo allora il ritorno alla pagina dell'evento lo porta con se'. */
+  viaToken?: string | null;
   jvbSizingConfig: JvbSizingConfig;
   availableTags: Array<{ slug: string; name: Record<string, string>; color: string | null }>;
   gdprTemplates: Array<{ id: string; name: string; isDefault: boolean }>;
@@ -224,6 +228,7 @@ export default function EventWizard(props: WizardProps) {
   const toast = useToast();
 
   const mode: 'create' | 'edit' = props.mode ?? 'create';
+  const viaToken = props.viaToken ?? null;
   const initialEvent = props.initialEvent;
   /**
    * Lo scatto delle risorse collegate, aggiornato a ogni salvataggio riuscito.
@@ -806,9 +811,7 @@ export default function EventWizard(props: WizardProps) {
           }
 
           clearDraft();
-          router.push(
-            percorso(`/admin/events/${eventId}?token=${encodeURIComponent(moderatorToken)}`),
-          );
+          router.push(percorso(eventAdminPath(eventId, { viaToken })));
           return;
         }
 
@@ -987,9 +990,8 @@ export default function EventWizard(props: WizardProps) {
 
         // La pagina dell'evento, con la sessione dello staff che ha appena
         // creato l'evento (il wizard la richiede, e chi crea l'evento lo
-        // gestisce). Non la pagina di modifica, che senza il token del
-        // moderatore risponde 404; e il token, credenziale che non scade,
-        // resta fuori dalla barra degli indirizzi e dalla cronologia.
+        // gestisce): il token, credenziale che non scade, resta fuori dalla
+        // barra degli indirizzi e dalla cronologia.
         let destination = `/admin/events/${created.id}`;
         if (overrideRedirect === '__questionnaires__') {
           destination = `/admin/events/${created.id}/questionnaires`;
@@ -1008,6 +1010,7 @@ export default function EventWizard(props: WizardProps) {
       router,
       toast,
       clearDraft,
+      viaToken,
       props.defaultLocale,
       t,
       tc,

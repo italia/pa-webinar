@@ -3936,5 +3936,11 @@
     "thankYou": "Merci pour vos réponses.",
     "yes": "Oui",
     "no": "Non"
+  },
+  "notFound": {
+    "title": "Page introuvable",
+    "text": "L'adresse est peut-être erronée, ou la page n'existe plus.",
+    "home": "Aller à l'accueil",
+    "staffArea": "Retour à l'espace réservé"
   }
 }

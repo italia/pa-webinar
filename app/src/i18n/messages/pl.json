@@ -3936,5 +3936,11 @@
     "thankYou": "Dziękujemy za odpowiedzi.",
     "yes": "Tak",
     "no": "Nie"
+  },
+  "notFound": {
+    "title": "Nie znaleziono strony",
+    "text": "Adres może być błędny albo strona już nie istnieje.",
+    "home": "Przejdź do strony głównej",
+    "staffArea": "Wróć do strefy zastrzeżonej"
   }
 }

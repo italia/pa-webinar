@@ -3936,5 +3936,11 @@
     "thankYou": "Tak for dine svar.",
     "yes": "Ja",
     "no": "Nej"
+  },
+  "notFound": {
+    "title": "Siden blev ikke fundet",
+    "text": "Adressen kan være forkert, eller siden findes ikke længere.",
+    "home": "Gå til forsiden",
+    "staffArea": "Tilbage til det lukkede område"
   }
 }

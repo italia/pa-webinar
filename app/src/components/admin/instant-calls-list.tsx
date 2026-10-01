@@ -19,6 +19,7 @@ import { Icon } from '@/components/ui/icon';
 import { GlyphIcon } from '@/components/ui/glyph-icon';
 import { Link, percorso } from '@/i18n/navigation';
 import CopyButton from '@/components/admin/copy-button';
+import { eventAdminPath } from '@/lib/events/admin-links';
 import { localizedPath } from '@/lib/utils/localized-url';
 
 interface InstantCallRow {
@@ -268,7 +269,7 @@ export default function InstantCallsList({
       setCreateOpen(false);
       setNewTitle('');
       setNewModerator('');
-      router.push(localizedPath(`/admin/events/${data.id}?token=${data.moderatorToken}`, locale));
+      router.push(localizedPath(eventAdminPath(data.id), locale));
       router.refresh();
     } finally {
       setSubmitting(false);
@@ -502,7 +503,7 @@ export default function InstantCallsList({
                       />
                     </div>
                     <Link
-                      href={percorso(`/admin/events/${call.id}?token=${call.moderatorToken}`)}
+                      href={percorso(eventAdminPath(call.id))}
                       className="text-decoration-none flex-grow-1"
                     >
                       <div className="d-flex justify-content-between align-items-start">

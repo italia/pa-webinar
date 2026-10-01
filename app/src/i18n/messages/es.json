@@ -3936,5 +3936,11 @@
     "thankYou": "Gracias por tus respuestas.",
     "yes": "Sí",
     "no": "No"
+  },
+  "notFound": {
+    "title": "Página no encontrada",
+    "text": "Puede que la dirección sea incorrecta o que la página ya no exista.",
+    "home": "Ir a la página de inicio",
+    "staffArea": "Volver al área reservada"
   }
 }

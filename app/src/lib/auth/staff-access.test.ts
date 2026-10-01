@@ -111,7 +111,6 @@ describe('pagine dell’amministrazione', () => {
     const ECCEZIONI: Record<string, string> = {
       '[locale]/admin/login/page.tsx': 'la porta d’ingresso',
       '[locale]/admin/access/page.tsx': 'l’atterraggio del link per email',
-      '[locale]/admin/events/[id]/edit/page.tsx': 'si apre solo col token del moderatore',
     };
     const mute = pagine
       .map(rel)

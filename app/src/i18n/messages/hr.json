@@ -3936,5 +3936,11 @@
     "thankYou": "Hvala na vašim odgovorima.",
     "yes": "Da",
     "no": "Ne"
+  },
+  "notFound": {
+    "title": "Stranica nije pronađena",
+    "text": "Adresa je možda pogrešna ili stranica više ne postoji.",
+    "home": "Idi na početnu stranicu",
+    "staffArea": "Natrag u zaštićeni dio"
   }
 }

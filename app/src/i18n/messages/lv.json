@@ -3936,5 +3936,11 @@
     "thankYou": "Paldies par jūsu atbildēm.",
     "yes": "Jā",
     "no": "Nē"
+  },
+  "notFound": {
+    "title": "Lapa nav atrasta",
+    "text": "Adrese var būt nepareiza, vai lapa vairs nepastāv.",
+    "home": "Uz sākumlapu",
+    "staffArea": "Atpakaļ uz slēgto daļu"
   }
 }

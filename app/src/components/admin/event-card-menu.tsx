@@ -6,6 +6,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { useConfirm } from '@/components/ui/confirm-dialog';
 import { useToast } from '@/components/ui/toast';
 import { Link, percorso, useRouter } from '@/i18n/navigation';
+import { eventAdminPath } from '@/lib/events/admin-links';
 import { duplicaComeProssima, impostaStatoEvento } from '@/lib/events/event-actions';
 import { localizedPath } from '@/lib/utils/localized-url';
 
@@ -28,7 +29,14 @@ export interface EventCardMenuEvent {
   moderatorToken: string;
 }
 
-export default function EventCardMenu({ event }: { event: EventCardMenuEvent }) {
+export default function EventCardMenu({
+  event,
+  viaToken,
+}: {
+  event: EventCardMenuEvent;
+  /** Il token con cui si e' entrati nella pagina, se non c'e' una sessione dello staff. */
+  viaToken?: string | null;
+}) {
   const t = useTranslations('admin.eventsList.menu');
   const locale = useLocale();
   const router = useRouter();
@@ -143,7 +151,10 @@ export default function EventCardMenu({ event }: { event: EventCardMenuEvent }) 
       // confermata.
       router.push(
         percorso(
-          `/admin/events/${creato.id}/edit?token=${encodeURIComponent(creato.moderatorToken)}`,
+          eventAdminPath(creato.id, {
+            edit: true,
+            viaToken: viaToken ? creato.moderatorToken : null,
+          }),
         ),
       );
     });
@@ -201,7 +212,7 @@ export default function EventCardMenu({ event }: { event: EventCardMenuEvent }) 
           <li>
             <Link
               className={voce}
-              href={percorso(`/admin/events/${event.id}?token=${event.moderatorToken}`)}
+              href={percorso(eventAdminPath(event.id, { viaToken }))}
             >
               {t('manage')}
             </Link>
@@ -210,7 +221,7 @@ export default function EventCardMenu({ event }: { event: EventCardMenuEvent }) 
             <li>
               <Link
                 className={voce}
-                href={percorso(`/admin/events/${event.id}/edit?token=${event.moderatorToken}`)}
+                href={percorso(eventAdminPath(event.id, { edit: true, viaToken }))}
               >
                 {t('edit')}
               </Link>

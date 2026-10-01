@@ -3936,5 +3936,11 @@
     "thankYou": "Tack för dina svar.",
     "yes": "Ja",
     "no": "Nej"
+  },
+  "notFound": {
+    "title": "Sidan hittades inte",
+    "text": "Adressen kan vara fel, eller så finns sidan inte längre.",
+    "home": "Gå till startsidan",
+    "staffArea": "Tillbaka till det skyddade området"
   }
 }

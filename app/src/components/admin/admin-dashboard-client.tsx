@@ -12,6 +12,7 @@ import {
 } from 'design-react-kit';
 
 import { Link, percorso } from '@/i18n/navigation';
+import { eventAdminPath } from '@/lib/events/admin-links';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import EventTitle from '@/components/events/event-title';
 import { resolveKickerEnabled } from '@/lib/utils/title-kicker';
@@ -470,7 +471,7 @@ export default function AdminDashboardClient({
             const isSelected = selected.has(event.id);
             const borderColor =
               STATUS_BORDER[event.status] ?? STATUS_BORDER.DRAFT;
-            const manageUrl = `/admin/events/${event.id}?token=${token ?? event.moderatorToken}`;
+            const manageUrl = eventAdminPath(event.id, { viaToken: token });
             const cover = event.coverImageUrl ?? event.imageUrl;
             const kickerEnabled = resolveKickerEnabled(
               event,
@@ -747,6 +748,7 @@ export default function AdminDashboardClient({
                             eventType: event.eventType ?? 'SCHEDULED',
                             moderatorToken: token ?? event.moderatorToken,
                           }}
+                          viaToken={token}
                         />
                       </div>
                     </div>

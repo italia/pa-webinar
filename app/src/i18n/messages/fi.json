@@ -3936,5 +3936,11 @@
     "thankYou": "Kiitos vastauksistasi.",
     "yes": "Kyllä",
     "no": "Ei"
+  },
+  "notFound": {
+    "title": "Sivua ei löytynyt",
+    "text": "Osoite voi olla väärä, tai sivua ei enää ole.",
+    "home": "Siirry etusivulle",
+    "staffArea": "Takaisin suljetulle alueelle"
   }
 }

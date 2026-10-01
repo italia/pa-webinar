@@ -22,6 +22,7 @@ import { useConfirm } from '@/components/ui/confirm-dialog';
 import { useToast } from '@/components/ui/toast';
 import EventTitle from '@/components/events/event-title';
 import { MarkdownRenderer } from '@/components/ui/markdown';
+import { eventAdminPath } from '@/lib/events/admin-links';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import { duplicaComeProssima, impostaStatoEvento } from '@/lib/events/event-actions';
 import {
@@ -177,6 +178,9 @@ interface EventManagementClientProps {
   /** L'evento ammette chi entra senza iscrizione (lib/events/guest-window):
    *  senza, l'invito diretto porterebbe all'iscrizione e non va offerto. */
   guestEntryOpen?: boolean;
+  /** Il token con cui si e' entrati, se non c'e' una sessione dello staff:
+   *  solo allora i link interni all'area riservata lo portano con se'. */
+  viaToken?: string | null;
   /** L'istante del rendering sul server (ms): vedi `istante` qui sotto. */
   renderedAt: number;
 }
@@ -211,7 +215,7 @@ function tagChipStyle(color: string | null): CSSProperties {
 
 // ── Main component ──
 export default function EventManagementClient({
-  event, baseUrl, locale, kickerEnabled, guestEntryOpen = true, renderedAt,
+  event, baseUrl, locale, kickerEnabled, guestEntryOpen = true, renderedAt, viaToken = null,
 }: EventManagementClientProps) {
   const t = useTranslations('admin');
   const td = useTranslations('admin.eventDetail');
@@ -267,7 +271,7 @@ export default function EventManagementClient({
     locale,
   );
   const liveModeratorUrl = `/events/${event.slug}/live?token=${event.moderatorToken}`;
-  const editUrl = `/admin/events/${event.id}/edit?token=${event.moderatorToken}`;
+  const editUrl = eventAdminPath(event.id, { edit: true, viaToken });
 
   // I due ruoli con cui si entra, detti per nome: da moderatore, col link di
   // conduzione, e da partecipante, dalla stessa porta del pubblico — per
@@ -357,18 +361,22 @@ export default function EventManagementClient({
     setDuplicating(true);
     setDuplicateError(null);
     try {
-      // Il token DEVE viaggiare nell'URL: la pagina di modifica risponde
-      // notFound() senza (edit/page.tsx). Senza, il bottone atterrava su un
-      // 404 dopo aver creato davvero l'evento.
+      // Lo staff apre la copia con la propria sessione; chi e' entrato col
+      // link del moderatore ha bisogno del token della copia.
       const created = await duplicaComeProssima(event.id);
       router.push(
-        percorso(`/admin/events/${created.id}/edit?token=${encodeURIComponent(created.moderatorToken)}`),
+        percorso(
+          eventAdminPath(created.id, {
+            edit: true,
+            viaToken: viaToken ? created.moderatorToken : null,
+          }),
+        ),
       );
     } catch {
       setDuplicateError(td('duplicateNextError'));
       setDuplicating(false);
     }
-  }, [event.id, router, td]);
+  }, [event.id, router, td, viaToken]);
 
   const exportCsv = useCallback(() => {
     const headers = ['Nome', 'Ente', 'Ruolo', 'Tipologia ente', 'Data registrazione', 'Entrato'];

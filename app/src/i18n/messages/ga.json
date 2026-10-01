@@ -3936,5 +3936,11 @@
     "thankYou": "Go raibh maith agat as do chuid freagraí.",
     "yes": "Tá",
     "no": "Níl"
+  },
+  "notFound": {
+    "title": "Níor aimsíodh an leathanach",
+    "text": "D'fhéadfadh an seoladh a bheith mícheart, nó níl an leathanach ann a thuilleadh.",
+    "home": "Téigh go dtí an leathanach baile",
+    "staffArea": "Ar ais go dtí an limistéar foirne"
   }
 }

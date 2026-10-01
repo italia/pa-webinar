@@ -3936,5 +3936,11 @@
     "thankYou": "Hvala za vaše odgovore.",
     "yes": "Da",
     "no": "Ne"
+  },
+  "notFound": {
+    "title": "Strani ni mogoče najti",
+    "text": "Naslov je morda napačen ali pa stran ne obstaja več.",
+    "home": "Na domačo stran",
+    "staffArea": "Nazaj v zaprti del"
   }
 }

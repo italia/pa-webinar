@@ -3936,5 +3936,11 @@
     "thankYou": "Ďakujeme za vaše odpovede.",
     "yes": "Áno",
     "no": "Nie"
+  },
+  "notFound": {
+    "title": "Stránka sa nenašla",
+    "text": "Adresa môže byť nesprávna alebo stránka už neexistuje.",
+    "home": "Prejsť na úvodnú stránku",
+    "staffArea": "Späť do neverejnej časti"
   }
 }

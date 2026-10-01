@@ -3936,5 +3936,11 @@
     "thankYou": "Köszönjük a válaszait.",
     "yes": "Igen",
     "no": "Nem"
+  },
+  "notFound": {
+    "title": "Az oldal nem található",
+    "text": "Lehet, hogy hibás a cím, vagy az oldal már nem létezik.",
+    "home": "Ugrás a kezdőlapra",
+    "staffArea": "Vissza a zárt területre"
   }
 }

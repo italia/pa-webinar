@@ -3936,5 +3936,11 @@
     "thankYou": "Dėkojame už atsakymus.",
     "yes": "Taip",
     "no": "Ne"
+  },
+  "notFound": {
+    "title": "Puslapis nerastas",
+    "text": "Adresas gali būti neteisingas arba puslapio nebėra.",
+    "home": "Į pradžios puslapį",
+    "staffArea": "Atgal į uždarą sritį"
   }
 }

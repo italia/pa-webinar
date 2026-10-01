@@ -3936,5 +3936,11 @@
     "thankYou": "Vă mulțumim pentru răspunsuri.",
     "yes": "Da",
     "no": "Nu"
+  },
+  "notFound": {
+    "title": "Pagina nu a fost găsită",
+    "text": "Este posibil ca adresa să fie greșită sau pagina să nu mai existe.",
+    "home": "Mergeți la pagina principală",
+    "staffArea": "Înapoi la zona rezervată"
   }
 }
