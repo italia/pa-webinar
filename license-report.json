@@ -2767,7 +2767,7 @@
     "publisher": "Sergey Rubanov",
     "email": "chi187@gmail.com"
   },
-  "nodemailer@9.1.1": {
+  "nodemailer@10.0.13": {
     "licenses": "MIT-0",
     "repository": "https://github.com/nodemailer/nodemailer",
     "publisher": "Andris Reinman"

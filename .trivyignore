@@ -45,8 +45,21 @@ CVE-2026-5241
 # eventi. L'unica linea corretta e' transformers 5.x, incompatibile con lo stack
 # pinnato (whisperx<3.5 <- pyannote 3.3 <- numpy 1.x <- torch 2.6): il salto
 # rompe il build del worker. Rischio accettato (VEX: not_affected).
+
+# CVE-2026-80047 - transformers scarica il codice di generazione personalizzato
+# (`custom_generate` di un repository del Hub) prima del consenso
+# `trust_remote_code`. Il vettore richiede di chiamare `generate()` di
+# transformers su un modello o una configurazione che puntano a un repository
+# dell'attaccante. Questo worker non chiama mai `generate()` di transformers
+# (la sintesi passa dal servizio vLLM in cluster) e gira con
+# `HF_HUB_OFFLINE=1`, quindi non scarica nulla dal Hub: un grep di
+# `custom_generate|trust_remote_code|\.generate\(|from transformers` sul codice
+# di produzione e' vuoto. L'unica linea corretta e' transformers 5.x,
+# incompatibile con lo stack pinnato. Rischio accettato (VEX: not_affected).
+CVE-2026-80047
+
 #
-# Le tre deroghe a `transformers` in questo file condividono la stessa causa e
+# Le quattro deroghe a `transformers` in questo file condividono la stessa causa e
 # la stessa condizione di uscita: vanno rivalutate INSIEME, a ogni
 # aggiornamento di whisperx o di pyannote che allenti il vincolo su
 # transformers. Finche' il vincolo regge, la verifica da rifare e' che il grep
