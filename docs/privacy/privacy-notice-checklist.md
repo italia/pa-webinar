@@ -452,7 +452,6 @@ The same differences are tracked in [Known gaps](../GDPR.md#known-gaps).
 | Where | Text | What actually happens | Key |
 |---|---|---|---|
 | Waiting room, guests | **Email (optional)**, "Only for post-event follow-up" | The address never leaves the browser | `waiting.emailHelp` |
-| Erasure confirmation | "Registrations, questions, poll votes, feedback, reminders and your entry in the events address book will be deleted." | Feedback and questionnaire answers are unlinked from the registration and kept until the event's retention | `gdpr.erasure.confirmBody` |
 | AI pipeline settings | **Artifact retention (days)**: "A positive value keeps them for the given number of days even after the event is closed" | A positive value only adds a deletion date; it never extends retention | `admin.settings.postprod.artifactRetentionDaysHelp` |
 | Site privacy page | The built-in generic text | Describes AI processing and specific models on every installation | `legal.privacy.*` |
 
