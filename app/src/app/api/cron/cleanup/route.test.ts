@@ -18,6 +18,7 @@ vi.mock('@/lib/db', () => ({
       updateMany: vi.fn(async () => ({ count: 0 })),
     },
     adminAuditLog: { updateMany: vi.fn(async () => ({ count: 0 })) },
+    staffAccount: { updateMany: vi.fn(async () => ({ count: 0 })) },
     gdprAuditLog: { create: vi.fn() },
     eventMaterial: { findMany: vi.fn(), findFirst: vi.fn(), deleteMany: vi.fn() },
     chatMessage: { findMany: vi.fn(), deleteMany: vi.fn() },
@@ -80,6 +81,7 @@ const db = prisma as unknown as {
   staffLoginToken: { deleteMany: Mock };
   emailOutbox: { deleteMany: Mock; updateMany: Mock };
   adminAuditLog: { updateMany: Mock };
+  staffAccount: { updateMany: Mock };
   gdprAuditLog: { create: Mock };
   eventMaterial: { findMany: Mock; findFirst: Mock; deleteMany: Mock };
   chatMessage: { findMany: Mock; deleteMany: Mock };
@@ -794,6 +796,32 @@ describe('GET /api/cron/cleanup', () => {
     expect(Date.now() - cutoff).toBeGreaterThanOrEqual(90 * 86_400_000 - 1000);
   });
 
+  it('disattiva gli account dello staff senza accesso da oltre un anno', async () => {
+    stubEventQueries({});
+    await runCleanup();
+    const call = db.staffAccount.updateMany.mock.calls[0]?.[0] as {
+      where: { active: boolean; createdAt: { lt: Date }; AND: Array<{ OR: Array<Record<string, unknown>> }> };
+      data: { active: boolean };
+    };
+    expect(call.where.active).toBe(true);
+    expect(call.data).toEqual({ active: false });
+    expect(Date.now() - call.where.createdAt.lt.getTime()).toBeGreaterThanOrEqual(365 * 86_400_000 - 1000);
+    // Conta anche la riattivazione: un account appena riattivato non si spegne.
+    expect(JSON.stringify(call.where.AND)).toContain('reactivatedAt');
+    expect(JSON.stringify(call.where.AND)).toContain('lastLoginAt');
+  });
+
+  it('non disattiva nessun account con STAFF_INACTIVE_DEACTIVATE_DAYS=0', async () => {
+    process.env.STAFF_INACTIVE_DEACTIVATE_DAYS = '0';
+    try {
+      stubEventQueries({});
+      await runCleanup();
+      expect(db.staffAccount.updateMany).not.toHaveBeenCalled();
+    } finally {
+      delete process.env.STAFF_INACTIVE_DEACTIVATE_DAYS;
+    }
+  });
+
   it('fallisce con 500 se la pulizia della coda email non riesce', async () => {
     stubEventQueries({});
     db.emailOutbox.deleteMany.mockRejectedValueOnce(new Error('db down'));
@@ -815,6 +843,7 @@ describe('GET /api/cron/cleanup', () => {
     expect(body).toEqual({
       ok: true,
       staffLoginLinksDeleted: 0,
+      staffAccountsDeactivated: 0,
       emailOutboxDeleted: 0,
       emailOutboxScrubbed: 0,
       auditLogRowsScrubbed: 0,

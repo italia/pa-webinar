@@ -706,10 +706,6 @@ Known gaps:
   `recordings/multitrack/` are referenced by none of the fields above, so
   retained tracks and every `tracks.json` go through the orphan sweep (see
   [Recording](../architecture/recording.md#known-limitations)).
-- **Tracks without post-production.** An installation that records
-  per-participant audio but does not run AI post-production never reaches the
-  purge step (see **Participant tracks without the post-production pipeline**
-  in the [roadmap](../ROADMAP.md)).
 - **Backup only for a store in the cluster.** The `--include-storage`
   option of `scripts/backup.sh` and `scripts/restore.sh` covers an object
   store on a volume of the cluster, such as the Garage add-on of one k3s

@@ -20,7 +20,10 @@
  * Protected by CRON_API_KEY.
  */
 
+import type { Prisma } from '@prisma/client';
+
 import { withErrorHandling } from '@/lib/api-handler';
+import { withoutSpeakerNames } from '@/lib/ai/pipeline-snapshot';
 import { assertCronApiKey } from '@/lib/auth/cron';
 import { prisma } from '@/lib/db';
 import {
@@ -113,9 +116,21 @@ async function purgeRecordingArtifacts(
     where: { recordingId },
     data: { payload: { scrubbed: true }, lastError: null },
   });
+  // I nomi dei parlanti copiati nello snapshot dei modelli se ne vanno con
+  // le righe Speaker da cui venivano: resta la fotografia dei modelli.
+  const snap = await prisma.recording.findUnique({
+    where: { id: recordingId },
+    select: { pipelineSnapshot: true },
+  });
+  const scrubbed = withoutSpeakerNames(snap?.pipelineSnapshot ?? null);
   await prisma.recording.update({
     where: { id: recordingId },
-    data: { status: 'ARCHIVED' },
+    data: {
+      status: 'ARCHIVED',
+      ...(scrubbed && scrubbed !== snap?.pipelineSnapshot
+        ? { pipelineSnapshot: scrubbed as Prisma.InputJsonValue }
+        : {}),
+    },
   });
   return { blobsDeleted, blobsFailed, artifactsDeleted: del.count };
 }

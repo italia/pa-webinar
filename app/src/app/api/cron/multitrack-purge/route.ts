@@ -17,6 +17,7 @@
 import { withErrorHandling } from '@/lib/api-handler';
 import { assertCronApiKey } from '@/lib/auth/cron';
 import { prisma } from '@/lib/db';
+import { isEventEligibleForCleanup } from '@/lib/gdpr/cleanup-selection';
 import { getPostprodStorage, isPostprodStorageConfigured } from '@/lib/storage/postprod';
 
 export const dynamic = 'force-dynamic';
@@ -30,7 +31,7 @@ export const GET = withErrorHandling(async (request) => {
 
   // Tracce ancora presenti il cui recording ha già completato la
   // trascrizione multi-traccia → audio grezzo non più necessario.
-  const tracks = await prisma.recordingTrack.findMany({
+  const tracks: Array<{ id: string; blobKey: string }> = await prisma.recordingTrack.findMany({
     where: {
       audioPurgedAt: null,
       recording: {
@@ -65,6 +66,53 @@ export const GET = withErrorHandling(async (request) => {
     take: 500,
   });
 
+  // Tracce mai trascritte (installazione che registra senza post-produzione
+  // AI, o trascrizione mai riuscita): nessuno le consumera', e la loro durata
+  // e' quella dei dati dell'evento. Si cancellano alla scadenza della
+  // conservazione dell'evento — la stessa regola della pulizia GDPR — salvo
+  // un job ancora attivo o l'opzione "conserva" con la sua scadenza futura.
+  // Prima gli eventi scaduti (pochi), poi le loro tracce: filtrare dopo un
+  // `take` sulle tracce lascerebbe fuori quelle scadute ogni volta che le
+  // prime righe appartengono a eventi ancora in conservazione.
+  const now = new Date();
+  const candidateEvents = await prisma.event.findMany({
+    where: {
+      endsAt: { lt: now },
+      recordings: { some: { tracks: { some: { audioPurgedAt: null } } } },
+    },
+    select: { id: true, status: true, endsAt: true, lastActiveAt: true, dataRetentionDays: true },
+  });
+  const expiredEventIds = candidateEvents
+    .filter((e) => isEventEligibleForCleanup(e, now))
+    .map((e) => e.id);
+  const expired =
+    expiredEventIds.length === 0
+      ? []
+      : await prisma.recordingTrack.findMany({
+          where: {
+            audioPurgedAt: null,
+            recording: {
+              eventId: { in: expiredEventIds },
+              jobs: {
+                none: {
+                  OR: [
+                    { kind: 'TRANSCRIBE_MULTITRACK', status: 'DONE' },
+                    {
+                      kind: { in: ['TRANSCRIBE_MULTITRACK', 'ARCHIVE'] },
+                      status: { in: ['PENDING', 'CLAIMED', 'RUNNING'] },
+                    },
+                  ],
+                },
+              },
+              OR: [{ retentionUntil: null }, { retentionUntil: { lte: now } }],
+            },
+          },
+          select: { id: true, blobKey: true },
+          orderBy: { createdAt: 'asc' },
+          take: 500,
+        });
+  tracks.push(...expired);
+
   const storage = getPostprodStorage();
   let purged = 0;
   let failed = 0;
@@ -82,5 +130,11 @@ export const GET = withErrorHandling(async (request) => {
     }
   }
 
-  return Response.json({ ok: true, candidates: tracks.length, purged, failed });
+  return Response.json({
+    ok: true,
+    candidates: tracks.length,
+    untranscribedExpired: expired.length,
+    purged,
+    failed,
+  });
 });

@@ -80,7 +80,7 @@ This is the single inventory of the personal data that PA Webinar stores. `app/p
 
 ### What stays after an event is archived
 
-The event row itself survives as `ARCHIVED`, as a historical record: title, description, dates, the public speaker list (`Event.speakersInfo`), the co-organizing organizations (`EventOrganizer`), the event recap (with the texts of Q&A and chat questions, without their authors), the questionnaire configuration without answers, the `Recording` rows (emptied of AI outputs and tracks by `postprod-retention` unless the video is published, but still holding the speaker names in `pipelineSnapshot`), and the `GdprAuditLog` rows. The primary event contact also stays, and its name stays public in the event's calendar file; see [Known limitations](#known-limitations).
+The event row itself survives as `ARCHIVED`, as a historical record: title, description, dates, the public speaker list (`Event.speakersInfo`), the co-organizing organizations (`EventOrganizer`), the event recap (with the texts of Q&A and chat questions, without their authors), the questionnaire configuration without answers, the `Recording` rows (emptied of AI outputs and tracks by `postprod-retention` unless the video is published; the purge also removes the speaker names from `pipelineSnapshot`), and the `GdprAuditLog` rows. The primary event contact also stays, and its name stays public in the event's calendar file; see [Known limitations](#known-limitations).
 
 ## Consent model
 
@@ -220,7 +220,7 @@ A published video is a public record, so the event's retention does not delete i
 | `/api/cron/postprod-retention` | AI outputs, speaker labels and remaining tracks, by the recording's retention | Helm chart, with `postprod.enabled` and `postprod.retention.enabled` |
 | `/api/cron/recordings-reconcile` | Files under `recordings/` that no event or call session references, after `orphanRecordingGraceDays`. This includes per-participant track files, which no field it checks points to | Helm chart |
 
-An installation that turns on the recorder (`recorder.enabled`) without post-production (`postprod.enabled`) renders neither purge job: only the orphan sweep of `recordings-reconcile` removes per-participant audio ([limitation](#known-limitations)). The Docker Compose `cron` service calls only `email-outbox`, `lifecycle`, `reminders` and `cleanup`. On a Compose installation, address-book retention, the orphan sweep and the track purges do not run unless the operator schedules them ([limitation](#known-limitations)).
+With the recorder on (`recorder.enabled`) the chart renders `multitrack-purge` even without post-production (`postprod.enabled`): tracks that no transcription consumes are deleted when the event's data retention expires, the same rule as the GDPR cleanup. The Docker Compose `cron` service calls only `email-outbox`, `lifecycle`, `reminders` and `cleanup`. On a Compose installation, address-book retention, the orphan sweep and the track purges do not run unless the operator schedules them ([limitation](#known-limitations)).
 
 ### Rules for developers
 
@@ -344,7 +344,7 @@ Staff members are organizers and named administrators ([ADR-014](adr/014-organiz
 - **Sign-in links.** Only the SHA-256 of the token is stored. A link lasts 20 minutes and works once. The daily cleanup deletes links a day after use or expiry.
 - **Session.** The `admin_session` cookie carries the role and the account ID, never a name or an email address.
 - **Deactivation and deletion.** Deactivating an account blocks it at the next request. Deleting it also deletes its sign-in links, hands its events back to the administration and changes the moderator links of those events. Audit rows keep the actor as `organizer:<id>` or `admin:<id>`, which no longer resolves to a name once the account is gone.
-- **Retention.** Accounts stay until an administrator deletes them. The last sign-in time helps find inactive ones.
+- **Retention.** The GDPR cleanup deactivates an account with no sign-in for `STAFF_INACTIVE_DEACTIVATE_DAYS` days (default 365), counted from the latest of its creation, its last sign-in and its last reactivation; `0` turns this off. Unlike a manual deactivation, it does not change the moderator links of the account's events, which others may be using. A deactivated account stays until an administrator deletes it, and can be reactivated.
 
 The instance API key (`ADMIN_API_KEY`) has no owner. Its sessions appear in the audit log as a hash of the session cookie.
 
@@ -466,12 +466,10 @@ These are verified differences between what a reader might expect and what the c
 | The waiting-room multitrack consent is not recorded | Guests, speakers and registrants on another browser leave no trace of their consent | Rely on the registration consent where proof matters |
 | Erasure and export are narrower than a reader might assume | See [What the export contains](#what-the-export-contains) and [What erasure deletes](#what-erasure-deletes) | Handle the remainder by hand |
 | No tool to edit or delete a single registration | Rectification and requests from people who cannot receive the email need database access | Document the internal procedure |
-| Speaker names survive the AI-output purge | The purge deletes the `Speaker` rows but not the copy of their names in `Recording.pipelineSnapshot` (see [Recordings, voice data and AI outputs](privacy/recordings-and-ai.md#known-limitations)) | Clear the snapshot at database level when a purge must be complete |
 | The questionnaire respondent hash is not an email hash | `respondentEmailHash` is computed from the encrypted address, which differs on every encryption, so it cannot link a response to an email address | Nothing needed for privacy; do not rely on the field to find a respondent |
 | The speaking timeline is kept in plain text | `CallSession.dominantSpeakerLog` stores display names unencrypted in every live room until event retention | Declare it in the notice |
 | A published video with no deletion date is kept indefinitely | The option **Never (until event expiry)** and its note suggest otherwise | Choose a deletion period when publishing |
 | Deleting an event leaves some of its files | Chat attachments and post-production files of a deleted event stay in storage, and recording and track files under `recordings/` are removed only by the orphan sweep. Its material files are deleted; its `GdprAuditLog` rows go | Prefer letting retention archive the event |
-| Recorder on, post-production off | With `recorder.enabled` and without `postprod.enabled`, the chart renders neither `multitrack-purge` nor `postprod-retention`. Per-participant audio is then deleted only by the orphan sweep of `recordings-reconcile`, after `orphanRecordingGraceDays`, not at event retention | Enable post-production whenever the recorder is on, and keep `recordings-reconcile` running |
 | Docker Compose schedules only four jobs | The email outbox, the event lifecycle, reminders and the cleanup run. Address-book retention, the orphan sweep and the track purges do not run. With the `recorder` profile, per-participant audio is never deleted by a job | Schedule `/api/cron/rubrica-retention` in the host's cron, and with the `recorder` profile the purge routes too ([how](architecture/background-jobs.md#docker-compose)) |
 | Changing `APP_SECRET` breaks email lookups | Stored email hashes stop matching, so rights requests no longer find older data, and every session and personal cookie is invalidated | Treat `APP_SECRET` as permanent |
 | The waiting room asks guests for an optional email that goes nowhere | The hint promises post-event follow-up, but the server never receives the address | Nothing needed for privacy; the value stays in the browser |

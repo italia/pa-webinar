@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { buildPipelineSnapshot } from './pipeline-snapshot';
+import { buildPipelineSnapshot, withoutSpeakerNames } from './pipeline-snapshot';
 
 /** Shape projection for assertions (buildPipelineSnapshot returns a loose
  *  Record<string, unknown>; we narrow it here for typed access in tests). */
@@ -55,5 +55,29 @@ describe('buildPipelineSnapshot', () => {
     expect(snap.tts).toBeNull();
     expect(snap.watermark).toBeNull();
     expect(snap.languages.translation).toEqual([]);
+  });
+});
+
+describe('withoutSpeakerNames', () => {
+  it('drops the names and keeps labels and speaking time', () => {
+    const out = withoutSpeakerNames({
+      asr: { engine: 'whisperx' },
+      speakers: [{ diarLabel: 'SPEAKER_00', displayName: 'Anna Rossi', totalSpeechSec: 42 }],
+    }) as { asr: unknown; speakers: Array<Record<string, unknown>> };
+    expect(out.speakers).toEqual([{ diarLabel: 'SPEAKER_00', displayName: null, totalSpeechSec: 42 }]);
+    expect(out.asr).toEqual({ engine: 'whisperx' });
+  });
+
+  it('drops the names of the dubbing voice assignments too', () => {
+    const out = withoutSpeakerNames({
+      voiceAssignments: [{ diarLabel: 'SPEAKER_01', displayName: 'Mario', voice: 'it_IT-paola' }],
+    }) as { voiceAssignments: Array<Record<string, unknown>> };
+    expect(out.voiceAssignments).toEqual([{ diarLabel: 'SPEAKER_01', displayName: null, voice: 'it_IT-paola' }]);
+  });
+
+  it('returns other values unchanged', () => {
+    expect(withoutSpeakerNames(null)).toBeNull();
+    const snap = { asr: {} };
+    expect(withoutSpeakerNames(snap)).toBe(snap);
   });
 });

@@ -286,20 +286,18 @@ API, because it writes names into the transcript. Signed-URL mechanics are in
 
 ### Operator responsibilities
 
-- **The purge jobs belong to post-production.** The chart renders
-  `multitrack-purge` only when `postprod.enabled` is true, and
-  `postprod-retention` only when `postprod.enabled` and
-  `postprod.retention.enabled` (on by default in
-  `infra/helm/pa-webinar/values.yaml`) are both true. An installation with
-  `recorder.enabled` but without post-production captures tracks that no purge
-  job deletes. Only the orphan sweep removes them, after its grace period, and
-  only where `recordings-reconcile` runs (see **Participant tracks without the
-  post-production pipeline** in the [roadmap](../ROADMAP.md)).
+- **The purge jobs.** The chart renders `multitrack-purge` when
+  `postprod.enabled` or `recorder.enabled` is true, and `postprod-retention`
+  only when `postprod.enabled` and `postprod.retention.enabled` (on by default
+  in `infra/helm/pa-webinar/values.yaml`) are both true. `multitrack-purge`
+  deletes a track once its transcription is done, and a track that no
+  transcription consumes when the event's data retention expires, so an
+  installation that records without AI post-production also deletes its
+  tracks on time.
 - **Docker Compose runs neither purge job, nor the orphan sweep.** On a single
   VM with the `recorder` profile, schedule `postprod-retention` yourself: it is
-  the job that deletes tracks at the event's retention. `multitrack-purge` has
-  nothing to act on without AI post-production
-  ([how](../architecture/background-jobs.md#docker-compose)).
+  the job that deletes tracks at the event's retention, together with
+  `multitrack-purge` ([how](../architecture/background-jobs.md#docker-compose)).
 - **The orphan sweep reaches every track file.** `recordings-reconcile` lists
   every object under `recordings/` and knows only the composite video
   (`Event.recordingUrl`, `CallSession.recordingUrl`,
@@ -561,8 +559,8 @@ recording-level purges delete them; the site-wide limit does not.
 
 A purge leaves:
 
-- the `Recording` row, including `pipelineSnapshot`, which holds speaker
-  names;
+- the `Recording` row, including `pipelineSnapshot`, with the speaker
+  names emptied;
 - the admin audit log entries `POSTPROD_SPEAKER_MAP`, which hold each name
   given to a speaker label and are never deleted;
 - the `PostprodJob` rows, with kind, status and timing;
@@ -732,7 +730,7 @@ Points for the controller's assessment:
 | Machine versions | `PostprodOriginalBody.body` | The same ciphertext, copied without decrypting |
 | Track display names | `RecordingTrack.displayName` | Encrypted |
 | Speaker names | `Speaker.displayName` | Plain text |
-| Pipeline snapshot | `Recording.pipelineSnapshot` | Plain text JSON, including speaker names |
+| Pipeline snapshot | `Recording.pipelineSnapshot` | Plain text JSON, including speaker names until the AI outputs are purged |
 | Speaker renames | `AdminAuditLog.details` (`POSTPROD_SPEAKER_MAP`) | Plain text JSON, including the name, never deleted |
 | Speaking timeline | `CallSession.dominantSpeakerLog` | Plain text, emptied at the event's retention |
 | Every output file, track audio, `tracks.json`, composite video | Object storage | The storage provider's server-side encryption. Access through signed URLs |
@@ -779,9 +777,9 @@ Retention and deletion:
   setting can only shorten retention.
 - **The site-wide limit deletes artifacts only.** It leaves speaker records
   and job payloads in place.
-- **Speaker names outlive every purge.** `pipelineSnapshot` is never cleared,
-  and the `POSTPROD_SPEAKER_MAP` entries of the admin audit log are never
-  deleted.
+- **Speaker names in the admin audit log.** The `POSTPROD_SPEAKER_MAP`
+  entries keep the names given to speaker labels until the GDPR cleanup
+  empties their detail (`AUDIT_LOG_PERSONAL_DATA_RETENTION_DAYS`, default 90).
 - **Files of earlier pipeline runs are never deleted.** After a re-run, the
   previous run's files under `postprod/` are no longer referenced by any row,
   and no job removes them.

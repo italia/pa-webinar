@@ -21,6 +21,7 @@ import {
   AUDIT_ACTIONS_WITH_NAMES,
   auditLogPersonalDataRetentionDays,
   emailOutboxRetentionDays,
+  staffInactiveDeactivateDays,
 } from '@/lib/gdpr/log-retention';
 
 export const dynamic = 'force-dynamic';
@@ -454,6 +455,37 @@ export const GET = withErrorHandling(async (request) => {
     where: { OR: [{ usedAt: { lt: unGiornoFa } }, { expiresAt: { lt: unGiornoFa } }] },
   });
 
+  // ── Account dello staff inattivi ──
+  // Un account mai piu' usato e' una porta aperta e un dato personale tenuto
+  // senza scopo: dopo la soglia si disattiva (resta, e un amministratore puo'
+  // riattivarlo). La soglia conta dall'ultimo fra creazione, ultimo accesso e
+  // riattivazione. A differenza della disattivazione a mano, i link da
+  // moderatore dei suoi eventi non cambiano: chi conduce quegli eventi con il
+  // link condiviso non deve perderlo per l'inattivita' di un altro.
+  let staffDeactivated = 0;
+  const staffDays = staffInactiveDeactivateDays();
+  if (staffDays > 0) {
+    const staffCutoff = new Date(now.getTime() - staffDays * 86_400_000);
+    try {
+      staffDeactivated = (
+        await prisma.staffAccount.updateMany({
+          where: {
+            active: true,
+            createdAt: { lt: staffCutoff },
+            AND: [
+              { OR: [{ lastLoginAt: null }, { lastLoginAt: { lt: staffCutoff } }] },
+              { OR: [{ reactivatedAt: null }, { reactivatedAt: { lt: staffCutoff } }] },
+            ],
+          },
+          data: { active: false },
+        })
+      ).count;
+    } catch (err) {
+      console.error('[cron/cleanup] Failed to deactivate inactive staff accounts:', err);
+      failures.push('staff-accounts');
+    }
+  }
+
   // ── Coda delle email ──
   // Una riga inviata o fallita conserva destinatario, testo (con i link
   // personali) e allegato .ics: non serve piu' a nulla dopo la conservazione.
@@ -527,6 +559,7 @@ export const GET = withErrorHandling(async (request) => {
       ok,
       ...(!ok && { failures }),
       staffLoginLinksDeleted: staffLinks.count,
+      staffAccountsDeactivated: staffDeactivated,
       emailOutboxDeleted: outboxDeleted,
       emailOutboxScrubbed: outboxScrubbed,
       auditLogRowsScrubbed: auditScrubbed,

@@ -2288,6 +2288,10 @@ model StaffAccount {
   active      Boolean   @default(true)
   createdAt   DateTime  @default(now()) @map("created_at")
   lastLoginAt DateTime? @map("last_login_at")
+  // Quando un amministratore ha riattivato l'account: la disattivazione per
+  // inattivita' (pulizia GDPR) conta anche da qui, altrimenti lo spegnerebbe
+  // di nuovo al giro dopo.
+  reactivatedAt DateTime? @map("reactivated_at")
 
   events      Event[]           @relation("EventCreatedBy")
   loginTokens StaffLoginToken[]

@@ -66,13 +66,17 @@ export const PATCH = withErrorHandling(async (request, context) => {
   if (id === io.accountId && (active === false || role === 'ORGANIZER')) {
     throw new ForbiddenError('not_on_self');
   }
-  const esiste = await prisma.staffAccount.findUnique({ where: { id }, select: { id: true } });
+  const esiste = await prisma.staffAccount.findUnique({
+    where: { id },
+    select: { id: true, active: true },
+  });
   if (!esiste) throw new NotFoundError('Organizer');
   await prisma.$transaction(async (tx) => {
     await tx.staffAccount.update({
       where: { id },
       data: {
         ...(active !== undefined && { active }),
+        ...(active === true && !esiste.active && { reactivatedAt: new Date() }),
         ...(name !== undefined && { name: encryptPII(name) }),
         ...(role !== undefined && { role }),
       },
