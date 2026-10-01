@@ -39,6 +39,7 @@ vi.mock('@/lib/db', () => ({
     registration: { findUnique: vi.fn(), update: vi.fn() },
     eventModerator: { findUnique: vi.fn() },
     siteSetting: { findUnique: vi.fn() },
+    multitrackConsent: { create: vi.fn(), findFirst: vi.fn() },
   },
 }));
 
@@ -81,6 +82,7 @@ type EventOverrides = Partial<{
   status: string;
   eventType: string;
   joinPasswordHash: string | null;
+  multitrackRecordingEnabled: boolean;
 }>;
 
 function eventRow(overrides: EventOverrides = {}) {
@@ -93,6 +95,7 @@ function eventRow(overrides: EventOverrides = {}) {
     joinPasswordHash: null,
     moderatorToken: PRIMARY_TOKEN,
     moderatorName: 'Moderatore',
+    multitrackRecordingEnabled: false,
     ...overrides,
   };
 }
@@ -658,5 +661,70 @@ describe('POST jitsi/token — Gravatar', () => {
     });
     const { user } = await minted(res);
     expect(user.avatar).toMatch(/^data:image\/svg\+xml;base64,/);
+  });
+});
+
+describe('POST jitsi/token — consenso alla registrazione per partecipante', () => {
+  beforeEach(() => {
+    applySettings({ guestAccessEnabled: true, gravatarEnabled: false });
+    vi.mocked(prisma.multitrackConsent.create).mockResolvedValue({} as never);
+  });
+
+  it('records the waiting-room consent of a guest with the seat and the language', async () => {
+    vi.mocked(prisma.event.findUnique).mockResolvedValue(
+      eventRow({ multitrackRecordingEnabled: true }) as never,
+    );
+    const res = await post({ guestName: 'Ospite Anonimo', multitrackConsent: true, locale: 'it' });
+    expect(res.status).toBe(200);
+    const { user } = await minted(res);
+    const call = vi.mocked(prisma.multitrackConsent.create).mock.calls[0]![0] as {
+      data: { eventId: string; jitsiUserId: string; displayName: string; locale: string };
+    };
+    expect(call.data.eventId).toBe(EVENT_ID);
+    expect(call.data.jitsiUserId).toBe(user.id);
+    expect(call.data.locale).toBe('it');
+    expect(call.data.displayName).not.toBe('Ospite Anonimo');
+  });
+
+  it('records the moderator seat that the conference token carries', async () => {
+    vi.mocked(prisma.event.findUnique).mockResolvedValue(
+      eventRow({ multitrackRecordingEnabled: true }) as never,
+    );
+    const res = await post({
+      moderatorToken: PRIMARY_TOKEN,
+      displayNameOverride: 'Relatrice',
+      multitrackConsent: true,
+    });
+    expect(res.status).toBe(200);
+    const { user } = await minted(res);
+    const call = vi.mocked(prisma.multitrackConsent.create).mock.calls[0]![0] as {
+      data: { jitsiUserId: string };
+    };
+    expect(call.data.jitsiUserId).toBe(user.id);
+  });
+
+  it('still issues the token when the consent cannot be written', async () => {
+    vi.mocked(prisma.event.findUnique).mockResolvedValue(
+      eventRow({ multitrackRecordingEnabled: true }) as never,
+    );
+    vi.mocked(prisma.multitrackConsent.create).mockRejectedValueOnce(new Error('db down'));
+    const errore = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const res = await post({ guestName: 'Ospite Anonimo', multitrackConsent: true });
+    expect(res.status).toBe(200);
+    errore.mockRestore();
+  });
+
+  it('records nothing when the event does not record per participant', async () => {
+    vi.mocked(prisma.event.findUnique).mockResolvedValue(eventRow() as never);
+    await post({ guestName: 'Ospite Anonimo', multitrackConsent: true });
+    expect(prisma.multitrackConsent.create).not.toHaveBeenCalled();
+  });
+
+  it('records nothing without the consent', async () => {
+    vi.mocked(prisma.event.findUnique).mockResolvedValue(
+      eventRow({ multitrackRecordingEnabled: true }) as never,
+    );
+    await post({ guestName: 'Ospite Anonimo' });
+    expect(prisma.multitrackConsent.create).not.toHaveBeenCalled();
   });
 });

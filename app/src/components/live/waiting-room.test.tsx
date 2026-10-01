@@ -203,7 +203,12 @@ describe('sala d\'attesa — gli altri campi che trattengono', () => {
     premi(consenso);
     premi(pulsante(t.joinNowBtn));
     expect(onEnterLive).toHaveBeenCalledTimes(1);
-    expect(onEnterLive).toHaveBeenCalledWith('Relatore 1', { cameraOn: false, micOn: false });
+    // Il consenso viaggia con l'ingresso: il server ne conserva la prova.
+    expect(onEnterLive).toHaveBeenCalledWith('Relatore 1', {
+      cameraOn: false,
+      micOn: false,
+      multitrackConsent: true,
+    });
   });
 
   it('chi non deve dare il consenso entra senza la casella', () => {

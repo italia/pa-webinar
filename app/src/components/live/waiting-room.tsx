@@ -128,6 +128,9 @@ export interface WaitingRoomJoinPrefs {
   cameraOn: boolean;
   /** Whether the user wants their microphone on when they land in Jitsi. */
   micOn: boolean;
+  /** Consenso alla registrazione per partecipante dato qui: il server lo
+   *  registra come prova quando rilascia il JWT. */
+  multitrackConsent?: boolean;
 }
 
 /** Telemetria warm-up dal poll /lifecycle: alimenta il pannello di attesa
@@ -622,8 +625,20 @@ export default function WaitingRoom({
         /* ignore */
       }
     }
-    onEnterLive(trimmedName, devicePrefs);
-  }, [canEnter, segnalaCampoMancante, onEnterLive, trimmedName, trimmedEmail, devicePrefs]);
+    onEnterLive(trimmedName, {
+      ...devicePrefs,
+      ...(multitrackRequired && multitrackConsent ? { multitrackConsent: true } : {}),
+    });
+  }, [
+    canEnter,
+    segnalaCampoMancante,
+    onEnterLive,
+    trimmedName,
+    trimmedEmail,
+    devicePrefs,
+    multitrackRequired,
+    multitrackConsent,
+  ]);
 
   // Entry triggered from INSIDE the Phaser game (walking the avatar into the
   // open gate). It funnels through the SAME validated handleEnterLive as the

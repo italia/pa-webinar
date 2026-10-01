@@ -34,6 +34,7 @@ vi.mock('@/lib/db', () => ({
     reminderSent: { deleteMany: vi.fn() },
     eventReminder: { deleteMany: vi.fn() },
     registration: { deleteMany: vi.fn() },
+    multitrackConsent: { deleteMany: vi.fn() },
     reaction: { deleteMany: vi.fn() },
     agendaItemReaction: { deleteMany: vi.fn() },
     eventAgendaItem: { deleteMany: vi.fn() },
@@ -91,6 +92,7 @@ const db = prisma as unknown as {
   poll: { deleteMany: Mock };
   questionnaireResponse: { deleteMany: Mock };
   registration: { deleteMany: Mock };
+  multitrackConsent: { deleteMany: Mock };
   reaction: { deleteMany: Mock };
   agendaItemReaction: { deleteMany: Mock };
   eventAgendaItem: { deleteMany: Mock };

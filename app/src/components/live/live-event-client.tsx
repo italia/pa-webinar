@@ -502,7 +502,7 @@ export default function LiveEventClient({
   const fetchJwt = useCallback(async () => {
     setError('');
     try {
-      const body: Record<string, string> = {};
+      const body: Record<string, string | boolean> = {};
       if (isGuest || !token) {
         // Anonymous guest on a public (or password-cleared) LIVE event.
         // The typed name is required — we ensure it before transitioning
@@ -526,6 +526,12 @@ export default function LiveEventClient({
         if (chosenName && chosenName !== initialDisplayName) {
           body.displayNameOverride = chosenName;
         }
+      }
+      // Il consenso alla registrazione per partecipante dato in sala d'attesa:
+      // il server ne conserva la prova insieme al posto nella conferenza.
+      if (joinPrefs.multitrackConsent) {
+        body.multitrackConsent = true;
+        body.locale = locale;
       }
 
       const res = await fetch(`/api/events/${event.slug}/jitsi/token`, {
@@ -597,6 +603,8 @@ export default function LiveEventClient({
     router,
     t,
     markEnded,
+    joinPrefs.multitrackConsent,
+    locale,
   ]);
 
   useEffect(() => {

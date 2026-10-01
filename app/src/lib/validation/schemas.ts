@@ -325,6 +325,10 @@ export const jitsiTokenRequestSchema = z.object({
   moderatorToken: z.string().uuid().optional(),
   guestName: z.string().min(2).max(100).optional(),
   displayNameOverride: z.string().min(2).max(100).optional(),
+  /** Consenso alla registrazione per partecipante dato in sala d'attesa. */
+  multitrackConsent: z.boolean().optional(),
+  /** Lingua della pagina in cui il consenso e' stato dato. */
+  locale: z.string().min(2).max(8).optional(),
 }).refine(
   (data) => data.accessToken ?? data.moderatorToken ?? data.guestName,
   { message: 'Either accessToken, moderatorToken, or guestName is required' },

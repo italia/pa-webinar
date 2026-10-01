@@ -750,8 +750,6 @@ Consent and transparency:
 - **The consent text promises deletion even when tracks are kept.**
   `gdpr.consent.multitrack` says the track is deleted after transcription
   whatever **Keep per-participant tracks** says.
-- **Waiting-room consent is not recorded.** The waiting-room checkbox only
-  unlocks the button; no row or audit entry records the consent.
 - **Per-participant AI consent is not implemented.** The `aiConsent*` columns
   of `Registration` are unused, whatever their schema comment says.
 - **The transparency panel is public only on events with a summary.** Without

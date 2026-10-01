@@ -17,7 +17,7 @@ import {
   participantJitsiId,
   guestJitsiId,
 } from '@/lib/auth/jwt';
-import { decryptPII, tryDecryptPII } from '@/lib/crypto/pii';
+import { decryptPII, encryptPII, tryDecryptPII } from '@/lib/crypto/pii';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
 import { cookies } from 'next/headers';
 import { verifyEventAccess, eventAccessCookieName } from '@/lib/event-session';
@@ -25,6 +25,47 @@ import { guestAccessAllowed } from '@/lib/events/guest-window';
 import { hasJoinGrant } from '@/lib/events/join-grant';
 
 export const dynamic = 'force-dynamic';
+
+/**
+ * Registra il consenso alla registrazione per partecipante dato in sala
+ * d'attesa (prova del consenso, art. 7.1 GDPR), quando l'evento registra una
+ * traccia per partecipante e il consenso c'e'. Il posto e' lo stesso
+ * identificativo che entra nel JWT della conferenza.
+ *
+ * Al meglio: un errore di scrittura si registra nel log e non toglie il JWT a
+ * chi sta entrando o rientrando. Un'iscrizione che ha gia' la sua prova non ne
+ * aggiunge un'altra a ogni rientro.
+ */
+async function registraConsensoMultitraccia(
+  event: { id: string; multitrackRecordingEnabled: boolean },
+  data: { multitrackConsent?: boolean; locale?: string },
+  posto: { jitsiUserId: string; displayName: string; registrationId?: string },
+): Promise<void> {
+  if (!event.multitrackRecordingEnabled || data.multitrackConsent !== true) return;
+  try {
+    if (posto.registrationId) {
+      const gia = await prisma.multitrackConsent.findFirst({
+        where: { eventId: event.id, registrationId: posto.registrationId },
+        select: { id: true },
+      });
+      if (gia) return;
+    }
+    await prisma.multitrackConsent.create({
+      data: {
+        eventId: event.id,
+        jitsiUserId: posto.jitsiUserId,
+        displayName: encryptPII(posto.displayName),
+        registrationId: posto.registrationId ?? null,
+        locale: data.locale ?? null,
+      },
+    });
+  } catch (err) {
+    console.error('[jitsi/token] multitrack consent not recorded', {
+      eventId: event.id,
+      err: err instanceof Error ? err.message : String(err),
+    });
+  }
+}
 
 export const POST = withErrorHandling(async (request, context) => {
   const { param: slug } = await context.params;
@@ -75,10 +116,17 @@ export const POST = withErrorHandling(async (request, context) => {
       name = trimmedOverride || grant.displayName || (isSpeaker ? 'Relatore' : 'Moderatore');
     }
 
+    // Un identificativo per ingresso (con suffisso casuale): lo stesso nel
+    // consenso e nel JWT.
+    const postoModeratore = moderatorJitsiId(event.id);
+    await registraConsensoMultitraccia(event, parsed.data, {
+      jitsiUserId: postoModeratore,
+      displayName: name,
+    });
     const jwt = await generateJitsiJwt({
       roomName: event.jitsiRoomName,
       displayName: name,
-      uniqueId: moderatorJitsiId(event.id),
+      uniqueId: postoModeratore,
       isModerator: !isSpeaker,
       // Chi sta sullo schermo è soprattutto chi modera e chi parla: se l'avatar
       // Gravatar valesse solo per il pubblico, la funzione si vedrebbe dove
@@ -133,10 +181,15 @@ export const POST = withErrorHandling(async (request, context) => {
       if (!rl.allowed) {
         throw new RateLimitError((rl.resetAt - Date.now()) / 1000);
       }
+      const postoOspite = guestJitsiId();
+      await registraConsensoMultitraccia(event, parsed.data, {
+        jitsiUserId: postoOspite,
+        displayName: typedName,
+      });
       const guestJwt = await generateJitsiJwt({
         roomName: event.jitsiRoomName,
         displayName: typedName,
-        uniqueId: guestJitsiId(),
+        uniqueId: postoOspite,
         isModerator: false,
         expiresInSeconds: 2 * 60 * 60,
       });
@@ -171,10 +224,16 @@ export const POST = withErrorHandling(async (request, context) => {
       // PII decryption failure — skip Gravatar, use SVG fallback
     }
 
+    const postoIscritto = participantJitsiId(registration.id);
+    await registraConsensoMultitraccia(event, parsed.data, {
+      jitsiUserId: postoIscritto,
+      displayName: name,
+      registrationId: registration.id,
+    });
     const jwt = await generateJitsiJwt({
       roomName: event.jitsiRoomName,
       displayName: name,
-      uniqueId: participantJitsiId(registration.id),
+      uniqueId: postoIscritto,
       isModerator: false,
       email,
       // La scelta è dell'amministratore, e la legge il chiamante: il minter del
@@ -225,10 +284,15 @@ export const POST = withErrorHandling(async (request, context) => {
       throw new RateLimitError((rl.resetAt - Date.now()) / 1000);
     }
 
+    const postoOspite = guestJitsiId();
+    await registraConsensoMultitraccia(event, parsed.data, {
+      jitsiUserId: postoOspite,
+      displayName: guestName,
+    });
     const jwt = await generateJitsiJwt({
       roomName: event.jitsiRoomName,
       displayName: guestName,
-      uniqueId: guestJitsiId(),
+      uniqueId: postoOspite,
       isModerator: false,
       expiresInSeconds: 2 * 60 * 60,
     });

@@ -76,6 +76,12 @@ export const GET = withErrorHandling(async (request) => {
           },
         },
       },
+      // Le prove del consenso alla registrazione per partecipante date in sala
+      // d'attesa: quando e in quale lingua (il nome e' quello dell'iscrizione).
+      multitrackConsents: {
+        select: { consentedAt: true, locale: true },
+        orderBy: { consentedAt: 'asc' },
+      },
     },
   });
 
@@ -121,6 +127,10 @@ export const GET = withErrorHandling(async (request) => {
         locale: r.locale,
         registeredAt: r.createdAt.toISOString(),
         joinedAt: r.joinedAt?.toISOString() ?? null,
+        multitrackConsentsInRoom: (r.multitrackConsents ?? []).map((c) => ({
+          consentedAt: c.consentedAt.toISOString(),
+          locale: c.locale,
+        })),
       },
       event: {
         title: r.event.title,

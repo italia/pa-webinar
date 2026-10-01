@@ -30,6 +30,7 @@ export const PURGED_BY_CLEANUP: Record<string, string> = {
   EventReminder: 'promemoria programmati e loro invii',
   EventInvitation: 'nome, email cifrata, HMAC e token del link di registrazione precompilata',
   EventModerator: 'concessioni nominali: nome ed email cifrati piu’ un link di accesso durevole',
+  MultitrackConsent: 'prova del consenso alla registrazione per partecipante: nome cifrato e posto nella conferenza',
   CallSession: 'ripulita, non cancellata: si azzerano le colonne con PII e restano i numeri aggregati',
 };
 

@@ -49,6 +49,7 @@ export const NOT_DUPLICATED_EVENT_RELATIONS: Record<string, string> = {
   // qualcuno a un evento a cui non ha mai detto di sì.
   registrations: 'sono le persone iscritte a QUELL’occorrenza, e sono dati personali',
   invitations: 'un invito è un’azione verso una persona, non configurazione: la copia nasce in bozza e gli inviti si mandano quando la data è confermata',
+  multitrackConsents: 'prova del consenso dato da una persona per QUELL’occorrenza: non si trasferisce a un’altra',
 
   // Vita dell'evento.
   questions: 'domande poste durante quell’evento',

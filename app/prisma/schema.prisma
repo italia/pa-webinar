@@ -298,6 +298,8 @@ model Event {
 
   // FK lookup index: "what events use this GDPR template" / cascade
   // SetNull on template delete.
+
+  multitrackConsents MultitrackConsent[]
   @@index([gdprTemplateId], map: "events_gdpr_template_id_idx")
   // FK lookup index: "find all events in this recurring series".
   @@index([recurrenceSeriesId], map: "events_recurrence_series_id_idx")
@@ -763,6 +765,7 @@ model Registration {
   remindersSent          ReminderSent[]
   feedback               EventFeedback[]
   questionnaireResponses QuestionnaireResponse[]
+  multitrackConsents     MultitrackConsent[]
 
   @@unique([eventId, emailHash])
   @@index([personId])
@@ -2313,4 +2316,31 @@ model StaffLoginToken {
 
   @@index([accountId], map: "staff_login_tokens_account_id_idx")
   @@map("staff_login_tokens")
+}
+
+// Prova del consenso alla registrazione per partecipante (ADR-013) dato nella
+// sala d'attesa da chi non l'aveva dato all'iscrizione: ospiti, relatori,
+// iscritti entrati da un altro dispositivo o da un link inoltrato (art. 7.1
+// GDPR: il titolare deve poter dimostrare il consenso). Chi (posto nella
+// conferenza e nome mostrato, cifrato), quando, in quale lingua.
+// Dato personale: la pulizia GDPR lo cancella alla scadenza dell'evento, e la
+// cancellazione su richiesta lo porta via con l'iscrizione.
+model MultitrackConsent {
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  eventId        String   @map("event_id") @db.Uuid
+  // Il `context.user.id` del JWT della conferenza: il posto a cui il
+  // consenso si riferisce.
+  jitsiUserId    String   @map("jitsi_user_id") @db.VarChar(80)
+  // Nome mostrato in sala, cifrato (encryptPII).
+  displayName    String   @map("display_name")
+  registrationId String?  @map("registration_id") @db.Uuid
+  locale         String?  @db.VarChar(8)
+  consentedAt    DateTime @default(now()) @map("consented_at")
+
+  event        Event         @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  registration Registration? @relation(fields: [registrationId], references: [id], onDelete: Cascade)
+
+  @@index([eventId])
+  @@index([registrationId])
+  @@map("multitrack_consents")
 }
