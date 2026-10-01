@@ -2623,6 +2623,27 @@
     "eventQuestionnaires": {
       "title": "Dawnonari — {eventTitle}",
       "subtitle": "Configura wieħed dawnonario ta' preġistrazzjoni e/o post-avveniment combinando template u mistoqsijiet ad-hoc."
+    },
+    "registrationActions": {
+      "actions": "Azzjonijiet",
+      "edit": "Ikkoreġi",
+      "editFor": "Ikkoreġi r-reġistrazzjoni ta' {name}",
+      "delete": "Ħassar",
+      "deleteFor": "Ħassar ir-reġistrazzjoni ta' {name}",
+      "editTitle": "Ikkoreġi r-reġistrazzjoni",
+      "name": "Isem",
+      "newEmail": "Email ġdida",
+      "newEmailHelp": "Ħalliha vojta biex ma tinbidilx.",
+      "organization": "Organizzazzjoni",
+      "organizationRole": "Rwol",
+      "save": "Issejvja",
+      "saved": "Ir-reġistrazzjoni ġiet ikkoreġuta",
+      "emailTaken": "Din l-email diġà hija rreġistrata għall-avveniment.",
+      "addressBookLinked": "Din ir-reġistrazzjoni hija marbuta ma' entrata fil-ktieb tal-indirizzi tal-email attwali: amministratur l-ewwel ineħħi l-entrata mill-ktieb tal-indirizzi, imbagħad l-email tista' tiġi kkoreġuta.",
+      "deleteTitle": "Tħassar ir-reġistrazzjoni?",
+      "deleteBody": "Ir-reġistrazzjoni ta' {name} u l-kontribuzzjonijiet tiegħu jew tagħha għall-avveniment (chat, tweġibiet għall-kwestjonarji, emails fil-kju) se jitħassru. Ma tistax titreġġa' lura.",
+      "deleted": "Ir-reġistrazzjoni tħassret",
+      "failed": "L-operazzjoni ma rnexxietx. Erġa' pprova."
     }
   },
   "email": {

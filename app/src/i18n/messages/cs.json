@@ -2623,6 +2623,27 @@
     "eventQuestionnaires": {
       "title": "Dotazníky — {eventTitle}",
       "subtitle": "Nakonfigurujte dotazník předregistrace a/nebo po události kombinováním šablon a ad-hoc otázek."
+    },
+    "registrationActions": {
+      "actions": "Akce",
+      "edit": "Opravit",
+      "editFor": "Opravit registraci: {name}",
+      "delete": "Smazat",
+      "deleteFor": "Smazat registraci: {name}",
+      "editTitle": "Opravit registraci",
+      "name": "Jméno",
+      "newEmail": "Nový e-mail",
+      "newEmailHelp": "Ponechte prázdné, chcete-li jej nezměnit.",
+      "organization": "Organizace",
+      "organizationRole": "Funkce",
+      "save": "Uložit",
+      "saved": "Registrace opravena",
+      "emailTaken": "Tento e-mail je už k události registrován.",
+      "addressBookLinked": "Tato registrace je propojena se záznamem v adresáři pro současný e-mail: správce nejprve záznam z adresáře odstraní, potom lze e-mail opravit.",
+      "deleteTitle": "Smazat registraci?",
+      "deleteBody": "Registrace osoby {name} a její příspěvky k události (chat, odpovědi v dotaznících, e-maily ve frontě) budou smazány. Tuto akci nelze vrátit.",
+      "deleted": "Registrace smazána",
+      "failed": "Operace se nezdařila. Zkuste to znovu."
     }
   },
   "email": {

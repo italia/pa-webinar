@@ -2623,6 +2623,27 @@
     "eventQuestionnaires": {
       "title": "Vragenlijsten — {eventTitle}",
       "subtitle": "Configureer een aanmeldings- en/of post-event vragenlijst door sjablonen en ad-hoc vragen te combineren."
+    },
+    "registrationActions": {
+      "actions": "Acties",
+      "edit": "Corrigeren",
+      "editFor": "Inschrijving van {name} corrigeren",
+      "delete": "Verwijderen",
+      "deleteFor": "Inschrijving van {name} verwijderen",
+      "editTitle": "Inschrijving corrigeren",
+      "name": "Naam",
+      "newEmail": "Nieuw e-mailadres",
+      "newEmailHelp": "Laat leeg om het niet te wijzigen.",
+      "organization": "Organisatie",
+      "organizationRole": "Functie",
+      "save": "Opslaan",
+      "saved": "Inschrijving gecorrigeerd",
+      "emailTaken": "Dit e-mailadres is al ingeschreven voor het evenement.",
+      "addressBookLinked": "Deze inschrijving is gekoppeld aan een vermelding in het adresboek voor het huidige e-mailadres: een beheerder verwijdert eerst de vermelding uit het adresboek, daarna kan het e-mailadres worden gecorrigeerd.",
+      "deleteTitle": "Inschrijving verwijderen?",
+      "deleteBody": "De inschrijving van {name} en de bijdragen aan het evenement (chat, antwoorden op vragenlijsten, e-mails in de wachtrij) worden verwijderd. Dit kan niet ongedaan worden gemaakt.",
+      "deleted": "Inschrijving verwijderd",
+      "failed": "De bewerking is mislukt. Probeer het opnieuw."
     }
   },
   "email": {

@@ -2623,6 +2623,27 @@
     "eventQuestionnaires": {
       "title": "Vprašalniki — {eventTitle}",
       "subtitle": "Konfigurirajte vprašalnik pred prijavo in/ali po dogodku z združevanjem predlog in posebnih vprašanj."
+    },
+    "registrationActions": {
+      "actions": "Dejanja",
+      "edit": "Popravi",
+      "editFor": "Popravi prijavo: {name}",
+      "delete": "Izbriši",
+      "deleteFor": "Izbriši prijavo: {name}",
+      "editTitle": "Popravi prijavo",
+      "name": "Ime",
+      "newEmail": "Nov e-poštni naslov",
+      "newEmailHelp": "Pustite prazno, če ga ne želite spremeniti.",
+      "organization": "Organizacija",
+      "organizationRole": "Vloga",
+      "save": "Shrani",
+      "saved": "Prijava popravljena",
+      "emailTaken": "Ta e-poštni naslov je za dogodek že prijavljen.",
+      "addressBookLinked": "Ta prijava je povezana z vnosom v imeniku za trenutni e-poštni naslov: skrbnik najprej odstrani vnos iz imenika, nato je mogoče naslov popraviti.",
+      "deleteTitle": "Izbrisati prijavo?",
+      "deleteBody": "Prijava osebe {name} in njeni prispevki k dogodku (klepet, odgovori na vprašalnike, e-pošta v čakalni vrsti) bodo izbrisani. Tega ni mogoče razveljaviti.",
+      "deleted": "Prijava izbrisana",
+      "failed": "Postopek ni uspel. Poskusite znova."
     }
   },
   "email": {

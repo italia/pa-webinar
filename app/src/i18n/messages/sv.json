@@ -2623,6 +2623,27 @@
     "eventQuestionnaires": {
       "title": "Enkäter — {eventTitle}",
       "subtitle": "Konfigurera en förregistrerings- och/eller eftermöteenkät genom att kombinera mallar och ad hoc-frågor."
+    },
+    "registrationActions": {
+      "actions": "Åtgärder",
+      "edit": "Korrigera",
+      "editFor": "Korrigera anmälan för {name}",
+      "delete": "Radera",
+      "deleteFor": "Radera anmälan för {name}",
+      "editTitle": "Korrigera anmälan",
+      "name": "Namn",
+      "newEmail": "Ny e-postadress",
+      "newEmailHelp": "Lämna tomt för att behålla den.",
+      "organization": "Organisation",
+      "organizationRole": "Roll",
+      "save": "Spara",
+      "saved": "Anmälan korrigerad",
+      "emailTaken": "Den här e-postadressen är redan anmäld till evenemanget.",
+      "addressBookLinked": "Den här anmälan är kopplad till en post i adressboken för den nuvarande e-postadressen: en administratör tar först bort posten ur adressboken, sedan kan adressen korrigeras.",
+      "deleteTitle": "Radera anmälan?",
+      "deleteBody": "Anmälan för {name} och personens bidrag till evenemanget (chatt, enkätsvar, e-post i kö) raderas. Det går inte att ångra.",
+      "deleted": "Anmälan raderad",
+      "failed": "Åtgärden misslyckades. Försök igen."
     }
   },
   "email": {

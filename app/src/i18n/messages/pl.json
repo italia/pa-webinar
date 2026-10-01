@@ -2623,6 +2623,27 @@
     "eventQuestionnaires": {
       "title": "Kwestionariusze — {eventTitle}",
       "subtitle": "Skonfiguruj kwestionariusz przedrejestracyjny i/lub po wydarzeniu, łącząc szablony i pytania ad-hoc."
+    },
+    "registrationActions": {
+      "actions": "Działania",
+      "edit": "Popraw",
+      "editFor": "Popraw zgłoszenie: {name}",
+      "delete": "Usuń",
+      "deleteFor": "Usuń zgłoszenie: {name}",
+      "editTitle": "Popraw zgłoszenie",
+      "name": "Imię i nazwisko",
+      "newEmail": "Nowy adres e-mail",
+      "newEmailHelp": "Pozostaw puste, aby go nie zmieniać.",
+      "organization": "Instytucja",
+      "organizationRole": "Stanowisko",
+      "save": "Zapisz",
+      "saved": "Zgłoszenie poprawione",
+      "emailTaken": "Ten adres e-mail jest już zgłoszony na to wydarzenie.",
+      "addressBookLinked": "To zgłoszenie jest powiązane z wpisem w książce adresowej dla obecnego adresu e-mail: administrator najpierw usuwa wpis z książki adresowej, potem można poprawić adres.",
+      "deleteTitle": "Usunąć zgłoszenie?",
+      "deleteBody": "Zgłoszenie osoby {name} i jej udział w wydarzeniu (czat, odpowiedzi w ankietach, e-maile w kolejce) zostaną usunięte. Tej operacji nie można cofnąć.",
+      "deleted": "Zgłoszenie usunięte",
+      "failed": "Operacja nie powiodła się. Spróbuj ponownie."
     }
   },
   "email": {

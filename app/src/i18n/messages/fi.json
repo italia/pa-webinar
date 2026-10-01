@@ -2623,6 +2623,27 @@
     "eventQuestionnaires": {
       "title": "Kyselyt — {eventTitle}",
       "subtitle": "Määritä ennakkoilmoittautumis- ja/tai tapahtuman jälkeinen kysely yhdistämällä malleja ja ad-hoc-kysymyksiä."
+    },
+    "registrationActions": {
+      "actions": "Toiminnot",
+      "edit": "Korjaa",
+      "editFor": "Korjaa ilmoittautuminen: {name}",
+      "delete": "Poista",
+      "deleteFor": "Poista ilmoittautuminen: {name}",
+      "editTitle": "Korjaa ilmoittautuminen",
+      "name": "Nimi",
+      "newEmail": "Uusi sähköpostiosoite",
+      "newEmailHelp": "Jätä tyhjäksi, jos et halua muuttaa sitä.",
+      "organization": "Organisaatio",
+      "organizationRole": "Rooli",
+      "save": "Tallenna",
+      "saved": "Ilmoittautuminen korjattu",
+      "emailTaken": "Tämä sähköpostiosoite on jo ilmoittautunut tapahtumaan.",
+      "addressBookLinked": "Tämä ilmoittautuminen on yhdistetty nykyisen sähköpostiosoitteen osoitekirjamerkintään: ylläpitäjä poistaa ensin merkinnän osoitekirjasta, minkä jälkeen osoitteen voi korjata.",
+      "deleteTitle": "Poistetaanko ilmoittautuminen?",
+      "deleteBody": "Henkilön {name} ilmoittautuminen ja hänen osallistumisensa tapahtumaan (keskustelu, kyselyvastaukset, jonossa olevat sähköpostit) poistetaan. Toimintoa ei voi perua.",
+      "deleted": "Ilmoittautuminen poistettu",
+      "failed": "Toiminto epäonnistui. Yritä uudelleen."
     }
   },
   "email": {

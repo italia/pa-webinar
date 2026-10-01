@@ -2623,6 +2623,27 @@
     "eventQuestionnaires": {
       "title": "Anketas — {eventTitle}",
       "subtitle": "Konfigurējiet pirmsreģistrācijas un/vai pēcpasākuma anketu, apvienojot veidnes un ad-hoc jautājumus."
+    },
+    "registrationActions": {
+      "actions": "Darbības",
+      "edit": "Labot",
+      "editFor": "Labot reģistrāciju: {name}",
+      "delete": "Dzēst",
+      "deleteFor": "Dzēst reģistrāciju: {name}",
+      "editTitle": "Labot reģistrāciju",
+      "name": "Vārds",
+      "newEmail": "Jauna e-pasta adrese",
+      "newEmailHelp": "Atstājiet tukšu, lai to nemainītu.",
+      "organization": "Organizācija",
+      "organizationRole": "Amats",
+      "save": "Saglabāt",
+      "saved": "Reģistrācija izlabota",
+      "emailTaken": "Šī e-pasta adrese jau ir reģistrēta pasākumam.",
+      "addressBookLinked": "Šī reģistrācija ir saistīta ar adrešu grāmatas ierakstu pašreizējai e-pasta adresei: administrators vispirms izņem ierakstu no adrešu grāmatas, pēc tam adresi var labot.",
+      "deleteTitle": "Vai dzēst reģistrāciju?",
+      "deleteBody": "Personas {name} reģistrācija un tās ieguldījums pasākumā (tērzēšana, atbildes uz anketām, rindā esošie e-pasti) tiks dzēsti. To nevar atsaukt.",
+      "deleted": "Reģistrācija dzēsta",
+      "failed": "Darbība neizdevās. Mēģiniet vēlreiz."
     }
   },
   "email": {

@@ -2623,6 +2623,27 @@
     "eventQuestionnaires": {
       "title": "Questionnaires — {eventTitle}",
       "subtitle": "Configure a pre-registration and/or post-event questionnaire combining templates and ad-hoc questions."
+    },
+    "registrationActions": {
+      "actions": "Actions",
+      "edit": "Correct",
+      "editFor": "Correct the registration of {name}",
+      "delete": "Delete",
+      "deleteFor": "Delete the registration of {name}",
+      "editTitle": "Correct the registration",
+      "name": "Name",
+      "newEmail": "New email",
+      "newEmailHelp": "Leave empty to keep it unchanged.",
+      "organization": "Organization",
+      "organizationRole": "Role",
+      "save": "Save",
+      "saved": "Registration corrected",
+      "emailTaken": "This email is already registered for the event.",
+      "addressBookLinked": "This registration is linked to an address-book entry tied to the current email: an administrator first removes the entry from the address book, then the email can be corrected.",
+      "deleteTitle": "Delete the registration?",
+      "deleteBody": "The registration of {name} and their contributions to the event (chat, questionnaire answers, queued emails) will be deleted. This cannot be undone.",
+      "deleted": "Registration deleted",
+      "failed": "The operation failed. Please try again."
     }
   },
   "email": {

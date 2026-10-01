@@ -43,6 +43,7 @@ import DeleteEventModal from './delete-event-modal';
 import EventAnalyticsPanel from './event-analytics-panel';
 import EventConfigDiagram from './event-config-diagram';
 import EventModeratorsPanel from './event-moderators-panel';
+import RegistrationRowActions from './registration-row-actions';
 import PostEventConfig, { type PostEventVisibility } from './post-event-config';
 import RecordingManagement from './recording-management';
 import CollapsibleSection from './collapsible-section';
@@ -601,7 +602,8 @@ export default function EventManagementClient({
               />
             )}
             {activeTab === 'persone' && (
-              <PeopleTab event={event} baseUrl={baseUrl} locale={locale} onExportCsv={exportCsv} />
+              <PeopleTab event={event} baseUrl={baseUrl} locale={locale} onExportCsv={exportCsv}
+                         canEditRegistrations={!viaToken} />
             )}
             {activeTab === 'contenuti' && <ContentTab event={event} />}
             {activeTab === 'dopo' && (
@@ -969,8 +971,11 @@ function OverviewTab({ event, description, locale, editUrl, publicUrl, guestLive
   );
 }
 
-function PeopleTab({ event, baseUrl, locale, onExportCsv }: {
+function PeopleTab({ event, baseUrl, locale, onExportCsv, canEditRegistrations }: {
   event: EventData; baseUrl: string; locale: string; onExportCsv: () => void;
+  /** Correzione e cancellazione delle iscrizioni: solo con una sessione dello
+   *  staff, non con il solo link del moderatore. */
+  canEditRegistrations: boolean;
 }) {
   const t = useTranslations('admin');
   const te = useTranslations('events');
@@ -1036,6 +1041,9 @@ function PeopleTab({ event, baseUrl, locale, onExportCsv }: {
                   {event.requireOrganizationType && <th scope="col">{t('organizationType')}</th>}
                   <th scope="col">{t('registrationDate')}</th>
                   <th scope="col">{t('joined')}</th>
+                  {canEditRegistrations && (
+                    <th scope="col"><span className="visually-hidden">{t('registrationActions.actions')}</span></th>
+                  )}
                 </tr>
               </thead>
               <tbody>
@@ -1068,6 +1076,11 @@ function PeopleTab({ event, baseUrl, locale, onExportCsv }: {
                           {joined ? t('joined') : t('notJoined')}
                         </span>
                       </td>
+                      {canEditRegistrations && (
+                        <td>
+                          <RegistrationRowActions eventId={event.id} registration={reg} />
+                        </td>
+                      )}
                     </tr>
                   );
                 })}

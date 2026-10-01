@@ -2623,6 +2623,27 @@
     "eventQuestionnaires": {
       "title": "Fragebögen — {eventTitle}",
       "subtitle": "Konfigurieren Sie einen Voranmeldungs- und/oder Nach-Event-Fragebogen aus Vorlagen und Ad-hoc-Fragen."
+    },
+    "registrationActions": {
+      "actions": "Aktionen",
+      "edit": "Korrigieren",
+      "editFor": "Anmeldung von {name} korrigieren",
+      "delete": "Löschen",
+      "deleteFor": "Anmeldung von {name} löschen",
+      "editTitle": "Anmeldung korrigieren",
+      "name": "Name",
+      "newEmail": "Neue E-Mail-Adresse",
+      "newEmailHelp": "Leer lassen, um sie nicht zu ändern.",
+      "organization": "Organisation",
+      "organizationRole": "Funktion",
+      "save": "Speichern",
+      "saved": "Anmeldung korrigiert",
+      "emailTaken": "Diese E-Mail-Adresse ist für die Veranstaltung bereits angemeldet.",
+      "addressBookLinked": "Diese Anmeldung ist mit einem Adressbucheintrag zur aktuellen E-Mail-Adresse verknüpft: Eine Administratorin oder ein Administrator entfernt zuerst den Eintrag aus dem Adressbuch, dann kann die E-Mail-Adresse korrigiert werden.",
+      "deleteTitle": "Anmeldung löschen?",
+      "deleteBody": "Die Anmeldung von {name} und die Beiträge zur Veranstaltung (Chat, Fragebogenantworten, wartende E-Mails) werden gelöscht. Dies kann nicht rückgängig gemacht werden.",
+      "deleted": "Anmeldung gelöscht",
+      "failed": "Der Vorgang ist fehlgeschlagen. Bitte versuchen Sie es erneut."
     }
   },
   "email": {

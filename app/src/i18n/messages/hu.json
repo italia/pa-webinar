@@ -2623,6 +2623,27 @@
     "eventQuestionnaires": {
       "title": "Kérdőívek — {eventTitle}",
       "subtitle": "Állítson össze regisztráció előtti és/vagy esemény utáni kérdőívet sablonok és ad-hoc kérdések kombinálásával."
+    },
+    "registrationActions": {
+      "actions": "Műveletek",
+      "edit": "Javítás",
+      "editFor": "{name} regisztrációjának javítása",
+      "delete": "Törlés",
+      "deleteFor": "{name} regisztrációjának törlése",
+      "editTitle": "Regisztráció javítása",
+      "name": "Név",
+      "newEmail": "Új e-mail-cím",
+      "newEmailHelp": "Hagyja üresen, ha nem akarja módosítani.",
+      "organization": "Szervezet",
+      "organizationRole": "Beosztás",
+      "save": "Mentés",
+      "saved": "Regisztráció javítva",
+      "emailTaken": "Ez az e-mail-cím már regisztrálva van az eseményre.",
+      "addressBookLinked": "Ez a regisztráció a jelenlegi e-mail-címhez tartozó címjegyzék-bejegyzéshez kapcsolódik: előbb egy adminisztrátor eltávolítja a bejegyzést a címjegyzékből, utána javítható az e-mail-cím.",
+      "deleteTitle": "Törli a regisztrációt?",
+      "deleteBody": "{name} regisztrációja és az eseményhez fűzött hozzájárulásai (csevegés, kérdőívválaszok, sorban álló e-mailek) törlődnek. Ez nem vonható vissza.",
+      "deleted": "Regisztráció törölve",
+      "failed": "A művelet nem sikerült. Próbálja újra."
     }
   },
   "email": {

@@ -2623,6 +2623,27 @@
     "eventQuestionnaires": {
       "title": "Upitnici — {eventTitle}",
       "subtitle": "Konfigurirajte upitnik prije prijave i/ili nakon događaja kombinirajući predloške i ad-hoc pitanja."
+    },
+    "registrationActions": {
+      "actions": "Radnje",
+      "edit": "Ispravi",
+      "editFor": "Ispravi prijavu: {name}",
+      "delete": "Izbriši",
+      "deleteFor": "Izbriši prijavu: {name}",
+      "editTitle": "Ispravi prijavu",
+      "name": "Ime",
+      "newEmail": "Nova e-adresa",
+      "newEmailHelp": "Ostavite prazno ako je ne želite mijenjati.",
+      "organization": "Organizacija",
+      "organizationRole": "Uloga",
+      "save": "Spremi",
+      "saved": "Prijava ispravljena",
+      "emailTaken": "Ova e-adresa već je prijavljena na događaj.",
+      "addressBookLinked": "Ova je prijava povezana s unosom u adresaru za trenutačnu e-adresu: administrator najprije uklanja unos iz adresara, a zatim se e-adresa može ispraviti.",
+      "deleteTitle": "Izbrisati prijavu?",
+      "deleteBody": "Prijava osobe {name} i njezini doprinosi događaju (chat, odgovori na upitnike, e-poruke u redu čekanja) bit će izbrisani. To se ne može poništiti.",
+      "deleted": "Prijava izbrisana",
+      "failed": "Radnja nije uspjela. Pokušajte ponovno."
     }
   },
   "email": {

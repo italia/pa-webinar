@@ -2623,6 +2623,27 @@
     "eventQuestionnaires": {
       "title": "Ceistneoirí — {eventTitle}",
       "subtitle": "Cumraigh ceistneoir réamhchlárúcháin agus/nó iar-imeachta trí theimpléid agus ceisteanna ad hoc a chumasc."
+    },
+    "registrationActions": {
+      "actions": "Gníomhartha",
+      "edit": "Ceartaigh",
+      "editFor": "Ceartaigh clárú {name}",
+      "delete": "Scrios",
+      "deleteFor": "Scrios clárú {name}",
+      "editTitle": "Ceartaigh an clárú",
+      "name": "Ainm",
+      "newEmail": "Ríomhphost nua",
+      "newEmailHelp": "Fág folamh é chun é a choinneáil gan athrú.",
+      "organization": "Eagraíocht",
+      "organizationRole": "Ról",
+      "save": "Sábháil",
+      "saved": "Ceartaíodh an clárú",
+      "emailTaken": "Tá an ríomhphost seo cláraithe don imeacht cheana féin.",
+      "addressBookLinked": "Tá an clárú seo nasctha le hiontráil sa leabhar seoltaí don ríomhphost reatha: baineann riarthóir an iontráil den leabhar seoltaí ar dtús, ansin is féidir an ríomhphost a cheartú.",
+      "deleteTitle": "An clárú a scriosadh?",
+      "deleteBody": "Scriosfar clárú {name} agus a c(h)uid ranníocaíochtaí leis an imeacht (comhrá, freagraí ar cheistneoirí, ríomhphoist sa scuaine). Ní féidir é seo a chealú.",
+      "deleted": "Scriosadh an clárú",
+      "failed": "Níor éirigh leis an oibríocht. Bain triail eile as."
     }
   },
   "email": {

@@ -2623,6 +2623,27 @@
     "eventQuestionnaires": {
       "title": "Chestionare — {eventTitle}",
       "subtitle": "Configurați un chestionar de preînregistrare și/sau post-eveniment combinând șabloane și întrebări ad-hoc."
+    },
+    "registrationActions": {
+      "actions": "Acțiuni",
+      "edit": "Corectați",
+      "editFor": "Corectați înscrierea: {name}",
+      "delete": "Ștergeți",
+      "deleteFor": "Ștergeți înscrierea: {name}",
+      "editTitle": "Corectați înscrierea",
+      "name": "Nume",
+      "newEmail": "E-mail nou",
+      "newEmailHelp": "Lăsați gol pentru a nu-l modifica.",
+      "organization": "Organizație",
+      "organizationRole": "Funcție",
+      "save": "Salvați",
+      "saved": "Înscriere corectată",
+      "emailTaken": "Acest e-mail este deja înscris la eveniment.",
+      "addressBookLinked": "Această înscriere este legată de o intrare din agendă asociată e-mailului actual: un administrator elimină mai întâi intrarea din agendă, apoi e-mailul poate fi corectat.",
+      "deleteTitle": "Ștergeți înscrierea?",
+      "deleteBody": "Înscrierea lui {name} și contribuțiile sale la eveniment (chat, răspunsuri la chestionare, e-mailuri în coadă) vor fi șterse. Acțiunea nu poate fi anulată.",
+      "deleted": "Înscriere ștearsă",
+      "failed": "Operațiunea nu a reușit. Vă rugăm să reîncercați."
     }
   },
   "email": {

@@ -2623,6 +2623,27 @@
     "eventQuestionnaires": {
       "title": "Cuestionarios — {eventTitle}",
       "subtitle": "Configure un cuestionario de pre-registro y/o posevento combinando plantillas y preguntas ad-hoc."
+    },
+    "registrationActions": {
+      "actions": "Acciones",
+      "edit": "Corregir",
+      "editFor": "Corregir la inscripción de {name}",
+      "delete": "Eliminar",
+      "deleteFor": "Eliminar la inscripción de {name}",
+      "editTitle": "Corregir la inscripción",
+      "name": "Nombre",
+      "newEmail": "Nuevo correo electrónico",
+      "newEmailHelp": "Déjalo vacío para no cambiarlo.",
+      "organization": "Organismo",
+      "organizationRole": "Cargo",
+      "save": "Guardar",
+      "saved": "Inscripción corregida",
+      "emailTaken": "Este correo ya está inscrito en el evento.",
+      "addressBookLinked": "Esta inscripción está vinculada a una entrada de la libreta de direcciones asociada al correo actual: un administrador elimina primero la entrada de la libreta y después se puede corregir el correo.",
+      "deleteTitle": "¿Eliminar la inscripción?",
+      "deleteBody": "Se eliminarán la inscripción de {name} y sus aportaciones al evento (chat, respuestas a cuestionarios, correos en cola). No se puede deshacer.",
+      "deleted": "Inscripción eliminada",
+      "failed": "La operación no se ha completado. Vuelve a intentarlo."
     }
   },
   "email": {

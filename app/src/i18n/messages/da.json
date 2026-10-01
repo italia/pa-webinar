@@ -2623,6 +2623,27 @@
     "eventQuestionnaires": {
       "title": "Spørgeskemaer — {eventTitle}",
       "subtitle": "Konfigurér et spørgeskema før tilmelding og/eller efter arrangementet ved at kombinere skabeloner og ad hoc-spørgsmål."
+    },
+    "registrationActions": {
+      "actions": "Handlinger",
+      "edit": "Ret",
+      "editFor": "Ret tilmeldingen for {name}",
+      "delete": "Slet",
+      "deleteFor": "Slet tilmeldingen for {name}",
+      "editTitle": "Ret tilmeldingen",
+      "name": "Navn",
+      "newEmail": "Ny e-mail",
+      "newEmailHelp": "Lad feltet stå tomt for at beholde den.",
+      "organization": "Organisation",
+      "organizationRole": "Rolle",
+      "save": "Gem",
+      "saved": "Tilmeldingen er rettet",
+      "emailTaken": "Denne e-mail er allerede tilmeldt begivenheden.",
+      "addressBookLinked": "Denne tilmelding er knyttet til en post i adressebogen for den nuværende e-mail: en administrator fjerner først posten fra adressebogen, derefter kan e-mailen rettes.",
+      "deleteTitle": "Slet tilmeldingen?",
+      "deleteBody": "Tilmeldingen for {name} og vedkommendes bidrag til begivenheden (chat, svar på spørgeskemaer, e-mails i kø) slettes. Det kan ikke fortrydes.",
+      "deleted": "Tilmeldingen er slettet",
+      "failed": "Handlingen mislykkedes. Prøv igen."
     }
   },
   "email": {

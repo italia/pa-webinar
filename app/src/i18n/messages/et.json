@@ -2623,6 +2623,27 @@
     "eventQuestionnaires": {
       "title": "Küsimustikud — {eventTitle}",
       "subtitle": "Konfigureerige eelregistreerimise ja/või sündmusejärgne küsimustik, kombineerides malle ja ad-hoc küsimusi."
+    },
+    "registrationActions": {
+      "actions": "Toimingud",
+      "edit": "Paranda",
+      "editFor": "Paranda registreerimine: {name}",
+      "delete": "Kustuta",
+      "deleteFor": "Kustuta registreerimine: {name}",
+      "editTitle": "Paranda registreerimine",
+      "name": "Nimi",
+      "newEmail": "Uus e-posti aadress",
+      "newEmailHelp": "Jätke tühjaks, kui te ei soovi seda muuta.",
+      "organization": "Asutus",
+      "organizationRole": "Ametikoht",
+      "save": "Salvesta",
+      "saved": "Registreerimine parandatud",
+      "emailTaken": "See e-posti aadress on üritusele juba registreeritud.",
+      "addressBookLinked": "See registreerimine on seotud praeguse e-posti aadressi kirjega aadressiraamatus: administraator eemaldab kõigepealt kirje aadressiraamatust, seejärel saab aadressi parandada.",
+      "deleteTitle": "Kas kustutada registreerimine?",
+      "deleteBody": "Isiku {name} registreerimine ja tema panus üritusse (vestlus, küsimustike vastused, järjekorras olevad e-kirjad) kustutatakse. Seda ei saa tagasi võtta.",
+      "deleted": "Registreerimine kustutatud",
+      "failed": "Toiming ebaõnnestus. Proovige uuesti."
     }
   },
   "email": {

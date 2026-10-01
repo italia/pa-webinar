@@ -2623,6 +2623,27 @@
     "eventQuestionnaires": {
       "title": "Klausimynai — {eventTitle}",
       "subtitle": "Sukonfigūruokite išankstinės registracijos ir (arba) po renginio pildomą klausimyną, derindami šablonus ir ad-hoc klausimus."
+    },
+    "registrationActions": {
+      "actions": "Veiksmai",
+      "edit": "Taisyti",
+      "editFor": "Taisyti registraciją: {name}",
+      "delete": "Ištrinti",
+      "deleteFor": "Ištrinti registraciją: {name}",
+      "editTitle": "Taisyti registraciją",
+      "name": "Vardas",
+      "newEmail": "Naujas el. pašto adresas",
+      "newEmailHelp": "Palikite tuščią, jei nenorite keisti.",
+      "organization": "Organizacija",
+      "organizationRole": "Pareigos",
+      "save": "Išsaugoti",
+      "saved": "Registracija pataisyta",
+      "emailTaken": "Šis el. pašto adresas jau užregistruotas renginyje.",
+      "addressBookLinked": "Ši registracija susieta su adresų knygos įrašu dabartiniam el. pašto adresui: administratorius pirmiausia pašalina įrašą iš adresų knygos, tada adresą galima pataisyti.",
+      "deleteTitle": "Ištrinti registraciją?",
+      "deleteBody": "Asmens {name} registracija ir jo indėlis į renginį (pokalbiai, klausimynų atsakymai, eilėje esantys el. laiškai) bus ištrinti. To negalima atšaukti.",
+      "deleted": "Registracija ištrinta",
+      "failed": "Veiksmas nepavyko. Bandykite dar kartą."
     }
   },
   "email": {
