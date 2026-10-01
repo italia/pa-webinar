@@ -1299,6 +1299,7 @@ export default function WaitingRoom({
         <PhaserLobby
           hostOwnsEntry
           eventSlug={event.slug}
+          accessToken={chatToken}
           displayName={trimmedName}
           status={event.status}
           startsAtMs={startsAtMs}

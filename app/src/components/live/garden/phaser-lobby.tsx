@@ -28,6 +28,8 @@ const WORLD = { w: 2400, h: 1600 };
 
 interface PhaserLobbyProps {
   eventSlug: string;
+  /** Token della sala per le presenze della piazza (vedi garden/ping). */
+  accessToken?: string;
   displayName: string;
   status: AppEventStatus;
   startsAtMs: number;
@@ -54,6 +56,7 @@ interface PhaserLobbyProps {
 
 export default function PhaserLobby({
   eventSlug,
+  accessToken = '',
   displayName,
   status,
   startsAtMs,
@@ -92,7 +95,7 @@ export default function PhaserLobby({
       helmet: false,
       glasses: false,
     };
-    const presence = new GardenPresenceClient(eventSlug, world, shared);
+    const presence = new GardenPresenceClient(eventSlug, world, shared, accessToken);
     const conference = new EnterLiveConference(shared, (name, prefs) =>
       onEnterRef.current(name, prefs),
     );

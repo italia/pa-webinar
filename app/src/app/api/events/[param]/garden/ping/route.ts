@@ -14,15 +14,27 @@
  *      ~200 ms-fresh snapshot even if the SSE is briefly behind — or says
  *      the snapshot is missing, which is not the same as saying it is empty.
  *
- * No auth: anyone on the live page can ping, rate-limited per IP.
- * Not persistent: positions live only in Redis for 10 s.
+ * Chi ha accesso alla sala (token del moderatore, del relatore o
+ * dell'iscrizione, oppure ospite mentre la stanza e' aperta a chi arriva col
+ * link: la stessa regola dei pannelli, lib/events/panel-read-access) compare
+ * nella piazza e vede i nomi degli altri. Chi conosce solo l'indirizzo
+ * dell'evento non compare e vede soltanto quanti sono, senza nomi.
+ * Rate-limited per IP. Not persistent: positions live only in Redis for 10 s.
  */
+
+import { createHash, createHmac, randomBytes } from 'node:crypto';
 
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
-import { AppError, NotFoundError, RateLimitError } from '@/lib/errors';
+import {
+  AppError,
+  ForbiddenError,
+  NotFoundError,
+  RateLimitError,
+  UnauthorizedError,
+} from '@/lib/errors';
 import { prisma } from '@/lib/db';
 import {
   listGardenPeers,
@@ -31,6 +43,13 @@ import {
   type GardenPeer,
 } from '@/lib/garden/pubsub';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
+import { extractModeratorToken } from '@/lib/auth/moderator';
+import {
+  authorizePanelRead,
+  PANEL_READ_EVENT_SELECT,
+  type PanelReadEvent,
+} from '@/lib/events/panel-read-access';
+import { getCached, setCache } from '@/lib/cache';
 
 export const dynamic = 'force-dynamic';
 
@@ -60,6 +79,53 @@ const pingSchema = z.object({
   leave: z.boolean().optional(),
 });
 
+/** Quanto vale la decisione per un token: il ping arriva a 5 Hz per persona,
+ *  e la regola dei pannelli legge il database (fino a tre letture). Come la
+ *  cache del moderatore: una concessione revocata smette di valere entro
+ *  pochi secondi anche qui. */
+const ACCESSO_TTL_MS = 5_000;
+
+/** Chiave per gli identificativi opachi della risposta anonima. */
+const CHIAVE_ANONIMI = process.env.APP_SECRET || randomBytes(32).toString('hex');
+
+/**
+ * Chi non ha accesso non riceve l'identificativo vero di nessuno: con quello
+ * potrebbe mandare `leave` a nome di altri e farli sparire dalla piazza. Gli
+ * arriva un identificativo opaco ma stabile, cosi' gli avatar non si
+ * rimescolano a ogni ping.
+ */
+function identificativoOpaco(eventId: string, userId: string): string {
+  return `anon_${createHmac('sha256', CHIAVE_ANONIMI).update(`${eventId}:${userId}`).digest('hex').slice(0, 16)}`;
+}
+
+/**
+ * Un token che non risolve conta come nessun accesso: qui non c'e' nulla da
+ * far fallire a voce alta, la persona vede la piazza senza nomi. Un errore
+ * del database invece risale (500), e non resta in memoria come un rifiuto.
+ */
+async function haAccessoAllaSala(
+  event: PanelReadEvent,
+  token: string | null,
+): Promise<boolean> {
+  const decidi = () =>
+    authorizePanelRead(event, token).then(
+      () => true,
+      (err: unknown) => {
+        if (err instanceof UnauthorizedError || err instanceof ForbiddenError) return false;
+        throw err;
+      },
+    );
+  // Senza token la regola non tocca il database (finestra ospiti, cookie della
+  // password): niente da memorizzare.
+  if (!token) return decidi();
+  const chiave = `garden-access:${event.id}:${createHash('sha256').update(token).digest('hex')}`;
+  const memo = getCached<boolean>(chiave);
+  if (memo !== null) return memo;
+  const esito = await decidi();
+  setCache(chiave, esito, ACCESSO_TTL_MS);
+  return esito;
+}
+
 export const POST = withErrorHandling(async (request, context) => {
   const { param } = await context.params;
 
@@ -80,7 +146,7 @@ export const POST = withErrorHandling(async (request, context) => {
   const isUuid = UUID_RE.test(param);
   const event = await prisma.event.findFirst({
     where: isUuid ? { OR: [{ id: param }, { slug: param }] } : { slug: param },
-    select: { id: true, status: true },
+    select: PANEL_READ_EVENT_SELECT,
   });
   if (!event) throw new NotFoundError('Event');
 
@@ -94,6 +160,22 @@ export const POST = withErrorHandling(async (request, context) => {
   if (parsed.data.leave) {
     await removeGardenPeer(event.id, parsed.data.userId);
     return NextResponse.json({ peers: [], active: true, left: true });
+  }
+
+  // Senza accesso alla sala: nessuna presenza scritta, e degli altri solo il
+  // numero (posizioni senza nomi).
+  if (!(await haAccessoAllaSala(event, extractModeratorToken(request)))) {
+    const altri = await listGardenPeers(event.id);
+    if (altri === null) return NextResponse.json({ peers: [], active: true, degraded: true });
+    return NextResponse.json({
+      peers: altri.map((p) => ({
+        ...p,
+        userId: identificativoOpaco(event.id, p.userId),
+        displayName: '',
+      })),
+      active: true,
+      anonymous: true,
+    });
   }
 
   const peer: GardenPeer = {

@@ -104,6 +104,9 @@ export class GardenPresenceClient implements PresenceClient {
     private readonly slug: string,
     private readonly world: { w: number; h: number },
     private readonly shared: LobbyLocalState,
+    /** Il token della sala (moderatore, relatore o iscrizione): chi lo porta
+     *  compare nella piazza e vede i nomi. Vuoto per un ospite. */
+    private readonly accessToken: string = '',
   ) {}
 
   connect(profile: PlayerProfile): Promise<void> {
@@ -247,7 +250,10 @@ export class GardenPresenceClient implements PresenceClient {
     try {
       const res = await fetch(`/api/events/${this.slug}/garden/ping`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(this.accessToken ? { Authorization: `Bearer ${this.accessToken}` } : {}),
+        },
         body: JSON.stringify({ ...this.wireBody(), ...(leave ? { leave: true } : {}) }),
         signal: AbortSignal.timeout(PING_TIMEOUT_MS),
       });

@@ -306,11 +306,14 @@ sequenceDiagram
 
     Lobby->>Client: move(x, y, facing), emote(type)
     loop about every 200 ms, one request in flight
-        Client->>Route: userId, displayName, avatarId, x%, y%, facing, emote?
+        Client->>Route: userId, displayName, avatarId, x%, y%, facing, emote?<br/>Authorization: room token, if any
         Route->>Route: per-IP rate limit (in-memory, per pod) and schema check
         Route->>DB: read event id and status
         alt status DRAFT, IDLE or ENDED
             Route-->>Client: peers empty, active false
+        else no access to the room
+            Route->>Hash: HGETALL
+            Route-->>Client: positions without names, anonymous true
         else any other status
             Route->>Hash: HSET userId, EXPIRE 10 s
             Route->>Chan: PUBLISH (no subscriber)
@@ -331,6 +334,7 @@ sequenceDiagram
 - **One loop, one route.** While the square is open, `GardenPresenceClient` (`app/src/lib/lobby/presence-adapter.ts`) sends `POST /api/events/[param]/garden/ping` about every 200 ms. Only one request is in flight at a time, with a 2-second timeout. The response carries the snapshot of everyone in the square. There is no stream: the snapshot in the response is how peers arrive.
 - **What a ping carries.** A random `userId` generated each time the square opens (`self_` plus 8 characters), the display name (at most 80 characters), and the position as a percentage of the world. `avatarId` packs the avatar color and accessory flags into one short string. Emotes ride on the ping when present.
 - **Where it lives.** `app/src/lib/garden/pubsub.ts` writes a Redis hash `garden:<eventId>:pos`, one field per user. It refreshes a 10-second expiry on the whole hash and drops entries older than 10 seconds when reading. Each Redis command is capped at 500 ms. When Redis is not ready or too slow, the route answers `degraded: true`, and the client keeps its current avatars instead of treating the answer as an empty square.
+- **Who appears and who sees names.** The client sends the room token it already holds (moderator, speaker or registration) as `Authorization: Bearer`. The route applies the same rule as the live panels (`app/src/lib/events/panel-read-access.ts`): a valid token, or no token while the room is open to people arriving by link and the event has no password (or its password cookie is present). With access, the person appears in the square and sees the others' names. Without it, nothing is written for them and the answer carries `anonymous: true` and the others' positions with empty names and opaque identifiers (stable, but not the real ones, which would let them send `leave` on someone else's behalf), so they only see how many are there. A token that does not resolve counts as no access. The decision for a token is kept in memory for 5 seconds on each pod, like the moderator check, so the rule does not read the database on every ping and a revoked grant stops counting within seconds.
 - **Status gate.** For `DRAFT`, `IDLE` and `ENDED` the route answers `{ peers: [], active: false }` without writing. So during `IDLE` a visitor walks alone until the wake moves the event to `PROVISIONING`. The route records pings for every other status.
 - **Leaving.** Closing the square, or entering the room (which unmounts it), sends a final ping with `leave: true` via `navigator.sendBeacon`, and the entry is deleted. Otherwise it ages out within 10 seconds.
 - **Emotes and jumps.** A wave or heart is attached to the next pings for 1.5 seconds, at most once every 600 ms. Receivers use the sender's timestamp to avoid replaying it. Others see it about one ping later. Jumps are local animations and are not sent.
@@ -338,9 +342,9 @@ sequenceDiagram
 
 ### Cost, limits and exposure
 
-- **Load.** Each person in the square generates about five requests per second to the app tier. Each request does one PostgreSQL read (the event status) and two Redis round trips. A hundred people in the square means about 500 requests per second. App-tier scaling is covered in [scaling the media plane](scaling.md).
+- **Load.** Each person in the square generates about five requests per second to the app tier. Each request does one PostgreSQL read (the event status) and two Redis round trips; checking a room token adds up to three more reads once every 5 seconds per token and pod. A hundred people in the square means about 500 requests per second. App-tier scaling is covered in [scaling the media plane](scaling.md).
 - **Rate limit.** 600 pings per minute per client IP, counted in memory on each pod (`app/src/lib/rate-limit.ts`). One browser uses about 300. Two browsers behind the same NAT address reach the limit on a pod, and a third starts getting `429` responses: its avatar stops updating and disappears for others after 10 seconds.
-- **No authentication.** The route takes no credential. Anyone who knows an event's slug can read the names and positions of the people in its square while they are there. The name shown is whatever is in the page's name field. An empty name appears as `Ospite`, a literal Italian placeholder.
+- **Exposure.** Knowing an event's slug is not enough to read names: without access to the room, the route returns positions only. Anyone with access sees the names of the people in the square while they are there, which is the same audience as the room itself. The name shown is whatever is in the page's name field. An empty name appears as `Ospite`, a literal Italian placeholder.
 
 ## Accessibility contract
 
@@ -372,7 +376,7 @@ The canvas itself does not read `prefers-reduced-motion`, and a screen reader ge
 ## Known limitations
 
 - `CLASSIC` does not remove the square. See [`CLASSIC` is a starting point, not a switch-off](#classic-is-a-starting-point-not-a-switch-off).
-- Presence is unauthenticated, so names in the square are readable by anyone who knows the slug. It is also rate-limited per IP per pod, which penalizes offices behind one NAT address.
+- Presence is rate-limited per IP per pod, which penalizes offices behind one NAT address.
 - The square shows no one as "in the call": the app adapter reports no call members.
 - The error boundary saves the classic preference, so one failed load keeps that browser in the classic view on later visits.
 - Errors raised later inside the running game loop are not caught by the React error boundary, so they do not trigger the fallback.
