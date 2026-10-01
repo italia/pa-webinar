@@ -3807,9 +3807,9 @@
       "7d": "7 zile",
       "30d": "30 zile",
       "90d": "90 zile",
-      "forever": "Niciodată (până la expirarea evenimentului)"
+      "forever": "Fără ștergere automată"
     },
-    "retentionNote": "Videoclipul va respecta oricum retenția GDPR a evenimentului",
+    "retentionNote": "Un videoclip publicat nu urmează perioada de păstrare a datelor evenimentului: fără o durată, rămâne public până când cineva îl șterge.",
     "delete": "Ștergeți înregistrarea",
     "deleteConfirm": "Sigur doriți? Videoclipul va fi șters definitiv.",
     "notConfigured": "Jibri nu este configurat în infrastructură. Înregistrarea video nu este disponibilă.",

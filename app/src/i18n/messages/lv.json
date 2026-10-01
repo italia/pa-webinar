@@ -3807,9 +3807,9 @@
       "7d": "7 dienas",
       "30d": "30 dienas",
       "90d": "90 dienas",
-      "forever": "Nekad (līdz pasākuma termiņa beigām)"
+      "forever": "Bez automātiskas dzēšanas"
     },
-    "retentionNote": "Video jebkurā gadījumā ievēros pasākuma GDPR saglabāšanas politiku",
+    "retentionNote": "Publicēts video neievēro pasākuma datu glabāšanas termiņu: bez noteikta termiņa tas paliek publisks, līdz kāds to izdzēš.",
     "delete": "Dzēst ierakstu",
     "deleteConfirm": "Vai esat pārliecināts? Video tiks neatgriezeniski dzēsts.",
     "notConfigured": "Jibri nav konfigurēts infrastruktūrā. Video ierakstīšana nav pieejama.",

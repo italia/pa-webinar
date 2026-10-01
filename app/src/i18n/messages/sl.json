@@ -3807,9 +3807,9 @@
       "7d": "7 dni",
       "30d": "30 dni",
       "90d": "90 dni",
-      "forever": "Nikoli (do poteka dogodka)"
+      "forever": "Brez samodejnega brisanja"
     },
-    "retentionNote": "Video bo v vsakem primeru upošteval GDPR hrambo dogodka",
+    "retentionNote": "Objavljeni videoposnetek ne sledi hrambi podatkov dogodka: brez določenega roka ostane javen, dokler ga kdo ne izbriše.",
     "delete": "Izbriši posnetek",
     "deleteConfirm": "Ali ste prepričani? Video bo trajno izbrisan.",
     "notConfigured": "Jibri ni konfiguriran v infrastrukturi. Video snemanje ni na voljo.",

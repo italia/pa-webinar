@@ -304,7 +304,7 @@ What each job deletes is in the
 |---|---|---|
 | Event data: registrations, contributions, chat and attachments, questionnaire answers, feedback, invitations, named grants, call-session logs, uploaded materials | `dataRetentionDays` after the event's end. The event itself stays, as `ARCHIVED` | Wizard **Retention days** (1 to 365). New events start at 30 (`app/src/app/[locale]/admin/events/new/page.tsx`) unless the event template sets **Default data retention (days)**. Instant calls use 7 (`app/src/app/api/events/instant/route.ts`). The `DEFAULT_DATA_RETENTION_DAYS` value in the chart's values is not read by the application |
 | Unpublished composite recording | The event's retention | As above |
-| Published composite recording | `recordingDeleteAfterDays` from publication. **Never (until event expiry)** stores no value, and the video then has no expiry: the event's retention does not delete it | **Retention** on the recording panel of the event, in the administration area |
+| Published composite recording | `recordingDeleteAfterDays` from publication. **No automatic deletion** stores no value, and the video then has no expiry: the event's retention does not delete it | **Retention** on the recording panel of the event, in the administration area |
 | Publications | Created published with no deletion date for the video, and with a 3650-day event retention (`app/src/app/api/admin/publications/route.ts`) | **Retention** on the recording panel of the publication's event |
 | Earlier recordings of the same event | Not deleted by retention: each new recording replaces the one the event points to, and the older ones stay referenced by their call session | Delete them from **Video recordings** or from the event's sessions |
 | Temporary recording | `TEMP_RECORDING_TTL_MS` in `app/src/lib/gdpr/cleanup-selection.ts` | Not configurable |
@@ -453,7 +453,6 @@ The same differences are tracked in [Known gaps](../GDPR.md#known-gaps).
 |---|---|---|---|
 | Waiting room, guests | **Email (optional)**, "Only for post-event follow-up" | The address never leaves the browser | `waiting.emailHelp` |
 | Erasure confirmation | "Registrations, questions, poll votes, feedback, reminders and your entry in the events address book will be deleted." | Feedback and questionnaire answers are unlinked from the registration and kept until the event's retention | `gdpr.erasure.confirmBody` |
-| Recording panel | **Never (until event expiry)** and "The video will still follow the event's GDPR retention" | A published recording is not deleted by the event's retention | `recording.retention.forever`, `recording.retentionNote` |
 | AI pipeline settings | **Artifact retention (days)**: "A positive value keeps them for the given number of days even after the event is closed" | A positive value only adds a deletion date; it never extends retention | `admin.settings.postprod.artifactRetentionDaysHelp` |
 | Site privacy page | The built-in generic text | Describes AI processing and specific models on every installation | `legal.privacy.*` |
 

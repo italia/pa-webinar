@@ -3807,9 +3807,9 @@
       "7d": "7 dagar",
       "30d": "30 dagar",
       "90d": "90 dagar",
-      "forever": "Aldrig (tills evenemanget löper ut)"
+      "forever": "Ingen automatisk radering"
     },
-    "retentionNote": "Videon följer fortfarande evenemangets GDPR-lagringspolicy",
+    "retentionNote": "En publicerad video följer inte lagringstiden för evenemangets data: utan en period förblir den offentlig tills någon raderar den.",
     "delete": "Radera inspelning",
     "deleteConfirm": "Är du säker? Videon raderas permanent.",
     "notConfigured": "Jibri är inte konfigurerat. Videoinspelning är inte tillgänglig.",

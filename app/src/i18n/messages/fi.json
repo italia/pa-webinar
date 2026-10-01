@@ -3807,9 +3807,9 @@
       "7d": "7 päivää",
       "30d": "30 päivää",
       "90d": "90 päivää",
-      "forever": "Ei koskaan (tapahtuman vanhenemiseen asti)"
+      "forever": "Ei automaattista poistoa"
     },
-    "retentionNote": "Video noudattaa silti tapahtuman GDPR-säilytyskäytäntöä",
+    "retentionNote": "Julkaistu video ei noudata tapahtuman tietojen säilytysaikaa: ilman määräaikaa se pysyy julkisena, kunnes joku poistaa sen.",
     "delete": "Poista tallenne",
     "deleteConfirm": "Oletko varma? Video poistetaan pysyvästi.",
     "notConfigured": "Jibri ei ole määritetty. Videotallennus ei ole käytettävissä.",

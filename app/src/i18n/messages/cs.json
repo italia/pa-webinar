@@ -3807,9 +3807,9 @@
       "7d": "7 dní",
       "30d": "30 dní",
       "90d": "90 dní",
-      "forever": "Nikdy (do vypršení události)"
+      "forever": "Bez automatického smazání"
     },
-    "retentionNote": "Video bude i nadále podléhat GDPR retenci události",
+    "retentionNote": "Zveřejněné video se neřídí dobou uchování údajů události: bez stanovené doby zůstane veřejné, dokud ho někdo nesmaže.",
     "delete": "Smazat záznam",
     "deleteConfirm": "Jste si jisti? Video bude trvale smazáno.",
     "notConfigured": "Jibri není nakonfigurován. Videozáznam není k dispozici.",

@@ -3807,9 +3807,9 @@
       "7d": "7 nap",
       "30d": "30 nap",
       "90d": "90 nap",
-      "forever": "Soha (az esemény lejártáig)"
+      "forever": "Nincs automatikus törlés"
     },
-    "retentionNote": "A videóra továbbra is az esemény GDPR megőrzési szabálya vonatkozik",
+    "retentionNote": "A közzétett videóra nem vonatkozik az esemény adatainak megőrzési ideje: időtartam nélkül nyilvános marad, amíg valaki nem törli.",
     "delete": "Felvétel törlése",
     "deleteConfirm": "Biztos benne? A videó véglegesen törlésre kerül.",
     "notConfigured": "Jibri nincs konfigurálva. A videofelvétel nem elérhető.",

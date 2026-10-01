@@ -3807,9 +3807,9 @@
       "7d": "7 dage",
       "30d": "30 dage",
       "90d": "90 dage",
-      "forever": "Aldrig (indtil begivenhed udløber)"
+      "forever": "Ingen automatisk sletning"
     },
-    "retentionNote": "Videoen følger stadig begivenhedens GDPR-opbevaringspolitik",
+    "retentionNote": "En offentliggjort video følger ikke opbevaringen af begivenhedens data: uden en periode forbliver den offentlig, indtil nogen sletter den.",
     "delete": "Slet optagelse",
     "deleteConfirm": "Er du sikker? Videoen slettes permanent.",
     "notConfigured": "Jibri er ikke konfigureret. Videooptagelse er ikke tilgængelig.",

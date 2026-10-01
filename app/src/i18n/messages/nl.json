@@ -3807,9 +3807,9 @@
       "7d": "7 dagen",
       "30d": "30 dagen",
       "90d": "90 dagen",
-      "forever": "Nooit (tot evenement verloopt)"
+      "forever": "Geen automatische verwijdering"
     },
-    "retentionNote": "De video volgt hoe dan ook de GDPR-bewaring van het evenement",
+    "retentionNote": "Een gepubliceerde video volgt de bewaartermijn van de evenementgegevens niet: zonder termijn blijft hij openbaar tot iemand hem verwijdert.",
     "delete": "Opname verwijderen",
     "deleteConfirm": "Weet u het zeker? De video wordt definitief verwijderd.",
     "notConfigured": "Jibri is niet geconfigureerd in de infrastructuur. Video-opname is niet beschikbaar.",

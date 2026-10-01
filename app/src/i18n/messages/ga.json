@@ -3807,9 +3807,9 @@
       "7d": "7 lá",
       "30d": "30 lá",
       "90d": "90 lá",
-      "forever": "Choíche (go dtí dul in éag an imeachta)"
+      "forever": "Gan scriosadh uathoibríoch"
     },
-    "retentionNote": "Leanfaidh an físeán coinneáil GDPR an imeachta fós",
+    "retentionNote": "Ní leanann físeán foilsithe coinneáil sonraí an imeachta: gan tréimhse, fanann sé poiblí go dtí go scriosann duine é.",
     "delete": "Scrios taifeadadh",
     "deleteConfirm": "An bhfuil sibh cinnte? Scriosfar an físeán go buan.",
     "notConfigured": "Níl Jibri cumraithe. Níl taifeadadh físe ar fáil.",

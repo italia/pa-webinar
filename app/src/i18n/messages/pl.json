@@ -3807,9 +3807,9 @@
       "7d": "7 dni",
       "30d": "30 dni",
       "90d": "90 dni",
-      "forever": "Nigdy (do wygaśnięcia wydarzenia)"
+      "forever": "Bez automatycznego usuwania"
     },
-    "retentionNote": "Wideo i tak podlega zasadom przechowywania GDPR wydarzenia",
+    "retentionNote": "Opublikowane wideo nie podlega okresowi przechowywania danych wydarzenia: bez ustalonego okresu pozostaje publiczne, dopóki ktoś go nie usunie.",
     "delete": "Usuń nagranie",
     "deleteConfirm": "Czy na pewno? Wideo zostanie trwale usunięte.",
     "notConfigured": "Jibri nie jest skonfigurowany w infrastrukturze. Nagrywanie wideo nie jest dostępne.",

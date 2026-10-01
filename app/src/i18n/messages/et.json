@@ -3807,9 +3807,9 @@
       "7d": "7 päeva",
       "30d": "30 päeva",
       "90d": "90 päeva",
-      "forever": "Mitte kunagi (kuni ürituse aegumiseni)"
+      "forever": "Automaatset kustutamist pole"
     },
-    "retentionNote": "Video järgib igal juhul ürituse GDPR säilitamispoliitikat",
+    "retentionNote": "Avaldatud video ei järgi ürituse andmete säilitamisaega: ilma tähtajata jääb see avalikuks, kuni keegi selle kustutab.",
     "delete": "Kustuta salvestis",
     "deleteConfirm": "Kas olete kindel? Video kustutatakse jäädavalt.",
     "notConfigured": "Jibri pole infrastruktuuris seadistatud. Videosalvestamine pole saadaval.",

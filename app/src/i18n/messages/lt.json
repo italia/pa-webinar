@@ -3807,9 +3807,9 @@
       "7d": "7 dienos",
       "30d": "30 dienų",
       "90d": "90 dienų",
-      "forever": "Niekada (iki renginio galiojimo pabaigos)"
+      "forever": "Be automatinio ištrynimo"
     },
-    "retentionNote": "Vaizdo įrašas vis tiek bus taikomas renginio GDPR saugojimo politikai",
+    "retentionNote": "Paskelbtam vaizdo įrašui netaikomas renginio duomenų saugojimo laikotarpis: nenustačius laikotarpio, jis lieka viešas, kol kas nors jį ištrins.",
     "delete": "Ištrinti įrašą",
     "deleteConfirm": "Ar esate tikri? Vaizdo įrašas bus ištrintas negrįžtamai.",
     "notConfigured": "Jibri nesukonfigūruotas infrastruktūroje. Vaizdo įrašymas neprieinamas.",

@@ -3807,9 +3807,9 @@
       "7d": "7 ijiem",
       "30d": "30 ġurnata",
       "90d": "90 ġurnata",
-      "forever": "Qatt (sa ma jiskadi l-avveniment)"
+      "forever": "L-ebda tħassir awtomatiku"
     },
-    "retentionNote": "Il-vidjo se jsegwi xorta waħda r-retention GDPR tal-avveniment",
+    "retentionNote": "Vidjo ppubblikat ma jsegwix iż-żamma tad-data tal-avveniment: mingħajr perjodu, jibqa' pubbliku sakemm xi ħadd iħassru.",
     "delete": "Ħassar ir-reġistrazzjoni",
     "deleteConfirm": "Żgur? Il-vidjo se jiġi mħassar definittivament.",
     "notConfigured": "Jibri mhux ikkonfigurat. Ir-reġistrazzjoni bil-vidjo mhijiex disponibbli.",
