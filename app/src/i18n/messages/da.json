@@ -1707,6 +1707,17 @@
         "avatarTitle": "Deltagernes billeder",
         "gravatarEnabled": "Brug Gravatar, når det er muligt",
         "gravatarEnabledHelp": "Deltagere, der har tilmeldt sig med en e-mail, der har en Gravatar, får den vist som billede i mødelokalet; for alle andre bruges de initialer, platformen genererer. Billedet hentes via vores egen server, så deltagernes browser kontakter aldrig gravatar.com — men det gør platformen: det skal fremgå af privatlivspolitikken."
+      },
+      "errors": {
+        "invalid": "Indstillingerne blev ikke gemt: en værdi er ugyldig. Kontroller de ændrede felter, og prøv igen.",
+        "saveFailed": "Indstillingerne blev ikke gemt. Prøv igen om et par sekunder.",
+        "required": "Udfyld »{field}«: feltet er obligatorisk.",
+        "url": "Kontroller »{field}«: angiv en fuldstændig webadresse, for eksempel https://www.example.org.",
+        "email": "Kontroller »{field}«: angiv en gyldig e-mailadresse, for eksempel info@example.org.",
+        "tooLong": "Kontroller »{field}«: højst {max} tegn.",
+        "min": "Kontroller »{field}«: minimumsværdien er {min}.",
+        "max": "Kontroller »{field}«: maksimumværdien er {max}.",
+        "field": "Kontroller »{field}«: værdien er ugyldig."
       }
     },
     "analytics": {

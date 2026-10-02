@@ -27,6 +27,7 @@ import { useCallback, useId, useMemo, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
 import { useUploadsAvailable } from '@/components/ui/uploads-availability';
+import { withScheme } from '@/lib/utils/with-scheme';
 import { MATERIAL_FILE_MIME_TYPES } from '@/lib/validation/materials';
 import type { AssetUploadResponse } from '@/lib/validation/schemas';
 
@@ -253,7 +254,8 @@ export default function FileOrUrlInput({
   };
 
   const commitUrl = (raw: string) => {
-    const trimmed = raw.trim();
+    // Senza schema («www.comune.it/logo.png») vale come https://, come sul server.
+    const trimmed = String(withScheme(raw));
     if (!trimmed) {
       setUrlError(null);
       onChange(null);
@@ -270,7 +272,7 @@ export default function FileOrUrlInput({
   const onUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const raw = e.target.value;
     setUrlDraft(raw);
-    const trimmed = raw.trim();
+    const trimmed = String(withScheme(raw));
     if (!trimmed) {
       setUrlError(null);
       onChange(null);

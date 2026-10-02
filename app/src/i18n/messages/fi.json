@@ -1707,6 +1707,17 @@
         "avatarTitle": "Osallistujien kuvat",
         "gravatarEnabled": "Käytä Gravataria, kun se on saatavilla",
         "gravatarEnabledHelp": "Osallistujat, jotka ilmoittautuivat Gravatariin liitetyllä sähköpostiosoitteella, näkyvät huoneessa kuvallaan; muilla säilyvät alustan luomat nimikirjaimet. Kuva haetaan oman palvelimemme kautta, joten osallistujien selaimet eivät ota yhteyttä gravatar.comiin — mutta alusta ottaa: tämä on mainittava tietosuojaselosteessa."
+      },
+      "errors": {
+        "invalid": "Asetuksia ei tallennettu: arvo ei kelpaa. Tarkista muuttamasi kentät ja yritä uudelleen.",
+        "saveFailed": "Asetuksia ei tallennettu. Yritä uudelleen muutaman sekunnin kuluttua.",
+        "required": "Täytä ”{field}”: kenttä on pakollinen.",
+        "url": "Tarkista ”{field}”: kirjoita täydellinen verkko-osoite, esimerkiksi https://www.example.org.",
+        "email": "Tarkista ”{field}”: kirjoita kelvollinen sähköpostiosoite, esimerkiksi info@example.org.",
+        "tooLong": "Tarkista ”{field}”: enintään {max} merkkiä.",
+        "min": "Tarkista ”{field}”: pienin arvo on {min}.",
+        "max": "Tarkista ”{field}”: suurin arvo on {max}.",
+        "field": "Tarkista ”{field}”: arvo ei kelpaa."
       }
     },
     "analytics": {

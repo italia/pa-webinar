@@ -1707,6 +1707,17 @@
         "avatarTitle": "Osalejate pildid",
         "gravatarEnabled": "Kasuta Gravatari, kui see on olemas",
         "gravatarEnabledHelp": "Osalejad, kes registreerusid e-posti aadressiga, millel on Gravatar, näevad seda ruumis pildina; kõigil teistel jäävad platvormi loodud initsiaalid. Pilt tuuakse läbi meie enda serveri, seega osalejate brauserid ei võta ühendust saidiga gravatar.com – küll aga teeb seda platvorm: märgi see privaatsusteatesse."
+      },
+      "errors": {
+        "invalid": "Seadeid ei salvestatud: üks väärtus on vigane. Kontrollige muudetud välju ja proovige uuesti.",
+        "saveFailed": "Seadeid ei salvestatud. Proovige mõne sekundi pärast uuesti.",
+        "required": "Täitke väli „{field}“: see on kohustuslik.",
+        "url": "Kontrollige välja „{field}“: sisestage täielik veebiaadress, näiteks https://www.example.org.",
+        "email": "Kontrollige välja „{field}“: sisestage kehtiv e-posti aadress, näiteks info@example.org.",
+        "tooLong": "Kontrollige välja „{field}“: kuni {max} tähemärki.",
+        "min": "Kontrollige välja „{field}“: väikseim väärtus on {min}.",
+        "max": "Kontrollige välja „{field}“: suurim väärtus on {max}.",
+        "field": "Kontrollige välja „{field}“: väärtus on vigane."
       }
     },
     "analytics": {

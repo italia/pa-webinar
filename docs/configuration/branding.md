@@ -409,14 +409,6 @@ remain, are described in
   URL** does not replace it there.
 - **Some footer links never display.** Links in the **Main** section are saved, but only **Legal**
   links are rendered.
-- **Saving after editing footer links fails.** The **Footer** tab keeps the list as a JSON string,
-  and the settings API expects an array. So **Save** returns a validation error, and none of the other
-  changes on the form are saved either. Until the editor is fixed, send `footerLinks` as an array to
-  `PUT /api/admin/settings`.
-- **Clearing the last custom legal text fails.** Emptying the only filled language of the privacy
-  policy or accessibility statement makes **Save** return a validation error, and no other change on
-  the form is saved. To go back to the built-in template, send `privacyPolicy` (or `accessibility`)
-  as `{}` to `PUT /api/admin/settings`.
 - **Several identity fields are single-language:** **Application name**, **Application description**,
   **SEO title**, **SEO description**, footer link titles and the custom home HTML. To get
   per-language SEO text, leave **SEO title** and **SEO description** empty (**SEO description** is

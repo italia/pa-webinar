@@ -1707,6 +1707,17 @@
         "avatarTitle": "Afbeeldingen van de deelnemers",
         "gravatarEnabled": "Gravatar gebruiken wanneer beschikbaar",
         "gravatarEnabledHelp": "Wie zich heeft geregistreerd met een e-mailadres dat een Gravatar heeft, ziet die als afbeelding in de zaal; voor alle anderen blijven de initialen die het platform genereert. De afbeelding loopt via onze server, dus de browser van de deelnemers neemt geen contact op met gravatar.com — het platform wel: dat moet in de privacyverklaring worden vermeld."
+      },
+      "errors": {
+        "invalid": "De instellingen zijn niet opgeslagen: een waarde is ongeldig. Controleer de gewijzigde velden en probeer het opnieuw.",
+        "saveFailed": "De instellingen zijn niet opgeslagen. Probeer het over een paar seconden opnieuw.",
+        "required": "Vul ‘{field}’ in: dit veld is verplicht.",
+        "url": "Controleer ‘{field}’: voer een volledig webadres in, bijvoorbeeld https://www.example.org.",
+        "email": "Controleer ‘{field}’: voer een geldig e-mailadres in, bijvoorbeeld info@example.org.",
+        "tooLong": "Controleer ‘{field}’: maximaal {max} tekens.",
+        "min": "Controleer ‘{field}’: de minimumwaarde is {min}.",
+        "max": "Controleer ‘{field}’: de maximumwaarde is {max}.",
+        "field": "Controleer ‘{field}’: de waarde is ongeldig."
       }
     },
     "analytics": {

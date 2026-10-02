@@ -1707,6 +1707,17 @@
         "avatarTitle": "Imaginile participanților",
         "gravatarEnabled": "Folosește Gravatar când este disponibil",
         "gravatarEnabledHelp": "Cei care s-au înscris cu o adresă de e-mail asociată unui Gravatar îl vor vedea ca imagine în sală; pentru toți ceilalți rămân inițialele generate de platformă. Imaginea trece prin serverul nostru, deci browserul participanților nu contactează gravatar.com — dar platforma o face: acest lucru trebuie declarat în nota de informare privind confidențialitatea."
+      },
+      "errors": {
+        "invalid": "Setările nu au fost salvate: o valoare nu este validă. Verificați câmpurile modificate și încercați din nou.",
+        "saveFailed": "Setările nu au fost salvate. Încercați din nou peste câteva secunde.",
+        "required": "Completați „{field}”: câmpul este obligatoriu.",
+        "url": "Verificați „{field}”: introduceți o adresă web completă, de exemplu https://www.example.org.",
+        "email": "Verificați „{field}”: introduceți o adresă de e-mail validă, de exemplu info@example.org.",
+        "tooLong": "Verificați „{field}”: cel mult {max} caractere.",
+        "min": "Verificați „{field}”: valoarea minimă este {min}.",
+        "max": "Verificați „{field}”: valoarea maximă este {max}.",
+        "field": "Verificați „{field}”: valoarea nu este validă."
       }
     },
     "analytics": {

@@ -44,9 +44,20 @@ export const PUT = withErrorHandling(async (request: NextRequest) => {
   const { id: _id, updatedAt: _updatedAt, ...cleanBody } = body as Record<string, unknown>;
   const parsed = updateSettingsSchema.safeParse(cleanBody);
   if (!parsed.success) {
+    // Oltre al percorso, il tipo di controllo fallito e i suoi limiti: il
+    // pannello porta al campo e spiega che cosa scrivere
+    // (components/admin/settings-field-error).
     throw new ValidationError(
       'Validation failed',
-      parsed.error.issues.map((i) => ({ path: i.path, message: i.message })),
+      parsed.error.issues.map((i) => ({
+        path: i.path,
+        message: i.message,
+        code: i.code,
+        ...('validation' in i && typeof i.validation === 'string' && { validation: i.validation }),
+        ...('type' in i && typeof i.type === 'string' && { type: i.type }),
+        ...('minimum' in i && { minimum: Number(i.minimum) }),
+        ...('maximum' in i && { maximum: Number(i.maximum) }),
+      })),
     );
   }
 

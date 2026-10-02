@@ -1707,6 +1707,17 @@
         "avatarTitle": "Obrázky účastníků",
         "gravatarEnabled": "Použít Gravatar, když je k dispozici",
         "gravatarEnabledHelp": "Účastníci, kteří se zaregistrovali e-mailem s Gravatarem, jej uvidí jako obrázek v místnosti; ostatním zůstanou iniciály generované platformou. Obrázek se načítá přes náš server, takže prohlížeče účastníků gravatar.com nikdy nekontaktují — platforma ale ano: uveďte to v zásadách ochrany osobních údajů."
+      },
+      "errors": {
+        "invalid": "Nastavení nebylo uloženo: jedna hodnota není platná. Zkontrolujte změněná pole a zkuste to znovu.",
+        "saveFailed": "Nastavení nebylo uloženo. Zkuste to znovu za několik sekund.",
+        "required": "Vyplňte „{field}“: pole je povinné.",
+        "url": "Zkontrolujte „{field}“: zadejte úplnou webovou adresu, například https://www.example.org.",
+        "email": "Zkontrolujte „{field}“: zadejte platnou e-mailovou adresu, například info@example.org.",
+        "tooLong": "Zkontrolujte „{field}“: nejvýše {max} znaků.",
+        "min": "Zkontrolujte „{field}“: minimální hodnota je {min}.",
+        "max": "Zkontrolujte „{field}“: maximální hodnota je {max}.",
+        "field": "Zkontrolujte „{field}“: hodnota není platná."
       }
     },
     "analytics": {

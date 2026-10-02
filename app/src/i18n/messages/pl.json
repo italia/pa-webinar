@@ -1707,6 +1707,17 @@
         "avatarTitle": "Zdjęcia uczestników",
         "gravatarEnabled": "Używaj Gravatara, gdy jest dostępny",
         "gravatarEnabledHelp": "Osoby, które zarejestrowały się adresem e-mail powiązanym z Gravatarem, zobaczą go jako zdjęcie w sali; pozostali zachowają inicjały generowane przez platformę. Obraz jest pobierany przez nasz serwer, więc przeglądarki uczestników nie łączą się z gravatar.com — ale platforma tak: należy to zadeklarować w informacji o ochronie prywatności."
+      },
+      "errors": {
+        "invalid": "Ustawienia nie zostały zapisane: jedna z wartości jest nieprawidłowa. Sprawdź zmienione pola i spróbuj ponownie.",
+        "saveFailed": "Ustawienia nie zostały zapisane. Spróbuj ponownie za kilka sekund.",
+        "required": "Wypełnij „{field}”: pole jest obowiązkowe.",
+        "url": "Sprawdź „{field}”: wpisz pełny adres strony, na przykład https://www.example.org.",
+        "email": "Sprawdź „{field}”: wpisz prawidłowy adres e-mail, na przykład info@example.org.",
+        "tooLong": "Sprawdź „{field}”: maksymalnie {max} znaków.",
+        "min": "Sprawdź „{field}”: wartość minimalna to {min}.",
+        "max": "Sprawdź „{field}”: wartość maksymalna to {max}.",
+        "field": "Sprawdź „{field}”: wartość jest nieprawidłowa."
       }
     },
     "analytics": {

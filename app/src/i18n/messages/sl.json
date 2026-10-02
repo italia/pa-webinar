@@ -1707,6 +1707,17 @@
         "avatarTitle": "Slike udeležencev",
         "gravatarEnabled": "Uporabi Gravatar, kadar je na voljo",
         "gravatarEnabledHelp": "Kdor se je prijavil z e-naslovom, ki ima Gravatar, ga bo v sobi videl kot sliko; pri vseh drugih ostanejo začetnice, ki jih ustvari platforma. Slika gre prek našega strežnika, zato brskalniki udeležencev ne stopijo v stik z gravatar.com — platforma pa: to navedite v obvestilu o zasebnosti."
+      },
+      "errors": {
+        "invalid": "Nastavitve niso bile shranjene: ena od vrednosti ni veljavna. Preverite spremenjena polja in poskusite znova.",
+        "saveFailed": "Nastavitve niso bile shranjene. Poskusite znova čez nekaj sekund.",
+        "required": "Izpolnite »{field}«: polje je obvezno.",
+        "url": "Preverite »{field}«: vnesite popoln spletni naslov, na primer https://www.example.org.",
+        "email": "Preverite »{field}«: vnesite veljaven e-poštni naslov, na primer info@example.org.",
+        "tooLong": "Preverite »{field}«: največ {max} znakov.",
+        "min": "Preverite »{field}«: najmanjša vrednost je {min}.",
+        "max": "Preverite »{field}«: največja vrednost je {max}.",
+        "field": "Preverite »{field}«: vrednost ni veljavna."
       }
     },
     "analytics": {

@@ -1707,6 +1707,17 @@
         "avatarTitle": "Dalyvių nuotraukos",
         "gravatarEnabled": "Naudoti Gravatar, kai jis yra",
         "gravatarEnabledHelp": "Užsiregistravusieji el. pašto adresu, turinčiu Gravatar, matys jį kaip nuotrauką salėje; visiems kitiems lieka platformos sugeneruoti inicialai. Paveikslėlis parsiunčiamas per mūsų serverį, todėl dalyvių naršyklės su gravatar.com nesusisiekia – bet platforma susisiekia: tai reikia nurodyti privatumo pranešime."
+      },
+      "errors": {
+        "invalid": "Nustatymai neišsaugoti: viena reikšmė netinkama. Patikrinkite pakeistus laukus ir bandykite dar kartą.",
+        "saveFailed": "Nustatymai neišsaugoti. Bandykite dar kartą po kelių sekundžių.",
+        "required": "Užpildykite „{field}“: laukas privalomas.",
+        "url": "Patikrinkite „{field}“: įveskite visą interneto adresą, pavyzdžiui, https://www.example.org.",
+        "email": "Patikrinkite „{field}“: įveskite galiojantį el. pašto adresą, pavyzdžiui, info@example.org.",
+        "tooLong": "Patikrinkite „{field}“: ne daugiau kaip {max} simbolių.",
+        "min": "Patikrinkite „{field}“: mažiausia reikšmė yra {min}.",
+        "max": "Patikrinkite „{field}“: didžiausia reikšmė yra {max}.",
+        "field": "Patikrinkite „{field}“: reikšmė netinkama."
       }
     },
     "analytics": {

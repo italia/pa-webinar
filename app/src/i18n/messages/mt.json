@@ -1707,6 +1707,17 @@
         "avatarTitle": "Stampi tal-parteċipanti",
         "gravatarEnabled": "Uża Gravatar meta jkun disponibbli",
         "gravatarEnabledHelp": "Min irreġistra b'email li għandha Gravatar jarah bħala stampa fil-kamra; għall-oħrajn jibqgħu l-inizjali ġġenerati mill-pjattaforma. L-istampa tgħaddi mis-server tagħna, għalhekk il-browser tal-parteċipanti qatt ma jikkuntattja lil gravatar.com — imma l-pjattaforma iva: dan irid jiġi ddikjarat fl-avviż tal-privatezza."
+      },
+      "errors": {
+        "invalid": "L-issettjar ma ġewx issejvjati: valur mhux validu. Iċċekkja l-oqsma li biddilt u erġa' pprova.",
+        "saveFailed": "L-issettjar ma ġewx issejvjati. Erġa' pprova fi ftit sekondi.",
+        "required": "Imla “{field}”: il-qasam huwa obbligatorju.",
+        "url": "Iċċekkja “{field}”: daħħal indirizz tal-web sħiħ, pereżempju https://www.example.org.",
+        "email": "Iċċekkja “{field}”: daħħal indirizz tal-email validu, pereżempju info@example.org.",
+        "tooLong": "Iċċekkja “{field}”: massimu ta' {max} karattru.",
+        "min": "Iċċekkja “{field}”: il-valur minimu huwa {min}.",
+        "max": "Iċċekkja “{field}”: il-valur massimu huwa {max}.",
+        "field": "Iċċekkja “{field}”: il-valur mhuwiex validu."
       }
     },
     "analytics": {

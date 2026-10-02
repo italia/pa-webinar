@@ -10,21 +10,42 @@
 import { z } from 'zod';
 import { HomePageMode } from '@prisma/client';
 
+import { withScheme } from '@/lib/utils/with-scheme';
+
+// Gli indirizzi senza schema prendono https:// (lib/utils/with-scheme).
+const urlField = () => z.preprocess(withScheme, z.string().url());
+
+/**
+ * I link del pie' di pagina arrivano come elenco. Il pannello e il seed li
+ * scrivevano come testo JSON, e la GET restituisce cio' che c'e' nel
+ * database: un testo JSON valido si legge come elenco, cosi' rimandare le
+ * impostazioni appena lette torna a funzionare. Un testo non JSON resta un
+ * testo, e lo schema lo rifiuta con il campo nel percorso.
+ */
+function jsonText(v: unknown): unknown {
+  if (typeof v !== 'string') return v;
+  try {
+    return JSON.parse(v);
+  } catch {
+    return v;
+  }
+}
+
 export const updateSettingsSchema = z.object({
   siteName: z.string().min(1).max(200).optional(),
   siteDescription: z.string().max(2000).optional(),
   organizationName: z.string().max(200).optional(),
   organizationNameShort: z.string().max(100).optional(),
-  organizationUrl: z.string().url().or(z.literal('')).optional(),
+  organizationUrl: z.preprocess(withScheme, z.string().url().or(z.literal(''))).optional(),
   parentOrganization: z.string().max(200).optional(),
-  parentOrganizationUrl: z.string().url().or(z.literal('')).optional(),
+  parentOrganizationUrl: z.preprocess(withScheme, z.string().url().or(z.literal(''))).optional(),
   siteTagline: z.record(z.string(), z.string().max(200)).optional(),
-  logoUrl: z.string().url().nullish(),
-  faviconUrl: z.string().url().nullish(),
+  logoUrl: urlField().nullish(),
+  faviconUrl: urlField().nullish(),
   primaryColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/).optional(),
   seoTitle: z.string().max(200).optional(),
   seoDescription: z.string().max(2000).optional(),
-  seoImage: z.string().url().nullish(),
+  seoImage: urlField().nullish(),
   // Derivato dall'enum del modello, non riscritto a mano: aggiungere un
   // impianto di home allo schema dati e dimenticarlo qui significa
   // un'opzione che il pannello mostra e il salvataggio rifiuta — e con lo
@@ -34,11 +55,13 @@ export const updateSettingsSchema = z.object({
   homeShowProject: z.boolean().optional(),
   waitingRoomEngine: z.enum(['GARDEN', 'GAME', 'CLASSIC']).optional(),
   customHomeHtml: z.string().max(50000).nullish(),
-  footerLinks: z.array(z.object({
+  footerLinks: z.preprocess(jsonText, z.array(z.object({
     title: z.string().max(100),
-    url: z.string().max(500),
+    // Un percorso del sito («/privacy») resta tale; un indirizzo esterno
+    // scritto senza schema prende https://.
+    url: z.preprocess(withScheme, z.string().max(500)),
     section: z.enum(['main', 'legal']).optional(),
-  })).max(20).optional(),
+  })).max(20)).optional(),
   privacyPolicy: z.record(z.string(), z.string().max(100000)).optional(),
   accessibility: z.record(z.string(), z.string().max(100000)).optional(),
   defaultLocale: z.string().min(2).max(5).optional(),
@@ -48,7 +71,7 @@ export const updateSettingsSchema = z.object({
   publicRegistrationEnabled: z.boolean().optional(),
   calendarPublic: z.boolean().optional(),
   parseTitleKicker: z.boolean().optional(),
-  jitsiWatermarkUrl: z.string().url().nullish(),
+  jitsiWatermarkUrl: urlField().nullish(),
   jitsiWatermarkEnabled: z.boolean().optional(),
   jitsiWatermarkOpacity: z.number().min(0).max(1).optional(),
   jitsiWatermarkPosition: z.enum(['top-left', 'top-right', 'bottom-left', 'bottom-right']).optional(),
@@ -59,7 +82,7 @@ export const updateSettingsSchema = z.object({
   ogShowDate: z.boolean().optional(),
   ogShowSpeakers: z.boolean().optional(),
   ogShowOrganization: z.boolean().optional(),
-  githubUrl: z.string().url().nullish(),
+  githubUrl: urlField().nullish(),
   supportEmail: z.string().email().nullish(),
   // Nome mittente mostrato in posta; stringa vuota = torna al default.
   gravatarEnabled: z.boolean().optional(),

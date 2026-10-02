@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { HomePageMode, VideoQuality, WaitingRoomEngine } from '@prisma/client';
+import { HomePageMode, Prisma, VideoQuality, WaitingRoomEngine } from '@prisma/client';
 
 import { updateSettingsSchema } from './site-settings';
 
@@ -62,5 +62,65 @@ describe('schema delle impostazioni', () => {
       ogShowOrganization: false,
     });
     expect(esito.success).toBe(true);
+  });
+});
+
+describe('salvataggio di cio\' che si e\' appena letto', () => {
+  it('ogni colonna delle impostazioni e\' accettata dallo schema o tolta dalla rotta', () => {
+    // La GET restituisce la riga intera e il pannello la rimanda: una colonna
+    // nuova dimenticata qui fa rifiutare ogni salvataggio (schema stretto).
+    const tolte = new Set(['id', 'updatedAt']);
+    const accettate = new Set(Object.keys(updateSettingsSchema.shape));
+    const mancanti = Object.values(Prisma.SiteSettingScalarFieldEnum).filter(
+      (c) => !tolte.has(c) && !accettate.has(c),
+    );
+    expect(mancanti).toEqual([]);
+  });
+
+  it('i link del pie\' di pagina salvati come testo JSON si leggono come elenco', () => {
+    const r = updateSettingsSchema.safeParse({
+      footerLinks: JSON.stringify([{ title: 'Privacy', url: '/privacy', section: 'legal' }]),
+    });
+    expect(r.success && r.data.footerLinks).toEqual([{ title: 'Privacy', url: '/privacy', section: 'legal' }]);
+  });
+
+  it('un testo che non e\' JSON e\' rifiutato con il campo nel percorso', () => {
+    const r = updateSettingsSchema.safeParse({ footerLinks: '{non json' });
+    expect(r.success).toBe(false);
+    expect(r.success ? [] : r.error.issues[0]!.path).toEqual(['footerLinks']);
+  });
+});
+
+describe('indirizzi senza schema', () => {
+  it('il sito dell\'ente scritto senza schema si salva con https://', () => {
+    const r = updateSettingsSchema.safeParse({ organizationUrl: 'www.comune-esempio.it', githubUrl: 'github.com/ente' });
+    expect(r.success && r.data).toMatchObject({
+      organizationUrl: 'https://www.comune-esempio.it',
+      githubUrl: 'https://github.com/ente',
+    });
+  });
+
+  it('nei link del pie\' di pagina un percorso resta, un indirizzo esterno prende https://', () => {
+    const r = updateSettingsSchema.safeParse({
+      footerLinks: [
+        { title: 'Privacy', url: '/privacy' },
+        { title: 'Trasparenza', url: 'www.comune.it/trasparenza' },
+      ],
+    });
+    expect(r.success && r.data.footerLinks?.map((l) => l.url)).toEqual([
+      '/privacy',
+      'https://www.comune.it/trasparenza',
+    ]);
+  });
+
+  it('un indirizzo vuoto per il sito dell\'ente resta vuoto', () => {
+    const r = updateSettingsSchema.safeParse({ organizationUrl: '' });
+    expect(r.success && r.data.organizationUrl).toBe('');
+  });
+});
+
+describe('testi legali', () => {
+  it('svuotare l\'ultima lingua manda {} e torna al testo predefinito', () => {
+    expect(updateSettingsSchema.safeParse({ privacyPolicy: {}, accessibility: {} }).success).toBe(true);
   });
 });

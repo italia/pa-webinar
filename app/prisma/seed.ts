@@ -121,11 +121,13 @@ async function main() {
       guestAccessEnabled: true,
       publicRegistrationEnabled: true,
       calendarPublic: true,
-      footerLinks: JSON.stringify([
+      // Un elenco, non un testo JSON: la colonna e' JSON, e le impostazioni
+      // lette tornano indietro cosi' come sono quando si salva dal pannello.
+      footerLinks: [
         { title: 'Privacy', url: '/privacy', section: 'legal' },
         { title: 'Accessibilità', url: '/accessibility', section: 'legal' },
         { title: 'Note legali', url: '/legal-notice', section: 'legal' },
-      ]),
+      ],
     },
   });
   console.log('Seeded site settings.');

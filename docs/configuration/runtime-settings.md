@@ -147,23 +147,10 @@ await fetch('/api/admin/settings', {
 });
 ```
 
-The same pattern writes `footerLinks` as the array the schema expects, which repairs the
-[footer-links limitation](#known-limitations). For example, with your own titles and paths:
-
-```js
-await fetch('/api/admin/settings', {
-  method: 'PUT',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    footerLinks: [
-      { title: 'Privacy', url: '/privacy', section: 'legal' },
-      { title: 'Accessibility', url: '/accessibility', section: 'legal' },
-    ],
-  }),
-});
-```
-
-A `422` response lists the fields that failed validation. The change is audited like a save from the
+A `422` response lists the fields that failed validation, each with its path, the check that failed
+(`code`, plus `validation`, `type`, `minimum` or `maximum` when they apply). `footerLinks` is an
+array; a JSON string holding an array, as older installations stored it, is accepted and saved as an
+array. Web addresses without a scheme get `https://`. The change is audited like a save from the
 panel.
 
 ## Where each setting is edited
@@ -456,12 +443,6 @@ How each value resolves:
 ## Known limitations
 
 - **`jibriCpuCoresPerPod` has no effect.** It is shown in **Infra sizing** but nothing reads it.
-- **Footer links break the save.** The **Footer** tab sends the links in a form that the settings API
-  rejects, so a save that includes edited footer links fails as a whole (see
-  [branding known limitations](branding.md#known-limitations)). The Docker Compose seed stores the
-  links in the same rejected form, so on a seeded installation every save of **Site settings** fails
-  until `footerLinks` is written as an array through the API, as shown in
-  [writing a field the panel does not show](#writing-a-field-the-panel-does-not-show).
 - **Some help texts in the panel are out of date.** The help for **Empty-room minutes before
   definitive close** gives a default of 15 (the real default is `-1`, off). **Pre-scale lead time
   (minutes)** recommends 10 (the default is 15). **Artifact retention (days)** suggests that a positive

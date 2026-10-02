@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import {
   Alert,
@@ -23,7 +23,9 @@ import { localeNames, type Locale } from '@/i18n/config';
 import FileOrUrlInput from '@/components/ui/file-or-url-input';
 import { videoQualityMaxHeight } from '@/lib/jitsi/config';
 
-type Tab = 'branding' | 'header' | 'seo' | 'homepage' | 'pages' | 'footer' | 'features' | 'scaling' | 'postprod';
+import { settingsFieldError, type SettingsFieldError } from './settings-field-error';
+
+type Tab = SettingsFieldError['tab'];
 
 const COMMON_TIMEZONES = [
   'Europe/Rome', 'Europe/London', 'Europe/Paris', 'Europe/Berlin',
@@ -55,12 +57,19 @@ export default function SiteSettingsForm({
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState('');
+  // Il campo da correggere dopo un salvataggio rifiutato, e la sua etichetta
+  // letta dal modulo: il messaggio dice quale campo e che cosa scrivere.
+  const [fieldError, setFieldError] = useState<SettingsFieldError | null>(null);
+  const [fieldLabel, setFieldLabel] = useState('');
   const [settings, setSettings] = useState<SiteSetting>(initialSettings);
 
   const updateField = useCallback(
     <K extends keyof SiteSetting>(key: K, value: SiteSetting[K]) => {
       setSettings((prev) => ({ ...prev, [key]: value }));
       setSaved(false);
+      // Toccare il campo segnalato toglie l'errore: il prossimo salvataggio
+      // dira' se va bene.
+      setFieldError((cur) => (cur && cur.field === key ? null : cur));
     },
     [],
   );
@@ -68,6 +77,8 @@ export default function SiteSettingsForm({
   const handleSave = useCallback(async () => {
     setSaving(true);
     setError('');
+    setFieldError(null);
+    setFieldLabel('');
     setSaved(false);
     try {
       const res = await fetch('/api/admin/settings', {
@@ -76,19 +87,84 @@ export default function SiteSettingsForm({
         body: JSON.stringify(settings),
       });
       if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error ?? 'Save failed');
+        const data = (await res.json().catch(() => ({}))) as { details?: unknown };
+        const campo = res.status === 422 ? settingsFieldError(data.details) : null;
+        if (campo) {
+          setActiveTab(campo.tab);
+          setFieldError(campo);
+        } else {
+          setError(res.status === 422 ? t('errors.invalid') : t('errors.saveFailed'));
+        }
+        return;
       }
       const updated = await res.json();
       setSettings(updated);
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Save failed');
+    } catch {
+      setError(t('errors.saveFailed'));
     } finally {
       setSaving(false);
     }
-  }, [settings]);
+  }, [settings, t]);
+
+  // Portato nella sua scheda, il campo prende il fuoco ed e' segnato come non
+  // valido, collegato al messaggio. I campi sono resi dalle schede, una
+  // cinquantina: li si cerca nel documento dopo che la scheda si e' disegnata,
+  // invece di far passare l'errore per ognuno. Il fuoco si sposta una volta
+  // per errore, non a ogni ritorno sulla scheda.
+  const portatoRef = useRef<SettingsFieldError | null>(null);
+  useEffect(() => {
+    if (!fieldError || activeTab !== fieldError.tab) return;
+    const id = fieldError.inputId;
+    const el =
+      document.getElementById(id) ??
+      document.querySelector<HTMLElement>(`[id^="${id}-url-"]`) ??
+      document.querySelector<HTMLElement>(`[data-testid="${id}"] input`);
+    if (!el) {
+      // Campo non presente nel modulo: resta il messaggio generico.
+      setFieldError(null);
+      setError(t('errors.invalid'));
+      return;
+    }
+    const prima = el.getAttribute('aria-describedby');
+    const primaInvalid = el.getAttribute('aria-invalid');
+    // La classe puo' averla gia' il componente (il proprio errore): in quel
+    // caso non e' nostra da togliere.
+    const classeNostra = !el.classList.contains('is-invalid');
+    el.setAttribute('aria-invalid', 'true');
+    el.setAttribute('aria-describedby', [prima, 'settings-save-error'].filter(Boolean).join(' '));
+    el.classList.add('is-invalid');
+    const etichetta = document.querySelector(`label[for="${el.id}"]`)?.textContent?.trim() || id;
+    setFieldLabel(fieldError.locale ? `${etichetta} (${fieldError.locale.toUpperCase()})` : etichetta);
+    if (portatoRef.current !== fieldError) {
+      portatoRef.current = fieldError;
+      el.focus();
+    }
+    return () => {
+      if (primaInvalid === null) el.removeAttribute('aria-invalid');
+      else el.setAttribute('aria-invalid', primaInvalid);
+      if (prima) el.setAttribute('aria-describedby', prima);
+      else el.removeAttribute('aria-describedby');
+      if (classeNostra) el.classList.remove('is-invalid');
+    };
+  }, [fieldError, activeTab, t]);
+
+  const messaggioCampo = fieldError
+    ? fieldError.problem === 'required'
+      ? t('errors.required', { field: fieldLabel })
+      : fieldError.problem === 'url'
+      ? t('errors.url', { field: fieldLabel })
+      : fieldError.problem === 'email'
+        ? t('errors.email', { field: fieldLabel })
+        : fieldError.problem === 'tooLong' && fieldError.limit !== undefined
+          ? t('errors.tooLong', { field: fieldLabel, max: fieldError.limit })
+          : fieldError.problem === 'min' && fieldError.limit !== undefined
+            ? t('errors.min', { field: fieldLabel, min: fieldError.limit })
+            : fieldError.problem === 'max' && fieldError.limit !== undefined
+              ? t('errors.max', { field: fieldLabel, max: fieldError.limit })
+              : t('errors.field', { field: fieldLabel })
+    : '';
 
   const tabs: { id: Tab; label: string; icon: string }[] = [
     { id: 'branding', label: t('tabs.branding'), icon: 'it-designers-italia' },
@@ -137,7 +213,11 @@ export default function SiteSettingsForm({
             <BrandingTab settings={settings} updateField={updateField} />
           )}
           {activeTab === 'header' && (
-            <HeaderTab settings={settings} updateField={updateField} />
+            <HeaderTab
+              settings={settings}
+              updateField={updateField}
+              taglineLocale={fieldError?.field === 'siteTagline' ? fieldError.locale : undefined}
+            />
           )}
           {activeTab === 'seo' && (
             <SeoTab settings={settings} updateField={updateField} />
@@ -184,8 +264,13 @@ export default function SiteSettingsForm({
           </Alert>
         )}
         {error && (
-          <Alert color="danger" className="mb-0">
+          <Alert color="danger" className="mb-0" role="alert">
             {error}
+          </Alert>
+        )}
+        {fieldError && fieldLabel && (
+          <Alert color="danger" className="mb-0" id="settings-save-error" role="alert">
+            {messaggioCampo}
           </Alert>
         )}
       </div>
@@ -699,7 +784,9 @@ function PagesTab({ settings, updateField }: TabProps) {
   ) => {
     const updated = { ...current, [locale]: value };
     if (!value) delete updated[locale];
-    updateField(field, (Object.keys(updated).length > 0 ? updated : null) as SiteSetting[typeof field]);
+    // Nessuna lingua compilata = `{}`, che torna al testo predefinito: `null`
+    // lo schema lo rifiuta, e con lui l'intero salvataggio.
+    updateField(field, updated as SiteSetting[typeof field]);
   };
 
   return (
@@ -824,7 +911,8 @@ function FooterTab({ settings, updateField }: TabProps) {
   }
 
   const updateLinks = (newLinks: FooterLink[]) => {
-    updateField('footerLinks', JSON.stringify(newLinks) as unknown as SiteSetting['footerLinks']);
+    // Un elenco: la colonna e' JSON, e un testo JSON tornava indietro come testo.
+    updateField('footerLinks', newLinks as unknown as SiteSetting['footerLinks']);
   };
 
   const addLink = () => {
@@ -961,7 +1049,11 @@ function FooterTab({ settings, updateField }: TabProps) {
   );
 }
 
-function HeaderTab({ settings, updateField }: TabProps) {
+function HeaderTab({
+  settings,
+  updateField,
+  taglineLocale,
+}: TabProps & { taglineLocale?: string }) {
   const t = useTranslations('admin.settings.header');
   // Il motto si scrive per lingua, tra quelle attive del sito.
   const lingueAttive =
@@ -970,6 +1062,10 @@ function HeaderTab({ settings, updateField }: TabProps) {
       : ['it', 'en'];
   const linguaPredefinita = settings.defaultLocale || 'it';
   const [linguaMotto, setLinguaMotto] = useState(linguaPredefinita);
+  // Un motto rifiutato si apre nella lingua che ha l'errore.
+  useEffect(() => {
+    if (taglineLocale) setLinguaMotto(taglineLocale);
+  }, [taglineLocale]);
   const motto = (
     settings.siteTagline && typeof settings.siteTagline === 'object' && !Array.isArray(settings.siteTagline)
       ? settings.siteTagline

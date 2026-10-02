@@ -1707,6 +1707,17 @@
         "avatarTitle": "A résztvevők képei",
         "gravatarEnabled": "Gravatar használata, ha elérhető",
         "gravatarEnabledHelp": "Aki olyan e-mail-címmel regisztrált, amelyhez tartozik Gravatar, azt fogja képként látni a teremben; mindenki másnál a platform által generált kezdőbetűk maradnak. A kép a saját kiszolgálónkon keresztül érkezik, így a résztvevők böngészője nem lép kapcsolatba a gravatar.com oldallal – a platform viszont igen: ezt fel kell tüntetni az adatvédelmi tájékoztatóban."
+      },
+      "errors": {
+        "invalid": "A beállítások nem lettek mentve: egy érték érvénytelen. Ellenőrizze a módosított mezőket, és próbálja újra.",
+        "saveFailed": "A beállítások nem lettek mentve. Próbálja újra néhány másodperc múlva.",
+        "required": "Töltse ki ezt: „{field}”: a mező kötelező.",
+        "url": "Ellenőrizze ezt: „{field}”: adjon meg teljes webcímet, például https://www.example.org.",
+        "email": "Ellenőrizze ezt: „{field}”: adjon meg érvényes e-mail-címet, például info@example.org.",
+        "tooLong": "Ellenőrizze ezt: „{field}”: legfeljebb {max} karakter.",
+        "min": "Ellenőrizze ezt: „{field}”: a legkisebb érték {min}.",
+        "max": "Ellenőrizze ezt: „{field}”: a legnagyobb érték {max}.",
+        "field": "Ellenőrizze ezt: „{field}”: az érték érvénytelen."
       }
     },
     "analytics": {

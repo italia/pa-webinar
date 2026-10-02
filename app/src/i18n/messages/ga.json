@@ -1707,6 +1707,17 @@
         "avatarTitle": "Pictiúir na rannpháirtithe",
         "gravatarEnabled": "Úsáid Gravatar nuair atá sé ar fáil",
         "gravatarEnabledHelp": "Taispeánfar an Gravatar sa seomra do dhaoine a chláraigh le seoladh ríomhphoist a bhfuil Gravatar aige; coinníonn gach duine eile na ceannlitreacha a chruthaíonn an t-ardán. Faightear an íomhá trínár bhfreastalaí féin, agus mar sin ní dhéanann brabhsálaithe na rannpháirtithe teagmháil le gravatar.com — ach déanann an t-ardán: caithfear é sin a lua i bhfógra príobháideachais an tsuímh."
+      },
+      "errors": {
+        "invalid": "Níor sábháladh na socruithe: tá luach neamhbhailí. Seiceáil na réimsí a d'athraigh tú agus bain triail eile as.",
+        "saveFailed": "Níor sábháladh na socruithe. Bain triail eile as i gceann cúpla soicind.",
+        "required": "Líon isteach “{field}”: tá an réimse seo riachtanach.",
+        "url": "Seiceáil “{field}”: cuir isteach seoladh gréasáin iomlán, mar shampla https://www.example.org.",
+        "email": "Seiceáil “{field}”: cuir isteach seoladh ríomhphoist bailí, mar shampla info@example.org.",
+        "tooLong": "Seiceáil “{field}”: {max} carachtar ar a mhéad.",
+        "min": "Seiceáil “{field}”: is é {min} an luach íosta.",
+        "max": "Seiceáil “{field}”: is é {max} an luach uasta.",
+        "field": "Seiceáil “{field}”: níl an luach bailí."
       }
     },
     "analytics": {

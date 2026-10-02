@@ -1808,6 +1808,17 @@
         "avatarTitle": "Immagini dei partecipanti",
         "gravatarEnabled": "Usa Gravatar quando disponibile",
         "gravatarEnabledHelp": "Chi si è iscritto con un'email che ha un Gravatar lo vedrà come immagine in sala; per tutti gli altri restano le iniziali generate dalla piattaforma. L'immagine passa dal nostro server, quindi il browser dei partecipanti non contatta gravatar.com — ma la piattaforma sì: va dichiarato nell'informativa privacy."
+      },
+      "errors": {
+        "invalid": "Le impostazioni non sono state salvate: un valore non è valido. Controlla i campi modificati e riprova.",
+        "saveFailed": "Le impostazioni non sono state salvate. Riprova tra qualche secondo.",
+        "required": "Compila «{field}»: il campo è obbligatorio.",
+        "url": "Controlla «{field}»: scrivi un indirizzo web completo, ad esempio https://www.comune.esempio.it.",
+        "email": "Controlla «{field}»: scrivi un indirizzo email valido, ad esempio info@comune.esempio.it.",
+        "tooLong": "Controlla «{field}»: al massimo {max} caratteri.",
+        "min": "Controlla «{field}»: il valore minimo è {min}.",
+        "max": "Controlla «{field}»: il valore massimo è {max}.",
+        "field": "Controlla «{field}»: il valore non è valido."
       }
     },
     "analytics": {

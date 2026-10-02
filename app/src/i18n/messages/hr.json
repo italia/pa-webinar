@@ -1707,6 +1707,17 @@
         "avatarTitle": "Slike sudionika",
         "gravatarEnabled": "Koristi Gravatar kada je dostupan",
         "gravatarEnabledHelp": "Tko se prijavio e-adresom koja ima Gravatar vidjet će ga kao sliku u sobi; svima ostalima ostaju inicijali koje generira platforma. Slika se dohvaća preko našeg poslužitelja pa preglednici sudionika ne kontaktiraju gravatar.com — ali platforma da: to treba navesti u izjavi o privatnosti."
+      },
+      "errors": {
+        "invalid": "Postavke nisu spremljene: jedna vrijednost nije valjana. Provjerite izmijenjena polja i pokušajte ponovno.",
+        "saveFailed": "Postavke nisu spremljene. Pokušajte ponovno za nekoliko sekundi.",
+        "required": "Ispunite „{field}”: polje je obavezno.",
+        "url": "Provjerite „{field}”: unesite potpunu web-adresu, na primjer https://www.example.org.",
+        "email": "Provjerite „{field}”: unesite valjanu adresu e-pošte, na primjer info@example.org.",
+        "tooLong": "Provjerite „{field}”: najviše {max} znakova.",
+        "min": "Provjerite „{field}”: najmanja vrijednost je {min}.",
+        "max": "Provjerite „{field}”: najveća vrijednost je {max}.",
+        "field": "Provjerite „{field}”: vrijednost nije valjana."
       }
     },
     "analytics": {

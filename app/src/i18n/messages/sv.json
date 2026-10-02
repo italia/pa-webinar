@@ -1707,6 +1707,17 @@
         "avatarTitle": "Deltagarnas bilder",
         "gravatarEnabled": "Använd Gravatar när det finns",
         "gravatarEnabledHelp": "Den som har anmält sig med en e-postadress som har en Gravatar får den som bild i rummet; för alla andra visas initialerna som plattformen genererar. Bilden hämtas via vår egen server, så deltagarnas webbläsare kontaktar aldrig gravatar.com – men plattformen gör det: det måste anges i integritetspolicyn."
+      },
+      "errors": {
+        "invalid": "Inställningarna sparades inte: ett värde är ogiltigt. Kontrollera de ändrade fälten och försök igen.",
+        "saveFailed": "Inställningarna sparades inte. Försök igen om några sekunder.",
+        "required": "Fyll i ”{field}”: fältet är obligatoriskt.",
+        "url": "Kontrollera ”{field}”: ange en fullständig webbadress, till exempel https://www.example.org.",
+        "email": "Kontrollera ”{field}”: ange en giltig e-postadress, till exempel info@example.org.",
+        "tooLong": "Kontrollera ”{field}”: högst {max} tecken.",
+        "min": "Kontrollera ”{field}”: minimivärdet är {min}.",
+        "max": "Kontrollera ”{field}”: maxvärdet är {max}.",
+        "field": "Kontrollera ”{field}”: värdet är ogiltigt."
       }
     },
     "analytics": {

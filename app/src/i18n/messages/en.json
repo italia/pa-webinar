@@ -1707,6 +1707,17 @@
         "avatarTitle": "Participant pictures",
         "gravatarEnabled": "Use Gravatar when available",
         "gravatarEnabledHelp": "Attendees who registered with an email that has a Gravatar will show it in the room; everyone else keeps the initials avatar the platform generates. The image is fetched through our own server, so participants’ browsers never contact gravatar.com — but the platform does: declare it in your privacy notice."
+      },
+      "errors": {
+        "invalid": "The settings were not saved: a value is not valid. Check the fields you changed and try again.",
+        "saveFailed": "The settings were not saved. Try again in a few seconds.",
+        "required": "Fill in “{field}”: this field is required.",
+        "url": "Check “{field}”: enter a complete web address, for example https://www.example.org.",
+        "email": "Check “{field}”: enter a valid email address, for example info@example.org.",
+        "tooLong": "Check “{field}”: at most {max} characters.",
+        "min": "Check “{field}”: the minimum value is {min}.",
+        "max": "Check “{field}”: the maximum value is {max}.",
+        "field": "Check “{field}”: the value is not valid."
       }
     },
     "analytics": {

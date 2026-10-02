@@ -1707,6 +1707,17 @@
         "avatarTitle": "Dalībnieku attēli",
         "gravatarEnabled": "Izmantot Gravatar, kad tas ir pieejams",
         "gravatarEnabledHelp": "Tie, kas reģistrējušies ar e-pasta adresi, kurai ir Gravatar, telpā redzēs to kā attēlu; pārējiem paliek platformas ģenerētie iniciāļi. Attēls tiek ielādēts caur mūsu serveri, tāpēc dalībnieku pārlūkprogrammas nesazinās ar gravatar.com — taču platforma to dara: tas ir jānorāda privātuma paziņojumā."
+      },
+      "errors": {
+        "invalid": "Iestatījumi netika saglabāti: kāda vērtība nav derīga. Pārbaudiet mainītos laukus un mēģiniet vēlreiz.",
+        "saveFailed": "Iestatījumi netika saglabāti. Mēģiniet vēlreiz pēc dažām sekundēm.",
+        "required": "Aizpildiet “{field}”: lauks ir obligāts.",
+        "url": "Pārbaudiet “{field}”: ievadiet pilnu tīmekļa adresi, piemēram, https://www.example.org.",
+        "email": "Pārbaudiet “{field}”: ievadiet derīgu e-pasta adresi, piemēram, info@example.org.",
+        "tooLong": "Pārbaudiet “{field}”: ne vairāk kā {max} rakstzīmes.",
+        "min": "Pārbaudiet “{field}”: mazākā vērtība ir {min}.",
+        "max": "Pārbaudiet “{field}”: lielākā vērtība ir {max}.",
+        "field": "Pārbaudiet “{field}”: vērtība nav derīga."
       }
     },
     "analytics": {
