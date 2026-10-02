@@ -724,6 +724,14 @@ selected, so their own traffic is not restricted.
 | Ingress, on TCP 3000 | The ingress controller: namespaces in `networkPolicy.ingress.fromNamespaceSelectors` (default: `ingress-nginx`) and pods in `fromPodSelectors`; with both lists empty, any source. Every pod carrying the release's selector labels, which admits the scheduled jobs, the scaler, the recorder controller and the post-production worker. The Jibri pods when Jibri is enabled. The `monitoring` namespace when `allowMonitoring` is on. Anything in `ingress.extraRules` |
 | Egress | DNS on port 53 to `egress.dns.to` (default: `k8s-app: kube-dns` pods); PostgreSQL and Redis pods; the Jitsi pods on 5222 and 5280 (Prosody), 8080 (the bridge statistics), 2222 (Jibri health), 80 (the web container) and 8888 (Jicofo's REST API), the last two for the status page's in-cluster probes; the recorder controller when it is enabled; the ingress controller's namespaces on 443 and 8443, for the portal's calls to its own public hostnames; TCP 587 anywhere (465 with `allowImplicitTlsSmtp`); TCP 443 anywhere except `169.254.0.0/16` (`httpsExcept`); anything in `egress.extraRules` |
 
+With in-cluster Jibri, a second policy (`<fullname>-jibri`) selects the Jibri
+pods and admits only the app pods, on TCP 2222. The chart opens Jibri's HTTP
+API on every interface so the portal can read its health, and that API also
+starts and stops recordings and streams without authentication: the policy
+keeps every other pod away from it. Jibri receives no other traffic; it opens
+its own connections to Prosody, the conference and storage. Without
+`networkPolicy.enabled`, any pod in the cluster can reach that API.
+
 [NetworkPolicy](DEPLOYMENT.md#networkpolicy) in Deploying with Helm describes
 each key. The PostgreSQL and Redis subcharts render their own permissive
 policies, and these did not interfere.

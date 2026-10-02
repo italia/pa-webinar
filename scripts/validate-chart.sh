@@ -558,6 +558,32 @@ for pol in docs:
         if any(not r.get("to") for r in spec.get("egress") or []):
             print(f"la NetworkPolicy {nome} ha una regola di uscita senza destinazione")
         continue
+    # La policy dei pod di Jibri: entra solo l'applicazione, solo sull'API
+    # HTTP (2222), che avvia e ferma registrazioni senza autenticazione.
+    if (pol["metadata"].get("labels") or {}).get("app.kubernetes.io/component") == "jibri":
+        for t, n, m in carichi:
+            sel = seleziona(selettore, etichette(m))
+            di_jibri = etichette(m).get("app.kubernetes.io/component") == "jibri"
+            if di_jibri and not sel:
+                print(f"la NetworkPolicy {nome} non seleziona {t}/{n}")
+            if sel and not di_jibri:
+                print(f"la NetworkPolicy {nome} seleziona anche {t}/{n}")
+        if not any(t == "Deployment" and etichette(m).get("app.kubernetes.io/component") == "jibri" for t, n, m in carichi):
+            print(f"la NetworkPolicy {nome} è resa ma Jibri no")
+        app_j = next((m for t, n, m in carichi if t == "Deployment"
+                      and "app.kubernetes.io/component" not in etichette(m)
+                      and etichette(m).get("app.kubernetes.io/name") == "pa-webinar"), None)
+        regole = spec.get("ingress") or []
+        if app_j is not None and not any(ammette(r, etichette(app_j), 2222) for r in regole):
+            print(f"la NetworkPolicy {nome} non lascia all'applicazione la salute di Jibri (2222)")
+        if any(not r.get("from") for r in regole):
+            print(f"la NetworkPolicy {nome} ha una regola di ingresso senza sorgente: Jibri resterebbe aperto a tutti")
+        porte = {p.get("port") for r in regole for p in r.get("ports") or []}
+        if porte != {2222}:
+            print(f"la NetworkPolicy {nome} dovrebbe ammettere solo la porta 2222, non {sorted(porte)}")
+        if "Egress" in (spec.get("policyTypes") or []):
+            print(f"la NetworkPolicy {nome} limita l'uscita di Jibri, che apre le sue connessioni verso Prosody, la conferenza e lo storage")
+        continue
     if not any(t == "Deployment" and n == nome and seleziona(selettore, etichette(m)) for t, n, m in carichi):
         print(f"la NetworkPolicy {nome} non seleziona il Deployment dell'applicazione, che resterebbe senza restrizioni")
     for tipo, n, modello in carichi:
@@ -767,6 +793,21 @@ if "JIBRI_HEALTH_URL" in variabili and not jibri_reso:
     print(f"JIBRI_HEALTH_URL è impostato ({variabili['JIBRI_HEALTH_URL']}) ma Jibri non è reso: ogni richiesta della pagina di stato aspetterebbe un Service inesistente")
 if jibri_reso and "JIBRI_HEALTH_URL" not in variabili:
     print("Jibri è reso ma l'applicazione non ha JIBRI_HEALTH_URL")
+# Jibri recente apre l'API di salute solo su 127.0.0.1: il portale, da un altro
+# pod, la raggiunge solo se Jibri la apre su tutte le interfacce.
+if jibri_reso and "JIBRI_HEALTH_URL" in variabili:
+    for _, nome_j, modello_j, _ in carichi:
+        if ((modello_j.get("metadata") or {}).get("labels") or {}).get("app.kubernetes.io/component") != "jibri":
+            continue
+        ambiente = {}
+        for c in (modello_j.get("spec") or {}).get("containers") or []:
+            for f in c.get("envFrom") or []:
+                ambiente.update(mappe.get((f.get("configMapRef") or {}).get("name"), {}))
+            for e in c.get("env") or []:
+                if "value" in e:
+                    ambiente[e["name"]] = str(e["value"])
+        if "jibri.api.http.external-api-host=0.0.0.0" not in str(ambiente.get("JAVA_TOOL_OPTIONS", "")):
+            print(f"{nome_j}: senza -Djibri.api.http.external-api-host=0.0.0.0 in JAVA_TOOL_OPTIONS l'API di salute di Jibri ascolta solo su 127.0.0.1 e il portale non la raggiunge (JIBRI_HEALTH_URL)")
 
 # Come è installata la piattaforma, per la pagina di stato.
 if variabili.get("DEPLOY_PROFILE") not in ("simple", "standard", "full"):

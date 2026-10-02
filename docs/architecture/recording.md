@@ -105,6 +105,15 @@ every few seconds while the event is `LIVE`, reports `jibriStatus: 'ready'`.
 That takes recordings storage configured (`RECORDING_STORAGE_TYPE` set and not
 `local`) and a Jibri health check that answers `HEALTHY` at
 `JIBRI_HEALTH_URL`, which the chart sets whenever `jitsi.enabled` is true.
+Jibri images from `stable-11031` open that API on `127.0.0.1` only, so the
+chart sets `JAVA_TOOL_OPTIONS=-Djibri.api.http.external-api-host=0.0.0.0` on
+the Jibri container (`jitsi-meet.jibri.extraEnvs`): without it the portal's
+probe is refused, Jibri stays "starting" and the room reports the recording
+unavailable once the wait runs out. A values file that sets its own
+`jitsi-meet.jibri.extraEnvs.JAVA_TOOL_OPTIONS` must keep that option. The same
+API starts and stops recordings without authentication; with
+`networkPolicy.enabled` the chart admits only the app pods to it (see
+[Network policies](../INFRASTRUCTURE.md#network-policies)).
 Outside Kubernetes, with no `JIBRI_HEALTH_URL`, Jibri is assumed ready. Until
 then the button is disabled and shows **Recording starting…**; with no
 recordings storage it stays that way. Once enabled it toggles between **Start

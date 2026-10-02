@@ -248,4 +248,46 @@ spec:
           port: {{ .port | default 5432 }}
     {{- end }}
 {{- end }}
+{{- if and .Values.jitsi.enabled (dig "jibri" "enabled" false $jm) (not (dig "jibri" "useExternalJibri" false $jm)) }}
+---
+# ─────────────────────────────────────────────────────────────
+# Ingresso dei pod di Jibri: solo l'applicazione, solo sull'API HTTP (2222).
+#
+# Il chart apre quell'API su tutte le interfacce perché il portale ne legga
+# la salute (JIBRI_HEALTH_URL). La stessa API avvia e ferma registrazioni e
+# dirette senza autenticazione: senza questa policy la raggiungerebbe ogni
+# pod del cluster. Jibri non riceve altro traffico: verso Prosody, la
+# conferenza e lo storage le connessioni le apre lui.
+# ─────────────────────────────────────────────────────────────
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "pa-webinar.fullname" . }}-jibri
+  labels:
+    {{- include "pa-webinar.labels" . | nindent 4 }}
+    app.kubernetes.io/component: jibri
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: {{ (dig "nameOverride" "" $jm | default "jitsi-meet") | trunc 63 | trimSuffix "-" | quote }}
+      app.kubernetes.io/instance: {{ .Release.Name | quote }}
+      app.kubernetes.io/component: jibri
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              {{- include "pa-webinar.selectorLabels" . | nindent 14 }}
+              {{- if $componente }}
+              app.kubernetes.io/component: {{ $componente | quote }}
+              {{- else }}
+            matchExpressions:
+              - key: app.kubernetes.io/component
+                operator: DoesNotExist
+              {{- end }}
+      ports:
+        - protocol: TCP
+          port: 2222
+{{- end }}
 {{- end }}

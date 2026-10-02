@@ -1062,6 +1062,17 @@ jitsi-meet:
     singleUseMode: true
     nodeSelector: {}
     tolerations: []
+    # Jibri da stable-11031 apre la propria API HTTP solo su 127.0.0.1. Il
+    # portale ne legge la salute da un altro pod (JIBRI_HEALTH_URL, porta
+    # 2222): senza questa opzione la connessione viene rifiutata, Jibri
+    # resta «in avvio» e la registrazione video fallisce allo scadere
+    # dell'attesa. La JVM legge JAVA_TOOL_OPTIONS da sola, e le versioni
+    # precedenti ignorano la chiave. L'API interna (3333) resta su
+    # 127.0.0.1. Quella esterna avvia e ferma anche registrazioni e dirette
+    # senza autenticazione: con networkPolicy.enabled il chart la apre al
+    # solo portale (NetworkPolicy <fullname>-jibri).
+    extraEnvs:
+      JAVA_TOOL_OPTIONS: "-Djibri.api.http.external-api-host=0.0.0.0"
 
   web:
     # Immagine web con la patch che forza a 48 kHz il contesto audio della
