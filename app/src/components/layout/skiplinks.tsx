@@ -1,22 +1,26 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import {
-  Skiplink as SkiplinkBase,
-  SkiplinkItem as SkiplinkItemBase,
-} from 'design-react-kit';
 
+/**
+ * Link di salto, il primo elemento raggiungibile col tasto Tab su ogni pagina.
+ *
+ * Ancore semplici con la classe di Bootstrap Italia, non lo Skiplink di
+ * design-react-kit: quel componente rende i figli solo con la prop `nav`, e
+ * senza di essa i link non arrivavano mai nella pagina. I bersagli hanno
+ * tabIndex -1 (layout e piè di pagina), cosi' Invio vi porta davvero il fuoco.
+ */
 export function Skiplink() {
   const t = useTranslations('nav');
 
   return (
-    <SkiplinkBase>
-      <SkiplinkItemBase href="#main-content">
+    <div className="skiplinks">
+      <a className="visually-hidden-focusable" href="#main-content">
         {t('skipToContent')}
-      </SkiplinkItemBase>
-      <SkiplinkItemBase href="#footer">
+      </a>
+      <a className="visually-hidden-focusable" href="#footer">
         {t('skipToFooter')}
-      </SkiplinkItemBase>
-    </SkiplinkBase>
+      </a>
+    </div>
   );
 }

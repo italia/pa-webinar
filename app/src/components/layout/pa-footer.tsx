@@ -145,7 +145,7 @@ export default function PAFooter() {
   const legalLinks = footerLinks.filter((l) => l.section === 'legal');
 
   return (
-    <footer className="it-footer" id="footer">
+    <footer className="it-footer" id="footer" tabIndex={-1}>
       <div className="it-footer-main">
         <div className="container">
           <section>

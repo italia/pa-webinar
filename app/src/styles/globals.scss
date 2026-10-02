@@ -3499,3 +3499,11 @@ html.live-call-immersive body {
 @media (prefers-reduced-motion: reduce) {
   .wr-cta-pronta::after { animation: none; }
 }
+
+// Bersagli dei link di salto: ricevono il fuoco (tabIndex -1) perche' Invio
+// porti davvero la tastiera al contenuto, ma non sono controlli: niente
+// contorno attorno all'intera pagina.
+#main-content:focus,
+#footer:focus {
+  outline: none;
+}
