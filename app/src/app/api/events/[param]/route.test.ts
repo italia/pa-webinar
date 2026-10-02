@@ -161,6 +161,22 @@ describe('PUT /api/events/[param] — le modifiche parziali restano parziali', (
     }
   });
 
+  it('risponde anche per un evento con una registrazione Jibri (dimensione BigInt)', async () => {
+    mocked.event.update.mockImplementation(
+      async ({ data }: { data: Record<string, unknown> }) => ({
+        ...eventoEsistente(),
+        recordingFileSize: BigInt(4502766),
+        ...data,
+      }),
+    );
+
+    // Una modifica di fine evento, la piu' comune dopo una registrazione.
+    const res = await PUT(richiesta({ postEventShowQA: false }), contesto as never);
+
+    expect(res.status).toBe(200);
+    expect((await res.json()).recordingFileSize).toBe(4502766);
+  });
+
   it('scrive i campi quando sono inviati davvero', async () => {
     await PUT(
       richiesta({

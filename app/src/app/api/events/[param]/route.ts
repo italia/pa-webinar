@@ -553,6 +553,10 @@ export const PUT = withErrorHandling(async (request, context) => {
 
   return Response.json({
     ...updated,
+    // BigInt: JSON.stringify non lo sa scrivere, e un evento registrato con
+    // Jibri ne ha uno. Esce come numero, come nella GET dello stesso evento.
+    recordingFileSize:
+      updated.recordingFileSize === null ? null : Number(updated.recordingFileSize),
     dateChanged,
     ...(ignoredCreationOnlyFields.length > 0 && { ignoredCreationOnlyFields }),
   });
