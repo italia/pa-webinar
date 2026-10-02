@@ -642,7 +642,7 @@
         "heading": "Informații de bază",
         "intro": "Titlu, descriere, imagine și calendar al evenimentului.",
         "coverImage": "Imagine de copertă",
-        "coverImageHelp": "Afișată pe pagina publică și în e-mailurile de invitație.",
+        "coverImageHelp": "Afișată pe site-ul public și în e-mailurile către cei înscriși.",
         "scheduleHeading": "Calendar",
         "timezone": "Fus orar",
         "recurrenceHeading": "Recurență",
@@ -1431,7 +1431,11 @@
       "activeCount": "{count, plural, =0 {Niciun acces activ} =1 {1 acces activ} other {# accesuri active}}",
       "errors": {
         "addFailed": "Nu s-a putut salva. Încercați din nou."
-      }
+      },
+      "prepareEmail": "Pregătiți e-mailul",
+      "prepareEmailFor": "Pregătiți un e-mail pentru {name}",
+      "prepareEmailSubject": "Linkul dvs. pentru „{title}”",
+      "prepareEmailBody": "Bună ziua, {name},\n\niată linkul dvs. personal pentru „{title}”:\n{link}\n\nLinkul este doar pentru dvs.: nu îl redirecționați și nu îl distribuiți."
     },
     "gdprAuditLog": {
       "title": "Registru GDPR",

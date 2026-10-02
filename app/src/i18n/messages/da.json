@@ -642,7 +642,7 @@
         "heading": "Grundlæggende oplysninger",
         "intro": "Titel, beskrivelse, billede og tidsplan for arrangementet.",
         "coverImage": "Forsidebillede",
-        "coverImageHelp": "Vises på den offentlige side og i invitationsmails.",
+        "coverImageHelp": "Vises på det offentlige websted og i e-mails til tilmeldte.",
         "scheduleHeading": "Tidsplan",
         "timezone": "Tidszone",
         "recurrenceHeading": "Gentagelse",
@@ -1431,7 +1431,11 @@
       "activeCount": "{count, plural, =0 {Ingen aktive adgange} =1 {1 aktiv adgang} other {# aktive adgange}}",
       "errors": {
         "addFailed": "Kunne ikke gemme. Prøv igen."
-      }
+      },
+      "prepareEmail": "Forbered e-mail",
+      "prepareEmailFor": "Forbered en e-mail til {name}",
+      "prepareEmailSubject": "Dit link til »{title}«",
+      "prepareEmailBody": "Hej {name},\n\nher er dit personlige link til »{title}«:\n{link}\n\nLinket er kun til dig: videresend eller del det ikke."
     },
     "gdprAuditLog": {
       "title": "GDPR-revisionslog",

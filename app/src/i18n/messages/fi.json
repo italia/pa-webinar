@@ -642,7 +642,7 @@
         "heading": "Perustiedot",
         "intro": "Tapahtuman nimi, kuvaus, kuva ja aikataulu.",
         "coverImage": "Kansikuva",
-        "coverImageHelp": "Näytetään julkisella sivulla ja kutsusähköposteissa.",
+        "coverImageHelp": "Näytetään julkisella sivustolla ja ilmoittautuneille lähetettävissä sähköposteissa.",
         "scheduleHeading": "Aikataulu",
         "timezone": "Aikavyöhyke",
         "recurrenceHeading": "Toistuvuus",
@@ -1431,7 +1431,11 @@
       "activeCount": "{count, plural, =0 {Ei aktiivisia pääsyjä} =1 {1 aktiivinen pääsy} other {# aktiivista pääsyä}}",
       "errors": {
         "addFailed": "Tallennus epäonnistui. Yritä uudelleen."
-      }
+      },
+      "prepareEmail": "Valmistele sähköposti",
+      "prepareEmailFor": "Valmistele sähköposti henkilölle {name}",
+      "prepareEmailSubject": "Linkkisi tapahtumaan ”{title}”",
+      "prepareEmailBody": "Hei {name},\n\ntässä on henkilökohtainen linkkisi tapahtumaan ”{title}”:\n{link}\n\nLinkki on vain sinulle: älä välitä tai jaa sitä."
     },
     "gdprAuditLog": {
       "title": "GDPR-tarkastusloki",

@@ -642,7 +642,7 @@
         "heading": "Pamatinformācija",
         "intro": "Pasākuma nosaukums, apraksts, attēls un kalendārs.",
         "coverImage": "Vāka attēls",
-        "coverImageHelp": "Tiek rādīts publiskajā vietnē un ielūguma e-pastos.",
+        "coverImageHelp": "Tiek rādīts publiskajā vietnē un e-pastos reģistrētajiem dalībniekiem.",
         "scheduleHeading": "Kalendārs",
         "timezone": "Laika josla",
         "recurrenceHeading": "Atkārtošanās",
@@ -1431,7 +1431,11 @@
       "activeCount": "{count, plural, =0 {Nav aktīvu piekļuvju} =1 {1 aktīva piekļuve} other {# aktīvas piekļuves}}",
       "errors": {
         "addFailed": "Neizdevās saglabāt. Mēģiniet vēlreiz."
-      }
+      },
+      "prepareEmail": "Sagatavot e-pastu",
+      "prepareEmailFor": "Sagatavot e-pastu: {name}",
+      "prepareEmailSubject": "Jūsu saite uz “{title}”",
+      "prepareEmailBody": "Sveiki, {name}!\n\nŠeit ir jūsu personīgā saite uz “{title}”:\n{link}\n\nSaite ir tikai jums: nepārsūtiet un nekopīgojiet to."
     },
     "gdprAuditLog": {
       "title": "GDPR audita žurnāls",

@@ -642,7 +642,7 @@
         "heading": "Osnovne informacije",
         "intro": "Naslov, opis, slika in razpored dogodka.",
         "coverImage": "Naslovna slika",
-        "coverImageHelp": "Prikazana na javni strani in v vabilih po e-pošti.",
+        "coverImageHelp": "Prikazana na javni strani in v e-poštnih sporočilih prijavljenim.",
         "scheduleHeading": "Koledar",
         "timezone": "Časovni pas",
         "recurrenceHeading": "Ponovitev",
@@ -1431,7 +1431,11 @@
       "activeCount": "{count, plural, =0 {Brez aktivnih dostopov} =1 {1 aktiven dostop} other {# aktivnih dostopov}}",
       "errors": {
         "addFailed": "Shranjevanje ni uspelo. Poskusite znova."
-      }
+      },
+      "prepareEmail": "Pripravi e-pošto",
+      "prepareEmailFor": "Pripravi e-pošto za: {name}",
+      "prepareEmailSubject": "Vaša povezava za »{title}«",
+      "prepareEmailBody": "Pozdravljeni, {name},\n\ntu je vaša osebna povezava za »{title}«:\n{link}\n\nPovezava je samo za vas: ne posredujte je in je ne delite."
     },
     "gdprAuditLog": {
       "title": "Dnevnik GDPR",

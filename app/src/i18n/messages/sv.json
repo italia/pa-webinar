@@ -642,7 +642,7 @@
         "heading": "Grundläggande information",
         "intro": "Titel, beskrivning, omslagsbild och schema.",
         "coverImage": "Omslagsbild",
-        "coverImageHelp": "Visas på den publika evenemangssidan och i inbjudningsmejlen.",
+        "coverImageHelp": "Visas på den offentliga webbplatsen och i e-post till anmälda.",
         "scheduleHeading": "Schema",
         "timezone": "Tidszon",
         "recurrenceHeading": "Återkommande",
@@ -1431,7 +1431,11 @@
       "activeCount": "{count, plural, =0 {Ingen aktiv åtkomst} =1 {1 aktiv åtkomst} other {# aktiva åtkomster}}",
       "errors": {
         "addFailed": "Kunde inte spara. Försök igen."
-      }
+      },
+      "prepareEmail": "Förbered e-post",
+      "prepareEmailFor": "Förbered ett e-postmeddelande till {name}",
+      "prepareEmailSubject": "Din länk till ”{title}”",
+      "prepareEmailBody": "Hej {name},\n\nhär är din personliga länk till ”{title}”:\n{link}\n\nLänken är bara för dig: vidarebefordra eller dela den inte."
     },
     "gdprAuditLog": {
       "title": "GDPR-revisionslogg",

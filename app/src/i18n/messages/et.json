@@ -642,7 +642,7 @@
         "heading": "Põhiteave",
         "intro": "Sündmuse pealkiri, kirjeldus, pilt ja kalender.",
         "coverImage": "Kaanepilt",
-        "coverImageHelp": "Kuvatakse avalikul lehel ja kutsekirjades.",
+        "coverImageHelp": "Kuvatakse avalikul veebisaidil ja registreerunutele saadetavates e-kirjades.",
         "scheduleHeading": "Ajakava",
         "timezone": "Ajavöönd",
         "recurrenceHeading": "Kordumine",
@@ -1431,7 +1431,11 @@
       "activeCount": "{count, plural, =0 {Aktiivseid juurdepääse pole} =1 {1 aktiivne juurdepääs} other {# aktiivset juurdepääsu}}",
       "errors": {
         "addFailed": "Salvestamine ebaõnnestus. Proovi uuesti."
-      }
+      },
+      "prepareEmail": "Koosta e-kiri",
+      "prepareEmailFor": "Koosta e-kiri: {name}",
+      "prepareEmailSubject": "Teie link sündmusele „{title}“",
+      "prepareEmailBody": "Tere, {name}!\n\nSiin on teie isiklik link sündmusele „{title}“:\n{link}\n\nLink on ainult teile: ärge edastage ega jagage seda."
     },
     "gdprAuditLog": {
       "title": "GDPR auditilogi",

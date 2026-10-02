@@ -642,7 +642,7 @@
         "heading": "Información básica",
         "intro": "Título, descripción, imagen y calendario del evento.",
         "coverImage": "Imagen de portada",
-        "coverImageHelp": "Se muestra en el sitio público y en los correos de invitación.",
+        "coverImageHelp": "Se muestra en el sitio público y en los correos a los inscritos.",
         "scheduleHeading": "Calendario",
         "timezone": "Zona horaria",
         "recurrenceHeading": "Recurrencia",
@@ -1431,7 +1431,11 @@
       "activeCount": "{count, plural, =0 {Sin accesos activos} =1 {1 acceso activo} other {# accesos activos}}",
       "errors": {
         "addFailed": "No se ha podido guardar. Inténtalo de nuevo."
-      }
+      },
+      "prepareEmail": "Preparar correo",
+      "prepareEmailFor": "Preparar un correo para {name}",
+      "prepareEmailSubject": "Tu enlace para «{title}»",
+      "prepareEmailBody": "Hola, {name}:\n\naquí tienes tu enlace personal para «{title}»:\n{link}\n\nEl enlace es solo para ti: no lo reenvíes ni lo compartas."
     },
     "gdprAuditLog": {
       "title": "Registro GDPR",

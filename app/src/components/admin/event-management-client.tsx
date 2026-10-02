@@ -1034,6 +1034,7 @@ function PeopleTab({ event, baseUrl, locale, onExportCsv, canEditRegistrations }
       <div className="mb-4">
         <H>{t('coModerators.title')}</H>
         <EventModeratorsPanel eventId={event.id} eventSlug={event.slug}
+                              eventTitle={getLocalized(event.title as LocalizedField, locale)}
                               moderatorToken={event.moderatorToken}
                               baseUrl={baseUrl} locale={locale} />
       </div>

@@ -6,6 +6,7 @@ import { Badge, Button, Input, Label } from 'design-react-kit';
 
 import { useConfirm } from '@/components/ui/confirm-dialog';
 import { SkeletonLines } from '@/components/ui/skeleton';
+import { mailtoHref } from '@/lib/email/mailto';
 import { localizedUrl } from '@/lib/utils/localized-url';
 
 type GrantRole = 'MODERATOR' | 'SPEAKER';
@@ -23,6 +24,8 @@ interface ModeratorRow {
 interface Props {
   eventId: string;
   eventSlug: string;
+  /** Il titolo dell'evento, per l'oggetto dell'email da preparare. */
+  eventTitle?: string;
   moderatorToken: string;
   baseUrl: string;
   locale: string;
@@ -31,6 +34,7 @@ interface Props {
 export default function EventModeratorsPanel({
   eventId,
   eventSlug,
+  eventTitle = '',
   moderatorToken,
   baseUrl,
   locale,
@@ -134,6 +138,18 @@ export default function EventModeratorsPanel({
     setCopiedId(row.id);
     setTimeout(() => setCopiedId(null), 2000);
   }, [magicLink]);
+
+  // L'email con il solo link di quella persona: niente «copia tutti i link»,
+  // che finirebbe in un messaggio di gruppo con le credenziali di tutti.
+  const emailPreparata = useCallback(
+    (row: ModeratorRow) =>
+      mailtoHref({
+        to: row.email ?? '',
+        subject: t('prepareEmailSubject', { title: eventTitle }),
+        body: t('prepareEmailBody', { name: row.name, title: eventTitle, link: magicLink(row.token) }),
+      }),
+    [t, eventTitle, magicLink],
+  );
 
   const activeCount = rows.filter((r) => r.revokedAt === null).length;
 
@@ -282,6 +298,13 @@ export default function EventModeratorsPanel({
                       >
                         {copiedId === row.id ? t('copied') : t('copyLink')}
                       </Button>
+                      <a
+                        className="btn btn-outline-secondary btn-xs"
+                        href={emailPreparata(row)}
+                        aria-label={t('prepareEmailFor', { name: row.name })}
+                      >
+                        {t('prepareEmail')}
+                      </a>
                       <Button
                         color="danger"
                         outline

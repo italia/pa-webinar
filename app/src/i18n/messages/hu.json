@@ -642,7 +642,7 @@
         "heading": "Alapadatok",
         "intro": "Az esemény címe, leírása, borítóképe és időbeosztása.",
         "coverImage": "Borítókép",
-        "coverImageHelp": "A nyilvános oldalon és a meghívó e-mailekben jelenik meg.",
+        "coverImageHelp": "Megjelenik a nyilvános oldalon és a regisztráltaknak küldött e-mailekben.",
         "scheduleHeading": "Naptár",
         "timezone": "Időzóna",
         "recurrenceHeading": "Ismétlődés",
@@ -1431,7 +1431,11 @@
       "activeCount": "{count, plural, =0 {Nincs aktív hozzáférés} =1 {1 aktív hozzáférés} other {# aktív hozzáférés}}",
       "errors": {
         "addFailed": "Nem sikerült menteni. Próbáld újra."
-      }
+      },
+      "prepareEmail": "E-mail előkészítése",
+      "prepareEmailFor": "E-mail előkészítése neki: {name}",
+      "prepareEmailSubject": "Az Ön linkje ehhez: „{title}”",
+      "prepareEmailBody": "Kedves {name}!\n\nItt a személyes linkje ehhez: „{title}”:\n{link}\n\nA link csak Önnek szól: ne továbbítsa és ne ossza meg."
     },
     "gdprAuditLog": {
       "title": "GDPR auditnapló",

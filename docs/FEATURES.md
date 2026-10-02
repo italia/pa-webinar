@@ -311,7 +311,7 @@ Configured in: [Runtime settings](configuration/runtime-settings.md) · [Configu
 Moderators and speakers have no accounts. They enter through magic links.
 
 - **Moderator link.** It is the event's primary link (`?token=`). It identifies a *seat*, not a person: everyone who opens it is a moderator. An administrator can regenerate it from **Moderator links**, and the old link then stops working.
-- **Named grants.** Each is a personal link for one co-moderator (role `MODERATOR`) or speaker (role `SPEAKER`). They are created in the wizard's **People** step or on the event page, and each can be revoked on its own.
+- **Named grants.** Each is a personal link for one co-moderator (role `MODERATOR`) or speaker (role `SPEAKER`). They are created in the wizard's **People** step or on the event page, and each can be revoked on its own. Next to **Copy link**, **Prepare email** opens the organizer's own mail program with a message holding only that person's link; the platform sends nothing for it, and there is no way to copy every link at once.
 - **Where to find the links.** The event page in the administration area shows them. **Share** in the room can also reveal the moderator link to a moderator, with a warning. The platform does not email magic links.
 
 What a moderator can do in the room:

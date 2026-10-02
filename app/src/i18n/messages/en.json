@@ -642,7 +642,7 @@
         "heading": "Basic information",
         "intro": "Title, description, cover image and schedule.",
         "coverImage": "Cover image",
-        "coverImageHelp": "Shown on the public event page and invitation emails.",
+        "coverImageHelp": "Shown on the public site and in the emails to registrants.",
         "scheduleHeading": "Schedule",
         "timezone": "Timezone",
         "recurrenceHeading": "Recurrence",
@@ -1431,7 +1431,11 @@
       "activeCount": "{count, plural, =0 {No active access} =1 {1 active access} other {# active accesses}}",
       "errors": {
         "addFailed": "Couldn't save. Please retry."
-      }
+      },
+      "prepareEmail": "Prepare email",
+      "prepareEmailFor": "Prepare an email for {name}",
+      "prepareEmailSubject": "Your link for “{title}”",
+      "prepareEmailBody": "Hello {name},\n\nhere is your personal link for “{title}”:\n{link}\n\nThe link is for you only: do not forward or share it."
     },
     "gdprAuditLog": {
       "title": "GDPR Audit Log",

@@ -642,7 +642,7 @@
         "heading": "Informations de base",
         "intro": "Titre, description, image et calendrier de l'événement.",
         "coverImage": "Image de couverture",
-        "coverImageHelp": "Affichée sur la page publique et dans les e-mails d'invitation.",
+        "coverImageHelp": "Affichée sur le site public et dans les e-mails aux inscrits.",
         "scheduleHeading": "Calendrier",
         "timezone": "Fuseau horaire",
         "recurrenceHeading": "Récurrence",
@@ -1431,7 +1431,11 @@
       "activeCount": "{count, plural, =0 {Aucun accès actif} =1 {1 accès actif} other {# accès actifs}}",
       "errors": {
         "addFailed": "Enregistrement impossible. Veuillez réessayer."
-      }
+      },
+      "prepareEmail": "Préparer un e-mail",
+      "prepareEmailFor": "Préparer un e-mail pour {name}",
+      "prepareEmailSubject": "Votre lien pour « {title} »",
+      "prepareEmailBody": "Bonjour {name},\n\nvoici votre lien personnel pour « {title} » :\n{link}\n\nCe lien est pour vous seul : ne le transférez pas et ne le partagez pas."
     },
     "gdprAuditLog": {
       "title": "Journal GDPR",

@@ -30,6 +30,7 @@ async function disegna(locale: string) {
           eventId="evento-1"
           eventSlug="evento-di-prova"
           moderatorToken="TOKEN_MODERATORE"
+          eventTitle="Evento di prova"
           baseUrl={BASE}
           locale={locale}
         />
@@ -57,6 +58,15 @@ beforeEach(() => {
             role: 'SPEAKER',
             token: 'TOKEN_RELATORE',
             createdAt: '2026-09-25T10:00:00.000Z',
+            revokedAt: null,
+          },
+          {
+            id: 'g2',
+            name: 'Moderatrice 2',
+            email: 'moderatrice2@example.org',
+            role: 'MODERATOR',
+            token: 'TOKEN_MODERATRICE',
+            createdAt: '2026-09-25T10:05:00.000Z',
             revokedAt: null,
           },
         ],
@@ -89,5 +99,33 @@ describe('EventModeratorsPanel — link personali', () => {
     expect(container.querySelector('code')?.textContent).toBe(
       `${BASE}/en/events/evento-di-prova/live?token=TOKEN_RELATORE`,
     );
+  });
+});
+
+describe('EventModeratorsPanel — «Prepara email»', () => {
+  const mailto = (nome: string) =>
+    container.querySelector<HTMLAnchorElement>(
+      `a[aria-label="${messages.admin.coModerators.prepareEmailFor.replace('{name}', nome)}"]`,
+    )!;
+
+  it('apre un\'email con il solo link di quella persona', async () => {
+    await disegna('it');
+    const href = mailto('Moderatrice 2').getAttribute('href') ?? '';
+    expect(href.startsWith('mailto:moderatrice2@example.org?')).toBe(true);
+    const parametri = new URLSearchParams(href.slice(href.indexOf('?') + 1));
+    expect(parametri.get('subject')).toBe('Il tuo link per «Evento di prova»');
+    const corpo = parametri.get('body') ?? '';
+    expect(corpo).toContain(`${BASE}/it/eventi/evento-di-prova/live?token=TOKEN_MODERATRICE`);
+    // Un solo token, e non quello degli altri.
+    expect(corpo.match(/token=/g)).toHaveLength(1);
+    expect(corpo).not.toContain('TOKEN_RELATORE');
+    expect(corpo).not.toContain('TOKEN_MODERATORE');
+  });
+
+  it('senza indirizzo apre comunque l\'email da completare', async () => {
+    await disegna('it');
+    const href = mailto('Relatore 1').getAttribute('href') ?? '';
+    expect(href.startsWith('mailto:?subject=')).toBe(true);
+    expect(decodeURIComponent(href)).toContain('token=TOKEN_RELATORE');
   });
 });

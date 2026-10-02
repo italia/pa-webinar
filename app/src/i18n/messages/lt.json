@@ -642,7 +642,7 @@
         "heading": "Pagrindinė informacija",
         "intro": "Renginio pavadinimas, aprašymas, paveikslėlis ir kalendorius.",
         "coverImage": "Viršelio paveikslėlis",
-        "coverImageHelp": "Rodomas viešajame puslapyje ir kvietimo el. laiškuose.",
+        "coverImageHelp": "Rodomas viešoje svetainėje ir el. laiškuose užsiregistravusiesiems.",
         "scheduleHeading": "Kalendorius",
         "timezone": "Laiko juosta",
         "recurrenceHeading": "Pasikartojimas",
@@ -1431,7 +1431,11 @@
       "activeCount": "{count, plural, =0 {Nėra aktyvių prieigų} =1 {1 aktyvi prieiga} other {# aktyvių prieigų}}",
       "errors": {
         "addFailed": "Nepavyko išsaugoti. Bandykite dar kartą."
-      }
+      },
+      "prepareEmail": "Paruošti el. laišką",
+      "prepareEmailFor": "Paruošti el. laišką: {name}",
+      "prepareEmailSubject": "Jūsų nuoroda į „{title}“",
+      "prepareEmailBody": "Sveiki, {name},\n\nštai jūsų asmeninė nuoroda į „{title}“:\n{link}\n\nNuoroda skirta tik jums: jos nepersiųskite ir nesidalykite."
     },
     "gdprAuditLog": {
       "title": "GDPR audito žurnalas",

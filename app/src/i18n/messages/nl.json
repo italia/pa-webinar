@@ -642,7 +642,7 @@
         "heading": "Basisinformatie",
         "intro": "Titel, beschrijving, afbeelding en agenda van het evenement.",
         "coverImage": "Omslagafbeelding",
-        "coverImageHelp": "Wordt getoond op de openbare pagina en in de uitnodigingsmails.",
+        "coverImageHelp": "Getoond op de openbare site en in de e-mails aan ingeschrevenen.",
         "scheduleHeading": "Agenda",
         "timezone": "Tijdzone",
         "recurrenceHeading": "Herhaling",
@@ -1431,7 +1431,11 @@
       "activeCount": "{count, plural, =0 {Geen actieve toegang} =1 {1 actieve toegang} other {# actieve toegangen}}",
       "errors": {
         "addFailed": "Opslaan mislukt. Probeer het opnieuw."
-      }
+      },
+      "prepareEmail": "E-mail voorbereiden",
+      "prepareEmailFor": "E-mail voorbereiden voor {name}",
+      "prepareEmailSubject": "Uw link voor ‘{title}’",
+      "prepareEmailBody": "Hallo {name},\n\nhier is uw persoonlijke link voor ‘{title}’:\n{link}\n\nDe link is alleen voor u: stuur hem niet door en deel hem niet."
     },
     "gdprAuditLog": {
       "title": "GDPR-auditlogboek",

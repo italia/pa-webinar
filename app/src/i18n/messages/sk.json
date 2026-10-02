@@ -642,7 +642,7 @@
         "heading": "Základné informácie",
         "intro": "Názov, popis, obrázok a kalendár podujatia.",
         "coverImage": "Titulný obrázok",
-        "coverImageHelp": "Zobrazí sa na verejnej stránke a v pozvánkach e-mailom.",
+        "coverImageHelp": "Zobrazuje sa na verejnom webe a v e-mailoch registrovaným.",
         "scheduleHeading": "Kalendár",
         "timezone": "Časové pásmo",
         "recurrenceHeading": "Opakovanie",
@@ -1431,7 +1431,11 @@
       "activeCount": "{count, plural, =0 {Žiadny aktívny prístup} =1 {1 aktívny prístup} other {# aktívnych prístupov}}",
       "errors": {
         "addFailed": "Nepodarilo sa uložiť. Skúste znova."
-      }
+      },
+      "prepareEmail": "Pripraviť e-mail",
+      "prepareEmailFor": "Pripraviť e-mail pre: {name}",
+      "prepareEmailSubject": "Váš odkaz na „{title}“",
+      "prepareEmailBody": "Dobrý deň, {name},\n\ntu je váš osobný odkaz na „{title}“:\n{link}\n\nOdkaz je len pre vás: nepreposielajte ho ani ho nezdieľajte."
     },
     "gdprAuditLog": {
       "title": "Auditný protokol GDPR",

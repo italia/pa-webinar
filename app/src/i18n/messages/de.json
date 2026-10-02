@@ -642,7 +642,7 @@
         "heading": "Grundinformationen",
         "intro": "Titel, Beschreibung, Titelbild und Zeitplan des Events.",
         "coverImage": "Titelbild",
-        "coverImageHelp": "Wird auf der öffentlichen Seite und in Einladungs-E-Mails angezeigt.",
+        "coverImageHelp": "Wird auf der öffentlichen Website und in den E-Mails an die Angemeldeten angezeigt.",
         "scheduleHeading": "Zeitplan",
         "timezone": "Zeitzone",
         "recurrenceHeading": "Wiederholung",
@@ -1431,7 +1431,11 @@
       "activeCount": "{count, plural, =0 {Keine aktiven Zugänge} =1 {1 aktiver Zugang} other {# aktive Zugänge}}",
       "errors": {
         "addFailed": "Speichern nicht möglich. Bitte erneut versuchen."
-      }
+      },
+      "prepareEmail": "E-Mail vorbereiten",
+      "prepareEmailFor": "E-Mail für {name} vorbereiten",
+      "prepareEmailSubject": "Ihr Link für „{title}“",
+      "prepareEmailBody": "Hallo {name},\n\nhier ist Ihr persönlicher Link für „{title}“:\n{link}\n\nDer Link ist nur für Sie: Bitte nicht weiterleiten oder teilen."
     },
     "gdprAuditLog": {
       "title": "GDPR-Protokoll",

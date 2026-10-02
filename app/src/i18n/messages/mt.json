@@ -642,7 +642,7 @@
         "heading": "Informazzjoni bażika",
         "intro": "Titlu, deskrizzjoni, immaġni u kalendarju tal-avveniment.",
         "coverImage": "Immaġni tal-qoxra",
-        "coverImageHelp": "Tintwera fis-sit pubbliku u fl-emails tal-istedina.",
+        "coverImageHelp": "Tintwera fis-sit pubbliku u fl-emails lil min irreġistra.",
         "scheduleHeading": "Kalendarju",
         "timezone": "Żona tal-ħin",
         "recurrenceHeading": "Rikorrenza",
@@ -1431,7 +1431,11 @@
       "activeCount": "{count, plural, =0 {L-ebda aċċess attiv} =1 {1 aċċess attiv} other {# aċċessi attivi}}",
       "errors": {
         "addFailed": "Ma setax jiġi ssejvjat. Erġa' pprova."
-      }
+      },
+      "prepareEmail": "Ipprepara email",
+      "prepareEmailFor": "Ipprepara email għal {name}",
+      "prepareEmailSubject": "Il-link tiegħek għal “{title}”",
+      "prepareEmailBody": "Bonġu {name},\n\nhawn hu l-link personali tiegħek għal “{title}”:\n{link}\n\nIl-link huwa għalik biss: tgħaddihx u taqsmux."
     },
     "gdprAuditLog": {
       "title": "Reġistru tal-Awditu GDPR",

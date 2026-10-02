@@ -642,7 +642,7 @@
         "heading": "Osnovne informacije",
         "intro": "Naslov, opis, slika i raspored događaja.",
         "coverImage": "Naslovna slika",
-        "coverImageHelp": "Prikazuje se na javnoj stranici i u pozivnicama putem e-pošte.",
+        "coverImageHelp": "Prikazuje se na javnoj stranici i u e-porukama prijavljenima.",
         "scheduleHeading": "Raspored",
         "timezone": "Vremenska zona",
         "recurrenceHeading": "Ponavljanje",
@@ -1431,7 +1431,11 @@
       "activeCount": "{count, plural, =0 {Nema aktivnih pristupa} =1 {1 aktivni pristup} other {# aktivnih pristupa}}",
       "errors": {
         "addFailed": "Spremanje nije uspjelo. Pokušajte ponovno."
-      }
+      },
+      "prepareEmail": "Pripremi e-poruku",
+      "prepareEmailFor": "Pripremi e-poruku za: {name}",
+      "prepareEmailSubject": "Vaša poveznica za „{title}”",
+      "prepareEmailBody": "Pozdrav, {name},\n\nevo vaše osobne poveznice za „{title}”:\n{link}\n\nPoveznica je samo za vas: nemojte je prosljeđivati ni dijeliti."
     },
     "gdprAuditLog": {
       "title": "GDPR zapisnik",

@@ -642,7 +642,7 @@
         "heading": "Bunfhaisnéis",
         "intro": "Teideal, cur síos, íomhá agus sceideal an imeachta.",
         "coverImage": "Íomhá clúdaigh",
-        "coverImageHelp": "Taispeánta ar an suíomh poiblí agus i ríomhphoist cuiridh.",
+        "coverImageHelp": "Taispeántar é ar an suíomh poiblí agus sna ríomhphoist chuig na daoine cláraithe.",
         "scheduleHeading": "Sceideal",
         "timezone": "Crios ama",
         "recurrenceHeading": "Athrá",
@@ -1431,7 +1431,11 @@
       "activeCount": "{count, plural, =0 {Gan rochtain ghníomhach} =1 {1 rochtain ghníomhach} other {# rochtain ghníomhacha}}",
       "errors": {
         "addFailed": "Níorbh fhéidir é a shábháil. Déan iarracht arís."
-      }
+      },
+      "prepareEmail": "Ullmhaigh ríomhphost",
+      "prepareEmailFor": "Ullmhaigh ríomhphost do {name}",
+      "prepareEmailSubject": "Do nasc do “{title}”",
+      "prepareEmailBody": "Dia duit {name},\n\nseo do nasc pearsanta do “{title}”:\n{link}\n\nIs duitse amháin an nasc seo: ná seol ar aghaidh é agus ná roinn é."
     },
     "gdprAuditLog": {
       "title": "Loga iniúchóireachta GDPR",
