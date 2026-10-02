@@ -123,6 +123,16 @@
     transform: translateY(-2px);
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
   }
+
+  // Con il menu «…» aperto la scheda non si solleva: una scheda trasformata
+  // diventa il riferimento dell'elenco `position: fixed`, che finiva fuori
+  // dallo schermo e tagliato dai bordi della scheda proprio quando lo si
+  // apriva col mouse (il puntatore e' sopra la scheda). Senza transizione:
+  // per i 200 ms dell'animazione la scheda resterebbe trasformata.
+  &:has(.event-card-menu__toggle[aria-expanded='true']) {
+    transform: none;
+    transition: none;
+  }
 }
 
 // Editorial "kicker" / eyebrow above an event title. Opt-in via the

@@ -184,7 +184,7 @@ export default function EventCardMenu({
       <button
         ref={buttonRef}
         type="button"
-        className="btn btn-sm btn-outline-secondary d-inline-flex align-items-center"
+        className="event-card-menu__toggle btn btn-sm btn-outline-secondary d-inline-flex align-items-center"
         aria-expanded={open}
         aria-controls={listId}
         aria-label={t('actionsFor', { title: event.title })}
