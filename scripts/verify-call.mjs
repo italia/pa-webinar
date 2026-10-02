@@ -170,17 +170,32 @@ async function entra(pagina, url, nome) {
   const campo = pagina.locator('#waiting-name');
   await campo.waitFor({ timeout: 60_000 });
   await campo.fill(nome);
-  let pulsante = null;
+  // Mentre il ponte video si accende il pulsante cambia nome («La sala si sta
+  // preparando…») e torna a «Entra ora» quando e' pronto: lo si cerca di nuovo
+  // a ogni giro, invece di tenere un riferimento a un'etichetta che sparisce.
+  const limite = scadenza();
+  while (Date.now() < limite) {
+    const pulsante = await pulsanteIngresso(pagina);
+    if (pulsante && (await pulsante.isEnabled().catch(() => false))) {
+      await pulsante.click();
+      return;
+    }
+    await attendi(2000);
+  }
+  throw new Error(`il pulsante per entrare non si attiva entro ${opzioni.timeout} s (ponte video non pronto?)`);
+}
+
+async function pulsanteIngresso(pagina) {
   for (const etichetta of ETICHETTE) {
     const p = pagina.getByRole('button', { name: etichetta, exact: false });
-    if (await p.count()) { pulsante = p.first(); break; }
+    if (await p.count()) return p.first();
   }
-  pulsante ??= pagina.locator('button.btn-lg:not([disabled])').first();
-  // Durante l'allestimento del ponte video il pulsante resta spento.
-  await pulsante.waitFor({ timeout: opzioni.timeout * 1000 });
-  const limite = scadenza();
-  while (!(await pulsante.isEnabled()) && Date.now() < limite) await attendi(2000);
-  await pulsante.click();
+  // Etichette illeggibili (file delle traduzioni assente): il pulsante grande.
+  if (ETICHETTE.length === 0) {
+    const p = pagina.locator('button.btn-lg:not([disabled])');
+    if (await p.count()) return p.first();
+  }
+  return null;
 }
 
 async function statoConferenza(pagina) {
