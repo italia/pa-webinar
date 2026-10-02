@@ -16,6 +16,8 @@ import type { VideoPlayerHandle } from '@/components/events/video-player';
 interface QuestionData {
   id: string;
   text: string;
+  /** Risposta scritta durante l'evento, se c'e'. */
+  answerText: string | null;
   authorName: string;
   upvotes: number;
   status: string;
@@ -174,6 +176,7 @@ export default function PostEventTabs({
 }
 
 function QATabContent({ questions }: { questions: QuestionData[] }) {
+  const t = useTranslations('qa');
   return (
     <div className="d-flex flex-column gap-2">
       {questions.map((q) => (
@@ -188,10 +191,16 @@ function QATabContent({ questions }: { questions: QuestionData[] }) {
                   {q.authorName}
                   {q.status === 'ANSWERED' && (
                     <Badge color="success" pill className="ms-2" style={{ fontSize: '0.68rem' }}>
-                      Risposta data
+                      {t('status.ANSWERED')}
                     </Badge>
                   )}
                 </div>
+                {q.answerText && (
+                  <div className="qa-answer">
+                    <span className="qa-answer__label">{t('answerLabel')}</span>
+                    <p className="qa-answer__text">{q.answerText}</p>
+                  </div>
+                )}
               </div>
               <div className="d-flex align-items-center gap-1 flex-shrink-0 ms-2">
                 <Icon icon="it-arrow-up" size="xs" className="text-primary" />

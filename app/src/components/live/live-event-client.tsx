@@ -28,6 +28,7 @@ import {
 } from '@/lib/jitsi/bridge-readiness';
 import JitsiRoom from '@/components/jitsi/jitsi-room';
 import { LivePushContext, useLivePush, useLiveState } from '@/hooks/use-live-state';
+import { useQaAlerts } from '@/hooks/use-qa-alerts';
 import RecordingConsent, { RecordingBanner } from '@/components/jitsi/recording-consent';
 import ModeratorControls from '@/components/jitsi/moderator-controls';
 import RaisedHandsPanel from '@/components/jitsi/raised-hands-panel';
@@ -2010,6 +2011,16 @@ function LiveSidebar({
   const isPollsActive = activeTab === 'polls';
   const pollsOnScreen = onScreen('polls');
   const materialsOnScreen = onScreen('materials');
+  // Domande nuove e risposte mentre si guarda altro: pallino sulla scheda e,
+  // a chi riguardano, suono o notifica (hooks/use-qa-alerts).
+  const { hasNews: qaNews } = useQaAlerts({
+    eventSlug,
+    token,
+    voterGuestId,
+    isModerator,
+    enabled: effQa,
+    onScreen: onScreen('qa'),
+  });
   // Materiali nuovi mentre si guarda un'altra scheda: un pallino, come per i
   // sondaggi. Stessa chiave del pannello, quindi stessa richiesta: aprirlo non
   // ne aggiunge una. Con il canale vivo la rilettura la chiede l'avviso
@@ -2134,6 +2145,8 @@ function LiveSidebar({
           <circle cx="12" cy="12" r="10" />
         </svg>
       ),
+      dot: qaNews,
+      dotLabel: t('sidebarTabQaNew'),
       show: effQa,
     },
     {

@@ -469,7 +469,8 @@
     "leftModeratorReminder": "Üritus jääb avatuks, kuni keegi selle lõpetab. Kui olete lõpetanud, tulge tagasi ja valige „{action}“.",
     "rejoin": "Tule tagasi",
     "backToHome": "Tagasi avalehele",
-    "sidebarTabMaterialsNew": "Uued jagatud materjalid"
+    "sidebarTabMaterialsNew": "Uued jagatud materjalid",
+    "sidebarTabQaNew": "Uut küsimustes ja vastustes"
   },
   "qa": {
     "title": "Küsimused ja vastused",
@@ -498,7 +499,14 @@
       "highlight": "Tõsta esile",
       "markAnswered": "Märgi vastatuks",
       "dismiss": "Lükka tagasi",
-      "resetToPending": "Taasta"
+      "resetToPending": "Taasta",
+      "answer": "Vasta",
+      "editAnswer": "Muuda vastust",
+      "answerFieldLabel": "Vastus küsimusele, küsija {name}",
+      "answerPlaceholder": "Kirjutage vastus (kuni 2000 tähemärki)",
+      "sendAnswer": "Avalda vastus",
+      "cancel": "Tühista",
+      "removeAnswer": "Eemalda vastus"
     },
     "errors": {
       "textRequired": "Kirjutage oma küsimus",
@@ -506,14 +514,18 @@
       "rateLimit": "Palun oodake enne järgmise küsimuse esitamist",
       "busy": "Teie võrgust saabub praegu palju küsimusi: palun proovige mõne sekundi pärast uuesti",
       "generic": "Viga küsimuse esitamisel",
-      "upvoteFailed": "Teie häält ei salvestatud: palun proovige mõne sekundi pärast uuesti."
+      "upvoteFailed": "Teie häält ei salvestatud: palun proovige mõne sekundi pärast uuesti.",
+      "actionFailed": "Toiming ebaõnnestus: proovige mõne sekundi pärast uuesti."
     },
     "ctaTitle": "Esitage esimene küsimus",
     "ctaBody": "Teised osalejad saavad teie küsimust hinnata. Moderaatorid näevad seda ja saavad vastata suuliselt või kirjalikult.",
     "moderatorHint": "Osalejad saavad esitada küsimusi oma paneelist. Need ilmuvad siia reaalajas.",
     "yourQuestionLabel": "Teie küsimus",
     "placeholderInviting": "Nt: Kas saaksite täpsustada…",
-    "submitPrimary": "Saada küsimus"
+    "submitPrimary": "Saada küsimus",
+    "answerLabel": "Vastus",
+    "notifyNewQuestionTitle": "Uus küsimus: {name}",
+    "notifyAnsweredTitle": "Teie küsimusele on vastatud"
   },
   "admin": {
     "accessDenied": {

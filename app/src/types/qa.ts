@@ -7,6 +7,8 @@ export interface PublicQuestion {
   id: string;
   authorName: string;
   text: string;
+  /** Risposta scritta da chi conduce, se c'e'. */
+  answerText: string | null;
   status: QuestionStatus;
   upvoteCount: number;
   hasUpvoted: boolean; // whether the current participant has upvoted

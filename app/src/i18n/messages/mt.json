@@ -469,7 +469,8 @@
     "leftModeratorReminder": "L-avveniment jibqa' miftuħ sakemm xi ħadd itemmu. Meta tkunu lestejtu, erġa' idħol u agħżel “{action}”.",
     "rejoin": "Erġa' idħol",
     "backToHome": "Lura lejn il-paġna ewlenija",
-    "sidebarTabMaterialsNew": "Materjali ġodda maqsuma"
+    "sidebarTabMaterialsNew": "Materjali ġodda maqsuma",
+    "sidebarTabQaNew": "Ġdid fil-Mistoqsijiet u tweġibiet"
   },
   "qa": {
     "title": "Mistoqsijiet u Tweġibiet",
@@ -498,7 +499,14 @@
       "highlight": "Evidenzja",
       "markAnswered": "Marka bħala mweġba",
       "dismiss": "Iċħad",
-      "resetToPending": "Irrestawra"
+      "resetToPending": "Irrestawra",
+      "answer": "Wieġeb",
+      "editAnswer": "Editja t-tweġiba",
+      "answerFieldLabel": "Tweġiba għall-mistoqsija ta' {name}",
+      "answerPlaceholder": "Ikteb it-tweġiba (massimu ta' 2000 karattru)",
+      "sendAnswer": "Ippubblika t-tweġiba",
+      "cancel": "Ikkanċella",
+      "removeAnswer": "Neħħi t-tweġiba"
     },
     "errors": {
       "textRequired": "Jekk jogħġbok ikteb il-mistoqsija tiegħek",
@@ -506,14 +514,18 @@
       "rateLimit": "Jekk jogħġbok stenna qabel ma tibgħat mistoqsija oħra",
       "busy": "Bħalissa qed jaslu ħafna mistoqsijiet min-netwerk tiegħek: jekk jogħġbok erġa' pprova fi ftit sekondi",
       "generic": "Żball fl-ibgħat tal-mistoqsija",
-      "upvoteFailed": "Il-vot ma ġiex irreġistrat: jekk jogħġbok ipprova mill-ġdid fi ftit sekondi."
+      "upvoteFailed": "Il-vot ma ġiex irreġistrat: jekk jogħġbok ipprova mill-ġdid fi ftit sekondi.",
+      "actionFailed": "L-azzjoni ma rnexxietx: erġa' pprova fi ftit sekondi."
     },
     "ctaTitle": "Staqsi l-ewwel mistoqsija",
     "ctaBody": "Il-parteċipanti l-oħra jistgħu jivvutaw il-mistoqsija tiegħek. Il-moderaturi se jarawha u jistgħu jwieġbu bil-vuċi jew bil-kitba.",
     "moderatorHint": "Il-parteċipanti jistgħu jagħmlu mistoqsijiet mill-pannell tagħhom. Tarahom hawn f'ħin reali.",
     "yourQuestionLabel": "Il-mistoqsija tiegħek",
     "placeholderInviting": "Eż: Tista' tispjega aħjar…",
-    "submitPrimary": "Ibgħat il-mistoqsija"
+    "submitPrimary": "Ibgħat il-mistoqsija",
+    "answerLabel": "Tweġiba",
+    "notifyNewQuestionTitle": "Mistoqsija ġdida minn {name}",
+    "notifyAnsweredTitle": "Il-mistoqsija tiegħek irċeviet tweġiba"
   },
   "admin": {
     "accessDenied": {

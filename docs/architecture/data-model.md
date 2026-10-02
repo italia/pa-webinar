@@ -113,6 +113,7 @@ Most personal data is encrypted, but these fields are stored in plaintext. Reten
 | `Event.moderatorName`, `EventMaterial.addedBy`, `Speaker.displayName` | The primary moderator's name, a copy of that name on materials added from the room with the primary moderator link (links and file uploads alike; additions by named co-moderators and from the administration area store an empty string, shown as a translated "Added by the organisers"), and the name attached to a transcript speaker label. `Event.moderatorEmail` is encrypted. |
 | `Registration.organization`, `Registration.organizationRole`, `Person.organization` | Optional profiling fields. They stay searchable on purpose. |
 | `Question.text`, `EventFeedback.comment`, `QuestionnaireAnswer.valueText`, `WordCloudSubmission.word` | Free text typed by participants. |
+| `Question.answerText` | The written answer a moderator gives to a Q&A question. |
 | `EmailOutbox.subject`, `EmailOutbox.attachments`, `EmailOutbox.lastError` | The subject (the public event title), the calendar attachment (which names the event contact and gives their email address), and the last SMTP error (which can quote the recipient). The recipient and both bodies are encrypted. |
 | `AdminAuditLog.ip`, `AdminAuditLog.userAgent` | The client IP address and user agent of every administrative write. No job deletes these rows. |
 

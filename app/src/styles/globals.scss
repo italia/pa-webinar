@@ -1248,6 +1248,50 @@ html.live-call-immersive body {
   }
 }
 
+// ── Domande e risposte ──
+// La risposta scritta da chi conduce, sotto la domanda; il segno sulle
+// domande fatte da questo browser.
+.qa-mine-badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  line-height: 1.5;
+  color: #004d99;
+  background: #e8f0fe;
+  border-radius: 999px;
+  padding: 0 0.5rem;
+  white-space: nowrap;
+}
+
+.qa-answer {
+  margin-top: 0.35rem;
+  padding: 0.4rem 0.6rem;
+  border-left: 3px solid #008758;
+  background: #f1f8f4;
+  border-radius: 0 4px 4px 0;
+}
+
+.qa-answer__label {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: #00573a;
+}
+
+.qa-answer__text {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #1a1a1a;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.qa-answer-form textarea {
+  resize: vertical;
+  font-size: 0.85rem;
+}
+
 // ── Nuvola di parole ──
 .word-cloud {
   padding: 12px;

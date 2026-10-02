@@ -469,7 +469,8 @@
     "leftModeratorReminder": "Het evenement blijft open tot iemand het beëindigt. Als u klaar bent, keer dan terug en kies ‘{action}’.",
     "rejoin": "Terugkeren",
     "backToHome": "Terug naar de startpagina",
-    "sidebarTabMaterialsNew": "Nieuwe materialen gedeeld"
+    "sidebarTabMaterialsNew": "Nieuwe materialen gedeeld",
+    "sidebarTabQaNew": "Nieuw in Vragen en antwoorden"
   },
   "qa": {
     "title": "Vragen en Antwoorden",
@@ -498,7 +499,14 @@
       "highlight": "Uitlichten",
       "markAnswered": "Beantwoord",
       "dismiss": "Afwijzen",
-      "resetToPending": "Herstellen"
+      "resetToPending": "Herstellen",
+      "answer": "Beantwoorden",
+      "editAnswer": "Antwoord bewerken",
+      "answerFieldLabel": "Antwoord op de vraag van {name}",
+      "answerPlaceholder": "Schrijf het antwoord (max. 2000 tekens)",
+      "sendAnswer": "Antwoord publiceren",
+      "cancel": "Annuleren",
+      "removeAnswer": "Antwoord verwijderen"
     },
     "errors": {
       "textRequired": "Schrijf uw vraag",
@@ -506,14 +514,18 @@
       "rateLimit": "Wacht even voordat u een nieuwe vraag stelt",
       "busy": "Er komen nu veel vragen binnen vanaf uw netwerk: probeer het over een paar seconden opnieuw",
       "generic": "Fout bij het verzenden van de vraag",
-      "upvoteFailed": "Uw stem is niet geregistreerd: probeer het over een paar seconden opnieuw."
+      "upvoteFailed": "Uw stem is niet geregistreerd: probeer het over een paar seconden opnieuw.",
+      "actionFailed": "De actie is mislukt: probeer het over een paar seconden opnieuw."
     },
     "ctaTitle": "Stel de eerste vraag",
     "ctaBody": "Andere deelnemers kunnen op uw vraag stemmen. Moderatoren zien hem en kunnen mondeling of schriftelijk antwoorden.",
     "moderatorHint": "Deelnemers kunnen vragen stellen vanuit hun paneel. U ziet ze hier in realtime.",
     "yourQuestionLabel": "Uw vraag",
     "placeholderInviting": "Bv.: Kunt u uitleggen…",
-    "submitPrimary": "Vraag versturen"
+    "submitPrimary": "Vraag versturen",
+    "answerLabel": "Antwoord",
+    "notifyNewQuestionTitle": "Nieuwe vraag van {name}",
+    "notifyAnsweredTitle": "Uw vraag is beantwoord"
   },
   "admin": {
     "accessDenied": {

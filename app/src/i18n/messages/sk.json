@@ -469,7 +469,8 @@
     "leftModeratorReminder": "Udalosť zostane otvorená, kým ju niekto neukončí. Keď skončíte, vráťte sa a zvoľte „{action}“.",
     "rejoin": "Vrátiť sa",
     "backToHome": "Späť na úvodnú stránku",
-    "sidebarTabMaterialsNew": "Nové zdieľané materiály"
+    "sidebarTabMaterialsNew": "Nové zdieľané materiály",
+    "sidebarTabQaNew": "Novinky v Otázkach a odpovediach"
   },
   "qa": {
     "title": "Otázky a odpovede",
@@ -498,7 +499,14 @@
       "highlight": "Zvýrazniť",
       "markAnswered": "Zodpovedané",
       "dismiss": "Zamietnuť",
-      "resetToPending": "Obnoviť"
+      "resetToPending": "Obnoviť",
+      "answer": "Odpovedať",
+      "editAnswer": "Upraviť odpoveď",
+      "answerFieldLabel": "Odpoveď na otázku od {name}",
+      "answerPlaceholder": "Napíšte odpoveď (max. 2000 znakov)",
+      "sendAnswer": "Zverejniť odpoveď",
+      "cancel": "Zrušiť",
+      "removeAnswer": "Odstrániť odpoveď"
     },
     "errors": {
       "textRequired": "Napíšte svoju otázku",
@@ -506,14 +514,18 @@
       "rateLimit": "Počkajte prosím, kým odošlete ďalšiu otázku",
       "busy": "Z vašej siete práve prichádza veľa otázok: skúste to prosím znova o niekoľko sekúnd",
       "generic": "Chyba pri odosielaní otázky",
-      "upvoteFailed": "Váš hlas nebol zaznamenaný: skúste to prosím znova o niekoľko sekúnd."
+      "upvoteFailed": "Váš hlas nebol zaznamenaný: skúste to prosím znova o niekoľko sekúnd.",
+      "actionFailed": "Akcia sa nepodarila: skúste to znova o niekoľko sekúnd."
     },
     "ctaTitle": "Položte prvú otázku",
     "ctaBody": "Ostatní účastníci môžu hlasovať za vašu otázku. Moderátori ju uvidia a môžu odpovedať hlasom alebo písomne.",
     "moderatorHint": "Účastníci môžu klásť otázky zo svojho panela. Uvidíte ich tu v reálnom čase.",
     "yourQuestionLabel": "Vaša otázka",
     "placeholderInviting": "Napr.: Mohli by ste vysvetliť…",
-    "submitPrimary": "Odoslať otázku"
+    "submitPrimary": "Odoslať otázku",
+    "answerLabel": "Odpoveď",
+    "notifyNewQuestionTitle": "Nová otázka od {name}",
+    "notifyAnsweredTitle": "Na vašu otázku prišla odpoveď"
   },
   "admin": {
     "accessDenied": {

@@ -11,7 +11,7 @@ import {
   createInstantCallSchema,
   createRegistrationSchema,
   createQuestionSchema,
-  updateQuestionStatusSchema,
+  updateQuestionSchema,
   upvoteQuestionSchema,
   jitsiTokenRequestSchema,
   createPollSchema,
@@ -266,9 +266,9 @@ registry.registerPath({
   method: 'patch',
   path: '/api/events/{param}/questions/{id}',
   tags: ['Q&A'],
-  summary: 'Update question status (moderator)',
+  summary: 'Update question status or written answer (moderator)',
   security: [{ [moderatorToken.name]: [] }],
-  request: { params: z.object({ param: z.string(), id: z.string() }), body: { content: { 'application/json': { schema: updateQuestionStatusSchema } } } },
+  request: { params: z.object({ param: z.string(), id: z.string() }), body: { content: { 'application/json': { schema: updateQuestionSchema } } } },
   responses: { 200: { description: 'Updated question' } },
 });
 

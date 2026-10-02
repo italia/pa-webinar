@@ -469,7 +469,8 @@
     "leftModeratorReminder": "Evenemanget förblir öppet tills någon avslutar det. När ni är klara, gå in igen och välj ”{action}”.",
     "rejoin": "Gå in igen",
     "backToHome": "Tillbaka till startsidan",
-    "sidebarTabMaterialsNew": "Nytt delat material"
+    "sidebarTabMaterialsNew": "Nytt delat material",
+    "sidebarTabQaNew": "Nytt i Frågor och svar"
   },
   "qa": {
     "title": "Frågor och svar",
@@ -498,7 +499,14 @@
       "highlight": "Markera",
       "markAnswered": "Markera som besvarad",
       "dismiss": "Avvisa",
-      "resetToPending": "Återställ"
+      "resetToPending": "Återställ",
+      "answer": "Svara",
+      "editAnswer": "Redigera svar",
+      "answerFieldLabel": "Svar på frågan från {name}",
+      "answerPlaceholder": "Skriv svaret (max 2000 tecken)",
+      "sendAnswer": "Publicera svar",
+      "cancel": "Avbryt",
+      "removeAnswer": "Ta bort svaret"
     },
     "errors": {
       "textRequired": "Skriv din fråga",
@@ -506,14 +514,18 @@
       "rateLimit": "Vänta innan du skickar en ny fråga",
       "busy": "Just nu kommer många frågor från ditt nätverk: försök igen om några sekunder",
       "generic": "Fel vid sändning av fråga",
-      "upvoteFailed": "Din röst registrerades inte: försök igen om några sekunder."
+      "upvoteFailed": "Din röst registrerades inte: försök igen om några sekunder.",
+      "actionFailed": "Åtgärden misslyckades: försök igen om några sekunder."
     },
     "ctaTitle": "Ställ den första frågan",
     "ctaBody": "Andra deltagare kan rösta på din fråga. Moderatorerna ser den och kan svara muntligt eller skriftligt.",
     "moderatorHint": "Deltagare kan ställa frågor från sin egen panel. Du ser dem här i realtid.",
     "yourQuestionLabel": "Din fråga",
     "placeholderInviting": "T.ex. Kan du förklara närmare…",
-    "submitPrimary": "Skicka fråga"
+    "submitPrimary": "Skicka fråga",
+    "answerLabel": "Svar",
+    "notifyNewQuestionTitle": "Ny fråga från {name}",
+    "notifyAnsweredTitle": "Din fråga har besvarats"
   },
   "admin": {
     "accessDenied": {

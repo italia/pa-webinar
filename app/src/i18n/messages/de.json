@@ -469,7 +469,8 @@
     "leftModeratorReminder": "Die Veranstaltung bleibt geöffnet, bis jemand sie beendet. Wenn Sie fertig sind, treten Sie wieder bei und wählen Sie „{action}“.",
     "rejoin": "Wieder beitreten",
     "backToHome": "Zurück zur Startseite",
-    "sidebarTabMaterialsNew": "Neue Materialien geteilt"
+    "sidebarTabMaterialsNew": "Neue Materialien geteilt",
+    "sidebarTabQaNew": "Neues in Fragen & Antworten"
   },
   "qa": {
     "title": "Fragen und Antworten",
@@ -498,7 +499,14 @@
       "highlight": "Hervorheben",
       "markAnswered": "Als beantwortet markieren",
       "dismiss": "Verwerfen",
-      "resetToPending": "Zurücksetzen"
+      "resetToPending": "Zurücksetzen",
+      "answer": "Antworten",
+      "editAnswer": "Antwort bearbeiten",
+      "answerFieldLabel": "Antwort auf die Frage von {name}",
+      "answerPlaceholder": "Antwort schreiben (max. 2000 Zeichen)",
+      "sendAnswer": "Antwort veröffentlichen",
+      "cancel": "Abbrechen",
+      "removeAnswer": "Antwort entfernen"
     },
     "errors": {
       "textRequired": "Bitte schreiben Sie Ihre Frage",
@@ -506,14 +514,18 @@
       "rateLimit": "Bitte warten Sie, bevor Sie eine weitere Frage senden",
       "busy": "Aus Ihrem Netzwerk kommen gerade viele Fragen: Bitte versuchen Sie es in einigen Sekunden erneut",
       "generic": "Fehler beim Senden der Frage",
-      "upvoteFailed": "Ihre Stimme wurde nicht gezählt: Bitte versuchen Sie es in einigen Sekunden erneut."
+      "upvoteFailed": "Ihre Stimme wurde nicht gezählt: Bitte versuchen Sie es in einigen Sekunden erneut.",
+      "actionFailed": "Die Aktion ist fehlgeschlagen: Versuchen Sie es in ein paar Sekunden erneut."
     },
     "ctaTitle": "Stellen Sie die erste Frage",
     "ctaBody": "Andere Teilnehmende können Ihre Frage hochstufen. Die Moderation sieht sie und kann mündlich oder schriftlich antworten.",
     "moderatorHint": "Teilnehmende können Fragen über ihr Bedienfeld einreichen. Sie erscheinen hier in Echtzeit.",
     "yourQuestionLabel": "Ihre Frage",
     "placeholderInviting": "Z. B. Können Sie genauer erklären…",
-    "submitPrimary": "Frage senden"
+    "submitPrimary": "Frage senden",
+    "answerLabel": "Antwort",
+    "notifyNewQuestionTitle": "Neue Frage von {name}",
+    "notifyAnsweredTitle": "Ihre Frage wurde beantwortet"
   },
   "admin": {
     "accessDenied": {

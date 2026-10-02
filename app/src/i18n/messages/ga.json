@@ -469,7 +469,8 @@
     "leftModeratorReminder": "Fanann an t-imeacht oscailte go dtí go gcuireann duine éigin deireadh leis. Nuair a bheidh sibh réidh, fill isteach agus roghnaigh “{action}”.",
     "rejoin": "Fill isteach",
     "backToHome": "Ar ais go dtí an leathanach baile",
-    "sidebarTabMaterialsNew": "Ábhair nua roinnte"
+    "sidebarTabMaterialsNew": "Ábhair nua roinnte",
+    "sidebarTabQaNew": "Nua i gCeisteanna agus freagraí"
   },
   "qa": {
     "title": "Ceisteanna agus Freagraí",
@@ -498,7 +499,14 @@
       "highlight": "Aibhsigh",
       "markAnswered": "Marcáil mar fhreagartha",
       "dismiss": "Diúltaigh",
-      "resetToPending": "Athshocraigh"
+      "resetToPending": "Athshocraigh",
+      "answer": "Freagair",
+      "editAnswer": "Cuir an freagra in eagar",
+      "answerFieldLabel": "Freagra ar cheist {name}",
+      "answerPlaceholder": "Scríobh an freagra (2000 carachtar ar a mhéad)",
+      "sendAnswer": "Foilsigh an freagra",
+      "cancel": "Cealaigh",
+      "removeAnswer": "Bain an freagra"
     },
     "errors": {
       "textRequired": "Scríobh bhur gceist, le bhur dtoil",
@@ -506,14 +514,18 @@
       "rateLimit": "Fan sula seolann sibh ceist eile, le bhur dtoil",
       "busy": "Tá go leor ceisteanna ag teacht ó bhur líonra faoi láthair: bainigí triail eile as i gceann cúpla soicind",
       "generic": "Earráid agus an cheist á seoladh",
-      "upvoteFailed": "Níor taifeadadh an vóta: bainigí triail eile as i gceann cúpla soicind."
+      "upvoteFailed": "Níor taifeadadh an vóta: bainigí triail eile as i gceann cúpla soicind.",
+      "actionFailed": "Níor éirigh leis an ngníomh: bain triail eile as i gceann cúpla soicind."
     },
     "ctaTitle": "Cuir an chéad cheist",
     "ctaBody": "Beidh rannpháirtithe eile in ann do cheist a vótáil. Feicfidh na modhnóirí í agus is féidir leo freagra a thabhairt ó bhéal nó i scríbhinn.",
     "moderatorHint": "Is féidir le rannpháirtithe ceisteanna a chur óna bpainéal féin. Feicfidh tú anseo i bhfíor-am iad.",
     "yourQuestionLabel": "Do cheist",
     "placeholderInviting": "M.sh.: An féidir leat míniú níos fearr a thabhairt…",
-    "submitPrimary": "Seol an cheist"
+    "submitPrimary": "Seol an cheist",
+    "answerLabel": "Freagra",
+    "notifyNewQuestionTitle": "Ceist nua ó {name}",
+    "notifyAnsweredTitle": "Tá freagra ar do cheist"
   },
   "admin": {
     "accessDenied": {

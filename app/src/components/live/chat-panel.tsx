@@ -6,6 +6,7 @@ import { useFormatter, useTranslations } from 'next-intl';
 import { Icon } from '@/components/ui/icon';
 import ChatNotifyMenu from '@/components/live/chat-notify-menu';
 import { playChatChime } from '@/lib/chat/chime';
+import { showDesktopNotification } from '@/lib/chat/desktop-notification';
 import { renderChatBody, mentionsUser } from '@/lib/chat/linkify';
 import {
   CHAT_NOTIFY_STORAGE_KEY,
@@ -283,23 +284,15 @@ export default function ChatPanel({
           offerShownRef.current = true;
           setOfferNotify(true);
         }
-        if (Notification.permission !== 'granted') return;
-        const titolo = kind.mentionsMe
-          ? t('mentionNotificationTitle', { name: msg.senderName })
-          : kind.repliesToMe
-            ? t('replyNotificationTitle', { name: msg.senderName })
-            : t('messageNotificationTitle', { name: msg.senderName });
-        const n = new Notification(titolo, {
-          body: msg.text.slice(0, 140),
-          // Stesso tag: una raffica si raccoglie in una notifica sola invece
-          // di accumularsene.
-          tag: 'pa-webinar-chat',
-        });
-        n.onclick = () => { window.focus(); n.close(); };
       } catch {
-        // Alcuni browser lanciano in contesti non sicuri o con le notifiche
-        // bloccate dal sistema: non deve mai rompere la lista dei messaggi.
+        // Permesso illeggibile (contesto non sicuro): nessun invito.
       }
+      const titolo = kind.mentionsMe
+        ? t('mentionNotificationTitle', { name: msg.senderName })
+        : kind.repliesToMe
+          ? t('replyNotificationTitle', { name: msg.senderName })
+          : t('messageNotificationTitle', { name: msg.senderName });
+      showDesktopNotification(titolo, msg.text, 'pa-webinar-chat');
     },
     [t],
   );

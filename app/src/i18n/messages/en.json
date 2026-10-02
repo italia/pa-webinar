@@ -469,7 +469,8 @@
     "leftModeratorReminder": "The event stays open until someone ends it. When you have finished, rejoin and choose “{action}”.",
     "rejoin": "Rejoin",
     "backToHome": "Back to the home page",
-    "sidebarTabMaterialsNew": "New materials shared"
+    "sidebarTabMaterialsNew": "New materials shared",
+    "sidebarTabQaNew": "New in Q&A"
   },
   "qa": {
     "title": "Questions & Answers",
@@ -498,7 +499,14 @@
       "highlight": "Highlight",
       "markAnswered": "Mark as answered",
       "dismiss": "Dismiss",
-      "resetToPending": "Reset"
+      "resetToPending": "Reset",
+      "answer": "Answer",
+      "editAnswer": "Edit answer",
+      "answerFieldLabel": "Answer to {name}'s question",
+      "answerPlaceholder": "Write the answer (max 2000 characters)",
+      "sendAnswer": "Publish answer",
+      "cancel": "Cancel",
+      "removeAnswer": "Remove the answer"
     },
     "errors": {
       "textRequired": "Please write your question",
@@ -506,14 +514,18 @@
       "rateLimit": "Please wait before submitting another question",
       "busy": "Many questions are arriving from your network right now: please try again in a few seconds",
       "generic": "Error submitting question",
-      "upvoteFailed": "Your vote was not recorded: please try again in a few seconds."
+      "upvoteFailed": "Your vote was not recorded: please try again in a few seconds.",
+      "actionFailed": "The action did not go through: try again in a few seconds."
     },
     "ctaTitle": "Ask the first question",
     "ctaBody": "Other attendees can upvote your question. Moderators will see it and can answer live or in writing.",
     "moderatorHint": "Attendees can submit questions from their own panel. They appear here in real time.",
     "yourQuestionLabel": "Your question",
     "placeholderInviting": "E.g. Could you explain…",
-    "submitPrimary": "Send question"
+    "submitPrimary": "Send question",
+    "answerLabel": "Answer",
+    "notifyNewQuestionTitle": "New question from {name}",
+    "notifyAnsweredTitle": "Your question has been answered"
   },
   "admin": {
     "accessDenied": {

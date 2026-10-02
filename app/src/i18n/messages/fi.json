@@ -469,7 +469,8 @@
     "leftModeratorReminder": "Tapahtuma pysyy avoimena, kunnes joku päättää sen. Kun olette valmiita, palaa huoneeseen ja valitse ”{action}”.",
     "rejoin": "Palaa huoneeseen",
     "backToHome": "Takaisin etusivulle",
-    "sidebarTabMaterialsNew": "Uusia jaettuja materiaaleja"
+    "sidebarTabMaterialsNew": "Uusia jaettuja materiaaleja",
+    "sidebarTabQaNew": "Uutta kohdassa Kysymykset ja vastaukset"
   },
   "qa": {
     "title": "Kysymykset ja vastaukset",
@@ -498,7 +499,14 @@
       "highlight": "Korosta",
       "markAnswered": "Merkitse vastatuksi",
       "dismiss": "Hylkää",
-      "resetToPending": "Palauta"
+      "resetToPending": "Palauta",
+      "answer": "Vastaa",
+      "editAnswer": "Muokkaa vastausta",
+      "answerFieldLabel": "Vastaus kysymykseen, kysyjä {name}",
+      "answerPlaceholder": "Kirjoita vastaus (enintään 2000 merkkiä)",
+      "sendAnswer": "Julkaise vastaus",
+      "cancel": "Peruuta",
+      "removeAnswer": "Poista vastaus"
     },
     "errors": {
       "textRequired": "Kirjoita kysymyksesi",
@@ -506,14 +514,18 @@
       "rateLimit": "Odota ennen seuraavan kysymyksen lähettämistä",
       "busy": "Verkostasi saapuu juuri nyt paljon kysymyksiä: yritä uudelleen muutaman sekunnin kuluttua",
       "generic": "Virhe kysymyksen lähettämisessä",
-      "upvoteFailed": "Ääntäsi ei kirjattu: yritä uudelleen muutaman sekunnin kuluttua."
+      "upvoteFailed": "Ääntäsi ei kirjattu: yritä uudelleen muutaman sekunnin kuluttua.",
+      "actionFailed": "Toiminto epäonnistui: yritä uudelleen muutaman sekunnin kuluttua."
     },
     "ctaTitle": "Esitä ensimmäinen kysymys",
     "ctaBody": "Muut osallistujat voivat äänestää kysymystäsi. Moderaattorit näkevät sen ja voivat vastata äänellä tai kirjallisesti.",
     "moderatorHint": "Osallistujat voivat lähettää kysymyksiä omasta paneelistaan. Ne näkyvät täällä reaaliajassa.",
     "yourQuestionLabel": "Kysymyksesi",
     "placeholderInviting": "Esim. Voitko selittää tarkemmin…",
-    "submitPrimary": "Lähetä kysymys"
+    "submitPrimary": "Lähetä kysymys",
+    "answerLabel": "Vastaus",
+    "notifyNewQuestionTitle": "Uusi kysymys: {name}",
+    "notifyAnsweredTitle": "Kysymykseesi on vastattu"
   },
   "admin": {
     "accessDenied": {

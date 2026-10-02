@@ -4,7 +4,7 @@ import {
   updateEventSchema,
   createRegistrationSchema,
   createQuestionSchema,
-  updateQuestionStatusSchema,
+  updateQuestionSchema,
   jitsiTokenRequestSchema,
   createMaterialSchema,
   createReminderSchema,
@@ -395,20 +395,37 @@ describe('createQuestionSchema', () => {
   });
 });
 
-// ── updateQuestionStatusSchema ──────────────────────────────
+// ── updateQuestionSchema ──────────────────────────────
 
-describe('updateQuestionStatusSchema', () => {
+describe('updateQuestionSchema', () => {
   it.each(['PENDING', 'HIGHLIGHTED', 'ANSWERED', 'DISMISSED'])(
     'accepts status "%s"',
     (status) => {
-      const result = updateQuestionStatusSchema.safeParse({ status });
+      const result = updateQuestionSchema.safeParse({ status });
       expect(result.success).toBe(true);
     },
   );
 
   it('rejects invalid status', () => {
-    const result = updateQuestionStatusSchema.safeParse({ status: 'OPEN' });
+    const result = updateQuestionSchema.safeParse({ status: 'OPEN' });
     expect(result.success).toBe(false);
+  });
+
+  it('accetta una risposta da sola, ripulita dagli spazi', () => {
+    const result = updateQuestionSchema.safeParse({ answer: '  Sì, entro giugno.  ' });
+    expect(result.success && result.data.answer).toBe('Sì, entro giugno.');
+  });
+
+  it('accetta null per togliere la risposta', () => {
+    expect(updateQuestionSchema.safeParse({ answer: null }).success).toBe(true);
+  });
+
+  it('rifiuta una richiesta senza stato e senza risposta', () => {
+    expect(updateQuestionSchema.safeParse({}).success).toBe(false);
+  });
+
+  it('rifiuta una risposta oltre i 2000 caratteri', () => {
+    expect(updateQuestionSchema.safeParse({ answer: 'x'.repeat(2001) }).success).toBe(false);
   });
 });
 

@@ -469,7 +469,8 @@
     "leftModeratorReminder": "Az esemény nyitva marad, amíg valaki le nem zárja. Ha végeztek, lépjen vissza, és válassza ezt: „{action}”.",
     "rejoin": "Visszalépés",
     "backToHome": "Vissza a kezdőlapra",
-    "sidebarTabMaterialsNew": "Új megosztott anyagok"
+    "sidebarTabMaterialsNew": "Új megosztott anyagok",
+    "sidebarTabQaNew": "Újdonságok a Kérdések és válaszok részben"
   },
   "qa": {
     "title": "Kérdések és válaszok",
@@ -498,7 +499,14 @@
       "highlight": "Kiemelés",
       "markAnswered": "Megválaszolva",
       "dismiss": "Elutasítás",
-      "resetToPending": "Visszaállítás"
+      "resetToPending": "Visszaállítás",
+      "answer": "Válasz írása",
+      "editAnswer": "Válasz szerkesztése",
+      "answerFieldLabel": "Válasz {name} kérdésére",
+      "answerPlaceholder": "Írja meg a választ (legfeljebb 2000 karakter)",
+      "sendAnswer": "Válasz közzététele",
+      "cancel": "Mégse",
+      "removeAnswer": "Válasz eltávolítása"
     },
     "errors": {
       "textRequired": "Írja be kérdését",
@@ -506,14 +514,18 @@
       "rateLimit": "Kérjük, várjon a következő kérdés elküldése előtt",
       "busy": "A hálózatáról most sok kérdés érkezik: kérjük, próbálja újra néhány másodperc múlva",
       "generic": "Hiba a kérdés elküldésekor",
-      "upvoteFailed": "A szavazata nem került rögzítésre: kérjük, próbálja újra néhány másodperc múlva."
+      "upvoteFailed": "A szavazata nem került rögzítésre: kérjük, próbálja újra néhány másodperc múlva.",
+      "actionFailed": "A művelet nem sikerült: próbálja újra néhány másodperc múlva."
     },
     "ctaTitle": "Tegye fel az első kérdést",
     "ctaBody": "A többi résztvevő szavazhat a kérdésére. A moderátorok látják és válaszolhatnak rá hangban vagy írásban.",
     "moderatorHint": "A résztvevők a saját panelükről tehetnek fel kérdéseket. Ezeket valós időben láthatja itt.",
     "yourQuestionLabel": "Az Ön kérdése",
     "placeholderInviting": "Pl.: Tudná részletesebben kifejteni…",
-    "submitPrimary": "Kérdés küldése"
+    "submitPrimary": "Kérdés küldése",
+    "answerLabel": "Válasz",
+    "notifyNewQuestionTitle": "Új kérdés tőle: {name}",
+    "notifyAnsweredTitle": "Kérdésére válasz érkezett"
   },
   "admin": {
     "accessDenied": {

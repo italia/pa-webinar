@@ -469,7 +469,8 @@
     "leftModeratorReminder": "Evenimentul rămâne deschis până când cineva îl încheie. Când ați terminat, reveniți și alegeți „{action}”.",
     "rejoin": "Reveniți în sală",
     "backToHome": "Înapoi la pagina principală",
-    "sidebarTabMaterialsNew": "Materiale noi distribuite"
+    "sidebarTabMaterialsNew": "Materiale noi distribuite",
+    "sidebarTabQaNew": "Noutăți în Întrebări și răspunsuri"
   },
   "qa": {
     "title": "Întrebări și Răspunsuri",
@@ -498,7 +499,14 @@
       "highlight": "Evidențiați",
       "markAnswered": "Răspuns dat",
       "dismiss": "Respingeți",
-      "resetToPending": "Resetați"
+      "resetToPending": "Resetați",
+      "answer": "Răspunde",
+      "editAnswer": "Modifică răspunsul",
+      "answerFieldLabel": "Răspuns la întrebarea lui {name}",
+      "answerPlaceholder": "Scrieți răspunsul (max. 2000 de caractere)",
+      "sendAnswer": "Publică răspunsul",
+      "cancel": "Anulează",
+      "removeAnswer": "Elimină răspunsul"
     },
     "errors": {
       "textRequired": "Scrieți întrebarea dumneavoastră",
@@ -506,14 +514,18 @@
       "rateLimit": "Așteptați înainte de a trimite altă întrebare",
       "busy": "În acest moment sosesc multe întrebări din rețeaua dumneavoastră: încercați din nou peste câteva secunde",
       "generic": "Eroare la trimiterea întrebării",
-      "upvoteFailed": "Votul nu a fost înregistrat: încercați din nou peste câteva secunde."
+      "upvoteFailed": "Votul nu a fost înregistrat: încercați din nou peste câteva secunde.",
+      "actionFailed": "Operațiunea nu a reușit: încercați din nou peste câteva secunde."
     },
     "ctaTitle": "Adresați prima întrebare",
     "ctaBody": "Ceilalți participanți vor putea vota întrebarea dvs. Moderatorii o vor vedea și vor putea răspunde verbal sau în scris.",
     "moderatorHint": "Participanții pot adresa întrebări din panoul lor. Le veți vedea aici în timp real.",
     "yourQuestionLabel": "Întrebarea dvs.",
     "placeholderInviting": "Ex.: Puteți explica mai detaliat…",
-    "submitPrimary": "Trimiteți întrebarea"
+    "submitPrimary": "Trimiteți întrebarea",
+    "answerLabel": "Răspuns",
+    "notifyNewQuestionTitle": "Întrebare nouă de la {name}",
+    "notifyAnsweredTitle": "Întrebarea dvs. a primit un răspuns"
   },
   "admin": {
     "accessDenied": {

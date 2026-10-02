@@ -186,6 +186,7 @@ export default async function EventDetailPage({
   let answeredQuestions: {
     id: string;
     text: string;
+    answerText: string | null;
     authorName: string;
     upvotes: number;
     status: string;
@@ -237,7 +238,12 @@ export default async function EventDetailPage({
         ? prisma.question.findMany({
             where: {
               eventId: event.id,
-              status: { in: ['ANSWERED', 'HIGHLIGHTED'] },
+              // Anche una domanda rimessa in attesa dopo una risposta scritta:
+              // la risposta si vedeva in sala, e resta.
+              OR: [
+                { status: { in: ['ANSWERED', 'HIGHLIGHTED'] } },
+                { status: 'PENDING', answerText: { not: null } },
+              ],
             },
             orderBy: { upvoteCount: 'desc' },
           })
@@ -289,6 +295,7 @@ export default async function EventDetailPage({
     answeredQuestions = questionsRaw.map((q) => ({
       id: q.id,
       text: q.text,
+      answerText: q.answerText,
       authorName: q.authorName,
       upvotes: q.upvoteCount,
       status: q.status,

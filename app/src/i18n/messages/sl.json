@@ -469,7 +469,8 @@
     "leftModeratorReminder": "Dogodek ostane odprt, dokler ga kdo ne konča. Ko končate, se vrnite in izberite »{action}«.",
     "rejoin": "Vrni se",
     "backToHome": "Nazaj na začetno stran",
-    "sidebarTabMaterialsNew": "Nova deljena gradiva"
+    "sidebarTabMaterialsNew": "Nova deljena gradiva",
+    "sidebarTabQaNew": "Novo v Vprašanjih in odgovorih"
   },
   "qa": {
     "title": "Vprašanja in odgovori",
@@ -498,7 +499,14 @@
       "highlight": "Izpostavi",
       "markAnswered": "Odgovorjeno",
       "dismiss": "Zavrni",
-      "resetToPending": "Ponastavi"
+      "resetToPending": "Ponastavi",
+      "answer": "Odgovori",
+      "editAnswer": "Uredi odgovor",
+      "answerFieldLabel": "Odgovor na vprašanje od {name}",
+      "answerPlaceholder": "Napišite odgovor (največ 2000 znakov)",
+      "sendAnswer": "Objavi odgovor",
+      "cancel": "Prekliči",
+      "removeAnswer": "Odstrani odgovor"
     },
     "errors": {
       "textRequired": "Napišite svoje vprašanje",
@@ -506,14 +514,18 @@
       "rateLimit": "Počakajte, preden pošljete novo vprašanje",
       "busy": "Iz vašega omrežja trenutno prihaja veliko vprašanj: poskusite znova čez nekaj sekund",
       "generic": "Napaka pri pošiljanju vprašanja",
-      "upvoteFailed": "Vaš glas ni bil zabeležen: poskusite znova čez nekaj sekund."
+      "upvoteFailed": "Vaš glas ni bil zabeležen: poskusite znova čez nekaj sekund.",
+      "actionFailed": "Dejanje ni uspelo: poskusite znova čez nekaj sekund."
     },
     "ctaTitle": "Postavite prvo vprašanje",
     "ctaBody": "Drugi udeleženci bodo lahko glasovali za vaše vprašanje. Moderatorji ga bodo videli in lahko nanj odgovorijo ustno ali pisno.",
     "moderatorHint": "Udeleženci lahko postavljajo vprašanja iz svoje plošče. Tukaj jih boste videli v realnem času.",
     "yourQuestionLabel": "Vaše vprašanje",
     "placeholderInviting": "Npr.: Lahko natančneje pojasnite …",
-    "submitPrimary": "Pošlji vprašanje"
+    "submitPrimary": "Pošlji vprašanje",
+    "answerLabel": "Odgovor",
+    "notifyNewQuestionTitle": "Novo vprašanje od {name}",
+    "notifyAnsweredTitle": "Na vaše vprašanje je prišel odgovor"
   },
   "admin": {
     "accessDenied": {

@@ -19,7 +19,8 @@ interface QuestionFormProps {
    *  manca il token: è la chiave del limite di frequenza per persona. Senza,
    *  il server ricade sull'indirizzo IP, condiviso da un ufficio intero. */
   guestId?: string;
-  onSubmitted: () => void;
+  /** Riceve l'identificativo della domanda appena accettata, se il server lo dice. */
+  onSubmitted: (questionId?: string) => void;
 }
 
 export default function QuestionForm({
@@ -90,10 +91,16 @@ export default function QuestionForm({
           return;
         }
 
+        let questionId: string | undefined;
+        try {
+          questionId = ((await res.json()) as { id?: string }).id;
+        } catch {
+          // Corpo illeggibile: la domanda c'e' comunque, solo senza il segno.
+        }
         setText('');
         setSuccess(true);
         startCooldown();
-        onSubmitted();
+        onSubmitted(questionId);
 
         setTimeout(() => setSuccess(false), 3000);
       } catch {

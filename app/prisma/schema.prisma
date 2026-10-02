@@ -785,6 +785,8 @@ model Question {
 
   authorName String @map("author_name")
   text       String @db.VarChar(500)
+  // Risposta scritta da chi conduce, visibile a tutti sotto la domanda.
+  answerText String? @map("answer_text") @db.VarChar(2000)
 
   status      QuestionStatus @default(PENDING)
   upvoteCount Int            @default(0) @map("upvote_count") // denormalized

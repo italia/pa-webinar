@@ -297,9 +297,19 @@ export const createQuestionSchema = z.object({
   guestId: z.string().trim().min(1).max(100).optional(),
 });
 
-export const updateQuestionStatusSchema = z.object({
-  status: z.enum(['PENDING', 'HIGHLIGHTED', 'ANSWERED', 'DISMISSED']),
-});
+/**
+ * Il moderatore cambia lo stato di una domanda, ne scrive la risposta, o tutte
+ * e due le cose. Una risposta vuota (o null) toglie quella scritta.
+ */
+export const QUESTION_ANSWER_MAX = 2000;
+export const updateQuestionSchema = z
+  .object({
+    status: z.enum(['PENDING', 'HIGHLIGHTED', 'ANSWERED', 'DISMISSED']).optional(),
+    answer: z.string().trim().max(QUESTION_ANSWER_MAX).nullable().optional(),
+  })
+  .refine((v) => v.status !== undefined || v.answer !== undefined, {
+    message: 'status or answer required',
+  });
 
 /**
  * Il pollice in su a una domanda. L'identità è una sola, come nel voto dei
@@ -316,7 +326,7 @@ export const upvoteQuestionSchema = z.object({
 });
 
 export type CreateQuestionInput = z.infer<typeof createQuestionSchema>;
-export type UpdateQuestionStatusInput = z.infer<typeof updateQuestionStatusSchema>;
+export type UpdateQuestionInput = z.infer<typeof updateQuestionSchema>;
 
 // ── Jitsi Token Schema ───────────────────────────────
 

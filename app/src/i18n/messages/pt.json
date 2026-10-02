@@ -469,7 +469,8 @@
     "leftModeratorReminder": "O evento continua aberto até alguém o terminar. Quando terminarem, volte a entrar e escolha «{action}».",
     "rejoin": "Voltar a entrar",
     "backToHome": "Voltar à página inicial",
-    "sidebarTabMaterialsNew": "Novos materiais partilhados"
+    "sidebarTabMaterialsNew": "Novos materiais partilhados",
+    "sidebarTabQaNew": "Novidades em Perguntas e respostas"
   },
   "qa": {
     "title": "Perguntas e Respostas",
@@ -498,7 +499,14 @@
       "highlight": "Destacar",
       "markAnswered": "Respondida",
       "dismiss": "Descartar",
-      "resetToPending": "Repor"
+      "resetToPending": "Repor",
+      "answer": "Responder",
+      "editAnswer": "Editar resposta",
+      "answerFieldLabel": "Resposta à pergunta de {name}",
+      "answerPlaceholder": "Escreva a resposta (máx. 2000 caracteres)",
+      "sendAnswer": "Publicar resposta",
+      "cancel": "Cancelar",
+      "removeAnswer": "Remover a resposta"
     },
     "errors": {
       "textRequired": "Escreva a sua pergunta",
@@ -506,14 +514,18 @@
       "rateLimit": "Aguarde antes de enviar outra pergunta",
       "busy": "Neste momento chegam muitas perguntas da sua rede: tente novamente dentro de alguns segundos",
       "generic": "Erro ao enviar a pergunta",
-      "upvoteFailed": "O voto não foi registado: tente novamente dentro de alguns segundos."
+      "upvoteFailed": "O voto não foi registado: tente novamente dentro de alguns segundos.",
+      "actionFailed": "A operação falhou: tente novamente dentro de alguns segundos."
     },
     "ctaTitle": "Faça a primeira pergunta",
     "ctaBody": "Os outros participantes poderão votar a sua pergunta. Os moderadores irão vê-la e poderão responder por voz ou por escrito.",
     "moderatorHint": "Os participantes podem fazer perguntas a partir do seu painel. Aparecem aqui em tempo real.",
     "yourQuestionLabel": "A sua pergunta",
     "placeholderInviting": "Ex.: Pode explicar melhor…",
-    "submitPrimary": "Enviar pergunta"
+    "submitPrimary": "Enviar pergunta",
+    "answerLabel": "Resposta",
+    "notifyNewQuestionTitle": "Nova pergunta de {name}",
+    "notifyAnsweredTitle": "A sua pergunta recebeu resposta"
   },
   "admin": {
     "accessDenied": {

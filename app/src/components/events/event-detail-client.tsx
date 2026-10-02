@@ -36,6 +36,7 @@ import { MarkdownRenderer } from '@/components/ui/markdown';
 interface AnsweredQuestion {
   id: string;
   text: string;
+  answerText: string | null;
   authorName: string;
   upvotes: number;
   status: string;

@@ -469,7 +469,8 @@
     "leftModeratorReminder": "L'evento resta aperto finché qualcuno non lo termina. A evento finito, rientra e scegli «{action}».",
     "rejoin": "Rientra",
     "backToHome": "Torna alla home page",
-    "sidebarTabMaterialsNew": "Nuovi materiali condivisi"
+    "sidebarTabMaterialsNew": "Nuovi materiali condivisi",
+    "sidebarTabQaNew": "Novità in Domande e risposte"
   },
   "qa": {
     "title": "Domande e Risposte",
@@ -498,7 +499,14 @@
       "highlight": "Evidenzia",
       "markAnswered": "Risposta data",
       "dismiss": "Scarta",
-      "resetToPending": "Ripristina"
+      "resetToPending": "Ripristina",
+      "answer": "Rispondi",
+      "editAnswer": "Modifica risposta",
+      "answerFieldLabel": "Risposta alla domanda di {name}",
+      "answerPlaceholder": "Scrivi la risposta (max 2000 caratteri)",
+      "sendAnswer": "Pubblica risposta",
+      "cancel": "Annulla",
+      "removeAnswer": "Togli la risposta"
     },
     "errors": {
       "textRequired": "Scrivi la tua domanda",
@@ -506,14 +514,18 @@
       "rateLimit": "Attendi prima di inviare un'altra domanda",
       "busy": "Molte domande in arrivo dalla tua rete in questo momento: riprova tra qualche secondo",
       "generic": "Errore nell'invio della domanda",
-      "upvoteFailed": "Il voto non è stato registrato: riprova tra qualche secondo."
+      "upvoteFailed": "Il voto non è stato registrato: riprova tra qualche secondo.",
+      "actionFailed": "L'operazione non è riuscita: riprova tra qualche secondo."
     },
     "ctaTitle": "Fai la prima domanda",
     "ctaBody": "Gli altri partecipanti potranno votare la tua domanda. I moderatori la vedranno e potranno dare risposta in voce o in scritto.",
     "moderatorHint": "I partecipanti possono fare domande dal loro pannello. Le vedrai qui in tempo reale.",
     "yourQuestionLabel": "La tua domanda",
     "placeholderInviting": "Es: Puoi spiegare meglio…",
-    "submitPrimary": "Invia domanda"
+    "submitPrimary": "Invia domanda",
+    "answerLabel": "Risposta",
+    "notifyNewQuestionTitle": "Nuova domanda da {name}",
+    "notifyAnsweredTitle": "La tua domanda ha ricevuto risposta"
   },
   "polls": {
     "title": "Sondaggi",

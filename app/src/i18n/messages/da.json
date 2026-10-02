@@ -469,7 +469,8 @@
     "leftModeratorReminder": "Begivenheden forbliver åben, indtil nogen afslutter den. Når I er færdige, så gå ind igen og vælg »{action}«.",
     "rejoin": "Gå ind igen",
     "backToHome": "Tilbage til forsiden",
-    "sidebarTabMaterialsNew": "Nye delte materialer"
+    "sidebarTabMaterialsNew": "Nye delte materialer",
+    "sidebarTabQaNew": "Nyt i Spørgsmål og svar"
   },
   "qa": {
     "title": "Spørgsmål og svar",
@@ -498,7 +499,14 @@
       "highlight": "Fremhæv",
       "markAnswered": "Markér som besvaret",
       "dismiss": "Afvis",
-      "resetToPending": "Nulstil"
+      "resetToPending": "Nulstil",
+      "answer": "Svar",
+      "editAnswer": "Rediger svar",
+      "answerFieldLabel": "Svar på spørgsmålet fra {name}",
+      "answerPlaceholder": "Skriv svaret (maks. 2000 tegn)",
+      "sendAnswer": "Offentliggør svar",
+      "cancel": "Annuller",
+      "removeAnswer": "Fjern svaret"
     },
     "errors": {
       "textRequired": "Skriv venligst dit spørgsmål",
@@ -506,14 +514,18 @@
       "rateLimit": "Vent venligst, før du sender endnu et spørgsmål",
       "busy": "Der kommer mange spørgsmål fra dit netværk lige nu: prøv venligst igen om et par sekunder",
       "generic": "Fejl ved afsendelse af spørgsmål",
-      "upvoteFailed": "Din stemme blev ikke registreret: prøv venligst igen om et par sekunder."
+      "upvoteFailed": "Din stemme blev ikke registreret: prøv venligst igen om et par sekunder.",
+      "actionFailed": "Handlingen mislykkedes: prøv igen om et par sekunder."
     },
     "ctaTitle": "Stil det første spørgsmål",
     "ctaBody": "De øvrige deltagere kan stemme på dit spørgsmål. Moderatorerne ser det og kan svare mundtligt eller skriftligt.",
     "moderatorHint": "Deltagerne kan stille spørgsmål fra deres eget panel. De vises her i realtid.",
     "yourQuestionLabel": "Dit spørgsmål",
     "placeholderInviting": "F.eks.: Kan du forklare nærmere…",
-    "submitPrimary": "Send spørgsmål"
+    "submitPrimary": "Send spørgsmål",
+    "answerLabel": "Svar",
+    "notifyNewQuestionTitle": "Nyt spørgsmål fra {name}",
+    "notifyAnsweredTitle": "Dit spørgsmål er blevet besvaret"
   },
   "admin": {
     "accessDenied": {

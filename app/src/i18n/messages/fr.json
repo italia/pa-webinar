@@ -469,7 +469,8 @@
     "leftModeratorReminder": "L'événement reste ouvert jusqu'à ce que quelqu'un y mette fin. Quand vous aurez terminé, revenez dans la salle et choisissez « {action} ».",
     "rejoin": "Revenir dans la salle",
     "backToHome": "Retour à la page d'accueil",
-    "sidebarTabMaterialsNew": "Nouveaux supports partagés"
+    "sidebarTabMaterialsNew": "Nouveaux supports partagés",
+    "sidebarTabQaNew": "Nouveautés dans Questions-réponses"
   },
   "qa": {
     "title": "Questions et Réponses",
@@ -498,7 +499,14 @@
       "highlight": "Mettre en avant",
       "markAnswered": "Marquer comme répondue",
       "dismiss": "Écarter",
-      "resetToPending": "Réinitialiser"
+      "resetToPending": "Réinitialiser",
+      "answer": "Répondre",
+      "editAnswer": "Modifier la réponse",
+      "answerFieldLabel": "Réponse à la question de {name}",
+      "answerPlaceholder": "Rédigez la réponse (2000 caractères max.)",
+      "sendAnswer": "Publier la réponse",
+      "cancel": "Annuler",
+      "removeAnswer": "Retirer la réponse"
     },
     "errors": {
       "textRequired": "Veuillez rédiger votre question",
@@ -506,14 +514,18 @@
       "rateLimit": "Veuillez patienter avant d'envoyer une autre question",
       "busy": "De nombreuses questions arrivent de votre réseau en ce moment : veuillez réessayer dans quelques secondes",
       "generic": "Erreur lors de l'envoi de la question",
-      "upvoteFailed": "Votre vote n'a pas été enregistré : veuillez réessayer dans quelques secondes."
+      "upvoteFailed": "Votre vote n'a pas été enregistré : veuillez réessayer dans quelques secondes.",
+      "actionFailed": "L'opération a échoué : réessayez dans quelques secondes."
     },
     "ctaTitle": "Posez la première question",
     "ctaBody": "Les autres participants pourront voter pour votre question. Les modérateurs la verront et pourront y répondre à l'oral ou à l'écrit.",
     "moderatorHint": "Les participants peuvent envoyer des questions depuis leur propre panneau. Elles apparaissent ici en temps réel.",
     "yourQuestionLabel": "Votre question",
     "placeholderInviting": "Ex. : Pouvez-vous expliquer…",
-    "submitPrimary": "Envoyer la question"
+    "submitPrimary": "Envoyer la question",
+    "answerLabel": "Réponse",
+    "notifyNewQuestionTitle": "Nouvelle question de {name}",
+    "notifyAnsweredTitle": "Votre question a reçu une réponse"
   },
   "admin": {
     "accessDenied": {

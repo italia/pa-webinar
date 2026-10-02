@@ -469,7 +469,8 @@
     "leftModeratorReminder": "Pasākums paliek atvērts, līdz kāds to beidz. Kad esat beiguši, atgriezieties un izvēlieties “{action}”.",
     "rejoin": "Atgriezties",
     "backToHome": "Atpakaļ uz sākumlapu",
-    "sidebarTabMaterialsNew": "Jauni kopīgoti materiāli"
+    "sidebarTabMaterialsNew": "Jauni kopīgoti materiāli",
+    "sidebarTabQaNew": "Jaunumi sadaļā Jautājumi un atbildes"
   },
   "qa": {
     "title": "Jautājumi un atbildes",
@@ -498,7 +499,14 @@
       "highlight": "Izcelt",
       "markAnswered": "Atzīmēt kā atbildētu",
       "dismiss": "Noraidīt",
-      "resetToPending": "Atjaunot"
+      "resetToPending": "Atjaunot",
+      "answer": "Atbildēt",
+      "editAnswer": "Rediģēt atbildi",
+      "answerFieldLabel": "Atbilde uz {name} jautājumu",
+      "answerPlaceholder": "Uzrakstiet atbildi (līdz 2000 rakstzīmēm)",
+      "sendAnswer": "Publicēt atbildi",
+      "cancel": "Atcelt",
+      "removeAnswer": "Noņemt atbildi"
     },
     "errors": {
       "textRequired": "Uzrakstiet savu jautājumu",
@@ -506,14 +514,18 @@
       "rateLimit": "Lūdzu, uzgaidiet pirms nākamā jautājuma iesniegšanas",
       "busy": "No jūsu tīkla pašlaik pienāk daudz jautājumu: lūdzu, mēģiniet vēlreiz pēc dažām sekundēm",
       "generic": "Kļūda, iesniedzot jautājumu",
-      "upvoteFailed": "Jūsu balss netika reģistrēta: lūdzu, mēģiniet vēlreiz pēc dažām sekundēm."
+      "upvoteFailed": "Jūsu balss netika reģistrēta: lūdzu, mēģiniet vēlreiz pēc dažām sekundēm.",
+      "actionFailed": "Darbība neizdevās: mēģiniet vēlreiz pēc dažām sekundēm."
     },
     "ctaTitle": "Uzdodiet pirmo jautājumu",
     "ctaBody": "Citi dalībnieki varēs balsot par jūsu jautājumu. Moderatori to redzēs un varēs atbildēt mutiski vai rakstiski.",
     "moderatorHint": "Dalībnieki var iesniegt jautājumus no sava paneļa. Tie parādās šeit reāllaikā.",
     "yourQuestionLabel": "Jūsu jautājums",
     "placeholderInviting": "Piem.: Vai varat paskaidrot…",
-    "submitPrimary": "Nosūtīt jautājumu"
+    "submitPrimary": "Nosūtīt jautājumu",
+    "answerLabel": "Atbilde",
+    "notifyNewQuestionTitle": "Jauns jautājums no {name}",
+    "notifyAnsweredTitle": "Uz jūsu jautājumu ir atbildēts"
   },
   "admin": {
     "accessDenied": {

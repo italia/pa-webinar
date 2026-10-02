@@ -1,12 +1,14 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
+
+import { Icon } from '@/components/ui/icon';
+import { readMyQuestions, rememberMyQuestion } from '@/lib/qa/alerts';
 
 import QuestionForm from './question-form';
 import QuestionList from './question-list';
 
-import { Icon } from '@/components/ui/icon';
 
 interface QAPanelProps {
   eventSlug: string;
@@ -37,10 +39,20 @@ export default function QAPanel({
 }: QAPanelProps) {
   const t = useTranslations('qa');
   const [refreshKey, setRefreshKey] = useState(0);
+  // Le domande fatte da questo browser: la lista le segna, e la sala avvisa
+  // quando ricevono risposta (lib/qa/alerts).
+  const [myQuestionIds, setMyQuestionIds] = useState<ReadonlySet<string>>(() => new Set());
+  useEffect(() => {
+    setMyQuestionIds(readMyQuestions(eventSlug));
+  }, [eventSlug]);
 
-  const handleSubmitted = useCallback(() => {
-    setRefreshKey((k) => k + 1);
-  }, []);
+  const handleSubmitted = useCallback(
+    (questionId?: string) => {
+      if (questionId) setMyQuestionIds(rememberMyQuestion(eventSlug, questionId));
+      setRefreshKey((k) => k + 1);
+    },
+    [eventSlug],
+  );
 
   return (
     <div
@@ -105,6 +117,7 @@ export default function QAPanel({
             isModerator={isModerator}
             voterAccessToken={voterAccessToken}
             voterGuestId={voterGuestId}
+            myQuestionIds={myQuestionIds}
           />
         </div>
     </div>

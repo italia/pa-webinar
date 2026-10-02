@@ -469,7 +469,8 @@
     "leftModeratorReminder": "Renginys lieka atviras, kol kas nors jo neužbaigia. Kai baigsite, grįžkite ir pasirinkite „{action}“.",
     "rejoin": "Grįžti",
     "backToHome": "Grįžti į pradžios puslapį",
-    "sidebarTabMaterialsNew": "Nauja bendrinama medžiaga"
+    "sidebarTabMaterialsNew": "Nauja bendrinama medžiaga",
+    "sidebarTabQaNew": "Naujienos skiltyje Klausimai ir atsakymai"
   },
   "qa": {
     "title": "Klausimai ir atsakymai",
@@ -498,7 +499,14 @@
       "highlight": "Išskirti",
       "markAnswered": "Pažymėti kaip atsakytą",
       "dismiss": "Atmesti",
-      "resetToPending": "Atkurti"
+      "resetToPending": "Atkurti",
+      "answer": "Atsakyti",
+      "editAnswer": "Redaguoti atsakymą",
+      "answerFieldLabel": "Atsakymas į {name} klausimą",
+      "answerPlaceholder": "Parašykite atsakymą (iki 2000 simbolių)",
+      "sendAnswer": "Paskelbti atsakymą",
+      "cancel": "Atšaukti",
+      "removeAnswer": "Pašalinti atsakymą"
     },
     "errors": {
       "textRequired": "Parašykite savo klausimą",
@@ -506,14 +514,18 @@
       "rateLimit": "Palaukite prieš pateikdami kitą klausimą",
       "busy": "Šiuo metu iš jūsų tinklo gaunama daug klausimų: bandykite dar kartą po kelių sekundžių",
       "generic": "Klaida pateikiant klausimą",
-      "upvoteFailed": "Jūsų balsas neužregistruotas: bandykite dar kartą po kelių sekundžių."
+      "upvoteFailed": "Jūsų balsas neužregistruotas: bandykite dar kartą po kelių sekundžių.",
+      "actionFailed": "Veiksmas nepavyko: bandykite dar kartą po kelių sekundžių."
     },
     "ctaTitle": "Užduokite pirmą klausimą",
     "ctaBody": "Kiti dalyviai galės balsuoti už jūsų klausimą. Moderatoriai jį matys ir galės atsakyti balsu arba raštu.",
     "moderatorHint": "Dalyviai gali užduoti klausimus iš savo skydelio. Matysite juos čia tikruoju laiku.",
     "yourQuestionLabel": "Jūsų klausimas",
     "placeholderInviting": "Pvz.: Ar galite paaiškinti…",
-    "submitPrimary": "Siųsti klausimą"
+    "submitPrimary": "Siųsti klausimą",
+    "answerLabel": "Atsakymas",
+    "notifyNewQuestionTitle": "Naujas klausimas nuo {name}",
+    "notifyAnsweredTitle": "Į jūsų klausimą atsakyta"
   },
   "admin": {
     "accessDenied": {

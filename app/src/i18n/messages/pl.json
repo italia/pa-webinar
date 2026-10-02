@@ -469,7 +469,8 @@
     "leftModeratorReminder": "Wydarzenie pozostaje otwarte, dopóki ktoś go nie zakończy. Po zakończeniu proszę wrócić i wybrać „{action}”.",
     "rejoin": "Wróć do sali",
     "backToHome": "Powrót do strony głównej",
-    "sidebarTabMaterialsNew": "Udostępniono nowe materiały"
+    "sidebarTabMaterialsNew": "Udostępniono nowe materiały",
+    "sidebarTabQaNew": "Nowości w Pytaniach i odpowiedziach"
   },
   "qa": {
     "title": "Pytania i odpowiedzi",
@@ -498,7 +499,14 @@
       "highlight": "Wyróżnij",
       "markAnswered": "Odpowiedziane",
       "dismiss": "Odrzuć",
-      "resetToPending": "Przywróć"
+      "resetToPending": "Przywróć",
+      "answer": "Odpowiedz",
+      "editAnswer": "Edytuj odpowiedź",
+      "answerFieldLabel": "Odpowiedź na pytanie od {name}",
+      "answerPlaceholder": "Napisz odpowiedź (maks. 2000 znaków)",
+      "sendAnswer": "Opublikuj odpowiedź",
+      "cancel": "Anuluj",
+      "removeAnswer": "Usuń odpowiedź"
     },
     "errors": {
       "textRequired": "Proszę napisać pytanie",
@@ -506,14 +514,18 @@
       "rateLimit": "Proszę poczekać przed wysłaniem kolejnego pytania",
       "busy": "Z tej sieci napływa teraz wiele pytań: proszę spróbować ponownie za kilka sekund",
       "generic": "Błąd podczas wysyłania pytania",
-      "upvoteFailed": "Głos nie został zapisany: proszę spróbować ponownie za kilka sekund."
+      "upvoteFailed": "Głos nie został zapisany: proszę spróbować ponownie za kilka sekund.",
+      "actionFailed": "Operacja się nie powiodła: spróbuj ponownie za kilka sekund."
     },
     "ctaTitle": "Zadaj pierwsze pytanie",
     "ctaBody": "Inni uczestnicy będą mogli zagłosować na Twoje pytanie. Moderatorzy je zobaczą i będą mogli odpowiedzieć głosowo lub pisemnie.",
     "moderatorHint": "Uczestnicy mogą zadawać pytania ze swojego panelu. Pojawią się tutaj w czasie rzeczywistym.",
     "yourQuestionLabel": "Twoje pytanie",
     "placeholderInviting": "Np. Czy może Pan/Pani wyjaśnić…",
-    "submitPrimary": "Wyślij pytanie"
+    "submitPrimary": "Wyślij pytanie",
+    "answerLabel": "Odpowiedź",
+    "notifyNewQuestionTitle": "Nowe pytanie od {name}",
+    "notifyAnsweredTitle": "Twoje pytanie otrzymało odpowiedź"
   },
   "admin": {
     "accessDenied": {
