@@ -855,7 +855,9 @@
       "revocationFailed": "Preklic dostopa za {name} ni uspel: povezava za dostop še vedno velja. Znova shranite za nov poskus ali jo prekličite na zavihku »{tab}« na strani dogodka.",
       "validationFailedDetail": "Strežnik je zavrnil nekatere podatke: {reason}. Popravite jih in poskusite znova.",
       "publishFailed": "Dogodek je bil ustvarjen, vendar ni bil objavljen: ostaja osnutek. Objavite ga na strani dogodka.",
-      "publishFailedDetail": "Dogodek je bil ustvarjen, vendar ni bil objavljen: ostaja osnutek. Strežnik je odgovoril: {reason}. Objavite ga na strani dogodka."
+      "publishFailedDetail": "Dogodek je bil ustvarjen, vendar ni bil objavljen: ostaja osnutek. Strežnik je odgovoril: {reason}. Objavite ga na strani dogodka.",
+      "toFix": "Za popravek:",
+      "toFixField": "Polje {n}"
     },
     "nav": {
       "events": "Upravljanje dogodkov",
@@ -2328,7 +2330,19 @@
       "capacitySection": "Zmogljivost in infrastruktura",
       "capacitySubtitle": "Nastavljeno za največ {max} udeležencev",
       "publishBlockedLive": "Dogodek že poteka",
-      "publishBlockedEnded": "Dogodek se je končal"
+      "publishBlockedEnded": "Dogodek se je končal",
+      "created": {
+        "publishedTitle": "Dogodek objavljen",
+        "draftTitle": "Osnutek shranjen",
+        "publishedBody": "Je javno viden: delite povezavo z udeleženci.",
+        "draftBody": "Še ni javno viden: objavite ga, ko bo pripravljen.",
+        "publishFailedTitle": "Objava ni uspela",
+        "publishFailedBody": "Dogodek je shranjen kot osnutek: objavite ga na tej strani, ko bo težava odpravljena.",
+        "unsaved": "Ni shranjeno: {items}. Dodate jih lahko na tej strani.",
+        "copyParticipantLink": "Kopiraj povezavo za udeležence",
+        "sendToSpeakers": "Povezave moderatorjev in govorcev",
+        "close": "Zapri povzetek"
+      }
     },
     "rubrica": {
       "title": "Imenik",

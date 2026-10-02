@@ -855,7 +855,9 @@
       "revocationFailed": "Nem sikerült visszavonni {name} hozzáférését: a hozzáférési link továbbra is érvényes. Mentsen újra az újrapróbálkozáshoz, vagy vonja vissza az esemény oldalának „{tab}” lapján.",
       "validationFailedDetail": "A szerver elutasított néhány adatot: {reason}. Javítsa ki, és próbálja újra.",
       "publishFailed": "Az esemény létrejött, de nem lett közzétéve: továbbra is piszkozat. Tegye közzé az esemény oldaláról.",
-      "publishFailedDetail": "Az esemény létrejött, de nem lett közzétéve: továbbra is piszkozat. A szerver válasza: {reason}. Tegye közzé az esemény oldaláról."
+      "publishFailedDetail": "Az esemény létrejött, de nem lett közzétéve: továbbra is piszkozat. A szerver válasza: {reason}. Tegye közzé az esemény oldaláról.",
+      "toFix": "Javítandó:",
+      "toFixField": "{n}. mező"
     },
     "nav": {
       "events": "Események kezelése",
@@ -2328,7 +2330,19 @@
       "capacitySection": "Kapacitás és infrastruktúra",
       "capacitySubtitle": "Legfeljebb {max} résztvevőre beállítva",
       "publishBlockedLive": "Az esemény már zajlik",
-      "publishBlockedEnded": "Az esemény véget ért"
+      "publishBlockedEnded": "Az esemény véget ért",
+      "created": {
+        "publishedTitle": "Esemény közzétéve",
+        "draftTitle": "Piszkozat mentve",
+        "publishedBody": "Nyilvánosan látható: ossza meg a linket a résztvevőkkel.",
+        "draftBody": "Még nem látható nyilvánosan: tegye közzé, amikor elkészült.",
+        "publishFailedTitle": "A közzététel nem sikerült",
+        "publishFailedBody": "Az esemény piszkozatként van mentve: tegye közzé ezen az oldalon, ha a hiba megoldódott.",
+        "unsaved": "Nincs mentve: {items}. Ezen az oldalon hozzáadhatja őket.",
+        "copyParticipantLink": "Résztvevői link másolása",
+        "sendToSpeakers": "Moderátorok és előadók linkjei",
+        "close": "Összefoglaló bezárása"
+      }
     },
     "rubrica": {
       "title": "Címjegyzék",

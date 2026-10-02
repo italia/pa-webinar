@@ -956,7 +956,9 @@
       "revocationFailed": "La revoca di {name} non è riuscita: il suo link è ancora valido. Salva di nuovo per riprovare, oppure revocalo dalla scheda «{tab}» della pagina dell'evento.",
       "validationFailedDetail": "Il server ha rifiutato alcuni dati: {reason}. Correggi e riprova.",
       "publishFailed": "L'evento è stato creato ma non pubblicato: resta in bozza. Pubblicalo dalla pagina dell'evento.",
-      "publishFailedDetail": "L'evento è stato creato ma non pubblicato: resta in bozza. Il server ha risposto: {reason}. Pubblicalo dalla pagina dell'evento."
+      "publishFailedDetail": "L'evento è stato creato ma non pubblicato: resta in bozza. Il server ha risposto: {reason}. Pubblicalo dalla pagina dell'evento.",
+      "toFix": "Da correggere:",
+      "toFixField": "Campo {n}"
     },
     "nav": {
       "events": "Eventi",
@@ -2429,7 +2431,19 @@
       "capacitySection": "Capacità e infrastruttura",
       "capacitySubtitle": "Configurato per un massimo di {max} partecipanti",
       "publishBlockedLive": "L’evento è già in corso",
-      "publishBlockedEnded": "L’evento è concluso"
+      "publishBlockedEnded": "L’evento è concluso",
+      "created": {
+        "publishedTitle": "Evento pubblicato",
+        "draftTitle": "Bozza salvata",
+        "publishedBody": "È visibile al pubblico: condividi il link con chi deve partecipare.",
+        "draftBody": "Non è ancora visibile al pubblico: pubblicalo quando è pronto.",
+        "publishFailedTitle": "Pubblicazione non riuscita",
+        "publishFailedBody": "L'evento è salvato come bozza: pubblicalo da questa pagina quando il problema è risolto.",
+        "unsaved": "Non sono stati salvati: {items}. Puoi aggiungerli da questa pagina.",
+        "copyParticipantLink": "Copia il link per i partecipanti",
+        "sendToSpeakers": "Link di moderatori e relatori",
+        "close": "Chiudi il riepilogo"
+      }
     },
     "rubrica": {
       "title": "Rubrica",

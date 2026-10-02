@@ -855,7 +855,9 @@
       "revocationFailed": "Der Widerruf des Zugangs für {name} ist fehlgeschlagen: Der Zugangslink ist weiterhin gültig. Speichern Sie erneut, um es noch einmal zu versuchen, oder widerrufen Sie ihn im Reiter „{tab}“ der Veranstaltungsseite.",
       "validationFailedDetail": "Der Server hat einige Daten abgelehnt: {reason}. Korrigieren Sie sie und versuchen Sie es erneut.",
       "publishFailed": "Die Veranstaltung wurde erstellt, aber nicht veröffentlicht: Sie bleibt ein Entwurf. Veröffentlichen Sie sie auf der Seite der Veranstaltung.",
-      "publishFailedDetail": "Die Veranstaltung wurde erstellt, aber nicht veröffentlicht: Sie bleibt ein Entwurf. Der Server hat geantwortet: {reason}. Veröffentlichen Sie sie auf der Seite der Veranstaltung."
+      "publishFailedDetail": "Die Veranstaltung wurde erstellt, aber nicht veröffentlicht: Sie bleibt ein Entwurf. Der Server hat geantwortet: {reason}. Veröffentlichen Sie sie auf der Seite der Veranstaltung.",
+      "toFix": "Zu korrigieren:",
+      "toFixField": "Feld {n}"
     },
     "nav": {
       "events": "Veranstaltungsverwaltung",
@@ -2328,7 +2330,19 @@
       "capacitySection": "Kapazität und Infrastruktur",
       "capacitySubtitle": "Konfiguriert für bis zu {max} Teilnehmende",
       "publishBlockedLive": "Die Veranstaltung läuft bereits",
-      "publishBlockedEnded": "Die Veranstaltung ist beendet"
+      "publishBlockedEnded": "Die Veranstaltung ist beendet",
+      "created": {
+        "publishedTitle": "Veranstaltung veröffentlicht",
+        "draftTitle": "Entwurf gespeichert",
+        "publishedBody": "Sie ist öffentlich sichtbar: Teilen Sie den Link mit den Teilnehmenden.",
+        "draftBody": "Sie ist noch nicht öffentlich sichtbar: Veröffentlichen Sie sie, wenn sie bereit ist.",
+        "publishFailedTitle": "Veröffentlichung fehlgeschlagen",
+        "publishFailedBody": "Die Veranstaltung ist als Entwurf gespeichert: Veröffentlichen Sie sie auf dieser Seite, sobald das Problem behoben ist.",
+        "unsaved": "Nicht gespeichert: {items}. Sie können sie auf dieser Seite hinzufügen.",
+        "copyParticipantLink": "Link für Teilnehmende kopieren",
+        "sendToSpeakers": "Links für Moderierende und Vortragende",
+        "close": "Zusammenfassung schließen"
+      }
     },
     "rubrica": {
       "title": "Adressbuch",

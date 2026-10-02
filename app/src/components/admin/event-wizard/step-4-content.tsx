@@ -20,6 +20,12 @@ export interface MaterialDraft {
   description?: string | null;
   type: 'file' | 'link';
   visibility: 'BEFORE' | 'DURING' | 'AFTER' | 'ALWAYS';
+  /** Solo per un file caricato: la chiave nello storage (la pulizia la usa
+   *  per cancellarlo), il nome, la dimensione e il tipo. */
+  fileName?: string | null;
+  fileSize?: number | null;
+  mimeType?: string | null;
+  blobPath?: string | null;
 }
 
 export type AdhocQuestionType =
@@ -611,12 +617,30 @@ function MaterialsSection({
             label={t('materialUrl')}
             assetType="document"
             value={draft.url || null}
+            // Un indirizzo scritto e' un link; un file e' tale solo se lo si
+            // e' caricato qui (onUpload, che arriva dopo onChange). Dedurlo
+            // dall'indirizzo («/assets/») scambiava per file i link esterni.
             onChange={(next) =>
-              setDraft({
-                ...draft,
+              setDraft((d) => ({
+                ...d,
                 url: next ?? '',
-                type: next && next.includes('/assets/') ? 'file' : 'link',
-              })
+                type: 'link',
+                fileName: null,
+                fileSize: null,
+                mimeType: null,
+                blobPath: null,
+              }))
+            }
+            onUpload={(meta) =>
+              setDraft((d) => ({
+                ...d,
+                url: meta.url,
+                type: 'file',
+                fileName: meta.filename,
+                fileSize: meta.size,
+                mimeType: meta.mime,
+                blobPath: meta.key,
+              }))
             }
           />
         </div>

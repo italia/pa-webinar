@@ -855,7 +855,9 @@
       "revocationFailed": "Revoking access for {name} failed: their access link is still valid. Save again to retry, or revoke it from the “{tab}” tab of the event page.",
       "validationFailedDetail": "The server rejected some data: {reason}. Fix it and try again.",
       "publishFailed": "The event was created but not published: it is still a draft. Publish it from the event page.",
-      "publishFailedDetail": "The event was created but not published: it is still a draft. The server replied: {reason}. Publish it from the event page."
+      "publishFailedDetail": "The event was created but not published: it is still a draft. The server replied: {reason}. Publish it from the event page.",
+      "toFix": "To fix:",
+      "toFixField": "Field {n}"
     },
     "nav": {
       "events": "Events",
@@ -2328,7 +2330,19 @@
       "capacitySection": "Capacity and infrastructure",
       "capacitySubtitle": "Configured for up to {max} participants",
       "publishBlockedLive": "The event is already under way",
-      "publishBlockedEnded": "The event has ended"
+      "publishBlockedEnded": "The event has ended",
+      "created": {
+        "publishedTitle": "Event published",
+        "draftTitle": "Draft saved",
+        "publishedBody": "It is visible to the public: share the link with the people who should attend.",
+        "draftBody": "It is not visible to the public yet: publish it when it is ready.",
+        "publishFailedTitle": "Publishing failed",
+        "publishFailedBody": "The event is saved as a draft: publish it from this page once the problem is solved.",
+        "unsaved": "Not saved: {items}. You can add them from this page.",
+        "copyParticipantLink": "Copy the participant link",
+        "sendToSpeakers": "Moderator and speaker links",
+        "close": "Close the summary"
+      }
     },
     "rubrica": {
       "title": "Address book",

@@ -855,7 +855,9 @@
       "revocationFailed": "Zrušení přístupu pro {name} se nezdařilo: přístupový odkaz stále platí. Uložte znovu pro další pokus, nebo jej zrušte na kartě „{tab}“ na stránce události.",
       "validationFailedDetail": "Server odmítl některé údaje: {reason}. Opravte je a zkuste to znovu.",
       "publishFailed": "Událost byla vytvořena, ale nebyla zveřejněna: zůstává jako koncept. Zveřejněte ji ze stránky události.",
-      "publishFailedDetail": "Událost byla vytvořena, ale nebyla zveřejněna: zůstává jako koncept. Server odpověděl: {reason}. Zveřejněte ji ze stránky události."
+      "publishFailedDetail": "Událost byla vytvořena, ale nebyla zveřejněna: zůstává jako koncept. Server odpověděl: {reason}. Zveřejněte ji ze stránky události.",
+      "toFix": "K opravě:",
+      "toFixField": "Pole {n}"
     },
     "nav": {
       "events": "Správa událostí",
@@ -2328,7 +2330,19 @@
       "capacitySection": "Kapacita a infrastruktura",
       "capacitySubtitle": "Nastaveno až pro {max} účastníků",
       "publishBlockedLive": "Událost už probíhá",
-      "publishBlockedEnded": "Událost skončila"
+      "publishBlockedEnded": "Událost skončila",
+      "created": {
+        "publishedTitle": "Událost zveřejněna",
+        "draftTitle": "Koncept uložen",
+        "publishedBody": "Je veřejně viditelná: sdílejte odkaz s účastníky.",
+        "draftBody": "Zatím není veřejně viditelná: zveřejněte ji, až bude připravená.",
+        "publishFailedTitle": "Zveřejnění se nezdařilo",
+        "publishFailedBody": "Událost je uložena jako koncept: zveřejněte ji na této stránce, až bude problém vyřešen.",
+        "unsaved": "Neuloženo: {items}. Můžete je přidat na této stránce.",
+        "copyParticipantLink": "Kopírovat odkaz pro účastníky",
+        "sendToSpeakers": "Odkazy moderátorů a řečníků",
+        "close": "Zavřít souhrn"
+      }
     },
     "rubrica": {
       "title": "Adresář",

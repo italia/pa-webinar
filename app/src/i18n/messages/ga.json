@@ -855,7 +855,9 @@
       "revocationFailed": "Theip ar an gcúlghairm rochtana do {name}: tá an nasc rochtana bailí i gcónaí. Sábháil arís chun iarracht eile a dhéanamh, nó cúlghair é ón gcluaisín “{tab}” ar leathanach an imeachta.",
       "validationFailedDetail": "Dhiúltaigh an freastalaí do roinnt sonraí: {reason}. Ceartaigh iad agus bain triail eile as.",
       "publishFailed": "Cruthaíodh an t-imeacht ach níor foilsíodh é: is dréacht é fós. Foilsigh é ó leathanach an imeachta.",
-      "publishFailedDetail": "Cruthaíodh an t-imeacht ach níor foilsíodh é: is dréacht é fós. D'fhreagair an freastalaí: {reason}. Foilsigh é ó leathanach an imeachta."
+      "publishFailedDetail": "Cruthaíodh an t-imeacht ach níor foilsíodh é: is dréacht é fós. D'fhreagair an freastalaí: {reason}. Foilsigh é ó leathanach an imeachta.",
+      "toFix": "Le ceartú:",
+      "toFixField": "Réimse {n}"
     },
     "nav": {
       "events": "Bainistíocht imeachtaí",
@@ -2328,7 +2330,19 @@
       "capacitySection": "Toilleadh agus bonneagar",
       "capacitySubtitle": "Cumraithe do suas le {max} rannpháirtí",
       "publishBlockedLive": "Tá an t-imeacht ar siúl cheana féin",
-      "publishBlockedEnded": "Tá an t-imeacht thart"
+      "publishBlockedEnded": "Tá an t-imeacht thart",
+      "created": {
+        "publishedTitle": "Imeacht foilsithe",
+        "draftTitle": "Dréacht sábháilte",
+        "publishedBody": "Tá sé infheicthe ag an bpobal: roinn an nasc leis na rannpháirtithe.",
+        "draftBody": "Níl sé infheicthe ag an bpobal fós: foilsigh é nuair a bheidh sé réidh.",
+        "publishFailedTitle": "Theip ar an bhfoilsiú",
+        "publishFailedBody": "Tá an t-imeacht sábháilte mar dhréacht: foilsigh é ón leathanach seo nuair a bheidh an fhadhb réitithe.",
+        "unsaved": "Níor sábháladh: {items}. Is féidir leat iad a chur leis ón leathanach seo.",
+        "copyParticipantLink": "Cóipeáil an nasc do na rannpháirtithe",
+        "sendToSpeakers": "Naisc na modhnóirí agus na gcainteoirí",
+        "close": "Dún an achoimre"
+      }
     },
     "rubrica": {
       "title": "Leabhar seoltaí",

@@ -855,7 +855,9 @@
       "revocationFailed": "Revocarea accesului pentru {name} nu a reușit: linkul de acces este încă valabil. Salvați din nou pentru a reîncerca sau revocați-l din fila „{tab}” a paginii evenimentului.",
       "validationFailedDetail": "Serverul a respins unele date: {reason}. Corectați-le și încercați din nou.",
       "publishFailed": "Evenimentul a fost creat, dar nu a fost publicat: rămâne ciornă. Publicați-l din pagina evenimentului.",
-      "publishFailedDetail": "Evenimentul a fost creat, dar nu a fost publicat: rămâne ciornă. Serverul a răspuns: {reason}. Publicați-l din pagina evenimentului."
+      "publishFailedDetail": "Evenimentul a fost creat, dar nu a fost publicat: rămâne ciornă. Serverul a răspuns: {reason}. Publicați-l din pagina evenimentului.",
+      "toFix": "De corectat:",
+      "toFixField": "Câmpul {n}"
     },
     "nav": {
       "events": "Gestionare evenimente",
@@ -2328,7 +2330,19 @@
       "capacitySection": "Capacitate și infrastructură",
       "capacitySubtitle": "Configurat pentru maximum {max} participanți",
       "publishBlockedLive": "Evenimentul este deja în desfășurare",
-      "publishBlockedEnded": "Evenimentul s-a încheiat"
+      "publishBlockedEnded": "Evenimentul s-a încheiat",
+      "created": {
+        "publishedTitle": "Eveniment publicat",
+        "draftTitle": "Ciornă salvată",
+        "publishedBody": "Este vizibil public: distribuiți linkul celor care trebuie să participe.",
+        "draftBody": "Nu este încă vizibil public: publicați-l când este gata.",
+        "publishFailedTitle": "Publicarea nu a reușit",
+        "publishFailedBody": "Evenimentul este salvat ca ciornă: publicați-l din această pagină după ce problema este rezolvată.",
+        "unsaved": "Nu au fost salvate: {items}. Le puteți adăuga din această pagină.",
+        "copyParticipantLink": "Copiați linkul pentru participanți",
+        "sendToSpeakers": "Linkurile moderatorilor și ale vorbitorilor",
+        "close": "Închideți rezumatul"
+      }
     },
     "rubrica": {
       "title": "Agendă",

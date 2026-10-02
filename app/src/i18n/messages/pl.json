@@ -855,7 +855,9 @@
       "revocationFailed": "Nie udało się cofnąć dostępu ({name}): link dostępu nadal jest ważny. Zapisz ponownie, aby spróbować jeszcze raz, lub cofnij go na karcie „{tab}” na stronie wydarzenia.",
       "validationFailedDetail": "Serwer odrzucił niektóre dane: {reason}. Popraw je i spróbuj ponownie.",
       "publishFailed": "Wydarzenie zostało utworzone, ale nie zostało opublikowane: pozostaje wersją roboczą. Opublikuj je na stronie wydarzenia.",
-      "publishFailedDetail": "Wydarzenie zostało utworzone, ale nie zostało opublikowane: pozostaje wersją roboczą. Odpowiedź serwera: {reason}. Opublikuj je na stronie wydarzenia."
+      "publishFailedDetail": "Wydarzenie zostało utworzone, ale nie zostało opublikowane: pozostaje wersją roboczą. Odpowiedź serwera: {reason}. Opublikuj je na stronie wydarzenia.",
+      "toFix": "Do poprawienia:",
+      "toFixField": "Pole {n}"
     },
     "nav": {
       "events": "Zarządzanie wydarzeniami",
@@ -2328,7 +2330,19 @@
       "capacitySection": "Pojemność i infrastruktura",
       "capacitySubtitle": "Skonfigurowano dla maksymalnie {max} uczestników",
       "publishBlockedLive": "Wydarzenie już trwa",
-      "publishBlockedEnded": "Wydarzenie się zakończyło"
+      "publishBlockedEnded": "Wydarzenie się zakończyło",
+      "created": {
+        "publishedTitle": "Wydarzenie opublikowane",
+        "draftTitle": "Szkic zapisany",
+        "publishedBody": "Jest widoczne publicznie: udostępnij link uczestnikom.",
+        "draftBody": "Nie jest jeszcze widoczne publicznie: opublikuj je, gdy będzie gotowe.",
+        "publishFailedTitle": "Publikacja nie powiodła się",
+        "publishFailedBody": "Wydarzenie zapisano jako szkic: opublikuj je na tej stronie, gdy problem zostanie rozwiązany.",
+        "unsaved": "Nie zapisano: {items}. Możesz je dodać na tej stronie.",
+        "copyParticipantLink": "Kopiuj link dla uczestników",
+        "sendToSpeakers": "Linki moderatorów i prelegentów",
+        "close": "Zamknij podsumowanie"
+      }
     },
     "rubrica": {
       "title": "Książka adresowa",

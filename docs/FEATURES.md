@@ -348,6 +348,10 @@ Creating and editing an event use the same five steps. The wizard keeps an unsav
 
 A new blank event starts with chat on, Q&A off, and participants' microphone, camera and screen share off (`defaultMatrix()` in `app/src/lib/utils/permission-matrix.ts`).
 
+- **Errors.** When a step or the submission is refused, the focus moves to the first field to fix, which is marked as invalid and tied to its message; a list next to **Back** and **Next** links to each field. A message disappears as soon as its field is valid.
+- **After creation.** The wizard lands on the event's page with a summary on top: **Event published**, **Draft saved** or **Publishing failed** (a publish that was refused leaves a draft), **Copy the participant link**, **Moderator and speaker links** (the **People** tab), and the kinds of resources it could not save (organizations, invitations, co-moderators, speakers, materials, questionnaires), which can be added from that page. The summary stays until it is closed.
+- **Materials.** A file uploaded in the **Content** step is saved with its storage key, name, size and type, so deleting the material or the event removes the file too; an address typed there is a link.
+
 ### Reuse and series
 
 - **Event templates.** A template pre-fills the wizard: features, permissions, recording and AI options, default duration, retention and a description skeleton. Organizers pick templates, and administrators manage them.

@@ -855,7 +855,9 @@
       "revocationFailed": "No se ha podido revocar el acceso de {name}: su enlace sigue siendo válido. Guarda de nuevo para reintentarlo o revócalo desde la pestaña «{tab}» de la página del evento.",
       "validationFailedDetail": "El servidor ha rechazado algunos datos: {reason}. Corrígelos y vuelve a intentarlo.",
       "publishFailed": "El evento se ha creado, pero no se ha publicado: sigue siendo un borrador. Publícalo desde la página del evento.",
-      "publishFailedDetail": "El evento se ha creado, pero no se ha publicado: sigue siendo un borrador. El servidor ha respondido: {reason}. Publícalo desde la página del evento."
+      "publishFailedDetail": "El evento se ha creado, pero no se ha publicado: sigue siendo un borrador. El servidor ha respondido: {reason}. Publícalo desde la página del evento.",
+      "toFix": "Por corregir:",
+      "toFixField": "Campo {n}"
     },
     "nav": {
       "events": "Gestión de eventos",
@@ -2328,7 +2330,19 @@
       "capacitySection": "Capacidad e infraestructura",
       "capacitySubtitle": "Configurado para un máximo de {max} participantes",
       "publishBlockedLive": "El evento ya está en curso",
-      "publishBlockedEnded": "El evento ha terminado"
+      "publishBlockedEnded": "El evento ha terminado",
+      "created": {
+        "publishedTitle": "Evento publicado",
+        "draftTitle": "Borrador guardado",
+        "publishedBody": "Es visible al público: comparte el enlace con quienes deben participar.",
+        "draftBody": "Aún no es visible al público: publícalo cuando esté listo.",
+        "publishFailedTitle": "No se ha podido publicar",
+        "publishFailedBody": "El evento está guardado como borrador: publícalo desde esta página cuando se resuelva el problema.",
+        "unsaved": "No se han guardado: {items}. Puedes añadirlos desde esta página.",
+        "copyParticipantLink": "Copiar el enlace para los participantes",
+        "sendToSpeakers": "Enlaces de moderadores y ponentes",
+        "close": "Cerrar el resumen"
+      }
     },
     "rubrica": {
       "title": "Agenda",

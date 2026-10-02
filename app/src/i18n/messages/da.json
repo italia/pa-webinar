@@ -855,7 +855,9 @@
       "revocationFailed": "Tilbagekaldelsen af adgangen for {name} mislykkedes: adgangslinket er stadig gyldigt. Gem igen for at prøve igen, eller tilbagekald det under fanen »{tab}« på arrangementets side.",
       "validationFailedDetail": "Serveren afviste nogle data: {reason}. Ret dem, og prøv igen.",
       "publishFailed": "Arrangementet blev oprettet, men ikke offentliggjort: det er stadig en kladde. Offentliggør det fra arrangementets side.",
-      "publishFailedDetail": "Arrangementet blev oprettet, men ikke offentliggjort: det er stadig en kladde. Serveren svarede: {reason}. Offentliggør det fra arrangementets side."
+      "publishFailedDetail": "Arrangementet blev oprettet, men ikke offentliggjort: det er stadig en kladde. Serveren svarede: {reason}. Offentliggør det fra arrangementets side.",
+      "toFix": "Skal rettes:",
+      "toFixField": "Felt {n}"
     },
     "nav": {
       "events": "Begivenhedsstyring",
@@ -2328,7 +2330,19 @@
       "capacitySection": "Kapacitet og infrastruktur",
       "capacitySubtitle": "Konfigureret til op til {max} deltagere",
       "publishBlockedLive": "Begivenheden er allerede i gang",
-      "publishBlockedEnded": "Begivenheden er afsluttet"
+      "publishBlockedEnded": "Begivenheden er afsluttet",
+      "created": {
+        "publishedTitle": "Arrangement offentliggjort",
+        "draftTitle": "Kladde gemt",
+        "publishedBody": "Det er synligt for offentligheden: del linket med deltagerne.",
+        "draftBody": "Det er endnu ikke synligt for offentligheden: offentliggør det, når det er klar.",
+        "publishFailedTitle": "Offentliggørelsen mislykkedes",
+        "publishFailedBody": "Arrangementet er gemt som kladde: offentliggør det fra denne side, når problemet er løst.",
+        "unsaved": "Ikke gemt: {items}. Du kan tilføje dem fra denne side.",
+        "copyParticipantLink": "Kopiér linket til deltagerne",
+        "sendToSpeakers": "Links til moderatorer og talere",
+        "close": "Luk oversigten"
+      }
     },
     "rubrica": {
       "title": "Adressebog",

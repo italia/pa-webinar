@@ -855,7 +855,9 @@
       "revocationFailed": "La révocation de l’accès de {name} a échoué : son lien d’accès est toujours valide. Enregistrez à nouveau pour réessayer, ou révoquez-le depuis l’onglet « {tab} » de la page de l’événement.",
       "validationFailedDetail": "Le serveur a refusé certaines données : {reason}. Corrigez-les et réessayez.",
       "publishFailed": "L'événement a été créé mais pas publié : il reste à l'état de brouillon. Publiez-le depuis la page de l'événement.",
-      "publishFailedDetail": "L'événement a été créé mais pas publié : il reste à l'état de brouillon. Le serveur a répondu : {reason}. Publiez-le depuis la page de l'événement."
+      "publishFailedDetail": "L'événement a été créé mais pas publié : il reste à l'état de brouillon. Le serveur a répondu : {reason}. Publiez-le depuis la page de l'événement.",
+      "toFix": "À corriger :",
+      "toFixField": "Champ {n}"
     },
     "nav": {
       "events": "Gestion des événements",
@@ -2328,7 +2330,19 @@
       "capacitySection": "Capacité et infrastructure",
       "capacitySubtitle": "Configuré pour {max} participants au maximum",
       "publishBlockedLive": "L’événement est déjà en cours",
-      "publishBlockedEnded": "L’événement est terminé"
+      "publishBlockedEnded": "L’événement est terminé",
+      "created": {
+        "publishedTitle": "Événement publié",
+        "draftTitle": "Brouillon enregistré",
+        "publishedBody": "Il est visible par le public : partagez le lien avec les participants.",
+        "draftBody": "Il n'est pas encore visible par le public : publiez-le quand il est prêt.",
+        "publishFailedTitle": "La publication a échoué",
+        "publishFailedBody": "L'événement est enregistré comme brouillon : publiez-le depuis cette page une fois le problème résolu.",
+        "unsaved": "Non enregistrés : {items}. Vous pouvez les ajouter depuis cette page.",
+        "copyParticipantLink": "Copier le lien pour les participants",
+        "sendToSpeakers": "Liens des modérateurs et des intervenants",
+        "close": "Fermer le récapitulatif"
+      }
     },
     "rubrica": {
       "title": "Carnet d'adresses",

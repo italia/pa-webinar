@@ -855,7 +855,9 @@
       "revocationFailed": "Het intrekken van de toegang van {name} is mislukt: de toegangslink is nog steeds geldig. Sla opnieuw op om het nogmaals te proberen, of trek hem in via het tabblad “{tab}” op de pagina van het evenement.",
       "validationFailedDetail": "De server heeft enkele gegevens geweigerd: {reason}. Corrigeer ze en probeer het opnieuw.",
       "publishFailed": "Het evenement is aangemaakt maar niet gepubliceerd: het is nog een concept. Publiceer het vanaf de pagina van het evenement.",
-      "publishFailedDetail": "Het evenement is aangemaakt maar niet gepubliceerd: het is nog een concept. De server antwoordde: {reason}. Publiceer het vanaf de pagina van het evenement."
+      "publishFailedDetail": "Het evenement is aangemaakt maar niet gepubliceerd: het is nog een concept. De server antwoordde: {reason}. Publiceer het vanaf de pagina van het evenement.",
+      "toFix": "Te corrigeren:",
+      "toFixField": "Veld {n}"
     },
     "nav": {
       "events": "Evenementbeheer",
@@ -2328,7 +2330,19 @@
       "capacitySection": "Capaciteit en infrastructuur",
       "capacitySubtitle": "Ingesteld voor maximaal {max} deelnemers",
       "publishBlockedLive": "Het evenement is al bezig",
-      "publishBlockedEnded": "Het evenement is afgelopen"
+      "publishBlockedEnded": "Het evenement is afgelopen",
+      "created": {
+        "publishedTitle": "Evenement gepubliceerd",
+        "draftTitle": "Concept opgeslagen",
+        "publishedBody": "Het is openbaar zichtbaar: deel de link met de deelnemers.",
+        "draftBody": "Het is nog niet openbaar zichtbaar: publiceer het wanneer het klaar is.",
+        "publishFailedTitle": "Publiceren mislukt",
+        "publishFailedBody": "Het evenement is als concept opgeslagen: publiceer het vanaf deze pagina zodra het probleem is opgelost.",
+        "unsaved": "Niet opgeslagen: {items}. U kunt ze op deze pagina toevoegen.",
+        "copyParticipantLink": "Link voor deelnemers kopiëren",
+        "sendToSpeakers": "Links voor moderatoren en sprekers",
+        "close": "Overzicht sluiten"
+      }
     },
     "rubrica": {
       "title": "Adresboek",

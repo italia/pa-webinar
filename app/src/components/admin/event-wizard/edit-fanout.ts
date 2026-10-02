@@ -160,6 +160,32 @@ async function saveQuestionnaire(
 // idempotently replaces templates + adhoc items, so we just call it.
 
 /**
+ * Il corpo con cui il wizard crea un materiale (POST
+ * /api/admin/events/{id}/materials). Il wizard tiene il tipo in minuscolo
+ * ('file' | 'link') e un id provvisorio; l'API vuole 'FILE' | 'LINK' e
+ * nessun id: mandando la bozza cosi' com'era, ogni materiale veniva
+ * rifiutato e l'evento nasceva senza.
+ */
+export function materialPayload(m: WizardForm['materials'][number]) {
+  const file = m.type === 'file';
+  return {
+    title: m.title,
+    url: m.url,
+    description: m.description ?? null,
+    type: file ? ('FILE' as const) : ('LINK' as const),
+    visibility: m.visibility,
+    // Di un file caricato la chiave nello storage: senza, la pulizia non
+    // saprebbe che cosa cancellare e il file resterebbe per sempre.
+    ...(file && {
+      fileName: m.fileName ?? null,
+      fileSize: m.fileSize ?? null,
+      mimeType: m.mimeType ?? null,
+      blobPath: m.blobPath ?? null,
+    }),
+  };
+}
+
+/**
  * Cosa il fan-out non e' riuscito a salvare.
  *
  * Il fan-out applica le modifiche alle risorse collegate con una richiesta per
@@ -443,7 +469,7 @@ export async function fanoutEditDiff(
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(m),
+        body: JSON.stringify(materialPayload(m)),
       },
     );
     if (creato.body?.id) {

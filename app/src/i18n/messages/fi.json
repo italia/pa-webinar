@@ -855,7 +855,9 @@
       "revocationFailed": "Käyttöoikeuden peruminen epäonnistui ({name}): pääsylinkki on edelleen voimassa. Tallenna uudelleen yrittääksesi uudestaan tai peru se tapahtumasivun välilehdellä ”{tab}”.",
       "validationFailedDetail": "Palvelin hylkäsi osan tiedoista: {reason}. Korjaa ja yritä uudelleen.",
       "publishFailed": "Tapahtuma luotiin, mutta sitä ei julkaistu: se on yhä luonnos. Julkaise se tapahtuman sivulta.",
-      "publishFailedDetail": "Tapahtuma luotiin, mutta sitä ei julkaistu: se on yhä luonnos. Palvelin vastasi: {reason}. Julkaise se tapahtuman sivulta."
+      "publishFailedDetail": "Tapahtuma luotiin, mutta sitä ei julkaistu: se on yhä luonnos. Palvelin vastasi: {reason}. Julkaise se tapahtuman sivulta.",
+      "toFix": "Korjattavat:",
+      "toFixField": "Kenttä {n}"
     },
     "nav": {
       "events": "Tapahtumien hallinta",
@@ -2328,7 +2330,19 @@
       "capacitySection": "Kapasiteetti ja infrastruktuuri",
       "capacitySubtitle": "Määritetty enintään {max} osallistujalle",
       "publishBlockedLive": "Tapahtuma on jo käynnissä",
-      "publishBlockedEnded": "Tapahtuma on päättynyt"
+      "publishBlockedEnded": "Tapahtuma on päättynyt",
+      "created": {
+        "publishedTitle": "Tapahtuma julkaistu",
+        "draftTitle": "Luonnos tallennettu",
+        "publishedBody": "Se näkyy julkisesti: jaa linkki osallistujille.",
+        "draftBody": "Se ei vielä näy julkisesti: julkaise se, kun se on valmis.",
+        "publishFailedTitle": "Julkaisu epäonnistui",
+        "publishFailedBody": "Tapahtuma on tallennettu luonnoksena: julkaise se tältä sivulta, kun ongelma on korjattu.",
+        "unsaved": "Ei tallennettu: {items}. Voit lisätä ne tältä sivulta.",
+        "copyParticipantLink": "Kopioi osallistujien linkki",
+        "sendToSpeakers": "Moderaattorien ja puhujien linkit",
+        "close": "Sulje yhteenveto"
+      }
     },
     "rubrica": {
       "title": "Osoitekirja",

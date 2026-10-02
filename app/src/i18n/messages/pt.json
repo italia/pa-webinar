@@ -855,7 +855,9 @@
       "revocationFailed": "Não foi possível revogar o acesso de {name}: a ligação de acesso continua válida. Guarde novamente para tentar outra vez ou revogue-a no separador «{tab}» da página do evento.",
       "validationFailedDetail": "O servidor rejeitou alguns dados: {reason}. Corrija-os e tente novamente.",
       "publishFailed": "O evento foi criado, mas não foi publicado: continua a ser um rascunho. Publique-o a partir da página do evento.",
-      "publishFailedDetail": "O evento foi criado, mas não foi publicado: continua a ser um rascunho. O servidor respondeu: {reason}. Publique-o a partir da página do evento."
+      "publishFailedDetail": "O evento foi criado, mas não foi publicado: continua a ser um rascunho. O servidor respondeu: {reason}. Publique-o a partir da página do evento.",
+      "toFix": "A corrigir:",
+      "toFixField": "Campo {n}"
     },
     "nav": {
       "events": "Gestão de eventos",
@@ -2328,7 +2330,19 @@
       "capacitySection": "Capacidade e infraestrutura",
       "capacitySubtitle": "Configurado para um máximo de {max} participantes",
       "publishBlockedLive": "O evento já está a decorrer",
-      "publishBlockedEnded": "O evento terminou"
+      "publishBlockedEnded": "O evento terminou",
+      "created": {
+        "publishedTitle": "Evento publicado",
+        "draftTitle": "Rascunho guardado",
+        "publishedBody": "Está visível ao público: partilhe a ligação com quem deve participar.",
+        "draftBody": "Ainda não está visível ao público: publique-o quando estiver pronto.",
+        "publishFailedTitle": "A publicação falhou",
+        "publishFailedBody": "O evento está guardado como rascunho: publique-o a partir desta página quando o problema estiver resolvido.",
+        "unsaved": "Não foram guardados: {items}. Pode adicioná-los a partir desta página.",
+        "copyParticipantLink": "Copiar a ligação para os participantes",
+        "sendToSpeakers": "Ligações de moderadores e oradores",
+        "close": "Fechar o resumo"
+      }
     },
     "rubrica": {
       "title": "Agenda",

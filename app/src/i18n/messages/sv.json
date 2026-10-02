@@ -855,7 +855,9 @@
       "revocationFailed": "Återkallelsen av åtkomsten för {name} misslyckades: åtkomstlänken är fortfarande giltig. Spara igen för att försöka på nytt, eller återkalla den under fliken ”{tab}” på evenemangets sida.",
       "validationFailedDetail": "Servern avvisade vissa uppgifter: {reason}. Rätta dem och försök igen.",
       "publishFailed": "Evenemanget har skapats men inte publicerats: det är fortfarande ett utkast. Publicera det från evenemangets sida.",
-      "publishFailedDetail": "Evenemanget har skapats men inte publicerats: det är fortfarande ett utkast. Servern svarade: {reason}. Publicera det från evenemangets sida."
+      "publishFailedDetail": "Evenemanget har skapats men inte publicerats: det är fortfarande ett utkast. Servern svarade: {reason}. Publicera det från evenemangets sida.",
+      "toFix": "Att rätta:",
+      "toFixField": "Fält {n}"
     },
     "nav": {
       "events": "Evenemangshantering",
@@ -2328,7 +2330,19 @@
       "capacitySection": "Kapacitet och infrastruktur",
       "capacitySubtitle": "Konfigurerad för högst {max} deltagare",
       "publishBlockedLive": "Evenemanget pågår redan",
-      "publishBlockedEnded": "Evenemanget är avslutat"
+      "publishBlockedEnded": "Evenemanget är avslutat",
+      "created": {
+        "publishedTitle": "Evenemanget publicerat",
+        "draftTitle": "Utkast sparat",
+        "publishedBody": "Det är synligt för allmänheten: dela länken med deltagarna.",
+        "draftBody": "Det är ännu inte synligt för allmänheten: publicera det när det är klart.",
+        "publishFailedTitle": "Publiceringen misslyckades",
+        "publishFailedBody": "Evenemanget är sparat som utkast: publicera det från den här sidan när problemet är löst.",
+        "unsaved": "Inte sparade: {items}. Du kan lägga till dem från den här sidan.",
+        "copyParticipantLink": "Kopiera länken för deltagare",
+        "sendToSpeakers": "Länkar för moderatorer och talare",
+        "close": "Stäng sammanfattningen"
+      }
     },
     "rubrica": {
       "title": "Adressbok",

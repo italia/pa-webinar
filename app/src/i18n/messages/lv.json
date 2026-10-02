@@ -855,7 +855,9 @@
       "revocationFailed": "Neizdevās atsaukt piekļuvi ({name}): piekļuves saite joprojām ir derīga. Saglabājiet vēlreiz, lai mēģinātu atkārtoti, vai atsauciet to pasākuma lapas cilnē “{tab}”.",
       "validationFailedDetail": "Serveris noraidīja dažus datus: {reason}. Izlabojiet un mēģiniet vēlreiz.",
       "publishFailed": "Pasākums ir izveidots, bet nav publicēts: tas joprojām ir melnraksts. Publicējiet to pasākuma lapā.",
-      "publishFailedDetail": "Pasākums ir izveidots, bet nav publicēts: tas joprojām ir melnraksts. Serveris atbildēja: {reason}. Publicējiet to pasākuma lapā."
+      "publishFailedDetail": "Pasākums ir izveidots, bet nav publicēts: tas joprojām ir melnraksts. Serveris atbildēja: {reason}. Publicējiet to pasākuma lapā.",
+      "toFix": "Jālabo:",
+      "toFixField": "Lauks {n}"
     },
     "nav": {
       "events": "Pasākumu pārvaldība",
@@ -2328,7 +2330,19 @@
       "capacitySection": "Ietilpība un infrastruktūra",
       "capacitySubtitle": "Konfigurēts līdz {max} dalībniekiem",
       "publishBlockedLive": "Pasākums jau norisinās",
-      "publishBlockedEnded": "Pasākums ir beidzies"
+      "publishBlockedEnded": "Pasākums ir beidzies",
+      "created": {
+        "publishedTitle": "Pasākums publicēts",
+        "draftTitle": "Melnraksts saglabāts",
+        "publishedBody": "Tas ir publiski redzams: kopīgojiet saiti ar dalībniekiem.",
+        "draftBody": "Tas vēl nav publiski redzams: publicējiet to, kad tas ir gatavs.",
+        "publishFailedTitle": "Publicēšana neizdevās",
+        "publishFailedBody": "Pasākums ir saglabāts kā melnraksts: publicējiet to šajā lapā, kad problēma būs atrisināta.",
+        "unsaved": "Nav saglabāti: {items}. Varat tos pievienot šajā lapā.",
+        "copyParticipantLink": "Kopēt dalībnieku saiti",
+        "sendToSpeakers": "Moderatoru un runātāju saites",
+        "close": "Aizvērt kopsavilkumu"
+      }
     },
     "rubrica": {
       "title": "Kontaktu grāmata",

@@ -450,7 +450,8 @@ describe('creazione — dove si arriva', () => {
     await press(button(w.publish));
 
     expect(push).toHaveBeenCalledTimes(1);
-    expect(push).toHaveBeenCalledWith(`/admin/events/${CREATO.id}`);
+    // `created=1`: la pagina mostra il riepilogo dell'evento appena creato.
+    expect(push).toHaveBeenCalledWith(`/admin/events/${CREATO.id}?created=1`);
   });
 
   it('«Salva bozza» porta alla stessa pagina', async () => {
@@ -459,8 +460,143 @@ describe('creazione — dove si arriva', () => {
 
     expect(push).toHaveBeenCalledTimes(1);
     const [destinazione] = push.mock.calls[0] as [string];
-    expect(destinazione).toBe(`/admin/events/${CREATO.id}`);
+    expect(destinazione).toBe(`/admin/events/${CREATO.id}?created=1`);
     expect(destinazione).not.toContain('/edit');
     expect(destinazione).not.toContain(CREATO.moderatorToken);
+  });
+});
+
+/**
+ * Un passo rifiutato porta al campo: fuoco sul primo campo non valido,
+ * segnato per le tecnologie assistive e collegato al suo messaggio. Il
+ * messaggio sparisce appena il campo torna valido.
+ */
+describe('validazione — il fuoco va al campo da correggere', () => {
+  it('«Avanti» con il titolo vuoto: fuoco sul titolo, aria-invalid e messaggio collegato', async () => {
+    renderWizard();
+    await press(button(`${messages.common.next} →`));
+
+    const titolo = byId<HTMLInputElement>('ev-title');
+    expect(document.activeElement).toBe(titolo);
+    expect(titolo.getAttribute('aria-invalid')).toBe('true');
+    const descritto = titolo.getAttribute('aria-describedby') ?? '';
+    const messaggio = descritto.split(' ').map((id) => document.getElementById(id)).find(Boolean);
+    expect(messaggio?.classList.contains('invalid-feedback')).toBe(true);
+    // Il riepilogo accanto ai pulsanti nomina il campo.
+    expect(container.textContent).toContain(w.toFix);
+  });
+
+  it('scrivendo un titolo valido il suo errore sparisce, e con l ultimo anche il riepilogo', async () => {
+    renderWizard();
+    await press(button(`${messages.common.next} →`));
+    const voci = () => container.querySelectorAll('[role="status"] button').length;
+    const prima = voci();
+    type(byId<HTMLInputElement>('ev-title'), 'Evento di prova');
+    await press(byId('ev-title'));
+
+    const titolo = byId<HTMLInputElement>('ev-title');
+    expect(titolo.classList.contains('is-invalid')).toBe(false);
+    expect(titolo.hasAttribute('aria-invalid')).toBe(false);
+    expect(voci()).toBe(prima - 1);
+
+    // Anche la descrizione: non resta niente da correggere.
+    type(byId<HTMLTextAreaElement>('ev-description-it'), 'Una descrizione valida per il wizard.');
+    await press(byId('ev-title'));
+    expect(container.textContent).not.toContain(w.toFix);
+    expect(alertText()).toBe('');
+  });
+
+  it('«Pubblica» senza moderatore principale: fuoco sul primo campo mancante', async () => {
+    renderWizard();
+    type(byId<HTMLInputElement>('ev-title'), 'Evento di prova');
+    type(byId<HTMLTextAreaElement>('ev-description-it'), 'Una descrizione valida per il wizard.');
+    goToStep(w.steps.review);
+    await press(button(w.publish));
+
+    expect(fetchMock).not.toHaveBeenCalled();
+    const attivo = document.activeElement as HTMLElement;
+    expect(attivo.id).toBe('rev-mod-name');
+    expect(attivo.getAttribute('aria-invalid')).toBe('true');
+  });
+});
+
+describe('creazione — risorse non salvate', () => {
+  it('un relatore rifiutato arriva alla pagina dell evento come tipo di risorsa, senza dati della persona', async () => {
+    const CREATO = { id: 'evt-relatori', slug: 'evt-relatori', moderatorToken: 'tok-relatori' };
+    fetchMock.mockImplementation(async (input: RequestInfo | URL, init: RequestInit = {}) => {
+      const url = String(input);
+      if (url === '/api/events' && init.method === 'POST') return json(201, CREATO);
+      if (url.endsWith('/moderators') && init.method === 'POST') return json(500, {});
+      return json(200, {});
+    });
+    renderWizard();
+    type(byId<HTMLInputElement>('ev-title'), 'Evento di prova');
+    type(byId<HTMLTextAreaElement>('ev-description-it'), 'Una descrizione valida per il wizard.');
+    goToStep(w.steps.invites);
+    type(byId<HTMLInputElement>('sp-name'), 'Relatore 1');
+    type(byId<HTMLInputElement>('sp-email'), 'relatore@example.org');
+    // «Aggiungi» del blocco dei relatori: quello che segue il loro campo email.
+    const bloccoRelatori = byId('sp-email').closest('.row') ?? container;
+    await press(button(w.step3.add, bloccoRelatori));
+    goToStep(w.steps.review);
+    type(byId<HTMLInputElement>('rev-mod-name'), 'Mario Rossi');
+    type(byId<HTMLInputElement>('rev-mod-email'), 'mario@example.org');
+    await press(button(w.saveDraft));
+
+    expect(push).toHaveBeenCalledWith(`/admin/events/${CREATO.id}?created=1`);
+    const salvato = sessionStorage.getItem(`pa-wizard-unsaved:${CREATO.id}`);
+    expect(JSON.parse(salvato ?? '{}')).toEqual({ unsaved: ['speakers'], publishFailed: false });
+    expect(salvato).not.toContain('relatore@example.org');
+    // Il riepilogo della pagina lo dira': nessun avviso doppio.
+    expect(toastError).not.toHaveBeenCalled();
+  });
+
+  it('una pubblicazione rifiutata arriva al riepilogo come tale', async () => {
+    const CREATO = { id: 'evt-bozza', slug: 'evt-bozza', moderatorToken: 'tok-bozza' };
+    fetchMock.mockImplementation(async (input: RequestInfo | URL, init: RequestInit = {}) => {
+      const url = String(input);
+      if (url === '/api/events' && init.method === 'POST') return json(201, CREATO);
+      if (url === `/api/events/${CREATO.id}` && init.method === 'PUT') return json(409, { error: 'conflitto' });
+      return json(200, {});
+    });
+    renderWizard();
+    type(byId<HTMLInputElement>('ev-title'), 'Evento di prova');
+    type(byId<HTMLTextAreaElement>('ev-description-it'), 'Una descrizione valida per il wizard.');
+    goToStep(w.steps.review);
+    type(byId<HTMLInputElement>('rev-mod-name'), 'Mario Rossi');
+    type(byId<HTMLInputElement>('rev-mod-email'), 'mario@example.org');
+    await press(button(w.publish));
+
+    const salvato = JSON.parse(sessionStorage.getItem(`pa-wizard-unsaved:${CREATO.id}`) ?? '{}');
+    expect(salvato).toEqual({ unsaved: [], publishFailed: true });
+  });
+
+  it('se il browser non conserva l esito, le risorse mancanti le dice un avviso', async () => {
+    const CREATO = { id: 'evt-senza-storage', slug: 'evt-senza-storage', moderatorToken: 'tok-x' };
+    fetchMock.mockImplementation(async (input: RequestInfo | URL, init: RequestInit = {}) => {
+      const url = String(input);
+      if (url === '/api/events' && init.method === 'POST') return json(201, CREATO);
+      if (url.endsWith('/moderators') && init.method === 'POST') return json(500, {});
+      return json(200, {});
+    });
+    const setItem = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+      throw new Error('storage bloccato');
+    });
+    try {
+      renderWizard();
+      type(byId<HTMLInputElement>('ev-title'), 'Evento di prova');
+      type(byId<HTMLTextAreaElement>('ev-description-it'), 'Una descrizione valida per il wizard.');
+      goToStep(w.steps.invites);
+      type(byId<HTMLInputElement>('sp-name'), 'Relatore 1');
+      type(byId<HTMLInputElement>('sp-email'), 'relatore@example.org');
+      await press(button(w.step3.add, byId('sp-email').closest('.row') ?? container));
+      goToStep(w.steps.review);
+      await press(button(w.saveDraft));
+    } finally {
+      setItem.mockRestore();
+    }
+    expect(toastError).toHaveBeenCalledWith(
+      w.partialFailure.replace('{items}', w.resources.speakers),
+    );
   });
 });

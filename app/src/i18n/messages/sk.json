@@ -855,7 +855,9 @@
       "revocationFailed": "Odobratie prístupu pre {name} sa nepodarilo: prístupový odkaz stále platí. Uložte znova pre ďalší pokus, alebo ho odoberte na karte „{tab}“ na stránke podujatia.",
       "validationFailedDetail": "Server odmietol niektoré údaje: {reason}. Opravte ich a skúste to znova.",
       "publishFailed": "Podujatie bolo vytvorené, ale nebolo zverejnené: zostáva ako koncept. Zverejnite ho zo stránky podujatia.",
-      "publishFailedDetail": "Podujatie bolo vytvorené, ale nebolo zverejnené: zostáva ako koncept. Server odpovedal: {reason}. Zverejnite ho zo stránky podujatia."
+      "publishFailedDetail": "Podujatie bolo vytvorené, ale nebolo zverejnené: zostáva ako koncept. Server odpovedal: {reason}. Zverejnite ho zo stránky podujatia.",
+      "toFix": "Na opravu:",
+      "toFixField": "Pole {n}"
     },
     "nav": {
       "events": "Správa udalostí",
@@ -2328,7 +2330,19 @@
       "capacitySection": "Kapacita a infraštruktúra",
       "capacitySubtitle": "Nastavené najviac pre {max} účastníkov",
       "publishBlockedLive": "Podujatie už prebieha",
-      "publishBlockedEnded": "Podujatie sa skončilo"
+      "publishBlockedEnded": "Podujatie sa skončilo",
+      "created": {
+        "publishedTitle": "Udalosť zverejnená",
+        "draftTitle": "Koncept uložený",
+        "publishedBody": "Je verejne viditeľná: zdieľajte odkaz s účastníkmi.",
+        "draftBody": "Zatiaľ nie je verejne viditeľná: zverejnite ju, keď bude pripravená.",
+        "publishFailedTitle": "Zverejnenie sa nepodarilo",
+        "publishFailedBody": "Udalosť je uložená ako koncept: zverejnite ju na tejto stránke, keď bude problém vyriešený.",
+        "unsaved": "Neuložené: {items}. Môžete ich pridať na tejto stránke.",
+        "copyParticipantLink": "Kopírovať odkaz pre účastníkov",
+        "sendToSpeakers": "Odkazy moderátorov a rečníkov",
+        "close": "Zavrieť súhrn"
+      }
     },
     "rubrica": {
       "title": "Adresár",

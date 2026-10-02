@@ -855,7 +855,9 @@
       "revocationFailed": "Ir-revoka tal-aċċess għal {name} ma rnexxietx: il-link tal-aċċess għadu validu. Erġa’ ssejvja biex terġa’ tipprova, jew irrevokah mill-iskeda “{tab}” tal-paġna tal-avveniment.",
       "validationFailedDetail": "Is-server irrifjuta xi data: {reason}. Ikkoreġiha u erġa’ pprova.",
       "publishFailed": "L-avveniment inħoloq iżda ma ġiex ippubblikat: għadu abbozz. Ippubblikah mill-paġna tal-avveniment.",
-      "publishFailedDetail": "L-avveniment inħoloq iżda ma ġiex ippubblikat: għadu abbozz. Is-server wieġeb: {reason}. Ippubblikah mill-paġna tal-avveniment."
+      "publishFailedDetail": "L-avveniment inħoloq iżda ma ġiex ippubblikat: għadu abbozz. Is-server wieġeb: {reason}. Ippubblikah mill-paġna tal-avveniment.",
+      "toFix": "Biex tikkoreġi:",
+      "toFixField": "Qasam {n}"
     },
     "nav": {
       "events": "Ġestjoni tal-avvenimenti",
@@ -2328,7 +2330,19 @@
       "capacitySection": "Kapaċità u infrastruttura",
       "capacitySubtitle": "Ikkonfigurat għal massimu ta’ {max} parteċipanti",
       "publishBlockedLive": "L-avveniment diġà għaddej",
-      "publishBlockedEnded": "L-avveniment intemm"
+      "publishBlockedEnded": "L-avveniment intemm",
+      "created": {
+        "publishedTitle": "Avveniment ippubblikat",
+        "draftTitle": "Abbozz issejvjat",
+        "publishedBody": "Huwa viżibbli għall-pubbliku: aqsam il-link ma' min għandu jipparteċipa.",
+        "draftBody": "Għadu mhux viżibbli għall-pubbliku: ippubblikah meta jkun lest.",
+        "publishFailedTitle": "Il-pubblikazzjoni ma rnexxietx",
+        "publishFailedBody": "L-avveniment huwa ssejvjat bħala abbozz: ippubblikah minn din il-paġna meta tissolva l-problema.",
+        "unsaved": "Ma ġewx issejvjati: {items}. Tista' żżidhom minn din il-paġna.",
+        "copyParticipantLink": "Ikkopja l-link għall-parteċipanti",
+        "sendToSpeakers": "Links tal-moderaturi u tal-kelliema",
+        "close": "Agħlaq is-sommarju"
+      }
     },
     "rubrica": {
       "title": "Direttorju",

@@ -855,7 +855,9 @@
       "revocationFailed": "Ligipääsu tühistamine ebaõnnestus ({name}): ligipääsulink kehtib endiselt. Salvesta uuesti, et uuesti proovida, või tühista see sündmuse lehe vahekaardil „{tab}“.",
       "validationFailedDetail": "Server lükkas osa andmetest tagasi: {reason}. Paranda ja proovi uuesti.",
       "publishFailed": "Sündmus loodi, kuid seda ei avaldatud: see on endiselt mustand. Avalda see sündmuse lehelt.",
-      "publishFailedDetail": "Sündmus loodi, kuid seda ei avaldatud: see on endiselt mustand. Server vastas: {reason}. Avalda see sündmuse lehelt."
+      "publishFailedDetail": "Sündmus loodi, kuid seda ei avaldatud: see on endiselt mustand. Server vastas: {reason}. Avalda see sündmuse lehelt.",
+      "toFix": "Parandada:",
+      "toFixField": "Väli {n}"
     },
     "nav": {
       "events": "Ürituste haldus",
@@ -2328,7 +2330,19 @@
       "capacitySection": "Maht ja taristu",
       "capacitySubtitle": "Seadistatud kuni {max} osalejale",
       "publishBlockedLive": "Sündmus on juba käimas",
-      "publishBlockedEnded": "Sündmus on lõppenud"
+      "publishBlockedEnded": "Sündmus on lõppenud",
+      "created": {
+        "publishedTitle": "Sündmus avaldatud",
+        "draftTitle": "Mustand salvestatud",
+        "publishedBody": "See on avalikult nähtav: jagage linki osalejatega.",
+        "draftBody": "See pole veel avalikult nähtav: avaldage see, kui see on valmis.",
+        "publishFailedTitle": "Avaldamine ebaõnnestus",
+        "publishFailedBody": "Sündmus on salvestatud mustandina: avaldage see sellelt lehelt, kui probleem on lahendatud.",
+        "unsaved": "Salvestamata: {items}. Saate need sellel lehel lisada.",
+        "copyParticipantLink": "Kopeeri osalejate link",
+        "sendToSpeakers": "Moderaatorite ja esinejate lingid",
+        "close": "Sulge kokkuvõte"
+      }
     },
     "rubrica": {
       "title": "Aadressraamat",

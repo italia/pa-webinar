@@ -855,7 +855,9 @@
       "revocationFailed": "Nepavyko atšaukti prieigos ({name}): prieigos nuoroda vis dar galioja. Išsaugokite dar kartą, kad bandytumėte iš naujo, arba atšaukite ją renginio puslapio kortelėje „{tab}“.",
       "validationFailedDetail": "Serveris atmetė kai kuriuos duomenis: {reason}. Pataisykite ir bandykite dar kartą.",
       "publishFailed": "Renginys sukurtas, bet nepaskelbtas: jis tebėra juodraštis. Paskelbkite jį renginio puslapyje.",
-      "publishFailedDetail": "Renginys sukurtas, bet nepaskelbtas: jis tebėra juodraštis. Serverio atsakymas: {reason}. Paskelbkite jį renginio puslapyje."
+      "publishFailedDetail": "Renginys sukurtas, bet nepaskelbtas: jis tebėra juodraštis. Serverio atsakymas: {reason}. Paskelbkite jį renginio puslapyje.",
+      "toFix": "Reikia pataisyti:",
+      "toFixField": "Laukas {n}"
     },
     "nav": {
       "events": "Renginių valdymas",
@@ -2328,7 +2330,19 @@
       "capacitySection": "Talpa ir infrastruktūra",
       "capacitySubtitle": "Sukonfigūruota iki {max} dalyvių",
       "publishBlockedLive": "Renginys jau vyksta",
-      "publishBlockedEnded": "Renginys baigėsi"
+      "publishBlockedEnded": "Renginys baigėsi",
+      "created": {
+        "publishedTitle": "Renginys paskelbtas",
+        "draftTitle": "Juodraštis išsaugotas",
+        "publishedBody": "Jis matomas viešai: pasidalykite nuoroda su dalyviais.",
+        "draftBody": "Jis dar nematomas viešai: paskelbkite, kai bus paruoštas.",
+        "publishFailedTitle": "Paskelbti nepavyko",
+        "publishFailedBody": "Renginys išsaugotas kaip juodraštis: paskelbkite jį šiame puslapyje, kai problema bus išspręsta.",
+        "unsaved": "Neišsaugota: {items}. Galite juos pridėti šiame puslapyje.",
+        "copyParticipantLink": "Kopijuoti nuorodą dalyviams",
+        "sendToSpeakers": "Moderatorių ir pranešėjų nuorodos",
+        "close": "Uždaryti santrauką"
+      }
     },
     "rubrica": {
       "title": "Adresų knyga",

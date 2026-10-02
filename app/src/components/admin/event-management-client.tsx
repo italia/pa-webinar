@@ -14,7 +14,7 @@
  * confusion where the wizard and the detail page could disagree.
  */
 
-import { useCallback, useEffect, useState, type CSSProperties, type ReactNode } from 'react';
+import { useCallback, useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { useFormatter, useTranslations } from 'next-intl';
 
 import { Link, useRouter, percorso } from '@/i18n/navigation';
@@ -38,6 +38,7 @@ import { reminderTriggerAt } from '@/lib/email/reminder-plan';
 import { unsentReminderState } from '@/lib/email/reminder-status';
 import { localizedUrl } from '@/lib/utils/localized-url';
 
+import { forgetCreation, readCreation, type CreationOutcome } from './event-wizard/created-event';
 import CallSessionsPanel from './call-sessions-panel';
 import DeleteEventModal from './delete-event-modal';
 import EventAnalyticsPanel from './event-analytics-panel';
@@ -242,6 +243,30 @@ export default function EventManagementClient({
   const router = useRouter();
 
   const [activeTab, setActiveTab] = useState<TabId>('panoramica');
+  const tabsRef = useRef<HTMLDivElement>(null);
+
+  // Appena creato dal wizard (`?created=1`): un riepilogo in cima che dice se
+  // l'evento e' pubblicato o in bozza, da' il link per i partecipanti e
+  // elenca le risorse che il wizard non e' riuscito a salvare. Resta finche'
+  // non lo si chiude; il parametro sparisce subito dall'indirizzo, cosi' un
+  // ricaricamento o un segnalibro non lo ripropongono.
+  const [appenaCreato, setAppenaCreato] = useState<CreationOutcome | null>(null);
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('created') !== '1') return;
+    setAppenaCreato(readCreation(event.id));
+    params.delete('created');
+    const resto = params.toString();
+    window.history.replaceState(
+      window.history.state,
+      '',
+      `${window.location.pathname}${resto ? `?${resto}` : ''}${window.location.hash}`,
+    );
+  }, [event.id]);
+  const chiudiRiepilogo = () => {
+    forgetCreation(event.id);
+    setAppenaCreato(null);
+  };
   const [status, setStatus] = useState(event.status);
   // La pagina post-evento si accende e si spegne dalla scheda «Dopo l'evento»
   // senza ricaricare. Come lo stato, i due campi che la governano vivono qui:
@@ -434,6 +459,20 @@ export default function EventManagementClient({
         </Link>
       </div>
 
+      {appenaCreato && (
+        <CreatedSummary
+          published={status === 'PUBLISHED' || status === 'LIVE'}
+          publishFailed={appenaCreato.publishFailed}
+          unsaved={appenaCreato.unsaved}
+          shareUrl={condivisione ? localizedUrl(baseUrl, condivisione.path, locale) : null}
+          onPeople={() => {
+            setActiveTab('persone');
+            tabsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }}
+          onClose={chiudiRiepilogo}
+        />
+      )}
+
       {/* ═══ Hero ═══ */}
       <div className="p-4 mb-4" style={CARD}>
         <div className="d-flex flex-wrap gap-3 align-items-start">
@@ -581,7 +620,9 @@ export default function EventManagementClient({
           destra, nell'ordine di lettura. */}
       <div className="row g-4">
         <div className="col-lg-8 order-2 order-lg-1">
-          <TabNav active={activeTab} onChange={setActiveTab} t={td} />
+          <div ref={tabsRef}>
+            <TabNav active={activeTab} onChange={setActiveTab} t={td} />
+          </div>
           <div className="p-4" style={CARD}>
             {activeTab === 'panoramica' && (
               <OverviewTab
@@ -1398,6 +1439,51 @@ function KV({ label, value }: { label: string; value: ReactNode }) {
     <div className="py-3" style={{ borderBottom: '1px solid #f0f0f0' }}>
       <dt className="mb-1" style={EYEBROW}>{label}</dt>
       <dd className="mb-0" style={{ color: C_INK, fontSize: '0.9rem' }}>{value}</dd>
+    </div>
+  );
+}
+
+/** Il riepilogo dell'evento appena creato dal wizard. */
+function CreatedSummary({
+  published,
+  publishFailed,
+  unsaved,
+  shareUrl,
+  onPeople,
+  onClose,
+}: {
+  published: boolean;
+  publishFailed: boolean;
+  unsaved: CreationOutcome['unsaved'];
+  shareUrl: string | null;
+  onPeople: () => void;
+  onClose: () => void;
+}) {
+  const tc = useTranslations('admin.eventDetail.created');
+  const tw = useTranslations('admin.wizard.resources');
+  const mancanti = unsaved.map((k) => tw(k)).join(', ');
+  // Una pubblicazione chiesta e fallita non e' una bozza voluta.
+  const titolo = published ? tc('publishedTitle') : publishFailed ? tc('publishFailedTitle') : tc('draftTitle');
+  const testo = published ? tc('publishedBody') : publishFailed ? tc('publishFailedBody') : tc('draftBody');
+  return (
+    <div
+      className={`alert ${mancanti || (publishFailed && !published) ? 'alert-warning' : 'alert-success'} mb-4`}
+      role="status"
+    >
+      <div className="d-flex align-items-start gap-3">
+        <div className="flex-grow-1">
+          <p className="fw-semibold mb-1">{titolo}</p>
+          <p className="mb-2">{testo}</p>
+          {mancanti && <p className="mb-2">{tc('unsaved', { items: mancanti })}</p>}
+          <div className="d-flex flex-wrap gap-2 align-items-center">
+            {shareUrl && <CopyBtn text={shareUrl} label={tc('copyParticipantLink')} />}
+            <button type="button" className="btn btn-outline-primary btn-sm" onClick={onPeople}>
+              {tc('sendToSpeakers')}
+            </button>
+          </div>
+        </div>
+        <button type="button" className="btn-close" aria-label={tc('close')} onClick={onClose} />
+      </div>
     </div>
   );
 }

@@ -855,7 +855,9 @@
       "revocationFailed": "Opoziv pristupa za {name} nije uspio: poveznica za pristup i dalje vrijedi. Spremi ponovno za novi pokušaj ili je opozovi na kartici „{tab}” na stranici događaja.",
       "validationFailedDetail": "Poslužitelj je odbio neke podatke: {reason}. Ispravi ih i pokušaj ponovno.",
       "publishFailed": "Događaj je stvoren, ali nije objavljen: i dalje je nacrt. Objavite ga sa stranice događaja.",
-      "publishFailedDetail": "Događaj je stvoren, ali nije objavljen: i dalje je nacrt. Poslužitelj je odgovorio: {reason}. Objavite ga sa stranice događaja."
+      "publishFailedDetail": "Događaj je stvoren, ali nije objavljen: i dalje je nacrt. Poslužitelj je odgovorio: {reason}. Objavite ga sa stranice događaja.",
+      "toFix": "Za ispravak:",
+      "toFixField": "Polje {n}"
     },
     "nav": {
       "events": "Upravljanje događajima",
@@ -2328,7 +2330,19 @@
       "capacitySection": "Kapacitet i infrastruktura",
       "capacitySubtitle": "Konfigurirano za najviše {max} sudionika",
       "publishBlockedLive": "Događaj je već u tijeku",
-      "publishBlockedEnded": "Događaj je završio"
+      "publishBlockedEnded": "Događaj je završio",
+      "created": {
+        "publishedTitle": "Događaj objavljen",
+        "draftTitle": "Skica spremljena",
+        "publishedBody": "Javno je vidljiv: podijelite poveznicu sa sudionicima.",
+        "draftBody": "Još nije javno vidljiv: objavite ga kad bude spreman.",
+        "publishFailedTitle": "Objava nije uspjela",
+        "publishFailedBody": "Događaj je spremljen kao skica: objavite ga s ove stranice kad se problem riješi.",
+        "unsaved": "Nije spremljeno: {items}. Možete ih dodati na ovoj stranici.",
+        "copyParticipantLink": "Kopiraj poveznicu za sudionike",
+        "sendToSpeakers": "Poveznice moderatora i govornika",
+        "close": "Zatvori sažetak"
+      }
     },
     "rubrica": {
       "title": "Imenik",

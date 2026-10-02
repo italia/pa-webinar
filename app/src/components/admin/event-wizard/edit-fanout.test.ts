@@ -1,6 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { fanoutEditDiff } from './edit-fanout';
+import { createMaterialAdminSchema } from '@/lib/validation/materials';
+
+import { fanoutEditDiff, materialPayload } from './edit-fanout';
 import type { InitialEventShape, WizardForm } from './wizard-shell';
 
 /**
@@ -218,5 +220,64 @@ describe('fanoutEditDiff — altre cancellazioni', () => {
     const [url, init] = rimozioni[0]!;
     expect(url).toBe(`/api/events/${EVENT_ID}/organizers/org-1`);
     expect(init.headers).toEqual({ Authorization: `Bearer ${TOKEN}` });
+  });
+});
+
+/**
+ * Contratto fra il wizard e l'API dei materiali: la bozza del wizard, passata
+ * da materialPayload, e' accettata dallo schema della rotta cosi' com'e', con
+ * il tipo che l'API conosce.
+ */
+describe('materialPayload', () => {
+  it.each([
+    ['file', 'FILE'],
+    ['link', 'LINK'],
+  ] as const)('una bozza «%s» diventa un materiale %s valido', (tipo, atteso) => {
+    const bozza = {
+      id: 'bozza-1',
+      title: 'Slide della sessione',
+      url: 'https://storage.example.org/assets/documents/slide.pdf',
+      description: null,
+      type: tipo,
+      visibility: 'AFTER' as const,
+    };
+    const parsed = createMaterialAdminSchema.safeParse(materialPayload(bozza));
+    expect(parsed.success).toBe(true);
+    expect(parsed.success && parsed.data.type).toBe(atteso);
+    expect(parsed.success && parsed.data.visibility).toBe('AFTER');
+    expect(materialPayload(bozza)).not.toHaveProperty('id');
+  });
+});
+
+describe('materialPayload — file caricato', () => {
+  it('porta la chiave nello storage e i dati del file; un link no', () => {
+    const file = materialPayload({
+      title: 'Slide',
+      url: 'https://storage.example.org/assets/documents/2026/10/slide.pdf',
+      description: null,
+      type: 'file',
+      visibility: 'ALWAYS',
+      fileName: 'slide.pdf',
+      fileSize: 2048,
+      mimeType: 'application/pdf',
+      blobPath: 'assets/documents/2026/10/slide.pdf',
+    });
+    const parsed = createMaterialAdminSchema.safeParse(file);
+    expect(parsed.success && parsed.data).toMatchObject({
+      type: 'FILE',
+      blobPath: 'assets/documents/2026/10/slide.pdf',
+      fileName: 'slide.pdf',
+      fileSize: 2048,
+      mimeType: 'application/pdf',
+    });
+    const link = materialPayload({
+      title: 'Programma',
+      url: 'https://www.example.org/assets/programma.pdf',
+      description: null,
+      type: 'link',
+      visibility: 'ALWAYS',
+    });
+    expect(link).not.toHaveProperty('blobPath');
+    expect(link.type).toBe('LINK');
   });
 });

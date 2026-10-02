@@ -35,7 +35,8 @@ import type { VideoQualityPreset } from '@/lib/jitsi/config';
 
 import { RubricaAccessContext } from '../rubrica-picker';
 
-import { fanoutEditDiff, newFanoutReport, submitQuestionnaire } from './edit-fanout';
+import { fanoutEditDiff, materialPayload, newFanoutReport, submitQuestionnaire } from './edit-fanout';
+import { rememberCreation, type UnsavedResource } from './created-event';
 import Step1Base, { type Step1Value } from './step-1-base';
 import Step2Permissions, { type Step2Value } from './step-2-permissions';
 import Step3Invites, { type Step3Value } from './step-3-invites';
@@ -200,6 +201,10 @@ export interface InitialEventShape {
     description: string | null;
     type: 'file' | 'link';
     visibility: 'BEFORE' | 'DURING' | 'AFTER' | 'ALWAYS';
+    fileName?: string | null;
+    fileSize?: number | null;
+    mimeType?: string | null;
+    blobPath?: string | null;
   }>;
   preEventQuestionnaire: QuestionnaireBlock | null;
   postEventQuestionnaire: QuestionnaireBlock | null;
@@ -478,6 +483,12 @@ export default function EventWizard(props: WizardProps) {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  // Gli errori trovati nel browser: spariscono appena il campo torna valido.
+  // Quelli del server restano fino al prossimo invio, perche' qui non si sa
+  // ricontrollarli.
+  const chiaviClientRef = useRef<Set<string>>(new Set());
+  // Dopo un invio rifiutato il fuoco va al primo campo da correggere.
+  const fuocoRichiestoRef = useRef(false);
 
   // On step change move focus to the step region and scroll it into view so
   // keyboard/screen-reader users aren't left on the footer button (and a
@@ -499,7 +510,9 @@ export default function EventWizard(props: WizardProps) {
   // un errore mostrato senza portarlo in vista sembra un pulsante che non fa
   // niente. Il contatore fa scorrere anche quando il testo non cambia (stesso
   // errore al secondo tentativo). Dichiarato dopo l'effetto del cambio passo,
-  // cosi' quando cambiano insieme vince l'avviso.
+  // cosi' quando cambiano insieme vince l'avviso. Quando invece c'e' un campo
+  // da correggere vince il campo (vedi sotto): il suo messaggio e il
+  // riepilogo accanto ai pulsanti dicono che cosa fare.
   const alertRef = useRef<HTMLDivElement>(null);
   const [errorSeq, setErrorSeq] = useState(0);
   const showError = useCallback((message: string) => {
@@ -507,9 +520,100 @@ export default function EventWizard(props: WizardProps) {
     setErrorSeq((n) => n + 1);
   }, []);
   useEffect(() => {
-    if (errorSeq === 0) return;
+    if (errorSeq === 0 || fuocoRichiestoRef.current) return;
     alertRef.current?.scrollIntoView?.({ behavior: 'smooth', block: 'start' });
   }, [errorSeq]);
+
+  // Un errore trovato nel browser sparisce appena il campo torna valido; quando
+  // non ne resta nessuno sparisce anche l'avviso.
+  useEffect(() => {
+    const chiavi = chiaviClientRef.current;
+    if (chiavi.size === 0) return;
+    const ancora: Record<string, string> = { ...validatePublish(form) };
+    for (const k of STEP_KEYS) Object.assign(ancora, validateStep(k, form, props.defaultLocale));
+    const risolte = [...chiavi].filter((k) => !(k in ancora));
+    if (risolte.length === 0) return;
+    for (const k of risolte) chiavi.delete(k);
+    const next = { ...fieldErrors };
+    for (const k of risolte) delete next[k];
+    setFieldErrors(next);
+    if (Object.keys(next).length === 0) setSubmitError(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form]);
+
+  // I campi non validi del passo, come li segnano i passi (classe
+  // `is-invalid`): li si marca come tali per le tecnologie assistive,
+  // collegati al loro messaggio, e un riepilogo accanto ai pulsanti ci porta.
+  // Fatto qui una volta per i cinque passi, invece che campo per campo. La
+  // classe la cambia anche altro stato dei passi (la lingua mostrata, l'errore
+  // proprio di un campo): un osservatore delle classi tiene allineati
+  // attributi e riepilogo.
+  const [riepilogo, setRiepilogo] = useState<string[]>([]);
+  const campiNonValidiRef = useRef<HTMLElement[]>([]);
+  useEffect(() => {
+    const root = contentRef.current;
+    if (!root) return;
+    const allinea = () => {
+      root.querySelectorAll<HTMLElement>('[data-wizard-invalid]').forEach((el) => {
+        if (el.classList.contains('is-invalid')) return;
+        el.removeAttribute('aria-invalid');
+        const prima = el.getAttribute('data-wizard-describedby');
+        if (prima) el.setAttribute('aria-describedby', prima);
+        else el.removeAttribute('aria-describedby');
+        el.removeAttribute('data-wizard-invalid');
+        el.removeAttribute('data-wizard-describedby');
+      });
+      const campi = [
+        ...root.querySelectorAll<HTMLElement>('input.is-invalid, textarea.is-invalid, select.is-invalid'),
+      ];
+      const etichette: string[] = [];
+      campi.forEach((el, i) => {
+        if (!el.hasAttribute('data-wizard-invalid')) {
+          el.setAttribute('data-wizard-invalid', '');
+          el.setAttribute('data-wizard-describedby', el.getAttribute('aria-describedby') ?? '');
+        }
+        if (el.getAttribute('aria-invalid') !== 'true') el.setAttribute('aria-invalid', 'true');
+        const messaggio = el.parentElement?.querySelector<HTMLElement>('.invalid-feedback');
+        if (messaggio) {
+          if (!messaggio.id) messaggio.id = `wizard-errore-${activeStep}-${i}`;
+          const voluto = [el.getAttribute('data-wizard-describedby'), messaggio.id].filter(Boolean).join(' ');
+          if (el.getAttribute('aria-describedby') !== voluto) el.setAttribute('aria-describedby', voluto);
+        }
+        const etichetta =
+          (el.id && root.querySelector(`label[for="${el.id}"]`)?.textContent?.trim()) ||
+          el.getAttribute('aria-label') ||
+          el.getAttribute('placeholder') ||
+          '';
+        etichette.push(etichetta.replace(/\s*\*$/, ''));
+      });
+      campiNonValidiRef.current = campi;
+      setRiepilogo((prima) =>
+        prima.length === etichette.length && prima.every((e, i) => e === etichette[i]) ? prima : etichette,
+      );
+      return campi;
+    };
+
+    const campi = allinea();
+    // Dopo un invio rifiutato: il primo campo da correggere prende il fuoco e
+    // entra nella vista; se nessun campo del passo lo mostra, si porta in vista
+    // l'avviso. La richiesta si consuma comunque, cosi' una modifica
+    // successiva non sposta il fuoco mentre si scrive.
+    if (fuocoRichiestoRef.current) {
+      fuocoRichiestoRef.current = false;
+      if (campi[0]) {
+        campi[0].focus({ preventScroll: true });
+        campi[0].scrollIntoView?.({ block: 'center' });
+      } else {
+        alertRef.current?.scrollIntoView?.({ behavior: 'smooth', block: 'start' });
+      }
+    }
+
+    // Le nostre modifiche toccano solo attributi aria e data, non la classe:
+    // l'osservatore non si risveglia da se'.
+    const osservatore = new MutationObserver(() => allinea());
+    osservatore.observe(root, { subtree: true, childList: true, attributes: true, attributeFilter: ['class'] });
+    return () => osservatore.disconnect();
+  }, [fieldErrors, activeStep]);
 
   const updateForm = useCallback((patch: Partial<WizardForm>) => {
     setForm((prev) => ({ ...prev, ...patch }));
@@ -582,6 +686,8 @@ export default function EventWizard(props: WizardProps) {
   const goNext = () => {
     const errs = validateStep(activeStep, form, props.defaultLocale);
     if (Object.keys(errs).length > 0) {
+      chiaviClientRef.current = new Set(Object.keys(errs));
+      fuocoRichiestoRef.current = true;
       setFieldErrors(errs);
       showError(t('validationFailed'));
       return;
@@ -606,6 +712,8 @@ export default function EventWizard(props: WizardProps) {
         return err.error ?? err.message ?? `HTTP ${status}`;
       }
       const mapped = mapServerIssues(err.details, props.defaultLocale);
+      chiaviClientRef.current = new Set();
+      fuocoRichiestoRef.current = true;
       setFieldErrors(mapped.fieldErrors);
       if (mapped.step) setActiveStep(mapped.step);
       const parti: string[] = [];
@@ -642,6 +750,8 @@ export default function EventWizard(props: WizardProps) {
         Object.assign(aggregated, validatePublish(form));
       }
       if (Object.keys(aggregated).length > 0) {
+        chiaviClientRef.current = new Set(Object.keys(aggregated));
+        fuocoRichiestoRef.current = true;
         setFieldErrors(aggregated);
         showError(t('validationFailed'));
         // Jump to the first failing step. Gli errori di validatePublish
@@ -834,7 +944,8 @@ export default function EventWizard(props: WizardProps) {
         // Track side-resource failures so we can warn the admin instead of
         // silently dropping invites/moderators/materials. They can re-add them
         // on the event page — but only if they know something didn't save.
-        const failed = new Set<string>();
+        // Le risorse non salvate, per tipo (`admin.wizard.resources.*`).
+        const failed = new Set<UnsavedResource>();
 
         // 1) Organizers (primary-moderator auth)
         for (const org of form.organizers) {
@@ -852,7 +963,7 @@ export default function EventWizard(props: WizardProps) {
           })
             .then((r) => r.ok)
             .catch(() => false);
-          if (!ok) failed.add(t('resources.organizers'));
+          if (!ok) failed.add('organizers');
         }
 
         // 2) Invitations (admin-session auth)
@@ -869,7 +980,7 @@ export default function EventWizard(props: WizardProps) {
           })
             .then((r) => r.ok)
             .catch(() => false);
-          if (!ok) failed.add(t('resources.invitations'));
+          if (!ok) failed.add('invitations');
         }
 
         // 3) Moderators (EventModerator rows, MODERATOR role)
@@ -888,7 +999,7 @@ export default function EventWizard(props: WizardProps) {
           })
             .then((r) => r.ok)
             .catch(() => false);
-          if (!ok) failed.add(t('resources.moderators'));
+          if (!ok) failed.add('moderators');
         }
 
         // 4) Speakers (additional EventModerator rows, SPEAKER role)
@@ -907,7 +1018,7 @@ export default function EventWizard(props: WizardProps) {
           })
             .then((r) => r.ok)
             .catch(() => false);
-          if (!ok) failed.add(t('resources.speakers'));
+          if (!ok) failed.add('speakers');
         }
 
         // 5) Materials
@@ -915,11 +1026,11 @@ export default function EventWizard(props: WizardProps) {
           const ok = await fetch(`/api/admin/events/${created.id}/materials`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(m),
+            body: JSON.stringify(materialPayload(m)),
           })
             .then((r) => r.ok)
             .catch(() => false);
-          if (!ok) failed.add(t('resources.materials'));
+          if (!ok) failed.add('materials');
         }
 
         // 5) Questionnaires (pre/post). Il rifiuto confluisce nello stesso
@@ -941,7 +1052,7 @@ export default function EventWizard(props: WizardProps) {
           form.postEventQuestionnaire,
           props.defaultLocale,
         );
-        if (reportQ.failed.length > 0) failed.add(t('resources.questionnaires'));
+        if (reportQ.failed.length > 0) failed.add('questionnaires');
 
         // 6) Promote from DRAFT → PUBLISHED if requested. The create
         //    endpoint currently doesn't accept status; use PUT on the
@@ -972,11 +1083,17 @@ export default function EventWizard(props: WizardProps) {
           }
         }
 
-        // Warn about any side resources that didn't save. The ToastProvider
-        // lives in the admin layout, so this toast survives the redirect to
-        // the event page, from where the admin can re-add the missing items.
-        if (failed.size > 0) {
-          toast.error(t('partialFailure', { items: [...failed].join(', ') }));
+        // Le risorse non salvate e una pubblicazione fallita: sulla pagina di
+        // gestione le dice il riepilogo dell'evento appena creato, che resta
+        // finche' non lo si chiude. Verso un'altra pagina, o se il browser non
+        // conserva l'esito, un avviso, che sopravvive al cambio di pagina.
+        const esitoConservato =
+          !overrideRedirect &&
+          rememberCreation(created.id, { unsaved: [...failed], publishFailed: publishProblem !== null });
+        if (failed.size > 0 && !esitoConservato) {
+          toast.error(
+            t('partialFailure', { items: [...failed].map((k) => t(`resources.${k}`)).join(', ') }),
+          );
         }
         if (publishProblem) {
           toast.error(
@@ -992,7 +1109,7 @@ export default function EventWizard(props: WizardProps) {
         // creato l'evento (il wizard la richiede, e chi crea l'evento lo
         // gestisce): il token, credenziale che non scade, resta fuori dalla
         // barra degli indirizzi e dalla cronologia.
-        let destination = `/admin/events/${created.id}`;
+        let destination = `/admin/events/${created.id}?created=1`;
         if (overrideRedirect === '__questionnaires__') {
           destination = `/admin/events/${created.id}/questionnaires`;
         } else if (overrideRedirect) {
@@ -1128,6 +1245,26 @@ export default function EventWizard(props: WizardProps) {
           />
         )}
       </div>
+
+      {riepilogo.length > 0 && (
+        <div className="mt-4 small" role="status">
+          <span className="fw-semibold me-2">{t('toFix')}</span>
+          {riepilogo.map((etichetta, i) => (
+            <button
+              key={`${i}-${etichetta}`}
+              type="button"
+              className="btn btn-link btn-sm p-0 me-3 align-baseline"
+              onClick={() => {
+                const el = campiNonValidiRef.current[i];
+                el?.focus({ preventScroll: true });
+                el?.scrollIntoView?.({ block: 'center' });
+              }}
+            >
+              {etichetta || t('toFixField', { n: i + 1 })}
+            </button>
+          ))}
+        </div>
+      )}
 
       <div className="d-flex justify-content-between mt-4 pt-3" style={{ borderTop: '1px solid #e8e8e8' }}>
         <button
