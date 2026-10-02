@@ -1372,7 +1372,7 @@ check). The options are in its `--help` and in
    kubectl get secret videocall-secrets -n pa-webinar -o jsonpath='{.data.ADMIN_API_KEY}' | base64 -d
    ```
 
-4. **Create a named administrator.** In **Accounts** (`/en/admin/organizers`), under **Add a person**,
+4. **Create a named administrator.** In **Staff and access** > **Staff accounts** (`/en/admin/organizers`), under **Add an account**,
    choose the **Administrator** role and tick **Send the sign-in link now**. From then on, people sign
    in under their own names with a one-time sign-in link sent by email, and the instance API key can
    stay in a safe for emergencies and automation ([ADR-015](adr/015-named-administrators.md)). The link arriving also

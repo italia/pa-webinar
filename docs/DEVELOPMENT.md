@@ -61,7 +61,7 @@ The administration area has two ways in. The instance API key (`ADMIN_API_KEY`) 
    - The Compose stack sets `ADMIN_API_KEY=dev_admin_key_2026` in `docker-compose.yml`.
    - When Next.js runs on the host, the key comes from `app/.env`. The template `.env.example` sets `change_me_admin_key_in_production`.
    - Both values are public development placeholders. Never use them in a real installation (see [Development placeholders](../SECURITY.md#development-placeholders)).
-2. Open **Accounts** (`/en/admin/organizers`). Under **Add a person**, enter a name and an email, choose the **Role** (**Organiser** or **Administrator**) and press **Add**. **Send the sign-in link now** is selected by default.
+2. Open **Staff and access** > **Staff accounts** (`/en/admin/organizers`). Under **Add an account**, enter a name and an email, choose the **Role** (**Organiser** or **Administrator**) and press **Add**. **Send the sign-in link now** is selected by default.
 3. The sign-in email is queued in the email outbox, like every email the platform sends. The Compose `cron` service drains the outbox every minute, and the message then appears in Mailpit at <http://localhost:8025>. When Next.js runs on the host, the `cron` service cannot reach it: drain the outbox yourself (see [Next.js on the host](#nextjs-on-the-host)).
 4. Follow the link. It works once and expires after the number of minutes set by `DURATA_LINK_MINUTI` in `app/src/lib/auth/staff-link-config.ts`. Later, request a new link from the same sign-in page with **Send me the link**.
 

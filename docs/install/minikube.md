@@ -638,7 +638,7 @@ Open `https://app.<node-ip>.nip.io/en/admin/login`, expand **Sign in with the
 instance key**, enter the key in **Access key** and press **Sign in**.
 
 The instance key is for the first access, emergencies and automation. To work
-under your own name, open **People** > **Accounts**, add a person as
+under your own name, open **Staff and access** > **Staff accounts**, add a person as
 **Administrator** or **Organiser**, and open the one-time sign-in link from
 Mailpit
 (`https://mail.<node-ip>.nip.io`, signed by the same local authority).

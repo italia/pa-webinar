@@ -122,7 +122,7 @@ transcripts, "speaker label" means something else: see
 [AI post-production](#ai-post-production).
 [ADR-003](adr/003-moderator-magic-links.md)
 
-**Staff account** (`StaffAccount`, admin nav **Accounts**, route
+**Staff account** (`StaffAccount`, admin nav **Staff and access** > **Staff accounts**, route
 `/admin/organizers`): a named, passwordless account with role `ORGANIZER` or
 `ADMIN`. The session re-reads the account on every request, so deactivating it
 takes effect immediately. [ADR-014](adr/014-organizer-role.md)
@@ -909,7 +909,8 @@ these docs and the code use *organizer*.
 | Italian UI | English UI | Term in these docs |
 |---|---|---|
 | Amministrazione | **Administration** | administration area |
-| Utenze | **Accounts** | staff accounts (`StaffAccount`) |
+| Staff e accessi | **Staff and access** | admin section for staff accounts and moderator links |
+| Utenze dello staff | **Staff accounts** | staff accounts (`StaffAccount`) |
 | Amministratore | **Administrator** | administrator (`ADMIN`) |
 | Organizzatore | **Organiser** | organizer (`ORGANIZER`) |
 | Organizzatori | **Organizers** | co-organizing organizations (`EventOrganizer`) |
@@ -917,7 +918,7 @@ these docs and the code use *organizer*.
 | Moderatore | **Moderator** | moderator (`MODERATOR`) |
 | Moderatore principale | **Primary moderator** | primary moderator (the event's contact for the moderator link) |
 | Link da moderatore | **Moderator link** | moderator link |
-| Moderatori | **Moderators** | moderator links of all events |
+| Link dei moderatori | **Moderator links** | moderator links of all events |
 | Relatore | **Speaker** | speaker (grant role `SPEAKER`) |
 | Partecipante | **Participant** | participant (a registrant in the room) |
 | Ospite | **Guest** | guest |

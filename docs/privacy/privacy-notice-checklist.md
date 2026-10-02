@@ -234,7 +234,7 @@ feature on and what the notice should say about it.
 | Address book | The optional box on every registration form | See [Address book](#address-book) |
 | Invitations | Staff add them in the event wizard. The platform sends no invitation email | The invitee's name and email. With **Public registration enabled** off, the list decides who may register, and the personal join link reaches the registrant only by email |
 | Moderators and speakers | Event wizard and named grants | The primary moderator's name and email, which registrants receive (see [Recipients and processors](#recipients-and-processors)); named grants; the public speaker list |
-| Staff accounts | **Accounts** | Name, email, role, last sign-in |
+| Staff accounts | **Staff and access** > **Staff accounts** | Name, email, role, last sign-in |
 | Administration audit log | Always | For privileged writes (administration area, event edits made with a moderator link) and staff sign-ins: the actor, the action, the target, the IP address and the user agent |
 | Email outbox | Always | Recipient and body of every email, including personal join and sign-in links |
 | Avatars | **Use Gravatar when available** (`gravatarEnabled`, off by default) | Drawn from initials on the server by default; with Gravatar, see [Recipients and processors](#recipients-and-processors) |
@@ -312,7 +312,7 @@ What each job deletes is in the
 | AI outputs | The recording's regime: the event's retention if the video is not published, kept while it is | **Artifact retention (days)** (`aiArtifactRetentionDays`) adds a deletion date; it cannot keep outputs beyond the event's retention |
 | Event record and recap | Nothing deletes them. The archived event keeps its title, description, dates, speaker list and the primary moderator's name and encrypted email; the recap keeps, without authors, the text of the top Q&A and chat questions, published poll results and the most-submitted word-cloud words (`app/src/lib/events/recap.ts`) | Edit or delete the event |
 | Address book | `retentionMonths` after the person's last registration (default in `app/prisma/schema.prisma`, not editable in the administration area); opted-out entries at the next run | Delete entries under **Address book** |
-| Staff accounts | The account stays until an administrator deletes it. Used or expired sign-in links are swept by the daily cleanup (`app/src/app/api/cron/cleanup/route.ts`) | **Accounts** |
+| Staff accounts | The account stays until an administrator deletes it. Used or expired sign-in links are swept by the daily cleanup (`app/src/app/api/cron/cleanup/route.ts`) | **Staff and access** > **Staff accounts** |
 | Administration audit log, GDPR audit log | Nothing deletes them | Not configurable |
 | Email outbox | Nothing deletes it ([Email and calendar](../architecture/email.md#known-gaps)) | Not configurable |
 | Orphaned recording files | `orphanRecordingGraceDays`, unless marked **Keep** | [Runtime settings](../configuration/runtime-settings.md) |

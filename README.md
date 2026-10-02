@@ -68,7 +68,7 @@ What is still missing is in the [roadmap](docs/ROADMAP.md). What shipped, releas
 
 **Administrators and operators**
 
-- Manage **Accounts**: named administrators and organizers who sign in with a one-time link. Organizers see only their own events.
+- Manage **Staff accounts**: named administrators and organizers who sign in with a one-time link. Organizers see only their own events.
 - Brand the installation, pick the offered languages, allow or refuse guests, and make registration public or invitation-only, all at runtime and without a rebuild.
 - Install with a Helm chart whose bridges (Jitsi Videobridge) can scale to zero, with optional recording and in-cluster AI post-production.
 - Publish transparency pages: **System status** (on by default, and it can be withdrawn so that only administrators see its data), **What's new & changelog** with a viewer for the release SBOMs, and the **Service inventory**.

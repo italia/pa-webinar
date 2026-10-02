@@ -6,6 +6,8 @@ import { Link, percorsoSeNoto } from '@/i18n/navigation';
 import { useSettings } from '@/lib/settings-context';
 import { mottoDelSito } from '@/lib/utils/locale';
 
+import { LINK_PIEDE_EVENTI, linkVisibile } from './public-links';
+
 interface FooterLink {
   title: string;
   url: string;
@@ -181,11 +183,13 @@ export default function PAFooter() {
                   </Link>
                 </h4>
                 <ul className="footer-list link-list clearfix">
-                  <li>
-                    <Link href="/video-library" className="list-item text-white">
-                      {t('nav.videoLibrary')}
-                    </Link>
-                  </li>
+                  {LINK_PIEDE_EVENTI.filter((l) => linkVisibile(l, settings)).map((l) => (
+                    <li key={l.href}>
+                      <Link href={l.href} className="list-item text-white">
+                        {t(l.labelKey)}
+                      </Link>
+                    </li>
+                  ))}
                 </ul>
               </div>
               <div className="col-lg-4 col-md-4 pb-2">

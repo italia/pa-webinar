@@ -382,7 +382,7 @@ bodies on one installation is not supported. See
   links ([ADR-003](adr/003-moderator-magic-links.md)).
 
 The recommended path: sign in with the key once, create named administrators
-under **Accounts**, then keep the key in a vault
+under **Staff and access** > **Staff accounts**, then keep the key in a vault
 ([ADR-015](adr/015-named-administrators.md)). See
 [Identity, access and tokens](architecture/identity-and-access.md).
 

@@ -15,6 +15,7 @@ import { useSettings } from '@/lib/settings-context';
 import { mottoDelSito } from '@/lib/utils/locale';
 
 import LanguageSwitcher from './language-switcher';
+import { LINK_INTESTAZIONE, linkVisibile } from './public-links';
 
 interface PAHeaderProps {
   isAdmin?: boolean;
@@ -106,6 +107,8 @@ function CenterHeader({
   logoUrl?: string | null;
 }) {
   const t = useTranslations('nav');
+  const tr = useTranslations();
+  const settings = useSettings();
 
   return (
     <Header type="center" theme="dark" small>
@@ -131,19 +134,22 @@ function CenterHeader({
           </HeaderBrand>
         )}
         <HeaderRightZone>
-          {/* Archivio registrazioni pubblico: prima era raggiungibile solo
-              dal footer → poco scopribile. Esposto in header su ogni pagina. */}
-          <Link
-            href="/video-library"
-            // Sotto i 768px resta la sola icona: il nome serve comunque a chi
-            // usa un lettore di schermo.
-            aria-label={t('videoLibrary')}
-            className="text-white text-decoration-none d-inline-flex align-items-center gap-1 me-3"
-            style={{ fontSize: '0.9rem' }}
-          >
-            <Icon icon="it-video" size="sm" color="white" />
-            <span className="d-none d-md-inline">{t('videoLibrary')}</span>
-          </Link>
+          {/* Videoteca e, se pubblico, calendario: su ogni pagina, non solo
+              nel piè di pagina dove nessuno li cercava. */}
+          {LINK_INTESTAZIONE.filter((l) => linkVisibile(l, settings)).map((l) => (
+            <Link
+              key={l.href}
+              href={l.href}
+              // Sotto i 768px resta la sola icona: il nome serve comunque a chi
+              // usa un lettore di schermo.
+              aria-label={tr(l.labelKey)}
+              className="text-white text-decoration-none d-inline-flex align-items-center gap-1 me-3"
+              style={{ fontSize: '0.9rem' }}
+            >
+              {l.icon && <Icon icon={l.icon} size="sm" color="white" />}
+              <span className="d-none d-md-inline">{tr(l.labelKey)}</span>
+            </Link>
+          ))}
           {isAdmin && (
             <Link
               href="/admin"

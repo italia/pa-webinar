@@ -7,7 +7,7 @@ import { Icon } from '@/components/ui/icon';
 import { Link, usePathname } from '@/i18n/navigation';
 import type { PercorsoStatico } from '@/i18n/percorsi';
 
-interface NavItem {
+export interface NavItem {
   href: PercorsoStatico;
   icon: string;
   labelKey: string;
@@ -29,19 +29,21 @@ const VOCI_ORGANIZZATORE: ReadonlySet<PercorsoStatico> = new Set<PercorsoStatico
   '/admin/postprod',
 ]);
 
-const MAIN_SECTIONS: NavItem[] = [
+export const MAIN_SECTIONS: NavItem[] = [
   { href: '/admin/events', icon: 'it-calendar', labelKey: 'events' },
-  // La sezione raccoglie le persone, non solo le iscrizioni: rubrica,
-  // moderatori, registro GDPR, organizzatori.
+  // La sezione raccoglie chi partecipa: iscrizioni, rubrica, registro GDPR.
   { href: '/admin/registrations', icon: 'it-user', labelKey: 'people' },
   { href: '/admin/questionnaires', icon: 'it-help-circle', labelKey: 'questionnaires' },
   { href: '/admin/publications', icon: 'it-files', labelKey: 'publications' },
   { href: '/admin/recordings', icon: 'it-video', labelKey: 'recordings' },
   { href: '/admin/monitoring', icon: 'it-presentation', labelKey: 'monitoring' },
+  // Chi lavora sulla piattaforma e con quali chiavi: utenze dello staff e
+  // link dei moderatori.
+  { href: '/admin/organizers', icon: 'it-lock', labelKey: 'staffAccess' },
   { href: '/admin/settings', icon: 'it-settings', labelKey: 'settings' },
 ];
 
-const EVENTS_SUB_NAV: NavItem[] = [
+export const EVENTS_SUB_NAV: NavItem[] = [
   { href: '/admin/events', icon: 'it-list', labelKey: 'eventsList', exact: true },
   { href: '/admin/events/new', icon: 'it-plus', labelKey: 'newEvent' },
   { href: '/admin/events/calls', icon: 'it-video', labelKey: 'instantCalls' },
@@ -51,7 +53,7 @@ const EVENTS_SUB_NAV: NavItem[] = [
 ];
 
 // Registrations area groups cross-event attendee management.
-const REGISTRATIONS_SUB_NAV: NavItem[] = [
+export const REGISTRATIONS_SUB_NAV: NavItem[] = [
   {
     href: '/admin/registrations',
     icon: 'it-user',
@@ -59,13 +61,17 @@ const REGISTRATIONS_SUB_NAV: NavItem[] = [
     exact: true,
   },
   { href: '/admin/rubrica', icon: 'it-pa', labelKey: 'rubrica' },
-  { href: '/admin/moderators', icon: 'it-key', labelKey: 'moderators' },
   { href: '/admin/gdpr-audit', icon: 'it-files', labelKey: 'gdprAudit' },
-  { href: '/admin/organizers', icon: 'it-key', labelKey: 'organizers' },
+];
+
+// Staff e accessi: le utenze nominali (ADR-014/015) e i link dei moderatori.
+export const STAFF_SUB_NAV: NavItem[] = [
+  { href: '/admin/organizers', icon: 'it-user', labelKey: 'staffAccounts', exact: true },
+  { href: '/admin/moderators', icon: 'it-key', labelKey: 'moderatorLinks' },
 ];
 
 // Recordings / instant calls / live sessions — everything video-output.
-const RECORDINGS_SUB_NAV: NavItem[] = [
+export const RECORDINGS_SUB_NAV: NavItem[] = [
   {
     href: '/admin/recordings',
     icon: 'it-video',
@@ -80,7 +86,7 @@ const RECORDINGS_SUB_NAV: NavItem[] = [
 ];
 
 // Publications area: unified library editing.
-const PUBLICATIONS_SUB_NAV: NavItem[] = [
+export const PUBLICATIONS_SUB_NAV: NavItem[] = [
   {
     href: '/admin/publications',
     icon: 'it-files',
@@ -91,7 +97,7 @@ const PUBLICATIONS_SUB_NAV: NavItem[] = [
 ];
 
 // Monitoring groups together all the observability surfaces.
-const MONITORING_SUB_NAV: NavItem[] = [
+export const MONITORING_SUB_NAV: NavItem[] = [
   {
     href: '/admin/monitoring',
     icon: 'it-presentation',
@@ -101,7 +107,7 @@ const MONITORING_SUB_NAV: NavItem[] = [
   { href: '/admin/infrastructure', icon: 'it-piattaforme', labelKey: 'infrastructure' },
 ];
 
-const SETTINGS_SUB_NAV: NavItem[] = [
+export const SETTINGS_SUB_NAV: NavItem[] = [
   {
     href: '/admin/settings',
     icon: 'it-settings',
@@ -126,7 +132,7 @@ const SETTINGS_SUB_NAV: NavItem[] = [
   { href: '/admin/settings/tags', icon: 'it-bookmark', labelKey: 'settingsTags' },
 ];
 
-const QUESTIONNAIRES_SUB_NAV: NavItem[] = [
+export const QUESTIONNAIRES_SUB_NAV: NavItem[] = [
   {
     href: '/admin/questionnaires',
     icon: 'it-copy',
@@ -160,14 +166,9 @@ export default function AdminNav({ role = 'admin' }: { role?: 'admin' | 'organiz
   // hanno una sezione loro.
   const inMonitoring = sotto('/admin/monitoring', '/admin/infrastructure');
   const inSettings = sotto('/admin/settings');
-  // Le persone: iscrizioni, rubrica, moderatori, registro GDPR.
-  const inRegistrations = sotto(
-    '/admin/registrations',
-    '/admin/rubrica',
-    '/admin/moderators',
-    '/admin/gdpr-audit',
-    '/admin/organizers',
-  );
+  // Le persone: iscrizioni, rubrica, registro GDPR.
+  const inRegistrations = sotto('/admin/registrations', '/admin/rubrica', '/admin/gdpr-audit');
+  const inStaff = sotto('/admin/organizers', '/admin/moderators');
   const inRecordings = sotto('/admin/recordings', '/admin/postprod');
   const inPublications = sotto('/admin/publications');
   const inQuestionnaires = sotto('/admin/questionnaires');
@@ -182,6 +183,7 @@ export default function AdminNav({ role = 'admin' }: { role?: 'admin' | 'organiz
     if (item.href === '/admin/monitoring') return inMonitoring;
     if (item.href === '/admin/settings') return inSettings;
     if (item.href === '/admin/registrations') return inRegistrations;
+    if (item.href === '/admin/organizers') return inStaff;
     if (item.href === '/admin/recordings') return inRecordings;
     if (item.href === '/admin/publications') return inPublications;
     if (item.href === '/admin/questionnaires') return inQuestionnaires;
@@ -193,21 +195,18 @@ export default function AdminNav({ role = 'admin' }: { role?: 'admin' | 'organiz
     return matchesPath(item.href);
   }
 
-  const subNav = inEvents
-    ? EVENTS_SUB_NAV
-    : inRegistrations
-      ? REGISTRATIONS_SUB_NAV
-      : inRecordings
-        ? RECORDINGS_SUB_NAV
-        : inPublications
-          ? PUBLICATIONS_SUB_NAV
-          : inMonitoring
-            ? MONITORING_SUB_NAV
-            : inSettings
-              ? SETTINGS_SUB_NAV
-              : inQuestionnaires
-                ? QUESTIONNAIRES_SUB_NAV
-                : null;
+  // La prima sezione in cui ci si trova decide il sotto-menu.
+  const sezioni: Array<[boolean, NavItem[]]> = [
+    [inEvents, EVENTS_SUB_NAV],
+    [inRegistrations, REGISTRATIONS_SUB_NAV],
+    [inStaff, STAFF_SUB_NAV],
+    [inRecordings, RECORDINGS_SUB_NAV],
+    [inPublications, PUBLICATIONS_SUB_NAV],
+    [inMonitoring, MONITORING_SUB_NAV],
+    [inSettings, SETTINGS_SUB_NAV],
+    [inQuestionnaires, QUESTIONNAIRES_SUB_NAV],
+  ];
+  const subNav = sezioni.find(([dentro]) => dentro)?.[1] ?? null;
 
   return (
     <div>

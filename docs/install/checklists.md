@@ -196,7 +196,7 @@ stop, or warn, before they change anything. The commands let you check ahead.
       pa-webinar`; on k3s also `$S/helm-notes.txt`).
 - [ ] **The first sign-in**, with **Sign in with the instance key** at
       `/en/admin/login`.
-- [ ] **A named administrator**: **People** > **Accounts**, the
+- [ ] **A named administrator**: **Staff and access** > **Staff accounts**, the
       **Administrator** role, **Send the sign-in link now**. The link arrives:
       that is the test of the SMTP relay.
 - [ ] **A first event**: **New event**, a template or **Configure manually**,
@@ -342,7 +342,7 @@ Before the first public event. The owner is in each group's title.
       (IT).
 - [ ] The images you run scanned with your scanner, since published images
       are not scanned after publication (IT).
-- [ ] Staff accounts reviewed under **People** > **Accounts**: people who
+- [ ] Staff accounts reviewed under **Staff and access** > **Staff accounts**: people who
       left removed (IT, with Communications).
 - [ ] Certificates: your own renewed before they expire; with a private
       authority, the script run once a year re-signs them (IT).

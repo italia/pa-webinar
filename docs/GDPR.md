@@ -320,7 +320,7 @@ Self-service covers only registrations found by email address. Everything else g
 | A person's words in a transcript | The transcript editor's erasure mode removes a segment from both the machine version and the revised version, and logs `POSTPROD_TRANSCRIPT_REDACT`. See [Recordings, voice data and AI outputs](privacy/recordings-and-ai.md) |
 | A recording | Delete it from the event's recording panel. This writes `RECORDING_DELETED` |
 | A single chat message | A moderator can hide it, which deletes its attachment. The text is removed at event retention |
-| Staff account data | **Accounts**: an administrator deletes the account |
+| Staff account data | **Staff and access** > **Staff accounts**: an administrator deletes the account |
 | A person who cannot receive the email, or data the self-service does not reach | Only in the database, today. Chat messages carry an encrypted name and a seat identifier, not an email address, so they cannot be found by email |
 | Objection (Art. 21) and other rights | Decided by the controller. The platform's only built-in objection path is the address-book opt-out |
 
@@ -340,7 +340,7 @@ The address book (model `Person`, admin UI **Address book**) keeps people who as
 
 ### Staff accounts
 
-Staff members are organizers and named administrators ([ADR-014](adr/014-organizer-role.md), [ADR-015](adr/015-named-administrators.md)). Administrators create them in **Accounts**.
+Staff members are organizers and named administrators ([ADR-014](adr/014-organizer-role.md), [ADR-015](adr/015-named-administrators.md)). Administrators create them in **Staff and access** > **Staff accounts**.
 
 - **Stored.** Name and email encrypted, email HMAC for sign-in, role, active flag, creation time and last sign-in time. No password.
 - **Sign-in links.** Only the SHA-256 of the token is stored. A link lasts 20 minutes and works once. The daily cleanup deletes links a day after use or expiry.
