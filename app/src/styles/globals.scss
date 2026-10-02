@@ -584,11 +584,21 @@ html.live-call-immersive body {
     color: #0066CC;
   }
 
+  // Fino a due righe, sillabate nella lingua della pagina: con sei o sette
+  // schede «Nuvola di parole» o «Partecipanti» si leggono intere invece di
+  // finire in «Nuvola d…». Il nome completo resta nel title e nell'etichetta
+  // accessibile.
   &__label {
-    white-space: nowrap;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
     max-width: 100%;
     overflow: hidden;
-    text-overflow: ellipsis;
+    text-align: center;
+    white-space: normal;
+    overflow-wrap: break-word;
+    hyphens: auto;
+    font-size: 0.66rem;
   }
 
   &__badge {
@@ -863,26 +873,160 @@ html.live-call-immersive body {
   &__msg {
     display: flex;
     gap: 8px;
-    margin-bottom: 12px;
+    margin-top: 10px;
     animation: msgFadeIn 0.2s ease-out;
+
+    &:first-child { margin-top: 0; }
+
+    // Messaggio che continua il gruppo: niente intestazione, niente avatar,
+    // e piu' vicino a quello di prima.
+    &--continued { margin-top: 2px; }
 
     &--own {
       flex-direction: row-reverse;
+
+      .chat-panel__col { align-items: flex-end; }
 
       .chat-panel__bubble {
         background: #E8F0FE;
         border-radius: 14px 14px 4px 14px;
       }
 
-      .chat-panel__time {
-        text-align: right;
-      }
+      // La barra delle azioni sta sul lato interno del messaggio, e il
+      // selettore delle reazioni si apre verso l'interno della lista.
+      .chat-panel__tools { right: auto; left: 6px; }
+      .chat-panel__tools .chat-panel__react-pop { right: auto; left: 0; }
+      .chat-panel__q-actions { justify-content: flex-end; }
     }
+
+    &--continued .chat-panel__bubble { border-top-left-radius: 6px; }
+    &--own.chat-panel__msg--continued .chat-panel__bubble { border-top-left-radius: 14px; border-top-right-radius: 6px; }
+
+    // Le azioni (rispondi, reagisci, modifica, nascondi) compaiono quando il
+    // messaggio e' sotto il puntatore o ha il fuoco: sempre raggiungibili da
+    // tastiera, senza riempire la lista di icone ne' allargare i gruppi.
+    &:hover .chat-panel__tools,
+    &:focus-within .chat-panel__tools,
+    // Con il selettore delle reazioni aperto la barra resta: il puntatore
+    // puo' uscire dal messaggio (e alcuni browser non danno il fuoco al
+    // pulsante cliccato) senza che il selettore sparisca sotto la mano.
+    .chat-panel__tools.is-open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+  }
+
+  &__col {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    min-width: 0;
+    max-width: 85%;
+  }
+
+  &__head {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 0 4px 3px;
+    font-size: 0.74rem;
+    line-height: 1.2;
+
+    &--own { justify-content: flex-end; }
+  }
+
+  &__name {
+    font-weight: 600;
+    color: #17324D;
+  }
+
+  &__role {
+    padding: 0 6px;
+    border-radius: 8px;
+    background: #E8F0FE;
+    color: #0066CC;
+    font-size: 0.65rem;
+    font-weight: 600;
+    line-height: 16px;
+  }
+
+  &__stamp {
+    color: #5C6F82;
+    font-size: 0.68rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__tools {
+    position: absolute;
+    top: -12px;
+    right: 6px;
+    z-index: 4;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 7px;
+    border: 1px solid #E3E8ED;
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(23, 50, 77, 0.14);
+    font-size: 0.65rem;
+    color: #5C6F82;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.12s ease;
+
+    &:empty { display: none; }
+
+    .chat-panel__reply-btn { opacity: 0.8; }
+
+    // Sul primo messaggio del gruppo sta all'altezza della riga del nome, dal
+    // lato opposto al nome: non copre ne' il nome ne' il messaggio di prima.
+    .chat-panel__head ~ & { top: 0; }
+
+    // Il selettore delle reazioni si apre sotto la barra e verso l'interno:
+    // in cima alla lista non viene tagliato, e di lato resta nella lista.
+    .chat-panel__react-pop {
+      top: calc(100% + 4px);
+      bottom: auto;
+      left: auto;
+      right: 0;
+    }
+
+    // Senza puntatore non c'e' "sopra": la barra resta sotto il messaggio,
+    // visibile e tenue.
+    @media (hover: none) {
+      position: relative;
+      top: auto;
+      right: auto;
+      margin-top: 2px;
+      padding: 0 2px;
+      border: 0;
+      background: transparent;
+      box-shadow: none;
+      opacity: 0.75;
+      pointer-events: auto;
+
+      // L'ora dei messaggi che continuano il gruppo serve al passaggio del
+      // puntatore; sui touch ripeterla sotto ogni messaggio e' solo rumore
+      // (resta nell'intestazione del gruppo e nel title).
+      .chat-panel__stamp { display: none; }
+    }
+  }
+
+  &__q-actions {
+    display: flex;
+    gap: 10px;
+    margin: 2px 4px 0;
   }
 
   &__avatar {
     width: 28px;
     height: 28px;
+
+    &--spacer { visibility: hidden; }
+
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -896,18 +1040,12 @@ html.live-call-immersive body {
 
   &__bubble {
     background: #F5F6F7;
-    border-radius: 14px 14px 14px 4px;
-    padding: 8px 12px;
-    max-width: 85%;
-    min-width: 80px;
+    border-radius: 4px 14px 14px 14px;
+    padding: 7px 12px;
+    max-width: 100%;
+    min-width: 0;
   }
 
-  &__sender {
-    font-size: 0.72rem;
-    font-weight: 600;
-    color: #0066CC;
-    margin-bottom: 2px;
-  }
 
   &__text {
     font-size: 0.85rem;
@@ -928,11 +1066,6 @@ html.live-call-immersive body {
     }
   }
 
-  &__time {
-    font-size: 0.65rem;
-    color: #8899AA;
-    margin-top: 2px;
-  }
 
   &__input-row {
     display: flex;
@@ -1032,6 +1165,475 @@ html.live-call-immersive body {
     &:hover { background: #EEF3FA; }
     &:focus-visible { outline: 2px solid #0066CC; outline-offset: 1px; }
   }
+}
+
+// ── Pannelli della barra laterale della sala ──
+// Intestazione e stato vuoto comuni: ogni pannello (materiali, nuvola, Q&A…)
+// apre con lo stesso titolo e, se vuoto, con la stessa forma.
+.live-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+
+  &__title {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #17324D;
+
+    .icon { fill: #0066CC; }
+  }
+
+  // Variante a barra: in cima a un pannello che scorre sotto (sondaggi, Q&A).
+  &--bar {
+    margin: 0;
+    padding: 12px 12px 10px;
+    border-bottom: 1px solid #EEF1F4;
+  }
+
+  &--stacked {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+
+  &__note {
+    margin: 0;
+    font-size: 0.75rem;
+    color: #5C6F82;
+  }
+
+  &__count {
+    min-width: 20px;
+    padding: 0 6px;
+    border-radius: 10px;
+    background: #E8F0FE;
+    color: #0066CC;
+    font-size: 0.72rem;
+    line-height: 20px;
+    text-align: center;
+  }
+}
+
+.live-panel-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 28px 12px;
+  color: #5C6F82;
+
+  &__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    margin-bottom: 10px;
+    border-radius: 50%;
+    background: #EEF3FA;
+
+    .icon { fill: #0066CC; }
+  }
+
+  &__title {
+    margin: 0 0 4px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #17324D;
+  }
+
+  &__hint {
+    margin: 0;
+    font-size: 0.8rem;
+  }
+}
+
+// ── Nuvola di parole ──
+.word-cloud {
+  padding: 12px;
+
+  &__timer {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 12px;
+    background: #0066CC;
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__label {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #455B71;
+  }
+
+  &__create {
+    padding: 10px;
+    border: 1px solid #D9DADB;
+    border-radius: 10px;
+    background: #FAFBFC;
+  }
+
+  &__durations {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 10px;
+  }
+
+  &__duration {
+    flex: 1;
+    padding: 4px 6px;
+    border: 1px solid #C5D3E0;
+    border-radius: 6px;
+    background: #fff;
+    color: #0066CC;
+    font-size: 0.78rem;
+    font-weight: 600;
+
+    &.is-active {
+      border-color: #0066CC;
+      background: #0066CC;
+      color: #fff;
+    }
+
+    &:focus-visible { outline: 2px solid #0066CC; outline-offset: 1px; }
+  }
+
+  &__prompt {
+    margin: 0 0 8px;
+    padding: 8px 10px;
+    border-left: 3px solid #0066CC;
+    border-radius: 0 8px 8px 0;
+    background: #EEF3FA;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #17324D;
+
+    &--closed {
+      border-left-color: #8899AA;
+      background: #F5F6F7;
+      color: #455B71;
+    }
+  }
+
+  &__cloud {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 4px 10px;
+    min-height: 140px;
+    margin-bottom: 10px;
+    padding: 14px 10px;
+    border-radius: 12px;
+    background: radial-gradient(circle at 50% 40%, #FFFFFF 0%, #F2F5F8 100%);
+    border: 1px solid #E3E8ED;
+  }
+
+  &__word {
+    display: inline-block;
+    font-weight: 700;
+    line-height: 1.1;
+    transition: font-size 0.3s ease, opacity 0.3s ease;
+  }
+
+  &__waiting {
+    font-size: 0.82rem;
+    color: #5C6F82;
+  }
+
+  &__compose {
+    display: flex;
+    gap: 6px;
+  }
+
+  &__input {
+    flex: 1;
+    min-width: 0;
+    border: 1px solid #D9DADB;
+    border-radius: 20px;
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    outline: none;
+
+    &:focus {
+      border-color: #0066CC;
+      box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.15);
+    }
+  }
+
+  &__send {
+    width: 34px;
+    height: 34px;
+    border: 0;
+    border-radius: 50%;
+    background: #0066CC;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    &:disabled { background: #C9D4DE; }
+    &:focus-visible { outline: 2px solid #0066CC; outline-offset: 2px; }
+  }
+
+  &__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 8px;
+    font-size: 0.75rem;
+    color: #5C6F82;
+  }
+}
+
+// ── Materiali ──
+.material-panel {
+  padding: 12px;
+
+  &__form {
+    margin-bottom: 12px;
+    padding: 10px;
+    border: 1px solid #D9DADB;
+    border-radius: 10px;
+    background: #FAFBFC;
+  }
+
+  &__modes {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 10px;
+    padding: 3px;
+    border-radius: 8px;
+    background: #E8EDF2;
+  }
+
+  &__mode {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 5px 8px;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: #455B71;
+    font-size: 0.8rem;
+    font-weight: 600;
+
+    .icon { fill: currentColor; }
+
+    &.is-active {
+      background: #fff;
+      color: #0066CC;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+    }
+
+    &:focus-visible { outline: 2px solid #0066CC; outline-offset: 1px; }
+  }
+
+  &__drop {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    width: 100%;
+    margin: 0;
+    padding: 16px 10px;
+    border: 2px dashed #9DB3C9;
+    border-radius: 10px;
+    background: #fff;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease;
+
+    &:hover,
+    &.is-over {
+      border-color: #0066CC;
+      background: #F2F7FD;
+    }
+  }
+
+  // Il campo del file e' nascosto alla vista ma non al fuoco: quando lo
+  // raggiunge la tastiera si evidenzia la sua area.
+  &__file-input:focus-visible + &__drop {
+    outline: 2px solid #0066CC;
+    outline-offset: 2px;
+  }
+
+  &__drop-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #17324D;
+  }
+
+  &__drop-choose {
+    font-size: 0.8rem;
+    color: #0066CC;
+    text-decoration: underline;
+  }
+
+  &__chosen {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    border: 1px solid #D9DADB;
+    border-radius: 8px;
+    background: #fff;
+  }
+
+  &__chosen-name {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #17324D;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__meta {
+    font-size: 0.72rem;
+    font-weight: 400;
+    color: #5C6F82;
+  }
+
+  &__progress {
+    margin-bottom: 8px;
+
+    .progress { height: 6px; border-radius: 3px; margin-bottom: 2px; }
+    .progress-bar { transition: width 0.2s ease; }
+  }
+
+  &__error {
+    margin-bottom: 8px;
+    font-size: 0.8rem;
+    color: #D9364F;
+  }
+
+  &__icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: #455B71;
+    flex-shrink: 0;
+
+    .icon { fill: currentColor; }
+
+    &:hover { background: #EEF3FA; color: #0066CC; }
+    &:focus-visible { outline: 2px solid #0066CC; outline-offset: 1px; }
+
+    &--danger:hover { background: #FBEAEC; color: #D9364F; }
+  }
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+}
+
+.material-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid #E3E8ED;
+  border-radius: 10px;
+  background: #fff;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+  &:hover {
+    border-color: #C5D3E0;
+    box-shadow: 0 2px 6px rgba(23, 50, 77, 0.08);
+  }
+
+  &__body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__title {
+    display: block;
+    font-size: 0.86rem;
+    font-weight: 600;
+    color: #0066CC;
+    text-decoration: none;
+    word-break: break-word;
+
+    &:hover { text-decoration: underline; }
+  }
+
+  &__desc {
+    margin-top: 2px;
+    font-size: 0.78rem;
+    color: #455B71;
+  }
+
+  &__badge {
+    display: inline-block;
+    margin-top: 4px;
+    padding: 1px 6px;
+    border: 1px solid #D9DADB;
+    border-radius: 4px;
+    background: #F5F6F7;
+    font-size: 0.68rem;
+    color: #455B71;
+  }
+
+  &__actions {
+    display: flex;
+    gap: 2px;
+    flex-shrink: 0;
+  }
+}
+
+// Tessera colorata del genere di file: il colore aiuta, l'etichetta testuale
+// (PDF, DOCX…) nella riga sotto il titolo dice la stessa cosa a parole.
+.material-kind {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  flex-shrink: 0;
+  background: #EEF3FA;
+
+  .icon { fill: #0066CC; }
+
+  &--pdf { background: #FBEAEC; .icon { fill: #C02B43; } }
+  &--doc { background: #E6F0FB; .icon { fill: #0059B3; } }
+  &--slides { background: #FDF1E3; .icon { fill: #A65F00; } }
+  &--sheet { background: #E5F4EE; .icon { fill: #00704A; } }
+  &--text { background: #EEF0F2; .icon { fill: #455B71; } }
 }
 
 @keyframes msgFadeIn {
@@ -2371,21 +2973,11 @@ html.live-call-immersive body {
   display: inline-block;
 }
 
-// Il selettore si apre SOPRA il messaggio: in fondo alla lista non deve
-// finire fuori dal pannello.
-//
-// E deve restare DENTRO la lista anche di lato. La lista scorre (overflow
-// auto), e cio' che sborda a sinistra di un contenitore che scorre viene
-// tagliato e non si raggiunge nemmeno scorrendo: ancorato a destra del
-// pulsante, il selettore di un messaggio altrui perderebbe le prime emoji,
-// e al loro posto si vedrebbe la videochiamata dietro la barra laterale. Lo
-// z-index non c'entra (il contenuto tagliato non si rialza): l'ancora e' la
-// riga dell'ora, larga quanto il messaggio e dal suo lato, e il selettore
-// parte dal bordo sinistro per i messaggi altrui, dal destro per i propri.
-.chat-panel__time--anchor {
-  position: relative;
-}
-
+// Selettore delle reazioni. Deve restare DENTRO la lista anche di lato: la
+// lista scorre (overflow auto), e cio' che sborda da un contenitore che scorre
+// viene tagliato e non si raggiunge nemmeno scorrendo. L'ancora e' la barra
+// delle azioni del messaggio, che sta sul suo lato interno; la posizione
+// verticale e il lato di apertura li decide `.chat-panel__tools`.
 .chat-panel__react-pop {
   position: absolute;
   bottom: 100%;
@@ -2496,11 +3088,159 @@ html.live-call-immersive body {
   margin-bottom: 2px;
 }
 
-// Chat: barra con l'export (A5). Discreta, in cima alla lista.
+// Chat: barra in cima alla lista: avvisi a sinistra, export (A5) a destra.
 .chat-panel__toolbar {
   display: flex;
-  justify-content: flex-end;
-  padding: 4px 10px 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 10px 4px;
+  border-bottom: 1px solid #EEF1F4;
+}
+
+// Pillola «nuovi messaggi»: sopra la fine della lista, quando la si e' scorsa
+// in alto e intanto arriva altro.
+.chat-panel__new-wrap {
+  position: relative;
+  height: 0;
+}
+
+.chat-panel__new-pill {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 6;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 12px;
+  border: 0;
+  border-radius: 999px;
+  background: #0066CC;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+
+  &:focus-visible { outline: 2px solid #17324D; outline-offset: 2px; }
+}
+
+// Invito ad attivare le notifiche, sopra il campo di scrittura.
+.chat-panel__offer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-top: 1px solid #E3E8ED;
+  background: #F2F7FD;
+  font-size: 0.78rem;
+  color: #17324D;
+
+  span { flex: 1; }
+}
+
+.chat-panel__offer-btn {
+  padding: 3px 10px;
+  border: 1px solid #0066CC;
+  border-radius: 999px;
+  background: #fff;
+  color: #0066CC;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+
+  &:hover { background: #0066CC; color: #fff; }
+  &:focus-visible { outline: 2px solid #0066CC; outline-offset: 2px; }
+}
+
+.chat-panel__offer-close {
+  padding: 0 4px;
+  border: 0;
+  background: transparent;
+  color: #5C6F82;
+  font-size: 1rem;
+  line-height: 1;
+
+  &:focus-visible { outline: 2px solid #0066CC; outline-offset: 1px; }
+}
+
+// Campanella degli avvisi della chat (components/live/chat-notify-menu).
+.chat-notify {
+  position: relative;
+
+  &__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 8px;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    background: transparent;
+    color: #455B71;
+    font-size: 0.72rem;
+
+    &:hover { background: #EEF3FA; color: #0066CC; }
+    &:focus-visible { outline: 2px solid #0066CC; outline-offset: 1px; }
+    &[aria-expanded='true'] { border-color: #C5D3E0; background: #EEF3FA; color: #0066CC; }
+
+    &.is-off { color: #8A5A00; }
+  }
+
+  &__pop {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    z-index: 30;
+    width: 250px;
+    padding: 10px 12px;
+    border: 1px solid #D9DADB;
+    border-radius: 10px;
+    background: #fff;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+  }
+
+  &__group {
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  &__title {
+    float: none;
+    width: auto;
+    margin: 0 0 6px;
+    padding: 0;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #17324D;
+  }
+
+  &__option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 3px 0;
+    font-size: 0.82rem;
+    color: #17324D;
+    cursor: pointer;
+
+    input { accent-color: #0066CC; margin: 0; }
+    input:disabled + span { color: #8899AA; }
+  }
+
+  &__sep {
+    height: 1px;
+    margin: 6px 0;
+    background: #EEF1F4;
+  }
+
+  &__hint {
+    margin: 4px 0 0;
+    font-size: 0.72rem;
+    color: #8A5A00;
+  }
 }
 
 .chat-panel__export {

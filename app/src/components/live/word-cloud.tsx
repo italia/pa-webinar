@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useTranslations } from 'next-intl';
+import { useFormatter, useTranslations } from 'next-intl';
 import useSWR from 'swr';
-import { Alert, Button, Badge, Input } from 'design-react-kit';
+import { Alert, Button } from 'design-react-kit';
 
 import { Icon } from '@/components/ui/icon';
 import { useLivePush } from '@/hooks/use-live-state';
@@ -44,6 +44,43 @@ const BI_COLORS = [
   '#004D99', '#00264D', '#0059B3', '#003366',
 ];
 
+/** Il colore segue la parola, non la sua posizione: quando la classifica
+ *  cambia, ogni parola resta del suo colore invece di scambiarlo. */
+function wordColor(word: string): string {
+  let h = 0;
+  for (let i = 0; i < word.length; i += 1) h = (h * 31 + word.charCodeAt(i)) | 0;
+  return BI_COLORS[Math.abs(h) % BI_COLORS.length] ?? '#0066CC';
+}
+
+/** La nuvola, uguale da aperta e da chiusa. */
+function Cloud({ words, emptyText }: { words: WordEntry[]; emptyText?: string }) {
+  const maxCount = words.reduce((max, w) => Math.max(max, w.count), 1);
+  return (
+    <div className="word-cloud__cloud">
+      {words.length === 0 && emptyText && (
+        <span className="word-cloud__waiting">{emptyText}</span>
+      )}
+      {words.map((w) => {
+        const ratio = w.count / maxCount;
+        return (
+          <span
+            key={w.word}
+            className="word-cloud__word"
+            style={{
+              fontSize: `${14 + ratio * 30}px`,
+              color: wordColor(w.word),
+              opacity: 0.72 + ratio * 0.28,
+            }}
+            title={`${w.word}: ${w.count}`}
+          >
+            {w.word}
+          </span>
+        );
+      })}
+    </div>
+  );
+}
+
 export default function WordCloud({
   eventSlug,
   token,
@@ -53,6 +90,7 @@ export default function WordCloud({
 }: WordCloudProps) {
   const t = useTranslations('wordcloud');
   const tc = useTranslations('common');
+  const format = useFormatter();
   const pushLive = useLivePush();
   // Su SWR e non su un `fetch` a mano perché è la cache che il canale sa
   // toccare: l'avviso di cambiamento invalida per chiave, e uno stato locale
@@ -74,6 +112,9 @@ export default function WordCloud({
   const [inputWord, setInputWord] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [showCreate, setShowCreate] = useState(false);
+  // Una nuvola alla volta: un secondo Invio, o un tasto tenuto premuto, non
+  // deve avviarne un'altra mentre la prima sta partendo.
+  const [creating, setCreating] = useState(false);
   const [prompt, setPrompt] = useState('');
   const [duration, setDuration] = useState(120);
   const [timeLeft, setTimeLeft] = useState(0);
@@ -129,7 +170,8 @@ export default function WordCloud({
   }, [roundActive, roundCreatedAt, roundDuration, mutateRound]);
 
   const handleCreateRound = useCallback(async () => {
-    if (!prompt.trim()) return;
+    if (!prompt.trim() || creating) return;
+    setCreating(true);
     setError(null);
     try {
       const res = await fetch(`/api/events/${eventSlug}/wordcloud`, {
@@ -148,9 +190,11 @@ export default function WordCloud({
       setPrompt('');
     } catch {
       setError(tc('errorGeneric'));
+    } finally {
+      setCreating(false);
     }
     void fetchRound();
-  }, [eventSlug, token, prompt, duration, fetchRound, tc]);
+  }, [eventSlug, token, prompt, duration, creating, fetchRound, tc]);
 
   const handleCloseRound = useCallback(async () => {
     if (!round?.id) return;
@@ -196,8 +240,6 @@ export default function WordCloud({
     void fetchRound();
   }, [inputWord, round, eventSlug, token, voterAccessToken, voterGuestId, submitting, fetchRound, t]);
 
-  const maxCount = round?.words?.reduce((max, w) => Math.max(max, w.count), 1) ?? 1;
-
   // Vicino a dove si agisce: a giro aperto sopra il campo, perché con una
   // nuvola piena la cima del pannello è già fuori vista mentre si scrive.
   const avviso = error ? (
@@ -206,152 +248,161 @@ export default function WordCloud({
     </Alert>
   ) : null;
 
+  const mmss = `${Math.floor(timeLeft / 60)}:${String(timeLeft % 60).padStart(2, '0')}`;
+  const hasLastRound = !!round && !round.active && !!round.words && round.words.length > 0;
+
   return (
-    <div className="p-3">
+    <div className="word-cloud">
+      <div className="live-panel-header">
+        <h6 className="live-panel-header__title">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0066CC" strokeWidth="2"
+               strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z" />
+          </svg>
+          {t('title')}
+        </h6>
+        {round?.active && timeLeft > 0 && (
+          <span className="word-cloud__timer" role="timer" aria-label={t('timeLeft', { time: mmss })}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
+                 strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12 6 12 12 16 14" />
+            </svg>
+            {mmss}
+          </span>
+        )}
+      </div>
+
       {!round?.active && avviso}
 
       {isModerator && !round?.active && (
         <div className="mb-3">
           {showCreate ? (
-            <div>
-              <Input
+            <div className="word-cloud__create">
+              <label className="word-cloud__label" htmlFor="word-cloud-prompt">
+                {t('prompt')}
+              </label>
+              <input
+                id="word-cloud-prompt"
                 type="text"
-                label={t('promptPlaceholder')}
+                className="form-control form-control-sm mb-2"
+                placeholder={t('promptPlaceholder')}
                 value={prompt}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPrompt(e.target.value)}
+                onChange={(e) => setPrompt(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.nativeEvent.isComposing && prompt.trim()) {
+                    e.preventDefault();
+                    void handleCreateRound();
+                  }
+                }}
                 maxLength={200}
-                className="mb-2"
+                autoFocus
               />
-              <div className="d-flex gap-2 mb-2">
+              <div className="word-cloud__label" id="word-cloud-duration">{t('duration')}</div>
+              <div className="word-cloud__durations" role="group" aria-labelledby="word-cloud-duration">
                 {[60, 120, 180].map((d) => (
-                  <Button
+                  <button
                     key={d}
-                    color={duration === d ? 'primary' : 'outline-primary'}
-                    size="xs"
+                    type="button"
+                    className={`word-cloud__duration${duration === d ? ' is-active' : ''}`}
+                    aria-pressed={duration === d}
                     onClick={() => setDuration(d)}
                   >
-                    {d}s
-                  </Button>
+                    {format.number(d / 60, { style: 'unit', unit: 'minute' })}
+                  </button>
                 ))}
               </div>
               <div className="d-flex gap-2">
-                <Button color="primary" size="sm" onClick={handleCreateRound} disabled={!prompt.trim()}>
+                <Button color="primary" size="xs" className="px-3" onClick={handleCreateRound} disabled={!prompt.trim() || creating}>
                   {t('startRound')}
                 </Button>
-                <Button color="outline-secondary" size="sm" onClick={() => setShowCreate(false)}>
+                <Button color="secondary" outline size="xs" className="px-3" onClick={() => setShowCreate(false)}>
                   {t('cancel')}
                 </Button>
               </div>
             </div>
           ) : (
-            <Button color="primary" size="sm" className="w-100" onClick={() => setShowCreate(true)}>
-              <Icon icon="it-comment" size="xs" className="me-1" />
-              {t('title')}
-            </Button>
+            <>
+              {!hasLastRound && (
+                <div className="live-panel-empty pt-2">
+                  <span className="live-panel-empty__icon" aria-hidden="true">
+                    <Icon icon="it-comment" size="lg" />
+                  </span>
+                  <p className="live-panel-empty__hint">{t('emptyHintModerator')}</p>
+                </div>
+              )}
+              <Button color="primary" size="sm" className="w-100" onClick={() => setShowCreate(true)}>
+                {t('startNew')}
+              </Button>
+            </>
           )}
         </div>
       )}
 
       {round?.active && (
         <div>
-          <div className="d-flex justify-content-between align-items-center mb-2">
-            <h6 className="mb-0 small fw-semibold">{round.prompt}</h6>
-            {timeLeft > 0 && (
-              <Badge color="primary" pill className="px-2 py-1">
-                {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, '0')}
-              </Badge>
-            )}
-          </div>
-
-          {/* Word cloud visualization */}
-          <div
-            className="d-flex flex-wrap align-items-center justify-content-center gap-2 p-3 rounded-3 mb-3"
-            style={{ backgroundColor: '#F5F6F7', minHeight: '120px' }}
-          >
-            {(round.words ?? []).length === 0 && (
-              <span className="text-muted small">{t('noWords')}</span>
-            )}
-            {(round.words ?? []).map((w, idx) => {
-              const ratio = w.count / maxCount;
-              const fontSize = 14 + ratio * 34;
-              const color = BI_COLORS[idx % BI_COLORS.length];
-              return (
-                <span
-                  key={w.word}
-                  className="d-inline-block px-1 fw-semibold"
-                  style={{
-                    fontSize: `${fontSize}px`,
-                    color,
-                    opacity: 0.7 + ratio * 0.3,
-                    transition: 'all 0.3s ease',
-                  }}
-                  title={`${w.word}: ${w.count}`}
-                >
-                  {w.word}
-                </span>
-              );
-            })}
-          </div>
+          <p className="word-cloud__prompt">{round.prompt}</p>
+          <Cloud words={round.words ?? []} emptyText={t('noWords')} />
 
           {/* Scrive chiunque sia in sala, chi conduce compreso: come nei
               sondaggi, anche il moderatore partecipa. Nascondergli il campo
               lasciava una sala di soli ospiti e moderatore senza nessuno che
               potesse scrivere. */}
           {avviso}
-          <div className="d-flex gap-2">
+          <div className="word-cloud__compose">
             <input
               type="text"
-              className="form-control form-control-sm"
+              className="word-cloud__input"
               placeholder={t('submitPlaceholder')}
               aria-label={t('submitPlaceholder')}
               value={inputWord}
               onChange={(e) => setInputWord(e.target.value)}
               maxLength={30}
-              onKeyDown={(e) => e.key === 'Enter' && handleSubmitWord()}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.nativeEvent.isComposing) void handleSubmitWord();
+              }}
             />
-            <Button color="primary" size="sm" onClick={handleSubmitWord} disabled={!inputWord.trim() || submitting}>
-              {t('submit')}
-            </Button>
+            <button
+              type="button"
+              className="word-cloud__send"
+              onClick={handleSubmitWord}
+              disabled={!inputWord.trim() || submitting}
+              aria-label={t('submit')}
+              title={t('submit')}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2"
+                   strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <line x1="22" y1="2" x2="11" y2="13" />
+                <polygon points="22 2 15 22 11 13 2 9 22 2" />
+              </svg>
+            </button>
           </div>
 
-          {isModerator && round.active && (
-            <Button color="outline-danger" size="sm" className="w-100 mt-2" onClick={handleCloseRound}>
-              {t('close')}
-            </Button>
-          )}
-
-          <small className="text-muted d-block mt-2">
-            {t('wordsSubmitted', { count: round.totalSubmissions ?? 0 })}
-          </small>
+          <div className="word-cloud__footer">
+            <span>{t('wordsSubmitted', { count: round.totalSubmissions ?? 0 })}</span>
+            {isModerator && (
+              <Button color="danger" outline size="xs" className="px-2" onClick={handleCloseRound}>
+                {t('close')}
+              </Button>
+            )}
+          </div>
         </div>
       )}
 
-      {round && !round.active && round.words && round.words.length > 0 && (
+      {hasLastRound && (
         <div>
-          <h6 className="small fw-semibold text-muted mb-2">{round.prompt}</h6>
-          <div
-            className="d-flex flex-wrap align-items-center justify-content-center gap-2 p-3 rounded-3"
-            style={{ backgroundColor: '#F5F6F7', minHeight: '80px' }}
-          >
-            {round.words.map((w, idx) => {
-              const ratio = w.count / maxCount;
-              const fontSize = 14 + ratio * 34;
-              return (
-                <span
-                  key={w.word}
-                  className="d-inline-block px-1 fw-semibold"
-                  style={{ fontSize: `${fontSize}px`, color: BI_COLORS[idx % BI_COLORS.length], opacity: 0.7 + ratio * 0.3 }}
-                >
-                  {w.word}
-                </span>
-              );
-            })}
-          </div>
+          <p className="word-cloud__prompt word-cloud__prompt--closed">{round!.prompt}</p>
+          <Cloud words={round!.words ?? []} />
         </div>
       )}
 
-      {!round?.active && (!round?.words || round.words.length === 0) && !isModerator && (
-        <p className="text-muted small text-center mb-0">{t('noActiveRound')}</p>
+      {!round?.active && !hasLastRound && !isModerator && (
+        <div className="live-panel-empty">
+          <span className="live-panel-empty__icon" aria-hidden="true">
+            <Icon icon="it-comment" size="lg" />
+          </span>
+          <p className="live-panel-empty__title">{t('noActiveRound')}</p>
+        </div>
       )}
     </div>
   );

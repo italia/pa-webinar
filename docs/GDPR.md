@@ -375,7 +375,7 @@ The portal also uses the browser's local storage, which never leaves the device,
 - the last display name and optional email typed in the waiting room (`pawebinar.participant.name`, `pawebinar.participant.email`);
 - the guest identifier `paw_guest_id`, and the separate identifiers with which moderators and speakers vote in the room (`paw_moderator_voter_id`, `paw_speaker_voter_id`);
 - in the administration area, a draft of the event wizard (`pa-wizard-draft:<id>`, or `pa-wizard-draft:new` for a new event), saved as the form is filled in. It can contain the names and email addresses of the primary contact, moderators, speakers and invitees, in plain text, and stays in the browser until the event is saved or the draft is discarded;
-- preferences such as the chosen virtual background, the classic waiting-room view, bookmarks and the language of the recap summary.
+- preferences such as the chosen virtual background, the classic waiting-room view, bookmarks, the language of the recap summary and the chat alerts (`pa-webinar.chat-notify`: when to alert, with sound and with browser notifications).
 
 Whether this storage needs consent under the ePrivacy rules is the controller's assessment.
 

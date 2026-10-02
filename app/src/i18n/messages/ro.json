@@ -372,7 +372,23 @@
       "questionStatusFailed": "Întrebarea nu a putut fi actualizată",
       "questionNeedsText": "Scrieți textul întrebării: un atașament singur nu intră în coadă",
       "lensTruncated": "Sunt încărcate doar mesajele cele mai recente: pot exista întrebări mai vechi care nu apar în listă.",
-      "attachUnavailable": "Atașamentele nu sunt disponibile în această instalare."
+      "attachUnavailable": "Atașamentele nu sunt disponibile în această instalare.",
+      "you": "Dvs.",
+      "newMessagesBelow": "{count, plural, one {# mesaj nou} few {# mesaje noi} other {# de mesaje noi}}",
+      "replyNotificationTitle": "{name} v-a răspuns în chat",
+      "messageNotificationTitle": "{name} în chat",
+      "notifyButton": "Alerte chat",
+      "notifyButtonOff": "Alerte chat: silențios",
+      "notifyTitle": "Alertează-mă pentru",
+      "notifyAll": "Toate mesajele",
+      "notifyMentions": "Mențiuni și răspunsuri",
+      "notifyOff": "Silențios",
+      "notifySound": "Sunet",
+      "notifyDesktop": "Notificări de browser",
+      "notifyDesktopBlocked": "Browserul blochează notificările acestui site: le puteți permite din nou din setările site-ului.",
+      "notifyDesktopUnsupported": "Acest browser nu acceptă notificări.",
+      "notifyOffer": "Doriți o notificare când cineva vă menționează sau vă răspunde?",
+      "notifyOfferEnable": "Activați notificările"
     },
     "role": {
       "moderator": "Moderator",
@@ -469,7 +485,8 @@
     "leftMessage": "Evenimentul este încă în desfășurare: puteți reveni oricând.",
     "leftModeratorReminder": "Evenimentul rămâne deschis până când cineva îl încheie. Când ați terminat, reveniți și alegeți „{action}”.",
     "rejoin": "Reveniți în sală",
-    "backToHome": "Înapoi la pagina principală"
+    "backToHome": "Înapoi la pagina principală",
+    "sidebarTabMaterialsNew": "Materiale noi distribuite"
   },
   "qa": {
     "title": "Întrebări și Răspunsuri",
@@ -2886,7 +2903,17 @@
       "uploadBusy": "Prea multe încărcări în acest moment: încercați din nou în câteva secunde",
       "deleteFailed": "Materialul nu a putut fi șters"
     },
-    "addedByStaff": "Adăugat de organizatori"
+    "addedByStaff": "Adăugat de organizatori",
+    "dropzoneTitle": "Trageți fișierul aici",
+    "dropzoneChoose": "sau alegeți-l de pe calculator",
+    "removeFile": "Eliminați fișierul",
+    "uploadProgress": "Încărcare: {percent}%",
+    "cancelUpload": "Anulați încărcarea",
+    "uploadCancelled": "Încărcare anulată",
+    "open": "Deschideți",
+    "download": "Descărcați",
+    "emptyHintModerator": "Distribuiți participanților diapozitive, documente sau linkuri utile.",
+    "emptyHintPublic": "Aici vor apărea materialele distribuite de moderatori."
   },
   "reminders": {
     "title": "Notificări",
@@ -3444,16 +3471,16 @@
     "noFeedback": "Niciun feedback primit"
   },
   "wordcloud": {
-    "title": "Word Cloud",
+    "title": "Nor de cuvinte",
     "startRound": "Porniți",
     "prompt": "Temă",
     "promptPlaceholder": "de ex. Ce așteptări aveți de la acest eveniment?",
     "duration": "Durată",
     "submit": "Trimiteți",
     "submitPlaceholder": "Scrieți un cuvânt (max. 30 car.)",
-    "close": "Închideți word cloud",
+    "close": "Închideți norul de cuvinte",
     "cancel": "Anulați",
-    "noActiveRound": "Niciun word cloud activ momentan.",
+    "noActiveRound": "Niciun nor de cuvinte activ momentan.",
     "noWords": "Se așteaptă primele cuvinte...",
     "wordsSubmitted": "{count} cuvinte trimise",
     "timeRemaining": "Timp rămas",
@@ -3462,7 +3489,10 @@
       "closed": "Această rundă este închisă: nu se mai acceptă cuvinte.",
       "limit": "Ați trimis deja numărul maxim de cuvinte pentru această rundă.",
       "rateLimited": "Prea multe trimiteri în acest moment: așteptați câteva secunde înainte de a reîncerca."
-    }
+    },
+    "startNew": "Porniți un nor de cuvinte",
+    "emptyHintModerator": "Puneți o întrebare deschisă: răspunsurile dintr-un cuvânt formează norul în timp real.",
+    "timeLeft": "Timp rămas: {time}"
   },
   "timer": {
     "title": "Cronometru",

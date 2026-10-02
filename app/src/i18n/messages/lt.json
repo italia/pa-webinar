@@ -372,7 +372,23 @@
       "questionStatusFailed": "Nepavyko atnaujinti klausimo",
       "questionNeedsText": "Įrašykite klausimo tekstą: vien priedas į eilę nepatenka",
       "lensTruncated": "Įkeltos tik naujausios žinutės: senesnių klausimų sąraše gali nebūti.",
-      "attachUnavailable": "Priedai šiame diegime neprieinami."
+      "attachUnavailable": "Priedai šiame diegime neprieinami.",
+      "you": "Jūs",
+      "newMessagesBelow": "{count, plural, one {# nauja žinutė} few {# naujos žinutės} many {# naujos žinutės} other {# naujų žinučių}}",
+      "replyNotificationTitle": "{name} jums atsakė pokalbyje",
+      "messageNotificationTitle": "{name} pokalbyje",
+      "notifyButton": "Pokalbio pranešimai",
+      "notifyButtonOff": "Pokalbio pranešimai: nutildyta",
+      "notifyTitle": "Pranešti apie",
+      "notifyAll": "Visas žinutes",
+      "notifyMentions": "Paminėjimus ir atsakymus",
+      "notifyOff": "Nutildyta",
+      "notifySound": "Garsas",
+      "notifyDesktop": "Naršyklės pranešimai",
+      "notifyDesktopBlocked": "Naršyklė blokuoja šios svetainės pranešimus: juos vėl galite leisti svetainės nustatymuose.",
+      "notifyDesktopUnsupported": "Ši naršyklė nepalaiko pranešimų.",
+      "notifyOffer": "Norite pranešimo, kai kas nors jus pamini ar jums atsako?",
+      "notifyOfferEnable": "Įjungti pranešimus"
     },
     "role": {
       "moderator": "Moderatorius",
@@ -469,7 +485,8 @@
     "leftMessage": "Renginys vis dar vyksta: galite grįžti bet kada.",
     "leftModeratorReminder": "Renginys lieka atviras, kol kas nors jo neužbaigia. Kai baigsite, grįžkite ir pasirinkite „{action}“.",
     "rejoin": "Grįžti",
-    "backToHome": "Grįžti į pradžios puslapį"
+    "backToHome": "Grįžti į pradžios puslapį",
+    "sidebarTabMaterialsNew": "Nauja bendrinama medžiaga"
   },
   "qa": {
     "title": "Klausimai ir atsakymai",
@@ -2886,7 +2903,17 @@
       "uploadBusy": "Šiuo metu per daug įkėlimų: bandykite dar kartą po kelių sekundžių",
       "deleteFailed": "Medžiagos ištrinti nepavyko"
     },
-    "addedByStaff": "Pridėjo organizatoriai"
+    "addedByStaff": "Pridėjo organizatoriai",
+    "dropzoneTitle": "Vilkite failą čia",
+    "dropzoneChoose": "arba pasirinkite jį kompiuteryje",
+    "removeFile": "Pašalinti failą",
+    "uploadProgress": "Įkeliama: {percent} %",
+    "cancelUpload": "Atšaukti įkėlimą",
+    "uploadCancelled": "Įkėlimas atšauktas",
+    "open": "Atidaryti",
+    "download": "Atsisiųsti",
+    "emptyHintModerator": "Pasidalykite su dalyviais skaidrėmis, dokumentais ar naudingomis nuorodomis.",
+    "emptyHintPublic": "Čia bus rodoma vedėjų bendrinama medžiaga."
   },
   "reminders": {
     "title": "Pranešimai",
@@ -3451,9 +3478,9 @@
     "duration": "Trukmė",
     "submit": "Pateikti",
     "submitPlaceholder": "Įveskite žodį (maks. 30 simb.)",
-    "close": "Uždaryti \"Word Cloud\"",
+    "close": "Uždaryti žodžių debesį",
     "cancel": "Atšaukti",
-    "noActiveRound": "Šiuo metu \"Word Cloud\" neaktyvus.",
+    "noActiveRound": "Šiuo metu nėra aktyvaus žodžių debesies.",
     "noWords": "Laukiama pirmųjų žodžių...",
     "wordsSubmitted": "{count} žodžių pateikta",
     "timeRemaining": "Liko laiko",
@@ -3462,7 +3489,10 @@
       "closed": "Šis raundas uždarytas: daugiau žodžių nepriimama.",
       "limit": "Šiame raunde jau išsiuntėte didžiausią leistiną žodžių skaičių.",
       "rateLimited": "Šiuo metu per daug siuntimų: palaukite kelias sekundes ir bandykite dar kartą."
-    }
+    },
+    "startNew": "Pradėti žodžių debesį",
+    "emptyHintModerator": "Užduokite atvirą klausimą: vieno žodžio atsakymai realiuoju laiku sudaro debesį.",
+    "timeLeft": "Liko laiko: {time}"
   },
   "timer": {
     "title": "Laikmatis",

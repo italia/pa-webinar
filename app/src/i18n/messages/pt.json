@@ -372,7 +372,23 @@
       "questionStatusFailed": "Não foi possível atualizar a pergunta",
       "questionNeedsText": "Escreva o texto da pergunta: um anexo sozinho não entra na fila",
       "lensTruncated": "Apenas as mensagens mais recentes estão carregadas: podem existir perguntas mais antigas que não constam da lista.",
-      "attachUnavailable": "Os anexos não estão disponíveis nesta instalação."
+      "attachUnavailable": "Os anexos não estão disponíveis nesta instalação.",
+      "you": "Você",
+      "newMessagesBelow": "{count, plural, one {# mensagem nova} other {# mensagens novas}}",
+      "replyNotificationTitle": "{name} respondeu-lhe no chat",
+      "messageNotificationTitle": "{name} no chat",
+      "notifyButton": "Alertas do chat",
+      "notifyButtonOff": "Alertas do chat: silêncio",
+      "notifyTitle": "Alertar-me para",
+      "notifyAll": "Todas as mensagens",
+      "notifyMentions": "Menções e respostas",
+      "notifyOff": "Silêncio",
+      "notifySound": "Som",
+      "notifyDesktop": "Notificações do navegador",
+      "notifyDesktopBlocked": "O seu navegador bloqueia as notificações deste site: pode voltar a permiti-las nas definições do site.",
+      "notifyDesktopUnsupported": "Este navegador não suporta notificações.",
+      "notifyOffer": "Quer uma notificação quando o mencionarem ou lhe responderem?",
+      "notifyOfferEnable": "Ativar notificações"
     },
     "role": {
       "moderator": "Moderador",
@@ -469,7 +485,8 @@
     "leftMessage": "O evento ainda está a decorrer: pode voltar a entrar quando quiser.",
     "leftModeratorReminder": "O evento continua aberto até alguém o terminar. Quando terminarem, volte a entrar e escolha «{action}».",
     "rejoin": "Voltar a entrar",
-    "backToHome": "Voltar à página inicial"
+    "backToHome": "Voltar à página inicial",
+    "sidebarTabMaterialsNew": "Novos materiais partilhados"
   },
   "qa": {
     "title": "Perguntas e Respostas",
@@ -2886,7 +2903,17 @@
       "uploadBusy": "Demasiados carregamentos neste momento: tente novamente dentro de alguns segundos",
       "deleteFailed": "Não foi possível eliminar o material"
     },
-    "addedByStaff": "Adicionado pela organização"
+    "addedByStaff": "Adicionado pela organização",
+    "dropzoneTitle": "Arraste o ficheiro para aqui",
+    "dropzoneChoose": "ou escolha-o no seu computador",
+    "removeFile": "Remover o ficheiro",
+    "uploadProgress": "A carregar: {percent}%",
+    "cancelUpload": "Cancelar o carregamento",
+    "uploadCancelled": "Carregamento cancelado",
+    "open": "Abrir",
+    "download": "Transferir",
+    "emptyHintModerator": "Partilhe com a sala diapositivos, documentos ou ligações úteis.",
+    "emptyHintPublic": "Os materiais partilhados por quem conduz aparecerão aqui."
   },
   "reminders": {
     "title": "Notificações",
@@ -3444,16 +3471,16 @@
     "noFeedback": "Nenhum feedback recebido"
   },
   "wordcloud": {
-    "title": "Word Cloud",
+    "title": "Nuvem de palavras",
     "startRound": "Iniciar",
     "prompt": "Tema",
     "promptPlaceholder": "ex. O que espera deste evento?",
     "duration": "Duração",
     "submit": "Enviar",
     "submitPlaceholder": "Escreva uma palavra (máx. 30 car.)",
-    "close": "Fechar word cloud",
+    "close": "Fechar a nuvem de palavras",
     "cancel": "Cancelar",
-    "noActiveRound": "Nenhuma word cloud ativa de momento.",
+    "noActiveRound": "Nenhuma nuvem de palavras ativa de momento.",
     "noWords": "À espera das primeiras palavras...",
     "wordsSubmitted": "{count} palavras enviadas",
     "timeRemaining": "Tempo restante",
@@ -3462,7 +3489,10 @@
       "closed": "Esta ronda está fechada: não são aceites mais palavras.",
       "limit": "Já enviou o número máximo de palavras para esta ronda.",
       "rateLimited": "Demasiados envios neste momento: aguarde alguns segundos antes de tentar novamente."
-    }
+    },
+    "startNew": "Iniciar uma nuvem de palavras",
+    "emptyHintModerator": "Faça uma pergunta aberta: as respostas de uma palavra formam a nuvem em tempo real.",
+    "timeLeft": "Tempo restante: {time}"
   },
   "timer": {
     "title": "Temporizador",

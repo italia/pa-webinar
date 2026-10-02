@@ -386,7 +386,23 @@
       "questionStatusFailed": "Non è stato possibile aggiornare la domanda",
       "questionNeedsText": "Scrivi il testo della domanda: un allegato da solo non entra in coda",
       "lensTruncated": "Sono caricati i messaggi più recenti: potrebbero esserci domande più vecchie non in elenco.",
-      "attachUnavailable": "Gli allegati non sono disponibili su questa installazione."
+      "attachUnavailable": "Gli allegati non sono disponibili su questa installazione.",
+      "you": "Tu",
+      "newMessagesBelow": "{count, plural, one {# nuovo messaggio} other {# nuovi messaggi}}",
+      "replyNotificationTitle": "{name} ti ha risposto in chat",
+      "messageNotificationTitle": "{name} in chat",
+      "notifyButton": "Avvisi della chat",
+      "notifyButtonOff": "Avvisi della chat: silenziosa",
+      "notifyTitle": "Avvisami per",
+      "notifyAll": "Tutti i messaggi",
+      "notifyMentions": "Menzioni e risposte",
+      "notifyOff": "Silenziosa",
+      "notifySound": "Suono",
+      "notifyDesktop": "Notifiche del browser",
+      "notifyDesktopBlocked": "Il browser blocca le notifiche di questo sito: puoi riattivarle dalle impostazioni del sito.",
+      "notifyDesktopUnsupported": "Questo browser non supporta le notifiche.",
+      "notifyOffer": "Vuoi una notifica quando ti nominano o ti rispondono?",
+      "notifyOfferEnable": "Attiva le notifiche"
     },
     "role": {
       "moderator": "Moderatore",
@@ -469,7 +485,8 @@
     "leftMessage": "L'evento è ancora in corso: puoi rientrare quando vuoi.",
     "leftModeratorReminder": "L'evento resta aperto finché qualcuno non lo termina. A evento finito, rientra e scegli «{action}».",
     "rejoin": "Rientra",
-    "backToHome": "Torna alla home page"
+    "backToHome": "Torna alla home page",
+    "sidebarTabMaterialsNew": "Nuovi materiali condivisi"
   },
   "qa": {
     "title": "Domande e Risposte",
@@ -584,7 +601,17 @@
       "uploadBusy": "Troppi caricamenti in questo momento: riprova tra qualche secondo",
       "deleteFailed": "Impossibile eliminare il materiale"
     },
-    "addedByStaff": "Aggiunto dall'organizzazione"
+    "addedByStaff": "Aggiunto dall'organizzazione",
+    "dropzoneTitle": "Trascina qui il file",
+    "dropzoneChoose": "oppure sceglilo dal computer",
+    "removeFile": "Togli il file",
+    "uploadProgress": "Caricamento: {percent}%",
+    "cancelUpload": "Annulla caricamento",
+    "uploadCancelled": "Caricamento annullato",
+    "open": "Apri",
+    "download": "Scarica",
+    "emptyHintModerator": "Condividi con la sala slide, documenti o link utili.",
+    "emptyHintPublic": "Qui compariranno i materiali condivisi da chi conduce."
   },
   "reminders": {
     "title": "Notifiche",
@@ -3444,16 +3471,16 @@
     "noFeedback": "Nessun feedback ricevuto"
   },
   "wordcloud": {
-    "title": "Word Cloud",
+    "title": "Nuvola di parole",
     "startRound": "Avvia",
     "prompt": "Tema",
     "promptPlaceholder": "es. Cosa ti aspetti da questo evento?",
     "duration": "Durata",
     "submit": "Invia",
     "submitPlaceholder": "Scrivi una parola (max 30 car.)",
-    "close": "Chiudi word cloud",
+    "close": "Chiudi la nuvola",
     "cancel": "Annulla",
-    "noActiveRound": "Nessun word cloud attivo al momento.",
+    "noActiveRound": "Nessuna nuvola di parole attiva al momento.",
     "noWords": "In attesa delle prime parole...",
     "wordsSubmitted": "{count} parole inviate",
     "timeRemaining": "Tempo rimanente",
@@ -3462,7 +3489,10 @@
       "closed": "Il giro è chiuso: non si accettano altre parole.",
       "limit": "Hai già inviato il numero massimo di parole per questo giro.",
       "rateLimited": "Troppi invii in questo momento: attendi qualche secondo prima di riprovare."
-    }
+    },
+    "startNew": "Avvia una nuvola di parole",
+    "emptyHintModerator": "Fai una domanda aperta: le risposte di una parola compongono la nuvola in tempo reale.",
+    "timeLeft": "Tempo rimasto: {time}"
   },
   "timer": {
     "title": "Timer",

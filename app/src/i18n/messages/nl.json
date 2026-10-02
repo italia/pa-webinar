@@ -372,7 +372,23 @@
       "questionStatusFailed": "De vraag kon niet worden bijgewerkt",
       "questionNeedsText": "Typ de tekst van uw vraag: een bijlage alleen komt niet in de wachtrij",
       "lensTruncated": "Alleen de meest recente berichten zijn geladen: er kunnen oudere vragen zijn die niet in de lijst staan.",
-      "attachUnavailable": "Bijlagen zijn niet beschikbaar op deze installatie."
+      "attachUnavailable": "Bijlagen zijn niet beschikbaar op deze installatie.",
+      "you": "Jij",
+      "newMessagesBelow": "{count, plural, one {# nieuw bericht} other {# nieuwe berichten}}",
+      "replyNotificationTitle": "{name} heeft je geantwoord in de chat",
+      "messageNotificationTitle": "{name} in de chat",
+      "notifyButton": "Chatmeldingen",
+      "notifyButtonOff": "Chatmeldingen: stil",
+      "notifyTitle": "Melden bij",
+      "notifyAll": "Alle berichten",
+      "notifyMentions": "Vermeldingen en antwoorden",
+      "notifyOff": "Stil",
+      "notifySound": "Geluid",
+      "notifyDesktop": "Browsermeldingen",
+      "notifyDesktopBlocked": "Je browser blokkeert meldingen van deze site: je kunt ze weer toestaan in de site-instellingen.",
+      "notifyDesktopUnsupported": "Deze browser ondersteunt geen meldingen.",
+      "notifyOffer": "Een melding krijgen als iemand je noemt of je antwoordt?",
+      "notifyOfferEnable": "Meldingen inschakelen"
     },
     "role": {
       "moderator": "Moderator",
@@ -469,7 +485,8 @@
     "leftMessage": "Het evenement is nog bezig: u kunt op elk moment terugkeren.",
     "leftModeratorReminder": "Het evenement blijft open tot iemand het beëindigt. Als u klaar bent, keer dan terug en kies ‘{action}’.",
     "rejoin": "Terugkeren",
-    "backToHome": "Terug naar de startpagina"
+    "backToHome": "Terug naar de startpagina",
+    "sidebarTabMaterialsNew": "Nieuwe materialen gedeeld"
   },
   "qa": {
     "title": "Vragen en Antwoorden",
@@ -2886,7 +2903,17 @@
       "uploadBusy": "Te veel uploads op dit moment: probeer het over een paar seconden opnieuw",
       "deleteFailed": "Het materiaal kon niet worden verwijderd"
     },
-    "addedByStaff": "Toegevoegd door de organisatie"
+    "addedByStaff": "Toegevoegd door de organisatie",
+    "dropzoneTitle": "Sleep het bestand hierheen",
+    "dropzoneChoose": "of kies het op je computer",
+    "removeFile": "Bestand verwijderen",
+    "uploadProgress": "Uploaden: {percent}%",
+    "cancelUpload": "Upload annuleren",
+    "uploadCancelled": "Upload geannuleerd",
+    "open": "Openen",
+    "download": "Downloaden",
+    "emptyHintModerator": "Deel dia's, documenten of nuttige links met de zaal.",
+    "emptyHintPublic": "Hier verschijnen de materialen die de presentatoren delen."
   },
   "reminders": {
     "title": "Meldingen",
@@ -3444,16 +3471,16 @@
     "noFeedback": "Geen feedback ontvangen"
   },
   "wordcloud": {
-    "title": "Word Cloud",
+    "title": "Woordwolk",
     "startRound": "Starten",
     "prompt": "Onderwerp",
     "promptPlaceholder": "bijv. Wat verwacht u van dit evenement?",
     "duration": "Duur",
     "submit": "Verzenden",
     "submitPlaceholder": "Typ een woord (max. 30 tekens)",
-    "close": "Word cloud sluiten",
+    "close": "Woordwolk sluiten",
     "cancel": "Annuleren",
-    "noActiveRound": "Momenteel geen word cloud actief.",
+    "noActiveRound": "Er is momenteel geen woordwolk actief.",
     "noWords": "Wachten op de eerste woorden...",
     "wordsSubmitted": "{count} woorden ingediend",
     "timeRemaining": "Resterende tijd",
@@ -3462,7 +3489,10 @@
       "closed": "Deze ronde is gesloten: er worden geen woorden meer aangenomen.",
       "limit": "U hebt voor deze ronde al het maximale aantal woorden verzonden.",
       "rateLimited": "Te veel inzendingen op dit moment: wacht een paar seconden voordat u het opnieuw probeert."
-    }
+    },
+    "startNew": "Woordwolk starten",
+    "emptyHintModerator": "Stel een open vraag: antwoorden van één woord vormen de wolk in realtime.",
+    "timeLeft": "Resterende tijd: {time}"
   },
   "timer": {
     "title": "Timer",

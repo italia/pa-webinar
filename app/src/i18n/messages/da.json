@@ -372,7 +372,23 @@
       "questionStatusFailed": "Spørgsmålet kunne ikke opdateres",
       "questionNeedsText": "Skriv teksten til dit spørgsmål: en vedhæftet fil alene kommer ikke i køen",
       "lensTruncated": "Kun de nyeste beskeder er indlæst: der kan være ældre spørgsmål, som ikke er på listen.",
-      "attachUnavailable": "Vedhæftede filer er ikke tilgængelige på denne installation."
+      "attachUnavailable": "Vedhæftede filer er ikke tilgængelige på denne installation.",
+      "you": "Dig",
+      "newMessagesBelow": "{count, plural, one {# ny besked} other {# nye beskeder}}",
+      "replyNotificationTitle": "{name} har svaret dig i chatten",
+      "messageNotificationTitle": "{name} i chatten",
+      "notifyButton": "Chatbeskeder",
+      "notifyButtonOff": "Chatbeskeder: lydløs",
+      "notifyTitle": "Giv besked ved",
+      "notifyAll": "Alle beskeder",
+      "notifyMentions": "Omtaler og svar",
+      "notifyOff": "Lydløs",
+      "notifySound": "Lyd",
+      "notifyDesktop": "Browsernotifikationer",
+      "notifyDesktopBlocked": "Din browser blokerer notifikationer fra dette websted: du kan tillade dem igen i webstedets indstillinger.",
+      "notifyDesktopUnsupported": "Denne browser understøtter ikke notifikationer.",
+      "notifyOffer": "Vil du have besked, når nogen nævner eller svarer dig?",
+      "notifyOfferEnable": "Slå notifikationer til"
     },
     "role": {
       "moderator": "Moderator",
@@ -469,7 +485,8 @@
     "leftMessage": "Begivenheden er stadig i gang: du kan gå ind igen, når du vil.",
     "leftModeratorReminder": "Begivenheden forbliver åben, indtil nogen afslutter den. Når I er færdige, så gå ind igen og vælg »{action}«.",
     "rejoin": "Gå ind igen",
-    "backToHome": "Tilbage til forsiden"
+    "backToHome": "Tilbage til forsiden",
+    "sidebarTabMaterialsNew": "Nye delte materialer"
   },
   "qa": {
     "title": "Spørgsmål og svar",
@@ -2886,7 +2903,17 @@
       "uploadBusy": "For mange uploads lige nu: prøv igen om et par sekunder",
       "deleteFailed": "Materialet kunne ikke slettes"
     },
-    "addedByStaff": "Tilføjet af arrangørerne"
+    "addedByStaff": "Tilføjet af arrangørerne",
+    "dropzoneTitle": "Træk filen hertil",
+    "dropzoneChoose": "eller vælg den på din computer",
+    "removeFile": "Fjern filen",
+    "uploadProgress": "Uploader: {percent} %",
+    "cancelUpload": "Annuller upload",
+    "uploadCancelled": "Upload annulleret",
+    "open": "Åbn",
+    "download": "Download",
+    "emptyHintModerator": "Del slides, dokumenter eller nyttige links med deltagerne.",
+    "emptyHintPublic": "Her vises de materialer, som værterne deler."
   },
   "reminders": {
     "title": "Påmindelser",
@@ -3444,16 +3471,16 @@
     "noFeedback": "Ingen feedback modtaget"
   },
   "wordcloud": {
-    "title": "Word Cloud",
+    "title": "Ordsky",
     "startRound": "Start",
     "prompt": "Emne",
     "promptPlaceholder": "f.eks. Hvad forventer du af denne begivenhed?",
     "duration": "Varighed",
     "submit": "Send",
     "submitPlaceholder": "Skriv et ord (maks. 30 tegn)",
-    "close": "Luk word cloud",
+    "close": "Luk ordskyen",
     "cancel": "Annuller",
-    "noActiveRound": "Ingen aktiv word cloud i øjeblikket.",
+    "noActiveRound": "Ingen aktiv ordsky lige nu.",
     "noWords": "Venter på de første ord...",
     "wordsSubmitted": "{count} ord indsendt",
     "timeRemaining": "Tid tilbage",
@@ -3462,7 +3489,10 @@
       "closed": "Runden er lukket: der modtages ikke flere ord.",
       "limit": "Du har allerede sendt det maksimale antal ord i denne runde.",
       "rateLimited": "For mange indsendelser lige nu: vent et par sekunder, før du prøver igen."
-    }
+    },
+    "startNew": "Start en ordsky",
+    "emptyHintModerator": "Stil et åbent spørgsmål: svar på ét ord danner skyen i realtid.",
+    "timeLeft": "Tid tilbage: {time}"
   },
   "timer": {
     "title": "Timer",

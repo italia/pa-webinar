@@ -169,15 +169,20 @@ export default function ParticipantPanel({
       {/* Header stays pinned so the title + live count remain visible while
           scrolling a long roster (F2b). */}
       <div
-        className="d-flex justify-content-between align-items-center mb-2 pb-2"
+        className="live-panel-header pb-2"
         style={{ position: 'sticky', top: 0, background: '#fff', zIndex: 2 }}
       >
-        <h6 className="mb-0 fw-semibold" style={{ fontSize: '0.9rem' }}>
+        <h6 className="live-panel-header__title">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0066CC" strokeWidth="2"
+               strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+          </svg>
           {t('title')}
+          <span className="live-panel-header__count">{participants.length}</span>
         </h6>
-        <Badge color="primary" pill style={{ fontSize: '0.75rem' }}>
-          {participants.length}
-        </Badge>
       </div>
 
       {/* Connection quality indicator */}

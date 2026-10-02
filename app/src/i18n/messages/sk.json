@@ -372,7 +372,23 @@
       "questionStatusFailed": "Otázku sa nepodarilo aktualizovať",
       "questionNeedsText": "Napíšte text otázky: samotná príloha sa do frontu nedostane",
       "lensTruncated": "Načítané sú len najnovšie správy: môžu existovať staršie otázky, ktoré nie sú v zozname.",
-      "attachUnavailable": "Prílohy nie sú v tejto inštalácii k dispozícii."
+      "attachUnavailable": "Prílohy nie sú v tejto inštalácii k dispozícii.",
+      "you": "Vy",
+      "newMessagesBelow": "{count, plural, one {# nová správa} few {# nové správy} many {# novej správy} other {# nových správ}}",
+      "replyNotificationTitle": "{name} vám odpovedal(a) v chate",
+      "messageNotificationTitle": "{name} v chate",
+      "notifyButton": "Upozornenia chatu",
+      "notifyButtonOff": "Upozornenia chatu: stlmené",
+      "notifyTitle": "Upozorňovať na",
+      "notifyAll": "Všetky správy",
+      "notifyMentions": "Zmienky a odpovede",
+      "notifyOff": "Stlmené",
+      "notifySound": "Zvuk",
+      "notifyDesktop": "Upozornenia prehliadača",
+      "notifyDesktopBlocked": "Prehliadač blokuje upozornenia tejto stránky: môžete ich znova povoliť v nastaveniach stránky.",
+      "notifyDesktopUnsupported": "Tento prehliadač nepodporuje upozornenia.",
+      "notifyOffer": "Chcete upozornenie, keď vás niekto spomenie alebo vám odpovie?",
+      "notifyOfferEnable": "Zapnúť upozornenia"
     },
     "role": {
       "moderator": "Moderátor",
@@ -469,7 +485,8 @@
     "leftMessage": "Udalosť stále prebieha: môžete sa kedykoľvek vrátiť.",
     "leftModeratorReminder": "Udalosť zostane otvorená, kým ju niekto neukončí. Keď skončíte, vráťte sa a zvoľte „{action}“.",
     "rejoin": "Vrátiť sa",
-    "backToHome": "Späť na úvodnú stránku"
+    "backToHome": "Späť na úvodnú stránku",
+    "sidebarTabMaterialsNew": "Nové zdieľané materiály"
   },
   "qa": {
     "title": "Otázky a odpovede",
@@ -2886,7 +2903,17 @@
       "uploadBusy": "Práve prebieha príliš veľa nahrávaní: skúste to znova o niekoľko sekúnd",
       "deleteFailed": "Materiál sa nepodarilo odstrániť"
     },
-    "addedByStaff": "Pridali organizátori"
+    "addedByStaff": "Pridali organizátori",
+    "dropzoneTitle": "Presuňte súbor sem",
+    "dropzoneChoose": "alebo ho vyberte z počítača",
+    "removeFile": "Odstrániť súbor",
+    "uploadProgress": "Nahrávanie: {percent} %",
+    "cancelUpload": "Zrušiť nahrávanie",
+    "uploadCancelled": "Nahrávanie zrušené",
+    "open": "Otvoriť",
+    "download": "Stiahnuť",
+    "emptyHintModerator": "Zdieľajte s účastníkmi snímky, dokumenty alebo užitočné odkazy.",
+    "emptyHintPublic": "Tu sa zobrazia materiály zdieľané moderátormi."
   },
   "reminders": {
     "title": "Upozornenia",
@@ -3444,16 +3471,16 @@
     "noFeedback": "Žiadna spätná väzba"
   },
   "wordcloud": {
-    "title": "Word Cloud",
+    "title": "Slovný mrak",
     "startRound": "Spustiť",
     "prompt": "Téma",
     "promptPlaceholder": "napr. Čo od tejto udalosti očakávate?",
     "duration": "Trvanie",
     "submit": "Odoslať",
     "submitPlaceholder": "Napíšte slovo (max. 30 znakov)",
-    "close": "Zavrieť word cloud",
+    "close": "Zavrieť slovný mrak",
     "cancel": "Zrušiť",
-    "noActiveRound": "V tejto chvíli nie je aktívny žiadny word cloud.",
+    "noActiveRound": "Momentálne nie je aktívny žiadny slovný mrak.",
     "noWords": "Čakáme na prvé slová...",
     "wordsSubmitted": "{count} odoslaných slov",
     "timeRemaining": "Zostávajúci čas",
@@ -3462,7 +3489,10 @@
       "closed": "Toto kolo je uzavreté: ďalšie slová sa už neprijímajú.",
       "limit": "V tomto kole ste už odoslali maximálny počet slov.",
       "rateLimited": "Práve prebieha príliš veľa odoslaní: počkajte niekoľko sekúnd, než to skúsite znova."
-    }
+    },
+    "startNew": "Spustiť slovný mrak",
+    "emptyHintModerator": "Položte otvorenú otázku: jednoslovné odpovede tvoria mrak v reálnom čase.",
+    "timeLeft": "Zostávajúci čas: {time}"
   },
   "timer": {
     "title": "Časovač",

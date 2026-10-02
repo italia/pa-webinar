@@ -35,6 +35,7 @@ import QAPanel from '@/components/qa/qa-panel';
 import PollPanel from '@/components/polls/poll-panel';
 import AgendaPanel from '@/components/live/agenda-panel';
 import MaterialPanel from '@/components/materials/material-panel';
+import { fetchMaterials, materialsListKey } from '@/components/materials/material-request';
 import ParticipantPanel from '@/components/participants/participant-panel';
 import PreJoinScreen from '@/components/live/pre-join-screen';
 import PostEventFeedbackModal from '@/components/live/post-event-feedback-modal';
@@ -1990,8 +1991,49 @@ function LiveSidebar({
   // Sondaggi aperti in cui questa persona non ha ancora votato: il pannello
   // resta montato anche su un'altra scheda apposta per poterlo dire.
   const [pollsUnvoted, setPollsUnvoted] = useState(0);
-  const isChatActive = activeTab === 'chat';
+  // Un pannello e' sotto gli occhi quando e' la scheda scelta E si vede: su
+  // desktop la colonna e' sempre aperta, sotto i 992px solo a cassetto aperto.
+  // E' questo, non la sola scheda scelta, a dire se un messaggio o un
+  // materiale nuovo e' gia' stato visto.
+  const [isDesktop, setIsDesktop] = useState(true);
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return;
+    const mq = window.matchMedia('(min-width: 992px)');
+    const aggiorna = () => setIsDesktop(mq.matches);
+    aggiorna();
+    mq.addEventListener('change', aggiorna);
+    return () => mq.removeEventListener('change', aggiorna);
+  }, []);
+  const onScreen = (key: SidebarTab) => activeTab === key && (isDesktop || drawerOpen);
+  const isChatActive = onScreen('chat');
+  // La scheda scelta decide che cosa si disegna; `pollsOnScreen` se si vede.
   const isPollsActive = activeTab === 'polls';
+  const pollsOnScreen = onScreen('polls');
+  const materialsOnScreen = onScreen('materials');
+  // Materiali nuovi mentre si guarda un'altra scheda: un pallino, come per i
+  // sondaggi. Stessa chiave del pannello, quindi stessa richiesta: aprirlo non
+  // ne aggiunge una. Con il canale vivo la rilettura la chiede l'avviso
+  // `materials`; senza, lo stesso giro del pannello.
+  const { data: materialsData } = useSWR<{ materials: Array<{ id: string }> }>(
+    materialsListKey(eventSlug, token),
+    fetchMaterials,
+    { refreshInterval: pushLive ? 0 : 30_000 },
+  );
+  const seenMaterialsRef = useRef<Set<string> | null>(null);
+  const [materialsNew, setMaterialsNew] = useState(false);
+  useEffect(() => {
+    if (!materialsData?.materials) return;
+    const ids = new Set(materialsData.materials.map((m) => m.id));
+    // Al primo elenco, e ogni volta che la scheda e' aperta, quel che c'e' e'
+    // visto.
+    if (seenMaterialsRef.current === null || materialsOnScreen) {
+      seenMaterialsRef.current = ids;
+      setMaterialsNew(false);
+      return;
+    }
+    const visti = seenMaterialsRef.current;
+    if ([...ids].some((id) => !visti.has(id))) setMaterialsNew(true);
+  }, [materialsData, materialsOnScreen]);
   // Browser tab title flash: when unread increases while document is
   // hidden, prefix the title with "● ". Restore on focus. We scope
   // the effect to *this* sidebar instance so at most one listener is
@@ -2117,7 +2159,7 @@ function LiveSidebar({
       // Un sondaggio aperto va notato anche da chi in quel momento sta
       // guardando la chat: senza questo segno, il canale avvisava il pannello
       // e il pannello non avvisava nessuno.
-      dot: pollsUnvoted > 0 && !isPollsActive,
+      dot: pollsUnvoted > 0 && !pollsOnScreen,
       dotLabel: t('sidebarTabPollsOpen'),
       show: true,
     },
@@ -2171,6 +2213,8 @@ function LiveSidebar({
     {
       key: 'materials',
       label: t('sidebarTabMaterials'),
+      dot: materialsNew && !materialsOnScreen,
+      dotLabel: t('sidebarTabMaterialsNew'),
       svg: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -2481,7 +2525,7 @@ function LiveSidebar({
               isModerator={isModerator}
               voterAccessToken={voterAccessToken}
               voterGuestId={voterGuestId}
-              active={isPollsActive}
+              active={pollsOnScreen}
               onUnvotedCountChange={setPollsUnvoted}
             />
           </div>

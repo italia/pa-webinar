@@ -372,7 +372,23 @@
       "questionStatusFailed": "Det gick inte att uppdatera frågan",
       "questionNeedsText": "Skriv texten till din fråga: en bilaga ensam hamnar inte i kön",
       "lensTruncated": "Endast de senaste meddelandena är inlästa: det kan finnas äldre frågor som inte visas i listan.",
-      "attachUnavailable": "Bilagor är inte tillgängliga i den här installationen."
+      "attachUnavailable": "Bilagor är inte tillgängliga i den här installationen.",
+      "you": "Du",
+      "newMessagesBelow": "{count, plural, one {# nytt meddelande} other {# nya meddelanden}}",
+      "replyNotificationTitle": "{name} svarade dig i chatten",
+      "messageNotificationTitle": "{name} i chatten",
+      "notifyButton": "Chattaviseringar",
+      "notifyButtonOff": "Chattaviseringar: tyst",
+      "notifyTitle": "Avisera mig vid",
+      "notifyAll": "Alla meddelanden",
+      "notifyMentions": "Omnämnanden och svar",
+      "notifyOff": "Tyst",
+      "notifySound": "Ljud",
+      "notifyDesktop": "Webbläsaraviseringar",
+      "notifyDesktopBlocked": "Webbläsaren blockerar aviseringar från den här webbplatsen: du kan tillåta dem igen i webbplatsinställningarna.",
+      "notifyDesktopUnsupported": "Den här webbläsaren stöder inte aviseringar.",
+      "notifyOffer": "Vill du få en avisering när någon nämner eller svarar dig?",
+      "notifyOfferEnable": "Aktivera aviseringar"
     },
     "role": {
       "moderator": "Moderator",
@@ -469,7 +485,8 @@
     "leftMessage": "Evenemanget pågår fortfarande: du kan gå in igen när du vill.",
     "leftModeratorReminder": "Evenemanget förblir öppet tills någon avslutar det. När ni är klara, gå in igen och välj ”{action}”.",
     "rejoin": "Gå in igen",
-    "backToHome": "Tillbaka till startsidan"
+    "backToHome": "Tillbaka till startsidan",
+    "sidebarTabMaterialsNew": "Nytt delat material"
   },
   "qa": {
     "title": "Frågor och svar",
@@ -2886,7 +2903,17 @@
       "uploadBusy": "För många uppladdningar just nu: försök igen om några sekunder",
       "deleteFailed": "Materialet kunde inte tas bort"
     },
-    "addedByStaff": "Tillagt av arrangörerna"
+    "addedByStaff": "Tillagt av arrangörerna",
+    "dropzoneTitle": "Dra filen hit",
+    "dropzoneChoose": "eller välj den på datorn",
+    "removeFile": "Ta bort filen",
+    "uploadProgress": "Laddar upp: {percent} %",
+    "cancelUpload": "Avbryt uppladdningen",
+    "uploadCancelled": "Uppladdningen avbröts",
+    "open": "Öppna",
+    "download": "Ladda ned",
+    "emptyHintModerator": "Dela bilder, dokument eller användbara länkar med deltagarna.",
+    "emptyHintPublic": "Här visas material som värdarna delar."
   },
   "reminders": {
     "title": "Påminnelser",
@@ -3444,16 +3471,16 @@
     "noFeedback": "Ingen feedback mottagen"
   },
   "wordcloud": {
-    "title": "Word Cloud",
+    "title": "Ordmoln",
     "startRound": "Starta",
     "prompt": "Ämne",
     "promptPlaceholder": "t.ex. Vad förväntar du dig av detta evenemang?",
     "duration": "Längd",
     "submit": "Skicka",
     "submitPlaceholder": "Skriv ett ord (max 30 tecken)",
-    "close": "Stäng word cloud",
+    "close": "Stäng ordmolnet",
     "cancel": "Avbryt",
-    "noActiveRound": "Ingen aktiv word cloud just nu.",
+    "noActiveRound": "Inget ordmoln är aktivt just nu.",
     "noWords": "Väntar på de första orden...",
     "wordsSubmitted": "{count} ord inskickade",
     "timeRemaining": "Tid kvar",
@@ -3462,7 +3489,10 @@
       "closed": "Omgången är stängd: inga fler ord tas emot.",
       "limit": "Du har redan skickat det högsta antalet ord för den här omgången.",
       "rateLimited": "För många inskick just nu: vänta några sekunder innan du försöker igen."
-    }
+    },
+    "startNew": "Starta ett ordmoln",
+    "emptyHintModerator": "Ställ en öppen fråga: svar med ett ord bygger molnet i realtid.",
+    "timeLeft": "Tid kvar: {time}"
   },
   "timer": {
     "title": "Timer",

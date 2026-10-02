@@ -372,7 +372,23 @@
       "questionStatusFailed": "Pitanje nije bilo moguće ažurirati",
       "questionNeedsText": "Upišite tekst pitanja: sam privitak ne ulazi u red",
       "lensTruncated": "Učitane su samo najnovije poruke: starija pitanja možda nisu na popisu.",
-      "attachUnavailable": "Privici nisu dostupni u ovoj instalaciji."
+      "attachUnavailable": "Privici nisu dostupni u ovoj instalaciji.",
+      "you": "Vi",
+      "newMessagesBelow": "{count, plural, one {# nova poruka} few {# nove poruke} other {# novih poruka}}",
+      "replyNotificationTitle": "{name} vam je odgovorio/la u chatu",
+      "messageNotificationTitle": "{name} u chatu",
+      "notifyButton": "Upozorenja chata",
+      "notifyButtonOff": "Upozorenja chata: utišano",
+      "notifyTitle": "Upozori me na",
+      "notifyAll": "Sve poruke",
+      "notifyMentions": "Spominjanja i odgovore",
+      "notifyOff": "Utišano",
+      "notifySound": "Zvuk",
+      "notifyDesktop": "Obavijesti preglednika",
+      "notifyDesktopBlocked": "Preglednik blokira obavijesti ove stranice: možete ih ponovno dopustiti u postavkama stranice.",
+      "notifyDesktopUnsupported": "Ovaj preglednik ne podržava obavijesti.",
+      "notifyOffer": "Želite li obavijest kad vas netko spomene ili vam odgovori?",
+      "notifyOfferEnable": "Uključi obavijesti"
     },
     "role": {
       "moderator": "Moderator",
@@ -469,7 +485,8 @@
     "leftMessage": "Događaj je još u tijeku: možete se vratiti kad god želite.",
     "leftModeratorReminder": "Događaj ostaje otvoren dok ga netko ne završi. Kad završite, vratite se i odaberite „{action}”.",
     "rejoin": "Vrati se",
-    "backToHome": "Natrag na početnu stranicu"
+    "backToHome": "Natrag na početnu stranicu",
+    "sidebarTabMaterialsNew": "Novi podijeljeni materijali"
   },
   "qa": {
     "title": "Pitanja i odgovori",
@@ -2886,7 +2903,17 @@
       "uploadBusy": "Trenutačno ima previše učitavanja: pokušajte ponovno za nekoliko sekundi",
       "deleteFailed": "Materijal nije moguće izbrisati"
     },
-    "addedByStaff": "Dodali organizatori"
+    "addedByStaff": "Dodali organizatori",
+    "dropzoneTitle": "Povucite datoteku ovamo",
+    "dropzoneChoose": "ili je odaberite na računalu",
+    "removeFile": "Ukloni datoteku",
+    "uploadProgress": "Prijenos: {percent} %",
+    "cancelUpload": "Otkaži prijenos",
+    "uploadCancelled": "Prijenos otkazan",
+    "open": "Otvori",
+    "download": "Preuzmi",
+    "emptyHintModerator": "Podijelite sa sudionicima slajdove, dokumente ili korisne poveznice.",
+    "emptyHintPublic": "Ovdje će se prikazati materijali koje dijele voditelji."
   },
   "reminders": {
     "title": "Obavijesti",
@@ -3444,16 +3471,16 @@
     "noFeedback": "Nema zaprimljenih povratnih informacija"
   },
   "wordcloud": {
-    "title": "Word Cloud",
+    "title": "Oblak riječi",
     "startRound": "Pokreni",
     "prompt": "Tema",
     "promptPlaceholder": "npr. Što očekujete od ovog događaja?",
     "duration": "Trajanje",
     "submit": "Pošalji",
     "submitPlaceholder": "Upišite riječ (maks. 30 znakova)",
-    "close": "Zatvori word cloud",
+    "close": "Zatvori oblak riječi",
     "cancel": "Odustani",
-    "noActiveRound": "Trenutno nema aktivnog word clouda.",
+    "noActiveRound": "Trenutačno nema aktivnog oblaka riječi.",
     "noWords": "Čekamo prve riječi...",
     "wordsSubmitted": "{count} riječi poslano",
     "timeRemaining": "Preostalo vrijeme",
@@ -3462,7 +3489,10 @@
       "closed": "Ovaj krug je zatvoren: nove riječi se više ne primaju.",
       "limit": "Već ste poslali najveći dopušteni broj riječi za ovaj krug.",
       "rateLimited": "Trenutačno ima previše slanja: pričekajte nekoliko sekundi prije ponovnog pokušaja."
-    }
+    },
+    "startNew": "Pokreni oblak riječi",
+    "emptyHintModerator": "Postavite otvoreno pitanje: odgovori od jedne riječi stvaraju oblak u stvarnom vremenu.",
+    "timeLeft": "Preostalo vrijeme: {time}"
   },
   "timer": {
     "title": "Mjerač vremena",

@@ -372,7 +372,23 @@
       "questionStatusFailed": "Ma kienx possibbli li l-mistoqsija tiġi aġġornata",
       "questionNeedsText": "Ikteb it-test tal-mistoqsija: attachment waħdu ma jidħolx fil-kju",
       "lensTruncated": "Huma mgħobbija biss l-aktar messaġġi reċenti: jista' jkun hemm mistoqsijiet eqdem li mhumiex elenkati.",
-      "attachUnavailable": "L-annessi mhumiex disponibbli f'din l-installazzjoni."
+      "attachUnavailable": "L-annessi mhumiex disponibbli f'din l-installazzjoni.",
+      "you": "Int",
+      "newMessagesBelow": "{count, plural, one {# messaġġ ġdid} other {# messaġġi ġodda}}",
+      "replyNotificationTitle": "{name} wieġbek fiċ-chat",
+      "messageNotificationTitle": "{name} fiċ-chat",
+      "notifyButton": "Twissijiet taċ-chat",
+      "notifyButtonOff": "Twissijiet taċ-chat: siekta",
+      "notifyTitle": "Wissini għal",
+      "notifyAll": "Il-messaġġi kollha",
+      "notifyMentions": "Referenzi u tweġibiet",
+      "notifyOff": "Siekta",
+      "notifySound": "Ħoss",
+      "notifyDesktop": "Notifiki tal-brawżer",
+      "notifyDesktopBlocked": "Il-brawżer qed jimblokka n-notifiki ta' dan is-sit: tista' terġa' tippermettihom mis-settings tas-sit.",
+      "notifyDesktopUnsupported": "Dan il-brawżer ma jappoġġjax notifiki.",
+      "notifyOffer": "Trid notifika meta xi ħadd isemmik jew iwieġbek?",
+      "notifyOfferEnable": "Ixgħel in-notifiki"
     },
     "role": {
       "moderator": "Moderatur",
@@ -469,7 +485,8 @@
     "leftMessage": "L-avveniment għadu għaddej: tista' terġa' tidħol meta trid.",
     "leftModeratorReminder": "L-avveniment jibqa' miftuħ sakemm xi ħadd itemmu. Meta tkunu lestejtu, erġa' idħol u agħżel “{action}”.",
     "rejoin": "Erġa' idħol",
-    "backToHome": "Lura lejn il-paġna ewlenija"
+    "backToHome": "Lura lejn il-paġna ewlenija",
+    "sidebarTabMaterialsNew": "Materjali ġodda maqsuma"
   },
   "qa": {
     "title": "Mistoqsijiet u Tweġibiet",
@@ -2886,7 +2903,17 @@
       "uploadBusy": "Wisq fajls qed jitellgħu bħalissa: erġa' pprova fi ftit sekondi",
       "deleteFailed": "Ma setax jitħassar il-materjal"
     },
-    "addedByStaff": "Miżjud mill-organizzaturi"
+    "addedByStaff": "Miżjud mill-organizzaturi",
+    "dropzoneTitle": "Kaxkar il-fajl hawn",
+    "dropzoneChoose": "jew agħżlu mill-kompjuter",
+    "removeFile": "Neħħi l-fajl",
+    "uploadProgress": "Qed jittella': {percent}%",
+    "cancelUpload": "Ikkanċella t-tlugħ",
+    "uploadCancelled": "It-tlugħ ġie kkanċellat",
+    "open": "Iftaħ",
+    "download": "Niżżel",
+    "emptyHintModerator": "Aqsam mal-parteċipanti slajds, dokumenti jew links utli.",
+    "emptyHintPublic": "Hawn jidhru l-materjali maqsuma minn min qed jippreżenta."
   },
   "reminders": {
     "title": "Notifiki",
@@ -3444,16 +3471,16 @@
     "noFeedback": "L-ebda feedback irċevut"
   },
   "wordcloud": {
-    "title": "Word Cloud",
+    "title": "Sħaba ta' kliem",
     "startRound": "Ibda",
     "prompt": "Tema",
     "promptPlaceholder": "eż. X'qed tistenna minn dan l-avveniment?",
     "duration": "Tul",
     "submit": "Ibgħat",
     "submitPlaceholder": "Ikteb kelma (massimu 30 kar.)",
-    "close": "Agħlaq il-word cloud",
+    "close": "Agħlaq is-sħaba ta' kliem",
     "cancel": "Ikkanċella",
-    "noActiveRound": "L-ebda word cloud attiv bħalissa.",
+    "noActiveRound": "Bħalissa m'hemm l-ebda sħaba ta' kliem attiva.",
     "noWords": "Qed nistennew l-ewwel kliem...",
     "wordsSubmitted": "{count} kliem mibgħuta",
     "timeRemaining": "Ħin li fadal",
@@ -3462,7 +3489,10 @@
       "closed": "Din ir-rawnd għalqet: ma jiġux aċċettati aktar kliem.",
       "limit": "Diġà bgħatt l-ogħla numru ta' kliem għal din ir-rawnd.",
       "rateLimited": "Wisq invji bħalissa: stenna ftit sekondi qabel ma terġa' tipprova."
-    }
+    },
+    "startNew": "Ibda sħaba ta' kliem",
+    "emptyHintModerator": "Agħmel mistoqsija miftuħa: it-tweġibiet ta' kelma waħda jibnu s-sħaba f'ħin reali.",
+    "timeLeft": "Ħin li fadal: {time}"
   },
   "timer": {
     "title": "Timer",

@@ -372,7 +372,23 @@
       "questionStatusFailed": "Küsimust ei õnnestunud uuendada",
       "questionNeedsText": "Kirjutage küsimuse tekst: ainult manus järjekorda ei lähe",
       "lensTruncated": "Laaditud on ainult uusimad sõnumid: vanemaid küsimusi ei pruugi loendis olla.",
-      "attachUnavailable": "Manused ei ole selles paigalduses saadaval."
+      "attachUnavailable": "Manused ei ole selles paigalduses saadaval.",
+      "you": "Teie",
+      "newMessagesBelow": "{count, plural, one {# uus sõnum} other {# uut sõnumit}}",
+      "replyNotificationTitle": "{name} vastas teile vestluses",
+      "messageNotificationTitle": "{name} vestluses",
+      "notifyButton": "Vestluse teavitused",
+      "notifyButtonOff": "Vestluse teavitused: vaigistatud",
+      "notifyTitle": "Teavita mind",
+      "notifyAll": "Kõigist sõnumitest",
+      "notifyMentions": "Mainimistest ja vastustest",
+      "notifyOff": "Vaigistatud",
+      "notifySound": "Heli",
+      "notifyDesktop": "Brauseri teavitused",
+      "notifyDesktopBlocked": "Brauser blokeerib selle saidi teavitused: saate need saidi seadetes uuesti lubada.",
+      "notifyDesktopUnsupported": "See brauser ei toeta teavitusi.",
+      "notifyOffer": "Kas soovite teavitust, kui keegi teid mainib või teile vastab?",
+      "notifyOfferEnable": "Lülita teavitused sisse"
     },
     "role": {
       "moderator": "Moderaator",
@@ -469,7 +485,8 @@
     "leftMessage": "Üritus käib veel: võite igal ajal tagasi tulla.",
     "leftModeratorReminder": "Üritus jääb avatuks, kuni keegi selle lõpetab. Kui olete lõpetanud, tulge tagasi ja valige „{action}“.",
     "rejoin": "Tule tagasi",
-    "backToHome": "Tagasi avalehele"
+    "backToHome": "Tagasi avalehele",
+    "sidebarTabMaterialsNew": "Uued jagatud materjalid"
   },
   "qa": {
     "title": "Küsimused ja vastused",
@@ -2886,7 +2903,17 @@
       "uploadBusy": "Praegu on liiga palju üleslaadimisi: proovige mõne sekundi pärast uuesti",
       "deleteFailed": "Materjali ei õnnestunud kustutada"
     },
-    "addedByStaff": "Lisasid korraldajad"
+    "addedByStaff": "Lisasid korraldajad",
+    "dropzoneTitle": "Lohistage fail siia",
+    "dropzoneChoose": "või valige see arvutist",
+    "removeFile": "Eemalda fail",
+    "uploadProgress": "Üleslaadimine: {percent}%",
+    "cancelUpload": "Tühista üleslaadimine",
+    "uploadCancelled": "Üleslaadimine tühistati",
+    "open": "Ava",
+    "download": "Laadi alla",
+    "emptyHintModerator": "Jagage osalejatega slaide, dokumente või kasulikke linke.",
+    "emptyHintPublic": "Siia ilmuvad juhtide jagatud materjalid."
   },
   "reminders": {
     "title": "Teavitused",
@@ -3451,9 +3478,9 @@
     "duration": "Kestus",
     "submit": "Saada",
     "submitPlaceholder": "Sisestage sõna (max 30 tähemärki)",
-    "close": "Sulge Word Cloud",
+    "close": "Sulge sõnapilv",
     "cancel": "Tühista",
-    "noActiveRound": "Hetkel pole aktiivset Word Cloud'i.",
+    "noActiveRound": "Praegu pole ühtegi aktiivset sõnapilve.",
     "noWords": "Ootame esimesi sõnu...",
     "wordsSubmitted": "{count} sõna saadetud",
     "timeRemaining": "Jäänud aega",
@@ -3462,7 +3489,10 @@
       "closed": "See voor on suletud: rohkem sõnu vastu ei võeta.",
       "limit": "Olete selles voorus juba saatnud maksimaalse arvu sõnu.",
       "rateLimited": "Praegu on liiga palju saatmisi: oodake mõni sekund, enne kui uuesti proovite."
-    }
+    },
+    "startNew": "Alusta sõnapilve",
+    "emptyHintModerator": "Esitage avatud küsimus: ühesõnalised vastused moodustavad pilve reaalajas.",
+    "timeLeft": "Aega jäänud: {time}"
   },
   "timer": {
     "title": "Taimer",

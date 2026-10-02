@@ -372,7 +372,23 @@
       "questionStatusFailed": "Vprašanja ni bilo mogoče posodobiti",
       "questionNeedsText": "Napišite besedilo vprašanja: sama priponka ne pride v čakalno vrsto",
       "lensTruncated": "Naložena so le najnovejša sporočila: morda obstajajo starejša vprašanja, ki niso na seznamu.",
-      "attachUnavailable": "Priloge v tej namestitvi niso na voljo."
+      "attachUnavailable": "Priloge v tej namestitvi niso na voljo.",
+      "you": "Vi",
+      "newMessagesBelow": "{count, plural, one {# novo sporočilo} two {# novi sporočili} few {# nova sporočila} other {# novih sporočil}}",
+      "replyNotificationTitle": "{name} vam je odgovoril(a) v klepetu",
+      "messageNotificationTitle": "{name} v klepetu",
+      "notifyButton": "Opozorila klepeta",
+      "notifyButtonOff": "Opozorila klepeta: utišano",
+      "notifyTitle": "Opozori me na",
+      "notifyAll": "Vsa sporočila",
+      "notifyMentions": "Omembe in odgovore",
+      "notifyOff": "Utišano",
+      "notifySound": "Zvok",
+      "notifyDesktop": "Obvestila brskalnika",
+      "notifyDesktopBlocked": "Brskalnik blokira obvestila tega spletnega mesta: znova jih lahko dovolite v nastavitvah mesta.",
+      "notifyDesktopUnsupported": "Ta brskalnik ne podpira obvestil.",
+      "notifyOffer": "Želite obvestilo, ko vas kdo omeni ali vam odgovori?",
+      "notifyOfferEnable": "Vklopi obvestila"
     },
     "role": {
       "moderator": "Moderator",
@@ -469,7 +485,8 @@
     "leftMessage": "Dogodek še poteka: vrnete se lahko kadar koli.",
     "leftModeratorReminder": "Dogodek ostane odprt, dokler ga kdo ne konča. Ko končate, se vrnite in izberite »{action}«.",
     "rejoin": "Vrni se",
-    "backToHome": "Nazaj na začetno stran"
+    "backToHome": "Nazaj na začetno stran",
+    "sidebarTabMaterialsNew": "Nova deljena gradiva"
   },
   "qa": {
     "title": "Vprašanja in odgovori",
@@ -2886,7 +2903,17 @@
       "uploadBusy": "Trenutno je preveč nalaganj: poskusite znova čez nekaj sekund",
       "deleteFailed": "Gradiva ni bilo mogoče izbrisati"
     },
-    "addedByStaff": "Dodali organizatorji"
+    "addedByStaff": "Dodali organizatorji",
+    "dropzoneTitle": "Povlecite datoteko sem",
+    "dropzoneChoose": "ali jo izberite v računalniku",
+    "removeFile": "Odstrani datoteko",
+    "uploadProgress": "Nalaganje: {percent} %",
+    "cancelUpload": "Prekliči nalaganje",
+    "uploadCancelled": "Nalaganje preklicano",
+    "open": "Odpri",
+    "download": "Prenesi",
+    "emptyHintModerator": "Z udeleženci delite prosojnice, dokumente ali uporabne povezave.",
+    "emptyHintPublic": "Tukaj se bodo prikazala gradiva, ki jih delijo voditelji."
   },
   "reminders": {
     "title": "Obvestila",
@@ -3444,16 +3471,16 @@
     "noFeedback": "Ni prejetih povratnih informacij"
   },
   "wordcloud": {
-    "title": "Word Cloud",
+    "title": "Oblak besed",
     "startRound": "Zaženi",
     "prompt": "Tema",
     "promptPlaceholder": "npr. Kaj pričakujete od tega dogodka?",
     "duration": "Trajanje",
     "submit": "Pošlji",
     "submitPlaceholder": "Vnesite besedo (najv. 30 znakov)",
-    "close": "Zapri word cloud",
+    "close": "Zapri oblak besed",
     "cancel": "Prekliči",
-    "noActiveRound": "Trenutno ni aktivnega word clouda.",
+    "noActiveRound": "Trenutno ni aktivnega oblaka besed.",
     "noWords": "Čakamo na prve besede...",
     "wordsSubmitted": "{count} besed poslanih",
     "timeRemaining": "Preostali čas",
@@ -3462,7 +3489,10 @@
       "closed": "Ta krog je zaprt: novih besed ni več mogoče oddati.",
       "limit": "V tem krogu ste že poslali največje dovoljeno število besed.",
       "rateLimited": "Trenutno je preveč pošiljanj: počakajte nekaj sekund, preden poskusite znova."
-    }
+    },
+    "startNew": "Začni oblak besed",
+    "emptyHintModerator": "Zastavite odprto vprašanje: enobesedni odgovori sproti sestavljajo oblak.",
+    "timeLeft": "Preostali čas: {time}"
   },
   "timer": {
     "title": "Časovnik",

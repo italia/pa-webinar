@@ -372,7 +372,23 @@
       "questionStatusFailed": "Kysymystä ei voitu päivittää",
       "questionNeedsText": "Kirjoita kysymyksen teksti: pelkkä liite ei pääse jonoon",
       "lensTruncated": "Vain uusimmat viestit on ladattu: vanhempia kysymyksiä voi puuttua luettelosta.",
-      "attachUnavailable": "Liitteet eivät ole käytettävissä tässä asennuksessa."
+      "attachUnavailable": "Liitteet eivät ole käytettävissä tässä asennuksessa.",
+      "you": "Sinä",
+      "newMessagesBelow": "{count, plural, one {# uusi viesti} other {# uutta viestiä}}",
+      "replyNotificationTitle": "{name} vastasi sinulle chatissa",
+      "messageNotificationTitle": "{name} chatissa",
+      "notifyButton": "Chatin ilmoitukset",
+      "notifyButtonOff": "Chatin ilmoitukset: äänetön",
+      "notifyTitle": "Ilmoita",
+      "notifyAll": "Kaikista viesteistä",
+      "notifyMentions": "Maininnoista ja vastauksista",
+      "notifyOff": "Äänetön",
+      "notifySound": "Ääni",
+      "notifyDesktop": "Selaimen ilmoitukset",
+      "notifyDesktopBlocked": "Selain estää tämän sivuston ilmoitukset: voit sallia ne uudelleen sivuston asetuksista.",
+      "notifyDesktopUnsupported": "Tämä selain ei tue ilmoituksia.",
+      "notifyOffer": "Haluatko ilmoituksen, kun joku mainitsee sinut tai vastaa sinulle?",
+      "notifyOfferEnable": "Ota ilmoitukset käyttöön"
     },
     "role": {
       "moderator": "Moderaattori",
@@ -469,7 +485,8 @@
     "leftMessage": "Tapahtuma on yhä käynnissä: voit palata milloin haluat.",
     "leftModeratorReminder": "Tapahtuma pysyy avoimena, kunnes joku päättää sen. Kun olette valmiita, palaa huoneeseen ja valitse ”{action}”.",
     "rejoin": "Palaa huoneeseen",
-    "backToHome": "Takaisin etusivulle"
+    "backToHome": "Takaisin etusivulle",
+    "sidebarTabMaterialsNew": "Uusia jaettuja materiaaleja"
   },
   "qa": {
     "title": "Kysymykset ja vastaukset",
@@ -2886,7 +2903,17 @@
       "uploadBusy": "Liian monta latausta juuri nyt: yritä uudelleen muutaman sekunnin kuluttua",
       "deleteFailed": "Materiaalia ei voitu poistaa"
     },
-    "addedByStaff": "Järjestäjien lisäämä"
+    "addedByStaff": "Järjestäjien lisäämä",
+    "dropzoneTitle": "Vedä tiedosto tähän",
+    "dropzoneChoose": "tai valitse se tietokoneelta",
+    "removeFile": "Poista tiedosto",
+    "uploadProgress": "Ladataan: {percent} %",
+    "cancelUpload": "Peruuta lataus",
+    "uploadCancelled": "Lataus peruttiin",
+    "open": "Avaa",
+    "download": "Lataa",
+    "emptyHintModerator": "Jaa osallistujille dioja, asiakirjoja tai hyödyllisiä linkkejä.",
+    "emptyHintPublic": "Tähän ilmestyvät juontajien jakamat materiaalit."
   },
   "reminders": {
     "title": "Muistutukset",
@@ -3451,9 +3478,9 @@
     "duration": "Kesto",
     "submit": "Lähetä",
     "submitPlaceholder": "Kirjoita sana (enintään 30 merkkiä)",
-    "close": "Sulje word cloud",
+    "close": "Sulje sanapilvi",
     "cancel": "Peruuta",
-    "noActiveRound": "Ei aktiivista word cloudia tällä hetkellä.",
+    "noActiveRound": "Yksikään sanapilvi ei ole nyt käynnissä.",
     "noWords": "Odotetaan ensimmäisiä sanoja...",
     "wordsSubmitted": "{count} sanaa lähetetty",
     "timeRemaining": "Aikaa jäljellä",
@@ -3462,7 +3489,10 @@
       "closed": "Kierros on päättynyt: uusia sanoja ei enää oteta vastaan.",
       "limit": "Olet jo lähettänyt tämän kierroksen enimmäismäärän sanoja.",
       "rateLimited": "Liian monta lähetystä juuri nyt: odota muutama sekunti ennen kuin yrität uudelleen."
-    }
+    },
+    "startNew": "Aloita sanapilvi",
+    "emptyHintModerator": "Esitä avoin kysymys: yhden sanan vastaukset muodostavat pilven reaaliajassa.",
+    "timeLeft": "Aikaa jäljellä: {time}"
   },
   "timer": {
     "title": "Ajastin",

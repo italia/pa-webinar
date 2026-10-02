@@ -71,6 +71,13 @@ export function uploadErrorFromStatus(status: number, code?: string): MaterialUp
   return 'generic';
 }
 
+export interface UploadOptions {
+  /** Quanto del file e' partito, da 0 a 1: per la barra di avanzamento. */
+  onProgress?: (fraction: number) => void;
+  /** Annulla il caricamento in corso: l'esito e' 'aborted', non un errore. */
+  signal?: AbortSignal;
+}
+
 /**
  * Carica `file` come materiale dell'evento (POST
  * /api/events/[slug]/materials/upload). Il token moderatore viaggia come
@@ -81,16 +88,64 @@ export async function uploadMaterialFile(
   eventSlug: string,
   token: string,
   input: { file: File; title: string; description: string },
-): Promise<MaterialUploadError | null> {
+  opts: UploadOptions = {},
+): Promise<MaterialUploadError | 'aborted' | null> {
   const form = new FormData();
   form.append('file', input.file);
   if (input.title) form.append('title', input.title);
   if (input.description) form.append('description', input.description);
-  const res = await fetch(`/api/events/${eventSlug}/materials/upload`, {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${token}` },
-    body: form,
-  });
+  const url = `/api/events/${eventSlug}/materials/upload`;
+  if (opts.signal?.aborted) return 'aborted';
+
+  // L'avanzamento dell'invio lo da' solo XMLHttpRequest: fetch non espone
+  // quanto del corpo e' partito.
+  if (opts.onProgress && typeof XMLHttpRequest !== 'undefined') {
+    return new Promise((resolve) => {
+      const xhr = new XMLHttpRequest();
+      const annulla = () => xhr.abort();
+      // A richiesta finita l'annullamento non serve piu': si stacca.
+      const fine = (esito: MaterialUploadError | 'aborted' | null) => {
+        opts.signal?.removeEventListener('abort', annulla);
+        resolve(esito);
+      };
+      xhr.open('POST', url);
+      xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+      xhr.upload.onprogress = (e) => {
+        if (e.lengthComputable && e.total > 0) opts.onProgress?.(e.loaded / e.total);
+      };
+      xhr.onload = () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          opts.onProgress?.(1);
+          fine(null);
+          return;
+        }
+        let code: string | undefined;
+        try {
+          code = (JSON.parse(xhr.responseText) as { code?: string }).code;
+        } catch {
+          // Risposta non JSON (un proxy): conta solo lo stato.
+        }
+        fine(uploadErrorFromStatus(xhr.status, code));
+      };
+      xhr.onerror = () => fine('generic');
+      xhr.onabort = () => fine('aborted');
+      opts.signal?.addEventListener('abort', annulla, { once: true });
+      xhr.send(form);
+    });
+  }
+
+  let res: Response;
+  try {
+    res = await fetch(url, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: form,
+      ...(opts.signal ? { signal: opts.signal } : {}),
+    });
+  } catch (e) {
+    if (opts.signal?.aborted || (e instanceof DOMException && e.name === 'AbortError')) return 'aborted';
+    throw e;
+  }
   if (res.ok) return null;
   let code: string | undefined;
   try {

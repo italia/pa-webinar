@@ -372,7 +372,23 @@
       "questionStatusFailed": "Nem sikerült frissíteni a kérdést",
       "questionNeedsText": "Írja be a kérdés szövegét: önmagában egy melléklet nem kerül a sorba",
       "lensTruncated": "Csak a legfrissebb üzenetek vannak betöltve: régebbi kérdések hiányozhatnak a listából.",
-      "attachUnavailable": "A mellékletek ebben a telepítésben nem érhetők el."
+      "attachUnavailable": "A mellékletek ebben a telepítésben nem érhetők el.",
+      "you": "Ön",
+      "newMessagesBelow": "{count, plural, one {# új üzenet} other {# új üzenet}}",
+      "replyNotificationTitle": "{name} válaszolt Önnek a csevegésben",
+      "messageNotificationTitle": "{name} a csevegésben",
+      "notifyButton": "Csevegési értesítések",
+      "notifyButtonOff": "Csevegési értesítések: némítva",
+      "notifyTitle": "Értesítés",
+      "notifyAll": "Minden üzenetnél",
+      "notifyMentions": "Említéseknél és válaszoknál",
+      "notifyOff": "Némítva",
+      "notifySound": "Hang",
+      "notifyDesktop": "Böngészőértesítések",
+      "notifyDesktopBlocked": "A böngésző letiltja a webhely értesítéseit: a webhely beállításaiban újra engedélyezheti őket.",
+      "notifyDesktopUnsupported": "Ez a böngésző nem támogatja az értesítéseket.",
+      "notifyOffer": "Kér értesítést, ha valaki megemlíti vagy válaszol Önnek?",
+      "notifyOfferEnable": "Értesítések bekapcsolása"
     },
     "role": {
       "moderator": "Moderátor",
@@ -469,7 +485,8 @@
     "leftMessage": "Az esemény még tart: bármikor visszaléphet.",
     "leftModeratorReminder": "Az esemény nyitva marad, amíg valaki le nem zárja. Ha végeztek, lépjen vissza, és válassza ezt: „{action}”.",
     "rejoin": "Visszalépés",
-    "backToHome": "Vissza a kezdőlapra"
+    "backToHome": "Vissza a kezdőlapra",
+    "sidebarTabMaterialsNew": "Új megosztott anyagok"
   },
   "qa": {
     "title": "Kérdések és válaszok",
@@ -2886,7 +2903,17 @@
       "uploadBusy": "Jelenleg túl sok a feltöltés: próbálja újra néhány másodperc múlva",
       "deleteFailed": "Az anyagot nem sikerült törölni"
     },
-    "addedByStaff": "A szervezők adták hozzá"
+    "addedByStaff": "A szervezők adták hozzá",
+    "dropzoneTitle": "Húzza ide a fájlt",
+    "dropzoneChoose": "vagy válassza ki a számítógépéről",
+    "removeFile": "Fájl eltávolítása",
+    "uploadProgress": "Feltöltés: {percent}%",
+    "cancelUpload": "Feltöltés megszakítása",
+    "uploadCancelled": "Feltöltés megszakítva",
+    "open": "Megnyitás",
+    "download": "Letöltés",
+    "emptyHintModerator": "Ossza meg a résztvevőkkel a diákat, dokumentumokat vagy hasznos hivatkozásokat.",
+    "emptyHintPublic": "Itt jelennek meg a házigazdák által megosztott anyagok."
   },
   "reminders": {
     "title": "Értesítések",
@@ -3451,9 +3478,9 @@
     "duration": "Időtartam",
     "submit": "Küldés",
     "submitPlaceholder": "Írjon be egy szót (max. 30 karakter)",
-    "close": "Word cloud bezárása",
+    "close": "Szófelhő lezárása",
     "cancel": "Mégse",
-    "noActiveRound": "Jelenleg nincs aktív word cloud.",
+    "noActiveRound": "Jelenleg nincs aktív szófelhő.",
     "noWords": "Várunk az első szavakra...",
     "wordsSubmitted": "{count} beküldött szó",
     "timeRemaining": "Hátralévő idő",
@@ -3462,7 +3489,10 @@
       "closed": "Ez a kör lezárult: további szavakat már nem fogadunk.",
       "limit": "Ebben a körben már elküldte a megengedett legtöbb szót.",
       "rateLimited": "Túl sok beküldés érkezik most: várjon néhány másodpercet, mielőtt újra próbálkozik."
-    }
+    },
+    "startNew": "Szófelhő indítása",
+    "emptyHintModerator": "Tegyen fel nyitott kérdést: az egyszavas válaszok valós időben alkotják a felhőt.",
+    "timeLeft": "Hátralévő idő: {time}"
   },
   "timer": {
     "title": "Időzítő",

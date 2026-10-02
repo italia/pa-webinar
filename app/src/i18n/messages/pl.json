@@ -372,7 +372,23 @@
       "questionStatusFailed": "Nie udało się zaktualizować pytania",
       "questionNeedsText": "Wpisz treść pytania: sam załącznik nie trafia do kolejki",
       "lensTruncated": "Wczytano tylko najnowsze wiadomości: mogą istnieć starsze pytania, których nie ma na liście.",
-      "attachUnavailable": "Załączniki nie są dostępne w tej instalacji."
+      "attachUnavailable": "Załączniki nie są dostępne w tej instalacji.",
+      "you": "Ty",
+      "newMessagesBelow": "{count, plural, one {# nowa wiadomość} few {# nowe wiadomości} many {# nowych wiadomości} other {# nowej wiadomości}}",
+      "replyNotificationTitle": "{name} odpowiada ci na czacie",
+      "messageNotificationTitle": "{name} na czacie",
+      "notifyButton": "Powiadomienia czatu",
+      "notifyButtonOff": "Powiadomienia czatu: wyciszone",
+      "notifyTitle": "Powiadamiaj o",
+      "notifyAll": "Wszystkich wiadomościach",
+      "notifyMentions": "Wzmiankach i odpowiedziach",
+      "notifyOff": "Wyciszone",
+      "notifySound": "Dźwięk",
+      "notifyDesktop": "Powiadomienia przeglądarki",
+      "notifyDesktopBlocked": "Przeglądarka blokuje powiadomienia tej witryny: możesz je ponownie zezwolić w ustawieniach witryny.",
+      "notifyDesktopUnsupported": "Ta przeglądarka nie obsługuje powiadomień.",
+      "notifyOffer": "Chcesz powiadomienie, gdy ktoś cię wspomni lub ci odpowie?",
+      "notifyOfferEnable": "Włącz powiadomienia"
     },
     "role": {
       "moderator": "Moderator",
@@ -469,7 +485,8 @@
     "leftMessage": "Wydarzenie wciąż trwa: można wrócić w dowolnym momencie.",
     "leftModeratorReminder": "Wydarzenie pozostaje otwarte, dopóki ktoś go nie zakończy. Po zakończeniu proszę wrócić i wybrać „{action}”.",
     "rejoin": "Wróć do sali",
-    "backToHome": "Powrót do strony głównej"
+    "backToHome": "Powrót do strony głównej",
+    "sidebarTabMaterialsNew": "Udostępniono nowe materiały"
   },
   "qa": {
     "title": "Pytania i odpowiedzi",
@@ -2886,7 +2903,17 @@
       "uploadBusy": "Zbyt wiele przesyłań w tej chwili: spróbuj ponownie za kilka sekund",
       "deleteFailed": "Nie udało się usunąć materiału"
     },
-    "addedByStaff": "Dodane przez organizatorów"
+    "addedByStaff": "Dodane przez organizatorów",
+    "dropzoneTitle": "Przeciągnij plik tutaj",
+    "dropzoneChoose": "lub wybierz go z komputera",
+    "removeFile": "Usuń plik",
+    "uploadProgress": "Przesyłanie: {percent}%",
+    "cancelUpload": "Anuluj przesyłanie",
+    "uploadCancelled": "Przesyłanie anulowane",
+    "open": "Otwórz",
+    "download": "Pobierz",
+    "emptyHintModerator": "Udostępnij uczestnikom slajdy, dokumenty lub przydatne linki.",
+    "emptyHintPublic": "Tutaj pojawią się materiały udostępnione przez prowadzących."
   },
   "reminders": {
     "title": "Powiadomienia",
@@ -3444,16 +3471,16 @@
     "noFeedback": "Brak otrzymanych opinii"
   },
   "wordcloud": {
-    "title": "Word Cloud",
+    "title": "Chmura słów",
     "startRound": "Rozpocznij",
     "prompt": "Temat",
     "promptPlaceholder": "np. Czego oczekujesz od tego wydarzenia?",
     "duration": "Czas trwania",
     "submit": "Wyślij",
     "submitPlaceholder": "Wpisz słowo (maks. 30 zn.)",
-    "close": "Zamknij word cloud",
+    "close": "Zamknij chmurę słów",
     "cancel": "Anuluj",
-    "noActiveRound": "Brak aktywnego word cloud w tym momencie.",
+    "noActiveRound": "Obecnie nie ma aktywnej chmury słów.",
     "noWords": "Oczekiwanie na pierwsze słowa...",
     "wordsSubmitted": "{count} przesłanych słów",
     "timeRemaining": "Pozostały czas",
@@ -3462,7 +3489,10 @@
       "closed": "Ta runda jest zamknięta: kolejne słowa nie są przyjmowane.",
       "limit": "W tej rundzie wysłano już maksymalną liczbę słów.",
       "rateLimited": "Zbyt wiele wysłanych słów w tej chwili: odczekaj kilka sekund przed ponowną próbą."
-    }
+    },
+    "startNew": "Uruchom chmurę słów",
+    "emptyHintModerator": "Zadaj pytanie otwarte: jednowyrazowe odpowiedzi tworzą chmurę na żywo.",
+    "timeLeft": "Pozostały czas: {time}"
   },
   "timer": {
     "title": "Minutnik",

@@ -372,7 +372,23 @@
       "questionStatusFailed": "No se ha podido actualizar la pregunta",
       "questionNeedsText": "Escribe el texto de la pregunta: un archivo adjunto por sí solo no entra en la cola",
       "lensTruncated": "Solo se han cargado los mensajes más recientes: puede haber preguntas más antiguas que no aparecen en la lista.",
-      "attachUnavailable": "Los archivos adjuntos no están disponibles en esta instalación."
+      "attachUnavailable": "Los archivos adjuntos no están disponibles en esta instalación.",
+      "you": "Tú",
+      "newMessagesBelow": "{count, plural, one {# mensaje nuevo} other {# mensajes nuevos}}",
+      "replyNotificationTitle": "{name} te ha respondido en el chat",
+      "messageNotificationTitle": "{name} en el chat",
+      "notifyButton": "Avisos del chat",
+      "notifyButtonOff": "Avisos del chat: silencio",
+      "notifyTitle": "Avisarme de",
+      "notifyAll": "Todos los mensajes",
+      "notifyMentions": "Menciones y respuestas",
+      "notifyOff": "Silencio",
+      "notifySound": "Sonido",
+      "notifyDesktop": "Notificaciones del navegador",
+      "notifyDesktopBlocked": "Tu navegador bloquea las notificaciones de este sitio: puedes volver a permitirlas en la configuración del sitio.",
+      "notifyDesktopUnsupported": "Este navegador no admite notificaciones.",
+      "notifyOffer": "¿Quieres una notificación cuando te mencionen o te respondan?",
+      "notifyOfferEnable": "Activar notificaciones"
     },
     "role": {
       "moderator": "Moderador",
@@ -469,7 +485,8 @@
     "leftMessage": "El evento sigue en curso: puede volver a entrar cuando quiera.",
     "leftModeratorReminder": "El evento sigue abierto hasta que alguien lo termine. Cuando hayan terminado, vuelva a entrar y elija «{action}».",
     "rejoin": "Volver a entrar",
-    "backToHome": "Volver a la página de inicio"
+    "backToHome": "Volver a la página de inicio",
+    "sidebarTabMaterialsNew": "Nuevos materiales compartidos"
   },
   "qa": {
     "title": "Preguntas y Respuestas",
@@ -2886,7 +2903,17 @@
       "uploadBusy": "Demasiadas subidas en este momento: inténtelo de nuevo en unos segundos",
       "deleteFailed": "No se pudo eliminar el material"
     },
-    "addedByStaff": "Añadido por la organización"
+    "addedByStaff": "Añadido por la organización",
+    "dropzoneTitle": "Arrastra el archivo aquí",
+    "dropzoneChoose": "o elígelo desde tu ordenador",
+    "removeFile": "Quitar el archivo",
+    "uploadProgress": "Subiendo: {percent} %",
+    "cancelUpload": "Cancelar la subida",
+    "uploadCancelled": "Subida cancelada",
+    "open": "Abrir",
+    "download": "Descargar",
+    "emptyHintModerator": "Comparte con la sala diapositivas, documentos o enlaces útiles.",
+    "emptyHintPublic": "Aquí aparecerán los materiales compartidos por quienes conducen."
   },
   "reminders": {
     "title": "Notificaciones",
@@ -3444,16 +3471,16 @@
     "noFeedback": "No se han recibido valoraciones"
   },
   "wordcloud": {
-    "title": "Word Cloud",
+    "title": "Nube de palabras",
     "startRound": "Iniciar",
     "prompt": "Tema",
     "promptPlaceholder": "p. ej. ¿Qué espera de este evento?",
     "duration": "Duración",
     "submit": "Enviar",
     "submitPlaceholder": "Escriba una palabra (máx. 30 car.)",
-    "close": "Cerrar word cloud",
+    "close": "Cerrar la nube de palabras",
     "cancel": "Cancelar",
-    "noActiveRound": "No hay ningún word cloud activo en este momento.",
+    "noActiveRound": "No hay ninguna nube de palabras activa en este momento.",
     "noWords": "Esperando las primeras palabras...",
     "wordsSubmitted": "{count} palabras enviadas",
     "timeRemaining": "Tiempo restante",
@@ -3462,7 +3489,10 @@
       "closed": "Esta ronda está cerrada: ya no se aceptan más palabras.",
       "limit": "Ya ha enviado el número máximo de palabras para esta ronda.",
       "rateLimited": "Demasiados envíos en este momento: espere unos segundos antes de volver a intentarlo."
-    }
+    },
+    "startNew": "Iniciar una nube de palabras",
+    "emptyHintModerator": "Haz una pregunta abierta: las respuestas de una palabra forman la nube en tiempo real.",
+    "timeLeft": "Tiempo restante: {time}"
   },
   "timer": {
     "title": "Temporizador",

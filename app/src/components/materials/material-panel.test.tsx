@@ -219,7 +219,7 @@ describe('MaterialPanel — togliere un materiale', () => {
 describe('MaterialPanel — quando il pubblico vede un materiale', () => {
   const tv = messages.admin.materials;
   const etichette = () =>
-    Array.from(container.querySelectorAll('.badge')).map((el) => el.textContent?.trim());
+    Array.from(container.querySelectorAll('.material-item__badge')).map((el) => el.textContent?.trim());
 
   it('chi conduce vede la fase di ogni voce, anche del predefinito', async () => {
     // Prima dell'inizio il pubblico non vede il predefinito: senza etichetta
@@ -251,5 +251,57 @@ describe('MaterialPanel — chi ha aggiunto il materiale', () => {
     expect(testo).toContain(t.addedBy.replace('{name}', 'Conduzione'));
     expect(testo).not.toContain(t.addedBy.replace('{name}', 'Moderator'));
     expect(testo.split(t.addedByStaff).length - 1).toBe(2);
+  });
+});
+
+describe('MaterialPanel — caricare un file', () => {
+  beforeEach(() => {
+    fetchMock.mockImplementation(async () =>
+      new Response(JSON.stringify({ materials: elenco, uploadsEnabled: true }), { status: 200 }),
+    );
+  });
+
+  async function modoFile() {
+    await render();
+    act(() => pulsante(t.addMaterial).click());
+    act(() => pulsante(t.modeFile).click());
+  }
+
+  function scegli(file: File) {
+    const input = container.querySelector<HTMLInputElement>('input[type=file]')!;
+    Object.defineProperty(input, 'files', { value: [file], configurable: true });
+    act(() => {
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+  }
+
+  const campoTitoloFile = () =>
+    container.querySelector<HTMLInputElement>(`input[aria-label="${t.titleOptional}"]`)!;
+
+  it('un file scelto si vede con nome e peso, e il titolo si propone dal nome', async () => {
+    await modoFile();
+    scegli(new File(['%PDF-1.7'], 'slide_finali.pdf', { type: 'application/pdf' }));
+    expect(container.querySelector('.material-panel__chosen-name')?.textContent).toContain('slide_finali.pdf');
+    expect(campoTitoloFile().value).toBe('slide finali');
+    // Cambiato il file, il titolo proposto lo segue.
+    scegli(new File(['PK'], 'Bilancio.xlsx', {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    }));
+    expect(campoTitoloFile().value).toBe('Bilancio');
+  });
+
+  it('un titolo scritto a mano non viene sovrascritto da un altro file', async () => {
+    await modoFile();
+    scegli(new File(['%PDF'], 'a.pdf', { type: 'application/pdf' }));
+    scrivi(campoTitoloFile(), 'Il mio titolo');
+    scegli(new File(['%PDF'], 'b.pdf', { type: 'application/pdf' }));
+    expect(campoTitoloFile().value).toBe('Il mio titolo');
+  });
+
+  it('un tipo non ammesso si rifiuta subito, prima dell’invio', async () => {
+    await modoFile();
+    scegli(new File(['x'], 'foto.png', { type: 'image/png' }));
+    expect(container.querySelector('.material-panel__chosen')).toBeNull();
+    expect(erroreLista().join(' ')).toContain(t.errors.fileType);
   });
 });

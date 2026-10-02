@@ -372,7 +372,23 @@
       "questionStatusFailed": "Neizdevās atjaunināt jautājumu",
       "questionNeedsText": "Ierakstiet jautājuma tekstu: pielikums vien rindā netiek ievietots",
       "lensTruncated": "Ielādēti tikai jaunākie ziņojumi: sarakstā var nebūt vecāku jautājumu.",
-      "attachUnavailable": "Pielikumi šajā instalācijā nav pieejami."
+      "attachUnavailable": "Pielikumi šajā instalācijā nav pieejami.",
+      "you": "Jūs",
+      "newMessagesBelow": "{count, plural, zero {# jaunu ziņu} one {# jauna ziņa} other {# jaunas ziņas}}",
+      "replyNotificationTitle": "{name} jums atbildēja tērzēšanā",
+      "messageNotificationTitle": "{name} tērzēšanā",
+      "notifyButton": "Tērzēšanas paziņojumi",
+      "notifyButtonOff": "Tērzēšanas paziņojumi: kluss",
+      "notifyTitle": "Paziņot par",
+      "notifyAll": "Visām ziņām",
+      "notifyMentions": "Pieminējumiem un atbildēm",
+      "notifyOff": "Kluss",
+      "notifySound": "Skaņa",
+      "notifyDesktop": "Pārlūka paziņojumi",
+      "notifyDesktopBlocked": "Pārlūks bloķē šīs vietnes paziņojumus: tos var atkal atļaut vietnes iestatījumos.",
+      "notifyDesktopUnsupported": "Šis pārlūks neatbalsta paziņojumus.",
+      "notifyOffer": "Vai vēlaties paziņojumu, kad kāds jūs piemin vai jums atbild?",
+      "notifyOfferEnable": "Ieslēgt paziņojumus"
     },
     "role": {
       "moderator": "Moderators",
@@ -469,7 +485,8 @@
     "leftMessage": "Pasākums joprojām notiek: varat atgriezties jebkurā laikā.",
     "leftModeratorReminder": "Pasākums paliek atvērts, līdz kāds to beidz. Kad esat beiguši, atgriezieties un izvēlieties “{action}”.",
     "rejoin": "Atgriezties",
-    "backToHome": "Atpakaļ uz sākumlapu"
+    "backToHome": "Atpakaļ uz sākumlapu",
+    "sidebarTabMaterialsNew": "Jauni kopīgoti materiāli"
   },
   "qa": {
     "title": "Jautājumi un atbildes",
@@ -2886,7 +2903,17 @@
       "uploadBusy": "Pašlaik ir pārāk daudz augšupielāžu: mēģiniet vēlreiz pēc dažām sekundēm",
       "deleteFailed": "Materiālu neizdevās dzēst"
     },
-    "addedByStaff": "Pievienoja organizatori"
+    "addedByStaff": "Pievienoja organizatori",
+    "dropzoneTitle": "Ievelciet failu šeit",
+    "dropzoneChoose": "vai izvēlieties to datorā",
+    "removeFile": "Noņemt failu",
+    "uploadProgress": "Augšupielāde: {percent}%",
+    "cancelUpload": "Atcelt augšupielādi",
+    "uploadCancelled": "Augšupielāde atcelta",
+    "open": "Atvērt",
+    "download": "Lejupielādēt",
+    "emptyHintModerator": "Kopīgojiet ar dalībniekiem slaidus, dokumentus vai noderīgas saites.",
+    "emptyHintPublic": "Šeit parādīsies vadītāju kopīgotie materiāli."
   },
   "reminders": {
     "title": "Paziņojumi",
@@ -3444,16 +3471,16 @@
     "noFeedback": "Nav saņemtu atsauksmju"
   },
   "wordcloud": {
-    "title": "Word Cloud",
+    "title": "Vārdu mākonis",
     "startRound": "Sākt",
     "prompt": "Tēma",
     "promptPlaceholder": "piem. Ko jūs sagaidāt no šī pasākuma?",
     "duration": "Ilgums",
     "submit": "Iesniegt",
     "submitPlaceholder": "Ierakstiet vārdu (maks. 30 rakstz.)",
-    "close": "Aizvērt \"Word Cloud\"",
+    "close": "Aizvērt vārdu mākoni",
     "cancel": "Atcelt",
-    "noActiveRound": "Šobrīd nav aktīva \"Word Cloud\".",
+    "noActiveRound": "Pašlaik nav aktīva vārdu mākoņa.",
     "noWords": "Gaidām pirmos vārdus...",
     "wordsSubmitted": "{count} vārdi iesniegti",
     "timeRemaining": "Atlikušais laiks",
@@ -3462,7 +3489,10 @@
       "closed": "Šī kārta ir slēgta: vairāk vārdu netiek pieņemts.",
       "limit": "Šajā kārtā jau ir nosūtīts maksimālais vārdu skaits.",
       "rateLimited": "Pašlaik ir pārāk daudz sūtījumu: pagaidiet dažas sekundes, pirms mēģināt vēlreiz."
-    }
+    },
+    "startNew": "Sākt vārdu mākoni",
+    "emptyHintModerator": "Uzdodiet atvērtu jautājumu: viena vārda atbildes reāllaikā veido mākoni.",
+    "timeLeft": "Atlikušais laiks: {time}"
   },
   "timer": {
     "title": "Taimeris",

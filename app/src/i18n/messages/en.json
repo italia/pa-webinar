@@ -372,7 +372,23 @@
       "questionStatusFailed": "Could not update the question",
       "questionNeedsText": "Type the text of your question: an attachment alone does not enter the queue",
       "lensTruncated": "Only the most recent messages are loaded: there may be older questions not listed.",
-      "attachUnavailable": "Attachments are not available on this installation."
+      "attachUnavailable": "Attachments are not available on this installation.",
+      "you": "You",
+      "newMessagesBelow": "{count, plural, one {# new message} other {# new messages}}",
+      "replyNotificationTitle": "{name} replied to you in the chat",
+      "messageNotificationTitle": "{name} in the chat",
+      "notifyButton": "Chat alerts",
+      "notifyButtonOff": "Chat alerts: silent",
+      "notifyTitle": "Alert me for",
+      "notifyAll": "All messages",
+      "notifyMentions": "Mentions and replies",
+      "notifyOff": "Silent",
+      "notifySound": "Sound",
+      "notifyDesktop": "Browser notifications",
+      "notifyDesktopBlocked": "Your browser blocks notifications for this site: you can allow them again in the site settings.",
+      "notifyDesktopUnsupported": "This browser does not support notifications.",
+      "notifyOffer": "Get a notification when someone mentions or replies to you?",
+      "notifyOfferEnable": "Turn on notifications"
     },
     "role": {
       "moderator": "Moderator",
@@ -469,7 +485,8 @@
     "leftMessage": "The event is still in progress: you can rejoin whenever you like.",
     "leftModeratorReminder": "The event stays open until someone ends it. When you have finished, rejoin and choose “{action}”.",
     "rejoin": "Rejoin",
-    "backToHome": "Back to the home page"
+    "backToHome": "Back to the home page",
+    "sidebarTabMaterialsNew": "New materials shared"
   },
   "qa": {
     "title": "Questions & Answers",
@@ -2886,7 +2903,17 @@
       "uploadBusy": "Too many uploads at the moment: try again in a few seconds",
       "deleteFailed": "Could not delete the material"
     },
-    "addedByStaff": "Added by the organisers"
+    "addedByStaff": "Added by the organisers",
+    "dropzoneTitle": "Drag the file here",
+    "dropzoneChoose": "or choose it from your computer",
+    "removeFile": "Remove the file",
+    "uploadProgress": "Uploading: {percent}%",
+    "cancelUpload": "Cancel upload",
+    "uploadCancelled": "Upload cancelled",
+    "open": "Open",
+    "download": "Download",
+    "emptyHintModerator": "Share slides, documents or useful links with the room.",
+    "emptyHintPublic": "Materials shared by the hosts will appear here."
   },
   "reminders": {
     "title": "Notifications",
@@ -3444,16 +3471,16 @@
     "noFeedback": "No feedback received"
   },
   "wordcloud": {
-    "title": "Word Cloud",
+    "title": "Word cloud",
     "startRound": "Start",
     "prompt": "Topic",
     "promptPlaceholder": "e.g. What do you expect from this event?",
     "duration": "Duration",
     "submit": "Submit",
     "submitPlaceholder": "Type a word (max 30 chars)",
-    "close": "Close word cloud",
+    "close": "Close the word cloud",
     "cancel": "Cancel",
-    "noActiveRound": "No word cloud active at the moment.",
+    "noActiveRound": "No word cloud is active right now.",
     "noWords": "Waiting for the first words...",
     "wordsSubmitted": "{count} words submitted",
     "timeRemaining": "Time remaining",
@@ -3462,7 +3489,10 @@
       "closed": "This round is closed: no more words are accepted.",
       "limit": "You have already sent the maximum number of words for this round.",
       "rateLimited": "Too many submissions right now: wait a few seconds before trying again."
-    }
+    },
+    "startNew": "Start a word cloud",
+    "emptyHintModerator": "Ask an open question: one-word answers build the cloud in real time.",
+    "timeLeft": "Time left: {time}"
   },
   "timer": {
     "title": "Timer",

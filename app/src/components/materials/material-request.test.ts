@@ -155,3 +155,91 @@ describe('caricamento di un file dal pannello', () => {
     expect(src).toMatch(/checkMaterialFile\(file, MATERIAL_FILE_MIME_TYPES, MATERIAL_FILE_MAX_BYTES\)/);
   });
 });
+
+describe('caricamento con avanzamento', () => {
+  /** XMLHttpRequest finto: registra la richiesta e lascia al test l'esito. */
+  class XhrFinto {
+    static ultimo: XhrFinto | null = null;
+    upload: { onprogress: ((e: { lengthComputable: boolean; loaded: number; total: number }) => void) | null } = {
+      onprogress: null,
+    };
+    onload: (() => void) | null = null;
+    onerror: (() => void) | null = null;
+    onabort: (() => void) | null = null;
+    status = 0;
+    responseText = '';
+    metodo = '';
+    url = '';
+    intestazioni: Record<string, string> = {};
+    corpo: unknown = null;
+    open(metodo: string, url: string) {
+      this.metodo = metodo;
+      this.url = url;
+    }
+    setRequestHeader(k: string, v: string) {
+      this.intestazioni[k] = v;
+    }
+    send(corpo: unknown) {
+      this.corpo = corpo;
+      XhrFinto.ultimo = this;
+    }
+    abort() {
+      this.onabort?.();
+    }
+  }
+
+  beforeEach(() => {
+    XhrFinto.ultimo = null;
+    vi.stubGlobal('XMLHttpRequest', XhrFinto);
+  });
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  const pdf = () => new File(['%PDF-1.7'], 'slide.pdf', { type: 'application/pdf' });
+
+  it('riporta l’avanzamento e chiude a 1 quando il server accetta', async () => {
+    const passi: number[] = [];
+    const esito = uploadMaterialFile(SLUG, 'T', { file: pdf(), title: '', description: '' }, {
+      onProgress: (f) => passi.push(f),
+    });
+    const xhr = XhrFinto.ultimo!;
+    expect(xhr.metodo).toBe('POST');
+    expect(xhr.url).toBe(`/api/events/${SLUG}/materials/upload`);
+    expect(xhr.intestazioni).toEqual({ Authorization: 'Bearer T' });
+    xhr.upload.onprogress?.({ lengthComputable: true, loaded: 50, total: 200 });
+    xhr.status = 201;
+    xhr.onload?.();
+    expect(await esito).toBeNull();
+    expect(passi).toEqual([0.25, 1]);
+  });
+
+  it('un rifiuto porta il codice del server', async () => {
+    const esito = uploadMaterialFile(SLUG, 'T', { file: pdf(), title: '', description: '' }, {
+      onProgress: () => {},
+    });
+    const xhr = XhrFinto.ultimo!;
+    xhr.status = 409;
+    xhr.responseText = JSON.stringify({ code: 'MATERIALS_QUOTA_EXCEEDED' });
+    xhr.onload?.();
+    expect(await esito).toBe('quotaExceeded');
+  });
+
+  it('annullato: l’esito è aborted, non un errore', async () => {
+    const ctrl = new AbortController();
+    const esito = uploadMaterialFile(SLUG, 'T', { file: pdf(), title: '', description: '' }, {
+      onProgress: () => {},
+      signal: ctrl.signal,
+    });
+    ctrl.abort();
+    expect(await esito).toBe('aborted');
+  });
+
+  it('la rete che cade è un errore generico, non un’eccezione', async () => {
+    const esito = uploadMaterialFile(SLUG, 'T', { file: pdf(), title: '', description: '' }, {
+      onProgress: () => {},
+    });
+    XhrFinto.ultimo!.onerror?.();
+    expect(await esito).toBe('generic');
+  });
+});

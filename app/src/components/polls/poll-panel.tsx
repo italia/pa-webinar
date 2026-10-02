@@ -175,9 +175,9 @@ export default function PollPanel({
       className="d-flex flex-column flex-grow-1"
       style={{ width: '100%', minHeight: 0 }}
     >
-        <div className="p-3 border-bottom">
-          <h3 className="h5 mb-0 d-flex align-items-center">
-            <Icon icon="it-chart-line" className="me-2" />
+        <div className="live-panel-header live-panel-header--bar">
+          <h3 className="live-panel-header__title">
+            <Icon icon="it-chart-line" size="sm" aria-hidden="true" />
             {t('title')}
           </h3>
         </div>

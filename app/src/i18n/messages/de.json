@@ -372,7 +372,23 @@
       "questionStatusFailed": "Die Frage konnte nicht aktualisiert werden",
       "questionNeedsText": "Geben Sie den Text Ihrer Frage ein: Ein Anhang allein wird nicht in die Warteschlange aufgenommen",
       "lensTruncated": "Es sind nur die neuesten Nachrichten geladen: Ältere Fragen werden möglicherweise nicht aufgeführt.",
-      "attachUnavailable": "Anhänge sind in dieser Installation nicht verfügbar."
+      "attachUnavailable": "Anhänge sind in dieser Installation nicht verfügbar.",
+      "you": "Sie",
+      "newMessagesBelow": "{count, plural, one {# neue Nachricht} other {# neue Nachrichten}}",
+      "replyNotificationTitle": "{name} hat Ihnen im Chat geantwortet",
+      "messageNotificationTitle": "{name} im Chat",
+      "notifyButton": "Chat-Hinweise",
+      "notifyButtonOff": "Chat-Hinweise: stumm",
+      "notifyTitle": "Hinweisen bei",
+      "notifyAll": "Allen Nachrichten",
+      "notifyMentions": "Erwähnungen und Antworten",
+      "notifyOff": "Stumm",
+      "notifySound": "Ton",
+      "notifyDesktop": "Browser-Benachrichtigungen",
+      "notifyDesktopBlocked": "Ihr Browser blockiert Benachrichtigungen dieser Website: Sie können sie in den Website-Einstellungen wieder erlauben.",
+      "notifyDesktopUnsupported": "Dieser Browser unterstützt keine Benachrichtigungen.",
+      "notifyOffer": "Benachrichtigung erhalten, wenn Sie erwähnt werden oder jemand antwortet?",
+      "notifyOfferEnable": "Benachrichtigungen aktivieren"
     },
     "role": {
       "moderator": "Moderator",
@@ -469,7 +485,8 @@
     "leftMessage": "Die Veranstaltung läuft noch: Sie können jederzeit wieder beitreten.",
     "leftModeratorReminder": "Die Veranstaltung bleibt geöffnet, bis jemand sie beendet. Wenn Sie fertig sind, treten Sie wieder bei und wählen Sie „{action}“.",
     "rejoin": "Wieder beitreten",
-    "backToHome": "Zurück zur Startseite"
+    "backToHome": "Zurück zur Startseite",
+    "sidebarTabMaterialsNew": "Neue Materialien geteilt"
   },
   "qa": {
     "title": "Fragen und Antworten",
@@ -2886,7 +2903,17 @@
       "uploadBusy": "Zu viele Uploads im Moment: Versuchen Sie es in einigen Sekunden erneut",
       "deleteFailed": "Das Material konnte nicht gelöscht werden"
     },
-    "addedByStaff": "Von den Organisatoren hinzugefügt"
+    "addedByStaff": "Von den Organisatoren hinzugefügt",
+    "dropzoneTitle": "Datei hierher ziehen",
+    "dropzoneChoose": "oder vom Computer auswählen",
+    "removeFile": "Datei entfernen",
+    "uploadProgress": "Hochladen: {percent} %",
+    "cancelUpload": "Hochladen abbrechen",
+    "uploadCancelled": "Hochladen abgebrochen",
+    "open": "Öffnen",
+    "download": "Herunterladen",
+    "emptyHintModerator": "Teilen Sie Folien, Dokumente oder nützliche Links mit dem Raum.",
+    "emptyHintPublic": "Hier erscheinen die Materialien, die die Moderation teilt."
   },
   "reminders": {
     "title": "Benachrichtigungen",
@@ -3444,16 +3471,16 @@
     "noFeedback": "Kein Feedback erhalten"
   },
   "wordcloud": {
-    "title": "Word Cloud",
+    "title": "Wortwolke",
     "startRound": "Starten",
     "prompt": "Thema",
     "promptPlaceholder": "z. B. Was erwarten Sie von dieser Veranstaltung?",
     "duration": "Dauer",
     "submit": "Senden",
     "submitPlaceholder": "Geben Sie ein Wort ein (max. 30 Zeichen)",
-    "close": "Word Cloud schließen",
+    "close": "Wortwolke schließen",
     "cancel": "Abbrechen",
-    "noActiveRound": "Derzeit keine Word Cloud aktiv.",
+    "noActiveRound": "Derzeit ist keine Wortwolke aktiv.",
     "noWords": "Warten auf die ersten Wörter...",
     "wordsSubmitted": "{count} Wörter eingereicht",
     "timeRemaining": "Verbleibende Zeit",
@@ -3462,7 +3489,10 @@
       "closed": "Diese Runde ist geschlossen: Es werden keine weiteren Wörter angenommen.",
       "limit": "Sie haben für diese Runde bereits die maximale Anzahl an Wörtern gesendet.",
       "rateLimited": "Zu viele Einsendungen im Moment: Bitte warten Sie einige Sekunden, bevor Sie es erneut versuchen."
-    }
+    },
+    "startNew": "Wortwolke starten",
+    "emptyHintModerator": "Stellen Sie eine offene Frage: Antworten aus einem Wort bilden die Wolke in Echtzeit.",
+    "timeLeft": "Verbleibende Zeit: {time}"
   },
   "timer": {
     "title": "Timer",

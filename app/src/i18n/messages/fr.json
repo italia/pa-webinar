@@ -372,7 +372,23 @@
       "questionStatusFailed": "Impossible de mettre à jour la question",
       "questionNeedsText": "Saisissez le texte de la question : une pièce jointe seule n'entre pas dans la file",
       "lensTruncated": "Seuls les messages les plus récents sont chargés : des questions plus anciennes peuvent ne pas figurer dans la liste.",
-      "attachUnavailable": "Les pièces jointes ne sont pas disponibles sur cette installation."
+      "attachUnavailable": "Les pièces jointes ne sont pas disponibles sur cette installation.",
+      "you": "Vous",
+      "newMessagesBelow": "{count, plural, one {# nouveau message} other {# nouveaux messages}}",
+      "replyNotificationTitle": "{name} vous a répondu dans le chat",
+      "messageNotificationTitle": "{name} dans le chat",
+      "notifyButton": "Alertes du chat",
+      "notifyButtonOff": "Alertes du chat : silencieux",
+      "notifyTitle": "M'alerter pour",
+      "notifyAll": "Tous les messages",
+      "notifyMentions": "Mentions et réponses",
+      "notifyOff": "Silencieux",
+      "notifySound": "Son",
+      "notifyDesktop": "Notifications du navigateur",
+      "notifyDesktopBlocked": "Votre navigateur bloque les notifications de ce site : vous pouvez les réactiver dans les paramètres du site.",
+      "notifyDesktopUnsupported": "Ce navigateur ne prend pas en charge les notifications.",
+      "notifyOffer": "Recevoir une notification quand on vous mentionne ou vous répond ?",
+      "notifyOfferEnable": "Activer les notifications"
     },
     "role": {
       "moderator": "Modérateur",
@@ -469,7 +485,8 @@
     "leftMessage": "L'événement est toujours en cours : vous pouvez revenir quand vous le souhaitez.",
     "leftModeratorReminder": "L'événement reste ouvert jusqu'à ce que quelqu'un y mette fin. Quand vous aurez terminé, revenez dans la salle et choisissez « {action} ».",
     "rejoin": "Revenir dans la salle",
-    "backToHome": "Retour à la page d'accueil"
+    "backToHome": "Retour à la page d'accueil",
+    "sidebarTabMaterialsNew": "Nouveaux supports partagés"
   },
   "qa": {
     "title": "Questions et Réponses",
@@ -2886,7 +2903,17 @@
       "uploadBusy": "Trop de téléversements en ce moment : réessayez dans quelques secondes",
       "deleteFailed": "Impossible de supprimer le document"
     },
-    "addedByStaff": "Ajouté par l'organisation"
+    "addedByStaff": "Ajouté par l'organisation",
+    "dropzoneTitle": "Faites glisser le fichier ici",
+    "dropzoneChoose": "ou choisissez-le sur votre ordinateur",
+    "removeFile": "Retirer le fichier",
+    "uploadProgress": "Envoi : {percent} %",
+    "cancelUpload": "Annuler l'envoi",
+    "uploadCancelled": "Envoi annulé",
+    "open": "Ouvrir",
+    "download": "Télécharger",
+    "emptyHintModerator": "Partagez avec la salle des diapositives, des documents ou des liens utiles.",
+    "emptyHintPublic": "Les supports partagés par les animateurs apparaîtront ici."
   },
   "reminders": {
     "title": "Notifications",
@@ -3451,9 +3478,9 @@
     "duration": "Durée",
     "submit": "Envoyer",
     "submitPlaceholder": "Saisissez un mot (max. 30 car.)",
-    "close": "Fermer le word cloud",
+    "close": "Fermer le nuage de mots",
     "cancel": "Annuler",
-    "noActiveRound": "Aucun word cloud actif pour le moment.",
+    "noActiveRound": "Aucun nuage de mots actif pour le moment.",
     "noWords": "En attente des premiers mots...",
     "wordsSubmitted": "{count} mots soumis",
     "timeRemaining": "Temps restant",
@@ -3462,7 +3489,10 @@
       "closed": "Ce tour est clos : aucun autre mot n'est accepté.",
       "limit": "Vous avez déjà envoyé le nombre maximal de mots pour ce tour.",
       "rateLimited": "Trop d'envois en ce moment : patientez quelques secondes avant de réessayer."
-    }
+    },
+    "startNew": "Lancer un nuage de mots",
+    "emptyHintModerator": "Posez une question ouverte : les réponses d'un mot forment le nuage en temps réel.",
+    "timeLeft": "Temps restant : {time}"
   },
   "timer": {
     "title": "Minuteur",

@@ -62,6 +62,9 @@ export const GET = withErrorHandling(async (request, context) => {
         description: m.description,
         // Solo per i file caricati (type FILE): il peso da mostrare accanto.
         fileSize: m.fileSize != null ? Number(m.fileSize) : null,
+        // Il tipo verificato al caricamento: la sala ne ricava icona ed
+        // etichetta (lib/materials/file-kind). Null per i link.
+        mimeType: m.mimeType ?? null,
         visibility: m.visibility,
         // Null quando la riga non porta un nome: la sala mostra una dicitura
         // tradotta (lib/events/material-author).

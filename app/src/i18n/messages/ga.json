@@ -372,7 +372,23 @@
       "questionStatusFailed": "Níorbh fhéidir an cheist a nuashonrú",
       "questionNeedsText": "Clóscríobh téacs na ceiste: ní théann ceangaltán leis féin isteach sa scuaine",
       "lensTruncated": "Níl ach na teachtaireachtaí is déanaí luchtaithe: d'fhéadfadh ceisteanna níos sine a bheith ann nach bhfuil liostaithe.",
-      "attachUnavailable": "Níl ceangaltáin ar fáil ar an suiteáil seo."
+      "attachUnavailable": "Níl ceangaltáin ar fáil ar an suiteáil seo.",
+      "you": "Tusa",
+      "newMessagesBelow": "{count, plural, one {# teachtaireacht nua} two {# theachtaireacht nua} few {# theachtaireacht nua} many {# dteachtaireacht nua} other {# teachtaireacht nua}}",
+      "replyNotificationTitle": "D'fhreagair {name} thú sa chomhrá",
+      "messageNotificationTitle": "{name} sa chomhrá",
+      "notifyButton": "Foláirimh an chomhrá",
+      "notifyButtonOff": "Foláirimh an chomhrá: ciúin",
+      "notifyTitle": "Cuir foláireamh chugam faoi",
+      "notifyAll": "Gach teachtaireacht",
+      "notifyMentions": "Tagairtí agus freagraí",
+      "notifyOff": "Ciúin",
+      "notifySound": "Fuaim",
+      "notifyDesktop": "Fógraí brabhsálaí",
+      "notifyDesktopBlocked": "Tá fógraí an tsuímh seo blocáilte ag do bhrabhsálaí: is féidir iad a cheadú arís i socruithe an tsuímh.",
+      "notifyDesktopUnsupported": "Ní thacaíonn an brabhsálaí seo le fógraí.",
+      "notifyOffer": "Ar mhaith leat fógra nuair a luann duine thú nó nuair a fhreagraíonn sé thú?",
+      "notifyOfferEnable": "Cas air fógraí"
     },
     "role": {
       "moderator": "Modhnóir",
@@ -469,7 +485,8 @@
     "leftMessage": "Tá an t-imeacht fós ar siúl: is féidir leat filleadh isteach am ar bith.",
     "leftModeratorReminder": "Fanann an t-imeacht oscailte go dtí go gcuireann duine éigin deireadh leis. Nuair a bheidh sibh réidh, fill isteach agus roghnaigh “{action}”.",
     "rejoin": "Fill isteach",
-    "backToHome": "Ar ais go dtí an leathanach baile"
+    "backToHome": "Ar ais go dtí an leathanach baile",
+    "sidebarTabMaterialsNew": "Ábhair nua roinnte"
   },
   "qa": {
     "title": "Ceisteanna agus Freagraí",
@@ -2886,7 +2903,17 @@
       "uploadBusy": "An iomarca uaslódálacha faoi láthair: bain triail eile as i gceann cúpla soicind",
       "deleteFailed": "Níorbh fhéidir an t-ábhar a scriosadh"
     },
-    "addedByStaff": "Curtha leis ag lucht eagraithe"
+    "addedByStaff": "Curtha leis ag lucht eagraithe",
+    "dropzoneTitle": "Tarraing an comhad anseo",
+    "dropzoneChoose": "nó roghnaigh ón ríomhaire é",
+    "removeFile": "Bain an comhad",
+    "uploadProgress": "Á uaslódáil: {percent}%",
+    "cancelUpload": "Cealaigh an uaslódáil",
+    "uploadCancelled": "Cealaíodh an uaslódáil",
+    "open": "Oscail",
+    "download": "Íoslódáil",
+    "emptyHintModerator": "Roinn sleamhnáin, doiciméid nó naisc úsáideacha leis an seomra.",
+    "emptyHintPublic": "Taispeánfar anseo na hábhair a roinneann na hóstaigh."
   },
   "reminders": {
     "title": "Fógraí",
@@ -3444,16 +3471,16 @@
     "noFeedback": "Ní bhfuarthas aon aiseolas"
   },
   "wordcloud": {
-    "title": "Néal Focal",
+    "title": "Scamall focal",
     "startRound": "Tosaigh",
     "prompt": "Topaic",
     "promptPlaceholder": "m.sh. Cad a bhfuil sibh ag súil leis ón imeacht seo?",
     "duration": "Fad",
     "submit": "Seol",
     "submitPlaceholder": "Clóscríobh focal (uasmhéid 30 car.)",
-    "close": "Dún an word cloud",
+    "close": "Dún an scamall focal",
     "cancel": "Cealaigh",
-    "noActiveRound": "Gan word cloud gníomhach faoi láthair.",
+    "noActiveRound": "Níl aon scamall focal gníomhach faoi láthair.",
     "noWords": "Ag fanacht leis na chéad fhocail...",
     "wordsSubmitted": "{count} focal seolta",
     "timeRemaining": "Am fágtha",
@@ -3462,7 +3489,10 @@
       "closed": "Tá an babhta seo dúnta: ní ghlactar le tuilleadh focal.",
       "limit": "Tá an líon uasta focal seolta agaibh cheana don bhabhta seo.",
       "rateLimited": "An iomarca seoltaí faoi láthair: fan cúpla soicind sula mbainfidh tú triail eile as."
-    }
+    },
+    "startNew": "Tosaigh scamall focal",
+    "emptyHintModerator": "Cuir ceist oscailte: cruthaíonn freagraí aon fhocail an scamall i bhfíor-am.",
+    "timeLeft": "Am fágtha: {time}"
   },
   "timer": {
     "title": "Amadóir",
