@@ -74,6 +74,10 @@ const STATUSES = [
 ] as const;
 
 type SortKey = 'startsAsc' | 'startsDesc' | 'createdDesc' | 'titleAsc';
+
+const DEFAULT_SORT: SortKey = 'createdDesc';
+/** Tutti gli eventi tranne gli archiviati: la lista di lavoro di tutti i giorni. */
+const DEFAULT_STATUS_FILTER = 'NOT_ARCHIVED';
 type BulkAction = 'delete' | 'archive' | null;
 
 function hexWithAlpha(hex: string, alpha: number): string {
@@ -123,9 +127,17 @@ export default function AdminDashboardClient({
   // Filter state
   const [search, setSearch] = useState('');
   const deferredSearch = useDeferredValue(search);
-  const [statusFilter, setStatusFilter] = useState<string>('ALL');
+  // Predefiniti: gli ultimi creati in cima, gli archiviati fuori dalla vista
+  // (restano a un filtro di distanza).
+  // Se nascondere gli archiviati lascerebbe la lista vuota (il link di un solo
+  // evento archiviato, o un elenco di soli archiviati) si parte da «Tutti».
+  const defaultStatusFilter =
+    events.length > 0 && events.every((e) => e.status === 'ARCHIVED')
+      ? 'ALL'
+      : DEFAULT_STATUS_FILTER;
+  const [statusFilter, setStatusFilter] = useState<string>(defaultStatusFilter);
   const [tagFilter, setTagFilter] = useState<Set<string>>(new Set());
-  const [sort, setSort] = useState<SortKey>('startsAsc');
+  const [sort, setSort] = useState<SortKey>(DEFAULT_SORT);
 
   const toggleTagFilter = useCallback((slug: string) => {
     setTagFilter((prev) => {
@@ -138,21 +150,31 @@ export default function AdminDashboardClient({
 
   const resetFilters = useCallback(() => {
     setSearch('');
-    setStatusFilter('ALL');
+    setStatusFilter(defaultStatusFilter);
     setTagFilter(new Set());
-    setSort('startsAsc');
-  }, []);
+    setSort(DEFAULT_SORT);
+  }, [defaultStatusFilter]);
 
   const hasActiveFilters =
     search.trim() !== '' ||
-    statusFilter !== 'ALL' ||
+    statusFilter !== defaultStatusFilter ||
     tagFilter.size > 0 ||
-    sort !== 'startsAsc';
+    sort !== DEFAULT_SORT;
+
+  const statusCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const e of events) counts[e.status] = (counts[e.status] ?? 0) + 1;
+    return counts;
+  }, [events]);
 
   const filteredEvents = useMemo(() => {
     const needle = deferredSearch.trim().toLowerCase();
     let list = events.filter((event) => {
-      if (statusFilter !== 'ALL' && event.status !== statusFilter) return false;
+      if (statusFilter === 'NOT_ARCHIVED') {
+        if (event.status === 'ARCHIVED') return false;
+      } else if (statusFilter !== 'ALL' && event.status !== statusFilter) {
+        return false;
+      }
       if (tagFilter.size > 0) {
         const eventSlugs = new Set(event.tags.map((tag) => tag.slug));
         for (const slug of tagFilter) {
@@ -308,10 +330,15 @@ export default function AdminDashboardClient({
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
             >
-              <option value="ALL">{tList('statusAll')}</option>
+              <option value="NOT_ARCHIVED">
+                {tList('statusNotArchived')} ({events.length - (statusCounts.ARCHIVED ?? 0)})
+              </option>
+              <option value="ALL">
+                {tList('statusAll')} ({events.length})
+              </option>
               {STATUSES.map((s) => (
                 <option key={s} value={s}>
-                  {tStatus(s)}
+                  {tStatus(s)} ({statusCounts[s] ?? 0})
                 </option>
               ))}
             </select>
@@ -330,9 +357,9 @@ export default function AdminDashboardClient({
               value={sort}
               onChange={(e) => setSort(e.target.value as SortKey)}
             >
+              <option value="createdDesc">{tList('sortCreatedDesc')}</option>
               <option value="startsAsc">{tList('sortStartsAsc')}</option>
               <option value="startsDesc">{tList('sortStartsDesc')}</option>
-              <option value="createdDesc">{tList('sortCreatedDesc')}</option>
               <option value="titleAsc">{tList('sortTitleAsc')}</option>
             </select>
           </div>

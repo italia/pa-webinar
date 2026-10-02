@@ -11,7 +11,7 @@ import CreateEventWithTemplate from '@/components/admin/create-event-with-templa
 import type { PermissionMatrix } from '@/lib/utils/permission-matrix';
 
 interface CreateEventPageProps {
-  searchParams: Promise<{ template?: string }>;
+  searchParams: Promise<{ template?: string; instant?: string }>;
 }
 
 export default async function CreateEventPage({
@@ -20,7 +20,7 @@ export default async function CreateEventPage({
   // Creare eventi e' il mestiere dell'organizzatore (ADR-014).
   const session = await staffOLogin(await getLocale());
   const t = await getTranslations('admin');
-  const { template: templateId } = await searchParams;
+  const { template: templateId, instant } = await searchParams;
 
   const [templates, siteSettings, tags, gdprTemplates] = await Promise.all([
     prisma.eventTemplate.findMany({ orderBy: { sortOrder: 'asc' } }),
@@ -120,6 +120,7 @@ export default async function CreateEventPage({
       </div>
 
       <CreateEventWithTemplate
+        initialInstant={instant === '1'}
         templates={serializedTemplates}
         selectedTemplate={serializedSelected}
         siteTimezone={siteSettings.defaultTimezone}

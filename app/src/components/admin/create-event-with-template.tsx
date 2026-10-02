@@ -70,6 +70,9 @@ interface Props {
   siteDefaultParseTitleKicker: boolean;
   siteDefaultVideoQuality: VideoQualityPreset;
   whiteboardInfraReady: boolean;
+  /** Apre direttamente il modulo della chiamata rapida (dal pulsante della
+   *  lista eventi), senza passare dalla scelta del modello. */
+  initialInstant?: boolean;
 }
 
 export default function CreateEventWithTemplate({
@@ -87,12 +90,13 @@ export default function CreateEventWithTemplate({
   siteDefaultParseTitleKicker,
   siteDefaultVideoQuality,
   whiteboardInfraReady,
+  initialInstant = false,
 }: Props) {
   const t = useTranslations('admin.templates');
   const ti = useTranslations('admin.instantCall');
   const router = useRouter();
   const [skipped, setSkipped] = useState(false);
-  const [showInstant, setShowInstant] = useState(false);
+  const [showInstant, setShowInstant] = useState(initialInstant);
 
   if (showInstant) {
     return (
