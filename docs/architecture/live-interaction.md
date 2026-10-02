@@ -242,12 +242,16 @@ All three stream routes return `text/event-stream` with `Cache-Control: no-cache
 | Stream | On open | Keepalive | Replay |
 |---|---|---|---|
 | Chat | Opener comment; the client then backfills with `GET /chat?since=` | SSE comment | None from the stream; frames carry `id:`, and the client backfills over REST |
-| Live | `hello`, then a `flags` snapshot and an `eventStatus` snapshot read from the database | A `ping` **message** | None; every envelope is a full snapshot or a poke |
+| Live | `hello`; then, once the stream is subscribed to Redis, a `flags` snapshot and an `eventStatus` snapshot read from the database, followed by any envelope that arrived during that read | A `ping` **message** | None; every envelope is a full snapshot or a poke |
 | Control | Opener comment | SSE comment | None; control signals are fire-and-forget |
 
 The live stream's keepalive is a real message, not a comment, because `EventSource` never passes comments to `onmessage`. A commented heartbeat would keep the connection alive but leave the client unable to tell a quiet channel from a dead one.
 
-`hello` carries `pushAvailable`, which is true only when the pod's Redis connection is `ready`. Without Redis the stream carries only its opening snapshots and keepalive pings, so the client must know that before it turns its polling off. The live stream takes no token, so no credential ends up in proxy access logs.
+The snapshots are read after the subscription, and envelopes that arrive during the read follow them in order, so no change falls between the read and the subscription. The subscription is awaited for at most 3 seconds. Past that, the stream sends a second `hello` with `pushAvailable: false`, so the client keeps polling, and still sends the snapshots from the database; a subscription that completes later sends `hello` with `pushAvailable: true`, and one that fails closes the stream so that the client reopens it. When the subscriber connection comes back after an interruption, every open live stream sends the snapshots again and a poke for every panel (`resync`, generated in the pod by `subscribeLiveState`), because whatever was published during the gap never arrives. The streams of the same event in a pod share one database read, and envelopes that arrive during it follow the snapshots, as at opening.
+
+Publishing (`publishLiveState`) waits up to 2 seconds for a connection that is still opening, which is the case for the first publish after a pod starts or reconnects, and gives up after that, because the client queues commands forever. The callers do not wait for it, so no write is slowed down.
+
+`hello` carries `pushAvailable`, which is true only when the pod's Redis connection is `ready`; a connection that is still opening is awaited for up to 1 second. Without Redis the stream carries only its opening snapshots and keepalive pings, so the client must know that before it turns its polling off. The live stream takes no token, so no credential ends up in proxy access logs.
 
 SSE was chosen over WebSocket because the traffic is one-way broadcast plus ordinary POST requests. Browsers support `EventSource` natively and reconnect on their own, and SSE passes through the ingress without upgrade headers.
 
@@ -398,7 +402,7 @@ The Jitsi toolbar, per-device buttons and the screen-share banner are covered in
 
 **How it is deployed.** The chart deploys the Bitnami Redis subchart as a single standalone node with no persistence (`save ""`, `appendonly no`) and authentication on. It requests 50m CPU and 128Mi memory, and raises the pub/sub output-buffer limit for bursts during a live event. See the `redis:` block of `infra/helm/pa-webinar/values.yaml`. To use a managed Redis instead, disable the subchart and set `REDIS_URL` ([CONFIGURATION.md](../CONFIGURATION.md), [DEPLOYMENT.md](../DEPLOYMENT.md)). The Docker Compose stack also runs Redis without persistence, so a single VM exercises the same code path as a cluster.
 
-**When Redis restarts or is evicted.** Fan-out stops until the pod is back. Nothing is lost: every write is already in PostgreSQL. Chat clients catch up through the watchdog backfill. Open live streams do not notice (see [Known limitations](#known-limitations)): panels stay on push, pokes published during the outage are lost, and they catch up at the next change after the subscriber reconnects. A browser whose stream errors for another reason goes back to polling. The Redis client reconnects on its own, with a back-off capped at 3 seconds.
+**When Redis restarts or is evicted.** Fan-out stops until the pod is back. Nothing is lost: every write is already in PostgreSQL. Chat clients catch up through the watchdog backfill. Open live streams stay on push: when the subscriber reconnects, each one sends the snapshots again and a poke for every panel, so the panels catch up then (see [Known limitations](#known-limitations) for the outage itself). A browser whose stream errors for another reason goes back to polling. The Redis client reconnects on its own, with a back-off capped at 3 seconds.
 
 **When `REDIS_URL` is not set.** Publish and subscribe become no-ops:
 
@@ -414,7 +418,7 @@ The Jitsi toolbar, per-device buttons and the screen-share banner are covered in
 ## Known limitations
 
 - **Timer and reaction-bar counters are per pod.** They live in process memory. The chart runs at least two app replicas by default (`autoscaling.minReplicas`, or `app.replicaCount` when autoscaling is off in `values.yaml`), with no session affinity. A browser whose requests land on another pod can see a different timer or different reaction counts, and a pod restart resets them. The `Reaction` rows used for analytics are not affected.
-- **A Redis outage that starts after a live stream opened is not signaled to the client.** The `ping` keepalive comes from the app pod, not from Redis, so the client keeps polling off. Pokes published during the outage are dropped. Panels catch up at the next change after Redis returns, or on reload. The chat is not affected, because its watchdog relies on real message frames.
+- **A Redis outage that starts after a live stream opened is not signaled to the client.** The `ping` keepalive comes from the app pod, not from Redis, so the client keeps polling off. Pokes published during the outage are dropped, and the panels stay as they were until Redis returns; then every open stream resends the snapshots and pokes every panel. The chat is not affected, because its watchdog relies on real message frames.
 - **Browser-id identities are chosen by the client.** Poll, word-cloud and agenda deduplication for browsers without a registration is only as strong as the browser's honesty.
 - **Speakers cannot submit the post-event rating.** Speakers see the rating prompt, but the room sends no identity for them, so `POST /feedback` refuses the rating while the prompt reports success.
 - **The whiteboard is not stored.** Jitsi's whiteboard is ephemeral. When it is enabled for the event (`whiteboardEnabled`, always on for instant calls) and for the installation (`NEXT_PUBLIC_WHITEBOARD_ENABLED`), the drawer reminds moderators to export it and attach it as a material before ending.

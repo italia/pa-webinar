@@ -24,7 +24,7 @@
  * nulle, e i pannelli restano sul loro polling. È il caso dello stack locale.
  */
 
-import { getRedis, getRedisSubscriber } from '@/lib/redis';
+import { getRedis, getRedisSubscriber, withDeadline } from '@/lib/redis';
 
 /**
  * I pannelli che si limitano a dire «rileggi». Due motivi distinti per starci:
@@ -36,6 +36,14 @@ import { getRedis, getRedisSubscriber } from '@/lib/redis';
  * condivisa mostrerebbe a qualcuno lo stato di qualcun altro.
  */
 export type PokeablePanel = 'qa' | 'polls' | 'agenda' | 'wordcloud' | 'materials';
+
+export const POKEABLE_PANELS: readonly PokeablePanel[] = [
+  'qa',
+  'polls',
+  'agenda',
+  'wordcloud',
+  'materials',
+];
 
 /**
  * Gli interruttori attivabili durante l'evento. L'elenco è quello servito da
@@ -61,6 +69,14 @@ export type LiveEnvelope =
   | { op: 'eventStatus'; status: string; ts: string }
   | { op: 'poke'; panel: PokeablePanel; ts: string };
 
+/**
+ * Cio' che riceve chi si iscrive: le buste pubblicate, piu' `resync`, che non
+ * viaggia su Redis ma nasce in questo processo quando la connessione di
+ * ascolto torna dopo un'interruzione. Le buste pubblicate nel frattempo sono
+ * perse: lo stream rilegge lo stato e lo rimanda.
+ */
+export type LiveStreamEvent = LiveEnvelope | { op: 'resync' };
+
 function channel(eventId: string): string {
   return `live:${eventId}`;
 }
@@ -74,8 +90,21 @@ function channel(eventId: string): string {
  * avvisi scambiati per una perdita di memoria. Qui il gestore è uno solo e
  * smista sul registro.
  */
-const registro = new Map<string, Set<(envelope: LiveEnvelope) => void>>();
+const registro = new Map<string, Set<(envelope: LiveStreamEvent) => void>>();
 let ascoltatoreAttivo = false;
+
+/** Avvisa ogni iscritto locale che la connessione di ascolto e' tornata. */
+function riallinea(): void {
+  for (const iscritti of registro.values()) {
+    for (const iscritto of iscritti) {
+      try {
+        iscritto({ op: 'resync' });
+      } catch {
+        // Un consumatore che esplode non deve impedire la consegna agli altri.
+      }
+    }
+  }
+}
 
 function smista(receivedChannel: string, payload: string): void {
   const iscritti = registro.get(receivedChannel);
@@ -97,19 +126,73 @@ function smista(receivedChannel: string, payload: string): void {
   }
 }
 
+/** Quanto si aspetta una connessione che si sta aprendo, prima di rinunciare. */
+const READY_WAIT_MS = 2000;
+
+type ClientConStato = {
+  status: string;
+  once?: (evento: 'ready', fn: () => void) => unknown;
+};
+
+/** Un'attesa sola per connessione: chi aspetta la stessa si aggancia a quella. */
+const attesePronte = new WeakMap<object, Promise<void>>();
+
+function prontezza(redis: ClientConStato): Promise<void> {
+  const inCorso = attesePronte.get(redis);
+  if (inCorso) return inCorso;
+  const attesa = new Promise<void>((resolve) => {
+    redis.once!('ready', () => {
+      attesePronte.delete(redis);
+      resolve();
+    });
+  });
+  attesePronte.set(redis, attesa);
+  return attesa;
+}
+
+/**
+ * Vero quando la connessione e' pronta, aspettandola fino a `ms` se si sta
+ * aprendo: il client nasce alla prima richiesta che lo usa (lib/redis), quindi
+ * il primo avviso dopo un avvio o una riconnessione trova la connessione
+ * ancora in apertura. Tutti quelli che aspettano la stessa connessione
+ * condividono un solo ascoltatore, per quanti siano.
+ */
+async function connessionePronta(redis: ClientConStato, ms: number): Promise<boolean> {
+  if (redis.status === 'ready') return true;
+  if (redis.status === 'end' || redis.status === 'close' || !redis.once) return false;
+  return withDeadline(
+    prontezza(redis).then(() => true),
+    ms,
+    false
+  );
+}
+
+/**
+ * Vero se la connessione per pubblicare e' pronta, aspettandola fino a `ms`.
+ * Lo usa lo stream per dire al client se il push e' disponibile: senza
+ * attesa, chi apriva il canale mentre la connessione nasceva restava a
+ * interrogare il server per tutta la sessione.
+ */
+export async function liveRedisReady(ms: number): Promise<boolean> {
+  const redis = getRedis();
+  return !!redis && (await connessionePronta(redis, ms));
+}
+
 /**
  * Pubblica uno snapshot (o un poke) a tutti gli stream aperti nel cluster.
  * Non solleva mai: un pannello che non si aggiorna è un fastidio, una mutazione
- * che fallisce perché Redis è lento è un danno. Con la connessione non pronta
- * si rinuncia subito, perché il client ioredis è configurato per accodare i
- * comandi all'infinito (`maxRetriesPerRequest: null`) invece di rifiutarli.
+ * che fallisce perché Redis è lento è un danno. I chiamanti non attendono
+ * (lib/live-state/publish), quindi l'attesa di una connessione in apertura non
+ * rallenta nessuna mutazione; oltre l'attesa si rinuncia, perché il client
+ * ioredis è configurato per accodare i comandi all'infinito
+ * (`maxRetriesPerRequest: null`) invece di rifiutarli.
  */
 export async function publishLiveState(
   eventId: string,
   envelope: LiveEnvelope
 ): Promise<number> {
   const redis = getRedis();
-  if (!redis || redis.status !== 'ready') return 0;
+  if (!redis || !(await connessionePronta(redis, READY_WAIT_MS))) return 0;
   try {
     return await redis.publish(channel(eventId), JSON.stringify(envelope));
   } catch {
@@ -123,7 +206,7 @@ export async function publishLiveState(
  */
 export async function subscribeLiveState(
   eventId: string,
-  onMessage: (envelope: LiveEnvelope) => void
+  onMessage: (envelope: LiveStreamEvent) => void
 ): Promise<() => void> {
   const sub = getRedisSubscriber();
   if (!sub) return () => {};
@@ -132,6 +215,17 @@ export async function subscribeLiveState(
 
   if (!ascoltatoreAttivo) {
     sub.on('message', smista);
+    // ioredis ripete le iscrizioni da solo quando la connessione torna, ma
+    // cio' che e' stato pubblicato durante il buco non arriva piu': ogni
+    // 'ready' dopo il primo chiede agli stream di riallinearsi.
+    let primaConnessione = sub.status !== 'ready';
+    sub.on('ready', () => {
+      if (primaConnessione) {
+        primaConnessione = false;
+        return;
+      }
+      riallinea();
+    });
     ascoltatoreAttivo = true;
   }
 
@@ -142,7 +236,15 @@ export async function subscribeLiveState(
   }
   iscritti.add(onMessage);
 
-  await sub.subscribe(ch);
+  try {
+    await sub.subscribe(ch);
+  } catch (err) {
+    // Iscrizione fallita: il consumatore non resta nel registro senza nessuno
+    // che possa staccarlo.
+    iscritti.delete(onMessage);
+    if (iscritti.size === 0) registro.delete(ch);
+    throw err;
+  }
 
   return () => {
     const insieme = registro.get(ch);
