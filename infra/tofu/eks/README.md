@@ -501,10 +501,10 @@ Details of the storage settings are in
 **Jibri.** Jibri needs the `snd-aloop` kernel module on its node. Whether the
 Amazon Linux 2023 EKS AMI provides it (for example through its
 `kernel-modules-extra` package) has not been checked. If `modprobe snd-aloop`
-fails on a `jibri` node, you need a custom AMI that has it. Jibri's upload
-script also has to be mounted by hand
+fails on a `jibri` node, you need a custom AMI that has it. The chart mounts
+Jibri's upload script
 ([Recording setup](../../../docs/operations/recording-setup.md)). The
-per-participant recorder bot needs neither.
+per-participant recorder bot does not need the module.
 
 **GPU.** The `gpu` group uses the AL2023 NVIDIA AMI, which ships the drivers.
 Install the NVIDIA device plugin, not the GPU Operator's driver. Without the

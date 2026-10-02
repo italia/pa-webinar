@@ -1,11 +1,32 @@
-{{- if and .Values.jitsi.enabled (index .Values "jitsi-meet" "jibri" "enabled") }}
+{{- /*
+Lo script che Jibri esegue a fine registrazione (files/jibri-finalize.sh):
+carica il file nello storage e avvisa il portale, con la firma
+(RECORDING_WEBHOOK_SECRET) quando c'e'. Lo monta in /config/finalize.sh il
+volume che `jitsi-meet.jibri.extraVolumes` dichiara in values.yaml: cosi' ogni
+aggiornamento del chart porta lo script aggiornato (a Jibri arriva al riavvio
+del pod: il montaggio subPath non segue le modifiche), invece di una copia nei
+valori che resta indietro. La guardia pa-webinar.validateJibriFinalize ferma la
+resa se uno stesso file di valori monta anche una propria copia.
+*/}}
+{{- include "pa-webinar.validateJibriFinalize" . }}
+{{- $jm := index .Values "jitsi-meet" | default dict }}
+{{- if and .Values.jitsi.enabled (dig "jibri" "enabled" false $jm) (not (dig "jibri" "useExternalJibri" false $jm)) }}
+{{- /*
+Lo stesso script anche col nome delle versioni precedenti
+(<fullname>-jibri-finalize), che la documentazione indicava da montare a
+mano: un'installazione che lo monta cosi' continua a trovarlo.
+*/}}
+{{- $nomi := uniq (list (include "pa-webinar.jibriFinalizeConfigMap" .) (printf "%s-jibri-finalize" (include "pa-webinar.fullname" .))) }}
+{{- range $nomi }}
+---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "pa-webinar.fullname" . }}-jibri-finalize
+  name: {{ . }}
   labels:
-    {{- include "pa-webinar.labels" . | nindent 4 }}
+    {{- include "pa-webinar.labels" $ | nindent 4 }}
 data:
   finalize.sh: |
-    {{ .Files.Get "files/jibri-finalize.sh" | nindent 4 }}
+    {{ $.Files.Get "files/jibri-finalize.sh" | nindent 4 }}
+{{- end }}
 {{- end }}

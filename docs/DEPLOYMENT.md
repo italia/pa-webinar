@@ -1268,11 +1268,10 @@ The design of network isolation for the whole installation is in
 
 Composite video recording runs on Jibri from the jitsi-meet subchart (`jitsi-meet.jibri.enabled`, on in
 the standard and full profiles; in the full profile the JVB scaler also sets Jibri's replica count). The
-chart renders its finalize script (`files/jibri-finalize.sh`) as the ConfigMap `<fullname>-jibri-finalize`,
-but does not mount it. Jibri runs whatever is at `/config/finalize.sh` after each recording: mount the
-chart's ConfigMap there with `jitsi-meet.jibri.extraVolumes` and `extraVolumeMounts`, or pass the script
-through `jitsi-meet.jibri.custom.other._finalize_sh`, and in both cases give Jibri the `APP_INTERNAL_URL`
-and `CRON_API_KEY` the script needs
+chart renders its finalize script (`files/jibri-finalize.sh`) as the ConfigMap `pa-webinar-jibri-finalize`
+and mounts it at `/config/finalize.sh`, where Jibri runs it after each recording. Give Jibri the
+`APP_INTERNAL_URL`, `CRON_API_KEY` and, if the portal checks signatures, `RECORDING_WEBHOOK_SECRET` the
+script needs; a values file that still sets `jitsi-meet.jibri.custom.other._finalize_sh` stops the render
 ([Mount the finalize script](operations/recording-setup.md#mount-the-finalize-script)). The
 per-participant audio recorder is a separate path (`recorder.enabled`). Which values turn on each path,
 the storage they need and how to verify them: [Setting up recording](operations/recording-setup.md).

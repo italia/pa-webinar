@@ -200,9 +200,9 @@ recordings](#background-jobs-that-touch-recordings)).
 
 ### Where the finalize script comes from
 
-The chart renders the script as the ConfigMap `<fullname>-jibri-finalize` when
-`jitsi.enabled` and `jitsi-meet.jibri.enabled` are both true, but does not
-mount it in the Jibri pod or pass it its variables: that wiring is an operator
+The chart renders the script as the ConfigMap `pa-webinar-jibri-finalize` when
+`jitsi.enabled` and `jitsi-meet.jibri.enabled` are both true, and mounts it at
+`/config/finalize.sh` in the Jibri pod. The variables it reads are an operator
 step, described in
 [Setting up recording](../operations/recording-setup.md#mount-the-finalize-script).
 `infra/jitsi/jibri-finalize.sh` is an older standalone variant that the chart

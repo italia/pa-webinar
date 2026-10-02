@@ -513,6 +513,52 @@ values.yaml, e i valori di un sottochart non possono calcolarlo.
 pa-webinar-prosody-plugins
 {{- end }}
 
+{{- /*
+Lo script di fine registrazione di Jibri: nome fisso (una sola release per
+namespace), perche' il sottochart non applica i modelli ai volumi extra.
+*/}}
+{{- define "pa-webinar.jibriFinalizeConfigMap" -}}
+pa-webinar-jibri-finalize
+{{- end }}
+
+{{- /*
+"true" se un volume extra di Jibri nomina il ConfigMap dello script ed e'
+montato in /config/finalize.sh, dove Jibri lo cerca.
+*/}}
+{{- define "pa-webinar.jibriFinalizeMounted" -}}
+{{- $jibri := dig "jibri" dict (index .Values "jitsi-meet" | default dict) | default dict -}}
+{{- $cm := include "pa-webinar.jibriFinalizeConfigMap" . -}}
+{{- $volumi := list -}}
+{{- range (dig "extraVolumes" list $jibri | default list) -}}
+{{- if and (kindIs "map" .) (eq (toString (dig "configMap" "name" "" .)) $cm) -}}
+{{- $volumi = append $volumi (toString (index . "name")) -}}
+{{- end -}}
+{{- end -}}
+{{- $montato := false -}}
+{{- range (dig "extraVolumeMounts" list $jibri | default list) -}}
+{{- if and (kindIs "map" .) (has (toString (index . "name" | default "")) $volumi) (eq (toString (index . "mountPath" | default "")) "/config/finalize.sh") -}}
+{{- $montato = true -}}
+{{- end -}}
+{{- end -}}
+{{- if $montato -}}true{{- end -}}
+{{- end }}
+
+{{- /*
+"true" se una voce di `jitsi-meet.jibri.extraVolumeMounts` occupa
+/config/finalize.sh, qualunque sia il volume: con `_finalize_sh` del
+sottochart sarebbero due montaggi nello stesso punto.
+*/}}
+{{- define "pa-webinar.jibriFinalizePathMounted" -}}
+{{- $jibri := dig "jibri" dict (index .Values "jitsi-meet" | default dict) | default dict -}}
+{{- $occupato := false -}}
+{{- range (dig "extraVolumeMounts" list $jibri | default list) -}}
+{{- if and (kindIs "map" .) (eq (toString (index . "mountPath" | default "")) "/config/finalize.sh") -}}
+{{- $occupato = true -}}
+{{- end -}}
+{{- end -}}
+{{- if $occupato -}}true{{- end -}}
+{{- end }}
+
 {{/*
 Un volume di Prosody monta quel ConfigMap in /prosody-plugins-custom?
 Restituisce "true" oppure niente.

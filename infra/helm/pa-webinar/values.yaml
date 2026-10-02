@@ -1073,6 +1073,43 @@ jitsi-meet:
     # solo portale (NetworkPolicy <fullname>-jibri).
     extraEnvs:
       JAVA_TOOL_OPTIONS: "-Djibri.api.http.external-api-host=0.0.0.0"
+      # L'applicazione, per lo script di fine registrazione: il nome del suo
+      # Service ricavato dalla release come fa il chart (senza
+      # fullnameOverride) e la porta predefinita. Se cambi l'uno o l'altra,
+      # scrivi qui l'indirizzo: le note dell'installazione lo segnalano.
+      APP_INTERNAL_URL: '{{ if contains "pa-webinar" .Release.Name }}http://{{ .Release.Name }}:3000{{ else }}http://{{ .Release.Name }}-pa-webinar:3000{{ end }}'
+    # Le chiavi che lo script usa con l'applicazione, dal suo Secret (il nome
+    # predefinito di secrets.existingSecretName: se lo cambi, cambialo anche
+    # qui). RECORDING_WEBHOOK_SECRET e' facoltativo.
+    extraSecrets:
+      - name: CRON_API_KEY
+        valueFrom:
+          secretKeyRef:
+            name: videocall-secrets
+            key: CRON_API_KEY
+      - name: RECORDING_WEBHOOK_SECRET
+        valueFrom:
+          secretKeyRef:
+            name: videocall-secrets
+            key: RECORDING_WEBHOOK_SECRET
+            optional: true
+    # Lo script di fine registrazione del chart (files/jibri-finalize.sh), dal
+    # ConfigMap `pa-webinar-jibri-finalize`, dove Jibri lo cerca. Il nome e'
+    # fisso: una sola release per namespace. Sono liste: se ne imposti di tue
+    # in un altro file di valori, sostituiscono queste, e queste due voci vanno
+    # ripetute (le note dell'installazione avvisano se lo script non e'
+    # montato). Lo script nuovo arriva a Jibri al riavvio del pod: con
+    # replicaCount 0 al prossimo avvio, altrimenti dopo un rollout restart.
+    extraVolumes:
+      - name: pa-webinar-finalize
+        configMap:
+          name: pa-webinar-jibri-finalize
+          defaultMode: 0755
+    extraVolumeMounts:
+      - name: pa-webinar-finalize
+        mountPath: /config/finalize.sh
+        subPath: finalize.sh
+        readOnly: true
 
   web:
     # Immagine web con la patch che forza a 48 kHz il contesto audio della
@@ -1141,12 +1178,10 @@ jitsi-meet:
 #     dell'applicazione (RECORDING_AZURE_CONNECTION_STRING,
 #     RECORDING_S3_ACCESS_KEY_ID, RECORDING_S3_SECRET_ACCESS_KEY);
 #   - Jibri: `jitsi-meet.jibri.*`. Lo script che carica il file e avvisa il
-#     portale a fine registrazione va passato in
-#     `jitsi-meet.jibri.custom.other._finalize_sh`, insieme a
-#     `jitsi-meet.jibri.extraEnvs.APP_INTERNAL_URL` e a CRON_API_KEY (per
-#     esempio con `jitsi-meet.jibri.extraSecretsFrom` sul Secret
-#     dell'applicazione). Il ConfigMap `<fullname>-jibri-finalize` reso da
-#     questo chart ne contiene una copia, ma il sottochart non lo monta;
+#     portale a fine registrazione lo monta il chart (ConfigMap
+#     `pa-webinar-jibri-finalize`, voci in `jitsi-meet.jibri.extraVolumes`) e
+#     gli passa l'indirizzo dell'applicazione (`extraEnvs.APP_INTERNAL_URL`) e
+#     le sole chiavi che usa dal Secret dell'applicazione (`extraSecrets`);
 #   - conservazione: la decide l'applicazione (pannello di amministrazione e
 #     cron di pulizia), non il chart.
 

@@ -707,7 +707,7 @@ Record these choices in your privacy notes ([GDPR](../GDPR.md)).
   ([TURN](#turn-turn_enabled)). That coturn relays correctly to a bridge behind
   the load balancer has not been checked.
 - **Storage keys are static** ([Storage on Cloud Storage](#storage-on-cloud-storage)).
-- **Composite recording** needs Jibri's upload script mounted by hand
+- **Composite recording**: the chart mounts Jibri's upload script
   ([Mount the finalize script](../operations/recording-setup.md#mount-the-finalize-script)).
   Jibri's 2Gi of shared memory, set in `values-gke.yaml`, counts against its
   4Gi memory limit.

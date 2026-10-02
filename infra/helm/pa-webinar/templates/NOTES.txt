@@ -98,6 +98,22 @@
 {{- end }}
 {{- end }}
 {{- end }}
+{{- $jibri := dig "jibri" dict $jm | default dict }}
+{{- if and (dig "enabled" false $jibri) (not (dig "useExternalJibri" false $jibri)) }}
+{{- if not (or (include "pa-webinar.jibriFinalizePathMounted" .) (dig "custom" "other" "_finalize_sh" "" $jibri)) }}
+{{- $avvisi = append $avvisi "Jibri non ha uno script di fine registrazione in /config/finalize.sh: le registrazioni restano sul suo disco e il portale non le vede. Succede con helm upgrade --reuse-values (le chiavi nuove del chart non arrivano) o se un file di valori sostituisce jitsi-meet.jibri.extraVolumes ed extraVolumeMounts: ripeti le voci dello script di values.yaml." }}
+{{- end }}
+{{- $urlJibri := tpl (toString (dig "extraEnvs" "APP_INTERNAL_URL" "" $jibri)) $ }}
+{{- if ne $urlJibri (include "pa-webinar.internalUrl" .) }}
+{{- $avvisi = append $avvisi (printf "Jibri raggiunge l'applicazione a %q, ma il suo Service risponde a %q: imposta jitsi-meet.jibri.extraEnvs.APP_INTERNAL_URL, o le registrazioni non vengono caricate." $urlJibri (include "pa-webinar.internalUrl" .)) }}
+{{- end }}
+{{- range (dig "extraSecrets" list $jibri | default list) }}
+{{- $rif := dig "valueFrom" "secretKeyRef" dict . | default dict }}
+{{- if and (has (toString (index . "name" | default "")) (list "CRON_API_KEY" "RECORDING_WEBHOOK_SECRET")) (ne (toString (index $rif "name" | default "")) (include "pa-webinar.secretName" $)) }}
+{{- $avvisi = append $avvisi (printf "Jibri legge %s dal Secret %q, ma quello dell'applicazione è %q: correggi jitsi-meet.jibri.extraSecrets." (toString (index . "name")) (toString (index $rif "name" | default "")) (include "pa-webinar.secretName" $)) }}
+{{- end }}
+{{- end }}
+{{- end }}
 {{- if and .Values.jitsi.webIngress.redirectUrl (has (toString .Values.jitsi.webIngress.ingressClassName) (dig "nonNginxClassNames" list (.Values.ingress | default dict))) }}
 {{- $avvisi = append $avvisi (printf "jitsi.webIngress.redirectUrl usa un'annotazione di ingress-nginx: con la classe %q il reindirizzamento dalla radice della conferenza non avviene." (toString .Values.jitsi.webIngress.ingressClassName)) }}
 {{- end }}

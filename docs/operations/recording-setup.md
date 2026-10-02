@@ -154,30 +154,21 @@ file and calls the recording webhook. Its contract is described in
 [From MP4 to recording](../architecture/recording.md#from-mp4-to-recording-the-finalize-contract).
 
 The chart renders this script from `files/jibri-finalize.sh` as the ConfigMap
-`<fullname>-jibri-finalize` whenever `jitsi.enabled` and
-`jitsi-meet.jibri.enabled` are both true. It does not mount it, and neither
-example profile does. Without the mount the MP4 stays on the Jibri pod's
-volume and the portal never learns about it.
+`pa-webinar-jibri-finalize` whenever `jitsi.enabled` and
+`jitsi-meet.jibri.enabled` are both true, and mounts it there by default
+(`jitsi-meet.jibri.extraVolumes` and `extraVolumeMounts` in the chart's
+`values.yaml`). The name is fixed, so one release per namespace. A chart upgrade
+updates the ConfigMap, and Jibri pods read the new script when they restart.
 
-Mount it through the subchart's `extraVolumes` and `extraVolumeMounts`, and give
-the script the two variables it requires, `APP_INTERNAL_URL` and
-`CRON_API_KEY`:
+What the operator still provides are the variables the script reads:
+`APP_INTERNAL_URL`, `CRON_API_KEY` and, when the portal checks webhook
+signatures, `RECORDING_WEBHOOK_SECRET`:
 
 ```yaml
 jitsi-meet:
   jibri:
     enabled: true
     replicaCount: 1   # 0 in the full profile, where the JVB scaler starts Jibri
-    # The chart's finalize script, mounted where Jibri runs it.
-    extraVolumes:
-      - name: pa-webinar-finalize
-        configMap:
-          name: pa-webinar-jibri-finalize   # <fullname>-jibri-finalize
-          defaultMode: 0755
-    extraVolumeMounts:
-      - name: pa-webinar-finalize
-        mountPath: /config/finalize.sh
-        subPath: finalize.sh
     # Plain settings go to the Jibri ConfigMap.
     extraEnvs:
       APP_INTERNAL_URL: "http://pa-webinar:3000"   # http://<fullname>:<service.port>
@@ -196,20 +187,16 @@ jitsi-meet:
             optional: true
 ```
 
-This mount follows the chart: a chart upgrade updates the ConfigMap, and Jibri
-pods read the new script when they restart.
+`extraEnvs` is a map and merges with the chart's own entries. `extraVolumes` and
+`extraVolumeMounts` are lists: a values file that sets its own replaces the
+chart's, and must repeat the two entries for the script.
 
-The alternative is the subchart's own slot, which also mounts the file at
-`/config/finalize.sh`:
-
-```bash
-helm upgrade pa-webinar infra/helm/pa-webinar -n pa-webinar -f <your-values>.yaml \
-  --set-file jitsi-meet.jibri.custom.other._finalize_sh=infra/helm/pa-webinar/files/jibri-finalize.sh
-```
-
-With this form the script becomes part of the release values. An upgrade with
-`--reuse-values` then keeps the old copy until you pass the file again
-([Upgrades and rollback](upgrades.md)).
+A values file that still carries its own copy in
+`jitsi-meet.jibri.custom.other._finalize_sh` would mount a second file at the
+same path; the chart stops the render and says so. Remove `_finalize_sh` (the
+chart's script is kept up to date with each release and signs the webhook), or,
+to keep your own script, set `extraVolumes` and `extraVolumeMounts` without the
+script's entries.
 
 The script calls `curl`, `jq`, `ffprobe`, `ffmpeg` and, to sign the webhook,
 `openssl`. Check that the Jibri image you run provides them.

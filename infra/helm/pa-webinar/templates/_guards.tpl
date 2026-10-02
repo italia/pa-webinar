@@ -507,3 +507,19 @@ senza che nessuno lo guardi.
 {{- end -}}
 {{- end -}}
 {{- end -}}
+
+{{- /*
+Lo script di fine registrazione di Jibri sta in un posto solo,
+/config/finalize.sh. Il chart lo monta dal proprio ConfigMap; un file di
+valori che porta ancora una propria copia (`jibri.custom.other._finalize_sh`)
+lo monterebbe una seconda volta nello stesso punto, e l'API server
+rifiuterebbe il Deployment. Meglio dirlo qui, con la strada per uscirne.
+*/}}
+{{- define "pa-webinar.validateJibriFinalize" -}}
+{{- $jm := index .Values "jitsi-meet" | default dict -}}
+{{- if and .Values.jitsi.enabled (dig "jibri" "enabled" false $jm) (not (dig "jibri" "useExternalJibri" false $jm)) -}}
+{{- if and (dig "jibri" "custom" "other" "_finalize_sh" "" $jm) (include "pa-webinar.jibriFinalizePathMounted" .) -}}
+{{- fail (printf "jitsi-meet.jibri.custom.other._finalize_sh porta una copia dello script di fine registrazione, ma il chart monta gia' il proprio (ConfigMap %s) in /config/finalize.sh: due volumi nello stesso punto. Togli _finalize_sh dai tuoi valori (consigliato: lo script del chart firma l'avviso al portale ed e' aggiornato a ogni rilascio), oppure, per tenere il tuo, imposta jitsi-meet.jibri.extraVolumes ed extraVolumeMounts senza la voce dello script." (include "pa-webinar.jibriFinalizeConfigMap" .)) -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}

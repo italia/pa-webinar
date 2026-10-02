@@ -107,21 +107,20 @@ differently.
 
 The chart uses `infra/helm/pa-webinar/files/jibri-finalize.sh`. When `jitsi.enabled` and
 `jitsi-meet.jibri.enabled` are both true, `templates/configmap-jibri-finalize.yaml` renders the script
-into the ConfigMap `<fullname>-jibri-finalize` under the key `finalize.sh`. For a release named
-`pa-webinar`, the ConfigMap is `pa-webinar-jibri-finalize`.
+into the ConfigMap `pa-webinar-jibri-finalize` under the key `finalize.sh` (also as
+`<fullname>-jibri-finalize`, the name earlier versions documented for mounting by hand).
 
-The chart renders that ConfigMap but does not mount it, and sets none of the script's variables in the
-Jibri container. [Setting up recording](../../docs/operations/recording-setup.md#mount-the-finalize-script)
-shows how to mount it and pass `APP_INTERNAL_URL`, `CRON_API_KEY` and `RECORDING_WEBHOOK_SECRET`. Pass
-the two secrets through `jitsi-meet.jibri.extraSecrets`, which exposes only the keys you name. Two
-alternatives suggested elsewhere in the repository expose more:
+The chart mounts it at `/config/finalize.sh` and passes the script its inputs: `APP_INTERNAL_URL` in
+`jitsi-meet.jibri.extraEnvs`, and `CRON_API_KEY` and `RECORDING_WEBHOOK_SECRET` through
+`jitsi-meet.jibri.extraSecrets`, which exposes only the keys it names
+([Setting up recording](../../docs/operations/recording-setup.md#mount-the-finalize-script)). Two
+alternatives suggested elsewhere expose more:
 
 - The script's header comment suggests `jitsi-meet.jibri.extraEnvs`. The subchart writes `extraEnvs`
   into a ConfigMap, so a secret placed there is stored in plain text and readable by anyone who can
   read ConfigMaps in the namespace.
-- The comment in `values.yaml` suggests `jitsi-meet.jibri.extraSecretsFrom` on the app Secret. That
-  loads every key of the app Secret, such as `DATABASE_URL` and `PII_ENCRYPTION_KEY`, into the Jibri
-  container.
+- `jitsi-meet.jibri.extraSecretsFrom` on the app Secret loads every key of the app Secret, such as
+  `DATABASE_URL` and `PII_ENCRYPTION_KEY`, into the Jibri container.
 
 The page [Recording](../../docs/architecture/recording.md#from-mp4-to-recording-the-finalize-contract)
 describes what the chart's script does and which webhook it calls. The Docker Compose stack has no Jibri
@@ -136,7 +135,7 @@ script uses the same signature and the same payload fields, without `participant
 
 | | Chart script (`infra/helm/pa-webinar/files/jibri-finalize.sh`) | Standalone script (`infra/jitsi/jibri-finalize.sh`) |
 |---|---|---|
-| Shipped by | The chart, as ConfigMap `<fullname>-jibri-finalize` | Nothing |
+| Shipped by | The chart, as ConfigMap `pa-webinar-jibri-finalize`, mounted in Jibri | Nothing |
 | Upload | A `PUT` to a single-object write URL from `POST /api/internal/recording-upload-url`. Storage credentials stay in the portal | The command-line tool selected by `RECORDING_STORAGE_TYPE`: `azcopy`, `aws`, `gcloud` or `mc`. `local` skips the upload. Storage credentials must be in the Jibri container |
 | Webhook address | Always `$APP_INTERNAL_URL/api/webhooks/recording` | `$RECORDING_WEBHOOK_URL`. No webhook when it is unset |
 | Webhook payload | `roomName`, `recordingUrl`, `filename`, `duration`, `fileSize` | The same fields plus `participants`, which the portal stores encrypted on the `CallSession`. Without `jq` or `python3`, `participants` is left out |

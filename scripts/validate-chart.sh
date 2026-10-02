@@ -649,13 +649,15 @@ PY
   # portale si aspetta. Tutti difetti che non fermano l'installazione e si
   # vedono solo usandola: una pagina di stato rossa con le sale che
   # funzionano, ospiti moderatori, eventi che non si chiudono mai.
-  if ! python3 - "$reso" "$nome" >"$OUT/$nome.conf" 2>"$OUT/$nome.conf.err" <<'PY'
+  if ! python3 - "$reso" "$nome" "$CHART" >"$OUT/$nome.conf" 2>"$OUT/$nome.conf.err" <<'PY'
+import os
 import re
 import sys
 
 import yaml
 
 docs = [d for d in yaml.safe_load_all(open(sys.argv[1])) if d]
+SCRIPT_FINE_REGISTRAZIONE = open(os.path.join(sys.argv[3], "files/jibri-finalize.sh")).read().strip()
 profilo = sys.argv[2]
 
 
@@ -808,6 +810,31 @@ if jibri_reso and "JIBRI_HEALTH_URL" in variabili:
                     ambiente[e["name"]] = str(e["value"])
         if "jibri.api.http.external-api-host=0.0.0.0" not in str(ambiente.get("JAVA_TOOL_OPTIONS", "")):
             print(f"{nome_j}: senza -Djibri.api.http.external-api-host=0.0.0.0 in JAVA_TOOL_OPTIONS l'API di salute di Jibri ascolta solo su 127.0.0.1 e il portale non la raggiunge (JIBRI_HEALTH_URL)")
+        # Lo script di fine registrazione: montato dove Jibri lo cerca, ed e'
+        # quello del chart (che firma l'avviso al portale), non una copia.
+        spec_j = modello_j.get("spec") or {}
+        volumi_j = {v.get("name"): v for v in spec_j.get("volumes") or []}
+        script = None
+        for c in spec_j.get("containers") or []:
+            for m in c.get("volumeMounts") or []:
+                if m.get("mountPath") == "/config/finalize.sh":
+                    v = volumi_j.get(m.get("name")) or {}
+                    dati = mappe.get((v.get("configMap") or {}).get("name"), {})
+                    script = dati.get(m.get("subPath") or "finalize.sh")
+        if script is None:
+            print(f"{nome_j}: nessuno script montato in /config/finalize.sh: le registrazioni restano sul disco di Jibri e il portale non le vede")
+        elif script.strip() != SCRIPT_FINE_REGISTRAZIONE:
+            print(f"{nome_j}: lo script in /config/finalize.sh non e' files/jibri-finalize.sh del chart")
+        # Le variabili che lo script usa con l'applicazione.
+        url_app = f"http://{nome_app}:{(servizi.get(nome_app) or {}).get('spec', {}).get('ports', [{}])[0].get('port')}"
+        if ambiente.get("APP_INTERNAL_URL") != url_app:
+            print(f"{nome_j}: APP_INTERNAL_URL e' {ambiente.get('APP_INTERNAL_URL')!r}, il Service dell'applicazione risponde a {url_app!r}")
+        chiavi_j = {e["name"]: e for c in spec_j.get("containers") or [] for e in c.get("env") or []}
+        segreto_app = next((f.get("secretRef", {}).get("name") for f in contenitore.get("envFrom") or [] if f.get("secretRef")), None)
+        rif = ((chiavi_j.get("CRON_API_KEY") or {}).get("valueFrom") or {}).get("secretKeyRef") or {}
+        da_secret = any((f.get("secretRef") or {}).get("name") == segreto_app for c in spec_j.get("containers") or [] for f in c.get("envFrom") or [])
+        if rif.get("name") != segreto_app and not da_secret:
+            print(f"{nome_j}: CRON_API_KEY non arriva dal Secret dell'applicazione ({segreto_app!r}): lo script non puo' chiedere dove caricare il file")
 
 # Come è installata la piattaforma, per la pagina di stato.
 if variabili.get("DEPLOY_PROFILE") not in ("simple", "standard", "full"):
@@ -1320,6 +1347,8 @@ deve_fallire "Jicofo senza autenticazione e Prosody senza i ruoli dal token" "XM
   --set-string 'jitsi-meet.prosody.extraEnvs.XMPP_MUC_MODULES=muc_size'
 deve_fallire "modulo dei ruoli richiesto ma non montato" "/prosody-plugins-custom" \
   --set 'jitsi-meet.prosody.extraVolumeMounts=null'
+deve_fallire "script di fine registrazione montato due volte" "_finalize_sh" \
+  --set jitsi-meet.jibri.enabled=true --set-string 'jitsi-meet.jibri.custom.other._finalize_sh=#!/bin/sh'
 # Nomi pubblici: forma, coincidenza con le chiavi esplicite, valori del
 # sottochart che il chart non può ricavare.
 deve_fallire "site.portalHost con lo schema" "site.portalHost" \
