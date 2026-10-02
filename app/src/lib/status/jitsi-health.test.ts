@@ -55,7 +55,7 @@ describe('getJitsiHealth — Jitsi incluso, indirizzi interni', () => {
     expect(h.prosody).toMatchObject({ status: 'operational', via: 'internal' });
     expect(h.jicofo).toMatchObject({ status: 'operational', via: 'internal' });
     const chiamati = fetchMock.mock.calls.map((c) => String(c[0]));
-    expect(chiamati.some((u) => u.startsWith('https://jitsi.example.test'))).toBe(false);
+    expect(chiamati.some((u) => new URL(u).hostname === 'jitsi.example.test')).toBe(false);
     // /about/health risponde solo con i controlli di salute accesi.
     expect(chiamati).toContain('http://rel-jicofo-rest:8888/about/version');
   });

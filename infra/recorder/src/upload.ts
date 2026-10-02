@@ -143,8 +143,9 @@ async function putToSignedUrl(
   const headers: Record<string, string> = {
     'Content-Type': input.contentType,
   };
-  // Azure Blob: PUT Blob richiede x-ms-blob-type (vedi client.py:233).
-  if (url.includes('blob.core.windows.net')) {
+  // Azure Blob: PUT Blob richiede x-ms-blob-type (vedi client.py:233). Si
+  // guarda l'host, non una sottostringa dell'indirizzo intero.
+  if (new URL(url).hostname.endsWith('.blob.core.windows.net')) {
     headers['x-ms-blob-type'] = 'BlockBlob';
   }
   const res = await fetchImpl(url, {

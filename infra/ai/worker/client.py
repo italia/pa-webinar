@@ -17,6 +17,7 @@ from __future__ import annotations
 import logging
 import os
 from typing import Any, Dict, List, Optional
+from urllib.parse import urlparse
 
 import httpx
 from pydantic import BaseModel, ConfigDict, Field
@@ -237,7 +238,8 @@ def _put_headers(url: str, content_type: str) -> Dict[str, str]:
     the extra header), so we only add it for Azure blob endpoints.
     """
     headers = {"content-type": content_type}
-    if "blob.core.windows.net" in url:
+    # Si guarda l'host, non una sottostringa dell'indirizzo intero.
+    if (urlparse(url).hostname or "").endswith(".blob.core.windows.net"):
         headers["x-ms-blob-type"] = "BlockBlob"
     return headers
 

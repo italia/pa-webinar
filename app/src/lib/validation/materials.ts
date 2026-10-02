@@ -48,9 +48,19 @@ export const MATERIAL_FILE_MAX_BYTES = 25 * 1024 * 1024;
 export const MATERIAL_FILES_PER_EVENT_MAX = 50;
 export const MATERIAL_FILES_PER_EVENT_MAX_BYTES = 500 * 1024 * 1024;
 
+/**
+ * L'indirizzo di un materiale: solo http e https. Un materiale e' un link
+ * cliccato da chi partecipa, e `javascript:` o `data:` non ci devono stare
+ * nemmeno quando l'interfaccia li renderebbe innocui.
+ */
+export const materialUrlSchema = z
+  .string()
+  .url()
+  .refine((v) => /^https?:\/\//i.test(v), { message: 'Only http and https addresses' });
+
 export const materialBaseSchema = z.object({
   title: z.string().min(1).max(300),
-  url: z.string().url(),
+  url: materialUrlSchema,
   description: z.string().max(500).nullable().optional(),
   type: z.enum(MATERIAL_TYPES).default('LINK'),
   fileName: z.string().max(500).nullable().optional(),

@@ -316,6 +316,7 @@ async function fetchPrometheusData(namespace: string): Promise<PrometheusData> {
   // meaningful number instead of one per label combination.
   const durationBucket = `http_request_duration_seconds_bucket{namespace="${NS}",app="${APP}"}`;
   const requestsTotal = `http_requests_total{namespace="${NS}",app="${APP}"}`;
+  const requestsTotal5xx = `http_requests_total{namespace="${NS}",app="${APP}",status_code=~"5.."}`;
 
   try {
     const [
@@ -334,7 +335,7 @@ async function fetchPrometheusData(namespace: string): Promise<PrometheusData> {
       queryPrometheus(`histogram_quantile(0.50, sum by (le) (rate(${durationBucket}[5m])))`).catch(() => null),
       queryPrometheus(`histogram_quantile(0.95, sum by (le) (rate(${durationBucket}[5m])))`).catch(() => null),
       queryPrometheus(`histogram_quantile(0.99, sum by (le) (rate(${durationBucket}[5m])))`).catch(() => null),
-      queryPrometheus(`sum(rate(${requestsTotal.replace('}', ',status_code=~"5.."}')}[5m])) / clamp_min(sum(rate(${requestsTotal}[5m])), 0.001)`).catch(() => null),
+      queryPrometheus(`sum(rate(${requestsTotal5xx}[5m])) / clamp_min(sum(rate(${requestsTotal}[5m])), 0.001)`).catch(() => null),
       queryPrometheus(`sum(rate(${requestsTotal}[5m]))`).catch(() => null),
       queryPrometheus(`max(time() - process_start_time_seconds{namespace="${NS}",app="${APP}"})`).catch(() => null),
       queryPrometheusRange(

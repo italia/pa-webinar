@@ -4,6 +4,7 @@ import {
   EVENT_DESCRIPTION_MIN_LENGTH,
   EVENT_DESCRIPTION_REQUIRED_LOCALE,
 } from './event-description';
+import { materialUrlSchema } from './materials';
 
 // ── Event Schemas ────────────────────────────────────
 
@@ -379,7 +380,7 @@ export type PollVoteInput = z.infer<typeof pollVoteSchema>;
 
 export const createMaterialSchema = z.object({
   title: z.string().min(1).max(300),
-  url: z.string().url(),
+  url: materialUrlSchema,
   description: z.string().max(500).optional(),
 });
 

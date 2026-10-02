@@ -64,6 +64,13 @@ function getInitials(name: string): string {
   return (first + last).toUpperCase();
 }
 
+/** Le iniziali vanno nel testo di un SVG: un nome che comincia con «<» o «&»
+ *  darebbe un XML non valido, e l'avatar non si vedrebbe. */
+const XML_ESC: Record<string, string> = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;' };
+function escapeXml(s: string): string {
+  return s.replace(/[&<>"']/g, (c) => XML_ESC[c]!);
+}
+
 export function generateAvatarSvg(name: string, size: number): string {
   const idx = hashName(name) % BI_PALETTE.length;
   const entry = BI_PALETTE[idx] ?? BI_PALETTE[0]!;
@@ -85,7 +92,7 @@ export function generateAvatarSvg(name: string, size: number): string {
     font-family="'Titillium Web','Segoe UI',system-ui,sans-serif"
     font-weight="600" font-size="${fontSize}px"
     fill="${fg}" fill-opacity="0.95"
-    letter-spacing="1">${initials}</text>
+    letter-spacing="1">${escapeXml(initials)}</text>
 </svg>`;
 }
 

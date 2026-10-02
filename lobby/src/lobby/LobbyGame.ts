@@ -250,7 +250,8 @@ function injectStyles(): HTMLStyleElement {
 }
 
 function genId(): string {
-  const c = globalThis.crypto as Crypto | undefined;
-  if (c && typeof c.randomUUID === 'function') return `self_${c.randomUUID().slice(0, 8)}`;
-  return `self_${Math.random().toString(36).slice(2, 10)}`;
+  // getRandomValues c'e' anche fuori da HTTPS, dove manca randomUUID: niente
+  // ripiego su Math.random. Otto caratteri esadecimali, come prima.
+  const b = globalThis.crypto.getRandomValues(new Uint8Array(4));
+  return `self_${Array.from(b, (x) => x.toString(16).padStart(2, '0')).join('')}`;
 }
