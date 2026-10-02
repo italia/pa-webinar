@@ -345,8 +345,7 @@ disagreement on each point (`AgendaItemReaction`).
 [Live interaction and realtime](architecture/live-interaction.md)
 
 **Chat** (`ChatMessage`): the room's text chat. Messages are stored in
-PostgreSQL and fanned out through Redis. A message can be marked as a question
-(`isQuestion`) and filtered in a questions view.
+PostgreSQL and fanned out through Redis. Questions go through the Q&A panel.
 [Live interaction and realtime](architecture/live-interaction.md)
 
 **Control bar and drawer**: the live room's floating buttons over the video,

@@ -362,7 +362,7 @@ erDiagram
 
 How to read it:
 
-- **Two ways to ask a question.** A chat message ticked as a question (`ChatMessage.isQuestion`) stays in the conversation. The moderator's verdict on it is two timestamps, `answeredAt` and `dismissedAt`, kept separate from the author's intent. The Q&A panel uses its own `Question` rows, with upvotes and the `QuestionStatus` workflow. Both are described in [live-interaction.md](live-interaction.md).
+- **Questions.** The room collects questions in the Q&A panel, as `Question` rows with upvotes. `ChatMessage.isQuestion`, `answeredAt` and `dismissedAt` remain in the chat model and API, but the room does not set them.
 - **Hiding is a soft delete.** A moderator sets `hiddenAt` and `hiddenBy`. The row stays, but it leaves history and exports. Hiding also deletes the message's attachment file, on a best-effort basis.
 - **Reactions come in three kinds.** `ChatMessageReaction` is an emoji on one chat message. `AgendaItemReaction` is agree or disagree on an agenda item. `Reaction` is one click on the app's reaction bar and stores only the emoji and the time. These rows are analytics only: they are written best-effort after the in-memory counter, capped per event, and do not drive the live count.
 - **PostgreSQL is canonical for these tables.** Each route writes its row first, then notifies the other pods through Redis ([ADR-005](../adr/005-live-interaction-in-portal.md)). Some live state has no table: the timer and the reaction-bar counters live in each pod's memory, presence in the square lives in Redis with a short TTL, and the raised-hand queue belongs to Jitsi ([live-interaction.md](live-interaction.md)).
