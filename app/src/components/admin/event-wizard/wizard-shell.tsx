@@ -30,6 +30,7 @@ import {
   type PermissionMatrix,
 } from '@/lib/utils/permission-matrix';
 import { toDatetimeLocalInTz, fromDatetimeLocalInTz } from '@/lib/utils/date-format';
+import { parseLocaleList, SOURCE_LANGUAGE_FALLBACK } from '@/lib/ai/target-locales';
 import type { JvbSizingConfig } from '@/lib/jvb-sizing';
 import type { VideoQualityPreset } from '@/lib/jitsi/config';
 
@@ -108,6 +109,11 @@ export interface WizardProps {
    *  (`resolveWhiteboardInfraReady`, letto dalla pagina server). Senza, la
    *  sala non mostra la lavagna e il passo 2 non la offre. */
   whiteboardInfraReady: boolean;
+  /** Le lingue di traduzione predefinite dell'istanza (SiteSetting). */
+  defaultTargetLocales?: string | null;
+  /** Il moderatore principale di partenza di un evento nuovo: chi lo crea,
+   *  quando entra con un account nominale. */
+  defaultModerator?: { name: string; email: string } | null;
   /** When `'edit'`, the wizard seeds state from `initialEvent`, PUTs to
    *  /api/events/:id on submit, and redirects to the admin detail page.
    *  When `'create'` (default), it POSTs to /api/events and falls into the
@@ -249,16 +255,34 @@ export default function EventWizard(props: WizardProps) {
     snapshotRef.current = structuredClone(initialEvent);
   }
 
-  const defaultStart = new Date(Date.now() + 24 * 3600_000);
-  // Durata predefinita dal template (semplificazione): l'utente meno esperto
-  // imposta solo l'inizio e la fine è calcolata. Default 120 min se il
-  // template non la specifica.
-  const defaultDurationMin = props.template?.defaultDurationMinutes ?? 120;
-  const defaultEnd = new Date(defaultStart.getTime() + defaultDurationMin * 60_000);
 
   // Initial form state seeded from template (when given) + sensible defaults,
   // or — in edit mode — from `initialEvent`.
   const initial: WizardForm = useMemo(() => {
+    // Un evento nuovo parte da domani alle 10 nell'ora dell'istanza: un orario
+    // da riunione, non il minuto in cui si apre il modulo. "Domani" e' il
+    // giorno di calendario dopo oggi in quel fuso, non adesso piu' 24 ore
+    // (che al cambio dell'ora legale salta un giorno o resta su oggi).
+    const [y, m, d] = toDatetimeLocalInTz(new Date(), props.siteTimezone)
+      .slice(0, 10)
+      .split('-')
+      .map(Number);
+    const domani = new Date(Date.UTC(y!, m! - 1, d! + 1)).toISOString().slice(0, 10);
+    const defaultStart = fromDatetimeLocalInTz(`${domani}T10:00`, props.siteTimezone);
+    // Durata predefinita dal template (semplificazione): l'utente meno esperto
+    // imposta solo l'inizio e la fine è calcolata. Default 120 min se il
+    // template non la specifica.
+    const defaultDurationMin = props.template?.defaultDurationMinutes ?? 120;
+    const defaultEnd = new Date(defaultStart.getTime() + defaultDurationMin * 60_000);
+    // Traduzione accesa senza lingue (un modello o un evento che ereditava le
+    // lingue dell'istanza): si parte da quelle dell'istanza, gia' spuntate.
+    const lingueDiPartenza = (traduce: boolean | null | undefined, lingue: string | null | undefined) =>
+      lingue ??
+      (traduce
+        ? parseLocaleList(props.defaultTargetLocales)
+            .filter((c) => c !== SOURCE_LANGUAGE_FALLBACK)
+            .join(',') || null
+        : null);
     if (mode === 'edit' && initialEvent) {
       const ev = initialEvent.event;
       // Prefer the stored matrix; if absent (older events), project from
@@ -311,7 +335,7 @@ export default function EventWizard(props: WizardProps) {
         aiDubbingEnabled: ev.aiDubbingEnabled ?? false,
         multitrackRecordingEnabled: ev.multitrackRecordingEnabled ?? false,
         retainParticipantTracks: ev.retainParticipantTracks ?? false,
-        aiTargetLocales: ev.aiTargetLocales ?? null,
+        aiTargetLocales: lingueDiPartenza(ev.aiTranslationEnabled, ev.aiTargetLocales),
         expectedSpeakers: ev.expectedSpeakers ?? null,
 
         // Step 3 — seed lists from related entities.
@@ -450,7 +474,7 @@ export default function EventWizard(props: WizardProps) {
         (tpl?.recordingEnabled ?? false) &&
         (tpl?.multitrackRecordingEnabled ?? false) &&
         (tpl?.retainParticipantTracks ?? false),
-      aiTargetLocales: tpl?.aiTargetLocales ?? null,
+      aiTargetLocales: lingueDiPartenza(tpl?.aiTranslationEnabled, tpl?.aiTargetLocales),
       expectedSpeakers: tpl?.defaultExpectedSpeakers ?? null,
 
       // Step 3
@@ -472,8 +496,8 @@ export default function EventWizard(props: WizardProps) {
       gdprTemplateId: props.gdprTemplates.find((g) => g.isDefault)?.id ?? null,
       privacyPolicyText: '',
       privacyPolicyUrl: null,
-      moderatorName: '',
-      moderatorEmail: '',
+      moderatorName: props.defaultModerator?.name ?? '',
+      moderatorEmail: props.defaultModerator?.email ?? '',
     } satisfies WizardForm;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.template, mode, initialEvent]);
@@ -580,6 +604,7 @@ export default function EventWizard(props: WizardProps) {
           if (el.getAttribute('aria-describedby') !== voluto) el.setAttribute('aria-describedby', voluto);
         }
         const etichetta =
+          el.getAttribute('data-wizard-label') ||
           (el.id && root.querySelector(`label[for="${el.id}"]`)?.textContent?.trim()) ||
           el.getAttribute('aria-label') ||
           el.getAttribute('placeholder') ||
@@ -1218,6 +1243,8 @@ export default function EventWizard(props: WizardProps) {
             onChange={updateForm}
             fieldErrors={fieldErrors}
             whiteboardInfraReady={props.whiteboardInfraReady}
+            defaultTargetLocales={props.defaultTargetLocales}
+            eventLocale={SOURCE_LANGUAGE_FALLBACK}
           />
         )}
         {activeStep === 'invites' && (
@@ -1242,6 +1269,7 @@ export default function EventWizard(props: WizardProps) {
             defaultLocale={props.defaultLocale}
             gdprTemplates={props.gdprTemplates}
             fieldErrors={fieldErrors}
+            prefilledModeratorEmail={mode === 'edit' ? null : props.defaultModerator?.email ?? null}
           />
         )}
       </div>

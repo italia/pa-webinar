@@ -32,6 +32,7 @@ import { NotFoundError } from '@/lib/errors';
 import { ADMIN_ONLY_CACHE_CONTROL, statusDataAccess } from '@/lib/status-page';
 import { prisma } from '@/lib/db';
 import { refreshPostprodGauges } from '@/lib/ai/metrics';
+import { DEFAULT_TARGET_LOCALES } from '@/lib/ai/target-locales';
 
 export const dynamic = 'force-dynamic';
 
@@ -218,7 +219,7 @@ export const GET = withErrorHandling(async () => {
     config: {
       llmProvider: site?.aiLlmProvider ?? 'vllm',
       asrProvider: site?.aiAsrProvider ?? 'whisperx',
-      defaultTargetLocales: (site?.aiDefaultTargetLocales ?? 'en,fr')
+      defaultTargetLocales: (site?.aiDefaultTargetLocales ?? DEFAULT_TARGET_LOCALES)
         .split(',')
         .map((s) => s.trim())
         .filter(Boolean),

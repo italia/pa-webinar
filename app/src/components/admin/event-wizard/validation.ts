@@ -10,6 +10,7 @@ import {
   EVENT_DESCRIPTION_MIN_LENGTH,
   EVENT_DESCRIPTION_REQUIRED_LOCALE,
 } from '@/lib/validation/event-description';
+import { parseLocaleList } from '@/lib/ai/target-locales';
 
 import type { WizardForm } from './wizard-shell';
 
@@ -63,7 +64,9 @@ export function validateStep(
   if (step === 'permissions') {
     // La traduzione automatica senza lingue target non produce nulla:
     // richiediamo almeno una lingua. (Errore mostrato nello step 2.)
-    if (form.aiTranslationEnabled && !(form.aiTargetLocales ?? '').trim()) {
+    // Letti come li legge la pipeline: un valore vecchio scritto a mano
+    // ("english", "en;fr") non conta come lingua.
+    if (form.aiTranslationEnabled && parseLocaleList(form.aiTargetLocales).length === 0) {
       errs['aiTargetLocales'] = 'required';
     }
   }

@@ -316,7 +316,7 @@ Defaults are those of `app/prisma/schema.prisma`.
 | Setting | Label | Default | Accepted | Meaning |
 |---|---|---|---|---|
 | `aiPipelineEnabled` | **Post-event pipeline active** | `false` | on or off | The kill switch for the whole pipeline (see below) |
-| `aiDefaultTargetLocales` | **Default translation languages** | `en,fr` | text up to 200 characters, read as comma-separated language codes; invalid entries are ignored when jobs are queued | The translation targets of an event that sets none. The recording's source language is always dropped from the list |
+| `aiDefaultTargetLocales` | **Default translation languages** | `en,fr,es,de` | language checkboxes, stored as comma-separated language codes; invalid entries are ignored when jobs are queued | Ticked in the event wizard when translation is turned on, and the translation targets of an event that sets none. The recording's source language is always dropped from the list |
 | `aiAsrProvider` | **Transcription engine** | `whisperx` | `whisperx` only | The transcription engine the worker is told to use |
 | `aiLlmProvider` | **Summary and translation engine** | `vllm` | `vllm` only | The language-model engine, served in the cluster |
 | `aiTtsEngine` | **Dubbing engine** | `piper` | `piper` only | The engine for synthetic dubbing voices |

@@ -1266,7 +1266,7 @@ this table gives only their effect on the pipeline.
 |---|---|---|
 | `aiPipelineEnabled` | **Post-event pipeline active** | Master switch: no enqueue, no new workers, and every public AI endpoint answers `404` while it is off. It does not scale vLLM down ([vLLM on demand](#vllm-on-demand)) |
 | `aiAsrProvider`, `aiLlmProvider`, `aiTtsEngine` | **Transcription engine**, **Summary and translation engine**, **Dubbing engine** | One allowed value each ([Data sovereignty](#data-sovereignty)) |
-| `aiDefaultTargetLocales` | **Default translation languages** | Target languages for events without their own |
+| `aiDefaultTargetLocales` | **Default translation languages** | Target languages ticked in the wizard when translation is turned on, and used for events without their own (`en,fr,es,de` on a new installation) |
 | `aiMaxConcurrentJobs` | **Parallel jobs** | Upper bound on concurrent workers, reached only when that many jobs are runnable at once ([The orchestrator](#the-orchestrator)) |
 | `aiJobMaxAttempts` | **Attempts before failure** | Attempt cap per job ([Retries and backoff](#retries-and-backoff)) |
 | `aiArtifactRetentionDays` | **Artifact retention (days)** | `0` sets no site-wide cap: outputs follow the event's retention, or the published video's lifetime. A positive value makes the daily retention job delete every artifact older than that many days, published recordings included ([Recordings, voice data and AI outputs](privacy/recordings-and-ai.md)) |
@@ -1284,7 +1284,7 @@ post-production**. An event template can pre-fill all of them.
 | `retainParticipantTracks` | **Keep per-participant tracks** | Keeps the tracks after transcription, for per-speaker playback and the archive |
 | `aiSummaryEnabled` | **Summary and chapters** | Adds `SUMMARIZE` |
 | `aiTranslationEnabled` | **Translation into other languages** | Adds `TRANSLATE` for each target language |
-| `aiTargetLocales` | **Translation languages** | Comma-separated language codes; the wizard asks for at least one when translation is on |
+| `aiTargetLocales` | **Translation languages** | Chosen with checkboxes (English, French, Spanish and German first, the other EU languages in a group that opens) and stored as comma-separated language codes; the wizard asks for at least one when translation is on |
 | `aiDubbingEnabled` | **Audio dubbing** | Adds `DUB` for each target language; needs translation |
 | `expectedSpeakers` | **Expected number of speakers** | Forces the diarization to that number of speakers (1 to 30) |
 

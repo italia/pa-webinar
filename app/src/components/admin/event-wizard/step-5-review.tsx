@@ -10,10 +10,11 @@
  * fields that are review-specific.
  */
 
+import { useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 
 import EventConfigDiagram from '@/components/admin/event-config-diagram';
-import JvbCapacityPreview from '@/components/admin/jvb-capacity-preview';
+import JvbCapacityPreview, { capacityWarnings } from '@/components/admin/jvb-capacity-preview';
 import FileOrUrlInput from '@/components/ui/file-or-url-input';
 import { togglesFromMatrix } from '@/lib/utils/permission-matrix';
 import { describeRRule } from '@/lib/utils/recurrence';
@@ -46,6 +47,9 @@ interface Props {
   defaultLocale: string;
   gdprTemplates: Array<{ id: string; name: string; isDefault: boolean }>;
   fieldErrors?: Record<string, string>;
+  /** L'email con cui il wizard ha precompilato il moderatore principale (chi
+   *  crea l'evento): finche' resta quella, la pagina lo dice. */
+  prefilledModeratorEmail?: string | null;
 }
 
 export default function Step5Review({
@@ -56,9 +60,25 @@ export default function Step5Review({
   defaultLocale,
   gdprTemplates,
   fieldErrors = {},
+  prefilledModeratorEmail = null,
 }: Props) {
   const t = useTranslations('admin.wizard.step5');
   const toggles = togglesFromMatrix(form.permissionMatrix);
+  // I dettagli tecnici sono ripiegati, ma un avviso di capacita' (bridge al
+  // tetto, quota di partecipanti attivi ereditata su un evento grande) non
+  // deve restare dentro: con un avviso la sezione si apre da sola.
+  const avvisi = capacityWarnings({
+    maxParticipants: form.maxParticipants,
+    senderRatioPct: form.expectedSenderRatioPct,
+    videoEnabled: toggles.participantsCanStartVideo,
+    defaultSenderRatioPct,
+    sizingConfig: jvbSizingConfig,
+  });
+  const conAvviso = avvisi.atCeiling || avvisi.shouldWarnInherited;
+  const tecnicaRef = useRef<HTMLDetailsElement>(null);
+  useEffect(() => {
+    if (conAvviso && tecnicaRef.current) tecnicaRef.current.open = true;
+  }, [conAvviso]);
   // Use the site default locale (not a client-side navigator.language guess)
   // so the summary is stable and correct for locale-only events.
   const locale: 'it' | 'en' = defaultLocale === 'it' ? 'it' : 'en';
@@ -148,6 +168,69 @@ export default function Step5Review({
           )}
         </div>
       </div>
+
+      {/* Primary moderator: name+email are required to publish. This person
+          receives the moderator magic link (ADR-003) — distinct from the
+          additional co-moderators added in the People step. */}
+      <section className="mb-4">
+        <h3 className="h6 fw-semibold mb-2" style={{ color: 'var(--app-text)' }}>
+          {t('moderatorHeading')}
+        </h3>
+        <p className="text-secondary mb-2" style={{ fontSize: '0.82rem' }}>
+          {t('moderatorPublishHint')}
+        </p>
+        {/* Precompilato con chi crea l'evento: se lo modera un'altra persona,
+            il link deve arrivare a lei, non a chi lo ha preparato. */}
+        {prefilledModeratorEmail &&
+          (form.moderatorEmail ?? '').trim().toLowerCase() === prefilledModeratorEmail.trim().toLowerCase() && (
+            <div className="alert alert-warning py-2 mb-3" role="note" style={{ fontSize: '0.85rem' }}>
+              {t('moderatorPrefilled')}
+            </div>
+          )}
+        <div
+          className="p-2 mb-3 rounded"
+          style={{
+            background: 'rgba(0,102,204,0.08)',
+            border: '1px solid rgba(0,102,204,0.25)',
+            color: 'var(--app-text)',
+            fontSize: '0.82rem',
+          }}
+        >
+          {t('moderatorLinkNote')}
+        </div>
+        <div className="row g-3">
+          <div className="col-md-6">
+            <label className="form-label" htmlFor="rev-mod-name">
+              {t('moderatorName')}
+            </label>
+            <input
+              id="rev-mod-name"
+              type="text"
+              className={`form-control${fieldErrors.moderatorName ? ' is-invalid' : ''}`}
+              value={form.moderatorName ?? ''}
+              onChange={(e) => onChange({ moderatorName: e.target.value })}
+            />
+            {fieldErrors.moderatorName && (
+              <div className="invalid-feedback d-block">{t('moderatorRequired')}</div>
+            )}
+          </div>
+          <div className="col-md-6">
+            <label className="form-label" htmlFor="rev-mod-email">
+              {t('moderatorEmail')}
+            </label>
+            <input
+              id="rev-mod-email"
+              type="email"
+              className={`form-control${fieldErrors.moderatorEmail ? ' is-invalid' : ''}`}
+              value={form.moderatorEmail ?? ''}
+              onChange={(e) => onChange({ moderatorEmail: e.target.value })}
+            />
+            {fieldErrors.moderatorEmail && (
+              <div className="invalid-feedback d-block">{t('moderatorEmailRequired')}</div>
+            )}
+          </div>
+        </div>
+      </section>
 
       {/* GDPR / retention */}
       <section className="mb-4">
@@ -239,97 +322,47 @@ export default function Step5Review({
         </div>
       </section>
 
-      {/* Primary moderator: name+email are required to publish. This person
-          receives the moderator magic link (ADR-003) — distinct from the
-          additional co-moderators added in the People step. */}
-      <section className="mb-4">
-        <h3 className="h6 fw-semibold mb-2" style={{ color: 'var(--app-text)' }}>
-          {t('moderatorHeading')}
-        </h3>
-        <p className="text-secondary mb-2" style={{ fontSize: '0.82rem' }}>
-          {t('moderatorPublishHint')}
-        </p>
-        <div
-          className="p-2 mb-3 rounded"
-          style={{
-            background: 'rgba(0,102,204,0.08)',
-            border: '1px solid rgba(0,102,204,0.25)',
-            color: 'var(--app-text)',
-            fontSize: '0.82rem',
-          }}
-        >
-          {t('moderatorLinkNote')}
-        </div>
-        <div className="row g-3">
-          <div className="col-md-6">
-            <label className="form-label" htmlFor="rev-mod-name">
-              {t('moderatorName')}
-            </label>
-            <input
-              id="rev-mod-name"
-              type="text"
-              className={`form-control${fieldErrors.moderatorName ? ' is-invalid' : ''}`}
-              value={form.moderatorName ?? ''}
-              onChange={(e) => onChange({ moderatorName: e.target.value })}
-            />
-            {fieldErrors.moderatorName && (
-              <div className="invalid-feedback d-block">{t('moderatorRequired')}</div>
-            )}
-          </div>
-          <div className="col-md-6">
-            <label className="form-label" htmlFor="rev-mod-email">
-              {t('moderatorEmail')}
-            </label>
-            <input
-              id="rev-mod-email"
-              type="email"
-              className={`form-control${fieldErrors.moderatorEmail ? ' is-invalid' : ''}`}
-              value={form.moderatorEmail ?? ''}
-              onChange={(e) => onChange({ moderatorEmail: e.target.value })}
-            />
-            {fieldErrors.moderatorEmail && (
-              <div className="invalid-feedback d-block">{t('moderatorEmailRequired')}</div>
-            )}
-          </div>
-        </div>
-      </section>
+      {/* Capacita' e risorse: utili a chi dimensiona l'installazione, non a
+          chi prepara l'evento. Chiuse: il modello le ha gia' impostate. */}
+      <details className="wizard-tech mb-3" ref={tecnicaRef}>
+        <summary>{t('technicalDetails')}</summary>
+        {/* Load capacity */}
+        <section className="mb-4">
+          <h3 className="h6 fw-semibold mb-2" style={{ color: 'var(--app-text)' }}>
+            {t('capacityHeading')}
+          </h3>
+          <JvbCapacityPreview
+            maxParticipants={form.maxParticipants}
+            senderRatioPct={form.expectedSenderRatioPct}
+            onSenderRatioChange={(next) =>
+              onChange({ expectedSenderRatioPct: next })
+            }
+            videoEnabled={toggles.participantsCanStartVideo}
+            defaultSenderRatioPct={defaultSenderRatioPct}
+            sizingConfig={jvbSizingConfig}
+          />
+        </section>
 
-      {/* Load capacity */}
-      <section className="mb-4">
-        <h3 className="h6 fw-semibold mb-2" style={{ color: 'var(--app-text)' }}>
-          {t('capacityHeading')}
-        </h3>
-        <JvbCapacityPreview
-          maxParticipants={form.maxParticipants}
-          senderRatioPct={form.expectedSenderRatioPct}
-          onSenderRatioChange={(next) =>
-            onChange({ expectedSenderRatioPct: next })
-          }
-          videoEnabled={toggles.participantsCanStartVideo}
-          defaultSenderRatioPct={defaultSenderRatioPct}
-          sizingConfig={jvbSizingConfig}
-        />
-      </section>
-
-      {/* Feature diagram */}
-      <section className="mb-3">
-        <h3 className="h6 fw-semibold mb-2" style={{ color: 'var(--app-text)' }}>
-          {t('featuresHeading')}
-        </h3>
-        <EventConfigDiagram
-          event={{
-            maxParticipants: form.maxParticipants,
-            qaEnabled: toggles.qaEnabled,
-            chatEnabled: toggles.chatEnabled,
-            recordingEnabled: form.recordingEnabled,
-            participantsCanUnmute: toggles.participantsCanUnmute,
-            participantsCanStartVideo: toggles.participantsCanStartVideo,
-            participantsCanShareScreen: toggles.participantsCanShareScreen,
-            speakers: form.speakers.map((s) => s.name).join(', ') || undefined,
-          }}
-          adminMode
-        />
-      </section>
+        {/* Feature diagram */}
+        <section className="mb-3">
+          <h3 className="h6 fw-semibold mb-2" style={{ color: 'var(--app-text)' }}>
+            {t('featuresHeading')}
+          </h3>
+          <EventConfigDiagram
+            event={{
+              maxParticipants: form.maxParticipants,
+              qaEnabled: toggles.qaEnabled,
+              chatEnabled: toggles.chatEnabled,
+              recordingEnabled: form.recordingEnabled,
+              participantsCanUnmute: toggles.participantsCanUnmute,
+              participantsCanStartVideo: toggles.participantsCanStartVideo,
+              participantsCanShareScreen: toggles.participantsCanShareScreen,
+              speakers: form.speakers.map((s) => s.name).join(', ') || undefined,
+            }}
+            adminMode
+          />
+        </section>
+      </details>
     </div>
   );
 }

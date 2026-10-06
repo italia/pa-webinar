@@ -7013,3 +7013,87 @@ html.live-resizing .live-sidebar-resizer::after {
     color: #3D4A56;
   }
 }
+
+// ── Lingue come caselle (components/admin/language-checklist)
+.lang-checklist {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.lang-checklist__legend {
+  float: none;
+  width: auto;
+  padding: 0;
+  margin-bottom: 0.25rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--app-text);
+}
+
+.lang-checklist__desc {
+  margin-bottom: 0.5rem;
+  font-size: 0.82rem;
+  color: #5A6772;
+}
+
+.lang-checklist__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 0.25rem 1rem;
+}
+
+// Le caselle di Bootstrap Italia hanno margini da modulo lungo: qui sono
+// una griglia compatta.
+.lang-checklist__item.form-check {
+  margin: 0;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+}
+
+.lang-checklist--invalid {
+  padding-left: 0.75rem;
+  border-left: 3px solid #D9364F;
+
+  // L'errore e' del gruppo: la prima casella porta il segno per il riepilogo
+  // del wizard, ma la sua lingua non e' "sbagliata".
+  .form-check-input.is-invalid ~ .form-check-label {
+    color: inherit;
+  }
+}
+
+.lang-checklist__empty {
+  margin: 0.5rem 0 0;
+  font-size: 0.82rem;
+  color: #A66300;
+}
+
+.lang-checklist__more {
+  margin-top: 0.5rem;
+
+  summary {
+    cursor: pointer;
+    color: var(--app-primary);
+    font-size: 0.88rem;
+    font-weight: 600;
+  }
+
+  .lang-checklist__grid {
+    margin-top: 0.5rem;
+  }
+}
+
+// ── Sezioni tecniche chiuse del wizard (capacita', risorse)
+.wizard-tech {
+  summary {
+    cursor: pointer;
+    color: var(--app-primary);
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 0.25rem 0;
+  }
+
+  &[open] summary {
+    margin-bottom: 0.75rem;
+  }
+}

@@ -31,6 +31,8 @@ export default function TemplatePicker({
   onSkip,
 }: TemplatePickerProps) {
   const t = useTranslations('admin.templates');
+  // Le funzioni con i nomi della matrice dei permessi del wizard.
+  const tf = useTranslations('admin.wizard.step2.feature');
 
   return (
     <div>
@@ -41,8 +43,12 @@ export default function TemplatePicker({
           <div key={tpl.id} className="col-12 col-sm-6 col-lg-3">
             <button
               type="button"
-              className="border-0 bg-transparent p-0 w-100 text-start"
+              className="border-0 bg-transparent p-0 w-100 h-100 text-start"
               onClick={() => onSelect(tpl)}
+              // Il pulsante contiene una scheda intera: il nome e' quello del
+              // modello, la descrizione arriva come aria-describedby.
+              aria-label={tpl.name}
+              aria-describedby={tpl.description ? `tpl-desc-${tpl.id}` : undefined}
             >
               <Card
                 className="h-100 border shadow-sm"
@@ -74,15 +80,16 @@ export default function TemplatePicker({
                     >
                       <Icon icon={tpl.icon} size="sm" color="primary" />
                     </div>
-                    <h6
+                    <span
                       className="fw-semibold mb-0"
                       style={{ color: 'var(--app-text)', fontSize: '0.95rem' }}
                     >
                       {tpl.name}
-                    </h6>
+                    </span>
                   </div>
                   {tpl.description && (
                     <p
+                      id={`tpl-desc-${tpl.id}`}
                       className="text-secondary mb-2 flex-grow-1"
                       style={{ fontSize: '0.8rem', lineHeight: 1.4 }}
                     >
@@ -93,24 +100,24 @@ export default function TemplatePicker({
                     className="d-flex flex-wrap gap-1"
                     style={{ fontSize: '0.7rem' }}
                   >
-                    {tpl.qaEnabled && <Badge color="primary">Q&A</Badge>}
-                    {tpl.chatEnabled && <Badge color="primary">Chat</Badge>}
-                    {tpl.recordingEnabled && <Badge color="primary">Rec</Badge>}
+                    {tpl.qaEnabled && <Badge color="primary">{tf('qa.label')}</Badge>}
+                    {tpl.chatEnabled && <Badge color="primary">{tf('chat.label')}</Badge>}
+                    {tpl.recordingEnabled && <Badge color="primary">{t('recordingLabel')}</Badge>}
                     {tpl.participantsCanUnmute && (
-                      <Badge color="info">Mic</Badge>
+                      <Badge color="info">{tf('mic.label')}</Badge>
                     )}
                     {tpl.participantsCanStartVideo && (
-                      <Badge color="info">Video</Badge>
+                      <Badge color="info">{tf('video.label')}</Badge>
                     )}
                     {tpl.participantsCanShareScreen && (
-                      <Badge color="info">Screen</Badge>
+                      <Badge color="info">{tf('share.label')}</Badge>
                     )}
                   </div>
                   <div
                     className="text-muted mt-2"
                     style={{ fontSize: '0.75rem' }}
                   >
-                    Max {tpl.maxParticipants}
+                    {t('maxParticipantsLabel')}: {tpl.maxParticipants}
                   </div>
                 </CardBody>
               </Card>

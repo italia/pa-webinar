@@ -1376,7 +1376,7 @@ model SiteSetting {
   aiPipelineEnabled       Boolean @default(false) @map("ai_pipeline_enabled")
   // Default target locales for translation when Event.aiTargetLocales
   // is null. Comma-separated ISO-639-1.
-  aiDefaultTargetLocales  String  @default("en,fr") @map("ai_default_target_locales")
+  aiDefaultTargetLocales  String  @default("en,fr,es,de") @map("ai_default_target_locales")
   // Provider routing — "vllm" or "ovh" (pluggable). The actual
   // endpoint URLs / secrets live in env vars (see lib/ai/providers).
   aiLlmProvider           String  @default("vllm") @map("ai_llm_provider")

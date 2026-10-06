@@ -1,12 +1,12 @@
 import { getLocale, getTranslations } from 'next-intl/server';
 
 import { staffOLogin } from '@/lib/auth/staff-page';
+import { tryDecryptPII } from '@/lib/crypto/pii';
 import { getPublicEnv } from '@/lib/env';
 import { resolveWhiteboardInfraReady } from '@/lib/jitsi/whiteboard';
 import { prisma } from '@/lib/db';
 import { jvbMaxReplicasFromEnv } from '@/lib/jvb-sizing';
 import { getSettings } from '@/lib/settings';
-import { Link } from '@/i18n/navigation';
 import CreateEventWithTemplate from '@/components/admin/create-event-with-template';
 import type { PermissionMatrix } from '@/lib/utils/permission-matrix';
 
@@ -31,6 +31,19 @@ export default async function CreateEventPage({
       select: { id: true, name: true, isDefault: true },
     }),
   ]);
+
+  // Chi crea l'evento da un account nominale ne e' il moderatore principale
+  // di partenza: nome ed email gia' scritti, si cambiano se serve. Con la
+  // chiave dell'istanza non c'e' un account, e i campi restano vuoti.
+  const account = session.accountId
+    ? await prisma.staffAccount.findUnique({
+        where: { id: session.accountId },
+        select: { name: true, email: true },
+      })
+    : null;
+  const moderatoreDiPartenza = account
+    ? { name: tryDecryptPII(account.name) ?? '', email: tryDecryptPII(account.email) ?? '' }
+    : null;
 
   const selectedTemplate = templateId
     ? templates.find((tpl) => tpl.id === templateId) ?? null
@@ -91,17 +104,6 @@ export default async function CreateEventPage({
 
   return (
     <div className="container py-5">
-      <div className="mb-2">
-        <Link
-          href="/admin/events"
-          className="text-decoration-none d-inline-flex align-items-center text-primary"
-          style={{ fontSize: '0.9rem' }}
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="me-1" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
-          {t('title')}
-        </Link>
-      </div>
-
       <h1 className="fw-bold mb-3" style={{ color: 'var(--app-text)' }}>
         {t('createEvent')}
       </h1>
@@ -153,6 +155,8 @@ export default async function CreateEventPage({
         whiteboardInfraReady={resolveWhiteboardInfraReady(
           getPublicEnv('NEXT_PUBLIC_WHITEBOARD_ENABLED'),
         )}
+        defaultTargetLocales={siteSettings.aiDefaultTargetLocales}
+        defaultModerator={moderatoreDiPartenza}
       />
     </div>
   );

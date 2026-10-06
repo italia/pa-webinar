@@ -447,55 +447,67 @@ export default function Step1Base({
             )}
           </div>
           <div className="col-12">
-            <label className="form-label" htmlFor="ev-sender-ratio">
-              {t('senderRatioLabel')}
-            </label>
-            <div className="d-flex align-items-center flex-wrap gap-2">
-              {SENDER_RATIO_PRESETS.map((pct) => {
-                const effective = value.expectedSenderRatioPct ?? defaultSenderRatioPct;
-                const active = effective === pct;
-                return (
-                  <button
-                    key={pct}
-                    type="button"
-                    aria-pressed={active}
-                    className={`btn btn-sm ${active ? 'btn-primary' : 'btn-outline-secondary'}`}
-                    onClick={() => onChange({ expectedSenderRatioPct: pct })}
-                  >
-                    {t('senderRatioPreset', { pct })}
-                  </button>
-                );
-              })}
-              <input
-                id="ev-sender-ratio"
-                type="number"
-                min={0}
-                max={100}
-                step={1}
-                className="form-control"
-                style={{ maxWidth: 96 }}
-                value={value.expectedSenderRatioPct ?? defaultSenderRatioPct}
-                onChange={(e) => {
-                  const raw = Number(e.target.value);
-                  if (!Number.isFinite(raw)) return;
-                  const clamped = Math.min(100, Math.max(0, Math.round(raw)));
-                  onChange({ expectedSenderRatioPct: clamped });
-                }}
-                aria-label={t('senderRatioLabel')}
-              />
-              <span className="text-muted" style={{ fontSize: '0.85rem' }}>
+            {/* Serve a dimensionare il server video: il modello la imposta, e
+                chi prepara l'evento la apre solo se vuole cambiarla. */}
+            <details className="wizard-tech">
+              <summary>
+                {t('senderRatioLabel')}: {value.expectedSenderRatioPct ?? defaultSenderRatioPct}% ·{' '}
                 {t('activeParticipantsEstimate', {
                   count: Math.round(
-                    (value.maxParticipants *
-                      (value.expectedSenderRatioPct ?? defaultSenderRatioPct)) /
-                      100,
+                    (value.maxParticipants * (value.expectedSenderRatioPct ?? defaultSenderRatioPct)) / 100,
                   ),
                 })}
-              </span>
-            </div>
-            <small className="form-text text-muted">
-              {t('senderRatioHelp')}
-            </small>
+              </summary>
+              <label className="form-label" htmlFor="ev-sender-ratio">
+                {t('senderRatioLabel')}
+              </label>
+              <div className="d-flex align-items-center flex-wrap gap-2">
+                {SENDER_RATIO_PRESETS.map((pct) => {
+                  const effective = value.expectedSenderRatioPct ?? defaultSenderRatioPct;
+                  const active = effective === pct;
+                  return (
+                    <button
+                      key={pct}
+                      type="button"
+                      aria-pressed={active}
+                      className={`btn btn-sm ${active ? 'btn-primary' : 'btn-outline-secondary'}`}
+                      onClick={() => onChange({ expectedSenderRatioPct: pct })}
+                    >
+                      {t('senderRatioPreset', { pct })}
+                    </button>
+                  );
+                })}
+                <input
+                  id="ev-sender-ratio"
+                  type="number"
+                  min={0}
+                  max={100}
+                  step={1}
+                  className="form-control"
+                  style={{ maxWidth: 96 }}
+                  value={value.expectedSenderRatioPct ?? defaultSenderRatioPct}
+                  onChange={(e) => {
+                    const raw = Number(e.target.value);
+                    if (!Number.isFinite(raw)) return;
+                    const clamped = Math.min(100, Math.max(0, Math.round(raw)));
+                    onChange({ expectedSenderRatioPct: clamped });
+                  }}
+                  aria-label={t('senderRatioLabel')}
+                />
+                <span className="text-muted" style={{ fontSize: '0.85rem' }}>
+                  {t('activeParticipantsEstimate', {
+                    count: Math.round(
+                      (value.maxParticipants *
+                        (value.expectedSenderRatioPct ?? defaultSenderRatioPct)) /
+                        100,
+                    ),
+                  })}
+                </span>
+              </div>
+              <small className="form-text text-muted">
+                {t('senderRatioHelp')}
+              </small>
+            </details>
           </div>
         </div>
       </section>

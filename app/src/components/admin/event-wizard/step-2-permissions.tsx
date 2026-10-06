@@ -12,6 +12,7 @@
 
 import { useTranslations } from 'next-intl';
 
+import LanguageChecklist, { parseLocaleList } from '@/components/admin/language-checklist';
 import ToggleSwitch from '@/components/ui/toggle-switch';
 import {
   EVENT_ROLES,
@@ -58,6 +59,12 @@ interface Props {
    * da un modello o da un evento precedente.
    */
   whiteboardInfraReady: boolean;
+  /** Le lingue di traduzione predefinite dell'istanza (`en,fr,es,de`):
+   *  si spuntano da sole quando si accende la traduzione. */
+  defaultTargetLocales?: string | null;
+  /** La lingua in cui la pipeline trascrive (SOURCE_LANGUAGE_FALLBACK): non
+   *  si offre come lingua di traduzione, la pipeline la toglierebbe. */
+  eventLocale?: string;
 }
 
 export default function Step2Permissions({
@@ -65,6 +72,8 @@ export default function Step2Permissions({
   onChange,
   fieldErrors = {},
   whiteboardInfraReady,
+  defaultTargetLocales = null,
+  eventLocale,
 }: Props) {
   const t = useTranslations('admin.wizard.step2');
   const tAdmin = useTranslations('admin');
@@ -346,7 +355,19 @@ export default function Step2Permissions({
                   const next = !value.aiTranslationEnabled;
                   onChange(
                     next
-                      ? { aiTranslationEnabled: true }
+                      ? {
+                          aiTranslationEnabled: true,
+                          // Le lingue dell'istanza gia' spuntate: si toglie
+                          // quella che non serve invece di scriverle.
+                          ...(parseLocaleList(value.aiTargetLocales).length === 0
+                            ? {
+                                aiTargetLocales:
+                                  parseLocaleList(defaultTargetLocales)
+                                    .filter((c) => c !== eventLocale)
+                                    .join(',') || null,
+                              }
+                            : {}),
+                        }
                       : {
                           aiTranslationEnabled: false,
                           aiDubbingEnabled: false,
@@ -357,41 +378,19 @@ export default function Step2Permissions({
 
               {value.aiTranslationEnabled && (
                 <div
+                  id="aiTargetLocales"
                   className="py-2"
                   style={{ borderTop: '1px solid #e8e8e8' }}
                 >
-                  <label
-                    className="fw-semibold mb-1 d-block"
-                    style={{ color: 'var(--app-text)', fontSize: '0.9rem' }}
-                    htmlFor="aiTargetLocales"
-                  >
-                    {tAdmin('form.aiTargetLocales')}
-                  </label>
-                  <p
-                    className="text-secondary mb-2"
-                    style={{ fontSize: '0.82rem' }}
-                  >
-                    {tAdmin('form.aiTargetLocalesDesc')}
-                  </p>
-                  <input
-                    id="aiTargetLocales"
-                    type="text"
-                    className={`form-control form-control-sm${fieldErrors.aiTargetLocales ? ' is-invalid' : ''}`}
-                    style={{ maxWidth: 260 }}
-                    placeholder="en,fr,de"
-                    value={value.aiTargetLocales ?? ''}
-                    onChange={(e) =>
-                      onChange({
-                        aiTargetLocales:
-                          e.target.value.trim() === '' ? null : e.target.value,
-                      })
-                    }
+                  <LanguageChecklist
+                    legend={tAdmin('form.aiTargetLocales')}
+                    description={tAdmin('form.aiTargetLocalesDesc')}
+                    value={value.aiTargetLocales}
+                    onChange={(next) => onChange({ aiTargetLocales: next })}
+                    invalid={!!fieldErrors.aiTargetLocales}
+                    errorText={tAdmin('form.aiTargetLocalesRequired')}
+                    exclude={eventLocale ? [eventLocale] : []}
                   />
-                  {fieldErrors.aiTargetLocales && (
-                    <div className="invalid-feedback d-block">
-                      {tAdmin('form.aiTargetLocalesRequired')}
-                    </div>
-                  )}
                 </div>
               )}
 

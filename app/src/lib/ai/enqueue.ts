@@ -17,6 +17,7 @@ import type { Prisma, PrismaClient } from '@prisma/client';
 
 import { deriveIdempotencyKey } from './idempotency';
 import { parseTargetLocales } from './providers';
+import { SOURCE_LANGUAGE_FALLBACK } from './target-locales';
 import { isMultitrackPlaceholder } from '@/lib/recorder/lifecycle';
 
 export interface EnqueueOptions {
@@ -94,7 +95,7 @@ export async function enqueuePostprodForRecording(
     return { enqueued: 0, skippedExisting: 0, jobIds: [] };
   }
 
-  const sourceLanguage = opts.sourceLanguage ?? recording.sourceLanguage ?? 'it';
+  const sourceLanguage = opts.sourceLanguage ?? recording.sourceLanguage ?? SOURCE_LANGUAGE_FALLBACK;
   const runCount = recording.runCount;
 
   // Multitrack recordings have no mixed/video source — the transcript must be
@@ -318,7 +319,7 @@ export async function enqueueTranslateLanguage(
     throw new Error(`recording not found: ${opts.recordingId}`);
   }
 
-  const sourceLanguage = recording.sourceLanguage ?? 'it';
+  const sourceLanguage = recording.sourceLanguage ?? SOURCE_LANGUAGE_FALLBACK;
 
   // Locate the existing TRANSCRIPT_JSON and the root job that produced
   // it, so the new TRANSLATE job both references the transcript artifact
@@ -459,7 +460,7 @@ export async function enqueueArchiveJob(
     throw new Error(`recording not found: ${opts.recordingId}`);
   }
 
-  const sourceLanguage = recording.sourceLanguage ?? 'it';
+  const sourceLanguage = recording.sourceLanguage ?? SOURCE_LANGUAGE_FALLBACK;
 
   // Depend on the root job that produced TRANSCRIPT_JSON so the
   // subtitles exist when the archive runs. The transcript already

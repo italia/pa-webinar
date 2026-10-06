@@ -307,6 +307,7 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
         whiteboardInfraReady={resolveWhiteboardInfraReady(
           getPublicEnv('NEXT_PUBLIC_WHITEBOARD_ENABLED'),
         )}
+        defaultTargetLocales={siteSettings.aiDefaultTargetLocales}
       />
     </div>
   );

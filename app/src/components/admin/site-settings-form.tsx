@@ -21,6 +21,8 @@ import ToggleSwitch from '@/components/ui/toggle-switch';
 import LocaleTabBar from '@/components/ui/locale-tab-bar';
 import { localeNames, type Locale } from '@/i18n/config';
 import FileOrUrlInput from '@/components/ui/file-or-url-input';
+import LanguageChecklist from '@/components/admin/language-checklist';
+import { DEFAULT_TARGET_LOCALES } from '@/lib/ai/target-locales';
 import { videoQualityMaxHeight } from '@/lib/jitsi/config';
 
 import { settingsFieldError, type SettingsFieldError } from './settings-field-error';
@@ -135,7 +137,8 @@ export default function SiteSettingsForm({
     el.setAttribute('aria-invalid', 'true');
     el.setAttribute('aria-describedby', [prima, 'settings-save-error'].filter(Boolean).join(' '));
     el.classList.add('is-invalid');
-    const etichetta = document.querySelector(`label[for="${el.id}"]`)?.textContent?.trim() || id;
+    const etichetta =
+      document.querySelector(`label[for="${el.id}"]`)?.textContent?.trim() || el.getAttribute('aria-label') || id;
     setFieldLabel(fieldError.locale ? `${etichetta} (${fieldError.locale.toUpperCase()})` : etichetta);
     if (portatoRef.current !== fieldError) {
       portatoRef.current = fieldError;
@@ -1921,24 +1924,17 @@ function PostprodTab({ settings, updateField }: TabProps) {
             </small>
           </FormGroup>
         </Col>
-        <Col md={6}>
-          <FormGroup>
-            <Label htmlFor="aiDefaultTargetLocales">
-              {t('defaultTargetLocales')}
-            </Label>
-            <Input
-              id="aiDefaultTargetLocales"
-              type="text"
-              placeholder="en,fr"
-              value={settings.aiDefaultTargetLocales ?? 'en,fr'}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                updateField('aiDefaultTargetLocales', e.target.value)
-              }
+        <Col md={12}>
+          {/* Il gruppo prende il fuoco se il server rifiuta il campo. */}
+          <div id="aiDefaultTargetLocales" className="mb-3" tabIndex={-1} aria-label={t('defaultTargetLocales')}>
+            <LanguageChecklist
+              legend={t('defaultTargetLocales')}
+              description={t('defaultTargetLocalesHelp')}
+              value={settings.aiDefaultTargetLocales ?? DEFAULT_TARGET_LOCALES}
+              onChange={(next) => updateField('aiDefaultTargetLocales', next ?? '')}
+              emptyHint={t('defaultTargetLocalesEmpty')}
             />
-            <small className="text-muted d-block mt-1">
-              {t('defaultTargetLocalesHelp')}
-            </small>
-          </FormGroup>
+          </div>
         </Col>
       </Row>
 

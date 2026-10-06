@@ -70,6 +70,8 @@ interface Props {
   siteDefaultParseTitleKicker: boolean;
   siteDefaultVideoQuality: VideoQualityPreset;
   whiteboardInfraReady: boolean;
+  defaultTargetLocales?: string | null;
+  defaultModerator?: { name: string; email: string } | null;
   /** Apre direttamente il modulo della chiamata rapida (dal pulsante della
    *  lista eventi), senza passare dalla scelta del modello. */
   initialInstant?: boolean;
@@ -90,6 +92,8 @@ export default function CreateEventWithTemplate({
   siteDefaultParseTitleKicker,
   siteDefaultVideoQuality,
   whiteboardInfraReady,
+  defaultTargetLocales = null,
+  defaultModerator = null,
   initialInstant = false,
 }: Props) {
   const t = useTranslations('admin.templates');
@@ -193,6 +197,8 @@ export default function CreateEventWithTemplate({
       siteDefaultParseTitleKicker={siteDefaultParseTitleKicker}
       siteDefaultVideoQuality={siteDefaultVideoQuality}
       whiteboardInfraReady={whiteboardInfraReady}
+      defaultTargetLocales={defaultTargetLocales}
+      defaultModerator={defaultModerator}
     />
   );
 }
