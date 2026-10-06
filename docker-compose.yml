@@ -142,6 +142,10 @@ services:
       - JVB_TCP_HARVESTER_DISABLED=true
     volumes:
       - jitsi_web_config:/config
+      # Niente logo di Jitsi sopra la chiamata: l'immagine aggiunge questi due
+      # file alla configurazione che genera all'avvio.
+      - ./infra/jitsi/web/custom-interface_config.js:/config/custom-interface_config.js:ro
+      - ./infra/jitsi/web/custom-config.js:/config/custom-config.js:ro
       - jitsi_web_crontabs:/var/spool/cron/crontabs
       - jitsi_transcripts:/usr/share/jitsi-meet/transcripts
     depends_on:

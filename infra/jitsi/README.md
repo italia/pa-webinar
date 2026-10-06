@@ -1,4 +1,4 @@
-# Jitsi extras: Prosody module and Jibri finalize scripts
+# Jitsi extras: Prosody module, Jibri finalize scripts, web overrides
 
 This directory holds the pieces of PA Webinar that run inside Jitsi components instead of in the portal.
 Neither piece changes Jitsi's source code. The Prosody module loads from the image's plugin directory,
@@ -10,6 +10,7 @@ pieces sit on the Jitsi boundary.
 |---|---|---|
 | `prosody-plugins/mod_token_affiliation_custom.lua` | A Prosody MUC module that sets each occupant's room affiliation from the portal's JWT | The Docker Compose stack, from this folder, and the Helm chart, from an identical copy in `infra/helm/pa-webinar/files/prosody-plugins/` |
 | `jibri-finalize.sh` | A standalone Jibri finalize script | Nothing in the repository. The chart ships a different script, `infra/helm/pa-webinar/files/jibri-finalize.sh` |
+| `web/custom-interface_config.js`, `web/custom-config.js` | Interface and config overrides that hide the Jitsi logo and links over the call | The Docker Compose stack, which mounts them into the `jitsi-web` container; the image appends them to the configuration it generates at startup. On Kubernetes the same settings go in the web component's custom configs of the deployment values |
 
 ## The Prosody module
 
