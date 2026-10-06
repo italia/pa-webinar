@@ -156,6 +156,8 @@ export default async function EventManagePage({
     postEventShowRecap: event.postEventShowRecap,
     postEventShowWordCloud: event.postEventShowWordCloud,
     postEventEmailEnabled: event.postEventEmailEnabled,
+    recordingNotifyEnabled: event.recordingNotifyEnabled,
+    recordingNotifiedAt: event.recordingNotifiedAt?.toISOString() ?? null,
     feedbackEnabled: event.feedbackEnabled,
     recordingConsentText: event.recordingConsentText,
     moderatorToken: event.moderatorToken,

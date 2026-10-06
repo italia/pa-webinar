@@ -4073,7 +4073,10 @@
       "polls": "Polls",
       "feedback": "Feedback",
       "transcript": "AI transcript"
-    }
+    },
+    "recordingNotify": "Notify registrants when the recording is published",
+    "recordingNotifyHelp": "A single email, sent when the recording (or external video) is visible on the event's public page. It reaches whoever is still registered: after the data retention period nobody is notified.",
+    "recordingNotifySent": "Notice sent on {date}."
   },
   "provisioning": {
     "loading": "Loading",

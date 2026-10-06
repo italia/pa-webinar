@@ -4073,7 +4073,10 @@
       "polls": "Stħarriġ",
       "feedback": "Feedback",
       "transcript": "Traskrizzjoni bl-AI"
-    }
+    },
+    "recordingNotify": "Avża lill-irreġistrati meta r-reġistrazzjoni tiġi ppubblikata",
+    "recordingNotifyHelp": "Email waħda biss, meta r-reġistrazzjoni (jew il-vidjo estern) tidher fil-paġna pubblika tal-avveniment. Tasal għand min għadu rreġistrat: wara l-perjodu taż-żamma ħadd ma jiġi avżat.",
+    "recordingNotifySent": "Avviż mibgħut fl-{date}."
   },
   "provisioning": {
     "loading": "Caricament",

@@ -163,6 +163,8 @@ interface EventData {
   postEventShowRecap: boolean;
   postEventShowWordCloud: boolean;
   postEventEmailEnabled: boolean;
+  recordingNotifyEnabled: boolean;
+  recordingNotifiedAt: string | null;
   feedbackEnabled: boolean; recordingConsentText: string | null;
   requireOrganization: boolean; requireOrganizationRole: boolean; requireOrganizationType: boolean;
   moderatorToken: string; moderatorName: string | null; moderatorEmail: string | null;
@@ -1290,6 +1292,8 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, via
             postEventShowRecap: event.postEventShowRecap,
             postEventShowWordCloud: event.postEventShowWordCloud,
             postEventEmailEnabled: event.postEventEmailEnabled,
+            recordingNotifyEnabled: event.recordingNotifyEnabled,
+            recordingNotifiedAt: event.recordingNotifiedAt,
             feedbackEnabled: event.feedbackEnabled,
             dataRetentionDays: event.dataRetentionDays,
           }}

@@ -4073,7 +4073,10 @@
       "polls": "Ankiety",
       "feedback": "Opinie",
       "transcript": "Transkrypcja AI"
-    }
+    },
+    "recordingNotify": "Powiadom zapisanych, gdy nagranie zostanie opublikowane",
+    "recordingNotifyHelp": "Jeden e-mail, gdy nagranie (lub zewnętrzne wideo) jest widoczne na publicznej stronie wydarzenia. Trafia do osób wciąż zapisanych: po okresie przechowywania nikt nie jest powiadamiany.",
+    "recordingNotifySent": "Powiadomienie wysłane {date}."
   },
   "provisioning": {
     "loading": "Ładowanie",

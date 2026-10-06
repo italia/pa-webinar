@@ -90,6 +90,7 @@ export const CREATED_EVENT_FIELDS = [
   'postEventShowRecap',
   'postEventShowWordCloud',
   'postEventEmailEnabled',
+  'recordingNotifyEnabled',
 
   // presentazione
   'coverImageUrl',

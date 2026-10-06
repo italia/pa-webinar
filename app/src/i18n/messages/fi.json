@@ -4073,7 +4073,10 @@
       "polls": "Kyselyt",
       "feedback": "Palaute",
       "transcript": "Tekoälylitterointi"
-    }
+    },
+    "recordingNotify": "Ilmoita osallistujille, kun tallenne julkaistaan",
+    "recordingNotifyHelp": "Yksi sähköposti, kun tallenne (tai ulkoinen video) näkyy tapahtuman julkisella sivulla. Se tavoittaa vielä ilmoittautuneet: säilytysajan jälkeen ketään ei ilmoiteta.",
+    "recordingNotifySent": "Ilmoitus lähetetty {date}."
   },
   "provisioning": {
     "loading": "Ladataan",

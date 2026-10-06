@@ -762,6 +762,77 @@ ${ctaButton(c.participantCta, input.eventPageUrl)}`;
   return { subject, html, text };
 }
 
+// ── Registrazione pubblicata ──
+// L'avviso a chi si era iscritto quando la registrazione diventa visibile sulla
+// pagina pubblica dell'evento (lib/events/recording-notify). Una volta sola.
+
+const recordingCopy: Record<
+  Locale,
+  { subject: (t: string) => string; heading: string; intro: (t: string) => string; cta: string }
+> = {
+  it: {
+    subject: (t) => `È disponibile la registrazione: ${t}`,
+    heading: 'La registrazione è disponibile',
+    intro: (t) => `La registrazione di "${t}" è pubblicata sulla pagina dell'evento: puoi rivederla quando vuoi, insieme ai materiali condivisi.`,
+    cta: 'Guarda la registrazione',
+  },
+  en: {
+    subject: (t) => `The recording is available: ${t}`,
+    heading: 'The recording is available',
+    intro: (t) => `The recording of "${t}" is published on the event page: you can watch it whenever you like, together with the shared materials.`,
+    cta: 'Watch the recording',
+  },
+  fr: {
+    subject: (t) => `L'enregistrement est disponible : ${t}`,
+    heading: "L'enregistrement est disponible",
+    intro: (t) => `L'enregistrement de « ${t} » est publié sur la page de l'événement : vous pouvez le revoir quand vous voulez, avec les documents partagés.`,
+    cta: "Voir l'enregistrement",
+  },
+  de: {
+    subject: (t) => `Die Aufzeichnung ist verfügbar: ${t}`,
+    heading: 'Die Aufzeichnung ist verfügbar',
+    intro: (t) => `Die Aufzeichnung von „${t}“ ist auf der Veranstaltungsseite veröffentlicht: Du kannst sie jederzeit ansehen, zusammen mit den geteilten Materialien.`,
+    cta: 'Aufzeichnung ansehen',
+  },
+  es: {
+    subject: (t) => `La grabación está disponible: ${t}`,
+    heading: 'La grabación está disponible',
+    intro: (t) => `La grabación de «${t}» está publicada en la página del evento: puedes verla cuando quieras, junto con los materiales compartidos.`,
+    cta: 'Ver la grabación',
+  },
+};
+
+export function recordingPublishedEmail(input: PostEventParticipantInput): {
+  subject: string;
+  html: string;
+  text: string;
+} {
+  const c = recordingCopy[input.locale];
+  const base = copy[input.locale];
+  const footer = input.organizationFooter || base.footer;
+  const subject = c.subject(input.eventTitle);
+  const body = `
+<p style="margin:0 0 16px;">${escapeHtml(c.intro(input.eventTitle))}</p>
+${ctaButton(c.cta, input.eventPageUrl)}`;
+  const optOutHtml = input.addressBookOptOutUrl
+    ? `${footer ? '<br>' : ''}${escapeHtml(base.unsubscribeAddressBook)}${addressBookOptOutHtml(base, input.addressBookOptOutUrl)}`
+    : '';
+  const html = layout(escapeHtml(c.heading), body, `${footer}${optOutHtml}`, input.locale, input.siteName);
+  const text = [
+    c.heading,
+    '',
+    c.intro(input.eventTitle),
+    '',
+    `${c.cta}: ${input.eventPageUrl}`,
+    '',
+    footer,
+    ...(input.addressBookOptOutUrl
+      ? [base.unsubscribeAddressBook, ...addressBookOptOutText(base, input.addressBookOptOutUrl)]
+      : []),
+  ].join('\n');
+  return { subject, html, text };
+}
+
 export function postEventModeratorEmail(input: PostEventModeratorInput): {
   subject: string;
   html: string;

@@ -4073,7 +4073,10 @@
       "polls": "Sondaggi",
       "feedback": "Feedback",
       "transcript": "Trascrizione AI"
-    }
+    },
+    "recordingNotify": "Avvisa gli iscritti quando la registrazione è pubblicata",
+    "recordingNotifyHelp": "Un'email sola, quando la registrazione (o il video esterno) è visibile sulla pagina pubblica dell'evento. Arriva a chi è ancora iscritto: dopo la conservazione dei dati non avvisa nessuno.",
+    "recordingNotifySent": "Avviso inviato il {date}."
   },
   "provisioning": {
     "loading": "Caricamento",

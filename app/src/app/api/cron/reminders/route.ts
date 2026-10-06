@@ -26,6 +26,7 @@ import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import { getPublicEnv } from '@/lib/env';
 import { WARMUP_STATUSES } from '@/lib/events/visibility';
 import { finalizePostEventEmails } from '@/lib/events/post-event-finalize';
+import { notifyPublishedRecordings } from '@/lib/events/recording-notify';
 import { localizedUrl } from '@/lib/utils/localized-url';
 import { registrationJoinUrl } from '@/lib/events/registration-link';
 import { currentReminder } from '@/lib/email/reminder-plan';
@@ -251,11 +252,21 @@ export const GET = withErrorHandling(async (request) => {
     defaultLocale: settings.defaultLocale,
   });
 
+  // L'avviso che la registrazione e' visibile: stesso giro, stessa prenotazione
+  // per evento prima dell'invio (lib/events/recording-notify).
+  const recordingNotice = await notifyPublishedRecordings({
+    now,
+    baseUrl,
+    siteName: settings.siteName || 'PA Webinar',
+    defaultLocale: settings.defaultLocale,
+  });
+
   return Response.json({
     ok: true,
     remindersProcessed,
     emailsSent,
     emailsFailed,
     postEvent,
+    recordingNotice,
   });
 });

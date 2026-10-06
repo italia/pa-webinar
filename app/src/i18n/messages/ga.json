@@ -4073,7 +4073,10 @@
       "polls": "Pobalbhreitheanna",
       "feedback": "Aiseolas",
       "transcript": "Tras-scríbhinn AI"
-    }
+    },
+    "recordingNotify": "Cuir in iúl do na rannpháirtithe cláraithe nuair a fhoilsítear an taifeadadh",
+    "recordingNotifyHelp": "Ríomhphost amháin, nuair a bhíonn an taifeadadh (nó an físeán seachtrach) le feiceáil ar leathanach poiblí an imeachta. Sroicheann sé na daoine atá fós cláraithe: tar éis na tréimhse coinneála ní chuirtear in iúl d'aon duine.",
+    "recordingNotifySent": "Fógra seolta ar {date}."
   },
   "provisioning": {
     "loading": "Á luchtú",

@@ -4073,7 +4073,10 @@
       "polls": "Apklausos",
       "feedback": "Atsiliepimai",
       "transcript": "DI transkripcija"
-    }
+    },
+    "recordingNotify": "Pranešti užsiregistravusiems, kai įrašas paskelbtas",
+    "recordingNotifyHelp": "Vienas el. laiškas, kai įrašas (ar išorinis vaizdo įrašas) matomas viešame renginio puslapyje. Jis pasiekia vis dar užsiregistravusius: pasibaigus saugojimo laikotarpiui niekam nepranešama.",
+    "recordingNotifySent": "Pranešimas išsiųstas {date}."
   },
   "provisioning": {
     "loading": "Įkeliama",

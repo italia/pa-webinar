@@ -84,6 +84,8 @@ export const eventBaseSchema = z.object({
   postEventShowRecap: z.boolean().default(true),
   postEventShowWordCloud: z.boolean().default(true),
   postEventEmailEnabled: z.boolean().default(false),
+  // Avviso agli iscritti quando la registrazione diventa visibile.
+  recordingNotifyEnabled: z.boolean().default(true),
   feedbackEnabled: z.boolean().default(true),
   recordingConsentText: z.string().max(5000).optional(),
 

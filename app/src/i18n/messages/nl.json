@@ -4073,7 +4073,10 @@
       "polls": "Peilingen",
       "feedback": "Feedback",
       "transcript": "AI-transcriptie"
-    }
+    },
+    "recordingNotify": "Ingeschrevenen waarschuwen wanneer de opname is gepubliceerd",
+    "recordingNotifyHelp": "Eén e-mail, wanneer de opname (of externe video) zichtbaar is op de openbare pagina van het evenement. Hij bereikt wie nog ingeschreven is: na de bewaartermijn wordt niemand meer gewaarschuwd.",
+    "recordingNotifySent": "Bericht verzonden op {date}."
   },
   "provisioning": {
     "loading": "Laden",

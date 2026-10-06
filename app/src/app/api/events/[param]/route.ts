@@ -425,6 +425,7 @@ export const PUT = withErrorHandling(async (request, context) => {
       ...(data.postEventShowRecap !== undefined && { postEventShowRecap: data.postEventShowRecap }),
       ...(data.postEventShowWordCloud !== undefined && { postEventShowWordCloud: data.postEventShowWordCloud }),
       ...(data.postEventEmailEnabled !== undefined && { postEventEmailEnabled: data.postEventEmailEnabled }),
+      ...(data.recordingNotifyEnabled !== undefined && { recordingNotifyEnabled: data.recordingNotifyEnabled }),
       ...(data.feedbackEnabled !== undefined && { feedbackEnabled: data.feedbackEnabled }),
       ...(data.recordingConsentText !== undefined && { recordingConsentText: data.recordingConsentText }),
       ...(data.recordingPublished !== undefined && {

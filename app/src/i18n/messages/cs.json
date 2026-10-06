@@ -4073,7 +4073,10 @@
       "polls": "Ankety",
       "feedback": "Zpětná vazba",
       "transcript": "AI přepis"
-    }
+    },
+    "recordingNotify": "Upozornit přihlášené, až bude záznam zveřejněn",
+    "recordingNotifyHelp": "Jediný e-mail, jakmile je záznam (nebo externí video) viditelný na veřejné stránce akce. Dostanou ho ti, kdo jsou stále přihlášeni: po uplynutí doby uchování už nikdo.",
+    "recordingNotifySent": "Upozornění odesláno {date}."
   },
   "provisioning": {
     "loading": "Načítání",

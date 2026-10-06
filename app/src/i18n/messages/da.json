@@ -4073,7 +4073,10 @@
       "polls": "Afstemninger",
       "feedback": "Feedback",
       "transcript": "AI-transskription"
-    }
+    },
+    "recordingNotify": "Giv tilmeldte besked, når optagelsen er offentliggjort",
+    "recordingNotifyHelp": "Én e-mail, når optagelsen (eller den eksterne video) er synlig på arrangementets offentlige side. Den når dem, der stadig er tilmeldt: efter opbevaringsperioden får ingen besked.",
+    "recordingNotifySent": "Besked sendt {date}."
   },
   "provisioning": {
     "loading": "Indlæser",

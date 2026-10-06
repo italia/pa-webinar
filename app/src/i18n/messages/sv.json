@@ -4073,7 +4073,10 @@
       "polls": "Omröstningar",
       "feedback": "Feedback",
       "transcript": "AI-transkription"
-    }
+    },
+    "recordingNotify": "Meddela anmälda när inspelningen publiceras",
+    "recordingNotifyHelp": "Ett enda mejl när inspelningen (eller den externa videon) syns på evenemangets offentliga sida. Det når dem som fortfarande är anmälda: efter lagringstiden meddelas ingen.",
+    "recordingNotifySent": "Meddelande skickat {date}."
   },
   "provisioning": {
     "loading": "Laddar",

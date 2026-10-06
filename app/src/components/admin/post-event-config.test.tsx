@@ -29,6 +29,8 @@ const evento = {
   postEventShowRecap: false,
   postEventShowWordCloud: false,
   postEventEmailEnabled: false,
+  recordingNotifyEnabled: true,
+  recordingNotifiedAt: null,
   feedbackEnabled: false,
   dataRetentionDays: 30,
 };

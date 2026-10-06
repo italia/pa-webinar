@@ -4073,7 +4073,10 @@
       "polls": "Szavazások",
       "feedback": "Visszajelzés",
       "transcript": "AI-átirat"
-    }
+    },
+    "recordingNotify": "Értesítés a jelentkezőknek, amikor a felvétel megjelenik",
+    "recordingNotifyHelp": "Egyetlen e-mail, amikor a felvétel (vagy a külső videó) látható az esemény nyilvános oldalán. A még jelentkezettekhez jut el: a megőrzési idő után senkihez.",
+    "recordingNotifySent": "Értesítés elküldve: {date}."
   },
   "provisioning": {
     "loading": "Betöltés",

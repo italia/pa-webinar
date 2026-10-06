@@ -4073,7 +4073,10 @@
       "polls": "Umfragen",
       "feedback": "Feedback",
       "transcript": "KI-Transkript"
-    }
+    },
+    "recordingNotify": "Angemeldete benachrichtigen, wenn die Aufzeichnung veröffentlicht ist",
+    "recordingNotifyHelp": "Eine einzige E-Mail, sobald die Aufzeichnung (oder das externe Video) auf der öffentlichen Seite sichtbar ist. Sie erreicht alle, die noch angemeldet sind: nach Ablauf der Aufbewahrungsfrist wird niemand mehr benachrichtigt.",
+    "recordingNotifySent": "Benachrichtigung gesendet am {date}."
   },
   "provisioning": {
     "loading": "Wird geladen",

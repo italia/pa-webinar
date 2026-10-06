@@ -134,6 +134,11 @@ model Event {
   recordingUrl             String?   @map("recording_url")
   recordingPublished       Boolean   @default(false) @map("recording_published")
   recordingPublishedAt     DateTime? @map("recording_published_at")
+  // Avviso agli iscritti quando la registrazione diventa visibile sulla pagina
+  // pubblica (lib/events/recording-notify): acceso di predefinito, parte una
+  // volta sola; `recordingNotifiedAt` e' quando e' partito.
+  recordingNotifyEnabled   Boolean   @default(true) @map("recording_notify_enabled")
+  recordingNotifiedAt      DateTime? @map("recording_notified_at")
   recordingFileSize        BigInt?   @map("recording_file_size")
   recordingDuration        Int?      @map("recording_duration")
   recordingDeleteAfterDays Int?      @map("recording_delete_after_days")

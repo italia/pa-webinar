@@ -4073,7 +4073,10 @@
       "polls": "Ankete",
       "feedback": "Povratne informacije",
       "transcript": "Prepis AI"
-    }
+    },
+    "recordingNotify": "Obvesti prijavljene, ko je posnetek objavljen",
+    "recordingNotifyHelp": "Eno samo sporočilo, ko je posnetek (ali zunanji video) viden na javni strani dogodka. Dobijo ga še prijavljeni: po izteku hrambe nihče.",
+    "recordingNotifySent": "Obvestilo poslano {date}."
   },
   "provisioning": {
     "loading": "Nalaganje",

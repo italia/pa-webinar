@@ -36,6 +36,10 @@ vi.mock('@/lib/events/post-event-finalize', () => ({
     emailsFailed: 0,
   })),
 }));
+// L'avviso di registrazione pubblicata ha i suoi test (lib/events/recording-notify).
+vi.mock('@/lib/events/recording-notify', () => ({
+  notifyPublishedRecordings: vi.fn(async () => ({ eventsNotified: 0, emailsQueued: 0, emailsFailed: 0 })),
+}));
 
 import { prisma } from '@/lib/db';
 import { enqueueEmail } from '@/lib/email/outbox';

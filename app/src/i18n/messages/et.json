@@ -4073,7 +4073,10 @@
       "polls": "Küsitlused",
       "feedback": "Tagasiside",
       "transcript": "AI transkriptsioon"
-    }
+    },
+    "recordingNotify": "Teavita registreerunuid, kui salvestis avaldatakse",
+    "recordingNotifyHelp": "Üks e-kiri, kui salvestis (või väline video) on ürituse avalikul lehel nähtav. See jõuab nendeni, kes on veel registreeritud: pärast säilitusaega kedagi ei teavitata.",
+    "recordingNotifySent": "Teade saadetud {date}."
   },
   "provisioning": {
     "loading": "Laadimine",

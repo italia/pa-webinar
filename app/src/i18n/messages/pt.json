@@ -4073,7 +4073,10 @@
       "polls": "Sondagens",
       "feedback": "Feedback",
       "transcript": "Transcrição de IA"
-    }
+    },
+    "recordingNotify": "Avisar os inscritos quando a gravação for publicada",
+    "recordingNotifyHelp": "Um único e-mail, quando a gravação (ou o vídeo externo) fica visível na página pública do evento. Chega a quem ainda está inscrito: após o período de conservação ninguém é avisado.",
+    "recordingNotifySent": "Aviso enviado em {date}."
   },
   "provisioning": {
     "loading": "A carregar",

@@ -4073,7 +4073,10 @@
       "polls": "Ankete",
       "feedback": "Povratne informacije",
       "transcript": "AI transkript"
-    }
+    },
+    "recordingNotify": "Obavijesti prijavljene kad snimka bude objavljena",
+    "recordingNotifyHelp": "Jedna poruka e-pošte, kad je snimka (ili vanjski video) vidljiva na javnoj stranici događaja. Stiže onima koji su još prijavljeni: nakon razdoblja čuvanja nitko nije obaviješten.",
+    "recordingNotifySent": "Obavijest poslana {date}."
   },
   "provisioning": {
     "loading": "Učitavanje",

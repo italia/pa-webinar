@@ -165,6 +165,7 @@ export const POST = withErrorHandling(async (request) => {
       postEventShowRecap: data.postEventShowRecap,
       postEventShowWordCloud: data.postEventShowWordCloud,
       postEventEmailEnabled: data.postEventEmailEnabled,
+      recordingNotifyEnabled: data.recordingNotifyEnabled,
       postEventPublicUntil: data.postEventPublicUntil
         ? new Date(data.postEventPublicUntil)
         : null,

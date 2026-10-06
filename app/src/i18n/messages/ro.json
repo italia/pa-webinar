@@ -4073,7 +4073,10 @@
       "polls": "Sondaje",
       "feedback": "Feedback",
       "transcript": "Transcriere AI"
-    }
+    },
+    "recordingNotify": "Anunță înscrișii când înregistrarea este publicată",
+    "recordingNotifyHelp": "Un singur e-mail, când înregistrarea (sau videoclipul extern) este vizibilă pe pagina publică a evenimentului. Ajunge la cei încă înscriși: după perioada de păstrare nu este anunțat nimeni.",
+    "recordingNotifySent": "Anunț trimis pe {date}."
   },
   "provisioning": {
     "loading": "Se încarcă",

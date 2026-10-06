@@ -4073,7 +4073,10 @@
       "polls": "Aptaujas",
       "feedback": "Atsauksmes",
       "transcript": "MI transkripcija"
-    }
+    },
+    "recordingNotify": "Paziņot reģistrētajiem, kad ieraksts ir publicēts",
+    "recordingNotifyHelp": "Viens e-pasts, kad ieraksts (vai ārējais video) ir redzams pasākuma publiskajā lapā. Tas sasniedz tos, kas vēl ir reģistrēti: pēc glabāšanas termiņa neviens netiek informēts.",
+    "recordingNotifySent": "Paziņojums nosūtīts {date}."
   },
   "provisioning": {
     "loading": "Ielādē",
