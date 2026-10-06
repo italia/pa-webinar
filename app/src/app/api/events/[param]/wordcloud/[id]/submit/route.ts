@@ -10,8 +10,10 @@ import {
 import { prisma } from '@/lib/db';
 import { authorizePanelRead } from '@/lib/events/panel-read-access';
 import { pokeLivePanel } from '@/lib/live-state/publish';
+import { forgetWordcloudLite } from '@/lib/wordcloud/lite';
 import { submitWordCloudSchema } from '@/lib/validation/schemas';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
+import { isRoundExpired, normalizeWord } from '@/lib/wordcloud/normalize';
 
 export const dynamic = 'force-dynamic';
 
@@ -54,13 +56,15 @@ export const POST = withErrorHandling(async (request, context) => {
   // Tempo scaduto: il giro si chiude qui, e chi lo chiude lo dice alla sala
   // (come la lettura in ../../route.ts). La condizione sullo stato fa scrivere
   // e avvisare solo il primo.
-  const elapsedMs = Date.now() - round.createdAt.getTime();
-  if (elapsedMs > round.duration * 1000) {
+  if (isRoundExpired(round)) {
     const chiusi = await prisma.wordCloudRound.updateMany({
       where: { id: round.id, status: 'OPEN' },
       data: { status: 'CLOSED', closedAt: new Date() },
     });
-    if (chiusi.count > 0) pokeLivePanel(event.id, 'wordcloud');
+    if (chiusi.count > 0) {
+      forgetWordcloudLite(event.id);
+      pokeLivePanel(event.id, 'wordcloud');
+    }
     throw new ConflictError('Word cloud round has expired');
   }
 
@@ -106,12 +110,43 @@ export const POST = withErrorHandling(async (request, context) => {
 
   // Al massimo cinque parole a testa per giro. Il codice distinto dice al
   // pannello perché la parola non entra: il giro chiuso ha la stessa 409.
-  const count = await prisma.wordCloudSubmission.count({
-    where: registrationId
-      ? { roundId: round.id, registrationId }
-      : { roundId: round.id, guestId },
+  // La forma con cui la parola si salva e si conta: «Chiarezza!» = «chiarezza».
+  const parola = normalizeWord(word);
+  if (!parola) {
+    throw new AppError('Word must contain letters or digits', 422, 'WORD_INVALID');
+  }
+
+  const chi = registrationId ? { registrationId } : { guestId };
+
+  // Controlli senza transazione: quando una domanda si apre scrive tutta la
+  // sala insieme, e metterla in fila su una riga terrebbe occupata una
+  // connessione per ogni invio in attesa. Le corse che restano sono rare e
+  // innocue: una parola mandata nello stesso istante in cui il moderatore la
+  // toglie (la si toglie di nuovo), un doppio invio della stessa persona
+  // (la nuvola conta le persone, non le righe).
+
+  // Tolta dal moderatore: in questo giro non torna, da nessuno.
+  // Confronti sulla parola normalizzata, come la conta la nuvola: valgono
+  // anche per le righe salvate prima della normalizzazione.
+  const tolte = await prisma.wordCloudSubmission.findMany({
+    where: { roundId: round.id, hiddenAt: { not: null } },
+    select: { word: true },
   });
-  if (count >= 5) {
+  if (tolte.some((s) => normalizeWord(s.word) === parola)) {
+    throw new AppError('This word was removed by the moderator', 409, 'WORD_REMOVED');
+  }
+
+  // Una persona, una volta per parola: la grandezza dice quante PERSONE l'hanno
+  // scritta. Ripeterla per farla sembrare piu' importante non deve funzionare.
+  const mie = await prisma.wordCloudSubmission.findMany({
+    where: { roundId: round.id, ...chi },
+    select: { word: true },
+  });
+  if (mie.some((s) => normalizeWord(s.word) === parola)) {
+    throw new AppError('You already sent this word', 409, 'WORD_DUPLICATE');
+  }
+
+  if (mie.length >= 5) {
     throw new AppError(
       'Maximum submissions reached for this round',
       409,
@@ -129,7 +164,7 @@ export const POST = withErrorHandling(async (request, context) => {
       roundId: round.id,
       registrationId,
       guestId: registrationId ? null : (guestId ?? null),
-      word: word.toLowerCase().trim(),
+      word: parola,
     },
   });
 

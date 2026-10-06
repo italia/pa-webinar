@@ -18,6 +18,7 @@ vi.mock('@/lib/db', () => ({
 vi.mock('@/lib/cache', () => ({
   getCached: vi.fn(() => null),
   setCache: vi.fn(),
+  deleteCache: vi.fn(),
   deleteCacheByPrefix: vi.fn(),
 }));
 vi.mock('@/lib/live-state/publish', () => ({ pokeLivePanel: vi.fn() }));
@@ -28,6 +29,7 @@ vi.mock('@/lib/settings', () => ({ getSettings: async () => siteSettings }));
 import { prisma } from '@/lib/db';
 import { hasJoinGrant } from '@/lib/events/join-grant';
 import { pokeLivePanel } from '@/lib/live-state/publish';
+import { deleteCache, getCached, setCache } from '@/lib/cache';
 
 import { GET } from './route';
 
@@ -127,7 +129,11 @@ describe('GET /api/events/[slug]/wordcloud — giro scaduto', () => {
       duration: 60,
       createdAt: new Date(Date.now() - 61_000),
       closedAt: null,
-      submissions: [{ word: 'Futuro' }, { word: 'futuro ' }, { word: 'dati' }],
+      submissions: [
+        { word: 'Futuro', guestId: 'g1', registrationId: null, hiddenAt: null },
+        { word: 'futuro ', guestId: 'g2', registrationId: null, hiddenAt: null },
+        { word: 'dati', guestId: 'g1', registrationId: null, hiddenAt: null },
+      ],
     });
     const res = await GET(get(), ctx());
     const body = await res.json();
@@ -181,5 +187,131 @@ describe('GET /api/events/[slug]/wordcloud — giro scaduto', () => {
     const body = await (await GET(get(), ctx())).json();
     expect(body.active).toBe(true);
     expect(mockedUpdateMany).not.toHaveBeenCalled();
+  });
+});
+
+describe('GET /api/events/[slug]/wordcloud — come si conta', () => {
+  const giro = (submissions: unknown[], extra: Record<string, unknown> = {}) =>
+    mockedRound.mockResolvedValue({
+      id: 'round-2',
+      prompt: 'Una parola',
+      status: 'OPEN',
+      duration: 120,
+      createdAt: new Date(Date.now() - 10_000),
+      closedAt: null,
+      submissions,
+      ...extra,
+    });
+
+  it('conta le persone, non gli invii: la stessa parola ripetuta vale una volta', async () => {
+    giro([
+      { word: 'confronto', guestId: 'g1', registrationId: null, hiddenAt: null },
+      { word: 'Confronto!', guestId: 'g1', registrationId: null, hiddenAt: null },
+      { word: 'confronto', guestId: null, registrationId: 'r1', hiddenAt: null },
+      { word: 'dati', guestId: 'g1', registrationId: null, hiddenAt: null },
+    ]);
+    const body = await (await GET(get(), ctx())).json();
+    expect(body.words).toEqual([
+      { word: 'confronto', count: 2 },
+      { word: 'dati', count: 1 },
+    ]);
+  });
+
+  it('le parole tolte dal moderatore non ci sono', async () => {
+    giro([
+      { word: 'brutta', guestId: 'g1', registrationId: null, hiddenAt: new Date() },
+      { word: 'dati', guestId: 'g2', registrationId: null, hiddenAt: null },
+    ]);
+    const body = await (await GET(get(), ctx())).json();
+    expect(body.words).toEqual([{ word: 'dati', count: 1 }]);
+    expect(body.totalSubmissions).toBe(1);
+  });
+
+  it('una domanda senza limite di tempo resta aperta', async () => {
+    giro([], { duration: 0, createdAt: new Date(Date.now() - 6 * 3600_000) });
+    const body = await (await GET(get(), ctx())).json();
+    expect(body.active).toBe(true);
+    expect(mockedUpdateMany).not.toHaveBeenCalled();
+  });
+});
+
+describe('GET ?lite=1 (il pallino sulla scheda)', () => {
+  const lite = () =>
+    new Request(`https://webinar.gov.it/api/events/${SLUG}/wordcloud?lite=1`) as unknown as NextRequest;
+
+  it('dice solo se c’e’ una domanda aperta, e quale, senza leggere le parole', async () => {
+    evento();
+    mockedRound.mockResolvedValue({
+      id: 'giro-1',
+      status: 'OPEN',
+      duration: 120,
+      createdAt: new Date(),
+    });
+    const res = await GET(lite(), ctx());
+    expect(await res.json()).toEqual({ active: true, id: 'giro-1' });
+    const letto = mockedRound.mock.calls[0]?.[0] as { include?: unknown; select?: Record<string, boolean> };
+    expect(letto.include).toBeUndefined();
+    expect(letto.select).not.toHaveProperty('submissions');
+  });
+
+  it('passa la stessa regola di lettura del pannello', async () => {
+    evento({ joinPasswordHash: 'hash' });
+    const res = await GET(lite(), ctx());
+    expect(res.status).toBe(401);
+    expect(mockedRound).not.toHaveBeenCalled();
+  });
+
+  it('una domanda scaduta non e’ aperta, e la lettura leggera non scrive', async () => {
+    evento();
+    mockedRound.mockResolvedValue({
+      id: 'giro-1',
+      status: 'OPEN',
+      duration: 60,
+      createdAt: new Date(Date.now() - 5 * 60_000),
+    });
+    expect(await (await GET(lite(), ctx())).json()).toEqual({ active: false, id: 'giro-1' });
+    expect(mockedUpdateMany).not.toHaveBeenCalled();
+  });
+
+  it('in caldo: non tocca il database', async () => {
+    evento();
+    vi.mocked(getCached).mockImplementation(((chiave: string) =>
+      chiave.startsWith('wordcloud-lite:') ? { active: false } : null) as typeof getCached);
+    expect(await (await GET(lite(), ctx())).json()).toEqual({ active: false });
+    expect(mockedRound).not.toHaveBeenCalled();
+    vi.mocked(getCached).mockImplementation(() => null);
+  });
+
+  it('chi ha un token si controlla una volta, poi l’esito resta in caldo', async () => {
+    evento();
+    mockedRound.mockResolvedValue(null);
+    mockedRegistration.mockResolvedValue({ id: 'reg-1', eventId: EVENT_ID });
+    const conToken = () =>
+      new Request(`https://webinar.gov.it/api/events/${SLUG}/wordcloud?lite=1`, {
+        headers: { Authorization: 'Bearer REG_TOKEN' },
+      }) as unknown as NextRequest;
+    expect((await GET(conToken(), ctx())).status).toBe(200);
+    expect(mockedRegistration).toHaveBeenCalledTimes(1);
+    expect(vi.mocked(setCache)).toHaveBeenCalledWith(
+      `wordcloud-lite-auth:${EVENT_ID}:REG_TOKEN`,
+      true,
+      expect.any(Number),
+    );
+  });
+
+  it('chi chiude la domanda allo scadere la dimentica, cosi’ l’avviso trova lo stato nuovo', async () => {
+    evento();
+    mockedRound.mockResolvedValue({
+      id: 'giro-1',
+      eventId: EVENT_ID,
+      status: 'OPEN',
+      duration: 60,
+      createdAt: new Date(Date.now() - 5 * 60_000),
+      closedAt: null,
+      submissions: [],
+    });
+    mockedUpdateMany.mockResolvedValue({ count: 1 });
+    await GET(get({ Authorization: `Bearer ${PRIMARY_TOKEN}` }), ctx());
+    expect(deleteCache).toHaveBeenCalledWith(`wordcloud-lite:${EVENT_ID}`);
   });
 });

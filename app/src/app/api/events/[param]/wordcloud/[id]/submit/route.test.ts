@@ -12,18 +12,23 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
  * entrata. L'identità di chi non è iscritto è l'identificativo del browser,
  * come nei sondaggi; il token di sala resta una prova di presenza.
  */
-vi.mock('@/lib/db', () => ({
-  prisma: {
+vi.mock('@/lib/db', () => {
+  const prisma: Record<string, unknown> = {
     event: { findUnique: vi.fn() },
     wordCloudRound: { findUnique: vi.fn(), updateMany: vi.fn() },
-    wordCloudSubmission: { count: vi.fn(), create: vi.fn() },
+    wordCloudSubmission: { create: vi.fn(), findMany: vi.fn() },
     registration: { findUnique: vi.fn() },
     eventModerator: { findUnique: vi.fn() },
-  },
-}));
+    $executeRaw: vi.fn(async () => 1),
+  };
+  // La transazione lavora sullo stesso oggetto: i controlli restano visibili.
+  prisma.$transaction = vi.fn(async (fn: (tx: unknown) => unknown) => fn(prisma));
+  return { prisma };
+});
 vi.mock('@/lib/cache', () => ({
   getCached: vi.fn(() => null),
   setCache: vi.fn(),
+  deleteCache: vi.fn(),
   deleteCacheByPrefix: vi.fn(),
 }));
 vi.mock('@/lib/live-state/publish', () => ({ pokeLivePanel: vi.fn() }));
@@ -39,10 +44,17 @@ import { POST } from './route';
 
 const mockedEvent = prisma.event.findUnique as unknown as ReturnType<typeof vi.fn>;
 const mockedRound = prisma.wordCloudRound.findUnique as unknown as ReturnType<typeof vi.fn>;
-const mockedCount = prisma.wordCloudSubmission.count as unknown as ReturnType<typeof vi.fn>;
 const mockedCloseRound = prisma.wordCloudRound
   .updateMany as unknown as ReturnType<typeof vi.fn>;
 const mockedCreate = prisma.wordCloudSubmission.create as unknown as ReturnType<typeof vi.fn>;
+// Le righe del giro: quelle tolte (where.hiddenAt) e quelle di chi scrive.
+const mockedFindWord = prisma.wordCloudSubmission
+  .findMany as unknown as ReturnType<typeof vi.fn>;
+/** Le parole gia' mandate da chi scrive in questo giro. */
+const giaMie = (parole: string[]) =>
+  mockedFindWord.mockImplementation(async (args: { where: Record<string, unknown> }) =>
+    args.where.hiddenAt ? [] : parole.map((word) => ({ word })),
+  );
 const mockedRegistration = prisma.registration
   .findUnique as unknown as ReturnType<typeof vi.fn>;
 const mockedGrant = prisma.eventModerator
@@ -97,9 +109,9 @@ beforeEach(() => {
     duration: 120,
     createdAt: new Date(Date.now() - 10_000),
   });
-  mockedCount.mockResolvedValue(0);
   mockedCloseRound.mockResolvedValue({ count: 1 });
   mockedCreate.mockResolvedValue({});
+  mockedFindWord.mockResolvedValue([]);
   mockedRegistration.mockResolvedValue(null);
   mockedGrant.mockResolvedValue(null);
 });
@@ -221,7 +233,7 @@ describe('POST /api/events/[slug]/wordcloud/[id]/submit — una sala dietro un s
 
 describe('POST /api/events/[slug]/wordcloud/[id]/submit — perché una parola non entra', () => {
   it('oltre la quinta parola il codice lo dice, distinto dal giro chiuso', async () => {
-    mockedCount.mockResolvedValue(5);
+    giaMie(['uno', 'due', 'tre', 'quattro', 'cinque']);
     const res = await POST(submit({ word: 'sesta', guestId: nuovoOspite() }), ctx());
     expect(res.status).toBe(409);
     expect((await res.json()).code).toBe('WORD_LIMIT_REACHED');
@@ -244,6 +256,56 @@ describe('POST /api/events/[slug]/wordcloud/[id]/submit — perché una parola n
     const res = await POST(submit({ word: '   ', guestId: nuovoOspite() }), ctx());
     expect(res.status).toBe(422);
     expect(mockedCreate).not.toHaveBeenCalled();
+  });
+
+  it('una parola fatta di soli simboli non entra, con un codice suo', async () => {
+    const res = await POST(submit({ word: '!!!', guestId: nuovoOspite() }), ctx());
+    expect(res.status).toBe(422);
+    expect((await res.json()).code).toBe('WORD_INVALID');
+    expect(mockedCreate).not.toHaveBeenCalled();
+  });
+
+  it('si salva nella forma con cui si conta: minuscole, senza punteggiatura ai bordi', async () => {
+    const res = await POST(submit({ word: ' Chiarezza! ', guestId: nuovoOspite() }), ctx());
+    expect(res.status).toBe(201);
+    expect(scritto()?.word).toBe('chiarezza');
+  });
+
+  it('la stessa persona non manda due volte la stessa parola', async () => {
+    const ospite = nuovoOspite();
+    // Anche una riga salvata prima della normalizzazione conta come la stessa.
+    giaMie(['Confronto!']);
+    const res = await POST(submit({ word: 'confronto', guestId: ospite }), ctx());
+    expect(res.status).toBe(409);
+    expect((await res.json()).code).toBe('WORD_DUPLICATE');
+    const cercata = mockedFindWord.mock.calls.find(
+      ([a]) => !(a as { where: Record<string, unknown> }).where.hiddenAt,
+    )?.[0] as { where: Record<string, unknown> };
+    expect(cercata.where).toMatchObject({ roundId: ROUND_ID, guestId: ospite });
+    expect(mockedCreate).not.toHaveBeenCalled();
+  });
+
+  it('una parola tolta dal moderatore non torna, da nessuno', async () => {
+    mockedFindWord.mockImplementation(async (args: { where: Record<string, unknown> }) =>
+      args.where.hiddenAt ? [{ word: 'Parolaccia!' }] : [],
+    );
+    const res = await POST(submit({ word: 'parolaccia', guestId: nuovoOspite() }), ctx());
+    expect(res.status).toBe(409);
+    expect((await res.json()).code).toBe('WORD_REMOVED');
+    expect(mockedCreate).not.toHaveBeenCalled();
+  });
+
+  it('una domanda senza limite di tempo non scade', async () => {
+    mockedRound.mockResolvedValue({
+      id: ROUND_ID,
+      eventId: EVENT_ID,
+      status: 'OPEN',
+      duration: 0,
+      createdAt: new Date(Date.now() - 5 * 3600_000),
+    });
+    const res = await POST(submit({ word: 'ancora', guestId: nuovoOspite() }), ctx());
+    expect(res.status).toBe(201);
+    expect(mockedCloseRound).not.toHaveBeenCalled();
   });
 });
 

@@ -2,6 +2,7 @@ import { withErrorHandling } from '@/lib/api-handler';
 import { NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
 import { prisma } from '@/lib/db';
 import { pokeLivePanel } from '@/lib/live-state/publish';
+import { forgetWordcloudLite } from '@/lib/wordcloud/lite';
 import { isEventModerator, extractModeratorToken } from '@/lib/auth/moderator';
 
 export const dynamic = 'force-dynamic';
@@ -32,6 +33,7 @@ export const PATCH = withErrorHandling(async (request, context) => {
     data: { status: 'CLOSED', closedAt: new Date() },
   });
 
+  forgetWordcloudLite(event.id);
   pokeLivePanel(event.id, 'wordcloud');
 
   return Response.json({

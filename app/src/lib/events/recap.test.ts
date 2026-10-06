@@ -6,7 +6,7 @@ vi.mock('@/lib/db', () => ({
     registration: { count: vi.fn() },
     question: { findMany: vi.fn() },
     poll: { findMany: vi.fn() },
-    wordCloudSubmission: { groupBy: vi.fn() },
+    wordCloudSubmission: { findMany: vi.fn() },
     eventFeedback: { aggregate: vi.fn() },
     chatMessage: { findMany: vi.fn() },
   },
@@ -21,7 +21,7 @@ const mocked = prisma as unknown as {
   registration: { count: ReturnType<typeof vi.fn> };
   question: { findMany: ReturnType<typeof vi.fn> };
   poll: { findMany: ReturnType<typeof vi.fn> };
-  wordCloudSubmission: { groupBy: ReturnType<typeof vi.fn> };
+  wordCloudSubmission: { findMany: ReturnType<typeof vi.fn> };
   eventFeedback: { aggregate: ReturnType<typeof vi.fn> };
   chatMessage: { findMany: ReturnType<typeof vi.fn> };
 };
@@ -42,9 +42,21 @@ describe('buildRecap', () => {
         votes: [{ optionIndex: 0 }, { optionIndex: 0 }, { optionIndex: 2 }],
       },
     ]);
-    mocked.wordCloudSubmission.groupBy.mockResolvedValue([
-      { word: 'digitale', _count: { word: 9 } },
-      { word: 'pa', _count: { word: 4 } },
+    // Come nella nuvola: persone, non invii, sulla forma normalizzata.
+    mocked.wordCloudSubmission.findMany.mockResolvedValue([
+      ...Array.from({ length: 9 }, (_, i) => ({
+        word: i % 2 ? 'Digitale!' : 'digitale',
+        registrationId: `r${i}`,
+        guestId: null,
+        roundId: 'd1',
+      })),
+      { word: 'digitale', registrationId: 'r0', guestId: null, roundId: 'd1' },
+      ...Array.from({ length: 4 }, (_, i) => ({
+        word: 'pa',
+        registrationId: null,
+        guestId: `g${i}`,
+        roundId: 'd1',
+      })),
     ]);
     mocked.eventFeedback.aggregate.mockResolvedValue({ _avg: { rating: 4.5 }, _count: 20 });
     mocked.chatMessage.findMany.mockResolvedValue([
@@ -179,7 +191,7 @@ describe('buildRecap — domande poste in chat', () => {
     mocked.registration.count.mockResolvedValue(10);
     mocked.question.findMany.mockResolvedValue([]);
     mocked.poll.findMany.mockResolvedValue([]);
-    mocked.wordCloudSubmission.groupBy.mockResolvedValue([]);
+    mocked.wordCloudSubmission.findMany.mockResolvedValue([]);
     mocked.eventFeedback.aggregate.mockResolvedValue({ _avg: { rating: null }, _count: 0 });
   });
 

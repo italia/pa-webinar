@@ -17,6 +17,7 @@ import type { Prisma } from '@prisma/client';
 
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
+import { countWordsByPerson } from '@/lib/wordcloud/normalize';
 import type { EmailLocale } from '@/lib/email/lingua';
 
 const MAX_QUESTIONS = 5;
@@ -169,12 +170,11 @@ export async function buildRecap(eventId: string): Promise<EventRecap> {
       orderBy: { createdAt: 'asc' },
       include: { votes: { select: { optionIndex: true } } },
     }),
-    prisma.wordCloudSubmission.groupBy({
-      by: ['word'],
-      where: { round: { eventId } },
-      _count: { word: true },
-      orderBy: { _count: { word: 'desc' } },
-      take: MAX_WORDS,
+    // Le parole si contano come nella nuvola: persone, non invii, sulla
+    // forma normalizzata. Le parole tolte dal moderatore restano fuori.
+    prisma.wordCloudSubmission.findMany({
+      where: { round: { eventId }, hiddenAt: null },
+      select: { word: true, registrationId: true, guestId: true, roundId: true },
     }),
     prisma.eventFeedback.aggregate({
       where: { eventId },
@@ -233,7 +233,7 @@ export async function buildRecap(eventId: string): Promise<EventRecap> {
     topQuestions: questions.map((q) => ({ text: q.text, upvotes: q.upvoteCount })),
     chatQuestions: recapChatQuestions,
     polls: recapPolls,
-    topWords: words.map((w) => ({ word: w.word, count: w._count.word })),
+    topWords: countWordsByPerson(words).slice(0, MAX_WORDS),
     feedback: {
       average: feedback._avg.rating ?? null,
       count: feedback._count,

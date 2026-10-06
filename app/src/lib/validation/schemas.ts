@@ -427,7 +427,8 @@ export type CreateFeedbackInput = z.infer<typeof createFeedbackSchema>;
 
 export const createWordCloudRoundSchema = z.object({
   prompt: z.string().min(3).max(200),
-  duration: z.number().int().min(30).max(300).default(120),
+  // Secondi; 0 = resta aperta finche' il moderatore non la chiude.
+  duration: z.union([z.literal(0), z.number().int().min(30).max(300)]).default(120),
 });
 
 export const submitWordCloudSchema = z.object({

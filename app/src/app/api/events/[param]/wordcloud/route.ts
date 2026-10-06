@@ -9,9 +9,18 @@ import { prisma } from '@/lib/db';
 import { pokeLivePanel } from '@/lib/live-state/publish';
 import { createWordCloudRoundSchema } from '@/lib/validation/schemas';
 import { isEventModerator, extractModeratorToken } from '@/lib/auth/moderator';
-import { authorizePanelRead } from '@/lib/events/panel-read-access';
+import { authorizePanelRead, PANEL_READ_EVENT_SELECT, type PanelReadEvent } from '@/lib/events/panel-read-access';
+import { countWordsByPerson, isRoundExpired } from '@/lib/wordcloud/normalize';
+import { WORDCLOUD_LITE_TTL_MS, forgetWordcloudLite, wordcloudLiteKey } from '@/lib/wordcloud/lite';
+import { getCached, setCache } from '@/lib/cache';
 
 export const dynamic = 'force-dynamic';
+
+/** Lettura leggera: quanto restano in caldo l'evento e l'esito del controllo
+ *  di un token. Brevi: lo stato dell'evento decide la finestra degli ospiti,
+ *  e un accesso revocato smette di leggere entro un minuto. */
+const LITE_EVENT_TTL_MS = 5_000;
+const LITE_AUTH_TTL_MS = 60_000;
 
 // POST /api/events/[slug]/wordcloud — create round (moderator)
 export const POST = withErrorHandling(async (request, context) => {
@@ -58,6 +67,7 @@ export const POST = withErrorHandling(async (request, context) => {
     });
   });
 
+  forgetWordcloudLite(event.id);
   pokeLivePanel(event.id, 'wordcloud');
 
   return Response.json(
@@ -77,6 +87,40 @@ export const POST = withErrorHandling(async (request, context) => {
 export const GET = withErrorHandling(async (request, context) => {
   const { param: slug } = await context.params;
 
+  // Lettura leggera per il pallino sulla scheda: c'e' una domanda aperta, e
+  // quale. Niente parole e nessuna scrittura (la chiusura allo scadere la fa
+  // la lettura completa). Passa la stessa regola di lettura del pannello;
+  // la risposta, uguale per tutti, si tiene in caldo.
+  if (new URL(request.url).searchParams.get('lite') === '1') {
+    // La segue ogni presente a ogni parola inviata: l'evento e l'esito del
+    // controllo di chi ha un token restano in caldo, cosi' una rilettura e'
+    // fatta di memoria e non di query.
+    let ev = getCached<PanelReadEvent>(`wordcloud-lite-event:${slug}`);
+    if (!ev) {
+      ev = await prisma.event.findUnique({ where: { slug }, select: PANEL_READ_EVENT_SELECT });
+      if (!ev) throw new NotFoundError('Event');
+      setCache(`wordcloud-lite-event:${slug}`, ev, LITE_EVENT_TTL_MS);
+    }
+    const token = extractModeratorToken(request) || null;
+    const autorizzato = token ? `wordcloud-lite-auth:${ev.id}:${token}` : null;
+    if (!autorizzato || !getCached<true>(autorizzato)) {
+      await authorizePanelRead(ev, token);
+      if (autorizzato) setCache(autorizzato, true, LITE_AUTH_TTL_MS);
+    }
+    const inCaldo = getCached<{ active: boolean; id?: string }>(wordcloudLiteKey(ev.id));
+    if (inCaldo) return Response.json(inCaldo);
+    const ultimo = await prisma.wordCloudRound.findFirst({
+      where: { eventId: ev.id },
+      orderBy: { createdAt: 'desc' },
+      select: { id: true, status: true, duration: true, createdAt: true },
+    });
+    const corpo = ultimo
+      ? { active: ultimo.status === 'OPEN' && !isRoundExpired(ultimo), id: ultimo.id }
+      : { active: false };
+    setCache(wordcloudLiteKey(ev.id), corpo, WORDCLOUD_LITE_TTL_MS);
+    return Response.json(corpo);
+  }
+
   const event = await prisma.event.findUnique({ where: { slug } });
   if (!event) throw new NotFoundError('Event');
 
@@ -91,7 +135,7 @@ export const GET = withErrorHandling(async (request, context) => {
     orderBy: { createdAt: 'desc' },
     include: {
       submissions: {
-        select: { word: true },
+        select: { word: true, registrationId: true, guestId: true, hiddenAt: true },
       },
     },
   });
@@ -102,8 +146,7 @@ export const GET = withErrorHandling(async (request, context) => {
 
   // Auto-close if duration exceeded
   if (round.status === 'OPEN') {
-    const elapsedMs = Date.now() - round.createdAt.getTime();
-    if (elapsedMs > round.duration * 1000) {
+    if (isRoundExpired(round)) {
       // Allo scadere del conto alla rovescia la sala intera rilegge nello
       // stesso secondo: la condizione sullo stato fa scrivere solo la prima.
       const closedAt = new Date();
@@ -116,20 +159,19 @@ export const GET = withErrorHandling(async (request, context) => {
       // Chi l'ha chiuso lo dice alla sala: chi ha l'orologio avanti ha già
       // riletto trovandolo aperto, e senza avviso lo vedrebbe aperto fino al
       // prossimo giro periodico, con le parole respinte.
-      if (chiusi.count > 0) pokeLivePanel(event.id, 'wordcloud');
+      if (chiusi.count > 0) {
+        forgetWordcloudLite(event.id);
+        pokeLivePanel(event.id, 'wordcloud');
+      }
     }
   }
 
   // Aggregate word counts
-  const wordCounts = new Map<string, number>();
-  for (const s of round.submissions) {
-    const normalized = s.word.toLowerCase().trim();
-    wordCounts.set(normalized, (wordCounts.get(normalized) || 0) + 1);
-  }
-
-  const words = Array.from(wordCounts.entries())
-    .map(([word, count]) => ({ word, count }))
-    .sort((a, b) => b.count - a.count);
+  // Si contano le PERSONE per parola, non gli invii: anche le righe salvate
+  // prima della regola «una volta per parola» non gonfiano niente. Le parole
+  // tolte dal moderatore non ci sono.
+  const visibili = round.submissions.filter((s) => !s.hiddenAt);
+  const words = countWordsByPerson(visibili);
 
   return Response.json({
     active: round.status === 'OPEN',
@@ -139,7 +181,7 @@ export const GET = withErrorHandling(async (request, context) => {
     duration: round.duration,
     createdAt: round.createdAt.toISOString(),
     closedAt: round.closedAt?.toISOString() ?? null,
-    totalSubmissions: round.submissions.length,
+    totalSubmissions: visibili.length,
     words,
   });
 });

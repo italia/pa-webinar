@@ -1505,6 +1505,10 @@ model WordCloudSubmission {
   guestId        String?  @map("guest_id")
   word           String   @db.VarChar(30)
   createdAt      DateTime @default(now()) @map("created_at")
+  // Tolta dal moderatore: fuori dalla nuvola e dal riepilogo, e la stessa
+  // parola non si puo' piu' inviare in quel giro. La riga resta, cosi' conta
+  // ancora nel limite di invii di chi l'aveva scritta.
+  hiddenAt       DateTime? @map("hidden_at")
 
   // Relations
   round WordCloudRound @relation(fields: [roundId], references: [id], onDelete: Cascade)
