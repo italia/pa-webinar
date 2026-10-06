@@ -55,6 +55,7 @@ const ETICHETTE: Partial<Record<PercorsoInterno, string>> = {
   '/admin/settings/gdpr-templates': 'settingsGdprTemplates',
   '/admin/settings/email-templates': 'settingsEmailTemplates',
   '/admin/settings/tags': 'settingsTags',
+  '/admin/settings/glossary': 'settingsGlossary',
 };
 
 interface Anello {
@@ -83,7 +84,7 @@ function ancestorChain(pathname: string, params: Record<string, string>): Anello
   return catena;
 }
 
-export default function AdminBreadcrumb() {
+export default function AdminBreadcrumb({ role = 'admin' }: { role?: 'admin' | 'organizer' }) {
   const pathname = usePathname();
   const params = useParams<Record<string, string>>();
   const t = useTranslations('admin.nav');
@@ -94,7 +95,11 @@ export default function AdminBreadcrumb() {
     return null;
   }
 
-  const chain = ancestorChain(pathname, params ?? {});
+  // Chi organizza non apre l'indice delle impostazioni: dalle pagine che
+  // vede la' sotto (il glossario) si risale agli eventi, non a quella.
+  const chain = ancestorChain(pathname, params ?? {}).filter(
+    (c) => role === 'admin' || c.labelKey !== 'settings',
+  );
   if (chain.length < 2) return null;
 
   const parent = chain[chain.length - 2];

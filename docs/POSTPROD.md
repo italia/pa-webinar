@@ -575,9 +575,14 @@ Licenses of the models and libraries are listed in
 
 ### Speech recognition
 
-- The portal builds an initial prompt from the event's title, organizer name
-  and speaker information, so that Whisper spells names, acronyms and
-  organizations correctly.
+- The portal builds an initial prompt from the terms of the
+  [glossary](#glossary), the event's first, and the event's title, organizer
+  name and speaker information, so that Whisper spells names, acronyms and
+  organizations correctly. Whisper keeps only the last ~220 tokens of a
+  prompt, so the glossary terms come first and take at most 240 characters,
+  and the title and speakers come last; the whole prompt stays under 800
+  characters. Multitrack transcription gets no prompt: a participant's track
+  is mostly silence, and on silence Whisper tends to repeat the prompt.
 - Segments that Whisper is unsure about are dropped as probable
   hallucinations (average log-probability below -1.0, or no-speech probability
   above 0.6; see the thresholds in `transcribe.py`). Segments with a borderline
@@ -618,6 +623,69 @@ energy envelope with the mix (`align.py`); otherwise the offsets from the
 recorder's manifest are used. Several track sessions of the same participant
 (after a rejoin) merge under one speaker. No waveform is produced on this
 path.
+
+### Glossary
+
+The glossary tells every stage how a term is written, how speech recognition
+may render it, how it is translated and how it is pronounced in dubbing
+(`app/src/lib/ai/glossary.ts`, applied by `infra/ai/worker/glossary.py`). It
+has two levels:
+
+- **Instance terms**, in **Settings → Glossary** (`/admin/settings/glossary`,
+  API `/api/admin/glossary`). They apply to every event. Administrators and
+  organizers add terms; an organizer edits and deletes only the terms they
+  added, administrators all of them. Organizers reach the page from the
+  glossary panel of their events. A new installation starts with common
+  Italian public-administration acronyms, which administrators can edit or
+  delete.
+- **Event terms**, managed in the **After the event** tab of the event page
+  (API `/api/admin/events/{id}/glossary`) by administrators, the event's
+  organizer and its moderators. They add to the instance terms, and an event
+  term replaces an instance term with the same spelling (case-insensitive).
+  A duplicated event copies its glossary.
+
+Each term has:
+
+| Field | Used for |
+|---|---|
+| Term | The written form, kept in transcripts and subtitles |
+| Forms to correct (`aliases`) | Spoken or misspelled forms that speech recognition may produce; the worker replaces them with the term, case-insensitively and across spaces, dots and hyphens |
+| Reading (`reading`) | How dubbing reads the term when it has no pronunciation: `auto` (the speech synthesizer decides), `spell` (letter by letter, sent as `A-B-C`, a form the synthesizer spells in every language) or `word` (sent with only the first letter capitalized). For `spell` terms, letters written with dots or spaces (`A.B.C`, `A B C`) also become the term |
+| Pronunciation (`spoken`) | What dubbing says instead of the term, per language or for all languages (`*`) |
+| Fixed translations (`translations`) | The term's form in a target language; without one, the term is kept unchanged in every language |
+| Meaning (`note`) | Context for the model that corrects, summarizes and translates; it never appears in the outputs |
+
+How each stage uses it:
+
+- **Transcription.** After speech recognition, the forms to correct become
+  the term. The language model then corrects names, acronyms and technical
+  terms line by line, with the speakers' names and the glossary in its prompt
+  (names first, then event terms, then instance terms, up to 80 entries). A
+  corrected line is kept only if every changed part is a spelling variant of
+  the original words or a known term or name, no word is removed, and at most
+  three words, or 30% of a long line, change; otherwise the original stays.
+  After the correction the forms to correct are applied again. When a line
+  changes, its word timings are realigned to the new words, so the public
+  transcript can still highlight them.
+- **Correction limits.** The correction always runs when the job carries a
+  language model endpoint, on the GPU worker right after recognition. Only
+  its first request waits for vLLM's cold start (`LLM_CONNECT_WAIT_S`), and
+  not at all when the vLLM service name does not resolve; the others run in
+  parallel (`LLM_PARALLEL`) with two minutes each. It stops at
+  `AI_CORRECTION_MAX_S`, or earlier so that at least 15 minutes of the Job's
+  `activeDeadlineSeconds` (passed as `WORKER_DEADLINE_S`) remain, and keeps
+  the lines not yet corrected. Each finished batch refreshes the job's lease.
+- **Summary.** The terms that appear in the transcript are listed in the
+  prompt with their meaning, with the instruction to write them as given and
+  not to expand them.
+- **Translation.** In each subtitle line the terms become markers that the
+  model copies unchanged; the worker puts back the term or its fixed
+  translation. If the model loses or duplicates a marker, the batch is
+  translated again without markers, with the glossary rules in the prompt.
+  The summary is translated with the same rules in the prompt.
+- **Dubbing.** Before synthesis, each term, or its fixed translation in the
+  target language, is replaced by its pronunciation or by its reading. The
+  subtitles keep the written form.
 
 ### Summaries and translation
 
@@ -799,6 +867,7 @@ for their fields; deletion and retention are described in
 | `postprod_artifacts` (`PostprodArtifact`) | One output per `(recording, type, language)`: key, size, MIME type, encrypted inline copy, `contentHash` (SHA-256), `isSynthetic`, `watermarkType`, model id and version, `revisedAt` |
 | `postprod_original_bodies` (`PostprodOriginalBody`) | The machine version of a transcript, copied byte for byte (still encrypted) at its first manual correction |
 | `speakers` (`Speaker`) | One speaker label per recording: display name in plain text, optional link to an address-book `Person`, total speaking time |
+| `glossary_terms` (`GlossaryTerm`) | The [glossary](#glossary): instance terms (no event) and event terms, each with its forms to correct, reading, pronunciations, fixed translations and meaning |
 
 ```mermaid
 %%{init: {"theme": "base", "themeVariables": {"primaryColor": "#E6F0FA", "primaryBorderColor": "#0066CC", "primaryTextColor": "#17324D", "lineColor": "#5C6F82", "tertiaryColor": "#F7F9FB", "edgeLabelBackground": "#FFFFFF"}}}%%
@@ -1176,6 +1245,9 @@ Set these through `postprod.worker.extraEnv` unless noted:
 | Variable | Default | Purpose |
 |---|---|---|
 | `LLM_CONNECT_WAIT_S` | `720` | How long a worker waits for vLLM to come up |
+| `LLM_PARALLEL` | `6` | Parallel requests of the transcript correction ([Glossary](#glossary)) |
+| `AI_CORRECTION_MAX_S` | `1200` | Time budget of the transcript correction; lines not corrected by then stay as recognized |
+| `WORKER_DEADLINE_S` | set by the chart to `postprod.worker.activeDeadlineSeconds` | The Job's deadline, so the correction leaves time for the uploads |
 | `AI_WATERMARK` | `1` | `0` disables the AudioSeal watermark on dubbed audio |
 | `AUDIOSEAL_CACHE_DIR` | unset (AudioSeal then uses `XDG_CACHE_HOME`, `/work/.cache`) | Where the watermark generator is cached |
 | `WHISPERX_VERSION`, `PIPER_VERSION` | `whisperx-3.1`, `piper-1.2` | Version labels written to each artifact's `modelVersion`. They are labels, not detected versions: set them to the versions in `infra/ai/worker/requirements.txt` if you need exact provenance. |

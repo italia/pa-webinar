@@ -112,6 +112,10 @@ spec:
                 # downloads the source MP4 and stages artifacts anyway).
                 - name: TMPDIR
                   value: /work
+                # La scadenza del Job, per i passi che si regolano sul tempo
+                # rimasto (la correzione della trascrizione).
+                - name: WORKER_DEADLINE_S
+                  value: {{ .Values.postprod.worker.activeDeadlineSeconds | default 3600 | quote }}
                 - name: CRON_API_KEY
                   valueFrom:
                     secretKeyRef:

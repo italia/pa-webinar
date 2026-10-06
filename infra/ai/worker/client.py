@@ -61,6 +61,10 @@ class ProviderHints(BaseModel):
     # Numero di speaker attesi (dall'Event.expectedSpeakers). Quando
     # valorizzato, il worker forza k nel clustering della diarization.
     expectedSpeakers: Optional[int] = None
+    # Il glossario dell'evento e dell'istanza (app: lib/ai/glossary.ts):
+    # voci {term, aliases, reading, spoken, translations, note}, lette da
+    # glossary.parse.
+    glossary: List[Dict[str, Any]] = Field(default_factory=list)
 
 
 class ClaimResponse(BaseModel):

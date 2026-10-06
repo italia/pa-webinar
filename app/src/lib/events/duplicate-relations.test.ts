@@ -38,6 +38,9 @@ function fullSource(): DuplicateSource {
       { label: 'Domande', sortOrder: 1, plannedMinutes: null },
     ],
     reminders: [{ offsetMinutes: 1440, label: 'Un giorno prima' }],
+    glossaryTerms: [
+      { term: 'ACN', aliases: ['a ci enne'], reading: 'spell', spoken: {}, translations: { en: 'ACN' }, note: 'Agenzia' },
+    ],
     questionnaires: [
       {
         placement: 'POST_EVENT',
@@ -170,6 +173,7 @@ describe('duplicatedRelations', () => {
       agendaItems: [],
       reminders: [],
       questionnaires: [],
+      glossaryTerms: [],
     };
     expect(duplicatedRelations(empty)).toEqual({});
   });
@@ -181,6 +185,10 @@ describe('duplicatedRelations', () => {
       { name: 'Ente A', logoUrl: null, websiteUrl: 'https://esempio.gov.it', sortOrder: 0 },
     ]);
     expect(out.reminders?.create).toEqual([{ offsetMinutes: 1440, label: 'Un giorno prima' }]);
+    // Il glossario dell'evento si eredita: le sigle di una serie si ripetono.
+    expect(out.glossaryTerms?.create).toEqual([
+      { term: 'ACN', aliases: ['a ci enne'], reading: 'spell', spoken: {}, translations: { en: 'ACN' }, note: 'Agenzia' },
+    ]);
     const q = (out.questionnaires?.create as Record<string, unknown>[])[0]!;
     expect(q.placement).toBe('POST_EVENT');
     expect(q.templates).toEqual({ create: [{ templateId: 'tpl-1', sortOrder: 0 }] });

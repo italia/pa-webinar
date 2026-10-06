@@ -25,6 +25,11 @@ from typing import Any, Dict, List, Optional
 
 import httpx
 
+try:  # nel pacchetto del worker
+    from . import glossary as gl
+except ImportError:  # nei test, che importano i moduli per nome (conftest.py)
+    import glossary as gl  # type: ignore[no-redef]
+
 log = logging.getLogger(__name__)
 
 
@@ -64,6 +69,22 @@ def _stub_enabled() -> bool:
     return os.environ.get("WORKER_STUB") == "1"
 
 
+def _name_unknown(e: BaseException) -> bool:
+    """Il nome del servizio non esiste (non solo: non risponde ancora)."""
+    import socket
+
+    seen = set()
+    cur: Optional[BaseException] = e
+    while cur is not None and id(cur) not in seen:
+        seen.add(id(cur))
+        if isinstance(cur, socket.gaierror) and cur.errno == socket.EAI_NONAME:
+            return True
+        if "Name or service not known" in str(cur) or "nodename nor servname" in str(cur):
+            return True
+        cur = cur.__cause__ or cur.__context__
+    return False
+
+
 def _chat_completions(
     *,
     base_url: str,
@@ -73,6 +94,8 @@ def _chat_completions(
     max_tokens: int = 2048,
     timeout: float = 300.0,
     json_mode: bool = False,
+    connect_wait: Optional[float] = None,
+    fail_if_unresolvable: bool = False,
 ) -> str:
     """OpenAI-compatible /chat/completions call. Returns the content
     string from the first choice. ``json_mode`` sets response_format to
@@ -96,7 +119,8 @@ def _chat_completions(
     # Restando invece in attesa qui, il job resta RUNNING, l'orchestrator
     # mantiene running>0 e vLLM finisce di caricare → la chiamata va a buon
     # fine. Atteso fino a LLM_CONNECT_WAIT_S (default 12 min); poi propaga.
-    connect_wait = float(os.environ.get("LLM_CONNECT_WAIT_S", "720"))
+    if connect_wait is None:
+        connect_wait = float(os.environ.get("LLM_CONNECT_WAIT_S", "720"))
     deadline = time.monotonic() + connect_wait
     attempt = 0
     while True:
@@ -105,7 +129,8 @@ def _chat_completions(
             r = httpx.post(url, json=body, timeout=timeout)
         except (httpx.ConnectError, httpx.ConnectTimeout, httpx.RemoteProtocolError) as e:
             # Backend irraggiungibile: vLLM in cold-start → attendi e ritenta.
-            if time.monotonic() >= deadline:
+            # Un nome che non esiste non e' un cold-start: vLLM non c'e'.
+            if time.monotonic() >= deadline or (fail_if_unresolvable and _name_unknown(e)):
                 raise
             wait = min(15.0, 2.0 * attempt)
             log.info(
@@ -301,14 +326,21 @@ def summarize_transcript(
 CORRECT_SYSTEM_IT = (
     "Sei un editor che corregge una trascrizione automatica di una riunione "
     "della Pubblica Amministrazione italiana. Riceverai la trascrizione "
-    "originale e un elenco di nomi propri, sigle e termini tecnici noti. "
-    "Il tuo compito è correggere SOLO ortografia, nomi propri e sigle, "
-    "senza inventare o aggiungere contenuto, senza modificare il senso, "
-    "senza accorpare o splittare frasi. Mantieni esattamente la stessa "
-    "struttura di righe. Se una riga è incomprensibile, lasciala invariata. "
-    "Output: una riga per ogni riga di input, nello stesso ordine, niente "
-    "preamboli, niente numerazione aggiuntiva."
+    "originale e un glossario di nomi propri, sigle e termini tecnici, ciascuno "
+    "nella forma in cui va scritto (con il significato fra parentesi, quando "
+    "c'e'). Il tuo compito è correggere SOLO ortografia, nomi propri e sigle: "
+    "se una riga contiene un termine del glossario scritto male, o detto per "
+    "esteso lettera per lettera, scrivilo nella forma del glossario. Non "
+    "inventare o aggiungere contenuto, non modificare il senso, non accorpare "
+    "o dividere frasi, non sciogliere le sigle. Mantieni esattamente la stessa "
+    "struttura di righe. Se una riga è incomprensibile o corretta, lasciala "
+    "invariata. Output: una riga per ogni riga di input, nello stesso ordine e "
+    "con lo stesso numero, niente preamboli."
 )
+
+# Errori di rete dopo l'attesa del cold-start: vLLM non c'e', inutile
+# riprovare riga per riga.
+_UNREACHABLE = (httpx.ConnectError, httpx.ConnectTimeout, httpx.RemoteProtocolError)
 
 
 def correct_transcript_segments(
@@ -318,15 +350,25 @@ def correct_transcript_segments(
     source_language: str,
     base_url: Optional[str],
     model_id: Optional[str],
+    max_workers: Optional[int] = None,
+    deadline_s: Optional[float] = None,
+    allowed: Optional[set] = None,
+    on_progress: Optional[Any] = None,
 ) -> list[str]:
-    """Passa N righe di trascrizione a Mistral per correggere nomi
-    propri, sigle e termini tecnici. Ritorna N righe corrette nello
-    stesso ordine. In stub mode o senza LLM, ritorna l'input invariato.
+    """Passa la trascrizione al modello per correggere nomi propri, sigle e
+    termini tecnici, con il glossario dell'evento. Ritorna le righe nello
+    stesso ordine; una riga resta quella originale se il modello non la
+    restituisce, o se la riscrive troppo (``glossary.correction_is_safe``).
 
-    `glossary_terms`: lista di nomi propri / sigle dell'evento
-    (`speakersInfo`, organizzazione, etc.) che Mistral deve preservare
-    e correggere se Whisper li ha approssimati. Es. ["Mario Rossi",
-    "PCM", "OVH", "Azure", "Kubernetes"].
+    Le richieste partono in parallelo (vLLM le serve insieme): una call di due
+    ore resta nell'ordine dei minuti. Solo il primo lotto aspetta il
+    cold-start di vLLM (LLM_CONNECT_WAIT_S), e non lo aspetta se il nome del
+    servizio non esiste; gli altri non aspettano e hanno 2 minuti ciascuno.
+    Oltre ``deadline_s`` (default AI_CORRECTION_MAX_S, 20 minuti) le righe
+    non ancora corrette restano com'erano: la correzione migliora la
+    trascrizione, non deve farla fallire. ``on_progress(fatti, totale)`` dal
+    thread chiamante, per rinnovare la presa sul job. In stub mode, o senza
+    LLM, ritorna l'input.
     """
     if not segments_text:
         return []
@@ -334,51 +376,102 @@ def correct_transcript_segments(
         log.info("LLM stub mode for correct_transcript_segments")
         return list(segments_text)
 
+    import concurrent.futures as cf
+
+    workers = max_workers or int(os.environ.get("LLM_PARALLEL", "6"))
+    budget = deadline_s if deadline_s is not None else float(os.environ.get("AI_CORRECTION_MAX_S", "1200"))
+    deadline = time.monotonic() + budget
+
     # Batch: ogni richiesta corregge N=40 righe per stare sotto i
     # limiti di token e per ridurre il rischio di "drift" su prompt
     # troppo lunghi.
     BATCH = 40
-    corrected: list[str] = []
     glossary_block = (
-        "Glossario evento: " + ", ".join(glossary_terms[:60]) + "."
+        "Glossario: " + "; ".join(glossary_terms[:80]) + "."
         if glossary_terms
         else ""
     )
-    for i in range(0, len(segments_text), BATCH):
-        batch = segments_text[i : i + BATCH]
+    batches = [segments_text[i : i + BATCH] for i in range(0, len(segments_text), BATCH)]
+    results: Dict[int, list[str]] = {}
+    unreachable = False
+
+    def one(batch: list[str], first: bool = False) -> list[str]:
+        if unreachable or time.monotonic() > deadline:
+            return list(batch)
         numbered = "\n".join(f"{j + 1}. {line}" for j, line in enumerate(batch))
-        try:
-            resp = _chat_completions(
-                base_url=base_url,
-                model_id=model_id,
-                messages=[
-                    {"role": "system", "content": CORRECT_SYSTEM_IT},
-                    {
-                        "role": "user",
-                        "content": (
-                            f"Lingua sorgente: {source_language}.\n"
-                            + (glossary_block + "\n\n" if glossary_block else "\n")
-                            + "Trascrizione (una frase per riga, numerata):\n"
-                            + numbered
-                        ),
-                    },
-                ],
-            )
-        except Exception as e:
-            log.warning("correction batch %d failed: %s — keeping originals", i, e)
-            corrected.extend(batch)
-            continue
-        # Parsing: estrai N righe nel formato "N. testo"
+        resp = _chat_completions(
+            base_url=base_url,
+            model_id=model_id,
+            messages=[
+                {"role": "system", "content": CORRECT_SYSTEM_IT},
+                {
+                    "role": "user",
+                    "content": (
+                        f"Lingua sorgente: {source_language}.\n"
+                        + (glossary_block + "\n\n" if glossary_block else "\n")
+                        + "Trascrizione (una frase per riga, numerata):\n"
+                        + numbered
+                    ),
+                },
+            ],
+            temperature=0.0,
+            max_tokens=4000,
+            timeout=120.0,
+            # Il primo lotto aspetta il cold-start, ma non oltre il tempo
+            # concesso alla correzione.
+            connect_wait=(
+                min(float(os.environ.get("LLM_CONNECT_WAIT_S", "720")), max(0.0, deadline - time.monotonic()))
+                if first
+                else 0.0
+            ),
+            fail_if_unresolvable=True,
+        )
         parsed: dict[int, str] = {}
         for raw in resp.splitlines():
-            import re
-
             m = re.match(r"^\s*(\d+)\.\s*(.*)$", raw)
             if m:
-                idx = int(m.group(1)) - 1
-                parsed[idx] = m.group(2).strip()
+                parsed[int(m.group(1)) - 1] = m.group(2).strip()
+        out = []
         for j, original in enumerate(batch):
-            corrected.append(parsed.get(j, original))
+            fixed = parsed.get(j)
+            out.append(
+                fixed if fixed is not None and gl.correction_is_safe(original, fixed, allowed) else original
+            )
+        return out
+
+    # Il primo lotto da solo: aspetta il cold-start di vLLM una volta sola, e
+    # se vLLM non c'e' non si accodano altre attese.
+    try:
+        results[0] = one(batches[0], first=True)
+    except _UNREACHABLE as e:
+        log.warning("correzione saltata, LLM non raggiungibile: %s", e)
+        return list(segments_text)
+    except Exception as e:  # noqa: BLE001
+        log.warning("correction batch 0 failed: %s — keeping originals", e)
+        results[0] = list(batches[0])
+
+    with cf.ThreadPoolExecutor(max_workers=workers) as ex:
+        futures = {ex.submit(one, b): k for k, b in enumerate(batches) if k > 0}
+        for fut in cf.as_completed(futures):
+            k = futures[fut]
+            if on_progress is not None:
+                try:
+                    on_progress(len(results) + 1, len(batches))
+                except Exception:  # noqa: BLE001 — l'avanzamento e' informativo
+                    log.debug("progress callback failed", exc_info=True)
+            try:
+                results[k] = fut.result()
+            except _UNREACHABLE as e:
+                unreachable = True
+                log.warning("correction batch %d: LLM non raggiungibile (%s)", k, e)
+                results[k] = list(batches[k])
+            except Exception as e:  # noqa: BLE001
+                log.warning("correction batch %d failed: %s — keeping originals", k, e)
+                results[k] = list(batches[k])
+
+    corrected: list[str] = []
+    for k in range(len(batches)):
+        corrected.extend(results[k])
     return corrected
 
 
@@ -388,6 +481,7 @@ def translate_text(
     target_language: str,
     base_url: Optional[str],
     model_id: Optional[str],
+    rules: str = "",
 ) -> str:
     if _stub_enabled() or not base_url or not model_id:
         log.info("LLM stub mode for translate to %s", target_language)
@@ -396,7 +490,8 @@ def translate_text(
     messages = [
         {
             "role": "system",
-            "content": TRANSLATE_SYSTEM_PROMPT.format(target=target_language),
+            "content": TRANSLATE_SYSTEM_PROMPT.format(target=target_language)
+            + (GLOSSARY_RULES_PROMPT.format(rules=rules) if rules else ""),
         },
         {"role": "user", "content": text},
     ]
@@ -417,7 +512,14 @@ meaning, tone, named entities and any in-text formatting. Keep EXACTLY
 the same numbering and the same number of lines, one translation per
 input line, in the same order. Do not merge or split lines. Do not add
 commentary. Output only the numbered translated lines.
+Markers like \u27e61\u27e7 stand for protected terms: copy each one
+unchanged, exactly once, where the term belongs in the translated sentence.
 Target language: {target}.
+"""
+
+GLOSSARY_RULES_PROMPT = """
+Glossary — apply these rules to every line:
+{rules}
 """
 
 
@@ -439,12 +541,43 @@ def _parse_numbered_lines(resp: str, n: int) -> Optional[List[str]]:
     return [parsed[i] for i in range(n)]
 
 
+def _translate_numbered(
+    lines: List[str],
+    target_language: str,
+    base_url: str,
+    model_id: str,
+    *,
+    rules: str = "",
+) -> Optional[List[str]]:
+    """Una richiesta per un lotto di righe numerate; None se le righe
+    restituite non tornano."""
+    system = TRANSLATE_BATCH_SYSTEM_PROMPT.format(target=target_language)
+    if rules:
+        system += GLOSSARY_RULES_PROMPT.format(rules=rules)
+    numbered = "\n".join(f"{k + 1}. {line}" for k, line in enumerate(lines))
+    resp = _chat_completions(
+        base_url=base_url,
+        model_id=model_id,
+        messages=[
+            {"role": "system", "content": system},
+            {
+                "role": "user",
+                "content": "Lines to translate (one phrase per line, numbered):\n" + numbered,
+            },
+        ],
+        # Translations should be deterministic.
+        temperature=0.0,
+    )
+    return _parse_numbered_lines(resp, len(lines))
+
+
 def translate_segments(
     *,
     segments: List[Dict[str, Any]],
     target_language: str,
     base_url: Optional[str],
     model_id: Optional[str],
+    glossary: Optional[List["gl.Term"]] = None,
 ) -> List[Dict[str, Any]]:
     """Translate each segment's text, preserving timing and speaker
     labels and the input order.
@@ -456,7 +589,13 @@ def translate_segments(
     the proven pattern in ``correct_transcript_segments``. If a batch's
     reply fails the line-count round-trip, we fall back to per-segment
     translation for that batch only (count mismatch → safe recovery).
+
+    Con il glossario, i termini di ogni riga diventano segnaposto che il
+    modello copia (glossary.protect) e tornano come termine o traduzione
+    fissa; se il modello ne perde uno, il lotto si traduce di nuovo con le
+    regole del glossario nel prompt, senza segnaposti.
     """
+    terms = glossary or []
     out: List[Dict[str, Any]] = []
     if _stub_enabled() or not base_url or not model_id:
         # Mantieni il comportamento storico in stub mode (test downstream):
@@ -488,31 +627,23 @@ def translate_segments(
             out.extend(batch)
             continue
         texts = [(batch[j].get("text") or "").strip() for j in nonempty_idx]
-        numbered = "\n".join(f"{k + 1}. {line}" for k, line in enumerate(texts))
+        present = gl.terms_in("\n".join(texts), terms) if terms else []
+        protected = [gl.protect(t, present, target_language) for t in texts]
         translations: Optional[List[str]] = None
         try:
-            resp = _chat_completions(
-                base_url=base_url,
-                model_id=model_id,
-                messages=[
-                    {
-                        "role": "system",
-                        "content": TRANSLATE_BATCH_SYSTEM_PROMPT.format(
-                            target=target_language
-                        ),
-                    },
-                    {
-                        "role": "user",
-                        "content": (
-                            "Lines to translate (one phrase per line, numbered):\n"
-                            + numbered
-                        ),
-                    },
-                ],
-                # Translations should be deterministic.
-                temperature=0.0,
+            translations = _translate_numbered(
+                [p for p, _ in protected], target_language, base_url, model_id,
             )
-            translations = _parse_numbered_lines(resp, len(texts))
+            if translations is not None and present:
+                restored = [gl.restore(tr, rep) for tr, (_, rep) in zip(translations, protected)]
+                if any(r is None for r in restored):
+                    log.info("translation batch %d: segnaposto persi — regole del glossario nel prompt", i)
+                    translations = _translate_numbered(
+                        texts, target_language, base_url, model_id,
+                        rules=gl.translation_rules(present, target_language),
+                    )
+                else:
+                    translations = [r for r in restored if r is not None]
         except Exception as e:  # noqa: BLE001
             log.warning(
                 "translation batch %d failed: %s — falling back to per-segment", i, e
@@ -529,6 +660,9 @@ def translate_segments(
                     target_language=target_language,
                     base_url=base_url,
                     model_id=model_id,
+                    rules=gl.translation_rules(
+                        gl.terms_in((batch[j].get("text") or ""), present), target_language
+                    ),
                 ).strip()
                 for j in nonempty_idx
             }
@@ -797,6 +931,16 @@ def _apply_chapters(summary: Dict[str, Any], chapters: list) -> Dict[str, Any]:
     return {**summary, "topics": out_topics}
 
 
+def _format_glossary(terms: List["gl.Term"]) -> str:
+    if not terms:
+        return ""
+    righe = [f"- {t.term}" + (f": {t.note}" if t.note else "") for t in terms]
+    return (
+        "\n\nGlossario (scrivi questi termini esattamente in questa forma, "
+        "senza scioglierli):\n" + "\n".join(righe)
+    )
+
+
 def summarize_transcript_structured(
     *,
     transcript_text: str,
@@ -805,9 +949,12 @@ def summarize_transcript_structured(
     model_id: Optional[str],
     agenda_items: Optional[list] = None,
     timeline: Optional[dict] = None,
+    glossary: Optional[List["gl.Term"]] = None,
 ) -> Dict[str, Any]:
     """SUMMARY_JSON: sintesi strutturata via LLM JSON-mode. Con i capitoli
-    della scaletta nella cronologia, i topic sono quelli (vedi _apply_chapters)."""
+    della scaletta nella cronologia, i topic sono quelli (vedi _apply_chapters).
+    I termini del glossario presenti nella trascrizione arrivano al modello con
+    il loro significato, perche' li scriva nella forma giusta."""
     chapters = _timeline_chapters(timeline)
     if _stub_enabled() or not base_url or not model_id:
         log.info("LLM stub mode for structured summary")
@@ -821,6 +968,7 @@ def summarize_transcript_structured(
                 + _format_agenda(agenda_items)
                 + _format_chapters(chapters)
                 + _format_timeline(timeline)
+                + _format_glossary(gl.terms_in(transcript_text, glossary or []))
                 + "\n\nTranscript:\n" + transcript_text
             ),
         },
@@ -857,6 +1005,7 @@ def translate_summary_structured(
     target_language: str,
     base_url: Optional[str],
     model_id: Optional[str],
+    glossary: Optional[List["gl.Term"]] = None,
 ) -> Dict[str, Any]:
     """Traduce la sintesi strutturata mantenendo lo shape; i `start_mmss`
     dei topic restano invariati (timestamp). Fallback alla sorgente se
@@ -864,6 +1013,8 @@ def translate_summary_structured(
     import json
     if _stub_enabled() or not base_url or not model_id:
         return {**summary, "overall_summary": f"[stub {target_language}] " + (summary.get("overall_summary") or "")}
+    present = gl.terms_in(json.dumps(summary, ensure_ascii=False), glossary or [])
+    rules = gl.translation_rules(present, target_language) if present else ""
     raw = _chat_completions(
         base_url=base_url, model_id=model_id,
         messages=[
@@ -871,7 +1022,7 @@ def translate_summary_structured(
                 f"You translate Italian PA meeting summaries to {target_language}. "
                 "Keep the SAME JSON keys and the topics' start_mmss values UNCHANGED. "
                 "Translate only human-readable text. Output JSON only."
-            )},
+            ) + (GLOSSARY_RULES_PROMPT.format(rules=rules) if rules else "")},
             {"role": "user", "content": json.dumps(summary, ensure_ascii=False)},
         ],
         # Piu' margine della sintesi sorgente (3000): la traduzione puo' essere

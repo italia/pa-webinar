@@ -28,11 +28,13 @@ import os
 import subprocess
 import sys
 import tempfile
+import time
 from typing import Any, Dict, List, Optional
 
 from . import align as almod
 from . import archive as arcmod
 from . import client as cli
+from . import glossary as glmod
 from . import llm as llmmod
 from . import multitrack as mtmod
 from . import transcribe as tr
@@ -122,6 +124,75 @@ def _write_and_upload(
 # ---------------------------------------------------------------------------
 
 
+# Quando e' partito il processo: il Job ha una scadenza (activeDeadlineSeconds,
+# passata dal chart come WORKER_DEADLINE_S) che conta anche l'accensione del
+# nodo e il pull dell'immagine, quindi si tiene un margine largo.
+_PROCESS_STARTED = time.monotonic()
+_DEADLINE_MARGIN_S = 900.0
+
+
+def _correction_budget_s() -> float:
+    """Quanto tempo puo' prendersi la correzione senza mettere a rischio la
+    scadenza del Job e il caricamento dei risultati."""
+    budget = float(os.environ.get("AI_CORRECTION_MAX_S", "1200"))
+    raw = os.environ.get("WORKER_DEADLINE_S")
+    if raw:
+        try:
+            left = float(raw) - (time.monotonic() - _PROCESS_STARTED) - _DEADLINE_MARGIN_S
+            budget = min(budget, left)
+        except ValueError:
+            pass
+    return budget
+
+
+def _refine_transcript(
+    app: cli.AppClient,
+    job: cli.ClaimResponse,
+    segments: List[Dict[str, Any]],
+    *,
+    language: str,
+    names: List[str],
+) -> None:
+    """Rifinisce la trascrizione con il glossario, in place: le forme note dei
+    termini tornano alla forma scritta, poi il modello corregge nomi, sigle e
+    termini tecnici. Quando il testo di un segmento cambia, le sue parole con
+    i tempi si riallineano (glossary.apply_text)."""
+    terms = glmod.parse(job.providerHints.glossary)
+    normalize = glmod.normalizer(terms)
+    fixed = glmod.apply_text(segments, [normalize(s.get("text") or "") for s in segments])
+    budget = _correction_budget_s()
+    if budget < 60:
+        log.warning("correzione saltata: il Job e' vicino alla scadenza (%.0fs disponibili)", budget)
+        return
+    app.progress(job.jobId, "RUNNING", percent=82.0, message="correcting transcript")
+
+    def avanzamento(fatti: int, totale: int) -> None:
+        # Ogni avanzamento rinnova la presa sul job: una correzione lunga non
+        # deve farlo riprendere da un altro worker.
+        app.progress(
+            job.jobId, "RUNNING",
+            percent=82.0 + 8.0 * fatti / max(1, totale),
+            message=f"correcting transcript {fatti}/{totale}",
+        )
+
+    corrected = llmmod.correct_transcript_segments(
+        segments_text=[s.get("text") or "" for s in segments],
+        glossary_terms=glmod.correction_terms(terms, names),
+        source_language=language,
+        base_url=job.providerHints.llmBaseUrl,
+        model_id=job.providerHints.llmModelId,
+        deadline_s=budget,
+        allowed=glmod.allowed_tokens(terms, names),
+        on_progress=avanzamento,
+    )
+    # Il modello puo' riscrivere una sigla compitata: ripassa le forme note.
+    llm_fixed = glmod.apply_text(segments, [normalize(t) for t in corrected])
+    log.info(
+        "transcript refined: %d segment(s) from the glossary, %d by the LLM (%d terms)",
+        fixed, llm_fixed, len(terms),
+    )
+
+
 def run_transcribe(app: cli.AppClient, job: cli.ClaimResponse) -> None:
     src_lang = job.payload.get("sourceLanguage") or "it"
 
@@ -148,6 +219,14 @@ def run_transcribe(app: cli.AppClient, job: cli.ClaimResponse) -> None:
             )
 
         app.progress(job.jobId, "RUNNING", percent=80.0, message="asr+diar done")
+
+        # raw_json condivide la lista dei segmenti: la rifinitura vale per tutti
+        # gli artifact.
+        _refine_transcript(
+            app, job, result.segments,
+            language=result.language,
+            names=[n for n in (getattr(job, "speakerNames", {}) or {}).values() if n],
+        )
 
         # TRANSCRIPT_JSON (full raw output, no language).
         raw_bytes = json.dumps(result.raw_json, ensure_ascii=False).encode("utf-8")
@@ -302,7 +381,12 @@ def run_transcribe_multitrack(app: cli.AppClient, job: cli.ClaimResponse) -> Non
             )
 
         merged = mtmod.merge_tracks(track_results, language=detected_lang)
-        app.progress(job.jobId, "RUNNING", percent=85.0, message="merged tracks")
+        app.progress(job.jobId, "RUNNING", percent=80.0, message="merged tracks")
+        _refine_transcript(
+            app, job, merged["segments"],
+            language=detected_lang,
+            names=[t["display_name"] for t in track_results if t.get("display_name")],
+        )
 
         # Nomi reali per la VTT + speakerMap (con displayName → il portale
         # popola Speaker.displayName senza mapping manuale).
@@ -388,6 +472,7 @@ def run_summarize(app: cli.AppClient, job: cli.ClaimResponse) -> None:
             model_id=job.providerHints.llmModelId,
             agenda_items=agenda_items,
             timeline=timeline,
+            glossary=glmod.parse(job.providerHints.glossary),
         )
 
         # SUMMARY_JSON (strutturato) — usato da hero card + topic-chips.
@@ -440,11 +525,13 @@ def run_translate(app: cli.AppClient, job: cli.ClaimResponse) -> None:
                 names[dl] = dn
 
         app.progress(job.jobId, "RUNNING", percent=20.0, message="translating segments")
+        terms = glmod.parse(job.providerHints.glossary)
         translated_segments = llmmod.translate_segments(
             segments=transcript.get("segments", []),
             target_language=target_lang,
             base_url=job.providerHints.llmBaseUrl,
             model_id=job.providerHints.llmModelId,
+            glossary=terms,
         )
 
         # TRANSLATION_VTT (subtitle track in the target language).
@@ -480,6 +567,7 @@ def run_translate(app: cli.AppClient, job: cli.ClaimResponse) -> None:
                     target_language=target_lang,
                     base_url=job.providerHints.llmBaseUrl,
                     model_id=job.providerHints.llmModelId,
+                    glossary=terms,
                 )
             except Exception:  # noqa: BLE001 — sintesi tradotta best-effort
                 log.exception("translate summary failed — emit empty summary for %s", target_lang)
@@ -541,6 +629,13 @@ def run_dub(app: cli.AppClient, job: cli.ClaimResponse) -> None:
         # testato: rimuove tag <v> + prefisso "LABEL: " duplicato così
         # il TTS non pronuncia l'etichetta speaker).
         segments, total_duration = vttmod.parse_translated_vtt(vtt_text)
+        # La pronuncia dei termini del glossario nella lingua: i sottotitoli
+        # restano con la forma scritta, la voce dice la sigla lettera per lettera
+        # o con la pronuncia indicata.
+        terms = glmod.parse(job.providerHints.glossary)
+        if terms:
+            for seg in segments:
+                seg["text"] = glmod.speakable(seg.get("text") or "", terms, target_lang)
 
         app.progress(job.jobId, "RUNNING", percent=20.0, message="parsed transcript")
 

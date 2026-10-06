@@ -29,7 +29,7 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
           <>
             <AdminSessionKeepAlive />
             <AdminNav role={session.role} />
-            <AdminBreadcrumb />
+            <AdminBreadcrumb role={session.role} />
           </>
         )}
         {/* Senza storage per i file i campi "file o URL" offrono solo l'URL. */}

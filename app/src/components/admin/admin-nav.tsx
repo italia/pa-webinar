@@ -27,6 +27,8 @@ const VOCI_ORGANIZZATORE: ReadonlySet<PercorsoStatico> = new Set<PercorsoStatico
   '/admin/calendar',
   '/admin/recordings',
   '/admin/postprod',
+  // Il glossario comune della post-produzione: chi organizza lo arricchisce.
+  '/admin/settings/glossary',
 ]);
 
 export const MAIN_SECTIONS: NavItem[] = [
@@ -130,6 +132,7 @@ export const SETTINGS_SUB_NAV: NavItem[] = [
     labelKey: 'settingsEmailTemplates',
   },
   { href: '/admin/settings/tags', icon: 'it-bookmark', labelKey: 'settingsTags' },
+  { href: '/admin/settings/glossary', icon: 'it-file-txt', labelKey: 'settingsGlossary' },
 ];
 
 export const QUESTIONNAIRES_SUB_NAV: NavItem[] = [

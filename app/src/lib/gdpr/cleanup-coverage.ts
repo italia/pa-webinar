@@ -44,6 +44,7 @@ export const NOT_PURGED_BY_CLEANUP: Record<string, string> = {
   LiveAction: 'cronologia della sala senza nomi (titoli, risultati, ore delle azioni): contenuto dell’evento, serve anche alla post-produzione',
   EventOrganizer: 'enti organizzatori: dati istituzionali pubblici, non personali, e restano leggibili sull’evento anche dopo la conservazione dei dati',
   EventTagLink: 'legame con una parola chiave: nessun dato personale',
+  GlossaryTerm: 'glossario della post-produzione (sigle, termini, pronunce): configurazione dell’evento scritta da chi lo organizza, non dati delle persone che partecipano',
   GdprAuditLog: 'è il registro delle cancellazioni: cancellarlo distruggerebbe la prova di averle fatte',
   EventQuestionnaire: 'resta la configurazione, che non è un dato personale; le risposte di fine evento restano senza nome, hash dell’email e identità, quelle chieste all’iscrizione si cancellano passando dal questionario',
   Recording: 'l’albero della registrazione segue la propria retention (può essere più lunga); di suo la transazione cancella le tracce per-partecipante già purgate, che portano il nome cifrato',

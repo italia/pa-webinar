@@ -43,6 +43,7 @@ import CallSessionsPanel from './call-sessions-panel';
 import DeleteEventModal from './delete-event-modal';
 import EventAnalyticsPanel from './event-analytics-panel';
 import EventFeedbackPanel from './event-feedback-panel';
+import GlossaryManager from './glossary-manager';
 import EventConfigDiagram from './event-config-diagram';
 import EventModeratorsPanel from './event-moderators-panel';
 import RegistrationRowActions from './registration-row-actions';
@@ -1220,6 +1221,7 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, via
   const td = useTranslations('admin.eventDetail');
   const t = useTranslations('admin');
   const tfb = useTranslations('admin.feedbackPanel');
+  const tg = useTranslations('admin.glossary');
   const format = useFormatter();
   const isEnded = status === 'ENDED' || status === 'ARCHIVED';
 
@@ -1363,6 +1365,15 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, via
             {td('aiManageNotEnded')}
           </div>
         )}
+      </div>
+
+      {/* Il glossario dell'evento: termini e sigle per trascrizione, traduzioni
+          e doppiaggio, in aggiunta a quelli dell'istanza. Serve anche prima
+          della fine: si compila quando si prepara l'evento. */}
+      <div className="mb-4">
+        <H>{tg('eventTitle')}</H>
+        <p style={{ color: C_MUTED, fontSize: '0.9rem', maxWidth: 680 }}>{tg('eventIntro')}</p>
+        <GlossaryManager apiBase={`/api/admin/events/${event.id}/glossary`} token={viaToken} scope="event" />
       </div>
 
       {/* Il file video: riprodurlo, scaricarlo, pubblicarlo, cancellarlo. */}

@@ -460,3 +460,106 @@ def test_cpu_worker_refuses_gpu_kinds():
     assert not cli_mod.cpu_kinds_ok([])
     assert not cli_mod.cpu_kinds_ok(["SUMMARIZE", "TRANSCRIBE"])
     assert not cli_mod.cpu_kinds_ok(["DUB"])
+
+
+# ---------------------------------------------------------------------------
+# Glossario: correzione della trascrizione e traduzione con i termini protetti.
+# ---------------------------------------------------------------------------
+
+import glossary as gl_mod
+
+GLOSS = gl_mod.parse(
+    [
+        {"term": "ABC", "reading": "spell", "note": "Agenzia di esempio"},
+        {"term": "IA", "reading": "spell", "translations": {"en": "AI"}},
+    ]
+)
+
+
+def test_correct_segments_applica_il_glossario_e_scarta_le_riscritture(monkeypatch):
+    prompts = []
+
+    def fake_chat(*, base_url, model_id, messages, **kwargs):
+        prompts.append(messages[-1]["content"])
+        return "1. la ABC ha scritto\n2. Il relatore riassume tutto in modo diverso e molto piu' lungo\n3. ok"
+
+    monkeypatch.setattr(llm, "_chat_completions", fake_chat)
+    out = llm.correct_transcript_segments(
+        segments_text=["la a bi ci ha scritto", "allora vediamo un attimo il punto", "ok"],
+        glossary_terms=gl_mod.correction_terms(GLOSS, ["Relatore 1"]),
+        source_language="it",
+        base_url="http://vllm.local/v1",
+        model_id="m",
+    )
+    assert out == ["la ABC ha scritto", "allora vediamo un attimo il punto", "ok"]
+    assert "ABC (Agenzia di esempio)" in prompts[0]
+    assert "Relatore 1" in prompts[0]
+
+
+def test_correct_segments_ordine_con_lotti_paralleli(monkeypatch):
+    def fake_chat(*, base_url, model_id, messages, **kwargs):
+        return _echo_numbered_reply(messages[-1]["content"]).replace("[tr] ", "")
+
+    monkeypatch.setattr(llm, "_chat_completions", fake_chat)
+    righe = [f"riga {i}" for i in range(130)]
+    out = llm.correct_transcript_segments(
+        segments_text=righe, glossary_terms=[], source_language="it",
+        base_url="http://vllm.local/v1", model_id="m", max_workers=4,
+    )
+    assert out == righe
+
+
+def test_correct_segments_senza_vllm_restano_le_righe(monkeypatch):
+    calls = []
+
+    def fake_chat(**kwargs):
+        calls.append(1)
+        raise llm.httpx.ConnectError("down")
+
+    monkeypatch.setattr(llm, "_chat_completions", fake_chat)
+    righe = [f"riga {i}" for i in range(200)]
+    out = llm.correct_transcript_segments(
+        segments_text=righe, glossary_terms=[], source_language="it",
+        base_url="http://vllm.local/v1", model_id="m",
+    )
+    assert out == righe
+    # Una sola attesa del cold-start, non una per lotto.
+    assert len(calls) == 1
+
+
+def test_translate_segments_protegge_i_termini(monkeypatch):
+    systems = []
+
+    def fake_chat(*, base_url, model_id, messages, **kwargs):
+        systems.append(messages[0]["content"])
+        return _echo_numbered_reply(messages[-1]["content"])
+
+    monkeypatch.setattr(llm, "_chat_completions", fake_chat)
+    segs = [{"start": 0.0, "end": 1.0, "text": "La ABC parla di IA"}, {"start": 1.0, "end": 2.0, "text": "niente"}]
+    out = llm.translate_segments(
+        segments=segs, target_language="en", base_url="http://vllm.local/v1", model_id="m", glossary=GLOSS,
+    )
+    assert out[0]["text"] == "[tr] La ABC parla di AI"
+    assert out[1]["text"] == "[tr] niente"
+    assert len(systems) == 1
+
+
+def test_translate_segments_segnaposto_persi_regole_nel_prompt(monkeypatch):
+    calls = []
+
+    def fake_chat(*, base_url, model_id, messages, **kwargs):
+        calls.append(messages)
+        if len(calls) == 1:
+            return "1. The agency talks about it"  # segnaposto persi
+        return "1. The ABC talks about AI"
+
+    monkeypatch.setattr(llm, "_chat_completions", fake_chat)
+    out = llm.translate_segments(
+        segments=[{"start": 0.0, "end": 1.0, "text": "La ABC parla di IA"}],
+        target_language="en", base_url="http://vllm.local/v1", model_id="m", glossary=GLOSS,
+    )
+    assert out[0]["text"] == "The ABC talks about AI"
+    assert len(calls) == 2
+    secondo = calls[1]
+    assert '"IA": always "AI"' in secondo[0]["content"]
+    assert "La ABC parla di IA" in secondo[-1]["content"]

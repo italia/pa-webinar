@@ -33,6 +33,7 @@ export const DUPLICATED_EVENT_RELATIONS = [
   'agendaItems',
   'questionnaires',
   'reminders',
+  'glossaryTerms',
 ] as const;
 
 type DuplicatedRelation = (typeof DUPLICATED_EVENT_RELATIONS)[number];
@@ -90,6 +91,10 @@ export const DUPLICATE_SOURCE_INCLUDE = {
     select: { label: true, sortOrder: true, plannedMinutes: true },
   },
   reminders: { select: { offsetMinutes: true, label: true } },
+  // Il glossario della post-produzione: sigle e nomi di una serie si ripetono.
+  glossaryTerms: {
+    select: { term: true, aliases: true, reading: true, spoken: true, translations: true, note: true },
+  },
   questionnaires: {
     select: {
       placement: true,
@@ -208,6 +213,19 @@ export function duplicatedRelations(source: DuplicateSource): DuplicatedRelation
   if (source.reminders.length > 0) {
     out.reminders = {
       create: source.reminders.map((r) => ({ offsetMinutes: r.offsetMinutes, label: r.label })),
+    };
+  }
+
+  if (source.glossaryTerms.length > 0) {
+    out.glossaryTerms = {
+      create: source.glossaryTerms.map((g) => ({
+        term: g.term,
+        aliases: g.aliases,
+        reading: g.reading,
+        spoken: requiredJson(g.spoken),
+        translations: requiredJson(g.translations),
+        note: g.note,
+      })),
     };
   }
 

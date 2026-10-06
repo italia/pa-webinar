@@ -74,6 +74,7 @@ function sourceEvent() {
     agendaItems: [],
     reminders: [],
     questionnaires: [],
+    glossaryTerms: [],
   };
 }
 

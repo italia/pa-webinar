@@ -6839,3 +6839,177 @@ html.live-resizing .live-sidebar-resizer::after {
 .feedback-panel__legacy {
   margin-top: 1.5rem;
 }
+
+// ── Glossario della post-produzione AI (components/admin/glossary-manager)
+.glossary__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.glossary__search {
+  flex: 1 1 220px;
+  max-width: 360px;
+}
+
+.glossary__empty {
+  color: #5A6772;
+  font-size: 0.9rem;
+}
+
+.glossary__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: 1px solid #E3E9F0;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.glossary__item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+
+  & + & {
+    border-top: 1px solid #E3E9F0;
+  }
+
+  &--editing {
+    display: block;
+    background: #F7FAFD;
+  }
+}
+
+.glossary__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 0.6rem;
+}
+
+.glossary__term {
+  font-weight: 700;
+  color: var(--app-text);
+}
+
+.glossary__badge {
+  padding: 0.05rem 0.5rem;
+  border-radius: 999px;
+  background: #EAF2FB;
+  color: #004A94;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.glossary__note {
+  color: #5A6772;
+  font-size: 0.88rem;
+}
+
+.glossary__details {
+  margin: 0.35rem 0 0;
+  font-size: 0.82rem;
+  color: #3D4A56;
+
+  div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+
+  dt {
+    font-weight: 600;
+  }
+
+  dt::after {
+    content: ':';
+  }
+
+  dd {
+    margin: 0;
+  }
+}
+
+.glossary__actions {
+  display: flex;
+  flex-shrink: 0;
+  gap: 0.25rem;
+}
+
+.glossary__editor {
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid #C9D7E6;
+  border-radius: 10px;
+  background: #F7FAFD;
+
+  .glossary__item--editing & {
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+}
+
+.glossary__langs {
+  margin: 0;
+  padding: 0;
+  border: 0;
+
+  // La legenda come le etichette dei campi accanto: Bootstrap Italia la
+  // rimpicciolisce e la rientra.
+  legend {
+    float: none;
+    width: auto;
+    padding: 0;
+    margin-bottom: 0.5rem;
+    font-size: 1.125rem;
+    font-weight: 400;
+  }
+}
+
+.glossary__lang-row {
+  display: grid;
+  grid-template-columns: minmax(110px, 0.8fr) 2fr auto;
+  gap: 0.5rem;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.glossary__instance {
+  margin-top: 1rem;
+  font-size: 0.88rem;
+
+  summary {
+    cursor: pointer;
+    color: var(--app-primary);
+    font-weight: 600;
+  }
+}
+
+.glossary__shared {
+  margin: 0.75rem 0 0;
+  font-size: 0.88rem;
+}
+
+.glossary__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  list-style: none;
+  margin: 0.6rem 0 0;
+  padding: 0;
+
+  li {
+    padding: 0.1rem 0.55rem;
+    border: 1px solid #D5DEE8;
+    border-radius: 999px;
+    background: #fff;
+    color: #3D4A56;
+  }
+}
