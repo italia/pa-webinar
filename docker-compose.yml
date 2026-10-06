@@ -193,7 +193,9 @@ services:
       - ENABLE_AUTO_OWNER=false
       - JICOFO_ENABLE_AUTO_OWNER=false
       - JICOFO_AUTHENTICATION_TYPE=jwt
-      - JICOFO_CONF_INITIAL_PARTICIPANT_WAIT_TIMEOUT=30
+      # Durata con l'unita': Jicofo legge un numero nudo come millisecondi, e
+      # con «30» chiudeva la conferenza prima che il primo partecipante entrasse.
+      - JICOFO_CONF_INITIAL_PARTICIPANT_WAIT_TIMEOUT=30 seconds
       - JICOFO_CONF_SINGLE_PARTICIPANT_TIMEOUT=0
       - JICOFO_AUTH_LIFETIME=86400
       # API REST sulla 8888 aperta alla rete di compose (di default ascolta
