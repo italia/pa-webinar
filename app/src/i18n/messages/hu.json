@@ -443,7 +443,21 @@
       },
       "volume": "Hangerő",
       "volumeFor": "{name} hangereje",
-      "kickName": "Eltávolítás: {name}"
+      "kickName": "Eltávolítás: {name}",
+      "you": "te",
+      "raisedHand": "Feltett kéz · {position}.",
+      "speaking": "Beszél",
+      "hosts": "Vezetők",
+      "audience": "Közönség",
+      "search": "Keresés név szerint",
+      "noMatch": "Nincs ilyen nevű résztvevő",
+      "connections": "{count, plural, one {# kapcsolat} other {# kapcsolat}}",
+      "connectionsHint": "Aki újra belép, néhány percig hátrahagyja előző kapcsolatát: a számlálás személyenként történik.",
+      "registeredAs": "Regisztráció: {name}",
+      "forwardedLink": "{email} regisztrációs linkje",
+      "sharedModeratorLink": "Moderátorok közös linkje",
+      "handRaisedAnnounce": "{name} jelentkezik",
+      "identityContested": "A személyazonosság nem ellenőrizhető"
     },
     "moderator": {
       "muteAll": "Mindenki némítása",

@@ -443,7 +443,21 @@
       },
       "volume": "Glasnoća",
       "volumeFor": "Glasnoća za {name}",
-      "kickName": "Izbaci: {name}"
+      "kickName": "Izbaci: {name}",
+      "you": "vi",
+      "raisedHand": "Podignuta ruka · {position}.",
+      "speaking": "Govori",
+      "hosts": "Voditelji",
+      "audience": "Publika",
+      "search": "Traži po imenu",
+      "noMatch": "Nitko s tim imenom",
+      "connections": "{count, plural, one {# veza} few {# veze} other {# veza}}",
+      "connectionsHint": "Tko se ponovno pridruži, ostavlja prethodnu vezu nekoliko minuta: broji se po osobama.",
+      "registeredAs": "Prijava: {name}",
+      "forwardedLink": "Poveznica prijave {email}",
+      "sharedModeratorLink": "Zajednička poveznica moderatora",
+      "handRaisedAnnounce": "{name} diže ruku",
+      "identityContested": "Identitet nije moguće provjeriti"
     },
     "moderator": {
       "muteAll": "Utišaj sve",

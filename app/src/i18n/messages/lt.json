@@ -443,7 +443,21 @@
       },
       "volume": "Garsumas",
       "volumeFor": "Garsumas: {name}",
-      "kickName": "Pašalinti: {name}"
+      "kickName": "Pašalinti: {name}",
+      "you": "jūs",
+      "raisedHand": "Pakelta ranka · {position}",
+      "speaking": "Kalba",
+      "hosts": "Vedėjai",
+      "audience": "Auditorija",
+      "search": "Ieškoti pagal vardą",
+      "noMatch": "Nėra nė vieno tokiu vardu",
+      "connections": "{count, plural, one {# ryšys} few {# ryšiai} other {# ryšių}}",
+      "connectionsHint": "Kas prisijungia iš naujo, kelioms minutėms palieka ankstesnį ryšį: skaičiuojama pagal asmenis.",
+      "registeredAs": "Registracija: {name}",
+      "forwardedLink": "{email} registracijos nuoroda",
+      "sharedModeratorLink": "Bendra moderatorių nuoroda",
+      "handRaisedAnnounce": "{name} pakėlė ranką",
+      "identityContested": "Tapatybės patikrinti negalima"
     },
     "moderator": {
       "muteAll": "Nutildyti visus",

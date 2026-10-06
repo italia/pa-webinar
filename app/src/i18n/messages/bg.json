@@ -443,7 +443,21 @@
       },
       "volume": "Сила на звука",
       "volumeFor": "Сила на звука на {name}",
-      "kickName": "Отстраняване на {name}"
+      "kickName": "Отстраняване на {name}",
+      "you": "вие",
+      "raisedHand": "Вдигната ръка · {position}",
+      "speaking": "Говори",
+      "hosts": "Водещи",
+      "audience": "Публика",
+      "search": "Търсене по име",
+      "noMatch": "Няма човек с това име",
+      "connections": "{count, plural, one {# връзка} other {# връзки}}",
+      "connectionsHint": "Който влезе отново, оставя предишната връзка за няколко минути: броят е по хора.",
+      "registeredAs": "Регистрация: {name}",
+      "forwardedLink": "Линк за регистрация на {email}",
+      "sharedModeratorLink": "Общ линк на модераторите",
+      "handRaisedAnnounce": "{name} вдигна ръка",
+      "identityContested": "Самоличността не може да се провери"
     },
     "moderator": {
       "muteAll": "Заглушаване на всички",

@@ -443,7 +443,21 @@
       },
       "volume": "Volym",
       "volumeFor": "Volym för {name}",
-      "kickName": "Ta bort {name}"
+      "kickName": "Ta bort {name}",
+      "you": "du",
+      "raisedHand": "Handen uppräckt · {position}",
+      "speaking": "Talar",
+      "hosts": "Värdar",
+      "audience": "Publik",
+      "search": "Sök på namn",
+      "noMatch": "Ingen med detta namn",
+      "connections": "{count, plural, one {# anslutning} other {# anslutningar}}",
+      "connectionsHint": "Den som ansluter igen lämnar den tidigare anslutningen kvar några minuter: antalet räknas per person.",
+      "registeredAs": "Anmälan: {name}",
+      "forwardedLink": "Anmälningslänk för {email}",
+      "sharedModeratorLink": "Delad moderatorlänk",
+      "handRaisedAnnounce": "{name} räckte upp handen",
+      "identityContested": "Identiteten kan inte bekräftas"
     },
     "moderator": {
       "muteAll": "Tysta alla",

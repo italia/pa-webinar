@@ -443,7 +443,21 @@
       },
       "volume": "Helitugevus",
       "volumeFor": "{name} helitugevus",
-      "kickName": "Eemalda {name}"
+      "kickName": "Eemalda {name}",
+      "you": "sina",
+      "raisedHand": "Käsi tõstetud · {position}.",
+      "speaking": "Räägib",
+      "hosts": "Juhid",
+      "audience": "Publik",
+      "search": "Otsi nime järgi",
+      "noMatch": "Selle nimega kedagi pole",
+      "connections": "{count, plural, one {# ühendus} other {# ühendust}}",
+      "connectionsHint": "Kes uuesti liitub, jätab eelmise ühenduse mõneks minutiks alles: loendus on inimeste kaupa.",
+      "registeredAs": "Registreering: {name}",
+      "forwardedLink": "Aadressi {email} registreerimislink",
+      "sharedModeratorLink": "Moderaatorite ühine link",
+      "handRaisedAnnounce": "{name} tõstis käe",
+      "identityContested": "Isikut ei saa kontrollida"
     },
     "moderator": {
       "muteAll": "Vaigista kõik",

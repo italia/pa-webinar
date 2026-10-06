@@ -443,7 +443,21 @@
       },
       "volume": "Volum",
       "volumeFor": "Volum ta' {name}",
-      "kickName": "Keċċi lil {name}"
+      "kickName": "Keċċi lil {name}",
+      "you": "int",
+      "raisedHand": "Id merfugħa · {position}",
+      "speaking": "Qed jitkellem",
+      "hosts": "Ospiti",
+      "audience": "Udjenza",
+      "search": "Fittex bl-isem",
+      "noMatch": "Ħadd b'dan l-isem",
+      "connections": "{count, plural, one {# konnessjoni} other {# konnessjonijiet}}",
+      "connectionsHint": "Min jerġa' jidħol iħalli l-konnessjoni ta' qabel għal ftit minuti: l-għadd huwa għal kull persuna.",
+      "registeredAs": "Reġistrazzjoni: {name}",
+      "forwardedLink": "Link tar-reġistrazzjoni ta’ {email}",
+      "sharedModeratorLink": "Link maqsum tal-moderaturi",
+      "handRaisedAnnounce": "{name} qajjem idu",
+      "identityContested": "L-identità ma tistax tiġi vverifikata"
     },
     "moderator": {
       "muteAll": "Iskot lil kulħadd",

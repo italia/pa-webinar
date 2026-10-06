@@ -443,7 +443,21 @@
       },
       "volume": "Hlasitost",
       "volumeFor": "Hlasitost pro {name}",
-      "kickName": "Vyloučit {name}"
+      "kickName": "Vyloučit {name}",
+      "you": "vy",
+      "raisedHand": "Zvednutá ruka · {position}.",
+      "speaking": "Mluví",
+      "hosts": "Moderátoři",
+      "audience": "Publikum",
+      "search": "Hledat podle jména",
+      "noMatch": "Nikdo s tímto jménem",
+      "connections": "{count, plural, one {# připojení} few {# připojení} other {# připojení}}",
+      "connectionsHint": "Kdo se znovu připojí, nechá předchozí připojení na několik minut: počet je podle osob.",
+      "registeredAs": "Registrace: {name}",
+      "forwardedLink": "Registrační odkaz {email}",
+      "sharedModeratorLink": "Sdílený odkaz moderátorů",
+      "handRaisedAnnounce": "{name} se hlásí",
+      "identityContested": "Totožnost nelze ověřit"
     },
     "moderator": {
       "muteAll": "Ztlumit všechny",

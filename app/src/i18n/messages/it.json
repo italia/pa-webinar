@@ -457,7 +457,21 @@
       },
       "volume": "Volume",
       "volumeFor": "Volume di {name}",
-      "kickName": "Espelli {name}"
+      "kickName": "Espelli {name}",
+      "you": "tu",
+      "raisedHand": "Mano alzata · {position}°",
+      "speaking": "Sta parlando",
+      "hosts": "Conduzione",
+      "audience": "Pubblico",
+      "search": "Cerca per nome",
+      "noMatch": "Nessuno con questo nome",
+      "connections": "{count, plural, one {# collegamento} other {# collegamenti}}",
+      "connectionsHint": "Chi rientra in sala lascia per qualche minuto il collegamento precedente: il conteggio è per persona.",
+      "registeredAs": "Iscrizione: {name}",
+      "forwardedLink": "Link d’iscrizione di {email}",
+      "sharedModeratorLink": "Link condiviso dei moderatori",
+      "handRaisedAnnounce": "{name} ha alzato la mano",
+      "identityContested": "Identità non verificabile"
     },
     "moderator": {
       "muteAll": "Silenzia tutti",

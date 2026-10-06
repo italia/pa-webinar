@@ -443,7 +443,21 @@
       },
       "volume": "Volum",
       "volumeFor": "Volumul pentru {name}",
-      "kickName": "Eliminați-l pe {name}"
+      "kickName": "Eliminați-l pe {name}",
+      "you": "tu",
+      "raisedHand": "Mână ridicată · {position}",
+      "speaking": "Vorbește",
+      "hosts": "Moderatori",
+      "audience": "Public",
+      "search": "Caută după nume",
+      "noMatch": "Nimeni cu acest nume",
+      "connections": "{count, plural, one {# conexiune} few {# conexiuni} other {# de conexiuni}}",
+      "connectionsHint": "Cine reintră lasă conexiunea anterioară câteva minute: numărătoarea este pe persoană.",
+      "registeredAs": "Înscriere: {name}",
+      "forwardedLink": "Linkul de înscriere al {email}",
+      "sharedModeratorLink": "Link comun al moderatorilor",
+      "handRaisedAnnounce": "{name} a ridicat mâna",
+      "identityContested": "Identitatea nu poate fi verificată"
     },
     "moderator": {
       "muteAll": "Dezactivați sunetul tuturor",

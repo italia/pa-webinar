@@ -443,7 +443,21 @@
       },
       "volume": "Lydstyrke",
       "volumeFor": "Lydstyrke for {name}",
-      "kickName": "Fjern {name}"
+      "kickName": "Fjern {name}",
+      "you": "dig",
+      "raisedHand": "Hånd rakt op · {position}.",
+      "speaking": "Taler",
+      "hosts": "Værter",
+      "audience": "Publikum",
+      "search": "Søg efter navn",
+      "noMatch": "Ingen med dette navn",
+      "connections": "{count, plural, one {# forbindelse} other {# forbindelser}}",
+      "connectionsHint": "Den, der kommer ind igen, efterlader den tidligere forbindelse i nogle minutter: antallet er pr. person.",
+      "registeredAs": "Tilmelding: {name}",
+      "forwardedLink": "Tilmeldingslink fra {email}",
+      "sharedModeratorLink": "Delt moderatorlink",
+      "handRaisedAnnounce": "{name} har rakt hånden op",
+      "identityContested": "Identiteten kan ikke bekræftes"
     },
     "moderator": {
       "muteAll": "Slå alle fra",

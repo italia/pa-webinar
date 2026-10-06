@@ -443,7 +443,21 @@
       },
       "volume": "Volume",
       "volumeFor": "Volume for {name}",
-      "kickName": "Kick {name}"
+      "kickName": "Kick {name}",
+      "you": "you",
+      "raisedHand": "Hand raised · #{position}",
+      "speaking": "Speaking",
+      "hosts": "Hosts",
+      "audience": "Audience",
+      "search": "Search by name",
+      "noMatch": "Nobody with this name",
+      "connections": "{count, plural, one {# connection} other {# connections}}",
+      "connectionsHint": "Someone who rejoins leaves the previous connection for a few minutes: the count is per person.",
+      "registeredAs": "Registered as: {name}",
+      "forwardedLink": "Registration link of {email}",
+      "sharedModeratorLink": "Shared moderator link",
+      "handRaisedAnnounce": "{name} raised their hand",
+      "identityContested": "Identity cannot be verified"
     },
     "moderator": {
       "muteAll": "Mute all",

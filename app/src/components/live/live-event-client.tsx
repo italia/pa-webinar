@@ -2188,6 +2188,32 @@ function LiveSidebar({
     return () => mq.removeEventListener('change', aggiorna);
   }, []);
   const onScreen = (key: SidebarTab) => activeTab === key && (isDesktop || drawerOpen);
+
+  // Entrati nella chiamata, si dice al server quale riquadro e' questo
+  // browser (lib/live/seats): chi modera vede accanto al nome l'iscrizione
+  // che c'e' dietro. Un nuovo ingresso (riconnessione) ha un endpoint nuovo.
+  useEffect(() => {
+    if (!localParticipantId || !token) return;
+    let annullato = false;
+    const dichiara = async (tentativo: number) => {
+      try {
+        const res = await fetch(`/api/events/${eventSlug}/seats`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ endpointId: localParticipantId }),
+        });
+        // Rifiutata per il token o per l'id: riprovare non cambia niente.
+        if (res.ok || res.status === 403 || res.status === 422) return;
+      } catch {
+        /* rete: si riprova qui sotto */
+      }
+      if (!annullato && tentativo < 3) setTimeout(() => void dichiara(tentativo + 1), 5000 * tentativo);
+    };
+    void dichiara(1);
+    return () => {
+      annullato = true;
+    };
+  }, [localParticipantId, token, eventSlug]);
   const isChatActive = onScreen('chat');
   // Aperta la chat, l'anteprima non serve piu'.
   useEffect(() => {
@@ -2878,14 +2904,19 @@ function LiveSidebar({
               isModerator={isModerator}
             />
           )}
-          {activeTab === 'participants' && (
+          {/* Sempre montato, come chat e sondaggi: segue mani alzate e chi sta
+              parlando anche mentre si guarda un'altra scheda. */}
+          <div className={activeTab === 'participants' ? 'd-block' : 'd-none'}>
             <ParticipantPanel
               api={jitsiApi}
               isModerator={isModerator}
               localParticipantId={localParticipantId}
               onCountChange={setParticipantCount}
+              visible={onScreen('participants')}
+              eventSlug={eventSlug}
+              token={token}
             />
-          )}
+          </div>
         </div>
       </div>
     </>

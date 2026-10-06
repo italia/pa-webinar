@@ -443,7 +443,21 @@
       },
       "volume": "Glasnost",
       "volumeFor": "Glasnost za {name}",
-      "kickName": "Odstrani: {name}"
+      "kickName": "Odstrani: {name}",
+      "you": "vi",
+      "raisedHand": "Dvignjena roka · {position}.",
+      "speaking": "Govori",
+      "hosts": "Vodenje",
+      "audience": "Občinstvo",
+      "search": "Išči po imenu",
+      "noMatch": "Nihče s tem imenom",
+      "connections": "{count, plural, one {# povezava} two {# povezavi} few {# povezave} other {# povezav}}",
+      "connectionsHint": "Kdor se znova pridruži, za nekaj minut pusti prejšnjo povezavo: šteje se po osebah.",
+      "registeredAs": "Prijava: {name}",
+      "forwardedLink": "Povezava prijave {email}",
+      "sharedModeratorLink": "Skupna povezava moderatorjev",
+      "handRaisedAnnounce": "{name} dviguje roko",
+      "identityContested": "Identitete ni mogoče preveriti"
     },
     "moderator": {
       "muteAll": "Utišaj vse",

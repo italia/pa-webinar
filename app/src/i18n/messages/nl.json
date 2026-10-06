@@ -443,7 +443,21 @@
       },
       "volume": "Volume",
       "volumeFor": "Volume van {name}",
-      "kickName": "{name} verwijderen"
+      "kickName": "{name} verwijderen",
+      "you": "jij",
+      "raisedHand": "Hand opgestoken · {position}e",
+      "speaking": "Spreekt",
+      "hosts": "Presentatie",
+      "audience": "Publiek",
+      "search": "Zoeken op naam",
+      "noMatch": "Niemand met deze naam",
+      "connections": "{count, plural, one {# verbinding} other {# verbindingen}}",
+      "connectionsHint": "Wie opnieuw deelneemt, laat de vorige verbinding enkele minuten achter: er wordt per persoon geteld.",
+      "registeredAs": "Inschrijving: {name}",
+      "forwardedLink": "Inschrijvingslink van {email}",
+      "sharedModeratorLink": "Gedeelde moderatorlink",
+      "handRaisedAnnounce": "{name} heeft de hand opgestoken",
+      "identityContested": "Identiteit niet te controleren"
     },
     "moderator": {
       "muteAll": "Iedereen dempen",

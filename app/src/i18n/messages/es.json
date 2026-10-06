@@ -443,7 +443,21 @@
       },
       "volume": "Volumen",
       "volumeFor": "Volumen de {name}",
-      "kickName": "Expulsar a {name}"
+      "kickName": "Expulsar a {name}",
+      "you": "tú",
+      "raisedHand": "Mano levantada · {position}.º",
+      "speaking": "Está hablando",
+      "hosts": "Moderación",
+      "audience": "Público",
+      "search": "Buscar por nombre",
+      "noMatch": "Nadie con este nombre",
+      "connections": "{count, plural, one {# conexión} other {# conexiones}}",
+      "connectionsHint": "Quien vuelve a entrar deja la conexión anterior durante unos minutos: el recuento es por persona.",
+      "registeredAs": "Inscripción: {name}",
+      "forwardedLink": "Enlace de inscripción de {email}",
+      "sharedModeratorLink": "Enlace compartido de moderación",
+      "handRaisedAnnounce": "{name} ha levantado la mano",
+      "identityContested": "Identidad no verificable"
     },
     "moderator": {
       "muteAll": "Silenciar a todos",

@@ -443,7 +443,21 @@
       },
       "volume": "Äänenvoimakkuus",
       "volumeFor": "Osallistujan {name} äänenvoimakkuus",
-      "kickName": "Poista {name}"
+      "kickName": "Poista {name}",
+      "you": "sinä",
+      "raisedHand": "Käsi ylhäällä · {position}.",
+      "speaking": "Puhuu",
+      "hosts": "Juontajat",
+      "audience": "Yleisö",
+      "search": "Hae nimellä",
+      "noMatch": "Ei ketään tällä nimellä",
+      "connections": "{count, plural, one {# yhteys} other {# yhteyttä}}",
+      "connectionsHint": "Uudelleen liittyvän edellinen yhteys jää muutamaksi minuutiksi: määrä lasketaan henkilöinä.",
+      "registeredAs": "Ilmoittautuminen: {name}",
+      "forwardedLink": "Osoitteen {email} ilmoittautumislinkki",
+      "sharedModeratorLink": "Moderaattorien yhteinen linkki",
+      "handRaisedAnnounce": "{name} nosti käden",
+      "identityContested": "Henkilöllisyyttä ei voi varmistaa"
     },
     "moderator": {
       "muteAll": "Mykistä kaikki",

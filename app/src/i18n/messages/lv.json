@@ -443,7 +443,21 @@
       },
       "volume": "Skaļums",
       "volumeFor": "{name} skaļums",
-      "kickName": "Izslēgt: {name}"
+      "kickName": "Izslēgt: {name}",
+      "you": "jūs",
+      "raisedHand": "Pacelta roka · {position}.",
+      "speaking": "Runā",
+      "hosts": "Vadītāji",
+      "audience": "Auditorija",
+      "search": "Meklēt pēc vārda",
+      "noMatch": "Nav neviena ar šo vārdu",
+      "connections": "{count, plural, zero {# savienojumu} one {# savienojums} other {# savienojumi}}",
+      "connectionsHint": "Kas pievienojas atkārtoti, uz dažām minūtēm atstāj iepriekšējo savienojumu: skaits ir pa personām.",
+      "registeredAs": "Reģistrācija: {name}",
+      "forwardedLink": "{email} reģistrācijas saite",
+      "sharedModeratorLink": "Moderatoru kopīgā saite",
+      "handRaisedAnnounce": "{name} pacēla roku",
+      "identityContested": "Identitāti nevar pārbaudīt"
     },
     "moderator": {
       "muteAll": "Izslēgt skaņu visiem",

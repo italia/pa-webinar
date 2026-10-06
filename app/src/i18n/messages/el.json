@@ -443,7 +443,21 @@
       },
       "volume": "Ένταση",
       "volumeFor": "Ένταση για {name}",
-      "kickName": "Αποβολή: {name}"
+      "kickName": "Αποβολή: {name}",
+      "you": "εσείς",
+      "raisedHand": "Σηκωμένο χέρι · {position}ος",
+      "speaking": "Μιλάει",
+      "hosts": "Συντονισμός",
+      "audience": "Κοινό",
+      "search": "Αναζήτηση με όνομα",
+      "noMatch": "Κανείς με αυτό το όνομα",
+      "connections": "{count, plural, one {# σύνδεση} other {# συνδέσεις}}",
+      "connectionsHint": "Όποιος ξαναμπαίνει αφήνει την προηγούμενη σύνδεση για λίγα λεπτά: η καταμέτρηση είναι ανά άτομο.",
+      "registeredAs": "Εγγραφή: {name}",
+      "forwardedLink": "Σύνδεσμος εγγραφής του {email}",
+      "sharedModeratorLink": "Κοινός σύνδεσμος συντονιστών",
+      "handRaisedAnnounce": "{name} σήκωσε το χέρι",
+      "identityContested": "Η ταυτότητα δεν μπορεί να επαληθευτεί"
     },
     "moderator": {
       "muteAll": "Σίγαση όλων",

@@ -443,7 +443,21 @@
       },
       "volume": "Airde",
       "volumeFor": "Airde {name}",
-      "kickName": "Díbir {name}"
+      "kickName": "Díbir {name}",
+      "you": "tusa",
+      "raisedHand": "Lámh in airde · {position}",
+      "speaking": "Ag labhairt",
+      "hosts": "Óstaigh",
+      "audience": "Lucht féachana",
+      "search": "Cuardaigh de réir ainm",
+      "noMatch": "Níl aon duine leis an ainm seo",
+      "connections": "{count, plural, one {# nasc} other {# nasc}}",
+      "connectionsHint": "Fágann duine a thagann ar ais an nasc roimhe ar feadh cúpla nóiméad: is in aghaidh an duine an comhaireamh.",
+      "registeredAs": "Clárú: {name}",
+      "forwardedLink": "Nasc clárúcháin {email}",
+      "sharedModeratorLink": "Nasc comhroinnte na modhnóirí",
+      "handRaisedAnnounce": "Tá a lámh ardaithe ag {name}",
+      "identityContested": "Ní féidir an t-aitheantas a fhíorú"
     },
     "moderator": {
       "muteAll": "Balbhaigh gach duine",
