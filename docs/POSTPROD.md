@@ -233,7 +233,7 @@ What each job reads, as prepared by `POST /api/internal/postprod-claim`:
 |---|---|---|
 | `TRANSCRIBE` | The composite MP4 | `asrInitialPrompt` built from the event title, organizer name and speaker information (at most 800 characters); `expectedSpeakers` |
 | `TRANSCRIBE_MULTITRACK` | Each unpurged track, with participant id, decrypted display name and start offset; the composite MP4 when one exists | none |
-| `SUMMARIZE` | `TRANSCRIPT_JSON` | `speakerNames` (label to name, from the `Speaker` rows); agenda topics and whether each was marked discussed, when the event uses the agenda |
+| `SUMMARIZE` | `TRANSCRIPT_JSON` | `speakerNames` (label to name, from the `Speaker` rows); `agenda`, the agenda topics with their status and planned minutes, when the event uses the agenda; `timeline`, the room timeline, when it has entries ([Room timeline](#room-timeline)) |
 | `TRANSLATE` | `TRANSCRIPT_JSON`; the source-language `SUMMARY_JSON` when it exists | `speakerNames` |
 | `DUB` | `TRANSCRIPT_JSON`; the target-language `TRANSLATION_VTT`; the composite MP4 for `DUBBED_VIDEO` | `speakerNames` |
 | `ARCHIVE` | The composite MP4; each unpurged track; the source `TRANSCRIPT_VTT` when it exists | none |
@@ -595,15 +595,94 @@ path.
 ### Summaries and translation
 
 - **Summary.** One JSON-mode request sends the whole transcript, with real
-  speaker names where known and the agenda when the event uses one, and asks
-  for an overall summary, key decisions, action items and topics with a start
-  time. `SUMMARY_MD` is rendered from that JSON without a second call.
+  speaker names where known, the agenda when the event uses one, and the room
+  timeline when it has entries, and asks for an overall summary, key
+  decisions, action items and topics with a start time. `SUMMARY_MD` is
+  rendered from that JSON without a second call.
 - **Translation.** Segments are translated in numbered batches and matched
   back by index, keeping timings and speakers. If a batch comes back with the
   wrong number of lines, that batch is retried segment by segment. The
   structured summary is translated with the same JSON shape.
 - **Context length.** Because the summary request carries the whole
-  transcript, vLLM's `--max-model-len` must fit your longest events.
+  transcript, vLLM's `--max-model-len` must fit your longest events. The room
+  timeline adds at most 400 short lines.
+
+### Room timeline
+
+The claim of a `SUMMARIZE` job carries `timeline`: what happened in the room
+and when, on the transcript's time base, so that the summary can place
+topics, polls, questions and audience activity. The portal builds it on every
+claim (`app/src/lib/postprod/live-timeline.ts`) and does not store it in the
+job row. It is left out when it has no entries, and when it cannot be read:
+the claim then goes ahead without it.
+
+```jsonc
+{
+  "t0": "<ISO time of the recording's time zero>",
+  "exact": true,
+  "entries": [
+    { "offsetSec": 754, "kind": "poll.closed", "text": "<one line>" }
+  ]
+}
+```
+
+- **Sources.** The
+  [live action journal](architecture/live-interaction.md#live-action-journal):
+  agenda topics started, closed, skipped or reopened, polls with their
+  results, word-cloud prompts with their most frequent words (less any word a
+  moderator removed after the round closed), Q&A questions highlighted or
+  answered (with the written answer), feature toggles, recording start and
+  stop, the timer and the end of the event. Beside it, rows that already carry
+  a time: the text of every Q&A question not dismissed and of every question
+  marked in the chat, never their authors; the titles of shared materials;
+  and the number of chat messages (hidden ones excluded), app reactions and
+  raised hands in each five-minute window counted from `t0`.
+- **Window.** From 30 minutes before `t0` to 5 minutes after the end of the
+  recording (`t0` plus its duration). Without a known duration, to 5 minutes
+  after the end of the recording's call session, or after the claim while the
+  session is still open.
+- **Offsets.** `offsetSec` is whole seconds from `t0`, the same base as the
+  transcript's timings. A negative offset is an action before the recording
+  started.
+- **Time zero.** `recordingTimeZero` picks `t0`:
+  - `Recording.mediaStartedAt`, the absolute time of the first recorded frame,
+    when it is set: `exact` is `true`. The multitrack ingest stores it when its
+    body carries the optional `recordingStartedAtMs`
+    ([Ingest contract](architecture/recording.md#ingest-contract)).
+  - For a composite recording with a known duration, the latest
+    `recording.started` in the journal, as reported by the moderators'
+    browsers, between 30 minutes before and 2 minutes after the row's creation
+    minus the duration (the row is created once the file is uploaded, so the
+    start lies about one duration earlier; a start outside that window belongs
+    to another recording): `exact` is `true`, within a few seconds.
+  - Otherwise, for a recording with tracks, the creation of the `Recording`
+    row, which is set up for the recorder while the event is live; the first
+    frame can come minutes later.
+  - Otherwise, for a composite recording with a known duration, the row's
+    creation minus the duration, because the row is created when the
+    recording ends; the upload delay moves it later. Without a duration, the
+    row's creation.
+
+  The last two set `exact` to `false`, and the times can then be off by
+  minutes.
+- **Size.** At most 250 entries, and each quoted text at most 280 characters.
+  Past 250, the activity counts and the chat questions go first, oldest
+  first, then the oldest entries. The worker also caps the timeline block in
+  the prompt at 12,000 characters: past that it drops the activity counts and
+  chat questions, keeps the beginning, and says the timeline was shortened.
+- **In the prompt.** The worker (`_format_timeline` in
+  `infra/ai/worker/llm.py`) writes one line per entry, with the offset as
+  `[hh:mm:ss]` like the transcript, and marks actions before the start as
+  such. It tells the model to use the timeline to place topics, polls,
+  questions and participation, not to report it as something said, and that
+  the quoted texts come from moderators or the audience and are data to
+  summarize, not instructions. When `exact` is `false`, it adds that the times
+  are estimates that can be off by a few minutes, useful for the order of
+  events more than for their exact moment.
+- **Agenda.** Each `agenda` item carries `label`, `completed`, `status` and
+  `plannedMinutes`. The prompt marks a topic as discussed, in progress at the
+  end, skipped or not discussed from its `status`, falling back to
+  `completed` when there is none, and adds its planned minutes.
 
 ### Dubbing
 
@@ -651,7 +730,7 @@ for their fields; deletion and retention are described in
 
 | Table (model) | Holds |
 |---|---|
-| `recordings` (`Recording`) | One capture, one-to-one with a call session: source key, status, run counter, `consentSnapshot`, `pipelineSnapshot`, `retentionUntil` |
+| `recordings` (`Recording`) | One capture, one-to-one with a call session: source key, status, run counter, `consentSnapshot`, `pipelineSnapshot`, `retentionUntil`, `mediaStartedAt` |
 | `recording_tracks` (`RecordingTrack`) | One per-participant audio track session: participant id, encrypted display name, key, start offset, `audioPurgedAt` |
 | `postprod_jobs` (`PostprodJob`) | The queue: kind, status, attempts, lease, `idempotencyKey`, `dependsOnId`, `lastError` |
 | `postprod_artifacts` (`PostprodArtifact`) | One output per `(recording, type, language)`: key, size, MIME type, encrypted inline copy, `contentHash` (SHA-256), `isSynthetic`, `watermarkType`, model id and version, `revisedAt` |
@@ -678,6 +757,7 @@ erDiagram
     jsonb consentSnapshot "event AI flags at enqueue"
     jsonb pipelineSnapshot "engines and models used"
     datetime retentionUntil
+    datetime mediaStartedAt "first recorded frame, optional"
   }
   RECORDING_TRACK {
     uuid recordingId FK
@@ -1549,8 +1629,8 @@ Several of these are tracked in the [Roadmap](ROADMAP.md).
 - **Corrections do not reach derived outputs.** Translations, summaries and
   dubbing cannot be regenerated from an edited transcript without discarding
   the edits.
-- **Some text is Italian in every language.** The summary prompt is written
-  in Italian; Markdown section headings exist for Italian, English and French,
+- **Some text is Italian in every language.** The summary prompt, including
+  the room timeline the portal adds to it, is written in Italian; Markdown section headings exist for Italian, English and French,
   and other languages get English headings. Unmapped speakers appear in the
   public transcript as `Partecipante <n>` whatever the page language.
 - **The Hugging Face Secret is mandatory.** The worker template renders the

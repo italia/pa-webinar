@@ -114,6 +114,7 @@ Most personal data is encrypted, but these fields are stored in plaintext. Reten
 | `Registration.organization`, `Registration.organizationRole`, `Person.organization` | Optional profiling fields. They stay searchable on purpose. |
 | `Question.text`, `EventFeedback.comment`, `QuestionnaireAnswer.valueText`, `WordCloudSubmission.word` | Free text typed by participants. |
 | `Question.answerText` | The written answer a moderator gives to a Q&A question. |
+| `LiveAction.data` | The details of a live action: ids, counts and texts written by moderators (agenda topics, poll questions with their options and results, word-cloud prompts), and the most frequent words of a closed word-cloud round, which participants typed. No names. |
 | `EmailOutbox.subject`, `EmailOutbox.attachments`, `EmailOutbox.lastError` | The subject (the public event title), the calendar attachment (which names the event contact and gives their email address), and the last SMTP error (which can quote the recipient). The recipient and both bodies are encrypted. |
 | `AdminAuditLog.ip`, `AdminAuditLog.userAgent` | The client IP address and user agent of every administrative write. No job deletes these rows. |
 
@@ -133,7 +134,7 @@ flowchart LR
   AC["<b>Access</b><br/>EventModerator<br/>StaffAccount<br/>StaffLoginToken"]:::access
   EV["<b>Events and content</b><br/>Event<br/>EventTemplate<br/>Tag<br/>EventMaterial<br/>EventReminder<br/>EventQuestionnaire<br/>GdprTemplate"]:::events
   PA["<b>Participation</b><br/>Registration<br/>EventInvitation<br/>Person<br/>QuestionnaireResponse<br/>EventFeedback"]:::participation
-  LI["<b>Live interaction</b><br/>ChatMessage<br/>Question<br/>Poll<br/>WordCloudRound<br/>EventAgendaItem<br/>Reaction"]:::live
+  LI["<b>Live interaction</b><br/>ChatMessage<br/>Question<br/>Poll<br/>WordCloudRound<br/>EventAgendaItem<br/>Reaction<br/>LiveAction"]:::live
   SA["<b>Settings and audit</b><br/>SiteSetting<br/>CallSession<br/>EmailOutbox<br/>EmailTemplate<br/>GdprAuditLog<br/>AdminAuditLog"]:::settings
   RA["<b>Recording and AI</b><br/>Recording<br/>RecordingTrack<br/>PostprodJob<br/>PostprodArtifact<br/>Speaker<br/>OrphanRecording"]:::recording
 
@@ -149,7 +150,7 @@ flowchart LR
 |---|---|---|---|
 | Events and content | `Event`, `EventTemplate`, `Tag` and `EventTagLink`, `EventMaterial`, `EventReminder`, `EventQuestionnaire` with `QuestionTemplate`, `QuestionnaireTemplateLink` and `QuestionItem`, `GdprTemplate` | The event and everything an organizer prepares for it. `EventTemplate` only pre-fills the wizard: an event keeps no reference to its template, so editing a template never changes existing events. | [event-journey.md](event-journey.md); statuses in [event-lifecycle.md](event-lifecycle.md) |
 | Participation | `Registration`, `EventInvitation`, `Person`, `ReminderSent`, `QuestionnaireResponse` and `QuestionnaireAnswer`, `EventFeedback` | Who registered, who was invited, the opt-in address book, and what participants answered. | [event-journey.md](event-journey.md); address book in [GDPR.md](../GDPR.md) and [ADR-011](../adr/011-person-rubrica.md) |
-| Live interaction | `ChatMessage` and `ChatMessageReaction`, `Question`, `QuestionUpvote` and `QuestionGuestUpvote`, `Poll` and `PollVote`, `WordCloudRound` and `WordCloudSubmission`, `EventAgendaItem` and `AgendaItemReaction`, `Reaction` | The table-backed features beside the video during a live event. PostgreSQL holds their state, and Redis only fans it out. The timer and the reaction-bar counters have no table ([Live interaction](#live-interaction)). | [live-interaction.md](live-interaction.md), [ADR-005](../adr/005-live-interaction-in-portal.md) |
+| Live interaction | `ChatMessage` and `ChatMessageReaction`, `Question`, `QuestionUpvote` and `QuestionGuestUpvote`, `Poll` and `PollVote`, `WordCloudRound` and `WordCloudSubmission`, `EventAgendaItem` and `AgendaItemReaction`, `Reaction`, `LiveAction` | The table-backed features beside the video during a live event, and the journal of the actions taken in the room. PostgreSQL holds their state, and Redis only fans it out. The timer and the reaction-bar counters have no table ([Live interaction](#live-interaction)). | [live-interaction.md](live-interaction.md), [ADR-005](../adr/005-live-interaction-in-portal.md) |
 | Access | `EventModerator`, `StaffAccount`, `StaffLoginToken` | Named moderator and speaker grants, staff accounts and their one-time sign-in links. The primary moderator link is a column on `Event`, and the instance API key is not stored in the database. `EventOrganizer` sits next to these models but is display metadata only: it lists co-organizing organizations on the event page and grants no access. | [identity-and-access.md](identity-and-access.md) |
 | Recording and AI | `Recording`, `RecordingTrack`, `Speaker`, `PostprodJob`, `PostprodArtifact`, `PostprodOriginalBody`, `OrphanRecording` | Recordings, per-participant audio tracks, the AI post-production queue and its outputs. | [recording.md](recording.md), [POSTPROD.md](../POSTPROD.md) |
 | Settings and audit | `SiteSetting`, `EmailTemplate`, `EmailOutbox`, `CallSession`, `GdprAuditLog`, `AdminAuditLog` | The runtime settings singleton, email overrides and the outbox, call-session analytics, and the two audit trails. | [runtime-settings.md](../configuration/runtime-settings.md), [email.md](email.md), [call sessions](event-lifecycle.md#call-sessions), [GDPR.md](../GDPR.md), [audit actor format](identity-and-access.md#audit-actor-format) |
@@ -263,7 +264,7 @@ How to read it:
 
 ## Live interaction
 
-The table-backed live features (chat, Q&A, polls, word cloud, agenda, reaction-bar analytics) each have their own tables under `Event`. Registrants are identified by `registrationId`. Guests are identified by a `guestId` that their browser generates and keeps in local storage. The chat identifies its authors by `senderId`, a seat identity such as `reg-<registrationId>`. Why a token identifies a seat and not a person is explained in [identity-and-access.md](identity-and-access.md).
+The table-backed live features (chat, Q&A, polls, word cloud, agenda, reaction-bar analytics) each have their own tables under `Event`, and so does the live action journal. Registrants are identified by `registrationId`. Guests are identified by a `guestId` that their browser generates and keeps in local storage. The chat identifies its authors by `senderId`, a seat identity such as `reg-<registrationId>`. Why a token identifies a seat and not a person is explained in [identity-and-access.md](identity-and-access.md).
 
 ```mermaid
 %%{init: {"theme": "base", "themeVariables": {"primaryColor": "#E6F0FA", "primaryBorderColor": "#0066CC", "primaryTextColor": "#17324D", "lineColor": "#5C6F82", "tertiaryColor": "#F7F9FB", "edgeLabelBackground": "#FFFFFF"}}}%%
@@ -283,6 +284,7 @@ erDiagram
   EVENT ||--o{ EVENT_AGENDA_ITEM : "agenda"
   EVENT_AGENDA_ITEM ||--o{ AGENDA_ITEM_REACTION : "agree or disagree"
   EVENT ||--o{ REACTION : "reaction bar"
+  EVENT ||--o{ LIVE_ACTION : "live action journal"
 
   CHAT_MESSAGE {
     uuid id PK
@@ -362,6 +364,14 @@ erDiagram
     uuid eventId FK
     string emoji "no personal data"
   }
+  LIVE_ACTION {
+    uuid id PK
+    uuid eventId FK
+    datetime at "server time"
+    string kind
+    string actor "role, never a person"
+    jsonb data "ids, counts, moderator texts"
+  }
 ```
 
 How to read it:
@@ -369,6 +379,8 @@ How to read it:
 - **Questions.** The room collects questions in the Q&A panel, as `Question` rows with upvotes. `ChatMessage.isQuestion`, `answeredAt` and `dismissedAt` remain in the chat model and API, but the room does not set them.
 - **Hiding is a soft delete.** A moderator sets `hiddenAt` and `hiddenBy`. The row stays, but it leaves history and exports. Hiding also deletes the message's attachment file, on a best-effort basis. A word that a moderator removes from the word cloud is hidden the same way, with `WordCloudSubmission.hiddenAt`: the rows leave the cloud and the recap, and still count toward their authors' limit for the round.
 - **Reactions come in three kinds.** `ChatMessageReaction` is an emoji on one chat message. `AgendaItemReaction` is agree or disagree on an agenda item. `Reaction` is one click on the app's reaction bar and stores only the emoji and the time. These rows are analytics only: they are written best-effort after the in-memory counter, capped per event, and do not drive the live count.
+- **The live action journal.** A `LiveAction` row (`live_actions`) records one action taken in the room: a topic started, a poll closed with its results, a feature turned on, a hand raised. `at` is the server's time, the one time base of the room, and is indexed with `eventId`. `kind` names the action, `actor` holds only the role (`moderator`, `participant` or `system`), and `data` is a small JSONB object that never holds participant names ([Plaintext fields worth knowing](#plaintext-fields-worth-knowing)). The rows go with their event (`onDelete: Cascade`) and are deleted by the GDPR cleanup. Which actions are written, and from where, is in [live-interaction.md](live-interaction.md#live-action-journal).
+- **Placing the journal on a recording.** AI post-production measures the journal from `Recording.mediaStartedAt`, the absolute time of the first recorded frame. The multitrack ingest stores it when its body carries the optional `recordingStartedAtMs`; otherwise the column is `null`, and post-production uses the recording start reported to the journal or an approximation ([POSTPROD.md](../POSTPROD.md#room-timeline)).
 - **PostgreSQL is canonical for these tables.** Each route writes its row first, then notifies the other pods through Redis ([ADR-005](../adr/005-live-interaction-in-portal.md)). Some live state has no table: the timer and the reaction-bar counters live in each pod's memory, presence in the square lives in Redis with a short TTL, and the raised-hand queue belongs to Jitsi ([live-interaction.md](live-interaction.md)).
 
 ## Enums worth knowing

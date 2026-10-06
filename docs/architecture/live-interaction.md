@@ -1,6 +1,6 @@
 # Live interaction and realtime
 
-This page covers everything that happens beside the video during a live event: chat, Q&A, polls, word cloud, agenda, materials, reactions, timer, the raised-hand queue and post-event feedback. It explains who may read and write each feature and how a change reaches every open browser. It also covers what happens when Redis is missing.
+This page covers everything that happens beside the video during a live event: chat, Q&A, polls, word cloud, agenda, materials, reactions, timer, the raised-hand queue and post-event feedback. It explains who may read and write each feature, how a change reaches every open browser, and which actions the room records in its journal. It also covers what happens when Redis is missing.
 
 It is written for developers who add or change a live feature, and for operators who run the Redis tier.
 
@@ -61,7 +61,7 @@ In this page, **moderator** means a caller holding the event's primary moderator
 | Materials | `EventMaterial` | Moderators | Anyone while the event is publicly visible: before the start only `BEFORE`; during the event `ALWAYS` and `DURING`; after it `ALWAYS` and `AFTER`. Every material with a moderator token | Poke `materials`, plus a 120 s poll |
 | Reactions (app bar) | Process memory, plus `Reaction` rows for analytics | Anyone who knows the event slug | Anyone who knows the event slug | 5 s poll |
 | Timer | Process memory | Moderators | Anyone who knows the event slug | 5 s poll |
-| Raised hands | Jitsi. Analytics in `CallSession.handRaiseLog` | Participants in Jitsi. **Lower hand**: moderators | Jitsi roster | Jitsi events, plus `control:<eventId>` |
+| Raised hands | Jitsi. Analytics in `CallSession.handRaiseLog` and the [live action journal](#live-action-journal) | Participants in Jitsi. **Lower hand**: moderators | Jitsi roster | Jitsi events, plus `control:<eventId>` |
 | Post-event feedback | `EventFeedback`, or a post-event questionnaire | Registrants and browser ids while `LIVE` or `ENDED` | Summary: anyone. Comments: primary moderator link | Not live |
 | Live flags | `Event` columns | Moderators | Anyone who knows the event slug | Snapshot `flags` on `live:<eventId>` |
 
@@ -186,7 +186,7 @@ The agenda is the list of topics for the meeting.
 - While `agendaEnabled` is on, registrants and browser ids can **Agree** or **Disagree** with a topic, change their answer, or withdraw it. There is one answer per identity per topic. The room offers the buttons only on the current topic, and shows the tallies on every topic that has answers; the API accepts an answer on any topic. The room does not show the buttons to moderators and speakers, who see the tallies only.
 - `GET /agenda` returns the topics, the tallies and the caller's own answer (from the bearer registration token or `?guestId=`). `GET /agenda?lite=1` returns only `agendaEnabled` and each topic's id, title, status, `startedAt`, `completedAt` and `plannedMinutes`: no reactions and no identity. That answer is the same for everyone, so each pod keeps it in memory for 2 seconds and drops it on every agenda write it handles.
 - The room's top bar shows the current topic and how many topics are discussed, to everyone, while the agenda is on and has topics. Hovering over it or clicking it opens the whole agenda with each topic's status. It reads `GET /agenda?lite=1`, and `agenda` pokes re-read it like the panel; with push active it also re-reads every 15 seconds, because another pod may answer a poke with the state of a moment earlier.
-- When a recording of the event goes through AI post-production, the summary job receives the agenda topics and whether each was marked discussed ([POSTPROD.md](../POSTPROD.md)).
+- When a recording of the event goes through AI post-production, the summary job receives the agenda topics with their status and planned duration, and the room timeline built from the [live action journal](#live-action-journal) ([POSTPROD.md](../POSTPROD.md#room-timeline)).
 
 ### Materials
 
@@ -212,7 +212,7 @@ Jitsi owns the raised-hand state. The portal builds the queue from Jitsi's `rais
 - Every participant sees a read-only queue with names and order. Moderators get the full panel: **Give the floor**, **Audio only** (both issue Jitsi commands) and **Lower hand**.
 - The Jitsi IFrame API can lower only the local participant's hand. **Lower hand** therefore calls `POST /hand-raises/lower`, which publishes `{op: 'lowerHand', targetEndpointId, raiseId}` on `control:<eventId>`. The raiser's own browser toggles its hand, and Jitsi then drains every queue.
 - A browser opens the control stream only while its own hand is up. It acts only if `raiseId` matches its current raise, so a late signal cannot lower (and so re-raise) a hand that was already lowered and raised again. The signal is best effort, with no replay: a lost signal is a no-op, and the moderator can click again.
-- For analytics, each non-moderator client reports only its own raises to `POST /hand-raises`. The server appends opaque Jitsi endpoint ids to `CallSession.handRaiseLog` without names.
+- For analytics, each non-moderator client reports only its own raises to `POST /hand-raises`, in batches of `{participantId, raised, atEpochMs}` with the batch's `sentAt`; both times are optional and come from the browser's clock. The server appends opaque Jitsi endpoint ids to `CallSession.handRaiseLog` without names or times, and writes the raises, not the lowerings, to the [live action journal](#live-action-journal) at server time, without the endpoint id. The route takes no credential, so the journal caps what one request can add.
 
 How the toolbar and roster are configured is in [jitsi-integration.md](jitsi-integration.md).
 
@@ -222,6 +222,38 @@ When the event ends, participants who are not moderators see a post-event feedba
 
 - If the event has a `POST_EVENT` questionnaire, the prompt renders it and answers go to `QuestionnaireResponse` (see [event-journey.md](event-journey.md)).
 - Otherwise the prompt collects a single rating from 1 to 5 and an optional comment of up to 500 characters through `POST /feedback`. It is accepted only while the event is `LIVE` or `ENDED`, once per registration or browser id. The room sends the registration token for registrants and the browser id for guests (see [Known limitations](#known-limitations) for speakers). `GET /feedback` returns the average and distribution to anyone. Comments are returned only to the primary moderator link.
+
+## Live action journal
+
+The room also keeps a journal of what happened and when: one `LiveAction` row per action, written by `recordLiveAction` and `recordLiveActions` in `app/src/lib/live/actions.ts`. AI post-production places it beside the transcript, so the summary knows when a topic started or a poll closed ([POSTPROD.md](../POSTPROD.md#room-timeline)). The journal has no reader in the room.
+
+- **One time base.** `at` is the server's clock. An action that happened in a browser is converted to server time, described below.
+- **No people.** `actor` holds the role (`moderator`, `participant`, or `system` for a round closed at its expiry), never a person. `data` holds ids, counts and texts written by moderators. It never holds names or endpoint ids, nor the text of a Q&A question or a chat message: post-production reads those from their own tables.
+- **Best effort.** The write runs after the response (Next's `after()`, which keeps it alive during an orderly pod shutdown): the response does not wait for it, and a failed write is only logged, so it never fails or delays the action that caused it.
+
+| `kind` | Written by | When | `data` |
+|---|---|---|---|
+| `agenda.topic` | `PATCH /agenda/{id}` | A status change. Starting a topic first writes each topic it closes, as `DONE`. Restarting the current topic, or changing only the title or duration, writes nothing | `itemId`, `label`, `status` |
+| `poll.opened` | `POST /polls` | A new poll, which starts open | `pollId`, `question`, `options` |
+| `poll.closed`, `poll.published`, `poll.reopened` | `PATCH /polls/{id}` | A real status change | `pollId`, `question`; closing and publishing add `options`, `counts` per option and `totalVotes` at that moment |
+| `poll.deleted` | `DELETE /polls/{id}` | Every deletion | `pollId`, `question` |
+| `wordcloud.opened` | `POST /wordcloud` | Every new round | `roundId`, `prompt`, `duration` |
+| `wordcloud.closed` | `PATCH /wordcloud/{id}` on an open round; `POST /wordcloud`, for the round the new one closes; the read or submission that finds a round expired, timed at its expiry | When the round closes | `roundId`, `prompt`, `words`: the 15 most frequent words with the number of people who sent each |
+| `wordcloud.word_removed` | `DELETE /wordcloud/{id}/words` | At least one row hidden | `roundId`, `hidden` (the number of rows hidden); never the word |
+| `question.status` | `PATCH /questions/{id}` | A request that sets a status or carries a written answer | `questionId`, `status`, `answered` |
+| `chat.question.status` | `PATCH /chat/{messageId}/question` | A real change of the answered or dismissed state | `messageId`, `status` |
+| `chat.hidden` | `DELETE /chat/{messageId}` | A message hidden | `messageId` |
+| `feature.toggled` | `PUT /api/events/{eventId}` | A change of one of the live flags in `LIVE_FLAG_FIELDS` ([Live-toggleable flags](#live-toggleable-flags)) | `feature`, `enabled` |
+| `event.ended` | `PUT /api/events/{eventId}` | The status moves to `ENDED` | none |
+| `timer.started`, `timer.stopped` | `POST /timer` | Every start; a pause or reset that stops a running countdown | `durationSec` on start |
+| `hand.raised` | `POST /hand-raises` | A reported raise: at most one per endpoint id and 20 per request, 60 per IP address and event every five minutes, and none once the event has 5,000. The count and the write run after the response. Lowered hands are not written | none |
+| `recording.started`, `recording.stopped` | `POST /live-actions` | A moderator's browser sees Jitsi's recording status change | none |
+
+**Times from the browser.** Hand raises and recording changes are seen only by browsers. The browser sends the time of the action (`atEpochMs`) and the time it sent the request (`sentAt`), both from its own clock. The server adds the difference between its arrival time and `sentAt`, so a browser clock that is off does not move the action (`serverTimeOf`). Without both times, or when the result lies in the future or more than a day back, the arrival time is used.
+
+**Recording start and stop.** The server does not see the Jitsi recording start or stop, so the room's moderators report it. On `recordingStatusChanged`, a moderator's browser sends `POST /api/events/{slug}/live-actions` with `{kind, atEpochMs, sentAt}`, where `kind` is `recording.started` or `recording.stopped`, and the moderator token as `Authorization: Bearer`. The route accepts only those two kinds, from the primary moderator link or a `MODERATOR` grant (403 for anyone else), at most 30 times per minute per token and event. A browser reports only the changes it sees: not a repeat of the last status, and not the status it finds in its first 10 seconds in the call, which is how the recording already was, unless that browser asked for the recording itself (automatic start, or **Start** right after joining). Every moderator in the room reports the same change, so the route skips a report equal to the last recording action less than 10 minutes apart, and answers 204 either way; the check and the write run under a per-event advisory lock, so simultaneous reports write one row. A later one is written, so that a start that follows a stop nobody reported is not lost.
+
+**Retention.** The journal is event data. The GDPR cleanup deletes it at event retention ([GDPR.md](../GDPR.md#the-daily-gdpr-cleanup)), deleting the event removes it by cascade, and duplicating an event does not copy it.
 
 ## Channels
 

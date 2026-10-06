@@ -423,12 +423,18 @@ post-production worker; changing it means changing all three.
 `POST /api/internal/multitrack-manifest` takes `{eventId, recordingId,
 tracks[]}`, where each track has `participantId`, `displayName`, `blobKey`,
 `mimeType`, `sizeBytes`, `startOffsetMs` and `durationMs` (at least one and at
-most 500 tracks). The portal:
+most 500 tracks), and an optional `recordingStartedAtMs`, the epoch time in
+milliseconds of the first recorded frame. The portal:
 
 1. checks that the recording exists and belongs to `eventId`, and that every
    `blobKey` starts with the string `recordings/multitrack/<eventId>/<recordingId>/`;
 2. upserts one `RecordingTrack` per `(recordingId, blobKey)`, encrypting the
-   display name, so a retried ingest updates rather than duplicates;
+   display name, so a retried ingest updates rather than duplicates. In the
+   same transaction it stores `recordingStartedAtMs` as
+   `Recording.mediaStartedAt`, the time zero of the room timeline that the
+   summary receives ([AI post-production](../POSTPROD.md#room-timeline)). A
+   value that is not a plausible time (before 2020) is ignored rather than
+   rejected, so it never costs the tracks;
 3. if every track's byte rate is under the floor set in
    `app/src/lib/ai/track-silence.ts` and the event has AI transcription on,
    marks the recording `POSTPROD_FAILED` instead of enqueueing. The tracks

@@ -335,7 +335,15 @@ and storage layout are in [AI post-production](../POSTPROD.md).
 
 The transcript carries names: the display names of per-participant tracks, or
 the names mapped to diarization labels. The language model that writes the
-summary and the translations reads that transcript. All of this happens inside
+summary and the translations reads that transcript. For the summary it also
+receives the event's agenda and a timeline of the room, built from the
+[live action journal](../architecture/live-interaction.md#live-action-journal)
+and the room's tables: agenda topics, poll questions and results, word-cloud
+prompts with their most frequent words, the texts of Q&A questions and of
+written answers, questions marked in the chat, the titles of shared
+materials, and the number of chat messages, reaction-bar reactions and
+raised hands in each five-minute window. The timeline names no author
+([Room timeline](../POSTPROD.md#room-timeline)). All of this happens inside
 the installation.
 
 ### Marking machine-generated content

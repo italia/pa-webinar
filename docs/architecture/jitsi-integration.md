@@ -188,9 +188,9 @@ too); for listeners, `grep -rn "addListener(" app/src/components app/src/hooks`.
 | `readyToClose` | Treated as the authoritative "this person meant to leave" signal (see [Leaving](#leaving-the-room-and-readytoclose)) |
 | `participantJoined`, `participantLeft`, `displayNameChange` | Recounts people and refreshes the roster and the raised-hand queue; the recorder bot is excluded |
 | `audioMuteStatusChanged`, `videoMuteStatusChanged` | Re-enables noise suppression on unmute; reapplies quality and background when the camera turns on |
-| `raiseHandUpdated` | Updates the raised-hand queue. Each non-moderator also reports their own raises, batched, to `/api/events/{slug}/hand-raises` for event analytics |
+| `raiseHandUpdated` | Updates the raised-hand queue. Each non-moderator also reports their own raises, batched and timed, to `/api/events/{slug}/hand-raises` for event analytics and the [live action journal](live-interaction.md#live-action-journal) |
 | `dominantSpeakerChanged` | In moderators' clients only (every browser receives the same change, and one report per attendee would rewrite the log once per person), builds the dominant-speaker timeline; with no moderator in the room nothing is recorded. The timeline is batched to `/api/events/{slug}/speaker-events` for speaker attribution ([ADR-013](../adr/013-multitrack-speaker-attribution.md)) |
-| `recordingStatusChanged` | Drives the recording indicator |
+| `recordingStatusChanged` | Drives the recording indicator. Moderators' clients also report the start or stop to `/api/events/{slug}/live-actions` for the [live action journal](live-interaction.md#live-action-journal) |
 | `moderationStatusChanged` | Keeps the audio and video moderation toggles in sync |
 | `screenSharingStatusChanged` | Shows the screen-share banner |
 
