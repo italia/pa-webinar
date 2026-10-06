@@ -900,16 +900,32 @@ model EventAgendaItem {
   eventId   String  @map("event_id") @db.Uuid
   label     String  @db.VarChar(500)
   sortOrder Int     @default(0) @map("sort_order")
+  // Tenuto allineato a `status` (vero solo per DONE): lo leggono la sintesi
+  // della post-produzione e i client della versione precedente.
   completed Boolean @default(false)
+  // Lo stato dell'argomento nella scaletta. Uno solo alla volta e' CURRENT.
+  status    AgendaItemStatus @default(PENDING)
 
   createdAt   DateTime  @default(now()) @map("created_at")
   completedAt DateTime? @map("completed_at")
+  // Quando l'argomento e' passato «in corso»: la sala mostra da quanto.
+  startedAt   DateTime? @map("started_at")
+  // Quanto dovrebbe durare, se chi conduce lo ha detto: il moderatore vede
+  // quando si va oltre.
+  plannedMinutes Int?   @map("planned_minutes")
 
   event     Event                @relation(fields: [eventId], references: [id], onDelete: Cascade)
   reactions AgendaItemReaction[]
 
   @@index([eventId])
   @@map("event_agenda_items")
+}
+
+enum AgendaItemStatus {
+  PENDING // da discutere
+  CURRENT // in corso
+  DONE // discusso
+  SKIPPED // saltato
 }
 
 // Assenso/dissenso dei partecipanti su un singolo punto d'agenda (audience

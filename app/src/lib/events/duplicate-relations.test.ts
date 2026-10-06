@@ -33,7 +33,10 @@ function fullSource(): DuplicateSource {
       { name: 'cifrato:nome', email: 'cifrato:email', role: 'MODERATOR' },
       { name: 'cifrato:nome2', email: null, role: 'SPEAKER' },
     ],
-    agendaItems: [{ label: 'Apertura', sortOrder: 0 }],
+    agendaItems: [
+      { label: 'Apertura', sortOrder: 0, plannedMinutes: 10 },
+      { label: 'Domande', sortOrder: 1, plannedMinutes: null },
+    ],
     reminders: [{ offsetMinutes: 1440, label: 'Un giorno prima' }],
     questionnaires: [
       {
@@ -110,6 +113,8 @@ describe('classificazione delle relazioni di Event', () => {
     const selected = Object.keys(DUPLICATE_SOURCE_INCLUDE.agendaItems.select);
     expect(selected).not.toContain('completed');
     expect(selected).not.toContain('completedAt');
+    expect(selected).not.toContain('status');
+    expect(selected).not.toContain('startedAt');
   });
 });
 
@@ -129,7 +134,8 @@ describe('duplicatedRelations', () => {
   it('copia la scaletta ma non il suo stato di esecuzione', () => {
     const out = duplicatedRelations(fullSource());
     const items = out.agendaItems?.create as Record<string, unknown>[];
-    expect(items[0]).toEqual({ label: 'Apertura', sortOrder: 0 });
+    expect(items[0]).toEqual({ label: 'Apertura', sortOrder: 0, plannedMinutes: 10 });
+    expect(items[1]).toEqual({ label: 'Domande', sortOrder: 1 });
     expect(items[0]?.completed).toBeUndefined();
     expect(items[0]?.completedAt).toBeUndefined();
   });

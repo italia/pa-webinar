@@ -86,7 +86,7 @@ export const DUPLICATE_SOURCE_INCLUDE = {
   agendaItems: {
     // `completed`/`completedAt` NON si leggono: sono lo stato di esecuzione
     // della riunione che si è svolta, non la scaletta.
-    select: { label: true, sortOrder: true },
+    select: { label: true, sortOrder: true, plannedMinutes: true },
   },
   reminders: { select: { offsetMinutes: true, label: true } },
   questionnaires: {
@@ -196,7 +196,11 @@ export function duplicatedRelations(source: DuplicateSource): DuplicatedRelation
 
   if (source.agendaItems.length > 0) {
     out.agendaItems = {
-      create: source.agendaItems.map((a) => ({ label: a.label, sortOrder: a.sortOrder })),
+      create: source.agendaItems.map((a) => ({
+        label: a.label,
+        sortOrder: a.sortOrder,
+        ...(a.plannedMinutes !== null && { plannedMinutes: a.plannedMinutes }),
+      })),
     };
   }
 
