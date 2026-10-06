@@ -334,14 +334,15 @@ jitsi-meet:
 | `site.portalHost` | `NEXT_PUBLIC_APP_URL` (`https://<portalHost>`), the host of the portal Ingress, and the `hosts` of every `ingress.tls` entry that has none |
 | `site.conferenceHost` | `NEXT_PUBLIC_JITSI_DOMAIN`, the host and TLS hosts of the conference Ingress rendered by the chart (`jitsi.conferenceIngress`), the hosts of the conference-root redirect, and the recorder bot's domain |
 | `jitsi-meet.publicURL` | Not derived: it is a value of the Jitsi subchart, which a parent chart cannot fill in. The chart checks it, and the render stops with the line to add when it is not `https://<conferenceHost>` |
+| `jitsi-meet.web.extraEnvs.DYNAMIC_BRANDING_URL` | Not derived and not checked, for the same reason: `null` by default, because the chart does not know the portal's address. Set it to `https://<portalHost>/api/jitsi-branding.json`: the participants' browsers fetch the portal's dynamic-branding document from there, so it must be reachable without authentication. Unset, or behind HTTP authentication, the stage keeps the room's blue, but Jitsi's toolbar, menus and tiles keep its dark greys ([Branding limits](architecture/jitsi-integration.md#branding-limits)) |
 
 - **Format.** Lowercase DNS names only: `https://`, a port, a path or uppercase letters stop the render.
   The portal and the conference need two different names.
 - **Explicit keys still work**: `app.env.NEXT_PUBLIC_APP_URL`, `app.env.NEXT_PUBLIC_JITSI_DOMAIN`,
   `ingress.hosts[].host`, `ingress.tls[].hosts`, and `jitsi-meet.web.ingress.hosts` with the subchart's
   Ingress. When `site.*` is set, a key that disagrees with it stops the render. The chart's placeholders
-  (`videocall.example.com`) count as not set; the post-install notes warn while any `example.com` name
-  remains.
+  (`videocall.example.com`) count as not set; the post-install notes warn while an `example.com` name
+  remains in `app.env` or `jitsi-meet.publicURL`.
 - **TURN**, for example `turn.webinar.example.com` (optional), goes in `jitsi-meet.turnHost`. Its DNS
   record points at coturn's address, or, with the k3s add-on, at the ingress node
   ([coturn (TURN and TURNS)](#coturn-turn-and-turns)).
@@ -724,6 +725,8 @@ jitsi:
 jitsi-meet:
   publicURL: "https://meet.webinar.example.com"
   web:
+    extraEnvs:                     # the portal's branding document, read by browsers
+      DYNAMIC_BRANDING_URL: "https://webinar.example.com/api/jitsi-branding.json"
     ingress:                       # the subchart's Ingress: its hosts cannot be derived
       hosts:
         - host: meet.webinar.example.com

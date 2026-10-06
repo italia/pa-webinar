@@ -188,8 +188,9 @@ too); for listeners, `grep -rn "addListener(" app/src/components app/src/hooks`.
 | `readyToClose` | Treated as the authoritative "this person meant to leave" signal (see [Leaving](#leaving-the-room-and-readytoclose)) |
 | `participantJoined`, `participantLeft`, `displayNameChange` | Recounts people and refreshes the roster and the raised-hand queue; the recorder bot is excluded |
 | `audioMuteStatusChanged`, `videoMuteStatusChanged` | Re-enables noise suppression on unmute; reapplies quality and background when the camera turns on |
-| `raiseHandUpdated` | Updates the raised-hand queue. Each non-moderator also reports their own raises, batched and timed, to `/api/events/{slug}/hand-raises` for event analytics and the [live action journal](live-interaction.md#live-action-journal) |
-| `dominantSpeakerChanged` | In moderators' clients only (every browser receives the same change, and one report per attendee would rewrite the log once per person), builds the dominant-speaker timeline; with no moderator in the room nothing is recorded. The timeline is batched to `/api/events/{slug}/speaker-events` for speaker attribution ([ADR-013](../adr/013-multitrack-speaker-attribution.md)) |
+| `participantRoleChanged` | Keeps the participants panel's **Hosts** and **Audience** split current |
+| `raiseHandUpdated` | Updates the raised-hand queue and the order of the participants panel. Each non-moderator also reports their own raises, batched and timed, to `/api/events/{slug}/hand-raises` for event analytics and the [live action journal](live-interaction.md#live-action-journal) |
+| `dominantSpeakerChanged` | In every client, highlights the person speaking in the participants panel. In moderators' clients only (every browser receives the same change, and one report per attendee would rewrite the log once per person), builds the dominant-speaker timeline; with no moderator in the room nothing is recorded. The timeline is batched to `/api/events/{slug}/speaker-events` for speaker attribution ([ADR-013](../adr/013-multitrack-speaker-attribution.md)) |
 | `recordingStatusChanged` | Drives the recording indicator. Moderators' clients also report the start or stop to `/api/events/{slug}/live-actions` for the [live action journal](live-interaction.md#live-action-journal) |
 | `moderationStatusChanged` | Keeps the audio and video moderation toggles in sync |
 | `screenSharingStatusChanged` | Shows the screen-share banner |
@@ -282,12 +283,13 @@ people therefore see the desktop Jitsi toolbar with the mobile drawer.
 | Pages and prompts | `enableWelcomePage`, `enableClosePage: false`; `disableDeepLinking`; `disableInviteFunctions`; `MOBILE_APP_PROMO: false` | No Jitsi landing, closing or "open in the app" pages, and no invite dialog |
 | Header and notices | `hideConferenceSubject`; `notifications: []`; `DISABLE_JOIN_LEAVE_NOTIFICATIONS` | No room title bar and no Jitsi toast notifications |
 | Watermarks | `SHOW_JITSI_WATERMARK`, `SHOW_BRAND_WATERMARK`, `SHOW_POWERED_BY: false`; `APP_NAME: 'PA Webinar'` | No Jitsi branding inside the frame (see [Branding limits](#branding-limits)) |
+| Stage | `DEFAULT_BACKGROUND: '#004D99'` (`JITSI_STAGE_BACKGROUND` in `app/src/lib/jitsi/branding.ts`) | The area behind the videos is the room's blue instead of black, on any Jitsi server (see [Branding limits](#branding-limits)) |
 | Raised hands | `raisedHands.disableRemoveRaisedHandOnFocus: true` | A hand stays up until it is lowered, even when that person starts speaking. The key must stay nested: the flat form is ignored |
 | Self view | `disableSelfViewSettings: true`, `disableSelfView: false` | Nobody can hide their own tile, and anyone who did so earlier gets it back (explicit `false` wins only with the patched image) |
 | Moderation menu | `remoteVideoMenu.disableKick` (`false` for moderators only); `disableGrantModerator: true` | Only moderators see "remove"; nobody can promote another participant from the UI |
 | Peer-to-peer | `p2p.enabled: false` | Every call goes through the bridge, even with two people |
 | Other features | breakout-room buttons hidden, `enableLobbyChat: false`, `disableProfile`, `enableFileSharing: false` except in instant calls | Features the portal does not support stay out of sight |
-| Avatars | `gravatar.disabled: true` | The browser never contacts Gravatar; an avatar in the JWT is used instead ([identity and access](identity-and-access.md)) |
+| Avatars | `gravatar.disabled: true` | The browser never contacts Gravatar; the avatar in the JWT is used instead: the person's uploaded photo or the Gravatar proxy, both served by the portal, or initials ([identity and access](identity-and-access.md#avatars)) |
 | Audio processing | `disableAEC`, `disableNS`, `disableAGC: false`; `enableTalkWhileMuted: true`; `enableNoisyMicDetection: false` | Echo cancellation, noise suppression and gain control stay on; people are told when they speak while muted |
 | Start state | `startWithAudioMuted`, `startWithVideoMuted` | Desktop follows the device check in the waiting room; mobile always starts muted, because the browser needs a fresh tap to open the camera inside an iframe |
 
@@ -437,14 +439,42 @@ and `app/src/components/jitsi/`):
 - **Drawer** (`LiveSidebar`). The live panels: Q&A, chat, polls, word cloud, agenda, materials and
   participants. It is a side drawer from 992 px up and a bottom sheet with a tab strip below that. The
   panels themselves are documented in [live interaction](live-interaction.md).
-- **Participants panel.** The roster from `getParticipantsInfo()` with the recorder bot filtered out, a
-  per-listener volume slider, and removal. The remove button follows the portal: people who are
-  moderators in the portal see it on every row except their own (the local endpoint id comes from
-  `videoConferenceJoined`), and it carries the person's name as its accessible label. Role badges, and
-  the moderators-first order, come from Jitsi's roles (`getRoomsInfo()` and `participantRoleChanged`;
-  `getParticipantsInfo()` carries none), and appear only when those roles distinguish someone: at least
-  one moderator and one participant in the list. Without token-based roles every token holder is a
-  Jitsi moderator, and no badge is shown.
+- **Participants panel** (`app/src/components/participants/participant-panel.tsx`). The roster from
+  `getParticipantsInfo()` with the recorder bot filtered out, refreshed on join, leave and name changes
+  and every 5 seconds. The panel stays mounted while another drawer tab is open, but then draws nothing:
+  it only keeps the people count for the tab, read every 15 seconds and on join and leave, and follows
+  raised hands and the current speaker, so the list is in order as soon as the tab reopens.
+  - **Rows.** Each row shows the avatar, the name and **you** on one's own row (the local endpoint id
+    comes from `videoConferenceJoined`). The avatar is the `avatarURL` that Jitsi reports from the
+    person's token, shown only when it is an inline image (`data:` PNG, JPEG, WebP or SVG) or a link to
+    the portal's own `/api/avatar…` routes on the same origin, so the viewer's browser never fetches an
+    image from anyone else; otherwise the row draws initials ([Avatars](identity-and-access.md#avatars)).
+  - **Order and state.** Raised hands come first, each with its turn, in the order the
+    `raiseHandUpdated` events reached that browser, the same order as the moderators' raised-hand queue;
+    then everyone else by name. The current dominant speaker is highlighted (`dominantSpeakerChanged`).
+    While the panel is open, a moderator's screen reader hears who raised a hand, through a polite live
+    region.
+  - **Identity, for moderators.** In the browsers of the primary moderator link and of `MODERATOR`
+    grants, each row also shows who stands behind the connection, from `GET /api/events/{slug}/seats`,
+    read while the panel is open, every 20 seconds and when the number of connections changes: the email
+    address of the registration or the grant; **Registered as: {name}** when the name typed in the room
+    differs from the registration's; **Registration link of {email}** for a registration link opened in
+    another browser; **Shared moderator link**; **Identity cannot be verified** when two different
+    links claimed the same connection. Every browser declares its own endpoint after joining,
+    with `POST /api/events/{slug}/seats` ([Who is behind each video tile](identity-and-access.md#who-is-behind-each-video-tile)).
+  - **Sections.** **Hosts** and **Audience** come from Jitsi's roles (`getRoomsInfo()` and
+    `participantRoleChanged`; `getParticipantsInfo()` carries none), and appear only when those roles
+    distinguish someone: at least one moderator and one participant in the list. Without token-based
+    roles every token holder is a Jitsi moderator, and the list is not split.
+  - **Count.** The header counts people: connections with the same name count once, such as the one a
+    person leaves behind for a few minutes when they rejoin. When there are more connections than people,
+    the number of connections is shown beside it. Every connection keeps its row, so a moderator can
+    remove it. Above 8 connections, a search filters the rows by name; for moderators it also matches
+    the registration name and the email address shown under each name.
+  - **Controls.** A per-listener volume slider on every row except one's own, and removal. The remove
+    button follows the portal: people who are moderators in the portal see it on every row except their
+    own, and it carries the person's name as its accessible label. The first click arms it and the
+    second, within 4 seconds, removes the person. Moderators also see their own connection quality.
 - **Raised-hand queue.** A read-only queue in order of raising, shown to every non-moderator so the
   room can see who is next. It stays hidden while no hand is up.
 - **Screen-share banner.** A banner that announces who started sharing; the presenter does not see it.
@@ -633,14 +663,38 @@ Building, bumping and verifying the image step by step is covered in
   which falls back to the organization logo and then to `/images/default-watermark.svg`,
   `jitsiWatermarkEnabled`, `jitsiWatermarkOpacity` and `jitsiWatermarkPosition`. Defaults are in
   `app/prisma/schema.prisma`. Jitsi's own watermarks and "powered by" are hidden.
-- **The UI inside the iframe keeps Jitsi's look.** The IFrame API ignores `customTheme` and
-  `dynamicBrandingUrl` in `configOverwrite`, so colors, fonts and logos inside the conference can only
-  change on the server: through `jitsi-meet.web.custom.configs._custom_config_js` or the web image's
-  environment. The chart ships no such theme. The subchart does not restart the web pod when only
-  that custom configuration changes, so the chart's config-reload hook (`configReloadHook`) restarts it
-  after every install and upgrade.
-- **`/api/jitsi-branding.json` exists but is not wired.** The route serves a Jitsi dynamic-branding
-  document built from site settings, but nothing in the chart or in Docker Compose points Jitsi at it.
+- **The UI inside the iframe keeps Jitsi's look, except its colors.** The IFrame API ignores
+  `customTheme` and `dynamicBrandingUrl` in `configOverwrite`, so fonts, icons and the rest of the
+  conference's look can only change on the server: through
+  `jitsi-meet.web.custom.configs._custom_config_js` or the web image's environment. The subchart does
+  not restart the web pod when only that custom configuration changes, so the chart's config-reload
+  hook (`configReloadHook`) restarts it after every install and upgrade. The colors come from the
+  portal in two ways:
+  - **The stage.** The iframe passes `DEFAULT_BACKGROUND` (`#004D99`) in
+    `interfaceConfigOverwrite`, which the IFrame API accepts, so the stage behind the videos is the
+    room's blue instead of black on any Jitsi server, whether or not it reads the document below.
+  - **The dynamic-branding document.** `GET /api/jitsi-branding.json` returns the same
+    `backgroundColor`; a `backgroundImageUrl`, an SVG data URI with the room's gradient and faint
+    circles, without logo or text, and a `premeetingBackground` with the same gradient;
+    `customTheme.palette`, which replaces Jitsi's dark greys with the room's blues: `uiBackground`
+    (`#004D99`, the stage and filmstrip blue), `ui01` (`#2F5175`, a slate blue) for the toolbar, menus
+    and dialogs, `ui02` and `ui03` (`#3D6289`) for highlighted rows on those surfaces and the tiles of
+    people without a camera, `ui04` (`#4D7299`) for borders and button hover, and
+    `thumbnailBackground` (`#3D6289`) for the camera-off tiles where the Jitsi version reads it
+    separately. Jitsi's white text and icons keep a contrast of at least 4.5:1 on every one of these
+    surfaces. The document also returns `avatarBackgrounds`, colors for initials avatars that stay
+    readable on the blue; `logoImageUrl`, the watermark or logo an administrator set (**Watermark
+    URL**, then **Custom logo URL**), empty otherwise; and `logoClickUrl` and `inviteDomain`. The
+    colors are constants in `app/src/lib/jitsi/branding.ts`. Jitsi reads the document only when its
+    web server points at it. In the chart, `jitsi-meet.web.extraEnvs.DYNAMIC_BRANDING_URL` is `null`
+    by default, because the chart does not know the portal's address: set it to the portal's own
+    public URL (`NEXT_PUBLIC_APP_URL`) followed by `/api/jitsi-branding.json`
+    ([Where each hostname goes](../DEPLOYMENT.md#where-each-hostname-goes)). Docker Compose sets
+    `DYNAMIC_BRANDING_URL=${JITSI_BRANDING_URL:-http://localhost:3000/api/jitsi-branding.json}`. The
+    participant's browser fetches it from the conference page, so it must be reachable without
+    authentication. Without the document, because the value is unset or the portal host is behind
+    HTTP authentication, the stage keeps its blue, but Jitsi's toolbar, menus, dialogs and tiles keep
+    its dark greys and the avatars its own colors.
 - **Jitsi runs on its own host**, for example `meet.webinar.example.com` next to the portal on
   `webinar.example.com`. That separation is what keeps media code out of the portal's origin. It is
   also why the portal cannot reach Jitsi's storage, and why background images travel as data URIs.

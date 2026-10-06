@@ -111,8 +111,13 @@ other participant sees it on screen anyway. The portal controls where the name c
   MD5 would let any participant test guessed addresses against everyone present. The reference in the link
   is that MD5 encrypted under `PII_ENCRYPTION_KEY`: it reveals nothing, and only the portal can decrypt
   it.
+- **A photo the person uploads, served by the portal.** A registrant who has opened the personal link
+  from an email in the same browser, which proves the address, can upload a profile photo in the
+  waiting room. Named grants cannot, because staff choose their address. The photo takes precedence
+  over Gravatar and initials, and the avatar becomes a link to the portal's `/api/avatar/photo/{id}`,
+  whose id is a random UUID with nothing derived from the address.
 
-How the proxy works, and which seats can show a Gravatar, are in
+How the proxy and the photo work, and which seats can show them, are in
 [Avatars](../architecture/identity-and-access.md#avatars). What Gravatar receives, and the legal view of
 it, are in [Privacy and data protection](../GDPR.md). The toggle is described in
 [Runtime settings](../configuration/runtime-settings.md).

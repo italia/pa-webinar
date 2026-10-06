@@ -37,7 +37,7 @@ flowchart LR
     end
     MAIL["Emails"]
   end
-  JF["Inside the Jitsi frame<br/>not reached by site settings"]
+  JF["Inside the Jitsi frame<br/>Jitsi's own look,<br/>colors from the portal"]
 
   ID -->|"every surface"| SURF
   HOME --> LINK
@@ -64,8 +64,8 @@ flowchart LR
 
 The waiting room keeps the site's regular header and footer. The live room covers them with a
 full-screen call surface: there, the logo (or the site name) sits in the room's top bar and the
-watermark is drawn over the video. The Jitsi interface inside the frame is outside the portal's reach
-(see [Inside the Jitsi frame](#inside-the-jitsi-frame)).
+watermark is drawn over the video. The Jitsi interface inside the frame is outside the portal's reach,
+except for its colors (see [Inside the Jitsi frame](#inside-the-jitsi-frame)).
 
 ## How changes take effect
 
@@ -358,11 +358,21 @@ How the chosen background reaches the conference is in
 
 ## Inside the Jitsi frame
 
-Site settings stop at the iframe. Inside it, Jitsi keeps its own colors, fonts and logos, and the
+Site settings stop at the iframe. Inside it, Jitsi keeps its own fonts, icons and layout, and the
 interface names the app "PA Webinar" (`APP_NAME` in `app/src/lib/jitsi/config.ts`) whatever
-**Application name** says. Why the portal cannot reach further, and the server-side options that
-remain, are described in
-[Branding limits](../architecture/jitsi-integration.md#branding-limits).
+**Application name** says. The colors come from the portal, and are not settings: the stage behind the
+videos is always the room's blue, and, when the Jitsi web server reads the portal's dynamic-branding
+document (`/api/jitsi-branding.json`), Jitsi's toolbar, menus and dialogs turn slate blue and the
+tiles of people without a camera a lighter blue, with matching colors for the initials avatars. That document also names the **Watermark URL**, or else the **Custom
+logo URL**, as Jitsi's logo, and **Organization URL** as its link.
+
+The chart points Jitsi at the document with `jitsi-meet.web.extraEnvs.DYNAMIC_BRANDING_URL`, which
+is `null` by default because the chart does not know your portal's address. Set it to your portal's
+address followed by `/api/jitsi-branding.json`
+([Hostnames and ingress](../DEPLOYMENT.md#where-each-hostname-goes)). Participants' browsers fetch it,
+so it must be reachable without authentication. Unset, or behind HTTP authentication, only the stage
+color applies, and Jitsi's toolbar and menus keep their dark greys. Why the portal cannot reach further, and the server-side options that remain, are described
+in [Branding limits](../architecture/jitsi-integration.md#branding-limits).
 
 ## Design constraints
 
@@ -400,6 +410,7 @@ remain, are described in
 | Virtual backgrounds | `app/src/lib/jitsi/virtual-background.ts` and `app/public/images/virtual-backgrounds/` | Code change, 24-language names, rebuild |
 | Email layout | `app/src/lib/email/templates.ts` | Code change, rebuild |
 | Look of the Jitsi interface | Jitsi web configuration in the chart | Helm upgrade (see [deploying with Helm](../DEPLOYMENT.md)) |
+| Colors of the conference stage, toolbar, menus, tiles and initials avatars | `app/src/lib/jitsi/branding.ts` | Code change, rebuild the app image |
 
 ## Known limitations
 

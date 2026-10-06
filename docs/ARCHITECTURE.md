@@ -357,7 +357,8 @@ sequenceDiagram
 
 - the fan-out channels `chat:<eventId>`, `chat-typing:<eventId>`, `control:<eventId>`, `live:<eventId>` and `garden:<eventId>`;
 - the JVB snapshot, and the heartbeat with which the scaler tells the lifecycle job to stand down;
-- positions in the square, which expire in seconds.
+- positions in the square, which expire in seconds;
+- the map from call connections to registrations and grants that moderators read in the participants panel, which expires 12 hours after the last person joins.
 
 Losing Redis loses no data. Real-time delivery degrades until it returns ([Live interaction and realtime](architecture/live-interaction.md)).
 

@@ -152,7 +152,7 @@ This is the complete list of producers: every call to `enqueueEmail()` in the ap
 
 | Link | Path | Lifetime | Owner page |
 |---|---|---|---|
-| Personal join link | `/events/<slug>/live?token=<accessToken>`; while public registration is off, `/api/events/<slug>/registrations/enter?token=…&sig=…&lang=…` instead ([Invitation-only registration](#invitation-only-registration)) | As long as the registration exists; it identifies a seat, and a forwarded copy works for whoever holds it | [Identity, access and tokens](identity-and-access.md) |
+| Personal join link | `/api/events/<slug>/registrations/enter?token=…&sig=…&lang=…`, or with `proof=…` in place of `sig=…`, which redirects to `/events/<slug>/live?token=<accessToken>`; the add-to-calendar links carry the second form ([The signed personal link](#the-signed-personal-link)) | As long as the registration exists; it identifies a seat, and a forwarded copy works for whoever holds it | [Identity, access and tokens](identity-and-access.md) |
 | Event page | `/events/<slug>` | Public while the event page is visible | [Event lifecycle](event-lifecycle.md) |
 | Calendar download | `/api/events/<slug>/calendar.ics` | Public; 404 for drafts | [Calendar files](#calendar-files) |
 | Staff sign-in link | `/admin/access?t=<token>` | 20 minutes (`DURATA_LINK_MINUTI` in `app/src/lib/auth/staff-link-config.ts`), one use; opening it consumes nothing until **Sign in** is pressed | [Identity, access and tokens](identity-and-access.md) |
@@ -180,14 +180,21 @@ The confirmation contains, in order:
 
 A reminder has the same layout, with the "starts in…" sentence as its introduction and no note under the button.
 
+### The signed personal link
+
+Confirmations, resends and reminders carry the personal link through the entry route, `/api/events/<slug>/registrations/enter`, with a signature next to the token, an HMAC keyed with `APP_SECRET` (`app/src/lib/events/registration-link.ts`). The registration form proves nothing about the address typed in it; opening the email does. The signature is chosen when each message is built, from **Public registration enabled** at that moment, and the link keeps it whatever the setting says when it is opened:
+
+- `proof`, with public registration on: the browser that registered keeps its identity, and opening the link there also records in its `event_access_<eventId>` cookie that the address is proved, which the profile photo requires. Any other browser enters the live room with the seat only, as with a forwarded link.
+- `sig`, with public registration off: opening the link binds that browser to the registration with the signed cookie, as described next. A link sent this way keeps binding after public registration is switched on.
+- The two signatures are not interchangeable. Either way the route redirects to the live room.
+- The add-to-calendar links (Google, Outlook, Yahoo) in the same emails always carry the unsigned personal link, `/live?token=…`, because calendar entries are forwarded and shared without much thought. That link admits whoever opens it to the registrant's seat, but not with the registrant's identity. The response to the registration form carries the unsigned link too.
+
 ### Invitation-only registration
 
-When an administrator turns off **Public registration enabled** (`SiteSetting.publicRegistrationEnabled`, in the **Features** tab of the **General** settings page), only addresses on the event's invitation list (`EventInvitation`) can register, and the email becomes the only way to receive the personal link (`app/src/lib/events/registration-access.ts`, `app/src/lib/events/registration-link.ts`):
+When an administrator turns off **Public registration enabled** (`SiteSetting.publicRegistrationEnabled`, in the **Features** tab of the **General** settings page), only addresses on the event's invitation list (`EventInvitation`) can register, and the email becomes the only way to receive the personal link (`app/src/lib/events/registration-access.ts`):
 
 - The registration form answers `202` with the same body whether the address is invited, already registered or neither. It queues a confirmation for a new registration and again for an existing one, and nothing for an address that is not on the list. The form shows no link and sets no cookie.
-- Confirmations, resends and reminders carry the personal link through the entry route, `/api/events/<slug>/registrations/enter`, with a signature (`sig`, an HMAC keyed with `APP_SECRET`) next to the token. Opening it binds that browser to the registration with the signed `event_access_<eventId>` cookie and redirects to the live room. The form proves nothing about the address; opening the email does.
-- The add-to-calendar links (Google, Outlook, Yahoo) in the same emails always carry the unsigned personal link, `/live?token=…`, because calendar entries are forwarded and shared without much thought. That link admits whoever opens it to the registrant's seat, but not with the registrant's identity.
-- The link form is chosen when each message is built, so emails queued while registration was public keep the plain `/live?token=` link.
+- The personal link in the email, signed with `sig`, binds the browser that opens it to the registration with the signed `event_access_<eventId>` cookie, and redirects to the live room.
 
 The access model behind this is in [Identity, access and tokens](identity-and-access.md#registrants), and the registration flow in [From creation to recap](event-journey.md#invitation-only-registration).
 
@@ -336,7 +343,7 @@ Because the `UID` is stable and the `SEQUENCE` grows, a calendar client recogniz
 
 ### Add-to-calendar links
 
-Confirmation and reminder emails also carry links that open a pre-filled entry in Google Calendar, Outlook on the web and Yahoo Calendar (`app/src/lib/ical/calendar-links.ts`). In those links the entry's location and details hold the **personal join link**, in its unsigned form even while public registration is off: following one hands the link to that calendar provider and stores it in the recipient's calendar. The add-to-calendar menu on the public event page uses the same generator with the public event page address instead.
+Confirmation and reminder emails also carry links that open a pre-filled entry in Google Calendar, Outlook on the web and Yahoo Calendar (`app/src/lib/ical/calendar-links.ts`). In those links the entry's location and details hold the **personal join link**, always in its unsigned form ([The signed personal link](#the-signed-personal-link)): following one hands the link to that calendar provider and stores it in the recipient's calendar. The add-to-calendar menu on the public event page uses the same generator with the public event page address instead.
 
 ## Sender identity and templates
 

@@ -280,11 +280,11 @@ sequenceDiagram
   else public registration on, new registrant
     R->>DB: INSERT Registration, create or refresh Person only with address-book consent
     R->>DB: INSERT GdprAuditLog CONSENT_RECORDED, then COMMIT
-    R->>DB: INSERT EmailOutbox row, confirmation with .ics attached
+    R->>DB: INSERT EmailOutbox row, confirmation with the entry link signed with proof, and .ics attached
     R-->>B: 201 accessToken and joinUrl, Set-Cookie event_access_{eventId}
   else public registration off
     R->>DB: lookup in transaction, INSERT only for an invited address
-    R->>DB: INSERT EmailOutbox row with the signed entry link, for a new or an existing registration
+    R->>DB: INSERT EmailOutbox row with the entry link signed with sig, for a new or an existing registration
     R-->>B: 202 with the same body for every address, no token and no cookie
   end
   J->>DB: claim pending outbox rows
@@ -310,7 +310,7 @@ The page's language is sent along and stored on the registration. Later emails u
 
 1. Allows 10 requests per minute per IP address and answers `409` if the event is not open for registration.
 2. Validates the body with Zod: `consentGiven` must be literally `true`, and the recording consents are checked against the event's flags.
-3. Computes `emailHash`, an HMAC-SHA256 of the lowercased, trimmed address keyed with `APP_SECRET` (plain SHA-256 when the variable is unset; `hashEmail()` in `app/src/lib/crypto/pii.ts`). The hash deduplicates registrations and is the form used for every lookup and match. The encrypted address is decrypted only where the address itself is needed: to send email, in the staff **Sign-ups** list and its export, in a data-subject export, and to derive the optional avatar reference in the room token ([identity-and-access.md](identity-and-access.md)).
+3. Computes `emailHash`, an HMAC-SHA256 of the lowercased, trimmed address keyed with `APP_SECRET` (plain SHA-256 when the variable is unset; `hashEmail()` in `app/src/lib/crypto/pii.ts`). The hash deduplicates registrations and is the form used for every lookup and match. The encrypted address is decrypted only where the address itself is needed: to send email, in the staff **Sign-ups** list and its export, in a data-subject export, to derive the optional avatar reference in the room token, and to show the room's moderators who is behind each video tile ([identity-and-access.md](identity-and-access.md#who-is-behind-each-video-tile)).
 4. Encrypts the name and the email address with AES-256-GCM (`encryptPII()`), and generates the personal `accessToken` with `nanoid` (24 characters).
 5. In one transaction:
    - refuses a second registration with the same hash for the same event (`409` with code `ALREADY_REGISTERED`). With public registration off it keeps the existing row instead, to send its link again (see [Invitation-only registration](#invitation-only-registration));
@@ -318,15 +318,15 @@ The page's language is sent along and stored on the registration. Later emails u
    - links the address-book person record, which is created or refreshed only with the separate address-book consent ([ADR-011](../adr/011-person-rubrica.md));
    - inserts the registration with the consent timestamp;
    - writes a `CONSENT_RECORDED` entry to `GdprAuditLog` with the consent flags and no personal data.
-6. After the commit, queues the confirmation email in the outbox (`sendConfirmationEmail()`, which calls `enqueueEmail()`): the personal link, links to add the event to Google, Outlook and Yahoo calendars, and an `.ics` attachment. A failure to queue is logged and does not fail the registration. `confirmationSentAt` records the time the email was queued; delivery status lives in the outbox row ([email.md](email.md)).
-7. Answers `201` with the access token and the personal link, `/events/{slug}/live?token=<accessToken>` localized to the page's language, and sets the signed `event_access_<eventId>` cookie. The cookie lets the same browser return to the live page without the token in the URL ([identity-and-access.md](identity-and-access.md#registrants)). With public registration off, it answers `202` instead, as described next.
+6. After the commit, queues the confirmation email in the outbox (`sendConfirmationEmail()`, which calls `enqueueEmail()`): the personal link as the signed entry link `/api/events/{slug}/registrations/enter?token=…&proof=…&lang=…` (with `sig=…` in place of `proof=…` while public registration is off, as described next), links to add the event to Google, Outlook and Yahoo calendars, which carry the unsigned link, and an `.ics` attachment. A failure to queue is logged and does not fail the registration. `confirmationSentAt` records the time the email was queued; delivery status lives in the outbox row ([email.md](email.md)).
+7. Answers `201` with the access token and the unsigned personal link, `/events/{slug}/live?token=<accessToken>` localized to the page's language, and sets the signed `event_access_<eventId>` cookie. The cookie lets the same browser return to the live page without the token in the URL. Opening the signed link from the email in the same browser also records that the address is proved, which the profile photo requires ([identity-and-access.md](identity-and-access.md#registrants)). With public registration off, it answers `202` instead, as described next.
 
 ### Invitation-only registration
 
 When the site setting `publicRegistrationEnabled` (**Public registration enabled**) is off, the event's invitation list (`EventInvitation`) is the list of addresses that may register. Whoever fills in the form has not proved that they own the address they typed, so the response never carries the personal link:
 
 - `POST /api/events/{slug}/registrations` answers `202` with `{ eventSlug, delivery: "email" }` and no cookie, whatever the address. An invited address is registered. An address that is already registered gets its confirmation again, in the language of the registration. Any other address gets nothing. The form shows **Check your email**. Neither the status code nor the body tells the caller which case applied.
-- The personal link in the confirmation, resend and reminder emails is the signed entry link `/api/events/{slug}/registrations/enter?token=…&sig=…&lang=…`. Opening it sets the `event_access_<eventId>` cookie and redirects to the room, so the mailbox is the proof of identity ([identity-and-access.md](identity-and-access.md#registrants)). The add-to-calendar links in the same emails carry the unsigned `/live?token=…` link, which gives a seat but not the registrant's identity.
+- In this mode the personal link in the confirmation, resend and reminder emails is the entry link signed with `sig`. Opening it sets the `event_access_<eventId>` cookie in whichever browser opens it, and redirects to the room, so the mailbox is the proof of identity. The signature is chosen when each email is built: a link sent in this mode keeps binding after public registration is switched on, and a link sent while it was on (`proof`) never binds a browser other than the one that registered ([identity-and-access.md](identity-and-access.md#registrants)). The add-to-calendar links in the same emails carry the unsigned `/live?token=…` link, which gives a seat but not the registrant's identity.
 - An event with no invitations accepts no new registrations. Its registration page says that registration is not open to the public and offers only the resend form, and the event page links to it with **Already registered? Get your personal link again**.
 - Existing registrations, moderator and speaker links, and staff paths are unaffected. Guest entry is a separate switch (`guestAccessEnabled`): a closed meeting needs both off.
 - The pre-registration questionnaire is not shown, because the `202` carries no access token to submit it with.
@@ -337,7 +337,7 @@ The registration page and the event page choose what to show with `registrationA
 
 When the event has a pre-registration questionnaire, the confirmation screen shows it and submits it with the new access token. When it has none and the event starts within `waitingRoomLeadMinutes` (a site setting, 15 by default in `app/prisma/schema.prisma`), the browser moves into the waiting room after about a second. Otherwise the participant sees a thank-you screen that checks the time again every 30 seconds and moves them in once the event is close.
 
-With public registration on, a second registration with the same address shows **Resend my access link**. With it off, the form answers every address in the same way and emails the link to an address that is already registered. `POST /api/events/{slug}/registrations/resend` queues the original confirmation again when the address is registered, with the signed entry link while public registration is off. It always answers `200` with the same neutral body, so it cannot be used to find out who is registered, and allows 5 requests per minute per IP address. The registration page also offers it on its own, under **Already registered? Get your personal link again**, when registration is closed.
+With public registration on, a second registration with the same address shows **Resend my access link**. With it off, the form answers every address in the same way and emails the link to an address that is already registered. `POST /api/events/{slug}/registrations/resend` queues the original confirmation again when the address is registered, with the entry link signed for the setting at that moment: `sig` while public registration is off, `proof` while it is on. It always answers `200` with the same neutral body, so it cannot be used to find out who is registered, and allows 5 requests per minute per IP address. The registration page also offers it on its own, under **Already registered? Get your personal link again**, when registration is closed.
 
 Registrations are listed in the administration area under **Sign-ups**, both across events and on each event's page.
 
@@ -361,7 +361,7 @@ The schema has the columns for a pre-filled personal registration link (`token`,
 
 | Mode | Who gets in | How |
 |---|---|---|
-| Registration | Anyone who registers while registration is open. With public registration off, only the addresses on the invitation list | The personal link from the confirmation email, or the `event_access_<eventId>` cookie in the browser that registered, or, with public registration off, in the browser that opened the signed entry link |
+| Registration | Anyone who registers while registration is open. With public registration off, only the addresses on the invitation list | The personal link from the confirmation email, or the `event_access_<eventId>` cookie in the browser that registered, or in the browser that opened an entry link signed with `sig`, which the emails built while public registration is off carry |
 | Guest link | Anyone holding `/events/{slug}/live`. The administration's event page shows it under **Event links** as **Direct invite (no registration)**, and hides it for scheduled events while `guestAccessEnabled` is off | The visitor types a name in the waiting room. Scheduled events admit guests only while `LIVE`, and only when the site setting `guestAccessEnabled` is on; instant calls, whatever that setting, admit them while `LIVE`, `IDLE` or `PROVISIONING`. At other times a scheduled event redirects to its registration page, or to the event page once `ENDED` or `ARCHIVED` |
 | Join password | Visitors arriving without a personal token, when `joinPasswordHash` is set | Redirected to `/events/{slug}/password` first. A correct password sets a 12-hour grant cookie ([identity-and-access.md](identity-and-access.md#password-protected-events)) |
 | Moderator and speaker links | Holders of the primary moderator link or of a named grant | [identity-and-access.md](identity-and-access.md#moderator-and-speaker-links) |
@@ -399,7 +399,8 @@ Materials (`EventMaterial`) are links or uploaded files, each with a title, an o
 | Where | Route | Credential |
 |---|---|---|
 | Wizard step 4, and the event's **Materials** page (`/admin/events/{id}/materials`) | `/api/admin/events/{id}/materials` | Staff session (administrator or owning organizer) |
-| Live room, by moderators | `POST /api/events/{slug}/materials`, 20 per minute per IP address and event | Moderator token |
+| Live room, by moderators | `POST /api/events/{slug}/materials`, 20 per minute per IP address and event; `POST …/materials/upload`; `PATCH` and `DELETE …/materials/{id}` | Moderator token |
+| Open count, on a click in the room or on the public event page | `POST /api/events/{slug}/materials/{id}/opened` ([Materials](live-interaction.md#materials)) | Optional room token; moderators and staff are not counted |
 | Public read | `GET /api/events/{slug}/materials` and `GET /api/events/{slug}/files`, while the event is publicly visible (`isEventPubliclyVisible()`, which also covers a running instant call) | None for the public view; the primary moderator link or a co-moderator grant returns every material. On a password-protected event, a reader needs a room token of the event (registration or named grant), the join-password grant cookie or the registrant's access cookie, otherwise 401 |
 
 Visibility is enforced on the server (`app/src/lib/events/material-visibility.ts`). The event's phase comes from its status when the status is decisive: `LIVE` is `DURING`, and `ENDED` and `ARCHIVED` are `AFTER`. In any other status the clock decides: before `startsAt` is `BEFORE`, from `endsAt` on is `AFTER`, and in between is `DURING`.

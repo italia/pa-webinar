@@ -99,8 +99,8 @@ The dotted edge from the session matters. Core edits to an event made from the a
 | Staff session (`admin_session` cookie) | Minted at sign-in | HttpOnly cookie | 6-hour JWT, slid while in use. The cookie itself lasts 24 hours | Logout, expiry, account deactivation, `APP_SECRET` change |
 | Primary moderator link (`Event.moderatorToken`) | Generated with the event (a duplicate gets a fresh one). Emailed once to the event's contact address, when there is one ([Email and calendar](email.md#moderator-and-speaker-links)) | `?token=` on landing pages, then `Authorization: Bearer` | No expiry. It lives as long as the event row | **Regenerate** on **Moderator links** (administrators), or automatic rotation when the owning staff account is deactivated or deleted |
 | Named grant (`EventModerator`, role `MODERATOR` or `SPEAKER`) | Created by the holder of the primary link, in the wizard or under **Co-moderators and speakers**. Emailed once to the grant's address, when there is one | Same as the primary link | No expiry | Individual revocation (`revokedAt`), and row deletion by the GDPR cleanup |
-| Registrant access token (`Registration.accessToken`) | Issued at registration and sent in the confirmation email. **Resend my access link** sends it again | `?token=` on `/events/{slug}/live`, or with a signature on the entry link of invitation-only registration ([Registrants](#registrants)); `Authorization: Bearer` on chat requests and panel reads; `accessToken` in the JSON body of the Jitsi token, poll-vote, question, upvote and feedback requests; a path segment in `GET /api/events/{slug}/registrations/{accessToken}` | As long as the registration exists | Deletion of the registration by the GDPR cleanup or an erasure request, or deletion of the event |
-| `event_access_<eventId>` cookie | Set in the browser that registered, or, with public registration off, in the browser that opened the signed entry link from the email | HttpOnly cookie | Until 6 hours after the event ends, clamped between 1 hour and 30 days | Expiry, `APP_SECRET` change |
+| Registrant access token (`Registration.accessToken`) | Issued at registration and sent in the confirmation email. **Resend my access link** sends it again | `?token=` on `/events/{slug}/live`, or with a signature on the entry link of the registration emails ([Registrants](#registrants)); `Authorization: Bearer` on chat requests and panel reads; `accessToken` in the JSON body of the Jitsi token, poll-vote, question, upvote and feedback requests; a path segment in `GET /api/events/{slug}/registrations/{accessToken}` | As long as the registration exists | Deletion of the registration by the GDPR cleanup or an erasure request, or deletion of the event |
+| `event_access_<eventId>` cookie | Set in the browser that registered, or in the browser that opened an entry link signed with `sig` from an email. The entry link also marks the address as proved in the cookie ([Registrants](#registrants)) | HttpOnly cookie | Until 6 hours after the event ends, clamped between 1 hour and 30 days | Expiry, `APP_SECRET` change |
 | Guest | Nothing is issued. The guest types a name | Name in the Jitsi token request | Nothing persists; each join mints a 2-hour guest Jitsi token | Not applicable |
 | `join_granted_<eventId>` cookie | Correct password on `POST /api/events/{slug}/verify-password` | HttpOnly cookie | 12 hours | Expiry, `APP_SECRET` change. Changing the password does not revoke grants already issued |
 | Jitsi JWT | `POST /api/events/{slug}/jitsi/token`, or the recorder claim | Handed to the Jitsi IFrame API | 90 minutes or 2 hours for people; 10 minutes to 6 hours for the recorder bot (see [Seats, identifiers and lifetimes](#seats-identifiers-and-lifetimes)) | Expiry only |
@@ -115,13 +115,13 @@ Two things that look like credentials are not credentials:
 
 ### Other signed links
 
-Four more tokens are self-contained HMAC-SHA256 signatures under `APP_SECRET`. The server keeps no copy of them, so none can be revoked individually: each ends at expiry, when `APP_SECRET` changes or, for the registration entry signature, when the registration is deleted.
+Four more kinds of token are self-contained HMAC-SHA256 signatures under `APP_SECRET`. The server keeps no copy of them, so none can be revoked individually: each ends at expiry, when `APP_SECRET` changes or, for the registration entry signatures, when the registration is deleted.
 
 | Token | Obtained | Carried as | Lifetime | Owner page |
 |---|---|---|---|---|
 | Data-subject request link (`app/src/lib/gdpr/request-token.ts`) | Emailed on request from the privacy pages, for an export or an erasure. The payload carries the email hash, never the address | `?t=` on `/privacy/my-data` or `/privacy/my-data/erasure`, then to `GET /api/gdpr/export` or `POST /api/gdpr/erasure` | 1 hour, not single use | [Data-subject rights](../GDPR.md#data-subject-rights) |
 | Address-book opt-out token (`app/src/lib/persons/opt-out-token.ts`) | Minted by `issueRubricaOptOutToken`. No platform email sends it | `?token=` on `/rubrica/opt-out` and on `GET` and `POST /api/rubrica/opt-out` | 90 days | [The address book](../GDPR.md#the-address-book) |
-| Registration entry signature (`app/src/lib/events/registration-link.ts`) | Put in the confirmation, resend and reminder emails while public registration is off. It signs the event id and the access token | `sig` next to `token` and `lang` on `GET /api/events/{slug}/registrations/enter` | No expiry, not single use | [Registrants](#registrants) |
+| Registration entry signatures (`app/src/lib/events/registration-link.ts`) | Put in the confirmation, resend and reminder emails: `sig` when public registration is off as the email is built, `proof` when it is on. Each signs its purpose, the event id and the access token | `sig` or `proof` next to `token` and `lang` on `GET /api/events/{slug}/registrations/enter` | No expiry, not single use | [Registrants](#registrants) |
 | Chat attachment token (`app/src/lib/chat/attachment-token.ts`) | Returned by `POST /api/events/{slug}/chat/attachment` after an upload | `attachmentToken` in the JSON body of `POST /api/events/{slug}/chat` | 30 minutes, bound to the event and the sender's seat | [Chat](live-interaction.md#chat) |
 
 ## Staff sign-in
@@ -362,6 +362,24 @@ The chat attributes messages, attachments and reactions to a **seat**. Q&A, poll
 
 A forwarded link keeps the registrant's seat on purpose, so that a registrant who switches devices does not split into two identities in analytics. It never inherits the registrant's name, though. The opener is shown under the name they typed. Any action that works *as the author*, such as editing an existing chat message, requires `isPerPersonIdentity`. The single implementation is `resolveTokenSender` in `app/src/lib/chat/sender.ts`.
 
+### Who is behind each video tile
+
+Jitsi does not say which registration or grant a person in the call belongs to: the conference picks the endpoint id, and the person types the name. So each browser, once it has joined the call (`videoConferenceJoined`), declares its own endpoint with `POST /api/events/{slug}/seats`, body `{ endpointId }`, and its room token as `Authorization: Bearer` (`app/src/lib/live/seats.ts`). The server binds the endpoint to what the token proves:
+
+| Token | Bound to | What moderators see under the name |
+|---|---|---|
+| Registrant access token, from the browser whose `event_access_<eventId>` cookie carries it | The registration | The registration's email address, and **Registered as: {name}** when the name typed in the room differs from the registration's |
+| The same token from any other browser | The registration, as a forwarded link | **Registration link of {email}** |
+| Named grant, `MODERATOR` or `SPEAKER` | The grant | The grant's email address, when it has one |
+| Primary moderator link | The shared link | **Shared moderator link** |
+| Any token, for an endpoint another seat has already claimed | Nothing: the endpoint is contested | **Identity cannot be verified** |
+
+- **A clash makes the endpoint contested.** The server cannot tell which browser owns an endpoint: each browser declares its own, and everyone in the call learns its id once it joins. The browser that joined with an endpoint claims it right after joining, and a repeated claim from the same seat changes nothing. When a different seat claims an endpoint that is already bound, the endpoint becomes contested and stays so, and moderators see **Identity cannot be verified** instead of an identity that could be the wrong one. The route answers `204` either way, so it does not reveal the clash. A rejoin gets a new endpoint and claims it again. An unknown token gets `403`, and each token, counted by its hash, can claim 12 times in 10 minutes.
+- **Only references are stored.** Each entry maps an endpoint id to the registration or grant id, never to a name or an address, in the Redis hash `live:seats:<eventId>`. The hash expires 12 hours after the last claim in the event. Without Redis, or when Redis does not answer, the map lives in the memory of the pod, so with several replicas a moderator sees only the claims that reached the same pod. There each entry expires 12 hours after its claim, and expired entries of every event are dropped whenever the map is used.
+- **Moderators only.** `GET /api/events/{slug}/seats` answers the primary moderator link and `MODERATOR` grants, not speakers (`isEventModerator`), with `Cache-Control: no-store`. For each endpoint it returns `kind` (`registration`, `forwardedLink`, `grant`, `sharedModeratorLink` or `contested`) and the name and email address, decrypted from the registration or the grant; a contested endpoint has neither. A registration deleted in the meantime is left out.
+
+The participants panel reads it while it is open in a moderator's browser ([Participants panel](jitsi-integration.md#app-owned-controls-around-the-iframe)). What this means for privacy is in [Privacy and data protection](../GDPR.md#data-inventory-and-retention).
+
 ## Participants and guests
 
 ### Registrants
@@ -369,25 +387,33 @@ A forwarded link keeps the registrant's seat on purpose, so that a registrant wh
 With public registration on, `POST /api/events/{slug}/registrations` creates the registration and does three things:
 
 - issues `accessToken`, a 24-character nanoid;
-- sends the confirmation email with the personal link `/events/{slug}/live?token=<accessToken>`;
+- sends the confirmation email with the entry link described below, signed with `proof`. The response to the form carries the unsigned personal link `/events/{slug}/live?token=<accessToken>`;
 - sets the signed `event_access_<eventId>` cookie in the registering browser. The cookie carries `{ eventId, token }`.
 
-The cookie does two jobs:
+The cookie does three jobs:
 
 - **Return without the link.** A registrant who comes back to `/live` without `?token=`, for example after a refresh, from a bookmark or through the event page, is recognized from the cookie instead of being sent to register again. On a password-protected event the password check comes first: see [Password-protected events](#password-protected-events).
-- **Identity binding.** Only the browser that holds a cookie with the same token receives the registrant's name and their per-participant recording consent. A personal link opened in another browser still admits the person, but they must type a name. In Jitsi they join as a guest with a fresh `guest-` identity and a 2-hour token. In the chat they occupy the registrant's seat under the typed name.
+- **Identity binding.** Only the browser that holds a cookie with the same token receives the registrant's name, avatar and per-participant recording consent. A personal link opened in another browser still admits the person, but they must type a name. In Jitsi they join as a guest with a fresh `guest-` identity and a 2-hour token. In the chat they occupy the registrant's seat under the typed name.
+- **Proof of the address.** Filling in the form proves nothing about the address typed in it. The cookie also carries `ev: true` (email verified) when the entry link from an email set it. Only a cookie with the same token and that claim lets the browser see, upload or remove the address's profile photo, and only then does the conference token carry the photo ([Avatars](#avatars)).
 
 **Resend my access link** (`POST /api/events/{slug}/registrations/resend`) sends the confirmation again, in the language of the registration. It always gives the same answer, so it cannot be used to find out who registered.
 
-**Invitation-only registration.** With the site setting `publicRegistrationEnabled` off, the browser that fills in the form proves nothing: the address is not verified, and whoever knows an invitee's address could otherwise take that invitee's identity. So the registration route answers `202` with the same body for every address and sets no cookie, and the personal link reaches the registrant only by email ([event-journey.md](event-journey.md#invitation-only-registration)). In that mode the confirmation, resend and reminder emails carry the entry link `GET /api/events/{slug}/registrations/enter?token=…&sig=…&lang=…`, where `sig` is an HMAC-SHA256 under `APP_SECRET` over the event and the access token (`app/src/lib/events/registration-link.ts`). The route:
+**The entry link in the emails.** The confirmation, resend and reminder emails carry the personal link as `GET /api/events/{slug}/registrations/enter?token=…&lang=…` with one of two signatures, each an HMAC-SHA256 under `APP_SECRET` over its own purpose, the event and the access token (`app/src/lib/events/registration-link.ts`). Opening it is the proof that the mailbox belongs to whoever opens it. The signature is chosen when each email is built, from `publicRegistrationEnabled` at that moment, and stays in the link:
 
-- sets the `event_access_<eventId>` cookie only when the registration exists, belongs to the event and the signature verifies, which binds that browser to the registration as registering does in open mode;
+- **`sig`**, while public registration is off: the link binds the browser that opens it to the registration, as registering does in open mode. A link sent with `sig` keeps doing so after public registration is switched on.
+- **`proof`**, while public registration is on: the identity stays with the browser that registered. The link only upgrades a browser whose cookie already carries the same token; any other browser enters with the token only, a seat with no identity, as with a forwarded link.
+
+The two signatures are not interchangeable: a `sig` value does not verify as `proof`, nor the reverse. The route:
+
+- sets the `event_access_<eventId>` cookie, with `ev: true`, only when the registration exists and belongs to the event, and either `sig` verifies, or `proof` verifies and the browser's cookie already carries the same token. The route's behavior does not depend on the setting at the time of the click;
 - redirects (`303`, `Cache-Control: no-store`, `Referrer-Policy: no-referrer`) to `/live?token=…` whenever a token is present, so a missing or wrong signature, another event's token and an unknown token get the same answer without a cookie, and the visitor then holds a seat with no identity;
 - redirects to the event page when there is no token, and answers `404` only for an unknown event.
 
-The entry link does not expire and is not single use, because mail scanners open links before the recipient does. Forwarding the email therefore forwards the identity. The add-to-calendar links in the same emails, and the address bar after the redirect, carry only the unsigned `/live?token=…` link, which gives a seat without the identity. Someone who lures a registrant into opening another registrant's entry link rebinds that browser's cookie for the event to the other registration.
+The entry link does not expire and is not single use, because mail scanners open links before the recipient does. Forwarding an email whose link carries `sig` therefore forwards the identity. The add-to-calendar links in the same emails, the response to the registration form and the address bar after the redirect carry only the unsigned `/live?token=…` link, which gives a seat without the identity. Someone who lures a registrant into opening another registrant's `sig` link rebinds that browser's cookie for the event to the other registration.
 
-Registration never verifies the address, in either mode. Someone who knows an invitee's address can create that invitee's registration, with a name and consents of their choosing. With public registration off, the link then still goes only to the invitee's mailbox, and the room shows the name typed at registration.
+**Invitation-only registration.** With the site setting `publicRegistrationEnabled` off, the browser that fills in the form proves nothing: the address is not verified, and whoever knows an invitee's address could otherwise take that invitee's identity. So the registration route answers `202` with the same body for every address and sets no cookie, and the personal link reaches the registrant only by email, as the entry link above signed with `sig` ([event-journey.md](event-journey.md#invitation-only-registration)).
+
+Registration never verifies the address, in either mode. Someone who knows an invitee's address can create that invitee's registration, with a name and consents of their choosing. With public registration off, the link then still goes only to the invitee's mailbox, and the room shows the name typed at registration. With public registration on, that person enters the room from the browser they registered in, but never shows the profile photo of the address, which needs the entry link opened in that browser.
 
 ### Guests
 
@@ -436,7 +462,7 @@ The portal signs every conference token. Prosody verifies it and derives the par
 |---|---|
 | `context.user.name`, `displayName` | The display name. `name` is the canonical field. `displayName` covers modules that read the other one |
 | `context.user.id` | A per-join session identifier (prefixes below), unique for each entry |
-| `context.user.avatar` | A data-URI SVG with initials, generated locally, or a link to the portal's own `/api/avatar` proxy (see [Avatars](#avatars)) |
+| `context.user.avatar` | A data-URI SVG with initials, generated locally, or a link to the portal: the person's uploaded photo (`/api/avatar/photo/{id}`) or the `/api/avatar` Gravatar proxy (see [Avatars](#avatars)) |
 | `context.user.affiliation`, `moderator` and the top-level copies | `owner`/`true` for moderators, `member`/`false` for everyone else |
 | `context.features` | `recording` is true for moderators only. `screen-sharing` is true for everyone. `livestreaming` and `outbound-call` are false for everyone (`app/src/lib/jitsi/config.ts`) |
 | `room` | The event's `jitsiRoomName`, a UUID |
@@ -453,9 +479,9 @@ The token is signed with HS256 using `JITSI_JWT_SECRET`, which must equal Prosod
 
 | Who | `context.user.id` | Role | Lifetime | Avatar |
 |---|---|---|---|---|
-| Primary moderator link, `MODERATOR` grant | `mod-<eventId>-<8 hex>` | `owner` | 2 hours | Initials. Gravatar is possible for a named grant that has an email address |
+| Primary moderator link, `MODERATOR` grant | `mod-<eventId>-<8 hex>` | `owner` | 2 hours | Initials. A named grant that has an email address shows its Gravatar when enabled. Never an uploaded photo |
 | `SPEAKER` grant | `mod-<eventId>-<8 hex>` | `member` | 90 minutes | As above |
-| Registrant, in the browser that registered | `reg-<registrationId>-<8 hex>` | `member` | 90 minutes | Initials, or Gravatar when enabled |
+| Registrant, in the browser that registered | `reg-<registrationId>-<8 hex>` | `member` | 90 minutes | An uploaded photo once that browser has opened the signed entry link from an email (`ev` in its cookie), otherwise Gravatar when enabled, otherwise initials |
 | Guest, or a forwarded personal link | `guest-<uuid>` | `member` | 2 hours | Initials |
 | Recorder bot, JWT path only (see [Machine credentials](#machine-credentials)) | `rec-bot-<recordingId>`, stable per recording | `member` | Time left until the event ends plus 30 minutes, clamped between 10 minutes and 6 hours | Initials |
 
@@ -463,14 +489,24 @@ A random suffix gives every entry, including a second tab, its own conference id
 
 ### Avatars
 
+The token route picks the avatar in this order: the person's uploaded photo, then Gravatar when it is enabled, then initials. A seat has a Gravatar only when an email address stands behind it: a registration, in the browser that registered, or a named grant created with an email address, whose Gravatar reference the route derives from the address staff entered. Only a registration can have a photo: the route finds it through the registration's stored `emailHash`, and only when the browser's `event_access_<eventId>` cookie carries the same token and the proof of the address (`ev`, see [Registrants](#registrants)). Named grants and the shared moderator link never carry a photo, because staff choose a grant's address and holding its link does not prove that the address belongs to whoever opens it. A link to the portal needs the absolute public URL (`NEXT_PUBLIC_APP_URL`); without it the avatar stays the initials.
+
 By default the avatar is an SVG with initials, inlined as a data URI. It triggers no request and passes any restriction of the Jitsi web app.
+
+**Uploaded photo.** A registrant can upload a photo in the waiting room (`app/src/components/live/profile-photo-field.tsx`) through `GET`, `POST` and `DELETE /api/events/{slug}/profile-photo`, with the room token as `Authorization: Bearer` (`app/src/lib/profile-photo.ts`):
+
+- **Who.** The holder of a registration of this event, only in a browser whose signed `event_access_<eventId>` cookie carries the same token and the proof of the address (`ev`), which only the entry link in the registration emails sets ([Registrants](#registrants)). A forwarded personal link admits its opener but cannot see or change the registrant's photo, and neither can someone who registered with an address they do not read. Because the photo belongs to the address at every event, registering with someone else's address does not let anyone wear, replace or remove that person's photo. Named grants (co-moderators and speakers), the shared primary moderator link and guests cannot upload: a grant's address is chosen by staff, so holding its link does not prove the address. `GET` answers `{ canUpload, needsEmailProof, photo }`: `canUpload: false` hides the photo field, and `needsEmailProof: true`, for the browser that registered but has not opened the entry link there, shows a hint to open the personal link from the email in this browser.
+- **What.** The browser crops the image to a centered square and reduces it to a 256×256 JPEG before sending it. The server does not rely on that. It reads the raw request body with a streaming limit of 150,000 bytes, so a larger body gets `413` even without a `Content-Length`. It recognizes JPEG, PNG and WebP from the first bytes, never from the declared type, and refuses SVG. Then it re-encodes every upload with sharp (`normalizePhoto` in `app/src/lib/profile-photo.ts`) as a 256×256 JPEG: a centered crop of the first frame only, with the EXIF orientation applied and every metadata field removed. The portal loads sharp, a native module, only when it processes an upload, so entering the room never depends on it. An image larger than 4096×4096 pixels is refused before it is decoded. The route answers `422` for an empty body, another format or an image it cannot decode, `403` when the caller may not upload, and `429` past 10 uploads per hour for the same address. A new upload replaces the previous photo under a new id, so the old address stops working.
+- **Scope.** The photo belongs to the email address, through its keyed hash (`ProfilePhoto.emailHash`), not to the event: it appears at every event that the same address registers for, in the browser that opened that registration's entry link. The token carries it from the next entry into the room. Its retention and erasure are in [Privacy and data protection](../GDPR.md#data-inventory-and-retention).
+- **Serving.** The token carries `https://webinar.example.com/api/avatar/photo/<id>`. The id is a random UUID that reveals nothing about the address, and every upload gets a new one. The route needs no credential, because the conference runs on another origin: it answers with the stored type, `X-Content-Type-Options: nosniff`, `Content-Security-Policy: default-src 'none'; sandbox`, `Access-Control-Allow-Origin: *`, `Cross-Origin-Resource-Policy: cross-origin` and `Cache-Control: private, max-age=3600`, so only the viewer's browser keeps a copy, never a shared cache. A removed or replaced photo answers `404` with `Cache-Control: private, max-age=60`, and the room falls back to initials; a browser that has already loaded the image can keep showing it for up to an hour.
+- **Where it shows.** In the video tiles and in the participants panel, which takes the avatar from Jitsi. The chat keeps the initials: a chat seat is shared by whoever opens a forwarded registration link, so a photo there could show the registrant next to a name someone else typed ([Seats and people](#seats-and-people)).
 
 When an administrator enables Gravatar in the site settings (`gravatarEnabled`, see [Runtime settings](../configuration/runtime-settings.md)) and the seat has an email address, the avatar becomes `https://webinar.example.com/api/avatar?name=…&g=<ref>&size=200`, where:
 
 - `<ref>` is the Gravatar MD5 of the address, **encrypted** with `PII_ENCRYPTION_KEY` (`app/src/lib/gravatar-ref.ts`). Jitsi broadcasts avatar URLs to the whole room, and a bare MD5 of an address could be tested against guessed addresses. Only the portal can decrypt the reference.
 - the proxy, and never the participant's browser, calls gravatar.com. It asks with `d=404`, so a person without a Gravatar keeps their initials. It does this only while the setting is on.
 
-The shared primary link and guests have no email address, so they always show initials.
+The shared primary link and guests have no email address, so they always show initials. A named grant with an email address shows its Gravatar or its initials.
 
 ## Machine credentials
 
@@ -523,7 +559,7 @@ The role prefix comes from the account **at the time of the action**, not from t
 | Cookie | Set by | Contents | Lifetime | Flags |
 |---|---|---|---|---|
 | `admin_session` | `POST /api/admin/login`, `POST /api/staff/login-link/verify`, `POST /api/admin/refresh` | HS256 JWT: `role`, plus `sub` for accounts | 24-hour cookie, 6-hour token | `HttpOnly`, `SameSite=Lax`, `Secure` when `NODE_ENV=production`, `Path=/` |
-| `event_access_<eventId>` | `POST /api/events/{slug}/registrations`, or `GET /api/events/{slug}/registrations/enter` with a valid signature while public registration is off | HS256 JWT: `eventId`, the access token | Until 6 hours after the event ends, clamped between 1 hour and 30 days | `HttpOnly`, `SameSite=Lax`, `Secure` when `NODE_ENV=production`, `Path=/` |
+| `event_access_<eventId>` | `POST /api/events/{slug}/registrations`, or `GET /api/events/{slug}/registrations/enter` with a valid signature ([Registrants](#registrants)) | HS256 JWT: `eventId`, the access token, and `ev: true` when the cookie comes from the entry link | Until 6 hours after the event ends, clamped between 1 hour and 30 days | `HttpOnly`, `SameSite=Lax`, `Secure` when `NODE_ENV=production`, `Path=/` |
 | `join_granted_<eventId>` | `POST /api/events/{slug}/verify-password` | HS256 JWT: `eventId`, `role: "guest"` | 12 hours | `HttpOnly`, `SameSite=Lax`, `Secure` when `NODE_ENV=production`, `Path=/` |
 | `NEXT_LOCALE` | The next-intl middleware | The interface language code | Browser session | `SameSite=Lax`. Set only when the page language differs from the browser's preferred language or from an earlier value |
 

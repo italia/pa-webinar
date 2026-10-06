@@ -282,7 +282,7 @@ Two layers decide whether someone gets into the conference: the waiting room, an
 
 When the token endpoint answers `409` to a client that tries to enter or rejoin, the client reads `/lifecycle`: an `ENDED` event takes it to the closing screen, and a `PUBLISHED`, `PROVISIONING` or `IDLE` one back to the waiting room.
 
-A registrant is recognized from the personal link or from the signed per-event cookie set at registration, or, while public registration is off, by the signed entry link in the email. A forwarded personal link still gets in, but under the typed name and a fresh guest identity. On a password-protected event, the live page asks visitors without a token for the password before showing the waiting room. These rules, and the JWT claims themselves, are described in [identity-and-access.md](identity-and-access.md).
+A registrant is recognized from the personal link or from the signed per-event cookie set at registration, or set by an email entry link signed with `sig`, which the emails built while public registration is off carry. A forwarded personal link still gets in, but under the typed name and a fresh guest identity. On a password-protected event, the live page asks visitors without a token for the password before showing the waiting room. These rules, and the JWT claims themselves, are described in [identity-and-access.md](identity-and-access.md).
 
 ## Timing semantics
 

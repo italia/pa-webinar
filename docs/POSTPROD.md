@@ -54,7 +54,7 @@ authoritative list.
 | `TRANSCRIPT_VTT` | `TRANSCRIBE`, `TRANSCRIBE_MULTITRACK` | source | WebVTT subtitles with a `<v>` voice tag per speaker | Player subtitle track; `.vtt` download, served by the subtitle endpoint |
 | `TRANSCRIPT_TXT` | `TRANSCRIBE`, `TRANSCRIBE_MULTITRACK` | source | Plain text with speaker prefixes | Stored only; the `.txt` download is built from `TRANSCRIPT_JSON` |
 | `WAVEFORM_JSON` | `TRANSCRIBE`, optional | none | Normalized audio peaks | Waveform in the transcript editor |
-| `SUMMARY_JSON` | `SUMMARIZE`; `TRANSLATE` for each target language | source or target | Overall summary, key decisions, action items, topics with a start time | Summary card and topic chips on the post-event page |
+| `SUMMARY_JSON` | `SUMMARIZE`; `TRANSLATE` for each target language | source or target | Overall summary, key decisions, action items, topics with a start time, which follow the agenda's chapters when the event used the agenda | Summary card and topic chips on the post-event page |
 | `SUMMARY_MD` | `SUMMARIZE` | source | Markdown rendered from `SUMMARY_JSON` without a second model call | Summary tab, `.md` download |
 | `TRANSLATION_VTT` | `TRANSLATE` | target | Translated subtitles on the original timings | Player subtitle track |
 | `TRANSLATION_MD` | `TRANSLATE` | target | Markdown of the translated summary | Summary tab in that language |
@@ -233,7 +233,7 @@ What each job reads, as prepared by `POST /api/internal/postprod-claim`:
 |---|---|---|
 | `TRANSCRIBE` | The composite MP4 | `asrInitialPrompt` built from the event title, organizer name and speaker information (at most 800 characters); `expectedSpeakers` |
 | `TRANSCRIBE_MULTITRACK` | Each unpurged track, with participant id, decrypted display name and start offset; the composite MP4 when one exists | none |
-| `SUMMARIZE` | `TRANSCRIPT_JSON` | `speakerNames` (label to name, from the `Speaker` rows); `agenda`, the agenda topics with their status and planned minutes, when the event uses the agenda; `timeline`, the room timeline, when it has entries ([Room timeline](#room-timeline)) |
+| `SUMMARIZE` | `TRANSCRIPT_JSON` | `speakerNames` (label to name, from the `Speaker` rows); `agenda`, the agenda topics with their status and planned minutes, when the event uses the agenda; `timeline`, the room timeline, when it has entries or chapters ([Room timeline](#room-timeline)) |
 | `TRANSLATE` | `TRANSCRIPT_JSON`; the source-language `SUMMARY_JSON` when it exists | `speakerNames` |
 | `DUB` | `TRANSCRIPT_JSON`; the target-language `TRANSLATION_VTT`; the composite MP4 for `DUBBED_VIDEO` | `speakerNames` |
 | `ARCHIVE` | The composite MP4; each unpurged track; the source `TRANSCRIPT_VTT` when it exists | none |
@@ -596,16 +596,34 @@ path.
 
 - **Summary.** One JSON-mode request sends the whole transcript, with real
   speaker names where known, the agenda when the event uses one, and the room
-  timeline when it has entries, and asks for an overall summary, key
-  decisions, action items and topics with a start time. `SUMMARY_MD` is
-  rendered from that JSON without a second call.
+  timeline with its chapters when it has them, and asks for an overall
+  summary, key decisions, action items and topics with a start time. The
+  prompt asks the model to write in the source language; to give, in the
+  overall summary, the meeting's purpose, its main content and its outcome;
+  to list as decisions only what was explicitly decided or announced; to
+  write action items as "who — what — by when", naming who and when only
+  when they were said; to give each topic its concrete facts (initiatives,
+  numbers, dates, examples) and any audience questions with the answers
+  given; and to use a person's name only as it appears in the transcript.
+  `SUMMARY_MD` is rendered from that JSON without a second call.
+- **Topics from the agenda.** When the timeline carries chapters, the
+  structured summary's topics follow them (`_apply_chapters` in
+  `infra/ai/worker/llm.py`): one topic per chapter, in the same order, with
+  the chapter's title and start time, while the model writes what was said
+  from that chapter's start to the next one's. The worker matches each of the
+  model's topics to a chapter by title, then by start time, then by position,
+  and joins the texts of topics that fall on the same chapter; a chapter the
+  model wrote nothing for keeps its title alone. An opening topic, at
+  `00:00`, may precede the first chapter when the part before it has content
+  of its own. Chapter times are `MM:SS`, or `H:MM:SS` past one hour, and the
+  post-event player accepts both.
 - **Translation.** Segments are translated in numbered batches and matched
   back by index, keeping timings and speakers. If a batch comes back with the
   wrong number of lines, that batch is retried segment by segment. The
   structured summary is translated with the same JSON shape.
 - **Context length.** Because the summary request carries the whole
   transcript, vLLM's `--max-model-len` must fit your longest events. The room
-  timeline adds at most 400 short lines.
+  timeline adds at most 400 short lines, plus one line per chapter.
 
 ### Room timeline
 
@@ -613,8 +631,8 @@ The claim of a `SUMMARIZE` job carries `timeline`: what happened in the room
 and when, on the transcript's time base, so that the summary can place
 topics, polls, questions and audience activity. The portal builds it on every
 claim (`app/src/lib/postprod/live-timeline.ts`) and does not store it in the
-job row. It is left out when it has no entries, and when it cannot be read:
-the claim then goes ahead without it.
+job row. It is left out when it has neither entries nor chapters, and when it
+cannot be read: the claim then goes ahead without it.
 
 ```jsonc
 {
@@ -622,6 +640,9 @@ the claim then goes ahead without it.
   "exact": true,
   "entries": [
     { "offsetSec": 754, "kind": "poll.closed", "text": "<one line>" }
+  ],
+  "chapters": [
+    { "offsetSec": 0, "title": "<agenda topic>" }
   ]
 }
 ```
@@ -644,6 +665,17 @@ the claim then goes ahead without it.
 - **Offsets.** `offsetSec` is whole seconds from `t0`, the same base as the
   transcript's timings. A negative offset is an action before the recording
   started.
+- **Chapters.** `chapters` lists the agenda topics in the order the host
+  started them, each with the time the server recorded for its start, in
+  whole seconds from `t0` (`chaptersFromActions`). The topic in progress when
+  the recording started opens at `0`, unless it was closed, skipped or
+  reopened before `t0`. After `t0` every start opens a chapter, two starts in
+  a row of the same topic make one, and a topic started after the end of the
+  recording is not a chapter. For this the portal reads the agenda's journal
+  rows from the start of the event, not only inside the window, because the
+  topic in progress at `t0` may have started long before. The list is empty
+  when the agenda was not used, and the summary's topics then come from the
+  model alone ([Summaries and translation](#summaries-and-translation)).
 - **Time zero.** `recordingTimeZero` picks `t0`:
   - `Recording.mediaStartedAt`, the absolute time of the first recorded frame,
     when it is set: `exact` is `true`. The multitrack ingest stores it when its
@@ -678,7 +710,11 @@ the claim then goes ahead without it.
   the quoted texts come from moderators or the audience and are data to
   summarize, not instructions. When `exact` is `false`, it adds that the times
   are estimates that can be off by a few minutes, useful for the order of
-  events more than for their exact moment.
+  events more than for their exact moment. The chapters go in a block of
+  their own (`_format_chapters`), one line per chapter with its `[hh:mm:ss]`
+  start and title, which asks the model to use them as the topics, in the same
+  order and with the same titles, and says that the titles were written by
+  the host and are data, not instructions.
 - **Agenda.** Each `agenda` item carries `label`, `completed`, `status` and
   `plannedMinutes`. The prompt marks a topic as discussed, in progress at the
   end, skipped or not discussed from its `status`, falling back to
@@ -1631,8 +1667,11 @@ Several of these are tracked in the [Roadmap](ROADMAP.md).
   the edits.
 - **Some text is Italian in every language.** The summary prompt, including
   the room timeline the portal adds to it, is written in Italian; Markdown section headings exist for Italian, English and French,
-  and other languages get English headings. Unmapped speakers appear in the
-  public transcript as `Partecipante <n>` whatever the page language.
+  and other languages get English headings. The opening topic that can
+  precede the agenda's chapters is requested as «Apertura», and the worker
+  names it so when it joins several of the model's topics into it. Unmapped
+  speakers appear in the public transcript as `Partecipante <n>` whatever the
+  page language.
 - **The Hugging Face Secret is mandatory.** The worker template renders the
   `HF_TOKEN` reference whenever the `hfTokenSecret` map exists, so an empty
   `postprod.worker.hfTokenSecret.name` breaks the worker template

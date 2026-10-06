@@ -220,12 +220,12 @@ feature on and what the notice should say about it.
 
 | Feature | Switched on by | What the notice should say |
 |---|---|---|
-| Registration | Always | Name and email, the consent choices, and join and leave times. The personal join link in emails is an access credential |
+| Registration | Always | Name and email, the consent choices, and join and leave times. The personal join link in emails is an access credential. In the call, the event's moderators see each registrant's registration name and email address next to the name shown in the room ([Who is behind each video tile](../architecture/identity-and-access.md#who-is-behind-each-video-tile)) |
 | Organization fields | `requireOrganization`, `requireOrganizationRole`, `requireOrganizationType`, per event and only through the events API; the wizard has no control for them. Off by default | When on, the organization name is required on the form; role and type of body are optional. State the statistical purpose |
 | Guests | **Guest access enabled** for scheduled events; always on instant calls | The display name typed in the waiting room, and, in chat messages, an identifier derived from the IP address and that name. The **Email (optional)** field there stays in the browser and is never sent |
 | Q&A, chat, polls, word cloud, reactions, agenda reactions | `qaEnabled`, `chatEnabled` and the other live-interaction flags of the event | Contributions carry the author's display name: chat sender names and texts are encrypted; Q&A author names and questions are stored in plain text. Everyone who can read the chat can download it, names included |
 | Questionnaires and post-event feedback | Per event | Answers carry the respondent's name, and free-text answers can contain anything |
-| Materials | Staff and moderators add them per event | Whatever the documents contain. The visibility setting decides which public lists show a material, not who can open it: an uploaded file is served from its URL to anyone who has the URL, so a document with personal data should not be shared as a material |
+| Materials | Staff and moderators add them per event | Whatever the documents contain. The visibility setting decides which public lists show a material, not who can open it: an uploaded file is served from its URL to anyone who has the URL, so a document with personal data should not be shared as a material. Openings and downloads are counted as one number per material, which only the event's moderators see; to count each person once every 10 minutes the server holds a hash of the room token, or else the IP address, in memory for that time, and stores neither |
 | The square | Offered in the waiting room; the waiting-room engine sets only the starting view ([Engines](../architecture/waiting-room.md#engines-classic-view-and-the-square)) | Display name and position, visible to others waiting who have access to the room (people who only know the address see positions without names), expiring seconds after the last update ([Presence](../architecture/waiting-room.md#presence)) |
 | Raised hands and call analytics | Always; shown in the event's **Statistics** tab | Attendance, who spoke when and who raised a hand, per call session |
 | Composite recording | `recordingEnabled` | Video and mixed audio of the conference, shared screens included |
@@ -237,7 +237,7 @@ feature on and what the notice should say about it.
 | Staff accounts | **Staff and access** > **Staff accounts** | Name, email, role, last sign-in |
 | Administration audit log | Always | For privileged writes (administration area, event edits made with a moderator link) and staff sign-ins: the actor, the action, the target, the IP address and the user agent |
 | Email outbox | Always | Recipient and body of every email, including personal join and sign-in links |
-| Avatars | **Use Gravatar when available** (`gravatarEnabled`, off by default) | Drawn from initials on the server by default; with Gravatar, see [Recipients and processors](#recipients-and-processors) |
+| Avatars | **Use Gravatar when available** (`gravatarEnabled`, off by default); the profile photo is always offered | Drawn from initials on the server by default; with Gravatar, see [Recipients and processors](#recipients-and-processors). Registrants who have opened the personal link from their email may upload a photo in the waiting room; moderators and speakers cannot. Everyone in the room sees it, at every event of that address, until the person removes it or its retention ends ([data inventory](../GDPR.md#data-inventory-and-retention)) |
 | Browser storage | Always | See [Cookies](#cookies) |
 | Conference and TURN servers | Always | IP addresses, display names, the audio and video streams. Jitsi components keep their own logs |
 
@@ -263,6 +263,7 @@ Check each row against the basis you rely on.
 | Address book | Separate optional consent | See [Address book](#address-book) |
 | AI post-production | Shows a notice in the waiting room. It asks for no consent | Choose a basis that does not depend on per-person consent, or collect consent outside the platform |
 | Event analytics | Attendance, speaking time and raised hands per participant, shown pseudonymously by default | State the purpose, typically running and evaluating the event |
+| Material open count | Counts the openings and downloads of each material, in the room and on the event page, as one number per material shown only to moderators. Nothing records who opened what; the IP address of a caller without a valid room token is held in memory for 10 minutes only to avoid counting the same click twice | State the purpose, typically evaluating which materials the audience uses |
 
 ### Recipients and processors
 
@@ -273,7 +274,7 @@ Check each row against the basis you rely on.
 | SMTP relay | Always | Every email in clear: addresses, names, personal join and sign-in links, calendar files ([Email delivery (SMTP)](../configuration/email.md)) |
 | Gravatar (Automattic Inc., United States) | Only with **Use Gravatar when available** on (`gravatarEnabled`, off by default) | The MD5 hash of the email of registrants and moderators, sent by the server. Browsers never contact Gravatar |
 | Your monitoring and logging stack | Always | Ingress, load balancer, Jitsi and TURN logs, which usually contain IP addresses ([Monitoring and health](../operations/monitoring.md)) |
-| Staff | Always | Administrators see everything and can export sign-ups as CSV; organizers see their own events; moderators see what happens in their room |
+| Staff | Always | Administrators see everything and can export sign-ups as CSV; organizers see their own events; moderators see what happens in their room, including, in the participants panel, the name and email address given at registration or on a named grant for each person in the call. Speakers do not see these |
 | Other participants | Always | Display names and avatars in the room, chat and Q&A authors, and the chat download. People in the square who have access to the room see each other's display names and positions. Registrants receive the primary moderator's name and email address as the organizer of the calendar file attached to their confirmation, reminder and date-change emails |
 | The public | Per event | The speaker list, the primary moderator's name in the event's public calendar file (any event that is not `DRAFT`), a published recording and its AI outputs, publications, and the event recap |
 
@@ -312,6 +313,7 @@ What each job deletes is in the
 | AI outputs | The recording's regime: the event's retention if the video is not published, kept while it is | **Artifact retention (days)** (`aiArtifactRetentionDays`) adds a deletion date; it cannot keep outputs beyond the event's retention |
 | Event record and recap | Nothing deletes them. The archived event keeps its title, description, dates, speaker list and the primary moderator's name and encrypted email; the recap keeps, without authors, the text of the top Q&A and chat questions, published poll results and the most-submitted word-cloud words (`app/src/lib/events/recap.ts`) | Edit or delete the event |
 | Address book | `retentionMonths` after the person's last registration (default in `app/prisma/schema.prisma`, not editable in the administration area); opted-out entries at the next run | Delete entries under **Address book** |
+| Profile photos | Kept while a registration with the same email address exists, at any event; then deleted once 30 days have passed since the photo last changed (`app/src/app/api/cron/cleanup/route.ts`). Self-service erasure deletes it | Not configurable. The person can remove it in the waiting room |
 | Staff accounts | The account stays until an administrator deletes it. Used or expired sign-in links are swept by the daily cleanup (`app/src/app/api/cron/cleanup/route.ts`) | **Staff and access** > **Staff accounts** |
 | Administration audit log, GDPR audit log | Nothing deletes them | Not configurable |
 | Email outbox | Nothing deletes it ([Email and calendar](../architecture/email.md#known-gaps)) | Not configurable |

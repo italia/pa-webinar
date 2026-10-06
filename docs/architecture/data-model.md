@@ -1,6 +1,6 @@
 # Data model
 
-PA Webinar keeps its persistent records in one PostgreSQL database, accessed through Prisma. Files are in object storage ([storage.md](../configuration/storage.md)), and transient live state is in Redis or in the memory of each app pod ([live-interaction.md](live-interaction.md)). This page covers four things about the database:
+PA Webinar keeps its persistent records in one PostgreSQL database, accessed through Prisma. Files are in object storage ([storage.md](../configuration/storage.md)), except profile photos, which are small enough to stay in the database. Transient live state is in Redis or in the memory of each app pod ([live-interaction.md](live-interaction.md)). This page covers four things about the database:
 
 - the conventions every model follows, including how personal data is stored;
 - a map of the models by domain;
@@ -86,10 +86,11 @@ Which columns are encrypted is recorded once, in the data inventory of [GDPR.md]
 
 `hashEmail()` in the same file trims and lowercases the address, then computes an HMAC-SHA-256 keyed with `APP_SECRET`, as hex. If `APP_SECRET` is unset it falls back to an unkeyed SHA-256. In production a missing `APP_SECRET` is only logged at start-up (the start-up check stops the app only for a secret shorter than 32 characters). A registration commits its rows with an unkeyed hash before any later step that signs with `APP_SECRET` fails, so set `APP_SECRET` before the first registration and never leave it unset.
 
-The hash is stored as `emailHash` on `Registration`, `EventInvitation`, `Person` and `StaffAccount`. The Jitsi JWT does not carry it ([the Jitsi JWT](identity-and-access.md#the-jitsi-jwt)). The hash carries:
+The hash is stored as `emailHash` on `Registration`, `EventInvitation`, `Person`, `StaffAccount` and `ProfilePhoto`. The Jitsi JWT does not carry it ([the Jitsi JWT](identity-and-access.md#the-jitsi-jwt)). The hash carries:
 
 - the one-registration-per-email-per-event rule;
 - deduplication of address-book entries;
+- the profile photo of an address, shared by every event that address takes part in;
 - the staff-account lookup when someone asks for a sign-in link;
 - the lookup behind data-subject access and erasure requests.
 
@@ -117,10 +118,11 @@ Most personal data is encrypted, but these fields are stored in plaintext. Reten
 | `LiveAction.data` | The details of a live action: ids, counts and texts written by moderators (agenda topics, poll questions with their options and results, word-cloud prompts), and the most frequent words of a closed word-cloud round, which participants typed. No names. |
 | `EmailOutbox.subject`, `EmailOutbox.attachments`, `EmailOutbox.lastError` | The subject (the public event title), the calendar attachment (which names the event contact and gives their email address), and the last SMTP error (which can quote the recipient). The recipient and both bodies are encrypted. |
 | `AdminAuditLog.ip`, `AdminAuditLog.userAgent` | The client IP address and user agent of every administrative write. No job deletes these rows. |
+| `ProfilePhoto.bytes` | The image a person uploaded to show in the room. It is served without a credential to anyone who has its address, which every participant receives in the conference. |
 
 ## Domain map
 
-Every model belongs to one domain. Most event data hangs off `Event`, either directly through `eventId` or through a parent that has one (a `PollVote` through its `Poll`). The address book, staff accounts, templates, settings, email tables and audit logs are instance-wide.
+Every model belongs to one domain. Most event data hangs off `Event`, either directly through `eventId` or through a parent that has one (a `PollVote` through its `Poll`). The address book, profile photos, staff accounts, templates, settings, email tables and audit logs are instance-wide.
 
 ```mermaid
 flowchart LR
@@ -133,13 +135,13 @@ flowchart LR
 
   AC["<b>Access</b><br/>EventModerator<br/>StaffAccount<br/>StaffLoginToken"]:::access
   EV["<b>Events and content</b><br/>Event<br/>EventTemplate<br/>Tag<br/>EventMaterial<br/>EventReminder<br/>EventQuestionnaire<br/>GdprTemplate"]:::events
-  PA["<b>Participation</b><br/>Registration<br/>EventInvitation<br/>Person<br/>QuestionnaireResponse<br/>EventFeedback"]:::participation
+  PA["<b>Participation</b><br/>Registration<br/>EventInvitation<br/>Person<br/>ProfilePhoto<br/>QuestionnaireResponse<br/>EventFeedback"]:::participation
   LI["<b>Live interaction</b><br/>ChatMessage<br/>Question<br/>Poll<br/>WordCloudRound<br/>EventAgendaItem<br/>Reaction<br/>LiveAction"]:::live
   SA["<b>Settings and audit</b><br/>SiteSetting<br/>CallSession<br/>EmailOutbox<br/>EmailTemplate<br/>GdprAuditLog<br/>AdminAuditLog"]:::settings
   RA["<b>Recording and AI</b><br/>Recording<br/>RecordingTrack<br/>PostprodJob<br/>PostprodArtifact<br/>Speaker<br/>OrphanRecording"]:::recording
 
   AC -->|"grants per event,<br/>organizer owns events"| EV
-  EV -->|"eventId, or via a parent<br/>(Person is instance-wide)"| PA
+  EV -->|"eventId, or via a parent<br/>(Person and ProfilePhoto<br/>are instance-wide)"| PA
   EV -->|"eventId"| LI
   PA -->|"registrationId"| LI
   EV -->|"eventId on CallSession<br/>and GdprAuditLog"| SA
@@ -149,7 +151,7 @@ flowchart LR
 | Domain | Key models | What it holds | Owner page |
 |---|---|---|---|
 | Events and content | `Event`, `EventTemplate`, `Tag` and `EventTagLink`, `EventMaterial`, `EventReminder`, `EventQuestionnaire` with `QuestionTemplate`, `QuestionnaireTemplateLink` and `QuestionItem`, `GdprTemplate` | The event and everything an organizer prepares for it. `EventTemplate` only pre-fills the wizard: an event keeps no reference to its template, so editing a template never changes existing events. | [event-journey.md](event-journey.md); statuses in [event-lifecycle.md](event-lifecycle.md) |
-| Participation | `Registration`, `EventInvitation`, `Person`, `ReminderSent`, `QuestionnaireResponse` and `QuestionnaireAnswer`, `EventFeedback` | Who registered, who was invited, the opt-in address book, and what participants answered. | [event-journey.md](event-journey.md); address book in [GDPR.md](../GDPR.md) and [ADR-011](../adr/011-person-rubrica.md) |
+| Participation | `Registration`, `EventInvitation`, `Person`, `ProfilePhoto`, `ReminderSent`, `QuestionnaireResponse` and `QuestionnaireAnswer`, `EventFeedback` | Who registered, who was invited, the opt-in address book, the photos people show in the room, and what participants answered. | [event-journey.md](event-journey.md); address book in [GDPR.md](../GDPR.md) and [ADR-011](../adr/011-person-rubrica.md) |
 | Live interaction | `ChatMessage` and `ChatMessageReaction`, `Question`, `QuestionUpvote` and `QuestionGuestUpvote`, `Poll` and `PollVote`, `WordCloudRound` and `WordCloudSubmission`, `EventAgendaItem` and `AgendaItemReaction`, `Reaction`, `LiveAction` | The table-backed features beside the video during a live event, and the journal of the actions taken in the room. PostgreSQL holds their state, and Redis only fans it out. The timer and the reaction-bar counters have no table ([Live interaction](#live-interaction)). | [live-interaction.md](live-interaction.md), [ADR-005](../adr/005-live-interaction-in-portal.md) |
 | Access | `EventModerator`, `StaffAccount`, `StaffLoginToken` | Named moderator and speaker grants, staff accounts and their one-time sign-in links. The primary moderator link is a column on `Event`, and the instance API key is not stored in the database. `EventOrganizer` sits next to these models but is display metadata only: it lists co-organizing organizations on the event page and grants no access. | [identity-and-access.md](identity-and-access.md) |
 | Recording and AI | `Recording`, `RecordingTrack`, `Speaker`, `PostprodJob`, `PostprodArtifact`, `PostprodOriginalBody`, `OrphanRecording` | Recordings, per-participant audio tracks, the AI post-production queue and its outputs. | [recording.md](recording.md), [POSTPROD.md](../POSTPROD.md) |
@@ -257,6 +259,7 @@ How to read it:
   - An `EventModerator` row is a named grant with its own magic link and a role, `MODERATOR` or `SPEAKER`.
   - An `EventOrganizer` row is only a name, logo and link shown on the event page.
 - **The address book is opt-in.** A `Person` row is created only when someone ticks the separate address-book consent. A later registration from the same address is linked to that row, and refreshes `lastActiveAt`, even when the box is left unticked. This also happens after an opt-out, because opting out keeps the row until the address-book retention job deletes it. `Registration.personId` is `null` only when no person record exists for the address. The model and its retention are in [ADR-011](../adr/011-person-rubrica.md) and [GDPR.md](../GDPR.md#the-address-book).
+- **Profile photos belong to an address, not to an event (not drawn).** A `ProfilePhoto` row holds one image per `emailHash`, with no foreign key: the token route finds it from the registration that enters the room, so the same photo appears at every event of that address. Named grants never carry one. The image bytes are stored in the row rather than in object storage: the server accepts at most 150,000 bytes and re-encodes every upload as a 256×256 JPEG. Uploads, serving and access are in [Avatars](identity-and-access.md#avatars); retention is in [GDPR.md](../GDPR.md#data-inventory-and-retention).
 - **Organizer scoping runs through `createdById`.** An event created by a staff account records that account, and an organizer sees only events whose `createdById` is their own. Events created with the instance API key have no creator and are managed by administrators only. The rules are in [identity-and-access.md](identity-and-access.md).
 - **Series.** `recurrenceRule` stores an RFC 5545 `RRULE`. The wizard shows it on the review step, and duplication uses it to propose the next date; nothing else reads it. `recurrenceSeriesId` can link an occurrence to a parent event, but only an API client sets it: no screen does, no job creates occurrences, and a copy never inherits it ([event-journey.md](event-journey.md#recurrence)).
 - **Call sessions.** A `CallSession` records one span of real use of the room. It is the anchor of a `Recording` (one-to-one) and of the live speaker and raised-hand logs. Its lifecycle is in [event-lifecycle.md](event-lifecycle.md#call-sessions).
@@ -404,8 +407,10 @@ The values below are copied from `schema.prisma`. The owner page explains what e
 Each rule below names the mechanism that enforces it. Keep that mechanism in place when you change the model.
 
 - **One registration per email per event.** Enforced by the unique index `(eventId, emailHash)` on `Registration`. The email column holds ciphertext with a random IV, so only the hash can carry uniqueness. `EventInvitation` has the same pair. Its older `(eventId, email)` index only affects legacy plaintext rows.
+- **One profile photo per email address.** Enforced by the unique index on `ProfilePhoto.emailHash`. An upload deletes the address's row and creates a new one in a single transaction, so a new photo replaces the old one under a new id, and the old photo's address stops working.
 - **One upvote per identity per question.** A registrant's upvote is a `QuestionUpvote` row, unique on `(questionId, registrationId)`, and `registrationId` is required there. Anyone without a registration (a guest, a speaker or a moderator) upvotes with the browser id, stored as a `QuestionGuestUpvote` row, unique on `(questionId, guestId)`. The two identities live in separate tables so that `QuestionUpvote.registrationId` stays required, and an earlier release that reads it never meets a row without a registration.
 - **`Question.upvoteCount` is denormalized.** The upvote route creates or deletes the `QuestionUpvote` or `QuestionGuestUpvote` row and increments or decrements the counter in a single transaction. The counter covers both tables. The index `(eventId, status, upvoteCount DESC)` serves the sorted list. Any new code that adds or removes upvotes must keep the row and the counter in step.
+- **`EventMaterial.openCount` is an aggregate with no rows behind it.** `POST /api/events/{slug}/materials/{id}/opened` increments it with Prisma's atomic `increment`, so concurrent openings do not overwrite each other. No table records who opened a material, so the number cannot be broken down by person. The once-per-10-minutes rule per caller is held in each app pod's memory, not in the database, so the number is indicative ([Materials](live-interaction.md#materials)). Only moderators receive it, in the room's material answers (`GET /api/events/{slug}/materials` and `PATCH …/materials/{id}`); the administration area does not show it.
 - **Guests can ask questions.** `Question.registrationId` is nullable. `authorName` is always set and is the name displayed.
 - **One vote per identity.** `PollVote`, `AgendaItemReaction`, `EventFeedback` and `QuestionnaireResponse` each carry two unique indexes, one on the parent plus `registrationId` and one on the parent plus `guestId`. PostgreSQL ignores `NULL` in unique indexes, so each index constrains only the identity present on the row. A `guestId` comes from the browser and the server cannot verify it, so for guests the index stops double submissions, not a guest who clears local storage. `ChatMessageReaction` is unique on `(messageId, senderId, emoji)`, which makes a toggle idempotent.
 - **At most one questionnaire per placement.** Enforced by the unique index `(eventId, placement)` on `EventQuestionnaire`.

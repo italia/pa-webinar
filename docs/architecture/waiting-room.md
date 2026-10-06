@@ -14,7 +14,7 @@ The live page (internal path `/events/[slug]/live`, localized through `app/src/i
 
 | Visitor | How they are recognized | Statuses that reach the waiting room |
 |---|---|---|
-| Registrant | Personal link `?token=<accessToken>`, or the signed per-event access cookie set at registration (or, while public registration is off, by the signed entry link in the email) | Any status. If the link was forwarded and opened in another browser, the name field starts empty and per-participant consent is asked again |
+| Registrant | Personal link `?token=<accessToken>`, or the signed per-event access cookie set at registration (or by an email entry link signed with `sig`, which the emails built while public registration is off carry) | Any status. If the link was forwarded and opened in another browser, the name field starts empty and per-participant consent is asked again |
 | Moderator or speaker | Magic link `?token=` (the primary moderator link or a named grant) | Any status |
 | Guest, scheduled event | No token | `LIVE` only, and only while the site setting `guestAccessEnabled` is on. Otherwise the page redirects to the registration page, or to the event page when `ENDED` or `ARCHIVED` |
 | Guest, instant call | No token | `LIVE`, `IDLE`, `PROVISIONING`. Any other status returns not found |
@@ -103,6 +103,7 @@ All of these pieces live in one React tree. The classic view and the open square
 | Header | Always | Event image or cover (a gradient if neither is set), title (with the optional kicker line), the organizer name (`organizerName`) when set, **Moderated by {name}** when `moderatorName` is set, and date and time in the event's time zone. A badge reads **The event is live!** or **Event ended** |
 | Status banners | `IDLE`, `PROVISIONING`, or `LIVE` with the bridge starting | See [What each state shows](#what-each-state-shows) |
 | **Your name** | Every status except `ENDED` | At least 2 characters. Pre-filled for a registrant on the browser that registered and for a named grant. Empty for the shared primary moderator link, so each person types their own name |
+| **Your photo** | Every status except `ENDED`, for a registrant whose browser has opened the personal link from an email. Named grants, the shared moderator link and guests never see it. The page asks `GET /api/events/{slug}/profile-photo`, and shows nothing when the answer is `canUpload: false`. In the browser that registered, before the emailed link has been opened there (`needsEmailProof: true`), it shows the initials and **To add a photo, open the personal link you received by email in this browser: that shows the address is yours.** | Optional. A preview with the photo or the initials, **Choose a photo** or **Change photo**, and **Remove**, which asks for a second click to confirm. The browser crops the image to a square and reduces it to a 256×256 JPEG before sending it; the server re-encodes whatever it receives. Others see the photo instead of the initials from the next entry into the room, also at later events with the same email address. See [Avatars](identity-and-access.md#avatars) |
 | **Email (optional)** | Guests only | Validated if filled in. It stays in the browser and is never sent to the server |
 | **Insecure address** | The page was opened over `http://` other than `localhost`, which is not a secure context | The browser gives such a page no microphone or camera, so the video call cannot start. The notice says so, above the name field, and links to the same page over `https://`. The link text shows only the host, never the personal token in the address. The room shows the same notice instead of loading Jitsi ([How PA Webinar extends Jitsi Meet](jitsi-integration.md)) |
 | Device check | Every status except `ENDED` | See [Device check and virtual backgrounds](#device-check-and-virtual-backgrounds) |
@@ -396,6 +397,7 @@ The canvas itself does not read `prefers-reduced-motion`, and a screen reader ge
 | Square mount | `app/src/components/live/garden/phaser-lobby.tsx` |
 | Square adapters | `app/src/lib/lobby/` |
 | Presence route and Redis helpers | `app/src/app/api/events/[param]/garden/ping/route.ts`, `app/src/lib/garden/pubsub.ts` |
+| Profile photo | `app/src/components/live/profile-photo-field.tsx`, `app/src/lib/profile-photo.ts` |
 | Device check, backgrounds, music | `app/src/components/live/device-check.tsx`, `app/src/lib/jitsi/virtual-background.ts`, `app/src/components/live/audio-player.tsx` |
 | The game | `lobby/` |
 
