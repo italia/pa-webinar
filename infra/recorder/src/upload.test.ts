@@ -21,6 +21,26 @@ import { buildManifest } from './manifest.js';
 import { trackKey, localTrackFilename } from './paths.js';
 
 describe('buildIngestBody', () => {
+  it('manda il t0 della registrazione, lo zero dei tempi della trascrizione', () => {
+    const t0 = Date.parse('2026-10-08T10:00:03.250Z');
+    const m = buildManifest({
+      eventId: 'evt1',
+      recordingId: 'rec1',
+      roomName: 'room-1',
+      recordings: [
+        {
+          participantId: 'p1',
+          trackFileId: 'p1',
+          displayName: 'Ada',
+          firstFrameAtMs: t0,
+          lastFrameAtMs: t0 + 1000,
+          bytesWritten: 100,
+        },
+      ],
+    });
+    expect(buildIngestBody(m).recordingStartedAtMs).toBe(t0);
+  });
+
   it('mappa il manifest sul contratto multitrack-manifest (blobKey=trackKey)', () => {
     const m = buildManifest({
       eventId: 'evt1',
@@ -53,6 +73,8 @@ describe('buildIngestBody', () => {
         },
       ],
     });
+    // t0 a 0 (solo nei test): non si manda, il portale lo ignorerebbe.
+    expect(body).not.toHaveProperty('recordingStartedAtMs');
     // blobKey deve stare sotto il prefisso che il portale impone.
     expect(body.tracks[0]!.blobKey.startsWith('recordings/multitrack/evt1/rec1/')).toBe(
       true,

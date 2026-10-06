@@ -370,6 +370,9 @@ export interface IngestBody {
   eventId: string;
   recordingId: string;
   tracks: IngestTrack[];
+  /** t0 della registrazione (epoch ms): il portale lo usa come zero dei
+   *  tempi della trascrizione e della cronologia della sala. */
+  recordingStartedAtMs?: number;
 }
 
 /**
@@ -383,6 +386,7 @@ export function buildIngestBody(
   return {
     eventId: manifest.eventId,
     recordingId: manifest.recordingId,
+    ...(manifest.recordingStartedAtMs > 0 && { recordingStartedAtMs: manifest.recordingStartedAtMs }),
     tracks: manifest.tracks.map((t) => ({
       participantId: t.participantId,
       displayName: t.displayName,
