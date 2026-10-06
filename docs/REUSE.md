@@ -353,7 +353,9 @@ bodies on one installation is not supported. See
   fact your notice needs to the setting that controls it.
 - **Retention.** Each event has a retention period for participant data
   (`dataRetentionDays`, 30 days by default in `app/prisma/schema.prisma`). The
-  daily GDPR cleanup applies it. Address-book entries, recordings and AI
+  daily GDPR cleanup applies it: it deletes the personal data, and keeps the
+  event's live content without names or identifiers, for as long as the event
+  exists. Address-book entries, recordings and AI
   outputs follow their own regimes. [Privacy and data protection](GDPR.md) is
   the authoritative source for durations.
 - **Third parties.** Avatar lookup on Gravatar is off by default. If you turn it
@@ -521,8 +523,9 @@ software.
 - Data subjects can exercise access and erasure themselves. Erasure deletes
   the person's registrations and what cascades from them, and leaves the
   rest to other regimes:
-  - chat messages, questionnaire answers, invitations and named grants remain
-    until the event's retention;
+  - chat messages, invitations and named grants remain until the event's
+    retention; questionnaire answers given as a guest remain, and lose their
+    browser id at the event's retention;
   - the address-book entry remains until its own retention or until an
     administrator deletes it;
   - recordings, per-participant tracks and AI outputs follow their own

@@ -21,7 +21,7 @@ For organizers and moderators who need to predict when a room opens and closes:
 | When can people enter? | At the first scaler tick at or after `startsAt` once a bridge answers, or earlier if a moderator pressed **Start event** | At the first lifecycle tick (every minute) at or after `startsAt`, provided the bridge answers when `JVB_HEALTH_URL` is set, or earlier if a moderator pressed **Start event** (instant calls are open from creation) |
 | When does the room close? | At `endsAt` plus the grace period, when a moderator chooses **End for everyone**, or when an open-ended room has been empty long enough | At `endsAt` plus the grace period, when a moderator chooses **End for everyone** or **End event**, or, for an open-ended room past `endsAt` and for an instant call, after `jvbInactiveGraceMinutes` without activity |
 | What happens during a long break with nobody connected? | Before `endsAt`, the room goes `IDLE` and its bridge is released; the first person to come back wakes it (a few minutes on a cold node) | Nothing: a scheduled room stays `LIVE` until its end, because there is no `IDLE` without the scaler |
-| When is participant data deleted? | After `endsAt` plus the event's retention days, by the cleanup job, whether or not the event was ended | Same |
+| When is participant data deleted? | After `endsAt` plus the event's retention days, by the cleanup job, whether or not the event was ended. The event's live content stays, without names or identifiers | Same |
 
 ## Statuses
 
@@ -32,8 +32,8 @@ For organizers and moderators who need to predict when a room opens and closes:
 | `PROVISIONING` | A bridge is being brought up for the event, set by the scaler's pre-scale or by a wake. Nobody can enter yet. | **Room warming up** banner, or **The room opens at the start time** when the scaler is not driving the lifecycle; entry disabled; **Start event** for moderators |
 | `LIVE` | The room is open. It is the only status in which the waiting room lets anyone into the Jitsi conference and the only one that admits guests. | **Enter now** |
 | `IDLE` | The room was `LIVE`, stayed empty for the inactivity grace and its bridge was scaled to zero. Only the scaler sets it. | As `PROVISIONING`; opening the page wakes the room; **Start event** for moderators |
-| `ENDED` | The event is over. With the scaler, bridges are released on the next tick. The post-event page stays public unless it was turned off (`postEventPublic`, on by default for scheduled events and off for instant calls) or `postEventPublicUntil` has passed. | Closing view: recording and feedback |
-| `ARCHIVED` | Hidden from every public surface. The event row (title, description, dates) is kept as a record; participant data is deleted once retention expires. | Entry disabled with a valid link; without one, a redirect to the event page, which is not public |
+| `ENDED` | The event is over. With the scaler, bridges are released on the next tick. The post-event page stays public unless it was turned off (`postEventPublic`, on by default for scheduled events and off for instant calls) or `postEventPublicUntil` has passed. Retention removes personal data and leaves the status unchanged. | Closing view: recording and feedback |
+| `ARCHIVED` | Hidden from every public surface. Set by staff with bulk archive, or by the cleanup job on an event that was never ended. The event row is kept; personal data is removed once retention expires, as for `ENDED`. | Entry disabled with a valid link; without one, a redirect to the event page, which is not public |
 
 The exact screen for each combination of status, time and bridge readiness, with every label, is described in [waiting-room.md](waiting-room.md#what-each-state-shows).
 
@@ -94,7 +94,7 @@ stateDiagram-v2
   IDLE --> ENDED : scaler or lifecycle: endsAt passed
   ENDED --> LIVE : moderator: revive, start passed
   ENDED --> PUBLISHED : moderator: revive, start ahead
-  ENDED --> ARCHIVED : cleanup: retention over
+  ENDED --> ARCHIVED : staff: bulk Archive
   ARCHIVED --> PUBLISHED : moderator: Publish (management page)
 
   class DRAFT,PUBLISHED human
@@ -104,7 +104,7 @@ stateDiagram-v2
   class ARCHIVED cron
 ```
 
-Blue statuses are set by people, teal ones only by automation, green is the open room, gray is the end of the live phase and amber is the retention hand-off. Instant calls are created directly as `LIVE`. Three actions are left out of the drawing to keep it readable: bulk archive moves any status to `ARCHIVED`, **Publish** on the management page also moves an `IDLE` event to `PUBLISHED`, and the cleanup job archives an event that was never ended once its retention has passed. The lifecycle cron also opens `PROVISIONING` and `IDLE` events it finds, although it never sets either status. The diagram shows the transitions the user interface offers; the events API itself accepts an explicit `DRAFT`, `PUBLISHED`, `LIVE` or `ENDED` from any status (see [Manual transitions](#manual-transitions)). With the scaler there are no `lifecycle:` edges; without it there are no `scaler:` edges, a wake leaves a `PUBLISHED` event unchanged and `IDLE` never occurs: see [Running without the scaler](#running-without-the-scaler).
+Blue statuses are set by people, teal ones only by automation, green is the open room, gray is the end of the live phase and amber is the archive. Instant calls are created directly as `LIVE`. Three actions are left out of the drawing to keep it readable: bulk archive moves any other status to `ARCHIVED` too, **Publish** on the management page also moves an `IDLE` event to `PUBLISHED`, and the cleanup job archives an event that was never ended once its retention has passed. The lifecycle cron also opens `PROVISIONING` and `IDLE` events it finds, although it never sets either status. The diagram shows the transitions the user interface offers; the events API itself accepts an explicit `DRAFT`, `PUBLISHED`, `LIVE` or `ENDED` from any status (see [Manual transitions](#manual-transitions)). With the scaler there are no `lifecycle:` edges; without it there are no `scaler:` edges, a wake leaves a `PUBLISHED` event unchanged and `IDLE` never occurs: see [Running without the scaler](#running-without-the-scaler).
 
 ## Who moves an event
 
@@ -134,7 +134,7 @@ Blue statuses are set by people, teal ones only by automation, green is the open
 | `LIVE` → `ENDED` | Open-ended room (grace `-1`) past `endsAt` and without activity for `jvbInactiveGraceMinutes` | Scaler or lifecycle cron | Yes | Yes | Yes |
 | `LIVE` → `ENDED` | Instant call without activity for `jvbInactiveGraceMinutes`, before its `endsAt` | Lifecycle cron | Yes | Yes | No (the scaler moves it to `IDLE`) |
 | `PUBLISHED`, `PROVISIONING`, `IDLE` → `ENDED` | `endsAt` passed | Scaler or lifecycle cron | Yes | Yes | Yes |
-| `ENDED` → `ARCHIVED`; `PUBLISHED`, `PROVISIONING`, `IDLE`, `LIVE` → `ARCHIVED` | Retention expired | Cleanup job | Yes (hourly) | Yes (daily) | Yes (daily) |
+| `PUBLISHED`, `PROVISIONING`, `IDLE`, `LIVE` → `ARCHIVED` | Retention expired on an event that was never ended | Cleanup job | Yes (hourly) | Yes (daily) | Yes (daily) |
 
 ### Manual transitions
 
@@ -255,7 +255,7 @@ flowchart LR
   P -->|"lifecycle: start reached,<br/>bridge answers<br/>moderator: Start event"| L
   P -->|"lifecycle: endsAt passed,<br/>never opened"| E
   L -->|"lifecycle: endsAt plus grace,<br/>or inactive when open-ended<br/>or an instant call<br/>moderator: End for everyone"| E
-  E -->|"cleanup job after<br/>endsAt plus dataRetentionDays"| A
+  E -->|"staff: bulk Archive"| A
 ```
 
 What never happens without the scaler:
@@ -299,7 +299,7 @@ flowchart TB
   C["startsAt and a bridge answers<br/>scaler: LIVE<br/>everyone can enter"]:::live
   D["endsAt passed<br/>still LIVE: overtime banner"]:::live
   E["endsAt plus grace<br/>scaler: ENDED<br/>bridges released"]:::terminal
-  F["endsAt plus dataRetentionDays<br/>cleanup: ARCHIVED<br/>participant data deleted"]:::cron
+  F["endsAt plus dataRetentionDays<br/>cleanup: personal data removed<br/>status stays ENDED"]:::cron
 
   I["IDLE<br/>bridge scaled to zero"]:::auto
   W["PROVISIONING<br/>bridge restarts"]:::auto
@@ -424,9 +424,9 @@ The GDPR cleanup scrubs the personal data held in sessions (participants, speake
 - **Follow-up emails** are sent at most once per event by the reminders job, for `ENDED` events that opted in (`postEventEmailEnabled`) and whose `endsAt` is within the last seven days (`app/src/lib/events/post-event-finalize.ts`). `ARCHIVED` events are skipped. Events reach `ENDED` by themselves wherever the scaler or the lifecycle cron runs, so no manual end is needed; an event that is never ended gets none ([email.md](email.md), [background-jobs.md](background-jobs.md)).
 - **The recording and AI post-production** start from the recording finalize path, not from the status change ([recording.md](recording.md), [POSTPROD.md](../POSTPROD.md)).
 
-**`ENDED` to `ARCHIVED`.** The GDPR cleanup job (`GET /api/cron/cleanup`) selects `ENDED` and `ARCHIVED` events whose `endsAt` plus `dataRetentionDays` is strictly in the past. For each one it deletes participant data and sets `ARCHIVED` in the same transaction. Retention is counted from `endsAt`, not from the moment the event was ended. The job also selects events that were never ended (`PUBLISHED`, `PROVISIONING`, `IDLE`, `LIVE`) once the later of `endsAt` and `lastActiveAt`, plus `dataRetentionDays`, has passed: it archives them, closes their open call sessions with the estimated close time and cleans them in the same run. `DRAFT` events are never cleaned: they hold no registrations, and their configuration is what copies inherit. It runs daily in the Helm chart (`cronjobs.cleanup.schedule`, 03:00 by default in `infra/helm/pa-webinar/values.yaml`) and hourly in the Compose `cron` service. `Event.dataRetentionDays` is 30 by default in `app/prisma/schema.prisma` and 7 for instant calls (`app/src/app/api/events/instant/route.ts`). What exactly is deleted, what is kept and why is in [GDPR.md](../GDPR.md).
+**Retention.** The GDPR cleanup job (`GET /api/cron/cleanup`) selects, on every run, the `ENDED` and `ARCHIVED` events whose `endsAt` plus `dataRetentionDays` is strictly in the past, including those it cleaned on an earlier run. For each one it removes the personal data in one transaction; every step is idempotent, so a later run removes only what was written since or left by a failed run, and writes a `DATA_DELETED` audit row only when it removed or anonymized something. The status does not change, so a concluded event stays `ENDED`, and its public page and what that page shows follow its post-event settings. Its live content (Q&A, polls, word cloud, end-of-event answers, materials, agenda, live action journal) stays, without names or registrations, and with browser ids replaced by a per-event pseudonym. Retention is counted from `endsAt`, not from the moment the event was ended. The job also selects events that were never ended (`PUBLISHED`, `PROVISIONING`, `IDLE`, `LIVE`) once the later of `endsAt` and `lastActiveAt`, plus `dataRetentionDays`, has passed: it archives them, closes their open call sessions with the estimated close time and cleans them in the same run. `DRAFT` events are never cleaned: they hold no registrations, and their configuration is what copies inherit. It runs daily in the Helm chart (`cronjobs.cleanup.schedule`, 03:00 by default in `infra/helm/pa-webinar/values.yaml`) and hourly in the Compose `cron` service. `Event.dataRetentionDays` is 30 by default in `app/prisma/schema.prisma` and 7 for instant calls (`app/src/app/api/events/instant/route.ts`). What exactly is deleted, what is kept and why is in [GDPR.md](../GDPR.md).
 
-**Bulk archive** hides events from every public surface immediately but deletes nothing. Because `ARCHIVED` events are still processed by the cleanup job, their participant data is deleted when retention expires, as for `ENDED` events.
+**Bulk archive** hides events from every public surface immediately but deletes nothing. Because `ARCHIVED` events are still processed by the cleanup job, their personal data is removed when retention expires, as for `ENDED` events.
 
 `ARCHIVED` is not locked: an explicit status change through the events API, including **Publish** on the management page, moves an archived event like any other.
 

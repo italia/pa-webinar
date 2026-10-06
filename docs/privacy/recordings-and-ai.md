@@ -510,9 +510,9 @@ track file earlier (see [Operator responsibilities](#operator-responsibilities))
 This is the default. When `Recording.retentionUntil` is empty, the event is
 `ENDED` or `ARCHIVED`, and its video is not published, the recording's outputs
 are purged once `endsAt` plus `dataRetentionDays` has passed. The default of
-`dataRetentionDays` is in `app/prisma/schema.prisma`. The cleanup job archives
-the event but never deletes AI outputs, so this pass is what enforces the
-event's retention on them. An event that was never ended reaches this pass
+`dataRetentionDays` is in `app/prisma/schema.prisma`. The cleanup job never
+deletes AI outputs, so this pass is what enforces the event's retention on
+them. An event that was never ended reaches this pass
 once the cleanup job has archived it, after its retention.
 
 ### Published recordings

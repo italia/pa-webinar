@@ -402,9 +402,10 @@ Configured in: [Runtime settings](configuration/runtime-settings.md) · [Brandin
 ### The concluded event page
 
 - **Visibility.** The page stays public after the end unless it is switched off, and it can close at a set date. Instant calls start with it off. When it is off or has expired, the page returns "not found" and leaves listings and the sitemap.
-- **Recap.** An anonymous summary is computed the first time someone opens the page, then stored so that it outlives the retention cleanup. It shows peak and registered participants, the top questions, poll results and the most-shared words. The average rating is read when the page is served, so later ratings count; once the retention cleanup has removed the answers, the stored figure is shown. It appears only while the event shows its feedback.
+- **Recap.** An anonymous summary is computed the first time someone opens the page, then stored so that it outlives the retention cleanup. It shows peak and registered participants, the top questions, poll results and the most-shared words. The average rating is read when the page is served, so later ratings count; when fewer answers are left than the summary counted, for example after an erasure, the stored figure is shown. It appears only while the event shows its feedback.
 - **Video.** A published recording plays in the platform's player, with speed control, picture-in-picture, keyboard shortcuts, subtitle tracks and a download link. If the event has a YouTube URL, the page shows a **Watch the video on YouTube** link. Nothing from YouTube loads until the visitor follows it.
 - **Tabs.** **AI transcript**, **Questions & Answers** (answered and highlighted questions, with their written answers), **Materials**, **Polls** (published results only) and **Feedback**. Each event can hide the Q&A, materials, polls, feedback, recap and word-cloud sections.
+- **After the retention period.** The event's personal data is deleted, but the page and its content stay as configured: questions and answers, polls, words, ratings and materials remain, without the names of the people who wrote, voted or added them. See [Privacy and data protection](GDPR.md#what-stays-after-event-retention).
 
 ### Recording publication
 

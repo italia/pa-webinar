@@ -152,7 +152,7 @@ state machine and who moves it are in
 | `LIVE` | live | The room admits participants. |
 | `IDLE` | idle | A live room that stayed empty past the inactivity grace, so its bridge can be scaled down (only with the JVB scaler). |
 | `ENDED` | ended | The live part is over; the post-event page takes the place of the room. |
-| `ARCHIVED` | archived | Hidden from every public surface: either the GDPR cleanup archived it after removing personal data at the end of retention, or staff archived it from the event list (an administrator, or an organizer for their own events), which deletes nothing by itself. |
+| `ARCHIVED` | archived | Hidden from every public surface: either staff archived it from the event list (an administrator, or an organizer for their own events), which deletes nothing by itself, or the GDPR cleanup archived an event that was never ended when its retention passed. A concluded event keeps its status at retention. |
 
 **Event type** (`EventType`): `SCHEDULED` for an ordinary event with a
 schedule, `INSTANT` for an instant call, and `LEGACY` for a past recording
@@ -417,9 +417,10 @@ for attendance, interaction and engagement. The instance-wide page is
 
 **Event recap** (`postEventRecap`, UI **Event recap**): an anonymized,
 aggregate snapshot of an ended event (headcount, top questions, published poll
-results, word-cloud words). It is stored so it outlives the retention cleanup
-of the underlying rows. The average rating shown with it is read live while
-the answers exist, and taken from the stored snapshot after the retention cleanup.
+results, word-cloud words). It is stored so it outlives the retention cleanup,
+which deletes the registrations and chat messages it counts and quotes. The
+average rating shown with it is read live, and taken from the stored snapshot
+when fewer answers are left than it counted.
 [From creation to recap](architecture/event-journey.md)
 
 **Post-event feedback** (UI **Feedback**; **Ratings** in the administration
@@ -861,7 +862,8 @@ no actor. [Privacy and data protection](GDPR.md)
 
 **GDPR cleanup**: the scheduled job (`/api/cron/cleanup`; daily in the Helm
 chart, hourly in Compose) that deletes or scrubs personal data of events past
-their retention and marks those events `ARCHIVED`.
+their retention, keeps their live content without names or identifiers, and
+marks `ARCHIVED` only the events that were never ended.
 [Privacy and data protection](GDPR.md)
 
 **Privacy notice** (UI **Privacy policy**) and **privacy notice template**
@@ -875,7 +877,8 @@ controller's behalf, for example an operator or hosting provider that runs the
 installation for a public body.
 [Privacy notice checklist for controllers](privacy/privacy-notice-checklist.md)
 
-**Retention**: how long each kind of personal data is kept before deletion.
+**Retention**: how long each kind of personal data is kept before deletion or
+anonymization.
 Events (`dataRetentionDays`), the address book, recordings, per-participant
 tracks and AI artifacts each follow their own regime.
 [Privacy and data protection](GDPR.md)

@@ -322,7 +322,7 @@ The schema lives in `app/prisma/schema.prisma`, and every change reaches a datab
 - **Migration and schema travel together.** Run `npm run db:migrate:dev --workspace=app`, review the generated SQL in `app/prisma/migrations/`, and commit it in the same commit as the schema change. The Migration Integrity job fails when the two disagree.
 - **Migrations are additive.** During a rollout, and after a rollback, older code runs against the newer schema. A migration therefore adds only what that code can ignore.
 - **A migration is never edited once it is merged or applied anywhere.** Prisma keeps a checksum of every migration it has applied, so an edited file is either treated as drift or never re-run. Write a new migration instead.
-- **Personal data needs a retention path.** A new model that holds participants' personal data is purged by the `/api/cron/cleanup` transaction and its test, and classified in `app/src/lib/gdpr/cleanup-coverage.ts`. If the model points to a stored file, the cleanup deletes the file too ([Rules for developers](../GDPR.md#rules-for-developers)).
+- **Personal data needs a retention path.** A new model that holds participants' personal data is purged, or stripped of its identities, by the `/api/cron/cleanup` transaction and its test, and classified in `app/src/lib/gdpr/cleanup-coverage.ts`. If the model points to a stored file, the cleanup deletes the file too ([Rules for developers](../GDPR.md#rules-for-developers)).
 
 ## Architecture decisions
 
