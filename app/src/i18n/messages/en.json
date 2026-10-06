@@ -1,15 +1,51 @@
 {
   "agenda": {
-    "title": "Notes / Checklist",
-    "empty": "No items yet. Add the topics to cover and check them off as you go.",
+    "title": "Agenda",
+    "empty": "The agenda hasn't been prepared yet.",
     "add": "Add",
-    "addPlaceholder": "New item…",
-    "remove": "Remove",
+    "addPlaceholder": "New topic…",
+    "remove": "Delete topic",
     "inProgress": "in progress",
     "agree": "Agree",
     "disagree": "Disagree",
     "favorablePct": "{pct}% in favour",
-    "noReactions": "Share your view"
+    "noReactions": "Share your view",
+    "emptyModerator": "Add the meeting's topics: during the event you mark their progress and the room sees the current one.",
+    "progress": "{done} of {total} discussed",
+    "skippedCount": "{count, plural, one {# skipped} other {# skipped}}",
+    "nextTopic": "Next topic:",
+    "startFirst": "Start with:",
+    "finishCurrent": "Finish the current topic",
+    "runningFor": "{minutes, plural, =0 {just started} one {for # minute} other {for # minutes}}",
+    "tickerNow": "Now",
+    "status": {
+      "PENDING": "To discuss",
+      "CURRENT": "In progress",
+      "DONE": "Discussed",
+      "SKIPPED": "Skipped"
+    },
+    "actions": {
+      "start": "Start now",
+      "done": "Mark as discussed",
+      "skip": "Skip",
+      "reopen": "Reopen",
+      "edit": "Edit",
+      "moveUp": "Move up",
+      "moveDown": "Move down"
+    },
+    "plannedMinutes": "{minutes} min planned",
+    "elapsedOfPlanned": "{minutes} of {planned} min",
+    "overtime": "over time",
+    "tookMinutes": "{minutes} min",
+    "plannedTotal": "Planned duration: {minutes} min",
+    "pulsePrompt": "Do you agree?",
+    "addHint": "Enter to add, Shift+Enter for a new line. You can paste a list: one topic per line.",
+    "addMany": "{count, plural, one {Add # topic} other {Add # topics}}",
+    "minutesPlaceholder": "min",
+    "minutesLabel": "Planned duration in minutes (optional)",
+    "editLabel": "Topic title",
+    "agendaChanged": "The agenda has just changed: try again.",
+    "minutesInvalid": "Enter the duration in minutes, from 1 to 600."
   },
   "common": {
     "appName": "PA Webinar",
@@ -64,7 +100,7 @@
     "past": "Past events",
     "noUpcoming": "No upcoming events at the moment. Check back soon!",
     "noPast": "No past events",
-    "wordCloudTitle": "Word cloud",
+    "wordCloudTitle": "In one word",
     "card": {
       "publicEvent": "Public event",
       "readMore": "Read more",
@@ -173,6 +209,7 @@
     "resendLink": "Resend my access link",
     "resending": "Sending…",
     "resendSent": "If the address is registered, we've re-sent the access link by email.",
+    "resendFailed": "We couldn't re-send the link. Please try again in a few minutes.",
     "invitationOnly": "Registration is reserved for invited people: use the email address you were invited with. The link to enter will reach you by email.",
     "closed": "Registration for this event is not open to the public.",
     "lostLink": "Already registered? Get your personal link again",
@@ -317,9 +354,9 @@
     "whiteboardNotSavedHint": "The whiteboard isn't saved automatically. If you use it, export it (whiteboard menu) and attach it to the event Materials before ending.",
     "sidebarTabChat": "Chat",
     "sidebarTabPolls": "Polls",
-    "sidebarTabWordcloud": "Word cloud",
-    "sidebarTabAgenda": "Notes / Checklist",
-    "liveToggleAgenda": "Notes / Checklist (agenda)",
+    "sidebarTabWordcloud": "In one word",
+    "sidebarTabAgenda": "Agenda",
+    "liveToggleAgenda": "Agenda",
     "sidebarTabMaterials": "Materials",
     "sidebarTabParticipants": "Participants",
     "chat": {
@@ -371,7 +408,20 @@
       "notifyDesktopBlocked": "Your browser blocks notifications for this site: you can allow them again in the site settings.",
       "notifyDesktopUnsupported": "This browser does not support notifications.",
       "notifyOffer": "Get a notification when someone mentions or replies to you?",
-      "notifyOfferEnable": "Turn on notifications"
+      "notifyOfferEnable": "Turn on notifications",
+      "emojiSearch": "Search emoji",
+      "emojiNoResults": "No emoji found",
+      "emojiRecent": "Recently used",
+      "emojiAll": "All emoji",
+      "mentionListLabel": "People to mention",
+      "mentionButton": "Mention someone",
+      "replyJump": "Go to the original message",
+      "typingOne": "{name} is typing…",
+      "typingTwo": "{a} and {b} are typing…",
+      "typingMany": "Several people are typing…",
+      "hideForAll": "Hide for everyone",
+      "deleteOwn": "Delete message",
+      "mentionedYou": "Mentioned you"
     },
     "role": {
       "moderator": "Moderator",
@@ -470,7 +520,9 @@
     "rejoin": "Rejoin",
     "backToHome": "Back to the home page",
     "sidebarTabMaterialsNew": "New materials shared",
-    "sidebarTabQaNew": "New in Q&A"
+    "sidebarTabQaNew": "New in Q&A",
+    "resizeSidebar": "Resize the side panel",
+    "sidebarTabWordcloudNew": "New “In one word” question"
   },
   "qa": {
     "title": "Questions & Answers",
@@ -1280,10 +1332,10 @@
       "qaEnabled": "Enable Q&A",
       "chatEnabled": "Enable chat",
       "recordingEnabled": "Enable video recording",
-      "agendaEnabled": "Live notes / checklist (agenda)",
-      "agendaEnabledDesc": "A checklist of topics to cover that moderators tick off during the event. Feeds the automatic summary. Optional and can also be enabled during the event.",
-      "wordCloudEnabled": "Live word cloud",
-      "wordCloudEnabledDesc": "Participants send a word and the cloud updates live. Useful to open a discussion or gather a feeling in a few seconds.",
+      "agendaEnabled": "Meeting agenda",
+      "agendaEnabledDesc": "The list of topics for the meeting: during the event the moderator marks the current one, those discussed and those skipped, and the room always sees where things stand, also in the top bar. It feeds into the automatic summary. Optional, and can be turned on during the event too.",
+      "wordCloudEnabled": "“In one word” questions",
+      "wordCloudEnabledDesc": "The moderator asks a question and everyone answers with a single word: the answers form a cloud that updates live, and the most common words grow larger. Useful to break the ice or gather an impression in a few seconds.",
       "whiteboardEnabled": "Shared whiteboard",
       "whiteboardEnabledDesc": "Enables the native collaborative whiteboard (Excalidraw): moderators can open it from the toolbar during the event. Requires the installation's whiteboard service; where it is available, it is always on for instant calls.",
       "autoStartRecording": "Start recording automatically",
@@ -2760,8 +2812,8 @@
         "desc": "Answer polls in real time and see the results instantly."
       },
       "wordcloud": {
-        "title": "Word cloud",
-        "desc": "Add your words to the event's shared word cloud."
+        "title": "In one word",
+        "desc": "Answer the moderator's questions with one word and watch the cloud of answers grow."
       },
       "reactions": {
         "title": "Reactions and raised hands",
@@ -2772,8 +2824,8 @@
         "desc": "Write in the event chat and follow the conversation with other participants."
       },
       "agenda": {
-        "title": "Notes and checklist",
-        "desc": "Follow the notes and checklist the moderators share during the event."
+        "title": "Agenda",
+        "desc": "Follow the current topic and the meeting agenda."
       }
     },
     "projectTeaser": {
@@ -2888,8 +2940,17 @@
       "minOptions": "At least 2 options are required",
       "generic": "Error creating the poll",
       "vote": "Vote not recorded. Try again.",
-      "alreadyVoted": "You have already voted in this poll."
-    }
+      "alreadyVoted": "You have already voted in this poll.",
+      "action": "The action failed. Please try again."
+    },
+    "participation": "{votes, plural, one {# vote} other {# votes}} out of {present} present",
+    "participationLabel": "Poll participation",
+    "yourVote": "Your vote",
+    "deletePoll": "Delete poll",
+    "questionLabel": "Question",
+    "optionsLabel": "Possible answers",
+    "resultsHidden": "Vote recorded. Results will appear when the moderator publishes them.",
+    "closedNoVote": "Voting is closed. Results will appear when the moderator publishes them."
   },
   "materials": {
     "title": "Materials",
@@ -3497,16 +3558,16 @@
     "noFeedback": "No feedback received"
   },
   "wordcloud": {
-    "title": "Word cloud",
+    "title": "In one word",
     "startRound": "Start",
-    "prompt": "Topic",
+    "prompt": "Question",
     "promptPlaceholder": "e.g. What do you expect from this event?",
     "duration": "Duration",
     "submit": "Submit",
-    "submitPlaceholder": "Type a word (max 30 chars)",
-    "close": "Close the word cloud",
+    "submitPlaceholder": "Your word",
+    "close": "Close the answers",
     "cancel": "Cancel",
-    "noActiveRound": "No word cloud is active right now.",
+    "noActiveRound": "No question is open right now.",
     "noWords": "Waiting for the first words...",
     "wordsSubmitted": "{count} words submitted",
     "timeRemaining": "Time remaining",
@@ -3514,11 +3575,22 @@
       "send": "Word not sent. Please try again.",
       "closed": "This round is closed: no more words are accepted.",
       "limit": "You have already sent the maximum number of words for this round.",
-      "rateLimited": "Too many submissions right now: wait a few seconds before trying again."
+      "rateLimited": "Too many submissions right now: wait a few seconds before trying again.",
+      "duplicate": "You already wrote this word: it counts only once per person.",
+      "removed": "The moderator removed this word: it can't be sent again.",
+      "invalid": "Write a word made of letters or numbers."
     },
-    "startNew": "Start a word cloud",
-    "emptyHintModerator": "Ask an open question: one-word answers build the cloud in real time.",
-    "timeLeft": "Time left: {time}"
+    "startNew": "Ask a question",
+    "emptyHintModerator": "Ask a question that can be answered with a single word, for example “How are you feeling today?”. The answers form a cloud that updates live: the more people write the same word, the bigger it gets.",
+    "timeLeft": "Time left: {time}",
+    "howItWorks": "Answer with a single word: the more people write the same word, the bigger it gets.",
+    "enableHint": "The “In one word” tab will appear for everyone when you start the first question.",
+    "topWords": "Most written",
+    "yourWords": "You wrote:",
+    "closedBadge": "Closed",
+    "durationUnlimited": "No time limit",
+    "allWords": "All words",
+    "removeWord": "Remove from the cloud"
   },
   "timer": {
     "title": "Timer",
@@ -3915,7 +3987,7 @@
     "showPolls": "Show poll results",
     "showFeedback": "Show feedback",
     "showRecap": "Show event recap",
-    "showWordCloud": "Show word cloud",
+    "showWordCloud": "Show the “In one word” answers",
     "emailEnabled": "Send recap email when the event ends",
     "emailEnabledHelp": "On conclusion, sends registered participants a thank-you email with links to the recap and feedback, and the moderator a short recap. Sent only once.",
     "feedbackEnabled": "Feedback survey active at event end",
@@ -3976,7 +4048,7 @@
     "micToggleOn": "Microphone ON",
     "micToggleOff": "Microphone OFF",
     "cameraOffPreview": "Camera off",
-    "speakerTest": "🔊 Test audio",
+    "speakerTest": "Test audio",
     "backgroundLabel": "Virtual background",
     "backgroundNoneShort": "No",
     "backgroundHint": "Applied when you enter the room. To blur your background use the backgrounds button once inside: the preview above shows the camera without effects.",

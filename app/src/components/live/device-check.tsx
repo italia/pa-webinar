@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { Alert, Button } from 'design-react-kit';
 
+import { Icon } from '@/components/ui/icon';
 import {
   SFONDI_VIRTUALI,
   SFONDO_PREDEFINITO,
@@ -12,6 +13,10 @@ import {
 } from '@/lib/jitsi/virtual-background';
 
 type PermissionState = 'idle' | 'requesting' | 'granted' | 'denied';
+
+/** Errori per cui manca (o e' occupata) la sola webcam: un permesso negato
+ *  non c'e', e il microfono si puo' ancora provare da solo. */
+const SOLO_AUDIO_SE = new Set(['NotFoundError', 'OverconstrainedError', 'NotReadableError', 'AbortError']);
 
 // Una scelta per ruolo, non una sola per browser: chi ha acceso il microfono
 // conducendo un evento non deve ritrovarlo acceso quando partecipa a un altro.
@@ -186,7 +191,18 @@ export default function DeviceCheck({
         video: videoId ? { deviceId: { exact: videoId } } : true,
         audio: audioId ? { deviceId: { exact: audioId } } : true,
       };
-      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      let stream: MediaStream;
+      try {
+        stream = await navigator.mediaDevices.getUserMedia(constraints);
+      } catch (err) {
+        // Senza webcam, o con la webcam tenuta da un'altra applicazione, la
+        // richiesta congiunta fallisce intera e si porta via anche la prova del
+        // microfono: si riprova con il solo audio e si entra a camera spenta.
+        const name = (err as { name?: unknown } | null)?.name;
+        if (videoId || typeof name !== 'string' || !SOLO_AUDIO_SE.has(name)) throw err;
+        stream = await navigator.mediaDevices.getUserMedia({ video: false, audio: constraints.audio });
+        setCameraOn(false);
+      }
       if (disposedRef.current) {
         for (const track of stream.getTracks()) track.stop();
         return;
@@ -260,7 +276,14 @@ export default function DeviceCheck({
     const next = e.target.checked;
     setCameraOn(next);
     writeBoolPref(chiavi.camera, next);
-  }, [chiavi.camera]);
+    // Entrati col solo audio (webcam assente o tenuta da un'altra
+    // applicazione): riaccendere vuol dire chiederla di nuovo, non abilitare
+    // una traccia che non c'e'. Se ancora non si puo', si torna a camera spenta.
+    const stream = streamRef.current;
+    if (next && stream && stream.getVideoTracks().length === 0) {
+      void requestMedia(undefined, selectedAudioId || undefined);
+    }
+  }, [chiavi.camera, requestMedia, selectedAudioId]);
 
   const handleMicToggle = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const next = e.target.checked;
@@ -464,7 +487,9 @@ export default function DeviceCheck({
                 osc.onended = () => ctx.close();
               } catch { /* ignore — user can still join */ }
             }}
+            className="d-inline-flex align-items-center gap-1"
           >
+            <Icon icon="it-hearing" size="xs" color="primary" />
             {t('speakerTest')}
           </Button>
         </div>

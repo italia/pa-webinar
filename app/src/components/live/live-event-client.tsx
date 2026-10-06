@@ -42,13 +42,14 @@ import PreJoinScreen from '@/components/live/pre-join-screen';
 import PostEventFeedbackModal from '@/components/live/post-event-feedback-modal';
 import PresentationTimer from '@/components/live/presentation-timer';
 import ReactionBar from '@/components/live/reaction-bar';
-import ChatPanel from '@/components/live/chat-panel';
+import ChatPanel, { type ChatPreview } from '@/components/live/chat-panel';
 import WordCloud from '@/components/live/word-cloud';
 import {
   registrationAccessToken,
   voterIdentity,
   voterIdStorageKey,
 } from '@/components/live/voter-identity';
+import AgendaTicker from '@/components/live/agenda-ticker';
 import EventTimer from '@/components/live/event-timer';
 import LiveShareButton from '@/components/live/live-share-button';
 import WaitingRoom, {
@@ -57,6 +58,8 @@ import WaitingRoom, {
 } from '@/components/live/waiting-room';
 import { closingPhase, exitDestination, phaseAfterTokenConflict } from '@/components/live/live-phase';
 import { warmupFromLifecycle } from '@/components/live/lifecycle-warmup';
+import { avatarColor, avatarInitials } from '@/lib/chat/avatar';
+import { isHumanParticipant } from '@/lib/jitsi/participants';
 import { splitTitleKicker } from '@/lib/utils/title-kicker';
 import { useSettings } from '@/lib/settings-context';
 
@@ -183,6 +186,26 @@ type LivePhase =
   | 'left'
   | 'ended'
   | 'error';
+
+/** Quanto resta a schermo l'anteprima di un messaggio arrivato a chat chiusa. */
+const CHAT_PREVIEW_MS = 6_000;
+/** Una menzione resta di piu': e' un messaggio per chi guarda. */
+const CHAT_MENTION_PREVIEW_MS = 12_000;
+
+/** Larghezza della colonna dei pannelli su schermo largo: predefinita e limiti.
+ *  Il massimo lascia sempre almeno 420 px alla videochiamata. */
+const SIDEBAR_DEFAULT_W = 400;
+const SIDEBAR_MIN_W = 320;
+const SIDEBAR_MAX_W = 960;
+const SIDEBAR_MIN_VIDEO_W = 420;
+const SIDEBAR_WIDTH_KEY = 'pa-webinar.sidebar-width';
+
+function clampSidebarWidth(w: number): number {
+  const max = typeof window === 'undefined'
+    ? SIDEBAR_MAX_W
+    : Math.max(SIDEBAR_MIN_W, Math.min(SIDEBAR_MAX_W, window.innerWidth - SIDEBAR_MIN_VIDEO_W));
+  return Math.round(Math.min(max, Math.max(SIDEBAR_MIN_W, w)));
+}
 
 // Maximum number of automatic rejoin attempts after a network-induced
 // `videoConferenceLeft`. After this many failures we fall through to the
@@ -388,7 +411,12 @@ export default function LiveEventClient({
   // holds the grace timer so `readyToClose` can cancel it.
   const pendingLeaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Poll infrastructure status (JVB + Jibri) when event is LIVE
+  // Poll infrastructure status (JVB + Jibri) when event is LIVE.
+  // Dentro la chiamata lo stato del ponte non serve piu' (decide la sala
+  // d'attesa e la copertura prima dell'ingresso): da li' continua a chiederlo
+  // solo chi modera, per lo stato del registratore. Con centinaia di persone in
+  // sala erano centinaia di richieste ogni 3 secondi per tutta la diretta.
+  const statusPollNeeded = !jitsiJoined || isModerator;
   useEffect(() => {
     if (eventStatus !== 'LIVE') {
       setJvbReady(null);
@@ -396,6 +424,7 @@ export default function LiveEventClient({
       setRecorderPhase(null);
       return;
     }
+    if (!statusPollNeeded) return;
     let cancelled = false;
     const poll = async () => {
       try {
@@ -421,7 +450,7 @@ export default function LiveEventClient({
       cancelled = true;
       clearInterval(interval);
     };
-  }, [eventStatus]);
+  }, [eventStatus, statusPollNeeded]);
 
   // Determine initial phase. Everyone (guest, participant, moderator,
   // speaker) lands on the unified waiting room first regardless of
@@ -1202,6 +1231,13 @@ export default function LiveEventClient({
     leaveSelf();
   }, [leaveSelf]);
 
+  // «Termina evento» dalla barra del moderatore: stessa fine di «Termina per
+  // tutti», segnata prima che l'hangup faccia arrivare `readyToClose`.
+  const handleEndedFromControls = useCallback(() => {
+    userHangupRef.current = true;
+    markEnded();
+  }, [markEnded]);
+
   // "Termina per tutti": flip the event to ENDED (waiting participants and
   // those in the room detect it via their status poll and are taken to the
   // closing screen), then hang up our own client. Uses the moderator token.
@@ -1361,19 +1397,28 @@ export default function LiveEventClient({
     </Link>
   );
 
+  // Il titolo dell'evento sopra il messaggio d'uscita: chi ha piu' schede
+  // aperte, o torna al computer dopo un po', deve capire di quale sala si parla.
+  const exitEventTitle = splitTitleKicker(event.title, event.parseTitleKicker ?? false).main;
+
   // ── Ended ──
   if (phase === 'ended') {
     return (
-      <div className="container py-5 text-center">
-        <Icon icon="it-check-circle" size="xl" className="text-success mb-3" />
-        <h1 className="h3 mb-3">{t('eventEnded')}</h1>
-        <p className="mb-4">{t('eventEndedMessage')}</p>
+      <div className="live-exit container">
+        <div className="live-exit__card">
+          <span className="live-exit__icon live-exit__icon--success" aria-hidden="true">
+            <Icon icon="it-check-circle" size="lg" color="success" />
+          </span>
+          <p className="live-exit__event">{exitEventTitle}</p>
+          <h1 className="h3 mb-2">{t('eventEnded')}</h1>
+          <p className="live-exit__message">{t('eventEndedMessage')}</p>
 
-        {/* Questionario post-evento: emerge a fine call (poll ENDED →
-            setShowFeedback(true)) sopra questa schermata di chiusura. */}
-        {feedbackModal}
+          {/* Questionario post-evento: emerge a fine call (poll ENDED →
+              setShowFeedback(true)) sopra questa schermata di chiusura. */}
+          {feedbackModal}
 
-        {backLink}
+          <div className="live-exit__actions">{backLink}</div>
+        </div>
       </div>
     );
   }
@@ -1384,24 +1429,29 @@ export default function LiveEventClient({
   // chiuso — senza lo scaler nessuno lo chiuderebbe al posto suo.
   if (phase === 'left') {
     return (
-      <div className="container py-5 text-center">
-        <Icon icon="it-info-circle" size="xl" className="text-primary mb-3" />
-        <h1 className="h3 mb-3">{t('leftTitle')}</h1>
-        <p className="mb-3">{t('leftMessage')}</p>
-        {isModerator && (
-          <p className="mb-4 mx-auto text-muted" style={{ maxWidth: 560 }}>
-            {t('leftModeratorReminder', { action: t('leaveChoice.endForAll') })}
-          </p>
-        )}
+      <div className="live-exit container">
+        <div className="live-exit__card">
+          <span className="live-exit__icon" aria-hidden="true">
+            <Icon icon="it-logout" size="lg" color="primary" />
+          </span>
+          <p className="live-exit__event">{exitEventTitle}</p>
+          <h1 className="h3 mb-2">{t('leftTitle')}</h1>
+          <p className="live-exit__message">{t('leftMessage')}</p>
+          {isModerator && (
+            <p className="live-exit__note">
+              {t('leftModeratorReminder', { action: t('leaveChoice.endForAll') })}
+            </p>
+          )}
 
-        {feedbackModal}
+          {feedbackModal}
 
-        <div className="d-flex flex-wrap justify-content-center gap-3 mt-4">
-          <Button color="primary" onClick={handleRejoin}>
-            <Icon icon="it-video" size="sm" color="white" className="me-2" />
-            {t('rejoin')}
-          </Button>
-          {backLink}
+          <div className="live-exit__actions">
+            <Button color="primary" onClick={handleRejoin}>
+              <Icon icon="it-video" size="sm" color="white" className="me-2" />
+              {t('rejoin')}
+            </Button>
+            {backLink}
+          </div>
         </div>
       </div>
     );
@@ -1412,7 +1462,6 @@ export default function LiveEventClient({
     return (
       <div className="container py-5">
         <Alert color="danger">
-          <Icon icon="it-close-circle" className="me-2" />
           {error || t('connectionError')}
         </Alert>
         <div className="text-center mt-3">
@@ -1587,6 +1636,8 @@ export default function LiveEventClient({
           whiteboardInfraReady={whiteboardInfraReady}
           localDisplayName={credentials?.displayName ?? chosenName ?? ''}
           isPrimaryModerator={isPrimaryModerator}
+          onEnded={handleEndedFromControls}
+          modalContainer={modalContainer}
         />
       )}
 
@@ -1692,6 +1743,7 @@ export default function LiveEventClient({
           jitsiApi={jitsiApi}
           localParticipantId={localEndpointId}
           displayName={credentials.displayName}
+          roomCount={participantCount}
           canReactAgenda={!isModerator && !isSpeaker}
           guestId={isGuest ? guestId : undefined}
           {...voterIdentity(registeredAccessToken, guestId)}
@@ -1866,6 +1918,9 @@ type SidebarTab =
 
 interface LiveSidebarProps {
   eventSlug: string;
+  /** Persone nella chiamata adesso, dallo stesso conteggio che la sala riceve
+   *  da Jitsi: il pannello dei partecipanti lo aggiorna solo quando e' aperto. */
+  roomCount?: number;
   /** Event UUID — used for the moderator feature-toggle PUT. The
    *  /api/events/[param] route accepts updates ONLY by UUID (a slug 400s
    *  before touching the DB). The slug is still used for the GET /flags poll,
@@ -1900,6 +1955,7 @@ interface LiveSidebarProps {
 
 function LiveSidebar({
   eventSlug,
+  roomCount,
   eventId,
   token,
   isModerator,
@@ -1916,6 +1972,7 @@ function LiveSidebar({
   voterAccessToken,
   voterGuestId,
 }: LiveSidebarProps) {
+  const tCommon = useTranslations('common');
   const t = useTranslations('live');
   // Live feature flags: i flag arrivano come props al mount, ma un moderatore
   // può attivarli/disattivarli DURANTE l'evento → li ripolliamo così i tab
@@ -1973,9 +2030,11 @@ function LiveSidebar({
       if (!res.ok) {
         console.error('toggleFeature failed', key, res.status);
       }
+      return res.ok;
     },
     [eventId, token, mutateFlags]
   );
+  const accendiParole = useCallback(() => toggleFeature('wordCloudEnabled', false), [toggleFeature]);
   const [activeTab, setActiveTab] = useState<SidebarTab>(
     // Chat is the primary channel: prefer it as the initial
     // tab, falling back to Q&A then polls only when chat is disabled.
@@ -1989,6 +2048,29 @@ function LiveSidebar({
   // A chat is "active" when the Chat tab is selected AND (on mobile)
   // the drawer is open.
   const [chatUnread, setChatUnread] = useState(0);
+  // Anteprima dell'ultimo messaggio arrivato a chat chiusa: un clic apre la
+  // chat, sparisce da sola, e il messaggio successivo la sostituisce.
+  const [chatPreview, setChatPreview] = useState<ChatPreview | null>(null);
+  useEffect(() => {
+    if (!chatPreview) return;
+    const durata =
+      chatPreview.mentionsMe || chatPreview.repliesToMe ? CHAT_MENTION_PREVIEW_MS : CHAT_PREVIEW_MS;
+    const timer = setTimeout(() => setChatPreview(null), durata);
+    return () => clearTimeout(timer);
+  }, [chatPreview]);
+  // Menzioni e risposte non lette: il contatore della chat diventa «@».
+  const [chatMentions, setChatMentions] = useState(0);
+  // Chi e' nella chiamata adesso, per le @menzioni (bot di registrazione escluso).
+  const getRoster = useCallback((): string[] => {
+    try {
+      return (jitsiApi?.getParticipantsInfo?.() ?? [])
+        .filter((p) => isHumanParticipant(p))
+        .map((p) => (p.displayName ?? '').trim())
+        .filter(Boolean);
+    } catch {
+      return [];
+    }
+  }, [jitsiApi]);
   // Sondaggi aperti in cui questa persona non ha ancora votato: il pannello
   // resta montato anche su un'altra scheda apposta per poterlo dire.
   const [pollsUnvoted, setPollsUnvoted] = useState(0);
@@ -1997,6 +2079,66 @@ function LiveSidebar({
   // E' questo, non la sola scheda scelta, a dire se un messaggio o un
   // materiale nuovo e' gia' stato visto.
   const [isDesktop, setIsDesktop] = useState(true);
+  // Chi segue soprattutto la chat allarga la colonna trascinandone il bordo:
+  // la videochiamata si restringe di conseguenza, mai sotto i 420 px. La
+  // scelta resta nel browser; doppio clic sul bordo torna alla misura iniziale.
+  const [sidebarWidth, setSidebarWidth] = useState<number | null>(null);
+  useEffect(() => {
+    try {
+      const salvata = Number(window.localStorage.getItem(SIDEBAR_WIDTH_KEY));
+      if (Number.isFinite(salvata) && salvata > 0) setSidebarWidth(clampSidebarWidth(salvata));
+    } catch { /* storage non disponibile: misura predefinita */ }
+    const onResize = () => setSidebarWidth((w) => (w === null ? w : clampSidebarWidth(w)));
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+  const salvaLarghezza = useCallback((w: number | null) => {
+    try {
+      if (w === null) window.localStorage.removeItem(SIDEBAR_WIDTH_KEY);
+      else window.localStorage.setItem(SIDEBAR_WIDTH_KEY, String(w));
+    } catch { /* storage non disponibile: vale finche' resta aperta la pagina */ }
+  }, []);
+  const dragRef = useRef<{ x: number; w: number } | null>(null);
+  const onResizerPointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    if (e.button !== 0) return;
+    e.preventDefault();
+    const colonna = e.currentTarget.parentElement;
+    dragRef.current = { x: e.clientX, w: colonna?.getBoundingClientRect().width ?? SIDEBAR_DEFAULT_W };
+    e.currentTarget.setPointerCapture(e.pointerId);
+    // Durante il trascinamento l'iframe della chiamata non deve catturare il
+    // puntatore, altrimenti il bordo si «stacca» appena ci si passa sopra.
+    document.documentElement.classList.add('live-resizing');
+  }, []);
+  const onResizerPointerMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    const d = dragRef.current;
+    if (!d) return;
+    // La colonna sta a destra: verso sinistra si allarga.
+    setSidebarWidth(clampSidebarWidth(d.w + (d.x - e.clientX)));
+  }, []);
+  const onResizerPointerUp = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    if (!dragRef.current) return;
+    dragRef.current = null;
+    document.documentElement.classList.remove('live-resizing');
+    try { e.currentTarget.releasePointerCapture(e.pointerId); } catch { /* gia' rilasciato */ }
+    setSidebarWidth((w) => {
+      salvaLarghezza(w);
+      return w;
+    });
+  }, [salvaLarghezza]);
+  const onResizerKeyDown = useCallback((e: React.KeyboardEvent<HTMLDivElement>) => {
+    const passo = e.shiftKey ? 96 : 32;
+    let next: number | null | undefined;
+    if (e.key === 'ArrowLeft') next = clampSidebarWidth((sidebarWidth ?? SIDEBAR_DEFAULT_W) + passo);
+    else if (e.key === 'ArrowRight') next = clampSidebarWidth((sidebarWidth ?? SIDEBAR_DEFAULT_W) - passo);
+    else if (e.key === 'Home') next = SIDEBAR_MIN_W;
+    else if (e.key === 'End') next = clampSidebarWidth(SIDEBAR_MAX_W);
+    else if (e.key === 'Enter') next = null;
+    if (next === undefined) return;
+    e.preventDefault();
+    setSidebarWidth(next);
+    salvaLarghezza(next);
+  }, [sidebarWidth, salvaLarghezza]);
+  useEffect(() => () => document.documentElement.classList.remove('live-resizing'), []);
   useEffect(() => {
     if (typeof window === 'undefined' || !window.matchMedia) return;
     const mq = window.matchMedia('(min-width: 992px)');
@@ -2007,6 +2149,10 @@ function LiveSidebar({
   }, []);
   const onScreen = (key: SidebarTab) => activeTab === key && (isDesktop || drawerOpen);
   const isChatActive = onScreen('chat');
+  // Aperta la chat, l'anteprima non serve piu'.
+  useEffect(() => {
+    if (isChatActive) setChatPreview(null);
+  }, [isChatActive]);
   // La scheda scelta decide che cosa si disegna; `pollsOnScreen` se si vede.
   const isPollsActive = activeTab === 'polls';
   const pollsOnScreen = onScreen('polls');
@@ -2025,6 +2171,25 @@ function LiveSidebar({
   // sondaggi. Stessa chiave del pannello, quindi stessa richiesta: aprirlo non
   // ne aggiunge una. Con il canale vivo la rilettura la chiede l'avviso
   // `materials`; senza, lo stesso giro del pannello.
+  // Una domanda «in una parola» appena aperta mentre si guarda altro: un
+  // pallino sulla scheda. Legge la versione leggera (c'e' una domanda aperta,
+  // e quale: in caldo sul server, uguale per tutti) e segue gli avvisi del
+  // canale, cosi' il pallino compare appena la domanda si apre. Il giro lento
+  // resta anche col canale: un'altra istanza dell'app puo' rispondere
+  // all'avviso con lo stato di un attimo prima.
+  const { data: giroParole } = useSWR<{ active: boolean; id?: string }>(
+    effWordCloud && !isModerator ? [`/api/events/${eventSlug}/wordcloud?lite=1`, 'alert', token] : null,
+    ([url, , tok]: [string, string, string]) =>
+      fetch(url, { headers: tok ? { Authorization: `Bearer ${tok}` } : undefined }).then((r) =>
+        r.ok ? r.json() : null,
+      ),
+    { refreshInterval: 20_000, revalidateOnFocus: false },
+  );
+  const giriVistiRef = useRef<Set<string>>(new Set());
+  const wordcloudOnScreen = onScreen('wordcloud');
+  if (wordcloudOnScreen && giroParole?.id) giriVistiRef.current.add(giroParole.id);
+  const wordcloudNew =
+    !!giroParole?.active && !!giroParole.id && !wordcloudOnScreen && !giriVistiRef.current.has(giroParole.id);
   const { data: materialsData } = useSWR<{ materials: Array<{ id: string }> }>(
     materialsListKey(eventSlug, token),
     fetchMaterials,
@@ -2045,41 +2210,27 @@ function LiveSidebar({
     const visti = seenMaterialsRef.current;
     if ([...ids].some((id) => !visti.has(id))) setMaterialsNew(true);
   }, [materialsData, materialsOnScreen]);
-  // Browser tab title flash: when unread increases while document is
-  // hidden, prefix the title with "● ". Restore on focus. We scope
-  // the effect to *this* sidebar instance so at most one listener is
-  // registered at a time.
+  // Il titolo della scheda del browser dice quanti messaggi non letti ci
+  // sono mentre si guarda altro: «(3) Titolo». Torna com'era al ritorno.
   useEffect(() => {
     if (typeof document === 'undefined') return;
-    const BULLET = '● ';
-    const originalTitle = document.title;
-    let flashed = false;
-    const setFlashed = (on: boolean) => {
-      if (on === flashed) return;
-      flashed = on;
-      if (on) {
-        if (!document.title.startsWith(BULLET)) {
-          document.title = BULLET + document.title;
-        }
-      } else if (document.title.startsWith(BULLET)) {
-        document.title = document.title.slice(BULLET.length);
-      }
+    const PREFISSO = /^\(\d+\+?\) /;
+    const pulisci = () => {
+      if (PREFISSO.test(document.title)) document.title = document.title.replace(PREFISSO, '');
     };
-
-    if (chatUnread > 0 && document.hidden) setFlashed(true);
-    if (chatUnread === 0) setFlashed(false);
-
+    if (chatUnread > 0 && document.hidden) {
+      pulisci();
+      document.title = `(${chatUnread > 99 ? '99+' : chatUnread}) ${document.title}`;
+    } else if (chatUnread === 0) {
+      pulisci();
+    }
     const onVisibility = () => {
-      if (!document.hidden) setFlashed(false);
+      if (!document.hidden) pulisci();
     };
     document.addEventListener('visibilitychange', onVisibility);
     return () => {
       document.removeEventListener('visibilitychange', onVisibility);
-      setFlashed(false);
-      // Best-effort restore in case a teardown happens mid-flash.
-      if (document.title.startsWith(BULLET)) {
-        document.title = originalTitle;
-      }
+      pulisci();
     };
   }, [chatUnread]);
 
@@ -2093,6 +2244,9 @@ function LiveSidebar({
     label: string;
     svg: React.ReactNode;
     badge?: number;
+    /** `alert`: un numero da leggere (rosso, con il richiamo animato);
+     *  `neutral`: un conteggio informativo (i presenti). */
+    badgeTone?: 'alert' | 'mention' | 'neutral';
     dot?: boolean;
     /** Testo del pallino per chi usa uno screen reader: dire «messaggi non
      *  letti» sopra la scheda dei sondaggi è peggio che non dire niente. */
@@ -2120,7 +2274,10 @@ function LiveSidebar({
           <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
         </svg>
       ),
-      dot: chatUnread > 0,
+      // Il numero dei non letti, non un pallino: a ogni messaggio nuovo il
+      // contatore «salta» e finche' non si legge pulsa.
+      badge: chatUnread,
+      badgeTone: chatMentions > 0 ? 'mention' : 'alert',
       dotLabel: t('sidebarTabChatUnread'),
       show: showChat,
     },
@@ -2194,12 +2351,15 @@ function LiveSidebar({
           strokeLinejoin="round"
           aria-hidden="true"
         >
-          <path d="M4 7h10" />
-          <path d="M4 12h16" />
-          <path d="M4 17h7" />
+          <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z" />
         </svg>
       ),
-      show: effWordCloud,
+      // Chi conduce la vede anche spenta: dentro c'e' la spiegazione, e la
+      // prima domanda la accende per tutti. Era la funzione che nessuno usava
+      // perche' andava prima scoperta e accesa da un'altra parte.
+      show: effWordCloud || isModerator,
+      dot: wordcloudNew,
+      dotLabel: t('sidebarTabWordcloudNew'),
     },
     {
       key: 'agenda',
@@ -2217,8 +2377,11 @@ function LiveSidebar({
           strokeLinejoin="round"
           aria-hidden="true"
         >
-          <path d="M9 11l3 3L22 4" />
-          <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+          <rect x="3" y="4" width="6" height="6" rx="1" />
+          <path d="m3 17 2 2 4-4" />
+          <path d="M13 6h8" />
+          <path d="M13 12h8" />
+          <path d="M13 18h8" />
         </svg>
       ),
       show: effAgenda,
@@ -2268,7 +2431,10 @@ function LiveSidebar({
           <path d="M16 3.13a4 4 0 0 1 0 7.75" />
         </svg>
       ),
-      badge: participantCount,
+      // Il conteggio della sala quando c'e': quello del pannello si ferma
+      // quando il pannello si chiude.
+      badge: roomCount && roomCount > 0 ? roomCount : participantCount,
+      badgeTone: 'neutral',
       show: true,
     },
   ];
@@ -2341,8 +2507,17 @@ function LiveSidebar({
             <span className="live-floating-btn__icon">{tab.svg}</span>
             <span className="live-floating-btn__label">{tab.label}</span>
             {tab.badge !== undefined && tab.badge > 0 && (
-              <span className="live-floating-btn__badge" aria-hidden="true">
-                {tab.badge}
+              <span
+                // La chiave cambia col numero: il contatore rinasce e la sua
+                // animazione d'ingresso riparte a ogni messaggio nuovo.
+                key={tab.badgeTone !== 'neutral' ? tab.badge : 'n'}
+                className={`live-floating-btn__badge${
+                  tab.badgeTone === 'mention' ? ' is-alert is-mention' : tab.badgeTone === 'alert' ? ' is-alert' : ''
+                }`}
+                aria-hidden="true"
+              >
+                {tab.badgeTone === 'mention' && '@'}
+                {tab.badge > 99 ? '99+' : tab.badge}
               </span>
             )}
             {tab.dot && (
@@ -2364,6 +2539,54 @@ function LiveSidebar({
           overlays the Jitsi iframe and scales with the video. */}
       {slot && createPortal(floatingBar, slot)}
 
+      {chatPreview && (
+        <div
+          className={`chat-preview${
+            chatPreview.mentionsMe || chatPreview.repliesToMe ? ' chat-preview--mention' : ''
+          }`}
+        >
+          <button
+            type="button"
+            className="chat-preview__open"
+            onClick={() => {
+              setChatPreview(null);
+              setActiveTab('chat');
+              setDrawerOpen(true);
+            }}
+          >
+            <span
+              className="chat-preview__avatar"
+              style={{ backgroundColor: avatarColor(chatPreview.senderKey || chatPreview.senderName) }}
+              aria-hidden="true"
+            >
+              {avatarInitials(chatPreview.senderName)}
+            </span>
+            <span className="chat-preview__body">
+              <span className="chat-preview__title">
+                {chatPreview.mentionsMe
+                  ? t('chat.mentionNotificationTitle', { name: chatPreview.senderName })
+                  : chatPreview.repliesToMe
+                    ? t('chat.replyNotificationTitle', { name: chatPreview.senderName })
+                    : t('chat.messageNotificationTitle', { name: chatPreview.senderName })}
+              </span>
+              <span className="chat-preview__text">{chatPreview.text}</span>
+            </span>
+          </button>
+          <button
+            type="button"
+            className="chat-preview__close"
+            aria-label={tCommon('close')}
+            onClick={() => setChatPreview(null)}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
+                 strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </div>
+      )}
+
       {/* Scrim visible whenever the drawer is open (desktop + mobile).
           Click = close. */}
       <button
@@ -2376,7 +2599,34 @@ function LiveSidebar({
 
       <div
         className={`d-flex flex-column live-sidebar${drawerOpen ? ' live-sidebar--open' : ''}`}
+        style={
+          isDesktop && sidebarWidth !== null
+            ? { width: sidebarWidth, flexBasis: sidebarWidth, maxWidth: 'none' }
+            : undefined
+        }
       >
+        {isDesktop && (
+          <div
+            className="live-sidebar-resizer"
+            role="separator"
+            aria-orientation="vertical"
+            aria-label={t('resizeSidebar')}
+            aria-valuenow={sidebarWidth ?? SIDEBAR_DEFAULT_W}
+            aria-valuemin={SIDEBAR_MIN_W}
+            aria-valuemax={SIDEBAR_MAX_W}
+            title={t('resizeSidebar')}
+            tabIndex={0}
+            onPointerDown={onResizerPointerDown}
+            onPointerMove={onResizerPointerMove}
+            onPointerUp={onResizerPointerUp}
+            onPointerCancel={onResizerPointerUp}
+            onKeyDown={onResizerKeyDown}
+            onDoubleClick={() => {
+              setSidebarWidth(null);
+              salvaLarghezza(null);
+            }}
+          />
+        )}
         {/* Desktop persistent-column tab strip (mobile keeps the floating bar
             + drawer header below). Proper tablist semantics for keyboard/SR. */}
         <div
@@ -2401,7 +2651,22 @@ function LiveSidebar({
                 </span>
                 <span className="live-sidebar-tab__label">{tab.label}</span>
                 {tab.badge !== undefined && tab.badge > 0 && (
-                  <span className="live-sidebar-tab__badge">{tab.badge}</span>
+                  <span
+                    key={tab.badgeTone !== 'neutral' ? tab.badge : 'n'}
+                    className={`live-sidebar-tab__badge${
+                      tab.badgeTone === 'mention'
+                        ? ' is-alert is-mention'
+                        : tab.badgeTone === 'alert'
+                          ? ' is-alert'
+                          : ' is-neutral'
+                    }`}
+                  >
+                    {tab.badgeTone === 'mention' && '@'}
+                    {tab.badge > 99 ? '99+' : tab.badge}
+                    {tab.badgeTone !== 'neutral' && tab.dotLabel && (
+                      <span className="visually-hidden"> {tab.dotLabel}</span>
+                    )}
+                  </span>
                 )}
                 {tab.dot && <span className="live-sidebar-tab__dot" aria-hidden="true" />}
               </button>
@@ -2520,6 +2785,9 @@ function LiveSidebar({
                 isModerator={isModerator}
                 active={isChatActive}
                 onUnreadCountChange={setChatUnread}
+                onPreview={setChatPreview}
+                onUnreadMentionsChange={setChatMentions}
+                getRoster={getRoster}
               />
             </div>
           )}
@@ -2540,15 +2808,18 @@ function LiveSidebar({
               voterGuestId={voterGuestId}
               active={pollsOnScreen}
               onUnvotedCountChange={setPollsUnvoted}
+              presentCount={roomCount && roomCount > 0 ? roomCount : participantCount}
             />
           </div>
-          {activeTab === 'wordcloud' && effWordCloud && (
+          {activeTab === 'wordcloud' && (effWordCloud || isModerator) && (
             <WordCloud
               eventSlug={eventSlug}
               token={token}
               isModerator={isModerator}
               voterAccessToken={voterAccessToken}
               voterGuestId={voterGuestId}
+              enabled={effWordCloud}
+              onEnable={accendiParole}
             />
           )}
           {activeTab === 'agenda' && effAgenda && (
@@ -2722,7 +2993,6 @@ function LiveTopBar({
   const badgeColors = ROLE_BADGE_COLORS[role];
   const { kicker, main } = splitTitleKicker(title, parseTitleKicker);
   const thumbUrl = imageUrl ?? coverImageUrl ?? null;
-  const monogram = (main.trim().charAt(0) || title.trim().charAt(0) || '?').toUpperCase();
 
   return (
     <div
@@ -2732,7 +3002,7 @@ function LiveTopBar({
         boxShadow: '0 2px 8px rgba(0, 40, 85, 0.3)',
       }}
     >
-      <div className="d-flex align-items-center">
+      <div className="d-flex align-items-center live-top-bar__lead">
         {/* PA Webinar brand — the immersive call overlay deliberately hides the
             site header/footer (wrong to show full chrome over a fullscreen
             call), so surface the brand here for orientation. Non-navigating on
@@ -2758,7 +3028,9 @@ function LiveTopBar({
             </span>
           )}
         </div>
-        {thumbUrl ? (
+        {/* La miniatura solo se l'evento ha un'immagine: l'iniziale del
+            titolo in un quadratino non diceva niente a nessuno. */}
+        {thumbUrl && (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={thumbUrl}
@@ -2773,22 +3045,6 @@ function LiveTopBar({
               border: '1px solid rgba(255,255,255,0.25)',
             }}
           />
-        ) : (
-          <span
-            aria-hidden="true"
-            className="me-2 flex-shrink-0 d-inline-flex align-items-center justify-content-center fw-bold"
-            style={{
-              width: 28,
-              height: 28,
-              borderRadius: 6,
-              background: 'linear-gradient(135deg, #0066CC 0%, #004080 100%)',
-              color: '#fff',
-              fontSize: '0.8rem',
-              border: '1px solid rgba(255,255,255,0.25)',
-            }}
-          >
-            {monogram}
-          </span>
         )}
         <h1 className="h6 mb-0 me-3 text-white">
           {kicker && (
@@ -2804,7 +3060,7 @@ function LiveTopBar({
         <Badge
           color=""
           pill
-          className="px-2 py-1 me-2"
+          className="px-2 py-1 me-2 live-role-badge"
           style={{
             backgroundColor: badgeColors.badge,
             color: badgeColors.badgeFg,
@@ -2819,7 +3075,11 @@ function LiveTopBar({
          *  under-reported. The sidebar remains the single
          *  source of truth for the present-participant count. */}
       </div>
-      <div className="d-flex align-items-center gap-3">
+      {/* L'argomento in corso della scaletta, per chi segue chiamata e chat
+          senza aprire il pannello: si apre sull'elenco completo. Sul telefono
+          va su una riga sua, sotto titolo e comandi. */}
+      <AgendaTicker eventSlug={slug} isModerator={role === 'moderator'} />
+      <div className="live-top-bar__actions d-flex align-items-center gap-2">
         {isRecording && (
           <Badge color="danger" pill className="px-2 py-1">
             <span className="me-1">●</span>
@@ -2885,8 +3145,8 @@ function LiveTopBar({
             onClick={onLeaveRoom}
             aria-label={t('leaveRoom')}
           >
-            <Icon icon="it-external-link" size="xs" color="white" className="me-1" />
-            {t('leaveRoom')}
+            <Icon icon="it-logout" size="xs" color="white" />
+            <span className="leave-room-btn__text">{t('leaveRoom')}</span>
           </Button>
         )}
       </div>
@@ -2951,8 +3211,11 @@ function ScreenshareBanner({ api }: { api: JitsiMeetExternalAPI }) {
     <div
       className="d-flex align-items-center gap-2 px-3 py-2"
       style={{
-        background: 'linear-gradient(90deg, #F7A11A 0%, #D97706 100%)',
-        color: '#fff',
+        // Fascia informativa chiara, come gli avvisi della sala: il bianco
+        // sull'arancio di prima non arrivava al contrasto minimo (circa 2,5:1).
+        background: '#E6F0FA',
+        color: '#004D99',
+        borderBottom: '1px solid #CFE0F3',
         fontSize: '0.88rem',
         fontWeight: 600,
         flexShrink: 0,

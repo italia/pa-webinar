@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect, useRef, type FormEvent } from 'react';
 import { useTranslations } from 'next-intl';
-import { Button, Alert } from 'design-react-kit';
+import { Button } from 'design-react-kit';
 
 import { questionSubmitBody, questionSubmitError } from './question-request';
 
@@ -115,72 +115,70 @@ export default function QuestionForm({
   const remaining = MAX_LENGTH - text.length;
 
   return (
-    <form onSubmit={handleSubmit} className="mb-3">
-      {success && (
-        <Alert color="success" className="py-2 mb-2">
-          {t('questionSent')}
-        </Alert>
-      )}
+    <form onSubmit={handleSubmit} className="qa-composer">
+      <label htmlFor="qa-question-textarea" className="qa-composer__label">
+        {t('yourQuestionLabel')}
+      </label>
+      <p id="qa-question-hint" className="qa-composer__hint">
+        {t('ctaBody')}
+      </p>
+      <textarea
+        id="qa-question-textarea"
+        className="form-control qa-composer__input"
+        rows={3}
+        maxLength={MAX_LENGTH}
+        placeholder={t('placeholderInviting')}
+        aria-describedby="qa-question-hint"
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+        disabled={submitting || cooldown > 0}
+      />
 
       {error && (
-        <Alert color="danger" className="py-2 mb-2">
+        <p className="qa-error" role="alert">
           {error}
-        </Alert>
+        </p>
+      )}
+      {success && (
+        <p className="qa-composer__sent" role="status">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
+               strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M20 6 9 17l-5-5" />
+          </svg>
+          {t('questionSent')}
+        </p>
       )}
 
-      <div className="mb-2">
-        <label
-          htmlFor="qa-question-textarea"
-          className="form-label fw-semibold mb-1"
+      <div className="qa-composer__foot">
+        <small className={`qa-composer__count${remaining < 50 ? ' is-low' : ''}`}>
+          {cooldown > 0 ? t('cooldownWait', { seconds: cooldown }) : `${remaining}/${MAX_LENGTH}`}
+        </small>
+        <Button
+          color="primary"
+          type="submit"
+          size="sm"
+          className="qa-composer__send"
+          disabled={submitting || cooldown > 0 || text.trim().length < 3}
         >
-          {t('yourQuestionLabel')}
-        </label>
-        <textarea
-          id="qa-question-textarea"
-          className="form-control"
-          rows={3}
-          maxLength={MAX_LENGTH}
-          placeholder={t('placeholderInviting')}
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          disabled={submitting || cooldown > 0}
-        />
-        <div className="d-flex justify-content-between mt-1">
-          <small className={remaining < 50 ? 'text-danger' : 'text-muted'}>
-            {remaining}/{MAX_LENGTH}
-          </small>
-          {cooldown > 0 && (
-            <small className="text-muted">
-              {t('cooldownWait', { seconds: cooldown })}
-            </small>
-          )}
-        </div>
+          {/* Inline SVG instead of <Icon> to avoid design-react-kit
+              hydration mismatches inside interactive forms. */}
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <line x1="22" y1="2" x2="11" y2="13" />
+            <polygon points="22 2 15 22 11 13 2 9 22 2" />
+          </svg>
+          {submitting ? t('submitting') : t('submitPrimary')}
+        </Button>
       </div>
-
-      <Button
-        color="primary"
-        type="submit"
-        className="w-100 d-flex align-items-center justify-content-center gap-2"
-        disabled={submitting || cooldown > 0 || text.trim().length < 3}
-      >
-        {/* Inline SVG instead of <Icon> to avoid design-react-kit
-            hydration mismatches inside interactive forms. */}
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          aria-hidden="true"
-        >
-          <line x1="22" y1="2" x2="11" y2="13" />
-          <polygon points="22 2 15 22 11 13 2 9 22 2" />
-        </svg>
-        {submitting ? t('submitting') : t('submitPrimary')}
-      </Button>
     </form>
   );
 }

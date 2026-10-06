@@ -1,15 +1,51 @@
 {
   "agenda": {
-    "title": "Poznámky / kontrolný zoznam",
-    "empty": "Zatiaľ žiadne body. Pridajte témy, ktoré treba prebrať, a postupne ich odškrtávajte.",
+    "title": "Program",
+    "empty": "Program ešte nebol pripravený.",
     "add": "Pridať",
-    "addPlaceholder": "Nový bod…",
-    "remove": "Odstrániť",
+    "addPlaceholder": "Nová téma…",
+    "remove": "Odstrániť tému",
     "inProgress": "prebieha",
     "agree": "Súhlasím",
     "disagree": "Nesúhlasím",
     "favorablePct": "{pct} % za",
-    "noReactions": "Vyjadrite svoj názor"
+    "noReactions": "Vyjadrite svoj názor",
+    "emptyModerator": "Pridajte témy stretnutia: počas podujatia označujete priebeh a sála vidí aktuálnu tému.",
+    "progress": "{done} z {total} prebratých",
+    "skippedCount": "{count, plural, one {# preskočená} few {# preskočené} other {# preskočených}}",
+    "nextTopic": "Ďalšia téma:",
+    "startFirst": "Začnite témou:",
+    "finishCurrent": "Ukončiť aktuálnu tému",
+    "runningFor": "{minutes, plural, =0 {práve začala} one {už # minútu} few {už # minúty} other {už # minút}}",
+    "tickerNow": "Teraz",
+    "status": {
+      "PENDING": "Na prebratie",
+      "CURRENT": "Prebieha",
+      "DONE": "Prebraté",
+      "SKIPPED": "Preskočené"
+    },
+    "actions": {
+      "start": "Začať teraz",
+      "done": "Označiť ako prebraté",
+      "skip": "Preskočiť",
+      "reopen": "Znovu otvoriť",
+      "edit": "Upraviť",
+      "moveUp": "Posunúť nahor",
+      "moveDown": "Posunúť nadol"
+    },
+    "plannedMinutes": "plánované {minutes} min",
+    "elapsedOfPlanned": "{minutes} z {planned} min",
+    "overtime": "nad plán",
+    "tookMinutes": "{minutes} min",
+    "plannedTotal": "Plánovaná dĺžka: {minutes} min",
+    "pulsePrompt": "Súhlasíte?",
+    "addHint": "Enter pridá, Shift+Enter nový riadok. Môžete vložiť zoznam: jedna téma na riadok.",
+    "addMany": "{count, plural, one {Pridať # tému} few {Pridať # témy} other {Pridať # tém}}",
+    "minutesPlaceholder": "min",
+    "minutesLabel": "Plánovaná dĺžka v minútach (nepovinné)",
+    "editLabel": "Názov témy",
+    "agendaChanged": "Program sa práve zmenil: skúste to znova.",
+    "minutesInvalid": "Zadajte dĺžku v minútach, od 1 do 600."
   },
   "common": {
     "appName": "PA Webinar",
@@ -64,7 +100,7 @@
     "past": "Minulé udalosti",
     "noUpcoming": "V tejto chvíli nie sú naplánované žiadne udalosti. Navštívte nás znova!",
     "noPast": "Žiadne minulé udalosti",
-    "wordCloudTitle": "Slovný mrak",
+    "wordCloudTitle": "Jedným slovom",
     "card": {
       "publicEvent": "Verejná udalosť",
       "readMore": "Zistiť viac",
@@ -173,6 +209,7 @@
     "resendLink": "Znova poslať prístupový odkaz",
     "resending": "Odosiela sa…",
     "resendSent": "Ak je adresa zaregistrovaná, znova sme vám e-mailom poslali prístupový odkaz.",
+    "resendFailed": "Odkaz sa nepodarilo znova odoslať. Skúste to znova o niekoľko minút.",
     "invitationOnly": "Registrácia je vyhradená pre pozvané osoby: použite e-mailovú adresu, na ktorú ste boli pozvaní. Odkaz na vstup vám príde e-mailom.",
     "closed": "Registrácia na túto udalosť nie je otvorená verejnosti.",
     "lostLink": "Už ste registrovaní? Nechajte si znova poslať svoj osobný odkaz",
@@ -317,9 +354,9 @@
     "whiteboardNotSavedHint": "Tabuľa sa neukladá automaticky. Ak ju použijete, exportujte ju (menu tabule) a pred ukončením ju priložte k materiálom podujatia.",
     "sidebarTabChat": "Chat",
     "sidebarTabPolls": "Ankety",
-    "sidebarTabWordcloud": "Slovný mrak",
-    "sidebarTabAgenda": "Poznámky / kontrolný zoznam",
-    "liveToggleAgenda": "Poznámky / kontrolný zoznam (agenda)",
+    "sidebarTabWordcloud": "Jedným slovom",
+    "sidebarTabAgenda": "Program",
+    "liveToggleAgenda": "Program",
     "sidebarTabMaterials": "Materiály",
     "sidebarTabParticipants": "Účastníci",
     "chat": {
@@ -371,7 +408,20 @@
       "notifyDesktopBlocked": "Prehliadač blokuje upozornenia tejto stránky: môžete ich znova povoliť v nastaveniach stránky.",
       "notifyDesktopUnsupported": "Tento prehliadač nepodporuje upozornenia.",
       "notifyOffer": "Chcete upozornenie, keď vás niekto spomenie alebo vám odpovie?",
-      "notifyOfferEnable": "Zapnúť upozornenia"
+      "notifyOfferEnable": "Zapnúť upozornenia",
+      "emojiSearch": "Hľadať emoji",
+      "emojiNoResults": "Nenašlo sa žiadne emoji",
+      "emojiRecent": "Nedávno použité",
+      "emojiAll": "Všetky emoji",
+      "mentionListLabel": "Ľudia na označenie",
+      "mentionButton": "Označiť niekoho",
+      "replyJump": "Prejsť na pôvodnú správu",
+      "typingOne": "{name} píše…",
+      "typingTwo": "{a} a {b} píšu…",
+      "typingMany": "Niekoľko ľudí píše…",
+      "hideForAll": "Skryť všetkým",
+      "deleteOwn": "Odstrániť správu",
+      "mentionedYou": "Spomenul(a) vás"
     },
     "role": {
       "moderator": "Moderátor",
@@ -470,7 +520,9 @@
     "rejoin": "Vrátiť sa",
     "backToHome": "Späť na úvodnú stránku",
     "sidebarTabMaterialsNew": "Nové zdieľané materiály",
-    "sidebarTabQaNew": "Novinky v Otázkach a odpovediach"
+    "sidebarTabQaNew": "Novinky v Otázkach a odpovediach",
+    "resizeSidebar": "Zmeniť veľkosť bočného panela",
+    "sidebarTabWordcloudNew": "Nová otázka „Jedným slovom“"
   },
   "qa": {
     "title": "Otázky a odpovede",
@@ -1280,10 +1332,10 @@
       "qaEnabled": "Povoliť Q&A",
       "chatEnabled": "Povoliť chat",
       "recordingEnabled": "Povoliť videozáznam",
-      "agendaEnabled": "Živé poznámky / kontrolný zoznam (agenda)",
-      "agendaEnabledDesc": "Kontrolný zoznam tém, ktoré moderátori počas podujatia odškrtávajú. Premietne sa do automatického zhrnutia. Voliteľné, dá sa zapnúť aj počas podujatia.",
-      "wordCloudEnabled": "Živý oblak slov",
-      "wordCloudEnabledDesc": "Účastníci pošlú slovo a oblak sa aktualizuje naživo. Užitočné na otvorenie diskusie alebo zachytenie nálady v priebehu niekoľkých sekúnd.",
+      "agendaEnabled": "Program stretnutia",
+      "agendaEnabledDesc": "Zoznam tém stretnutia: počas podujatia moderátor označuje aktuálnu, prebraté a preskočené témy a sála vždy vidí, kde sa nachádza, aj v hornej lište. Vstupuje do automatického zhrnutia. Voliteľné, dá sa zapnúť aj počas podujatia.",
+      "wordCloudEnabled": "Otázky „Jedným slovom“",
+      "wordCloudEnabledDesc": "Moderátor položí otázku a každý odpovie jediným slovom: odpovede vytvoria oblak, ktorý sa aktualizuje naživo, a najčastejšie slová sa zväčšujú. Hodí sa na prelomenie ľadov alebo rýchly zber dojmov.",
       "whiteboardEnabled": "Zdieľaná tabuľa",
       "whiteboardEnabledDesc": "Zapne natívnu spoločnú tabuľu (Excalidraw): moderátori ju môžu počas podujatia otvoriť z panela nástrojov. Vyžaduje službu tabule v inštalácii; kde je k dispozícii, je pri okamžitých hovoroch vždy zapnutá.",
       "autoStartRecording": "Spustiť záznam automaticky",
@@ -2760,8 +2812,8 @@
         "desc": "Odpovedajte na ankety v reálnom čase a okamžite uvidíte výsledky."
       },
       "wordcloud": {
-        "title": "Slovný mrak",
-        "desc": "Pridajte svoje slová do zdieľaného slovného mraku podujatia."
+        "title": "Jedným slovom",
+        "desc": "Odpovedajte jedným slovom na otázky moderátora a sledujte, ako rastie oblak odpovedí."
       },
       "reactions": {
         "title": "Reakcie a zdvihnuté ruky",
@@ -2772,8 +2824,8 @@
         "desc": "Píšte do chatu podujatia a sledujte konverzáciu s ostatnými účastníkmi."
       },
       "agenda": {
-        "title": "Program a poznámky",
-        "desc": "Sledujte program a poznámky, ktoré moderátori zdieľajú počas podujatia."
+        "title": "Program",
+        "desc": "Sledujte aktuálnu tému a program stretnutia."
       }
     },
     "projectTeaser": {
@@ -2888,8 +2940,17 @@
       "minOptions": "Sú potrebné aspoň 2 možnosti",
       "generic": "Chyba pri vytváraní ankety",
       "vote": "Hlas nebol zaznamenaný. Skúste to znova.",
-      "alreadyVoted": "V tejto ankete ste už hlasovali."
-    }
+      "alreadyVoted": "V tejto ankete ste už hlasovali.",
+      "action": "Akcia zlyhala. Skúste to znova."
+    },
+    "participation": "{votes, plural, one {# hlas} few {# hlasy} other {# hlasov}} z {present} prítomných",
+    "participationLabel": "Účasť v ankete",
+    "yourVote": "Váš hlas",
+    "deletePoll": "Odstrániť anketu",
+    "questionLabel": "Otázka",
+    "optionsLabel": "Možné odpovede",
+    "resultsHidden": "Hlas bol zaznamenaný. Výsledky sa zobrazia, keď ich moderátor zverejní.",
+    "closedNoVote": "Hlasovanie je uzavreté. Výsledky sa zobrazia, keď ich moderátor zverejní."
   },
   "materials": {
     "title": "Materiály",
@@ -3497,16 +3558,16 @@
     "noFeedback": "Žiadna spätná väzba"
   },
   "wordcloud": {
-    "title": "Slovný mrak",
+    "title": "Jedným slovom",
     "startRound": "Spustiť",
-    "prompt": "Téma",
+    "prompt": "Otázka",
     "promptPlaceholder": "napr. Čo od tejto udalosti očakávate?",
     "duration": "Trvanie",
     "submit": "Odoslať",
-    "submitPlaceholder": "Napíšte slovo (max. 30 znakov)",
-    "close": "Zavrieť slovný mrak",
+    "submitPlaceholder": "Vaše slovo",
+    "close": "Uzavrieť odpovede",
     "cancel": "Zrušiť",
-    "noActiveRound": "Momentálne nie je aktívny žiadny slovný mrak.",
+    "noActiveRound": "Momentálne nie je otvorená žiadna otázka.",
     "noWords": "Čakáme na prvé slová...",
     "wordsSubmitted": "{count} odoslaných slov",
     "timeRemaining": "Zostávajúci čas",
@@ -3514,11 +3575,22 @@
       "send": "Slovo sa neodoslalo. Skúste to znova.",
       "closed": "Toto kolo je uzavreté: ďalšie slová sa už neprijímajú.",
       "limit": "V tomto kole ste už odoslali maximálny počet slov.",
-      "rateLimited": "Práve prebieha príliš veľa odoslaní: počkajte niekoľko sekúnd, než to skúsite znova."
+      "rateLimited": "Práve prebieha príliš veľa odoslaní: počkajte niekoľko sekúnd, než to skúsite znova.",
+      "duplicate": "Toto slovo ste už napísali: počíta sa len raz na osobu.",
+      "removed": "Moderátor toto slovo odstránil: nedá sa poslať znova.",
+      "invalid": "Napíšte slovo z písmen alebo číslic."
     },
-    "startNew": "Spustiť slovný mrak",
-    "emptyHintModerator": "Položte otvorenú otázku: jednoslovné odpovede tvoria mrak v reálnom čase.",
-    "timeLeft": "Zostávajúci čas: {time}"
+    "startNew": "Položiť otázku",
+    "emptyHintModerator": "Položte otázku, na ktorú sa dá odpovedať jedným slovom, napríklad „Ako sa dnes cítite?“. Odpovede vytvoria oblak, ktorý sa aktualizuje naživo: čím viac ľudí napíše rovnaké slovo, tým je väčšie.",
+    "timeLeft": "Zostávajúci čas: {time}",
+    "howItWorks": "Odpovedzte jediným slovom: čím viac ľudí napíše rovnaké slovo, tým je väčšie.",
+    "enableHint": "Karta „Jedným slovom“ sa všetkým zobrazí, keď spustíte prvú otázku.",
+    "topWords": "Najčastejšie",
+    "yourWords": "Napísali ste:",
+    "closedBadge": "Ukončené",
+    "durationUnlimited": "Bez časového limitu",
+    "allWords": "Všetky slová",
+    "removeWord": "Odstrániť z oblaku"
   },
   "timer": {
     "title": "Časovač",
@@ -3915,7 +3987,7 @@
     "showPolls": "Zobraziť výsledky ankiet",
     "showFeedback": "Zobraziť spätnú väzbu",
     "showRecap": "Zobraziť zhrnutie podujatia",
-    "showWordCloud": "Zobraziť slovný mrak",
+    "showWordCloud": "Zobraziť odpovede „Jedným slovom“",
     "emailEnabled": "Po skončení podujatia odoslať súhrnný e-mail",
     "emailEnabledHelp": "Po skončení odošle registrovaným účastníkom ďakovný e-mail s odkazmi na zhrnutie a spätnú väzbu a moderátorovi krátky súhrn. Odosiela sa len raz.",
     "feedbackEnabled": "Dotazník spätnej väzby aktívny po skončení udalosti",
@@ -3976,7 +4048,7 @@
     "micToggleOn": "Mikrofón ZAP",
     "micToggleOff": "Mikrofón VYP",
     "cameraOffPreview": "Kamera vypnutá",
-    "speakerTest": "🔊 Test zvuku",
+    "speakerTest": "Test zvuku",
     "backgroundLabel": "Virtuálne pozadie",
     "backgroundNoneShort": "No",
     "backgroundHint": "Použije sa po vstupe do miestnosti. Na rozmazanie pozadia použite po vstupe tlačidlo pozadí: náhľad vyššie zobrazuje kameru bez efektu.",

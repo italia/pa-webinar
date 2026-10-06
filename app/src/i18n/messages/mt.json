@@ -1,15 +1,51 @@
 {
   "agenda": {
-    "title": "Noti / Lista ta' kontroll",
-    "empty": "Għad m'hemm l-ebda punt. Żid it-temi li trid tkopri u mmarkahom hekk kif tgħaddi minnhom.",
+    "title": "Aġenda",
+    "empty": "L-aġenda għadha ma ġietx ippreparata.",
     "add": "Żid",
-    "addPlaceholder": "Punt ġdid…",
-    "remove": "Neħħi",
+    "addPlaceholder": "Suġġett ġdid…",
+    "remove": "Ħassar is-suġġett",
     "inProgress": "għaddej",
     "agree": "Naqbel",
     "disagree": "Ma naqbilx",
     "favorablePct": "{pct}% favur",
-    "noReactions": "Esprimi l-opinjoni tiegħek"
+    "noReactions": "Esprimi l-opinjoni tiegħek",
+    "emptyModerator": "Żid is-suġġetti tal-laqgħa: matul l-avveniment timmarka l-progress u s-sala tara s-suġġett attwali.",
+    "progress": "{done} minn {total} diskussi",
+    "skippedCount": "{count, plural, one {# maqbuż} other {# maqbuża}}",
+    "nextTopic": "Is-suġġett li jmiss:",
+    "startFirst": "Ibda b':",
+    "finishCurrent": "Temm is-suġġett attwali",
+    "runningFor": "{minutes, plural, =0 {għadu kif beda} one {ilu # minuta} other {ilu # minuti}}",
+    "tickerNow": "Issa",
+    "status": {
+      "PENDING": "Biex jiġi diskuss",
+      "CURRENT": "Għaddej",
+      "DONE": "Diskuss",
+      "SKIPPED": "Maqbuż"
+    },
+    "actions": {
+      "start": "Ibda issa",
+      "done": "Immarka bħala diskuss",
+      "skip": "Aqbeż",
+      "reopen": "Erġa' iftaħ",
+      "edit": "Editja",
+      "moveUp": "Ċaqlaq 'il fuq",
+      "moveDown": "Ċaqlaq 'l isfel"
+    },
+    "plannedMinutes": "{minutes} min ippjanati",
+    "elapsedOfPlanned": "{minutes} minn {planned} min",
+    "overtime": "lil hinn mill-ħin",
+    "tookMinutes": "{minutes} min",
+    "plannedTotal": "Tul ippjanat: {minutes} min",
+    "pulsePrompt": "Taqbel?",
+    "addHint": "Enter biex iżżid, Shift+Enter għal linja ġdida. Tista' twaħħal lista: suġġett wieħed f'kull linja.",
+    "addMany": "{count, plural, one {Żid # suġġett} other {Żid # suġġetti}}",
+    "minutesPlaceholder": "min",
+    "minutesLabel": "Tul ippjanat f'minuti (fakultattiv)",
+    "editLabel": "Titlu tas-suġġett",
+    "agendaChanged": "L-aġenda għadha kif inbidlet: erġa' pprova.",
+    "minutesInvalid": "Ikteb it-tul f'minuti, minn 1 sa 600."
   },
   "common": {
     "appName": "PA Webinar",
@@ -64,7 +100,7 @@
     "past": "Avvenimenti passati",
     "noUpcoming": "M'hemmx avvenimenti skedati bħalissa. Erġa' ċċekkja aktar tard!",
     "noPast": "L-ebda avvenimenti passati",
-    "wordCloudTitle": "Sħaba ta' kliem",
+    "wordCloudTitle": "F'kelma waħda",
     "card": {
       "publicEvent": "Avveniment pubbliku",
       "readMore": "Aqra aktar",
@@ -173,6 +209,7 @@
     "resendLink": "Ibgħat il-link tal-aċċess mill-ġdid",
     "resending": "Qed jintbagħat…",
     "resendSent": "Jekk l-indirizz ikun irreġistrat, bgħatnielek il-link tal-aċċess mill-ġdid bl-email.",
+    "resendFailed": "Ma setgħux nerġgħu nibagħtu l-link. Erġa' pprova fi ftit minuti.",
     "invitationOnly": "Ir-reġistrazzjoni hija riżervata għal persuni mistiedna: uża l-indirizz tal-email li bih ġejt mistieden/mistiedna. Il-link biex tidħol jaslek bl-email.",
     "closed": "Ir-reġistrazzjoni għal dan l-avveniment mhijiex miftuħa għall-pubbliku.",
     "lostLink": "Diġà rreġistrajt? Irċievi l-link personali tiegħek mill-ġdid",
@@ -317,9 +354,9 @@
     "whiteboardNotSavedHint": "Il-whiteboard ma tiġix salvata awtomatikament. Jekk tużaha, esportaha (mill-menu tal-whiteboard) u waħħalha mal-Materjali tal-avveniment qabel ma ttemm.",
     "sidebarTabChat": "Chat",
     "sidebarTabPolls": "Stħarriġ",
-    "sidebarTabWordcloud": "Sħaba ta' kliem",
-    "sidebarTabAgenda": "Noti / Lista ta' kontroll",
-    "liveToggleAgenda": "Noti / Lista ta' kontroll (aġenda)",
+    "sidebarTabWordcloud": "F'kelma waħda",
+    "sidebarTabAgenda": "Aġenda",
+    "liveToggleAgenda": "Aġenda",
     "sidebarTabMaterials": "Materjali",
     "sidebarTabParticipants": "Parteċipanti",
     "chat": {
@@ -371,7 +408,20 @@
       "notifyDesktopBlocked": "Il-brawżer qed jimblokka n-notifiki ta' dan is-sit: tista' terġa' tippermettihom mis-settings tas-sit.",
       "notifyDesktopUnsupported": "Dan il-brawżer ma jappoġġjax notifiki.",
       "notifyOffer": "Trid notifika meta xi ħadd isemmik jew iwieġbek?",
-      "notifyOfferEnable": "Ixgħel in-notifiki"
+      "notifyOfferEnable": "Ixgħel in-notifiki",
+      "emojiSearch": "Fittex emoji",
+      "emojiNoResults": "Ma nstab l-ebda emoji",
+      "emojiRecent": "Użati riċentement",
+      "emojiAll": "L-emoji kollha",
+      "mentionListLabel": "Persuni biex issemmi",
+      "mentionButton": "Semmi lil xi ħadd",
+      "replyJump": "Mur għall-messaġġ oriġinali",
+      "typingOne": "{name} qed jikteb…",
+      "typingTwo": "{a} u {b} qed jiktbu…",
+      "typingMany": "Diversi persuni qed jiktbu…",
+      "hideForAll": "Aħbi minn kulħadd",
+      "deleteOwn": "Ħassar il-messaġġ",
+      "mentionedYou": "Semmiek"
     },
     "role": {
       "moderator": "Moderatur",
@@ -470,7 +520,9 @@
     "rejoin": "Erġa' idħol",
     "backToHome": "Lura lejn il-paġna ewlenija",
     "sidebarTabMaterialsNew": "Materjali ġodda maqsuma",
-    "sidebarTabQaNew": "Ġdid fil-Mistoqsijiet u tweġibiet"
+    "sidebarTabQaNew": "Ġdid fil-Mistoqsijiet u tweġibiet",
+    "resizeSidebar": "Ibdel id-daqs tal-pannell tal-ġenb",
+    "sidebarTabWordcloudNew": "Mistoqsija ġdida “F'kelma waħda”"
   },
   "qa": {
     "title": "Mistoqsijiet u Tweġibiet",
@@ -1280,10 +1332,10 @@
       "qaEnabled": "Ippermetti Q&A",
       "chatEnabled": "Ippermetti ċ-chat",
       "recordingEnabled": "Ippermetti r-reġistrazzjoni bil-vidjo",
-      "agendaEnabled": "Noti / Lista ta' kontroll (aġenda) live",
-      "agendaEnabledDesc": "Lista ta' kontroll tat-temi li għandhom jiġu koperti, li l-moderaturi jimmarkaw matul l-avveniment. Tidħol fis-sommarju awtomatiku. Mhijiex obbligatorja u tista' tiġi attivata anke matul l-avveniment.",
-      "wordCloudEnabled": "Sħaba ta' kliem f'ħin reali",
-      "wordCloudEnabledDesc": "Il-parteċipanti jibagħtu kelma u s-sħaba tiġi aġġornata f'ħin reali. Utli biex tiftaħ diskussjoni jew tiġbor sentiment fi ftit sekondi.",
+      "agendaEnabled": "L-aġenda tal-laqgħa",
+      "agendaEnabledDesc": "Il-lista tas-suġġetti tal-laqgħa: matul l-avveniment il-moderatur jimmarka s-suġġett attwali, dawk diskussi u dawk maqbuża, u s-sala dejjem tara fejn waslu, anki fil-bar ta' fuq. Jidħol fis-sommarju awtomatiku. Fakultattiv, jista' jinxtegħel anki matul l-avveniment.",
+      "wordCloudEnabled": "Mistoqsijiet “F'kelma waħda”",
+      "wordCloudEnabledDesc": "Il-moderatur jistaqsi mistoqsija u kulħadd iwieġeb b'kelma waħda: it-tweġibiet jiffurmaw sħaba li tiġi aġġornata live, u l-aktar kliem frekwenti jikber. Utli biex tkisser is-silġ jew tiġbor impressjoni fi ftit sekondi.",
       "whiteboardEnabled": "Whiteboard kondiviża",
       "whiteboardEnabledDesc": "Tattiva l-whiteboard kollaborattiva nattiva (Excalidraw): il-moderaturi jistgħu jiftħuha mit-toolbar matul l-avveniment. Teħtieġ is-servizz tal-whiteboard tal-installazzjoni; fejn ikun disponibbli, hija dejjem attiva fis-sejħiet istantanji.",
       "autoStartRecording": "Ibda la reġistrazzjoni awtomatikament",
@@ -2760,8 +2812,8 @@
         "desc": "Wieġeb għall-istħarriġ f'ħin reali u ara r-riżultati mill-ewwel."
       },
       "wordcloud": {
-        "title": "Sħaba ta' kliem",
-        "desc": "Żid il-kliem tiegħek mas-sħaba ta' kliem kondiviża tal-avveniment."
+        "title": "F'kelma waħda",
+        "desc": "Wieġeb b'kelma waħda għall-mistoqsijiet tal-moderatur u ara s-sħaba tat-tweġibiet tikber."
       },
       "reactions": {
         "title": "Reazzjonijiet u idejn merfugħa",
@@ -2772,8 +2824,8 @@
         "desc": "Ikteb fil-chat tal-avveniment u segwi l-konversazzjoni mal-parteċipanti l-oħra."
       },
       "agenda": {
-        "title": "Aġenda u noti",
-        "desc": "Segwi l-aġenda u n-noti li l-moderaturi jaqsmu matul l-avveniment."
+        "title": "Aġenda",
+        "desc": "Segwi s-suġġett attwali u l-aġenda tal-laqgħa."
       }
     },
     "projectTeaser": {
@@ -2888,8 +2940,17 @@
       "minOptions": "Hemm bżonn ta' mill-inqas 2 għażliet",
       "generic": "Żball fil-ħolqien tal-istħarriġa",
       "vote": "Il-vot ma ġiex irreġistrat. Erġa' pprova.",
-      "alreadyVoted": "Diġà vvutajt f'dan l-istħarriġ."
-    }
+      "alreadyVoted": "Diġà vvutajt f'dan l-istħarriġ.",
+      "action": "L-azzjoni ma rnexxietx. Erġa' pprova."
+    },
+    "participation": "{votes, plural, one {# vot} other {# voti}} minn {present} preżenti",
+    "participationLabel": "Parteċipazzjoni fl-istħarriġ",
+    "yourVote": "Il-vot tiegħek",
+    "deletePoll": "Ħassar l-istħarriġ",
+    "questionLabel": "Mistoqsija",
+    "optionsLabel": "Tweġibiet possibbli",
+    "resultsHidden": "Il-vot ġie rreġistrat. Ir-riżultati jidhru meta l-moderatur jippubblikahom.",
+    "closedNoVote": "Il-vot għalaq. Ir-riżultati jidhru meta l-moderatur jippubblikahom."
   },
   "materials": {
     "title": "Materjali",
@@ -3497,16 +3558,16 @@
     "noFeedback": "L-ebda feedback irċevut"
   },
   "wordcloud": {
-    "title": "Sħaba ta' kliem",
+    "title": "F'kelma waħda",
     "startRound": "Ibda",
-    "prompt": "Tema",
+    "prompt": "Mistoqsija",
     "promptPlaceholder": "eż. X'qed tistenna minn dan l-avveniment?",
     "duration": "Tul",
     "submit": "Ibgħat",
-    "submitPlaceholder": "Ikteb kelma (massimu 30 kar.)",
-    "close": "Agħlaq is-sħaba ta' kliem",
+    "submitPlaceholder": "Il-kelma tiegħek",
+    "close": "Agħlaq it-tweġibiet",
     "cancel": "Ikkanċella",
-    "noActiveRound": "Bħalissa m'hemm l-ebda sħaba ta' kliem attiva.",
+    "noActiveRound": "M'hemm l-ebda mistoqsija miftuħa bħalissa.",
     "noWords": "Qed nistennew l-ewwel kliem...",
     "wordsSubmitted": "{count} kliem mibgħuta",
     "timeRemaining": "Ħin li fadal",
@@ -3514,11 +3575,22 @@
       "send": "Il-kelma ma ntbagħtitx. Erġa' pprova.",
       "closed": "Din ir-rawnd għalqet: ma jiġux aċċettati aktar kliem.",
       "limit": "Diġà bgħatt l-ogħla numru ta' kliem għal din ir-rawnd.",
-      "rateLimited": "Wisq invji bħalissa: stenna ftit sekondi qabel ma terġa' tipprova."
+      "rateLimited": "Wisq invji bħalissa: stenna ftit sekondi qabel ma terġa' tipprova.",
+      "duplicate": "Diġà ktibt din il-kelma: tgħodd darba biss għal kull persuna.",
+      "removed": "Il-moderatur neħħa din il-kelma: ma tistax terġa' tintbagħat.",
+      "invalid": "Ikteb kelma magħmula minn ittri jew numri."
     },
-    "startNew": "Ibda sħaba ta' kliem",
-    "emptyHintModerator": "Agħmel mistoqsija miftuħa: it-tweġibiet ta' kelma waħda jibnu s-sħaba f'ħin reali.",
-    "timeLeft": "Ħin li fadal: {time}"
+    "startNew": "Agħmel mistoqsija",
+    "emptyHintModerator": "Agħmel mistoqsija li titwieġeb b'kelma waħda, pereżempju “Kif qed tħossukom illum?”. It-tweġibiet jiffurmaw sħaba li tiġi aġġornata live: aktar ma jiktbu nies l-istess kelma, aktar tikber.",
+    "timeLeft": "Ħin li fadal: {time}",
+    "howItWorks": "Wieġeb b'kelma waħda: aktar ma jiktbu nies l-istess kelma, aktar tikber.",
+    "enableHint": "It-tab “F'kelma waħda” tidher lil kulħadd meta tibda l-ewwel mistoqsija.",
+    "topWords": "L-aktar miktuba",
+    "yourWords": "Ktibt:",
+    "closedBadge": "Magħluqa",
+    "durationUnlimited": "Mingħajr limitu ta' ħin",
+    "allWords": "Il-kliem kollu",
+    "removeWord": "Neħħi mis-sħaba"
   },
   "timer": {
     "title": "Timer",
@@ -3915,7 +3987,7 @@
     "showPolls": "Uri r-riżultati tal-istħarriġ",
     "showFeedback": "Uri l-feedback",
     "showRecap": "Uri l-ġabra fil-qosor tal-avveniment",
-    "showWordCloud": "Uri s-sħaba ta' kliem",
+    "showWordCloud": "Uri t-tweġibiet “F'kelma waħda”",
     "emailEnabled": "Ibgħat email ta' ġabra fil-qosor meta jintemm l-avveniment",
     "emailEnabledHelp": "Meta jintemm, tibgħat lill-parteċipanti rreġistrati email ta' ringrazzjament bil-links għall-ġabra fil-qosor u għall-feedback, u lill-moderatur ġabra qasira. Tintbagħat darba biss.",
     "feedbackEnabled": "Survey tal-feedback attiva fi tmiem l-avveniment",
@@ -3976,7 +4048,7 @@
     "micToggleOn": "Mikrofonu ON",
     "micToggleOff": "Mikrofonu OFF",
     "cameraOffPreview": "Fotocamera spenta",
-    "speakerTest": "🔊 Test awdjo",
+    "speakerTest": "Test awdjo",
     "backgroundLabel": "Sfond virtwali",
     "backgroundNoneShort": "No",
     "backgroundHint": "Japplika meta tidħol fis-sala. Biex iċċajpar l-isfond, uża l-buttuna tal-isfondi ladarba tkun ġewwa: il-preview hawn fuq turi l-kamera mingħajr effett.",

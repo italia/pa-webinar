@@ -113,14 +113,9 @@ export function renderChatBody(text: string, selfName?: string): ReactNode[] {
     out.push(
       <span
         key={`m${key++}`}
+        // Aspetto in globals.scss (.chat-mention): uno stile scritto qui
+        // vincerebbe su quello delle bolle blu dei propri messaggi.
         className={isSelf ? 'chat-mention chat-mention--self' : 'chat-mention'}
-        style={{
-          color: 'var(--app-primary, #06c)',
-          fontWeight: 600,
-          ...(isSelf
-            ? { background: 'rgba(0,102,204,0.12)', borderRadius: 4, padding: '0 2px' }
-            : {}),
-        }}
       >
         @{handle}
       </span>,

@@ -1,11 +1,12 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { getTranslations, getLocale } from 'next-intl/server';
+import { getTranslations, getLocale, getFormatter } from 'next-intl/server';
 
 import { prisma } from '@/lib/db';
 import { Link, percorso } from '@/i18n/navigation';
 import RegistrationFormClient from '@/components/registration/registration-form-client';
 import EventTitle from '@/components/events/event-title';
+import { Icon } from '@/components/ui/icon';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import { resolveKickerEnabled } from '@/lib/utils/title-kicker';
 import { getSettings } from '@/lib/settings';
@@ -35,6 +36,7 @@ export default async function RegistrationPage({
   const { slug } = await params;
   const locale = await getLocale();
   const t = await getTranslations('registration');
+  const format = await getFormatter();
 
   const event = await prisma.event.findUnique({
     where: { slug },
@@ -87,13 +89,13 @@ export default async function RegistrationPage({
     <div className="container py-5">
       <div className="row justify-content-center">
         <div className="col-lg-7">
-          <div className="mb-3">
+          <div className="mb-4">
             <Link
               href={percorso(`/events/${slug}`)}
-              className="text-decoration-none d-inline-flex align-items-center text-primary"
+              className="text-decoration-none d-inline-flex align-items-center gap-1 text-primary"
               style={{ fontSize: '0.9rem' }}
             >
-              <span aria-hidden="true" className="me-1">←</span>
+              <Icon icon="it-arrow-left" size="sm" color="primary" />
               {t('backToEvent')}
             </Link>
           </div>
@@ -102,8 +104,26 @@ export default async function RegistrationPage({
             title={title}
             kickerEnabled={resolveKickerEnabled(event, settings.parseTitleKicker)}
             as="p"
-            className="lead text-muted mb-4"
+            className="lead text-muted mb-3"
           />
+          {/* Quando, prima di chiedere i dati: chi si iscrive da un link
+              inoltrato non e' passato dalla pagina dell'evento. */}
+          <p className="registration-when mb-5">
+            <Icon icon="it-calendar" size="sm" color="primary" />
+            <span>
+              {format.dateTime(event.startsAt, {
+                weekday: 'long',
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric',
+                timeZone: event.timezone,
+              })}
+              {' · '}
+              {format.dateTime(event.startsAt, { hour: '2-digit', minute: '2-digit', timeZone: event.timezone })}
+              {' – '}
+              {format.dateTime(event.endsAt, { hour: '2-digit', minute: '2-digit', timeZone: event.timezone })}
+            </span>
+          </p>
 
           <RegistrationFormClient
             eventSlug={slug}

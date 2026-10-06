@@ -1,15 +1,51 @@
 {
   "agenda": {
-    "title": "Anteckningar / Checklista",
-    "empty": "Inga punkter ännu. Lägg till ämnena som ska tas upp och bocka av dem efter hand.",
+    "title": "Dagordning",
+    "empty": "Dagordningen är inte förberedd ännu.",
     "add": "Lägg till",
-    "addPlaceholder": "Ny punkt…",
-    "remove": "Ta bort",
+    "addPlaceholder": "Nytt ämne…",
+    "remove": "Radera ämne",
     "inProgress": "pågår",
     "agree": "Instämmer",
     "disagree": "Instämmer inte",
     "favorablePct": "{pct} % instämmer",
-    "noReactions": "Dela din åsikt"
+    "noReactions": "Dela din åsikt",
+    "emptyModerator": "Lägg till mötets ämnen: under evenemanget markerar du hur det går och salen ser det aktuella ämnet.",
+    "progress": "{done} av {total} behandlade",
+    "skippedCount": "{count, plural, one {# överhoppat} other {# överhoppade}}",
+    "nextTopic": "Nästa ämne:",
+    "startFirst": "Börja med:",
+    "finishCurrent": "Avsluta det aktuella ämnet",
+    "runningFor": "{minutes, plural, =0 {nyss börjat} one {i # minut} other {i # minuter}}",
+    "tickerNow": "Nu",
+    "status": {
+      "PENDING": "Att behandla",
+      "CURRENT": "Pågår",
+      "DONE": "Behandlat",
+      "SKIPPED": "Överhoppat"
+    },
+    "actions": {
+      "start": "Börja nu",
+      "done": "Markera som behandlat",
+      "skip": "Hoppa över",
+      "reopen": "Öppna igen",
+      "edit": "Redigera",
+      "moveUp": "Flytta upp",
+      "moveDown": "Flytta ned"
+    },
+    "plannedMinutes": "{minutes} min planerat",
+    "elapsedOfPlanned": "{minutes} av {planned} min",
+    "overtime": "över tiden",
+    "tookMinutes": "{minutes} min",
+    "plannedTotal": "Planerad längd: {minutes} min",
+    "pulsePrompt": "Håller du med?",
+    "addHint": "Enter för att lägga till, Skift+Enter för ny rad. Du kan klistra in en lista: ett ämne per rad.",
+    "addMany": "{count, plural, one {Lägg till # ämne} other {Lägg till # ämnen}}",
+    "minutesPlaceholder": "min",
+    "minutesLabel": "Planerad längd i minuter (valfritt)",
+    "editLabel": "Ämnets titel",
+    "agendaChanged": "Dagordningen ändrades just: försök igen.",
+    "minutesInvalid": "Ange längden i minuter, från 1 till 600."
   },
   "common": {
     "appName": "PA Webinar",
@@ -64,7 +100,7 @@
     "past": "Tidigare evenemang",
     "noUpcoming": "Inga kommande evenemang för tillfället. Kom tillbaka snart!",
     "noPast": "Inga tidigare evenemang",
-    "wordCloudTitle": "Ordmoln",
+    "wordCloudTitle": "Med ett ord",
     "card": {
       "publicEvent": "Offentligt evenemang",
       "readMore": "Läs mer",
@@ -173,6 +209,7 @@
     "resendLink": "Skicka åtkomstlänken igen",
     "resending": "Skickar…",
     "resendSent": "Om adressen är anmäld har vi skickat åtkomstlänken igen via e-post.",
+    "resendFailed": "Länken kunde inte skickas igen. Försök igen om några minuter.",
     "invitationOnly": "Anmälan är förbehållen inbjudna: använd den e-postadress som du bjöds in med. Länken för att delta skickas till dig via e-post.",
     "closed": "Anmälan till det här evenemanget är inte öppen för allmänheten.",
     "lostLink": "Redan anmäld? Få din personliga länk igen",
@@ -317,9 +354,9 @@
     "whiteboardNotSavedHint": "Whiteboarden sparas inte automatiskt. Om du använder den, exportera den (whiteboardens meny) och bifoga den till evenemangets material innan du avslutar.",
     "sidebarTabChat": "Chatt",
     "sidebarTabPolls": "Omröstningar",
-    "sidebarTabWordcloud": "Ordmoln",
-    "sidebarTabAgenda": "Anteckningar / Checklista",
-    "liveToggleAgenda": "Anteckningar / Checklista (agenda)",
+    "sidebarTabWordcloud": "Med ett ord",
+    "sidebarTabAgenda": "Dagordning",
+    "liveToggleAgenda": "Dagordning",
     "sidebarTabMaterials": "Material",
     "sidebarTabParticipants": "Deltagare",
     "chat": {
@@ -371,7 +408,20 @@
       "notifyDesktopBlocked": "Webbläsaren blockerar aviseringar från den här webbplatsen: du kan tillåta dem igen i webbplatsinställningarna.",
       "notifyDesktopUnsupported": "Den här webbläsaren stöder inte aviseringar.",
       "notifyOffer": "Vill du få en avisering när någon nämner eller svarar dig?",
-      "notifyOfferEnable": "Aktivera aviseringar"
+      "notifyOfferEnable": "Aktivera aviseringar",
+      "emojiSearch": "Sök emoji",
+      "emojiNoResults": "Inga emoji hittades",
+      "emojiRecent": "Nyligen använda",
+      "emojiAll": "Alla emoji",
+      "mentionListLabel": "Personer att nämna",
+      "mentionButton": "Nämn någon",
+      "replyJump": "Gå till det ursprungliga meddelandet",
+      "typingOne": "{name} skriver…",
+      "typingTwo": "{a} och {b} skriver…",
+      "typingMany": "Flera personer skriver…",
+      "hideForAll": "Dölj för alla",
+      "deleteOwn": "Radera meddelandet",
+      "mentionedYou": "Nämnde dig"
     },
     "role": {
       "moderator": "Moderator",
@@ -470,7 +520,9 @@
     "rejoin": "Gå in igen",
     "backToHome": "Tillbaka till startsidan",
     "sidebarTabMaterialsNew": "Nytt delat material",
-    "sidebarTabQaNew": "Nytt i Frågor och svar"
+    "sidebarTabQaNew": "Nytt i Frågor och svar",
+    "resizeSidebar": "Ändra storlek på sidopanelen",
+    "sidebarTabWordcloudNew": "Ny fråga ”Med ett ord”"
   },
   "qa": {
     "title": "Frågor och svar",
@@ -1280,10 +1332,10 @@
       "qaEnabled": "Aktivera Q&A",
       "chatEnabled": "Aktivera chatt",
       "recordingEnabled": "Aktivera videoinspelning",
-      "agendaEnabled": "Live-anteckningar / checklista (agenda)",
-      "agendaEnabledDesc": "En checklista över ämnen som ska tas upp och som moderatorerna bockar av under evenemanget. Den används i den automatiska sammanfattningen. Valfri och kan aktiveras även under evenemanget.",
-      "wordCloudEnabled": "Ordmoln live",
-      "wordCloudEnabledDesc": "Deltagarna skickar ett ord och molnet uppdateras live. Användbart för att öppna en diskussion eller fånga en stämning på några sekunder.",
+      "agendaEnabled": "Mötets dagordning",
+      "agendaEnabledDesc": "Listan över mötets ämnen: under evenemanget markerar moderatorn det aktuella ämnet, de behandlade och de överhoppade, och salen ser alltid var man är, även i den övre raden. Ingår i den automatiska sammanfattningen. Valfritt, kan även aktiveras under evenemanget.",
+      "wordCloudEnabled": "Frågor ”Med ett ord”",
+      "wordCloudEnabledDesc": "Moderatorn ställer en fråga och alla svarar med ett enda ord: svaren bildar ett moln som uppdateras live, och de vanligaste orden blir större. Bra för att bryta isen eller samla ett intryck på några sekunder.",
       "whiteboardEnabled": "Delad whiteboard",
       "whiteboardEnabledDesc": "Aktiverar den inbyggda samarbetswhiteboarden (Excalidraw): moderatorerna kan öppna den från verktygsfältet under evenemanget. Kräver installationens whiteboardtjänst; där den finns är den alltid på i snabbsamtal.",
       "autoStartRecording": "Starta inspelningen automatiskt",
@@ -2760,8 +2812,8 @@
         "desc": "Svara på omröstningar i realtid och se resultaten direkt."
       },
       "wordcloud": {
-        "title": "Ordmoln",
-        "desc": "Lägg till dina ord i evenemangets gemensamma ordmoln."
+        "title": "Med ett ord",
+        "desc": "Svara med ett ord på moderatorns frågor och se molnet av svar växa."
       },
       "reactions": {
         "title": "Reaktioner och uppräckta händer",
@@ -2772,8 +2824,8 @@
         "desc": "Skriv i evenemangets chatt och följ samtalet med andra deltagare."
       },
       "agenda": {
-        "title": "Agenda och anteckningar",
-        "desc": "Följ agendan och anteckningarna som moderatorerna delar under evenemanget."
+        "title": "Dagordning",
+        "desc": "Följ det aktuella ämnet och mötets dagordning."
       }
     },
     "projectTeaser": {
@@ -2888,8 +2940,17 @@
       "minOptions": "Minst 2 alternativ krävs",
       "generic": "Fel vid skapande av omröstning",
       "vote": "Rösten registrerades inte. Försök igen.",
-      "alreadyVoted": "Du har redan röstat i den här omröstningen."
-    }
+      "alreadyVoted": "Du har redan röstat i den här omröstningen.",
+      "action": "Åtgärden misslyckades. Försök igen."
+    },
+    "participation": "{votes, plural, one {# röst} other {# röster}} av {present} närvarande",
+    "participationLabel": "Deltagande i omröstningen",
+    "yourVote": "Din röst",
+    "deletePoll": "Radera omröstning",
+    "questionLabel": "Fråga",
+    "optionsLabel": "Möjliga svar",
+    "resultsHidden": "Rösten är registrerad. Resultaten visas när moderatorn publicerar dem.",
+    "closedNoVote": "Omröstningen är stängd. Resultaten visas när moderatorn publicerar dem."
   },
   "materials": {
     "title": "Material",
@@ -3497,16 +3558,16 @@
     "noFeedback": "Ingen feedback mottagen"
   },
   "wordcloud": {
-    "title": "Ordmoln",
+    "title": "Med ett ord",
     "startRound": "Starta",
-    "prompt": "Ämne",
+    "prompt": "Fråga",
     "promptPlaceholder": "t.ex. Vad förväntar du dig av detta evenemang?",
     "duration": "Längd",
     "submit": "Skicka",
-    "submitPlaceholder": "Skriv ett ord (max 30 tecken)",
-    "close": "Stäng ordmolnet",
+    "submitPlaceholder": "Ditt ord",
+    "close": "Stäng svaren",
     "cancel": "Avbryt",
-    "noActiveRound": "Inget ordmoln är aktivt just nu.",
+    "noActiveRound": "Det finns ingen öppen fråga just nu.",
     "noWords": "Väntar på de första orden...",
     "wordsSubmitted": "{count} ord inskickade",
     "timeRemaining": "Tid kvar",
@@ -3514,11 +3575,22 @@
       "send": "Ordet skickades inte. Försök igen.",
       "closed": "Omgången är stängd: inga fler ord tas emot.",
       "limit": "Du har redan skickat det högsta antalet ord för den här omgången.",
-      "rateLimited": "För många inskick just nu: vänta några sekunder innan du försöker igen."
+      "rateLimited": "För många inskick just nu: vänta några sekunder innan du försöker igen.",
+      "duplicate": "Du har redan skrivit det här ordet: det räknas bara en gång per person.",
+      "removed": "Moderatorn har tagit bort ordet: det kan inte skickas igen.",
+      "invalid": "Skriv ett ord med bokstäver eller siffror."
     },
-    "startNew": "Starta ett ordmoln",
-    "emptyHintModerator": "Ställ en öppen fråga: svar med ett ord bygger molnet i realtid.",
-    "timeLeft": "Tid kvar: {time}"
+    "startNew": "Ställ en fråga",
+    "emptyHintModerator": "Ställ en fråga som kan besvaras med ett ord, till exempel ”Hur mår ni i dag?”. Svaren bildar ett moln som uppdateras live: ju fler som skriver samma ord, desto större blir det.",
+    "timeLeft": "Tid kvar: {time}",
+    "howItWorks": "Svara med ett enda ord: ju fler som skriver samma ord, desto större blir det.",
+    "enableHint": "Fliken ”Med ett ord” visas för alla när du startar den första frågan.",
+    "topWords": "Mest skrivna",
+    "yourWords": "Du skrev:",
+    "closedBadge": "Avslutad",
+    "durationUnlimited": "Utan tidsgräns",
+    "allWords": "Alla ord",
+    "removeWord": "Ta bort från molnet"
   },
   "timer": {
     "title": "Timer",
@@ -3915,7 +3987,7 @@
     "showPolls": "Visa omröstningsresultat",
     "showFeedback": "Visa feedback",
     "showRecap": "Visa sammanfattningen av evenemanget",
-    "showWordCloud": "Visa ordmoln",
+    "showWordCloud": "Visa svaren ”Med ett ord”",
     "emailEnabled": "Skicka sammanfattningsmejl när evenemanget avslutas",
     "emailEnabledHelp": "Vid avslutningen skickas ett tackmejl till de anmälda deltagarna med länkar till sammanfattningen och feedbacken, och en kort sammanfattning till moderatorn. Skickas bara en gång.",
     "feedbackEnabled": "Feedbackundersökning aktiv vid evenemangets slut",
@@ -3976,7 +4048,7 @@
     "micToggleOn": "Mikrofon PÅ",
     "micToggleOff": "Mikrofon AV",
     "cameraOffPreview": "Kamera avstängd",
-    "speakerTest": "🔊 Testa ljud",
+    "speakerTest": "Testa ljud",
     "backgroundLabel": "Virtuell bakgrund",
     "backgroundNoneShort": "No",
     "backgroundHint": "Tillämpas när du går in i rummet. För att göra bakgrunden suddig använder du bakgrundsknappen när du är inne: förhandsvisningen ovan visar kameran utan effekt.",

@@ -1,15 +1,51 @@
 {
   "agenda": {
-    "title": "Piezīmes / kontrolsaraksts",
-    "empty": "Vēl nav neviena punkta. Pievienojiet apspriežamās tēmas un pakāpeniski atzīmējiet tās.",
+    "title": "Darba kārtība",
+    "empty": "Darba kārtība vēl nav sagatavota.",
     "add": "Pievienot",
-    "addPlaceholder": "Jauns punkts…",
-    "remove": "Noņemt",
+    "addPlaceholder": "Jauna tēma…",
+    "remove": "Dzēst tēmu",
     "inProgress": "notiek",
     "agree": "Piekrītu",
     "disagree": "Nepiekrītu",
     "favorablePct": "{pct}% par",
-    "noReactions": "Izsakiet savu viedokli"
+    "noReactions": "Izsakiet savu viedokli",
+    "emptyModerator": "Pievienojiet sanāksmes tēmas: pasākuma laikā atzīmējat gaitu, un zāle redz pašreizējo tēmu.",
+    "progress": "Apspriestas {done} no {total}",
+    "skippedCount": "{count, plural, zero {# izlaistas} one {# izlaista} other {# izlaistas}}",
+    "nextTopic": "Nākamā tēma:",
+    "startFirst": "Sāciet ar:",
+    "finishCurrent": "Pabeigt pašreizējo tēmu",
+    "runningFor": "{minutes, plural, =0 {tikko sākās} one {jau # minūti} other {jau # minūtes}}",
+    "tickerNow": "Tagad",
+    "status": {
+      "PENDING": "Apspriežama",
+      "CURRENT": "Notiek",
+      "DONE": "Apspriesta",
+      "SKIPPED": "Izlaista"
+    },
+    "actions": {
+      "start": "Sākt tagad",
+      "done": "Atzīmēt kā apspriestu",
+      "skip": "Izlaist",
+      "reopen": "Atvērt no jauna",
+      "edit": "Rediģēt",
+      "moveUp": "Pārvietot uz augšu",
+      "moveDown": "Pārvietot uz leju"
+    },
+    "plannedMinutes": "plānotas {minutes} min",
+    "elapsedOfPlanned": "{minutes} no {planned} min",
+    "overtime": "virs laika",
+    "tookMinutes": "{minutes} min",
+    "plannedTotal": "Plānotais ilgums: {minutes} min",
+    "pulsePrompt": "Vai piekrītat?",
+    "addHint": "Enter, lai pievienotu, Shift+Enter jaunai rindai. Varat ielīmēt sarakstu: viena tēma katrā rindā.",
+    "addMany": "{count, plural, zero {Pievienot # tēmas} one {Pievienot # tēmu} other {Pievienot # tēmas}}",
+    "minutesPlaceholder": "min",
+    "minutesLabel": "Plānotais ilgums minūtēs (pēc izvēles)",
+    "editLabel": "Tēmas nosaukums",
+    "agendaChanged": "Darba kārtība tikko mainījās: mēģiniet vēlreiz.",
+    "minutesInvalid": "Ievadiet ilgumu minūtēs, no 1 līdz 600."
   },
   "common": {
     "appName": "PA Webinar",
@@ -64,7 +100,7 @@
     "past": "Iepriekšējie pasākumi",
     "noUpcoming": "Šobrīd nav plānotu pasākumu. Apmeklējiet vēlāk!",
     "noPast": "Nav iepriekšējo pasākumu",
-    "wordCloudTitle": "Vārdu mākonis",
+    "wordCloudTitle": "Vienā vārdā",
     "card": {
       "publicEvent": "Publisks pasākums",
       "readMore": "Uzzināt vairāk",
@@ -173,6 +209,7 @@
     "resendLink": "Nosūtīt piekļuves saiti vēlreiz",
     "resending": "Sūta…",
     "resendSent": "Ja adrese ir reģistrēta, mēs vēlreiz nosūtījām piekļuves saiti pa e-pastu.",
+    "resendFailed": "Saiti neizdevās nosūtīt vēlreiz. Mēģiniet vēlreiz pēc dažām minūtēm.",
     "invitationOnly": "Reģistrācija ir paredzēta tikai uzaicinātajiem: izmantojiet e-pasta adresi, ar kuru jūs tikāt uzaicināts. Saiti ieiešanai saņemsiet pa e-pastu.",
     "closed": "Reģistrācija šim pasākumam nav atvērta sabiedrībai.",
     "lostLink": "Jau reģistrējāties? Saņemiet savu personīgo saiti vēlreiz",
@@ -317,9 +354,9 @@
     "whiteboardNotSavedHint": "Tāfele netiek saglabāta automātiski. Ja to izmantojat, eksportējiet to (tāfeles izvēlnē) un pirms pasākuma beigšanas pievienojiet pasākuma materiāliem.",
     "sidebarTabChat": "Tērzēšana",
     "sidebarTabPolls": "Aptaujas",
-    "sidebarTabWordcloud": "Vārdu mākonis",
-    "sidebarTabAgenda": "Piezīmes / kontrolsaraksts",
-    "liveToggleAgenda": "Piezīmes / kontrolsaraksts (darba kārtība)",
+    "sidebarTabWordcloud": "Vienā vārdā",
+    "sidebarTabAgenda": "Darba kārtība",
+    "liveToggleAgenda": "Darba kārtība",
     "sidebarTabMaterials": "Materiāli",
     "sidebarTabParticipants": "Dalībnieki",
     "chat": {
@@ -371,7 +408,20 @@
       "notifyDesktopBlocked": "Pārlūks bloķē šīs vietnes paziņojumus: tos var atkal atļaut vietnes iestatījumos.",
       "notifyDesktopUnsupported": "Šis pārlūks neatbalsta paziņojumus.",
       "notifyOffer": "Vai vēlaties paziņojumu, kad kāds jūs piemin vai jums atbild?",
-      "notifyOfferEnable": "Ieslēgt paziņojumus"
+      "notifyOfferEnable": "Ieslēgt paziņojumus",
+      "emojiSearch": "Meklēt emocijzīmi",
+      "emojiNoResults": "Emocijzīmes nav atrastas",
+      "emojiRecent": "Nesen lietotās",
+      "emojiAll": "Visas emocijzīmes",
+      "mentionListLabel": "Pieminamie cilvēki",
+      "mentionButton": "Pieminēt kādu",
+      "replyJump": "Doties uz sākotnējo ziņu",
+      "typingOne": "{name} raksta…",
+      "typingTwo": "{a} un {b} raksta…",
+      "typingMany": "Raksta vairāki cilvēki…",
+      "hideForAll": "Paslēpt visiem",
+      "deleteOwn": "Dzēst ziņu",
+      "mentionedYou": "Jūs pieminēja"
     },
     "role": {
       "moderator": "Moderators",
@@ -470,7 +520,9 @@
     "rejoin": "Atgriezties",
     "backToHome": "Atpakaļ uz sākumlapu",
     "sidebarTabMaterialsNew": "Jauni kopīgoti materiāli",
-    "sidebarTabQaNew": "Jaunumi sadaļā Jautājumi un atbildes"
+    "sidebarTabQaNew": "Jaunumi sadaļā Jautājumi un atbildes",
+    "resizeSidebar": "Mainīt sānu paneļa izmēru",
+    "sidebarTabWordcloudNew": "Jauns jautājums “Vienā vārdā”"
   },
   "qa": {
     "title": "Jautājumi un atbildes",
@@ -1280,10 +1332,10 @@
       "qaEnabled": "Iespējot Q&A",
       "chatEnabled": "Iespējot tērzēšanu",
       "recordingEnabled": "Iespējot video ierakstīšanu",
-      "agendaEnabled": "Piezīmes / kontrolsaraksts (darba kārtība) tiešraidē",
-      "agendaEnabledDesc": "Apspriežamo tēmu kontrolsaraksts, ko moderatori atzīmē pasākuma laikā. Tas tiek iekļauts automātiskajā kopsavilkumā. Nav obligāts, un to var ieslēgt arī pasākuma laikā.",
-      "wordCloudEnabled": "Tiešraides vārdu mākonis",
-      "wordCloudEnabledDesc": "Dalībnieki nosūta vārdu, un mākonis atjaunojas tiešraidē. Noderīgi, lai uzsāktu diskusiju vai dažās sekundēs apkopotu noskaņojumu.",
+      "agendaEnabled": "Sanāksmes darba kārtība",
+      "agendaEnabledDesc": "Sanāksmes tēmu saraksts: pasākuma laikā moderators atzīmē pašreizējo, apspriestās un izlaistās tēmas, un zāle vienmēr redz, kur atrodas, arī augšējā joslā. Tiek iekļauts automātiskajā kopsavilkumā. Pēc izvēles, ieslēdzams arī pasākuma laikā.",
+      "wordCloudEnabled": "Jautājumi “Vienā vārdā”",
+      "wordCloudEnabledDesc": "Moderators uzdod jautājumu, un katrs atbild ar vienu vārdu: atbildes veido mākoni, kas atjaunojas tiešsaistē, un biežākie vārdi kļūst lielāki. Noder, lai lauztu ledu vai dažās sekundēs savāktu iespaidus.",
       "whiteboardEnabled": "Koplietojamā tāfele",
       "whiteboardEnabledDesc": "Iespējo iebūvēto sadarbības tāfeli (Excalidraw): moderatori to pasākuma laikā var atvērt no rīkjoslas. Nepieciešams instalācijas tāfeles pakalpojums; kur tas ir pieejams, tūlītējos zvanos tāfele ir vienmēr ieslēgta.",
       "autoStartRecording": "Sākt ierakstīšanu automātiski",
@@ -2760,8 +2812,8 @@
         "desc": "Atbildiet uz aptaujām reāllaikā un redziet rezultātus uzreiz."
       },
       "wordcloud": {
-        "title": "Vārdu mākonis",
-        "desc": "Pievienojiet savus vārdus pasākuma kopīgajam vārdu mākonim."
+        "title": "Vienā vārdā",
+        "desc": "Atbildiet ar vienu vārdu uz moderatora jautājumiem un vērojiet, kā aug atbilžu mākonis."
       },
       "reactions": {
         "title": "Reakcijas un paceltas rokas",
@@ -2772,8 +2824,8 @@
         "desc": "Rakstiet pasākuma tērzēšanā un sekojiet sarunai ar citiem dalībniekiem."
       },
       "agenda": {
-        "title": "Darba kārtība un piezīmes",
-        "desc": "Sekojiet darba kārtībai un piezīmēm, ko moderatori kopīgo pasākuma laikā."
+        "title": "Darba kārtība",
+        "desc": "Sekojiet pašreizējai tēmai un sanāksmes darba kārtībai."
       }
     },
     "projectTeaser": {
@@ -2888,8 +2940,17 @@
       "minOptions": "Nepieciešami vismaz 2 varianti",
       "generic": "Kļūda, veidojot aptauju",
       "vote": "Balss nav reģistrēta. Mēģiniet vēlreiz.",
-      "alreadyVoted": "Jūs jau esat balsojis šajā aptaujā."
-    }
+      "alreadyVoted": "Jūs jau esat balsojis šajā aptaujā.",
+      "action": "Darbība neizdevās. Mēģiniet vēlreiz."
+    },
+    "participation": "{votes, plural, zero {# balsis} one {# balss} other {# balsis}} no {present} klātesošajiem",
+    "participationLabel": "Dalība aptaujā",
+    "yourVote": "Jūsu balss",
+    "deletePoll": "Dzēst aptauju",
+    "questionLabel": "Jautājums",
+    "optionsLabel": "Iespējamās atbildes",
+    "resultsHidden": "Balss reģistrēta. Rezultāti parādīsies, kad moderators tos publicēs.",
+    "closedNoVote": "Balsošana ir slēgta. Rezultāti parādīsies, kad moderators tos publicēs."
   },
   "materials": {
     "title": "Materiāli",
@@ -3497,16 +3558,16 @@
     "noFeedback": "Nav saņemtu atsauksmju"
   },
   "wordcloud": {
-    "title": "Vārdu mākonis",
+    "title": "Vienā vārdā",
     "startRound": "Sākt",
-    "prompt": "Tēma",
+    "prompt": "Jautājums",
     "promptPlaceholder": "piem. Ko jūs sagaidāt no šī pasākuma?",
     "duration": "Ilgums",
     "submit": "Iesniegt",
-    "submitPlaceholder": "Ierakstiet vārdu (maks. 30 rakstz.)",
-    "close": "Aizvērt vārdu mākoni",
+    "submitPlaceholder": "Jūsu vārds",
+    "close": "Slēgt atbildes",
     "cancel": "Atcelt",
-    "noActiveRound": "Pašlaik nav aktīva vārdu mākoņa.",
+    "noActiveRound": "Pašlaik nav neviena atvērta jautājuma.",
     "noWords": "Gaidām pirmos vārdus...",
     "wordsSubmitted": "{count} vārdi iesniegti",
     "timeRemaining": "Atlikušais laiks",
@@ -3514,11 +3575,22 @@
       "send": "Vārds netika nosūtīts. Mēģiniet vēlreiz.",
       "closed": "Šī kārta ir slēgta: vairāk vārdu netiek pieņemts.",
       "limit": "Šajā kārtā jau ir nosūtīts maksimālais vārdu skaits.",
-      "rateLimited": "Pašlaik ir pārāk daudz sūtījumu: pagaidiet dažas sekundes, pirms mēģināt vēlreiz."
+      "rateLimited": "Pašlaik ir pārāk daudz sūtījumu: pagaidiet dažas sekundes, pirms mēģināt vēlreiz.",
+      "duplicate": "Šo vārdu jūs jau uzrakstījāt: tas tiek skaitīts tikai vienreiz katram cilvēkam.",
+      "removed": "Moderators noņēma šo vārdu: to nevar nosūtīt vēlreiz.",
+      "invalid": "Uzrakstiet vārdu no burtiem vai cipariem."
     },
-    "startNew": "Sākt vārdu mākoni",
-    "emptyHintModerator": "Uzdodiet atvērtu jautājumu: viena vārda atbildes reāllaikā veido mākoni.",
-    "timeLeft": "Atlikušais laiks: {time}"
+    "startNew": "Uzdot jautājumu",
+    "emptyHintModerator": "Uzdodiet jautājumu, uz kuru var atbildēt ar vienu vārdu, piemēram, “Kā jūs šodien jūtaties?”. Atbildes veido mākoni, kas atjaunojas tiešsaistē: jo vairāk cilvēku uzraksta to pašu vārdu, jo lielāks tas kļūst.",
+    "timeLeft": "Atlikušais laiks: {time}",
+    "howItWorks": "Atbildiet ar vienu vārdu: jo vairāk cilvēku uzraksta to pašu vārdu, jo lielāks tas kļūst.",
+    "enableHint": "Cilne “Vienā vārdā” parādīsies visiem, kad sāksiet pirmo jautājumu.",
+    "topWords": "Biežāk rakstītie",
+    "yourWords": "Jūs uzrakstījāt:",
+    "closedBadge": "Pabeigts",
+    "durationUnlimited": "Bez laika ierobežojuma",
+    "allWords": "Visi vārdi",
+    "removeWord": "Noņemt no mākoņa"
   },
   "timer": {
     "title": "Taimeris",
@@ -3915,7 +3987,7 @@
     "showPolls": "Rādīt aptauju rezultātus",
     "showFeedback": "Rādīt atsauksmes",
     "showRecap": "Rādīt pasākuma pārskatu",
-    "showWordCloud": "Rādīt vārdu mākoni",
+    "showWordCloud": "Rādīt atbildes “Vienā vārdā”",
     "emailEnabled": "Nosūtīt pārskata e-pastu pasākuma beigās",
     "emailEnabledHelp": "Pasākumam noslēdzoties, reģistrētajiem dalībniekiem tiek nosūtīts pateicības e-pasts ar saitēm uz pārskatu un atsauksmju veidlapu, bet moderatoram — īss pārskats. Tas tiek nosūtīts tikai vienu reizi.",
     "feedbackEnabled": "Atsauksmju aptauja aktīva pasākuma beigās",
@@ -3976,7 +4048,7 @@
     "micToggleOn": "Mikrofons ON",
     "micToggleOff": "Mikrofons OFF",
     "cameraOffPreview": "Kamera izslēgta",
-    "speakerTest": "🔊 Audio tests",
+    "speakerTest": "Audio tests",
     "backgroundLabel": "Virtuālais fons",
     "backgroundNoneShort": "No",
     "backgroundHint": "Tiek piemērots, kad ieejat telpā. Lai aizmiglotu fonu, telpā izmantojiet fonu pogu: augstāk redzamais priekšskatījums rāda kameru bez efekta.",

@@ -1,15 +1,51 @@
 {
   "agenda": {
-    "title": "Notizen / Checkliste",
-    "empty": "Noch keine Punkte. Fügen Sie die zu behandelnden Themen hinzu und haken Sie sie nach und nach ab.",
+    "title": "Ablauf",
+    "empty": "Der Ablauf ist noch nicht vorbereitet.",
     "add": "Hinzufügen",
-    "addPlaceholder": "Neuer Punkt…",
-    "remove": "Entfernen",
+    "addPlaceholder": "Neues Thema…",
+    "remove": "Thema löschen",
     "inProgress": "in Bearbeitung",
     "agree": "Einverstanden",
     "disagree": "Nicht einverstanden",
     "favorablePct": "{pct}% dafür",
-    "noReactions": "Sagen Sie uns Ihre Meinung"
+    "noReactions": "Sagen Sie uns Ihre Meinung",
+    "emptyModerator": "Füge die Themen des Treffens hinzu: Während der Veranstaltung markierst du den Fortschritt, und der Saal sieht das aktuelle Thema.",
+    "progress": "{done} von {total} besprochen",
+    "skippedCount": "{count, plural, one {# übersprungen} other {# übersprungen}}",
+    "nextTopic": "Nächstes Thema:",
+    "startFirst": "Beginne mit:",
+    "finishCurrent": "Aktuelles Thema abschließen",
+    "runningFor": "{minutes, plural, =0 {gerade begonnen} one {seit # Minute} other {seit # Minuten}}",
+    "tickerNow": "Jetzt",
+    "status": {
+      "PENDING": "Offen",
+      "CURRENT": "Läuft",
+      "DONE": "Besprochen",
+      "SKIPPED": "Übersprungen"
+    },
+    "actions": {
+      "start": "Jetzt beginnen",
+      "done": "Als besprochen markieren",
+      "skip": "Überspringen",
+      "reopen": "Wieder öffnen",
+      "edit": "Bearbeiten",
+      "moveUp": "Nach oben",
+      "moveDown": "Nach unten"
+    },
+    "plannedMinutes": "{minutes} Min. geplant",
+    "elapsedOfPlanned": "{minutes} von {planned} Min.",
+    "overtime": "über der Zeit",
+    "tookMinutes": "{minutes} Min.",
+    "plannedTotal": "Geplante Dauer: {minutes} Min.",
+    "pulsePrompt": "Stimmst du zu?",
+    "addHint": "Enter zum Hinzufügen, Umschalt+Enter für eine neue Zeile. Du kannst eine Liste einfügen: ein Thema pro Zeile.",
+    "addMany": "{count, plural, one {# Thema hinzufügen} other {# Themen hinzufügen}}",
+    "minutesPlaceholder": "Min.",
+    "minutesLabel": "Geplante Dauer in Minuten (optional)",
+    "editLabel": "Titel des Themas",
+    "agendaChanged": "Der Ablauf wurde gerade geändert: versuche es erneut.",
+    "minutesInvalid": "Gib die Dauer in Minuten an, von 1 bis 600."
   },
   "common": {
     "appName": "PA Webinar",
@@ -64,7 +100,7 @@
     "past": "Vergangene Veranstaltungen",
     "noUpcoming": "Derzeit keine geplanten Veranstaltungen. Schauen Sie bald wieder vorbei!",
     "noPast": "Keine vergangenen Veranstaltungen",
-    "wordCloudTitle": "Wortwolke",
+    "wordCloudTitle": "In einem Wort",
     "card": {
       "publicEvent": "Öffentliche Veranstaltung",
       "readMore": "Mehr erfahren",
@@ -173,6 +209,7 @@
     "resendLink": "Zugangslink erneut senden",
     "resending": "Wird gesendet…",
     "resendSent": "Wenn die Adresse angemeldet ist, haben wir den Zugangslink erneut per E-Mail gesendet.",
+    "resendFailed": "Der Link konnte nicht erneut gesendet werden. Bitte in einigen Minuten erneut versuchen.",
     "invitationOnly": "Die Anmeldung ist eingeladenen Personen vorbehalten: Verwenden Sie die E-Mail-Adresse, mit der Sie eingeladen wurden. Den Link zur Teilnahme erhalten Sie per E-Mail.",
     "closed": "Die Anmeldung zu dieser Veranstaltung ist nicht öffentlich.",
     "lostLink": "Bereits angemeldet? Persönlichen Link erneut erhalten",
@@ -317,9 +354,9 @@
     "whiteboardNotSavedHint": "Das Whiteboard wird nicht automatisch gespeichert. Wenn Sie es nutzen, exportieren Sie es (Whiteboard-Menü) und hängen Sie es vor dem Beenden an die Materialien der Veranstaltung an.",
     "sidebarTabChat": "Chat",
     "sidebarTabPolls": "Umfragen",
-    "sidebarTabWordcloud": "Wortwolke",
-    "sidebarTabAgenda": "Notizen / Checkliste",
-    "liveToggleAgenda": "Notizen / Checkliste (Agenda)",
+    "sidebarTabWordcloud": "In einem Wort",
+    "sidebarTabAgenda": "Ablauf",
+    "liveToggleAgenda": "Ablauf",
     "sidebarTabMaterials": "Materialien",
     "sidebarTabParticipants": "Teilnehmende",
     "chat": {
@@ -371,7 +408,20 @@
       "notifyDesktopBlocked": "Ihr Browser blockiert Benachrichtigungen dieser Website: Sie können sie in den Website-Einstellungen wieder erlauben.",
       "notifyDesktopUnsupported": "Dieser Browser unterstützt keine Benachrichtigungen.",
       "notifyOffer": "Benachrichtigung erhalten, wenn Sie erwähnt werden oder jemand antwortet?",
-      "notifyOfferEnable": "Benachrichtigungen aktivieren"
+      "notifyOfferEnable": "Benachrichtigungen aktivieren",
+      "emojiSearch": "Emoji suchen",
+      "emojiNoResults": "Kein Emoji gefunden",
+      "emojiRecent": "Zuletzt verwendet",
+      "emojiAll": "Alle Emojis",
+      "mentionListLabel": "Personen zum Erwähnen",
+      "mentionButton": "Jemanden erwähnen",
+      "replyJump": "Zur ursprünglichen Nachricht",
+      "typingOne": "{name} schreibt…",
+      "typingTwo": "{a} und {b} schreiben…",
+      "typingMany": "Mehrere Personen schreiben…",
+      "hideForAll": "Für alle ausblenden",
+      "deleteOwn": "Nachricht löschen",
+      "mentionedYou": "Hat dich erwähnt"
     },
     "role": {
       "moderator": "Moderator",
@@ -470,7 +520,9 @@
     "rejoin": "Wieder beitreten",
     "backToHome": "Zurück zur Startseite",
     "sidebarTabMaterialsNew": "Neue Materialien geteilt",
-    "sidebarTabQaNew": "Neues in Fragen & Antworten"
+    "sidebarTabQaNew": "Neues in Fragen & Antworten",
+    "resizeSidebar": "Größe der Seitenleiste ändern",
+    "sidebarTabWordcloudNew": "Neue Frage „In einem Wort“"
   },
   "qa": {
     "title": "Fragen und Antworten",
@@ -1280,10 +1332,10 @@
       "qaEnabled": "Q&A aktivieren",
       "chatEnabled": "Chat aktivieren",
       "recordingEnabled": "Videoaufzeichnung aktivieren",
-      "agendaEnabled": "Live-Notizen / Checkliste (Agenda)",
-      "agendaEnabledDesc": "Eine Checkliste der zu behandelnden Punkte, die die Moderatoren während der Veranstaltung abhaken. Fließt in die automatische Zusammenfassung ein. Optional und auch während der Veranstaltung aktivierbar.",
-      "wordCloudEnabled": "Live-Wortwolke",
-      "wordCloudEnabledDesc": "Teilnehmende senden ein Wort, und die Wolke aktualisiert sich live. Nützlich, um eine Diskussion zu eröffnen oder in wenigen Sekunden ein Stimmungsbild einzuholen.",
+      "agendaEnabled": "Ablauf des Treffens",
+      "agendaEnabledDesc": "Die Liste der Themen des Treffens: Während der Veranstaltung markiert die Moderation das aktuelle, die besprochenen und die übersprungenen Themen, und der Saal sieht immer den Stand, auch in der oberen Leiste. Fließt in die automatische Zusammenfassung ein. Optional, auch während der Veranstaltung aktivierbar.",
+      "wordCloudEnabled": "Fragen „In einem Wort“",
+      "wordCloudEnabledDesc": "Die Moderation stellt eine Frage und alle antworten mit einem einzigen Wort: Die Antworten bilden eine Wolke, die sich live aktualisiert, und die häufigsten Wörter werden größer. Gut zum Aufwärmen oder um in Sekunden ein Stimmungsbild einzuholen.",
       "whiteboardEnabled": "Gemeinsames Whiteboard",
       "whiteboardEnabledDesc": "Aktiviert das native kollaborative Whiteboard (Excalidraw): Moderatoren können es während der Veranstaltung über die Symbolleiste öffnen. Erfordert den Whiteboard-Dienst der Installation; wo er vorhanden ist, ist es bei Sofortkonferenzen immer aktiv.",
       "autoStartRecording": "Aufzeichnung automatisch starten",
@@ -2760,8 +2812,8 @@
         "desc": "Beantworten Sie Umfragen in Echtzeit und sehen Sie die Ergebnisse sofort."
       },
       "wordcloud": {
-        "title": "Wortwolke",
-        "desc": "Fügen Sie Ihre Wörter zur gemeinsamen Wortwolke der Veranstaltung hinzu."
+        "title": "In einem Wort",
+        "desc": "Beantworte die Fragen der Moderation mit einem Wort und sieh zu, wie die Antwortwolke wächst."
       },
       "reactions": {
         "title": "Reaktionen und erhobene Hände",
@@ -2772,8 +2824,8 @@
         "desc": "Schreiben Sie im Chat der Veranstaltung und verfolgen Sie das Gespräch mit den anderen Teilnehmenden."
       },
       "agenda": {
-        "title": "Agenda und Notizen",
-        "desc": "Folgen Sie der Agenda und den Notizen, die die Moderatoren während der Veranstaltung teilen."
+        "title": "Ablauf",
+        "desc": "Verfolge das aktuelle Thema und den Ablauf des Treffens."
       }
     },
     "projectTeaser": {
@@ -2888,8 +2940,17 @@
       "minOptions": "Mindestens 2 Optionen erforderlich",
       "generic": "Fehler beim Erstellen der Umfrage",
       "vote": "Stimme nicht erfasst. Bitte versuchen Sie es erneut.",
-      "alreadyVoted": "Sie haben an dieser Umfrage bereits teilgenommen."
-    }
+      "alreadyVoted": "Sie haben an dieser Umfrage bereits teilgenommen.",
+      "action": "Die Aktion ist fehlgeschlagen. Bitte erneut versuchen."
+    },
+    "participation": "{votes, plural, one {# Stimme} other {# Stimmen}} von {present} Anwesenden",
+    "participationLabel": "Beteiligung an der Umfrage",
+    "yourVote": "Deine Stimme",
+    "deletePoll": "Umfrage löschen",
+    "questionLabel": "Frage",
+    "optionsLabel": "Mögliche Antworten",
+    "resultsHidden": "Stimme erfasst. Die Ergebnisse erscheinen, sobald die Moderation sie veröffentlicht.",
+    "closedNoVote": "Die Abstimmung ist geschlossen. Die Ergebnisse erscheinen, sobald die Moderation sie veröffentlicht."
   },
   "materials": {
     "title": "Materialien",
@@ -3497,16 +3558,16 @@
     "noFeedback": "Kein Feedback erhalten"
   },
   "wordcloud": {
-    "title": "Wortwolke",
+    "title": "In einem Wort",
     "startRound": "Starten",
-    "prompt": "Thema",
+    "prompt": "Frage",
     "promptPlaceholder": "z. B. Was erwarten Sie von dieser Veranstaltung?",
     "duration": "Dauer",
     "submit": "Senden",
-    "submitPlaceholder": "Geben Sie ein Wort ein (max. 30 Zeichen)",
-    "close": "Wortwolke schließen",
+    "submitPlaceholder": "Dein Wort",
+    "close": "Antworten schließen",
     "cancel": "Abbrechen",
-    "noActiveRound": "Derzeit ist keine Wortwolke aktiv.",
+    "noActiveRound": "Gerade ist keine Frage offen.",
     "noWords": "Warten auf die ersten Wörter...",
     "wordsSubmitted": "{count} Wörter eingereicht",
     "timeRemaining": "Verbleibende Zeit",
@@ -3514,11 +3575,22 @@
       "send": "Wort nicht gesendet. Bitte versuchen Sie es erneut.",
       "closed": "Diese Runde ist geschlossen: Es werden keine weiteren Wörter angenommen.",
       "limit": "Sie haben für diese Runde bereits die maximale Anzahl an Wörtern gesendet.",
-      "rateLimited": "Zu viele Einsendungen im Moment: Bitte warten Sie einige Sekunden, bevor Sie es erneut versuchen."
+      "rateLimited": "Zu viele Einsendungen im Moment: Bitte warten Sie einige Sekunden, bevor Sie es erneut versuchen.",
+      "duplicate": "Dieses Wort hast du schon geschrieben: Es zählt nur einmal pro Person.",
+      "removed": "Die Moderation hat dieses Wort entfernt: Es kann nicht erneut gesendet werden.",
+      "invalid": "Schreibe ein Wort aus Buchstaben oder Ziffern."
     },
-    "startNew": "Wortwolke starten",
-    "emptyHintModerator": "Stellen Sie eine offene Frage: Antworten aus einem Wort bilden die Wolke in Echtzeit.",
-    "timeLeft": "Verbleibende Zeit: {time}"
+    "startNew": "Eine Frage stellen",
+    "emptyHintModerator": "Stelle eine Frage, die sich mit einem Wort beantworten lässt, zum Beispiel „Wie geht es euch heute?“. Die Antworten bilden eine Wolke, die sich live aktualisiert: Je mehr Personen dasselbe Wort schreiben, desto größer wird es.",
+    "timeLeft": "Verbleibende Zeit: {time}",
+    "howItWorks": "Antworte mit einem einzigen Wort: Je mehr Personen dasselbe Wort schreiben, desto größer wird es.",
+    "enableHint": "Der Reiter „In einem Wort“ erscheint für alle, sobald du die erste Frage startest.",
+    "topWords": "Am häufigsten",
+    "yourWords": "Du hast geschrieben:",
+    "closedBadge": "Beendet",
+    "durationUnlimited": "Ohne Zeitlimit",
+    "allWords": "Alle Wörter",
+    "removeWord": "Aus der Wolke entfernen"
   },
   "timer": {
     "title": "Timer",
@@ -3915,7 +3987,7 @@
     "showPolls": "Umfrageergebnisse anzeigen",
     "showFeedback": "Feedback anzeigen",
     "showRecap": "Zusammenfassung der Veranstaltung anzeigen",
-    "showWordCloud": "Wortwolke anzeigen",
+    "showWordCloud": "Antworten „In einem Wort“ anzeigen",
     "emailEnabled": "Zusammenfassungs-E-Mail am Ende der Veranstaltung senden",
     "emailEnabledHelp": "Nach dem Abschluss erhalten die angemeldeten Teilnehmer eine Dankes-E-Mail mit den Links zur Zusammenfassung und zum Feedback und der Moderator eine kurze Zusammenfassung. Wird nur einmal versendet.",
     "feedbackEnabled": "Feedback-Umfrage am Ende der Veranstaltung aktiv",
@@ -3976,7 +4048,7 @@
     "micToggleOn": "Mikrofon EIN",
     "micToggleOff": "Mikrofon AUS",
     "cameraOffPreview": "Kamera ausgeschaltet",
-    "speakerTest": "🔊 Audio testen",
+    "speakerTest": "Audio testen",
     "backgroundLabel": "Virtueller Hintergrund",
     "backgroundNoneShort": "No",
     "backgroundHint": "Wird beim Betreten des Raums angewendet. Um den Hintergrund weichzuzeichnen, verwenden Sie im Raum die Schaltfläche für Hintergründe: Die Vorschau oben zeigt die Kamera ohne Effekte.",

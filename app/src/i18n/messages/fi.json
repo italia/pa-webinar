@@ -1,15 +1,51 @@
 {
   "agenda": {
-    "title": "Muistiinpanot / tarkistuslista",
-    "empty": "Ei vielä kohtia. Lisää käsiteltävät aiheet ja merkitse ne tehdyiksi sitä mukaa.",
+    "title": "Asialista",
+    "empty": "Asialistaa ei ole vielä laadittu.",
     "add": "Lisää",
-    "addPlaceholder": "Uusi kohta…",
-    "remove": "Poista",
+    "addPlaceholder": "Uusi aihe…",
+    "remove": "Poista aihe",
     "inProgress": "käynnissä",
     "agree": "Samaa mieltä",
     "disagree": "Eri mieltä",
     "favorablePct": "{pct} % kannattaa",
-    "noReactions": "Kerro mielipiteesi"
+    "noReactions": "Kerro mielipiteesi",
+    "emptyModerator": "Lisää tapaamisen aiheet: tilaisuuden aikana merkitset etenemisen ja sali näkee käynnissä olevan aiheen.",
+    "progress": "{done}/{total} käsitelty",
+    "skippedCount": "{count, plural, one {# ohitettu} other {# ohitettu}}",
+    "nextTopic": "Seuraava aihe:",
+    "startFirst": "Aloita aiheella:",
+    "finishCurrent": "Päätä käynnissä oleva aihe",
+    "runningFor": "{minutes, plural, =0 {juuri alkanut} one {# minuutin ajan} other {# minuutin ajan}}",
+    "tickerNow": "Nyt",
+    "status": {
+      "PENDING": "Käsittelemättä",
+      "CURRENT": "Käynnissä",
+      "DONE": "Käsitelty",
+      "SKIPPED": "Ohitettu"
+    },
+    "actions": {
+      "start": "Aloita nyt",
+      "done": "Merkitse käsitellyksi",
+      "skip": "Ohita",
+      "reopen": "Avaa uudelleen",
+      "edit": "Muokkaa",
+      "moveUp": "Siirrä ylös",
+      "moveDown": "Siirrä alas"
+    },
+    "plannedMinutes": "{minutes} min suunniteltu",
+    "elapsedOfPlanned": "{minutes}/{planned} min",
+    "overtime": "yli ajan",
+    "tookMinutes": "{minutes} min",
+    "plannedTotal": "Suunniteltu kesto: {minutes} min",
+    "pulsePrompt": "Oletko samaa mieltä?",
+    "addHint": "Enter lisää, Vaihto+Enter uusi rivi. Voit liittää luettelon: yksi aihe riville.",
+    "addMany": "{count, plural, one {Lisää # aihe} other {Lisää # aihetta}}",
+    "minutesPlaceholder": "min",
+    "minutesLabel": "Suunniteltu kesto minuutteina (valinnainen)",
+    "editLabel": "Aiheen otsikko",
+    "agendaChanged": "Asialista muuttui juuri: yritä uudelleen.",
+    "minutesInvalid": "Anna kesto minuutteina, 1–600."
   },
   "common": {
     "appName": "PA Webinar",
@@ -64,7 +100,7 @@
     "past": "Menneet tapahtumat",
     "noUpcoming": "Ei tulevia tapahtumia tällä hetkellä. Tarkista myöhemmin uudelleen!",
     "noPast": "Ei menneitä tapahtumia",
-    "wordCloudTitle": "Sanapilvi",
+    "wordCloudTitle": "Yhdellä sanalla",
     "card": {
       "publicEvent": "Julkinen tapahtuma",
       "readMore": "Lue lisää",
@@ -173,6 +209,7 @@
     "resendLink": "Lähetä pääsylinkki uudelleen",
     "resending": "Lähetetään…",
     "resendSent": "Jos osoite on rekisteröity, lähetimme pääsylinkin uudelleen sähköpostitse.",
+    "resendFailed": "Linkkiä ei voitu lähettää uudelleen. Yritä uudelleen muutaman minuutin kuluttua.",
     "invitationOnly": "Ilmoittautuminen on vain kutsutuille: käytä sähköpostiosoitetta, jolla sinut kutsuttiin. Linkki sisäänpääsyyn lähetetään sinulle sähköpostitse.",
     "closed": "Tähän tapahtumaan ilmoittautuminen ei ole avoinna yleisölle.",
     "lostLink": "Oletko jo ilmoittautunut? Pyydä henkilökohtainen linkkisi uudelleen",
@@ -317,9 +354,9 @@
     "whiteboardNotSavedHint": "Piirtotaulua ei tallenneta automaattisesti. Jos käytät sitä, vie se tiedostoon (piirtotaulun valikko) ja liitä se tapahtuman materiaaleihin ennen päättämistä.",
     "sidebarTabChat": "Keskustelu",
     "sidebarTabPolls": "Kyselyt",
-    "sidebarTabWordcloud": "Sanapilvi",
-    "sidebarTabAgenda": "Muistiinpanot / tarkistuslista",
-    "liveToggleAgenda": "Muistiinpanot / tarkistuslista (agenda)",
+    "sidebarTabWordcloud": "Yhdellä sanalla",
+    "sidebarTabAgenda": "Asialista",
+    "liveToggleAgenda": "Asialista",
     "sidebarTabMaterials": "Materiaalit",
     "sidebarTabParticipants": "Osallistujat",
     "chat": {
@@ -371,7 +408,20 @@
       "notifyDesktopBlocked": "Selain estää tämän sivuston ilmoitukset: voit sallia ne uudelleen sivuston asetuksista.",
       "notifyDesktopUnsupported": "Tämä selain ei tue ilmoituksia.",
       "notifyOffer": "Haluatko ilmoituksen, kun joku mainitsee sinut tai vastaa sinulle?",
-      "notifyOfferEnable": "Ota ilmoitukset käyttöön"
+      "notifyOfferEnable": "Ota ilmoitukset käyttöön",
+      "emojiSearch": "Hae emojia",
+      "emojiNoResults": "Emojeja ei löytynyt",
+      "emojiRecent": "Viimeksi käytetyt",
+      "emojiAll": "Kaikki emojit",
+      "mentionListLabel": "Mainittavat henkilöt",
+      "mentionButton": "Mainitse joku",
+      "replyJump": "Siirry alkuperäiseen viestiin",
+      "typingOne": "{name} kirjoittaa…",
+      "typingTwo": "{a} ja {b} kirjoittavat…",
+      "typingMany": "Useampi henkilö kirjoittaa…",
+      "hideForAll": "Piilota kaikilta",
+      "deleteOwn": "Poista viesti",
+      "mentionedYou": "Mainitsi sinut"
     },
     "role": {
       "moderator": "Moderaattori",
@@ -470,7 +520,9 @@
     "rejoin": "Palaa huoneeseen",
     "backToHome": "Takaisin etusivulle",
     "sidebarTabMaterialsNew": "Uusia jaettuja materiaaleja",
-    "sidebarTabQaNew": "Uutta kohdassa Kysymykset ja vastaukset"
+    "sidebarTabQaNew": "Uutta kohdassa Kysymykset ja vastaukset",
+    "resizeSidebar": "Muuta sivupaneelin kokoa",
+    "sidebarTabWordcloudNew": "Uusi ”Yhdellä sanalla” -kysymys"
   },
   "qa": {
     "title": "Kysymykset ja vastaukset",
@@ -1280,10 +1332,10 @@
       "qaEnabled": "Ota Q&A käyttöön",
       "chatEnabled": "Ota chat käyttöön",
       "recordingEnabled": "Ota videotallennus käyttöön",
-      "agendaEnabled": "Live-muistiinpanot / tarkistuslista (agenda)",
-      "agendaEnabledDesc": "Tarkistuslista käsiteltävistä aiheista, jotka moderaattorit merkitsevät tehdyiksi tapahtuman aikana. Se sisältyy automaattiseen yhteenvetoon. Valinnainen, ja sen voi ottaa käyttöön myös tapahtuman aikana.",
-      "wordCloudEnabled": "Reaaliaikainen sanapilvi",
-      "wordCloudEnabledDesc": "Osallistujat lähettävät sanan, ja sanapilvi päivittyy reaaliajassa. Hyödyllinen keskustelun avaamiseen tai tunnelman kartoittamiseen muutamassa sekunnissa.",
+      "agendaEnabled": "Tapaamisen asialista",
+      "agendaEnabledDesc": "Tapaamisen aiheiden luettelo: tilaisuuden aikana moderaattori merkitsee käynnissä olevan, käsitellyt ja ohitetut aiheet, ja sali näkee aina, missä mennään, myös yläpalkissa. Mukana automaattisessa yhteenvedossa. Valinnainen, voidaan ottaa käyttöön myös tilaisuuden aikana.",
+      "wordCloudEnabled": "”Yhdellä sanalla” -kysymykset",
+      "wordCloudEnabledDesc": "Moderaattori esittää kysymyksen ja jokainen vastaa yhdellä sanalla: vastaukset muodostavat pilven, joka päivittyy reaaliajassa, ja yleisimmät sanat kasvavat. Hyvä jään murtamiseen tai tunnelman keräämiseen muutamassa sekunnissa.",
       "whiteboardEnabled": "Jaettu piirtotaulu",
       "whiteboardEnabledDesc": "Ottaa käyttöön natiivin yhteiskäyttöisen piirtotaulun (Excalidraw): moderaattorit voivat avata sen työkalupalkista tapahtuman aikana. Edellyttää asennuksen piirtotaulupalvelua; kun se on käytettävissä, piirtotaulu on aina käytössä pikapuheluissa.",
       "autoStartRecording": "Aloita tallennus automaattisesti",
@@ -2760,8 +2812,8 @@
         "desc": "Vastaa kyselyihin reaaliajassa ja näe tulokset heti."
       },
       "wordcloud": {
-        "title": "Sanapilvi",
-        "desc": "Lisää sanasi tapahtuman jaettuun sanapilveen."
+        "title": "Yhdellä sanalla",
+        "desc": "Vastaa moderaattorin kysymyksiin yhdellä sanalla ja katso, miten vastausten pilvi kasvaa."
       },
       "reactions": {
         "title": "Reaktiot ja nostetut kädet",
@@ -2772,8 +2824,8 @@
         "desc": "Kirjoita tapahtuman keskusteluun ja seuraa keskustelua muiden osallistujien kanssa."
       },
       "agenda": {
-        "title": "Ohjelma ja muistiinpanot",
-        "desc": "Seuraa ohjelmaa ja moderaattorien tapahtuman aikana jakamia muistiinpanoja."
+        "title": "Asialista",
+        "desc": "Seuraa käynnissä olevaa aihetta ja tapaamisen asialistaa."
       }
     },
     "projectTeaser": {
@@ -2888,8 +2940,17 @@
       "minOptions": "Vähintään 2 vaihtoehtoa vaaditaan",
       "generic": "Virhe kyselyn luomisessa",
       "vote": "Ääntä ei tallennettu. Yritä uudelleen.",
-      "alreadyVoted": "Olet jo äänestänyt tässä kyselyssä."
-    }
+      "alreadyVoted": "Olet jo äänestänyt tässä kyselyssä.",
+      "action": "Toiminto epäonnistui. Yritä uudelleen."
+    },
+    "participation": "{votes, plural, one {# ääni} other {# ääntä}} / {present} paikalla",
+    "participationLabel": "Osallistuminen kyselyyn",
+    "yourVote": "Sinun äänesi",
+    "deletePoll": "Poista kysely",
+    "questionLabel": "Kysymys",
+    "optionsLabel": "Vastausvaihtoehdot",
+    "resultsHidden": "Ääni tallennettu. Tulokset näkyvät, kun moderaattori julkaisee ne.",
+    "closedNoVote": "Äänestys on suljettu. Tulokset näkyvät, kun moderaattori julkaisee ne."
   },
   "materials": {
     "title": "Materiaalit",
@@ -3497,16 +3558,16 @@
     "noFeedback": "Palautetta ei ole saatu"
   },
   "wordcloud": {
-    "title": "Sanapilvi",
+    "title": "Yhdellä sanalla",
     "startRound": "Aloita",
-    "prompt": "Aihe",
+    "prompt": "Kysymys",
     "promptPlaceholder": "esim. Mitä odotat tästä tapahtumasta?",
     "duration": "Kesto",
     "submit": "Lähetä",
-    "submitPlaceholder": "Kirjoita sana (enintään 30 merkkiä)",
-    "close": "Sulje sanapilvi",
+    "submitPlaceholder": "Sinun sanasi",
+    "close": "Sulje vastaukset",
     "cancel": "Peruuta",
-    "noActiveRound": "Yksikään sanapilvi ei ole nyt käynnissä.",
+    "noActiveRound": "Tällä hetkellä ei ole avoimia kysymyksiä.",
     "noWords": "Odotetaan ensimmäisiä sanoja...",
     "wordsSubmitted": "{count} sanaa lähetetty",
     "timeRemaining": "Aikaa jäljellä",
@@ -3514,11 +3575,22 @@
       "send": "Sanaa ei lähetetty. Yritä uudelleen.",
       "closed": "Kierros on päättynyt: uusia sanoja ei enää oteta vastaan.",
       "limit": "Olet jo lähettänyt tämän kierroksen enimmäismäärän sanoja.",
-      "rateLimited": "Liian monta lähetystä juuri nyt: odota muutama sekunti ennen kuin yrität uudelleen."
+      "rateLimited": "Liian monta lähetystä juuri nyt: odota muutama sekunti ennen kuin yrität uudelleen.",
+      "duplicate": "Olet jo kirjoittanut tämän sanan: se lasketaan vain kerran henkilöä kohden.",
+      "removed": "Moderaattori poisti tämän sanan: sitä ei voi lähettää uudelleen.",
+      "invalid": "Kirjoita sana, jossa on kirjaimia tai numeroita."
     },
-    "startNew": "Aloita sanapilvi",
-    "emptyHintModerator": "Esitä avoin kysymys: yhden sanan vastaukset muodostavat pilven reaaliajassa.",
-    "timeLeft": "Aikaa jäljellä: {time}"
+    "startNew": "Esitä kysymys",
+    "emptyHintModerator": "Esitä kysymys, johon voi vastata yhdellä sanalla, esimerkiksi ”Miltä teistä tänään tuntuu?”. Vastaukset muodostavat pilven, joka päivittyy reaaliajassa: mitä useampi kirjoittaa saman sanan, sitä suuremmaksi se kasvaa.",
+    "timeLeft": "Aikaa jäljellä: {time}",
+    "howItWorks": "Vastaa yhdellä sanalla: mitä useampi kirjoittaa saman sanan, sitä suuremmaksi se kasvaa.",
+    "enableHint": "”Yhdellä sanalla” -välilehti tulee kaikkien näkyviin, kun aloitat ensimmäisen kysymyksen.",
+    "topWords": "Eniten kirjoitetut",
+    "yourWords": "Kirjoitit:",
+    "closedBadge": "Päättynyt",
+    "durationUnlimited": "Ei aikarajaa",
+    "allWords": "Kaikki sanat",
+    "removeWord": "Poista pilvestä"
   },
   "timer": {
     "title": "Ajastin",
@@ -3915,7 +3987,7 @@
     "showPolls": "Näytä kyselytulokset",
     "showFeedback": "Näytä palaute",
     "showRecap": "Näytä tapahtuman yhteenveto",
-    "showWordCloud": "Näytä sanapilvi",
+    "showWordCloud": "Näytä ”Yhdellä sanalla” -vastaukset",
     "emailEnabled": "Lähetä yhteenvetosähköposti tapahtuman päättyessä",
     "emailEnabledHelp": "Lähettää päättymisen yhteydessä ilmoittautuneille osallistujille kiitossähköpostin, jossa on linkit yhteenvetoon ja palautteeseen, ja moderaattorille lyhyen yhteenvedon. Lähetetään vain kerran.",
     "feedbackEnabled": "Palautekysely aktiivinen tapahtuman päätyttyä",
@@ -3976,7 +4048,7 @@
     "micToggleOn": "Mikrofoni päällä",
     "micToggleOff": "Mikrofoni pois",
     "cameraOffPreview": "Kamera pois päältä",
-    "speakerTest": "🔊 Äänen testi",
+    "speakerTest": "Äänen testi",
     "backgroundLabel": "Virtuaalitausta",
     "backgroundNoneShort": "No",
     "backgroundHint": "Otetaan käyttöön, kun tulet saliin. Voit sumentaa taustan salissa taustapainikkeella: yllä oleva esikatselu näyttää kameran kuvan ilman tehosteita.",

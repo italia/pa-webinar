@@ -2,8 +2,8 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
-import { Button } from 'design-react-kit';
 import useSWR from 'swr';
+
 import { Icon } from '@/components/ui/icon';
 import { useLivePush } from '@/hooks/use-live-state';
 
@@ -48,6 +48,9 @@ interface PollPanelProps {
   /** Quanti sondaggi aperti la persona non ha ancora votato: la barra delle
    *  schede ci accende il pallino. */
   onUnvotedCountChange?: (count: number) => void;
+  /** Persone in sala adesso: la partecipazione a un sondaggio si misura su di
+   *  loro. Assente fuori dalla chiamata. */
+  presentCount?: number;
 }
 
 export default function PollPanel({
@@ -58,6 +61,7 @@ export default function PollPanel({
   voterGuestId,
   active = true,
   onUnvotedCountChange,
+  presentCount,
 }: PollPanelProps) {
   const t = useTranslations('polls');
   const [showCreate, setShowCreate] = useState(false);
@@ -139,30 +143,44 @@ export default function PollPanel({
     [eventSlug, token, voterAccessToken, voterGuestId, mutate, t],
   );
 
+  // Chiudere, pubblicare, riaprire, eliminare: un rifiuto del server si dice,
+  // altrimenti il pulsante sembrerebbe non fare niente.
   const handleStatusChange = useCallback(
     async (pollId: string, status: string) => {
-      await fetch(`/api/events/${eventSlug}/polls/${pollId}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ status }),
-      });
-      mutate();
+      setVoteError(null);
+      try {
+        const res = await fetch(`/api/events/${eventSlug}/polls/${pollId}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ status }),
+        });
+        if (!res.ok) setVoteError(t('errors.action'));
+      } catch {
+        setVoteError(t('errors.action'));
+      }
+      void mutate();
     },
-    [eventSlug, token, mutate],
+    [eventSlug, token, mutate, t],
   );
 
   const handleDelete = useCallback(
     async (pollId: string) => {
-      await fetch(`/api/events/${eventSlug}/polls/${pollId}`, {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      mutate();
+      setVoteError(null);
+      try {
+        const res = await fetch(`/api/events/${eventSlug}/polls/${pollId}`, {
+          method: 'DELETE',
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) setVoteError(t('errors.action'));
+      } catch {
+        setVoteError(t('errors.action'));
+      }
+      void mutate();
     },
-    [eventSlug, token, mutate],
+    [eventSlug, token, mutate, t],
   );
 
   const handleCreated = useCallback(() => {
@@ -182,7 +200,7 @@ export default function PollPanel({
           </h3>
         </div>
 
-        <div className="p-3 flex-grow-1" style={{ overflowY: 'auto' }}>
+        <div className="poll-body flex-grow-1">
           {isModerator && (
             <div className="mb-3">
               {showCreate ? (
@@ -193,34 +211,36 @@ export default function PollPanel({
                   onCancel={() => setShowCreate(false)}
                 />
               ) : (
-                <Button
-                  color="primary"
-                  size="sm"
-                  className="w-100"
-                  onClick={() => setShowCreate(true)}
-                >
+                <button type="button" className="poll-new" onClick={() => setShowCreate(true)}>
+                  <Icon icon="it-plus-circle" size="sm" color="primary" />
                   {t('createPoll')}
-                </Button>
+                </button>
               )}
             </div>
           )}
 
           {voteError && (
-            <p className="text-danger small mb-2" role="alert">
+            <p className="qa-error" role="alert">
               {voteError}
             </p>
           )}
 
           {polls.length === 0 && (
-            <p className="text-muted small text-center py-3">{t('noPolls')}</p>
+            <div className="qa-empty">
+              <span className="qa-empty__icon" aria-hidden="true">
+                <Icon icon="it-chart-line" color="primary" />
+              </span>
+              <p className="mb-0">{t('noPolls')}</p>
+            </div>
           )}
 
-          <div className="d-flex flex-column gap-2">
+          <div className="poll-list">
             {polls.map((poll) => (
               <PollCard
                 key={poll.id}
                 poll={poll}
                 isModerator={isModerator}
+                presentCount={presentCount}
                 onVote={handleVote}
                 onStatusChange={handleStatusChange}
                 onDelete={handleDelete}

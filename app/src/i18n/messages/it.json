@@ -1,15 +1,51 @@
 {
   "agenda": {
-    "title": "Note / Checklist",
-    "empty": "Nessun punto ancora. Aggiungi i temi da trattare e spuntali man mano.",
+    "title": "Scaletta",
+    "empty": "La scaletta non è ancora stata preparata.",
     "add": "Aggiungi",
-    "addPlaceholder": "Nuovo punto…",
-    "remove": "Rimuovi",
+    "addPlaceholder": "Nuovo argomento…",
+    "remove": "Elimina argomento",
     "inProgress": "in corso",
     "agree": "D'accordo",
     "disagree": "Non d'accordo",
     "favorablePct": "{pct}% favorevole",
-    "noReactions": "Esprimi la tua opinione"
+    "noReactions": "Esprimi la tua opinione",
+    "emptyModerator": "Aggiungi gli argomenti dell'incontro: durante l'evento ne segni l'avanzamento e la sala vede quello in corso.",
+    "progress": "{done} di {total} discussi",
+    "skippedCount": "{count, plural, one {# saltato} other {# saltati}}",
+    "nextTopic": "Prossimo argomento:",
+    "startFirst": "Inizia con:",
+    "finishCurrent": "Concludi l'argomento in corso",
+    "runningFor": "{minutes, plural, =0 {appena iniziato} one {da # minuto} other {da # minuti}}",
+    "tickerNow": "In corso",
+    "status": {
+      "PENDING": "Da discutere",
+      "CURRENT": "In corso",
+      "DONE": "Discusso",
+      "SKIPPED": "Saltato"
+    },
+    "actions": {
+      "start": "Inizia ora",
+      "done": "Segna come discusso",
+      "skip": "Salta",
+      "reopen": "Riapri",
+      "edit": "Modifica",
+      "moveUp": "Sposta su",
+      "moveDown": "Sposta giù"
+    },
+    "plannedMinutes": "{minutes} min previsti",
+    "elapsedOfPlanned": "{minutes} di {planned} min",
+    "overtime": "oltre il previsto",
+    "tookMinutes": "{minutes} min",
+    "plannedTotal": "Durata prevista: {minutes} min",
+    "pulsePrompt": "Sei d'accordo?",
+    "addHint": "Invio per aggiungere, Maiusc+Invio per andare a capo. Puoi incollare un elenco: un argomento per riga.",
+    "addMany": "{count, plural, one {Aggiungi # argomento} other {Aggiungi # argomenti}}",
+    "minutesPlaceholder": "min",
+    "minutesLabel": "Durata prevista in minuti (facoltativa)",
+    "editLabel": "Titolo dell'argomento",
+    "agendaChanged": "La scaletta è appena cambiata: riprova.",
+    "minutesInvalid": "La durata va scritta in minuti, da 1 a 600."
   },
   "common": {
     "appName": "PA Webinar",
@@ -64,7 +100,7 @@
     "past": "Eventi passati",
     "noUpcoming": "Nessun evento in programma al momento. Torna a trovarci!",
     "noPast": "Nessun evento passato",
-    "wordCloudTitle": "Nuvola di parole",
+    "wordCloudTitle": "In una parola",
     "card": {
       "publicEvent": "Evento pubblico",
       "readMore": "Scopri di più",
@@ -173,6 +209,7 @@
     "resendLink": "Invia di nuovo il link di accesso",
     "resending": "Invio in corso…",
     "resendSent": "Se l'indirizzo è registrato, ti abbiamo inviato di nuovo il link di accesso via email.",
+    "resendFailed": "Non è stato possibile inviare di nuovo il link. Riprova tra qualche minuto.",
     "invitationOnly": "L'iscrizione è riservata alle persone invitate: usa l'indirizzo email con cui ti hanno invitato. Il link per entrare ti arriverà via email.",
     "closed": "L'iscrizione a questo evento non è aperta al pubblico.",
     "lostLink": "Ti eri già registrato? Ricevi di nuovo il tuo link personale",
@@ -331,9 +368,9 @@
     "whiteboardNotSavedHint": "La lavagna non viene salvata automaticamente. Se la usi, esportala (menu della lavagna) e allegala ai Materiali dell'evento prima di terminare.",
     "sidebarTabChat": "Chat",
     "sidebarTabPolls": "Sondaggi",
-    "sidebarTabWordcloud": "Nuvola di parole",
-    "sidebarTabAgenda": "Note / Checklist",
-    "liveToggleAgenda": "Note / Checklist (agenda)",
+    "sidebarTabWordcloud": "In una parola",
+    "sidebarTabAgenda": "Scaletta",
+    "liveToggleAgenda": "Scaletta",
     "sidebarTabMaterials": "Materiali",
     "sidebarTabParticipants": "Partecipanti",
     "chat": {
@@ -385,7 +422,20 @@
       "notifyDesktopBlocked": "Il browser blocca le notifiche di questo sito: puoi riattivarle dalle impostazioni del sito.",
       "notifyDesktopUnsupported": "Questo browser non supporta le notifiche.",
       "notifyOffer": "Vuoi una notifica quando ti nominano o ti rispondono?",
-      "notifyOfferEnable": "Attiva le notifiche"
+      "notifyOfferEnable": "Attiva le notifiche",
+      "emojiSearch": "Cerca un'emoji",
+      "emojiNoResults": "Nessuna emoji trovata",
+      "emojiRecent": "Usate di recente",
+      "emojiAll": "Tutte le emoji",
+      "mentionListLabel": "Persone da menzionare",
+      "mentionButton": "Menziona una persona",
+      "replyJump": "Vai al messaggio originale",
+      "typingOne": "{name} sta scrivendo…",
+      "typingTwo": "{a} e {b} stanno scrivendo…",
+      "typingMany": "Più persone stanno scrivendo…",
+      "hideForAll": "Nascondi a tutti",
+      "deleteOwn": "Elimina il messaggio",
+      "mentionedYou": "Ti ha menzionato"
     },
     "role": {
       "moderator": "Moderatore",
@@ -470,7 +520,9 @@
     "rejoin": "Rientra",
     "backToHome": "Torna alla home page",
     "sidebarTabMaterialsNew": "Nuovi materiali condivisi",
-    "sidebarTabQaNew": "Novità in Domande e risposte"
+    "sidebarTabQaNew": "Novità in Domande e risposte",
+    "resizeSidebar": "Ridimensiona il pannello laterale",
+    "sidebarTabWordcloudNew": "Nuova domanda «In una parola»"
   },
   "qa": {
     "title": "Domande e Risposte",
@@ -555,8 +607,17 @@
       "minOptions": "Servono almeno 2 opzioni",
       "generic": "Errore nella creazione del sondaggio",
       "vote": "Voto non registrato. Riprova.",
-      "alreadyVoted": "Hai già votato in questo sondaggio."
-    }
+      "alreadyVoted": "Hai già votato in questo sondaggio.",
+      "action": "Operazione non riuscita. Riprova."
+    },
+    "participation": "{votes, plural, one {# voto} other {# voti}} su {present} presenti",
+    "participationLabel": "Partecipazione al sondaggio",
+    "yourVote": "Il tuo voto",
+    "deletePoll": "Elimina sondaggio",
+    "questionLabel": "Domanda",
+    "optionsLabel": "Risposte possibili",
+    "resultsHidden": "Voto registrato. I risultati compariranno quando il moderatore li pubblicherà.",
+    "closedNoVote": "Il voto è chiuso. I risultati compariranno quando il moderatore li pubblicherà."
   },
   "materials": {
     "title": "Materiali",
@@ -1381,10 +1442,10 @@
       "qaEnabled": "Abilita Q&A",
       "chatEnabled": "Abilita chat",
       "recordingEnabled": "Abilita registrazione video",
-      "agendaEnabled": "Note / Checklist (agenda) live",
-      "agendaEnabledDesc": "Una checklist dei punti da trattare che i moderatori spuntano durante l'evento. Confluisce nella sintesi automatica. Opzionale e attivabile anche durante l'evento.",
-      "wordCloudEnabled": "Nuvola di parole live",
-      "wordCloudEnabledDesc": "Chi partecipa manda una parola e la nuvola si aggiorna in diretta. Utile per aprire un confronto o raccogliere un sentimento in pochi secondi.",
+      "agendaEnabled": "Scaletta dell'incontro",
+      "agendaEnabledDesc": "La lista degli argomenti dell'incontro: durante l'evento il moderatore segna quello in corso, i discussi e i saltati, e la sala vede sempre a che punto si è, anche nella barra in alto. Confluisce nella sintesi automatica. Opzionale e attivabile anche durante l'evento.",
+      "wordCloudEnabled": "Domande «In una parola»",
+      "wordCloudEnabledDesc": "Il moderatore fa una domanda e ognuno risponde con una parola sola: le risposte formano una nuvola che si aggiorna in diretta, e le parole più scritte diventano più grandi. Utile per rompere il ghiaccio o raccogliere un'impressione in pochi secondi.",
       "whiteboardEnabled": "Lavagna condivisa",
       "whiteboardEnabledDesc": "Abilita la lavagna collaborativa (Excalidraw) nativa: i moderatori possono aprirla dalla toolbar durante l'evento. Richiede il servizio lavagna dell'installazione; dove c'è, nelle chiamate istantanee è sempre attiva.",
       "autoStartRecording": "Avvia la registrazione automaticamente",
@@ -2861,8 +2922,8 @@
         "desc": "Rispondi ai sondaggi in tempo reale e vedi i risultati all'istante."
       },
       "wordcloud": {
-        "title": "Word cloud",
-        "desc": "Contribuisci con le tue parole alla nuvola condivisa dell'evento."
+        "title": "In una parola",
+        "desc": "Rispondi con una parola alle domande del moderatore e guarda crescere la nuvola delle risposte."
       },
       "reactions": {
         "title": "Reazioni e mani alzate",
@@ -2873,8 +2934,8 @@
         "desc": "Scrivi nella chat dell'evento e segui la conversazione con gli altri partecipanti."
       },
       "agenda": {
-        "title": "Note e checklist",
-        "desc": "Segui le note e la checklist condivise dai moderatori durante l'evento."
+        "title": "Scaletta",
+        "desc": "Segui l'argomento in corso e la scaletta dell'incontro."
       }
     },
     "projectTeaser": {
@@ -3497,16 +3558,16 @@
     "noFeedback": "Nessun feedback ricevuto"
   },
   "wordcloud": {
-    "title": "Nuvola di parole",
+    "title": "In una parola",
     "startRound": "Avvia",
-    "prompt": "Tema",
+    "prompt": "Domanda",
     "promptPlaceholder": "es. Cosa ti aspetti da questo evento?",
     "duration": "Durata",
     "submit": "Invia",
-    "submitPlaceholder": "Scrivi una parola (max 30 car.)",
-    "close": "Chiudi la nuvola",
+    "submitPlaceholder": "La tua parola",
+    "close": "Chiudi le risposte",
     "cancel": "Annulla",
-    "noActiveRound": "Nessuna nuvola di parole attiva al momento.",
+    "noActiveRound": "Nessuna domanda aperta in questo momento.",
     "noWords": "In attesa delle prime parole...",
     "wordsSubmitted": "{count} parole inviate",
     "timeRemaining": "Tempo rimanente",
@@ -3514,11 +3575,22 @@
       "send": "Parola non inviata. Riprova.",
       "closed": "Il giro è chiuso: non si accettano altre parole.",
       "limit": "Hai già inviato il numero massimo di parole per questo giro.",
-      "rateLimited": "Troppi invii in questo momento: attendi qualche secondo prima di riprovare."
+      "rateLimited": "Troppi invii in questo momento: attendi qualche secondo prima di riprovare.",
+      "duplicate": "Hai già scritto questa parola: conta una volta sola per persona.",
+      "removed": "Il moderatore ha tolto questa parola: non si può inviare di nuovo.",
+      "invalid": "Scrivi una parola fatta di lettere o numeri."
     },
-    "startNew": "Avvia una nuvola di parole",
-    "emptyHintModerator": "Fai una domanda aperta: le risposte di una parola compongono la nuvola in tempo reale.",
-    "timeLeft": "Tempo rimasto: {time}"
+    "startNew": "Fai una domanda",
+    "emptyHintModerator": "Fai una domanda a cui si risponde con una parola sola, per esempio «Come vi sentite oggi?». Le risposte formano una nuvola che si aggiorna in diretta: più persone scrivono la stessa parola, più diventa grande.",
+    "timeLeft": "Tempo rimasto: {time}",
+    "howItWorks": "Rispondi con una parola sola: più persone scrivono la stessa parola, più diventa grande.",
+    "enableHint": "La scheda «In una parola» comparirà a tutti quando avvierai la prima domanda.",
+    "topWords": "Le più scritte",
+    "yourWords": "Hai scritto:",
+    "closedBadge": "Conclusa",
+    "durationUnlimited": "Senza limite",
+    "allWords": "Tutte le parole",
+    "removeWord": "Togli dalla nuvola"
   },
   "timer": {
     "title": "Timer",
@@ -3915,7 +3987,7 @@
     "showPolls": "Mostra risultati sondaggi",
     "showFeedback": "Mostra feedback",
     "showRecap": "Mostra riepilogo evento",
-    "showWordCloud": "Mostra nuvola di parole",
+    "showWordCloud": "Mostra le risposte «In una parola»",
     "emailEnabled": "Invia email di riepilogo a fine evento",
     "emailEnabledHelp": "Alla conclusione, invia ai partecipanti registrati un'email di ringraziamento con il link al riepilogo e al feedback, e al moderatore un riepilogo sintetico. Parte una sola volta.",
     "feedbackEnabled": "Survey feedback attiva a fine evento",
@@ -3976,7 +4048,7 @@
     "micToggleOn": "Microfono ON",
     "micToggleOff": "Microfono OFF",
     "cameraOffPreview": "Fotocamera spenta",
-    "speakerTest": "🔊 Test audio",
+    "speakerTest": "Test audio",
     "backgroundLabel": "Sfondo virtuale",
     "backgroundNoneShort": "No",
     "backgroundHint": "Si applica quando entri in sala. Per sfocare lo sfondo usa il pulsante degli sfondi una volta dentro: l'anteprima qui sopra mostra la videocamera senza effetto.",

@@ -1,15 +1,51 @@
 {
   "agenda": {
-    "title": "Jegyzetek / Ellenőrzőlista",
-    "empty": "Még nincs egyetlen pont sem. Vegye fel a megtárgyalandó témákat, és haladás közben pipálja ki őket.",
+    "title": "Napirend",
+    "empty": "A napirend még nem készült el.",
     "add": "Hozzáadás",
-    "addPlaceholder": "Új pont…",
-    "remove": "Eltávolítás",
+    "addPlaceholder": "Új téma…",
+    "remove": "Téma törlése",
     "inProgress": "folyamatban",
     "agree": "Egyetértek",
     "disagree": "Nem értek egyet",
     "favorablePct": "{pct}% támogatja",
-    "noReactions": "Ossza meg a véleményét"
+    "noReactions": "Ossza meg a véleményét",
+    "emptyModerator": "Add hozzá a találkozó témáit: az esemény alatt jelölöd a haladást, a terem pedig látja az aktuális témát.",
+    "progress": "{done}/{total} megbeszélve",
+    "skippedCount": "{count, plural, one {# kihagyva} other {# kihagyva}}",
+    "nextTopic": "Következő téma:",
+    "startFirst": "Kezdés ezzel:",
+    "finishCurrent": "Aktuális téma lezárása",
+    "runningFor": "{minutes, plural, =0 {épp most kezdődött} one {# perce} other {# perce}}",
+    "tickerNow": "Most",
+    "status": {
+      "PENDING": "Megbeszélendő",
+      "CURRENT": "Folyamatban",
+      "DONE": "Megbeszélve",
+      "SKIPPED": "Kihagyva"
+    },
+    "actions": {
+      "start": "Kezdés most",
+      "done": "Megbeszéltnek jelöl",
+      "skip": "Kihagyás",
+      "reopen": "Újranyitás",
+      "edit": "Szerkesztés",
+      "moveUp": "Feljebb",
+      "moveDown": "Lejjebb"
+    },
+    "plannedMinutes": "{minutes} perc tervezett",
+    "elapsedOfPlanned": "{minutes}/{planned} perc",
+    "overtime": "túllépve az időt",
+    "tookMinutes": "{minutes} perc",
+    "plannedTotal": "Tervezett időtartam: {minutes} perc",
+    "pulsePrompt": "Egyetértesz?",
+    "addHint": "Enter a hozzáadáshoz, Shift+Enter új sorhoz. Beilleszthetsz egy listát is: soronként egy témát.",
+    "addMany": "{count, plural, one {# téma hozzáadása} other {# téma hozzáadása}}",
+    "minutesPlaceholder": "perc",
+    "minutesLabel": "Tervezett időtartam percben (nem kötelező)",
+    "editLabel": "A téma címe",
+    "agendaChanged": "A napirend épp most változott: próbáld újra.",
+    "minutesInvalid": "Add meg az időtartamot percben, 1 és 600 között."
   },
   "common": {
     "appName": "PA Webinar",
@@ -64,7 +100,7 @@
     "past": "Korábbi események",
     "noUpcoming": "Jelenleg nincs tervezett esemény. Látogasson vissza később!",
     "noPast": "Nincsenek korábbi események",
-    "wordCloudTitle": "Szófelhő",
+    "wordCloudTitle": "Egy szóval",
     "card": {
       "publicEvent": "Nyilvános esemény",
       "readMore": "Részletek",
@@ -173,6 +209,7 @@
     "resendLink": "Hozzáférési link újraküldése",
     "resending": "Küldés…",
     "resendSent": "Ha a cím regisztrálva van, e-mailben újra elküldtük a hozzáférési linket.",
+    "resendFailed": "A linket nem sikerült újra elküldeni. Próbálja újra néhány perc múlva.",
     "invitationOnly": "A regisztráció csak meghívottaknak szól: azt az e-mail címet használja, amellyel meghívták. A belépési linket e-mailben kapja meg.",
     "closed": "Erre az eseményre a regisztráció nem nyilvános.",
     "lostLink": "Már regisztrált? Kérje újra a személyes linkjét",
@@ -317,9 +354,9 @@
     "whiteboardNotSavedHint": "A tábla tartalma nem mentődik automatikusan. Ha használja, exportálja (a tábla menüjéből), és a lezárás előtt csatolja az esemény Anyagaihoz.",
     "sidebarTabChat": "Chat",
     "sidebarTabPolls": "Szavazások",
-    "sidebarTabWordcloud": "Szófelhő",
-    "sidebarTabAgenda": "Jegyzetek / Ellenőrzőlista",
-    "liveToggleAgenda": "Jegyzetek / Ellenőrzőlista (napirend)",
+    "sidebarTabWordcloud": "Egy szóval",
+    "sidebarTabAgenda": "Napirend",
+    "liveToggleAgenda": "Napirend",
     "sidebarTabMaterials": "Anyagok",
     "sidebarTabParticipants": "Résztvevők",
     "chat": {
@@ -371,7 +408,20 @@
       "notifyDesktopBlocked": "A böngésző letiltja a webhely értesítéseit: a webhely beállításaiban újra engedélyezheti őket.",
       "notifyDesktopUnsupported": "Ez a böngésző nem támogatja az értesítéseket.",
       "notifyOffer": "Kér értesítést, ha valaki megemlíti vagy válaszol Önnek?",
-      "notifyOfferEnable": "Értesítések bekapcsolása"
+      "notifyOfferEnable": "Értesítések bekapcsolása",
+      "emojiSearch": "Emoji keresése",
+      "emojiNoResults": "Nincs találat",
+      "emojiRecent": "Nemrég használt",
+      "emojiAll": "Összes emoji",
+      "mentionListLabel": "Megemlíthető személyek",
+      "mentionButton": "Valaki megemlítése",
+      "replyJump": "Ugrás az eredeti üzenetre",
+      "typingOne": "{name} ír…",
+      "typingTwo": "{a} és {b} ír…",
+      "typingMany": "Többen írnak…",
+      "hideForAll": "Elrejtés mindenki elől",
+      "deleteOwn": "Üzenet törlése",
+      "mentionedYou": "Megemlített téged"
     },
     "role": {
       "moderator": "Moderátor",
@@ -470,7 +520,9 @@
     "rejoin": "Visszalépés",
     "backToHome": "Vissza a kezdőlapra",
     "sidebarTabMaterialsNew": "Új megosztott anyagok",
-    "sidebarTabQaNew": "Újdonságok a Kérdések és válaszok részben"
+    "sidebarTabQaNew": "Újdonságok a Kérdések és válaszok részben",
+    "resizeSidebar": "Az oldalsáv átméretezése",
+    "sidebarTabWordcloudNew": "Új „Egy szóval” kérdés"
   },
   "qa": {
     "title": "Kérdések és válaszok",
@@ -1280,10 +1332,10 @@
       "qaEnabled": "Q&A engedélyezése",
       "chatEnabled": "Csevegés engedélyezése",
       "recordingEnabled": "Videofelvétel engedélyezése",
-      "agendaEnabled": "Élő jegyzetek / ellenőrzőlista (napirend)",
-      "agendaEnabledDesc": "A megtárgyalandó pontok ellenőrzőlistája, amelyet a moderátorok az esemény során kipipálnak. Beépül az automatikus összefoglalóba. Nem kötelező, és az esemény közben is bekapcsolható.",
-      "wordCloudEnabled": "Élő szófelhő",
-      "wordCloudEnabledDesc": "A résztvevők beküldenek egy szót, és a felhő élőben frissül. Hasznos egy beszélgetés elindításához vagy a hangulat néhány másodperc alatti felméréséhez.",
+      "agendaEnabled": "A találkozó napirendje",
+      "agendaEnabledDesc": "A találkozó témáinak listája: az esemény alatt a moderátor jelöli az aktuális, a megbeszélt és a kihagyott témákat, a terem pedig mindig látja, hol tartanak, a felső sávban is. Bekerül az automatikus összefoglalóba. Választható, az esemény alatt is bekapcsolható.",
+      "wordCloudEnabled": "„Egy szóval” kérdések",
+      "wordCloudEnabledDesc": "A moderátor feltesz egy kérdést, és mindenki egyetlen szóval válaszol: a válaszokból élőben frissülő felhő lesz, a leggyakoribb szavak pedig nagyobbak lesznek. Hasznos a jég megtöréséhez vagy egy benyomás gyors összegyűjtéséhez.",
       "whiteboardEnabled": "Megosztott tábla",
       "whiteboardEnabledDesc": "Bekapcsolja a beépített, együttműködésre szolgáló táblát (Excalidraw): a moderátorok az esemény alatt az eszköztárból nyithatják meg. A telepítés táblaszolgáltatását igényli; ahol elérhető, az azonnali hívásokban mindig aktív.",
       "autoStartRecording": "Felvétel automatikus indítása",
@@ -2760,8 +2812,8 @@
         "desc": "Válaszoljon a szavazásokra valós időben, és azonnal lássa az eredményeket."
       },
       "wordcloud": {
-        "title": "Szófelhő",
-        "desc": "Adja hozzá saját szavait az esemény közös szófelhőjéhez."
+        "title": "Egy szóval",
+        "desc": "Válaszolj egy szóval a moderátor kérdéseire, és nézd, ahogy nő a válaszfelhő."
       },
       "reactions": {
         "title": "Reakciók és felemelt kezek",
@@ -2772,8 +2824,8 @@
         "desc": "Írjon az esemény csevegésébe, és kövesse a beszélgetést a többi résztvevővel."
       },
       "agenda": {
-        "title": "Napirend és jegyzetek",
-        "desc": "Kövesse a napirendet és a moderátorok által az esemény során megosztott jegyzeteket."
+        "title": "Napirend",
+        "desc": "Kövesd az aktuális témát és a találkozó napirendjét."
       }
     },
     "projectTeaser": {
@@ -2888,8 +2940,17 @@
       "minOptions": "Legalább 2 lehetőség szükséges",
       "generic": "Hiba a szavazás létrehozásakor",
       "vote": "A szavazat nem lett rögzítve. Próbálja újra.",
-      "alreadyVoted": "Ezen a szavazáson már szavazott."
-    }
+      "alreadyVoted": "Ezen a szavazáson már szavazott.",
+      "action": "A művelet nem sikerült. Próbálja újra."
+    },
+    "participation": "{votes, plural, one {# szavazat} other {# szavazat}} {present} jelenlévőből",
+    "participationLabel": "Részvétel a szavazáson",
+    "yourVote": "Az Ön szavazata",
+    "deletePoll": "Szavazás törlése",
+    "questionLabel": "Kérdés",
+    "optionsLabel": "Lehetséges válaszok",
+    "resultsHidden": "Szavazat rögzítve. Az eredmények akkor jelennek meg, amikor a moderátor közzéteszi őket.",
+    "closedNoVote": "A szavazás lezárult. Az eredmények akkor jelennek meg, amikor a moderátor közzéteszi őket."
   },
   "materials": {
     "title": "Anyagok",
@@ -3497,16 +3558,16 @@
     "noFeedback": "Nem érkezett visszajelzés"
   },
   "wordcloud": {
-    "title": "Szófelhő",
+    "title": "Egy szóval",
     "startRound": "Indítás",
-    "prompt": "Téma",
+    "prompt": "Kérdés",
     "promptPlaceholder": "pl. Mit vár ettől az eseménytől?",
     "duration": "Időtartam",
     "submit": "Küldés",
-    "submitPlaceholder": "Írjon be egy szót (max. 30 karakter)",
-    "close": "Szófelhő lezárása",
+    "submitPlaceholder": "A te szavad",
+    "close": "Válaszok lezárása",
     "cancel": "Mégse",
-    "noActiveRound": "Jelenleg nincs aktív szófelhő.",
+    "noActiveRound": "Jelenleg nincs nyitott kérdés.",
     "noWords": "Várunk az első szavakra...",
     "wordsSubmitted": "{count} beküldött szó",
     "timeRemaining": "Hátralévő idő",
@@ -3514,11 +3575,22 @@
       "send": "A szó nem lett elküldve. Próbálja újra.",
       "closed": "Ez a kör lezárult: további szavakat már nem fogadunk.",
       "limit": "Ebben a körben már elküldte a megengedett legtöbb szót.",
-      "rateLimited": "Túl sok beküldés érkezik most: várjon néhány másodpercet, mielőtt újra próbálkozik."
+      "rateLimited": "Túl sok beküldés érkezik most: várjon néhány másodpercet, mielőtt újra próbálkozik.",
+      "duplicate": "Ezt a szót már leírtad: személyenként csak egyszer számít.",
+      "removed": "A moderátor eltávolította ezt a szót: nem küldhető el újra.",
+      "invalid": "Írj egy betűkből vagy számokból álló szót."
     },
-    "startNew": "Szófelhő indítása",
-    "emptyHintModerator": "Tegyen fel nyitott kérdést: az egyszavas válaszok valós időben alkotják a felhőt.",
-    "timeLeft": "Hátralévő idő: {time}"
+    "startNew": "Kérdés feltevése",
+    "emptyHintModerator": "Tegyél fel egy kérdést, amelyre egy szóval lehet válaszolni, például: „Hogy érzitek magatokat ma?”. A válaszokból élőben frissülő felhő lesz: minél többen írják ugyanazt a szót, annál nagyobb lesz.",
+    "timeLeft": "Hátralévő idő: {time}",
+    "howItWorks": "Válaszolj egyetlen szóval: minél többen írják ugyanazt a szót, annál nagyobb lesz.",
+    "enableHint": "Az „Egy szóval” fül mindenkinek megjelenik, amikor elindítod az első kérdést.",
+    "topWords": "Leggyakoribbak",
+    "yourWords": "Ezt írtad:",
+    "closedBadge": "Lezárva",
+    "durationUnlimited": "Időkorlát nélkül",
+    "allWords": "Minden szó",
+    "removeWord": "Eltávolítás a felhőből"
   },
   "timer": {
     "title": "Időzítő",
@@ -3915,7 +3987,7 @@
     "showPolls": "Szavazási eredmények megjelenítése",
     "showFeedback": "Visszajelzések megjelenítése",
     "showRecap": "Az esemény összegzésének megjelenítése",
-    "showWordCloud": "Szófelhő megjelenítése",
+    "showWordCloud": "„Egy szóval” válaszok megjelenítése",
     "emailEnabled": "Összegző e-mail küldése az esemény végén",
     "emailEnabledHelp": "A lezáráskor a regisztrált résztvevőknek köszönő e-mailt küld az összegzésre és a visszajelzésre mutató linkekkel, a moderátornak pedig rövid összegzést. Csak egyszer megy ki.",
     "feedbackEnabled": "Visszajelzési kérdőív aktív az esemény végén",
@@ -3976,7 +4048,7 @@
     "micToggleOn": "Mikrofon BE",
     "micToggleOff": "Mikrofon KI",
     "cameraOffPreview": "Kamera kikapcsolva",
-    "speakerTest": "🔊 Hangteszt",
+    "speakerTest": "Hangteszt",
     "backgroundLabel": "Virtuális háttér",
     "backgroundNoneShort": "No",
     "backgroundHint": "A terembe lépéskor lép érvénybe. A háttér elmosásához a teremben használja a hátterek gombot: a fenti előnézet effektus nélkül mutatja a kamerát.",

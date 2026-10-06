@@ -94,59 +94,68 @@ export default function PollCreateForm({
   );
 
   return (
-    <form onSubmit={handleSubmit} className="border rounded p-2">
-      <div className="mb-2">
-        <input
-          type="text"
-          className="form-control form-control-sm"
-          placeholder={t('questionPlaceholder')}
-          value={question}
-          onChange={(e) => setQuestion(e.target.value)}
-          maxLength={300}
-        />
-      </div>
+    <form onSubmit={handleSubmit} className="poll-form">
+      <label htmlFor="poll-question" className="poll-form__label">
+        {t('questionLabel')}
+      </label>
+      <textarea
+        id="poll-question"
+        className="poll-form__input"
+        rows={2}
+        placeholder={t('questionPlaceholder')}
+        value={question}
+        onChange={(e) => setQuestion(e.target.value)}
+        maxLength={300}
+        autoFocus
+      />
 
-      {options.map((opt, i) => (
-        <div key={i} className="d-flex gap-1 mb-1">
-          <input
-            type="text"
-            className="form-control form-control-sm"
-            placeholder={t('optionPlaceholder', { number: i + 1 })}
-            value={opt}
-            onChange={(e) => updateOption(i, e.target.value)}
-            maxLength={200}
-          />
-          {options.length > 2 && (
-            <button
-              type="button"
-              className="btn btn-sm btn-outline-danger border-0"
-              onClick={() => removeOption(i)}
-              aria-label={t('removeOption')}
-            >
-              <Icon icon="it-close" size="xs" />
-            </button>
-          )}
-        </div>
-      ))}
+      <fieldset className="poll-form__options">
+        <legend className="poll-form__label">{t('optionsLabel')}</legend>
+        {options.map((opt, i) => (
+          <div key={i} className="poll-form__option">
+            <span className="poll-form__num" aria-hidden="true">{i + 1}</span>
+            <input
+              type="text"
+              className="poll-form__input"
+              placeholder={t('optionPlaceholder', { number: i + 1 })}
+              aria-label={t('optionPlaceholder', { number: i + 1 })}
+              value={opt}
+              onChange={(e) => updateOption(i, e.target.value)}
+              maxLength={200}
+            />
+            {options.length > 2 && (
+              <button
+                type="button"
+                className="poll-form__remove"
+                onClick={() => removeOption(i)}
+                aria-label={t('removeOption')}
+                title={t('removeOption')}
+              >
+                <Icon icon="it-close" size="sm" />
+              </button>
+            )}
+          </div>
+        ))}
+        {options.length < 6 && (
+          <button type="button" className="poll-form__add" onClick={addOption}>
+            <Icon icon="it-plus-circle" size="xs" color="primary" />
+            {t('addOption')}
+          </button>
+        )}
+      </fieldset>
 
-      {options.length < 6 && (
-        <button
-          type="button"
-          className="btn btn-sm btn-link p-0 mb-2"
-          onClick={addOption}
-        >
-          + {t('addOption')}
-        </button>
+      {error && (
+        <p className="qa-error" role="alert">
+          {error}
+        </p>
       )}
 
-      {error && <div className="text-danger small mb-2">{error}</div>}
-
-      <div className="d-flex gap-2">
-        <Button color="primary" size="xs" type="submit" disabled={submitting}>
-          {submitting ? t('creating') : t('create')}
-        </Button>
-        <Button color="secondary" outline size="xs" type="button" onClick={onCancel}>
+      <div className="poll-form__actions">
+        <Button color="secondary" outline size="sm" type="button" onClick={onCancel}>
           {t('cancelCreate')}
+        </Button>
+        <Button color="primary" size="sm" type="submit" disabled={submitting}>
+          {submitting ? t('creating') : t('create')}
         </Button>
       </div>
     </form>

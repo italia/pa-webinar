@@ -125,6 +125,7 @@ export function useQaAlerts({
       repliesToMe: false,
       onScreen: onScreenRef.current,
       pageVisible: document.visibilityState === 'visible',
+      pageFocused: document.hasFocus(),
     });
     if (azione.sound) playChatChime();
     if (azione.desktop) showDesktopNotification(avviso.title, avviso.body, 'pa-webinar-qa');

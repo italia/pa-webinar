@@ -1,15 +1,51 @@
 {
   "agenda": {
-    "title": "Märkmed / kontrollnimekiri",
-    "empty": "Ühtegi punkti veel pole. Lisa käsitletavad teemad ja märgi need töö käigus tehtuks.",
+    "title": "Päevakava",
+    "empty": "Päevakava pole veel koostatud.",
     "add": "Lisa",
-    "addPlaceholder": "Uus punkt…",
-    "remove": "Eemalda",
+    "addPlaceholder": "Uus teema…",
+    "remove": "Kustuta teema",
     "inProgress": "pooleli",
     "agree": "Nõus",
     "disagree": "Ei ole nõus",
     "favorablePct": "{pct}% poolt",
-    "noReactions": "Avalda oma arvamus"
+    "noReactions": "Avalda oma arvamus",
+    "emptyModerator": "Lisa kohtumise teemad: ürituse ajal märgid edenemist ja saal näeb käimasolevat teemat.",
+    "progress": "{done}/{total} käsitletud",
+    "skippedCount": "{count, plural, one {# vahele jäetud} other {# vahele jäetud}}",
+    "nextTopic": "Järgmine teema:",
+    "startFirst": "Alusta teemaga:",
+    "finishCurrent": "Lõpeta käimasolev teema",
+    "runningFor": "{minutes, plural, =0 {just alanud} one {# minut} other {# minutit}}",
+    "tickerNow": "Praegu",
+    "status": {
+      "PENDING": "Käsitlemata",
+      "CURRENT": "Käimas",
+      "DONE": "Käsitletud",
+      "SKIPPED": "Vahele jäetud"
+    },
+    "actions": {
+      "start": "Alusta kohe",
+      "done": "Märgi käsitletuks",
+      "skip": "Jäta vahele",
+      "reopen": "Ava uuesti",
+      "edit": "Muuda",
+      "moveUp": "Liiguta üles",
+      "moveDown": "Liiguta alla"
+    },
+    "plannedMinutes": "plaanis {minutes} min",
+    "elapsedOfPlanned": "{minutes}/{planned} min",
+    "overtime": "üle aja",
+    "tookMinutes": "{minutes} min",
+    "plannedTotal": "Planeeritud kestus: {minutes} min",
+    "pulsePrompt": "Kas oled nõus?",
+    "addHint": "Enter lisab, Shift+Enter teeb uue rea. Võid kleepida loendi: üks teema reas.",
+    "addMany": "{count, plural, one {Lisa # teema} other {Lisa # teemat}}",
+    "minutesPlaceholder": "min",
+    "minutesLabel": "Planeeritud kestus minutites (valikuline)",
+    "editLabel": "Teema pealkiri",
+    "agendaChanged": "Päevakava muutus just: proovi uuesti.",
+    "minutesInvalid": "Sisesta kestus minutites, 1 kuni 600."
   },
   "common": {
     "appName": "PA Webinar",
@@ -64,7 +100,7 @@
     "past": "Möödunud üritused",
     "noUpcoming": "Hetkel pole planeeritud üritusi. Tulge hiljem tagasi!",
     "noPast": "Möödunud üritusi pole",
-    "wordCloudTitle": "Sõnapilv",
+    "wordCloudTitle": "Ühe sõnaga",
     "card": {
       "publicEvent": "Avalik üritus",
       "readMore": "Loe lähemalt",
@@ -173,6 +209,7 @@
     "resendLink": "Saada minu juurdepääsulink uuesti",
     "resending": "Saatmine…",
     "resendSent": "Kui aadress on registreeritud, saatsime juurdepääsulingi e-postiga uuesti.",
+    "resendFailed": "Linki ei õnnestunud uuesti saata. Proovi mõne minuti pärast uuesti.",
     "invitationOnly": "Registreerumine on ainult kutsutud isikutele: kasutage e-posti aadressi, millega teid kutsuti. Sisenemislingi saate e-postiga.",
     "closed": "Sellele üritusele registreerumine ei ole avalik.",
     "lostLink": "Olete juba registreerunud? Saage oma isiklik link uuesti",
@@ -317,9 +354,9 @@
     "whiteboardNotSavedHint": "Tahvlit ei salvestata automaatselt. Kui seda kasutad, ekspordi see (tahvli menüüst) ja lisa enne lõpetamist sündmuse materjalide juurde.",
     "sidebarTabChat": "Vestlus",
     "sidebarTabPolls": "Küsitlused",
-    "sidebarTabWordcloud": "Sõnapilv",
-    "sidebarTabAgenda": "Märkmed / kontrollnimekiri",
-    "liveToggleAgenda": "Märkmed / kontrollnimekiri (päevakava)",
+    "sidebarTabWordcloud": "Ühe sõnaga",
+    "sidebarTabAgenda": "Päevakava",
+    "liveToggleAgenda": "Päevakava",
     "sidebarTabMaterials": "Materjalid",
     "sidebarTabParticipants": "Osalejad",
     "chat": {
@@ -371,7 +408,20 @@
       "notifyDesktopBlocked": "Brauser blokeerib selle saidi teavitused: saate need saidi seadetes uuesti lubada.",
       "notifyDesktopUnsupported": "See brauser ei toeta teavitusi.",
       "notifyOffer": "Kas soovite teavitust, kui keegi teid mainib või teile vastab?",
-      "notifyOfferEnable": "Lülita teavitused sisse"
+      "notifyOfferEnable": "Lülita teavitused sisse",
+      "emojiSearch": "Otsi emojit",
+      "emojiNoResults": "Emojisid ei leitud",
+      "emojiRecent": "Hiljuti kasutatud",
+      "emojiAll": "Kõik emojid",
+      "mentionListLabel": "Mainitavad inimesed",
+      "mentionButton": "Maini kedagi",
+      "replyJump": "Mine algse sõnumi juurde",
+      "typingOne": "{name} kirjutab…",
+      "typingTwo": "{a} ja {b} kirjutavad…",
+      "typingMany": "Mitu inimest kirjutab…",
+      "hideForAll": "Peida kõigi eest",
+      "deleteOwn": "Kustuta sõnum",
+      "mentionedYou": "Mainis sind"
     },
     "role": {
       "moderator": "Moderaator",
@@ -470,7 +520,9 @@
     "rejoin": "Tule tagasi",
     "backToHome": "Tagasi avalehele",
     "sidebarTabMaterialsNew": "Uued jagatud materjalid",
-    "sidebarTabQaNew": "Uut küsimustes ja vastustes"
+    "sidebarTabQaNew": "Uut küsimustes ja vastustes",
+    "resizeSidebar": "Muuda külgpaneeli suurust",
+    "sidebarTabWordcloudNew": "Uus „Ühe sõnaga“ küsimus"
   },
   "qa": {
     "title": "Küsimused ja vastused",
@@ -1280,10 +1332,10 @@
       "qaEnabled": "Luba Q&A",
       "chatEnabled": "Luba vestlus",
       "recordingEnabled": "Luba videosalvestamine",
-      "agendaEnabled": "Otsemärkmed / kontrollnimekiri (päevakava)",
-      "agendaEnabledDesc": "Käsitletavate teemade kontrollnimekiri, mille moderaatorid sündmuse ajal punkthaaval tehtuks märgivad. Läheb automaatsesse kokkuvõttesse. Valikuline ja sisselülitatav ka sündmuse ajal.",
-      "wordCloudEnabled": "Reaalajas sõnapilv",
-      "wordCloudEnabledDesc": "Osalejad saadavad sõna ja pilv uueneb reaalajas. Kasulik arutelu avamiseks või meeleolu kogumiseks mõne sekundiga.",
+      "agendaEnabled": "Kohtumise päevakava",
+      "agendaEnabledDesc": "Kohtumise teemade loend: ürituse ajal märgib moderaator käimasoleva, käsitletud ja vahele jäetud teemad ning saal näeb alati, kus ollakse, ka ülemisel ribal. Kaasatakse automaatsesse kokkuvõttesse. Valikuline, saab sisse lülitada ka ürituse ajal.",
+      "wordCloudEnabled": "„Ühe sõnaga“ küsimused",
+      "wordCloudEnabledDesc": "Moderaator esitab küsimuse ja igaüks vastab ühe sõnaga: vastustest moodustub pilv, mis uueneb reaalajas, ja kõige sagedamad sõnad muutuvad suuremaks. Sobib jää murdmiseks või mõne sekundiga muljete kogumiseks.",
       "whiteboardEnabled": "Jagatud tahvel",
       "whiteboardEnabledDesc": "Lubab sisseehitatud koostöötahvli (Excalidraw): moderaatorid saavad selle sündmuse ajal tööriistaribalt avada. Nõuab paigalduse tahvliteenust; kus see on olemas, on tahvel kiirkõnedes alati sees.",
       "autoStartRecording": "Käivita salvestus automaatselt",
@@ -2760,8 +2812,8 @@
         "desc": "Vasta küsitlustele reaalajas ja näe tulemusi kohe."
       },
       "wordcloud": {
-        "title": "Sõnapilv",
-        "desc": "Lisa oma sõnad ürituse jagatud sõnapilve."
+        "title": "Ühe sõnaga",
+        "desc": "Vasta moderaatori küsimustele ühe sõnaga ja vaata, kuidas vastuste pilv kasvab."
       },
       "reactions": {
         "title": "Reaktsioonid ja tõstetud käed",
@@ -2772,8 +2824,8 @@
         "desc": "Kirjuta ürituse vestlusesse ja jälgi vestlust teiste osalejatega."
       },
       "agenda": {
-        "title": "Päevakord ja märkmed",
-        "desc": "Jälgi päevakorda ja märkmeid, mida moderaatorid ürituse ajal jagavad."
+        "title": "Päevakava",
+        "desc": "Jälgi käimasolevat teemat ja kohtumise päevakava."
       }
     },
     "projectTeaser": {
@@ -2888,8 +2940,17 @@
       "minOptions": "Vaja on vähemalt 2 varianti",
       "generic": "Viga küsitluse loomisel",
       "vote": "Häält ei salvestatud. Proovige uuesti.",
-      "alreadyVoted": "Olete selles küsitluses juba hääletanud."
-    }
+      "alreadyVoted": "Olete selles küsitluses juba hääletanud.",
+      "action": "Toiming ebaõnnestus. Proovi uuesti."
+    },
+    "participation": "{votes, plural, one {# hääl} other {# häält}} {present} kohalviibijast",
+    "participationLabel": "Küsitluses osalemine",
+    "yourVote": "Sinu hääl",
+    "deletePoll": "Kustuta küsitlus",
+    "questionLabel": "Küsimus",
+    "optionsLabel": "Võimalikud vastused",
+    "resultsHidden": "Hääl on salvestatud. Tulemused ilmuvad, kui moderaator need avaldab.",
+    "closedNoVote": "Hääletus on suletud. Tulemused ilmuvad, kui moderaator need avaldab."
   },
   "materials": {
     "title": "Materjalid",
@@ -3497,16 +3558,16 @@
     "noFeedback": "Tagasisidet pole saadud"
   },
   "wordcloud": {
-    "title": "Sõnapilv",
+    "title": "Ühe sõnaga",
     "startRound": "Alusta",
-    "prompt": "Teema",
+    "prompt": "Küsimus",
     "promptPlaceholder": "nt Mida te sellelt ürituselt ootate?",
     "duration": "Kestus",
     "submit": "Saada",
-    "submitPlaceholder": "Sisestage sõna (max 30 tähemärki)",
-    "close": "Sulge sõnapilv",
+    "submitPlaceholder": "Sinu sõna",
+    "close": "Sulge vastused",
     "cancel": "Tühista",
-    "noActiveRound": "Praegu pole ühtegi aktiivset sõnapilve.",
+    "noActiveRound": "Praegu ei ole ühtegi avatud küsimust.",
     "noWords": "Ootame esimesi sõnu...",
     "wordsSubmitted": "{count} sõna saadetud",
     "timeRemaining": "Jäänud aega",
@@ -3514,11 +3575,22 @@
       "send": "Sõna ei saadetud. Proovige uuesti.",
       "closed": "See voor on suletud: rohkem sõnu vastu ei võeta.",
       "limit": "Olete selles voorus juba saatnud maksimaalse arvu sõnu.",
-      "rateLimited": "Praegu on liiga palju saatmisi: oodake mõni sekund, enne kui uuesti proovite."
+      "rateLimited": "Praegu on liiga palju saatmisi: oodake mõni sekund, enne kui uuesti proovite.",
+      "duplicate": "Oled selle sõna juba kirjutanud: see loeb ainult üks kord inimese kohta.",
+      "removed": "Moderaator eemaldas selle sõna: seda ei saa uuesti saata.",
+      "invalid": "Kirjuta sõna tähtedest või numbritest."
     },
-    "startNew": "Alusta sõnapilve",
-    "emptyHintModerator": "Esitage avatud küsimus: ühesõnalised vastused moodustavad pilve reaalajas.",
-    "timeLeft": "Aega jäänud: {time}"
+    "startNew": "Esita küsimus",
+    "emptyHintModerator": "Esita küsimus, millele saab vastata ühe sõnaga, näiteks „Kuidas te end täna tunnete?“. Vastustest moodustub pilv, mis uueneb reaalajas: mida rohkem inimesi sama sõna kirjutab, seda suuremaks see muutub.",
+    "timeLeft": "Aega jäänud: {time}",
+    "howItWorks": "Vasta ühe sõnaga: mida rohkem inimesi sama sõna kirjutab, seda suuremaks see muutub.",
+    "enableHint": "Vahekaart „Ühe sõnaga“ ilmub kõigile, kui alustad esimest küsimust.",
+    "topWords": "Kõige sagedamad",
+    "yourWords": "Sa kirjutasid:",
+    "closedBadge": "Lõpetatud",
+    "durationUnlimited": "Ajapiiranguta",
+    "allWords": "Kõik sõnad",
+    "removeWord": "Eemalda pilvest"
   },
   "timer": {
     "title": "Taimer",
@@ -3915,7 +3987,7 @@
     "showPolls": "Näita küsitluste tulemusi",
     "showFeedback": "Näita tagasisidet",
     "showRecap": "Näita sündmuse kokkuvõtet",
-    "showWordCloud": "Näita sõnapilve",
+    "showWordCloud": "Näita „Ühe sõnaga“ vastuseid",
     "emailEnabled": "Saada sündmuse lõppedes kokkuvõtlik e-kiri",
     "emailEnabledHelp": "Lõppemisel saadetakse registreerunud osalejatele tänukiri koos linkidega kokkuvõttele ja tagasisidele ning moderaatorile lühike kokkuvõte. Saadetakse ainult üks kord.",
     "feedbackEnabled": "Tagasisideküsitlus aktiivne ürituse lõpus",
@@ -3976,7 +4048,7 @@
     "micToggleOn": "Mikrofon SEES",
     "micToggleOff": "Mikrofon VÄLJAS",
     "cameraOffPreview": "Kaamera väljas",
-    "speakerTest": "🔊 Heli test",
+    "speakerTest": "Heli test",
     "backgroundLabel": "Virtuaalne taust",
     "backgroundNoneShort": "No",
     "backgroundHint": "Rakendub ruumi sisenemisel. Tausta hägustamiseks kasutage ruumis olles taustade nuppu: ülal olev eelvaade näitab kaamerat ilma efektideta.",

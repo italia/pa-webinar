@@ -1,15 +1,51 @@
 {
   "agenda": {
-    "title": "Nótaí / Seicliosta",
-    "empty": "Níl aon phointe ann fós. Cuir na topaicí atá le plé leis agus ticeáil iad de réir mar a théann tú ar aghaidh.",
+    "title": "Clár",
+    "empty": "Níl an clár ullmhaithe fós.",
     "add": "Cuir leis",
-    "addPlaceholder": "Pointe nua…",
-    "remove": "Bain",
+    "addPlaceholder": "Ábhar nua…",
+    "remove": "Scrios an t-ábhar",
     "inProgress": "ar siúl",
     "agree": "Aontaím",
     "disagree": "Ní aontaím",
     "favorablePct": "{pct}% i bhfabhar",
-    "noReactions": "Abair do thuairim"
+    "noReactions": "Abair do thuairim",
+    "emptyModerator": "Cuir ábhair an chruinnithe leis: le linn na hócáide marcálann tú an dul chun cinn agus feiceann an seomra an t-ábhar reatha.",
+    "progress": "{done} as {total} pléite",
+    "skippedCount": "{count, plural, one {# fágtha ar lár} other {# fágtha ar lár}}",
+    "nextTopic": "An chéad ábhar eile:",
+    "startFirst": "Tosaigh le:",
+    "finishCurrent": "Críochnaigh an t-ábhar reatha",
+    "runningFor": "{minutes, plural, =0 {díreach tosaithe} one {le # nóiméad} other {le # nóiméad}}",
+    "tickerNow": "Anois",
+    "status": {
+      "PENDING": "Le plé",
+      "CURRENT": "Ar siúl",
+      "DONE": "Pléite",
+      "SKIPPED": "Fágtha ar lár"
+    },
+    "actions": {
+      "start": "Tosaigh anois",
+      "done": "Marcáil mar pléite",
+      "skip": "Fág ar lár",
+      "reopen": "Athoscail",
+      "edit": "Cuir in eagar",
+      "moveUp": "Bog suas",
+      "moveDown": "Bog síos"
+    },
+    "plannedMinutes": "{minutes} nóim. beartaithe",
+    "elapsedOfPlanned": "{minutes} as {planned} nóim.",
+    "overtime": "thar am",
+    "tookMinutes": "{minutes} nóim.",
+    "plannedTotal": "Fad beartaithe: {minutes} nóim.",
+    "pulsePrompt": "An aontaíonn tú?",
+    "addHint": "Enter le cur leis, Shift+Enter le haghaidh líne nua. Is féidir leat liosta a ghreamú: ábhar amháin in aghaidh na líne.",
+    "addMany": "{count, plural, one {Cuir # ábhar leis} other {Cuir # ábhar leis}}",
+    "minutesPlaceholder": "nóim.",
+    "minutesLabel": "Fad beartaithe i nóiméid (roghnach)",
+    "editLabel": "Teideal an ábhair",
+    "agendaChanged": "Tá an clár díreach athraithe: bain triail eile as.",
+    "minutesInvalid": "Scríobh an fad i nóiméid, ó 1 go 600."
   },
   "common": {
     "appName": "PA Webinar",
@@ -64,7 +100,7 @@
     "past": "Imeachtaí roimhe seo",
     "noUpcoming": "Níl aon imeacht beartaithe faoi láthair. Tar ar ais arís!",
     "noPast": "Níl aon imeacht roimhe seo",
-    "wordCloudTitle": "Scamall focal",
+    "wordCloudTitle": "In aon fhocal amháin",
     "card": {
       "publicEvent": "Imeacht poiblí",
       "readMore": "Tuilleadh eolais",
@@ -173,6 +209,7 @@
     "resendLink": "Seol an nasc rochtana arís",
     "resending": "Á sheoladh…",
     "resendSent": "Má tá an seoladh cláraithe, sheolamar an nasc rochtana chugaibh arís trí ríomhphost.",
+    "resendFailed": "Níorbh fhéidir an nasc a sheoladh arís. Bain triail eile as i gceann cúpla nóiméad.",
     "invitationOnly": "Tá an clárú curtha in áirithe do dhaoine a fuair cuireadh: úsáidigí an seoladh ríomhphoist lenar tugadh cuireadh daoibh. Gheobhaidh sibh an nasc isteach trí ríomhphost.",
     "closed": "Níl an clárú don imeacht seo oscailte don phobal.",
     "lostLink": "Cláraithe cheana? Faighigí bhur nasc pearsanta arís",
@@ -317,9 +354,9 @@
     "whiteboardNotSavedHint": "Ní shábháiltear an clár bán go huathoibríoch. Má úsáideann tú é, easpórtáil é (roghchlár an chláir bháin) agus ceangail le hÁbhair an imeachta é sula gcuirfidh tú deireadh leis.",
     "sidebarTabChat": "Comhrá",
     "sidebarTabPolls": "Pobalbhreitheanna",
-    "sidebarTabWordcloud": "Scamall focal",
-    "sidebarTabAgenda": "Nótaí / Seicliosta",
-    "liveToggleAgenda": "Nótaí / Seicliosta (clár oibre)",
+    "sidebarTabWordcloud": "In aon fhocal amháin",
+    "sidebarTabAgenda": "Clár",
+    "liveToggleAgenda": "Clár",
     "sidebarTabMaterials": "Ábhair",
     "sidebarTabParticipants": "Rannpháirtithe",
     "chat": {
@@ -371,7 +408,20 @@
       "notifyDesktopBlocked": "Tá fógraí an tsuímh seo blocáilte ag do bhrabhsálaí: is féidir iad a cheadú arís i socruithe an tsuímh.",
       "notifyDesktopUnsupported": "Ní thacaíonn an brabhsálaí seo le fógraí.",
       "notifyOffer": "Ar mhaith leat fógra nuair a luann duine thú nó nuair a fhreagraíonn sé thú?",
-      "notifyOfferEnable": "Cas air fógraí"
+      "notifyOfferEnable": "Cas air fógraí",
+      "emojiSearch": "Cuardaigh emoji",
+      "emojiNoResults": "Níor aimsíodh emoji",
+      "emojiRecent": "Úsáidte le déanaí",
+      "emojiAll": "Gach emoji",
+      "mentionListLabel": "Daoine le lua",
+      "mentionButton": "Luaigh duine",
+      "replyJump": "Téigh go dtí an bunteachtaireacht",
+      "typingOne": "Tá {name} ag clóscríobh…",
+      "typingTwo": "Tá {a} agus {b} ag clóscríobh…",
+      "typingMany": "Tá roinnt daoine ag clóscríobh…",
+      "hideForAll": "Folaigh ar gach duine",
+      "deleteOwn": "Scrios an teachtaireacht",
+      "mentionedYou": "Luaigh sé/sí thú"
     },
     "role": {
       "moderator": "Modhnóir",
@@ -470,7 +520,9 @@
     "rejoin": "Fill isteach",
     "backToHome": "Ar ais go dtí an leathanach baile",
     "sidebarTabMaterialsNew": "Ábhair nua roinnte",
-    "sidebarTabQaNew": "Nua i gCeisteanna agus freagraí"
+    "sidebarTabQaNew": "Nua i gCeisteanna agus freagraí",
+    "resizeSidebar": "Athraigh méid an phainéil taoibh",
+    "sidebarTabWordcloudNew": "Ceist nua “In aon fhocal amháin”"
   },
   "qa": {
     "title": "Ceisteanna agus Freagraí",
@@ -1280,10 +1332,10 @@
       "qaEnabled": "Cumasaigh Q&A",
       "chatEnabled": "Cumasaigh comhrá",
       "recordingEnabled": "Cumasaigh taifeadadh físe",
-      "agendaEnabled": "Nótaí / Seicliosta beo (clár oibre)",
-      "agendaEnabledDesc": "Seicliosta de na topaicí atá le plé a thiceálann na modhnóirí le linn an imeachta. Cuirtear san áireamh san achoimre uathoibríoch é. Roghnach, agus is féidir é a chur ar siúl le linn an imeachta freisin.",
-      "wordCloudEnabled": "Scamall focal beo",
-      "wordCloudEnabledDesc": "Seolann na rannpháirtithe focal agus nuashonraítear an scamall beo. Úsáideach chun plé a oscailt nó chun mothú a bhailiú i gceann cúpla soicind.",
+      "agendaEnabled": "Clár an chruinnithe",
+      "agendaEnabledDesc": "Liosta ábhar an chruinnithe: le linn na hócáide marcálann an modhnóir an t-ábhar reatha, na cinn a pléadh agus na cinn a fágadh ar lár, agus feiceann an seomra i gcónaí cá bhfuiltear, sa bharra barr freisin. Cuirtear san achoimre uathoibríoch é. Roghnach, is féidir é a chur ar siúl le linn na hócáide freisin.",
+      "wordCloudEnabled": "Ceisteanna “In aon fhocal amháin”",
+      "wordCloudEnabledDesc": "Cuireann an modhnóir ceist agus freagraíonn gach duine le focal amháin: cruthaíonn na freagraí scamall a nuashonraítear beo, agus éiríonn na focail is coitianta níos mó. Úsáideach chun an t-oighear a bhriseadh nó chun tuairim a bhailiú i gceann cúpla soicind.",
       "whiteboardEnabled": "Clár bán comhroinnte",
       "whiteboardEnabledDesc": "Cumasaíonn sé an clár bán comhoibríoch dúchasach (Excalidraw): is féidir le modhnóirí é a oscailt ón mbarra uirlisí le linn an imeachta. Teastaíonn seirbhís chlár bán na suiteála; nuair atá sí ar fáil, bíonn sé ar siúl i gcónaí i nglaonna láithreacha.",
       "autoStartRecording": "Tosaigh an taifeadadh go huathoibríoch",
@@ -2760,8 +2812,8 @@
         "desc": "Freagair pobalbhreitheanna i bhfíor-am agus féach na torthaí láithreach."
       },
       "wordcloud": {
-        "title": "Scamall focal",
-        "desc": "Cuir do chuid focal le scamall focal comhroinnte an imeachta."
+        "title": "In aon fhocal amháin",
+        "desc": "Freagair ceisteanna an mhodhnóra le focal amháin agus féach ar scamall na bhfreagraí ag fás."
       },
       "reactions": {
         "title": "Frithghníomhartha agus lámha ardaithe",
@@ -2772,8 +2824,8 @@
         "desc": "Scríobh i gcomhrá an imeachta agus lean an comhrá leis na rannpháirtithe eile."
       },
       "agenda": {
-        "title": "Clár oibre agus nótaí",
-        "desc": "Lean an clár oibre agus na nótaí a roinneann na modhnóirí le linn an imeachta."
+        "title": "Clár",
+        "desc": "Lean an t-ábhar reatha agus clár an chruinnithe."
       }
     },
     "projectTeaser": {
@@ -2888,8 +2940,17 @@
       "minOptions": "Tá 2 rogha ar a laghad ag teastáil",
       "generic": "Earráid agus an phobalbhreith á cruthú",
       "vote": "Níor taifeadadh an vóta. Bain triail eile as.",
-      "alreadyVoted": "Tá vóta caite agaibh sa phobalbhreith seo cheana."
-    }
+      "alreadyVoted": "Tá vóta caite agaibh sa phobalbhreith seo cheana.",
+      "action": "Theip ar an ngníomh. Bain triail eile as."
+    },
+    "participation": "{votes, plural, one {# vóta} other {# vóta}} as {present} i láthair",
+    "participationLabel": "Rannpháirtíocht sa phobalbhreith",
+    "yourVote": "Do vóta",
+    "deletePoll": "Scrios an phobalbhreith",
+    "questionLabel": "Ceist",
+    "optionsLabel": "Freagraí féideartha",
+    "resultsHidden": "Taifeadadh an vóta. Taispeánfar na torthaí nuair a fhoilseoidh an modhnóir iad.",
+    "closedNoVote": "Tá an vótáil dúnta. Taispeánfar na torthaí nuair a fhoilseoidh an modhnóir iad."
   },
   "materials": {
     "title": "Ábhair",
@@ -3497,16 +3558,16 @@
     "noFeedback": "Ní bhfuarthas aon aiseolas"
   },
   "wordcloud": {
-    "title": "Scamall focal",
+    "title": "In aon fhocal amháin",
     "startRound": "Tosaigh",
-    "prompt": "Topaic",
+    "prompt": "Ceist",
     "promptPlaceholder": "m.sh. Cad a bhfuil sibh ag súil leis ón imeacht seo?",
     "duration": "Fad",
     "submit": "Seol",
-    "submitPlaceholder": "Clóscríobh focal (uasmhéid 30 car.)",
-    "close": "Dún an scamall focal",
+    "submitPlaceholder": "Do fhocal",
+    "close": "Dún na freagraí",
     "cancel": "Cealaigh",
-    "noActiveRound": "Níl aon scamall focal gníomhach faoi láthair.",
+    "noActiveRound": "Níl aon cheist oscailte faoi láthair.",
     "noWords": "Ag fanacht leis na chéad fhocail...",
     "wordsSubmitted": "{count} focal seolta",
     "timeRemaining": "Am fágtha",
@@ -3514,11 +3575,22 @@
       "send": "Níor seoladh an focal. Bain triail eile as.",
       "closed": "Tá an babhta seo dúnta: ní ghlactar le tuilleadh focal.",
       "limit": "Tá an líon uasta focal seolta agaibh cheana don bhabhta seo.",
-      "rateLimited": "An iomarca seoltaí faoi láthair: fan cúpla soicind sula mbainfidh tú triail eile as."
+      "rateLimited": "An iomarca seoltaí faoi láthair: fan cúpla soicind sula mbainfidh tú triail eile as.",
+      "duplicate": "Scríobh tú an focal seo cheana: ní áirítear é ach uair amháin in aghaidh an duine.",
+      "removed": "Bhain an modhnóir an focal seo: ní féidir é a sheoladh arís.",
+      "invalid": "Scríobh focal le litreacha nó uimhreacha."
     },
-    "startNew": "Tosaigh scamall focal",
-    "emptyHintModerator": "Cuir ceist oscailte: cruthaíonn freagraí aon fhocail an scamall i bhfíor-am.",
-    "timeLeft": "Am fágtha: {time}"
+    "startNew": "Cuir ceist",
+    "emptyHintModerator": "Cuir ceist ar féidir a fhreagairt le focal amháin, mar shampla “Conas atá sibh ag mothú inniu?”. Cruthaíonn na freagraí scamall a nuashonraítear beo: dá mhéad daoine a scríobhann an focal céanna, is ea is mó a éiríonn sé.",
+    "timeLeft": "Am fágtha: {time}",
+    "howItWorks": "Freagair le focal amháin: dá mhéad daoine a scríobhann an focal céanna, is ea is mó a éiríonn sé.",
+    "enableHint": "Beidh an cluaisín “In aon fhocal amháin” le feiceáil ag gach duine nuair a chuirfidh tú tús leis an gcéad cheist.",
+    "topWords": "Na cinn is mó a scríobhadh",
+    "yourWords": "Scríobh tú:",
+    "closedBadge": "Críochnaithe",
+    "durationUnlimited": "Gan teorainn ama",
+    "allWords": "Gach focal",
+    "removeWord": "Bain den scamall"
   },
   "timer": {
     "title": "Amadóir",
@@ -3915,7 +3987,7 @@
     "showPolls": "Taispeáin torthaí pobalbhreitheanna",
     "showFeedback": "Taispeáin aiseolas",
     "showRecap": "Taispeáin achoimre an imeachta",
-    "showWordCloud": "Taispeáin an scamall focal",
+    "showWordCloud": "Taispeáin na freagraí “In aon fhocal amháin”",
     "emailEnabled": "Seol ríomhphost achoimre nuair a chríochnaíonn an t-imeacht",
     "emailEnabledHelp": "Nuair a chríochnaíonn sé, seoltar ríomhphost buíochais chuig na rannpháirtithe cláraithe le naisc chuig an achoimre agus chuig an aiseolas, agus achoimre ghairid chuig an modhnóir. Ní sheoltar ach uair amháin é.",
     "feedbackEnabled": "Suirbhé aiseolais gníomhach ag deireadh an imeachta",
@@ -3976,7 +4048,7 @@
     "micToggleOn": "Micreafón ON",
     "micToggleOff": "Micreafón OFF",
     "cameraOffPreview": "Ceamara as",
-    "speakerTest": "🔊 Tástáil fuaime",
+    "speakerTest": "Tástáil fuaime",
     "backgroundLabel": "Cúlra fíorúil",
     "backgroundNoneShort": "No",
     "backgroundHint": "Cuirtear i bhfeidhm é nuair a théann sibh isteach sa seomra. Chun an cúlra a dhoiléiriú, úsáidigí an cnaipe cúlraí nuair atá sibh istigh: taispeánann an réamhamharc thuas an ceamara gan éifeacht.",

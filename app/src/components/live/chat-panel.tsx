@@ -1,21 +1,39 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import { useFormatter, useTranslations } from 'next-intl';
 
 import { Icon } from '@/components/ui/icon';
 import ChatNotifyMenu from '@/components/live/chat-notify-menu';
+import { avatarColor, avatarInitials } from '@/lib/chat/avatar';
 import { playChatChime } from '@/lib/chat/chime';
 import { showDesktopNotification } from '@/lib/chat/desktop-notification';
 import { renderChatBody, mentionsUser } from '@/lib/chat/linkify';
 import {
   CHAT_NOTIFY_STORAGE_KEY,
   DEFAULT_CHAT_NOTIFY_PREFS,
+  DEFAULT_MODERATOR_CHAT_NOTIFY_PREFS,
   chatAlertFor,
+  chatPreviewFor,
   parseChatNotifyPrefs,
   type ChatNotifyPrefs,
 } from '@/lib/chat/notify-prefs';
 import { CHAT_REACTION_EMOJIS } from '@/lib/chat/emoji';
+import {
+  applyTyping,
+  clearTyping,
+  parseTypingPayload,
+  pruneTyping,
+  shouldPing,
+  typingLabel,
+  type TypingState,
+} from '@/lib/chat/typing';
+import {
+  RECENT_EMOJI_KEY,
+  parseRecentEmoji,
+  pushRecentEmoji,
+  searchEmoji,
+} from '@/lib/chat/emoji-catalog';
 import {
   CHAT_ATTACHMENT_MIME,
   CHAT_ATTACHMENT_MAX_BYTES,
@@ -71,6 +89,25 @@ interface ChatPanelProps {
   isModerator?: boolean;
   active?: boolean;
   onUnreadCountChange?: (count: number) => void;
+  /** Un messaggio da mostrare in anteprima nella sala perche' la chat non e'
+   *  sotto gli occhi (lib/chat/notify-prefs#chatPreviewFor). */
+  onPreview?: (preview: ChatPreview) => void;
+  /** Messaggi non letti che nominano chi guarda o gli rispondono: la sala li
+   *  segnala a parte, piu' in vista del semplice conteggio. */
+  onUnreadMentionsChange?: (count: number) => void;
+  /** I nomi delle persone in sala adesso: si possono menzionare anche se non
+   *  hanno ancora scritto. Letto quando si apre l'elenco delle menzioni. */
+  getRoster?: () => string[];
+}
+
+/** Quanto basta all'anteprima di un messaggio arrivato a chat chiusa. */
+export interface ChatPreview {
+  id: string;
+  senderName: string;
+  senderKey?: string;
+  text: string;
+  mentionsMe: boolean;
+  repliesToMe: boolean;
 }
 
 interface ChatMessage {
@@ -105,26 +142,11 @@ interface ChatHistoryResponse {
   attachmentsEnabled?: boolean;
 }
 
-// Small static emoji set for the compose-box picker. Plain string
-// literals — no npm dep, server/client render identically (no hydration risk).
-// 16 emojis → 2 rows of 8 in the popover grid.
-const CHAT_EMOJIS = [
-  '👍', '🙏', '👏', '😀', '😂', '😍', '🤔', '😮',
-  '😢', '🎉', '❤️', '🔥', '✅', '👀', '💡', '🚀',
-] as const;
+/** Altezza massima della casella di scrittura (circa otto righe): oltre, scorre. */
+const INPUT_MAX_HEIGHT = 200;
 
-const AVATAR_COLORS = [
-  '#0066CC', '#008758', '#A66300', '#D9364F',
-  '#6A50D3', '#00A8B3', '#B23683', '#73348C',
-];
-
-function getAvatarColor(key: string): string {
-  let hash = 0;
-  for (let i = 0; i < key.length; i += 1) {
-    hash = key.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length] ?? '#0066CC';
-}
+/** Oltre quest'eta' un messaggio e' storico, non una novita' da anteprima. */
+const PREVIEW_MAX_AGE_MS = 60_000;
 
 /** Due messaggi di fila della stessa persona entro questo intervallo formano
  *  un gruppo: nome, ruolo e avatar si mostrano una volta sola. */
@@ -155,6 +177,9 @@ export default function ChatPanel({
   isModerator = false,
   active = true,
   onUnreadCountChange,
+  onPreview,
+  onUnreadMentionsChange,
+  getRoster,
 }: ChatPanelProps) {
   const t = useTranslations('live.chat');
   const tc = useTranslations('common');
@@ -198,9 +223,30 @@ export default function ChatPanel({
   const [attaching, setAttaching] = useState(false);
   const [composeError, setComposeError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
   const [emojiOpen, setEmojiOpen] = useState(false);
   const emojiRef = useRef<HTMLDivElement>(null);
+  const [emojiQuery, setEmojiQuery] = useState('');
+  const [recentEmoji, setRecentEmoji] = useState<string[]>([]);
+  useEffect(() => {
+    try {
+      setRecentEmoji(parseRecentEmoji(window.localStorage.getItem(RECENT_EMOJI_KEY)));
+    } catch { /* storage non disponibile: nessuna recente */ }
+  }, []);
+  // Il messaggio originale di una risposta, appena raggiunto dal riquadro
+  // citato: si illumina un attimo per farsi trovare.
+  const [flashId, setFlashId] = useState<string | null>(null);
+  const mentionListId = useId();
+  // Chi sta scrivendo (lib/chat/typing): arriva dallo stream come evento a
+  // parte, si spegne da solo dopo qualche secondo o al suo messaggio.
+  const [typing, setTyping] = useState<TypingState>(() => new Map());
+  // La mia chiave di mittente, nota dal primo messaggio inviato: serve a non
+  // mostrarmi come «sta scrivendo» a me stesso.
+  const ownKeyRef = useRef<string | undefined>(undefined);
+  const lastTypingPingRef = useRef(0);
+  const [mentionIndex, setMentionIndex] = useState(0);
+  // Esc chiude l'elenco delle menzioni finche' il testo resta quello.
+  const [mentionDismissedFor, setMentionDismissedFor] = useState<string | null>(null);
 
   const listRef = useRef<HTMLDivElement>(null);
   const isAtBottomRef = useRef(true);
@@ -225,6 +271,14 @@ export default function ChatPanel({
     unreadCountRef.current = n;
     onUnreadCountChangeRef.current?.(n);
   }, []);
+  const unreadMentionsRef = useRef(0);
+  const onUnreadMentionsChangeRef = useRef(onUnreadMentionsChange);
+  useEffect(() => { onUnreadMentionsChangeRef.current = onUnreadMentionsChange; }, [onUnreadMentionsChange]);
+  const setUnreadMentions = useCallback((n: number) => {
+    if (unreadMentionsRef.current === n) return;
+    unreadMentionsRef.current = n;
+    onUnreadMentionsChangeRef.current?.(n);
+  }, []);
 
   // Ids of messages that name me. A ref holds the set (it is read during render
   // of every row) and a counter forces the re-render when it grows.
@@ -239,14 +293,21 @@ export default function ChatPanel({
   // ── Avvisi: suono e notifica di sistema (lib/chat/notify-prefs) ──────────
   // Le preferenze sono di chi guarda e restano nel browser. Lette nell'handler
   // SSE attraverso un ref: dipenderne ricreerebbe la connessione a ogni scelta.
-  const [notifyPrefs, setNotifyPrefs] = useState<ChatNotifyPrefs>(DEFAULT_CHAT_NOTIFY_PREFS);
+  // Chi conduce parte da «tutti i messaggi», il pubblico da «menzioni e
+  // risposte»: una scelta fatta dalla campanella vale per entrambi.
+  const predefinite = isModerator ? DEFAULT_MODERATOR_CHAT_NOTIFY_PREFS : DEFAULT_CHAT_NOTIFY_PREFS;
+  const [notifyPrefs, setNotifyPrefs] = useState<ChatNotifyPrefs>(predefinite);
   const notifyPrefsRef = useRef(notifyPrefs);
   useEffect(() => { notifyPrefsRef.current = notifyPrefs; }, [notifyPrefs]);
   useEffect(() => {
     try {
-      setNotifyPrefs(parseChatNotifyPrefs(window.localStorage.getItem(CHAT_NOTIFY_STORAGE_KEY)));
+      setNotifyPrefs(
+        parseChatNotifyPrefs(window.localStorage.getItem(CHAT_NOTIFY_STORAGE_KEY), predefinite),
+      );
     } catch { /* storage non disponibile: restano le predefinite */ }
-  }, []);
+  }, [predefinite]);
+  const onPreviewRef = useRef(onPreview);
+  useEffect(() => { onPreviewRef.current = onPreview; }, [onPreview]);
   const updateNotifyPrefs = useCallback((patch: Partial<ChatNotifyPrefs>) => {
     setNotifyPrefs((cur) => {
       const next = { ...cur, ...patch };
@@ -269,6 +330,8 @@ export default function ChatPanel({
     (msg: { senderName: string; text: string }, kind: { mentionsMe: boolean; repliesToMe: boolean; onScreen: boolean }) => {
       if (typeof window === 'undefined') return;
       const pageVisible = document.visibilityState === 'visible';
+      // Il fuoco dentro la chiamata (l'iframe) conta come fuoco della pagina.
+      const pageFocused = document.hasFocus();
       const azione = chatAlertFor({
         prefs: notifyPrefsRef.current,
         own: false,
@@ -276,17 +339,32 @@ export default function ChatPanel({
         repliesToMe: kind.repliesToMe,
         onScreen: kind.onScreen,
         pageVisible,
+        pageFocused,
       });
       if (azione.sound) playChatChime();
-      if (!azione.desktop || !('Notification' in window)) return;
+      if (!('Notification' in window)) return;
+      // L'invito ad attivare le notifiche del browser arriva col primo
+      // messaggio per cui servirebbero a pagina in secondo piano, anche se
+      // adesso la pagina e' in primo piano: chi non esce mai dalla sala
+      // altrimenti non lo vedrebbe mai.
+      const servirebbe = chatAlertFor({
+        prefs: notifyPrefsRef.current,
+        own: false,
+        mentionsMe: kind.mentionsMe,
+        repliesToMe: kind.repliesToMe,
+        onScreen: kind.onScreen,
+        pageVisible: false,
+        pageFocused: false,
+      }).desktop;
       try {
-        if (Notification.permission === 'default' && !offerShownRef.current) {
+        if (servirebbe && Notification.permission === 'default' && !offerShownRef.current) {
           offerShownRef.current = true;
           setOfferNotify(true);
         }
       } catch {
         // Permesso illeggibile (contesto non sicuro): nessun invito.
       }
+      if (!azione.desktop) return;
       const titolo = kind.mentionsMe
         ? t('mentionNotificationTitle', { name: msg.senderName })
         : kind.repliesToMe
@@ -409,6 +487,7 @@ export default function ChatPanel({
       lastSeenAtRef.current = msg.createdAt;
     }
     setMessages((prev) => [...prev, msg]);
+    setTyping((prev) => clearTyping(prev, msg.senderKey ?? '', msg.senderName));
 
     // `mine` arriva dal server (e sull'eco del mio invio); sull'envelope SSE non
     // viaggia, perche' e' per destinatario: allora decide il nome.
@@ -428,26 +507,45 @@ export default function ChatPanel({
     // con `active`): altrimenti conta come non letto.
     const onScreen = activeRef.current;
     if (!isOwn) alertFor(msg, { mentionsMe, repliesToMe, onScreen });
+    // Solo messaggi appena arrivati: la prima lettura dello storico (fino a 200
+    // messaggi) non deve diventare una raffica di anteprime.
+    const appenaArrivato = Date.now() - Date.parse(msg.createdAt) < PREVIEW_MAX_AGE_MS;
+    if (
+      !isOwn &&
+      appenaArrivato &&
+      chatPreviewFor({ prefs: notifyPrefsRef.current, own: false, mentionsMe, repliesToMe, onScreen })
+    ) {
+      onPreviewRef.current?.({
+        id: msg.id,
+        senderName: msg.senderName,
+        senderKey: msg.senderKey,
+        text: msg.text,
+        mentionsMe,
+        repliesToMe,
+      });
+    }
     if (!onScreen && !isOwn) {
       setUnread(unreadCountRef.current + 1);
+      if (mentionsMe || repliesToMe) setUnreadMentions(unreadMentionsRef.current + 1);
     } else if (onScreen) {
       lastReadIdRef.current = msg.id;
       // Chat aperta ma lista scorsa in alto: il messaggio non si vede, lo dice
       // la pillola «nuovi messaggi».
       if (!isOwn && !isAtBottomRef.current) setNewBelow((n) => n + 1);
     }
-  }, [displayName, setUnread, alertFor]);
+  }, [displayName, setUnread, setUnreadMentions, alertFor]);
 
   useEffect(() => {
     if (active) {
       setUnread(0);
+      setUnreadMentions(0);
       setMessages((prev) => {
         const last = prev[prev.length - 1];
         if (last) lastReadIdRef.current = last.id;
         return prev;
       });
     }
-  }, [active, setUnread]);
+  }, [active, setUnread, setUnreadMentions]);
 
   // Read auth. History and the SSE stream carry other attendees' names and
   // messages, so both are token-gated server-side now (lib/chat/read-access);
@@ -796,6 +894,25 @@ export default function ChatPanel({
     };
     document.addEventListener('visibilitychange', onVisible);
 
+    // «Sta scrivendo»: evento con un nome suo, che i client precedenti ignorano.
+    const onTyping = (e: MessageEvent) => {
+      let raw: unknown;
+      try {
+        raw = JSON.parse(e.data);
+      } catch {
+        return;
+      }
+      const payload = parseTypingPayload(raw);
+      if (!payload) return;
+      setTyping((prev) =>
+        applyTyping(prev, payload, Date.now(), {
+          key: ownKeyRef.current,
+          name: mentionCtxRef.current.displayName,
+        }),
+      );
+    };
+    es.addEventListener('typing', onTyping);
+
     es.addEventListener('message', onMessage);
     es.addEventListener('open', onOpen);
     es.addEventListener('error', onError);
@@ -803,6 +920,7 @@ export default function ChatPanel({
       clearInterval(poll);
       document.removeEventListener('visibilitychange', onVisible);
       es.removeEventListener('message', onMessage);
+      es.removeEventListener('typing', onTyping);
       es.removeEventListener('open', onOpen);
       es.removeEventListener('error', onError);
       es.close();
@@ -816,15 +934,33 @@ export default function ChatPanel({
   // ── Mention autocomplete ────────────────────────────────
   // Candidates are the distinct handles of people who have chatted (minus
   // the current user). Cheap, self-contained, no roster prop needed.
+  // Chi e' in sala, letto quando comincia una menzione (non a ogni tasto).
+  const [roster, setRoster] = useState<string[]>([]);
+  const mentionAperta = /(?:^|\s)@(\p{L}[\p{L}\p{N}._-]*)?$/u.test(input);
+  useEffect(() => {
+    if (!mentionAperta || !getRoster) return;
+    try {
+      setRoster(getRoster());
+    } catch {
+      setRoster([]);
+    }
+  }, [mentionAperta, getRoster]);
+
   const mentionCandidates = useMemo(() => {
     const selfHandle = mentionHandle(displayName).toLowerCase();
-    const seen = new Map<string, string>(); // lower → display handle
+    const seen = new Map<string, { handle: string; name: string; key: string }>(); // lower → persona
+    for (const name of roster) {
+      const h = mentionHandle(name);
+      if (h && h.toLowerCase() !== selfHandle) seen.set(h.toLowerCase(), { handle: h, name, key: name });
+    }
     for (const m of messages) {
       const h = mentionHandle(m.senderName);
-      if (h && h.toLowerCase() !== selfHandle) seen.set(h.toLowerCase(), h);
+      if (h && h.toLowerCase() !== selfHandle) {
+        seen.set(h.toLowerCase(), { handle: h, name: m.senderName, key: m.senderKey || m.senderName });
+      }
     }
     return Array.from(seen.values());
-  }, [messages, displayName]);
+  }, [messages, displayName, roster]);
 
   // Active mention query = an "@word" run at the caret (end of input here).
   const mentionQuery = useMemo(() => {
@@ -832,17 +968,91 @@ export default function ChatPanel({
     return m ? (m[1] ?? '') : null;
   }, [input]);
 
+  // Si cerca sull'handle e su ogni parola del nome: «@bian» trova Giulia Bianchi.
   const mentionSuggestions = useMemo(() => {
-    if (mentionQuery === null) return [];
+    if (mentionQuery === null || mentionDismissedFor === input) return [];
     const q = mentionQuery.toLowerCase();
     return mentionCandidates
-      .filter((h) => h.toLowerCase().startsWith(q))
-      .slice(0, 5);
-  }, [mentionQuery, mentionCandidates]);
+      .filter(
+        (c) =>
+          c.handle.toLowerCase().startsWith(q) ||
+          c.name.toLowerCase().split(/\s+/).some((w) => w.startsWith(q)),
+      )
+      .slice(0, 6);
+  }, [mentionQuery, mentionCandidates, mentionDismissedFor, input]);
+
+  useEffect(() => {
+    setMentionIndex(0);
+  }, [mentionQuery]);
 
   const applyMention = useCallback((handle: string) => {
     setInput((prev) => prev.replace(/@(\p{L}[\p{L}\p{N}._-]*)?$/u, `@${handle} `));
     inputRef.current?.focus();
+  }, []);
+
+  // Il pulsante «@»: apre l'elenco delle persone da menzionare.
+  const startMention = useCallback(() => {
+    setMentionDismissedFor(null);
+    setInput((prev) => (prev === '' || /\s$/.test(prev) ? `${prev}@` : `${prev} @`));
+    requestAnimationFrame(() => {
+      const node = inputRef.current;
+      if (!node) return;
+      node.focus();
+      const end = node.value.length;
+      try { node.setSelectionRange(end, end); } catch { /* noop */ }
+    });
+  }, []);
+
+  useEffect(() => {
+    if (typing.size === 0) return;
+    const timer = setInterval(() => setTyping((prev) => pruneTyping(prev, Date.now())), 1000);
+    return () => clearInterval(timer);
+  }, [typing.size]);
+
+  const typingText = useMemo(() => {
+    const label = typingLabel([...typing.values()].map((e) => e.name));
+    if (label.kind === 'one') return t('typingOne', { name: label.name });
+    if (label.kind === 'two') return t('typingTwo', { a: label.a, b: label.b });
+    if (label.kind === 'many') return t('typingMany');
+    return '';
+  }, [typing, t]);
+
+  // Dice agli altri che sto scrivendo, al massimo una volta ogni pochi secondi.
+  const segnalaScrittura = useCallback(() => {
+    const now = Date.now();
+    if (!shouldPing(lastTypingPingRef.current, now)) return;
+    lastTypingPingRef.current = now;
+    const body: Record<string, unknown> = {};
+    if (isGuest) body.guestName = displayName;
+    else if (displayName) body.displayNameOverride = displayName;
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    if (token) headers.Authorization = `Bearer ${token}`;
+    // Un avviso effimero: perderne uno (limite, pod precedente) non toglie
+    // niente a nessuno, e non deve disturbare chi scrive.
+    void fetch(`/api/events/${eventSlug}/chat/typing`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(body),
+    }).catch(() => undefined);
+  }, [eventSlug, token, isGuest, displayName]);
+
+  // La casella cresce con il testo, fino a circa otto righe: un messaggio
+  // lungo si rilegge tutto prima di mandarlo. Oltre, scorre al suo interno.
+  useEffect(() => {
+    const el = inputRef.current;
+    if (!el) return;
+    el.style.height = 'auto';
+    el.style.height = `${Math.min(el.scrollHeight, INPUT_MAX_HEIGHT)}px`;
+    el.style.overflowY = el.scrollHeight > INPUT_MAX_HEIGHT ? 'auto' : 'hidden';
+  }, [input]);
+
+  // Dal riquadro citato al messaggio originale, se e' fra quelli caricati.
+  const jumpToMessage = useCallback((id: string) => {
+    const el = listRef.current?.querySelector<HTMLElement>(`[data-msg-id="${CSS.escape(id)}"]`);
+    if (!el) return;
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    setFlashId(id);
+    window.setTimeout(() => setFlashId((cur) => (cur === id ? null : cur)), 1600);
   }, []);
 
   // ── Emoji picker ───────────────────────────────────────
@@ -856,6 +1066,13 @@ export default function ChatPanel({
     const next = input.slice(0, start) + emoji + input.slice(end);
     if (next.length > 2000) return; // mirror the input maxLength / server cap
     setInput(next);
+    setRecentEmoji((cur) => {
+      const recenti = pushRecentEmoji(cur, emoji);
+      try {
+        window.localStorage.setItem(RECENT_EMOJI_KEY, JSON.stringify(recenti));
+      } catch { /* storage non disponibile: valgono finche' resta aperta la pagina */ }
+      return recenti;
+    });
     const caret = start + emoji.length;
     requestAnimationFrame(() => {
       const node = inputRef.current;
@@ -866,8 +1083,13 @@ export default function ChatPanel({
   }, [input]);
 
   useEffect(() => {
-    if (!emojiOpen) return;
+    if (!emojiOpen) {
+      setEmojiQuery('');
+      return;
+    }
     const onDocMouseDown = (e: MouseEvent) => {
+      // Il pulsante che lo apre lo chiude da se': qui solo i clic altrove.
+      if ((e.target as Element | null)?.closest?.('[data-emoji-toggle]')) return;
       if (emojiRef.current && !emojiRef.current.contains(e.target as Node)) {
         setEmojiOpen(false);
       }
@@ -977,6 +1199,8 @@ export default function ChatPanel({
       const created = (await res.json().catch(() => null)) as
         | { id?: string; createdAt?: string; senderKey?: string; canEdit?: boolean }
         | null;
+      if (created?.senderKey) ownKeyRef.current = created.senderKey;
+      lastTypingPingRef.current = 0;
       if (created?.id && created.createdAt) {
         upsertMessage({
           id: created.id,
@@ -1017,6 +1241,15 @@ export default function ChatPanel({
       setSending(false);
     }
   }, [input, attachment, sending, attaching, eventSlug, token, isGuest, displayName, isModerator, replyTo, upsertMessage, t]);
+
+  // Nascondere un messaggio vale per tutti e non si annulla: il primo clic
+  // chiede conferma (il pulsante diventa «Conferma»), il secondo agisce.
+  const [armedHideId, setArmedHideId] = useState<string | null>(null);
+  useEffect(() => {
+    if (!armedHideId) return;
+    const timer = setTimeout(() => setArmedHideId(null), 4000);
+    return () => clearTimeout(timer);
+  }, [armedHideId]);
 
   const hideMessage = useCallback(async (id: string) => {
     if (!isModerator || !token) return;
@@ -1099,20 +1332,17 @@ export default function ChatPanel({
               (prev.mine ?? prev.senderName === displayName) === isOwn &&
               prev.isModerator === m.isModerator &&
               new Date(m.createdAt).getTime() - new Date(prev.createdAt).getTime() < GROUP_WINDOW_MS;
-            const color = getAvatarColor(m.senderKey || m.senderName);
-            const initials = m.senderName
-              .split(/\s+/)
-              .map((s) => s[0])
-              .filter(Boolean)
-              .slice(0, 2)
-              .join('')
-              .toUpperCase();
+            const color = avatarColor(m.senderKey || m.senderName);
+            const initials = avatarInitials(m.senderName);
             return (
               <div
                 key={m.id}
+                data-msg-id={m.id}
                 className={`chat-panel__msg${isOwn ? ' chat-panel__msg--own' : ''}${
                   continued ? ' chat-panel__msg--continued' : ''
-                }${mentionedIdsRef.current.has(m.id) ? ' chat-panel__msg--mention' : ''}`}
+                }${mentionedIdsRef.current.has(m.id) ? ' chat-panel__msg--mention' : ''}${
+                  flashId === m.id ? ' chat-panel__msg--flash' : ''
+                }`}
               >
                 {!isOwn &&
                   (continued ? (
@@ -1139,24 +1369,21 @@ export default function ChatPanel({
                     </div>
                   )}
                   <div className="chat-panel__bubble" title={fmtFullTime(m.createdAt)}>
+                    {mentionedIdsRef.current.has(m.id) && (
+                      <span className="chat-panel__mention-flag">
+                        <span aria-hidden="true">@</span> {t('mentionedYou')}
+                      </span>
+                    )}
                     {m.replyTo && (
-                      <div
+                      <button
+                        type="button"
                         className="chat-panel__reply-quote"
-                        style={{
-                          borderLeft: '3px solid var(--app-primary, #06c)',
-                          padding: '2px 6px',
-                          margin: '0 0 4px',
-                          fontSize: '0.78rem',
-                          opacity: 0.85,
-                          background: 'rgba(0,0,0,0.04)',
-                          borderRadius: 3,
-                        }}
+                        onClick={() => m.replyTo && jumpToMessage(m.replyTo.id)}
+                        title={t('replyJump')}
                       >
-                        <strong>{m.replyTo.senderName}</strong>
-                        <div className="text-truncate" style={{ maxWidth: 220 }}>
-                          {m.replyTo.text}
-                        </div>
-                      </div>
+                        <span className="chat-panel__reply-quote-name">{m.replyTo.senderName}</span>
+                        <span className="chat-panel__reply-quote-text">{m.replyTo.text}</span>
+                      </button>
                     )}
                     {editingId === m.id ? (
                       <div className="d-flex gap-1 align-items-center">
@@ -1222,7 +1449,11 @@ export default function ChatPanel({
                       del puntatore o al fuoco (sui touch resta sotto). Fa da
                       ancora al selettore delle reazioni, che si apre verso il
                       basso e verso l'interno della lista (vedi globals.scss). */}
-                  <div className={`chat-panel__tools${reactingId === m.id ? ' is-open' : ''}`}>
+                  <div
+                    className={`chat-panel__tools${
+                      reactingId === m.id || armedHideId === m.id ? ' is-open' : ''
+                    }`}
+                  >
                     {continued && (
                       <time className="chat-panel__stamp" dateTime={m.createdAt}>
                         {fmtTime(m.createdAt)}
@@ -1236,7 +1467,7 @@ export default function ChatPanel({
                         title={t('reply')}
                         onClick={() => {
                           setReplyTo({ id: m.id, senderName: m.senderName, text: m.text || '📎' });
-                          inputRef.current?.focus();
+                          requestAnimationFrame(() => inputRef.current?.focus());
                         }}
                       >
                         {/* Inline SVG, not <Icon>: this renders once per message,
@@ -1300,23 +1531,51 @@ export default function ChatPanel({
                         </svg>
                       </button>
                     )}
-                    {isModerator && token && (
-                      <button
-                        type="button"
-                        className="chat-panel__reply-btn chat-panel__hide-btn btn btn-link p-0"
-                        aria-label={t('hide')}
-                        title={t('hide')}
-                        onClick={() => hideMessage(m.id)}
-                      >
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
-                             stroke="currentColor" strokeWidth="2" strokeLinecap="round"
-                             strokeLinejoin="round" aria-hidden="true">
-                          <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
-                          <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
-                          <line x1="1" y1="1" x2="23" y2="23" />
-                        </svg>
-                      </button>
-                    )}
+                    {isModerator && token && (() => {
+                      // Sul proprio messaggio e' «elimina»; su quello di un altro e'
+                      // moderazione: «nascondi a tutti». L'effetto e' lo stesso
+                      // (sparisce per chiunque), il nome dice cosa succede.
+                      const etichetta = isOwn ? t('deleteOwn') : t('hideForAll');
+                      const armato = armedHideId === m.id;
+                      return (
+                        <button
+                          type="button"
+                          className={`chat-panel__reply-btn chat-panel__hide-btn btn btn-link p-0${
+                            armato ? ' is-armed' : ''
+                          }`}
+                          aria-label={armato ? `${etichetta}: ${tc('confirm')}` : etichetta}
+                          title={etichetta}
+                          onClick={() => {
+                            if (!armato) {
+                              setArmedHideId(m.id);
+                              return;
+                            }
+                            setArmedHideId(null);
+                            void hideMessage(m.id);
+                          }}
+                        >
+                          {isOwn ? (
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+                                 stroke="currentColor" strokeWidth="2" strokeLinecap="round"
+                                 strokeLinejoin="round" aria-hidden="true">
+                              <polyline points="3 6 5 6 21 6" />
+                              <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                              <path d="M10 11v6M14 11v6" />
+                              <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                            </svg>
+                          ) : (
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+                                 stroke="currentColor" strokeWidth="2" strokeLinecap="round"
+                                 strokeLinejoin="round" aria-hidden="true">
+                              <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
+                              <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
+                              <line x1="1" y1="1" x2="23" y2="23" />
+                            </svg>
+                          )}
+                          {armato && <span className="chat-panel__hide-confirm">{tc('confirm')}</span>}
+                        </button>
+                      );
+                    })()}
                   </div>
                 </div>
               </div>
@@ -1370,21 +1629,33 @@ export default function ChatPanel({
 
       {/* Reply context bar */}
       {replyTo && (
-        <div
-          className="chat-panel__reply-bar d-flex align-items-center justify-content-between"
-          style={{ padding: '4px 10px', fontSize: '0.8rem', background: 'rgba(0,0,0,0.05)' }}
-        >
-          <span className="text-truncate">
-            {t('replyingTo', { name: replyTo.senderName })}
+        <div className="chat-panel__reply-bar">
+          <svg className="chat-panel__reply-bar-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <polyline points="9 14 4 9 9 4" />
+            <path d="M20 20v-7a4 4 0 0 0-4-4H4" />
+          </svg>
+          <span className="chat-panel__reply-bar-body">
+            <span className="chat-panel__reply-bar-title">
+              {t('replyingTo', { name: replyTo.senderName })}
+            </span>
+            <span className="chat-panel__reply-bar-text">{replyTo.text}</span>
           </span>
           <button
             type="button"
-            className="btn btn-link p-0 ms-2"
-            onClick={() => setReplyTo(null)}
+            className="chat-panel__reply-bar-close"
+            onClick={() => {
+              setReplyTo(null);
+              inputRef.current?.focus();
+            }}
             aria-label={t('cancelReply')}
             title={t('cancelReply')}
           >
-            ✕
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
+                 strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
           </button>
         </div>
       )}
@@ -1416,22 +1687,6 @@ export default function ChatPanel({
         </div>
       )}
 
-      {/* Mention suggestions */}
-      {mentionSuggestions.length > 0 && (
-        <div className="chat-panel__mentions" style={{ padding: '2px 10px' }}>
-          {mentionSuggestions.map((h) => (
-            <button
-              key={h}
-              type="button"
-              className="btn btn-sm btn-outline-primary me-1 mb-1"
-              style={{ fontSize: '0.75rem', padding: '1px 8px' }}
-              onClick={() => applyMention(h)}
-            >
-              @{h}
-            </button>
-          ))}
-        </div>
-      )}
 
       {connStatus !== 'live' && (
         <div
@@ -1463,104 +1718,248 @@ export default function ChatPanel({
         </div>
       )}
 
-      <div className="chat-panel__input-row">
-        {canAttach && (
-          <>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept={Array.from(CHAT_ATTACHMENT_MIME).join(',')}
-              style={{ display: 'none' }}
-              onChange={(e) => {
-                const f = e.target.files?.[0];
-                if (f) void uploadFile(f);
-              }}
-            />
-            <button
-              type="button"
-              className="chat-panel__attach-btn btn btn-link p-1"
-              onClick={() => fileInputRef.current?.click()}
-              disabled={attaching || !!attachment || sending}
-              aria-label={t('attach')}
-              title={t('attach')}
-            >
-              {attaching ? (
-                <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
-              ) : (
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" />
-                </svg>
-              )}
-            </button>
-          </>
-        )}
-        <div className="chat-panel__emoji" ref={emojiRef}>
-          <button
-            type="button"
-            className="chat-panel__emoji-btn btn btn-link p-1"
-            onClick={() => setEmojiOpen((v) => !v)}
-            disabled={sending}
-            aria-label={t('emojiPicker')}
-            title={t('emojiPicker')}
-            aria-haspopup="true"
-            aria-expanded={emojiOpen}
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <circle cx="12" cy="12" r="10" />
-              <path d="M8 14s1.5 2 4 2 4-2 4-2" />
-              <line x1="9" y1="9" x2="9.01" y2="9" />
-              <line x1="15" y1="9" x2="15.01" y2="9" />
-            </svg>
-          </button>
-          {emojiOpen && (
-            <div className="chat-panel__emoji-pop" role="group" aria-label={t('emojiPicker')}>
-              {CHAT_EMOJIS.map((emoji) => (
-                <button
-                  key={emoji}
-                  type="button"
-                  className="chat-panel__emoji-pick"
-                  onMouseDown={(e) => e.preventDefault()}
-                  onClick={() => insertEmoji(emoji)}
-                  aria-label={emoji}
-                  title={emoji}
-                >
-                  {emoji}
-                </button>
-              ))}
-            </div>
+      <div className="chat-panel__composer">
+        <div className="chat-panel__typing">
+          {typingText && (
+            <>
+              <span className="chat-panel__typing-dots" aria-hidden="true">
+                <span />
+                <span />
+                <span />
+              </span>
+              {typingText}
+            </>
           )}
         </div>
-        <input
-          ref={inputRef}
-          type="text"
-          className="chat-panel__input"
-          value={input}
-          placeholder={t('placeholder')}
-          onChange={(e) => setInput(e.target.value)}
-          onPaste={onPaste}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-              e.preventDefault();
-              handleSend();
+        {mentionSuggestions.length > 0 && (
+          <ul className="chat-panel__mention-pop" role="listbox" id={mentionListId} aria-label={t('mentionListLabel')}>
+            {mentionSuggestions.map((c, i) => (
+              <li
+                key={c.handle}
+                id={`${mentionListId}-${i}`}
+                role="option"
+                aria-selected={i === mentionIndex}
+                className={`chat-panel__mention-opt${i === mentionIndex ? ' is-active' : ''}`}
+                onMouseDown={(e) => e.preventDefault()}
+                onMouseEnter={() => setMentionIndex(i)}
+                onClick={() => applyMention(c.handle)}
+              >
+                <span
+                  className="chat-panel__mention-avatar"
+                  style={{ backgroundColor: avatarColor(c.key) }}
+                  aria-hidden="true"
+                >
+                  {avatarInitials(c.name)}
+                </span>
+                <span className="chat-panel__mention-name">{c.name}</span>
+                <span className="chat-panel__mention-handle">@{c.handle}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        {emojiOpen && (
+          <div className="chat-panel__emoji-pop" role="dialog" aria-label={t('emojiPicker')} ref={emojiRef}>
+            <input
+              type="search"
+              className="chat-panel__emoji-search"
+              placeholder={t('emojiSearch')}
+              aria-label={t('emojiSearch')}
+              value={emojiQuery}
+              autoFocus
+              onChange={(e) => setEmojiQuery(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  const first = searchEmoji(emojiQuery)[0];
+                  if (first) insertEmoji(first.emoji);
+                }
+              }}
+            />
+            <div className="chat-panel__emoji-scroll">
+              {!emojiQuery && recentEmoji.length > 0 && (
+                <>
+                  <p className="chat-panel__emoji-section">{t('emojiRecent')}</p>
+                  <div className="chat-panel__emoji-grid">
+                    {recentEmoji.map((emoji) => (
+                      <button
+                        key={`r-${emoji}`}
+                        type="button"
+                        className="chat-panel__emoji-pick"
+                        onMouseDown={(e) => e.preventDefault()}
+                        onClick={() => insertEmoji(emoji)}
+                        aria-label={emoji}
+                      >
+                        {emoji}
+                      </button>
+                    ))}
+                  </div>
+                  <p className="chat-panel__emoji-section">{t('emojiAll')}</p>
+                </>
+              )}
+              {(() => {
+                const risultati = searchEmoji(emojiQuery);
+                if (risultati.length === 0) {
+                  return <p className="chat-panel__emoji-empty">{t('emojiNoResults')}</p>;
+                }
+                return (
+                  <div className="chat-panel__emoji-grid">
+                    {risultati.map(({ emoji, keywords }) => (
+                      <button
+                        key={emoji}
+                        type="button"
+                        className="chat-panel__emoji-pick"
+                        onMouseDown={(e) => e.preventDefault()}
+                        onClick={() => insertEmoji(emoji)}
+                        aria-label={emoji}
+                        title={keywords.split(' ')[0]}
+                      >
+                        {emoji}
+                      </button>
+                    ))}
+                  </div>
+                );
+              })()}
+            </div>
+          </div>
+        )}
+
+        <div className="chat-panel__compose-box">
+          <textarea
+            ref={inputRef}
+            rows={1}
+            className="chat-panel__input"
+            value={input}
+            placeholder={t('placeholder')}
+            onChange={(e) => {
+              setInput(e.target.value);
+              if (mentionDismissedFor !== null) setMentionDismissedFor(null);
+              if (e.target.value.trim()) segnalaScrittura();
+            }}
+            onPaste={onPaste}
+            onKeyDown={(e) => {
+              // L'elenco delle menzioni aperto prende frecce, Invio, Tab ed Esc.
+              if (mentionSuggestions.length > 0) {
+                const n = mentionSuggestions.length;
+                if (e.key === 'ArrowDown') { e.preventDefault(); setMentionIndex((i) => (i + 1) % n); return; }
+                if (e.key === 'ArrowUp') { e.preventDefault(); setMentionIndex((i) => (i - 1 + n) % n); return; }
+                if (e.key === 'Enter' || e.key === 'Tab') {
+                  e.preventDefault();
+                  const scelta = mentionSuggestions[mentionIndex] ?? mentionSuggestions[0];
+                  if (scelta) applyMention(scelta.handle);
+                  return;
+                }
+                if (e.key === 'Escape') {
+                  // Solo l'elenco: sotto i 992px la sala chiude il cassetto con Esc.
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setMentionDismissedFor(input);
+                  return;
+                }
+              }
+              if (e.key === 'Escape' && replyTo) {
+                e.preventDefault();
+                e.stopPropagation();
+                setReplyTo(null);
+                return;
+              }
+              // Invio manda, Maiusc+Invio va a capo. Non durante la composizione
+              // di un carattere (tastiere con accenti, cinese, giapponese).
+              if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
+                e.preventDefault();
+                handleSend();
+              }
+            }}
+            disabled={sending}
+            maxLength={2000}
+            aria-label={t('inputLabel')}
+            aria-controls={mentionSuggestions.length > 0 ? mentionListId : undefined}
+            aria-activedescendant={
+              mentionSuggestions.length > 0 ? `${mentionListId}-${mentionIndex}` : undefined
             }
-          }}
-          disabled={sending}
-          maxLength={2000}
-          aria-label={t('inputLabel')}
-        />
-        <button
-          type="button"
-          className="chat-panel__send-btn"
-          onClick={handleSend}
-          disabled={sending || attaching || (input.trim().length === 0 && !attachment)}
-          aria-label={t('send')}
-          title={t('send')}
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <line x1="22" y1="2" x2="11" y2="13" />
-            <polygon points="22 2 15 22 11 13 2 9 22 2" />
-          </svg>
-        </button>
+          />
+          <div className="chat-panel__compose-tools">
+            {canAttach && (
+              <>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept={Array.from(CHAT_ATTACHMENT_MIME).join(',')}
+                  style={{ display: 'none' }}
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) void uploadFile(f);
+                  }}
+                />
+                <button
+                  type="button"
+                  className="chat-panel__tool-btn"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={attaching || !!attachment || sending}
+                  aria-label={t('attach')}
+                  title={t('attach')}
+                >
+                  {attaching ? (
+                    <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+                  ) : (
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" />
+                    </svg>
+                  )}
+                </button>
+              </>
+            )}
+            <button
+              type="button"
+              className={`chat-panel__tool-btn${emojiOpen ? ' is-on' : ''}`}
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => setEmojiOpen((v) => !v)}
+              disabled={sending}
+              aria-label={t('emojiPicker')}
+              title={t('emojiPicker')}
+              aria-haspopup="dialog"
+              aria-expanded={emojiOpen}
+              data-emoji-toggle=""
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="10" />
+                <path d="M8 14s1.5 2 4 2 4-2 4-2" />
+                <line x1="9" y1="9" x2="9.01" y2="9" />
+                <line x1="15" y1="9" x2="15.01" y2="9" />
+              </svg>
+            </button>
+            <button
+              type="button"
+              className="chat-panel__tool-btn chat-panel__tool-btn--at"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={startMention}
+              disabled={sending}
+              aria-label={t('mentionButton')}
+              title={t('mentionButton')}
+            >
+              @
+            </button>
+            <span className="chat-panel__compose-spacer" />
+            {input.length > 1800 && (
+              <span className="chat-panel__compose-count" aria-live="polite">
+                {2000 - input.length}
+              </span>
+            )}
+            <button
+              type="button"
+              className="chat-panel__send-btn"
+              onClick={handleSend}
+              disabled={sending || attaching || (input.trim().length === 0 && !attachment)}
+              aria-label={t('send')}
+              title={t('send')}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <line x1="22" y1="2" x2="11" y2="13" />
+                <polygon points="22 2 15 22 11 13 2 9 22 2" />
+              </svg>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );

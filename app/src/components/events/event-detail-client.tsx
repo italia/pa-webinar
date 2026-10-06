@@ -179,6 +179,17 @@ export default function EventDetailClient({
 }: EventDetailClientProps) {
   const t = useTranslations('events');
   const tr = useTranslations('registration');
+  const tl = useTranslations('live');
+  const svegliaPonte = () => {
+    // 1a: anticipa il risveglio del bridge (JVB) al
+    // momento del click, prima di navigazione + idratazione
+    // di /live — così il pre-warm parte qualche secondo
+    // prima. L'endpoint wake è idempotente e no-op se
+    // l'evento è già LIVE.
+    void fetch(`/api/events/${event.slug}/wake`, {
+      method: 'POST',
+    }).catch(() => {});
+  };
   const tv = useTranslations('video');
   const tm = useTranslations('materials');
   const tPostprod = useTranslations('postprod');
@@ -512,7 +523,10 @@ export default function EventDetailClient({
                     <div className="fw-semibold" style={{ color: 'var(--app-text)' }}>
                       {t('detail.speakers')}
                     </div>
-                    <div className="text-muted" style={{ fontSize: '0.9rem' }}>
+                    {/* Un relatore per riga, come li scrive chi crea l'evento:
+                        senza `pre-line` gli a capo sparivano e i nomi si
+                        fondevano in una riga sola. */}
+                    <div className="text-muted" style={{ fontSize: '0.9rem', whiteSpace: 'pre-line' }}>
                       {speakers}
                     </div>
                   </div>
@@ -811,7 +825,11 @@ export default function EventDetailClient({
                       agli amministratori nel pannello admin. Il pubblico vede
                       solo il conteggio dei presenti nella sala live. */}
                   {hasRoomAccess && !invalidToken && (
-                    <p className="text-success fw-semibold text-center mb-3" role="status">
+                    <p
+                      className="text-success fw-semibold d-flex align-items-center justify-content-center gap-2 mb-3"
+                      role="status"
+                    >
+                      <Icon icon="it-check-circle" size="sm" color="success" />
                       {t('detail.registered')}
                     </p>
                   )}
@@ -868,30 +886,36 @@ export default function EventDetailClient({
                     // evitare. Con invalidToken (cookie valido ma registrazione
                     // rimossa) /live ci ha appena rimbalzato qui: rimostrare il
                     // link accanto all'alert creerebbe un ping-pong infinito.
-                    <p className="text-center mt-3 mb-0" style={{ fontSize: '0.85rem' }}>
+                    // Chi ha gia' il posto (cookie firmato) vede il pulsante
+                    // pieno «Entra nella sala»; il link a domanda resta per chi
+                    // si e' iscritto da un altro dispositivo e qui non e' noto.
+                    hasRoomAccess && !invalidToken ? (
                       <Link
                         href={percorso(`/events/${event.slug}/live`)}
-                        className="text-decoration-none fw-semibold text-primary"
-                        onMouseDown={() => {
-                          // 1a: anticipa il risveglio del bridge (JVB) al
-                          // momento del click, prima di navigazione + idratazione
-                          // di /live — così il pre-warm parte qualche secondo
-                          // prima. L'endpoint wake è idempotente e no-op se
-                          // l'evento è già LIVE.
-                          void fetch(`/api/events/${event.slug}/wake`, {
-                            method: 'POST',
-                          }).catch(() => {});
-                        }}
+                        onMouseDown={svegliaPonte}
                       >
-                        {t('detail.alreadyRegisteredEnter')}
+                        <Button color="primary" size="lg" className="w-100 fw-semibold" tag="span">
+                          <Icon icon="it-video" color="white" className="me-2" />
+                          {tl('enterRoom')}
+                        </Button>
                       </Link>
-                    </p>
+                    ) : (
+                      <p className="text-center mt-3 mb-0" style={{ fontSize: '0.85rem' }}>
+                        <Link
+                          href={percorso(`/events/${event.slug}/live`)}
+                          className="text-decoration-none fw-semibold text-primary"
+                          onMouseDown={svegliaPonte}
+                        >
+                          {t('detail.alreadyRegisteredEnter')}
+                        </Link>
+                      </p>
+                    )
                   )}
 
                   {event.chatEnabled && (
-                    <p className="text-muted mt-3 mb-0" style={{ fontSize: '0.82rem' }}>
-                      <Icon icon="it-info-circle" size="xs" className="me-1" />
-                      {t('detail.chatNotSaved')}
+                    <p className="text-muted mt-3 mb-0 d-flex align-items-start gap-1" style={{ fontSize: '0.82rem', lineHeight: 1.45 }}>
+                      <Icon icon="it-info-circle" size="xs" className="flex-shrink-0" style={{ marginTop: 1 }} />
+                      <span>{t('detail.chatNotSaved')}</span>
                     </p>
                   )}
 

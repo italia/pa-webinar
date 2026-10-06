@@ -1,15 +1,51 @@
 {
   "agenda": {
-    "title": "Notities / Checklist",
-    "empty": "Nog geen punten. Voeg de te bespreken onderwerpen toe en vink ze gaandeweg af.",
+    "title": "Agenda",
+    "empty": "De agenda is nog niet voorbereid.",
     "add": "Toevoegen",
-    "addPlaceholder": "Nieuw punt…",
-    "remove": "Verwijderen",
+    "addPlaceholder": "Nieuw onderwerp…",
+    "remove": "Onderwerp verwijderen",
     "inProgress": "bezig",
     "agree": "Eens",
     "disagree": "Oneens",
     "favorablePct": "{pct}% voor",
-    "noReactions": "Geef uw mening"
+    "noReactions": "Geef uw mening",
+    "emptyModerator": "Voeg de onderwerpen van de bijeenkomst toe: tijdens het evenement markeer je de voortgang en ziet de zaal het huidige onderwerp.",
+    "progress": "{done} van {total} besproken",
+    "skippedCount": "{count, plural, one {# overgeslagen} other {# overgeslagen}}",
+    "nextTopic": "Volgend onderwerp:",
+    "startFirst": "Begin met:",
+    "finishCurrent": "Huidig onderwerp afronden",
+    "runningFor": "{minutes, plural, =0 {net begonnen} one {sinds # minuut} other {sinds # minuten}}",
+    "tickerNow": "Nu",
+    "status": {
+      "PENDING": "Te bespreken",
+      "CURRENT": "Bezig",
+      "DONE": "Besproken",
+      "SKIPPED": "Overgeslagen"
+    },
+    "actions": {
+      "start": "Nu beginnen",
+      "done": "Markeren als besproken",
+      "skip": "Overslaan",
+      "reopen": "Heropenen",
+      "edit": "Bewerken",
+      "moveUp": "Omhoog",
+      "moveDown": "Omlaag"
+    },
+    "plannedMinutes": "{minutes} min gepland",
+    "elapsedOfPlanned": "{minutes} van {planned} min",
+    "overtime": "over de tijd",
+    "tookMinutes": "{minutes} min",
+    "plannedTotal": "Geplande duur: {minutes} min",
+    "pulsePrompt": "Ben je het eens?",
+    "addHint": "Enter om toe te voegen, Shift+Enter voor een nieuwe regel. Je kunt een lijst plakken: één onderwerp per regel.",
+    "addMany": "{count, plural, one {# onderwerp toevoegen} other {# onderwerpen toevoegen}}",
+    "minutesPlaceholder": "min",
+    "minutesLabel": "Geplande duur in minuten (optioneel)",
+    "editLabel": "Titel van het onderwerp",
+    "agendaChanged": "De agenda is net gewijzigd: probeer het opnieuw.",
+    "minutesInvalid": "Vul de duur in minuten in, van 1 tot 600."
   },
   "common": {
     "appName": "PA Webinar",
@@ -64,7 +100,7 @@
     "past": "Eerdere evenementen",
     "noUpcoming": "Momenteel geen evenementen gepland. Kom binnenkort terug!",
     "noPast": "Geen eerdere evenementen",
-    "wordCloudTitle": "Woordwolk",
+    "wordCloudTitle": "In één woord",
     "card": {
       "publicEvent": "Publiek evenement",
       "readMore": "Meer informatie",
@@ -173,6 +209,7 @@
     "resendLink": "Toegangslink opnieuw versturen",
     "resending": "Bezig met verzenden…",
     "resendSent": "Als het adres is ingeschreven, hebben we de toegangslink opnieuw per e-mail verstuurd.",
+    "resendFailed": "De link kon niet opnieuw worden verstuurd. Probeer het over een paar minuten opnieuw.",
     "invitationOnly": "Inschrijving is voorbehouden aan genodigden: gebruik het e-mailadres waarmee u bent uitgenodigd. De link om deel te nemen ontvangt u per e-mail.",
     "closed": "Inschrijving voor dit evenement is niet openbaar.",
     "lostLink": "Al ingeschreven? Ontvang uw persoonlijke link opnieuw",
@@ -317,9 +354,9 @@
     "whiteboardNotSavedHint": "Het whiteboard wordt niet automatisch opgeslagen. Als u het gebruikt, exporteer het dan (menu van het whiteboard) en voeg het toe aan het Materiaal van het evenement voordat u afsluit.",
     "sidebarTabChat": "Chat",
     "sidebarTabPolls": "Peilingen",
-    "sidebarTabWordcloud": "Woordwolk",
-    "sidebarTabAgenda": "Notities / Checklist",
-    "liveToggleAgenda": "Notities / Checklist (agenda)",
+    "sidebarTabWordcloud": "In één woord",
+    "sidebarTabAgenda": "Agenda",
+    "liveToggleAgenda": "Agenda",
     "sidebarTabMaterials": "Materialen",
     "sidebarTabParticipants": "Deelnemers",
     "chat": {
@@ -371,7 +408,20 @@
       "notifyDesktopBlocked": "Je browser blokkeert meldingen van deze site: je kunt ze weer toestaan in de site-instellingen.",
       "notifyDesktopUnsupported": "Deze browser ondersteunt geen meldingen.",
       "notifyOffer": "Een melding krijgen als iemand je noemt of je antwoordt?",
-      "notifyOfferEnable": "Meldingen inschakelen"
+      "notifyOfferEnable": "Meldingen inschakelen",
+      "emojiSearch": "Emoji zoeken",
+      "emojiNoResults": "Geen emoji gevonden",
+      "emojiRecent": "Recent gebruikt",
+      "emojiAll": "Alle emoji",
+      "mentionListLabel": "Personen om te noemen",
+      "mentionButton": "Iemand noemen",
+      "replyJump": "Naar het oorspronkelijke bericht",
+      "typingOne": "{name} is aan het typen…",
+      "typingTwo": "{a} en {b} zijn aan het typen…",
+      "typingMany": "Meerdere mensen zijn aan het typen…",
+      "hideForAll": "Voor iedereen verbergen",
+      "deleteOwn": "Bericht verwijderen",
+      "mentionedYou": "Heeft je genoemd"
     },
     "role": {
       "moderator": "Moderator",
@@ -470,7 +520,9 @@
     "rejoin": "Terugkeren",
     "backToHome": "Terug naar de startpagina",
     "sidebarTabMaterialsNew": "Nieuwe materialen gedeeld",
-    "sidebarTabQaNew": "Nieuw in Vragen en antwoorden"
+    "sidebarTabQaNew": "Nieuw in Vragen en antwoorden",
+    "resizeSidebar": "Formaat van het zijpaneel wijzigen",
+    "sidebarTabWordcloudNew": "Nieuwe vraag ‘In één woord’"
   },
   "qa": {
     "title": "Vragen en Antwoorden",
@@ -1280,10 +1332,10 @@
       "qaEnabled": "Q&A inschakelen",
       "chatEnabled": "Chat inschakelen",
       "recordingEnabled": "Video-opname inschakelen",
-      "agendaEnabled": "Live notities / checklist (agenda)",
-      "agendaEnabledDesc": "Een checklist met de te behandelen punten die de moderatoren tijdens het evenement afvinken. Wordt meegenomen in de automatische samenvatting. Optioneel en ook tijdens het evenement in te schakelen.",
-      "wordCloudEnabled": "Live woordwolk",
-      "wordCloudEnabledDesc": "Deelnemers sturen een woord en de wolk wordt live bijgewerkt. Handig om een discussie te openen of in enkele seconden een stemming te peilen.",
+      "agendaEnabled": "Agenda van de bijeenkomst",
+      "agendaEnabledDesc": "De lijst met onderwerpen van de bijeenkomst: tijdens het evenement markeert de moderator het huidige, de besproken en de overgeslagen onderwerpen, en de zaal ziet altijd waar men is, ook in de bovenste balk. Wordt meegenomen in de automatische samenvatting. Optioneel, ook tijdens het evenement in te schakelen.",
+      "wordCloudEnabled": "Vragen ‘In één woord’",
+      "wordCloudEnabledDesc": "De moderator stelt een vraag en iedereen antwoordt met één woord: de antwoorden vormen een wolk die live wordt bijgewerkt, en de meest geschreven woorden worden groter. Handig om het ijs te breken of in een paar seconden een indruk te verzamelen.",
       "whiteboardEnabled": "Gedeeld whiteboard",
       "whiteboardEnabledDesc": "Schakelt het ingebouwde samenwerkingswhiteboard (Excalidraw) in: de moderatoren kunnen het tijdens het evenement openen via de werkbalk. Vereist de whiteboarddienst van de installatie; waar die beschikbaar is, is het bij directe calls altijd actief.",
       "autoStartRecording": "Opname automatisch starten",
@@ -2760,8 +2812,8 @@
         "desc": "Beantwoord polls in realtime en zie de resultaten meteen."
       },
       "wordcloud": {
-        "title": "Woordwolk",
-        "desc": "Voeg je woorden toe aan de gedeelde woordwolk van het evenement."
+        "title": "In één woord",
+        "desc": "Beantwoord de vragen van de moderator met één woord en zie de wolk met antwoorden groeien."
       },
       "reactions": {
         "title": "Reacties en opgestoken handen",
@@ -2772,8 +2824,8 @@
         "desc": "Schrijf in de chat van het evenement en volg het gesprek met andere deelnemers."
       },
       "agenda": {
-        "title": "Agenda en notities",
-        "desc": "Volg de agenda en de notities die de moderatoren tijdens het evenement delen."
+        "title": "Agenda",
+        "desc": "Volg het huidige onderwerp en de agenda van de bijeenkomst."
       }
     },
     "projectTeaser": {
@@ -2888,8 +2940,17 @@
       "minOptions": "Er zijn ten minste 2 opties vereist",
       "generic": "Fout bij het aanmaken van de peiling",
       "vote": "Stem niet geregistreerd. Probeer het opnieuw.",
-      "alreadyVoted": "U hebt al gestemd in deze peiling."
-    }
+      "alreadyVoted": "U hebt al gestemd in deze peiling.",
+      "action": "De actie is mislukt. Probeer het opnieuw."
+    },
+    "participation": "{votes, plural, one {# stem} other {# stemmen}} van {present} aanwezigen",
+    "participationLabel": "Deelname aan de peiling",
+    "yourVote": "Jouw stem",
+    "deletePoll": "Peiling verwijderen",
+    "questionLabel": "Vraag",
+    "optionsLabel": "Mogelijke antwoorden",
+    "resultsHidden": "Stem geregistreerd. De resultaten verschijnen zodra de moderator ze publiceert.",
+    "closedNoVote": "De stemming is gesloten. De resultaten verschijnen zodra de moderator ze publiceert."
   },
   "materials": {
     "title": "Materialen",
@@ -3497,16 +3558,16 @@
     "noFeedback": "Geen feedback ontvangen"
   },
   "wordcloud": {
-    "title": "Woordwolk",
+    "title": "In één woord",
     "startRound": "Starten",
-    "prompt": "Onderwerp",
+    "prompt": "Vraag",
     "promptPlaceholder": "bijv. Wat verwacht u van dit evenement?",
     "duration": "Duur",
     "submit": "Verzenden",
-    "submitPlaceholder": "Typ een woord (max. 30 tekens)",
-    "close": "Woordwolk sluiten",
+    "submitPlaceholder": "Jouw woord",
+    "close": "Antwoorden sluiten",
     "cancel": "Annuleren",
-    "noActiveRound": "Er is momenteel geen woordwolk actief.",
+    "noActiveRound": "Er is op dit moment geen open vraag.",
     "noWords": "Wachten op de eerste woorden...",
     "wordsSubmitted": "{count} woorden ingediend",
     "timeRemaining": "Resterende tijd",
@@ -3514,11 +3575,22 @@
       "send": "Woord niet verzonden. Probeer het opnieuw.",
       "closed": "Deze ronde is gesloten: er worden geen woorden meer aangenomen.",
       "limit": "U hebt voor deze ronde al het maximale aantal woorden verzonden.",
-      "rateLimited": "Te veel inzendingen op dit moment: wacht een paar seconden voordat u het opnieuw probeert."
+      "rateLimited": "Te veel inzendingen op dit moment: wacht een paar seconden voordat u het opnieuw probeert.",
+      "duplicate": "Je hebt dit woord al geschreven: het telt maar één keer per persoon.",
+      "removed": "De moderator heeft dit woord verwijderd: het kan niet opnieuw worden verstuurd.",
+      "invalid": "Schrijf een woord met letters of cijfers."
     },
-    "startNew": "Woordwolk starten",
-    "emptyHintModerator": "Stel een open vraag: antwoorden van één woord vormen de wolk in realtime.",
-    "timeLeft": "Resterende tijd: {time}"
+    "startNew": "Een vraag stellen",
+    "emptyHintModerator": "Stel een vraag die met één woord te beantwoorden is, bijvoorbeeld ‘Hoe voelen jullie je vandaag?’. De antwoorden vormen een wolk die live wordt bijgewerkt: hoe meer mensen hetzelfde woord schrijven, hoe groter het wordt.",
+    "timeLeft": "Resterende tijd: {time}",
+    "howItWorks": "Antwoord met één woord: hoe meer mensen hetzelfde woord schrijven, hoe groter het wordt.",
+    "enableHint": "Het tabblad ‘In één woord’ verschijnt voor iedereen zodra je de eerste vraag start.",
+    "topWords": "Meest geschreven",
+    "yourWords": "Jij schreef:",
+    "closedBadge": "Afgesloten",
+    "durationUnlimited": "Zonder tijdslimiet",
+    "allWords": "Alle woorden",
+    "removeWord": "Uit de wolk verwijderen"
   },
   "timer": {
     "title": "Timer",
@@ -3915,7 +3987,7 @@
     "showPolls": "Peilingresultaten tonen",
     "showFeedback": "Feedback tonen",
     "showRecap": "De samenvatting van het evenement tonen",
-    "showWordCloud": "De woordwolk tonen",
+    "showWordCloud": "Antwoorden ‘In één woord’ tonen",
     "emailEnabled": "Een samenvattingsmail versturen bij het einde van het evenement",
     "emailEnabledHelp": "Bij de afsluiting ontvangen de geregistreerde deelnemers een bedankmail met de link naar de samenvatting en naar de feedback, en de moderator een beknopt overzicht. Wordt maar één keer verzonden.",
     "feedbackEnabled": "Feedbackenquête actief na het evenement",
@@ -3976,7 +4048,7 @@
     "micToggleOn": "Microfoon AAN",
     "micToggleOff": "Microfoon UIT",
     "cameraOffPreview": "Camera uit",
-    "speakerTest": "🔊 Audiotest",
+    "speakerTest": "Audiotest",
     "backgroundLabel": "Virtuele achtergrond",
     "backgroundNoneShort": "No",
     "backgroundHint": "Wordt toegepast wanneer u de zaal betreedt. Gebruik om uw achtergrond te vervagen de achtergrondknop zodra u binnen bent: het voorbeeld hierboven toont de camera zonder effect.",

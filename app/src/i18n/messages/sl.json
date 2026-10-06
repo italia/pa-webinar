@@ -1,15 +1,51 @@
 {
   "agenda": {
-    "title": "Zapiski / Kontrolni seznam",
-    "empty": "Točk še ni. Dodajte teme za obravnavo in jih sproti odkljukajte.",
+    "title": "Dnevni red",
+    "empty": "Dnevni red še ni pripravljen.",
     "add": "Dodaj",
-    "addPlaceholder": "Nova točka…",
-    "remove": "Odstrani",
+    "addPlaceholder": "Nova tema …",
+    "remove": "Izbriši temo",
     "inProgress": "v teku",
     "agree": "Strinjam se",
     "disagree": "Ne strinjam se",
     "favorablePct": "{pct} % za",
-    "noReactions": "Povejte svoje mnenje"
+    "noReactions": "Povejte svoje mnenje",
+    "emptyModerator": "Dodajte teme srečanja: med dogodkom označujete napredek, dvorana pa vidi trenutno temo.",
+    "progress": "{done} od {total} obravnavanih",
+    "skippedCount": "{count, plural, one {# preskočena} two {# preskočeni} few {# preskočene} other {# preskočenih}}",
+    "nextTopic": "Naslednja tema:",
+    "startFirst": "Začnite s:",
+    "finishCurrent": "Zaključi trenutno temo",
+    "runningFor": "{minutes, plural, =0 {pravkar začeto} one {že # minuto} two {že # minuti} few {že # minute} other {že # minut}}",
+    "tickerNow": "Zdaj",
+    "status": {
+      "PENDING": "Za obravnavo",
+      "CURRENT": "V teku",
+      "DONE": "Obravnavano",
+      "SKIPPED": "Preskočeno"
+    },
+    "actions": {
+      "start": "Začni zdaj",
+      "done": "Označi kot obravnavano",
+      "skip": "Preskoči",
+      "reopen": "Znova odpri",
+      "edit": "Uredi",
+      "moveUp": "Premakni gor",
+      "moveDown": "Premakni dol"
+    },
+    "plannedMinutes": "načrtovano {minutes} min",
+    "elapsedOfPlanned": "{minutes} od {planned} min",
+    "overtime": "čez čas",
+    "tookMinutes": "{minutes} min",
+    "plannedTotal": "Načrtovano trajanje: {minutes} min",
+    "pulsePrompt": "Se strinjate?",
+    "addHint": "Enter za dodajanje, Shift+Enter za novo vrstico. Prilepite lahko seznam: ena tema na vrstico.",
+    "addMany": "{count, plural, one {Dodaj # temo} two {Dodaj # temi} few {Dodaj # teme} other {Dodaj # tem}}",
+    "minutesPlaceholder": "min",
+    "minutesLabel": "Načrtovano trajanje v minutah (neobvezno)",
+    "editLabel": "Naslov teme",
+    "agendaChanged": "Dnevni red se je pravkar spremenil: poskusite znova.",
+    "minutesInvalid": "Vnesite trajanje v minutah, od 1 do 600."
   },
   "common": {
     "appName": "PA Webinar",
@@ -64,7 +100,7 @@
     "past": "Pretekli dogodki",
     "noUpcoming": "Trenutno ni načrtovanih dogodkov. Preverite ponovno kmalu!",
     "noPast": "Ni preteklih dogodkov",
-    "wordCloudTitle": "Oblak besed",
+    "wordCloudTitle": "Z eno besedo",
     "card": {
       "publicEvent": "Javni dogodek",
       "readMore": "Več informacij",
@@ -173,6 +209,7 @@
     "resendLink": "Znova pošlji povezavo za dostop",
     "resending": "Pošiljanje…",
     "resendSent": "Če je naslov prijavljen, smo vam povezavo za dostop znova poslali po e-pošti.",
+    "resendFailed": "Povezave ni bilo mogoče znova poslati. Poskusite znova čez nekaj minut.",
     "invitationOnly": "Prijava je namenjena samo povabljenim: uporabite e-poštni naslov, s katerim ste bili povabljeni. Povezavo za vstop boste prejeli po e-pošti.",
     "closed": "Prijava na ta dogodek ni odprta za javnost.",
     "lostLink": "Ste že prijavljeni? Znova prejmite svojo osebno povezavo",
@@ -317,9 +354,9 @@
     "whiteboardNotSavedHint": "Tabla se ne shranjuje samodejno. Če jo uporabljate, jo izvozite (meni table) in jo pripnite h gradivom dogodka, preden ga končate.",
     "sidebarTabChat": "Klepet",
     "sidebarTabPolls": "Ankete",
-    "sidebarTabWordcloud": "Oblak besed",
-    "sidebarTabAgenda": "Zapiski / Kontrolni seznam",
-    "liveToggleAgenda": "Zapiski / Kontrolni seznam (agenda)",
+    "sidebarTabWordcloud": "Z eno besedo",
+    "sidebarTabAgenda": "Dnevni red",
+    "liveToggleAgenda": "Dnevni red",
     "sidebarTabMaterials": "Gradiva",
     "sidebarTabParticipants": "Udeleženci",
     "chat": {
@@ -371,7 +408,20 @@
       "notifyDesktopBlocked": "Brskalnik blokira obvestila tega spletnega mesta: znova jih lahko dovolite v nastavitvah mesta.",
       "notifyDesktopUnsupported": "Ta brskalnik ne podpira obvestil.",
       "notifyOffer": "Želite obvestilo, ko vas kdo omeni ali vam odgovori?",
-      "notifyOfferEnable": "Vklopi obvestila"
+      "notifyOfferEnable": "Vklopi obvestila",
+      "emojiSearch": "Iskanje emojijev",
+      "emojiNoResults": "Ni najdenih emojijev",
+      "emojiRecent": "Nedavno uporabljeni",
+      "emojiAll": "Vsi emojiji",
+      "mentionListLabel": "Osebe za omembo",
+      "mentionButton": "Omeni nekoga",
+      "replyJump": "Pojdi na izvirno sporočilo",
+      "typingOne": "{name} piše …",
+      "typingTwo": "{a} in {b} pišeta …",
+      "typingMany": "Več oseb piše …",
+      "hideForAll": "Skrij za vse",
+      "deleteOwn": "Izbriši sporočilo",
+      "mentionedYou": "Vas je omenil(a)"
     },
     "role": {
       "moderator": "Moderator",
@@ -470,7 +520,9 @@
     "rejoin": "Vrni se",
     "backToHome": "Nazaj na začetno stran",
     "sidebarTabMaterialsNew": "Nova deljena gradiva",
-    "sidebarTabQaNew": "Novo v Vprašanjih in odgovorih"
+    "sidebarTabQaNew": "Novo v Vprašanjih in odgovorih",
+    "resizeSidebar": "Spremeni velikost stranske plošče",
+    "sidebarTabWordcloudNew": "Novo vprašanje »Z eno besedo«"
   },
   "qa": {
     "title": "Vprašanja in odgovori",
@@ -1280,10 +1332,10 @@
       "qaEnabled": "Omogoči Q&A",
       "chatEnabled": "Omogoči klepet",
       "recordingEnabled": "Omogoči video snemanje",
-      "agendaEnabled": "Zapiski / kontrolni seznam (agenda) v živo",
-      "agendaEnabledDesc": "Kontrolni seznam tem za obravnavo, ki jih moderatorji med dogodkom odkljukajo. Vključi se v samodejni povzetek. Neobvezno; vklopiti ga je mogoče tudi med dogodkom.",
-      "wordCloudEnabled": "Oblak besed v živo",
-      "wordCloudEnabledDesc": "Udeleženci pošljejo besedo in oblak se posodablja v živo. Uporabno za začetek razprave ali zajem razpoloženja v nekaj sekundah.",
+      "agendaEnabled": "Dnevni red srečanja",
+      "agendaEnabledDesc": "Seznam tem srečanja: med dogodkom moderator označuje trenutno, obravnavane in preskočene teme, dvorana pa vedno vidi, kje ste, tudi v zgornji vrstici. Vključeno v samodejni povzetek. Neobvezno, mogoče vklopiti tudi med dogodkom.",
+      "wordCloudEnabled": "Vprašanja »Z eno besedo«",
+      "wordCloudEnabledDesc": "Moderator postavi vprašanje in vsak odgovori z eno samo besedo: odgovori sestavijo oblak, ki se posodablja v živo, najpogostejše besede pa postanejo večje. Uporabno za prebijanje ledu ali hitro zbiranje vtisov.",
       "whiteboardEnabled": "Deljena tabla",
       "whiteboardEnabledDesc": "Omogoči vgrajeno sodelovalno tablo (Excalidraw): moderatorji jo lahko med dogodkom odprejo iz orodne vrstice. Zahteva storitev table v namestitvi; kjer je na voljo, je pri takojšnjih klicih vedno vklopljena.",
       "autoStartRecording": "Samodejno začni snemanje",
@@ -2760,8 +2812,8 @@
         "desc": "Odgovarjajte na ankete v realnem času in si rezultate oglejte v trenutku."
       },
       "wordcloud": {
-        "title": "Oblak besed",
-        "desc": "Dodajte svoje besede v skupni oblak besed dogodka."
+        "title": "Z eno besedo",
+        "desc": "Na vprašanja moderatorja odgovorite z eno besedo in opazujte, kako raste oblak odgovorov."
       },
       "reactions": {
         "title": "Reakcije in dvignjene roke",
@@ -2772,8 +2824,8 @@
         "desc": "Pišite v klepetu dogodka in spremljajte pogovor z drugimi udeleženci."
       },
       "agenda": {
-        "title": "Dnevni red in zapiski",
-        "desc": "Spremljajte dnevni red in zapiske, ki jih moderatorji delijo med dogodkom."
+        "title": "Dnevni red",
+        "desc": "Spremljajte trenutno temo in dnevni red srečanja."
       }
     },
     "projectTeaser": {
@@ -2888,8 +2940,17 @@
       "minOptions": "Potrebni sta vsaj 2 možnosti",
       "generic": "Napaka pri ustvarjanju ankete",
       "vote": "Glas ni bil zabeležen. Poskusite znova.",
-      "alreadyVoted": "V tej anketi ste že glasovali."
-    }
+      "alreadyVoted": "V tej anketi ste že glasovali.",
+      "action": "Dejanje ni uspelo. Poskusite znova."
+    },
+    "participation": "{votes, plural, one {# glas} two {# glasova} few {# glasovi} other {# glasov}} od {present} prisotnih",
+    "participationLabel": "Sodelovanje v anketi",
+    "yourVote": "Vaš glas",
+    "deletePoll": "Izbriši anketo",
+    "questionLabel": "Vprašanje",
+    "optionsLabel": "Možni odgovori",
+    "resultsHidden": "Glas je zabeležen. Rezultati bodo prikazani, ko jih moderator objavi.",
+    "closedNoVote": "Glasovanje je zaprto. Rezultati bodo prikazani, ko jih moderator objavi."
   },
   "materials": {
     "title": "Gradiva",
@@ -3497,16 +3558,16 @@
     "noFeedback": "Ni prejetih povratnih informacij"
   },
   "wordcloud": {
-    "title": "Oblak besed",
+    "title": "Z eno besedo",
     "startRound": "Zaženi",
-    "prompt": "Tema",
+    "prompt": "Vprašanje",
     "promptPlaceholder": "npr. Kaj pričakujete od tega dogodka?",
     "duration": "Trajanje",
     "submit": "Pošlji",
-    "submitPlaceholder": "Vnesite besedo (najv. 30 znakov)",
-    "close": "Zapri oblak besed",
+    "submitPlaceholder": "Vaša beseda",
+    "close": "Zapri odgovore",
     "cancel": "Prekliči",
-    "noActiveRound": "Trenutno ni aktivnega oblaka besed.",
+    "noActiveRound": "Trenutno ni odprtega vprašanja.",
     "noWords": "Čakamo na prve besede...",
     "wordsSubmitted": "{count} besed poslanih",
     "timeRemaining": "Preostali čas",
@@ -3514,11 +3575,22 @@
       "send": "Beseda ni bila poslana. Poskusite znova.",
       "closed": "Ta krog je zaprt: novih besed ni več mogoče oddati.",
       "limit": "V tem krogu ste že poslali največje dovoljeno število besed.",
-      "rateLimited": "Trenutno je preveč pošiljanj: počakajte nekaj sekund, preden poskusite znova."
+      "rateLimited": "Trenutno je preveč pošiljanj: počakajte nekaj sekund, preden poskusite znova.",
+      "duplicate": "To besedo ste že napisali: šteje samo enkrat na osebo.",
+      "removed": "Moderator je odstranil to besedo: ni je mogoče znova poslati.",
+      "invalid": "Napišite besedo iz črk ali številk."
     },
-    "startNew": "Začni oblak besed",
-    "emptyHintModerator": "Zastavite odprto vprašanje: enobesedni odgovori sproti sestavljajo oblak.",
-    "timeLeft": "Preostali čas: {time}"
+    "startNew": "Postavite vprašanje",
+    "emptyHintModerator": "Postavite vprašanje, na katero se odgovori z eno besedo, na primer »Kako se počutite danes?«. Odgovori sestavijo oblak, ki se posodablja v živo: več ljudi kot napiše isto besedo, večja postane.",
+    "timeLeft": "Preostali čas: {time}",
+    "howItWorks": "Odgovorite z eno samo besedo: več ljudi kot napiše isto besedo, večja postane.",
+    "enableHint": "Zavihek »Z eno besedo« se bo vsem prikazal, ko začnete prvo vprašanje.",
+    "topWords": "Najpogostejše",
+    "yourWords": "Napisali ste:",
+    "closedBadge": "Zaključeno",
+    "durationUnlimited": "Brez časovne omejitve",
+    "allWords": "Vse besede",
+    "removeWord": "Odstrani iz oblaka"
   },
   "timer": {
     "title": "Časovnik",
@@ -3915,7 +3987,7 @@
     "showPolls": "Prikaži rezultate anket",
     "showFeedback": "Prikaži povratne informacije",
     "showRecap": "Prikaži povzetek dogodka",
-    "showWordCloud": "Prikaži oblak besed",
+    "showWordCloud": "Prikaži odgovore »Z eno besedo«",
     "emailEnabled": "Ob koncu dogodka pošlji e-sporočilo s povzetkom",
     "emailEnabledHelp": "Ob zaključku prijavljenim udeležencem pošlje zahvalno e-sporočilo s povezavama do povzetka in povratnih informacij, moderatorju pa kratek povzetek. Pošlje se samo enkrat.",
     "feedbackEnabled": "Anketa o povratnih informacijah aktivna ob koncu dogodka",
@@ -3976,7 +4048,7 @@
     "micToggleOn": "Mikrofon ON",
     "micToggleOff": "Mikrofon OFF",
     "cameraOffPreview": "Kamera ugasnjena",
-    "speakerTest": "🔊 Test zvoka",
+    "speakerTest": "Test zvoka",
     "backgroundLabel": "Navidezno ozadje",
     "backgroundNoneShort": "No",
     "backgroundHint": "Uveljavi se, ko vstopite v dvorano. Za zameglitev ozadja po vstopu uporabite gumb za ozadja: zgornji predogled prikazuje kamero brez učinka.",

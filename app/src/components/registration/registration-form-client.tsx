@@ -108,6 +108,7 @@ export default function RegistrationFormClient({
   const [alreadyRegistered, setAlreadyRegistered] = useState(false);
   const [resending, setResending] = useState(false);
   const [resent, setResent] = useState(false);
+  const [resendFailed, setResendFailed] = useState(false);
 
   const showOrg = profiling?.requireOrganization ?? false;
   const showRole = profiling?.requireOrganizationRole ?? false;
@@ -266,18 +267,23 @@ export default function RegistrationFormClient({
   // Duplicate sign-up recovery: re-send the original confirmation email
   // (with the personal join link). The endpoint always answers 200 with a
   // neutral body, so this never reveals whether the address is registered.
+  // Un rifiuto (limite di richieste, errore del server) non e' un «inviato»:
+  // altrimenti si aspetta un'email che non partira' mai.
   const handleResend = useCallback(async () => {
     setResent(false);
+    setResendFailed(false);
     setResending(true);
     try {
-      await fetch(`/api/events/${eventSlug}/registrations/resend`, {
+      const res = await fetch(`/api/events/${eventSlug}/registrations/resend`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, locale }),
       });
-      setResent(true);
+      if (res.ok) setResent(true);
+      else setResendFailed(true);
     } catch {
-      /* leave the button live so the user can retry */
+      // Il pulsante resta attivo: si puo' riprovare.
+      setResendFailed(true);
     } finally {
       setResending(false);
     }
@@ -388,9 +394,9 @@ export default function RegistrationFormClient({
             event is LIVE — this is what was missing on a real run
             (people registered but had no on-screen way in). When we
             auto-redirect, this button is the manual fallback. */}
-        <div className="text-center d-flex flex-column align-items-center gap-2">
+        <div className="d-flex flex-wrap justify-content-center align-items-center gap-3">
           {autoRedirecting && (
-            <div className="text-muted mb-1 d-inline-flex align-items-center" style={{ fontSize: '0.9rem' }}>
+            <div className="w-100 text-center text-muted mb-1 d-inline-flex align-items-center justify-content-center" style={{ fontSize: '0.9rem' }}>
               <Spinner active small className="me-2" />
               {t('enteringRoomHint')}
             </div>
@@ -408,8 +414,9 @@ export default function RegistrationFormClient({
             <a
               href={`/api/events/${eventSlug}/calendar.ics`}
               download
-              className="btn btn-outline-primary"
+              className="btn btn-primary d-inline-flex align-items-center gap-2"
             >
+              <Icon icon="it-calendar" size="sm" color="white" />
               {t('addToCalendar')}
             </a>
           )}
@@ -473,6 +480,11 @@ export default function RegistrationFormClient({
               </div>
             )}
           </FormGroup>
+          {resendFailed && !resent && (
+            <Alert color="danger" className="mb-3" role="alert">
+              {t('resendFailed')}
+            </Alert>
+          )}
           {resent ? (
             <Alert color="success" className="mb-3">
               {t('resendSent')}
@@ -500,7 +512,7 @@ export default function RegistrationFormClient({
   }
 
   return (
-    <form ref={formRef} onSubmit={handleSubmit} noValidate>
+    <form ref={formRef} onSubmit={handleSubmit} noValidate className="registration-form">
       {registrationAccess === 'invitation' && (
         <Alert color="info" className="mb-4">
           {t('invitationOnly')}
@@ -515,6 +527,11 @@ export default function RegistrationFormClient({
 
       {alreadyRegistered && (
         <div className="mb-4">
+          {resendFailed && !resent && (
+            <Alert color="danger" className="mb-3" role="alert">
+              {t('resendFailed')}
+            </Alert>
+          )}
           {resent ? (
             <Alert color="success" className="mb-0">
               {t('resendSent')}
@@ -540,7 +557,7 @@ export default function RegistrationFormClient({
         </div>
       )}
 
-      <FormGroup className="mb-4">
+      <FormGroup className="mb-5">
         <Input
           type="text"
           id="displayName"
@@ -571,7 +588,7 @@ export default function RegistrationFormClient({
         )}
       </FormGroup>
 
-      <FormGroup className="mb-4">
+      <FormGroup className="mb-5">
         <Input
           type="email"
           id="email"
@@ -603,7 +620,7 @@ export default function RegistrationFormClient({
       </FormGroup>
 
       {showOrg && (
-        <FormGroup className="mb-4">
+        <FormGroup className="mb-5">
           <Label htmlFor="organization">{t('organization')}</Label>
           <input
             type="text"
@@ -637,7 +654,7 @@ export default function RegistrationFormClient({
       )}
 
       {showRole && (
-        <FormGroup className="mb-4">
+        <FormGroup className="mb-5">
           <Input
             type="text"
             id="organizationRole"
@@ -652,7 +669,7 @@ export default function RegistrationFormClient({
       )}
 
       {showType && (
-        <FormGroup className="mb-4">
+        <FormGroup className="mb-5">
           <Label htmlFor="organizationType">{t('organizationType')}</Label>
           <select
             id="organizationType"
@@ -677,6 +694,7 @@ export default function RegistrationFormClient({
             type="button"
             className="btn btn-link p-0 text-decoration-none fw-semibold"
             onClick={() => setPrivacyExpanded(!privacyExpanded)}
+            aria-expanded={privacyExpanded}
             style={{ fontSize: '0.9rem' }}
           >
             <Icon icon={privacyExpanded ? 'it-collapse' : 'it-expand'} size="sm" className="me-1" />

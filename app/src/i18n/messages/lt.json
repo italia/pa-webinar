@@ -1,15 +1,51 @@
 {
   "agenda": {
-    "title": "Užrašai / kontrolinis sąrašas",
-    "empty": "Kol kas punktų nėra. Pridėkite aptartinas temas ir žymėkite jas eigoje.",
+    "title": "Darbotvarkė",
+    "empty": "Darbotvarkė dar neparengta.",
     "add": "Pridėti",
-    "addPlaceholder": "Naujas punktas…",
-    "remove": "Pašalinti",
+    "addPlaceholder": "Nauja tema…",
+    "remove": "Ištrinti temą",
     "inProgress": "vykdoma",
     "agree": "Pritariu",
     "disagree": "Nepritariu",
     "favorablePct": "{pct} % pritaria",
-    "noReactions": "Išsakykite savo nuomonę"
+    "noReactions": "Išsakykite savo nuomonę",
+    "emptyModerator": "Pridėkite susitikimo temas: renginio metu žymite eigą, o salė mato dabartinę temą.",
+    "progress": "Aptarta {done} iš {total}",
+    "skippedCount": "{count, plural, one {# praleista} few {# praleistos} other {# praleista}}",
+    "nextTopic": "Kita tema:",
+    "startFirst": "Pradėkite nuo:",
+    "finishCurrent": "Užbaigti dabartinę temą",
+    "runningFor": "{minutes, plural, =0 {ką tik prasidėjo} one {jau # minutę} few {jau # minutes} other {jau # minučių}}",
+    "tickerNow": "Dabar",
+    "status": {
+      "PENDING": "Aptarti",
+      "CURRENT": "Vyksta",
+      "DONE": "Aptarta",
+      "SKIPPED": "Praleista"
+    },
+    "actions": {
+      "start": "Pradėti dabar",
+      "done": "Pažymėti kaip aptartą",
+      "skip": "Praleisti",
+      "reopen": "Atidaryti iš naujo",
+      "edit": "Redaguoti",
+      "moveUp": "Perkelti aukštyn",
+      "moveDown": "Perkelti žemyn"
+    },
+    "plannedMinutes": "numatyta {minutes} min",
+    "elapsedOfPlanned": "{minutes} iš {planned} min",
+    "overtime": "viršytas laikas",
+    "tookMinutes": "{minutes} min",
+    "plannedTotal": "Numatyta trukmė: {minutes} min",
+    "pulsePrompt": "Ar sutinkate?",
+    "addHint": "Enter – pridėti, Shift+Enter – nauja eilutė. Galite įklijuoti sąrašą: po vieną temą eilutėje.",
+    "addMany": "{count, plural, one {Pridėti # temą} few {Pridėti # temas} other {Pridėti # temų}}",
+    "minutesPlaceholder": "min",
+    "minutesLabel": "Numatyta trukmė minutėmis (neprivaloma)",
+    "editLabel": "Temos pavadinimas",
+    "agendaChanged": "Darbotvarkė ką tik pasikeitė: bandykite dar kartą.",
+    "minutesInvalid": "Įveskite trukmę minutėmis, nuo 1 iki 600."
   },
   "common": {
     "appName": "PA Webinar",
@@ -64,7 +100,7 @@
     "past": "Praėję renginiai",
     "noUpcoming": "Šiuo metu nėra suplanuotų renginių. Užsukite vėliau!",
     "noPast": "Praėjusių renginių nėra",
-    "wordCloudTitle": "Žodžių debesis",
+    "wordCloudTitle": "Vienu žodžiu",
     "card": {
       "publicEvent": "Viešas renginys",
       "readMore": "Sužinoti daugiau",
@@ -173,6 +209,7 @@
     "resendLink": "Išsiųsti prieigos nuorodą dar kartą",
     "resending": "Siunčiama…",
     "resendSent": "Jei adresas užregistruotas, dar kartą išsiuntėme prieigos nuorodą el. paštu.",
+    "resendFailed": "Nepavyko dar kartą išsiųsti nuorodos. Bandykite dar kartą po kelių minučių.",
     "invitationOnly": "Registracija skirta tik pakviestiems asmenims: naudokite el. pašto adresą, kuriuo buvote pakviesti. Nuorodą prisijungti gausite el. paštu.",
     "closed": "Registracija į šį renginį nėra vieša.",
     "lostLink": "Jau užsiregistravote? Gaukite asmeninę nuorodą dar kartą",
@@ -317,9 +354,9 @@
     "whiteboardNotSavedHint": "Lenta automatiškai neišsaugoma. Jei ja naudojatės, prieš užbaigdami eksportuokite ją (lentos meniu) ir pridėkite prie renginio medžiagos.",
     "sidebarTabChat": "Pokalbis",
     "sidebarTabPolls": "Apklausos",
-    "sidebarTabWordcloud": "Žodžių debesis",
-    "sidebarTabAgenda": "Užrašai / kontrolinis sąrašas",
-    "liveToggleAgenda": "Užrašai / kontrolinis sąrašas (darbotvarkė)",
+    "sidebarTabWordcloud": "Vienu žodžiu",
+    "sidebarTabAgenda": "Darbotvarkė",
+    "liveToggleAgenda": "Darbotvarkė",
     "sidebarTabMaterials": "Medžiaga",
     "sidebarTabParticipants": "Dalyviai",
     "chat": {
@@ -371,7 +408,20 @@
       "notifyDesktopBlocked": "Naršyklė blokuoja šios svetainės pranešimus: juos vėl galite leisti svetainės nustatymuose.",
       "notifyDesktopUnsupported": "Ši naršyklė nepalaiko pranešimų.",
       "notifyOffer": "Norite pranešimo, kai kas nors jus pamini ar jums atsako?",
-      "notifyOfferEnable": "Įjungti pranešimus"
+      "notifyOfferEnable": "Įjungti pranešimus",
+      "emojiSearch": "Ieškoti jaustuko",
+      "emojiNoResults": "Jaustukų nerasta",
+      "emojiRecent": "Neseniai naudoti",
+      "emojiAll": "Visi jaustukai",
+      "mentionListLabel": "Paminėtini žmonės",
+      "mentionButton": "Paminėti ką nors",
+      "replyJump": "Eiti į pradinę žinutę",
+      "typingOne": "{name} rašo…",
+      "typingTwo": "{a} ir {b} rašo…",
+      "typingMany": "Rašo keli žmonės…",
+      "hideForAll": "Slėpti nuo visų",
+      "deleteOwn": "Ištrinti žinutę",
+      "mentionedYou": "Jus paminėjo"
     },
     "role": {
       "moderator": "Moderatorius",
@@ -470,7 +520,9 @@
     "rejoin": "Grįžti",
     "backToHome": "Grįžti į pradžios puslapį",
     "sidebarTabMaterialsNew": "Nauja bendrinama medžiaga",
-    "sidebarTabQaNew": "Naujienos skiltyje Klausimai ir atsakymai"
+    "sidebarTabQaNew": "Naujienos skiltyje Klausimai ir atsakymai",
+    "resizeSidebar": "Keisti šoninio skydelio dydį",
+    "sidebarTabWordcloudNew": "Naujas klausimas „Vienu žodžiu“"
   },
   "qa": {
     "title": "Klausimai ir atsakymai",
@@ -1280,10 +1332,10 @@
       "qaEnabled": "Įjungti Q&A",
       "chatEnabled": "Įjungti pokalbius",
       "recordingEnabled": "Įjungti vaizdo įrašymą",
-      "agendaEnabled": "Tiesioginiai užrašai / kontrolinis sąrašas (darbotvarkė)",
-      "agendaEnabledDesc": "Aptartinų temų sąrašas, kurį moderatoriai žymi renginio metu. Įtraukiamas į automatinę santrauką. Neprivalomas ir gali būti įjungtas net renginio metu.",
-      "wordCloudEnabled": "Tiesioginis žodžių debesis",
-      "wordCloudEnabledDesc": "Dalyviai siunčia žodį, o debesis atnaujinamas tiesiogiai. Naudinga pradedant diskusiją arba per kelias sekundes surenkant nuotaikas.",
+      "agendaEnabled": "Susitikimo darbotvarkė",
+      "agendaEnabledDesc": "Susitikimo temų sąrašas: renginio metu moderatorius pažymi dabartinę, aptartas ir praleistas temas, o salė visada mato, kur esama, ir viršutinėje juostoje. Įtraukiama į automatinę santrauką. Neprivaloma, galima įjungti ir renginio metu.",
+      "wordCloudEnabled": "Klausimai „Vienu žodžiu“",
+      "wordCloudEnabledDesc": "Moderatorius užduoda klausimą ir kiekvienas atsako vienu žodžiu: atsakymai sudaro debesį, kuris atnaujinamas tiesiogiai, o dažniausi žodžiai tampa didesni. Naudinga pralaužti ledus ar per kelias sekundes surinkti įspūdžius.",
       "whiteboardEnabled": "Bendra lenta",
       "whiteboardEnabledDesc": "Įjungia integruotą bendradarbiavimo lentą (Excalidraw): moderatoriai gali ją atverti iš įrankių juostos renginio metu. Reikalinga diegimo lentos paslauga; kur ji yra, momentiniuose skambučiuose lenta visada įjungta.",
       "autoStartRecording": "Pradėti įrašymą automatiškai",
@@ -2760,8 +2812,8 @@
         "desc": "Atsakykite į apklausas realiuoju laiku ir iškart matykite rezultatus."
       },
       "wordcloud": {
-        "title": "Žodžių debesis",
-        "desc": "Pridėkite savo žodžius prie bendro renginio žodžių debesies."
+        "title": "Vienu žodžiu",
+        "desc": "Atsakykite vienu žodžiu į moderatoriaus klausimus ir stebėkite, kaip auga atsakymų debesis."
       },
       "reactions": {
         "title": "Reakcijos ir pakeltos rankos",
@@ -2772,8 +2824,8 @@
         "desc": "Rašykite renginio pokalbiuose ir sekite pokalbį su kitais dalyviais."
       },
       "agenda": {
-        "title": "Darbotvarkė ir užrašai",
-        "desc": "Sekite darbotvarkę ir užrašus, kuriais moderatoriai dalijasi renginio metu."
+        "title": "Darbotvarkė",
+        "desc": "Sekite dabartinę temą ir susitikimo darbotvarkę."
       }
     },
     "projectTeaser": {
@@ -2888,8 +2940,17 @@
       "minOptions": "Reikia bent 2 variantų",
       "generic": "Klaida kuriant apklausą",
       "vote": "Balsas neužregistruotas. Bandykite dar kartą.",
-      "alreadyVoted": "Šioje apklausoje jau balsavote."
-    }
+      "alreadyVoted": "Šioje apklausoje jau balsavote.",
+      "action": "Veiksmas nepavyko. Bandykite dar kartą."
+    },
+    "participation": "{votes, plural, one {# balsas} few {# balsai} other {# balsų}} iš {present} dalyvaujančių",
+    "participationLabel": "Dalyvavimas apklausoje",
+    "yourVote": "Jūsų balsas",
+    "deletePoll": "Ištrinti apklausą",
+    "questionLabel": "Klausimas",
+    "optionsLabel": "Galimi atsakymai",
+    "resultsHidden": "Balsas užregistruotas. Rezultatai bus rodomi, kai moderatorius juos paskelbs.",
+    "closedNoVote": "Balsavimas baigtas. Rezultatai bus parodyti, kai moderatorius juos paskelbs."
   },
   "materials": {
     "title": "Medžiaga",
@@ -3497,16 +3558,16 @@
     "noFeedback": "Atsiliepimų negauta"
   },
   "wordcloud": {
-    "title": "Žodžių debesis",
+    "title": "Vienu žodžiu",
     "startRound": "Pradėti",
-    "prompt": "Tema",
+    "prompt": "Klausimas",
     "promptPlaceholder": "pvz. Ko tikitės iš šio renginio?",
     "duration": "Trukmė",
     "submit": "Pateikti",
-    "submitPlaceholder": "Įveskite žodį (maks. 30 simb.)",
-    "close": "Uždaryti žodžių debesį",
+    "submitPlaceholder": "Jūsų žodis",
+    "close": "Uždaryti atsakymus",
     "cancel": "Atšaukti",
-    "noActiveRound": "Šiuo metu nėra aktyvaus žodžių debesies.",
+    "noActiveRound": "Šiuo metu nėra atvirų klausimų.",
     "noWords": "Laukiama pirmųjų žodžių...",
     "wordsSubmitted": "{count} žodžių pateikta",
     "timeRemaining": "Liko laiko",
@@ -3514,11 +3575,22 @@
       "send": "Žodis neišsiųstas. Bandykite dar kartą.",
       "closed": "Šis raundas uždarytas: daugiau žodžių nepriimama.",
       "limit": "Šiame raunde jau išsiuntėte didžiausią leistiną žodžių skaičių.",
-      "rateLimited": "Šiuo metu per daug siuntimų: palaukite kelias sekundes ir bandykite dar kartą."
+      "rateLimited": "Šiuo metu per daug siuntimų: palaukite kelias sekundes ir bandykite dar kartą.",
+      "duplicate": "Šį žodį jau parašėte: jis skaičiuojamas tik kartą vienam žmogui.",
+      "removed": "Moderatorius pašalino šį žodį: jo negalima siųsti dar kartą.",
+      "invalid": "Parašykite žodį iš raidžių ar skaičių."
     },
-    "startNew": "Pradėti žodžių debesį",
-    "emptyHintModerator": "Užduokite atvirą klausimą: vieno žodžio atsakymai realiuoju laiku sudaro debesį.",
-    "timeLeft": "Liko laiko: {time}"
+    "startNew": "Užduoti klausimą",
+    "emptyHintModerator": "Užduokite klausimą, į kurį galima atsakyti vienu žodžiu, pavyzdžiui, „Kaip šiandien jaučiatės?“. Atsakymai sudaro debesį, kuris atnaujinamas tiesiogiai: kuo daugiau žmonių parašo tą patį žodį, tuo jis didesnis.",
+    "timeLeft": "Liko laiko: {time}",
+    "howItWorks": "Atsakykite vienu žodžiu: kuo daugiau žmonių parašo tą patį žodį, tuo jis didesnis.",
+    "enableHint": "Skirtukas „Vienu žodžiu“ visiems pasirodys, kai pradėsite pirmąjį klausimą.",
+    "topWords": "Dažniausi",
+    "yourWords": "Parašėte:",
+    "closedBadge": "Baigta",
+    "durationUnlimited": "Be laiko apribojimo",
+    "allWords": "Visi žodžiai",
+    "removeWord": "Pašalinti iš debesies"
   },
   "timer": {
     "title": "Laikmatis",
@@ -3915,7 +3987,7 @@
     "showPolls": "Rodyti apklausų rezultatus",
     "showFeedback": "Rodyti atsiliepimus",
     "showRecap": "Rodyti renginio suvestinę",
-    "showWordCloud": "Rodyti žodžių debesį",
+    "showWordCloud": "Rodyti atsakymus „Vienu žodžiu“",
     "emailEnabled": "Pasibaigus renginiui siųsti suvestinės el. laišką",
     "emailEnabledHelp": "Pasibaigus renginiui užsiregistravusiems dalyviams išsiunčiamas padėkos laiškas su nuorodomis į suvestinę ir atsiliepimų formą, o moderatoriui – trumpa suvestinė. Siunčiama tik vieną kartą.",
     "feedbackEnabled": "Atsiliepimų apklausa aktyvi renginio pabaigoje",
@@ -3976,7 +4048,7 @@
     "micToggleOn": "Mikrofonas ON",
     "micToggleOff": "Mikrofonas OFF",
     "cameraOffPreview": "Kamera išjungta",
-    "speakerTest": "🔊 Garso testas",
+    "speakerTest": "Garso testas",
     "backgroundLabel": "Virtualus fonas",
     "backgroundNoneShort": "No",
     "backgroundHint": "Taikoma įėjus į salę. Norėdami sulieti foną, viduje naudokite fonų mygtuką: aukščiau esanti peržiūra rodo kamerą be efekto.",

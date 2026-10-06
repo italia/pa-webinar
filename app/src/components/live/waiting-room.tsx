@@ -5,7 +5,6 @@ import dynamic from 'next/dynamic';
 import { useTranslations, useFormatter } from 'next-intl';
 import {
   Alert,
-  Badge,
   Button,
   Card,
   CardBody,
@@ -993,7 +992,9 @@ export default function WaitingRoom({
         </div>
       </div>
       {nameValid ? (
-        <div style={{ height: 220, display: 'flex', flexDirection: 'column' }}>
+        // Abbastanza alta per leggere qualche messaggio sopra il riquadro di
+        // scrittura, che ora cresce con il testo.
+        <div style={{ height: 360, display: 'flex', flexDirection: 'column' }}>
           <ChatPanel
             eventSlug={event.slug}
             token={chatToken}
@@ -1116,15 +1117,12 @@ export default function WaitingRoom({
       )}
       {liveCueActive && (
         <div
-          className="text-center rounded-3 p-2"
+          className="waiting-countdown waiting-countdown--open"
           role="status"
           aria-live="assertive"
-          style={{ background: 'linear-gradient(135deg, #008758, #00592f)', color: '#fff' }}
         >
-          <div className="small text-uppercase fw-semibold opacity-75">
-            {t('roomOpen')}
-          </div>
-          <div className="display-6 fw-bold font-monospace lh-1">{liveCountdown}</div>
+          <div className="waiting-countdown__label">{t('roomOpen')}</div>
+          <div className="waiting-countdown__value">{liveCountdown}</div>
         </div>
       )}
       {/* Anche in preparazione o in pausa: se nessuno porta la sala a LIVE (lo
@@ -1169,7 +1167,7 @@ export default function WaitingRoom({
               innerRef={piazzaAttesaRef}
               onClick={() => setGameOpen(true)}
             >
-              <span className="me-2" aria-hidden="true">🌿</span>
+              <Icon icon="it-map-marker-circle" size="sm" color="primary" className="me-2" />
               {t('roomNotReadyPiazza')}
             </Button>
           )}
@@ -1230,7 +1228,7 @@ export default function WaitingRoom({
           className="fw-semibold"
           onClick={() => setWatchingCatchUp(true)}
         >
-          <span className="me-2">⏪</span>
+          <Icon icon="it-restore" size="sm" color="success" className="me-2" />
           {t('watchCatchup')}
         </Button>
       )}
@@ -1381,12 +1379,25 @@ export default function WaitingRoom({
       ref={inviteRef}
       onClick={() => setGameOpen(true)}
     >
-      <span className="wr-game-invite__art" aria-hidden="true">🌿</span>
+      <span className="wr-game-invite__art" aria-hidden="true">
+        <Icon icon="it-map-marker-circle" color="primary" />
+      </span>
       <span>
         <span className="wr-game-invite__title">{t('enterGardenTitle')}</span>
         <span className="wr-game-invite__hint">{t('enterGardenHint')}</span>
       </span>
     </button>
+  ) : null;
+
+  const statusBadge = isLive ? (
+    <span className="wr-status wr-status--live">
+      <span className="wr-status__dot" aria-hidden="true" />
+      {t('eventLive')}
+    </span>
+  ) : isEnded ? (
+    <span className="wr-status wr-status--ended">
+      {notHeld ? t('notHeldBadge') : t('endedTitle')}
+    </span>
   ) : null;
 
   return (
@@ -1414,32 +1425,31 @@ export default function WaitingRoom({
       <div className="container py-4 py-md-5">
         <div className="row g-4 justify-content-center">
           <div className={asideBox ? 'col-lg-7 col-xl-6' : 'col-lg-8 col-xl-7'}>
-            <Card className="waiting-card shadow-sm border-0 overflow-hidden" style={{ borderRadius: 16 }}>
-              <div
-                className="waiting-hero"
-                style={{
-                  height: 160,
-                  background: heroUrl
-                    ? `url("${heroUrl}") center/cover no-repeat`
-                    : 'linear-gradient(135deg, #0066CC, #004080)',
-                  position: 'relative',
-                }}
-                aria-hidden={!heroUrl}
-              >
-                {isLive && (
-                  <Badge color="danger" pill className="px-3 py-2 position-absolute" style={{ top: 12, right: 12, fontSize: '0.75rem' }}>
-                    <span className="me-1">●</span>
-                    {t('eventLive')}
-                  </Badge>
-                )}
-                {isEnded && (
-                  <Badge color="" pill className="px-3 py-2 position-absolute" style={{ top: 12, right: 12, fontSize: '0.75rem', backgroundColor: '#E9ECEF', color: 'var(--app-muted)' }}>
-                    {notHeld ? t('notHeldBadge') : t('endedTitle')}
-                  </Badge>
-                )}
-              </div>
+            <Card
+              className={`waiting-card shadow-sm border-0 overflow-hidden${heroUrl ? '' : ' waiting-card--plain'}`}
+              style={{ borderRadius: 16 }}
+            >
+              {/* La fascia c'e' solo se c'e' un'immagine da mostrare: vuota era
+                  un rettangolo blu alto 160 px che spingeva tutto in basso. */}
+              {heroUrl && (
+                <div
+                  className="waiting-hero"
+                  style={{
+                    height: 160,
+                    background: `url("${heroUrl}") center/cover no-repeat`,
+                    position: 'relative',
+                  }}
+                >
+                  {statusBadge && (
+                    <div className="position-absolute" style={{ top: 12, right: 12 }}>
+                      {statusBadge}
+                    </div>
+                  )}
+                </div>
+              )}
 
               <CardBody className="p-4 p-md-5">
+                {!heroUrl && statusBadge && <div className="mb-3">{statusBadge}</div>}
                 <EventTitle
                   title={event.title}
                   kickerEnabled={event.parseTitleKicker ?? false}
@@ -1476,12 +1486,9 @@ export default function WaitingRoom({
                 )}
 
                 {isPublished && countdown && (
-                  <div
-                    className={`rounded-3 p-3 mb-4 text-center${pulseCountdown ? ' waiting-countdown--pulse' : ''}`}
-                    style={{ background: 'linear-gradient(135deg, #0066CC, #004080)', color: '#fff' }}
-                  >
-                    <div className="small text-uppercase mb-1 opacity-75">{t('startsIn')}</div>
-                    <div className="display-6 fw-bold font-monospace">{countdown}</div>
+                  <div className={`waiting-countdown mb-4${pulseCountdown ? ' waiting-countdown--pulse' : ''}`}>
+                    <div className="waiting-countdown__label">{t('startsIn')}</div>
+                    <div className="waiting-countdown__value">{countdown}</div>
                   </div>
                 )}
 
@@ -1507,7 +1514,7 @@ export default function WaitingRoom({
                     qui, con l'indirizzo sicuro, invece di una prova dei
                     dispositivi che chiede un permesso impossibile. */}
                 {!isEnded && <InsecureContextNotice className="mb-3" />}
-                {!isEnded && <div className="mb-3">{nameField}</div>}
+                {!isEnded && <div className="wr-name-field mb-3">{nameField}</div>}
                 {/* Email: solo per gli ospiti (i registrati l'hanno già data,
                     per moderatori/speaker è irrilevante). Il valore non è ancora
                     inviato al server: campo di cortesia locale finché non c'è un

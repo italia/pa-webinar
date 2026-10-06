@@ -1,15 +1,51 @@
 {
   "agenda": {
-    "title": "Notatki / Lista kontrolna",
-    "empty": "Brak pozycji. Dodaj tematy do omówienia i odhaczaj je na bieżąco.",
+    "title": "Porządek",
+    "empty": "Porządek nie został jeszcze przygotowany.",
     "add": "Dodaj",
-    "addPlaceholder": "Nowa pozycja…",
-    "remove": "Usuń",
+    "addPlaceholder": "Nowy temat…",
+    "remove": "Usuń temat",
     "inProgress": "w toku",
     "agree": "Zgadzam się",
     "disagree": "Nie zgadzam się",
     "favorablePct": "{pct}% za",
-    "noReactions": "Wyraź swoją opinię"
+    "noReactions": "Wyraź swoją opinię",
+    "emptyModerator": "Dodaj tematy spotkania: podczas wydarzenia oznaczasz postęp, a sala widzi bieżący temat.",
+    "progress": "Omówiono {done} z {total}",
+    "skippedCount": "{count, plural, one {# pominięty} few {# pominięte} many {# pominiętych} other {# pominiętego}}",
+    "nextTopic": "Następny temat:",
+    "startFirst": "Zacznij od:",
+    "finishCurrent": "Zakończ bieżący temat",
+    "runningFor": "{minutes, plural, =0 {właśnie rozpoczęty} one {od # minuty} few {od # minut} many {od # minut} other {od # minuty}}",
+    "tickerNow": "Teraz",
+    "status": {
+      "PENDING": "Do omówienia",
+      "CURRENT": "W toku",
+      "DONE": "Omówiony",
+      "SKIPPED": "Pominięty"
+    },
+    "actions": {
+      "start": "Rozpocznij teraz",
+      "done": "Oznacz jako omówiony",
+      "skip": "Pomiń",
+      "reopen": "Otwórz ponownie",
+      "edit": "Edytuj",
+      "moveUp": "Przesuń w górę",
+      "moveDown": "Przesuń w dół"
+    },
+    "plannedMinutes": "planowane {minutes} min",
+    "elapsedOfPlanned": "{minutes} z {planned} min",
+    "overtime": "ponad czas",
+    "tookMinutes": "{minutes} min",
+    "plannedTotal": "Planowany czas: {minutes} min",
+    "pulsePrompt": "Zgadzasz się?",
+    "addHint": "Enter, aby dodać, Shift+Enter, aby przejść do nowej linii. Możesz wkleić listę: jeden temat w linii.",
+    "addMany": "{count, plural, one {Dodaj # temat} few {Dodaj # tematy} many {Dodaj # tematów} other {Dodaj # tematu}}",
+    "minutesPlaceholder": "min",
+    "minutesLabel": "Planowany czas w minutach (opcjonalnie)",
+    "editLabel": "Tytuł tematu",
+    "agendaChanged": "Porządek właśnie się zmienił: spróbuj ponownie.",
+    "minutesInvalid": "Wpisz czas w minutach, od 1 do 600."
   },
   "common": {
     "appName": "PA Webinar",
@@ -64,7 +100,7 @@
     "past": "Minione wydarzenia",
     "noUpcoming": "Brak zaplanowanych wydarzeń. Zapraszamy wkrótce!",
     "noPast": "Brak minionych wydarzeń",
-    "wordCloudTitle": "Chmura słów",
+    "wordCloudTitle": "Jednym słowem",
     "card": {
       "publicEvent": "Wydarzenie publiczne",
       "readMore": "Dowiedz się więcej",
@@ -173,6 +209,7 @@
     "resendLink": "Wyślij ponownie link dostępu",
     "resending": "Wysyłanie…",
     "resendSent": "Jeśli adres jest zarejestrowany, ponownie wysłaliśmy link dostępu e-mailem.",
+    "resendFailed": "Nie udało się ponownie wysłać linku. Spróbuj ponownie za kilka minut.",
     "invitationOnly": "Rejestracja jest zarezerwowana dla osób zaproszonych: użyj adresu e-mail, na który otrzymano zaproszenie. Link do wejścia otrzymasz e-mailem.",
     "closed": "Rejestracja na to wydarzenie nie jest otwarta dla wszystkich.",
     "lostLink": "Rejestracja już dokonana? Otrzymaj ponownie swój osobisty link",
@@ -317,9 +354,9 @@
     "whiteboardNotSavedHint": "Tablica nie jest zapisywana automatycznie. Jeśli z niej korzystasz, wyeksportuj ją (menu tablicy) i dołącz do Materiałów wydarzenia przed zakończeniem.",
     "sidebarTabChat": "Czat",
     "sidebarTabPolls": "Ankiety",
-    "sidebarTabWordcloud": "Chmura słów",
-    "sidebarTabAgenda": "Notatki / Lista kontrolna",
-    "liveToggleAgenda": "Notatki / Lista kontrolna (agenda)",
+    "sidebarTabWordcloud": "Jednym słowem",
+    "sidebarTabAgenda": "Porządek",
+    "liveToggleAgenda": "Porządek",
     "sidebarTabMaterials": "Materiały",
     "sidebarTabParticipants": "Uczestnicy",
     "chat": {
@@ -371,7 +408,20 @@
       "notifyDesktopBlocked": "Przeglądarka blokuje powiadomienia tej witryny: możesz je ponownie zezwolić w ustawieniach witryny.",
       "notifyDesktopUnsupported": "Ta przeglądarka nie obsługuje powiadomień.",
       "notifyOffer": "Chcesz powiadomienie, gdy ktoś cię wspomni lub ci odpowie?",
-      "notifyOfferEnable": "Włącz powiadomienia"
+      "notifyOfferEnable": "Włącz powiadomienia",
+      "emojiSearch": "Szukaj emoji",
+      "emojiNoResults": "Nie znaleziono emoji",
+      "emojiRecent": "Ostatnio używane",
+      "emojiAll": "Wszystkie emoji",
+      "mentionListLabel": "Osoby do oznaczenia",
+      "mentionButton": "Oznacz kogoś",
+      "replyJump": "Przejdź do oryginalnej wiadomości",
+      "typingOne": "{name} pisze…",
+      "typingTwo": "{a} i {b} piszą…",
+      "typingMany": "Kilka osób pisze…",
+      "hideForAll": "Ukryj dla wszystkich",
+      "deleteOwn": "Usuń wiadomość",
+      "mentionedYou": "Wspomniał(a) o tobie"
     },
     "role": {
       "moderator": "Moderator",
@@ -470,7 +520,9 @@
     "rejoin": "Wróć do sali",
     "backToHome": "Powrót do strony głównej",
     "sidebarTabMaterialsNew": "Udostępniono nowe materiały",
-    "sidebarTabQaNew": "Nowości w Pytaniach i odpowiedziach"
+    "sidebarTabQaNew": "Nowości w Pytaniach i odpowiedziach",
+    "resizeSidebar": "Zmień rozmiar panelu bocznego",
+    "sidebarTabWordcloudNew": "Nowe pytanie „Jednym słowem”"
   },
   "qa": {
     "title": "Pytania i odpowiedzi",
@@ -1280,10 +1332,10 @@
       "qaEnabled": "Włącz Q&A",
       "chatEnabled": "Włącz czat",
       "recordingEnabled": "Włącz nagrywanie wideo",
-      "agendaEnabled": "Notatki / Lista kontrolna (agenda) na żywo",
-      "agendaEnabledDesc": "Lista kontrolna tematów do omówienia, którą moderatorzy odhaczają podczas wydarzenia. Zasila automatyczne podsumowanie. Opcjonalna, można ją włączyć także w trakcie wydarzenia.",
-      "wordCloudEnabled": "Chmura słów na żywo",
-      "wordCloudEnabledDesc": "Uczestnicy wysyłają słowo, a chmura aktualizuje się na żywo. Przydatne do rozpoczęcia dyskusji lub zebrania nastrojów w kilka sekund.",
+      "agendaEnabled": "Porządek spotkania",
+      "agendaEnabledDesc": "Lista tematów spotkania: podczas wydarzenia moderator oznacza bieżący temat, omówione i pominięte, a sala zawsze widzi, na jakim etapie jesteście, także na górnym pasku. Trafia do automatycznego podsumowania. Opcjonalne, można włączyć także w trakcie wydarzenia.",
+      "wordCloudEnabled": "Pytania „Jednym słowem”",
+      "wordCloudEnabledDesc": "Moderator zadaje pytanie, a każdy odpowiada jednym słowem: odpowiedzi tworzą chmurę aktualizowaną na żywo, a najczęstsze słowa stają się większe. Przydatne na przełamanie lodów lub szybkie zebranie wrażeń.",
       "whiteboardEnabled": "Tablica współdzielona",
       "whiteboardEnabledDesc": "Włącza natywną tablicę do pracy zespołowej (Excalidraw): moderatorzy mogą ją otworzyć z paska narzędzi podczas wydarzenia. Wymaga usługi tablicy w instalacji; tam, gdzie jest dostępna, w połączeniach natychmiastowych jest zawsze aktywna.",
       "autoStartRecording": "Uruchom nagrywanie automatycznie",
@@ -2760,8 +2812,8 @@
         "desc": "Odpowiadaj na ankiety w czasie rzeczywistym i od razu zobacz wyniki."
       },
       "wordcloud": {
-        "title": "Chmura słów",
-        "desc": "Dodaj swoje słowa do wspólnej chmury słów wydarzenia."
+        "title": "Jednym słowem",
+        "desc": "Odpowiadaj jednym słowem na pytania moderatora i patrz, jak rośnie chmura odpowiedzi."
       },
       "reactions": {
         "title": "Reakcje i podniesione ręce",
@@ -2772,8 +2824,8 @@
         "desc": "Pisz na czacie wydarzenia i śledź rozmowę z innymi uczestnikami."
       },
       "agenda": {
-        "title": "Agenda i notatki",
-        "desc": "Śledź agendę i notatki, którymi moderatorzy dzielą się podczas wydarzenia."
+        "title": "Porządek",
+        "desc": "Śledź bieżący temat i porządek spotkania."
       }
     },
     "projectTeaser": {
@@ -2888,8 +2940,17 @@
       "minOptions": "Wymagane są co najmniej 2 opcje",
       "generic": "Błąd podczas tworzenia ankiety",
       "vote": "Głos nie został zapisany. Spróbuj ponownie.",
-      "alreadyVoted": "Twój głos w tej ankiecie został już oddany."
-    }
+      "alreadyVoted": "Twój głos w tej ankiecie został już oddany.",
+      "action": "Działanie nie powiodło się. Spróbuj ponownie."
+    },
+    "participation": "{votes, plural, one {# głos} few {# głosy} many {# głosów} other {# głosu}} z {present} obecnych",
+    "participationLabel": "Udział w ankiecie",
+    "yourVote": "Twój głos",
+    "deletePoll": "Usuń ankietę",
+    "questionLabel": "Pytanie",
+    "optionsLabel": "Możliwe odpowiedzi",
+    "resultsHidden": "Głos zapisany. Wyniki pojawią się, gdy moderator je opublikuje.",
+    "closedNoVote": "Głosowanie jest zamknięte. Wyniki pojawią się, gdy moderator je opublikuje."
   },
   "materials": {
     "title": "Materiały",
@@ -3497,16 +3558,16 @@
     "noFeedback": "Brak otrzymanych opinii"
   },
   "wordcloud": {
-    "title": "Chmura słów",
+    "title": "Jednym słowem",
     "startRound": "Rozpocznij",
-    "prompt": "Temat",
+    "prompt": "Pytanie",
     "promptPlaceholder": "np. Czego oczekujesz od tego wydarzenia?",
     "duration": "Czas trwania",
     "submit": "Wyślij",
-    "submitPlaceholder": "Wpisz słowo (maks. 30 zn.)",
-    "close": "Zamknij chmurę słów",
+    "submitPlaceholder": "Twoje słowo",
+    "close": "Zamknij odpowiedzi",
     "cancel": "Anuluj",
-    "noActiveRound": "Obecnie nie ma aktywnej chmury słów.",
+    "noActiveRound": "W tej chwili nie ma otwartego pytania.",
     "noWords": "Oczekiwanie na pierwsze słowa...",
     "wordsSubmitted": "{count} przesłanych słów",
     "timeRemaining": "Pozostały czas",
@@ -3514,11 +3575,22 @@
       "send": "Nie wysłano słowa. Spróbuj ponownie.",
       "closed": "Ta runda jest zamknięta: kolejne słowa nie są przyjmowane.",
       "limit": "W tej rundzie wysłano już maksymalną liczbę słów.",
-      "rateLimited": "Zbyt wiele wysłanych słów w tej chwili: odczekaj kilka sekund przed ponowną próbą."
+      "rateLimited": "Zbyt wiele wysłanych słów w tej chwili: odczekaj kilka sekund przed ponowną próbą.",
+      "duplicate": "To słowo już napisałeś(-aś): liczy się tylko raz na osobę.",
+      "removed": "Moderator usunął to słowo: nie można go wysłać ponownie.",
+      "invalid": "Napisz słowo z liter lub cyfr."
     },
-    "startNew": "Uruchom chmurę słów",
-    "emptyHintModerator": "Zadaj pytanie otwarte: jednowyrazowe odpowiedzi tworzą chmurę na żywo.",
-    "timeLeft": "Pozostały czas: {time}"
+    "startNew": "Zadaj pytanie",
+    "emptyHintModerator": "Zadaj pytanie, na które można odpowiedzieć jednym słowem, na przykład „Jak się dziś czujecie?”. Odpowiedzi tworzą chmurę aktualizowaną na żywo: im więcej osób napisze to samo słowo, tym jest większe.",
+    "timeLeft": "Pozostały czas: {time}",
+    "howItWorks": "Odpowiedz jednym słowem: im więcej osób napisze to samo słowo, tym jest większe.",
+    "enableHint": "Karta „Jednym słowem” pojawi się u wszystkich, gdy rozpoczniesz pierwsze pytanie.",
+    "topWords": "Najczęściej pisane",
+    "yourWords": "Napisałeś(-aś):",
+    "closedBadge": "Zakończone",
+    "durationUnlimited": "Bez limitu czasu",
+    "allWords": "Wszystkie słowa",
+    "removeWord": "Usuń z chmury"
   },
   "timer": {
     "title": "Minutnik",
@@ -3915,7 +3987,7 @@
     "showPolls": "Pokaż wyniki ankiet",
     "showFeedback": "Pokaż opinie",
     "showRecap": "Pokaż podsumowanie wydarzenia",
-    "showWordCloud": "Pokaż chmurę słów",
+    "showWordCloud": "Pokaż odpowiedzi „Jednym słowem”",
     "emailEnabled": "Wyślij e-mail podsumowujący po zakończeniu wydarzenia",
     "emailEnabledHelp": "Po zakończeniu wysyła zarejestrowanym uczestnikom e-mail z podziękowaniem oraz linkami do podsumowania i formularza opinii, a moderatorowi krótkie zestawienie. Wysyłany tylko raz.",
     "feedbackEnabled": "Ankieta opinii aktywna po zakończeniu wydarzenia",
@@ -3976,7 +4048,7 @@
     "micToggleOn": "Mikrofon ON",
     "micToggleOff": "Mikrofon OFF",
     "cameraOffPreview": "Kamera wyłączona",
-    "speakerTest": "🔊 Test audio",
+    "speakerTest": "Test audio",
     "backgroundLabel": "Wirtualne tło",
     "backgroundNoneShort": "No",
     "backgroundHint": "Zostanie zastosowane po wejściu do sali. Aby rozmyć tło, użyj przycisku teł po wejściu: powyższy podgląd pokazuje kamerę bez efektów.",

@@ -47,6 +47,13 @@ interface ModeratorControlsProps {
    *  and speakers hold a magic-link token without admin rights, so redirecting
    *  them there after "Termina evento" lands on a 404 — they just close. */
   isPrimaryModerator?: boolean;
+  /** Avvisa la sala che l'evento e' finito PRIMA dell'hangup: senza, la
+   *  chiusura di Jitsi arrivava con l'evento ancora LIVE e chi l'aveva appena
+   *  terminato si vedeva «Sei uscito dalla sala» con il pulsante «Rientra». */
+  onEnded?: () => void;
+  /** Dove montare la conferma: a schermo intero `<body>` e' fuori dal livello
+   *  visibile e la finestra non comparirebbe (vedi LiveEventClient). */
+  modalContainer?: HTMLElement;
 }
 
 const BAR_STYLE: React.CSSProperties = {
@@ -84,6 +91,8 @@ export default function ModeratorControls({
   whiteboardInfraReady = false,
   localDisplayName = '',
   isPrimaryModerator = false,
+  onEnded,
+  modalContainer,
 }: ModeratorControlsProps) {
   const t = useTranslations('live.moderator');
   const tl = useTranslations('live');
@@ -309,6 +318,7 @@ export default function ModeratorControls({
         mostraAvviso(tl('endEventError'));
         return;
       }
+      onEnded?.();
       api?.executeCommand('hangup');
       setEndModalOpen(false);
       // Only the primary moderator has admin access. Co-moderators/speakers
@@ -323,7 +333,7 @@ export default function ModeratorControls({
       setEnding(false);
       mostraAvviso(tl('endEventError'));
     }
-  }, [api, eventId, moderatorToken, router, tl, mostraAvviso, isPrimaryModerator]);
+  }, [api, eventId, moderatorToken, router, tl, mostraAvviso, isPrimaryModerator, onEnded]);
 
   return (
     <>
@@ -542,7 +552,12 @@ export default function ModeratorControls({
       </div>
 
       {/* End event confirmation modal */}
-      <Modal isOpen={endModalOpen} toggle={() => setEndModalOpen(false)} centered>
+      <Modal
+        isOpen={endModalOpen}
+        toggle={() => setEndModalOpen(false)}
+        centered
+        container={modalContainer}
+      >
         <ModalHeader closeAriaLabel={tc('close')} toggle={() => setEndModalOpen(false)}>
           {t('endEvent')}
         </ModalHeader>

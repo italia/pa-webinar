@@ -3,16 +3,20 @@ import { describe, expect, it } from 'vitest';
 import {
   DEFAULT_CHAT_NOTIFY_PREFS,
   chatAlertFor,
+  chatPreviewFor,
+  DEFAULT_MODERATOR_CHAT_NOTIFY_PREFS,
   parseChatNotifyPrefs,
   type ChatNotifyPrefs,
 } from './notify-prefs';
 
+// Pagina in secondo piano: il caso in cui suono e notifica servono tutti e due.
 const base = {
   own: false,
   mentionsMe: false,
   repliesToMe: false,
   onScreen: false,
-  pageVisible: true,
+  pageVisible: false,
+  pageFocused: false,
 };
 const prefs = (p: Partial<ChatNotifyPrefs> = {}): ChatNotifyPrefs => ({
   ...DEFAULT_CHAT_NOTIFY_PREFS,
@@ -79,5 +83,53 @@ describe('chatAlertFor', () => {
       sound: true,
       desktop: false,
     });
+  });
+});
+
+describe('chatAlertFor — pagina in primo piano', () => {
+  it('suona, ma la notifica di sistema la lascia all’anteprima nella sala', () => {
+    expect(
+      chatAlertFor({ ...base, mentionsMe: true, pageVisible: true, pageFocused: true, prefs: prefs() }),
+    ).toEqual({ sound: true, desktop: false });
+  });
+
+  it('visibile ma dietro un’altra applicazione: l’anteprima non si vede, la notifica sì', () => {
+    expect(
+      chatAlertFor({ ...base, mentionsMe: true, pageVisible: true, pageFocused: false, prefs: prefs() }),
+    ).toEqual({ sound: true, desktop: true });
+  });
+});
+
+describe('chatPreviewFor', () => {
+  const anteprima = (i: Partial<Parameters<typeof chatPreviewFor>[0]>) =>
+    chatPreviewFor({ own: false, mentionsMe: false, repliesToMe: false, onScreen: false, prefs: prefs(), ...i });
+
+  it('a chat chiusa, per gli stessi messaggi che meritano un avviso', () => {
+    expect(anteprima({ mentionsMe: true })).toBe(true);
+    expect(anteprima({ repliesToMe: true })).toBe(true);
+    expect(anteprima({})).toBe(false);
+    expect(anteprima({ prefs: prefs({ mode: 'all' }) })).toBe(true);
+  });
+
+  it('mai per i miei messaggi, in silenzioso o a chat aperta', () => {
+    expect(anteprima({ own: true, mentionsMe: true })).toBe(false);
+    expect(anteprima({ mentionsMe: true, prefs: prefs({ mode: 'off' }) })).toBe(false);
+    expect(anteprima({ mentionsMe: true, onScreen: true })).toBe(false);
+  });
+
+  it('non dipende da suono e notifica del browser', () => {
+    expect(anteprima({ mentionsMe: true, prefs: prefs({ sound: false, desktop: false }) })).toBe(true);
+  });
+});
+
+describe('preferenze predefinite per chi conduce', () => {
+  it('senza una scelta salvata, tutti i messaggi', () => {
+    expect(parseChatNotifyPrefs(null, DEFAULT_MODERATOR_CHAT_NOTIFY_PREFS).mode).toBe('all');
+  });
+
+  it('una scelta salvata vale anche per chi conduce', () => {
+    expect(
+      parseChatNotifyPrefs(JSON.stringify({ mode: 'mentions' }), DEFAULT_MODERATOR_CHAT_NOTIFY_PREFS).mode,
+    ).toBe('mentions');
   });
 });

@@ -863,7 +863,32 @@ html.live-call-immersive body {
   &__messages {
     padding: 12px;
     overflow-y: auto;
+    // Mai di lato: un messaggio o uno strumento troppo largo va a capo o
+    // resta dentro, non sposta la lista.
+    overflow-x: hidden;
     min-height: 0;
+    // Filigrana: i segni della sala (fumetto, microfono, videocamera, il
+    // triangolo del marchio) a un'opacita' che non disturba la lettura.
+    background-color: #FBFCFD;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Cg fill='none' stroke='%230066CC' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' opacity='0.045'%3E%3Cpath d='M22 30h40a6 6 0 0 1 6 6v20a6 6 0 0 1-6 6H38l-10 9v-9h-6a6 6 0 0 1-6-6V36a6 6 0 0 1 6-6z'/%3E%3Crect x='118' y='22' width='14' height='24' rx='7'/%3E%3Cpath d='M112 40a13 13 0 0 0 26 0M125 53v8'/%3E%3Crect x='30' y='112' width='34' height='24' rx='4'/%3E%3Cpath d='M64 120l12-7v22l-12-7'/%3E%3Cpath d='M118 108l26 15-26 15z'/%3E%3Ccircle cx='96' cy='88' r='2'/%3E%3Ccircle cx='160' cy='160' r='2'/%3E%3Ccircle cx='10' cy='92' r='2'/%3E%3C/g%3E%3C/svg%3E");
+    background-size: 180px 180px;
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+
+    &:hover,
+    &:focus-within {
+      scrollbar-color: rgba(23, 50, 77, 0.28) transparent;
+    }
+
+    &::-webkit-scrollbar { width: 8px; }
+    &::-webkit-scrollbar-track { background: transparent; }
+    &::-webkit-scrollbar-thumb {
+      background: transparent;
+      border-radius: 8px;
+      border: 2px solid transparent;
+      background-clip: padding-box;
+    }
+    &:hover::-webkit-scrollbar-thumb { background-color: rgba(23, 50, 77, 0.28); }
   }
 
   &__empty {
@@ -897,15 +922,28 @@ html.live-call-immersive body {
 
       .chat-panel__col { align-items: flex-end; }
 
+      // I propri messaggi si riconoscono senza leggere il nome: a destra, con
+      // «Tu», su un azzurro tenue con bordo; gli altri su bianco. Il testo resta
+      // scuro su entrambi (contrasto oltre 12:1), il colore non e' l'unico segno.
       .chat-panel__bubble {
-        background: #E8F0FE;
+        background: #EAF2FB;
+        border-color: #C3D8EF;
         border-radius: 14px 14px 4px 14px;
       }
 
-      // La barra delle azioni sta sul lato interno del messaggio, e il
-      // selettore delle reazioni si apre verso l'interno della lista.
-      .chat-panel__tools { right: auto; left: 6px; }
-      .chat-panel__tools .chat-panel__react-pop { right: auto; left: 0; }
+      .chat-mention {
+        background: #fff;
+        box-shadow: inset 0 0 0 1px #C3D8EF;
+      }
+
+      .chat-panel__reply-quote {
+        background: rgba(255, 255, 255, 0.7);
+      }
+
+      // La barra delle azioni di un proprio messaggio resta ancorata a destra e
+      // si allarga verso l'interno della lista, come il selettore delle
+      // reazioni: ancorata a sinistra di una bolla corta («ok») sbordava e
+      // faceva comparire una barra di scorrimento orizzontale.
     }
 
     &--continued .chat-panel__bubble { border-top-left-radius: 6px; }
@@ -1043,19 +1081,24 @@ html.live-call-immersive body {
   }
 
   &__bubble {
-    background: #F5F6F7;
+    background: #fff;
+    border: 1px solid #E1E7EE;
     border-radius: 4px 14px 14px 14px;
     padding: 7px 12px;
     max-width: 100%;
     min-width: 0;
+    box-shadow: 0 1px 1px rgba(23, 50, 77, 0.04);
   }
 
 
   &__text {
-    font-size: 0.85rem;
+    font-size: 0.875rem;
     color: #17324D;
-    line-height: 1.4;
+    line-height: 1.45;
     word-break: break-word;
+    overflow-wrap: anywhere;
+    // Gli a capo di un messaggio lungo restano dove li ha messi chi scrive.
+    white-space: pre-wrap;
   }
 
   // Clickable links inside a chat message. Long URLs wrap instead of
@@ -1071,38 +1114,92 @@ html.live-call-immersive body {
   }
 
 
-  &__input-row {
-    display: flex;
-    gap: 8px;
-    padding: 10px 12px;
-    border-top: 1px solid #E8E8E8;
-    background: #FAFBFC;
+  // Il riquadro di scrittura: la casella in alto, gli strumenti sotto.
+  &__composer {
+    position: relative;
     flex-shrink: 0;
+    padding: 8px 10px 10px;
+    border-top: 1px solid #E3E8ED;
+    background: #fff;
+  }
+
+  &__compose-box {
+    border: 1px solid #C9D4DE;
+    border-radius: 12px;
+    background: #fff;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+    &:focus-within {
+      border-color: #0066CC;
+      box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.15);
+    }
   }
 
   &__input {
-    flex: 1;
-    border: 1px solid #D9DADB;
-    border-radius: 20px;
-    padding: 8px 14px;
-    font-size: 0.85rem;
-    outline: none;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    display: block;
+    width: 100%;
+    min-height: 44px;
+    max-height: 200px;
+    padding: 10px 12px 4px;
+    border: 0;
+    border-radius: 12px 12px 0 0;
+    background: transparent;
     font-family: inherit;
+    font-size: 0.9rem;
+    line-height: 1.45;
+    color: #17324D;
+    resize: none;
+    outline: none;
+    overflow-y: hidden;
 
-    &:focus {
-      border-color: #0066CC;
-      box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.15);
+    &::placeholder { color: #8A9BAD; }
+  }
+
+  &__compose-tools {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 2px 6px 6px;
+  }
+
+  &__compose-spacer { flex: 1; }
+
+  &__compose-count {
+    margin-right: 6px;
+    font-size: 0.72rem;
+    color: #A1112E;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__tool-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: #5A6772;
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+
+    &:hover:not(:disabled),
+    &.is-on {
+      background: #EEF4FB;
+      color: #0066CC;
     }
 
-    &::placeholder {
-      color: #AAB8C8;
-    }
+    &:focus-visible { outline: 2px solid #0066CC; outline-offset: 1px; }
+    &:disabled { opacity: 0.5; cursor: default; }
   }
 
   &__send-btn {
-    width: 36px;
-    height: 36px;
+    width: 34px;
+    height: 34px;
     border-radius: 50%;
     border: none;
     background: #0066CC;
@@ -1124,45 +1221,72 @@ html.live-call-immersive body {
     }
   }
 
-  // Emoji picker (feedback #9): toggle button + upward popover in the compose row.
-  &__emoji {
-    position: relative;
-    display: flex;
-    align-items: center;
-    flex-shrink: 0;
-  }
-
-  &__emoji-btn {
-    color: #5A6772;
-    line-height: 0;
-
-    &:hover:not(:disabled) { color: #0066CC; }
-    &:disabled { opacity: 0.5; cursor: default; }
-  }
-
+  // Selettore delle emoji, con la ricerca: si apre sopra il riquadro.
   &__emoji-pop {
     position: absolute;
-    bottom: calc(100% + 6px);
-    left: 0;
+    bottom: calc(100% - 2px);
+    left: 10px;
+    right: 10px;
     z-index: 20;
-    display: grid;
-    grid-template-columns: repeat(8, 1fr);
-    gap: 2px;
-    width: max-content;
-    max-width: 260px;
-    padding: 6px;
+    display: flex;
+    flex-direction: column;
+    max-width: 360px;
+    padding: 8px;
     background: #fff;
-    border: 1px solid #D9DADB;
-    border-radius: 10px;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.16);
+    border: 1px solid #D4DEE8;
+    border-radius: 12px;
+    box-shadow: 0 10px 28px rgba(15, 27, 45, 0.18);
+  }
+
+  &__emoji-search {
+    width: 100%;
+    margin-bottom: 6px;
+    padding: 6px 10px;
+    border: 1px solid #C9D4DE;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    outline: none;
+
+    &:focus {
+      border-color: #0066CC;
+      box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.15);
+    }
+  }
+
+  &__emoji-scroll {
+    max-height: 220px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
+
+  &__emoji-section {
+    margin: 4px 2px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #5C6F82;
+  }
+
+  &__emoji-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(34px, 1fr));
+    gap: 2px;
+  }
+
+  &__emoji-empty {
+    margin: 12px 0;
+    text-align: center;
+    font-size: 0.8rem;
+    color: #5C6F82;
   }
 
   &__emoji-pick {
     border: none;
     background: transparent;
     border-radius: 6px;
-    padding: 3px;
-    font-size: 1.15rem;
+    padding: 4px;
+    font-size: 1.3rem;
     line-height: 1;
     cursor: pointer;
 
@@ -1259,96 +1383,582 @@ html.live-call-immersive body {
 }
 
 // ── Domande e risposte ──
-// La risposta scritta da chi conduce, sotto la domanda; il segno sulle
-// domande fatte da questo browser.
-.qa-mine-badge {
-  font-size: 0.7rem;
-  font-weight: 600;
-  line-height: 1.5;
-  color: #004d99;
-  background: #e8f0fe;
-  border-radius: 999px;
-  padding: 0 0.5rem;
-  white-space: nowrap;
+// Schede chiare su fondo grigio tenue: chi ha scritto, quando, lo stato in un
+// cartellino, la domanda, la risposta in un riquadro, e in fondo il voto e le
+// azioni di chi conduce. Un colore per significato, non uno per pulsante.
+.qa-body {
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0.75rem;
+  background: #F5F7FA;
 }
 
+.qa-moderator-hint {
+  margin: 0 0 0.75rem;
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: var(--app-muted);
+}
+
+.qa-error {
+  margin: 0 0 0.5rem;
+  font-size: 0.8rem;
+  color: #A1112E;
+}
+
+// Scrivere una domanda.
+.qa-composer {
+  margin-bottom: 1rem;
+  padding: 0.85rem;
+  background: #fff;
+  border: 1px solid #DCE3EB;
+  border-radius: 12px;
+  box-shadow: 0 1px 2px rgba(23, 50, 77, 0.05);
+
+  &__label {
+    display: block;
+    margin-bottom: 0.15rem;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--app-text);
+  }
+
+  &__hint {
+    margin: 0 0 0.6rem;
+    font-size: 0.78rem;
+    line-height: 1.4;
+    color: var(--app-muted);
+  }
+
+  &__input {
+    border: 1px solid #C9D4DE !important;
+    border-radius: 8px !important;
+    padding: 0.5rem 0.65rem !important;
+    font-size: 0.9rem;
+    line-height: 1.45;
+    resize: vertical;
+    min-height: 76px;
+
+    &:focus {
+      border-color: var(--app-primary) !important;
+      box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.15) !important;
+    }
+  }
+
+  &__foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-top: 0.6rem;
+  }
+
+  &__count {
+    font-size: 0.75rem;
+    color: var(--app-muted);
+    font-variant-numeric: tabular-nums;
+
+    &.is-low { color: #A1112E; }
+  }
+
+  &__send {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.45rem 0.95rem !important;
+    font-size: 0.85rem !important;
+  }
+
+  &__sent {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin: 0.5rem 0 0;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #00663F;
+  }
+}
+
+// Filtri di chi conduce: tutte le schede con il loro numero.
+.qa-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 0.75rem;
+}
+
+.qa-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.6rem;
+  border: 1px solid #DCE3EB;
+  border-radius: 999px;
+  background: #fff;
+  color: var(--app-text);
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+
+  &:hover { border-color: var(--app-primary); }
+
+  &__count {
+    min-width: 1.25rem;
+    padding: 0 0.3rem;
+    border-radius: 999px;
+    background: #EEF2F6;
+    color: var(--app-muted);
+    font-size: 0.7rem;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+
+  // Domande ancora da guardare: il numero si vede anche a filtro spento.
+  &.has-pending .qa-filter__count {
+    background: #D9364F;
+    color: #fff;
+  }
+
+  &.is-active {
+    background: var(--app-primary);
+    border-color: var(--app-primary);
+    color: #fff;
+
+    .qa-filter__count {
+      background: rgba(255, 255, 255, 0.25);
+      color: #fff;
+    }
+  }
+}
+
+.qa-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.75rem 1rem;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--app-muted);
+
+  &__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: rgba(0, 102, 204, 0.1);
+  }
+}
+
+.qa-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+// La scheda di una domanda.
+.qa-card {
+  position: relative;
+  padding: 0.75rem 0.85rem 0.6rem;
+  background: #fff;
+  border: 1px solid #DCE3EB;
+  border-radius: 12px;
+  box-shadow: 0 1px 2px rgba(23, 50, 77, 0.05);
+
+  // In evidenza: la domanda di cui si sta parlando. Filo a sinistra e un
+  // fondo appena caldo, che si nota senza gridare.
+  &--highlighted {
+    border-color: #F0C36D;
+    background: #FFFBF2;
+    box-shadow: inset 4px 0 0 #E59E1A, 0 2px 8px rgba(166, 99, 0, 0.12);
+  }
+
+  &--dismissed {
+    background: #F7F9FB;
+
+    .qa-card__text,
+    .qa-card__who { opacity: 0.6; }
+  }
+
+  &__head {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin-bottom: 0.4rem;
+  }
+
+  &__avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+
+  &__who {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    line-height: 1.2;
+  }
+
+  &__name {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--app-text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__time {
+    font-size: 0.72rem;
+    color: var(--app-muted);
+  }
+
+  &__chips {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.25rem;
+    margin-left: auto;
+  }
+
+  &__text {
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.45;
+    color: var(--app-text);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
+  &__foot {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.6rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid #EEF2F6;
+  }
+}
+
+// Cartellini di stato.
+.qa-chip,
+.qa-mine-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1.3;
+  white-space: nowrap;
+  background: #EEF2F6;
+  color: var(--app-muted);
+
+  .icon { width: 12px; height: 12px; fill: currentColor; }
+}
+
+.qa-mine-badge {
+  background: #E8F0FE;
+  color: #004D99;
+}
+
+.qa-chip--highlighted {
+  background: #FFEFCF;
+  color: #7A4A00;
+}
+
+.qa-chip--answered {
+  background: #E3F4EC;
+  color: #00663F;
+}
+
+// Il voto: un pulsante a pillola con freccia e numero.
+.qa-vote {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  min-height: 30px;
+  padding: 0 0.65rem;
+  border: 1px solid #C9D4DE;
+  border-radius: 999px;
+  background: #fff;
+  color: var(--app-text);
+  font-size: 0.8rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+
+  .icon { fill: currentColor; }
+
+  &:hover,
+  &:focus-visible {
+    border-color: var(--app-primary);
+    color: var(--app-primary);
+  }
+
+  &.is-on {
+    background: var(--app-primary);
+    border-color: var(--app-primary);
+    color: #fff;
+  }
+
+  &.is-static {
+    cursor: default;
+    border-color: transparent;
+    background: #F1F4F8;
+    color: var(--app-muted);
+  }
+}
+
+// Le azioni di chi conduce: «Rispondi» con il testo, le altre a icona con il
+// nome nel suggerimento e per i lettori di schermo.
+.qa-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-left: auto;
+}
+
+.qa-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--app-muted);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+
+  .icon { fill: currentColor; }
+
+  &:hover,
+  &:focus-visible { background: #EEF2F6; color: var(--app-text); }
+
+  &--text {
+    width: auto;
+    padding: 0 0.6rem;
+    border-color: #C9D4DE;
+    color: var(--app-primary);
+    font-size: 0.78rem;
+    font-weight: 700;
+
+    &:hover,
+    &:focus-visible { background: #EEF4FB; color: #004D99; border-color: var(--app-primary); }
+  }
+
+  &--highlight:hover,
+  &--highlight:focus-visible { background: #FFEFCF; color: #7A4A00; }
+
+  &--answered:hover,
+  &--answered:focus-visible { background: #E3F4EC; color: #00663F; }
+
+  &--dismiss:hover,
+  &--dismiss:focus-visible { background: #FDECEF; color: #A1112E; }
+}
+
+// La risposta scritta da chi conduce, sotto la domanda.
 .qa-answer {
-  margin-top: 0.35rem;
-  padding: 0.4rem 0.6rem;
-  border-left: 3px solid #008758;
-  background: #f1f8f4;
-  border-radius: 0 4px 4px 0;
+  margin-top: 0.55rem;
+  padding: 0.5rem 0.7rem;
+  border-left: 3px solid var(--app-primary);
+  background: #F0F6FC;
+  border-radius: 0 8px 8px 0;
 }
 
 .qa-answer__label {
   display: block;
-  font-size: 0.7rem;
+  margin-bottom: 0.1rem;
+  font-size: 0.68rem;
   font-weight: 700;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: #00573a;
+  color: #004D99;
 }
 
 .qa-answer__text {
   margin: 0;
   font-size: 0.85rem;
-  color: #1a1a1a;
+  line-height: 1.45;
+  color: var(--app-text);
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
 
-.qa-answer-form textarea {
-  resize: vertical;
-  font-size: 0.85rem;
+.qa-answer-form {
+  margin-top: 0.6rem;
+
+  textarea {
+    border: 1px solid #C9D4DE;
+    border-radius: 8px;
+    padding: 0.5rem 0.65rem;
+    font-size: 0.85rem;
+    line-height: 1.45;
+    resize: vertical;
+
+    &:focus {
+      border-color: var(--app-primary);
+      box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.15);
+    }
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.4rem;
+    margin-top: 0.5rem;
+  }
 }
 
-// ── Nuvola di parole ──
+.qa-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+
+  &--danger { color: #A1112E; }
+}
+
+// ── «In una parola» (nuvola di parole) ──
+// Una domanda, una risposta di una parola, una nuvola che cresce in diretta.
+// La grandezza dice la frequenza; il colore la rinforza su tre livelli dello
+// stesso blu. Sotto, le piu' scritte in elenco con i numeri: la nuvola letta
+// in ordine, anche per chi usa un lettore di schermo.
 .word-cloud {
-  padding: 12px;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0.75rem;
+  background: #F5F7FA;
+  scrollbar-width: thin;
 
   &__timer {
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    padding: 2px 8px;
+    padding: 2px 9px;
+    border-radius: 999px;
+    background: #EEF4FB;
+    color: #004D99;
+    font-size: 0.75rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  // Spiegazione per chi conduce, prima della prima domanda.
+  &__intro {
+    display: flex;
+    gap: 0.7rem;
+    margin-bottom: 0.75rem;
+    padding: 0.8rem 0.9rem;
+    background: #fff;
+    border: 1px solid #DCE3EB;
     border-radius: 12px;
-    background: #0066CC;
-    color: #fff;
+  }
+
+  &__intro-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(0, 102, 204, 0.1);
+    color: #0066CC;
+  }
+
+  &__intro-text {
+    margin: 0;
+    font-size: 0.82rem;
+    line-height: 1.45;
+    color: #33485C;
+  }
+
+  &__intro-note {
+    margin: 0.4rem 0 0;
     font-size: 0.75rem;
     font-weight: 600;
-    font-variant-numeric: tabular-nums;
+    color: #004D99;
   }
 
   &__label {
     display: block;
     margin-bottom: 4px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: #455B71;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #17324D;
   }
 
   &__create {
-    padding: 10px;
-    border: 1px solid #D9DADB;
-    border-radius: 10px;
-    background: #FAFBFC;
+    padding: 0.85rem;
+    border: 1px solid #DCE3EB;
+    border-radius: 12px;
+    background: #fff;
+  }
+
+  &__field {
+    display: block;
+    width: 100%;
+    margin-bottom: 0.75rem;
+    padding: 0.45rem 0.6rem;
+    border: 1px solid #C9D4DE;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    color: #17324D;
+
+    &:focus {
+      outline: none;
+      border-color: #0066CC;
+      box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.15);
+    }
+  }
+
+  &__create-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
   }
 
   &__durations {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
     gap: 4px;
-    margin-bottom: 10px;
+    margin-bottom: 0.85rem;
   }
 
   &__duration {
     flex: 1;
-    padding: 4px 6px;
-    border: 1px solid #C5D3E0;
-    border-radius: 6px;
+    padding: 5px 6px;
+    border: 1px solid #C9D4DE;
+    border-radius: 8px;
     background: #fff;
-    color: #0066CC;
-    font-size: 0.78rem;
-    font-weight: 600;
+    color: #17324D;
+    font-size: 0.8rem;
+    font-weight: 700;
 
     &.is-active {
       border-color: #0066CC;
@@ -1359,46 +1969,38 @@ html.live-call-immersive body {
     &:focus-visible { outline: 2px solid #0066CC; outline-offset: 1px; }
   }
 
+  &__round {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  // La domanda aperta, con il campo per rispondere.
+  &__question {
+    padding: 0.8rem 0.9rem;
+    background: #fff;
+    border: 1px solid #DCE3EB;
+    border-radius: 12px;
+    box-shadow: inset 3px 0 0 #0066CC;
+  }
+
+  // Conclusa: niente filo blu, non chiede piu' niente.
+  &__question--closed { box-shadow: none; }
+
   &__prompt {
-    margin: 0 0 8px;
-    padding: 8px 10px;
-    border-left: 3px solid #0066CC;
-    border-radius: 0 8px 8px 0;
-    background: #EEF3FA;
-    font-size: 0.88rem;
-    font-weight: 600;
+    margin: 0 0 0.25rem;
+    font-size: 0.98rem;
+    font-weight: 700;
+    line-height: 1.35;
     color: #17324D;
 
-    &--closed {
-      border-left-color: #8899AA;
-      background: #F5F6F7;
-      color: #455B71;
-    }
+    &--closed { margin-top: 0.4rem; color: #33485C; }
   }
 
-  &__cloud {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
-    gap: 4px 10px;
-    min-height: 140px;
-    margin-bottom: 10px;
-    padding: 14px 10px;
-    border-radius: 12px;
-    background: radial-gradient(circle at 50% 40%, #FFFFFF 0%, #F2F5F8 100%);
-    border: 1px solid #E3E8ED;
-  }
-
-  &__word {
-    display: inline-block;
-    font-weight: 700;
-    line-height: 1.1;
-    transition: font-size 0.3s ease, opacity 0.3s ease;
-  }
-
-  &__waiting {
-    font-size: 0.82rem;
+  &__how {
+    margin: 0 0 0.65rem;
+    font-size: 0.78rem;
+    line-height: 1.45;
     color: #5C6F82;
   }
 
@@ -1410,21 +2012,22 @@ html.live-call-immersive body {
   &__input {
     flex: 1;
     min-width: 0;
-    border: 1px solid #D9DADB;
-    border-radius: 20px;
-    padding: 6px 12px;
-    font-size: 0.85rem;
+    border: 1px solid #C9D4DE;
+    border-radius: 999px;
+    padding: 7px 14px;
+    font-size: 0.9rem;
+    color: #17324D;
     outline: none;
 
     &:focus {
       border-color: #0066CC;
-      box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.15);
+      box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.15);
     }
   }
 
   &__send {
-    width: 34px;
-    height: 34px;
+    width: 36px;
+    height: 36px;
     border: 0;
     border-radius: 50%;
     background: #0066CC;
@@ -1437,15 +2040,175 @@ html.live-call-immersive body {
     &:focus-visible { outline: 2px solid #0066CC; outline-offset: 2px; }
   }
 
+  &__mine {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+    margin-top: 0.55rem;
+  }
+
+  &__mine-label {
+    font-size: 0.72rem;
+    color: #5C6F82;
+  }
+
+  &__mine-chip {
+    padding: 1px 8px;
+    border-radius: 999px;
+    background: #E8F0FE;
+    color: #004D99;
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+
+  // La nuvola.
+  &__cloud {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 6px 14px;
+    min-height: 150px;
+    padding: 1.1rem 0.9rem;
+    border-radius: 12px;
+    background: #fff;
+    border: 1px solid #DCE3EB;
+  }
+
+  &__word {
+    display: inline-block;
+    line-height: 1.1;
+    transition: font-size 0.35s ease;
+
+    &--top { color: #0066CC; font-weight: 700; }
+    &--mid { color: #004D99; font-weight: 600; }
+    &--low { color: #5C6F82; font-weight: 500; }
+  }
+
+  &__waiting {
+    font-size: 0.85rem;
+    color: #5C6F82;
+  }
+
+  // Le piu' scritte: un piccolo grafico a barre, una sola tinta.
+  &__top {
+    padding: 0.7rem 0.9rem;
+    background: #fff;
+    border: 1px solid #DCE3EB;
+    border-radius: 12px;
+  }
+
+  &__top-title {
+    margin: 0 0 0.45rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #5C6F82;
+  }
+
+  &__top-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__top-row {
+    display: grid;
+    grid-template-columns: minmax(0, 7rem) 1fr auto;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.82rem;
+  }
+
+  &__top-word {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 600;
+    color: #17324D;
+  }
+
+  &__top-track {
+    display: block;
+    height: 8px;
+    border-radius: 0 4px 4px 0;
+    background: #EEF2F6;
+    overflow: hidden;
+
+    span {
+      display: block;
+      height: 100%;
+      border-radius: 0 4px 4px 0;
+      background: #0066CC;
+      transition: width 0.35s ease;
+    }
+  }
+
+  &__top-count {
+    min-width: 1.5rem;
+    text-align: right;
+    font-weight: 700;
+    color: #17324D;
+    font-variant-numeric: tabular-nums;
+  }
+
+  // Per chi conduce: tutte le parole, ciascuna con «Togli».
+  &__top-list--all {
+    max-height: 260px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
+
+  &__top-row.has-action {
+    grid-template-columns: minmax(0, 7rem) 1fr auto auto;
+  }
+
+  &__remove {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    min-width: 26px;
+    height: 26px;
+    padding: 0 4px;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: #5C6F82;
+    font-size: 0.72rem;
+    font-weight: 700;
+    cursor: pointer;
+
+    .icon { width: 12px; height: 12px; fill: currentColor; }
+
+    &:hover,
+    &:focus-visible { background: #FDECEF; color: #A1112E; }
+
+    &.is-armed {
+      padding: 0 8px;
+      background: #D9364F;
+      color: #fff;
+    }
+  }
+
   &__footer {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 8px;
-    margin-top: 8px;
-    font-size: 0.75rem;
+    font-size: 0.78rem;
     color: #5C6F82;
   }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .word-cloud__word,
+  .word-cloud__top-track span { transition: none; }
 }
 
 // ── Materiali ──
@@ -2973,8 +3736,25 @@ html.live-call-immersive body {
 // ("quando viene taggato qualcuno non viene avviata alcuna notifica, né di
 // suono né visiva"). Accento a sinistra sulla riga, non solo sul chip @nome.
 .chat-panel__msg--mention .chat-panel__bubble {
-  border-left: 3px solid var(--app-primary, #06c);
-  background: rgba(0, 102, 204, 0.06);
+  border-color: #EFCF94;
+  background: #FFF8EA;
+  box-shadow: inset 3px 0 0 #E59E1A, 0 1px 3px rgba(166, 99, 0, 0.12);
+  padding-left: 14px;
+}
+
+// «@ Ti ha menzionato» in testa al messaggio: il perche' di quel colore.
+.chat-panel__mention-flag {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  margin-bottom: 4px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: #FCE7BF;
+  color: #6B3F00;
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1.5;
 }
 
 // Il pulsante "Rispondi" era un link testuale vistoso quanto il messaggio:
@@ -3479,4 +4259,1794 @@ html.live-call-immersive body {
 #main-content:focus,
 #footer:focus {
   outline: none;
+}
+
+// ── Percorso del partecipante: iscrizione, attesa, sala, uscita ──
+
+// Marchio dell'intestazione su una riga, come nel piè di pagina. HeaderBrand
+// avvolge logo e nome in `.it-brand-text`, che e' un blocco: il nome finiva a
+// capo sotto il logo.
+.it-header-center-wrapper .it-brand-wrapper .it-brand-text {
+  display: flex;
+  align-items: center;
+}
+
+// Modulo d'iscrizione.
+.registration-form {
+  // I consensi si leggono, non si urlano: il grassetto del kit su quattro
+  // paragrafi di fila rendeva il modulo piu' pesante del necessario.
+  .form-check [type='checkbox'] + label {
+    font-weight: 400;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--app-text);
+  }
+}
+
+.registration-when {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--app-text);
+  font-weight: 600;
+
+  &::first-letter {
+    text-transform: uppercase;
+  }
+}
+
+// Sala d'attesa senza immagine di copertina: un filo di colore in testa alla
+// scheda al posto della fascia vuota.
+.waiting-card--plain {
+  border-top: 4px solid var(--app-primary) !important;
+}
+
+// Il campo del nome porta l'etichetta sopra di se' una volta compilato: senza
+// questo margine finiva sopra la riga della data.
+.wr-name-field {
+  margin-top: 1.75rem;
+}
+
+// Stato dell'evento (in corso / terminato) nella scheda della sala d'attesa.
+.wr-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.2;
+
+  &--live {
+    background: #D9364F;
+    color: #fff;
+  }
+
+  &--ended {
+    background: #E9EDF2;
+    color: var(--app-muted);
+  }
+
+  &__dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+    animation: pulse-dot 1.5s ease-in-out infinite;
+  }
+}
+
+// Conto alla rovescia: superficie chiara e cifre a larghezza fissa nel font
+// del sito (il monospaziato di sistema stonava con Titillium).
+.waiting-countdown {
+  border-radius: 12px;
+  padding: 0.9rem 1.25rem;
+  text-align: center;
+  background: #EEF4FB;
+  border: 1px solid #CFE0F3;
+  color: var(--app-text);
+
+  &__label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--app-muted);
+    margin-bottom: 0.15rem;
+  }
+
+  &__value {
+    font-size: 2.25rem;
+    font-weight: 700;
+    line-height: 1.1;
+    color: #004D99;
+    font-variant-numeric: tabular-nums;
+  }
+
+  // «La sala e' aperta»: lo stesso riquadro, nel verde del design system.
+  &--open {
+    background: #E8F5EF;
+    border-color: #A9D8C2;
+
+    .waiting-countdown__value { color: #00663F; }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wr-status__dot { animation: none; }
+}
+
+// Buone pratiche: un elenco da scorrere, non un paragrafo arioso.
+.waiting-netiquette li {
+  line-height: 1.45;
+  margin-bottom: 0.3rem;
+
+  &:last-child { margin-bottom: 0; }
+}
+
+// L'invito alla piazza: l'icona in un cerchio, come le altre informazioni
+// della sala, al posto dell'emoji.
+.wr-game-invite__art {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(0, 102, 204, 0.1);
+}
+
+// Barra della sala: i comandi a destra hanno la stessa altezza e lo stesso
+// raggio, cosi' si leggono come un gruppo e non come quattro bottoni diversi.
+.live-top-bar__actions {
+  .fullscreen-toggle-btn,
+  .live-share-btn,
+  .leave-room-btn,
+  .live-timer {
+    min-height: 34px;
+    border-radius: 6px;
+  }
+
+  .fullscreen-toggle-btn {
+    width: 34px;
+    padding: 0;
+    justify-content: center;
+    border: 1px solid rgba(255, 255, 255, 0.5) !important;
+    background: transparent;
+    box-shadow: none;
+
+    &:hover,
+    &:focus-visible {
+      background: rgba(255, 255, 255, 0.15);
+    }
+  }
+
+  .live-share-btn,
+  .leave-room-btn {
+    padding: 0 0.85rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    box-shadow: none;
+  }
+
+  .live-timer {
+    padding: 0 0.6rem;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+
+  .live-timer--off {
+    width: 34px;
+    padding: 0;
+    justify-content: center;
+  }
+}
+
+// Schermate d'uscita (evento terminato, uscita volontaria): una scheda al
+// centro con il nome dell'evento, al posto di un'icona nera gigante su bianco.
+.live-exit {
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+
+  @media (min-width: 768px) {
+    padding-top: 4.5rem;
+    padding-bottom: 4.5rem;
+  }
+}
+
+.live-exit__card {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+  background: #fff;
+  border: 1px solid #E3E9F0;
+  border-radius: 16px;
+  box-shadow: 0 8px 28px rgba(23, 50, 77, 0.08);
+
+  @media (min-width: 768px) {
+    padding: 3rem 3.5rem;
+  }
+}
+
+.live-exit__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  margin-bottom: 1.25rem;
+  border-radius: 50%;
+  background: rgba(0, 102, 204, 0.1);
+
+  &--success {
+    background: rgba(0, 135, 88, 0.12);
+  }
+}
+
+.live-exit__event {
+  margin-bottom: 0.35rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--app-muted);
+}
+
+.live-exit__message {
+  margin-bottom: 0;
+  color: var(--app-text);
+}
+
+.live-exit__note {
+  margin: 1rem auto 0;
+  max-width: 480px;
+  font-size: 0.9rem;
+  color: var(--app-muted);
+}
+
+.live-exit__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 2rem;
+}
+
+// ── Avvisi della sala: contatori dei tab e anteprima della chat ──
+
+// Il contatore dei non letti entra con un piccolo salto (la chiave cambia a
+// ogni messaggio, quindi l'animazione riparte) e finche' non si legge emette
+// un alone che pulsa. I pallini degli altri pannelli pulsano allo stesso modo.
+@keyframes tab-badge-pop {
+  0%   { transform: scale(0.4); }
+  55%  { transform: scale(1.35); }
+  100% { transform: scale(1); }
+}
+
+@keyframes tab-badge-halo {
+  0%   { box-shadow: 0 0 0 0 rgba(217, 54, 79, 0.65); }
+  70%  { box-shadow: 0 0 0 7px rgba(217, 54, 79, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(217, 54, 79, 0); }
+}
+
+.live-sidebar-tab__badge.is-alert,
+.live-floating-btn__badge.is-alert {
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  border-radius: 10px;
+  line-height: 20px;
+  font-size: 0.68rem;
+  background: #D9364F;
+  color: #fff;
+  border: 2px solid #fff;
+  box-sizing: content-box;
+  animation:
+    tab-badge-pop 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.4),
+    tab-badge-halo 1.6s ease-out 0.45s infinite;
+}
+
+.live-sidebar-tab__badge.is-alert {
+  top: 0;
+  right: 6px;
+}
+
+// Il numero dei presenti non e' un avviso: niente rosso.
+.live-sidebar-tab__badge.is-neutral {
+  background: rgba(255, 255, 255, 0.24);
+  color: #fff;
+}
+
+.live-sidebar-tab--active .live-sidebar-tab__badge.is-neutral {
+  background: #E8F0FE;
+  color: #004D99;
+}
+
+.live-sidebar-tab__dot,
+.live-floating-btn__dot {
+  animation: tab-badge-halo 1.6s ease-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .live-sidebar-tab__badge.is-alert,
+  .live-floating-btn__badge.is-alert,
+  .live-sidebar-tab__dot,
+  .live-floating-btn__dot {
+    animation: none;
+  }
+}
+
+// Anteprima di un messaggio arrivato a chat chiusa. Su schermo largo in basso
+// a destra, sopra la colonna dei pannelli; sotto i 992px sopra la barra delle
+// schede.
+@keyframes chat-preview-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.chat-preview {
+  position: fixed;
+  z-index: 1065;
+  right: 12px;
+  bottom: 16px;
+  width: min(376px, calc(100vw - 24px));
+  display: flex;
+  align-items: flex-start;
+  gap: 0.25rem;
+  padding: 0.65rem 0.5rem 0.65rem 0.75rem;
+  background: #fff;
+  border: 1px solid #DCE3EB;
+  border-left: 4px solid var(--app-primary);
+  border-radius: 12px;
+  box-shadow: 0 10px 28px rgba(15, 27, 45, 0.28);
+  animation: chat-preview-in 0.25s ease-out;
+
+  @media (max-width: 991.98px) {
+    left: 12px;
+    right: 12px;
+    width: auto;
+    bottom: calc(60px + env(safe-area-inset-bottom, 0px));
+  }
+
+  // Ti hanno nominato o risposto: lo stesso riquadro, con l'accento caldo.
+  &--mention {
+    border-left-color: #E59E1A;
+    background: #FFFBF2;
+  }
+
+  &__open {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    padding: 0;
+    border: 0;
+    background: none;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  &__avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    color: #fff;
+    font-size: 0.72rem;
+    font-weight: 700;
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  &__title {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--app-text);
+  }
+
+  &__text {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    font-size: 0.85rem;
+    line-height: 1.4;
+    color: #33485C;
+    overflow-wrap: anywhere;
+  }
+
+  &__close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--app-muted);
+    cursor: pointer;
+
+    &:hover,
+    &:focus-visible { background: #EEF2F6; color: var(--app-text); }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chat-preview { animation: none; }
+}
+
+// ── Chat: menzioni, risposte, chi sta scrivendo ──
+
+// Una @menzione nel testo: si vede come un nome, non come testo qualunque.
+// La propria, in arancio: e' il punto del messaggio che riguarda chi legge.
+.chat-mention {
+  padding: 0 3px;
+  border-radius: 4px;
+  background: rgba(0, 102, 204, 0.1);
+  color: #004D99;
+  font-weight: 700;
+}
+
+.chat-mention--self {
+  background: #FCE7BF;
+  color: #6B3F00;
+  box-shadow: inset 0 0 0 1px #EFCF94;
+}
+
+// Elenco delle persone da menzionare, sopra il riquadro di scrittura.
+.chat-panel__mention-pop {
+  position: absolute;
+  bottom: calc(100% - 2px);
+  left: 10px;
+  right: 10px;
+  z-index: 21;
+  max-width: 360px;
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+  background: #fff;
+  border: 1px solid #D4DEE8;
+  border-radius: 12px;
+  box-shadow: 0 10px 28px rgba(15, 27, 45, 0.18);
+}
+
+.chat-panel__mention-opt {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  cursor: pointer;
+
+  &.is-active { background: #EEF4FB; }
+}
+
+.chat-panel__mention-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+}
+
+.chat-panel__mention-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #17324D;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chat-panel__mention-handle {
+  margin-left: auto;
+  font-size: 0.75rem;
+  color: #5C6F82;
+  white-space: nowrap;
+}
+
+// La citazione nel messaggio di risposta: un clic porta all'originale.
+.chat-panel__reply-quote {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin: 0 0 5px;
+  padding: 3px 8px;
+  border: 0;
+  border-left: 3px solid #0066CC;
+  border-radius: 4px;
+  background: rgba(0, 102, 204, 0.07);
+  color: #33485C;
+  font-size: 0.78rem;
+  text-align: left;
+  cursor: pointer;
+
+  &:hover { background: rgba(0, 102, 204, 0.12); }
+  &:focus-visible { outline: 2px solid #0066CC; outline-offset: 1px; }
+}
+
+.chat-panel__reply-quote-name {
+  font-weight: 700;
+  color: #004D99;
+}
+
+.chat-panel__reply-quote-text {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+// Il messaggio originale raggiunto dalla citazione si illumina un attimo.
+@keyframes chat-msg-flash {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(229, 158, 26, 0); }
+  30%      { box-shadow: 0 0 0 4px rgba(229, 158, 26, 0.55); }
+}
+
+.chat-panel__msg--flash .chat-panel__bubble {
+  animation: chat-msg-flash 1.5s ease-out;
+}
+
+// A chi si sta rispondendo: sopra il riquadro, con il testo citato.
+.chat-panel__reply-bar {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 8px 10px;
+  border-top: 1px solid #E3E8ED;
+  border-left: 3px solid #0066CC;
+  background: #F0F6FC;
+}
+
+.chat-panel__reply-bar-icon {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: #0066CC;
+}
+
+.chat-panel__reply-bar-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.chat-panel__reply-bar-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #004D99;
+}
+
+.chat-panel__reply-bar-text {
+  font-size: 0.8rem;
+  color: #33485C;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chat-panel__reply-bar-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #5C6F82;
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible { background: #DCE8F5; color: #17324D; }
+}
+
+// Chi sta scrivendo: una riga tenue sopra il riquadro, con i tre puntini.
+.chat-panel__typing {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 20px;
+  padding: 0 14px 2px;
+  font-size: 0.75rem;
+  font-style: italic;
+  color: #5C6F82;
+}
+
+@keyframes chat-typing-dot {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+  30%           { transform: translateY(-3px); opacity: 1; }
+}
+
+.chat-panel__typing-dots {
+  display: inline-flex;
+  gap: 3px;
+
+  span {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: currentColor;
+    animation: chat-typing-dot 1.2s ease-in-out infinite;
+
+    &:nth-child(2) { animation-delay: 0.15s; }
+    &:nth-child(3) { animation-delay: 0.3s; }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chat-panel__typing-dots span,
+  .chat-panel__msg--flash .chat-panel__bubble { animation: none; }
+}
+
+// Barre di scorrimento dei pannelli della sala: sottili, e visibili solo
+// quando si passa sopra il pannello.
+.live-sidebar .flex-grow-1,
+.qa-body {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+
+  &:hover { scrollbar-color: rgba(23, 50, 77, 0.28) transparent; }
+}
+
+// ── Colonna dei pannelli ridimensionabile ──
+// Il bordo sinistro della colonna si trascina (o si sposta con le frecce):
+// una linea sottile che si accende al passaggio del mouse.
+.live-sidebar-resizer {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -5px;
+  z-index: 6;
+  width: 10px;
+  cursor: col-resize;
+  touch-action: none;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 4px;
+    width: 2px;
+    background: transparent;
+    transition: background 0.15s ease;
+  }
+
+  &:hover::after,
+  &:focus-visible::after { background: #0066CC; }
+
+  &:focus-visible { outline: none; }
+}
+
+// Durante il trascinamento: niente selezione di testo e l'iframe della
+// chiamata non intercetta il puntatore.
+html.live-resizing,
+html.live-resizing * {
+  cursor: col-resize !important;
+  user-select: none !important;
+}
+
+html.live-resizing iframe {
+  pointer-events: none !important;
+}
+
+html.live-resizing .live-sidebar-resizer::after {
+  background: #0066CC;
+}
+
+// Contatore della chat quando ti hanno menzionato o risposto: arancio, con la @.
+.live-sidebar-tab__badge.is-mention,
+.live-floating-btn__badge.is-mention {
+  background: #E59E1A;
+  color: #3D2600;
+  animation:
+    tab-badge-pop 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.4),
+    tab-badge-halo-mention 1.4s ease-out 0.45s infinite;
+}
+
+@keyframes tab-badge-halo-mention {
+  0%   { box-shadow: 0 0 0 0 rgba(229, 158, 26, 0.75); }
+  70%  { box-shadow: 0 0 0 9px rgba(229, 158, 26, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(229, 158, 26, 0); }
+}
+
+// L'anteprima di una menzione arriva con un piccolo scuotimento.
+@keyframes chat-preview-nudge {
+  0%, 100% { transform: translateX(0); }
+  20%      { transform: translateX(-6px); }
+  40%      { transform: translateX(5px); }
+  60%      { transform: translateX(-3px); }
+  80%      { transform: translateX(2px); }
+}
+
+.chat-preview--mention {
+  animation:
+    chat-preview-in 0.25s ease-out,
+    chat-preview-nudge 0.5s ease-in-out 0.3s 2;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .live-sidebar-tab__badge.is-mention,
+  .live-floating-btn__badge.is-mention,
+  .chat-preview--mention { animation: none; }
+}
+
+// Nascondere/eliminare chiede conferma: al primo clic il pulsante diventa una
+// pastiglia rossa con «Conferma», e torna com'era dopo qualche secondo.
+.chat-panel__hide-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+
+  &.is-armed {
+    text-decoration: none !important;
+    padding: 1px 7px !important;
+    border-radius: 999px;
+    background: #D9364F;
+    color: #fff !important;
+    opacity: 1 !important;
+  }
+}
+
+.chat-panel__hide-confirm {
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+// ── Sondaggi ──
+// Una scheda per sondaggio. Chi deve votare vede le risposte come scelte; chi
+// vede i risultati, un grafico a barre orizzontali: la risposta in testa in
+// blu pieno, le altre in grigio (una sola serie, nessuna legenda), percentuale
+// e voti sempre scritti accanto, mai il solo colore.
+.poll-body {
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0.75rem;
+  background: #F5F7FA;
+}
+
+.poll-new {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  width: 100%;
+  padding: 0.6rem;
+  border: 1px dashed #9DB7D3;
+  border-radius: 12px;
+  background: #fff;
+  color: #0066CC;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible { border-color: #0066CC; background: #F0F6FC; }
+}
+
+.poll-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.poll-card {
+  padding: 0.8rem 0.9rem;
+  background: #fff;
+  border: 1px solid #DCE3EB;
+  border-radius: 12px;
+  box-shadow: 0 1px 2px rgba(23, 50, 77, 0.05);
+
+  // Il sondaggio aperto e' quello che chiede qualcosa: un filo blu.
+  &--open { box-shadow: inset 3px 0 0 #0066CC, 0 1px 2px rgba(23, 50, 77, 0.05); }
+
+  &__head {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.4rem;
+  }
+
+  &__voted {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+    margin-left: auto;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #00663F;
+
+    .icon { width: 12px; height: 12px; fill: currentColor; }
+  }
+
+  &__question {
+    margin: 0 0 0.65rem;
+    font-size: 0.95rem;
+    font-weight: 700;
+    line-height: 1.35;
+    color: #17324D;
+  }
+
+  &__waiting {
+    margin: 0;
+    padding: 0.6rem 0.7rem;
+    border-radius: 8px;
+    background: #F0F6FC;
+    font-size: 0.8rem;
+    line-height: 1.45;
+    color: #33485C;
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem;
+    margin-top: 0.75rem;
+    padding-top: 0.6rem;
+    border-top: 1px solid #EEF2F6;
+  }
+}
+
+.poll-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  line-height: 1.3;
+
+  &--open { background: #E3F4EC; color: #00663F; }
+  &--closed { background: #EEF2F6; color: #5C6F82; }
+  &--published { background: #E8F0FE; color: #004D99; }
+
+  &__dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+    animation: pulse-dot 1.5s ease-in-out infinite;
+  }
+}
+
+// Le risposte da scegliere.
+.poll-choices {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.poll-choice {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid #C9D4DE;
+  border-radius: 10px;
+  background: #fff;
+  color: #17324D;
+  font-size: 0.875rem;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+
+  &:hover,
+  &:focus-visible {
+    border-color: #0066CC;
+    background: #F0F6FC;
+
+    .poll-choice__radio { border-color: #0066CC; }
+  }
+
+  &:focus-visible { outline: 2px solid #0066CC; outline-offset: 1px; }
+
+  &__radio {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    border: 2px solid #8293A6;
+    border-radius: 50%;
+    background: #fff;
+  }
+
+  &__text { overflow-wrap: anywhere; }
+}
+
+// Le risposte di un voto chiuso a cui non si e' partecipato: si leggono, non
+// si cliccano.
+.poll-choices--static {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  .poll-choice {
+    cursor: default;
+    opacity: 0.8;
+
+    &:hover {
+      border-color: #C9D4DE;
+      background: #fff;
+    }
+
+    &:hover .poll-choice__radio { border-color: #8293A6; }
+  }
+}
+
+// Il grafico dei risultati: una riga per risposta.
+.poll-results {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.poll-result {
+  &__vote {
+    display: block;
+    width: 100%;
+    padding: 0.2rem 0.3rem;
+    margin: -0.2rem -0.3rem;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    text-align: left;
+    cursor: pointer;
+
+    &:hover,
+    &:focus-visible { background: #F0F6FC; }
+  }
+
+  &__label {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-bottom: 0.25rem;
+    font-size: 0.85rem;
+    color: #17324D;
+  }
+
+  &__text { overflow-wrap: anywhere; }
+
+  &__mine {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.15rem;
+    padding: 0 0.4rem;
+    border-radius: 999px;
+    background: #E8F0FE;
+    color: #004D99;
+    font-size: 0.68rem;
+    font-weight: 700;
+
+    .icon { width: 11px; height: 11px; fill: currentColor; }
+  }
+
+  &__value {
+    margin-left: auto;
+    font-size: 0.8rem;
+    color: #5C6F82;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+
+    strong { color: #17324D; }
+  }
+
+  // Barra sottile, angolo arrotondato solo in punta, base dritta.
+  &__track {
+    display: block;
+    height: 10px;
+    border-radius: 0 4px 4px 0;
+    background: #EEF2F6;
+    overflow: hidden;
+  }
+
+  &__bar {
+    display: block;
+    height: 100%;
+    min-width: 0;
+    border-radius: 0 4px 4px 0;
+    background: #8293A6;
+    transition: width 0.4s ease;
+
+    &.is-leading { background: #0066CC; }
+  }
+}
+
+// Partecipazione: voti rispetto ai presenti, come un indicatore.
+.poll-participation {
+  margin-top: 0.8rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid #EEF2F6;
+
+  &__label {
+    display: block;
+    margin-bottom: 0.3rem;
+    font-size: 0.75rem;
+    color: #5C6F82;
+    font-variant-numeric: tabular-nums;
+
+    strong { color: #17324D; }
+  }
+
+  &__meter {
+    display: block;
+    height: 6px;
+    border-radius: 3px;
+    background: #DCE6F1;
+    overflow: hidden;
+
+    span {
+      display: block;
+      height: 100%;
+      border-radius: 3px;
+      background: #0066CC;
+      transition: width 0.4s ease;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .poll-result__bar,
+  .poll-participation__meter span { transition: none; }
+  .poll-status__dot { animation: none; }
+}
+
+// Azioni di chi conduce: testo e icona, un solo colore pieno (pubblica).
+.poll-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  min-height: 30px;
+  padding: 0 0.65rem;
+  border: 1px solid #C9D4DE;
+  border-radius: 8px;
+  background: #fff;
+  color: #17324D;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+
+  .icon { width: 13px; height: 13px; fill: currentColor; }
+
+  &:hover,
+  &:focus-visible { border-color: #0066CC; color: #004D99; background: #F0F6FC; }
+
+  &--primary {
+    border-color: #0066CC;
+    background: #0066CC;
+    color: #fff;
+
+    &:hover,
+    &:focus-visible { background: #004D99; color: #fff; }
+  }
+
+  &--delete {
+    margin-left: auto;
+    padding: 0 0.5rem;
+    border-color: transparent;
+    color: #5C6F82;
+
+    &:hover,
+    &:focus-visible { background: #FDECEF; color: #A1112E; border-color: transparent; }
+
+    &.is-armed {
+      padding: 0 0.65rem;
+      background: #D9364F;
+      color: #fff;
+    }
+  }
+}
+
+// Creare un sondaggio.
+.poll-form {
+  padding: 0.85rem;
+  background: #fff;
+  border: 1px solid #DCE3EB;
+  border-radius: 12px;
+
+  &__label {
+    display: block;
+    margin-bottom: 0.3rem;
+    padding: 0;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #17324D;
+  }
+
+  &__input {
+    display: block;
+    width: 100%;
+    padding: 0.45rem 0.6rem;
+    border: 1px solid #C9D4DE;
+    border-radius: 8px;
+    background: #fff;
+    font-family: inherit;
+    font-size: 0.875rem;
+    color: #17324D;
+    resize: vertical;
+
+    &:focus {
+      outline: none;
+      border-color: #0066CC;
+      box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.15);
+    }
+  }
+
+  &__options {
+    margin: 0.75rem 0 0;
+    padding: 0;
+    border: 0;
+  }
+
+  &__option {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-bottom: 0.4rem;
+  }
+
+  &__num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #EEF2F6;
+    color: #5C6F82;
+    font-size: 0.72rem;
+    font-weight: 700;
+  }
+
+  &__remove {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: #5C6F82;
+    cursor: pointer;
+
+    .icon { fill: currentColor; }
+
+    &:hover,
+    &:focus-visible { background: #FDECEF; color: #A1112E; }
+  }
+
+  &__add {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    margin-top: 0.1rem;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: #0066CC;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 0.85rem;
+  }
+}
+
+.poll-body {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+
+  &:hover { scrollbar-color: rgba(23, 50, 77, 0.28) transparent; }
+}
+
+// ── Scaletta ──
+//
+// Gli argomenti dell'incontro e il loro stato: da discutere (numero), in corso
+// (punto blu che pulsa), discusso (spunta verde), saltato (freccia, testo
+// barrato in grigio). Lo stato si legge anche scritto sotto il titolo: il
+// colore non e' mai l'unico segnale.
+
+.agenda {
+  padding: 12px;
+}
+
+.agenda__progress {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 12px;
+}
+
+.agenda__progress-label {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 4px 12px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #5A6772;
+}
+
+.agenda__planned-total {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 500;
+
+  .icon { fill: currentColor; }
+}
+
+.agenda__progress-bar {
+  display: block;
+  height: 6px;
+  border-radius: 999px;
+  background: #E6ECF2;
+  overflow: hidden;
+
+  > span {
+    display: block;
+    height: 100%;
+    border-radius: 999px;
+    background: #008758;
+    transition: width 0.3s ease;
+  }
+}
+
+// Il comando che il moderatore usa di piu': chiude l'argomento in corso e
+// avvia il successivo, con il titolo di quello che parte.
+.agenda__next {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  margin-bottom: 12px;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 10px;
+  background: #0066CC;
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s ease;
+
+  .icon { fill: #fff; flex-shrink: 0; }
+
+  &:hover,
+  &:focus-visible { background: #004D99; }
+}
+
+.agenda__next-label {
+  display: block;
+  font-weight: 400;
+  font-size: 0.8rem;
+  opacity: 0.92;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.agenda__list {
+  list-style: none;
+  margin: 0 0 12px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.agenda-item {
+  padding: 8px 10px;
+  border: 1px solid #E3E9EF;
+  border-radius: 10px;
+  background: #fff;
+
+  &--current {
+    border-color: #0066CC;
+    background: #F0F6FC;
+    box-shadow: inset 3px 0 0 #0066CC;
+  }
+
+  &--done,
+  &--skipped { background: #FAFBFC; }
+}
+
+.agenda-item__main {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.agenda-item__marker {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  margin-top: 1px;
+  border-radius: 50%;
+  border: 1.5px solid #C5D0DA;
+  color: #5A6772;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1;
+
+  .icon { fill: currentColor; }
+
+  .agenda-item--current & { border-color: #0066CC; background: #fff; }
+  .agenda-item--done & { border-color: #008758; background: #008758; color: #fff; }
+  .agenda-item--skipped & { border-style: dashed; color: #8293A6; }
+}
+
+.agenda-item__pulse {
+  display: block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #0066CC;
+  animation: agenda-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes agenda-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(0, 102, 204, 0.45); }
+  50% { box-shadow: 0 0 0 5px rgba(0, 102, 204, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .agenda-item__pulse { animation: none; }
+}
+
+.agenda-item__body {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.agenda-item__label {
+  font-size: 0.88rem;
+  line-height: 1.35;
+  color: #17324D;
+  overflow-wrap: anywhere;
+
+  .agenda-item--current & { font-weight: 700; }
+  .agenda-item--done & { color: #5A6772; }
+  .agenda-item--skipped & { color: #707C88; text-decoration: line-through; }
+}
+
+.agenda-item__status {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #5A6772;
+
+  .agenda-item--current & { color: #004D99; }
+  .agenda-item--done & { color: #00663F; }
+
+  // Oltre il previsto (lo vede solo chi conduce): ambra scuro, leggibile
+  // sul celeste dell'argomento in corso.
+  &.is-over { color: #8A5300 !important; }
+}
+
+.agenda-item__actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+  margin: -4px -6px 0 0;
+
+  .qa-action { width: 30px; height: 30px; }
+  .qa-action--text { width: auto; height: 28px; margin-right: 2px; white-space: nowrap; }
+
+  .qa-action.is-armed {
+    width: auto;
+    padding: 0 0.5rem;
+    background: #FDECEF;
+    color: #A1112E;
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+}
+
+.agenda-item__pulse-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 6px 0 0 34px;
+}
+
+.agenda-item__prompt {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #33475B;
+}
+
+.agenda-item__tally,
+.agenda-item__favor {
+  font-size: 0.75rem;
+  color: #5A6772;
+}
+
+.agenda-item__favor { font-weight: 600; }
+
+.agenda-react {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 9px;
+  border: 1px solid #D3DCE4;
+  border-radius: 999px;
+  background: #fff;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #33475B;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+
+  &:hover,
+  &:focus-visible { border-color: #8293A6; }
+
+  &--agree.is-on { background: #E3F4EC; border-color: #008758; color: #00663F; }
+  &--disagree.is-on { background: #FDECEF; border-color: #D9364F; color: #A1112E; }
+}
+
+.agenda__add {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 10px;
+  border-top: 1px solid #EEF1F4;
+}
+
+.agenda__add-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.agenda__add-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 36px;
+  padding: 7px 10px;
+  border: 1px solid #C5D0DA;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: #17324D;
+  resize: none;
+  overflow-y: auto;
+
+  &:focus { outline: 2px solid #0066CC; outline-offset: 0; border-color: #0066CC; }
+}
+
+.agenda__add-foot {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.agenda__add-foot .poll-action {
+  flex-shrink: 0;
+  white-space: nowrap;
+
+  .icon { fill: currentColor; }
+}
+
+.agenda__add-hint {
+  font-size: 0.72rem;
+  line-height: 1.35;
+  color: #5A6772;
+}
+
+// Il campo dei minuti previsti: piccolo, con l'orologio davanti.
+.agenda-minutes {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  height: 36px;
+  padding: 0 8px;
+  border: 1px solid #C5D0DA;
+  border-radius: 8px;
+  background: #fff;
+  color: #5A6772;
+  font-size: 0.78rem;
+
+  .icon { fill: currentColor; flex-shrink: 0; }
+
+  input {
+    width: 3.2em;
+    border: 0;
+    padding: 0;
+    background: transparent;
+    font-size: 0.85rem;
+    color: #17324D;
+    -moz-appearance: textfield;
+
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+    &:focus { outline: none; }
+  }
+
+  &:focus-within { outline: 2px solid #0066CC; border-color: #0066CC; }
+}
+
+// Un argomento in modifica: titolo, durata, posizione, elimina.
+.agenda-edit {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.agenda-edit__label {
+  width: 100%;
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid #0066CC;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #17324D;
+
+  &:focus { outline: 2px solid #0066CC; outline-offset: 0; }
+}
+
+.agenda-edit__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+
+  .agenda-minutes { height: 32px; margin-right: 4px; }
+
+  .qa-action:disabled { opacity: 0.35; cursor: default; background: transparent; }
+
+  .qa-action.is-armed {
+    width: auto;
+    padding: 0 0.5rem;
+    background: #FDECEF;
+    color: #A1112E;
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+}
+
+.agenda-edit__spacer { flex: 1 1 auto; }
+
+// ── L'argomento in corso nella barra della sala ──
+//
+// Una pastiglia chiara sul blu della barra, subito dopo il titolo; al
+// passaggio o al clic si apre sotto l'elenco completo, sopra la chiamata.
+
+.live-top-bar__lead {
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+.agenda-ticker {
+  position: relative;
+  min-width: 0;
+  flex: 0 1 auto;
+  max-width: 420px;
+  margin-right: auto;
+}
+
+.agenda-ticker__pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  max-width: 100%;
+  min-height: 30px;
+  padding: 3px 10px 3px 9px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-size: 0.78rem;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: background 0.15s ease;
+
+  &:hover,
+  &:focus-visible,
+  &[aria-expanded='true'] { background: rgba(255, 255, 255, 0.22); }
+
+  &:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+}
+
+.agenda-ticker__dot {
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #7FD6A8;
+  box-shadow: 0 0 0 0 rgba(127, 214, 168, 0.6);
+  animation: agenda-ticker-dot 1.8s ease-in-out infinite;
+}
+
+@keyframes agenda-ticker-dot {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(127, 214, 168, 0.6); }
+  50% { box-shadow: 0 0 0 4px rgba(127, 214, 168, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .agenda-ticker__dot { animation: none; }
+}
+
+.agenda-ticker__kicker {
+  flex-shrink: 0;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+.agenda-ticker__label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.agenda-ticker__count {
+  flex-shrink: 0;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.18);
+  font-size: 0.7rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.agenda-ticker__chevron {
+  flex-shrink: 0;
+  opacity: 0.85;
+  transition: transform 0.15s ease;
+
+  [aria-expanded='true'] > & { transform: rotate(180deg); }
+}
+
+.agenda-ticker__pop {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 1060;
+  width: min(360px, calc(100vw - 32px));
+  max-height: min(60vh, 440px);
+  overflow-y: auto;
+  padding: 12px;
+  border-radius: 12px;
+  background: #fff;
+  color: #17324D;
+  box-shadow: 0 12px 32px rgba(0, 30, 70, 0.28);
+}
+
+.agenda-ticker__title {
+  margin: 0 0 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #5A6772;
+}
+
+.agenda-ticker__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.agenda-ticker__row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 6px 8px;
+  border-radius: 8px;
+
+  &.agenda-item--current { background: #F0F6FC; box-shadow: inset 3px 0 0 #0066CC; }
+}
+
+.agenda-ticker__row-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+// Sul telefono la barra va su due righe: titolo e comandi sopra, l'argomento
+// in corso sotto, largo quanto lo schermo. Il titolo sta su una riga, il ruolo
+// non si ripete e «Esci dalla sala» resta l'icona (il nome e' nell'etichetta).
+@media (max-width: 767.98px) {
+  .live-top-bar {
+    flex-wrap: wrap;
+    row-gap: 6px;
+  }
+
+  .live-top-bar__lead {
+    flex: 1 1 0;
+
+    h1 { min-width: 0; margin-right: 0.5rem !important; }
+  }
+
+  .live-top-bar .event-title-main {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .live-role-badge { display: none !important; }
+
+  .live-top-bar__actions .leave-room-btn {
+    width: 34px;
+    padding: 0;
+    justify-content: center;
+  }
+
+  .leave-room-btn__text {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .agenda-ticker {
+    order: 3;
+    flex: 1 1 100%;
+    max-width: none;
+    margin-right: 0;
+  }
+
+  .agenda-ticker__pill { width: 100%; }
+  .agenda-ticker__label { flex: 1 1 auto; text-align: left; }
 }

@@ -1,15 +1,51 @@
 {
   "agenda": {
-    "title": "Noter / Tjekliste",
-    "empty": "Ingen punkter endnu. Tilføj de emner, der skal behandles, og kryds dem af undervejs.",
+    "title": "Dagsorden",
+    "empty": "Dagsordenen er ikke forberedt endnu.",
     "add": "Tilføj",
-    "addPlaceholder": "Nyt punkt…",
-    "remove": "Fjern",
+    "addPlaceholder": "Nyt emne…",
+    "remove": "Slet emne",
     "inProgress": "i gang",
     "agree": "Enig",
     "disagree": "Uenig",
     "favorablePct": "{pct}% enige",
-    "noReactions": "Del din mening"
+    "noReactions": "Del din mening",
+    "emptyModerator": "Tilføj mødets emner: under arrangementet markerer du fremdriften, og salen ser det aktuelle emne.",
+    "progress": "{done} af {total} behandlet",
+    "skippedCount": "{count, plural, one {# sprunget over} other {# sprunget over}}",
+    "nextTopic": "Næste emne:",
+    "startFirst": "Start med:",
+    "finishCurrent": "Afslut det aktuelle emne",
+    "runningFor": "{minutes, plural, =0 {lige startet} one {i # minut} other {i # minutter}}",
+    "tickerNow": "Nu",
+    "status": {
+      "PENDING": "Til behandling",
+      "CURRENT": "I gang",
+      "DONE": "Behandlet",
+      "SKIPPED": "Sprunget over"
+    },
+    "actions": {
+      "start": "Start nu",
+      "done": "Markér som behandlet",
+      "skip": "Spring over",
+      "reopen": "Genåbn",
+      "edit": "Rediger",
+      "moveUp": "Flyt op",
+      "moveDown": "Flyt ned"
+    },
+    "plannedMinutes": "{minutes} min planlagt",
+    "elapsedOfPlanned": "{minutes} af {planned} min",
+    "overtime": "over tiden",
+    "tookMinutes": "{minutes} min",
+    "plannedTotal": "Planlagt varighed: {minutes} min",
+    "pulsePrompt": "Er du enig?",
+    "addHint": "Enter for at tilføje, Shift+Enter for ny linje. Du kan indsætte en liste: ét emne pr. linje.",
+    "addMany": "{count, plural, one {Tilføj # emne} other {Tilføj # emner}}",
+    "minutesPlaceholder": "min",
+    "minutesLabel": "Planlagt varighed i minutter (valgfrit)",
+    "editLabel": "Emnets titel",
+    "agendaChanged": "Dagsordenen er lige blevet ændret: prøv igen.",
+    "minutesInvalid": "Angiv varigheden i minutter, fra 1 til 600."
   },
   "common": {
     "appName": "PA Webinar",
@@ -64,7 +100,7 @@
     "past": "Tidligere begivenheder",
     "noUpcoming": "Ingen kommende begivenheder i øjeblikket. Kig forbi igen snart!",
     "noPast": "Ingen tidligere begivenheder",
-    "wordCloudTitle": "Ordsky",
+    "wordCloudTitle": "Med ét ord",
     "card": {
       "publicEvent": "Offentlig begivenhed",
       "readMore": "Læs mere",
@@ -173,6 +209,7 @@
     "resendLink": "Send mit adgangslink igen",
     "resending": "Sender…",
     "resendSent": "Hvis adressen er tilmeldt, har vi sendt adgangslinket igen via e-mail.",
+    "resendFailed": "Linket kunne ikke sendes igen. Prøv igen om et par minutter.",
     "invitationOnly": "Tilmelding er forbeholdt inviterede: brug den e-mailadresse, du er blevet inviteret med. Linket til at deltage får du tilsendt via e-mail.",
     "closed": "Tilmelding til denne begivenhed er ikke åben for offentligheden.",
     "lostLink": "Allerede tilmeldt? Få dit personlige link igen",
@@ -317,9 +354,9 @@
     "whiteboardNotSavedHint": "Whiteboardet gemmes ikke automatisk. Hvis du bruger det, skal du eksportere det (whiteboardets menu) og vedhæfte det til arrangementets materialer, før du afslutter.",
     "sidebarTabChat": "Chat",
     "sidebarTabPolls": "Afstemninger",
-    "sidebarTabWordcloud": "Ordsky",
-    "sidebarTabAgenda": "Noter / Tjekliste",
-    "liveToggleAgenda": "Noter / Tjekliste (dagsorden)",
+    "sidebarTabWordcloud": "Med ét ord",
+    "sidebarTabAgenda": "Dagsorden",
+    "liveToggleAgenda": "Dagsorden",
     "sidebarTabMaterials": "Materialer",
     "sidebarTabParticipants": "Deltagere",
     "chat": {
@@ -371,7 +408,20 @@
       "notifyDesktopBlocked": "Din browser blokerer notifikationer fra dette websted: du kan tillade dem igen i webstedets indstillinger.",
       "notifyDesktopUnsupported": "Denne browser understøtter ikke notifikationer.",
       "notifyOffer": "Vil du have besked, når nogen nævner eller svarer dig?",
-      "notifyOfferEnable": "Slå notifikationer til"
+      "notifyOfferEnable": "Slå notifikationer til",
+      "emojiSearch": "Søg emoji",
+      "emojiNoResults": "Ingen emoji fundet",
+      "emojiRecent": "Senest brugt",
+      "emojiAll": "Alle emoji",
+      "mentionListLabel": "Personer at nævne",
+      "mentionButton": "Nævn en person",
+      "replyJump": "Gå til den oprindelige besked",
+      "typingOne": "{name} skriver…",
+      "typingTwo": "{a} og {b} skriver…",
+      "typingMany": "Flere personer skriver…",
+      "hideForAll": "Skjul for alle",
+      "deleteOwn": "Slet beskeden",
+      "mentionedYou": "Nævnte dig"
     },
     "role": {
       "moderator": "Moderator",
@@ -470,7 +520,9 @@
     "rejoin": "Gå ind igen",
     "backToHome": "Tilbage til forsiden",
     "sidebarTabMaterialsNew": "Nye delte materialer",
-    "sidebarTabQaNew": "Nyt i Spørgsmål og svar"
+    "sidebarTabQaNew": "Nyt i Spørgsmål og svar",
+    "resizeSidebar": "Tilpas størrelsen på sidepanelet",
+    "sidebarTabWordcloudNew": "Nyt “Med ét ord”-spørgsmål"
   },
   "qa": {
     "title": "Spørgsmål og svar",
@@ -1280,10 +1332,10 @@
       "qaEnabled": "Aktivér Q&A",
       "chatEnabled": "Aktivér chat",
       "recordingEnabled": "Aktivér videooptagelse",
-      "agendaEnabled": "Live-noter / tjekliste (dagsorden)",
-      "agendaEnabledDesc": "En tjekliste over de emner, der skal behandles, som moderatorerne krydser af under arrangementet. Indgår i det automatiske resumé. Valgfri og kan også slås til under arrangementet.",
-      "wordCloudEnabled": "Live-ordsky",
-      "wordCloudEnabledDesc": "Deltagerne sender et ord, og skyen opdateres live. Nyttigt til at åbne en drøftelse eller indsamle en stemning på få sekunder.",
+      "agendaEnabled": "Mødets dagsorden",
+      "agendaEnabledDesc": "Listen over mødets emner: under arrangementet markerer moderatoren det aktuelle, de behandlede og de sprungne, og salen ser altid, hvor man er, også i den øverste bjælke. Indgår i det automatiske resumé. Valgfrit og kan også slås til under arrangementet.",
+      "wordCloudEnabled": "“Med ét ord”-spørgsmål",
+      "wordCloudEnabledDesc": "Moderatoren stiller et spørgsmål, og alle svarer med ét enkelt ord: svarene danner en sky, der opdateres live, og de hyppigste ord bliver større. Godt til at bryde isen eller indsamle et indtryk på få sekunder.",
       "whiteboardEnabled": "Delt whiteboard",
       "whiteboardEnabledDesc": "Aktiverer det indbyggede whiteboard til samarbejde (Excalidraw): moderatorerne kan åbne det fra værktøjslinjen under arrangementet. Kræver installationens whiteboard-tjeneste; hvor den findes, er det altid slået til ved øjeblikkelige opkald.",
       "autoStartRecording": "Start optagelsen automatisk",
@@ -2760,8 +2812,8 @@
         "desc": "Besvar afstemninger i realtid og se resultaterne med det samme."
       },
       "wordcloud": {
-        "title": "Ordsky",
-        "desc": "Tilføj dine ord til arrangementets fælles ordsky."
+        "title": "Med ét ord",
+        "desc": "Svar med ét ord på moderatorens spørgsmål, og se skyen af svar vokse."
       },
       "reactions": {
         "title": "Reaktioner og hævede hænder",
@@ -2772,8 +2824,8 @@
         "desc": "Skriv i arrangementets chat og følg samtalen med de andre deltagere."
       },
       "agenda": {
-        "title": "Dagsorden og noter",
-        "desc": "Følg dagsordenen og de noter, moderatorerne deler under arrangementet."
+        "title": "Dagsorden",
+        "desc": "Følg det aktuelle emne og mødets dagsorden."
       }
     },
     "projectTeaser": {
@@ -2888,8 +2940,17 @@
       "minOptions": "Mindst 2 valgmuligheder er påkrævet",
       "generic": "Fejl ved oprettelse af afstemning",
       "vote": "Stemmen blev ikke registreret. Prøv igen.",
-      "alreadyVoted": "Du har allerede stemt i denne afstemning."
-    }
+      "alreadyVoted": "Du har allerede stemt i denne afstemning.",
+      "action": "Handlingen mislykkedes. Prøv igen."
+    },
+    "participation": "{votes, plural, one {# stemme} other {# stemmer}} ud af {present} til stede",
+    "participationLabel": "Deltagelse i afstemningen",
+    "yourVote": "Din stemme",
+    "deletePoll": "Slet afstemning",
+    "questionLabel": "Spørgsmål",
+    "optionsLabel": "Mulige svar",
+    "resultsHidden": "Stemmen er registreret. Resultaterne vises, når moderatoren offentliggør dem.",
+    "closedNoVote": "Afstemningen er lukket. Resultaterne vises, når moderatoren offentliggør dem."
   },
   "materials": {
     "title": "Materialer",
@@ -3497,16 +3558,16 @@
     "noFeedback": "Ingen feedback modtaget"
   },
   "wordcloud": {
-    "title": "Ordsky",
+    "title": "Med ét ord",
     "startRound": "Start",
-    "prompt": "Emne",
+    "prompt": "Spørgsmål",
     "promptPlaceholder": "f.eks. Hvad forventer du af denne begivenhed?",
     "duration": "Varighed",
     "submit": "Send",
-    "submitPlaceholder": "Skriv et ord (maks. 30 tegn)",
-    "close": "Luk ordskyen",
+    "submitPlaceholder": "Dit ord",
+    "close": "Luk svarene",
     "cancel": "Annuller",
-    "noActiveRound": "Ingen aktiv ordsky lige nu.",
+    "noActiveRound": "Der er ikke noget åbent spørgsmål lige nu.",
     "noWords": "Venter på de første ord...",
     "wordsSubmitted": "{count} ord indsendt",
     "timeRemaining": "Tid tilbage",
@@ -3514,11 +3575,22 @@
       "send": "Ordet blev ikke sendt. Prøv igen.",
       "closed": "Runden er lukket: der modtages ikke flere ord.",
       "limit": "Du har allerede sendt det maksimale antal ord i denne runde.",
-      "rateLimited": "For mange indsendelser lige nu: vent et par sekunder, før du prøver igen."
+      "rateLimited": "For mange indsendelser lige nu: vent et par sekunder, før du prøver igen.",
+      "duplicate": "Du har allerede skrevet dette ord: det tæller kun én gang pr. person.",
+      "removed": "Moderatoren har fjernet dette ord: det kan ikke sendes igen.",
+      "invalid": "Skriv et ord med bogstaver eller tal."
     },
-    "startNew": "Start en ordsky",
-    "emptyHintModerator": "Stil et åbent spørgsmål: svar på ét ord danner skyen i realtid.",
-    "timeLeft": "Tid tilbage: {time}"
+    "startNew": "Stil et spørgsmål",
+    "emptyHintModerator": "Stil et spørgsmål, der kan besvares med ét ord, for eksempel “Hvordan har I det i dag?”. Svarene danner en sky, der opdateres live: jo flere der skriver det samme ord, jo større bliver det.",
+    "timeLeft": "Tid tilbage: {time}",
+    "howItWorks": "Svar med ét enkelt ord: jo flere der skriver det samme ord, jo større bliver det.",
+    "enableHint": "Fanen “Med ét ord” vises for alle, når du starter det første spørgsmål.",
+    "topWords": "Mest skrevne",
+    "yourWords": "Du skrev:",
+    "closedBadge": "Afsluttet",
+    "durationUnlimited": "Uden tidsgrænse",
+    "allWords": "Alle ord",
+    "removeWord": "Fjern fra skyen"
   },
   "timer": {
     "title": "Timer",
@@ -3915,7 +3987,7 @@
     "showPolls": "Vis afstemningsresultater",
     "showFeedback": "Vis feedback",
     "showRecap": "Vis opsummeringen af arrangementet",
-    "showWordCloud": "Vis ordskyen",
+    "showWordCloud": "Vis “Med ét ord”-svarene",
     "emailEnabled": "Send opsummerings-e-mail, når arrangementet slutter",
     "emailEnabledHelp": "Ved afslutningen sendes der en takke-e-mail til de tilmeldte deltagere med link til opsummeringen og til feedback, og en kort opsummering til moderatoren. Den sendes kun én gang.",
     "feedbackEnabled": "Feedbackundersøgelse aktiv efter begivenhed",
@@ -3976,7 +4048,7 @@
     "micToggleOn": "Mikrofon TIL",
     "micToggleOff": "Mikrofon FRA",
     "cameraOffPreview": "Kameraet er slukket",
-    "speakerTest": "🔊 Lydtest",
+    "speakerTest": "Lydtest",
     "backgroundLabel": "Virtuel baggrund",
     "backgroundNoneShort": "No",
     "backgroundHint": "Anvendes, når du går ind i rummet. Brug knappen til baggrunde, når du er inde, hvis du vil sløre din baggrund: forhåndsvisningen ovenfor viser kameraet uden effekter.",
