@@ -189,7 +189,7 @@ too); for listeners, `grep -rn "addListener(" app/src/components app/src/hooks`.
 | `participantJoined`, `participantLeft`, `displayNameChange` | Recounts people and refreshes the roster and the raised-hand queue; the recorder bot is excluded |
 | `audioMuteStatusChanged`, `videoMuteStatusChanged` | Re-enables noise suppression on unmute; reapplies quality and background when the camera turns on |
 | `raiseHandUpdated` | Updates the raised-hand queue. Each non-moderator also reports their own raises, batched, to `/api/events/{slug}/hand-raises` for event analytics |
-| `dominantSpeakerChanged` | Builds the dominant-speaker timeline, batched to `/api/events/{slug}/speaker-events` for speaker attribution ([ADR-013](../adr/013-multitrack-speaker-attribution.md)) |
+| `dominantSpeakerChanged` | In moderators' clients only (every browser receives the same change, and one report per attendee would rewrite the log once per person), builds the dominant-speaker timeline; with no moderator in the room nothing is recorded. The timeline is batched to `/api/events/{slug}/speaker-events` for speaker attribution ([ADR-013](../adr/013-multitrack-speaker-attribution.md)) |
 | `recordingStatusChanged` | Drives the recording indicator |
 | `moderationStatusChanged` | Keeps the audio and video moderation toggles in sync |
 | `screenSharingStatusChanged` | Shows the screen-share banner |
@@ -399,8 +399,8 @@ Blur is not available from outside the iframe (see [Limits of the boundary](#lim
 The portal draws its own controls around the iframe (`app/src/components/live/live-event-client.tsx`
 and `app/src/components/jitsi/`):
 
-- **Top bar.** Event title, participant count, recording indicator, sharing links, **Fullscreen**
-  (desktop) and **Leave room**. The app's
+- **Top bar.** Event title, participant count, the current agenda topic, recording indicator,
+  sharing links, **Fullscreen** (desktop) and **Leave room**. The app's
   fullscreen covers the whole live area, so the drawer stays visible. Dialogs render inside the
   fullscreen element, so they do not disappear behind it.
 - **Moderator control bar** (`ModeratorControls`, `app/src/components/jitsi/moderator-controls.tsx`):

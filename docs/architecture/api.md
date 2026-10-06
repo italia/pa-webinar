@@ -286,11 +286,11 @@ Some responses do not fit this shape:
 
 ## Streaming endpoints
 
-The live room uses Server-Sent Events streams, one for each Redis channel:
+The live room uses these Server-Sent Events streams:
 
 | Route | Redis channel | Gate | Held open by |
 |---|---|---|---|
-| `GET /api/events/{slug}/chat/stream` | `chat:<eventId>` | The chat read gate (`authorizeChatRead`), with the token in `?token=` | The chat panel, while the chat is on |
+| `GET /api/events/{slug}/chat/stream` | `chat:<eventId>`, and `chat-typing:<eventId>` for the typing indicator, delivered as `event: typing` | The chat read gate (`authorizeChatRead`), with the token in `?token=` | The chat panel, while the chat is on |
 | `GET /api/events/{slug}/live/stream` | `live:<eventId>` | The event is publicly visible. No token is read | Every live room |
 | `GET /api/events/{slug}/control/stream` | `control:<eventId>` | The event exists | A participant whose hand is raised |
 

@@ -27,7 +27,8 @@ assessment belongs to the controller of each installation.
   needs `recordingEnabled`. Per-participant audio also needs
   `aiTranscriptEnabled` and `multitrackRecordingEnabled`. AI processing also
   needs the site-wide switch `aiPipelineEnabled`. The speaking timeline (who
-  spoke when, with display names) is collected in every live room.
+  spoke when, with display names) is collected in every live room that a
+  moderator attends.
 - Per-participant audio needs its own consent, and that consent blocks entry.
   It is separate from the recording consent, and nobody enters a
   per-participant event without giving it, except moderators.
@@ -57,7 +58,7 @@ assessment belongs to the controller of each installation.
 |---|---|---|---|---|
 | Composite video (Jibri) | **Enable video recording** (`recordingEnabled`). A moderator starts it, or it starts on its own with `autoStartRecording` | `consentRecording` at registration, and the full-screen **Recording consent** dialog before the room loads | One MP4 file with the conference video and the mixed audio of everyone | `recordings/` in the recordings storage domain |
 | Per-participant audio (recorder bot) | **Per-participant recording (high accuracy)** (`multitrackRecordingEnabled`). The toggle appears only with recording and **Automatic transcription** on. The bot starts when the event goes `LIVE` | `consentMultitrack` at registration, and a blocking checkbox in the waiting room | One audio file per participant and per track session, plus a manifest that names the participant of each file | `recordings/multitrack/<eventId>/<recordingId>/` in the recordings storage domain |
-| Speaking timeline | Always, in every live room, recorded or not | No dedicated consent | Who was the dominant speaker and when: the Jitsi endpoint ID and the display name | `CallSession.dominantSpeakerLog` in PostgreSQL |
+| Speaking timeline | Always, in every live room that a moderator attends, recorded or not | No dedicated consent | Who was the dominant speaker and when: the Jitsi endpoint ID and the display name | `CallSession.dominantSpeakerLog` in PostgreSQL |
 
 AI outputs are produced after the event from the composite video or from the
 per-participant tracks. That happens when the event has **Automatic
@@ -96,9 +97,9 @@ consent gates below.
 
 ### Speaking timeline
 
-Every browser in a live room reports Jitsi's dominant-speaker changes to the
-portal, whether or not the event is recorded. The log stores the display names
-in plain text.
+The browser of every moderator in a live room reports Jitsi's dominant-speaker
+changes to the portal, whether or not the event is recorded. Other participants'
+browsers do not report them. The log stores the display names in plain text.
 
 The public transcript endpoint uses the log at read time to put names on the
 anonymous voice clusters of a composite recording, so a public transcript can
@@ -767,7 +768,8 @@ Consent and transparency:
 - **Dubbing guesses gender from first names.** The **Editorial line on voice**
   text does not mention it, and the worker's log records the guesses.
 - **The speaking timeline has no dedicated consent.** It is collected in every
-  live room and stored with plain-text names until the event's retention.
+  live room that a moderator attends and stored with plain-text names until the
+  event's retention.
 
 Retention and deletion:
 

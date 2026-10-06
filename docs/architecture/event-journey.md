@@ -210,7 +210,7 @@ The rule is that a copy inherits the configuration, not the life of the occurren
 | Inherited | Not inherited |
 |---|---|
 | Description, time zone, event type, sizing and quality settings, every live-feature and permission setting, registration rules, the moderator contact, branding, the privacy and retention settings, recording and AI post-production flags, the post-event page settings and the library listing, the recurrence rule | Title (suffixed), slug, dates (resolved as above), status, room name, moderator token, owner, join password, series membership, `postEventPublicUntil`, `youtubeUrl`, and all runtime, analytics and recording state |
-| Tags, co-organizing organizations, active named grants (each with a fresh token), agenda items, questionnaires, reminder schedule | Registrations, invitations, questions, chat, reactions, polls, word-cloud rounds, feedback, call sessions, recordings, materials, GDPR audit entries |
+| Tags, co-organizing organizations, active named grants (each with a fresh token), agenda topics (title, order and planned duration), questionnaires, reminder schedule | The agenda's progress (status and times), registrations, invitations, questions, chat, reactions, polls, word-cloud rounds, feedback, call sessions, recordings, materials, GDPR audit entries |
 
 Revoked grants are not recreated. Materials and polls are left out on purpose: they are the content of a specific day.
 
@@ -387,7 +387,7 @@ An event has at most one questionnaire per placement: `PRE_REGISTRATION` and `PO
 - **Where they are edited.** In step 4 of the wizard, or on the event's **Questionnaires** page (`/admin/events/{id}/questionnaires`), through `GET`, `PUT` and `DELETE` on `/api/admin/events/{id}/questionnaires/{placement}`. `PUT` replaces the questionnaire as a whole and is refused with `409` once responses exist. `DELETE` removes it together with all its responses, whether or not responses exist. The **Questionnaires** page shows the response count and asks for confirmation first; emptying the questionnaire in the edit wizard sends the same `DELETE` without either.
 - **Default feedback.** Every new event gets the platform's generic feedback template as its post-event questionnaire (the system template named by `FEEDBACK_GENERIC_TEMPLATE_NAME` in `app/src/lib/feedback/constants.ts`), unless `feedbackEnabled` is off. A questionnaire configured in the wizard replaces it.
 - **Where participants answer.** The pre-registration questionnaire appears on the registration confirmation screen. The post-event questionnaire appears in the feedback dialog when leaving the call and on the public post-event page. The standalone page `/events/{slug}/questionnaire/{placement}` shows either one.
-- **Submission.** `POST /api/events/{slug}/questionnaires/{placement}/responses` allows 10 requests per minute per IP address and validates the answers against the questions. A registrant is identified by the access token (one response per registration). Everyone else is identified by a random id kept in the browser's local storage (one response per id). A second submission updates the response when `allowEdit` is on, and is refused with `409` otherwise.
+- **Submission.** `POST /api/events/{slug}/questionnaires/{placement}/responses` allows 60 requests per minute per IP address and validates the answers against the questions. A registrant is identified by the access token (one response per registration). Everyone else is identified by a random id kept in the browser's local storage (one response per id). A second submission updates the response when `allowEdit` is on, and is refused with `409` otherwise.
 - **Results.** Responses and statistics are under **Questionnaires**, **Responses and statistics** (`/admin/questionnaires/responses`).
 
 The older rating-and-comment feedback (`EventFeedback`, `POST /api/events/{slug}/feedback`, accepted while `LIVE` or `ENDED`) is still accepted. The post-event page's star summary uses it when it exists, and otherwise averages the 1-to-5 `LIKERT` answers of the post-event questionnaire.
@@ -410,7 +410,7 @@ Visibility is enforced on the server (`app/src/lib/events/material-visibility.ts
 
 The filter governs lists, not access: a link stays an external address, and an uploaded file stays downloadable from its `/api/assets/…` URL by anyone who already has it. Materials are not copied when an event is duplicated.
 
-The agenda is a checklist of points to cover. It is turned on with `agendaEnabled` in step 2, or during the event, and moderators add items from the live room, even while the event is running ([live-interaction.md](live-interaction.md#feature-catalog)). Agenda items are copied when an event is duplicated.
+The agenda is the list of topics for the meeting, each with an optional planned duration. It is turned on with `agendaEnabled` in step 2, or during the event, and moderators prepare and lead it from the live room, even while the event is running ([live-interaction.md](live-interaction.md#agenda)). When an event is duplicated, each topic's title, order and planned duration are copied; its status and times are not.
 
 ## After the event
 

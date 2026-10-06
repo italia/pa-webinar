@@ -670,12 +670,13 @@ The portal scales in the usual way for a stateless web application:
 - **Long-lived connections.** Every participant in the live room holds
   server-sent event streams. The HPA scales on CPU and memory, not on the
   number of open connections.
-- **Polling per viewer.** Every open live page polls `/api/status` every 3
-  seconds while the event is `LIVE`, including for participants already in
-  the call, and every waiting-room tab polls `/api/events/[slug]/lifecycle`
-  just as often. Each `/api/status` request runs database queries and
-  health checks. Request rate therefore grows with the audience, and so
-  does the CPU that the HPA scales on. Account for it when you size the app
+- **Polling per viewer.** While the event is `LIVE`, every open live page
+  polls `/api/status` every 3 seconds until it has joined the call; after
+  that only moderators keep polling it. Every waiting-room tab polls
+  `/api/events/[slug]/lifecycle` just as often. Each pod reuses its
+  `/api/status` answer for 3 seconds, so the database queries and health
+  checks behind it do not grow with the audience, but the request rate
+  does, and so does the CPU that the HPA scales on. Account for it when you size the app
   tier; see [Load testing](../LOAD-TESTING.md).
 - **Rate limits per process.** The in-app limiter counts per pod. A limit
   of N requests a minute becomes N times the number of pods across the

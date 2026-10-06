@@ -374,6 +374,7 @@ The values below come from the route files. To list every call site with its val
 | Guest Jitsi token, including a personal link opened in another browser | `POST …/jitsi/token` | IP | `GUEST_JWT_RATE_LIMIT_PER_MINUTE`, default 120 per minute |
 | Call session opening | `POST …/sessions` | IP | 30 per minute |
 | Chat message / attachment | `POST …/chat`, `POST …/chat/attachment` | Event and sender | 30 / 10 per minute |
+| Chat typing signal | `POST …/chat/typing` | Event and sender / event | 40 per minute / 10 per second; past the second limit the signal is accepted and not published |
 | Q&A question | `POST …/questions` | Registration, named grant, or the guest's browser id and event (IP when a guest sends no browser id) / IP and event, for guests with a browser id | 1 per 30 seconds / 60 per minute |
 | Q&A upvote | `POST …/questions/{id}/upvote` | IP and event, for browser ids / voter (registration or browser id) | 300 / 10 per minute |
 | Poll vote | `POST …/polls/{id}/vote` | IP and event / voter | 60 / 10 per minute |

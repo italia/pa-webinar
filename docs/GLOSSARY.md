@@ -339,9 +339,11 @@ visitor presses **Enable music**.
 
 ### The live room
 
-**Agenda** (`agendaEnabled`, UI **Notes / Checklist**): a checklist of points
-that moderators tick off during the event. Participants can mark agreement or
-disagreement on each point (`AgendaItemReaction`).
+**Agenda** (`agendaEnabled`, UI **Agenda**): the list of topics for the
+meeting. During the event moderators mark each topic in progress, discussed or
+skipped (`AgendaItemStatus`), one in progress at a time, and the room's top bar
+shows the current one. Participants can mark agreement or disagreement on the
+topic in progress (`AgendaItemReaction`).
 [Live interaction and realtime](architecture/live-interaction.md)
 
 **Chat** (`ChatMessage`): the room's text chat. Messages are stored in
@@ -399,8 +401,10 @@ recording is published. [Recording](architecture/recording.md)
 shared whiteboard. It is enabled per event and needs the whiteboard backend on
 the Jitsi side. [How PA Webinar extends Jitsi Meet](architecture/jitsi-integration.md)
 
-**Word cloud** (`WordCloudRound`, UI **Word cloud**): a timed round in which
-participants answer a prompt with short words, shown as a cloud.
+**Word cloud** (`WordCloudRound`, UI **In one word**): a round, timed or open
+until a moderator closes it, in which participants answer a question with
+single words, shown as a cloud where each word grows with the number of people
+who wrote it.
 [Live interaction and realtime](architecture/live-interaction.md)
 
 ### After the event
@@ -979,10 +983,10 @@ these docs and the code use *organizer*.
 | Esci solo tu | **Just leave** | Just leave |
 | Domande e Risposte | **Questions & Answers** | Q&A (`Question`) |
 | Sondaggi | **Polls** | polls (`Poll`) |
-| Nuvola di parole | **Word cloud** | word cloud (`WordCloudRound`) |
+| In una parola | **In one word** | word cloud (`WordCloudRound`) |
 | Reazioni | **Reactions** | reactions |
 | Mani alzate | **Raised hands** | raised-hand queue |
-| Note / Checklist | **Notes / Checklist** | agenda (`agendaEnabled`) |
+| Scaletta | **Agenda** | agenda (`agendaEnabled`) |
 | Lavagna | **Whiteboard** | whiteboard (`whiteboardEnabled`) |
 | Registrazione in corso | **Recording in progress** | recording (never "registration") |
 | Guarda dall'inizio | **Watch from the start** | temporary recording (catch-up) |

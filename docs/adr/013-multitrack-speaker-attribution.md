@@ -56,9 +56,10 @@ keeps two fallbacks.
   display name. The worker's `TRANSCRIBE_MULTITRACK` job transcribes each track without diarization and
   merges the segments. Overlaps are kept, and segments that overlap another speaker are marked as
   concurrent.
-- **The dominant-speaker timeline** (option D) is captured in every live room. Each browser reports
-  dominant-speaker changes through the IFrame API to `POST /api/events/<param>/speaker-events`, and the
-  portal appends them to a call session's `CallSession.dominantSpeakerLog`. The transcript view uses the
+- **The dominant-speaker timeline** (option D) is captured in every live room that a moderator attends.
+  Moderators' browsers receive dominant-speaker changes through the IFrame API and report them to
+  `POST /api/events/<param>/speaker-events` (one report per attendee would rewrite the log once per
+  person for every change), and the portal appends them to a call session's `CallSession.dominantSpeakerLog`. The transcript view uses the
   timeline to name anonymous diarization clusters. In the current code this fallback rarely finds a
   timeline to use (see [below](#how-a-transcript-gets-its-speaker-names)).
 - **Diarization of the mix** remains the path for every event without per-participant tracks.
@@ -120,8 +121,8 @@ matches, the cluster gets a numbered participant label, and an administrator can
 In the current code the timeline branch rarely names a cluster. The speaker-events route appends to the
 event's newest open call session, which is normally the analytics session that the live page opens on
 the first join. The Jibri webhook links a Jibri-only recording to a new call session that it creates
-already closed, so the log the transcript route reads for that recording is normally empty. Each browser
-also measures `atMs` from its own join, not from the start of the recording.
+already closed, so the log the transcript route reads for that recording is normally empty. Each reporting
+browser also measures `atMs` from its own join, not from the start of the recording.
 
 ## Consequences
 
@@ -508,7 +509,7 @@ retries, clean-up and the work volume are in
 ## Known limitations
 
 - **The dominant-speaker fallback rarely names a cluster.** The timeline and the recording normally sit
-  on different call sessions, and each browser times the timeline from its own join (see
+  on different call sessions, and each reporting browser times the timeline from its own join (see
   [How a transcript gets its speaker names](#how-a-transcript-gets-its-speaker-names)).
 - **A second multitrack recording in one event.** The portal recognizes the event's multitrack
   `Recording` by its placeholder key, and a Jibri webhook replaces that key. Once a webhook has attached

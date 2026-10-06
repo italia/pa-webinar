@@ -341,13 +341,16 @@ erDiagram
   WORD_CLOUD_SUBMISSION {
     uuid id PK
     uuid roundId FK
-    string word
+    string word "normalized"
+    datetime hiddenAt "removed by a moderator"
   }
   EVENT_AGENDA_ITEM {
     uuid id PK
     uuid eventId FK
     string label
-    boolean completed
+    AgendaItemStatus status "one CURRENT per event"
+    boolean completed "true only for DONE"
+    int plannedMinutes "optional"
   }
   AGENDA_ITEM_REACTION {
     uuid id PK
@@ -364,7 +367,7 @@ erDiagram
 How to read it:
 
 - **Questions.** The room collects questions in the Q&A panel, as `Question` rows with upvotes. `ChatMessage.isQuestion`, `answeredAt` and `dismissedAt` remain in the chat model and API, but the room does not set them.
-- **Hiding is a soft delete.** A moderator sets `hiddenAt` and `hiddenBy`. The row stays, but it leaves history and exports. Hiding also deletes the message's attachment file, on a best-effort basis.
+- **Hiding is a soft delete.** A moderator sets `hiddenAt` and `hiddenBy`. The row stays, but it leaves history and exports. Hiding also deletes the message's attachment file, on a best-effort basis. A word that a moderator removes from the word cloud is hidden the same way, with `WordCloudSubmission.hiddenAt`: the rows leave the cloud and the recap, and still count toward their authors' limit for the round.
 - **Reactions come in three kinds.** `ChatMessageReaction` is an emoji on one chat message. `AgendaItemReaction` is agree or disagree on an agenda item. `Reaction` is one click on the app's reaction bar and stores only the emoji and the time. These rows are analytics only: they are written best-effort after the in-memory counter, capped per event, and do not drive the live count.
 - **PostgreSQL is canonical for these tables.** Each route writes its row first, then notifies the other pods through Redis ([ADR-005](../adr/005-live-interaction-in-portal.md)). Some live state has no table: the timer and the reaction-bar counters live in each pod's memory, presence in the square lives in Redis with a short TTL, and the raised-hand queue belongs to Jitsi ([live-interaction.md](live-interaction.md)).
 
@@ -381,7 +384,7 @@ The values below are copied from `schema.prisma`. The owner page explains what e
 | `WaitingRoomEngine` | `GARDEN` (**Garden (standard)**), `GAME` (**Videogame (Phaser lobby)**), `CLASSIC` (**Classic (static)**) | Site default on `SiteSetting` (`GARDEN` in the schema), with a nullable override on `Event` and `EventTemplate`. | [waiting-room.md](waiting-room.md) |
 | `HomePageMode` | `LANDING` (**Landing page**), `LANDING_ISTITUZIONALE` (**Institutional landing**), `LANDING_SEMPLICE` (**Plain-language landing**), `EVENTS_LIST` (**Events list**), `CUSTOM` (**Custom**) | `SiteSetting.homePageMode`. Some values keep Italian identifiers. | [branding.md](../configuration/branding.md) |
 | `VideoQuality` | `SAVE_DATA`, `BALANCED`, `HIGH`, `MAX` | Site default on `SiteSetting` (`HIGH` in the schema) with a per-event override. The mapping to Jitsi parameters is in `app/src/lib/jitsi/config.ts`. | [jitsi-integration.md](jitsi-integration.md) |
-| `QuestionStatus`, `PollStatus` | See the schema | Q&A and poll workflows. | [live-interaction.md](live-interaction.md) |
+| `QuestionStatus`, `PollStatus`, `AgendaItemStatus` | See the schema | Q&A, poll and agenda workflows. | [live-interaction.md](live-interaction.md) |
 | `RecordingStatus`, `PostprodJobKind`, `PostprodJobStatus`, `PostprodArtifactType` | See the schema | The recording lifecycle, the post-production job kinds and their outputs. | [recording.md](recording.md), [POSTPROD.md](../POSTPROD.md) |
 
 ## Invariants

@@ -355,7 +355,7 @@ sequenceDiagram
 
 **All state is in PostgreSQL. Redis is not storage.** Everything that must survive a restart lives in PostgreSQL. Binary content (materials, recordings, tracks, AI outputs) lives in object storage. Redis runs without persistence and carries only short-lived data:
 
-- the fan-out channels `chat:<eventId>`, `control:<eventId>`, `live:<eventId>` and `garden:<eventId>`;
+- the fan-out channels `chat:<eventId>`, `chat-typing:<eventId>`, `control:<eventId>`, `live:<eventId>` and `garden:<eventId>`;
 - the JVB snapshot, and the heartbeat with which the scaler tells the lifecycle job to stand down;
 - positions in the square, which expire in seconds.
 
