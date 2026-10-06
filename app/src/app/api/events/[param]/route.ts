@@ -10,6 +10,8 @@ import {
 } from '@/lib/errors';
 import { prisma } from '@/lib/db';
 import { publishEventStatus, publishFlagsIfChanged } from '@/lib/live-state/publish';
+import { LIVE_FLAG_FIELDS } from '@/lib/live-state/pubsub';
+import { recordLiveAction, recordLiveActions } from '@/lib/live/actions';
 import { reviveStatus } from '@/lib/events/lifecycle';
 import { closeOpenSessions } from '@/lib/events/call-sessions';
 import { removeFilesOfEventsBeingDeleted } from '@/lib/events/material-files';
@@ -542,6 +544,21 @@ export const PUT = withErrorHandling(async (request, context) => {
   publishFlagsIfChanged(eventId, event, updated);
   if (updated.status !== event.status) {
     publishEventStatus(eventId, updated.status);
+  }
+
+  // Cronologia della sala: le funzioni accese o spente (solo quelle cambiate
+  // davvero, per la stessa ragione dell'avviso qui sopra) e la fine
+  // dell'evento decisa da chi conduce.
+  await recordLiveActions(
+    LIVE_FLAG_FIELDS.filter((campo) => event[campo] !== updated[campo]).map((campo) => ({
+      eventId,
+      kind: 'feature.toggled' as const,
+      actor: 'moderator' as const,
+      data: { feature: campo, enabled: updated[campo] },
+    })),
+  );
+  if (updated.status === 'ENDED' && event.status !== 'ENDED') {
+    await recordLiveAction({ eventId, kind: 'event.ended', actor: 'moderator' });
   }
 
   await logAdminAction({

@@ -209,7 +209,7 @@ export default function JitsiRoom({
   // schema di batching del dominant speaker: accumula e invia in batch a
   // `/api/events/[slug]/hand-raises`. Condivide `speakerT0Ref` come t0.
   // Nessuna PII: solo l'endpoint id opaco della PROPRIA sessione (self-report).
-  const handRaiseBufferRef = useRef<Array<{ participantId: string; raised: boolean }>>([]);
+  const handRaiseBufferRef = useRef<Array<{ participantId: string; raised: boolean; atEpochMs: number }>>([]);
   const handRaiseFlushTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   // Endpoint id locale (dal `videoConferenceJoined`): serve a segnalare SOLO le
   // nostre alzate di mano, dato che l'evento arriva in broadcast a ogni client.
@@ -367,7 +367,13 @@ export default function JitsiRoom({
       const buf = handRaiseBufferRef.current;
       if (!slug || buf.length === 0) return;
       const events = buf.splice(0, 2000);
-      sendJson(`/api/events/${encodeURIComponent(slug)}/hand-raises`, JSON.stringify({ events }), useBeacon);
+      // L'ora di invio fa riportare al server ogni alzata alla sua ora
+      // (lib/live/actions, serverTimeOf): la cronologia ha una base sola.
+      sendJson(
+        `/api/events/${encodeURIComponent(slug)}/hand-raises`,
+        JSON.stringify({ events, sentAt: Date.now() }),
+        useBeacon,
+      );
     }
 
     function scheduleHandRaiseFlush() {
@@ -635,6 +641,7 @@ export default function JitsiRoom({
           handRaiseBufferRef.current.push({
             participantId: evt.id,
             raised: evt.handRaised > 0,
+            atEpochMs: Date.now(),
           });
           scheduleHandRaiseFlush();
         });

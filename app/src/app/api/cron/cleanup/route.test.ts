@@ -38,6 +38,7 @@ vi.mock('@/lib/db', () => ({
     reaction: { deleteMany: vi.fn() },
     agendaItemReaction: { deleteMany: vi.fn() },
     eventAgendaItem: { deleteMany: vi.fn() },
+    liveAction: { deleteMany: vi.fn() },
     eventInvitation: { deleteMany: vi.fn() },
     eventModerator: { deleteMany: vi.fn() },
     recordingTrack: { deleteMany: vi.fn() },
@@ -96,6 +97,7 @@ const db = prisma as unknown as {
   reaction: { deleteMany: Mock };
   agendaItemReaction: { deleteMany: Mock };
   eventAgendaItem: { deleteMany: Mock };
+  liveAction: { deleteMany: Mock };
   eventInvitation: { deleteMany: Mock };
   eventModerator: { deleteMany: Mock };
   recordingTrack: { deleteMany: Mock };
@@ -466,6 +468,9 @@ describe('GET /api/cron/cleanup', () => {
     expect(db.agendaItemReaction.deleteMany).toHaveBeenCalledWith({
       where: { agendaItem: { eventId: 'evt-vecchio' } },
     });
+    // La cronologia della sala: risultati e parole del pubblico, oltre la
+    // retention non servono piu' alla post-produzione.
+    expect(db.liveAction.deleteMany).toHaveBeenCalledWith(byEvent);
   });
 
   it('fase 3: cancella le concessioni nominali di moderatore e relatore', async () => {

@@ -27,6 +27,7 @@ export const PURGED_BY_CLEANUP: Record<string, string> = {
   WordCloudRound: 'parole proposte da chi c’era',
   EventMaterial: 'materiali caricati per quell’occorrenza',
   EventAgendaItem: 'scaletta e reazioni collegate',
+  LiveAction: 'cronologia della sala: titoli, risultati e parole delle domande, ore delle azioni',
   EventReminder: 'promemoria programmati e loro invii',
   EventInvitation: 'nome, email cifrata, HMAC e token del link di registrazione precompilata',
   EventModerator: 'concessioni nominali: nome ed email cifrati piu’ un link di accesso durevole',

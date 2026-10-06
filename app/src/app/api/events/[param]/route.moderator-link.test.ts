@@ -34,6 +34,8 @@ vi.mock('@/lib/email/moderator-link', async (importOriginal) => ({
   ...(await importOriginal<Record<string, unknown>>()),
   sendPrimaryModeratorLink: vi.fn(async () => true),
 }));
+vi.mock('@/lib/live/actions', () => ({ recordLiveAction: vi.fn(), recordLiveActions: vi.fn() }));
+
 vi.mock('@/lib/db', () => ({
   prisma: {
     event: { findUnique: vi.fn(), update: vi.fn() },

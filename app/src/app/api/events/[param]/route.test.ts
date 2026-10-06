@@ -50,6 +50,8 @@ const { sessioni } = vi.hoisted(() => ({
 }));
 vi.mock('@/lib/events/call-sessions', () => sessioni);
 
+vi.mock('@/lib/live/actions', () => ({ recordLiveAction: vi.fn(), recordLiveActions: vi.fn() }));
+
 vi.mock('@/lib/db', () => ({
   prisma: {
     event: { findUnique: vi.fn(), update: vi.fn(), delete: vi.fn() },
@@ -61,6 +63,7 @@ vi.mock('@/lib/db', () => ({
 
 import { prisma } from '@/lib/db';
 import { AppError } from '@/lib/errors';
+import { recordLiveAction, recordLiveActions } from '@/lib/live/actions';
 
 import { DELETE, PUT } from './route';
 
@@ -286,6 +289,70 @@ describe('PUT /api/events/[param] — cambio di stato e sessioni di chiamata', (
       await conStato(attuale, { status: 'LIVE' });
       expect(datiScritti().status).toBe('LIVE');
     }
+  });
+});
+
+describe('PUT /api/events/[param] — cronologia della sala', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocked.event.update.mockImplementation(
+      async ({ data }: { data: Record<string, unknown> }) => ({ ...eventoEsistente(), ...data }),
+    );
+    mocked.$transaction.mockImplementation(async (fn: (tx: unknown) => unknown) => fn(prisma));
+  });
+
+  async function conEvento(attuale: Record<string, unknown>, corpo: Record<string, unknown>) {
+    const { verifyModeratorToken } = await import('@/lib/auth/moderator');
+    vi.mocked(verifyModeratorToken).mockResolvedValueOnce(
+      attuale as unknown as Awaited<ReturnType<typeof verifyModeratorToken>>,
+    );
+    mocked.event.update.mockImplementation(
+      async ({ data }: { data: Record<string, unknown> }) => ({ ...attuale, ...data }),
+    );
+    return PUT(richiesta(corpo), contesto as never);
+  }
+
+  it('una funzione accesa dalla sala registra quale e come', async () => {
+    const r = await conEvento(
+      { ...eventoEsistente('LIVE'), qaEnabled: false, wordCloudEnabled: true },
+      { qaEnabled: true, wordCloudEnabled: true },
+    );
+    expect(r.status).toBe(200);
+    // Solo quella cambiata davvero: la seconda era gia' accesa.
+    expect(recordLiveActions).toHaveBeenCalledWith([
+      {
+        eventId: EVENT_ID,
+        kind: 'feature.toggled',
+        actor: 'moderator',
+        data: { feature: 'qaEnabled', enabled: true },
+      },
+    ]);
+    expect(recordLiveAction).not.toHaveBeenCalled();
+  });
+
+  it('«Termina evento» registra la fine', async () => {
+    const r = await conEvento(eventoEsistente('LIVE'), { status: 'ENDED' });
+    expect(r.status).toBe(200);
+    expect(recordLiveAction).toHaveBeenCalledWith({
+      eventId: EVENT_ID,
+      kind: 'event.ended',
+      actor: 'moderator',
+    });
+    expect(recordLiveActions).toHaveBeenCalledWith([]);
+  });
+
+  it('un evento gia’ concluso non finisce una seconda volta', async () => {
+    await conEvento(eventoEsistente('ENDED'), { status: 'ENDED' });
+    expect(recordLiveAction).not.toHaveBeenCalled();
+  });
+
+  it('una modifica rifiutata non registra niente', async () => {
+    const { verifyModeratorToken } = await import('@/lib/auth/moderator');
+    vi.mocked(verifyModeratorToken).mockResolvedValueOnce(null);
+    const r = await PUT(richiesta({ status: 'ENDED', qaEnabled: true }), contesto as never);
+    expect(r.status).toBe(403);
+    expect(recordLiveAction).not.toHaveBeenCalled();
+    expect(recordLiveActions).not.toHaveBeenCalled();
   });
 });
 

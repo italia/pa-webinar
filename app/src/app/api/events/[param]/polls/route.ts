@@ -19,6 +19,7 @@ import {
 } from '@/lib/events/panel-read-access';
 import { getRedis } from '@/lib/redis';
 import { pokeLivePanel } from '@/lib/live-state/publish';
+import { recordLiveAction } from '@/lib/live/actions';
 import { createPollSchema } from '@/lib/validation/schemas';
 
 export const dynamic = 'force-dynamic';
@@ -187,6 +188,15 @@ export const POST = withErrorHandling(async (request, context) => {
 
   deleteCacheByPrefix(`polls:${event.id}`);
   pokeLivePanel(event.id, 'polls');
+
+  if (poll.status === 'OPEN') {
+    await recordLiveAction({
+      eventId: event.id,
+      kind: 'poll.opened',
+      actor: 'moderator',
+      data: { pollId: poll.id, question: poll.question, options: poll.options },
+    });
+  }
 
   return Response.json(
     {

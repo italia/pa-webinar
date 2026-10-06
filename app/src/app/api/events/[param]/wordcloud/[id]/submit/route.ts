@@ -10,10 +10,11 @@ import {
 import { prisma } from '@/lib/db';
 import { authorizePanelRead } from '@/lib/events/panel-read-access';
 import { pokeLivePanel } from '@/lib/live-state/publish';
+import { recordLiveAction } from '@/lib/live/actions';
 import { forgetWordcloudLite } from '@/lib/wordcloud/lite';
 import { submitWordCloudSchema } from '@/lib/validation/schemas';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
-import { isRoundExpired, normalizeWord } from '@/lib/wordcloud/normalize';
+import { countWordsByPerson, isRoundExpired, normalizeWord } from '@/lib/wordcloud/normalize';
 
 export const dynamic = 'force-dynamic';
 
@@ -42,7 +43,14 @@ export const POST = withErrorHandling(async (request, context) => {
 
   const round = await prisma.wordCloudRound.findUnique({
     where: { id: roundId },
-    select: { id: true, eventId: true, status: true, duration: true, createdAt: true },
+    select: {
+      id: true,
+      eventId: true,
+      prompt: true,
+      status: true,
+      duration: true,
+      createdAt: true,
+    },
   });
 
   if (!round || round.eventId !== event.id) {
@@ -64,6 +72,23 @@ export const POST = withErrorHandling(async (request, context) => {
     if (chiusi.count > 0) {
       forgetWordcloudLite(event.id);
       pokeLivePanel(event.id, 'wordcloud');
+      // Nella cronologia il giro si chiude allo scadere, con le parole piu'
+      // scritte (come la lettura in ../../route.ts).
+      const visibili = await prisma.wordCloudSubmission.findMany({
+        where: { roundId: round.id, hiddenAt: null },
+        select: { word: true, registrationId: true, guestId: true },
+      });
+      await recordLiveAction({
+        eventId: event.id,
+        kind: 'wordcloud.closed',
+        actor: 'system',
+        data: {
+          roundId: round.id,
+          prompt: round.prompt,
+          words: countWordsByPerson(visibili).slice(0, 15),
+        },
+        at: new Date(round.createdAt.getTime() + round.duration * 1000),
+      });
     }
     throw new ConflictError('Word cloud round has expired');
   }

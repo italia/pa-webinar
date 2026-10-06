@@ -21,9 +21,11 @@ vi.mock('@/lib/auth/moderator', () => ({
   isEventModerator: vi.fn(async (_e: unknown, token: string) => token === 'MOD'),
 }));
 vi.mock('@/lib/live-state/publish', () => ({ pokeLivePanel: vi.fn() }));
+vi.mock('@/lib/live/actions', () => ({ recordLiveAction: vi.fn(), recordLiveActions: vi.fn() }));
 
 import { prisma } from '@/lib/db';
 import { pokeLivePanel } from '@/lib/live-state/publish';
+import { recordLiveAction } from '@/lib/live/actions';
 
 import { DELETE } from './route';
 
@@ -93,5 +95,24 @@ describe('DELETE /api/events/[slug]/wordcloud/[id]/words', () => {
     mockedRound.mockResolvedValue({ id: ROUND_ID, eventId: 'altro' });
     expect((await DELETE(del('dati', 'MOD'), ctx())).status).toBe(404);
     expect(mockedHide).not.toHaveBeenCalled();
+  });
+});
+
+describe('DELETE words: cronologia della sala', () => {
+  it('registra quante righe ha tolto, senza la parola', async () => {
+    await DELETE(del('Brutta!', 'MOD'), ctx());
+    expect(recordLiveAction).toHaveBeenCalledWith({
+      eventId: EVENT_ID,
+      kind: 'wordcloud.word_removed',
+      actor: 'moderator',
+      data: { roundId: ROUND_ID, hidden: 3 },
+    });
+    expect(JSON.stringify(vi.mocked(recordLiveAction).mock.calls)).not.toContain('brutta');
+  });
+
+  it('niente da nascondere, o nessun permesso: niente in cronologia', async () => {
+    await DELETE(del('assente', 'MOD'), ctx());
+    await DELETE(del('brutta', 'ALTRO'), ctx());
+    expect(recordLiveAction).not.toHaveBeenCalled();
   });
 });

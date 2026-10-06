@@ -7,14 +7,22 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
  * quindi la sala intera arriva nello stesso secondo: scrive solo la prima
  * lettura che trova il giro ancora aperto.
  */
+const { tx } = vi.hoisted(() => ({
+  tx: {
+    $executeRaw: vi.fn(),
+    wordCloudRound: { updateMany: vi.fn(), create: vi.fn(), findMany: vi.fn(async (): Promise<unknown[]> => []) },
+  },
+}));
 vi.mock('@/lib/db', () => ({
   prisma: {
     event: { findUnique: vi.fn() },
     wordCloudRound: { findFirst: vi.fn(), updateMany: vi.fn() },
     registration: { findUnique: vi.fn() },
     eventModerator: { findUnique: vi.fn() },
+    $transaction: vi.fn(async (fn: (t: typeof tx) => unknown) => fn(tx)),
   },
 }));
+vi.mock('@/lib/live/actions', () => ({ recordLiveAction: vi.fn(), recordLiveActions: vi.fn() }));
 vi.mock('@/lib/cache', () => ({
   getCached: vi.fn(() => null),
   setCache: vi.fn(),
@@ -30,8 +38,9 @@ import { prisma } from '@/lib/db';
 import { hasJoinGrant } from '@/lib/events/join-grant';
 import { pokeLivePanel } from '@/lib/live-state/publish';
 import { deleteCache, getCached, setCache } from '@/lib/cache';
+import { recordLiveAction } from '@/lib/live/actions';
 
-import { GET } from './route';
+import { GET, POST } from './route';
 
 const mockedEvent = prisma.event.findUnique as unknown as ReturnType<typeof vi.fn>;
 const mockedRound = prisma.wordCloudRound.findFirst as unknown as ReturnType<typeof vi.fn>;
@@ -313,5 +322,162 @@ describe('GET ?lite=1 (il pallino sulla scheda)', () => {
     mockedUpdateMany.mockResolvedValue({ count: 1 });
     await GET(get({ Authorization: `Bearer ${PRIMARY_TOKEN}` }), ctx());
     expect(deleteCache).toHaveBeenCalledWith(`wordcloud-lite:${EVENT_ID}`);
+  });
+});
+
+describe('cronologia della sala', () => {
+  it('aprire una domanda la registra con testo e durata', async () => {
+    const creato = new Date('2026-10-01T10:00:00.000Z');
+    tx.$executeRaw.mockResolvedValue(1);
+    tx.wordCloudRound.updateMany.mockResolvedValue({ count: 0 });
+    tx.wordCloudRound.create.mockImplementation(async (args: { data: Record<string, unknown> }) => ({
+      id: 'round-nuovo',
+      status: 'OPEN',
+      createdAt: creato,
+      ...args.data,
+    }));
+    const res = await POST(
+      new Request(`https://webinar.gov.it/api/events/${SLUG}/wordcloud`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${PRIMARY_TOKEN}` },
+        body: JSON.stringify({ prompt: 'Una parola', duration: 60 }),
+      }) as unknown as NextRequest,
+      ctx(),
+    );
+    expect(res.status).toBe(201);
+    expect(recordLiveAction).toHaveBeenCalledWith({
+      eventId: EVENT_ID,
+      kind: 'wordcloud.opened',
+      actor: 'moderator',
+      data: { roundId: 'round-nuovo', prompt: 'Una parola', duration: 60 },
+    });
+  });
+
+  it('la domanda che la nuova chiude va in cronologia chiusa, con le sue parole', async () => {
+    const creata = new Date(Date.now() - 10 * 60_000);
+    tx.$executeRaw.mockResolvedValue(1);
+    tx.wordCloudRound.findMany.mockResolvedValueOnce([
+      {
+        id: 'round-vecchio',
+        prompt: 'Prima domanda',
+        duration: 60,
+        createdAt: creata,
+        submissions: [
+          { word: 'fiducia', registrationId: 'r1', guestId: null },
+          { word: 'Fiducia!', registrationId: null, guestId: 'g1' },
+        ],
+      },
+    ]);
+    tx.wordCloudRound.updateMany.mockResolvedValue({ count: 1 });
+    tx.wordCloudRound.create.mockImplementation(async (args: { data: Record<string, unknown> }) => ({
+      id: 'round-nuovo',
+      status: 'OPEN',
+      createdAt: new Date(),
+      ...args.data,
+    }));
+    await POST(
+      new Request(`https://webinar.gov.it/api/events/${SLUG}/wordcloud`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${PRIMARY_TOKEN}` },
+        body: JSON.stringify({ prompt: 'Seconda domanda', duration: 60 }),
+      }) as unknown as NextRequest,
+      ctx(),
+    );
+    const chiamate = vi.mocked(recordLiveAction).mock.calls.map((c) => c[0]);
+    expect(chiamate.map((c) => c.kind)).toEqual(['wordcloud.closed', 'wordcloud.opened']);
+    // Scaduta dopo un minuto e mai chiusa da una lettura: chiusa allo scadere.
+    expect(chiamate[0]?.at?.getTime()).toBe(creata.getTime() + 60_000);
+    expect(chiamate[0]?.data).toEqual({
+      roundId: 'round-vecchio',
+      prompt: 'Prima domanda',
+      words: [{ word: 'fiducia', count: 2 }],
+    });
+  });
+
+  it('senza moderazione non si apre e non si registra', async () => {
+    const res = await POST(
+      new Request(`https://webinar.gov.it/api/events/${SLUG}/wordcloud`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ALTRO' },
+        body: JSON.stringify({ prompt: 'Una parola', duration: 60 }),
+      }) as unknown as NextRequest,
+      ctx(),
+    );
+    expect(res.status).toBe(403);
+    expect(tx.wordCloudRound.create).not.toHaveBeenCalled();
+    expect(recordLiveAction).not.toHaveBeenCalled();
+  });
+
+  it('il giro chiuso allo scadere si registra all’ora di scadenza, con le parole visibili', async () => {
+    const creato = new Date(Date.now() - 61_000);
+    mockedRound.mockResolvedValue({
+      id: 'round-1',
+      prompt: 'Una parola',
+      status: 'OPEN',
+      duration: 60,
+      createdAt: creato,
+      closedAt: null,
+      submissions: [
+        { word: 'Futuro', guestId: 'g1', registrationId: null, hiddenAt: null },
+        { word: 'futuro', guestId: 'g2', registrationId: null, hiddenAt: null },
+        { word: 'brutta', guestId: 'g3', registrationId: null, hiddenAt: new Date() },
+      ],
+    });
+    await GET(get(), ctx());
+    expect(recordLiveAction).toHaveBeenCalledWith({
+      eventId: EVENT_ID,
+      kind: 'wordcloud.closed',
+      actor: 'system',
+      data: { roundId: 'round-1', prompt: 'Una parola', words: [{ word: 'futuro', count: 2 }] },
+      at: new Date(creato.getTime() + 60_000),
+    });
+  });
+
+  it('le parole registrate sono al massimo quindici', async () => {
+    mockedRound.mockResolvedValue({
+      id: 'round-1',
+      prompt: 'Una parola',
+      status: 'OPEN',
+      duration: 60,
+      createdAt: new Date(Date.now() - 61_000),
+      closedAt: null,
+      submissions: Array.from({ length: 20 }, (_, i) => ({
+        word: `parola${i}`,
+        guestId: 'g1',
+        registrationId: null,
+        hiddenAt: null,
+      })),
+    });
+    await GET(get(), ctx());
+    const dati = vi.mocked(recordLiveAction).mock.calls[0]?.[0].data as { words: unknown[] };
+    expect(dati.words).toHaveLength(15);
+  });
+
+  it('chi arriva dopo la chiusura, o trova il giro in corso, non registra niente', async () => {
+    mockedRound.mockResolvedValue({
+      id: 'round-3',
+      prompt: 'Una parola',
+      status: 'OPEN',
+      duration: 60,
+      createdAt: new Date(Date.now() - 61_000),
+      closedAt: null,
+      submissions: [],
+    });
+    mockedUpdateMany.mockResolvedValue({ count: 0 });
+    await GET(get(), ctx());
+    expect(recordLiveAction).not.toHaveBeenCalled();
+
+    mockedRound.mockResolvedValue({
+      id: 'round-2',
+      prompt: 'Una parola',
+      status: 'OPEN',
+      duration: 60,
+      createdAt: new Date(Date.now() - 10_000),
+      closedAt: null,
+      submissions: [],
+    });
+    mockedUpdateMany.mockResolvedValue({ count: 1 });
+    await GET(get(), ctx());
+    expect(recordLiveAction).not.toHaveBeenCalled();
   });
 });

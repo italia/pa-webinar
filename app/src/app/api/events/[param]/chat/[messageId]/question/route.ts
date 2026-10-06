@@ -30,6 +30,7 @@ import { senderColourKey } from '@/lib/chat/sender-key';
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { ForbiddenError, NotFoundError, RateLimitError, ValidationError } from '@/lib/errors';
+import { recordLiveAction } from '@/lib/live/actions';
 import { rateLimit } from '@/lib/rate-limit';
 
 export const dynamic = 'force-dynamic';
@@ -101,6 +102,17 @@ export const PATCH = withErrorHandling(async (request, context) => {
       moderatedBy: status ? `mod-${event.id}` : null,
     },
   });
+
+  // Cronologia: solo un cambio di stato vero, senza il testo della domanda.
+  const statoPrima = message.answeredAt ? 'ANSWERED' : message.dismissedAt ? 'DISMISSED' : null;
+  if (status !== statoPrima) {
+    await recordLiveAction({
+      eventId: event.id,
+      kind: 'chat.question.status',
+      actor: 'moderator',
+      data: { messageId: message.id, status },
+    });
+  }
 
   // L'envelope porta i campi VERI del messaggio, non segnaposto vuoti.
   //

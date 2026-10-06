@@ -10,6 +10,7 @@ import {
 import { deleteCacheByPrefix } from '@/lib/cache';
 import { prisma } from '@/lib/db';
 import { pokeLivePanel } from '@/lib/live-state/publish';
+import { recordLiveAction } from '@/lib/live/actions';
 import { updateQuestionSchema } from '@/lib/validation/schemas';
 import { isEventModerator } from '@/lib/auth/moderator';
 
@@ -80,6 +81,17 @@ export const PATCH = withErrorHandling(async (request, context) => {
 
   deleteCacheByPrefix(`qa:${event.id}:`);
   pokeLivePanel(event.id, 'qa');
+
+  // Cronologia: uno stato toccato o una risposta scritta. Mai i testi: la
+  // domanda e' del pubblico, e la cronologia la rilegge dalla sua tabella.
+  if (newStatus !== undefined || !!answerText) {
+    await recordLiveAction({
+      eventId: event.id,
+      kind: 'question.status',
+      actor: 'moderator',
+      data: { questionId: updated.id, status: updated.status, answered: !!answerText },
+    });
+  }
 
   return Response.json({
     id: updated.id,

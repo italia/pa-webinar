@@ -7,6 +7,7 @@ import {
 } from '@/lib/errors';
 import { prisma } from '@/lib/db';
 import { pokeLivePanel } from '@/lib/live-state/publish';
+import { recordLiveAction } from '@/lib/live/actions';
 import { createWordCloudRoundSchema } from '@/lib/validation/schemas';
 import { isEventModerator, extractModeratorToken } from '@/lib/auth/moderator';
 import { authorizePanelRead, PANEL_READ_EVENT_SELECT, type PanelReadEvent } from '@/lib/events/panel-read-access';
@@ -52,8 +53,30 @@ export const POST = withErrorHandling(async (request, context) => {
   // entrambe chiudono il vecchio e ne creano uno nuovo. Si serializza prendendo
   // il lucchetto sulla riga dell'evento: la seconda apertura aspetta la prima e
   // ne chiude il giro.
+  // Le domande ancora aperte che la nuova chiude: nella cronologia della sala
+  // ci vanno chiuse, con le loro parole, come una chiusura del moderatore.
+  let chiuseDallaNuova: Array<{
+    id: string;
+    prompt: string;
+    duration: number;
+    createdAt: Date;
+    submissions: Array<{ word: string; registrationId: string | null; guestId: string | null }>;
+  }> = [];
   const round = await prisma.$transaction(async (tx) => {
     await tx.$executeRaw`SELECT id FROM events WHERE id = ${event.id}::uuid FOR UPDATE`;
+    chiuseDallaNuova = await tx.wordCloudRound.findMany({
+      where: { eventId: event.id, status: 'OPEN' },
+      select: {
+        id: true,
+        prompt: true,
+        duration: true,
+        createdAt: true,
+        submissions: {
+          where: { hiddenAt: null },
+          select: { word: true, registrationId: true, guestId: true },
+        },
+      },
+    });
     await tx.wordCloudRound.updateMany({
       where: { eventId: event.id, status: 'OPEN' },
       data: { status: 'CLOSED', closedAt: new Date() },
@@ -69,6 +92,31 @@ export const POST = withErrorHandling(async (request, context) => {
 
   forgetWordcloudLite(event.id);
   pokeLivePanel(event.id, 'wordcloud');
+
+  const adesso = Date.now();
+  for (const vecchia of chiuseDallaNuova) {
+    // Scaduta e non ancora chiusa da una lettura: e' finita allo scadere.
+    const scadenza =
+      vecchia.duration > 0 ? vecchia.createdAt.getTime() + vecchia.duration * 1000 : Infinity;
+    await recordLiveAction({
+      eventId: event.id,
+      kind: 'wordcloud.closed',
+      actor: 'moderator',
+      at: new Date(Math.min(adesso, scadenza)),
+      data: {
+        roundId: vecchia.id,
+        prompt: vecchia.prompt,
+        words: countWordsByPerson(vecchia.submissions).slice(0, 15),
+      },
+    });
+  }
+
+  await recordLiveAction({
+    eventId: event.id,
+    kind: 'wordcloud.opened',
+    actor: 'moderator',
+    data: { roundId: round.id, prompt: round.prompt, duration: round.duration },
+  });
 
   return Response.json(
     {
@@ -144,6 +192,13 @@ export const GET = withErrorHandling(async (request, context) => {
     return Response.json({ active: false });
   }
 
+  // Aggregate word counts
+  // Si contano le PERSONE per parola, non gli invii: anche le righe salvate
+  // prima della regola «una volta per parola» non gonfiano niente. Le parole
+  // tolte dal moderatore non ci sono.
+  const visibili = round.submissions.filter((s) => !s.hiddenAt);
+  const words = countWordsByPerson(visibili);
+
   // Auto-close if duration exceeded
   if (round.status === 'OPEN') {
     if (isRoundExpired(round)) {
@@ -162,16 +217,18 @@ export const GET = withErrorHandling(async (request, context) => {
       if (chiusi.count > 0) {
         forgetWordcloudLite(event.id);
         pokeLivePanel(event.id, 'wordcloud');
+        // Nella cronologia il giro si chiude allo scadere, non alla lettura
+        // che se ne accorge.
+        await recordLiveAction({
+          eventId: event.id,
+          kind: 'wordcloud.closed',
+          actor: 'system',
+          data: { roundId: round.id, prompt: round.prompt, words: words.slice(0, 15) },
+          at: new Date(round.createdAt.getTime() + round.duration * 1000),
+        });
       }
     }
   }
-
-  // Aggregate word counts
-  // Si contano le PERSONE per parola, non gli invii: anche le righe salvate
-  // prima della regola «una volta per parola» non gonfiano niente. Le parole
-  // tolte dal moderatore non ci sono.
-  const visibili = round.submissions.filter((s) => !s.hiddenAt);
-  const words = countWordsByPerson(visibili);
 
   return Response.json({
     active: round.status === 'OPEN',

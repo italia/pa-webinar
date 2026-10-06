@@ -56,6 +56,7 @@ export const NOT_DUPLICATED_EVENT_RELATIONS: Record<string, string> = {
   chatMessages: 'conversazione di quell’evento (e dati personali cifrati)',
   liveReactions: 'reazioni di quell’evento',
   wordCloudRounds: 'giri di word cloud con le parole di chi c’era',
+  liveActions: 'cronologia della sala dell’occorrenza che si e’ svolta',
   feedback: 'giudizi su quell’evento',
   callSessions: 'sessioni della call che si è svolta',
   gdprAuditLogs: 'registro delle cancellazioni: appartiene alla riga che le ha subite',

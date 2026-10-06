@@ -802,10 +802,20 @@ export default function LiveEventClient({
     };
   }, []);
 
+  // Per la cronologia della sala: quando questo browser e' entrato nella
+  // chiamata, l'ultimo stato della registrazione che ha visto, e se l'avvio
+  // l'ha chiesto lui. Il primo avviso dopo l'ingresso dice com'era gia' la
+  // registrazione, non che e' cambiata, a meno che a chiederla sia stato
+  // proprio questo browser (avvio automatico, o «Avvia» appena entrati).
+  const entratoAlleRef = useRef<number | null>(null);
+  const registrazioneVistaRef = useRef<boolean | null>(null);
+  const avvioChiestoQuiRef = useRef(false);
+
   // Shared "fire startRecording on Jitsi, with retry" — used both by the
   // moderator-confirmed prompt and by the autoStartRecording path which
   // bypasses the prompt entirely.
   const triggerRecording = useCallback((api: JitsiMeetExternalAPI) => {
+    avvioChiestoQuiRef.current = true;
     let attempts = 0;
     const tryStart = () => {
       try {
@@ -832,6 +842,8 @@ export default function LiveEventClient({
   );
 
   const handleJitsiReady = useCallback(() => {
+    entratoAlleRef.current = Date.now();
+    registrazioneVistaRef.current = null;
     // Open a CallSession server-side so every live event has a row in
     // `call_sessions` with start/end timestamps even when no recording
     // is ever triggered. The route is idempotent — repeated calls (mod
@@ -1011,9 +1023,37 @@ export default function LiveEventClient({
   const handleParticipantCountChanged = useCallback((count: number) => {
     setParticipantCount(count);
   }, []);
-  const handleRecordingStatusChanged = useCallback((recording: boolean) => {
-    setIsRecording(recording);
-  }, []);
+  const handleRecordingStatusChanged = useCallback(
+    (recording: boolean) => {
+      setIsRecording(recording);
+      // Avvio e arresto della registrazione il server non li vede passare:
+      // li riferisce chi modera, per la cronologia della sala. Il server
+      // scarta lo stesso cambio riferito da piu' moderatori.
+      const prima = registrazioneVistaRef.current;
+      registrazioneVistaRef.current = recording;
+      if (prima === recording) return;
+      // Il primo stato visto appena entrati e' com'era gia': non un cambio,
+      // salvo che l'avvio l'abbia chiesto questo browser.
+      const entrato = entratoAlleRef.current;
+      const chiestoQui = recording && avvioChiestoQuiRef.current;
+      if (recording) avvioChiestoQuiRef.current = false;
+      if (prima === null && !chiestoQui && entrato !== null && Date.now() - entrato < 10_000) return;
+      if (!isModerator || !token) return;
+      void fetch(`/api/events/${event.slug}/live-actions`, {
+        method: 'POST',
+        keepalive: true,
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({
+          kind: recording ? 'recording.started' : 'recording.stopped',
+          atEpochMs: Date.now(),
+          sentAt: Date.now(),
+        }),
+      }).catch((err: unknown) => {
+        console.warn('[live] cronologia: registrazione non riferita', err);
+      });
+    },
+    [isModerator, token, event.slug],
+  );
   const handleApiReady = useCallback((api: JitsiMeetExternalAPI) => {
     setJitsiApi(api);
   }, []);

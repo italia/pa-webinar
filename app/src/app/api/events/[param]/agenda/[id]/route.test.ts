@@ -8,7 +8,12 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const { tx } = vi.hoisted(() => ({
   tx: {
     $executeRaw: vi.fn(),
-    eventAgendaItem: { updateMany: vi.fn(), update: vi.fn(), findUnique: vi.fn() },
+    eventAgendaItem: {
+      updateMany: vi.fn(),
+      update: vi.fn(),
+      findUnique: vi.fn(),
+      findMany: vi.fn(),
+    },
   },
 }));
 
@@ -26,12 +31,14 @@ vi.mock('@/lib/auth/moderator', () => ({
   ),
 }));
 vi.mock('@/lib/live-state/publish', () => ({ pokeLivePanel: vi.fn() }));
+vi.mock('@/lib/live/actions', () => ({ recordLiveAction: vi.fn(), recordLiveActions: vi.fn() }));
 
 const EVENT_ID = '55555555-5555-4555-8555-555555555555';
 const ITEM_ID = '77777777-7777-4777-8777-777777777777';
 
 import { prisma } from '@/lib/db';
 import { pokeLivePanel } from '@/lib/live-state/publish';
+import { recordLiveAction, recordLiveActions } from '@/lib/live/actions';
 
 import { PATCH } from './route';
 
@@ -49,9 +56,11 @@ beforeEach(() => {
   mockedFind.mockResolvedValue({ id: ITEM_ID, eventId: EVENT_ID });
   tx.eventAgendaItem.updateMany.mockResolvedValue({ count: 1 });
   tx.eventAgendaItem.findUnique.mockResolvedValue({ status: 'PENDING' });
+  tx.eventAgendaItem.findMany.mockResolvedValue([]);
   tx.$executeRaw.mockResolvedValue(1);
   tx.eventAgendaItem.update.mockImplementation(async (args: { data: Record<string, unknown> }) => ({
     id: ITEM_ID,
+    label: 'Apertura',
     ...args.data,
   }));
 });
@@ -121,5 +130,67 @@ describe('PATCH /api/events/[slug]/agenda/[id]', () => {
     const res = await PATCH(patch({ status: 'CURRENT' }, 'ALTRO'), ctx());
     expect(res.status).toBe(403);
     expect(tx.eventAgendaItem.update).not.toHaveBeenCalled();
+    expect(recordLiveAction).not.toHaveBeenCalled();
+    expect(recordLiveActions).not.toHaveBeenCalled();
+  });
+});
+
+describe('PATCH agenda: cronologia della sala', () => {
+  const PRIMA = '88888888-8888-4888-8888-888888888888';
+
+  it('avviare un argomento registra il precedente come discusso e il nuovo in corso', async () => {
+    tx.eventAgendaItem.findMany.mockResolvedValue([{ id: PRIMA, label: 'Saluti' }]);
+    await PATCH(patch({ status: 'CURRENT' }), ctx());
+    // Gli argomenti da chiudere si leggono con la stessa condizione, prima di chiuderli.
+    expect(tx.eventAgendaItem.findMany).toHaveBeenCalledWith({
+      where: { eventId: EVENT_ID, status: 'CURRENT', id: { not: ITEM_ID } },
+      select: { id: true, label: true },
+    });
+    expect(tx.eventAgendaItem.findMany.mock.invocationCallOrder[0]).toBeLessThan(
+      tx.eventAgendaItem.updateMany.mock.invocationCallOrder[0]!,
+    );
+    expect(recordLiveActions).toHaveBeenCalledWith([
+      {
+        eventId: EVENT_ID,
+        kind: 'agenda.topic',
+        actor: 'moderator',
+        data: { itemId: PRIMA, label: 'Saluti', status: 'DONE' },
+        at: expect.any(Date),
+      },
+    ]);
+    expect(recordLiveAction).toHaveBeenCalledWith({
+      eventId: EVENT_ID,
+      kind: 'agenda.topic',
+      actor: 'moderator',
+      data: { itemId: ITEM_ID, label: 'Apertura', status: 'CURRENT' },
+      at: expect.any(Date),
+    });
+    // Nella cronologia il nuovo argomento viene dopo quello chiuso.
+    const chiuso = vi.mocked(recordLiveActions).mock.calls[0]?.[0]?.[0]?.at as Date;
+    const avviato = vi.mocked(recordLiveAction).mock.calls[0]?.[0]?.at as Date;
+    expect(avviato.getTime()).toBeGreaterThan(chiuso.getTime());
+  });
+
+  it('riavviare quello gia’ in corso non registra niente', async () => {
+    tx.eventAgendaItem.findUnique.mockResolvedValue({ status: 'CURRENT' });
+    await PATCH(patch({ status: 'CURRENT' }), ctx());
+    expect(recordLiveAction).not.toHaveBeenCalled();
+    expect(recordLiveActions).toHaveBeenCalledWith([]);
+  });
+
+  it('cambiare solo il titolo non registra niente', async () => {
+    await PATCH(patch({ label: 'Nuovo titolo' }), ctx());
+    expect(recordLiveAction).not.toHaveBeenCalled();
+    expect(recordLiveActions).not.toHaveBeenCalled();
+  });
+
+  it('saltare registra solo l’argomento toccato', async () => {
+    await PATCH(patch({ status: 'SKIPPED' }), ctx());
+    expect(recordLiveAction).toHaveBeenCalledWith(
+      expect.objectContaining({
+        kind: 'agenda.topic',
+        data: { itemId: ITEM_ID, label: 'Apertura', status: 'SKIPPED' },
+      }),
+    );
   });
 });

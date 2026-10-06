@@ -17,12 +17,14 @@ vi.mock('@/lib/db', () => ({
 }));
 vi.mock('@/lib/cache', () => ({ deleteCacheByPrefix: vi.fn() }));
 vi.mock('@/lib/live-state/publish', () => ({ pokeLivePanel: vi.fn() }));
+vi.mock('@/lib/live/actions', () => ({ recordLiveAction: vi.fn(), recordLiveActions: vi.fn() }));
 vi.mock('@/lib/auth/moderator', () => ({
   isEventModerator: vi.fn(async (_e: unknown, token: string) => token === 'token-moderatore'),
 }));
 
 import { prisma } from '@/lib/db';
 import { pokeLivePanel } from '@/lib/live-state/publish';
+import { recordLiveAction } from '@/lib/live/actions';
 
 import { PATCH } from './route';
 
@@ -150,5 +152,45 @@ describe('PATCH /api/events/[param]/questions/[id]', () => {
 
     expect(res.status).toBe(422);
     expect(mocked.question.update).not.toHaveBeenCalled();
+  });
+});
+
+describe('PATCH questions/[id]: cronologia della sala', () => {
+  it('una risposta scritta registra stato e «risposta data», senza testi', async () => {
+    domanda('PENDING');
+    await PATCH(richiesta({ answer: 'A novembre.' }), contesto as never);
+    expect(recordLiveAction).toHaveBeenCalledWith({
+      eventId: EVENT_ID,
+      kind: 'question.status',
+      actor: 'moderator',
+      data: { questionId: QID, status: 'ANSWERED', answered: true },
+    });
+    const tutto = JSON.stringify(vi.mocked(recordLiveAction).mock.calls);
+    expect(tutto).not.toContain('A novembre');
+    expect(tutto).not.toContain('bando');
+  });
+
+  it('il solo stato registra lo stato, senza risposta', async () => {
+    domanda('PENDING');
+    await PATCH(richiesta({ status: 'HIGHLIGHTED' }), contesto as never);
+    expect(recordLiveAction).toHaveBeenCalledWith(
+      expect.objectContaining({
+        kind: 'question.status',
+        data: { questionId: QID, status: 'HIGHLIGHTED', answered: false },
+      }),
+    );
+  });
+
+  it('togliere la risposta senza toccare lo stato non registra niente', async () => {
+    domanda('ANSWERED', 'Vecchia risposta');
+    await PATCH(richiesta({ answer: '' }), contesto as never);
+    expect(recordLiveAction).not.toHaveBeenCalled();
+  });
+
+  it('chi non conduce, o una richiesta vuota: niente in cronologia', async () => {
+    domanda('PENDING');
+    await PATCH(richiesta({ status: 'ANSWERED' }, 'token-altrui'), contesto as never);
+    await PATCH(richiesta({}), contesto as never);
+    expect(recordLiveAction).not.toHaveBeenCalled();
   });
 });

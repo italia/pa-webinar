@@ -323,6 +323,13 @@ export const GET = withErrorHandling(async (request) => {
           where: { eventId: evt.id },
         });
 
+        // La cronologia della sala: niente nomi, ma risultati dei sondaggi e
+        // parole del pubblico, e le ore di ogni azione. Serve alla
+        // post-produzione, non oltre la retention dell'evento.
+        const liveActionsDeleted = await tx.liveAction.deleteMany({
+          where: { eventId: evt.id },
+        });
+
         // Inviti: nome, email cifrata, HMAC dell'email e il token del link di
         // registrazione precompilata. Stessa trappola della cascade, e un
         // invito non accettato non ha piu' alcuna ragione di esistere quando
@@ -398,6 +405,7 @@ export const GET = withErrorHandling(async (request) => {
           reactions: reactionsDeleted.count,
           agendaReactions: agendaReactionsDeleted.count,
           agendaItems: agendaItemsDeleted.count,
+          liveActions: liveActionsDeleted.count,
           invitations: invitationsDeleted.count,
           moderatorGrants: moderatorGrantsDeleted.count,
           recordingTracks: recordingTracksDeleted.count,

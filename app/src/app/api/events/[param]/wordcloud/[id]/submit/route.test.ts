@@ -32,6 +32,7 @@ vi.mock('@/lib/cache', () => ({
   deleteCacheByPrefix: vi.fn(),
 }));
 vi.mock('@/lib/live-state/publish', () => ({ pokeLivePanel: vi.fn() }));
+vi.mock('@/lib/live/actions', () => ({ recordLiveAction: vi.fn(), recordLiveActions: vi.fn() }));
 vi.mock('@/lib/events/join-grant', () => ({ hasJoinGrant: vi.fn(async () => false) }));
 const { siteSettings } = vi.hoisted(() => ({ siteSettings: { guestAccessEnabled: true } }));
 vi.mock('@/lib/settings', () => ({ getSettings: async () => siteSettings }));
@@ -39,6 +40,7 @@ vi.mock('@/lib/settings', () => ({ getSettings: async () => siteSettings }));
 import { prisma } from '@/lib/db';
 import { hasJoinGrant } from '@/lib/events/join-grant';
 import { pokeLivePanel } from '@/lib/live-state/publish';
+import { recordLiveAction } from '@/lib/live/actions';
 
 import { POST } from './route';
 
@@ -310,14 +312,50 @@ describe('POST /api/events/[slug]/wordcloud/[id]/submit — perché una parola n
 });
 
 describe('POST /api/events/[slug]/wordcloud/[id]/submit — giro scaduto', () => {
+  const creato = new Date(Date.now() - 61_000);
   beforeEach(() => {
     mockedRound.mockResolvedValue({
       id: ROUND_ID,
       eventId: EVENT_ID,
+      prompt: 'Una parola',
       status: 'OPEN',
       duration: 60,
-      createdAt: new Date(Date.now() - 61_000),
+      createdAt: creato,
     });
+  });
+
+  it('chi lo chiude lo registra all’ora di scadenza, con le parole visibili', async () => {
+    mockedFindWord.mockResolvedValue([
+      { word: 'futuro', guestId: 'g1', registrationId: null },
+      { word: 'Futuro', guestId: null, registrationId: 'r1' },
+      { word: 'dati', guestId: 'g1', registrationId: null },
+    ]);
+    const res = await POST(submit({ word: 'tardi', guestId: nuovoOspite() }), ctx());
+    expect(res.status).toBe(409);
+    expect(mockedFindWord).toHaveBeenCalledWith({
+      where: { roundId: ROUND_ID, hiddenAt: null },
+      select: { word: true, registrationId: true, guestId: true },
+    });
+    expect(recordLiveAction).toHaveBeenCalledWith({
+      eventId: EVENT_ID,
+      kind: 'wordcloud.closed',
+      actor: 'system',
+      data: {
+        roundId: ROUND_ID,
+        prompt: 'Una parola',
+        words: [
+          { word: 'futuro', count: 2 },
+          { word: 'dati', count: 1 },
+        ],
+      },
+      at: new Date(creato.getTime() + 60_000),
+    });
+  });
+
+  it('se un altro l’ha già chiuso non si registra una seconda volta', async () => {
+    mockedCloseRound.mockResolvedValue({ count: 0 });
+    await POST(submit({ word: 'tardi', guestId: nuovoOspite() }), ctx());
+    expect(recordLiveAction).not.toHaveBeenCalled();
   });
 
   it('lo chiude, respinge la parola e lo dice alla sala', async () => {

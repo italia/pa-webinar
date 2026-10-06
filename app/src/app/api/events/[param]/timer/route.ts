@@ -10,6 +10,7 @@ import { prisma } from '@/lib/db';
 import { timerActionSchema } from '@/lib/validation/schemas';
 import { isEventModerator, extractModeratorToken } from '@/lib/auth/moderator';
 import { getCached, setCache } from '@/lib/cache';
+import { recordLiveAction } from '@/lib/live/actions';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
 
 export const dynamic = 'force-dynamic';
@@ -64,6 +65,10 @@ export const POST = withErrorHandling(async (request, context) => {
   const { action, duration, visible } = parsed.data;
   const key = getTimerKey(event.id);
   let state = getCached<TimerState>(key);
+  // Il conto alla rovescia stava correndo? Pausa e azzeramento finiscono
+  // nella cronologia solo se fermano davvero qualcosa.
+  const correvaPrima =
+    !!state && state.active && !!state.startedAt && !state.pausedAt && resolveRemaining(state) > 0;
 
   const TTL = 7200_000;
 
@@ -116,6 +121,17 @@ export const POST = withErrorHandling(async (request, context) => {
 
   if (state) {
     setCache(key, state, TTL);
+  }
+
+  if (action === 'start' && state) {
+    await recordLiveAction({
+      eventId: event.id,
+      kind: 'timer.started',
+      actor: 'moderator',
+      data: { durationSec: state.duration },
+    });
+  } else if ((action === 'pause' || action === 'reset') && correvaPrima) {
+    await recordLiveAction({ eventId: event.id, kind: 'timer.stopped', actor: 'moderator' });
   }
 
   const remaining = state ? resolveRemaining(state) : 0;

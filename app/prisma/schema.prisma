@@ -246,6 +246,7 @@ model Event {
   gdprAuditLogs   GdprAuditLog[]
   feedback        EventFeedback[]
   wordCloudRounds WordCloudRound[]
+  liveActions     LiveAction[]
   callSessions    CallSession[]
   additionalMods  EventModerator[]
   organizers      EventOrganizer[]
@@ -2038,6 +2039,10 @@ model Recording {
   // postprod-retention cron. Null = follow event retention.
   retentionUntil DateTime? @map("retention_until")
 
+  // Ora assoluta (server) del primo fotogramma registrato: lo zero dei tempi
+  // della trascrizione. La manda il registratore multitraccia col manifest;
+  // senza, la cronologia della sala usa createdAt come zero approssimato.
+  mediaStartedAt DateTime? @map("media_started_at")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
@@ -2365,4 +2370,28 @@ model MultitrackConsent {
   @@index([eventId])
   @@index([registrationId])
   @@map("multitrack_consents")
+}
+
+// La cronologia della sala: un'azione dal vivo per riga (un argomento della
+// scaletta avviato, un sondaggio chiuso, una funzione accesa, una mano
+// alzata...), con l'ora del server come unica base dei tempi. La
+// post-produzione la legge accanto alla trascrizione (lib/postprod/
+// live-timeline.ts). Scrive lib/live/actions.ts.
+model LiveAction {
+  id      String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  eventId String   @map("event_id") @db.Uuid
+  // Ora del server dell'azione: la base dei tempi comune a tutta la sala.
+  at      DateTime @default(now()) @map("at")
+  kind    String   @db.VarChar(64)
+  // Il ruolo di chi l'ha fatta, mai la persona: moderator, speaker,
+  // participant, guest, system.
+  actor   String?  @db.VarChar(16)
+  // I dettagli: id e testi di chi conduce (argomenti, domande dei sondaggi),
+  // conteggi; mai nomi o dati di chi partecipa.
+  data    Json     @default("{}") @db.JsonB
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@index([eventId, at])
+  @@map("live_actions")
 }

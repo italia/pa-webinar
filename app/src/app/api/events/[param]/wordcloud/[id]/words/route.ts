@@ -13,6 +13,7 @@ import { extractModeratorToken, isEventModerator } from '@/lib/auth/moderator';
 import { prisma } from '@/lib/db';
 import { ForbiddenError, NotFoundError, UnauthorizedError, ValidationError } from '@/lib/errors';
 import { pokeLivePanel } from '@/lib/live-state/publish';
+import { recordLiveAction } from '@/lib/live/actions';
 import { normalizeWord } from '@/lib/wordcloud/normalize';
 
 export const dynamic = 'force-dynamic';
@@ -63,7 +64,16 @@ export const DELETE = withErrorHandling(async (request, context) => {
         })
       : { count: 0 };
 
-  if (tolte.count > 0) pokeLivePanel(event.id, 'wordcloud');
+  if (tolte.count > 0) {
+    pokeLivePanel(event.id, 'wordcloud');
+    // Nella cronologia solo quante righe: la parola e' scritta dal pubblico.
+    await recordLiveAction({
+      eventId: event.id,
+      kind: 'wordcloud.word_removed',
+      actor: 'moderator',
+      data: { roundId: round.id, hidden: tolte.count },
+    });
+  }
 
   return Response.json({ word: parola, hidden: tolte.count });
 });

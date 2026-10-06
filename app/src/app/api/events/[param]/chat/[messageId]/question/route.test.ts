@@ -17,6 +17,7 @@ vi.mock('@/lib/db', () => ({
 }));
 vi.mock('@/lib/crypto/pii', () => ({ tryDecryptPII: (v: string) => v }));
 vi.mock('@/lib/chat/pubsub', () => ({ publishChat: vi.fn() }));
+vi.mock('@/lib/live/actions', () => ({ recordLiveAction: vi.fn(), recordLiveActions: vi.fn() }));
 vi.mock('@/lib/auth/moderator', () => ({
   extractModeratorToken: (req: Request) =>
     req.headers.get('authorization')?.replace(/^Bearer\s+/i, '') ?? null,
@@ -27,6 +28,7 @@ import { prisma } from '@/lib/db';
 import { publishChat } from '@/lib/chat/pubsub';
 import { senderColourKey } from '@/lib/chat/sender-key';
 import { verifyModeratorToken } from '@/lib/auth/moderator';
+import { recordLiveAction } from '@/lib/live/actions';
 
 import { PATCH } from './route';
 
@@ -99,5 +101,70 @@ describe('PATCH /chat/[messageId]/question — published envelope', () => {
     // non la ritrova con uno SHA-256 non firmato dell'id.
     const unkeyed = createHash('sha256').update(GUEST_SENDER_ID).digest('hex').slice(0, 16);
     expect(envelope.senderKey).not.toBe(unkeyed);
+  });
+});
+
+describe('PATCH /chat/[messageId]/question — cronologia della sala', () => {
+  it('segnare una domanda come risposta registra id e stato, senza testi', async () => {
+    await PATCH(patchRequest('ANSWERED'), ctx);
+    expect(recordLiveAction).toHaveBeenCalledWith({
+      eventId: EVENT_ID,
+      kind: 'chat.question.status',
+      actor: 'moderator',
+      data: { messageId: MESSAGE_ID, status: 'ANSWERED' },
+    });
+    const tutto = JSON.stringify(vi.mocked(recordLiveAction).mock.calls);
+    expect(tutto).not.toContain('Anna');
+    expect(tutto).not.toContain('registrazione');
+  });
+
+  it('riaprire una domanda scartata registra lo stato nullo', async () => {
+    mockedFind.mockResolvedValue({
+      id: MESSAGE_ID,
+      isQuestion: true,
+      hiddenAt: null,
+      answeredAt: null,
+      dismissedAt: new Date('2026-07-22T10:05:00.000Z'),
+      senderId: GUEST_SENDER_ID,
+      senderName: 'Anna',
+      isModerator: false,
+      text: 'Quando esce la registrazione?',
+      createdAt: new Date('2026-07-22T10:00:00.000Z'),
+    });
+    await PATCH(patchRequest(null), ctx);
+    expect(recordLiveAction).toHaveBeenCalledWith(
+      expect.objectContaining({ data: { messageId: MESSAGE_ID, status: null } }),
+    );
+  });
+
+  it('ri-segnare lo stesso stato non registra niente', async () => {
+    mockedFind.mockResolvedValue({
+      id: MESSAGE_ID,
+      isQuestion: true,
+      hiddenAt: null,
+      answeredAt: new Date('2026-07-22T10:05:00.000Z'),
+      dismissedAt: null,
+      senderId: GUEST_SENDER_ID,
+      senderName: 'Anna',
+      isModerator: false,
+      text: 'Quando esce la registrazione?',
+      createdAt: new Date('2026-07-22T10:00:00.000Z'),
+    });
+    await PATCH(patchRequest('ANSWERED'), ctx);
+    expect(recordLiveAction).not.toHaveBeenCalled();
+  });
+
+  it('senza moderazione, o su un messaggio che non è una domanda: niente', async () => {
+    mockedVerify.mockResolvedValueOnce(null);
+    expect((await PATCH(patchRequest('ANSWERED'), ctx)).status).toBe(403);
+    mockedFind.mockResolvedValueOnce({
+      id: MESSAGE_ID,
+      isQuestion: false,
+      hiddenAt: null,
+      answeredAt: null,
+      dismissedAt: null,
+    });
+    expect((await PATCH(patchRequest('ANSWERED'), ctx)).status).toBe(422);
+    expect(recordLiveAction).not.toHaveBeenCalled();
   });
 });

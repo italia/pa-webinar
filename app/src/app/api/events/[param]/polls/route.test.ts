@@ -16,13 +16,14 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 vi.mock('@/lib/db', () => ({
   prisma: {
     event: { findUnique: vi.fn() },
-    poll: { findMany: vi.fn() },
+    poll: { findMany: vi.fn(), create: vi.fn() },
     pollVote: { groupBy: vi.fn(), findMany: vi.fn() },
     registration: { findUnique: vi.fn() },
     eventModerator: { findUnique: vi.fn() },
   },
 }));
 vi.mock('@/lib/live-state/publish', () => ({ pokeLivePanel: vi.fn() }));
+vi.mock('@/lib/live/actions', () => ({ recordLiveAction: vi.fn(), recordLiveActions: vi.fn() }));
 vi.mock('@/lib/events/join-grant', () => ({ hasJoinGrant: vi.fn() }));
 const { siteSettings } = vi.hoisted(() => ({ siteSettings: { guestAccessEnabled: true } }));
 vi.mock('@/lib/settings', () => ({ getSettings: async () => siteSettings }));
@@ -37,8 +38,9 @@ vi.mock('@/lib/cache', () => ({
 
 import { prisma } from '@/lib/db';
 import { hasJoinGrant } from '@/lib/events/join-grant';
+import { recordLiveAction } from '@/lib/live/actions';
 
-import { GET } from './route';
+import { GET, POST } from './route';
 
 const mockedEvent = prisma.event.findUnique as unknown as ReturnType<typeof vi.fn>;
 const mockedPolls = prisma.poll.findMany as unknown as ReturnType<typeof vi.fn>;
@@ -192,5 +194,46 @@ describe('GET /api/events/[slug]/polls — chi vede il sondaggio', () => {
   it('un token che non risolve resta un errore, non un declassamento', async () => {
     const res = await GET(get({ Authorization: 'Bearer TOKEN_SCADUTO' }), ctx());
     expect(res.status).toBe(403);
+  });
+});
+
+describe('POST /api/events/[slug]/polls — cronologia della sala', () => {
+  const mockedCreate = prisma.poll.create as unknown as ReturnType<typeof vi.fn>;
+  const post = (body: unknown, token = PRIMARY_TOKEN) =>
+    new Request(`https://webinar.gov.it/api/events/${SLUG}/polls`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify(body),
+    }) as unknown as NextRequest;
+  const corpo = { question: 'Ti è stato utile?', options: ['Sì', 'No'] };
+
+  beforeEach(() => {
+    mockedCreate.mockImplementation(async (args: { data: Record<string, unknown> }) =>
+      pollRow({ ...args.data, id: 'poll-nuovo' }),
+    );
+  });
+
+  it('un sondaggio creato aperto si registra con domanda e opzioni', async () => {
+    const res = await POST(post(corpo), ctx());
+    expect(res.status).toBe(201);
+    expect(recordLiveAction).toHaveBeenCalledWith({
+      eventId: EVENT_ID,
+      kind: 'poll.opened',
+      actor: 'moderator',
+      data: { pollId: 'poll-nuovo', question: 'Ti è stato utile?', options: ['Sì', 'No'] },
+    });
+  });
+
+  it('senza moderazione non si crea e non si registra niente', async () => {
+    const res = await POST(post(corpo, 'ALTRO'), ctx());
+    expect(res.status).toBe(403);
+    expect(mockedCreate).not.toHaveBeenCalled();
+    expect(recordLiveAction).not.toHaveBeenCalled();
+  });
+
+  it('un sondaggio non valido non si registra', async () => {
+    const res = await POST(post({ question: 'Ti?', options: ['Sì'] }), ctx());
+    expect(res.status).toBe(422);
+    expect(recordLiveAction).not.toHaveBeenCalled();
   });
 });

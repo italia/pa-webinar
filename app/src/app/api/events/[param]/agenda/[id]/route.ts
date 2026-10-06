@@ -11,6 +11,7 @@ import { parseJsonBody, withErrorHandling } from '@/lib/api-handler';
 import { deleteCacheByPrefix } from '@/lib/cache';
 import { prisma } from '@/lib/db';
 import { pokeLivePanel } from '@/lib/live-state/publish';
+import { recordLiveAction, recordLiveActions } from '@/lib/live/actions';
 import { NotFoundError, UnauthorizedError, ForbiddenError } from '@/lib/errors';
 import { extractModeratorToken, verifyModeratorToken } from '@/lib/auth/moderator';
 import {
@@ -49,8 +50,9 @@ export const PATCH = withErrorHandling(async (request, context) => {
     body.status ?? (body.completed !== undefined ? statusFromCompleted(body.completed) : undefined);
   const now = new Date();
 
-  const updated = await prisma.$transaction(async (tx) => {
+  const { updated, giaInCorso, chiusi } = await prisma.$transaction(async (tx) => {
     let giaInCorso = false;
+    let chiusi: { id: string; label: string }[] = [];
     if (status === 'CURRENT') {
       // I cambi di stato della stessa scaletta in fila: sotto READ COMMITTED
       // due «prossimo argomento» contemporanei (due moderatori, o un doppio
@@ -62,12 +64,18 @@ export const PATCH = withErrorHandling(async (request, context) => {
       const attuale = await tx.eventAgendaItem.findUnique({ where: { id }, select: { status: true } });
       giaInCorso = attuale?.status === 'CURRENT';
       // Uno solo in corso: avviarne uno chiude il precedente come discusso.
+      // Quali si chiudono lo leggiamo prima, per la cronologia della sala.
+      const doveInCorso = { eventId, status: 'CURRENT' as const, id: { not: id } };
+      chiusi = await tx.eventAgendaItem.findMany({
+        where: doveInCorso,
+        select: { id: true, label: true },
+      });
       await tx.eventAgendaItem.updateMany({
-        where: { eventId, status: 'CURRENT', id: { not: id } },
+        where: doveInCorso,
         data: agendaStatusData('DONE', now),
       });
     }
-    return tx.eventAgendaItem.update({
+    const updated = await tx.eventAgendaItem.update({
       where: { id },
       data: {
         ...(body.label !== undefined && { label: body.label }),
@@ -86,9 +94,34 @@ export const PATCH = withErrorHandling(async (request, context) => {
         sortOrder: true,
       },
     });
+    return { updated, giaInCorso, chiusi };
   });
   deleteCacheByPrefix(`agenda-lite:${eventId}`);
   pokeLivePanel(eventId, 'agenda');
+
+  // Cronologia: prima gli argomenti chiusi dall'avvio, poi quello toccato
+  // (se era gia' in corso non e' cambiato niente).
+  if (status !== undefined) {
+    await recordLiveActions(
+      chiusi.map((c) => ({
+        eventId,
+        kind: 'agenda.topic' as const,
+        actor: 'moderator' as const,
+        data: { itemId: c.id, label: c.label, status: 'DONE' },
+        at: now,
+      })),
+    );
+    if (!(giaInCorso && status === 'CURRENT')) {
+      // Un millisecondo dopo: nella cronologia il nuovo segue i chiusi.
+      await recordLiveAction({
+        eventId,
+        kind: 'agenda.topic',
+        actor: 'moderator',
+        data: { itemId: updated.id, label: updated.label, status },
+        at: new Date(now.getTime() + 1),
+      });
+    }
+  }
 
   return Response.json(updated);
 });
