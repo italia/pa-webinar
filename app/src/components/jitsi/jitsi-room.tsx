@@ -101,6 +101,9 @@ type LoadState = 'loading' | 'ready' | 'error' | 'unreachable';
 
 const DEFAULT_WATERMARK_URL = '/images/default-watermark.svg';
 
+/** Dopo quanto, senza il segnale d'ingresso, si mostra comunque la chiamata. */
+const JOIN_REVEAL_AFTER_MS = 30_000;
+
 const POSITION_STYLES: Record<string, React.CSSProperties> = {
   'bottom-left': { bottom: 16, left: 16 },
   'bottom-right': { bottom: 16, right: 16 },
@@ -154,6 +157,20 @@ export default function JitsiRoom({
     setLoadState('loading');
     setAttempt((n) => n + 1);
   };
+
+  // La chiamata resta nascosta finche' Jitsi non dice «sei dentro», per non
+  // mostrarne il caricamento. Ma se quel segnale non arriva (token rifiutato,
+  // sala d'attesa di Jitsi, permessi del browser in sospeso) la copertura
+  // diventava uno spinner eterno sopra l'unica cosa che spiega il problema:
+  // dopo un'attesa ragionevole si scopre la chiamata cosi' com'e'.
+  const [revealedWhileLoading, setRevealedWhileLoading] = useState(false);
+  useEffect(() => {
+    setRevealedWhileLoading(false);
+    if (loadState !== 'loading') return;
+    const timer = setTimeout(() => setRevealedWhileLoading(true), JOIN_REVEAL_AFTER_MS);
+    return () => clearTimeout(timer);
+  }, [loadState, attempt]);
+  const frameVisible = loadState === 'ready' || (loadState === 'loading' && revealedWhileLoading);
 
   const onReadyRef = useRef(onReady);
   const onLeftRef = useRef(onLeft);
@@ -585,8 +602,14 @@ export default function JitsiRoom({
         // ADR-013 Fase 0 — cattura la timeline del dominant speaker. A ogni
         // cambio accumuliamo `{ atMs, participantId, displayName }`; l'invio
         // è batchato (debounce 10s) o al pagehide/leave.
+        // Il cambio di chi parla arriva identico a TUTTI i client: se lo
+        // mandassero tutti, ogni cambio diventerebbe una scrittura per persona
+        // in sala sulla stessa riga (lettura e riscrittura dell'intero log).
+        // Lo riferisce solo chi modera, che in sala c'e' per tutto l'evento:
+        // senza un moderatore in sala la cronologia non si registra.
         api.addListener('dominantSpeakerChanged', (evt: { id: string }) => {
           if (disposedRef.current || !eventSlugRef.current || !evt?.id) return;
+          if (role !== 'moderator') return;
           let name: string | undefined;
           try {
             name = api.getDisplayName?.(evt.id) || undefined;
@@ -693,7 +716,7 @@ export default function JitsiRoom({
         </div>
       ) : (
         <>
-          {loadState === 'loading' && (
+          {loadState === 'loading' && !revealedWhileLoading && (
             <div className="position-absolute top-50 start-50 translate-middle text-center">
               <Spinner active double />
               <p className="mt-3 text-white-50">{t('connecting')}</p>
@@ -741,7 +764,7 @@ export default function JitsiRoom({
         style={{
           width: '100%',
           height: '100%',
-          opacity: loadState === 'ready' ? 1 : 0,
+          opacity: frameVisible ? 1 : 0,
           transition: 'opacity 0.3s ease',
         }}
       />
