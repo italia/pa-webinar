@@ -3002,7 +3002,10 @@
       "uploadFailed": "Virhe tiedoston latauksessa",
       "quotaExceeded": "Tämä tapahtuma on saavuttanut ladattujen tiedostojen rajan ({maxFiles} tiedostoa, yhteensä {maxMb} MB): poista joitakin ladataksesi lisää",
       "uploadBusy": "Liian monta latausta juuri nyt: yritä uudelleen muutaman sekunnin kuluttua",
-      "deleteFailed": "Materiaalia ei voitu poistaa"
+      "deleteFailed": "Materiaalia ei voitu poistaa",
+      "updateFailed": "Materiaalin muutoksia ei voitu tallentaa",
+      "copyFailed": "Kopiointi epäonnistui: avaa linkki ja kopioi osoite selaimesta",
+      "editTitleMissing": "Otsikko ei voi olla tyhjä"
     },
     "addedByStaff": "Järjestäjien lisäämä",
     "dropzoneTitle": "Vedä tiedosto tähän",
@@ -3014,7 +3017,18 @@
     "open": "Avaa",
     "download": "Lataa",
     "emptyHintModerator": "Jaa osallistujille dioja, asiakirjoja tai hyödyllisiä linkkejä.",
-    "emptyHintPublic": "Tähän ilmestyvät juontajien jakamat materiaalit."
+    "emptyHintPublic": "Tähän ilmestyvät juontajien jakamat materiaalit.",
+    "filter": {
+      "label": "Suodata materiaaleja",
+      "all": "Kaikki",
+      "files": "Tiedostot",
+      "links": "Linkit"
+    },
+    "openCount": "{count, plural, one {avattu # kerran} other {avattu # kertaa}}",
+    "downloadCount": "{count, plural, one {# lataus} other {# latausta}}",
+    "copyLink": "Kopioi linkki",
+    "linkCopied": "Linkki kopioitu leikepöydälle",
+    "materialUpdated": "Materiaali päivitetty"
   },
   "reminders": {
     "title": "Muistutukset",

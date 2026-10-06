@@ -46,6 +46,18 @@ export const MATERIAL_ACCESS_EVENT_SELECT = {
 } as const;
 
 /**
+ * I campi per leggere l'elenco dal lato pubblico: quelli di
+ * `materialsWhereFor` più quelli di `isEventPubliclyVisible`
+ * (lib/events/visibility), che decide se l'evento ha una pagina pubblica.
+ */
+export const MATERIAL_LIST_EVENT_SELECT = {
+  ...MATERIAL_ACCESS_EVENT_SELECT,
+  eventType: true,
+  postEventPublic: true,
+  postEventPublicUntil: true,
+} as const;
+
+/**
  * Evento protetto da password: i materiali sono quelli della stanza (anche i
  * file caricati in diretta), e chi ha solo l'indirizzo non entra nella stanza,
  * quindi non li elenca — come per domande, sondaggi e nuvola
@@ -58,40 +70,80 @@ async function entraNellaStanza(
   event: { id: string; joinPasswordHash: string | null },
   token: string | null | undefined,
 ): Promise<boolean> {
-  if (token) {
-    const [registrazione, grant] = await Promise.all([
-      prisma.registration.findUnique({ where: { accessToken: token }, select: { eventId: true } }),
-      prisma.eventModerator.findUnique({
-        where: { token },
-        select: { eventId: true, revokedAt: true },
-      }),
-    ]);
-    if (registrazione?.eventId === event.id) return true;
-    if (grant && grant.eventId === event.id && grant.revokedAt === null) return true;
-  }
+  if (await isRoomToken(event, token)) return true;
   if (await hasJoinGrant(event.id)) return true;
   return (await readOwnedEventAccessToken(event.id)) !== null;
 }
 
 /**
- * Il `where` Prisma dei materiali che questo chiamante può vedere adesso:
- * nessun filtro per chi conduce, il filtro di fase per tutti gli altri. Per un
- * evento protetto da password, chi non può entrare nella stanza riceve 401.
+ * Se `token` è il token di sala di un iscritto o di un relatore (o di un
+ * co-moderatore) di QUESTO evento, non revocato. Il token moderatore primario
+ * non passa di qui: lo riconosce già `seesAllMaterials`.
  */
-export async function materialsWhereFor(
-  event: {
-    id: string;
-    moderatorToken: string;
-    status: string;
-    startsAt: Date;
-    endsAt: Date;
-    joinPasswordHash: string | null;
-  },
+export async function isRoomToken(
+  event: { id: string },
   token: string | null | undefined,
-): Promise<{ eventId: string; visibility?: { in: string[] } }> {
-  if (await seesAllMaterials(event, token)) return { eventId: event.id };
+): Promise<boolean> {
+  if (!token) return false;
+  const [registrazione, grant] = await Promise.all([
+    prisma.registration.findUnique({ where: { accessToken: token }, select: { eventId: true } }),
+    prisma.eventModerator.findUnique({
+      where: { token },
+      select: { eventId: true, revokedAt: true },
+    }),
+  ]);
+  if (registrazione?.eventId === event.id) return true;
+  return !!grant && grant.eventId === event.id && grant.revokedAt === null;
+}
+
+interface MaterialAccessEvent {
+  id: string;
+  moderatorToken: string;
+  status: string;
+  startsAt: Date;
+  endsAt: Date;
+  joinPasswordHash: string | null;
+}
+
+export interface MaterialAccess {
+  /** Il `where` Prisma dei materiali che il chiamante può vedere adesso. */
+  where: { eventId: string; visibility?: { in: string[] } };
+  /**
+   * Chi conduce la sala: vede ogni fase e, solo lui, i dati di chi conduce
+   * (la fase di ogni voce, quante volte è stata aperta).
+   */
+  seesAll: boolean;
+}
+
+/**
+ * Cosa vede questo chiamante dei materiali dell'evento: nessun filtro per chi
+ * conduce, il filtro di fase per tutti gli altri. Per un evento protetto da
+ * password, chi non può entrare nella stanza riceve 401.
+ *
+ * Una regola sola per l'elenco (GET .../materials, .../files) e per ciò che
+ * dall'elenco si raggiunge (il conteggio delle aperture): un materiale conta
+ * solo se il chiamante lo vedrebbe elencato.
+ */
+export async function materialAccessFor(
+  event: MaterialAccessEvent,
+  token: string | null | undefined,
+): Promise<MaterialAccess> {
+  if (await seesAllMaterials(event, token)) {
+    return { where: { eventId: event.id }, seesAll: true };
+  }
   if (event.joinPasswordHash && !(await entraNellaStanza(event, token))) {
     throw new UnauthorizedError('Token required');
   }
-  return { eventId: event.id, ...materialVisibilityWhere(materialPhase(event)) };
+  return {
+    where: { eventId: event.id, ...materialVisibilityWhere(materialPhase(event)) },
+    seesAll: false,
+  };
+}
+
+/** Il solo `where` di `materialAccessFor`. */
+export async function materialsWhereFor(
+  event: MaterialAccessEvent,
+  token: string | null | undefined,
+): Promise<{ eventId: string; visibility?: { in: string[] } }> {
+  return (await materialAccessFor(event, token)).where;
 }

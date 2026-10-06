@@ -3002,7 +3002,10 @@
       "uploadFailed": "Napaka pri nalaganju datoteke",
       "quotaExceeded": "Ta dogodek je dosegel omejitev naloženih datotek ({maxFiles} datotek, skupaj {maxMb} MB): odstranite nekaj datotek, da naložite nove",
       "uploadBusy": "Trenutno je preveč nalaganj: poskusite znova čez nekaj sekund",
-      "deleteFailed": "Gradiva ni bilo mogoče izbrisati"
+      "deleteFailed": "Gradiva ni bilo mogoče izbrisati",
+      "updateFailed": "Sprememb gradiva ni bilo mogoče shraniti",
+      "copyFailed": "Kopiranje ni uspelo: odprite povezavo in kopirajte naslov iz brskalnika",
+      "editTitleMissing": "Naslov ne sme biti prazen"
     },
     "addedByStaff": "Dodali organizatorji",
     "dropzoneTitle": "Povlecite datoteko sem",
@@ -3014,7 +3017,18 @@
     "open": "Odpri",
     "download": "Prenesi",
     "emptyHintModerator": "Z udeleženci delite prosojnice, dokumente ali uporabne povezave.",
-    "emptyHintPublic": "Tukaj se bodo prikazala gradiva, ki jih delijo voditelji."
+    "emptyHintPublic": "Tukaj se bodo prikazala gradiva, ki jih delijo voditelji.",
+    "filter": {
+      "label": "Filtriraj gradiva",
+      "all": "Vse",
+      "files": "Datoteke",
+      "links": "Povezave"
+    },
+    "openCount": "{count, plural, one {# odprtje} two {# odprtji} few {# odprtja} other {# odprtij}}",
+    "downloadCount": "{count, plural, one {# prenos} two {# prenosa} few {# prenosi} other {# prenosov}}",
+    "copyLink": "Kopiraj povezavo",
+    "linkCopied": "Povezava kopirana v odložišče",
+    "materialUpdated": "Gradivo posodobljeno"
   },
   "reminders": {
     "title": "Obvestila",

@@ -3002,7 +3002,10 @@
       "uploadFailed": "Erro ao carregar o ficheiro",
       "quotaExceeded": "Este evento atingiu o limite de ficheiros carregados ({maxFiles} ficheiros, {maxMb} MB no total): remova alguns para carregar outros",
       "uploadBusy": "Demasiados carregamentos neste momento: tente novamente dentro de alguns segundos",
-      "deleteFailed": "Não foi possível eliminar o material"
+      "deleteFailed": "Não foi possível eliminar o material",
+      "updateFailed": "Não foi possível guardar as alterações ao material",
+      "copyFailed": "Não foi possível copiar: abra a ligação e copie o endereço no navegador",
+      "editTitleMissing": "O título não pode ficar vazio"
     },
     "addedByStaff": "Adicionado pela organização",
     "dropzoneTitle": "Arraste o ficheiro para aqui",
@@ -3014,7 +3017,18 @@
     "open": "Abrir",
     "download": "Transferir",
     "emptyHintModerator": "Partilhe com a sala diapositivos, documentos ou ligações úteis.",
-    "emptyHintPublic": "Os materiais partilhados por quem conduz aparecerão aqui."
+    "emptyHintPublic": "Os materiais partilhados por quem conduz aparecerão aqui.",
+    "filter": {
+      "label": "Filtrar materiais",
+      "all": "Todos",
+      "files": "Ficheiros",
+      "links": "Ligações"
+    },
+    "openCount": "{count, plural, one {# abertura} other {# aberturas}}",
+    "downloadCount": "{count, plural, one {# transferência} other {# transferências}}",
+    "copyLink": "Copiar ligação",
+    "linkCopied": "Ligação copiada para a área de transferência",
+    "materialUpdated": "Material atualizado"
   },
   "reminders": {
     "title": "Notificações",

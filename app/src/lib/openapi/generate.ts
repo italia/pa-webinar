@@ -29,6 +29,8 @@ import {
   MATERIAL_FILE_MAX_BYTES,
   MATERIAL_FILES_PER_EVENT_MAX,
   MATERIAL_FILES_PER_EVENT_MAX_BYTES,
+  MATERIAL_VISIBILITIES,
+  updateMaterialRoomSchema,
 } from '@/lib/validation/materials';
 
 extendZodWithOpenApi(z);
@@ -343,7 +345,8 @@ registry.registerPath({
     'Public callers receive the materials whose visibility matches the current phase of the event: ' +
     'before the start only BEFORE; during the event ALWAYS and DURING; after it ALWAYS and AFTER ' +
     '(ALWAYS means in the live room and after the event, never before the start). ' +
-    'A moderator token (Bearer) receives every material; ' +
+    'A moderator token (Bearer) receives every material, each with its open count (`openCount`, ' +
+    'never sent to the public); ' +
     'an admin session does not widen this list (the admin API lists everything). Only the list ' +
     'is filtered: an uploaded file stays reachable at its URL.',
   request: { params: z.object({ param: z.string() }) },
@@ -369,8 +372,9 @@ registry.registerPath({
     'Multipart form with a `file` field and optional `title` (defaults to the file name) and ' +
     '`description`. Same types and size cap as the admin document upload: PDF, DOCX, PPTX, XLSX, TXT ' +
     `up to ${MATERIAL_FILE_MAX_BYTES / 1024 / 1024} MiB, checked against the file content. The file ` +
-    'is stored in the files storage and served from /api/assets; the material is created with ' +
-    `visibility ALWAYS. An event holds at most ${MATERIAL_FILES_PER_EVENT_MAX} uploaded files and ` +
+    'is stored in the files storage and served from /api/assets; the material is created with the ' +
+    'optional `visibility` field (ALWAYS when omitted). ' +
+    `An event holds at most ${MATERIAL_FILES_PER_EVENT_MAX} uploaded files and ` +
     `${MATERIAL_FILES_PER_EVENT_MAX_BYTES / 1024 / 1024} MiB in total.`,
   security: [{ [moderatorToken.name]: [] }],
   request: {
@@ -382,6 +386,7 @@ registry.registerPath({
             file: z.string().openapi({ format: 'binary' }),
             title: z.string().max(300).optional(),
             description: z.string().max(500).optional(),
+            visibility: z.enum(MATERIAL_VISIBILITIES).optional(),
           }),
         },
       },
@@ -397,6 +402,42 @@ registry.registerPath({
     429: { description: 'Too many uploads: per-minute limit, or the server is already receiving other files' },
     503: { description: 'Files storage not configured' },
   },
+});
+
+registry.registerPath({
+  method: 'patch',
+  path: '/api/events/{param}/materials/{id}',
+  tags: ['Materials'],
+  summary: 'Edit a material from the live room (moderator)',
+  description:
+    'Changes the title, description and/or visibility of a material; the address cannot be changed. ' +
+    'An empty description removes it. Same authorization as deleting a material.',
+  security: [{ [moderatorToken.name]: [] }],
+  request: {
+    params: z.object({ param: z.string(), id: z.string().uuid() }),
+    body: { content: { 'application/json': { schema: updateMaterialRoomSchema } } },
+  },
+  responses: {
+    200: { description: 'The updated material, with its open count' },
+    403: { description: 'Not a moderator token for this event' },
+    404: { description: 'Material not found for this event' },
+    422: { description: 'Validation failed' },
+  },
+});
+
+registry.registerPath({
+  method: 'post',
+  path: '/api/events/{param}/materials/{id}/opened',
+  tags: ['Materials'],
+  summary: 'Count an opening or download of a material',
+  description:
+    'Sent by the browser when a material link is clicked. Counted only if the caller could see the ' +
+    'material in the list (same rules as GET /materials; the room token as Bearer is optional), ' +
+    'at most once per caller and material every ten minutes. Requires Content-Type: application/json ' +
+    '(an empty object as body). Opens by moderators and staff are not counted. Always answers 204, ' +
+    'whether counted or not. The count is returned by GET /materials to moderators only.',
+  request: { params: z.object({ param: z.string(), id: z.string().uuid() }) },
+  responses: { 204: { description: 'Received' } },
 });
 
 registry.registerPath({

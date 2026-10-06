@@ -3002,7 +3002,10 @@
       "uploadFailed": "Chyba při nahrávání souboru",
       "quotaExceeded": "Tato akce dosáhla limitu nahraných souborů ({maxFiles} souborů, celkem {maxMb} MB): odstraňte některé, abyste mohli nahrát další",
       "uploadBusy": "Právě probíhá příliš mnoho nahrávání: zkuste to znovu za několik sekund",
-      "deleteFailed": "Materiál se nepodařilo smazat"
+      "deleteFailed": "Materiál se nepodařilo smazat",
+      "updateFailed": "Změny materiálu se nepodařilo uložit",
+      "copyFailed": "Kopírování se nezdařilo: otevřete odkaz a zkopírujte adresu z prohlížeče",
+      "editTitleMissing": "Název nesmí být prázdný"
     },
     "addedByStaff": "Přidali organizátoři",
     "dropzoneTitle": "Přetáhněte soubor sem",
@@ -3014,7 +3017,18 @@
     "open": "Otevřít",
     "download": "Stáhnout",
     "emptyHintModerator": "Sdílejte s účastníky snímky, dokumenty nebo užitečné odkazy.",
-    "emptyHintPublic": "Zde se zobrazí materiály sdílené moderátory."
+    "emptyHintPublic": "Zde se zobrazí materiály sdílené moderátory.",
+    "filter": {
+      "label": "Filtrovat materiály",
+      "all": "Vše",
+      "files": "Soubory",
+      "links": "Odkazy"
+    },
+    "openCount": "{count, plural, one {# otevření} few {# otevření} many {# otevření} other {# otevření}}",
+    "downloadCount": "{count, plural, one {# stažení} few {# stažení} many {# stažení} other {# stažení}}",
+    "copyLink": "Kopírovat odkaz",
+    "linkCopied": "Odkaz zkopírován do schránky",
+    "materialUpdated": "Materiál aktualizován"
   },
   "reminders": {
     "title": "Upozornění",

@@ -3002,7 +3002,10 @@
       "uploadFailed": "Eroare la încărcarea fișierului",
       "quotaExceeded": "Acest eveniment a atins limita de fișiere încărcate ({maxFiles} fișiere, {maxMb} MB în total): eliminați câteva pentru a încărca altele",
       "uploadBusy": "Prea multe încărcări în acest moment: încercați din nou în câteva secunde",
-      "deleteFailed": "Materialul nu a putut fi șters"
+      "deleteFailed": "Materialul nu a putut fi șters",
+      "updateFailed": "Modificările materialului nu au putut fi salvate",
+      "copyFailed": "Copierea nu a reușit: deschideți linkul și copiați adresa din browser",
+      "editTitleMissing": "Titlul nu poate fi gol"
     },
     "addedByStaff": "Adăugat de organizatori",
     "dropzoneTitle": "Trageți fișierul aici",
@@ -3014,7 +3017,18 @@
     "open": "Deschideți",
     "download": "Descărcați",
     "emptyHintModerator": "Distribuiți participanților diapozitive, documente sau linkuri utile.",
-    "emptyHintPublic": "Aici vor apărea materialele distribuite de moderatori."
+    "emptyHintPublic": "Aici vor apărea materialele distribuite de moderatori.",
+    "filter": {
+      "label": "Filtrați materialele",
+      "all": "Toate",
+      "files": "Fișiere",
+      "links": "Linkuri"
+    },
+    "openCount": "{count, plural, one {# deschidere} few {# deschideri} other {# de deschideri}}",
+    "downloadCount": "{count, plural, one {# descărcare} few {# descărcări} other {# de descărcări}}",
+    "copyLink": "Copiați linkul",
+    "linkCopied": "Linkul a fost copiat în clipboard",
+    "materialUpdated": "Material actualizat"
   },
   "reminders": {
     "title": "Notificări",

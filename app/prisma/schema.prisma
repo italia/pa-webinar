@@ -994,6 +994,10 @@ model EventMaterial {
 
   // Visibility control
   visibility String @default("ALWAYS") @map("visibility") // ALWAYS, BEFORE, DURING, AFTER
+  // Quante volte è stato aperto (link) o scaricato (file) da chi lo vedeva
+  // nell'elenco: conteggio indicativo, senza alcun dato su chi l'ha aperto.
+  // Lo leggono solo chi conduce la sala e lo staff.
+  openCount Int @default(0) @map("open_count")
 
   createdAt DateTime @default(now()) @map("created_at")
 

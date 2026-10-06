@@ -163,7 +163,7 @@ export default function PostEventTabs({
         <QATabContent questions={questions} />
       )}
       {activeTab === 'materials' && showMaterials && (
-        <MaterialList materials={materials} />
+        <MaterialList materials={materials} eventSlug={eventSlug} />
       )}
       {activeTab === 'polls' && showPolls && (
         <PollsTabContent polls={polls} />

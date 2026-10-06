@@ -1,19 +1,13 @@
 'use client';
 
 import { useState, useCallback, useEffect, useId, useRef, type FormEvent } from 'react';
-import { useTranslations, useFormatter } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import useSWR from 'swr';
 import { Button } from 'design-react-kit';
 
 import { Icon } from '@/components/ui/icon';
 import { useLivePush } from '@/hooks/use-live-state';
-import { materialAuthorName } from '@/lib/events/material-author';
-import {
-  MATERIAL_KIND_ICON,
-  MATERIAL_KIND_SHORT,
-  materialKind,
-  titleFromFileName,
-} from '@/lib/materials/file-kind';
+import { MATERIAL_KIND_ICON, materialKind, titleFromFileName } from '@/lib/materials/file-kind';
 import {
   MATERIAL_FILE_MAX_BYTES,
   MATERIAL_FILE_MIME_TYPES,
@@ -21,32 +15,17 @@ import {
   MATERIAL_FILES_PER_EVENT_MAX_BYTES,
 } from '@/lib/validation/materials';
 
+import MaterialItem, { MaterialVisibilitySelect, useMaterialFormat } from './material-item';
 import {
   checkMaterialFile,
   fetchMaterials,
+  markMaterialOpened,
   materialsListKey,
   uploadMaterialFile,
+  type MaterialPatch,
   type MaterialUploadError,
+  type RoomMaterial,
 } from './material-request';
-
-interface MaterialData {
-  id: string;
-  type: string;
-  title: string;
-  url: string;
-  description: string | null;
-  /** Peso in byte dei file caricati (type FILE); null per i link. */
-  fileSize?: number | null;
-  /** Tipo verificato al caricamento (FILE): decide icona ed etichetta. */
-  mimeType?: string | null;
-  /** ALWAYS | BEFORE | DURING | AFTER. Il server filtra già per il pubblico;
-   *  al moderatore, che vede tutto, serve a sapere cosa la sala NON vede. */
-  visibility?: string;
-  /** Il nome di chi l'ha aggiunto, o null quando la riga non ne porta uno
-   *  (lib/events/material-author): allora si mostra una dicitura tradotta. */
-  addedBy: string | null;
-  createdAt: string;
-}
 
 interface MaterialPanelProps {
   eventSlug: string;
@@ -56,50 +35,30 @@ interface MaterialPanelProps {
 
 type AddMode = 'link' | 'file';
 
+/** Quali voci mostra l'elenco: tutte, solo i file caricati, solo i link. */
+type MaterialFilter = 'all' | 'file' | 'link';
+
+/**
+ * Da quante voci in su, se ci sono sia file sia link, l'elenco offre il filtro:
+ * con poche voci basta scorrerle, e un filtro sarebbe solo rumore.
+ */
+const FILTER_MIN_ITEMS = 5;
+
+/** Quanto resta armato «Elimina» in attesa della conferma, come nel resto della sala. */
+const DELETE_ARM_MS = 4_000;
+
 /** I limiti in MB da mostrare nei testi, dalle stesse costanti del server. */
 const MAX_MB = Math.round(MATERIAL_FILE_MAX_BYTES / (1024 * 1024));
 const MAX_EVENT_MB = Math.round(MATERIAL_FILES_PER_EVENT_MAX_BYTES / (1024 * 1024));
 
 export default function MaterialPanel({ eventSlug, token, isModerator }: MaterialPanelProps) {
   const t = useTranslations('materials');
-  const tv = useTranslations('admin.materials');
-  const format = useFormatter();
-
-  // Quando il pubblico vede il materiale: chi conduce vede tutto l'elenco, e
-  // ogni voce porta la propria fase. Anche il predefinito (ALWAYS, «in sala e
-  // dopo l'evento»): prima dell'inizio il pubblico e i relatori non lo
-  // vedono, e senza etichetta chi controlla la sala in anticipo non avrebbe
-  // modo di accorgersene.
-  const visibilityLabel = (v: string | undefined): string | null => {
-    if (v === 'ALWAYS') return tv('visibilityAlways');
-    if (v === 'BEFORE') return tv('visibilityBefore');
-    if (v === 'DURING') return tv('visibilityDuring');
-    if (v === 'AFTER') return tv('visibilityAfter');
-    return null;
-  };
-
-  // «Aggiunto da …»: il nome quando la riga ne porta uno, altrimenti una
-  // dicitura nella lingua di chi legge (mai una parola fissa del database).
-  const authorLine = (addedBy: string | null): string => {
-    const name = materialAuthorName(addedBy);
-    return name ? t('addedBy', { name }) : t('addedByStaff');
-  };
-
-  const fileSizeLabel = (bytes: number): string =>
-    bytes >= 1024 * 1024
-      ? format.number(bytes / (1024 * 1024), {
-          style: 'unit',
-          unit: 'megabyte',
-          maximumFractionDigits: 1,
-        })
-      : format.number(Math.max(1, Math.round(bytes / 1024)), {
-          style: 'unit',
-          unit: 'kilobyte',
-        });
+  const tf = useTranslations('materials.filter');
+  const { fileSizeLabel } = useMaterialFormat();
 
   const pushLive = useLivePush();
 
-  const { data, mutate } = useSWR<{ materials: MaterialData[]; uploadsEnabled?: boolean }>(
+  const { data, mutate } = useSWR<{ materials: RoomMaterial[]; uploadsEnabled?: boolean }>(
     // Il token parte per chiunque ne abbia uno (./material-request): al
     // moderatore allarga l'elenco, a tutti apre quello di un evento protetto
     // da password. I contrassegni qui sotto restano di chi conduce.
@@ -119,6 +78,8 @@ export default function MaterialPanel({ eventSlug, token, isModerator }: Materia
   const [title, setTitle] = useState('');
   const [url, setUrl] = useState('');
   const [description, setDescription] = useState('');
+  // Quando il pubblico lo vede: il predefinito è quello del server.
+  const [visibility, setVisibility] = useState<string>('ALWAYS');
   const [file, setFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const fileHelpId = useId();
@@ -147,7 +108,72 @@ export default function MaterialPanel({ eventSlug, token, isModerator }: Materia
     formWasOpen.current = showForm;
   }, [showForm]);
 
+  // «Elimina» armato (un solo materiale alla volta): il primo clic arma, il
+  // secondo conferma; da solo si disarma dopo qualche secondo. Armato, lo si
+  // annuncia: il cambio di nome del pulsante che ha il fuoco la maggior parte
+  // dei lettori di schermo non lo legge.
+  const [armedDelete, setArmedDelete] = useState<string | null>(null);
+  const armedAnnouncementRef = useRef('');
+  useEffect(() => {
+    if (!armedDelete) return;
+    const timer = setTimeout(() => {
+      setArmedDelete(null);
+      // Disarmato, la richiesta di conferma non vale più: si toglie, e un
+      // nuovo armo dello stesso materiale si annuncia di nuovo.
+      setAnnouncement((cur) => (cur === armedAnnouncementRef.current ? '' : cur));
+    }, DELETE_ARM_MS);
+    return () => clearTimeout(timer);
+  }, [armedDelete]);
+  // Tolto un materiale, il fuoco non deve cadere in cima alla pagina con la
+  // sua riga: va al titolo della voce seguente, altrimenti al pulsante per
+  // aggiungere, altrimenti al titolo del pannello. Si sposta quando l'elenco
+  // riletto non contiene più la voce tolta.
+  const panelRef = useRef<HTMLDivElement>(null);
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  const focusAfterDeleteRef = useRef<{ deletedId: string; nextId: string | null } | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  // Il link appena copiato: la sua icona dice «fatto» per un attimo.
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+  useEffect(() => {
+    if (!copiedId) return;
+    const timer = setTimeout(() => setCopiedId(null), 2_000);
+    return () => clearTimeout(timer);
+  }, [copiedId]);
+  const [filter, setFilter] = useState<MaterialFilter>('all');
+
   const materials = data?.materials ?? [];
+
+  useEffect(() => {
+    const dopo = focusAfterDeleteRef.current;
+    if (!dopo || !data || data.materials.some((x) => x.id === dopo.deletedId)) return;
+    focusAfterDeleteRef.current = null;
+    const riga = dopo.nextId
+      ? Array.from(panelRef.current?.querySelectorAll<HTMLElement>('li[data-material-id]') ?? []).find(
+          (li) => li.dataset.materialId === dopo.nextId,
+        )
+      : undefined;
+    const titolo = riga?.querySelector<HTMLElement>('.material-item__title');
+    if (titolo) {
+      titolo.focus();
+    } else if (addButtonRef.current) {
+      addButtonRef.current.focus();
+    } else if (headingRef.current) {
+      // Il titolo non è un controllo: diventa raggiungibile solo per questo.
+      headingRef.current.setAttribute('tabindex', '-1');
+      headingRef.current.focus();
+    }
+  }, [data]);
+
+  const fileCount = materials.filter((m) => m.type === 'FILE').length;
+  const linkCount = materials.length - fileCount;
+  // Il filtro c'è solo quando serve; quando sparisce (un genere è rimasto
+  // senza voci) l'elenco torna completo, non resta filtrato su un vuoto.
+  const showFilter = fileCount > 0 && linkCount > 0 && materials.length >= FILTER_MIN_ITEMS;
+  const activeFilter: MaterialFilter = showFilter ? filter : 'all';
+  const shown =
+    activeFilter === 'all'
+      ? materials
+      : materials.filter((m) => (m.type === 'FILE') === (activeFilter === 'file'));
   // Il caricamento si offre solo se l'installazione ha uno storage per i file:
   // altrimenti il server risponderebbe 503 a ogni tentativo.
   const uploadsEnabled = data?.uploadsEnabled === true;
@@ -182,6 +208,7 @@ export default function MaterialPanel({ eventSlug, token, isModerator }: Materia
     setTitle('');
     setUrl('');
     setDescription('');
+    setVisibility('ALWAYS');
     setFile(null);
     if (fileInputRef.current) fileInputRef.current.value = '';
     setError('');
@@ -255,6 +282,7 @@ export default function MaterialPanel({ eventSlug, token, isModerator }: Materia
             file,
             title: title.trim(),
             description: description.trim(),
+            visibility,
           }, { onProgress: setProgress, signal: controller.signal });
           if (failed === 'aborted') {
             setAnnouncement(t('uploadCancelled'));
@@ -306,6 +334,7 @@ export default function MaterialPanel({ eventSlug, token, isModerator }: Materia
             title: title.trim(),
             url: url.trim(),
             description: description.trim() || undefined,
+            visibility,
           }),
         });
 
@@ -321,12 +350,11 @@ export default function MaterialPanel({ eventSlug, token, isModerator }: Materia
         setSubmitting(false);
       }
     },
-    [fileMode, file, title, url, description, eventSlug, token, t, materialAdded, uploadErrorMessage, mutate],
+    [fileMode, file, title, url, description, visibility, eventSlug, token, t, materialAdded, uploadErrorMessage, mutate],
   );
 
   const handleDelete = useCallback(
     async (materialId: string) => {
-      if (!confirm(t('confirmDelete'))) return;
       setListError('');
       setAnnouncement('');
 
@@ -337,14 +365,90 @@ export default function MaterialPanel({ eventSlug, token, isModerator }: Materia
         });
         // 404: l'ha già tolto qualcun altro (un altro moderatore, l'area
         // admin). Il risultato chiesto c'è: non è un errore.
-        if (res.ok || res.status === 404) setAnnouncement(t('materialDeleted'));
-        else setListError(t('errors.deleteFailed'));
+        if (res.ok || res.status === 404) {
+          setAnnouncement(t('materialDeleted'));
+        } else {
+          // La riga resta, e il fuoco con lei.
+          focusAfterDeleteRef.current = null;
+          setListError(t('errors.deleteFailed'));
+        }
       } catch {
+        focusAfterDeleteRef.current = null;
         setListError(t('errors.deleteFailed'));
       }
       mutate();
     },
     [eventSlug, token, t, mutate],
+  );
+
+  /** Primo clic: arma e lo annuncia. Secondo, sullo stesso materiale: toglie. */
+  const handleDeleteClick = useCallback(
+    (m: RoomMaterial, nextId: string | null) => {
+      if (armedDelete !== m.id) {
+        const avviso = `${t('deleteMaterial')}: ${m.title}. ${t('confirmDelete')}`;
+        armedAnnouncementRef.current = avviso;
+        setAnnouncement(avviso);
+        setArmedDelete(m.id);
+        return;
+      }
+      setArmedDelete(null);
+      focusAfterDeleteRef.current = { deletedId: m.id, nextId };
+      void handleDelete(m.id);
+    },
+    [armedDelete, handleDelete, t],
+  );
+
+  /** Salva una correzione: null se è andata, altrimenti il messaggio per il modulo. */
+  const handleSave = useCallback(
+    async (materialId: string, patch: MaterialPatch): Promise<string | null> => {
+      setListError('');
+      setAnnouncement('');
+      try {
+        const res = await fetch(`/api/events/${eventSlug}/materials/${materialId}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(patch),
+        });
+        if (res.ok) {
+          setEditingId(null);
+          setAnnouncement(t('materialUpdated'));
+          void mutate();
+          return null;
+        }
+        if (res.status === 404) {
+          // Tolto da qualcun altro mentre lo si correggeva: il modulo se ne va
+          // con la riga, e l'errore resta sopra l'elenco.
+          setEditingId(null);
+          setListError(t('errors.updateFailed'));
+          void mutate();
+          return null;
+        }
+        return t('errors.updateFailed');
+      } catch {
+        return t('errors.updateFailed');
+      }
+    },
+    [eventSlug, token, t, mutate],
+  );
+
+  const handleCopy = useCallback(
+    async (m: RoomMaterial) => {
+      setListError('');
+      setAnnouncement('');
+      try {
+        await navigator.clipboard.writeText(m.url);
+        setCopiedId(m.id);
+        setAnnouncement(t('linkCopied'));
+      } catch {
+        // Contesto non sicuro o permesso negato: lo si dice, l'indirizzo resta
+        // raggiungibile dal link stesso.
+        setListError(t('errors.copyFailed'));
+      }
+    },
+    [t],
   );
 
   const percent = progress === null ? null : Math.round(progress * 100);
@@ -353,9 +457,9 @@ export default function MaterialPanel({ eventSlug, token, isModerator }: Materia
     : null;
 
   return (
-    <div className="material-panel">
+    <div className="material-panel" ref={panelRef}>
       <div className="live-panel-header">
-        <h6 className="live-panel-header__title">
+        <h6 className="live-panel-header__title" ref={headingRef}>
           <Icon icon="it-clip" size="sm" aria-hidden="true" />
           {t('title')}
           {materials.length > 0 && (
@@ -515,6 +619,7 @@ export default function MaterialPanel({ eventSlug, token, isModerator }: Materia
               maxLength={500}
             />
           </div>
+          <MaterialVisibilitySelect value={visibility} onChange={setVisibility} disabled={submitting} />
           {percent !== null && (
             <div className="material-panel__progress">
               <div
@@ -600,68 +705,52 @@ export default function MaterialPanel({ eventSlug, token, isModerator }: Materia
           </p>
         </div>
       ) : (
-        <ul className="material-panel__list">
-          {materials.map((m) => {
-            const kind = materialKind(m);
-            const meta = [
-              kind !== 'link' ? MATERIAL_KIND_SHORT[kind] : null,
-              m.type === 'FILE' && m.fileSize != null ? fileSizeLabel(m.fileSize) : null,
-            ].filter(Boolean);
-            return (
-              <li key={m.id} className="material-item">
-                <span className={`material-kind material-kind--${kind}`} aria-hidden="true">
-                  <Icon icon={MATERIAL_KIND_ICON[kind]} size="sm" />
-                </span>
-                <div className="material-item__body">
-                  <a
-                    href={m.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="material-item__title"
-                  >
-                    {m.title}
-                    <span className="visually-hidden"> ({kind === 'link' ? t('open') : t('download')})</span>
-                  </a>
-                  {m.description && <div className="material-item__desc">{m.description}</div>}
-                  <div className="material-panel__meta">
-                    {meta.length > 0 && <>{meta.join(' · ')} · </>}
-                    {authorLine(m.addedBy)} ·{' '}
-                    {format.dateTime(new Date(m.createdAt), {
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })}
-                  </div>
-                  {isModerator && visibilityLabel(m.visibility) && (
-                    <span className="material-item__badge">{visibilityLabel(m.visibility)}</span>
-                  )}
-                </div>
-                <div className="material-item__actions">
-                  <a
-                    href={m.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="material-panel__icon-btn"
-                    aria-label={`${kind === 'link' ? t('open') : t('download')}: ${m.title}`}
-                    title={kind === 'link' ? t('open') : t('download')}
-                  >
-                    <Icon icon={kind === 'link' ? 'it-external-link' : 'it-download'} size="sm" aria-hidden="true" />
-                  </a>
-                  {isModerator && (
-                    <button
-                      type="button"
-                      className="material-panel__icon-btn material-panel__icon-btn--danger"
-                      onClick={() => handleDelete(m.id)}
-                      aria-label={t('deleteMaterial')}
-                      title={t('deleteMaterial')}
-                    >
-                      <Icon icon="it-delete" size="sm" aria-hidden="true" />
-                    </button>
-                  )}
-                </div>
-              </li>
-            );
-          })}
-        </ul>
+        <>
+          {showFilter && (
+            <div className="material-panel__filters" role="group" aria-label={tf('label')}>
+              {(
+                [
+                  ['all', tf('all'), materials.length],
+                  ['file', tf('files'), fileCount],
+                  ['link', tf('links'), linkCount],
+                ] as const
+              ).map(([key, label, count]) => (
+                <button
+                  key={key}
+                  type="button"
+                  className={`material-panel__filter${activeFilter === key ? ' is-active' : ''}`}
+                  aria-pressed={activeFilter === key}
+                  onClick={() => setFilter(key)}
+                >
+                  {label}
+                  <span className="material-panel__filter-count">{count}</span>
+                </button>
+              ))}
+            </div>
+          )}
+          <ul className="material-panel__list">
+            {shown.map((m, i) => (
+              <MaterialItem
+                key={m.id}
+                material={m}
+                isModerator={isModerator}
+                onOpen={() => markMaterialOpened(eventSlug, m.id, token || undefined)}
+                deleteArmed={armedDelete === m.id}
+                onDeleteClick={() => handleDeleteClick(m, shown[i + 1]?.id ?? null)}
+                copied={copiedId === m.id}
+                onCopy={() => void handleCopy(m)}
+                editing={editingId === m.id}
+                onEdit={() => {
+                  setArmedDelete(null);
+                  setAnnouncement('');
+                  setEditingId(m.id);
+                }}
+                onCancelEdit={() => setEditingId(null)}
+                onSave={(patch) => handleSave(m.id, patch)}
+              />
+            ))}
+          </ul>
+        </>
       )}
     </div>
   );

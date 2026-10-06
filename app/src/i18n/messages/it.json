@@ -669,7 +669,10 @@
       "uploadFailed": "Errore durante il caricamento del file",
       "quotaExceeded": "Questo evento ha raggiunto il limite dei file caricati ({maxFiles} file, {maxMb} MB in tutto): rimuovine qualcuno per caricarne altri",
       "uploadBusy": "Troppi caricamenti in questo momento: riprova tra qualche secondo",
-      "deleteFailed": "Impossibile eliminare il materiale"
+      "deleteFailed": "Impossibile eliminare il materiale",
+      "updateFailed": "Impossibile salvare le modifiche al materiale",
+      "copyFailed": "Copia non riuscita: apri il link e copia l'indirizzo dal browser",
+      "editTitleMissing": "Il titolo non può essere vuoto"
     },
     "addedByStaff": "Aggiunto dall'organizzazione",
     "dropzoneTitle": "Trascina qui il file",
@@ -681,7 +684,18 @@
     "open": "Apri",
     "download": "Scarica",
     "emptyHintModerator": "Condividi con la sala slide, documenti o link utili.",
-    "emptyHintPublic": "Qui compariranno i materiali condivisi da chi conduce."
+    "emptyHintPublic": "Qui compariranno i materiali condivisi da chi conduce.",
+    "filter": {
+      "label": "Filtra i materiali",
+      "all": "Tutti",
+      "files": "File",
+      "links": "Link"
+    },
+    "openCount": "{count, plural, one {# apertura} other {# aperture}}",
+    "downloadCount": "{count, plural, one {# download} other {# download}}",
+    "copyLink": "Copia link",
+    "linkCopied": "Link copiato negli appunti",
+    "materialUpdated": "Materiale aggiornato"
   },
   "reminders": {
     "title": "Notifiche",

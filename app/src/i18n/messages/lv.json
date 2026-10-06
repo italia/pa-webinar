@@ -3002,7 +3002,10 @@
       "uploadFailed": "Kļūda, augšupielādējot failu",
       "quotaExceeded": "Šis pasākums ir sasniedzis augšupielādēto failu ierobežojumu ({maxFiles} faili, kopā {maxMb} MB): noņemiet dažus, lai augšupielādētu citus",
       "uploadBusy": "Pašlaik ir pārāk daudz augšupielāžu: mēģiniet vēlreiz pēc dažām sekundēm",
-      "deleteFailed": "Materiālu neizdevās dzēst"
+      "deleteFailed": "Materiālu neizdevās dzēst",
+      "updateFailed": "Materiāla izmaiņas neizdevās saglabāt",
+      "copyFailed": "Kopēšana neizdevās: atveriet saiti un nokopējiet adresi no pārlūkprogrammas",
+      "editTitleMissing": "Nosaukums nevar būt tukšs"
     },
     "addedByStaff": "Pievienoja organizatori",
     "dropzoneTitle": "Ievelciet failu šeit",
@@ -3014,7 +3017,18 @@
     "open": "Atvērt",
     "download": "Lejupielādēt",
     "emptyHintModerator": "Kopīgojiet ar dalībniekiem slaidus, dokumentus vai noderīgas saites.",
-    "emptyHintPublic": "Šeit parādīsies vadītāju kopīgotie materiāli."
+    "emptyHintPublic": "Šeit parādīsies vadītāju kopīgotie materiāli.",
+    "filter": {
+      "label": "Filtrēt materiālus",
+      "all": "Visi",
+      "files": "Faili",
+      "links": "Saites"
+    },
+    "openCount": "{count, plural, zero {# atvēršanu} one {# atvēršana} other {# atvēršanas}}",
+    "downloadCount": "{count, plural, zero {# lejupielāžu} one {# lejupielāde} other {# lejupielādes}}",
+    "copyLink": "Kopēt saiti",
+    "linkCopied": "Saite nokopēta starpliktuvē",
+    "materialUpdated": "Materiāls atjaunināts"
   },
   "reminders": {
     "title": "Paziņojumi",

@@ -21,11 +21,13 @@
  * (cancellare il materiale cancella quel blob) né lasciare una riga che punta
  * a un file mai arrivato.
  *
- * VISIBILITÀ. `ALWAYS` («in sala e dopo l'evento»), come il predefinito
- * dell'area admin e come i link aggiunti dalla sala: ciò che si condivide in
- * diretta (le slide, un documento) di solito serve anche dopo, e un `DURING`
- * lo farebbe sparire dalla pagina dell'evento alla chiusura. Chi vuole
- * un'altra fase la cambia dall'area admin.
+ * VISIBILITÀ. Il campo facoltativo `visibility` del modulo (ALWAYS, BEFORE,
+ * DURING, AFTER: lib/events/material-visibility). Senza, `ALWAYS` («in sala e
+ * dopo l'evento»), come il predefinito dell'area admin e dei link aggiunti
+ * dalla sala: ciò che si condivide in diretta (le slide, un documento) di
+ * solito serve anche dopo, e un `DURING` lo farebbe sparire dalla pagina
+ * dell'evento alla chiusura. Chi conduce la può cambiare anche dopo (PATCH
+ * ../materials/[id]).
  *
  * QUANTO. Il link moderatore è condiviso e non scade: oltre al limite per
  * minuto, un tetto per evento sul numero di file e sui byte
@@ -70,6 +72,7 @@ import {
   MATERIAL_FILE_MIME_TYPES,
   MATERIAL_FILES_PER_EVENT_MAX,
   MATERIAL_FILES_PER_EVENT_MAX_BYTES,
+  MATERIAL_VISIBILITIES,
 } from '@/lib/validation/materials';
 
 export const dynamic = 'force-dynamic';
@@ -112,6 +115,7 @@ async function fileDellEvento(eventId: string): Promise<{ count: number; bytes: 
 const uploadFieldsSchema = z.object({
   title: z.string().trim().max(300).optional(),
   description: z.string().trim().max(500).optional(),
+  visibility: z.enum(MATERIAL_VISIBILITIES).optional(),
 });
 
 /** Un campo di testo del modulo, o undefined se manca o non è testo. */
@@ -215,6 +219,7 @@ async function riceviECrea(
   const fields = uploadFieldsSchema.safeParse({
     title: textField(form, 'title'),
     description: textField(form, 'description'),
+    visibility: textField(form, 'visibility'),
   });
   if (!fields.success) {
     throw new ValidationError(
@@ -283,7 +288,7 @@ async function riceviECrea(
         fileSize: BigInt(buffer.byteLength),
         mimeType: mime,
         blobPath: key,
-        visibility: 'ALWAYS',
+        visibility: fields.data.visibility ?? 'ALWAYS',
       },
     });
   } catch (err) {

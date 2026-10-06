@@ -3002,7 +3002,10 @@
       "uploadFailed": "Fehler beim Hochladen der Datei",
       "quotaExceeded": "Diese Veranstaltung hat das Limit für hochgeladene Dateien erreicht ({maxFiles} Dateien, insgesamt {maxMb} MB): Entfernen Sie einige, um weitere hochzuladen",
       "uploadBusy": "Zu viele Uploads im Moment: Versuchen Sie es in einigen Sekunden erneut",
-      "deleteFailed": "Das Material konnte nicht gelöscht werden"
+      "deleteFailed": "Das Material konnte nicht gelöscht werden",
+      "updateFailed": "Die Änderungen am Material konnten nicht gespeichert werden",
+      "copyFailed": "Kopieren fehlgeschlagen: Öffnen Sie den Link und kopieren Sie die Adresse im Browser",
+      "editTitleMissing": "Der Titel darf nicht leer sein"
     },
     "addedByStaff": "Von den Organisatoren hinzugefügt",
     "dropzoneTitle": "Datei hierher ziehen",
@@ -3014,7 +3017,18 @@
     "open": "Öffnen",
     "download": "Herunterladen",
     "emptyHintModerator": "Teilen Sie Folien, Dokumente oder nützliche Links mit dem Raum.",
-    "emptyHintPublic": "Hier erscheinen die Materialien, die die Moderation teilt."
+    "emptyHintPublic": "Hier erscheinen die Materialien, die die Moderation teilt.",
+    "filter": {
+      "label": "Materialien filtern",
+      "all": "Alle",
+      "files": "Dateien",
+      "links": "Links"
+    },
+    "openCount": "{count, plural, one {# Aufruf} other {# Aufrufe}}",
+    "downloadCount": "{count, plural, one {# Download} other {# Downloads}}",
+    "copyLink": "Link kopieren",
+    "linkCopied": "Link in die Zwischenablage kopiert",
+    "materialUpdated": "Material aktualisiert"
   },
   "reminders": {
     "title": "Benachrichtigungen",

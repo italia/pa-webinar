@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { materialKind, titleFromFileName } from './file-kind';
+import { materialHost, materialKind, titleFromFileName } from './file-kind';
 
 describe('materialKind', () => {
   it('un link resta un link, qualunque sia l’indirizzo', () => {
@@ -34,5 +34,16 @@ describe('titleFromFileName', () => {
   it('toglie l’estensione e i trattini bassi', () => {
     expect(titleFromFileName('slide_intervento_finale.pptx')).toBe('slide intervento finale');
     expect(titleFromFileName('Programma.pdf')).toBe('Programma');
+  });
+});
+
+describe('materialHost', () => {
+  it('il nome del sito, senza www né percorso', () => {
+    expect(materialHost('https://www.example.org/slide.pdf?x=1')).toBe('example.org');
+    expect(materialHost('http://docs.example.gov.it:8443/a')).toBe('docs.example.gov.it');
+  });
+
+  it('un indirizzo illeggibile non ha sito', () => {
+    expect(materialHost('non è un indirizzo')).toBeNull();
   });
 });

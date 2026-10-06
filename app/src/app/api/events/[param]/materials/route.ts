@@ -13,8 +13,9 @@ import {
 } from '@/lib/auth/moderator';
 import { prisma } from '@/lib/db';
 import { isEventPubliclyVisible } from '@/lib/events/visibility';
-import { MATERIAL_ACCESS_EVENT_SELECT, materialsWhereFor } from '@/lib/events/material-access';
+import { MATERIAL_LIST_EVENT_SELECT, materialAccessFor } from '@/lib/events/material-access';
 import { materialAddedBy, materialAuthorName } from '@/lib/events/material-author';
+import { roomMaterialJson } from '@/lib/events/material-json';
 import { pokeLivePanel } from '@/lib/live-state/publish';
 import { getFilesStorage } from '@/lib/storage';
 import { createMaterialSchema } from '@/lib/validation/schemas';
@@ -29,12 +30,7 @@ export const GET = withErrorHandling(async (request, context) => {
 
   const event = await prisma.event.findUnique({
     where: { slug },
-    select: {
-      ...MATERIAL_ACCESS_EVENT_SELECT,
-      eventType: true,
-      postEventPublic: true,
-      postEventPublicUntil: true,
-    },
+    select: MATERIAL_LIST_EVENT_SELECT,
   });
 
   // Stessa regola delle pagine pubbliche (lib/events/visibility): i materiali
@@ -47,30 +43,17 @@ export const GET = withErrorHandling(async (request, context) => {
   // pubblico; chi ha un token moderatore vede tutto
   // (lib/events/material-access). Il token è facoltativo: senza, è la vista
   // del pubblico.
+  const access = await materialAccessFor(event, extractModeratorToken(request));
   const materials = await prisma.eventMaterial.findMany({
-    where: await materialsWhereFor(event, extractModeratorToken(request)),
+    where: access.where,
     orderBy: { createdAt: 'desc' },
   });
 
   return Response.json(
     {
-      materials: materials.map((m) => ({
-        id: m.id,
-        type: m.type,
-        title: m.title,
-        url: m.url,
-        description: m.description,
-        // Solo per i file caricati (type FILE): il peso da mostrare accanto.
-        fileSize: m.fileSize != null ? Number(m.fileSize) : null,
-        // Il tipo verificato al caricamento: la sala ne ricava icona ed
-        // etichetta (lib/materials/file-kind). Null per i link.
-        mimeType: m.mimeType ?? null,
-        visibility: m.visibility,
-        // Null quando la riga non porta un nome: la sala mostra una dicitura
-        // tradotta (lib/events/material-author).
-        addedBy: materialAuthorName(m.addedBy),
-        createdAt: m.createdAt.toISOString(),
-      })),
+      // Campo per campo, il percorso nello storage escluso; il conteggio
+      // delle aperture solo a chi conduce (lib/events/material-json).
+      materials: materials.map((m) => roomMaterialJson(m, access)),
       // Se questa installazione ha uno storage per i file: il pannello della
       // sala offre il caricamento (POST ./upload) solo quando può riuscire.
       uploadsEnabled: getFilesStorage() !== null,
@@ -114,6 +97,7 @@ export const POST = withErrorHandling(async (request, context) => {
       title: parsed.data.title,
       url: parsed.data.url,
       description: parsed.data.description ?? null,
+      visibility: parsed.data.visibility ?? 'ALWAYS',
       // Un nome solo se gia' pubblico, mai una parola fissa: vedi
       // lib/events/material-author.
       addedBy: materialAddedBy(await resolveGrantForEvent(event, token)),
@@ -130,6 +114,7 @@ export const POST = withErrorHandling(async (request, context) => {
       title: material.title,
       url: material.url,
       description: material.description,
+      visibility: material.visibility,
       addedBy: materialAuthorName(material.addedBy),
       createdAt: material.createdAt.toISOString(),
     },

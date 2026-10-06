@@ -3002,7 +3002,10 @@
       "uploadFailed": "Error al subir el archivo",
       "quotaExceeded": "Este evento ha alcanzado el límite de archivos subidos ({maxFiles} archivos, {maxMb} MB en total): elimine algunos para subir otros",
       "uploadBusy": "Demasiadas subidas en este momento: inténtelo de nuevo en unos segundos",
-      "deleteFailed": "No se pudo eliminar el material"
+      "deleteFailed": "No se pudo eliminar el material",
+      "updateFailed": "No se pudieron guardar los cambios del material",
+      "copyFailed": "No se pudo copiar: abra el enlace y copie la dirección desde el navegador",
+      "editTitleMissing": "El título no puede estar vacío"
     },
     "addedByStaff": "Añadido por la organización",
     "dropzoneTitle": "Arrastra el archivo aquí",
@@ -3014,7 +3017,18 @@
     "open": "Abrir",
     "download": "Descargar",
     "emptyHintModerator": "Comparte con la sala diapositivas, documentos o enlaces útiles.",
-    "emptyHintPublic": "Aquí aparecerán los materiales compartidos por quienes conducen."
+    "emptyHintPublic": "Aquí aparecerán los materiales compartidos por quienes conducen.",
+    "filter": {
+      "label": "Filtrar materiales",
+      "all": "Todos",
+      "files": "Archivos",
+      "links": "Enlaces"
+    },
+    "openCount": "{count, plural, one {# clic} other {# clics}}",
+    "downloadCount": "{count, plural, one {# descarga} other {# descargas}}",
+    "copyLink": "Copiar enlace",
+    "linkCopied": "Enlace copiado al portapapeles",
+    "materialUpdated": "Material actualizado"
   },
   "reminders": {
     "title": "Notificaciones",

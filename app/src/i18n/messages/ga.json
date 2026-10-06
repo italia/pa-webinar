@@ -3002,7 +3002,10 @@
       "uploadFailed": "Earráid agus an comhad á uaslódáil",
       "quotaExceeded": "Tá teorainn na gcomhad uaslódáilte bainte amach ag an imeacht seo ({maxFiles} comhad, {maxMb} MB san iomlán): bain cuid acu chun tuilleadh a uaslódáil",
       "uploadBusy": "An iomarca uaslódálacha faoi láthair: bain triail eile as i gceann cúpla soicind",
-      "deleteFailed": "Níorbh fhéidir an t-ábhar a scriosadh"
+      "deleteFailed": "Níorbh fhéidir an t-ábhar a scriosadh",
+      "updateFailed": "Níorbh fhéidir na hathruithe ar an ábhar a shábháil",
+      "copyFailed": "Theip ar an gcóipeáil: oscail an nasc agus cóipeáil an seoladh ón mbrabhsálaí",
+      "editTitleMissing": "Ní féidir leis an teideal a bheith folamh"
     },
     "addedByStaff": "Curtha leis ag lucht eagraithe",
     "dropzoneTitle": "Tarraing an comhad anseo",
@@ -3014,7 +3017,18 @@
     "open": "Oscail",
     "download": "Íoslódáil",
     "emptyHintModerator": "Roinn sleamhnáin, doiciméid nó naisc úsáideacha leis an seomra.",
-    "emptyHintPublic": "Taispeánfar anseo na hábhair a roinneann na hóstaigh."
+    "emptyHintPublic": "Taispeánfar anseo na hábhair a roinneann na hóstaigh.",
+    "filter": {
+      "label": "Scag na hábhair",
+      "all": "Gach ceann",
+      "files": "Comhaid",
+      "links": "Naisc"
+    },
+    "openCount": "{count, plural, one {# oscailt} two {# oscailt} few {# oscailt} many {# n-oscailt} other {# oscailt}}",
+    "downloadCount": "{count, plural, one {# íoslódáil} two {# íoslódáil} few {# íoslódáil} many {# n-íoslódáil} other {# íoslódáil}}",
+    "copyLink": "Cóipeáil nasc",
+    "linkCopied": "Cóipeáladh an nasc chuig an ghearrthaisce",
+    "materialUpdated": "Ábhar nuashonraithe"
   },
   "reminders": {
     "title": "Fógraí",

@@ -694,7 +694,7 @@ export default function EventDetailClient({
               <h2 className="h4 fw-semibold mb-3" style={{ color: 'var(--app-text)' }}>
                 {tm('title')}
               </h2>
-              <MaterialList materials={materials} />
+              <MaterialList materials={materials} eventSlug={event.slug} />
             </section>
           )}
 

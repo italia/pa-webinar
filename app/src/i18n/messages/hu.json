@@ -3002,7 +3002,10 @@
       "uploadFailed": "Hiba a fájl feltöltése során",
       "quotaExceeded": "Ez az esemény elérte a feltöltött fájlok korlátját ({maxFiles} fájl, összesen {maxMb} MB): távolítson el néhányat, hogy újakat tölthessen fel",
       "uploadBusy": "Jelenleg túl sok a feltöltés: próbálja újra néhány másodperc múlva",
-      "deleteFailed": "Az anyagot nem sikerült törölni"
+      "deleteFailed": "Az anyagot nem sikerült törölni",
+      "updateFailed": "Az anyag módosításait nem sikerült menteni",
+      "copyFailed": "A másolás nem sikerült: nyissa meg a hivatkozást, és másolja ki a címet a böngészőből",
+      "editTitleMissing": "A cím nem lehet üres"
     },
     "addedByStaff": "A szervezők adták hozzá",
     "dropzoneTitle": "Húzza ide a fájlt",
@@ -3014,7 +3017,18 @@
     "open": "Megnyitás",
     "download": "Letöltés",
     "emptyHintModerator": "Ossza meg a résztvevőkkel a diákat, dokumentumokat vagy hasznos hivatkozásokat.",
-    "emptyHintPublic": "Itt jelennek meg a házigazdák által megosztott anyagok."
+    "emptyHintPublic": "Itt jelennek meg a házigazdák által megosztott anyagok.",
+    "filter": {
+      "label": "Anyagok szűrése",
+      "all": "Összes",
+      "files": "Fájlok",
+      "links": "Hivatkozások"
+    },
+    "openCount": "{count, plural, one {# megnyitás} other {# megnyitás}}",
+    "downloadCount": "{count, plural, one {# letöltés} other {# letöltés}}",
+    "copyLink": "Link másolása",
+    "linkCopied": "A hivatkozás a vágólapra másolva",
+    "materialUpdated": "Anyag frissítve"
   },
   "reminders": {
     "title": "Értesítések",

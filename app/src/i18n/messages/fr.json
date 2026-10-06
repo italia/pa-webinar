@@ -3002,7 +3002,10 @@
       "uploadFailed": "Erreur lors du téléversement du fichier",
       "quotaExceeded": "Cet événement a atteint la limite de fichiers téléversés ({maxFiles} fichiers, {maxMb} Mo au total) : supprimez-en quelques-uns pour en ajouter d'autres",
       "uploadBusy": "Trop de téléversements en ce moment : réessayez dans quelques secondes",
-      "deleteFailed": "Impossible de supprimer le document"
+      "deleteFailed": "Impossible de supprimer le document",
+      "updateFailed": "Impossible d'enregistrer les modifications du document",
+      "copyFailed": "La copie a échoué : ouvrez le lien et copiez l'adresse depuis le navigateur",
+      "editTitleMissing": "Le titre ne peut pas être vide"
     },
     "addedByStaff": "Ajouté par l'organisation",
     "dropzoneTitle": "Faites glisser le fichier ici",
@@ -3014,7 +3017,18 @@
     "open": "Ouvrir",
     "download": "Télécharger",
     "emptyHintModerator": "Partagez avec la salle des diapositives, des documents ou des liens utiles.",
-    "emptyHintPublic": "Les supports partagés par les animateurs apparaîtront ici."
+    "emptyHintPublic": "Les supports partagés par les animateurs apparaîtront ici.",
+    "filter": {
+      "label": "Filtrer les documents",
+      "all": "Tous",
+      "files": "Fichiers",
+      "links": "Liens"
+    },
+    "openCount": "{count, plural, one {# ouverture} other {# ouvertures}}",
+    "downloadCount": "{count, plural, one {# téléchargement} other {# téléchargements}}",
+    "copyLink": "Copier le lien",
+    "linkCopied": "Lien copié dans le presse-papiers",
+    "materialUpdated": "Document mis à jour"
   },
   "reminders": {
     "title": "Notifications",

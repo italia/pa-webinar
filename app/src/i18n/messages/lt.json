@@ -3002,7 +3002,10 @@
       "uploadFailed": "Klaida įkeliant failą",
       "quotaExceeded": "Šis renginys pasiekė įkeltų failų ribą ({maxFiles} failų, iš viso {maxMb} MB): pašalinkite kelis, kad galėtumėte įkelti daugiau",
       "uploadBusy": "Šiuo metu per daug įkėlimų: bandykite dar kartą po kelių sekundžių",
-      "deleteFailed": "Medžiagos ištrinti nepavyko"
+      "deleteFailed": "Medžiagos ištrinti nepavyko",
+      "updateFailed": "Medžiagos pakeitimų išsaugoti nepavyko",
+      "copyFailed": "Nukopijuoti nepavyko: atidarykite nuorodą ir nukopijuokite adresą iš naršyklės",
+      "editTitleMissing": "Pavadinimas negali būti tuščias"
     },
     "addedByStaff": "Pridėjo organizatoriai",
     "dropzoneTitle": "Vilkite failą čia",
@@ -3014,7 +3017,18 @@
     "open": "Atidaryti",
     "download": "Atsisiųsti",
     "emptyHintModerator": "Pasidalykite su dalyviais skaidrėmis, dokumentais ar naudingomis nuorodomis.",
-    "emptyHintPublic": "Čia bus rodoma vedėjų bendrinama medžiaga."
+    "emptyHintPublic": "Čia bus rodoma vedėjų bendrinama medžiaga.",
+    "filter": {
+      "label": "Filtruoti medžiagą",
+      "all": "Visi",
+      "files": "Failai",
+      "links": "Nuorodos"
+    },
+    "openCount": "{count, plural, one {# atidarymas} few {# atidarymai} many {# atidarymo} other {# atidarymų}}",
+    "downloadCount": "{count, plural, one {# atsisiuntimas} few {# atsisiuntimai} many {# atsisiuntimo} other {# atsisiuntimų}}",
+    "copyLink": "Kopijuoti nuorodą",
+    "linkCopied": "Nuoroda nukopijuota į iškarpinę",
+    "materialUpdated": "Medžiaga atnaujinta"
   },
   "reminders": {
     "title": "Pranešimai",

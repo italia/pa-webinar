@@ -3002,7 +3002,10 @@
       "uploadFailed": "Pogreška pri učitavanju datoteke",
       "quotaExceeded": "Ovaj je događaj dosegao ograničenje učitanih datoteka ({maxFiles} datoteka, ukupno {maxMb} MB): uklonite neke da biste učitali nove",
       "uploadBusy": "Trenutačno ima previše učitavanja: pokušajte ponovno za nekoliko sekundi",
-      "deleteFailed": "Materijal nije moguće izbrisati"
+      "deleteFailed": "Materijal nije moguće izbrisati",
+      "updateFailed": "Izmjene materijala nije moguće spremiti",
+      "copyFailed": "Kopiranje nije uspjelo: otvorite poveznicu i kopirajte adresu iz preglednika",
+      "editTitleMissing": "Naslov ne smije biti prazan"
     },
     "addedByStaff": "Dodali organizatori",
     "dropzoneTitle": "Povucite datoteku ovamo",
@@ -3014,7 +3017,18 @@
     "open": "Otvori",
     "download": "Preuzmi",
     "emptyHintModerator": "Podijelite sa sudionicima slajdove, dokumente ili korisne poveznice.",
-    "emptyHintPublic": "Ovdje će se prikazati materijali koje dijele voditelji."
+    "emptyHintPublic": "Ovdje će se prikazati materijali koje dijele voditelji.",
+    "filter": {
+      "label": "Filtriraj materijale",
+      "all": "Sve",
+      "files": "Datoteke",
+      "links": "Poveznice"
+    },
+    "openCount": "{count, plural, one {# otvaranje} few {# otvaranja} other {# otvaranja}}",
+    "downloadCount": "{count, plural, one {# preuzimanje} few {# preuzimanja} other {# preuzimanja}}",
+    "copyLink": "Kopiraj poveznicu",
+    "linkCopied": "Poveznica kopirana u međuspremnik",
+    "materialUpdated": "Materijal ažuriran"
   },
   "reminders": {
     "title": "Obavijesti",

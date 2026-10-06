@@ -3002,7 +3002,10 @@
       "uploadFailed": "Error while uploading the file",
       "quotaExceeded": "This event has reached its upload limit ({maxFiles} files, {maxMb} MB in total): remove some files to upload more",
       "uploadBusy": "Too many uploads at the moment: try again in a few seconds",
-      "deleteFailed": "Could not delete the material"
+      "deleteFailed": "Could not delete the material",
+      "updateFailed": "Could not save the changes to the material",
+      "copyFailed": "Copy failed: open the link and copy the address from the browser",
+      "editTitleMissing": "The title cannot be empty"
     },
     "addedByStaff": "Added by the organisers",
     "dropzoneTitle": "Drag the file here",
@@ -3014,7 +3017,18 @@
     "open": "Open",
     "download": "Download",
     "emptyHintModerator": "Share slides, documents or useful links with the room.",
-    "emptyHintPublic": "Materials shared by the hosts will appear here."
+    "emptyHintPublic": "Materials shared by the hosts will appear here.",
+    "filter": {
+      "label": "Filter materials",
+      "all": "All",
+      "files": "Files",
+      "links": "Links"
+    },
+    "openCount": "{count, plural, one {# click} other {# clicks}}",
+    "downloadCount": "{count, plural, one {# download} other {# downloads}}",
+    "copyLink": "Copy link",
+    "linkCopied": "Link copied to the clipboard",
+    "materialUpdated": "Material updated"
   },
   "reminders": {
     "title": "Notifications",

@@ -2341,14 +2341,30 @@ html.live-call-immersive body {
   &__error {
     margin-bottom: 8px;
     font-size: 0.8rem;
-    color: #D9364F;
+    color: #C02B43;
+  }
+
+  // La fase in cui il pubblico vede il materiale: etichetta sopra la scelta.
+  &__field {
+    margin-bottom: 8px;
+
+    .form-select { font-size: 0.82rem; }
+  }
+
+  &__label {
+    display: block;
+    margin-bottom: 2px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #455B71;
   }
 
   &__icon-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 30px;
+    gap: 4px;
+    min-width: 30px;
     height: 30px;
     padding: 0;
     border: 0;
@@ -2362,7 +2378,56 @@ html.live-call-immersive body {
     &:hover { background: #EEF3FA; color: #0066CC; }
     &:focus-visible { outline: 2px solid #0066CC; outline-offset: 1px; }
 
-    &--danger:hover { background: #FBEAEC; color: #D9364F; }
+    &--danger:hover { background: #FBEAEC; color: #C02B43; }
+
+    // Copiato: per un attimo l'icona diventa una spunta.
+    &.is-done { color: #00704A; }
+
+    // Primo clic su «Elimina»: il pulsante chiede conferma a parole.
+    &.is-armed {
+      padding: 0 8px;
+      background: #C02B43;
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 700;
+
+      &:hover { background: #A1112E; color: #fff; }
+    }
+  }
+
+  // Tutti / File / Link: solo con un elenco lungo che li mescola.
+  &__filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+
+  &__filter {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 10px;
+    border: 1px solid #C5D3E0;
+    border-radius: 999px;
+    background: #fff;
+    color: #455B71;
+    font-size: 0.78rem;
+    font-weight: 600;
+
+    &:hover { border-color: #0066CC; color: #0066CC; }
+    &:focus-visible { outline: 2px solid #0066CC; outline-offset: 1px; }
+
+    &.is-active {
+      border-color: #0066CC;
+      background: #0066CC;
+      color: #fff;
+    }
+  }
+
+  &__filter-count {
+    font-variant-numeric: tabular-nums;
+    font-weight: 400;
   }
 
   &__list {
@@ -2377,8 +2442,8 @@ html.live-call-immersive body {
 
 .material-item {
   display: flex;
-  align-items: flex-start;
-  gap: 10px;
+  flex-direction: column;
+  gap: 8px;
   padding: 10px;
   border: 1px solid #E3E8ED;
   border-radius: 10px;
@@ -2390,6 +2455,14 @@ html.live-call-immersive body {
     box-shadow: 0 2px 6px rgba(23, 50, 77, 0.08);
   }
 
+  &.is-editing { border-color: #0066CC; }
+
+  &__main {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
   &__body {
     flex: 1;
     min-width: 0;
@@ -2399,6 +2472,7 @@ html.live-call-immersive body {
     display: block;
     font-size: 0.86rem;
     font-weight: 600;
+    line-height: 1.3;
     color: #0066CC;
     text-decoration: none;
     word-break: break-word;
@@ -2407,14 +2481,45 @@ html.live-call-immersive body {
   }
 
   &__desc {
-    margin-top: 2px;
+    margin: 2px 0 0;
     font-size: 0.78rem;
+    line-height: 1.35;
     color: #455B71;
+    word-break: break-word;
   }
+
+  // Tipo e peso del file, o il sito del link: dove porta il clic.
+  &__meta {
+    margin-top: 3px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    line-height: 1.4;
+    color: #455B71;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__byline {
+    font-size: 0.72rem;
+    line-height: 1.4;
+    color: #5C6F82;
+  }
+
+  // Solo per chi conduce: fase, aperture e strumenti, sotto la voce.
+  &__tools {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    padding-top: 6px;
+    border-top: 1px solid #EEF0F2;
+  }
+
+  &__tools-spacer { flex: 1; }
 
   &__badge {
     display: inline-block;
-    margin-top: 4px;
     padding: 1px 6px;
     border: 1px solid #D9DADB;
     border-radius: 4px;
@@ -2423,10 +2528,23 @@ html.live-call-immersive body {
     color: #455B71;
   }
 
-  &__actions {
+  &__count {
+    font-size: 0.72rem;
+    font-weight: 600;
+    line-height: 1.4;
+    color: #17324D;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__edit {
+    flex: 1;
+    min-width: 0;
     display: flex;
-    gap: 2px;
-    flex-shrink: 0;
+    flex-direction: column;
+    gap: 6px;
+
+    .material-panel__field,
+    .material-panel__error { margin-bottom: 0; }
   }
 }
 

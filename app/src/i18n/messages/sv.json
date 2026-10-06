@@ -3002,7 +3002,10 @@
       "uploadFailed": "Fel vid uppladdning av filen",
       "quotaExceeded": "Det här evenemanget har nått gränsen för uppladdade filer ({maxFiles} filer, {maxMb} MB totalt): ta bort några för att ladda upp fler",
       "uploadBusy": "För många uppladdningar just nu: försök igen om några sekunder",
-      "deleteFailed": "Materialet kunde inte tas bort"
+      "deleteFailed": "Materialet kunde inte tas bort",
+      "updateFailed": "Ändringarna i materialet kunde inte sparas",
+      "copyFailed": "Kopieringen misslyckades: öppna länken och kopiera adressen i webbläsaren",
+      "editTitleMissing": "Titeln får inte vara tom"
     },
     "addedByStaff": "Tillagt av arrangörerna",
     "dropzoneTitle": "Dra filen hit",
@@ -3014,7 +3017,18 @@
     "open": "Öppna",
     "download": "Ladda ned",
     "emptyHintModerator": "Dela bilder, dokument eller användbara länkar med deltagarna.",
-    "emptyHintPublic": "Här visas material som värdarna delar."
+    "emptyHintPublic": "Här visas material som värdarna delar.",
+    "filter": {
+      "label": "Filtrera material",
+      "all": "Alla",
+      "files": "Filer",
+      "links": "Länkar"
+    },
+    "openCount": "{count, plural, one {öppnad # gång} other {öppnad # gånger}}",
+    "downloadCount": "{count, plural, one {# nedladdning} other {# nedladdningar}}",
+    "copyLink": "Kopiera länk",
+    "linkCopied": "Länken har kopierats till urklipp",
+    "materialUpdated": "Materialet har uppdaterats"
   },
   "reminders": {
     "title": "Påminnelser",

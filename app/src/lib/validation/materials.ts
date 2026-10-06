@@ -78,3 +78,23 @@ export const updateMaterialAdminSchema = materialBaseSchema.partial();
 
 export type CreateMaterialAdminInput = z.infer<typeof createMaterialAdminSchema>;
 export type UpdateMaterialAdminInput = z.infer<typeof updateMaterialAdminSchema>;
+
+/**
+ * Cosa chi conduce può cambiare di un materiale dalla sala
+ * (PATCH /api/events/[param]/materials/[id]): titolo, descrizione e fase,
+ * con gli stessi limiti della creazione. L'indirizzo no: per un file punta al
+ * blob caricato, e un link sbagliato si toglie e si aggiunge di nuovo.
+ * Almeno un campo; una descrizione vuota (o null) la toglie.
+ */
+export const updateMaterialRoomSchema = z
+  .object({
+    title: z.string().trim().min(1).max(300).optional(),
+    description: z.string().trim().max(500).nullable().optional(),
+    visibility: z.enum(MATERIAL_VISIBILITIES).optional(),
+  })
+  .strict()
+  .refine((v) => v.title !== undefined || v.description !== undefined || v.visibility !== undefined, {
+    message: 'Nothing to update',
+  });
+
+export type UpdateMaterialRoomInput = z.infer<typeof updateMaterialRoomSchema>;

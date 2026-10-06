@@ -3002,7 +3002,10 @@
       "uploadFailed": "Błąd podczas przesyłania pliku",
       "quotaExceeded": "To wydarzenie osiągnęło limit przesłanych plików ({maxFiles} plików, łącznie {maxMb} MB): usuń część, aby przesłać kolejne",
       "uploadBusy": "Zbyt wiele przesyłań w tej chwili: spróbuj ponownie za kilka sekund",
-      "deleteFailed": "Nie udało się usunąć materiału"
+      "deleteFailed": "Nie udało się usunąć materiału",
+      "updateFailed": "Nie udało się zapisać zmian w materiale",
+      "copyFailed": "Nie udało się skopiować: otwórz link i skopiuj adres z przeglądarki",
+      "editTitleMissing": "Tytuł nie może być pusty"
     },
     "addedByStaff": "Dodane przez organizatorów",
     "dropzoneTitle": "Przeciągnij plik tutaj",
@@ -3014,7 +3017,18 @@
     "open": "Otwórz",
     "download": "Pobierz",
     "emptyHintModerator": "Udostępnij uczestnikom slajdy, dokumenty lub przydatne linki.",
-    "emptyHintPublic": "Tutaj pojawią się materiały udostępnione przez prowadzących."
+    "emptyHintPublic": "Tutaj pojawią się materiały udostępnione przez prowadzących.",
+    "filter": {
+      "label": "Filtruj materiały",
+      "all": "Wszystkie",
+      "files": "Pliki",
+      "links": "Linki"
+    },
+    "openCount": "{count, plural, one {# otwarcie} few {# otwarcia} many {# otwarć} other {# otwarcia}}",
+    "downloadCount": "{count, plural, one {# pobranie} few {# pobrania} many {# pobrań} other {# pobrania}}",
+    "copyLink": "Kopiuj link",
+    "linkCopied": "Link skopiowany do schowka",
+    "materialUpdated": "Materiał zaktualizowany"
   },
   "reminders": {
     "title": "Powiadomienia",

@@ -3002,7 +3002,10 @@
       "uploadFailed": "Fejl under upload af filen",
       "quotaExceeded": "Denne begivenhed har nået grænsen for uploadede filer ({maxFiles} filer, {maxMb} MB i alt): fjern nogle for at uploade flere",
       "uploadBusy": "For mange uploads lige nu: prøv igen om et par sekunder",
-      "deleteFailed": "Materialet kunne ikke slettes"
+      "deleteFailed": "Materialet kunne ikke slettes",
+      "updateFailed": "Ændringerne af materialet kunne ikke gemmes",
+      "copyFailed": "Kopieringen mislykkedes: åbn linket, og kopiér adressen i browseren",
+      "editTitleMissing": "Titlen må ikke være tom"
     },
     "addedByStaff": "Tilføjet af arrangørerne",
     "dropzoneTitle": "Træk filen hertil",
@@ -3014,7 +3017,18 @@
     "open": "Åbn",
     "download": "Download",
     "emptyHintModerator": "Del slides, dokumenter eller nyttige links med deltagerne.",
-    "emptyHintPublic": "Her vises de materialer, som værterne deler."
+    "emptyHintPublic": "Her vises de materialer, som værterne deler.",
+    "filter": {
+      "label": "Filtrér materialer",
+      "all": "Alle",
+      "files": "Filer",
+      "links": "Links"
+    },
+    "openCount": "{count, plural, one {åbnet # gang} other {åbnet # gange}}",
+    "downloadCount": "{count, plural, one {# download} other {# downloads}}",
+    "copyLink": "Kopiér link",
+    "linkCopied": "Linket er kopieret til udklipsholderen",
+    "materialUpdated": "Materiale opdateret"
   },
   "reminders": {
     "title": "Påmindelser",

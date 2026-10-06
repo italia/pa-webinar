@@ -3002,7 +3002,10 @@
       "uploadFailed": "Faili üleslaadimisel tekkis viga",
       "quotaExceeded": "See sündmus on jõudnud üleslaaditud failide piirini ({maxFiles} faili, kokku {maxMb} MB): eemaldage mõni, et rohkem üles laadida",
       "uploadBusy": "Praegu on liiga palju üleslaadimisi: proovige mõne sekundi pärast uuesti",
-      "deleteFailed": "Materjali ei õnnestunud kustutada"
+      "deleteFailed": "Materjali ei õnnestunud kustutada",
+      "updateFailed": "Materjali muudatusi ei õnnestunud salvestada",
+      "copyFailed": "Kopeerimine ebaõnnestus: avage link ja kopeerige aadress brauserist",
+      "editTitleMissing": "Pealkiri ei tohi olla tühi"
     },
     "addedByStaff": "Lisasid korraldajad",
     "dropzoneTitle": "Lohistage fail siia",
@@ -3014,7 +3017,18 @@
     "open": "Ava",
     "download": "Laadi alla",
     "emptyHintModerator": "Jagage osalejatega slaide, dokumente või kasulikke linke.",
-    "emptyHintPublic": "Siia ilmuvad juhtide jagatud materjalid."
+    "emptyHintPublic": "Siia ilmuvad juhtide jagatud materjalid.",
+    "filter": {
+      "label": "Filtreeri materjale",
+      "all": "Kõik",
+      "files": "Failid",
+      "links": "Lingid"
+    },
+    "openCount": "{count, plural, one {avatud # kord} other {avatud # korda}}",
+    "downloadCount": "{count, plural, one {# allalaadimine} other {# allalaadimist}}",
+    "copyLink": "Kopeeri link",
+    "linkCopied": "Link kopeeriti lõikelauale",
+    "materialUpdated": "Materjal uuendatud"
   },
   "reminders": {
     "title": "Teavitused",

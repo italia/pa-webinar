@@ -87,3 +87,17 @@ export function titleFromFileName(nome: string): string {
   const senza = nome.replace(/\.[a-z0-9]{2,5}$/i, '');
   return senza.replace(/[_]+/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 300);
 }
+
+/**
+ * Dove porta un link, da mostrare sotto il titolo: il nome del sito senza
+ * `www.`, perché chi clicca sappia dove arriva prima di farlo. Null se
+ * l'indirizzo non si legge (le righe valide sono solo http e https).
+ */
+export function materialHost(url: string): string | null {
+  try {
+    const host = new URL(url).hostname;
+    return host ? host.replace(/^www\./i, '') : null;
+  } catch {
+    return null;
+  }
+}

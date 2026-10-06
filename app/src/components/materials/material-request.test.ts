@@ -8,6 +8,9 @@ import { MATERIAL_FILE_MAX_BYTES, MATERIAL_FILE_MIME_TYPES } from '@/lib/validat
 import {
   checkMaterialFile,
   fetchMaterials,
+  markMaterialOpened,
+  materialOpenHandlers,
+  materialPatch,
   materialsListKey,
   uploadErrorFromStatus,
   uploadMaterialFile,
@@ -63,7 +66,8 @@ describe('elenco dei materiali della sala — il token', () => {
     const src = readFileSync(path.join(__dirname, 'material-panel.tsx'), 'utf8');
     expect(src).toContain('materialsListKey(eventSlug, token)');
     expect(src).toContain('fetchMaterials');
-    expect(src).toMatch(/isModerator && visibilityLabel\(m\.visibility\)/);
+    const riga = readFileSync(path.join(__dirname, 'material-item.tsx'), 'utf8');
+    expect(riga).toMatch(/isModerator \? visibilityLabel\(m\.visibility\) : null/);
   });
 });
 
@@ -120,6 +124,21 @@ describe('caricamento di un file dal pannello', () => {
     expect(form.get('title')).toBe('Slide');
     // Un campo vuoto non parte: il server lo tratterebbe come assente comunque.
     expect(form.has('description')).toBe(false);
+    // Senza scelta, la fase la decide il server (il predefinito).
+    expect(form.has('visibility')).toBe(false);
+  });
+
+  it('la fase scelta parte con il file', async () => {
+    fetchMock.mockResolvedValue({ ok: true, status: 201 });
+    const file = new File(['%PDF-1.7'], 'slide.pdf', { type: PDF });
+    await uploadMaterialFile(SLUG, 'TOKEN_MODERATORE', {
+      file,
+      title: '',
+      description: '',
+      visibility: 'BEFORE',
+    });
+    const [, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+    expect((init.body as FormData).get('visibility')).toBe('BEFORE');
   });
 
   it('un rifiuto del server diventa l’errore da mostrare', async () => {
@@ -241,5 +260,82 @@ describe('caricamento con avanzamento', () => {
     });
     XhrFinto.ultimo!.onerror?.();
     expect(await esito).toBe('generic');
+  });
+});
+
+describe('conteggio delle aperture', () => {
+  it('parte senza aspettare, sopravvive al cambio di pagina, con il token come Bearer', () => {
+    fetchMock.mockResolvedValue(new Response(null, { status: 204 }));
+    markMaterialOpened(SLUG, 'mat-1', 'TOKEN_DI_UN_ISCRITTO');
+    expect(fetchMock).toHaveBeenCalledWith(`/api/events/${SLUG}/materials/mat-1/opened`, {
+      method: 'POST',
+      keepalive: true,
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer TOKEN_DI_UN_ISCRITTO' },
+      body: '{}',
+    });
+  });
+
+  it('senza token (la scheda pubblica) nessun Authorization; il JSON dichiarato sempre', () => {
+    // Il server conta solo una richiesta dichiarata JSON: un'altra pagina non
+    // puo' mandarla senza la richiesta preliminare CORS.
+    fetchMock.mockResolvedValue(new Response(null, { status: 204 }));
+    markMaterialOpened(SLUG, 'mat-1');
+    expect(fetchMock).toHaveBeenCalledWith(`/api/events/${SLUG}/materials/mat-1/opened`, {
+      method: 'POST',
+      keepalive: true,
+      headers: { 'Content-Type': 'application/json' },
+      body: '{}',
+    });
+  });
+
+  it('una rete che cade non diventa un errore per chi ha cliccato', async () => {
+    fetchMock.mockRejectedValue(new TypeError('Failed to fetch'));
+    expect(() => markMaterialOpened(SLUG, 'mat-1')).not.toThrow();
+    // La promessa rifiutata è gestita: nessun rifiuto non raccolto.
+    await new Promise((r) => setTimeout(r, 0));
+  });
+
+  it('contano il clic e il clic centrale, non il destro', () => {
+    const aperto = vi.fn();
+    const h = materialOpenHandlers(aperto);
+    h.onClick();
+    h.onAuxClick({ button: 1 });
+    h.onAuxClick({ button: 2 });
+    expect(aperto).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe('modifica dalla sala — il corpo della richiesta', () => {
+  const riga = { title: 'Slide', description: 'Prima versione', visibility: 'ALWAYS' };
+
+  it('solo i campi cambiati, ripuliti dagli spazi', () => {
+    expect(
+      materialPatch(riga, { title: ' Slide finali ', description: 'Prima versione', visibility: 'ALWAYS' }),
+    ).toEqual({ title: 'Slide finali' });
+    expect(materialPatch(riga, { title: 'Slide', description: 'Prima versione', visibility: 'AFTER' })).toEqual({
+      visibility: 'AFTER',
+    });
+  });
+
+  it('una descrizione svuotata si toglie (null)', () => {
+    expect(materialPatch(riga, { title: 'Slide', description: '  ', visibility: 'ALWAYS' })).toEqual({
+      description: null,
+    });
+  });
+
+  it('niente di cambiato: nessuna richiesta', () => {
+    expect(materialPatch(riga, { title: 'Slide ', description: 'Prima versione', visibility: 'ALWAYS' })).toBeNull();
+    expect(
+      materialPatch({ title: 'X', description: null, visibility: 'ALWAYS' }, { title: 'X', description: '', visibility: 'ALWAYS' }),
+    ).toBeNull();
+  });
+
+  it('una fase sconosciuta non si sovrascrive se non la si sceglie', () => {
+    expect(
+      materialPatch(
+        { title: 'X', description: null, visibility: 'VALORE_DI_UNA_VERSIONE_FUTURA' },
+        { title: 'Y', description: '', visibility: 'VALORE_DI_UNA_VERSIONE_FUTURA' },
+      ),
+    ).toEqual({ title: 'Y' });
   });
 });

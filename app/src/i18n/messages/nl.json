@@ -3002,7 +3002,10 @@
       "uploadFailed": "Fout bij het uploaden van het bestand",
       "quotaExceeded": "Dit evenement heeft de limiet voor geüploade bestanden bereikt ({maxFiles} bestanden, {maxMb} MB in totaal): verwijder er enkele om meer te uploaden",
       "uploadBusy": "Te veel uploads op dit moment: probeer het over een paar seconden opnieuw",
-      "deleteFailed": "Het materiaal kon niet worden verwijderd"
+      "deleteFailed": "Het materiaal kon niet worden verwijderd",
+      "updateFailed": "De wijzigingen aan het materiaal konden niet worden opgeslagen",
+      "copyFailed": "Kopiëren mislukt: open de link en kopieer het adres in de browser",
+      "editTitleMissing": "De titel mag niet leeg zijn"
     },
     "addedByStaff": "Toegevoegd door de organisatie",
     "dropzoneTitle": "Sleep het bestand hierheen",
@@ -3014,7 +3017,18 @@
     "open": "Openen",
     "download": "Downloaden",
     "emptyHintModerator": "Deel dia's, documenten of nuttige links met de zaal.",
-    "emptyHintPublic": "Hier verschijnen de materialen die de presentatoren delen."
+    "emptyHintPublic": "Hier verschijnen de materialen die de presentatoren delen.",
+    "filter": {
+      "label": "Materialen filteren",
+      "all": "Alle",
+      "files": "Bestanden",
+      "links": "Links"
+    },
+    "openCount": "{count, plural, one {# keer geopend} other {# keer geopend}}",
+    "downloadCount": "{count, plural, one {# download} other {# downloads}}",
+    "copyLink": "Link kopiëren",
+    "linkCopied": "Link gekopieerd naar het klembord",
+    "materialUpdated": "Materiaal bijgewerkt"
   },
   "reminders": {
     "title": "Meldingen",

@@ -3002,7 +3002,10 @@
       "uploadFailed": "Żball waqt it-tlugħ tal-fajl",
       "quotaExceeded": "Dan l-avveniment laħaq il-limitu tal-fajls imtella' ({maxFiles} fajl, {maxMb} MB b'kollox): neħħi xi wħud biex ittella' oħrajn",
       "uploadBusy": "Wisq fajls qed jitellgħu bħalissa: erġa' pprova fi ftit sekondi",
-      "deleteFailed": "Ma setax jitħassar il-materjal"
+      "deleteFailed": "Ma setax jitħassar il-materjal",
+      "updateFailed": "Ma setgħux jiġu ssejvjati l-bidliet fil-materjal",
+      "copyFailed": "L-ikkupjar ma rnexxiex: iftaħ il-link u kkopja l-indirizz mill-browser",
+      "editTitleMissing": "It-titlu ma jistax ikun vojt"
     },
     "addedByStaff": "Miżjud mill-organizzaturi",
     "dropzoneTitle": "Kaxkar il-fajl hawn",
@@ -3014,7 +3017,18 @@
     "open": "Iftaħ",
     "download": "Niżżel",
     "emptyHintModerator": "Aqsam mal-parteċipanti slajds, dokumenti jew links utli.",
-    "emptyHintPublic": "Hawn jidhru l-materjali maqsuma minn min qed jippreżenta."
+    "emptyHintPublic": "Hawn jidhru l-materjali maqsuma minn min qed jippreżenta.",
+    "filter": {
+      "label": "Iffiltra l-materjali",
+      "all": "Kollha",
+      "files": "Fajls",
+      "links": "Links"
+    },
+    "openCount": "{count, plural, one {miftuħ # darba} two {miftuħ # drabi} few {miftuħ # drabi} many {miftuħ # darba} other {miftuħ # darba}}",
+    "downloadCount": "{count, plural, one {# tniżżil} two {# tniżżil} few {# tniżżil} many {# tniżżil} other {# tniżżil}}",
+    "copyLink": "Ikkopja l-link",
+    "linkCopied": "Il-link ġie kkopjat fil-clipboard",
+    "materialUpdated": "Materjal aġġornat"
   },
   "reminders": {
     "title": "Notifiki",
