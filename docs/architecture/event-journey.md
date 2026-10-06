@@ -385,12 +385,12 @@ Reusable question sets (`QuestionTemplate`) are managed under **Questionnaires**
 An event has at most one questionnaire per placement: `PRE_REGISTRATION` and `POST_EVENT` (`EventQuestionnaire`). A questionnaire combines linked library templates, in link order, with questions written for that event. It also has a title, a description, a `required` flag and an `allowEdit` flag.
 
 - **Where they are edited.** In step 4 of the wizard, or on the event's **Questionnaires** page (`/admin/events/{id}/questionnaires`), through `GET`, `PUT` and `DELETE` on `/api/admin/events/{id}/questionnaires/{placement}`. `PUT` replaces the questionnaire as a whole and is refused with `409` once responses exist. `DELETE` removes it together with all its responses, whether or not responses exist. The **Questionnaires** page shows the response count and asks for confirmation first; emptying the questionnaire in the edit wizard sends the same `DELETE` without either.
-- **Default feedback.** Every new event gets the platform's generic feedback template as its post-event questionnaire (the system template named by `FEEDBACK_GENERIC_TEMPLATE_NAME` in `app/src/lib/feedback/constants.ts`), unless `feedbackEnabled` is off. A questionnaire configured in the wizard replaces it.
-- **Where participants answer.** The pre-registration questionnaire appears on the registration confirmation screen. The post-event questionnaire appears in the feedback dialog when leaving the call and on the public post-event page. The standalone page `/events/{slug}/questionnaire/{placement}` shows either one.
-- **Submission.** `POST /api/events/{slug}/questionnaires/{placement}/responses` allows 60 requests per minute per IP address and validates the answers against the questions. A registrant is identified by the access token (one response per registration). Everyone else is identified by a random id kept in the browser's local storage (one response per id). A second submission updates the response when `allowEdit` is on, and is refused with `409` otherwise.
-- **Results.** Responses and statistics are under **Questionnaires**, **Responses and statistics** (`/admin/questionnaires/responses`).
+- **Default feedback.** Every new event, instant calls included, gets the platform's generic feedback template as its post-event questionnaire (the system template «Feedback generico», named by `FEEDBACK_GENERIC_TEMPLATE_NAME` in `app/src/lib/feedback/constants.ts`), unless it is created with `feedbackEnabled` off (`ensurePostEventQuestionnaire()` in `app/src/lib/feedback/default-questionnaire.ts`). A questionnaire configured in the wizard replaces it. Organizers can change or delete it on the **Questionnaires** page; nothing attaches it again afterwards, and reading an event never does.
+- **Where participants answer.** The pre-registration questionnaire appears on the registration confirmation screen. The post-event questionnaire is the end-of-event rating: the room asks for it on the closing screen, offers it on the leaving screen and from the waiting room of an ended event ([live-interaction.md](live-interaction.md#post-event-feedback)), and the public post-event page invites people to answer it. The standalone page `/events/{slug}/questionnaire/{placement}` shows either one. The post-event questionnaire can be read and answered only while feedback collection is on and the event is `LIVE`, `IDLE` or `ENDED`.
+- **Submission.** `POST /api/events/{slug}/questionnaires/{placement}/responses` allows 60 requests per minute per IP address and validates the answers against the questions. A registrant is identified by the access token (one response per registration). Everyone else is identified by a random id kept in the browser's local storage (one response per id). A second submission updates the response when `allowEdit` is on, and is refused with `409` otherwise. A post-event response stores neither the respondent's name nor an email hash: the registration is kept only to allow one response each.
+- **Results.** Responses and statistics are under **Questionnaires**, **Responses and statistics** (`/admin/questionnaires/responses`). The post-event answers of one event are also in the **Ratings** panel of its page ([Ratings](#ratings)).
 
-The older rating-and-comment feedback (`EventFeedback`, `POST /api/events/{slug}/feedback`, accepted while `LIVE` or `ENDED`) is still accepted. The post-event page's star summary uses it when it exists, and otherwise averages the 1-to-5 `LIKERT` answers of the post-event questionnaire.
+The room does not offer the older rating-and-comment feedback (`EventFeedback`); `POST /api/events/{slug}/feedback` accepts it while `LIVE` or `ENDED`. Its rows count in the event's average rating next to the post-event answers ([Ratings](#ratings)).
 
 ## Materials and agenda
 
@@ -437,14 +437,15 @@ The **Post-event configuration** panel on the **After the event** tab controls t
 - **Publish to the video library** (`libraryListed`).
 - What the page shows: Q&A, materials, poll results, feedback, the recap and the word cloud (`postEventShow*`).
 - **Send recap email when the event ends** (`postEventEmailEnabled`), described in [email.md](email.md).
+- **Notify registrants when the recording is published** (`recordingNotifyEnabled`, on by default), with the time the notice went out once it has (`recordingNotifiedAt`), described in [email.md](email.md#recording-notice).
 - **Feedback survey active at event end** (`feedbackEnabled`).
 
 The page shows, when available:
 
 - **The video**: the self-hosted recording once published. A `youtubeUrl` is shown as an external link, **Watch the video on YouTube**, never embedded, and only when it is an `http(s)` address on a YouTube host. Both appear when both exist.
-- **The event recap** (`app/src/lib/events/recap.ts`): an anonymous, aggregate snapshot with the peak headcount, the number of registrations, the most upvoted answered questions and questions asked in chat (text only, no author), published poll results, the most frequent word-cloud words and the average feedback. It is generated on the first view of the concluded page and stored on the event (`postEventRecap`), so it survives the GDPR cleanup that deletes the rows it came from.
-- **Tabs**: **AI transcript** (when AI outputs are available for the recording), **Questions & Answers** (answered and highlighted questions, when Q&A was on), **Materials**, **Polls** (published polls) and **Feedback** (the star summary).
-- **An invitation to answer the post-event questionnaire**, when feedback is shown and the event has one. It is meant for people who did not answer when leaving the call.
+- **The event recap** (`app/src/lib/events/recap.ts`): an anonymous, aggregate snapshot with the peak headcount, the number of registrations, the most upvoted answered questions and questions asked in chat (text only, no author), published poll results, the most frequent word-cloud words and the average feedback. It is generated on the first view of the concluded page and stored on the event (`postEventRecap`), so it survives the GDPR cleanup that deletes the rows it came from. The average rating is the exception: the page reads it when it is served ([Ratings](#ratings)), and shows it only while **Show feedback** is on.
+- **Tabs**: **AI transcript** (when AI outputs are available for the recording), **Questions & Answers** (answered and highlighted questions, when Q&A was on), **Materials**, **Polls** (published polls) and **Feedback** (the average rating and its distribution).
+- **An invitation to answer the post-event questionnaire**, when feedback is shown, feedback collection is on and the event has one. It is meant for people who did not answer in the room, and answers with the browser id, never with a registration.
 
 ### The recording and the video library
 
@@ -465,11 +466,24 @@ Administrators curate the library in **Publications** (`/admin/publications`). T
 
 When the installation's AI pipeline is on (the site setting `aiPipelineEnabled`) and AI post-production is enabled for the event, subtitles, the transcript, the summary, translations and dubbed audio are attached to the recording. The public page shows them next to the player, and staff review them in the administration area. The pipeline, the review workflow and the transparency notices are described in [POSTPROD.md](../POSTPROD.md); the privacy regime is in [privacy/recordings-and-ai.md](../privacy/recordings-and-ai.md).
 
+### Ratings
+
+The **Ratings** panel of the **After the event** tab, below **Post-event configuration**, reads `GET /api/admin/events/{id}/feedback` (`app/src/lib/feedback/event-feedback-report.ts`) and refreshes every minute. Administrators and the event's organizer read it with their staff session, and the event's moderators (the primary link or a `MODERATOR` grant) with their token, when they open the event page from a moderator link. Speakers cannot. It shows:
+
+- how many ratings arrived;
+- for each question of the post-event questionnaire, how many people answered it, and the average and distribution of scale and yes/no answers, or the count per option of choice questions;
+- every comment (open-text answer), without names;
+- the older star ratings (`EventFeedback`), with their average and comments, when the event has any.
+
+**Download CSV** fetches `?format=csv&locale=<language>`: one row per response, with the submission time, whether it came through a registration or a browser id (`registration` or `guest`), and one column per question, worded in the chosen language. Fields are separated by `;`, the file starts with a UTF-8 byte-order mark so spreadsheet programs read accented letters, yes/no answers are written as words, and a field that starts with `=`, `+`, `-`, `@`, a tab or a carriage return gets a leading `'` so that it is never run as a formula.
+
+**One average.** `getFeedbackSummary()` in `app/src/lib/feedback/feedback-summary.ts` computes the event's average rating for the **Feedback** tab and the recap of the concluded page, and for the **Statistics** tab. Each response with at least one scale (`LIKERT`) answer counts once, as the mean of those answers, each rescaled to 1–5; each older star rating also counts once. The distribution rounds each value to the nearest star. It is computed on every request, so ratings given after the recap was first built are included.
+
 ### Event analytics
 
 The **Statistics** tab reads `GET /api/admin/events/{id}/analytics`, open to administrators and the owning organizer. It works for any event, recorded or not, and combines:
 
-- the recap;
+- the recap, with the average rating read at request time ([Ratings](#ratings));
 - attendance and conversion from the registrations' join and leave times;
 - the newest call session's peak headcount and times, and the raised-hand log across all sessions;
 - dwell and retention for registrants with both a join and a leave time;
@@ -498,6 +512,7 @@ Both call `POST /api/events/instant`, which requires a staff session and allows 
 - chat and whiteboard on, Q&A off, and microphone, camera and screen sharing open to everyone;
 - recording on (`recordingEnabled: true`), so the creator and the other moderators can record. The guest view of an instant call forces the recording flags off, so guests are not shown the recording-consent step before joining ([known limitations](#known-limitations));
 - a retention of 7 days and the post-event page off;
+- the platform's generic post-event feedback questionnaire, so the end of the call asks for a rating. If it cannot be attached, the call is created without it;
 - the name as the title, and the fixed Italian description `Videocall istantanea`. The API requires the `it` key, so the card stores the name there whatever language it was typed in; the list's quick form stores it under both `it` and `en`.
 
 The response carries the moderator's room link and the share link, `/events/{slug}/live`. Anyone with the share link enters as a guest while the call is `LIVE`, `IDLE` or `PROVISIONING`.
@@ -518,7 +533,7 @@ These describe the current code. Planned work is tracked in [ROADMAP.md](../ROAD
 - **Organization names.** Step 3 asks for a contact name and an organization for each co-organizing organization, but only the contact name, the logo and the website are stored.
 - **Calendar file of hidden events.** `GET /api/events/{slug}/calendar.ics` answers for every event that is not a `DRAFT`, with no visibility check. Anyone who knows the slug of an `ARCHIVED` event, of a concluded event whose post-event page is off or expired, or of an instant call can still download its title, description, dates and moderator name.
 - **Recording consent in instant calls.** Instant calls have recording on, but their guest view skips the recording-consent step that participants of a recorded scheduled event see, so people who join through the share link are not asked before a moderator records.
-- **Feedback can be counted twice.** A registrant who answered the post-event questionnaire when leaving the call can answer again on the public post-event page, which submits as an anonymous respondent.
+- **Feedback can be counted twice.** A registrant or a speaker who answered the post-event questionnaire in the room can answer again on the public post-event page, which submits with the browser's guest id.
 - **No series.** A recurrence rule only proposes the next date on duplication; occurrences are not created automatically and have no shared configuration ([ROADMAP.md](../ROADMAP.md#recurring-events-and-series)).
 
 ## Where the code lives

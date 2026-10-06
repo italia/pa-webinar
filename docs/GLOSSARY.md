@@ -269,7 +269,8 @@ always do everything.
 
 **Questionnaire** (`EventQuestionnaire`, UI **Questionnaires**): questions
 attached to an event, either inside the registration form (`PRE_REGISTRATION`)
-or on the post-event page (`POST_EVENT`). A questionnaire is built from
+or as the end-of-event rating, in the room and on the post-event page
+(`POST_EVENT`). A questionnaire is built from
 reusable question templates (`QuestionTemplate`) plus questions specific to
 the event. [From creation to recap](architecture/event-journey.md)
 
@@ -416,13 +417,16 @@ for attendance, interaction and engagement. The instance-wide page is
 
 **Event recap** (`postEventRecap`, UI **Event recap**): an anonymized,
 aggregate snapshot of an ended event (headcount, top questions, published poll
-results, word-cloud words, feedback average). It is stored so it outlives the
-retention cleanup of the underlying rows.
+results, word-cloud words). It is stored so it outlives the retention cleanup
+of the underlying rows. The average rating shown with it is read live while
+the answers exist, and taken from the stored snapshot after the retention cleanup.
 [From creation to recap](architecture/event-journey.md)
 
-**Post-event feedback** (`EventFeedback`): a 1 to 5 rating with an optional
-comment, collected on the post-event page. It is separate from the post-event
-questionnaire. [From creation to recap](architecture/event-journey.md)
+**Post-event feedback** (UI **Feedback**; **Ratings** in the administration
+area): the end-of-event rating, which is the event's post-event questionnaire.
+The room asks for it when the call ends, and organizers see the answers
+without names. Older 1 to 5 star ratings with a comment (`EventFeedback`)
+count in the same average. [From creation to recap](architecture/event-journey.md#ratings)
 
 **Post-event page**: what an event's page becomes once it has `ENDED`:
 recording, recap, Q&A, polls, materials, feedback and AI outputs, each shown
@@ -432,6 +436,12 @@ or hidden per event. [From creation to recap](architecture/event-journey.md)
 published video: scheduled events, instant calls, uploaded archive videos,
 and recordings still waiting to be promoted.
 [From creation to recap](architecture/event-journey.md)
+
+**Recording notice** (`recordingNotifyEnabled`, UI **Notify registrants when
+the recording is published**): the single email that tells an event's
+registrants that its recording, or external video, is visible on the event
+page. On by default, sent once per event.
+[Email and calendar](architecture/email.md#recording-notice)
 
 **Video library** (`/video-library`, UI **Video library**): the public list of
 events whose recordings are published and listed (`libraryListed`).
@@ -996,7 +1006,8 @@ these docs and the code use *organizer*.
 | Italian UI | English UI | Term in these docs |
 |---|---|---|
 | Riepilogo dell'evento | **Event recap** | event recap (`postEventRecap`) |
-| Feedback | **Feedback** | post-event feedback (`EventFeedback`) |
+| Feedback | **Feedback** | post-event feedback (`POST_EVENT` questionnaire) |
+| Valutazioni | **Ratings** | the event's ratings panel (post-event feedback) |
 | Libreria video | **Video library** | video library |
 | Pubblicazioni | **Publications** | publications |
 | Statistiche | **Statistics** | event analytics |

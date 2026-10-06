@@ -43,7 +43,7 @@ flowchart LR
 
   subgraph AFTER["After: portal pages fed by background jobs"]
     direction TB
-    A1["Feedback<br/>post-event questionnaire<br/>or star rating"]
+    A1["Rating<br/>end-of-event questionnaire,<br/>asked in the room"]
     A2["Recap page<br/>anonymous aggregate,<br/>answered Q&A, poll results"]
     A3["Recording<br/>published by a moderator<br/>or the administration"]
     A4["Transcript, subtitles,<br/>summary, dubbing<br/>optional AI post-production"]
@@ -187,6 +187,7 @@ Configured in: [Branding and white-labeling](configuration/branding.md) · [Runt
   - Reminders. A new scheduled event gets two, one day and one hour before the start. The organizer can change them: up to five per event, chosen from presets between **7 days before** and **15 minutes before**.
   - A notice when the date of a published event changes.
   - An *optional* thank-you email after the event, with a recap and a feedback link.
+  - A notice when the event's recording, or its external video, becomes visible on the event page. It is on by default and can be turned off per event.
 
   Emails are written in the registrant's language when copy exists for it, and in English otherwise. See [Email and calendar](architecture/email.md).
 - **Capacity.** The expected number of participants sizes the video infrastructure. It is not a registration cap.
@@ -213,7 +214,7 @@ The waiting room is the single front door. Personal links and magic links always
 - **Over plain `http://`.** The browser gives the page no microphone or camera, so the waiting room and the room show a notice with the `https://` address instead of trying to start the call.
 - **When the bridge lags.** If the event is live but the bridge still reports not ready after a minute, the room offers **Enter anyway**, so a stale readiness signal never locks people out.
 - **When live.** A short cue announces that the room is open, and the join button turns on.
-- **After the end.** It links to the recording and the feedback.
+- **After the end.** It links to the recording and, when feedback is on, offers everyone except moderators **Leave feedback**, which opens the end-of-event rating in a dialog.
 - **Profile photo.** *Optional.* Registrants who opened the personal link from their email in this browser can choose a photo. Someone who registered in this browser but has not opened that link here yet is asked to open it in this browser first, because it shows the address is theirs. Moderators and speakers do not add a photo: they keep their initials, or their Gravatar where it is enabled. Others in the room then see the photo instead of the initials, in the video tiles and in the participants panel; the chat keeps the initials. The photo is cropped to a square and saved as a small JPEG without its metadata (date, place, device). It also applies at later events the person registers for with the same email address, until they remove it. See [Avatars](architecture/identity-and-access.md#avatars).
 - **Device check.** A camera preview, a microphone level meter and an audio test, with on and off switches. Participants start with camera and microphone off. Moderators, speakers and instant-call participants start with them on. On phones everyone joins muted, because mobile browsers need a tap to open the camera.
 - **Virtual background.** A few neutral images, such as **Light office** and **Institutional blue**, applied on entry. Background blur is available inside the room.
@@ -304,7 +305,7 @@ Below 992 px, the layout is a full-screen video with a floating control bar, and
 - **Just leave.** The call goes on for everyone else. The leaving screen reminds the moderator that the event stays open until someone chooses **End for everyone**.
 - **End for everyone.** This opens **Event destiny**, which offers **Keep it public**, **Publish to the library** or **Archive (private)**. When the event records and AI post-production is on for it, it also offers a checkbox to generate the transcript and summary.
 
-When the event ends, participants get the feedback form, unless feedback is turned off for the event. The closing screen appears only when the event has really ended; someone who leaves or loses the connection sees the leaving screen instead.
+When the event ends, however it ends, the closing screen asks everyone except moderators for the end-of-event rating, unless feedback is turned off for the event. The closing screen appears only when the event has really ended; someone who leaves or loses the connection sees the leaving screen instead, which offers **Leave a rating** without waiting for the end. The rating is asked once per visit, whether it is answered or skipped.
 
 Configured in: [Runtime settings](configuration/runtime-settings.md) · [Configuration reference](CONFIGURATION.md) · [From creation to recap: the event journey](architecture/event-journey.md).
 
@@ -401,13 +402,15 @@ Configured in: [Runtime settings](configuration/runtime-settings.md) · [Brandin
 ### The concluded event page
 
 - **Visibility.** The page stays public after the end unless it is switched off, and it can close at a set date. Instant calls start with it off. When it is off or has expired, the page returns "not found" and leaves listings and the sitemap.
-- **Recap.** An anonymous summary is computed the first time someone opens the page, then stored so that it outlives the retention cleanup. It shows peak and registered participants, the top questions, poll results, the most-shared words and the average rating.
+- **Recap.** An anonymous summary is computed the first time someone opens the page, then stored so that it outlives the retention cleanup. It shows peak and registered participants, the top questions, poll results and the most-shared words. The average rating is read when the page is served, so later ratings count; once the retention cleanup has removed the answers, the stored figure is shown. It appears only while the event shows its feedback.
 - **Video.** A published recording plays in the platform's player, with speed control, picture-in-picture, keyboard shortcuts, subtitle tracks and a download link. If the event has a YouTube URL, the page shows a **Watch the video on YouTube** link. Nothing from YouTube loads until the visitor follows it.
 - **Tabs.** **AI transcript**, **Questions & Answers** (answered and highlighted questions, with their written answers), **Materials**, **Polls** (published results only) and **Feedback**. Each event can hide the Q&A, materials, polls, feedback, recap and word-cloud sections.
 
 ### Recording publication
 
 A recording stays private until a moderator or the administration publishes it (**Publish recording**) and picks how long it stays online, from **24 hours (temporary)** up to the event's retention deadline. **Publish to the video library** then lists the event in the **Video library**. Whatever is chosen, the event's GDPR retention still applies. See [Recordings, voice data and AI outputs](privacy/recordings-and-ai.md).
+
+When the recording, or an external video, becomes visible on the event page, every registration the event still keeps receives one email with the event page link (**Notify registrants when the recording is published**, on by default). It goes out once per event, and only after the page itself is public. The switch can be turned off until the notice is sent; the panel then shows when it went out. Once data retention has deleted the registrations, nobody is notified. See [Email and calendar](architecture/email.md#recording-notice).
 
 ### AI outputs
 
@@ -442,7 +445,12 @@ The pipeline is described in [AI post-production](POSTPROD.md), and the decision
 
 ### Feedback
 
-When the event ends, participants get the post-event questionnaire if the event has one, or a 1–5 star rating otherwise. Results feed the **Feedback** tab, the recap and the **Feedback** dashboard. The follow-up email is *optional* and sends registrants a thank-you with the recap and a feedback link, and the moderator a recap.
+The end-of-event rating is the event's post-event questionnaire. Every event, instant calls included, gets the platform's generic feedback questionnaire when it is created with feedback collection on; organizers can change it or remove it. The room asks for it as described in [Leaving](#leaving), and the concluded event page offers it too while it shows feedback. Organizers see the answers without the respondent's name, and the form says so.
+
+- **Ratings.** On the event page in the administration area, the **After the event** tab has a **Ratings** panel: the average and distribution of each question, every comment, the older star ratings, and **Download CSV**. Administrators, the event's organizer and its moderators see it; speakers do not.
+- **One average.** The **Feedback** tab of the concluded page, the recap and the event's **Statistics** tab show the same average rating, on a 1–5 scale.
+
+The follow-up email is *optional* and sends registrants a thank-you with the recap and a feedback link, and the moderator a recap.
 
 Configured in: [AI post-production](POSTPROD.md) · [Setting up recording](operations/recording-setup.md) · [Recordings, voice data and AI outputs](privacy/recordings-and-ai.md).
 

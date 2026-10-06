@@ -49,7 +49,7 @@ Two features do not follow this principle: the presentation timer and the counte
 
 ## Feature catalog
 
-In this page, **moderator** means a caller holding the event's primary moderator link or a non-revoked named grant with role `MODERATOR`. Speakers (named grant with role `SPEAKER`) never pass a moderator check. **Registrant** means a caller holding the `accessToken` of a `Registration` for this event. A **browser id** is a random identifier the room stores in `localStorage`, under one key per role (`paw_guest_id`, `paw_speaker_voter_id`, `paw_moderator_voter_id`), so a moderator who previews the room as a guest in the same browser does not carry over the moderator's votes. The poll and word-cloud panels and Q&A upvotes use it for everyone without a registration (guests, speakers and moderators); Q&A questions, agenda reactions and the post-event rating send it only for guests.
+In this page, **moderator** means a caller holding the event's primary moderator link or a non-revoked named grant with role `MODERATOR`. Speakers (named grant with role `SPEAKER`) never pass a moderator check. **Registrant** means a caller holding the `accessToken` of a `Registration` for this event. A **browser id** is a random identifier the room stores in `localStorage`, under one key per role (`paw_guest_id`, `paw_speaker_voter_id`, `paw_moderator_voter_id`), so a moderator who previews the room as a guest in the same browser does not carry over the moderator's votes. The poll and word-cloud panels and Q&A upvotes use it for everyone without a registration (guests, speakers and moderators); Q&A questions and agenda reactions send it only for guests; the post-event rating sends it for guests and speakers, and moderators are not asked.
 
 | Feature | Stored in | Who writes | Who reads | How a change reaches the room |
 |---|---|---|---|---|
@@ -62,7 +62,7 @@ In this page, **moderator** means a caller holding the event's primary moderator
 | Reactions (app bar) | Process memory, plus `Reaction` rows for analytics | Anyone who knows the event slug | Anyone who knows the event slug | 5 s poll |
 | Timer | Process memory | Moderators | Anyone who knows the event slug | 5 s poll |
 | Raised hands | Jitsi. Analytics in `CallSession.handRaiseLog` and the [live action journal](#live-action-journal) | Participants in Jitsi. **Lower hand**: moderators | Jitsi roster | Jitsi events, plus `control:<eventId>` |
-| Post-event feedback | `EventFeedback`, or a post-event questionnaire | Registrants and browser ids while `LIVE` or `ENDED` | Summary: anyone. Comments: primary moderator link | Not live |
+| Post-event feedback | The `POST_EVENT` questionnaire (`QuestionnaireResponse`); older star ratings in `EventFeedback` | Registrants and browser ids, except moderators, while feedback collection is on and the event is `LIVE`, `IDLE` or `ENDED` | Average and distribution: the concluded event page, when it shows feedback. Every answer: staff who manage the event and its moderators (**Ratings** panel) | Not live |
 | Live flags | `Event` columns | Moderators | Anyone who knows the event slug | Snapshot `flags` on `live:<eventId>` |
 
 ### Who is in the room: the read rules
@@ -232,10 +232,17 @@ How the toolbar and roster are configured is in [jitsi-integration.md](jitsi-int
 
 ### Post-event feedback
 
-When the event ends, participants who are not moderators see a post-event feedback prompt:
+The end-of-event rating is the event's `POST_EVENT` questionnaire ([event-journey.md](event-journey.md#questionnaires-and-post-event-feedback)), shown by `app/src/components/live/post-event-feedback.tsx`. The room asks for it when feedback collection is on (`feedbackEnabled`) and the event has one, and never asks moderators:
 
-- If the event has a `POST_EVENT` questionnaire, the prompt renders it and answers go to `QuestionnaireResponse` (see [event-journey.md](event-journey.md)).
-- Otherwise the prompt collects a single rating from 1 to 5 and an optional comment of up to 500 characters through `POST /feedback`. It is accepted only while the event is `LIVE` or `ENDED`, once per registration or browser id. The room sends the registration token for registrants and the browser id for guests (see [Known limitations](#known-limitations) for speakers). `GET /feedback` returns the average and distribution to anyone. Comments are returned only to the primary moderator link.
+- **Closing screen.** However the call ends (the end time passes, a moderator ends it for everyone, or the connection drops after the end), the closing card shows the form.
+- **Leaving screen.** Someone who leaves while the event is still running sees **Leave a rating**, which opens the form on the same screen. It is an offer, not a prompt.
+- **Ended waiting room.** **Leave feedback** opens the form in a modal `<dialog>`: focus stays inside, the page behind it cannot be used, and Esc, **Skip** or the close button close it and return focus to the button.
+
+The rating is shown once per visit: after it is answered or skipped, the closing screen does not ask again. **Submit feedback** stays disabled until at least one question has an answer, because each identity has a single response. If the server already holds a response for that identity, the form says **You have already left your rating: thank you!** instead of an error.
+
+`GET /questionnaires/POST_EVENT` and `POST /questionnaires/POST_EVENT/responses` answer only while feedback collection is on and the event is `LIVE`, `IDLE` or `ENDED` (`feedbackOpen()` in `app/src/lib/feedback/default-questionnaire.ts`). Otherwise the read answers `404`, so no form appears, and the write answers `403`. The room sends the registration token for registrants and the browser id for everyone else, guests and speakers included. The response stores neither the respondent's name nor an email hash: the registration link is kept only to allow one response per registration. The form tells respondents that organizers see the answers without their name.
+
+The room does not offer the older star rating (`EventFeedback`). `POST /feedback` accepts one while the event is `LIVE` or `ENDED`, and `GET /feedback` returns the average and distribution of those rows to anyone and their comments to the primary moderator link. These rows count in the event's average rating and appear in the **Ratings** panel ([event-journey.md](event-journey.md#ratings)).
 
 ## Live action journal
 
@@ -479,7 +486,6 @@ The Jitsi toolbar, per-device buttons and the screen-share banner are covered in
 - **Timer and reaction-bar counters are per pod.** They live in process memory. The chart runs at least two app replicas by default (`autoscaling.minReplicas`, or `app.replicaCount` when autoscaling is off in `values.yaml`), with no session affinity. A browser whose requests land on another pod can see a different timer or different reaction counts, and a pod restart resets them. The `Reaction` rows used for analytics are not affected.
 - **A Redis outage that starts after a live stream opened is not signaled to the client.** The `ping` keepalive comes from the app pod, not from Redis, so the client keeps polling off. Pokes published during the outage are dropped, and the panels stay as they were until Redis returns; then every open stream resends the snapshots and pokes every panel. The chat is not affected, because its watchdog relies on real message frames.
 - **Browser-id identities are chosen by the client.** Poll, word-cloud and agenda deduplication for browsers without a registration is only as strong as the browser's honesty.
-- **Speakers cannot submit the post-event rating.** Speakers see the rating prompt, but the room sends no identity for them, so `POST /feedback` refuses the rating while the prompt reports success.
 - **The whiteboard is not stored.** Jitsi's whiteboard is ephemeral. When it is enabled for the event (`whiteboardEnabled`, always on for instant calls) and for the installation (`NEXT_PUBLIC_WHITEBOARD_ENABLED`), the drawer reminds moderators to export it and attach it as a material before ending.
 
 ## Design notes

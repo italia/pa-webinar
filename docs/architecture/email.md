@@ -1,6 +1,6 @@
 # Email and calendar
 
-PA Webinar sends a small, fixed set of transactional emails: registration confirmations, reminders, date-change notices, post-event follow-ups, moderator and speaker links, staff sign-in links and the verification links of data-subject requests. It never sends marketing mail, and there is no mailing-list feature. Every message goes through one durable queue, the email outbox, and leaves over SMTP from a single scheduled job.
+PA Webinar sends a small, fixed set of transactional emails: registration confirmations, reminders, date-change notices, post-event follow-ups, recording notices, moderator and speaker links, staff sign-in links and the verification links of data-subject requests. It never sends marketing mail, and there is no mailing-list feature. Every message goes through one durable queue, the email outbox, and leaves over SMTP from a single scheduled job.
 
 This page owns outgoing email behavior: the outbox pattern, the catalog of emails, their languages, reminders, calendar files, the sender identity and the editable templates, and the known gaps. It is written for developers who add or change an email and for operators who need to find out why a message did not arrive.
 
@@ -142,6 +142,7 @@ This is the complete list of producers: every call to `enqueueEmail()` in the ap
 | Date-change notice | An edit of the event (`PUT /api/events/<id>`) changes its start or end time while the event is `PUBLISHED` | Every registrant | The new date and time and an `event-updated.ics` attachment. No link: it says that the personal join link is unchanged | No | `date-change-notification` |
 | Post-event thank-you | The reminders job finalizes an event that opted in (see [After the event](#after-the-event)) | Every registrant, whether or not they attended | Event page link, where the recap and the feedback form are | No | `post_event_participant` |
 | Post-event recap | The same run | The event's moderator contact (`moderatorEmail`), if set | Headcount, registrations, questions, polls and average feedback; event page link; recording link if the recording is published | No | `post_event_moderator` |
+| Recording notice | The reminders job finds an `ENDED` event whose recording is visible on its public page ([Recording notice](#recording-notice)) | Every registration the event still keeps, whether or not they attended | Event page link, where the recording is | No | `recording_published` |
 | Moderator link | An event with a primary contact address (`moderatorEmail`) is created (`POST /api/events`, even as a draft) or published (`PUT /api/events/<id>`), or that address changes; once per address | The event's primary contact | The event's management link and the room link, both with the primary moderator token, and the warning that the link is personal and must not be shared | No | `moderator-link` |
 | Co-moderator or speaker link | A named grant with an email address is created (`POST /api/events/<id>/moderators`) | The grant's address | The room link with the grant's token, a text for the role (co-moderator or speaker) and the same warning | No | `moderator-link` |
 | Staff sign-in link | A request from the sign-in page (`POST /api/staff/login-link`), an administrator creating a staff account with the invitation option, or re-sending the link from **Staff accounts** | An active staff account | One-time sign-in link ([lifetime](#what-each-link-is)) | No | `staff-login` |
@@ -209,6 +210,17 @@ When an event has **Send recap email when the event ends** turned on (`Event.pos
 
 The thank-you links to the event page, and for registrants in the address book it carries the same opt-out link as the confirmation. An `ENDED` event's page answers 404 unless **Event page visible after end** is on and its **Visible until:** date (`postEventPublicUntil`), if set, has not passed ([Event lifecycle](event-lifecycle.md)). The finalization checks neither, so the two options should be turned on together, with an end date that leaves registrants time to open the link ([Known gaps](#known-gaps)).
 
+### Recording notice
+
+When an event's recording becomes visible on its public page, the reminders job tells the registrants, once. The switch is **Notify registrants when the recording is published** in the **Post-event configuration** panel (`Event.recordingNotifyEnabled`, on by default; `POST /api/events` and `PUT /api/events/<id>` accept it). The logic is in `app/src/lib/events/recording-notify.ts`:
+
+- an event qualifies when it is `ENDED`, not a historical event from **Publications** (type `LEGACY`), has the switch on, has not been notified (`recordingNotifiedAt` is empty), and has a published recording with a URL (`recordingPublished` and `recordingUrl`) or an external video (`youtubeUrl`). It does not matter where the recording was published from;
+- the event page must be publicly visible ([Event lifecycle](event-lifecycle.md)). Until it is, the event waits and is checked again on the next run;
+- the event is claimed first by setting `recordingNotifiedAt`, with a conditional update, so two overlapping runs cannot both send; the notice goes out at most once per event;
+- it goes to every registration the event still has, in the registration's language, with a link to the event page and, for registrants in the address book, the same opt-out link as the confirmation. Registrations deleted by data retention or erasure receive nothing, so a recording published after the event's retention notifies nobody.
+
+The panel shows when the notice went out, and from then on the switch has no effect; turned off before, it prevents the notice. The migration that adds the two columns marks the events whose recording is already public as notified, so an upgrade sends no late notices. Duplicating an event copies the switch, not `recordingNotifiedAt`.
+
 ### Moderator and speaker links
 
 The people who run an event receive their own link by email when an address is known (`app/src/lib/email/moderator-link.ts`):
@@ -266,7 +278,7 @@ The language is stored once, at registration, and every later email to that regi
 | Email | Where its language comes from |
 |---|---|
 | Confirmation | The page the person registered from, as above; a resend uses the stored `Registration.locale` |
-| Reminder, date-change notice, post-event thank-you | `Registration.locale`; for registrations that have none, the installation's default language (`SiteSetting.defaultLocale`) |
+| Reminder, date-change notice, post-event thank-you, recording notice | `Registration.locale`; for registrations that have none, the installation's default language (`SiteSetting.defaultLocale`) |
 | Post-event recap to the moderator | The installation's default language (`SiteSetting.defaultLocale`) |
 | Moderator and speaker links | The administration page that made the request: `?locale=`, then the language of the page in the `Referer`, then the installation's default language |
 | Staff sign-in link | The page the link was requested from: the sign-in page, or the administration page of the administrator who sent it |
@@ -295,6 +307,7 @@ On each run, the reminders job (`GET /api/cron/reminders`) does the following:
 2. For each event that has not started, it picks the **current** reminder: among those that are due (`startsAt − offset ≤ now`), the one with the smallest offset, whose wording ("in 30 minutes") is closest to the time actually left. Larger due reminders are superseded and are not sent (`app/src/lib/email/reminder-plan.ts`).
 3. A current reminder that was created after its own moment goes to nobody. Otherwise it goes to every registration created by that moment with no `ReminderSent` row for it: the job queues the email, then writes the `ReminderSent` row.
 4. It runs the post-event finalization ([After the event](#after-the-event)).
+5. It sends the recording notices that are due ([Recording notice](#recording-notice)).
 
 What follows from these rules:
 
@@ -376,7 +389,7 @@ Administrators can override the text of two emails from **Email templates** (`/a
 - **Plain text only.** The heading, intro, info note and footer note are HTML-escaped when inserted. The button label is inserted as is, so it must stay plain text, and it should not contain `{{eventTitle}}` ([Known gaps](#known-gaps)).
 - **Defaults are visible.** The editor shows the built-in text of every field from `GET /api/admin/email-templates/defaults`, with placeholders in place of real values, except the reminder offset, which is shown for one hour.
 
-The date-change notice, the post-event emails, the staff sign-in email and the data-subject emails have fixed texts in code: `app/src/lib/email/notification.ts`, `app/src/lib/email/templates.ts` and the two `request` routes under `app/src/app/api/gdpr/`.
+The date-change notice, the post-event emails, the recording notice, the staff sign-in email and the data-subject emails have fixed texts in code: `app/src/lib/email/notification.ts`, `app/src/lib/email/templates.ts` and the two `request` routes under `app/src/app/api/gdpr/`.
 
 ### What the emails look like
 
@@ -384,7 +397,7 @@ Every email is self-contained HTML with inline styles and a plain-text alternati
 
 The layout differs by email:
 
-- **Confirmations, reminders, post-event emails and the staff sign-in email** share one layout from `app/src/lib/email/templates.ts`, with a header band above the heading. The band shows the site name in post-event and staff emails; in confirmations and reminders it always reads "PA Webinar" ([Known gaps](#known-gaps)).
+- **Confirmations, reminders, post-event emails, the recording notice and the staff sign-in email** share one layout from `app/src/lib/email/templates.ts`, with a header band above the heading. The band shows the site name in post-event, recording-notice and staff emails; in confirmations and reminders it always reads "PA Webinar" ([Known gaps](#known-gaps)).
 - **The date-change notice** has its own layout in `app/src/lib/email/notification.ts`: its header band shows its heading, and its footer always says the email was sent automatically by PA Webinar, whatever the site name is.
 - **The data-subject emails** are plain paragraphs with the signed link, with no header or footer.
 
@@ -433,7 +446,7 @@ LIMIT 20;
 
 **2. Read what the row says.**
 
-- **No row:** the producer never queued the message. Check its trigger in the [catalog](#emails-the-platform-sends): a draft event gets no reminders, a date change on an event that is not `PUBLISHED` notifies nobody, while public registration is off an address that is not on the invitation list gets no confirmation, the post-event follow-up needs its option on and a recently ended event ([After the event](#after-the-event)), and the data-subject and staff forms stop queuing, without saying so, once their per-address rate limits are reached ([Security architecture](security.md)). Queuing errors are logged by the application with an `[email]`, `[cron/reminders]` or `[post-event-finalize]` prefix.
+- **No row:** the producer never queued the message. Check its trigger in the [catalog](#emails-the-platform-sends): a draft event gets no reminders, a date change on an event that is not `PUBLISHED` notifies nobody, while public registration is off an address that is not on the invitation list gets no confirmation, the post-event follow-up needs its option on and a recently ended event ([After the event](#after-the-event)), the recording notice needs its option on, a visible event page and registrations not yet deleted ([Recording notice](#recording-notice)), and the data-subject and staff forms stop queuing, without saying so, once their per-address rate limits are reached ([Security architecture](security.md)). Queuing errors are logged by the application with an `[email]`, `[cron/reminders]`, `[post-event-finalize]` or `[recording-notify]` prefix.
 - **`PENDING` with `attempts` at 0 and a recent `created_at`:** the row is waiting for the next run, or behind a large mailing ([Throughput and timing](#throughput-and-timing)).
 - **`PENDING` with `attempts` at 0 and an old `created_at`:** nothing is draining the queue. Check the job:
 
@@ -504,7 +517,7 @@ On a local stack, every message is captured by Mailpit instead of being delivere
 | Queue, encryption, retry schedule | `app/src/lib/email/outbox.ts` |
 | Transport, sender resolution | `app/src/lib/email/send.ts` |
 | Draining the queue | `app/src/app/api/cron/email-outbox/route.ts` |
-| Reminders and post-event run | `app/src/app/api/cron/reminders/route.ts`, `app/src/lib/events/post-event-finalize.ts` |
+| Reminders, post-event run and recording notice | `app/src/app/api/cron/reminders/route.ts`, `app/src/lib/events/post-event-finalize.ts`, `app/src/lib/events/recording-notify.ts` |
 | Confirmation | `app/src/lib/email/confirmation.ts` |
 | Moderator and speaker links | `app/src/lib/email/moderator-link.ts` |
 | Which reminder is current | `app/src/lib/email/reminder-plan.ts` |

@@ -42,7 +42,7 @@ Statuses, wake and overtime are owned by [the event lifecycle](event-lifecycle.m
 | `LIVE` | Bridge reported as starting, for less than 60 seconds | Banner **Preparing room...** and a disabled button **The room is getting ready…**, with **Head to the square meanwhile** below it |
 | `LIVE` | Bridge ready or unknown | **Enter now**, which can always be pressed. With an incomplete form, pressing it marks the first missing field (the name, then the email, then the per-participant recording consent when it is asked), shows why and moves focus there. While the name is missing, **To enter, type your name (at least 2 characters).** already shows next to the field and above the button |
 | `LIVE` | Bridge still reported as starting after 60 seconds | **Enter now** behaves the same way, but the **Preparing room...** banner stays and the room is not announced as ready |
-| `ENDED` | Any | **Event ended**, with **Watch the recording** when a recording exists and **Leave feedback** when feedback is on. There is no name field, device check or entry button |
+| `ENDED` | Any | **Event ended**, with **Watch the recording** when a recording exists and, when feedback is on, **Leave feedback** for everyone except moderators, which opens the end-of-event rating in a dialog ([Post-event feedback](live-interaction.md#post-event-feedback)). There is no name field, device check or entry button |
 
 Any other status (`DRAFT`, `ARCHIVED`) reached with a valid link shows the disabled **Opens at {time}** button.
 

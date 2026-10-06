@@ -226,8 +226,8 @@ Each step with the result to expect ([First steps](minikube.md#first-steps)):
       both hear and see each other.
 - [ ] **System status** shows two participants and one conference;
       **Monitoring** > **Infrastructure** shows **Fixed mode**.
-- [ ] **End for everyone** closes the room and shows the page with the
-      feedback form.
+- [ ] **End for everyone** closes the room and shows the registrant the
+      closing screen with the rating form.
 - [ ] `scripts/verify-install.sh --context pa-webinar ... --call` exits `0`.
 - [ ] When you are done, `scripts/minikube-down.sh --purge`, and the
       profile's name typed when it asks (`--yes` skips the question): the

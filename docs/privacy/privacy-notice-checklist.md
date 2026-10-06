@@ -224,7 +224,7 @@ feature on and what the notice should say about it.
 | Organization fields | `requireOrganization`, `requireOrganizationRole`, `requireOrganizationType`, per event and only through the events API; the wizard has no control for them. Off by default | When on, the organization name is required on the form; role and type of body are optional. State the statistical purpose |
 | Guests | **Guest access enabled** for scheduled events; always on instant calls | The display name typed in the waiting room, and, in chat messages, an identifier derived from the IP address and that name. The **Email (optional)** field there stays in the browser and is never sent |
 | Q&A, chat, polls, word cloud, reactions, agenda reactions | `qaEnabled`, `chatEnabled` and the other live-interaction flags of the event | Contributions carry the author's display name: chat sender names and texts are encrypted; Q&A author names and questions are stored in plain text. Everyone who can read the chat can download it, names included |
-| Questionnaires and post-event feedback | Per event | Answers carry the respondent's name, and free-text answers can contain anything |
+| Questionnaires and post-event feedback | Per event; every event created with feedback collection on gets the generic end-of-event rating | Pre-registration answers carry the respondent's name. The end-of-event rating stores no name and no email hash, only the registration (one response each) or a browser id, and the form tells respondents that organizers see the answers without their name. Administrators, the event's organizer and its moderators read every answer and can download them as CSV. Free-text answers can contain anything |
 | Materials | Staff and moderators add them per event | Whatever the documents contain. The visibility setting decides which public lists show a material, not who can open it: an uploaded file is served from its URL to anyone who has the URL, so a document with personal data should not be shared as a material. Openings and downloads are counted as one number per material, which only the event's moderators see; to count each person once every 10 minutes the server holds a hash of the room token, or else the IP address, in memory for that time, and stores neither |
 | The square | Offered in the waiting room; the waiting-room engine sets only the starting view ([Engines](../architecture/waiting-room.md#engines-classic-view-and-the-square)) | Display name and position, visible to others waiting who have access to the room (people who only know the address see positions without names), expiring seconds after the last update ([Presence](../architecture/waiting-room.md#presence)) |
 | Raised hands and call analytics | Always; shown in the event's **Statistics** tab | Attendance, who spoke when and who raised a hand, per call session |
@@ -260,6 +260,7 @@ Check each row against the basis you rely on.
 | Recording | Requires the recording box at registration and shows the **Recording consent** screen to registrants and guests | Moderators and speakers entering by magic link see neither: collect their agreement outside the platform |
 | Per-participant audio | Requires a separate box at registration, and again in the waiting room for anyone who has not given it, speakers included | Moderators are exempt from the waiting-room box. The waiting-room tick is not recorded; only the registration box is stored (`consentMultitrack`) |
 | Future communications | Records the choice and shows it in **Sign-ups** and its CSV export. Nothing in the platform sends mail based on it | Describe the channel you use, or change the label if you do not use it |
+| Recording notice | On by default per event: once, when the event's recording or external video is visible on its public page, emails every registration the event still keeps, with the event page link. It does not depend on the future-communications box, and nobody is notified once retention has deleted the registrations | State it as part of the registration's purpose, or turn **Notify registrants when the recording is published** off on the event before it is sent |
 | Address book | Separate optional consent | See [Address book](#address-book) |
 | AI post-production | Shows a notice in the waiting room. It asks for no consent | Choose a basis that does not depend on per-person consent, or collect consent outside the platform |
 | Event analytics | Attendance, speaking time and raised hands per participant, shown pseudonymously by default | State the purpose, typically running and evaluating the event |
@@ -337,7 +338,10 @@ Your notice should state at least:
   is published. A published recording plays on the concluded event page and, if
   listed, in the **Video library**. Its AI outputs are public when the AI
   pipeline is on, the recording is published and the event page is visible
-  after the end (`app/src/lib/ai/access.ts`).
+  after the end (`app/src/lib/ai/access.ts`). When the recording or an
+  external video becomes visible there, the event's registrants receive one
+  email about it, unless the event turns the notice off
+  ([Recording notice](../architecture/email.md#recording-notice)).
 - **Publications.** Past videos uploaded by administrators under
   **Publications** are published immediately, listed in the **Video library**
   unless **Publish in the video library now** is unticked, and have no deletion
@@ -369,9 +373,10 @@ Your notice should state at least:
   last registration with the same email address, ticked or not (see
   [Retention and where to change it](#retention-and-where-to-change-it)).
 - **Objection.** The registration form says consent can be withdrawn with a
-  "Remove me from the address book" link in emails. The confirmation, reminder
-  and post-event thank-you emails of people in the address book carry that
-  signed link, valid for 90 days. An erasure request also deletes the entry.
+  "Remove me from the address book" link in emails. The confirmation, reminder,
+  post-event thank-you and recording-notice emails of people in the address
+  book carry that signed link, valid for 90 days. An erasure request also
+  deletes the entry.
   Objections by other means are handled by request: an administrator deletes
   the entry under **Address book**, and the deletion is written to the
   administration audit log.
@@ -390,7 +395,7 @@ flow covers.
 | Right | Where | What your internal procedure must cover |
 |---|---|---|
 | Access (Art. 15) | `/<locale>/privacy/my-data` (`/it/privacy/i-miei-dati`, `/en/privacy/my-data`) | Everything outside [What the export contains](../GDPR.md#what-the-export-contains), such as chat, questionnaire answers, the address-book entry, recordings and AI outputs |
-| Erasure (Art. 17) | `/<locale>/privacy/my-data/erasure` (`/it/privacy/i-miei-dati/cancellazione`, `/en/privacy/my-data/erasure`) | Everything outside [What erasure deletes](../GDPR.md#what-erasure-deletes). Feedback and questionnaire answers are unlinked, not deleted; the event's retention removes most of the rest later |
+| Erasure (Art. 17) | `/<locale>/privacy/my-data/erasure` (`/it/privacy/i-miei-dati/cancellazione`, `/en/privacy/my-data/erasure`) | Everything outside [What erasure deletes](../GDPR.md#what-erasure-deletes). Feedback and questionnaire answers given through a registration are deleted; those given as a guest, or on the public event page, are not found; the event's retention removes most of the rest later |
 | Objection (Art. 21), address book | By request | Deletion of the entry by an administrator |
 | Rectification, portability, restriction | By request | No self-service flow |
 | Guests | By request | Nothing ties a guest's data to an email address, so self-service cannot find it |
