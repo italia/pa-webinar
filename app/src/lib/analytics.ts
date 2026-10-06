@@ -1,5 +1,6 @@
 import { prisma } from './db';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
+import { getFeedbackSummaryFor } from '@/lib/feedback/feedback-summary';
 
 export interface AnalyticsOverview {
   totalEvents: number;
@@ -69,13 +70,9 @@ export async function getOverview(days?: number): Promise<AnalyticsOverview> {
           ? { poll: { event: { startsAt: dateFilter } } }
           : {},
       }),
-      prisma.eventFeedback.aggregate({
-        _avg: { rating: true },
-        _count: true,
-        where: dateFilter
-          ? { event: { startsAt: dateFilter } }
-          : {},
-      }),
+      // La stessa media della pagina dell'evento: questionari di fine evento
+      // e vecchie valutazioni a stelle (lib/feedback/feedback-summary).
+      getFeedbackSummaryFor(eventWhere),
     ]);
 
   const avgParticipants = events > 0 ? Math.round(participants / events) : 0;
@@ -109,8 +106,8 @@ export async function getOverview(days?: number): Promise<AnalyticsOverview> {
     averageParticipantsPerEvent: avgParticipants,
     averageConversionRate: avgConversion,
     averageDurationMinutes: avgDuration,
-    averageFeedbackRating: Math.round((feedbackAgg._avg.rating ?? 0) * 10) / 10,
-    totalFeedback: feedbackAgg._count,
+    averageFeedbackRating: Math.round((feedbackAgg.average ?? 0) * 10) / 10,
+    totalFeedback: feedbackAgg.count,
   };
 }
 

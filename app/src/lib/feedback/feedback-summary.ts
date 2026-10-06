@@ -7,6 +7,8 @@
  * Si calcola al momento: le risposte arrivano anche dopo la fine.
  */
 
+import type { Prisma } from '@prisma/client';
+
 import { prisma } from '@/lib/db';
 
 export interface FeedbackSummary {
@@ -18,14 +20,23 @@ export interface FeedbackSummary {
   distribution: { rating: number; count: number }[];
 }
 
+/** La valutazione di un evento. */
 export async function getFeedbackSummary(eventId: string): Promise<FeedbackSummary> {
+  return getFeedbackSummaryFor({ id: eventId });
+}
+
+/**
+ * La valutazione di piu' eventi insieme (le statistiche dell'istanza): la
+ * stessa regola, su tutti gli eventi che rispondono al filtro.
+ */
+export async function getFeedbackSummaryFor(eventi: Prisma.EventWhereInput): Promise<FeedbackSummary> {
   const [stelle, scale] = await Promise.all([
-    prisma.eventFeedback.findMany({ where: { eventId }, select: { rating: true } }),
+    prisma.eventFeedback.findMany({ where: { event: eventi }, select: { rating: true } }),
     prisma.questionnaireAnswer.findMany({
       where: {
         valueScale: { not: null },
         item: { type: 'LIKERT' },
-        response: { questionnaire: { eventId, placement: 'POST_EVENT' } },
+        response: { questionnaire: { placement: 'POST_EVENT', event: eventi } },
       },
       select: { responseId: true, valueScale: true, item: { select: { scaleMin: true, scaleMax: true } } },
     }),
