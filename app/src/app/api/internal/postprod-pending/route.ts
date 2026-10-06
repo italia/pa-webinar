@@ -11,6 +11,8 @@
  *     "running": 0,         // jobs reported RUNNING (subset of CLAIMED)
  *     "maxConcurrent": 2,   // SiteSetting.aiMaxConcurrentJobs
  *     "desired": 2,         // min(runnable + claimed, maxConcurrent)
+ *     "desiredGpu": 1,      // `desired` diviso fra il worker con la GPU
+ *     "desiredCpu": 1,      // e quello senza (lib/ai/job-classes)
  *   }
  *
  * The orchestrator's policy is: if `desired > currently-running k8s
@@ -23,6 +25,7 @@
 import { withErrorHandling } from '@/lib/api-handler';
 import { assertCronApiKey } from '@/lib/auth/cron';
 import { prisma } from '@/lib/db';
+import { GPU_WORKER_KINDS } from '@/lib/ai/job-classes';
 
 export const dynamic = 'force-dynamic';
 
@@ -30,6 +33,8 @@ interface CountRow {
   runnable: bigint;
   claimed: bigint;
   running: bigint;
+  gpu_runnable: bigint;
+  gpu_claimed: bigint;
 }
 
 export const GET = withErrorHandling(async (request) => {
@@ -53,6 +58,8 @@ export const GET = withErrorHandling(async (request) => {
       running: 0,
       maxConcurrent,
       desired: 0,
+      desiredGpu: 0,
+      desiredCpu: 0,
     });
   }
 
@@ -69,19 +76,37 @@ export const GET = withErrorHandling(async (request) => {
                           WHERE dep.id = j.depends_on_id AND dep.status = 'DONE'))
       ) AS runnable,
       COUNT(*) FILTER (WHERE j.status = 'CLAIMED') AS claimed,
-      COUNT(*) FILTER (WHERE j.status = 'RUNNING') AS running
+      COUNT(*) FILTER (WHERE j.status = 'RUNNING') AS running,
+      COUNT(*) FILTER (
+        WHERE j.kind::text = ANY(${[...GPU_WORKER_KINDS]}::text[])
+          AND j.status = 'PENDING'
+          AND j.next_attempt_at <= NOW()
+          AND (j.depends_on_id IS NULL
+               OR EXISTS (SELECT 1 FROM postprod_jobs dep
+                          WHERE dep.id = j.depends_on_id AND dep.status = 'DONE'))
+      ) AS gpu_runnable,
+      COUNT(*) FILTER (
+        WHERE j.kind::text = ANY(${[...GPU_WORKER_KINDS]}::text[]) AND j.status = 'CLAIMED'
+      ) AS gpu_claimed
     FROM postprod_jobs j
   `;
 
-  const row = rows[0] ?? { runnable: 0n, claimed: 0n, running: 0n };
+  const row = rows[0] ?? { runnable: 0n, claimed: 0n, running: 0n, gpu_runnable: 0n, gpu_claimed: 0n };
   const runnable = Number(row.runnable);
   const claimed = Number(row.claimed);
   const running = Number(row.running);
+  const gpuWork = Number(row.gpu_runnable) + Number(row.gpu_claimed);
+  const cpuWork = runnable + claimed - gpuWork;
 
   // The orchestrator subtracts currently-running k8s Jobs from
   // `desired` to decide how many new ones to spawn. We cap at
   // maxConcurrent here so the cluster doesn't get flooded.
   const desired = Math.min(runnable + claimed, maxConcurrent);
+  // `desired` diviso fra i due worker, per l'orchestratore che li distingue:
+  // il tetto resta complessivo (i worker senza GPU caricano comunque vLLM) e
+  // la trascrizione passa per prima, perche' gli altri job ne dipendono.
+  const desiredGpu = Math.min(gpuWork, maxConcurrent);
+  const desiredCpu = Math.min(cpuWork, maxConcurrent - desiredGpu);
 
   return Response.json({
     pipelineEnabled: true,
@@ -90,5 +115,7 @@ export const GET = withErrorHandling(async (request) => {
     running,
     maxConcurrent,
     desired,
+    desiredGpu,
+    desiredCpu,
   });
 });

@@ -88,6 +88,21 @@ class ClaimResponse(BaseModel):
 # ---------------------------------------------------------------------------
 
 
+def worker_kinds() -> List[str]:
+    """I tipi di job che questo worker esegue, da AI_WORKER_KINDS."""
+    raw = os.environ.get("AI_WORKER_KINDS", "")
+    return [k.strip().upper() for k in raw.split(",") if k.strip()]
+
+
+# I job che hanno bisogno del worker con la GPU (app: lib/ai/job-classes).
+GPU_WORKER_KINDS = frozenset({"TRANSCRIBE", "TRANSCRIBE_MULTITRACK", "DUB"})
+
+
+def cpu_kinds_ok(kinds: List[str]) -> bool:
+    """Un elenco adatto al worker senza GPU: non vuoto, senza job della GPU."""
+    return bool(kinds) and not GPU_WORKER_KINDS.intersection(kinds)
+
+
 class AppClient:
     """Minimal client. Methods raise on non-2xx."""
 
@@ -130,14 +145,20 @@ class AppClient:
     # ------------------------------------------------------------------
 
     def claim(self, lease_minutes: int = 30) -> Optional[ClaimResponse]:
-        """Try to claim a job. Returns None when nothing runnable."""
-        r = self._client.post(
-            "/api/internal/postprod-claim",
-            json={
-                "workerId": self.worker_id,
-                "leaseMinutes": lease_minutes,
-            },
-        )
+        """Try to claim a job. Returns None when nothing runnable.
+
+        Con AI_WORKER_KINDS (tipi separati da virgola) il worker prende solo
+        quei job: il worker senza GPU non prende una trascrizione, quello con
+        la GPU lascia agli altri sintesi e traduzioni. Assente: tutti.
+        """
+        body: Dict[str, Any] = {
+            "workerId": self.worker_id,
+            "leaseMinutes": lease_minutes,
+        }
+        kinds = worker_kinds()
+        if kinds:
+            body["kinds"] = kinds
+        r = self._client.post("/api/internal/postprod-claim", json=body)
         if r.status_code == 204:
             return None
         r.raise_for_status()

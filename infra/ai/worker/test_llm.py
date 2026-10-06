@@ -442,3 +442,21 @@ def test_translate_summary_structured_has_room_for_a_long_summary(monkeypatch):
     out = llm.translate_summary_structured(summary=src, target_language="en", base_url="http://llm", model_id="m")
     assert out["overall_summary"] == "ok"
     assert budget["system"] > 3000
+
+
+def test_worker_kinds_from_env(monkeypatch):
+    import client as cli_mod
+
+    monkeypatch.setenv("AI_WORKER_KINDS", "summarize, TRANSLATE,,dub")
+    assert cli_mod.worker_kinds() == ["SUMMARIZE", "TRANSLATE", "DUB"]
+    monkeypatch.delenv("AI_WORKER_KINDS")
+    assert cli_mod.worker_kinds() == []
+
+
+def test_cpu_worker_refuses_gpu_kinds():
+    import client as cli_mod
+
+    assert cli_mod.cpu_kinds_ok(["SUMMARIZE", "TRANSLATE", "ARCHIVE"])
+    assert not cli_mod.cpu_kinds_ok([])
+    assert not cli_mod.cpu_kinds_ok(["SUMMARIZE", "TRANSCRIBE"])
+    assert not cli_mod.cpu_kinds_ok(["DUB"])

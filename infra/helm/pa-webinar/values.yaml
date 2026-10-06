@@ -1496,6 +1496,26 @@ postprod:
         cpu: "22"
         memory: "200Gi"
 
+    # Worker senza GPU per i job che non la usano: sintesi e traduzioni (il
+    # testo lo produce vLLM, sulla sua GPU) e archivio (rimux senza
+    # ricodifica). Con la variante accesa il worker con la GPU prende solo
+    # trascrizione e doppiaggio (la filigrana AudioSeal, su un evento lungo,
+    # chiede decine di GB), e una sintesi accende una sola A100 invece di due.
+    # Stessa immagine del worker, scaricata sui nodi dell'app; nodi e
+    # tolleranze, se vuoti, quelli dell'app.
+    cpu:
+      enabled: true
+      nodeSelector: {}
+      tolerations: []
+      affinity: {}
+      resources:
+        requests:
+          cpu: "1"
+          memory: "3Gi"
+        limits:
+          cpu: "4"
+          memory: "8Gi"
+
 # ── Recorder multi-traccia (ADR-013 Fase 3) ─────────────────
 # Feature "full mode": registrazione audio per-partecipante per attribuzione
 # speaker certa. Disabilitata di default. Su VM/compose si usa il runner Docker

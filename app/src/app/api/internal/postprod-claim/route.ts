@@ -20,8 +20,10 @@
  * additionally restrict ingress to the app pod CIDR).
  */
 
+import { Prisma } from '@prisma/client';
 import { z } from 'zod';
 
+import { POSTPROD_JOB_KINDS } from '@/lib/ai/job-classes';
 import { withErrorHandling } from '@/lib/api-handler';
 import { assertCronApiKey } from '@/lib/auth/cron';
 import { AppError, NotFoundError, ValidationError } from '@/lib/errors';
@@ -89,6 +91,9 @@ const claimRequestSchema = z.object({
   workerId: z.string().min(1).max(120),
   /** Lease horizon, in minutes. Default 30, max 120. */
   leaseMinutes: z.number().int().min(1).max(120).optional(),
+  /** I tipi di job che questo worker sa eseguire (lib/ai/job-classes): un
+   *  worker senza GPU non prende una trascrizione. Assente: tutti. */
+  kinds: z.array(z.enum(POSTPROD_JOB_KINDS)).min(1).max(POSTPROD_JOB_KINDS.length).optional(),
 });
 
 interface ClaimedRow {
@@ -105,7 +110,10 @@ export const POST = withErrorHandling(async (request) => {
   assertCronApiKey(request);
 
   const body = (await request.json()) as unknown;
-  const { workerId, leaseMinutes } = claimRequestSchema.parse(body);
+  const { workerId, leaseMinutes, kinds } = claimRequestSchema.parse(body);
+  const soloTipi = kinds
+    ? Prisma.sql`AND j.kind::text = ANY(${[...kinds]}::text[])`
+    : Prisma.empty;
   const lease = leaseMinutes ?? 30;
   const leaseUntil = new Date(Date.now() + lease * 60_000);
 
@@ -121,6 +129,7 @@ export const POST = withErrorHandling(async (request) => {
       WHERE j.status = 'PENDING'
         AND j.next_attempt_at <= NOW()
         AND (j.depends_on_id IS NULL OR dep.status = 'DONE')
+        ${soloTipi}
       ORDER BY j.next_attempt_at ASC
       LIMIT 1
       -- Lock ONLY j (the row we claim). Without OF j, Postgres tries to

@@ -1,16 +1,31 @@
-{{- if and .Values.postprod.enabled .Values.postprod.worker.enabled }}
 # Worker template — this CronJob is created **suspended** and used as
 # a Pod spec template by the postprod-orchestrator (`kubectl create
 # job --from=cronjob/...`). It's never executed on its own schedule.
 # The "@yearly" schedule is a never-fires placeholder; we also set
 # suspend=true so even that one tick is skipped.
+{{- /*
+  Il worker di post-produzione, come modello di Pod per l'orchestratore.
+  Si rende in due varianti (vedi in fondo):
+  - `postprod-worker`: con la GPU, per la trascrizione (WhisperX, pyannote)
+    e il doppiaggio (la filigrana AudioSeal chiede molta memoria);
+  - `postprod-worker-cpu` (postprod.worker.cpu.enabled): senza GPU, per
+    sintesi e traduzioni (il testo lo produce vLLM, sulla sua GPU) e archivio.
+    Per una sintesi si accende cosi' una sola A100.
+  Senza la variante CPU, il worker con la GPU prende ogni tipo di job. Gli
+  elenchi dei tipi sono quelli di app/src/lib/ai/job-classes.ts. La variante
+  CPU parte da `worker.cpu`, che un'immagine precedente non ha: con
+  un'immagine fissata a una versione vecchia il pod termina senza prendere job.
+*/ -}}
+{{- define "pa-webinar.postprodWorker" -}}
+{{- $v := .v -}}
+{{- with .root }}
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: {{ include "pa-webinar.fullname" . }}-postprod-worker
+  name: {{ include "pa-webinar.fullname" . }}-{{ $v.component }}
   labels:
     {{- include "pa-webinar.labels" . | nindent 4 }}
-    app.kubernetes.io/component: postprod-worker
+    app.kubernetes.io/component: {{ $v.component }}
 spec:
   schedule: "@yearly"
   suspend: true
@@ -18,7 +33,7 @@ spec:
     metadata:
       labels:
         {{- include "pa-webinar.selectorLabels" . | nindent 8 }}
-        app.kubernetes.io/component: postprod-worker
+        app.kubernetes.io/component: {{ $v.component }}
     spec:
       # One Pod per job, no retries inside the Job (the queue retries
       # via PostprodJob.attempts).
@@ -30,7 +45,7 @@ spec:
         metadata:
           labels:
             {{- include "pa-webinar.selectorLabels" . | nindent 12 }}
-            app.kubernetes.io/component: postprod-worker
+            app.kubernetes.io/component: {{ $v.component }}
         spec:
           restartPolicy: Never
           automountServiceAccountToken: false
@@ -43,15 +58,15 @@ spec:
           imagePullSecrets:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{- with .Values.postprod.worker.nodeSelector }}
+          {{- with $v.nodeSelector }}
           nodeSelector:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{- with .Values.postprod.worker.tolerations }}
+          {{- with $v.tolerations }}
           tolerations:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{- with .Values.postprod.worker.affinity }}
+          {{- with $v.affinity }}
           affinity:
             {{- toYaml . | nindent 12 }}
           {{- end }}
@@ -83,6 +98,10 @@ spec:
             - name: worker
               image: {{ include "pa-webinar.auxImage" (list . .Values.postprod.worker.image "postprod-worker") }}
               imagePullPolicy: {{ .Values.postprod.worker.imagePullPolicy | default "IfNotPresent" }}
+              {{- with $v.args }}
+              args:
+                {{- toYaml . | nindent 16 }}
+              {{- end }}
               env:
                 - name: APP_INTERNAL_URL
                   value: {{ include "pa-webinar.internalUrl" . | quote }}
@@ -111,6 +130,11 @@ spec:
                 - name: WORKER_STUB
                   value: "1"
                 {{- end }}
+                {{- with $v.kinds }}
+                # I tipi di job che questo worker prende (lib/ai/job-classes).
+                - name: AI_WORKER_KINDS
+                  value: {{ join "," . | quote }}
+                {{- end }}
                 {{- range $key, $value := .Values.postprod.worker.extraEnv }}
                 - name: {{ $key }}
                   value: {{ $value | quote }}
@@ -129,15 +153,35 @@ spec:
                     - ALL
               resources:
                 requests:
-                  cpu: {{ .Values.postprod.worker.resources.requests.cpu | default "2" }}
-                  memory: {{ .Values.postprod.worker.resources.requests.memory | default "16Gi" }}
-                  {{- if .Values.postprod.worker.gpu.enabled }}
+                  cpu: {{ $v.resources.requests.cpu | quote }}
+                  memory: {{ $v.resources.requests.memory | quote }}
+                  {{- if $v.gpu }}
                   nvidia.com/gpu: {{ .Values.postprod.worker.gpu.count | default 1 }}
                   {{- end }}
                 limits:
-                  cpu: {{ .Values.postprod.worker.resources.limits.cpu | default "8" }}
-                  memory: {{ .Values.postprod.worker.resources.limits.memory | default "48Gi" }}
-                  {{- if .Values.postprod.worker.gpu.enabled }}
+                  cpu: {{ $v.resources.limits.cpu | quote }}
+                  memory: {{ $v.resources.limits.memory | quote }}
+                  {{- if $v.gpu }}
                   nvidia.com/gpu: {{ .Values.postprod.worker.gpu.count | default 1 }}
                   {{- end }}
+{{- end }}
+{{- end -}}
+
+{{- if and .Values.postprod.enabled .Values.postprod.worker.enabled }}
+{{- $w := .Values.postprod.worker }}
+{{- $cpu := $w.cpu | default dict }}
+{{- $gpuRes := dict "requests" (dict "cpu" ($w.resources.requests.cpu | default "2") "memory" ($w.resources.requests.memory | default "16Gi")) "limits" (dict "cpu" ($w.resources.limits.cpu | default "8") "memory" ($w.resources.limits.memory | default "48Gi")) }}
+{{- $gpuKinds := list }}
+{{- if $cpu.enabled }}
+{{- $gpuKinds = list "TRANSCRIBE" "TRANSCRIBE_MULTITRACK" "DUB" }}
+{{- end }}
+{{ include "pa-webinar.postprodWorker" (dict "root" . "v" (dict "component" "postprod-worker" "gpu" $w.gpu.enabled "nodeSelector" $w.nodeSelector "tolerations" $w.tolerations "affinity" $w.affinity "resources" $gpuRes "kinds" $gpuKinds)) }}
+{{- if $cpu.enabled }}
+{{- $cr := $cpu.resources | default dict }}
+{{- $creq := $cr.requests | default dict }}
+{{- $clim := $cr.limits | default dict }}
+{{- $cpuRes := dict "requests" (dict "cpu" ($creq.cpu | default "1") "memory" ($creq.memory | default "3Gi")) "limits" (dict "cpu" ($clim.cpu | default "4") "memory" ($clim.memory | default "8Gi")) }}
+---
+{{ include "pa-webinar.postprodWorker" (dict "root" . "v" (dict "component" "postprod-worker-cpu" "gpu" false "nodeSelector" ($cpu.nodeSelector | default .Values.app.nodeSelector) "tolerations" ($cpu.tolerations | default .Values.app.tolerations) "affinity" ($cpu.affinity | default dict) "resources" $cpuRes "kinds" (list "SUMMARIZE" "TRANSLATE" "SUBTITLE" "ARCHIVE") "args" (list "python" "-m" "worker.cpu"))) }}
+{{- end }}
 {{- end }}

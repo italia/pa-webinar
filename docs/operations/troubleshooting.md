@@ -35,7 +35,7 @@ Labels to select pods:
 | Pods | Selector |
 |---|---|
 | App pods only | `-l 'app.kubernetes.io/instance=pa-webinar,app.kubernetes.io/name=pa-webinar,!app.kubernetes.io/component'` |
-| One job, controller or bot | `-l app.kubernetes.io/component=<value>`, where the value is `cronjob-<job>` for the `curl` jobs and the post-production orchestrator (for example `cronjob-email-outbox`), or `jvb-scaler`, `recorder`, `recorder-controller`, `postprod-worker`, `config-reload` |
+| One job, controller or bot | `-l app.kubernetes.io/component=<value>`, where the value is `cronjob-<job>` for the `curl` jobs and the post-production orchestrator (for example `cronjob-email-outbox`), or `jvb-scaler`, `recorder`, `recorder-controller`, `postprod-worker`, `postprod-worker-cpu`, `config-reload` |
 | One Jitsi component | `-l app.kubernetes.io/component=<web, jvb, prosody, jicofo, jibri or coturn>` |
 
 The app pods and the pods of the chart's CronJobs, controllers and post-production workers share the two labels `app.kubernetes.io/name` and `app.kubernetes.io/instance`; only the extra `app.kubernetes.io/component` label tells them apart. The recorder bot pods are the exception: the recorder controller gives them only `app.kubernetes.io/component: recorder` and the recording and event IDs. The templates of the scheduled CronJobs label the pod template, and a Job created without labels of its own takes them, so both Jobs and pods can be selected by `app.kubernetes.io/component` ([background-jobs.md](../architecture/background-jobs.md#find-a-jobs-runs-and-logs)).
@@ -460,12 +460,13 @@ Quick checks before the pipeline's own troubleshooting in [POSTPROD.md](../POSTP
 
 - `postprod.enabled` is `false` by default in `values.yaml`. Without it the chart renders neither the orchestrator nor the worker template.
 - **Post-event pipeline active** (`aiPipelineEnabled`, off by default in `app/prisma/schema.prisma`), under **Site settings** → **Post-event AI pipeline**. While it is off, the orchestrator is told to start nothing.
-- At most `aiMaxConcurrentJobs` workers run at once (2 by default in `schema.prisma`), and a failed job waits for its retry delay.
+- At most `aiMaxConcurrentJobs` workers run at once (2 by default in `schema.prisma`), with and without a GPU together, and a failed job waits for its retry delay.
+- A `postprod-worker-cpu` pod that exits at once with `AI_WORKER_KINDS` in its log runs a worker image older than the chart: align `postprod.worker.image`, or set `postprod.worker.cpu.enabled: false`.
 - A worker pod in `Pending` with `Insufficient nvidia.com/gpu` means that no GPU node is available or that the GPU device plugin is missing. GPU pools are covered in [Node pools](../INFRASTRUCTURE.md#node-pools), and quotas in the guide of each managed cloud.
 
 ```bash
 kubectl -n pa-webinar logs -l app.kubernetes.io/component=cronjob-postprod-orchestrator --tail=20
-kubectl -n pa-webinar get pods -l app.kubernetes.io/component=postprod-worker
+kubectl -n pa-webinar get pods -l 'app.kubernetes.io/component in (postprod-worker,postprod-worker-cpu)'
 ```
 
 ## Collecting diagnostics without personal data

@@ -396,15 +396,21 @@ piling up. Each run:
 
 1. calls `GET /api/internal/postprod-pending` with `CRON_API_KEY`. The portal
    answers with `pipelineEnabled`, `runnable`, `claimed`, `running`,
-   `maxConcurrent` and `desired = min(runnable + claimed, aiMaxConcurrentJobs)`.
-   While the site switch is off, `desired` is zero and the orchestrator stops
-   here;
-2. counts the active worker Jobs in the release namespace by the label
-   `app.kubernetes.io/component=postprod-worker`;
-3. creates `desired - active` Jobs with
-   `kubectl create job --from=cronjob/<fullname>-postprod-worker`, where
-   `<fullname>` is the chart's full name (`pa-webinar` for a release named
-   `pa-webinar`).
+   `maxConcurrent` and `desired = min(runnable + claimed, aiMaxConcurrentJobs)`,
+   split into `desiredGpu` and `desiredCpu` for the two kinds of worker
+   ([The worker Job](#the-worker-job)). The split keeps the same overall cap
+   and gives transcription and dubbing their share first. While the site
+   switch is off, every count is zero and the orchestrator stops here;
+2. counts the active worker Jobs of each kind in the release namespace, by
+   the labels `app.kubernetes.io/component=postprod-worker` and
+   `app.kubernetes.io/component=postprod-worker-cpu`;
+3. creates the missing Jobs of each kind with
+   `kubectl create job --from=cronjob/<fullname>-postprod-worker` or
+   `--from=cronjob/<fullname>-postprod-worker-cpu`, where `<fullname>` is the
+   chart's full name (`pa-webinar` for a release named `pa-webinar`).
+
+Without the CPU worker (`postprod.worker.cpu.enabled: false`), or with a
+portal that does not send the split, every job goes to the GPU worker.
 
 `RUNNING` jobs are not in `desired`, but their pods are in the active count.
 A new worker therefore starts only when runnable plus claimed jobs outnumber
@@ -441,7 +447,25 @@ kubectl scale deploy -n <namespace> <fullname>-vllm --replicas=0
 ### The worker Job
 
 `templates/cronjob-postprod-worker.yaml` renders the worker as a suspended
-CronJob (`@yearly`, `suspend: true`). Only its pod template matters:
+CronJob (`@yearly`, `suspend: true`), in two variants built from the same
+image:
+
+| Template | Takes | Runs on |
+|---|---|---|
+| `<fullname>-postprod-worker` | `TRANSCRIBE`, `TRANSCRIBE_MULTITRACK`, `DUB` | the GPU pool, with a whole GPU and tens of GB of memory |
+| `<fullname>-postprod-worker-cpu` | `SUMMARIZE`, `TRANSLATE`, `SUBTITLE`, `ARCHIVE` | the app nodes, without a GPU (`postprod.worker.cpu`) |
+
+Summaries and translations get their text from vLLM, which has its own GPU,
+and the archive remuxes without re-encoding. On the CPU worker, a summary
+therefore starts one GPU node (vLLM) instead of two. Dubbing stays on the GPU
+worker for its memory: Piper runs on the CPU, but the AudioSeal watermark
+processes the whole track at once and needs tens of GB for a long event.
+
+Each worker sends the kinds it takes (`AI_WORKER_KINDS`) when it claims a job.
+The CPU worker starts from its own entry point, `python -m worker.cpu`, which
+refuses to run without a list or with a GPU kind in it. An older worker image
+lacks that module, so a CPU pod pinned to it exits before claiming anything.
+Both variants share the rest of the pod template:
 
 - **One job per pod.** Each Job runs one pod that claims one queue job, runs
   it and exits. `backoffLimit: 0`, because the queue owns retries. Pod
@@ -451,7 +475,10 @@ CronJob (`@yearly`, `suspend: true`). Only its pod template matters:
   finished Jobs.
 - **Placement.** `postprod.worker.nodeSelector` and `tolerations` target the
   GPU node pool (`workload: ai-gpu` in `values.yaml`); `gpu.enabled` requests
-  `nvidia.com/gpu` (`gpu.count`, default 1).
+  `nvidia.com/gpu` (`gpu.count`, default 1). The CPU worker uses
+  `postprod.worker.cpu.nodeSelector` and `tolerations`, or the app's when they
+  are empty. Its first pod on a node pulls the worker image, which is large
+  because it carries the CUDA libraries.
 - **Hardening.** Non-root user 10001, read-only root file system, all
   capabilities dropped, no service-account token.
 - **Volumes.** `/models` is the PVC named in `postprod.worker.modelsPvc`, or an
@@ -1123,6 +1150,9 @@ holds the defaults quoted here. Chart-wide keys are in
 | `worker.hfTokenSecret.name`, `.key` | empty, `HF_TOKEN` | Hugging Face token; set the name (see the [checklist](#operational-checklist)) |
 | `worker.extraEnv` | empty | Extra worker environment, for example `AUDIOSEAL_CACHE_DIR` or `LLM_CONNECT_WAIT_S` |
 | `worker.gpu.enabled`, `.count` | `true`, `1` | GPU request and limit |
+| `worker.cpu.enabled` | `true` | Renders the CPU worker template and routes summaries, translations and archives to it |
+| `worker.cpu.nodeSelector`, `.tolerations`, `.affinity` | empty: the app's placement | Placement of the CPU worker |
+| `worker.cpu.resources` | requests `1` CPU / `3Gi`, limits `4` CPU / `8Gi` | CPU worker resources |
 | `worker.resources` | requests 8 CPU and 32Gi; limits 22 CPU and 200Gi | Sized for a GPU node with 24 vCPU and about 220 GiB; lower them for smaller nodes |
 
 ### Portal environment
@@ -1202,7 +1232,8 @@ What the GPUs must hold:
   plus room for the KV cache, so an 80 GB GPU
   ([Choosing another model](#choosing-another-model)).
 - **Quota** for `aiMaxConcurrentJobs` + 1 GPUs in the region: the workers at
-  the cap, plus vLLM.
+  the cap, plus vLLM. With the CPU worker some of those workers need no GPU,
+  but a queue of transcriptions can still fill the cap.
 
 On any cloud:
 
@@ -1443,7 +1474,7 @@ worker Jobs are deleted after `ttlSecondsAfterFinished`, and their logs go
 with them:
 
 ```bash
-kubectl get jobs -n pa-webinar -l app.kubernetes.io/component=postprod-worker
+kubectl get jobs -n pa-webinar -l 'app.kubernetes.io/component in (postprod-worker,postprod-worker-cpu)'
 kubectl logs -n pa-webinar job/<worker-job-name>
 kubectl logs -n pa-webinar job/<orchestrator-job-name>
 ```

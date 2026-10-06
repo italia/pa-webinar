@@ -115,7 +115,7 @@ Every CronJob is named `<release>-<job>`, where `<release>` is the chart's full 
 | `multitrack-purge` | `GET /api/cron/multitrack-purge` | `postprod.multitrackPurgeSchedule`, not declared in `values.yaml`; the template falls back to `*/15 * * * *` | `postprod.enabled` (no key of its own) |
 | `web-config-reload` hook | Kubernetes API (`kubectl rollout restart`) | none: a Helm `post-install` and `post-upgrade` hook | `configReloadHook.enabled` (default `true`) |
 
-Two more objects render as CronJobs but never run on a schedule: `postprod-worker` and `recorder`. They are suspended templates (see [Suspended CronJobs as Job templates](#suspended-cronjobs-as-job-templates)). The recorder controller is a Deployment, not a CronJob (see [Long-running controllers](#long-running-controllers)).
+More objects render as CronJobs but never run on a schedule: `postprod-worker`, `postprod-worker-cpu` and `recorder`. They are suspended templates (see [Suspended CronJobs as Job templates](#suspended-cronjobs-as-job-templates)). The recorder controller is a Deployment, not a CronJob (see [Long-running controllers](#long-running-controllers)).
 
 ## What each job does
 
@@ -171,7 +171,7 @@ It also deletes staff sign-in link rows one day after they were used or expired,
 
 ### postprod-orchestrator
 
-**Does.** The job asks `/api/internal/postprod-pending` how many workers should be running. The answer is capped by the `aiMaxConcurrentJobs` site setting, and it is zero while `aiPipelineEnabled` is off. The job counts active worker Jobs by label and creates the difference from the worker template, with `kubectl create job --from=cronjob/<release>-postprod-worker`. When `postprod.vllm.autoscale` is `true`, it also scales the vLLM Deployment to one while there is work and back to zero when the queue is empty. The vLLM step runs only while `aiPipelineEnabled` is on: disabling the pipeline does not scale vLLM down, so scale it to zero by hand. The job never reads the database; the queue lives in PostgreSQL behind the portal. The pipeline is described in [POSTPROD.md](../POSTPROD.md).
+**Does.** The job asks `/api/internal/postprod-pending` how many workers should be running. The answer is capped by the `aiMaxConcurrentJobs` site setting, and it is zero while `aiPipelineEnabled` is off. The answer is split between the GPU worker (transcription, dubbing) and the worker without a GPU (summaries, translations, archives). The job counts the active worker Jobs of each kind by label and creates the difference from the matching template, with `kubectl create job --from=cronjob/<release>-postprod-worker` or `<release>-postprod-worker-cpu`. When `postprod.vllm.autoscale` is `true`, it also scales the vLLM Deployment to one while there is work and back to zero when the queue is empty. The vLLM step runs only while `aiPipelineEnabled` is on: disabling the pipeline does not scale vLLM down, so scale it to zero by hand. The job never reads the database; the queue lives in PostgreSQL behind the portal. The pipeline is described in [POSTPROD.md](../POSTPROD.md).
 
 **If it does not run.** Post-production tasks stay queued, no worker starts and no new GPU node is requested for workers. A vLLM replica that was running stays up.
 
@@ -265,7 +265,7 @@ flowchart LR
     direction LR
     ORCH["postprod-orchestrator<br/>CronJob, every minute"]:::job
     PP["/api/internal/<br/>postprod-pending"]:::portal
-    TW["Suspended CronJob<br/>&lt;release&gt;-postprod-worker<br/>@yearly · suspend: true<br/>GPU placement and limits"]:::tpl
+    TW["Suspended CronJobs<br/>&lt;release&gt;-postprod-worker (GPU)<br/>&lt;release&gt;-postprod-worker-cpu<br/>@yearly · suspend: true"]:::tpl
     JW["Job &lt;release&gt;-postprod-worker-&lt;epoch&gt;-&lt;n&gt;<br/>claims its task from the queue"]:::run
     ORCH -->|"1 how many workers?"| PP
     ORCH -->|"2 kubectl create job<br/>--from=cronjob"| TW
@@ -294,7 +294,7 @@ flowchart LR
 
 The two creators use the template differently:
 
-- **The orchestrator** runs `kubectl create job --from=cronjob/<release>-postprod-worker` and changes nothing. Each worker claims its own task from the queue, so all workers are identical. The Jobs carry the template's `app.kubernetes.io/component: postprod-worker` label, which the orchestrator uses to count active workers.
+- **The orchestrator** runs `kubectl create job --from=cronjob/<release>-postprod-worker` (or `-postprod-worker-cpu`) and changes nothing. Each worker claims its own task from the queue, among the kinds its template allows. The Jobs carry the template's `app.kubernetes.io/component` label (`postprod-worker` or `postprod-worker-cpu`), which the orchestrator uses to count active workers of each kind.
 - **The controller** reads the template's `jobTemplate` through the Kubernetes API and injects `RECORDING_ID` and `EVENT_ID` into the first container. It creates a Job named `recorder-<first 20 hex characters of the recording ID>`. The Job and its pod carry only `app.kubernetes.io/component: recorder` and the recording and event IDs: the controller replaces the template's pod labels, so bot pods do not carry the release's selector labels (see [Before enabling the NetworkPolicy](#before-enabling-the-networkpolicy)). The deterministic name makes a duplicate creation fail harmlessly with a conflict.
 
 The pattern keeps both specs inside the chart, so `helm template` and the chart checks see them, and it needs no operator framework. Its costs are two CronJob objects that look inactive, and a rule for operators: never unsuspend them. An unsuspended template fires on its placeholder schedule, outside the control of the orchestrator or the controller. A recorder started that way has no recording to capture.
@@ -317,7 +317,7 @@ kubectl get pods -n pa-webinar -l app.kubernetes.io/component=cronjob-cleanup
 kubectl logs -n pa-webinar -l app.kubernetes.io/component=cronjob-cleanup --tail=50
 ```
 
-The `app.kubernetes.io/component` values are `cronjob-<job>` for the `curl` jobs and the orchestrator (for example `cronjob-email-outbox`, `cronjob-postprod-orchestrator`), `jvb-scaler` for the scaler, `postprod-worker`, `recorder`, `recorder-controller` and `config-reload`. The logs disappear with the Job when its TTL expires.
+The `app.kubernetes.io/component` values are `cronjob-<job>` for the `curl` jobs and the orchestrator (for example `cronjob-email-outbox`, `cronjob-postprod-orchestrator`), `jvb-scaler` for the scaler, `postprod-worker`, `postprod-worker-cpu`, `recorder`, `recorder-controller` and `config-reload`. The logs disappear with the Job when its TTL expires.
 
 ### Run a job once
 
@@ -338,7 +338,7 @@ kubectl patch cronjob pa-webinar-reminders -n pa-webinar -p '{"spec":{"suspend":
 kubectl patch cronjob pa-webinar-reminders -n pa-webinar -p '{"spec":{"suspend":false}}'
 ```
 
-A patch is a runtime change that the chart does not declare, so check it again after each upgrade. To switch a job off durably, set its `enabled` key to `false`; the next upgrade then removes the CronJob. Suspending `jvb-scaler` also pauses the automatic event lifecycle ([operations/jvb-scaler.md](../operations/jvb-scaler.md)), and so does suspending `lifecycle` where the scaler is not rendered. Never unsuspend `postprod-worker` or `recorder`.
+A patch is a runtime change that the chart does not declare, so check it again after each upgrade. To switch a job off durably, set its `enabled` key to `false`; the next upgrade then removes the CronJob. Suspending `jvb-scaler` also pauses the automatic event lifecycle ([operations/jvb-scaler.md](../operations/jvb-scaler.md)), and so does suspending `lifecycle` where the scaler is not rendered. Never unsuspend `postprod-worker`, `postprod-worker-cpu` or `recorder`.
 
 ### Before enabling the NetworkPolicy
 
