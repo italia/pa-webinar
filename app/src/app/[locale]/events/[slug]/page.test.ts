@@ -15,7 +15,8 @@ vi.mock('@/lib/db', () => ({
     eventMaterial: { findMany: vi.fn() },
     question: { findMany: vi.fn() },
     poll: { findMany: vi.fn() },
-    eventFeedback: { aggregate: vi.fn(), groupBy: vi.fn() },
+    eventFeedback: { aggregate: vi.fn(), groupBy: vi.fn(), findMany: vi.fn(async (): Promise<unknown[]> => []) },
+    questionnaireAnswer: { findMany: vi.fn(async (): Promise<unknown[]> => []) },
     eventQuestionnaire: { findUnique: vi.fn() },
   },
 }));

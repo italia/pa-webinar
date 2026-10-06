@@ -42,6 +42,7 @@ import { forgetCreation, readCreation, type CreationOutcome } from './event-wiza
 import CallSessionsPanel from './call-sessions-panel';
 import DeleteEventModal from './delete-event-modal';
 import EventAnalyticsPanel from './event-analytics-panel';
+import EventFeedbackPanel from './event-feedback-panel';
 import EventConfigDiagram from './event-config-diagram';
 import EventModeratorsPanel from './event-moderators-panel';
 import RegistrationRowActions from './registration-row-actions';
@@ -648,7 +649,7 @@ export default function EventManagementClient({
             )}
             {activeTab === 'contenuti' && <ContentTab event={event} />}
             {activeTab === 'dopo' && (
-              <PostEventTab event={event} status={status}
+              <PostEventTab event={event} status={status} viaToken={viaToken}
                             paginaPostEvento={paginaPostEvento}
                             onPaginaPostEvento={(patch) =>
                               setPaginaPostEvento((prima) => ({ ...prima, ...patch }))} />
@@ -1209,13 +1210,14 @@ function ContentTab({ event }: { event: EventData }) {
   );
 }
 
-function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento }: {
-  event: EventData; status: string;
+function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento, viaToken }: {
+  event: EventData; status: string; viaToken: string | null;
   paginaPostEvento: PostEventVisibility;
   onPaginaPostEvento: (patch: Partial<PostEventVisibility>) => void;
 }) {
   const td = useTranslations('admin.eventDetail');
   const t = useTranslations('admin');
+  const tfb = useTranslations('admin.feedbackPanel');
   const format = useFormatter();
   const isEnded = status === 'ENDED' || status === 'ARCHIVED';
 
@@ -1292,6 +1294,13 @@ function PostEventTab({ event, status, paginaPostEvento, onPaginaPostEvento }: {
             dataRetentionDays: event.dataRetentionDays,
           }}
         />
+      </div>
+
+      {/* Le valutazioni di chi ha partecipato, subito sotto le regole che le
+          raccolgono e le pubblicano. */}
+      <div className="mb-4">
+        <H>{tfb('title')}</H>
+        <EventFeedbackPanel eventId={event.id} token={viaToken} />
       </div>
 
       {/* CTA prominente verso la gestione AI completa del video:

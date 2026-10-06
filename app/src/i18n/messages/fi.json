@@ -2758,6 +2758,27 @@
       "deleteBody": "Henkilön {name} ilmoittautuminen ja hänen osallistumisensa tapahtumaan (keskustelu, kyselyvastaukset, jonossa olevat sähköpostit) poistetaan. Toimintoa ei voi perua.",
       "deleted": "Ilmoittautuminen poistettu",
       "failed": "Toiminto epäonnistui. Yritä uudelleen."
+    },
+    "feedbackPanel": {
+      "title": "Arviot",
+      "loading": "Ladataan arvioita…",
+      "loadFailed": "Arvioita ei voitu ladata.",
+      "empty": "Arvioita ei ole vielä saatu.",
+      "responses": "{count, plural, one {# arvio saatu} other {# arviota saatu}}",
+      "downloadCsv": "Lataa CSV",
+      "disabled": "Arvioiden keruu on pois päältä tässä tapahtumassa: huone ei pyydä niitä.",
+      "average": "Keskiarvo {value}/{max}",
+      "yesShare": "Kyllä: {pct} %",
+      "yes": "Kyllä",
+      "no": "Ei",
+      "answered": "{count, plural, one {# vastaus} other {# vastausta}}",
+      "commentsTitle": "Kommentit ({count})",
+      "showAll": "Näytä kaikki ({count})",
+      "showFewer": "Näytä vähemmän",
+      "legacyTitle": "Tähtiarviot",
+      "legacySummary": "Huoneen aiemmalla versiolla kerätyt: {count} · keskiarvo {average}/5.",
+      "legacyRating": "{rating}/5",
+      "downloadFailed": "Lataus epäonnistui: yritä uudelleen."
     }
   },
   "email": {
@@ -3585,7 +3606,13 @@
     "thankYou": "Kiitos palautteestasi!",
     "averageRating": "Keskiarvo",
     "ratingCount": "{count} arviota",
-    "noFeedback": "Palautetta ei ole saatu"
+    "noFeedback": "Palautetta ei ole saatu",
+    "heading": "Miten meni?",
+    "intro": "Minuutti tulevien tapahtumien parantamiseksi. Järjestäjät näkevät vastaukset ilman nimeäsi.",
+    "thankYouDetail": "Arviosi on välitetty järjestäjille.",
+    "alreadyDone": "Olet jo antanut arviosi: kiitos!",
+    "leftPrompt": "Voit antaa arvion jo nyt odottamatta loppua.",
+    "leftCta": "Anna arvio"
   },
   "wordcloud": {
     "title": "Yhdellä sanalla",
@@ -4135,7 +4162,9 @@
     "alreadySubmitted": "Olet jo lähettänyt vastauksesi tähän kyselyyn.",
     "thankYou": "Kiitos vastauksistasi.",
     "yes": "Kyllä",
-    "no": "Ei"
+    "no": "Ei",
+    "scaleValue": "{value}/{max}",
+    "answerOne": "Vastaa vähintään yhteen kysymykseen lähettääksesi."
   },
   "notFound": {
     "title": "Sivua ei löytynyt",

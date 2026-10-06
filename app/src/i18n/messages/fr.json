@@ -2758,6 +2758,27 @@
       "deleteBody": "L'inscription de {name} et ses contributions à l'événement (chat, réponses aux questionnaires, e-mails en attente) seront supprimées. Cette action est irréversible.",
       "deleted": "Inscription supprimée",
       "failed": "L'opération a échoué. Veuillez réessayer."
+    },
+    "feedbackPanel": {
+      "title": "Évaluations",
+      "loading": "Chargement des évaluations…",
+      "loadFailed": "Impossible de charger les évaluations.",
+      "empty": "Aucune évaluation reçue pour l'instant.",
+      "responses": "{count, plural, one {# évaluation reçue} other {# évaluations reçues}}",
+      "downloadCsv": "Télécharger le CSV",
+      "disabled": "La collecte des évaluations est désactivée pour cet événement : la salle ne les demande pas.",
+      "average": "Moyenne {value} sur {max}",
+      "yesShare": "Oui : {pct} %",
+      "yes": "Oui",
+      "no": "Non",
+      "answered": "{count, plural, one {# réponse} other {# réponses}}",
+      "commentsTitle": "Commentaires ({count})",
+      "showAll": "Tout afficher ({count})",
+      "showFewer": "Afficher moins",
+      "legacyTitle": "Évaluations par étoiles",
+      "legacySummary": "Recueillies avec la version précédente de la salle : {count} · moyenne {average} sur 5.",
+      "legacyRating": "{rating} sur 5",
+      "downloadFailed": "Échec du téléchargement : réessayez."
     }
   },
   "email": {
@@ -3585,7 +3606,13 @@
     "thankYou": "Merci pour votre retour !",
     "averageRating": "Note moyenne",
     "ratingCount": "{count} évaluations",
-    "noFeedback": "Aucun retour reçu"
+    "noFeedback": "Aucun retour reçu",
+    "heading": "Comment ça s'est passé ?",
+    "intro": "Une minute pour améliorer les prochains événements. Les organisateurs voient les réponses sans votre nom.",
+    "thankYouDetail": "Votre évaluation est parvenue aux organisateurs.",
+    "alreadyDone": "Vous avez déjà laissé votre évaluation : merci !",
+    "leftPrompt": "Vous pouvez déjà laisser une évaluation, sans attendre la fin.",
+    "leftCta": "Laisser une évaluation"
   },
   "wordcloud": {
     "title": "En un mot",
@@ -4135,7 +4162,9 @@
     "alreadySubmitted": "Vous avez déjà envoyé vos réponses à ce questionnaire.",
     "thankYou": "Merci pour vos réponses.",
     "yes": "Oui",
-    "no": "Non"
+    "no": "Non",
+    "scaleValue": "{value} sur {max}",
+    "answerOne": "Répondez à au moins une question pour envoyer."
   },
   "notFound": {
     "title": "Page introuvable",

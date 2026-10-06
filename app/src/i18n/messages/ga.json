@@ -2758,6 +2758,27 @@
       "deleteBody": "Scriosfar clárú {name} agus a c(h)uid ranníocaíochtaí leis an imeacht (comhrá, freagraí ar cheistneoirí, ríomhphoist sa scuaine). Ní féidir é seo a chealú.",
       "deleted": "Scriosadh an clárú",
       "failed": "Níor éirigh leis an oibríocht. Bain triail eile as."
+    },
+    "feedbackPanel": {
+      "title": "Meastóireachtaí",
+      "loading": "Meastóireachtaí á lódáil…",
+      "loadFailed": "Níorbh fhéidir na meastóireachtaí a lódáil.",
+      "empty": "Níl aon mheastóireacht faighte fós.",
+      "responses": "{count, plural, one {# mheastóireacht faighte} two {# mheastóireacht faighte} few {# mheastóireacht faighte} many {# meastóireacht faighte} other {# meastóireacht faighte}}",
+      "downloadCsv": "Íoslódáil CSV",
+      "disabled": "Tá bailiú meastóireachtaí múchta don imeacht seo: ní iarrann an seomra iad.",
+      "average": "Meán {value} as {max}",
+      "yesShare": "Tá: {pct}%",
+      "yes": "Tá",
+      "no": "Níl",
+      "answered": "{count, plural, one {# fhreagra} two {# fhreagra} few {# fhreagra} many {# bhfreagra} other {# freagra}}",
+      "commentsTitle": "Tráchtanna ({count})",
+      "showAll": "Taispeáin gach ceann ({count})",
+      "showFewer": "Taispeáin níos lú",
+      "legacyTitle": "Rátálacha réalta",
+      "legacySummary": "Bailithe le leagan roimhe seo den seomra: {count} · meán {average} as 5.",
+      "legacyRating": "{rating} as 5",
+      "downloadFailed": "Theip ar an íoslódáil: bain triail eile as."
     }
   },
   "email": {
@@ -3585,7 +3606,13 @@
     "thankYou": "Go raibh maith agaibh as bhur n-aiseolas!",
     "averageRating": "Meánrátáil",
     "ratingCount": "{count} rátáil",
-    "noFeedback": "Ní bhfuarthas aon aiseolas"
+    "noFeedback": "Ní bhfuarthas aon aiseolas",
+    "heading": "Conas a d'éirigh leis?",
+    "intro": "Nóiméad chun cabhrú le himeachtaí amach anseo a fheabhsú. Feiceann na heagraithe na freagraí gan d'ainm.",
+    "thankYouDetail": "Tá do mheastóireacht faighte ag na heagraithe.",
+    "alreadyDone": "Tá do mheastóireacht tugtha agat cheana: go raibh maith agat!",
+    "leftPrompt": "Is féidir leat meastóireacht a thabhairt anois féin, gan fanacht leis an deireadh.",
+    "leftCta": "Tabhair meastóireacht"
   },
   "wordcloud": {
     "title": "In aon fhocal amháin",
@@ -4135,7 +4162,9 @@
     "alreadySubmitted": "Sheol tú do chuid freagraí ar an gceistneoir seo cheana féin.",
     "thankYou": "Go raibh maith agat as do chuid freagraí.",
     "yes": "Tá",
-    "no": "Níl"
+    "no": "Níl",
+    "scaleValue": "{value} as {max}",
+    "answerOne": "Freagair ceist amháin ar a laghad chun é a sheoladh."
   },
   "notFound": {
     "title": "Níor aimsíodh an leathanach",

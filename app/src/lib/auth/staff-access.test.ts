@@ -33,6 +33,7 @@ const ROTTE_ORGANIZZATORE: Record<string, string> = {
   'api/admin/events/instant/route.ts': 'le proprie chiamate rapide',
   'api/admin/events/[id]/analytics/route.ts': 'proprio evento',
   'api/admin/events/[id]/duplicate/route.ts': 'proprio evento; la copia e’ sua',
+  'api/admin/events/[id]/feedback/route.ts': 'valutazioni del proprio evento, senza nomi',
   'api/admin/events/[id]/generate-ai/route.ts': 'proprio evento',
   'api/admin/events/[id]/invitations/route.ts': 'proprio evento',
   'api/admin/events/[id]/invitations/[invId]/route.ts': 'proprio evento',

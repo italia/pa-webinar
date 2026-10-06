@@ -14,6 +14,7 @@ import { prisma } from '@/lib/db';
 import { AppError, NotFoundError } from '@/lib/errors';
 import { findEventQuestionnaireByPlacement } from '@/lib/questionnaires';
 import { QUESTIONNAIRE_PLACEMENTS } from '@/lib/validation/schemas';
+import { feedbackOpen } from '@/lib/feedback/default-questionnaire';
 
 export const dynamic = 'force-dynamic';
 
@@ -32,10 +33,16 @@ export const GET = withErrorHandling(async (_request, context) => {
 
   const event = await prisma.event.findUnique({
     where: UUID_RE.test(param) ? { id: param } : { slug: param },
-    select: { id: true },
+    select: { id: true, feedbackEnabled: true, status: true },
   });
   if (!event) throw new NotFoundError('Event');
 
+  // La valutazione di fine evento c'e' solo quando si puo' inviare (vedi
+  // .../responses): raccolta accesa, evento in corso o concluso. Altrimenti
+  // il modulo comparirebbe e l'invio fallirebbe.
+  if (placement === 'POST_EVENT' && !feedbackOpen(event)) {
+    throw new NotFoundError('EventQuestionnaire');
+  }
   const q = await findEventQuestionnaireByPlacement(event.id, placement);
   if (!q) throw new NotFoundError('EventQuestionnaire');
 

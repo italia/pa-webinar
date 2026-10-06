@@ -2758,6 +2758,27 @@
       "deleteBody": "Zgłoszenie osoby {name} i jej udział w wydarzeniu (czat, odpowiedzi w ankietach, e-maile w kolejce) zostaną usunięte. Tej operacji nie można cofnąć.",
       "deleted": "Zgłoszenie usunięte",
       "failed": "Operacja nie powiodła się. Spróbuj ponownie."
+    },
+    "feedbackPanel": {
+      "title": "Oceny",
+      "loading": "Wczytywanie ocen…",
+      "loadFailed": "Nie udało się wczytać ocen.",
+      "empty": "Nie otrzymano jeszcze ocen.",
+      "responses": "{count, plural, one {# otrzymana ocena} few {# otrzymane oceny} many {# otrzymanych ocen} other {# otrzymanej oceny}}",
+      "downloadCsv": "Pobierz CSV",
+      "disabled": "Zbieranie ocen jest wyłączone dla tego wydarzenia: sala o nie nie prosi.",
+      "average": "Średnio {value} z {max}",
+      "yesShare": "Tak: {pct}%",
+      "yes": "Tak",
+      "no": "Nie",
+      "answered": "{count, plural, one {# odpowiedź} few {# odpowiedzi} many {# odpowiedzi} other {# odpowiedzi}}",
+      "commentsTitle": "Komentarze ({count})",
+      "showAll": "Pokaż wszystkie ({count})",
+      "showFewer": "Pokaż mniej",
+      "legacyTitle": "Oceny w gwiazdkach",
+      "legacySummary": "Zebrane w poprzedniej wersji sali: {count} · średnio {average} z 5.",
+      "legacyRating": "{rating} z 5",
+      "downloadFailed": "Pobieranie nie powiodło się: spróbuj ponownie."
     }
   },
   "email": {
@@ -3585,7 +3606,13 @@
     "thankYou": "Dziękujemy za opinię!",
     "averageRating": "Średnia ocena",
     "ratingCount": "{count} ocen",
-    "noFeedback": "Brak otrzymanych opinii"
+    "noFeedback": "Brak otrzymanych opinii",
+    "heading": "Jak było?",
+    "intro": "Minuta, by ulepszyć kolejne wydarzenia. Organizatorzy widzą odpowiedzi bez Twojego imienia i nazwiska.",
+    "thankYouDetail": "Twoja ocena dotarła do organizatorów.",
+    "alreadyDone": "Twoja ocena została już przesłana: dziękujemy!",
+    "leftPrompt": "Możesz już teraz ocenić wydarzenie, nie czekając na koniec.",
+    "leftCta": "Oceń wydarzenie"
   },
   "wordcloud": {
     "title": "Jednym słowem",
@@ -4135,7 +4162,9 @@
     "alreadySubmitted": "Twoje odpowiedzi na ten kwestionariusz zostały już wysłane.",
     "thankYou": "Dziękujemy za odpowiedzi.",
     "yes": "Tak",
-    "no": "Nie"
+    "no": "Nie",
+    "scaleValue": "{value} z {max}",
+    "answerOne": "Odpowiedz na co najmniej jedno pytanie, aby wysłać."
   },
   "notFound": {
     "title": "Nie znaleziono strony",

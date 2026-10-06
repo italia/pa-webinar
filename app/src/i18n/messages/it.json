@@ -2882,6 +2882,27 @@
       "deleteBody": "Si cancellano l'iscrizione di {name} e i suoi contributi all'evento (chat, risposte ai questionari, email in coda). Non si può annullare.",
       "deleted": "Iscrizione eliminata",
       "failed": "Operazione non riuscita. Riprova."
+    },
+    "feedbackPanel": {
+      "title": "Valutazioni",
+      "loading": "Caricamento delle valutazioni…",
+      "loadFailed": "Impossibile caricare le valutazioni.",
+      "empty": "Nessuna valutazione ricevuta finora.",
+      "responses": "{count, plural, one {# valutazione ricevuta} other {# valutazioni ricevute}}",
+      "downloadCsv": "Scarica CSV",
+      "disabled": "La raccolta delle valutazioni è spenta per questo evento: la sala non le chiede.",
+      "average": "Media {value} su {max}",
+      "yesShare": "Sì: {pct}%",
+      "yes": "Sì",
+      "no": "No",
+      "answered": "{count, plural, one {# risposta} other {# risposte}}",
+      "commentsTitle": "Commenti ({count})",
+      "showAll": "Mostra tutti ({count})",
+      "showFewer": "Mostra meno",
+      "legacyTitle": "Valutazioni a stelle",
+      "legacySummary": "Raccolte con la versione precedente della sala: {count} · media {average} su 5.",
+      "legacyRating": "{rating} su 5",
+      "downloadFailed": "Download non riuscito: riprova."
     }
   },
   "email": {
@@ -3585,7 +3606,13 @@
     "thankYou": "Grazie per il tuo feedback!",
     "averageRating": "Valutazione media",
     "ratingCount": "{count} valutazioni",
-    "noFeedback": "Nessun feedback ricevuto"
+    "noFeedback": "Nessun feedback ricevuto",
+    "heading": "Com'è andato?",
+    "intro": "Un minuto per aiutare a migliorare i prossimi eventi. Chi organizza vede le risposte senza il tuo nome.",
+    "thankYouDetail": "La tua valutazione è arrivata a chi organizza.",
+    "alreadyDone": "Hai già lasciato la tua valutazione: grazie!",
+    "leftPrompt": "Puoi già lasciare una valutazione, senza aspettare la fine.",
+    "leftCta": "Lascia una valutazione"
   },
   "wordcloud": {
     "title": "In una parola",
@@ -4135,7 +4162,9 @@
     "alreadySubmitted": "Hai già inviato le tue risposte a questo questionario.",
     "thankYou": "Grazie per le tue risposte.",
     "yes": "Sì",
-    "no": "No"
+    "no": "No",
+    "scaleValue": "{value} su {max}",
+    "answerOne": "Rispondi ad almeno una domanda per inviare."
   },
   "notFound": {
     "title": "Pagina non trovata",

@@ -2758,6 +2758,27 @@
       "deleteBody": "Prijava osobe {name} i njezini doprinosi događaju (chat, odgovori na upitnike, e-poruke u redu čekanja) bit će izbrisani. To se ne može poništiti.",
       "deleted": "Prijava izbrisana",
       "failed": "Radnja nije uspjela. Pokušajte ponovno."
+    },
+    "feedbackPanel": {
+      "title": "Ocjene",
+      "loading": "Učitavanje ocjena…",
+      "loadFailed": "Ocjene nije moguće učitati.",
+      "empty": "Još nema ocjena.",
+      "responses": "{count, plural, one {# primljena ocjena} few {# primljene ocjene} other {# primljenih ocjena}}",
+      "downloadCsv": "Preuzmi CSV",
+      "disabled": "Prikupljanje ocjena za ovaj je događaj isključeno: soba ih ne traži.",
+      "average": "Prosjek {value} od {max}",
+      "yesShare": "Da: {pct} %",
+      "yes": "Da",
+      "no": "Ne",
+      "answered": "{count, plural, one {# odgovor} few {# odgovora} other {# odgovora}}",
+      "commentsTitle": "Komentari ({count})",
+      "showAll": "Prikaži sve ({count})",
+      "showFewer": "Prikaži manje",
+      "legacyTitle": "Ocjene zvjezdicama",
+      "legacySummary": "Prikupljeno prethodnom verzijom sobe: {count} · prosjek {average} od 5.",
+      "legacyRating": "{rating} od 5",
+      "downloadFailed": "Preuzimanje nije uspjelo: pokušajte ponovno."
     }
   },
   "email": {
@@ -3585,7 +3606,13 @@
     "thankYou": "Hvala na vašim povratnim informacijama!",
     "averageRating": "Prosječna ocjena",
     "ratingCount": "{count} ocjena",
-    "noFeedback": "Nema zaprimljenih povratnih informacija"
+    "noFeedback": "Nema zaprimljenih povratnih informacija",
+    "heading": "Kako je prošlo?",
+    "intro": "Minuta za poboljšanje sljedećih događaja. Organizatori vide odgovore bez vašeg imena.",
+    "thankYouDetail": "Vaša ocjena stigla je organizatorima.",
+    "alreadyDone": "Ocjenu ste već poslali: hvala!",
+    "leftPrompt": "Ocjenu možete ostaviti već sada, bez čekanja kraja.",
+    "leftCta": "Ostavi ocjenu"
   },
   "wordcloud": {
     "title": "Jednom riječju",
@@ -4135,7 +4162,9 @@
     "alreadySubmitted": "Već ste poslali svoje odgovore na ovaj upitnik.",
     "thankYou": "Hvala na vašim odgovorima.",
     "yes": "Da",
-    "no": "Ne"
+    "no": "Ne",
+    "scaleValue": "{value} od {max}",
+    "answerOne": "Za slanje odgovorite barem na jedno pitanje."
   },
   "notFound": {
     "title": "Stranica nije pronađena",

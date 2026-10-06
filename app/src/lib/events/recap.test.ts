@@ -7,8 +7,9 @@ vi.mock('@/lib/db', () => ({
     question: { findMany: vi.fn() },
     poll: { findMany: vi.fn() },
     wordCloudSubmission: { findMany: vi.fn() },
-    eventFeedback: { aggregate: vi.fn() },
+    eventFeedback: { findMany: vi.fn(async (): Promise<unknown[]> => []) },
     chatMessage: { findMany: vi.fn() },
+    questionnaireAnswer: { findMany: vi.fn(async (): Promise<unknown[]> => []) },
   },
 }));
 
@@ -22,8 +23,9 @@ const mocked = prisma as unknown as {
   question: { findMany: ReturnType<typeof vi.fn> };
   poll: { findMany: ReturnType<typeof vi.fn> };
   wordCloudSubmission: { findMany: ReturnType<typeof vi.fn> };
-  eventFeedback: { aggregate: ReturnType<typeof vi.fn> };
+  eventFeedback: { findMany: ReturnType<typeof vi.fn> };
   chatMessage: { findMany: ReturnType<typeof vi.fn> };
+  questionnaireAnswer: { findMany: ReturnType<typeof vi.fn> };
 };
 
 describe('buildRecap', () => {
@@ -58,7 +60,11 @@ describe('buildRecap', () => {
         roundId: 'd1',
       })),
     ]);
-    mocked.eventFeedback.aggregate.mockResolvedValue({ _avg: { rating: 4.5 }, _count: 20 });
+    // Venti stelle con media 4,5: dieci da 4 e dieci da 5.
+    mocked.eventFeedback.findMany.mockResolvedValue([
+      ...Array.from({ length: 10 }, () => ({ rating: 4 })),
+      ...Array.from({ length: 10 }, () => ({ rating: 5 })),
+    ]);
     mocked.chatMessage.findMany.mockResolvedValue([
       { text: 'Ci sarà la registrazione?', answeredAt: null, _count: { reactions: 2 } },
       { text: 'Le slide sono scaricabili?', answeredAt: new Date(), _count: { reactions: 5 } },
@@ -115,7 +121,7 @@ describe('buildRecap', () => {
   });
 
   it('feedback null quando non ci sono risposte', async () => {
-    mocked.eventFeedback.aggregate.mockResolvedValue({ _avg: { rating: null }, _count: 0 });
+    mocked.eventFeedback.findMany.mockResolvedValue([]);
     const recap = await buildRecap('evt1');
     expect(recap.feedback).toEqual({ average: null, count: 0 });
   });
@@ -192,7 +198,7 @@ describe('buildRecap — domande poste in chat', () => {
     mocked.question.findMany.mockResolvedValue([]);
     mocked.poll.findMany.mockResolvedValue([]);
     mocked.wordCloudSubmission.findMany.mockResolvedValue([]);
-    mocked.eventFeedback.aggregate.mockResolvedValue({ _avg: { rating: null }, _count: 0 });
+    mocked.eventFeedback.findMany.mockResolvedValue([]);
   });
 
   it('ordina per reazioni ricevute e marca quelle con risposta', async () => {
@@ -235,5 +241,28 @@ describe('buildRecap — domande poste in chat', () => {
     } satisfies EventRecap;
     expect(isRecapEmpty(vecchio)).toBe(true);
     expect(() => formatRecapSummary(vecchio, 'it')).not.toThrow();
+  });
+});
+
+
+describe('buildRecap — valutazioni del questionario', () => {
+  it('una media per risposta, insieme alle stelle', async () => {
+    mocked.event.findUnique.mockResolvedValue({ id: 'e1', peakParticipants: 0 } as never);
+    mocked.registration.count.mockResolvedValue(0);
+    mocked.question.findMany.mockResolvedValue([]);
+    mocked.poll.findMany.mockResolvedValue([]);
+    mocked.wordCloudSubmission.findMany.mockResolvedValue([]);
+    mocked.chatMessage.findMany.mockResolvedValue([]);
+    mocked.eventFeedback.findMany.mockResolvedValue([{ rating: 2 }]);
+    mocked.questionnaireAnswer.findMany.mockResolvedValue([
+      { responseId: 'r1', valueScale: 4, item: { scaleMin: 1, scaleMax: 5 } },
+      { responseId: 'r1', valueScale: 5, item: { scaleMin: 1, scaleMax: 5 } },
+      // Una scala 0-10 riportata su 1-5: 10 → 5.
+      { responseId: 'r2', valueScale: 10, item: { scaleMin: 0, scaleMax: 10 } },
+    ]);
+    const recap = await buildRecap('e1');
+    expect(recap.feedback.count).toBe(3);
+    // (2 + 4.5 + 5) / 3
+    expect(recap.feedback.average).toBeCloseTo(3.833, 2);
   });
 });

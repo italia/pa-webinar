@@ -10,6 +10,7 @@ import { guestAccessAllowed } from '@/lib/events/guest-window';
 import { registrationAccessFor } from '@/lib/events/registration-access';
 import { materialPhase, materialVisibilityWhere } from '@/lib/events/material-visibility';
 import { ensureEventRecap, type EventRecap } from '@/lib/events/recap';
+import { getFeedbackSummary } from '@/lib/feedback/feedback-summary';
 import EventDetailClient from '@/components/events/event-detail-client';
 import { appBaseUrl, getPublicEnv } from '@/lib/env';
 import { getSettings } from '@/lib/settings';
@@ -213,13 +214,25 @@ export default async function EventDetailPage({
     // regardless of the display toggle so it survives retention for the future
     // follow-up email; the page gates DISPLAY on postEventShowRecap below.
     recap = await ensureEventRecap(event.id);
+    // Il riepilogo si congela alla prima visita, ma le valutazioni arrivano
+    // anche dopo: si leggono al momento. Pubbliche solo se lo sono i feedback.
+    if (recap) {
+      const valutazioni = event.postEventShowFeedback ? await getFeedbackSummary(event.id) : null;
+      recap = {
+        ...recap,
+        feedback: !valutazioni
+          ? { average: null, count: 0 }
+          : valutazioni.count >= recap.feedback.count
+            ? { average: valutazioni.average, count: valutazioni.count }
+            : recap.feedback,
+      };
+    }
 
     const [
       materialsRaw,
       questionsRaw,
       pollsRaw,
-      feedbackAgg,
-      feedbackDist,
+      valutazioni,
       postEventQuestionnaire,
     ] = await Promise.all([
       // Vista del pubblico: la visibilità del singolo materiale
@@ -254,21 +267,7 @@ export default async function EventDetailPage({
             include: { votes: { select: { optionIndex: true } } },
           })
         : Promise.resolve([]),
-      event.postEventShowFeedback
-        ? prisma.eventFeedback.aggregate({
-            where: { eventId: event.id },
-            _avg: { rating: true },
-            _count: true,
-          })
-        : Promise.resolve(null),
-      event.postEventShowFeedback
-        ? prisma.eventFeedback.groupBy({
-            by: ['rating'],
-            where: { eventId: event.id },
-            _count: true,
-            orderBy: { rating: 'desc' },
-          })
-        : Promise.resolve([]),
+      event.postEventShowFeedback ? getFeedbackSummary(event.id) : Promise.resolve(null),
       // Il toggle del feedback governa anche l'invito: spento, non serve
       // nemmeno sapere se il questionario c'è.
       event.postEventShowFeedback
@@ -315,67 +314,8 @@ export default async function EventDetailPage({
       };
     });
 
-    if (feedbackAgg && feedbackAgg._count > 0) {
-      feedbackSummary = {
-        average: feedbackAgg._avg.rating,
-        count: feedbackAgg._count,
-        distribution: feedbackDist.map((d) => ({
-          rating: d.rating,
-          count: d._count,
-        })),
-      };
-    }
-
-    // Convergence fallback: events created after the feedback redesign
-    // collect ratings via the POST_EVENT questionnaire (QuestionnaireResponse),
-    // not the legacy EventFeedback table. When there is no legacy feedback,
-    // derive the public star summary from the questionnaire's 1-5 LIKERT
-    // answers (averaged across all rating questions) so the public Feedback
-    // tab keeps working for new events.
-    if (!feedbackSummary && event.postEventShowFeedback) {
-      const pq = await prisma.eventQuestionnaire.findUnique({
-        where: { eventId_placement: { eventId: event.id, placement: 'POST_EVENT' } },
-        select: {
-          _count: { select: { responses: true } },
-          responses: {
-            select: {
-              answers: {
-                select: { valueScale: true, item: { select: { type: true } } },
-              },
-            },
-          },
-        },
-      });
-      if (pq && pq._count.responses > 0) {
-        const counts: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
-        let sum = 0;
-        let n = 0;
-        for (const r of pq.responses) {
-          for (const a of r.answers) {
-            if (
-              a.item.type === 'LIKERT' &&
-              a.valueScale != null &&
-              a.valueScale >= 1 &&
-              a.valueScale <= 5
-            ) {
-              counts[a.valueScale] = (counts[a.valueScale] ?? 0) + 1;
-              sum += a.valueScale;
-              n += 1;
-            }
-          }
-        }
-        if (n > 0) {
-          feedbackSummary = {
-            average: sum / n,
-            count: pq._count.responses,
-            distribution: [5, 4, 3, 2, 1].map((rating) => ({
-              rating,
-              count: counts[rating] ?? 0,
-            })),
-          };
-        }
-      }
-    }
+    // Una sola media per tutte le pagine (lib/feedback/feedback-summary).
+    if (valutazioni && valutazioni.count > 0) feedbackSummary = valutazioni;
   }
 
   // Prima dell'inizio la scheda è l'unica superficie in cui il pubblico trova

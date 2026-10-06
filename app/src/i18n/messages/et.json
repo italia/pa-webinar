@@ -2758,6 +2758,27 @@
       "deleteBody": "Isiku {name} registreerimine ja tema panus üritusse (vestlus, küsimustike vastused, järjekorras olevad e-kirjad) kustutatakse. Seda ei saa tagasi võtta.",
       "deleted": "Registreerimine kustutatud",
       "failed": "Toiming ebaõnnestus. Proovige uuesti."
+    },
+    "feedbackPanel": {
+      "title": "Hinnangud",
+      "loading": "Hinnangute laadimine…",
+      "loadFailed": "Hinnanguid ei õnnestunud laadida.",
+      "empty": "Hinnanguid pole veel saadud.",
+      "responses": "{count, plural, one {# hinnang saadud} other {# hinnangut saadud}}",
+      "downloadCsv": "Laadi CSV alla",
+      "disabled": "Hinnangute kogumine on selle ürituse jaoks välja lülitatud: ruum neid ei küsi.",
+      "average": "Keskmine {value}/{max}",
+      "yesShare": "Jah: {pct}%",
+      "yes": "Jah",
+      "no": "Ei",
+      "answered": "{count, plural, one {# vastus} other {# vastust}}",
+      "commentsTitle": "Kommentaarid ({count})",
+      "showAll": "Näita kõiki ({count})",
+      "showFewer": "Näita vähem",
+      "legacyTitle": "Tärnhinnangud",
+      "legacySummary": "Ruumi varasema versiooniga kogutud: {count} · keskmine {average}/5.",
+      "legacyRating": "{rating}/5",
+      "downloadFailed": "Allalaadimine ebaõnnestus: proovi uuesti."
     }
   },
   "email": {
@@ -3585,7 +3606,13 @@
     "thankYou": "Täname teie tagasiside eest!",
     "averageRating": "Keskmine hinne",
     "ratingCount": "{count} hinnangut",
-    "noFeedback": "Tagasisidet pole saadud"
+    "noFeedback": "Tagasisidet pole saadud",
+    "heading": "Kuidas läks?",
+    "intro": "Üks minut, et järgmisi üritusi paremaks teha. Korraldajad näevad vastuseid ilma sinu nimeta.",
+    "thankYouDetail": "Sinu hinnang jõudis korraldajateni.",
+    "alreadyDone": "Oled oma hinnangu juba andnud: aitäh!",
+    "leftPrompt": "Saad hinnangu anda juba praegu, lõppu ootamata.",
+    "leftCta": "Anna hinnang"
   },
   "wordcloud": {
     "title": "Ühe sõnaga",
@@ -4135,7 +4162,9 @@
     "alreadySubmitted": "Oled sellele küsimustikule juba vastanud.",
     "thankYou": "Täname vastuste eest.",
     "yes": "Jah",
-    "no": "Ei"
+    "no": "Ei",
+    "scaleValue": "{value}/{max}",
+    "answerOne": "Saatmiseks vasta vähemalt ühele küsimusele."
   },
   "notFound": {
     "title": "Lehte ei leitud",

@@ -2758,6 +2758,27 @@
       "deleteBody": "The registration of {name} and their contributions to the event (chat, questionnaire answers, queued emails) will be deleted. This cannot be undone.",
       "deleted": "Registration deleted",
       "failed": "The operation failed. Please try again."
+    },
+    "feedbackPanel": {
+      "title": "Ratings",
+      "loading": "Loading ratings…",
+      "loadFailed": "Could not load the ratings.",
+      "empty": "No ratings received yet.",
+      "responses": "{count, plural, one {# rating received} other {# ratings received}}",
+      "downloadCsv": "Download CSV",
+      "disabled": "Rating collection is off for this event: the room doesn't ask for them.",
+      "average": "Average {value} of {max}",
+      "yesShare": "Yes: {pct}%",
+      "yes": "Yes",
+      "no": "No",
+      "answered": "{count, plural, one {# answer} other {# answers}}",
+      "commentsTitle": "Comments ({count})",
+      "showAll": "Show all ({count})",
+      "showFewer": "Show fewer",
+      "legacyTitle": "Star ratings",
+      "legacySummary": "Collected with the previous version of the room: {count} · average {average} of 5.",
+      "legacyRating": "{rating} of 5",
+      "downloadFailed": "Download failed: please try again."
     }
   },
   "email": {
@@ -3585,7 +3606,13 @@
     "thankYou": "Thank you for your feedback!",
     "averageRating": "Average rating",
     "ratingCount": "{count} ratings",
-    "noFeedback": "No feedback received"
+    "noFeedback": "No feedback received",
+    "heading": "How did it go?",
+    "intro": "A minute to help improve future events. The organisers see the answers without your name.",
+    "thankYouDetail": "Your rating has reached the organisers.",
+    "alreadyDone": "You have already left your rating: thank you!",
+    "leftPrompt": "You can already leave a rating, without waiting for the end.",
+    "leftCta": "Leave a rating"
   },
   "wordcloud": {
     "title": "In one word",
@@ -4135,7 +4162,9 @@
     "alreadySubmitted": "You have already sent your answers to this questionnaire.",
     "thankYou": "Thank you for your answers.",
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "scaleValue": "{value} of {max}",
+    "answerOne": "Answer at least one question to send."
   },
   "notFound": {
     "title": "Page not found",

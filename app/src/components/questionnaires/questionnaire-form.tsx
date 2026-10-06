@@ -21,7 +21,7 @@
  * like the error texts and the yes/no options.
  */
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useId, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { Button, Label } from 'design-react-kit';
 
@@ -68,6 +68,9 @@ export interface QuestionnaireFormProps {
   onNotFound?: () => void;
   /** Callback fired after a successful submission. */
   onSubmitted?: () => void;
+  /** Chi aveva gia' risposto (409): il chiamante lo dice come un esito, non
+   *  come un errore. Senza, resta il messaggio d'errore. */
+  onAlreadySubmitted?: () => void;
 }
 
 export default function QuestionnaireForm({
@@ -82,6 +85,7 @@ export default function QuestionnaireForm({
   submittedMessage,
   onNotFound,
   onSubmitted,
+  onAlreadySubmitted,
 }: QuestionnaireFormProps) {
   const locale = useLocale();
   const tc = useTranslations('common');
@@ -94,6 +98,7 @@ export default function QuestionnaireForm({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
+  const hintId = useId();
 
   useEffect(() => {
     let cancelled = false;
@@ -170,6 +175,10 @@ export default function QuestionnaireForm({
         // Il messaggio del server e' tecnico e in inglese: chi risponde legge
         // una frase nella propria lingua, scelta dal codice dell'errore.
         const err = (await res.json().catch(() => ({}))) as { code?: string };
+        if (err.code === 'ALREADY_SUBMITTED' && onAlreadySubmitted) {
+          onAlreadySubmitted();
+          return;
+        }
         setError(
           err.code === 'VALIDATION_ERROR'
             ? tq('answersInvalid')
@@ -186,7 +195,7 @@ export default function QuestionnaireForm({
     } finally {
       setSubmitting(false);
     }
-  }, [q, values, eventSlug, placement, accessToken, guestId, onSubmitted, tq]);
+  }, [q, values, eventSlug, placement, accessToken, guestId, onSubmitted, onAlreadySubmitted, tq]);
 
   if (loading) return <div className="text-muted">{tc('loading')}</div>;
   // Surface a load failure (non-404 error) instead of returning null, which
@@ -208,6 +217,13 @@ export default function QuestionnaireForm({
   }
 
   const showHeader = !hideHeader;
+  // Nella valutazione si invia dopo almeno una risposta: un invio vuoto non
+  // dice niente a chi organizza e consuma l'unica risposta concessa.
+  const nessunaRisposta =
+    variant === 'feedback' &&
+    !Object.values(values).some(
+      (v) => v.scale != null || (v.text ?? '').trim() !== '' || (v.choices ?? []).length > 0,
+    );
 
   return (
     <div>
@@ -228,7 +244,7 @@ export default function QuestionnaireForm({
         </div>
       )}
 
-      <div className="d-flex flex-column gap-3">
+      <div className={variant === 'feedback' ? 'qf-feedback' : 'd-flex flex-column gap-3'}>
         {q.items.map((it) => (
           <ItemInput
             key={it.id}
@@ -241,12 +257,22 @@ export default function QuestionnaireForm({
         ))}
       </div>
 
-      <div className="mt-3">
-        <Button color="primary" onClick={submit} disabled={submitting}>
+      <div className={variant === 'feedback' ? 'qf-feedback__submit' : 'mt-3'}>
+        <Button
+          color="primary"
+          onClick={submit}
+          disabled={submitting || nessunaRisposta}
+          aria-describedby={nessunaRisposta ? hintId : undefined}
+        >
           {submitting
             ? (submittingLabel ?? tc('loading'))
             : (submitLabel ?? tq('submit'))}
         </Button>
+        {nessunaRisposta && (
+          <p className="qf-feedback__hint" id={hintId}>
+            {tq('answerOne')}
+          </p>
+        )}
       </div>
     </div>
   );
@@ -270,6 +296,26 @@ function ItemInput({
 
   switch (item.type) {
     case 'OPEN_TEXT':
+      if (variant === 'feedback') {
+        const testo = value?.text ?? '';
+        return (
+          <div className="qf-item qf-item--text">
+            <label className="qf-item__prompt" htmlFor={`q-${item.id}`}>
+              {prompt}
+              {item.required && <span className="text-danger"> *</span>}
+            </label>
+            <textarea
+              id={`q-${item.id}`}
+              className="form-control qf-item__textarea"
+              rows={3}
+              maxLength={2000}
+              value={testo}
+              onChange={(e) => onChange({ text: e.target.value })}
+            />
+            {testo.length > 1500 && <span className="qf-item__count">{testo.length}/2000</span>}
+          </div>
+        );
+      }
       return (
         <div>
           <Label>
@@ -381,11 +427,11 @@ function ItemInput({
       // Star scale in the feedback variant for the canonical 1..N rating.
       if (variant === 'feedback' && min === 1 && max >= 2 && max <= 10) {
         return (
-          <div>
-            <Label className="d-block mb-2">
+          <div className="qf-item qf-item--scale">
+            <span className="qf-item__prompt">
               {prompt}
               {item.required && <span className="text-danger"> *</span>}
-            </Label>
+            </span>
             <StarScale
               max={max}
               value={value?.scale}
@@ -447,40 +493,39 @@ function StarScale({
   minLabel: string | null;
   maxLabel: string | null;
 }) {
+  const tq = useTranslations('questionnaire');
   const [hover, setHover] = useState(0);
   const active = hover || value || 0;
   const stars = Array.from({ length: max }, (_, i) => i + 1);
   return (
-    <div style={{ maxWidth: max * 40 }}>
-      {/* Toggle-button group (not a radiogroup) — each star carries an
-          "n/max" accessible name and the group is named by its prompt. */}
-      <div
-        className="d-flex gap-1 align-items-center"
-        role="group"
-        aria-label={ariaLabel}
-      >
-        {stars.map((n) => (
-          <button
-            key={n}
-            type="button"
-            className="btn btn-link p-0 border-0 lh-1"
-            aria-label={`${n}/${max}`}
-            aria-pressed={value === n}
-            onMouseEnter={() => setHover(n)}
-            onMouseLeave={() => setHover(0)}
-            onFocus={() => setHover(n)}
-            onBlur={() => setHover(0)}
-            onClick={() => onChange(n)}
-          >
-            <StarIcon filled={n <= active} />
-          </button>
-        ))}
+    <div className="qf-stars">
+      <div className="qf-stars__row">
+        {/* Toggle-button group (not a radiogroup) — each star carries an
+            "n/max" accessible name and the group is named by its prompt. */}
+        <div className="qf-stars__buttons" role="group" aria-label={ariaLabel}>
+          {stars.map((n) => (
+            <button
+              key={n}
+              type="button"
+              className={`qf-stars__star${n <= active ? ' is-on' : ''}`}
+              aria-label={`${n}/${max}`}
+              aria-pressed={value === n}
+              onMouseEnter={() => setHover(n)}
+              onMouseLeave={() => setHover(0)}
+              onFocus={() => setHover(n)}
+              onBlur={() => setHover(0)}
+              onClick={() => onChange(n)}
+            >
+              <StarIcon filled={n <= active} />
+            </button>
+          ))}
+        </div>
+        <span className="qf-stars__value" aria-hidden="true">
+          {value ? tq('scaleValue', { value, max }) : ''}
+        </span>
       </div>
       {(minLabel || maxLabel) && (
-        <div
-          className="d-flex justify-content-between text-muted mt-1"
-          style={{ fontSize: '0.75rem' }}
-        >
+        <div className="qf-stars__labels" style={{ width: `${max * 44}px` }}>
           <span>{minLabel ?? ''}</span>
           <span>{maxLabel ?? ''}</span>
         </div>
@@ -492,8 +537,8 @@ function StarScale({
 function StarIcon({ filled }: { filled: boolean }) {
   return (
     <svg
-      width="30"
-      height="30"
+      width="32"
+      height="32"
       viewBox="0 0 24 24"
       fill={filled ? '#FFB400' : 'none'}
       stroke={filled ? '#FFB400' : '#b1b1b3'}

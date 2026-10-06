@@ -2758,6 +2758,27 @@
       "deleteBody": "Asmens {name} registracija ir jo indėlis į renginį (pokalbiai, klausimynų atsakymai, eilėje esantys el. laiškai) bus ištrinti. To negalima atšaukti.",
       "deleted": "Registracija ištrinta",
       "failed": "Veiksmas nepavyko. Bandykite dar kartą."
+    },
+    "feedbackPanel": {
+      "title": "Įvertinimai",
+      "loading": "Įkeliami įvertinimai…",
+      "loadFailed": "Nepavyko įkelti įvertinimų.",
+      "empty": "Įvertinimų dar negauta.",
+      "responses": "{count, plural, one {# įvertinimas gautas} few {# įvertinimai gauti} many {# įvertinimo gauta} other {# įvertinimų gauta}}",
+      "downloadCsv": "Atsisiųsti CSV",
+      "disabled": "Šiam renginiui įvertinimų rinkimas išjungtas: kambarys jų neprašo.",
+      "average": "Vidurkis {value} iš {max}",
+      "yesShare": "Taip: {pct} %",
+      "yes": "Taip",
+      "no": "Ne",
+      "answered": "{count, plural, one {# atsakymas} few {# atsakymai} many {# atsakymo} other {# atsakymų}}",
+      "commentsTitle": "Komentarai ({count})",
+      "showAll": "Rodyti visus ({count})",
+      "showFewer": "Rodyti mažiau",
+      "legacyTitle": "Žvaigždučių įvertinimai",
+      "legacySummary": "Surinkta ankstesne kambario versija: {count} · vidurkis {average} iš 5.",
+      "legacyRating": "{rating} iš 5",
+      "downloadFailed": "Atsisiųsti nepavyko: bandykite dar kartą."
     }
   },
   "email": {
@@ -3585,7 +3606,13 @@
     "thankYou": "Dėkojame už jūsų atsiliepimą!",
     "averageRating": "Vidutinis įvertinimas",
     "ratingCount": "{count} įvertinimų",
-    "noFeedback": "Atsiliepimų negauta"
+    "noFeedback": "Atsiliepimų negauta",
+    "heading": "Kaip sekėsi?",
+    "intro": "Minutė, kad kiti renginiai būtų geresni. Organizatoriai mato atsakymus be jūsų vardo.",
+    "thankYouDetail": "Jūsų įvertinimas pasiekė organizatorius.",
+    "alreadyDone": "Jau palikote savo įvertinimą: ačiū!",
+    "leftPrompt": "Įvertinimą galite palikti jau dabar, nelaukdami pabaigos.",
+    "leftCta": "Palikti įvertinimą"
   },
   "wordcloud": {
     "title": "Vienu žodžiu",
@@ -4135,7 +4162,9 @@
     "alreadySubmitted": "Į šį klausimyną jau atsakėte.",
     "thankYou": "Dėkojame už atsakymus.",
     "yes": "Taip",
-    "no": "Ne"
+    "no": "Ne",
+    "scaleValue": "{value} iš {max}",
+    "answerOne": "Kad išsiųstumėte, atsakykite bent į vieną klausimą."
   },
   "notFound": {
     "title": "Puslapis nerastas",

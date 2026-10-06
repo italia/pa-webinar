@@ -2758,6 +2758,27 @@
       "deleteBody": "Die Anmeldung von {name} und die Beiträge zur Veranstaltung (Chat, Fragebogenantworten, wartende E-Mails) werden gelöscht. Dies kann nicht rückgängig gemacht werden.",
       "deleted": "Anmeldung gelöscht",
       "failed": "Der Vorgang ist fehlgeschlagen. Bitte versuchen Sie es erneut."
+    },
+    "feedbackPanel": {
+      "title": "Bewertungen",
+      "loading": "Bewertungen werden geladen…",
+      "loadFailed": "Die Bewertungen konnten nicht geladen werden.",
+      "empty": "Noch keine Bewertungen erhalten.",
+      "responses": "{count, plural, one {# Bewertung erhalten} other {# Bewertungen erhalten}}",
+      "downloadCsv": "CSV herunterladen",
+      "disabled": "Die Bewertungen sind für diese Veranstaltung deaktiviert: Der Raum fragt nicht danach.",
+      "average": "Durchschnitt {value} von {max}",
+      "yesShare": "Ja: {pct} %",
+      "yes": "Ja",
+      "no": "Nein",
+      "answered": "{count, plural, one {# Antwort} other {# Antworten}}",
+      "commentsTitle": "Kommentare ({count})",
+      "showAll": "Alle anzeigen ({count})",
+      "showFewer": "Weniger anzeigen",
+      "legacyTitle": "Sternebewertungen",
+      "legacySummary": "Mit der früheren Version des Raums erfasst: {count} · Durchschnitt {average} von 5.",
+      "legacyRating": "{rating} von 5",
+      "downloadFailed": "Download fehlgeschlagen: bitte erneut versuchen."
     }
   },
   "email": {
@@ -3585,7 +3606,13 @@
     "thankYou": "Vielen Dank für Ihr Feedback!",
     "averageRating": "Durchschnittliche Bewertung",
     "ratingCount": "{count} Bewertungen",
-    "noFeedback": "Kein Feedback erhalten"
+    "noFeedback": "Kein Feedback erhalten",
+    "heading": "Wie war es?",
+    "intro": "Eine Minute, um künftige Veranstaltungen zu verbessern. Die Organisatoren sehen die Antworten ohne deinen Namen.",
+    "thankYouDetail": "Deine Bewertung ist bei den Organisatoren angekommen.",
+    "alreadyDone": "Du hast deine Bewertung schon abgegeben: danke!",
+    "leftPrompt": "Du kannst schon jetzt bewerten, ohne das Ende abzuwarten.",
+    "leftCta": "Bewertung abgeben"
   },
   "wordcloud": {
     "title": "In einem Wort",
@@ -4135,7 +4162,9 @@
     "alreadySubmitted": "Sie haben Ihre Antworten auf diesen Fragebogen bereits gesendet.",
     "thankYou": "Vielen Dank für Ihre Antworten.",
     "yes": "Ja",
-    "no": "Nein"
+    "no": "Nein",
+    "scaleValue": "{value} von {max}",
+    "answerOne": "Beantworte mindestens eine Frage, um zu senden."
   },
   "notFound": {
     "title": "Seite nicht gefunden",

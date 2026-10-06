@@ -39,7 +39,7 @@ import MaterialPanel from '@/components/materials/material-panel';
 import { fetchMaterials, materialsListKey } from '@/components/materials/material-request';
 import ParticipantPanel from '@/components/participants/participant-panel';
 import PreJoinScreen from '@/components/live/pre-join-screen';
-import PostEventFeedbackModal from '@/components/live/post-event-feedback-modal';
+import PostEventFeedback from '@/components/live/post-event-feedback';
 import PresentationTimer from '@/components/live/presentation-timer';
 import ReactionBar from '@/components/live/reaction-bar';
 import ChatPanel, { type ChatPreview } from '@/components/live/chat-panel';
@@ -265,6 +265,7 @@ export default function LiveEventClient({
 }: LiveEventClientProps) {
   const t = useTranslations('live');
   const tc = useTranslations('common');
+  const tf = useTranslations('feedback');
   const router = useRouter();
 
   // Un solo canale per sala, montato qui: i pannelli si smontano al cambio
@@ -345,6 +346,10 @@ export default function LiveEventClient({
   }, [jitsiDomain]);
 
   const [showFeedback, setShowFeedback] = useState(false);
+  const [leftFeedbackOpen, setLeftFeedbackOpen] = useState(false);
+  // La valutazione gia' data o saltata in questa visita: la schermata di
+  // chiusura non la chiede una seconda volta.
+  const [feedbackSettled, setFeedbackSettled] = useState(false);
   // Stable anonymous id for guests, persisted in localStorage so a refresh or
   // a network-induced Jitsi reconnect keeps the same identity (poll/agenda
   // dedup + "my reaction" recall depend on it). SSR-safe: falls back to a
@@ -703,10 +708,8 @@ export default function LiveEventClient({
           // as an intentional end so a late `videoConferenceLeft` from the
           // tearing-down iframe doesn't bounce the user into 'reconnecting'.
           userHangupRef.current = true;
+          // La valutazione e' dentro la schermata di chiusura (phase 'ended').
           setPhase('ended');
-          if (!isModerator) {
-            setShowFeedback(true);
-          }
         }
       } catch {
         /* retry */
@@ -766,6 +769,7 @@ export default function LiveEventClient({
     // to rejoin a call the user has already left for good.
     userHangupRef.current = true;
     setShowFeedback(false);
+    setFeedbackSettled(true);
     setPhase('ended');
   }, []);
 
@@ -1345,11 +1349,18 @@ export default function LiveEventClient({
   // rileva la fine; ready → chiusura in corso). Prima era montato solo nel return
   // di phase='ready', quindi il questionario non appariva mai a fine call e il
   // bottone in sala d'attesa era morto.
-  const feedbackModal = showFeedback ? (
-    <PostEventFeedbackModal
+  // Chi risponde: l'iscrizione, se c'e'; altrimenti l'identificativo stabile
+  // del browser (ospiti e relatori, che un'iscrizione non ce l'hanno). Chi
+  // modera non valuta l'evento che conduce.
+  const feedbackIdentity = registeredAccessToken
+    ? { accessToken: registeredAccessToken }
+    : { guestId };
+  const askFeedback = !isModerator && event.feedbackEnabled !== false;
+  const feedbackModal = showFeedback && askFeedback ? (
+    <PostEventFeedback
       eventSlug={event.slug}
-      accessToken={registeredAccessToken}
-      guestId={isGuest ? guestId : undefined}
+      {...feedbackIdentity}
+      mode="dialog"
       onClose={handleFeedbackClose}
     />
   ) : null;
@@ -1404,7 +1415,7 @@ export default function LiveEventClient({
           defaultName={chosenName || initialDisplayName}
           onEnterLive={handleEnterFromWaiting}
           onStartEvent={isModerator ? handleStartEvent : undefined}
-          onLeaveFeedback={() => setShowFeedback(true)}
+          onLeaveFeedback={askFeedback ? () => setShowFeedback(true) : undefined}
           // Esente dal consenso multitrack in sala d'attesa: chi l'ha già
           // prestato alla registrazione, o il moderatore (è chi ha configurato
           // e controlla la registrazione). Gli speaker NO: non controllano la
@@ -1453,9 +1464,11 @@ export default function LiveEventClient({
           <h1 className="h3 mb-2">{t('eventEnded')}</h1>
           <p className="live-exit__message">{t('eventEndedMessage')}</p>
 
-          {/* Questionario post-evento: emerge a fine call (poll ENDED →
-              setShowFeedback(true)) sopra questa schermata di chiusura. */}
-          {feedbackModal}
+          {/* La valutazione dentro la scheda: comunque sia finita la call
+              (fine dall'orario, da chi modera, rete caduta a evento chiuso). */}
+          {askFeedback && !feedbackSettled && (
+            <PostEventFeedback eventSlug={event.slug} {...feedbackIdentity} mode="inline" />
+          )}
 
           <div className="live-exit__actions">{backLink}</div>
         </div>
@@ -1483,7 +1496,18 @@ export default function LiveEventClient({
             </p>
           )}
 
-          {feedbackModal}
+          {/* Uscito prima della fine: la valutazione si offre, non si impone. */}
+          {askFeedback &&
+            (leftFeedbackOpen ? (
+              <PostEventFeedback eventSlug={event.slug} {...feedbackIdentity} mode="inline" />
+            ) : (
+              <p className="live-exit__note">
+                {tf('leftPrompt')}{' '}
+                <button type="button" className="btn btn-link p-0 align-baseline" onClick={() => setLeftFeedbackOpen(true)}>
+                  {tf('leftCta')}
+                </button>
+              </p>
+            ))}
 
           <div className="live-exit__actions">
             <Button color="primary" onClick={handleRejoin}>
@@ -1789,8 +1813,6 @@ export default function LiveEventClient({
           {...voterIdentity(registeredAccessToken, guestId)}
         />
       </div>
-
-      {feedbackModal}
 
       {/* Recording pre-activation prompt for moderator */}
       <Modal

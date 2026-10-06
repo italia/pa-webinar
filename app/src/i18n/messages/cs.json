@@ -2758,6 +2758,27 @@
       "deleteBody": "Registrace osoby {name} a její příspěvky k události (chat, odpovědi v dotaznících, e-maily ve frontě) budou smazány. Tuto akci nelze vrátit.",
       "deleted": "Registrace smazána",
       "failed": "Operace se nezdařila. Zkuste to znovu."
+    },
+    "feedbackPanel": {
+      "title": "Hodnocení",
+      "loading": "Načítání hodnocení…",
+      "loadFailed": "Hodnocení se nepodařilo načíst.",
+      "empty": "Zatím nepřišlo žádné hodnocení.",
+      "responses": "{count, plural, one {# přijaté hodnocení} few {# přijatá hodnocení} many {# přijatého hodnocení} other {# přijatých hodnocení}}",
+      "downloadCsv": "Stáhnout CSV",
+      "disabled": "Sběr hodnocení je pro tuto akci vypnutý: místnost o ně nežádá.",
+      "average": "Průměr {value} z {max}",
+      "yesShare": "Ano: {pct} %",
+      "yes": "Ano",
+      "no": "Ne",
+      "answered": "{count, plural, one {# odpověď} few {# odpovědi} many {# odpovědi} other {# odpovědí}}",
+      "commentsTitle": "Komentáře ({count})",
+      "showAll": "Zobrazit vše ({count})",
+      "showFewer": "Zobrazit méně",
+      "legacyTitle": "Hodnocení hvězdičkami",
+      "legacySummary": "Sebráno předchozí verzí místnosti: {count} · průměr {average} z 5.",
+      "legacyRating": "{rating} z 5",
+      "downloadFailed": "Stažení se nezdařilo: zkuste to znovu."
     }
   },
   "email": {
@@ -3585,7 +3606,13 @@
     "thankYou": "Děkujeme za vaši zpětnou vazbu!",
     "averageRating": "Průměrné hodnocení",
     "ratingCount": "{count} hodnocení",
-    "noFeedback": "Žádná zpětná vazba"
+    "noFeedback": "Žádná zpětná vazba",
+    "heading": "Jak to šlo?",
+    "intro": "Minuta na zlepšení dalších akcí. Organizátoři vidí odpovědi bez vašeho jména.",
+    "thankYouDetail": "Vaše hodnocení dorazilo organizátorům.",
+    "alreadyDone": "Hodnocení jste už odeslali: děkujeme!",
+    "leftPrompt": "Hodnocení můžete zanechat už teď, bez čekání na konec.",
+    "leftCta": "Ohodnotit"
   },
   "wordcloud": {
     "title": "Jedním slovem",
@@ -4135,7 +4162,9 @@
     "alreadySubmitted": "Na tento dotazník jste již odpověděli.",
     "thankYou": "Děkujeme za vaše odpovědi.",
     "yes": "Ano",
-    "no": "Ne"
+    "no": "Ne",
+    "scaleValue": "{value} z {max}",
+    "answerOne": "Pro odeslání odpovězte alespoň na jednu otázku."
   },
   "notFound": {
     "title": "Stránka nenalezena",

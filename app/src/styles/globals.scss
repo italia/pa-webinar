@@ -6504,3 +6504,338 @@ html.live-resizing .live-sidebar-resizer::after {
   &--ok { color: #00663F; }
   &--errore { color: #A1112E; }
 }
+
+// ── Valutazione di fine evento ──
+// Dentro la scheda di chiusura (o in una finestra dalla sala d'attesa): una
+// sezione separata da una riga, domande a sinistra, stelle grandi e allineate
+// con le etichette agli estremi, il voto scelto scritto accanto.
+.event-feedback {
+  margin-top: 2rem;
+  padding-top: 1.75rem;
+  border-top: 1px solid #E3E9F0;
+  text-align: left;
+
+  // <dialog> modale: il riquadro e' il dialogo stesso, lo sfondo il ::backdrop.
+  &--dialog {
+    margin: auto;
+    padding: 0;
+    width: calc(100% - 2rem);
+    max-width: 540px;
+    max-height: calc(100vh - 2rem);
+    overflow-y: auto;
+    background: #fff;
+    border: 0;
+    border-top: 0;
+    border-radius: 16px;
+    box-shadow: 0 16px 48px rgba(23, 50, 77, 0.25);
+
+    &::backdrop {
+      background: rgba(23, 50, 77, 0.55);
+    }
+  }
+}
+
+.event-feedback__dialog-body {
+  position: relative;
+  padding: 2rem 1.5rem 1.25rem;
+
+  @media (min-width: 576px) {
+    padding: 2.25rem 2.25rem 1.25rem;
+  }
+}
+
+.event-feedback__close {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: #5A6772;
+
+  &:hover { background: #F2F5F8; color: var(--app-text); }
+  &:focus-visible { outline: 2px solid #0066CC; outline-offset: 2px; }
+}
+
+.event-feedback__title {
+  margin-bottom: 0.35rem;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--app-text);
+}
+
+.event-feedback__intro {
+  margin-bottom: 1.5rem;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: #5A6772;
+}
+
+.event-feedback__loading {
+  color: #5A6772;
+}
+
+.event-feedback__skip {
+  margin-top: 0.5rem;
+  text-align: center;
+
+  .btn-link { color: #5A6772; font-size: 0.9rem; }
+}
+
+.event-feedback__done {
+  padding: 0.5rem 0;
+  text-align: center;
+
+  svg { margin: 0 auto 0.75rem; display: block; }
+}
+
+.event-feedback__done-title {
+  margin-bottom: 0.25rem;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--app-text);
+}
+
+.event-feedback__done-text {
+  margin-bottom: 0;
+  color: #5A6772;
+}
+
+.qf-feedback {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.qf-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.qf-item__prompt {
+  font-size: 0.98rem;
+  font-weight: 600;
+  color: var(--app-text);
+}
+
+.qf-item__textarea {
+  border: 1px solid #C5CED8;
+  border-radius: 8px;
+  font-size: 0.95rem;
+
+  &:focus { border-color: #0066CC; box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.18); }
+}
+
+.qf-item__count {
+  align-self: flex-end;
+  font-size: 0.75rem;
+  color: #5A6772;
+}
+
+.qf-stars__row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.qf-stars__buttons {
+  display: flex;
+  gap: 4px;
+}
+
+.qf-stars__star {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  transition: transform 0.1s ease;
+
+  &:hover { transform: scale(1.08); }
+  &:focus-visible { outline: 2px solid #0066CC; outline-offset: 1px; }
+}
+
+.qf-stars__value {
+  min-width: 3.5rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #7A4A00;
+}
+
+.qf-stars__labels {
+  display: flex;
+  justify-content: space-between;
+  max-width: 100%;
+  font-size: 0.75rem;
+  color: #5A6772;
+}
+
+.qf-feedback__submit {
+  margin-top: 1.5rem;
+  text-align: center;
+
+  .btn { min-width: 12rem; }
+}
+
+.qf-feedback__hint {
+  margin: 0.5rem 0 0;
+  font-size: 0.8rem;
+  color: #5A6772;
+}
+
+// ── Valutazioni nella pagina evento in amministrazione ──
+.feedback-panel__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.feedback-panel__count {
+  margin: 0;
+  font-weight: 600;
+  color: var(--app-text);
+}
+
+.feedback-panel__note {
+  font-size: 0.88rem;
+  color: #5A6772;
+}
+
+.feedback-panel__items {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.feedback-item {
+  padding: 1rem 1.1rem;
+  border: 1px solid #E3E9F0;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.feedback-item__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.75rem;
+  margin-bottom: 0.35rem;
+}
+
+.feedback-item__prompt {
+  font-weight: 600;
+  font-size: 0.92rem;
+  color: var(--app-text);
+}
+
+.feedback-item__avg {
+  flex-shrink: 0;
+  font-weight: 700;
+  font-size: 0.92rem;
+  color: #0066CC;
+}
+
+.feedback-item__scale,
+.feedback-item__answered {
+  display: block;
+  font-size: 0.75rem;
+  color: #5A6772;
+}
+
+.feedback-item__bars {
+  list-style: none;
+  margin: 0.6rem 0 0.4rem;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.feedback-item__bar {
+  display: grid;
+  grid-template-columns: minmax(1.5rem, auto) 1fr 2rem;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+}
+
+.feedback-item__label {
+  color: var(--app-text);
+}
+
+.feedback-item__track {
+  height: 10px;
+  border-radius: 5px;
+  background: #EEF2F6;
+  overflow: hidden;
+}
+
+.feedback-item__fill {
+  display: block;
+  height: 100%;
+  border-radius: 5px;
+  background: #0066CC;
+}
+
+.feedback-item__n {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: #5A6772;
+}
+
+.feedback-panel__subtitle {
+  margin-bottom: 0.75rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--app-text);
+}
+
+.feedback-panel__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.feedback-panel__comment {
+  padding: 0.75rem 0.9rem;
+  border-left: 3px solid #0066CC;
+  border-radius: 0 8px 8px 0;
+  background: #F5F8FB;
+  font-size: 0.92rem;
+  color: var(--app-text);
+}
+
+.feedback-panel__comment-q {
+  display: block;
+  margin-bottom: 0.2rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #5A6772;
+}
+
+.feedback-panel__meta {
+  font-size: 0.75rem;
+  color: #5A6772;
+}
+
+.feedback-panel__legacy {
+  margin-top: 1.5rem;
+}

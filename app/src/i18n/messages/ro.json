@@ -2758,6 +2758,27 @@
       "deleteBody": "Înscrierea lui {name} și contribuțiile sale la eveniment (chat, răspunsuri la chestionare, e-mailuri în coadă) vor fi șterse. Acțiunea nu poate fi anulată.",
       "deleted": "Înscriere ștearsă",
       "failed": "Operațiunea nu a reușit. Vă rugăm să reîncercați."
+    },
+    "feedbackPanel": {
+      "title": "Evaluări",
+      "loading": "Se încarcă evaluările…",
+      "loadFailed": "Evaluările nu au putut fi încărcate.",
+      "empty": "Nu s-a primit încă nicio evaluare.",
+      "responses": "{count, plural, one {# evaluare primită} few {# evaluări primite} other {# de evaluări primite}}",
+      "downloadCsv": "Descarcă CSV",
+      "disabled": "Colectarea evaluărilor este dezactivată pentru acest eveniment: sala nu le cere.",
+      "average": "Medie {value} din {max}",
+      "yesShare": "Da: {pct}%",
+      "yes": "Da",
+      "no": "Nu",
+      "answered": "{count, plural, one {# răspuns} few {# răspunsuri} other {# de răspunsuri}}",
+      "commentsTitle": "Comentarii ({count})",
+      "showAll": "Afișează toate ({count})",
+      "showFewer": "Afișează mai puține",
+      "legacyTitle": "Evaluări cu stele",
+      "legacySummary": "Colectate cu versiunea anterioară a sălii: {count} · medie {average} din 5.",
+      "legacyRating": "{rating} din 5",
+      "downloadFailed": "Descărcarea nu a reușit: încearcă din nou."
     }
   },
   "email": {
@@ -3585,7 +3606,13 @@
     "thankYou": "Vă mulțumim pentru feedback!",
     "averageRating": "Evaluare medie",
     "ratingCount": "{count} evaluări",
-    "noFeedback": "Niciun feedback primit"
+    "noFeedback": "Niciun feedback primit",
+    "heading": "Cum a fost?",
+    "intro": "Un minut pentru a îmbunătăți evenimentele viitoare. Organizatorii văd răspunsurile fără numele tău.",
+    "thankYouDetail": "Evaluarea ta a ajuns la organizatori.",
+    "alreadyDone": "Ai lăsat deja evaluarea: mulțumim!",
+    "leftPrompt": "Poți lăsa o evaluare deja acum, fără să aștepți finalul.",
+    "leftCta": "Lasă o evaluare"
   },
   "wordcloud": {
     "title": "Într-un cuvânt",
@@ -4135,7 +4162,9 @@
     "alreadySubmitted": "Ați trimis deja răspunsurile la acest chestionar.",
     "thankYou": "Vă mulțumim pentru răspunsuri.",
     "yes": "Da",
-    "no": "Nu"
+    "no": "Nu",
+    "scaleValue": "{value} din {max}",
+    "answerOne": "Răspunde la cel puțin o întrebare pentru a trimite."
   },
   "notFound": {
     "title": "Pagina nu a fost găsită",

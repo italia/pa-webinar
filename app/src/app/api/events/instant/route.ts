@@ -14,6 +14,7 @@ import { resolveLocale } from '@/lib/utils/locale';
 import { localizedUrl } from '@/lib/utils/localized-url';
 import { calculateEstimates } from '@/lib/estimates';
 import { hashJoinPassword } from '@/lib/auth/password';
+import { ensurePostEventQuestionnaire } from '@/lib/feedback/default-questionnaire';
 
 export const dynamic = 'force-dynamic';
 
@@ -125,6 +126,14 @@ export const POST = withErrorHandling(async (request) => {
           : null,
     },
   });
+
+  // La valutazione di fine chiamata, come per ogni evento: il questionario
+  // predefinito. Senza, a fine chiamata non si chiederebbe niente.
+  try {
+    await ensurePostEventQuestionnaire(event.id);
+  } catch {
+    // Non blocca la chiamata: si puo' aggiungere dalla pagina dell'evento.
+  }
 
   const baseUrl = getPublicEnv('NEXT_PUBLIC_APP_URL');
   const locale = resolveLocale(request);

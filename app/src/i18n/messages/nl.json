@@ -2758,6 +2758,27 @@
       "deleteBody": "De inschrijving van {name} en de bijdragen aan het evenement (chat, antwoorden op vragenlijsten, e-mails in de wachtrij) worden verwijderd. Dit kan niet ongedaan worden gemaakt.",
       "deleted": "Inschrijving verwijderd",
       "failed": "De bewerking is mislukt. Probeer het opnieuw."
+    },
+    "feedbackPanel": {
+      "title": "Beoordelingen",
+      "loading": "Beoordelingen laden…",
+      "loadFailed": "De beoordelingen konden niet worden geladen.",
+      "empty": "Nog geen beoordelingen ontvangen.",
+      "responses": "{count, plural, one {# beoordeling ontvangen} other {# beoordelingen ontvangen}}",
+      "downloadCsv": "CSV downloaden",
+      "disabled": "Beoordelingen zijn uitgeschakeld voor dit evenement: de ruimte vraagt er niet om.",
+      "average": "Gemiddeld {value} van {max}",
+      "yesShare": "Ja: {pct}%",
+      "yes": "Ja",
+      "no": "Nee",
+      "answered": "{count, plural, one {# antwoord} other {# antwoorden}}",
+      "commentsTitle": "Opmerkingen ({count})",
+      "showAll": "Alles tonen ({count})",
+      "showFewer": "Minder tonen",
+      "legacyTitle": "Sterrenbeoordelingen",
+      "legacySummary": "Verzameld met de vorige versie van de ruimte: {count} · gemiddeld {average} van 5.",
+      "legacyRating": "{rating} van 5",
+      "downloadFailed": "Downloaden mislukt: probeer het opnieuw."
     }
   },
   "email": {
@@ -3585,7 +3606,13 @@
     "thankYou": "Bedankt voor uw feedback!",
     "averageRating": "Gemiddelde beoordeling",
     "ratingCount": "{count} beoordelingen",
-    "noFeedback": "Geen feedback ontvangen"
+    "noFeedback": "Geen feedback ontvangen",
+    "heading": "Hoe was het?",
+    "intro": "Eén minuut om volgende evenementen te verbeteren. De organisatie ziet de antwoorden zonder je naam.",
+    "thankYouDetail": "Je beoordeling is bij de organisatie aangekomen.",
+    "alreadyDone": "Je hebt je beoordeling al gegeven: bedankt!",
+    "leftPrompt": "Je kunt nu al een beoordeling geven, zonder op het einde te wachten.",
+    "leftCta": "Beoordeling geven"
   },
   "wordcloud": {
     "title": "In één woord",
@@ -4135,7 +4162,9 @@
     "alreadySubmitted": "U hebt uw antwoorden op deze vragenlijst al verzonden.",
     "thankYou": "Bedankt voor uw antwoorden.",
     "yes": "Ja",
-    "no": "Nee"
+    "no": "Nee",
+    "scaleValue": "{value} van {max}",
+    "answerOne": "Beantwoord minstens één vraag om te verzenden."
   },
   "notFound": {
     "title": "Pagina niet gevonden",

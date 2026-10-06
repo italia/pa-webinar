@@ -2758,6 +2758,27 @@
       "deleteBody": "{name} regisztrációja és az eseményhez fűzött hozzájárulásai (csevegés, kérdőívválaszok, sorban álló e-mailek) törlődnek. Ez nem vonható vissza.",
       "deleted": "Regisztráció törölve",
       "failed": "A művelet nem sikerült. Próbálja újra."
+    },
+    "feedbackPanel": {
+      "title": "Értékelések",
+      "loading": "Értékelések betöltése…",
+      "loadFailed": "Nem sikerült betölteni az értékeléseket.",
+      "empty": "Még nem érkezett értékelés.",
+      "responses": "{count, plural, one {# értékelés érkezett} other {# értékelés érkezett}}",
+      "downloadCsv": "CSV letöltése",
+      "disabled": "Ennél az eseménynél ki van kapcsolva az értékelések gyűjtése: a terem nem kéri őket.",
+      "average": "Átlag {value}/{max}",
+      "yesShare": "Igen: {pct}%",
+      "yes": "Igen",
+      "no": "Nem",
+      "answered": "{count, plural, one {# válasz} other {# válasz}}",
+      "commentsTitle": "Hozzászólások ({count})",
+      "showAll": "Összes megjelenítése ({count})",
+      "showFewer": "Kevesebb megjelenítése",
+      "legacyTitle": "Csillagos értékelések",
+      "legacySummary": "A terem korábbi változatával gyűjtve: {count} · átlag {average}/5.",
+      "legacyRating": "{rating}/5",
+      "downloadFailed": "A letöltés nem sikerült: próbáld újra."
     }
   },
   "email": {
@@ -3585,7 +3606,13 @@
     "thankYou": "Köszönjük a visszajelzését!",
     "averageRating": "Átlagos értékelés",
     "ratingCount": "{count} értékelés",
-    "noFeedback": "Nem érkezett visszajelzés"
+    "noFeedback": "Nem érkezett visszajelzés",
+    "heading": "Milyen volt?",
+    "intro": "Egy perc a következő események jobbá tételéért. A szervezők a neved nélkül látják a válaszokat.",
+    "thankYouDetail": "Az értékelésed megérkezett a szervezőkhöz.",
+    "alreadyDone": "Már értékelted az eseményt: köszönjük!",
+    "leftPrompt": "Már most értékelheted, nem kell a végét megvárnod.",
+    "leftCta": "Értékelés"
   },
   "wordcloud": {
     "title": "Egy szóval",
@@ -4135,7 +4162,9 @@
     "alreadySubmitted": "Erre a kérdőívre már elküldte a válaszait.",
     "thankYou": "Köszönjük a válaszait.",
     "yes": "Igen",
-    "no": "Nem"
+    "no": "Nem",
+    "scaleValue": "{value}/{max}",
+    "answerOne": "A küldéshez válaszolj legalább egy kérdésre."
   },
   "notFound": {
     "title": "Az oldal nem található",

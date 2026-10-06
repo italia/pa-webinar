@@ -2758,6 +2758,27 @@
       "deleteBody": "Se eliminarán la inscripción de {name} y sus aportaciones al evento (chat, respuestas a cuestionarios, correos en cola). No se puede deshacer.",
       "deleted": "Inscripción eliminada",
       "failed": "La operación no se ha completado. Vuelve a intentarlo."
+    },
+    "feedbackPanel": {
+      "title": "Valoraciones",
+      "loading": "Cargando valoraciones…",
+      "loadFailed": "No se han podido cargar las valoraciones.",
+      "empty": "Aún no se ha recibido ninguna valoración.",
+      "responses": "{count, plural, one {# valoración recibida} other {# valoraciones recibidas}}",
+      "downloadCsv": "Descargar CSV",
+      "disabled": "La recogida de valoraciones está desactivada para este evento: la sala no las pide.",
+      "average": "Media {value} de {max}",
+      "yesShare": "Sí: {pct} %",
+      "yes": "Sí",
+      "no": "No",
+      "answered": "{count, plural, one {# respuesta} other {# respuestas}}",
+      "commentsTitle": "Comentarios ({count})",
+      "showAll": "Mostrar todos ({count})",
+      "showFewer": "Mostrar menos",
+      "legacyTitle": "Valoraciones con estrellas",
+      "legacySummary": "Recogidas con la versión anterior de la sala: {count} · media {average} de 5.",
+      "legacyRating": "{rating} de 5",
+      "downloadFailed": "No se ha podido descargar: inténtalo de nuevo."
     }
   },
   "email": {
@@ -3585,7 +3606,13 @@
     "thankYou": "¡Gracias por su valoración!",
     "averageRating": "Valoración media",
     "ratingCount": "{count} valoraciones",
-    "noFeedback": "No se han recibido valoraciones"
+    "noFeedback": "No se han recibido valoraciones",
+    "heading": "¿Qué tal ha ido?",
+    "intro": "Un minuto para mejorar los próximos eventos. La organización ve las respuestas sin tu nombre.",
+    "thankYouDetail": "Tu valoración ha llegado a la organización.",
+    "alreadyDone": "Ya has dejado tu valoración: ¡gracias!",
+    "leftPrompt": "Ya puedes dejar una valoración, sin esperar al final.",
+    "leftCta": "Dejar una valoración"
   },
   "wordcloud": {
     "title": "En una palabra",
@@ -4135,7 +4162,9 @@
     "alreadySubmitted": "Ya has enviado tus respuestas a este cuestionario.",
     "thankYou": "Gracias por tus respuestas.",
     "yes": "Sí",
-    "no": "No"
+    "no": "No",
+    "scaleValue": "{value} de {max}",
+    "answerOne": "Responde al menos a una pregunta para enviar."
   },
   "notFound": {
     "title": "Página no encontrada",

@@ -18,6 +18,7 @@ import type { Prisma } from '@prisma/client';
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { countWordsByPerson } from '@/lib/wordcloud/normalize';
+import { getFeedbackSummary } from '@/lib/feedback/feedback-summary';
 import type { EmailLocale } from '@/lib/email/lingua';
 
 const MAX_QUESTIONS = 5;
@@ -176,11 +177,7 @@ export async function buildRecap(eventId: string): Promise<EventRecap> {
       where: { round: { eventId }, hiddenAt: null },
       select: { word: true, registrationId: true, guestId: true, roundId: true },
     }),
-    prisma.eventFeedback.aggregate({
-      where: { eventId },
-      _avg: { rating: true },
-      _count: true,
-    }),
+    getFeedbackSummary(eventId),
     // Domande poste in chat. Le scartate NON entrano nell'archivio pubblico —
     // stessa regola del Q&A storico, che pubblicava solo ANSWERED/HIGHLIGHTED:
     // un archivio che mostra "questa non verrà trattata" espone chi ha chiesto.
@@ -196,6 +193,8 @@ export async function buildRecap(eventId: string): Promise<EventRecap> {
       },
     }),
   ]);
+
+
 
   const recapPolls: RecapPoll[] = polls.map((p) => {
     const optionTexts = Array.isArray(p.options) ? (p.options as string[]) : [];
@@ -235,8 +234,8 @@ export async function buildRecap(eventId: string): Promise<EventRecap> {
     polls: recapPolls,
     topWords: countWordsByPerson(words).slice(0, MAX_WORDS),
     feedback: {
-      average: feedback._avg.rating ?? null,
-      count: feedback._count,
+      average: feedback.average,
+      count: feedback.count,
     },
   };
 }

@@ -2758,6 +2758,27 @@
       "deleteBody": "Registrácia osoby {name} a jej príspevky k podujatiu (chat, odpovede v dotazníkoch, e-maily v poradí) budú vymazané. Túto akciu nemožno vrátiť.",
       "deleted": "Registrácia vymazaná",
       "failed": "Operácia zlyhala. Skúste to znova."
+    },
+    "feedbackPanel": {
+      "title": "Hodnotenia",
+      "loading": "Načítavajú sa hodnotenia…",
+      "loadFailed": "Hodnotenia sa nepodarilo načítať.",
+      "empty": "Zatiaľ neprišlo žiadne hodnotenie.",
+      "responses": "{count, plural, one {# prijaté hodnotenie} few {# prijaté hodnotenia} many {# prijatého hodnotenia} other {# prijatých hodnotení}}",
+      "downloadCsv": "Stiahnuť CSV",
+      "disabled": "Zber hodnotení je pre toto podujatie vypnutý: miestnosť o ne nežiada.",
+      "average": "Priemer {value} z {max}",
+      "yesShare": "Áno: {pct} %",
+      "yes": "Áno",
+      "no": "Nie",
+      "answered": "{count, plural, one {# odpoveď} few {# odpovede} many {# odpovede} other {# odpovedí}}",
+      "commentsTitle": "Komentáre ({count})",
+      "showAll": "Zobraziť všetko ({count})",
+      "showFewer": "Zobraziť menej",
+      "legacyTitle": "Hodnotenia hviezdičkami",
+      "legacySummary": "Zozbierané predchádzajúcou verziou miestnosti: {count} · priemer {average} z 5.",
+      "legacyRating": "{rating} z 5",
+      "downloadFailed": "Stiahnutie sa nepodarilo: skúste to znova."
     }
   },
   "email": {
@@ -3585,7 +3606,13 @@
     "thankYou": "Ďakujeme za vašu spätnú väzbu!",
     "averageRating": "Priemerné hodnotenie",
     "ratingCount": "{count} hodnotení",
-    "noFeedback": "Žiadna spätná väzba"
+    "noFeedback": "Žiadna spätná väzba",
+    "heading": "Ako to išlo?",
+    "intro": "Minúta na zlepšenie ďalších podujatí. Organizátori vidia odpovede bez vášho mena.",
+    "thankYouDetail": "Vaše hodnotenie dorazilo organizátorom.",
+    "alreadyDone": "Hodnotenie ste už odoslali: ďakujeme!",
+    "leftPrompt": "Hodnotenie môžete zanechať už teraz, bez čakania na koniec.",
+    "leftCta": "Ohodnotiť"
   },
   "wordcloud": {
     "title": "Jedným slovom",
@@ -4135,7 +4162,9 @@
     "alreadySubmitted": "Na tento dotazník ste už odpovedali.",
     "thankYou": "Ďakujeme za vaše odpovede.",
     "yes": "Áno",
-    "no": "Nie"
+    "no": "Nie",
+    "scaleValue": "{value} z {max}",
+    "answerOne": "Na odoslanie odpovedzte aspoň na jednu otázku."
   },
   "notFound": {
     "title": "Stránka sa nenašla",

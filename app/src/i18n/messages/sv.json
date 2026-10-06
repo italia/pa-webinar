@@ -2758,6 +2758,27 @@
       "deleteBody": "Anmälan för {name} och personens bidrag till evenemanget (chatt, enkätsvar, e-post i kö) raderas. Det går inte att ångra.",
       "deleted": "Anmälan raderad",
       "failed": "Åtgärden misslyckades. Försök igen."
+    },
+    "feedbackPanel": {
+      "title": "Omdömen",
+      "loading": "Läser in omdömen…",
+      "loadFailed": "Omdömena kunde inte läsas in.",
+      "empty": "Inga omdömen har kommit in än.",
+      "responses": "{count, plural, one {# omdöme mottaget} other {# omdömen mottagna}}",
+      "downloadCsv": "Ladda ned CSV",
+      "disabled": "Insamling av omdömen är avstängd för detta evenemang: rummet ber inte om dem.",
+      "average": "Snitt {value} av {max}",
+      "yesShare": "Ja: {pct} %",
+      "yes": "Ja",
+      "no": "Nej",
+      "answered": "{count, plural, one {# svar} other {# svar}}",
+      "commentsTitle": "Kommentarer ({count})",
+      "showAll": "Visa alla ({count})",
+      "showFewer": "Visa färre",
+      "legacyTitle": "Stjärnbetyg",
+      "legacySummary": "Insamlade med rummets tidigare version: {count} · snitt {average} av 5.",
+      "legacyRating": "{rating} av 5",
+      "downloadFailed": "Nedladdningen misslyckades: försök igen."
     }
   },
   "email": {
@@ -3585,7 +3606,13 @@
     "thankYou": "Tack för din feedback!",
     "averageRating": "Genomsnittligt betyg",
     "ratingCount": "{count} omdömen",
-    "noFeedback": "Ingen feedback mottagen"
+    "noFeedback": "Ingen feedback mottagen",
+    "heading": "Hur gick det?",
+    "intro": "En minut för att förbättra kommande evenemang. Arrangörerna ser svaren utan ditt namn.",
+    "thankYouDetail": "Ditt omdöme har nått arrangörerna.",
+    "alreadyDone": "Du har redan lämnat ditt omdöme: tack!",
+    "leftPrompt": "Du kan redan lämna ett omdöme utan att vänta till slutet.",
+    "leftCta": "Lämna ett omdöme"
   },
   "wordcloud": {
     "title": "Med ett ord",
@@ -4135,7 +4162,9 @@
     "alreadySubmitted": "Du har redan skickat dina svar på den här enkäten.",
     "thankYou": "Tack för dina svar.",
     "yes": "Ja",
-    "no": "Nej"
+    "no": "Nej",
+    "scaleValue": "{value} av {max}",
+    "answerOne": "Svara på minst en fråga för att skicka."
   },
   "notFound": {
     "title": "Sidan hittades inte",

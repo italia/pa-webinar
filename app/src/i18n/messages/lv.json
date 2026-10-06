@@ -2758,6 +2758,27 @@
       "deleteBody": "Personas {name} reģistrācija un tās ieguldījums pasākumā (tērzēšana, atbildes uz anketām, rindā esošie e-pasti) tiks dzēsti. To nevar atsaukt.",
       "deleted": "Reģistrācija dzēsta",
       "failed": "Darbība neizdevās. Mēģiniet vēlreiz."
+    },
+    "feedbackPanel": {
+      "title": "Vērtējumi",
+      "loading": "Ielādē vērtējumus…",
+      "loadFailed": "Neizdevās ielādēt vērtējumus.",
+      "empty": "Vērtējumi vēl nav saņemti.",
+      "responses": "{count, plural, zero {# vērtējumu saņemts} one {# vērtējums saņemts} other {# vērtējumi saņemti}}",
+      "downloadCsv": "Lejupielādēt CSV",
+      "disabled": "Vērtējumu vākšana šim pasākumam ir izslēgta: telpa tos neprasa.",
+      "average": "Vidēji {value} no {max}",
+      "yesShare": "Jā: {pct}%",
+      "yes": "Jā",
+      "no": "Nē",
+      "answered": "{count, plural, zero {# atbilžu} one {# atbilde} other {# atbildes}}",
+      "commentsTitle": "Komentāri ({count})",
+      "showAll": "Rādīt visus ({count})",
+      "showFewer": "Rādīt mazāk",
+      "legacyTitle": "Zvaigžņu vērtējumi",
+      "legacySummary": "Savākti ar iepriekšējo telpas versiju: {count} · vidēji {average} no 5.",
+      "legacyRating": "{rating} no 5",
+      "downloadFailed": "Lejupielāde neizdevās: mēģini vēlreiz."
     }
   },
   "email": {
@@ -3585,7 +3606,13 @@
     "thankYou": "Paldies par jūsu atsauksmi!",
     "averageRating": "Vidējais vērtējums",
     "ratingCount": "{count} vērtējumi",
-    "noFeedback": "Nav saņemtu atsauksmju"
+    "noFeedback": "Nav saņemtu atsauksmju",
+    "heading": "Kā gāja?",
+    "intro": "Viena minūte, lai uzlabotu nākamos pasākumus. Organizatori redz atbildes bez tava vārda.",
+    "thankYouDetail": "Tavs vērtējums ir nonācis pie organizatoriem.",
+    "alreadyDone": "Tu jau esi atstājis savu vērtējumu: paldies!",
+    "leftPrompt": "Vērtējumu vari atstāt jau tagad, negaidot beigas.",
+    "leftCta": "Atstāt vērtējumu"
   },
   "wordcloud": {
     "title": "Vienā vārdā",
@@ -4135,7 +4162,9 @@
     "alreadySubmitted": "Jūsu atbildes uz šo aptauju jau ir nosūtītas.",
     "thankYou": "Paldies par jūsu atbildēm.",
     "yes": "Jā",
-    "no": "Nē"
+    "no": "Nē",
+    "scaleValue": "{value} no {max}",
+    "answerOne": "Lai nosūtītu, atbildi vismaz uz vienu jautājumu."
   },
   "notFound": {
     "title": "Lapa nav atrasta",

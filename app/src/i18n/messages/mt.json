@@ -2758,6 +2758,27 @@
       "deleteBody": "Ir-reġistrazzjoni ta' {name} u l-kontribuzzjonijiet tiegħu jew tagħha għall-avveniment (chat, tweġibiet għall-kwestjonarji, emails fil-kju) se jitħassru. Ma tistax titreġġa' lura.",
       "deleted": "Ir-reġistrazzjoni tħassret",
       "failed": "L-operazzjoni ma rnexxietx. Erġa' pprova."
+    },
+    "feedbackPanel": {
+      "title": "Valutazzjonijiet",
+      "loading": "Qed jitgħabbew il-valutazzjonijiet…",
+      "loadFailed": "Ma setgħux jitgħabbew il-valutazzjonijiet.",
+      "empty": "Għadha ma waslet l-ebda valutazzjoni.",
+      "responses": "{count, plural, one {# valutazzjoni rċevuta} two {# valutazzjonijiet rċevuti} few {# valutazzjonijiet rċevuti} many {# valutazzjoni rċevuta} other {# valutazzjoni rċevuta}}",
+      "downloadCsv": "Niżżel CSV",
+      "disabled": "Il-ġbir tal-valutazzjonijiet huwa mitfi għal dan l-avveniment: is-sala ma titlobhomx.",
+      "average": "Medja {value} minn {max}",
+      "yesShare": "Iva: {pct}%",
+      "yes": "Iva",
+      "no": "Le",
+      "answered": "{count, plural, one {# tweġiba} two {# tweġibiet} few {# tweġibiet} many {# tweġiba} other {# tweġiba}}",
+      "commentsTitle": "Kummenti ({count})",
+      "showAll": "Uri kollox ({count})",
+      "showFewer": "Uri inqas",
+      "legacyTitle": "Valutazzjonijiet bl-istilel",
+      "legacySummary": "Miġbura bil-verżjoni preċedenti tas-sala: {count} · medja {average} minn 5.",
+      "legacyRating": "{rating} minn 5",
+      "downloadFailed": "It-tniżżil ma rnexxiex: erġa' pprova."
     }
   },
   "email": {
@@ -3585,7 +3606,13 @@
     "thankYou": "Grazzi għall-feedback tiegħek!",
     "averageRating": "Valutazzjoni medja",
     "ratingCount": "{count} valutazzjonijiet",
-    "noFeedback": "L-ebda feedback irċevut"
+    "noFeedback": "L-ebda feedback irċevut",
+    "heading": "Kif mar?",
+    "intro": "Minuta biex jitjiebu l-avvenimenti li ġejjin. L-organizzaturi jaraw it-tweġibiet mingħajr ismek.",
+    "thankYouDetail": "Il-valutazzjoni tiegħek waslet għand l-organizzaturi.",
+    "alreadyDone": "Diġà tajt il-valutazzjoni tiegħek: grazzi!",
+    "leftPrompt": "Tista' tħalli valutazzjoni issa stess, mingħajr ma tistenna t-tmiem.",
+    "leftCta": "Ħalli valutazzjoni"
   },
   "wordcloud": {
     "title": "F'kelma waħda",
@@ -4135,7 +4162,9 @@
     "alreadySubmitted": "Diġà bgħatt it-tweġibiet tiegħek għal dan il-kwestjonarju.",
     "thankYou": "Grazzi tat-tweġibiet tiegħek.",
     "yes": "Iva",
-    "no": "Le"
+    "no": "Le",
+    "scaleValue": "{value} minn {max}",
+    "answerOne": "Wieġeb mill-inqas mistoqsija waħda biex tibgħat."
   },
   "notFound": {
     "title": "Il-paġna ma nstabitx",

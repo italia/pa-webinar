@@ -20,7 +20,7 @@ import { getSettings } from '@/lib/settings';
 import { calculateEstimates } from '@/lib/estimates';
 import { hashJoinPassword } from '@/lib/auth/password';
 import { coerceMatrix, togglesFromMatrix } from '@/lib/utils/permission-matrix';
-import { FEEDBACK_GENERIC_TEMPLATE_NAME } from '@/lib/feedback/constants';
+import { ensurePostEventQuestionnaire } from '@/lib/feedback/default-questionnaire';
 import {
   ALWAYS_PUBLIC_STATUSES,
   WARMUP_STATUSES,
@@ -258,20 +258,7 @@ export const POST = withErrorHandling(async (request) => {
   // default. Best-effort: a failure here must not fail event creation.
   if (data.feedbackEnabled !== false) {
     try {
-      const generic = await prisma.questionTemplate.findUnique({
-        where: { name: FEEDBACK_GENERIC_TEMPLATE_NAME },
-        select: { id: true },
-      });
-      if (generic) {
-        await prisma.eventQuestionnaire.create({
-          data: {
-            eventId: event.id,
-            placement: 'POST_EVENT',
-            title: { it: 'Il tuo feedback', en: 'Your feedback' },
-            templates: { create: [{ templateId: generic.id, sortOrder: 0 }] },
-          },
-        });
-      }
+      await ensurePostEventQuestionnaire(event.id);
     } catch {
       // Non-fatal: admin can attach the questionnaire from the event page.
     }

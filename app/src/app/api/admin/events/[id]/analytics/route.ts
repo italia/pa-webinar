@@ -18,6 +18,7 @@ import { cookies } from 'next/headers';
 
 import { withErrorHandling } from '@/lib/api-handler';
 import { requireEventManager } from '@/lib/auth/staff-session';
+import { getFeedbackSummary } from '@/lib/feedback/feedback-summary';
 import { tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { NotFoundError } from '@/lib/errors';
@@ -80,7 +81,18 @@ export const GET = withErrorHandling(async (_request, context) => {
     await Promise.all([
       // Persisted recap survives the retention cleanup (raw rows are deleted);
       // fall back to a live build for events that aren't concluded yet.
-      ensureEventRecap(id).then((r) => r ?? buildRecap(id)),
+      // Le valutazioni si leggono al momento: arrivano anche dopo il
+      // congelamento. Dopo la conservazione dei dati le righe non ci sono piu':
+      // allora vale il valore conservato nel riepilogo.
+      Promise.all([ensureEventRecap(id).then((r) => r ?? buildRecap(id)), getFeedbackSummary(id)]).then(
+        ([r, valutazioni]) => ({
+          ...r,
+          feedback:
+            valutazioni.count >= (r.feedback?.count ?? 0)
+              ? { average: valutazioni.average, count: valutazioni.count }
+              : r.feedback,
+        }),
+      ),
       prisma.registration.findMany({ where: { eventId: id }, select: { joinedAt: true, leftAt: true } }),
       prisma.chatMessage.findMany({
         where: { eventId: id, hiddenAt: null },

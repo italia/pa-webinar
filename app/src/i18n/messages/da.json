@@ -2758,6 +2758,27 @@
       "deleteBody": "Tilmeldingen for {name} og vedkommendes bidrag til begivenheden (chat, svar på spørgeskemaer, e-mails i kø) slettes. Det kan ikke fortrydes.",
       "deleted": "Tilmeldingen er slettet",
       "failed": "Handlingen mislykkedes. Prøv igen."
+    },
+    "feedbackPanel": {
+      "title": "Vurderinger",
+      "loading": "Indlæser vurderinger…",
+      "loadFailed": "Vurderingerne kunne ikke indlæses.",
+      "empty": "Ingen vurderinger modtaget endnu.",
+      "responses": "{count, plural, one {# vurdering modtaget} other {# vurderinger modtaget}}",
+      "downloadCsv": "Download CSV",
+      "disabled": "Indsamling af vurderinger er slået fra for dette arrangement: rummet beder ikke om dem.",
+      "average": "Gennemsnit {value} af {max}",
+      "yesShare": "Ja: {pct} %",
+      "yes": "Ja",
+      "no": "Nej",
+      "answered": "{count, plural, one {# svar} other {# svar}}",
+      "commentsTitle": "Kommentarer ({count})",
+      "showAll": "Vis alle ({count})",
+      "showFewer": "Vis færre",
+      "legacyTitle": "Stjernevurderinger",
+      "legacySummary": "Indsamlet med den tidligere version af rummet: {count} · gennemsnit {average} af 5.",
+      "legacyRating": "{rating} af 5",
+      "downloadFailed": "Download mislykkedes: prøv igen."
     }
   },
   "email": {
@@ -3585,7 +3606,13 @@
     "thankYou": "Tak for din feedback!",
     "averageRating": "Gennemsnitlig vurdering",
     "ratingCount": "{count} vurderinger",
-    "noFeedback": "Ingen feedback modtaget"
+    "noFeedback": "Ingen feedback modtaget",
+    "heading": "Hvordan gik det?",
+    "intro": "Et minut til at forbedre de næste arrangementer. Arrangørerne ser svarene uden dit navn.",
+    "thankYouDetail": "Din vurdering er nået frem til arrangørerne.",
+    "alreadyDone": "Du har allerede givet din vurdering: tak!",
+    "leftPrompt": "Du kan allerede give en vurdering uden at vente til slutningen.",
+    "leftCta": "Giv en vurdering"
   },
   "wordcloud": {
     "title": "Med ét ord",
@@ -4135,7 +4162,9 @@
     "alreadySubmitted": "Du har allerede sendt dine svar på dette spørgeskema.",
     "thankYou": "Tak for dine svar.",
     "yes": "Ja",
-    "no": "Nej"
+    "no": "Nej",
+    "scaleValue": "{value} af {max}",
+    "answerOne": "Besvar mindst ét spørgsmål for at sende."
   },
   "notFound": {
     "title": "Siden blev ikke fundet",

@@ -2758,6 +2758,27 @@
       "deleteBody": "A inscrição de {name} e os seus contributos para o evento (chat, respostas a questionários, e-mails em fila) serão eliminados. Não é possível anular.",
       "deleted": "Inscrição eliminada",
       "failed": "A operação falhou. Tente novamente."
+    },
+    "feedbackPanel": {
+      "title": "Avaliações",
+      "loading": "A carregar avaliações…",
+      "loadFailed": "Não foi possível carregar as avaliações.",
+      "empty": "Ainda não foram recebidas avaliações.",
+      "responses": "{count, plural, one {# avaliação recebida} other {# avaliações recebidas}}",
+      "downloadCsv": "Descarregar CSV",
+      "disabled": "A recolha de avaliações está desativada para este evento: a sala não as pede.",
+      "average": "Média {value} de {max}",
+      "yesShare": "Sim: {pct}%",
+      "yes": "Sim",
+      "no": "Não",
+      "answered": "{count, plural, one {# resposta} other {# respostas}}",
+      "commentsTitle": "Comentários ({count})",
+      "showAll": "Mostrar todos ({count})",
+      "showFewer": "Mostrar menos",
+      "legacyTitle": "Avaliações com estrelas",
+      "legacySummary": "Recolhidas com a versão anterior da sala: {count} · média {average} de 5.",
+      "legacyRating": "{rating} de 5",
+      "downloadFailed": "Falha na transferência: tente novamente."
     }
   },
   "email": {
@@ -3585,7 +3606,13 @@
     "thankYou": "Obrigado pelo seu feedback!",
     "averageRating": "Avaliação média",
     "ratingCount": "{count} avaliações",
-    "noFeedback": "Nenhum feedback recebido"
+    "noFeedback": "Nenhum feedback recebido",
+    "heading": "Como correu?",
+    "intro": "Um minuto para ajudar a melhorar os próximos eventos. A organização vê as respostas sem o seu nome.",
+    "thankYouDetail": "A sua avaliação chegou à organização.",
+    "alreadyDone": "Já deixou a sua avaliação: obrigado!",
+    "leftPrompt": "Já pode deixar uma avaliação, sem esperar pelo fim.",
+    "leftCta": "Deixar uma avaliação"
   },
   "wordcloud": {
     "title": "Numa palavra",
@@ -4135,7 +4162,9 @@
     "alreadySubmitted": "Já enviou as suas respostas a este questionário.",
     "thankYou": "Obrigado pelas suas respostas.",
     "yes": "Sim",
-    "no": "Não"
+    "no": "Não",
+    "scaleValue": "{value} de {max}",
+    "answerOne": "Responda a pelo menos uma pergunta para enviar."
   },
   "notFound": {
     "title": "Página não encontrada",
