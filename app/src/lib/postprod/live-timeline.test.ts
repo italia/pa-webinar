@@ -17,7 +17,7 @@ vi.mock('@/lib/crypto/pii', () => ({
 
 import { prisma } from '@/lib/db';
 
-import { buildLiveTimeline, describeAction, recordingTimeZero } from './live-timeline';
+import { buildLiveTimeline, chaptersFromActions, describeAction, recordingTimeZero } from './live-timeline';
 
 const T0 = new Date('2026-10-08T10:00:00Z');
 const at = (min: number, sec = 0) => new Date(T0.getTime() + min * 60_000 + sec * 1000);
@@ -165,6 +165,43 @@ describe('buildLiveTimeline', () => {
     expect(Object.keys(dove.select)).toEqual(['text', 'createdAt']);
   });
 
+  it('i capitoli: la scaletta si legge dall’inizio dell’evento, fino alla fine della registrazione', async () => {
+    // L'argomento in corso allo zero e' stato avviato 45 minuti prima: fuori
+    // dalla finestra delle azioni, ma apre la registrazione.
+    m('liveAction').mockImplementation(async (args: { where: { kind?: unknown } }) =>
+      args.where.kind === 'agenda.topic'
+        ? [
+            { at: at(-45), kind: 'agenda.topic', data: { itemId: 'a', label: 'Saluti', status: 'CURRENT' } },
+            { at: at(20), kind: 'agenda.topic', data: { itemId: 'b', label: 'Il servizio', status: 'CURRENT' } },
+          ]
+        : [],
+    );
+    const tl = await buildLiveTimeline({ eventId: 'e1', t0: T0, exact: true, until: at(60) });
+    expect(tl.chapters).toEqual([
+      { offsetSec: 0, title: 'Saluti' },
+      { offsetSec: 1200, title: 'Il servizio' },
+    ]);
+    const scaletta = m('liveAction').mock.calls
+      .map((c) => c[0] as { where: Record<string, unknown>; take?: number })
+      .find((a) => a.where.kind === 'agenda.topic');
+    // Nessun limite inferiore: solo la fine della registrazione.
+    expect(scaletta?.where).toEqual({ eventId: 'e1', kind: 'agenda.topic', at: { lte: at(60) } });
+    expect(scaletta?.take).toBeGreaterThan(0);
+  });
+
+  it('un argomento avviato dopo la fine della registrazione non e’ un suo capitolo', async () => {
+    m('liveAction').mockImplementation(async (args: { where: { kind?: unknown } }) =>
+      args.where.kind === 'agenda.topic'
+        ? [
+            { at: at(5), kind: 'agenda.topic', data: { itemId: 'a', label: 'Uno', status: 'CURRENT' } },
+            { at: at(60), kind: 'agenda.topic', data: { itemId: 'b', label: 'Due', status: 'CURRENT' } },
+          ]
+        : [],
+    );
+    const tl = await buildLiveTimeline({ eventId: 'e1', t0: T0, exact: true, until: at(60) });
+    expect(tl.chapters).toEqual([{ offsetSec: 300, title: 'Uno' }]);
+  });
+
   it('troppe voci: via per prime le minori, le azioni restano', async () => {
     m('liveAction').mockResolvedValue([
       { at: at(5), kind: 'agenda.topic', data: { label: 'Uno', status: 'CURRENT' } },
@@ -209,5 +246,81 @@ describe('recordingTimeZero', () => {
     expect(
       recordingTimeZero({ mediaStartedAt: null, createdAt: creata, durationSec: 3600, multitrack: false }),
     ).toEqual({ t0: T0, exact: false });
+  });
+});
+
+describe('chaptersFromActions', () => {
+  const t0 = new Date('2026-10-08T09:00:00Z');
+  const at = (min: number) => new Date(t0.getTime() + min * 60_000);
+  const avvio = (min: number, itemId: string, label: string, status = 'CURRENT') => ({
+    at: at(min),
+    kind: 'agenda.topic',
+    data: { itemId, label, status },
+  });
+
+  it('gli argomenti avviati, in ordine, con i secondi dallo zero', () => {
+    expect(
+      chaptersFromActions(
+        [
+          avvio(12, 'b', 'Secondo punto'),
+          avvio(1, 'a', 'Primo punto'),
+          avvio(11, 'a', 'Primo punto', 'DONE'),
+          { at: at(5), kind: 'poll.opened', data: {} },
+        ],
+        t0,
+      ),
+    ).toEqual([
+      { offsetSec: 60, title: 'Primo punto' },
+      { offsetSec: 720, title: 'Secondo punto' },
+    ]);
+  });
+
+  it("prima dello zero conta l'ultimo avviato, che apre la registrazione; i doppioni consecutivi sono uno", () => {
+    expect(
+      chaptersFromActions(
+        [avvio(-20, 'a', 'Saluti'), avvio(-5, 'b', 'Contesto'), avvio(3, 'b', 'Contesto'), avvio(30, 'a', 'Saluti')],
+        t0,
+      ),
+    ).toEqual([
+      { offsetSec: 0, title: 'Contesto' },
+      { offsetSec: 1800, title: 'Saluti' },
+    ]);
+  });
+
+  it('un argomento avviato e poi chiuso prima dello zero non apre la registrazione', () => {
+    for (const chiuso of ['DONE', 'SKIPPED', 'PENDING']) {
+      expect(
+        chaptersFromActions([avvio(-20, 'a', 'Saluti'), avvio(-10, 'a', 'Saluti', chiuso), avvio(5, 'b', 'Contesto')], t0),
+      ).toEqual([{ offsetSec: 300, title: 'Contesto' }]);
+    }
+    // Chiuderne un altro non tocca quello in corso.
+    expect(
+      chaptersFromActions([avvio(-20, 'a', 'Saluti'), avvio(-10, 'b', 'Contesto', 'DONE'), avvio(5, 'b', 'Contesto')], t0),
+    ).toEqual([
+      { offsetSec: 0, title: 'Saluti' },
+      { offsetSec: 300, title: 'Contesto' },
+    ]);
+    // Concluso dopo lo zero: era in corso quando la registrazione e' partita.
+    expect(chaptersFromActions([avvio(-20, 'a', 'Saluti'), avvio(10, 'a', 'Saluti', 'DONE')], t0)).toEqual([
+      { offsetSec: 0, title: 'Saluti' },
+    ]);
+  });
+
+  it('con la fine della registrazione: i capitoli avviati da li’ in poi si scartano', () => {
+    const fine = at(30);
+    expect(
+      chaptersFromActions(
+        [avvio(-5, 'a', 'Saluti'), avvio(10, 'b', 'Contesto'), avvio(30, 'c', 'Domande'), avvio(40, 'd', 'Chiusura')],
+        t0,
+        fine,
+      ),
+    ).toEqual([
+      { offsetSec: 0, title: 'Saluti' },
+      { offsetSec: 600, title: 'Contesto' },
+    ]);
+  });
+
+  it('senza scaletta: nessun capitolo', () => {
+    expect(chaptersFromActions([{ at: at(1), kind: 'poll.opened', data: {} }], t0)).toEqual([]);
   });
 });

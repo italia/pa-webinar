@@ -574,7 +574,7 @@ export const POST = withErrorHandling(async (request) => {
     payloadOut = {
       ...(parsed.data.payload as Record<string, unknown>),
       ...(agenda.length > 0 && { agenda }),
-      ...(timeline && timeline.entries.length > 0 && { timeline }),
+      ...(timeline && (timeline.entries.length > 0 || timeline.chapters.length > 0) && { timeline }),
     };
   }
 

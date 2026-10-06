@@ -47,10 +47,11 @@ interface Props {
   onExpand?: () => void;
 }
 
+/** «MM:SS» o, oltre l'ora, «H:MM:SS». */
 const mmssToSec = (mmss: string): number | null => {
-  const m = mmss.match(/^(\d{1,2}):(\d{2})$/);
+  const m = mmss.trim().match(/^(?:(\d{1,2}):)?(\d{1,3}):(\d{2})$/);
   if (!m) return null;
-  return Number(m[1]) * 60 + Number(m[2]);
+  return Number(m[1] ?? 0) * 3600 + Number(m[2]) * 60 + Number(m[3]);
 };
 
 const LANG_STORAGE_KEY = 'pa-webinar:summary-lang';

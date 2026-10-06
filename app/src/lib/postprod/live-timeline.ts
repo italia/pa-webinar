@@ -31,12 +31,84 @@ export interface TimelineEntry {
   text: string;
 }
 
+/** Un capitolo della registrazione: un argomento della scaletta avviato. */
+export interface TimelineChapter {
+  /** Secondi dall'inizio della registrazione (0 se avviato prima). */
+  offsetSec: number;
+  title: string;
+}
+
 export interface LiveTimeline {
   /** Ora del server dello zero. */
   t0: string;
   /** Vero se lo zero e' l'inizio del media, falso se approssimato. */
   exact: boolean;
   entries: TimelineEntry[];
+  /**
+   * Gli argomenti della scaletta nell'ordine in cui chi conduce li ha avviati:
+   * i capitoli della registrazione, con l'ora dichiarata in sala. Quello in
+   * corso quando la registrazione e' partita apre a zero. Vuoto se la
+   * scaletta non e' stata usata.
+   */
+  chapters: TimelineChapter[];
+}
+
+/**
+ * I capitoli dagli argomenti della scaletta (`agenda.topic`), in ordine di
+ * tempo.
+ *
+ * Prima dello zero conta solo l'argomento in corso quando la registrazione
+ * parte, che la apre: l'ultimo avviato (CURRENT), purche' nel frattempo non
+ * sia stato concluso, saltato o riaperto (ogni altro stato dello stesso
+ * argomento lo chiude). Dopo lo zero ogni avvio apre un capitolo; due avvii di
+ * seguito dello stesso argomento sono uno.
+ *
+ * `fine` e' la fine della registrazione: un argomento avviato da li' in poi
+ * non e' nella registrazione e non e' un suo capitolo.
+ */
+export function chaptersFromActions(
+  azioni: ReadonlyArray<{ at: Date; kind: string; data: unknown }>,
+  t0: Date,
+  fine?: Date | null,
+): TimelineChapter[] {
+  const voci = azioni
+    .filter((a) => a.kind === 'agenda.topic')
+    .map((a) => {
+      const data = (a.data && typeof a.data === 'object' ? a.data : {}) as Record<string, unknown>;
+      const label = str(data.label).trim();
+      return {
+        at: a.at,
+        id: str(data.itemId) || label,
+        // Un avvio vale solo con un titolo da mostrare.
+        avvio: data.status === 'CURRENT' && label.length > 0,
+        label: data.label,
+      };
+    })
+    .filter((v) => v.id.length > 0)
+    .sort((x, y) => x.at.getTime() - y.at.getTime());
+
+  let inCorso: { id: string; title: string } | null = null;
+  const out: Array<TimelineChapter & { id: string }> = [];
+  for (const v of voci) {
+    const offsetSec = Math.round((v.at.getTime() - t0.getTime()) / 1000);
+    if (offsetSec <= 0) {
+      if (v.avvio) inCorso = { id: v.id, title: cita(v.label) };
+      else if (inCorso?.id === v.id) inCorso = null;
+      continue;
+    }
+    if (fine && v.at.getTime() >= fine.getTime()) break;
+    if (!v.avvio) continue;
+    // L'argomento in corso allo zero apre la registrazione.
+    if (inCorso) {
+      out.push({ id: inCorso.id, offsetSec: 0, title: inCorso.title });
+      inCorso = null;
+    }
+    const ultimo = out[out.length - 1];
+    if (ultimo && ultimo.id === v.id) continue;
+    out.push({ id: v.id, offsetSec, title: cita(v.label) });
+  }
+  if (inCorso) out.push({ id: inCorso.id, offsetSec: 0, title: inCorso.title });
+  return out.map(({ offsetSec, title }) => ({ offsetSec, title }));
 }
 
 /** Quanto prima dello zero si guarda: una domanda preparata o un sondaggio
@@ -46,6 +118,9 @@ const BEFORE_MS = 30 * 60_000;
 const AFTER_MS = 5 * 60_000;
 /** Finestra di conteggio di chat, reazioni e mani alzate. */
 const BUCKET_MS = 5 * 60_000;
+/** Righe della scaletta lette per i capitoli: ben oltre ogni scaletta vera,
+ *  solo un tetto alla lettura. */
+const MAX_AGENDA_ACTIONS = 1_000;
 /** Voci al massimo: oltre, il prompt non le regge. */
 const MAX_ENTRIES = 250;
 /** Lunghezza massima di un testo citato. */
@@ -210,6 +285,11 @@ export async function buildLiveTimeline(opts: {
   eventId: string;
   t0: Date;
   exact: boolean;
+  /**
+   * La fine della registrazione (lo zero piu' la durata) quando se ne sa la
+   * durata; altrimenti la fine della sessione, o adesso. Un argomento avviato
+   * da qui in poi non e' un capitolo.
+   */
   until: Date;
 }): Promise<LiveTimeline> {
   const { eventId, t0 } = opts;
@@ -217,10 +297,19 @@ export async function buildLiveTimeline(opts: {
   const a = new Date(opts.until.getTime() + AFTER_MS);
   const nellaFinestra = { gte: da, lte: a };
 
-  const [azioni, domande, domandeChat, materiali, chat, reazioni, mani] = await Promise.all([
+  const [azioni, scaletta, domande, domandeChat, materiali, chat, reazioni, mani] = await Promise.all([
     prisma.liveAction.findMany({
       where: { eventId, at: nellaFinestra, kind: { notIn: ['hand.raised', 'hand.lowered'] } },
       orderBy: { at: 'asc' },
+      select: { at: true, kind: true, data: true },
+    }),
+    // Per i capitoli la scaletta si legge dall'inizio dell'evento, non dalla
+    // finestra: l'argomento in corso quando parte la registrazione puo' essere
+    // stato avviato ben prima dei trenta minuti di contesto.
+    prisma.liveAction.findMany({
+      where: { eventId, kind: 'agenda.topic', at: { lte: opts.until } },
+      orderBy: { at: 'desc' },
+      take: MAX_AGENDA_ACTIONS,
       select: { at: true, kind: true, data: true },
     }),
     prisma.question.findMany({
@@ -343,6 +432,7 @@ export async function buildLiveTimeline(opts: {
   return {
     t0: t0.toISOString(),
     exact: opts.exact,
+    chapters: chaptersFromActions(scaletta, t0, opts.until),
     entries: scelti.map((f) => ({
       offsetSec: Math.round((f.at.getTime() - t0.getTime()) / 1000),
       kind: f.kind,
