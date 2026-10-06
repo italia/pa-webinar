@@ -26,6 +26,7 @@ import { withErrorHandling } from '@/lib/api-handler';
 import { assertCronApiKey } from '@/lib/auth/cron';
 import { AppError, NotFoundError, ValidationError } from '@/lib/errors';
 import { prisma } from '@/lib/db';
+import { buildLiveTimeline, recordingTimeZero } from '@/lib/postprod/live-timeline';
 import {
   artifactMimeType,
   artifactPath,
@@ -189,10 +190,12 @@ export const POST = withErrorHandling(async (request) => {
           // della sintesi (job SUMMARIZE) — vedi più sotto.
           agendaItems: {
             orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
-            select: { label: true, completed: true },
+            select: { label: true, completed: true, status: true, plannedMinutes: true },
           },
         },
       },
+      callSession: { select: { endedAt: true } },
+      _count: { select: { tracks: true } },
     },
   });
   if (!recording) throw new NotFoundError('Recording');
@@ -511,14 +514,69 @@ export const POST = withErrorHandling(async (request) => {
     }
   }
 
-  // Per la sintesi: inietta l'agenda (punti + spunte) nel payload, così il
+  // Per la sintesi: inietta l'agenda (punti + stato) nel payload, così il
   // worker la include nel prompt LLM. Funzione opzionale: se non ci sono
-  // item (agenda spenta/vuota) il payload resta invariato e nulla cambia.
+  // item (agenda spenta/vuota) il payload resta senza.
+  // E la cronologia della sala, sulla base dei tempi della trascrizione:
+  // quando si e' aperto un argomento, chiuso un sondaggio, alzata una mano.
   const agenda = recording.event.agendaItems ?? [];
-  const payloadOut =
-    row.kind === 'SUMMARIZE' && agenda.length > 0
-      ? { ...(parsed.data.payload as Record<string, unknown>), agenda }
-      : parsed.data.payload;
+  let payloadOut: unknown = parsed.data.payload;
+  if (row.kind === 'SUMMARIZE') {
+    const multitrack = recording._count.tracks > 0;
+    // Una registrazione composita nasce a file caricato: il suo avvio vero e'
+    // quello che chi modera ha riferito dalla sala, se c'e'. Si cerca dove
+    // deve stare: circa una durata prima della creazione (il caricamento la
+    // sposta in avanti di qualche minuto, mai indietro). Un avvio fuori da
+    // quella finestra e' di un'altra registrazione.
+    const durataMs = (recording.durationSec ?? 0) * 1000;
+    const avviata =
+      multitrack || durataMs <= 0
+        ? null
+        : await prisma.liveAction
+            .findFirst({
+              where: {
+                eventId: recording.event.id,
+                kind: 'recording.started',
+                at: {
+                  gte: new Date(recording.createdAt.getTime() - durataMs - 30 * 60_000),
+                  lte: new Date(recording.createdAt.getTime() - durataMs + 2 * 60_000),
+                },
+              },
+              orderBy: { at: 'desc' },
+              select: { at: true },
+            })
+            .catch(() => null);
+    const { t0, exact } = recordingTimeZero({
+      mediaStartedAt: recording.mediaStartedAt,
+      createdAt: recording.createdAt,
+      durationSec: recording.durationSec,
+      multitrack,
+      journaledStart: avviata?.at ?? null,
+    });
+    // La cronologia arricchisce la sintesi, non la condiziona: se non si
+    // legge, la sintesi parte senza (il job e' gia' preso in carico).
+    let timeline: Awaited<ReturnType<typeof buildLiveTimeline>> | null = null;
+    try {
+      timeline = await buildLiveTimeline({
+        eventId: recording.event.id,
+        t0,
+        exact,
+        // Fino alla fine di questa registrazione, se se ne sa la durata: una
+        // sessione con piu' registrazioni non mescola le loro cronologie.
+        until:
+          durataMs > 0
+            ? new Date(t0.getTime() + durataMs)
+            : (recording.callSession?.endedAt ?? new Date()),
+      });
+    } catch (err) {
+      console.error(`[postprod-claim] job ${row.id}: cronologia della sala non letta`, err);
+    }
+    payloadOut = {
+      ...(parsed.data.payload as Record<string, unknown>),
+      ...(agenda.length > 0 && { agenda }),
+      ...(timeline && timeline.entries.length > 0 && { timeline }),
+    };
+  }
 
   return Response.json(
     {
