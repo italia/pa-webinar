@@ -371,8 +371,12 @@ def run_summarize(app: cli.AppClient, job: cli.ClaimResponse) -> None:
         app.progress(job.jobId, "RUNNING", percent=30.0, message="calling LLM")
 
         # Agenda/note (opzionale): se l'evento la usa, il claim la mette nel
-        # payload come lista {label, completed}. Confluisce nel prompt LLM.
-        agenda_items = job.payload.get("agenda") if isinstance(job.payload, dict) else None
+        # payload come lista {label, completed, status, plannedMinutes}.
+        # La cronologia della sala (opzionale) arriva accanto, con i tempi
+        # dall'inizio della registrazione. Confluiscono nel prompt LLM.
+        payload = job.payload if isinstance(job.payload, dict) else {}
+        agenda_items = payload.get("agenda")
+        timeline = payload.get("timeline")
 
         # Sintesi STRUTTURATA (una chiamata vLLM JSON-mode): overall +
         # decisioni + azioni + topics con start_mmss. È la sorgente di
@@ -383,6 +387,7 @@ def run_summarize(app: cli.AppClient, job: cli.ClaimResponse) -> None:
             base_url=job.providerHints.llmBaseUrl,
             model_id=job.providerHints.llmModelId,
             agenda_items=agenda_items,
+            timeline=timeline,
         )
 
         # SUMMARY_JSON (strutturato) — usato da hero card + topic-chips.
