@@ -5,7 +5,6 @@ import { prisma } from '@/lib/db';
 import { assertCronApiKey } from '@/lib/auth/cron';
 import { deleteRecordingBlob } from '@/lib/storage/recordings';
 import { deleteBlob, isAzureConfigured } from '@/lib/azure/blob-storage';
-import { materialBlobsOfEvents, removeMaterialBlobs } from '@/lib/events/material-files';
 import { closeStaleSessions } from '@/lib/events/call-sessions';
 import {
   CLEANABLE_EVENT_STATUSES,
@@ -32,9 +31,14 @@ export const dynamic = 'force-dynamic';
 /**
  * GET /api/cron/cleanup
  *
- * GDPR data cleanup: deletes participant PII — registrations, questions,
- * upvotes, poll votes, questionnaire responses, chat messages (encrypted),
- * agenda reactions — for events whose retention period has expired.
+ * GDPR data cleanup: for events whose retention period has expired, deletes
+ * participant personal data — registrations, chat messages (encrypted),
+ * invitations, named grants, consents, reactions — and strips every identity
+ * from the content that stays with the event (questions, poll votes, words,
+ * ratings, end-of-event answers, materials). Ripassa ogni giorno sugli eventi
+ * oltre la conservazione: tutto e' idempotente, e cosi' toglie anche cio' che
+ * si fosse scritto dopo il primo giro o che un giro fallito avesse lasciato.
+ * L'evento concluso resta com'e'.
  *
  * Vale anche per gli eventi mai conclusi (PUBLISHED, PROVISIONING, IDLE, LIVE
  * oltre la fine più la retention): vengono archiviati, con le sessioni di
@@ -193,29 +197,19 @@ export const GET = withErrorHandling(async (request) => {
   let unfinishedArchived = 0;
 
   let totalRegistrationsDeleted = 0;
-  let totalQuestionsDeleted = 0;
-  let totalPollsDeleted = 0;
+  let totalQuestionsAnonymized = 0;
+  let totalPollVotesAnonymized = 0;
   let eventsProcessed = 0;
 
   let totalRecordingBlobsDeleted = 0;
-  let totalMaterialBlobsDeleted = 0;
+  let totalAttachmentBlobsDeleted = 0;
 
   for (const evt of toClean) {
     try {
-      // I file dei materiali se ne vanno PRIMA delle righe, fuori dalla
-      // transazione (I/O di rete), con le regole di ogni altra cancellazione di
-      // un materiale (lib/events/material-files): solo le chiavi dei materiali
-      // di questo evento, e non un file che un'altra riga o l'informativa di un
-      // evento usa ancora. Si raccolgono per `blobPath`, qualunque sia il tipo:
-      // è la colonna che dice quale riga possiede un file. Una riga il cui file
-      // non si è potuto cancellare resta per il giro successivo, invece di
-      // lasciare nello storage un file che nessuno ritroverebbe più.
-      const materialFiles = await materialBlobsOfEvents({ id: evt.id });
-      const materialBlobs = await removeMaterialBlobs(materialFiles, {
-        materialIds: materialFiles.map((m) => m.id),
-      });
-      totalMaterialBlobsDeleted += materialBlobs.deleted;
-      const materialsKept = materialBlobs.failed.map((m) => m.id);
+      // I materiali restano con l'evento, file compresi: se ne vanno solo
+      // quando si cancella l'evento (lib/events/material-files,
+      // removeFilesOfEventsBeingDeleted). Qui perdono solo il nome di chi li
+      // ha aggiunti.
 
       // Chat attachment blobs (files domain, assets/ prefix) — capture before
       // the rows are deleted so we can purge the underlying blobs afterwards.
@@ -238,45 +232,64 @@ export const GET = withErrorHandling(async (request) => {
           where: { question: { eventId: evt.id } },
         });
 
-        const questionsDeleted = await tx.question.deleteMany({
-          where: { eventId: evt.id },
+        // ── Contenuti della sala: restano con l'evento, senza identita' ──
+        // Domande e risposte, sondaggi, parole, valutazioni, materiali,
+        // scaletta e cronologia restano finche' esiste l'evento, perche' chi
+        // organizza possa decidere se pubblicarli. Perdono pero' ogni legame
+        // con una persona: nome dell'autore, iscrizione, identificativo del
+        // browser. Si fa PRIMA di cancellare le iscrizioni: domande e voti
+        // hanno la chiave verso l'iscrizione in cascata, e se ne andrebbero
+        // con lei. Al posto di iscrizione e identificativo del browser resta
+        // uno pseudonimo `anon:<md5(evento:identita')>`: lo stesso per la
+        // stessa persona in tutte le tabelle dell'evento, diverso da evento a
+        // evento, senza ritorno alla persona (l'iscrizione si cancella qui
+        // sotto). Cosi' reggono i vincoli «uno per persona» e i conteggi per
+        // persona restano quelli di prima.
+        // Solo le righe non ancora anonime: il giro e' quotidiano, e il
+        // conteggio deve dire cosa e' cambiato oggi.
+        const questionsAnonymized = await tx.question.updateMany({
+          where: { eventId: evt.id, OR: [{ registrationId: { not: null } }, { authorName: { not: '' } }] },
+          data: { registrationId: null, authorName: '' },
         });
 
-        const pollVotesDeleted = await tx.pollVote.deleteMany({
-          where: { poll: { eventId: evt.id } },
-        });
+        const pollVotesAnonymized = await tx.$executeRaw`
+          UPDATE "poll_votes" SET "registration_id" = NULL,
+              "guest_id" = 'anon:' || md5(${evt.id}::text || ':' || COALESCE("registration_id"::text, "guest_id", "id"::text))
+          WHERE "poll_id" IN (SELECT "id" FROM "polls" WHERE "event_id" = ${evt.id}::uuid)
+            AND ("registration_id" IS NOT NULL OR "guest_id" NOT LIKE 'anon:%')`;
 
-        const pollsDeleted = await tx.poll.deleteMany({
-          where: { eventId: evt.id },
-        });
+        const feedbackAnonymized = await tx.$executeRaw`
+          UPDATE "event_feedback" SET "registration_id" = NULL,
+              "guest_id" = 'anon:' || md5(${evt.id}::text || ':' || COALESCE("registration_id"::text, "guest_id", "id"::text))
+          WHERE "event_id" = ${evt.id}::uuid
+            AND ("registration_id" IS NOT NULL OR "guest_id" NOT LIKE 'anon:%')`;
 
-        const feedbackDeleted = await tx.eventFeedback.deleteMany({
-          where: { eventId: evt.id },
-        });
-
-        // Post-event feedback converged onto the questionnaire subsystem:
-        // call-exit feedback now lands in QuestionnaireResponse (which holds
-        // a respondent name + email-hash snapshot). The event is only
-        // ARCHIVED (never hard-deleted) and registration deletion only
-        // SetNulls the FK, so these rows must be purged explicitly or PII
-        // would survive past the retention window. Answers cascade.
+        // Le risposte di fine evento restano, senza nome ne' hash dell'email;
+        // quelle chieste all'iscrizione riguardano chi si e' iscritto, e se
+        // ne vanno con lui. Le risposte delle domande si cancellano a cascata.
+        const questionnaireResponsesAnonymized = await tx.$executeRaw`
+          UPDATE "questionnaire_responses"
+          SET "registration_id" = NULL,
+              "guest_id" = 'anon:' || md5(${evt.id}::text || ':' || COALESCE("registration_id"::text, "guest_id", "id"::text)),
+              "respondent_name" = NULL, "respondent_email_hash" = NULL
+          WHERE "questionnaire_id" IN (
+            SELECT "id" FROM "event_questionnaires"
+            WHERE "event_id" = ${evt.id}::uuid AND "placement" = 'POST_EVENT'
+          )
+            AND ("registration_id" IS NOT NULL OR "guest_id" NOT LIKE 'anon:%' OR "respondent_name" IS NOT NULL)`;
         const questionnaireResponsesDeleted = await tx.questionnaireResponse.deleteMany({
-          where: { questionnaire: { eventId: evt.id } },
+          where: { questionnaire: { eventId: evt.id, placement: { not: 'POST_EVENT' } } },
         });
 
-        const wcSubmissionsDeleted = await tx.wordCloudSubmission.deleteMany({
-          where: { round: { eventId: evt.id } },
-        });
+        const wcSubmissionsAnonymized = await tx.$executeRaw`
+          UPDATE "word_cloud_submissions" SET "registration_id" = NULL,
+              "guest_id" = 'anon:' || md5(${evt.id}::text || ':' || COALESCE("registration_id"::text, "guest_id", "id"::text))
+          WHERE "round_id" IN (SELECT "id" FROM "word_cloud_rounds" WHERE "event_id" = ${evt.id}::uuid)
+            AND ("registration_id" IS NOT NULL OR "guest_id" IS NULL OR "guest_id" NOT LIKE 'anon:%')`;
 
-        const wcRoundsDeleted = await tx.wordCloudRound.deleteMany({
-          where: { eventId: evt.id },
-        });
-
-        const materialsDeleted = await tx.eventMaterial.deleteMany({
-          where: {
-            eventId: evt.id,
-            ...(materialsKept.length > 0 && { id: { notIn: materialsKept } }),
-          },
+        const materialsAnonymized = await tx.eventMaterial.updateMany({
+          where: { eventId: evt.id, addedBy: { not: '' } },
+          data: { addedBy: '' },
         });
 
         const reminderSentDeleted = await tx.reminderSent.deleteMany({
@@ -301,36 +314,25 @@ export const GET = withErrorHandling(async (request) => {
 
         // Chat history: sender names + message bodies are PII, encrypted at
         // rest (encryptPII, AES-256-GCM). The FK is onDelete: Cascade, but the
-        // event row is only ARCHIVED below (never hard-deleted), so the cascade
-        // never fires — these must be purged explicitly or the chat would
-        // survive past the retention window.
+        // event row stays (with its anonymized content), so the cascade never
+        // fires — these must be purged explicitly or the chat would survive
+        // past the retention window.
         const chatMessagesDeleted = await tx.chatMessage.deleteMany({
           where: { eventId: evt.id },
         });
 
         // Live emoji reactions (no PII, but event data past retention). FK is
-        // onDelete: Cascade, but the event is only ARCHIVED (never hard-deleted)
-        // so the cascade never fires — purge explicitly, like chat above.
+        // onDelete: Cascade, but the event row stays, so the cascade never
+        // fires — purge explicitly, like chat above.
         const reactionsDeleted = await tx.reaction.deleteMany({
           where: { eventId: evt.id },
         });
 
-        // Agenda items + their reactions. Reactions tied to a registration
-        // already cascaded when the registration was deleted above, but guest
-        // reactions and the items themselves are only reachable via the event
-        // (never hard-deleted), so purge them explicitly (child before parent).
+        // Le reazioni agli argomenti della scaletta sono di una persona: via.
+        // Gli argomenti restano, come la cronologia della sala (nessun nome:
+        // titoli, risultati, ore), contenuti dell'evento.
         const agendaReactionsDeleted = await tx.agendaItemReaction.deleteMany({
           where: { agendaItem: { eventId: evt.id } },
-        });
-        const agendaItemsDeleted = await tx.eventAgendaItem.deleteMany({
-          where: { eventId: evt.id },
-        });
-
-        // La cronologia della sala: niente nomi, ma risultati dei sondaggi e
-        // parole del pubblico, e le ore di ogni azione. Serve alla
-        // post-produzione, non oltre la retention dell'evento.
-        const liveActionsDeleted = await tx.liveAction.deleteMany({
-          where: { eventId: evt.id },
         });
 
         // Inviti: nome, email cifrata, HMAC dell'email e il token del link di
@@ -343,7 +345,7 @@ export const GET = withErrorHandling(async (request) => {
 
         // Named moderator/speaker grants: `name` and `email` are encrypted PII
         // and `token` is a durable magic-link credential. Same cascade trap as
-        // the chat above — the event row survives as ARCHIVED, so nothing else
+        // the chat above — the event row survives the cleanup, so nothing else
         // ever removes these. The public programme is unaffected: the speaker
         // list shown on the event page comes from `Event.speakersInfo`, not from
         // these rows. Copies of a recurring event multiply the grants, so a
@@ -357,8 +359,10 @@ export const GET = withErrorHandling(async (request) => {
         // audioPurgedAt but never removes the row, so it lingers. Guard on
         // audioPurgedAt: rows whose audio is still present (retained tracks not
         // yet past their own retentionUntil, or a pending ARCHIVE job) are left
-        // for a later run — deleting them now would orphan the blob / break the
-        // archive. The Recording tree itself is untouched.
+        // to the post-production retention (cron/postprod-retention), which
+        // removes them with the recording's artifacts — deleting them now would
+        // orphan the blob / break the archive. The Recording tree itself is
+        // untouched.
         const recordingTracksDeleted = await tx.recordingTrack.deleteMany({
           where: { recording: { eventId: evt.id }, audioPurgedAt: { not: null } },
         });
@@ -382,24 +386,22 @@ export const GET = withErrorHandling(async (request) => {
           await closeStaleSessions(tx, [evt.id], now, siteGrace);
         }
 
-        if (evt.status !== 'ARCHIVED') {
-          await tx.event.update({
-            where: { id: evt.id },
-            data: { status: 'ARCHIVED' },
-          });
+        // Un evento concluso resta com'e': la sua pagina e cio' che mostra
+        // li decide chi organizza. Uno mai concluso si archivia.
+        if (!isFinishedEventStatus(evt.status)) {
+          await tx.event.update({ where: { id: evt.id }, data: { status: 'ARCHIVED' } });
         }
 
         const counts = {
           upvotes: upvotesDeleted.count,
           guestUpvotes: guestUpvotesDeleted.count,
-          questions: questionsDeleted.count,
-          pollVotes: pollVotesDeleted.count,
-          polls: pollsDeleted.count,
-          feedback: feedbackDeleted.count,
-          questionnaireResponses: questionnaireResponsesDeleted.count,
-          wordCloudSubmissions: wcSubmissionsDeleted.count,
-          wordCloudRounds: wcRoundsDeleted.count,
-          materials: materialsDeleted.count,
+          questionsAnonymized: questionsAnonymized.count,
+          pollVotesAnonymized,
+          feedbackAnonymized,
+          questionnaireResponsesAnonymized,
+          questionnaireResponsesDeleted: questionnaireResponsesDeleted.count,
+          wordCloudSubmissionsAnonymized: wcSubmissionsAnonymized,
+          materialsAnonymized: materialsAnonymized.count,
           remindersSent: reminderSentDeleted.count,
           reminders: remindersDeleted.count,
           registrations: registrationsDeleted.count,
@@ -407,23 +409,25 @@ export const GET = withErrorHandling(async (request) => {
           chatMessages: chatMessagesDeleted.count,
           reactions: reactionsDeleted.count,
           agendaReactions: agendaReactionsDeleted.count,
-          agendaItems: agendaItemsDeleted.count,
-          liveActions: liveActionsDeleted.count,
           invitations: invitationsDeleted.count,
           moderatorGrants: moderatorGrantsDeleted.count,
           recordingTracks: recordingTracksDeleted.count,
           callSessionsScrubbed: callSessionsScrubbed.count,
         };
 
-        // GDPR audit log — no PII, only counts
-        await tx.gdprAuditLog.create({
-          data: {
-            eventId: evt.id,
-            action: 'DATA_DELETED',
-            recordCount: counts.registrations,
-            details: JSON.stringify(counts),
-          },
-        });
+        // GDPR audit log — no PII, only counts. Il giro quotidiano ripassa
+        // sugli stessi eventi: una riga solo se questo giro ha tolto qualcosa.
+        const { callSessionsScrubbed: _sessioni, ...tolti } = counts;
+        if (Object.values(tolti).some((n) => n > 0)) {
+          await tx.gdprAuditLog.create({
+            data: {
+              eventId: evt.id,
+              action: 'DATA_DELETED',
+              recordCount: counts.registrations,
+              details: JSON.stringify(counts),
+            },
+          });
+        }
 
         return counts;
       });
@@ -444,19 +448,20 @@ export const GET = withErrorHandling(async (request) => {
         for (const c of chatAttachmentBlobs) {
           if (c.attachmentBlobPath) {
             const ok = await deleteBlob(c.attachmentBlobPath).catch(() => false);
-            if (ok) totalMaterialBlobsDeleted++;
+            if (ok) totalAttachmentBlobsDeleted++;
           }
         }
       }
 
       console.log(
         `[cron/cleanup] Cleaned event ${evt.id} (${evt.slug}): ` +
-          `${result.registrations} registrations, ${result.questions} questions, ${result.upvotes} upvotes, ${result.polls} polls, ${result.pollVotes} poll votes, ${result.materials} materials, ${result.chatMessages} chat messages deleted`
+          `${result.registrations} registrations, ${result.chatMessages} chat messages, ${result.upvotes} upvotes deleted; ` +
+          `${result.questionsAnonymized} questions, ${result.pollVotesAnonymized} poll votes, ${result.materialsAnonymized} materials anonymized`
       );
 
       totalRegistrationsDeleted += result.registrations;
-      totalQuestionsDeleted += result.questions;
-      totalPollsDeleted += result.polls;
+      totalQuestionsAnonymized += result.questionsAnonymized;
+      totalPollVotesAnonymized += result.pollVotesAnonymized;
       eventsProcessed++;
       if (!isFinishedEventStatus(evt.status)) unfinishedArchived++;
     } catch (err) {
@@ -609,10 +614,12 @@ export const GET = withErrorHandling(async (request) => {
       eventsProcessed,
       unfinishedEventsArchived: unfinishedArchived,
       registrationsDeleted: totalRegistrationsDeleted,
-      questionsDeleted: totalQuestionsDeleted,
-      pollsDeleted: totalPollsDeleted,
+      questionsAnonymized: totalQuestionsAnonymized,
+      pollVotesAnonymized: totalPollVotesAnonymized,
       recordingBlobsDeleted: totalRecordingBlobsDeleted,
-      materialBlobsDeleted: totalMaterialBlobsDeleted,
+      // I file degli allegati della chat: quelli dei materiali restano con
+      // l'evento e se ne vanno solo quando lo si cancella.
+      chatAttachmentBlobsDeleted: totalAttachmentBlobsDeleted,
     },
     { status: ok ? 200 : 500 }
   );

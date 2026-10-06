@@ -33,7 +33,7 @@ export const GET = withErrorHandling(async (_request, context) => {
 
   const event = await prisma.event.findUnique({
     where: UUID_RE.test(param) ? { id: param } : { slug: param },
-    select: { id: true, feedbackEnabled: true, status: true },
+    select: { id: true, feedbackEnabled: true, status: true, endsAt: true, dataRetentionDays: true },
   });
   if (!event) throw new NotFoundError('Event');
 

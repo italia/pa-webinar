@@ -43,8 +43,9 @@ export default function PostEventQA({ questions }: PostEventQAProps) {
         >
           <CardBody className="p-3">
             <div className="d-flex justify-content-between align-items-start mb-2">
+              {/* Dopo la conservazione dei dati la domanda resta senza autore. */}
               <span className="fw-semibold" style={{ fontSize: '0.85rem', color: 'var(--app-muted)' }}>
-                {q.authorName}
+                {q.authorName || null}
               </span>
               <div className="d-flex align-items-center gap-2">
                 <Badge

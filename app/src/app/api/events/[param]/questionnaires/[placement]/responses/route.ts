@@ -62,7 +62,7 @@ export const POST = withErrorHandling(async (request, context) => {
 
   const event = await prisma.event.findUnique({
     where: UUID_RE.test(param) ? { id: param } : { slug: param },
-    select: { id: true, status: true, feedbackEnabled: true },
+    select: { id: true, status: true, feedbackEnabled: true, endsAt: true, dataRetentionDays: true },
   });
   if (!event) throw new NotFoundError('Event');
   // La valutazione si da' durante l'evento o dopo, finche' l'evento non e'

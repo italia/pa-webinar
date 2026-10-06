@@ -11,6 +11,7 @@ const tx = {
   eventFeedback: { deleteMany: vi.fn() },
   questionnaireResponse: { deleteMany: vi.fn() },
   chatMessage: { deleteMany: vi.fn() },
+  wordCloudSubmission: { deleteMany: vi.fn() },
   chatMessageReaction: { deleteMany: vi.fn() },
   registration: { deleteMany: vi.fn() },
   $executeRaw: vi.fn(),
@@ -71,6 +72,7 @@ beforeEach(() => {
   tx.eventFeedback.deleteMany.mockResolvedValue({ count: 1 });
   tx.questionnaireResponse.deleteMany.mockResolvedValue({ count: 1 });
   tx.chatMessage.deleteMany.mockResolvedValue({ count: 3 });
+  tx.wordCloudSubmission.deleteMany.mockResolvedValue({ count: 2 });
   tx.chatMessageReaction.deleteMany.mockResolvedValue({ count: 0 });
   tx.registration.deleteMany.mockResolvedValue({ count: 1 });
   tx.$executeRaw.mockResolvedValue(2);
@@ -112,6 +114,9 @@ describe('POST /api/gdpr/erasure', () => {
     expect(tx.chatMessageReaction.deleteMany).toHaveBeenCalledWith({
       where: { senderId: { in: ['reg-r1', 'reg-r2'] } },
     });
+    // Le parole di «In una parola» non hanno una chiave verso l'iscrizione:
+    // la cascata non le porta via, e dopo la conservazione restano.
+    expect(tx.wordCloudSubmission.deleteMany).toHaveBeenCalledWith({ where: { registrationId: ids } });
     expect(tx.$executeRaw).toHaveBeenCalledTimes(1);
     expect(tx.registration.deleteMany).toHaveBeenCalledWith({ where: { id: ids } });
     expect(db.gdprAuditLog.create).toHaveBeenCalledTimes(2);

@@ -8,6 +8,7 @@
 import { Prisma } from '@prisma/client';
 
 import { prisma } from '@/lib/db';
+import { isEventDataRetentionExpired } from '@/lib/gdpr/cleanup-selection';
 
 import { FEEDBACK_GENERIC_TEMPLATE_NAME } from './constants';
 
@@ -45,7 +46,16 @@ export async function ensurePostEventQuestionnaire(eventId: string): Promise<boo
 
 /** Quando la valutazione di fine evento si puo' vedere e inviare: raccolta
  *  accesa, evento in corso (anche con la sala ferma per inattivita') o
- *  concluso. Mai prima dell'inizio, mai da archiviato. */
-export function feedbackOpen(event: { feedbackEnabled: boolean; status: string }): boolean {
-  return event.feedbackEnabled && (event.status === 'LIVE' || event.status === 'IDLE' || event.status === 'ENDED');
+ *  concluso entro la conservazione dei suoi dati: oltre, i dati personali se
+ *  ne vanno e una risposta nuova non avrebbe senso. Una sala ancora in uso
+ *  oltre la fine programmata resta aperta: la pulizia non la tocca finche'
+ *  si usa (lib/gdpr/cleanup-selection). Mai prima dell'inizio, mai da
+ *  archiviato. */
+export function feedbackOpen(
+  event: { feedbackEnabled: boolean; status: string; endsAt: Date; dataRetentionDays: number },
+  now: Date = new Date(),
+): boolean {
+  if (!event.feedbackEnabled) return false;
+  if (event.status === 'LIVE' || event.status === 'IDLE') return true;
+  return event.status === 'ENDED' && !isEventDataRetentionExpired(event, now);
 }

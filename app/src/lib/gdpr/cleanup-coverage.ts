@@ -3,10 +3,11 @@
  *
  * PERCHÉ ESISTE. La transazione di `/api/cron/cleanup` è un elenco scritto a
  * mano. Aggiungere un modello con `eventId` e dimenticarlo lì non rompe niente:
- * la chiave esterna è `onDelete: Cascade`, ma l'evento non viene mai cancellato
- * davvero — resta `ARCHIVED` come riferimento storico — quindi la cascata non
- * scatta e i dati sopravvivono alla conservazione dichiarata. È già successo
- * due volte, con la chat e con le concessioni nominali.
+ * la chiave esterna è `onDelete: Cascade`, ma l'evento non viene cancellato
+ * dalla pulizia — resta, con i suoi contenuti anonimi, finché qualcuno non lo
+ * elimina — quindi la cascata non scatta e i dati sopravvivono alla
+ * conservazione dichiarata. È già successo due volte, con la chat e con le
+ * concessioni nominali.
  *
  * Qui ogni tabella è classificata una volta sola, e un test verifica contro lo
  * schema di Prisma che non ne manchi nessuna: se ne aggiungi una e non decidi
@@ -19,15 +20,10 @@
 /** Tabelle che la transazione svuota (o ripulisce) alla scadenza. */
 export const PURGED_BY_CLEANUP: Record<string, string> = {
   Registration: 'iscritti: email cifrata, nome, hash, token di accesso',
-  Question: 'domande poste durante l’evento',
-  Poll: 'sondaggi e voti di quell’occorrenza',
+  Question: 'anonimizzate, non cancellate: restano testo, risposta e voti contati; si tolgono nome dell’autore e iscrizione (prima di cancellare le iscrizioni, che le porterebbero via in cascata)',
   ChatMessage: 'nomi dei mittenti e testi, allegati compresi',
   Reaction: 'reazioni di quell’occorrenza',
-  EventFeedback: 'giudizi dei partecipanti',
-  WordCloudRound: 'parole proposte da chi c’era',
-  EventMaterial: 'materiali caricati per quell’occorrenza',
-  EventAgendaItem: 'scaletta e reazioni collegate',
-  LiveAction: 'cronologia della sala: titoli, risultati e parole delle domande, ore delle azioni',
+  EventMaterial: 'anonimizzati, non cancellati: il materiale e il suo file restano con l’evento, si toglie il nome di chi l’ha aggiunto; il file se ne va quando si cancella l’evento',
   EventReminder: 'promemoria programmati e loro invii',
   EventInvitation: 'nome, email cifrata, HMAC e token del link di registrazione precompilata',
   EventModerator: 'concessioni nominali: nome ed email cifrati piu’ un link di accesso durevole',
@@ -41,10 +37,15 @@ export const PURGED_BY_CLEANUP: Record<string, string> = {
  * personali (risposte e tracce audio), non la riga che li possiede.
  */
 export const NOT_PURGED_BY_CLEANUP: Record<string, string> = {
-  EventOrganizer: 'enti organizzatori: dati istituzionali pubblici, non personali, e restano leggibili sull’evento archiviato',
+  Poll: 'contenuto dell’evento: domanda, opzioni e voti restano; i voti perdono iscrizione e identificativo del browser (UPDATE di poll_votes nella transazione)',
+  EventFeedback: 'valutazioni a stelle e commenti restano senza identità: iscrizione e identificativo del browser si tolgono (UPDATE di event_feedback nella transazione)',
+  WordCloudRound: 'contenuto dell’evento: le parole restano, senza iscrizione né identificativo del browser (UPDATE di word_cloud_submissions nella transazione)',
+  EventAgendaItem: 'la scaletta è contenuto dell’evento, senza dati personali; le reazioni delle persone agli argomenti si cancellano',
+  LiveAction: 'cronologia della sala senza nomi (titoli, risultati, ore delle azioni): contenuto dell’evento, serve anche alla post-produzione',
+  EventOrganizer: 'enti organizzatori: dati istituzionali pubblici, non personali, e restano leggibili sull’evento anche dopo la conservazione dei dati',
   EventTagLink: 'legame con una parola chiave: nessun dato personale',
   GdprAuditLog: 'è il registro delle cancellazioni: cancellarlo distruggerebbe la prova di averle fatte',
-  EventQuestionnaire: 'resta la configurazione, che non è un dato personale; le RISPOSTE, con nome e hash dell’email di chi ha risposto, vengono cancellate passando dal questionario',
+  EventQuestionnaire: 'resta la configurazione, che non è un dato personale; le risposte di fine evento restano senza nome, hash dell’email e identità, quelle chieste all’iscrizione si cancellano passando dal questionario',
   Recording: 'l’albero della registrazione segue la propria retention (può essere più lunga); di suo la transazione cancella le tracce per-partecipante già purgate, che portano il nome cifrato',
   PostprodOriginalBody: 'il testo come l’ha prodotto la macchina, conservato accanto alla versione rivista: segue l’artefatto da cui è copiato e la retention della registrazione, che lo cancella insieme al resto (cron di post-produzione + cascade). Cancellarlo qui, alla scadenza dell’evento, separerebbe le due versioni di un verbale che deve restare confrontabile',
 };

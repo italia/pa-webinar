@@ -47,6 +47,13 @@ export async function eraseRegistrations(
     const chatMessages = await tx.chatMessage.deleteMany({
       where: { senderId: { in: chatSenderIds } },
     });
+    // Le parole di «In una parola»: la tabella non ha una chiave verso le
+    // iscrizioni, quindi la cascata non le porta via. Alla scadenza della
+    // conservazione restano senza identita'; chi chiede la cancellazione le
+    // toglie subito.
+    const wordCloudSubmissions = await tx.wordCloudSubmission.deleteMany({
+      where: { registrationId: { in: registrationIds } },
+    });
     // Le reazioni della persona ai messaggi altrui: quelle ai suoi messaggi
     // se ne vanno per cascata con i messaggi.
     await tx.chatMessageReaction.deleteMany({ where: { senderId: { in: chatSenderIds } } });
@@ -66,6 +73,7 @@ export async function eraseRegistrations(
       feedback: feedback.count,
       questionnaireResponses: questionnaireResponses.count,
       chatMessages: chatMessages.count,
+      wordCloudSubmissions: wordCloudSubmissions.count,
       outboxRows,
     };
   });

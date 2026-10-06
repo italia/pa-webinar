@@ -98,19 +98,28 @@ describe('ensurePostEventQuestionnaire', () => {
   });
 });
 
+// Un evento appena concluso, entro la conservazione dei suoi dati.
+const RECENTE = { endsAt: new Date(Date.now() - 86_400_000), dataRetentionDays: 30 };
+
 describe('feedbackOpen', () => {
   it.each(['LIVE', 'IDLE', 'ENDED'])('raccolta accesa, evento %s: aperta', (status) => {
-    expect(feedbackOpen({ feedbackEnabled: true, status })).toBe(true);
+    expect(feedbackOpen({ feedbackEnabled: true, status, ...RECENTE })).toBe(true);
   });
 
   it.each(['DRAFT', 'PUBLISHED', 'PROVISIONING', 'ARCHIVED'])(
     'raccolta accesa, evento %s: chiusa (mai prima dell’inizio, mai da archiviato)',
     (status) => {
-      expect(feedbackOpen({ feedbackEnabled: true, status })).toBe(false);
+      expect(feedbackOpen({ feedbackEnabled: true, status, ...RECENTE })).toBe(false);
     },
   );
 
   it.each(['LIVE', 'IDLE', 'ENDED'])('raccolta spenta, evento %s: chiusa', (status) => {
-    expect(feedbackOpen({ feedbackEnabled: false, status })).toBe(false);
+    expect(feedbackOpen({ feedbackEnabled: false, status, ...RECENTE })).toBe(false);
+  });
+
+  it('concluso oltre la conservazione dei suoi dati: chiusa; una sala ancora in uso resta aperta', () => {
+    const scaduto = { endsAt: new Date(Date.now() - 40 * 86_400_000), dataRetentionDays: 30 };
+    expect(feedbackOpen({ feedbackEnabled: true, status: 'ENDED', ...scaduto })).toBe(false);
+    expect(feedbackOpen({ feedbackEnabled: true, status: 'LIVE', ...scaduto })).toBe(true);
   });
 });

@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 vi.mock('@/lib/db', () => ({
   prisma: {
-    event: { findUnique: vi.fn() },
+    event: { findUnique: vi.fn(), updateMany: vi.fn(async () => ({ count: 1 })) },
     registration: { count: vi.fn() },
     question: { findMany: vi.fn() },
     poll: { findMany: vi.fn() },
@@ -15,10 +15,10 @@ vi.mock('@/lib/db', () => ({
 
 import { prisma } from '@/lib/db';
 
-import { buildRecap, isRecapEmpty, formatRecapSummary, type EventRecap } from './recap';
+import { buildRecap, ensureEventRecap, isRecapEmpty, formatRecapSummary, type EventRecap } from './recap';
 
 const mocked = prisma as unknown as {
-  event: { findUnique: ReturnType<typeof vi.fn> };
+  event: { findUnique: ReturnType<typeof vi.fn>; updateMany: ReturnType<typeof vi.fn> };
   registration: { count: ReturnType<typeof vi.fn> };
   question: { findMany: ReturnType<typeof vi.fn> };
   poll: { findMany: ReturnType<typeof vi.fn> };
@@ -264,5 +264,39 @@ describe('buildRecap — valutazioni del questionario', () => {
     expect(recap.feedback.count).toBe(3);
     // (2 + 4.5 + 5) / 3
     expect(recap.feedback.average).toBeCloseTo(3.833, 2);
+  });
+});
+
+
+describe('ensureEventRecap', () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  function base() {
+    mocked.registration.count.mockResolvedValue(0);
+    mocked.question.findMany.mockResolvedValue([]);
+    mocked.poll.findMany.mockResolvedValue([]);
+    mocked.wordCloudSubmission.findMany.mockResolvedValue([]);
+    mocked.chatMessage.findMany.mockResolvedValue([]);
+    mocked.eventFeedback.findMany.mockResolvedValue([]);
+  }
+
+  it('entro la conservazione: costruito e congelato', async () => {
+    base();
+    mocked.event.findUnique.mockResolvedValue({
+      status: 'ENDED', eventType: 'SCHEDULED', postEventRecap: null, postEventRecapAt: null,
+      endsAt: new Date(Date.now() - 86_400_000), dataRetentionDays: 30, peakParticipants: 3,
+    });
+    expect(await ensureEventRecap('e1')).not.toBeNull();
+    expect(mocked.event.updateMany).toHaveBeenCalled();
+  });
+
+  it('oltre la conservazione: si mostra ma non si congela (iscrizioni e chat non ci sono piu’)', async () => {
+    base();
+    mocked.event.findUnique.mockResolvedValue({
+      status: 'ENDED', eventType: 'SCHEDULED', postEventRecap: null, postEventRecapAt: null,
+      endsAt: new Date(Date.now() - 40 * 86_400_000), dataRetentionDays: 30, peakParticipants: 3,
+    });
+    expect(await ensureEventRecap('e1')).not.toBeNull();
+    expect(mocked.event.updateMany).not.toHaveBeenCalled();
   });
 });

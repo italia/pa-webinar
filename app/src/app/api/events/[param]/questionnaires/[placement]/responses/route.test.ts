@@ -42,6 +42,8 @@ import { findEventQuestionnaireByPlacement, submitResponse } from '@/lib/questio
 
 import { POST } from './route';
 
+// Concluso da poco, entro la conservazione dei suoi dati.
+const RECENTE = { endsAt: new Date(Date.now() - 86_400_000), dataRetentionDays: 30 };
 const mockedEvent = prisma.event.findUnique as unknown as ReturnType<typeof vi.fn>;
 const mockedRegistration = prisma.registration.findUnique as unknown as ReturnType<typeof vi.fn>;
 const mockedFind = vi.mocked(findEventQuestionnaireByPlacement);
@@ -102,7 +104,7 @@ function inviato() {
 
 beforeEach(() => {
   vi.clearAllMocks();
-  mockedEvent.mockResolvedValue({ id: EVENT_ID, status: 'ENDED', feedbackEnabled: true });
+  mockedEvent.mockResolvedValue({ id: EVENT_ID, status: 'ENDED', feedbackEnabled: true, ...RECENTE });
   mockedFind.mockImplementation(async (_id, placement) => questionario(placement));
   mockedSubmit.mockResolvedValue({ id: 'resp-1', created: true });
   mockedRegistration.mockResolvedValue({
@@ -116,7 +118,7 @@ beforeEach(() => {
 describe('POST …/POST_EVENT/responses — quando la valutazione e’ aperta', () => {
   // IDLE: evento in corso con la sala ferma per inattivita'.
   it.each(['LIVE', 'IDLE', 'ENDED'])('evento %s con la raccolta accesa: accettata (201)', async (status) => {
-    mockedEvent.mockResolvedValue({ id: EVENT_ID, status, feedbackEnabled: true });
+    mockedEvent.mockResolvedValue({ id: EVENT_ID, status, feedbackEnabled: true, ...RECENTE });
 
     const res = await POST(...post('POST_EVENT', { guestId: 'guest-1' }));
 
@@ -127,7 +129,7 @@ describe('POST …/POST_EVENT/responses — quando la valutazione e’ aperta', 
   it.each(['DRAFT', 'PUBLISHED', 'PROVISIONING', 'ARCHIVED'])(
     'evento %s: 403, nessuna risposta salvata',
     async (status) => {
-      mockedEvent.mockResolvedValue({ id: EVENT_ID, status, feedbackEnabled: true });
+      mockedEvent.mockResolvedValue({ id: EVENT_ID, status, feedbackEnabled: true, ...RECENTE });
 
       const res = await POST(...post('POST_EVENT', { guestId: 'guest-1' }));
 
@@ -138,7 +140,7 @@ describe('POST …/POST_EVENT/responses — quando la valutazione e’ aperta', 
   );
 
   it('raccolta spenta, anche a evento concluso: 403', async () => {
-    mockedEvent.mockResolvedValue({ id: EVENT_ID, status: 'ENDED', feedbackEnabled: false });
+    mockedEvent.mockResolvedValue({ id: EVENT_ID, status: 'ENDED', feedbackEnabled: false, ...RECENTE });
 
     const res = await POST(...post('POST_EVENT', { guestId: 'guest-1' }));
 
@@ -197,7 +199,7 @@ describe('POST …/POST_EVENT/responses — senza nome', () => {
 
 describe('POST …/PRE_REGISTRATION/responses — il questionario d’iscrizione', () => {
   it('non dipende dalla raccolta delle valutazioni ne’ dallo stato dell’evento', async () => {
-    mockedEvent.mockResolvedValue({ id: EVENT_ID, status: 'PUBLISHED', feedbackEnabled: false });
+    mockedEvent.mockResolvedValue({ id: EVENT_ID, status: 'PUBLISHED', feedbackEnabled: false, ...RECENTE });
 
     const res = await POST(...post('PRE_REGISTRATION', { accessToken: 'TOKEN_ISCRIZIONE' }));
 

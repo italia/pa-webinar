@@ -22,12 +22,12 @@ const DAY_MS = 86_400_000;
  * suoi dati servono al servizio e la finestra di conservazione non è nemmeno
  * cominciata (decorre da `endsAt`).
  *
- * ARCHIVED è nell'elenco insieme a ENDED perché la fase 3 archivia l'evento
- * ma lo lascia in piedi (`docs/GDPR.md`: titolo, descrizione e date restano
- * come riferimento storico): senza ARCHIVED un secondo giro non ripasserebbe
- * più su un evento già archiviato, e tutto ciò che vi è stato scritto DOPO
- * l'archiviazione — o che una versione precedente del cron non cancellava —
- * resterebbe lì per sempre.
+ * ARCHIVED è nell'elenco insieme a ENDED perché un evento si può archiviare a
+ * mano prima che la sua conservazione scada, e i suoi dati personali vanno
+ * tolti lo stesso. La fase 3 ripassa ogni giorno sugli eventi oltre la
+ * conservazione (è idempotente): toglie anche ciò che vi si fosse scritto dopo
+ * il primo giro, o che un giro fallito avesse lasciato. Restano i contenuti,
+ * senza identità.
  */
 export const CLEANABLE_EVENT_STATUSES = ['ENDED', 'ARCHIVED'] as const;
 

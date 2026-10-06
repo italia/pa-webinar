@@ -19,6 +19,7 @@ import { tryDecryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { countWordsByPerson } from '@/lib/wordcloud/normalize';
 import { getFeedbackSummary } from '@/lib/feedback/feedback-summary';
+import { isEventDataRetentionExpired } from '@/lib/gdpr/cleanup-selection';
 import type { EmailLocale } from '@/lib/email/lingua';
 
 const MAX_QUESTIONS = 5;
@@ -254,6 +255,8 @@ export async function ensureEventRecap(eventId: string): Promise<EventRecap | nu
       eventType: true,
       postEventRecap: true,
       postEventRecapAt: true,
+      endsAt: true,
+      dataRetentionDays: true,
     },
   });
   if (!event) return null;
@@ -264,6 +267,10 @@ export async function ensureEventRecap(eventId: string): Promise<EventRecap | nu
   if (event.status !== 'ENDED' || event.eventType === 'LEGACY') return null;
 
   const recap = await buildRecap(eventId);
+  // Oltre la conservazione dei dati iscrizioni e chat non ci sono piu': un
+  // riepilogo fatto adesso direbbe zero iscritti. Si mostra, ma non si
+  // congela.
+  if (isEventDataRetentionExpired(event, new Date())) return recap;
   await prisma.event.updateMany({
     where: { id: eventId, postEventRecapAt: null },
     data: {

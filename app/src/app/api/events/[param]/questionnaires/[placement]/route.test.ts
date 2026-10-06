@@ -29,6 +29,8 @@ import { findEventQuestionnaireByPlacement } from '@/lib/questionnaires';
 
 import { GET } from './route';
 
+// Concluso da poco, entro la conservazione dei suoi dati.
+const RECENTE = { endsAt: new Date(Date.now() - 86_400_000), dataRetentionDays: 30 };
 const mockedEvent = prisma.event.findUnique as unknown as ReturnType<typeof vi.fn>;
 const mockedCreate = prisma.eventQuestionnaire.create as unknown as ReturnType<typeof vi.fn>;
 const mockedFind = vi.mocked(findEventQuestionnaireByPlacement);
@@ -75,13 +77,13 @@ function get(
 
 beforeEach(() => {
   vi.clearAllMocks();
-  mockedEvent.mockResolvedValue({ id: EVENT_ID, feedbackEnabled: true, status: 'ENDED' });
+  mockedEvent.mockResolvedValue({ id: EVENT_ID, feedbackEnabled: true, status: 'ENDED', ...RECENTE });
   mockedFind.mockResolvedValue(QUESTIONARIO);
 });
 
 describe('GET /api/events/[param]/questionnaires/POST_EVENT — la valutazione di fine evento', () => {
   it.each(['LIVE', 'IDLE', 'ENDED'])('evento %s con la raccolta accesa: il questionario', async (status) => {
-    mockedEvent.mockResolvedValue({ id: EVENT_ID, feedbackEnabled: true, status });
+    mockedEvent.mockResolvedValue({ id: EVENT_ID, feedbackEnabled: true, status, ...RECENTE });
 
     const res = await GET(...get(SLUG, 'POST_EVENT'));
 
@@ -102,7 +104,7 @@ describe('GET /api/events/[param]/questionnaires/POST_EVENT — la valutazione d
   it.each(['DRAFT', 'PUBLISHED', 'PROVISIONING', 'ARCHIVED'])(
     'evento %s: 404, il modulo non compare',
     async (status) => {
-      mockedEvent.mockResolvedValue({ id: EVENT_ID, feedbackEnabled: true, status });
+      mockedEvent.mockResolvedValue({ id: EVENT_ID, feedbackEnabled: true, status, ...RECENTE });
 
       const res = await GET(...get(SLUG, 'POST_EVENT'));
 
@@ -112,7 +114,7 @@ describe('GET /api/events/[param]/questionnaires/POST_EVENT — la valutazione d
   );
 
   it('raccolta spenta, anche a evento concluso: 404', async () => {
-    mockedEvent.mockResolvedValue({ id: EVENT_ID, feedbackEnabled: false, status: 'ENDED' });
+    mockedEvent.mockResolvedValue({ id: EVENT_ID, feedbackEnabled: false, status: 'ENDED', ...RECENTE });
 
     const res = await GET(...get(SLUG, 'POST_EVENT'));
 
@@ -133,7 +135,7 @@ describe('GET /api/events/[param]/questionnaires/POST_EVENT — la valutazione d
     await GET(...get(EVENT_ID, 'POST_EVENT'));
     expect(mockedEvent.mock.calls[0]![0]).toEqual({
       where: { id: EVENT_ID },
-      select: { id: true, feedbackEnabled: true, status: true },
+      select: { id: true, feedbackEnabled: true, status: true, endsAt: true, dataRetentionDays: true },
     });
 
     await GET(...get(SLUG, 'POST_EVENT'));
@@ -151,7 +153,7 @@ describe('GET /api/events/[param]/questionnaires/POST_EVENT — la valutazione d
 
 describe('GET /api/events/[param]/questionnaires/PRE_REGISTRATION — non dipende dalla valutazione', () => {
   it('con la raccolta spenta e l’evento non ancora iniziato il questionario d’iscrizione resta', async () => {
-    mockedEvent.mockResolvedValue({ id: EVENT_ID, feedbackEnabled: false, status: 'PUBLISHED' });
+    mockedEvent.mockResolvedValue({ id: EVENT_ID, feedbackEnabled: false, status: 'PUBLISHED', ...RECENTE });
     mockedFind.mockResolvedValue({ ...QUESTIONARIO, placement: 'PRE_REGISTRATION' });
 
     const res = await GET(...get(SLUG, 'PRE_REGISTRATION'));

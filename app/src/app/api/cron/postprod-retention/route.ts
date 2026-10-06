@@ -6,8 +6,8 @@
  *
  *   1. **Event-bound** (default): `Recording.retentionUntil` is null
  *      → the artifact follows the parent event's retention. Since
- *      `/api/cron/cleanup` only ARCHIVES the event (it never hard-
- *      deletes the row), we purge here once the event is past
+ *      `/api/cron/cleanup` removes the event's personal data but never
+ *      deletes the event row, we purge here once the event is past
  *      `endsAt + dataRetentionDays` — otherwise transcripts/summaries
  *      (which can carry names) would survive forever.
  *
@@ -190,7 +190,7 @@ export const GET = withErrorHandling(async (request) => {
   }
 
   // Event-bound default (retentionUntil == null): follow the parent event's
-  // retention. `/api/cron/cleanup` only ARCHIVES the event (never hard-deletes),
+  // retention. `/api/cron/cleanup` never deletes the event row,
   // so WITHOUT this branch these artifacts — transcripts/summaries that can
   // carry names — would live forever. Purge once the event is past
   // endsAt + dataRetentionDays. Prisma can't do that date arithmetic in a

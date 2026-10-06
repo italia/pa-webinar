@@ -967,7 +967,7 @@ model AgendaItemReaction {
 /// timestamp are stored, for post-event counts and the engagement timeline
 /// (createdAt is absolute → placeable on the same axis as chat/Q&A). Distinct
 /// from AgendaItemReaction (agenda 👍/👎 audience pulse). Deleted by the cleanup
-/// cron for archived events.
+/// cron when the event's retention expires.
 model Reaction {
   id        String   @id @default(uuid()) @db.Uuid
   eventId   String   @map("event_id") @db.Uuid
@@ -1607,8 +1607,9 @@ model CallSession {
 // (tracked via a nanoid stored in a short-lived cookie, same pattern
 // used by PollVote and WordCloudSubmission).
 //
-// Fase A is strictly per-event: responses scadono con la retention
-// dell'evento. La deduplica cross-evento dei campi profilo stabili è
+// Fase A is strictly per-event: alla retention dell'evento le risposte
+// chieste all'iscrizione si cancellano, quelle di fine evento restano senza
+// identita'. La deduplica cross-evento dei campi profilo stabili è
 // parte di fase B (ADR-011 — Person + rubrica).
 
 enum QuestionItemType {
@@ -1698,7 +1699,7 @@ model EventQuestionnaire {
   required Boolean @default(false)
 
   // Whether respondents can change their answers after first submit
-  // (until the event retention deletes them). Default false — once
+  // (until the event retention removes their identity). Default false — once
   // submitted, the response is frozen.
   allowEdit Boolean @default(false) @map("allow_edit")
 

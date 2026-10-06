@@ -11,7 +11,7 @@ const { filesStorage } = vi.hoisted(() => ({
 
 vi.mock('@/lib/db', () => ({
   prisma: {
-    event: { findMany: vi.fn(), findFirst: vi.fn(), update: vi.fn() },
+    event: { findMany: vi.fn(), findFirst: vi.fn(), update: vi.fn(), updateMany: vi.fn() },
     staffLoginToken: { deleteMany: vi.fn(async () => ({ count: 0 })) },
     $executeRaw: vi.fn(async () => 0),
     registration: { deleteMany: vi.fn(), findMany: vi.fn(async (): Promise<unknown[]> => []) },
@@ -22,11 +22,16 @@ vi.mock('@/lib/db', () => ({
     adminAuditLog: { updateMany: vi.fn(async () => ({ count: 0 })) },
     staffAccount: { updateMany: vi.fn(async () => ({ count: 0 })) },
     gdprAuditLog: { create: vi.fn() },
-    eventMaterial: { findMany: vi.fn(), findFirst: vi.fn(), deleteMany: vi.fn() },
+    eventMaterial: {
+      findMany: vi.fn(),
+      findFirst: vi.fn(),
+      deleteMany: vi.fn(),
+      updateMany: vi.fn(),
+    },
     chatMessage: { findMany: vi.fn(), deleteMany: vi.fn() },
     questionUpvote: { deleteMany: vi.fn() },
     questionGuestUpvote: { deleteMany: vi.fn() },
-    question: { deleteMany: vi.fn() },
+    question: { deleteMany: vi.fn(), updateMany: vi.fn() },
     pollVote: { deleteMany: vi.fn() },
     poll: { deleteMany: vi.fn() },
     eventFeedback: { deleteMany: vi.fn() },
@@ -69,30 +74,38 @@ import { GET } from './route';
  * Il cron di cleanup è il codice che CANCELLA dati di persone. Le tre fasi
  * lavorano su una `where` diversa ciascuna e su un evento che NON viene mai
  * hard-deleted: sbagliare la selezione significa o perdere dati vivi, o
- * lasciare PII oltre la retention promessa in `docs/GDPR.md`.
+ * lasciare PII oltre la retention promessa in `docs/GDPR.md`. Alla scadenza
+ * i dati delle persone se ne vanno, mentre i contenuti della sala (domande,
+ * sondaggi, parole, valutazioni, materiali) restano con l'evento, anonimi.
  *
- * Il DB è mockato con lo stesso oggetto usato come `tx`, così le deleteMany
- * dentro la transazione sono ispezionabili come le altre chiamate: qui non si
- * verifica Prisma, si verifica CHE COSA il cron chiede di cancellare e su
- * quali eventi.
+ * Il DB è mockato con lo stesso oggetto usato come `tx`, così le deleteMany e
+ * le updateMany dentro la transazione sono ispezionabili come le altre
+ * chiamate: qui non si verifica Prisma, si verifica CHE COSA il cron chiede di
+ * cancellare o anonimizzare, e su quali eventi.
  */
 
 type Mock = ReturnType<typeof vi.fn>;
 
 const db = prisma as unknown as {
-  event: { findMany: Mock; findFirst: Mock; update: Mock };
+  event: { findMany: Mock; findFirst: Mock; update: Mock; updateMany: Mock };
   staffLoginToken: { deleteMany: Mock };
   emailOutbox: { deleteMany: Mock; updateMany: Mock };
   adminAuditLog: { updateMany: Mock };
   staffAccount: { updateMany: Mock };
   gdprAuditLog: { create: Mock };
-  eventMaterial: { findMany: Mock; findFirst: Mock; deleteMany: Mock };
+  eventMaterial: { findMany: Mock; findFirst: Mock; deleteMany: Mock; updateMany: Mock };
   chatMessage: { findMany: Mock; deleteMany: Mock };
   questionUpvote: { deleteMany: Mock };
   questionGuestUpvote: { deleteMany: Mock };
-  question: { deleteMany: Mock };
+  question: { deleteMany: Mock; updateMany: Mock };
+  pollVote: { deleteMany: Mock };
   poll: { deleteMany: Mock };
+  eventFeedback: { deleteMany: Mock };
   questionnaireResponse: { deleteMany: Mock };
+  wordCloudSubmission: { deleteMany: Mock };
+  wordCloudRound: { deleteMany: Mock };
+  reminderSent: { deleteMany: Mock };
+  eventReminder: { deleteMany: Mock };
   registration: { deleteMany: Mock; findMany: Mock };
   $executeRaw: Mock;
   multitrackConsent: { deleteMany: Mock };
@@ -149,17 +162,51 @@ function stubEventQueries(rows: {
   });
 }
 
-/** Tutte le chiamate registrate su tutti i delegate, serializzate. */
+/**
+ * Tutte le chiamate registrate su tutti i delegate, serializzate. Comprese
+ * quelle in SQL (`$executeRaw`), che portano l'id dell'evento fra i parametri.
+ */
 function everyDbCall(): string {
   const chunks: string[] = [];
-  for (const delegate of Object.values(prisma as unknown as Record<string, unknown>)) {
-    if (!delegate || typeof delegate !== 'object') continue;
-    for (const fn of Object.values(delegate as Record<string, unknown>)) {
+  for (const value of Object.values(prisma as unknown as Record<string, unknown>)) {
+    if (!value) continue;
+    const own = (value as { mock?: { calls: unknown[][] } }).mock;
+    if (typeof value === 'function' && own) {
+      chunks.push(JSON.stringify(own.calls));
+      continue;
+    }
+    if (typeof value !== 'object') continue;
+    for (const fn of Object.values(value as Record<string, unknown>)) {
       const mock = (fn as { mock?: { calls: unknown[][] } }).mock;
       if (mock) chunks.push(JSON.stringify(mock.calls));
     }
   }
   return chunks.join('|');
+}
+
+/** Le tabelle i cui contenuti la fase 3 anonimizza con una UPDATE in SQL. */
+const RAW_ANONYMIZED_TABLES = [
+  'poll_votes',
+  'event_feedback',
+  'questionnaire_responses',
+  'word_cloud_submissions',
+] as const;
+
+/**
+ * La UPDATE in SQL emessa su `table`, riconosciuta dal testo e non
+ * dall'ordine: testo, parametri e posizione nella sequenza delle chiamate.
+ */
+function rawUpdate(table: string): { sql: string; params: unknown[]; order: number } {
+  const calls = db.$executeRaw.mock.calls as unknown[][];
+  const i = calls.findIndex((c) =>
+    (c[0] as TemplateStringsArray).join('?').includes(`UPDATE "${table}"`),
+  );
+  if (i < 0) throw new Error(`nessuna UPDATE su "${table}"`);
+  return {
+    sql: (calls[i]![0] as TemplateStringsArray).join('?'),
+    params: calls[i]!.slice(1),
+    order: db.$executeRaw.mock.invocationCallOrder[i] as number,
+  };
 }
 
 async function runCleanup(apiKey: string | null = CRON_KEY) {
@@ -333,7 +380,7 @@ describe('GET /api/cron/cleanup', () => {
     const body = await res.json();
 
     // La query parte già ristretta agli eventi finiti, o mai conclusi ma
-    // oltre la loro fine…
+    // oltre la loro fine: il giro ripassa ogni giorno (è idempotente)…
     const phase3Args = db.event.findMany.mock.calls[2]?.[0];
     expect(phase3Args.where).toEqual({
       OR: [
@@ -366,6 +413,7 @@ describe('GET /api/cron/cleanup', () => {
     expect(db.registration.deleteMany).toHaveBeenCalledWith({
       where: { eventId: 'evt-incagliato' },
     });
+    // Lascia il servizio adesso: archiviato.
     expect(db.event.update).toHaveBeenCalledWith({
       where: { id: 'evt-incagliato' },
       data: { status: 'ARCHIVED' },
@@ -439,41 +487,193 @@ describe('GET /api/cron/cleanup', () => {
     expect(db.callSession.findMany).not.toHaveBeenCalled();
   });
 
-  it('fase 3: cancella tutte le entità con PII dell’evento scaduto', async () => {
+  it('fase 3: cancella i dati delle persone dell’evento scaduto', async () => {
     stubEventQueries({ ended: [endedEvent({ id: 'evt-vecchio' })] });
 
     await runCleanup();
 
     const byEvent = { where: { eventId: 'evt-vecchio' } };
-    // Registrazioni (email cifrata, nome, hash, token) e Q&A: sono le due voci
-    // che `docs/GDPR.md` promette esplicitamente di cancellare.
+    // Iscrizioni (email cifrata, nome, hash, token): la voce che
+    // `docs/GDPR.md` promette esplicitamente di cancellare.
     expect(db.registration.deleteMany).toHaveBeenCalledWith(byEvent);
-    expect(db.question.deleteMany).toHaveBeenCalledWith(byEvent);
     // I pollici in su si cancellano passando dalla domanda, in tutte e due le
     // tabelle: quella degli iscritti e quella di chi vota con l'identificativo
-    // del browser (ospiti, relatori, moderatori).
+    // del browser (ospiti, relatori, moderatori). La domanda resta, con il
+    // conteggio dei voti.
     expect(db.questionUpvote.deleteMany).toHaveBeenCalledWith({
       where: { question: { eventId: 'evt-vecchio' } },
     });
     expect(db.questionGuestUpvote.deleteMany).toHaveBeenCalledWith({
       where: { question: { eventId: 'evt-vecchio' } },
     });
-    expect(db.poll.deleteMany).toHaveBeenCalledWith(byEvent);
-    // Le risposte ai questionari contengono nome + hash email del rispondente
-    // e non sono raggiungibili da `eventId`: si passa dal questionario.
-    expect(db.questionnaireResponse.deleteMany).toHaveBeenCalledWith({
-      where: { questionnaire: { eventId: 'evt-vecchio' } },
+    // Promemoria programmati e loro invii, consensi alla registrazione dati
+    // in sala d'attesa: riguardano persone, non il contenuto dell'evento.
+    expect(db.reminderSent.deleteMany).toHaveBeenCalledWith({
+      where: { reminder: { eventId: 'evt-vecchio' } },
     });
-    // Reazioni e agenda non hanno PII ma sono dati dell'evento oltre la
-    // retention, e la loro cascade non scatta (vedi il test sulla chat).
+    expect(db.eventReminder.deleteMany).toHaveBeenCalledWith(byEvent);
+    expect(db.multitrackConsent.deleteMany).toHaveBeenCalledWith(byEvent);
+    // Le reazioni live e quelle agli argomenti della scaletta sono di una
+    // persona, e la loro cascade non scatta (vedi il test sulla chat).
     expect(db.reaction.deleteMany).toHaveBeenCalledWith(byEvent);
-    expect(db.eventAgendaItem.deleteMany).toHaveBeenCalledWith(byEvent);
     expect(db.agendaItemReaction.deleteMany).toHaveBeenCalledWith({
       where: { agendaItem: { eventId: 'evt-vecchio' } },
     });
-    // La cronologia della sala: risultati e parole del pubblico, oltre la
-    // retention non servono piu' alla post-produzione.
-    expect(db.liveAction.deleteMany).toHaveBeenCalledWith(byEvent);
+  });
+
+  it('fase 3: i contenuti della sala restano con l’evento', async () => {
+    // Domande, sondaggi, parole, valutazioni, materiali, scaletta e
+    // cronologia restano finché esiste l'evento, perché chi organizza possa
+    // decidere se pubblicarli: la pulizia toglie le identità, non i contenuti.
+    stubEventQueries({ ended: [endedEvent({ id: 'evt-vecchio' })] });
+
+    const res = await runCleanup();
+
+    expect(res.status).toBe(200);
+    const nonCancellati = {
+      question: db.question.deleteMany,
+      poll: db.poll.deleteMany,
+      pollVote: db.pollVote.deleteMany,
+      eventFeedback: db.eventFeedback.deleteMany,
+      wordCloudRound: db.wordCloudRound.deleteMany,
+      wordCloudSubmission: db.wordCloudSubmission.deleteMany,
+      eventMaterial: db.eventMaterial.deleteMany,
+      eventAgendaItem: db.eventAgendaItem.deleteMany,
+      liveAction: db.liveAction.deleteMany,
+    };
+    for (const [modello, deleteMany] of Object.entries(nonCancellati)) {
+      expect(deleteMany, modello).not.toHaveBeenCalled();
+    }
+  });
+
+  it('fase 3: domande, voti, valutazioni, risposte e parole perdono ogni legame con una persona', async () => {
+    stubEventQueries({ ended: [endedEvent({ id: 'evt-vecchio' })] });
+
+    await runCleanup();
+
+    // La domanda resta (testo, risposta, voti contati) senza nome
+    // dell'autore né iscrizione.
+    expect(db.question.updateMany).toHaveBeenCalledWith({
+      where: { eventId: 'evt-vecchio', OR: [{ registrationId: { not: null } }, { authorName: { not: '' } }] },
+      data: { registrationId: null, authorName: '' },
+    });
+    // Voti, valutazioni, risposte di fine evento e parole: via l'iscrizione,
+    // e l'identificativo del browser diventa uno pseudonimo per persona e per
+    // evento (md5 di evento e identità), così i vincoli «una per persona» e i
+    // conteggi per persona reggono. Solo le righe dell'evento.
+    for (const table of RAW_ANONYMIZED_TABLES) {
+      const upd = rawUpdate(table);
+      expect(upd.sql, table).toContain('"registration_id" = NULL');
+      expect(upd.sql, table).toContain(`'anon:' || md5(`);
+      expect(upd.sql, table).toContain(`COALESCE("registration_id"::text, "guest_id", "id"::text)`);
+      expect(new Set(upd.params), table).toEqual(new Set(['evt-vecchio']));
+    }
+    // Le risposte di fine evento perdono anche nome e hash dell'email…
+    const risposte = rawUpdate('questionnaire_responses').sql;
+    expect(risposte).toContain('"respondent_name" = NULL');
+    expect(risposte).toContain('"respondent_email_hash" = NULL');
+    expect(risposte).toContain(`"placement" = 'POST_EVENT'`);
+    // …quelle chieste all'iscrizione riguardano chi si è iscritto, e se ne
+    // vanno con lui.
+    expect(db.questionnaireResponse.deleteMany).toHaveBeenCalledWith({
+      where: { questionnaire: { eventId: 'evt-vecchio', placement: { not: 'POST_EVENT' } } },
+    });
+  });
+
+  it('fase 3: toglie le identità PRIMA di cancellare le iscrizioni', async () => {
+    // Domande e voti dei sondaggi hanno la chiave verso l'iscrizione in
+    // cascata: cancellare prima le iscrizioni li porterebbe via con loro, e i
+    // contenuti dell'evento sparirebbero invece di restare anonimi.
+    stubEventQueries({ ended: [endedEvent({ id: 'evt-vecchio' })] });
+
+    await runCleanup();
+
+    const iscrizioni = db.registration.deleteMany.mock.invocationCallOrder[0];
+    expect(iscrizioni).toBeDefined();
+    expect(db.question.updateMany.mock.invocationCallOrder[0]).toBeLessThan(iscrizioni!);
+    for (const table of RAW_ANONYMIZED_TABLES) {
+      expect(rawUpdate(table).order, table).toBeLessThan(iscrizioni!);
+    }
+    expect(db.questionnaireResponse.deleteMany.mock.invocationCallOrder[0]).toBeLessThan(
+      iscrizioni!,
+    );
+  });
+
+  it('fase 3: i materiali restano con il loro file, senza il nome di chi li ha aggiunti', async () => {
+    // Il file di un materiale se ne va quando si cancella l'evento, non alla
+    // scadenza della conservazione: qui si toglie solo `addedBy`.
+    stubEventQueries({ ended: [endedEvent({ id: 'evt-vecchio' })] });
+    db.eventMaterial.findMany.mockResolvedValue([
+      { id: 'mat-1', eventId: 'evt-vecchio', blobPath: 'events/evt-vecchio/files/slide.pdf' },
+    ]);
+    db.eventMaterial.updateMany.mockResolvedValue({ count: 1 });
+
+    const res = await runCleanup();
+    const body = await res.json();
+
+    expect(db.eventMaterial.updateMany).toHaveBeenCalledWith({
+      where: { eventId: 'evt-vecchio', addedBy: { not: '' } },
+      data: { addedBy: '' },
+    });
+    expect(db.eventMaterial.deleteMany).not.toHaveBeenCalled();
+    expect(filesStorage.current!.delete).not.toHaveBeenCalled();
+    expect(deleteBlobMock).not.toHaveBeenCalled();
+    expect(deleteRecordingBlobMock).not.toHaveBeenCalled();
+    expect(body.chatAttachmentBlobsDeleted).toBe(0);
+    expect(body.eventsProcessed).toBe(1);
+  });
+
+  it('fase 3: il registro GDPR conta ciò che è stato cancellato e ciò che è stato anonimizzato', async () => {
+    stubEventQueries({ ended: [endedEvent({ id: 'evt-vecchio' })] });
+    db.registration.deleteMany.mockResolvedValue({ count: 9 });
+    db.question.updateMany.mockResolvedValue({ count: 4 });
+    db.questionnaireResponse.deleteMany.mockResolvedValue({ count: 1 });
+    db.eventMaterial.updateMany.mockResolvedValue({ count: 2 });
+    const righe: Record<string, number> = {
+      poll_votes: 5,
+      event_feedback: 2,
+      questionnaire_responses: 3,
+      word_cloud_submissions: 6,
+    };
+    db.$executeRaw.mockImplementation(async (strings: TemplateStringsArray) => {
+      const sql = strings.join('?');
+      const table = Object.keys(righe).find((t) => sql.includes(`UPDATE "${t}"`));
+      return table ? righe[table] : 0;
+    });
+
+    const res = await runCleanup();
+    const body = await res.json();
+
+    const audit = db.gdprAuditLog.create.mock.calls[0]?.[0].data;
+    expect(audit).toMatchObject({
+      eventId: 'evt-vecchio',
+      action: 'DATA_DELETED',
+      recordCount: 9,
+    });
+    const details = JSON.parse(audit.details);
+    expect(details).toMatchObject({
+      registrations: 9,
+      questionsAnonymized: 4,
+      pollVotesAnonymized: 5,
+      feedbackAnonymized: 2,
+      questionnaireResponsesAnonymized: 3,
+      questionnaireResponsesDeleted: 1,
+      wordCloudSubmissionsAnonymized: 6,
+      materialsAnonymized: 2,
+    });
+    // Nessun conteggio di cancellazione per ciò che ora resta.
+    for (const vecchia of ['questions', 'polls', 'pollVotes', 'materials', 'agendaItems', 'liveActions']) {
+      expect(details, vecchia).not.toHaveProperty(vecchia);
+    }
+    // La risposta del cron riporta gli anonimizzati, non più i cancellati.
+    expect(body).toMatchObject({
+      eventsProcessed: 1,
+      registrationsDeleted: 9,
+      questionsAnonymized: 4,
+      pollVotesAnonymized: 5,
+    });
+    expect(body).not.toHaveProperty('questionsDeleted');
+    expect(body).not.toHaveProperty('pollsDeleted');
   });
 
   it('fase 3: cancella le concessioni nominali di moderatore e relatore', async () => {
@@ -506,10 +706,11 @@ describe('GET /api/cron/cleanup', () => {
 
   it('fase 3: cancella la CHAT anche quando l’evento è già ARCHIVED', async () => {
     // Il difetto storico: `ChatMessage.eventId` è onDelete: Cascade, ma
-    // l'evento non viene MAI hard-deleted (resta ARCHIVED come riferimento
-    // storico), quindi la cascata non scatta e nomi + testi dei messaggi
-    // sopravvivevano alla retention. Vanno cancellati esplicitamente, e
-    // l'evento già archiviato deve comunque essere ripreso in carico.
+    // l'evento non viene MAI hard-deleted dalla pulizia (resta, ENDED o
+    // ARCHIVED), quindi la cascata non scatta e nomi + testi dei messaggi
+    // sopravvivevano alla retention. Vanno cancellati esplicitamente, e un
+    // evento archiviato a mano prima della scadenza deve comunque essere
+    // ripreso in carico.
     stubEventQueries({
       ended: [endedEvent({ id: 'evt-archiviato', status: 'ARCHIVED' })],
     });
@@ -530,27 +731,27 @@ describe('GET /api/cron/cleanup', () => {
     expect(JSON.parse(audit.details).chatMessages).toBe(7);
   });
 
-  it('fase 3: archivia l’evento ENDED dopo averlo ripulito', async () => {
-    stubEventQueries({ ended: [endedEvent({ id: 'evt-vecchio', status: 'ENDED' })] });
+  it.each(['ENDED', 'ARCHIVED'])(
+    'fase 3: un evento concluso (%s) resta com’è',
+    async (status) => {
+      // La pagina di un evento concluso e ciò che mostra li decide chi
+      // organizza: la pulizia non lo archivia e non ne tocca lo stato.
+      stubEventQueries({ ended: [endedEvent({ id: 'evt-vecchio', status })] });
 
-    await runCleanup();
+      const res = await runCleanup();
+      const body = await res.json();
 
-    // L'evento sopravvive come riferimento storico (titolo, date): è
-    // esattamente ciò che `docs/GDPR.md` dichiara.
-    expect(db.event.update).toHaveBeenCalledWith({
-      where: { id: 'evt-vecchio' },
-      data: { status: 'ARCHIVED' },
-    });
-  });
+      expect(db.event.update).not.toHaveBeenCalled();
+      expect(body.eventsProcessed).toBe(1);
+      expect(body.unfinishedEventsArchived).toBe(0);
+    },
+  );
 
-  it('fase 3: cancella i blob degli allegati chat e dei materiali', async () => {
+  it('fase 3: cancella i blob degli allegati chat', async () => {
     // Cancellare la riga senza il blob lascerebbe il file caricato in chat
     // (contenuto scritto da un partecipante) nello storage per sempre, senza
     // più nessuna riga che lo indichi.
     stubEventQueries({ ended: [endedEvent({ id: 'evt-vecchio' })] });
-    db.eventMaterial.findMany.mockResolvedValue([
-      { id: 'mat-1', eventId: 'evt-vecchio', blobPath: 'events/evt-vecchio/files/slide.pdf' },
-    ]);
     db.chatMessage.findMany.mockResolvedValue([
       { attachmentBlobPath: 'assets/chat/a.png' },
       { attachmentBlobPath: 'assets/chat/b.pdf' },
@@ -563,76 +764,13 @@ describe('GET /api/cron/cleanup', () => {
       where: { eventId: 'evt-vecchio', attachmentBlobPath: { not: null } },
       select: { attachmentBlobPath: true },
     });
-    // I file dei materiali si raccolgono per `blobPath`, qualunque sia il tipo.
-    expect(db.eventMaterial.findMany).toHaveBeenCalledWith({
-      where: { event: { id: 'evt-vecchio' }, blobPath: { not: null } },
-      select: { id: true, eventId: true, blobPath: true },
-    });
-    expect(filesStorage.current!.delete).toHaveBeenCalledWith('events/evt-vecchio/files/slide.pdf');
     expect(deleteBlobMock.mock.calls.map((c) => c[0]).sort()).toEqual([
       'assets/chat/a.png',
       'assets/chat/b.pdf',
     ]);
-    expect(body.materialBlobsDeleted).toBe(3);
-  });
-
-  it('fase 3: il file di un materiale si cancella prima della riga', async () => {
-    stubEventQueries({ ended: [endedEvent({ id: 'evt-vecchio' })] });
-    db.eventMaterial.findMany.mockResolvedValue([
-      { id: 'mat-1', eventId: 'evt-vecchio', blobPath: 'events/evt-vecchio/files/slide.pdf' },
-    ]);
-
-    await runCleanup();
-
-    expect(filesStorage.current!.delete.mock.invocationCallOrder[0]).toBeLessThan(
-      db.eventMaterial.deleteMany.mock.invocationCallOrder[0] as number
-    );
-    expect(db.eventMaterial.deleteMany).toHaveBeenCalledWith({ where: { eventId: 'evt-vecchio' } });
-  });
-
-  it('fase 3: un file che lo storage non cancella lascia la sua riga al giro dopo', async () => {
-    // Cancellare la riga lo stesso lascerebbe nello storage un file che
-    // nessuno ritroverebbe più. Le PII dell'evento se ne vanno comunque.
-    stubEventQueries({ ended: [endedEvent({ id: 'evt-vecchio' })] });
-    db.eventMaterial.findMany.mockResolvedValue([
-      { id: 'mat-ok', eventId: 'evt-vecchio', blobPath: 'events/evt-vecchio/files/a.pdf' },
-      { id: 'mat-ko', eventId: 'evt-vecchio', blobPath: 'events/evt-vecchio/files/b.pdf' },
-    ]);
-    filesStorage.current!.delete.mockImplementation(async (key: string) => {
-      if (key.endsWith('b.pdf')) throw new Error('storage down');
-      return true;
-    });
-
-    const res = await runCleanup();
-    const body = await res.json();
-
-    expect(db.eventMaterial.deleteMany).toHaveBeenCalledWith({
-      where: { eventId: 'evt-vecchio', id: { notIn: ['mat-ko'] } },
-    });
-    expect(db.registration.deleteMany).toHaveBeenCalled();
-    expect(body.materialBlobsDeleted).toBe(1);
-    expect(body.eventsProcessed).toBe(1);
-  });
-
-  it('fase 3: il file che il materiale di un altro evento tiene ancora resta', async () => {
-    // Un materiale che punta al file di un altro evento (una riga scritta prima
-    // che l'area admin rifiutasse le chiavi già in uso): la retention del suo
-    // evento non deve togliere il file all'altro.
-    const chiave = 'assets/document/2026/09/66666666-6666-4666-8666-666666666666-slide.pdf';
-    stubEventQueries({ ended: [endedEvent({ id: 'evt-vecchio' })] });
-    db.eventMaterial.findMany.mockResolvedValue([
-      { id: 'mat-1', eventId: 'evt-vecchio', blobPath: chiave },
-    ]);
-    db.eventMaterial.findFirst.mockResolvedValue({ id: 'materiale-di-un-altro-evento' });
-
-    await runCleanup();
-
-    expect(db.eventMaterial.findFirst).toHaveBeenCalledWith({
-      where: { blobPath: chiave, id: { notIn: ['mat-1'] } },
-      select: { id: true },
-    });
+    // Solo gli allegati della chat: i file dei materiali restano.
     expect(filesStorage.current!.delete).not.toHaveBeenCalled();
-    expect(db.eventMaterial.deleteMany).toHaveBeenCalledWith({ where: { eventId: 'evt-vecchio' } });
+    expect(body.chatAttachmentBlobsDeleted).toBe(2);
   });
 
   it('fase 3: legge i path degli allegati PRIMA di cancellare le righe', async () => {
@@ -646,9 +784,6 @@ describe('GET /api/cron/cleanup', () => {
     expect(db.chatMessage.findMany.mock.invocationCallOrder[0]).toBeLessThan(
       db.$transaction.mock.invocationCallOrder[0] as number
     );
-    expect(db.eventMaterial.findMany.mock.invocationCallOrder[0]).toBeLessThan(
-      db.$transaction.mock.invocationCallOrder[0] as number
-    );
   });
 
   it('fase 3: senza storage file configurato cancella comunque i dati dal DB', async () => {
@@ -658,16 +793,17 @@ describe('GET /api/cron/cleanup', () => {
     filesStorage.current = null;
     stubEventQueries({ ended: [endedEvent({ id: 'evt-vecchio' })] });
     db.chatMessage.findMany.mockResolvedValue([{ attachmentBlobPath: 'assets/chat/a.png' }]);
-    db.eventMaterial.findMany.mockResolvedValue([
-      { id: 'mat-1', eventId: 'evt-vecchio', blobPath: 'events/evt-vecchio/files/slide.pdf' },
-    ]);
 
     const res = await runCleanup();
     const body = await res.json();
 
     expect(deleteBlobMock).not.toHaveBeenCalled();
     expect(db.chatMessage.deleteMany).toHaveBeenCalled();
-    expect(db.eventMaterial.deleteMany).toHaveBeenCalledWith({ where: { eventId: 'evt-vecchio' } });
+    expect(db.registration.deleteMany).toHaveBeenCalledWith({ where: { eventId: 'evt-vecchio' } });
+    expect(db.eventMaterial.updateMany).toHaveBeenCalledWith({
+      where: { eventId: 'evt-vecchio', addedBy: { not: '' } },
+      data: { addedBy: '' },
+    });
     expect(body.eventsProcessed).toBe(1);
   });
 
@@ -757,6 +893,7 @@ describe('GET /api/cron/cleanup', () => {
     expect(db.chatMessage.deleteMany).toHaveBeenCalledWith({
       where: { eventId: 'evt-sano' },
     });
+    // Quello rotto si riprende al giro dopo: la fase 3 ripassa ogni giorno.
   });
 
   it('cancella i link di accesso dello staff usati o scaduti da oltre un giorno', async () => {
@@ -848,6 +985,7 @@ describe('GET /api/cron/cleanup', () => {
     const body = await res.json();
 
     expect(db.$transaction).not.toHaveBeenCalled();
+    expect(db.event.update).not.toHaveBeenCalled();
     expect(deleteRecordingBlobMock).not.toHaveBeenCalled();
     expect(deleteBlobMock).not.toHaveBeenCalled();
     expect(body).toEqual({
@@ -862,10 +1000,10 @@ describe('GET /api/cron/cleanup', () => {
       eventsProcessed: 0,
       unfinishedEventsArchived: 0,
       registrationsDeleted: 0,
-      questionsDeleted: 0,
-      pollsDeleted: 0,
+      questionsAnonymized: 0,
+      pollVotesAnonymized: 0,
       recordingBlobsDeleted: 0,
-      materialBlobsDeleted: 0,
+      chatAttachmentBlobsDeleted: 0,
       profilePhotosDeleted: 0,
     });
   });
@@ -888,3 +1026,33 @@ describe('GET /api/cron/cleanup', () => {
 
 });
 
+
+
+describe('GET /api/cron/cleanup — giro quotidiano idempotente', () => {
+  it('un giro che non toglie niente non scrive nel registro GDPR', async () => {
+    vi.resetAllMocks();
+    process.env.CRON_API_KEY = CRON_KEY;
+    // Tutto a zero: l'evento era gia' stato ripulito un altro giorno. Le
+    // sessioni di chiamata si ripuliscono sempre (contano 1), ma non bastano.
+    for (const delegate of Object.values(prisma as unknown as Record<string, unknown>)) {
+      if (!delegate || typeof delegate !== 'object') continue;
+      for (const [name, fn] of Object.entries(delegate as Record<string, unknown>)) {
+        const mock = fn as Mock;
+        if (typeof mock !== 'function') continue;
+        if (name === 'findMany') mock.mockResolvedValue([]);
+        else if (name === 'deleteMany' || name === 'updateMany') mock.mockResolvedValue({ count: 0 });
+        else mock.mockResolvedValue({});
+      }
+    }
+    db.callSession.updateMany.mockResolvedValue({ count: 1 });
+    db.$executeRaw.mockResolvedValue(0);
+    db.$transaction.mockImplementation(async (arg: unknown) =>
+      typeof arg === 'function' ? await (arg as (tx: unknown) => Promise<unknown>)(prisma) : arg,
+    );
+    vi.spyOn(console, 'log').mockImplementation(() => {});
+    stubEventQueries({ ended: [endedEvent({ id: 'evt-gia-pulito' })] });
+    const res = await runCleanup();
+    expect((await res.json()).eventsProcessed).toBe(1);
+    expect(db.gdprAuditLog.create).not.toHaveBeenCalled();
+  });
+});

@@ -10,6 +10,7 @@ import { prisma } from '@/lib/db';
 import { createFeedbackSchema } from '@/lib/validation/schemas';
 import { constantTimeEqual } from '@/lib/auth/moderator';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
+import { isEventDataRetentionExpired } from '@/lib/gdpr/cleanup-selection';
 
 export const dynamic = 'force-dynamic';
 
@@ -30,7 +31,12 @@ export const POST = withErrorHandling(async (request, context) => {
   const event = await prisma.event.findUnique({ where: { slug } });
   if (!event) throw new NotFoundError('Event');
 
-  if (!['LIVE', 'ENDED'].includes(event.status)) {
+  // Anche qui: oltre la conservazione dei dati dell'evento non si raccoglie
+  // piu' niente (lib/gdpr/cleanup-selection).
+  const aperta =
+    event.status === 'LIVE' ||
+    (event.status === 'ENDED' && !isEventDataRetentionExpired(event, new Date()));
+  if (!aperta) {
     throw new ConflictError('Feedback is only accepted for live or ended events');
   }
 
