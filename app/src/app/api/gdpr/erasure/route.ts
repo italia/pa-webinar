@@ -64,6 +64,11 @@ export const POST = withErrorHandling(async (request) => {
   // iscritta, quindi vanno via come la voce di rubrica.
   const invitations = await prisma.eventInvitation.deleteMany({ where: { emailHash } });
 
+  // La foto profilo e' legata all'email, non a un evento: va via qui anche
+  // quando non resta nessuna iscrizione.
+  const photo = await prisma.profilePhoto.deleteMany({ where: { emailHash } });
+  const profilePhotoDeleted = photo.count > 0;
+
   const registrations = await prisma.registration.findMany({
     where: { emailHash },
     select: { id: true, eventId: true },
@@ -75,6 +80,7 @@ export const POST = withErrorHandling(async (request) => {
       deleted: 0,
       addressBookDeleted,
       invitationsDeleted: invitations.count,
+      profilePhotoDeleted,
     });
   }
 
@@ -104,6 +110,7 @@ export const POST = withErrorHandling(async (request) => {
     deleted: counts.registrations,
     addressBookDeleted,
     invitationsDeleted: invitations.count,
+    profilePhotoDeleted,
     feedbackDeleted: counts.feedback,
     questionnaireResponsesDeleted: counts.questionnaireResponses,
     chatMessagesDeleted: counts.chatMessages,

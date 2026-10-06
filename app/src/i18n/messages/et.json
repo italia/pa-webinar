@@ -3074,7 +3074,9 @@
       "optionLabel": "Variant",
       "erasureCtaTitle": "Kas soovite oma andmed kustutada?",
       "erasureCtaBody": "Võite taotleda oma e-posti aadressiga seotud andmete täielikku kustutamist vastavalt GDPR artiklile 17.",
-      "erasureCtaButton": "Taotle kustutamist"
+      "erasureCtaButton": "Taotle kustutamist",
+      "photoTitle": "Profiilifoto",
+      "photoBody": "Üles laaditud {date}. Teised osalejad näevad seda sinu initsiaalide asemel. Saad selle eemaldada ürituse ooteruumis või oma andmed kustutades."
     },
     "erasure": {
       "title": "Teie andmete kustutamine",
@@ -3957,7 +3959,22 @@
     "enterAnyway": "Sisene siiski",
     "notHeldBadge": "Aeg on möödas",
     "notHeldTitle": "Sündmuse kavandatud aeg on möödas",
-    "notHeldDetail": "Ruumi ei avatud. Vaata sündmuse lehelt, kas on uudiseid."
+    "notHeldDetail": "Ruumi ei avatud. Vaata sündmuse lehelt, kas on uudiseid.",
+    "photo": {
+      "title": "Sinu foto",
+      "help": "Valikuline: saalis näevad teised seda sinu initsiaalide asemel, ka hilisematel üritustel, kuhu registreerud selle e-postiga. Saad selle igal ajal eemaldada.",
+      "choose": "Vali foto",
+      "change": "Muuda fotot",
+      "remove": "Eemalda",
+      "saving": "Salvestamine…",
+      "saved": "Foto salvestatud: teised näevad seda, kui saali sisened.",
+      "removed": "Foto eemaldatud.",
+      "errors": {
+        "tooLarge": "Foto on ka vähendatult liiga suur: proovi mõnda teist.",
+        "invalid": "See fail ei ole JPEG-, PNG- ega WebP-foto."
+      },
+      "verifyHint": "Foto lisamiseks ava selles brauseris e-kirjaga saadud isiklik link: nii on näha, et aadress on sinu."
+    }
   },
   "recording": {
     "management": "Videosalvestis",

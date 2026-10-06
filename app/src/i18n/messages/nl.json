@@ -3074,7 +3074,9 @@
       "optionLabel": "Optie",
       "erasureCtaTitle": "Wilt u uw gegevens laten verwijderen?",
       "erasureCtaBody": "U kunt de volledige verwijdering aanvragen van de gegevens die aan uw e-mailadres zijn gekoppeld (Art. 17 GDPR).",
-      "erasureCtaButton": "Verwijdering aanvragen"
+      "erasureCtaButton": "Verwijdering aanvragen",
+      "photoTitle": "Profielfoto",
+      "photoBody": "Geüpload op {date}. Andere deelnemers zien hem in plaats van je initialen. Je kunt hem verwijderen in de wachtruimte van een evenement of door je gegevens te wissen."
     },
     "erasure": {
       "title": "Verwijdering van uw gegevens",
@@ -3957,7 +3959,22 @@
     "enterAnyway": "Toch binnengaan",
     "notHeldBadge": "Tijd verstreken",
     "notHeldTitle": "Het geplande tijdstip van het evenement is verstreken",
-    "notHeldDetail": "De zaal is niet geopend. Kijk op de evenementpagina voor eventuele updates."
+    "notHeldDetail": "De zaal is niet geopend. Kijk op de evenementpagina voor eventuele updates.",
+    "photo": {
+      "title": "Je foto",
+      "help": "Optioneel: in de zaal zien anderen hem in plaats van je initialen, ook bij latere evenementen waarvoor je je met dit e-mailadres aanmeldt. Je kunt hem altijd verwijderen.",
+      "choose": "Kies een foto",
+      "change": "Foto wijzigen",
+      "remove": "Verwijderen",
+      "saving": "Opslaan…",
+      "saved": "Foto opgeslagen: anderen zien hem zodra je de zaal binnenkomt.",
+      "removed": "Foto verwijderd.",
+      "errors": {
+        "tooLarge": "De foto is ook verkleind te groot: probeer een andere.",
+        "invalid": "Dit bestand is geen JPEG-, PNG- of WebP-foto."
+      },
+      "verifyHint": "Open in deze browser de persoonlijke link uit je e-mail om een foto toe te voegen: zo blijkt dat het adres van jou is."
+    }
   },
   "recording": {
     "management": "Video-opname",

@@ -85,8 +85,22 @@ export const GET = withErrorHandling(async (request) => {
     },
   });
 
+  // La foto profilo e' legata all'indirizzo, non a un'iscrizione: c'e' anche
+  // quando le iscrizioni sono gia' state cancellate (la pulizia la tiene un
+  // po' di piu'), e per chi ha solo una concessione nominale.
+  const foto = await prisma.profilePhoto.findUnique({
+    where: { emailHash },
+    select: { contentType: true, bytes: true, createdAt: true },
+  });
+  const profilePhoto = foto
+    ? {
+        uploadedAt: foto.createdAt.toISOString(),
+        dataUrl: `data:${foto.contentType};base64,${Buffer.from(foto.bytes).toString('base64')}`,
+      }
+    : null;
+
   if (registrations.length === 0) {
-    return Response.json({ data: [] });
+    return Response.json({ data: [], profilePhoto });
   }
 
   // Audit one row per distinct event, recording only an emailHash prefix
@@ -151,5 +165,5 @@ export const GET = withErrorHandling(async (request) => {
     };
   });
 
-  return Response.json({ data: result });
+  return Response.json({ data: result, profilePhoto });
 });

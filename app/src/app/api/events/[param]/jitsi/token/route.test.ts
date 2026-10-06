@@ -40,6 +40,7 @@ vi.mock('@/lib/db', () => ({
     eventModerator: { findUnique: vi.fn() },
     siteSetting: { findUnique: vi.fn() },
     multitrackConsent: { create: vi.fn(), findFirst: vi.fn() },
+    profilePhoto: { findUnique: vi.fn(async () => null) },
   },
 }));
 
@@ -193,6 +194,7 @@ beforeEach(() => {
   cookieJar.clear();
   vi.mocked(prisma.event.findUnique).mockResolvedValue(eventRow() as never);
   vi.mocked(prisma.registration.update).mockResolvedValue({} as never);
+  vi.mocked(prisma.profilePhoto.findUnique).mockResolvedValue(null as never);
   siteSettings = { ...DEFAULT_SETTINGS };
   applySettings({});
 });
@@ -596,18 +598,31 @@ describe('POST jitsi/token — accesso ospiti spento', () => {
 // ── Gravatar (opt-in dell'amministratore) ──
 
 describe('POST jitsi/token — Gravatar', () => {
-  async function participantAvatar(): Promise<string> {
+  async function participantAvatar(opts: { emailVerified?: boolean } = {}): Promise<string> {
     vi.mocked(prisma.registration.findUnique).mockResolvedValue(
       registrationRow() as never,
     );
     cookieJar.set(
       eventAccessCookieName(EVENT_ID),
-      await signEventAccess(EVENT_ID, ACCESS_TOKEN, 3600),
+      await signEventAccess(EVENT_ID, ACCESS_TOKEN, 3600, opts),
     );
     const res = await post({ accessToken: ACCESS_TOKEN });
     const { user } = await minted(res);
     return user.avatar;
   }
+
+  it("una foto caricata vince su Gravatar e sulle iniziali, se l'email e' provata", async () => {
+    setGravatarEnabled(true);
+    vi.mocked(prisma.profilePhoto.findUnique).mockResolvedValue({ id: 'foto-1' } as never);
+    expect(await participantAvatar({ emailVerified: true })).toBe(`${APP_URL}/api/avatar/photo/foto-1`);
+  });
+
+  it("iscritto dal modulo, senza aver aperto l'email: la foto dell'indirizzo non si indossa", async () => {
+    setGravatarEnabled(false);
+    vi.mocked(prisma.profilePhoto.findUnique).mockResolvedValue({ id: 'foto-1' } as never);
+    expect(await participantAvatar()).toMatch(/^data:image\/svg\+xml;base64,/);
+    expect(prisma.profilePhoto.findUnique).not.toHaveBeenCalled();
+  });
 
   it('spento: l\'avatar resta l\'SVG con le iniziali', async () => {
     setGravatarEnabled(false);
@@ -644,10 +659,14 @@ describe('POST jitsi/token — Gravatar', () => {
       email: encryptPII('anna.bianchi@example.com'),
     } as never);
 
+    vi.mocked(prisma.profilePhoto.findUnique).mockResolvedValue({ id: 'foto-anna' } as never);
     const res = await post({ moderatorToken: GRANT_TOKEN });
     const { user } = await minted(res);
     expect(user.avatar.startsWith(`${APP_URL}/api/avatar?`)).toBe(true);
     expect(user.avatar).not.toContain('anna.bianchi');
+    // L'indirizzo di una concessione lo sceglie lo staff: non ne prova il
+    // possesso, quindi niente foto caricata per quell'indirizzo.
+    expect(prisma.profilePhoto.findUnique).not.toHaveBeenCalled();
   });
 
   it('acceso: il link primario condiviso resta senza Gravatar', async () => {

@@ -82,7 +82,8 @@ export const POST = withErrorHandling(async (request, context) => {
     };
     const joinUrl = registrationJoinUrl({
       ...link,
-      viaEmailEntry: !(await getSettings()).publicRegistrationEnabled,
+      viaEmailEntry: true,
+      bindsIdentity: !(await getSettings()).publicRegistrationEnabled,
     });
     const eventPageUrl = localizedUrl(baseUrl, `/events/${slug}`, locale);
 

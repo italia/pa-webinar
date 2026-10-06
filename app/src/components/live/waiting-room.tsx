@@ -22,6 +22,7 @@ import {
   statoIngresso,
   type BloccoModulo,
 } from '@/lib/waiting-room/entry-state';
+import ProfilePhotoField from '@/components/live/profile-photo-field';
 import AudioPlayer from '@/components/live/audio-player';
 import ChatPanel from '@/components/live/chat-panel';
 import DeviceCheck from '@/components/live/device-check';
@@ -1515,6 +1516,11 @@ export default function WaitingRoom({
                     dispositivi che chiede un permesso impossibile. */}
                 {!isEnded && <InsecureContextNotice className="mb-3" />}
                 {!isEnded && <div className="wr-name-field mb-3">{nameField}</div>}
+                {/* La foto al posto delle iniziali: solo per chi ha un'email
+                    dietro al token (lo dice il server). */}
+                {!isEnded && chatToken && (
+                  <ProfilePhotoField eventSlug={event.slug} token={chatToken} name={name} />
+                )}
                 {/* Email: solo per gli ospiti (i registrati l'hanno già data,
                     per moderatori/speaker è irrilevante). Il valore non è ancora
                     inviato al server: campo di cortesia locale finché non c'è un

@@ -119,15 +119,16 @@ export const GET = withErrorHandling(async (request) => {
         const title = getLocalized(event.title as LocalizedField, locale);
         const description = getLocalized(event.description as LocalizedField, locale);
         const recipientEmail = decryptPII(reg.email);
-        // Con l'iscrizione pubblica spenta il link dell'email e' anche la
-        // prova d'identita' (lib/events/registration-link).
+        // Il link dell'email e' anche la prova che l'indirizzo e' di chi lo
+        // apre (lib/events/registration-link).
         const joinUrl = registrationJoinUrl({
           baseUrl,
           slug: event.slug,
           eventId: event.id,
           accessToken: reg.accessToken,
           locale,
-          viaEmailEntry: !settings.publicRegistrationEnabled,
+          viaEmailEntry: true,
+          bindsIdentity: !settings.publicRegistrationEnabled,
         });
         const eventPageUrl = localizedUrl(baseUrl, `/events/${event.slug}`, locale);
 

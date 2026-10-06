@@ -3074,7 +3074,9 @@
       "optionLabel": "Option",
       "erasureCtaTitle": "Möchten Sie Ihre Daten löschen?",
       "erasureCtaBody": "Sie können die vollständige Löschung der mit Ihrer E-Mail-Adresse verknüpften Daten beantragen (Art. 17 GDPR).",
-      "erasureCtaButton": "Löschung beantragen"
+      "erasureCtaButton": "Löschung beantragen",
+      "photoTitle": "Profilfoto",
+      "photoBody": "Hochgeladen am {date}. Andere Teilnehmende sehen es statt deiner Initialen. Du kannst es im Warteraum einer Veranstaltung oder durch Löschen deiner Daten entfernen."
     },
     "erasure": {
       "title": "Löschung Ihrer Daten",
@@ -3957,7 +3959,22 @@
     "enterAnyway": "Trotzdem beitreten",
     "notHeldBadge": "Zeit abgelaufen",
     "notHeldTitle": "Die geplante Zeit der Veranstaltung ist vorbei",
-    "notHeldDetail": "Der Raum wurde nicht geöffnet. Aktuelle Informationen finden Sie auf der Veranstaltungsseite."
+    "notHeldDetail": "Der Raum wurde nicht geöffnet. Aktuelle Informationen finden Sie auf der Veranstaltungsseite.",
+    "photo": {
+      "title": "Dein Foto",
+      "help": "Optional: Im Raum sehen andere es statt deiner Initialen, auch bei späteren Veranstaltungen, für die du dich mit dieser E-Mail anmeldest. Du kannst es jederzeit entfernen.",
+      "choose": "Foto auswählen",
+      "change": "Foto ändern",
+      "remove": "Entfernen",
+      "saving": "Wird gespeichert…",
+      "saved": "Foto gespeichert: Andere sehen es, sobald du den Raum betrittst.",
+      "removed": "Foto entfernt.",
+      "errors": {
+        "tooLarge": "Das Foto ist auch verkleinert zu groß: Versuche ein anderes.",
+        "invalid": "Diese Datei ist kein JPEG-, PNG- oder WebP-Foto."
+      },
+      "verifyHint": "Um ein Foto hinzuzufügen, öffne in diesem Browser den persönlichen Link aus deiner E-Mail: So zeigst du, dass die Adresse dir gehört."
+    }
   },
   "recording": {
     "management": "Videoaufzeichnung",

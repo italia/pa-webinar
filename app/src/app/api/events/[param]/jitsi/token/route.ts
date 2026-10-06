@@ -18,9 +18,9 @@ import {
   guestJitsiId,
 } from '@/lib/auth/jwt';
 import { decryptPII, encryptPII, tryDecryptPII } from '@/lib/crypto/pii';
+import { findPhotoByEmailHash, profilePhotoUrl } from '@/lib/profile-photo';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
-import { cookies } from 'next/headers';
-import { verifyEventAccess, eventAccessCookieName } from '@/lib/event-session';
+import { readOwnedEventAccess } from '@/lib/event-session';
 import { guestAccessAllowed } from '@/lib/events/guest-window';
 import { hasJoinGrant } from '@/lib/events/join-grant';
 
@@ -160,12 +160,8 @@ export const POST = withErrorHandling(async (request, context) => {
     // this same token. A non-owner still gets in (possessing the shared token
     // authorizes entry), but under THEIR OWN typed name and a fresh guest
     // identity — never the registrant's name, slot, or recording consent.
-    const cookieStore = await cookies();
-    const ownsToken =
-      (await verifyEventAccess(
-        event.id,
-        cookieStore.get(eventAccessCookieName(event.id))?.value,
-      )) === accessToken;
+    const accesso = await readOwnedEventAccess(event.id);
+    const ownsToken = accesso?.token === accessToken;
 
     if (!ownsToken) {
       const typedName = displayNameOverride?.trim();
@@ -230,12 +226,19 @@ export const POST = withErrorHandling(async (request, context) => {
       displayName: name,
       registrationId: registration.id,
     });
+    // La foto vale per l'indirizzo in tutti gli eventi: si mostra solo a chi
+    // ha provato che l'indirizzo e' suo aprendo il link dell'email. Iscriversi
+    // con l'indirizzo di un altro non ne fa indossare la foto.
+    const fotoIscritto = accesso?.emailVerified
+      ? await findPhotoByEmailHash(registration.emailHash)
+      : null;
     const jwt = await generateJitsiJwt({
       roomName: event.jitsiRoomName,
       displayName: name,
       uniqueId: postoIscritto,
       isModerator: false,
       email,
+      photoUrl: fotoIscritto ? profilePhotoUrl(fotoIscritto) : null,
       // La scelta è dell'amministratore, e la legge il chiamante: il minter del
       // token resta puro (vedi JitsiTokenPayload.useGravatar).
       useGravatar: (await getSettings()).gravatarEnabled,

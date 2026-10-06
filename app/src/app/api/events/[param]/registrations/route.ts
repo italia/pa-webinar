@@ -202,7 +202,7 @@ export const POST = withErrorHandling(async (request, context) => {
       await sendConfirmationEmail({
         registrationId: registrazione.id,
         locale,
-        joinUrl: registrationJoinUrl({ ...link, viaEmailEntry: true }),
+        joinUrl: registrationJoinUrl({ ...link, viaEmailEntry: true, bindsIdentity: true }),
         calendarJoinUrl: registrationJoinUrl({ ...link, viaEmailEntry: false }),
         eventPageUrl: localizedUrl(baseUrl, `/events/${slug}`, locale),
       });
@@ -220,11 +220,16 @@ export const POST = withErrorHandling(async (request, context) => {
 
   const joinUrl = localizedUrl(baseUrl, `/events/${slug}/live?token=${accessToken}`, pageLocale);
   const eventPageUrl = localizedUrl(baseUrl, `/events/${slug}`, pageLocale);
+  const link = { baseUrl, slug, eventId: event.id, accessToken, locale: pageLocale };
 
+  // Nell'email il link firmato: aperto da questo browser, prova anche che
+  // l'indirizzo e' suo (lib/events/registration-link). La risposta qui sotto
+  // resta senza firma: il modulo non prova niente sull'indirizzo.
   await sendConfirmationEmail({
     registrationId: registration.id,
     locale: pageLocale,
-    joinUrl,
+    joinUrl: registrationJoinUrl({ ...link, viaEmailEntry: true }),
+    calendarJoinUrl: registrationJoinUrl({ ...link, viaEmailEntry: false }),
     eventPageUrl,
   });
 

@@ -3074,7 +3074,9 @@
       "optionLabel": "Alternativ",
       "erasureCtaTitle": "Vill du radera dina uppgifter?",
       "erasureCtaBody": "Du kan begära fullständig radering av de uppgifter som är kopplade till din e-postadress (GDPR art. 17).",
-      "erasureCtaButton": "Begär radering"
+      "erasureCtaButton": "Begär radering",
+      "photoTitle": "Profilbild",
+      "photoBody": "Uppladdad {date}. Andra deltagare ser den i stället för dina initialer. Du kan ta bort den i ett evenemangs väntrum eller genom att radera dina uppgifter."
     },
     "erasure": {
       "title": "Radering av dina uppgifter",
@@ -3957,7 +3959,22 @@
     "enterAnyway": "Gå in ändå",
     "notHeldBadge": "Tiden har passerat",
     "notHeldTitle": "Den planerade tiden för evenemanget har passerat",
-    "notHeldDetail": "Rummet öppnades inte. Se evenemangets sida för eventuella uppdateringar."
+    "notHeldDetail": "Rummet öppnades inte. Se evenemangets sida för eventuella uppdateringar.",
+    "photo": {
+      "title": "Ditt foto",
+      "help": "Valfritt: i salen ser andra det i stället för dina initialer, även vid senare evenemang du anmäler dig till med den här e-postadressen. Du kan ta bort det när du vill.",
+      "choose": "Välj ett foto",
+      "change": "Byt foto",
+      "remove": "Ta bort",
+      "saving": "Sparar…",
+      "saved": "Fotot sparat: andra ser det när du går in i salen.",
+      "removed": "Fotot borttaget.",
+      "errors": {
+        "tooLarge": "Fotot är för stort även förminskat: prova ett annat.",
+        "invalid": "Filen är inte ett JPEG-, PNG- eller WebP-foto."
+      },
+      "verifyHint": "Öppna den personliga länken i ditt e-postmeddelande i den här webbläsaren för att lägga till ett foto: då vet vi att adressen är din."
+    }
   },
   "recording": {
     "management": "Videoinspelning",

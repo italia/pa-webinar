@@ -99,13 +99,21 @@ describe('POST registrations — iscrizione pubblica', () => {
     expect(tx.eventInvitation.findFirst).not.toHaveBeenCalled();
   });
 
-  it('accesa: token, link e cookie nella risposta; nell\'email il link della sala', async () => {
+  it("accesa: token, link e cookie nella risposta; nell'email il link firmato", async () => {
     const res = await iscriviti('anna@example.com');
     const body = (await res.json()) as { accessToken: string; joinUrl: string };
     expect(body.accessToken).toBeTruthy();
     expect(body.joinUrl).toContain(`/live?token=${body.accessToken}`);
+    // La firma prova che l'indirizzo e' di chi apre l'email: non esce mai
+    // nella risposta al modulo.
+    expect(body.joinUrl).not.toContain('sig=');
     expect(res.headers.get('Set-Cookie')).toContain(`event_access_${EVENT_ID}=`);
-    expect(linkEmail().pathname).toBe(`/it/eventi/${SLUG}/live`);
+    const link = linkEmail();
+    expect(link.pathname).toBe(`/api/events/${SLUG}/registrations/enter`);
+    expect(link.searchParams.get('token')).toBe(body.accessToken);
+    // Iscrizione pubblica: la firma che prova l'indirizzo, non quella che lega.
+    expect(link.searchParams.get('proof')).toBeTruthy();
+    expect(link.searchParams.get('sig')).toBeNull();
   });
 
   it('accesa: un indirizzo già iscritto riceve «già iscritto»', async () => {

@@ -3074,7 +3074,9 @@
       "optionLabel": "Option",
       "erasureCtaTitle": "Want to delete your data?",
       "erasureCtaBody": "You can request full erasure of the data tied to your email (GDPR Art. 17).",
-      "erasureCtaButton": "Request erasure"
+      "erasureCtaButton": "Request erasure",
+      "photoTitle": "Profile photo",
+      "photoBody": "Uploaded on {date}. Other attendees see it instead of your initials. You can remove it from an event’s waiting room or by erasing your data."
     },
     "erasure": {
       "title": "Erase your data",
@@ -3957,7 +3959,22 @@
     "enterAnyway": "Enter anyway",
     "notHeldBadge": "Time passed",
     "notHeldTitle": "The scheduled time for this event has passed",
-    "notHeldDetail": "The room was not opened. Check the event page for any updates."
+    "notHeldDetail": "The room was not opened. Check the event page for any updates.",
+    "photo": {
+      "title": "Your photo",
+      "help": "Optional: in the room others see it instead of your initials, also at later events you register for with this email. You can remove it any time.",
+      "choose": "Choose a photo",
+      "change": "Change photo",
+      "remove": "Remove",
+      "saving": "Saving…",
+      "saved": "Photo saved: others will see it when you join the room.",
+      "removed": "Photo removed.",
+      "errors": {
+        "tooLarge": "The photo is too large even when reduced: try another one.",
+        "invalid": "This file is not a JPEG, PNG or WebP photo."
+      },
+      "verifyHint": "To add a photo, open the personal link you received by email in this browser: that shows the address is yours."
+    }
   },
   "recording": {
     "management": "Video recording",

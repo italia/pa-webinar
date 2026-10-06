@@ -6289,3 +6289,100 @@ html.live-resizing .live-sidebar-resizer::after {
     color: #5A6772;
   }
 }
+
+// ── Foto profilo in sala d'attesa ──
+
+.profile-photo {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 1rem;
+  padding: 12px 14px;
+  border: 1px solid #E3E9EF;
+  border-radius: 12px;
+  background: #FAFBFC;
+}
+
+.profile-photo__preview {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  overflow: hidden;
+  color: #fff;
+  font-size: 1.05rem;
+  font-weight: 700;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.profile-photo__body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.profile-photo__title {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #17324D;
+}
+
+.profile-photo__help {
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: #5A6772;
+}
+
+.profile-photo__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 6px;
+
+}
+
+// Il pulsante e' un'etichetta del campo file: le regole delle etichette dei
+// moduli di Bootstrap Italia (posizione, colore, dimensione) vanno annullate.
+.profile-photo .profile-photo__pick {
+  position: static;
+  display: inline-flex;
+  align-items: center;
+  height: 34px;
+  margin: 0;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 8px;
+  background: #0066CC;
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1;
+  transform: none;
+  cursor: pointer;
+
+  &:hover { background: #004D99; color: #fff; }
+  &.is-busy { opacity: 0.6; pointer-events: none; }
+}
+
+// Il campo file e' nascosto: il fuoco va mostrato sull'etichetta-pulsante.
+.profile-photo__actions input:focus-visible + label {
+  outline: 2px solid #0066CC;
+  outline-offset: 2px;
+}
+
+.profile-photo__msg {
+  font-size: 0.8rem;
+  font-weight: 600;
+
+  &--ok { color: #00663F; }
+  &--errore { color: #A1112E; }
+}

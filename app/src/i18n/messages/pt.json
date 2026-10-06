@@ -3074,7 +3074,9 @@
       "optionLabel": "Opção",
       "erasureCtaTitle": "Pretende eliminar os seus dados?",
       "erasureCtaBody": "Pode solicitar a eliminação completa dos dados associados ao seu endereço de email (Art.º 17 do GDPR).",
-      "erasureCtaButton": "Solicitar eliminação"
+      "erasureCtaButton": "Solicitar eliminação",
+      "photoTitle": "Foto de perfil",
+      "photoBody": "Carregada em {date}. Os outros participantes veem-na em vez das suas iniciais. Pode removê-la na sala de espera de um evento ou apagando os seus dados."
     },
     "erasure": {
       "title": "Eliminação dos seus dados",
@@ -3957,7 +3959,22 @@
     "enterAnyway": "Entrar mesmo assim",
     "notHeldBadge": "Hora ultrapassada",
     "notHeldTitle": "A hora prevista do evento já passou",
-    "notHeldDetail": "A sala não foi aberta. Consulte a página do evento para eventuais atualizações."
+    "notHeldDetail": "A sala não foi aberta. Consulte a página do evento para eventuais atualizações.",
+    "photo": {
+      "title": "A sua fotografia",
+      "help": "Opcional: na sala os outros veem-na em vez das suas iniciais, também nos eventos seguintes em que se inscrever com este email. Pode removê-la quando quiser.",
+      "choose": "Escolher fotografia",
+      "change": "Mudar fotografia",
+      "remove": "Remover",
+      "saving": "A guardar…",
+      "saved": "Fotografia guardada: os outros vão vê-la quando entrar na sala.",
+      "removed": "Fotografia removida.",
+      "errors": {
+        "tooLarge": "A fotografia é demasiado pesada mesmo reduzida: experimente outra.",
+        "invalid": "Este ficheiro não é uma fotografia JPEG, PNG ou WebP."
+      },
+      "verifyHint": "Para adicionar uma foto, abra neste navegador o link pessoal que recebeu por e-mail: assim confirma que o endereço é seu."
+    }
   },
   "recording": {
     "management": "Gravação de vídeo",

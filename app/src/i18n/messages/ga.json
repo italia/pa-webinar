@@ -3074,7 +3074,9 @@
       "optionLabel": "Rogha",
       "erasureCtaTitle": "Ar mhaith libh bhur gcuid sonraí a scriosadh?",
       "erasureCtaBody": "Is féidir libh scriosadh iomlán na sonraí a bhaineann le bhur seoladh ríomhphoist a iarraidh (Airteagal 17 de GDPR).",
-      "erasureCtaButton": "Iarr scriosadh"
+      "erasureCtaButton": "Iarr scriosadh",
+      "photoTitle": "Grianghraf próifíle",
+      "photoBody": "Uaslódáilte ar {date}. Feiceann rannpháirtithe eile é in áit do cheannlitreacha. Is féidir leat é a bhaint i seomra feithimh imeachta nó trí do shonraí a scriosadh."
     },
     "erasure": {
       "title": "Scriosadh bhur gcuid sonraí",
@@ -3957,7 +3959,22 @@
     "enterAnyway": "Téigh isteach mar sin féin",
     "notHeldBadge": "Tá an t-am thart",
     "notHeldTitle": "Tá an t-am sceidealaithe don imeacht thart",
-    "notHeldDetail": "Níor osclaíodh an seomra. Féach ar leathanach an imeachta le haghaidh aon nuashonruithe."
+    "notHeldDetail": "Níor osclaíodh an seomra. Féach ar leathanach an imeachta le haghaidh aon nuashonruithe.",
+    "photo": {
+      "title": "Do ghrianghraf",
+      "help": "Roghnach: sa seomra feiceann daoine eile é in ionad do cheannlitreacha, ag imeachtaí ina dhiaidh sin freisin a gcláraíonn tú leis an ríomhphost seo. Is féidir leat é a bhaint am ar bith.",
+      "choose": "Roghnaigh grianghraf",
+      "change": "Athraigh an grianghraf",
+      "remove": "Bain",
+      "saving": "Á shábháil…",
+      "saved": "Grianghraf sábháilte: feicfidh daoine eile é nuair a thagann tú isteach sa seomra.",
+      "removed": "Grianghraf bainte.",
+      "errors": {
+        "tooLarge": "Tá an grianghraf rómhór fiú nuair a laghdaítear é: bain triail as ceann eile.",
+        "invalid": "Ní grianghraf JPEG, PNG ná WebP an comhad seo."
+      },
+      "verifyHint": "Chun grianghraf a chur leis, oscail sa bhrabhsálaí seo an nasc pearsanta a fuair tú ar ríomhphost: léiríonn sé sin gur leatsa an seoladh."
+    }
   },
   "recording": {
     "management": "Taifeadadh físe",

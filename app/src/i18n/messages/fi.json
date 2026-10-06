@@ -3074,7 +3074,9 @@
       "optionLabel": "Vaihtoehto",
       "erasureCtaTitle": "Haluatko poistaa tietosi?",
       "erasureCtaBody": "Voit pyytää kaikkien sähköpostiosoitteeseesi liittyvien tietojen poistamista (GDPR:n 17 artikla).",
-      "erasureCtaButton": "Pyydä poistoa"
+      "erasureCtaButton": "Pyydä poistoa",
+      "photoTitle": "Profiilikuva",
+      "photoBody": "Ladattu {date}. Muut osallistujat näkevät sen nimikirjaintesi sijaan. Voit poistaa sen tapahtuman odotushuoneessa tai poistamalla tietosi."
     },
     "erasure": {
       "title": "Tietojesi poistaminen",
@@ -3957,7 +3959,22 @@
     "enterAnyway": "Siirry silti sisään",
     "notHeldBadge": "Aika on mennyt",
     "notHeldTitle": "Tapahtuman suunniteltu aika on mennyt",
-    "notHeldDetail": "Salia ei avattu. Tarkista mahdolliset päivitykset tapahtuman sivulta."
+    "notHeldDetail": "Salia ei avattu. Tarkista mahdolliset päivitykset tapahtuman sivulta.",
+    "photo": {
+      "title": "Kuvasi",
+      "help": "Valinnainen: salissa muut näkevät sen nimikirjaintesi sijaan, myös myöhemmissä tilaisuuksissa, joihin ilmoittaudut tällä sähköpostilla. Voit poistaa sen milloin tahansa.",
+      "choose": "Valitse kuva",
+      "change": "Vaihda kuva",
+      "remove": "Poista",
+      "saving": "Tallennetaan…",
+      "saved": "Kuva tallennettu: muut näkevät sen, kun tulet saliin.",
+      "removed": "Kuva poistettu.",
+      "errors": {
+        "tooLarge": "Kuva on liian suuri pienennettynäkin: kokeile toista.",
+        "invalid": "Tiedosto ei ole JPEG-, PNG- tai WebP-kuva."
+      },
+      "verifyHint": "Lisää kuva avaamalla sähköpostiisi tullut henkilökohtainen linkki tässä selaimessa: se osoittaa, että osoite on sinun."
+    }
   },
   "recording": {
     "management": "Videotallenne",

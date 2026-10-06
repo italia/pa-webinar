@@ -19,6 +19,7 @@ vi.mock('@/lib/db', () => ({
   prisma: {
     person: { deleteMany: vi.fn() },
     eventInvitation: { deleteMany: vi.fn() },
+    profilePhoto: { deleteMany: vi.fn() },
     registration: { findMany: vi.fn() },
     chatMessage: { findMany: vi.fn() },
     gdprAuditLog: { create: vi.fn() },
@@ -42,6 +43,7 @@ type Fn = ReturnType<typeof vi.fn>;
 const db = prisma as unknown as {
   person: { deleteMany: Fn };
   eventInvitation: { deleteMany: Fn };
+  profilePhoto: { deleteMany: Fn };
   registration: { findMany: Fn };
   chatMessage: { findMany: Fn };
   gdprAuditLog: { create: Fn };
@@ -62,6 +64,7 @@ beforeEach(() => {
   vi.clearAllMocks();
   db.person.deleteMany.mockResolvedValue({ count: 1 });
   db.eventInvitation.deleteMany.mockResolvedValue({ count: 2 });
+  db.profilePhoto.deleteMany.mockResolvedValue({ count: 1 });
   db.chatMessage.findMany.mockResolvedValue([]);
   db.gdprAuditLog.create.mockResolvedValue({});
   db.$transaction.mockImplementation(async (fn: (t: typeof tx) => unknown) => fn(tx));
@@ -84,6 +87,7 @@ describe('POST /api/gdpr/erasure', () => {
       deleted: 1,
       addressBookDeleted: true,
       invitationsDeleted: 2,
+      profilePhotoDeleted: true,
       feedbackDeleted: 1,
       questionnaireResponsesDeleted: 1,
       chatMessagesDeleted: 3,
@@ -144,7 +148,10 @@ describe('POST /api/gdpr/erasure', () => {
       deleted: 0,
       addressBookDeleted: true,
       invitationsDeleted: 2,
+      profilePhotoDeleted: true,
     });
+    // La foto e' legata all'email: va via anche senza iscrizioni.
+    expect(db.profilePhoto.deleteMany).toHaveBeenCalledWith({ where: { emailHash: 'h'.repeat(64) } });
   });
 
   it('touches nothing with an invalid token', async () => {

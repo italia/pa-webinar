@@ -13,6 +13,8 @@ vi.mock('@/lib/db', () => ({
   prisma: {
     event: { findMany: vi.fn(), findFirst: vi.fn(), update: vi.fn() },
     staffLoginToken: { deleteMany: vi.fn(async () => ({ count: 0 })) },
+    $executeRaw: vi.fn(async () => 0),
+    registration: { deleteMany: vi.fn(), findMany: vi.fn(async (): Promise<unknown[]> => []) },
     emailOutbox: {
       deleteMany: vi.fn(async () => ({ count: 0 })),
       updateMany: vi.fn(async () => ({ count: 0 })),
@@ -33,7 +35,6 @@ vi.mock('@/lib/db', () => ({
     wordCloudRound: { deleteMany: vi.fn() },
     reminderSent: { deleteMany: vi.fn() },
     eventReminder: { deleteMany: vi.fn() },
-    registration: { deleteMany: vi.fn() },
     multitrackConsent: { deleteMany: vi.fn() },
     reaction: { deleteMany: vi.fn() },
     agendaItemReaction: { deleteMany: vi.fn() },
@@ -92,7 +93,8 @@ const db = prisma as unknown as {
   question: { deleteMany: Mock };
   poll: { deleteMany: Mock };
   questionnaireResponse: { deleteMany: Mock };
-  registration: { deleteMany: Mock };
+  registration: { deleteMany: Mock; findMany: Mock };
+  $executeRaw: Mock;
   multitrackConsent: { deleteMany: Mock };
   reaction: { deleteMany: Mock };
   agendaItemReaction: { deleteMany: Mock };
@@ -195,6 +197,7 @@ describe('GET /api/cron/cleanup', () => {
         ? await (arg as (tx: unknown) => Promise<unknown>)(prisma)
         : await Promise.all(arg as Promise<unknown>[])
     );
+    db.$executeRaw.mockResolvedValue(0);
     deleteRecordingBlobMock.mockResolvedValue(true);
     deleteBlobMock.mockResolvedValue(true);
     isAzureConfiguredMock.mockReturnValue(true);
@@ -863,6 +866,25 @@ describe('GET /api/cron/cleanup', () => {
       pollsDeleted: 0,
       recordingBlobsDeleted: 0,
       materialBlobsDeleted: 0,
+      profilePhotosDeleted: 0,
     });
   });
+
+  it('foto profilo: una sola DELETE per le vecchie senza iscrizioni', async () => {
+    stubEventQueries({});
+    db.$executeRaw.mockResolvedValue(3);
+    const body = await (await runCleanup()).json();
+    const chiamata = db.$executeRaw.mock.calls.find((c: unknown[]) =>
+      String((c[0] as TemplateStringsArray).join('?')).includes('profile_photos'),
+    );
+    expect(chiamata).toBeDefined();
+    const sql = (chiamata![0] as TemplateStringsArray).join('?');
+    expect(sql).toContain('NOT EXISTS');
+    expect(sql).toContain('"registrations"');
+    const limite = chiamata![1] as Date;
+    expect(Date.now() - limite.getTime()).toBeGreaterThan(29 * 86_400_000);
+    expect(body.profilePhotosDeleted).toBe(3);
+  });
+
 });
+

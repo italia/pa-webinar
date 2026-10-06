@@ -2395,3 +2395,22 @@ model LiveAction {
   @@index([eventId, at])
   @@map("live_actions")
 }
+
+// La foto che una persona ha scelto di mostrare in sala (riquadro della
+// chiamata, elenco dei partecipanti), legata all'email tramite il suo hash, mai
+// l'indirizzo: torna negli eventi successivi a cui si iscrive con la stessa
+// email, dopo averne aperto il link. La carica e la toglie lei dalla sala
+// d'attesa; la cancellano anche «I miei dati» e il cleanup, quando di
+// quell'email non resta nessuna iscrizione. Piccola per costruzione (il
+// server la ricodifica in JPEG 256x256 senza metadati), quindi sta qui e non
+// nello storage dei file. Ogni foto nuova e' una riga nuova, con un id nuovo.
+model ProfilePhoto {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  emailHash   String   @unique @map("email_hash")
+  contentType String   @map("content_type") @db.VarChar(32)
+  bytes       Bytes
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("profile_photos")
+}

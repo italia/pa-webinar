@@ -3074,7 +3074,9 @@
       "optionLabel": "Opcija",
       "erasureCtaTitle": "Želite li izbrisati svoje podatke?",
       "erasureCtaBody": "Možete zatražiti potpuno brisanje podataka povezanih s vašom email adresom (čl. 17 GDPR-a).",
-      "erasureCtaButton": "Zatraži brisanje"
+      "erasureCtaButton": "Zatraži brisanje",
+      "photoTitle": "Profilna fotografija",
+      "photoBody": "Učitano {date}. Ostali sudionici vide je umjesto vaših inicijala. Možete je ukloniti u čekaonici događaja ili brisanjem svojih podataka."
     },
     "erasure": {
       "title": "Brisanje vaših podataka",
@@ -3957,7 +3959,22 @@
     "enterAnyway": "Svejedno uđi",
     "notHeldBadge": "Vrijeme je prošlo",
     "notHeldTitle": "Predviđeno vrijeme događaja je prošlo",
-    "notHeldDetail": "Soba nije otvorena. Provjeri stranicu događaja za eventualne novosti."
+    "notHeldDetail": "Soba nije otvorena. Provjeri stranicu događaja za eventualne novosti.",
+    "photo": {
+      "title": "Vaša fotografija",
+      "help": "Neobavezno: u dvorani je drugi vide umjesto vaših inicijala, i na sljedećim događajima na koje se prijavite ovom e-poštom. Možete je ukloniti kad god želite.",
+      "choose": "Odaberite fotografiju",
+      "change": "Promijeni fotografiju",
+      "remove": "Ukloni",
+      "saving": "Spremanje…",
+      "saved": "Fotografija spremljena: drugi će je vidjeti kad uđete u dvoranu.",
+      "removed": "Fotografija uklonjena.",
+      "errors": {
+        "tooLarge": "Fotografija je prevelika i nakon smanjivanja: pokušajte s drugom.",
+        "invalid": "Ova datoteka nije fotografija JPEG, PNG ili WebP."
+      },
+      "verifyHint": "Za dodavanje fotografije u ovom pregledniku otvorite osobnu poveznicu iz e-pošte: tako potvrđujete da je adresa vaša."
+    }
   },
   "recording": {
     "management": "Video snimka",

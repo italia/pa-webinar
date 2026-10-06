@@ -3074,7 +3074,9 @@
       "optionLabel": "Variantas",
       "erasureCtaTitle": "Norite ištrinti savo duomenis?",
       "erasureCtaBody": "Galite paprašyti visiškai ištrinti su jūsų el. pašto adresu susietus duomenis (GDPR 17 straipsnis).",
-      "erasureCtaButton": "Prašyti ištrinti"
+      "erasureCtaButton": "Prašyti ištrinti",
+      "photoTitle": "Profilio nuotrauka",
+      "photoBody": "Įkelta {date}. Kiti dalyviai ją mato vietoj jūsų inicialų. Ją galite pašalinti renginio laukiamajame arba ištrindami savo duomenis."
     },
     "erasure": {
       "title": "Jūsų duomenų ištrynimas",
@@ -3957,7 +3959,22 @@
     "enterAnyway": "Vis tiek įeiti",
     "notHeldBadge": "Laikas praėjo",
     "notHeldTitle": "Numatytas renginio laikas jau praėjo",
-    "notHeldDetail": "Salė nebuvo atidaryta. Naujienų ieškok renginio puslapyje."
+    "notHeldDetail": "Salė nebuvo atidaryta. Naujienų ieškok renginio puslapyje.",
+    "photo": {
+      "title": "Jūsų nuotrauka",
+      "help": "Neprivaloma: salėje kiti ją mato vietoj jūsų inicialų, taip pat vėlesniuose renginiuose, į kuriuos registruojatės šiuo el. paštu. Galite ją bet kada pašalinti.",
+      "choose": "Pasirinkti nuotrauką",
+      "change": "Keisti nuotrauką",
+      "remove": "Pašalinti",
+      "saving": "Saugoma…",
+      "saved": "Nuotrauka išsaugota: kiti ją matys, kai įeisite į salę.",
+      "removed": "Nuotrauka pašalinta.",
+      "errors": {
+        "tooLarge": "Nuotrauka per didelė net sumažinus: pabandykite kitą.",
+        "invalid": "Šis failas nėra JPEG, PNG ar WebP nuotrauka."
+      },
+      "verifyHint": "Norėdami pridėti nuotrauką, šioje naršyklėje atidarykite el. paštu gautą asmeninę nuorodą: taip patvirtinsite, kad adresas jūsų."
+    }
   },
   "recording": {
     "management": "Vaizdo įrašas",

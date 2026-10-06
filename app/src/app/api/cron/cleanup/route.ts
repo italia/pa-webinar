@@ -24,6 +24,9 @@ import {
   staffInactiveDeactivateDays,
 } from '@/lib/gdpr/log-retention';
 
+/** Giorni senza iscrizioni dopo cui una foto profilo si cancella. */
+const PROFILE_PHOTO_GRACE_DAYS = 30;
+
 export const dynamic = 'force-dynamic';
 
 /**
@@ -503,6 +506,24 @@ export const GET = withErrorHandling(async (request) => {
     }
   }
 
+  // ── Foto profilo ──
+  // La foto e' legata all'email, non a un evento: resta finche' di
+  // quell'email c'e' un'iscrizione (le iscrizioni vanno via con la
+  // conservazione dei loro eventi). Senza iscrizioni, e non aggiornata da
+  // PROFILE_PHOTO_GRACE_DAYS, si cancella. Una sola istruzione: quante che
+  // siano le foto, nessun elenco passa dall'applicazione.
+  let profilePhotosDeleted = 0;
+  try {
+    const limite = new Date(now.getTime() - PROFILE_PHOTO_GRACE_DAYS * 86_400_000);
+    profilePhotosDeleted = await prisma.$executeRaw`
+      DELETE FROM "profile_photos" p
+      WHERE p."updated_at" < ${limite}
+        AND NOT EXISTS (SELECT 1 FROM "registrations" r WHERE r."email_hash" = p."email_hash")`;
+  } catch (err) {
+    console.error('[cron/cleanup] Failed to purge profile photos:', err);
+    failures.push('profile-photos');
+  }
+
   // ── Coda delle email ──
   // Una riga inviata o fallita conserva destinatario, testo (con i link
   // personali) e allegato .ics: non serve piu' a nulla dopo la conservazione.
@@ -578,6 +599,7 @@ export const GET = withErrorHandling(async (request) => {
       staffLoginLinksDeleted: staffLinks.count,
       staffAccountsDeactivated: staffDeactivated,
       emailOutboxDeleted: outboxDeleted,
+      profilePhotosDeleted,
       emailOutboxScrubbed: outboxScrubbed,
       auditLogRowsScrubbed: auditScrubbed,
       tempRecordingsCleaned: tempRecordingEvents.length,

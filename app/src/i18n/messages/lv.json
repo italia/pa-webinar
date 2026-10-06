@@ -3074,7 +3074,9 @@
       "optionLabel": "Variants",
       "erasureCtaTitle": "Vai vēlaties dzēst savus datus?",
       "erasureCtaBody": "Varat pieprasīt ar jūsu e-pasta adresi saistīto datu pilnīgu dzēšanu (GDPR 17. pants).",
-      "erasureCtaButton": "Pieprasīt dzēšanu"
+      "erasureCtaButton": "Pieprasīt dzēšanu",
+      "photoTitle": "Profila fotoattēls",
+      "photoBody": "Augšupielādēts {date}. Citi dalībnieki to redz tavu iniciāļu vietā. To var noņemt pasākuma uzgaidāmajā telpā vai dzēšot savus datus."
     },
     "erasure": {
       "title": "Jūsu datu dzēšana",
@@ -3957,7 +3959,22 @@
     "enterAnyway": "Tomēr ienākt",
     "notHeldBadge": "Laiks ir pagājis",
     "notHeldTitle": "Pasākuma plānotais laiks ir pagājis",
-    "notHeldDetail": "Telpa netika atvērta. Jaunumus meklē pasākuma lapā."
+    "notHeldDetail": "Telpa netika atvērta. Jaunumus meklē pasākuma lapā.",
+    "photo": {
+      "title": "Jūsu foto",
+      "help": "Pēc izvēles: zālē citi to redz jūsu iniciāļu vietā, arī turpmākajos pasākumos, kuros reģistrējaties ar šo e-pastu. To var noņemt jebkurā laikā.",
+      "choose": "Izvēlēties foto",
+      "change": "Mainīt foto",
+      "remove": "Noņemt",
+      "saving": "Saglabā…",
+      "saved": "Foto saglabāts: citi to redzēs, kad ienāksiet zālē.",
+      "removed": "Foto noņemts.",
+      "errors": {
+        "tooLarge": "Foto ir pārāk liels arī samazināts: mēģiniet citu.",
+        "invalid": "Šis fails nav JPEG, PNG vai WebP foto."
+      },
+      "verifyHint": "Lai pievienotu fotoattēlu, šajā pārlūkā atver personīgo saiti, ko saņēmi e-pastā: tā redzams, ka adrese ir tava."
+    }
   },
   "recording": {
     "management": "Video ieraksts",

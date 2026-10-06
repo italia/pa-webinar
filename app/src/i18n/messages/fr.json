@@ -3074,7 +3074,9 @@
       "optionLabel": "Option",
       "erasureCtaTitle": "Vous souhaitez effacer vos données ?",
       "erasureCtaBody": "Vous pouvez demander l'effacement complet des données associées à votre adresse e-mail (Art. 17 du GDPR).",
-      "erasureCtaButton": "Demander l'effacement"
+      "erasureCtaButton": "Demander l'effacement",
+      "photoTitle": "Photo de profil",
+      "photoBody": "Téléversée le {date}. Les autres participants la voient à la place de vos initiales. Vous pouvez la retirer depuis la salle d’attente d’un événement ou en effaçant vos données."
     },
     "erasure": {
       "title": "Effacement de vos données",
@@ -3957,7 +3959,22 @@
     "enterAnyway": "Entrer quand même",
     "notHeldBadge": "Horaire dépassé",
     "notHeldTitle": "L'horaire prévu de l'événement est dépassé",
-    "notHeldDetail": "La salle n'a pas été ouverte. Consultez la page de l'événement pour d'éventuelles mises à jour."
+    "notHeldDetail": "La salle n'a pas été ouverte. Consultez la page de l'événement pour d'éventuelles mises à jour.",
+    "photo": {
+      "title": "Votre photo",
+      "help": "Facultative : dans la salle, les autres la voient à la place de vos initiales, y compris aux événements suivants auxquels vous vous inscrivez avec cette adresse. Vous pouvez la retirer à tout moment.",
+      "choose": "Choisir une photo",
+      "change": "Changer de photo",
+      "remove": "Retirer",
+      "saving": "Enregistrement…",
+      "saved": "Photo enregistrée : les autres la verront quand vous entrerez dans la salle.",
+      "removed": "Photo retirée.",
+      "errors": {
+        "tooLarge": "La photo est trop lourde même réduite : essayez-en une autre.",
+        "invalid": "Ce fichier n'est pas une photo JPEG, PNG ou WebP."
+      },
+      "verifyHint": "Pour ajouter une photo, ouvrez dans ce navigateur le lien personnel reçu par e-mail : cela montre que l’adresse est la vôtre."
+    }
   },
   "recording": {
     "management": "Enregistrement vidéo",

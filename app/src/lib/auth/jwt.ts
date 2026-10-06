@@ -79,11 +79,16 @@ interface JitsiTokenPayload {
    * sito, e renderebbe impuri gli unit test di questo modulo.
    */
   useGravatar?: boolean;
+  /**
+   * La foto che la persona ha caricato (indirizzo assoluto del portale, vedi
+   * lib/profile-photo): vince su Gravatar e sulle iniziali.
+   */
+  photoUrl?: string | null;
 }
 
 /** L'origin pubblico dell'app, o null se non è un URL http(s) assoluto (nel
  *  qual caso l'avatar resta il data URI invece di diventare un link rotto). */
-function absoluteAppUrl(): string | null {
+export function absoluteAppUrl(): string | null {
   const url = appBaseUrl();
   return url ? `${url.origin}${url.pathname.replace(/\/$/, '')}` : null;
 }
@@ -147,6 +152,8 @@ export async function generateJitsiJwt(
       avatarUrl = `${base}/api/avatar?${q.toString()}`;
     }
   }
+  // La foto caricata vince: e' quella che la persona ha scelto di mostrare.
+  if (payload.photoUrl) avatarUrl = payload.photoUrl;
 
   const jwt = await new SignJWT({
     context: {

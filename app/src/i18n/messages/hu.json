@@ -3074,7 +3074,9 @@
       "optionLabel": "Lehetőség",
       "erasureCtaTitle": "Szeretné törölni az adatait?",
       "erasureCtaBody": "Kérheti az e-mail címéhez társított adatok teljes törlését (GDPR 17. cikk).",
-      "erasureCtaButton": "Törlés kérése"
+      "erasureCtaButton": "Törlés kérése",
+      "photoTitle": "Profilkép",
+      "photoBody": "Feltöltve: {date}. A többi résztvevő a monogramod helyett ezt látja. Egy esemény várótermében vagy az adataid törlésével távolíthatod el."
     },
     "erasure": {
       "title": "Az Ön adatainak törlése",
@@ -3957,7 +3959,22 @@
     "enterAnyway": "Belépés ennek ellenére",
     "notHeldBadge": "Lejárt időpont",
     "notHeldTitle": "Az esemény tervezett időpontja már elmúlt",
-    "notHeldDetail": "A terem nem nyílt meg. Az esetleges frissítéseket az esemény oldalán találod."
+    "notHeldDetail": "A terem nem nyílt meg. Az esetleges frissítéseket az esemény oldalán találod.",
+    "photo": {
+      "title": "A fotód",
+      "help": "Nem kötelező: a teremben a többiek a monogramod helyett ezt látják, a későbbi eseményeken is, amelyekre ezzel az e-mail-címmel jelentkezel. Bármikor eltávolíthatod.",
+      "choose": "Fotó kiválasztása",
+      "change": "Fotó cseréje",
+      "remove": "Eltávolítás",
+      "saving": "Mentés…",
+      "saved": "Fotó mentve: a többiek akkor látják, amikor belépsz a terembe.",
+      "removed": "Fotó eltávolítva.",
+      "errors": {
+        "tooLarge": "A fotó kicsinyítve is túl nagy: próbálj egy másikat.",
+        "invalid": "Ez a fájl nem JPEG, PNG vagy WebP fotó."
+      },
+      "verifyHint": "Fotó hozzáadásához ebben a böngészőben nyisd meg az e-mailben kapott személyes linket: így igazolod, hogy a cím a tiéd."
+    }
   },
   "recording": {
     "management": "Videofelvétel",

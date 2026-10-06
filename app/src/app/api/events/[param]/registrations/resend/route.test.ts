@@ -23,7 +23,7 @@ vi.mock('@/lib/email/confirmation', () => ({ sendConfirmationEmail: vi.fn() }));
 
 import { prisma } from '@/lib/db';
 import { sendConfirmationEmail } from '@/lib/email/confirmation';
-import { verifyRegistrationEntry } from '@/lib/events/registration-link';
+import { verifyRegistrationEntry, verifyRegistrationProof } from '@/lib/events/registration-link';
 
 import { POST } from './route';
 
@@ -66,12 +66,14 @@ beforeEach(() => {
 });
 
 describe('POST registrations/resend', () => {
-  it('iscrizione aperta: rimanda il link della sala', async () => {
+  it("iscrizione aperta: rimanda il link firmato (prova dell'indirizzo)", async () => {
     const res = await rimanda('anna@example.com');
     expect(res.status).toBe(200);
     const link = linkEmail();
-    expect(link.pathname).toBe(`/it/eventi/${SLUG}/live`);
+    expect(link.pathname).toBe(`/api/events/${SLUG}/registrations/enter`);
     expect(link.searchParams.get('token')).toBe(TOKEN);
+    expect(verifyRegistrationProof(EVENT_ID, TOKEN, link.searchParams.get('proof') ?? '')).toBe(true);
+    expect(link.searchParams.get('sig')).toBeNull();
   });
 
   it("iscrizione pubblica spenta: rimanda il link firmato della rotta d'ingresso", async () => {

@@ -3074,7 +3074,9 @@
       "optionLabel": "Valgmulighed",
       "erasureCtaTitle": "Vil du slette dine data?",
       "erasureCtaBody": "Du kan anmode om fuld sletning af de data, der er tilknyttet din e-mailadresse (GDPR art. 17).",
-      "erasureCtaButton": "Anmod om sletning"
+      "erasureCtaButton": "Anmod om sletning",
+      "photoTitle": "Profilbillede",
+      "photoBody": "Uploadet {date}. Andre deltagere ser det i stedet for dine initialer. Du kan fjerne det i et arrangements venteværelse eller ved at slette dine data."
     },
     "erasure": {
       "title": "Sletning af dine data",
@@ -3957,7 +3959,22 @@
     "enterAnyway": "Gå ind alligevel",
     "notHeldBadge": "Tidspunktet er passeret",
     "notHeldTitle": "Det planlagte tidspunkt for begivenheden er passeret",
-    "notHeldDetail": "Rummet blev ikke åbnet. Se begivenhedens side for eventuelle opdateringer."
+    "notHeldDetail": "Rummet blev ikke åbnet. Se begivenhedens side for eventuelle opdateringer.",
+    "photo": {
+      "title": "Dit foto",
+      "help": "Valgfrit: i salen ser de andre det i stedet for dine initialer, også ved senere arrangementer, du tilmelder dig med denne e-mail. Du kan fjerne det når som helst.",
+      "choose": "Vælg et foto",
+      "change": "Skift foto",
+      "remove": "Fjern",
+      "saving": "Gemmer…",
+      "saved": "Foto gemt: de andre ser det, når du går ind i salen.",
+      "removed": "Foto fjernet.",
+      "errors": {
+        "tooLarge": "Fotoet er for stort, selv når det er formindsket: prøv et andet.",
+        "invalid": "Filen er ikke et JPEG-, PNG- eller WebP-foto."
+      },
+      "verifyHint": "Åbn det personlige link fra din e-mail i denne browser for at tilføje et foto: så ved vi, at adressen er din."
+    }
   },
   "recording": {
     "management": "Videooptagelse",

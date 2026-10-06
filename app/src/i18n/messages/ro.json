@@ -3074,7 +3074,9 @@
       "optionLabel": "Opțiune",
       "erasureCtaTitle": "Doriți să vă ștergeți datele?",
       "erasureCtaBody": "Puteți solicita ștergerea completă a datelor asociate adresei dumneavoastră de email (Art. 17 din GDPR).",
-      "erasureCtaButton": "Solicitați ștergerea"
+      "erasureCtaButton": "Solicitați ștergerea",
+      "photoTitle": "Fotografie de profil",
+      "photoBody": "Încărcată pe {date}. Ceilalți participanți o văd în locul inițialelor tale. O poți elimina din sala de așteptare a unui eveniment sau ștergându-ți datele."
     },
     "erasure": {
       "title": "Ștergerea datelor dumneavoastră",
@@ -3957,7 +3959,22 @@
     "enterAnyway": "Intră oricum",
     "notHeldBadge": "Ora a trecut",
     "notHeldTitle": "Ora programată a evenimentului a trecut",
-    "notHeldDetail": "Sala nu a fost deschisă. Verifică pagina evenimentului pentru eventuale noutăți."
+    "notHeldDetail": "Sala nu a fost deschisă. Verifică pagina evenimentului pentru eventuale noutăți.",
+    "photo": {
+      "title": "Fotografia ta",
+      "help": "Opțională: în sală ceilalți o văd în locul inițialelor tale, și la evenimentele următoare la care te înscrii cu acest e-mail. O poți elimina oricând.",
+      "choose": "Alege o fotografie",
+      "change": "Schimbă fotografia",
+      "remove": "Elimină",
+      "saving": "Se salvează…",
+      "saved": "Fotografie salvată: ceilalți o vor vedea când intri în sală.",
+      "removed": "Fotografie eliminată.",
+      "errors": {
+        "tooLarge": "Fotografia este prea mare chiar și redusă: încearcă alta.",
+        "invalid": "Acest fișier nu este o fotografie JPEG, PNG sau WebP."
+      },
+      "verifyHint": "Pentru a adăuga o fotografie, deschide în acest browser linkul personal primit pe e-mail: așa confirmi că adresa este a ta."
+    }
   },
   "recording": {
     "management": "Înregistrare video",

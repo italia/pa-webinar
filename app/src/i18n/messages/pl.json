@@ -3074,7 +3074,9 @@
       "optionLabel": "Opcja",
       "erasureCtaTitle": "Chcesz usunąć swoje dane?",
       "erasureCtaBody": "Możesz złożyć wniosek o całkowite usunięcie danych powiązanych z Twoim adresem e-mail (art. 17 GDPR).",
-      "erasureCtaButton": "Zażądaj usunięcia"
+      "erasureCtaButton": "Zażądaj usunięcia",
+      "photoTitle": "Zdjęcie profilowe",
+      "photoBody": "Przesłano {date}. Inni uczestnicy widzą je zamiast Twoich inicjałów. Możesz je usunąć w poczekalni wydarzenia lub usuwając swoje dane."
     },
     "erasure": {
       "title": "Usunięcie Twoich danych",
@@ -3957,7 +3959,22 @@
     "enterAnyway": "Wejdź mimo to",
     "notHeldBadge": "Czas minął",
     "notHeldTitle": "Zaplanowany czas wydarzenia już minął",
-    "notHeldDetail": "Sala nie została otwarta. Sprawdź stronę wydarzenia, czy są nowe informacje."
+    "notHeldDetail": "Sala nie została otwarta. Sprawdź stronę wydarzenia, czy są nowe informacje.",
+    "photo": {
+      "title": "Twoje zdjęcie",
+      "help": "Opcjonalne: na sali inni widzą je zamiast twoich inicjałów, także na kolejnych wydarzeniach, na które zapiszesz się tym adresem e-mail. Możesz je usunąć w dowolnej chwili.",
+      "choose": "Wybierz zdjęcie",
+      "change": "Zmień zdjęcie",
+      "remove": "Usuń",
+      "saving": "Zapisywanie…",
+      "saved": "Zdjęcie zapisane: inni zobaczą je, gdy wejdziesz na salę.",
+      "removed": "Zdjęcie usunięte.",
+      "errors": {
+        "tooLarge": "Zdjęcie jest za duże nawet po zmniejszeniu: spróbuj innego.",
+        "invalid": "Ten plik nie jest zdjęciem JPEG, PNG ani WebP."
+      },
+      "verifyHint": "Aby dodać zdjęcie, otwórz w tej przeglądarce osobisty link z e-maila: to potwierdza, że adres należy do Ciebie."
+    }
   },
   "recording": {
     "management": "Nagranie wideo",

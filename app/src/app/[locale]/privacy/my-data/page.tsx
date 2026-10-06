@@ -6,7 +6,7 @@ import {
   useEffect,
   type FormEvent,
 } from 'react';
-import { useTranslations, useLocale } from 'next-intl';
+import { useFormatter, useTranslations, useLocale } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import {
   Button,
@@ -72,6 +72,9 @@ export default function MyDataPage() {
   const [error, setError] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [results, setResults] = useState<ExportEntry[] | null>(null);
+  // La foto profilo e' dell'indirizzo, non di un'iscrizione: arriva a parte.
+  const [photo, setPhoto] = useState<{ uploadedAt: string; dataUrl: string } | null>(null);
+  const format = useFormatter();
 
   // When the user lands here via the signed link emailed to them, the
   // URL carries ?t=<token>. We then fetch the data directly.
@@ -103,6 +106,7 @@ export default function MyDataPage() {
         }
         const json = await res.json();
         setResults(json.data);
+        setPhoto(json.profilePhoto ?? null);
       } catch {
         if (!cancelled) setError(t('error'));
       } finally {
@@ -233,7 +237,30 @@ export default function MyDataPage() {
             </Alert>
           )}
 
-          {results !== null && results.length === 0 && (
+          {photo && (
+            <Card className="shadow-sm border-0 mb-3" style={{ borderRadius: 8 }}>
+              <CardBody className="p-4 d-flex gap-3 align-items-center">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={photo.dataUrl}
+                  alt={t('photoTitle')}
+                  width={72}
+                  height={72}
+                  style={{ borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }}
+                />
+                <div>
+                  <h2 className="h5 mb-1">{t('photoTitle')}</h2>
+                  <p className="mb-0 text-muted" style={{ fontSize: '0.9rem' }}>
+                    {t('photoBody', {
+                      date: format.dateTime(new Date(photo.uploadedAt), { dateStyle: 'long' }),
+                    })}
+                  </p>
+                </div>
+              </CardBody>
+            </Card>
+          )}
+
+          {results !== null && results.length === 0 && !photo && (
             <Alert color="info">
               <Icon icon="it-info-circle" className="me-2" />
               {t('noData')}

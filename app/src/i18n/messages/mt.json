@@ -3074,7 +3074,9 @@
       "optionLabel": "Għażla",
       "erasureCtaTitle": "Trid tħassar id-dejta tiegħek?",
       "erasureCtaBody": "Tista' titlob it-tħassir sħiħ tad-dejta assoċjata mal-indirizz email tiegħek (Art. 17 tal-GDPR).",
-      "erasureCtaButton": "Itlob it-tħassir"
+      "erasureCtaButton": "Itlob it-tħassir",
+      "photoTitle": "Ritratt tal-profil",
+      "photoBody": "Imtella’ fil-{date}. Il-parteċipanti l-oħra jarawh minflok l-inizjali tiegħek. Tista’ tneħħih mis-sala tal-istennija ta’ avveniment jew billi tħassar id-data tiegħek."
     },
     "erasure": {
       "title": "Tħassir tad-dejta tiegħek",
@@ -3957,7 +3959,22 @@
     "enterAnyway": "Idħol xorta",
     "notHeldBadge": "Il-ħin għadda",
     "notHeldTitle": "Il-ħin ippjanat għall-avveniment għadda",
-    "notHeldDetail": "Is-sala ma nfetħitx. Iċċekkja l-paġna tal-avveniment għal xi aġġornamenti."
+    "notHeldDetail": "Is-sala ma nfetħitx. Iċċekkja l-paġna tal-avveniment għal xi aġġornamenti.",
+    "photo": {
+      "title": "Ir-ritratt tiegħek",
+      "help": "Fakultattiv: fis-sala l-oħrajn jarawh minflok l-inizjali tiegħek, anki f'avvenimenti oħra li tirreġistra għalihom b'din l-email. Tista' tneħħih meta trid.",
+      "choose": "Agħżel ritratt",
+      "change": "Ibdel ir-ritratt",
+      "remove": "Neħħi",
+      "saving": "Qed jissejvja…",
+      "saved": "Ritratt issejvjat: l-oħrajn jarawh meta tidħol fis-sala.",
+      "removed": "Ritratt imneħħi.",
+      "errors": {
+        "tooLarge": "Ir-ritratt huwa kbir wisq anki mċekken: ipprova ieħor.",
+        "invalid": "Dan il-fajl mhuwiex ritratt JPEG, PNG jew WebP."
+      },
+      "verifyHint": "Biex iżżid ritratt, iftaħ f’dan il-brawżer il-link personali li rċevejt bl-email: hekk jidher li l-indirizz huwa tiegħek."
+    }
   },
   "recording": {
     "management": "Reġistrazzjoni bil-vidjo",

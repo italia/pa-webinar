@@ -3074,7 +3074,9 @@
       "optionLabel": "Možnosť",
       "erasureCtaTitle": "Chcete vymazať svoje údaje?",
       "erasureCtaBody": "Môžete požiadať o úplné vymazanie údajov spojených s vašou e-mailovou adresou (čl. 17 GDPR).",
-      "erasureCtaButton": "Požiadať o vymazanie"
+      "erasureCtaButton": "Požiadať o vymazanie",
+      "photoTitle": "Profilová fotka",
+      "photoBody": "Nahraté {date}. Ostatní účastníci ju vidia namiesto vašich iniciál. Odstrániť ju môžete v čakárni podujatia alebo vymazaním svojich údajov."
     },
     "erasure": {
       "title": "Vymazanie vašich údajov",
@@ -3957,7 +3959,22 @@
     "enterAnyway": "Vstúpiť napriek tomu",
     "notHeldBadge": "Čas uplynul",
     "notHeldTitle": "Plánovaný čas podujatia už uplynul",
-    "notHeldDetail": "Miestnosť nebola otvorená. Prípadné novinky nájdete na stránke podujatia."
+    "notHeldDetail": "Miestnosť nebola otvorená. Prípadné novinky nájdete na stránke podujatia.",
+    "photo": {
+      "title": "Vaša fotka",
+      "help": "Nepovinná: v sále ju ostatní uvidia namiesto vašich iniciál, aj na ďalších podujatiach, na ktoré sa prihlásite s týmto e-mailom. Môžete ju kedykoľvek odstrániť.",
+      "choose": "Vybrať fotku",
+      "change": "Zmeniť fotku",
+      "remove": "Odstrániť",
+      "saving": "Ukladá sa…",
+      "saved": "Fotka uložená: ostatní ju uvidia, keď vstúpite do sály.",
+      "removed": "Fotka odstránená.",
+      "errors": {
+        "tooLarge": "Fotka je príliš veľká aj po zmenšení: skúste inú.",
+        "invalid": "Tento súbor nie je fotka JPEG, PNG ani WebP."
+      },
+      "verifyHint": "Ak chcete pridať fotku, otvorte v tomto prehliadači osobný odkaz z e-mailu: tým overíte, že adresa je vaša."
+    }
   },
   "recording": {
     "management": "Videozáznam",

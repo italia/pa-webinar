@@ -1,10 +1,12 @@
 // @vitest-environment node
 /**
- * Il link personale dell'email quando l'iscrizione pubblica è spenta.
+ * Il link personale dell'email.
  *
- * Con la firma giusta il browser che lo apre diventa quello dell'iscritto (il
- * cookie `event_access`); in ogni altro caso va comunque nella sala con il
- * solo token, come un link inoltrato, e nessuna risposta distingue un token
+ * Con l'iscrizione pubblica spenta e la firma giusta il browser che lo apre
+ * diventa quello dell'iscritto (il cookie `event_access`, con la prova
+ * dell'email); con l'iscrizione pubblica accesa solo il browser che si era
+ * iscritto riceve la prova. In ogni altro caso si va comunque nella sala con
+ * il solo token, come un link inoltrato, e nessuna risposta distingue un token
  * esistente da uno inventato.
  */
 import type { NextRequest } from 'next/server';
@@ -17,9 +19,19 @@ vi.mock('@/lib/db', () => ({
   },
 }));
 
+const impostazioni = vi.hoisted(() => ({ publicRegistrationEnabled: false }));
+vi.mock('@/lib/settings', () => ({ getSettings: vi.fn(async () => impostazioni) }));
+
+const barattolo = vi.hoisted(() => ({ cookie: undefined as string | undefined }));
+vi.mock('next/headers', () => ({
+  cookies: async () => ({
+    get: () => (barattolo.cookie ? { value: barattolo.cookie } : undefined),
+  }),
+}));
+
 import { prisma } from '@/lib/db';
-import { verifyEventAccess } from '@/lib/event-session';
-import { signRegistrationEntry } from '@/lib/events/registration-link';
+import { readEventAccess, signEventAccess, verifyEventAccess } from '@/lib/event-session';
+import { signRegistrationEntry, signRegistrationProof } from '@/lib/events/registration-link';
 
 import { GET } from './route';
 
@@ -56,6 +68,8 @@ function cookieAccesso(res: Response): string | undefined {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  impostazioni.publicRegistrationEnabled = false;
+  barattolo.cookie = undefined;
   vi.mocked(prisma.event.findUnique).mockResolvedValue({
     id: EVENT_ID,
     endsAt: new Date(Date.now() + 3_600_000),
@@ -81,6 +95,40 @@ describe('GET registrations/enter', () => {
     // Lo stesso cookie che si riceve iscrivendosi: la sala e il token Jitsi
     // lo riconoscono come il proprietario del token.
     await expect(verifyEventAccess(EVENT_ID, cookieAccesso(res))).resolves.toBe(TOKEN);
+    // Aperto dall'email: la casella e' di chi apre.
+    await expect(readEventAccess(EVENT_ID, cookieAccesso(res))).resolves.toEqual({
+      token: TOKEN,
+      emailVerified: true,
+    });
+  });
+
+  it("link `sig` partito su invito: lega l'identita' anche se poi l'iscrizione diventa pubblica", async () => {
+    impostazioni.publicRegistrationEnabled = true;
+    const res = await apri({ token: TOKEN, sig: signRegistrationEntry(EVENT_ID, TOKEN) });
+    await expect(verifyEventAccess(EVENT_ID, cookieAccesso(res))).resolves.toBe(TOKEN);
+  });
+
+  it("link `proof`: un browser nuovo entra con il solo token, quello che si e' iscritto riceve la prova", async () => {
+    const proof = signRegistrationProof(EVENT_ID, TOKEN);
+    // Le due firme non si scambiano.
+    expect(proof).not.toBe(signRegistrationEntry(EVENT_ID, TOKEN));
+    const scambiata = await apri({ token: TOKEN, sig: proof });
+    expect(scambiata.headers.get('Set-Cookie')).toBeNull();
+
+    const nuovo = await apri({ token: TOKEN, proof });
+    expect(nuovo.status).toBe(303);
+    expect(nuovo.headers.get('Set-Cookie')).toBeNull();
+
+    barattolo.cookie = await signEventAccess(EVENT_ID, TOKEN, 3600);
+    await expect(readEventAccess(EVENT_ID, barattolo.cookie)).resolves.toEqual({
+      token: TOKEN,
+      emailVerified: false,
+    });
+    const suo = await apri({ token: TOKEN, proof });
+    await expect(readEventAccess(EVENT_ID, cookieAccesso(suo))).resolves.toEqual({
+      token: TOKEN,
+      emailVerified: true,
+    });
   });
 
   it('senza lingua nel link: quella dell\'iscrizione', async () => {
