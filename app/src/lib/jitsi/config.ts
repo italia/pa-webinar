@@ -8,11 +8,15 @@
  * Chat and reactions are handled by custom components in the app sidebar
  * and as a floating overlay, so they are excluded from the Jitsi toolbar.
  *
- * NOTE: Theme (customTheme), watermark, and branding settings are applied
- * server-side via Jitsi's _custom_config_js and _custom_interface_config_js
- * in the Helm values — NOT here. The IFrame API ignores customTheme and
- * dynamicBrandingUrl when passed via configOverwrite.
+ * NOTE: the IFrame API ignores customTheme and dynamicBrandingUrl when passed
+ * via configOverwrite. The stage colour is set here (DEFAULT_BACKGROUND, which
+ * the interfaceConfig whitelist accepts); the tile colours, avatar colours and
+ * stage pattern come from the dynamic-branding document
+ * (/api/jitsi-branding.json), which the Jitsi server reads only when its own
+ * config points at it (DYNAMIC_BRANDING_URL). See lib/jitsi/branding.
  */
+
+import { JITSI_STAGE_BACKGROUND } from './branding';
 
 /**
  * Toolbars carry NO native 'hangup' — for ANY role. Jitsi's own hangup
@@ -209,6 +213,10 @@ export const jitsiConfigOverwrite = {
  * Interface config overrides passed as `interfaceConfigOverwrite`.
  */
 export const jitsiInterfaceConfigOverwrite = {
+  // La scena dietro ai video e ai riquadri senza telecamera: il blu della sala
+  // invece del nero di Jitsi (lib/jitsi/branding). Vale anche dove il server
+  // Jitsi non legge il documento di branding.
+  DEFAULT_BACKGROUND: JITSI_STAGE_BACKGROUND,
   SHOW_JITSI_WATERMARK: false,
   SHOW_WATERMARK_FOR_GUESTS: false,
   SHOW_BRAND_WATERMARK: false,

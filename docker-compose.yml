@@ -136,6 +136,8 @@ services:
       - JWT_ACCEPTED_AUDIENCES=jitsi
       - ENABLE_GUESTS=0
       - PUBLIC_URL=https://localhost:8443
+      # La filigrana e i colori della scena, dal portale (lo legge il browser).
+      - DYNAMIC_BRANDING_URL=${JITSI_BRANDING_URL:-http://localhost:3000/api/jitsi-branding.json}
       - TZ=Europe/Rome
       - XMPP_DOMAIN=meet.jitsi
       - XMPP_BOSH_URL_BASE=http://prosody:5280

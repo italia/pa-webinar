@@ -1,5 +1,14 @@
 import { getSettings } from '@/lib/settings';
 import { appBaseUrl } from '@/lib/env';
+import {
+  JITSI_AVATAR_BACKGROUNDS,
+  JITSI_STAGE_BACKGROUND,
+  JITSI_STAGE_SVG,
+  JITSI_SURFACE,
+  JITSI_SURFACE_RAISED,
+  JITSI_SURFACE_STRONG,
+  JITSI_TILE_BACKGROUND,
+} from '@/lib/jitsi/branding';
 
 const CORS_HEADERS = {
   'Cache-Control': 'public, s-maxage=300',
@@ -8,22 +17,8 @@ const CORS_HEADERS = {
   'Access-Control-Allow-Headers': 'Content-Type',
 };
 
-/**
- * Avatar background palette derived from Bootstrap Italia / Designers Italia:
- * primary-a8, analogue-1-a5, analogue-2-a7, complementary-1-a7,
- * complementary-3-a7, neutral-1-a5, analogue-1-a4, primary-b3, analogue-1-b3
- */
-const BI_AVATAR_BACKGROUNDS = [
-  '#004D99',
-  '#4B44CC',
-  '#08A19C',
-  '#B02E42',
-  '#00996B',
-  '#3D5A80',
-  '#6A50D3',
-  '#0077B6',
-  '#8B6AAF',
-];
+/** La filigrana come data URI: nessuna seconda richiesta fra domini. */
+const STAGE_IMAGE = `data:image/svg+xml;base64,${Buffer.from(JITSI_STAGE_SVG).toString('base64')}`;
 
 export async function OPTIONS() {
   return new Response(null, { status: 204, headers: CORS_HEADERS });
@@ -34,15 +29,32 @@ export async function GET() {
 
   return Response.json(
     {
-      backgroundColor: '#17324D',
-      premeetingBackground: 'radial-gradient(circle at 30% 40%, #17324D 0%, #0F1B2D 100%)',
-      backgroundImageUrl: '',
+      // Lo stesso colore dell'interfaceConfig (lib/jitsi/config): qui vince
+      // il branding, e i due non devono dire cose diverse.
+      backgroundColor: JITSI_STAGE_BACKGROUND,
+      backgroundImageUrl: STAGE_IMAGE,
+      premeetingBackground: `linear-gradient(135deg, ${JITSI_STAGE_BACKGROUND} 0%, #0059B3 100%)`,
+      // Le superfici di Jitsi nei blu della sala (lib/jitsi/branding): la
+      // striscia delle miniature (`uiBackground`), la barra dei controlli con
+      // menu e finestre (`ui01`), evidenziazioni e riquadri senza telecamera
+      // (`ui02`, `ui03`; `thumbnailBackground` dove la versione di Jitsi lo
+      // distingue), bordi e passaggi del mouse (`ui04`).
+      customTheme: {
+        palette: {
+          uiBackground: JITSI_STAGE_BACKGROUND,
+          ui01: JITSI_SURFACE,
+          ui02: JITSI_SURFACE_RAISED,
+          ui03: JITSI_SURFACE_RAISED,
+          ui04: JITSI_SURFACE_STRONG,
+          thumbnailBackground: JITSI_TILE_BACKGROUND,
+        },
+      },
       logoClickUrl: settings.organizationUrl || '',
-      logoImageUrl:
-        settings.jitsiWatermarkUrl ||
-        settings.logoUrl ||
-        '/images/default-watermark.svg',
-      avatarBackgrounds: BI_AVATAR_BACKGROUNDS,
+      // La filigrana di Jitsi resta spenta (SHOW_JITSI_WATERMARK); senza un
+      // logo scelto dall'amministratore non se ne indica nessuno, cosi' non
+      // compare nemmeno quello predefinito del server Jitsi.
+      logoImageUrl: settings.jitsiWatermarkUrl || settings.logoUrl || '',
+      avatarBackgrounds: JITSI_AVATAR_BACKGROUNDS,
       // Guardato: un NEXT_PUBLIC_APP_URL senza schema faceva 500 questa route.
       inviteDomain: appBaseUrl()?.hostname ?? '',
     },

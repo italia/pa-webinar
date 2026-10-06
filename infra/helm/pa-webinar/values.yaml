@@ -1137,6 +1137,17 @@ jitsi-meet:
       repository: ghcr.io/italia/pa-webinar-jitsi-web
       tag: stable-10741-rnnoise
       pullPolicy: Always
+    # Il documento di branding del portale: la filigrana della scena e i colori
+    # di barra dei controlli, menu, riquadri e avatar con le iniziali, intonati
+    # alla sala. Senza, la scena prende comunque il blu della sala (lo imposta
+    # il portale), il resto di Jitsi resta nei suoi grigi scuri. Spento per
+    # impostazione predefinita perché il chart non conosce l'indirizzo
+    # dell'app: si accende con l'indirizzo di `app.env.NEXT_PUBLIC_APP_URL`
+    # seguito da `/api/jitsi-branding.json`. Lo legge il browser di chi è in
+    # sala, quindi deve essere raggiungibile senza autenticazione.
+    extraEnvs:
+      DYNAMIC_BRANDING_URL: null
+      # DYNAMIC_BRANDING_URL: "https://videocall.example.com/api/jitsi-branding.json"
     # Solo richieste, come per Jicofo.
     resources:
       requests:
