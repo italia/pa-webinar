@@ -50,7 +50,11 @@ export const POST = withErrorHandling(async (request, context) => {
   const placement = rawPlacement as (typeof QUESTIONNAIRE_PLACEMENTS)[number];
 
   const ip = getClientIp(request);
-  const rl = rateLimit(`questionnaire:${ip}`, { limit: 10, windowMs: 60_000 });
+  // Alla chiusura il questionario arriva a tutti nello stesso momento, e un
+  // ufficio esce su internet da un solo indirizzo: con 10 al minuto chi
+  // rispondeva dopo i primi dieci colleghi perdeva la risposta. Il doppio
+  // invio lo ferma gia' la deduplica per persona.
+  const rl = rateLimit(`questionnaire:${ip}`, { limit: 60, windowMs: 60_000 });
   if (!rl.allowed) {
     throw new RateLimitError((rl.resetAt - Date.now()) / 1000);
   }
