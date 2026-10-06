@@ -20,6 +20,7 @@ import {
   RUNNING_STATUSES,
 } from '@/lib/status/event-activity';
 import { getJitsiHealth, type JitsiComponentHealth } from '@/lib/status/jitsi-health';
+import { cachedProbe } from '@/lib/status/probes';
 import { statusDataVisible } from '@/lib/status-page';
 import { getLocalized, resolveLocale, type LocalizedField } from '@/lib/utils/locale';
 
@@ -526,14 +527,30 @@ const upcomingSelect = {
   participantsCanStartVideo: true,
 } as const;
 
-export const GET = withErrorHandling(async (request) => {
-  const settings = await getSettings();
-  const provisioningTimeoutMinutes = settings.jvbProvisioningTimeoutMinutes ?? 15;
-  const pollIntervalSeconds = settings.statusPollIntervalSeconds ?? 30;
+/**
+ * Quanto si riusa la risposta. La sala live la chiede ogni 3 secondi da ogni
+ * persona in attesa e da ogni moderatore, e la risposta e' la stessa per tutti
+ * (cambia solo la lingua dei titoli): calcolarla a ogni richiesta voleva dire
+ * una decina di query per richiesta, moltiplicate per chi e' in sala.
+ */
+const STATUS_RESPONSE_TTL_MS = 3_000;
 
+export const GET = withErrorHandling(async (request) => {
+  const visible = await statusDataVisible();
+  // I titoli nella lingua di chi guarda (la pagina passa ?locale=).
+  const locale = resolveLocale(request);
+  const body = await cachedProbe(
+    visible ? `status-response:full:${locale}` : 'status-response:room',
+    () => (visible ? computeStatus(locale) : computeRoomStatus()),
+    STATUS_RESPONSE_TTL_MS,
+  );
+  return Response.json(body, { headers: { 'Cache-Control': 'no-store' } });
+});
+
+/** Stato di ponte e registratore per eventi con la registrazione accesa. */
+async function recordingContext(now: Date, provisioningTimeoutMinutes: number) {
   // Pull recording-enabled events in LIVE/PROVISIONING once; drive both the
   // "Jibri is expected to be up" signal and the stale-provisioning check.
-  const now = new Date();
   const staleCutoff = new Date(now.getTime() - provisioningTimeoutMinutes * 60 * 1000);
   const recordingEvents = await prisma.event.findMany({
     where: {
@@ -547,29 +564,41 @@ export const GET = withErrorHandling(async (request) => {
     const since = e.provisioningStartedAt ?? e.startsAt;
     return since <= staleCutoff;
   });
+  return { recordingEventIds, recordingStale };
+}
 
-  // Pagina di stato spenta dall'amministrazione (lib/status-page): la sala
-  // live continua a chiedere qui se il ponte video e il registratore sono
-  // pronti (lib/jitsi/bridge-readiness), e riceve quei valori e nient'altro —
-  // niente componenti, conteggi o prossimi eventi.
-  if (!(await statusDataVisible())) {
-    const [jvbSala, jibriSala] = await Promise.all([
-      getJvbStatus(settings, provisioningTimeoutMinutes),
-      getJibriStatus(recordingEventIds, recordingStale, provisioningTimeoutMinutes, now),
-    ]);
-    return Response.json(
-      {
-        metrics: {
-          jvbStatus: jvbSala.jvbStatus,
-          jvbParticipants: jvbSala.participants,
-          jvbStale: jvbSala.stale,
-          jibriStatus: jibriSala.jibriStatus,
-        },
-        lastChecked: now.toISOString(),
-      },
-      { headers: { 'Cache-Control': 'no-store' } },
-    );
-  }
+/**
+ * Pagina di stato spenta dall'amministrazione (lib/status-page): la sala
+ * live continua a chiedere qui se il ponte video e il registratore sono
+ * pronti (lib/jitsi/bridge-readiness), e riceve quei valori e nient'altro —
+ * niente componenti, conteggi o prossimi eventi.
+ */
+async function computeRoomStatus() {
+  const settings = await getSettings();
+  const provisioningTimeoutMinutes = settings.jvbProvisioningTimeoutMinutes ?? 15;
+  const now = new Date();
+  const { recordingEventIds, recordingStale } = await recordingContext(now, provisioningTimeoutMinutes);
+  const [jvbSala, jibriSala] = await Promise.all([
+    getJvbStatus(settings, provisioningTimeoutMinutes),
+    getJibriStatus(recordingEventIds, recordingStale, provisioningTimeoutMinutes, now),
+  ]);
+  return {
+    metrics: {
+      jvbStatus: jvbSala.jvbStatus,
+      jvbParticipants: jvbSala.participants,
+      jvbStale: jvbSala.stale,
+      jibriStatus: jibriSala.jibriStatus,
+    },
+    lastChecked: now.toISOString(),
+  };
+}
+
+async function computeStatus(locale: ReturnType<typeof resolveLocale>): Promise<SystemStatus> {
+  const settings = await getSettings();
+  const provisioningTimeoutMinutes = settings.jvbProvisioningTimeoutMinutes ?? 15;
+  const pollIntervalSeconds = settings.statusPollIntervalSeconds ?? 30;
+  const now = new Date();
+  const { recordingEventIds, recordingStale } = await recordingContext(now, provisioningTimeoutMinutes);
 
   const [db, jitsiHealth, smtp, redisHealth, jvb, jibriResult, orphanRecordingsPendingCount] = await Promise.all([
     checkDatabase(),
@@ -637,8 +666,6 @@ export const GET = withErrorHandling(async (request) => {
       }),
     ]);
   const upcomingEvents = [...runningEvents].sort(compareForStatusList).concat(futureEvents);
-  // I titoli nella lingua di chi guarda (la pagina passa ?locale=).
-  const locale = resolveLocale(request);
 
   const status: SystemStatus = {
     overall,
@@ -686,7 +713,5 @@ export const GET = withErrorHandling(async (request) => {
     lastChecked: now.toISOString(),
   };
 
-  return Response.json(status, {
-    headers: { 'Cache-Control': 'no-store' },
-  });
-});
+  return status;
+}
