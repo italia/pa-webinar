@@ -607,6 +607,10 @@
     "publisher": "Justin Ridgewell",
     "email": "justin@ridgewell.name"
   },
+  "@napi-rs/canvas@1.0.10": {
+    "licenses": "MIT",
+    "repository": "https://github.com/Brooooooklyn/canvas"
+  },
   "@next/env@15.5.25": {
     "licenses": "MIT",
     "repository": "https://github.com/vercel/next.js",
@@ -2923,6 +2927,10 @@
     "repository": "https://github.com/chaijs/pathval",
     "publisher": "Veselin Todorov",
     "email": "hi@vesln.com"
+  },
+  "pdfjs-dist@6.4.299": {
+    "licenses": "Apache-2.0",
+    "repository": "https://github.com/mozilla/pdf.js"
   },
   "perfect-debounce@1.0.0": {
     "licenses": "MIT",

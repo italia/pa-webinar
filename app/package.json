@@ -51,6 +51,7 @@
     "next": "^15.5.25",
     "next-intl": "^4.13.4",
     "nodemailer": "^10.0.13",
+    "pdfjs-dist": "^6.4.299",
     "prom-client": "^15.0.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
