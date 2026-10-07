@@ -9,7 +9,7 @@
  * collects the full form and POSTs on review.
  */
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
 import LocaleTabBar from '@/components/ui/locale-tab-bar';
@@ -21,7 +21,7 @@ import {
   type RecurrencePreset,
   type RecurrenceValue,
 } from '@/lib/utils/recurrence';
-import { fromDatetimeLocalInTz } from '@/lib/utils/date-format';
+import { fromDatetimeLocalInTz, toDatetimeLocalInTz } from '@/lib/utils/date-format';
 import { EVENT_DESCRIPTION_MIN_LENGTH } from '@/lib/validation/event-description';
 import type { VideoQualityPreset } from '@/lib/jitsi/config';
 
@@ -87,6 +87,8 @@ export default function Step1Base({
   siteDefaultVideoQuality,
 }: Props) {
   const t = useTranslations('admin.wizard.step1');
+  // Il testo del campo partecipanti mentre lo si scrive (null fuori dal campo).
+  const [maxText, setMaxText] = useState<string | null>(null);
   const tAdmin = useTranslations('admin');
   const [contentLocale, setContentLocale] = useState(defaultLocale);
   // Titolo e descrizione sono obbligatori solo nella lingua predefinita:
@@ -138,6 +140,35 @@ export default function Step1Base({
   } catch {
     dtstart = new Date();
   }
+
+  // La fine segue l'inizio, con la durata che l'evento aveva prima della
+  // modifica. Mentre si scrive nel campo si calcola all'uscita, non a ogni
+  // tasto: una data scritta a mano passa per valori intermedi (il giorno «1»
+  // prima del «15», l'anno «0202» prima del «2026») che falserebbero la
+  // durata. Un valore che arriva a campo non attivo (il selettore di data di
+  // alcuni browser toglie il fuoco al campo) si applica subito.
+  const allIngresso = useRef<{ startsAt: string; endsAt: string } | null>(null);
+  const fineDa = (prima: { startsAt: string; endsAt: string }, inizioNuovo: string) => {
+    if (prima.startsAt === inizioNuovo) return null;
+    try {
+      const durata =
+        fromDatetimeLocalInTz(prima.endsAt, value.timezone).getTime() -
+        fromDatetimeLocalInTz(prima.startsAt, value.timezone).getTime();
+      const inizio = fromDatetimeLocalInTz(inizioNuovo, value.timezone).getTime();
+      if (Number.isFinite(durata) && durata > 0 && Number.isFinite(inizio)) {
+        return toDatetimeLocalInTz(new Date(inizio + durata), value.timezone);
+      }
+    } catch {
+      /* data incompleta: la fine resta com'e' */
+    }
+    return null;
+  };
+  const fineCheSegue = () => {
+    const prima = allIngresso.current;
+    allIngresso.current = null;
+    const fine = prima ? fineDa(prima, value.startsAt) : null;
+    if (fine) onChange({ endsAt: fine });
+  };
 
   // When startsAt or preset changes, refresh the RRULE body so BYDAY etc stay in sync.
   const handleStartsAt = (next: string) => {
@@ -363,7 +394,22 @@ export default function Step1Base({
               type="datetime-local"
               className={`form-control ${fieldErrors.startsAt ? 'is-invalid' : ''}`}
               value={value.startsAt}
-              onChange={(e) => handleStartsAt(e.target.value)}
+              onFocus={() => {
+                allIngresso.current = { startsAt: value.startsAt, endsAt: value.endsAt };
+              }}
+              onChange={(e) => {
+                const aCampoAttivo = document.activeElement === e.target;
+                const prima = allIngresso.current ?? { startsAt: value.startsAt, endsAt: value.endsAt };
+                handleStartsAt(e.target.value);
+                if (aCampoAttivo) {
+                  allIngresso.current = prima;
+                } else {
+                  allIngresso.current = null;
+                  const fine = fineDa(prima, e.target.value);
+                  if (fine) onChange({ endsAt: fine });
+                }
+              }}
+              onBlur={fineCheSegue}
               required
             />
             {fieldErrors.startsAt && (
@@ -428,12 +474,20 @@ export default function Step1Base({
                 max={500}
                 className={`form-control ${fieldErrors.maxParticipants ? 'is-invalid' : ''}`}
                 style={{ maxWidth: 96 }}
-                value={value.maxParticipants}
+                // Mentre si scrive il campo tiene il testo cosi' com'e' (anche
+                // vuoto); il valore si riporta nei limiti all'uscita, non a ogni
+                // tasto: scrivendo «150» il primo «1» diventerebbe 2.
+                value={maxText ?? value.maxParticipants}
                 onChange={(e) => {
+                  setMaxText(e.target.value);
                   const raw = Number(e.target.value);
-                  if (!Number.isFinite(raw)) return;
-                  const clamped = Math.min(500, Math.max(2, Math.floor(raw)));
-                  onChange({ maxParticipants: clamped });
+                  if (e.target.value.trim() === '' || !Number.isFinite(raw)) return;
+                  onChange({ maxParticipants: Math.floor(raw) });
+                }}
+                onBlur={() => {
+                  setMaxText(null);
+                  const clamped = Math.min(500, Math.max(2, value.maxParticipants || 2));
+                  if (clamped !== value.maxParticipants) onChange({ maxParticipants: clamped });
                 }}
               />
             </div>

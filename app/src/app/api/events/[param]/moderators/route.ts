@@ -116,8 +116,8 @@ export const POST = withErrorHandling(async (request, context) => {
   });
 
   // Il link personale per email, con il testo del ruolo (co-moderatore o
-  // relatore): e' quello che il wizard e il pannello promettono. Una concessione
-  // nasce una volta sola, quindi parte una volta sola.
+  // relatore). Su un evento in bozza non parte qui ma alla pubblicazione
+  // (lib/email/moderator-link); in ogni caso una volta sola per concessione.
   if (parsed.data.email) {
     const { defaultLocale: predefinita } = await getSettings();
     await sendGrantModeratorLink(created.id, {

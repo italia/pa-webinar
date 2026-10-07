@@ -16,6 +16,7 @@ import { useTranslations } from 'next-intl';
 import EventConfigDiagram from '@/components/admin/event-config-diagram';
 import JvbCapacityPreview, { capacityWarnings } from '@/components/admin/jvb-capacity-preview';
 import FileOrUrlInput from '@/components/ui/file-or-url-input';
+import ToggleSwitch from '@/components/ui/toggle-switch';
 import { togglesFromMatrix } from '@/lib/utils/permission-matrix';
 import { MAX_RETENTION_DAYS } from '@/lib/validation/retention';
 import { describeRRule } from '@/lib/utils/recurrence';
@@ -54,6 +55,8 @@ interface Props {
   /** Il massimo per la conservazione: piu' alto del normale solo in modifica,
    *  per un evento gia' salvato cosi'. */
   retentionMax?: number;
+  /** In creazione: dire che i link partono alla pubblicazione. */
+  showLinksOnPublish?: boolean;
 }
 
 export default function Step5Review({
@@ -66,8 +69,10 @@ export default function Step5Review({
   fieldErrors = {},
   prefilledModeratorEmail = null,
   retentionMax = MAX_RETENTION_DAYS,
+  showLinksOnPublish = false,
 }: Props) {
   const t = useTranslations('admin.wizard.step5');
+  const tPost = useTranslations('postEvent');
   const toggles = togglesFromMatrix(form.permissionMatrix);
   // I dettagli tecnici sono ripiegati, ma un avviso di capacita' (bridge al
   // tetto, quota di partecipanti attivi ereditata su un evento grande) non
@@ -202,6 +207,7 @@ export default function Step5Review({
           }}
         >
           {t('moderatorLinkNote')}
+          {showLinksOnPublish && <> {t('linksOnPublish')}</>}
         </div>
         <div className="row g-3">
           <div className="col-md-6">
@@ -329,6 +335,16 @@ export default function Step5Review({
               onChange={(next) => onChange({ privacyPolicyUrl: next })}
               helpText={t('privacyDocHelp')}
             />
+          </div>
+          {/* La pagina dell'evento concluso: il template la decide (una
+              riunione di lavoro non e' pubblica), qui si cambia. */}
+          <div className="col-12">
+            <ToggleSwitch
+              label={tPost('pageVisible')}
+              checked={form.postEventPublic}
+              onChange={() => onChange({ postEventPublic: !form.postEventPublic })}
+            />
+            <small className="form-text text-muted d-block">{tPost('pageVisibleHelp')}</small>
           </div>
         </div>
       </section>

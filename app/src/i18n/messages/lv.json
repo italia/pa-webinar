@@ -784,7 +784,8 @@
           }
         },
         "recordingHeading": "Ierakstīšana",
-        "roomFeaturesHeading": "Telpas funkcijas"
+        "roomFeaturesHeading": "Telpas funkcijas",
+        "aiPipelineOff": "MI pēcapstrāde (transkripcija, kopsavilkums, tulkojumi) šajā instalācijā nav ieslēgta."
       },
       "step3": {
         "heading": "Personas un ielūgumi",
@@ -902,7 +903,8 @@
         "privacyDocHelp": "Augšupielādējiet PDF vai ielīmējiet alternatīva privātuma paziņojuma URL. Pārraksta VDAR veidni, ja iestatīts.",
         "privacyTextHelp": "Īss teksts, kas tiek rādīts reģistrācijas formā; var papildināt vai aizstāt VDAR veidni.",
         "technicalDetails": "Tehniskā informācija: ietilpība un resursi",
-        "retentionRange": "Ievadiet dienu skaitu no 1 līdz {max}."
+        "retentionRange": "Ievadiet dienu skaitu no 1 līdz {max}.",
+        "linksOnPublish": "Personiskās saites (galvenajam moderatoram, līdzmoderatoriem un runātājiem) tiek nosūtītas pa e-pastu, kad pasākums tiek publicēts. Kamēr tas ir melnraksts, nokopējiet tās no pasākuma lapas."
       },
       "validationFailed": "Pirms turpināt, pārbaudiet izceltos laukus.",
       "partialFailure": "Pasākums ir izveidots, taču dažus elementus neizdevās saglabāt: {items}. Tos varat pievienot pasākuma lapā.",
@@ -1301,7 +1303,6 @@
     "dateChangedNotification": "Datums tika mainīts. Reģistrētie dalībnieki tiks informēti e-pastā.",
     "eventCreated": "Pasākums veiksmīgi izveidots!",
     "createEventCta": "Organizēt pasākumu",
-    "createEventExplanation": "Izveidojiet savu pasākumu un saņemsiet saiti tā pārvaldībai.",
     "noAccountNeeded": "Konts nav nepieciešams — moderatora saite ir jūsu piekļuve pasākuma pārvaldībai.",
     "form": {
       "titleIt": "Nosaukums (itāliešu val.)",
@@ -1504,7 +1505,8 @@
       "prepareEmail": "Sagatavot e-pastu",
       "prepareEmailFor": "Sagatavot e-pastu: {name}",
       "prepareEmailSubject": "Jūsu saite uz “{title}”",
-      "prepareEmailBody": "Sveiki, {name}!\n\nŠeit ir jūsu personīgā saite uz “{title}”:\n{link}\n\nSaite ir tikai jums: nepārsūtiet un nekopīgojiet to."
+      "prepareEmailBody": "Sveiki, {name}!\n\nŠeit ir jūsu personīgā saite uz “{title}”:\n{link}\n\nSaite ir tikai jums: nepārsūtiet un nekopīgojiet to.",
+      "draftNote": "Pasākums ir melnraksts: saites tiek nosūtītas pa e-pastu, kad tas tiek publicēts. Pa to laiku varat tās nokopēt šeit."
     },
     "gdprAuditLog": {
       "title": "GDPR audita žurnāls",
@@ -1898,7 +1900,10 @@
       "aiTranslation": "Automātiskā tulkošana (noklusējums)",
       "pickerTitle": "Izvēlieties veidni",
       "pickerSubtitle": "Izvēlieties veidni, lai iepriekš konfigurētu pasākuma iestatījumus, vai izlaidiet, lai visu konfigurētu manuāli.",
-      "skipTemplate": "Konfigurēt manuāli"
+      "skipTemplate": "Konfigurēt manuāli",
+      "postEventPublic": "Publiska lapa pēc pasākuma",
+      "invalidFields": "Pārbaudiet šos laukus: {fields}.",
+      "descriptionOtherLanguages": "Ir arī versijas valodās: {languages}, kuras šeit nevar rediģēt. Ja maināt itāļu tekstu, tās tiek noņemtas."
     },
     "instantCall": {
       "title": "Tūlītējs video zvans",

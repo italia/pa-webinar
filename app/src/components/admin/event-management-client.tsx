@@ -636,7 +636,7 @@ export default function EventManagementClient({
             )}
             {activeTab === 'persone' && (
               <PeopleTab event={event} baseUrl={baseUrl} locale={locale} onExportCsv={exportCsv}
-                         canEditRegistrations={!viaToken} />
+                         canEditRegistrations={!viaToken} isDraft={status === 'DRAFT'} />
             )}
             {activeTab === 'contenuti' && <ContentTab event={event} staffTools={!viaToken} />}
             {activeTab === 'dopo' && (
@@ -1011,8 +1011,10 @@ function OverviewTab({ event, description, locale, editUrl, publicUrl, guestLive
   );
 }
 
-function PeopleTab({ event, baseUrl, locale, onExportCsv, canEditRegistrations }: {
+function PeopleTab({ event, baseUrl, locale, onExportCsv, canEditRegistrations, isDraft }: {
   event: EventData; baseUrl: string; locale: string; onExportCsv: () => void;
+  /** In bozza i link di co-moderatori e relatori partono alla pubblicazione. */
+  isDraft: boolean;
   /** Correzione e cancellazione delle iscrizioni: solo con una sessione dello
    *  staff, non con il solo link del moderatore. */
   canEditRegistrations: boolean;
@@ -1035,7 +1037,7 @@ function PeopleTab({ event, baseUrl, locale, onExportCsv, canEditRegistrations }
         <EventModeratorsPanel eventId={event.id} eventSlug={event.slug}
                               eventTitle={getLocalized(event.title as LocalizedField, locale)}
                               moderatorToken={event.moderatorToken}
-                              baseUrl={baseUrl} locale={locale} />
+                              baseUrl={baseUrl} locale={locale} isDraft={isDraft} />
       </div>
 
       <div>

@@ -908,7 +908,8 @@
           }
         },
         "recordingHeading": "Registrazione",
-        "roomFeaturesHeading": "Funzioni della stanza"
+        "roomFeaturesHeading": "Funzioni della stanza",
+        "aiPipelineOff": "La post-produzione AI (trascrizione, sintesi, traduzioni) non è attiva su questa installazione."
       },
       "step3": {
         "heading": "Persone e inviti",
@@ -1026,7 +1027,8 @@
         "privacyDocHelp": "Carica un PDF o incolla l'URL di un'informativa sostitutiva. Sovrascrive il template GDPR se presente.",
         "privacyTextHelp": "Testo sintetico mostrato nel form di registrazione; può integrare o sostituire il template GDPR.",
         "technicalDetails": "Dettagli tecnici: capacità e risorse",
-        "retentionRange": "Inserisci un numero di giorni fra 1 e {max}."
+        "retentionRange": "Inserisci un numero di giorni fra 1 e {max}.",
+        "linksOnPublish": "I link personali (moderatore principale, co-moderatori e relatori) partono per email quando l'evento viene pubblicato. Finché è una bozza si copiano dalla pagina dell'evento."
       },
       "validationFailed": "Controlla i campi evidenziati prima di procedere.",
       "partialFailure": "Evento creato, ma alcuni elementi non sono stati salvati: {items}. Puoi aggiungerli dalla pagina dell'evento.",
@@ -1425,7 +1427,6 @@
     "dateChangedNotification": "La data è stata modificata. I partecipanti registrati riceveranno una notifica via email.",
     "eventCreated": "Evento creato con successo!",
     "createEventCta": "Organizza un evento",
-    "createEventExplanation": "Crea il tuo evento e riceverai un link per gestirlo.",
     "noAccountNeeded": "Non serve un account — il link moderatore è il tuo accesso per gestire l'evento.",
     "form": {
       "titleIt": "Titolo (italiano)",
@@ -1628,7 +1629,8 @@
       "prepareEmail": "Prepara email",
       "prepareEmailFor": "Prepara un'email per {name}",
       "prepareEmailSubject": "Il tuo link per «{title}»",
-      "prepareEmailBody": "Ciao {name},\n\necco il tuo link personale per «{title}»:\n{link}\n\nIl link è solo per te: non inoltrarlo e non condividerlo."
+      "prepareEmailBody": "Ciao {name},\n\necco il tuo link personale per «{title}»:\n{link}\n\nIl link è solo per te: non inoltrarlo e non condividerlo.",
+      "draftNote": "L'evento è una bozza: i link partono per email quando viene pubblicato. Intanto puoi copiarli da qui."
     },
     "gdprAuditLog": {
       "title": "Registro GDPR",
@@ -2022,7 +2024,10 @@
       "aiTranslation": "Traduzione automatica (default)",
       "pickerTitle": "Scegli un template",
       "pickerSubtitle": "Seleziona un template per pre-configurare le impostazioni dell'evento, oppure salta per configurare tutto manualmente.",
-      "skipTemplate": "Configura manualmente"
+      "skipTemplate": "Configura manualmente",
+      "postEventPublic": "Pagina dopo l'evento pubblica",
+      "invalidFields": "Controlla questi campi: {fields}.",
+      "descriptionOtherLanguages": "Ci sono anche le versioni in: {languages}, che qui non si modificano. Se cambi il testo italiano vengono tolte."
     },
     "instantCall": {
       "title": "Videocall istantanea",

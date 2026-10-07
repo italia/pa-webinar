@@ -784,7 +784,8 @@
           }
         },
         "recordingHeading": "Taifeadadh",
-        "roomFeaturesHeading": "Gnéithe an tseomra"
+        "roomFeaturesHeading": "Gnéithe an tseomra",
+        "aiPipelineOff": "Níl iarléiriú AI (tras-scríobh, achoimre, aistriúcháin) ar siúl ar an tsuiteáil seo."
       },
       "step3": {
         "heading": "Daoine agus cuirí",
@@ -902,7 +903,8 @@
         "privacyDocHelp": "Uaslódáil PDF nó greamaigh URL fógra príobháideachais ionadúil. Sáraíonn sé an teimpléad GDPR má tá ceann ann.",
         "privacyTextHelp": "Téacs gairid taispeánta ar fhoirm an chlárúcháin; is féidir leis an teimpléad GDPR a chomhlánú nó a athrú.",
         "technicalDetails": "Sonraí teicniúla: toilleadh agus acmhainní",
-        "retentionRange": "Cuirigí isteach líon laethanta idir 1 agus {max}."
+        "retentionRange": "Cuirigí isteach líon laethanta idir 1 agus {max}.",
+        "linksOnPublish": "Seoltar na naisc phearsanta (príomh-mhodhnóir, comh-mhodhnóirí agus cainteoirí) trí ríomhphost nuair a fhoilsítear an t-imeacht. Fad is dréacht é, cóipeálaigí iad ó leathanach an imeachta."
       },
       "validationFailed": "Athbhreithnigh na réimsí aibhsithe sula leantar ar aghaidh.",
       "partialFailure": "Cruthaíodh an t-imeacht, ach níor sábháladh roinnt míreanna: {items}. Is féidir leat iad a chur leis ó leathanach an imeachta.",
@@ -1301,7 +1303,6 @@
     "dateChangedNotification": "Athraíodh an dáta. Gheobhaidh na rannpháirtithe cláraithe fógra ar ríomhphost.",
     "eventCreated": "Imeacht cruthaithe go rathúil!",
     "createEventCta": "Eagraigh imeacht",
-    "createEventExplanation": "Cruthaigh bhur n-imeacht agus gheobhaidh sibh nasc chun é a bhainistiú.",
     "noAccountNeeded": "Ní theastaíonn cuntas — is é an nasc modhnóra bhur rochtain chun an t-imeacht a bhainistiú.",
     "form": {
       "titleIt": "Teideal (Iodáilis)",
@@ -1504,7 +1505,8 @@
       "prepareEmail": "Ullmhaigh ríomhphost",
       "prepareEmailFor": "Ullmhaigh ríomhphost do {name}",
       "prepareEmailSubject": "Do nasc do “{title}”",
-      "prepareEmailBody": "Dia duit {name},\n\nseo do nasc pearsanta do “{title}”:\n{link}\n\nIs duitse amháin an nasc seo: ná seol ar aghaidh é agus ná roinn é."
+      "prepareEmailBody": "Dia duit {name},\n\nseo do nasc pearsanta do “{title}”:\n{link}\n\nIs duitse amháin an nasc seo: ná seol ar aghaidh é agus ná roinn é.",
+      "draftNote": "Is dréacht é an t-imeacht: seoltar na naisc trí ríomhphost nuair a fhoilseofar é. Idir an dá linn is féidir libh iad a chóipeáil anseo."
     },
     "gdprAuditLog": {
       "title": "Loga iniúchóireachta GDPR",
@@ -1898,7 +1900,10 @@
       "aiTranslation": "Aistriúchán uathoibríoch (réamhshocrú)",
       "pickerTitle": "Roghnaigh teimpléad",
       "pickerSubtitle": "Roghnaigh teimpléad chun socruithe an imeachta a réamhchumrú, nó scipeáil chun gach rud a chumrú de láimh.",
-      "skipTemplate": "Cumraigh de láimh"
+      "skipTemplate": "Cumraigh de láimh",
+      "postEventPublic": "Leathanach poiblí tar éis an imeachta",
+      "invalidFields": "Seiceálaigí na réimsí seo: {fields}.",
+      "descriptionOtherLanguages": "Tá leaganacha ann freisin i: {languages}, nach féidir a chur in eagar anseo. Má athraíonn sibh an téacs Iodáilise, bainfear iad."
     },
     "instantCall": {
       "title": "Glao físe láithreach",

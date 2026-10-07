@@ -784,7 +784,8 @@
           }
         },
         "recordingHeading": "Felvétel",
-        "roomFeaturesHeading": "A terem funkciói"
+        "roomFeaturesHeading": "A terem funkciói",
+        "aiPipelineOff": "Az AI-utómunka (átirat, összefoglaló, fordítások) nincs bekapcsolva ezen a telepítésen."
       },
       "step3": {
         "heading": "Személyek és meghívók",
@@ -902,7 +903,8 @@
         "privacyDocHelp": "Töltsön fel egy PDF-et vagy illesszen be egy alternatív adatvédelmi tájékoztató URL-jét. Felülírja a GDPR-sablont, ha be van állítva.",
         "privacyTextHelp": "A regisztrációs űrlapon megjelenő rövid szöveg; kiegészítheti vagy helyettesítheti a GDPR-sablont.",
         "technicalDetails": "Műszaki részletek: kapacitás és erőforrások",
-        "retentionRange": "Adjon meg 1 és {max} közötti napszámot."
+        "retentionRange": "Adjon meg 1 és {max} közötti napszámot.",
+        "linksOnPublish": "A személyes linkeket (fő moderátor, társmoderátorok és előadók) e-mailben küldjük el, amikor az esemény megjelenik. Amíg piszkozat, másolja ki őket az esemény oldaláról."
       },
       "validationFailed": "Folytatás előtt ellenőrizze a kiemelt mezőket.",
       "partialFailure": "Az esemény létrejött, de néhány elem nem lett elmentve: {items}. Ezeket az esemény oldaláról adhatja hozzá.",
@@ -1301,7 +1303,6 @@
     "dateChangedNotification": "A dátum módosult. A regisztrált résztvevők e-mail értesítést kapnak.",
     "eventCreated": "Esemény sikeresen létrehozva!",
     "createEventCta": "Esemény szervezése",
-    "createEventExplanation": "Hozza létre az eseményét, és kap egy linket a kezeléséhez.",
     "noAccountNeeded": "Nincs szükség fiókra — a moderátor link az Ön hozzáférése az esemény kezeléséhez.",
     "form": {
       "titleIt": "Cím (olaszul)",
@@ -1504,7 +1505,8 @@
       "prepareEmail": "E-mail előkészítése",
       "prepareEmailFor": "E-mail előkészítése neki: {name}",
       "prepareEmailSubject": "Az Ön linkje ehhez: „{title}”",
-      "prepareEmailBody": "Kedves {name}!\n\nItt a személyes linkje ehhez: „{title}”:\n{link}\n\nA link csak Önnek szól: ne továbbítsa és ne ossza meg."
+      "prepareEmailBody": "Kedves {name}!\n\nItt a személyes linkje ehhez: „{title}”:\n{link}\n\nA link csak Önnek szól: ne továbbítsa és ne ossza meg.",
+      "draftNote": "Az esemény piszkozat: a linkeket e-mailben küldjük el, amikor megjelenik. Addig innen másolhatja ki őket."
     },
     "gdprAuditLog": {
       "title": "GDPR auditnapló",
@@ -1898,7 +1900,10 @@
       "aiTranslation": "Automatikus fordítás (alapértelmezés)",
       "pickerTitle": "Sablon kiválasztása",
       "pickerSubtitle": "Válasszon sablont az eseménybeállítások előkonfigurálásához, vagy hagyja ki a kézi konfiguráláshoz.",
-      "skipTemplate": "Kézi konfigurálás"
+      "skipTemplate": "Kézi konfigurálás",
+      "postEventPublic": "Nyilvános esemény utáni oldal",
+      "invalidFields": "Ellenőrizze ezeket a mezőket: {fields}.",
+      "descriptionOtherLanguages": "Más nyelvű változatok is vannak: {languages}, amelyek itt nem szerkeszthetők. Ha módosítja az olasz szöveget, törlődnek."
     },
     "instantCall": {
       "title": "Azonnali videohívás",

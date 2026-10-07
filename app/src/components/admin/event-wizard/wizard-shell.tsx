@@ -83,6 +83,8 @@ export interface WizardTemplatePreset {
   descriptionTemplate?: Record<string, string> | null;
   defaultRetentionDays?: number | null;
   defaultExpectedSpeakers?: number | null;
+  /** La pagina dopo l'evento e' pubblica (false per una riunione di lavoro). */
+  postEventPublic?: boolean;
 }
 
 export interface WizardProps {
@@ -112,6 +114,9 @@ export interface WizardProps {
   whiteboardInfraReady: boolean;
   /** Le lingue di traduzione predefinite dell'istanza (SiteSetting). */
   defaultTargetLocales?: string | null;
+  /** La post-produzione AI e' accesa sull'installazione: spenta, il passo 2
+   *  non ne propone le funzioni. */
+  aiPipelineEnabled?: boolean;
   /** Il moderatore principale di partenza di un evento nuovo: chi lo crea,
    *  quando entra con un account nominale. */
   defaultModerator?: { name: string; email: string } | null;
@@ -152,6 +157,8 @@ export interface InitialEventShape {
     videoQuality: VideoQualityPreset | null;
     expectedSenderRatioPct: number | null;
     permissionMatrix: PermissionMatrix | null;
+    /** Lo stato dell'evento: in bozza i link personali non partono ancora. */
+    status: string;
     qaEnabled: boolean;
     chatEnabled: boolean;
     participantsCanUnmute: boolean;
@@ -171,6 +178,7 @@ export interface InitialEventShape {
     aiTargetLocales?: string | null;
     expectedSpeakers?: number | null;
     dataRetentionDays: number;
+    postEventPublic: boolean;
     gdprTemplateId: string | null;
     privacyPolicyText: string | null;
     privacyPolicyUrl: string | null;
@@ -218,6 +226,8 @@ export interface InitialEventShape {
 
 export interface Step5ReviewFields {
   dataRetentionDays: number;
+  /** Event.postEventPublic: la pagina dell'evento concluso resta visibile. */
+  postEventPublic: boolean;
   gdprTemplateId: string | null;
   privacyPolicyText: string;
   privacyPolicyUrl: string | null;
@@ -275,9 +285,12 @@ export default function EventWizard(props: WizardProps) {
     const domani = new Date(Date.UTC(y!, m! - 1, d! + 1)).toISOString().slice(0, 10);
     const defaultStart = fromDatetimeLocalInTz(`${domani}T10:00`, props.siteTimezone);
     // Durata predefinita dal template (semplificazione): l'utente meno esperto
-    // imposta solo l'inizio e la fine è calcolata. Default 120 min se il
-    // template non la specifica.
-    const defaultDurationMin = props.template?.defaultDurationMinutes ?? 120;
+    // imposta solo l'inizio e la fine è calcolata. Un template senza durata
+    // tiene le due ore di sempre; senza template valgono i valori del
+    // «Webinar pubblico»: un'ora, fino a 300 persone.
+    const defaultDurationMin = props.template
+      ? (props.template.defaultDurationMinutes ?? 120)
+      : 60;
     const defaultEnd = new Date(defaultStart.getTime() + defaultDurationMin * 60_000);
     // Traduzione accesa senza lingue (un modello o un evento che ereditava le
     // lingue dell'istanza): si parte da quelle dell'istanza, gia' spuntate.
@@ -391,6 +404,7 @@ export default function EventWizard(props: WizardProps) {
 
         // Step 5
         dataRetentionDays: ev.dataRetentionDays,
+        postEventPublic: ev.postEventPublic,
         gdprTemplateId: ev.gdprTemplateId,
         privacyPolicyText: ev.privacyPolicyText ?? '',
         privacyPolicyUrl: ev.privacyPolicyUrl,
@@ -427,7 +441,7 @@ export default function EventWizard(props: WizardProps) {
       startsAt: toDatetimeLocalInTz(defaultStart, props.siteTimezone),
       endsAt: toDatetimeLocalInTz(defaultEnd, props.siteTimezone),
       timezone: props.siteTimezone,
-      maxParticipants: tpl?.maxParticipants ?? 150,
+      maxParticipants: tpl?.maxParticipants ?? 300,
       coverImageUrl: null,
       imageUrl: null,
       waitingRoomAudioUrl: null,
@@ -499,6 +513,7 @@ export default function EventWizard(props: WizardProps) {
         tpl?.defaultRetentionDays ?? props.defaultRetentionDays,
         MAX_RETENTION_DAYS,
       ),
+      postEventPublic: tpl?.postEventPublic ?? true,
       // Il modello marcato come predefinito esiste per essere pre-scelto sui
       // nuovi eventi: senza questo la colonna resterebbe vuota su ogni evento
       // creato da qui, e quella marcatura non avrebbe alcun effetto.
@@ -703,7 +718,10 @@ export default function EventWizard(props: WizardProps) {
   const restoreDraft = useCallback(() => {
     if (savedDraftRef.current) {
       try {
-        setForm(JSON.parse(savedDraftRef.current) as WizardForm);
+        // Sopra il modulo di partenza, non al suo posto: una bozza salvata
+        // prima che il modulo avesse un campo nuovo non lo lascerebbe vuoto.
+        const salvata = JSON.parse(savedDraftRef.current) as Partial<WizardForm>;
+        setForm((prima) => ({ ...prima, ...salvata }));
       } catch {
         /* corrupt draft — ignore */
       }
@@ -882,6 +900,13 @@ export default function EventWizard(props: WizardProps) {
               ? undefined
               : form.dataRetentionDays,
           gdprTemplateId: form.gdprTemplateId,
+          // In modifica solo se cambiato qui: la pagina dell'evento ha il suo
+          // interruttore, e un salvataggio del wizard non deve rimettere un
+          // valore letto prima.
+          postEventPublic:
+            mode === 'edit' && form.postEventPublic === initialEvent?.event.postEventPublic
+              ? undefined
+              : form.postEventPublic,
           // La stringa vuota si spedisce, non si trasforma in `undefined`: il
           // server scrive il campo solo quando è definito, e scegliere un
           // modello di informativa deve poter CANCELLARE il testo scritto a
@@ -1260,6 +1285,7 @@ export default function EventWizard(props: WizardProps) {
             fieldErrors={fieldErrors}
             whiteboardInfraReady={props.whiteboardInfraReady}
             defaultTargetLocales={props.defaultTargetLocales}
+            aiPipelineEnabled={props.aiPipelineEnabled ?? true}
             eventLocale={SOURCE_LANGUAGE_FALLBACK}
           />
         )}
@@ -1294,6 +1320,7 @@ export default function EventWizard(props: WizardProps) {
             fieldErrors={fieldErrors}
             prefilledModeratorEmail={mode === 'edit' ? null : props.defaultModerator?.email ?? null}
             retentionMax={retentionMax}
+            showLinksOnPublish={mode === 'create' || initialEvent?.event.status === 'DRAFT'}
           />
         )}
       </div>

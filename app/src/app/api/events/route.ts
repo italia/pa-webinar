@@ -15,8 +15,6 @@ import { puoGestire, requireStaff } from '@/lib/auth/staff-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { encryptPIIOrNull } from '@/lib/crypto/pii';
 import { getPublicEnv } from '@/lib/env';
-import { adminRequestLocale, sendPrimaryModeratorLink } from '@/lib/email/moderator-link';
-import { getSettings } from '@/lib/settings';
 import { calculateEstimates } from '@/lib/estimates';
 import { hashJoinPassword } from '@/lib/auth/password';
 import { coerceMatrix, togglesFromMatrix } from '@/lib/utils/permission-matrix';
@@ -275,16 +273,8 @@ export const POST = withErrorHandling(async (request) => {
     details: { slug: event.slug, fields: Object.keys(data) },
   });
 
-  // Il moderatore principale riceve il suo link personale per email, come
-  // promettono il wizard e la pagina di gestione. Atteso (non in background):
-  // il wizard pubblica subito dopo, e la pubblicazione deve trovare la riga
-  // gia' in coda per non spedire una seconda volta.
-  if (data.moderatorEmail) {
-    const { defaultLocale: predefinita } = await getSettings();
-    await sendPrimaryModeratorLink(event.id, {
-      locale: adminRequestLocale(request, predefinita),
-    });
-  }
+  // Nessun link per email qui: l'evento nasce in bozza, e i link personali
+  // partono alla pubblicazione (PUT /api/events/[param], lib/email/moderator-link).
 
   return Response.json(
     {

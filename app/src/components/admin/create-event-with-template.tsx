@@ -71,6 +71,8 @@ interface Props {
   siteDefaultVideoQuality: VideoQualityPreset;
   whiteboardInfraReady: boolean;
   defaultTargetLocales?: string | null;
+  /** La post-produzione AI e' accesa sull'installazione. */
+  aiPipelineEnabled?: boolean;
   defaultModerator?: { name: string; email: string } | null;
   /** Apre direttamente il modulo della chiamata rapida (dal pulsante della
    *  lista eventi), senza passare dalla scelta del modello. */
@@ -93,6 +95,7 @@ export default function CreateEventWithTemplate({
   siteDefaultVideoQuality,
   whiteboardInfraReady,
   defaultTargetLocales = null,
+  aiPipelineEnabled = true,
   defaultModerator = null,
   initialInstant = false,
 }: Props) {
@@ -198,6 +201,7 @@ export default function CreateEventWithTemplate({
       siteDefaultVideoQuality={siteDefaultVideoQuality}
       whiteboardInfraReady={whiteboardInfraReady}
       defaultTargetLocales={defaultTargetLocales}
+      aiPipelineEnabled={aiPipelineEnabled}
       defaultModerator={defaultModerator}
     />
   );

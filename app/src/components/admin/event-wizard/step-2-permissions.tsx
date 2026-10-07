@@ -65,6 +65,10 @@ interface Props {
   /** La lingua in cui la pipeline trascrive (SOURCE_LANGUAGE_FALLBACK): non
    *  si offre come lingua di traduzione, la pipeline la toglierebbe. */
   eventLocale?: string;
+  /** La post-produzione AI e' accesa sull'installazione? Spenta, le sue
+   *  funzioni non si propongono: si mostrano solo se l'evento le ha gia'
+   *  (per poterle togliere). */
+  aiPipelineEnabled?: boolean;
 }
 
 export default function Step2Permissions({
@@ -74,6 +78,7 @@ export default function Step2Permissions({
   whiteboardInfraReady,
   defaultTargetLocales = null,
   eventLocale,
+  aiPipelineEnabled = true,
 }: Props) {
   const t = useTranslations('admin.wizard.step2');
   const tAdmin = useTranslations('admin');
@@ -272,7 +277,12 @@ export default function Step2Permissions({
       {/* Post-produzione AI — solo se recording attiva. Renderizzata
           come sezione separata sotto la registrazione (la AI lavora
           sulla registrazione, ne è subordinata). */}
-      {value.recordingEnabled && (
+      {value.recordingEnabled && !aiPipelineEnabled && !value.aiTranscriptEnabled && (
+        <p className="text-secondary mb-3" style={{ fontSize: '0.85rem' }}>
+          {t('aiPipelineOff')}
+        </p>
+      )}
+      {value.recordingEnabled && (aiPipelineEnabled || value.aiTranscriptEnabled) && (
         <section className="mb-3">
           <h3 className="h6 fw-semibold mb-1" style={{ color: 'var(--app-text)' }}>
             {tAdmin('form.aiSectionHeading')}

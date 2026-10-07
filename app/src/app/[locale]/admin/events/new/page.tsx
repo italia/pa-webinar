@@ -99,6 +99,7 @@ export default async function CreateEventPage({
           (selectedTemplate.descriptionTemplate as Record<string, string> | null) ?? null,
         defaultRetentionDays: selectedTemplate.defaultRetentionDays,
         defaultExpectedSpeakers: selectedTemplate.defaultExpectedSpeakers,
+        postEventPublic: selectedTemplate.postEventPublic,
       }
     : null;
 
@@ -107,19 +108,6 @@ export default async function CreateEventPage({
       <h1 className="fw-bold mb-3" style={{ color: 'var(--app-text)' }}>
         {t('createEvent')}
       </h1>
-
-      <div
-        className="p-4 rounded mb-4"
-        style={{
-          backgroundColor: '#F5F7FB',
-          borderLeft: '4px solid #0066CC',
-          borderRadius: 8,
-        }}
-      >
-        <p className="mb-0 fw-semibold" style={{ color: 'var(--app-text)' }}>
-          {t('createEventExplanation')}
-        </p>
-      </div>
 
       <CreateEventWithTemplate
         initialInstant={instant === '1'}
@@ -156,6 +144,7 @@ export default async function CreateEventPage({
           getPublicEnv('NEXT_PUBLIC_WHITEBOARD_ENABLED'),
         )}
         defaultTargetLocales={siteSettings.aiDefaultTargetLocales}
+        aiPipelineEnabled={siteSettings.aiPipelineEnabled}
         defaultModerator={moderatoreDiPartenza}
       />
     </div>

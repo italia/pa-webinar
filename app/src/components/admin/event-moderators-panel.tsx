@@ -29,6 +29,8 @@ interface Props {
   moderatorToken: string;
   baseUrl: string;
   locale: string;
+  /** Evento in bozza: i link per email partono alla pubblicazione. */
+  isDraft?: boolean;
 }
 
 export default function EventModeratorsPanel({
@@ -38,6 +40,7 @@ export default function EventModeratorsPanel({
   moderatorToken,
   baseUrl,
   locale,
+  isDraft = false,
 }: Props) {
   const t = useTranslations('admin.coModerators');
   const tc = useTranslations('common');
@@ -163,6 +166,11 @@ export default function EventModeratorsPanel({
           <div className="text-secondary" style={{ fontSize: '0.85rem' }}>
             {t('introHint')}
           </div>
+          {isDraft && (
+            <div className="text-secondary mt-1" style={{ fontSize: '0.85rem' }}>
+              {t('draftNote')}
+            </div>
+          )}
         </div>
         {!showForm && (
           <Button color="primary" size="sm" onClick={() => setShowForm(true)}>

@@ -214,7 +214,9 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
       retainParticipantTracks: event.retainParticipantTracks,
       aiTargetLocales: event.aiTargetLocales,
       expectedSpeakers: event.expectedSpeakers,
+      status: event.status,
       dataRetentionDays: event.dataRetentionDays,
+      postEventPublic: event.postEventPublic,
       gdprTemplateId: event.gdprTemplateId,
       privacyPolicyText: event.privacyPolicyText,
       privacyPolicyUrl: event.privacyPolicyUrl,
@@ -304,6 +306,7 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
           getPublicEnv('NEXT_PUBLIC_WHITEBOARD_ENABLED'),
         )}
         defaultTargetLocales={siteSettings.aiDefaultTargetLocales}
+        aiPipelineEnabled={siteSettings.aiPipelineEnabled}
       />
     </div>
   );

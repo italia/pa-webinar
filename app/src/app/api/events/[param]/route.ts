@@ -24,7 +24,11 @@ import {
   constantTimeEqual,
 } from '@/lib/auth/moderator';
 import { sendDateChangeNotifications } from '@/lib/email/notification';
-import { adminRequestLocale, sendPrimaryModeratorLink } from '@/lib/email/moderator-link';
+import {
+  adminRequestLocale,
+  sendGrantModeratorLinks,
+  sendPrimaryModeratorLink,
+} from '@/lib/email/moderator-link';
 import { getSettings } from '@/lib/settings';
 import { encryptPIIOrNull, tryDecryptPII } from '@/lib/crypto/pii';
 import { calculateEstimates } from '@/lib/estimates';
@@ -523,20 +527,26 @@ export const PUT = withErrorHandling(async (request, context) => {
     sendDateChangeNotifications({ eventId });
   }
 
-  // Il link personale del moderatore principale: alla pubblicazione, o quando
-  // cambia l'indirizzo. Una volta sola per indirizzo (vedi moderator-link):
-  // ripubblicare o risalvare dal wizard non rispedisce.
+  // I link personali: alla pubblicazione (o all'uscita dalla bozza) partono
+  // quello del moderatore principale e quelli delle concessioni create in
+  // bozza; un indirizzo del principale cambiato riceve il suo. Una volta sola
+  // per indirizzo e per concessione (vedi moderator-link): ripubblicare o
+  // risalvare dal wizard non rispedisce, e una bozza non spedisce niente.
   const moderatorEmailChanged =
     data.moderatorEmail !== undefined &&
     (data.moderatorEmail || null) !== (tryDecryptPII(event.moderatorEmail) || null);
-  if (
+  const pubblicato =
     (updated.status === 'PUBLISHED' && event.status !== 'PUBLISHED') ||
-    moderatorEmailChanged
-  ) {
+    (event.status === 'DRAFT' && updated.status !== 'DRAFT');
+  // Un salvataggio completo dal wizard (porta il titolo) di un evento non in
+  // bozza ritenta i link delle concessioni che non erano andati in coda: e'
+  // una lettura della coda, e non rispedisce quelli partiti.
+  const salvataggioCompleto = data.title !== undefined && updated.status !== 'DRAFT';
+  if (pubblicato || moderatorEmailChanged || salvataggioCompleto) {
     const { defaultLocale: predefinita } = await getSettings();
-    await sendPrimaryModeratorLink(eventId, {
-      locale: adminRequestLocale(request, predefinita),
-    });
+    const locale = adminRequestLocale(request, predefinita);
+    if (pubblicato || moderatorEmailChanged) await sendPrimaryModeratorLink(eventId, { locale });
+    if (pubblicato || salvataggioCompleto) await sendGrantModeratorLinks(eventId, { locale });
   }
 
   // Chi è in sala vede subito una funzione accesa o spenta, senza aspettare il

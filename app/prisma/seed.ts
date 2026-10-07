@@ -26,42 +26,30 @@ async function main() {
   // System templates are created by migration; only delete user-created ones during seed
   await prisma.eventTemplate.deleteMany({ where: { isSystem: false } });
 
-  // Ensure system templates exist (idempotent — migration handles this, seed is a safety net)
+  // Ensure system templates exist (idempotent — migration handles this, seed is a safety net).
+  // Gli stessi tre della migrazione 20261007150000_three_event_templates.
   const systemTemplates = [
     {
-      name: 'Webinar',
+      name: 'Webinar pubblico',
       description:
-        'Presentazione pubblica con molti partecipanti. Solo ascolto, chat attiva, nessuna webcam partecipanti.',
+        "Relatori in video e pubblico in ascolto, con la chat. La registrazione è disponibile e si avvia in sala. Fino a 300 partecipanti, un'ora.",
       icon: 'it-presentation',
       qaEnabled: false,
       chatEnabled: true,
-      recordingEnabled: false,
+      recordingEnabled: true,
       participantsCanUnmute: false,
       participantsCanStartVideo: false,
       participantsCanShareScreen: false,
       maxParticipants: 300,
+      defaultDurationMinutes: 60,
+      postEventPublic: true,
       isSystem: true,
       sortOrder: 0,
     },
     {
-      name: 'Community interattiva',
+      name: 'Riunione di lavoro',
       description:
-        'Evento partecipativo con chat e possibilità per tutti di parlare e mostrare la webcam.',
-      icon: 'it-team-digitale',
-      qaEnabled: false,
-      chatEnabled: true,
-      recordingEnabled: false,
-      participantsCanUnmute: true,
-      participantsCanStartVideo: true,
-      participantsCanShareScreen: false,
-      maxParticipants: 50,
-      isSystem: true,
-      sortOrder: 1,
-    },
-    {
-      name: 'Videocall tra colleghi',
-      description:
-        'Riunione interna con pochi partecipanti. Tutti possono parlare, condividere schermo e usare la webcam.',
+        "Tutti possono parlare, usare la webcam e condividere lo schermo. Senza registrazione, e la pagina dopo l'evento non è pubblica. Fino a 20 partecipanti, un'ora.",
       icon: 'it-video',
       qaEnabled: false,
       chatEnabled: true,
@@ -70,23 +58,29 @@ async function main() {
       participantsCanStartVideo: true,
       participantsCanShareScreen: true,
       maxParticipants: 20,
+      defaultDurationMinutes: 60,
+      postEventPublic: false,
       isSystem: true,
-      sortOrder: 2,
+      sortOrder: 1,
     },
     {
-      name: 'Presentazione pubblica',
+      name: 'Evento partecipativo',
       description:
-        'Evento pubblico con registrazione video e condivisione schermo del relatore. Chat attiva.',
-      icon: 'it-camera',
+        "Tutti possono parlare e usare la webcam; lo schermo lo condividono i relatori. Con la scaletta dell'incontro e le domande «In una parola». Fino a 50 partecipanti, un'ora e mezza.",
+      icon: 'it-comment',
       qaEnabled: false,
       chatEnabled: true,
-      recordingEnabled: true,
-      participantsCanUnmute: false,
-      participantsCanStartVideo: false,
+      recordingEnabled: false,
+      agendaEnabled: true,
+      wordCloudEnabled: true,
+      participantsCanUnmute: true,
+      participantsCanStartVideo: true,
       participantsCanShareScreen: false,
-      maxParticipants: 300,
+      maxParticipants: 50,
+      defaultDurationMinutes: 90,
+      postEventPublic: true,
       isSystem: true,
-      sortOrder: 3,
+      sortOrder: 2,
     },
   ];
   for (const tmpl of systemTemplates) {

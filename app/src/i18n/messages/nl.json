@@ -784,7 +784,8 @@
           }
         },
         "recordingHeading": "Opname",
-        "roomFeaturesHeading": "Functies van de zaal"
+        "roomFeaturesHeading": "Functies van de zaal",
+        "aiPipelineOff": "AI-nabewerking (transcriptie, samenvatting, vertalingen) is niet ingeschakeld op deze installatie."
       },
       "step3": {
         "heading": "Personen en uitnodigingen",
@@ -902,7 +903,8 @@
         "privacyDocHelp": "Upload een PDF of plak de URL van een vervangende privacyverklaring. Vervangt het AVG-sjabloon indien aanwezig.",
         "privacyTextHelp": "Korte tekst die op het aanmeldingsformulier wordt getoond; kan het AVG-sjabloon aanvullen of vervangen.",
         "technicalDetails": "Technische details: capaciteit en middelen",
-        "retentionRange": "Voer een aantal dagen in tussen 1 en {max}."
+        "retentionRange": "Voer een aantal dagen in tussen 1 en {max}.",
+        "linksOnPublish": "De persoonlijke links (hoofdmoderator, co-moderatoren en sprekers) worden per e-mail verstuurd zodra het evenement wordt gepubliceerd. Zolang het een concept is, kopieert u ze van de pagina van het evenement."
       },
       "validationFailed": "Controleer de gemarkeerde velden voordat u doorgaat.",
       "partialFailure": "Evenement aangemaakt, maar sommige onderdelen zijn niet opgeslagen: {items}. U kunt ze toevoegen vanaf de pagina van het evenement.",
@@ -1301,7 +1303,6 @@
     "dateChangedNotification": "De datum is gewijzigd. Ingeschreven deelnemers worden per e-mail op de hoogte gesteld.",
     "eventCreated": "Evenement succesvol aangemaakt!",
     "createEventCta": "Een evenement organiseren",
-    "createEventExplanation": "Maak uw evenement aan en u ontvangt een link om het te beheren.",
     "noAccountNeeded": "Geen account nodig — de moderatorlink is uw toegang om het evenement te beheren.",
     "form": {
       "titleIt": "Titel (Italiaans)",
@@ -1504,7 +1505,8 @@
       "prepareEmail": "E-mail voorbereiden",
       "prepareEmailFor": "E-mail voorbereiden voor {name}",
       "prepareEmailSubject": "Uw link voor ‘{title}’",
-      "prepareEmailBody": "Hallo {name},\n\nhier is uw persoonlijke link voor ‘{title}’:\n{link}\n\nDe link is alleen voor u: stuur hem niet door en deel hem niet."
+      "prepareEmailBody": "Hallo {name},\n\nhier is uw persoonlijke link voor ‘{title}’:\n{link}\n\nDe link is alleen voor u: stuur hem niet door en deel hem niet.",
+      "draftNote": "Het evenement is een concept: de links worden per e-mail verstuurd zodra het wordt gepubliceerd. Tot dan kunt u ze hier kopiëren."
     },
     "gdprAuditLog": {
       "title": "GDPR-auditlogboek",
@@ -1898,7 +1900,10 @@
       "aiTranslation": "Automatische vertaling (standaard)",
       "pickerTitle": "Kies een sjabloon",
       "pickerSubtitle": "Selecteer een sjabloon om de evenementinstellingen vooraf te configureren, of sla over om alles handmatig in te stellen.",
-      "skipTemplate": "Handmatig instellen"
+      "skipTemplate": "Handmatig instellen",
+      "postEventPublic": "Openbare pagina na het evenement",
+      "invalidFields": "Controleer deze velden: {fields}.",
+      "descriptionOtherLanguages": "Er zijn ook versies in: {languages}, die hier niet te bewerken zijn. Als u de Italiaanse tekst wijzigt, worden ze verwijderd."
     },
     "instantCall": {
       "title": "Directe videogesprek",

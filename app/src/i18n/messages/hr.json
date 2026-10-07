@@ -784,7 +784,8 @@
           }
         },
         "recordingHeading": "Snimanje",
-        "roomFeaturesHeading": "Funkcije sobe"
+        "roomFeaturesHeading": "Funkcije sobe",
+        "aiPipelineOff": "AI postprodukcija (transkripcija, sažetak, prijevodi) nije uključena u ovoj instalaciji."
       },
       "step3": {
         "heading": "Osobe i pozivnice",
@@ -902,7 +903,8 @@
         "privacyDocHelp": "Učitajte PDF ili zalijepite URL alternativne obavijesti. Ako je postavljeno, nadjačava GDPR predložak.",
         "privacyTextHelp": "Sažeti tekst prikazan u obrascu za prijavu; može nadopuniti ili zamijeniti GDPR predložak.",
         "technicalDetails": "Tehnički detalji: kapacitet i resursi",
-        "retentionRange": "Unesite broj dana između 1 i {max}."
+        "retentionRange": "Unesite broj dana između 1 i {max}.",
+        "linksOnPublish": "Osobne poveznice (glavni moderator, sumoderatori i govornici) šalju se e-poštom kada se događaj objavi. Dok je skica, kopirajte ih sa stranice događaja."
       },
       "validationFailed": "Provjerite istaknuta polja prije nastavka.",
       "partialFailure": "Događaj je stvoren, ali neke stavke nisu spremljene: {items}. Možeš ih dodati sa stranice događaja.",
@@ -1301,7 +1303,6 @@
     "dateChangedNotification": "Datum je promijenjen. Prijavljeni sudionici bit će obaviješteni emailom.",
     "eventCreated": "Događaj uspješno stvoren!",
     "createEventCta": "Organizirajte događaj",
-    "createEventExplanation": "Stvorite svoj događaj i primit ćete poveznicu za upravljanje.",
     "noAccountNeeded": "Nije potreban račun — moderatorska poveznica je vaš pristup za upravljanje događajem.",
     "form": {
       "titleIt": "Naslov (talijanski)",
@@ -1504,7 +1505,8 @@
       "prepareEmail": "Pripremi e-poruku",
       "prepareEmailFor": "Pripremi e-poruku za: {name}",
       "prepareEmailSubject": "Vaša poveznica za „{title}”",
-      "prepareEmailBody": "Pozdrav, {name},\n\nevo vaše osobne poveznice za „{title}”:\n{link}\n\nPoveznica je samo za vas: nemojte je prosljeđivati ni dijeliti."
+      "prepareEmailBody": "Pozdrav, {name},\n\nevo vaše osobne poveznice za „{title}”:\n{link}\n\nPoveznica je samo za vas: nemojte je prosljeđivati ni dijeliti.",
+      "draftNote": "Događaj je skica: poveznice se šalju e-poštom kada se objavi. U međuvremenu ih možete kopirati odavde."
     },
     "gdprAuditLog": {
       "title": "GDPR zapisnik",
@@ -1898,7 +1900,10 @@
       "aiTranslation": "Automatski prijevod (zadano)",
       "pickerTitle": "Odaberite predložak",
       "pickerSubtitle": "Odaberite predložak za predkonfiguraciju postavki događaja ili preskočite za ručnu konfiguraciju.",
-      "skipTemplate": "Konfiguriraj ručno"
+      "skipTemplate": "Konfiguriraj ručno",
+      "postEventPublic": "Javna stranica nakon događaja",
+      "invalidFields": "Provjerite ova polja: {fields}.",
+      "descriptionOtherLanguages": "Postoje i verzije na: {languages}, koje se ovdje ne uređuju. Ako promijenite talijanski tekst, uklanjaju se."
     },
     "instantCall": {
       "title": "Trenutačni videopoziv",

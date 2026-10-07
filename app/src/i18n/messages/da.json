@@ -784,7 +784,8 @@
           }
         },
         "recordingHeading": "Optagelse",
-        "roomFeaturesHeading": "Funktioner i mødelokalet"
+        "roomFeaturesHeading": "Funktioner i mødelokalet",
+        "aiPipelineOff": "AI-efterbehandling (transskription, resumé, oversættelser) er ikke slået til på denne installation."
       },
       "step3": {
         "heading": "Personer og invitationer",
@@ -902,7 +903,8 @@
         "privacyDocHelp": "Upload en PDF eller indsæt en URL til en alternativ erklæring. Tilsidesætter GDPR-skabelonen, hvis den er angivet.",
         "privacyTextHelp": "Kort tekst, der vises i tilmeldingsformularen; kan supplere eller erstatte GDPR-skabelonen.",
         "technicalDetails": "Tekniske detaljer: kapacitet og ressourcer",
-        "retentionRange": "Angiv et antal dage mellem 1 og {max}."
+        "retentionRange": "Angiv et antal dage mellem 1 og {max}.",
+        "linksOnPublish": "Personlige links (primær moderator, medmoderatorer og oplægsholdere) sendes pr. e-mail, når begivenheden offentliggøres. Mens den er en kladde, kan du kopiere dem fra begivenhedens side."
       },
       "validationFailed": "Gennemgå de fremhævede felter, før du fortsætter.",
       "partialFailure": "Arrangementet blev oprettet, men nogle elementer blev ikke gemt: {items}. Du kan tilføje dem fra arrangementets side.",
@@ -1301,7 +1303,6 @@
     "dateChangedNotification": "Datoen er ændret. Tilmeldte deltagere vil blive underrettet via e-mail.",
     "eventCreated": "Begivenhed oprettet!",
     "createEventCta": "Arrangér en begivenhed",
-    "createEventExplanation": "Opret din begivenhed, og du modtager et link til at administrere den.",
     "noAccountNeeded": "Ingen konto nødvendig — moderatorlinket er din adgang til at administrere begivenheden.",
     "form": {
       "titleIt": "Titel (italiensk)",
@@ -1504,7 +1505,8 @@
       "prepareEmail": "Forbered e-mail",
       "prepareEmailFor": "Forbered en e-mail til {name}",
       "prepareEmailSubject": "Dit link til »{title}«",
-      "prepareEmailBody": "Hej {name},\n\nher er dit personlige link til »{title}«:\n{link}\n\nLinket er kun til dig: videresend eller del det ikke."
+      "prepareEmailBody": "Hej {name},\n\nher er dit personlige link til »{title}«:\n{link}\n\nLinket er kun til dig: videresend eller del det ikke.",
+      "draftNote": "Begivenheden er en kladde: links sendes pr. e-mail, når den offentliggøres. Indtil da kan du kopiere dem herfra."
     },
     "gdprAuditLog": {
       "title": "GDPR-revisionslog",
@@ -1898,7 +1900,10 @@
       "aiTranslation": "Automatisk oversættelse (standard)",
       "pickerTitle": "Vælg en skabelon",
       "pickerSubtitle": "Vælg en skabelon for at forkonfigurere begivenhedsindstillingerne, eller spring over for at konfigurere alt manuelt.",
-      "skipTemplate": "Konfigurer manuelt"
+      "skipTemplate": "Konfigurer manuelt",
+      "postEventPublic": "Offentlig side efter begivenheden",
+      "invalidFields": "Tjek disse felter: {fields}.",
+      "descriptionOtherLanguages": "Der findes også versioner på: {languages}, som ikke kan redigeres her. Hvis du ændrer den italienske tekst, fjernes de."
     },
     "instantCall": {
       "title": "Øjeblikkeligt videoopkald",

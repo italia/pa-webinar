@@ -7083,6 +7083,44 @@ html.live-resizing .live-sidebar-resizer::after {
   }
 }
 
+// ── Sezioni richiudibili del passo «Persone» del wizard
+.wizard-group {
+  border: 1px solid #d9dadb;
+  border-radius: 8px;
+  background: #fff;
+
+  > summary {
+    cursor: pointer;
+    padding: 0.75rem 1rem;
+  }
+
+  &[open] > summary {
+    border-bottom: 1px solid #e8e8e8;
+  }
+}
+
+.wizard-group__title {
+  font-weight: 600;
+  color: var(--app-text);
+}
+
+.wizard-group__count {
+  background-color: var(--app-primary);
+  color: #fff;
+  font-size: 0.75rem;
+}
+
+.wizard-group__help {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.85rem;
+  color: var(--app-muted);
+}
+
+.wizard-group__body {
+  padding: 1rem;
+}
+
 // ── Sezioni tecniche chiuse del wizard (capacita', risorse)
 .wizard-tech {
   summary {

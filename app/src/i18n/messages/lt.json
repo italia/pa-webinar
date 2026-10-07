@@ -784,7 +784,8 @@
           }
         },
         "recordingHeading": "Įrašymas",
-        "roomFeaturesHeading": "Salės funkcijos"
+        "roomFeaturesHeading": "Salės funkcijos",
+        "aiPipelineOff": "DI pogamyba (transkripcija, santrauka, vertimai) šiame diegime neįjungta."
       },
       "step3": {
         "heading": "Asmenys ir kvietimai",
@@ -902,7 +903,8 @@
         "privacyDocHelp": "Įkelkite PDF arba įklijuokite alternatyvios privatumo informacijos URL. Pakeičia GDPR/BDAR šabloną, jei nustatyta.",
         "privacyTextHelp": "Trumpas tekstas, rodomas registracijos formoje; gali papildyti arba pakeisti GDPR/BDAR šabloną.",
         "technicalDetails": "Techninė informacija: talpa ir ištekliai",
-        "retentionRange": "Įveskite dienų skaičių nuo 1 iki {max}."
+        "retentionRange": "Įveskite dienų skaičių nuo 1 iki {max}.",
+        "linksOnPublish": "Asmeninės nuorodos (pagrindiniam moderatoriui, pagalbiniams moderatoriams ir pranešėjams) išsiunčiamos el. paštu, kai renginys paskelbiamas. Kol tai juodraštis, nukopijuokite jas iš renginio puslapio."
       },
       "validationFailed": "Patikrinkite paryškintus laukus prieš tęsdami.",
       "partialFailure": "Renginys sukurtas, tačiau kai kurie elementai neišsaugoti: {items}. Galite juos pridėti renginio puslapyje.",
@@ -1301,7 +1303,6 @@
     "dateChangedNotification": "Data buvo pakeista. Užsiregistravę dalyviai bus informuoti el. paštu.",
     "eventCreated": "Renginys sėkmingai sukurtas!",
     "createEventCta": "Organizuoti renginį",
-    "createEventExplanation": "Sukurkite renginį ir gausite nuorodą jam valdyti.",
     "noAccountNeeded": "Paskyra nereikalinga — moderatoriaus nuoroda yra jūsų prieiga renginiui valdyti.",
     "form": {
       "titleIt": "Pavadinimas (italų k.)",
@@ -1504,7 +1505,8 @@
       "prepareEmail": "Paruošti el. laišką",
       "prepareEmailFor": "Paruošti el. laišką: {name}",
       "prepareEmailSubject": "Jūsų nuoroda į „{title}“",
-      "prepareEmailBody": "Sveiki, {name},\n\nštai jūsų asmeninė nuoroda į „{title}“:\n{link}\n\nNuoroda skirta tik jums: jos nepersiųskite ir nesidalykite."
+      "prepareEmailBody": "Sveiki, {name},\n\nštai jūsų asmeninė nuoroda į „{title}“:\n{link}\n\nNuoroda skirta tik jums: jos nepersiųskite ir nesidalykite.",
+      "draftNote": "Renginys yra juodraštis: nuorodos išsiunčiamos el. paštu, kai jis paskelbiamas. Tuo tarpu galite jas nukopijuoti iš čia."
     },
     "gdprAuditLog": {
       "title": "GDPR audito žurnalas",
@@ -1898,7 +1900,10 @@
       "aiTranslation": "Automatinis vertimas (numatytasis)",
       "pickerTitle": "Pasirinkite šabloną",
       "pickerSubtitle": "Pasirinkite šabloną iš anksto konfigūruoti renginio nustatymams arba praleiskite, kad viską sukonfigūruotumėte patys.",
-      "skipTemplate": "Konfigūruoti rankiniu būdu"
+      "skipTemplate": "Konfigūruoti rankiniu būdu",
+      "postEventPublic": "Viešas puslapis po renginio",
+      "invalidFields": "Patikrinkite šiuos laukus: {fields}.",
+      "descriptionOtherLanguages": "Yra ir versijos kalbomis: {languages}, kurių čia redaguoti negalima. Jei pakeisite tekstą italų kalba, jos bus pašalintos."
     },
     "instantCall": {
       "title": "Momentinis vaizdo skambutis",

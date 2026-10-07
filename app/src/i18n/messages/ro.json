@@ -784,7 +784,8 @@
           }
         },
         "recordingHeading": "Înregistrare",
-        "roomFeaturesHeading": "Funcțiile sălii"
+        "roomFeaturesHeading": "Funcțiile sălii",
+        "aiPipelineOff": "Postproducția AI (transcriere, rezumat, traduceri) nu este activată pe această instalare."
       },
       "step3": {
         "heading": "Persoane și invitații",
@@ -902,7 +903,8 @@
         "privacyDocHelp": "Încărcați un PDF sau lipiți URL-ul unei note de informare alternative. Suprascrie șablonul RGPD dacă este setat.",
         "privacyTextHelp": "Text sintetic afișat în formularul de înregistrare; poate completa sau înlocui șablonul RGPD.",
         "technicalDetails": "Detalii tehnice: capacitate și resurse",
-        "retentionRange": "Introduceți un număr de zile între 1 și {max}."
+        "retentionRange": "Introduceți un număr de zile între 1 și {max}.",
+        "linksOnPublish": "Linkurile personale (moderator principal, comoderatori și vorbitori) se trimit prin e-mail când evenimentul este publicat. Cât timp este ciornă, copiați-le de pe pagina evenimentului."
       },
       "validationFailed": "Verificați câmpurile evidențiate înainte de a continua.",
       "partialFailure": "Evenimentul a fost creat, dar unele elemente nu au fost salvate: {items}. Le puteți adăuga din pagina evenimentului.",
@@ -1301,7 +1303,6 @@
     "dateChangedNotification": "Data a fost modificată. Participanții înregistrați vor primi o notificare prin email.",
     "eventCreated": "Eveniment creat cu succes!",
     "createEventCta": "Organizați un eveniment",
-    "createEventExplanation": "Creați evenimentul și veți primi un link pentru a-l gestiona.",
     "noAccountNeeded": "Nu este necesar un cont — linkul de moderator este accesul dumneavoastră pentru gestionarea evenimentului.",
     "form": {
       "titleIt": "Titlu (italiană)",
@@ -1504,7 +1505,8 @@
       "prepareEmail": "Pregătiți e-mailul",
       "prepareEmailFor": "Pregătiți un e-mail pentru {name}",
       "prepareEmailSubject": "Linkul dvs. pentru „{title}”",
-      "prepareEmailBody": "Bună ziua, {name},\n\niată linkul dvs. personal pentru „{title}”:\n{link}\n\nLinkul este doar pentru dvs.: nu îl redirecționați și nu îl distribuiți."
+      "prepareEmailBody": "Bună ziua, {name},\n\niată linkul dvs. personal pentru „{title}”:\n{link}\n\nLinkul este doar pentru dvs.: nu îl redirecționați și nu îl distribuiți.",
+      "draftNote": "Evenimentul este o ciornă: linkurile se trimit prin e-mail când este publicat. Până atunci le puteți copia de aici."
     },
     "gdprAuditLog": {
       "title": "Registru GDPR",
@@ -1898,7 +1900,10 @@
       "aiTranslation": "Traducere automată (implicit)",
       "pickerTitle": "Alegeți un șablon",
       "pickerSubtitle": "Selectați un șablon pentru a pre-configura setările evenimentului sau omiteți pentru a configura totul manual.",
-      "skipTemplate": "Configurați manual"
+      "skipTemplate": "Configurați manual",
+      "postEventPublic": "Pagină publică după eveniment",
+      "invalidFields": "Verificați aceste câmpuri: {fields}.",
+      "descriptionOtherLanguages": "Există și versiuni în: {languages}, care nu se editează aici. Dacă modificați textul în italiană, sunt eliminate."
     },
     "instantCall": {
       "title": "Apel video instant",

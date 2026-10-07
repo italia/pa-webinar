@@ -13,12 +13,17 @@
  * finisce mai nei log, nemmeno negli errori, e l'oggetto dell'email (salvato
  * in chiaro nella coda) non lo contiene. Il corpo nella coda e' cifrato.
  *
- * Una sola email per concessione. Il moderatore principale riceve il link
- * alla creazione e alla pubblicazione, ma la seconda volta trova nella coda
- * la riga della prima (stessa chiave: evento + hash dell'indirizzo) e non
- * spedisce: ripubblicare o risalvare l'evento non moltiplica le email, mentre
- * un indirizzo cambiato riceve il suo link. Le concessioni nascono una volta
- * sola (POST /moderators), quindi partono alla creazione.
+ * I link partono quando l'evento e' pubblico, non mentre e' una bozza: chi
+ * prepara un evento lo salva e lo rivede piu' volte, e una bozza abbandonata
+ * non deve aver gia' mandato credenziali in giro. In bozza i link si copiano
+ * dalla pagina dell'evento. Alla pubblicazione partono quello del moderatore
+ * principale e quelli delle concessioni gia' create; una concessione creata
+ * dopo parte subito.
+ *
+ * Una sola email per concessione: la chiave nella coda (evento + hash
+ * dell'indirizzo per il principale, evento + concessione per le altre) fa si'
+ * che ripubblicare o risalvare l'evento non moltiplichi le email, mentre un
+ * indirizzo cambiato riceve il suo link.
  */
 
 import { defaultLocale, locales } from '@/i18n/config';
@@ -326,8 +331,13 @@ export function adminRequestLocale(request: Request, predefinita?: string | null
   return linguaPagina(predefinita) ?? defaultLocale;
 }
 
-/** Stati in cui un link di conduzione non serve piu'. */
-const CLOSED_STATUSES = new Set(['ENDED', 'ARCHIVED']);
+/** Stati in cui i link non partono: la bozza (non ancora pubblica) e
+ *  l'evento concluso. */
+const NO_SEND_STATUSES = new Set(['DRAFT', 'ENDED', 'ARCHIVED']);
+
+function dedupKeyGrant(eventId: string, grantId: string): string {
+  return `moderator-link:${eventId}:grant:${grantId}`;
+}
 
 function dedupKeyPrimary(eventId: string, email: string): string {
   return `moderator-link:${eventId}:primary:${hashEmail(email)}`;
@@ -366,7 +376,7 @@ export async function sendPrimaryModeratorLink(
         moderatorEmail: true,
       },
     });
-    if (!event || CLOSED_STATUSES.has(event.status)) return false;
+    if (!event || NO_SEND_STATUSES.has(event.status)) return false;
     const to = tryDecryptPII(event.moderatorEmail)?.trim();
     if (!to) return false;
 
@@ -421,54 +431,139 @@ export async function sendGrantModeratorLink(
   try {
     const grant = await prisma.eventModerator.findUnique({
       where: { id: grantId },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-        token: true,
-        revokedAt: true,
-        event: {
-          select: { id: true, slug: true, title: true, status: true, startsAt: true, timezone: true },
-        },
-      },
+      select: { ...GRANT_SELECT, event: { select: EVENT_SELECT } },
     });
-    if (!grant || grant.revokedAt || CLOSED_STATUSES.has(grant.event.status)) return false;
-    const to = tryDecryptPII(grant.email)?.trim();
-    if (!to) return false;
-
-    const settings = await getSettings();
-    const pagina = linguaPagina(opts.locale) ?? defaultLocale;
-    const testi = linguaEmail(pagina);
-    const event = grant.event;
-    const role: ModeratorLinkRole = grant.role === 'SPEAKER' ? 'SPEAKER' : 'MODERATOR';
-    const mail = moderatorLinkEmail({
-      locale: testi,
-      role,
-      name: tryDecryptPII(grant.name) ?? grant.name,
-      eventTitle: getLocalized(event.title as LocalizedField, pagina),
-      eventDate: formatDate(event.startsAt, testi, event.timezone),
-      eventTime: formatTime(event.startsAt, testi, event.timezone),
-      liveUrl: localizedUrl(
-        emailBaseUrl(),
-        `/events/${event.slug}/live?token=${encodeURIComponent(grant.token)}`,
-        pagina,
-      ),
-      siteName: settings.siteName || undefined,
-    });
-    return await enqueueEmailOnce({
-      to,
-      subject: mail.subject,
-      html: mail.html,
-      text: mail.text,
-      metadata: { kind: 'moderator-link', role, eventId: event.id, grantId: grant.id },
-      dedupKey: `moderator-link:${event.id}:grant:${grant.id}`,
-    });
+    if (!grant) return false;
+    return await accodaConcessione(grant, grant.event, await getSettings(), opts);
   } catch (err) {
     console.error('[email] moderator link not queued', {
       grantId,
       error: err instanceof Error ? err.name : 'unknown',
     });
     return false;
+  }
+}
+
+const GRANT_SELECT = {
+  id: true,
+  name: true,
+  email: true,
+  role: true,
+  token: true,
+  revokedAt: true,
+} as const;
+
+const EVENT_SELECT = {
+  id: true,
+  slug: true,
+  title: true,
+  status: true,
+  startsAt: true,
+  timezone: true,
+} as const;
+
+type GrantRow = {
+  id: string;
+  name: string;
+  email: string | null;
+  role: string;
+  token: string;
+  revokedAt: Date | null;
+};
+type GrantEvent = {
+  id: string;
+  slug: string;
+  title: unknown;
+  status: string;
+  startsAt: Date;
+  timezone: string;
+};
+
+/** Compone e accoda il link di una concessione; false se non deve partire. */
+async function accodaConcessione(
+  grant: GrantRow,
+  event: GrantEvent,
+  settings: { siteName?: string | null },
+  opts: { locale: string },
+): Promise<boolean> {
+  if (grant.revokedAt || NO_SEND_STATUSES.has(event.status)) return false;
+  const to = tryDecryptPII(grant.email)?.trim();
+  if (!to) return false;
+
+  const pagina = linguaPagina(opts.locale) ?? defaultLocale;
+  const testi = linguaEmail(pagina);
+  const role: ModeratorLinkRole = grant.role === 'SPEAKER' ? 'SPEAKER' : 'MODERATOR';
+  const mail = moderatorLinkEmail({
+    locale: testi,
+    role,
+    name: tryDecryptPII(grant.name) ?? grant.name,
+    eventTitle: getLocalized(event.title as LocalizedField, pagina),
+    eventDate: formatDate(event.startsAt, testi, event.timezone),
+    eventTime: formatTime(event.startsAt, testi, event.timezone),
+    liveUrl: localizedUrl(
+      emailBaseUrl(),
+      `/events/${event.slug}/live?token=${encodeURIComponent(grant.token)}`,
+      pagina,
+    ),
+    siteName: settings.siteName || undefined,
+  });
+  return enqueueEmailOnce({
+    to,
+    subject: mail.subject,
+    html: mail.html,
+    text: mail.text,
+    metadata: { kind: 'moderator-link', role, eventId: event.id, grantId: grant.id },
+    dedupKey: dedupKeyGrant(event.id, grant.id),
+  });
+}
+
+/**
+ * I link delle concessioni dell'evento che non sono ancora partiti: alla
+ * pubblicazione (quelle create in bozza) e a ogni salvataggio successivo dal
+ * wizard (per ritentare quelle che non erano andate in coda). Ognuna una volta
+ * sola (la chiave nella coda). Evento e impostazioni si leggono una volta,
+ * gli invii vanno uno dopo l'altro: niente raffica di connessioni. Restituisce
+ * quante ne ha accodate; non lancia.
+ */
+export async function sendGrantModeratorLinks(
+  eventId: string,
+  opts: { locale: string },
+): Promise<number> {
+  try {
+    const event = await prisma.event.findUnique({ where: { id: eventId }, select: EVENT_SELECT });
+    if (!event || NO_SEND_STATUSES.has(event.status)) return 0;
+    const grants = await prisma.eventModerator.findMany({
+      where: { eventId, revokedAt: null, email: { not: null } },
+      select: GRANT_SELECT,
+    });
+    if (grants.length === 0) return 0;
+    // Quelle gia' partite non si ricompongono: una sola lettura della coda.
+    const gia = await prisma.emailOutbox.findMany({
+      where: { dedupKey: { in: grants.map((g) => dedupKeyGrant(eventId, g.id)) } },
+      select: { dedupKey: true },
+    });
+    const partite = new Set(gia.map((r) => r.dedupKey));
+    const settings = await getSettings();
+    let accodate = 0;
+    for (const g of grants) {
+      if (partite.has(dedupKeyGrant(eventId, g.id))) continue;
+      try {
+        if (await accodaConcessione(g, event, settings, opts)) accodate += 1;
+      } catch (err) {
+        // Una concessione che non va in coda non ferma le altre; si ritenta
+        // al prossimo salvataggio.
+        console.error('[email] moderator link not queued', {
+          grantId: g.id,
+          error: err instanceof Error ? err.name : 'unknown',
+        });
+      }
+    }
+    return accodate;
+  } catch (err) {
+    console.error('[email] moderator links not queued', {
+      eventId,
+      error: err instanceof Error ? err.name : 'unknown',
+    });
+    return 0;
   }
 }

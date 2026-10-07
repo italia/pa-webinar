@@ -784,7 +784,8 @@
           }
         },
         "recordingHeading": "Recording",
-        "roomFeaturesHeading": "Room features"
+        "roomFeaturesHeading": "Room features",
+        "aiPipelineOff": "AI post-production (transcription, summary, translations) is not enabled on this installation."
       },
       "step3": {
         "heading": "People and invites",
@@ -902,7 +903,8 @@
         "privacyDocHelp": "Upload a PDF or paste the URL of an alternative privacy notice. Overrides the GDPR template when set.",
         "privacyTextHelp": "Short text shown on the registration form; can complement or replace the GDPR template.",
         "technicalDetails": "Technical details: capacity and resources",
-        "retentionRange": "Enter a number of days between 1 and {max}."
+        "retentionRange": "Enter a number of days between 1 and {max}.",
+        "linksOnPublish": "Personal links (primary moderator, co-moderators and speakers) are emailed when the event is published. While it is a draft, copy them from the event page."
       },
       "validationFailed": "Please review the highlighted fields before continuing.",
       "partialFailure": "Event created, but some items weren't saved: {items}. You can add them from the event page.",
@@ -1301,7 +1303,6 @@
     "dateChangedNotification": "The date has been changed. Registered participants will be notified via email.",
     "eventCreated": "Event created successfully!",
     "createEventCta": "Organise an event",
-    "createEventExplanation": "Create your event and you will receive a link to manage it.",
     "noAccountNeeded": "No account needed — the moderator link is your access to manage the event.",
     "form": {
       "titleIt": "Title (Italian)",
@@ -1504,7 +1505,8 @@
       "prepareEmail": "Prepare email",
       "prepareEmailFor": "Prepare an email for {name}",
       "prepareEmailSubject": "Your link for “{title}”",
-      "prepareEmailBody": "Hello {name},\n\nhere is your personal link for “{title}”:\n{link}\n\nThe link is for you only: do not forward or share it."
+      "prepareEmailBody": "Hello {name},\n\nhere is your personal link for “{title}”:\n{link}\n\nThe link is for you only: do not forward or share it.",
+      "draftNote": "The event is a draft: links are emailed when it is published. Meanwhile you can copy them from here."
     },
     "gdprAuditLog": {
       "title": "GDPR Audit Log",
@@ -1898,7 +1900,10 @@
       "aiTranslation": "Automatic translation (default)",
       "pickerTitle": "Choose a template",
       "pickerSubtitle": "Select a template to pre-configure event settings, or skip to configure everything manually.",
-      "skipTemplate": "Configure manually"
+      "skipTemplate": "Configure manually",
+      "postEventPublic": "Public post-event page",
+      "invalidFields": "Check these fields: {fields}.",
+      "descriptionOtherLanguages": "There are also versions in: {languages}, which cannot be edited here. If you change the Italian text they are removed."
     },
     "instantCall": {
       "title": "Instant video call",

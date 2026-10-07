@@ -27,8 +27,10 @@ interface SerializedTemplate {
   icon: string;
   qaEnabled: boolean;
   chatEnabled: boolean;
+  agendaEnabled: boolean;
   wordCloudEnabled: boolean;
   whiteboardEnabled: boolean;
+  postEventPublic: boolean;
   waitingRoomEngine: 'GARDEN' | 'GAME' | 'CLASSIC' | null;
   recordingEnabled: boolean;
   participantsCanUnmute: boolean;
@@ -64,8 +66,10 @@ interface EditingTemplate {
   icon: string;
   qaEnabled: boolean;
   chatEnabled: boolean;
+  agendaEnabled: boolean;
   wordCloudEnabled: boolean;
   whiteboardEnabled: boolean;
+  postEventPublic: boolean;
   waitingRoomEngine: 'GARDEN' | 'GAME' | 'CLASSIC' | null;
   recordingEnabled: boolean;
   participantsCanUnmute: boolean;
@@ -80,6 +84,12 @@ interface EditingTemplate {
   multitrackRecordingEnabled: boolean;
   retainParticipantTracks: boolean;
   descriptionTemplateIt: string;
+  /** Le altre lingue della descrizione, che qui non si modificano: si
+   *  rimandano com'erano finche' l'italiano resta quello, e cadono quando
+   *  l'italiano cambia (sarebbero la traduzione di un testo che non c'e' piu'). */
+  descriptionTemplateOther: Record<string, string>;
+  /** L'italiano com'era all'apertura. */
+  descriptionTemplateItOriginal: string;
   defaultRetentionDays: number | null;
   defaultExpectedSpeakers: number | null;
 }
@@ -93,15 +103,17 @@ const DEFAULT_NEW: EditingTemplate = {
   // quando serve.
   qaEnabled: false,
   chatEnabled: true,
+  agendaEnabled: false,
   wordCloudEnabled: false,
   whiteboardEnabled: false,
+  postEventPublic: true,
   waitingRoomEngine: null,
   recordingEnabled: false,
   participantsCanUnmute: false,
   participantsCanStartVideo: false,
   participantsCanShareScreen: false,
   maxParticipants: 300,
-  defaultDurationMinutes: 120,
+  defaultDurationMinutes: 60,
   aiTranscriptEnabled: false,
   aiSummaryEnabled: false,
   aiTranslationEnabled: false,
@@ -109,6 +121,8 @@ const DEFAULT_NEW: EditingTemplate = {
   multitrackRecordingEnabled: false,
   retainParticipantTracks: false,
   descriptionTemplateIt: '',
+  descriptionTemplateOther: {},
+  descriptionTemplateItOriginal: '',
   defaultRetentionDays: null,
   defaultExpectedSpeakers: null,
 };
@@ -140,8 +154,10 @@ export default function TemplateManagement({
       icon: tpl.icon,
       qaEnabled: tpl.qaEnabled,
       chatEnabled: tpl.chatEnabled,
+      agendaEnabled: tpl.agendaEnabled,
       wordCloudEnabled: tpl.wordCloudEnabled,
       whiteboardEnabled: tpl.whiteboardEnabled,
+      postEventPublic: tpl.postEventPublic,
       waitingRoomEngine: tpl.waitingRoomEngine,
       recordingEnabled: tpl.recordingEnabled,
       participantsCanUnmute: tpl.participantsCanUnmute,
@@ -156,6 +172,10 @@ export default function TemplateManagement({
       multitrackRecordingEnabled: tpl.multitrackRecordingEnabled,
       retainParticipantTracks: tpl.retainParticipantTracks,
       descriptionTemplateIt: tpl.descriptionTemplate?.it ?? '',
+      descriptionTemplateOther: Object.fromEntries(
+        Object.entries(tpl.descriptionTemplate ?? {}).filter(([k]) => k !== 'it'),
+      ),
+      descriptionTemplateItOriginal: tpl.descriptionTemplate?.it ?? '',
       // Un valore salvato prima del limite attuale si riporta entro il
       // massimo: altrimenti il template non si risalverebbe piu'.
       defaultRetentionDays:
@@ -174,12 +194,18 @@ export default function TemplateManagement({
     try {
       const isNew = editing === 'new';
       // Mappa il campo UI `descriptionTemplateIt` sul JSON {it} atteso dall'API.
-      const { descriptionTemplateIt, ...rest } = form;
+      const {
+        descriptionTemplateIt,
+        descriptionTemplateOther,
+        descriptionTemplateItOriginal,
+        ...rest
+      } = form;
+      const italiano = descriptionTemplateIt.trim();
+      const altre = italiano === descriptionTemplateItOriginal.trim() ? descriptionTemplateOther : {};
+      const descrizione = { ...altre, ...(italiano ? { it: italiano } : {}) };
       const payload = {
         ...rest,
-        descriptionTemplate: descriptionTemplateIt.trim()
-          ? { it: descriptionTemplateIt.trim() }
-          : null,
+        descriptionTemplate: Object.keys(descrizione).length > 0 ? descrizione : null,
       };
       const body = isNew ? payload : { id: editing, ...payload };
 
@@ -190,8 +216,28 @@ export default function TemplateManagement({
       });
 
       if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error ?? 'Save failed');
+        // I campi rifiutati, con il nome che hanno nel modulo.
+        const body = (await res.json().catch(() => ({}))) as {
+          details?: Array<{ path?: Array<string | number> }>;
+        };
+        const etichette: Record<string, string> = {
+          name: t('nameLabel'),
+          description: t('descriptionLabel'),
+          maxParticipants: t('maxParticipantsLabel'),
+          defaultDurationMinutes: t('durationLabel'),
+          defaultRetentionDays: t('retentionLabel'),
+          defaultExpectedSpeakers: t('expectedSpeakersLabel'),
+          descriptionTemplate: t('descriptionTemplateLabel'),
+        };
+        const campi = [
+          ...new Set(
+            (body.details ?? [])
+              .map((d) => etichette[String(d.path?.[0] ?? '')])
+              .filter((e): e is string => Boolean(e)),
+          ),
+        ];
+        setError(campi.length > 0 ? t('invalidFields', { fields: campi.join(', ') }) : tc('errorGeneric'));
+        return;
       }
 
       const saved = await res.json();
@@ -206,12 +252,12 @@ export default function TemplateManagement({
         );
       }
       setEditing(null);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Error');
+    } catch {
+      setError(tc('errorGeneric'));
     } finally {
       setSaving(false);
     }
-  }, [editing, form]);
+  }, [editing, form, t, tc]);
 
   const handleDelete = useCallback(async (id: string) => {
     const ok = await confirm({
@@ -225,13 +271,10 @@ export default function TemplateManagement({
       const res = await fetch(`/api/admin/templates?id=${id}`, {
         method: 'DELETE',
       });
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error ?? 'Delete failed');
-      }
+      if (!res.ok) throw new Error(String(res.status));
       setTemplates((prev) => prev.filter((tpl) => tpl.id !== id));
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Error');
+    } catch {
+      setError(tc('errorGeneric'));
     }
   }, [confirm, t, tc]);
 
@@ -535,6 +578,15 @@ function TemplateForm({
           }
         />
         <small className="form-text text-muted">{t('descriptionTemplateHint')}</small>
+        {/* Le altre lingue non si modificano qui: lo si dice, e si dice che
+            cambiando l'italiano cadono (tradurrebbero un testo che non c'e' piu'). */}
+        {Object.keys(form.descriptionTemplateOther).length > 0 && (
+          <small className="form-text text-muted d-block">
+            {t('descriptionOtherLanguages', {
+              languages: Object.keys(form.descriptionTemplateOther).sort().join(', '),
+            })}
+          </small>
+        )}
       </FormGroup>
 
       <div className="mb-3">
@@ -545,6 +597,7 @@ function TemplateForm({
           [
             ['qaEnabled', 'Q&A'],
             ['chatEnabled', 'Chat'],
+            ['agendaEnabled', ta('agendaEnabled')],
             ['wordCloudEnabled', ta('wordCloudEnabled')],
             ['whiteboardEnabled', t('whiteboardLabel')],
             ['recordingEnabled', t('recordingLabel')],
@@ -561,6 +614,7 @@ function TemplateForm({
             ['aiDubbingEnabled', ta('aiDubbingEnabled')],
             ['multitrackRecordingEnabled', ta('multitrackRecordingEnabled')],
             ['retainParticipantTracks', ta('retainParticipantTracks')],
+            ['postEventPublic', t('postEventPublic')],
           ] as const
         ).map(([key, label]) => {
           // La lavagna senza il servizio dell'installazione non comparirebbe

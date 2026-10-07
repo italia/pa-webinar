@@ -784,7 +784,8 @@
           }
         },
         "recordingHeading": "Rekording",
-        "roomFeaturesHeading": "Funzjonijiet tal-kamra"
+        "roomFeaturesHeading": "Funzjonijiet tal-kamra",
+        "aiPipelineOff": "Il-post-produzzjoni AI (traskrizzjoni, sommarju, traduzzjonijiet) mhijiex attiva f'din l-installazzjoni."
       },
       "step3": {
         "heading": "Persuni u stediniet",
@@ -902,7 +903,8 @@
         "privacyDocHelp": "Tella' PDF jew waħħal URL ta' avviż sostituttiv. Jissostitwixxi t-template GDPR jekk preżenti.",
         "privacyTextHelp": "Test qasir muri fil-formola tal-irreġistrazzjoni; jista' jikkomplementa jew jissostitwixxi t-template GDPR.",
         "technicalDetails": "Dettalji tekniċi: kapaċità u riżorsi",
-        "retentionRange": "Daħħal numru ta' jiem bejn 1 u {max}."
+        "retentionRange": "Daħħal numru ta' jiem bejn 1 u {max}.",
+        "linksOnPublish": "Il-links personali (moderatur prinċipali, ko-moderaturi u kelliema) jintbagħtu bl-email meta l-avveniment jiġi ppubblikat. Sakemm ikun abbozz, ikkopjahom mill-paġna tal-avveniment."
       },
       "validationFailed": "Iċċekkja l-oqsma evidenzjati qabel tipproċedi.",
       "partialFailure": "L-avveniment inħoloq, imma xi elementi ma ġewx salvati: {items}. Tista' żżidhom mill-paġna tal-avveniment.",
@@ -1301,7 +1303,6 @@
     "dateChangedNotification": "Id-data nbidlet. Il-parteċipanti rreġistrati se jiġu nnotifikati bl-email.",
     "eventCreated": "Avveniment maħluq b'suċċess!",
     "createEventCta": "Organizza avveniment",
-    "createEventExplanation": "Oħloq l-avveniment tiegħek u se tirċievi link biex timmaniġġjah.",
     "noAccountNeeded": "Mhemmx bżonn ta' kont — il-link tal-moderatur huwa l-aċċess tiegħek biex timmaniġġja l-avveniment.",
     "form": {
       "titleIt": "Titlu (Taljan)",
@@ -1504,7 +1505,8 @@
       "prepareEmail": "Ipprepara email",
       "prepareEmailFor": "Ipprepara email għal {name}",
       "prepareEmailSubject": "Il-link tiegħek għal “{title}”",
-      "prepareEmailBody": "Bonġu {name},\n\nhawn hu l-link personali tiegħek għal “{title}”:\n{link}\n\nIl-link huwa għalik biss: tgħaddihx u taqsmux."
+      "prepareEmailBody": "Bonġu {name},\n\nhawn hu l-link personali tiegħek għal “{title}”:\n{link}\n\nIl-link huwa għalik biss: tgħaddihx u taqsmux.",
+      "draftNote": "L-avveniment huwa abbozz: il-links jintbagħtu bl-email meta jiġi ppubblikat. Sadanittant tista' tikkopjahom minn hawn."
     },
     "gdprAuditLog": {
       "title": "Reġistru tal-Awditu GDPR",
@@ -1898,7 +1900,10 @@
       "aiTranslation": "Traduzzjoni awtomatika (prestabbilit)",
       "pickerTitle": "Agħżel template",
       "pickerSubtitle": "Agħżel template biex tikkonfigura minn qabel is-settings tal-avveniment, jew aqbeż biex tikkonfigura kollox manwalment.",
-      "skipTemplate": "Ikkonfigura manwalment"
+      "skipTemplate": "Ikkonfigura manwalment",
+      "postEventPublic": "Paġna pubblika wara l-avveniment",
+      "invalidFields": "Iċċekkja dawn l-oqsma: {fields}.",
+      "descriptionOtherLanguages": "Hemm ukoll verżjonijiet bil-: {languages}, li ma jistgħux jiġu editjati hawn. Jekk tibdel it-test bit-Taljan, jitneħħew."
     },
     "instantCall": {
       "title": "Videocall istantanja",

@@ -107,16 +107,34 @@ export default function Step3Invites({
   );
 }
 
-function SectionHeading({ title, help }: { title: string; help: string }) {
+/**
+ * Una sezione del passo, richiudibile: chiusa finche' e' vuota, aperta se ha
+ * gia' qualcuno. Il riassunto dice cosa contiene e quante persone ci sono,
+ * cosi' il passo si legge con un colpo d'occhio e si apre solo cio' che serve.
+ */
+function Gruppo({
+  title,
+  help,
+  count,
+  children,
+}: {
+  title: string;
+  help: string;
+  count: number;
+  children: React.ReactNode;
+}) {
+  const [apertoAllInizio] = useState(count > 0);
   return (
-    <>
-      <h3 className="h6 fw-semibold mb-2" style={{ color: 'var(--app-text)' }}>
-        {title}
-      </h3>
-      <p className="text-secondary mb-2" style={{ fontSize: '0.85rem' }}>
-        {help}
-      </p>
-    </>
+    <details className="wizard-group mb-3" open={apertoAllInizio || undefined}>
+      <summary>
+        <span className="wizard-group__title">
+          {title}
+          {count > 0 && <span className="badge rounded-pill ms-2 wizard-group__count">{count}</span>}
+        </span>
+        <span className="wizard-group__help">{help}</span>
+      </summary>
+      <div className="wizard-group__body">{children}</div>
+    </details>
   );
 }
 
@@ -217,8 +235,7 @@ function OrganizersSection({
   };
 
   return (
-    <section className="mb-4">
-      <SectionHeading title={t('organizersHeading')} help={t('organizersHelp')} />
+    <Gruppo title={t('organizersHeading')} help={t('organizersHelp')} count={value.length}>
       <AddedList
         items={value}
         keyOf={(o) => o.name}
@@ -268,7 +285,7 @@ function OrganizersSection({
         </div>
         <FieldError message={err} />
       </div>
-    </section>
+    </Gruppo>
   );
 }
 
@@ -329,11 +346,11 @@ function PeopleSection({
   };
 
   return (
-    <section className="mb-4">
-      <SectionHeading
-        title={t(kind === 'moderators' ? 'moderatorsHeading' : 'speakersHeading')}
-        help={t(kind === 'moderators' ? 'moderatorsHelp' : 'speakersHelp')}
-      />
+    <Gruppo
+      title={t(kind === 'moderators' ? 'moderatorsHeading' : 'speakersHeading')}
+      help={t(kind === 'moderators' ? 'moderatorsHelp' : 'speakersHelp')}
+      count={value.length}
+    >
       <AddedList
         items={value}
         keyOf={(p) => p.email}
@@ -375,7 +392,7 @@ function PeopleSection({
         </div>
         <FieldError message={err} />
       </div>
-    </section>
+    </Gruppo>
   );
 }
 
@@ -425,8 +442,7 @@ function InvitationsSection({
   };
 
   return (
-    <section className="mb-3">
-      <SectionHeading title={t('invitationsHeading')} help={t('invitationsHelp')} />
+    <Gruppo title={t('invitationsHeading')} help={t('invitationsHelp')} count={value.length}>
       <AddedList
         items={value}
         keyOf={(inv) => inv.email}
@@ -475,6 +491,6 @@ function InvitationsSection({
           </div>
         </>
       )}
-    </section>
+    </Gruppo>
   );
 }

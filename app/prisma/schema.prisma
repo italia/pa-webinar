@@ -1164,6 +1164,10 @@ model EventTemplate {
   // is applied on new-event creation instead of the boolean toggles.
   permissionMatrix Json? @map("permission_matrix") @db.JsonB
 
+  // La pagina dopo l'evento (Event.postEventPublic) e' pubblica? Una riunione
+  // di lavoro non lo e': il template lo decide per gli eventi che crea.
+  postEventPublic Boolean @default(true) @map("post_event_public")
+
   isSystem  Boolean  @default(false) @map("is_system")
   sortOrder Int      @default(0) @map("sort_order")
   createdAt DateTime @default(now()) @map("created_at")

@@ -33,6 +33,7 @@ vi.mock('@/lib/settings', () => ({ getSettings: vi.fn(async () => ({ defaultLoca
 vi.mock('@/lib/email/moderator-link', async (importOriginal) => ({
   ...(await importOriginal<Record<string, unknown>>()),
   sendPrimaryModeratorLink: vi.fn(async () => true),
+  sendGrantModeratorLinks: vi.fn(async () => 0),
 }));
 vi.mock('@/lib/live/actions', () => ({ recordLiveAction: vi.fn(), recordLiveActions: vi.fn() }));
 
@@ -46,7 +47,7 @@ vi.mock('@/lib/db', () => ({
 }));
 
 import { prisma } from '@/lib/db';
-import { sendPrimaryModeratorLink } from '@/lib/email/moderator-link';
+import { sendGrantModeratorLinks, sendPrimaryModeratorLink } from '@/lib/email/moderator-link';
 
 import { PUT } from './route';
 
@@ -108,6 +109,32 @@ describe('PUT /api/events/[param] — link del moderatore principale', () => {
     const r = await PUT(put({ status: 'PUBLISHED' }), ctx as never);
     expect(r.status).toBe(200);
     expect(sendPrimaryModeratorLink).toHaveBeenCalledWith(EVENT_ID, { locale: 'en' });
+  });
+
+  it('at publication also sends the links of the grants created while in draft', async () => {
+    await PUT(put({ status: 'PUBLISHED' }), ctx as never);
+    expect(sendGrantModeratorLinks).toHaveBeenCalledWith(EVENT_ID, { locale: 'en' });
+  });
+
+  it('a full wizard save of a published event retries the grant links that did not go out', async () => {
+    stato.status = 'PUBLISHED';
+    await PUT(put({ title: { it: 'Titolo' } }), ctx as never);
+    expect(sendGrantModeratorLinks).toHaveBeenCalledWith(EVENT_ID, { locale: 'en' });
+    expect(sendPrimaryModeratorLink).not.toHaveBeenCalled();
+  });
+
+  it('a partial update from the room sends nothing', async () => {
+    stato.status = 'PUBLISHED';
+    await PUT(put({ qaEnabled: true }), ctx as never);
+    expect(sendGrantModeratorLinks).not.toHaveBeenCalled();
+    expect(sendPrimaryModeratorLink).not.toHaveBeenCalled();
+  });
+
+  it('a changed address on a published event re-sends only the primary link', async () => {
+    stato.status = 'PUBLISHED';
+    await PUT(put({ moderatorEmail: 'nuovo@example.test' }), ctx as never);
+    expect(sendPrimaryModeratorLink).toHaveBeenCalledTimes(1);
+    expect(sendGrantModeratorLinks).not.toHaveBeenCalled();
   });
 
   it('asks for it when the address changes', async () => {

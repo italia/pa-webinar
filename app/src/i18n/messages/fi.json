@@ -784,7 +784,8 @@
           }
         },
         "recordingHeading": "Tallennus",
-        "roomFeaturesHeading": "Huoneen toiminnot"
+        "roomFeaturesHeading": "Huoneen toiminnot",
+        "aiPipelineOff": "Tekoälyjälkikäsittely (litterointi, tiivistelmä, käännökset) ei ole käytössä tässä asennuksessa."
       },
       "step3": {
         "heading": "Henkilöt ja kutsut",
@@ -902,7 +903,8 @@
         "privacyDocHelp": "Lataa PDF tai liitä vaihtoehtoisen tietosuojaselosteen URL. Korvaa GDPR-mallin, jos asetettu.",
         "privacyTextHelp": "Lyhyt teksti, joka näytetään ilmoittautumislomakkeessa; voi täydentää tai korvata GDPR-mallin.",
         "technicalDetails": "Tekniset tiedot: kapasiteetti ja resurssit",
-        "retentionRange": "Anna päivien määrä väliltä 1–{max}."
+        "retentionRange": "Anna päivien määrä väliltä 1–{max}.",
+        "linksOnPublish": "Henkilökohtaiset linkit (päämoderaattori, apumoderaattorit ja puhujat) lähetetään sähköpostitse, kun tapahtuma julkaistaan. Kun se on luonnos, kopioi ne tapahtuman sivulta."
       },
       "validationFailed": "Tarkista korostetut kentät ennen jatkamista.",
       "partialFailure": "Tapahtuma luotiin, mutta joitakin osia ei tallennettu: {items}. Voit lisätä ne tapahtuman sivulta.",
@@ -1301,7 +1303,6 @@
     "dateChangedNotification": "Päivämäärä on muutettu. Ilmoittautuneet osallistujat saavat ilmoituksen sähköpostitse.",
     "eventCreated": "Tapahtuma luotu onnistuneesti!",
     "createEventCta": "Järjestä tapahtuma",
-    "createEventExplanation": "Luo tapahtuma ja saat linkin sen hallintaan.",
     "noAccountNeeded": "Tiliä ei tarvita — moderaattorilinkki on pääsynne tapahtuman hallintaan.",
     "form": {
       "titleIt": "Otsikko (italia)",
@@ -1504,7 +1505,8 @@
       "prepareEmail": "Valmistele sähköposti",
       "prepareEmailFor": "Valmistele sähköposti henkilölle {name}",
       "prepareEmailSubject": "Linkkisi tapahtumaan ”{title}”",
-      "prepareEmailBody": "Hei {name},\n\ntässä on henkilökohtainen linkkisi tapahtumaan ”{title}”:\n{link}\n\nLinkki on vain sinulle: älä välitä tai jaa sitä."
+      "prepareEmailBody": "Hei {name},\n\ntässä on henkilökohtainen linkkisi tapahtumaan ”{title}”:\n{link}\n\nLinkki on vain sinulle: älä välitä tai jaa sitä.",
+      "draftNote": "Tapahtuma on luonnos: linkit lähetetään sähköpostitse, kun se julkaistaan. Sitä ennen voit kopioida ne täältä."
     },
     "gdprAuditLog": {
       "title": "GDPR-tarkastusloki",
@@ -1898,7 +1900,10 @@
       "aiTranslation": "Automaattinen käännös (oletus)",
       "pickerTitle": "Valitse malli",
       "pickerSubtitle": "Valitse malli esimäärittääksesi tapahtuma-asetukset tai ohita ja määritä kaikki manuaalisesti.",
-      "skipTemplate": "Määritä manuaalisesti"
+      "skipTemplate": "Määritä manuaalisesti",
+      "postEventPublic": "Julkinen tapahtuman jälkeinen sivu",
+      "invalidFields": "Tarkista nämä kentät: {fields}.",
+      "descriptionOtherLanguages": "Tekstistä on myös versiot kielillä: {languages}, joita ei voi muokata täällä. Jos muutat italiankielistä tekstiä, ne poistetaan."
     },
     "instantCall": {
       "title": "Pikavideopuhelu",

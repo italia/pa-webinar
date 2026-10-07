@@ -784,7 +784,8 @@
           }
         },
         "recordingHeading": "Inspelning",
-        "roomFeaturesHeading": "Rummets funktioner"
+        "roomFeaturesHeading": "Rummets funktioner",
+        "aiPipelineOff": "AI-efterbearbetning (transkribering, sammanfattning, översättningar) är inte aktiverad i den här installationen."
       },
       "step3": {
         "heading": "Personer och inbjudningar",
@@ -902,7 +903,8 @@
         "privacyDocHelp": "Ladda upp en PDF eller klistra in URL:en till en alternativ integritetspolicy. Ersätter GDPR-mallen om angiven.",
         "privacyTextHelp": "Kort text som visas på registreringsformuläret; kan komplettera eller ersätta GDPR-mallen.",
         "technicalDetails": "Tekniska detaljer: kapacitet och resurser",
-        "retentionRange": "Ange ett antal dagar mellan 1 och {max}."
+        "retentionRange": "Ange ett antal dagar mellan 1 och {max}.",
+        "linksOnPublish": "De personliga länkarna (huvudmoderator, medmoderatorer och talare) skickas via e-post när evenemanget publiceras. Så länge det är ett utkast kopierar du dem från evenemangets sida."
       },
       "validationFailed": "Kontrollera de markerade fälten innan du fortsätter.",
       "partialFailure": "Evenemanget skapades, men vissa delar sparades inte: {items}. Du kan lägga till dem från evenemangets sida.",
@@ -1301,7 +1303,6 @@
     "dateChangedNotification": "Datumet har ändrats. Anmälda deltagare meddelas via e-post.",
     "eventCreated": "Evenemanget skapat!",
     "createEventCta": "Arrangera ett evenemang",
-    "createEventExplanation": "Skapa ditt evenemang och du får en länk för att hantera det.",
     "noAccountNeeded": "Inget konto behövs — moderatorlänken är din åtkomst för att hantera evenemanget.",
     "form": {
       "titleIt": "Titel (italienska)",
@@ -1504,7 +1505,8 @@
       "prepareEmail": "Förbered e-post",
       "prepareEmailFor": "Förbered ett e-postmeddelande till {name}",
       "prepareEmailSubject": "Din länk till ”{title}”",
-      "prepareEmailBody": "Hej {name},\n\nhär är din personliga länk till ”{title}”:\n{link}\n\nLänken är bara för dig: vidarebefordra eller dela den inte."
+      "prepareEmailBody": "Hej {name},\n\nhär är din personliga länk till ”{title}”:\n{link}\n\nLänken är bara för dig: vidarebefordra eller dela den inte.",
+      "draftNote": "Evenemanget är ett utkast: länkarna skickas via e-post när det publiceras. Under tiden kan du kopiera dem härifrån."
     },
     "gdprAuditLog": {
       "title": "GDPR-revisionslogg",
@@ -1898,7 +1900,10 @@
       "aiTranslation": "Automatisk översättning (standard)",
       "pickerTitle": "Välj en mall",
       "pickerSubtitle": "Välj en mall för att förkonfigurera evenemangsinställningarna, eller hoppa över för att konfigurera allt manuellt.",
-      "skipTemplate": "Konfigurera manuellt"
+      "skipTemplate": "Konfigurera manuellt",
+      "postEventPublic": "Offentlig sida efter evenemanget",
+      "invalidFields": "Kontrollera de här fälten: {fields}.",
+      "descriptionOtherLanguages": "Det finns även versioner på: {languages}, som inte kan redigeras här. Om du ändrar den italienska texten tas de bort."
     },
     "instantCall": {
       "title": "Omedelbart videosamtal",

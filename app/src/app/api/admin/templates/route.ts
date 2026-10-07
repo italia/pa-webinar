@@ -22,6 +22,8 @@ const templateSchema = z.object({
   autoStartRecording: z.boolean().optional(),
   agendaEnabled: z.boolean().optional(),
   wordCloudEnabled: z.boolean().optional(),
+  // La pagina dopo l'evento e' pubblica? (Event.postEventPublic)
+  postEventPublic: z.boolean().optional(),
   whiteboardEnabled: z.boolean().optional(),
   // Motore sala d'attesa pre-popolato nel wizard. null = default sito.
   waitingRoomEngine: z.enum(['GARDEN', 'GAME', 'CLASSIC']).nullish(),
@@ -96,8 +98,10 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
   const body = await parseJsonBody(request);
   const result = templateSchema.safeParse(body);
   if (!result.success) {
+    // Con i campi: l'editor dice quale correggere.
     throw new ValidationError(
-      result.error.issues.map((i) => i.message).join(', '),
+      'Validation failed',
+      result.error.issues.map((i) => ({ path: i.path, message: i.message })),
     );
   }
 
@@ -137,8 +141,10 @@ export const PUT = withErrorHandling(async (request: NextRequest) => {
 
   const result = templateSchema.partial().safeParse(data);
   if (!result.success) {
+    // Con i campi: l'editor dice quale correggere.
     throw new ValidationError(
-      result.error.issues.map((i) => i.message).join(', '),
+      'Validation failed',
+      result.error.issues.map((i) => ({ path: i.path, message: i.message })),
     );
   }
 

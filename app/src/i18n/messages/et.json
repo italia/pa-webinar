@@ -784,7 +784,8 @@
           }
         },
         "recordingHeading": "Salvestus",
-        "roomFeaturesHeading": "Ruumi funktsioonid"
+        "roomFeaturesHeading": "Ruumi funktsioonid",
+        "aiPipelineOff": "AI järeltöötlus (transkriptsioon, kokkuvõte, tõlked) ei ole selles paigalduses sisse lülitatud."
       },
       "step3": {
         "heading": "Inimesed ja kutsed",
@@ -902,7 +903,8 @@
         "privacyDocHelp": "Laadige üles PDF või kleepige asendava teabe URL. Olemasolul kirjutab IKÜM-i malli üle.",
         "privacyTextHelp": "Lühike tekst, mis kuvatakse registreerimisvormil; võib täiendada või asendada IKÜM-i malli.",
         "technicalDetails": "Tehnilised üksikasjad: mahutavus ja ressursid",
-        "retentionRange": "Sisestage päevade arv vahemikus 1 kuni {max}."
+        "retentionRange": "Sisestage päevade arv vahemikus 1 kuni {max}.",
+        "linksOnPublish": "Isiklikud lingid (peamoderaator, kaasmoderaatorid ja esinejad) saadetakse e-postiga, kui üritus avaldatakse. Kuni see on mustand, kopeerige need ürituse lehelt."
       },
       "validationFailed": "Enne jätkamist kontrollige esiletõstetud välju.",
       "partialFailure": "Sündmus loodi, kuid mõnda elementi ei salvestatud: {items}. Saad need lisada sündmuse lehelt.",
@@ -1301,7 +1303,6 @@
     "dateChangedNotification": "Kuupäev on muudetud. Registreerunud osalejaid teavitatakse e-postiga.",
     "eventCreated": "Üritus edukalt loodud!",
     "createEventCta": "Korralda üritus",
-    "createEventExplanation": "Looge oma üritus ja saate lingi selle haldamiseks.",
     "noAccountNeeded": "Kontot pole vaja — moderaatori link on teie ligipääs ürituse haldamiseks.",
     "form": {
       "titleIt": "Pealkiri (itaalia k.)",
@@ -1504,7 +1505,8 @@
       "prepareEmail": "Koosta e-kiri",
       "prepareEmailFor": "Koosta e-kiri: {name}",
       "prepareEmailSubject": "Teie link sündmusele „{title}“",
-      "prepareEmailBody": "Tere, {name}!\n\nSiin on teie isiklik link sündmusele „{title}“:\n{link}\n\nLink on ainult teile: ärge edastage ega jagage seda."
+      "prepareEmailBody": "Tere, {name}!\n\nSiin on teie isiklik link sündmusele „{title}“:\n{link}\n\nLink on ainult teile: ärge edastage ega jagage seda.",
+      "draftNote": "Üritus on mustand: lingid saadetakse e-postiga, kui see avaldatakse. Seni saate need siit kopeerida."
     },
     "gdprAuditLog": {
       "title": "GDPR auditilogi",
@@ -1898,7 +1900,10 @@
       "aiTranslation": "Automaatne tõlge (vaikimisi)",
       "pickerTitle": "Valige mall",
       "pickerSubtitle": "Valige mall ürituse seadete eelseadistamiseks või jätke vahele, et kõik käsitsi seadistada.",
-      "skipTemplate": "Seadista käsitsi"
+      "skipTemplate": "Seadista käsitsi",
+      "postEventPublic": "Avalik ürituse järgne leht",
+      "invalidFields": "Kontrollige neid välju: {fields}.",
+      "descriptionOtherLanguages": "On ka versioonid keeltes: {languages}, mida siin muuta ei saa. Kui muudate itaaliakeelset teksti, need eemaldatakse."
     },
     "instantCall": {
       "title": "Kiire videokõne",

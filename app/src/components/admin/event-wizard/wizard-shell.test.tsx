@@ -234,6 +234,8 @@ describe('modifica — revoca di un co-moderatore', () => {
       recordingEnabled: false,
       autoStartRecording: false,
       dataRetentionDays: 30,
+      postEventPublic: true,
+      status: 'PUBLISHED',
       gdprTemplateId: null,
       privacyPolicyText: null,
       privacyPolicyUrl: null,
@@ -598,5 +600,56 @@ describe('creazione — risorse non salvate', () => {
     expect(toastError).toHaveBeenCalledWith(
       w.partialFailure.replace('{items}', w.resources.speakers),
     );
+  });
+});
+
+describe('passo 1 — la fine segue l inizio', () => {
+  function fuoco(el: HTMLElement, dentro: boolean) {
+    act(() => {
+      if (dentro) el.focus();
+      else el.blur();
+    });
+  }
+
+  it('scrivendo nel campo, la fine si sposta all uscita con la durata che aveva, ignorando i valori intermedi', () => {
+    renderWizard();
+    const inizio = byId<HTMLInputElement>('ev-starts');
+    const fine = byId<HTMLInputElement>('ev-ends');
+    fuoco(inizio, true);
+    type(inizio, '2030-03-10T10:00');
+    fuoco(inizio, false);
+    type(fine, '2030-03-10T11:30');
+
+    fuoco(inizio, true);
+    // Una data scritta a mano passa per valori intermedi.
+    type(inizio, '2030-03-01T10:00');
+    expect(fine.value).toBe('2030-03-10T11:30');
+    type(inizio, '2030-03-15T10:00');
+    fuoco(inizio, false);
+
+    expect(fine.value).toBe('2030-03-15T11:30');
+  });
+
+  it('un valore arrivato a campo non attivo (dal selettore di data) sposta subito la fine', () => {
+    renderWizard();
+    const inizio = byId<HTMLInputElement>('ev-starts');
+    const fine = byId<HTMLInputElement>('ev-ends');
+    fuoco(inizio, true);
+    type(inizio, '2030-03-10T10:00');
+    fuoco(inizio, false);
+    type(fine, '2030-03-10T12:00');
+
+    type(inizio, '2030-04-02T09:00');
+    expect(fine.value).toBe('2030-04-02T11:00');
+  });
+
+  it('se l inizio non cambia, la fine resta', () => {
+    renderWizard();
+    const inizio = byId<HTMLInputElement>('ev-starts');
+    const fine = byId<HTMLInputElement>('ev-ends');
+    type(fine, '2030-03-10T18:00');
+    fuoco(inizio, true);
+    fuoco(inizio, false);
+    expect(fine.value).toBe('2030-03-10T18:00');
   });
 });

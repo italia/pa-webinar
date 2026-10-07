@@ -784,7 +784,8 @@
           }
         },
         "recordingHeading": "Enregistrement",
-        "roomFeaturesHeading": "Fonctions de la salle"
+        "roomFeaturesHeading": "Fonctions de la salle",
+        "aiPipelineOff": "La post-production IA (transcription, synthèse, traductions) n'est pas activée sur cette installation."
       },
       "step3": {
         "heading": "Personnes et invitations",
@@ -902,7 +903,8 @@
         "privacyDocHelp": "Téléversez un PDF ou collez l'URL d'une notice alternative. Remplace le modèle RGPD lorsqu'il est défini.",
         "privacyTextHelp": "Texte synthétique affiché dans le formulaire d'inscription ; peut compléter ou remplacer le modèle RGPD.",
         "technicalDetails": "Détails techniques : capacité et ressources",
-        "retentionRange": "Saisissez un nombre de jours entre 1 et {max}."
+        "retentionRange": "Saisissez un nombre de jours entre 1 et {max}.",
+        "linksOnPublish": "Les liens personnels (modérateur principal, co-modérateurs et intervenants) sont envoyés par e-mail lorsque l'événement est publié. Tant qu'il s'agit d'un brouillon, copiez-les depuis la page de l'événement."
       },
       "validationFailed": "Veuillez vérifier les champs en surbrillance avant de poursuivre.",
       "partialFailure": "Événement créé, mais certains éléments n'ont pas été enregistrés : {items}. Vous pouvez les ajouter depuis la page de l'événement.",
@@ -1301,7 +1303,6 @@
     "dateChangedNotification": "La date a été modifiée. Les participants inscrits recevront une notification par e-mail.",
     "eventCreated": "Événement créé avec succès !",
     "createEventCta": "Organiser un événement",
-    "createEventExplanation": "Créez votre événement et vous recevrez un lien pour le gérer.",
     "noAccountNeeded": "Aucun compte nécessaire — le lien modérateur est votre accès pour gérer l'événement.",
     "form": {
       "titleIt": "Titre (italien)",
@@ -1504,7 +1505,8 @@
       "prepareEmail": "Préparer un e-mail",
       "prepareEmailFor": "Préparer un e-mail pour {name}",
       "prepareEmailSubject": "Votre lien pour « {title} »",
-      "prepareEmailBody": "Bonjour {name},\n\nvoici votre lien personnel pour « {title} » :\n{link}\n\nCe lien est pour vous seul : ne le transférez pas et ne le partagez pas."
+      "prepareEmailBody": "Bonjour {name},\n\nvoici votre lien personnel pour « {title} » :\n{link}\n\nCe lien est pour vous seul : ne le transférez pas et ne le partagez pas.",
+      "draftNote": "L'événement est un brouillon : les liens sont envoyés par e-mail lors de sa publication. En attendant, vous pouvez les copier ici."
     },
     "gdprAuditLog": {
       "title": "Journal GDPR",
@@ -1898,7 +1900,10 @@
       "aiTranslation": "Traduction automatique (par défaut)",
       "pickerTitle": "Choisir un modèle",
       "pickerSubtitle": "Sélectionnez un modèle pour préconfigurer les paramètres de l'événement, ou passez cette étape pour tout configurer manuellement.",
-      "skipTemplate": "Configurer manuellement"
+      "skipTemplate": "Configurer manuellement",
+      "postEventPublic": "Page publique après l'événement",
+      "invalidFields": "Vérifiez ces champs : {fields}.",
+      "descriptionOtherLanguages": "Il existe aussi des versions en : {languages}, qui ne se modifient pas ici. Si vous changez le texte italien, elles sont supprimées."
     },
     "instantCall": {
       "title": "Appel vidéo instantané",

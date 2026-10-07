@@ -784,7 +784,8 @@
           }
         },
         "recordingHeading": "Gravação",
-        "roomFeaturesHeading": "Funcionalidades da sala"
+        "roomFeaturesHeading": "Funcionalidades da sala",
+        "aiPipelineOff": "A pós-produção com IA (transcrição, síntese, traduções) não está ativada nesta instalação."
       },
       "step3": {
         "heading": "Pessoas e convites",
@@ -902,7 +903,8 @@
         "privacyDocHelp": "Carregue um PDF ou cole o URL de uma política alternativa. Substitui o modelo RGPD se estiver definido.",
         "privacyTextHelp": "Texto resumido apresentado no formulário de inscrição; pode complementar ou substituir o modelo RGPD.",
         "technicalDetails": "Detalhes técnicos: capacidade e recursos",
-        "retentionRange": "Introduza um número de dias entre 1 e {max}."
+        "retentionRange": "Introduza um número de dias entre 1 e {max}.",
+        "linksOnPublish": "As ligações pessoais (moderador principal, comoderadores e oradores) são enviadas por e-mail quando o evento é publicado. Enquanto for um rascunho, copie-as a partir da página do evento."
       },
       "validationFailed": "Verifique os campos assinalados antes de prosseguir.",
       "partialFailure": "Evento criado, mas alguns elementos não foram guardados: {items}. Pode adicioná-los a partir da página do evento.",
@@ -1301,7 +1303,6 @@
     "dateChangedNotification": "A data foi alterada. Os participantes inscritos receberão uma notificação por email.",
     "eventCreated": "Evento criado com sucesso!",
     "createEventCta": "Organizar um evento",
-    "createEventExplanation": "Crie o seu evento e receberá uma ligação para o gerir.",
     "noAccountNeeded": "Não é necessária uma conta — a ligação de moderador é o seu acesso para gerir o evento.",
     "form": {
       "titleIt": "Título (italiano)",
@@ -1504,7 +1505,8 @@
       "prepareEmail": "Preparar e-mail",
       "prepareEmailFor": "Preparar um e-mail para {name}",
       "prepareEmailSubject": "A sua ligação para «{title}»",
-      "prepareEmailBody": "Olá {name},\n\naqui está a sua ligação pessoal para «{title}»:\n{link}\n\nA ligação é só para si: não a reencaminhe nem a partilhe."
+      "prepareEmailBody": "Olá {name},\n\naqui está a sua ligação pessoal para «{title}»:\n{link}\n\nA ligação é só para si: não a reencaminhe nem a partilhe.",
+      "draftNote": "O evento é um rascunho: as ligações são enviadas por e-mail quando for publicado. Entretanto, pode copiá-las aqui."
     },
     "gdprAuditLog": {
       "title": "Registo GDPR",
@@ -1898,7 +1900,10 @@
       "aiTranslation": "Tradução automática (predefinição)",
       "pickerTitle": "Escolher um modelo",
       "pickerSubtitle": "Selecione um modelo para pré-configurar as definições do evento ou ignore para configurar tudo manualmente.",
-      "skipTemplate": "Configurar manualmente"
+      "skipTemplate": "Configurar manualmente",
+      "postEventPublic": "Página pública após o evento",
+      "invalidFields": "Verifique estes campos: {fields}.",
+      "descriptionOtherLanguages": "Existem também versões em: {languages}, que não se editam aqui. Se alterar o texto em italiano, são removidas."
     },
     "instantCall": {
       "title": "Videochamada instantânea",

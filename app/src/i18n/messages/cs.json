@@ -784,7 +784,8 @@
           }
         },
         "recordingHeading": "Záznam",
-        "roomFeaturesHeading": "Funkce místnosti"
+        "roomFeaturesHeading": "Funkce místnosti",
+        "aiPipelineOff": "AI postprodukce (přepis, shrnutí, překlady) není v této instalaci zapnutá."
       },
       "step3": {
         "heading": "Osoby a pozvánky",
@@ -902,7 +903,8 @@
         "privacyDocHelp": "Nahrajte PDF nebo vložte URL alternativního textu. Přepíše šablonu GDPR, pokud existuje.",
         "privacyTextHelp": "Stručný text zobrazený v registračním formuláři; může doplňovat nebo nahradit šablonu GDPR.",
         "technicalDetails": "Technické podrobnosti: kapacita a prostředky",
-        "retentionRange": "Zadejte počet dní mezi 1 a {max}."
+        "retentionRange": "Zadejte počet dní mezi 1 a {max}.",
+        "linksOnPublish": "Osobní odkazy (hlavní moderátor, spolumoderátoři a řečníci) se odešlou e-mailem, když je událost zveřejněna. Dokud je to koncept, zkopírujte je ze stránky události."
       },
       "validationFailed": "Před pokračováním zkontrolujte zvýrazněná pole.",
       "partialFailure": "Událost byla vytvořena, ale některé položky se neuložily: {items}. Můžete je doplnit na stránce události.",
@@ -1301,7 +1303,6 @@
     "dateChangedNotification": "Datum bylo změněno. Registrovaní účastníci budou informováni e-mailem.",
     "eventCreated": "Událost úspěšně vytvořena!",
     "createEventCta": "Uspořádat událost",
-    "createEventExplanation": "Vytvořte svou událost a obdržíte odkaz pro její správu.",
     "noAccountNeeded": "Nepotřebujete účet — odkaz moderátora je váš přístup ke správě události.",
     "form": {
       "titleIt": "Název (italsky)",
@@ -1504,7 +1505,8 @@
       "prepareEmail": "Připravit e-mail",
       "prepareEmailFor": "Připravit e-mail pro: {name}",
       "prepareEmailSubject": "Váš odkaz na „{title}“",
-      "prepareEmailBody": "Dobrý den, {name},\n\nzde je váš osobní odkaz na „{title}“:\n{link}\n\nOdkaz je jen pro vás: nepřeposílejte ho ani ho nesdílejte."
+      "prepareEmailBody": "Dobrý den, {name},\n\nzde je váš osobní odkaz na „{title}“:\n{link}\n\nOdkaz je jen pro vás: nepřeposílejte ho ani ho nesdílejte.",
+      "draftNote": "Událost je koncept: odkazy se odešlou e-mailem po jejím zveřejnění. Mezitím je můžete zkopírovat odsud."
     },
     "gdprAuditLog": {
       "title": "Auditní protokol GDPR",
@@ -1898,7 +1900,10 @@
       "aiTranslation": "Automatický překlad (výchozí)",
       "pickerTitle": "Vyberte šablonu",
       "pickerSubtitle": "Vyberte šablonu pro předkonfiguraci nastavení události, nebo přeskočte pro ruční konfiguraci.",
-      "skipTemplate": "Konfigurovat ručně"
+      "skipTemplate": "Konfigurovat ručně",
+      "postEventPublic": "Veřejná stránka po události",
+      "invalidFields": "Zkontrolujte tato pole: {fields}.",
+      "descriptionOtherLanguages": "Existují také verze v jazycích: {languages}, které zde nelze upravit. Pokud změníte italský text, odstraní se."
     },
     "instantCall": {
       "title": "Okamžitý videohovor",
