@@ -616,7 +616,13 @@ Where the Jibri and recorder pods run is covered in
 To estimate the object storage, multiply the average bitrate by the duration:
 one hour at 1 Mbps is about 450 MB.
 
-- **Composite MP4.** The finalize script only re-muxes Jibri's file for
+- **Composite MP4.** The chart records at full quality by default: Jibri
+  captures the room at 1920x1080 (`JIBRI_RECORDING_RESOLUTION`, which also
+  sizes Jibri's virtual screen, so shared slides stay readable) with H.264
+  CRF 20 (`JIBRI_RECORDING_CONSTANT_RATE_FACTOR`; the image default is 25),
+  keeping the lightest encoder preset so the CPU goes to rendering the room.
+  Both are in `jitsi-meet.jibri.extraEnvs`; a lower resolution or a higher
+  CRF gives smaller files. The finalize script only re-muxes Jibri's file for
   streaming (faststart) and does not re-encode it, so the stored size is what
   Jibri's encoder produced. It depends on the resolution and on what is on
   screen: slides and a few talking heads compress far better than full-motion

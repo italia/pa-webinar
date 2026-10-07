@@ -27,21 +27,28 @@ async function main() {
   await prisma.eventTemplate.deleteMany({ where: { isSystem: false } });
 
   // Ensure system templates exist (idempotent — migration handles this, seed is a safety net).
-  // Gli stessi tre della migrazione 20261007150000_three_event_templates.
+  // Gli stessi tre delle migrazioni 20261007150000_three_event_templates e
+  // 20261007233000_template_scenarios.
   const systemTemplates = [
     {
       name: 'Webinar pubblico',
       description:
-        "Relatori in video e pubblico in ascolto, con la chat. La registrazione è disponibile e si avvia in sala. Fino a 300 partecipanti, un'ora.",
+        "Per una grande platea, anche di centinaia di persone: moderatori e relatori in video con la condivisione dello schermo, il pubblico ascolta e partecipa con chat, domande (Q&A), sondaggi e scaletta. La registrazione parte da sola; dopo l'evento trascrizione, sintesi e traduzioni, con la pagina pubblica.",
       icon: 'it-presentation',
-      qaEnabled: false,
+      qaEnabled: true,
       chatEnabled: true,
+      agendaEnabled: true,
       recordingEnabled: true,
+      autoStartRecording: true,
       participantsCanUnmute: false,
       participantsCanStartVideo: false,
       participantsCanShareScreen: false,
+      aiTranscriptEnabled: true,
+      aiSummaryEnabled: true,
+      aiTranslationEnabled: true,
+      multitrackRecordingEnabled: true,
       maxParticipants: 300,
-      defaultDurationMinutes: 60,
+      defaultDurationMinutes: 90,
       postEventPublic: true,
       isSystem: true,
       sortOrder: 0,
@@ -49,7 +56,7 @@ async function main() {
     {
       name: 'Riunione di lavoro',
       description:
-        "Tutti possono parlare, usare la webcam e condividere lo schermo. Senza registrazione, e la pagina dopo l'evento non è pubblica. Fino a 20 partecipanti, un'ora.",
+        "Per un piccolo gruppo: tutti possono parlare, usare la webcam e condividere lo schermo, con la chat. Senza registrazione; la pagina dopo l'evento non è pubblica.",
       icon: 'it-video',
       qaEnabled: false,
       chatEnabled: true,
@@ -66,18 +73,21 @@ async function main() {
     {
       name: 'Evento partecipativo',
       description:
-        "Tutti possono parlare e usare la webcam; lo schermo lo condividono i relatori. Con la scaletta dell'incontro e le domande «In una parola». Fino a 50 partecipanti, un'ora e mezza.",
+        "Per un incontro aperto di un centinaio di persone: tutti possono parlare, usare la webcam e condividere lo schermo, con la chat e le domande «In una parola». La registrazione è disponibile e la avvia chi modera; se si registra, dopo l'evento trascrizione, sintesi e traduzioni.",
       icon: 'it-comment',
       qaEnabled: false,
       chatEnabled: true,
-      recordingEnabled: false,
-      agendaEnabled: true,
       wordCloudEnabled: true,
+      recordingEnabled: true,
       participantsCanUnmute: true,
       participantsCanStartVideo: true,
-      participantsCanShareScreen: false,
-      maxParticipants: 50,
-      defaultDurationMinutes: 90,
+      participantsCanShareScreen: true,
+      aiTranscriptEnabled: true,
+      aiSummaryEnabled: true,
+      aiTranslationEnabled: true,
+      multitrackRecordingEnabled: true,
+      maxParticipants: 100,
+      defaultDurationMinutes: 60,
       postEventPublic: true,
       isSystem: true,
       sortOrder: 2,

@@ -1073,6 +1073,16 @@ jitsi-meet:
     # solo portale (NetworkPolicy <fullname>-jibri).
     extraEnvs:
       JAVA_TOOL_OPTIONS: "-Djibri.api.http.external-api-host=0.0.0.0"
+      # Qualita' della registrazione al massimo per default: la sala si
+      # cattura a 1920x1080 (l'immagine ne ricava anche lo schermo virtuale,
+      # cosi' le slide condivise restano leggibili) con un fattore di qualita'
+      # H.264 piu' alto del predefinito (CRF 20 invece di 25). Il preset di
+      # codifica resta il piu' leggero (ultrafast): a parita' di CRF cambia
+      # il peso del file, non la qualita', e lascia la CPU al rendering della
+      # sala. File piu' grandi: lo script di fine registrazione li carica
+      # comunque, e lo scaler tiene Jibri acceso finche' ha finito.
+      JIBRI_RECORDING_RESOLUTION: "1920x1080"
+      JIBRI_RECORDING_CONSTANT_RATE_FACTOR: "20"
       # L'applicazione, per lo script di fine registrazione: il nome del suo
       # Service ricavato dalla release come fa il chart (senza
       # fullnameOverride) e la porta predefinita. Se cambi l'uno o l'altra,

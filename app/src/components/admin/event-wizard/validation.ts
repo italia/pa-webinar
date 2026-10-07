@@ -61,7 +61,7 @@ export function validateStep(
     if (
       !Number.isFinite(form.maxParticipants) ||
       form.maxParticipants < 2 ||
-      form.maxParticipants > 500
+      form.maxParticipants > 5000
     ) {
       errs['maxParticipants'] = 'outOfRange';
     }

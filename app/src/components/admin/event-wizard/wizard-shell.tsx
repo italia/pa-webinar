@@ -289,8 +289,8 @@ export default function EventWizard(props: WizardProps) {
     const defaultStart = fromDatetimeLocalInTz(`${domani}T10:00`, props.siteTimezone);
     // Durata predefinita dal template (semplificazione): l'utente meno esperto
     // imposta solo l'inizio e la fine è calcolata. Un template senza durata
-    // tiene le due ore di sempre; senza template valgono i valori del
-    // «Webinar pubblico»: un'ora, fino a 300 persone.
+    // tiene le due ore di sempre; senza template: un'ora, circa 300 persone
+    // attese (una stima per il dimensionamento, non un tetto).
     const defaultDurationMin = props.template
       ? (props.template.defaultDurationMinutes ?? 120)
       : 60;
@@ -417,6 +417,7 @@ export default function EventWizard(props: WizardProps) {
     }
 
     const tpl = props.template;
+    const conAi = (tpl?.recordingEnabled ?? false) && (props.aiPipelineEnabled ?? true);
     // Seed the permission matrix from the template. Prefer the template's
     // stored matrix; if it has none (the common case — templates only persist
     // the legacy boolean toggles), PROJECT those booleans into the matrix so
@@ -469,14 +470,17 @@ export default function EventWizard(props: WizardProps) {
       autoStartRecording: tpl?.autoStartRecording ?? false,
       // Default AI dal template (semplificazione): un template "registrato"
       // può pre-attivare trascrizione/sintesi. La trascrizione richiede la
-      // registrazione, quindi la attiviamo solo se recordingEnabled.
-      aiTranscriptEnabled: (tpl?.recordingEnabled ?? false) && (tpl?.aiTranscriptEnabled ?? false),
+      // registrazione, quindi la attiviamo solo se recordingEnabled, e solo
+      // se l'elaborazione AI e' attiva sull'istanza (conAi): altrimenti un
+      // template la accenderebbe senza che nessuno la esegua. Lo stesso per
+      // le tracce per partecipante, che servono alla trascrizione.
+      aiTranscriptEnabled: conAi && (tpl?.aiTranscriptEnabled ?? false),
       aiSummaryEnabled:
-        (tpl?.recordingEnabled ?? false) &&
+        conAi &&
         (tpl?.aiTranscriptEnabled ?? false) &&
         (tpl?.aiSummaryEnabled ?? false),
       aiTranslationEnabled:
-        (tpl?.recordingEnabled ?? false) &&
+        conAi &&
         (tpl?.aiTranscriptEnabled ?? false) &&
         (tpl?.aiTranslationEnabled ?? false),
       // Presi dal template, non piu' cablati a false: e' qui che la
@@ -486,16 +490,17 @@ export default function EventWizard(props: WizardProps) {
       // l'evento sia registrato non ha senso e sarebbe una raccolta di dati
       // personali senza scopo.
       aiDubbingEnabled:
-        (tpl?.recordingEnabled ?? false) &&
+        conAi &&
         (tpl?.aiTranscriptEnabled ?? false) &&
         (tpl?.aiDubbingEnabled ?? false),
       multitrackRecordingEnabled:
-        (tpl?.recordingEnabled ?? false) && (tpl?.multitrackRecordingEnabled ?? false),
+        conAi && (tpl?.aiTranscriptEnabled ?? false) && (tpl?.multitrackRecordingEnabled ?? false),
       retainParticipantTracks:
-        (tpl?.recordingEnabled ?? false) &&
+        conAi &&
+        (tpl?.aiTranscriptEnabled ?? false) &&
         (tpl?.multitrackRecordingEnabled ?? false) &&
         (tpl?.retainParticipantTracks ?? false),
-      aiTargetLocales: lingueDiPartenza(tpl?.aiTranslationEnabled, tpl?.aiTargetLocales),
+      aiTargetLocales: lingueDiPartenza(conAi && tpl?.aiTranslationEnabled, tpl?.aiTargetLocales),
       expectedSpeakers: tpl?.defaultExpectedSpeakers ?? null,
 
       // Step 3
@@ -1298,6 +1303,7 @@ export default function EventWizard(props: WizardProps) {
             defaultTargetLocales={props.defaultTargetLocales}
             aiPipelineEnabled={props.aiPipelineEnabled ?? true}
             eventLocale={SOURCE_LANGUAGE_FALLBACK}
+            editing={props.mode === 'edit'}
           />
         )}
         {activeStep === 'invites' && (

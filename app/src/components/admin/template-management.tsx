@@ -416,7 +416,7 @@ export default function TemplateManagement({
                     </Badge>
                   </div>
                   <div className="text-muted mb-3" style={{ fontSize: '0.8rem' }}>
-                    Max: {tpl.maxParticipants}
+                    {t('maxParticipantsLabel')}: {tpl.maxParticipants}
                   </div>
                   <div className="mt-auto d-flex gap-2">
                     <Button
@@ -510,7 +510,7 @@ function TemplateForm({
             setField('maxParticipants', Number(e.target.value) || 0)
           }
           min={2}
-          max={500}
+          max={5000}
         />
       </FormGroup>
 

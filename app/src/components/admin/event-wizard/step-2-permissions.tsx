@@ -69,6 +69,10 @@ interface Props {
    *  funzioni non si propongono: si mostrano solo se l'evento le ha gia'
    *  (per poterle togliere). */
   aiPipelineEnabled?: boolean;
+  /** In modifica le scelte gia' fatte non si cambiano da sole: accendere la
+   *  registrazione o la trascrizione non accende le tracce per partecipante,
+   *  che chiederebbero il consenso a chi e' gia' iscritto. */
+  editing?: boolean;
 }
 
 export default function Step2Permissions({
@@ -79,6 +83,7 @@ export default function Step2Permissions({
   defaultTargetLocales = null,
   eventLocale,
   aiPipelineEnabled = true,
+  editing = false,
 }: Props) {
   const t = useTranslations('admin.wizard.step2');
   const tAdmin = useTranslations('admin');
@@ -180,6 +185,12 @@ export default function Step2Permissions({
               onChange({
                 recordingEnabled: !value.recordingEnabled,
                 autoStartRecording: !value.recordingEnabled ? value.autoStartRecording : false,
+                // Chi registra ha per default la trascrizione e le tracce per
+                // partecipante (servono a dire chi parla), se l'elaborazione
+                // AI e' attiva sull'istanza; si spengono qui sotto.
+                ...(!value.recordingEnabled && aiPipelineEnabled && !editing
+                  ? { aiTranscriptEnabled: true, multitrackRecordingEnabled: true }
+                  : {}),
               })
             }
           />
@@ -302,7 +313,7 @@ export default function Step2Permissions({
               // input.
               onChange(
                 next
-                  ? { aiTranscriptEnabled: true }
+                  ? { aiTranscriptEnabled: true, ...(editing ? {} : { multitrackRecordingEnabled: true }) }
                   : {
                       aiTranscriptEnabled: false,
                       aiSummaryEnabled: false,

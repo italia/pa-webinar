@@ -458,10 +458,10 @@ export default function Step1Base({
                 id="ev-max-range"
                 type="range"
                 min={2}
-                max={500}
+                max={5000}
                 step={1}
                 className="form-range flex-grow-1"
-                value={Math.min(500, Math.max(2, value.maxParticipants || 150))}
+                value={Math.min(5000, Math.max(2, value.maxParticipants || 150))}
                 onChange={(e) =>
                   onChange({ maxParticipants: Number(e.target.value) || 2 })
                 }
@@ -471,7 +471,7 @@ export default function Step1Base({
                 id="ev-max"
                 type="number"
                 min={2}
-                max={500}
+                max={5000}
                 className={`form-control ${fieldErrors.maxParticipants ? 'is-invalid' : ''}`}
                 style={{ maxWidth: 96 }}
                 // Mentre si scrive il campo tiene il testo cosi' com'e' (anche
@@ -486,7 +486,7 @@ export default function Step1Base({
                 }}
                 onBlur={() => {
                   setMaxText(null);
-                  const clamped = Math.min(500, Math.max(2, value.maxParticipants || 2));
+                  const clamped = Math.min(5000, Math.max(2, value.maxParticipants || 2));
                   if (clamped !== value.maxParticipants) onChange({ maxParticipants: clamped });
                 }}
               />

@@ -1104,8 +1104,9 @@ model EventTemplate {
   description String? @db.Text
   icon        String  @default("it-video")
 
-  // Chat primaria, Q&A opt-in: per default la sala ha solo la chat.
-  // allineato a defaultMatrix() e ai template di sistema.
+  // Chat primaria, Q&A opt-in: per default la sala ha solo la chat, come
+  // defaultMatrix(). I template di sistema accendono la Q&A dove serve (la
+  // grande platea).
   qaEnabled                  Boolean @default(false) @map("qa_enabled")
   chatEnabled                Boolean @default(true) @map("chat_enabled")
   recordingEnabled           Boolean @default(false) @map("recording_enabled")
@@ -1143,9 +1144,11 @@ model EventTemplate {
   // questo si perdevano a ogni evento nuovo: chi crea una serie ricorrente
   // riattivava a mano la traccia per-partecipante e le lingue, e quando se ne
   // dimenticava lo scopriva a evento finito — senza audio isolato, quindi senza
-  // trascrizione né sintesi. I default sono gli stessi di `Event`: un template
-  // che pre-accende la registrazione per partecipante sarebbe una raccolta di
-  // dati personali attivata retroattivamente su tutte le righe esistenti.
+  // trascrizione né sintesi. I default delle colonne sono gli stessi di
+  // `Event`: un default acceso pre-attiverebbe la registrazione per
+  // partecipante su tutte le righe esistenti. Sono i template di sistema che
+  // registrano ad accenderla, esplicitamente (migrazione
+  // 20261007233000_template_scenarios).
   aiDubbingEnabled           Boolean @default(false) @map("ai_dubbing_enabled")
   multitrackRecordingEnabled Boolean @default(false) @map("multitrack_recording_enabled")
   retainParticipantTracks    Boolean @default(false) @map("retain_participant_tracks")
