@@ -925,7 +925,8 @@
       "publishFailed": "Wydarzenie zostało utworzone, ale nie zostało opublikowane: pozostaje wersją roboczą. Opublikuj je na stronie wydarzenia.",
       "publishFailedDetail": "Wydarzenie zostało utworzone, ale nie zostało opublikowane: pozostaje wersją roboczą. Odpowiedź serwera: {reason}. Opublikuj je na stronie wydarzenia.",
       "toFix": "Do poprawienia:",
-      "toFixField": "Pole {n}"
+      "toFixField": "Pole {n}",
+      "stepsAriaLabel": "Kroki formularza wydarzenia"
     },
     "nav": {
       "events": "Wydarzenia",

@@ -925,7 +925,8 @@
       "publishFailed": "Dogodek je bil ustvarjen, vendar ni bil objavljen: ostaja osnutek. Objavite ga na strani dogodka.",
       "publishFailedDetail": "Dogodek je bil ustvarjen, vendar ni bil objavljen: ostaja osnutek. Strežnik je odgovoril: {reason}. Objavite ga na strani dogodka.",
       "toFix": "Za popravek:",
-      "toFixField": "Polje {n}"
+      "toFixField": "Polje {n}",
+      "stepsAriaLabel": "Koraki obrazca dogodka"
     },
     "nav": {
       "events": "Dogodki",

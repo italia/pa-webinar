@@ -339,7 +339,7 @@ Organizers are staff accounts with the role `ORGANIZER`. They sign in with a one
 
 ### The event wizard
 
-Creating and editing an event use the same five steps. The wizard keeps an unsaved draft in the browser and offers to restore it.
+Creating and editing an event use the same five steps. The wizard keeps an unsaved draft in the browser and offers to restore it. When editing, **Update event** is available on every step, and the edit links on the event page open the step they refer to (`?step=` on the edit address).
 
 | Step | Label | What it covers |
 |---|---|---|

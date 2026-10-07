@@ -925,7 +925,8 @@
       "publishFailed": "Die Veranstaltung wurde erstellt, aber nicht veröffentlicht: Sie bleibt ein Entwurf. Veröffentlichen Sie sie auf der Seite der Veranstaltung.",
       "publishFailedDetail": "Die Veranstaltung wurde erstellt, aber nicht veröffentlicht: Sie bleibt ein Entwurf. Der Server hat geantwortet: {reason}. Veröffentlichen Sie sie auf der Seite der Veranstaltung.",
       "toFix": "Zu korrigieren:",
-      "toFixField": "Feld {n}"
+      "toFixField": "Feld {n}",
+      "stepsAriaLabel": "Schritte des Veranstaltungsformulars"
     },
     "nav": {
       "events": "Veranstaltungen",

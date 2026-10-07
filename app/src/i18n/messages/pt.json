@@ -925,7 +925,8 @@
       "publishFailed": "O evento foi criado, mas não foi publicado: continua a ser um rascunho. Publique-o a partir da página do evento.",
       "publishFailedDetail": "O evento foi criado, mas não foi publicado: continua a ser um rascunho. O servidor respondeu: {reason}. Publique-o a partir da página do evento.",
       "toFix": "A corrigir:",
-      "toFixField": "Campo {n}"
+      "toFixField": "Campo {n}",
+      "stepsAriaLabel": "Passos do formulário do evento"
     },
     "nav": {
       "events": "Eventos",

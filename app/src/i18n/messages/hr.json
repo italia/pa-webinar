@@ -925,7 +925,8 @@
       "publishFailed": "Događaj je stvoren, ali nije objavljen: i dalje je nacrt. Objavite ga sa stranice događaja.",
       "publishFailedDetail": "Događaj je stvoren, ali nije objavljen: i dalje je nacrt. Poslužitelj je odgovorio: {reason}. Objavite ga sa stranice događaja.",
       "toFix": "Za ispravak:",
-      "toFixField": "Polje {n}"
+      "toFixField": "Polje {n}",
+      "stepsAriaLabel": "Koraci obrasca događaja"
     },
     "nav": {
       "events": "Događaji",

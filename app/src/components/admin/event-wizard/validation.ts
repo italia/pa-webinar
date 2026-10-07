@@ -12,11 +12,12 @@ import {
 } from '@/lib/validation/event-description';
 import { parseLocaleList } from '@/lib/ai/target-locales';
 import { MAX_RETENTION_DAYS } from '@/lib/validation/retention';
+import { WIZARD_STEPS, type WizardStep } from '@/lib/events/wizard-steps';
 
 import type { WizardForm } from './wizard-shell';
 
-export const STEP_KEYS = ['base', 'permissions', 'invites', 'content', 'review'] as const;
-export type StepKey = (typeof STEP_KEYS)[number];
+export const STEP_KEYS = WIZARD_STEPS;
+export type StepKey = WizardStep;
 
 /**
  * I controlli che devono passare prima di lasciare un passo.

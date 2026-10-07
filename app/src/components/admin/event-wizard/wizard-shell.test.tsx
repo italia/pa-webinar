@@ -85,7 +85,7 @@ function click(el: HTMLElement) {
 }
 
 function goToStep(label: string) {
-  const nav = container.querySelector<HTMLElement>('nav[aria-label="Wizard steps"]')!;
+  const nav = container.querySelector<HTMLElement>(`nav[aria-label="${w.stepsAriaLabel}"]`)!;
   const b = Array.from(nav.querySelectorAll<HTMLButtonElement>('button')).find((el) =>
     el.textContent?.includes(label),
   );
@@ -297,6 +297,93 @@ describe('modifica — revoca di un co-moderatore', () => {
     for (const [, init] of revoche) {
       expect((init.headers as Record<string, string>).Authorization).toBe('Bearer token-primario');
     }
+  });
+});
+
+describe('modifica — salvataggio da un passo intermedio', () => {
+  it('si parte dal passo chiesto e si salva da lì, senza arrivare al riepilogo', async () => {
+    fetchMock.mockImplementation(async () => json(200, {}));
+    const evento: InitialEventShape = {
+      id: 'evt-2',
+      slug: 'evento-2',
+      moderatorToken: 'token-primario',
+      event: {
+        title: { it: 'Evento di prova' },
+        description: { it: 'Una descrizione valida per il wizard.' },
+        startsAt: '2030-01-10T09:00:00.000Z',
+        endsAt: '2030-01-10T10:00:00.000Z',
+        timezone: 'Europe/Rome',
+        maxParticipants: 50,
+        dataRetentionDays: 30,
+        postEventPublic: true,
+        status: 'PUBLISHED',
+      } as unknown as InitialEventShape['event'],
+      organizers: [],
+      eventModerators: [],
+      invitations: [],
+      materials: [],
+      preEventQuestionnaire: null,
+      postEventQuestionnaire: null,
+    } as InitialEventShape;
+    renderWizard({ mode: 'edit', initialEvent: evento, initialStep: 'permissions' });
+
+    const attivo = container.querySelector(
+      `nav[aria-label="${w.stepsAriaLabel}"] [aria-current="step"]`,
+    );
+    expect(attivo?.textContent).toContain(w.steps.permissions);
+    await press(button(w.updateEvent));
+
+    const put = (fetchMock.mock.calls as Array<[string, RequestInit]>).find(
+      ([url, init]) => url === '/api/events/evt-2' && init?.method === 'PUT',
+    );
+    expect(put).toBeTruthy();
+    expect(push).toHaveBeenCalledTimes(1);
+  });
+
+  it('con un errore in un altro passo non salva e porta a quel passo', async () => {
+    fetchMock.mockImplementation(async () => json(200, {}));
+    const evento = {
+      id: 'evt-3',
+      slug: 'evento-3',
+      moderatorToken: 'token-primario',
+      event: {
+        title: { it: '' },
+        description: { it: 'Una descrizione valida per il wizard.' },
+        startsAt: '2030-01-10T09:00:00.000Z',
+        endsAt: '2030-01-10T10:00:00.000Z',
+        timezone: 'Europe/Rome',
+        maxParticipants: 50,
+        dataRetentionDays: 30,
+        postEventPublic: true,
+        status: 'PUBLISHED',
+      },
+      organizers: [],
+      eventModerators: [],
+      invitations: [],
+      materials: [],
+      preEventQuestionnaire: null,
+      postEventQuestionnaire: null,
+    } as unknown as InitialEventShape;
+    renderWizard({ mode: 'edit', initialEvent: evento, initialStep: 'permissions' });
+
+    await press(button(w.updateEvent));
+
+    const put = (fetchMock.mock.calls as Array<[string, RequestInit]>).find(
+      ([, init]) => init?.method === 'PUT',
+    );
+    expect(put).toBeUndefined();
+    const attivo = container.querySelector(
+      `nav[aria-label="${w.stepsAriaLabel}"] [aria-current="step"]`,
+    );
+    expect(attivo?.textContent).toContain(w.steps.base);
+  });
+
+  it('in creazione il passo di partenza si ignora', () => {
+    renderWizard({ initialStep: 'review' });
+    const attivo = container.querySelector(
+      `nav[aria-label="${w.stepsAriaLabel}"] [aria-current="step"]`,
+    );
+    expect(attivo?.textContent).toContain(w.steps.base);
   });
 });
 

@@ -925,7 +925,8 @@
       "publishFailed": "Událost byla vytvořena, ale nebyla zveřejněna: zůstává jako koncept. Zveřejněte ji ze stránky události.",
       "publishFailedDetail": "Událost byla vytvořena, ale nebyla zveřejněna: zůstává jako koncept. Server odpověděl: {reason}. Zveřejněte ji ze stránky události.",
       "toFix": "K opravě:",
-      "toFixField": "Pole {n}"
+      "toFixField": "Pole {n}",
+      "stepsAriaLabel": "Kroky formuláře události"
     },
     "nav": {
       "events": "Události",

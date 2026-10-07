@@ -925,7 +925,8 @@
       "publishFailed": "Het evenement is aangemaakt maar niet gepubliceerd: het is nog een concept. Publiceer het vanaf de pagina van het evenement.",
       "publishFailedDetail": "Het evenement is aangemaakt maar niet gepubliceerd: het is nog een concept. De server antwoordde: {reason}. Publiceer het vanaf de pagina van het evenement.",
       "toFix": "Te corrigeren:",
-      "toFixField": "Veld {n}"
+      "toFixField": "Veld {n}",
+      "stepsAriaLabel": "Stappen van het evenementformulier"
     },
     "nav": {
       "events": "Evenementen",

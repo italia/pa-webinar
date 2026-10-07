@@ -925,7 +925,8 @@
       "publishFailed": "Az esemény létrejött, de nem lett közzétéve: továbbra is piszkozat. Tegye közzé az esemény oldaláról.",
       "publishFailedDetail": "Az esemény létrejött, de nem lett közzétéve: továbbra is piszkozat. A szerver válasza: {reason}. Tegye közzé az esemény oldaláról.",
       "toFix": "Javítandó:",
-      "toFixField": "{n}. mező"
+      "toFixField": "{n}. mező",
+      "stepsAriaLabel": "Az eseményűrlap lépései"
     },
     "nav": {
       "events": "Események",

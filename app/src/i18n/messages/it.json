@@ -1049,7 +1049,8 @@
       "publishFailed": "L'evento è stato creato ma non pubblicato: resta in bozza. Pubblicalo dalla pagina dell'evento.",
       "publishFailedDetail": "L'evento è stato creato ma non pubblicato: resta in bozza. Il server ha risposto: {reason}. Pubblicalo dalla pagina dell'evento.",
       "toFix": "Da correggere:",
-      "toFixField": "Campo {n}"
+      "toFixField": "Campo {n}",
+      "stepsAriaLabel": "Passi del modulo dell'evento"
     },
     "nav": {
       "events": "Eventi",

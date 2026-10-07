@@ -925,7 +925,8 @@
       "publishFailed": "Tapahtuma luotiin, mutta sitä ei julkaistu: se on yhä luonnos. Julkaise se tapahtuman sivulta.",
       "publishFailedDetail": "Tapahtuma luotiin, mutta sitä ei julkaistu: se on yhä luonnos. Palvelin vastasi: {reason}. Julkaise se tapahtuman sivulta.",
       "toFix": "Korjattavat:",
-      "toFixField": "Kenttä {n}"
+      "toFixField": "Kenttä {n}",
+      "stepsAriaLabel": "Tapahtumalomakkeen vaiheet"
     },
     "nav": {
       "events": "Tapahtumat",

@@ -925,7 +925,8 @@
       "publishFailed": "Evenemanget har skapats men inte publicerats: det är fortfarande ett utkast. Publicera det från evenemangets sida.",
       "publishFailedDetail": "Evenemanget har skapats men inte publicerats: det är fortfarande ett utkast. Servern svarade: {reason}. Publicera det från evenemangets sida.",
       "toFix": "Att rätta:",
-      "toFixField": "Fält {n}"
+      "toFixField": "Fält {n}",
+      "stepsAriaLabel": "Steg i evenemangsformuläret"
     },
     "nav": {
       "events": "Evenemang",

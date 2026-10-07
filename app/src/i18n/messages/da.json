@@ -925,7 +925,8 @@
       "publishFailed": "Arrangementet blev oprettet, men ikke offentliggjort: det er stadig en kladde. Offentliggør det fra arrangementets side.",
       "publishFailedDetail": "Arrangementet blev oprettet, men ikke offentliggjort: det er stadig en kladde. Serveren svarede: {reason}. Offentliggør det fra arrangementets side.",
       "toFix": "Skal rettes:",
-      "toFixField": "Felt {n}"
+      "toFixField": "Felt {n}",
+      "stepsAriaLabel": "Trin i formularen til begivenheden"
     },
     "nav": {
       "events": "Begivenheder",

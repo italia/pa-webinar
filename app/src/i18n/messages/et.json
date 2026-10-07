@@ -925,7 +925,8 @@
       "publishFailed": "Sündmus loodi, kuid seda ei avaldatud: see on endiselt mustand. Avalda see sündmuse lehelt.",
       "publishFailedDetail": "Sündmus loodi, kuid seda ei avaldatud: see on endiselt mustand. Server vastas: {reason}. Avalda see sündmuse lehelt.",
       "toFix": "Parandada:",
-      "toFixField": "Väli {n}"
+      "toFixField": "Väli {n}",
+      "stepsAriaLabel": "Ürituse vormi sammud"
     },
     "nav": {
       "events": "Üritused",

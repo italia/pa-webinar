@@ -925,7 +925,8 @@
       "publishFailed": "Podujatie bolo vytvorené, ale nebolo zverejnené: zostáva ako koncept. Zverejnite ho zo stránky podujatia.",
       "publishFailedDetail": "Podujatie bolo vytvorené, ale nebolo zverejnené: zostáva ako koncept. Server odpovedal: {reason}. Zverejnite ho zo stránky podujatia.",
       "toFix": "Na opravu:",
-      "toFixField": "Pole {n}"
+      "toFixField": "Pole {n}",
+      "stepsAriaLabel": "Kroky formulára udalosti"
     },
     "nav": {
       "events": "Udalosti",

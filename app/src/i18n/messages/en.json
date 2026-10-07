@@ -925,7 +925,8 @@
       "publishFailed": "The event was created but not published: it is still a draft. Publish it from the event page.",
       "publishFailedDetail": "The event was created but not published: it is still a draft. The server replied: {reason}. Publish it from the event page.",
       "toFix": "To fix:",
-      "toFixField": "Field {n}"
+      "toFixField": "Field {n}",
+      "stepsAriaLabel": "Event form steps"
     },
     "nav": {
       "events": "Events",

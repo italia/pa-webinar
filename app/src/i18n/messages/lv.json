@@ -925,7 +925,8 @@
       "publishFailed": "Pasākums ir izveidots, bet nav publicēts: tas joprojām ir melnraksts. Publicējiet to pasākuma lapā.",
       "publishFailedDetail": "Pasākums ir izveidots, bet nav publicēts: tas joprojām ir melnraksts. Serveris atbildēja: {reason}. Publicējiet to pasākuma lapā.",
       "toFix": "Jālabo:",
-      "toFixField": "Lauks {n}"
+      "toFixField": "Lauks {n}",
+      "stepsAriaLabel": "Pasākuma veidlapas soļi"
     },
     "nav": {
       "events": "Pasākumi",

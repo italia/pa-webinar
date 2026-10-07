@@ -11,6 +11,21 @@ describe('eventAdminPath', () => {
     expect(eventAdminPath(ID, { viaToken: null })).not.toContain('token=');
   });
 
+  it('opens the edit wizard on a given step', () => {
+    expect(eventAdminPath(ID, { edit: true, step: 'permissions' })).toBe(
+      `/admin/events/${ID}/edit?step=permissions`,
+    );
+    expect(eventAdminPath(ID, { edit: true, step: 'review', viaToken: 'abc' })).toBe(
+      `/admin/events/${ID}/edit?step=review&token=abc`,
+    );
+    // Il passo vale solo per la modifica.
+    expect(eventAdminPath(ID, { step: 'review' })).toBe(`/admin/events/${ID}`);
+    // Il token si codifica come sempre.
+    expect(eventAdminPath(ID, { viaToken: "a!'()~*" })).toBe(
+      `/admin/events/${ID}?token=${encodeURIComponent("a!'()~*")}`,
+    );
+  });
+
   it('keeps the token for whoever came in with the moderator link', () => {
     expect(eventAdminPath(ID, { viaToken: 'abc' })).toBe(`/admin/events/${ID}?token=abc`);
     expect(eventAdminPath(ID, { edit: true, viaToken: 'a b' })).toBe(

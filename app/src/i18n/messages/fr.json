@@ -925,7 +925,8 @@
       "publishFailed": "L'événement a été créé mais pas publié : il reste à l'état de brouillon. Publiez-le depuis la page de l'événement.",
       "publishFailedDetail": "L'événement a été créé mais pas publié : il reste à l'état de brouillon. Le serveur a répondu : {reason}. Publiez-le depuis la page de l'événement.",
       "toFix": "À corriger :",
-      "toFixField": "Champ {n}"
+      "toFixField": "Champ {n}",
+      "stepsAriaLabel": "Étapes du formulaire de l'événement"
     },
     "nav": {
       "events": "Événements",

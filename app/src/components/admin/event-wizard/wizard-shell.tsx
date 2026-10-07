@@ -117,6 +117,9 @@ export interface WizardProps {
   /** La post-produzione AI e' accesa sull'installazione: spenta, il passo 2
    *  non ne propone le funzioni. */
   aiPipelineEnabled?: boolean;
+  /** In modifica: il passo da cui partire (i link «Modifica» della pagina
+   *  dell'evento portano dritti a quello che serve). */
+  initialStep?: StepKey;
   /** Il moderatore principale di partenza di un evento nuovo: chi lo crea,
    *  quando entra con un account nominale. */
   defaultModerator?: { name: string; email: string } | null;
@@ -527,7 +530,13 @@ export default function EventWizard(props: WizardProps) {
   }, [props.template, mode, initialEvent]);
 
   const [form, setForm] = useState<WizardForm>(initial);
-  const [activeStep, setActiveStep] = useState<StepKey>('base');
+  // Il passo di partenza vale solo in modifica: in creazione si comincia
+  // dall'inizio.
+  // Quale pulsante ha avviato il salvataggio: solo lui dice «Salvataggio…».
+  const [azione, setAzione] = useState<'draft' | 'publish' | null>(null);
+  const [activeStep, setActiveStep] = useState<StepKey>(
+    (mode === 'edit' ? props.initialStep : undefined) ?? 'base',
+  );
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -793,6 +802,7 @@ export default function EventWizard(props: WizardProps) {
    */
   const handleSubmit = useCallback(
     async (submitMode: 'draft' | 'publish', overrideRedirect?: string) => {
+      setAzione(submitMode);
       // Validate every step before submitting (especially on publish).
       const aggregated: Record<string, string> = {};
       for (const key of STEP_KEYS) {
@@ -1243,6 +1253,7 @@ export default function EventWizard(props: WizardProps) {
         steps={STEP_KEYS.map((k) => ({ key: k, label: t(`steps.${k}`) }))}
         activeStep={activeStep}
         onJump={(k) => setActiveStep(k)}
+        ariaLabel={t('stepsAriaLabel')}
       />
 
       {submitError && (
@@ -1356,14 +1367,28 @@ export default function EventWizard(props: WizardProps) {
         </button>
 
         {activeStep !== 'review' ? (
-          <button
-            type="button"
-            className="btn btn-primary"
-            onClick={goNext}
-            disabled={submitting}
-          >
-            {tc('next')} →
-          </button>
+          <div className="d-flex gap-2 flex-wrap justify-content-end">
+            {/* In modifica si salva da qualunque passo: cambiare
+                un'impostazione non obbliga a percorrere tutto il wizard. */}
+            {mode === 'edit' && (
+              <button
+                type="button"
+                className="btn btn-outline-primary"
+                onClick={() => handleSubmit('draft')}
+                disabled={submitting}
+              >
+                {submitting && azione === 'draft' ? tc('saving') : t('updateEvent')}
+              </button>
+            )}
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={goNext}
+              disabled={submitting}
+            >
+              {tc('next')} →
+            </button>
+          </div>
         ) : mode === 'edit' ? (
           <button
             type="button"
@@ -1371,7 +1396,7 @@ export default function EventWizard(props: WizardProps) {
             onClick={() => handleSubmit('draft')}
             disabled={submitting}
           >
-            {submitting ? '...' : t('updateEvent')}
+            {submitting && azione === 'draft' ? tc('saving') : t('updateEvent')}
           </button>
         ) : (
           <div className="d-flex gap-2">
@@ -1381,7 +1406,7 @@ export default function EventWizard(props: WizardProps) {
               onClick={() => handleSubmit('draft')}
               disabled={submitting}
             >
-              {t('saveDraft')}
+              {submitting && azione === 'draft' ? tc('saving') : t('saveDraft')}
             </button>
             <button
               type="button"
@@ -1389,7 +1414,7 @@ export default function EventWizard(props: WizardProps) {
               onClick={() => handleSubmit('publish')}
               disabled={submitting}
             >
-              {submitting ? '...' : t('publish')}
+              {submitting && azione === 'publish' ? tc('saving') : t('publish')}
             </button>
           </div>
         )}
@@ -1408,14 +1433,16 @@ function StepNav({
   steps,
   activeStep,
   onJump,
+  ariaLabel,
 }: {
   steps: Array<{ key: StepKey; label: string }>;
   activeStep: StepKey;
   onJump: (k: StepKey) => void;
+  ariaLabel: string;
 }) {
   const activeIdx = steps.findIndex((s) => s.key === activeStep);
   return (
-    <nav aria-label="Wizard steps" className="mb-3">
+    <nav aria-label={ariaLabel} className="mb-3">
       <ol className="d-flex align-items-center justify-content-between list-unstyled mb-0 flex-wrap gap-2">
         {steps.map((s, i) => {
           const isActive = i === activeIdx;

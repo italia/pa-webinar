@@ -925,7 +925,8 @@
       "publishFailed": "Renginys sukurtas, bet nepaskelbtas: jis tebėra juodraštis. Paskelbkite jį renginio puslapyje.",
       "publishFailedDetail": "Renginys sukurtas, bet nepaskelbtas: jis tebėra juodraštis. Serverio atsakymas: {reason}. Paskelbkite jį renginio puslapyje.",
       "toFix": "Reikia pataisyti:",
-      "toFixField": "Laukas {n}"
+      "toFixField": "Laukas {n}",
+      "stepsAriaLabel": "Renginio formos žingsniai"
     },
     "nav": {
       "events": "Renginiai",

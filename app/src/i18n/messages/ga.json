@@ -925,7 +925,8 @@
       "publishFailed": "Cruthaíodh an t-imeacht ach níor foilsíodh é: is dréacht é fós. Foilsigh é ó leathanach an imeachta.",
       "publishFailedDetail": "Cruthaíodh an t-imeacht ach níor foilsíodh é: is dréacht é fós. D'fhreagair an freastalaí: {reason}. Foilsigh é ó leathanach an imeachta.",
       "toFix": "Le ceartú:",
-      "toFixField": "Réimse {n}"
+      "toFixField": "Réimse {n}",
+      "stepsAriaLabel": "Céimeanna fhoirm an imeachta"
     },
     "nav": {
       "events": "Imeachtaí",

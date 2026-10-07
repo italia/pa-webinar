@@ -23,6 +23,7 @@ import { useToast } from '@/components/ui/toast';
 import EventTitle from '@/components/events/event-title';
 import { MarkdownRenderer } from '@/components/ui/markdown';
 import { eventAdminPath } from '@/lib/events/admin-links';
+import type { WizardStep } from '@/lib/events/wizard-steps';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import { duplicaComeProssima, impostaStatoEvento } from '@/lib/events/event-actions';
 import {
@@ -302,6 +303,9 @@ export default function EventManagementClient({
   );
   const liveModeratorUrl = `/events/${event.slug}/live?token=${event.moderatorToken}`;
   const editUrl = eventAdminPath(event.id, { edit: true, viaToken });
+  // La modifica aperta sul passo che riguarda cio' che si sta guardando.
+  const editUrlAt = (step: WizardStep) =>
+    eventAdminPath(event.id, { edit: true, viaToken, step });
 
   // I due ruoli con cui si entra, detti per nome: da moderatore, col link di
   // conduzione, e da partecipante, dalla stessa porta del pubblico — per
@@ -621,7 +625,7 @@ export default function EventManagementClient({
                 event={event}
                 description={description}
                 locale={locale}
-                editUrl={editUrl}
+                editUrlAt={editUrlAt}
                 // Di un evento a calendario la pagina pubblica si offre anche
                 // in bozza, da preparare per quando esce; una chiamata rapida
                 // ne ha una solo a chiamata conclusa, se il post-evento e'
@@ -875,8 +879,9 @@ function TabNav({ active, onChange, t }: {
 }
 
 // ── Tabs ──
-function OverviewTab({ event, description, locale, editUrl, publicUrl, guestLiveUrl, moderatorUrl, instant }: {
-  event: EventData; description: string; locale: string; editUrl: string;
+function OverviewTab({ event, description, locale, editUrlAt, publicUrl, guestLiveUrl, moderatorUrl, instant }: {
+  event: EventData; description: string; locale: string;
+  editUrlAt: (step: WizardStep) => string;
   publicUrl: string | null; guestLiveUrl: string | null; moderatorUrl: string;
   instant: boolean;
 }) {
@@ -907,7 +912,7 @@ function OverviewTab({ event, description, locale, editUrl, publicUrl, guestLive
       <div>
         <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
           <H>{td('featureSummary')}</H>
-          <Link href={percorso(editUrl)}
+          <Link href={percorso(editUrlAt('permissions'))}
                 className="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-2">
             <Svg name="pencil" size={12} /> {td('editSettings')}
           </Link>
@@ -956,7 +961,7 @@ function OverviewTab({ event, description, locale, editUrl, publicUrl, guestLive
           icon="it-lock"
         >
         <div className="d-flex justify-content-end mb-3">
-          <Link href={percorso(editUrl)}
+          <Link href={percorso(editUrlAt('review'))}
                 className="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-2">
             <Svg name="pencil" size={12} /> {td('editSettings')}
           </Link>

@@ -925,7 +925,8 @@
       "publishFailed": "El evento se ha creado, pero no se ha publicado: sigue siendo un borrador. Publícalo desde la página del evento.",
       "publishFailedDetail": "El evento se ha creado, pero no se ha publicado: sigue siendo un borrador. El servidor ha respondido: {reason}. Publícalo desde la página del evento.",
       "toFix": "Por corregir:",
-      "toFixField": "Campo {n}"
+      "toFixField": "Campo {n}",
+      "stepsAriaLabel": "Pasos del formulario del evento"
     },
     "nav": {
       "events": "Eventos",

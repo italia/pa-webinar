@@ -925,7 +925,8 @@
       "publishFailed": "Evenimentul a fost creat, dar nu a fost publicat: rămâne ciornă. Publicați-l din pagina evenimentului.",
       "publishFailedDetail": "Evenimentul a fost creat, dar nu a fost publicat: rămâne ciornă. Serverul a răspuns: {reason}. Publicați-l din pagina evenimentului.",
       "toFix": "De corectat:",
-      "toFixField": "Câmpul {n}"
+      "toFixField": "Câmpul {n}",
+      "stepsAriaLabel": "Pașii formularului evenimentului"
     },
     "nav": {
       "events": "Evenimente",

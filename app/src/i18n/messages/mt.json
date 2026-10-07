@@ -925,7 +925,8 @@
       "publishFailed": "L-avveniment inħoloq iżda ma ġiex ippubblikat: għadu abbozz. Ippubblikah mill-paġna tal-avveniment.",
       "publishFailedDetail": "L-avveniment inħoloq iżda ma ġiex ippubblikat: għadu abbozz. Is-server wieġeb: {reason}. Ippubblikah mill-paġna tal-avveniment.",
       "toFix": "Biex tikkoreġi:",
-      "toFixField": "Qasam {n}"
+      "toFixField": "Qasam {n}",
+      "stepsAriaLabel": "Passi tal-formola tal-avveniment"
     },
     "nav": {
       "events": "Avvenimenti",
