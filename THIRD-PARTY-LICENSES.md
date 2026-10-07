@@ -261,6 +261,7 @@ The baked voices are listed in `infra/ai/Dockerfile.worker`. The worker builds i
 | Icon sprite | `app/public/svg/sprites.svg`, generated from `bootstrap-italia` at install time by the app's `copy-sprites` script (and by the `Dockerfile` in the image); not committed | BSD-3-Clause | Covered by the `bootstrap-italia` entry in the report. |
 | Logo and default watermark | `app/public/images/logo/`, `app/public/images/default-watermark.svg` | Project artwork | The repository states no separate license or trademark policy for them. |
 | The square (waiting room) | `lobby/` | Repository license (EUPL-1.2) | The lobby draws its avatars and scenery in code and bundles no third-party art. |
+| PDF viewer worker (pdf.js) | `/_next/static/media/pdf.worker.min.<hash>.mjs` in the build output, emitted at build time from `pdfjs-dist/legacy/build/`; not committed | Apache-2.0 | Covered by the `pdfjs-dist` entry in the report. The live room serves it to its own browsers to show presented PDFs, with no CDN. The build's minifier processes it like the rest of the bundle and drops the upstream comment header, as it does for every bundled dependency. |
 
 ## Adding a third-party component
 

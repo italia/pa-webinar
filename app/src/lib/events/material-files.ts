@@ -64,6 +64,17 @@ function isEventFileKey(key: string, eventId: string): boolean {
   return name !== '' && name !== '.' && name !== '..' && !/[\\/]/.test(name);
 }
 
+/**
+ * True se `key` è il file di un materiale di quell'evento: un documento
+ * caricato o il caricamento per evento. Chi legge un blob a partire dalla riga
+ * (la presentazione in sala, lib/presentation) lo verifica prima di chiederlo
+ * allo storage: una chiave estranea — un logo, una registrazione — non si
+ * serve da lì anche se finisse in `blobPath`.
+ */
+export function isMaterialFileKey(key: string, eventId: string): boolean {
+  return isMaterialUploadKey(key) || isEventFileKey(key, eventId);
+}
+
 /** Il percorso con cui `/api/assets` serve una chiave `assets/…`, o null. */
 function servedPath(key: string): string | null {
   return key.startsWith('assets/') ? `/api/assets/${key.slice('assets/'.length)}` : null;

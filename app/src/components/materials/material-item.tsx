@@ -116,9 +116,27 @@ export function MaterialVisibilitySelect({
   );
 }
 
+/**
+ * La presentazione in sala vista dalla riga di un materiale: se è quello
+ * presentato e, per chi conduce o interviene, i comandi per presentarlo o
+ * chiuderlo (components/presentation). Assente fuori dalla sala.
+ */
+export interface MaterialPresentControls {
+  /** È il materiale presentato adesso. */
+  presenting: boolean;
+  /** Chi guarda può presentare (moderatori e relatori). */
+  canPresent: boolean;
+  /** Un avvio o una chiusura è in corso. */
+  busy: boolean;
+  onPresent: () => void;
+  onStop: () => void;
+}
+
 interface MaterialItemProps {
   material: RoomMaterial;
   isModerator: boolean;
+  /** Presentazione in sala; senza, la riga non ne parla. */
+  present?: MaterialPresentControls;
   /** Il link è stato aperto (clic o clic centrale): per il conteggio. */
   onOpen: () => void;
   /** Il pannello tiene armato un solo «Elimina» alla volta. */
@@ -152,8 +170,10 @@ export default function MaterialItem({
   onEdit,
   onCancelEdit,
   onSave,
+  present,
 }: MaterialItemProps) {
   const t = useTranslations('materials');
+  const tp = useTranslations('presentation');
   const tv = useTranslations('admin.materials');
   const tc = useTranslations('common');
   const { fileSizeLabel, whenLabel, visibilityLabel } = useMaterialFormat();
@@ -179,6 +199,9 @@ export default function MaterialItem({
   const author = name ? t('addedBy', { name }) : t('addedByStaff');
   const phase = isModerator ? visibilityLabel(m.visibility) : null;
   const open = materialOpenHandlers(onOpen);
+  // Si presenta solo un PDF caricato: un link porta a un altro sito.
+  const presentable = kind === 'pdf';
+  const presentando = !!present?.presenting;
 
   return (
     <li className={`material-item${editing ? ' is-editing' : ''}`} data-material-id={m.id}>
@@ -210,6 +233,40 @@ export default function MaterialItem({
               <div className="material-item__byline">
                 {author} · <time dateTime={m.createdAt}>{whenLabel(m.createdAt)}</time>
               </div>
+              {present && presentable && (presentando || present.canPresent) && (
+                <div className="material-item__present">
+                  {presentando && (
+                    <span className="material-item__badge material-item__badge--live">
+                      <Icon icon="it-presentation" size="xs" aria-hidden="true" />
+                      {tp('presentingBadge')}
+                    </span>
+                  )}
+                  {present.canPresent &&
+                    (presentando ? (
+                      <button
+                        type="button"
+                        className="material-panel__icon-btn material-item__present-btn material-panel__icon-btn--danger"
+                        onClick={present.onStop}
+                        disabled={present.busy}
+                        aria-label={`${tp('stop')}: ${m.title}`}
+                      >
+                        <Icon icon="it-close" size="sm" aria-hidden="true" />
+                        <span>{tp('stopShort')}</span>
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        className="material-panel__icon-btn material-item__present-btn"
+                        onClick={present.onPresent}
+                        disabled={present.busy}
+                        aria-label={tp('presentAria', { title: m.title })}
+                      >
+                        <Icon icon="it-presentation" size="sm" aria-hidden="true" />
+                        <span>{tp('present')}</span>
+                      </button>
+                    ))}
+                </div>
+              )}
             </div>
             <a
               href={m.url}

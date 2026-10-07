@@ -13,6 +13,7 @@ import {
   pokeLivePanel,
   publishEventStatus,
   publishFlagsIfChanged,
+  publishPresentation,
   __resetPokeCoalescing,
 } from './publish';
 
@@ -82,6 +83,18 @@ describe('pokeLivePanel', () => {
   });
 });
 
+describe('publishPresentation', () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it('annuncia il puntatore della presentazione, subito', () => {
+    publishPresentation('evt-1', { materialId: 'mat-1', page: 2, version: 5 });
+    publishPresentation('evt-1', { materialId: 'mat-1', page: 3, version: 6 });
+    // Nessun accorpamento: ogni pagina parte.
+    expect(publish).toHaveBeenCalledTimes(2);
+    expect(ultimaBusta()).toMatchObject({ op: 'presentation', materialId: 'mat-1', page: 3, version: 6 });
+  });
+});
+
 describe('publishEventStatus', () => {
   beforeEach(() => vi.clearAllMocks());
 
@@ -148,9 +161,22 @@ describe('confine di ciò che viaggia sul canale', () => {
       'displayName',
       'email',
       'token',
+      // La presentazione viaggia come puntatore: titolo e chi presenta restano
+      // dietro la rotta che controlla chi sta nella stanza.
+      'title',
+      'presenterName',
+      'fileUrl',
     ];
     publishFlagsIfChanged('evt-1', FLAG_BASE, { ...FLAG_BASE, qaEnabled: false });
     publishEventStatus('evt-1', 'LIVE');
+    // Anche se il chiamante passa uno stato più ricco, partono solo i tre campi.
+    publishPresentation('evt-1', {
+      materialId: 'mat-1',
+      page: 3,
+      version: 4,
+      title: 'Riservato',
+      presenterName: 'Nome',
+    } as unknown as Parameters<typeof publishPresentation>[1]);
     for (const pannello of ['qa', 'polls', 'agenda', 'wordcloud', 'materials'] as const) {
       pokeLivePanel('evt-1', pannello);
     }

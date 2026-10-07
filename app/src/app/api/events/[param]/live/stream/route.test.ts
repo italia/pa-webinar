@@ -30,9 +30,18 @@ vi.mock('@/lib/live-state/pubsub', () => ({
 vi.mock('@/lib/db', () => ({
   prisma: { event: { findFirst: vi.fn(), findUnique: vi.fn() } },
 }));
+// La lettura della presentazione: per default non riesce, e allora lo stream
+// non ne manda (il client tiene il suo). I test della presentazione la danno.
+vi.mock('@/lib/presentation/state', async (originale) => ({
+  ...(await originale<Record<string, unknown>>()),
+  readPresentationPointer: vi.fn(async () => {
+    throw new Error('non letta');
+  }),
+}));
 
 import { prisma } from '@/lib/db';
 import { subscribeLiveState } from '@/lib/live-state/pubsub';
+import { readPresentationPointer } from '@/lib/presentation/state';
 
 import { GET } from './route';
 
@@ -227,5 +236,46 @@ describe('GET /api/events/[param]/live/stream', () => {
     await new Promise((r) => setTimeout(r, 20));
     expect(setIntervalSpy).not.toHaveBeenCalled();
     setIntervalSpy.mockRestore();
+  });
+});
+
+describe('GET /api/events/[param]/live/stream — presentazione', () => {
+  it('chi entra a metà presentazione riceve il puntatore all’apertura, dopo flag e stato', async () => {
+    db.event.findUnique.mockResolvedValue({ status: 'LIVE', ...FLAG_SPENTI });
+    vi.mocked(readPresentationPointer).mockResolvedValueOnce({
+      materialId: '55555555-5555-4555-8555-555555555555',
+      page: 4,
+      version: 9,
+    });
+    const ctrl = new AbortController();
+    const res = await GET(new Request('http://x/api/events/e/live/stream', { signal: ctrl.signal }), {
+      params: Promise.resolve({ param: 'evento' }),
+    });
+    const msgs = await leggi(res, 4);
+    ctrl.abort();
+    expect(msgs.map((m) => m.op)).toEqual(['hello', 'flags', 'eventStatus', 'presentation']);
+    expect(msgs[3]).toMatchObject({
+      materialId: '55555555-5555-4555-8555-555555555555',
+      page: 4,
+      version: 9,
+    });
+    // Solo il puntatore.
+    expect(Object.keys(msgs[3]!).sort()).toEqual(['materialId', 'op', 'page', 'ts', 'version']);
+  });
+
+  it('a evento concluso il puntatore arriva chiuso, con la sua versione', async () => {
+    db.event.findUnique.mockResolvedValue({ status: 'ENDED', ...FLAG_SPENTI });
+    vi.mocked(readPresentationPointer).mockResolvedValueOnce({
+      materialId: '55555555-5555-4555-8555-555555555555',
+      page: 4,
+      version: 9,
+    });
+    const ctrl = new AbortController();
+    const res = await GET(new Request('http://x/api/events/e/live/stream', { signal: ctrl.signal }), {
+      params: Promise.resolve({ param: 'evento' }),
+    });
+    const msgs = await leggi(res, 4);
+    ctrl.abort();
+    expect(msgs[3]).toMatchObject({ op: 'presentation', materialId: null, page: 1, version: 9 });
   });
 });

@@ -16,9 +16,10 @@
  *
  * APERTURA. Subito dopo il commento di apertura arriva `hello`, che dice se il
  * push è davvero disponibile — senza Redis lo stream resta muto, e il client
- * deve saperlo per non spegnere il proprio polling. Poi `flags` ed
- * `eventStatus` letti dal database: chi entra a metà evento non aspetta il
- * primo cambiamento per essere allineato.
+ * deve saperlo per non spegnere il proprio polling. Poi `flags`,
+ * `eventStatus` e `presentation` (materiale e pagina del PDF presentato,
+ * lib/presentation/state) letti dal database: chi entra a metà evento non
+ * aspetta il primo cambiamento per essere allineato.
  *
  * L'istantanea si legge dopo l'iscrizione a Redis (atteso al massimo tre
  * secondi), e gli avvisi arrivati durante la lettura partono dopo di lei,
@@ -40,6 +41,8 @@ import {
   type LiveFlags,
   type LiveStreamEvent,
 } from '@/lib/live-state/pubsub';
+import { pointerForStatus, readPresentationPointer } from '@/lib/presentation/state';
+import type { PresentationPointer } from '@/lib/presentation/types';
 import { withDeadline } from '@/lib/redis';
 
 export const dynamic = 'force-dynamic';
@@ -58,22 +61,34 @@ const HELLO_WAIT_MS = 1_000;
 /** Attesa massima dell'iscrizione a Redis prima di mandare comunque lo stato. */
 const SUBSCRIBE_WAIT_MS = 3_000;
 
-type StatoLive = { status: string } & Record<LiveFlagField, boolean>;
+type StatoLive = { status: string } & Record<LiveFlagField, boolean> & {
+  /** Null se la lettura non e' riuscita: allora non si manda, e il client tiene il suo. */
+  presentation?: PresentationPointer | null;
+};
 
-function leggiStato(eventId: string): Promise<StatoLive | null> {
-  return prisma.event
-    .findUnique({
-      where: { id: eventId },
-      select: {
-        status: true,
-        qaEnabled: true,
-        chatEnabled: true,
-        agendaEnabled: true,
-        wordCloudEnabled: true,
-        recordingEnabled: true,
-      },
-    })
-    .catch(() => null);
+async function leggiStato(eventId: string): Promise<StatoLive | null> {
+  const [evento, presentazione] = await Promise.all([
+    prisma.event
+      .findUnique({
+        where: { id: eventId },
+        select: {
+          status: true,
+          qaEnabled: true,
+          chatEnabled: true,
+          agendaEnabled: true,
+          wordCloudEnabled: true,
+          recordingEnabled: true,
+        },
+      })
+      .catch(() => null),
+    readPresentationPointer(eventId).catch(() => null),
+  ]);
+  if (!evento) return null;
+  // Concluso l'evento, la presentazione rimasta aperta non si mostra più.
+  return {
+    ...evento,
+    presentation: presentazione ? pointerForStatus(presentazione, evento.status) : null,
+  };
 }
 
 /**
@@ -158,6 +173,7 @@ export async function GET(
           ts: ora,
         });
         invia({ op: 'eventStatus', status: stato.status, ts: ora });
+        if (stato.presentation) invia({ op: 'presentation', ...stato.presentation, ts: ora });
       };
 
       // Mentre si legge lo stato (all'apertura o a un riallineamento) gli

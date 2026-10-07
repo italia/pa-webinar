@@ -38,6 +38,8 @@ import AgendaPanel from '@/components/live/agenda-panel';
 import MaterialPanel from '@/components/materials/material-panel';
 import { fetchMaterials, materialsListKey } from '@/components/materials/material-request';
 import ParticipantPanel from '@/components/participants/participant-panel';
+import PresentationStage from '@/components/presentation/presentation-stage';
+import { PresentationContext, usePresentation } from '@/components/presentation/use-presentation';
 import PreJoinScreen from '@/components/live/pre-join-screen';
 import PostEventFeedback from '@/components/live/post-event-feedback';
 import PresentationTimer from '@/components/live/presentation-timer';
@@ -275,8 +277,27 @@ export default function LiveEventClient({
   // duplicare la chiusura della sala, che tocca schermata di feedback e
   // segnali di riaggancio. Il canale la annuncia comunque, per chi vorra'
   // agganciarla in un secondo momento.
-  const { pushLive } = useLiveState(event.slug);
+  const { pushLive, presentation: puntatorePresentazione } = useLiveState(event.slug);
   const [phase, setPhase] = useState<LivePhase>('waiting');
+  // Il PDF presentato in sala (components/presentation): chi conduce e i
+  // relatori lo avviano e girano le pagine, tutti lo vedono. Lo stato si legge
+  // solo dentro la chiamata; il puntatore arriva comunque dal canale.
+  const presentation = usePresentation({
+    eventSlug: event.slug,
+    token,
+    pointer: puntatorePresentazione,
+    pushLive,
+    canPresent: isModerator || isSpeaker,
+    active: phase === 'ready',
+  });
+  const presentando = presentation.view.materialId !== null;
+  // Chi preferisce il video grande riduce la presentazione a una riga; un
+  // documento nuovo la riapre, perche' nessuno se lo perda.
+  const [presentazioneRidotta, setPresentazioneRidotta] = useState(false);
+  useEffect(() => {
+    if (presentation.view.materialId) setPresentazioneRidotta(false);
+  }, [presentation.view.materialId]);
+  const presentazioneAffiancata = presentando && !presentazioneRidotta;
   const [credentials, setCredentials] = useState<JitsiCredentials | null>(null);
   const [participantCount, setParticipantCount] = useState(0);
   // Mirror of participantCount for the peak reporter's interval: reading it
@@ -1657,6 +1678,7 @@ export default function LiveEventClient({
 
   return (
     <LivePushContext.Provider value={pushLive}>
+    <PresentationContext.Provider value={presentation}>
     <div ref={liveRootRef} className="d-flex flex-column live-page-bg">
       <RecordingBanner visible={isRecording} />
       <OvertimeBanner
@@ -1732,8 +1754,28 @@ export default function LiveEventClient({
       {!showJvbOverlay && jitsiApi && <ScreenshareBanner api={jitsiApi} />}
 
       <div className="d-flex flex-column flex-lg-row flex-grow-1 live-body">
-        <div className="d-flex flex-column flex-grow-1 live-main">
-          <div className="flex-grow-1 position-relative">
+        {/* La presentazione sta accanto alla chiamata (sopra, sotto i 992px):
+            e' un fratello che compare prima del riquadro di Jitsi, che resta
+            allo stesso posto nell'albero e non si ricarica. Cambiano solo le
+            classi del contenitore. */}
+        <div
+          className={`d-flex flex-column flex-grow-1 live-main${
+            presentazioneAffiancata ? ' flex-lg-row live-main--presenting' : ''
+          }`}
+        >
+          {presentando && (
+            <PresentationStage
+              token={token}
+              isRecording={isRecording}
+              minimized={presentazioneRidotta}
+              onToggleMinimized={() => setPresentazioneRidotta((r) => !r)}
+            />
+          )}
+          <div
+            className={`position-relative live-video-area${
+              presentazioneAffiancata ? ' live-video-area--beside' : ' flex-grow-1'
+            }`}
+          >
             {showJvbOverlay && (
               <div
                 className="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column align-items-center justify-content-center"
@@ -1963,6 +2005,7 @@ export default function LiveEventClient({
         </ModalFooter>
       </Modal>
     </div>
+    </PresentationContext.Provider>
     </LivePushContext.Provider>
   );
 }

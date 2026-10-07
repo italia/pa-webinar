@@ -7,7 +7,8 @@
  *
  * COSA VIAGGIA, E COSA NO. Due forme, e il confine è **chi vede cosa**:
  *   - **snapshot** solo dove la risposta è identica per tutti quelli che vedono
- *     l'evento (flag e stato): il client lo usa così com'è;
+ *     l'evento (flag, stato, pagina della presentazione in corso): il client
+ *     lo usa così com'è;
  *   - **poke** dove la risposta dipende dal ruolo (Q&A e sondaggi) o contiene un
  *     campo per-utente (agenda, word cloud). Lì il canale dice soltanto «è
  *     cambiato qualcosa» e a rispondere resta la rotta REST, con le
@@ -64,10 +65,26 @@ export type LiveFlagField = (typeof LIVE_FLAG_FIELDS)[number];
 /** Derivato dall'elenco: un flag si aggiunge in un posto solo. */
 export type LiveFlags = Record<LiveFlagField, boolean>;
 
+/**
+ * Dove e' arrivata la presentazione di un PDF (lib/presentation/state): quale
+ * materiale e quale pagina. Viaggia come snapshot perche' e' uguale per tutti
+ * e una pagina girata deve arrivare subito, non dopo una rilettura frenata.
+ * Porta solo il puntatore: titolo, nome di chi presenta e file restano dietro
+ * le rotte che controllano chi sta nella stanza.
+ */
+export interface PresentationPointer {
+  /** Null quando nessuno presenta. */
+  materialId: string | null;
+  page: number;
+  /** Cresce a ogni cambio: fra due stati si tiene quello con il numero piu' alto. */
+  version: number;
+}
+
 export type LiveEnvelope =
   | { op: 'flags'; flags: LiveFlags; ts: string }
   | { op: 'eventStatus'; status: string; ts: string }
-  | { op: 'poke'; panel: PokeablePanel; ts: string };
+  | { op: 'poke'; panel: PokeablePanel; ts: string }
+  | ({ op: 'presentation'; ts: string } & PresentationPointer);
 
 /**
  * Cio' che riceve chi si iscrive: le buste pubblicate, piu' `resync`, che non

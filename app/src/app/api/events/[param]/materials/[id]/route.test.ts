@@ -11,11 +11,12 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
  * risponde, il materiale resta e si riprova. Il pannello di chi è in sala
  * rilegge subito.
  */
-const { storage, poke } = vi.hoisted(() => ({
+const { storage, poke, publishPresentation } = vi.hoisted(() => ({
   storage: {
     current: null as null | { delete: ReturnType<typeof vi.fn>; list: ReturnType<typeof vi.fn> },
   },
   poke: vi.fn(),
+  publishPresentation: vi.fn(),
 }));
 
 vi.mock('@/lib/db', () => ({
@@ -23,6 +24,7 @@ vi.mock('@/lib/db', () => ({
     event: { findUnique: vi.fn(), findFirst: vi.fn() },
     eventMaterial: { findUnique: vi.fn(), findFirst: vi.fn(), delete: vi.fn(), update: vi.fn() },
     eventModerator: { findUnique: vi.fn() },
+    eventPresentation: { updateMany: vi.fn(), findUnique: vi.fn() },
   },
 }));
 vi.mock('@/lib/storage', () => ({
@@ -30,7 +32,9 @@ vi.mock('@/lib/storage', () => ({
 }));
 vi.mock('@/lib/live-state/publish', () => ({
   pokeLivePanel: poke,
+  publishPresentation,
 }));
+vi.mock('@/lib/live/actions', () => ({ recordLiveAction: vi.fn(async () => undefined) }));
 
 import { prisma } from '@/lib/db';
 
@@ -43,6 +47,8 @@ const mockedOtherRow = prisma.eventMaterial.findFirst as unknown as ReturnType<t
 const mockedGrant = prisma.eventModerator.findUnique as unknown as ReturnType<typeof vi.fn>;
 const mockedPrivacyNotice = prisma.event.findFirst as unknown as ReturnType<typeof vi.fn>;
 const mockedUpdate = prisma.eventMaterial.update as unknown as ReturnType<typeof vi.fn>;
+const mockedEndPresentation = prisma.eventPresentation.updateMany as unknown as ReturnType<typeof vi.fn>;
+const mockedPresentation = prisma.eventPresentation.findUnique as unknown as ReturnType<typeof vi.fn>;
 
 const EVENT_ID = '22222222-2222-4222-8222-222222222222';
 const MATERIAL_ID = '55555555-5555-4555-8555-555555555555';
@@ -68,6 +74,8 @@ beforeEach(() => {
   mockedDelete.mockResolvedValue({});
   mockedOtherRow.mockResolvedValue(null);
   mockedPrivacyNotice.mockResolvedValue(null);
+  mockedEndPresentation.mockResolvedValue({ count: 0 });
+  mockedPresentation.mockResolvedValue({ materialId: null, page: 1, version: 4 });
 });
 
 describe('DELETE /api/events/[slug]/materials/[id]', () => {
@@ -85,6 +93,38 @@ describe('DELETE /api/events/[slug]/materials/[id]', () => {
       select: { id: true },
     });
     expect(poke).toHaveBeenCalledWith(EVENT_ID, 'materials');
+  });
+
+  it('il materiale presentato in sala: la presentazione si chiude prima che la riga se ne vada', async () => {
+    mockedEndPresentation.mockResolvedValue({ count: 1 });
+    mockedFind.mockResolvedValue({
+      id: MATERIAL_ID,
+      eventId: EVENT_ID,
+      type: 'FILE',
+      blobPath: KEY,
+      title: 'Slide',
+    });
+    const res = await DELETE(del(), ctx());
+    expect(res.status).toBe(200);
+    expect(mockedEndPresentation).toHaveBeenCalledWith({
+      where: { eventId: EVENT_ID, materialId: MATERIAL_ID },
+      data: expect.objectContaining({ materialId: null, version: { increment: 1 } }),
+    });
+    // Prima del file e della riga: chi lo sta scaricando vede una chiusura,
+    // non un errore.
+    expect(mockedEndPresentation.mock.invocationCallOrder[0]).toBeLessThan(
+      storage.current!.delete.mock.invocationCallOrder[0]!,
+    );
+    expect(mockedEndPresentation.mock.invocationCallOrder[0]).toBeLessThan(
+      mockedDelete.mock.invocationCallOrder[0]!,
+    );
+    expect(publishPresentation).toHaveBeenCalledWith(EVENT_ID, { materialId: null, page: 1, version: 4 });
+  });
+
+  it('un materiale che nessuno presenta: nessun annuncio della presentazione', async () => {
+    const res = await DELETE(del(), ctx());
+    expect(res.status).toBe(200);
+    expect(publishPresentation).not.toHaveBeenCalled();
   });
 
   it('un file che un’altra riga usa ancora resta nello storage', async () => {

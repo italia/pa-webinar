@@ -262,6 +262,7 @@ model Event {
   questionnaires  EventQuestionnaire[]
   recordings      Recording[]
   glossaryTerms   GlossaryTerm[]
+  presentation    EventPresentation?
 
   // ── Postprod AI feature flags (per-event) ─────────────────────
   // When true, the postprod pipeline produces a transcript / summary /
@@ -356,6 +357,8 @@ model EventModerator {
   revokedAt DateTime? @map("revoked_at")
 
   event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  presentations EventPresentation[]
 
   @@index([eventId])
   @@map("event_moderators")
@@ -1008,10 +1011,47 @@ model EventMaterial {
   createdAt DateTime @default(now()) @map("created_at")
 
   // Relations
-  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  event         Event               @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  presentations EventPresentation[]
 
   @@index([eventId])
   @@map("event_materials")
+}
+
+// Il PDF che chi conduce o un relatore sta presentando nella sala, e a che
+// pagina: una riga per evento, riscritta a ogni cambio. La legge chi entra a
+// meta' presentazione (e ogni replica dell'app), la porta a tutti il canale
+// `live:<eventId>` (lib/presentation/state.ts). Tabella a parte e non colonne
+// di `events`: una pagina girata ogni pochi secondi non deve riscrivere la
+// riga dell'evento, ne' spostarne `updated_at`.
+model EventPresentation {
+  eventId          String    @id @map("event_id") @db.Uuid
+  // Il materiale presentato; null quando nessuno presenta. Toglierlo dai
+  // materiali chiude la presentazione (SetNull).
+  materialId       String?   @map("material_id") @db.Uuid
+  // Pagina corrente, da 1.
+  page             Int       @default(1)
+  // Pagine del documento, come le ha contate il browser di chi presenta;
+  // null finche' non le ha dette.
+  pageCount        Int?      @map("page_count")
+  // Chi presenta: il ruolo (MODERATOR o SPEAKER) e, per una concessione
+  // nominale, la riga della concessione. Null per il link moderatore
+  // principale, che non ha una persona dietro. Mai un nome copiato qui.
+  presenterRole    String?   @map("presenter_role") @db.VarChar(16)
+  presenterGrantId String?   @map("presenter_grant_id") @db.Uuid
+  // Cresce a ogni cambio: chi riceve due stati fuori ordine tiene il piu'
+  // recente.
+  version          Int       @default(0)
+  startedAt        DateTime? @map("started_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+
+  event     Event           @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  material  EventMaterial?  @relation(fields: [materialId], references: [id], onDelete: SetNull)
+  presenter EventModerator? @relation(fields: [presenterGrantId], references: [id], onDelete: SetNull)
+
+  @@index([materialId])
+  @@index([presenterGrantId])
+  @@map("event_presentations")
 }
 
 // ─── Event Reminders ────────────────────────────────────
