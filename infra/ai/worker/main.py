@@ -158,6 +158,9 @@ def _refine_transcript(
     termini tecnici. Quando il testo di un segmento cambia, le sue parole con
     i tempi si riallineano (glossary.apply_text)."""
     terms = glmod.parse(job.providerHints.glossary)
+    # Solo i nomi di persona: un'etichetta come "Moderatore" finirebbe al
+    # posto della parola comune che contiene.
+    names = glmod.person_names(names)
     normalize = glmod.normalizer(terms)
     fixed = glmod.apply_text(segments, [normalize(s.get("text") or "") for s in segments])
     budget = _correction_budget_s()

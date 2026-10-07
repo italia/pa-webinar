@@ -144,3 +144,44 @@ def test_speakable_traduzione_di_piu_parole_si_legge_com_e():
     t = g.parse([{"term": "ABC", "reading": "spell", "translations": {"en": "Example Agency"}}])
     assert g.speakable("The Example Agency said", t, "en") == "The Example Agency said"
     assert g.speakable("La ABC", t, "it") == "La A-B-C"
+
+
+# --- etichette di ruolo e nomi di persona ------------------------------------
+
+
+def test_le_etichette_di_ruolo_non_sono_nomi_di_persona():
+    assert g.person_names(["Moderatore Principale", "Relatore 1", "Ufficio Stampa", "Ospite", "Moderatore della prova"]) == ["Principale", "Stampa"]
+    assert g.person_names(["Moderatore", "Relatore 2", "della"]) == []
+
+
+def test_dai_nomi_di_persona_si_tolgono_solo_ruolo_e_cifre():
+    assert g.person_names(["Mario Rossi - Relatore", "Giulia Bianchi 2", "Anna Sala", "Giulia Del Monte", "  ", ""]) == [
+        "Mario Rossi", "Giulia Bianchi", "Anna Sala", "Giulia Del Monte",
+    ]
+
+
+def test_un_etichetta_di_ruolo_non_e_un_nome_ammesso():
+    frase = "I link per moderatori e relatori partono alla pubblicazione"
+    sbagliata = "I link per Moderatore Principale e relatori partono alla pubblicazione"
+    nomi = g.person_names(["Moderatore Principale"])
+    assert not any("Moderatore" in x for x in g.correction_terms([], nomi))
+    assert not g.correction_is_safe(frase, sbagliata, g.allowed_tokens([], nomi))
+    assert not g.correction_is_safe(
+        "i relatori parlano", "i Relatore 1 parlano", g.allowed_tokens([], g.person_names(["Relatore 1"]))
+    )
+
+
+def test_parole_aggiunte_solo_se_note_o_la_stessa_parola_divisa():
+    assert g.correction_is_safe("la pubblicaamministrazione digitale", "la pubblica amministrazione digitale", set())
+    assert not g.correction_is_safe("parla il ministero", "parla il ministero dell'interno", set())
+    assert g.correction_is_safe("scarica io", "scarica App IO", g.allowed_tokens([g.Term(term="App IO")]))
+
+
+def test_i_nomi_di_persona_correggono_come_prima():
+    nomi = g.person_names(["Mario Rossi", "Giulia Del Monte"])
+    allowed = g.allowed_tokens([g.Term(term="Presidenza del Consiglio")], nomi)
+    assert g.correction_is_safe("ha parlato Mario Rosi", "ha parlato Mario Rossi", allowed)
+    assert g.correction_is_safe("ha parlato rosi oggi", "ha parlato Rossi oggi", allowed)
+    assert g.correction_is_safe("ha parlato Mario", "ha parlato Mario Rossi", allowed)
+    assert g.correction_is_safe("grazie Mariorosi", "grazie Mario Rossi", allowed)
+    assert g.correction_is_safe("la pcm ha deciso", "la Presidenza del Consiglio ha deciso", allowed)

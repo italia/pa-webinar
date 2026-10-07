@@ -179,6 +179,51 @@ def normalize_text(text: str, terms: List[Term]) -> str:
     return normalizer(terms)(text) if terms else text
 
 
+# Parole di ruolo o di postazione che possono stare nel nome visualizzato
+# ("Moderatore", "Relatore 1", "Mario Rossi - Relatore"). Non sono nomi di
+# persona: mandate alla correzione, il modello le metterebbe al posto della
+# parola comune che somigliano ("i moderatori" -> l'etichetta). Restano fuori
+# le parole che sono anche cognomi comuni (Sala, Aula, Regia).
+_PAROLE_DI_RUOLO = frozenset(
+    """
+    moderatore moderatrice moderatori moderatrici moderazione
+    relatore relatrice relatori relatrici ospite ospiti
+    partecipante partecipanti organizzatore organizzatrice organizzatori
+    conduttore conduttrice coordinatore coordinatrice interprete
+    ufficio uffici segreteria postazione riunione riunioni prova test
+    utente utenti registrazione recorder
+    moderator moderators speaker speakers presenter participant participants
+    attendee attendees guest guests host user office meeting
+    moderateur modérateur modératrice intervenant intervenante invité invitée
+    moderador moderadora ponente invitado invitada
+    moderatorin referent referentin gast teilnehmer teilnehmerin
+    """.split()
+)
+
+# Particelle che da sole non fanno un nome ("della" resta da
+# "Moderatore della prova").
+_PARTICELLE = frozenset("di de del della dei degli delle da dal dalla la lo le il van von der den du des y e".split())
+
+
+def person_names(names: Iterable[str]) -> List[str]:
+    """I nomi di chi parla da usare nella correzione: di ciascuno restano le
+    parole di persona, tolte quelle di ruolo o di postazione e le cifre
+    ("Mario Rossi - Relatore" -> "Mario Rossi"). Un nome che resta vuoto o
+    fatto di sole particelle e' un'etichetta e non si usa. Nella trascrizione
+    chi parla resta indicato con il nome visualizzato intero."""
+    out = []
+    for n in names:
+        parole = [
+            p for p in (n or "").split()
+            if _token_key(p)
+            and _token_key(p) not in _PAROLE_DI_RUOLO
+            and not any(c.isdigit() for c in p)
+        ]
+        if any(_token_key(p) not in _PARTICELLE for p in parole):
+            out.append(" ".join(parole))
+    return out
+
+
 def correction_terms(terms: List[Term], names: Iterable[str] = ()) -> List[str]:
     """I termini per la correzione con il modello: prima i nomi di chi parla,
     poi le voci nell'ordine del job (quelle dell'evento per prime), ciascuna
@@ -280,7 +325,8 @@ def correction_is_safe(original: str, corrected: str, allowed: Optional[set] = N
     """Una correzione del modello si accetta se aggiusta parole, non se
     riscrive la frase. Ogni parte cambiata deve essere una variante scritta
     di quella originale ("Rosi" -> "Rossi", "a bi ci" -> "ABC") o un termine
-    o nome noto (`allowed`); niente parole tolte senza sostituto, e al piu' 3
+    o nome noto (`allowed`); niente parole tolte senza sostituto, parole
+    aggiunte solo se note o se e' la stessa parola divisa, e al piu' 3
     parole toccate, o il 30% di una riga lunga. Una riga inventata, riassunta
     o tradotta resta quella originale, anche se e' corta."""
     if not corrected.strip():
@@ -303,8 +349,12 @@ def correction_is_safe(original: str, corrected: str, allowed: Optional[set] = N
         nuovo = "".join(nuove)
         if not nuove:
             continue
-        simile = bool(vecchio) and difflib.SequenceMatcher(a=vecchio, b=nuovo).ratio() >= 0.6
-        if not (simile or all(t in allowed for t in nuove)):
+        rapporto = difflib.SequenceMatcher(a=vecchio, b=nuovo).ratio() if vecchio else 0.0
+        # Una parte che aggiunge parole e' la stessa parola divisa
+        # ("pubblicaamministrazione" -> "pubblica amministrazione"), non una
+        # parola inventata: la somiglianza richiesta sale.
+        soglia = 0.9 if len(nuove) > len([t for t in a[i1:i2] if t]) else 0.6
+        if not (rapporto >= soglia or all(t in allowed for t in nuove)):
             return False
         toccate += max(i2 - i1, j2 - j1)
     return toccate <= max(3, math.ceil(0.3 * len(a)))
