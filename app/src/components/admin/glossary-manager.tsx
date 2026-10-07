@@ -270,7 +270,7 @@ export default function GlossaryManager({
           dello staff: chi entra col link del moderatore non la apre. */}
       {scope === 'event' && !token && (
         <p className="glossary__shared">
-          <Link href="/admin/settings/glossary">{t('openInstance')}</Link>
+          <Link href="/admin/glossary">{t('openInstance')}</Link>
         </p>
       )}
     </div>

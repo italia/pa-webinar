@@ -11,6 +11,7 @@ import { getSettings } from '@/lib/settings';
 import { guestAccessAllowed } from '@/lib/events/guest-window';
 import EventManagementClient from '@/components/admin/event-management-client';
 import { localizedPath } from '@/lib/utils/localized-url';
+import { eventPageMetadata } from '@/components/admin/admin-page-title';
 
 interface EventManagePageProps {
   params: Promise<{ id: string }>;
@@ -18,6 +19,17 @@ interface EventManagePageProps {
 }
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+export async function generateMetadata({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ token?: string | string[] }>;
+}) {
+  const [{ id }, { token }] = await Promise.all([params, searchParams]);
+  return eventPageMetadata('/admin/events/[id]', id, { token, conToken: true });
+}
 
 export default async function EventManagePage({
   params,

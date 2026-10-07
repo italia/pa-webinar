@@ -615,7 +615,6 @@
       "newLink": "Prašyti naujos nuorodos"
     },
     "organizers": {
-      "title": "Darbuotojų paskyros",
       "intro": "Asmenys, dirbantys administravimo srityje savo vardu. Organizatoriai kuria ir valdo savo renginius; administratoriai valdo visą egzempliorių. Jie prisijungia nuoroda, išsiųsta jų el. paštu, be slaptažodžio. Egzemplioriaus raktas lieka avarinėms situacijoms ir automatizavimui.",
       "newTitle": "Pridėti paskyrą",
       "name": "Vardas ir pavardė",
@@ -929,82 +928,51 @@
       "toFixField": "Laukas {n}"
     },
     "nav": {
-      "events": "Renginių valdymas",
-      "registrations": "Registracijos",
-      "recordings": "Vaizdo įrašai ir sesijos",
-      "settings": "Sistemos nustatymai",
-      "eventsList": "Renginių sąrašas",
+      "events": "Renginiai",
+      "settings": "Nustatymai",
+      "eventsList": "Visi renginiai",
       "newEvent": "Naujas renginys",
-      "calendar": "Kalendorius",
-      "templates": "Šablonai",
+      "calendar": "Renginių kalendorius",
+      "templates": "Renginių šablonai",
       "analytics": "Statistika",
-      "instantCalls": "Greitieji skambučiai",
+      "instantCalls": "Greiti skambučiai",
       "infrastructure": "Infrastruktūra",
       "monitoring": "Stebėsena",
-      "monitoringDashboard": "Skydelis",
+      "monitoringDashboard": "Paslaugos būsena",
       "registrationsList": "Registracijos",
-      "moderators": "Moderatoriai",
       "moderatorLinks": "Moderatorių nuorodos",
-      "gdprAudit": "GDPR/BDAR auditas",
-      "recordingsList": "Vaizdo įrašai",
-      "settingsGeneral": "Bendri",
+      "gdprAudit": "BDAR žurnalas",
+      "recordingsList": "Įrašai",
+      "settingsGeneral": "Bendrieji nustatymai",
       "settingsLanguages": "Kalbos",
-      "settingsGdprTemplates": "GDPR/BDAR šablonai",
-      "admin": "Administravimas",
-      "eventDetail": "Renginio informacija",
-      "eventEdit": "Redaguoti renginį",
-      "publications": "Publikacijos",
-      "publicationsList": "Visos publikacijos",
+      "settingsGdprTemplates": "Privatumo pranešimai",
+      "eventDetail": "Renginys",
+      "eventEdit": "Redaguoti",
+      "publicationsList": "Publikacijos",
       "publicationsNew": "Nauja publikacija",
       "ariaLabel": "Administravimo navigacija",
       "subNavAriaLabel": "Skyriaus navigacija",
       "questionnaires": "Klausimynai",
-      "questionnairesLibrary": "Šablonų biblioteka",
-      "questionnairesResponses": "Atsakymai ir statistika",
+      "questionnairesLibrary": "Klausimynų šablonai",
+      "questionnairesResponses": "Atsakymai",
       "rubrica": "Adresų knyga",
       "settingsEmailTemplates": "El. laiškų šablonai",
-      "settingsTags": "Žymų valdymas",
-      "settingsGlossary": "Žodynėlis",
+      "settingsTags": "Žymos",
       "eventMaterials": "Medžiaga",
       "eventQuestionnaires": "Klausimynai",
-      "rubricaList": "Sąrašas",
-      "rubricaDetail": "Įrašas",
-      "organizers": "Paskyros",
-      "staffAccess": "Darbuotojai ir prieiga",
-      "staffAccounts": "Darbuotojų paskyros",
+      "rubricaDetail": "Asmuo",
+      "staffAccess": "Komanda ir prieiga",
+      "staffAccounts": "Komandos paskyros",
       "people": "Asmenys",
       "postprodDetail": "Įrašas",
-      "recordingsPostprod": "Transkripcijos / DI",
-      "feedbackDashboard": "Feedback"
-    },
-    "landing": {
-      "title": "Administravimo skydelis",
-      "subtitle": "Valdykite renginius ir konfigūruokite platformą",
-      "eventsTitle": "Renginių valdymas",
-      "eventsDescription": "Kurkite, redaguokite ir valdykite renginius, šablonus ir statistiką.",
-      "instantCallsTitle": "Greitieji skambučiai",
-      "instantCallsDescription": "Sukurkite viešą vaizdo skambutį iš karto, be planavimo: nuoroda iš karto bendrinama.",
-      "instantCallsStat": "{count, plural, =0 {per pastarąsias 30 dienų greitųjų skambučių nebuvo} one {1 greitasis skambutis per pastarąsias 30 dienų} other {# greitieji skambučiai per pastarąsias 30 dienų}}",
-      "registrationsTitle": "Registracijos",
-      "registrationsDescription": "Renginiuose užsiregistravusių dalyvių adresų knyga: paieška, filtrai, eksportas, moderatoriai ir GDPR/BDAR auditas.",
-      "registrationsTotal": "{count, plural, =0 {nė vienas asmuo neužsiregistravęs} one {1 užsiregistravęs asmuo} other {# užsiregistravę asmenys}}",
-      "today": "šiandien",
-      "recordingsTitle": "Vaizdo įrašai ir sesijos",
-      "recordingsDescription": "Skambučių vaizdo įrašai, baigtos tiesioginės sesijos ir archyvuoti greitieji skambučiai. Atsisiuntimas ir valdymas.",
-      "recordingsStat": "{count, plural, =0 {vaizdo įrašų nėra} one {1 vaizdo įrašas prieinamas} other {# vaizdo įrašai prieinami}}",
-      "analyticsTitle": "Statistika",
-      "analyticsDescription": "Naudojimo metrikų apžvalga: sukurti renginiai, dalyviai, konversijos rodiklis, populiariausi renginiai.",
-      "monitoringTitle": "Stebėsena",
-      "monitoringDescription": "Techninis skydelis su infrastruktūros metrikomis, našumu, prieinamumu ir paslaugos kokybe.",
-      "templatesTitle": "Renginių šablonai",
-      "templatesDescription": "Daugkartinio naudojimo modeliai, leidžiantys greitai sukurti renginius su iš anksto nustatytomis konfigūracijomis.",
-      "settingsTitle": "Sistemos nustatymai",
-      "settingsDescription": "Konfigūruokite prekės ženklą, turinį, kalbas, funkcijas ir infrastruktūrą.",
-      "liveNow": "{count, plural, one {# tiesioginis renginys} few {# tiesioginiai renginiai} many {# tiesioginių renginių} other {# tiesioginių renginių}}",
-      "upcomingEvents": "{count, plural, one {# artėjantis renginys} few {# artėjantys renginiai} many {# artėjančių renginių} other {# artėjančių renginių}}"
+      "recordingsPostprod": "DI pogamyba",
+      "feedbackDashboard": "Atsiliepimai",
+      "video": "Vaizdo įrašai",
+      "glossary": "Žodynėlis",
+      "breadcrumbAriaLabel": "Naršymo kelias",
+      "skipToPage": "Pereiti į puslapio turinį"
     },
     "publications": {
-      "title": "Publikacijos",
       "subtitle": "Bendras redakcinis centras visiems paskelbtiems vaizdo įrašams: planuoti renginiai, greitieji skambučiai, įkelti istoriniai archyvai ir sesijos, laukiančios paskelbimo.",
       "newPublication": "Nauja publikacija",
       "searchPlaceholder": "Ieškoti pagal pavadinimą arba aprašymą…",
@@ -1040,7 +1008,6 @@
         "unlist": "Pašalinti iš bibliotekos"
       },
       "uploadPage": {
-        "title": "Nauja publikacija",
         "subtitle": "Įkelkite esamą vaizdo įrašą (MP4, WebM arba MOV) į platformos saugyklą ir papildykite jį redakciniais metaduomenimis.",
         "step1Title": "1. Įkelkite vaizdo failą",
         "startUpload": "Įkelti",
@@ -1077,7 +1044,6 @@
       "updateFailed": "Atnaujinti nepavyko."
     },
     "recordingsLibrary": {
-      "title": "Vaizdo įrašai",
       "subtitle": "Centralizuota skambučių vaizdo įrašų biblioteka: filtruokite, atsisiųskite, eksportuokite",
       "loading": "Įkeliama...",
       "range": "Laikotarpis",
@@ -1149,7 +1115,6 @@
       "transcriptProcessing": "Apdorojama"
     },
     "gdprAudit": {
-      "title": "GDPR/BDAR auditas",
       "subtitle": "Privatumo veiksmų su asmens duomenimis registras: pašalinimai, sutikimai, eksportai",
       "loading": "Įkeliama...",
       "range": "Laikotarpis",
@@ -1172,7 +1137,6 @@
       "noResults": "Pasirinktame laikotarpyje audito įvykių nėra."
     },
     "moderators": {
-      "title": "Moderatoriai",
       "subtitle": "Atkurti, kopijuoti ir iš naujo generuoti moderatorių stebuklingąsias nuorodas",
       "searchPlaceholder": "Ieškoti pagal slug, moderatoriaus vardą ar el. paštą…",
       "searchHelp": "Stebuklingoji nuoroda turi unikalų žetoną: dalykitės ja tik su paskirtu moderatoriumi.",
@@ -1191,7 +1155,6 @@
       "noResults": "Renginių nerasta."
     },
     "registrations": {
-      "title": "Registracijos",
       "subtitle": "Visi renginiuose užsiregistravę asmenys — paieška, filtravimas ir eksportas",
       "loading": "Įkeliama...",
       "range": "Laikotarpis",
@@ -1525,18 +1488,6 @@
       "title": "Svetainės nustatymai",
       "subtitle": "Konfigūruokite platformos išvaizdą ir elgseną pakartotiniam VA naudojimui",
       "saving": "Saugoma...",
-      "sections": {
-        "languagesTitle": "Kalbų valdymas",
-        "languagesDescription": "Įjunkite arba išjunkite ES kalbas, matomas sąsajoje, pasirinkite numatytąją kalbą ir tinkinkite vertimus.",
-        "gdprTemplatesTitle": "GDPR šablonai",
-        "gdprTemplatesDescription": "Kurkite daugkartinio naudojimo privatumo pranešimus, kuriuos galima susieti su bet kuriuo renginiu, ir pasirinkite numatytąjį naujiems renginiams.",
-        "emailTemplatesTitle": "El. laiškų šablonai",
-        "emailTemplatesDescription": "Tinkinkite patvirtinimo ir priminimo laiškų temą, antraštes ir tekstą. Palikite tuščią, kad būtų naudojami įtaisyti numatytieji tekstai.",
-        "tagsTitle": "Žymų valdymas",
-        "tagsDescription": "Kurkite ir redaguokite žymas, naudojamas renginiams filtruoti",
-        "glossaryTitle": "Žodynėlis",
-        "glossaryDescription": "Santrumpos ir terminai nuorašams, vertimams ir įgarsinimui"
-      },
       "saved": "Nustatymai sėkmingai išsaugoti",
       "tabs": {
         "branding": "Prekės ženklas",
@@ -1869,7 +1820,6 @@
       "invalidRRule": "Neteisinga taisyklė"
     },
     "templates": {
-      "title": "Renginių šablonai",
       "subtitle": "Valdykite numatytuosius šablonus greitam renginių kūrimui",
       "create": "Naujas šablonas",
       "deleteConfirm": "Ar tikrai norite ištrinti šį šabloną?",
@@ -1966,7 +1916,6 @@
       "errorGeneric": "Įvyko klaida. Bandykite dar kartą."
     },
     "gdprTemplates": {
-      "title": "GDPR/BDAR šablonai",
       "subtitle": "Kurkite ir valdykite daugkartinio naudojimo privatumo informaciją, bendrinamą tarp renginių. Numatytuoju pažymėtas šablonas iš anksto pasirenkamas naujiems renginiams.",
       "newTemplate": "Naujas šablonas",
       "emptyState": "Šablonų dar nesukurta. Sukurkite pirmąjį, kad galėtumėte pakartotinai naudoti tą patį privatumo tekstą keliuose renginiuose.",
@@ -1992,7 +1941,6 @@
       "deleteTitle": "Ištrinti šabloną"
     },
     "emailTemplates": {
-      "title": "El. laiškų šablonai",
       "subtitle": "Tinkinkite operacinių el. laiškų temą, antraštes ir tekstą. Palikus tuščius laukus naudojami įtaisyti numatytieji tekstai.",
       "overridden": "Tinkinta",
       "usingDefault": "Naudojamas numatytasis",
@@ -2031,7 +1979,6 @@
       }
     },
     "languages": {
-      "title": "Kalbų valdymas",
       "subtitle": "Konfigūruokite galimas kalbas ir tinkinkite vertimus",
       "defaultLocaleTitle": "Numatytoji kalba",
       "defaultLocaleDescription": "Numatytoji kalba naudojama kaip atsarginis variantas, kai vertimas neprieinamas, ir kaip pagrindinė svetainės kalba.",
@@ -2057,7 +2004,6 @@
       "addOverride": "Pridėti"
     },
     "infrastructure": {
-      "title": "Infrastruktūra",
       "subtitle": "Komponentų būsena ir aplinkos konfigūracija",
       "deploymentMode": "Diegimo režimas",
       "version": "Versija",
@@ -2120,7 +2066,6 @@
       }
     },
     "instantCalls": {
-      "title": "Greitieji skambučiai",
       "subtitle": "Greitųjų vaizdo skambučių sąrašas",
       "total": "iš viso",
       "noCalls": "Greitųjų skambučių dar nebuvo.",
@@ -2182,7 +2127,6 @@
       "deleteTitle": "Ištrinti sesiją"
     },
     "monitoring": {
-      "title": "Stebėsena",
       "subtitle": "Real-time infrastructure and performance monitoring dashboard",
       "loading": "Įkeliamos metrikos...",
       "prometheusUnavailable": "Prometheus is not configured. Set the PROMETHEUS_URL environment variable to enable advanced monitoring.",
@@ -2308,9 +2252,7 @@
       "registeredCount": "{count, plural, =0 {Registracijų nėra} one {1 registracija} other {# registracijų}}"
     },
     "tags": {
-      "title": "Žymų valdymas",
       "subtitle": "Kurkite, redaguokite ir pašalinkite žymas, naudojamas viešųjų renginių klasifikavimui ir filtravimui.",
-      "backToSettings": "Nustatymai",
       "addTag": "Nauja žyma",
       "editTag": "Redaguoti žymą",
       "columnColor": "Spalva",
@@ -2426,7 +2368,6 @@
       }
     },
     "rubrica": {
-      "title": "Adresų knyga",
       "subtitle": "Asmenys, davę sutikimą būti įtraukti į adresų knygą (GDPR/BDAR str. 6.1.a). Profilio informacija automatiškai atnaujinama kiekvieną kartą iš naujo registruojantis.",
       "searchLabel": "Ieškoti pagal vardą ar organizaciją",
       "orgTypeLabel": "Organizacijos tipas",
@@ -2519,7 +2460,6 @@
       "privacyNote": "Atskirų asmenų statistika pagal numatytuosius nustatymus yra pseudonimizuota. Anoniminiai suvestiniai duomenys saugomi renginio suvestinėje; neapdorotos eilutės ištrinamos pasibaigus saugojimo terminui."
     },
     "postprod": {
-      "title": "DI postprodukcijos grandinė",
       "subtitle": "Klasteryje veikiančios DI grandinės parengtos transkripcijos, santraukos ir vertimai. Susiekite kalbėtojus, paleiskite iš naujo arba atšaukite užduotis.",
       "filterStatus": "Būsena",
       "all": "Visos",
@@ -2603,7 +2543,6 @@
       "archiveGenerateOk": "Archyvo kūrimas pradėtas.",
       "archiveGenerateErr": "Nepavyko sukurti archyvo (HTTP {code}).",
       "archiveTrackFallback": "Dalyvis",
-      "manageBackToList": "Visi įrašai",
       "manageDuration": "Trukmė",
       "manageSource": "Šaltinio kalba",
       "manageOpenPublic": "Viešasis puslapis",
@@ -2768,11 +2707,9 @@
       "originalUncertainHint": "Išsaugotame tekste jau gali būti pataisymų, padarytų prieš atsirandant šiai funkcijai: neįmanoma įrodyti, kad tai automatinės transkripcijos sukurtas tekstas"
     },
     "questionnairesPage": {
-      "title": "Klausimynai",
       "subtitle": "Daugkartinio naudojimo klausimų šablonai išankstinės registracijos ir po renginio pildomiems klausimynams."
     },
     "questionnaireResponses": {
-      "title": "Klausimynų atsakymai",
       "subtitle": "Suvestinės pagal klausimą, filtruojamos pagal renginį, etapą ir datų intervalą."
     },
     "eventQuestionnaires": {
@@ -2822,11 +2759,8 @@
       "downloadFailed": "Atsisiųsti nepavyko: bandykite dar kartą."
     },
     "glossary": {
-      "title": "Žodynėlis",
       "subtitle": "Santrumpos, pavadinimai ir terminai DI apdorojimui po renginio: kaip juos rašyti nuorašuose, kaip versti ir kaip tarti įgarsinant. Jie galioja visiems renginiams; kiekvienas renginys gali pridėti savų.",
       "organizerNote": "Galite pridėti terminų visiems renginiams ir redaguoti savo pridėtus; kitus tvarko administratoriai.",
-      "backToSettings": "Grįžti į nustatymus",
-      "backToEvents": "Grįžti į renginius",
       "eventTitle": "Renginio terminai ir santrumpos",
       "eventIntro": "Jie papildo egzemplioriaus žodynėlį šio renginio nuorašui, vertimams ir įgarsinimui. Jei terminas jau yra egzemplioriuje, jį pakeičia čia nurodytas.",
       "openInstance": "Papildyti egzemplioriaus žodynėlį, galiojantį visiems renginiams",
@@ -3761,7 +3695,6 @@
     "reactionSent": "Reakcija išsiųsta!"
   },
   "calendar": {
-    "title": "Renginių kalendorius",
     "subtitle": "Peržiūrėkite visus renginius laikui bėgant",
     "publicTitle": "Renginių kalendorius",
     "publicSubtitle": "Atraskite artėjančius renginius",
@@ -4240,7 +4173,6 @@
     "hintJoystick": "Vilkite, kad judėtumėte"
   },
   "feedbackAdmin": {
-    "title": "Atsiliepimų rezultatai",
     "totalVotes": "atsakymų",
     "noFeedback": "Atsiliepimų negauta",
     "comments": "Komentarai",

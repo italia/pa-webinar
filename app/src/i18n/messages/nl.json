@@ -615,7 +615,6 @@
       "newLink": "Nieuwe link aanvragen"
     },
     "organizers": {
-      "title": "Medewerkersaccounts",
       "intro": "Mensen die onder hun eigen naam in het beheergedeelte werken. Organisatoren maken en beheren hun eigen evenementen; beheerders beheren de hele instantie. Ze loggen in met een link die naar hun e-mailadres wordt gestuurd, zonder wachtwoord. De instantiesleutel blijft beschikbaar voor noodgevallen en automatisering.",
       "newTitle": "Account toevoegen",
       "name": "Voor- en achternaam",
@@ -929,82 +928,51 @@
       "toFixField": "Veld {n}"
     },
     "nav": {
-      "events": "Evenementbeheer",
-      "registrations": "Aanmeldingen",
-      "recordings": "Video's & sessies",
-      "settings": "Systeeminstellingen",
-      "eventsList": "Evenementenlijst",
+      "events": "Evenementen",
+      "settings": "Instellingen",
+      "eventsList": "Alle evenementen",
       "newEvent": "Nieuw evenement",
-      "calendar": "Kalender",
-      "templates": "Sjablonen",
+      "calendar": "Evenementenkalender",
+      "templates": "Evenementsjablonen",
       "analytics": "Statistieken",
-      "instantCalls": "Snelgesprekken",
+      "instantCalls": "Snelle gesprekken",
       "infrastructure": "Infrastructuur",
       "monitoring": "Monitoring",
-      "monitoringDashboard": "Dashboard",
-      "registrationsList": "Aanmeldingen",
-      "moderators": "Moderatoren",
+      "monitoringDashboard": "Dienststatus",
+      "registrationsList": "Inschrijvingen",
       "moderatorLinks": "Moderatorlinks",
-      "gdprAudit": "AVG-audit",
-      "recordingsList": "Video-opnames",
-      "settingsGeneral": "Algemeen",
+      "gdprAudit": "AVG-logboek",
+      "recordingsList": "Opnamen",
+      "settingsGeneral": "Algemene instellingen",
       "settingsLanguages": "Talen",
-      "settingsGdprTemplates": "AVG-sjablonen",
-      "admin": "Beheer",
-      "eventDetail": "Detail evenement",
-      "eventEdit": "Evenement bewerken",
-      "publications": "Publicaties",
-      "publicationsList": "Alle publicaties",
+      "settingsGdprTemplates": "Privacyverklaringen",
+      "eventDetail": "Evenement",
+      "eventEdit": "Bewerken",
+      "publicationsList": "Publicaties",
       "publicationsNew": "Nieuwe publicatie",
       "ariaLabel": "Beheernavigatie",
       "subNavAriaLabel": "Sectienavigatie",
       "questionnaires": "Vragenlijsten",
-      "questionnairesLibrary": "Sjabloonbibliotheek",
-      "questionnairesResponses": "Antwoorden en statistieken",
+      "questionnairesLibrary": "Vragenlijstsjablonen",
+      "questionnairesResponses": "Antwoorden",
       "rubrica": "Adresboek",
       "settingsEmailTemplates": "E-mailsjablonen",
-      "settingsTags": "Tagbeheer",
-      "settingsGlossary": "Woordenlijst",
+      "settingsTags": "Tags",
       "eventMaterials": "Materialen",
       "eventQuestionnaires": "Vragenlijsten",
-      "rubricaList": "Lijst",
-      "rubricaDetail": "Detail",
-      "organizers": "Accounts",
-      "staffAccess": "Medewerkers en toegang",
-      "staffAccounts": "Medewerkersaccounts",
+      "rubricaDetail": "Persoon",
+      "staffAccess": "Team en toegang",
+      "staffAccounts": "Teamaccounts",
       "people": "Personen",
       "postprodDetail": "Opname",
-      "recordingsPostprod": "Transcripties / AI",
-      "feedbackDashboard": "Feedback"
-    },
-    "landing": {
-      "title": "Beheerpaneel",
-      "subtitle": "Beheer evenementen en configureer het platform",
-      "eventsTitle": "Evenementbeheer",
-      "eventsDescription": "Maak, bewerk en beheer evenementen, sjablonen en statistieken.",
-      "instantCallsTitle": "Snelgesprekken",
-      "instantCallsDescription": "Maak direct een openbare videocall aan zonder planning: link is meteen deelbaar.",
-      "instantCallsStat": "{count, plural, =0 {geen snelgesprekken in de afgelopen 30 dagen} one {1 snelgesprek in de afgelopen 30 dagen} other {# snelgesprekken in de afgelopen 30 dagen}}",
-      "registrationsTitle": "Aanmeldingen",
-      "registrationsDescription": "Adresboek van deelnemers die zich voor evenementen hebben aangemeld: zoeken, filters, export, moderatoren en AVG-audit.",
-      "registrationsTotal": "{count, plural, =0 {geen aangemelde personen} one {1 persoon aangemeld} other {# personen aangemeld}}",
-      "today": "vandaag",
-      "recordingsTitle": "Video's & sessies",
-      "recordingsDescription": "Video-opnames van calls, afgeronde live-sessies en gearchiveerde snelgesprekken. Downloaden en beheer.",
-      "recordingsStat": "{count, plural, =0 {geen video-opnames} one {1 video-opname beschikbaar} other {# video-opnames beschikbaar}}",
-      "analyticsTitle": "Statistieken",
-      "analyticsDescription": "Overzicht van gebruiksstatistieken: aangemaakte evenementen, deelnemers, conversieratio, topevenementen.",
-      "monitoringTitle": "Monitoring",
-      "monitoringDescription": "Technisch dashboard met infrastructuurstatistieken, prestaties, beschikbaarheid en servicekwaliteit.",
-      "templatesTitle": "Evenementsjablonen",
-      "templatesDescription": "Herbruikbare modellen om snel evenementen met vooraf ingestelde configuraties te maken.",
-      "settingsTitle": "Systeeminstellingen",
-      "settingsDescription": "Configureer huisstijl, inhoud, talen, functionaliteiten en infrastructuur.",
-      "liveNow": "{count, plural, one {# evenement live} other {# evenementen live}}",
-      "upcomingEvents": "{count, plural, one {# gepland evenement} other {# geplande evenementen}}"
+      "recordingsPostprod": "AI-nabewerking",
+      "feedbackDashboard": "Feedback",
+      "video": "Video",
+      "glossary": "Woordenlijst",
+      "breadcrumbAriaLabel": "Kruimelpad",
+      "skipToPage": "Naar de inhoud van de pagina"
     },
     "publications": {
-      "title": "Publicaties",
       "subtitle": "Centrale redactiehub voor alle gepubliceerde video's: geplande evenementen, snelgesprekken, geladen archieven en sessies die wachten op promotie.",
       "newPublication": "Nieuwe publicatie",
       "searchPlaceholder": "Zoeken op titel of beschrijving…",
@@ -1040,7 +1008,6 @@
         "unlist": "Uit bibliotheek verwijderen"
       },
       "uploadPage": {
-        "title": "Nieuwe publicatie",
         "subtitle": "Upload een bestaand videobestand (MP4, WebM of MOV) naar de platformopslag en verrijk het met redactionele metadata.",
         "step1Title": "1. Videobestand uploaden",
         "startUpload": "Uploaden",
@@ -1077,7 +1044,6 @@
       "updateFailed": "Bijwerken mislukt."
     },
     "recordingsLibrary": {
-      "title": "Video-opnames",
       "subtitle": "Centrale bibliotheek van call-opnames: filteren, downloaden, exporteren",
       "loading": "Laden...",
       "range": "Periode",
@@ -1149,7 +1115,6 @@
       "transcriptProcessing": "In verwerking"
     },
     "gdprAudit": {
-      "title": "AVG-audit",
       "subtitle": "Logboek van privacy-acties op persoonsgegevens: verwijderingen, toestemmingen, exports",
       "loading": "Laden...",
       "range": "Periode",
@@ -1172,7 +1137,6 @@
       "noResults": "Geen audit-items in de geselecteerde periode."
     },
     "moderators": {
-      "title": "Moderatoren",
       "subtitle": "Magic links van moderatoren ophalen, kopiëren en opnieuw genereren",
       "searchPlaceholder": "Zoeken op slug, naam of e-mail van moderator…",
       "searchHelp": "De magic link bevat een uniek token: deel hem alleen met de aangewezen moderator.",
@@ -1191,7 +1155,6 @@
       "noResults": "Geen evenementen gevonden."
     },
     "registrations": {
-      "title": "Aanmeldingen",
       "subtitle": "Alle personen die zich voor evenementen hebben aangemeld — zoeken, filteren en exporteren",
       "loading": "Laden...",
       "range": "Periode",
@@ -1525,18 +1488,6 @@
       "title": "Site-instellingen",
       "subtitle": "Configureer het uiterlijk en gedrag van het platform voor hergebruik door overheden",
       "saving": "Opslaan...",
-      "sections": {
-        "languagesTitle": "Taalbeheer",
-        "languagesDescription": "Activeer of deactiveer de EU-talen in de interface, kies de standaardtaal en pas vertalingen aan.",
-        "gdprTemplatesTitle": "GDPR-sjablonen",
-        "gdprTemplatesDescription": "Maak herbruikbare privacyverklaringen die aan elk evenement gekoppeld kunnen worden en kies de standaardverklaring voor nieuwe evenementen.",
-        "emailTemplatesTitle": "E-mailsjablonen",
-        "emailTemplatesDescription": "Pas onderwerp, koppen en teksten van de bevestigings- en herinneringsmails aan. Laat leeg om de ingebouwde standaardteksten te gebruiken.",
-        "tagsTitle": "Tagbeheer",
-        "tagsDescription": "Tags maken en bewerken die worden gebruikt om evenementen te filteren",
-        "glossaryTitle": "Woordenlijst",
-        "glossaryDescription": "Afkortingen en vaktermen voor transcripties, vertalingen en nasynchronisatie"
-      },
       "saved": "Instellingen succesvol opgeslagen",
       "tabs": {
         "branding": "Huisstijl",
@@ -1869,7 +1820,6 @@
       "invalidRRule": "Ongeldige regel"
     },
     "templates": {
-      "title": "Evenementsjablonen",
       "subtitle": "Beheer vooraf ingestelde sjablonen voor het snel aanmaken van evenementen",
       "create": "Nieuw sjabloon",
       "deleteConfirm": "Weet u zeker dat u dit sjabloon wilt verwijderen?",
@@ -1966,7 +1916,6 @@
       "errorGeneric": "Er is een fout opgetreden. Probeer het opnieuw."
     },
     "gdprTemplates": {
-      "title": "AVG-sjablonen",
       "subtitle": "Maak en beheer herbruikbare privacyverklaringen die over evenementen heen gedeeld worden. Een als standaard gemarkeerd sjabloon wordt vooraf geselecteerd op nieuwe evenementen.",
       "newTemplate": "Nieuw sjabloon",
       "emptyState": "Nog geen sjablonen aangemaakt. Maak het eerste om dezelfde privacytekst over meerdere evenementen te hergebruiken.",
@@ -1992,7 +1941,6 @@
       "deleteTitle": "Sjabloon verwijderen"
     },
     "emailTemplates": {
-      "title": "E-mailsjablonen",
       "subtitle": "Pas onderwerp, koppen en teksten van transactionele e-mails aan. Lege velden gebruiken de ingebouwde standaardteksten.",
       "overridden": "Aangepast",
       "usingDefault": "Standaard wordt gebruikt",
@@ -2031,7 +1979,6 @@
       }
     },
     "languages": {
-      "title": "Taalbeheer",
       "subtitle": "Configureer beschikbare talen en pas vertalingen aan",
       "defaultLocaleTitle": "Standaardtaal",
       "defaultLocaleDescription": "De standaardtaal wordt gebruikt als fallback wanneer een vertaling niet beschikbaar is en als hoofdtaal van de site.",
@@ -2057,7 +2004,6 @@
       "addOverride": "Toevoegen"
     },
     "infrastructure": {
-      "title": "Infrastructuur",
       "subtitle": "Status van componenten en omgevingsconfiguratie",
       "deploymentMode": "Implementatiemodus",
       "version": "Versie",
@@ -2120,7 +2066,6 @@
       }
     },
     "instantCalls": {
-      "title": "Snelgesprekken",
       "subtitle": "Lijst van directe videogesprekken",
       "total": "totaal",
       "noCalls": "Nog geen snelgesprekken uitgevoerd.",
@@ -2182,7 +2127,6 @@
       "deleteTitle": "Sessie verwijderen"
     },
     "monitoring": {
-      "title": "Monitoring",
       "subtitle": "Real-time infrastructure and performance monitoring dashboard",
       "loading": "Statistieken laden...",
       "prometheusUnavailable": "Prometheus is not configured. Set the PROMETHEUS_URL environment variable to enable advanced monitoring.",
@@ -2308,9 +2252,7 @@
       "registeredCount": "{count, plural, =0 {Geen aanmeldingen} one {1 aanmelding} other {# aanmeldingen}}"
     },
     "tags": {
-      "title": "Tagbeheer",
       "subtitle": "Tags maken, bewerken en verwijderen die worden gebruikt om openbare evenementen te classificeren en te filteren.",
-      "backToSettings": "Instellingen",
       "addTag": "Nieuwe tag",
       "editTag": "Tag bewerken",
       "columnColor": "Kleur",
@@ -2426,7 +2368,6 @@
       }
     },
     "rubrica": {
-      "title": "Adresboek",
       "subtitle": "Personen die toestemming hebben gegeven voor opname in het adresboek (art. 6.1.a AVG). Profielinformatie wordt automatisch bijgewerkt bij elke nieuwe aanmelding.",
       "searchLabel": "Zoeken op naam of organisatie",
       "orgTypeLabel": "Type organisatie",
@@ -2519,7 +2460,6 @@
       "privacyNote": "Statistieken per persoon zijn standaard gepseudonimiseerd. Anonieme geaggregeerde gegevens worden bewaard in de samenvatting van het evenement; de onbewerkte rijen worden verwijderd wanneer de bewaartermijn verstrijkt."
     },
     "postprod": {
-      "title": "AI-pijplijn voor postproductie",
       "subtitle": "Transcripties, samenvattingen en vertalingen geproduceerd door de AI-pijplijn in het cluster. Wijs de sprekers toe, start de jobs opnieuw of annuleer ze.",
       "filterStatus": "Status",
       "all": "Alle",
@@ -2603,7 +2543,6 @@
       "archiveGenerateOk": "Het genereren van het archief is gestart.",
       "archiveGenerateErr": "Genereren van het archief mislukt (HTTP {code}).",
       "archiveTrackFallback": "Deelnemer",
-      "manageBackToList": "Alle opnamen",
       "manageDuration": "Duur",
       "manageSource": "Brontaal",
       "manageOpenPublic": "Openbare pagina",
@@ -2768,11 +2707,9 @@
       "originalUncertainHint": "De bewaarde tekst kan al correcties bevatten die zijn gemaakt voordat deze functie bestond: niet aantoonbaar is dat het de tekst is die de automatische transcriptie heeft geproduceerd"
     },
     "questionnairesPage": {
-      "title": "Vragenlijsten",
       "subtitle": "Herbruikbare vraagsjablonen voor aanmeldings- en post-event vragenlijsten."
     },
     "questionnaireResponses": {
-      "title": "Antwoorden vragenlijsten",
       "subtitle": "Aggregaties per vraag, filterbaar op evenement, fase en datumbereik."
     },
     "eventQuestionnaires": {
@@ -2822,11 +2759,8 @@
       "downloadFailed": "Downloaden mislukt: probeer het opnieuw."
     },
     "glossary": {
-      "title": "Woordenlijst",
       "subtitle": "Afkortingen, namen en vaktermen voor de AI-nabewerking: hoe ze in transcripties worden geschreven, hoe ze worden vertaald en hoe ze in de nasynchronisatie worden uitgesproken. Ze gelden voor alle evenementen; elk evenement kan er eigen termen aan toevoegen.",
       "organizerNote": "U kunt termen voor alle evenementen toevoegen en de termen wijzigen die u zelf hebt toegevoegd; de overige beheert de beheerder.",
-      "backToSettings": "Terug naar instellingen",
-      "backToEvents": "Terug naar evenementen",
       "eventTitle": "Termen en afkortingen van het evenement",
       "eventIntro": "Ze komen bij de woordenlijst van de instantie voor de transcriptie, de vertalingen en de nasynchronisatie van dit evenement. Een term die al in de instantie staat, wordt door deze vervangen.",
       "openInstance": "Woordenlijst van de instantie aanvullen, geldig voor alle evenementen",
@@ -3761,7 +3695,6 @@
     "reactionSent": "Reactie verzonden!"
   },
   "calendar": {
-    "title": "Evenementenkalender",
     "subtitle": "Bekijk alle evenementen in de tijd",
     "publicTitle": "Evenementenkalender",
     "publicSubtitle": "Ontdek de geplande evenementen",
@@ -4240,7 +4173,6 @@
     "hintJoystick": "Versleep om te bewegen"
   },
   "feedbackAdmin": {
-    "title": "Feedbackresultaten",
     "totalVotes": "antwoorden",
     "noFeedback": "Geen feedback ontvangen",
     "comments": "Opmerkingen",

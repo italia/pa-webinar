@@ -248,7 +248,7 @@ Whether an event appears on public surfaces depends on its status, its type and,
 | `GET /api/events/{slug}/calendar.ics` | A calendar file for any event that is not a `DRAFT`, including `ARCHIVED` events, concluded events whose post-event page is off or expired, and instant calls ([known limitations](#known-limitations)). Times are UTC instants. The organizer's address is the platform's sender address (`SMTP_FROM`), never the moderator's personal email; its name is the moderator name, or the site name when none is set |
 | Event page | A schema.org `Event` block, with the expected participants as the attendee capacity |
 
-Tags are managed by administrators in **Tag management** (`/admin/settings/tags`, API `/api/admin/tags`) and attached in step 1 of the wizard.
+Tags are managed by administrators in **Settings → Tags** (`/admin/settings/tags`, API `/api/admin/tags`) and attached in step 1 of the wizard.
 
 ## Registration
 
@@ -378,7 +378,7 @@ Capacity is not enforced at any of these doors. `maxParticipants` sizes the brid
 
 ### The template library
 
-Reusable question sets (`QuestionTemplate`) are managed under **Questionnaires**, in the **Template library** (`/admin/questionnaires`). Each question has a multilingual prompt and one of five types: `SINGLE_CHOICE`, `MULTI_CHOICE`, `YES_NO`, `LIKERT` (1 to 5 by default, with optional labels at the ends) and `OPEN_TEXT`. System templates are seeded by migrations and cannot be deleted.
+Reusable question sets (`QuestionTemplate`) are managed under **Questionnaires → Questionnaire templates** (`/admin/questionnaires`). Each question has a multilingual prompt and one of five types: `SINGLE_CHOICE`, `MULTI_CHOICE`, `YES_NO`, `LIKERT` (1 to 5 by default, with optional labels at the ends) and `OPEN_TEXT`. System templates are seeded by migrations and cannot be deleted.
 
 ### Questionnaires on an event
 

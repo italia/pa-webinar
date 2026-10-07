@@ -123,12 +123,12 @@ The guard table and the request flow are in
 | See the recordings of their own events and run AI post-production on them, including naming transcript speaker labels | See sign-ups, questionnaire responses or feedback across all events, instance analytics or the GDPR log |
 | Read the shared tag and question libraries to compose their own events | Use the publications library, the orphaned recording files, the **Moderators** directory or staff accounts. They cannot rotate a moderator link, even for their own events |
 
-The organizer's menu shows **Events** (**Event list**, **New event**, **Instant calls**,
-**Calendar**) and **Video & sessions** (**Video recordings**, **Transcripts / AI**).
+The organizer's menu shows **Events** (**All events**, **New event**, **Instant calls**,
+**Event calendar**) and **Video** (**Recordings**, **AI post-production**, **Glossary**).
 
 ### Deactivation and deletion
 
-Administrators manage accounts on **Accounts** (`/admin/organizers`, page title **Staff accounts**).
+Administrators manage accounts under **Staff and access → Staff accounts** (`/admin/organizers`).
 
 **Deactivating** an account (`PATCH /api/admin/organizers/{id}` with `active: false`) sets `active`
 to false and, in the same transaction, deletes the account's unused sign-in links and **rotates the

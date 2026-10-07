@@ -101,23 +101,19 @@ describe('indirizzi scritti a mano', () => {
 });
 
 describe('briciole di pane', () => {
-  it('ogni pagina dell’amministrazione ha un’etichetta', async () => {
-    // Una pagina senza etichetta non compare nella catena: la breadcrumb
-    // indicherebbe come pagina corrente la sezione madre, e il pulsante
-    // «indietro» salterebbe un livello.
-    const { readFileSync, readdirSync } = await import('node:fs');
+  it('ogni pagina dell’amministrazione ha un nome nel menu', async () => {
+    // Una pagina che il menu non conosce non ha briciole ne' titolo: chi ci
+    // arriva non sa dove si trova.
+    const { readdirSync } = await import('node:fs');
     const path = await import('node:path');
-    const sorgente = readFileSync(
-      path.resolve(__dirname, '../../components/admin/admin-breadcrumb.tsx'),
-      'utf-8',
-    );
+    const { nomePagina } = await import('@/components/admin/admin-nav-model');
     const radice = path.resolve(__dirname, '../../app/[locale]/admin');
     const pagine = (readdirSync(radice, { recursive: true }) as string[])
       .map((f) => f.replace(/\\/g, '/'))
       .filter((f) => f === 'page.tsx' || f.endsWith('/page.tsx'))
       .map((f) => ('/admin/' + f.replace(/\/?page\.tsx$/, '')).replace(/\/$/, ''))
-      // Le porte d'ingresso non hanno briciole: non si sta dentro l'area.
-      .filter((p) => p !== '/admin/login' && p !== '/admin/access');
-    expect(pagine.filter((p) => !sorgente.includes(`'${p}':`))).toEqual([]);
+      // Le porte d'ingresso e il rinvio all'elenco non stanno dentro l'area.
+      .filter((p) => p !== '/admin/login' && p !== '/admin/access' && p !== '/admin');
+    expect(pagine.filter((p) => !nomePagina(p))).toEqual([]);
   });
 });

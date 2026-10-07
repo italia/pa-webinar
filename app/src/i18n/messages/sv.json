@@ -615,7 +615,6 @@
       "newLink": "Begär en ny länk"
     },
     "organizers": {
-      "title": "Personalkonton",
       "intro": "Personer som arbetar i administrationen under eget namn. Arrangörer skapar och hanterar sina egna evenemang; administratörer hanterar hela instansen. De loggar in med en länk som skickas till deras e-post, utan lösenord. Instansnyckeln finns kvar för nödfall och automatisering.",
       "newTitle": "Lägg till ett konto",
       "name": "För- och efternamn",
@@ -929,82 +928,51 @@
       "toFixField": "Fält {n}"
     },
     "nav": {
-      "events": "Evenemangshantering",
-      "registrations": "Anmälningar",
-      "recordings": "Video och sessioner",
-      "settings": "Systeminställningar",
-      "eventsList": "Evenemangslista",
+      "events": "Evenemang",
+      "settings": "Inställningar",
+      "eventsList": "Alla evenemang",
       "newEvent": "Nytt evenemang",
-      "calendar": "Kalender",
-      "templates": "Mallar",
+      "calendar": "Evenemangskalender",
+      "templates": "Evenemangsmallar",
       "analytics": "Statistik",
       "instantCalls": "Snabbsamtal",
       "infrastructure": "Infrastruktur",
       "monitoring": "Övervakning",
-      "monitoringDashboard": "Dashboard",
+      "monitoringDashboard": "Tjänstens status",
       "registrationsList": "Anmälningar",
-      "moderators": "Moderatorer",
       "moderatorLinks": "Moderatorlänkar",
-      "gdprAudit": "GDPR-revision",
-      "recordingsList": "Videoinspelningar",
-      "settingsGeneral": "Allmänt",
+      "gdprAudit": "GDPR-logg",
+      "recordingsList": "Inspelningar",
+      "settingsGeneral": "Allmänna inställningar",
       "settingsLanguages": "Språk",
-      "settingsGdprTemplates": "GDPR-mallar",
-      "admin": "Administration",
-      "eventDetail": "Evenemangsdetaljer",
-      "eventEdit": "Redigera evenemang",
-      "publications": "Publikationer",
-      "publicationsList": "Alla publikationer",
-      "publicationsNew": "Ny publikation",
+      "settingsGdprTemplates": "Integritetsmeddelanden",
+      "eventDetail": "Evenemang",
+      "eventEdit": "Redigera",
+      "publicationsList": "Publiceringar",
+      "publicationsNew": "Ny publicering",
       "ariaLabel": "Administrationsnavigering",
       "subNavAriaLabel": "Sektionsnavigering",
       "questionnaires": "Enkäter",
-      "questionnairesLibrary": "Mallbibliotek",
-      "questionnairesResponses": "Svar och statistik",
+      "questionnairesLibrary": "Enkätmallar",
+      "questionnairesResponses": "Svar",
       "rubrica": "Adressbok",
       "settingsEmailTemplates": "E-postmallar",
-      "settingsTags": "Tagghantering",
-      "settingsGlossary": "Ordlista",
+      "settingsTags": "Taggar",
       "eventMaterials": "Material",
       "eventQuestionnaires": "Enkäter",
-      "rubricaList": "Lista",
-      "rubricaDetail": "Post",
-      "organizers": "Konton",
+      "rubricaDetail": "Person",
       "staffAccess": "Personal och åtkomst",
       "staffAccounts": "Personalkonton",
       "people": "Personer",
       "postprodDetail": "Inspelning",
-      "recordingsPostprod": "Transkriptioner / AI",
-      "feedbackDashboard": "Feedback"
-    },
-    "landing": {
-      "title": "Administrationspanel",
-      "subtitle": "Hantera evenemang och konfigurera plattformen",
-      "eventsTitle": "Evenemangshantering",
-      "eventsDescription": "Skapa, redigera och hantera evenemang, mallar och statistik.",
-      "instantCallsTitle": "Snabbsamtal",
-      "instantCallsDescription": "Skapa ett publikt videosamtal i stunden utan planering: länken kan delas omedelbart.",
-      "instantCallsStat": "{count, plural, =0 {inga snabbsamtal de senaste 30 dagarna} one {1 snabbsamtal de senaste 30 dagarna} other {# snabbsamtal de senaste 30 dagarna}}",
-      "registrationsTitle": "Anmälningar",
-      "registrationsDescription": "Adressbok över deltagare anmälda till evenemang: sökning, filter, export, moderatorer och GDPR-revision.",
-      "registrationsTotal": "{count, plural, =0 {inga personer anmälda} one {1 person anmäld} other {# personer anmälda}}",
-      "today": "i dag",
-      "recordingsTitle": "Video och sessioner",
-      "recordingsDescription": "Videoinspelningar av samtal, avslutade livesessioner och arkiverade snabbsamtal. Nedladdning och hantering.",
-      "recordingsStat": "{count, plural, =0 {inga videoinspelningar} one {1 videoinspelning tillgänglig} other {# videoinspelningar tillgängliga}}",
-      "analyticsTitle": "Statistik",
-      "analyticsDescription": "Översikt över användningsmått: skapade evenemang, deltagare, konverteringsgrad, topp-evenemang.",
-      "monitoringTitle": "Övervakning",
-      "monitoringDescription": "Teknisk dashboard med infrastrukturmått, prestanda, tillgänglighet och tjänstekvalitet.",
-      "templatesTitle": "Evenemangsmallar",
-      "templatesDescription": "Återanvändbara mallar för att snabbt skapa evenemang med fördefinierade konfigurationer.",
-      "settingsTitle": "Systeminställningar",
-      "settingsDescription": "Konfigurera varumärkesprofil, innehåll, språk, funktioner och infrastruktur.",
-      "liveNow": "{count, plural, one {# evenemang pågår} other {# evenemang pågår}}",
-      "upcomingEvents": "{count, plural, one {# kommande evenemang} other {# kommande evenemang}}"
+      "recordingsPostprod": "AI-efterbearbetning",
+      "feedbackDashboard": "Återkoppling",
+      "video": "Video",
+      "glossary": "Ordlista",
+      "breadcrumbAriaLabel": "Brödsmulor",
+      "skipToPage": "Gå till sidans innehåll"
     },
     "publications": {
-      "title": "Publikationer",
       "subtitle": "Enhetlig redaktionell hubb för alla publicerade videor: schemalagda evenemang, snabbsamtal, uppladdade arkiv och sessioner som väntar på att marknadsföras.",
       "newPublication": "Ny publikation",
       "searchPlaceholder": "Sök efter titel eller beskrivning…",
@@ -1040,7 +1008,6 @@
         "unlist": "Ta bort från biblioteket"
       },
       "uploadPage": {
-        "title": "Ny publikation",
         "subtitle": "Ladda upp en befintlig video (MP4, WebM eller MOV) till plattformens lagring och berika den med redaktionell metadata.",
         "step1Title": "1. Ladda upp videofilen",
         "startUpload": "Ladda upp",
@@ -1077,7 +1044,6 @@
       "updateFailed": "Uppdateringen misslyckades."
     },
     "recordingsLibrary": {
-      "title": "Videoinspelningar",
       "subtitle": "Centralt bibliotek för videoinspelningar av samtal: filtrera, ladda ned, exportera",
       "loading": "Laddar...",
       "range": "Period",
@@ -1149,7 +1115,6 @@
       "transcriptProcessing": "Bearbetas"
     },
     "gdprAudit": {
-      "title": "GDPR-revision",
       "subtitle": "Logg över integritetsåtgärder på personuppgifter: raderingar, samtycken, exporter",
       "loading": "Laddar...",
       "range": "Period",
@@ -1172,7 +1137,6 @@
       "noResults": "Inga revisionsposter under den valda perioden."
     },
     "moderators": {
-      "title": "Moderatorer",
       "subtitle": "Hämta, kopiera och regenerera moderatorernas magic-länkar",
       "searchPlaceholder": "Sök efter slug, moderatorsnamn eller e-post…",
       "searchHelp": "Magic-länken innehåller en unik token: dela den endast med den utsedda moderatorn.",
@@ -1191,7 +1155,6 @@
       "noResults": "Inga evenemang funna."
     },
     "registrations": {
-      "title": "Anmälningar",
       "subtitle": "Alla personer anmälda till evenemang — sök, filtrera och exportera",
       "loading": "Laddar...",
       "range": "Period",
@@ -1525,18 +1488,6 @@
       "title": "Webbplatsinställningar",
       "subtitle": "Konfigurera plattformens utseende och beteende för återanvändning inom offentlig förvaltning",
       "saving": "Sparar...",
-      "sections": {
-        "languagesTitle": "Språkhantering",
-        "languagesDescription": "Aktivera eller inaktivera EU-språken som visas i gränssnittet, välj standardspråk och anpassa översättningar.",
-        "gdprTemplatesTitle": "GDPR-mallar",
-        "gdprTemplatesDescription": "Skapa återanvändbara integritetsmeddelanden som kan kopplas till evenemang och välj standardmallen för nya evenemang.",
-        "emailTemplatesTitle": "E-postmallar",
-        "emailTemplatesDescription": "Anpassa ämne, rubriker och text för bekräftelse- och påminnelsemeddelanden. Lämnas fälten tomma används de inbyggda standardtexterna.",
-        "tagsTitle": "Tagghantering",
-        "tagsDescription": "Skapa och redigera taggarna som används för att filtrera evenemang",
-        "glossaryTitle": "Ordlista",
-        "glossaryDescription": "Förkortningar och facktermer för transkriberingar, översättningar och dubbning"
-      },
       "saved": "Inställningar sparade",
       "tabs": {
         "branding": "Varumärkesprofil",
@@ -1869,7 +1820,6 @@
       "invalidRRule": "Ogiltig regel"
     },
     "templates": {
-      "title": "Evenemangsmallar",
       "subtitle": "Hantera förinställda mallar för snabbt skapande av evenemang",
       "create": "Ny mall",
       "deleteConfirm": "Är du säker på att du vill radera denna mall?",
@@ -1966,7 +1916,6 @@
       "errorGeneric": "Ett fel uppstod. Försök igen."
     },
     "gdprTemplates": {
-      "title": "GDPR-mallar",
       "subtitle": "Skapa och hantera återanvändbara integritetspolicyer som delas mellan evenemang. En mall märkt som standard är förvald på nya evenemang.",
       "newTemplate": "Ny mall",
       "emptyState": "Inga mallar skapade ännu. Skapa den första för att återanvända samma integritetstext på flera evenemang.",
@@ -1992,7 +1941,6 @@
       "deleteTitle": "Ta bort mall"
     },
     "emailTemplates": {
-      "title": "E-postmallar",
       "subtitle": "Anpassa ämne, rubriker och text för transaktionsmeddelanden. Fält som lämnas tomma använder de inbyggda standardtexterna.",
       "overridden": "Anpassad",
       "usingDefault": "Standard",
@@ -2031,7 +1979,6 @@
       }
     },
     "languages": {
-      "title": "Språkhantering",
       "subtitle": "Konfigurera tillgängliga språk och anpassa översättningar",
       "defaultLocaleTitle": "Standardspråk",
       "defaultLocaleDescription": "Standardspråket används som reserv när en översättning inte är tillgänglig och som webbplatsens primära språk.",
@@ -2057,7 +2004,6 @@
       "addOverride": "Lägg till"
     },
     "infrastructure": {
-      "title": "Infrastruktur",
       "subtitle": "Komponentstatus och miljökonfiguration",
       "deploymentMode": "Driftläge",
       "version": "Version",
@@ -2120,7 +2066,6 @@
       }
     },
     "instantCalls": {
-      "title": "Snabbsamtal",
       "subtitle": "Lista över snabba videosamtal",
       "total": "totalt",
       "noCalls": "Inga snabbsamtal genomförda.",
@@ -2182,7 +2127,6 @@
       "deleteTitle": "Ta bort session"
     },
     "monitoring": {
-      "title": "Övervakning",
       "subtitle": "Real-time infrastructure and performance monitoring dashboard",
       "loading": "Laddar mätvärden...",
       "prometheusUnavailable": "Prometheus is not configured. Set the PROMETHEUS_URL environment variable to enable advanced monitoring.",
@@ -2308,9 +2252,7 @@
       "registeredCount": "{count, plural, =0 {Inga anmälningar} one {1 anmälan} other {# anmälningar}}"
     },
     "tags": {
-      "title": "Tagghantering",
       "subtitle": "Skapa, redigera och radera taggar som används för att klassificera och filtrera publika evenemang.",
-      "backToSettings": "Inställningar",
       "addTag": "Ny tagg",
       "editTag": "Redigera tagg",
       "columnColor": "Färg",
@@ -2426,7 +2368,6 @@
       }
     },
     "rubrica": {
-      "title": "Adressbok",
       "subtitle": "Personer som har samtyckt till att läggas till i adressboken (GDPR art. 6.1.a). Profilinformation uppdateras automatiskt vid varje ny anmälan.",
       "searchLabel": "Sök på namn eller organisation",
       "orgTypeLabel": "Typ av organisation",
@@ -2519,7 +2460,6 @@
       "privacyNote": "Statistik per person är pseudonymiserad som standard. Anonyma aggregat sparas i evenemangets sammanfattning; rådata raderas när lagringstiden går ut."
     },
     "postprod": {
-      "title": "AI-pipeline för efterproduktion",
       "subtitle": "Transkriptioner, sammanfattningar och översättningar framtagna av AI-pipelinen i klustret. Mappa talare, kör om eller avbryt jobb.",
       "filterStatus": "Status",
       "all": "Alla",
@@ -2603,7 +2543,6 @@
       "archiveGenerateOk": "Skapandet av arkivet har startat.",
       "archiveGenerateErr": "Skapandet av arkivet misslyckades (HTTP {code}).",
       "archiveTrackFallback": "Deltagare",
-      "manageBackToList": "Alla inspelningar",
       "manageDuration": "Längd",
       "manageSource": "Källspråk",
       "manageOpenPublic": "Publik sida",
@@ -2768,11 +2707,9 @@
       "originalUncertainHint": "Den bevarade texten kan redan innehålla korrigeringar gjorda innan den här funktionen fanns: det går inte att visa att det är den text som den automatiska transkriberingen tog fram"
     },
     "questionnairesPage": {
-      "title": "Enkäter",
       "subtitle": "Återanvändbara frågemallar för förregistrerings- och eftermöteenkäter."
     },
     "questionnaireResponses": {
-      "title": "Enkätsvar",
       "subtitle": "Aggregeringar per fråga, filtrerbara efter evenemang, fas och datumintervall."
     },
     "eventQuestionnaires": {
@@ -2822,11 +2759,8 @@
       "downloadFailed": "Nedladdningen misslyckades: försök igen."
     },
     "glossary": {
-      "title": "Ordlista",
       "subtitle": "Förkortningar, namn och facktermer för AI-efterbearbetningen: hur de skrivs i transkriberingar, hur de översätts och hur de uttalas i dubbningen. De gäller för alla evenemang; varje evenemang kan lägga till egna.",
       "organizerNote": "Du kan lägga till termer för alla evenemang och redigera dem du själv har lagt till; de övriga hanteras av administratörerna.",
-      "backToSettings": "Tillbaka till inställningar",
-      "backToEvents": "Tillbaka till evenemangen",
       "eventTitle": "Evenemangets termer och förkortningar",
       "eventIntro": "De läggs till instansens ordlista för transkribering, översättningar och dubbning av det här evenemanget. En term som redan finns i instansen ersätts av den här.",
       "openInstance": "Utöka instansens ordlista, som gäller för alla evenemang",
@@ -3761,7 +3695,6 @@
     "reactionSent": "Reaktion skickad!"
   },
   "calendar": {
-    "title": "Evenemangskalender",
     "subtitle": "Visa alla evenemang över tid",
     "publicTitle": "Evenemangskalender",
     "publicSubtitle": "Upptäck kommande evenemang",
@@ -4240,7 +4173,6 @@
     "hintJoystick": "Dra för att röra dig"
   },
   "feedbackAdmin": {
-    "title": "Återkopplingsresultat",
     "totalVotes": "svar",
     "noFeedback": "Ingen återkoppling mottagen",
     "comments": "Kommentarer",

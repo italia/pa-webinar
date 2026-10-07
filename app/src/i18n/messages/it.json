@@ -739,7 +739,6 @@
       "newLink": "Chiedi un nuovo link"
     },
     "organizers": {
-      "title": "Utenze dello staff",
       "intro": "Chi lavora nell'area di amministrazione con un nome proprio. Gli organizzatori creano e gestiscono i propri eventi; gli amministratori gestiscono tutta l'istanza. Si entra con un link mandato alla propria email, senza password. La chiave dell'istanza resta per l'emergenza e l'automazione.",
       "newTitle": "Aggiungi un'utenza",
       "name": "Nome e cognome",
@@ -1054,81 +1053,50 @@
     },
     "nav": {
       "events": "Eventi",
-      "registrations": "Iscrizioni",
-      "recordings": "Video & sessioni",
       "settings": "Impostazioni",
-      "eventsList": "Lista eventi",
+      "eventsList": "Tutti gli eventi",
       "newEvent": "Nuovo evento",
-      "calendar": "Calendario",
-      "templates": "Template",
+      "calendar": "Calendario eventi",
+      "templates": "Template di evento",
       "analytics": "Statistiche",
       "instantCalls": "Chiamate rapide",
       "infrastructure": "Infrastruttura",
       "monitoring": "Monitoraggio",
-      "monitoringDashboard": "Dashboard",
+      "monitoringDashboard": "Stato del servizio",
       "registrationsList": "Iscrizioni",
-      "moderators": "Moderatori",
       "moderatorLinks": "Link dei moderatori",
-      "gdprAudit": "Audit GDPR",
-      "recordingsList": "Registrazioni video",
-      "settingsGeneral": "Generali",
+      "gdprAudit": "Registro GDPR",
+      "recordingsList": "Registrazioni",
+      "settingsGeneral": "Impostazioni generali",
       "settingsLanguages": "Lingue",
-      "settingsGdprTemplates": "Template GDPR",
-      "admin": "Amministrazione",
-      "eventDetail": "Dettaglio evento",
-      "eventEdit": "Modifica evento",
-      "publications": "Pubblicazioni",
-      "publicationsList": "Tutte le pubblicazioni",
+      "settingsGdprTemplates": "Informative privacy",
+      "eventDetail": "Evento",
+      "eventEdit": "Modifica",
+      "publicationsList": "Pubblicazioni",
       "publicationsNew": "Nuova pubblicazione",
       "questionnaires": "Questionari",
-      "questionnairesLibrary": "Libreria template",
-      "questionnairesResponses": "Risposte e statistiche",
+      "questionnairesLibrary": "Modelli di questionario",
+      "questionnairesResponses": "Risposte",
       "ariaLabel": "Navigazione amministrazione",
       "subNavAriaLabel": "Navigazione sezione",
       "rubrica": "Rubrica",
       "settingsEmailTemplates": "Template email",
-      "settingsTags": "Gestione tag",
-      "settingsGlossary": "Glossario",
+      "settingsTags": "Tag",
       "eventMaterials": "Materiali",
       "eventQuestionnaires": "Questionari",
-      "rubricaList": "Elenco",
-      "rubricaDetail": "Dettaglio",
-      "organizers": "Utenze",
+      "rubricaDetail": "Persona",
       "staffAccess": "Staff e accessi",
       "staffAccounts": "Utenze dello staff",
       "people": "Persone",
       "postprodDetail": "Registrazione",
-      "recordingsPostprod": "Trascrizioni / AI",
-      "feedbackDashboard": "Feedback"
-    },
-    "landing": {
-      "title": "Pannello di amministrazione",
-      "subtitle": "Gestisci eventi, iscrizioni, registrazioni video, monitoraggio e configurazione",
-      "eventsTitle": "Eventi",
-      "eventsDescription": "Crea, modifica e gestisci gli eventi programmati e le chiamate rapide. Include template e calendario.",
-      "instantCallsTitle": "Chiamate rapide",
-      "instantCallsDescription": "Crea al volo una videocall pubblica senza pianificazione: link condivisibile immediatamente.",
-      "instantCallsStat": "{count, plural, =0 {nessuna call rapida negli ultimi 30 giorni} one {1 call rapida negli ultimi 30 giorni} other {# call rapide negli ultimi 30 giorni}}",
-      "registrationsTitle": "Iscrizioni",
-      "registrationsDescription": "Rubrica dei partecipanti iscritti agli eventi: ricerca, filtri, export, moderatori e audit GDPR.",
-      "registrationsTotal": "{count, plural, =0 {nessuna persona iscritta} one {1 persona iscritta} other {# persone iscritte}}",
-      "today": "oggi",
-      "recordingsTitle": "Video & sessioni",
-      "recordingsDescription": "Videoregistrazioni delle call, sessioni live concluse e chiamate rapide archiviate. Download e gestione.",
-      "recordingsStat": "{count, plural, =0 {nessuna registrazione video} one {1 registrazione video disponibile} other {# registrazioni video disponibili}}",
-      "analyticsTitle": "Statistiche",
-      "analyticsDescription": "Panoramica delle metriche di utilizzo: eventi creati, partecipanti, tasso di conversione, top eventi.",
-      "monitoringTitle": "Monitoraggio",
-      "monitoringDescription": "Dashboard tecnica con metriche infrastruttura, prestazioni, disponibilità e qualità del servizio.",
-      "templatesTitle": "Template eventi",
-      "templatesDescription": "Modelli riutilizzabili per creare rapidamente eventi con configurazioni predefinite.",
-      "settingsTitle": "Impostazioni di sistema",
-      "settingsDescription": "Configura branding, contenuti, lingue, privacy e comportamento della piattaforma.",
-      "liveNow": "{count, plural, one {# evento live} other {# eventi live}}",
-      "upcomingEvents": "{count, plural, one {# evento in programma} other {# eventi in programma}}"
+      "recordingsPostprod": "Post-produzione AI",
+      "feedbackDashboard": "Feedback",
+      "video": "Video",
+      "glossary": "Glossario",
+      "breadcrumbAriaLabel": "Percorso",
+      "skipToPage": "Vai al contenuto della pagina"
     },
     "publications": {
-      "title": "Pubblicazioni",
       "subtitle": "Hub editoriale unico per tutti i video pubblicati: eventi schedulati, call istantanee, archivi storici caricati e sessioni in attesa di promozione.",
       "newPublication": "Nuova pubblicazione",
       "searchPlaceholder": "Cerca per titolo o descrizione…",
@@ -1164,7 +1132,6 @@
         "unlist": "Rimuovi dalla libreria"
       },
       "uploadPage": {
-        "title": "Nuova pubblicazione",
         "subtitle": "Carica un video esistente (MP4, WebM o MOV) nello storage della piattaforma e arricchiscilo con i metadati editoriali.",
         "step1Title": "1. Carica il file video",
         "startUpload": "Carica",
@@ -1201,7 +1168,6 @@
       "updateFailed": "Aggiornamento non riuscito."
     },
     "recordingsLibrary": {
-      "title": "Registrazioni video",
       "subtitle": "Libreria centralizzata delle videoregistrazioni delle call: filtra, scarica, esporta",
       "loading": "Caricamento...",
       "range": "Periodo",
@@ -1273,7 +1239,6 @@
       "transcriptProcessing": "In elab."
     },
     "gdprAudit": {
-      "title": "Audit GDPR",
       "subtitle": "Registro delle azioni di privacy su dati personali: cancellazioni, consensi, export",
       "loading": "Caricamento...",
       "range": "Periodo",
@@ -1296,7 +1261,6 @@
       "noResults": "Nessun evento di audit nel periodo selezionato."
     },
     "moderators": {
-      "title": "Moderatori",
       "subtitle": "Recupera, copia e rigenera i link magici dei moderatori",
       "searchPlaceholder": "Cerca per slug, nome o email moderatore…",
       "searchHelp": "Il link magico contiene un token univoco: condividilo solo con il moderatore designato.",
@@ -1315,7 +1279,6 @@
       "noResults": "Nessun evento trovato."
     },
     "registrations": {
-      "title": "Iscrizioni",
       "subtitle": "Tutte le persone iscritte agli eventi — ricerca, filtra ed esporta",
       "loading": "Caricamento...",
       "range": "Periodo",
@@ -1650,18 +1613,6 @@
       "subtitle": "Configura l'aspetto e il comportamento della piattaforma per il riuso PA",
       "saving": "Salvataggio...",
       "saved": "Impostazioni salvate con successo",
-      "sections": {
-        "languagesTitle": "Gestione lingue",
-        "languagesDescription": "Attiva/disattiva le lingue dell'UE esposte nell'interfaccia, scegli la lingua predefinita e personalizza le traduzioni.",
-        "gdprTemplatesTitle": "Template GDPR",
-        "gdprTemplatesDescription": "Crea informative privacy riutilizzabili tra eventi e scegli quella predefinita per i nuovi eventi.",
-        "emailTemplatesTitle": "Template email",
-        "emailTemplatesDescription": "Personalizza oggetto, titoli e testi delle email di conferma e promemoria. Se lasciati vuoti si usano i testi predefiniti.",
-        "tagsTitle": "Gestione tag",
-        "tagsDescription": "Crea e modifica i tag usati per filtrare gli eventi",
-        "glossaryTitle": "Glossario",
-        "glossaryDescription": "Sigle e termini tecnici per trascrizioni, traduzioni e doppiaggio"
-      },
       "tabs": {
         "branding": "Branding",
         "header": "Header",
@@ -1993,7 +1944,6 @@
       "invalidRRule": "Regola non valida"
     },
     "templates": {
-      "title": "Template eventi",
       "subtitle": "Gestisci i template predefiniti per la creazione rapida di eventi",
       "create": "Nuovo template",
       "deleteConfirm": "Sei sicuro di voler eliminare questo template?",
@@ -2090,7 +2040,6 @@
       "errorGeneric": "Si è verificato un errore. Riprova."
     },
     "gdprTemplates": {
-      "title": "Template GDPR",
       "subtitle": "Crea e gestisci informative privacy riutilizzabili tra eventi. Un template marcato come predefinito è pre-selezionato sui nuovi eventi.",
       "newTemplate": "Nuovo template",
       "emptyState": "Nessun template ancora creato. Crea il primo per riutilizzare lo stesso testo privacy su più eventi.",
@@ -2116,7 +2065,6 @@
       "deleteTitle": "Elimina template"
     },
     "emailTemplates": {
-      "title": "Template email",
       "subtitle": "Personalizza oggetto, titoli e testi delle email transazionali. Campi lasciati vuoti usano i testi predefiniti integrati.",
       "overridden": "Personalizzato",
       "usingDefault": "Predefinito",
@@ -2155,7 +2103,6 @@
       }
     },
     "languages": {
-      "title": "Gestione lingue",
       "subtitle": "Configura le lingue disponibili e personalizza le traduzioni",
       "defaultLocaleTitle": "Lingua predefinita",
       "defaultLocaleDescription": "La lingua predefinita è usata come fallback quando una traduzione non è disponibile e come lingua principale del sito.",
@@ -2181,7 +2128,6 @@
       "addOverride": "Aggiungi"
     },
     "infrastructure": {
-      "title": "Infrastruttura",
       "subtitle": "Stato dei componenti e della configurazione dell'ambiente",
       "deploymentMode": "Modalità deploy",
       "version": "Versione",
@@ -2244,7 +2190,6 @@
       }
     },
     "instantCalls": {
-      "title": "Chiamate rapide",
       "subtitle": "Elenco delle videochiamate istantanee",
       "total": "totali",
       "noCalls": "Nessuna chiamata rapida effettuata.",
@@ -2306,7 +2251,6 @@
       "deleteTitle": "Elimina sessione"
     },
     "monitoring": {
-      "title": "Monitoraggio",
       "subtitle": "Dashboard tecnica con metriche infrastruttura, prestazioni, disponibilità e analytics delle call",
       "loading": "Caricamento metriche...",
       "prometheusUnavailable": "Prometheus non è configurato. Imposta la variabile PROMETHEUS_URL per abilitare il monitoraggio avanzato. I dati da DB sono comunque mostrati.",
@@ -2432,9 +2376,7 @@
       "registeredCount": "{count, plural, =0 {Nessun iscritto} one {1 iscritto} other {# iscritti}}"
     },
     "tags": {
-      "title": "Gestione tag",
       "subtitle": "Crea, modifica ed elimina i tag usati per classificare e filtrare gli eventi pubblici.",
-      "backToSettings": "Impostazioni",
       "addTag": "Nuovo tag",
       "editTag": "Modifica tag",
       "columnColor": "Colore",
@@ -2550,7 +2492,6 @@
       }
     },
     "rubrica": {
-      "title": "Rubrica",
       "subtitle": "Persone che hanno dato consenso all'inserimento in rubrica (art. 6.1.a GDPR). Le informazioni di profilo vengono aggiornate automaticamente ad ogni re-iscrizione.",
       "searchLabel": "Cerca per nome o ente",
       "orgTypeLabel": "Tipo di ente",
@@ -2643,7 +2584,6 @@
       "privacyNote": "Statistiche per-persona pseudonime per impostazione predefinita. Aggregati anonimi conservati nel recap dell'evento; le righe grezze vengono cancellate alla scadenza della retention."
     },
     "postprod": {
-      "title": "Pipeline AI post-produzione",
       "subtitle": "Trascrizioni, sintesi e traduzioni generate dalla pipeline AI in cluster. Mappa gli speaker, rilancia o annulla i job.",
       "filterStatus": "Stato",
       "all": "Tutti",
@@ -2727,7 +2667,6 @@
       "archiveGenerateOk": "Generazione archivio avviata.",
       "archiveGenerateErr": "Generazione archivio fallita (HTTP {code}).",
       "archiveTrackFallback": "Partecipante",
-      "manageBackToList": "Tutte le registrazioni",
       "manageDuration": "Durata",
       "manageSource": "Lingua sorgente",
       "manageOpenPublic": "Pagina pubblica",
@@ -2892,11 +2831,9 @@
       "originalUncertainHint": "Il testo conservato potrebbe già includere correzioni fatte prima che questa funzione esistesse: non è dimostrabile che sia quello prodotto dalla trascrizione automatica"
     },
     "questionnairesPage": {
-      "title": "Questionari",
       "subtitle": "Template riutilizzabili di domande per i questionari di pre-registrazione e post-evento."
     },
     "questionnaireResponses": {
-      "title": "Risposte questionari",
       "subtitle": "Aggregazioni per domanda, filtrabili per evento, fase e intervallo di date."
     },
     "eventQuestionnaires": {
@@ -2946,11 +2883,8 @@
       "downloadFailed": "Download non riuscito: riprova."
     },
     "glossary": {
-      "title": "Glossario",
       "subtitle": "Sigle, nomi e termini tecnici per la post-produzione AI: come si scrivono nelle trascrizioni, come si traducono e come si pronunciano nel doppiaggio. Valgono per tutti gli eventi; ogni evento può aggiungere i propri.",
       "organizerNote": "Puoi aggiungere termini validi per tutti gli eventi e modificare quelli che hai aggiunto tu; gli altri li gestisce l'amministrazione.",
-      "backToSettings": "Torna alle impostazioni",
-      "backToEvents": "Torna agli eventi",
       "eventTitle": "Termini e sigle dell'evento",
       "eventIntro": "Si aggiungono al glossario dell'istanza per la trascrizione, le traduzioni e il doppiaggio di questo evento. Un termine già presente nell'istanza qui prende il suo posto.",
       "openInstance": "Arricchisci il glossario dell'istanza, valido per tutti gli eventi",
@@ -3761,7 +3695,6 @@
     "reactionSent": "Reazione inviata!"
   },
   "calendar": {
-    "title": "Calendario eventi",
     "subtitle": "Visualizza tutti gli eventi nel tempo",
     "publicTitle": "Calendario eventi",
     "publicSubtitle": "Scopri gli eventi in programma",
@@ -4240,7 +4173,6 @@
     "close": "Chiudi"
   },
   "feedbackAdmin": {
-    "title": "Risultati feedback",
     "totalVotes": "risposte",
     "noFeedback": "Nessun feedback ricevuto",
     "comments": "Commenti",

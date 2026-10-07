@@ -615,7 +615,6 @@
       "newLink": "Pyydä uusi linkki"
     },
     "organizers": {
-      "title": "Henkilöstön tilit",
       "intro": "Henkilöt, jotka työskentelevät ylläpidossa omalla nimellään. Järjestäjät luovat ja hallinnoivat omia tapahtumiaan; ylläpitäjät hallinnoivat koko instanssia. He kirjautuvat sähköpostiin lähetetyllä linkillä ilman salasanaa. Instanssin avain säilyy hätätilanteita ja automaatiota varten.",
       "newTitle": "Lisää tili",
       "name": "Etu- ja sukunimi",
@@ -929,82 +928,51 @@
       "toFixField": "Kenttä {n}"
     },
     "nav": {
-      "events": "Tapahtumien hallinta",
-      "registrations": "Ilmoittautumiset",
-      "recordings": "Videot ja istunnot",
-      "settings": "Järjestelmäasetukset",
-      "eventsList": "Tapahtumalista",
+      "events": "Tapahtumat",
+      "settings": "Asetukset",
+      "eventsList": "Kaikki tapahtumat",
       "newEvent": "Uusi tapahtuma",
-      "calendar": "Kalenteri",
-      "templates": "Mallit",
+      "calendar": "Tapahtumakalenteri",
+      "templates": "Tapahtumamallit",
       "analytics": "Tilastot",
       "instantCalls": "Pikapuhelut",
       "infrastructure": "Infrastruktuuri",
       "monitoring": "Valvonta",
-      "monitoringDashboard": "Hallintapaneeli",
+      "monitoringDashboard": "Palvelun tila",
       "registrationsList": "Ilmoittautumiset",
-      "moderators": "Moderaattorit",
-      "moderatorLinks": "Moderaattorilinkit",
-      "gdprAudit": "GDPR-auditointi",
-      "recordingsList": "Videotallenteet",
-      "settingsGeneral": "Yleiset",
+      "moderatorLinks": "Moderaattorien linkit",
+      "gdprAudit": "GDPR-loki",
+      "recordingsList": "Tallenteet",
+      "settingsGeneral": "Yleiset asetukset",
       "settingsLanguages": "Kielet",
-      "settingsGdprTemplates": "GDPR-mallit",
-      "admin": "Hallinta",
-      "eventDetail": "Tapahtuman tiedot",
-      "eventEdit": "Muokkaa tapahtumaa",
-      "publications": "Julkaisut",
-      "publicationsList": "Kaikki julkaisut",
+      "settingsGdprTemplates": "Tietosuojaselosteet",
+      "eventDetail": "Tapahtuma",
+      "eventEdit": "Muokkaa",
+      "publicationsList": "Julkaisut",
       "publicationsNew": "Uusi julkaisu",
       "ariaLabel": "Hallinnan navigointi",
       "subNavAriaLabel": "Osion navigointi",
       "questionnaires": "Kyselyt",
-      "questionnairesLibrary": "Mallikirjasto",
-      "questionnairesResponses": "Vastaukset ja tilastot",
+      "questionnairesLibrary": "Kyselymallit",
+      "questionnairesResponses": "Vastaukset",
       "rubrica": "Osoitekirja",
       "settingsEmailTemplates": "Sähköpostimallit",
-      "settingsTags": "Tagien hallinta",
-      "settingsGlossary": "Sanasto",
+      "settingsTags": "Tunnisteet",
       "eventMaterials": "Materiaalit",
       "eventQuestionnaires": "Kyselyt",
-      "rubricaList": "Luettelo",
-      "rubricaDetail": "Tiedot",
-      "organizers": "Tilit",
-      "staffAccess": "Henkilöstö ja käyttöoikeudet",
-      "staffAccounts": "Henkilöstön tilit",
+      "rubricaDetail": "Henkilö",
+      "staffAccess": "Henkilökunta ja pääsy",
+      "staffAccounts": "Henkilökunnan tilit",
       "people": "Henkilöt",
       "postprodDetail": "Tallenne",
-      "recordingsPostprod": "Litteroinnit / tekoäly",
-      "feedbackDashboard": "Feedback"
-    },
-    "landing": {
-      "title": "Hallintapaneeli",
-      "subtitle": "Hallitse tapahtumia ja määritä alustan asetukset",
-      "eventsTitle": "Tapahtumien hallinta",
-      "eventsDescription": "Luo, muokkaa ja hallitse tapahtumia, malleja ja tilastoja.",
-      "instantCallsTitle": "Pikapuhelut",
-      "instantCallsDescription": "Luo julkinen videopuhelu välittömästi ilman aikataulutusta — linkin voi jakaa heti.",
-      "instantCallsStat": "{count, plural, =0 {ei pikapuheluja viimeisten 30 päivän aikana} one {1 pikapuhelu viimeisten 30 päivän aikana} other {# pikapuhelua viimeisten 30 päivän aikana}}",
-      "registrationsTitle": "Ilmoittautumiset",
-      "registrationsDescription": "Tapahtumiin ilmoittautuneiden osoitekirja: haku, suodattimet, vienti, moderaattorit ja GDPR-auditointi.",
-      "registrationsTotal": "{count, plural, =0 {ei ilmoittautuneita henkilöitä} one {1 henkilö ilmoittautunut} other {# henkilöä ilmoittautunut}}",
-      "today": "tänään",
-      "recordingsTitle": "Videot ja istunnot",
-      "recordingsDescription": "Puheluiden videotallenteet, päättyneet live-istunnot ja arkistoidut pikapuhelut. Lataus ja hallinta.",
-      "recordingsStat": "{count, plural, =0 {ei videotallenteita} one {1 videotallenne saatavilla} other {# videotallennetta saatavilla}}",
-      "analyticsTitle": "Tilastot",
-      "analyticsDescription": "Yleiskuva käyttömittareista: luodut tapahtumat, osallistujat, konversioaste ja suosituimmat tapahtumat.",
-      "monitoringTitle": "Valvonta",
-      "monitoringDescription": "Tekninen hallintapaneeli infrastruktuurin mittareineen, suorituskyvyn, saatavuuden ja palvelun laadun osalta.",
-      "templatesTitle": "Tapahtumamallit",
-      "templatesDescription": "Uudelleenkäytettävät mallit, joiden avulla luot tapahtumia nopeasti ennalta määritellyillä asetuksilla.",
-      "settingsTitle": "Järjestelmäasetukset",
-      "settingsDescription": "Määritä brändi, sisältö, kielet, toiminnot ja infrastruktuuri.",
-      "liveNow": "{count, plural, one {# tapahtuma käynnissä} other {# tapahtumaa käynnissä}}",
-      "upcomingEvents": "{count, plural, one {# tuleva tapahtuma} other {# tulevaa tapahtumaa}}"
+      "recordingsPostprod": "Tekoälyjälkikäsittely",
+      "feedbackDashboard": "Palaute",
+      "video": "Video",
+      "glossary": "Sanasto",
+      "breadcrumbAriaLabel": "Murupolku",
+      "skipToPage": "Siirry sivun sisältöön"
     },
     "publications": {
-      "title": "Julkaisut",
       "subtitle": "Yhtenäinen toimituksellinen keskus kaikille julkaistuille videoille: aikataulutetut tapahtumat, pikapuhelut, ladatut arkistotallenteet ja istunnot, jotka odottavat julkaisua.",
       "newPublication": "Uusi julkaisu",
       "searchPlaceholder": "Hae nimellä tai kuvauksella…",
@@ -1040,7 +1008,6 @@
         "unlist": "Poista kirjastosta"
       },
       "uploadPage": {
-        "title": "Uusi julkaisu",
         "subtitle": "Lataa olemassa oleva videotiedosto (MP4, WebM tai MOV) alustan tallennustilaan ja täydennä se toimituksellisilla metatiedoilla.",
         "step1Title": "1. Lataa videotiedosto",
         "startUpload": "Lataa",
@@ -1077,7 +1044,6 @@
       "updateFailed": "Päivitys epäonnistui."
     },
     "recordingsLibrary": {
-      "title": "Videotallenteet",
       "subtitle": "Keskitetty kirjasto puheluiden videotallenteille: suodata, lataa, vie",
       "loading": "Ladataan...",
       "range": "Ajanjakso",
@@ -1149,7 +1115,6 @@
       "transcriptProcessing": "Käsitellään"
     },
     "gdprAudit": {
-      "title": "GDPR-auditointi",
       "subtitle": "Lokirekisteri henkilötietoihin kohdistuvista yksityisyystoimista: poistot, suostumukset, viennit",
       "loading": "Ladataan...",
       "range": "Ajanjakso",
@@ -1172,7 +1137,6 @@
       "noResults": "Valitulla ajanjaksolla ei ole auditointimerkintöjä."
     },
     "moderators": {
-      "title": "Moderaattorit",
       "subtitle": "Hae, kopioi ja luo uudelleen moderaattoreiden taikalinkit",
       "searchPlaceholder": "Hae slugilla, moderaattorin nimellä tai sähköpostilla…",
       "searchHelp": "Taikalinkki sisältää yksilöllisen tunnuksen: jaa se vain nimetylle moderaattorille.",
@@ -1191,7 +1155,6 @@
       "noResults": "Tapahtumia ei löytynyt."
     },
     "registrations": {
-      "title": "Ilmoittautumiset",
       "subtitle": "Kaikki tapahtumiin ilmoittautuneet henkilöt — hae, suodata ja vie",
       "loading": "Ladataan...",
       "range": "Ajanjakso",
@@ -1525,18 +1488,6 @@
       "title": "Sivuston asetukset",
       "subtitle": "Määritä alustan ulkoasu ja toiminta julkishallinnon uudelleenkäyttöä varten",
       "saving": "Tallennetaan...",
-      "sections": {
-        "languagesTitle": "Kielten hallinta",
-        "languagesDescription": "Ota käyttöön tai poista käytöstä EU-kielet, valitse oletuskieli ja mukauta käännöksiä.",
-        "gdprTemplatesTitle": "GDPR-mallit",
-        "gdprTemplatesDescription": "Luo uudelleenkäytettäviä tietosuojailmoituksia, jotka voidaan liittää tapahtumiin, ja valitse uusien tapahtumien oletusmalli.",
-        "emailTemplatesTitle": "Sähköpostimallit",
-        "emailTemplatesDescription": "Mukauta vahvistus- ja muistutusviestien otsikoita, aiheita ja tekstejä. Tyhjiin kenttiin jää sisäänrakennettu oletusteksti.",
-        "tagsTitle": "Tagien hallinta",
-        "tagsDescription": "Luo ja muokkaa tageja, joita käytetään tapahtumien suodattamiseen",
-        "glossaryTitle": "Sanasto",
-        "glossaryDescription": "Lyhenteet ja erikoistermit litterointeihin, käännöksiin ja jälkiäänitykseen"
-      },
       "saved": "Asetukset tallennettu",
       "tabs": {
         "branding": "Brändi",
@@ -1869,7 +1820,6 @@
       "invalidRRule": "Virheellinen sääntö"
     },
     "templates": {
-      "title": "Tapahtumamallit",
       "subtitle": "Hallitse esimääritettyjä malleja tapahtumien nopeaan luomiseen",
       "create": "Uusi malli",
       "deleteConfirm": "Haluatko varmasti poistaa tämän mallin?",
@@ -1966,7 +1916,6 @@
       "errorGeneric": "Tapahtui virhe. Yritä uudelleen."
     },
     "gdprTemplates": {
-      "title": "GDPR-mallit",
       "subtitle": "Luo ja hallitse tapahtumien välillä jaettavia uudelleenkäytettäviä tietosuojaselosteita. Oletukseksi merkitty malli on esivalittuna uusissa tapahtumissa.",
       "newTemplate": "Uusi malli",
       "emptyState": "Ei vielä malleja. Luo ensimmäinen, jotta voit käyttää samaa tietosuojatekstiä useissa tapahtumissa.",
@@ -1992,7 +1941,6 @@
       "deleteTitle": "Poista mallipohja"
     },
     "emailTemplates": {
-      "title": "Sähköpostimallit",
       "subtitle": "Mukauta transaktioviestien aihetta, otsikoita ja sisältöä. Tyhjiksi jätetyissä kentissä käytetään sisäänrakennettuja oletustekstejä.",
       "overridden": "Mukautettu",
       "usingDefault": "Oletus",
@@ -2031,7 +1979,6 @@
       }
     },
     "languages": {
-      "title": "Kielihallinta",
       "subtitle": "Määritä käytettävissä olevat kielet ja muokkaa käännöksiä",
       "defaultLocaleTitle": "Oletuskieli",
       "defaultLocaleDescription": "Oletuskieltä käytetään varakielenä, kun käännös ei ole saatavilla, ja sivuston ensisijaisena kielenä.",
@@ -2057,7 +2004,6 @@
       "addOverride": "Lisää"
     },
     "infrastructure": {
-      "title": "Infrastruktuuri",
       "subtitle": "Komponenttien tila ja ympäristömääritys",
       "deploymentMode": "Käyttöönottotapa",
       "version": "Versio",
@@ -2120,7 +2066,6 @@
       }
     },
     "instantCalls": {
-      "title": "Pikapuhelut",
       "subtitle": "Pikavideopuheluiden luettelo",
       "total": "yhteensä",
       "noCalls": "Ei vielä pikapuheluja.",
@@ -2182,7 +2127,6 @@
       "deleteTitle": "Poista istunto"
     },
     "monitoring": {
-      "title": "Valvonta",
       "subtitle": "Real-time infrastructure and performance monitoring dashboard",
       "loading": "Ladataan mittareita...",
       "prometheusUnavailable": "Prometheus is not configured. Set the PROMETHEUS_URL environment variable to enable advanced monitoring.",
@@ -2308,9 +2252,7 @@
       "registeredCount": "{count, plural, =0 {Ei ilmoittautumisia} one {1 ilmoittautuminen} other {# ilmoittautumista}}"
     },
     "tags": {
-      "title": "Tagien hallinta",
       "subtitle": "Luo, muokkaa ja poista tageja, joilla luokitellaan ja suodatetaan julkisia tapahtumia.",
-      "backToSettings": "Asetukset",
       "addTag": "Uusi tagi",
       "editTag": "Muokkaa tagia",
       "columnColor": "Väri",
@@ -2426,7 +2368,6 @@
       }
     },
     "rubrica": {
-      "title": "Osoitekirja",
       "subtitle": "Henkilöt, jotka ovat antaneet suostumuksen osoitekirjaan lisäämiseen (GDPR art. 6.1.a). Profiilitiedot päivitetään automaattisesti jokaisen uudelleenilmoittautumisen yhteydessä.",
       "searchLabel": "Hae nimellä tai organisaatiolla",
       "orgTypeLabel": "Organisaation tyyppi",
@@ -2519,7 +2460,6 @@
       "privacyNote": "Henkilökohtaiset tilastot ovat oletuksena pseudonymisoituja. Anonyymit koosteet säilytetään tapahtuman yhteenvedossa; raakarivit poistetaan säilytysajan päättyessä."
     },
     "postprod": {
-      "title": "Tekoälyn jälkituotantoputki",
       "subtitle": "Klusterissa toimivan tekoälyputken tuottamat litteroinnit, yhteenvedot ja käännökset. Kohdista puhujat, aja työt uudelleen tai peruuta ne.",
       "filterStatus": "Tila",
       "all": "Kaikki",
@@ -2603,7 +2543,6 @@
       "archiveGenerateOk": "Arkiston luonti käynnistetty.",
       "archiveGenerateErr": "Arkiston luonti epäonnistui (HTTP {code}).",
       "archiveTrackFallback": "Osallistuja",
-      "manageBackToList": "Kaikki tallenteet",
       "manageDuration": "Kesto",
       "manageSource": "Lähdekieli",
       "manageOpenPublic": "Julkinen sivu",
@@ -2768,11 +2707,9 @@
       "originalUncertainHint": "Säilytetty teksti saattaa jo sisältää korjauksia, jotka on tehty ennen tämän toiminnon käyttöönottoa: ei voida osoittaa, että se on automaattisen litteroinnin tuottama teksti"
     },
     "questionnairesPage": {
-      "title": "Kyselyt",
       "subtitle": "Uudelleenkäytettävät kysymysmallit ennakkoilmoittautumis- ja tapahtuman jälkeisiä kyselyitä varten."
     },
     "questionnaireResponses": {
-      "title": "Kyselyvastaukset",
       "subtitle": "Aggregaatit kysymyskohtaisesti, suodatettavissa tapahtuman, vaiheen ja päivämääräalueen mukaan."
     },
     "eventQuestionnaires": {
@@ -2822,11 +2759,8 @@
       "downloadFailed": "Lataus epäonnistui: yritä uudelleen."
     },
     "glossary": {
-      "title": "Sanasto",
       "subtitle": "Lyhenteet, nimet ja erikoistermit tekoälyjälkikäsittelyä varten: miten ne kirjoitetaan litteroinneissa, miten ne käännetään ja miten ne lausutaan jälkiäänityksessä. Ne koskevat kaikkia tapahtumia; jokainen tapahtuma voi lisätä omansa.",
       "organizerNote": "Voit lisätä termejä kaikkiin tapahtumiin ja muokata itse lisäämiäsi; muita hallinnoivat ylläpitäjät.",
-      "backToSettings": "Takaisin asetuksiin",
-      "backToEvents": "Takaisin tapahtumiin",
       "eventTitle": "Tapahtuman termit ja lyhenteet",
       "eventIntro": "Ne lisätään instanssin sanastoon tämän tapahtuman litterointia, käännöksiä ja jälkiäänitystä varten. Jos termi on jo instanssissa, se korvataan tällä.",
       "openInstance": "Täydennä instanssin sanastoa, joka koskee kaikkia tapahtumia",
@@ -3761,7 +3695,6 @@
     "reactionSent": "Reaktio lähetetty!"
   },
   "calendar": {
-    "title": "Tapahtumakalenteri",
     "subtitle": "Selaa kaikkia tapahtumia ajallisesti",
     "publicTitle": "Tapahtumakalenteri",
     "publicSubtitle": "Tutustu tuleviin tapahtumiin",
@@ -4240,7 +4173,6 @@
     "hintJoystick": "Vedä liikkuaksesi"
   },
   "feedbackAdmin": {
-    "title": "Palautteen tulokset",
     "totalVotes": "vastausta",
     "noFeedback": "Palautetta ei ole vastaanotettu",
     "comments": "Kommentit",

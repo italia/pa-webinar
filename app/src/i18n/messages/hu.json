@@ -615,7 +615,6 @@
       "newLink": "Új link kérése"
     },
     "organizers": {
-      "title": "Munkatársi fiókok",
       "intro": "Azok a személyek, akik saját nevükön dolgoznak az adminisztrációs felületen. A szervezők saját eseményeiket hozzák létre és kezelik; az adminisztrátorok a teljes példányt kezelik. Az e-mail-címükre küldött linkkel lépnek be, jelszó nélkül. A példány kulcsa vészhelyzetekre és automatizálásra megmarad.",
       "newTitle": "Fiók hozzáadása",
       "name": "Teljes név",
@@ -929,82 +928,51 @@
       "toFixField": "{n}. mező"
     },
     "nav": {
-      "events": "Események kezelése",
-      "registrations": "Regisztrációk",
-      "recordings": "Videó és munkamenetek",
-      "settings": "Rendszerbeállítások",
-      "eventsList": "Eseménylista",
+      "events": "Események",
+      "settings": "Beállítások",
+      "eventsList": "Összes esemény",
       "newEvent": "Új esemény",
-      "calendar": "Naptár",
-      "templates": "Sablonok",
+      "calendar": "Eseménynaptár",
+      "templates": "Eseménysablonok",
       "analytics": "Statisztikák",
       "instantCalls": "Gyorshívások",
       "infrastructure": "Infrastruktúra",
       "monitoring": "Felügyelet",
-      "monitoringDashboard": "Műszerfal",
+      "monitoringDashboard": "Szolgáltatás állapota",
       "registrationsList": "Regisztrációk",
-      "moderators": "Moderátorok",
-      "moderatorLinks": "Moderátori hivatkozások",
+      "moderatorLinks": "Moderátori linkek",
       "gdprAudit": "GDPR-napló",
-      "recordingsList": "Videófelvételek",
-      "settingsGeneral": "Általános",
+      "recordingsList": "Felvételek",
+      "settingsGeneral": "Általános beállítások",
       "settingsLanguages": "Nyelvek",
-      "settingsGdprTemplates": "GDPR-sablonok",
-      "admin": "Adminisztráció",
-      "eventDetail": "Esemény részletei",
-      "eventEdit": "Esemény szerkesztése",
-      "publications": "Közzétételek",
-      "publicationsList": "Összes közzététel",
+      "settingsGdprTemplates": "Adatvédelmi tájékoztatók",
+      "eventDetail": "Esemény",
+      "eventEdit": "Szerkesztés",
+      "publicationsList": "Közzétételek",
       "publicationsNew": "Új közzététel",
       "ariaLabel": "Adminisztrációs navigáció",
       "subNavAriaLabel": "Szekció navigáció",
       "questionnaires": "Kérdőívek",
-      "questionnairesLibrary": "Sablonkönyvtár",
-      "questionnairesResponses": "Válaszok és statisztikák",
+      "questionnairesLibrary": "Kérdőívsablonok",
+      "questionnairesResponses": "Válaszok",
       "rubrica": "Címjegyzék",
       "settingsEmailTemplates": "E-mail-sablonok",
-      "settingsTags": "Címkekezelés",
-      "settingsGlossary": "Szójegyzék",
+      "settingsTags": "Címkék",
       "eventMaterials": "Anyagok",
       "eventQuestionnaires": "Kérdőívek",
-      "rubricaList": "Lista",
-      "rubricaDetail": "Részletek",
-      "organizers": "Fiókok",
+      "rubricaDetail": "Személy",
       "staffAccess": "Munkatársak és hozzáférés",
       "staffAccounts": "Munkatársi fiókok",
       "people": "Személyek",
       "postprodDetail": "Felvétel",
-      "recordingsPostprod": "Átiratok / AI",
-      "feedbackDashboard": "Feedback"
-    },
-    "landing": {
-      "title": "Adminisztrációs panel",
-      "subtitle": "Események kezelése és a platform konfigurálása",
-      "eventsTitle": "Események kezelése",
-      "eventsDescription": "Események, sablonok és statisztikák létrehozása, szerkesztése és kezelése.",
-      "instantCallsTitle": "Gyorshívások",
-      "instantCallsDescription": "Hozzon létre egy nyilvános videohívást azonnal, ütemezés nélkül: a hivatkozás rögtön megosztható.",
-      "instantCallsStat": "{count, plural, =0 {nincs gyorshívás az elmúlt 30 napban} one {1 gyorshívás az elmúlt 30 napban} other {# gyorshívás az elmúlt 30 napban}}",
-      "registrationsTitle": "Regisztrációk",
-      "registrationsDescription": "Az eseményekre regisztrált résztvevők címjegyzéke: keresés, szűrők, exportálás, moderátorok és GDPR-napló.",
-      "registrationsTotal": "{count, plural, =0 {nincs regisztrált személy} one {1 regisztrált személy} other {# regisztrált személy}}",
-      "today": "ma",
-      "recordingsTitle": "Videó és munkamenetek",
-      "recordingsDescription": "Hívásokról készült videófelvételek, befejezett élő munkamenetek és archivált gyorshívások. Letöltés és kezelés.",
-      "recordingsStat": "{count, plural, =0 {nincs videófelvétel} one {1 elérhető videófelvétel} other {# elérhető videófelvétel}}",
-      "analyticsTitle": "Statisztikák",
-      "analyticsDescription": "A használati metrikák áttekintése: létrehozott események, résztvevők, konverziós arány, legnépszerűbb események.",
-      "monitoringTitle": "Felügyelet",
-      "monitoringDescription": "Műszaki műszerfal infrastruktúra-metrikákkal, teljesítménnyel, rendelkezésre állással és szolgáltatásminőséggel.",
-      "templatesTitle": "Eseménysablonok",
-      "templatesDescription": "Újrafelhasználható minták események gyors, előre definiált konfigurációval való létrehozásához.",
-      "settingsTitle": "Rendszerbeállítások",
-      "settingsDescription": "Arculat, tartalom, nyelvek, funkciók és infrastruktúra konfigurálása.",
-      "liveNow": "{count, plural, one {# élő esemény} other {# élő esemény}}",
-      "upcomingEvents": "{count, plural, one {# közelgő esemény} other {# közelgő esemény}}"
+      "recordingsPostprod": "AI-utómunka",
+      "feedbackDashboard": "Visszajelzések",
+      "video": "Videó",
+      "glossary": "Szójegyzék",
+      "breadcrumbAriaLabel": "Morzsamenü",
+      "skipToPage": "Ugrás az oldal tartalmára"
     },
     "publications": {
-      "title": "Közzétételek",
       "subtitle": "Egységes szerkesztőségi központ minden közzétett videóhoz: ütemezett események, azonnali hívások, feltöltött archív felvételek és előléptetésre váró munkamenetek.",
       "newPublication": "Új közzététel",
       "searchPlaceholder": "Keresés cím vagy leírás alapján…",
@@ -1040,7 +1008,6 @@
         "unlist": "Eltávolítás a könyvtárból"
       },
       "uploadPage": {
-        "title": "Új közzététel",
         "subtitle": "Töltsön fel egy meglévő videót (MP4, WebM vagy MOV) a platform tárhelyére, és gazdagítsa szerkesztői metaadatokkal.",
         "step1Title": "1. Töltse fel a videofájlt",
         "startUpload": "Feltöltés",
@@ -1077,7 +1044,6 @@
       "updateFailed": "A frissítés nem sikerült."
     },
     "recordingsLibrary": {
-      "title": "Videófelvételek",
       "subtitle": "A hívások videófelvételeinek központi tára: szűrés, letöltés, exportálás",
       "loading": "Betöltés...",
       "range": "Időszak",
@@ -1149,7 +1115,6 @@
       "transcriptProcessing": "Feldolg. alatt"
     },
     "gdprAudit": {
-      "title": "GDPR-napló",
       "subtitle": "A személyes adatokon végzett adatvédelmi műveletek naplója: törlések, hozzájárulások, exportok",
       "loading": "Betöltés...",
       "range": "Időszak",
@@ -1172,7 +1137,6 @@
       "noResults": "Nincs naplóbejegyzés a kiválasztott időszakban."
     },
     "moderators": {
-      "title": "Moderátorok",
       "subtitle": "Moderátori varázslinkek lekérése, másolása és újragenerálása",
       "searchPlaceholder": "Keresés slug, moderátornév vagy e-mail alapján…",
       "searchHelp": "A varázslink egyedi tokent tartalmaz: kizárólag a kijelölt moderátorral ossza meg.",
@@ -1191,7 +1155,6 @@
       "noResults": "Nem található esemény."
     },
     "registrations": {
-      "title": "Regisztrációk",
       "subtitle": "Az eseményekre regisztrált összes személy — keresés, szűrés és exportálás",
       "loading": "Betöltés...",
       "range": "Időszak",
@@ -1525,18 +1488,6 @@
       "title": "Webhely beállításai",
       "subtitle": "A platform megjelenésének és viselkedésének konfigurálása közigazgatási újrahasznosításhoz",
       "saving": "Mentés...",
-      "sections": {
-        "languagesTitle": "Nyelvek kezelése",
-        "languagesDescription": "A felhasználók számára elérhető EU-s nyelvek engedélyezése vagy letiltása, az alapértelmezett nyelv kiválasztása és a fordítások testreszabása.",
-        "gdprTemplatesTitle": "GDPR sablonok",
-        "gdprTemplatesDescription": "Hozz létre bármely eseményhez kapcsolható, újrafelhasználható adatvédelmi tájékoztatókat, és válaszd ki az új eseményekhez használt alapértelmezettet.",
-        "emailTemplatesTitle": "E-mail sablonok",
-        "emailTemplatesDescription": "Szabd testre a visszaigazoló és emlékeztető e-mailek tárgyát, címsorát és szövegét. Üres mezők esetén a beépített alapértelmezett szövegek maradnak.",
-        "tagsTitle": "Címkekezelés",
-        "tagsDescription": "Az események szűrésére használt címkék létrehozása és szerkesztése",
-        "glossaryTitle": "Szójegyzék",
-        "glossaryDescription": "Rövidítések és szakkifejezések átiratokhoz, fordításokhoz és szinkronhoz"
-      },
       "saved": "Beállítások sikeresen mentve",
       "tabs": {
         "branding": "Arculat",
@@ -1869,7 +1820,6 @@
       "invalidRRule": "Érvénytelen szabály"
     },
     "templates": {
-      "title": "Eseménysablonok",
       "subtitle": "Előre beállított sablonok kezelése események gyors létrehozásához",
       "create": "Új sablon",
       "deleteConfirm": "Biztosan törölni szeretné ezt a sablont?",
@@ -1966,7 +1916,6 @@
       "errorGeneric": "Hiba történt. Kérjük, próbálja újra."
     },
     "gdprTemplates": {
-      "title": "GDPR-sablonok",
       "subtitle": "Hozzon létre és kezeljen események között újrafelhasználható adatvédelmi tájékoztatókat. Az alapértelmezettként megjelölt sablon az új eseményeken előre kiválasztott.",
       "newTemplate": "Új sablon",
       "emptyState": "Még nincs létrehozott sablon. Hozza létre az elsőt, hogy ugyanaz az adatvédelmi szöveg több eseményen is felhasználható legyen.",
@@ -1992,7 +1941,6 @@
       "deleteTitle": "Sablon törlése"
     },
     "emailTemplates": {
-      "title": "E-mail sablonok",
       "subtitle": "Szabd testre a tranzakciós e-mailek tárgyát, címsorait és szövegét. Az üresen hagyott mezőkben a beépített alapértelmezett szövegek érvényesek.",
       "overridden": "Testreszabva",
       "usingDefault": "Alapértelmezett",
@@ -2031,7 +1979,6 @@
       }
     },
     "languages": {
-      "title": "Nyelvkezelés",
       "subtitle": "Az elérhető nyelvek konfigurálása és a fordítások testreszabása",
       "defaultLocaleTitle": "Alapértelmezett nyelv",
       "defaultLocaleDescription": "Az alapértelmezett nyelv tartalék, ha egy fordítás nem érhető el, és a webhely fő nyelve.",
@@ -2057,7 +2004,6 @@
       "addOverride": "Hozzáadás"
     },
     "infrastructure": {
-      "title": "Infrastruktúra",
       "subtitle": "Komponensek állapota és környezeti konfiguráció",
       "deploymentMode": "Telepítési mód",
       "version": "Verzió",
@@ -2120,7 +2066,6 @@
       }
     },
     "instantCalls": {
-      "title": "Gyorshívások",
       "subtitle": "Az azonnali videohívások listája",
       "total": "összesen",
       "noCalls": "Még nincs gyorshívás.",
@@ -2182,7 +2127,6 @@
       "deleteTitle": "Munkamenet törlése"
     },
     "monitoring": {
-      "title": "Felügyelet",
       "subtitle": "Real-time infrastructure and performance monitoring dashboard",
       "loading": "Metrikák betöltése...",
       "prometheusUnavailable": "Prometheus is not configured. Set the PROMETHEUS_URL environment variable to enable advanced monitoring.",
@@ -2308,9 +2252,7 @@
       "registeredCount": "{count, plural, =0 {Nincs regisztráció} one {1 regisztráció} other {# regisztráció}}"
     },
     "tags": {
-      "title": "Címkekezelés",
       "subtitle": "A nyilvános események osztályozására és szűrésére használt címkék létrehozása, szerkesztése és törlése.",
-      "backToSettings": "Beállítások",
       "addTag": "Új címke",
       "editTag": "Címke szerkesztése",
       "columnColor": "Szín",
@@ -2426,7 +2368,6 @@
       }
     },
     "rubrica": {
-      "title": "Címjegyzék",
       "subtitle": "A címjegyzékbe való felvételhez hozzájárulást adó személyek (GDPR 6. cikk (1) bekezdés a) pont). A profilinformációk minden újraregisztrációkor automatikusan frissülnek.",
       "searchLabel": "Keresés név vagy szervezet szerint",
       "orgTypeLabel": "Szervezet típusa",
@@ -2519,7 +2460,6 @@
       "privacyNote": "A személyenkénti statisztikák alapértelmezés szerint álnevesítettek. Az anonim összesítések az esemény összegzésében maradnak; a nyers sorok a megőrzési idő lejártakor törlődnek."
     },
     "postprod": {
-      "title": "AI-utómunka pipeline",
       "subtitle": "A fürtön belüli AI pipeline által készített átiratok, összefoglalók és fordítások. Rendelje hozzá a beszélőket, indítsa újra vagy szakítsa meg a feladatokat.",
       "filterStatus": "Állapot",
       "all": "Összes",
@@ -2603,7 +2543,6 @@
       "archiveGenerateOk": "Az archívum létrehozása elindult.",
       "archiveGenerateErr": "Az archívum létrehozása nem sikerült (HTTP {code}).",
       "archiveTrackFallback": "Résztvevő",
-      "manageBackToList": "Az összes felvétel",
       "manageDuration": "Időtartam",
       "manageSource": "Forrásnyelv",
       "manageOpenPublic": "Nyilvános oldal",
@@ -2768,11 +2707,9 @@
       "originalUncertainHint": "A megőrzött szöveg már tartalmazhat olyan javításokat, amelyek e funkció bevezetése előtt készültek: nem igazolható, hogy azonos az automatikus átirat által előállított szöveggel"
     },
     "questionnairesPage": {
-      "title": "Kérdőívek",
       "subtitle": "Újrafelhasználható kérdéssablonok regisztráció előtti és esemény utáni kérdőívekhez."
     },
     "questionnaireResponses": {
-      "title": "Kérdőív-válaszok",
       "subtitle": "Kérdésenkénti aggregációk, esemény, fázis és dátumtartomány szerint szűrhetők."
     },
     "eventQuestionnaires": {
@@ -2822,11 +2759,8 @@
       "downloadFailed": "A letöltés nem sikerült: próbáld újra."
     },
     "glossary": {
-      "title": "Szójegyzék",
       "subtitle": "Rövidítések, nevek és szakkifejezések a mesterséges intelligenciás utómunkához: hogyan írandók az átiratokban, hogyan fordítandók, és hogyan ejtendők a szinkronban. Minden eseményre érvényesek; minden esemény hozzáadhatja a sajátjait.",
       "organizerNote": "Kifejezéseket adhat hozzá minden eseményhez, és szerkesztheti az Ön által hozzáadottakat; a többit az adminisztráció kezeli.",
-      "backToSettings": "Vissza a beállításokhoz",
-      "backToEvents": "Vissza az eseményekhez",
       "eventTitle": "Az esemény kifejezései és rövidítései",
       "eventIntro": "Kiegészítik a példány szójegyzékét az esemény átiratához, fordításaihoz és szinkronjához. Ha egy kifejezés már szerepel a példányban, az itteni lép a helyébe.",
       "openInstance": "A példány szójegyzékének bővítése, amely minden eseményre érvényes",
@@ -3761,7 +3695,6 @@
     "reactionSent": "Reakció elküldve!"
   },
   "calendar": {
-    "title": "Eseménynaptár",
     "subtitle": "Összes esemény megjelenítése időrendben",
     "publicTitle": "Eseménynaptár",
     "publicSubtitle": "Fedezze fel a tervezett eseményeket",
@@ -4240,7 +4173,6 @@
     "hintJoystick": "Húzza a mozgáshoz"
   },
   "feedbackAdmin": {
-    "title": "Visszajelzések eredményei",
     "totalVotes": "válasz",
     "noFeedback": "Nem érkezett visszajelzés",
     "comments": "Megjegyzések",

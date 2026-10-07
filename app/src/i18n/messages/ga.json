@@ -615,7 +615,6 @@
       "newLink": "Iarr nasc nua"
     },
     "organizers": {
-      "title": "Cuntais foirne",
       "intro": "Daoine a oibríonn sa limistéar riaracháin faoina n-ainm féin. Cruthaíonn agus bainistíonn eagraithe a n-imeachtaí féin; bainistíonn riarthóirí an t-ásc ar fad. Síníonn siad isteach le nasc a sheoltar chuig a ríomhphost, gan pasfhocal. Fanann eochair an ásc le haghaidh éigeandálaí agus uathoibrithe.",
       "newTitle": "Cuir cuntas leis",
       "name": "Ainm iomlán",
@@ -929,82 +928,51 @@
       "toFixField": "Réimse {n}"
     },
     "nav": {
-      "events": "Bainistíocht imeachtaí",
-      "registrations": "Clárúcháin",
-      "recordings": "Físeán & seisiúin",
-      "settings": "Socruithe córais",
-      "eventsList": "Liosta imeachtaí",
+      "events": "Imeachtaí",
+      "settings": "Socruithe",
+      "eventsList": "Gach imeacht",
       "newEvent": "Imeacht nua",
-      "calendar": "Féilire",
-      "templates": "Teimpléid",
+      "calendar": "Féilire na n-imeachtaí",
+      "templates": "Teimpléid imeachta",
       "analytics": "Staitisticí",
-      "instantCalls": "Glaonna tapa",
+      "instantCalls": "Glaonna láithreacha",
       "infrastructure": "Bonneagar",
       "monitoring": "Monatóireacht",
-      "monitoringDashboard": "Painéal",
+      "monitoringDashboard": "Stádas na seirbhíse",
       "registrationsList": "Clárúcháin",
-      "moderators": "Modhnóirí",
-      "moderatorLinks": "Naisc modhnóra",
-      "gdprAudit": "Iniúchadh GDPR",
-      "recordingsList": "Taifeadtaí físe",
-      "settingsGeneral": "Ginearálta",
+      "moderatorLinks": "Naisc na modhnóirí",
+      "gdprAudit": "Logáil GDPR",
+      "recordingsList": "Taifeadtaí",
+      "settingsGeneral": "Socruithe ginearálta",
       "settingsLanguages": "Teangacha",
-      "settingsGdprTemplates": "Teimpléid GDPR",
-      "admin": "Riarachán",
-      "eventDetail": "Sonraí an imeachta",
-      "eventEdit": "Cuir an t-imeacht in eagar",
-      "publications": "Foilseacháin",
-      "publicationsList": "Gach foilseachán",
+      "settingsGdprTemplates": "Fógraí príobháideachais",
+      "eventDetail": "Imeacht",
+      "eventEdit": "Cuir in eagar",
+      "publicationsList": "Foilseacháin",
       "publicationsNew": "Foilseachán nua",
       "ariaLabel": "Nascleanúint riaracháin",
       "subNavAriaLabel": "Nascleanúint rannáin",
       "questionnaires": "Ceistneoirí",
-      "questionnairesLibrary": "Leabharlann teimpléad",
-      "questionnairesResponses": "Freagraí agus staitisticí",
+      "questionnairesLibrary": "Teimpléid cheistneora",
+      "questionnairesResponses": "Freagraí",
       "rubrica": "Leabhar seoltaí",
       "settingsEmailTemplates": "Teimpléid ríomhphoist",
-      "settingsTags": "Bainistíocht clibeanna",
-      "settingsGlossary": "Gluais",
-      "eventMaterials": "Ábhair",
+      "settingsTags": "Clibeanna",
+      "eventMaterials": "Áiseanna",
       "eventQuestionnaires": "Ceistneoirí",
-      "rubricaList": "Liosta",
-      "rubricaDetail": "Iontráil",
-      "organizers": "Cuntais",
+      "rubricaDetail": "Duine",
       "staffAccess": "Foireann agus rochtain",
-      "staffAccounts": "Cuntais foirne",
+      "staffAccounts": "Cuntais na foirne",
       "people": "Daoine",
       "postprodDetail": "Taifeadadh",
-      "recordingsPostprod": "Tras-scríbhinní / AI",
-      "feedbackDashboard": "Feedback"
-    },
-    "landing": {
-      "title": "Painéal riaracháin",
-      "subtitle": "Bainistigh imeachtaí agus cumraigh an t-ardán",
-      "eventsTitle": "Bainistíocht imeachtaí",
-      "eventsDescription": "Cruthaigh, cuir in eagar agus bainistigh imeachtaí, teimpléid agus staitisticí.",
-      "instantCallsTitle": "Glaonna meara",
-      "instantCallsDescription": "Cruthaigh físghlao poiblí ar an toirt gan sceidealú: nasc inroinnte láithreach.",
-      "instantCallsStat": "{count, plural, =0 {gan glao mear sa 30 lá deiridh} one {1 ghlao mear sa 30 lá deiridh} other {# ghlaonna meara sa 30 lá deiridh}}",
-      "registrationsTitle": "Cláruithe",
-      "registrationsDescription": "Leabhar seoltaí na rannpháirtithe atá cláraithe le himeachtaí: cuardach, scagairí, easpórtáil, modhnóirí agus iniúchadh GDPR.",
-      "registrationsTotal": "{count, plural, =0 {níl aon duine cláraithe} one {1 duine cláraithe} other {# duine cláraithe}}",
-      "today": "inniu",
-      "recordingsTitle": "Físeáin agus seisiúin",
-      "recordingsDescription": "Físthaifeadtaí glaonna, seisiúin bheo a chríochnaigh agus glaonna meara cartlannaithe. Íoslódáil agus bainistíocht.",
-      "recordingsStat": "{count, plural, =0 {gan aon fhístaifeadadh} one {1 fhístaifeadadh ar fáil} other {# fhístaifeadadh ar fáil}}",
-      "analyticsTitle": "Staitisticí",
-      "analyticsDescription": "Forbhreathnú ar mhéadracht úsáide: imeachtaí cruthaithe, rannpháirtithe, ráta tiontaithe, barr-imeachtaí.",
-      "monitoringTitle": "Monatóireacht",
-      "monitoringDescription": "Painéal teicniúil le méadracht bhonneagair, feidhmíocht, infhaighteacht agus cáilíocht seirbhíse.",
-      "templatesTitle": "Teimpléid imeachtaí",
-      "templatesDescription": "Múnlaí in-athúsáidte chun imeachtaí a chruthú go tapa le cumraíochtaí réamhshocraithe.",
-      "settingsTitle": "Socruithe córais",
-      "settingsDescription": "Cumraigh brandáil, ábhar, teangacha, gnéithe agus bonneagar.",
-      "liveNow": "{count, plural, one {# imeacht beo} two {# imeacht beo} few {# imeacht beo} many {# n-imeacht beo} other {# imeacht beo}}",
-      "upcomingEvents": "{count, plural, one {# imeacht le teacht} two {# imeacht le teacht} few {# imeacht le teacht} many {# n-imeacht le teacht} other {# imeacht le teacht}}"
+      "recordingsPostprod": "Iarléiriú AI",
+      "feedbackDashboard": "Aiseolas",
+      "video": "Físeán",
+      "glossary": "Gluais",
+      "breadcrumbAriaLabel": "Cosán nascleanúna",
+      "skipToPage": "Téigh chuig ábhar an leathanaigh"
     },
     "publications": {
-      "title": "Foilseacháin",
       "subtitle": "Mol eagarthóireachta amháin do gach físeán foilsithe: imeachtaí sceidealta, glaonna meara, físthaifeadtaí cartlainne uaslódáilte agus seisiúin ag fanacht le cur chun cinn.",
       "newPublication": "Foilseachán nua",
       "searchPlaceholder": "Cuardaigh de réir teidil nó tuairisce…",
@@ -1040,7 +1008,6 @@
         "unlist": "Bain den leabharlann"
       },
       "uploadPage": {
-        "title": "Foilseachán nua",
         "subtitle": "Uaslódáil comhad físe atá ann (MP4, WebM nó MOV) chuig stóráil an ardáin agus cuir meiteashonraí eagarthóireachta leis.",
         "step1Title": "1. Uaslódáil an comhad físe",
         "startUpload": "Uaslódáil",
@@ -1077,7 +1044,6 @@
       "updateFailed": "Theip ar an nuashonrú."
     },
     "recordingsLibrary": {
-      "title": "Físthaifeadtaí",
       "subtitle": "Leabharlann lárnach do thaifeadtaí glaonna: scag, íoslódáil, easpórtáil",
       "loading": "Á luchtú...",
       "range": "Tréimhse",
@@ -1149,7 +1115,6 @@
       "transcriptProcessing": "Á phróiseáil"
     },
     "gdprAudit": {
-      "title": "Iniúchadh GDPR",
       "subtitle": "Logleabhar gníomhartha príobháideachais ar shonraí pearsanta: scriosadh, toiliú, easpórtálacha",
       "loading": "Á luchtú...",
       "range": "Tréimhse",
@@ -1172,7 +1137,6 @@
       "noResults": "Níl aon iontráil iniúchta sa tréimhse roghnaithe."
     },
     "moderators": {
-      "title": "Modhnóirí",
       "subtitle": "Aisghabh, cóipeáil agus athghin nascanna draíochta na modhnóirí",
       "searchPlaceholder": "Cuardaigh de réir slug, ainm modhnóra nó ríomhphoist…",
       "searchHelp": "Tá comhartha uathúil sa nasc draíochta: roinn é leis an modhnóir ainmnithe amháin.",
@@ -1191,7 +1155,6 @@
       "noResults": "Níor aimsíodh aon imeacht."
     },
     "registrations": {
-      "title": "Cláruithe",
       "subtitle": "Gach duine atá cláraithe le himeachtaí — cuardaigh, scag agus easpórtáil",
       "loading": "Á luchtú...",
       "range": "Tréimhse",
@@ -1525,18 +1488,6 @@
       "title": "Socruithe an tsuímh",
       "subtitle": "Cumraigh cuma agus iompar an ardáin le haghaidh athúsáide RA",
       "saving": "Ag sábháil...",
-      "sections": {
-        "languagesTitle": "Bainistíocht teangacha",
-        "languagesDescription": "Cumasaigh nó díchumasaigh na teangacha AE atá ar fáil d'úsáideoirí, roghnaigh an teanga réamhshocraithe agus saincheap na haistriúcháin.",
-        "gdprTemplatesTitle": "Teimpléid GDPR",
-        "gdprTemplatesDescription": "Cruthaigh fógraí príobháideachta in-athúsáidte is féidir a nascadh le himeachtaí ar bith, agus roghnaigh an ceann réamhshocraithe do imeachtaí nua.",
-        "emailTemplatesTitle": "Teimpléid ríomhphoist",
-        "emailTemplatesDescription": "Saincheap ábhar, cinnteidil agus téacs na ríomhphost deimhnithe agus meabhrúcháin. Fág folamh chun na téacsanna réamhshocraithe a úsáid.",
-        "tagsTitle": "Bainistíocht clibeanna",
-        "tagsDescription": "Cruthaigh agus cuir in eagar na clibeanna a úsáidtear chun imeachtaí a scagadh",
-        "glossaryTitle": "Gluais",
-        "glossaryDescription": "Acrainmneacha agus téarmaí teicniúla do thrascríbhinní, d’aistriúcháin agus do dhubáil"
-      },
       "saved": "Socruithe sábháilte go rathúil",
       "tabs": {
         "branding": "Brandáil",
@@ -1869,7 +1820,6 @@
       "invalidRRule": "Riail neamhbhailí"
     },
     "templates": {
-      "title": "Teimpléid imeachtaí",
       "subtitle": "Bainistigh teimpléid réamhshocraithe chun imeachtaí a chruthú go tapa",
       "create": "Teimpléad nua",
       "deleteConfirm": "An bhfuil sibh cinnte gur mian libh an teimpléad seo a scriosadh?",
@@ -1966,7 +1916,6 @@
       "errorGeneric": "Tharla earráid. Bain triail eile as."
     },
     "gdprTemplates": {
-      "title": "Teimpléid GDPR",
       "subtitle": "Cruthaigh agus bainistigh fógraí príobháideachais in-athúsáidte ar fud imeachtaí. Tá teimpléad atá marcáilte mar réamhshocrú réamhroghnaithe ar imeachtaí nua.",
       "newTemplate": "Teimpléad nua",
       "emptyState": "Níor cruthaíodh teimpléid go fóill. Cruthaigh an chéad cheann chun an téacs príobháideachais céanna a athúsáid ar imeachtaí iolracha.",
@@ -1992,7 +1941,6 @@
       "deleteTitle": "Scrios an teimpléad"
     },
     "emailTemplates": {
-      "title": "Teimpléid ríomhphoist",
       "subtitle": "Saincheap ábhar, cinnteidil agus téacs na ríomhphost idirbheartaíochta. Úsáidtear na téacsanna réamhshocraithe ionsuite i réimsí folmha.",
       "overridden": "Saincheaptha",
       "usingDefault": "Réamhshocraithe",
@@ -2031,7 +1979,6 @@
       }
     },
     "languages": {
-      "title": "Bainistíocht teangacha",
       "subtitle": "Cumraigh na teangacha atá ar fáil agus saincheap aistriúcháin",
       "defaultLocaleTitle": "Teanga réamhshocraithe",
       "defaultLocaleDescription": "Úsáidtear an teanga réamhshocraithe mar chúltaca nuair nach bhfuil aistriúchán ar fáil agus mar phríomhtheanga an tsuímh.",
@@ -2057,7 +2004,6 @@
       "addOverride": "Cuir leis"
     },
     "infrastructure": {
-      "title": "Bonneagar",
       "subtitle": "Stádas na gcomhpháirteanna agus cumraíocht an chomhshaoil",
       "deploymentMode": "Mód imlonnaithe",
       "version": "Leagan",
@@ -2120,7 +2066,6 @@
       }
     },
     "instantCalls": {
-      "title": "Glaonna tapa",
       "subtitle": "Liosta de na físghlaonna láithreacha",
       "total": "iomlán",
       "noCalls": "Níor déanadh aon ghlao tapa.",
@@ -2182,7 +2127,6 @@
       "deleteTitle": "Scrios an seisiún"
     },
     "monitoring": {
-      "title": "Monatóireacht",
       "subtitle": "Real-time infrastructure and performance monitoring dashboard",
       "loading": "Méadracht á luchtú...",
       "prometheusUnavailable": "Prometheus is not configured. Set the PROMETHEUS_URL environment variable to enable advanced monitoring.",
@@ -2308,9 +2252,7 @@
       "registeredCount": "{count, plural, =0 {Aon chlárúchán} one {1 chlárúchán} other {# clárúchán}}"
     },
     "tags": {
-      "title": "Bainistiú clibeanna",
       "subtitle": "Cruthaigh, cuir in eagar agus scrios na clibeanna a úsáidtear chun imeachtaí poiblí a aicmiú agus a scagadh.",
-      "backToSettings": "Socruithe",
       "addTag": "Clib nua",
       "editTag": "Cuir clib in eagar",
       "columnColor": "Dath",
@@ -2426,7 +2368,6 @@
       }
     },
     "rubrica": {
-      "title": "Leabhar seoltaí",
       "subtitle": "Daoine a thug toiliú a gcur leis an leabhar seoltaí (airteagal 6.1.a GDPR). Nuashonraítear faisnéis phróifíle go huathoibríoch ag gach athchlárúchán.",
       "searchLabel": "Cuardaigh de réir ainm nó eagraíochta",
       "orgTypeLabel": "Cineál eagraíochta",
@@ -2519,7 +2460,6 @@
       "privacyNote": "Tá na staitisticí de réir duine bréagainmnithe mar réamhshocrú. Coinnítear comhiomláin gan ainm in achoimre an imeachta; scriostar na sraitheanna amha nuair a rachaidh an tréimhse choinneála in éag."
     },
     "postprod": {
-      "title": "Píblíne iarléirithe AI",
       "subtitle": "Tras-scríbhinní, achoimrí agus aistriúcháin a chruthaigh an phíblíne AI sa bhraisle. Mapáil na cainteoirí, athrith nó cealaigh jabanna.",
       "filterStatus": "Stádas",
       "all": "Uile",
@@ -2603,7 +2543,6 @@
       "archiveGenerateOk": "Tosaíodh cruthú na cartlainne.",
       "archiveGenerateErr": "Theip ar chruthú na cartlainne (HTTP {code}).",
       "archiveTrackFallback": "Rannpháirtí",
-      "manageBackToList": "Na taifeadtaí go léir",
       "manageDuration": "Fad",
       "manageSource": "Teanga fhoinseach",
       "manageOpenPublic": "Leathanach poiblí",
@@ -2768,11 +2707,9 @@
       "originalUncertainHint": "D'fhéadfadh ceartúcháin a rinneadh sula raibh an fheidhm seo ann a bheith sa téacs caomhnaithe cheana féin: ní féidir a chruthú gurb é an téacs a tháirg an tras-scríobh uathoibríoch é"
     },
     "questionnairesPage": {
-      "title": "Ceistneoirí",
       "subtitle": "Teimpléid in-athúsáidte ceisteanna do cheistneoirí réamhchlárúcháin agus iar-imeachta."
     },
     "questionnaireResponses": {
-      "title": "Freagraí ceistneoirí",
       "subtitle": "Comhiomláin de réir ceiste, inscagtha de réir imeachta, céime agus raoin dáta."
     },
     "eventQuestionnaires": {
@@ -2822,11 +2759,8 @@
       "downloadFailed": "Theip ar an íoslódáil: bain triail eile as."
     },
     "glossary": {
-      "title": "Gluais",
       "subtitle": "Acrainmneacha, ainmneacha agus téarmaí teicniúla don iarléiriúchán le hintleacht shaorga: conas a scríobhtar iad sna trascríbhinní, conas a aistrítear iad agus conas a fhuaimnítear iad sa dubáil. Baineann siad le gach imeacht; is féidir le gach imeacht a chuid féin a chur leo.",
       "organizerNote": "Is féidir libh téarmaí a chur leis do gach imeacht agus na cinn a chuir sibh féin leis a chur in eagar; bainistíonn an riarachán an chuid eile.",
-      "backToSettings": "Ar ais chuig na socruithe",
-      "backToEvents": "Ar ais chuig na himeachtaí",
       "eventTitle": "Téarmaí agus acrainmneacha an imeachta",
       "eventIntro": "Cuirtear iad le gluais an ásc don trascríbhinn, do na haistriúcháin agus don dubáil ar an imeacht seo. Má tá téarma san ásc cheana, cuirtear an ceann anseo ina áit.",
       "openInstance": "Cuir le gluais an ásc, a bhaineann le gach imeacht",
@@ -3761,7 +3695,6 @@
     "reactionSent": "Imoibriúchán seolta!"
   },
   "calendar": {
-    "title": "Féilire imeachtaí",
     "subtitle": "Féach ar na himeachtaí go léir le himeacht aimsire",
     "publicTitle": "Féilire imeachtaí",
     "publicSubtitle": "Aimsigh imeachtaí atá le teacht",
@@ -4240,7 +4173,6 @@
     "hintJoystick": "Tarraing chun bogadh"
   },
   "feedbackAdmin": {
-    "title": "Torthaí an aiseolais",
     "totalVotes": "freagraí",
     "noFeedback": "Níor fuarthas aon aiseolas",
     "comments": "Tráchtanna",

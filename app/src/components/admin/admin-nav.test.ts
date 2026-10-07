@@ -1,29 +1,22 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 
-import { describe, expect, it, vi } from 'vitest';
-
-// Il modulo del menu e' un componente: qui servono solo le sue costanti.
-vi.mock('@/i18n/navigation', () => ({ Link: () => null, usePathname: () => '/admin' }));
-vi.mock('@/components/admin/admin-logout-button', () => ({ default: () => null }));
+import { describe, expect, it } from 'vitest';
 
 import {
   LINK_INTESTAZIONE,
   LINK_PIEDE_EVENTI,
 } from '@/components/layout/public-links';
+import messages from '@/i18n/messages/it.json';
 import { routing } from '@/i18n/routing';
 
 import {
-  EVENTS_SUB_NAV,
-  MAIN_SECTIONS,
-  MONITORING_SUB_NAV,
-  PUBLICATIONS_SUB_NAV,
-  QUESTIONNAIRES_SUB_NAV,
-  RECORDINGS_SUB_NAV,
-  REGISTRATIONS_SUB_NAV,
-  SETTINGS_SUB_NAV,
-  STAFF_SUB_NAV,
-} from './admin-nav';
+  SEZIONI,
+  VOCI_ORGANIZZATORE,
+  catena,
+  nomePagina,
+  sezioniPerRuolo,
+} from './admin-nav-model';
 
 /**
  * Raggiungibilita': ogni pagina ha un link che ci porta. Il test diventa rosso
@@ -31,23 +24,11 @@ import {
  * una pagina esistente.
  */
 
-const RIGHE_ADMIN = {
-  MAIN_SECTIONS,
-  EVENTS_SUB_NAV,
-  REGISTRATIONS_SUB_NAV,
-  STAFF_SUB_NAV,
-  RECORDINGS_SUB_NAV,
-  PUBLICATIONS_SUB_NAV,
-  MONITORING_SUB_NAV,
-  SETTINGS_SUB_NAV,
-  QUESTIONNAIRES_SUB_NAV,
-};
-
 const percorsiStatici = Object.keys(routing.pathnames).filter((p) => !p.includes('['));
 
 /** Pagine admin raggiunte da altro che il menu, con il perche'. */
 const ESENZIONI_ADMIN: Record<string, string> = {
-  '/admin': 'home dello staff: link «Amministrazione» nell’intestazione',
+  '/admin': 'ingresso: rimanda all’elenco degli eventi',
   '/admin/login': 'accesso: ci porta il middleware',
   '/admin/access': 'atterraggio del link monouso arrivato per email',
 };
@@ -60,26 +41,65 @@ const ESENZIONI_PUBBLICHE: Record<string, string> = {
 
 describe('menu dello staff', () => {
   it('ogni pagina statica /admin sta nel menu o fra le esenzioni', () => {
-    const nelMenu = new Set(Object.values(RIGHE_ADMIN).flat().map((v) => v.href as string));
+    const nelMenu = new Set(SEZIONI.flatMap((s) => [s.href, ...s.voci.map((v) => v.href)]) as string[]);
     const orfane = percorsiStatici
       .filter((p) => p === '/admin' || p.startsWith('/admin/'))
       .filter((p) => !nelMenu.has(p) && !(p in ESENZIONI_ADMIN));
     expect(orfane).toEqual([]);
   });
 
-  it('«Staff e accessi» è una voce di primo livello e porta alle utenze', () => {
-    const voce = MAIN_SECTIONS.find((v) => v.labelKey === 'staffAccess');
-    expect(voce?.href).toBe('/admin/organizers');
-    expect(STAFF_SUB_NAV.map((v) => v.href)).toEqual(['/admin/organizers', '/admin/moderators']);
-    // Il sotto-menu delle persone non porta piu' alle chiavi dello staff.
-    const persone = REGISTRATIONS_SUB_NAV.map((v) => v.href as string);
-    expect(persone).not.toContain('/admin/organizers');
-    expect(persone).not.toContain('/admin/moderators');
+  it('ogni sezione porta a una delle sue voci, e ogni voce sta sotto una sua radice', () => {
+    for (const s of SEZIONI) {
+      expect(s.voci.map((v) => v.href)).toContain(s.href);
+      for (const v of s.voci) {
+        expect(s.radici.some((r) => v.href === r || v.href.startsWith(`${r}/`))).toBe(true);
+      }
+    }
   });
 
-  it.each(Object.entries(RIGHE_ADMIN))('in %s nessuna icona si ripete', (_nome, riga) => {
-    const icone = riga.map((v) => v.icon);
-    expect(new Set(icone).size).toBe(icone.length);
+  it('nessuna icona si ripete fra intestazione, sezioni e voci di una stessa sezione', () => {
+    // L'intestazione mostra i link pubblici e «Amministrazione».
+    const intestazione = [...LINK_INTESTAZIONE.map((l) => l.icon), 'it-tool'].filter(Boolean);
+    const sezioni = SEZIONI.map((s) => s.icon);
+    expect(new Set(sezioni).size).toBe(sezioni.length);
+    for (const s of SEZIONI) {
+      const visibili = [...intestazione, ...sezioni, ...s.voci.map((v) => v.icon)];
+      expect(new Set(visibili).size, s.labelKey).toBe(visibili.length);
+    }
+  });
+
+  it('chi organizza vede eventi e video, con il glossario', () => {
+    const sezioni = sezioniPerRuolo('organizer');
+    expect(sezioni.map((s) => s.labelKey)).toEqual(['events', 'video']);
+    expect(sezioni.flatMap((s) => s.voci.map((v) => v.href))).toEqual([...VOCI_ORGANIZZATORE]);
+  });
+
+  it('le briciole seguono il menu, anche per le pagine fuori dalla radice della sezione', () => {
+    expect(catena('/admin/events').map((a) => a.labelKey)).toEqual(['events']);
+    expect(catena('/admin/calendar').map((a) => a.labelKey)).toEqual(['events', 'calendar']);
+    expect(catena('/admin/events/[id]/edit').map((a) => a.labelKey)).toEqual([
+      'events',
+      'eventDetail',
+      'eventEdit',
+    ]);
+    expect(catena('/admin/rubrica/[id]').map((a) => a.labelKey)).toEqual([
+      'people',
+      'rubrica',
+      'rubricaDetail',
+    ]);
+    expect(catena('/admin/glossary', 'organizer').map((a) => a.labelKey)).toEqual(['video', 'glossary']);
+    expect(catena('/admin/publications/new').map((a) => a.labelKey)).toEqual(['video', 'publicationsNew']);
+    // Chi organizza non ha la sezione delle impostazioni.
+    expect(catena('/admin/settings/tags', 'organizer')).toEqual([]);
+    expect(nomePagina('/admin/settings')).toBe('settingsGeneral');
+    expect(nomePagina('/admin/events')).toBe('eventsList');
+    expect(nomePagina('/admin/events/[id]')).toBe('eventDetail');
+  });
+
+  it('ogni etichetta del menu esiste fra i messaggi', () => {
+    const nav = (messages as { admin: { nav: Record<string, string> } }).admin.nav;
+    const chiavi = SEZIONI.flatMap((s) => [s.labelKey, ...s.voci.map((v) => v.labelKey)]);
+    for (const k of chiavi) expect(nav[k], k).toBeTruthy();
   });
 });
 

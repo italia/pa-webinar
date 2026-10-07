@@ -5,290 +5,78 @@ import { useTranslations } from 'next-intl';
 import AdminLogoutButton from '@/components/admin/admin-logout-button';
 import { Icon } from '@/components/ui/icon';
 import { Link, usePathname } from '@/i18n/navigation';
-import type { PercorsoStatico } from '@/i18n/percorsi';
 
-export interface NavItem {
-  href: PercorsoStatico;
-  icon: string;
-  labelKey: string;
-  exact?: boolean;
-}
+import { sezioneDi, sezioniPerRuolo, voceAttiva, type StaffRole } from './admin-nav-model';
 
 /**
- * Le voci che l'organizzatore vede (ADR-014). Un elenco di ammessi, non di
- * esclusi: una sezione aggiunta domani nasce riservata all'amministrazione
- * finche' qualcuno non decide il contrario — com'e' per le pagine, che senza
- * guardia esplicita mostrano «accesso non consentito».
+ * Il menu dell'area di amministrazione: le sezioni in alto, le voci della
+ * sezione corrente sotto. La struttura e' in admin-nav-model, la stessa delle
+ * briciole e dei titoli delle pagine.
  */
-const VOCI_ORGANIZZATORE: ReadonlySet<PercorsoStatico> = new Set<PercorsoStatico>([
-  '/admin/events',
-  '/admin/events/new',
-  '/admin/events/calls',
-  '/admin/calendar',
-  '/admin/recordings',
-  '/admin/postprod',
-  // Il glossario comune della post-produzione: chi organizza lo arricchisce.
-  '/admin/settings/glossary',
-]);
-
-export const MAIN_SECTIONS: NavItem[] = [
-  { href: '/admin/events', icon: 'it-calendar', labelKey: 'events' },
-  // La sezione raccoglie chi partecipa: iscrizioni, rubrica, registro GDPR.
-  { href: '/admin/registrations', icon: 'it-user', labelKey: 'people' },
-  { href: '/admin/questionnaires', icon: 'it-help-circle', labelKey: 'questionnaires' },
-  { href: '/admin/publications', icon: 'it-files', labelKey: 'publications' },
-  { href: '/admin/recordings', icon: 'it-video', labelKey: 'recordings' },
-  { href: '/admin/monitoring', icon: 'it-presentation', labelKey: 'monitoring' },
-  // Chi lavora sulla piattaforma e con quali chiavi: utenze dello staff e
-  // link dei moderatori.
-  { href: '/admin/organizers', icon: 'it-lock', labelKey: 'staffAccess' },
-  { href: '/admin/settings', icon: 'it-settings', labelKey: 'settings' },
-];
-
-export const EVENTS_SUB_NAV: NavItem[] = [
-  { href: '/admin/events', icon: 'it-list', labelKey: 'eventsList', exact: true },
-  { href: '/admin/events/new', icon: 'it-plus', labelKey: 'newEvent' },
-  { href: '/admin/events/calls', icon: 'it-video', labelKey: 'instantCalls' },
-  { href: '/admin/calendar', icon: 'it-calendar', labelKey: 'calendar' },
-  { href: '/admin/events/template', icon: 'it-copy', labelKey: 'templates' },
-  { href: '/admin/events/statistics', icon: 'it-chart-line', labelKey: 'analytics' },
-];
-
-// Registrations area groups cross-event attendee management.
-export const REGISTRATIONS_SUB_NAV: NavItem[] = [
-  {
-    href: '/admin/registrations',
-    icon: 'it-user',
-    labelKey: 'registrationsList',
-    exact: true,
-  },
-  { href: '/admin/rubrica', icon: 'it-pa', labelKey: 'rubrica' },
-  { href: '/admin/gdpr-audit', icon: 'it-files', labelKey: 'gdprAudit' },
-];
-
-// Staff e accessi: le utenze nominali (ADR-014/015) e i link dei moderatori.
-export const STAFF_SUB_NAV: NavItem[] = [
-  { href: '/admin/organizers', icon: 'it-user', labelKey: 'staffAccounts', exact: true },
-  { href: '/admin/moderators', icon: 'it-key', labelKey: 'moderatorLinks' },
-];
-
-// Recordings / instant calls / live sessions — everything video-output.
-export const RECORDINGS_SUB_NAV: NavItem[] = [
-  {
-    href: '/admin/recordings',
-    icon: 'it-video',
-    labelKey: 'recordingsList',
-    exact: true,
-  },
-  // Gestione post-produzione AI delle registrazioni (trascrizione,
-  // traduzione, speaker, editor, re-run). Vive sotto "Registrazioni"
-  // perché opera SULLE registrazioni — non è configurazione (quella sta
-  // in Impostazioni → Pipeline AI).
-  { href: '/admin/postprod', icon: 'it-comment', labelKey: 'recordingsPostprod' },
-];
-
-// Publications area: unified library editing.
-export const PUBLICATIONS_SUB_NAV: NavItem[] = [
-  {
-    href: '/admin/publications',
-    icon: 'it-files',
-    labelKey: 'publicationsList',
-    exact: true,
-  },
-  { href: '/admin/publications/new', icon: 'it-plus', labelKey: 'publicationsNew' },
-];
-
-// Monitoring groups together all the observability surfaces.
-export const MONITORING_SUB_NAV: NavItem[] = [
-  {
-    href: '/admin/monitoring',
-    icon: 'it-presentation',
-    labelKey: 'monitoringDashboard',
-    exact: true,
-  },
-  { href: '/admin/infrastructure', icon: 'it-piattaforme', labelKey: 'infrastructure' },
-];
-
-export const SETTINGS_SUB_NAV: NavItem[] = [
-  {
-    href: '/admin/settings',
-    icon: 'it-settings',
-    labelKey: 'settingsGeneral',
-    exact: true,
-  },
-  {
-    href: '/admin/settings/languages',
-    icon: 'it-hearing',
-    labelKey: 'settingsLanguages',
-  },
-  {
-    href: '/admin/settings/gdpr-templates',
-    icon: 'it-lock',
-    labelKey: 'settingsGdprTemplates',
-  },
-  {
-    href: '/admin/settings/email-templates',
-    icon: 'it-mail',
-    labelKey: 'settingsEmailTemplates',
-  },
-  { href: '/admin/settings/tags', icon: 'it-bookmark', labelKey: 'settingsTags' },
-  { href: '/admin/settings/glossary', icon: 'it-file-txt', labelKey: 'settingsGlossary' },
-];
-
-export const QUESTIONNAIRES_SUB_NAV: NavItem[] = [
-  {
-    href: '/admin/questionnaires',
-    icon: 'it-copy',
-    labelKey: 'questionnairesLibrary',
-    exact: true,
-  },
-  {
-    href: '/admin/questionnaires/responses',
-    icon: 'it-chart-line',
-    labelKey: 'questionnairesResponses',
-  },
-  {
-    href: '/admin/questionnaires/feedback',
-    icon: 'it-star-outline',
-    labelKey: 'feedbackDashboard',
-  },
-];
-
-export default function AdminNav({ role = 'admin' }: { role?: 'admin' | 'organizer' }) {
+export default function AdminNav({ role = 'admin' }: { role?: StaffRole }) {
   const t = useTranslations('admin.nav');
-  const pathname = usePathname();
-  const visibile = (item: NavItem) => role === 'admin' || VOCI_ORGANIZZATORE.has(item.href);
-
   // `usePathname` restituisce il percorso INTERNO — senza prefisso di lingua
   // e con i segnaposto (`/admin/events/[id]`) — quindi le sezioni si
   // riconoscono una volta sola, in qualunque lingua sia l'indirizzo.
-  const sotto = (...radici: string[]) =>
-    radici.some((r) => pathname === r || pathname.startsWith(`${r}/`));
-  const inEvents = sotto('/admin/events', '/admin/calendar');
-  // Monitoraggio e infrastruttura sono viste operative, non configurazione:
-  // hanno una sezione loro.
-  const inMonitoring = sotto('/admin/monitoring', '/admin/infrastructure');
-  const inSettings = sotto('/admin/settings');
-  // Le persone: iscrizioni, rubrica, registro GDPR.
-  const inRegistrations = sotto('/admin/registrations', '/admin/rubrica', '/admin/gdpr-audit');
-  const inStaff = sotto('/admin/organizers', '/admin/moderators');
-  const inRecordings = sotto('/admin/recordings', '/admin/postprod');
-  const inPublications = sotto('/admin/publications');
-  const inQuestionnaires = sotto('/admin/questionnaires');
-
-  function matchesPath(href: string, exact?: boolean): boolean {
-    return exact ? pathname === href : sotto(href);
-  }
-
-  function isActive(item: NavItem): boolean {
-    if (item.exact) return matchesPath(item.href, true);
-    if (item.href === '/admin/events' && !item.exact) return inEvents;
-    if (item.href === '/admin/monitoring') return inMonitoring;
-    if (item.href === '/admin/settings') return inSettings;
-    if (item.href === '/admin/registrations') return inRegistrations;
-    if (item.href === '/admin/organizers') return inStaff;
-    if (item.href === '/admin/recordings') return inRecordings;
-    if (item.href === '/admin/publications') return inPublications;
-    if (item.href === '/admin/questionnaires') return inQuestionnaires;
-    return matchesPath(item.href);
-  }
-
-  function isSubActive(item: NavItem): boolean {
-    if (item.exact) return matchesPath(item.href, true);
-    return matchesPath(item.href);
-  }
-
-  // La prima sezione in cui ci si trova decide il sotto-menu.
-  const sezioni: Array<[boolean, NavItem[]]> = [
-    [inEvents, EVENTS_SUB_NAV],
-    [inRegistrations, REGISTRATIONS_SUB_NAV],
-    [inStaff, STAFF_SUB_NAV],
-    [inRecordings, RECORDINGS_SUB_NAV],
-    [inPublications, PUBLICATIONS_SUB_NAV],
-    [inMonitoring, MONITORING_SUB_NAV],
-    [inSettings, SETTINGS_SUB_NAV],
-    [inQuestionnaires, QUESTIONNAIRES_SUB_NAV],
-  ];
-  const subNav = sezioni.find(([dentro]) => dentro)?.[1] ?? null;
+  const pathname = usePathname();
+  const sezioni = sezioniPerRuolo(role);
+  const corrente = sezioneDi(pathname, role);
 
   return (
     <div>
-      <nav
-        style={{ backgroundColor: '#f8f9fa', borderBottom: '1px solid #d9dadb' }}
-        aria-label={t('ariaLabel')}
-      >
-        <div className="container">
-          <ul className="nav" style={{ gap: 0 }}>
-            {MAIN_SECTIONS.filter(visibile).map((item) => {
-              const active = isActive(item);
+      {/* Il «vai al contenuto» del sito porta al menu: questo salta anche lui. */}
+      <a className="visually-hidden-focusable admin-skip" href="#admin-content">
+        {t('skipToPage')}
+      </a>
+      <nav className="admin-nav" aria-label={t('ariaLabel')}>
+        <div className="container d-flex align-items-stretch">
+          <ul className="nav flex-nowrap admin-nav__list">
+            {sezioni.map((s) => {
+              const attiva = corrente?.href === s.href;
               return (
-                <li key={item.href} className="nav-item">
+                <li key={s.href} className="nav-item">
                   <Link
-                    href={item.href}
-                    className={`nav-link d-inline-flex align-items-center gap-2 px-3 py-3 ${
-                      active ? 'text-primary fw-semibold' : 'text-secondary'
-                    }`}
-                    style={{
-                      borderBottom: active
-                        ? '3px solid #0066CC'
-                        : '3px solid transparent',
-                      fontSize: '0.9rem',
-                      borderRadius: 0,
-                      marginBottom: '-1px',
-                    }}
-                    aria-current={active ? 'page' : undefined}
+                    href={s.href}
+                    className={`nav-link admin-nav__link${attiva ? ' admin-nav__link--active' : ''}`}
+                    // La sezione dice dove ci si trova; la pagina la indica
+                    // la voce del sotto-menu.
+                    aria-current={attiva ? 'location' : undefined}
                     // Sui telefoni l'etichetta e' nascosta (`d-none` la toglie
-                    // anche ai lettori di schermo): il nome del link lo porta
-                    // l'attributo, altrimenti resterebbe un'icona muta.
-                    aria-label={t(item.labelKey)}
+                    // anche ai lettori di schermo): il nome lo porta l'attributo.
+                    aria-label={t(s.labelKey)}
+                    title={t(s.labelKey)}
                   >
-                    <Icon icon={item.icon} size="sm" />
-                    <span className="d-none d-sm-inline">{t(item.labelKey)}</span>
+                    <Icon icon={s.icon} size="sm" />
+                    <span className="d-none d-xl-inline">{t(s.labelKey)}</span>
                   </Link>
                 </li>
               );
             })}
-            {/* L'uscita sta qui, su ogni pagina e in fondo alla barra: era
-                solo in due pagine, e accanto all'azione principale. */}
-            <li className="nav-item ms-auto d-flex align-items-center">
-              <AdminLogoutButton variant="nav" />
-            </li>
           </ul>
+          {/* L'uscita sta qui, su ogni pagina e in fondo alla barra. */}
+          <div className="ms-auto d-flex align-items-center ps-2">
+            <AdminLogoutButton variant="nav" />
+          </div>
         </div>
       </nav>
 
-      {subNav && (
-        <nav
-          style={{
-            backgroundColor: '#fff',
-            borderBottom: '1px solid #e8e8e8',
-          }}
-          aria-label={t('subNavAriaLabel')}
-        >
+      {corrente && corrente.voci.length > 1 && (
+        <nav className="admin-subnav" aria-label={t('subNavAriaLabel')}>
           <div className="container">
-            <ul className="nav" style={{ gap: 0 }}>
-              {subNav.filter(visibile).map((item) => {
-                const active = isSubActive(item);
+            <ul className="nav admin-nav__list">
+              {corrente.voci.map((v) => {
+                const attiva = voceAttiva(pathname, v);
                 return (
-                  <li key={item.href} className="nav-item">
+                  <li key={v.href} className="nav-item">
                     <Link
-                      href={item.href}
-                      className={`nav-link d-inline-flex align-items-center gap-2 px-3 py-2 ${
-                        active ? 'text-primary fw-semibold' : 'text-muted'
-                      }`}
-                      style={{
-                        borderBottom: active
-                          ? '2px solid #0066CC'
-                          : '2px solid transparent',
-                        fontSize: '0.85rem',
-                        borderRadius: 0,
-                        marginBottom: '-1px',
-                      }}
-                      aria-current={active ? 'page' : undefined}
-                      aria-label={t(item.labelKey)}
+                      href={v.href}
+                      className={`nav-link admin-subnav__link${attiva ? ' admin-nav__link--active' : ''}`}
+                      aria-current={attiva ? 'page' : undefined}
+                      aria-label={t(v.labelKey)}
+                      title={t(v.labelKey)}
                     >
-                      <Icon icon={item.icon} size="xs" />
-                      <span className="d-none d-sm-inline">{t(item.labelKey)}</span>
+                      <Icon icon={v.icon} size="xs" />
+                      <span className="d-none d-sm-inline">{t(v.labelKey)}</span>
                     </Link>
                   </li>
                 );

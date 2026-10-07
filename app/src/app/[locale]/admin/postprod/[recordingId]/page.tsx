@@ -7,6 +7,7 @@ import AccessDenied from '@/components/admin/access-denied';
 import { prisma } from '@/lib/db';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import RecordingManageClient from '@/components/admin/recording-manage-client';
+import { adminPageMetadata } from '@/components/admin/admin-page-title';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,6 +20,10 @@ interface PageProps {
  * diarization), sintesi AI e traduzioni in un unico posto. Linkata da
  * lista registrazioni, dettaglio evento e dashboard postprod.
  */
+export function generateMetadata() {
+  return adminPageMetadata('/admin/postprod/[recordingId]');
+}
+
 export default async function RecordingManagePage({ params }: PageProps) {
   const locale = await getLocale();
   const session = await staffOLogin(locale);

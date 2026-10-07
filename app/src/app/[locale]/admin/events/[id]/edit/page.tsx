@@ -25,6 +25,8 @@ import {
   coerceMatrix,
   type PermissionMatrix,
 } from '@/lib/utils/permission-matrix';
+import AdminPageHeader from '@/components/admin/admin-page-header';
+import { eventPageMetadata } from '@/components/admin/admin-page-title';
 
 interface PageProps {
   params: Promise<{ id: string; locale: string }>;
@@ -87,10 +89,22 @@ function adhocFromDb(
   };
 }
 
+export async function generateMetadata({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ token?: string | string[] }>;
+}) {
+  const [{ id }, { token }] = await Promise.all([params, searchParams]);
+  return eventPageMetadata('/admin/events/[id]/edit', id, { token, conToken: true });
+}
+
 export default async function EditEventPage({ params, searchParams }: PageProps) {
   const { id, locale } = await params;
   const { token } = await searchParams;
   const t = await getTranslations({ locale, namespace: 'admin' });
+  const tNav = await getTranslations('admin.nav');
 
   if (!UUID_RE.test(id)) notFound();
 
@@ -258,19 +272,21 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
 
   return (
     <div className="container py-4">
-      <div className="mb-2">
-        <Link
-          href={percorso(eventAdminPath(id, { viaToken: staffCanManage ? null : token }))}
-          className="text-decoration-none d-inline-flex align-items-center text-primary"
-          style={{ fontSize: '0.9rem' }}
-        >
-          ← {t('title')}
-        </Link>
-      </div>
+      {/* Lo staff torna indietro con le briciole; chi ha solo il link del
+          moderatore non le ha, e torna alla pagina dell'evento da qui. */}
+      {!staffCanManage && (
+        <div className="mb-2">
+          <Link
+            href={percorso(eventAdminPath(id, { viaToken: token }))}
+            className="text-decoration-none d-inline-flex align-items-center text-primary"
+            style={{ fontSize: '0.9rem' }}
+          >
+            ← {tNav('eventDetail')}
+          </Link>
+        </div>
+      )}
 
-      <h1 className="fw-bold mb-4" style={{ color: 'var(--app-text)' }}>
-        {t('editEvent')}
-      </h1>
+      <AdminPageHeader title={t('editEvent')} />
 
       <EventWizard
         mode="edit"

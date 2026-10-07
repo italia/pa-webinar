@@ -1,4 +1,4 @@
-import { getLocale, getTranslations } from 'next-intl/server';
+import { getLocale } from 'next-intl/server';
 
 import { staffOLogin } from '@/lib/auth/staff-page';
 import { tryDecryptPII } from '@/lib/crypto/pii';
@@ -9,9 +9,15 @@ import { jvbMaxReplicasFromEnv } from '@/lib/jvb-sizing';
 import { getSettings } from '@/lib/settings';
 import CreateEventWithTemplate from '@/components/admin/create-event-with-template';
 import type { PermissionMatrix } from '@/lib/utils/permission-matrix';
+import AdminPageHeader from '@/components/admin/admin-page-header';
+import { adminPageMetadata, adminPageTitle } from '@/components/admin/admin-page-title';
 
 interface CreateEventPageProps {
   searchParams: Promise<{ template?: string; instant?: string }>;
+}
+
+export function generateMetadata() {
+  return adminPageMetadata('/admin/events/new');
 }
 
 export default async function CreateEventPage({
@@ -19,7 +25,6 @@ export default async function CreateEventPage({
 }: CreateEventPageProps) {
   // Creare eventi e' il mestiere dell'organizzatore (ADR-014).
   const session = await staffOLogin(await getLocale());
-  const t = await getTranslations('admin');
   const { template: templateId, instant } = await searchParams;
 
   const [templates, siteSettings, tags, gdprTemplates] = await Promise.all([
@@ -105,9 +110,7 @@ export default async function CreateEventPage({
 
   return (
     <div className="container py-5">
-      <h1 className="fw-bold mb-3" style={{ color: 'var(--app-text)' }}>
-        {t('createEvent')}
-      </h1>
+      <AdminPageHeader title={await adminPageTitle('/admin/events/new')} />
 
       <CreateEventWithTemplate
         initialInstant={instant === '1'}

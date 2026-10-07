@@ -6,6 +6,8 @@ import { prisma } from '@/lib/db';
 import { getSettings } from '@/lib/settings';
 import { Link } from '@/i18n/navigation';
 import AdminDashboardClient from '@/components/admin/admin-dashboard-client';
+import AdminPageHeader from '@/components/admin/admin-page-header';
+import { adminPageMetadata, adminPageTitle } from '@/components/admin/admin-page-title';
 
 interface EventsListPageProps {
   searchParams: Promise<{ token?: string }>;
@@ -68,6 +70,10 @@ async function loadAvailableTags() {
   }));
 }
 
+export function generateMetadata() {
+  return adminPageMetadata('/admin/events');
+}
+
 export default async function EventsListPage({
   searchParams,
 }: EventsListPageProps) {
@@ -83,17 +89,12 @@ export default async function EventsListPage({
 
   return (
     <div className="container py-5">
-      <div className="d-flex justify-content-between align-items-start mb-5 flex-wrap gap-3">
-        <div>
-          {/* Niente sottotitolo «Pannello di amministrazione»: il menu sopra
-              dice gia' dove si e'. */}
-          <h1 className="mb-1 fw-bold" style={{ color: 'var(--app-text)' }}>
-            {t('title')}
-          </h1>
-        </div>
-        {/* Le due creazioni, una accanto all'altra: un evento programmato e una
-            chiamata rapida, che porta dritta al suo modulo. */}
-        <div className="d-flex gap-2 align-items-center flex-wrap flex-shrink-0">
+      <AdminPageHeader
+        title={await adminPageTitle('/admin/events')}
+        // Le due creazioni, una accanto all'altra: un evento programmato e una
+        // chiamata rapida, che porta dritta al suo modulo.
+        actions={
+          <>
           <Link
             href="/admin/events/new"
             className="btn btn-primary d-inline-flex align-items-center gap-2"
@@ -108,8 +109,9 @@ export default async function EventsListPage({
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M15 10l4.55-2.28A1 1 0 0 1 21 8.62v6.76a1 1 0 0 1-1.45.9L15 14M5 18h8a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2z"/></svg>
             {t('createInstantCall')}
           </Link>
-        </div>
-      </div>
+          </>
+        }
+      />
 
       {events.length === 0 ? (
         <div

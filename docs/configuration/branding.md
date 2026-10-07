@@ -212,7 +212,7 @@ pick up a corrected title or poster.
 Any interface string can be reworded per language without touching the catalogs. Use this for
 organization-specific terminology, or to rewrite the landing copy.
 
-- **Where.** **Site settings** → **Language management** (`/en/admin/settings/languages`) →
+- **Where.** **Settings** → **Languages** (`/en/admin/settings/languages`) →
   **Custom translations**. Pick a language, then enter a **Translation key** in dot notation and its
   **Value**. Keys are the paths in `app/src/i18n/messages/<locale>.json`, for example
   `home.hero.title`. An override changes one language only.

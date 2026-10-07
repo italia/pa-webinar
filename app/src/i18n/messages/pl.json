@@ -615,7 +615,6 @@
       "newLink": "Poproś o nowy link"
     },
     "organizers": {
-      "title": "Konta personelu",
       "intro": "Osoby pracujące w panelu administracyjnym pod własnym nazwiskiem. Organizatorzy tworzą własne wydarzenia i nimi zarządzają; administratorzy zarządzają całą instancją. Logują się linkiem wysłanym na swój e-mail, bez hasła. Klucz instancji pozostaje na sytuacje awaryjne i do automatyzacji.",
       "newTitle": "Dodaj konto",
       "name": "Imię i nazwisko",
@@ -929,82 +928,51 @@
       "toFixField": "Pole {n}"
     },
     "nav": {
-      "events": "Zarządzanie wydarzeniami",
-      "registrations": "Rejestracje",
-      "recordings": "Wideo i sesje",
-      "settings": "Ustawienia systemu",
-      "eventsList": "Lista wydarzeń",
+      "events": "Wydarzenia",
+      "settings": "Ustawienia",
+      "eventsList": "Wszystkie wydarzenia",
       "newEvent": "Nowe wydarzenie",
-      "calendar": "Kalendarz",
-      "templates": "Szablony",
+      "calendar": "Kalendarz wydarzeń",
+      "templates": "Szablony wydarzeń",
       "analytics": "Statystyki",
       "instantCalls": "Szybkie połączenia",
       "infrastructure": "Infrastruktura",
       "monitoring": "Monitorowanie",
-      "monitoringDashboard": "Pulpit",
+      "monitoringDashboard": "Stan usługi",
       "registrationsList": "Rejestracje",
-      "moderators": "Moderatorzy",
       "moderatorLinks": "Linki moderatorów",
-      "gdprAudit": "Audyt RODO",
-      "recordingsList": "Nagrania wideo",
-      "settingsGeneral": "Ogólne",
+      "gdprAudit": "Rejestr RODO",
+      "recordingsList": "Nagrania",
+      "settingsGeneral": "Ustawienia ogólne",
       "settingsLanguages": "Języki",
-      "settingsGdprTemplates": "Szablony RODO",
-      "admin": "Administracja",
-      "eventDetail": "Szczegóły wydarzenia",
-      "eventEdit": "Edytuj wydarzenie",
-      "publications": "Publikacje",
-      "publicationsList": "Wszystkie publikacje",
+      "settingsGdprTemplates": "Informacje o prywatności",
+      "eventDetail": "Wydarzenie",
+      "eventEdit": "Edycja",
+      "publicationsList": "Publikacje",
       "publicationsNew": "Nowa publikacja",
       "ariaLabel": "Nawigacja administracyjna",
       "subNavAriaLabel": "Nawigacja sekcji",
       "questionnaires": "Kwestionariusze",
-      "questionnairesLibrary": "Biblioteka szablonów",
-      "questionnairesResponses": "Odpowiedzi i statystyki",
+      "questionnairesLibrary": "Szablony kwestionariuszy",
+      "questionnairesResponses": "Odpowiedzi",
       "rubrica": "Książka adresowa",
-      "settingsEmailTemplates": "Szablony e-mail",
-      "settingsTags": "Zarządzanie tagami",
-      "settingsGlossary": "Glosariusz",
+      "settingsEmailTemplates": "Szablony e-maili",
+      "settingsTags": "Tagi",
       "eventMaterials": "Materiały",
       "eventQuestionnaires": "Kwestionariusze",
-      "rubricaList": "Lista",
-      "rubricaDetail": "Wpis",
-      "organizers": "Konta",
-      "staffAccess": "Personel i dostęp",
-      "staffAccounts": "Konta personelu",
+      "rubricaDetail": "Osoba",
+      "staffAccess": "Zespół i dostęp",
+      "staffAccounts": "Konta zespołu",
       "people": "Osoby",
       "postprodDetail": "Nagranie",
-      "recordingsPostprod": "Transkrypcje / AI",
-      "feedbackDashboard": "Feedback"
-    },
-    "landing": {
-      "title": "Panel administracyjny",
-      "subtitle": "Zarządzaj wydarzeniami i konfiguruj platformę",
-      "eventsTitle": "Zarządzanie wydarzeniami",
-      "eventsDescription": "Twórz, edytuj i zarządzaj wydarzeniami, szablonami i statystykami.",
-      "instantCallsTitle": "Szybkie połączenia",
-      "instantCallsDescription": "Utwórz publiczną rozmowę wideo bez planowania: link można udostępnić od razu.",
-      "instantCallsStat": "{count, plural, =0 {brak szybkich połączeń w ostatnich 30 dniach} one {1 szybkie połączenie w ostatnich 30 dniach} few {# szybkie połączenia w ostatnich 30 dniach} many {# szybkich połączeń w ostatnich 30 dniach} other {# szybkich połączeń w ostatnich 30 dniach}}",
-      "registrationsTitle": "Rejestracje",
-      "registrationsDescription": "Książka adresowa uczestników zarejestrowanych na wydarzenia: wyszukiwanie, filtry, eksport, moderatorzy i audyt RODO.",
-      "registrationsTotal": "{count, plural, =0 {brak zarejestrowanych osób} one {1 zarejestrowana osoba} few {# zarejestrowane osoby} many {# zarejestrowanych osób} other {# zarejestrowanych osób}}",
-      "today": "dziś",
-      "recordingsTitle": "Wideo i sesje",
-      "recordingsDescription": "Nagrania wideo z rozmów, zakończone sesje na żywo i zarchiwizowane szybkie połączenia. Pobieranie i zarządzanie.",
-      "recordingsStat": "{count, plural, =0 {brak nagrań wideo} one {1 dostępne nagranie wideo} few {# dostępne nagrania wideo} many {# dostępnych nagrań wideo} other {# dostępnych nagrań wideo}}",
-      "analyticsTitle": "Statystyki",
-      "analyticsDescription": "Przegląd metryk użytkowania: utworzone wydarzenia, uczestnicy, współczynnik konwersji, najpopularniejsze wydarzenia.",
-      "monitoringTitle": "Monitorowanie",
-      "monitoringDescription": "Pulpit techniczny z metrykami infrastruktury, wydajności, dostępności i jakości usługi.",
-      "templatesTitle": "Szablony wydarzeń",
-      "templatesDescription": "Modele wielokrotnego użytku do szybkiego tworzenia wydarzeń z predefiniowanymi konfiguracjami.",
-      "settingsTitle": "Ustawienia systemu",
-      "settingsDescription": "Konfiguruj identyfikację wizualną, treści, języki, funkcje i infrastrukturę.",
-      "liveNow": "{count, plural, one {# wydarzenie na żywo} few {# wydarzenia na żywo} many {# wydarzeń na żywo} other {# wydarzeń na żywo}}",
-      "upcomingEvents": "{count, plural, one {# zaplanowane wydarzenie} few {# zaplanowane wydarzenia} many {# zaplanowanych wydarzeń} other {# zaplanowanych wydarzeń}}"
+      "recordingsPostprod": "Postprodukcja AI",
+      "feedbackDashboard": "Opinie",
+      "video": "Wideo",
+      "glossary": "Słowniczek",
+      "breadcrumbAriaLabel": "Ścieżka nawigacji",
+      "skipToPage": "Przejdź do treści strony"
     },
     "publications": {
-      "title": "Publikacje",
       "subtitle": "Jednolity hub redakcyjny dla wszystkich opublikowanych nagrań: zaplanowane wydarzenia, szybkie połączenia, przesłane archiwa historyczne i sesje oczekujące na promocję.",
       "newPublication": "Nowa publikacja",
       "searchPlaceholder": "Szukaj według tytułu lub opisu…",
@@ -1040,7 +1008,6 @@
         "unlist": "Usuń z biblioteki"
       },
       "uploadPage": {
-        "title": "Nowa publikacja",
         "subtitle": "Prześlij istniejący plik wideo (MP4, WebM lub MOV) do magazynu platformy i wzbogać go o metadane redakcyjne.",
         "step1Title": "1. Prześlij plik wideo",
         "startUpload": "Prześlij",
@@ -1077,7 +1044,6 @@
       "updateFailed": "Aktualizacja nie powiodła się."
     },
     "recordingsLibrary": {
-      "title": "Nagrania wideo",
       "subtitle": "Scentralizowana biblioteka nagrań wideo z rozmów: filtruj, pobieraj, eksportuj",
       "loading": "Ładowanie...",
       "range": "Okres",
@@ -1149,7 +1115,6 @@
       "transcriptProcessing": "W trakcie"
     },
     "gdprAudit": {
-      "title": "Audyt RODO",
       "subtitle": "Rejestr działań związanych z prywatnością danych osobowych: usunięcia, zgody, eksporty",
       "loading": "Ładowanie...",
       "range": "Okres",
@@ -1172,7 +1137,6 @@
       "noResults": "Brak wpisów audytu w wybranym okresie."
     },
     "moderators": {
-      "title": "Moderatorzy",
       "subtitle": "Pobieraj, kopiuj i regeneruj magiczne linki moderatorów",
       "searchPlaceholder": "Szukaj według sluga, imienia lub adresu e-mail moderatora…",
       "searchHelp": "Magiczny link zawiera unikalny token: udostępnij go tylko wyznaczonemu moderatorowi.",
@@ -1191,7 +1155,6 @@
       "noResults": "Nie znaleziono wydarzeń."
     },
     "registrations": {
-      "title": "Rejestracje",
       "subtitle": "Wszystkie osoby zarejestrowane na wydarzenia — wyszukaj, filtruj i eksportuj",
       "loading": "Ładowanie...",
       "range": "Okres",
@@ -1525,18 +1488,6 @@
       "title": "Ustawienia witryny",
       "subtitle": "Konfiguracja wyglądu i zachowania platformy do ponownego wykorzystania przez administrację publiczną",
       "saving": "Zapisywanie...",
-      "sections": {
-        "languagesTitle": "Zarządzanie językami",
-        "languagesDescription": "Włącz lub wyłącz języki UE widoczne w interfejsie, wybierz język domyślny i dostosuj tłumaczenia.",
-        "gdprTemplatesTitle": "Szablony GDPR",
-        "gdprTemplatesDescription": "Twórz wielokrotnego użytku klauzule prywatności, które można powiązać z dowolnym wydarzeniem, i wybierz domyślny szablon dla nowych wydarzeń.",
-        "emailTemplatesTitle": "Szablony e-maili",
-        "emailTemplatesDescription": "Dostosuj temat, nagłówki i treść e-maili z potwierdzeniem i przypomnieniem. Pozostaw puste, aby użyć wbudowanych tekstów domyślnych.",
-        "tagsTitle": "Zarządzanie tagami",
-        "tagsDescription": "Twórz i edytuj tagi używane do filtrowania wydarzeń",
-        "glossaryTitle": "Glosariusz",
-        "glossaryDescription": "Skróty i terminy techniczne do transkrypcji, tłumaczeń i dubbingu"
-      },
       "saved": "Ustawienia zapisane pomyślnie",
       "tabs": {
         "branding": "Identyfikacja wizualna",
@@ -1869,7 +1820,6 @@
       "invalidRRule": "Nieprawidłowa reguła"
     },
     "templates": {
-      "title": "Szablony wydarzeń",
       "subtitle": "Zarządzaj predefiniowanymi szablonami do szybkiego tworzenia wydarzeń",
       "create": "Nowy szablon",
       "deleteConfirm": "Czy na pewno chcesz usunąć ten szablon?",
@@ -1966,7 +1916,6 @@
       "errorGeneric": "Wystąpił błąd. Proszę spróbować ponownie."
     },
     "gdprTemplates": {
-      "title": "Szablony RODO",
       "subtitle": "Twórz i zarządzaj informacjami o prywatności wielokrotnego użytku, współdzielonymi między wydarzeniami. Szablon oznaczony jako domyślny jest wstępnie wybrany dla nowych wydarzeń.",
       "newTemplate": "Nowy szablon",
       "emptyState": "Brak utworzonych szablonów. Utwórz pierwszy, aby ponownie używać tego samego tekstu informacji o prywatności na wielu wydarzeniach.",
@@ -1992,7 +1941,6 @@
       "deleteTitle": "Usuń szablon"
     },
     "emailTemplates": {
-      "title": "Szablony e-maili",
       "subtitle": "Dostosuj temat, nagłówki i treść e-maili transakcyjnych. Puste pola używają wbudowanych tekstów domyślnych.",
       "overridden": "Dostosowane",
       "usingDefault": "Używany domyślny",
@@ -2031,7 +1979,6 @@
       }
     },
     "languages": {
-      "title": "Zarządzanie językami",
       "subtitle": "Konfiguruj dostępne języki i dostosuj tłumaczenia",
       "defaultLocaleTitle": "Język domyślny",
       "defaultLocaleDescription": "Język domyślny jest używany jako rezerwowy, gdy tłumaczenie nie jest dostępne, oraz jako główny język witryny.",
@@ -2057,7 +2004,6 @@
       "addOverride": "Dodaj"
     },
     "infrastructure": {
-      "title": "Infrastruktura",
       "subtitle": "Stan komponentów i konfiguracja środowiska",
       "deploymentMode": "Tryb wdrożenia",
       "version": "Wersja",
@@ -2120,7 +2066,6 @@
       }
     },
     "instantCalls": {
-      "title": "Szybkie połączenia",
       "subtitle": "Lista natychmiastowych rozmów wideo",
       "total": "łącznie",
       "noCalls": "Brak szybkich połączeń.",
@@ -2182,7 +2127,6 @@
       "deleteTitle": "Usuń sesję"
     },
     "monitoring": {
-      "title": "Monitorowanie",
       "subtitle": "Real-time infrastructure and performance monitoring dashboard",
       "loading": "Ładowanie metryk...",
       "prometheusUnavailable": "Prometheus is not configured. Set the PROMETHEUS_URL environment variable to enable advanced monitoring.",
@@ -2308,9 +2252,7 @@
       "registeredCount": "{count, plural, =0 {Brak rejestracji} one {1 rejestracja} few {# rejestracje} many {# rejestracji} other {# rejestracji}}"
     },
     "tags": {
-      "title": "Zarządzanie tagami",
       "subtitle": "Twórz, edytuj i usuwaj tagi używane do klasyfikacji i filtrowania wydarzeń publicznych.",
-      "backToSettings": "Ustawienia",
       "addTag": "Nowy tag",
       "editTag": "Edytuj tag",
       "columnColor": "Kolor",
@@ -2426,7 +2368,6 @@
       }
     },
     "rubrica": {
-      "title": "Książka adresowa",
       "subtitle": "Osoby, które wyraziły zgodę na wpisanie do książki adresowej (art. 6.1.a RODO). Informacje o profilu są aktualizowane automatycznie przy każdej ponownej rejestracji.",
       "searchLabel": "Szukaj według imienia lub organizacji",
       "orgTypeLabel": "Typ organizacji",
@@ -2519,7 +2460,6 @@
       "privacyNote": "Statystyki dotyczące poszczególnych osób są domyślnie pseudonimizowane. Anonimowe dane zbiorcze pozostają w podsumowaniu wydarzenia; surowe rekordy są usuwane po upływie okresu przechowywania."
     },
     "postprod": {
-      "title": "Potok AI postprodukcji",
       "subtitle": "Transkrypcje, podsumowania i tłumaczenia wytworzone przez potok AI w klastrze. Przypisz mówców, uruchom ponownie lub anuluj zadania.",
       "filterStatus": "Status",
       "all": "Wszystkie",
@@ -2603,7 +2543,6 @@
       "archiveGenerateOk": "Rozpoczęto generowanie archiwum.",
       "archiveGenerateErr": "Generowanie archiwum nie powiodło się (HTTP {code}).",
       "archiveTrackFallback": "Uczestnik",
-      "manageBackToList": "Wszystkie nagrania",
       "manageDuration": "Czas trwania",
       "manageSource": "Język źródłowy",
       "manageOpenPublic": "Strona publiczna",
@@ -2768,11 +2707,9 @@
       "originalUncertainHint": "Zachowany tekst może już zawierać poprawki wprowadzone przed pojawieniem się tej funkcji: nie da się wykazać, że jest to tekst wytworzony przez automatyczną transkrypcję"
     },
     "questionnairesPage": {
-      "title": "Kwestionariusze",
       "subtitle": "Szablony pytań wielokrotnego użytku do kwestionariuszy przedrejestracyjnych i po wydarzeniu."
     },
     "questionnaireResponses": {
-      "title": "Odpowiedzi na kwestionariusze",
       "subtitle": "Agregacje według pytań, filtrowane według wydarzenia, fazy i zakresu dat."
     },
     "eventQuestionnaires": {
@@ -2822,11 +2759,8 @@
       "downloadFailed": "Pobieranie nie powiodło się: spróbuj ponownie."
     },
     "glossary": {
-      "title": "Glosariusz",
       "subtitle": "Skróty, nazwy i terminy techniczne do postprodukcji AI: jak zapisywać je w transkrypcjach, jak je tłumaczyć i jak wymawiać w dubbingu. Obowiązują dla wszystkich wydarzeń; każde wydarzenie może dodać własne.",
       "organizerNote": "Możesz dodawać terminy dla wszystkich wydarzeń i edytować te, które dodałeś; pozostałymi zarządzają administratorzy.",
-      "backToSettings": "Powrót do ustawień",
-      "backToEvents": "Powrót do wydarzeń",
       "eventTitle": "Terminy i skróty wydarzenia",
       "eventIntro": "Uzupełniają glosariusz instancji na potrzeby transkrypcji, tłumaczeń i dubbingu tego wydarzenia. Termin, który jest już w instancji, zostaje zastąpiony tym podanym tutaj.",
       "openInstance": "Uzupełnij glosariusz instancji, obowiązujący dla wszystkich wydarzeń",
@@ -3761,7 +3695,6 @@
     "reactionSent": "Reakcja wysłana!"
   },
   "calendar": {
-    "title": "Kalendarz wydarzeń",
     "subtitle": "Przeglądaj wszystkie wydarzenia w czasie",
     "publicTitle": "Kalendarz wydarzeń",
     "publicSubtitle": "Odkryj zaplanowane wydarzenia",
@@ -4240,7 +4173,6 @@
     "hintJoystick": "Przeciągnij, aby się poruszać"
   },
   "feedbackAdmin": {
-    "title": "Wyniki opinii",
     "totalVotes": "odpowiedzi",
     "noFeedback": "Brak otrzymanych opinii",
     "comments": "Komentarze",

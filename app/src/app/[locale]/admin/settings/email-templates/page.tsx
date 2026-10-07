@@ -2,6 +2,12 @@ import { getTranslations, getLocale } from 'next-intl/server';
 
 import { soloAdmin } from '@/lib/auth/staff-page';
 import EmailTemplatesManagement from '@/components/admin/email-templates-management';
+import AdminPageHeader from '@/components/admin/admin-page-header';
+import { adminPageMetadata, adminPageTitle } from '@/components/admin/admin-page-title';
+
+export function generateMetadata() {
+  return adminPageMetadata('/admin/settings/email-templates');
+}
 
 export default async function EmailTemplatesPage() {
   const locale = await getLocale();
@@ -12,12 +18,7 @@ export default async function EmailTemplatesPage() {
 
   return (
     <div className="container py-5">
-      <div className="mb-5">
-        <h1 className="fw-bold mb-1" style={{ color: 'var(--app-text)' }}>
-          {t('title')}
-        </h1>
-        <p className="text-secondary mb-0">{t('subtitle')}</p>
-      </div>
+      <AdminPageHeader title={await adminPageTitle('/admin/settings/email-templates')} subtitle={t('subtitle')} />
       <EmailTemplatesManagement />
     </div>
   );

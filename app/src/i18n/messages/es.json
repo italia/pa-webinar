@@ -615,7 +615,6 @@
       "newLink": "Solicitar un enlace nuevo"
     },
     "organizers": {
-      "title": "Cuentas del personal",
       "intro": "Personas que trabajan en el área de administración con su propio nombre. Los organizadores crean y gestionan sus propios eventos; los administradores gestionan toda la instancia. Entran con un enlace enviado a su correo, sin contraseña. La clave de la instancia se mantiene para emergencias y automatización.",
       "newTitle": "Añadir una cuenta",
       "name": "Nombre y apellidos",
@@ -929,82 +928,51 @@
       "toFixField": "Campo {n}"
     },
     "nav": {
-      "events": "Gestión de eventos",
-      "registrations": "Inscripciones",
-      "recordings": "Vídeos y sesiones",
-      "settings": "Configuración del sistema",
-      "eventsList": "Lista de eventos",
+      "events": "Eventos",
+      "settings": "Configuración",
+      "eventsList": "Todos los eventos",
       "newEvent": "Nuevo evento",
-      "calendar": "Calendario",
-      "templates": "Plantillas",
+      "calendar": "Calendario de eventos",
+      "templates": "Plantillas de evento",
       "analytics": "Estadísticas",
       "instantCalls": "Llamadas rápidas",
       "infrastructure": "Infraestructura",
       "monitoring": "Monitorización",
-      "monitoringDashboard": "Panel",
+      "monitoringDashboard": "Estado del servicio",
       "registrationsList": "Inscripciones",
-      "moderators": "Moderadores",
       "moderatorLinks": "Enlaces de moderador",
-      "gdprAudit": "Auditoría RGPD",
-      "recordingsList": "Grabaciones de vídeo",
-      "settingsGeneral": "General",
+      "gdprAudit": "Registro RGPD",
+      "recordingsList": "Grabaciones",
+      "settingsGeneral": "Configuración general",
       "settingsLanguages": "Idiomas",
-      "settingsGdprTemplates": "Plantillas RGPD",
-      "admin": "Administración",
-      "eventDetail": "Detalle del evento",
-      "eventEdit": "Editar evento",
-      "publications": "Publicaciones",
-      "publicationsList": "Todas las publicaciones",
+      "settingsGdprTemplates": "Avisos de privacidad",
+      "eventDetail": "Evento",
+      "eventEdit": "Editar",
+      "publicationsList": "Publicaciones",
       "publicationsNew": "Nueva publicación",
       "ariaLabel": "Navegación de administración",
       "subNavAriaLabel": "Navegación de sección",
       "questionnaires": "Cuestionarios",
-      "questionnairesLibrary": "Biblioteca de plantillas",
-      "questionnairesResponses": "Respuestas y estadísticas",
+      "questionnairesLibrary": "Plantillas de cuestionario",
+      "questionnairesResponses": "Respuestas",
       "rubrica": "Agenda",
       "settingsEmailTemplates": "Plantillas de correo",
-      "settingsTags": "Gestión de etiquetas",
-      "settingsGlossary": "Glosario",
+      "settingsTags": "Etiquetas",
       "eventMaterials": "Materiales",
       "eventQuestionnaires": "Cuestionarios",
-      "rubricaList": "Lista",
-      "rubricaDetail": "Detalle",
-      "organizers": "Cuentas",
+      "rubricaDetail": "Persona",
       "staffAccess": "Personal y accesos",
       "staffAccounts": "Cuentas del personal",
       "people": "Personas",
       "postprodDetail": "Grabación",
-      "recordingsPostprod": "Transcripciones / IA",
-      "feedbackDashboard": "Feedback"
-    },
-    "landing": {
-      "title": "Panel de administración",
-      "subtitle": "Gestione eventos y configure la plataforma",
-      "eventsTitle": "Gestión de eventos",
-      "eventsDescription": "Cree, edite y gestione eventos, plantillas y estadísticas.",
-      "instantCallsTitle": "Llamadas rápidas",
-      "instantCallsDescription": "Cree al vuelo una videollamada pública sin planificación: el enlace se puede compartir de inmediato.",
-      "instantCallsStat": "{count, plural, =0 {ninguna llamada rápida en los últimos 30 días} one {1 llamada rápida en los últimos 30 días} other {# llamadas rápidas en los últimos 30 días}}",
-      "registrationsTitle": "Inscripciones",
-      "registrationsDescription": "Agenda de los participantes inscritos a los eventos: búsqueda, filtros, exportación, moderadores y auditoría RGPD.",
-      "registrationsTotal": "{count, plural, =0 {ninguna persona inscrita} one {1 persona inscrita} other {# personas inscritas}}",
-      "today": "hoy",
-      "recordingsTitle": "Vídeos y sesiones",
-      "recordingsDescription": "Grabaciones de vídeo de las llamadas, sesiones en directo finalizadas y llamadas rápidas archivadas. Descarga y gestión.",
-      "recordingsStat": "{count, plural, =0 {ninguna grabación de vídeo} one {1 grabación de vídeo disponible} other {# grabaciones de vídeo disponibles}}",
-      "analyticsTitle": "Estadísticas",
-      "analyticsDescription": "Vista general de las métricas de uso: eventos creados, participantes, tasa de conversión, eventos destacados.",
-      "monitoringTitle": "Monitorización",
-      "monitoringDescription": "Panel técnico con métricas de infraestructura, rendimiento, disponibilidad y calidad del servicio.",
-      "templatesTitle": "Plantillas de eventos",
-      "templatesDescription": "Modelos reutilizables para crear rápidamente eventos con configuraciones predefinidas.",
-      "settingsTitle": "Configuración del sistema",
-      "settingsDescription": "Configure el branding, el contenido, los idiomas, las funcionalidades y la infraestructura.",
-      "liveNow": "{count, plural, one {# evento en directo} other {# eventos en directo}}",
-      "upcomingEvents": "{count, plural, one {# evento programado} other {# eventos programados}}"
+      "recordingsPostprod": "Posproducción con IA",
+      "feedbackDashboard": "Valoraciones",
+      "video": "Vídeo",
+      "glossary": "Glosario",
+      "breadcrumbAriaLabel": "Ruta de navegación",
+      "skipToPage": "Ir al contenido de la página"
     },
     "publications": {
-      "title": "Publicaciones",
       "subtitle": "Hub editorial único para todos los vídeos publicados: eventos planificados, llamadas instantáneas, archivos históricos cargados y sesiones a la espera de promoción.",
       "newPublication": "Nueva publicación",
       "searchPlaceholder": "Buscar por título o descripción…",
@@ -1040,7 +1008,6 @@
         "unlist": "Quitar de la biblioteca"
       },
       "uploadPage": {
-        "title": "Nueva publicación",
         "subtitle": "Suba un vídeo existente (MP4, WebM o MOV) al almacenamiento de la plataforma y enriquézcalo con metadatos editoriales.",
         "step1Title": "1. Subir el archivo de vídeo",
         "startUpload": "Subir",
@@ -1077,7 +1044,6 @@
       "updateFailed": "No se ha podido actualizar."
     },
     "recordingsLibrary": {
-      "title": "Grabaciones de vídeo",
       "subtitle": "Biblioteca centralizada de las grabaciones de vídeo de las llamadas: filtre, descargue y exporte",
       "loading": "Cargando...",
       "range": "Periodo",
@@ -1149,7 +1115,6 @@
       "transcriptProcessing": "En proc."
     },
     "gdprAudit": {
-      "title": "Auditoría RGPD",
       "subtitle": "Registro de las acciones de privacidad sobre datos personales: eliminaciones, consentimientos, exportaciones",
       "loading": "Cargando...",
       "range": "Periodo",
@@ -1172,7 +1137,6 @@
       "noResults": "No hay entradas de auditoría en el periodo seleccionado."
     },
     "moderators": {
-      "title": "Moderadores",
       "subtitle": "Recupere, copie y regenere los enlaces mágicos de los moderadores",
       "searchPlaceholder": "Buscar por slug, nombre o correo del moderador…",
       "searchHelp": "El enlace mágico contiene un token único: compártalo solo con el moderador designado.",
@@ -1191,7 +1155,6 @@
       "noResults": "No se ha encontrado ningún evento."
     },
     "registrations": {
-      "title": "Inscripciones",
       "subtitle": "Todas las personas inscritas a los eventos: busque, filtre y exporte",
       "loading": "Cargando...",
       "range": "Periodo",
@@ -1525,18 +1488,6 @@
       "title": "Configuración del sitio",
       "subtitle": "Configure la apariencia y el comportamiento de la plataforma para la reutilización PA",
       "saving": "Guardando...",
-      "sections": {
-        "languagesTitle": "Gestión de idiomas",
-        "languagesDescription": "Activa o desactiva los idiomas de la UE mostrados en la interfaz, elige el idioma predeterminado y personaliza las traducciones.",
-        "gdprTemplatesTitle": "Plantillas RGPD",
-        "gdprTemplatesDescription": "Crea avisos de privacidad reutilizables entre eventos y elige la plantilla predeterminada para los nuevos eventos.",
-        "emailTemplatesTitle": "Plantillas de correo",
-        "emailTemplatesDescription": "Personaliza el asunto, los títulos y los textos de los correos de confirmación y recordatorio. Si se dejan vacíos, se usan los textos predeterminados.",
-        "tagsTitle": "Gestión de etiquetas",
-        "tagsDescription": "Cree y modifique las etiquetas usadas para filtrar los eventos",
-        "glossaryTitle": "Glosario",
-        "glossaryDescription": "Siglas y términos técnicos para transcripciones, traducciones y doblaje"
-      },
       "saved": "Configuración guardada con éxito",
       "tabs": {
         "branding": "Marca",
@@ -1869,7 +1820,6 @@
       "invalidRRule": "Regla no válida"
     },
     "templates": {
-      "title": "Plantillas de eventos",
       "subtitle": "Gestione las plantillas predefinidas para la creación rápida de eventos",
       "create": "Nueva plantilla",
       "deleteConfirm": "¿Está seguro de que desea eliminar esta plantilla?",
@@ -1966,7 +1916,6 @@
       "errorGeneric": "Se ha producido un error. Vuelva a intentarlo."
     },
     "gdprTemplates": {
-      "title": "Plantillas RGPD",
       "subtitle": "Cree y gestione avisos de privacidad reutilizables entre eventos. Una plantilla marcada como predeterminada se preselecciona en los eventos nuevos.",
       "newTemplate": "Nueva plantilla",
       "emptyState": "Aún no se ha creado ninguna plantilla. Cree la primera para reutilizar el mismo texto de privacidad en varios eventos.",
@@ -1992,7 +1941,6 @@
       "deleteTitle": "Eliminar la plantilla"
     },
     "emailTemplates": {
-      "title": "Plantillas de correo",
       "subtitle": "Personaliza el asunto, los títulos y los textos de los correos transaccionales. Los campos vacíos usan los textos predeterminados integrados.",
       "overridden": "Personalizado",
       "usingDefault": "Predeterminado",
@@ -2031,7 +1979,6 @@
       }
     },
     "languages": {
-      "title": "Gestión de idiomas",
       "subtitle": "Configure los idiomas disponibles y personalice las traducciones",
       "defaultLocaleTitle": "Lengua predeterminada",
       "defaultLocaleDescription": "La lengua predeterminada se usa como respaldo cuando no hay traducción disponible y como lengua principal del sitio.",
@@ -2057,7 +2004,6 @@
       "addOverride": "Añadir"
     },
     "infrastructure": {
-      "title": "Infraestructura",
       "subtitle": "Estado de los componentes y configuración del entorno",
       "deploymentMode": "Modo de despliegue",
       "version": "Versión",
@@ -2120,7 +2066,6 @@
       }
     },
     "instantCalls": {
-      "title": "Llamadas rápidas",
       "subtitle": "Lista de las videollamadas instantáneas",
       "total": "totales",
       "noCalls": "Aún no se ha realizado ninguna llamada rápida.",
@@ -2182,7 +2127,6 @@
       "deleteTitle": "Eliminar la sesión"
     },
     "monitoring": {
-      "title": "Monitorización",
       "subtitle": "Real-time infrastructure and performance monitoring dashboard",
       "loading": "Cargando métricas...",
       "prometheusUnavailable": "Prometheus is not configured. Set the PROMETHEUS_URL environment variable to enable advanced monitoring.",
@@ -2308,9 +2252,7 @@
       "registeredCount": "{count, plural, =0 {Sin inscripciones} one {1 inscripción} other {# inscripciones}}"
     },
     "tags": {
-      "title": "Gestión de etiquetas",
       "subtitle": "Cree, modifique y elimine las etiquetas usadas para clasificar y filtrar los eventos públicos.",
-      "backToSettings": "Configuración",
       "addTag": "Nueva etiqueta",
       "editTag": "Editar etiqueta",
       "columnColor": "Color",
@@ -2426,7 +2368,6 @@
       }
     },
     "rubrica": {
-      "title": "Agenda",
       "subtitle": "Personas que han dado consentimiento para ser incluidas en la agenda (art. 6.1.a RGPD). La información de perfil se actualiza automáticamente con cada nueva inscripción.",
       "searchLabel": "Buscar por nombre u organización",
       "orgTypeLabel": "Tipo de organización",
@@ -2519,7 +2460,6 @@
       "privacyNote": "Las estadísticas por persona son seudónimas de forma predeterminada. Los agregados anónimos se conservan en el resumen del evento; las filas en bruto se eliminan al vencer el periodo de conservación."
     },
     "postprod": {
-      "title": "Pipeline de IA de posproducción",
       "subtitle": "Transcripciones, resúmenes y traducciones generados por el pipeline de IA en el clúster. Asigna los hablantes, relanza o cancela los trabajos.",
       "filterStatus": "Estado",
       "all": "Todos",
@@ -2603,7 +2543,6 @@
       "archiveGenerateOk": "Generación del archivo iniciada.",
       "archiveGenerateErr": "La generación del archivo ha fallado (HTTP {code}).",
       "archiveTrackFallback": "Participante",
-      "manageBackToList": "Todas las grabaciones",
       "manageDuration": "Duración",
       "manageSource": "Idioma de origen",
       "manageOpenPublic": "Página pública",
@@ -2768,11 +2707,9 @@
       "originalUncertainHint": "El texto conservado podría incluir ya correcciones hechas antes de que existiera esta función: no se puede demostrar que sea el producido por la transcripción automática"
     },
     "questionnairesPage": {
-      "title": "Cuestionarios",
       "subtitle": "Plantillas reutilizables de preguntas para los cuestionarios de pre-registro y posevento."
     },
     "questionnaireResponses": {
-      "title": "Respuestas a cuestionarios",
       "subtitle": "Agregaciones por pregunta, filtrables por evento, fase e intervalo de fechas."
     },
     "eventQuestionnaires": {
@@ -2822,11 +2759,8 @@
       "downloadFailed": "No se ha podido descargar: inténtalo de nuevo."
     },
     "glossary": {
-      "title": "Glosario",
       "subtitle": "Siglas, nombres y términos técnicos para la posproducción con IA: cómo se escriben en las transcripciones, cómo se traducen y cómo se pronuncian en el doblaje. Se aplican a todos los eventos; cada evento puede añadir los suyos.",
       "organizerNote": "Puede añadir términos para todos los eventos y modificar los que haya añadido usted; los demás los gestiona la administración.",
-      "backToSettings": "Volver a la configuración",
-      "backToEvents": "Volver a los eventos",
       "eventTitle": "Términos y siglas del evento",
       "eventIntro": "Se añaden al glosario de la instancia para la transcripción, las traducciones y el doblaje de este evento. Un término que ya está en la instancia se sustituye por el de aquí.",
       "openInstance": "Ampliar el glosario de la instancia, válido para todos los eventos",
@@ -3761,7 +3695,6 @@
     "reactionSent": "¡Reacción enviada!"
   },
   "calendar": {
-    "title": "Calendario de eventos",
     "subtitle": "Visualice todos los eventos a lo largo del tiempo",
     "publicTitle": "Calendario de eventos",
     "publicSubtitle": "Descubra los eventos programados",
@@ -4240,7 +4173,6 @@
     "hintJoystick": "Arrastre para moverse"
   },
   "feedbackAdmin": {
-    "title": "Resultados del feedback",
     "totalVotes": "respuestas",
     "noFeedback": "No se ha recibido feedback",
     "comments": "Comentarios",

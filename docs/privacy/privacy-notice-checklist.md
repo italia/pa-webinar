@@ -55,11 +55,10 @@ notice.
 ### Which notice the registration form shows
 
 The registration form shows one notice, chosen in this order
-(`app/src/app/[locale]/events/[slug]/registration/page.tsx`). The event wizard
-always saves the event's text field, as an empty string when nothing is typed,
-and choosing a GDPR template empties it. An empty string ends the text lookup
-before the template is consulted, so the amber path below is the one every
-event saved through the wizard takes when it has no typed text.
+(`app/src/app/[locale]/events/[slug]/registration/page.tsx`). An event's text
+field saved empty counts as no text (the server stores it as `NULL`), and
+choosing a privacy notice template in the wizard empties it, so the template is
+what the form shows.
 
 ```mermaid
 flowchart TD
@@ -71,7 +70,7 @@ flowchart TD
 
   START(["Registration form opens<br/>in the visitor's language"]):::start
   T1{"1. What does the event store<br/>in <code>privacyPolicyText</code>?"}:::check
-  T2["2. Linked GDPR template with a body<br/>in this language, or in Italian?<br/><code>gdprTemplateId</code>"]:::check
+  T2["2. Linked privacy notice template with a body<br/>in this language, or in Italian?<br/><code>gdprTemplateId</code>"]:::check
   U1["3. Event URL or uploaded PDF?<br/><code>privacyPolicyUrl</code>"]:::check
   U2["4. Instance default set?<br/><code>DEFAULT_PRIVACY_POLICY_URL</code>"]:::check
 
@@ -81,32 +80,26 @@ flowchart TD
 
   START --> T1
   T1 -- "non-empty text" --> IN1
-  T1 -- "empty string: saved through<br/>the wizard with no text typed,<br/>template chosen or not" --> U1
-  T1 -- "nothing (NULL): created<br/>through the API without the field" --> T2
+  T1 -- "no text" --> T2
   T2 -- "yes" --> IN1
   T2 -- "no" --> U1
   U1 -- "yes" --> L1
   U1 -- "no" --> U2
   U2 -- "yes" --> L1
   U2 -- "no" --> L3
-
-  linkStyle 2 stroke:#CC7A00,stroke-width:2px
 ```
 
 What follows from that order:
 
 - **The event's own text wins when it is non-empty.** **Privacy notice
   (text)** has one version for all languages and is shown inline.
-- **A GDPR template is not shown on events saved through the wizard.** The
-  wizard preselects the template marked as default (★) under **Settings** >
-  **GDPR templates** and saves the choice, but the registration form of such an
-  event links the event's URL, then `DEFAULT_PRIVACY_POLICY_URL`, then
-  `/privacy`. A template's body appears only on events created through the
-  events API without `privacyPolicyText`. Templates hold a body in Italian and
-  in English; a registrant in any other language sees the Italian body.
-- **To attach a notice to a wizard event,** type it in **Privacy notice
-  (text)**, or set **Privacy notice document (PDF or link)**, or rely on the
-  site page.
+- **Otherwise the event's privacy notice template is shown.** The wizard
+  preselects the template marked as default (★) under **Settings** >
+  **Privacy notices**. Templates hold a body in Italian and in English; a
+  registrant in any other language sees the Italian body.
+- **To attach a different notice to an event,** pick another template, type it
+  in **Privacy notice (text)**, or set **Privacy notice document (PDF or
+  link)**; without any of these the form links the site page.
 - **`DEFAULT_PRIVACY_POLICY_URL`** is unset in the chart's
   `infra/helm/pa-webinar/values.yaml`, so the form links the site page
   `/privacy`. Set it in `app.env` only to point at a notice published

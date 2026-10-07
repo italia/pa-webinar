@@ -4,8 +4,14 @@ import { soloAdmin } from '@/lib/auth/staff-page';
 import { prisma } from '@/lib/db';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import RegistrationsDashboard from '@/components/admin/registrations-dashboard';
+import AdminPageHeader from '@/components/admin/admin-page-header';
+import { adminPageMetadata, adminPageTitle } from '@/components/admin/admin-page-title';
 
 export const dynamic = 'force-dynamic';
+
+export function generateMetadata() {
+  return adminPageMetadata('/admin/registrations');
+}
 
 export default async function RegistrationsPage() {
   const locale = await getLocale();
@@ -33,12 +39,7 @@ export default async function RegistrationsPage() {
 
   return (
     <div className="container py-5">
-      <div className="mb-4">
-        <h1 className="fw-bold mb-1" style={{ color: 'var(--app-text)' }}>
-          {t('title')}
-        </h1>
-        <p className="text-secondary mb-0">{t('subtitle')}</p>
-      </div>
+      <AdminPageHeader title={await adminPageTitle('/admin/registrations')} subtitle={t('subtitle')} />
       <RegistrationsDashboard events={eventOptions} locale={locale} />
     </div>
   );

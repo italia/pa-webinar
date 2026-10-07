@@ -856,7 +856,7 @@ transcripts held in the database) are stored encrypted with AES-256-GCM under
 personal data on request, alongside the automatic deletion at the end of
 retention. [Privacy and data protection](GDPR.md)
 
-**GDPR audit log** (`GdprAuditLog`, UI **GDPR audit**): per-event records of
+**GDPR audit log** (`GdprAuditLog`, UI **GDPR log**): per-event records of
 personal-data operations such as consents, exports and deletions. It records
 no actor. [Privacy and data protection](GDPR.md)
 
@@ -867,7 +867,7 @@ marks `ARCHIVED` only the events that were never ended.
 [Privacy and data protection](GDPR.md)
 
 **Privacy notice** (UI **Privacy policy**) and **privacy notice template**
-(`GdprTemplate`, UI **GDPR templates**): the information text a controller
+(`GdprTemplate`, UI **Privacy notices**): the information text a controller
 gives data subjects, set per installation and per event. Templates let the
 same text be reused across events.
 [Privacy and data protection](GDPR.md)
@@ -1015,14 +1015,14 @@ these docs and the code use *organizer*.
 | Pubblicazioni | **Publications** | publications |
 | Statistiche | **Statistics** | event analytics |
 | Statistiche | **Analytics** | instance-wide analytics |
-| Video & sessioni | **Video & sessions** | recordings and call sessions |
+| Video | **Video** | recordings, AI post-production, glossary and publications (administration menu) |
 
 ### AI post-production
 
 | Italian UI | English UI | Term in these docs |
 |---|---|---|
 | Post-produzione automatica | **Automatic post-production** | AI post-production |
-| Trascrizioni / AI | **Transcripts / AI** | AI post-production (administration list) |
+| Post-produzione AI | **AI post-production** | AI post-production (administration list) |
 | Registrazione per-partecipante | **Per-participant recording** | multitrack recording |
 | Conserva le tracce per-partecipante | **Keep per-participant tracks** | retained per-participant tracks (`retainParticipantTracks`) |
 | Trascrizione | **Transcript** | transcript |
@@ -1049,8 +1049,8 @@ these docs and the code use *organizer*.
 | Sicurezza e trasparenza | **Security and transparency** | security and transparency page (`/security`) |
 | Dichiarazione di accessibilità | **Accessibility statement** | accessibility statement |
 | Informativa privacy | **Privacy policy** | privacy notice |
-| Template GDPR | **GDPR templates** | privacy notice template (`GdprTemplate`) |
-| Audit GDPR | **GDPR audit** | GDPR audit log (`GdprAuditLog`) |
+| Informative privacy | **Privacy notices** | privacy notice template (`GdprTemplate`) |
+| Registro GDPR | **GDPR log** | GDPR audit log (`GdprAuditLog`) |
 
 ## Abbreviations
 

@@ -53,7 +53,7 @@ The rule matters because the whole row reaches the browser (see [consequences](#
 
 ### Administrators edit it in the administration area
 
-- Administrators edit the row under **Settings**. The **Site settings** page is organized in tabs, and the **Language management** page holds the language fields.
+- Administrators edit the row under **Settings**. The **General settings** page is organized in tabs, and the **Languages** page holds the language fields.
 - Only administrators can open or save these pages: the instance API key or a named administrator account ([ADR-009](009-admin-session.md), [ADR-015](015-named-administrators.md)). Organizers cannot.
 - A save goes through `PUT /api/admin/settings`. The body is checked against `updateSettingsSchema` in `app/src/lib/validation/site-settings.ts`, a strict Zod schema, so an unknown field fails the whole request. Every save writes the administrator audit entry `SITE_SETTINGS_UPDATE` with the names of the saved fields. Translation overrides are saved through `PUT /api/admin/languages`.
 

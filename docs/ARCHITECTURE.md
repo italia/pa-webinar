@@ -71,7 +71,7 @@ flowchart LR
 | Guest | Their typed name, while the event is `LIVE`, after the event's join password if one is set. Scheduled events admit guests only while the site setting **Guest access enabled** is on (the default). Instant calls always admit them, and guests can wait there from `PROVISIONING` | The live room of one event |
 | Moderator or speaker | The event's moderator link or a personal magic link (named grant) | Running one event. Speakers get full audio and video, with no moderation powers |
 | Organizer | A one-time sign-in link sent by email (staff role `ORGANIZER`) | The administration area, limited to the events they own |
-| Administrator | A one-time sign-in link (staff role `ADMIN`) or the instance API key (`ADMIN_API_KEY`) | The whole instance: settings, every event, the address book and the **GDPR audit** log |
+| Administrator | A one-time sign-in link (staff role `ADMIN`) or the instance API key (`ADMIN_API_KEY`) | The whole instance: settings, every event, the address book and the **GDPR log** |
 | Operator | Helm values and cluster access, plus the status and infrastructure pages | The installation itself |
 
 There is **no external identity provider**, no user account and no personal password. The only password is an optional per-event join password that guests type before entering. Participants have a registration token, moderators and speakers have magic links, staff have one-time sign-in links, and the instance key exists for first access, emergencies and automation. A token identifies a *seat*, not a person. The credentials, their lifetimes and their revocation are covered in [Identity, access and tokens](architecture/identity-and-access.md).

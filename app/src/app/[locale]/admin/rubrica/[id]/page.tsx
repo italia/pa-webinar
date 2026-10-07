@@ -2,6 +2,11 @@ import { getLocale } from 'next-intl/server';
 
 import { soloAdmin } from '@/lib/auth/staff-page';
 import RubricaDetail from '@/components/admin/rubrica-detail';
+import { adminPageMetadata } from '@/components/admin/admin-page-title';
+
+export function generateMetadata() {
+  return adminPageMetadata('/admin/rubrica/[id]');
+}
 
 export default async function RubricaDetailPage({
   params,

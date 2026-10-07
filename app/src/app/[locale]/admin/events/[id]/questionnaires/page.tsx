@@ -7,12 +7,25 @@ import { puoGestire } from '@/lib/auth/staff-session';
 import AccessDenied from '@/components/admin/access-denied';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import { prisma } from '@/lib/db';
+import AdminPageHeader from '@/components/admin/admin-page-header';
+import { eventPageMetadata } from '@/components/admin/admin-page-title';
 
 interface PageProps {
   params: Promise<{ id: string; locale: string }>;
 }
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+export async function generateMetadata({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ token?: string | string[] }>;
+}) {
+  const [{ id }, { token }] = await Promise.all([params, searchParams]);
+  return eventPageMetadata('/admin/events/[id]/questionnaires', id, { token, conToken: false });
+}
 
 export default async function EventQuestionnairesPage({ params }: PageProps) {
   const { id } = await params;
@@ -33,12 +46,7 @@ export default async function EventQuestionnairesPage({ params }: PageProps) {
 
   return (
     <div className="container py-5">
-      <div className="mb-4">
-        <h1 className="fw-bold mb-1" style={{ color: 'var(--app-text)' }}>
-          {t('title', { eventTitle })}
-        </h1>
-        <p className="text-secondary mb-0">{t('subtitle')}</p>
-      </div>
+      <AdminPageHeader title={t('title', { eventTitle })} subtitle={t('subtitle')} />
       <EventQuestionnairesManager eventId={event.id} />
     </div>
   );

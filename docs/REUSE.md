@@ -348,7 +348,8 @@ bodies on one installation is not supported. See
 
 - **Privacy notice.** You write it. The platform shows it from a site-wide page,
   from a default URL (`DEFAULT_PRIVACY_POLICY_URL`), from reusable
-  **GDPR templates**, or per event as a URL or as text.
+  privacy notice templates (**Settings → Privacy notices**), or per event as a URL
+  or as text.
   The [privacy notice checklist](privacy/privacy-notice-checklist.md) maps each
   fact your notice needs to the setting that controls it.
 - **Retention.** Each event has a retention period for participant data
@@ -601,7 +602,7 @@ image tags explicitly, and pin the conference's internal credentials, or every
   - Helm values;
   - site settings (branding, languages, legal pages, translation overrides);
   - email templates;
-  - GDPR templates.
+  - privacy notice templates.
 
   See the [configuration reference](CONFIGURATION.md).
 - **Contribute fixes upstream.** [CONTRIBUTING](../CONTRIBUTING.md) explains

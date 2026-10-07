@@ -615,7 +615,6 @@
       "newLink": "Pieprasīt jaunu saiti"
     },
     "organizers": {
-      "title": "Darbinieku konti",
       "intro": "Personas, kas strādā administrēšanas sadaļā ar savu vārdu. Organizatori izveido un pārvalda savus pasākumus; administratori pārvalda visu instanci. Viņi piesakās ar saiti, kas nosūtīta uz viņu e-pastu, bez paroles. Instances atslēga paliek ārkārtas situācijām un automatizācijai.",
       "newTitle": "Pievienot kontu",
       "name": "Vārds un uzvārds",
@@ -929,82 +928,51 @@
       "toFixField": "Lauks {n}"
     },
     "nav": {
-      "events": "Pasākumu pārvaldība",
-      "registrations": "Reģistrācijas",
-      "recordings": "Video un sesijas",
-      "settings": "Sistēmas iestatījumi",
-      "eventsList": "Pasākumu saraksts",
+      "events": "Pasākumi",
+      "settings": "Iestatījumi",
+      "eventsList": "Visi pasākumi",
       "newEvent": "Jauns pasākums",
-      "calendar": "Kalendārs",
-      "templates": "Veidnes",
+      "calendar": "Pasākumu kalendārs",
+      "templates": "Pasākumu veidnes",
       "analytics": "Statistika",
       "instantCalls": "Ātrie zvani",
       "infrastructure": "Infrastruktūra",
-      "monitoring": "Monitorings",
-      "monitoringDashboard": "Informācijas panelis",
+      "monitoring": "Uzraudzība",
+      "monitoringDashboard": "Pakalpojuma statuss",
       "registrationsList": "Reģistrācijas",
-      "moderators": "Moderatori",
       "moderatorLinks": "Moderatoru saites",
-      "gdprAudit": "VDAR audits",
-      "recordingsList": "Video ieraksti",
-      "settingsGeneral": "Vispārīgi",
+      "gdprAudit": "VDAR žurnāls",
+      "recordingsList": "Ieraksti",
+      "settingsGeneral": "Vispārīgie iestatījumi",
       "settingsLanguages": "Valodas",
-      "settingsGdprTemplates": "VDAR veidnes",
-      "admin": "Administrēšana",
-      "eventDetail": "Pasākuma informācija",
-      "eventEdit": "Rediģēt pasākumu",
-      "publications": "Publikācijas",
-      "publicationsList": "Visas publikācijas",
+      "settingsGdprTemplates": "Privātuma paziņojumi",
+      "eventDetail": "Pasākums",
+      "eventEdit": "Rediģēt",
+      "publicationsList": "Publikācijas",
       "publicationsNew": "Jauna publikācija",
       "ariaLabel": "Administrēšanas navigācija",
       "subNavAriaLabel": "Sadaļas navigācija",
       "questionnaires": "Anketas",
-      "questionnairesLibrary": "Veidņu bibliotēka",
-      "questionnairesResponses": "Atbildes un statistika",
+      "questionnairesLibrary": "Anketu veidnes",
+      "questionnairesResponses": "Atbildes",
       "rubrica": "Kontaktu grāmata",
       "settingsEmailTemplates": "E-pasta veidnes",
-      "settingsTags": "Tagu pārvaldība",
-      "settingsGlossary": "Glosārijs",
+      "settingsTags": "Birkas",
       "eventMaterials": "Materiāli",
       "eventQuestionnaires": "Anketas",
-      "rubricaList": "Saraksts",
-      "rubricaDetail": "Ieraksts",
-      "organizers": "Konti",
-      "staffAccess": "Darbinieki un piekļuve",
-      "staffAccounts": "Darbinieku konti",
+      "rubricaDetail": "Persona",
+      "staffAccess": "Komanda un piekļuve",
+      "staffAccounts": "Komandas konti",
       "people": "Personas",
       "postprodDetail": "Ieraksts",
-      "recordingsPostprod": "Transkripcijas / MI",
-      "feedbackDashboard": "Feedback"
-    },
-    "landing": {
-      "title": "Administrēšanas panelis",
-      "subtitle": "Pārvaldiet pasākumus un konfigurējiet platformu",
-      "eventsTitle": "Pasākumu pārvaldība",
-      "eventsDescription": "Izveidojiet, rediģējiet un pārvaldiet pasākumus, veidnes un statistiku.",
-      "instantCallsTitle": "Ātrie zvani",
-      "instantCallsDescription": "Izveidojiet publisku videozvanu uzreiz bez plānošanas: saiti var koplietot nekavējoties.",
-      "instantCallsStat": "{count, plural, =0 {nav ātro zvanu pēdējo 30 dienu laikā} one {1 ātrais zvans pēdējo 30 dienu laikā} other {# ātrie zvani pēdējo 30 dienu laikā}}",
-      "registrationsTitle": "Reģistrācijas",
-      "registrationsDescription": "Pasākumu dalībnieku kontaktu grāmata: meklēšana, filtri, eksports, moderatori un VDAR audits.",
-      "registrationsTotal": "{count, plural, =0 {nav reģistrētu personu} one {1 reģistrēta persona} other {# reģistrētas personas}}",
-      "today": "šodien",
-      "recordingsTitle": "Video un sesijas",
-      "recordingsDescription": "Zvanu video ieraksti, beigtās tiešraides sesijas un arhivēti ātrie zvani. Lejupielāde un pārvaldība.",
-      "recordingsStat": "{count, plural, =0 {nav video ierakstu} one {pieejams 1 video ieraksts} other {pieejami # video ieraksti}}",
-      "analyticsTitle": "Statistika",
-      "analyticsDescription": "Lietošanas metriku pārskats: izveidotie pasākumi, dalībnieki, konversijas rādītājs, populārākie pasākumi.",
-      "monitoringTitle": "Monitorings",
-      "monitoringDescription": "Tehniskais informācijas panelis ar infrastruktūras metrikām, veiktspēju, pieejamību un pakalpojuma kvalitāti.",
-      "templatesTitle": "Pasākumu veidnes",
-      "templatesDescription": "Atkārtoti izmantojami modeļi pasākumu ātrai izveidei ar iepriekš definētām konfigurācijām.",
-      "settingsTitle": "Sistēmas iestatījumi",
-      "settingsDescription": "Konfigurējiet zīmolu, saturu, valodas, funkcijas un infrastruktūru.",
-      "liveNow": "{count, plural, zero {# tiešraides pasākumu} one {# tiešraides pasākums} other {# tiešraides pasākumi}}",
-      "upcomingEvents": "{count, plural, zero {# gaidāmo pasākumu} one {# gaidāms pasākums} other {# gaidāmi pasākumi}}"
+      "recordingsPostprod": "MI pēcapstrāde",
+      "feedbackDashboard": "Atsauksmes",
+      "video": "Video",
+      "glossary": "Glosārijs",
+      "breadcrumbAriaLabel": "Navigācijas ceļš",
+      "skipToPage": "Pāriet uz lapas saturu"
     },
     "publications": {
-      "title": "Publikācijas",
       "subtitle": "Vienots redakcionālais centrs visiem publicētajiem video: plānoti pasākumi, ātrie zvani, augšupielādēti vēsturiski arhīvi un sesijas, kas gaida publicēšanu.",
       "newPublication": "Jauna publikācija",
       "searchPlaceholder": "Meklēt pēc nosaukuma vai apraksta…",
@@ -1040,7 +1008,6 @@
         "unlist": "Noņemt no bibliotēkas"
       },
       "uploadPage": {
-        "title": "Jauna publikācija",
         "subtitle": "Augšupielādējiet esošu video failu (MP4, WebM vai MOV) platformas krātuvē un papildiniet to ar redakcionālajiem metadatiem.",
         "step1Title": "1. Augšupielādējiet video failu",
         "startUpload": "Augšupielādēt",
@@ -1077,7 +1044,6 @@
       "updateFailed": "Atjaunināšana neizdevās."
     },
     "recordingsLibrary": {
-      "title": "Video ieraksti",
       "subtitle": "Centralizēta zvanu video ierakstu bibliotēka: filtrēšana, lejupielāde, eksports",
       "loading": "Notiek ielāde...",
       "range": "Periods",
@@ -1149,7 +1115,6 @@
       "transcriptProcessing": "Apstrādē"
     },
     "gdprAudit": {
-      "title": "VDAR audits",
       "subtitle": "Privātuma darbību reģistrs ar personas datiem: dzēšanas, piekrišanas, eksporti",
       "loading": "Notiek ielāde...",
       "range": "Periods",
@@ -1172,7 +1137,6 @@
       "noResults": "Atlasītajā periodā nav audita ierakstu."
     },
     "moderators": {
-      "title": "Moderatori",
       "subtitle": "Iegūstiet, kopējiet un atjaunojiet moderatoru maģiskās saites",
       "searchPlaceholder": "Meklēt pēc slug, moderatora vārda vai e-pasta…",
       "searchHelp": "Maģiskā saite satur unikālu marķieri: koplietojiet to tikai ar paredzēto moderatoru.",
@@ -1191,7 +1155,6 @@
       "noResults": "Pasākumi netika atrasti."
     },
     "registrations": {
-      "title": "Reģistrācijas",
       "subtitle": "Visas pasākumiem reģistrētās personas — meklēšana, filtrēšana un eksports",
       "loading": "Notiek ielāde...",
       "range": "Periods",
@@ -1525,18 +1488,6 @@
       "title": "Vietnes iestatījumi",
       "subtitle": "Konfigurējiet platformas izskatu un uzvedību VA atkārtotai izmantošanai",
       "saving": "Saglabāšana...",
-      "sections": {
-        "languagesTitle": "Valodu pārvaldība",
-        "languagesDescription": "Ieslēdziet vai izslēdziet ES valodas, kas redzamas saskarnē, izvēlieties noklusējuma valodu un pielāgojiet tulkojumus.",
-        "gdprTemplatesTitle": "GDPR veidnes",
-        "gdprTemplatesDescription": "Izveidojiet atkārtoti lietojamus privātuma paziņojumus, ko var saistīt ar jebkuru pasākumu, un izvēlieties noklusējuma veidni jauniem pasākumiem.",
-        "emailTemplatesTitle": "E-pasta veidnes",
-        "emailTemplatesDescription": "Pielāgojiet apstiprinājuma un atgādinājuma e-pastu tēmu, virsrakstus un tekstu. Atstājiet tukšu, lai izmantotu iebūvētos noklusējuma tekstus.",
-        "tagsTitle": "Tagu pārvaldība",
-        "tagsDescription": "Izveidojiet un rediģējiet tagus, kas tiek izmantoti pasākumu filtrēšanai",
-        "glossaryTitle": "Glosārijs",
-        "glossaryDescription": "Saīsinājumi un termini atšifrējumiem, tulkojumiem un dublēšanai"
-      },
       "saved": "Iestatījumi veiksmīgi saglabāti",
       "tabs": {
         "branding": "Zīmols",
@@ -1869,7 +1820,6 @@
       "invalidRRule": "Nederīgs noteikums"
     },
     "templates": {
-      "title": "Pasākumu veidnes",
       "subtitle": "Pārvaldiet iepriekš iestatītas veidnes ātrai pasākumu izveidei",
       "create": "Jauna veidne",
       "deleteConfirm": "Vai tiešām vēlaties dzēst šo veidni?",
@@ -1966,7 +1916,6 @@
       "errorGeneric": "Radās kļūda. Lūdzu, mēģiniet vēlreiz."
     },
     "gdprTemplates": {
-      "title": "VDAR veidnes",
       "subtitle": "Izveidojiet un pārvaldiet atkārtoti izmantojamus privātuma paziņojumus, kas tiek koplietoti starp pasākumiem. Veidne, kas atzīmēta kā noklusējuma, tiek iepriekš atlasīta jauniem pasākumiem.",
       "newTemplate": "Jauna veidne",
       "emptyState": "Vēl nav veidņu. Izveidojiet vienu, lai atkārtoti izmantotu to pašu privātuma tekstu vairākos pasākumos.",
@@ -1992,7 +1941,6 @@
       "deleteTitle": "Dzēst veidni"
     },
     "emailTemplates": {
-      "title": "E-pasta veidnes",
       "subtitle": "Pielāgojiet transakciju e-pastu tēmu, virsrakstus un tekstu. Tukšos laukos tiek izmantoti iebūvētie noklusējuma teksti.",
       "overridden": "Pielāgots",
       "usingDefault": "Tiek lietots noklusējuma",
@@ -2031,7 +1979,6 @@
       }
     },
     "languages": {
-      "title": "Valodu pārvaldība",
       "subtitle": "Konfigurējiet pieejamās valodas un pielāgojiet tulkojumus",
       "defaultLocaleTitle": "Noklusējuma valoda",
       "defaultLocaleDescription": "Noklusējuma valoda tiek izmantota kā rezerves variants, kad tulkojums nav pieejams, un kā vietnes galvenā valoda.",
@@ -2057,7 +2004,6 @@
       "addOverride": "Pievienot"
     },
     "infrastructure": {
-      "title": "Infrastruktūra",
       "subtitle": "Komponentu statuss un vides konfigurācija",
       "deploymentMode": "Izvietošanas režīms",
       "version": "Versija",
@@ -2120,7 +2066,6 @@
       }
     },
     "instantCalls": {
-      "title": "Ātrie zvani",
       "subtitle": "Tūlītējo videozvanu saraksts",
       "total": "kopā",
       "noCalls": "Vēl nav veikts neviens ātrais zvans.",
@@ -2182,7 +2127,6 @@
       "deleteTitle": "Dzēst sesiju"
     },
     "monitoring": {
-      "title": "Monitorings",
       "subtitle": "Real-time infrastructure and performance monitoring dashboard",
       "loading": "Notiek metriku ielāde...",
       "prometheusUnavailable": "Prometheus is not configured. Set the PROMETHEUS_URL environment variable to enable advanced monitoring.",
@@ -2308,9 +2252,7 @@
       "registeredCount": "{count, plural, =0 {Nav reģistrāciju} one {1 reģistrācija} other {# reģistrācijas}}"
     },
     "tags": {
-      "title": "Tagu pārvaldība",
       "subtitle": "Izveidojiet, rediģējiet un dzēsiet tagus, ko izmanto publisko pasākumu klasificēšanai un filtrēšanai.",
-      "backToSettings": "Iestatījumi",
       "addTag": "Jauns tags",
       "editTag": "Rediģēt tagu",
       "columnColor": "Krāsa",
@@ -2426,7 +2368,6 @@
       }
     },
     "rubrica": {
-      "title": "Kontaktu grāmata",
       "subtitle": "Personas, kas devušas piekrišanu iekļaušanai kontaktu grāmatā (VDAR 6.1.a pants). Profila informācija tiek atjaunināta automātiski katrā atkārtotā reģistrācijā.",
       "searchLabel": "Meklēt pēc vārda vai organizācijas",
       "orgTypeLabel": "Organizācijas veids",
@@ -2519,7 +2460,6 @@
       "privacyNote": "Statistika par katru personu pēc noklusējuma ir pseidonimizēta. Anonīmi apkopotie dati tiek saglabāti pasākuma pārskatā; neapstrādātās rindas tiek dzēstas, beidzoties glabāšanas termiņam."
     },
     "postprod": {
-      "title": "MI pēcapstrādes konveijers",
       "subtitle": "Transkripcijas, kopsavilkumi un tulkojumi, ko izveidojis klasterī izvietotais MI konveijers. Piesaistiet runātājus, palaidiet darbus atkārtoti vai atceliet tos.",
       "filterStatus": "Statuss",
       "all": "Visi",
@@ -2603,7 +2543,6 @@
       "archiveGenerateOk": "Arhīva izveide ir sākta.",
       "archiveGenerateErr": "Arhīva izveide neizdevās (HTTP {code}).",
       "archiveTrackFallback": "Dalībnieks",
-      "manageBackToList": "Visi ieraksti",
       "manageDuration": "Ilgums",
       "manageSource": "Avota valoda",
       "manageOpenPublic": "Publiskā lapa",
@@ -2768,11 +2707,9 @@
       "originalUncertainHint": "Saglabātajā tekstā jau var būt labojumi, kas veikti pirms šīs funkcijas ieviešanas: nav pierādāms, ka tas ir automātiskās transkripcijas izveidotais teksts"
     },
     "questionnairesPage": {
-      "title": "Anketas",
       "subtitle": "Atkārtoti izmantojamas jautājumu veidnes pirmsreģistrācijas un pēcpasākuma anketām."
     },
     "questionnaireResponses": {
-      "title": "Anketu atbildes",
       "subtitle": "Apkopojumi pa jautājumiem, filtrējami pēc pasākuma, fāzes un datumu diapazona."
     },
     "eventQuestionnaires": {
@@ -2822,11 +2759,8 @@
       "downloadFailed": "Lejupielāde neizdevās: mēģini vēlreiz."
     },
     "glossary": {
-      "title": "Glosārijs",
       "subtitle": "Saīsinājumi, nosaukumi un termini MI pēcapstrādei: kā tos rakstīt atšifrējumos, kā tulkot un kā izrunāt dublējumā. Tie attiecas uz visiem pasākumiem; katrs pasākums var pievienot savus.",
       "organizerNote": "Varat pievienot terminus visiem pasākumiem un rediģēt tos, ko pievienojāt jūs; pārējos pārvalda administrācija.",
-      "backToSettings": "Atpakaļ uz iestatījumiem",
-      "backToEvents": "Atpakaļ uz pasākumiem",
       "eventTitle": "Pasākuma termini un saīsinājumi",
       "eventIntro": "Tie papildina instances glosāriju šī pasākuma atšifrējumam, tulkojumiem un dublējumam. Ja termins jau ir instancē, to aizstāj šeit norādītais.",
       "openInstance": "Papildināt instances glosāriju, kas attiecas uz visiem pasākumiem",
@@ -3761,7 +3695,6 @@
     "reactionSent": "Reakcija nosūtīta!"
   },
   "calendar": {
-    "title": "Pasākumu kalendārs",
     "subtitle": "Skatiet visus pasākumus laika gaitā",
     "publicTitle": "Pasākumu kalendārs",
     "publicSubtitle": "Atklājiet gaidāmos pasākumus",
@@ -4240,7 +4173,6 @@
     "hintJoystick": "Velciet, lai pārvietotos"
   },
   "feedbackAdmin": {
-    "title": "Atsauksmju rezultāti",
     "totalVotes": "atbildes",
     "noFeedback": "Atsauksmes nav saņemtas",
     "comments": "Komentāri",

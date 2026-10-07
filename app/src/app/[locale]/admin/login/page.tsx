@@ -55,7 +55,7 @@ export default function AdminLoginPage() {
         // so a soft push renders nothing until a manual reload. A full
         // document request re-runs middleware with the fresh admin_session
         // cookie and lands on the real admin page.
-        window.location.assign(localizedPath('/admin', locale));
+        window.location.assign(localizedPath('/admin/events', locale));
         return;
       } else {
         setError(true);

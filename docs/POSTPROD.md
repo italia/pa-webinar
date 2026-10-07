@@ -634,11 +634,11 @@ may render it, how it is translated and how it is pronounced in dubbing
 (`app/src/lib/ai/glossary.ts`, applied by `infra/ai/worker/glossary.py`). It
 has two levels:
 
-- **Instance terms**, in **Settings → Glossary** (`/admin/settings/glossary`,
+- **Instance terms**, in **Video → Glossary** (`/admin/glossary`,
   API `/api/admin/glossary`). They apply to every event. Administrators and
   organizers add terms; an organizer edits and deletes only the terms they
-  added, administrators all of them. Organizers reach the page from the
-  glossary panel of their events. A new installation starts with common
+  added, administrators all of them. Everyone reaches the page from the
+  menu, and from the glossary panel of an event. A new installation starts with common
   Italian public-administration acronyms, which administrators can edit or
   delete.
 - **Event terms**, managed in the **After the event** tab of the event page
@@ -1343,7 +1343,7 @@ the spot taint too. Each platform guide covers its pool:
 
 ### The recording list
 
-**Transcripts / AI** in the administration menu opens `/admin/postprod`
+**Video → AI post-production** in the administration menu opens `/admin/postprod`
 (**AI post-production pipeline**). It lists recordings with their status,
 jobs and artifacts, filters by status, and refreshes every 10 seconds.
 Administrators see every recording; organizers see only the recordings of

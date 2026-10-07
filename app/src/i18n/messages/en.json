@@ -615,7 +615,6 @@
       "newLink": "Request a new link"
     },
     "organizers": {
-      "title": "Staff accounts",
       "intro": "People who work in the administration area under their own name. Organisers create and manage their own events; administrators manage the whole instance. They sign in with a link sent to their email, no password. The instance key remains for emergencies and automation.",
       "newTitle": "Add an account",
       "name": "Full name",
@@ -930,81 +929,50 @@
     },
     "nav": {
       "events": "Events",
-      "registrations": "Sign-ups",
-      "recordings": "Video & sessions",
       "settings": "Settings",
-      "eventsList": "Event list",
+      "eventsList": "All events",
       "newEvent": "New event",
-      "calendar": "Calendar",
-      "templates": "Templates",
+      "calendar": "Event calendar",
+      "templates": "Event templates",
       "analytics": "Analytics",
       "instantCalls": "Instant calls",
       "infrastructure": "Infrastructure",
       "monitoring": "Monitoring",
-      "monitoringDashboard": "Dashboard",
+      "monitoringDashboard": "Service status",
       "registrationsList": "Sign-ups",
-      "moderators": "Moderators",
       "moderatorLinks": "Moderator links",
-      "gdprAudit": "GDPR audit",
-      "recordingsList": "Video recordings",
-      "settingsGeneral": "General",
+      "gdprAudit": "GDPR log",
+      "recordingsList": "Recordings",
+      "settingsGeneral": "General settings",
       "settingsLanguages": "Languages",
-      "settingsGdprTemplates": "GDPR templates",
-      "admin": "Administration",
-      "eventDetail": "Event detail",
-      "eventEdit": "Edit event",
-      "publications": "Publications",
-      "publicationsList": "All publications",
+      "settingsGdprTemplates": "Privacy notices",
+      "eventDetail": "Event",
+      "eventEdit": "Edit",
+      "publicationsList": "Publications",
       "publicationsNew": "New publication",
       "ariaLabel": "Admin navigation",
       "subNavAriaLabel": "Section navigation",
       "questionnaires": "Questionnaires",
-      "questionnairesLibrary": "Template library",
-      "questionnairesResponses": "Responses and statistics",
+      "questionnairesLibrary": "Questionnaire templates",
+      "questionnairesResponses": "Responses",
       "rubrica": "Address book",
       "settingsEmailTemplates": "Email templates",
-      "settingsTags": "Tag management",
-      "settingsGlossary": "Glossary",
+      "settingsTags": "Tags",
       "eventMaterials": "Materials",
       "eventQuestionnaires": "Questionnaires",
-      "rubricaList": "List",
-      "rubricaDetail": "Entry",
-      "organizers": "Accounts",
+      "rubricaDetail": "Person",
       "staffAccess": "Staff and access",
       "staffAccounts": "Staff accounts",
       "people": "People",
       "postprodDetail": "Recording",
-      "recordingsPostprod": "Transcripts / AI",
-      "feedbackDashboard": "Feedback"
-    },
-    "landing": {
-      "title": "Admin panel",
-      "subtitle": "Manage events, sign-ups, video recordings, monitoring and configuration",
-      "eventsTitle": "Events",
-      "eventsDescription": "Create, edit and manage scheduled events and instant calls. Includes templates and calendar.",
-      "instantCallsTitle": "Instant calls",
-      "instantCallsDescription": "Spin up a public video call on the fly without scheduling — link is shareable immediately.",
-      "instantCallsStat": "{count, plural, =0 {no instant calls in the last 30 days} one {1 instant call in the last 30 days} other {# instant calls in the last 30 days}}",
-      "registrationsTitle": "Sign-ups",
-      "registrationsDescription": "Address book of attendees signed up to events: search, filters, export, moderators and GDPR audit.",
-      "registrationsTotal": "{count, plural, =0 {no people signed up} one {1 person signed up} other {# people signed up}}",
-      "today": "today",
-      "recordingsTitle": "Video & sessions",
-      "recordingsDescription": "Call video recordings, ended live sessions and archived instant calls. Download and management.",
-      "recordingsStat": "{count, plural, =0 {no video recordings} one {1 video recording available} other {# video recordings available}}",
-      "analyticsTitle": "Analytics",
-      "analyticsDescription": "Usage metrics overview: events created, participants, conversion rate, top events.",
-      "monitoringTitle": "Monitoring",
-      "monitoringDescription": "Technical dashboard with infrastructure metrics, performance, availability and quality of service.",
-      "templatesTitle": "Event templates",
-      "templatesDescription": "Reusable models to quickly create events with predefined configurations.",
-      "settingsTitle": "System settings",
-      "settingsDescription": "Configure branding, content, languages, privacy and platform behaviour.",
-      "liveNow": "{count, plural, one {# event live} other {# events live}}",
-      "upcomingEvents": "{count, plural, one {# upcoming event} other {# upcoming events}}"
+      "recordingsPostprod": "AI post-production",
+      "feedbackDashboard": "Feedback",
+      "video": "Video",
+      "glossary": "Glossary",
+      "breadcrumbAriaLabel": "Breadcrumb",
+      "skipToPage": "Skip to page content"
     },
     "publications": {
-      "title": "Publications",
       "subtitle": "Single editorial hub for every published video: scheduled events, instant calls, uploaded archive recordings, and sessions waiting to be promoted.",
       "newPublication": "New publication",
       "searchPlaceholder": "Search by title or description…",
@@ -1040,7 +1008,6 @@
         "unlist": "Remove from library"
       },
       "uploadPage": {
-        "title": "New publication",
         "subtitle": "Upload an existing video file (MP4, WebM or MOV) to the platform storage and enrich it with editorial metadata.",
         "step1Title": "1. Upload the video file",
         "startUpload": "Upload",
@@ -1077,7 +1044,6 @@
       "updateFailed": "Update failed."
     },
     "recordingsLibrary": {
-      "title": "Video recordings",
       "subtitle": "Centralised library of call recordings: filter, download, export",
       "loading": "Loading...",
       "range": "Range",
@@ -1149,7 +1115,6 @@
       "transcriptProcessing": "Processing"
     },
     "gdprAudit": {
-      "title": "GDPR audit",
       "subtitle": "Log of privacy actions on personal data: deletions, consent, exports",
       "loading": "Loading...",
       "range": "Range",
@@ -1172,7 +1137,6 @@
       "noResults": "No audit entries in the selected range."
     },
     "moderators": {
-      "title": "Moderators",
       "subtitle": "Retrieve, copy and regenerate moderator magic links",
       "searchPlaceholder": "Search by slug, moderator name or email…",
       "searchHelp": "The magic link contains a unique token: share it only with the designated moderator.",
@@ -1191,7 +1155,6 @@
       "noResults": "No events found."
     },
     "registrations": {
-      "title": "Sign-ups",
       "subtitle": "All people signed up to events — search, filter and export",
       "loading": "Loading...",
       "range": "Range",
@@ -1525,18 +1488,6 @@
       "title": "Site settings",
       "subtitle": "Configure the platform appearance and behavior for PA reuse",
       "saving": "Saving...",
-      "sections": {
-        "languagesTitle": "Language management",
-        "languagesDescription": "Enable or disable the EU languages exposed to users, pick the default locale and customise translation strings.",
-        "gdprTemplatesTitle": "GDPR templates",
-        "gdprTemplatesDescription": "Create reusable privacy notices that can be linked to any event, and pick the default one for new events.",
-        "emailTemplatesTitle": "Email templates",
-        "emailTemplatesDescription": "Customise subject, headings and copy for the confirmation and reminder emails. Leave empty to keep the built-in defaults.",
-        "tagsTitle": "Tag management",
-        "tagsDescription": "Create and edit the tags used to filter events",
-        "glossaryTitle": "Glossary",
-        "glossaryDescription": "Acronyms and technical terms for transcripts, translations and dubbing"
-      },
       "saved": "Settings saved successfully",
       "tabs": {
         "branding": "Branding",
@@ -1869,7 +1820,6 @@
       "invalidRRule": "Invalid rule"
     },
     "templates": {
-      "title": "Event templates",
       "subtitle": "Manage preset templates for quick event creation",
       "create": "New template",
       "deleteConfirm": "Are you sure you want to delete this template?",
@@ -1966,7 +1916,6 @@
       "errorGeneric": "Something went wrong. Please try again."
     },
     "gdprTemplates": {
-      "title": "GDPR templates",
       "subtitle": "Create and manage reusable privacy notices shared across events. A template marked as default is pre-selected on new events.",
       "newTemplate": "New template",
       "emptyState": "No templates yet. Create one to reuse the same privacy text across multiple events.",
@@ -1992,7 +1941,6 @@
       "deleteTitle": "Delete template"
     },
     "emailTemplates": {
-      "title": "Email templates",
       "subtitle": "Customise subject, headings and copy for transactional emails. Fields left empty use the built-in default copy.",
       "overridden": "Customised",
       "usingDefault": "Using default",
@@ -2031,7 +1979,6 @@
       }
     },
     "languages": {
-      "title": "Language management",
       "subtitle": "Configure available languages and customize translations",
       "defaultLocaleTitle": "Default language",
       "defaultLocaleDescription": "The default language is used as fallback when a translation is not available and as the primary language of the site.",
@@ -2057,7 +2004,6 @@
       "addOverride": "Add"
     },
     "infrastructure": {
-      "title": "Infrastructure",
       "subtitle": "Component status and environment configuration",
       "deploymentMode": "Deployment mode",
       "version": "Version",
@@ -2120,7 +2066,6 @@
       }
     },
     "instantCalls": {
-      "title": "Instant calls",
       "subtitle": "List of instant videocalls",
       "total": "total",
       "noCalls": "No instant calls yet.",
@@ -2182,7 +2127,6 @@
       "deleteTitle": "Delete session"
     },
     "monitoring": {
-      "title": "Monitoring",
       "subtitle": "Technical dashboard with infrastructure metrics, performance, availability and call analytics",
       "loading": "Loading metrics...",
       "prometheusUnavailable": "Prometheus is not configured. Set PROMETHEUS_URL to enable advanced monitoring. DB analytics are still shown.",
@@ -2308,9 +2252,7 @@
       "registeredCount": "{count, plural, =0 {No registrations} one {1 registration} other {# registrations}}"
     },
     "tags": {
-      "title": "Tag management",
       "subtitle": "Create, edit and delete the tags used to classify and filter public events.",
-      "backToSettings": "Settings",
       "addTag": "New tag",
       "editTag": "Edit tag",
       "columnColor": "Color",
@@ -2426,7 +2368,6 @@
       }
     },
     "rubrica": {
-      "title": "Address book",
       "subtitle": "People who have consented to be added to the address book (GDPR art. 6.1.a). Profile information is updated automatically on every re-registration.",
       "searchLabel": "Search by name or organization",
       "orgTypeLabel": "Organization type",
@@ -2519,7 +2460,6 @@
       "privacyNote": "Per-person statistics are pseudonymous by default. Anonymous aggregates are kept in the event recap; raw rows are deleted when retention expires."
     },
     "postprod": {
-      "title": "AI post-production pipeline",
       "subtitle": "Transcripts, summaries and translations produced by the in-cluster AI pipeline. Map speakers, re-run or cancel jobs.",
       "filterStatus": "Status",
       "all": "All",
@@ -2603,7 +2543,6 @@
       "archiveGenerateOk": "Archive generation started.",
       "archiveGenerateErr": "Archive generation failed (HTTP {code}).",
       "archiveTrackFallback": "Participant",
-      "manageBackToList": "All recordings",
       "manageDuration": "Duration",
       "manageSource": "Source language",
       "manageOpenPublic": "Public page",
@@ -2768,11 +2707,9 @@
       "originalUncertainHint": "The preserved text may already include corrections made before this feature existed: it cannot be proven to be what the automatic transcription produced"
     },
     "questionnairesPage": {
-      "title": "Questionnaires",
       "subtitle": "Reusable question templates for pre-registration and post-event questionnaires."
     },
     "questionnaireResponses": {
-      "title": "Questionnaire responses",
       "subtitle": "Aggregations by question, filterable by event, phase and date range."
     },
     "eventQuestionnaires": {
@@ -2822,11 +2759,8 @@
       "downloadFailed": "Download failed: please try again."
     },
     "glossary": {
-      "title": "Glossary",
       "subtitle": "Acronyms, names and technical terms for AI post-production: how they are written in transcripts, how they are translated and how they are pronounced in dubbing. They apply to every event; each event can add its own.",
       "organizerNote": "You can add terms for every event and edit the ones you added; the others are managed by the administrators.",
-      "backToSettings": "Back to settings",
-      "backToEvents": "Back to events",
       "eventTitle": "Event terms and acronyms",
       "eventIntro": "They are added to the instance glossary for the transcript, translations and dubbing of this event. A term that is already in the instance glossary is replaced by the one here.",
       "openInstance": "Add to the instance glossary, used for every event",
@@ -3761,7 +3695,6 @@
     "reactionSent": "Reaction sent!"
   },
   "calendar": {
-    "title": "Event calendar",
     "subtitle": "View all events over time",
     "publicTitle": "Event calendar",
     "publicSubtitle": "Discover upcoming events",
@@ -4240,7 +4173,6 @@
     "hintJoystick": "Drag to move"
   },
   "feedbackAdmin": {
-    "title": "Feedback results",
     "totalVotes": "responses",
     "noFeedback": "No feedback received",
     "comments": "Comments",

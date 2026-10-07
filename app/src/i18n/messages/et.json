@@ -615,7 +615,6 @@
       "newLink": "Küsi uut linki"
     },
     "organizers": {
-      "title": "Töötajate kontod",
       "intro": "Inimesed, kes töötavad haldusalas oma nime all. Korraldajad loovad ja haldavad oma üritusi; administraatorid haldavad kogu instantsi. Nad sisenevad oma e-postile saadetud lingiga, ilma paroolita. Instantsi võti jääb hädaolukordadeks ja automatiseerimiseks.",
       "newTitle": "Lisa konto",
       "name": "Ees- ja perekonnanimi",
@@ -929,82 +928,51 @@
       "toFixField": "Väli {n}"
     },
     "nav": {
-      "events": "Ürituste haldus",
-      "registrations": "Registreeringud",
-      "recordings": "Video ja sessioonid",
-      "settings": "Süsteemi seaded",
-      "eventsList": "Ürituste nimekiri",
+      "events": "Üritused",
+      "settings": "Seaded",
+      "eventsList": "Kõik üritused",
       "newEvent": "Uus üritus",
-      "calendar": "Kalender",
-      "templates": "Mallid",
+      "calendar": "Ürituste kalender",
+      "templates": "Ürituste mallid",
       "analytics": "Statistika",
       "instantCalls": "Kiirkõned",
-      "infrastructure": "Infrastruktuur",
+      "infrastructure": "Taristu",
       "monitoring": "Seire",
-      "monitoringDashboard": "Töölaud",
-      "registrationsList": "Registreeringud",
-      "moderators": "Moderaatorid",
+      "monitoringDashboard": "Teenuse olek",
+      "registrationsList": "Registreerimised",
       "moderatorLinks": "Moderaatorite lingid",
-      "gdprAudit": "IKÜM-i audit",
-      "recordingsList": "Videosalvestused",
-      "settingsGeneral": "Üldised",
+      "gdprAudit": "IKÜM logi",
+      "recordingsList": "Salvestised",
+      "settingsGeneral": "Üldseaded",
       "settingsLanguages": "Keeled",
-      "settingsGdprTemplates": "IKÜM-i mallid",
-      "admin": "Haldus",
-      "eventDetail": "Sündmuse detailid",
-      "eventEdit": "Muuda sündmust",
-      "publications": "Avaldatud sisu",
-      "publicationsList": "Kõik avaldatud",
-      "publicationsNew": "Uus avaldus",
+      "settingsGdprTemplates": "Privaatsusteated",
+      "eventDetail": "Üritus",
+      "eventEdit": "Muuda",
+      "publicationsList": "Väljaanded",
+      "publicationsNew": "Uus väljaanne",
       "ariaLabel": "Halduse navigatsioon",
       "subNavAriaLabel": "Jaotise navigatsioon",
       "questionnaires": "Küsimustikud",
-      "questionnairesLibrary": "Mallide kogu",
-      "questionnairesResponses": "Vastused ja statistika",
+      "questionnairesLibrary": "Küsimustiku mallid",
+      "questionnairesResponses": "Vastused",
       "rubrica": "Aadressraamat",
-      "settingsEmailTemplates": "E-posti mallid",
-      "settingsTags": "Siltide haldus",
-      "settingsGlossary": "Sõnastik",
+      "settingsEmailTemplates": "E-kirja mallid",
+      "settingsTags": "Sildid",
       "eventMaterials": "Materjalid",
       "eventQuestionnaires": "Küsimustikud",
-      "rubricaList": "Loend",
-      "rubricaDetail": "Detail",
-      "organizers": "Kontod",
-      "staffAccess": "Töötajad ja juurdepääs",
-      "staffAccounts": "Töötajate kontod",
+      "rubricaDetail": "Inimene",
+      "staffAccess": "Meeskond ja juurdepääs",
+      "staffAccounts": "Meeskonna kontod",
       "people": "Inimesed",
       "postprodDetail": "Salvestis",
-      "recordingsPostprod": "Transkriptsioonid / AI",
-      "feedbackDashboard": "Feedback"
-    },
-    "landing": {
-      "title": "Halduspaneel",
-      "subtitle": "Hallake üritusi ja seadistage platvormi",
-      "eventsTitle": "Ürituste haldus",
-      "eventsDescription": "Looge, muutke ja hallake üritusi, malle ja statistikat.",
-      "instantCallsTitle": "Kiirkõned",
-      "instantCallsDescription": "Looge kohe avalik videokõne ilma eelneva planeerimiseta: jagatav link tekib koheselt.",
-      "instantCallsStat": "{count, plural, =0 {viimase 30 päeva jooksul kiirkõnesid pole} one {1 kiirkõne viimase 30 päeva jooksul} other {# kiirkõnet viimase 30 päeva jooksul}}",
-      "registrationsTitle": "Registreeringud",
-      "registrationsDescription": "Sündmustele registreerunud osalejate aadressraamat: otsing, filtrid, eksport, moderaatorid ja IKÜM-i audit.",
-      "registrationsTotal": "{count, plural, =0 {registreerunuid pole} one {1 registreerunu} other {# registreerunut}}",
-      "today": "täna",
-      "recordingsTitle": "Video ja sessioonid",
-      "recordingsDescription": "Kõnede videosalvestused, lõppenud reaalajasessioonid ja arhiveeritud kiirkõned. Allalaadimine ja haldus.",
-      "recordingsStat": "{count, plural, =0 {videosalvestusi pole} one {1 videosalvestus saadaval} other {# videosalvestust saadaval}}",
-      "analyticsTitle": "Statistika",
-      "analyticsDescription": "Kasutusmõõdikute ülevaade: loodud sündmused, osalejad, konversioonimäär, populaarsemad sündmused.",
-      "monitoringTitle": "Seire",
-      "monitoringDescription": "Tehniline töölaud koos infrastruktuuri mõõdikute, jõudluse, kättesaadavuse ja teenusekvaliteediga.",
-      "templatesTitle": "Sündmuste mallid",
-      "templatesDescription": "Korduvkasutatavad mudelid sündmuste kiireks loomiseks eelseadistustega.",
-      "settingsTitle": "Süsteemi seaded",
-      "settingsDescription": "Seadistage brändi, sisu, keeli, funktsioone ja infrastruktuuri.",
-      "liveNow": "{count, plural, one {# otseüritus} other {# otseüritust}}",
-      "upcomingEvents": "{count, plural, one {# eelseisev üritus} other {# eelseisvat üritust}}"
+      "recordingsPostprod": "AI järeltöötlus",
+      "feedbackDashboard": "Tagasiside",
+      "video": "Video",
+      "glossary": "Sõnastik",
+      "breadcrumbAriaLabel": "Asukoharada",
+      "skipToPage": "Mine lehe sisu juurde"
     },
     "publications": {
-      "title": "Avaldatud sisu",
       "subtitle": "Ühtne toimetuskeskus kõigi avaldatud videote jaoks: planeeritud sündmused, kiirkõned, üleslaaditud arhiivisalvestused ja avaldamist ootavad sessioonid.",
       "newPublication": "Uus avaldus",
       "searchPlaceholder": "Otsi pealkirja või kirjelduse järgi…",
@@ -1040,7 +1008,6 @@
         "unlist": "Eemalda kogust"
       },
       "uploadPage": {
-        "title": "Uus avaldus",
         "subtitle": "Laadige olemasolev video (MP4, WebM või MOV) platvormi salvestusruumi ja täiendage seda toimetuslike metaandmetega.",
         "step1Title": "1. Laadige videofail üles",
         "startUpload": "Lae üles",
@@ -1077,7 +1044,6 @@
       "updateFailed": "Uuendamine ebaõnnestus."
     },
     "recordingsLibrary": {
-      "title": "Videosalvestused",
       "subtitle": "Kõnesalvestuste kesksed kogu: filtreerimine, allalaadimine, eksport",
       "loading": "Laadimine...",
       "range": "Periood",
@@ -1149,7 +1115,6 @@
       "transcriptProcessing": "Töötlemisel"
     },
     "gdprAudit": {
-      "title": "IKÜM-i audit",
       "subtitle": "Privaatsustegevuste logi isikuandmetel: kustutamised, nõusolekud, ekspordid",
       "loading": "Laadimine...",
       "range": "Periood",
@@ -1172,7 +1137,6 @@
       "noResults": "Valitud perioodil auditi kandeid pole."
     },
     "moderators": {
-      "title": "Moderaatorid",
       "subtitle": "Otsige, kopeerige ja taasgenereerige moderaatorite maagilisi linke",
       "searchPlaceholder": "Otsi slug-i, moderaatori nime või e-posti järgi…",
       "searchHelp": "Maagiline link sisaldab unikaalset märgendit: jagage seda ainult määratud moderaatoriga.",
@@ -1191,7 +1155,6 @@
       "noResults": "Sündmusi ei leitud."
     },
     "registrations": {
-      "title": "Registreeringud",
       "subtitle": "Kõik sündmustele registreerunud isikud — otsi, filtreeri ja ekspordi",
       "loading": "Laadimine...",
       "range": "Periood",
@@ -1525,18 +1488,6 @@
       "title": "Saidi seaded",
       "subtitle": "Seadistage platvormi välimus ja käitumine AH taaskasutuseks",
       "saving": "Salvestamine...",
-      "sections": {
-        "languagesTitle": "Keelte haldus",
-        "languagesDescription": "Luba või keela kasutajale avatavad EL keeled, vali vaikekeel ja kohanda tõlkeid.",
-        "gdprTemplatesTitle": "GDPR mallid",
-        "gdprTemplatesDescription": "Loo korduvkasutatavad privaatsusteated, mida saab siduda iga üritusega, ja vali uute ürituste jaoks vaikevariant.",
-        "emailTemplatesTitle": "E-kirjade mallid",
-        "emailTemplatesDescription": "Kohanda kinnitus- ja meeldetuletuskirjade teemasid, pealkirju ja tekste. Tühjadele väljadele jäetakse sisseehitatud vaiketekstid.",
-        "tagsTitle": "Siltide haldus",
-        "tagsDescription": "Looge ja muutke silte sündmuste filtreerimiseks",
-        "glossaryTitle": "Sõnastik",
-        "glossaryDescription": "Lühendid ja oskussõnad transkriptsioonide, tõlgete ja dublaaži jaoks"
-      },
       "saved": "Seaded edukalt salvestatud",
       "tabs": {
         "branding": "Bränd",
@@ -1869,7 +1820,6 @@
       "invalidRRule": "Reegel pole kehtiv"
     },
     "templates": {
-      "title": "Ürituste mallid",
       "subtitle": "Hallake eelseadistatud malle ürituste kiireks loomiseks",
       "create": "Uus mall",
       "deleteConfirm": "Kas olete kindel, et soovite selle malli kustutada?",
@@ -1966,7 +1916,6 @@
       "errorGeneric": "Tekkis viga. Palun proovige uuesti."
     },
     "gdprTemplates": {
-      "title": "IKÜM-i mallid",
       "subtitle": "Looge ja hallake sündmuste vahel jagatud privaatsusteatisi. Vaikemalliks märgitud mall on uutel sündmustel ette valitud.",
       "newTemplate": "Uus mall",
       "emptyState": "Malle pole veel loodud. Looge esimene, et kasutada sama privaatsusteksti mitme sündmuse jaoks.",
@@ -1992,7 +1941,6 @@
       "deleteTitle": "Kustuta mall"
     },
     "emailTemplates": {
-      "title": "E-kirjade mallid",
       "subtitle": "Kohanda transaktsiooniliste e-kirjade teemasid, pealkirju ja tekste. Tühjade väljadega kasutatakse sisseehitatud vaiketekste.",
       "overridden": "Kohandatud",
       "usingDefault": "Vaikeväärtus",
@@ -2031,7 +1979,6 @@
       }
     },
     "languages": {
-      "title": "Keelte haldus",
       "subtitle": "Seadistage saadaolevad keeled ja kohandage tõlkeid",
       "defaultLocaleTitle": "Vaikekeelsetting",
       "defaultLocaleDescription": "Vaikekeelt kasutatakse varuvõimalusena, kui tõlge pole saadaval, ja saidi peamise keelena.",
@@ -2057,7 +2004,6 @@
       "addOverride": "Lisa"
     },
     "infrastructure": {
-      "title": "Infrastruktuur",
       "subtitle": "Komponentide olek ja keskkonna seadistus",
       "deploymentMode": "Juurutusrežiim",
       "version": "Versioon",
@@ -2120,7 +2066,6 @@
       }
     },
     "instantCalls": {
-      "title": "Kiirkõned",
       "subtitle": "Kohese videokõnede loend",
       "total": "kokku",
       "noCalls": "Kiirkõnesid pole tehtud.",
@@ -2182,7 +2127,6 @@
       "deleteTitle": "Kustuta sessioon"
     },
     "monitoring": {
-      "title": "Seire",
       "subtitle": "Real-time infrastructure and performance monitoring dashboard",
       "loading": "Mõõdikute laadimine...",
       "prometheusUnavailable": "Prometheus is not configured. Set the PROMETHEUS_URL environment variable to enable advanced monitoring.",
@@ -2308,9 +2252,7 @@
       "registeredCount": "{count, plural, =0 {Registreeringuid pole} one {1 registreering} other {# registreeringut}}"
     },
     "tags": {
-      "title": "Siltide haldus",
       "subtitle": "Looge, muutke ja kustutage silte avalike sündmuste klassifitseerimiseks ja filtreerimiseks.",
-      "backToSettings": "Seaded",
       "addTag": "Uus silt",
       "editTag": "Muuda silti",
       "columnColor": "Värv",
@@ -2426,7 +2368,6 @@
       }
     },
     "rubrica": {
-      "title": "Aadressraamat",
       "subtitle": "Inimesed, kes on andnud nõusoleku aadressraamatusse lisamiseks (IKÜM art. 6.1.a). Profiiliteave uuendatakse automaatselt iga uuesti registreerimise käigus.",
       "searchLabel": "Otsi nime või organisatsiooni järgi",
       "orgTypeLabel": "Organisatsiooni liik",
@@ -2519,7 +2460,6 @@
       "privacyNote": "Isikupõhine statistika on vaikimisi pseudonüümitud. Anonüümsed koondnäitajad säilitatakse sündmuse kokkuvõttes; toorandmete read kustutatakse säilitustähtaja möödudes."
     },
     "postprod": {
-      "title": "AI järeltöötluse töövoog",
       "subtitle": "Klastrisisese AI töövoo loodud transkriptsioonid, kokkuvõtted ja tõlked. Seosta kõnelejad, käivita tööd uuesti või tühista need.",
       "filterStatus": "Olek",
       "all": "Kõik",
@@ -2603,7 +2543,6 @@
       "archiveGenerateOk": "Arhiivi loomine käivitatud.",
       "archiveGenerateErr": "Arhiivi loomine ebaõnnestus (HTTP {code}).",
       "archiveTrackFallback": "Osaleja",
-      "manageBackToList": "Kõik salvestised",
       "manageDuration": "Kestus",
       "manageSource": "Lähtekeel",
       "manageOpenPublic": "Avalik leht",
@@ -2768,11 +2707,9 @@
       "originalUncertainHint": "Säilitatud tekst võib juba sisaldada parandusi, mis tehti enne selle funktsiooni olemasolu: ei ole võimalik tõendada, et see on automaatse transkribeerimise koostatud tekst"
     },
     "questionnairesPage": {
-      "title": "Küsimustikud",
       "subtitle": "Korduvkasutatavad küsimuste mallid eelregistreerimise ja sündmusejärgsete küsimustike jaoks."
     },
     "questionnaireResponses": {
-      "title": "Küsimustike vastused",
       "subtitle": "Küsimuste kaupa koondamised, filtreeritavad sündmuse, faasi ja kuupäeva järgi."
     },
     "eventQuestionnaires": {
@@ -2822,11 +2759,8 @@
       "downloadFailed": "Allalaadimine ebaõnnestus: proovi uuesti."
     },
     "glossary": {
-      "title": "Sõnastik",
       "subtitle": "Lühendid, nimed ja oskussõnad tehisintellektiga järeltöötluse jaoks: kuidas neid transkriptsioonides kirjutatakse, kuidas neid tõlgitakse ja kuidas neid dublaažis hääldatakse. Need kehtivad kõigile üritustele; iga üritus saab lisada oma terminid.",
       "organizerNote": "Saate lisada termineid kõigile üritustele ja muuta neid, mille ise lisasite; ülejäänuid haldavad administraatorid.",
-      "backToSettings": "Tagasi seadete juurde",
-      "backToEvents": "Tagasi ürituste juurde",
       "eventTitle": "Ürituse terminid ja lühendid",
       "eventIntro": "Need lisanduvad instantsi sõnastikule selle ürituse transkriptsiooni, tõlgete ja dublaaži jaoks. Kui termin on juba instantsis olemas, asendatakse see siinsega.",
       "openInstance": "Täienda instantsi sõnastikku, mis kehtib kõigile üritustele",
@@ -3761,7 +3695,6 @@
     "reactionSent": "Reaktsioon saadetud!"
   },
   "calendar": {
-    "title": "Ürituste kalender",
     "subtitle": "Vaadake kõiki üritusi ajas",
     "publicTitle": "Ürituste kalender",
     "publicSubtitle": "Avastage eelseisvad üritused",
@@ -4240,7 +4173,6 @@
     "hintJoystick": "Lohistage liikumiseks"
   },
   "feedbackAdmin": {
-    "title": "Tagasiside tulemused",
     "totalVotes": "vastust",
     "noFeedback": "Tagasisidet ei ole saadud",
     "comments": "Kommentaarid",

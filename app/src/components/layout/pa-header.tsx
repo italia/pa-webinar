@@ -152,12 +152,12 @@ function CenterHeader({
           ))}
           {isAdmin && (
             <Link
-              href="/admin"
+              href="/admin/events"
               aria-label={t('admin')}
               className="text-white text-decoration-none d-inline-flex align-items-center gap-1 me-3"
               style={{ fontSize: '0.9rem' }}
             >
-              <Icon icon="it-settings" size="sm" color="white" />
+              <Icon icon="it-tool" size="sm" color="white" />
               <span className="d-none d-md-inline">{t('admin')}</span>
             </Link>
           )}

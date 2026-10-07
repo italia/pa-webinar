@@ -438,7 +438,7 @@ Whether this storage needs consent under the ePrivacy rules is the controller's 
 
 ## Audit trails
 
-`GdprAuditLog` is the privacy audit trail. Its rows hold an event ID, an action, a record count and a JSON detail with no personal data. The administration reads it at **GDPR audit** (`/admin/gdpr-audit`, administrators only).
+`GdprAuditLog` is the privacy audit trail. Its rows hold an event ID, an action, a record count and a JSON detail with no personal data. The administration reads it at **People → GDPR log** (`/admin/gdpr-audit`, administrators only).
 
 | Action | Written by | Details |
 |---|---|---|
@@ -464,7 +464,7 @@ The registration form shows the event's privacy notice above the consent boxes. 
 4. the environment variable `DEFAULT_PRIVACY_POLICY_URL`;
 5. the installation's own page, `/privacy`.
 
-An event's `privacyPolicyUrl` can be replaced but not removed, so once set it keeps taking precedence over steps 4 and 5 ([Roadmap](ROADMAP.md#known-limitations-of-shipped-features)). A text from steps 1 or 2 appears in an expandable section of the form. Otherwise the form shows a link that opens in a new tab. GDPR templates are managed at **GDPR templates** in the settings; the template marked as default is preselected on new events, and choosing a template in the wizard clears any text typed by hand.
+An event's `privacyPolicyUrl` can be replaced but not removed, so once set it keeps taking precedence over steps 4 and 5 ([Roadmap](ROADMAP.md#known-limitations-of-shipped-features)). A text from steps 1 or 2 appears in an expandable section of the form. Otherwise the form shows a link that opens in a new tab. Privacy notice templates are managed at **Settings → Privacy notices**; an event's text saved empty counts as no text, so the template applies; the template marked as default is preselected on new events, and choosing a template in the wizard clears any text typed by hand.
 
 ### The installation's privacy page
 

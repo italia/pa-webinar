@@ -615,7 +615,6 @@
       "newLink": "Požiadať o nový odkaz"
     },
     "organizers": {
-      "title": "Účty tímu",
       "intro": "Ľudia, ktorí pracujú v administrácii pod vlastným menom. Organizátori vytvárajú a spravujú vlastné podujatia; administrátori spravujú celú inštanciu. Prihlasujú sa odkazom zaslaným na svoj e-mail, bez hesla. Kľúč inštancie zostáva pre núdzové situácie a automatizáciu.",
       "newTitle": "Pridať účet",
       "name": "Meno a priezvisko",
@@ -929,82 +928,51 @@
       "toFixField": "Pole {n}"
     },
     "nav": {
-      "events": "Správa udalostí",
-      "registrations": "Registrácie",
-      "recordings": "Video a relácie",
-      "settings": "Nastavenia systému",
-      "eventsList": "Zoznam udalostí",
+      "events": "Udalosti",
+      "settings": "Nastavenia",
+      "eventsList": "Všetky udalosti",
       "newEvent": "Nová udalosť",
-      "calendar": "Kalendár",
-      "templates": "Šablóny",
+      "calendar": "Kalendár udalostí",
+      "templates": "Šablóny udalostí",
       "analytics": "Štatistiky",
       "instantCalls": "Rýchle hovory",
       "infrastructure": "Infraštruktúra",
-      "monitoring": "Monitoring",
-      "monitoringDashboard": "Dashboard",
+      "monitoring": "Monitorovanie",
+      "monitoringDashboard": "Stav služby",
       "registrationsList": "Registrácie",
-      "moderators": "Moderátori",
       "moderatorLinks": "Odkazy moderátorov",
-      "gdprAudit": "Audit GDPR",
-      "recordingsList": "Videozáznamy",
-      "settingsGeneral": "Všeobecné",
+      "gdprAudit": "Záznamy GDPR",
+      "recordingsList": "Záznamy",
+      "settingsGeneral": "Všeobecné nastavenia",
       "settingsLanguages": "Jazyky",
-      "settingsGdprTemplates": "Šablóny GDPR",
-      "admin": "Administrácia",
-      "eventDetail": "Detail podujatia",
-      "eventEdit": "Upraviť podujatie",
-      "publications": "Publikácie",
-      "publicationsList": "Všetky publikácie",
+      "settingsGdprTemplates": "Informácie o ochrane súkromia",
+      "eventDetail": "Udalosť",
+      "eventEdit": "Úpravy",
+      "publicationsList": "Publikácie",
       "publicationsNew": "Nová publikácia",
       "ariaLabel": "Navigácia administrácie",
       "subNavAriaLabel": "Navigácia sekcie",
       "questionnaires": "Dotazníky",
-      "questionnairesLibrary": "Knižnica šablón",
-      "questionnairesResponses": "Odpovede a štatistiky",
+      "questionnairesLibrary": "Šablóny dotazníkov",
+      "questionnairesResponses": "Odpovede",
       "rubrica": "Adresár",
-      "settingsEmailTemplates": "E-mailové šablóny",
-      "settingsTags": "Správa tagov",
-      "settingsGlossary": "Glosár",
+      "settingsEmailTemplates": "Šablóny e-mailov",
+      "settingsTags": "Štítky",
       "eventMaterials": "Materiály",
       "eventQuestionnaires": "Dotazníky",
-      "rubricaList": "Zoznam",
-      "rubricaDetail": "Detail",
-      "organizers": "Účty",
+      "rubricaDetail": "Osoba",
       "staffAccess": "Tím a prístupy",
       "staffAccounts": "Účty tímu",
-      "people": "Osoby",
+      "people": "Ľudia",
       "postprodDetail": "Záznam",
-      "recordingsPostprod": "Prepisy / AI",
-      "feedbackDashboard": "Feedback"
-    },
-    "landing": {
-      "title": "Administračný panel",
-      "subtitle": "Spravujte udalosti a konfigurujte platformu",
-      "eventsTitle": "Správa udalostí",
-      "eventsDescription": "Vytvárajte, upravujte a spravujte udalosti, šablóny a štatistiky.",
-      "instantCallsTitle": "Rýchle hovory",
-      "instantCallsDescription": "Vytvorte verejný videohovor okamžite bez plánovania: odkaz je ihneď zdieľateľný.",
-      "instantCallsStat": "{count, plural, =0 {žiadny rýchly hovor za posledných 30 dní} one {1 rýchly hovor za posledných 30 dní} other {# rýchlych hovorov za posledných 30 dní}}",
-      "registrationsTitle": "Registrácie",
-      "registrationsDescription": "Adresár účastníkov registrovaných na podujatia: vyhľadávanie, filtre, export, moderátori a audit GDPR.",
-      "registrationsTotal": "{count, plural, =0 {žiadna registrovaná osoba} one {1 registrovaná osoba} other {# registrovaných osôb}}",
-      "today": "dnes",
-      "recordingsTitle": "Video a relácie",
-      "recordingsDescription": "Videozáznamy hovorov, ukončené živé relácie a archivované rýchle hovory. Stiahnutie a správa.",
-      "recordingsStat": "{count, plural, =0 {žiadny videozáznam} one {1 dostupný videozáznam} other {# dostupných videozáznamov}}",
-      "analyticsTitle": "Štatistiky",
-      "analyticsDescription": "Prehľad metrík využívania: vytvorené podujatia, účastníci, miera konverzie, top podujatia.",
-      "monitoringTitle": "Monitoring",
-      "monitoringDescription": "Technický dashboard s metrikami infraštruktúry, výkonu, dostupnosti a kvality služby.",
-      "templatesTitle": "Šablóny podujatí",
-      "templatesDescription": "Opakovane použiteľné modely na rýchle vytváranie podujatí s preddefinovanou konfiguráciou.",
-      "settingsTitle": "Nastavenia systému",
-      "settingsDescription": "Konfigurujte branding, obsah, jazyky, funkcie a infraštruktúru.",
-      "liveNow": "{count, plural, one {# udalosť naživo} few {# udalosti naživo} other {# udalostí naživo}}",
-      "upcomingEvents": "{count, plural, one {# nadchádzajúca udalosť} few {# nadchádzajúce udalosti} other {# nadchádzajúcich udalostí}}"
+      "recordingsPostprod": "AI postprodukcia",
+      "feedbackDashboard": "Spätná väzba",
+      "video": "Video",
+      "glossary": "Glosár",
+      "breadcrumbAriaLabel": "Navigačná cesta",
+      "skipToPage": "Prejsť na obsah stránky"
     },
     "publications": {
-      "title": "Publikácie",
       "subtitle": "Jednotný redakčný hub pre všetky zverejnené videá: naplánované podujatia, rýchle hovory, nahrané historické archívy a relácie čakajúce na zverejnenie.",
       "newPublication": "Nová publikácia",
       "searchPlaceholder": "Hľadať podľa názvu alebo popisu…",
@@ -1040,7 +1008,6 @@
         "unlist": "Odstrániť z knižnice"
       },
       "uploadPage": {
-        "title": "Nová publikácia",
         "subtitle": "Nahrajte existujúci video súbor (MP4, WebM alebo MOV) do úložiska platformy a doplňte ho redakčnými metaúdajmi.",
         "step1Title": "1. Nahrajte video súbor",
         "startUpload": "Nahrať",
@@ -1077,7 +1044,6 @@
       "updateFailed": "Aktualizácia zlyhala."
     },
     "recordingsLibrary": {
-      "title": "Videozáznamy",
       "subtitle": "Centrálna knižnica videozáznamov hovorov: filtrovanie, sťahovanie, export",
       "loading": "Načítava sa...",
       "range": "Obdobie",
@@ -1149,7 +1115,6 @@
       "transcriptProcessing": "Spracúva sa"
     },
     "gdprAudit": {
-      "title": "Audit GDPR",
       "subtitle": "Register akcií ochrany súkromia na osobných údajoch: vymazania, súhlasy, exporty",
       "loading": "Načítava sa...",
       "range": "Obdobie",
@@ -1172,7 +1137,6 @@
       "noResults": "Žiadne audit záznamy v zvolenom období."
     },
     "moderators": {
-      "title": "Moderátori",
       "subtitle": "Načítavajte, kopírujte a regenerujte magic linky moderátorov",
       "searchPlaceholder": "Hľadať podľa slug, mena alebo e-mailu moderátora…",
       "searchHelp": "Magic link obsahuje jedinečný token: zdieľajte ho len s určeným moderátorom.",
@@ -1191,7 +1155,6 @@
       "noResults": "Žiadne podujatie nebolo nájdené."
     },
     "registrations": {
-      "title": "Registrácie",
       "subtitle": "Všetky osoby registrované na podujatia — vyhľadávanie, filtrovanie a export",
       "loading": "Načítava sa...",
       "range": "Obdobie",
@@ -1525,18 +1488,6 @@
       "title": "Nastavenia webu",
       "subtitle": "Konfigurujte vzhľad a správanie platformy pre opakované použitie vo verejnej správe",
       "saving": "Ukladanie...",
-      "sections": {
-        "languagesTitle": "Správa jazykov",
-        "languagesDescription": "Aktivujte alebo deaktivujte jazyky EÚ zobrazené v rozhraní, zvoľte predvolený jazyk a prispôsobte preklady.",
-        "gdprTemplatesTitle": "Šablóny GDPR",
-        "gdprTemplatesDescription": "Vytvorte opakovane použiteľné oznámenia o ochrane súkromia pre udalosti a zvoľte predvolenú pre nové udalosti.",
-        "emailTemplatesTitle": "E-mailové šablóny",
-        "emailTemplatesDescription": "Prispôsobte predmet, nadpisy a texty potvrdzovacích a pripomienkových e-mailov. Ak ostanú prázdne, použijú sa predvolené texty.",
-        "tagsTitle": "Správa tagov",
-        "tagsDescription": "Vytvárajte a upravujte tagy používané na filtrovanie podujatí",
-        "glossaryTitle": "Glosár",
-        "glossaryDescription": "Skratky a odborné výrazy pre prepisy, preklady a dabing"
-      },
       "saved": "Nastavenia úspešne uložené",
       "tabs": {
         "branding": "Branding",
@@ -1869,7 +1820,6 @@
       "invalidRRule": "Neplatné pravidlo"
     },
     "templates": {
-      "title": "Šablóny udalostí",
       "subtitle": "Spravujte prednastavené šablóny pre rýchle vytváranie udalostí",
       "create": "Nová šablóna",
       "deleteConfirm": "Naozaj chcete zmazať túto šablónu?",
@@ -1966,7 +1916,6 @@
       "errorGeneric": "Vyskytla sa chyba. Skúste to znova."
     },
     "gdprTemplates": {
-      "title": "Šablóny GDPR",
       "subtitle": "Vytvárajte a spravujte opakovane použiteľné informácie o ochrane súkromia zdieľané medzi podujatiami. Šablóna označená ako predvolená je predvybraná na nových podujatiach.",
       "newTemplate": "Nová šablóna",
       "emptyState": "Zatiaľ žiadne šablóny. Vytvorte prvú na opätovné použitie rovnakého textu ochrany súkromia na viacerých podujatiach.",
@@ -1992,7 +1941,6 @@
       "deleteTitle": "Odstrániť šablónu"
     },
     "emailTemplates": {
-      "title": "E-mailové šablóny",
       "subtitle": "Prispôsobte predmet, nadpisy a texty transakčných e-mailov. Polia ponechané prázdne použijú vstavané predvolené texty.",
       "overridden": "Prispôsobené",
       "usingDefault": "Predvolené",
@@ -2031,7 +1979,6 @@
       }
     },
     "languages": {
-      "title": "Správa jazykov",
       "subtitle": "Konfigurujte dostupné jazyky a prispôsobte preklady",
       "defaultLocaleTitle": "Predvolený jazyk",
       "defaultLocaleDescription": "Predvolený jazyk sa používa ako záložný, keď preklad nie je k dispozícii, a ako hlavný jazyk stránky.",
@@ -2057,7 +2004,6 @@
       "addOverride": "Pridať"
     },
     "infrastructure": {
-      "title": "Infraštruktúra",
       "subtitle": "Stav komponentov a konfigurácia prostredia",
       "deploymentMode": "Režim nasadenia",
       "version": "Verzia",
@@ -2120,7 +2066,6 @@
       }
     },
     "instantCalls": {
-      "title": "Rýchle hovory",
       "subtitle": "Zoznam okamžitých videohovorov",
       "total": "celkovo",
       "noCalls": "Zatiaľ žiadne rýchle hovory.",
@@ -2182,7 +2127,6 @@
       "deleteTitle": "Odstrániť reláciu"
     },
     "monitoring": {
-      "title": "Monitoring",
       "subtitle": "Real-time infrastructure and performance monitoring dashboard",
       "loading": "Načítavajú sa metriky...",
       "prometheusUnavailable": "Prometheus is not configured. Set the PROMETHEUS_URL environment variable to enable advanced monitoring.",
@@ -2308,9 +2252,7 @@
       "registeredCount": "{count, plural, =0 {Žiadne registrácie} one {1 registrácia} other {# registrácií}}"
     },
     "tags": {
-      "title": "Správa tagov",
       "subtitle": "Vytvárajte, upravujte a odstraňujte tagy používané na klasifikáciu a filtrovanie verejných podujatí.",
-      "backToSettings": "Nastavenia",
       "addTag": "Nový tag",
       "editTag": "Upraviť tag",
       "columnColor": "Farba",
@@ -2426,7 +2368,6 @@
       }
     },
     "rubrica": {
-      "title": "Adresár",
       "subtitle": "Osoby, ktoré dali súhlas so zaradením do adresára (čl. 6.1.a GDPR). Profilové informácie sa automaticky aktualizujú pri každej opätovnej registrácii.",
       "searchLabel": "Hľadať podľa mena alebo organizácie",
       "orgTypeLabel": "Typ organizácie",
@@ -2519,7 +2460,6 @@
       "privacyNote": "Štatistiky za jednotlivé osoby sú predvolene pseudonymizované. Anonymné súhrny sa uchovávajú v zhrnutí podujatia; surové riadky sa vymažú po uplynutí lehoty uchovávania."
     },
     "postprod": {
-      "title": "AI pipeline postprodukcie",
       "subtitle": "Prepisy, zhrnutia a preklady vytvorené AI pipeline v klastri. Priraďte hovoriacich, znova spustite alebo zrušte úlohy.",
       "filterStatus": "Stav",
       "all": "Všetky",
@@ -2603,7 +2543,6 @@
       "archiveGenerateOk": "Vytváranie archívu sa spustilo.",
       "archiveGenerateErr": "Vytvorenie archívu zlyhalo (HTTP {code}).",
       "archiveTrackFallback": "Účastník",
-      "manageBackToList": "Všetky nahrávky",
       "manageDuration": "Trvanie",
       "manageSource": "Zdrojový jazyk",
       "manageOpenPublic": "Verejná stránka",
@@ -2768,11 +2707,9 @@
       "originalUncertainHint": "Uchovaný text už môže obsahovať opravy vykonané predtým, ako táto funkcia existovala: nedá sa preukázať, že ide o text vytvorený automatickým prepisom"
     },
     "questionnairesPage": {
-      "title": "Dotazníky",
       "subtitle": "Opakovane použiteľné šablóny otázok pre predregistračné a po-podujatie dotazníky."
     },
     "questionnaireResponses": {
-      "title": "Odpovede dotazníkov",
       "subtitle": "Agregácie podľa otázky, filtrovateľné podľa podujatia, fázy a dátumového rozsahu."
     },
     "eventQuestionnaires": {
@@ -2822,11 +2759,8 @@
       "downloadFailed": "Stiahnutie sa nepodarilo: skúste to znova."
     },
     "glossary": {
-      "title": "Glosár",
       "subtitle": "Skratky, mená a odborné výrazy pre postprodukciu s AI: ako sa píšu v prepisoch, ako sa prekladajú a ako sa vyslovujú v dabingu. Platia pre všetky udalosti; každá udalosť môže pridať vlastné.",
       "organizerNote": "Môžete pridávať výrazy pre všetky udalosti a upravovať tie, ktoré ste pridali; ostatné spravuje administrácia.",
-      "backToSettings": "Späť na nastavenia",
-      "backToEvents": "Späť na udalosti",
       "eventTitle": "Výrazy a skratky udalosti",
       "eventIntro": "Dopĺňajú glosár inštancie pre prepis, preklady a dabing tejto udalosti. Výraz, ktorý už je v inštancii, sa nahradí tunajším.",
       "openInstance": "Doplniť glosár inštancie, platný pre všetky udalosti",
@@ -3761,7 +3695,6 @@
     "reactionSent": "Reakcia odoslaná!"
   },
   "calendar": {
-    "title": "Kalendár udalostí",
     "subtitle": "Zobraziť všetky udalosti v čase",
     "publicTitle": "Kalendár udalostí",
     "publicSubtitle": "Objavte naplánované udalosti",
@@ -4240,7 +4173,6 @@
     "hintJoystick": "Posúvaním sa pohybujte"
   },
   "feedbackAdmin": {
-    "title": "Výsledky spätnej väzby",
     "totalVotes": "odpovede",
     "noFeedback": "Nebola prijatá žiadna spätná väzba",
     "comments": "Komentáre",

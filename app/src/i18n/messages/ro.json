@@ -615,7 +615,6 @@
       "newLink": "Cere un link nou"
     },
     "organizers": {
-      "title": "Conturile echipei",
       "intro": "Persoane care lucrează în zona de administrare cu propriul nume. Organizatorii își creează și își gestionează propriile evenimente; administratorii gestionează întreaga instanță. Intră cu un link trimis pe e-mail, fără parolă. Cheia instanței rămâne pentru urgențe și automatizare.",
       "newTitle": "Adaugă un cont",
       "name": "Nume și prenume",
@@ -929,82 +928,51 @@
       "toFixField": "Câmpul {n}"
     },
     "nav": {
-      "events": "Gestionare evenimente",
-      "registrations": "Înscrieri",
-      "recordings": "Video și sesiuni",
-      "settings": "Setări de sistem",
-      "eventsList": "Listă evenimente",
+      "events": "Evenimente",
+      "settings": "Setări",
+      "eventsList": "Toate evenimentele",
       "newEvent": "Eveniment nou",
-      "calendar": "Calendar",
-      "templates": "Șabloane",
+      "calendar": "Calendarul evenimentelor",
+      "templates": "Șabloane de evenimente",
       "analytics": "Statistici",
       "instantCalls": "Apeluri rapide",
       "infrastructure": "Infrastructură",
       "monitoring": "Monitorizare",
-      "monitoringDashboard": "Tablou de bord",
+      "monitoringDashboard": "Starea serviciului",
       "registrationsList": "Înscrieri",
-      "moderators": "Moderatori",
-      "moderatorLinks": "Linkuri pentru moderatori",
-      "gdprAudit": "Audit RGPD",
-      "recordingsList": "Înregistrări video",
-      "settingsGeneral": "Generale",
+      "moderatorLinks": "Linkuri de moderator",
+      "gdprAudit": "Jurnal RGPD",
+      "recordingsList": "Înregistrări",
+      "settingsGeneral": "Setări generale",
       "settingsLanguages": "Limbi",
-      "settingsGdprTemplates": "Șabloane RGPD",
-      "admin": "Administrare",
-      "eventDetail": "Detalii eveniment",
-      "eventEdit": "Modificare eveniment",
-      "publications": "Publicații",
-      "publicationsList": "Toate publicațiile",
+      "settingsGdprTemplates": "Notificări de confidențialitate",
+      "eventDetail": "Eveniment",
+      "eventEdit": "Editare",
+      "publicationsList": "Publicații",
       "publicationsNew": "Publicație nouă",
       "ariaLabel": "Navigare administrare",
       "subNavAriaLabel": "Navigare secțiune",
       "questionnaires": "Chestionare",
-      "questionnairesLibrary": "Bibliotecă șabloane",
-      "questionnairesResponses": "Răspunsuri și statistici",
+      "questionnairesLibrary": "Șabloane de chestionar",
+      "questionnairesResponses": "Răspunsuri",
       "rubrica": "Agendă",
-      "settingsEmailTemplates": "Șabloane e-mail",
-      "settingsTags": "Gestionare etichete",
-      "settingsGlossary": "Glosar",
+      "settingsEmailTemplates": "Șabloane de e-mail",
+      "settingsTags": "Etichete",
       "eventMaterials": "Materiale",
       "eventQuestionnaires": "Chestionare",
-      "rubricaList": "Listă",
-      "rubricaDetail": "Detaliu",
-      "organizers": "Conturi",
+      "rubricaDetail": "Persoană",
       "staffAccess": "Echipă și acces",
-      "staffAccounts": "Conturile echipei",
+      "staffAccounts": "Conturi ale echipei",
       "people": "Persoane",
       "postprodDetail": "Înregistrare",
-      "recordingsPostprod": "Transcrieri / AI",
-      "feedbackDashboard": "Feedback"
-    },
-    "landing": {
-      "title": "Panou de administrare",
-      "subtitle": "Gestionați evenimentele și configurați platforma",
-      "eventsTitle": "Gestionare evenimente",
-      "eventsDescription": "Creați, editați și gestionați evenimente, șabloane și statistici.",
-      "instantCallsTitle": "Apeluri rapide",
-      "instantCallsDescription": "Creați rapid un apel video public, fără planificare: linkul este partajabil imediat.",
-      "instantCallsStat": "{count, plural, =0 {niciun apel rapid în ultimele 30 de zile} one {1 apel rapid în ultimele 30 de zile} other {# apeluri rapide în ultimele 30 de zile}}",
-      "registrationsTitle": "Înscrieri",
-      "registrationsDescription": "Agenda participanților înscriși la evenimente: căutare, filtre, export, moderatori și audit RGPD.",
-      "registrationsTotal": "{count, plural, =0 {nicio persoană înscrisă} one {1 persoană înscrisă} other {# persoane înscrise}}",
-      "today": "astăzi",
-      "recordingsTitle": "Video și sesiuni",
-      "recordingsDescription": "Înregistrări video ale apelurilor, sesiuni live încheiate și apeluri rapide arhivate. Descărcare și gestionare.",
-      "recordingsStat": "{count, plural, =0 {nicio înregistrare video} one {1 înregistrare video disponibilă} other {# înregistrări video disponibile}}",
-      "analyticsTitle": "Statistici",
-      "analyticsDescription": "Privire generală asupra metricilor de utilizare: evenimente create, participanți, rată de conversie, evenimente de top.",
-      "monitoringTitle": "Monitorizare",
-      "monitoringDescription": "Tablou de bord tehnic cu metrici de infrastructură, performanță, disponibilitate și calitate a serviciului.",
-      "templatesTitle": "Șabloane evenimente",
-      "templatesDescription": "Modele reutilizabile pentru a crea rapid evenimente cu configurații predefinite.",
-      "settingsTitle": "Setări de sistem",
-      "settingsDescription": "Configurați brandingul, conținutul, limbile, funcționalitățile și infrastructura.",
-      "liveNow": "{count, plural, one {# eveniment live} few {# evenimente live} other {# evenimente live}}",
-      "upcomingEvents": "{count, plural, one {# eveniment programat} few {# evenimente programate} other {# evenimente programate}}"
+      "recordingsPostprod": "Postproducție AI",
+      "feedbackDashboard": "Feedback",
+      "video": "Video",
+      "glossary": "Glosar",
+      "breadcrumbAriaLabel": "Cale de navigare",
+      "skipToPage": "Salt la conținutul paginii"
     },
     "publications": {
-      "title": "Publicații",
       "subtitle": "Hub editorial unic pentru toate clipurile video publicate: evenimente programate, apeluri instant, arhive istorice încărcate și sesiuni în așteptare de promovare.",
       "newPublication": "Publicație nouă",
       "searchPlaceholder": "Căutați după titlu sau descriere…",
@@ -1040,7 +1008,6 @@
         "unlist": "Eliminați din bibliotecă"
       },
       "uploadPage": {
-        "title": "Publicație nouă",
         "subtitle": "Încărcați un fișier video existent (MP4, WebM sau MOV) în spațiul de stocare al platformei și completați-l cu metadate editoriale.",
         "step1Title": "1. Încărcați fișierul video",
         "startUpload": "Încărcați",
@@ -1077,7 +1044,6 @@
       "updateFailed": "Actualizarea nu a reușit."
     },
     "recordingsLibrary": {
-      "title": "Înregistrări video",
       "subtitle": "Bibliotecă centralizată a înregistrărilor video ale apelurilor: filtrare, descărcare, export",
       "loading": "Se încarcă...",
       "range": "Perioadă",
@@ -1149,7 +1115,6 @@
       "transcriptProcessing": "În curs"
     },
     "gdprAudit": {
-      "title": "Audit RGPD",
       "subtitle": "Registrul acțiunilor de confidențialitate asupra datelor cu caracter personal: ștergeri, consimțăminte, exporturi",
       "loading": "Se încarcă...",
       "range": "Perioadă",
@@ -1172,7 +1137,6 @@
       "noResults": "Nicio intrare de audit în perioada selectată."
     },
     "moderators": {
-      "title": "Moderatori",
       "subtitle": "Recuperați, copiați și regenerați linkurile magice ale moderatorilor",
       "searchPlaceholder": "Căutați după slug, nume sau e-mail moderator…",
       "searchHelp": "Linkul magic conține un token unic: partajați-l doar cu moderatorul desemnat.",
@@ -1191,7 +1155,6 @@
       "noResults": "Niciun eveniment găsit."
     },
     "registrations": {
-      "title": "Înscrieri",
       "subtitle": "Toate persoanele înscrise la evenimente — căutați, filtrați și exportați",
       "loading": "Se încarcă...",
       "range": "Perioadă",
@@ -1525,18 +1488,6 @@
       "title": "Setări site",
       "subtitle": "Configurați aspectul și comportamentul platformei pentru reutilizarea în AP",
       "saving": "Se salvează...",
-      "sections": {
-        "languagesTitle": "Gestionare limbi",
-        "languagesDescription": "Activați/dezactivați limbile UE expuse în interfață, alegeți limba implicită și personalizați traducerile.",
-        "gdprTemplatesTitle": "Șabloane GDPR",
-        "gdprTemplatesDescription": "Creați informări de confidențialitate reutilizabile între evenimente și alegeți-o pe cea implicită pentru evenimentele noi.",
-        "emailTemplatesTitle": "Șabloane de e-mail",
-        "emailTemplatesDescription": "Personalizați subiectul, titlurile și textele e-mailurilor de confirmare și memento. Dacă sunt lăsate goale, se folosesc textele predefinite.",
-        "tagsTitle": "Gestionare etichete",
-        "tagsDescription": "Creați și modificați etichetele folosite pentru filtrarea evenimentelor",
-        "glossaryTitle": "Glosar",
-        "glossaryDescription": "Acronime și termeni tehnici pentru transcrieri, traduceri și dublaj"
-      },
       "saved": "Setări salvate cu succes",
       "tabs": {
         "branding": "Branding",
@@ -1869,7 +1820,6 @@
       "invalidRRule": "Regulă nevalidă"
     },
     "templates": {
-      "title": "Șabloane evenimente",
       "subtitle": "Gestionați șabloanele predefinite pentru crearea rapidă de evenimente",
       "create": "Șablon nou",
       "deleteConfirm": "Sigur doriți să ștergeți acest șablon?",
@@ -1966,7 +1916,6 @@
       "errorGeneric": "S-a produs o eroare. Încercați din nou."
     },
     "gdprTemplates": {
-      "title": "Șabloane RGPD",
       "subtitle": "Creați și gestionați note de informare privind confidențialitatea reutilizabile între evenimente. Un șablon marcat ca implicit este preselectat la evenimente noi.",
       "newTemplate": "Șablon nou",
       "emptyState": "Niciun șablon creat încă. Creați primul pentru a reutiliza același text de confidențialitate la mai multe evenimente.",
@@ -1992,7 +1941,6 @@
       "deleteTitle": "Șterge șablonul"
     },
     "emailTemplates": {
-      "title": "Șabloane de e-mail",
       "subtitle": "Personalizați subiectul, titlurile și textele e-mailurilor tranzacționale. Câmpurile lăsate goale folosesc textele predefinite integrate.",
       "overridden": "Personalizat",
       "usingDefault": "Predefinit",
@@ -2031,7 +1979,6 @@
       }
     },
     "languages": {
-      "title": "Gestionare limbi",
       "subtitle": "Configurați limbile disponibile și personalizați traducerile",
       "defaultLocaleTitle": "Limbă implicită",
       "defaultLocaleDescription": "Limba implicită este folosită ca fallback când o traducere nu este disponibilă și ca limbă principală a site-ului.",
@@ -2057,7 +2004,6 @@
       "addOverride": "Adăugați"
     },
     "infrastructure": {
-      "title": "Infrastructură",
       "subtitle": "Starea componentelor și configurarea mediului",
       "deploymentMode": "Modul de implementare",
       "version": "Versiune",
@@ -2120,7 +2066,6 @@
       }
     },
     "instantCalls": {
-      "title": "Apeluri rapide",
       "subtitle": "Lista apelurilor video instant",
       "total": "totale",
       "noCalls": "Niciun apel rapid efectuat.",
@@ -2182,7 +2127,6 @@
       "deleteTitle": "Șterge sesiunea"
     },
     "monitoring": {
-      "title": "Monitorizare",
       "subtitle": "Real-time infrastructure and performance monitoring dashboard",
       "loading": "Se încarcă metricile...",
       "prometheusUnavailable": "Prometheus is not configured. Set the PROMETHEUS_URL environment variable to enable advanced monitoring.",
@@ -2308,9 +2252,7 @@
       "registeredCount": "{count, plural, =0 {Nicio înscriere} one {1 înscriere} other {# înscrieri}}"
     },
     "tags": {
-      "title": "Gestionare etichete",
       "subtitle": "Creați, modificați și ștergeți etichetele folosite pentru clasificarea și filtrarea evenimentelor publice.",
-      "backToSettings": "Setări",
       "addTag": "Etichetă nouă",
       "editTag": "Modificați eticheta",
       "columnColor": "Culoare",
@@ -2426,7 +2368,6 @@
       }
     },
     "rubrica": {
-      "title": "Agendă",
       "subtitle": "Persoane care și-au dat consimțământul pentru includerea în agendă (art. 6.1.a RGPD). Informațiile de profil sunt actualizate automat la fiecare reînscriere.",
       "searchLabel": "Căutați după nume sau organizație",
       "orgTypeLabel": "Tipul organizației",
@@ -2519,7 +2460,6 @@
       "privacyNote": "Statisticile pe persoană sunt pseudonime în mod implicit. Agregatele anonime se păstrează în recapitularea evenimentului; rândurile brute se șterg la expirarea perioadei de păstrare."
     },
     "postprod": {
-      "title": "Pipeline AI de post-producție",
       "subtitle": "Transcrieri, rezumate și traduceri produse de pipeline-ul AI în cluster. Asociați vorbitorii, reluați sau anulați joburile.",
       "filterStatus": "Stare",
       "all": "Toate",
@@ -2603,7 +2543,6 @@
       "archiveGenerateOk": "Generarea arhivei a pornit.",
       "archiveGenerateErr": "Generarea arhivei a eșuat (HTTP {code}).",
       "archiveTrackFallback": "Participant",
-      "manageBackToList": "Toate înregistrările",
       "manageDuration": "Durată",
       "manageSource": "Limba sursă",
       "manageOpenPublic": "Pagină publică",
@@ -2768,11 +2707,9 @@
       "originalUncertainHint": "Textul păstrat poate include deja corecturi făcute înainte ca această funcție să existe: nu se poate demonstra că este cel produs de transcrierea automată"
     },
     "questionnairesPage": {
-      "title": "Chestionare",
       "subtitle": "Șabloane reutilizabile de întrebări pentru chestionarele de preînregistrare și post-eveniment."
     },
     "questionnaireResponses": {
-      "title": "Răspunsuri chestionare",
       "subtitle": "Agregări pe întrebare, filtrabile după eveniment, fază și interval de date."
     },
     "eventQuestionnaires": {
@@ -2822,11 +2759,8 @@
       "downloadFailed": "Descărcarea nu a reușit: încearcă din nou."
     },
     "glossary": {
-      "title": "Glosar",
       "subtitle": "Acronime, nume și termeni tehnici pentru postprocesarea cu IA: cum se scriu în transcrieri, cum se traduc și cum se pronunță în dublaj. Se aplică tuturor evenimentelor; fiecare eveniment își poate adăuga propriii termeni.",
       "organizerNote": "Puteți adăuga termeni pentru toate evenimentele și îi puteți modifica pe cei adăugați de dumneavoastră; pe ceilalți îi gestionează administrația.",
-      "backToSettings": "Înapoi la setări",
-      "backToEvents": "Înapoi la evenimente",
       "eventTitle": "Termenii și acronimele evenimentului",
       "eventIntro": "Se adaugă la glosarul instanței pentru transcrierea, traducerile și dublajul acestui eveniment. Un termen care există deja în instanță este înlocuit cu cel de aici.",
       "openInstance": "Completați glosarul instanței, valabil pentru toate evenimentele",
@@ -3761,7 +3695,6 @@
     "reactionSent": "Reacție trimisă!"
   },
   "calendar": {
-    "title": "Calendarul evenimentelor",
     "subtitle": "Vizualizați toate evenimentele în timp",
     "publicTitle": "Calendarul evenimentelor",
     "publicSubtitle": "Descoperiți evenimentele programate",
@@ -4240,7 +4173,6 @@
     "hintJoystick": "Trageți pentru a vă deplasa"
   },
   "feedbackAdmin": {
-    "title": "Rezultatele feedbackului",
     "totalVotes": "răspunsuri",
     "noFeedback": "Niciun feedback primit",
     "comments": "Comentarii",

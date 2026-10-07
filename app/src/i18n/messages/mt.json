@@ -615,7 +615,6 @@
       "newLink": "Itlob link ġdid"
     },
     "organizers": {
-      "title": "Kontijiet tal-persunal",
       "intro": "Persuni li jaħdmu fiż-żona tal-amministrazzjoni b’isimhom. L-organizzaturi joħolqu u jimmaniġġjaw l-avvenimenti tagħhom; l-amministraturi jimmaniġġjaw l-istanza kollha. Jidħlu b’link mibgħut lill-email tagħhom, mingħajr password. Iċ-ċavetta tal-istanza tibqa’ għall-emerġenzi u għall-awtomazzjoni.",
       "newTitle": "Żid kont",
       "name": "Isem u kunjom",
@@ -929,82 +928,51 @@
       "toFixField": "Qasam {n}"
     },
     "nav": {
-      "events": "Ġestjoni tal-avvenimenti",
-      "registrations": "Reġistrazzjonijiet",
-      "recordings": "Vidjo u sessjonijiet",
-      "settings": "Settings tas-sistema",
-      "eventsList": "Lista tal-avvenimenti",
+      "events": "Avvenimenti",
+      "settings": "Issettjar",
+      "eventsList": "L-avvenimenti kollha",
       "newEvent": "Avveniment ġdid",
-      "calendar": "Kalendarju",
-      "templates": "Templates",
+      "calendar": "Kalendarju tal-avvenimenti",
+      "templates": "Templates tal-avvenimenti",
       "analytics": "Statistika",
-      "instantCalls": "Telefonati rapidi",
+      "instantCalls": "Sejħiet rapidi",
       "infrastructure": "Infrastruttura",
       "monitoring": "Monitoraġġ",
-      "monitoringDashboard": "Dashboard",
+      "monitoringDashboard": "Status tas-servizz",
       "registrationsList": "Reġistrazzjonijiet",
-      "moderators": "Moderaturi",
       "moderatorLinks": "Links tal-moderaturi",
-      "gdprAudit": "Awditjar GDPR",
-      "recordingsList": "Rekordings tal-vidjo",
-      "settingsGeneral": "Ġenerali",
+      "gdprAudit": "Reġistru GDPR",
+      "recordingsList": "Reġistrazzjonijiet",
+      "settingsGeneral": "Issettjar ġenerali",
       "settingsLanguages": "Lingwi",
-      "settingsGdprTemplates": "Templates GDPR",
-      "admin": "Amministrazzjoni",
-      "eventDetail": "Dettall tal-avveniment",
-      "eventEdit": "Editja l-avveniment",
-      "publications": "Pubblikazzjonijiet",
-      "publicationsList": "Il-pubblikazzjonijiet kollha",
+      "settingsGdprTemplates": "Avviżi ta' privatezza",
+      "eventDetail": "Avveniment",
+      "eventEdit": "Editja",
+      "publicationsList": "Pubblikazzjonijiet",
       "publicationsNew": "Pubblikazzjoni ġdida",
       "ariaLabel": "Navigazzjoni tal-amministrazzjoni",
       "subNavAriaLabel": "Navigazzjoni tas-sezzjoni",
       "questionnaires": "Kwestjonarji",
-      "questionnairesLibrary": "Librerija ta' templates",
-      "questionnairesResponses": "Tweġibiet u statistiki",
+      "questionnairesLibrary": "Templates tal-kwestjonarji",
+      "questionnairesResponses": "Tweġibiet",
       "rubrica": "Direttorju",
       "settingsEmailTemplates": "Templates tal-email",
-      "settingsTags": "Amministrazzjoni tat-tags",
-      "settingsGlossary": "Glossarju",
+      "settingsTags": "Tags",
       "eventMaterials": "Materjali",
       "eventQuestionnaires": "Kwestjonarji",
-      "rubricaList": "Lista",
-      "rubricaDetail": "Dettall",
-      "organizers": "Kontijiet",
-      "staffAccess": "Persunal u aċċess",
-      "staffAccounts": "Kontijiet tal-persunal",
+      "rubricaDetail": "Persuna",
+      "staffAccess": "Staff u aċċess",
+      "staffAccounts": "Kontijiet tal-istaff",
       "people": "Persuni",
       "postprodDetail": "Reġistrazzjoni",
-      "recordingsPostprod": "Traskrizzjonijiet / AI",
-      "feedbackDashboard": "Feedback"
-    },
-    "landing": {
-      "title": "Pannell tal-amministrazzjoni",
-      "subtitle": "Immaniġġja l-avvenimenti u kkonfigura l-pjattaforma",
-      "eventsTitle": "Ġestjoni tal-avvenimenti",
-      "eventsDescription": "Oħloq, editja u immaniġġja avvenimenti, templates u statistika.",
-      "instantCallsTitle": "Telefonati rapidi",
-      "instantCallsDescription": "Oħloq vidjokoll pubbliku fuq il-fly mingħajr ippjanar: link li tista' taqsmu mill-ewwel.",
-      "instantCallsStat": "{count, plural, =0 {ebda telefonata rapida fl-aħħar 30 jum} one {1 telefonata rapida fl-aħħar 30 jum} other {# telefonati rapidi fl-aħħar 30 jum}}",
-      "registrationsTitle": "Reġistrazzjonijiet",
-      "registrationsDescription": "Direttorju tal-parteċipanti reġistrati fl-avvenimenti: tfittxija, filtri, esportazzjoni, moderaturi u awditjar GDPR.",
-      "registrationsTotal": "{count, plural, =0 {ebda persuna reġistrata} one {1 persuna reġistrata} other {# persuni reġistrati}}",
-      "today": "illum",
-      "recordingsTitle": "Vidjo u sessjonijiet",
-      "recordingsDescription": "Rekordings tal-vidjo tal-koll, sessjonijiet live mitmuma u telefonati rapidi arkivjati. Niżżel u amministra.",
-      "recordingsStat": "{count, plural, =0 {ebda rekording tal-vidjo} one {1 rekording tal-vidjo disponibbli} other {# rekordings tal-vidjo disponibbli}}",
-      "analyticsTitle": "Statistiki",
-      "analyticsDescription": "Ħarsa ġenerali tal-metriki tal-użu: avvenimenti maħluqa, parteċipanti, rata ta' konverżjoni, l-aqwa avvenimenti.",
-      "monitoringTitle": "Monitoraġġ",
-      "monitoringDescription": "Dashboard teknika b'metriki tal-infrastruttura, prestazzjonijiet, disponibbiltà u kwalità tas-servizz.",
-      "templatesTitle": "Templates ta' avvenimenti",
-      "templatesDescription": "Mudelli użati mill-ġdid biex toħloq avvenimenti malajr b'konfigurazzjonijiet predefiniti.",
-      "settingsTitle": "Settings tas-sistema",
-      "settingsDescription": "Ikkonfigura l-branding, il-kontenut, il-lingwi, il-funzjonalitajiet u l-infrastruttura.",
-      "liveNow": "{count, plural, one {avveniment # ħaj} few {# avvenimenti ħajjin} many {# avvenimenti ħajjin} other {# avvenimenti ħajjin}}",
-      "upcomingEvents": "{count, plural, one {avveniment # li ġej} few {# avvenimenti li ġejjin} many {# avvenimenti li ġejjin} other {# avvenimenti li ġejjin}}"
+      "recordingsPostprod": "Post-produzzjoni AI",
+      "feedbackDashboard": "Rispons",
+      "video": "Vidjo",
+      "glossary": "Glossarju",
+      "breadcrumbAriaLabel": "Mogħdija",
+      "skipToPage": "Mur għall-kontenut tal-paġna"
     },
     "publications": {
-      "title": "Pubblikazzjonijiet",
       "subtitle": "Hub editorjali uniku għall-vidjos pubblikati kollha: avvenimenti skedati, telefonati istantanji, arkivji storiċi mtellgħin u sessjonijiet jistennew il-promozzjoni.",
       "newPublication": "Pubblikazzjoni ġdida",
       "searchPlaceholder": "Fittex bit-titlu jew bid-deskrizzjoni…",
@@ -1040,7 +1008,6 @@
         "unlist": "Neħħi mil-librerija"
       },
       "uploadPage": {
-        "title": "Pubblikazzjoni ġdida",
         "subtitle": "Tella' vidjo eżistenti (MP4, WebM jew MOV) fl-istorage tal-pjattaforma u arrikkih bil-metadata editorjali.",
         "step1Title": "1. Tella' l-fajl tal-vidjo",
         "startUpload": "Tella'",
@@ -1077,7 +1044,6 @@
       "updateFailed": "L-aġġornament ma rnexxiex."
     },
     "recordingsLibrary": {
-      "title": "Rekordings tal-vidjo",
       "subtitle": "Librerija ċentralizzata tar-rekordings tal-vidjo tal-koll: filtra, niżżel, esporta",
       "loading": "Qed jitla'...",
       "range": "Periodo",
@@ -1149,7 +1115,6 @@
       "transcriptProcessing": "Fl-ipproċessar"
     },
     "gdprAudit": {
-      "title": "Awditjar GDPR",
       "subtitle": "Reġistru tal-azioni ta' privatezza fuq data personali: cancellazioni, consensi, export",
       "loading": "Qed jitla'...",
       "range": "Periodo",
@@ -1172,7 +1137,6 @@
       "noResults": "Ebda avveniment ta' awditjar fil-periodo agħżelto."
     },
     "moderators": {
-      "title": "Moderaturi",
       "subtitle": "Recupera, copia u rigenera il-link magici tal-moderaturi",
       "searchPlaceholder": "Fittex għal slug, nomu o email moderatur…",
       "searchHelp": "Il link magico contienu wieħed token univoco: aqsamlo biss con il-moderatur designato.",
@@ -1191,7 +1155,6 @@
       "noResults": "Ebda avveniment misjub."
     },
     "registrations": {
-      "title": "Reġistrazzjonijiet",
       "subtitle": "Kollha il-personu imiktubin lill-avvenimenti — tfittxija, iffiltra ed esporta",
       "loading": "Qed jitla'...",
       "range": "Periodo",
@@ -1525,18 +1488,6 @@
       "title": "Settings tas-sit",
       "subtitle": "Ikkonfigura d-dehra u l-imġiba tal-pjattaforma għar-riużu tal-PA",
       "saving": "Qed jiġi ssejvjat...",
-      "sections": {
-        "languagesTitle": "Ġestjoni tal-lingwi",
-        "languagesDescription": "Attiva jew iddiżattiva l-lingwi tal-UE esposti fl-interfaċċja, agħżel il-lingwa awtomatika u personalizza t-traduzzjonijiet.",
-        "gdprTemplatesTitle": "Mudelli GDPR",
-        "gdprTemplatesDescription": "Oħloq avviżi ta' privatezza li jistgħu jerġgħu jintużaw u jiġu llinkjati ma' kwalunkwe avveniment, u agħżel dak awtomatiku għal avvenimenti ġodda.",
-        "emailTemplatesTitle": "Mudelli tal-email",
-        "emailTemplatesDescription": "Personalizza s-suġġett, it-titli u t-testi tal-emails ta' konferma u tfakkira. Ħalli vojt biex tuża t-testi awtomatiċi integrati.",
-        "tagsTitle": "Amministrazzjoni tat-tags",
-        "tagsDescription": "Oħloq u tbiddel i tag usati għal filtraru gli avvenimenti",
-        "glossaryTitle": "Glossarju",
-        "glossaryDescription": "Akronimi u termini tekniċi għat-traskrizzjonijiet, it-traduzzjonijiet u d-dubbing"
-      },
       "saved": "Settings issejvjati b'suċċess",
       "tabs": {
         "branding": "Branding",
@@ -1869,7 +1820,6 @@
       "invalidRRule": "Regola mhux valida"
     },
     "templates": {
-      "title": "Templates tal-avvenimenti",
       "subtitle": "Immaniġġja t-templates predefiniti għall-ħolqien malajr tal-avvenimenti",
       "create": "Template ġdid",
       "deleteConfirm": "Żgur li trid tħassar dan it-template?",
@@ -1966,7 +1916,6 @@
       "errorGeneric": "Seħħ żball. Erġa' pprova."
     },
     "gdprTemplates": {
-      "title": "Templates GDPR",
       "subtitle": "Oħloq u amministra informativu privatezza użati mill-ġdid bejn avvenimenti. Wieħed template marcato bħal default huwa pre-agħżelto sui ġodda avvenimenti.",
       "newTemplate": "Ġdid template",
       "emptyState": "Ebda template għadu maħluq. Oħloq il ewwel għal rituża il-stesso testo privatezza fuq aktar avvenimenti.",
@@ -1992,7 +1941,6 @@
       "deleteTitle": "Ħassar it-template"
     },
     "emailTemplates": {
-      "title": "Mudelli tal-email",
       "subtitle": "Personalizza s-suġġett, it-titli u t-testi tal-emails tranżazzjonali. Oqsma mħollija vojta jużaw it-testi awtomatiċi integrati.",
       "overridden": "Personalizzat",
       "usingDefault": "Qed jintuża dak awtomatiku",
@@ -2031,7 +1979,6 @@
       }
     },
     "languages": {
-      "title": "Ġestjoni tal-lingwi",
       "subtitle": "Ikkonfigura l-lingwi disponibbli u personalizza t-traduzzjonijiet",
       "defaultLocaleTitle": "Lingua default",
       "defaultLocaleDescription": "La lingua default huwa usata bħal fallback meta waħda traduzzjoni mhux disponibbli u bħal lingua principalu tal-sito.",
@@ -2057,7 +2004,6 @@
       "addOverride": "Żid"
     },
     "infrastructure": {
-      "title": "Infrastruttura",
       "subtitle": "Status tal-komponenti u konfigurazzjoni tal-ambjent",
       "deploymentMode": "Mod tad-deployment",
       "version": "Verżjoni",
@@ -2120,7 +2066,6 @@
       }
     },
     "instantCalls": {
-      "title": "Telefonati rapidi",
       "subtitle": "Elenco tal-vidjotelefonati istantanji",
       "total": "totali",
       "noCalls": "Ebda telefonata rapida effettuata.",
@@ -2182,7 +2127,6 @@
       "deleteTitle": "Ħassar is-sessjoni"
     },
     "monitoring": {
-      "title": "Monitoraġġ",
       "subtitle": "Real-time infrastructure and performance monitoring dashboard",
       "loading": "Caricament metriki...",
       "prometheusUnavailable": "Prometheus is not configured. Set the PROMETHEUS_URL environment variable to enable advanced monitoring.",
@@ -2308,9 +2252,7 @@
       "registeredCount": "{count, plural, =0 {Ebda reġistrazzjoni} one {1 reġistrazzjoni} other {# reġistrazzjonijiet}}"
     },
     "tags": {
-      "title": "Amministrazzjoni tat-tags",
       "subtitle": "Crea, tbiddel ed ħassar il-tag usati għal classificaru u filtraru gli avvenimenti pubbliċi.",
-      "backToSettings": "Settings",
       "addTag": "Ġdid tag",
       "editTag": "Editja tag",
       "columnColor": "Kulur",
@@ -2426,7 +2368,6 @@
       }
     },
     "rubrica": {
-      "title": "Direttorju",
       "subtitle": "Personu chu hsena datum kunsens lill-inserimento fi direttorju (art. 6.1.a GDPR). Lu informazzjoni ta' profilo vengono aġġornatu awtomatikament ad kull re-reġistrazzjoni.",
       "searchLabel": "Fittex skont l-isem jew l-organizzazzjoni",
       "orgTypeLabel": "Tip ta' organizzazzjoni",
@@ -2519,7 +2460,6 @@
       "privacyNote": "L-istatistiċi għal kull persuna huma psewdonimizzati b'mod prestabbilit. L-aggregati anonimi jinżammu fil-ġabra fil-qosor tal-avveniment; ir-ringieli mhux ipproċessati jitħassru meta tiskadi ż-żamma tad-data."
     },
     "postprod": {
-      "title": "Pipeline tal-post-produzzjoni bl-AI",
       "subtitle": "Traskrizzjonijiet, sommarji u traduzzjonijiet prodotti mill-pipeline tal-AI fil-cluster. Immappja l-kelliema, erġa' ħaddem jew ikkanċella x-xogħlijiet.",
       "filterStatus": "Stat",
       "all": "Kollha",
@@ -2603,7 +2543,6 @@
       "archiveGenerateOk": "Bdiet il-ġenerazzjoni tal-arkivju.",
       "archiveGenerateErr": "Il-ġenerazzjoni tal-arkivju falliet (HTTP {code}).",
       "archiveTrackFallback": "Parteċipant",
-      "manageBackToList": "Ir-reġistrazzjonijiet kollha",
       "manageDuration": "Durata",
       "manageSource": "Lingwa sors",
       "manageOpenPublic": "Paġna pubblika",
@@ -2768,11 +2707,9 @@
       "originalUncertainHint": "It-test ippreservat jista' diġà jinkludi korrezzjonijiet li saru qabel ma kienet teżisti din il-funzjoni: ma jistax jiġi ppruvat li huwa t-test prodott mit-traskrizzjoni awtomatika"
     },
     "questionnairesPage": {
-      "title": "Kwestjonarji",
       "subtitle": "Template użati mill-ġdid ta' mistoqsijiet għal i dawnonari ta' preġistrazzjoni u post-avveniment."
     },
     "questionnaireResponses": {
-      "title": "Tweġibiet dawnonari",
       "subtitle": "Aggregazioni għal mistoqsija, filtrabili għal avveniment, fasu u intervall ta' date."
     },
     "eventQuestionnaires": {
@@ -2822,11 +2759,8 @@
       "downloadFailed": "It-tniżżil ma rnexxiex: erġa' pprova."
     },
     "glossary": {
-      "title": "Glossarju",
       "subtitle": "Akronimi, ismijiet u termini tekniċi għall-post-produzzjoni bl-IA: kif jinkitbu fit-traskrizzjonijiet, kif jiġu tradotti u kif jiġu ppronunzjati fid-dubbing. Japplikaw għall-avvenimenti kollha; kull avveniment jista’ jżid tiegħu.",
       "organizerNote": "Tista’ żżid termini għall-avvenimenti kollha u teditja dawk li żidt int; il-bqija jiġġestixxihom l-amministrazzjoni.",
-      "backToSettings": "Lura għas-settings",
-      "backToEvents": "Lura għall-avvenimenti",
       "eventTitle": "Termini u akronimi tal-avveniment",
       "eventIntro": "Jiżdiedu mal-glossarju tal-istanza għat-traskrizzjoni, it-traduzzjonijiet u d-dubbing ta’ dan l-avveniment. Terminu li diġà jinsab fl-istanza jiġi sostitwit b’dak ta’ hawn.",
       "openInstance": "Żid mal-glossarju tal-istanza, li jgħodd għall-avvenimenti kollha",
@@ -3761,7 +3695,6 @@
     "reactionSent": "Reazzjoni mibgħuta!"
   },
   "calendar": {
-    "title": "Kalendarju tal-avvenimenti",
     "subtitle": "Ara l-avvenimenti kollha maż-żmien",
     "publicTitle": "Kalendarju tal-avvenimenti",
     "publicSubtitle": "Skopri l-avvenimenti li ġejjin",
@@ -4240,7 +4173,6 @@
     "hintJoystick": "Trascina għal muoverti"
   },
   "feedbackAdmin": {
-    "title": "Riżultati tal-feedback",
     "totalVotes": "tweġibiet",
     "noFeedback": "Ma wasal l-ebda feedback",
     "comments": "Kummenti",

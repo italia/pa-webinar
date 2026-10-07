@@ -615,7 +615,6 @@
       "newLink": "Zatraži novu poveznicu"
     },
     "organizers": {
-      "title": "Računi osoblja",
       "intro": "Osobe koje rade u administraciji pod vlastitim imenom. Organizatori izrađuju vlastite događaje i upravljaju njima; administratori upravljaju cijelom instancom. Prijavljuju se poveznicom poslanom na svoju e-poštu, bez lozinke. Ključ instance ostaje za hitne slučajeve i automatizaciju.",
       "newTitle": "Dodaj račun",
       "name": "Ime i prezime",
@@ -929,82 +928,51 @@
       "toFixField": "Polje {n}"
     },
     "nav": {
-      "events": "Upravljanje događajima",
-      "registrations": "Prijave",
-      "recordings": "Video i sesije",
-      "settings": "Postavke sustava",
-      "eventsList": "Popis događaja",
+      "events": "Događaji",
+      "settings": "Postavke",
+      "eventsList": "Svi događaji",
       "newEvent": "Novi događaj",
-      "calendar": "Kalendar",
-      "templates": "Predlošci",
-      "analytics": "Statistike",
+      "calendar": "Kalendar događaja",
+      "templates": "Predlošci događaja",
+      "analytics": "Statistika",
       "instantCalls": "Brzi pozivi",
       "infrastructure": "Infrastruktura",
-      "monitoring": "Praćenje",
-      "monitoringDashboard": "Nadzorna ploča",
+      "monitoring": "Nadzor",
+      "monitoringDashboard": "Stanje usluge",
       "registrationsList": "Prijave",
-      "moderators": "Moderatori",
       "moderatorLinks": "Poveznice moderatora",
-      "gdprAudit": "GDPR revizija",
-      "recordingsList": "Videosnimke",
-      "settingsGeneral": "Opće",
+      "gdprAudit": "Zapisnik GDPR",
+      "recordingsList": "Snimke",
+      "settingsGeneral": "Opće postavke",
       "settingsLanguages": "Jezici",
-      "settingsGdprTemplates": "GDPR predlošci",
-      "admin": "Administracija",
-      "eventDetail": "Detalji događaja",
-      "eventEdit": "Uredi događaj",
-      "publications": "Objave",
-      "publicationsList": "Sve objave",
+      "settingsGdprTemplates": "Obavijesti o privatnosti",
+      "eventDetail": "Događaj",
+      "eventEdit": "Uredi",
+      "publicationsList": "Objave",
       "publicationsNew": "Nova objava",
       "ariaLabel": "Navigacija administracije",
       "subNavAriaLabel": "Navigacija odjeljka",
       "questionnaires": "Upitnici",
-      "questionnairesLibrary": "Biblioteka predložaka",
-      "questionnairesResponses": "Odgovori i statistika",
+      "questionnairesLibrary": "Predlošci upitnika",
+      "questionnairesResponses": "Odgovori",
       "rubrica": "Imenik",
       "settingsEmailTemplates": "Predlošci e-pošte",
-      "settingsTags": "Upravljanje oznakama",
-      "settingsGlossary": "Pojmovnik",
+      "settingsTags": "Oznake",
       "eventMaterials": "Materijali",
       "eventQuestionnaires": "Upitnici",
-      "rubricaList": "Popis",
-      "rubricaDetail": "Stavka",
-      "organizers": "Računi",
-      "staffAccess": "Osoblje i pristupi",
+      "rubricaDetail": "Osoba",
+      "staffAccess": "Osoblje i pristup",
       "staffAccounts": "Računi osoblja",
       "people": "Osobe",
       "postprodDetail": "Snimka",
-      "recordingsPostprod": "Transkripti / AI",
-      "feedbackDashboard": "Feedback"
-    },
-    "landing": {
-      "title": "Administratorska ploča",
-      "subtitle": "Upravljajte događajima i konfigurirajte platformu",
-      "eventsTitle": "Upravljanje događajima",
-      "eventsDescription": "Stvarajte, uređujte i upravljajte događajima, predlošcima i statistikama.",
-      "instantCallsTitle": "Brzi pozivi",
-      "instantCallsDescription": "Stvorite javni videopoziv u trenu, bez planiranja: poveznicu možete odmah dijeliti.",
-      "instantCallsStat": "{count, plural, =0 {nijedan brzi poziv u zadnjih 30 dana} one {1 brzi poziv u zadnjih 30 dana} few {# brza poziva u zadnjih 30 dana} other {# brzih poziva u zadnjih 30 dana}}",
-      "registrationsTitle": "Prijave",
-      "registrationsDescription": "Imenik sudionika prijavljenih na događaje: pretraga, filtri, izvoz, moderatori i GDPR revizija.",
-      "registrationsTotal": "{count, plural, =0 {nije prijavljena nijedna osoba} one {1 prijavljena osoba} few {# prijavljene osobe} other {# prijavljenih osoba}}",
-      "today": "danas",
-      "recordingsTitle": "Video i sesije",
-      "recordingsDescription": "Videosnimke poziva, završene aktivne sesije i arhivirani brzi pozivi. Preuzimanje i upravljanje.",
-      "recordingsStat": "{count, plural, =0 {nema videosnimki} one {1 dostupna videosnimka} few {# dostupne videosnimke} other {# dostupnih videosnimki}}",
-      "analyticsTitle": "Statistika",
-      "analyticsDescription": "Pregled metrika korištenja: stvoreni događaji, sudionici, stopa konverzije, najistaknutiji događaji.",
-      "monitoringTitle": "Praćenje",
-      "monitoringDescription": "Tehnička nadzorna ploča s metrikama infrastrukture, performansi, dostupnosti i kvalitete usluge.",
-      "templatesTitle": "Predlošci događaja",
-      "templatesDescription": "Ponovno upotrebljivi modeli za brzo stvaranje događaja s unaprijed definiranim postavkama.",
-      "settingsTitle": "Postavke sustava",
-      "settingsDescription": "Konfigurirajte branding, sadržaj, jezike, funkcionalnosti i infrastrukturu.",
-      "liveNow": "{count, plural, one {# događaj uživo} few {# događaja uživo} other {# događaja uživo}}",
-      "upcomingEvents": "{count, plural, one {# nadolazeći događaj} few {# nadolazeća događaja} other {# nadolazećih događaja}}"
+      "recordingsPostprod": "AI postprodukcija",
+      "feedbackDashboard": "Povratne informacije",
+      "video": "Video",
+      "glossary": "Pojmovnik",
+      "breadcrumbAriaLabel": "Navigacijski put",
+      "skipToPage": "Idi na sadržaj stranice"
     },
     "publications": {
-      "title": "Objave",
       "subtitle": "Jedinstveno uredničko središte za sve objavljene videozapise: planirani događaji, brzi pozivi, prenesene povijesne arhive i sesije koje čekaju promociju.",
       "newPublication": "Nova objava",
       "searchPlaceholder": "Pretraži po naslovu ili opisu…",
@@ -1040,7 +1008,6 @@
         "unlist": "Ukloni iz biblioteke"
       },
       "uploadPage": {
-        "title": "Nova objava",
         "subtitle": "Prenesite postojeći videozapis (MP4, WebM ili MOV) u pohranu platforme i obogatite ga uredničkim metapodacima.",
         "step1Title": "1. Prenesite videodatoteku",
         "startUpload": "Prenesi",
@@ -1077,7 +1044,6 @@
       "updateFailed": "Ažuriranje nije uspjelo."
     },
     "recordingsLibrary": {
-      "title": "Videosnimke",
       "subtitle": "Centralizirana biblioteka videosnimki poziva: filtriraj, preuzmi, izvezi",
       "loading": "Učitavanje...",
       "range": "Razdoblje",
@@ -1149,7 +1115,6 @@
       "transcriptProcessing": "U obradi"
     },
     "gdprAudit": {
-      "title": "GDPR revizija",
       "subtitle": "Zapis radnji nad osobnim podacima: brisanja, privole, izvozi",
       "loading": "Učitavanje...",
       "range": "Razdoblje",
@@ -1172,7 +1137,6 @@
       "noResults": "Nema zapisa revizije u odabranom razdoblju."
     },
     "moderators": {
-      "title": "Moderatori",
       "subtitle": "Dohvaćanje, kopiranje i regeneriranje magičnih poveznica moderatora",
       "searchPlaceholder": "Pretraži po slugu, imenu ili e-pošti moderatora…",
       "searchHelp": "Magična poveznica sadrži jedinstveni token: dijelite je samo s određenim moderatorom.",
@@ -1191,7 +1155,6 @@
       "noResults": "Nije pronađen nijedan događaj."
     },
     "registrations": {
-      "title": "Prijave",
       "subtitle": "Sve osobe prijavljene na događaje — pretraga, filtri i izvoz",
       "loading": "Učitavanje...",
       "range": "Razdoblje",
@@ -1525,18 +1488,6 @@
       "title": "Postavke stranice",
       "subtitle": "Konfigurirajte izgled i ponašanje platforme za ponovnu uporabu u javnoj upravi",
       "saving": "Spremanje...",
-      "sections": {
-        "languagesTitle": "Upravljanje jezicima",
-        "languagesDescription": "Omogućite ili onemogućite jezike EU-a dostupne korisnicima, odaberite zadani jezik i prilagodite prijevode.",
-        "gdprTemplatesTitle": "GDPR predlošci",
-        "gdprTemplatesDescription": "Stvorite višekratne obavijesti o privatnosti koje se mogu povezati s bilo kojim događajem i odaberite zadanu za nove događaje.",
-        "emailTemplatesTitle": "Predlošci e-pošte",
-        "emailTemplatesDescription": "Prilagodite predmet, naslove i tekstove e-poruka potvrde i podsjetnika. Ostavite prazno za ugrađene zadane tekstove.",
-        "tagsTitle": "Upravljanje oznakama",
-        "tagsDescription": "Stvaranje i uređivanje oznaka za filtriranje događaja",
-        "glossaryTitle": "Pojmovnik",
-        "glossaryDescription": "Kratice i stručni pojmovi za transkripcije, prijevode i sinkronizaciju"
-      },
       "saved": "Postavke uspješno spremljene",
       "tabs": {
         "branding": "Vizualni identitet",
@@ -1869,7 +1820,6 @@
       "invalidRRule": "Pravilo nije valjano"
     },
     "templates": {
-      "title": "Predlošci događaja",
       "subtitle": "Upravljajte unaprijed definiranim predlošcima za brzo stvaranje događaja",
       "create": "Novi predložak",
       "deleteConfirm": "Jeste li sigurni da želite obrisati ovaj predložak?",
@@ -1966,7 +1916,6 @@
       "errorGeneric": "Došlo je do pogreške. Pokušajte ponovno."
     },
     "gdprTemplates": {
-      "title": "GDPR predlošci",
       "subtitle": "Stvaranje i upravljanje obavijestima o privatnosti koje se mogu ponovno koristiti između događaja. Predložak označen kao zadani unaprijed je odabran na novim događajima.",
       "newTemplate": "Novi predložak",
       "emptyState": "Još nije stvoren nijedan predložak. Stvorite prvi za ponovno korištenje istog teksta privatnosti na više događaja.",
@@ -1992,7 +1941,6 @@
       "deleteTitle": "Izbriši predložak"
     },
     "emailTemplates": {
-      "title": "Predlošci e-pošte",
       "subtitle": "Prilagodite predmet, naslove i tekstove transakcijskih e-poruka. Prazna polja koriste ugrađene zadane tekstove.",
       "overridden": "Prilagođeno",
       "usingDefault": "Koristi se zadano",
@@ -2031,7 +1979,6 @@
       }
     },
     "languages": {
-      "title": "Upravljanje jezicima",
       "subtitle": "Konfigurirajte dostupne jezike i prilagodite prijevode",
       "defaultLocaleTitle": "Zadani jezik",
       "defaultLocaleDescription": "Zadani jezik koristi se kao zamjena kada prijevod nije dostupan i kao primarni jezik mrežnog mjesta.",
@@ -2057,7 +2004,6 @@
       "addOverride": "Dodaj"
     },
     "infrastructure": {
-      "title": "Infrastruktura",
       "subtitle": "Stanje komponenti i konfiguracija okruženja",
       "deploymentMode": "Način implementacije",
       "version": "Verzija",
@@ -2120,7 +2066,6 @@
       }
     },
     "instantCalls": {
-      "title": "Brzi pozivi",
       "subtitle": "Popis trenutnih videopoziva",
       "total": "ukupno",
       "noCalls": "Nije obavljen nijedan brzi poziv.",
@@ -2182,7 +2127,6 @@
       "deleteTitle": "Izbriši sesiju"
     },
     "monitoring": {
-      "title": "Praćenje",
       "subtitle": "Real-time infrastructure and performance monitoring dashboard",
       "loading": "Učitavanje metrika...",
       "prometheusUnavailable": "Prometheus is not configured. Set the PROMETHEUS_URL environment variable to enable advanced monitoring.",
@@ -2308,9 +2252,7 @@
       "registeredCount": "{count, plural, =0 {Nema prijava} one {1 prijava} few {# prijave} other {# prijava}}"
     },
     "tags": {
-      "title": "Upravljanje oznakama",
       "subtitle": "Stvaranje, uređivanje i brisanje oznaka koje se koriste za klasifikaciju i filtriranje javnih događaja.",
-      "backToSettings": "Postavke",
       "addTag": "Nova oznaka",
       "editTag": "Uredi oznaku",
       "columnColor": "Boja",
@@ -2426,7 +2368,6 @@
       }
     },
     "rubrica": {
-      "title": "Imenik",
       "subtitle": "Osobe koje su dale privolu za uvrštavanje u imenik (čl. 6.1.a GDPR). Podaci profila automatski se ažuriraju pri svakoj ponovnoj prijavi.",
       "searchLabel": "Pretraži po imenu ili organizaciji",
       "orgTypeLabel": "Vrsta organizacije",
@@ -2519,7 +2460,6 @@
       "privacyNote": "Statistika po osobi zadano je pseudonimizirana. Anonimni se agregati čuvaju u sažetku događaja; sirovi se redci brišu istekom roka čuvanja."
     },
     "postprod": {
-      "title": "AI pipeline postprodukcije",
       "subtitle": "Transkripti, sažeci i prijevodi koje izrađuje AI pipeline u klasteru. Mapiraj govornike, ponovno pokreni ili otkaži poslove.",
       "filterStatus": "Stanje",
       "all": "Svi",
@@ -2603,7 +2543,6 @@
       "archiveGenerateOk": "Generiranje arhive je pokrenuto.",
       "archiveGenerateErr": "Generiranje arhive nije uspjelo (HTTP {code}).",
       "archiveTrackFallback": "Sudionik",
-      "manageBackToList": "Sve snimke",
       "manageDuration": "Trajanje",
       "manageSource": "Izvorni jezik",
       "manageOpenPublic": "Javna stranica",
@@ -2768,11 +2707,9 @@
       "originalUncertainHint": "Sačuvani tekst možda već sadrži ispravke napravljene prije nego što je ova funkcija postojala: nije moguće dokazati da je to tekst koji je proizvela automatska transkripcija"
     },
     "questionnairesPage": {
-      "title": "Upitnici",
       "subtitle": "Ponovno upotrebljivi predlošci pitanja za upitnike prije prijave i nakon događaja."
     },
     "questionnaireResponses": {
-      "title": "Odgovori upitnika",
       "subtitle": "Agregacije po pitanju, mogu se filtrirati po događaju, fazi i datumskom rasponu."
     },
     "eventQuestionnaires": {
@@ -2822,11 +2759,8 @@
       "downloadFailed": "Preuzimanje nije uspjelo: pokušajte ponovno."
     },
     "glossary": {
-      "title": "Pojmovnik",
       "subtitle": "Kratice, imena i stručni pojmovi za naknadnu obradu umjetnom inteligencijom: kako se pišu u transkripcijama, kako se prevode i kako se izgovaraju u sinkronizaciji. Vrijede za sve događaje; svaki događaj može dodati vlastite.",
       "organizerNote": "Možete dodavati pojmove za sve događaje i uređivati one koje ste sami dodali; ostalima upravlja administracija.",
-      "backToSettings": "Natrag na postavke",
-      "backToEvents": "Natrag na događaje",
       "eventTitle": "Pojmovi i kratice događaja",
       "eventIntro": "Dodaju se pojmovniku instance za transkripciju, prijevode i sinkronizaciju ovog događaja. Pojam koji već postoji u instanci zamjenjuje se ovdašnjim.",
       "openInstance": "Dopunite pojmovnik instance, koji vrijedi za sve događaje",
@@ -3761,7 +3695,6 @@
     "reactionSent": "Reakcija poslana!"
   },
   "calendar": {
-    "title": "Kalendar događaja",
     "subtitle": "Pregledajte sve događaje kroz vrijeme",
     "publicTitle": "Kalendar događaja",
     "publicSubtitle": "Otkrijte zakazane događaje",
@@ -4240,7 +4173,6 @@
     "hintJoystick": "Povucite za pomicanje"
   },
   "feedbackAdmin": {
-    "title": "Rezultati povratnih informacija",
     "totalVotes": "odgovora",
     "noFeedback": "Nije primljena nijedna povratna informacija",
     "comments": "Komentari",

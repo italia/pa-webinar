@@ -2,6 +2,12 @@ import { getLocale, getTranslations } from 'next-intl/server';
 
 import { soloAdmin } from '@/lib/auth/staff-page';
 import QuestionTemplatesManagement from '@/components/admin/question-templates-management';
+import AdminPageHeader from '@/components/admin/admin-page-header';
+import { adminPageMetadata, adminPageTitle } from '@/components/admin/admin-page-title';
+
+export function generateMetadata() {
+  return adminPageMetadata('/admin/questionnaires');
+}
 
 export default async function QuestionnairesPage() {
   const locale = await getLocale();
@@ -12,12 +18,7 @@ export default async function QuestionnairesPage() {
 
   return (
     <div className="container py-5">
-      <div className="mb-5">
-        <h1 className="fw-bold mb-1" style={{ color: 'var(--app-text)' }}>
-          {t('title')}
-        </h1>
-        <p className="text-secondary mb-0">{t('subtitle')}</p>
-      </div>
+      <AdminPageHeader title={await adminPageTitle('/admin/questionnaires')} subtitle={t('subtitle')} />
       <QuestionTemplatesManagement />
     </div>
   );

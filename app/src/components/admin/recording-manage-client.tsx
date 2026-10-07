@@ -164,12 +164,7 @@ export default function RecordingManageClient({
 
   return (
     <div className="container py-4">
-      {/* Header */}
-      <div className="mb-2">
-        <Link href="/admin/postprod" className="text-decoration-none small">
-          ← {t('manageBackToList')}
-        </Link>
-      </div>
+      {/* Header (il ritorno all'elenco lo danno le briciole) */}
       <div className="d-flex flex-wrap align-items-center gap-3 mb-4">
         <div className="flex-grow-1">
           <h1 className="fw-bold mb-1" style={{ color: 'var(--app-text)', fontSize: '1.5rem' }}>

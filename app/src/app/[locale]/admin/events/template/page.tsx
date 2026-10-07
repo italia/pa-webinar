@@ -5,6 +5,12 @@ import { prisma } from '@/lib/db';
 import { getPublicEnv } from '@/lib/env';
 import { resolveWhiteboardInfraReady } from '@/lib/jitsi/whiteboard';
 import TemplateManagement from '@/components/admin/template-management';
+import AdminPageHeader from '@/components/admin/admin-page-header';
+import { adminPageMetadata, adminPageTitle } from '@/components/admin/admin-page-title';
+
+export function generateMetadata() {
+  return adminPageMetadata('/admin/events/template');
+}
 
 export default async function TemplatesPage() {
   const locale = await getLocale();
@@ -27,12 +33,7 @@ export default async function TemplatesPage() {
 
   return (
     <div className="container py-5">
-      <div className="mb-5">
-        <h1 className="fw-bold mb-1" style={{ color: 'var(--app-text)' }}>
-          {t('title')}
-        </h1>
-        <p className="text-secondary mb-0">{t('subtitle')}</p>
-      </div>
+      <AdminPageHeader title={await adminPageTitle('/admin/events/template')} subtitle={t('subtitle')} />
       <TemplateManagement
         templates={serialized}
         // Letto a runtime come nella sala (lib/jitsi/whiteboard.ts).

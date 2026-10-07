@@ -24,7 +24,7 @@ const BUILD_CHANNEL = process.env.NEXT_PUBLIC_BUILD_CHANNEL ?? 'dev';
 const BUILD_DATE = process.env.NEXT_PUBLIC_BUILD_DATE ?? '';
 
 // Inline mono-stroke SVGs so the footer bar doesn't depend on the async
-// Bootstrap Italia sprite — same rationale as settings-sections-grid.
+// Bootstrap Italia sprite.
 const FOOTER_ICON_SIZE = 14;
 function FooterIconShield() {
   return (
