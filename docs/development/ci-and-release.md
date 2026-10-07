@@ -124,6 +124,7 @@ The local command for each job, and when a job may be skipped, are in [CI parity
 |---|---|---|
 | Build & Push Dev Image | Every push to `dev` and every dispatch | `pa-webinar:dev` and `:dev-<sha>`; the migration image as `pa-webinar:dev-migrate` and `:dev-migrate-<sha>` |
 | Build & Push Postprod Worker Image | The push changed `infra/ai/` (except `infra/ai/local-out/`, a development tool that is not part of the image) or `infra/helm/pa-webinar/templates/cronjob-postprod-*`, or the dispatch set `force_worker_build` | `pa-webinar-postprod-worker:dev` and `:dev-<sha>` |
+| Build & Push Postprod CPU Worker Image | The same conditions, in a job of its own so that a slow or failed CUDA build does not hold it back | `pa-webinar-postprod-worker-cpu:dev` and `:dev-<sha>` |
 | Build & Push Recorder Image | The push changed `infra/recorder/`, or the dispatch set `force_recorder_build` | `pa-webinar-recorder:dev` and `:dev-<sha>` |
 | Build & Push Recorder Controller Image | The push changed `infra/recorder-controller/`, or the dispatch set `force_recorder_controller_build` | `pa-webinar-recorder-controller:dev` and `:dev-<sha>` |
 
@@ -207,9 +208,10 @@ All images live in GitHub Container Registry under `ghcr.io/italia/`. They requi
 |---|---|---|---|
 | `pa-webinar` (the app) | `release.yml`, `dev.yml` | `X.Y.Z`, `X.Y`, `latest`, `sha-<sha>` | `dev`, `dev-<sha>` |
 | `pa-webinar` (the migration image: the `builder` stage, with the Prisma CLI) | `release.yml`, `dev.yml` | `X.Y.Z-migrate` and `vX.Y.Z-migrate` | `dev-migrate`, `dev-migrate-<sha>` |
-| `pa-webinar-recorder` | `dev.yml` | None | `dev`, `dev-<sha>` |
-| `pa-webinar-recorder-controller` | `dev.yml` | None | `dev`, `dev-<sha>` |
-| `pa-webinar-postprod-worker` | `dev.yml` | None | `dev`, `dev-<sha>` |
+| `pa-webinar-recorder` | `release.yml`, `dev.yml` | `X.Y.Z` | `dev`, `dev-<sha>` |
+| `pa-webinar-recorder-controller` | `release.yml`, `dev.yml` | `X.Y.Z` | `dev`, `dev-<sha>` |
+| `pa-webinar-postprod-worker` | `release.yml`, `dev.yml` | `X.Y.Z` | `dev`, `dev-<sha>` |
+| `pa-webinar-postprod-worker-cpu` (the worker without a GPU, `infra/ai/Dockerfile.worker-cpu`) | `release.yml` (from the first release that includes it), `dev.yml` | `X.Y.Z` | `dev`, `dev-<sha>` |
 | `pa-webinar-jitsi-web` | `jitsi-web.yml` | Not tied to releases: `stable-<jitsi-build>-rnnoise`, the value of `IMAGE_TAG` | None |
 
 The load-test image in `scripts/load-test/` is not built by any workflow. Its manual is [scripts/load-test/README.md](../../scripts/load-test/README.md).
@@ -232,7 +234,7 @@ Releases cut before `release.yml` published both forms carry only `vX.Y.Z-migrat
 
 ### Auxiliary components
 
-`release.yml` also builds the recorder, the recorder controller and the post-production worker for each tag, as `ghcr.io/italia/pa-webinar-<component>:X.Y.Z`; `dev.yml` builds them as `:dev` and `:dev-<sha>` when their folders change. In `values.yaml`, `recorder.image`, `recorder.controller.image` and `postprod.worker.image` are empty by default: the chart then uses `<app.image.repository>-<component>` with the app image's tag (`pa-webinar.auxImage` in `templates/_helpers.tpl`). A release installs the components of the same release and a rollback brings them back; an environment that runs the app as `:dev` gets them as `:dev`.
+`release.yml` also builds the recorder, the recorder controller and the post-production workers (with and without a GPU) for each tag, as `ghcr.io/italia/pa-webinar-<component>:X.Y.Z`; `dev.yml` builds them as `:dev` and `:dev-<sha>` when their folders change. In `values.yaml`, `recorder.image`, `recorder.controller.image`, `postprod.worker.image` and `postprod.worker.cpu.image` are empty by default: the chart then uses `<app.image.repository>-<component>` with the app image's tag (`pa-webinar.auxImage` in `templates/_helpers.tpl`). A release installs the components of the same release and a rollback brings them back; an environment that runs the app as `:dev` gets them as `:dev`.
 
 Releases before 0.13.0 have no versioned auxiliary images: for them, pin a `:dev-<sha>` tag or a digest, as described in [Upgrades and rollback](../operations/upgrades.md#making-the-dev-components-roll-back).
 

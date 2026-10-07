@@ -219,6 +219,12 @@ mounts are writable: `/models`, which is the PVC named in
 `postprod.worker.modelsPvc` or else an empty scratch volume, and `/work`, a
 scratch volume of `postprod.worker.workSizeLimit`.
 
+The worker without a GPU (`python -m worker.cpu`, for summaries, translations
+and the archive) has its own image, `../Dockerfile.worker-cpu`: Python on
+Alpine with ffmpeg and the packages in `requirements-cpu.txt`, under 300 MB.
+It mounts only `/work`. Its build imports `worker.cpu` and `worker.main`, so a
+module that imported torch, WhisperX or Piper at startup would stop the build.
+
 | Variable | Set by | Why |
 |---|---|---|
 | `HF_HOME=/models`, `TORCH_HOME=/models/torch`, `PYANNOTE_CACHE=/models/pyannote` | image | Model caches live on the models volume |
@@ -359,6 +365,7 @@ From the repository root:
 
 ```bash
 docker build -f infra/ai/Dockerfile.worker -t pa-webinar-postprod-worker:local infra/ai
+docker build -f infra/ai/Dockerfile.worker-cpu -t pa-webinar-postprod-worker-cpu:local infra/ai
 ```
 
 The build context is `infra/ai`, and only `worker/` is copied into the image.

@@ -229,6 +229,10 @@ jobs:
             file: ./infra/ai/Dockerfile.worker
             # Stessa cache del build di sviluppo: il worker cambia di rado.
             cache: dev-postprod-worker
+          - name: postprod-worker-cpu
+            context: ./infra/ai
+            file: ./infra/ai/Dockerfile.worker-cpu
+            cache: dev-postprod-worker-cpu
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 

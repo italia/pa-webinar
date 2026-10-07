@@ -110,7 +110,7 @@ The maintainers do not operate other administrations' installations and cannot p
 | Helm chart, including the scripts and configuration it mounts | `infra/helm/pa-webinar/` | Chart package attached to each GitHub Release |
 | Recorder bot | `infra/recorder/` | `ghcr.io/italia/pa-webinar-recorder` |
 | Recorder controller | `infra/recorder-controller/` | `ghcr.io/italia/pa-webinar-recorder-controller` |
-| AI post-production worker | `infra/ai/worker/` | `ghcr.io/italia/pa-webinar-postprod-worker` |
+| AI post-production worker | `infra/ai/worker/` | `ghcr.io/italia/pa-webinar-postprod-worker` and, without a GPU, `ghcr.io/italia/pa-webinar-postprod-worker-cpu` |
 | Patched jitsi/web image (the patches applied to the upstream bundle) | `infra/jitsi-web-patched/` | `ghcr.io/italia/pa-webinar-jitsi-web` |
 | Jitsi extras: the custom Prosody module used by the Docker Compose stack, and a Jibri finalize script | `infra/jitsi/` | Not published separately |
 | Docker Compose stack | `docker-compose*.yml` | Not published separately |

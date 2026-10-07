@@ -1501,10 +1501,18 @@ postprod:
     # ricodifica). Con la variante accesa il worker con la GPU prende solo
     # trascrizione e doppiaggio (la filigrana AudioSeal, su un evento lungo,
     # chiede decine di GB), e una sintesi accende una sola A100 invece di due.
-    # Stessa immagine del worker, scaricata sui nodi dell'app; nodi e
-    # tolleranze, se vuoti, quelli dell'app.
+    # Immagine propria e leggera (infra/ai/Dockerfile.worker-cpu, senza CUDA
+    # ne' modelli); nodi e tolleranze, se vuoti, quelli dell'app.
     cpu:
       enabled: true
+      # Vuota: l'immagine di postprod.worker.image se e' fissata (pesante,
+      # ma esiste nel registro dell'installazione), altrimenti
+      # <app.image.repository>-postprod-worker-cpu:<tag dell'app>. Le release
+      # la pubblicano dalla prima che ha il worker senza GPU in poi.
+      image: ""
+      # Variabili per questo worker (per esempio LLM_CONNECT_WAIT_S): quelle
+      # di postprod.worker.extraEnv valgono solo per il worker con la GPU.
+      extraEnv: {}
       nodeSelector: {}
       tolerations: []
       affinity: {}

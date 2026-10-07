@@ -1,0 +1,8 @@
+# Dipendenze del worker senza GPU (Dockerfile.worker-cpu, `python -m
+# worker.cpu`): sintesi, traduzioni e archivio. Il testo lo produce vLLM via
+# HTTP; l'archivio rimuxa con ffmpeg e allinea le tracce con numpy. Niente
+# torch, WhisperX o Piper: quelli servono solo al worker con la GPU
+# (requirements.txt), e da soli fanno un'immagine di ~15 GB.
+httpx==0.28.1
+pydantic==2.9.2
+numpy==1.26.4

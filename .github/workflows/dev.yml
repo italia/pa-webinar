@@ -46,6 +46,7 @@ env:
   REGISTRY: ghcr.io
   IMAGE_NAME: italia/pa-webinar
   WORKER_IMAGE_NAME: italia/pa-webinar-postprod-worker
+  WORKER_CPU_IMAGE_NAME: italia/pa-webinar-postprod-worker-cpu
   RECORDER_IMAGE_NAME: italia/pa-webinar-recorder
   RECORDER_CONTROLLER_IMAGE_NAME: italia/pa-webinar-recorder-controller
 
@@ -267,6 +268,57 @@ jobs:
           echo '# Per forzare un re-pull dei nodi GPU già allocati:' >> "$GITHUB_STEP_SUMMARY"
           echo 'kubectl -n <namespace> delete jobs -l app.kubernetes.io/component=postprod-worker' >> "$GITHUB_STEP_SUMMARY"
           echo '```' >> "$GITHUB_STEP_SUMMARY"
+
+  # Il worker senza GPU (sintesi, traduzioni, archivio): stesso codice del
+  # worker, immagine leggera senza CUDA (infra/ai/Dockerfile.worker-cpu). Job
+  # a parte: un build CUDA lento o fallito non deve fermare questa immagine,
+  # che si costruisce in un minuto.
+  build-worker-cpu:
+    env:
+      DOCKER_BUILD_SUMMARY: "false"
+      DOCKER_BUILD_RECORD_UPLOAD: "false"
+    name: Build & Push Postprod CPU Worker Image
+    needs: detect-worker-changes
+    if: needs.detect-worker-changes.outputs.worker_changed == 'true'
+    runs-on: arc-runner-pa-webinar
+    permissions:
+      contents: read
+      packages: write
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
+
+      - name: Login to GHCR
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Compute tags
+        id: tags
+        run: |
+          SHA_SHORT="${GITHUB_SHA::7}"
+          echo "tags=${{ env.REGISTRY }}/${{ env.WORKER_CPU_IMAGE_NAME }}:dev,${{ env.REGISTRY }}/${{ env.WORKER_CPU_IMAGE_NAME }}:dev-$SHA_SHORT" >> "$GITHUB_OUTPUT"
+
+      - name: Build and push CPU worker image
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
+        with:
+          context: ./infra/ai
+          file: ./infra/ai/Dockerfile.worker-cpu
+          push: true
+          tags: ${{ steps.tags.outputs.tags }}
+          platforms: linux/amd64
+          cache-from: ${{ inputs.no_cache && '' || 'type=gha,scope=dev-postprod-worker-cpu' }}
+          cache-to: ${{ inputs.no_cache && '' || 'type=gha,mode=max,scope=dev-postprod-worker-cpu' }}
+          labels: |
+            org.opencontainers.image.title=pa-webinar-postprod-worker-cpu
+            org.opencontainers.image.description=Postprod AI worker without GPU (summaries, translations, archive) for pa-webinar
+            org.opencontainers.image.source=https://github.com/italia/pa-webinar
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.ref.name=dev
 
   # ── Recorder multi-track (ADR-013, Fase 3) ────────────────────────────
   # Bot headless-Chrome (Puppeteer + lib-jitsi-meet) che registra una

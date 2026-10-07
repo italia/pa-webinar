@@ -453,10 +453,14 @@ image:
 | Template | Takes | Runs on |
 |---|---|---|
 | `<fullname>-postprod-worker` | `TRANSCRIBE`, `TRANSCRIBE_MULTITRACK`, `DUB` | the GPU pool, with a whole GPU and tens of GB of memory |
-| `<fullname>-postprod-worker-cpu` | `SUMMARIZE`, `TRANSLATE`, `SUBTITLE`, `ARCHIVE` | the app nodes, without a GPU (`postprod.worker.cpu`) |
+| `<fullname>-postprod-worker-cpu` | `SUMMARIZE`, `TRANSLATE`, `SUBTITLE`, `ARCHIVE` | the app nodes, without a GPU (`postprod.worker.cpu`), from its own image |
 
 Summaries and translations get their text from vLLM, which has its own GPU,
-and the archive remuxes without re-encoding. On the CPU worker, a summary
+and the archive remuxes without re-encoding. The CPU worker runs the same code
+from a light image, `pa-webinar-postprod-worker-cpu` (`infra/ai/Dockerfile.worker-cpu`:
+Python on Alpine with ffmpeg, `httpx`, `pydantic` and `numpy`, under 300 MB),
+because the GPU worker's image is about 15 GB compressed and would be pulled
+onto every app node that hosts a CPU worker. It mounts no models volume. On the CPU worker, a summary
 therefore starts one GPU node (vLLM) instead of two. Dubbing stays on the GPU
 worker for its memory: Piper runs on the CPU, but the AudioSeal watermark
 processes the whole track at once and needs tens of GB for a long event.
@@ -477,8 +481,7 @@ Both variants share the rest of the pod template:
   GPU node pool (`workload: ai-gpu` in `values.yaml`); `gpu.enabled` requests
   `nvidia.com/gpu` (`gpu.count`, default 1). The CPU worker uses
   `postprod.worker.cpu.nodeSelector` and `tolerations`, or the app's when they
-  are empty. Its first pod on a node pulls the worker image, which is large
-  because it carries the CUDA libraries.
+  are empty.
 - **Hardening.** Non-root user 10001, read-only root file system, all
   capabilities dropped, no service-account token.
 - **Volumes.** `/models` is the PVC named in `postprod.worker.modelsPvc`, or an
@@ -1220,6 +1223,8 @@ holds the defaults quoted here. Chart-wide keys are in
 | `worker.extraEnv` | empty | Extra worker environment, for example `AUDIOSEAL_CACHE_DIR` or `LLM_CONNECT_WAIT_S` |
 | `worker.gpu.enabled`, `.count` | `true`, `1` | GPU request and limit |
 | `worker.cpu.enabled` | `true` | Renders the CPU worker template and routes summaries, translations and archives to it |
+| `worker.cpu.image` | empty: `worker.image` when that is set, otherwise `<app.image.repository>-postprod-worker-cpu` with the app image's tag | The CPU worker's light image. Set it whenever you set `worker.image`, or the CPU worker pulls the GPU worker's large image |
+| `worker.cpu.extraEnv` | empty | Environment of the CPU worker, for example `LLM_CONNECT_WAIT_S`; `worker.extraEnv` and the Hugging Face token reach only the GPU worker |
 | `worker.cpu.nodeSelector`, `.tolerations`, `.affinity` | empty: the app's placement | Placement of the CPU worker |
 | `worker.cpu.resources` | requests `1` CPU / `3Gi`, limits `4` CPU / `8Gi` | CPU worker resources |
 | `worker.resources` | requests 8 CPU and 32Gi; limits 22 CPU and 200Gi | Sized for a GPU node with 24 vCPU and about 220 GiB; lower them for smaller nodes |

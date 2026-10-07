@@ -10,11 +10,15 @@
     e il doppiaggio (la filigrana AudioSeal chiede molta memoria);
   - `postprod-worker-cpu` (postprod.worker.cpu.enabled): senza GPU, per
     sintesi e traduzioni (il testo lo produce vLLM, sulla sua GPU) e archivio.
-    Per una sintesi si accende cosi' una sola A100.
+    Per una sintesi si accende cosi' una sola A100. Ha un'immagine sua,
+    leggera (infra/ai/Dockerfile.worker-cpu): quella del worker con la GPU
+    pesa ~15 GB e si scaricherebbe su ogni nodo dell'app che lo ospita.
   Senza la variante CPU, il worker con la GPU prende ogni tipo di job. Gli
   elenchi dei tipi sono quelli di app/src/lib/ai/job-classes.ts. La variante
-  CPU parte da `worker.cpu`, che un'immagine precedente non ha: con
-  un'immagine fissata a una versione vecchia il pod termina senza prendere job.
+  CPU parte da `worker.cpu`, che un'immagine del worker precedente a questa
+  separazione non ha: il pod termina senza prendere job. Variabili
+  (`extraEnv`) e token di Hugging Face sono per variante: quelle del worker
+  con la GPU non arrivano a quello senza.
 */ -}}
 {{- define "pa-webinar.postprodWorker" -}}
 {{- $v := .v -}}
@@ -77,26 +81,24 @@ spec:
             fsGroup: 10001
             seccompProfile:
               type: RuntimeDefault
-          {{- if .Values.postprod.worker.modelsPvc }}
           volumes:
+            {{- if $v.models }}
+            {{- if .Values.postprod.worker.modelsPvc }}
             - name: models
               persistentVolumeClaim:
                 claimName: {{ .Values.postprod.worker.modelsPvc }}
-            - name: work
-              emptyDir:
-                sizeLimit: {{ .Values.postprod.worker.workSizeLimit | default "20Gi" }}
-          {{- else }}
-          volumes:
+            {{- else }}
             - name: models
               emptyDir:
                 sizeLimit: {{ .Values.postprod.worker.modelsSizeLimit | default "30Gi" }}
+            {{- end }}
+            {{- end }}
             - name: work
               emptyDir:
                 sizeLimit: {{ .Values.postprod.worker.workSizeLimit | default "20Gi" }}
-          {{- end }}
           containers:
             - name: worker
-              image: {{ include "pa-webinar.auxImage" (list . .Values.postprod.worker.image "postprod-worker") }}
+              image: {{ $v.image }}
               imagePullPolicy: {{ .Values.postprod.worker.imagePullPolicy | default "IfNotPresent" }}
               {{- with $v.args }}
               args:
@@ -123,7 +125,7 @@ spec:
                       key: CRON_API_KEY
                 # Pyannote gated model needs the HF token. The Secret
                 # must exist before this rolls out (see docs/POSTPROD.md).
-                {{- if .Values.postprod.worker.hfTokenSecret }}
+                {{- if and $v.models .Values.postprod.worker.hfTokenSecret }}
                 - name: HF_TOKEN
                   valueFrom:
                     secretKeyRef:
@@ -139,13 +141,15 @@ spec:
                 - name: AI_WORKER_KINDS
                   value: {{ join "," . | quote }}
                 {{- end }}
-                {{- range $key, $value := .Values.postprod.worker.extraEnv }}
+                {{- range $key, $value := $v.extraEnv }}
                 - name: {{ $key }}
                   value: {{ $value | quote }}
                 {{- end }}
               volumeMounts:
+                {{- if $v.models }}
                 - name: models
                   mountPath: /models
+                {{- end }}
                 - name: work
                   mountPath: /work
               securityContext:
@@ -179,13 +183,19 @@ spec:
 {{- if $cpu.enabled }}
 {{- $gpuKinds = list "TRANSCRIBE" "TRANSCRIBE_MULTITRACK" "DUB" }}
 {{- end }}
-{{ include "pa-webinar.postprodWorker" (dict "root" . "v" (dict "component" "postprod-worker" "gpu" $w.gpu.enabled "nodeSelector" $w.nodeSelector "tolerations" $w.tolerations "affinity" $w.affinity "resources" $gpuRes "kinds" $gpuKinds)) }}
+{{ include "pa-webinar.postprodWorker" (dict "root" . "v" (dict "component" "postprod-worker" "gpu" $w.gpu.enabled "nodeSelector" $w.nodeSelector "tolerations" $w.tolerations "affinity" $w.affinity "resources" $gpuRes "kinds" $gpuKinds "models" true "extraEnv" ($w.extraEnv | default dict) "image" (include "pa-webinar.auxImage" (list . $w.image "postprod-worker")))) }}
 {{- if $cpu.enabled }}
 {{- $cr := $cpu.resources | default dict }}
 {{- $creq := $cr.requests | default dict }}
 {{- $clim := $cr.limits | default dict }}
 {{- $cpuRes := dict "requests" (dict "cpu" ($creq.cpu | default "1") "memory" ($creq.memory | default "3Gi")) "limits" (dict "cpu" ($clim.cpu | default "4") "memory" ($clim.memory | default "8Gi")) }}
+{{- /* L'immagine leggera: quella indicata, oppure, se l'installazione ha
+       fissato l'immagine del worker (registro proprio, digest, una release
+       senza immagine leggera), quella stessa, che contiene anche worker.cpu:
+       pesante, ma esiste. Altrimenti <repository dell'app>-postprod-worker-cpu
+       col tag dell'app. */}}
+{{- $cpuImage := $cpu.image | default $w.image | default (include "pa-webinar.auxImage" (list . "" "postprod-worker-cpu")) }}
 ---
-{{ include "pa-webinar.postprodWorker" (dict "root" . "v" (dict "component" "postprod-worker-cpu" "gpu" false "nodeSelector" ($cpu.nodeSelector | default .Values.app.nodeSelector) "tolerations" ($cpu.tolerations | default .Values.app.tolerations) "affinity" ($cpu.affinity | default dict) "resources" $cpuRes "kinds" (list "SUMMARIZE" "TRANSLATE" "SUBTITLE" "ARCHIVE") "args" (list "python" "-m" "worker.cpu"))) }}
+{{ include "pa-webinar.postprodWorker" (dict "root" . "v" (dict "component" "postprod-worker-cpu" "gpu" false "nodeSelector" ($cpu.nodeSelector | default .Values.app.nodeSelector) "tolerations" ($cpu.tolerations | default .Values.app.tolerations) "affinity" ($cpu.affinity | default dict) "resources" $cpuRes "kinds" (list "SUMMARIZE" "TRANSLATE" "SUBTITLE" "ARCHIVE") "args" (list "python" "-m" "worker.cpu") "models" false "extraEnv" ($cpu.extraEnv | default dict) "image" $cpuImage)) }}
 {{- end }}
 {{- end }}

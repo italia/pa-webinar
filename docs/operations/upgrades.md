@@ -48,6 +48,7 @@ An upgrade moves several parts, each with its own value in the chart:
 | Chart | the chart you pass to `helm upgrade` | Templates, defaults, the pinned subcharts (PostgreSQL, Redis, Jitsi Meet) and the third-party images `values.yaml` pins, the PostgreSQL server image among them. A new PostgreSQL major version needs care: see [Reading the dry run](#reading-the-dry-run). |
 | Patched Jitsi web image | `jitsi-meet.web.image.tag` | Built by its own workflow. Changing it is a conference-image rollout. See [The patched web image](../architecture/jitsi-integration.md#the-patched-web-image). |
 | Recorder bot, recorder controller, AI post-production worker | `recorder.image`, `recorder.controller.image`, `postprod.worker.image` | Empty by default: the chart uses the app image's tag, and each release from 0.13.0 publishes them with its version. See [Rollback](#making-the-dev-components-roll-back). |
+| AI post-production worker without a GPU | `postprod.worker.cpu.image` | Empty by default: `postprod.worker.image` when that is set, otherwise the app image's tag. Published with each release from the first one that includes it. |
 
 The tag each image carries for a release is listed in the image-tag table of
 [CI, images and releases](../development/ci-and-release.md).
@@ -237,6 +238,7 @@ build. Before the upgrade, record the digest each floating tag resolves to now (
 docker buildx imagetools inspect ghcr.io/italia/pa-webinar-recorder:dev
 docker buildx imagetools inspect ghcr.io/italia/pa-webinar-recorder-controller:dev
 docker buildx imagetools inspect ghcr.io/italia/pa-webinar-postprod-worker:dev
+docker buildx imagetools inspect ghcr.io/italia/pa-webinar-postprod-worker-cpu:dev
 ```
 
 A pod that is running shows the digest it actually pulled in `.status.containerStatuses[*].imageID`.
@@ -884,7 +886,17 @@ recorder:
 postprod:
   worker:
     image: ghcr.io/italia/pa-webinar-postprod-worker@sha256:<digest>
+    cpu:
+      image: ghcr.io/italia/pa-webinar-postprod-worker-cpu@sha256:<digest>
 ```
+
+The worker without a GPU has its own light image from the first release that
+includes it. Before that release there is no `pa-webinar-postprod-worker-cpu`
+image to pin: leave `postprod.worker.cpu.image` empty and the CPU worker uses
+`postprod.worker.image`, which also contains it; it is large but works. The
+same fallback applies whenever `postprod.worker.image` is set and
+`postprod.worker.cpu.image` is not, so an installation that pins the GPU
+worker should pin the light image too.
 
 With a pinned reference, these components change only when you bump the value. They then move with
 `helm rollback` like everything else the chart renders.
