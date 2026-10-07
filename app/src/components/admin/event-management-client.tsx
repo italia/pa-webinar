@@ -22,6 +22,7 @@ import { useConfirm } from '@/components/ui/confirm-dialog';
 import { useToast } from '@/components/ui/toast';
 import EventTitle from '@/components/events/event-title';
 import { MarkdownRenderer } from '@/components/ui/markdown';
+import { csvText } from '@/lib/utils/csv';
 import { eventAdminPath } from '@/lib/events/admin-links';
 import type { WizardStep } from '@/lib/events/wizard-steps';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
@@ -198,18 +199,11 @@ interface EventManagementClientProps {
 // da «Modifica evento».
 type TabId = 'panoramica' | 'persone' | 'contenuti' | 'dopo' | 'statistiche';
 
-const ORG_TYPE_LABELS: Record<string, { it: string; en: string }> = {
-  MINISTRY: { it: 'Ministero', en: 'Ministry' },
-  AGENCY: { it: 'Agenzia', en: 'Agency' },
-  REGION: { it: 'Regione', en: 'Region' },
-  PROVINCE: { it: 'Provincia', en: 'Province' },
-  MUNICIPALITY: { it: 'Comune', en: 'Municipality' },
-  ASL: { it: 'ASL', en: 'ASL' },
-  UNIVERSITY: { it: 'Università', en: 'University' },
-  PUBLIC_ENTITY: { it: 'Ente pubblico', en: 'Public entity' },
-  IN_HOUSE: { it: 'Società in-house', en: 'In-house company' },
-  OTHER: { it: 'Altro', en: 'Other' },
-};
+/** Il nome tradotto di un tipo di ente (admin.registrations.orgTypes). */
+function useOrgTypeLabel(): (code: string) => string {
+  const t = useTranslations('admin.registrations.orgTypes');
+  return useCallback((code: string) => (t.has(code) ? t(code) : code), [t]);
+}
 
 function tagChipStyle(color: string | null): CSSProperties {
   const base = color ?? C_PRIMARY;
@@ -226,6 +220,8 @@ export default function EventManagementClient({
 }: EventManagementClientProps) {
   const t = useTranslations('admin');
   const td = useTranslations('admin.eventDetail');
+  const tReg = useTranslations('admin.registrations');
+  const orgTypeLabel = useOrgTypeLabel();
   const te = useTranslations('events');
   const tr = useTranslations('reminders');
   const format = useFormatter();
@@ -410,24 +406,31 @@ export default function EventManagementClient({
   }, [event.id, router, td]);
 
   const exportCsv = useCallback(() => {
-    const headers = ['Nome', 'Ente', 'Ruolo', 'Tipologia ente', 'Data registrazione', 'Entrato'];
+    const headers = [
+      tReg('colName'),
+      tReg('colOrg'),
+      tReg('colRole'),
+      tReg('colOrgType'),
+      tReg('colCreatedAt'),
+      tReg('colJoined'),
+    ];
     const rows = event.registrations.map((r) => [
       r.displayName,
       r.organization ?? '',
       r.organizationRole ?? '',
-      r.organizationType ? (ORG_TYPE_LABELS[r.organizationType]?.[locale as 'it' | 'en'] ?? r.organizationType) : '',
+      r.organizationType ? orgTypeLabel(r.organizationType) : '',
       new Date(r.createdAt).toISOString(),
-      r.joinedAt ? 'Si' : 'No',
+      r.joinedAt ? tReg('yes') : tReg('no'),
     ]);
-    const csv = [headers, ...rows]
-      .map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(','))
-      .join('\n');
+    // Celle neutralizzate contro le formule e separatore «;», come gli altri
+    // CSV dell'amministrazione (lib/utils/csv).
+    const csv = csvText([headers, ...rows.map((row) => row.map(String))]);
     const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url; a.download = `registrazioni-${event.slug}.csv`; a.click();
     URL.revokeObjectURL(url);
-  }, [event.registrations, event.slug, locale]);
+  }, [event.registrations, event.slug, tReg, orgTypeLabel]);
 
   // Live peak-count poll when LIVE.
   const [liveCount, setLiveCount] = useState<number | null>(null);
@@ -1028,6 +1031,7 @@ function PeopleTab({ event, baseUrl, locale, onExportCsv, canEditRegistrations, 
   const t = useTranslations('admin');
   const te = useTranslations('events');
   const format = useFormatter();
+  const orgTypeLabel = useOrgTypeLabel();
 
   // Aggregated org-type histogram for the intro chip row.
   const orgTypeCounts = event.registrations.reduce<Record<string, number>>((acc, r) => {
@@ -1065,7 +1069,7 @@ function PeopleTab({ event, baseUrl, locale, onExportCsv, canEditRegistrations, 
           <div className="mb-3 d-flex flex-wrap gap-2">
             {orgTypeEntries.map(([type, count]) => {
               const pct = Math.round((count / event.registrations.length) * 100);
-              const label = ORG_TYPE_LABELS[type]?.[locale as 'it' | 'en'] ?? type;
+              const label = orgTypeLabel(type);
               return (
                 <span key={type} className="px-2 py-1 rounded-pill" style={PILL_MUTED}>
                   {label}: {pct}% ({count})
@@ -1099,7 +1103,7 @@ function PeopleTab({ event, baseUrl, locale, onExportCsv, canEditRegistrations, 
                 {event.registrations.map((reg, i) => {
                   const joined = !!reg.joinedAt;
                   const typeLabel = reg.organizationType
-                    ? (ORG_TYPE_LABELS[reg.organizationType]?.[locale as 'it' | 'en'] ?? reg.organizationType)
+                    ? orgTypeLabel(reg.organizationType)
                     : '—';
                   return (
                     <tr key={reg.id}>

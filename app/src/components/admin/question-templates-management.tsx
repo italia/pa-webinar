@@ -9,9 +9,11 @@
  *     fields (options for choice, scale range for Likert)
  *   - i18n editor covers IT + EN only; additional locales can be added
  *     by editing the exported JSON (or extending the UI later).
+ *   - Interface strings in admin.questionTemplates.
  */
 
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Badge, Button, Card, CardBody, Input, Label } from 'design-react-kit';
 
 import { useToast } from '@/components/ui/toast';
@@ -20,12 +22,13 @@ import { SkeletonLines } from '@/components/ui/skeleton';
 
 type QuestionType = 'SINGLE_CHOICE' | 'MULTI_CHOICE' | 'YES_NO' | 'LIKERT' | 'OPEN_TEXT';
 
-const QUESTION_TYPES: { value: QuestionType; label: string }[] = [
-  { value: 'OPEN_TEXT', label: 'Testo libero' },
-  { value: 'SINGLE_CHOICE', label: 'Scelta singola' },
-  { value: 'MULTI_CHOICE', label: 'Scelta multipla' },
-  { value: 'YES_NO', label: 'Sì/No' },
-  { value: 'LIKERT', label: 'Scala Likert' },
+// Le etichette sono quelle del wizard (admin.wizard.step4.questionType*).
+const QUESTION_TYPES: { value: QuestionType; labelKey: string }[] = [
+  { value: 'OPEN_TEXT', labelKey: 'questionTypeOpen' },
+  { value: 'SINGLE_CHOICE', labelKey: 'questionTypeSingle' },
+  { value: 'MULTI_CHOICE', labelKey: 'questionTypeMulti' },
+  { value: 'YES_NO', labelKey: 'questionTypeYesNo' },
+  { value: 'LIKERT', labelKey: 'questionTypeLikert' },
 ];
 
 interface ItemDraft {
@@ -78,6 +81,9 @@ const EMPTY_ITEM: ItemDraft = {
 };
 
 export default function QuestionTemplatesManagement() {
+  const t = useTranslations('admin.questionTemplates');
+  const tTypes = useTranslations('admin.wizard.step4');
+  const tc = useTranslations('common');
   const toast = useToast();
   const confirm = useConfirm();
   const [rows, setRows] = useState<TemplateRow[]>([]);
@@ -123,7 +129,7 @@ export default function QuestionTemplatesManagement() {
   const startEdit = async (row: TemplateRow) => {
     const res = await fetch(`/api/admin/question-templates/${row.id}`, { cache: 'no-store' });
     if (!res.ok) {
-      setError('Impossibile caricare il template');
+      setError(tc('errorGeneric'));
       return;
     }
     const d: TemplateDetail = await res.json();
@@ -233,8 +239,12 @@ export default function QuestionTemplatesManagement() {
       });
 
       if (!res.ok) {
-        const errData = await res.json().catch(() => ({}));
-        setError(errData.error ?? 'Salvataggio fallito');
+        const body = (await res.json().catch(() => ({}))) as { error?: string };
+        setError(
+          res.status === 400 || res.status === 422
+            ? `${t('invalid')}${body.error ? ` (${body.error})` : ''}`
+            : tc('errorGeneric'),
+        );
         return;
       }
 
@@ -244,15 +254,15 @@ export default function QuestionTemplatesManagement() {
       setSaving(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [name, description, sortOrder, items, editingId, fetchRows]);
+  }, [name, description, sortOrder, items, editingId, fetchRows, t, tc]);
 
   const handleDelete = useCallback(
     async (row: TemplateRow) => {
       if (row.isSystem) return;
       const ok = await confirm({
-        title: 'Elimina template',
-        message: `Eliminare "${row.name}"? Usato da ${row.usedByQuestionnaires} questionari attivi.`,
-        confirmLabel: 'Elimina',
+        title: t('deleteTitle'),
+        message: t('deleteMessage', { name: row.name, count: row.usedByQuestionnaires }),
+        confirmLabel: tc('delete'),
         danger: true,
       });
       if (!ok) return;
@@ -260,11 +270,11 @@ export default function QuestionTemplatesManagement() {
       if (res.ok) {
         await fetchRows();
       } else {
-        const err = await res.json().catch(() => ({}));
-        toast.error(err.error ?? 'Eliminazione fallita');
+        // Ancora collegato a dei questionari: va staccato prima.
+        toast.error(res.status === 409 ? t('inUse') : tc('errorGeneric'));
       }
     },
-    [fetchRows, confirm, toast],
+    [fetchRows, confirm, toast, t, tc],
   );
 
   const editing = editingId !== null;
@@ -274,7 +284,7 @@ export default function QuestionTemplatesManagement() {
       {!editing && (
         <div className="d-flex justify-content-end mb-3">
           <Button color="primary" size="sm" onClick={startNew}>
-            + Nuovo template
+            + {t('newTemplate')}
           </Button>
         </div>
       )}
@@ -283,7 +293,7 @@ export default function QuestionTemplatesManagement() {
         <Card className="shadow-sm border-0 mb-4" style={{ borderRadius: 8 }}>
           <CardBody className="p-4">
             <h5 className="fw-semibold mb-3" style={{ color: 'var(--app-text)' }}>
-              {editingId === 'new' ? 'Nuovo template' : 'Modifica template'}
+              {editingId === 'new' ? t('newTemplate') : t('editTemplate')}
             </h5>
 
             {error && (
@@ -293,7 +303,7 @@ export default function QuestionTemplatesManagement() {
             )}
 
             <div className="mb-3">
-              <Label for="tpl-name">Nome</Label>
+              <Label for="tpl-name">{t('name')}</Label>
               <Input
                 id="tpl-name"
                 type="text"
@@ -303,7 +313,7 @@ export default function QuestionTemplatesManagement() {
             </div>
 
             <div className="mb-3">
-              <Label for="tpl-desc">Descrizione</Label>
+              <Label for="tpl-desc">{t('description')}</Label>
               <Input
                 id="tpl-desc"
                 type="text"
@@ -313,7 +323,7 @@ export default function QuestionTemplatesManagement() {
             </div>
 
             <div className="mb-3" style={{ maxWidth: 160 }}>
-              <Label for="tpl-sort">Ordine</Label>
+              <Label for="tpl-sort">{t('order')}</Label>
               <Input
                 id="tpl-sort"
                 type="number"
@@ -323,7 +333,7 @@ export default function QuestionTemplatesManagement() {
             </div>
 
             <hr className="my-4" />
-            <h6 className="fw-semibold mb-3">Domande</h6>
+            <h3 className="h6 fw-semibold mb-3">{t('questions')}</h3>
 
             {items.map((it, idx) => (
               <Card key={idx} className="mb-3 border" style={{ borderRadius: 6 }}>
@@ -332,14 +342,21 @@ export default function QuestionTemplatesManagement() {
                     <Badge color="" className="px-2 py-1" style={{ backgroundColor: '#E8F0FE', color: 'var(--app-primary)' }}>
                       #{idx + 1}
                     </Badge>
-                    <Button color="danger" outline size="xs" onClick={() => removeItem(idx)}>
-                      Rimuovi
+                    <Button
+                      color="danger"
+                      outline
+                      size="xs"
+                      onClick={() => removeItem(idx)}
+                      aria-label={t('removeQuestion', { n: idx + 1 })}
+                    >
+                      {t('remove')}
                     </Button>
                   </div>
 
                   <div className="mb-2">
-                    <Label>Domanda (IT)</Label>
+                    <Label for={`q-${idx}-it`}>{t('promptIt')}</Label>
                     <Input
+                      id={`q-${idx}-it`}
                       type="text"
                       value={it.promptIt}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -348,8 +365,9 @@ export default function QuestionTemplatesManagement() {
                     />
                   </div>
                   <div className="mb-2">
-                    <Label>Domanda (EN)</Label>
+                    <Label for={`q-${idx}-en`}>{t('promptEn')}</Label>
                     <Input
+                      id={`q-${idx}-en`}
                       type="text"
                       value={it.promptEn}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -360,15 +378,16 @@ export default function QuestionTemplatesManagement() {
 
                   <div className="row g-2 mb-2">
                     <div className="col-md-6">
-                      <Label>Tipo</Label>
+                      <Label for={`q-${idx}-type`}>{t('type')}</Label>
                       <select
+                        id={`q-${idx}-type`}
                         className="form-select"
                         value={it.type}
                         onChange={(e) => updateItem(idx, { type: e.target.value as QuestionType })}
                       >
                         {QUESTION_TYPES.map((qt) => (
                           <option key={qt.value} value={qt.value}>
-                            {qt.label}
+                            {tTypes(qt.labelKey)}
                           </option>
                         ))}
                       </select>
@@ -383,7 +402,7 @@ export default function QuestionTemplatesManagement() {
                           onChange={(e) => updateItem(idx, { required: e.target.checked })}
                         />
                         <label className="form-check-label" htmlFor={`req-${idx}`}>
-                          Risposta obbligatoria
+                          {t('required')}
                         </label>
                       </div>
                     </div>
@@ -391,13 +410,14 @@ export default function QuestionTemplatesManagement() {
 
                   {(it.type === 'SINGLE_CHOICE' || it.type === 'MULTI_CHOICE') && (
                     <div className="mb-2">
-                      <Label>Opzioni</Label>
+                      <div className="form-label" id={`q-${idx}-opts`}>{t('options')}</div>
                       {it.options.map((opt, optIdx) => (
                         <div key={optIdx} className="row g-2 mb-1 align-items-center">
                           <div className="col">
                             <Input
                               type="text"
                               placeholder="IT"
+                              aria-label={t('optionIt', { n: optIdx + 1 })}
                               value={opt.it}
                               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                                 updateItem(idx, {
@@ -412,6 +432,7 @@ export default function QuestionTemplatesManagement() {
                             <Input
                               type="text"
                               placeholder="EN"
+                              aria-label={t('optionEn', { n: optIdx + 1 })}
                               value={opt.en}
                               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                                 updateItem(idx, {
@@ -423,14 +444,20 @@ export default function QuestionTemplatesManagement() {
                             />
                           </div>
                           <div className="col-auto">
-                            <Button color="danger" outline size="xs" onClick={() => removeOption(idx, optIdx)}>
+                            <Button
+                              color="danger"
+                              outline
+                              size="xs"
+                              onClick={() => removeOption(idx, optIdx)}
+                              aria-label={t('removeOption', { n: optIdx + 1 })}
+                            >
                               ×
                             </Button>
                           </div>
                         </div>
                       ))}
                       <Button color="secondary" outline size="xs" onClick={() => addOption(idx)}>
-                        + opzione
+                        + {t('addOption')}
                       </Button>
                     </div>
                   )}
@@ -438,8 +465,9 @@ export default function QuestionTemplatesManagement() {
                   {it.type === 'LIKERT' && (
                     <div className="row g-2 mb-2">
                       <div className="col-md-6">
-                        <Label>Scala min</Label>
+                        <Label for={`q-${idx}-min`}>{t('scaleMin')}</Label>
                         <Input
+                          id={`q-${idx}-min`}
                           type="number"
                           value={it.scaleMin}
                           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -448,8 +476,9 @@ export default function QuestionTemplatesManagement() {
                         />
                       </div>
                       <div className="col-md-6">
-                        <Label>Scala max</Label>
+                        <Label for={`q-${idx}-max`}>{t('scaleMax')}</Label>
                         <Input
+                          id={`q-${idx}-max`}
                           type="number"
                           value={it.scaleMax}
                           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -464,27 +493,27 @@ export default function QuestionTemplatesManagement() {
             ))}
 
             <Button color="secondary" outline size="sm" onClick={addItem} className="mb-4">
-              + Aggiungi domanda
+              + {t('addQuestion')}
             </Button>
 
             <div className="d-flex gap-2">
               <Button color="primary" onClick={save} disabled={saving || !name.trim()}>
-                {saving ? 'Salvataggio…' : 'Salva'}
+                {saving ? tc('saving') : tc('save')}
               </Button>
               <Button color="secondary" outline onClick={cancelEdit} disabled={saving}>
-                Annulla
+                {tc('cancel')}
               </Button>
             </div>
           </CardBody>
         </Card>
       ) : loading && rows.length === 0 ? (
-        <SkeletonLines lines={4} loadingLabel="Caricamento template…" />
+        <SkeletonLines lines={4} loadingLabel={tc('loading')} />
       ) : rows.length === 0 ? (
         <Card className="border-0 shadow-sm">
           <CardBody className="p-5 text-center">
-            <p className="text-muted mb-3">Nessun template. Creane uno per riutilizzare set di domande fra eventi.</p>
+            <p className="text-muted mb-3">{t('empty')}</p>
             <Button color="primary" size="sm" onClick={startNew}>
-              + Nuovo template
+              + {t('newTemplate')}
             </Button>
           </CardBody>
         </Card>
@@ -496,12 +525,12 @@ export default function QuestionTemplatesManagement() {
                 <div className="d-flex justify-content-between align-items-start flex-wrap gap-2">
                   <div style={{ minWidth: 0 }}>
                     <div className="d-flex align-items-center gap-2 flex-wrap mb-1">
-                      <h6 className="fw-semibold mb-0" style={{ color: 'var(--app-text)' }}>
+                      <h2 className="h6 fw-semibold mb-0" style={{ color: 'var(--app-text)' }}>
                         {row.name}
-                      </h6>
+                      </h2>
                       {row.isSystem && (
                         <Badge color="primary" pill style={{ fontSize: '0.7rem' }}>
-                          sistema
+                          {t('system')}
                         </Badge>
                       )}
                     </div>
@@ -511,16 +540,28 @@ export default function QuestionTemplatesManagement() {
                       </div>
                     )}
                     <div className="text-muted mt-1" style={{ fontSize: '0.75rem' }}>
-                      {row.itemCount} domande · usato in {row.usedByQuestionnaires} questionari
+                      {t('stats', { items: row.itemCount, used: row.usedByQuestionnaires })}
                     </div>
                   </div>
                   <div className="d-flex gap-2 flex-shrink-0">
-                    <Button color="secondary" outline size="xs" onClick={() => startEdit(row)}>
-                      Modifica
+                    <Button
+                      color="secondary"
+                      outline
+                      size="xs"
+                      onClick={() => startEdit(row)}
+                      aria-label={`${tc('edit')} – ${row.name}`}
+                    >
+                      {tc('edit')}
                     </Button>
                     {!row.isSystem && (
-                      <Button color="danger" outline size="xs" onClick={() => handleDelete(row)}>
-                        Elimina
+                      <Button
+                        color="danger"
+                        outline
+                        size="xs"
+                        onClick={() => handleDelete(row)}
+                        aria-label={`${tc('delete')} – ${row.name}`}
+                      >
+                        {tc('delete')}
                       </Button>
                     )}
                   </div>

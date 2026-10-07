@@ -12,10 +12,10 @@
  * primary view is a table; clicking a row expands the details inline.
  */
 
-import { useEffect, useRef, useState } from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import useSWR from 'swr';
-import { useTranslations } from 'next-intl';
+import { useFormatter, useTranslations } from 'next-intl';
 
 import { Link, useRouter, percorso } from '@/i18n/navigation';
 import { useToast } from '@/components/ui/toast';
@@ -113,6 +113,17 @@ function statusVariant(status: string): string {
   }
 }
 
+/** Lo stato di una registrazione (il soggetto e' la registrazione). */
+const STATUS_KEYS: Record<string, string> = {
+  READY: 'statusReady',
+  POSTPROD_QUEUED: 'statusQueued',
+  POSTPROD_RUNNING: 'statusRunning',
+  POSTPROD_PARTIAL: 'statusPartial',
+  POSTPROD_DONE: 'statusDone',
+  POSTPROD_FAILED: 'statusFailed',
+  ARCHIVED: 'statusArchived',
+};
+
 function formatDuration(seconds: number | null): string {
   if (seconds == null) return '–';
   const m = Math.floor(seconds / 60);
@@ -126,6 +137,7 @@ function formatDuration(seconds: number | null): string {
  * tradotte, waveform. Più informativo del semplice conteggio.
  */
 function ArtifactBadges({ artifacts }: { artifacts: ArtifactRow[] }) {
+  const t = useTranslations('admin.postprod');
   const has = (t: string) => artifacts.some((a) => a.type === t);
   const translated = Array.from(
     new Set(
@@ -157,17 +169,23 @@ function ArtifactBadges({ artifacts }: { artifacts: ArtifactRow[] }) {
   }
   return (
     <div className="d-flex flex-wrap gap-1">
-      {pill(has('TRANSCRIPT_JSON'), 'Trascr.', 'Trascrizione')}
-      {pill(has('SUMMARY_MD') || has('SUMMARY_JSON'), 'Sintesi', 'Sintesi')}
-      {pill(translated.length > 0, `Trad. ${translated.length || ''}`.trim(), `Traduzioni: ${translated.join(', ') || 'nessuna'}`)}
-      {dubbed.length > 0 && pill(true, `Doppi. ${dubbed.length}`, `Doppiaggio: ${dubbed.join(', ')}`)}
-      {has('WAVEFORM_JSON') && pill(true, 'Waveform', 'Waveform')}
+      {pill(has('TRANSCRIPT_JSON'), t('badgeTranscript'), t('badgeTranscript'))}
+      {pill(has('SUMMARY_MD') || has('SUMMARY_JSON'), t('badgeSummary'), t('badgeSummary'))}
+      {pill(
+        translated.length > 0,
+        t('badgeTranslations', { count: translated.length }),
+        translated.length > 0 ? `${t('badgeTranslationsTitle')}: ${translated.join(', ')}` : t('badgeTranslationsNone'),
+      )}
+      {dubbed.length > 0 &&
+        pill(true, t('badgeDubbing', { count: dubbed.length }), `${t('badgeDubbingTitle')}: ${dubbed.join(', ')}`)}
+      {has('WAVEFORM_JSON') && pill(true, t('badgeWaveform'), t('badgeWaveform'))}
     </div>
   );
 }
 
 export default function PostprodDashboard() {
   const t = useTranslations('admin.postprod');
+  const format = useFormatter();
   const toast = useToast();
   const confirm = useConfirm();
   const [statusFilter, setStatusFilter] = useState<string>('');
@@ -309,9 +327,8 @@ export default function PostprodDashboard() {
               const isExpanded = expanded === row.id;
               const doneJobs = row.jobs.filter((j) => j.status === 'DONE').length;
               return (
-                <>
+                <Fragment key={row.id}>
                   <tr
-                    key={row.id}
                     data-recording={row.id}
                     onClick={() => setExpanded(isExpanded ? null : row.id)}
                     style={{ cursor: 'pointer' }}
@@ -320,11 +337,11 @@ export default function PostprodDashboard() {
                       <div className="fw-semibold">{row.eventTitle}</div>
                       <code className="small text-muted">{row.eventSlug}</code>
                     </td>
-                    <td>{new Date(row.createdAt).toLocaleString()}</td>
+                    <td>{format.dateTime(new Date(row.createdAt), { dateStyle: 'short', timeStyle: 'short' })}</td>
                     <td>{formatDuration(row.durationSec)}</td>
                     <td>
                       <span className={`badge ${statusVariant(row.status)}`}>
-                        {row.status}
+                        {STATUS_KEYS[row.status] ? t(STATUS_KEYS[row.status]!) : row.status}
                       </span>
                     </td>
                     <td>
@@ -377,7 +394,7 @@ export default function PostprodDashboard() {
                       </td>
                     </tr>
                   )}
-                </>
+                </Fragment>
               );
             })}
             {data && data.rows.length === 0 && (

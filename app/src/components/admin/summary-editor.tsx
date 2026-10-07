@@ -152,6 +152,7 @@ export default function SummaryEditor({
   onSaved?: () => void;
 }) {
   const t = useTranslations('admin.postprod');
+  const tc = useTranslations('common');
   const { data, error, isLoading, mutate } = useSWR<SummaryResponse>(
     `/api/admin/postprod/recordings/${recordingId}/summary`,
     fetcher as (url: string) => Promise<SummaryResponse>,
@@ -277,21 +278,22 @@ export default function SummaryEditor({
         },
       );
       if (!r.ok) {
-        let detail = '';
-        try {
-          const j = (await r.json()) as { error?: string; message?: string };
-          detail = j.error ?? j.message ?? '';
-        } catch {
-          /* non-JSON error body */
-        }
-        setErrorMsg(`Salvataggio non riuscito (${r.status})${detail ? `: ${detail}` : ''}`);
+        // Un rifiuto del server (testo troppo lungo, lingua senza la sua
+        // sintesi) non si risolve riprovando: lo si dice, con il dettaglio.
+        const body = (await r.json().catch(() => ({}))) as { error?: string; message?: string };
+        const dettaglio = body.error ?? body.message ?? '';
+        setErrorMsg(
+          r.status >= 400 && r.status < 500
+            ? `${t('summarySaveRejected')}${dettaglio ? ` (${dettaglio})` : ''}`
+            : t('summarySaveFailed'),
+        );
         return;
       }
-      setSavedMsg('Sintesi salvata.');
+      setSavedMsg(t('summarySaved'));
       await mutate();
       onSaved?.();
     } catch {
-      setErrorMsg('Salvataggio non riuscito.');
+      setErrorMsg(t('summarySaveFailed'));
     } finally {
       setSaving(false);
     }
@@ -302,19 +304,19 @@ export default function SummaryEditor({
   return (
     <div>
       <div className="d-flex align-items-center flex-wrap gap-2 mb-3">
-        <strong className="small">Sintesi AI</strong>
+        <h3 className="h6 fw-semibold mb-0">{t('summaryHeading')}</h3>
         {data.languages.length > 1 ? (
           <select
             className="form-select form-select-sm"
             style={{ width: 'auto' }}
             value={lang}
             onChange={(e) => setLang(e.target.value)}
-            aria-label="Lingua della sintesi"
+            aria-label={t('summaryLanguage')}
           >
             {data.languages.map((l) => (
               <option key={l} value={l}>
                 {l}
-                {l === data.sourceLanguage ? ' (sorgente)' : ''}
+                {l === data.sourceLanguage ? ` (${t('summarySource')})` : ''}
               </option>
             ))}
           </select>
@@ -322,28 +324,31 @@ export default function SummaryEditor({
           <span className="badge bg-light text-dark">{lang}</span>
         )}
         <div className="ms-auto d-flex align-items-center gap-2">
-          {savedMsg && <span className="small text-success">{savedMsg}</span>}
-          {errorMsg && <span className="small text-danger">{errorMsg}</span>}
-          {dirty && <span className="small text-secondary">Modifiche non salvate</span>}
+          <span role="status" className="small text-success">{savedMsg}</span>
+          {errorMsg && <span role="alert" className="small text-danger">{errorMsg}</span>}
+          {dirty && <span className="small text-secondary">{t('summaryUnsaved')}</span>}
           <button
             type="button"
             className="btn btn-sm btn-primary"
             disabled={!dirty || saving}
             onClick={() => void save()}
           >
-            {saving ? 'Salvataggio…' : 'Salva'}
+            {saving ? tc('saving') : tc('save')}
           </button>
         </div>
       </div>
 
       {/* overall_summary */}
       <div className="mb-3">
-        <label className="form-label small fw-semibold">Sintesi generale</label>
+        <label className="form-label small fw-semibold" htmlFor={`${recordingId}-overall`}>
+          {t('summaryOverall')}
+        </label>
         <textarea
+          id={`${recordingId}-overall`}
           className="form-control form-control-sm"
           rows={4}
           value={draft.overall_summary}
-          placeholder="Riepilogo complessivo dell'evento…"
+          placeholder={t('summaryOverallPlaceholder')}
           onChange={(e) => patch({ overall_summary: e.target.value })}
         />
       </div>
@@ -352,23 +357,23 @@ export default function SummaryEditor({
         {/* key_decisions */}
         <div className="col-md-6">
           <EditableList
-            label="Decisioni chiave"
+            label={t('summaryDecisions')}
             items={draft.key_decisions}
             onEdit={(i, v) => editListItem('key_decisions', i, v)}
             onRemove={(i) => removeListItem('key_decisions', i)}
             onAdd={() => addListItem('key_decisions')}
-            addLabel="Aggiungi decisione"
+            addLabel={t('summaryAddDecision')}
           />
         </div>
         {/* action_items */}
         <div className="col-md-6">
           <EditableList
-            label="Azioni da intraprendere"
+            label={t('summaryActions')}
             items={draft.action_items}
             onEdit={(i, v) => editListItem('action_items', i, v)}
             onRemove={(i) => removeListItem('action_items', i)}
             onAdd={() => addListItem('action_items')}
-            addLabel="Aggiungi azione"
+            addLabel={t('summaryAddAction')}
           />
         </div>
       </div>
@@ -376,17 +381,17 @@ export default function SummaryEditor({
       {/* topics */}
       <div className="mt-3">
         <div className="d-flex align-items-center gap-2 mb-2">
-          <label className="form-label small fw-semibold mb-0">Argomenti (capitoli)</label>
+          <span className="form-label small fw-semibold mb-0">{t('summaryTopics')}</span>
           <button
             type="button"
             className="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-1 ms-auto"
             onClick={addTopic}
           >
-            <PlusIcon /> Aggiungi argomento
+            <PlusIcon /> {t('summaryAddTopic')}
           </button>
         </div>
         {draft.topics.length === 0 ? (
-          <p className="small text-secondary mb-0">Nessun argomento.</p>
+          <p className="small text-secondary mb-0">{t('summaryNoTopics')}</p>
         ) : (
           <div className="d-flex flex-column gap-2">
             {draft.topics.map((tp, i) => (
@@ -395,7 +400,8 @@ export default function SummaryEditor({
                   <input
                     type="text"
                     className="form-control form-control-sm"
-                    placeholder="Titolo argomento"
+                    placeholder={t('summaryTopicTitle')}
+                    aria-label={t('summaryTopicTitle')}
                     value={tp.title ?? ''}
                     onChange={(e) => editTopic(i, { title: e.target.value })}
                   />
@@ -406,14 +412,14 @@ export default function SummaryEditor({
                     placeholder="mm:ss"
                     value={tp.start_mmss ?? ''}
                     onChange={(e) => editTopic(i, { start_mmss: e.target.value })}
-                    aria-label="Minuto di inizio (mm:ss)"
+                    aria-label={t('summaryTopicStart')}
                   />
                   <button
                     type="button"
                     className="btn btn-sm btn-outline-danger d-inline-flex align-items-center"
                     onClick={() => removeTopic(i)}
-                    aria-label="Rimuovi argomento"
-                    title="Rimuovi argomento"
+                    aria-label={t('summaryRemoveTopic')}
+                    title={t('summaryRemoveTopic')}
                   >
                     <TrashIcon />
                   </button>
@@ -421,7 +427,8 @@ export default function SummaryEditor({
                 <textarea
                   className="form-control form-control-sm"
                   rows={2}
-                  placeholder="Sintesi dell'argomento…"
+                  placeholder={t('summaryTopicSummary')}
+                  aria-label={t('summaryTopicSummary')}
                   value={tp.summary ?? ''}
                   onChange={(e) => editTopic(i, { summary: e.target.value })}
                 />
@@ -440,22 +447,19 @@ export default function SummaryEditor({
             onClick={() => setShowMd((v) => !v)}
             aria-expanded={showMd}
           >
-            {showMd ? '▾ Markdown grezzo' : '▸ Markdown grezzo'}
+            {showMd ? '▾' : '▸'} {t('summaryRawMarkdown')}
           </button>
           {showMd && (
             <>
               <textarea
                 className="form-control form-control-sm mt-2"
                 rows={10}
+                aria-label={t('summaryRawMarkdown')}
                 value={draft.md}
                 onChange={(e) => patch({ md: e.target.value })}
                 style={{ fontFamily: 'monospace', fontSize: '0.8rem' }}
               />
-              <p className="small text-secondary mt-1 mb-0">
-                Il markdown è la versione testuale della sintesi mostrata nel
-                pannello trascrizione. Lo strutturato qui sopra alimenta la
-                hero post-evento.
-              </p>
+              <p className="small text-secondary mt-1 mb-0">{t('summaryRawMarkdownHelp')}</p>
             </>
           )}
         </div>
@@ -479,11 +483,12 @@ function EditableList({
   onAdd: () => void;
   addLabel: string;
 }) {
+  const t = useTranslations('admin.postprod');
   return (
     <div className="border rounded p-2 bg-white h-100">
       <div className="small fw-semibold mb-2">{label}</div>
       {items.length === 0 ? (
-        <p className="small text-secondary mb-2">Nessun elemento.</p>
+        <p className="small text-secondary mb-2">{t('summaryNoItems')}</p>
       ) : (
         <div className="d-flex flex-column gap-2 mb-2">
           {items.map((it, i) => (
@@ -491,6 +496,7 @@ function EditableList({
               <textarea
                 className="form-control form-control-sm"
                 rows={1}
+                aria-label={`${label} ${i + 1}`}
                 value={it}
                 onChange={(e) => onEdit(i, e.target.value)}
               />
@@ -498,8 +504,8 @@ function EditableList({
                 type="button"
                 className="btn btn-sm btn-outline-danger d-inline-flex align-items-center"
                 onClick={() => onRemove(i)}
-                aria-label="Rimuovi elemento"
-                title="Rimuovi elemento"
+                aria-label={t('summaryRemoveItem', { n: i + 1 })}
+                title={t('summaryRemoveItem', { n: i + 1 })}
               >
                 <TrashIcon />
               </button>

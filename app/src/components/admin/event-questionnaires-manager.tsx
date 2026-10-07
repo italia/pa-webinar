@@ -12,6 +12,7 @@
  */
 
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Badge, Button, Card, CardBody, Input, Label } from 'design-react-kit';
 
 import { useConfirm } from '@/components/ui/confirm-dialog';
@@ -20,20 +21,24 @@ type Placement = 'PRE_REGISTRATION' | 'POST_EVENT';
 
 type QuestionType = 'SINGLE_CHOICE' | 'MULTI_CHOICE' | 'YES_NO' | 'LIKERT' | 'OPEN_TEXT';
 
-const QUESTION_TYPES: { value: QuestionType; label: string }[] = [
-  { value: 'OPEN_TEXT', label: 'Testo libero' },
-  { value: 'SINGLE_CHOICE', label: 'Scelta singola' },
-  { value: 'MULTI_CHOICE', label: 'Scelta multipla' },
-  { value: 'YES_NO', label: 'Sì/No' },
-  { value: 'LIKERT', label: 'Scala Likert' },
+// Le etichette sono quelle del wizard (admin.wizard.step4.questionType*).
+const QUESTION_TYPES: { value: QuestionType; labelKey: string }[] = [
+  { value: 'OPEN_TEXT', labelKey: 'questionTypeOpen' },
+  { value: 'SINGLE_CHOICE', labelKey: 'questionTypeSingle' },
+  { value: 'MULTI_CHOICE', labelKey: 'questionTypeMulti' },
+  { value: 'YES_NO', labelKey: 'questionTypeYesNo' },
+  { value: 'LIKERT', labelKey: 'questionTypeLikert' },
 ];
 
 interface AdhocItemDraft {
   id?: string;
   promptIt: string;
   promptEn: string;
+  /** Le lingue oltre a italiano e inglese, che qui non si modificano: si
+   *  rimandano com'erano (lo stesso per le opzioni). */
+  promptOther: Record<string, string>;
   type: QuestionType;
-  options: { it: string; en: string }[];
+  options: { it: string; en: string; other?: Record<string, string> }[];
   scaleMin: number;
   scaleMax: number;
   required: boolean;
@@ -50,6 +55,10 @@ interface PlacementState {
   exists: boolean;
   titleIt: string;
   descriptionIt: string;
+  /** Le altre lingue di titolo e descrizione, che qui non si modificano: si
+   *  rimandano com'erano, altrimenti salvare le cancellerebbe. */
+  titleOther: Record<string, string>;
+  descriptionOther: Record<string, string>;
   required: boolean;
   allowEdit: boolean;
   selectedTemplateIds: string[];
@@ -64,6 +73,8 @@ const EMPTY_PLACEMENT: PlacementState = {
   exists: false,
   titleIt: '',
   descriptionIt: '',
+  titleOther: {},
+  descriptionOther: {},
   required: false,
   allowEdit: false,
   selectedTemplateIds: [],
@@ -73,7 +84,12 @@ const EMPTY_PLACEMENT: PlacementState = {
   error: null,
 };
 
+function senzaItaliano(campo: Record<string, string> | null | undefined): Record<string, string> {
+  return Object.fromEntries(Object.entries(campo ?? {}).filter(([k]) => k !== 'it'));
+}
+
 export default function EventQuestionnairesManager({ eventId }: { eventId: string }) {
+  const t = useTranslations('admin.eventQuestionnaires');
   const [templates, setTemplates] = useState<TemplateOption[]>([]);
   const [pre, setPre] = useState<PlacementState>(EMPTY_PLACEMENT);
   const [post, setPost] = useState<PlacementState>(EMPTY_PLACEMENT);
@@ -103,6 +119,8 @@ export default function EventQuestionnairesManager({ eventId }: { eventId: strin
           exists: true,
           titleIt: (match.title as Record<string, string>).it ?? '',
           descriptionIt: (match.description as Record<string, string>).it ?? '',
+          titleOther: senzaItaliano(match.title as Record<string, string>),
+          descriptionOther: senzaItaliano(match.description as Record<string, string>),
           required: match.required,
           allowEdit: match.allowEdit,
           selectedTemplateIds: match.templates.map((t) => t.id),
@@ -121,8 +139,8 @@ export default function EventQuestionnairesManager({ eventId }: { eventId: strin
     <div className="d-flex flex-column gap-4">
       <PlacementCard
         placement="PRE_REGISTRATION"
-        title="Pre-registrazione"
-        description="Mostrato nel form di registrazione; le risposte obbligatorie bloccano l'iscrizione finché non vengono fornite."
+        title={t('preTitle')}
+        description={t('preDescription')}
         templates={templates}
         state={pre}
         setState={setPre}
@@ -131,8 +149,8 @@ export default function EventQuestionnairesManager({ eventId }: { eventId: strin
       />
       <PlacementCard
         placement="POST_EVENT"
-        title="Post-evento"
-        description="Mostrato nella pagina di ringraziamento dopo la fine dell'evento."
+        title={t('postTitle')}
+        description={t('postDescription')}
         templates={templates}
         state={post}
         setState={setPost}
@@ -163,14 +181,19 @@ interface PlacementResponse {
   responseCount: number;
 }
 
+function altreLingue(campo: Record<string, string> | null | undefined): Record<string, string> {
+  return Object.fromEntries(Object.entries(campo ?? {}).filter(([k]) => k !== 'it' && k !== 'en'));
+}
+
 function adhocFromServer(i: PlacementResponse['adhocItems'][number]): AdhocItemDraft {
   return {
     id: i.id,
     promptIt: i.prompt.it ?? '',
     promptEn: i.prompt.en ?? '',
+    promptOther: altreLingue(i.prompt),
     type: i.type,
     options: i.options && i.options.length > 0
-      ? i.options.map((o) => ({ it: o.it ?? '', en: o.en ?? '' }))
+      ? i.options.map((o) => ({ it: o.it ?? '', en: o.en ?? '', other: altreLingue(o) }))
       : [{ it: '', en: '' }, { it: '', en: '' }],
     scaleMin: i.scaleMin ?? 1,
     scaleMax: i.scaleMax ?? 5,
@@ -197,6 +220,10 @@ function PlacementCard({
   eventId: string;
   onRefresh: () => void;
 }) {
+  const t = useTranslations('admin.eventQuestionnaires');
+  const tq = useTranslations('admin.questionTemplates');
+  const tw = useTranslations('admin.wizard.step4');
+  const tc = useTranslations('common');
   const confirm = useConfirm();
   const locked = state.responseCount > 0;
 
@@ -205,8 +232,11 @@ function PlacementCard({
     try {
       const payload = {
         placement,
-        title: state.titleIt.trim() ? { it: state.titleIt.trim() } : {},
-        description: state.descriptionIt.trim() ? { it: state.descriptionIt.trim() } : {},
+        title: { ...state.titleOther, ...(state.titleIt.trim() ? { it: state.titleIt.trim() } : {}) },
+        description: {
+          ...state.descriptionOther,
+          ...(state.descriptionIt.trim() ? { it: state.descriptionIt.trim() } : {}),
+        },
         required: state.required,
         allowEdit: state.allowEdit,
         templateIds: state.selectedTemplateIds,
@@ -220,7 +250,7 @@ function PlacementCard({
           if (it.type === 'SINGLE_CHOICE' || it.type === 'MULTI_CHOICE') {
             base.options = it.options
               .map((o) => {
-                const filled: Record<string, string> = {};
+                const filled: Record<string, string> = { ...(o.other ?? {}) };
                 if (o.it.trim()) filled.it = o.it.trim();
                 if (o.en.trim()) filled.en = o.en.trim();
                 return filled;
@@ -241,26 +271,30 @@ function PlacementCard({
         body: JSON.stringify(payload),
       });
       if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        setState((s) => ({ ...s, error: err.error ?? 'Salvataggio fallito', saving: false }));
+        // Un rifiuto che si puo' correggere lo si dice; il dettaglio del
+        // server resta fra parentesi.
+        const body = (await res.json().catch(() => ({}))) as { error?: string };
+        const messaggio =
+          res.status === 409
+            ? t('locked', { count: state.responseCount })
+            : res.status === 400 || res.status === 422
+              ? `${t('invalid')}${body.error ? ` (${body.error})` : ''}`
+              : tc('errorGeneric');
+        setState((s) => ({ ...s, error: messaggio, saving: false }));
         return;
       }
       setState((s) => ({ ...s, saving: false }));
       onRefresh();
-    } catch (e) {
-      setState((s) => ({
-        ...s,
-        saving: false,
-        error: e instanceof Error ? e.message : 'Errore di rete',
-      }));
+    } catch {
+      setState((s) => ({ ...s, saving: false, error: tc('errorGeneric') }));
     }
   };
 
   const remove = async () => {
     const ok = await confirm({
-      title: 'Elimina questionario',
-      message: 'Eliminare questo questionario? Verranno cancellate anche le risposte raccolte.',
-      confirmLabel: 'Elimina',
+      title: t('deleteTitle'),
+      message: t('deleteMessage'),
+      confirmLabel: tc('delete'),
       danger: true,
     });
     if (!ok) return;
@@ -281,6 +315,7 @@ function PlacementCard({
         {
           promptIt: '',
           promptEn: '',
+          promptOther: {},
           type: 'OPEN_TEXT',
           options: [{ it: '', en: '' }, { it: '', en: '' }],
           scaleMin: 1,
@@ -296,9 +331,9 @@ function PlacementCard({
       <CardBody className="p-4">
         <div className="d-flex justify-content-between align-items-start gap-2 mb-2">
           <div>
-            <h5 className="fw-semibold mb-1" style={{ color: 'var(--app-text)' }}>
+            <h2 className="h5 fw-semibold mb-1" style={{ color: 'var(--app-text)' }}>
               {title}
-            </h5>
+            </h2>
             <p className="text-secondary mb-0" style={{ fontSize: '0.85rem' }}>
               {description}
             </p>
@@ -306,7 +341,7 @@ function PlacementCard({
           <div className="d-flex gap-2">
             {state.exists && (
               <Badge color="" className="px-2 py-1" style={{ backgroundColor: '#E8F0FE', color: 'var(--app-primary)' }}>
-                {state.responseCount} risposte
+                {t('responses', { count: state.responseCount })}
               </Badge>
             )}
           </div>
@@ -322,7 +357,7 @@ function PlacementCard({
             onChange={(e) => setState((s) => ({ ...s, enabled: e.target.checked }))}
           />
           <label className="form-check-label" htmlFor={`enabled-${placement}`}>
-            Questionario attivo
+            {t('active')}
           </label>
         </div>
 
@@ -330,16 +365,16 @@ function PlacementCard({
           <>
             {locked && (
               <div className="alert alert-warning small">
-                Questionario con {state.responseCount} risposte raccolte — le modifiche strutturali sono
-                bloccate. Per riconfigurare, elimina il questionario (e le risposte).
+                {t('locked', { count: state.responseCount })}
               </div>
             )}
-            {state.error && <div className="alert alert-danger">{state.error}</div>}
+            {state.error && <div className="alert alert-danger" role="alert">{state.error}</div>}
 
             <div className="row g-3 mb-3">
               <div className="col-md-6">
-                <Label>Titolo (IT)</Label>
+                <Label for={`title-${placement}`}>{t('titleIt')}</Label>
                 <Input
+                  id={`title-${placement}`}
                   type="text"
                   value={state.titleIt}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -348,8 +383,9 @@ function PlacementCard({
                 />
               </div>
               <div className="col-md-6">
-                <Label>Descrizione (IT)</Label>
+                <Label for={`desc-${placement}`}>{t('descriptionIt')}</Label>
                 <Input
+                  id={`desc-${placement}`}
                   type="text"
                   value={state.descriptionIt}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -370,7 +406,7 @@ function PlacementCard({
                     onChange={(e) => setState((s) => ({ ...s, required: e.target.checked }))}
                   />
                   <label className="form-check-label" htmlFor={`req-${placement}`}>
-                    Compilazione richiesta
+                    {t('required')}
                   </label>
                 </div>
               </div>
@@ -384,36 +420,37 @@ function PlacementCard({
                     onChange={(e) => setState((s) => ({ ...s, allowEdit: e.target.checked }))}
                   />
                   <label className="form-check-label" htmlFor={`edit-${placement}`}>
-                    Modifica successive alla risposta consentite
+                    {t('allowEdit')}
                   </label>
                 </div>
               </div>
             </div>
 
             <div className="mb-3">
-              <Label>Template della libreria</Label>
+              <div className="form-label" id={`tpls-${placement}`}>{t('libraryTemplates')}</div>
               {templates.length === 0 ? (
-                <div className="text-muted small">Nessun template in libreria. Creane uno da /admin/questionnaires.</div>
+                <div className="text-muted small">{tw('templatesEmpty')}</div>
               ) : (
                 <div className="d-flex flex-column gap-1">
-                  {templates.map((t) => (
-                    <div key={t.id} className="form-check">
+                  {templates.map((tpl) => (
+                    <div key={tpl.id} className="form-check">
                       <input
-                        id={`tpl-${placement}-${t.id}`}
+                        id={`tpl-${placement}-${tpl.id}`}
                         className="form-check-input"
                         type="checkbox"
-                        checked={state.selectedTemplateIds.includes(t.id)}
+                        checked={state.selectedTemplateIds.includes(tpl.id)}
                         onChange={(e) => {
                           setState((s) => ({
                             ...s,
                             selectedTemplateIds: e.target.checked
-                              ? [...s.selectedTemplateIds, t.id]
-                              : s.selectedTemplateIds.filter((x) => x !== t.id),
+                              ? [...s.selectedTemplateIds, tpl.id]
+                              : s.selectedTemplateIds.filter((x) => x !== tpl.id),
                           }));
                         }}
                       />
-                      <label className="form-check-label" htmlFor={`tpl-${placement}-${t.id}`}>
-                        {t.name} <span className="text-muted small">· {t.itemCount} domande</span>
+                      <label className="form-check-label" htmlFor={`tpl-${placement}-${tpl.id}`}>
+                        {tpl.name}{' '}
+                        <span className="text-muted small">· {t('templateItems', { count: tpl.itemCount })}</span>
                       </label>
                     </div>
                   ))}
@@ -423,13 +460,13 @@ function PlacementCard({
 
             <div className="mb-3">
               <div className="d-flex justify-content-between align-items-center mb-2">
-                <Label className="mb-0">Domande ad-hoc per questo evento</Label>
+                <div className="form-label mb-0">{tw('adhocLabel')}</div>
                 <Button color="secondary" outline size="xs" onClick={addAdhoc}>
-                  + aggiungi
+                  + {tq('addQuestion')}
                 </Button>
               </div>
               {state.adhoc.length === 0 && (
-                <div className="text-muted small">Nessuna domanda ad-hoc. Puoi aggiungerne per questioni specifiche all&apos;evento.</div>
+                <div className="text-muted small">{t('adhocEmpty')}</div>
               )}
               {state.adhoc.map((it, idx) => (
                 <AdhocItemEditor
@@ -451,11 +488,11 @@ function PlacementCard({
 
             <div className="d-flex gap-2">
               <Button color="primary" onClick={save} disabled={state.saving || locked}>
-                {state.saving ? 'Salvataggio…' : 'Salva configurazione'}
+                {state.saving ? tc('saving') : t('save')}
               </Button>
               {state.exists && (
                 <Button color="danger" outline onClick={remove} disabled={state.saving}>
-                  Elimina questionario
+                  {t('deleteTitle')}
                 </Button>
               )}
             </div>
@@ -477,20 +514,31 @@ function AdhocItemEditor({
   onChange: (patch: Partial<AdhocItemDraft>) => void;
   onRemove: () => void;
 }) {
+  const t = useTranslations('admin.eventQuestionnaires');
+  const tq = useTranslations('admin.questionTemplates');
+  const tw = useTranslations('admin.wizard.step4');
+  const base = `adhoc-${idx}`;
   return (
     <Card className="mb-2 border" style={{ borderRadius: 6 }}>
       <CardBody className="p-3">
         <div className="d-flex justify-content-between align-items-start mb-2">
           <Badge color="" className="px-2 py-1" style={{ backgroundColor: '#E8F0FE', color: 'var(--app-primary)' }}>
-            Ad-hoc #{idx + 1}
+            {t('adhocBadge', { n: idx + 1 })}
           </Badge>
-          <Button color="danger" outline size="xs" onClick={onRemove}>
-            Rimuovi
+          <Button
+            color="danger"
+            outline
+            size="xs"
+            onClick={onRemove}
+            aria-label={tq('removeQuestion', { n: idx + 1 })}
+          >
+            {tq('remove')}
           </Button>
         </div>
         <div className="mb-2">
-          <Label>Domanda (IT)</Label>
+          <Label for={`${base}-it`}>{tq('promptIt')}</Label>
           <Input
+            id={`${base}-it`}
             type="text"
             value={item.promptIt}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange({ promptIt: e.target.value })}
@@ -498,15 +546,16 @@ function AdhocItemEditor({
         </div>
         <div className="row g-2 mb-2">
           <div className="col-md-6">
-            <Label>Tipo</Label>
+            <Label for={`${base}-type`}>{tq('type')}</Label>
             <select
+              id={`${base}-type`}
               className="form-select"
               value={item.type}
               onChange={(e) => onChange({ type: e.target.value as QuestionType })}
             >
               {QUESTION_TYPES.map((qt) => (
                 <option key={qt.value} value={qt.value}>
-                  {qt.label}
+                  {tw(qt.labelKey)}
                 </option>
               ))}
             </select>
@@ -521,7 +570,7 @@ function AdhocItemEditor({
                 onChange={(e) => onChange({ required: e.target.checked })}
               />
               <label className="form-check-label" htmlFor={`adhoc-req-${idx}`}>
-                Obbligatoria
+                {tq('required')}
               </label>
             </div>
           </div>
@@ -529,12 +578,13 @@ function AdhocItemEditor({
 
         {(item.type === 'SINGLE_CHOICE' || item.type === 'MULTI_CHOICE') && (
           <div className="mb-2">
-            <Label>Opzioni (IT)</Label>
+            <div className="form-label">{tq('options')}</div>
             {item.options.map((opt, optIdx) => (
               <div key={optIdx} className="row g-2 mb-1 align-items-center">
                 <div className="col">
                   <Input
                     type="text"
+                    aria-label={tq('optionIt', { n: optIdx + 1 })}
                     value={opt.it}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                       onChange({
@@ -553,6 +603,7 @@ function AdhocItemEditor({
                     onClick={() =>
                       onChange({ options: item.options.filter((_, i) => i !== optIdx) })
                     }
+                    aria-label={tq('removeOption', { n: optIdx + 1 })}
                   >
                     ×
                   </Button>
@@ -565,7 +616,7 @@ function AdhocItemEditor({
               size="xs"
               onClick={() => onChange({ options: [...item.options, { it: '', en: '' }] })}
             >
-              + opzione
+              + {tq('addOption')}
             </Button>
           </div>
         )}
@@ -573,8 +624,9 @@ function AdhocItemEditor({
         {item.type === 'LIKERT' && (
           <div className="row g-2">
             <div className="col-md-6">
-              <Label>Min</Label>
+              <Label for={`${base}-min`}>{tq('scaleMin')}</Label>
               <Input
+                id={`${base}-min`}
                 type="number"
                 value={item.scaleMin}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -583,8 +635,9 @@ function AdhocItemEditor({
               />
             </div>
             <div className="col-md-6">
-              <Label>Max</Label>
+              <Label for={`${base}-max`}>{tq('scaleMax')}</Label>
               <Input
+                id={`${base}-max`}
                 type="number"
                 value={item.scaleMax}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -600,7 +653,7 @@ function AdhocItemEditor({
 }
 
 function buildPrompt(it: AdhocItemDraft): Record<string, string> {
-  const prompt: Record<string, string> = {};
+  const prompt: Record<string, string> = { ...it.promptOther };
   if (it.promptIt.trim()) prompt.it = it.promptIt.trim();
   if (it.promptEn.trim()) prompt.en = it.promptEn.trim();
   return prompt;

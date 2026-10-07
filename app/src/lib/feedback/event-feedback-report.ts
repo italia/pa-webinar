@@ -6,6 +6,7 @@
  * risposto: la sala promette risposte senza nome.
  */
 
+import { csvCell } from '@/lib/utils/csv';
 import { prisma } from '@/lib/db';
 import { findEventQuestionnaireByPlacement, type RenderedItem } from '@/lib/questionnaires';
 
@@ -150,10 +151,7 @@ export async function buildEventFeedbackReport(eventId: string): Promise<EventFe
 /** Un campo CSV: tra virgolette se serve, e mai interpretato come formula.
  *  Il separatore e' il punto e virgola: e' quello che Excel si aspetta con le
  *  impostazioni italiane ed europee. */
-function campo(v: string): string {
-  const sicuro = /^[=+\-@\t\r]/.test(v) ? `'${v}` : v;
-  return /[",\n\r;]/.test(sicuro) ? `"${sicuro.replace(/"/g, '""')}"` : sicuro;
-}
+const campo = csvCell;
 
 /** Le risposte in CSV: una riga per risposta, una colonna per domanda. */
 export function feedbackReportCsv(
