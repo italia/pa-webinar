@@ -26,7 +26,10 @@ metadata:
   labels:
     {{- include "pa-webinar.labels" $ | nindent 4 }}
 data:
+  {{- /* Lo script deve cominciare con #!/bin/bash alla prima riga: con una
+       riga vuota davanti Jibri lo esegue con /bin/sh, che si ferma sugli
+       array bash dopo il caricamento e non avvisa mai il portale. */}}
   finalize.sh: |
-    {{ $.Files.Get "files/jibri-finalize.sh" | nindent 4 }}
+    {{- $.Files.Get "files/jibri-finalize.sh" | nindent 4 }}
 {{- end }}
 {{- end }}

@@ -825,6 +825,8 @@ if jibri_reso and "JIBRI_HEALTH_URL" in variabili:
             print(f"{nome_j}: nessuno script montato in /config/finalize.sh: le registrazioni restano sul disco di Jibri e il portale non le vede")
         elif script.strip() != SCRIPT_FINE_REGISTRAZIONE:
             print(f"{nome_j}: lo script in /config/finalize.sh non e' files/jibri-finalize.sh del chart")
+        elif not script.startswith("#!"):
+            print(f"{nome_j}: lo script in /config/finalize.sh non comincia con #! alla prima riga: Jibri lo esegue con /bin/sh, che si ferma sugli array bash e non avvisa il portale")
         # Le variabili che lo script usa con l'applicazione.
         url_app = f"http://{nome_app}:{(servizi.get(nome_app) or {}).get('spec', {}).get('ports', [{}])[0].get('port')}"
         if ambiente.get("APP_INTERNAL_URL") != url_app:
