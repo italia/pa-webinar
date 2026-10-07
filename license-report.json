@@ -541,7 +541,7 @@
     "licenses": "MIT",
     "repository": "https://github.com/lovell/colour"
   },
-  "@img/sharp-wasm32@0.35.4": {
+  "@img/sharp-wasm32@0.35.5": {
     "licenses": "Apache-2.0 AND LGPL-3.0-or-later AND MIT",
     "repository": "https://github.com/lovell/sharp",
     "publisher": "Lovell Fuller",
@@ -3278,7 +3278,7 @@
     "publisher": "Jordan Harband",
     "email": "ljharb@gmail.com"
   },
-  "sharp@0.35.4": {
+  "sharp@0.35.5": {
     "licenses": "Apache-2.0",
     "repository": "https://github.com/lovell/sharp",
     "publisher": "Lovell Fuller",
