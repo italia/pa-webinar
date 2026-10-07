@@ -55,8 +55,12 @@ import {
 import { jvbsForEvent, jvbMaxReplicasFromEnv } from '@/lib/jvb-sizing';
 import { getRedis } from '@/lib/redis';
 import { getSettings } from '@/lib/settings';
+import { fetchJibriHealth } from '@/lib/status/bridge';
 
 export const dynamic = 'force-dynamic';
+
+/** Per quanto, dopo la fine di un evento registrato, Jibri occupato resta acceso. */
+const JIBRI_HOLD_MINUTES = 120;
 
 const MAX_REPLICAS = jvbMaxReplicasFromEnv();
 
@@ -212,9 +216,35 @@ export const GET = withErrorHandling(async (request) => {
     MAX_REPLICAS,
   );
 
-  // Jibri: 1 replica only if a currently-billable event has recording on.
+  // Jibri: 1 replica se un evento in corso ha la registrazione accesa. Alla
+  // fine dell'evento Jibri resta in sala finche' non si svuota, poi chiude il
+  // file e lo carica: spegnerlo in quel momento interrompe il caricamento e il
+  // video va perso. Per questo, entro JIBRI_HOLD_MINUTES dalla fine di un
+  // evento con registrazione, resta acceso finche' risponde di essere occupato
+  // (BUSY). Passata la finestra si spegne comunque: un Jibri bloccato non
+  // tiene acceso il nodo per sempre. Se non risponde vale la regola di prima
+  // (spento): a zero repliche la sonda non risponde mai, e tenerlo acceso in
+  // quel caso lo riaccenderebbe a ogni giro.
   const needsRecording = billableEvents.some((e) => e.recordingEnabled);
-  const jibriDesired = needsRecording ? 1 : 0;
+  let jibriHold = false;
+  if (!needsRecording && process.env.JIBRI_HEALTH_URL) {
+    const appenaConclusi = await prisma.event.count({
+      where: {
+        recordingEnabled: true,
+        status: 'ENDED',
+        updatedAt: { gte: new Date(now.getTime() - JIBRI_HOLD_MINUTES * 60_000) },
+      },
+    });
+    if (appenaConclusi > 0) {
+      const health = await fetchJibriHealth();
+      jibriHold = health?.busyStatus === 'BUSY';
+      if (!health) {
+        // eslint-disable-next-line no-console
+        console.warn('[jvb-scaler] Jibri non risponde dopo un evento registrato: non lo si trattiene');
+      }
+    }
+  }
+  const jibriDesired = needsRecording || jibriHold ? 1 : 0;
 
   // Forensic log line: one structured summary per tick so we can
   // reconstruct which events moved between states and why (replica
@@ -227,7 +257,7 @@ export const GET = withErrorHandling(async (request) => {
     transitions.toEnded > 0 ||
     transitions.publishedToProvisioning > 0 ||
     transitions.provisioningToLive > 0;
-  if (hasTransitions || billableEvents.length > 0) {
+  if (hasTransitions || billableEvents.length > 0 || jibriHold) {
     // eslint-disable-next-line no-console
     console.log(
       `[jvb-scaler] tick ${now.toISOString()} ` +
@@ -237,6 +267,7 @@ export const GET = withErrorHandling(async (request) => {
         `jvbParticipants=${participants} conferences=${conferences} ` +
         `aggregated=${scalerAggregated} pollSuccesses=${pollSuccesses ?? 0} ` +
         `pollFailures=${pollFailures ?? 0} ` +
+        `jibriDesired=${jibriDesired} jibriHold=${jibriHold} ` +
         `transitions=${JSON.stringify(transitions)}`,
     );
   }
@@ -303,6 +334,7 @@ export const GET = withErrorHandling(async (request) => {
   return Response.json({
     desired,
     jibriDesired,
+    jibriHold,
     predictiveDesired,
     reactiveAdjustment,
     stressLevel: effectiveStress,

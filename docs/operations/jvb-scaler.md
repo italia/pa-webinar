@@ -129,7 +129,11 @@ About each key:
 - **Jibri.** The same tick scales Jibri, but only if a Deployment or
   StatefulSet labeled `app.kubernetes.io/component=jibri` exists. It asks for
   one replica while any `LIVE` or `PROVISIONING` event has recording turned
-  on, and zero otherwise. Otherwise the log reads
+  on. When such an event has ended within the last two hours, it keeps that
+  replica while Jibri's health API reports `BUSY`: after the event Jibri stays
+  in the room until it empties, then closes the file and uploads it, and
+  scaling it down at that moment loses the recording. It asks for zero
+  otherwise, including when Jibri's health API does not answer. Otherwise the log reads
   `Jibri: deployment/statefulset not found — skipping`, which is expected when
   Jibri is off. Recording values are in
   [Setting up recording](recording-setup.md).
@@ -409,7 +413,7 @@ organizer declared, not from who has joined:
 | `expectedSenderRatioPct` | Event form, **Expected sender ratio** | Sizing input. Falls back to **Default sender ratio** |
 | `participantsCanStartVideo` | Event form, **Participants can start video**; event templates | Sizing input. Default `false`: every participant counts as a receiver |
 | `gracePeriodMinutes` | Event form, **Event end (soft exit)** | Not a sizing input: it decides when a room past its end is closed. Falls back to **Default grace minutes past endsAt** |
-| `recordingEnabled` | Event settings; event templates | Not a sizing input: it decides whether Jibri is scaled up. Default `false` in `schema.prisma` |
+| `recordingEnabled` | Event settings; event templates | Not a sizing input: it decides whether Jibri is scaled up, and kept up while busy after the event ends. Default `false` in `schema.prisma` |
 
 Instant calls use 50 expected participants unless the request gives a
 number, and they have video and recording on and a grace of `-1`

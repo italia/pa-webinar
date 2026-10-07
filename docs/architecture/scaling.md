@@ -121,7 +121,8 @@ flowchart TB
 1. **Jibri recordings.** A Jibri pod records one conference at a time, and
    the scaler asks for at most one Jibri replica. It asks for that replica
    whenever any `LIVE` or `PROVISIONING` event has `recordingEnabled`, and
-   instant calls always have it. A second event recorded with Jibri at the
+   instant calls always have it. After such an event ends, it keeps the
+   replica while Jibri is still closing and uploading the file. A second event recorded with Jibri at the
    same time has no recorder. The per-participant recorder is scheduled
    separately; see [Recording](recording.md).
 2. **An event larger than one bridge.** Without cascading, the only remedy
