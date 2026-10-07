@@ -208,11 +208,10 @@ export default function RecordingManagement({
         {/* Recording available (post-event) */}
         {!isLive && hasRecording && (
           <>
-            <Alert color="success" className="py-2 px-3 mb-3">
-              <div className="d-flex align-items-center">
-                <Icon icon="it-video" className="me-2" />
-                <span className="fw-semibold">{t('available')}</span>
-              </div>
+            {/* L'icona la disegna Bootstrap Italia: niente padding orizzontale
+                ridotto, niente seconda icona (globals.scss, .alert). */}
+            <Alert color="success" className="mb-3">
+              <span className="fw-semibold">{t('available')}</span>
             </Alert>
 
             {event.recordingDuration && (

@@ -9,6 +9,7 @@ import { isAdminAuthenticated } from '@/lib/auth/admin-session';
 import { logAdminAction } from '@/lib/audit/admin-audit';
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { UnauthorizedError, ValidationError } from '@/lib/errors';
+import { MAX_RETENTION_DAYS } from '@/lib/validation/retention';
 import { coerceMatrix } from '@/lib/utils/permission-matrix';
 
 const templateSchema = z.object({
@@ -43,7 +44,7 @@ const templateSchema = z.object({
   // Elenco di lingue separate da virgola; null = eredita dal sito.
   aiTargetLocales: z.string().max(200).nullish(),
   descriptionTemplate: z.record(z.string()).nullish(),
-  defaultRetentionDays: z.number().int().min(1).max(3650).nullish(),
+  defaultRetentionDays: z.number().int().min(1).max(MAX_RETENTION_DAYS).nullish(),
   defaultExpectedSpeakers: z.number().int().min(1).max(30).nullish(),
   // Role×feature permission matrix (see lib/utils/permission-matrix.ts).
   // Optional; when set it pre-seeds step 2 of the wizard directly. When

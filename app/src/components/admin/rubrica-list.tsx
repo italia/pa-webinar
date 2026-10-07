@@ -9,14 +9,16 @@
  * Opening a detail page shows the per-event attendance history.
  */
 
-import Link from 'next/link';
-import { useCallback, useEffect, useState } from 'react';
-import { Button, Card, CardBody, Input, Label } from 'design-react-kit';
+import { useEffect, useId, useState } from 'react';
+import { useFormatter, useTranslations } from 'next-intl';
+import { Card, CardBody } from 'design-react-kit';
 
-const ORG_TYPES = [
-  'MINISTRY', 'AGENCY', 'REGION', 'PROVINCE', 'MUNICIPALITY',
-  'ASL', 'UNIVERSITY', 'PUBLIC_ENTITY', 'IN_HOUSE', 'OTHER',
-];
+import { Link, percorso } from '@/i18n/navigation';
+import { SkeletonLines } from '@/components/ui/skeleton';
+import { ORGANIZATION_TYPES } from '@/lib/validation/schemas';
+
+/** Attesa dopo l'ultimo tasto prima di cercare. */
+const SEARCH_DELAY_MS = 300;
 
 interface Row {
   id: string;
@@ -32,135 +34,156 @@ interface Row {
 }
 
 export default function RubricaList() {
+  const t = useTranslations('admin.rubrica');
+  const tTypes = useTranslations('admin.registrations.orgTypes');
+  const tc = useTranslations('common');
+  const format = useFormatter();
+  const id = useId();
   const [rows, setRows] = useState<Row[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [failed, setFailed] = useState(false);
   const [q, setQ] = useState('');
+  const [query, setQuery] = useState('');
   const [orgType, setOrgType] = useState('');
   const [includeOptedOut, setIncludeOptedOut] = useState(false);
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    try {
-      const qs = new URLSearchParams();
-      if (q) qs.set('q', q);
-      if (orgType) qs.set('orgType', orgType);
-      if (includeOptedOut) qs.set('includeOpted', 'out');
-      const res = await fetch(`/api/admin/rubrica?${qs}`, { cache: 'no-store' });
-      if (res.ok) {
-        const data = await res.json();
-        setRows(data.rows);
-        setTotal(data.total);
-      }
-    } finally {
-      setLoading(false);
-    }
-  }, [q, orgType, includeOptedOut]);
+  // La ricerca parte quando si smette di scrivere, non a ogni tasto.
+  useEffect(() => {
+    const timer = setTimeout(() => setQuery(q.trim()), SEARCH_DELAY_MS);
+    return () => clearTimeout(timer);
+  }, [q]);
 
   useEffect(() => {
-    load();
-  }, [load]);
+    let cancelled = false;
+    setLoading(true);
+    const qs = new URLSearchParams();
+    if (query) qs.set('q', query);
+    if (orgType) qs.set('orgType', orgType);
+    if (includeOptedOut) qs.set('includeOpted', 'out');
+    fetch(`/api/admin/rubrica?${qs}`, { cache: 'no-store' })
+      .then(async (res) => {
+        if (!res.ok) throw new Error(String(res.status));
+        const data = (await res.json()) as { rows: Row[]; total: number };
+        if (cancelled) return;
+        setRows(data.rows);
+        setTotal(data.total);
+        setFailed(false);
+      })
+      .catch(() => {
+        if (!cancelled) setFailed(true);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [query, orgType, includeOptedOut]);
+
+  const tipo = (code: string | null) =>
+    code ? (tTypes.has(code) ? tTypes(code) : code) : '—';
 
   return (
     <div>
       <Card className="shadow-sm border-0 mb-4" style={{ borderRadius: 8 }}>
         <CardBody className="p-3">
           <div className="row g-3 align-items-end">
-            <div className="col-md-4">
-              <Label>Cerca per nome o organizzazione</Label>
-              <Input
-                type="text"
+            <div className="col-md-5">
+              <label className="form-label" htmlFor={`${id}-q`}>
+                {t('searchLabel')}
+              </label>
+              <input
+                id={`${id}-q`}
+                type="search"
+                className="form-control"
                 value={q}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setQ(e.target.value)}
-                placeholder="Es. Ministero, Mario Rossi…"
+                onChange={(e) => setQ(e.target.value)}
               />
             </div>
             <div className="col-md-3">
-              <Label>Tipo organizzazione</Label>
+              <label className="form-label" htmlFor={`${id}-type`}>
+                {t('orgTypeLabel')}
+              </label>
               <select
+                id={`${id}-type`}
                 className="form-select"
                 value={orgType}
                 onChange={(e) => setOrgType(e.target.value)}
               >
-                <option value="">— tutti —</option>
-                {ORG_TYPES.map((t) => (
-                  <option key={t} value={t}>{t}</option>
+                <option value="">{t('allTypes')}</option>
+                {ORGANIZATION_TYPES.map((code) => (
+                  <option key={code} value={code}>{tipo(code)}</option>
                 ))}
               </select>
             </div>
-            <div className="col-md-3">
-              <div className="form-check mt-4">
+            <div className="col-md-4">
+              <div className="form-check mb-2">
                 <input
                   type="checkbox"
-                  id="includeOptedOut"
+                  id={`${id}-out`}
                   className="form-check-input"
                   checked={includeOptedOut}
                   onChange={(e) => setIncludeOptedOut(e.target.checked)}
                 />
-                <label htmlFor="includeOptedOut" className="form-check-label">
-                  Includi cancellati (opt-out)
+                <label htmlFor={`${id}-out`} className="form-check-label">
+                  {t('includeOptedOut')}
                 </label>
               </div>
-            </div>
-            <div className="col-md-2">
-              <Button color="primary" size="sm" onClick={load}>
-                Filtra
-              </Button>
             </div>
           </div>
         </CardBody>
       </Card>
 
-      <div className="mb-3 text-muted small">
-        {total} {total === 1 ? 'persona' : 'persone'} nella rubrica.
-      </div>
+      <p className="mb-3 text-muted small" role="status">
+        {loading ? '' : t('count', { count: total })}
+      </p>
 
       {loading ? (
-        <div className="text-muted">Caricamento…</div>
+        <SkeletonLines lines={5} loadingLabel={tc('loading')} />
+      ) : failed ? (
+        <div className="alert alert-danger" role="alert">{tc('errorGeneric')}</div>
       ) : rows.length === 0 ? (
-        <div className="text-muted">Nessuna persona corrisponde ai filtri.</div>
+        <p className="text-muted">{t('empty')}</p>
       ) : (
         <Card className="shadow-sm border-0" style={{ borderRadius: 8 }}>
           <CardBody className="p-0">
-            <table className="table table-hover mb-0">
-              <thead>
-                <tr>
-                  <th>Nome</th>
-                  <th>Organizzazione</th>
-                  <th>Tipo</th>
-                  <th className="text-end">Eventi</th>
-                  <th>Ultima attività</th>
-                  <th>Stato</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {rows.map((r) => (
-                  <tr key={r.id}>
-                    <td>{r.displayName || '—'}</td>
-                    <td>{r.organization || '—'}</td>
-                    <td>{r.organizationType || '—'}</td>
-                    <td className="text-end">{r.registrationCount}</td>
-                    <td>{new Date(r.lastActiveAt).toLocaleDateString('it')}</td>
-                    <td>
-                      {r.optedInToAddressBook ? (
-                        <span className="badge bg-success">Attivo</span>
-                      ) : (
-                        <span className="badge bg-secondary">Opt-out</span>
-                      )}
-                    </td>
-                    <td>
-                      <Link
-                        href={`/admin/rubrica/${r.id}`}
-                        className="btn btn-sm btn-outline-primary"
-                      >
-                        Dettaglio
-                      </Link>
-                    </td>
+            <div className="table-responsive">
+              <table className="table table-hover mb-0">
+                <thead>
+                  <tr>
+                    <th scope="col">{t('col.name')}</th>
+                    <th scope="col">{t('col.organization')}</th>
+                    <th scope="col">{t('col.type')}</th>
+                    <th scope="col" className="text-end">{t('col.events')}</th>
+                    <th scope="col">{t('col.lastActive')}</th>
+                    <th scope="col">{t('col.status')}</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {rows.map((r) => (
+                    <tr key={r.id}>
+                      <td>
+                        <Link href={percorso(`/admin/rubrica/${r.id}`)}>
+                          {r.displayName || t('noName')}
+                        </Link>
+                      </td>
+                      <td>{r.organization || '—'}</td>
+                      <td>{tipo(r.organizationType)}</td>
+                      <td className="text-end">{r.registrationCount}</td>
+                      <td>{format.dateTime(new Date(r.lastActiveAt), { dateStyle: 'medium' })}</td>
+                      <td>
+                        {r.optedInToAddressBook ? (
+                          <span className="badge bg-success">{t('statusActive')}</span>
+                        ) : (
+                          <span className="badge bg-secondary">{t('statusOptedOut')}</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </CardBody>
         </Card>
       )}

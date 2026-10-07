@@ -20,19 +20,21 @@ export async function impostaStatoEvento(
 }
 
 /**
- * Duplica l'evento come prossima occorrenza. La copia nasce in bozza; il
- * token serve a chi chiama per aprirne la modifica, che senza risponde 404.
+ * Duplica l'evento come prossima occorrenza. La copia nasce in bozza, e chi
+ * chiama ne apre la modifica.
  */
 export async function duplicaComeProssima(
   eventId: string,
-): Promise<{ id: string; moderatorToken: string }> {
+): Promise<{ id: string }> {
   const res = await fetch(`/api/admin/events/${eventId}/duplicate`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ nextOccurrence: true }),
   });
   if (!res.ok) throw new Error(`duplicazione: ${res.status}`);
-  const creato = (await res.json()) as { id: string; moderatorToken?: string };
-  if (!creato.moderatorToken) throw new Error('duplicazione: token mancante');
-  return { id: creato.id, moderatorToken: creato.moderatorToken };
+  // La copia si apre con la sessione dello staff (la rotta e' solo sua): il
+  // token della copia non serve a chi l'ha creata.
+  const creato = (await res.json()) as { id?: string };
+  if (!creato.id) throw new Error('duplicazione: risposta senza id');
+  return { id: creato.id };
 }

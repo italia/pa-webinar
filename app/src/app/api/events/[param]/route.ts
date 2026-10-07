@@ -582,6 +582,10 @@ export const PUT = withErrorHandling(async (request, context) => {
 
 // ── DELETE /api/events/[id] — Delete event (moderator only) ──
 
+/** Quanto puo' durare un'eliminazione: i file nello storage si cancellano uno a
+ *  uno, a riga bloccata. */
+const DELETE_TIMEOUT_MS = 60_000;
+
 export const DELETE = withErrorHandling(async (request, context) => {
   const { param: eventId } = await context.params;
 
@@ -594,12 +598,28 @@ export const DELETE = withErrorHandling(async (request, context) => {
 
   const event = await verifyModeratorToken(eventId, token);
   if (!event) throw new ForbiddenError('Invalid moderator token or event not found');
-
-  // I file dell'evento (materiali caricati, allegati di chat) se ne vanno
-  // prima: la cascata porta via le righe, e dopo nessuno saprebbe più quali
-  // blob cancellare. Se lo storage non risponde l'evento resta (503).
-  await removeFilesOfEventsBeingDeleted({ id: eventId });
-  await prisma.event.delete({ where: { id: eventId } });
+  // Un evento in diretta ha persone in sala: prima si termina, poi si elimina.
+  // La riga resta bloccata finche' file e riga se ne vanno: un cambio di stato
+  // nel frattempo (la sala che parte) aspetta, e la decisione presa qui vale
+  // per tutta l'operazione. FOR NO KEY UPDATE blocca gli UPDATE dell'evento
+  // ma non le scritture sulle righe figlie.
+  await prisma.$transaction(
+    async (tx) => {
+      const [riga] = await tx.$queryRaw<Array<{ status: string }>>`
+        SELECT status::text AS status FROM events WHERE id = ${eventId}::uuid FOR NO KEY UPDATE`;
+      // Gia' eliminato da un'altra richiesta (un doppio clic).
+      if (!riga) throw new NotFoundError('Event');
+      if (riga.status === 'LIVE') {
+        throw new AppError('A live event cannot be deleted: end it first', 409, 'EVENT_LIVE');
+      }
+      // I file dell'evento (materiali caricati, allegati di chat) se ne vanno
+      // prima: la cascata porta via le righe, e dopo nessuno saprebbe più
+      // quali blob cancellare. Se lo storage non risponde l'evento resta (503).
+      await removeFilesOfEventsBeingDeleted({ id: eventId });
+      await tx.event.delete({ where: { id: eventId } });
+    },
+    { timeout: DELETE_TIMEOUT_MS },
+  );
 
   await logAdminAction({
     request,

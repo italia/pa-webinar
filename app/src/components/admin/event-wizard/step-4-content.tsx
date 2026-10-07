@@ -13,6 +13,7 @@ import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
 import FileOrUrlInput from '@/components/ui/file-or-url-input';
+import { FEEDBACK_GENERIC_TEMPLATE_NAME } from '@/lib/feedback/constants';
 
 export interface MaterialDraft {
   title: string;
@@ -90,8 +91,16 @@ interface TemplateRow {
 interface Props {
   value: Step4Value;
   onChange: (patch: Partial<Step4Value>) => void;
-  onSaveDraftAndNavigate: (destination: string) => Promise<void>;
+  /** Solo in creazione: salva la bozza e apre la gestione completa dei
+   *  questionari. In modifica la pagina dell'evento ci porta gia'. */
+  onSaveDraftAndNavigate?: (destination: string) => Promise<void>;
   submitting?: boolean;
+  /** Con il solo link del moderatore questionari e materiali li gestisce lo
+   *  staff: si vedono, non si modificano. */
+  staffLocked?: boolean;
+  /** In creazione: senza scelte, dopo l'evento si propone il questionario
+   *  di feedback predefinito, e va detto. */
+  defaultFeedbackHint?: boolean;
 }
 
 export function makeEmptyQuestionnaireBlock(): QuestionnaireBlock {
@@ -114,12 +123,16 @@ export default function Step4Content({
   onChange,
   onSaveDraftAndNavigate,
   submitting,
+  staffLocked = false,
+  defaultFeedbackHint = false,
 }: Props) {
   const t = useTranslations('admin.wizard.step4');
   const [templates, setTemplates] = useState<TemplateRow[]>([]);
   const [savingDraft, setSavingDraft] = useState(false);
 
   useEffect(() => {
+    // La libreria dei modelli la legge solo lo staff.
+    if (staffLocked) return;
     let cancelled = false;
     fetch('/api/admin/question-templates', { cache: 'no-store' })
       .then((r) => (r.ok ? r.json() : { rows: [] }))
@@ -133,18 +146,20 @@ export default function Step4Content({
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [staffLocked]);
 
-  const handleSaveAndNavigate = async () => {
-    setSavingDraft(true);
-    try {
-      // The destination is resolved inside the shell (needs the created id);
-      // we pass a sentinel that the shell will rewrite after creation.
-      await onSaveDraftAndNavigate('__questionnaires__');
-    } finally {
-      setSavingDraft(false);
-    }
-  };
+  const handleSaveAndNavigate = onSaveDraftAndNavigate
+    ? async () => {
+        setSavingDraft(true);
+        try {
+          // The destination is resolved inside the shell (needs the created id);
+          // we pass a sentinel that the shell will rewrite after creation.
+          await onSaveDraftAndNavigate('__questionnaires__');
+        } finally {
+          setSavingDraft(false);
+        }
+      }
+    : undefined;
 
   return (
     <div>
@@ -155,18 +170,27 @@ export default function Step4Content({
         {t('intro')}
       </p>
 
-      <QuestionnairesSection
-        value={value}
-        onChange={onChange}
-        templates={templates}
-        onSaveAndNavigate={handleSaveAndNavigate}
-        savingDraft={savingDraft || submitting === true}
-      />
+      {staffLocked ? (
+        <div className="alert alert-info" role="note">
+          {t('staffOnly')}
+        </div>
+      ) : (
+        <>
+          <QuestionnairesSection
+            value={value}
+            onChange={onChange}
+            templates={templates}
+            onSaveAndNavigate={handleSaveAndNavigate}
+            savingDraft={savingDraft || submitting === true}
+            defaultFeedbackHint={defaultFeedbackHint}
+          />
 
-      <MaterialsSection
-        value={value.materials}
-        onChange={(next) => onChange({ materials: next })}
-      />
+          <MaterialsSection
+            value={value.materials}
+            onChange={(next) => onChange({ materials: next })}
+          />
+        </>
+      )}
     </div>
   );
 }
@@ -179,14 +203,17 @@ function QuestionnairesSection({
   templates,
   onSaveAndNavigate,
   savingDraft,
+  defaultFeedbackHint,
 }: {
   value: Step4Value;
   onChange: (patch: Partial<Step4Value>) => void;
   templates: TemplateRow[];
-  onSaveAndNavigate: () => void | Promise<void>;
+  onSaveAndNavigate?: () => void | Promise<void>;
   savingDraft: boolean;
+  defaultFeedbackHint: boolean;
 }) {
   const t = useTranslations('admin.wizard.step4');
+  const tc = useTranslations('common');
 
   return (
     <section className="mb-4">
@@ -211,18 +238,26 @@ function QuestionnairesSection({
         templates={templates}
         value={value.postEventQuestionnaire}
         onChange={(next) => onChange({ postEventQuestionnaire: next })}
+        emptyHint={
+          defaultFeedbackHint &&
+          templates.some((tpl) => tpl.name === FEEDBACK_GENERIC_TEMPLATE_NAME)
+            ? t('postDefaultHint', { name: FEEDBACK_GENERIC_TEMPLATE_NAME })
+            : undefined
+        }
       />
 
-      <div className="d-flex justify-content-end mb-2">
-        <button
-          type="button"
-          className="btn btn-outline-primary"
-          onClick={() => void onSaveAndNavigate()}
-          disabled={savingDraft}
-        >
-          {savingDraft ? '...' : t('saveDraftAndGoQuestionnaires')}
-        </button>
-      </div>
+      {onSaveAndNavigate && (
+        <div className="d-flex justify-content-end mb-2">
+          <button
+            type="button"
+            className="btn btn-outline-primary"
+            onClick={() => void onSaveAndNavigate()}
+            disabled={savingDraft}
+          >
+            {savingDraft ? tc('saving') : t('saveDraftAndGoQuestionnaires')}
+          </button>
+        </div>
+      )}
     </section>
   );
 }
@@ -233,12 +268,15 @@ function PlacementBlock({
   templates,
   value,
   onChange,
+  emptyHint,
 }: {
   heading: string;
   idPrefix: string;
   templates: TemplateRow[];
   value: QuestionnaireBlock;
   onChange: (next: QuestionnaireBlock) => void;
+  /** Detto quando non e' scelto nulla. */
+  emptyHint?: string;
 }) {
   const t = useTranslations('admin.wizard.step4');
 
@@ -279,12 +317,12 @@ function PlacementBlock({
         {heading}
       </h4>
 
-      <div className="mb-3">
-        <label className="form-label">{t('templatesLabel')}</label>
+      <div className="mb-3" role="group" aria-labelledby={`${idPrefix}-tpl-label`}>
+        <div id={`${idPrefix}-tpl-label`} className="form-label">
+          {t('templatesLabel')}
+        </div>
         {templates.length === 0 ? (
-          <div className="alert alert-info py-2 mb-0" role="status">
-            <small>{t('templatesEmpty')}</small>
-          </div>
+          <p className="text-secondary small mb-0">{t('templatesEmpty')}</p>
         ) : (
           <div className="d-flex flex-wrap gap-2">
             {templates.map((tpl) => {
@@ -306,10 +344,15 @@ function PlacementBlock({
             })}
           </div>
         )}
+        {emptyHint &&
+          value.templateIds.length === 0 &&
+          value.adhocQuestions.length === 0 && (
+            <p className="text-secondary small mt-2 mb-0">{emptyHint}</p>
+          )}
       </div>
 
       <div>
-        <label className="form-label mb-2">{t('adhocLabel')}</label>
+        <div className="form-label mb-2">{t('adhocLabel')}</div>
 
         {value.adhocQuestions.length > 0 && (
           <ul className="list-unstyled mb-2">

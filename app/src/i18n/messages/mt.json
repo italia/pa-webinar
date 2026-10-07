@@ -790,19 +790,18 @@
         "heading": "Persuni u stediniet",
         "intro": "Żid organizzaturi (jintwerew fuq il-paġna), moderaturi, kelliema u mistednin imsejħa.",
         "organizersHeading": "Organizzaturi",
-        "organizersHelp": "Jidhru fil-paġna pubblika tal-avveniment.",
-        "organizerName": "Persuna ta' kuntatt",
-        "organizerOrganization": "Organizzazzjoni",
+        "organizersHelp": "L-organizzazzjonijiet li qed jorganizzaw l-avveniment: l-isem, is-sit u l-logo jidhru fil-paġna pubblika.",
+        "organizerName": "Isem l-organizzazzjoni",
         "organizerWebsite": "Sit web",
         "organizerLogo": "Logo tal-organizzatur",
-        "organizerRequired": "Il-persuna ta' kuntatt u l-organizzazzjoni huma obbligatorji.",
+        "organizerRequired": "L-isem tal-organizzazzjoni huwa meħtieġ.",
         "moderatorsHeading": "Moderaturi",
         "moderatorsHelp": "Il-moderaturi jistgħu jamministraw is-sessjoni u jikkontrollaw il-permessi matul l-avveniment.",
         "moderatorName": "Isem",
         "moderatorEmail": "Email",
         "moderatorRequired": "L-isem u l-email huma obbligatorji.",
         "speakersHeading": "Kelliema",
-        "speakersHelp": "Jirċievu link ta' moderatur bl-email.",
+        "speakersHelp": "Jirċievu link personali bl-email biex jitkellmu, jużaw il-kamera u jaqsmu l-iskrin, mingħajr setgħat ta' moderazzjoni.",
         "speakerName": "Isem",
         "speakerEmail": "Email",
         "speakerRequired": "L-isem u l-email huma obbligatorji.",
@@ -810,17 +809,15 @@
         "invitationsHelp": "Lista tal-persuni mistiedna. Il-pjattaforma ma tibgħatx stediniet: aqsam int il-link tal-avveniment. Meta r-reġistrazzjoni pubblika tkun mitfija, jistgħu jirreġistraw biss dawn l-indirizzi, u l-link personali biex tidħol jasal bl-email wara r-reġistrazzjoni.",
         "invitationName": "Isem (fakultattiv)",
         "invitationEmail": "Email",
-        "invitationRole": "Rwol",
-        "role": {
-          "GUEST": "Mistieden",
-          "SPEAKER": "Kelliem"
-        },
         "add": "Żid",
         "remove": "Neħħi",
         "invalidEmail": "Indirizz email mhux validu.",
         "duplicateEmail": "L-indirizz diġà jeżisti.",
         "rubricaPick": "Fittex mid-direttorju…",
-        "rubricaOrAdd": "jew żid manwalment"
+        "rubricaOrAdd": "jew żid manwalment",
+        "removeItem": "Neħħi {name}",
+        "invitationsStaffOnly": "L-istediniet jimmaniġġjahom l-istaff tal-avveniment.",
+        "pickSkipped": "Xi persuni kienu diġà fil-lista jew ma kellhomx indirizz validu, u ma żdidux."
       },
       "step4": {
         "heading": "Kontenut u materjali",
@@ -840,11 +837,10 @@
         "remove": "Neħħi",
         "questionnairesHeading": "Kwestjonarji",
         "questionnairesIntro": "Għaqqad templates użati mill-ġdid ma' mistoqsijiet speċifiċi għal dan l-avveniment.",
-        "questionnairesEmpty": "Ebda kwestjonarju disponibbli. Oħloq kwestjonarju minn Settings → Kwestjonarji.",
         "preHeading": "Kwestjonarju ta' preġistrazzjoni",
         "postHeading": "Kwestjonarju post-avveniment",
         "templatesLabel": "Templates użati mill-ġdid",
-        "templatesEmpty": "Ebda template maħluq. Mur f'Settings → Kwestjonarji.",
+        "templatesEmpty": "Ma hemm l-ebda template ta' kwestjonarju disponibbli: żid il-mistoqsijiet għal dan l-avveniment hawn taħt.",
         "adhocLabel": "Mistoqsijiet speċifiċi għal dan l-avveniment",
         "addQuestion": "+ Żid mistoqsija",
         "questionPrompt": "Test tal-mistoqsija",
@@ -860,7 +856,9 @@
         "scaleMax": "Massimu",
         "required": "Obbligatorja",
         "saveDraftAndGoQuestionnaires": "Ssejvja l-abbozz u mur għall-amministrazzjoni tal-kwestjonarji",
-        "none": "— L-ebda —"
+        "none": "— L-ebda —",
+        "staffOnly": "Il-kwestjonarji u l-materjali jimmaniġġjahom l-istaff tal-avveniment: bil-link tal-moderatur tarahom fil-paġna tal-avveniment.",
+        "postDefaultHint": "Jekk ma tagħżel xejn, wara l-avveniment jiġi offrut il-kwestjonarju “{name}”."
       },
       "step5": {
         "heading": "Sommarju u pubblikazzjoni",
@@ -903,7 +901,8 @@
         "privacyDoc": "Dokument tal-avviż (PDF jew link)",
         "privacyDocHelp": "Tella' PDF jew waħħal URL ta' avviż sostituttiv. Jissostitwixxi t-template GDPR jekk preżenti.",
         "privacyTextHelp": "Test qasir muri fil-formola tal-irreġistrazzjoni; jista' jikkomplementa jew jissostitwixxi t-template GDPR.",
-        "technicalDetails": "Dettalji tekniċi: kapaċità u riżorsi"
+        "technicalDetails": "Dettalji tekniċi: kapaċità u riżorsi",
+        "retentionRange": "Daħħal numru ta' jiem bejn 1 u {max}."
       },
       "validationFailed": "Iċċekkja l-oqsma evidenzjati qabel tipproċedi.",
       "partialFailure": "L-avveniment inħoloq, imma xi elementi ma ġewx salvati: {items}. Tista' żżidhom mill-paġna tal-avveniment.",
@@ -2424,7 +2423,38 @@
     "rubrica": {
       "title": "Direttorju",
       "subtitle": "Personu chu hsena datum kunsens lill-inserimento fi direttorju (art. 6.1.a GDPR). Lu informazzjoni ta' profilo vengono aġġornatu awtomatikament ad kull re-reġistrazzjoni.",
-      "backToList": "← Erġa' lill-direttorju"
+      "searchLabel": "Fittex skont l-isem jew l-organizzazzjoni",
+      "orgTypeLabel": "Tip ta' organizzazzjoni",
+      "allTypes": "Kollha",
+      "includeOptedOut": "Inkludi lil min irtira l-kunsens",
+      "count": "Persuni fid-direttorju: {count}",
+      "empty": "Ħadd ma jaqbel mal-filtri.",
+      "noName": "(mingħajr isem)",
+      "statusActive": "Kunsens mogħti",
+      "statusOptedOut": "Kunsens irtirat",
+      "col": {
+        "name": "Isem",
+        "organization": "Organizzazzjoni",
+        "type": "Tip",
+        "events": "Avvenimenti",
+        "lastActive": "L-aħħar attività",
+        "status": "Status",
+        "event": "Avveniment",
+        "eventDate": "Data tal-avveniment",
+        "registeredAt": "Data tar-reġistrazzjoni",
+        "orgSnapshot": "Organizzazzjoni fil-ħin tar-reġistrazzjoni"
+      },
+      "deleteTitle": "Ħassar mid-direttorju",
+      "deleteMessage": "Tħassar din il-persuna għal kollox mid-direttorju? L-istorja tar-reġistrazzjonijiet tibqa'.",
+      "deleteFailed": "It-tħassir ma rnexxiex. Erġa' pprova.",
+      "notFound": "Il-persuna ma nstabitx.",
+      "consentGivenAt": "Kunsens mogħti fil-",
+      "optedOutAt": "Kunsens irtirat fil-",
+      "retentionMonths": "Żamma (xhur)",
+      "deleteButton": "Ħassar mid-direttorju (art. 17 GDPR)",
+      "deleting": "Qed jitħassar…",
+      "historyTitle": "Storja tar-reġistrazzjonijiet ({count})",
+      "historyEmpty": "L-ebda reġistrazzjoni."
     },
     "eventAnalytics": {
       "title": "Statistiċi",
@@ -2600,7 +2630,6 @@
       "ov": {
         "tab": "Ħarsa ġenerali",
         "intro": "X'ipproduċiet il-pipeline tal-AI għal din ir-reġistrazzjoni, lingwa b'lingwa.",
-        "processing": "L-ipproċessar għaddej jew għad m'hemm l-ebda artefatt. Erġa' ejja meta l-istat ikun “Lest”.",
         "loadError": "Il-ħarsa ġenerali ma setgħetx tinġieb.",
         "langsTitle": "Lingwi u artefatti",
         "colLang": "Lingwa",
@@ -2834,7 +2863,9 @@
       "full": "Il-glossarju laħaq l-għadd massimu ta’ termini.",
       "invalid": "Iċċekkja l-oqsma: xi valuri mhumiex validi.",
       "error": "L-operazzjoni ma rnexxietx. Erġa’ pprova."
-    }
+    },
+    "deleteLiveBlocked": "L-avveniment huwa live: temmu qabel ma tħassru.",
+    "bulkDeleteSkippedLive": "Avvenimenti live mhux imħassra: {count}. Temmhom qabel ma tħassarhom."
   },
   "email": {
     "confirmationSubject": "Reġistrazzjoni kkonfermata: {eventTitle}",

@@ -1,7 +1,6 @@
-import { getLocale, getTranslations } from 'next-intl/server';
+import { getLocale } from 'next-intl/server';
 
 import { soloAdmin } from '@/lib/auth/staff-page';
-import { Link } from '@/i18n/navigation';
 import RubricaDetail from '@/components/admin/rubrica-detail';
 
 export default async function RubricaDetailPage({
@@ -14,15 +13,9 @@ export default async function RubricaDetailPage({
   if (negato) return negato;
   const { id } = await params;
 
-  const t = await getTranslations('admin.rubrica');
-
+  // Il ritorno all'elenco lo danno le briciole.
   return (
     <div className="container py-5">
-      <div className="mb-3">
-        <Link href="/admin/rubrica" className="text-decoration-none small">
-          {t('backToList')}
-        </Link>
-      </div>
       <RubricaDetail id={id} />
     </div>
   );

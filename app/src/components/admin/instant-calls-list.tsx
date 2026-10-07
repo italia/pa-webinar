@@ -19,6 +19,7 @@ import { Icon } from '@/components/ui/icon';
 import { GlyphIcon } from '@/components/ui/glyph-icon';
 import { Link, percorso } from '@/i18n/navigation';
 import CopyButton from '@/components/admin/copy-button';
+import { useToast } from '@/components/ui/toast';
 import { eventAdminPath } from '@/lib/events/admin-links';
 import { localizedPath } from '@/lib/utils/localized-url';
 
@@ -153,6 +154,8 @@ export default function InstantCallsList({
   const t = useTranslations('admin.instantCalls');
   const tc = useTranslations('common');
   const tl = useTranslations('admin.links');
+  const ta = useTranslations('admin');
+  const toast = useToast();
   const fmt = useFormatter();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -286,17 +289,19 @@ export default function InstantCallsList({
         body: JSON.stringify({ ids: Array.from(selected) }),
       });
       if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
-        setError(body.error?.message ?? tc('errorGeneric'));
+        setError(tc('errorGeneric'));
         return;
       }
+      const { skippedLive = 0 } = (await res.json().catch(() => ({}))) as { skippedLive?: number };
       setDeleteOpen(false);
       setSelected(new Set());
+      // Il modale si e' chiuso: l'avviso va in una notifica, non nel suo corpo.
+      if (skippedLive > 0) toast.info(ta('bulkDeleteSkippedLive', { count: skippedLive }));
       refresh();
     } finally {
       setSubmitting(false);
     }
-  }, [selected, tc, refresh]);
+  }, [selected, tc, ta, toast, refresh]);
 
   const selectedCount = useMemo(() => selected.size, [selected]);
 

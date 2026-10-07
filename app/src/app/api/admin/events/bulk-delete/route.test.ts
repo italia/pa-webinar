@@ -30,17 +30,21 @@ vi.mock('@/lib/auth/staff-session', () => ({
 vi.mock('@/lib/audit/admin-audit', () => ({
   logAdminAction: vi.fn(async () => undefined),
 }));
+// La transazione con le righe bloccate: gli stati letti li' decidono tutto.
+const tx = vi.hoisted(() => ({
+  $queryRaw: vi.fn(),
+  event: { findMany: vi.fn(), deleteMany: vi.fn() },
+}));
 vi.mock('@/lib/db', () => ({
-  prisma: { event: { deleteMany: vi.fn() } },
+  prisma: { $transaction: vi.fn(async (fn: (t: unknown) => unknown) => fn(tx)) },
 }));
 vi.mock('@/lib/events/material-files', () => files);
 
-import { prisma } from '@/lib/db';
 import { AppError } from '@/lib/errors';
 
 import { POST } from './route';
 
-const mockedDeleteMany = prisma.event.deleteMany as unknown as ReturnType<typeof vi.fn>;
+const mockedDeleteMany = tx.event.deleteMany;
 
 const A = '11111111-1111-4111-8111-111111111111';
 const B = '22222222-2222-4222-8222-222222222222';
@@ -57,14 +61,32 @@ function post(ids: string[]): NextRequest {
 beforeEach(() => {
   vi.clearAllMocks();
   session.current = { role: 'admin' };
+  tx.event.findMany.mockResolvedValue([{ id: A }, { id: B }]);
+  tx.$queryRaw.mockResolvedValue([
+    { id: A, status: 'PUBLISHED' },
+    { id: B, status: 'ENDED' },
+  ]);
   mockedDeleteMany.mockResolvedValue({ count: 2 });
   files.removeFilesOfEventsBeingDeleted.mockResolvedValue(1);
 });
 
 describe('POST /api/admin/events/bulk-delete — i file degli eventi', () => {
-  it('cancella i file prima, poi gli eventi', async () => {
+  it('gli eventi in diretta restano, e la risposta li conta', async () => {
+    tx.$queryRaw.mockResolvedValue([
+      { id: A, status: 'PUBLISHED' },
+      { id: B, status: 'LIVE' },
+    ]);
+    mockedDeleteMany.mockResolvedValue({ count: 1 });
+    const res = await POST(post([A, B]), ctx);
+    expect(await res.json()).toEqual({ deleted: 1, skippedLive: 1 });
+    expect(files.removeFilesOfEventsBeingDeleted).toHaveBeenCalledWith({ id: { in: [A] } });
+    expect(mockedDeleteMany).toHaveBeenCalledWith({ where: { id: { in: [A] } } });
+  });
+
+  it('cancella i file prima, poi gli eventi, a righe bloccate', async () => {
     const res = await POST(post([A, B]), ctx);
     expect(res.status).toBe(200);
+    expect(String(tx.$queryRaw.mock.calls[0]![0])).toContain('FOR NO KEY UPDATE');
     const where = { id: { in: [A, B] } };
     expect(files.removeFilesOfEventsBeingDeleted).toHaveBeenCalledWith(where);
     expect(mockedDeleteMany).toHaveBeenCalledWith({ where });
@@ -73,12 +95,21 @@ describe('POST /api/admin/events/bulk-delete — i file degli eventi', () => {
     );
   });
 
-  it('l’organizzatore: file e cancellazione con lo stesso filtro sui propri eventi', async () => {
+  it('l’organizzatore: si parte solo dai propri eventi', async () => {
     session.current = { role: 'organizer', accountId: 'org-1' };
     await POST(post([A, B]), ctx);
-    const where = { id: { in: [A, B] }, createdById: 'org-1' };
-    expect(files.removeFilesOfEventsBeingDeleted).toHaveBeenCalledWith(where);
-    expect(mockedDeleteMany).toHaveBeenCalledWith({ where });
+    expect(tx.event.findMany).toHaveBeenCalledWith({
+      where: { id: { in: [A, B] }, createdById: 'org-1' },
+      select: { id: true },
+    });
+  });
+
+  it('nessun evento fra i propri: niente da bloccare né da cancellare', async () => {
+    tx.event.findMany.mockResolvedValue([]);
+    const res = await POST(post([A]), ctx);
+    expect(await res.json()).toEqual({ deleted: 0, skippedLive: 0 });
+    expect(tx.$queryRaw).not.toHaveBeenCalled();
+    expect(mockedDeleteMany).not.toHaveBeenCalled();
   });
 
   it('se i file non si cancellano, gli eventi restano: 503', async () => {

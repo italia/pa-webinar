@@ -24,7 +24,7 @@ function snapshot(): InitialEventShape {
     moderatorToken: TOKEN,
     event: {} as InitialEventShape['event'],
     organizers: [
-      { id: 'org-1', name: 'Ente', organization: 'Ente', logoUrl: null, websiteUrl: null },
+      { id: 'org-1', name: 'Ente', logoUrl: null, websiteUrl: null },
     ],
     eventModerators: [
       { id: 'mod-1', name: 'Anna Bianchi', email: 'anna@example.org', role: 'MODERATOR', personId: null },

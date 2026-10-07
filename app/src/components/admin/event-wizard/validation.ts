@@ -11,6 +11,7 @@ import {
   EVENT_DESCRIPTION_REQUIRED_LOCALE,
 } from '@/lib/validation/event-description';
 import { parseLocaleList } from '@/lib/ai/target-locales';
+import { MAX_RETENTION_DAYS } from '@/lib/validation/retention';
 
 import type { WizardForm } from './wizard-shell';
 
@@ -29,6 +30,9 @@ export function validateStep(
   step: StepKey,
   form: WizardForm,
   defaultLocale: string,
+  /** Il massimo accettato per la conservazione: in modifica, se l'evento ha
+   *  gia' un valore piu' alto (una pubblicazione in libreria), quello. */
+  retentionMax: number = MAX_RETENTION_DAYS,
 ): Record<string, string> {
   const errs: Record<string, string> = {};
   if (step === 'base') {
@@ -70,6 +74,14 @@ export function validateStep(
       errs['aiTargetLocales'] = 'required';
     }
   }
+  if (step === 'review') {
+    // Gli stessi limiti del server: un valore fuori misura (arrivato da un
+    // template) farebbe fallire il salvataggio senza dire dove.
+    const giorni = form.dataRetentionDays;
+    if (!Number.isInteger(giorni) || giorni < 1 || giorni > retentionMax) {
+      errs['dataRetentionDays'] = 'outOfRange';
+    }
+  }
   return errs;
 }
 
@@ -97,6 +109,7 @@ const INLINE_FIELDS: ReadonlyMap<string, StepKey> = new Map<string, StepKey>([
   ['maxParticipants', 'base'],
   ['aiTargetLocales', 'permissions'],
   ['gdprTemplateId', 'review'],
+  ['dataRetentionDays', 'review'],
   ['moderatorName', 'review'],
   ['moderatorEmail', 'review'],
 ]);

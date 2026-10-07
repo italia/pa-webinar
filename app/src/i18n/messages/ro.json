@@ -790,19 +790,18 @@
         "heading": "Persoane și invitații",
         "intro": "Adăugați organizatori (afișați pe pagină), moderatori, vorbitori și invitați.",
         "organizersHeading": "Organizatori",
-        "organizersHelp": "Apar pe pagina publică a evenimentului.",
-        "organizerName": "Persoană de contact",
-        "organizerOrganization": "Organizație",
+        "organizersHelp": "Organizațiile care organizează evenimentul: numele, site-ul și logoul apar pe pagina publică.",
+        "organizerName": "Numele organizației",
         "organizerWebsite": "Site web",
         "organizerLogo": "Logoul organizatorului",
-        "organizerRequired": "Persoana de contact și organizația sunt obligatorii.",
+        "organizerRequired": "Numele organizației este obligatoriu.",
         "moderatorsHeading": "Moderatori",
         "moderatorsHelp": "Moderatorii pot gestiona sesiunea și pot controla permisiunile în timpul evenimentului.",
         "moderatorName": "Nume",
         "moderatorEmail": "E-mail",
         "moderatorRequired": "Numele și e-mailul sunt obligatorii.",
         "speakersHeading": "Vorbitori",
-        "speakersHelp": "Primesc un link de moderator prin e-mail.",
+        "speakersHelp": "Primesc prin e-mail un link personal pentru a vorbi, a folosi camera și a partaja ecranul, fără drepturi de moderare.",
         "speakerName": "Nume",
         "speakerEmail": "E-mail",
         "speakerRequired": "Numele și e-mailul sunt obligatorii.",
@@ -810,17 +809,15 @@
         "invitationsHelp": "Lista persoanelor invitate. Platforma nu trimite invitații: distribuie tu linkul evenimentului. Cu înregistrarea publică dezactivată, se pot înregistra doar aceste adrese, iar linkul personal de acces sosește prin e-mail după înregistrare.",
         "invitationName": "Nume (opțional)",
         "invitationEmail": "E-mail",
-        "invitationRole": "Rol",
-        "role": {
-          "GUEST": "Invitat",
-          "SPEAKER": "Vorbitor"
-        },
         "add": "Adăugați",
         "remove": "Eliminați",
         "invalidEmail": "Adresă de e-mail nevalidă.",
         "duplicateEmail": "Adresă deja existentă.",
         "rubricaPick": "Căutați în agendă…",
-        "rubricaOrAdd": "sau adăugați manual"
+        "rubricaOrAdd": "sau adăugați manual",
+        "removeItem": "Eliminați {name}",
+        "invitationsStaffOnly": "Invitațiile sunt gestionate de echipa evenimentului.",
+        "pickSkipped": "Unele persoane erau deja în listă sau nu aveau o adresă validă și nu au fost adăugate."
       },
       "step4": {
         "heading": "Conținut și materiale",
@@ -840,11 +837,10 @@
         "remove": "Eliminați",
         "questionnairesHeading": "Chestionare",
         "questionnairesIntro": "Combinați șabloane reutilizabile cu întrebări specifice acestui eveniment.",
-        "questionnairesEmpty": "Niciun chestionar disponibil. Creați un chestionar din Setări → Chestionare.",
         "preHeading": "Chestionar de preînregistrare",
         "postHeading": "Chestionar post-eveniment",
         "templatesLabel": "Șabloane reutilizabile",
-        "templatesEmpty": "Niciun șablon creat. Accesați Setări → Chestionare.",
+        "templatesEmpty": "Nu există șabloane de chestionar disponibile: adăugați mai jos întrebările pentru acest eveniment.",
         "adhocLabel": "Întrebări specifice acestui eveniment",
         "addQuestion": "+ Adăugați întrebare",
         "questionPrompt": "Textul întrebării",
@@ -860,7 +856,9 @@
         "scaleMax": "Maxim",
         "required": "Obligatorie",
         "saveDraftAndGoQuestionnaires": "Salvați ciorna și mergeți la gestionarea chestionarelor",
-        "none": "— Niciunul —"
+        "none": "— Niciunul —",
+        "staffOnly": "Chestionarele și materialele sunt gestionate de echipa evenimentului: cu linkul de moderator le vedeți pe pagina evenimentului.",
+        "postDefaultHint": "Dacă nu alegeți nimic, după eveniment se propune chestionarul „{name}”."
       },
       "step5": {
         "heading": "Rezumat și publicare",
@@ -903,7 +901,8 @@
         "privacyDoc": "Document notă de informare (PDF sau link)",
         "privacyDocHelp": "Încărcați un PDF sau lipiți URL-ul unei note de informare alternative. Suprascrie șablonul RGPD dacă este setat.",
         "privacyTextHelp": "Text sintetic afișat în formularul de înregistrare; poate completa sau înlocui șablonul RGPD.",
-        "technicalDetails": "Detalii tehnice: capacitate și resurse"
+        "technicalDetails": "Detalii tehnice: capacitate și resurse",
+        "retentionRange": "Introduceți un număr de zile între 1 și {max}."
       },
       "validationFailed": "Verificați câmpurile evidențiate înainte de a continua.",
       "partialFailure": "Evenimentul a fost creat, dar unele elemente nu au fost salvate: {items}. Le puteți adăuga din pagina evenimentului.",
@@ -2424,7 +2423,38 @@
     "rubrica": {
       "title": "Agendă",
       "subtitle": "Persoane care și-au dat consimțământul pentru includerea în agendă (art. 6.1.a RGPD). Informațiile de profil sunt actualizate automat la fiecare reînscriere.",
-      "backToList": "← Înapoi la agendă"
+      "searchLabel": "Căutați după nume sau organizație",
+      "orgTypeLabel": "Tipul organizației",
+      "allTypes": "Toate",
+      "includeOptedOut": "Includeți persoanele care și-au retras consimțământul",
+      "count": "Persoane în agendă: {count}",
+      "empty": "Nicio persoană nu corespunde filtrelor.",
+      "noName": "(fără nume)",
+      "statusActive": "Consimțământ acordat",
+      "statusOptedOut": "Consimțământ retras",
+      "col": {
+        "name": "Nume",
+        "organization": "Organizație",
+        "type": "Tip",
+        "events": "Evenimente",
+        "lastActive": "Ultima activitate",
+        "status": "Stare",
+        "event": "Eveniment",
+        "eventDate": "Data evenimentului",
+        "registeredAt": "Data înscrierii",
+        "orgSnapshot": "Organizația la data înscrierii"
+      },
+      "deleteTitle": "Ștergeți din agendă",
+      "deleteMessage": "Ștergeți definitiv această persoană din agendă? Istoricul înscrierilor se păstrează.",
+      "deleteFailed": "Ștergerea nu a reușit. Încercați din nou.",
+      "notFound": "Persoana nu a fost găsită.",
+      "consentGivenAt": "Consimțământ acordat la",
+      "optedOutAt": "Consimțământ retras la",
+      "retentionMonths": "Păstrare (luni)",
+      "deleteButton": "Ștergeți din agendă (art. 17 RGPD)",
+      "deleting": "Se șterge…",
+      "historyTitle": "Istoricul înscrierilor ({count})",
+      "historyEmpty": "Nu există înscrieri."
     },
     "eventAnalytics": {
       "title": "Statistici",
@@ -2600,7 +2630,6 @@
       "ov": {
         "tab": "Prezentare generală",
         "intro": "Ce a produs pipeline-ul AI pentru această înregistrare, limbă cu limbă.",
-        "processing": "Procesare în curs sau niciun artefact disponibil. Reveniți când starea este „Finalizat”.",
         "loadError": "Prezentarea generală nu a putut fi încărcată.",
         "langsTitle": "Limbi și artefacte",
         "colLang": "Limbă",
@@ -2834,7 +2863,9 @@
       "full": "Glosarul a atins numărul maxim de termeni.",
       "invalid": "Verificați câmpurile: unele valori nu sunt valide.",
       "error": "Operațiunea a eșuat. Reîncercați."
-    }
+    },
+    "deleteLiveBlocked": "Evenimentul este în desfășurare live: încheiați-l înainte de a-l șterge.",
+    "bulkDeleteSkippedLive": "Evenimente live neșterse: {count}. Încheiați-le înainte de a le șterge."
   },
   "email": {
     "confirmationSubject": "Confirmare înregistrare: {eventTitle}",

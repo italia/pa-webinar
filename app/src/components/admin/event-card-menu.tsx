@@ -149,14 +149,7 @@ export default function EventCardMenu({
       const creato = await duplicaComeProssima(event.id);
       // La copia nasce in bozza: si apre subito la modifica, dove va
       // confermata.
-      router.push(
-        percorso(
-          eventAdminPath(creato.id, {
-            edit: true,
-            viaToken: viaToken ? creato.moderatorToken : null,
-          }),
-        ),
-      );
+      router.push(percorso(eventAdminPath(creato.id, { edit: true })));
     });
 
   const elimina = () =>
@@ -249,7 +242,8 @@ export default function EventCardMenu({
               </button>
             </li>
           )}
-          {!istantanea && (
+          {/* Duplicare e' dello staff (la rotta chiede la sessione). */}
+          {!istantanea && !viaToken && (
             <li>
               <button type="button" className={voce} onClick={duplica}>
                 {t('duplicate')}

@@ -146,7 +146,7 @@ async function saveQuestionnaire(
 //   – DELETE every initial row that is NOT in `form` by the same key.
 //
 // Identity keys:
-//   – organizers:        `${name}|${organization}`
+//   – organizers:        `${name}|${websiteUrl}|${logoUrl}`
 //   – moderators:        `${role}|${email}`
 //   – invitations:       `${email}` (invitations are event-scoped unique by email)
 //   – materials:         `${title}|${url}`
@@ -310,8 +310,8 @@ export async function fanoutEditDiff(
   const auth = { Authorization: `Bearer ${moderatorToken}` };
 
   // Organizers
-  const orgKey = (o: { name: string; organization: string }) =>
-    `${o.name}|${o.organization}`;
+  const orgKey = (o: { name: string; logoUrl: string | null; websiteUrl: string | null }) =>
+    `${o.name}|${o.websiteUrl ?? ''}|${o.logoUrl ?? ''}`;
   const initialOrgByKey = new Map(
     initial.organizers.map((o) => [orgKey(o), o]),
   );
@@ -336,7 +336,6 @@ export async function fanoutEditDiff(
       initial.organizers.push({
         id: creato.body.id,
         name: o.name,
-        organization: o.organization,
         logoUrl: o.logoUrl ?? null,
         websiteUrl: o.websiteUrl ?? null,
       });

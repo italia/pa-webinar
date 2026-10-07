@@ -58,6 +58,15 @@ describe('createEventSchema', () => {
     expect(result.success).toBe(true);
   });
 
+  it('treats an empty privacy text as no text, so the GDPR template applies', () => {
+    const vuoto = createEventSchema.safeParse({ ...validEvent(), privacyPolicyText: '  ' });
+    expect(vuoto.success && vuoto.data.privacyPolicyText).toBeNull();
+    const assente = updateEventSchema.safeParse({});
+    expect(assente.success && assente.data.privacyPolicyText).toBeUndefined();
+    const testo = updateEventSchema.safeParse({ privacyPolicyText: 'Informativa' });
+    expect(testo.success && testo.data.privacyPolicyText).toBe('Informativa');
+  });
+
   it('rejects missing title', () => {
     const { title: _, ...rest } = validEvent();
     const result = createEventSchema.safeParse(rest);

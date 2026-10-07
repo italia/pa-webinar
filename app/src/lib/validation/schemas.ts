@@ -5,6 +5,7 @@ import {
   EVENT_DESCRIPTION_REQUIRED_LOCALE,
 } from './event-description';
 import { MATERIAL_VISIBILITIES, materialUrlSchema } from './materials';
+import { MAX_RETENTION_DAYS } from './retention';
 
 // ── Event Schemas ────────────────────────────────────
 
@@ -47,9 +48,15 @@ export const eventBaseSchema = z.object({
   requireOrganization: z.boolean().default(false),
   requireOrganizationRole: z.boolean().default(false),
   requireOrganizationType: z.boolean().default(false),
-  dataRetentionDays: z.number().int().min(1).max(365).default(30),
+  dataRetentionDays: z.number().int().min(1).max(MAX_RETENTION_DAYS).default(30),
   privacyPolicyUrl: z.string().url().optional(),
-  privacyPolicyText: z.string().max(10000).optional(),
+  // Un testo vuoto non e' un'informativa: vale "nessun testo dell'evento", e
+  // all'iscrizione si mostra quella del template GDPR scelto.
+  privacyPolicyText: z
+    .string()
+    .max(10000)
+    .optional()
+    .transform((v) => (v === undefined ? undefined : v.trim() ? v : null)),
   gdprTemplateId: z.string().uuid().nullable().optional(),
   /** Cleartext join password. Server hashes and stores in `join_password_hash`.
    *  Empty string clears the password (sets the column back to NULL). */

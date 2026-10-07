@@ -790,19 +790,18 @@
         "heading": "Osoby a pozvánky",
         "intro": "Přidejte organizátory (zobrazí se na stránce), moderátory, řečníky a pozvané hosty.",
         "organizersHeading": "Organizátoři",
-        "organizersHelp": "Zobrazují se na veřejné stránce události.",
-        "organizerName": "Kontaktní osoba",
-        "organizerOrganization": "Organizace",
+        "organizersHelp": "Organizace, které událost pořádají: název, web a logo se zobrazí na veřejné stránce.",
+        "organizerName": "Název organizace",
         "organizerWebsite": "Webové stránky",
         "organizerLogo": "Logo pořadatele",
-        "organizerRequired": "Kontaktní osoba a organizace jsou povinné.",
+        "organizerRequired": "Název organizace je povinný.",
         "moderatorsHeading": "Moderátoři",
         "moderatorsHelp": "Moderátoři mohou řídit relaci a ovládat oprávnění během události.",
         "moderatorName": "Jméno",
         "moderatorEmail": "E-mail",
         "moderatorRequired": "Jméno a e-mail jsou povinné.",
         "speakersHeading": "Řečníci",
-        "speakersHelp": "Obdrží odkaz moderátora e-mailem.",
+        "speakersHelp": "E-mailem dostanou osobní odkaz, aby mohli mluvit, používat kameru a sdílet obrazovku, bez oprávnění moderátora.",
         "speakerName": "Jméno",
         "speakerEmail": "E-mail",
         "speakerRequired": "Jméno a e-mail jsou povinné.",
@@ -810,17 +809,15 @@
         "invitationsHelp": "Seznam pozvaných osob. Platforma pozvánky neposílá: odkaz na událost jim sdílejte sami. Když je veřejná registrace vypnutá, mohou se zaregistrovat jen tyto adresy a osobní odkaz pro vstup přijde e-mailem po registraci.",
         "invitationName": "Jméno (volitelné)",
         "invitationEmail": "E-mail",
-        "invitationRole": "Role",
-        "role": {
-          "GUEST": "Host",
-          "SPEAKER": "Řečník"
-        },
         "add": "Přidat",
         "remove": "Odstranit",
         "invalidEmail": "Neplatná e-mailová adresa.",
         "duplicateEmail": "Adresa je již zadána.",
         "rubricaPick": "Hledat v adresáři…",
-        "rubricaOrAdd": "nebo přidejte ručně"
+        "rubricaOrAdd": "nebo přidejte ručně",
+        "removeItem": "Odstranit {name}",
+        "invitationsStaffOnly": "Pozvánky spravuje tým události.",
+        "pickSkipped": "Některé osoby už byly uvedeny nebo neměly platnou adresu, a nebyly přidány."
       },
       "step4": {
         "heading": "Obsah a materiály",
@@ -840,11 +837,10 @@
         "remove": "Odstranit",
         "questionnairesHeading": "Dotazníky",
         "questionnairesIntro": "Kombinujte znovupoužitelné šablony s otázkami specifickými pro tuto událost.",
-        "questionnairesEmpty": "Není dostupný žádný dotazník. Vytvořte dotazník v Nastavení → Dotazníky.",
         "preHeading": "Dotazník předregistrace",
         "postHeading": "Dotazník po události",
         "templatesLabel": "Znovupoužitelné šablony",
-        "templatesEmpty": "Žádné šablony nebyly vytvořeny. Přejděte do Nastavení → Dotazníky.",
+        "templatesEmpty": "Nejsou k dispozici žádné šablony dotazníků: otázky pro tuto událost přidejte níže.",
         "adhocLabel": "Otázky specifické pro tuto událost",
         "addQuestion": "+ Přidat otázku",
         "questionPrompt": "Text otázky",
@@ -860,7 +856,9 @@
         "scaleMax": "Maximum",
         "required": "Povinná",
         "saveDraftAndGoQuestionnaires": "Uložit koncept a přejít na správu dotazníků",
-        "none": "— Žádný —"
+        "none": "— Žádný —",
+        "staffOnly": "Dotazníky a materiály spravuje tým události: s odkazem moderátora je uvidíte na stránce události.",
+        "postDefaultHint": "Pokud nic nevyberete, po události se nabídne dotazník „{name}“."
       },
       "step5": {
         "heading": "Souhrn a publikování",
@@ -903,7 +901,8 @@
         "privacyDoc": "Dokument s informacemi o ochraně (PDF nebo odkaz)",
         "privacyDocHelp": "Nahrajte PDF nebo vložte URL alternativního textu. Přepíše šablonu GDPR, pokud existuje.",
         "privacyTextHelp": "Stručný text zobrazený v registračním formuláři; může doplňovat nebo nahradit šablonu GDPR.",
-        "technicalDetails": "Technické podrobnosti: kapacita a prostředky"
+        "technicalDetails": "Technické podrobnosti: kapacita a prostředky",
+        "retentionRange": "Zadejte počet dní mezi 1 a {max}."
       },
       "validationFailed": "Před pokračováním zkontrolujte zvýrazněná pole.",
       "partialFailure": "Událost byla vytvořena, ale některé položky se neuložily: {items}. Můžete je doplnit na stránce události.",
@@ -2424,7 +2423,38 @@
     "rubrica": {
       "title": "Adresář",
       "subtitle": "Osoby, které udělily souhlas se zařazením do adresáře (čl. 6.1.a GDPR). Informace v profilu se automaticky aktualizují při každé opětovné registraci.",
-      "backToList": "← Zpět do adresáře"
+      "searchLabel": "Hledat podle jména nebo organizace",
+      "orgTypeLabel": "Typ organizace",
+      "allTypes": "Všechny",
+      "includeOptedOut": "Zahrnout osoby, které odvolaly souhlas",
+      "count": "Osoby v adresáři: {count}",
+      "empty": "Filtrům neodpovídá nikdo.",
+      "noName": "(bez jména)",
+      "statusActive": "Souhlas udělen",
+      "statusOptedOut": "Souhlas odvolán",
+      "col": {
+        "name": "Jméno",
+        "organization": "Organizace",
+        "type": "Typ",
+        "events": "Události",
+        "lastActive": "Poslední aktivita",
+        "status": "Stav",
+        "event": "Událost",
+        "eventDate": "Datum události",
+        "registeredAt": "Datum registrace",
+        "orgSnapshot": "Organizace v době registrace"
+      },
+      "deleteTitle": "Smazat z adresáře",
+      "deleteMessage": "Trvale smazat tuto osobu z adresáře? Historie registrací zůstane zachována.",
+      "deleteFailed": "Smazání se nezdařilo. Zkuste to znovu.",
+      "notFound": "Osoba nebyla nalezena.",
+      "consentGivenAt": "Souhlas udělen dne",
+      "optedOutAt": "Souhlas odvolán dne",
+      "retentionMonths": "Uchovávání (měsíce)",
+      "deleteButton": "Smazat z adresáře (čl. 17 GDPR)",
+      "deleting": "Mazání…",
+      "historyTitle": "Historie registrací ({count})",
+      "historyEmpty": "Žádné registrace."
     },
     "eventAnalytics": {
       "title": "Statistiky",
@@ -2600,7 +2630,6 @@
       "ov": {
         "tab": "Přehled",
         "intro": "Co AI pipeline pro tento záznam vytvořila, jazyk po jazyku.",
-        "processing": "Probíhá zpracování nebo zatím nejsou k dispozici žádné artefakty. Vraťte se, až bude stav „Dokončeno“.",
         "loadError": "Přehled se nepodařilo načíst.",
         "langsTitle": "Jazyky a artefakty",
         "colLang": "Jazyk",
@@ -2834,7 +2863,9 @@
       "full": "Glosář dosáhl maximálního počtu výrazů.",
       "invalid": "Zkontrolujte pole: některé hodnoty nejsou platné.",
       "error": "Operace se nezdařila. Zkuste to znovu."
-    }
+    },
+    "deleteLiveBlocked": "Událost právě probíhá živě: před smazáním ji ukončete.",
+    "bulkDeleteSkippedLive": "Nesmazané živé události: {count}. Před smazáním je ukončete."
   },
   "email": {
     "confirmationSubject": "Potvrzení registrace: {eventTitle}",

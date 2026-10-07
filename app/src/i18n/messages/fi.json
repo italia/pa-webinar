@@ -790,19 +790,18 @@
         "heading": "Henkilöt ja kutsut",
         "intro": "Lisää järjestäjät (näkyvät sivulla), moderaattorit, puhujat ja kutsutut vieraat.",
         "organizersHeading": "Järjestäjät",
-        "organizersHelp": "Näkyvät tapahtuman julkisella sivulla.",
-        "organizerName": "Yhteyshenkilö",
-        "organizerOrganization": "Organisaatio",
+        "organizersHelp": "Tapahtuman järjestävät organisaatiot: nimi, verkkosivusto ja logo näkyvät julkisella sivulla.",
+        "organizerName": "Organisaation nimi",
         "organizerWebsite": "Verkkosivusto",
         "organizerLogo": "Järjestäjän logo",
-        "organizerRequired": "Yhteyshenkilö ja organisaatio ovat pakollisia.",
+        "organizerRequired": "Organisaation nimi on pakollinen.",
         "moderatorsHeading": "Moderaattorit",
         "moderatorsHelp": "Moderaattorit voivat hallita istuntoa ja oikeuksia tapahtuman aikana.",
         "moderatorName": "Nimi",
         "moderatorEmail": "Sähköposti",
         "moderatorRequired": "Nimi ja sähköposti ovat pakollisia.",
         "speakersHeading": "Puhujat",
-        "speakersHelp": "Saavat moderaattorilinkin sähköpostitse.",
+        "speakersHelp": "He saavat sähköpostitse henkilökohtaisen linkin, jolla he voivat puhua, käyttää kameraa ja jakaa näyttönsä ilman moderointioikeuksia.",
         "speakerName": "Nimi",
         "speakerEmail": "Sähköposti",
         "speakerRequired": "Nimi ja sähköposti ovat pakollisia.",
@@ -810,17 +809,15 @@
         "invitationsHelp": "Luettelo kutsutuista. Alusta ei lähetä kutsuja: jaa tapahtuman linkki itse. Kun julkinen rekisteröityminen on pois käytöstä, vain nämä osoitteet voivat rekisteröityä, ja henkilökohtainen liittymislinkki tulee sähköpostitse rekisteröitymisen jälkeen.",
         "invitationName": "Nimi (valinnainen)",
         "invitationEmail": "Sähköposti",
-        "invitationRole": "Rooli",
-        "role": {
-          "GUEST": "Vieras",
-          "SPEAKER": "Puhuja"
-        },
         "add": "Lisää",
         "remove": "Poista",
         "invalidEmail": "Virheellinen sähköpostiosoite.",
         "duplicateEmail": "Osoite on jo lisätty.",
         "rubricaPick": "Hae osoitekirjasta…",
-        "rubricaOrAdd": "tai lisää manuaalisesti"
+        "rubricaOrAdd": "tai lisää manuaalisesti",
+        "removeItem": "Poista {name}",
+        "invitationsStaffOnly": "Kutsuja hallinnoi tapahtuman henkilökunta.",
+        "pickSkipped": "Osa henkilöistä oli jo luettelossa tai heillä ei ollut kelvollista osoitetta, joten heitä ei lisätty."
       },
       "step4": {
         "heading": "Sisältö ja materiaalit",
@@ -840,11 +837,10 @@
         "remove": "Poista",
         "questionnairesHeading": "Kyselyt",
         "questionnairesIntro": "Yhdistä uudelleenkäytettäviä malleja ja tämän tapahtuman erityiskysymyksiä.",
-        "questionnairesEmpty": "Ei saatavilla olevia kyselyitä. Luo kysely valikosta Asetukset → Kyselyt.",
         "preHeading": "Ennakkoilmoittautumiskysely",
         "postHeading": "Tapahtuman jälkeinen kysely",
         "templatesLabel": "Uudelleenkäytettävät mallit",
-        "templatesEmpty": "Ei luotuja malleja. Siirry kohtaan Asetukset → Kyselyt.",
+        "templatesEmpty": "Kyselymalleja ei ole saatavilla: lisää tämän tapahtuman kysymykset alle.",
         "adhocLabel": "Tämän tapahtuman erityiskysymykset",
         "addQuestion": "+ Lisää kysymys",
         "questionPrompt": "Kysymyksen teksti",
@@ -860,7 +856,9 @@
         "scaleMax": "Maksimi",
         "required": "Pakollinen",
         "saveDraftAndGoQuestionnaires": "Tallenna luonnos ja siirry kyselyiden hallintaan",
-        "none": "— Ei valittu —"
+        "none": "— Ei valittu —",
+        "staffOnly": "Kyselyjä ja materiaaleja hallinnoi tapahtuman henkilökunta: moderaattorin linkillä näet ne tapahtuman sivulla.",
+        "postDefaultHint": "Jos et valitse mitään, tapahtuman jälkeen tarjotaan kysely ”{name}”."
       },
       "step5": {
         "heading": "Yhteenveto ja julkaisu",
@@ -903,7 +901,8 @@
         "privacyDoc": "Tietosuojaseloste-dokumentti (PDF tai linkki)",
         "privacyDocHelp": "Lataa PDF tai liitä vaihtoehtoisen tietosuojaselosteen URL. Korvaa GDPR-mallin, jos asetettu.",
         "privacyTextHelp": "Lyhyt teksti, joka näytetään ilmoittautumislomakkeessa; voi täydentää tai korvata GDPR-mallin.",
-        "technicalDetails": "Tekniset tiedot: kapasiteetti ja resurssit"
+        "technicalDetails": "Tekniset tiedot: kapasiteetti ja resurssit",
+        "retentionRange": "Anna päivien määrä väliltä 1–{max}."
       },
       "validationFailed": "Tarkista korostetut kentät ennen jatkamista.",
       "partialFailure": "Tapahtuma luotiin, mutta joitakin osia ei tallennettu: {items}. Voit lisätä ne tapahtuman sivulta.",
@@ -2424,7 +2423,38 @@
     "rubrica": {
       "title": "Osoitekirja",
       "subtitle": "Henkilöt, jotka ovat antaneet suostumuksen osoitekirjaan lisäämiseen (GDPR art. 6.1.a). Profiilitiedot päivitetään automaattisesti jokaisen uudelleenilmoittautumisen yhteydessä.",
-      "backToList": "← Takaisin osoitekirjaan"
+      "searchLabel": "Hae nimellä tai organisaatiolla",
+      "orgTypeLabel": "Organisaation tyyppi",
+      "allTypes": "Kaikki",
+      "includeOptedOut": "Näytä myös suostumuksensa peruneet",
+      "count": "Henkilöitä osoitekirjassa: {count}",
+      "empty": "Kukaan ei vastaa suodattimia.",
+      "noName": "(ei nimeä)",
+      "statusActive": "Suostumus voimassa",
+      "statusOptedOut": "Suostumus peruttu",
+      "col": {
+        "name": "Nimi",
+        "organization": "Organisaatio",
+        "type": "Tyyppi",
+        "events": "Tapahtumat",
+        "lastActive": "Viimeisin toiminta",
+        "status": "Tila",
+        "event": "Tapahtuma",
+        "eventDate": "Tapahtuman päivämäärä",
+        "registeredAt": "Ilmoittautumispäivä",
+        "orgSnapshot": "Organisaatio ilmoittautumishetkellä"
+      },
+      "deleteTitle": "Poista osoitekirjasta",
+      "deleteMessage": "Poistetaanko tämä henkilö pysyvästi osoitekirjasta? Ilmoittautumishistoria säilyy.",
+      "deleteFailed": "Poisto epäonnistui. Yritä uudelleen.",
+      "notFound": "Henkilöä ei löytynyt.",
+      "consentGivenAt": "Suostumus annettu",
+      "optedOutAt": "Suostumus peruttu",
+      "retentionMonths": "Säilytys (kuukautta)",
+      "deleteButton": "Poista osoitekirjasta (GDPR art. 17)",
+      "deleting": "Poistetaan…",
+      "historyTitle": "Ilmoittautumishistoria ({count})",
+      "historyEmpty": "Ei ilmoittautumisia."
     },
     "eventAnalytics": {
       "title": "Tilastot",
@@ -2600,7 +2630,6 @@
       "ov": {
         "tab": "Yleiskatsaus",
         "intro": "Mitä tekoälyputki tuotti tälle tallenteelle, kieli kerrallaan.",
-        "processing": "Käsittely on kesken tai tuotoksia ei ole vielä. Palaa, kun tila on ”Valmis”.",
         "loadError": "Yleiskatsausta ei voitu ladata.",
         "langsTitle": "Kielet ja tuotokset",
         "colLang": "Kieli",
@@ -2834,7 +2863,9 @@
       "full": "Sanasto on saavuttanut termien enimmäismäärän.",
       "invalid": "Tarkista kentät: jotkin arvot ovat virheellisiä.",
       "error": "Toiminto epäonnistui. Yritä uudelleen."
-    }
+    },
+    "deleteLiveBlocked": "Tapahtuma on käynnissä: lopeta se ennen poistamista.",
+    "bulkDeleteSkippedLive": "Poistamatta jääneet käynnissä olevat tapahtumat: {count}. Lopeta ne ennen poistamista."
   },
   "email": {
     "confirmationSubject": "Ilmoittautuminen vahvistettu: {eventTitle}",

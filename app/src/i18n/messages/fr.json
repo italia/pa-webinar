@@ -790,19 +790,18 @@
         "heading": "Personnes et invitations",
         "intro": "Ajoutez des organisateurs (affichés sur la page), des modérateurs, des intervenants et des invités.",
         "organizersHeading": "Organisateurs",
-        "organizersHelp": "Apparaissent sur la page publique de l'événement.",
-        "organizerName": "Référent",
-        "organizerOrganization": "Organisation",
+        "organizersHelp": "Les organisations qui organisent l'événement : le nom, le site et le logo apparaissent sur la page publique.",
+        "organizerName": "Nom de l'organisation",
         "organizerWebsite": "Site web",
         "organizerLogo": "Logo de l'organisateur",
-        "organizerRequired": "Le référent et l'organisation sont obligatoires.",
+        "organizerRequired": "Le nom de l'organisation est obligatoire.",
         "moderatorsHeading": "Modérateurs",
         "moderatorsHelp": "Les modérateurs peuvent gérer la session et contrôler les permissions pendant l'événement.",
         "moderatorName": "Nom",
         "moderatorEmail": "E-mail",
         "moderatorRequired": "Le nom et l'e-mail sont obligatoires.",
         "speakersHeading": "Intervenants",
-        "speakersHelp": "Reçoivent un lien de modérateur par e-mail.",
+        "speakersHelp": "Ils reçoivent par e-mail un lien personnel pour parler, utiliser leur caméra et partager leur écran, sans pouvoirs de modération.",
         "speakerName": "Nom",
         "speakerEmail": "E-mail",
         "speakerRequired": "Le nom et l'e-mail sont obligatoires.",
@@ -810,17 +809,15 @@
         "invitationsHelp": "Liste des personnes invitées. La plateforme n'envoie pas d'invitations : partagez vous-même le lien de l'événement. Lorsque l'inscription publique est désactivée, seules ces adresses peuvent s'inscrire, et le lien personnel pour entrer arrive par e-mail après l'inscription.",
         "invitationName": "Nom (facultatif)",
         "invitationEmail": "E-mail",
-        "invitationRole": "Rôle",
-        "role": {
-          "GUEST": "Invité",
-          "SPEAKER": "Intervenant"
-        },
         "add": "Ajouter",
         "remove": "Supprimer",
         "invalidEmail": "Adresse e-mail non valide.",
         "duplicateEmail": "Adresse déjà ajoutée.",
         "rubricaPick": "Rechercher dans le carnet d'adresses…",
-        "rubricaOrAdd": "ou ajouter manuellement"
+        "rubricaOrAdd": "ou ajouter manuellement",
+        "removeItem": "Supprimer {name}",
+        "invitationsStaffOnly": "Les invitations sont gérées par l'équipe de l'événement.",
+        "pickSkipped": "Certaines personnes figuraient déjà dans la liste ou n'avaient pas d'adresse valide, et n'ont pas été ajoutées."
       },
       "step4": {
         "heading": "Contenus et ressources",
@@ -840,11 +837,10 @@
         "remove": "Supprimer",
         "questionnairesHeading": "Questionnaires",
         "questionnairesIntro": "Combinez des modèles réutilisables avec des questions spécifiques à cet événement.",
-        "questionnairesEmpty": "Aucun questionnaire disponible. Créez-en un depuis Paramètres → Questionnaires.",
         "preHeading": "Questionnaire de pré-inscription",
         "postHeading": "Questionnaire après l'événement",
         "templatesLabel": "Modèles réutilisables",
-        "templatesEmpty": "Aucun modèle créé. Allez dans Paramètres → Questionnaires.",
+        "templatesEmpty": "Aucun modèle de questionnaire disponible : ajoutez ci-dessous les questions pour cet événement.",
         "adhocLabel": "Questions spécifiques à cet événement",
         "addQuestion": "+ Ajouter une question",
         "questionPrompt": "Texte de la question",
@@ -860,7 +856,9 @@
         "scaleMax": "Maximum",
         "required": "Obligatoire",
         "saveDraftAndGoQuestionnaires": "Enregistrer le brouillon et accéder à la gestion des questionnaires",
-        "none": "— Aucun —"
+        "none": "— Aucun —",
+        "staffOnly": "Les questionnaires et les ressources sont gérés par l'équipe de l'événement : avec le lien du modérateur, vous les voyez sur la page de l'événement.",
+        "postDefaultHint": "Si vous ne choisissez rien, le questionnaire « {name} » est proposé après l'événement."
       },
       "step5": {
         "heading": "Récapitulatif et publication",
@@ -903,7 +901,8 @@
         "privacyDoc": "Document de notice (PDF ou lien)",
         "privacyDocHelp": "Téléversez un PDF ou collez l'URL d'une notice alternative. Remplace le modèle RGPD lorsqu'il est défini.",
         "privacyTextHelp": "Texte synthétique affiché dans le formulaire d'inscription ; peut compléter ou remplacer le modèle RGPD.",
-        "technicalDetails": "Détails techniques : capacité et ressources"
+        "technicalDetails": "Détails techniques : capacité et ressources",
+        "retentionRange": "Saisissez un nombre de jours entre 1 et {max}."
       },
       "validationFailed": "Veuillez vérifier les champs en surbrillance avant de poursuivre.",
       "partialFailure": "Événement créé, mais certains éléments n'ont pas été enregistrés : {items}. Vous pouvez les ajouter depuis la page de l'événement.",
@@ -2424,7 +2423,38 @@
     "rubrica": {
       "title": "Carnet d'adresses",
       "subtitle": "Personnes ayant consenti à être inscrites au carnet d'adresses (art. 6.1.a RGPD). Les informations de profil sont mises à jour automatiquement à chaque ré-inscription.",
-      "backToList": "← Retour au carnet d'adresses"
+      "searchLabel": "Rechercher par nom ou organisation",
+      "orgTypeLabel": "Type d'organisation",
+      "allTypes": "Tous",
+      "includeOptedOut": "Inclure les personnes ayant retiré leur consentement",
+      "count": "Personnes dans le carnet d'adresses : {count}",
+      "empty": "Personne ne correspond aux filtres.",
+      "noName": "(sans nom)",
+      "statusActive": "Consentement actif",
+      "statusOptedOut": "Consentement retiré",
+      "col": {
+        "name": "Nom",
+        "organization": "Organisation",
+        "type": "Type",
+        "events": "Événements",
+        "lastActive": "Dernière activité",
+        "status": "Statut",
+        "event": "Événement",
+        "eventDate": "Date de l'événement",
+        "registeredAt": "Date d'inscription",
+        "orgSnapshot": "Organisation au moment de l'inscription"
+      },
+      "deleteTitle": "Supprimer du carnet d'adresses",
+      "deleteMessage": "Supprimer définitivement cette personne du carnet d'adresses ? L'historique des inscriptions est conservé.",
+      "deleteFailed": "La suppression a échoué. Veuillez réessayer.",
+      "notFound": "Personne introuvable.",
+      "consentGivenAt": "Consentement donné le",
+      "optedOutAt": "Consentement retiré le",
+      "retentionMonths": "Conservation (mois)",
+      "deleteButton": "Supprimer du carnet d'adresses (art. 17 RGPD)",
+      "deleting": "Suppression…",
+      "historyTitle": "Historique des inscriptions ({count})",
+      "historyEmpty": "Aucune inscription enregistrée."
     },
     "eventAnalytics": {
       "title": "Statistiques",
@@ -2600,7 +2630,6 @@
       "ov": {
         "tab": "Vue d'ensemble",
         "intro": "Ce que la chaîne IA a produit pour cet enregistrement, langue par langue.",
-        "processing": "Traitement en cours ou aucun artefact. Revenez quand le statut est « Terminé ».",
         "loadError": "Impossible de charger la vue d'ensemble.",
         "langsTitle": "Langues et artefacts",
         "colLang": "Langue",
@@ -2834,7 +2863,9 @@
       "full": "Le glossaire a atteint le nombre maximal de termes.",
       "invalid": "Vérifiez les champs : certaines valeurs ne sont pas valides.",
       "error": "L’opération a échoué. Réessayez."
-    }
+    },
+    "deleteLiveBlocked": "L'événement est en direct : terminez-le avant de le supprimer.",
+    "bulkDeleteSkippedLive": "Événements en direct non supprimés : {count}. Terminez-les avant de les supprimer."
   },
   "email": {
     "confirmationSubject": "Confirmation d'inscription : {eventTitle}",

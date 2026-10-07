@@ -790,19 +790,18 @@
         "heading": "Daoine agus cuirí",
         "intro": "Cuir eagraithe (taispeánta ar an leathanach), modhnóirí, cainteoirí agus aíonna cuireadh leis.",
         "organizersHeading": "Eagraithe",
-        "organizersHelp": "Le feiceáil ar leathanach poiblí an imeachta.",
-        "organizerName": "Pointe teagmhála",
-        "organizerOrganization": "Eagraíocht",
+        "organizersHelp": "Na heagraíochtaí atá ag eagrú an imeachta: feictear an t-ainm, an suíomh gréasáin agus an lógó ar an leathanach poiblí.",
+        "organizerName": "Ainm na heagraíochta",
         "organizerWebsite": "Suíomh gréasáin",
         "organizerLogo": "Lógó an eagraí",
-        "organizerRequired": "Tá pointe teagmhála agus eagraíocht riachtanach.",
+        "organizerRequired": "Tá ainm na heagraíochta riachtanach.",
         "moderatorsHeading": "Modhnóirí",
         "moderatorsHelp": "Is féidir le modhnóirí an seisiún a bhainistiú agus na ceadanna a rialú le linn an imeachta.",
         "moderatorName": "Ainm",
         "moderatorEmail": "Ríomhphost",
         "moderatorRequired": "Tá ainm agus ríomhphost riachtanach.",
         "speakersHeading": "Cainteoirí",
-        "speakersHelp": "Faigheann siad nasc modhnóra trí ríomhphost.",
+        "speakersHelp": "Faigheann siad nasc pearsanta trí ríomhphost chun labhairt, an ceamara a úsáid agus an scáileán a roinnt, gan cumhachtaí modhnóra.",
         "speakerName": "Ainm",
         "speakerEmail": "Ríomhphost",
         "speakerRequired": "Tá ainm agus ríomhphost riachtanach.",
@@ -810,17 +809,15 @@
         "invitationsHelp": "Liosta na ndaoine a bhfuil cuireadh acu. Ní sheolann an t-ardán cuirí: roinn féin nasc an imeachta leo. Nuair atá an clárú poiblí múchta, ní féidir ach leis na seoltaí seo clárú, agus seoltar an nasc pearsanta chun dul isteach trí ríomhphost tar éis an chlárúcháin.",
         "invitationName": "Ainm (roghnach)",
         "invitationEmail": "Ríomhphost",
-        "invitationRole": "Ról",
-        "role": {
-          "GUEST": "Aoi",
-          "SPEAKER": "Cainteoir"
-        },
         "add": "Cuir leis",
         "remove": "Bain",
         "invalidEmail": "Seoladh ríomhphoist neamhbhailí.",
         "duplicateEmail": "Tá an seoladh ann cheana.",
         "rubricaPick": "Cuardaigh ón leabhar seoltaí…",
-        "rubricaOrAdd": "nó cuir isteach de láimh é"
+        "rubricaOrAdd": "nó cuir isteach de láimh é",
+        "removeItem": "Bain {name}",
+        "invitationsStaffOnly": "Is í foireann an imeachta a bhainistíonn na cuirí.",
+        "pickSkipped": "Bhí daoine áirithe ar an liosta cheana nó ní raibh seoladh bailí acu, agus níor cuireadh leis iad."
       },
       "step4": {
         "heading": "Ábhar agus áiseanna",
@@ -840,11 +837,10 @@
         "remove": "Bain",
         "questionnairesHeading": "Ceistneoirí",
         "questionnairesIntro": "Cumaisc teimpléid ath-inúsáidte le ceisteanna sonracha don imeacht seo.",
-        "questionnairesEmpty": "Níl ceistneoir ar bith ar fáil. Cruthaigh ceistneoir ó Shocruithe → Ceistneoirí.",
         "preHeading": "Ceistneoir réamhchlárúcháin",
         "postHeading": "Ceistneoir iar-imeachta",
         "templatesLabel": "Teimpléid ath-inúsáidte",
-        "templatesEmpty": "Níor cruthaíodh teimpléad ar bith. Téigh go Socruithe → Ceistneoirí.",
+        "templatesEmpty": "Níl aon teimpléad ceistneora ar fáil: cuirigí na ceisteanna don imeacht seo thíos.",
         "adhocLabel": "Ceisteanna sonracha don imeacht seo",
         "addQuestion": "+ Cuir ceist leis",
         "questionPrompt": "Téacs na ceiste",
@@ -860,7 +856,9 @@
         "scaleMax": "Uasmhéid",
         "required": "Riachtanach",
         "saveDraftAndGoQuestionnaires": "Sábháil dréacht agus téigh chuig bainistíocht ceistneoirí",
-        "none": "— Gan ceann ar bith —"
+        "none": "— Gan ceann ar bith —",
+        "staffOnly": "Is í foireann an imeachta a bhainistíonn na ceistneoirí agus na háiseanna: le nasc an mhodhnóra feicfidh sibh iad ar leathanach an imeachta.",
+        "postDefaultHint": "Mura roghnaíonn sibh aon rud, tairgtear an ceistneoir “{name}” tar éis an imeachta."
       },
       "step5": {
         "heading": "Achoimre agus foilsiú",
@@ -903,7 +901,8 @@
         "privacyDoc": "Doiciméad fógra príobháideachais (PDF nó nasc)",
         "privacyDocHelp": "Uaslódáil PDF nó greamaigh URL fógra príobháideachais ionadúil. Sáraíonn sé an teimpléad GDPR má tá ceann ann.",
         "privacyTextHelp": "Téacs gairid taispeánta ar fhoirm an chlárúcháin; is féidir leis an teimpléad GDPR a chomhlánú nó a athrú.",
-        "technicalDetails": "Sonraí teicniúla: toilleadh agus acmhainní"
+        "technicalDetails": "Sonraí teicniúla: toilleadh agus acmhainní",
+        "retentionRange": "Cuirigí isteach líon laethanta idir 1 agus {max}."
       },
       "validationFailed": "Athbhreithnigh na réimsí aibhsithe sula leantar ar aghaidh.",
       "partialFailure": "Cruthaíodh an t-imeacht, ach níor sábháladh roinnt míreanna: {items}. Is féidir leat iad a chur leis ó leathanach an imeachta.",
@@ -2424,7 +2423,38 @@
     "rubrica": {
       "title": "Leabhar seoltaí",
       "subtitle": "Daoine a thug toiliú a gcur leis an leabhar seoltaí (airteagal 6.1.a GDPR). Nuashonraítear faisnéis phróifíle go huathoibríoch ag gach athchlárúchán.",
-      "backToList": "← Ar ais go dtí an leabhar seoltaí"
+      "searchLabel": "Cuardaigh de réir ainm nó eagraíochta",
+      "orgTypeLabel": "Cineál eagraíochta",
+      "allTypes": "Gach cineál",
+      "includeOptedOut": "Cuir san áireamh daoine a tharraing siar a dtoiliú",
+      "count": "Daoine sa leabhar seoltaí: {count}",
+      "empty": "Níl aon duine ag teacht leis na scagairí.",
+      "noName": "(gan ainm)",
+      "statusActive": "Toiliú tugtha",
+      "statusOptedOut": "Toiliú tarraingthe siar",
+      "col": {
+        "name": "Ainm",
+        "organization": "Eagraíocht",
+        "type": "Cineál",
+        "events": "Imeachtaí",
+        "lastActive": "Gníomhaíocht dheireanach",
+        "status": "Stádas",
+        "event": "Imeacht",
+        "eventDate": "Dáta an imeachta",
+        "registeredAt": "Dáta clárúcháin",
+        "orgSnapshot": "Eagraíocht tráth an chláraithe"
+      },
+      "deleteTitle": "Scrios ón leabhar seoltaí",
+      "deleteMessage": "An bhfuil sibh ag iarraidh an duine seo a scriosadh go buan ón leabhar seoltaí? Coinnítear stair na gclárúchán.",
+      "deleteFailed": "Theip ar an scriosadh. Bainigí triail eile as.",
+      "notFound": "Níor aimsíodh an duine.",
+      "consentGivenAt": "Toiliú tugtha ar",
+      "optedOutAt": "Toiliú tarraingthe siar ar",
+      "retentionMonths": "Coinneáil (míonna)",
+      "deleteButton": "Scrios ón leabhar seoltaí (airteagal 17 GDPR)",
+      "deleting": "Á scriosadh…",
+      "historyTitle": "Stair na gclárúchán ({count})",
+      "historyEmpty": "Níl aon chlárúchán taifeadta."
     },
     "eventAnalytics": {
       "title": "Staitisticí",
@@ -2600,7 +2630,6 @@
       "ov": {
         "tab": "Forbhreathnú",
         "intro": "A bhfuil cruthaithe ag an bpíblíne AI don taifeadadh seo, teanga ar theanga.",
-        "processing": "Á phróiseáil, nó níl aon déantán ar fáil fós. Tar ar ais nuair a bheidh an stádas “Críochnaithe”.",
         "loadError": "Níorbh fhéidir an forbhreathnú a lódáil.",
         "langsTitle": "Teangacha agus déantáin",
         "colLang": "Teanga",
@@ -2834,7 +2863,9 @@
       "full": "Tá an líon uasta téarmaí sa ghluais.",
       "invalid": "Seiceálaigí na réimsí: tá luachanna áirithe neamhbhailí.",
       "error": "Theip ar an oibríocht. Bain triail eile as."
-    }
+    },
+    "deleteLiveBlocked": "Tá an t-imeacht beo: críochnaígí é sula scriosfaidh sibh é.",
+    "bulkDeleteSkippedLive": "Imeachtaí beo nár scriosadh: {count}. Críochnaígí iad sula scriosfaidh sibh iad."
   },
   "email": {
     "confirmationSubject": "Clárú deimhnithe: {eventTitle}",

@@ -790,19 +790,18 @@
         "heading": "Osobe i pozivnice",
         "intro": "Dodajte organizatore (prikazani na stranici), moderatore, govornike i pozvane goste.",
         "organizersHeading": "Organizatori",
-        "organizersHelp": "Pojavljuju se na javnoj stranici događaja.",
-        "organizerName": "Kontakt osoba",
-        "organizerOrganization": "Organizacija",
+        "organizersHelp": "Organizacije koje organiziraju događaj: naziv, web-mjesto i logotip prikazuju se na javnoj stranici.",
+        "organizerName": "Naziv organizacije",
         "organizerWebsite": "Mrežno mjesto",
         "organizerLogo": "Logotip organizatora",
-        "organizerRequired": "Kontakt osoba i organizacija su obavezni.",
+        "organizerRequired": "Naziv organizacije je obavezan.",
         "moderatorsHeading": "Moderatori",
         "moderatorsHelp": "Moderatori mogu upravljati sesijom i kontrolirati dozvole tijekom događaja.",
         "moderatorName": "Ime",
         "moderatorEmail": "E-pošta",
         "moderatorRequired": "Ime i e-pošta su obavezni.",
         "speakersHeading": "Govornici",
-        "speakersHelp": "Putem e-pošte primaju moderatorsku poveznicu.",
+        "speakersHelp": "E-poštom dobivaju osobnu poveznicu za govor, korištenje kamere i dijeljenje zaslona, bez ovlasti moderatora.",
         "speakerName": "Ime",
         "speakerEmail": "E-pošta",
         "speakerRequired": "Ime i e-pošta su obavezni.",
@@ -810,17 +809,15 @@
         "invitationsHelp": "Popis pozvanih osoba. Platforma ne šalje pozivnice: sami podijelite poveznicu na događaj. Kad je javna registracija isključena, mogu se registrirati samo ove adrese, a osobna poveznica za ulazak stiže e-poštom nakon registracije.",
         "invitationName": "Ime (neobavezno)",
         "invitationEmail": "E-pošta",
-        "invitationRole": "Uloga",
-        "role": {
-          "GUEST": "Gost",
-          "SPEAKER": "Govornik"
-        },
         "add": "Dodaj",
         "remove": "Ukloni",
         "invalidEmail": "Adresa e-pošte nije valjana.",
         "duplicateEmail": "Adresa je već dodana.",
         "rubricaPick": "Pretraži iz imenika…",
-        "rubricaOrAdd": "ili dodajte ručno"
+        "rubricaOrAdd": "ili dodajte ručno",
+        "removeItem": "Ukloni {name}",
+        "invitationsStaffOnly": "Pozivnicama upravlja osoblje događaja.",
+        "pickSkipped": "Neke osobe već su bile navedene ili nisu imale valjanu adresu, pa nisu dodane."
       },
       "step4": {
         "heading": "Sadržaj i materijali",
@@ -840,11 +837,10 @@
         "remove": "Ukloni",
         "questionnairesHeading": "Upitnici",
         "questionnairesIntro": "Kombinirajte ponovno upotrebljive predloške s pitanjima specifičnim za ovaj događaj.",
-        "questionnairesEmpty": "Nema dostupnih upitnika. Stvorite upitnik u Postavke → Upitnici.",
         "preHeading": "Upitnik prije prijave",
         "postHeading": "Upitnik nakon događaja",
         "templatesLabel": "Ponovno upotrebljivi predlošci",
-        "templatesEmpty": "Nema stvorenih predložaka. Idite u Postavke → Upitnici.",
+        "templatesEmpty": "Nema dostupnih predložaka upitnika: dodajte pitanja za ovaj događaj u nastavku.",
         "adhocLabel": "Pitanja specifična za ovaj događaj",
         "addQuestion": "+ Dodaj pitanje",
         "questionPrompt": "Tekst pitanja",
@@ -860,7 +856,9 @@
         "scaleMax": "Najviše",
         "required": "Obavezno",
         "saveDraftAndGoQuestionnaires": "Spremi nacrt i idi na upravljanje upitnicima",
-        "none": "— Nijedan —"
+        "none": "— Nijedan —",
+        "staffOnly": "Upitnicima i materijalima upravlja osoblje događaja: s poveznicom moderatora vidite ih na stranici događaja.",
+        "postDefaultHint": "Ako ništa ne odaberete, nakon događaja nudi se upitnik „{name}”."
       },
       "step5": {
         "heading": "Sažetak i objava",
@@ -903,7 +901,8 @@
         "privacyDoc": "Dokument obavijesti (PDF ili poveznica)",
         "privacyDocHelp": "Učitajte PDF ili zalijepite URL alternativne obavijesti. Ako je postavljeno, nadjačava GDPR predložak.",
         "privacyTextHelp": "Sažeti tekst prikazan u obrascu za prijavu; može nadopuniti ili zamijeniti GDPR predložak.",
-        "technicalDetails": "Tehnički detalji: kapacitet i resursi"
+        "technicalDetails": "Tehnički detalji: kapacitet i resursi",
+        "retentionRange": "Unesite broj dana između 1 i {max}."
       },
       "validationFailed": "Provjerite istaknuta polja prije nastavka.",
       "partialFailure": "Događaj je stvoren, ali neke stavke nisu spremljene: {items}. Možeš ih dodati sa stranice događaja.",
@@ -2424,7 +2423,38 @@
     "rubrica": {
       "title": "Imenik",
       "subtitle": "Osobe koje su dale privolu za uvrštavanje u imenik (čl. 6.1.a GDPR). Podaci profila automatski se ažuriraju pri svakoj ponovnoj prijavi.",
-      "backToList": "← Natrag u imenik"
+      "searchLabel": "Pretraži po imenu ili organizaciji",
+      "orgTypeLabel": "Vrsta organizacije",
+      "allTypes": "Sve",
+      "includeOptedOut": "Uključi osobe koje su povukle privolu",
+      "count": "Osobe u imeniku: {count}",
+      "empty": "Nitko ne odgovara filtrima.",
+      "noName": "(bez imena)",
+      "statusActive": "Privola dana",
+      "statusOptedOut": "Privola povučena",
+      "col": {
+        "name": "Ime",
+        "organization": "Organizacija",
+        "type": "Vrsta",
+        "events": "Događaji",
+        "lastActive": "Posljednja aktivnost",
+        "status": "Status",
+        "event": "Događaj",
+        "eventDate": "Datum događaja",
+        "registeredAt": "Datum prijave",
+        "orgSnapshot": "Organizacija u trenutku prijave"
+      },
+      "deleteTitle": "Izbriši iz imenika",
+      "deleteMessage": "Trajno izbrisati ovu osobu iz imenika? Povijest prijava ostaje sačuvana.",
+      "deleteFailed": "Brisanje nije uspjelo. Pokušajte ponovno.",
+      "notFound": "Osoba nije pronađena.",
+      "consentGivenAt": "Privola dana",
+      "optedOutAt": "Privola povučena",
+      "retentionMonths": "Čuvanje (mjeseci)",
+      "deleteButton": "Izbriši iz imenika (čl. 17 GDPR)",
+      "deleting": "Brisanje…",
+      "historyTitle": "Povijest prijava ({count})",
+      "historyEmpty": "Nema zabilježenih prijava."
     },
     "eventAnalytics": {
       "title": "Statistika",
@@ -2600,7 +2630,6 @@
       "ov": {
         "tab": "Pregled",
         "intro": "Što je AI pipeline izradio za ovu snimku, jezik po jezik.",
-        "processing": "Obrada je u tijeku ili još nema artefakata. Vrati se kada stanje bude »Dovršeno«.",
         "loadError": "Pregled nije moguće učitati.",
         "langsTitle": "Jezici i artefakti",
         "colLang": "Jezik",
@@ -2834,7 +2863,9 @@
       "full": "Pojmovnik je dosegao najveći broj pojmova.",
       "invalid": "Provjerite polja: neke vrijednosti nisu valjane.",
       "error": "Radnja nije uspjela. Pokušajte ponovno."
-    }
+    },
+    "deleteLiveBlocked": "Događaj je uživo: završite ga prije brisanja.",
+    "bulkDeleteSkippedLive": "Neizbrisani događaji uživo: {count}. Završite ih prije brisanja."
   },
   "email": {
     "confirmationSubject": "Potvrda prijave: {eventTitle}",

@@ -18,6 +18,7 @@ import {
 import { Icon } from '@/components/ui/icon';
 import ToggleSwitch from '@/components/ui/toggle-switch';
 import { useConfirm } from '@/components/ui/confirm-dialog';
+import { MAX_RETENTION_DAYS } from '@/lib/validation/retention';
 
 interface SerializedTemplate {
   id: string;
@@ -155,7 +156,12 @@ export default function TemplateManagement({
       multitrackRecordingEnabled: tpl.multitrackRecordingEnabled,
       retainParticipantTracks: tpl.retainParticipantTracks,
       descriptionTemplateIt: tpl.descriptionTemplate?.it ?? '',
-      defaultRetentionDays: tpl.defaultRetentionDays,
+      // Un valore salvato prima del limite attuale si riporta entro il
+      // massimo: altrimenti il template non si risalverebbe piu'.
+      defaultRetentionDays:
+        tpl.defaultRetentionDays == null
+          ? null
+          : Math.min(tpl.defaultRetentionDays, MAX_RETENTION_DAYS),
       defaultExpectedSpeakers: tpl.defaultExpectedSpeakers,
     });
     setEditing(tpl.id);
@@ -497,7 +503,7 @@ function TemplateForm({
             )
           }
           min={1}
-          max={3650}
+          max={MAX_RETENTION_DAYS}
         />
       </FormGroup>
 

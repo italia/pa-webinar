@@ -17,6 +17,7 @@ import EventConfigDiagram from '@/components/admin/event-config-diagram';
 import JvbCapacityPreview, { capacityWarnings } from '@/components/admin/jvb-capacity-preview';
 import FileOrUrlInput from '@/components/ui/file-or-url-input';
 import { togglesFromMatrix } from '@/lib/utils/permission-matrix';
+import { MAX_RETENTION_DAYS } from '@/lib/validation/retention';
 import { describeRRule } from '@/lib/utils/recurrence';
 import type { JvbSizingConfig } from '@/lib/jvb-sizing';
 
@@ -50,6 +51,9 @@ interface Props {
   /** L'email con cui il wizard ha precompilato il moderatore principale (chi
    *  crea l'evento): finche' resta quella, la pagina lo dice. */
   prefilledModeratorEmail?: string | null;
+  /** Il massimo per la conservazione: piu' alto del normale solo in modifica,
+   *  per un evento gia' salvato cosi'. */
+  retentionMax?: number;
 }
 
 export default function Step5Review({
@@ -61,6 +65,7 @@ export default function Step5Review({
   gdprTemplates,
   fieldErrors = {},
   prefilledModeratorEmail = null,
+  retentionMax = MAX_RETENTION_DAYS,
 }: Props) {
   const t = useTranslations('admin.wizard.step5');
   const toggles = togglesFromMatrix(form.permissionMatrix);
@@ -246,8 +251,8 @@ export default function Step5Review({
               id="rev-retention"
               type="number"
               min={1}
-              max={365}
-              className="form-control"
+              max={retentionMax}
+              className={`form-control${fieldErrors.dataRetentionDays ? ' is-invalid' : ''}`}
               value={form.dataRetentionDays}
               onChange={(e) =>
                 onChange({
@@ -255,8 +260,14 @@ export default function Step5Review({
                     Number(e.target.value) || form.dataRetentionDays,
                 })
               }
+              aria-describedby="rev-retention-help"
             />
-            <small className="form-text text-muted">
+            {fieldErrors.dataRetentionDays && (
+              <div className="invalid-feedback d-block">
+                {t('retentionRange', { max: MAX_RETENTION_DAYS })}
+              </div>
+            )}
+            <small id="rev-retention-help" className="form-text text-muted">
               {t('retentionHelp')}
             </small>
           </div>

@@ -12,6 +12,7 @@ import {
 } from 'design-react-kit';
 
 import { Link, percorso } from '@/i18n/navigation';
+import { useToast } from '@/components/ui/toast';
 import { eventAdminPath } from '@/lib/events/admin-links';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import EventTitle from '@/components/events/event-title';
@@ -114,6 +115,7 @@ export default function AdminDashboardClient({
   const t = useTranslations('admin');
   const tList = useTranslations('admin.eventsList');
   const tc = useTranslations('common');
+  const toast = useToast();
   const te = useTranslations('events');
   const tStatus = useTranslations('events.status');
   const router = useRouter();
@@ -261,17 +263,19 @@ export default function AdminDashboardClient({
         body: JSON.stringify({ ids: Array.from(selected) }),
       });
       if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
-        setError(body.error?.message ?? tc('errorGeneric'));
+        setError(tc('errorGeneric'));
         return;
       }
+      const { skippedLive = 0 } = (await res.json().catch(() => ({}))) as { skippedLive?: number };
       setPendingAction(null);
       setSelected(new Set());
+      // Il modale si e' chiuso: l'avviso va in una notifica, non nel suo corpo.
+      if (skippedLive > 0) toast.info(t('bulkDeleteSkippedLive', { count: skippedLive }));
       router.refresh();
     } finally {
       setSubmitting(false);
     }
-  }, [pendingAction, selected, tc, router]);
+  }, [pendingAction, selected, t, tc, toast, router]);
 
   const selectedCount = selected.size;
   const allVisibleSelected =

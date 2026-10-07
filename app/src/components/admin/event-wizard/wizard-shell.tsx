@@ -22,6 +22,7 @@ import { useTranslations } from 'next-intl';
 import { useRouter, percorso } from '@/i18n/navigation';
 import { useToast } from '@/components/ui/toast';
 import { eventAdminPath } from '@/lib/events/admin-links';
+import { MAX_RETENTION_DAYS } from '@/lib/validation/retention';
 import {
   coerceMatrix,
   defaultMatrix,
@@ -180,7 +181,6 @@ export interface InitialEventShape {
   organizers: Array<{
     id: string;
     name: string;
-    organization: string;
     logoUrl: string | null;
     websiteUrl: string | null;
   }>;
@@ -241,6 +241,11 @@ export default function EventWizard(props: WizardProps) {
   const mode: 'create' | 'edit' = props.mode ?? 'create';
   const viaToken = props.viaToken ?? null;
   const initialEvent = props.initialEvent;
+  // Un evento gia' salvato con una conservazione piu' lunga del massimo (le
+  // pubblicazioni in libreria) si puo' modificare senza toccarla: in quel caso
+  // il valore non si rimanda (vedi il payload).
+  const initialRetention = initialEvent?.event.dataRetentionDays ?? null;
+  const retentionMax = Math.max(MAX_RETENTION_DAYS, initialRetention ?? 0);
   /**
    * Lo scatto delle risorse collegate, aggiornato a ogni salvataggio riuscito.
    *
@@ -341,7 +346,6 @@ export default function EventWizard(props: WizardProps) {
         // Step 3 — seed lists from related entities.
         organizers: initialEvent.organizers.map((o) => ({
           name: o.name,
-          organization: o.organization,
           logoUrl: o.logoUrl,
           websiteUrl: o.websiteUrl,
         })),
@@ -489,7 +493,12 @@ export default function EventWizard(props: WizardProps) {
       postEventQuestionnaire: { templateIds: [], adhocQuestions: [] },
 
       // Step 5 fields written here so review can surface them
-      dataRetentionDays: tpl?.defaultRetentionDays ?? props.defaultRetentionDays,
+      // Un template salvato prima del limite attuale puo' avere un valore piu'
+      // alto: si riporta entro il massimo, altrimenti l'evento non si salva.
+      dataRetentionDays: Math.min(
+        tpl?.defaultRetentionDays ?? props.defaultRetentionDays,
+        MAX_RETENTION_DAYS,
+      ),
       // Il modello marcato come predefinito esiste per essere pre-scelto sui
       // nuovi eventi: senza questo la colonna resterebbe vuota su ogni evento
       // creato da qui, e quella marcatura non avrebbe alcun effetto.
@@ -554,7 +563,7 @@ export default function EventWizard(props: WizardProps) {
     const chiavi = chiaviClientRef.current;
     if (chiavi.size === 0) return;
     const ancora: Record<string, string> = { ...validatePublish(form) };
-    for (const k of STEP_KEYS) Object.assign(ancora, validateStep(k, form, props.defaultLocale));
+    for (const k of STEP_KEYS) Object.assign(ancora, validateStep(k, form, props.defaultLocale, retentionMax));
     const risolte = [...chiavi].filter((k) => !(k in ancora));
     if (risolte.length === 0) return;
     for (const k of risolte) chiavi.delete(k);
@@ -709,7 +718,7 @@ export default function EventWizard(props: WizardProps) {
   const stepIndex = STEP_KEYS.indexOf(activeStep);
   const goPrev = () => stepIndex > 0 && setActiveStep(STEP_KEYS[stepIndex - 1]!);
   const goNext = () => {
-    const errs = validateStep(activeStep, form, props.defaultLocale);
+    const errs = validateStep(activeStep, form, props.defaultLocale, retentionMax);
     if (Object.keys(errs).length > 0) {
       chiaviClientRef.current = new Set(Object.keys(errs));
       fuocoRichiestoRef.current = true;
@@ -769,7 +778,7 @@ export default function EventWizard(props: WizardProps) {
       // Validate every step before submitting (especially on publish).
       const aggregated: Record<string, string> = {};
       for (const key of STEP_KEYS) {
-        Object.assign(aggregated, validateStep(key, form, props.defaultLocale));
+        Object.assign(aggregated, validateStep(key, form, props.defaultLocale, retentionMax));
       }
       if (submitMode === 'publish') {
         Object.assign(aggregated, validatePublish(form));
@@ -785,7 +794,7 @@ export default function EventWizard(props: WizardProps) {
         // portiamo l'utente lì (altrimenti il messaggio resta senza campo
         // evidenziato visibile).
         const firstFailing = STEP_KEYS.find((k) =>
-          Object.keys(validateStep(k, form, props.defaultLocale)).length > 0,
+          Object.keys(validateStep(k, form, props.defaultLocale, retentionMax)).length > 0,
         );
         if (firstFailing) setActiveStep(firstFailing);
         else if (aggregated.moderatorName || aggregated.moderatorEmail) {
@@ -866,8 +875,12 @@ export default function EventWizard(props: WizardProps) {
           aiTargetLocales: form.aiTargetLocales,
           expectedSpeakers: form.expectedSpeakers,
 
-          // Review step
-          dataRetentionDays: form.dataRetentionDays,
+          // Review step. In modifica si manda solo se cambiato: un valore
+          // oltre il massimo, gia' salvato, il server non lo riaccetterebbe.
+          dataRetentionDays:
+            mode === 'edit' && form.dataRetentionDays === initialRetention
+              ? undefined
+              : form.dataRetentionDays,
           gdprTemplateId: form.gdprTemplateId,
           // La stringa vuota si spedisce, non si trasforma in `undefined`: il
           // server scrive il campo solo quando è definito, e scegliere un
@@ -892,8 +905,9 @@ export default function EventWizard(props: WizardProps) {
           const eventId = initialEvent.id;
           const moderatorToken = initialEvent.moderatorToken;
 
+          // Il token solo nell'intestazione: nell'indirizzo finirebbe nei log.
           const putRes = await fetch(
-            `/api/events/${eventId}?token=${encodeURIComponent(moderatorToken)}`,
+            `/api/events/${eventId}`,
             {
               method: 'PUT',
               headers: {
@@ -1159,6 +1173,8 @@ export default function EventWizard(props: WizardProps) {
       tDetail,
       mode,
       initialEvent,
+      initialRetention,
+      retentionMax,
       showError,
       serverErrorMessage,
     ],
@@ -1249,15 +1265,22 @@ export default function EventWizard(props: WizardProps) {
         )}
         {activeStep === 'invites' && (
           <RubricaAccessContext.Provider value={props.canUseRubrica ?? false}>
-            <Step3Invites value={form} onChange={updateForm} />
+            <Step3Invites
+              value={form}
+              onChange={updateForm}
+              invitationsLocked={viaToken !== null}
+              primaryModeratorEmail={form.moderatorEmail}
+            />
           </RubricaAccessContext.Provider>
         )}
         {activeStep === 'content' && (
           <Step4Content
             value={form}
             onChange={updateForm}
-            onSaveDraftAndNavigate={saveDraftAndNavigate}
+            onSaveDraftAndNavigate={mode === 'create' ? saveDraftAndNavigate : undefined}
             submitting={submitting}
+            staffLocked={viaToken !== null}
+            defaultFeedbackHint={mode === 'create'}
           />
         )}
         {activeStep === 'review' && (
@@ -1270,6 +1293,7 @@ export default function EventWizard(props: WizardProps) {
             gdprTemplates={props.gdprTemplates}
             fieldErrors={fieldErrors}
             prefilledModeratorEmail={mode === 'edit' ? null : props.defaultModerator?.email ?? null}
+            retentionMax={retentionMax}
           />
         )}
       </div>

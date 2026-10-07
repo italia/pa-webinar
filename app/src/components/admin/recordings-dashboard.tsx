@@ -288,12 +288,15 @@ export default function RecordingsDashboard({
           fmt={fmt}
         />
       ) : (
-        <LibraryView />
+        // Chiamata come funzione, non come <Componente/>: definita qui dentro,
+        // a ogni render sarebbe un tipo nuovo, e React smonterebbe la vista
+        // (il campo di ricerca perderebbe il fuoco a ogni tasto).
+        renderLibrary()
       )}
     </div>
   );
 
-  function LibraryView() {
+  function renderLibrary() {
     return (
       <div>
       {/* Filters */}

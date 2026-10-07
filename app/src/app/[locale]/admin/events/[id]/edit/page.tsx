@@ -224,10 +224,6 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
     organizers: event.organizers.map((o) => ({
       id: o.id,
       name: o.name,
-      // The wizard's OrganizerEntry carries an `organization` string. The
-      // DB model doesn't have a separate "organization" column yet — use
-      // the name as a stand-in so the picker doesn't show an empty field.
-      organization: o.name,
       logoUrl: o.logoUrl,
       websiteUrl: o.websiteUrl,
     })),

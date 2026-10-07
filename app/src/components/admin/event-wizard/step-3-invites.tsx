@@ -1,16 +1,17 @@
 'use client';
 
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
 import RubricaPicker, {
+  RubricaAccessContext,
   type RubricaPickedPerson,
 } from '@/components/admin/rubrica-picker';
 import FileOrUrlInput from '@/components/ui/file-or-url-input';
 
+/** Un ente che organizza l'evento: compare nella pagina pubblica. */
 export interface OrganizerEntry {
   name: string;
-  organization: string;
   logoUrl: string | null;
   websiteUrl: string | null;
 }
@@ -27,6 +28,11 @@ export interface SpeakerEntry {
   personId: string | null;
 }
 
+/**
+ * Una persona invitata. Il ruolo resta quello salvato (gli inviti nuovi sono
+ * ospiti): chi deve parlare si aggiunge fra i relatori, che hanno un accesso
+ * proprio.
+ */
 export interface InvitationEntry {
   name: string | null;
   email: string;
@@ -44,14 +50,25 @@ export interface Step3Value {
 interface Props {
   value: Step3Value;
   onChange: (patch: Partial<Step3Value>) => void;
+  /** Con il solo link del moderatore gli inviti si vedono ma non si
+   *  modificano: li gestisce lo staff. */
+  invitationsLocked?: boolean;
+  /** Il moderatore principale (passo Riepilogo): non si aggiunge anche qui. */
+  primaryModeratorEmail?: string | null;
 }
 
 function isEmail(s: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
 }
 
-export default function Step3Invites({ value, onChange }: Props) {
+export default function Step3Invites({
+  value,
+  onChange,
+  invitationsLocked = false,
+  primaryModeratorEmail = null,
+}: Props) {
   const t = useTranslations('admin.wizard.step3');
+  const principale = primaryModeratorEmail?.trim() ? [primaryModeratorEmail.trim()] : [];
 
   return (
     <div>
@@ -67,20 +84,104 @@ export default function Step3Invites({ value, onChange }: Props) {
         onChange={(next) => onChange({ organizers: next })}
       />
 
-      <ModeratorsSection
+      <PeopleSection
+        kind="moderators"
         value={value.moderators}
         onChange={(next) => onChange({ moderators: next })}
+        taken={[...principale, ...value.speakers.map((p) => p.email)]}
       />
 
-      <SpeakersSection
+      <PeopleSection
+        kind="speakers"
         value={value.speakers}
         onChange={(next) => onChange({ speakers: next })}
+        taken={[...principale, ...value.moderators.map((p) => p.email)]}
       />
 
       <InvitationsSection
         value={value.invitations}
         onChange={(next) => onChange({ invitations: next })}
+        locked={invitationsLocked}
       />
+    </div>
+  );
+}
+
+function SectionHeading({ title, help }: { title: string; help: string }) {
+  return (
+    <>
+      <h3 className="h6 fw-semibold mb-2" style={{ color: 'var(--app-text)' }}>
+        {title}
+      </h3>
+      <p className="text-secondary mb-2" style={{ fontSize: '0.85rem' }}>
+        {help}
+      </p>
+    </>
+  );
+}
+
+/** L'elenco di chi e' gia' stato aggiunto; senza `onRemove` e' in sola lettura. */
+function AddedList<T>({
+  items,
+  keyOf,
+  primary,
+  secondary,
+  onRemove,
+}: {
+  items: T[];
+  keyOf: (item: T) => string;
+  primary: (item: T) => string;
+  secondary: (item: T) => string | null;
+  onRemove?: (index: number) => void;
+}) {
+  const t = useTranslations('admin.wizard.step3');
+  if (items.length === 0) return null;
+  return (
+    <ul className="list-group mb-3">
+      {items.map((item, i) => (
+        <li
+          key={`${keyOf(item)}-${i}`}
+          className="list-group-item d-flex justify-content-between align-items-center gap-2"
+        >
+          <div className="text-break">
+            <div className="fw-semibold">{primary(item)}</div>
+            {secondary(item) && <small className="text-muted">{secondary(item)}</small>}
+          </div>
+          {onRemove && (
+            <button
+              type="button"
+              className="btn btn-sm btn-outline-danger flex-shrink-0"
+              onClick={() => onRemove(i)}
+              aria-label={t('removeItem', { name: primary(item) })}
+            >
+              {t('remove')}
+            </button>
+          )}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/** La ricerca in rubrica, quando chi compila puo' usarla. */
+function RubricaRow({ onAddMany }: { onAddMany: (picks: RubricaPickedPerson[]) => void }) {
+  const t = useTranslations('admin.wizard.step3');
+  if (!useContext(RubricaAccessContext)) return null;
+  return (
+    <div className="mb-2">
+      <RubricaPicker mode="multi" onAddMany={onAddMany} placeholder={t('rubricaPick')} />
+      <small className="text-muted">{t('rubricaOrAdd')}</small>
+    </div>
+  );
+}
+
+function FieldError({ message }: { message: string | null }) {
+  if (!message) return null;
+  return (
+    <div className="col-12">
+      <small className="text-danger" role="alert">
+        {message}
+      </small>
     </div>
   );
 }
@@ -93,16 +194,13 @@ function OrganizersSection({
   onChange: (next: OrganizerEntry[]) => void;
 }) {
   const t = useTranslations('admin.wizard.step3');
-  const [draft, setDraft] = useState<OrganizerEntry>({
-    name: '',
-    organization: '',
-    logoUrl: null,
-    websiteUrl: null,
-  });
+  const id = 'org';
+  const vuoto: OrganizerEntry = { name: '', logoUrl: null, websiteUrl: null };
+  const [draft, setDraft] = useState<OrganizerEntry>(vuoto);
   const [err, setErr] = useState<string | null>(null);
 
   const add = () => {
-    if (!draft.name.trim() || !draft.organization.trim()) {
+    if (!draft.name.trim()) {
       setErr(t('organizerRequired'));
       return;
     }
@@ -111,257 +209,163 @@ function OrganizersSection({
       ...value,
       {
         name: draft.name.trim(),
-        organization: draft.organization.trim(),
         logoUrl: draft.logoUrl?.trim() || null,
         websiteUrl: draft.websiteUrl?.trim() || null,
       },
     ]);
-    setDraft({ name: '', organization: '', logoUrl: null, websiteUrl: null });
-  };
-
-  const onPick = (p: RubricaPickedPerson) => {
-    setDraft((d) => ({
-      ...d,
-      name: p.displayName || d.name,
-      organization: p.organization ?? d.organization,
-    }));
+    setDraft(vuoto);
   };
 
   return (
     <section className="mb-4">
-      <h3 className="h6 fw-semibold mb-2" style={{ color: 'var(--app-text)' }}>
-        {t('organizersHeading')}
-      </h3>
-      <p className="text-secondary mb-2" style={{ fontSize: '0.85rem' }}>
-        {t('organizersHelp')}
-      </p>
-
-      {value.length > 0 && (
-        <ul className="list-group mb-3">
-          {value.map((o, i) => (
-            <li
-              key={`${o.name}-${i}`}
-              className="list-group-item d-flex justify-content-between align-items-center"
-            >
-              <div>
-                <div className="fw-semibold">{o.name}</div>
-                <small className="text-muted">{o.organization}</small>
-                {o.websiteUrl && (
-                  <div>
-                    <small className="text-muted">{o.websiteUrl}</small>
-                  </div>
-                )}
-              </div>
-              <button
-                type="button"
-                className="btn btn-sm btn-outline-danger"
-                onClick={() => onChange(value.filter((_, j) => j !== i))}
-              >
-                {t('remove')}
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
-
-      <div className="mb-2">
-        <RubricaPicker onSelect={onPick} placeholder={t('rubricaPick')} />
-        <small className="text-muted">{t('rubricaOrAdd')}</small>
-      </div>
+      <SectionHeading title={t('organizersHeading')} help={t('organizersHelp')} />
+      <AddedList
+        items={value}
+        keyOf={(o) => o.name}
+        primary={(o) => o.name}
+        secondary={(o) => o.websiteUrl}
+        onRemove={(i) => onChange(value.filter((_, j) => j !== i))}
+      />
 
       <div className="row g-2 align-items-end">
-        <div className="col-md-4">
-          <label className="form-label" htmlFor="org-name">
+        <div className="col-md-6">
+          <label className="form-label" htmlFor={`${id}-name`}>
             {t('organizerName')}
           </label>
           <input
-            id="org-name"
+            id={`${id}-name`}
             type="text"
             className="form-control"
             value={draft.name}
             onChange={(e) => setDraft({ ...draft, name: e.target.value })}
-            required
           />
         </div>
-        <div className="col-md-3">
-          <label className="form-label" htmlFor="org-org">
-            {t('organizerOrganization')}
-          </label>
-          <input
-            id="org-org"
-            type="text"
-            className="form-control"
-            value={draft.organization}
-            onChange={(e) =>
-              setDraft({ ...draft, organization: e.target.value })
-            }
-            required
-          />
-        </div>
-        <div className="col-md-3">
-          <label className="form-label" htmlFor="org-web">
+        <div className="col-md-6">
+          <label className="form-label" htmlFor={`${id}-web`}>
             {t('organizerWebsite')}
           </label>
           <input
-            id="org-web"
+            id={`${id}-web`}
             type="url"
             className="form-control"
             value={draft.websiteUrl ?? ''}
-            onChange={(e) =>
-              setDraft({ ...draft, websiteUrl: e.target.value || null })
-            }
+            onChange={(e) => setDraft({ ...draft, websiteUrl: e.target.value || null })}
           />
         </div>
         <div className="col-12">
           <FileOrUrlInput
-            id="org-logo"
+            id={`${id}-logo`}
             label={t('organizerLogo')}
             assetType="image"
             value={draft.logoUrl}
             onChange={(v) => setDraft({ ...draft, logoUrl: v })}
           />
         </div>
-        <div className="col-md-2">
-          <button
-            type="button"
-            className="btn btn-primary w-100"
-            onClick={add}
-            disabled={!draft.name.trim() || !draft.organization.trim()}
-          >
+        <div className="col-md-3">
+          <button type="button" className="btn btn-primary w-100" onClick={add}>
             {t('add')}
           </button>
         </div>
-        {err && (
-          <div className="col-12">
-            <small className="text-danger">{err}</small>
-          </div>
-        )}
+        <FieldError message={err} />
       </div>
     </section>
   );
 }
 
-function ModeratorsSection({
+/** Co-moderatori e relatori: stesso modulo, accesso diverso. */
+function PeopleSection({
+  kind,
   value,
   onChange,
+  taken,
 }: {
+  kind: 'moderators' | 'speakers';
   value: ModeratorEntry[];
   onChange: (next: ModeratorEntry[]) => void;
+  /** Gli indirizzi gia' nell'altro elenco: una persona ha un ruolo solo. */
+  taken: readonly string[];
 }) {
   const t = useTranslations('admin.wizard.step3');
-  const [draft, setDraft] = useState<ModeratorEntry>({
-    name: '',
-    email: '',
-    personId: null,
-  });
+  // Ogni sezione compare una volta sola nel passo: gli id fissi bastano.
+  const id = kind === 'moderators' ? 'mod' : 'sp';
+  const [draft, setDraft] = useState<ModeratorEntry>({ name: '', email: '', personId: null });
   const [err, setErr] = useState<string | null>(null);
+  // Gli indirizzi gia' usati, senza distinguere maiuscole: quelli caricati da
+  // un evento esistente possono averne.
+  const giaPresenti = new Set([...value.map((p) => p.email), ...taken].map((e) => e.toLowerCase()));
 
   const add = () => {
     if (!draft.name.trim() || !draft.email.trim()) {
-      setErr(t('moderatorRequired'));
+      setErr(t(kind === 'moderators' ? 'moderatorRequired' : 'speakerRequired'));
       return;
     }
-    if (!isEmail(draft.email.trim())) {
+    const email = draft.email.trim().toLowerCase();
+    if (!isEmail(email)) {
       setErr(t('invalidEmail'));
       return;
     }
+    if (giaPresenti.has(email)) {
+      setErr(t('duplicateEmail'));
+      return;
+    }
     setErr(null);
-    onChange([
-      ...value,
-      {
-        name: draft.name.trim(),
-        email: draft.email.trim().toLowerCase(),
-        personId: draft.personId,
-      },
-    ]);
+    onChange([...value, { name: draft.name.trim(), email, personId: draft.personId }]);
     setDraft({ name: '', email: '', personId: null });
   };
 
   const onAddMany = (picks: RubricaPickedPerson[]) => {
-    const existing = new Set(value.map((m) => m.email));
+    const existing = new Set(giaPresenti);
     const toAdd: ModeratorEntry[] = [];
     for (const p of picks) {
       const email = (p.email ?? '').trim().toLowerCase();
-      if (!email || !isEmail(email)) continue;
-      if (existing.has(email)) continue;
+      if (!email || !isEmail(email) || existing.has(email)) continue;
       existing.add(email);
-      toAdd.push({
-        name: p.displayName || email,
-        email,
-        personId: p.id,
-      });
+      toAdd.push({ name: p.displayName || email, email, personId: p.id });
     }
+    // Chi era gia' presente (o senza un indirizzo valido) non si aggiunge, e
+    // va detto: altrimenti sembra aggiunto.
+    setErr(toAdd.length < picks.length ? t('pickSkipped') : null);
     if (toAdd.length > 0) onChange([...value, ...toAdd]);
   };
 
   return (
     <section className="mb-4">
-      <h3 className="h6 fw-semibold mb-2" style={{ color: 'var(--app-text)' }}>
-        {t('moderatorsHeading')}
-      </h3>
-      <p className="text-secondary mb-2" style={{ fontSize: '0.85rem' }}>
-        {t('moderatorsHelp')}
-      </p>
-
-      {value.length > 0 && (
-        <ul className="list-group mb-3">
-          {value.map((m, i) => (
-            <li
-              key={`${m.email}-${i}`}
-              className="list-group-item d-flex justify-content-between align-items-center"
-            >
-              <div>
-                <div className="fw-semibold">{m.name}</div>
-                <small className="text-muted">{m.email}</small>
-              </div>
-              <button
-                type="button"
-                className="btn btn-sm btn-outline-danger"
-                onClick={() => onChange(value.filter((_, j) => j !== i))}
-              >
-                {t('remove')}
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
-
-      <div className="mb-2">
-        <RubricaPicker
-          mode="multi"
-          onAddMany={onAddMany}
-          placeholder={t('rubricaPick')}
-        />
-        <small className="text-muted">{t('rubricaOrAdd')}</small>
-      </div>
+      <SectionHeading
+        title={t(kind === 'moderators' ? 'moderatorsHeading' : 'speakersHeading')}
+        help={t(kind === 'moderators' ? 'moderatorsHelp' : 'speakersHelp')}
+      />
+      <AddedList
+        items={value}
+        keyOf={(p) => p.email}
+        primary={(p) => p.name}
+        secondary={(p) => p.email}
+        onRemove={(i) => onChange(value.filter((_, j) => j !== i))}
+      />
+      <RubricaRow onAddMany={onAddMany} />
 
       <div className="row g-2 align-items-end">
         <div className="col-md-5">
-          <label className="form-label" htmlFor="mod-name">
-            {t('moderatorName')}
+          <label className="form-label" htmlFor={`${id}-name`}>
+            {t(kind === 'moderators' ? 'moderatorName' : 'speakerName')}
           </label>
           <input
-            id="mod-name"
+            id={`${id}-name`}
             type="text"
             className="form-control"
             value={draft.name}
-            onChange={(e) =>
-              setDraft({ ...draft, name: e.target.value, personId: null })
-            }
+            onChange={(e) => setDraft({ ...draft, name: e.target.value, personId: null })}
           />
         </div>
         <div className="col-md-5">
-          <label className="form-label" htmlFor="mod-email">
-            {t('moderatorEmail')}
+          <label className="form-label" htmlFor={`${id}-email`}>
+            {t(kind === 'moderators' ? 'moderatorEmail' : 'speakerEmail')}
           </label>
           <input
-            id="mod-email"
+            id={`${id}-email`}
             type="email"
             className="form-control"
             value={draft.email}
-            onChange={(e) =>
-              setDraft({ ...draft, email: e.target.value, personId: null })
-            }
+            onChange={(e) => setDraft({ ...draft, email: e.target.value, personId: null })}
           />
         </div>
         <div className="col-md-2">
@@ -369,149 +373,7 @@ function ModeratorsSection({
             {t('add')}
           </button>
         </div>
-        {err && (
-          <div className="col-12">
-            <small className="text-danger">{err}</small>
-          </div>
-        )}
-      </div>
-    </section>
-  );
-}
-
-function SpeakersSection({
-  value,
-  onChange,
-}: {
-  value: SpeakerEntry[];
-  onChange: (next: SpeakerEntry[]) => void;
-}) {
-  const t = useTranslations('admin.wizard.step3');
-  const [draft, setDraft] = useState<SpeakerEntry>({
-    name: '',
-    email: '',
-    personId: null,
-  });
-  const [err, setErr] = useState<string | null>(null);
-
-  const add = () => {
-    if (!draft.name.trim() || !draft.email.trim()) {
-      setErr(t('speakerRequired'));
-      return;
-    }
-    if (!isEmail(draft.email.trim())) {
-      setErr(t('invalidEmail'));
-      return;
-    }
-    setErr(null);
-    onChange([
-      ...value,
-      {
-        name: draft.name.trim(),
-        email: draft.email.trim().toLowerCase(),
-        personId: draft.personId,
-      },
-    ]);
-    setDraft({ name: '', email: '', personId: null });
-  };
-
-  const onAddMany = (picks: RubricaPickedPerson[]) => {
-    const existing = new Set(value.map((s) => s.email));
-    const toAdd: SpeakerEntry[] = [];
-    for (const p of picks) {
-      const email = (p.email ?? '').trim().toLowerCase();
-      if (!email || !isEmail(email)) continue;
-      if (existing.has(email)) continue;
-      existing.add(email);
-      toAdd.push({
-        name: p.displayName || email,
-        email,
-        personId: p.id,
-      });
-    }
-    if (toAdd.length > 0) onChange([...value, ...toAdd]);
-  };
-
-  return (
-    <section className="mb-4">
-      <h3 className="h6 fw-semibold mb-2" style={{ color: 'var(--app-text)' }}>
-        {t('speakersHeading')}
-      </h3>
-      <p className="text-secondary mb-2" style={{ fontSize: '0.85rem' }}>
-        {t('speakersHelp')}
-      </p>
-
-      {value.length > 0 && (
-        <ul className="list-group mb-3">
-          {value.map((s, i) => (
-            <li
-              key={`${s.email}-${i}`}
-              className="list-group-item d-flex justify-content-between align-items-center"
-            >
-              <div>
-                <div className="fw-semibold">{s.name}</div>
-                <small className="text-muted">{s.email}</small>
-              </div>
-              <button
-                type="button"
-                className="btn btn-sm btn-outline-danger"
-                onClick={() => onChange(value.filter((_, j) => j !== i))}
-              >
-                {t('remove')}
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
-
-      <div className="mb-2">
-        <RubricaPicker
-          mode="multi"
-          onAddMany={onAddMany}
-          placeholder={t('rubricaPick')}
-        />
-        <small className="text-muted">{t('rubricaOrAdd')}</small>
-      </div>
-
-      <div className="row g-2 align-items-end">
-        <div className="col-md-5">
-          <label className="form-label" htmlFor="sp-name">
-            {t('speakerName')}
-          </label>
-          <input
-            id="sp-name"
-            type="text"
-            className="form-control"
-            value={draft.name}
-            onChange={(e) =>
-              setDraft({ ...draft, name: e.target.value, personId: null })
-            }
-          />
-        </div>
-        <div className="col-md-5">
-          <label className="form-label" htmlFor="sp-email">
-            {t('speakerEmail')}
-          </label>
-          <input
-            id="sp-email"
-            type="email"
-            className="form-control"
-            value={draft.email}
-            onChange={(e) =>
-              setDraft({ ...draft, email: e.target.value, personId: null })
-            }
-          />
-        </div>
-        <div className="col-md-2">
-          <button type="button" className="btn btn-primary w-100" onClick={add}>
-            {t('add')}
-          </button>
-        </div>
-        {err && (
-          <div className="col-12">
-            <small className="text-danger">{err}</small>
-          </div>
-        )}
+        <FieldError message={err} />
       </div>
     </section>
   );
@@ -520,169 +382,99 @@ function SpeakersSection({
 function InvitationsSection({
   value,
   onChange,
+  locked,
 }: {
   value: InvitationEntry[];
   onChange: (next: InvitationEntry[]) => void;
+  locked: boolean;
 }) {
   const t = useTranslations('admin.wizard.step3');
-  const [draft, setDraft] = useState<InvitationEntry>({
-    name: '',
-    email: '',
-    role: 'GUEST',
-    personId: null,
-  });
+  const id = 'inv';
+  const [draft, setDraft] = useState({ name: '', email: '', personId: null as string | null });
   const [err, setErr] = useState<string | null>(null);
 
   const add = () => {
-    if (!isEmail((draft.email ?? '').trim())) {
+    const email = draft.email.trim().toLowerCase();
+    if (!isEmail(email)) {
       setErr(t('invalidEmail'));
       return;
     }
-    const email = draft.email.trim().toLowerCase();
-    if (value.some((v) => v.email === email)) {
+    if (value.some((v) => v.email.toLowerCase() === email)) {
       setErr(t('duplicateEmail'));
       return;
     }
     setErr(null);
     onChange([
       ...value,
-      {
-        name: draft.name?.trim() || null,
-        email,
-        role: draft.role,
-        personId: draft.personId,
-      },
+      { name: draft.name.trim() || null, email, role: 'GUEST', personId: draft.personId },
     ]);
-    setDraft({ name: '', email: '', role: 'GUEST', personId: null });
+    setDraft({ name: '', email: '', personId: null });
   };
 
   const onAddMany = (picks: RubricaPickedPerson[]) => {
-    const existing = new Set(value.map((v) => v.email));
+    const existing = new Set(value.map((v) => v.email.toLowerCase()));
     const toAdd: InvitationEntry[] = [];
     for (const p of picks) {
       const email = (p.email ?? '').trim().toLowerCase();
-      if (!email || !isEmail(email)) continue;
-      if (existing.has(email)) continue;
+      if (!email || !isEmail(email) || existing.has(email)) continue;
       existing.add(email);
-      toAdd.push({
-        name: p.displayName?.trim() || null,
-        email,
-        role: draft.role,
-        personId: p.id,
-      });
+      toAdd.push({ name: p.displayName?.trim() || null, email, role: 'GUEST', personId: p.id });
     }
+    setErr(toAdd.length < picks.length ? t('pickSkipped') : null);
     if (toAdd.length > 0) onChange([...value, ...toAdd]);
   };
 
   return (
     <section className="mb-3">
-      <h3 className="h6 fw-semibold mb-2" style={{ color: 'var(--app-text)' }}>
-        {t('invitationsHeading')}
-      </h3>
-      <p className="text-secondary mb-2" style={{ fontSize: '0.85rem' }}>
-        {t('invitationsHelp')}
-      </p>
-
-      {value.length > 0 && (
-        <ul className="list-group mb-3">
-          {value.map((inv, i) => (
-            <li
-              key={`${inv.email}-${i}`}
-              className="list-group-item d-flex justify-content-between align-items-center"
-            >
-              <div>
-                <div className="fw-semibold">
-                  {inv.name ?? inv.email}
-                  <span
-                    className="badge ms-2"
-                    style={{
-                      backgroundColor: inv.role === 'SPEAKER' ? '#0066CC' : '#6c757d',
-                      fontSize: '0.7rem',
-                    }}
-                  >
-                    {t(`role.${inv.role}`)}
-                  </span>
-                </div>
-                {inv.name && <small className="text-muted">{inv.email}</small>}
-              </div>
-              <button
-                type="button"
-                className="btn btn-sm btn-outline-danger"
-                onClick={() => onChange(value.filter((_, j) => j !== i))}
-              >
-                {t('remove')}
+      <SectionHeading title={t('invitationsHeading')} help={t('invitationsHelp')} />
+      <AddedList
+        items={value}
+        keyOf={(inv) => inv.email}
+        primary={(inv) => inv.name ?? inv.email}
+        secondary={(inv) => (inv.name ? inv.email : null)}
+        onRemove={locked ? undefined : (i) => onChange(value.filter((_, j) => j !== i))}
+      />
+      {locked ? (
+        <p className="text-secondary mb-0" style={{ fontSize: '0.85rem' }}>
+          {t('invitationsStaffOnly')}
+        </p>
+      ) : (
+        <>
+          <RubricaRow onAddMany={onAddMany} />
+          <div className="row g-2 align-items-end">
+            <div className="col-md-5">
+              <label className="form-label" htmlFor={`${id}-name`}>
+                {t('invitationName')}
+              </label>
+              <input
+                id={`${id}-name`}
+                type="text"
+                className="form-control"
+                value={draft.name}
+                onChange={(e) => setDraft({ ...draft, name: e.target.value, personId: null })}
+              />
+            </div>
+            <div className="col-md-5">
+              <label className="form-label" htmlFor={`${id}-email`}>
+                {t('invitationEmail')}
+              </label>
+              <input
+                id={`${id}-email`}
+                type="email"
+                className="form-control"
+                value={draft.email}
+                onChange={(e) => setDraft({ ...draft, email: e.target.value, personId: null })}
+              />
+            </div>
+            <div className="col-md-2">
+              <button type="button" className="btn btn-primary w-100" onClick={add}>
+                {t('add')}
               </button>
-            </li>
-          ))}
-        </ul>
-      )}
-
-      <div className="mb-2">
-        <RubricaPicker
-          mode="multi"
-          onAddMany={onAddMany}
-          placeholder={t('rubricaPick')}
-        />
-        <small className="text-muted">{t('rubricaOrAdd')}</small>
-      </div>
-
-      <div className="row g-2 align-items-end">
-        <div className="col-md-4">
-          <label className="form-label" htmlFor="inv-name">
-            {t('invitationName')}
-          </label>
-          <input
-            id="inv-name"
-            type="text"
-            className="form-control"
-            value={draft.name ?? ''}
-            onChange={(e) =>
-              setDraft({ ...draft, name: e.target.value, personId: null })
-            }
-          />
-        </div>
-        <div className="col-md-4">
-          <label className="form-label" htmlFor="inv-email">
-            {t('invitationEmail')}
-          </label>
-          <input
-            id="inv-email"
-            type="email"
-            className="form-control"
-            value={draft.email}
-            onChange={(e) =>
-              setDraft({ ...draft, email: e.target.value, personId: null })
-            }
-            required
-          />
-        </div>
-        <div className="col-md-2">
-          <label className="form-label" htmlFor="inv-role">
-            {t('invitationRole')}
-          </label>
-          <select
-            id="inv-role"
-            className="form-select"
-            value={draft.role}
-            onChange={(e) =>
-              setDraft({ ...draft, role: e.target.value as 'GUEST' | 'SPEAKER' })
-            }
-          >
-            <option value="GUEST">{t('role.GUEST')}</option>
-            <option value="SPEAKER">{t('role.SPEAKER')}</option>
-          </select>
-        </div>
-        <div className="col-md-2">
-          <button type="button" className="btn btn-primary w-100" onClick={add}>
-            {t('add')}
-          </button>
-        </div>
-        {err && (
-          <div className="col-12">
-            <small className="text-danger">{err}</small>
+            </div>
+            <FieldError message={err} />
           </div>
-        )}
-      </div>
+        </>
+      )}
     </section>
   );
 }

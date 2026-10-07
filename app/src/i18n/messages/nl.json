@@ -790,19 +790,18 @@
         "heading": "Personen en uitnodigingen",
         "intro": "Voeg organisatoren (zichtbaar op de pagina), moderatoren, sprekers en uitgenodigde gasten toe.",
         "organizersHeading": "Organisatoren",
-        "organizersHelp": "Worden weergegeven op de openbare pagina van het evenement.",
-        "organizerName": "Contactpersoon",
-        "organizerOrganization": "Organisatie",
+        "organizersHelp": "De organisaties achter het evenement: naam, website en logo verschijnen op de openbare pagina.",
+        "organizerName": "Naam van de organisatie",
         "organizerWebsite": "Website",
         "organizerLogo": "Logo van de organisator",
-        "organizerRequired": "Contactpersoon en organisatie zijn verplicht.",
+        "organizerRequired": "De naam van de organisatie is verplicht.",
         "moderatorsHeading": "Moderatoren",
         "moderatorsHelp": "Moderatoren kunnen de sessie beheren en de rechten tijdens het evenement aanpassen.",
         "moderatorName": "Naam",
         "moderatorEmail": "E-mail",
         "moderatorRequired": "Naam en e-mail zijn verplicht.",
         "speakersHeading": "Sprekers",
-        "speakersHelp": "Ontvangen een moderatorlink per e-mail.",
+        "speakersHelp": "Ze krijgen per e-mail een persoonlijke link om te spreken, hun camera te gebruiken en hun scherm te delen, zonder moderatorrechten.",
         "speakerName": "Naam",
         "speakerEmail": "E-mail",
         "speakerRequired": "Naam en e-mail zijn verplicht.",
@@ -810,17 +809,15 @@
         "invitationsHelp": "Lijst van uitgenodigde personen. Het platform verstuurt geen uitnodigingen: deel de link naar het evenement zelf. Als publieke inschrijving uitstaat, kunnen alleen deze adressen zich inschrijven, en de persoonlijke deelnamelink komt na de inschrijving per e-mail.",
         "invitationName": "Naam (optioneel)",
         "invitationEmail": "E-mail",
-        "invitationRole": "Rol",
-        "role": {
-          "GUEST": "Gast",
-          "SPEAKER": "Spreker"
-        },
         "add": "Toevoegen",
         "remove": "Verwijderen",
         "invalidEmail": "Ongeldig e-mailadres.",
         "duplicateEmail": "Adres al toegevoegd.",
         "rubricaPick": "Zoeken in adresboek…",
-        "rubricaOrAdd": "of handmatig toevoegen"
+        "rubricaOrAdd": "of handmatig toevoegen",
+        "removeItem": "{name} verwijderen",
+        "invitationsStaffOnly": "De uitnodigingen worden beheerd door het team van het evenement.",
+        "pickSkipped": "Sommige personen stonden al in de lijst of hadden geen geldig adres en zijn niet toegevoegd."
       },
       "step4": {
         "heading": "Inhoud en materialen",
@@ -840,11 +837,10 @@
         "remove": "Verwijderen",
         "questionnairesHeading": "Vragenlijsten",
         "questionnairesIntro": "Combineer herbruikbare sjablonen met vragen die specifiek zijn voor dit evenement.",
-        "questionnairesEmpty": "Geen vragenlijsten beschikbaar. Maak een vragenlijst via Instellingen → Vragenlijsten.",
         "preHeading": "Vragenlijst voor aanmelding",
         "postHeading": "Vragenlijst na afloop",
         "templatesLabel": "Herbruikbare sjablonen",
-        "templatesEmpty": "Geen sjablonen aangemaakt. Ga naar Instellingen → Vragenlijsten.",
+        "templatesEmpty": "Geen vragenlijstsjablonen beschikbaar: voeg hieronder de vragen voor dit evenement toe.",
         "adhocLabel": "Vragen specifiek voor dit evenement",
         "addQuestion": "+ Vraag toevoegen",
         "questionPrompt": "Tekst van de vraag",
@@ -860,7 +856,9 @@
         "scaleMax": "Maximum",
         "required": "Verplicht",
         "saveDraftAndGoQuestionnaires": "Concept opslaan en naar vragenlijstbeheer",
-        "none": "— Geen —"
+        "none": "— Geen —",
+        "staffOnly": "Vragenlijsten en materialen worden beheerd door het team van het evenement: met de moderatorlink ziet u ze op de pagina van het evenement.",
+        "postDefaultHint": "Als u niets kiest, wordt na het evenement de vragenlijst ‘{name}’ aangeboden."
       },
       "step5": {
         "heading": "Overzicht en publicatie",
@@ -903,7 +901,8 @@
         "privacyDoc": "Privacydocument (PDF of link)",
         "privacyDocHelp": "Upload een PDF of plak de URL van een vervangende privacyverklaring. Vervangt het AVG-sjabloon indien aanwezig.",
         "privacyTextHelp": "Korte tekst die op het aanmeldingsformulier wordt getoond; kan het AVG-sjabloon aanvullen of vervangen.",
-        "technicalDetails": "Technische details: capaciteit en middelen"
+        "technicalDetails": "Technische details: capaciteit en middelen",
+        "retentionRange": "Voer een aantal dagen in tussen 1 en {max}."
       },
       "validationFailed": "Controleer de gemarkeerde velden voordat u doorgaat.",
       "partialFailure": "Evenement aangemaakt, maar sommige onderdelen zijn niet opgeslagen: {items}. U kunt ze toevoegen vanaf de pagina van het evenement.",
@@ -2424,7 +2423,38 @@
     "rubrica": {
       "title": "Adresboek",
       "subtitle": "Personen die toestemming hebben gegeven voor opname in het adresboek (art. 6.1.a AVG). Profielinformatie wordt automatisch bijgewerkt bij elke nieuwe aanmelding.",
-      "backToList": "← Terug naar adresboek"
+      "searchLabel": "Zoeken op naam of organisatie",
+      "orgTypeLabel": "Type organisatie",
+      "allTypes": "Alle",
+      "includeOptedOut": "Personen opnemen die hun toestemming hebben ingetrokken",
+      "count": "Personen in het adresboek: {count}",
+      "empty": "Niemand voldoet aan de filters.",
+      "noName": "(zonder naam)",
+      "statusActive": "Toestemming gegeven",
+      "statusOptedOut": "Toestemming ingetrokken",
+      "col": {
+        "name": "Naam",
+        "organization": "Organisatie",
+        "type": "Type",
+        "events": "Evenementen",
+        "lastActive": "Laatste activiteit",
+        "status": "Status",
+        "event": "Evenement",
+        "eventDate": "Datum van het evenement",
+        "registeredAt": "Inschrijvingsdatum",
+        "orgSnapshot": "Organisatie bij inschrijving"
+      },
+      "deleteTitle": "Verwijderen uit adresboek",
+      "deleteMessage": "Deze persoon definitief uit het adresboek verwijderen? De inschrijvingsgeschiedenis blijft bewaard.",
+      "deleteFailed": "Verwijderen mislukt. Probeer het opnieuw.",
+      "notFound": "Persoon niet gevonden.",
+      "consentGivenAt": "Toestemming gegeven op",
+      "optedOutAt": "Toestemming ingetrokken op",
+      "retentionMonths": "Bewaartermijn (maanden)",
+      "deleteButton": "Verwijderen uit adresboek (art. 17 AVG)",
+      "deleting": "Verwijderen…",
+      "historyTitle": "Inschrijvingsgeschiedenis ({count})",
+      "historyEmpty": "Geen inschrijvingen geregistreerd."
     },
     "eventAnalytics": {
       "title": "Statistieken",
@@ -2600,7 +2630,6 @@
       "ov": {
         "tab": "Overzicht",
         "intro": "Wat de AI-pijplijn voor deze opname heeft geproduceerd, taal voor taal.",
-        "processing": "De verwerking is bezig of er zijn nog geen artefacten beschikbaar. Kom terug wanneer de status “Voltooid” is.",
         "loadError": "Kan het overzicht niet laden.",
         "langsTitle": "Talen en artefacten",
         "colLang": "Taal",
@@ -2834,7 +2863,9 @@
       "full": "De woordenlijst heeft het maximale aantal termen bereikt.",
       "invalid": "Controleer de velden: sommige waarden zijn ongeldig.",
       "error": "De bewerking is mislukt. Probeer het opnieuw."
-    }
+    },
+    "deleteLiveBlocked": "Het evenement is live: beëindig het voordat u het verwijdert.",
+    "bulkDeleteSkippedLive": "Niet verwijderde live-evenementen: {count}. Beëindig ze voordat u ze verwijdert."
   },
   "email": {
     "confirmationSubject": "Inschrijving bevestigd: {eventTitle}",

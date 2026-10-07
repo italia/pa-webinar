@@ -79,11 +79,12 @@ export default async function RegistrationPage({
   // for the current locale (falling back to IT), and finally nothing — in
   // which case the registration form falls back to the privacyUrl link.
   const templateBody = event.gdprTemplate?.body as Record<string, string> | undefined;
+  // Un testo vuoto salvato da versioni precedenti vale come assente.
   const privacyText =
-    event.privacyPolicyText
-    ?? templateBody?.[locale]
-    ?? templateBody?.it
-    ?? undefined;
+    event.privacyPolicyText?.trim()
+    || templateBody?.[locale]?.trim()
+    || templateBody?.it?.trim()
+    || undefined;
 
   return (
     <div className="container py-5">

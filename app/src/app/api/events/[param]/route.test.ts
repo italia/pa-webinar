@@ -54,7 +54,7 @@ vi.mock('@/lib/live/actions', () => ({ recordLiveAction: vi.fn(), recordLiveActi
 
 vi.mock('@/lib/db', () => ({
   prisma: {
-    event: { findUnique: vi.fn(), update: vi.fn(), delete: vi.fn() },
+    event: { findUnique: vi.fn(), update: vi.fn() },
     gdprTemplate: { findUnique: vi.fn() },
     registration: { count: vi.fn(async () => 0) },
     $transaction: vi.fn(),
@@ -74,7 +74,6 @@ const mocked = prisma as unknown as {
   event: {
     findUnique: ReturnType<typeof vi.fn>;
     update: ReturnType<typeof vi.fn>;
-    delete: ReturnType<typeof vi.fn>;
   };
   gdprTemplate: { findUnique: ReturnType<typeof vi.fn> };
   $transaction: ReturnType<typeof vi.fn>;
@@ -199,14 +198,15 @@ describe('PUT /api/events/[param] — le modifiche parziali restano parziali', (
   });
 
   it('svuota il testo dell\'informativa quando arriva una stringa vuota', async () => {
-    // È il percorso che usa il wizard quando si sceglie un modello: la
-    // stringa vuota deve arrivare in banca dati, altrimenti il testo scritto
-    // a mano continuerebbe a vincere su una scelta già fatta.
+    // È il percorso che usa il wizard quando si sceglie un modello: il testo
+    // scritto a mano va svuotato, altrimenti continuerebbe a vincere su una
+    // scelta già fatta. Si salva come assente (null), così all'iscrizione si
+    // legge il modello.
     await PUT(richiesta({ privacyPolicyText: '' }), contesto as never);
 
     const dati = datiScritti();
     expect(dati).toHaveProperty('privacyPolicyText');
-    expect(dati.privacyPolicyText).toBe('');
+    expect(dati.privacyPolicyText).toBeNull();
   });
 
   it('rifiuta un testo dell\'informativa nullo', async () => {
@@ -357,9 +357,17 @@ describe('PUT /api/events/[param] — cronologia della sala', () => {
 });
 
 describe('DELETE /api/events/[param] — i file dell’evento', () => {
+  // La transazione con la riga bloccata: lo stato letto li' decide tutto.
+  const tx = {
+    $queryRaw: vi.fn(),
+    event: { delete: vi.fn() },
+  };
+
   beforeEach(() => {
     vi.clearAllMocks();
-    mocked.event.delete.mockResolvedValue({});
+    tx.$queryRaw.mockResolvedValue([{ status: 'PUBLISHED' }]);
+    tx.event.delete.mockResolvedValue({});
+    mocked.$transaction.mockImplementation(async (fn: (t: typeof tx) => unknown) => fn(tx));
     files.removeFilesOfEventsBeingDeleted.mockResolvedValue(1);
   });
 
@@ -370,15 +378,34 @@ describe('DELETE /api/events/[param] — i file dell’evento', () => {
     }) as unknown as NextRequest;
   }
 
-  it('la cascata porta via le righe: i file si cancellano prima', async () => {
+  it('la cascata porta via le righe: i file si cancellano prima, a riga bloccata', async () => {
     const r = await DELETE(cancella(), contesto as never);
 
     expect(r.status).toBe(200);
+    expect(String(tx.$queryRaw.mock.calls[0]![0])).toContain('FOR NO KEY UPDATE');
     expect(files.removeFilesOfEventsBeingDeleted).toHaveBeenCalledWith({ id: EVENT_ID });
-    expect(mocked.event.delete).toHaveBeenCalledWith({ where: { id: EVENT_ID } });
+    expect(tx.event.delete).toHaveBeenCalledWith({ where: { id: EVENT_ID } });
     expect(files.removeFilesOfEventsBeingDeleted.mock.invocationCallOrder[0]).toBeLessThan(
-      mocked.event.delete.mock.invocationCallOrder[0]!,
+      tx.event.delete.mock.invocationCallOrder[0]!,
     );
+  });
+
+  it('un evento in diretta non si elimina: 409, nessun file toccato', async () => {
+    tx.$queryRaw.mockResolvedValue([{ status: 'LIVE' }]);
+    const r = await DELETE(cancella(), contesto as never);
+
+    expect(r.status).toBe(409);
+    expect((await r.json()).code).toBe('EVENT_LIVE');
+    expect(files.removeFilesOfEventsBeingDeleted).not.toHaveBeenCalled();
+    expect(tx.event.delete).not.toHaveBeenCalled();
+  });
+
+  it('già eliminato da un’altra richiesta: 404, non «in diretta»', async () => {
+    tx.$queryRaw.mockResolvedValue([]);
+    const r = await DELETE(cancella(), contesto as never);
+
+    expect(r.status).toBe(404);
+    expect(files.removeFilesOfEventsBeingDeleted).not.toHaveBeenCalled();
   });
 
   it('se i file non si cancellano, l’evento resta: 503', async () => {
@@ -388,6 +415,6 @@ describe('DELETE /api/events/[param] — i file dell’evento', () => {
     const r = await DELETE(cancella(), contesto as never);
 
     expect(r.status).toBe(503);
-    expect(mocked.event.delete).not.toHaveBeenCalled();
+    expect(tx.event.delete).not.toHaveBeenCalled();
   });
 });

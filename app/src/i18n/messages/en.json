@@ -790,19 +790,18 @@
         "heading": "People and invites",
         "intro": "Add organizers (shown on the page), moderators, speakers, and invited guests.",
         "organizersHeading": "Organizers",
-        "organizersHelp": "Appear on the public event page.",
-        "organizerName": "Contact name",
-        "organizerOrganization": "Organization",
+        "organizersHelp": "The organizations running the event: name, website and logo appear on the public page.",
+        "organizerName": "Organization name",
         "organizerWebsite": "Website",
         "organizerLogo": "Organizer logo",
-        "organizerRequired": "Contact name and organization are required.",
+        "organizerRequired": "The organization name is required.",
         "moderatorsHeading": "Moderators",
         "moderatorsHelp": "Additional co-moderators: each receives their own link to manage the session and permissions during the event. The primary moderator (required contact) is set in the last step, “Review”.",
         "moderatorName": "Name",
         "moderatorEmail": "Email",
         "moderatorRequired": "Name and email are required.",
         "speakersHeading": "Speakers",
-        "speakersHelp": "Receive a moderator link via email.",
+        "speakersHelp": "They receive a personal link by email to speak, use their camera and share their screen, without moderation powers.",
         "speakerName": "Name",
         "speakerEmail": "Email",
         "speakerRequired": "Name and email are required.",
@@ -810,17 +809,15 @@
         "invitationsHelp": "List of invited people. The platform does not send invitations: share the event link with them yourself. With public registration off, only these addresses can register, and the personal link to enter arrives by email after registering.",
         "invitationName": "Name (optional)",
         "invitationEmail": "Email",
-        "invitationRole": "Role",
-        "role": {
-          "GUEST": "Guest",
-          "SPEAKER": "Speaker"
-        },
         "add": "Add",
         "remove": "Remove",
         "invalidEmail": "Invalid email address.",
         "duplicateEmail": "Email already added.",
         "rubricaPick": "Search from the address book…",
-        "rubricaOrAdd": "or add manually"
+        "rubricaOrAdd": "or add manually",
+        "removeItem": "Remove {name}",
+        "invitationsStaffOnly": "Invitations are managed by the event staff.",
+        "pickSkipped": "Some people were already listed, or had no valid address, and were not added."
       },
       "step4": {
         "heading": "Content and materials",
@@ -840,11 +837,10 @@
         "remove": "Remove",
         "questionnairesHeading": "Questionnaires",
         "questionnairesIntro": "Combine reusable templates with questions specific to this event.",
-        "questionnairesEmpty": "No questionnaires available. Create one from Settings → Questionnaires.",
         "preHeading": "Pre-registration questionnaire",
         "postHeading": "Post-event questionnaire",
         "templatesLabel": "Reusable templates",
-        "templatesEmpty": "No templates created. Go to Settings → Questionnaires.",
+        "templatesEmpty": "No questionnaire templates available: add the questions for this event below.",
         "adhocLabel": "Questions specific to this event",
         "addQuestion": "+ Add question",
         "questionPrompt": "Question text",
@@ -860,7 +856,9 @@
         "scaleMax": "Maximum",
         "required": "Required",
         "saveDraftAndGoQuestionnaires": "Save draft and go to questionnaire management",
-        "none": "— None —"
+        "none": "— None —",
+        "staffOnly": "Questionnaires and materials are managed by the event staff: with the moderator link you can see them on the event page.",
+        "postDefaultHint": "If you choose nothing, the “{name}” questionnaire is offered after the event."
       },
       "step5": {
         "heading": "Review and publish",
@@ -903,7 +901,8 @@
         "privacyDoc": "Privacy notice document (PDF or link)",
         "privacyDocHelp": "Upload a PDF or paste the URL of an alternative privacy notice. Overrides the GDPR template when set.",
         "privacyTextHelp": "Short text shown on the registration form; can complement or replace the GDPR template.",
-        "technicalDetails": "Technical details: capacity and resources"
+        "technicalDetails": "Technical details: capacity and resources",
+        "retentionRange": "Enter a number of days between 1 and {max}."
       },
       "validationFailed": "Please review the highlighted fields before continuing.",
       "partialFailure": "Event created, but some items weren't saved: {items}. You can add them from the event page.",
@@ -2424,7 +2423,38 @@
     "rubrica": {
       "title": "Address book",
       "subtitle": "People who have consented to be added to the address book (GDPR art. 6.1.a). Profile information is updated automatically on every re-registration.",
-      "backToList": "← Back to address book"
+      "searchLabel": "Search by name or organization",
+      "orgTypeLabel": "Organization type",
+      "allTypes": "All",
+      "includeOptedOut": "Include people who withdrew consent",
+      "count": "People in the address book: {count}",
+      "empty": "No one matches the filters.",
+      "noName": "(no name)",
+      "statusActive": "Consent given",
+      "statusOptedOut": "Consent withdrawn",
+      "col": {
+        "name": "Name",
+        "organization": "Organization",
+        "type": "Type",
+        "events": "Events",
+        "lastActive": "Last activity",
+        "status": "Status",
+        "event": "Event",
+        "eventDate": "Event date",
+        "registeredAt": "Registration date",
+        "orgSnapshot": "Organization at registration"
+      },
+      "deleteTitle": "Delete from address book",
+      "deleteMessage": "Permanently delete this person from the address book? Their registration history is kept.",
+      "deleteFailed": "Deletion failed. Please try again.",
+      "notFound": "Person not found.",
+      "consentGivenAt": "Consent given on",
+      "optedOutAt": "Consent withdrawn on",
+      "retentionMonths": "Retention (months)",
+      "deleteButton": "Delete from address book (GDPR art. 17)",
+      "deleting": "Deleting…",
+      "historyTitle": "Registration history ({count})",
+      "historyEmpty": "No registrations recorded."
     },
     "eventAnalytics": {
       "title": "Statistics",
@@ -2600,7 +2630,6 @@
       "ov": {
         "tab": "Overview",
         "intro": "What the AI pipeline produced for this recording, language by language.",
-        "processing": "Processing or no artifacts yet. Come back when the status is \"Done\".",
         "loadError": "Could not load the overview.",
         "langsTitle": "Languages and artifacts",
         "colLang": "Language",
@@ -2834,7 +2863,9 @@
       "full": "The glossary has reached the maximum number of terms.",
       "invalid": "Check the fields: some values are not valid.",
       "error": "The operation failed. Please try again."
-    }
+    },
+    "deleteLiveBlocked": "The event is live: end it before deleting it.",
+    "bulkDeleteSkippedLive": "Live events not deleted: {count}. End them before deleting them."
   },
   "email": {
     "confirmationSubject": "Registration confirmed: {eventTitle}",

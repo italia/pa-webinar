@@ -130,8 +130,9 @@ export default function RecordingOverview({ recordingId }: { recordingId: string
   const [showFiles, setShowFiles] = useState(false);
 
   if (isLoading) return <SkeletonLines lines={8} loadingLabel={t('tab')} />;
-  if (error) return <div className="alert alert-info small mb-0" role="status">{t('processing')}</div>;
-  if (!data) return <div className="alert alert-danger small mb-0" role="alert">{t('loadError')}</div>;
+  // La rotta risponde 200 per ogni registrazione che esiste, anche in
+  // elaborazione: un errore e' un errore, non un'elaborazione in corso.
+  if (error || !data) return <div className="alert alert-danger small mb-0" role="alert">{t('loadError')}</div>;
 
   const { recording: r, participants, tracks, jobs, artifacts, storageFiles, llm, dubbedAudio, speakers } = data;
   const slug = r.eventSlug;

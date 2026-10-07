@@ -790,19 +790,18 @@
         "heading": "Personas un ielūgumi",
         "intro": "Pievienojiet organizatorus (rāda lapā), moderatorus, runātājus un uzaicinātos viesus.",
         "organizersHeading": "Organizatori",
-        "organizersHelp": "Tiek rādīti pasākuma publiskajā lapā.",
-        "organizerName": "Kontaktpersona",
-        "organizerOrganization": "Organizācija",
+        "organizersHelp": "Organizācijas, kas rīko pasākumu: nosaukums, vietne un logotips tiek rādīti publiskajā lapā.",
+        "organizerName": "Organizācijas nosaukums",
         "organizerWebsite": "Tīmekļa vietne",
         "organizerLogo": "Organizatora logotips",
-        "organizerRequired": "Kontaktpersona un organizācija ir obligātas.",
+        "organizerRequired": "Organizācijas nosaukums ir obligāts.",
         "moderatorsHeading": "Moderatori",
         "moderatorsHelp": "Moderatori var pārvaldīt sesiju un kontrolēt atļaujas pasākuma laikā.",
         "moderatorName": "Vārds",
         "moderatorEmail": "E-pasts",
         "moderatorRequired": "Vārds un e-pasts ir obligāti.",
         "speakersHeading": "Runātāji",
-        "speakersHelp": "Saņem moderatora saiti pa e-pastu.",
+        "speakersHelp": "Pa e-pastu saņem personisku saiti, lai runātu, izmantotu kameru un kopīgotu ekrānu, bez moderatora tiesībām.",
         "speakerName": "Vārds",
         "speakerEmail": "E-pasts",
         "speakerRequired": "Vārds un e-pasts ir obligāti.",
@@ -810,17 +809,15 @@
         "invitationsHelp": "Uzaicināto personu saraksts. Platforma uzaicinājumus nesūta: pasākuma saiti kopīgojiet paši. Ja publiskā reģistrācija ir izslēgta, reģistrēties var tikai šīs adreses, un personīgā pievienošanās saite pēc reģistrācijas pienāk pa e-pastu.",
         "invitationName": "Vārds (neobligāts)",
         "invitationEmail": "E-pasts",
-        "invitationRole": "Loma",
-        "role": {
-          "GUEST": "Viesis",
-          "SPEAKER": "Runātājs"
-        },
         "add": "Pievienot",
         "remove": "Noņemt",
         "invalidEmail": "Nederīga e-pasta adrese.",
         "duplicateEmail": "Adrese jau ir pievienota.",
         "rubricaPick": "Meklēt no kontaktu grāmatas…",
-        "rubricaOrAdd": "vai pievienot manuāli"
+        "rubricaOrAdd": "vai pievienot manuāli",
+        "removeItem": "Noņemt {name}",
+        "invitationsStaffOnly": "Ielūgumus pārvalda pasākuma komanda.",
+        "pickSkipped": "Dažas personas jau bija sarakstā vai tām nebija derīgas adreses, tāpēc tās netika pievienotas."
       },
       "step4": {
         "heading": "Saturs un materiāli",
@@ -840,11 +837,10 @@
         "remove": "Noņemt",
         "questionnairesHeading": "Anketas",
         "questionnairesIntro": "Apvienojiet atkārtoti izmantojamas veidnes ar šim pasākumam specifiskiem jautājumiem.",
-        "questionnairesEmpty": "Nav pieejamu anketu. Izveidojiet anketu sadaļā Iestatījumi → Anketas.",
         "preHeading": "Pirmsreģistrācijas anketa",
         "postHeading": "Pēcpasākuma anketa",
         "templatesLabel": "Atkārtoti izmantojamas veidnes",
-        "templatesEmpty": "Nav izveidotu veidņu. Dodieties uz Iestatījumi → Anketas.",
+        "templatesEmpty": "Nav pieejamu anketu veidņu: pievienojiet šī pasākuma jautājumus zemāk.",
         "adhocLabel": "Šim pasākumam specifiski jautājumi",
         "addQuestion": "+ Pievienot jautājumu",
         "questionPrompt": "Jautājuma teksts",
@@ -860,7 +856,9 @@
         "scaleMax": "Maksimums",
         "required": "Obligāta",
         "saveDraftAndGoQuestionnaires": "Saglabāt melnrakstu un doties uz anketu pārvaldību",
-        "none": "— Nav —"
+        "none": "— Nav —",
+        "staffOnly": "Anketas un materiālus pārvalda pasākuma komanda: ar moderatora saiti tos varat redzēt pasākuma lapā.",
+        "postDefaultHint": "Ja neko neizvēlaties, pēc pasākuma tiek piedāvāta anketa “{name}”."
       },
       "step5": {
         "heading": "Kopsavilkums un publicēšana",
@@ -903,7 +901,8 @@
         "privacyDoc": "Privātuma paziņojuma dokuments (PDF vai saite)",
         "privacyDocHelp": "Augšupielādējiet PDF vai ielīmējiet alternatīva privātuma paziņojuma URL. Pārraksta VDAR veidni, ja iestatīts.",
         "privacyTextHelp": "Īss teksts, kas tiek rādīts reģistrācijas formā; var papildināt vai aizstāt VDAR veidni.",
-        "technicalDetails": "Tehniskā informācija: ietilpība un resursi"
+        "technicalDetails": "Tehniskā informācija: ietilpība un resursi",
+        "retentionRange": "Ievadiet dienu skaitu no 1 līdz {max}."
       },
       "validationFailed": "Pirms turpināt, pārbaudiet izceltos laukus.",
       "partialFailure": "Pasākums ir izveidots, taču dažus elementus neizdevās saglabāt: {items}. Tos varat pievienot pasākuma lapā.",
@@ -2424,7 +2423,38 @@
     "rubrica": {
       "title": "Kontaktu grāmata",
       "subtitle": "Personas, kas devušas piekrišanu iekļaušanai kontaktu grāmatā (VDAR 6.1.a pants). Profila informācija tiek atjaunināta automātiski katrā atkārtotā reģistrācijā.",
-      "backToList": "← Atpakaļ uz kontaktu grāmatu"
+      "searchLabel": "Meklēt pēc vārda vai organizācijas",
+      "orgTypeLabel": "Organizācijas veids",
+      "allTypes": "Visi",
+      "includeOptedOut": "Iekļaut personas, kas atsaukušas piekrišanu",
+      "count": "Personas kontaktu grāmatā: {count}",
+      "empty": "Neviens neatbilst filtriem.",
+      "noName": "(bez vārda)",
+      "statusActive": "Piekrišana dota",
+      "statusOptedOut": "Piekrišana atsaukta",
+      "col": {
+        "name": "Vārds",
+        "organization": "Organizācija",
+        "type": "Veids",
+        "events": "Pasākumi",
+        "lastActive": "Pēdējā aktivitāte",
+        "status": "Statuss",
+        "event": "Pasākums",
+        "eventDate": "Pasākuma datums",
+        "registeredAt": "Reģistrācijas datums",
+        "orgSnapshot": "Organizācija reģistrācijas brīdī"
+      },
+      "deleteTitle": "Dzēst no kontaktu grāmatas",
+      "deleteMessage": "Neatgriezeniski dzēst šo personu no kontaktu grāmatas? Reģistrāciju vēsture tiek saglabāta.",
+      "deleteFailed": "Dzēšana neizdevās. Mēģiniet vēlreiz.",
+      "notFound": "Persona nav atrasta.",
+      "consentGivenAt": "Piekrišana dota",
+      "optedOutAt": "Piekrišana atsaukta",
+      "retentionMonths": "Glabāšana (mēneši)",
+      "deleteButton": "Dzēst no kontaktu grāmatas (VDAR 17. pants)",
+      "deleting": "Dzēš…",
+      "historyTitle": "Reģistrāciju vēsture ({count})",
+      "historyEmpty": "Nav reģistrāciju."
     },
     "eventAnalytics": {
       "title": "Statistika",
@@ -2600,7 +2630,6 @@
       "ov": {
         "tab": "Kopskats",
         "intro": "Ko MI konveijers ir izveidojis šim ierakstam, valodu pa valodai.",
-        "processing": "Notiek apstrāde vai artefaktu vēl nav. Atgriezieties, kad statuss būs „Pabeigts“.",
         "loadError": "Neizdevās ielādēt kopskatu.",
         "langsTitle": "Valodas un artefakti",
         "colLang": "Valoda",
@@ -2834,7 +2863,9 @@
       "full": "Glosārijā ir sasniegts maksimālais terminu skaits.",
       "invalid": "Pārbaudiet laukus: dažas vērtības nav derīgas.",
       "error": "Darbība neizdevās. Mēģiniet vēlreiz."
-    }
+    },
+    "deleteLiveBlocked": "Pasākums notiek tiešraidē: pirms dzēšanas to pabeidziet.",
+    "bulkDeleteSkippedLive": "Neizdzēsti tiešraides pasākumi: {count}. Pirms dzēšanas tos pabeidziet."
   },
   "email": {
     "confirmationSubject": "Reģistrācija apstiprināta: {eventTitle}",

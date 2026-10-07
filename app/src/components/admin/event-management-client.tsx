@@ -376,7 +376,11 @@ export default function EventManagementClient({
     } finally { setUpdating(false); }
   }, [event.id, event.moderatorToken, event.startsAt, isEarlyStart, t, tc, confirm, toast, format]);
 
-  const handleDeleted = useCallback(() => { router.push('/admin'); }, [router]);
+  // Dopo l'eliminazione: lo staff torna all'elenco; chi ha solo il link del
+  // moderatore non ha un'area admin, e va alla home del portale.
+  const handleDeleted = useCallback(() => {
+    router.push(viaToken ? '/' : '/admin/events');
+  }, [router, viaToken]);
 
   // "Duplica come prossima occorrenza" (docs/architecture/event-journey.md,
   // "Duplicating as the next occurrence"):
@@ -391,22 +395,15 @@ export default function EventManagementClient({
     setDuplicating(true);
     setDuplicateError(null);
     try {
-      // Lo staff apre la copia con la propria sessione; chi e' entrato col
-      // link del moderatore ha bisogno del token della copia.
+      // Solo lo staff duplica (la rotta chiede la sessione): la copia si apre
+      // con la propria sessione.
       const created = await duplicaComeProssima(event.id);
-      router.push(
-        percorso(
-          eventAdminPath(created.id, {
-            edit: true,
-            viaToken: viaToken ? created.moderatorToken : null,
-          }),
-        ),
-      );
+      router.push(percorso(eventAdminPath(created.id, { edit: true })));
     } catch {
       setDuplicateError(td('duplicateNextError'));
       setDuplicating(false);
     }
-  }, [event.id, router, td, viaToken]);
+  }, [event.id, router, td]);
 
   const exportCsv = useCallback(() => {
     const headers = ['Nome', 'Ente', 'Ruolo', 'Tipologia ente', 'Data registrazione', 'Entrato'];
@@ -454,15 +451,6 @@ export default function EventManagementClient({
 
   return (
     <>
-      {/* ── Breadcrumb ── */}
-      <div className="mb-3">
-        <Link href="/admin" className="text-decoration-none d-inline-flex align-items-center"
-              style={{ fontSize: '0.9rem', color: C_PRIMARY }}>
-          <span className="me-1"><Svg name="arrow-left" size={14} /></span>
-          {t('title')}
-        </Link>
-      </div>
-
       {appenaCreato && (
         <CreatedSummary
           published={status === 'PUBLISHED' || status === 'LIVE'}
@@ -650,7 +638,7 @@ export default function EventManagementClient({
               <PeopleTab event={event} baseUrl={baseUrl} locale={locale} onExportCsv={exportCsv}
                          canEditRegistrations={!viaToken} />
             )}
-            {activeTab === 'contenuti' && <ContentTab event={event} />}
+            {activeTab === 'contenuti' && <ContentTab event={event} staffTools={!viaToken} />}
             {activeTab === 'dopo' && (
               <PostEventTab event={event} status={status} viaToken={viaToken}
                             paginaPostEvento={paginaPostEvento}
@@ -814,16 +802,23 @@ export default function EventManagementClient({
                     <Svg name="external" size={14} /> {t('openPublicPage')}
                   </a>
                 )}
-                <button type="button"
-                        className="btn btn-outline-primary d-flex align-items-center justify-content-center gap-2"
-                        onClick={duplicateAsNext}
-                        disabled={duplicating}
-                        title={td('duplicateNextHint')}>
-                  <Svg name="copy" size={14} />
-                  {duplicating ? td('duplicateNextBusy') : td('duplicateNext')}
-                </button>
-                <DeleteEventModal eventId={event.id} moderatorToken={event.moderatorToken}
-                                  onDeleted={handleDeleted} />
+                {/* Duplicare crea un evento dello staff: con il solo link del
+                    moderatore la rotta risponde 401. */}
+                {!viaToken && (
+                  <button type="button"
+                          className="btn btn-outline-primary d-flex align-items-center justify-content-center gap-2"
+                          onClick={duplicateAsNext}
+                          disabled={duplicating}
+                          title={td('duplicateNextHint')}>
+                    <Svg name="copy" size={14} />
+                    {duplicating ? td('duplicateNextBusy') : td('duplicateNext')}
+                  </button>
+                )}
+                {/* In diretta ci sono persone in sala: prima si termina. */}
+                {status !== 'LIVE' && (
+                  <DeleteEventModal eventId={event.id} moderatorToken={event.moderatorToken}
+                                    onDeleted={handleDeleted} />
+                )}
               </div>
               {duplicateError && (
                 <div className="alert alert-danger mt-2 mb-0 py-2" role="alert">
@@ -1139,7 +1134,9 @@ function PeopleTab({ event, baseUrl, locale, onExportCsv, canEditRegistrations }
   );
 }
 
-function ContentTab({ event }: { event: EventData }) {
+/** `staffTools`: le pagine di gestione di materiali e questionari sono dello
+ *  staff; con il solo link del moderatore qui si vedono e basta. */
+function ContentTab({ event, staffTools }: { event: EventData; staffTools: boolean }) {
   const tm = useTranslations('materials');
   // Senza un nome (aggiunto dallo staff, da un co-moderatore, o una parola
   // fissa salvata in passato) la dicitura tradotta: lib/events/material-author.
@@ -1160,10 +1157,12 @@ function ContentTab({ event }: { event: EventData }) {
               ({event.materials.length})
             </span>
           </H>
-          <Link href={percorso(`/admin/events/${event.id}/materials`)}
-                className="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-2">
-            <Svg name="pencil" size={12} /> {td('manageMaterials')}
-          </Link>
+          {staffTools && (
+            <Link href={percorso(`/admin/events/${event.id}/materials`)}
+                  className="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-2">
+              <Svg name="pencil" size={12} /> {td('manageMaterials')}
+            </Link>
+          )}
         </div>
         {event.materials.length === 0 ? (
           <div className="text-center py-3" style={{ color: C_MUTED, fontSize: '0.9rem' }}>
@@ -1200,10 +1199,12 @@ function ContentTab({ event }: { event: EventData }) {
       <div>
         <div className="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
           <H>{td('questionnaires')}</H>
-          <Link href={percorso(`/admin/events/${event.id}/questionnaires`)}
-                className="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-2">
-            <Svg name="pencil" size={12} /> {td('manageQuestionnaires')}
-          </Link>
+          {staffTools && (
+            <Link href={percorso(`/admin/events/${event.id}/questionnaires`)}
+                  className="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-2">
+              <Svg name="pencil" size={12} /> {td('manageQuestionnaires')}
+            </Link>
+          )}
         </div>
         <div style={{ fontSize: '0.88rem', color: C_MUTED }}>
           {td('questionnaireCount', { count: event.questionnaireCount })}

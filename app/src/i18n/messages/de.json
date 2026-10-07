@@ -790,19 +790,18 @@
         "heading": "Personen und Einladungen",
         "intro": "Fügen Sie Veranstalter (auf der Seite sichtbar), Moderatoren, Referenten und eingeladene Gäste hinzu.",
         "organizersHeading": "Veranstalter",
-        "organizersHelp": "Erscheinen auf der öffentlichen Eventseite.",
-        "organizerName": "Ansprechperson",
-        "organizerOrganization": "Organisation",
+        "organizersHelp": "Die Organisationen, die die Veranstaltung ausrichten: Name, Website und Logo erscheinen auf der öffentlichen Seite.",
+        "organizerName": "Name der Organisation",
         "organizerWebsite": "Website",
         "organizerLogo": "Logo des Veranstalters",
-        "organizerRequired": "Ansprechperson und Organisation sind erforderlich.",
+        "organizerRequired": "Der Name der Organisation ist erforderlich.",
         "moderatorsHeading": "Moderatoren",
         "moderatorsHelp": "Moderatoren können die Sitzung verwalten und Berechtigungen während des Events steuern.",
         "moderatorName": "Name",
         "moderatorEmail": "E-Mail",
         "moderatorRequired": "Name und E-Mail sind erforderlich.",
         "speakersHeading": "Referenten",
-        "speakersHelp": "Erhalten per E-Mail einen Moderator-Link.",
+        "speakersHelp": "Sie erhalten per E-Mail einen persönlichen Link, um zu sprechen, die Kamera zu nutzen und den Bildschirm zu teilen, ohne Moderationsrechte.",
         "speakerName": "Name",
         "speakerEmail": "E-Mail",
         "speakerRequired": "Name und E-Mail sind erforderlich.",
@@ -810,17 +809,15 @@
         "invitationsHelp": "Liste der eingeladenen Personen. Die Plattform verschickt keine Einladungen: Teilen Sie den Link zur Veranstaltung selbst. Ist die öffentliche Registrierung deaktiviert, können sich nur diese Adressen registrieren, und der persönliche Teilnahmelink kommt nach der Registrierung per E-Mail.",
         "invitationName": "Name (optional)",
         "invitationEmail": "E-Mail",
-        "invitationRole": "Rolle",
-        "role": {
-          "GUEST": "Gast",
-          "SPEAKER": "Referent/in"
-        },
         "add": "Hinzufügen",
         "remove": "Entfernen",
         "invalidEmail": "Ungültige E-Mail-Adresse.",
         "duplicateEmail": "Adresse bereits vorhanden.",
         "rubricaPick": "Aus dem Adressbuch suchen…",
-        "rubricaOrAdd": "oder manuell hinzufügen"
+        "rubricaOrAdd": "oder manuell hinzufügen",
+        "removeItem": "{name} entfernen",
+        "invitationsStaffOnly": "Die Einladungen verwaltet das Team der Veranstaltung.",
+        "pickSkipped": "Einige Personen waren bereits aufgeführt oder hatten keine gültige Adresse und wurden nicht hinzugefügt."
       },
       "step4": {
         "heading": "Inhalte und Materialien",
@@ -840,11 +837,10 @@
         "remove": "Entfernen",
         "questionnairesHeading": "Fragebögen",
         "questionnairesIntro": "Kombinieren Sie wiederverwendbare Vorlagen mit eventspezifischen Fragen.",
-        "questionnairesEmpty": "Keine Fragebögen verfügbar. Erstellen Sie einen unter Einstellungen → Fragebögen.",
         "preHeading": "Voranmeldungs-Fragebogen",
         "postHeading": "Nach-Event-Fragebogen",
         "templatesLabel": "Wiederverwendbare Vorlagen",
-        "templatesEmpty": "Keine Vorlagen erstellt. Gehen Sie zu Einstellungen → Fragebögen.",
+        "templatesEmpty": "Keine Fragebogenvorlagen verfügbar: Fügen Sie die Fragen für diese Veranstaltung unten hinzu.",
         "adhocLabel": "Eventspezifische Fragen",
         "addQuestion": "+ Frage hinzufügen",
         "questionPrompt": "Fragetext",
@@ -860,7 +856,9 @@
         "scaleMax": "Maximum",
         "required": "Pflichtfeld",
         "saveDraftAndGoQuestionnaires": "Entwurf speichern und zur Fragebogen-Verwaltung",
-        "none": "— Keiner —"
+        "none": "— Keiner —",
+        "staffOnly": "Fragebögen und Materialien verwaltet das Team der Veranstaltung: Mit dem Moderationslink sehen Sie sie auf der Seite der Veranstaltung.",
+        "postDefaultHint": "Wenn Sie nichts auswählen, wird nach der Veranstaltung der Fragebogen „{name}“ angeboten."
       },
       "step5": {
         "heading": "Übersicht und Veröffentlichung",
@@ -903,7 +901,8 @@
         "privacyDoc": "Datenschutzdokument (PDF oder Link)",
         "privacyDocHelp": "Laden Sie ein PDF hoch oder fügen Sie die URL eines alternativen Datenschutzhinweises ein. Überschreibt die GDPR-Vorlage, falls vorhanden.",
         "privacyTextHelp": "Kurztext, der im Anmeldeformular angezeigt wird; kann die GDPR-Vorlage ergänzen oder ersetzen.",
-        "technicalDetails": "Technische Details: Kapazität und Ressourcen"
+        "technicalDetails": "Technische Details: Kapazität und Ressourcen",
+        "retentionRange": "Geben Sie eine Anzahl von Tagen zwischen 1 und {max} ein."
       },
       "validationFailed": "Bitte prüfen Sie die markierten Felder, bevor Sie fortfahren.",
       "partialFailure": "Veranstaltung erstellt, einige Elemente wurden jedoch nicht gespeichert: {items}. Sie können sie über die Seite der Veranstaltung hinzufügen.",
@@ -2424,7 +2423,38 @@
     "rubrica": {
       "title": "Adressbuch",
       "subtitle": "Personen, die der Aufnahme in das Adressbuch zugestimmt haben (Art. 6.1.a GDPR). Profilinformationen werden bei jeder erneuten Anmeldung automatisch aktualisiert.",
-      "backToList": "← Zurück zum Adressbuch"
+      "searchLabel": "Nach Name oder Organisation suchen",
+      "orgTypeLabel": "Art der Organisation",
+      "allTypes": "Alle",
+      "includeOptedOut": "Personen einbeziehen, die ihre Einwilligung widerrufen haben",
+      "count": "Personen im Adressbuch: {count}",
+      "empty": "Niemand entspricht den Filtern.",
+      "noName": "(ohne Namen)",
+      "statusActive": "Einwilligung erteilt",
+      "statusOptedOut": "Einwilligung widerrufen",
+      "col": {
+        "name": "Name",
+        "organization": "Organisation",
+        "type": "Art",
+        "events": "Veranstaltungen",
+        "lastActive": "Letzte Aktivität",
+        "status": "Status",
+        "event": "Veranstaltung",
+        "eventDate": "Datum der Veranstaltung",
+        "registeredAt": "Anmeldedatum",
+        "orgSnapshot": "Organisation bei der Anmeldung"
+      },
+      "deleteTitle": "Aus dem Adressbuch löschen",
+      "deleteMessage": "Diese Person endgültig aus dem Adressbuch löschen? Der Anmeldeverlauf bleibt erhalten.",
+      "deleteFailed": "Löschen fehlgeschlagen. Bitte versuchen Sie es erneut.",
+      "notFound": "Person nicht gefunden.",
+      "consentGivenAt": "Einwilligung erteilt am",
+      "optedOutAt": "Einwilligung widerrufen am",
+      "retentionMonths": "Aufbewahrung (Monate)",
+      "deleteButton": "Aus dem Adressbuch löschen (Art. 17 DSGVO)",
+      "deleting": "Wird gelöscht…",
+      "historyTitle": "Anmeldeverlauf ({count})",
+      "historyEmpty": "Keine Anmeldungen erfasst."
     },
     "eventAnalytics": {
       "title": "Statistiken",
@@ -2600,7 +2630,6 @@
       "ov": {
         "tab": "Überblick",
         "intro": "Was die KI-Pipeline für diese Aufzeichnung erzeugt hat, Sprache für Sprache.",
-        "processing": "Verarbeitung läuft oder noch keine Artefakte verfügbar. Kommen Sie wieder, wenn der Status „Abgeschlossen“ lautet.",
         "loadError": "Der Überblick konnte nicht geladen werden.",
         "langsTitle": "Sprachen und Artefakte",
         "colLang": "Sprache",
@@ -2834,7 +2863,9 @@
       "full": "Das Glossar hat die Höchstzahl an Begriffen erreicht.",
       "invalid": "Prüfen Sie die Felder: Einige Werte sind ungültig.",
       "error": "Der Vorgang ist fehlgeschlagen. Bitte erneut versuchen."
-    }
+    },
+    "deleteLiveBlocked": "Die Veranstaltung läuft gerade live: Beenden Sie sie, bevor Sie sie löschen.",
+    "bulkDeleteSkippedLive": "Nicht gelöschte Live-Veranstaltungen: {count}. Beenden Sie sie, bevor Sie sie löschen."
   },
   "email": {
     "confirmationSubject": "Anmeldebestätigung: {eventTitle}",

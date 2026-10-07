@@ -790,19 +790,18 @@
         "heading": "Asmenys ir kvietimai",
         "intro": "Pridėkite organizatorius (rodomi puslapyje), moderatorius, pranešėjus ir pakviestus svečius.",
         "organizersHeading": "Organizatoriai",
-        "organizersHelp": "Rodomi viešajame renginio puslapyje.",
-        "organizerName": "Kontaktinis asmuo",
-        "organizerOrganization": "Organizacija",
+        "organizersHelp": "Renginį organizuojančios organizacijos: pavadinimas, svetainė ir logotipas rodomi viešame puslapyje.",
+        "organizerName": "Organizacijos pavadinimas",
         "organizerWebsite": "Svetainė",
         "organizerLogo": "Organizatoriaus logotipas",
-        "organizerRequired": "Kontaktinis asmuo ir organizacija yra privalomi.",
+        "organizerRequired": "Organizacijos pavadinimas privalomas.",
         "moderatorsHeading": "Moderatoriai",
         "moderatorsHelp": "Moderatoriai gali valdyti sesiją ir leidimus renginio metu.",
         "moderatorName": "Vardas",
         "moderatorEmail": "El. paštas",
         "moderatorRequired": "Vardas ir el. paštas yra privalomi.",
         "speakersHeading": "Pranešėjai",
-        "speakersHelp": "Gauna moderatoriaus nuorodą el. paštu.",
+        "speakersHelp": "El. paštu gauna asmeninę nuorodą kalbėti, naudoti kamerą ir bendrinti ekraną, be moderatoriaus teisių.",
         "speakerName": "Vardas",
         "speakerEmail": "El. paštas",
         "speakerRequired": "Vardas ir el. paštas yra privalomi.",
@@ -810,17 +809,15 @@
         "invitationsHelp": "Pakviestų asmenų sąrašas. Platforma kvietimų nesiunčia: renginio nuoroda pasidalykite patys. Kai viešoji registracija išjungta, užsiregistruoti gali tik šie adresai, o asmeninė prisijungimo nuoroda po registracijos atsiunčiama el. paštu.",
         "invitationName": "Vardas (neprivaloma)",
         "invitationEmail": "El. paštas",
-        "invitationRole": "Vaidmuo",
-        "role": {
-          "GUEST": "Svečias",
-          "SPEAKER": "Pranešėjas"
-        },
         "add": "Pridėti",
         "remove": "Pašalinti",
         "invalidEmail": "Neteisingas el. pašto adresas.",
         "duplicateEmail": "Adresas jau pridėtas.",
         "rubricaPick": "Ieškoti adresų knygoje…",
-        "rubricaOrAdd": "arba pridėti rankiniu būdu"
+        "rubricaOrAdd": "arba pridėti rankiniu būdu",
+        "removeItem": "Pašalinti {name}",
+        "invitationsStaffOnly": "Kvietimus tvarko renginio komanda.",
+        "pickSkipped": "Kai kurie asmenys jau buvo sąraše arba neturėjo galiojančio adreso, todėl nebuvo pridėti."
       },
       "step4": {
         "heading": "Turinys ir medžiaga",
@@ -840,11 +837,10 @@
         "remove": "Pašalinti",
         "questionnairesHeading": "Klausimynai",
         "questionnairesIntro": "Derinkite daugkartinio naudojimo šablonus su konkrečiais šio renginio klausimais.",
-        "questionnairesEmpty": "Klausimynų nėra. Sukurkite klausimyną iš Nustatymai → Klausimynai.",
         "preHeading": "Iš anksto pildomas klausimynas",
         "postHeading": "Po renginio pildomas klausimynas",
         "templatesLabel": "Daugkartinio naudojimo šablonai",
-        "templatesEmpty": "Šablonų nėra. Eikite į Nustatymai → Klausimynai.",
+        "templatesEmpty": "Klausimynų šablonų nėra: šio renginio klausimus pridėkite žemiau.",
         "adhocLabel": "Konkretūs šio renginio klausimai",
         "addQuestion": "+ Pridėti klausimą",
         "questionPrompt": "Klausimo tekstas",
@@ -860,7 +856,9 @@
         "scaleMax": "Didžiausia",
         "required": "Privaloma",
         "saveDraftAndGoQuestionnaires": "Įrašyti juodraštį ir eiti į klausimynų valdymą",
-        "none": "— Nė vieno —"
+        "none": "— Nė vieno —",
+        "staffOnly": "Klausimynus ir medžiagą tvarko renginio komanda: su moderatoriaus nuoroda juos matote renginio puslapyje.",
+        "postDefaultHint": "Jei nieko nepasirinksite, po renginio bus pasiūlytas klausimynas „{name}“."
       },
       "step5": {
         "heading": "Santrauka ir paskelbimas",
@@ -903,7 +901,8 @@
         "privacyDoc": "Informacijos dokumentas (PDF arba nuoroda)",
         "privacyDocHelp": "Įkelkite PDF arba įklijuokite alternatyvios privatumo informacijos URL. Pakeičia GDPR/BDAR šabloną, jei nustatyta.",
         "privacyTextHelp": "Trumpas tekstas, rodomas registracijos formoje; gali papildyti arba pakeisti GDPR/BDAR šabloną.",
-        "technicalDetails": "Techninė informacija: talpa ir ištekliai"
+        "technicalDetails": "Techninė informacija: talpa ir ištekliai",
+        "retentionRange": "Įveskite dienų skaičių nuo 1 iki {max}."
       },
       "validationFailed": "Patikrinkite paryškintus laukus prieš tęsdami.",
       "partialFailure": "Renginys sukurtas, tačiau kai kurie elementai neišsaugoti: {items}. Galite juos pridėti renginio puslapyje.",
@@ -2424,7 +2423,38 @@
     "rubrica": {
       "title": "Adresų knyga",
       "subtitle": "Asmenys, davę sutikimą būti įtraukti į adresų knygą (GDPR/BDAR str. 6.1.a). Profilio informacija automatiškai atnaujinama kiekvieną kartą iš naujo registruojantis.",
-      "backToList": "← Atgal į adresų knygą"
+      "searchLabel": "Ieškoti pagal vardą ar organizaciją",
+      "orgTypeLabel": "Organizacijos tipas",
+      "allTypes": "Visi",
+      "includeOptedOut": "Įtraukti atšaukusius sutikimą",
+      "count": "Asmenys adresų knygoje: {count}",
+      "empty": "Filtrus atitinkančių asmenų nėra.",
+      "noName": "(be vardo)",
+      "statusActive": "Sutikimas duotas",
+      "statusOptedOut": "Sutikimas atšauktas",
+      "col": {
+        "name": "Vardas",
+        "organization": "Organizacija",
+        "type": "Tipas",
+        "events": "Renginiai",
+        "lastActive": "Paskutinė veikla",
+        "status": "Būsena",
+        "event": "Renginys",
+        "eventDate": "Renginio data",
+        "registeredAt": "Registracijos data",
+        "orgSnapshot": "Organizacija registracijos metu"
+      },
+      "deleteTitle": "Ištrinti iš adresų knygos",
+      "deleteMessage": "Visam laikui ištrinti šį asmenį iš adresų knygos? Registracijų istorija išlieka.",
+      "deleteFailed": "Ištrinti nepavyko. Bandykite dar kartą.",
+      "notFound": "Asmuo nerastas.",
+      "consentGivenAt": "Sutikimas duotas",
+      "optedOutAt": "Sutikimas atšauktas",
+      "retentionMonths": "Saugojimas (mėnesiai)",
+      "deleteButton": "Ištrinti iš adresų knygos (BDAR 17 str.)",
+      "deleting": "Trinama…",
+      "historyTitle": "Registracijų istorija ({count})",
+      "historyEmpty": "Registracijų nėra."
     },
     "eventAnalytics": {
       "title": "Statistika",
@@ -2600,7 +2630,6 @@
       "ov": {
         "tab": "Apžvalga",
         "intro": "Ką DI grandinė parengė šiam įrašui, kalba po kalbos.",
-        "processing": "Vyksta apdorojimas arba artefaktų dar nėra. Grįžkite, kai būsena bus „Baigta“.",
         "loadError": "Nepavyko įkelti apžvalgos.",
         "langsTitle": "Kalbos ir artefaktai",
         "colLang": "Kalba",
@@ -2834,7 +2863,9 @@
       "full": "Žodynėlyje jau yra didžiausias leidžiamas terminų skaičius.",
       "invalid": "Patikrinkite laukus: kai kurios reikšmės netinkamos.",
       "error": "Veiksmas nepavyko. Bandykite dar kartą."
-    }
+    },
+    "deleteLiveBlocked": "Renginys vyksta tiesiogiai: prieš ištrindami jį užbaikite.",
+    "bulkDeleteSkippedLive": "Neištrinti tiesioginiai renginiai: {count}. Prieš ištrindami juos užbaikite."
   },
   "email": {
     "confirmationSubject": "Registracija patvirtinta: {eventTitle}",

@@ -790,19 +790,18 @@
         "heading": "Personer och inbjudningar",
         "intro": "Lägg till arrangörer (visas på sidan), moderatorer, talare och inbjudna gäster.",
         "organizersHeading": "Arrangörer",
-        "organizersHelp": "Visas på den publika evenemangssidan.",
-        "organizerName": "Kontaktperson",
-        "organizerOrganization": "Organisation",
+        "organizersHelp": "Organisationerna bakom evenemanget: namn, webbplats och logotyp visas på den offentliga sidan.",
+        "organizerName": "Organisationens namn",
         "organizerWebsite": "Webbplats",
         "organizerLogo": "Arrangörens logotyp",
-        "organizerRequired": "Kontaktperson och organisation är obligatoriska.",
+        "organizerRequired": "Organisationens namn måste anges.",
         "moderatorsHeading": "Moderatorer",
         "moderatorsHelp": "Moderatorer kan styra sessionen och kontrollera behörigheter under evenemanget.",
         "moderatorName": "Namn",
         "moderatorEmail": "E-post",
         "moderatorRequired": "Namn och e-post är obligatoriska.",
         "speakersHeading": "Talare",
-        "speakersHelp": "Får en moderatorlänk via e-post.",
+        "speakersHelp": "De får en personlig länk via e-post för att tala, använda kameran och dela skärmen, utan moderatorbehörighet.",
         "speakerName": "Namn",
         "speakerEmail": "E-post",
         "speakerRequired": "Namn och e-post är obligatoriska.",
@@ -810,17 +809,15 @@
         "invitationsHelp": "Lista över inbjudna personer. Plattformen skickar inga inbjudningar: dela länken till evenemanget själv. När offentlig registrering är avstängd kan bara dessa adresser registrera sig, och den personliga länken för att delta kommer via e-post efter registreringen.",
         "invitationName": "Namn (valfritt)",
         "invitationEmail": "E-post",
-        "invitationRole": "Roll",
-        "role": {
-          "GUEST": "Gäst",
-          "SPEAKER": "Talare"
-        },
         "add": "Lägg till",
         "remove": "Ta bort",
         "invalidEmail": "Ogiltig e-postadress.",
         "duplicateEmail": "Adressen finns redan.",
         "rubricaPick": "Sök i adressboken…",
-        "rubricaOrAdd": "eller lägg till manuellt"
+        "rubricaOrAdd": "eller lägg till manuellt",
+        "removeItem": "Ta bort {name}",
+        "invitationsStaffOnly": "Inbjudningarna hanteras av evenemangets personal.",
+        "pickSkipped": "Några personer fanns redan i listan eller saknade en giltig adress och lades inte till."
       },
       "step4": {
         "heading": "Innehåll och material",
@@ -840,11 +837,10 @@
         "remove": "Ta bort",
         "questionnairesHeading": "Enkäter",
         "questionnairesIntro": "Kombinera återanvändbara mallar med frågor specifika för detta evenemang.",
-        "questionnairesEmpty": "Inga enkäter tillgängliga. Skapa en enkät från Inställningar → Enkäter.",
         "preHeading": "Förregistreringsenkät",
         "postHeading": "Eftermöteenkät",
         "templatesLabel": "Återanvändbara mallar",
-        "templatesEmpty": "Inga mallar skapade. Gå till Inställningar → Enkäter.",
+        "templatesEmpty": "Inga enkätmallar finns: lägg till frågorna för det här evenemanget nedan.",
         "adhocLabel": "Frågor specifika för detta evenemang",
         "addQuestion": "+ Lägg till fråga",
         "questionPrompt": "Frågetext",
@@ -860,7 +856,9 @@
         "scaleMax": "Maximum",
         "required": "Obligatorisk",
         "saveDraftAndGoQuestionnaires": "Spara utkast och gå till enkäthantering",
-        "none": "— Ingen —"
+        "none": "— Ingen —",
+        "staffOnly": "Enkäter och material hanteras av evenemangets personal: med moderatorlänken ser du dem på evenemangets sida.",
+        "postDefaultHint": "Om du inte väljer något erbjuds enkäten ”{name}” efter evenemanget."
       },
       "step5": {
         "heading": "Sammanfattning och publicering",
@@ -903,7 +901,8 @@
         "privacyDoc": "Integritetspolicydokument (PDF eller länk)",
         "privacyDocHelp": "Ladda upp en PDF eller klistra in URL:en till en alternativ integritetspolicy. Ersätter GDPR-mallen om angiven.",
         "privacyTextHelp": "Kort text som visas på registreringsformuläret; kan komplettera eller ersätta GDPR-mallen.",
-        "technicalDetails": "Tekniska detaljer: kapacitet och resurser"
+        "technicalDetails": "Tekniska detaljer: kapacitet och resurser",
+        "retentionRange": "Ange ett antal dagar mellan 1 och {max}."
       },
       "validationFailed": "Kontrollera de markerade fälten innan du fortsätter.",
       "partialFailure": "Evenemanget skapades, men vissa delar sparades inte: {items}. Du kan lägga till dem från evenemangets sida.",
@@ -2424,7 +2423,38 @@
     "rubrica": {
       "title": "Adressbok",
       "subtitle": "Personer som har samtyckt till att läggas till i adressboken (GDPR art. 6.1.a). Profilinformation uppdateras automatiskt vid varje ny anmälan.",
-      "backToList": "← Tillbaka till adressboken"
+      "searchLabel": "Sök på namn eller organisation",
+      "orgTypeLabel": "Typ av organisation",
+      "allTypes": "Alla",
+      "includeOptedOut": "Ta med personer som har återkallat sitt samtycke",
+      "count": "Personer i adressboken: {count}",
+      "empty": "Ingen matchar filtren.",
+      "noName": "(utan namn)",
+      "statusActive": "Samtycke lämnat",
+      "statusOptedOut": "Samtycke återkallat",
+      "col": {
+        "name": "Namn",
+        "organization": "Organisation",
+        "type": "Typ",
+        "events": "Evenemang",
+        "lastActive": "Senaste aktivitet",
+        "status": "Status",
+        "event": "Evenemang",
+        "eventDate": "Datum för evenemanget",
+        "registeredAt": "Anmälningsdatum",
+        "orgSnapshot": "Organisation vid anmälan"
+      },
+      "deleteTitle": "Ta bort från adressboken",
+      "deleteMessage": "Ta bort den här personen permanent från adressboken? Anmälningshistoriken sparas.",
+      "deleteFailed": "Borttagningen misslyckades. Försök igen.",
+      "notFound": "Personen hittades inte.",
+      "consentGivenAt": "Samtycke lämnat",
+      "optedOutAt": "Samtycke återkallat",
+      "retentionMonths": "Lagring (månader)",
+      "deleteButton": "Ta bort från adressboken (GDPR art. 17)",
+      "deleting": "Tar bort…",
+      "historyTitle": "Anmälningshistorik ({count})",
+      "historyEmpty": "Inga anmälningar registrerade."
     },
     "eventAnalytics": {
       "title": "Statistik",
@@ -2600,7 +2630,6 @@
       "ov": {
         "tab": "Översikt",
         "intro": "Vad AI-pipelinen har producerat för den här inspelningen, språk för språk.",
-        "processing": "Bearbetning pågår eller inga artefakter ännu. Kom tillbaka när statusen är ”Klart”.",
         "loadError": "Det gick inte att läsa in översikten.",
         "langsTitle": "Språk och artefakter",
         "colLang": "Språk",
@@ -2834,7 +2863,9 @@
       "full": "Ordlistan har nått maxantalet termer.",
       "invalid": "Kontrollera fälten: vissa värden är ogiltiga.",
       "error": "Åtgärden misslyckades. Försök igen."
-    }
+    },
+    "deleteLiveBlocked": "Evenemanget pågår live: avsluta det innan du tar bort det.",
+    "bulkDeleteSkippedLive": "Live-evenemang som inte togs bort: {count}. Avsluta dem innan du tar bort dem."
   },
   "email": {
     "confirmationSubject": "Anmälan bekräftad: {eventTitle}",

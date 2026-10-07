@@ -914,19 +914,18 @@
         "heading": "Persone e inviti",
         "intro": "Aggiungi organizzatori (mostrati sulla pagina), moderatori, relatori e ospiti invitati.",
         "organizersHeading": "Organizzatori",
-        "organizersHelp": "Compaiono nella pagina pubblica dell'evento.",
-        "organizerName": "Referente",
-        "organizerOrganization": "Organizzazione",
+        "organizersHelp": "Gli enti che organizzano l'evento: nome, sito e logo compaiono nella pagina pubblica.",
+        "organizerName": "Nome dell'ente",
         "organizerWebsite": "Sito web",
         "organizerLogo": "Logo organizzatore",
-        "organizerRequired": "Referente e organizzazione sono obbligatori.",
+        "organizerRequired": "Il nome dell'ente è obbligatorio.",
         "moderatorsHeading": "Moderatori",
         "moderatorsHelp": "Co-moderatori aggiuntivi: ognuno riceve un proprio link per gestire la sessione e i permessi durante l'evento. Il moderatore principale (contatto obbligatorio) si imposta nell'ultimo step, «Riepilogo».",
         "moderatorName": "Nome",
         "moderatorEmail": "Email",
         "moderatorRequired": "Nome ed email sono obbligatori.",
         "speakersHeading": "Relatori",
-        "speakersHelp": "Ricevono un link da moderatore via email.",
+        "speakersHelp": "Ricevono via email un link personale per parlare, usare la webcam e condividere lo schermo, senza poteri di moderazione.",
         "speakerName": "Nome",
         "speakerEmail": "Email",
         "speakerRequired": "Nome ed email sono obbligatori.",
@@ -934,17 +933,15 @@
         "invitationsHelp": "Elenco delle persone invitate. La piattaforma non invia inviti: condividi tu il link dell'evento. Con la registrazione pubblica disattivata possono registrarsi solo questi indirizzi, e il link personale per entrare arriva via email dopo la registrazione.",
         "invitationName": "Nome (facoltativo)",
         "invitationEmail": "Email",
-        "invitationRole": "Ruolo",
-        "role": {
-          "GUEST": "Ospite",
-          "SPEAKER": "Relatore"
-        },
         "add": "Aggiungi",
         "remove": "Rimuovi",
         "invalidEmail": "Indirizzo email non valido.",
         "duplicateEmail": "Indirizzo già presente.",
         "rubricaPick": "Cerca dalla rubrica…",
-        "rubricaOrAdd": "oppure aggiungi manualmente"
+        "rubricaOrAdd": "oppure aggiungi manualmente",
+        "removeItem": "Rimuovi {name}",
+        "invitationsStaffOnly": "Gli inviti li gestisce lo staff dell'evento.",
+        "pickSkipped": "Alcune persone erano già presenti, o senza un indirizzo valido, e non sono state aggiunte."
       },
       "step4": {
         "heading": "Contenuti e materiali",
@@ -964,11 +961,10 @@
         "remove": "Rimuovi",
         "questionnairesHeading": "Questionari",
         "questionnairesIntro": "Combina template riutilizzabili con domande specifiche per questo evento.",
-        "questionnairesEmpty": "Nessun questionario disponibile. Crea un questionario da Impostazioni → Questionari.",
         "preHeading": "Questionario di pre-registrazione",
         "postHeading": "Questionario post-evento",
         "templatesLabel": "Template riutilizzabili",
-        "templatesEmpty": "Nessun template creato. Vai a Impostazioni → Questionari.",
+        "templatesEmpty": "Nessun modello di questionario disponibile: aggiungi qui sotto le domande per questo evento.",
         "adhocLabel": "Domande specifiche per questo evento",
         "addQuestion": "+ Aggiungi domanda",
         "questionPrompt": "Testo della domanda",
@@ -984,7 +980,9 @@
         "scaleMax": "Massimo",
         "required": "Obbligatoria",
         "saveDraftAndGoQuestionnaires": "Salva bozza e vai a gestione questionari",
-        "none": "— Nessuno —"
+        "none": "— Nessuno —",
+        "staffOnly": "Questionari e materiali li gestisce lo staff dell'evento: con il link del moderatore si vedono nella pagina dell'evento.",
+        "postDefaultHint": "Se non scegli nulla, dopo l'evento si propone il questionario «{name}»."
       },
       "step5": {
         "heading": "Riepilogo e pubblicazione",
@@ -1027,7 +1025,8 @@
         "privacyDoc": "Documento informativa (PDF o link)",
         "privacyDocHelp": "Carica un PDF o incolla l'URL di un'informativa sostitutiva. Sovrascrive il template GDPR se presente.",
         "privacyTextHelp": "Testo sintetico mostrato nel form di registrazione; può integrare o sostituire il template GDPR.",
-        "technicalDetails": "Dettagli tecnici: capacità e risorse"
+        "technicalDetails": "Dettagli tecnici: capacità e risorse",
+        "retentionRange": "Inserisci un numero di giorni fra 1 e {max}."
       },
       "validationFailed": "Controlla i campi evidenziati prima di procedere.",
       "partialFailure": "Evento creato, ma alcuni elementi non sono stati salvati: {items}. Puoi aggiungerli dalla pagina dell'evento.",
@@ -2548,7 +2547,38 @@
     "rubrica": {
       "title": "Rubrica",
       "subtitle": "Persone che hanno dato consenso all'inserimento in rubrica (art. 6.1.a GDPR). Le informazioni di profilo vengono aggiornate automaticamente ad ogni re-iscrizione.",
-      "backToList": "← Torna alla rubrica"
+      "searchLabel": "Cerca per nome o ente",
+      "orgTypeLabel": "Tipo di ente",
+      "allTypes": "Tutti",
+      "includeOptedOut": "Includi chi ha revocato il consenso",
+      "count": "Persone nella rubrica: {count}",
+      "empty": "Nessuna persona corrisponde ai filtri.",
+      "noName": "(senza nome)",
+      "statusActive": "Consenso attivo",
+      "statusOptedOut": "Consenso revocato",
+      "col": {
+        "name": "Nome",
+        "organization": "Ente",
+        "type": "Tipo",
+        "events": "Eventi",
+        "lastActive": "Ultima attività",
+        "status": "Stato",
+        "event": "Evento",
+        "eventDate": "Data dell'evento",
+        "registeredAt": "Data di iscrizione",
+        "orgSnapshot": "Ente al momento dell'iscrizione"
+      },
+      "deleteTitle": "Elimina dalla rubrica",
+      "deleteMessage": "Eliminare definitivamente questa persona dalla rubrica? Lo storico delle iscrizioni resta.",
+      "deleteFailed": "Eliminazione non riuscita. Riprova.",
+      "notFound": "Persona non trovata.",
+      "consentGivenAt": "Consenso dato il",
+      "optedOutAt": "Consenso revocato il",
+      "retentionMonths": "Conservazione (mesi)",
+      "deleteButton": "Elimina dalla rubrica (art. 17 GDPR)",
+      "deleting": "Eliminazione…",
+      "historyTitle": "Storico iscrizioni ({count})",
+      "historyEmpty": "Nessuna iscrizione registrata."
     },
     "eventAnalytics": {
       "title": "Statistiche",
@@ -2729,7 +2759,6 @@
       "ov": {
         "tab": "Panoramica",
         "intro": "Cosa ha prodotto la pipeline AI per questa registrazione, lingua per lingua.",
-        "processing": "Elaborazione in corso o nessun artefatto disponibile. Torna quando lo stato è \"Completato\".",
         "loadError": "Impossibile caricare la panoramica.",
         "langsTitle": "Lingue e artefatti",
         "colLang": "Lingua",
@@ -2958,7 +2987,9 @@
       "full": "Il glossario ha raggiunto il numero massimo di termini.",
       "invalid": "Controlla i campi: qualche valore non è valido.",
       "error": "Operazione non riuscita. Riprova."
-    }
+    },
+    "deleteLiveBlocked": "L'evento è in diretta: terminalo prima di eliminarlo.",
+    "bulkDeleteSkippedLive": "Eventi in diretta non eliminati: {count}. Terminali prima di eliminarli."
   },
   "email": {
     "confirmationSubject": "Conferma registrazione: {eventTitle}",

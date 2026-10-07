@@ -8,13 +8,16 @@
  * via onDelete: SetNull on the FK, so event analytics are preserved.
  */
 
-import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
+import { useFormatter, useLocale, useTranslations } from 'next-intl';
 import { Button, Card, CardBody } from 'design-react-kit';
 
+import { Link, percorso, useRouter } from '@/i18n/navigation';
 import { useToast } from '@/components/ui/toast';
 import { useConfirm } from '@/components/ui/confirm-dialog';
 import { SkeletonLines } from '@/components/ui/skeleton';
+import { eventAdminPath } from '@/lib/events/admin-links';
+import { getLocalized } from '@/lib/utils/locale';
 
 interface Detail {
   id: string;
@@ -34,11 +37,16 @@ interface Detail {
     organization: string | null;
     organizationRole: string | null;
     organizationType: string | null;
-    event: { slug: string; title: Record<string, string>; startsAt: string };
+    event: { id: string; slug: string; title: Record<string, string>; startsAt: string };
   }>;
 }
 
 export default function RubricaDetail({ id }: { id: string }) {
+  const t = useTranslations('admin.rubrica');
+  const tTypes = useTranslations('admin.registrations.orgTypes');
+  const tc = useTranslations('common');
+  const format = useFormatter();
+  const locale = useLocale();
   const router = useRouter();
   const toast = useToast();
   const confirm = useConfirm();
@@ -56,6 +64,8 @@ export default function RubricaDetail({ id }: { id: string }) {
       } else if (res.ok) {
         setData(await res.json());
       }
+    } catch {
+      // Resta senza dati: si mostra l'errore generico.
     } finally {
       setLoading(false);
     }
@@ -67,10 +77,9 @@ export default function RubricaDetail({ id }: { id: string }) {
 
   const handleDelete = useCallback(async () => {
     const ok = await confirm({
-      title: 'Elimina dalla rubrica',
-      message:
-        "Eliminare definitivamente questa persona dalla rubrica? L'operazione è irreversibile ma preserva lo storico delle iscrizioni.",
-      confirmLabel: 'Elimina',
+      title: t('deleteTitle'),
+      message: t('deleteMessage'),
+      confirmLabel: tc('delete'),
       danger: true,
     });
     if (!ok) return;
@@ -79,19 +88,23 @@ export default function RubricaDetail({ id }: { id: string }) {
       const res = await fetch(`/api/admin/rubrica/${id}`, { method: 'DELETE' });
       if (res.ok) {
         router.push('/admin/rubrica');
-      } else {
-        toast.error("Errore durante l'eliminazione.");
-        setDeleting(false);
+        return;
       }
+      toast.error(t('deleteFailed'));
     } catch {
-      toast.error('Errore di rete.');
-      setDeleting(false);
+      toast.error(t('deleteFailed'));
     }
-  }, [id, router, confirm, toast]);
+    setDeleting(false);
+  }, [id, router, confirm, toast, t, tc]);
 
-  if (loading) return <SkeletonLines lines={5} loadingLabel="Caricamento…" />;
-  if (notFound) return <div className="text-muted">Persona non trovata.</div>;
-  if (!data) return <div className="text-muted">Errore.</div>;
+  const tipo = (code: string | null) => (code ? (tTypes.has(code) ? tTypes(code) : code) : null);
+  const data_ = (iso: string) => format.dateTime(new Date(iso), { dateStyle: 'medium' });
+  const dataOra = (iso: string) =>
+    format.dateTime(new Date(iso), { dateStyle: 'medium', timeStyle: 'short' });
+
+  if (loading) return <SkeletonLines lines={5} loadingLabel={tc('loading')} />;
+  if (notFound) return <p className="text-muted">{t('notFound')}</p>;
+  if (!data) return <div className="alert alert-danger" role="alert">{tc('errorGeneric')}</div>;
 
   return (
     <div className="d-flex flex-column gap-3">
@@ -99,46 +112,46 @@ export default function RubricaDetail({ id }: { id: string }) {
         <CardBody className="p-4">
           <div className="d-flex justify-content-between flex-wrap gap-2 mb-3">
             <div>
-              <h2 className="fw-semibold mb-1" style={{ color: 'var(--app-text)' }}>
-                {data.displayName || '(senza nome)'}
-              </h2>
+              <h1 className="h2 fw-bold mb-1" style={{ color: 'var(--app-text)' }}>
+                {data.displayName || t('noName')}
+              </h1>
               <div className="text-muted small">
                 {data.organization || '—'}
                 {data.organizationRole && <> · {data.organizationRole}</>}
-                {data.organizationType && <> · {data.organizationType}</>}
+                {tipo(data.organizationType) && <> · {tipo(data.organizationType)}</>}
               </div>
             </div>
             <div>
               {data.optedInToAddressBook ? (
-                <span className="badge bg-success">Opt-in attivo</span>
+                <span className="badge bg-success">{t('statusActive')}</span>
               ) : (
-                <span className="badge bg-secondary">Opt-out</span>
+                <span className="badge bg-secondary">{t('statusOptedOut')}</span>
               )}
             </div>
           </div>
 
-          <div className="row g-3">
+          <dl className="row g-3 mb-0">
             <div className="col-md-3">
-              <div className="text-muted small">Consenso dato il</div>
-              <div>{data.optedInAt ? new Date(data.optedInAt).toLocaleString('it') : '—'}</div>
+              <dt className="text-muted small fw-normal">{t('consentGivenAt')}</dt>
+              <dd className="mb-0">{data.optedInAt ? dataOra(data.optedInAt) : '—'}</dd>
             </div>
             <div className="col-md-3">
-              <div className="text-muted small">Opt-out</div>
-              <div>{data.optedOutAt ? new Date(data.optedOutAt).toLocaleString('it') : '—'}</div>
+              <dt className="text-muted small fw-normal">{t('optedOutAt')}</dt>
+              <dd className="mb-0">{data.optedOutAt ? dataOra(data.optedOutAt) : '—'}</dd>
             </div>
             <div className="col-md-3">
-              <div className="text-muted small">Ultima attività</div>
-              <div>{new Date(data.lastActiveAt).toLocaleDateString('it')}</div>
+              <dt className="text-muted small fw-normal">{t('col.lastActive')}</dt>
+              <dd className="mb-0">{data_(data.lastActiveAt)}</dd>
             </div>
             <div className="col-md-3">
-              <div className="text-muted small">Retention</div>
-              <div>{data.retentionMonths} mesi</div>
+              <dt className="text-muted small fw-normal">{t('retentionMonths')}</dt>
+              <dd className="mb-0">{data.retentionMonths}</dd>
             </div>
-          </div>
+          </dl>
 
           <div className="mt-4 d-flex gap-2">
             <Button color="danger" outline size="sm" onClick={handleDelete} disabled={deleting}>
-              {deleting ? 'Eliminazione…' : 'Elimina dalla rubrica (art. 17)'}
+              {deleting ? t('deleting') : t('deleteButton')}
             </Button>
           </div>
         </CardBody>
@@ -146,40 +159,43 @@ export default function RubricaDetail({ id }: { id: string }) {
 
       <Card className="shadow-sm border-0" style={{ borderRadius: 8 }}>
         <CardBody className="p-4">
-          <h5 className="fw-semibold mb-3">Storico iscrizioni ({data.registrations.length})</h5>
+          <h2 className="h5 fw-semibold mb-3">
+            {t('historyTitle', { count: data.registrations.length })}
+          </h2>
           {data.registrations.length === 0 ? (
-            <div className="text-muted small">Nessuna iscrizione registrata.</div>
+            <p className="text-muted small mb-0">{t('historyEmpty')}</p>
           ) : (
-            <table className="table table-sm mb-0">
-              <thead>
-                <tr>
-                  <th>Evento</th>
-                  <th>Data evento</th>
-                  <th>Data iscrizione</th>
-                  <th>Organizzazione (snapshot)</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data.registrations.map((r) => {
-                  const title = r.event.title?.it || r.event.slug;
-                  return (
+            <div className="table-responsive">
+              <table className="table table-sm mb-0">
+                <thead>
+                  <tr>
+                    <th scope="col">{t('col.event')}</th>
+                    <th scope="col">{t('col.eventDate')}</th>
+                    <th scope="col">{t('col.registeredAt')}</th>
+                    <th scope="col">{t('col.orgSnapshot')}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {data.registrations.map((r) => (
                     <tr key={r.id}>
                       <td>
-                        <a href={`/admin/events/${r.event.slug}`} className="text-decoration-none">
-                          {title}
-                        </a>
+                        <Link href={percorso(eventAdminPath(r.event.id))}>
+                          {getLocalized(r.event.title, locale) || r.event.slug}
+                        </Link>
                       </td>
-                      <td>{new Date(r.event.startsAt).toLocaleDateString('it')}</td>
-                      <td>{new Date(r.createdAt).toLocaleDateString('it')}</td>
+                      <td>{data_(r.event.startsAt)}</td>
+                      <td>{data_(r.createdAt)}</td>
                       <td>
                         {r.organization || '—'}
-                        {r.organizationType && <span className="text-muted small"> · {r.organizationType}</span>}
+                        {tipo(r.organizationType) && (
+                          <span className="text-muted small"> · {tipo(r.organizationType)}</span>
+                        )}
                       </td>
                     </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </CardBody>
       </Card>
