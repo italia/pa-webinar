@@ -18,7 +18,7 @@
 
 import { useState } from 'react';
 import useSWR from 'swr';
-import { useTranslations, useLocale } from 'next-intl';
+import { useFormatter, useTranslations, useLocale } from 'next-intl';
 
 import { SkeletonLines } from '@/components/ui/skeleton';
 import PipelineProvenance, {
@@ -122,6 +122,7 @@ function Kpi({ label, value, sub }: { label: string; value: string; sub?: string
 export default function RecordingOverview({ recordingId }: { recordingId: string }) {
   const t = useTranslations('admin.postprod.ov');
   const locale = useLocale();
+  const format = useFormatter();
   const { data, error, isLoading, mutate } = useSWR<Details>(
     `/api/admin/postprod/recordings/${recordingId}/details`,
     fetcher,
@@ -165,7 +166,7 @@ export default function RecordingOverview({ recordingId }: { recordingId: string
         <Kpi label={t('kpiTracks')} value={String(tracks.count)} sub={tracks.purged > 0 ? `${tracks.purged} ${t('trackPurged')}` : undefined} />
         <Kpi label={t('kpiLanguages')} value={String(langs.length)} sub={langs.map((l) => l.toUpperCase()).join(' · ')} />
         <Kpi label={t('kpiArtifacts')} value={String(artifacts.length)} />
-        <Kpi label={t('kpiProcessed')} value={new Date(r.updatedAt).toLocaleDateString(locale)} sub={`${t('run')} #${r.runCount}`} />
+        <Kpi label={t('kpiProcessed')} value={format.dateTime(new Date(r.updatedAt), { dateStyle: 'short' })} sub={`${t('run')} #${r.runCount}`} />
       </div>
 
       {/* ── Timeline job ──────────────────────────────────── */}

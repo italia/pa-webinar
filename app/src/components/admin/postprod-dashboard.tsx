@@ -21,6 +21,7 @@ import { Link, useRouter, percorso } from '@/i18n/navigation';
 import { useToast } from '@/components/ui/toast';
 import { useConfirm } from '@/components/ui/confirm-dialog';
 import TranscriptEditor from './transcript-editor';
+import { recordingStatusLabel, statusBadgeClass } from './recording-status';
 
 const fetcher = (url: string): Promise<unknown> =>
   fetch(url, { credentials: 'include' }).then((r) => {
@@ -90,39 +91,6 @@ interface ListResponse {
   offset: number;
   rows: RecordingRow[];
 }
-
-function statusVariant(status: string): string {
-  switch (status) {
-    case 'POSTPROD_DONE':
-    case 'DONE':
-      return 'bg-success';
-    case 'POSTPROD_FAILED':
-    case 'FAILED':
-      return 'bg-danger';
-    case 'POSTPROD_PARTIAL':
-      return 'bg-warning text-dark';
-    case 'POSTPROD_RUNNING':
-    case 'RUNNING':
-    case 'CLAIMED':
-      return 'bg-info text-dark';
-    case 'POSTPROD_QUEUED':
-    case 'PENDING':
-      return 'bg-secondary';
-    default:
-      return 'bg-light text-dark';
-  }
-}
-
-/** Lo stato di una registrazione (il soggetto e' la registrazione). */
-const STATUS_KEYS: Record<string, string> = {
-  READY: 'statusReady',
-  POSTPROD_QUEUED: 'statusQueued',
-  POSTPROD_RUNNING: 'statusRunning',
-  POSTPROD_PARTIAL: 'statusPartial',
-  POSTPROD_DONE: 'statusDone',
-  POSTPROD_FAILED: 'statusFailed',
-  ARCHIVED: 'statusArchived',
-};
 
 function formatDuration(seconds: number | null): string {
   if (seconds == null) return '–';
@@ -340,8 +308,8 @@ export default function PostprodDashboard() {
                     <td>{format.dateTime(new Date(row.createdAt), { dateStyle: 'short', timeStyle: 'short' })}</td>
                     <td>{formatDuration(row.durationSec)}</td>
                     <td>
-                      <span className={`badge ${statusVariant(row.status)}`}>
-                        {STATUS_KEYS[row.status] ? t(STATUS_KEYS[row.status]!) : row.status}
+                      <span className={`badge ${statusBadgeClass(row.status)}`}>
+                        {recordingStatusLabel(row.status, t)}
                       </span>
                     </td>
                     <td>
@@ -444,7 +412,7 @@ function RecordingDetails({
           <ul className="list-unstyled mb-0">
             {row.jobs.map((j) => (
               <li key={j.id} className="mb-1">
-                <span className={`badge me-2 ${statusVariant(j.status)}`}>
+                <span className={`badge me-2 ${statusBadgeClass(j.status)}`}>
                   {j.status}
                 </span>
                 <code>{j.kind}</code>

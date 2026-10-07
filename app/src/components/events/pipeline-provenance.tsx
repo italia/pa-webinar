@@ -19,7 +19,7 @@
  */
 
 import { useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useFormatter, useTranslations } from 'next-intl';
 
 import { Icon } from '@/components/ui/icon';
 import { speakerColor } from '@/lib/utils/speaker-palette';
@@ -77,16 +77,15 @@ const hasContent = (s: PipelineSnapshot | null | undefined): s is PipelineSnapsh
 
 export default function PipelineProvenance({ snapshot, locale }: Props) {
   const t = useTranslations('postprod.provenance');
+  const format = useFormatter();
   const [open, setOpen] = useState(false);
   if (!hasContent(snapshot)) return null;
 
   const runAt = snapshot.runAt ? new Date(snapshot.runAt) : null;
-  const runFmt = runAt
-    ? new Intl.DateTimeFormat(locale, {
-        dateStyle: 'medium',
-        timeStyle: 'short',
-      }).format(runAt)
-    : null;
+  // Con il formattatore di next-intl, che usa il fuso dell'istanza: un
+  // Intl.DateTimeFormat senza fuso scrive l'ora del server nella pagina resa
+  // lato server e quella del browser dopo, e React segnala la differenza.
+  const runFmt = runAt ? format.dateTime(runAt, { dateStyle: 'medium', timeStyle: 'short' }) : null;
 
   const langs = snapshot.languages ?? {};
 

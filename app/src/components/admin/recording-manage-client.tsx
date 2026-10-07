@@ -11,7 +11,7 @@
  */
 
 import { useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useFormatter, useTranslations } from 'next-intl';
 
 import { Link, percorso } from '@/i18n/navigation';
 import { useToast } from '@/components/ui/toast';
@@ -23,16 +23,9 @@ import SummaryEditor from './summary-editor';
 import TranslationManager from './translation-manager';
 import ArchivePanel from './archive-panel';
 import AiReliabilityPanel from './ai-reliability-panel';
+import { recordingStatusLabel, statusBadgeClass } from './recording-status';
 
 type TabKey = 'overview' | 'transcript' | 'summary' | 'translations' | 'archive' | 'reliability';
-
-function statusBadgeClass(status: string): string {
-  if (status.endsWith('DONE')) return 'bg-success';
-  if (status.endsWith('FAILED')) return 'bg-danger';
-  if (status.endsWith('PARTIAL')) return 'bg-warning text-dark';
-  if (status.endsWith('RUNNING') || status.endsWith('QUEUED')) return 'bg-info text-dark';
-  return 'bg-secondary';
-}
 
 function fmtDuration(sec: number | null): string {
   if (sec == null) return '–';
@@ -59,6 +52,7 @@ export default function RecordingManageClient({
   createdAt: string;
 }) {
   const t = useTranslations('admin.postprod');
+  const format = useFormatter();
   const toast = useToast();
   const confirm = useConfirm();
   const [tab, setTab] = useState<TabKey>('overview');
@@ -171,10 +165,10 @@ export default function RecordingManageClient({
             {eventTitle}
           </h1>
           <div className="d-flex flex-wrap align-items-center gap-2 small text-secondary">
-            <span className={`badge ${statusBadgeClass(status)}`}>{status}</span>
+            <span className={`badge ${statusBadgeClass(status)}`}>{recordingStatusLabel(status, t)}</span>
             <span>· {t('manageDuration')}: {fmtDuration(durationSec)}</span>
             <span>· {t('manageSource')}: {sourceLanguage}</span>
-            <span>· {new Date(createdAt).toLocaleString()}</span>
+            <span>· {format.dateTime(new Date(createdAt), { dateStyle: 'short', timeStyle: 'medium' })}</span>
           </div>
         </div>
         <div className="d-flex align-items-center gap-2">
