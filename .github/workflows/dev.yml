@@ -210,9 +210,10 @@ jobs:
       contents: read
       packages: write
     # Build pesante: il base NGC pytorch image è ~10GB, pyannote+whisperx
-    # tirano modelli da HF al runtime ma il pip install è ~5GB. 60 min
-    # è un buffer ampio (cold senza cache fa ~25-30 min).
-    timeout-minutes: 60
+    # tirano modelli da HF al runtime ma il pip install è ~5GB. A freddo fa
+    # ~25-30 min, ma con la cache scaduta e il push dei layer sul runner
+    # in-cluster ha superato i 60: il tetto e' 120.
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
