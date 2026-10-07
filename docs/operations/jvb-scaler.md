@@ -132,8 +132,12 @@ About each key:
   on. When such an event has ended within the last two hours, it keeps that
   replica while Jibri's health API reports `BUSY`: after the event Jibri stays
   in the room until it empties, then closes the file and uploads it, and
-  scaling it down at that moment loses the recording. It asks for zero
-  otherwise, including when Jibri's health API does not answer. Otherwise the log reads
+  scaling it down at that moment loses the recording. If the health API does
+  not answer in that window, it keeps Jibri while it has replicas (the tick
+  passes the replica count as `jibriReplicas`): losing a recording costs more
+  than an idle Jibri. It never starts a stopped Jibri for this, and the app log
+  warns on each such tick. The window starts from the event's last update. It
+  asks for zero otherwise. Otherwise the log reads
   `Jibri: deployment/statefulset not found — skipping`, which is expected when
   Jibri is off. Recording values are in
   [Setting up recording](recording-setup.md).

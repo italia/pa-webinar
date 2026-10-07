@@ -190,11 +190,43 @@ describe('repliche di Jibri', () => {
     expect(body.jibriDesired).toBe(0);
   });
 
-  it('Jibri che non risponde: nessuna replica in piu (a zero repliche non risponde mai)', async () => {
+  it('Jibri che non risponde a zero repliche: non lo si riaccende', async () => {
     mocks.count.mockResolvedValue(1);
     mocks.fetchJibriHealth.mockResolvedValue(null);
     vi.spyOn(console, 'warn').mockImplementation(() => {});
-    const body = await (await chiama()).json();
+    expect((await (await chiama('?jibriReplicas=0')).json()).jibriDesired).toBe(0);
+    // uno scaler vecchio non passa le repliche: come a zero
+    expect((await (await chiama()).json()).jibriDesired).toBe(0);
+  });
+
+  it('Jibri acceso e muto dopo un evento registrato: lo si tiene (potrebbe caricare)', async () => {
+    mocks.count.mockResolvedValue(1);
+    mocks.fetchJibriHealth.mockResolvedValue(null);
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const body = await (await chiama('?jibriReplicas=1')).json();
+    expect(body.jibriDesired).toBe(1);
+    expect(body.jibriHold).toBe(true);
+  });
+
+  it('valori di jibriReplicas non validi o negativi: come zero', async () => {
+    mocks.count.mockResolvedValue(1);
+    mocks.fetchJibriHealth.mockResolvedValue(null);
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    expect((await (await chiama('?jibriReplicas=abc')).json()).jibriDesired).toBe(0);
+    expect((await (await chiama('?jibriReplicas=-1')).json()).jibriDesired).toBe(0);
+  });
+
+  it('la risposta della sonda vale piu\' delle repliche: IDLE con Jibri pronto e\' zero', async () => {
+    mocks.count.mockResolvedValue(1);
+    mocks.fetchJibriHealth.mockResolvedValue({ healthy: true, busyStatus: 'IDLE' });
+    const body = await (await chiama('?jibriReplicas=1')).json();
+    expect(body.jibriDesired).toBe(0);
+  });
+
+  it('fuori dalla finestra dopo la fine: zero anche con Jibri acceso e muto', async () => {
+    mocks.count.mockResolvedValue(0);
+    mocks.fetchJibriHealth.mockResolvedValue(null);
+    const body = await (await chiama('?jibriReplicas=1')).json();
     expect(body.jibriDesired).toBe(0);
   });
 

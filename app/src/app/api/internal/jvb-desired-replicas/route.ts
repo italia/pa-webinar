@@ -97,8 +97,15 @@ export const GET = withErrorHandling(async (request) => {
   // `current` (spec.replicas) and `ready` (status.readyReplicas) so we can
   // persist an authoritative snapshot for the public status page. Parse
   // defensively: if the caller is an older scaler image, fall back to null.
-  const currentReplicas = numParam('current') !== null ? Math.trunc(numParam('current')!) : null;
-  const readyReplicas = numParam('ready') !== null ? Math.trunc(numParam('ready')!) : null;
+  const intParam = (name: string): number | null => {
+    const v = numParam(name);
+    return v === null ? null : Math.trunc(v);
+  };
+  const currentReplicas = intParam('current');
+  const readyReplicas = intParam('ready');
+  // Le repliche di Jibri pronte, se lo scaler le passa (gli scaler piu'
+  // vecchi no: null).
+  const jibriReplicas = intParam('jibriReplicas');
 
   // The scaler also aggregates `/colibri/stats` across ALL JVB pods (it has
   // `pods/exec` RBAC). A single Service-LB fetch from this pod would only
@@ -222,9 +229,12 @@ export const GET = withErrorHandling(async (request) => {
   // video va perso. Per questo, entro JIBRI_HOLD_MINUTES dalla fine di un
   // evento con registrazione, resta acceso finche' risponde di essere occupato
   // (BUSY). Passata la finestra si spegne comunque: un Jibri bloccato non
-  // tiene acceso il nodo per sempre. Se non risponde vale la regola di prima
-  // (spento): a zero repliche la sonda non risponde mai, e tenerlo acceso in
-  // quel caso lo riaccenderebbe a ogni giro.
+  // tiene acceso il nodo per sempre. Se la sonda non risponde (installazione
+  // con l'API di salute irraggiungibile) lo si tiene finche' ha repliche,
+  // entro la stessa finestra: perdere un video costa piu' di un Jibri acceso
+  // a vuoto. A zero repliche no: trattenerlo lo riaccenderebbe a ogni giro.
+  // La finestra parte dall'ultima scrittura sull'evento (non c'e' un orario
+  // di chiusura): una modifica successiva la allunga.
   const needsRecording = billableEvents.some((e) => e.recordingEnabled);
   let jibriHold = false;
   if (!needsRecording && process.env.JIBRI_HEALTH_URL) {
@@ -237,10 +247,13 @@ export const GET = withErrorHandling(async (request) => {
     });
     if (appenaConclusi > 0) {
       const health = await fetchJibriHealth();
-      jibriHold = health?.busyStatus === 'BUSY';
+      jibriHold = health ? health.busyStatus === 'BUSY' : (jibriReplicas ?? 0) > 0;
       if (!health) {
         // eslint-disable-next-line no-console
-        console.warn('[jvb-scaler] Jibri non risponde dopo un evento registrato: non lo si trattiene');
+        console.warn(
+          `[jvb-scaler] Jibri non risponde dopo un evento registrato (repliche: ${jibriReplicas ?? '?'}): ` +
+            (jibriHold ? 'lo si tiene acceso' : 'non lo si trattiene'),
+        );
       }
     }
   }
