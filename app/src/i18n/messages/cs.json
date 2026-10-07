@@ -632,7 +632,7 @@
       "active": "Aktivní",
       "inactive": "Deaktivován",
       "invite": "Poslat odkaz",
-      "inviteFor": "Poslat přihlašovací odkaz: {name}",
+      "inviteFor": "Poslat odkaz – {name}",
       "deactivate": "Deaktivovat",
       "deactivateFor": "Deaktivovat: {name}",
       "activate": "Znovu aktivovat",
@@ -1750,7 +1750,8 @@
         "min": "Zkontrolujte „{field}“: minimální hodnota je {min}.",
         "max": "Zkontrolujte „{field}“: maximální hodnota je {max}.",
         "field": "Zkontrolujte „{field}“: hodnota není platná."
-      }
+      },
+      "primaryColorHex": "Primární barva (hexadecimální kód)"
     },
     "analytics": {
       "title": "Statistiky",
@@ -2002,7 +2003,8 @@
       "overridesDescription": "Přepište výchozí překlady pro tento jazyk. Použijte tečkovou notaci (např. common.appName).",
       "keyLabel": "Klíč překladu",
       "valueLabel": "Hodnota",
-      "addOverride": "Přidat"
+      "addOverride": "Přidat",
+      "invalidValues": "Některé hodnoty nejsou platné: zkontrolujte klíč a text překladu."
     },
     "infrastructure": {
       "subtitle": "Stav komponent a konfigurace prostředí",

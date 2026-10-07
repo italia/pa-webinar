@@ -632,7 +632,7 @@
       "active": "Active",
       "inactive": "Deactivated",
       "invite": "Send link",
-      "inviteFor": "Send a sign-in link to {name}",
+      "inviteFor": "Send link – {name}",
       "deactivate": "Deactivate",
       "deactivateFor": "Deactivate {name}",
       "activate": "Reactivate",
@@ -1750,7 +1750,8 @@
         "min": "Check “{field}”: the minimum value is {min}.",
         "max": "Check “{field}”: the maximum value is {max}.",
         "field": "Check “{field}”: the value is not valid."
-      }
+      },
+      "primaryColorHex": "Primary color (hex code)"
     },
     "analytics": {
       "title": "Analytics",
@@ -2002,7 +2003,8 @@
       "overridesDescription": "Override default translations for this language. Use dot notation (e.g. common.appName).",
       "keyLabel": "Translation key",
       "valueLabel": "Value",
-      "addOverride": "Add"
+      "addOverride": "Add",
+      "invalidValues": "Some values are not valid: check the key and the text of the translation."
     },
     "infrastructure": {
       "subtitle": "Component status and environment configuration",

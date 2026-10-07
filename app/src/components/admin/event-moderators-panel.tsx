@@ -268,7 +268,7 @@ export default function EventModeratorsPanel({
                       {row.role === 'SPEAKER' ? t('roleSpeaker') : t('roleModerator')}
                     </Badge>
                     {revoked && (
-                      <Badge color="" pill style={{ fontSize: '0.7rem', background: '#E9ECEF', color: 'var(--app-muted)' }}>
+                      <Badge color="" pill style={{ fontSize: '0.7rem', background: '#E9ECEF', color: 'var(--app-text)' }}>
                         {t('revoked')}
                       </Badge>
                     )}

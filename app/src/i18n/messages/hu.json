@@ -632,7 +632,7 @@
       "active": "Aktív",
       "inactive": "Letiltva",
       "invite": "Link küldése",
-      "inviteFor": "Belépési link küldése neki: {name}",
+      "inviteFor": "Link küldése – {name}",
       "deactivate": "Letiltás",
       "deactivateFor": "{name} letiltása",
       "activate": "Újraaktiválás",
@@ -1750,7 +1750,8 @@
         "min": "Ellenőrizze ezt: „{field}”: a legkisebb érték {min}.",
         "max": "Ellenőrizze ezt: „{field}”: a legnagyobb érték {max}.",
         "field": "Ellenőrizze ezt: „{field}”: az érték érvénytelen."
-      }
+      },
+      "primaryColorHex": "Elsődleges szín (hexadecimális kód)"
     },
     "analytics": {
       "title": "Statisztikák",
@@ -2002,7 +2003,8 @@
       "overridesDescription": "Írja felül az alapértelmezett fordításokat ehhez a nyelvhez. Használjon pont jelölést (pl. common.appName).",
       "keyLabel": "Fordítási kulcs",
       "valueLabel": "Érték",
-      "addOverride": "Hozzáadás"
+      "addOverride": "Hozzáadás",
+      "invalidValues": "Egyes értékek érvénytelenek: ellenőrizze a kulcsot és a fordítás szövegét."
     },
     "infrastructure": {
       "subtitle": "Komponensek állapota és környezeti konfiguráció",

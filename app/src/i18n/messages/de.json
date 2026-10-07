@@ -632,7 +632,7 @@
       "active": "Aktiv",
       "inactive": "Deaktiviert",
       "invite": "Link senden",
-      "inviteFor": "Anmeldelink an {name} senden",
+      "inviteFor": "Link senden – {name}",
       "deactivate": "Deaktivieren",
       "deactivateFor": "{name} deaktivieren",
       "activate": "Reaktivieren",
@@ -1750,7 +1750,8 @@
         "min": "Prüfen Sie „{field}“: Der Mindestwert ist {min}.",
         "max": "Prüfen Sie „{field}“: Der Höchstwert ist {max}.",
         "field": "Prüfen Sie „{field}“: Der Wert ist ungültig."
-      }
+      },
+      "primaryColorHex": "Primärfarbe (Hex-Code)"
     },
     "analytics": {
       "title": "Statistiken",
@@ -2002,7 +2003,8 @@
       "overridesDescription": "Standard-Übersetzungen für diese Sprache überschreiben. Verwenden Sie die Punktnotation (z. B. common.appName).",
       "keyLabel": "Übersetzungsschlüssel",
       "valueLabel": "Wert",
-      "addOverride": "Hinzufügen"
+      "addOverride": "Hinzufügen",
+      "invalidValues": "Einige Werte sind ungültig: Prüfen Sie den Schlüssel und den Text der Übersetzung."
     },
     "infrastructure": {
       "subtitle": "Komponentenstatus und Umgebungskonfiguration",

@@ -632,7 +632,7 @@
       "active": "Aktiv",
       "inactive": "Deaktiveret",
       "invite": "Send link",
-      "inviteFor": "Send et loginlink til {name}",
+      "inviteFor": "Send link – {name}",
       "deactivate": "Deaktivér",
       "deactivateFor": "Deaktivér {name}",
       "activate": "Genaktivér",
@@ -1750,7 +1750,8 @@
         "min": "Kontroller »{field}«: minimumsværdien er {min}.",
         "max": "Kontroller »{field}«: maksimumværdien er {max}.",
         "field": "Kontroller »{field}«: værdien er ugyldig."
-      }
+      },
+      "primaryColorHex": "Primær farve (hex-kode)"
     },
     "analytics": {
       "title": "Statistik",
@@ -2002,7 +2003,8 @@
       "overridesDescription": "Tilsidesæt standardoversættelser for dette sprog. Brug punktnotation (f.eks. common.appName).",
       "keyLabel": "Oversættelsesnøgle",
       "valueLabel": "Værdi",
-      "addOverride": "Tilføj"
+      "addOverride": "Tilføj",
+      "invalidValues": "Nogle værdier er ugyldige: tjek nøglen og oversættelsens tekst."
     },
     "infrastructure": {
       "subtitle": "Komponentstatus og miljøkonfiguration",

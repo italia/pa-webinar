@@ -756,7 +756,7 @@
       "active": "Attivo",
       "inactive": "Disattivato",
       "invite": "Manda link",
-      "inviteFor": "Manda un link di accesso a {name}",
+      "inviteFor": "Manda link – {name}",
       "deactivate": "Disattiva",
       "deactivateFor": "Disattiva {name}",
       "activate": "Riattiva",
@@ -1874,7 +1874,8 @@
         "min": "Controlla «{field}»: il valore minimo è {min}.",
         "max": "Controlla «{field}»: il valore massimo è {max}.",
         "field": "Controlla «{field}»: il valore non è valido."
-      }
+      },
+      "primaryColorHex": "Colore primario (codice esadecimale)"
     },
     "analytics": {
       "title": "Statistiche",
@@ -2126,7 +2127,8 @@
       "overridesDescription": "Sovrascrivi le traduzioni predefinite per questa lingua. Usa la notazione con punto (es. common.appName).",
       "keyLabel": "Chiave traduzione",
       "valueLabel": "Valore",
-      "addOverride": "Aggiungi"
+      "addOverride": "Aggiungi",
+      "invalidValues": "Alcuni valori non sono validi: controlla la chiave e il testo della traduzione."
     },
     "infrastructure": {
       "subtitle": "Stato dei componenti e della configurazione dell'ambiente",

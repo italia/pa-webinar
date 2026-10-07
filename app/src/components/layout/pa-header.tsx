@@ -41,19 +41,22 @@ export default function PAHeader({ isAdmin }: PAHeaderProps) {
   const parentUrl = parent ? settings.parentOrganizationUrl?.trim() || undefined : undefined;
   const appName = settings.siteName || t('common.appName');
 
+  // Il landmark «banner»: Headers del kit e' un div.
   return (
-    <Headers>
-      <SlimHeader
-        slimTitle={slimTitle}
-        slimSubtitle={slimSubtitle}
-        parentUrl={parentUrl}
-      />
-      <CenterHeader
-        appName={appName}
-        isAdmin={isAdmin}
-        logoUrl={settings.logoUrl}
-      />
-    </Headers>
+    <header>
+      <Headers>
+        <SlimHeader
+          slimTitle={slimTitle}
+          slimSubtitle={slimSubtitle}
+          parentUrl={parentUrl}
+        />
+        <CenterHeader
+          appName={appName}
+          isAdmin={isAdmin}
+          logoUrl={settings.logoUrl}
+        />
+      </Headers>
+    </header>
   );
 }
 
@@ -124,12 +127,18 @@ function CenterHeader({
             {/* Default PA Webinar mark (white knockout) — appName text sits
                 next to it, so the image is decorative (aria-hidden). */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/images/logo/pa-webinar-mark-white.svg"
-              alt=""
-              aria-hidden="true"
-              style={{ height: 34, marginRight: 10 }}
-            />
+            {/* Il kit nasconde sui telefoni ogni figlio dopo il primo (qui il
+                titolo): il nome del link resta nel primo, per i lettori di
+                schermo, solo dove il titolo non si vede. */}
+            <span className="d-inline-flex align-items-center">
+              <img
+                src="/images/logo/pa-webinar-mark-white.svg"
+                alt=""
+                aria-hidden="true"
+                style={{ height: 34, marginRight: 10 }}
+              />
+              <span className="visually-hidden d-md-none">{appName}</span>
+            </span>
             <h2>{appName}</h2>
           </HeaderBrand>
         )}

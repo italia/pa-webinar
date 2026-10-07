@@ -109,7 +109,7 @@ export default function Step2Permissions({
 
       <div className="table-responsive mb-4">
         <table
-          className="table table-bordered align-middle mb-0 bg-white"
+          className="table table-bordered align-middle mb-0 bg-white permission-matrix"
           style={{ borderRadius: 8, overflow: 'hidden' }}
         >
           <thead>

@@ -148,7 +148,7 @@ export default function ArchivePanel({ recordingId }: { recordingId: string }) {
           {/* Niente tracce per-partecipante (multitrack non attivo): invece
               di una tab vuota, offriamo la registrazione SORGENTE (riascolto
               + download) e spieghiamo perché l'archivio MKV non è disponibile. */}
-          <div className="alert alert-secondary" role="status">{t('archiveNoTracks')}</div>
+          <p className="text-muted mb-0" role="status">{t('archiveNoTracks')}</p>
           {data?.mixUrl && (
             <>
               <h2 className="h6 fw-semibold mb-2">{t('archiveSourceTitle')}</h2>

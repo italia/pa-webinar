@@ -318,6 +318,7 @@ export default function InstantCallsList({
           color: #fff;
           padding: 24px 28px;
           display: flex;
+          flex-wrap: wrap;
           align-items: center;
           justify-content: space-between;
           gap: 16px;
@@ -382,9 +383,10 @@ export default function InstantCallsList({
         <CardBody className="p-3">
           <div className="row g-2 align-items-end">
             <div className="col-md-4">
-              <label className="form-label small text-muted mb-1">{t('filters.search')}</label>
+              <label className="form-label small text-muted mb-1" htmlFor="ic-q">{t('filters.search')}</label>
               <div className="position-relative">
                 <Input
+                  id="ic-q"
                   type="text"
                   value={filters.q}
                   onChange={(e) => setFilters((f) => ({ ...f, q: e.target.value }))}
@@ -393,24 +395,27 @@ export default function InstantCallsList({
               </div>
             </div>
             <div className="col-md-2">
-              <label className="form-label small text-muted mb-1">{t('filters.from')}</label>
+              <label className="form-label small text-muted mb-1" htmlFor="ic-from">{t('filters.from')}</label>
               <Input
+                id="ic-from"
                 type="date"
                 value={filters.from}
                 onChange={(e) => setFilters((f) => ({ ...f, from: e.target.value }))}
               />
             </div>
             <div className="col-md-2">
-              <label className="form-label small text-muted mb-1">{t('filters.to')}</label>
+              <label className="form-label small text-muted mb-1" htmlFor="ic-to">{t('filters.to')}</label>
               <Input
+                id="ic-to"
                 type="date"
                 value={filters.to}
                 onChange={(e) => setFilters((f) => ({ ...f, to: e.target.value }))}
               />
             </div>
             <div className="col-md-2">
-              <label className="form-label small text-muted mb-1">{t('filters.status')}</label>
+              <label className="form-label small text-muted mb-1" htmlFor="ic-status">{t('filters.status')}</label>
               <select
+                id="ic-status"
                 className="form-select"
                 value={filters.status}
                 onChange={(e) => setFilters((f) => ({ ...f, status: e.target.value as StatusFilter }))}
@@ -423,8 +428,9 @@ export default function InstantCallsList({
               </select>
             </div>
             <div className="col-md-2">
-              <label className="form-label small text-muted mb-1">{t('filters.recording')}</label>
+              <label className="form-label small text-muted mb-1" htmlFor="ic-rec">{t('filters.recording')}</label>
               <select
+                id="ic-rec"
                 className="form-select"
                 value={filters.hasRec}
                 onChange={(e) => setFilters((f) => ({ ...f, hasRec: e.target.value as HasRecFilter }))}

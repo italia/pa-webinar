@@ -803,6 +803,7 @@ function ServiceDetailPanel({ service, data, t, onClose }: {
   t: ReturnType<typeof useTranslations<'infraMap'>>;
   onClose: () => void;
 }) {
+  const tc = useTranslations('common');
   const sc = STATUS_COLORS[service.status] ?? '#5A768A';
   const svcName = resolveI18nKey(t, service.name);
   const verdictText = resolveI18nKey(t, service.verdict);
@@ -819,10 +820,10 @@ function ServiceDetailPanel({ service, data, t, onClose }: {
             <Badge style={{ backgroundColor: sc, fontSize: '0.68rem' }}>
               {t(`statuses.${service.status}` as Parameters<typeof t>[0])}
             </Badge>
-            <span style={{ fontSize: '0.7rem', color: '#78909C' }}>{service.technicalName}</span>
+            <span style={{ fontSize: '0.7rem', color: '#5A768A' }}>{service.technicalName}</span>
           </div>
         </div>
-        <button className="btn btn-sm btn-link text-muted p-0" onClick={onClose} aria-label="Close">&#10005;</button>
+        <button className="btn btn-sm btn-link text-muted p-0" onClick={onClose} aria-label={tc('close')}>&#10005;</button>
       </div>
 
       <div className="infra-map__detail-body">

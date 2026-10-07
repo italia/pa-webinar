@@ -632,7 +632,7 @@
       "active": "Actif",
       "inactive": "Désactivé",
       "invite": "Envoyer le lien",
-      "inviteFor": "Envoyer un lien de connexion à {name}",
+      "inviteFor": "Envoyer le lien – {name}",
       "deactivate": "Désactiver",
       "deactivateFor": "Désactiver {name}",
       "activate": "Réactiver",
@@ -1750,7 +1750,8 @@
         "min": "Vérifiez « {field} » : la valeur minimale est {min}.",
         "max": "Vérifiez « {field} » : la valeur maximale est {max}.",
         "field": "Vérifiez « {field} » : la valeur n'est pas valide."
-      }
+      },
+      "primaryColorHex": "Couleur principale (code hexadécimal)"
     },
     "analytics": {
       "title": "Statistiques",
@@ -2002,7 +2003,8 @@
       "overridesDescription": "Remplacez les traductions par défaut pour cette langue. Utilisez la notation à points (p. ex. common.appName).",
       "keyLabel": "Clé de traduction",
       "valueLabel": "Valeur",
-      "addOverride": "Ajouter"
+      "addOverride": "Ajouter",
+      "invalidValues": "Certaines valeurs ne sont pas valides : vérifiez la clé et le texte de la traduction."
     },
     "infrastructure": {
       "subtitle": "État des composants et configuration de l'environnement",

@@ -632,7 +632,7 @@
       "active": "Aktivan",
       "inactive": "Deaktiviran",
       "invite": "Pošalji poveznicu",
-      "inviteFor": "Pošalji poveznicu za prijavu: {name}",
+      "inviteFor": "Pošalji poveznicu – {name}",
       "deactivate": "Deaktiviraj",
       "deactivateFor": "Deaktiviraj: {name}",
       "activate": "Ponovno aktiviraj",
@@ -1750,7 +1750,8 @@
         "min": "Provjerite „{field}”: najmanja vrijednost je {min}.",
         "max": "Provjerite „{field}”: najveća vrijednost je {max}.",
         "field": "Provjerite „{field}”: vrijednost nije valjana."
-      }
+      },
+      "primaryColorHex": "Primarna boja (heksadecimalni kôd)"
     },
     "analytics": {
       "title": "Statistike",
@@ -2002,7 +2003,8 @@
       "overridesDescription": "Nadjačajte zadane prijevode za ovaj jezik. Koristite notaciju s točkom (npr. common.appName).",
       "keyLabel": "Ključ prijevoda",
       "valueLabel": "Vrijednost",
-      "addOverride": "Dodaj"
+      "addOverride": "Dodaj",
+      "invalidValues": "Neke vrijednosti nisu valjane: provjerite ključ i tekst prijevoda."
     },
     "infrastructure": {
       "subtitle": "Stanje komponenti i konfiguracija okruženja",

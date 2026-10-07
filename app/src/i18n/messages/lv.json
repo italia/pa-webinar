@@ -632,7 +632,7 @@
       "active": "Aktīvs",
       "inactive": "Deaktivizēts",
       "invite": "Sūtīt saiti",
-      "inviteFor": "Sūtīt pieteikšanās saiti: {name}",
+      "inviteFor": "Sūtīt saiti – {name}",
       "deactivate": "Deaktivizēt",
       "deactivateFor": "Deaktivizēt: {name}",
       "activate": "Atkārtoti aktivizēt",
@@ -1750,7 +1750,8 @@
         "min": "Pārbaudiet “{field}”: mazākā vērtība ir {min}.",
         "max": "Pārbaudiet “{field}”: lielākā vērtība ir {max}.",
         "field": "Pārbaudiet “{field}”: vērtība nav derīga."
-      }
+      },
+      "primaryColorHex": "Galvenā krāsa (heksadecimālais kods)"
     },
     "analytics": {
       "title": "Statistika",
@@ -2002,7 +2003,8 @@
       "overridesDescription": "Pārrakstiet noklusējuma tulkojumus šai valodai. Izmantojiet punktu apzīmējumu (piem. common.appName).",
       "keyLabel": "Tulkojuma atslēga",
       "valueLabel": "Vērtība",
-      "addOverride": "Pievienot"
+      "addOverride": "Pievienot",
+      "invalidValues": "Dažas vērtības nav derīgas: pārbaudiet atslēgu un tulkojuma tekstu."
     },
     "infrastructure": {
       "subtitle": "Komponentu statuss un vides konfigurācija",

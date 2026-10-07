@@ -851,7 +851,8 @@ function TabNav({ active, onChange, t }: {
     { id: 'statistiche', icon: 'chart', key: 'tabs.analytics' },
   ];
   return (
-    <ul className="nav nav-tabs mb-0" role="tablist" style={{ borderBottom: 'none' }}>
+    // Su uno schermo stretto le schede scorrono invece di uscire dalla pagina.
+    <ul className="nav nav-tabs mb-0 flex-nowrap event-tabs" role="tablist" style={{ borderBottom: 'none' }}>
       {tabs.map((tab) => {
         const isActive = active === tab.id;
         return (

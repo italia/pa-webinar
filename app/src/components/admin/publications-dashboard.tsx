@@ -45,6 +45,7 @@ type Tab = 'all' | 'scheduled' | 'instant' | 'legacy' | 'pending';
 
 export default function PublicationsDashboard() {
   const t = useTranslations('admin.publications');
+  const tNav = useTranslations('nav');
   const tc = useTranslations('common');
   const fmt = useFormatter();
   const toast = useToast();
@@ -116,16 +117,17 @@ export default function PublicationsDashboard() {
       <div className="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
         <ul className="nav nav-tabs mb-0 flex-grow-1" role="tablist">
           {tabs.map((tb) => (
-            <li key={tb.id} className="nav-item">
+            <li key={tb.id} className="nav-item" role="presentation">
               <button
                 type="button"
                 role="tab"
+                aria-selected={tab === tb.id}
                 className={`nav-link ${tab === tb.id ? 'active' : ''}`}
                 onClick={() => setTab(tb.id)}
               >
                 {tb.label}
                 {tb.count !== undefined && (
-                  <Badge color="" pill className="ms-2" style={{ fontSize: '0.65rem', background: '#E9ECEF', color: 'var(--app-muted)' }}>
+                  <Badge color="" pill className="ms-2" style={{ fontSize: '0.7rem', background: '#E9ECEF', color: 'var(--app-text)' }}>
                     {tb.count}
                   </Badge>
                 )}
@@ -146,6 +148,7 @@ export default function PublicationsDashboard() {
             <div className="col-md-6">
               <Input
                 type="text"
+                aria-label={t('searchPlaceholder')}
                 placeholder={t('searchPlaceholder')}
                 value={search}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
@@ -154,6 +157,7 @@ export default function PublicationsDashboard() {
             <div className="col-md-3">
               <select
                 className="form-select form-select-sm"
+                aria-label={tNav('videoLibrary')}
                 value={listedFilter}
                 onChange={(e) => setListedFilter(e.target.value as 'any' | 'yes' | 'no')}
               >
@@ -221,7 +225,7 @@ export default function PublicationsDashboard() {
                             {t('badges.listed')}
                           </Badge>
                         ) : (
-                          <Badge color="" pill style={{ fontSize: '0.65rem', background: '#E9ECEF', color: 'var(--app-muted)' }}>
+                          <Badge color="" pill style={{ fontSize: '0.7rem', background: '#E9ECEF', color: 'var(--app-text)' }}>
                             {t('badges.unlisted')}
                           </Badge>
                         )}

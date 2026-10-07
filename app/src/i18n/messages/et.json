@@ -632,7 +632,7 @@
       "active": "Aktiivne",
       "inactive": "Deaktiveeritud",
       "invite": "Saada link",
-      "inviteFor": "Saada sisselogimislink kasutajale {name}",
+      "inviteFor": "Saada link – {name}",
       "deactivate": "Deaktiveeri",
       "deactivateFor": "Deaktiveeri {name}",
       "activate": "Aktiveeri uuesti",
@@ -1750,7 +1750,8 @@
         "min": "Kontrollige välja „{field}“: väikseim väärtus on {min}.",
         "max": "Kontrollige välja „{field}“: suurim väärtus on {max}.",
         "field": "Kontrollige välja „{field}“: väärtus on vigane."
-      }
+      },
+      "primaryColorHex": "Põhivärv (kuueteistkümnendkood)"
     },
     "analytics": {
       "title": "Statistika",
@@ -2002,7 +2003,8 @@
       "overridesDescription": "Kirjutage selle keele vaiketõlked üle. Kasutage punktmärgendit (nt common.appName).",
       "keyLabel": "Tõlkevõti",
       "valueLabel": "Väärtus",
-      "addOverride": "Lisa"
+      "addOverride": "Lisa",
+      "invalidValues": "Mõned väärtused ei sobi: kontrollige võtit ja tõlke teksti."
     },
     "infrastructure": {
       "subtitle": "Komponentide olek ja keskkonna seadistus",

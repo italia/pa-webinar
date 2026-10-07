@@ -16,11 +16,12 @@ import { Icon } from '@/components/ui/icon';
 import { useRouter, percorso } from '@/i18n/navigation';
 
 const STATUS_COLORS: Record<string, { bg: string; border: string; text: string }> = {
-  DRAFT: { bg: '#E9ECEF', border: 'var(--app-muted)', text: 'var(--app-muted)' },
+  DRAFT: { bg: '#E9ECEF', border: 'var(--app-muted)', text: 'var(--app-text)' },
   PUBLISHED: { bg: '#E8F0FE', border: 'var(--app-primary)', text: 'var(--app-primary)' },
-  LIVE: { bg: '#D4EDDA', border: '#008758', text: '#008758' },
-  ENDED: { bg: '#FFF3CD', border: '#A66300', text: '#A66300' },
-  ARCHIVED: { bg: '#E9ECEF', border: '#6C757D', text: '#6C757D' },
+  // Testi piu' scuri dei bordi: sul fondo chiaro devono arrivare a 4,5:1.
+  LIVE: { bg: '#D4EDDA', border: '#008758', text: '#00603F' },
+  ENDED: { bg: '#FFF3CD', border: '#A66300', text: '#7A4A00' },
+  ARCHIVED: { bg: '#E9ECEF', border: '#6C757D', text: '#495057' },
 };
 
 type ViewType = 'dayGridMonth' | 'timeGridWeek' | 'timeGridDay' | 'multiMonthYear' | 'listMonth';
@@ -83,7 +84,7 @@ export default function EventCalendar({ mode, initialEvents = [] }: EventCalenda
     }
   }, [mode, router]);
 
-  const defaultColors = { bg: '#E9ECEF', border: 'var(--app-muted)', text: 'var(--app-muted)' };
+  const defaultColors = { bg: '#E9ECEF', border: 'var(--app-muted)', text: 'var(--app-text)' };
 
   const calendarEvents: EventInput[] = events.map((evt) => {
     const colors = STATUS_COLORS[evt.status] ?? defaultColors;
@@ -309,15 +310,21 @@ export default function EventCalendar({ mode, initialEvents = [] }: EventCalenda
           background-color: rgba(90, 118, 138, 0.03);
         }
 
-        .fc-bootstrap-italia .fc-weekend-cell .fc-daygrid-day-number {
+        /* Niente trasparenza sui numeri: abbasserebbe il contrasto sotto
+           il 4,5:1. Il colore attenuato basta a distinguerli. */
+        .fc-bootstrap-italia .fc-weekend-cell .fc-daygrid-day-number,
+        .fc-bootstrap-italia .fc-day-other .fc-daygrid-day-number {
           color: #5A768A;
-          opacity: 0.7;
+          opacity: 1;
+        }
+
+        .fc-bootstrap-italia .fc-day-other .fc-daygrid-day-top {
+          opacity: 1;
         }
 
         .fc-bootstrap-italia .fc-week-number-cell {
-          font-size: 0.68rem;
-          color: #5A768A;
-          opacity: 0.6;
+          font-size: 0.75rem;
+          color: var(--app-text);
         }
 
         .fc-bootstrap-italia .fc-daygrid-event {

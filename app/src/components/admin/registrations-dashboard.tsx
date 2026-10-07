@@ -90,6 +90,7 @@ export default function RegistrationsDashboard({
   locale: string;
 }) {
   const t = useTranslations('admin.registrations');
+  const tc = useTranslations('common');
   const fmt = useFormatter();
 
   const [range, setRange] = useState<Range>('30d');
@@ -99,7 +100,8 @@ export default function RegistrationsDashboard({
   const [search, setSearch] = useState('');
   const [data, setData] = useState<ApiResponse | null>(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  // Se il caricamento e' fallito: il messaggio mostrato e' quello generico tradotto.
+  const [error, setError] = useState(false);
   const [offset, setOffset] = useState(0);
   const limit = 100;
 
@@ -117,15 +119,15 @@ export default function RegistrationsDashboard({
 
   const fetchData = useCallback(async () => {
     setLoading(true);
-    setError(null);
+    setError(false);
     try {
       const res = await fetch(`/api/admin/registrations?${buildQuery(false)}`, {
         cache: 'no-store',
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       setData(await res.json() as ApiResponse);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'fetch error');
+    } catch {
+      setError(true);
     } finally {
       setLoading(false);
     }
@@ -164,7 +166,7 @@ export default function RegistrationsDashboard({
               <Label for="range">{t('range')}</Label>
               <select
                 id="range"
-                className="form-control form-control-sm"
+                className="form-select form-select-sm"
                 value={range}
                 onChange={(e) => { setOffset(0); setRange(e.target.value as Range); }}
               >
@@ -178,7 +180,7 @@ export default function RegistrationsDashboard({
               <Label for="eventFilter">{t('eventFilter')}</Label>
               <select
                 id="eventFilter"
-                className="form-control form-control-sm"
+                className="form-select form-select-sm"
                 value={eventId}
                 onChange={(e) => { setOffset(0); setEventId(e.target.value); }}
               >
@@ -194,7 +196,7 @@ export default function RegistrationsDashboard({
               <Label for="orgType">{t('orgType')}</Label>
               <select
                 id="orgType"
-                className="form-control form-control-sm"
+                className="form-select form-select-sm"
                 value={orgType}
                 onChange={(e) => { setOffset(0); setOrgType(e.target.value); }}
               >
@@ -208,7 +210,7 @@ export default function RegistrationsDashboard({
               <Label for="joined">{t('joined')}</Label>
               <select
                 id="joined"
-                className="form-control form-control-sm"
+                className="form-select form-select-sm"
                 value={joined}
                 onChange={(e) => { setOffset(0); setJoined(e.target.value as '' | 'yes' | 'no'); }}
               >
@@ -296,7 +298,7 @@ export default function RegistrationsDashboard({
       )}
 
       {/* Table */}
-      {error && <div className="alert alert-danger">{error}</div>}
+      {error && <div className="alert alert-danger" role="alert">{tc('errorGeneric')}</div>}
       {loading && (
         <Card className="border-0 shadow-sm">
           <CardBody className="p-3">

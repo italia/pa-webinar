@@ -253,6 +253,7 @@ export default function RecordingManagement({
                 </div>
                 <ToggleSwitch
                   label=""
+                  ariaLabel={t('publish')}
                   checked={published}
                   onChange={handleTogglePublish}
                   disabled={saving}

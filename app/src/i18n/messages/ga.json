@@ -632,7 +632,7 @@
       "active": "Gníomhach",
       "inactive": "Díghníomhachtaithe",
       "invite": "Seol nasc",
-      "inviteFor": "Seol nasc síniú isteach chuig {name}",
+      "inviteFor": "Seol nasc – {name}",
       "deactivate": "Díghníomhachtaigh",
       "deactivateFor": "Díghníomhachtaigh {name}",
       "activate": "Athghníomhachtaigh",
@@ -1750,7 +1750,8 @@
         "min": "Seiceáil “{field}”: is é {min} an luach íosta.",
         "max": "Seiceáil “{field}”: is é {max} an luach uasta.",
         "field": "Seiceáil “{field}”: níl an luach bailí."
-      }
+      },
+      "primaryColorHex": "Príomhdhath (cód heicsidheachúlach)"
     },
     "analytics": {
       "title": "Staitisticí",
@@ -2002,7 +2003,8 @@
       "overridesDescription": "Sáraigh na haistriúcháin réamhshocraithe don teanga seo. Úsáid nodaireacht poncanna (m.sh. common.appName).",
       "keyLabel": "Eochair aistriúcháin",
       "valueLabel": "Luach",
-      "addOverride": "Cuir leis"
+      "addOverride": "Cuir leis",
+      "invalidValues": "Níl luachanna áirithe bailí: seiceálaigí an eochair agus téacs an aistriúcháin."
     },
     "infrastructure": {
       "subtitle": "Stádas na gcomhpháirteanna agus cumraíocht an chomhshaoil",

@@ -632,7 +632,7 @@
       "active": "Attiv",
       "inactive": "Diżattivat",
       "invite": "Ibgħat link",
-      "inviteFor": "Ibgħat link tad-dħul lil {name}",
+      "inviteFor": "Ibgħat link – {name}",
       "deactivate": "Iddiżattiva",
       "deactivateFor": "Iddiżattiva lil {name}",
       "activate": "Erġa’ attiva",
@@ -1750,7 +1750,8 @@
         "min": "Iċċekkja “{field}”: il-valur minimu huwa {min}.",
         "max": "Iċċekkja “{field}”: il-valur massimu huwa {max}.",
         "field": "Iċċekkja “{field}”: il-valur mhuwiex validu."
-      }
+      },
+      "primaryColorHex": "Kulur primarju (kodiċi eżadeċimali)"
     },
     "analytics": {
       "title": "Statistika",
@@ -2002,7 +2003,8 @@
       "overridesDescription": "Issostitwixxi t-traduzzjonijiet predefiniti għal din il-lingwa. Uża n-notazzjoni bil-punt (eż. common.appName).",
       "keyLabel": "Ċavetta tat-traduzzjoni",
       "valueLabel": "Valur",
-      "addOverride": "Żid"
+      "addOverride": "Żid",
+      "invalidValues": "Xi valuri mhumiex validi: iċċekkja ċ-ċavetta u t-test tat-traduzzjoni."
     },
     "infrastructure": {
       "subtitle": "Status tal-komponenti u konfigurazzjoni tal-ambjent",

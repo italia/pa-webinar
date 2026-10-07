@@ -346,6 +346,7 @@ function BrandingTab({ settings, updateField }: TabProps) {
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   updateField('primaryColor', e.target.value)
                 }
+                aria-label={t('primaryColorHex')}
                 style={{ maxWidth: 120 }}
               />
             </div>
@@ -1867,15 +1868,14 @@ function PostprodTab({ settings, updateField }: TabProps) {
             <Label htmlFor="aiAsrProvider">{t('asrProvider')}</Label>
             {/* Native <select> — il wrapper <Input type="select"> di
                 design-react-kit ha provocato React #137 in produzione.
-                Il pattern in uso nel resto del codebase
-                (recordings-dashboard, gdpr-audit-dashboard) è il
-                <select> con className="form-control". Le option sono
+                Si usa il <select> nativo con className="form-select"
+                (la freccia del campo vale solo per quella classe). Le option sono
                 hardcoded perché i provider supportati sono fissati al
                 deploy: per aggiungerne uno servono changes in
                 lib/ai/providers.ts + Zod schema + Deployment k8s. */}
             <select
               id="aiAsrProvider"
-              className="form-control"
+              className="form-select"
               value={settings.aiAsrProvider ?? 'whisperx'}
               onChange={(e) =>
                 updateField('aiAsrProvider', e.target.value as 'whisperx')
@@ -1893,7 +1893,7 @@ function PostprodTab({ settings, updateField }: TabProps) {
             <Label htmlFor="aiLlmProvider">{t('llmProvider')}</Label>
             <select
               id="aiLlmProvider"
-              className="form-control"
+              className="form-select"
               value={settings.aiLlmProvider ?? 'vllm'}
               onChange={(e) =>
                 updateField('aiLlmProvider', e.target.value as 'vllm')
@@ -1911,7 +1911,7 @@ function PostprodTab({ settings, updateField }: TabProps) {
             <Label htmlFor="aiTtsEngine">{t('ttsEngine')}</Label>
             <select
               id="aiTtsEngine"
-              className="form-control"
+              className="form-select"
               value={settings.aiTtsEngine ?? 'piper'}
               onChange={(e) =>
                 updateField('aiTtsEngine', e.target.value as 'piper')

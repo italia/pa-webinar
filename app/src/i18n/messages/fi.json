@@ -632,7 +632,7 @@
       "active": "Aktiivinen",
       "inactive": "Poistettu käytöstä",
       "invite": "Lähetä linkki",
-      "inviteFor": "Lähetä kirjautumislinkki henkilölle {name}",
+      "inviteFor": "Lähetä linkki – {name}",
       "deactivate": "Poista käytöstä",
       "deactivateFor": "Poista {name} käytöstä",
       "activate": "Ota uudelleen käyttöön",
@@ -1750,7 +1750,8 @@
         "min": "Tarkista ”{field}”: pienin arvo on {min}.",
         "max": "Tarkista ”{field}”: suurin arvo on {max}.",
         "field": "Tarkista ”{field}”: arvo ei kelpaa."
-      }
+      },
+      "primaryColorHex": "Pääväri (heksadesimaalikoodi)"
     },
     "analytics": {
       "title": "Tilastot",
@@ -2002,7 +2003,8 @@
       "overridesDescription": "Korvaa oletuskäännökset tälle kielelle. Käytä pistenotaatiota (esim. common.appName).",
       "keyLabel": "Käännösavain",
       "valueLabel": "Arvo",
-      "addOverride": "Lisää"
+      "addOverride": "Lisää",
+      "invalidValues": "Jotkin arvot eivät kelpaa: tarkista avain ja käännöksen teksti."
     },
     "infrastructure": {
       "subtitle": "Komponenttien tila ja ympäristömääritys",

@@ -632,7 +632,7 @@
       "active": "Aktiven",
       "inactive": "Onemogočen",
       "invite": "Pošlji povezavo",
-      "inviteFor": "Pošlji povezavo za prijavo: {name}",
+      "inviteFor": "Pošlji povezavo – {name}",
       "deactivate": "Onemogoči",
       "deactivateFor": "Onemogoči: {name}",
       "activate": "Znova omogoči",
@@ -1750,7 +1750,8 @@
         "min": "Preverite »{field}«: najmanjša vrednost je {min}.",
         "max": "Preverite »{field}«: največja vrednost je {max}.",
         "field": "Preverite »{field}«: vrednost ni veljavna."
-      }
+      },
+      "primaryColorHex": "Primarna barva (šestnajstiška koda)"
     },
     "analytics": {
       "title": "Statistike",
@@ -2002,7 +2003,8 @@
       "overridesDescription": "Prepišite privzete prevode za ta jezik. Uporabite pikčasto notacijo (npr. common.appName).",
       "keyLabel": "Ključ prevoda",
       "valueLabel": "Vrednost",
-      "addOverride": "Dodaj"
+      "addOverride": "Dodaj",
+      "invalidValues": "Nekatere vrednosti niso veljavne: preverite ključ in besedilo prevoda."
     },
     "infrastructure": {
       "subtitle": "Stanje komponent in konfiguracija okolja",

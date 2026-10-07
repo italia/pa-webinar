@@ -1447,8 +1447,11 @@ function StepNav({
         {steps.map((s, i) => {
           const isActive = i === activeIdx;
           const isDone = i < activeIdx;
-          const bg = isActive ? '#0066CC' : isDone ? '#5C9EFF' : '#DEE5EC';
-          const color = isActive || isDone ? '#fff' : 'var(--app-text)';
+          // Il passo gia' fatto: cerchio bianco con bordo e segno blu (il bianco
+          // su un azzurro chiaro non arrivava al contrasto minimo, e un fondo
+          // chiaro si confonderebbe con i passi da fare).
+          const bg = isActive ? '#0066CC' : isDone ? '#fff' : '#DEE5EC';
+          const color = isActive ? '#fff' : isDone ? '#0066CC' : 'var(--app-text)';
           return (
             <li key={s.key} className="flex-grow-1">
               <button
@@ -1468,6 +1471,7 @@ function StepNav({
                     height: 32,
                     borderRadius: '50%',
                     backgroundColor: bg,
+                    border: isDone ? '2px solid #0066CC' : 'none',
                     color,
                     fontSize: '0.9rem',
                   }}

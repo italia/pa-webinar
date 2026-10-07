@@ -194,6 +194,7 @@ export default function PostEventConfig({ event, onPublicPageChange }: PostEvent
             <span style={{ fontSize: '0.9rem' }}>{t('showQA')}</span>
             <ToggleSwitch
               label=""
+            ariaLabel={t('showQA')}
               checked={showQA}
               onChange={() => handleToggle('postEventShowQA', !showQA, setShowQA)}
             />
@@ -203,6 +204,7 @@ export default function PostEventConfig({ event, onPublicPageChange }: PostEvent
             <span style={{ fontSize: '0.9rem' }}>{t('showMaterials')}</span>
             <ToggleSwitch
               label=""
+            ariaLabel={t('showMaterials')}
               checked={showMaterials}
               onChange={() => handleToggle('postEventShowMaterials', !showMaterials, setShowMaterials)}
             />
@@ -212,6 +214,7 @@ export default function PostEventConfig({ event, onPublicPageChange }: PostEvent
             <span style={{ fontSize: '0.9rem' }}>{t('showPolls')}</span>
             <ToggleSwitch
               label=""
+            ariaLabel={t('showPolls')}
               checked={showPolls}
               onChange={() => handleToggle('postEventShowPolls', !showPolls, setShowPolls)}
             />
@@ -296,6 +299,7 @@ export default function PostEventConfig({ event, onPublicPageChange }: PostEvent
             <span style={{ fontSize: '0.9rem' }}>{t('feedbackEnabled')}</span>
             <ToggleSwitch
               label=""
+            ariaLabel={t('feedbackEnabled')}
               checked={feedbackActive}
               onChange={() => handleToggle('feedbackEnabled', !feedbackActive, setFeedbackActive)}
             />

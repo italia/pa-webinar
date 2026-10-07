@@ -33,16 +33,18 @@ const ACTION_COLORS: Record<string, string> = {
 
 export default function GdprAuditDashboard() {
   const t = useTranslations('admin.gdprAudit');
+  const tc = useTranslations('common');
   const fmt = useFormatter();
   const [data, setData] = useState<ApiResponse | null>(null);
   const [range, setRange] = useState<'30d' | '90d' | '1y'>('90d');
   const [action, setAction] = useState('');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  // Se il caricamento e' fallito: il messaggio mostrato e' quello generico tradotto.
+  const [error, setError] = useState(false);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
-    setError(null);
+    setError(false);
     try {
       const days = range === '30d' ? 30 : range === '90d' ? 90 : 365;
       const since = new Date(Date.now() - days * 86400_000).toISOString();
@@ -51,8 +53,8 @@ export default function GdprAuditDashboard() {
       const res = await fetch(`/api/admin/gdpr-audit?${p.toString()}`, { cache: 'no-store' });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       setData(await res.json() as ApiResponse);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'fetch error');
+    } catch {
+      setError(true);
     } finally {
       setLoading(false);
     }
@@ -67,7 +69,7 @@ export default function GdprAuditDashboard() {
           <div className="row g-3 align-items-end">
             <div className="col-md-3">
               <Label for="range">{t('range')}</Label>
-              <select id="range" className="form-control form-control-sm"
+              <select id="range" className="form-select form-select-sm"
                 value={range}
                 onChange={(e) => setRange(e.target.value as '30d' | '90d' | '1y')}
               >
@@ -78,7 +80,7 @@ export default function GdprAuditDashboard() {
             </div>
             <div className="col-md-3">
               <Label for="action">{t('actionFilter')}</Label>
-              <select id="action" className="form-control form-control-sm"
+              <select id="action" className="form-select form-select-sm"
                 value={action}
                 onChange={(e) => setAction(e.target.value)}
               >
@@ -114,7 +116,7 @@ export default function GdprAuditDashboard() {
         </div>
       )}
 
-      {error && <div className="alert alert-danger">{error}</div>}
+      {error && <div className="alert alert-danger" role="alert">{tc('errorGeneric')}</div>}
       {loading && (
         <Card className="border-0 shadow-sm">
           <CardBody className="p-3">

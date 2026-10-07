@@ -632,7 +632,7 @@
       "active": "Activ",
       "inactive": "Dezactivat",
       "invite": "Trimite link",
-      "inviteFor": "Trimite un link de acces către {name}",
+      "inviteFor": "Trimite link – {name}",
       "deactivate": "Dezactivează",
       "deactivateFor": "Dezactivează {name}",
       "activate": "Reactivează",
@@ -1750,7 +1750,8 @@
         "min": "Verificați „{field}”: valoarea minimă este {min}.",
         "max": "Verificați „{field}”: valoarea maximă este {max}.",
         "field": "Verificați „{field}”: valoarea nu este validă."
-      }
+      },
+      "primaryColorHex": "Culoare principală (cod hexazecimal)"
     },
     "analytics": {
       "title": "Statistici",
@@ -2002,7 +2003,8 @@
       "overridesDescription": "Suprascrieți traducerile implicite pentru această limbă. Utilizați notația cu punct (de ex. common.appName).",
       "keyLabel": "Cheie traducere",
       "valueLabel": "Valoare",
-      "addOverride": "Adăugați"
+      "addOverride": "Adăugați",
+      "invalidValues": "Unele valori nu sunt valide: verificați cheia și textul traducerii."
     },
     "infrastructure": {
       "subtitle": "Starea componentelor și configurarea mediului",

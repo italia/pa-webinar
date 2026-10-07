@@ -632,7 +632,7 @@
       "active": "Aktyvus",
       "inactive": "Išjungtas",
       "invite": "Siųsti nuorodą",
-      "inviteFor": "Siųsti prisijungimo nuorodą: {name}",
+      "inviteFor": "Siųsti nuorodą – {name}",
       "deactivate": "Išjungti",
       "deactivateFor": "Išjungti: {name}",
       "activate": "Vėl įjungti",
@@ -1750,7 +1750,8 @@
         "min": "Patikrinkite „{field}“: mažiausia reikšmė yra {min}.",
         "max": "Patikrinkite „{field}“: didžiausia reikšmė yra {max}.",
         "field": "Patikrinkite „{field}“: reikšmė netinkama."
-      }
+      },
+      "primaryColorHex": "Pagrindinė spalva (šešioliktainis kodas)"
     },
     "analytics": {
       "title": "Statistika",
@@ -2002,7 +2003,8 @@
       "overridesDescription": "Perrašykite numatytuosius šios kalbos vertimus. Naudokite taškų žymėjimą (pvz. common.appName).",
       "keyLabel": "Vertimo raktas",
       "valueLabel": "Reikšmė",
-      "addOverride": "Pridėti"
+      "addOverride": "Pridėti",
+      "invalidValues": "Kai kurios reikšmės netinkamos: patikrinkite raktą ir vertimo tekstą."
     },
     "infrastructure": {
       "subtitle": "Komponentų būsena ir aplinkos konfigūracija",

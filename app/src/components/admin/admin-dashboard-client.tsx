@@ -522,7 +522,8 @@ export default function AdminDashboardClient({
                     borderTop: `4px solid ${borderColor}`,
                     backgroundColor: '#fff',
                     overflow: 'hidden',
-                    opacity: isEnded ? 0.85 : 1,
+                    // Un evento concluso si distingue dal badge e dal bordo, non
+                    // dalla trasparenza: abbasserebbe il contrasto dei testi.
                     outline: isSelected ? '2px solid #0066CC' : 'none',
                     outlineOffset: isSelected ? '2px' : '0',
                   }}

@@ -632,7 +632,7 @@
       "active": "Actief",
       "inactive": "Uitgeschakeld",
       "invite": "Link sturen",
-      "inviteFor": "Stuur een inloglink naar {name}",
+      "inviteFor": "Link sturen – {name}",
       "deactivate": "Uitschakelen",
       "deactivateFor": "{name} uitschakelen",
       "activate": "Opnieuw inschakelen",
@@ -1750,7 +1750,8 @@
         "min": "Controleer ‘{field}’: de minimumwaarde is {min}.",
         "max": "Controleer ‘{field}’: de maximumwaarde is {max}.",
         "field": "Controleer ‘{field}’: de waarde is ongeldig."
-      }
+      },
+      "primaryColorHex": "Primaire kleur (hexcode)"
     },
     "analytics": {
       "title": "Statistieken",
@@ -2002,7 +2003,8 @@
       "overridesDescription": "Overschrijf standaardvertalingen voor deze taal. Gebruik puntnotatie (bijv. common.appName).",
       "keyLabel": "Vertaalsleutel",
       "valueLabel": "Waarde",
-      "addOverride": "Toevoegen"
+      "addOverride": "Toevoegen",
+      "invalidValues": "Sommige waarden zijn ongeldig: controleer de sleutel en de tekst van de vertaling."
     },
     "infrastructure": {
       "subtitle": "Status van componenten en omgevingsconfiguratie",

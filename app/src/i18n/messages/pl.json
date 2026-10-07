@@ -632,7 +632,7 @@
       "active": "Aktywny",
       "inactive": "Wyłączony",
       "invite": "Wyślij link",
-      "inviteFor": "Wyślij link do logowania: {name}",
+      "inviteFor": "Wyślij link – {name}",
       "deactivate": "Wyłącz",
       "deactivateFor": "Wyłącz: {name}",
       "activate": "Włącz ponownie",
@@ -1750,7 +1750,8 @@
         "min": "Sprawdź „{field}”: wartość minimalna to {min}.",
         "max": "Sprawdź „{field}”: wartość maksymalna to {max}.",
         "field": "Sprawdź „{field}”: wartość jest nieprawidłowa."
-      }
+      },
+      "primaryColorHex": "Kolor podstawowy (kod szesnastkowy)"
     },
     "analytics": {
       "title": "Statystyki",
@@ -2002,7 +2003,8 @@
       "overridesDescription": "Nadpisz domyślne tłumaczenia dla tego języka. Użyj notacji z kropką (np. common.appName).",
       "keyLabel": "Klucz tłumaczenia",
       "valueLabel": "Wartość",
-      "addOverride": "Dodaj"
+      "addOverride": "Dodaj",
+      "invalidValues": "Niektóre wartości są nieprawidłowe: sprawdź klucz i tekst tłumaczenia."
     },
     "infrastructure": {
       "subtitle": "Stan komponentów i konfiguracja środowiska",

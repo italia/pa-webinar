@@ -7258,3 +7258,43 @@ html.live-resizing .live-sidebar-resizer::after {
     inset 0 0 0 2px #fff,
     inset 0 0 0 5px #000 !important;
 }
+
+// Le schede della pagina di un evento scorrono in orizzontale sugli schermi
+// stretti invece di allargare la pagina.
+@media (max-width: 767.98px) {
+  .event-tabs {
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    .nav-link {
+      white-space: nowrap;
+    }
+
+    // Dentro la riga che scorre l'anello di fuoco esterno verrebbe tagliato.
+    .nav-link:focus:not([data-focus-mouse='true']) {
+      box-shadow:
+        inset 0 0 0 2px #fff,
+        inset 0 0 0 5px #000 !important;
+    }
+  }
+}
+
+// Una tabella che scorre contiene anche i suoi testi nascosti (posizionati in
+// assoluto): senza, allargano la pagina intera sugli schermi stretti.
+.table-responsive {
+  position: relative;
+}
+
+// Le card di Bootstrap Italia spezzano le parole ovunque: le intestazioni di
+// una tabella che scorre diventerebbero lettere in colonna. Solo le
+// intestazioni: nelle celle un indirizzo lungo deve poter andare a capo.
+.table-responsive > .table th {
+  word-break: normal;
+  overflow-wrap: normal;
+}
+
+// Le caselle della matrice dei permessi: il bordo predefinito (25% di nero)
+// non arriva al contrasto minimo per un elemento d'interfaccia (3:1).
+.permission-matrix .form-check-input:not(:checked) {
+  border-color: #5a768a;
+}

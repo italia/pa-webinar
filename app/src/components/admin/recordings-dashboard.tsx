@@ -142,7 +142,8 @@ export default function RecordingsDashboard({
   const [search, setSearch] = useState('');
   const [data, setData] = useState<ApiResponse | null>(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  // Se il caricamento e' fallito: il messaggio mostrato e' quello generico tradotto.
+  const [error, setError] = useState(false);
 
   const buildQuery = useCallback((csv = false) => {
     const p = new URLSearchParams();
@@ -155,13 +156,13 @@ export default function RecordingsDashboard({
 
   const fetchData = useCallback(async () => {
     setLoading(true);
-    setError(null);
+    setError(false);
     try {
       const res = await fetch(`/api/admin/recordings?${buildQuery()}`, { cache: 'no-store' });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       setData(await res.json() as ApiResponse);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'fetch error');
+    } catch {
+      setError(true);
     } finally {
       setLoading(false);
     }
@@ -305,7 +306,7 @@ export default function RecordingsDashboard({
           <div className="row g-3 align-items-end">
             <div className="col-md-3">
               <Label for="range">{t('range')}</Label>
-              <select id="range" className="form-control form-control-sm"
+              <select id="range" className="form-select form-select-sm"
                 value={range}
                 onChange={(e) => setRange(e.target.value as Range)}
               >
@@ -317,7 +318,7 @@ export default function RecordingsDashboard({
             </div>
             <div className="col-md-4">
               <Label for="eventFilter">{t('eventFilter')}</Label>
-              <select id="eventFilter" className="form-control form-control-sm"
+              <select id="eventFilter" className="form-select form-select-sm"
                 value={eventId}
                 onChange={(e) => setEventId(e.target.value)}
               >
@@ -332,7 +333,7 @@ export default function RecordingsDashboard({
             </div>
             <div className="col-md-3">
               <Label for="hasRec">{t('hasRecording')}</Label>
-              <select id="hasRec" className="form-control form-control-sm"
+              <select id="hasRec" className="form-select form-select-sm"
                 value={hasRecording}
                 onChange={(e) => setHasRecording(e.target.value as 'yes' | 'no' | 'any')}
               >
@@ -392,7 +393,7 @@ export default function RecordingsDashboard({
         </div>
       )}
 
-      {error && <div className="alert alert-danger">{error}</div>}
+      {error && <div className="alert alert-danger" role="alert">{tc('errorGeneric')}</div>}
       {loading && <div className="text-muted">{t('loading')}</div>}
 
       {data && (

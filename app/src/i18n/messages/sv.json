@@ -632,7 +632,7 @@
       "active": "Aktiv",
       "inactive": "Inaktiverad",
       "invite": "Skicka länk",
-      "inviteFor": "Skicka en inloggningslänk till {name}",
+      "inviteFor": "Skicka länk – {name}",
       "deactivate": "Inaktivera",
       "deactivateFor": "Inaktivera {name}",
       "activate": "Återaktivera",
@@ -1750,7 +1750,8 @@
         "min": "Kontrollera ”{field}”: minimivärdet är {min}.",
         "max": "Kontrollera ”{field}”: maxvärdet är {max}.",
         "field": "Kontrollera ”{field}”: värdet är ogiltigt."
-      }
+      },
+      "primaryColorHex": "Primärfärg (hexkod)"
     },
     "analytics": {
       "title": "Statistik",
@@ -2002,7 +2003,8 @@
       "overridesDescription": "Åsidosätt standardöversättningar för detta språk. Använd punktnotation (t.ex. common.appName).",
       "keyLabel": "Översättningsnyckel",
       "valueLabel": "Värde",
-      "addOverride": "Lägg till"
+      "addOverride": "Lägg till",
+      "invalidValues": "Vissa värden är ogiltiga: kontrollera nyckeln och översättningens text."
     },
     "infrastructure": {
       "subtitle": "Komponentstatus och miljökonfiguration",
