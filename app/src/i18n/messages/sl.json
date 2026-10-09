@@ -544,6 +544,8 @@
     "sidebarTabMaterialsNew": "Nova deljena gradiva",
     "sidebarTabQaNew": "Novo v Vprašanjih in odgovorih",
     "resizeSidebar": "Spremeni velikost stranske plošče",
+    "collapseSidebar": "Strni ploščo",
+    "expandSidebar": "Razširi ploščo",
     "sidebarTabWordcloudNew": "Novo vprašanje »Z eno besedo«"
   },
   "qa": {

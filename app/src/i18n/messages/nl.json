@@ -544,6 +544,8 @@
     "sidebarTabMaterialsNew": "Nieuwe materialen gedeeld",
     "sidebarTabQaNew": "Nieuw in Vragen en antwoorden",
     "resizeSidebar": "Formaat van het zijpaneel wijzigen",
+    "collapseSidebar": "Paneel inklappen",
+    "expandSidebar": "Paneel uitklappen",
     "sidebarTabWordcloudNew": "Nieuwe vraag ‘In één woord’"
   },
   "qa": {

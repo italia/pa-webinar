@@ -544,6 +544,8 @@
     "sidebarTabMaterialsNew": "Uusia jaettuja materiaaleja",
     "sidebarTabQaNew": "Uutta kohdassa Kysymykset ja vastaukset",
     "resizeSidebar": "Muuta sivupaneelin kokoa",
+    "collapseSidebar": "Pienennä paneeli",
+    "expandSidebar": "Laajenna paneeli",
     "sidebarTabWordcloudNew": "Uusi ”Yhdellä sanalla” -kysymys"
   },
   "qa": {

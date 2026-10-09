@@ -544,6 +544,8 @@
     "sidebarTabMaterialsNew": "Nouveaux supports partagés",
     "sidebarTabQaNew": "Nouveautés dans Questions-réponses",
     "resizeSidebar": "Redimensionner le panneau latéral",
+    "collapseSidebar": "Réduire le panneau",
+    "expandSidebar": "Développer le panneau",
     "sidebarTabWordcloudNew": "Nouvelle question « En un mot »"
   },
   "qa": {

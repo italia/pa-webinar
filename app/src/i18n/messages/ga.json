@@ -544,6 +544,8 @@
     "sidebarTabMaterialsNew": "Ábhair nua roinnte",
     "sidebarTabQaNew": "Nua i gCeisteanna agus freagraí",
     "resizeSidebar": "Athraigh méid an phainéil taoibh",
+    "collapseSidebar": "Laghdaigh an painéal",
+    "expandSidebar": "Leathnaigh an painéal",
     "sidebarTabWordcloudNew": "Ceist nua “In aon fhocal amháin”"
   },
   "qa": {

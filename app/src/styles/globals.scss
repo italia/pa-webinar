@@ -501,8 +501,9 @@ html.live-call-immersive body {
   @media (min-width: 992px) {
     // Persistent in-flow column (replaces the old right-slide overlay). As a
     // flex sibling of .live-main the video shrinks to fit and the interaction
-    // panels are ALWAYS visible — the #1 discoverability fix. drawerOpen and
-    // the --open transform are inert here (the drawer model is mobile-only).
+    // panels stay visible unless the column is collapsed to its icon strip
+    // (--collapsed). drawerOpen and the --open transform are inert here (the
+    // drawer model is mobile-only).
     position: relative;
     width: 400px;
     max-width: 42vw;
@@ -592,6 +593,61 @@ html.live-call-immersive body {
   &:hover {
     background: rgba(255, 255, 255, 0.25);
     color: #fff;
+  }
+}
+
+// Pulsante per comprimere o riaprire la colonna (solo da 992px).
+.live-sidebar-collapse {
+  display: none;
+
+  @media (min-width: 992px) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    align-self: flex-start;
+    width: 100%;
+    min-height: 28px;
+    border: 0;
+    background: #004d99;
+    color: #fff;
+    cursor: pointer;
+
+    &:hover { background: #003d7a; }
+    &:focus-visible { outline: 2px solid #fff; outline-offset: -3px; }
+  }
+}
+
+// Colonna compressa: una striscia di icone in verticale, con i contatori.
+// Le etichette spariscono, il pannello pure; un clic su una scheda riapre.
+@media (min-width: 992px) {
+  .live-sidebar.live-sidebar--collapsed {
+    width: 64px;
+    min-width: 64px;
+    flex: 0 0 64px;
+    max-width: none;
+
+    .live-sidebar-tabs {
+      flex-direction: column;
+      flex: 1 1 auto;
+      padding: 6px 4px;
+      overflow-x: hidden;
+      overflow-y: auto;
+      background: linear-gradient(180deg, #004D99 0%, #0066CC 100%);
+    }
+
+    .live-sidebar-tab {
+      flex: 0 0 auto;
+      border-radius: 8px;
+    }
+
+    .live-sidebar-tab__label {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+    }
   }
 }
 

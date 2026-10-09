@@ -544,6 +544,8 @@
     "sidebarTabMaterialsNew": "Materjali ġodda maqsuma",
     "sidebarTabQaNew": "Ġdid fil-Mistoqsijiet u tweġibiet",
     "resizeSidebar": "Ibdel id-daqs tal-pannell tal-ġenb",
+    "collapseSidebar": "Ċekken il-panew",
+    "expandSidebar": "Kabbar il-panew",
     "sidebarTabWordcloudNew": "Mistoqsija ġdida “F'kelma waħda”"
   },
   "qa": {

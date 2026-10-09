@@ -544,6 +544,8 @@
     "sidebarTabMaterialsNew": "Jauni kopīgoti materiāli",
     "sidebarTabQaNew": "Jaunumi sadaļā Jautājumi un atbildes",
     "resizeSidebar": "Mainīt sānu paneļa izmēru",
+    "collapseSidebar": "Sakļaut paneli",
+    "expandSidebar": "Izvērst paneli",
     "sidebarTabWordcloudNew": "Jauns jautājums “Vienā vārdā”"
   },
   "qa": {

@@ -544,6 +544,8 @@
     "sidebarTabMaterialsNew": "Új megosztott anyagok",
     "sidebarTabQaNew": "Újdonságok a Kérdések és válaszok részben",
     "resizeSidebar": "Az oldalsáv átméretezése",
+    "collapseSidebar": "Panel összecsukása",
+    "expandSidebar": "Panel kibontása",
     "sidebarTabWordcloudNew": "Új „Egy szóval” kérdés"
   },
   "qa": {

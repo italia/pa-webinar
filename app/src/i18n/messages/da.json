@@ -544,6 +544,8 @@
     "sidebarTabMaterialsNew": "Nye delte materialer",
     "sidebarTabQaNew": "Nyt i Spørgsmål og svar",
     "resizeSidebar": "Tilpas størrelsen på sidepanelet",
+    "collapseSidebar": "Fold panelet sammen",
+    "expandSidebar": "Fold panelet ud",
     "sidebarTabWordcloudNew": "Nyt “Med ét ord”-spørgsmål"
   },
   "qa": {

@@ -544,6 +544,8 @@
     "sidebarTabMaterialsNew": "Нови споделени материали",
     "sidebarTabQaNew": "Ново във Въпроси и отговори",
     "resizeSidebar": "Преоразмеряване на страничния панел",
+    "collapseSidebar": "Свий панела",
+    "expandSidebar": "Разгъни панела",
     "sidebarTabWordcloudNew": "Нов въпрос „С една дума“"
   },
   "qa": {

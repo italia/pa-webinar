@@ -544,6 +544,8 @@
     "sidebarTabMaterialsNew": "Novi podijeljeni materijali",
     "sidebarTabQaNew": "Novo u Pitanjima i odgovorima",
     "resizeSidebar": "Promijeni veličinu bočne ploče",
+    "collapseSidebar": "Sažmi ploču",
+    "expandSidebar": "Proširi ploču",
     "sidebarTabWordcloudNew": "Novo pitanje „Jednom riječju”"
   },
   "qa": {

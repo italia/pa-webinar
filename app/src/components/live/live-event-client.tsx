@@ -200,6 +200,8 @@ const SIDEBAR_MIN_W = 320;
 const SIDEBAR_MAX_W = 960;
 const SIDEBAR_MIN_VIDEO_W = 420;
 const SIDEBAR_WIDTH_KEY = 'pa-webinar.sidebar-width';
+/** La colonna compressa a una striscia di icone, ricordata nel browser. */
+const SIDEBAR_COLLAPSED_KEY = 'pa-webinar.sidebar-collapsed';
 
 function clampSidebarWidth(w: number): number {
   const max = typeof window === 'undefined'
@@ -2097,8 +2099,8 @@ function LiveSidebar({
   const [participantCount, setParticipantCount] = useState(0);
   // Mani alzate nella sala, dal pannello dei partecipanti (sempre montato).
   const [handsCount, setHandsCount] = useState(0);
-  // Drawer-open state only matters on mobile (<992px); on desktop the
-  // .live-sidebar is always visible via CSS regardless of this flag.
+  // Drawer-open state only matters on mobile (<992px); on desktop the column
+  // is in the flow, open unless collapsed (`collapsed` below).
   const [drawerOpen, setDrawerOpen] = useState(false);
   // Chat unread count — set by ChatPanel via onUnreadCountChange.
   // A chat is "active" when the Chat tab is selected AND (on mobile)
@@ -2131,7 +2133,7 @@ function LiveSidebar({
   // resta montato anche su un'altra scheda apposta per poterlo dire.
   const [pollsUnvoted, setPollsUnvoted] = useState(0);
   // Un pannello e' sotto gli occhi quando e' la scheda scelta E si vede: su
-  // desktop la colonna e' sempre aperta, sotto i 992px solo a cassetto aperto.
+  // desktop a colonna non compressa, sotto i 992px solo a cassetto aperto.
   // E' questo, non la sola scheda scelta, a dire se un messaggio o un
   // materiale nuovo e' gia' stato visto.
   const [isDesktop, setIsDesktop] = useState(true);
@@ -2148,6 +2150,23 @@ function LiveSidebar({
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
   }, []);
+  // Desktop: la colonna si può comprimere a una striscia di icone, per chi
+  // vuole il video più grande o meno elementi intorno. Le schede e i loro
+  // contatori restano visibili; un clic su una scheda la riapre.
+  const [collapsed, setCollapsed] = useState(false);
+  useEffect(() => {
+    try {
+      setCollapsed(window.localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === '1');
+    } catch { /* storage non disponibile: si parte aperta */ }
+  }, []);
+  const impostaCompressa = useCallback((v: boolean) => {
+    setCollapsed(v);
+    try {
+      if (v) window.localStorage.setItem(SIDEBAR_COLLAPSED_KEY, '1');
+      else window.localStorage.removeItem(SIDEBAR_COLLAPSED_KEY);
+    } catch { /* vale finche' resta aperta la pagina */ }
+  }, []);
+  const compressa = isDesktop && collapsed;
   const salvaLarghezza = useCallback((w: number | null) => {
     try {
       if (w === null) window.localStorage.removeItem(SIDEBAR_WIDTH_KEY);
@@ -2203,7 +2222,18 @@ function LiveSidebar({
     mq.addEventListener('change', aggiorna);
     return () => mq.removeEventListener('change', aggiorna);
   }, []);
-  const onScreen = (key: SidebarTab) => activeTab === key && (isDesktop || drawerOpen);
+  const onScreen = (key: SidebarTab) => activeTab === key && (isDesktop ? !compressa : drawerOpen);
+  // Aprire una scheda vuol dire mostrarla: su desktop riapre la colonna
+  // compressa, sul telefono apre il cassetto. Ogni via per aprire una scheda
+  // passa da qui.
+  const apriScheda = useCallback(
+    (key: SidebarTab) => {
+      setActiveTab(key);
+      if (isDesktop) impostaCompressa(false);
+      else setDrawerOpen(true);
+    },
+    [isDesktop, impostaCompressa],
+  );
 
   // Entrati nella chiamata, si dice al server quale riquadro e' questo
   // browser (lib/live/seats): chi modera vede accanto al nome l'iscrizione
@@ -2548,10 +2578,9 @@ function LiveSidebar({
         setDrawerOpen(false);
         return;
       }
-      setActiveTab(key);
-      setDrawerOpen(true);
+      apriScheda(key);
     },
-    [activeTab, drawerOpen]
+    [activeTab, drawerOpen, apriScheda]
   );
 
   const closeDrawer = useCallback(() => setDrawerOpen(false), []);
@@ -2645,8 +2674,7 @@ function LiveSidebar({
             className="chat-preview__open"
             onClick={() => {
               setChatPreview(null);
-              setActiveTab('chat');
-              setDrawerOpen(true);
+              apriScheda('chat');
             }}
           >
             <span
@@ -2693,14 +2721,35 @@ function LiveSidebar({
       />
 
       <div
-        className={`d-flex flex-column live-sidebar${drawerOpen ? ' live-sidebar--open' : ''}`}
+        className={`d-flex flex-column live-sidebar${drawerOpen ? ' live-sidebar--open' : ''}${
+          compressa ? ' live-sidebar--collapsed' : ''
+        }`}
         style={
-          isDesktop && sidebarWidth !== null
+          isDesktop && !compressa && sidebarWidth !== null
             ? { width: sidebarWidth, flexBasis: sidebarWidth, maxWidth: 'none' }
             : undefined
         }
+        // Sul telefono il cassetto chiuso esce dallo schermo ma resterebbe
+        // raggiungibile con il tasto Tab: chiuso, è inerte.
+        inert={!isDesktop && !drawerOpen ? true : undefined}
       >
         {isDesktop && (
+          <button
+            type="button"
+            className="live-sidebar-collapse"
+            onClick={() => impostaCompressa(!compressa)}
+            aria-expanded={!compressa}
+            aria-controls="live-sidebar-body"
+            aria-label={compressa ? t('expandSidebar') : t('collapseSidebar')}
+            title={compressa ? t('expandSidebar') : t('collapseSidebar')}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              {compressa ? <polyline points="15 18 9 12 15 6" /> : <polyline points="9 18 15 12 9 6" />}
+            </svg>
+          </button>
+        )}
+        {isDesktop && !compressa && (
           <div
             className="live-sidebar-resizer"
             role="separator"
@@ -2739,7 +2788,7 @@ function LiveSidebar({
                 aria-selected={isActive}
                 title={tab.label}
                 className={`live-sidebar-tab${isActive ? ' live-sidebar-tab--active' : ''}`}
-                onClick={() => setActiveTab(tab.key)}
+                onClick={() => apriScheda(tab.key)}
               >
                 <span className="live-floating-btn__icon" aria-hidden="true">
                   {tab.svg}
@@ -2800,7 +2849,8 @@ function LiveSidebar({
         </div>
 
         <div
-          className="flex-grow-1 d-flex flex-column live-sidebar-body"
+          id="live-sidebar-body"
+          className={`flex-grow-1 ${compressa ? 'd-none' : 'd-flex'} flex-column live-sidebar-body`}
           style={{ minHeight: 0, overflowY: 'auto' }}
         >
           {/* Attivazione funzioni durante l'evento (solo moderatore). Le

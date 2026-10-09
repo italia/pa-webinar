@@ -544,6 +544,8 @@
     "sidebarTabMaterialsNew": "Udostępniono nowe materiały",
     "sidebarTabQaNew": "Nowości w Pytaniach i odpowiedziach",
     "resizeSidebar": "Zmień rozmiar panelu bocznego",
+    "collapseSidebar": "Zwiń panel",
+    "expandSidebar": "Rozwiń panel",
     "sidebarTabWordcloudNew": "Nowe pytanie „Jednym słowem”"
   },
   "qa": {

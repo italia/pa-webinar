@@ -544,6 +544,8 @@
     "sidebarTabMaterialsNew": "New materials shared",
     "sidebarTabQaNew": "New in Q&A",
     "resizeSidebar": "Resize the side panel",
+    "collapseSidebar": "Collapse the panel",
+    "expandSidebar": "Expand the panel",
     "sidebarTabWordcloudNew": "New “In one word” question"
   },
   "qa": {

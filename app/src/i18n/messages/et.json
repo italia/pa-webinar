@@ -544,6 +544,8 @@
     "sidebarTabMaterialsNew": "Uued jagatud materjalid",
     "sidebarTabQaNew": "Uut küsimustes ja vastustes",
     "resizeSidebar": "Muuda külgpaneeli suurust",
+    "collapseSidebar": "Ahenda paneel",
+    "expandSidebar": "Laienda paneel",
     "sidebarTabWordcloudNew": "Uus „Ühe sõnaga“ küsimus"
   },
   "qa": {

@@ -544,6 +544,8 @@
     "sidebarTabMaterialsNew": "Nytt delat material",
     "sidebarTabQaNew": "Nytt i Frågor och svar",
     "resizeSidebar": "Ändra storlek på sidopanelen",
+    "collapseSidebar": "Fäll ihop panelen",
+    "expandSidebar": "Fäll ut panelen",
     "sidebarTabWordcloudNew": "Ny fråga ”Med ett ord”"
   },
   "qa": {

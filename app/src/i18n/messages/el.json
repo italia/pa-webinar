@@ -544,6 +544,8 @@
     "sidebarTabMaterialsNew": "Νέο κοινόχρηστο υλικό",
     "sidebarTabQaNew": "Νέα στις Ερωτήσεις και απαντήσεις",
     "resizeSidebar": "Αλλαγή μεγέθους πλαϊνού πίνακα",
+    "collapseSidebar": "Σύμπτυξη του πλαισίου",
+    "expandSidebar": "Ανάπτυξη του πλαισίου",
     "sidebarTabWordcloudNew": "Νέα ερώτηση «Με μία λέξη»"
   },
   "qa": {

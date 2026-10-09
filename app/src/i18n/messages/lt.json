@@ -544,6 +544,8 @@
     "sidebarTabMaterialsNew": "Nauja bendrinama medžiaga",
     "sidebarTabQaNew": "Naujienos skiltyje Klausimai ir atsakymai",
     "resizeSidebar": "Keisti šoninio skydelio dydį",
+    "collapseSidebar": "Suskleisti skydelį",
+    "expandSidebar": "Išskleisti skydelį",
     "sidebarTabWordcloudNew": "Naujas klausimas „Vienu žodžiu“"
   },
   "qa": {

@@ -544,6 +544,8 @@
     "sidebarTabMaterialsNew": "Materiale noi distribuite",
     "sidebarTabQaNew": "Noutăți în Întrebări și răspunsuri",
     "resizeSidebar": "Redimensionează panoul lateral",
+    "collapseSidebar": "Restrânge panoul",
+    "expandSidebar": "Extinde panoul",
     "sidebarTabWordcloudNew": "Întrebare nouă „Într-un cuvânt”"
   },
   "qa": {

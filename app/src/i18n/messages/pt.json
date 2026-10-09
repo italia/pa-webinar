@@ -544,6 +544,8 @@
     "sidebarTabMaterialsNew": "Novos materiais partilhados",
     "sidebarTabQaNew": "Novidades em Perguntas e respostas",
     "resizeSidebar": "Redimensionar o painel lateral",
+    "collapseSidebar": "Recolher o painel",
+    "expandSidebar": "Expandir o painel",
     "sidebarTabWordcloudNew": "Nova pergunta «Numa palavra»"
   },
   "qa": {

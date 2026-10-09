@@ -544,6 +544,8 @@
     "sidebarTabMaterialsNew": "Neue Materialien geteilt",
     "sidebarTabQaNew": "Neues in Fragen & Antworten",
     "resizeSidebar": "Größe der Seitenleiste ändern",
+    "collapseSidebar": "Bereich einklappen",
+    "expandSidebar": "Bereich ausklappen",
     "sidebarTabWordcloudNew": "Neue Frage „In einem Wort“"
   },
   "qa": {

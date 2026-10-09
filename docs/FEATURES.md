@@ -252,7 +252,7 @@ Configured in: [Runtime settings](configuration/runtime-settings.md) · [From cr
 
 ### Panels in the drawer
 
-The drawer is a column on the right on desktop, which can be widened by dragging its edge, and a sheet from the bottom on smaller screens. It holds these panels:
+The drawer is a column on the right on desktop, which can be widened by dragging its edge or collapsed to a strip of icons, and a sheet from the bottom on smaller screens. It holds these panels:
 
 | Panel | What it does | Default |
 |---|---|---|

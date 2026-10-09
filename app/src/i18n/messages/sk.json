@@ -544,6 +544,8 @@
     "sidebarTabMaterialsNew": "Nové zdieľané materiály",
     "sidebarTabQaNew": "Novinky v Otázkach a odpovediach",
     "resizeSidebar": "Zmeniť veľkosť bočného panela",
+    "collapseSidebar": "Zbaliť panel",
+    "expandSidebar": "Rozbaliť panel",
     "sidebarTabWordcloudNew": "Nová otázka „Jedným slovom“"
   },
   "qa": {
