@@ -39,11 +39,13 @@ flowchart LR
 1. **Prosody marks the room.** When the service is installed, the project's module `mod_pa_captions` sets two room metadata keys at creation: `asyncTranscription`, which clients cannot set, and `transcription.urlParams.room`, the room name. Nothing is transcribed yet.
 2. **The moderator's room turns it on.** If captions are on for the event, the room page of each moderator sends the IFrame API command `setSubtitles` after joining. Jitsi writes `recording.isTranscribingEnabled` into the room metadata; only a moderator's token, which carries the `transcription` feature, may do it.
 3. **Jicofo connects the bridge.** Jicofo builds the service URL from its template (`jicofo.transcription.url-template`, with the meeting id and, from Jitsi stable-10978, the room name as a query parameter) and tells the bridge to open it.
-4. **The bridge streams speakers.** The bridge sends the Opus packets of every participant whose audio is not silence; packets that clients mark as silence are dropped by the bridge, so a participant with a muted or quiet microphone costs nothing.
-5. **The gateway transcribes.** For each speaker it decodes Opus to 16 kHz mono PCM, opens a session on the engine with the room's language and vocabulary, and turns the engine's fragments into captions.
+4. **The bridge streams speakers.** The bridge sends the Opus audio of every participant whose microphone is on, pauses included; a muted microphone sends nothing.
+5. **The gateway transcribes.** For each speaker it decodes Opus to 16 kHz mono PCM, finds the stretches with voice, sends only those to an engine session opened with the room's language and vocabulary, and turns the engine's fragments into captions. Silence on an open microphone costs no engine time.
 6. **Every room shows the captions.** The bridge relays each `transcription-result` to all participants. The room receives it through the IFrame API event `transcriptionChunkReceived`, resolves the speaker's display name from the endpoint id, and draws it over the video (`app/src/components/live/live-captions.tsx`).
 
 Turning captions off during the event (the **Automatic captions** switch in the control room) sends `setSubtitles` with `false`, which stops the transcription for the room.
+
+Jitsi treats transcription as a kind of recording: when it starts or stops, every client plays the spoken "recording on/off" announcement and the IFrame API reports a recording status change. Nothing is recorded, so in rooms with captions the room turns those two sounds off (`disabledSounds`), and it never takes a "stopped" status it has not seen start as the end of a recording. During a real recording Jitsi skips the sounds by itself while transcription is on, and the room shows its own recording notice.
 
 ## Turning captions on and off
 
@@ -52,7 +54,7 @@ Turning captions off during the event (the **Automatic captions** switch in the 
 | Installation | Helm: `global.captions.enabled` | `true` | Renders the captions pod, the Prosody module setting and Jicofo's URL template, and gives the portal `CAPTIONS_STATUS_URL`. Without it the portal never tries to start captions. |
 | Instance | **Settings → Features → Live captions** (`SiteSetting.liveCaptionsEnabled`) | on | Off, no event starts captions and the scaler keeps the service at zero. On, the scaler keeps it up while any event is live or starting, also when a moderator turns captions off in the room, so that turning them back on is immediate. |
 | Event | `Event.liveCaptionsEnabled`, switched live from the control room | on | Off, the room's moderators stop the transcription. |
-| Viewer | **CC** button over the video | shown | Hides the captions for that viewer only; the choice is kept in the browser. |
+| Viewer | **Captions** button in the Jitsi toolbar | shown | Hides the captions for that viewer only; the icon is crossed out while they are hidden, and the choice is kept in the browser. |
 
 Captions start only when a moderator is in the room: speakers and participants cannot start them.
 
@@ -61,8 +63,9 @@ Captions start only when a moderator is in the room: speakers and participants c
 The gateway (`infra/captions/gateway`) is a small Node service with no state outside memory. Its behavior is set by environment variables, listed in `src/config.ts`; the chart sets them from `captions.*` values.
 
 - **Protocol.** It speaks the bridge's "mediajson" format: `start` for each audio source, `media` with one RTP Opus payload in base64, `ping` (answered with `pong`) and `session-end`. Results carry both `event` and `type` set to `transcription-result`, because the bridge reads one and the Jitsi client the other.
-- **Sentences.** The engine emits text only at the end, with punctuation. A caption grows until the speaker pauses: with no packets for `CAPTIONS_PAUSE_GAP_MS` (900 ms by default), the gateway closes the sentence on the engine and sends it as final. A caption longer than `CAPTIONS_MAX_CHARS` is split at the end of a sentence, a clause or a word. Interim updates are sent at most every `CAPTIONS_INTERIM_INTERVAL_MS`, and always contain the whole sentence so far.
-- **Lead-in silence.** Because the bridge drops silence, a sentence after a pause reaches the engine with no silence before it. When speech starts in the first milliseconds of a session, the model loses the first word and, for the whole sentence, capitals and punctuation. The gateway puts 300 ms of silence before each new sentence.
+- **Voice.** Each 20 ms frame counts as voice when its level is above both `CAPTIONS_VAD_MIN_DBFS` (−55 dBFS) and the speaker's noise floor plus `CAPTIONS_VAD_MARGIN_DB` (10 dB). The noise floor is the lowest level of the last three seconds: speech always has gaps between words, steady noise does not, so a fan or a murmur does not keep a sentence open. The 300 ms before the first voiced frame go to the engine too, because they hold the start of the first syllable.
+- **Sentences.** The engine's text grows with the speech, punctuation included, and is settled when the sentence is closed. A caption grows until the speaker pauses: with no voice for `CAPTIONS_PAUSE_GAP_MS` (900 ms by default), as silence on an open microphone or as no packets, the gateway closes the sentence on the engine and sends it as final. A caption longer than `CAPTIONS_MAX_CHARS` is split at the end of a sentence, a clause or a word. Interim updates are sent at most every `CAPTIONS_INTERIM_INTERVAL_MS`, and always contain the whole sentence so far.
+- **Lead-in silence.** The engine receives no pauses, so a sentence after a pause reaches it with no silence before it. When speech starts in the first milliseconds of a session, the model loses the first word and, for the whole sentence, capitals and punctuation. The gateway puts 300 ms of silence before each new sentence.
 - **Vocabulary.** For each room it asks the portal (`/api/internal/captions/context`, authenticated with the internal API key) for the language and the vocabulary: glossary terms of the instance and of the event, the organizers, the moderators and the speakers. Phrases bias the engine at weight `CAPTIONS_BOOST` (0.5); glossary aliases are replaced by their term in the text. The language is the instance's default language when the model transcribes it, and automatic detection otherwise.
 - **Authentication.** If `global.captions.bridgeToken` is set, Jicofo sends it in the `X-Captions-Token` header and the gateway refuses connections without it. With the chart's NetworkPolicy on, only the bridge and the portal can reach the service.
 - **Logs.** No transcript and no name is ever logged.
@@ -121,6 +124,7 @@ While captions are on, the voice of everyone who speaks is processed by the serv
 ## Known limitations
 
 - **A moderator must be in the room.** Captions are turned on by a moderator's room page; a room with only speakers and participants has none. Before Jitsi stable-10978, Jicofo puts a conference on the bridge only from two participants: a moderator alone is captioned once someone else joins.
+- **A restart of the service during a conference.** On Jitsi stable-10741 the bridge tries to reconnect once; if the service is not back yet, transcription resumes only when a moderator turns captions off and on again, or joins again.
 - **Numbers come out in words.** The engine has no inverse text normalization for Italian.
 - **Language.** The model transcribes 18 of the 24 interface languages; for Greek, Irish, Latvian, Lithuanian, Maltese and Slovenian the service falls back to automatic detection, which does not transcribe them reliably.
 - **Room name on older Jitsi.** Before stable-10978 the bridge does not pass the room name: the service uses the instance's language and glossary, and cannot tell which event a room belongs to.

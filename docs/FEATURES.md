@@ -293,7 +293,7 @@ The two capture paths (a composite video from Jibri, and per-participant audio f
 *On by default* where the installation runs the captions service.
 
 - While the event runs, what each person says appears as captions over the video, with the speaker's name, a few tenths of a second after the words. Speech is transcribed by a recognizer inside the installation, on CPU: no audio or text leaves it, and nothing is kept.
-- Each viewer hides or shows the captions for themselves with the **CC** button; screen readers hear the finished sentences.
+- Each viewer hides or shows the captions for themselves with the captions button in the call's toolbar; screen readers hear the finished sentences.
 - The waiting room tells participants that captions are on.
 - Moderators turn them off and on for everyone from the **Control** panel, with **Automatic captions**; administrators turn them off for the whole instance in the site settings.
 - The event's vocabulary (glossary, organizers, moderators and speakers) helps the recognizer write names and acronyms right.
