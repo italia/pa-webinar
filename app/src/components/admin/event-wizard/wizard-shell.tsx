@@ -39,15 +39,17 @@ import type { VideoQualityPreset } from '@/lib/jitsi/config';
 
 import { RubricaAccessContext } from '../rubrica-picker';
 
-import { fanoutEditDiff, materialPayload, newFanoutReport, submitQuestionnaire } from './edit-fanout';
+import {
+  fanoutEditDiff,
+  materialPayload,
+  newFanoutReport,
+  submitQuestionnaire,
+} from './edit-fanout';
 import { rememberCreation, type UnsavedResource } from './created-event';
 import Step1Base, { type Step1Value } from './step-1-base';
 import StepPermissions, { type StepPermissionsValue } from './step-3-permissions';
 import StepPeople, { type StepPeopleValue } from './step-2-people';
-import Step4Content, {
-  type Step4Value,
-  type QuestionnaireBlock,
-} from './step-4-content';
+import Step4Content, { type Step4Value, type QuestionnaireBlock } from './step-4-content';
 import Step5Review from './step-5-review';
 import {
   STEP_KEYS,
@@ -102,7 +104,11 @@ export interface WizardProps {
    *  staff: solo allora il ritorno alla pagina dell'evento lo porta con se'. */
   viaToken?: string | null;
   jvbSizingConfig: JvbSizingConfig;
-  availableTags: Array<{ slug: string; name: Record<string, string>; color: string | null }>;
+  availableTags: Array<{
+    slug: string;
+    name: Record<string, string>;
+    color: string | null;
+  }>;
   gdprTemplates: Array<{ id: string; name: string; isDefault: boolean }>;
   /** Site-wide default for the title-kicker parse. Used to decide whether
    *  to surface the per-event override in step 1 (hidden when already on). */
@@ -292,7 +298,6 @@ export default function EventWizard(props: WizardProps) {
     snapshotRef.current = structuredClone(initialEvent);
   }
 
-
   // Initial form state seeded from template (when given) + sensible defaults,
   // or — in edit mode — from `initialEvent`.
   const initial: WizardForm = useMemo(() => {
@@ -316,7 +321,10 @@ export default function EventWizard(props: WizardProps) {
     const defaultEnd = new Date(defaultStart.getTime() + defaultDurationMin * 60_000);
     // Traduzione accesa senza lingue (un modello o un evento che ereditava le
     // lingue dell'istanza): si parte da quelle dell'istanza, gia' spuntate.
-    const lingueDiPartenza = (traduce: boolean | null | undefined, lingue: string | null | undefined) =>
+    const lingueDiPartenza = (
+      traduce: boolean | null | undefined,
+      lingue: string | null | undefined
+    ) =>
       lingue ??
       (traduce
         ? parseLocaleList(props.defaultTargetLocales)
@@ -422,16 +430,14 @@ export default function EventWizard(props: WizardProps) {
           type: m.type,
           visibility: m.visibility,
         })),
-        preEventQuestionnaire:
-          initialEvent.preEventQuestionnaire ?? {
-            templateIds: [],
-            adhocQuestions: [],
-          },
-        postEventQuestionnaire:
-          initialEvent.postEventQuestionnaire ?? {
-            templateIds: [],
-            adhocQuestions: [],
-          },
+        preEventQuestionnaire: initialEvent.preEventQuestionnaire ?? {
+          templateIds: [],
+          adhocQuestions: [],
+        },
+        postEventQuestionnaire: initialEvent.postEventQuestionnaire ?? {
+          templateIds: [],
+          adhocQuestions: [],
+        },
 
         // Step 5
         dataRetentionDays: ev.dataRetentionDays,
@@ -455,13 +461,13 @@ export default function EventWizard(props: WizardProps) {
     // defaultMatrix() perderebbe in silenzio i permessi di ogni modello.
     const matrix: PermissionMatrix = tpl
       ? ((tpl.permissionMatrix && coerceMatrix(tpl.permissionMatrix)) ??
-          matrixFromToggles({
-            qaEnabled: tpl.qaEnabled,
-            chatEnabled: tpl.chatEnabled,
-            participantsCanUnmute: tpl.participantsCanUnmute,
-            participantsCanStartVideo: tpl.participantsCanStartVideo,
-            participantsCanShareScreen: tpl.participantsCanShareScreen,
-          }))
+        matrixFromToggles({
+          qaEnabled: tpl.qaEnabled,
+          chatEnabled: tpl.chatEnabled,
+          participantsCanUnmute: tpl.participantsCanUnmute,
+          participantsCanStartVideo: tpl.participantsCanStartVideo,
+          participantsCanShareScreen: tpl.participantsCanShareScreen,
+        }))
       : defaultMatrix();
     return {
       // Step 1
@@ -505,9 +511,7 @@ export default function EventWizard(props: WizardProps) {
       // le tracce per partecipante, che servono alla trascrizione.
       aiTranscriptEnabled: conAi && (tpl?.aiTranscriptEnabled ?? false),
       aiSummaryEnabled:
-        conAi &&
-        (tpl?.aiTranscriptEnabled ?? false) &&
-        (tpl?.aiSummaryEnabled ?? false),
+        conAi && (tpl?.aiTranscriptEnabled ?? false) && (tpl?.aiSummaryEnabled ?? false),
       aiTranslationEnabled:
         conAi &&
         (tpl?.aiTranscriptEnabled ?? false) &&
@@ -519,17 +523,20 @@ export default function EventWizard(props: WizardProps) {
       // l'evento sia registrato non ha senso e sarebbe una raccolta di dati
       // personali senza scopo.
       aiDubbingEnabled:
+        conAi && (tpl?.aiTranscriptEnabled ?? false) && (tpl?.aiDubbingEnabled ?? false),
+      multitrackRecordingEnabled:
         conAi &&
         (tpl?.aiTranscriptEnabled ?? false) &&
-        (tpl?.aiDubbingEnabled ?? false),
-      multitrackRecordingEnabled:
-        conAi && (tpl?.aiTranscriptEnabled ?? false) && (tpl?.multitrackRecordingEnabled ?? false),
+        (tpl?.multitrackRecordingEnabled ?? false),
       retainParticipantTracks:
         conAi &&
         (tpl?.aiTranscriptEnabled ?? false) &&
         (tpl?.multitrackRecordingEnabled ?? false) &&
         (tpl?.retainParticipantTracks ?? false),
-      aiTargetLocales: lingueDiPartenza(conAi && tpl?.aiTranslationEnabled, tpl?.aiTargetLocales),
+      aiTargetLocales: lingueDiPartenza(
+        conAi && tpl?.aiTranslationEnabled,
+        tpl?.aiTargetLocales
+      ),
       expectedSpeakers: tpl?.defaultExpectedSpeakers ?? null,
 
       // Passo Persone
@@ -548,7 +555,7 @@ export default function EventWizard(props: WizardProps) {
       // alto: si riporta entro il massimo, altrimenti l'evento non si salva.
       dataRetentionDays: Math.min(
         tpl?.defaultRetentionDays ?? props.defaultRetentionDays,
-        MAX_RETENTION_DAYS,
+        MAX_RETENTION_DAYS
       ),
       postEventPublic: tpl?.postEventPublic ?? true,
       // Il modello marcato come predefinito esiste per essere pre-scelto sui
@@ -572,7 +579,7 @@ export default function EventWizard(props: WizardProps) {
   // Quale pulsante ha avviato il salvataggio: solo lui dice «Salvataggio…».
   const [azione, setAzione] = useState<'draft' | 'publish' | null>(null);
   const [activeStep, setActiveStep] = useState<StepKey>(
-    (mode === 'edit' ? props.initialStep : undefined) ?? 'base',
+    (mode === 'edit' ? props.initialStep : undefined) ?? 'base'
   );
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -624,7 +631,8 @@ export default function EventWizard(props: WizardProps) {
     const chiavi = chiaviClientRef.current;
     if (chiavi.size === 0) return;
     const ancora: Record<string, string> = { ...validatePublish(form) };
-    for (const k of STEP_KEYS) Object.assign(ancora, validateStep(k, form, props.defaultLocale, retentionMax));
+    for (const k of STEP_KEYS)
+      Object.assign(ancora, validateStep(k, form, props.defaultLocale, retentionMax));
     const risolte = [...chiavi].filter((k) => !(k in ancora));
     if (risolte.length === 0) return;
     for (const k of risolte) chiavi.delete(k);
@@ -658,20 +666,30 @@ export default function EventWizard(props: WizardProps) {
         el.removeAttribute('data-wizard-describedby');
       });
       const campi = [
-        ...root.querySelectorAll<HTMLElement>('input.is-invalid, textarea.is-invalid, select.is-invalid'),
+        ...root.querySelectorAll<HTMLElement>(
+          'input.is-invalid, textarea.is-invalid, select.is-invalid'
+        ),
       ];
       const etichette: string[] = [];
       campi.forEach((el, i) => {
         if (!el.hasAttribute('data-wizard-invalid')) {
           el.setAttribute('data-wizard-invalid', '');
-          el.setAttribute('data-wizard-describedby', el.getAttribute('aria-describedby') ?? '');
+          el.setAttribute(
+            'data-wizard-describedby',
+            el.getAttribute('aria-describedby') ?? ''
+          );
         }
-        if (el.getAttribute('aria-invalid') !== 'true') el.setAttribute('aria-invalid', 'true');
-        const messaggio = el.parentElement?.querySelector<HTMLElement>('.invalid-feedback');
+        if (el.getAttribute('aria-invalid') !== 'true')
+          el.setAttribute('aria-invalid', 'true');
+        const messaggio =
+          el.parentElement?.querySelector<HTMLElement>('.invalid-feedback');
         if (messaggio) {
           if (!messaggio.id) messaggio.id = `wizard-errore-${activeStep}-${i}`;
-          const voluto = [el.getAttribute('data-wizard-describedby'), messaggio.id].filter(Boolean).join(' ');
-          if (el.getAttribute('aria-describedby') !== voluto) el.setAttribute('aria-describedby', voluto);
+          const voluto = [el.getAttribute('data-wizard-describedby'), messaggio.id]
+            .filter(Boolean)
+            .join(' ');
+          if (el.getAttribute('aria-describedby') !== voluto)
+            el.setAttribute('aria-describedby', voluto);
         }
         const etichetta =
           el.getAttribute('data-wizard-label') ||
@@ -683,7 +701,9 @@ export default function EventWizard(props: WizardProps) {
       });
       campiNonValidiRef.current = campi;
       setRiepilogo((prima) =>
-        prima.length === etichette.length && prima.every((e, i) => e === etichette[i]) ? prima : etichette,
+        prima.length === etichette.length && prima.every((e, i) => e === etichette[i])
+          ? prima
+          : etichette
       );
       return campi;
     };
@@ -706,7 +726,12 @@ export default function EventWizard(props: WizardProps) {
     // Le nostre modifiche toccano solo attributi aria e data, non la classe:
     // l'osservatore non si risveglia da se'.
     const osservatore = new MutationObserver(() => allinea());
-    osservatore.observe(root, { subtree: true, childList: true, attributes: true, attributeFilter: ['class'] });
+    osservatore.observe(root, {
+      subtree: true,
+      childList: true,
+      attributes: true,
+      attributeFilter: ['class'],
+    });
     return () => osservatore.disconnect();
   }, [fieldErrors, activeStep]);
 
@@ -805,7 +830,10 @@ export default function EventWizard(props: WizardProps) {
    * che nessun campo del wizard sa mostrare.
    */
   const serverErrorMessage = useCallback(
-    (err: { error?: string; message?: string; details?: unknown }, status: number): string => {
+    (
+      err: { error?: string; message?: string; details?: unknown },
+      status: number
+    ): string => {
       if (!Array.isArray(err.details)) {
         return err.error ?? err.message ?? `HTTP ${status}`;
       }
@@ -820,12 +848,12 @@ export default function EventWizard(props: WizardProps) {
         parti.push(
           t('validationFailedDetail', {
             reason: mapped.unmapped.join('; ') || err.error || `HTTP ${status}`,
-          }),
+          })
         );
       }
       return parti.join('\n');
     },
-    [props.defaultLocale, t],
+    [props.defaultLocale, t]
   );
 
   /**
@@ -843,7 +871,10 @@ export default function EventWizard(props: WizardProps) {
       // Validate every step before submitting (especially on publish).
       const aggregated: Record<string, string> = {};
       for (const key of STEP_KEYS) {
-        Object.assign(aggregated, validateStep(key, form, props.defaultLocale, retentionMax));
+        Object.assign(
+          aggregated,
+          validateStep(key, form, props.defaultLocale, retentionMax)
+        );
       }
       if (submitMode === 'publish') {
         Object.assign(aggregated, validatePublish(form));
@@ -859,8 +890,9 @@ export default function EventWizard(props: WizardProps) {
         // suoi (altrimenti il messaggio resta senza campo evidenziato).
         const firstFailing = STEP_KEYS.find(
           (k) =>
-            Object.keys(validateStep(k, form, props.defaultLocale, retentionMax)).length > 0 ||
-            (k === 'invites' && !!(aggregated.moderatorName || aggregated.moderatorEmail)),
+            Object.keys(validateStep(k, form, props.defaultLocale, retentionMax)).length >
+              0 ||
+            (k === 'invites' && !!(aggregated.moderatorName || aggregated.moderatorEmail))
         );
         if (firstFailing) setActiveStep(firstFailing);
         return;
@@ -874,7 +906,10 @@ export default function EventWizard(props: WizardProps) {
         // measure.
         const toggles = togglesFromMatrix(form.permissionMatrix);
 
-        const startsAtUTC = fromDatetimeLocalInTz(form.startsAt, form.timezone).toISOString();
+        const startsAtUTC = fromDatetimeLocalInTz(
+          form.startsAt,
+          form.timezone
+        ).toISOString();
         const endsAtUTC = fromDatetimeLocalInTz(form.endsAt, form.timezone).toISOString();
 
         const payload: Record<string, unknown> = {
@@ -911,9 +946,7 @@ export default function EventWizard(props: WizardProps) {
           // un'invariante: senza recordingEnabled non c'è transcript).
           aiTranscriptEnabled: form.recordingEnabled && form.aiTranscriptEnabled,
           aiSummaryEnabled:
-            form.recordingEnabled &&
-            form.aiTranscriptEnabled &&
-            form.aiSummaryEnabled,
+            form.recordingEnabled && form.aiTranscriptEnabled && form.aiSummaryEnabled,
           aiTranslationEnabled:
             form.recordingEnabled &&
             form.aiTranscriptEnabled &&
@@ -949,7 +982,8 @@ export default function EventWizard(props: WizardProps) {
           // interruttore, e un salvataggio del wizard non deve rimettere un
           // valore letto prima.
           postEventPublic:
-            mode === 'edit' && form.postEventPublic === initialEvent?.event.postEventPublic
+            mode === 'edit' &&
+            form.postEventPublic === initialEvent?.event.postEventPublic
               ? undefined
               : form.postEventPublic,
           // La stringa vuota si spedisce, non si trasforma in `undefined`: il
@@ -962,8 +996,7 @@ export default function EventWizard(props: WizardProps) {
           // In modifica, togliere il documento dell'informativa manda null:
           // altrimenti l'ultimo indirizzo resterebbe in vigore e avrebbe la
           // precedenza sull'informativa predefinita dell'installazione.
-          privacyPolicyUrl:
-            form.privacyPolicyUrl || (mode === 'edit' ? null : undefined),
+          privacyPolicyUrl: form.privacyPolicyUrl || (mode === 'edit' ? null : undefined),
           moderatorName: form.moderatorName?.trim() || undefined,
           moderatorEmail: form.moderatorEmail?.trim() || undefined,
           moderatorOrganization: form.moderatorOrganization?.trim() || null,
@@ -979,17 +1012,14 @@ export default function EventWizard(props: WizardProps) {
           const moderatorToken = initialEvent.moderatorToken;
 
           // Il token solo nell'intestazione: nell'indirizzo finirebbe nei log.
-          const putRes = await fetch(
-            `/api/events/${eventId}`,
-            {
-              method: 'PUT',
-              headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${moderatorToken}`,
-              },
-              body: JSON.stringify(payload),
+          const putRes = await fetch(`/api/events/${eventId}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${moderatorToken}`,
             },
-          );
+            body: JSON.stringify(payload),
+          });
           if (!putRes.ok) {
             const err = await putRes.json().catch(() => ({}));
             throw new Error(serverErrorMessage(err, putRes.status));
@@ -1000,7 +1030,7 @@ export default function EventWizard(props: WizardProps) {
             moderatorToken,
             form,
             snapshotRef.current ?? initialEvent,
-            props.defaultLocale,
+            props.defaultLocale
           );
 
           // Non si cancella la bozza e non si naviga via: il testo digitato
@@ -1013,7 +1043,7 @@ export default function EventWizard(props: WizardProps) {
           // quella persona e' ancora valido, e un nuovo salvataggio la
           // riprova (lo scatto non l'ha tolta).
           const avvisi = report.revocationFailed.map((name) =>
-            t('revocationFailed', { name, tab: tDetail('tabs.people') }),
+            t('revocationFailed', { name, tab: tDetail('tabs.people') })
           );
           if (report.failed.length > 0) {
             const risorse = [...new Set(report.failed)]
@@ -1025,7 +1055,7 @@ export default function EventWizard(props: WizardProps) {
                     items: risorse,
                     reason: report.reason,
                   })
-                : t('partialFailureEdit', { items: risorse }),
+                : t('partialFailureEdit', { items: risorse })
             );
           }
           if (avvisi.length > 0) {
@@ -1157,14 +1187,14 @@ export default function EventWizard(props: WizardProps) {
           created.id,
           'PRE_REGISTRATION',
           form.preEventQuestionnaire,
-          props.defaultLocale,
+          props.defaultLocale
         );
         await submitQuestionnaire(
           reportQ,
           created.id,
           'POST_EVENT',
           form.postEventQuestionnaire,
-          props.defaultLocale,
+          props.defaultLocale
         );
         if (reportQ.failed.length > 0) failed.add('questionnaires');
 
@@ -1193,7 +1223,9 @@ export default function EventWizard(props: WizardProps) {
               error?: string;
               message?: string;
             };
-            publishProblem = { reason: err.error ?? err.message ?? `HTTP ${pubRes.status}` };
+            publishProblem = {
+              reason: err.error ?? err.message ?? `HTTP ${pubRes.status}`,
+            };
           }
         }
 
@@ -1203,17 +1235,22 @@ export default function EventWizard(props: WizardProps) {
         // conserva l'esito, un avviso, che sopravvive al cambio di pagina.
         const esitoConservato =
           !overrideRedirect &&
-          rememberCreation(created.id, { unsaved: [...failed], publishFailed: publishProblem !== null });
+          rememberCreation(created.id, {
+            unsaved: [...failed],
+            publishFailed: publishProblem !== null,
+          });
         if (failed.size > 0 && !esitoConservato) {
           toast.error(
-            t('partialFailure', { items: [...failed].map((k) => t(`resources.${k}`)).join(', ') }),
+            t('partialFailure', {
+              items: [...failed].map((k) => t(`resources.${k}`)).join(', '),
+            })
           );
         }
         if (publishProblem) {
           toast.error(
             publishProblem.reason
               ? t('publishFailedDetail', { reason: publishProblem.reason })
-              : t('publishFailed'),
+              : t('publishFailed')
           );
         }
 
@@ -1252,14 +1289,14 @@ export default function EventWizard(props: WizardProps) {
       retentionMax,
       showError,
       serverErrorMessage,
-    ],
+    ]
   );
 
   const saveDraftAndNavigate = useCallback(
     async (destination: string) => {
       await handleSubmit('draft', destination);
     },
-    [handleSubmit],
+    [handleSubmit]
   );
 
   return (
@@ -1356,8 +1393,12 @@ export default function EventWizard(props: WizardProps) {
               }}
               onPrimaryChange={updateForm}
               fieldErrors={fieldErrors}
-              prefilledModeratorEmail={mode === 'edit' ? null : props.defaultModerator?.email ?? null}
-              showLinksOnPublish={mode === 'create' || initialEvent?.event.status === 'DRAFT'}
+              prefilledModeratorEmail={
+                mode === 'edit' ? null : (props.defaultModerator?.email ?? null)
+              }
+              showLinksOnPublish={
+                mode === 'create' || initialEvent?.event.status === 'DRAFT'
+              }
               publicRegistrationEnabled={props.publicRegistrationEnabled ?? true}
             />
           </RubricaAccessContext.Provider>
@@ -1406,7 +1447,10 @@ export default function EventWizard(props: WizardProps) {
         </div>
       )}
 
-      <div className="d-flex justify-content-between mt-4 pt-3" style={{ borderTop: '1px solid #e8e8e8' }}>
+      <div
+        className="d-flex justify-content-between mt-4 pt-3"
+        style={{ borderTop: '1px solid #e8e8e8' }}
+      >
         <button
           type="button"
           className="btn btn-outline-primary"

@@ -178,9 +178,16 @@ function PrimarySection({
     !!prefilledModeratorEmail &&
     primary.email.trim().toLowerCase() === prefilledModeratorEmail.trim().toLowerCase();
   return (
-    <section className="wizard-group wizard-group--static mb-3" aria-labelledby="wiz-primary-title">
+    <section
+      className="wizard-group wizard-group--static mb-3"
+      aria-labelledby="wiz-primary-title"
+    >
       <div className="wizard-group__body">
-        <h3 id="wiz-primary-title" className="h6 fw-semibold mb-1" style={{ color: 'var(--app-text)' }}>
+        <h3
+          id="wiz-primary-title"
+          className="h6 fw-semibold mb-1"
+          style={{ color: 'var(--app-text)' }}
+        >
           {t('primaryHeading')}
         </h3>
         <p className="text-secondary mb-2" style={{ fontSize: '0.85rem' }}>
@@ -188,7 +195,11 @@ function PrimarySection({
           {showLinksOnPublish && <> {t('linksOnPublish')}</>}
         </p>
         {precompilato && (
-          <div className="alert alert-warning py-2 mb-3" role="note" style={{ fontSize: '0.85rem' }}>
+          <div
+            className="alert alert-warning py-2 mb-3"
+            role="note"
+            style={{ fontSize: '0.85rem' }}
+          >
             {t('primaryPrefilled')}
           </div>
         )}
@@ -233,9 +244,12 @@ function PrimarySection({
               maxLength={200}
               className={`form-control${fieldErrors.moderatorOrganization ? ' is-invalid' : ''}`}
               value={primary.organization ?? ''}
-              onChange={(e) => onPrimaryChange({ moderatorOrganization: e.target.value || null })}
+              onChange={(e) =>
+                onPrimaryChange({ moderatorOrganization: e.target.value || null })
+              }
             />
-            {(fieldErrors.moderatorOrganization || fieldErrors.moderatorOrganizationLogoUrl) && (
+            {(fieldErrors.moderatorOrganization ||
+              fieldErrors.moderatorOrganizationLogoUrl) && (
               <div className="invalid-feedback d-block">{t('primaryProfileInvalid')}</div>
             )}
           </div>
@@ -246,7 +260,9 @@ function PrimarySection({
                 type="checkbox"
                 className="form-check-input"
                 checked={primary.publicListed}
-                onChange={(e) => onPrimaryChange({ moderatorPublicListed: e.target.checked })}
+                onChange={(e) =>
+                  onPrimaryChange({ moderatorPublicListed: e.target.checked })
+                }
               />
               <label className="form-check-label" htmlFor="wiz-primary-public">
                 {t('personPublic')}
@@ -298,7 +314,9 @@ function Gruppo({
       <summary>
         <span className="wizard-group__title">
           {title}
-          {count > 0 && <span className="badge rounded-pill ms-2 wizard-group__count">{count}</span>}
+          {count > 0 && (
+            <span className="badge rounded-pill ms-2 wizard-group__count">{count}</span>
+          )}
         </span>
         <span className="wizard-group__help">{help}</span>
       </summary>
@@ -355,7 +373,11 @@ function AddedList<T>({
 }
 
 /** La ricerca in rubrica, quando chi compila puo' usarla. */
-function RubricaRow({ onAddMany }: { onAddMany: (picks: RubricaPickedPerson[]) => void }) {
+function RubricaRow({
+  onAddMany,
+}: {
+  onAddMany: (picks: RubricaPickedPerson[]) => void;
+}) {
   const t = useTranslations('admin.wizard.step3');
   if (!useContext(RubricaAccessContext)) return null;
   return (
@@ -422,7 +444,11 @@ function OrganizersSection({
   };
 
   return (
-    <Gruppo title={t('organizersHeading')} help={t('organizersHelp')} count={value.length}>
+    <Gruppo
+      title={t('organizersHeading')}
+      help={t('organizersHelp')}
+      count={value.length}
+    >
       <AddedList
         items={value}
         keyOf={(o) => o.name}
@@ -494,7 +520,12 @@ function righe(moderators: ModeratorEntry[], speakers: SpeakerEntry[]): Riga[] {
       entry,
       role: (entry.organizer === true ? 'organizer' : 'moderator') as PersonRole,
     })),
-    ...speakers.map((entry, index) => ({ kind: 'speakers' as const, index, entry, role: 'speaker' as const })),
+    ...speakers.map((entry, index) => ({
+      kind: 'speakers' as const,
+      index,
+      entry,
+      role: 'speaker' as const,
+    })),
   ];
 }
 
@@ -522,10 +553,13 @@ function conRuolo(
   moderators: ModeratorEntry[],
   speakers: SpeakerEntry[],
   persona: SpeakerEntry,
-  role: PersonRole,
+  role: PersonRole
 ): Pick<StepPeopleValue, 'moderators' | 'speakers'> {
   if (role === 'speaker') return { moderators, speakers: [...speakers, persona] };
-  return { moderators: [...moderators, { ...persona, organizer: role === 'organizer' }], speakers };
+  return {
+    moderators: [...moderators, { ...persona, organizer: role === 'organizer' }],
+    speakers,
+  };
 }
 
 /**
@@ -552,7 +586,9 @@ function PeopleSection({
   const tutte = righe(moderators, speakers);
   // Una persona ha un ruolo solo: gli indirizzi, senza distinguere maiuscole
   // (quelli di un evento esistente possono averne).
-  const giaPresenti = new Set([...tutte.map((r) => r.entry.email), ...taken].map((e) => e.toLowerCase()));
+  const giaPresenti = new Set(
+    [...tutte.map((r) => r.entry.email), ...taken].map((e) => e.toLowerCase())
+  );
 
   const senza = (r: Riga): Pick<StepPeopleValue, 'moderators' | 'speakers'> =>
     r.kind === 'moderators'
@@ -561,9 +597,13 @@ function PeopleSection({
 
   const aggiorna = (r: Riga, patch: Partial<ModeratorEntry>) => {
     if (r.kind === 'moderators') {
-      onChange({ moderators: moderators.map((m, j) => (j === r.index ? { ...m, ...patch } : m)) });
+      onChange({
+        moderators: moderators.map((m, j) => (j === r.index ? { ...m, ...patch } : m)),
+      });
     } else {
-      onChange({ speakers: speakers.map((m, j) => (j === r.index ? { ...m, ...patch } : m)) });
+      onChange({
+        speakers: speakers.map((m, j) => (j === r.index ? { ...m, ...patch } : m)),
+      });
     }
   };
 
@@ -606,8 +646,8 @@ function PeopleSection({
           organizationLogoUrl: draft.organizationLogoUrl?.trim() || null,
           publicListed: draft.publicListed,
         },
-        draft.role,
-      ),
+        draft.role
+      )
     );
     // Il ruolo resta: di solito si aggiungono più persone con lo stesso.
     setDraft({ ...BOZZA_VUOTA, role: draft.role });
@@ -633,7 +673,7 @@ function PeopleSection({
           organizationLogoUrl: null,
           publicListed: false,
         },
-        draft.role,
+        draft.role
       );
     }
     // Chi era già presente (o senza un indirizzo valido) non si aggiunge, e
@@ -657,7 +697,10 @@ function PeopleSection({
           {tutte.map((r, i) => {
             const rid = `${id}-${i}`;
             return (
-              <li key={r.entry.grantId ?? `${r.kind}-${r.entry.email}`} className="list-group-item wizard-person">
+              <li
+                key={r.entry.grantId ?? `${r.kind}-${r.entry.email}`}
+                className="list-group-item wizard-person"
+              >
                 <div className="d-flex justify-content-between align-items-start gap-2">
                   <div className="text-break">
                     <div className="fw-semibold">{r.entry.name}</div>
@@ -696,7 +739,9 @@ function PeopleSection({
                       maxLength={200}
                       className="form-control form-control-sm"
                       value={r.entry.organization ?? ''}
-                      onChange={(e) => aggiorna(r, { organization: e.target.value || null })}
+                      onChange={(e) =>
+                        aggiorna(r, { organization: e.target.value || null })
+                      }
                     />
                   </div>
                   <div className="col-12 d-flex flex-wrap align-items-center gap-3">
@@ -714,7 +759,9 @@ function PeopleSection({
                     </div>
                     <details className="wizard-person__logo">
                       <summary className="small">
-                        {r.entry.organizationLogoUrl ? t('personLogoChange') : t('personLogoAdd')}
+                        {r.entry.organizationLogoUrl
+                          ? t('personLogoChange')
+                          : t('personLogoAdd')}
                       </summary>
                       <div className="pt-2">
                         <FileOrUrlInput
@@ -759,7 +806,9 @@ function PeopleSection({
             type="email"
             className="form-control"
             value={draft.email}
-            onChange={(e) => setDraft({ ...draft, email: e.target.value, personId: null })}
+            onChange={(e) =>
+              setDraft({ ...draft, email: e.target.value, personId: null })
+            }
           />
         </div>
         <div className="col-md-4">
@@ -846,7 +895,11 @@ function InvitationsSection({
 }) {
   const t = useTranslations('admin.wizard.step3');
   const id = 'inv';
-  const [draft, setDraft] = useState({ name: '', email: '', personId: null as string | null });
+  const [draft, setDraft] = useState({
+    name: '',
+    email: '',
+    personId: null as string | null,
+  });
   const [err, setErr] = useState<string | null>(null);
 
   const add = () => {
@@ -874,7 +927,12 @@ function InvitationsSection({
       const email = (p.email ?? '').trim().toLowerCase();
       if (!email || !isEmail(email) || existing.has(email)) continue;
       existing.add(email);
-      toAdd.push({ name: p.displayName?.trim() || null, email, role: 'GUEST', personId: p.id });
+      toAdd.push({
+        name: p.displayName?.trim() || null,
+        email,
+        role: 'GUEST',
+        personId: p.id,
+      });
     }
     setErr(toAdd.length < picks.length ? t('pickSkipped') : null);
     if (toAdd.length > 0) onChange([...value, ...toAdd]);
@@ -883,7 +941,9 @@ function InvitationsSection({
   return (
     <Gruppo
       title={t('invitationsHeading')}
-      help={t(publicRegistrationEnabled ? 'invitationsHelpOpen' : 'invitationsHelpRestricted')}
+      help={t(
+        publicRegistrationEnabled ? 'invitationsHelpOpen' : 'invitationsHelpRestricted'
+      )}
       count={value.length}
     >
       <AddedList
@@ -910,7 +970,9 @@ function InvitationsSection({
                 type="text"
                 className="form-control"
                 value={draft.name}
-                onChange={(e) => setDraft({ ...draft, name: e.target.value, personId: null })}
+                onChange={(e) =>
+                  setDraft({ ...draft, name: e.target.value, personId: null })
+                }
               />
             </div>
             <div className="col-md-5">
@@ -922,7 +984,9 @@ function InvitationsSection({
                 type="email"
                 className="form-control"
                 value={draft.email}
-                onChange={(e) => setDraft({ ...draft, email: e.target.value, personId: null })}
+                onChange={(e) =>
+                  setDraft({ ...draft, email: e.target.value, personId: null })
+                }
               />
             </div>
             <div className="col-md-2">

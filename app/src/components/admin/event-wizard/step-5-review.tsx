@@ -14,7 +14,9 @@ import { useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 
 import EventConfigDiagram from '@/components/admin/event-config-diagram';
-import JvbCapacityPreview, { capacityWarnings } from '@/components/admin/jvb-capacity-preview';
+import JvbCapacityPreview, {
+  capacityWarnings,
+} from '@/components/admin/jvb-capacity-preview';
 import FileOrUrlInput from '@/components/ui/file-or-url-input';
 import ToggleSwitch from '@/components/ui/toggle-switch';
 import { togglesFromMatrix } from '@/lib/utils/permission-matrix';
@@ -119,13 +121,10 @@ export default function Step5Review({
             label={t('summary.schedule')}
             value={`${formatWallClock(form.startsAt, locale)} → ${formatWallClock(
               form.endsAt,
-              locale,
+              locale
             )} (${form.timezone})`}
           />
-          <SummaryItem
-            label={t('summary.recurrence')}
-            value={recurrenceText}
-          />
+          <SummaryItem label={t('summary.recurrence')} value={recurrenceText} />
           <SummaryItem
             label={t('summary.maxParticipants')}
             value={String(form.maxParticipants)}
@@ -156,10 +155,7 @@ export default function Step5Review({
             label={t('summary.moderators')}
             value={nomi(form.moderators.filter((m) => !m.organizer))}
           />
-          <SummaryItem
-            label={t('summary.speakers')}
-            value={nomi(form.speakers)}
-          />
+          <SummaryItem label={t('summary.speakers')} value={nomi(form.speakers)} />
           <SummaryItem
             label={t('summary.invitations')}
             value={String(form.invitations.length)}
@@ -210,8 +206,7 @@ export default function Step5Review({
               value={form.dataRetentionDays}
               onChange={(e) =>
                 onChange({
-                  dataRetentionDays:
-                    Number(e.target.value) || form.dataRetentionDays,
+                  dataRetentionDays: Number(e.target.value) || form.dataRetentionDays,
                 })
               }
               aria-describedby="rev-retention-help"
@@ -240,7 +235,10 @@ export default function Step5Review({
                 // casella che lo contiene sparisce appena un modello è
                 // scelto. Senza questo, il testo continuerebbe a vincere su
                 // una scelta che si vede fatta e non si può più disfare.
-                onChange({ gdprTemplateId: id, ...(id ? { privacyPolicyText: '' } : {}) });
+                onChange({
+                  gdprTemplateId: id,
+                  ...(id ? { privacyPolicyText: '' } : {}),
+                });
               }}
             >
               <option value="">{t('gdprTemplateNone')}</option>
@@ -252,9 +250,7 @@ export default function Step5Review({
               ))}
             </select>
             {fieldErrors.gdprTemplateId && (
-              <div className="invalid-feedback d-block">
-                {t('gdprTemplateUnknown')}
-              </div>
+              <div className="invalid-feedback d-block">{t('gdprTemplateUnknown')}</div>
             )}
           </div>
           {!form.gdprTemplateId && (
@@ -269,9 +265,7 @@ export default function Step5Review({
                 value={form.privacyPolicyText ?? ''}
                 onChange={(e) => onChange({ privacyPolicyText: e.target.value })}
               />
-              <small className="form-text text-muted">
-                {t('privacyTextHelp')}
-              </small>
+              <small className="form-text text-muted">{t('privacyTextHelp')}</small>
             </div>
           )}
           <div className="col-12">
@@ -292,7 +286,9 @@ export default function Step5Review({
               checked={form.postEventPublic}
               onChange={() => onChange({ postEventPublic: !form.postEventPublic })}
             />
-            <small className="form-text text-muted d-block">{tPost('pageVisibleHelp')}</small>
+            <small className="form-text text-muted d-block">
+              {tPost('pageVisibleHelp')}
+            </small>
           </div>
         </div>
       </section>
@@ -309,9 +305,7 @@ export default function Step5Review({
           <JvbCapacityPreview
             maxParticipants={form.maxParticipants}
             senderRatioPct={form.expectedSenderRatioPct}
-            onSenderRatioChange={(next) =>
-              onChange({ expectedSenderRatioPct: next })
-            }
+            onSenderRatioChange={(next) => onChange({ expectedSenderRatioPct: next })}
             videoEnabled={toggles.participantsCanStartVideo}
             defaultSenderRatioPct={defaultSenderRatioPct}
             sizingConfig={jvbSizingConfig}
@@ -351,7 +345,10 @@ function SummaryItem({ label, value }: { label: string; value: string }) {
       >
         {label}
       </div>
-      <div className="fw-semibold" style={{ color: 'var(--app-text)', wordBreak: 'break-word' }}>
+      <div
+        className="fw-semibold"
+        style={{ color: 'var(--app-text)', wordBreak: 'break-word' }}
+      >
         {value}
       </div>
     </div>
