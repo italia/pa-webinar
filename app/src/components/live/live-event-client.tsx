@@ -1278,9 +1278,9 @@ export default function LiveEventClient({
   // Reactstrap portals every Modal into <body> by default. Once the app owns
   // fullscreen on the live wrapper, <body> is OUTSIDE the fullscreen
   // subtree, so those modals never reach the top layer and are simply invisible:
-  // in fullscreen "Condividi", the recording prompt and — worst of all — the
-  // moderator's "Esci dalla sala" dialog all looked like dead buttons, with no
-  // way out of the room. Rendering them inside the fullscreen element fixes it,
+  // in fullscreen the moderator's "Esci dalla sala" dialog and the other
+  // modals looked like dead buttons, with no way out of the room. («Condividi»
+  // is an inline popover inside the top bar and does not need this.) Rendering them inside the fullscreen element fixes it,
   // and outside fullscreen we keep the default (undefined = <body>) so nothing
   // else changes.
   const modalContainer = isFullscreen ? (liveRootRef.current ?? undefined) : undefined;
@@ -1764,7 +1764,6 @@ export default function LiveEventClient({
         moderatorToken={isActualModerator ? token : undefined}
         onLeaveRoom={handleLeaveRoom}
         isFullscreen={isFullscreen}
-        modalContainer={modalContainer}
         onToggleFullscreen={toggleFullscreen}
       />
 
@@ -2484,39 +2483,6 @@ function LiveSidebar({
     dotLabel?: string;
     show: boolean;
   }> = [
-    // La Regia per chi conduce, prima di tutto: è il suo lavoro. Il pubblico
-    // non la vede.
-    {
-      key: 'regia',
-      label: t('controlRoom.tab'),
-      svg: (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="22"
-          height="22"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          aria-hidden="true"
-        >
-          <line x1="4" y1="21" x2="4" y2="14" />
-          <line x1="4" y1="10" x2="4" y2="3" />
-          <line x1="12" y1="21" x2="12" y2="12" />
-          <line x1="12" y1="8" x2="12" y2="3" />
-          <line x1="20" y1="21" x2="20" y2="16" />
-          <line x1="20" y1="12" x2="20" y2="3" />
-          <line x1="1" y1="14" x2="7" y2="14" />
-          <line x1="9" y1="8" x2="15" y2="8" />
-          <line x1="17" y1="16" x2="23" y2="16" />
-        </svg>
-      ),
-      dot: !!regia?.isRecording,
-      dotLabel: t('recordingActive'),
-      show: !!regia,
-    },
     // Chat first: it is the primary audience channel, so it
     // renders as the leftmost sidebar tab, ahead of Q&A.
     {
@@ -2708,6 +2674,40 @@ function LiveSidebar({
       badgeTone: isModerator && handsCount > 0 ? 'alert' : 'neutral',
       dotLabel: isModerator && handsCount > 0 ? tp('handsRaised', { count: handsCount }) : undefined,
       show: true,
+    },
+    // La Regia per chi conduce, in fondo e dopo i Partecipanti: è un'altra
+    // cosa rispetto ai pannelli della sala, e lì non si confonde con loro.
+    // Il pubblico non la vede.
+    {
+      key: 'regia',
+      label: t('controlRoom.tab'),
+      svg: (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <line x1="4" y1="21" x2="4" y2="14" />
+          <line x1="4" y1="10" x2="4" y2="3" />
+          <line x1="12" y1="21" x2="12" y2="12" />
+          <line x1="12" y1="8" x2="12" y2="3" />
+          <line x1="20" y1="21" x2="20" y2="16" />
+          <line x1="20" y1="12" x2="20" y2="3" />
+          <line x1="1" y1="14" x2="7" y2="14" />
+          <line x1="9" y1="8" x2="15" y2="8" />
+          <line x1="17" y1="16" x2="23" y2="16" />
+        </svg>
+      ),
+      dot: !!regia?.isRecording,
+      dotLabel: t('recordingActive'),
+      show: !!regia,
     },
   ];
 
@@ -3182,8 +3182,6 @@ interface LiveTopBarProps {
    *  live-phase top bar (the consent-pending one renders no video/sidebar). */
   isFullscreen?: boolean;
   onToggleFullscreen?: () => void;
-  /** Fullscreen element to portal the share modal into while fullscreen is on. */
-  modalContainer?: HTMLElement;
 }
 
 function LiveTopBar({
@@ -3204,7 +3202,6 @@ function LiveTopBar({
   onLeaveRoom,
   isFullscreen,
   onToggleFullscreen,
-  modalContainer,
 }: LiveTopBarProps) {
   const t = useTranslations('live');
   const tr = useTranslations('live.role');
@@ -3352,7 +3349,6 @@ function LiveTopBar({
           moderatorToken={moderatorToken}
           hasPublicPage={hasPublicPage}
           hasCallLink={hasCallLink}
-          modalContainer={modalContainer}
         />
         {onLeaveRoom && (
           <Button

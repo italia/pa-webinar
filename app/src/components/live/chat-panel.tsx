@@ -1311,7 +1311,9 @@ export default function ChatPanel({
       >
         {messages.length === 0 ? (
           <div className="chat-panel__empty">
-            <Icon icon={readDenied ? 'it-lock' : 'it-comment'} size="lg" className="mb-2 text-muted" />
+            <span className={`chat-panel__empty-badge${readDenied ? ' is-locked' : ''}`} aria-hidden="true">
+              <Icon icon={readDenied ? 'it-lock' : 'it-comment'} size="lg" />
+            </span>
             {/* A refused reader must not be shown the same "no messages yet" as
                 a genuinely quiet room: the panel looks like it works, people
                 keep writing into it, and nobody understands why nothing arrives. */}

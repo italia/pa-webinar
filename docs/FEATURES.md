@@ -273,7 +273,7 @@ Moderators can switch Q&A, chat, **Agenda** and **In one word** on and off durin
 - **Reactions.** The site chooses the mode:
   - `NATIVE` (the default): Jitsi's own reactions button. It is ephemeral and nothing is counted.
   - `CUSTOM`: the app's reaction bar. Reactions are counted and appear in event analytics.
-- **Talk timer.** From the **Control** panel a moderator starts a countdown (presets **5 min** to **30 min**), pauses and resets it. With **Show to all**, everyone sees it in a bar above the call; moderators always see it in the time strip. It ends with **Time's up!**
+- **Talk timer.** From the **Control** panel a moderator starts a countdown (presets **5 min** to **30 min**), pauses and resets it. With **Show to all**, participants see it in a bar above the call; moderators always see it in the time strip, where its colour and ring follow the time left. A paused timer resumes where it stopped. It ends with **Time's up!**, which stays on screen for 30 seconds.
 - **Raised hands.** They are listed in the **Participants** panel, in order, visible to everyone. A hand stays up while its owner speaks, until they lower it or a moderator deals with it.
 
 ### Recording in the room

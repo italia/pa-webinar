@@ -1,17 +1,16 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import type { ReactNode } from 'react';
+import { useState, useEffect, useCallback, useId, useRef } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import { useTranslations } from 'next-intl';
-import { Button, Modal, ModalHeader, ModalBody } from 'design-react-kit';
 import { localizedPath } from '@/lib/utils/localized-url';
 
 type RowKey = 'call' | 'event' | 'mod';
 
-// Inline SVGs — NOT design-react-kit <Icon>, per the live-chrome hydration rule.
+// SVG inline, NON <Icon> di design-react-kit (regola di idratazione della sala).
 const svgProps = {
-  width: 15,
-  height: 15,
+  width: 16,
+  height: 16,
   viewBox: '0 0 24 24',
   fill: 'none',
   stroke: 'currentColor',
@@ -57,19 +56,49 @@ function ShieldGlyph() {
     </svg>
   );
 }
+function CopyGlyph() {
+  return (
+    <svg {...svgProps} width={14} height={14}>
+      <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+    </svg>
+  );
+}
+function CheckGlyph() {
+  return (
+    <svg {...svgProps} width={14} height={14} strokeWidth={3}>
+      <polyline points="20 6 9 17 4 12" />
+    </svg>
+  );
+}
+function CloseGlyph() {
+  return (
+    <svg {...svgProps} width={14} height={14}>
+      <line x1="18" y1="6" x2="6" y2="18" />
+      <line x1="6" y1="6" x2="18" y2="18" />
+    </svg>
+  );
+}
+
+/** Quanto dura l'animazione di chiusura (allineata a globals.scss). */
+const CHIUSURA_MS = 160;
 
 /**
- * In-call "Condividi" control. A modal with copy-to-clipboard links:
- *   - the tokenless join/call link  (`/{locale}/events/{slug}/live`)
- *   - the public event page          (`/{locale}/events/{slug}`)
- *   - (moderators only, collapsed) the PRIVILEGED moderator link (`?token=...`)
+ * «Condividi» nella sala: un fumetto ancorato al pulsante con i link da
+ * copiare:
+ *   - il link per entrare, senza token (`/{locale}/events/{slug}/live`)
+ *   - la pagina pubblica dell'evento (`/{locale}/events/{slug}`)
+ *   - (solo per chi modera, chiuso) il link PRIVILEGIATO da moderatore
  *
- * Public links are derived from slug + locale, NEVER from `window.location.href`
- * (the current URL carries the caller's `?token=`). The moderator link is built
- * from `moderatorToken`, which the live client passes ONLY when the current user
- * is a moderator — so the privileged token never enters a non-moderator's tree.
- * It is hidden behind a collapsed panel with an explicit warning so it isn't
- * shared by mistake.
+ * I link pubblici si costruiscono da slug e lingua, MAI da
+ * `window.location.href` (l'indirizzo corrente porta il `?token=` di chi
+ * guarda). Il link da moderatore viene da `moderatorToken`, che la sala passa
+ * SOLO a chi modera: il token non entra mai nell'albero di un partecipante. Sta
+ * dietro un pannello chiuso con un avviso esplicito, perché non si condivida
+ * per sbaglio.
+ *
+ * Il fumetto vive dentro la barra della sala: resta visibile anche nello
+ * schermo intero della sala, che contiene la barra.
  */
 export default function LiveShareButton({
   slug,
@@ -77,7 +106,6 @@ export default function LiveShareButton({
   moderatorToken,
   hasPublicPage = true,
   hasCallLink = true,
-  modalContainer,
 }: {
   slug: string;
   locale: string;
@@ -91,22 +119,85 @@ export default function LiveShareButton({
    *  suggerimento («entra direttamente») sarebbe falso. Resta la pagina
    *  dell'evento, che porta lì dichiarandolo. */
   hasCallLink?: boolean;
-  /** Element to portal the modal into. The live client passes the fullscreen
-   *  element while app-owned fullscreen is active — a modal left in
-   *  <body> would be outside the fullscreen subtree, i.e. invisible. Undefined
-   *  keeps reactstrap's default (<body>). */
-  modalContainer?: HTMLElement;
 }) {
   const t = useTranslations('live.share');
   const tc = useTranslations('common');
   const [open, setOpen] = useState(false);
+  const [chiusura, setChiusura] = useState(false);
+  // Ogni apertura conta: riaperto durante l'animazione di chiusura, il fumetto
+  // riprende il fuoco come a un'apertura normale.
+  const [aperture, setAperture] = useState(0);
+  // Dove comincia il fumetto (sotto il pulsante), per l'altezza massima e per
+  // la posizione sul telefono, dove la barra può andare su due righe.
+  const [sotto, setSotto] = useState<number | null>(null);
   const [origin, setOrigin] = useState('');
   const [copied, setCopied] = useState<RowKey | null>(null);
   const [showMod, setShowMod] = useState(false);
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const popRef = useRef<HTMLDivElement>(null);
+  const timerChiusura = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const timerCopia = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const popId = useId();
+  const titoloId = useId();
 
   useEffect(() => {
     setOrigin(window.location.origin);
+    return () => {
+      if (timerChiusura.current) clearTimeout(timerChiusura.current);
+      if (timerCopia.current) clearTimeout(timerCopia.current);
+    };
   }, []);
+
+  const chiudi = useCallback((rimettiFuoco: boolean) => {
+    if (timerChiusura.current) clearTimeout(timerChiusura.current);
+    setChiusura(true);
+    timerChiusura.current = setTimeout(() => {
+      setOpen(false);
+      setChiusura(false);
+      setShowMod(false);
+    }, CHIUSURA_MS);
+    if (rimettiFuoco) triggerRef.current?.focus();
+  }, []);
+
+  const apri = useCallback(() => {
+    if (timerChiusura.current) clearTimeout(timerChiusura.current);
+    const r = triggerRef.current?.getBoundingClientRect();
+    setSotto(r ? Math.round(r.bottom) : null);
+    setChiusura(false);
+    setOpen(true);
+    setAperture((n) => n + 1);
+  }, []);
+
+  // Aperto: il fuoco va al fumetto (da lì Tab porta ai comandi, e chi lo
+  // legge con uno screen reader sente il titolo); Esc e un clic fuori lo
+  // chiudono.
+  useEffect(() => {
+    if (!open) return;
+    popRef.current?.focus();
+    // In cattura e fermato lì: Esc chiude il fumetto e basta, non anche il
+    // pannello laterale che ascolta lo stesso tasto.
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.stopPropagation();
+        chiudi(true);
+      }
+    };
+    const onPointer = (e: PointerEvent) => {
+      if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) chiudi(false);
+    };
+    // Un clic nella videochiamata non arriva a questa pagina (è un iframe):
+    // la pagina però perde il fuoco, e il fumetto si chiude.
+    const onBlur = () => chiudi(false);
+    document.addEventListener('keydown', onKey, true);
+    document.addEventListener('pointerdown', onPointer);
+    window.addEventListener('blur', onBlur);
+    return () => {
+      document.removeEventListener('keydown', onKey, true);
+      document.removeEventListener('pointerdown', onPointer);
+      window.removeEventListener('blur', onBlur);
+    };
+  }, [open, aperture, chiudi]);
 
   const callUrl = origin ? `${origin}${localizedPath(`/events/${slug}/live`, locale)}` : '';
   const eventUrl = origin ? `${origin}${localizedPath(`/events/${slug}`, locale)}` : '';
@@ -129,12 +220,13 @@ export default function LiveShareButton({
       try {
         document.execCommand('copy');
       } catch {
-        /* give up silently — the input stays selectable for manual copy */
+        /* resta il campo selezionabile per la copia a mano */
       }
       ta.remove();
     }
     setCopied(which);
-    setTimeout(() => setCopied((c) => (c === which ? null : c)), 2000);
+    if (timerCopia.current) clearTimeout(timerCopia.current);
+    timerCopia.current = setTimeout(() => setCopied((c) => (c === which ? null : c)), 2000);
   }, []);
 
   const rows: Array<{ key: RowKey; icon: ReactNode; label: string; hint: string; url: string }> = [];
@@ -153,106 +245,125 @@ export default function LiveShareButton({
     });
   }
 
+  const riga = (key: RowKey, url: string, pericolo = false) => (
+    <div className={`live-share__field${copied === key ? ' is-copied' : ''}`}>
+      <input
+        type="text"
+        readOnly
+        value={url}
+        className="live-share__url"
+        aria-label={key === 'mod' ? t('moderatorLink') : rows.find((r) => r.key === key)?.label}
+        onFocus={(e) => e.currentTarget.select()}
+      />
+      <button
+        type="button"
+        className={`live-share__copy${pericolo ? ' live-share__copy--danger' : ''}`}
+        onClick={() => void copy(key, url)}
+      >
+        <span className="live-share__copy-icon" key={copied === key ? 'ok' : 'copia'}>
+          {copied === key ? <CheckGlyph /> : <CopyGlyph />}
+        </span>
+        {copied === key ? t('copied') : t('copy')}
+      </button>
+    </div>
+  );
+
   return (
-    <>
-      <Button
-        color="light"
-        outline
-        size="xs"
-        className="d-inline-flex align-items-center live-share-btn"
-        onClick={() => setOpen(true)}
+    <div className="live-share" ref={wrapRef}>
+      <button
+        ref={triggerRef}
+        type="button"
+        className={`btn btn-xs d-inline-flex align-items-center live-share-btn${open && !chiusura ? ' is-open' : ''}`}
+        onClick={() => (open && !chiusura ? chiudi(false) : apri())}
         aria-label={t('button')}
+        aria-expanded={open && !chiusura}
+        aria-controls={open ? popId : undefined}
+        aria-haspopup="dialog"
       >
         <ShareGlyph />
         <span className="d-none d-md-inline ms-1">{t('button')}</span>
-      </Button>
+      </button>
 
-      <Modal isOpen={open} toggle={() => setOpen(false)} centered container={modalContainer}>
-        <ModalHeader closeAriaLabel={tc('close')} toggle={() => setOpen(false)}>{t('title')}</ModalHeader>
-        <ModalBody>
-          {rows.map((r) => (
-            <div key={r.key} className="mb-3">
-              <label
-                className="fw-semibold d-flex align-items-center gap-2 mb-1"
-                style={{ fontSize: '0.9rem' }}
-              >
-                <span className="text-primary d-inline-flex">{r.icon}</span>
-                {r.label}
-              </label>
-              <div className="d-flex gap-2">
-                <input
-                  type="text"
-                  readOnly
-                  value={r.url}
-                  className="form-control form-control-sm"
-                  onFocus={(e) => e.currentTarget.select()}
-                />
-                <Button
-                  color={copied === r.key ? 'success' : 'primary'}
-                  outline
-                  size="sm"
-                  className="flex-shrink-0"
-                  onClick={() => void copy(r.key, r.url)}
-                >
-                  {copied === r.key ? t('copied') : t('copy')}
-                </Button>
-              </div>
-              <small className="text-muted">{r.hint}</small>
-            </div>
-          ))}
+      {open && (
+        <div
+          ref={popRef}
+          id={popId}
+          className={`live-share__pop${chiusura ? ' is-closing' : ''}`}
+          role="dialog"
+          aria-labelledby={titoloId}
+          tabIndex={-1}
+          style={sotto !== null ? ({ ['--share-sotto' as string]: `${sotto}px` } as CSSProperties) : undefined}
+        >
+          <div className="live-share__head">
+            <span className="live-share__head-icon" aria-hidden="true">
+              <ShareGlyph />
+            </span>
+            <h2 id={titoloId} className="live-share__title">
+              {t('title')}
+            </h2>
+            <button
+              type="button"
+              className="live-share__close"
+              onClick={() => chiudi(true)}
+              aria-label={tc('close')}
+              title={tc('close')}
+            >
+              <CloseGlyph />
+            </button>
+          </div>
 
-          {modUrl && (
-            <div className="mt-2 pt-2 border-top">
-              <button
-                type="button"
-                className="btn btn-link btn-sm p-0 text-decoration-none d-inline-flex align-items-center gap-1"
-                onClick={() => setShowMod((s) => !s)}
-                aria-expanded={showMod}
+          <div className="live-share__body">
+            {rows.map((r, i) => (
+              <section
+                key={r.key}
+                className="live-share__card"
+                style={{ animationDelay: `${60 + i * 50}ms` }}
               >
-                <ShieldGlyph />
-                {t('moderatorReveal')}
-                <span aria-hidden="true" style={{ fontSize: '0.7rem' }}>
-                  {showMod ? '▲' : '▼'}
-                </span>
-              </button>
-              {showMod && (
-                <div className="mt-2">
-                  {/* Plain styled div, NOT design-react-kit <Alert> (known
-                      icon-overlap / padding-left bug). */}
-                  <div
-                    className="p-2 mb-2 rounded"
-                    style={{ background: '#FFF6D6', border: '1px solid #E5C558', fontSize: '0.8rem' }}
-                  >
-                    {t('moderatorWarning')}
-                  </div>
-                  <label className="fw-semibold d-block mb-1" style={{ fontSize: '0.9rem' }}>
-                    {t('moderatorLink')}
-                  </label>
-                  <div className="d-flex gap-2">
-                    <input
-                      type="text"
-                      readOnly
-                      value={modUrl}
-                      className="form-control form-control-sm"
-                      onFocus={(e) => e.currentTarget.select()}
-                    />
-                    <Button
-                      color={copied === 'mod' ? 'success' : 'danger'}
-                      outline
-                      size="sm"
-                      className="flex-shrink-0"
-                      onClick={() => void copy('mod', modUrl)}
-                    >
-                      {copied === 'mod' ? t('copied') : t('copy')}
-                    </Button>
-                  </div>
-                  <small className="text-muted">{t('moderatorLinkHint')}</small>
+                <div className="live-share__card-head">
+                  <span className="live-share__card-icon">{r.icon}</span>
+                  <span className="live-share__card-label">{r.label}</span>
                 </div>
-              )}
-            </div>
-          )}
-        </ModalBody>
-      </Modal>
-    </>
+                {riga(r.key, r.url)}
+                <p className="live-share__hint">{r.hint}</p>
+              </section>
+            ))}
+
+            {modUrl && (
+              <section
+                className={`live-share__mod${showMod ? ' is-open' : ''}`}
+                style={{ animationDelay: `${60 + rows.length * 50}ms` }}
+              >
+                <button
+                  type="button"
+                  className="live-share__mod-toggle"
+                  onClick={() => setShowMod((s) => !s)}
+                  aria-expanded={showMod}
+                >
+                  <ShieldGlyph />
+                  <span>{t('moderatorReveal')}</span>
+                  <svg {...svgProps} width={14} height={14} className="live-share__chevron">
+                    <polyline points="6 9 12 15 18 9" />
+                  </svg>
+                </button>
+                {showMod && (
+                  <div className="live-share__mod-body">
+                    {/* Un div, NON <Alert> di design-react-kit (l'icona finisce
+                        sotto il testo). */}
+                    <p className="live-share__warning">{t('moderatorWarning')}</p>
+                    {riga('mod', modUrl, true)}
+                    <p className="live-share__hint">{t('moderatorLinkHint')}</p>
+                  </div>
+                )}
+              </section>
+            )}
+          </div>
+
+          {/* La conferma della copia per chi usa un lettore di schermo. */}
+          <span className="visually-hidden" role="status">
+            {copied ? t('copied') : ''}
+          </span>
+        </div>
+      )}
+    </div>
   );
 }

@@ -1390,6 +1390,372 @@ button.live-time-strip__rec {
   }
 }
 
+// «Condividi» aperto: il pulsante resta premuto finché il fumetto è aperto.
+.live-share-btn.is-open {
+  background: #e9f1fb;
+  color: #004d99;
+}
+
+// ── Fumetto «Condividi»: ancorato al pulsante, si apre dall'angolo in alto a
+// destra (da dove viene) con una piccola molla; le schede entrano una dopo
+// l'altra.
+.live-share {
+  position: relative;
+}
+
+.live-share__pop {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  z-index: 1070;
+  width: min(420px, calc(100vw - 24px));
+  color: #17324d;
+  text-align: left;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow:
+    0 24px 48px -12px rgba(23, 50, 77, 0.35),
+    0 8px 16px -8px rgba(23, 50, 77, 0.2),
+    0 0 0 1px rgba(23, 50, 77, 0.06);
+  transform-origin: calc(100% - 36px) -8px;
+  animation: share-pop-in 0.26s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+
+  &:focus {
+    outline: none;
+  }
+
+  // La punta, verso il pulsante.
+  &::before {
+    content: '';
+    position: absolute;
+    top: -7px;
+    right: 30px;
+    width: 14px;
+    height: 14px;
+    background: #0066cc;
+    border-radius: 3px 0 0 0;
+    transform: rotate(45deg);
+  }
+
+  &.is-closing {
+    animation: share-pop-out 0.16s ease-in both;
+  }
+}
+
+@keyframes share-pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes share-pop-out {
+  to {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.95);
+  }
+}
+
+.live-share__head {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.85rem 0.85rem 0.85rem 1rem;
+  color: #fff;
+  border-radius: 16px 16px 0 0;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(255, 255, 255, 0.18), transparent 55%),
+    linear-gradient(120deg, #0066cc 0%, #004d99 100%);
+  overflow: hidden;
+}
+
+.live-share__head-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
+  flex-shrink: 0;
+}
+
+.live-share__title {
+  flex: 1;
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.live-share__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  color: #fff;
+  background: transparent;
+  border: 0;
+  border-radius: 50%;
+  transition: background-color 0.15s ease, transform 0.2s ease;
+
+  &:hover,
+  &:focus-visible {
+    background: rgba(255, 255, 255, 0.2);
+    transform: rotate(90deg);
+  }
+}
+
+.live-share__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+  // Il fumetto non esce dallo schermo (la sala non scorre): l'altezza è
+  // quella che resta sotto il pulsante, meno la testata.
+  max-height: min(560px, calc(100dvh - var(--share-sotto, 64px) - 96px));
+  overflow-y: auto;
+}
+
+.live-share__card,
+.live-share__mod {
+  animation: share-card-in 0.3s ease-out both;
+}
+
+@keyframes share-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.live-share__card {
+  padding: 0.75rem;
+  background: #f5f9fd;
+  border: 1px solid #e1ebf5;
+  border-radius: 12px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover,
+  &:focus-within {
+    border-color: #b3d1f0;
+    box-shadow: 0 4px 12px -6px rgba(0, 102, 204, 0.35);
+  }
+}
+
+.live-share__card-head {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-bottom: 0.5rem;
+}
+
+.live-share__card-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  color: #0066cc;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px #d6e5f5;
+  flex-shrink: 0;
+}
+
+.live-share__card-label {
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.live-share__field {
+  display: flex;
+  align-items: stretch;
+  background: #fff;
+  border: 1px solid #c5d7ea;
+  border-radius: 10px;
+  overflow: hidden;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+  &.is-copied {
+    border-color: #008758;
+    box-shadow: 0 0 0 3px rgba(0, 135, 88, 0.15);
+  }
+}
+
+.live-share__url {
+  flex: 1;
+  min-width: 0;
+  padding: 0.4rem 0.6rem;
+  font-family: var(--bs-font-monospace, monospace);
+  font-size: 0.78rem;
+  color: #435a70;
+  background: transparent;
+  border: 0;
+  text-overflow: ellipsis;
+
+  &:focus {
+    outline: none;
+    color: #17324d;
+  }
+}
+
+.live-share__copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0 0.85rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap;
+  background: #0066cc;
+  border: 0;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background: #004d99;
+  }
+
+  &:focus-visible {
+    outline: 2px solid #ffb400;
+    outline-offset: -2px;
+  }
+
+  .is-copied & {
+    background: #008758;
+  }
+}
+
+.live-share__copy--danger {
+  background: #cc334d;
+
+  &:hover {
+    background: #a32a3e;
+  }
+}
+
+// L'icona cambia (copia → spunta) con un piccolo salto.
+.live-share__copy-icon {
+  display: inline-flex;
+  animation: share-copy-pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes share-copy-pop {
+  from {
+    transform: scale(0.4);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+.live-share__hint {
+  margin: 0.45rem 0 0;
+  font-size: 0.75rem;
+  line-height: 1.35;
+  color: #5c6f82;
+}
+
+.live-share__mod {
+  border-top: 1px dashed #d6dee6;
+  padding-top: 0.6rem;
+}
+
+.live-share__mod-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #a32a3e;
+  background: none;
+  border: 0;
+
+  &:hover span {
+    text-decoration: underline;
+  }
+
+  &:focus-visible {
+    outline: 2px solid #ffb400;
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+}
+
+.live-share__chevron {
+  transition: transform 0.2s ease;
+
+  .is-open & {
+    transform: rotate(180deg);
+  }
+}
+
+.live-share__mod-body {
+  margin-top: 0.5rem;
+  animation: share-card-in 0.25s ease-out both;
+}
+
+.live-share__warning {
+  margin: 0 0 0.5rem;
+  padding: 0.5rem 0.65rem;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  color: #5c3c00;
+  background: #fff6d6;
+  border: 1px solid #e5c558;
+  border-radius: 8px;
+}
+
+// Telefono: il fumetto occupa la larghezza dello schermo, sotto la barra.
+@media (max-width: 575.98px) {
+  .live-share__pop {
+    position: fixed;
+    top: calc(var(--share-sotto, 56px) + 10px);
+    right: max(12px, env(safe-area-inset-right));
+    left: max(12px, env(safe-area-inset-left));
+    width: auto;
+
+    &::before {
+      display: none;
+    }
+  }
+}
+
+@keyframes chat-empty-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chat-panel__empty-badge,
+  .live-share__pop,
+  .live-share__pop.is-closing,
+  .live-share__card,
+  .live-share__mod,
+  .live-share__mod-body,
+  .live-share__copy-icon,
+  .live-share__close,
+  .live-share__chevron {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
 // ── Reaction overlay (floating picker) ──
 
 .reaction-overlay {
@@ -1520,11 +1886,18 @@ button.live-time-strip__rec {
     // resta dentro, non sposta la lista.
     overflow-x: hidden;
     min-height: 0;
-    // Filigrana: i segni della sala (fumetto, microfono, videocamera, il
-    // triangolo del marchio) a un'opacita' che non disturba la lettura.
-    background-color: #FBFCFD;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Cg fill='none' stroke='%230066CC' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' opacity='0.045'%3E%3Cpath d='M22 30h40a6 6 0 0 1 6 6v20a6 6 0 0 1-6 6H38l-10 9v-9h-6a6 6 0 0 1-6-6V36a6 6 0 0 1 6-6z'/%3E%3Crect x='118' y='22' width='14' height='24' rx='7'/%3E%3Cpath d='M112 40a13 13 0 0 0 26 0M125 53v8'/%3E%3Crect x='30' y='112' width='34' height='24' rx='4'/%3E%3Cpath d='M64 120l12-7v22l-12-7'/%3E%3Cpath d='M118 108l26 15-26 15z'/%3E%3Ccircle cx='96' cy='88' r='2'/%3E%3Ccircle cx='160' cy='160' r='2'/%3E%3Ccircle cx='10' cy='92' r='2'/%3E%3C/g%3E%3C/svg%3E");
-    background-size: 180px 180px;
+    // Filigrana: i segni della sala (fumetti, cuore, domanda, idea, microfono,
+    // videocamera, il triangolo del marchio) sparsi con dimensioni e
+    // inclinazioni diverse, più qualche scintilla: un motivo, non una griglia.
+    // Sopra, una luce morbida nell'angolo e una sfumatura verso il campo di
+    // scrittura. Tutto fermo mentre la lista scorre: con `local` il browser
+    // ridisegnerebbe lo sfondo a ogni passo dello scorrimento.
+    background-color: #F8FAFD;
+    background-image:
+      radial-gradient(circle at 100% 0%, rgba(0, 102, 204, 0.07), transparent 42%),
+      linear-gradient(180deg, transparent 75%, rgba(234, 241, 249, 0.9) 100%),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='320' viewBox='0 0 320 320'%3E%3Cg fill='none' stroke='%230066CC' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' opacity='0.055'%3E%3Cg transform='translate(22 24) rotate(-8 12 12) scale(1.45)'%3E%3Cpath d='M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z'/%3E%3C/g%3E%3Cg transform='translate(128 18) rotate(10 12 12) scale(1.05)'%3E%3Cpath d='M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z'/%3E%3C/g%3E%3Cg transform='translate(262 70) rotate(12 12 12) scale(1.25)'%3E%3Crect x='9' y='2' width='6' height='12' rx='3'/%3E%3Cpath d='M5 10a7 7 0 0 0 14 0M12 17v4'/%3E%3C/g%3E%3Cg transform='translate(58 124) rotate(-6 12 12) scale(1.15)'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01'/%3E%3C/g%3E%3Cg transform='translate(168 118) rotate(4 12 12) scale(1.35)'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01'/%3E%3C/g%3E%3Cg transform='translate(250 186) rotate(-10 12 12) scale(1.25)'%3E%3Cpath d='M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z'/%3E%3C/g%3E%3Cg transform='translate(18 222) rotate(6 12 12) scale(1.25)'%3E%3Cpath d='M23 7l-7 5 7 5V7z'/%3E%3Crect x='1' y='5' width='15' height='14' rx='2'/%3E%3C/g%3E%3Cg transform='translate(118 222) rotate(-4 12 12) scale(1.5)'%3E%3Cpath d='M14 9a2 2 0 0 1-2 2H6l-4 4V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2z'/%3E%3Cpath d='M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1'/%3E%3C/g%3E%3Cg transform='translate(236 270) rotate(0 12 12) scale(0.95)'%3E%3Cpath d='M8 5l11 7-11 7z'/%3E%3C/g%3E%3C/g%3E%3Cg fill='%230066CC' opacity='0.07'%3E%3Cg transform='translate(212 34) scale(0.9)'%3E%3Cpath d='M12 3l1.9 5.6 5.6 1.9-5.6 1.9L12 18l-1.9-5.6-5.6-1.9 5.6-1.9z'/%3E%3C/g%3E%3Cg transform='translate(96 286) scale(0.65)'%3E%3Cpath d='M12 3l1.9 5.6 5.6 1.9-5.6 1.9L12 18l-1.9-5.6-5.6-1.9 5.6-1.9z'/%3E%3C/g%3E%3Cg transform='translate(300 140) scale(0.6)'%3E%3Cpath d='M12 3l1.9 5.6 5.6 1.9-5.6 1.9L12 18l-1.9-5.6-5.6-1.9 5.6-1.9z'/%3E%3C/g%3E%3Cg transform='translate(20 160) scale(0.55)'%3E%3Cpath d='M12 3l1.9 5.6 5.6 1.9-5.6 1.9L12 18l-1.9-5.6-5.6-1.9 5.6-1.9z'/%3E%3C/g%3E%3Ccircle cx='150' cy='78' r='1.6'/%3E%3Ccircle cx='44' cy='190' r='1.6'/%3E%3Ccircle cx='300' cy='252' r='1.6'/%3E%3Ccircle cx='204' cy='206' r='1.6'/%3E%3Ccircle cx='12' cy='302' r='1.6'/%3E%3Ccircle cx='176' cy='300' r='1.6'/%3E%3Ccircle cx='86' cy='72' r='1.6'/%3E%3C/g%3E%3C/svg%3E");
+    background-size: auto, auto, 320px 320px;
     scrollbar-width: thin;
     scrollbar-color: transparent transparent;
 
@@ -1551,11 +1924,33 @@ button.live-time-strip__rec {
     justify-content: center;
     height: 100%;
     min-height: 200px;
-    color: #8899AA;
+    color: #5C6F82;
     font-size: 0.85rem;
     text-align: center;
 
-    p { margin: 0; }
+    p { margin: 0; max-width: 24ch; }
+  }
+
+  // Lo stato vuoto: il fumetto in un cerchio chiaro che galleggia piano.
+  &__empty-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 72px;
+    height: 72px;
+    margin-bottom: 0.85rem;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #fff 0%, #E3EEF9 100%);
+    box-shadow: 0 10px 24px -12px rgba(0, 102, 204, 0.45), 0 0 0 6px rgba(0, 102, 204, 0.05);
+    animation: chat-empty-float 4s ease-in-out infinite;
+
+    .icon { fill: #0066CC; }
+
+    &.is-locked {
+      animation: none;
+      background: #F2F4F6;
+      .icon { fill: #5C6F82; }
+    }
   }
 
   &__msg {
