@@ -4224,7 +4224,12 @@
       "stagePreparing": "Go luath",
       "ended": "Tá an t-imeacht thart",
       "startsIn": "Tosóidh i gceann {time}",
-      "hostEarly": "Iontráil luath (óstach)"
+      "hostEarly": "Iontráil luath (óstach)",
+      "sign": "Bealach isteach chuig an bhfísghlao",
+      "zoneCafe": "Caife",
+      "zoneBoard": "Clár fógraí",
+      "zoneGallery": "Gailearaí",
+      "zoneLab": "Saotharlann"
     },
     "roomJustOpened": "Tá an seomra réidh — tar isteach",
     "enterAnyway": "Téigh isteach mar sin féin",
@@ -4258,7 +4263,20 @@
     "presenceLive": "{count, plural, =0 {Níl aon duine beo} one {# duine beo} other {# duine beo}}",
     "presenceWaiting": "{count, plural, one {# sa seomra feithimh} other {# sa seomra feithimh}}",
     "presenceTitle": "Cé atá anseo",
-    "piazzaAltKicker": "Nó"
+    "piazzaAltKicker": "Nó",
+    "piazza": {
+      "actionsLabel": "Gothaí agus fuaimeanna",
+      "sound": "Fuaimeanna na cearnóige",
+      "soundOn": "Fuaim ar siúl",
+      "soundOff": "Fuaim múchta",
+      "emote": {
+        "wave": "Beannaigh",
+        "heart": "Croí",
+        "clap": "Bualadh bos",
+        "laugh": "Gáire",
+        "idea": "Tá smaoineamh agam"
+      }
+    }
   },
   "recording": {
     "management": "Taifeadadh físe",

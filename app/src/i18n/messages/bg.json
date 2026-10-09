@@ -4224,7 +4224,12 @@
       "stagePreparing": "Скоро",
       "ended": "Събитието приключи",
       "startsIn": "Започва след {time}",
-      "hostEarly": "Ранен вход (домакин)"
+      "hostEarly": "Ранен вход (домакин)",
+      "sign": "Вход за видеоразговора",
+      "zoneCafe": "Кафене",
+      "zoneBoard": "Табло за обяви",
+      "zoneGallery": "Галерия",
+      "zoneLab": "Лаборатория"
     },
     "roomJustOpened": "Залата е готова — влез",
     "enterAnyway": "Влез въпреки това",
@@ -4258,7 +4263,20 @@
     "presenceLive": "{count, plural, =0 {Никой не е на живо} one {# човек на живо} other {# души на живо}}",
     "presenceWaiting": "{count, plural, one {# в чакалнята} other {# в чакалнята}}",
     "presenceTitle": "Кой е тук",
-    "piazzaAltKicker": "Или"
+    "piazzaAltKicker": "Или",
+    "piazza": {
+      "actionsLabel": "Жестове и звуци",
+      "sound": "Звуци на площада",
+      "soundOn": "Звук включен",
+      "soundOff": "Звук изключен",
+      "emote": {
+        "wave": "Махни",
+        "heart": "Сърце",
+        "clap": "Ръкопляскай",
+        "laugh": "Смей се",
+        "idea": "Имам идея"
+      }
+    }
   },
   "recording": {
     "management": "Видеозапис",

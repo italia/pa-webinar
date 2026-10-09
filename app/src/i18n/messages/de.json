@@ -4224,7 +4224,12 @@
       "stagePreparing": "Gleich geht’s los",
       "ended": "Veranstaltung beendet",
       "startsIn": "Beginnt in {time}",
-      "hostEarly": "Früher Zutritt (Host)"
+      "hostEarly": "Früher Zutritt (Host)",
+      "sign": "Eingang zum Videoanruf",
+      "zoneCafe": "Café",
+      "zoneBoard": "Pinnwand",
+      "zoneGallery": "Galerie",
+      "zoneLab": "Labor"
     },
     "roomJustOpened": "Der Raum ist bereit — komm rein",
     "enterAnyway": "Trotzdem beitreten",
@@ -4258,7 +4263,20 @@
     "presenceLive": "{count, plural, =0 {Noch niemand live} one {# Person live} other {# Personen live}}",
     "presenceWaiting": "{count, plural, one {# im Warteraum} other {# im Warteraum}}",
     "presenceTitle": "Wer ist da",
-    "piazzaAltKicker": "Oder"
+    "piazzaAltKicker": "Oder",
+    "piazza": {
+      "actionsLabel": "Gesten und Töne",
+      "sound": "Klänge des Platzes",
+      "soundOn": "Ton an",
+      "soundOff": "Ton aus",
+      "emote": {
+        "wave": "Winken",
+        "heart": "Herz",
+        "clap": "Klatschen",
+        "laugh": "Lachen",
+        "idea": "Ich habe eine Idee"
+      }
+    }
   },
   "recording": {
     "management": "Videoaufzeichnung",

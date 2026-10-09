@@ -5180,15 +5180,25 @@ button.live-time-strip__rec {
   min-width: 0;
   overflow: hidden;
   background: #26344a;
+  // La barra dei gesti si adatta alla larghezza della scena, non della finestra.
+  container-type: inline-size;
 }
 
 .wr-piazza-stage__bar {
   position: absolute;
   top: 12px;
   left: 12px;
+  right: 12px;
   z-index: 2;
   display: flex;
+  flex-wrap: wrap;
+  align-items: center;
   gap: 8px;
+  // La barra occupa la larghezza della scena per poter andare a capo, ma i
+  // clic fra un pulsante e l'altro arrivano alla scena.
+  pointer-events: none;
+
+  > * { pointer-events: auto; }
 }
 
 // Il suggerimento accanto ai pulsanti: dice che si può entrare camminando
@@ -5206,6 +5216,9 @@ button.live-time-strip__rec {
   border: 0;
   border-radius: 999px;
   padding: 6px 14px;
+  // Un pulsante non va a capo dentro di sé: semmai va a capo la barra, e il
+  // suggerimento scende sotto.
+  white-space: nowrap;
   font-size: 0.85rem;
   font-weight: 600;
   color: var(--app-text, #17324d);
@@ -5215,6 +5228,94 @@ button.live-time-strip__rec {
 
   &:hover,
   &:focus-visible { background: #fff; }
+}
+
+// I gesti e i suoni della piazza, in basso al centro sulla scena.
+.wr-piazza-azioni {
+  position: absolute;
+  // Centrata con i margini, non con left: 50%: così ha a disposizione tutta
+  // la larghezza della scena e va a capo solo se davvero non ci sta.
+  left: 8px;
+  right: 8px;
+  width: fit-content;
+  margin-inline: auto;
+  bottom: 16px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 8px 22px rgba(23, 50, 77, 0.22);
+  // Su una scena stretta (telefono) la scritta dei suoni lascia il posto
+  // all'icona, e i pulsanti non escono dai bordi.
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+@container (max-width: 420px) {
+  .wr-piazza-btn { padding: 5px 11px; font-size: 0.8rem; }
+  .wr-piazza-azioni__suoni > span { display: none; }
+  .wr-piazza-azioni__suoni { padding: 0 10px; }
+  .wr-piazza-azioni__gesto { width: 36px; height: 36px; }
+}
+
+.wr-piazza-azioni__gesto {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  font-size: 1.3rem;
+  line-height: 1;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.15s ease;
+
+  &:hover,
+  &:focus-visible {
+    background: #eef4fb;
+    transform: translateY(-3px) scale(1.12);
+  }
+
+  &:active { transform: scale(0.92); }
+}
+
+.wr-piazza-azioni__sep {
+  width: 1px;
+  height: 26px;
+  margin: 0 4px;
+  background: #d6dee6;
+}
+
+.wr-piazza-azioni__suoni {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 40px;
+  padding: 0 14px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #5c6f82;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  transition: background-color 0.15s ease, color 0.15s ease;
+
+  &:hover,
+  &:focus-visible { background: #eef4fb; }
+
+  &.is-on {
+    color: #fff;
+    background: #0066cc;
+  }
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+  .wr-piazza-azioni__gesto { transition: none; }
 }
 
 // Sotto i 992px la scena passa sopra e i controlli sotto. Lo stage ha

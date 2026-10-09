@@ -4224,7 +4224,12 @@
       "stagePreparing": "În curând",
       "ended": "Eveniment încheiat",
       "startsIn": "Începe în {time}",
-      "hostEarly": "Intrare anticipată (gazdă)"
+      "hostEarly": "Intrare anticipată (gazdă)",
+      "sign": "Intrare în apelul video",
+      "zoneCafe": "Cafenea",
+      "zoneBoard": "Avizier",
+      "zoneGallery": "Galerie",
+      "zoneLab": "Laborator"
     },
     "roomJustOpened": "Sala e gata — intră",
     "enterAnyway": "Intră oricum",
@@ -4258,7 +4263,20 @@
     "presenceLive": "{count, plural, =0 {Nimeni în direct} one {# persoană în direct} few {# persoane în direct} other {# de persoane în direct}}",
     "presenceWaiting": "{count, plural, one {# în sala de așteptare} few {# în sala de așteptare} other {# în sala de așteptare}}",
     "presenceTitle": "Cine este aici",
-    "piazzaAltKicker": "Sau"
+    "piazzaAltKicker": "Sau",
+    "piazza": {
+      "actionsLabel": "Gesturi și sunete",
+      "sound": "Sunetele pieței",
+      "soundOn": "Sunet pornit",
+      "soundOff": "Sunet oprit",
+      "emote": {
+        "wave": "Salută",
+        "heart": "Inimă",
+        "clap": "Aplaudă",
+        "laugh": "Râzi",
+        "idea": "Am o idee"
+      }
+    }
   },
   "recording": {
     "management": "Înregistrare video",

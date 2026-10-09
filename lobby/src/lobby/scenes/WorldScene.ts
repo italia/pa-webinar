@@ -2,7 +2,7 @@ import * as Phaser from 'phaser';
 
 import { busOn } from '../bus';
 import { PRESENCE_INTERVAL_MS } from '../constants';
-import { getContext, type LobbyContext } from '../context';
+import { getContext, type ChatBubble, type LobbyContext } from '../context';
 import type { DeviceSelection, EmoteType, Facing } from '../ports/types';
 import { AvatarSprite } from '../systems/AvatarSprite';
 import { CountdownGate } from '../systems/CountdownGate';
@@ -48,6 +48,7 @@ export class WorldScene extends Phaser.Scene {
   private localSeat: { x: number; y: number } | null = null;
 
   private readonly busUnsubs: (() => void)[] = [];
+  private ultimoStato: string | null = null;
 
   constructor() {
     super('World');
@@ -66,7 +67,7 @@ export class WorldScene extends Phaser.Scene {
     if (useClassic) cam.setBackgroundColor('#26344a');
     this.layout = useClassic
       ? buildPlaceholderMap(this, world)
-      : buildPiazzaMap(this, world);
+      : buildPiazzaMap(this, world, this.ctx.config.labels);
     this.initialSeatCount = this.layout.seats.length;
     this.freeSeats = this.layout.seats.map((_, i) => i).reverse();
 
@@ -114,6 +115,9 @@ export class WorldScene extends Phaser.Scene {
     this.store.start();
     for (const peer of this.store.values()) this.onPeerEvent({ type: 'add', peer });
 
+    // Lo stato di partenza: il jingle suona solo a un'apertura vera.
+    this.ultimoStato = this.ctx.schedule.getStatus();
+
     // UI → scene wiring.
     this.busUnsubs.push(
       busOn(this.ctx.bus, 'profileChange', () => this.local.setProfile(this.ctx.getProfile())),
@@ -125,11 +129,27 @@ export class WorldScene extends Phaser.Scene {
       // quando il cancello si apre non genera nessun fronte, e le porte si
       // aprivano su un ingresso che non partiva. Qui si chiude quel buco —
       // l'apertura stessa vale come arrivo al cancello.
-      busOn(this.ctx.bus, 'statusChange', () => this.chiediIngressoSeAlCancello()),
+      busOn(this.ctx.bus, 'statusChange', (s) => {
+        this.chiediIngressoSeAlCancello();
+        // Il cancello che si apre si sente, una volta.
+        if (s === 'live' && this.ultimoStato !== 'live') this.ctx.audio.gateOpen();
+        this.ultimoStato = s;
+      }),
+      busOn(this.ctx.bus, 'chatMessage', (m) => this.fumetto(m)),
+      busOn(this.ctx.bus, 'chatClear', (id) => {
+        this.local.clearMessage(id);
+        for (const s of this.sprites.values()) s.clearMessage(id);
+      }),
+      busOn(this.ctx.bus, 'chatEdit', ({ id, text }) => {
+        this.local.editMessage(id, text);
+        for (const s of this.sprites.values()) s.editMessage(id, text);
+      }),
+      busOn(this.ctx.bus, 'chatTyping', (nomi) => this.scrivono(nomi)),
     );
 
     this.scale.on('resize', this.applyCameraZoom, this);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.teardown());
+    this.ctx.bus.emit('sceneReady');
   }
 
   // ── per-frame ──
@@ -338,7 +358,44 @@ export class WorldScene extends Phaser.Scene {
   private localEmote(type: EmoteType): void {
     this.local.showEmote(type, performance.now());
     this.ctx.presence.emote(type);
-    this.ctx.audio.emote();
+    this.ctx.audio.emote(type);
+  }
+
+  // ── chat: fumetti e puntini ──
+  // Chi ha scritto si riconosce dal nome mostrato, lo stesso in chat e in
+  // piazza; se due persone hanno lo stesso nome, il fumetto compare su
+  // entrambe.
+  private avatarDi(nome: string): AvatarSprite[] {
+    const chiave = normalizzaNome(nome);
+    if (!chiave) return [];
+    const trovati: AvatarSprite[] = [];
+    if (normalizzaNome(this.ctx.getProfile().name) === chiave) trovati.push(this.local);
+    for (const peer of this.store.values()) {
+      if (normalizzaNome(peer.name) !== chiave) continue;
+      const sprite = this.sprites.get(peer.id);
+      if (sprite) trovati.push(sprite);
+    }
+    return trovati;
+  }
+
+  private fumetto(m: ChatBubble, suono = true): void {
+    // Il mio messaggio va sul mio avatar, qualunque nome mostri la chat.
+    const avatar = m.self ? [this.local] : this.avatarDi(m.name);
+    if (avatar.length === 0) return;
+    const ora = performance.now();
+    for (const a of avatar) a.say(m.text, ora, m.ageMs ?? 0, m.id ?? null);
+    // Il «pop» solo se il fumetto si vede.
+    if (suono && avatar.some((a) => !a.isCulled)) this.ctx.audio.pop();
+  }
+
+  private scrivono(nomi: string[]): void {
+    // Un nome vuoto non deve accendere i puntini di tutti gli anonimi.
+    const chiavi = new Set(nomi.map(normalizzaNome).filter(Boolean));
+    const io = normalizzaNome(this.ctx.getProfile().name);
+    this.local.setTyping(!!io && chiavi.has(io));
+    for (const peer of this.store.values()) {
+      this.sprites.get(peer.id)?.setTyping(chiavi.has(normalizzaNome(peer.name)));
+    }
   }
 
   private throttledMove(delta: number, x: number, y: number, facing: Facing): void {
@@ -428,6 +485,10 @@ export class WorldScene extends Phaser.Scene {
     this.store.stop();
     this.gate.destroy();
   }
+}
+
+function normalizzaNome(nome: string): string {
+  return nome.trim().replace(/\s+/g, ' ').toLocaleLowerCase();
 }
 
 function rectContainsMargin(

@@ -4224,7 +4224,12 @@
       "stagePreparing": "Starting soon",
       "ended": "Event ended",
       "startsIn": "Starts in {time}",
-      "hostEarly": "Early entry (host)"
+      "hostEarly": "Early entry (host)",
+      "sign": "Video call entrance",
+      "zoneCafe": "Café",
+      "zoneBoard": "Notice board",
+      "zoneGallery": "Gallery",
+      "zoneLab": "Lab"
     },
     "roomJustOpened": "The room is ready — come in",
     "enterAnyway": "Enter anyway",
@@ -4258,7 +4263,20 @@
     "presenceLive": "{count, plural, =0 {Nobody live yet} one {# person live} other {# people live}}",
     "presenceWaiting": "{count, plural, one {# in the waiting room} other {# in the waiting room}}",
     "presenceTitle": "Who's here",
-    "piazzaAltKicker": "Or"
+    "piazzaAltKicker": "Or",
+    "piazza": {
+      "actionsLabel": "Gestures and sounds",
+      "sound": "Square sounds",
+      "soundOn": "Sound on",
+      "soundOff": "Sound off",
+      "emote": {
+        "wave": "Wave",
+        "heart": "Heart",
+        "clap": "Clap",
+        "laugh": "Laugh",
+        "idea": "I have an idea"
+      }
+    }
   },
   "recording": {
     "management": "Video recording",

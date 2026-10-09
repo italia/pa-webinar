@@ -4224,7 +4224,12 @@
       "stagePreparing": "Pian",
       "ended": "Tapahtuma päättynyt",
       "startsIn": "Alkaa {time} kuluttua",
-      "hostEarly": "Ennakkopääsy (isäntä)"
+      "hostEarly": "Ennakkopääsy (isäntä)",
+      "sign": "Videopuhelun sisäänkäynti",
+      "zoneCafe": "Kahvila",
+      "zoneBoard": "Ilmoitustaulu",
+      "zoneGallery": "Galleria",
+      "zoneLab": "Laboratorio"
     },
     "roomJustOpened": "Huone on valmis — tule sisään",
     "enterAnyway": "Siirry silti sisään",
@@ -4258,7 +4263,20 @@
     "presenceLive": "{count, plural, =0 {Ei ketään livenä} one {# henkilö livenä} other {# henkilöä livenä}}",
     "presenceWaiting": "{count, plural, one {# odotustilassa} other {# odotustilassa}}",
     "presenceTitle": "Ketä täällä on",
-    "piazzaAltKicker": "Tai"
+    "piazzaAltKicker": "Tai",
+    "piazza": {
+      "actionsLabel": "Eleet ja äänet",
+      "sound": "Aukion äänet",
+      "soundOn": "Äänet päällä",
+      "soundOff": "Äänet pois",
+      "emote": {
+        "wave": "Vilkuta",
+        "heart": "Sydän",
+        "clap": "Taputa",
+        "laugh": "Naura",
+        "idea": "Minulla on idea"
+      }
+    }
   },
   "recording": {
     "management": "Videotallenne",

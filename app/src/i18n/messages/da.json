@@ -4224,7 +4224,12 @@
       "stagePreparing": "Om lidt",
       "ended": "Arrangementet er slut",
       "startsIn": "Starter om {time}",
-      "hostEarly": "Tidlig adgang (vært)"
+      "hostEarly": "Tidlig adgang (vært)",
+      "sign": "Indgang til videoopkald",
+      "zoneCafe": "Café",
+      "zoneBoard": "Opslagstavle",
+      "zoneGallery": "Galleri",
+      "zoneLab": "Laboratorium"
     },
     "roomJustOpened": "Rummet er klar — kom ind",
     "enterAnyway": "Gå ind alligevel",
@@ -4258,7 +4263,20 @@
     "presenceLive": "{count, plural, =0 {Ingen er live} one {# person live} other {# personer live}}",
     "presenceWaiting": "{count, plural, one {# i venteværelset} other {# i venteværelset}}",
     "presenceTitle": "Hvem er her",
-    "piazzaAltKicker": "Eller"
+    "piazzaAltKicker": "Eller",
+    "piazza": {
+      "actionsLabel": "Fagter og lyde",
+      "sound": "Lyde fra pladsen",
+      "soundOn": "Lyd til",
+      "soundOff": "Lyd fra",
+      "emote": {
+        "wave": "Vink",
+        "heart": "Hjerte",
+        "clap": "Klap",
+        "laugh": "Grin",
+        "idea": "Jeg har en idé"
+      }
+    }
   },
   "recording": {
     "management": "Videooptagelse",

@@ -178,14 +178,32 @@ describe('POST /api/events/[param]/garden/ping — canale emote', () => {
     expect(publishedPeer()).not.toHaveProperty('emote');
   });
 
-  it('rifiuta un’emote che non esiste, senza scriverla', async () => {
-    // Il campo è relayato così com'è fino agli altri client: quello che entra
-    // qui è quello che loro renderizzano, quindi il set va chiuso sul bordo.
+  it('scarta un gesto che non conosce, ma tiene la posizione', async () => {
+    // Quello che il server ripete è quello che gli altri mostrano: un gesto
+    // fuori elenco non arriva a nessuno. Ma il ping resta valido, perché un
+    // client più nuovo (durante un aggiornamento) non perda la posizione.
     const body = { ...legacyPing(), emote: { type: 'rickroll', at: 1 } };
+    const res = await POST(pingRequest(body), ctx());
+
+    expect(res.status).toBe(200);
+    expect(mockedPublish).toHaveBeenCalledTimes(1);
+    expect(mockedPublish.mock.calls[0]?.[1]).not.toHaveProperty('emote');
+  });
+
+  it('rifiuta un gesto con un nome troppo lungo', async () => {
+    const body = { ...legacyPing(), emote: { type: 'x'.repeat(17), at: 1 } };
     const res = await POST(pingRequest(body), ctx());
 
     expect(res.status).toBe(400);
     expect(mockedPublish).not.toHaveBeenCalled();
+  });
+
+  it.each(['wave', 'heart', 'clap', 'laugh', 'idea'])('ripete il gesto %s', async (tipo) => {
+    const body = { ...legacyPing(), emote: { type: tipo, at: 7 } };
+    const res = await POST(pingRequest(body), ctx());
+
+    expect(res.status).toBe(200);
+    expect(mockedPublish.mock.calls[0]?.[1]).toMatchObject({ emote: { type: tipo, at: 7 } });
   });
 
   it('distingue una snapshot mancante da un giardino vuoto', async () => {

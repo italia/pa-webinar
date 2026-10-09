@@ -33,6 +33,7 @@ import LiveShareButton from '@/components/live/live-share-button';
 import { MarkdownRenderer } from '@/components/ui/markdown';
 import type { EntePubblico, PersonaPubblica } from '@/lib/events/public-people';
 import type { Presenze } from '@/lib/live/presence';
+import { PonteChatPiazza } from '@/lib/lobby/chat-bridge';
 
 // Experimental Phaser lobby engine (opt-in via `?engine=phaser`). Loaded
 // client-only so Phaser never enters the main bundle or runs on the server.
@@ -228,6 +229,12 @@ const MESSAGGIO_DEL_BLOCCO: Record<BloccoModulo, string> = {
   consent: 'waiting-multitrack-consent-required',
 };
 
+/** Le due colonne della sala d'attesa: nella piazza quella con la chat viene
+ *  prima. */
+function inOrdine<T>(colonne: T[], chatPrima: boolean): T[] {
+  return chatPrima ? [...colonne].reverse() : colonne;
+}
+
 export default function WaitingRoom({
   event,
   presenze = null,
@@ -276,6 +283,9 @@ export default function WaitingRoom({
   const [classicView, setClassicView] = useState(false);
   // La piazza si apre su richiesta: vedi il commento su piazzaCard.
   const [gameOpen, setGameOpen] = useState(false);
+  // La chat dell'evento vista dalla piazza (fumetti, puntini, correzioni):
+  // passa dal ponte, non dallo stato, vedi lib/lobby/chat-bridge.
+  const [ponteChat] = useState(() => new PonteChatPiazza());
   // Fotocamera e microfono partono spenti: li accende chi vuole provarli (o
   // li ritrova come li aveva lasciati), e lo dice DeviceCheck.
   const [devicePrefs, setDevicePrefs] = useState<WaitingRoomJoinPrefs>({
@@ -418,6 +428,11 @@ export default function WaitingRoom({
   // davanti: a evento finito non serve, in vista classica e' stata rifiutata,
   // e senza consenso multitraccia non si va da nessuna parte.
   const canPlay = !isEnded && !classicView && !multitrackRequired;
+  // La piazza non è una pagina diversa: è questa pagina, ridisposta accanto
+  // alla scena. Un albero solo, quindi quello che c'è nella sala d'attesa c'è
+  // anche nella piazza, e aprendo e chiudendo la piazza React non smonta
+  // nulla: l'anteprima della fotocamera resta accesa e la bozza in chat resta.
+  const piazzaOpen = canPlay && gameOpen;
 
   // La sala e' pronta quando il ponte video c'e'. Si blocca SOLO su «si sta
   // accendendo adesso»: gli altri valori — nessuno lo ha chiesto, sonda muta,
@@ -1036,6 +1051,11 @@ export default function WaitingRoom({
             token={chatToken}
             displayName={trimmedName}
             isGuest={!chatToken}
+            onMessaggioNuovo={ponteChat.messaggio}
+            onMessaggioModificato={ponteChat.modificato}
+            onMessaggioRimosso={ponteChat.rimosso}
+            onScrittura={ponteChat.scrittura}
+            posizione={piazzaOpen ? 'piazza' : 'sala'}
           />
         </div>
       ) : (
@@ -1303,19 +1323,6 @@ export default function WaitingRoom({
   // scatola: si apre a piena pagina, con dentro tutto il necessario — nome,
   // controlli, ingresso in call — e un'uscita che riporta qui.
 
-  // La piazza non è una pagina DIVERSA: è QUESTA pagina, ri-disposta accanto
-  // alla scena. Il primo tentativo duplicava i controlli in un pannello
-  // dedicato, e ogni cosa lasciata fuori dalla copia diventava un difetto —
-  // l'email mancante bloccava in silenzio un ospite, l'informativa su
-  // registrazione e AI spariva proprio dalla schermata in cui si preme "Entra".
-  // Tenendo un albero solo, quel genere di dimenticanza non è più possibile:
-  // quello che c'è nella sala d'attesa c'è anche nella piazza, per costruzione.
-  //
-  // Ed è anche il motivo per cui l'anteprima della fotocamera non si spegne e
-  // la bozza in chat non si perde entrando e uscendo: React non smonta nulla,
-  // cambia solo il vestito.
-  const piazzaOpen = canPlay && gameOpen;
-
   // `hostOwnsEntry` spegne la chrome interna della lobby (onboarding, top bar,
   // pannello dispositivi). Senza, il gioco ne mostra una propria: in italiano
   // fisso — su 24 lingue —, con un nome che non torna mai nello stato React
@@ -1342,6 +1349,7 @@ export default function WaitingRoom({
           startsAtMs={startsAtMs}
           isHost={isModerator}
           salaPronta={salaPronta}
+          ponteChat={ponteChat}
           onEnterLive={handleGameEnter}
           onExitClassic={goClassic}
         />
@@ -1635,7 +1643,12 @@ export default function WaitingRoom({
       {piazzaStage}
       <div className="container py-4 py-md-5 wr-page">
         <div className="row g-4 justify-content-center">
-          <div className={asideBox ? 'col-lg-7' : 'col-lg-8 col-xl-7'}>
+          {/* Nella piazza la colonna con la chat viene prima, nel DOM e non
+              solo a vista, così l'ordine del Tab segue quello che si vede.
+              Le chiavi fanno spostare le due colonne senza smontarle: la
+              fotocamera e la bozza in chat restano. */}
+          {inOrdine([
+          <div key="card" className={asideBox ? 'col-lg-7' : 'col-lg-8 col-xl-7'}>
             <Card
               className={`waiting-card wr-card shadow-sm border-0${heroUrl ? '' : ' waiting-card--plain'}`}
             >
@@ -1791,9 +1804,9 @@ export default function WaitingRoom({
                 )}
               </CardBody>
             </Card>
-          </div>
-
-          {asideBox && <div className="col-lg-5">{asideBox}</div>}
+          </div>,
+          asideBox ? <div key="aside" className="col-lg-5">{asideBox}</div> : null,
+          ], piazzaOpen)}
         </div>
       </div>
     </div>

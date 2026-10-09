@@ -3,7 +3,7 @@ import * as Phaser from 'phaser';
 import { busOn, createBus, type LobbyBus } from './bus';
 import { DEFAULT_CAPACITY, DEFAULT_WORLD } from './constants';
 import { CONTEXT_KEY, type LobbyContext, type ResolvedConfig } from './context';
-import type { PlayerProfile } from './ports/types';
+import type { EmoteType, PlayerProfile } from './ports/types';
 import { DEFAULT_GATE_LABELS, type LobbyConfig, type LobbyDeps } from './public-types';
 import { BootScene } from './scenes/BootScene';
 import { WorldScene } from './scenes/WorldScene';
@@ -42,12 +42,19 @@ export class LobbyGame {
   private readonly busUnsubs: (() => void)[] = [];
   private gestureUnsub: (() => void) | null = null;
   private destroyed = false;
+  /** Si risolve quando la scena è partita (Phaser parte in modo asincrono):
+   *  da lì in poi gli eventi del bus hanno chi li ascolta. */
+  readonly ready: Promise<void>;
+  private segnalaPronta: () => void = () => undefined;
 
   constructor(
     private readonly container: HTMLElement,
     config: LobbyConfig,
     private readonly deps: LobbyDeps,
   ) {
+    this.ready = new Promise<void>((risolvi) => {
+      this.segnalaPronta = risolvi;
+    });
     const resolved: ResolvedConfig = {
       worldSize: config.worldSize ?? { ...DEFAULT_WORLD },
       capacityHint: config.capacityHint ?? DEFAULT_CAPACITY,
@@ -61,6 +68,8 @@ export class LobbyGame {
     this.onExitToClassic = config.onExitToClassic;
     this.profile = this.buildInitialProfile(config.initialProfile);
     this.bus = createBus();
+    // Prima di creare il gioco: la scena può partire in qualsiasi momento.
+    this.busUnsubs.push(busOn(this.bus, 'sceneReady', () => this.segnalaPronta()));
     this.audio = new AudioSystem();
 
     // ── DOM scaffolding ──
@@ -142,14 +151,20 @@ export class LobbyGame {
     );
     this.bus.emit('audioState', this.audio.isEnabled());
 
-    // Resume audio on the first user gesture (autoplay policy).
-    const resumeAudio = (): void => this.audio.resume();
-    document.addEventListener('pointerdown', resumeAudio, { once: true });
-    document.addEventListener('keydown', resumeAudio, { once: true });
-    this.gestureUnsub = () => {
-      document.removeEventListener('pointerdown', resumeAudio);
-      document.removeEventListener('keydown', resumeAudio);
+    // L'audio parte solo dopo un gesto della persona. Si riprova a ogni gesto
+    // finché il contesto non è davvero in funzione: col tocco, su un
+    // telefono, il primo `pointerdown` non basta al browser (conta il
+    // rilascio, o il clic).
+    const GESTI_AUDIO = ['pointerup', 'touchend', 'click', 'keydown'] as const;
+    const resumeAudio = (): void => {
+      this.audio.resume();
+      if (this.audio.inFunzione()) togli();
     };
+    const togli = (): void => {
+      for (const ev of GESTI_AUDIO) document.removeEventListener(ev, resumeAudio, true);
+    };
+    for (const ev of GESTI_AUDIO) document.addEventListener(ev, resumeAudio, true);
+    this.gestureUnsub = togli;
   }
 
   setProfile(p: Partial<PlayerProfile>): void {
@@ -176,6 +191,41 @@ export class LobbyGame {
     });
     this.deps.presence.setProfile(delta);
     this.bus.emit('profileChange', delta);
+  }
+
+  // La chat: chi ospita la piazza aspetta `ready` prima di mandarla (il bus
+  // non conserva gli eventi che nessuno ascolta) e tiene lui i messaggi
+  // recenti per chi apre la piazza dopo.
+  showChatMessage(name: string, text: string, ageMs = 0, id?: string, self = false): void {
+    if (this.destroyed) return;
+    this.bus.emit('chatMessage', { name, text, ageMs, id, self });
+  }
+
+  clearChatMessage(id: string): void {
+    if (this.destroyed) return;
+    this.bus.emit('chatClear', id);
+  }
+
+  editChatMessage(id: string, text: string): void {
+    if (this.destroyed) return;
+    this.bus.emit('chatEdit', { id, text });
+  }
+
+  setTyping(names: string[]): void {
+    if (this.destroyed) return;
+    this.bus.emit('chatTyping', names);
+  }
+
+  emote(type: EmoteType): void {
+    if (this.destroyed) return;
+    this.bus.emit('emote', type);
+  }
+
+  setAudio(on: boolean): boolean {
+    if (this.destroyed) return false;
+    const stato = this.audio.setEnabled(on);
+    this.bus.emit('audioState', stato);
+    return stato;
   }
 
   destroy(): void {

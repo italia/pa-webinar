@@ -1,6 +1,7 @@
 import * as Phaser from 'phaser';
 
 import { DEPTH } from '../constants';
+import { DEFAULT_GATE_LABELS, type GateLabels } from '../public-types';
 import type { Collider, WorldLayout } from './WorldMap';
 
 /**
@@ -42,16 +43,17 @@ function softShadow(g: Phaser.GameObjects.Graphics, x: number, y: number, rx: nu
 }
 
 function signPill(scene: Phaser.Scene, x: number, y: number, label: string, depth: number): void {
-  const padW = 12 + label.length * 7.2;
-  const g = scene.add.graphics().setDepth(depth);
-  g.fillStyle(BLUE, 1);
-  g.fillRoundedRect(x - padW / 2, y - 13, padW, 26, 8);
-  g.lineStyle(1.5, INK, 0.25);
-  g.strokeRoundedRect(x - padW / 2, y - 13, padW, 26, 8);
-  scene.add
-    .text(x, y, label, { fontFamily: LABEL_FONT, fontSize: '14px', fontStyle: '600', color: '#ffffff' })
+  // Il cartello si misura sul testo: la larghezza cambia con la lingua.
+  const testo = scene.add
+    .text(x, y, label, { fontFamily: LABEL_FONT, fontSize: '19px', fontStyle: '600', color: '#ffffff' })
     .setOrigin(0.5)
     .setDepth(depth + 1);
+  const padW = testo.width + 28;
+  const g = scene.add.graphics().setDepth(depth);
+  g.fillStyle(BLUE, 1);
+  g.fillRoundedRect(x - padW / 2, y - 17, padW, 34, 10);
+  g.lineStyle(1.5, INK, 0.25);
+  g.strokeRoundedRect(x - padW / 2, y - 17, padW, 34, 10);
 }
 
 function planter(g: Phaser.GameObjects.Graphics, x: number, y: number, r = 24): Collider {
@@ -81,6 +83,7 @@ function bench(g: Phaser.GameObjects.Graphics, x: number, y: number): Collider {
 export function buildPiazzaMap(
   scene: Phaser.Scene,
   world: { w: number; h: number },
+  labels: GateLabels = DEFAULT_GATE_LABELS,
 ): WorldLayout {
   const w = world.w;
   const h = world.h;
@@ -161,7 +164,7 @@ export function buildPiazzaMap(
   // flanking low planters (instead of a hedge)
   staticColliders.push(planter(portal, gate.x - 40, dividerY, 18));
   staticColliders.push(planter(portal, gate.right + 24, dividerY, 18));
-  signPill(scene, gateCx, dividerY - pillarH - 28, 'Ingresso videochiamata', dividerY + 4);
+  signPill(scene, gateCx, dividerY - pillarH - 32, labels.gateSign, dividerY + 4);
 
   const gateBar: Collider = {
     kind: 'rect',
@@ -215,7 +218,7 @@ export function buildPiazzaMap(
     });
   };
 
-  zone(w * 0.18, h * 0.55, 'Caffè', (g) => {
+  zone(w * 0.18, h * 0.55, labels.zoneCafe, (g) => {
     const x = w * 0.18;
     const y = h * 0.55;
     g.fillStyle(PAVING_ALT, 1); // cup
@@ -228,7 +231,7 @@ export function buildPiazzaMap(
     g.lineBetween(x - 6, y - 18, x - 6, y - 26);
     g.lineBetween(x + 4, y - 18, x + 4, y - 28);
   });
-  zone(w * 0.82, h * 0.55, 'Operazioni', (g) => {
+  zone(w * 0.82, h * 0.55, labels.zoneBoard, (g) => {
     const x = w * 0.82;
     const y = h * 0.55;
     for (let i = 0; i < 3; i++) {
@@ -241,7 +244,7 @@ export function buildPiazzaMap(
       g.fillCircle(x + 16, by + 5, 2.4);
     }
   });
-  zone(w * 0.18, h * 0.84, 'Design', (g) => {
+  zone(w * 0.18, h * 0.84, labels.zoneGallery, (g) => {
     const x = w * 0.18;
     const y = h * 0.84;
     const cols = [BLUE, GREEN, RED];
@@ -254,7 +257,7 @@ export function buildPiazzaMap(
       g.fillCircle(x - 25 + i * 26, y - 2, 6);
     }
   });
-  zone(w * 0.82, h * 0.84, 'Sviluppo', (g) => {
+  zone(w * 0.82, h * 0.84, labels.zoneLab, (g) => {
     const x = w * 0.82;
     const y = h * 0.84;
     g.fillStyle(PAVING_ALT, 1);

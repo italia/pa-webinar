@@ -12,7 +12,11 @@ export type Unsub = () => void;
 
 export type Facing = 'up' | 'down' | 'left' | 'right';
 
-export type EmoteType = 'wave' | 'heart';
+/** I gesti della piazza. Chi riceve un tipo che non conosce (un client di
+ *  una versione precedente) lo ignora. */
+export type EmoteType = 'wave' | 'heart' | 'clap' | 'laugh' | 'idea';
+
+export const EMOTE_TYPES: readonly EmoteType[] = ['wave', 'heart', 'clap', 'laugh', 'idea'];
 
 /** The identity + appearance of a participant in the garden. */
 export interface PlayerProfile {

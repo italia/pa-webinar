@@ -4224,7 +4224,12 @@
       "stagePreparing": "Varsti",
       "ended": "Üritus on lõppenud",
       "startsIn": "Algab {time} pärast",
-      "hostEarly": "Varajane sissepääs (korraldaja)"
+      "hostEarly": "Varajane sissepääs (korraldaja)",
+      "sign": "Videokõne sissepääs",
+      "zoneCafe": "Kohvik",
+      "zoneBoard": "Teadetetahvel",
+      "zoneGallery": "Galerii",
+      "zoneLab": "Labor"
     },
     "roomJustOpened": "Ruum on valmis — tule sisse",
     "enterAnyway": "Sisene siiski",
@@ -4258,7 +4263,20 @@
     "presenceLive": "{count, plural, =0 {Keegi pole otse} one {# inimene otse} other {# inimest otse}}",
     "presenceWaiting": "{count, plural, one {# ooteruumis} other {# ooteruumis}}",
     "presenceTitle": "Kes on siin",
-    "piazzaAltKicker": "Või"
+    "piazzaAltKicker": "Või",
+    "piazza": {
+      "actionsLabel": "Žestid ja helid",
+      "sound": "Väljaku helid",
+      "soundOn": "Heli sees",
+      "soundOff": "Heli väljas",
+      "emote": {
+        "wave": "Lehvita",
+        "heart": "Süda",
+        "clap": "Aplodeeri",
+        "laugh": "Naera",
+        "idea": "Mul on idee"
+      }
+    }
   },
   "recording": {
     "management": "Videosalvestis",

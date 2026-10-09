@@ -4224,7 +4224,12 @@
       "stagePreparing": "Uskoro",
       "ended": "Događaj je završen",
       "startsIn": "Počinje za {time}",
-      "hostEarly": "Raniji ulaz (domaćin)"
+      "hostEarly": "Raniji ulaz (domaćin)",
+      "sign": "Ulaz u videopoziv",
+      "zoneCafe": "Kafić",
+      "zoneBoard": "Oglasna ploča",
+      "zoneGallery": "Galerija",
+      "zoneLab": "Laboratorij"
     },
     "roomJustOpened": "Dvorana je spremna — uđi",
     "enterAnyway": "Svejedno uđi",
@@ -4258,7 +4263,20 @@
     "presenceLive": "{count, plural, =0 {Nitko uživo} one {# osoba uživo} few {# osobe uživo} other {# osoba uživo}}",
     "presenceWaiting": "{count, plural, one {# u čekaonici} few {# u čekaonici} other {# u čekaonici}}",
     "presenceTitle": "Tko je ovdje",
-    "piazzaAltKicker": "Ili"
+    "piazzaAltKicker": "Ili",
+    "piazza": {
+      "actionsLabel": "Geste i zvukovi",
+      "sound": "Zvukovi trga",
+      "soundOn": "Zvuk uključen",
+      "soundOff": "Zvuk isključen",
+      "emote": {
+        "wave": "Mahni",
+        "heart": "Srce",
+        "clap": "Pljeskaj",
+        "laugh": "Smij se",
+        "idea": "Imam ideju"
+      }
+    }
   },
   "recording": {
     "management": "Video snimka",

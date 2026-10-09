@@ -1,6 +1,7 @@
 import * as Phaser from 'phaser';
 
 import { INTERP_RATE } from '../constants';
+import { EMOTE_GLYPH } from '../emotes';
 import type { EmoteType, Facing, PlayerProfile } from '../ports/types';
 import {
   AVATAR_H,
@@ -10,7 +11,16 @@ import {
   type AvatarAppearance,
 } from './AvatarTextureFactory';
 
-const EMOTE_GLYPH: Record<EmoteType, string> = { wave: '👋', heart: '❤️' };
+/** Quanto resta un fumetto: almeno venti secondi, di più per i messaggi
+ *  lunghi. Un messaggio nuovo della stessa persona sostituisce il precedente. */
+export const FUMETTO_MIN_MS = 20_000;
+const FUMETTO_MAX_MS = 30_000;
+const FUMETTO_MS_PER_CARATTERE = 100;
+/** Un messaggio arrivato da poco resta almeno questo, anche se è quasi scaduto. */
+const FUMETTO_RESIDUO_MIN_MS = 3000;
+const FUMETTO_LARGHEZZA = 190;
+const FUMETTO_CARATTERI = 90;
+const FUMETTO_Y = -AVATAR_H - 24;
 const HOP_MS = 460;
 const HOP_HEIGHT = 22;
 const EMOTE_MS = 1500;
@@ -29,6 +39,12 @@ export interface AvatarSpriteOptions {
  * depth tracks y so the world y-sorts. Art comes from the texture factory, so
  * this class never draws a pixel — it only animates and interpolates.
  */
+/** Il testo di un fumetto: su una riga, e tagliato se troppo lungo. */
+function accorcia(testo: string): string {
+  const pulito = testo.replace(/\s+/g, ' ').trim();
+  return pulito.length > FUMETTO_CARATTERI ? `${pulito.slice(0, FUMETTO_CARATTERI - 1)}…` : pulito;
+}
+
 export class AvatarSprite {
   readonly container: Phaser.GameObjects.Container;
   private readonly scene: Phaser.Scene;
@@ -37,6 +53,18 @@ export class AvatarSprite {
   private readonly nametag: Phaser.GameObjects.Text;
   private readonly emote: Phaser.GameObjects.Text;
   private readonly ring: Phaser.GameObjects.Arc | null;
+  // Il fumetto della chat: sfondo disegnato e testo, sopra il nome. Creato
+  // la prima volta che serve: molti avatar non scrivono mai.
+  private bolla: {
+    container: Phaser.GameObjects.Container;
+    sfondo: Phaser.GameObjects.Graphics;
+    testo: Phaser.GameObjects.Text;
+  } | null = null;
+  private fumettoFino = 0;
+  private fumettoDurata = 0;
+  /** Il messaggio nel fumetto: se un moderatore lo nasconde, sparisce. */
+  private fumettoId: string | null = null;
+  private staScrivendo = false;
 
   private readonly isSelf: boolean;
   private readonly interpolate: boolean;
@@ -180,9 +208,96 @@ export class AvatarSprite {
   }
 
   showEmote(type: EmoteType, now: number): void {
-    this.emote.setText(EMOTE_GLYPH[type]);
+    // Un gesto di una versione più nuova, che qui non si conosce: si ignora.
+    const glifo = EMOTE_GLYPH[type];
+    if (!glifo) return;
+    this.emote.setText(glifo);
+    // Con il fumetto aperto il gesto si sposta di lato, per non coprirlo.
+    this.emote.setX(this.bolla?.container.visible ? FUMETTO_LARGHEZZA / 2 + 6 : 0);
     this.emote.setVisible(true).setAlpha(1).setY(-AVATAR_H - 20);
     this.emoteUntil = now + EMOTE_MS;
+  }
+
+  /** Un messaggio della chat sopra la testa. `etaMs` è quanto è vecchio: un
+   *  messaggio scritto prima di aprire la piazza resta per il tempo che gli
+   *  rimane. */
+  say(testo: string, now: number, etaMs = 0, id: string | null = null): void {
+    const breve = accorcia(testo);
+    if (!breve) return;
+    this.disegnaFumetto(breve, false);
+    const piena = Math.min(FUMETTO_MAX_MS, FUMETTO_MIN_MS + breve.length * FUMETTO_MS_PER_CARATTERE);
+    this.fumettoDurata = Math.max(FUMETTO_RESIDUO_MIN_MS, piena - Math.max(0, etaMs));
+    this.fumettoFino = now + this.fumettoDurata;
+    this.fumettoId = id;
+  }
+
+  /** Il testo corretto di un messaggio già nel fumetto; il tempo resta quello. */
+  editMessage(id: string, testo: string): void {
+    if (this.fumettoId !== id || this.fumettoFino === 0) return;
+    const breve = accorcia(testo);
+    if (!breve) {
+      this.clearMessage(id);
+      return;
+    }
+    this.disegnaFumetto(breve, false);
+    this.bolla?.container.setScale(1);
+  }
+
+  /** Toglie il fumetto se mostra quel messaggio (nascosto da un moderatore). */
+  clearMessage(id: string): void {
+    if (this.fumettoId !== id || this.fumettoFino === 0) return;
+    this.fumettoFino = 0;
+    this.fumettoId = null;
+    if (this.staScrivendo) this.disegnaFumetto('• • •', true);
+    else this.bolla?.container.setVisible(false);
+  }
+
+  /** I puntini di chi sta scrivendo, finché non arriva il messaggio. */
+  setTyping(on: boolean): void {
+    if (on === this.staScrivendo) return;
+    this.staScrivendo = on;
+    if (on && this.fumettoFino === 0) this.disegnaFumetto('• • •', true);
+    if (!on && this.fumettoFino === 0) this.bolla?.container.setVisible(false);
+  }
+
+  private assicuraBolla(): NonNullable<AvatarSprite['bolla']> {
+    if (this.bolla) return this.bolla;
+    const sfondo = this.scene.add.graphics();
+    const testo = this.scene.add
+      .text(0, 0, '', {
+        fontFamily: 'Titillium Web, system-ui, sans-serif',
+        fontSize: '13px',
+        color: '#17324d',
+        align: 'center',
+        wordWrap: { width: FUMETTO_LARGHEZZA - 20, useAdvancedWrap: true },
+        maxLines: 3,
+      })
+      .setOrigin(0.5, 1);
+    const container = this.scene.add.container(0, FUMETTO_Y, [sfondo, testo]).setVisible(false);
+    // Sotto il gesto, sopra il nome.
+    this.container.addAt(container, this.container.getIndex(this.emote));
+    this.bolla = { container, sfondo, testo };
+    return this.bolla;
+  }
+
+  private disegnaFumetto(testo: string, puntini: boolean): void {
+    const bolla = this.assicuraBolla();
+    bolla.testo.setText(testo).setY(-10);
+    const larghezza = Math.min(FUMETTO_LARGHEZZA, Math.max(puntini ? 46 : 60, bolla.testo.width + 20));
+    const altezza = bolla.testo.height + 12;
+    const g = bolla.sfondo;
+    g.clear();
+    g.fillStyle(0x17324d, 0.12);
+    g.fillRoundedRect(-larghezza / 2 + 2, -altezza - 4, larghezza, altezza, 10);
+    g.fillStyle(0xffffff, 1);
+    g.lineStyle(1.5, puntini ? 0x9fc3e8 : 0x0066cc, 1);
+    g.fillRoundedRect(-larghezza / 2, -altezza - 6, larghezza, altezza, 10);
+    g.strokeRoundedRect(-larghezza / 2, -altezza - 6, larghezza, altezza, 10);
+    // La punta verso la testa.
+    g.fillTriangle(-6, -7, 6, -7, 0, 1);
+    g.lineBetween(-6, -6, 0, 1);
+    g.lineBetween(6, -6, 0, 1);
+    bolla.container.setVisible(true).setAlpha(1).setScale(puntini ? 1 : 0.85);
   }
 
   /** Requested by culling; reconciled with the inCall pin in update. */
@@ -212,6 +327,10 @@ export class AvatarSprite {
   park(): void {
     this.container.setVisible(false);
     this.emote.setVisible(false);
+    this.bolla?.container.setVisible(false);
+    this.fumettoFino = 0;
+    this.fumettoId = null;
+    this.staScrivendo = false;
     this.culled = true;
   }
 
@@ -233,6 +352,10 @@ export class AvatarSprite {
     this.body.setTexture(ensureAvatarTexture(this.scene, this.appearance));
     this.nametag.setText(displayName(profile, this.isSelf));
     this.emote.setVisible(false);
+    this.bolla?.container.setVisible(false);
+    this.fumettoFino = 0;
+    this.fumettoId = null;
+    this.staScrivendo = false;
     this.culled = false;
     this.container.setVisible(true).setPosition(x, y).setDepth(y);
   }
@@ -280,6 +403,25 @@ export class AvatarSprite {
         this.emote.setY(-AVATAR_H - 20 - (1 - remaining) * 14);
         this.emote.setAlpha(Math.min(1, remaining * 2));
       }
+    }
+
+    // Il fumetto: entra con un piccolo rimbalzo, resta, poi svanisce; i
+    // puntini di chi scrive pulsano piano.
+    const bolla = this.bolla;
+    if (bolla && this.fumettoFino > 0) {
+      const resta = this.fumettoFino - now;
+      if (resta <= 0) {
+        this.fumettoFino = 0;
+        this.fumettoId = null;
+        if (this.staScrivendo) this.disegnaFumetto('• • •', true);
+        else bolla.container.setVisible(false);
+      } else {
+        const trascorso = this.fumettoDurata - resta;
+        const scala = trascorso < 180 ? 0.85 + (trascorso / 180) * 0.15 : 1;
+        bolla.container.setScale(scala).setAlpha(Math.min(1, resta / 400));
+      }
+    } else if (bolla && this.staScrivendo && bolla.container.visible) {
+      bolla.container.setAlpha(0.65 + Math.sin(now / 220) * 0.25);
     }
 
     // Nametag: pinned for inCall, otherwise driven by culling.

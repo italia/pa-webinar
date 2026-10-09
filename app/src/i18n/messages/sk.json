@@ -4224,7 +4224,12 @@
       "stagePreparing": "Čoskoro",
       "ended": "Podujatie sa skončilo",
       "startsIn": "Začína o {time}",
-      "hostEarly": "Skorší vstup (hostiteľ)"
+      "hostEarly": "Skorší vstup (hostiteľ)",
+      "sign": "Vstup do videohovoru",
+      "zoneCafe": "Kaviareň",
+      "zoneBoard": "Nástenka",
+      "zoneGallery": "Galéria",
+      "zoneLab": "Laboratórium"
     },
     "roomJustOpened": "Miestnosť je pripravená — vstúp",
     "enterAnyway": "Vstúpiť napriek tomu",
@@ -4258,7 +4263,20 @@
     "presenceLive": "{count, plural, =0 {Nikto naživo} one {# osoba naživo} few {# osoby naživo} other {# osôb naživo}}",
     "presenceWaiting": "{count, plural, one {# v čakárni} few {# v čakárni} other {# v čakárni}}",
     "presenceTitle": "Kto je tu",
-    "piazzaAltKicker": "Alebo"
+    "piazzaAltKicker": "Alebo",
+    "piazza": {
+      "actionsLabel": "Gestá a zvuky",
+      "sound": "Zvuky námestia",
+      "soundOn": "Zvuk zapnutý",
+      "soundOff": "Zvuk vypnutý",
+      "emote": {
+        "wave": "Zamávať",
+        "heart": "Srdce",
+        "clap": "Tlieskať",
+        "laugh": "Smiať sa",
+        "idea": "Mám nápad"
+      }
+    }
   },
   "recording": {
     "management": "Videozáznam",

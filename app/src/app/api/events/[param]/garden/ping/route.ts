@@ -36,6 +36,7 @@ import {
   UnauthorizedError,
 } from '@/lib/errors';
 import { prisma } from '@/lib/db';
+import { isGardenEmote } from '@/lib/garden/emotes';
 import {
   listGardenPeers,
   publishGardenPing,
@@ -64,14 +65,18 @@ const pingSchema = z.object({
   facing: z.enum(['down', 'up', 'left', 'right']),
   walkPhase: z.number().min(0).max(1),
   /**
-   * Emote transiente (saluto / cuore). `.optional()` NON è pigrizia: i client
+   * Gesto transiente (saluto, cuore, applauso…). `.optional()` NON è pigrizia: i client
    * già in giro non mandano il campo e devono continuare a pingare senza
    * beccarsi un 400. Il server fa solo da ripetitore — `at` è l'orologio del
    * mittente e serve al ricevente per deduplicare (vedi GardenPeer.emote).
    */
   emote: z
     .object({
-      type: z.enum(['wave', 'heart']),
+      // Un nome breve qualsiasi: un gesto che questo server non conosce (un
+      // client più nuovo, durante un aggiornamento) non deve far rifiutare il
+      // ping intero, posizione compresa. Lo si scarta più sotto: agli altri
+      // arrivano solo i gesti dell'elenco.
+      type: z.string().max(16),
       at: z.number().int().nonnegative(),
     })
     .optional(),
@@ -190,7 +195,9 @@ export const POST = withErrorHandling(async (request, context) => {
     // Presente solo quando il client la manda: mettere `emote: undefined` la
     // farebbe sparire comunque nel JSON, ma così il record Redis resta
     // identico a prima per i client che non emotano.
-    ...(parsed.data.emote ? { emote: parsed.data.emote } : {}),
+    ...(parsed.data.emote && isGardenEmote(parsed.data.emote.type)
+      ? { emote: { type: parsed.data.emote.type, at: parsed.data.emote.at } }
+      : {}),
   };
 
   await publishGardenPing(event.id, peer);

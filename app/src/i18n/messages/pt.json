@@ -4224,7 +4224,12 @@
       "stagePreparing": "Em breve",
       "ended": "Evento terminado",
       "startsIn": "Começa dentro de {time}",
-      "hostEarly": "Entrada antecipada (anfitrião)"
+      "hostEarly": "Entrada antecipada (anfitrião)",
+      "sign": "Entrada da videochamada",
+      "zoneCafe": "Café",
+      "zoneBoard": "Quadro de avisos",
+      "zoneGallery": "Galeria",
+      "zoneLab": "Laboratório"
     },
     "roomJustOpened": "A sala está pronta — entra",
     "enterAnyway": "Entrar mesmo assim",
@@ -4258,7 +4263,20 @@
     "presenceLive": "{count, plural, =0 {Ninguém em direto} one {# pessoa em direto} other {# pessoas em direto}}",
     "presenceWaiting": "{count, plural, one {# na sala de espera} other {# na sala de espera}}",
     "presenceTitle": "Quem está cá",
-    "piazzaAltKicker": "Ou"
+    "piazzaAltKicker": "Ou",
+    "piazza": {
+      "actionsLabel": "Gestos e sons",
+      "sound": "Sons da praça",
+      "soundOn": "Som ligado",
+      "soundOff": "Som desligado",
+      "emote": {
+        "wave": "Acenar",
+        "heart": "Coração",
+        "clap": "Aplaudir",
+        "laugh": "Rir",
+        "idea": "Tenho uma ideia"
+      }
+    }
   },
   "recording": {
     "management": "Gravação de vídeo",

@@ -4224,7 +4224,12 @@
       "stagePreparing": "Zo meteen",
       "ended": "Evenement afgelopen",
       "startsIn": "Begint over {time}",
-      "hostEarly": "Vroege toegang (host)"
+      "hostEarly": "Vroege toegang (host)",
+      "sign": "Ingang videogesprek",
+      "zoneCafe": "Café",
+      "zoneBoard": "Prikbord",
+      "zoneGallery": "Galerie",
+      "zoneLab": "Lab"
     },
     "roomJustOpened": "De ruimte is klaar — kom binnen",
     "enterAnyway": "Toch binnengaan",
@@ -4258,7 +4263,20 @@
     "presenceLive": "{count, plural, =0 {Nog niemand live} one {# persoon live} other {# personen live}}",
     "presenceWaiting": "{count, plural, one {# in de wachtruimte} other {# in de wachtruimte}}",
     "presenceTitle": "Wie is er",
-    "piazzaAltKicker": "Of"
+    "piazzaAltKicker": "Of",
+    "piazza": {
+      "actionsLabel": "Gebaren en geluiden",
+      "sound": "Geluiden van het plein",
+      "soundOn": "Geluid aan",
+      "soundOff": "Geluid uit",
+      "emote": {
+        "wave": "Zwaaien",
+        "heart": "Hart",
+        "clap": "Applaudisseren",
+        "laugh": "Lachen",
+        "idea": "Ik heb een idee"
+      }
+    }
   },
   "recording": {
     "management": "Video-opname",

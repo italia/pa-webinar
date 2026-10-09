@@ -4224,7 +4224,12 @@
       "stagePreparing": "Drīzumā",
       "ended": "Pasākums beidzies",
       "startsIn": "Sākas pēc {time}",
-      "hostEarly": "Agrīna ieeja (vadītājs)"
+      "hostEarly": "Agrīna ieeja (vadītājs)",
+      "sign": "Ieeja videozvanā",
+      "zoneCafe": "Kafejnīca",
+      "zoneBoard": "Ziņojumu dēlis",
+      "zoneGallery": "Galerija",
+      "zoneLab": "Laboratorija"
     },
     "roomJustOpened": "Telpa ir gatava — nāc iekšā",
     "enterAnyway": "Tomēr ienākt",
@@ -4258,7 +4263,20 @@
     "presenceLive": "{count, plural, =0 {Neviens nav tiešraidē} zero {# cilvēku tiešraidē} one {# cilvēks tiešraidē} other {# cilvēki tiešraidē}}",
     "presenceWaiting": "{count, plural, zero {# uzgaidāmajā telpā} one {# uzgaidāmajā telpā} other {# uzgaidāmajā telpā}}",
     "presenceTitle": "Kas ir šeit",
-    "piazzaAltKicker": "Vai arī"
+    "piazzaAltKicker": "Vai arī",
+    "piazza": {
+      "actionsLabel": "Žesti un skaņas",
+      "sound": "Laukuma skaņas",
+      "soundOn": "Skaņa ieslēgta",
+      "soundOff": "Skaņa izslēgta",
+      "emote": {
+        "wave": "Pamāt",
+        "heart": "Sirds",
+        "clap": "Aplaudēt",
+        "laugh": "Smieties",
+        "idea": "Man ir ideja"
+      }
+    }
   },
   "recording": {
     "management": "Video ieraksts",

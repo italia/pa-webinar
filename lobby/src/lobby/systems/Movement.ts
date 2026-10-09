@@ -1,4 +1,5 @@
 import { MOVE_SPEED, PLAYER_RADIUS } from '../constants';
+import { emoteForKey } from '../emotes';
 import type { EmoteType, Facing } from '../ports/types';
 import type { Collider } from './WorldMap';
 
@@ -21,8 +22,9 @@ export interface MoveResult {
  * the DOM UI overlays keep working. One rule governs all of them: while the
  * focus is on a control — a field, a button, a link — the keys belong to that
  * control and the game does not touch them. Otherwise arrows and WASD move,
- * Space jumps, E and H emote. A `setExternalAxis` hook lets a touch joystick
- * feed the same pipeline.
+ * Space jumps. I gesti hanno un tasto ciascuno (vedi emotes.ts), mai con Ctrl,
+ * Cmd o Alt: Ctrl+C copia, Ctrl+R ricarica. A `setExternalAxis` hook lets a
+ * touch joystick feed the same pipeline.
  *
  * Movement is authoritative and immediate (no physics engine): we integrate
  * velocity, then push the feet-circle out of every collider, then clamp to the
@@ -119,14 +121,13 @@ export class Movement {
       this.cbs.onJump();
       return;
     }
-    if (k === 'e') {
-      if (onControl) return;
-      this.cbs.onEmote('wave');
-      return;
-    }
-    if (k === 'h') {
-      if (onControl) return;
-      this.cbs.onEmote('heart');
+    // I gesti: un tasto ciascuno (vedi emotes.ts). Con un modificatore il
+    // tasto è una scorciatoia del browser (copia, ricarica, strumenti), non un
+    // gesto; tenuto premuto, il gesto non si ripete a raffica.
+    const gesto = emoteForKey(k);
+    if (gesto) {
+      if (onControl || e.ctrlKey || e.metaKey || e.altKey || e.repeat) return;
+      this.cbs.onEmote(gesto);
       return;
     }
     if (!isArrow && !isWasd) return;

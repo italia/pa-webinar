@@ -4224,7 +4224,12 @@
       "stagePreparing": "Brzy",
       "ended": "Událost skončila",
       "startsIn": "Začíná za {time}",
-      "hostEarly": "Dřívější vstup (hostitel)"
+      "hostEarly": "Dřívější vstup (hostitel)",
+      "sign": "Vstup do videohovoru",
+      "zoneCafe": "Kavárna",
+      "zoneBoard": "Nástěnka",
+      "zoneGallery": "Galerie",
+      "zoneLab": "Laboratoř"
     },
     "roomJustOpened": "Místnost je připravená — vstup",
     "enterAnyway": "Přesto vstoupit",
@@ -4258,7 +4263,20 @@
     "presenceLive": "{count, plural, =0 {Nikdo není živě} one {# osoba živě} few {# osoby živě} other {# osob živě}}",
     "presenceWaiting": "{count, plural, one {# v čekárně} few {# v čekárně} other {# v čekárně}}",
     "presenceTitle": "Kdo je tady",
-    "piazzaAltKicker": "Nebo"
+    "piazzaAltKicker": "Nebo",
+    "piazza": {
+      "actionsLabel": "Gesta a zvuky",
+      "sound": "Zvuky náměstí",
+      "soundOn": "Zvuk zapnut",
+      "soundOff": "Zvuk vypnut",
+      "emote": {
+        "wave": "Zamávat",
+        "heart": "Srdce",
+        "clap": "Tleskat",
+        "laugh": "Smát se",
+        "idea": "Mám nápad"
+      }
+    }
   },
   "recording": {
     "management": "Videozáznam",

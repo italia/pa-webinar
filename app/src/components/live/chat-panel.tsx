@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useFormatter, useTranslations } from 'next-intl';
 
 import { Icon } from '@/components/ui/icon';
@@ -98,6 +98,22 @@ interface ChatPanelProps {
   /** I nomi delle persone in sala adesso: si possono menzionare anche se non
    *  hanno ancora scritto. Letto quando si apre l'elenco delle menzioni. */
   getRoster?: () => string[];
+  /** Ogni messaggio appena arrivato, anche il proprio (non lo storico): la
+   *  piazza lo mostra in un fumetto sopra chi l'ha scritto. */
+  /** `etaMs`: per un messaggio recuperato dopo un'interruzione, quanto è
+   *  vecchio (stimato con l'ora del server); 0 per quelli arrivati in diretta. */
+  onMessaggioNuovo?: (m: { id: string; nome: string; testo: string; mio: boolean }, etaMs: number) => void;
+  /** Un messaggio corretto da chi l'ha scritto: il testo nuovo. */
+  onMessaggioModificato?: (id: string, testo: string) => void;
+  /** Chi sta scrivendo adesso (nomi), a ogni cambio; vuoto quando la chat
+   *  sparisce. */
+  onScrittura?: (nomi: string[]) => void;
+  /** Un messaggio tolto dalla chat (nascosto da un moderatore). */
+  onMessaggioRimosso?: (id: string) => void;
+  /** Cambia quando la pagina sposta il pannello altrove (la sala d'attesa lo
+   *  mette prima, nella piazza): un elenco spostato nel DOM perde lo
+   *  scorrimento, e va rimesso dov'era. */
+  posizione?: string;
 }
 
 /** Quanto basta all'anteprima di un messaggio arrivato a chat chiusa. */
@@ -180,6 +196,11 @@ export default function ChatPanel({
   onPreview,
   onUnreadMentionsChange,
   getRoster,
+  onMessaggioNuovo,
+  onMessaggioModificato,
+  onScrittura,
+  onMessaggioRimosso,
+  posizione,
 }: ChatPanelProps) {
   const t = useTranslations('live.chat');
   const tc = useTranslations('common');
@@ -196,6 +217,10 @@ export default function ChatPanel({
     [format],
   );
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  // I messaggi correnti per chi li legge fuori dal render (la rilettura
+  // completa dopo un'interruzione).
+  const messagesRef = useRef<ChatMessage[]>([]);
+  useEffect(() => { messagesRef.current = messages; }, [messages]);
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
   // Live-chat transport health, surfaced as an unobtrusive pill.
@@ -308,6 +333,14 @@ export default function ChatPanel({
   }, [predefinite]);
   const onPreviewRef = useRef(onPreview);
   useEffect(() => { onPreviewRef.current = onPreview; }, [onPreview]);
+  const onMessaggioNuovoRef = useRef(onMessaggioNuovo);
+  useEffect(() => { onMessaggioNuovoRef.current = onMessaggioNuovo; }, [onMessaggioNuovo]);
+  const onMessaggioRimossoRef = useRef(onMessaggioRimosso);
+  useEffect(() => { onMessaggioRimossoRef.current = onMessaggioRimosso; }, [onMessaggioRimosso]);
+  const onMessaggioModificatoRef = useRef(onMessaggioModificato);
+  useEffect(() => { onMessaggioModificatoRef.current = onMessaggioModificato; }, [onMessaggioModificato]);
+  // Dov'era l'elenco, per rimetterlo lì se il pannello viene spostato.
+  const ultimoScrollRef = useRef(0);
   const updateNotifyPrefs = useCallback((patch: Partial<ChatNotifyPrefs>) => {
     setNotifyPrefs((cur) => {
       const next = { ...cur, ...patch };
@@ -457,6 +490,7 @@ export default function ChatPanel({
   const handleScroll = useCallback(() => {
     if (!listRef.current) return;
     const { scrollTop, scrollHeight, clientHeight } = listRef.current;
+    ultimoScrollRef.current = scrollTop;
     isAtBottomRef.current = scrollHeight - scrollTop - clientHeight < 40;
     if (isAtBottomRef.current) setNewBelow(0);
   }, []);
@@ -472,9 +506,18 @@ export default function ChatPanel({
   // Remove a moderated message (op:'delete') everywhere.
   const removeMessage = useCallback((id: string) => {
     setMessages((prev) => prev.filter((m) => m.id !== id));
+    onMessaggioRimossoRef.current?.(id);
   }, []);
 
-  const upsertMessage = useCallback((msg: ChatMessage, opts?: { advanceWatermark?: boolean }) => {
+  const upsertMessage = useCallback((
+    msg: ChatMessage,
+    opts?: {
+      advanceWatermark?: boolean;
+      /** Da dove arriva: lo stream in diretta, il recupero dopo
+       *  un'interruzione (o all'apertura), o l'eco del mio invio. */
+      origine?: 'stream' | 'recupero' | 'eco';
+    },
+  ) => {
     if (seenIdsRef.current.has(msg.id)) return;
     seenIdsRef.current.add(msg.id);
     // The optimistic echo of our OWN send (advanceWatermark:false) must NOT move
@@ -510,6 +553,22 @@ export default function ChatPanel({
     // Solo messaggi appena arrivati: la prima lettura dello storico (fino a 200
     // messaggi) non deve diventare una raffica di anteprime.
     const appenaArrivato = Date.now() - Date.parse(msg.createdAt) < PREVIEW_MAX_AGE_MS;
+    // Il fumetto nella piazza: ogni messaggio dello stream o del mio invio,
+    // qualunque cosa dica l'orologio di questo computer; uno recuperato solo
+    // se recente, con l'età stimata.
+    const recuperato = opts?.origine === 'recupero';
+    if (!recuperato || appenaArrivato) {
+      onMessaggioNuovoRef.current?.(
+        {
+          id: msg.id,
+          nome: msg.senderName,
+          // Un allegato senza testo resta un fumetto, con la graffetta.
+          testo: msg.text?.trim() || (msg.attachment ? '📎' : ''),
+          mio: isOwn,
+        },
+        recuperato ? Math.max(0, Date.now() - Date.parse(msg.createdAt)) : 0,
+      );
+    }
     if (
       !isOwn &&
       appenaArrivato &&
@@ -751,9 +810,25 @@ export default function ChatPanel({
         let recovered = 0;
         data.messages.forEach((m) => {
           if (!seenIdsRef.current.has(m.id)) recovered += 1;
-          upsertMessage(m);
+          upsertMessage(m, { origine: 'recupero' });
         });
         if (full) {
+          for (const m of data.messages) {
+            if (m.editedAt) onMessaggioModificatoRef.current?.(m.id, m.text?.trim() ?? '');
+          }
+          // Un messaggio nascosto mentre lo stream era fermo non è più nella
+          // risposta: fra il più vecchio e il più recente letti, quello che
+          // manca è stato nascosto, e va tolto (anche dal suo fumetto).
+          const tempi = data.messages.map((m) => Date.parse(m.createdAt));
+          if (tempi.length > 0) {
+            const presenti = new Set(data.messages.map((m) => m.id));
+            const da = Math.min(...tempi);
+            const a = Math.max(...tempi);
+            for (const m of messagesRef.current) {
+              const t = Date.parse(m.createdAt);
+              if (t >= da && t <= a && !presenti.has(m.id)) removeMessage(m.id);
+            }
+          }
           // upsertMessage ignora per progetto gli id già visti (evita i doppioni
           // dell'eco SSE), quindi la rilettura completa riconcilia a parte il
           // testo, il segno di modifica, i conteggi delle reazioni e lo stato
@@ -808,6 +883,8 @@ export default function ChatPanel({
               m.id === env.id ? { ...m, text: env.text, editedAt: env.editedAt } : m,
             ),
           );
+          onMessaggioModificatoRef.current?.(env.id, env.text?.trim() ?? '');
+
           // Una correzione può AGGIUNGERE una menzione ("scusa @Alex, intendevo
           // le 16"): senza questo, essere nominati in una modifica non avvisa
           // nessuno, a differenza di qualsiasi altro messaggio.
@@ -847,7 +924,7 @@ export default function ChatPanel({
           );
           return;
         }
-        upsertMessage(env);
+        upsertMessage(env, { origine: 'stream' });
       } catch { /* drop malformed */ }
     };
     const onOpen = () => {
@@ -930,6 +1007,27 @@ export default function ChatPanel({
   useEffect(() => {
     scrollToBottom();
   }, [messages, scrollToBottom]);
+
+  // Spostato nel DOM (vedi `posizione`) l'elenco riparte dall'inizio: lo si
+  // rimette in fondo se era in fondo, altrimenti dov'era.
+  useLayoutEffect(() => {
+    const el = listRef.current;
+    if (!el || posizione === undefined) return;
+    el.scrollTop = isAtBottomRef.current ? el.scrollHeight : ultimoScrollRef.current;
+  }, [posizione]);
+
+  // Quando l'elenco cambia misura (si apre la piazza, si stringe la finestra)
+  // chi era in fondo resta in fondo: accorciare il riquadro non sposta lo
+  // scorrimento, e l'ultimo messaggio finirebbe fuori vista.
+  useEffect(() => {
+    const el = listRef.current;
+    if (!el || typeof ResizeObserver === 'undefined') return;
+    const ro = new ResizeObserver(() => {
+      if (isAtBottomRef.current) el.scrollTop = el.scrollHeight;
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
 
   // ── Mention autocomplete ────────────────────────────────
   // Candidates are the distinct handles of people who have chatted (minus
@@ -1019,6 +1117,19 @@ export default function ChatPanel({
     const timer = setInterval(() => setTyping((prev) => pruneTyping(prev, Date.now())), 1000);
     return () => clearInterval(timer);
   }, [typing.size]);
+
+  // Chi sta scrivendo, per chi lo mostra altrove (i puntini nella piazza).
+  const onScritturaRef = useRef(onScrittura);
+  useEffect(() => { onScritturaRef.current = onScrittura; }, [onScrittura]);
+  const nomiCheScrivono = useMemo(
+    () => [...typing.values()].map((e) => e.name).sort().join('\u0000'),
+    [typing],
+  );
+  useEffect(() => {
+    onScritturaRef.current?.(nomiCheScrivono ? nomiCheScrivono.split('\u0000') : []);
+  }, [nomiCheScrivono]);
+  // Quando la chat sparisce (il nome torna troppo corto) nessuno scrive più.
+  useEffect(() => () => onScritturaRef.current?.([]), []);
 
   const typingText = useMemo(() => {
     const label = typingLabel([...typing.values()].map((e) => e.name));
@@ -1212,6 +1323,15 @@ export default function ChatPanel({
         | null;
       if (created?.senderKey) ownKeyRef.current = created.senderKey;
       lastTypingPingRef.current = 0;
+      // Lo stream è arrivato prima della risposta: il messaggio è già passato,
+      // ma senza `mine` (lo stream non lo porta) e col nome del server. Il
+      // fumetto va comunque sul mio avatar.
+      if (created?.id && seenIdsRef.current.has(created.id)) {
+        onMessaggioNuovoRef.current?.(
+          { id: created.id, nome: displayName, testo: text || (attachment ? '📎' : ''), mio: true },
+          0,
+        );
+      }
       if (created?.id && created.createdAt) {
         upsertMessage({
           id: created.id,
@@ -1242,7 +1362,7 @@ export default function ChatPanel({
                 },
               }
             : {}),
-        }, { advanceWatermark: false });
+        }, { advanceWatermark: false, origine: 'eco' });
       }
       setInput('');
       setReplyTo(null);

@@ -2,7 +2,7 @@ import type { ConferenceState } from './ports/ConferenceState';
 import type { EventSchedule } from './ports/EventSchedule';
 import type { MediaDevices } from './ports/MediaDevices';
 import type { PresenceClient } from './ports/PresenceClient';
-import type { PlayerProfile } from './ports/types';
+import type { EmoteType, PlayerProfile } from './ports/types';
 
 /** Optional real assets that replace the programmatic placeholders. */
 export interface AssetConfig {
@@ -51,6 +51,12 @@ export interface LobbyConfig {
 }
 
 export interface GateLabels {
+  /** Il cartello sopra il cancello e i nomi dei quattro spazi della piazza. */
+  gateSign: string;
+  zoneCafe: string;
+  zoneBoard: string;
+  zoneGallery: string;
+  zoneLab: string;
   gateOpen: string;
   stageLive: string;
   gatePreparing: string;
@@ -61,6 +67,11 @@ export interface GateLabels {
 }
 
 export const DEFAULT_GATE_LABELS: GateLabels = {
+  gateSign: 'Ingresso videochiamata',
+  zoneCafe: 'Caffè',
+  zoneBoard: 'Bacheca',
+  zoneGallery: 'Galleria',
+  zoneLab: 'Laboratorio',
   gateOpen: 'Ingresso aperto',
   stageLive: '● IN DIRETTA',
   gatePreparing: 'La sala si sta preparando…',
@@ -78,8 +89,25 @@ export interface LobbyDeps {
 }
 
 export interface LobbyHandle {
+  /** Si risolve quando la scena è partita: prima, i messaggi della chat
+   *  (showChatMessage, setTyping…) andrebbero persi. */
+  readonly ready: Promise<void>;
   /** Live update of the local player's name / colour / accessories. */
   setProfile(p: Partial<PlayerProfile>): void;
+  /** Un messaggio della chat dell'evento: il fumetto sopra chi l'ha scritto
+   *  (riconosciuto dal nome mostrato). `ageMs`: quanto è vecchio il messaggio,
+   *  perché resti solo per il tempo che gli rimane. */
+  showChatMessage(name: string, text: string, ageMs?: number, id?: string, self?: boolean): void;
+  /** Un messaggio nascosto o cancellato in chat: il suo fumetto sparisce. */
+  clearChatMessage(id: string): void;
+  /** Un messaggio corretto in chat: il fumetto mostra il testo nuovo. */
+  editChatMessage(id: string, text: string): void;
+  /** Chi sta scrivendo in chat adesso: i puntini sopra la testa. */
+  setTyping(names: string[]): void;
+  /** Un gesto dell'avatar locale (dai pulsanti della pagina). */
+  emote(type: EmoteType): void;
+  /** Suoni accesi o spenti; restituisce lo stato. */
+  setAudio(on: boolean): boolean;
   /** Full teardown: sprites, listeners, RAF, Phaser game, media streams. */
   destroy(): void;
 }

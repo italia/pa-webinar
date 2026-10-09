@@ -4224,7 +4224,12 @@
       "stagePreparing": "Netrukus",
       "ended": "Renginys baigėsi",
       "startsIn": "Prasideda po {time}",
-      "hostEarly": "Ankstyvas įėjimas (šeimininkas)"
+      "hostEarly": "Ankstyvas įėjimas (šeimininkas)",
+      "sign": "Įėjimas į vaizdo skambutį",
+      "zoneCafe": "Kavinė",
+      "zoneBoard": "Skelbimų lenta",
+      "zoneGallery": "Galerija",
+      "zoneLab": "Laboratorija"
     },
     "roomJustOpened": "Salė paruošta — užeik",
     "enterAnyway": "Vis tiek įeiti",
@@ -4258,7 +4263,20 @@
     "presenceLive": "{count, plural, =0 {Niekas tiesiogiai} one {# žmogus tiesiogiai} few {# žmonės tiesiogiai} other {# žmonių tiesiogiai}}",
     "presenceWaiting": "{count, plural, one {# laukiamajame} few {# laukiamajame} other {# laukiamajame}}",
     "presenceTitle": "Kas čia yra",
-    "piazzaAltKicker": "Arba"
+    "piazzaAltKicker": "Arba",
+    "piazza": {
+      "actionsLabel": "Gestai ir garsai",
+      "sound": "Aikštės garsai",
+      "soundOn": "Garsas įjungtas",
+      "soundOff": "Garsas išjungtas",
+      "emote": {
+        "wave": "Pamojuoti",
+        "heart": "Širdis",
+        "clap": "Ploti",
+        "laugh": "Juoktis",
+        "idea": "Turiu idėją"
+      }
+    }
   },
   "recording": {
     "management": "Vaizdo įrašas",

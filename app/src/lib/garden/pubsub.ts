@@ -19,7 +19,9 @@
 
 import { getRedis, getRedisSubscriber, withDeadline } from '@/lib/redis';
 
-export type GardenEmoteType = 'wave' | 'heart';
+import type { GardenEmoteType } from './emotes';
+
+export type { GardenEmoteType };
 
 export interface GardenPeer {
   userId: string;

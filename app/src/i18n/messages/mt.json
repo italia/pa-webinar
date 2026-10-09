@@ -4224,7 +4224,12 @@
       "stagePreparing": "Dalwaqt",
       "ended": "L-avveniment intemm",
       "startsIn": "Jibda fi {time}",
-      "hostEarly": "Dħul kmieni (ospitant)"
+      "hostEarly": "Dħul kmieni (ospitant)",
+      "sign": "Daħla għas-sejħa bil-vidjo",
+      "zoneCafe": "Kafè",
+      "zoneBoard": "Bord tal-avviżi",
+      "zoneGallery": "Gallerija",
+      "zoneLab": "Laboratorju"
     },
     "roomJustOpened": "Il-kamra lesta — idħol",
     "enterAnyway": "Idħol xorta",
@@ -4258,7 +4263,20 @@
     "presenceLive": "{count, plural, =0 {Ħadd live} one {# persuna live} other {# persuni live}}",
     "presenceWaiting": "{count, plural, one {# fil-kamra tal-istennija} other {# fil-kamra tal-istennija}}",
     "presenceTitle": "Min hawn",
-    "piazzaAltKicker": "Jew"
+    "piazzaAltKicker": "Jew",
+    "piazza": {
+      "actionsLabel": "Ġesti u ħsejjes",
+      "sound": "Ħsejjes tal-pjazza",
+      "soundOn": "Ħoss mixgħul",
+      "soundOff": "Ħoss mitfi",
+      "emote": {
+        "wave": "Xejjer",
+        "heart": "Qalb",
+        "clap": "Ċapċap",
+        "laugh": "Idħak",
+        "idea": "Għandi idea"
+      }
+    }
   },
   "recording": {
     "management": "Reġistrazzjoni bil-vidjo",
