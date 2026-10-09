@@ -422,7 +422,9 @@
       "typingMany": "Többen írnak…",
       "hideForAll": "Elrejtés mindenki elől",
       "deleteOwn": "Üzenet törlése",
-      "mentionedYou": "Megemlített téged"
+      "mentionedYou": "Megemlített téged",
+      "mentionEmpty": "Még nincs kit megemlíteni: itt jelennek meg, akik írnak a csevegésben vagy a teremben vannak.",
+      "mentionNoMatch": "Nincs ilyen nevű személy."
     },
     "role": {
       "moderator": "Moderátor",

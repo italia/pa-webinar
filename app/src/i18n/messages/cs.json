@@ -422,7 +422,9 @@
       "typingMany": "Několik lidí píše…",
       "hideForAll": "Skrýt všem",
       "deleteOwn": "Smazat zprávu",
-      "mentionedYou": "Zmínil(a) vás"
+      "mentionedYou": "Zmínil(a) vás",
+      "mentionEmpty": "Zatím není koho zmínit: objeví se tu ti, kdo píší do chatu nebo jsou v místnosti.",
+      "mentionNoMatch": "Nikdo s tímto jménem."
     },
     "role": {
       "moderator": "Moderátor",

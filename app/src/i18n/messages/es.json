@@ -422,7 +422,9 @@
       "typingMany": "Varias personas están escribiendo…",
       "hideForAll": "Ocultar para todos",
       "deleteOwn": "Eliminar el mensaje",
-      "mentionedYou": "Te ha mencionado"
+      "mentionedYou": "Te ha mencionado",
+      "mentionEmpty": "Todavía no hay nadie a quien mencionar: aquí aparece quien escribe en el chat o está en la sala.",
+      "mentionNoMatch": "Nadie con este nombre."
     },
     "role": {
       "moderator": "Moderador",

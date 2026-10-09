@@ -422,7 +422,9 @@
       "typingMany": "Diversi persuni qed jiktbu…",
       "hideForAll": "Aħbi minn kulħadd",
       "deleteOwn": "Ħassar il-messaġġ",
-      "mentionedYou": "Semmiek"
+      "mentionedYou": "Semmiek",
+      "mentionEmpty": "Għad m'hemm ħadd x'issemmi: hawn jidhru dawk li jiktbu fiċ-chat jew li jinsabu fil-kamra.",
+      "mentionNoMatch": "Ħadd b'dan l-isem."
     },
     "role": {
       "moderator": "Moderatur",

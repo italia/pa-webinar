@@ -422,7 +422,9 @@
       "typingMany": "Meerdere mensen zijn aan het typen…",
       "hideForAll": "Voor iedereen verbergen",
       "deleteOwn": "Bericht verwijderen",
-      "mentionedYou": "Heeft je genoemd"
+      "mentionedYou": "Heeft je genoemd",
+      "mentionEmpty": "Nog niemand om te noemen: hier verschijnen wie in de chat schrijft of in de zaal is.",
+      "mentionNoMatch": "Niemand met deze naam."
     },
     "role": {
       "moderator": "Moderator",

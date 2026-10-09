@@ -422,7 +422,9 @@
       "typingMany": "Mai multe persoane scriu…",
       "hideForAll": "Ascunde pentru toți",
       "deleteOwn": "Șterge mesajul",
-      "mentionedYou": "V-a menționat"
+      "mentionedYou": "V-a menționat",
+      "mentionEmpty": "Încă nu e nimeni de menționat: aici apar cei care scriu în chat sau sunt în sală.",
+      "mentionNoMatch": "Nimeni cu acest nume."
     },
     "role": {
       "moderator": "Moderator",

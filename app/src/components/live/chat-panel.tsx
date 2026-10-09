@@ -990,10 +990,21 @@ export default function ChatPanel({
     inputRef.current?.focus();
   }, []);
 
-  // Il pulsante «@»: apre l'elenco delle persone da menzionare.
+  // L'elenco delle menzioni è aperto (scrivendo «@…» o con il pulsante).
+  const mentionOpen = mentionQuery !== null && mentionDismissedFor !== input;
+
+  // Il pulsante «@» apre e chiude l'elenco delle persone da menzionare: non
+  // scrive un «@» in più a ogni clic. Aperto con il solo «@», lo richiude
+  // togliendolo; aperto con un nome già iniziato, lo lascia e torna al testo.
   const startMention = useCallback(() => {
     setMentionDismissedFor(null);
-    setInput((prev) => (prev === '' || /\s$/.test(prev) ? `${prev}@` : `${prev} @`));
+    setInput((prev) => {
+      const aperta = /(?:^|\s)@(\p{L}[\p{L}\p{N}._-]*)?$/u.exec(prev);
+      if (aperta) {
+        return aperta[1] ? prev : prev.replace(/\s?@$/u, '');
+      }
+      return prev === '' || /\s$/.test(prev) ? `${prev}@` : `${prev} @`;
+    });
     requestAnimationFrame(() => {
       const node = inputRef.current;
       if (!node) return;
@@ -1733,6 +1744,13 @@ export default function ChatPanel({
             </>
           )}
         </div>
+        {/* Aperto ma vuoto: lo si dice, invece di lasciare un «@» che sembra
+            non fare niente. */}
+        {mentionOpen && mentionSuggestions.length === 0 && (
+          <div className="chat-panel__mention-pop chat-panel__mention-pop--empty" role="status">
+            {mentionQuery ? t('mentionNoMatch') : t('mentionEmpty')}
+          </div>
+        )}
         {mentionSuggestions.length > 0 && (
           <ul className="chat-panel__mention-pop" role="listbox" id={mentionListId} aria-label={t('mentionListLabel')}>
             {mentionSuggestions.map((c, i) => (
@@ -1932,10 +1950,11 @@ export default function ChatPanel({
             </button>
             <button
               type="button"
-              className="chat-panel__tool-btn chat-panel__tool-btn--at"
+              className={`chat-panel__tool-btn chat-panel__tool-btn--at${mentionOpen ? ' is-on' : ''}`}
               onMouseDown={(e) => e.preventDefault()}
               onClick={startMention}
               disabled={sending}
+              aria-expanded={mentionOpen}
               aria-label={t('mentionButton')}
               title={t('mentionButton')}
             >

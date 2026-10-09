@@ -5497,6 +5497,40 @@ button.live-time-strip__rec {
 
 .wr-card {
   border-radius: 20px !important;
+  // La disposizione interna segue la larghezza della SCHEDA, non della
+  // finestra: nella piazza la scheda è una colonna di 380 px anche su uno
+  // schermo largo.
+  container: wr-card / inline-size;
+}
+
+@container wr-card (max-width: 560px) {
+  // Con la scheda come prefisso: le regole a due colonne vengono dopo nel
+  // file e, a parità di peso, vincerebbero.
+  .wr-card .wr-facts,
+  .wr-card .av-check__toggles,
+  .wr-card .av-check__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+// Nella piazza la scheda è la colonna dei controlli: margini più stretti e
+// titolo più piccolo.
+.waiting-shell--piazza {
+  .wr-card .card-body {
+    padding: 1.25rem !important;
+  }
+
+  .wr-card h1 {
+    font-size: 1.35rem;
+  }
+
+  .wr-summary {
+    padding: 0.9rem;
+  }
+
+  .wr-chat__body {
+    height: 420px;
+  }
 }
 
 .waiting-hero {
@@ -6748,6 +6782,12 @@ button.live-time-strip__rec {
   border: 1px solid #D4DEE8;
   border-radius: 12px;
   box-shadow: 0 10px 28px rgba(15, 27, 45, 0.18);
+}
+
+.chat-panel__mention-pop--empty {
+  padding: 8px 12px;
+  font-size: 0.82rem;
+  color: #5A6772;
 }
 
 .chat-panel__mention-opt {

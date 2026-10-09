@@ -422,7 +422,9 @@
       "typingMany": "Niekoľko ľudí píše…",
       "hideForAll": "Skryť všetkým",
       "deleteOwn": "Odstrániť správu",
-      "mentionedYou": "Spomenul(a) vás"
+      "mentionedYou": "Spomenul(a) vás",
+      "mentionEmpty": "Zatiaľ nie je koho spomenúť: zobrazia sa tu tí, čo píšu do chatu alebo sú v miestnosti.",
+      "mentionNoMatch": "Nikto s týmto menom."
     },
     "role": {
       "moderator": "Moderátor",

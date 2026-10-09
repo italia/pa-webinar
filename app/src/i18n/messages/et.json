@@ -422,7 +422,9 @@
       "typingMany": "Mitu inimest kirjutab…",
       "hideForAll": "Peida kõigi eest",
       "deleteOwn": "Kustuta sõnum",
-      "mentionedYou": "Mainis sind"
+      "mentionedYou": "Mainis sind",
+      "mentionEmpty": "Kedagi pole veel mainida: siia ilmuvad need, kes kirjutavad vestlusesse või on ruumis.",
+      "mentionNoMatch": "Selle nimega pole kedagi."
     },
     "role": {
       "moderator": "Moderaator",

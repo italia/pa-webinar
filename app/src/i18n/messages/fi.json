@@ -422,7 +422,9 @@
       "typingMany": "Useampi henkilö kirjoittaa…",
       "hideForAll": "Piilota kaikilta",
       "deleteOwn": "Poista viesti",
-      "mentionedYou": "Mainitsi sinut"
+      "mentionedYou": "Mainitsi sinut",
+      "mentionEmpty": "Ei vielä ketään mainittavaa: tässä näkyvät ne, jotka kirjoittavat keskusteluun tai ovat huoneessa.",
+      "mentionNoMatch": "Ei ketään tällä nimellä."
     },
     "role": {
       "moderator": "Moderaattori",

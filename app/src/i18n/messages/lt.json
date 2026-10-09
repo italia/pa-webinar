@@ -422,7 +422,9 @@
       "typingMany": "Rašo keli žmonės…",
       "hideForAll": "Slėpti nuo visų",
       "deleteOwn": "Ištrinti žinutę",
-      "mentionedYou": "Jus paminėjo"
+      "mentionedYou": "Jus paminėjo",
+      "mentionEmpty": "Kol kas nėra ką paminėti: čia rodomi tie, kurie rašo pokalbyje arba yra kambaryje.",
+      "mentionNoMatch": "Nėra nė vieno tokiu vardu."
     },
     "role": {
       "moderator": "Moderatorius",

@@ -422,7 +422,9 @@
       "typingMany": "Plusieurs personnes sont en train d'écrire…",
       "hideForAll": "Masquer pour tous",
       "deleteOwn": "Supprimer le message",
-      "mentionedYou": "Vous a mentionné"
+      "mentionedYou": "Vous a mentionné",
+      "mentionEmpty": "Personne à mentionner pour l'instant : ici apparaissent celles et ceux qui écrivent dans le chat ou sont dans la salle.",
+      "mentionNoMatch": "Personne avec ce nom."
     },
     "role": {
       "moderator": "Modérateur",

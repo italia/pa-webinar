@@ -422,7 +422,9 @@
       "typingMany": "Flera personer skriver…",
       "hideForAll": "Dölj för alla",
       "deleteOwn": "Radera meddelandet",
-      "mentionedYou": "Nämnde dig"
+      "mentionedYou": "Nämnde dig",
+      "mentionEmpty": "Ingen att nämna än: här visas de som skriver i chatten eller är i rummet.",
+      "mentionNoMatch": "Ingen med det namnet."
     },
     "role": {
       "moderator": "Moderator",

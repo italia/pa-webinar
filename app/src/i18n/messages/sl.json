@@ -422,7 +422,9 @@
       "typingMany": "Več oseb piše …",
       "hideForAll": "Skrij za vse",
       "deleteOwn": "Izbriši sporočilo",
-      "mentionedYou": "Vas je omenil(a)"
+      "mentionedYou": "Vas je omenil(a)",
+      "mentionEmpty": "Zaenkrat ni nikogar za omembo: tukaj se prikažejo tisti, ki pišejo v klepet ali so v sobi.",
+      "mentionNoMatch": "Nikogar s tem imenom."
     },
     "role": {
       "moderator": "Moderator",

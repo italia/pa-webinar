@@ -422,7 +422,9 @@
       "typingMany": "Mehrere Personen schreiben…",
       "hideForAll": "Für alle ausblenden",
       "deleteOwn": "Nachricht löschen",
-      "mentionedYou": "Hat dich erwähnt"
+      "mentionedYou": "Hat dich erwähnt",
+      "mentionEmpty": "Noch niemand zum Erwähnen: Hier erscheint, wer im Chat schreibt oder im Raum ist.",
+      "mentionNoMatch": "Niemand mit diesem Namen."
     },
     "role": {
       "moderator": "Moderator",

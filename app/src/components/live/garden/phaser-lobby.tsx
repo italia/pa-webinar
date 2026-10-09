@@ -160,11 +160,16 @@ export default function PhaserLobby({
   }, [displayName]);
 
   // Riempie l'host, che deve essere posizionato (`position: relative`) e avere
-  // una dimensione propria — vedi `.wr-piazza-stage`.
+  // una dimensione propria — vedi `.wr-piazza-stage`. Due strati: la lobby
+  // mette `position: relative` sul contenitore che riceve, e su quello stesso
+  // nodo `inset: 0` non varrebbe più (altezza zero, tela vuota). Lo strato
+  // esterno riempie la scena, il contenitore ne prende la misura.
   return (
-    <div
-      ref={containerRef}
-      style={{ position: 'absolute', inset: 0, overflow: 'hidden', background: '#26344a' }}
-    />
+    <div style={{ position: 'absolute', inset: 0 }}>
+      <div
+        ref={containerRef}
+        style={{ width: '100%', height: '100%', overflow: 'hidden', background: '#26344a' }}
+      />
+    </div>
   );
 }

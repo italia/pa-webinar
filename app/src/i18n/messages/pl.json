@@ -422,7 +422,9 @@
       "typingMany": "Kilka osób pisze…",
       "hideForAll": "Ukryj dla wszystkich",
       "deleteOwn": "Usuń wiadomość",
-      "mentionedYou": "Wspomniał(a) o tobie"
+      "mentionedYou": "Wspomniał(a) o tobie",
+      "mentionEmpty": "Na razie nie ma kogo wspomnieć: tu pojawiają się osoby piszące na czacie lub obecne w sali.",
+      "mentionNoMatch": "Nikt o tym imieniu."
     },
     "role": {
       "moderator": "Moderator",

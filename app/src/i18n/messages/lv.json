@@ -422,7 +422,9 @@
       "typingMany": "Raksta vairāki cilvēki…",
       "hideForAll": "Paslēpt visiem",
       "deleteOwn": "Dzēst ziņu",
-      "mentionedYou": "Jūs pieminēja"
+      "mentionedYou": "Jūs pieminēja",
+      "mentionEmpty": "Pagaidām nav neviena, ko pieminēt: šeit parādās tie, kas raksta tērzēšanā vai ir telpā.",
+      "mentionNoMatch": "Nav neviena ar šo vārdu."
     },
     "role": {
       "moderator": "Moderators",

@@ -422,7 +422,9 @@
       "typingMany": "Tá roinnt daoine ag clóscríobh…",
       "hideForAll": "Folaigh ar gach duine",
       "deleteOwn": "Scrios an teachtaireacht",
-      "mentionedYou": "Luaigh sé/sí thú"
+      "mentionedYou": "Luaigh sé/sí thú",
+      "mentionEmpty": "Níl aon duine le lua fós: taispeántar anseo na daoine a scríobhann sa chomhrá nó atá sa seomra.",
+      "mentionNoMatch": "Níl aon duine leis an ainm seo."
     },
     "role": {
       "moderator": "Modhnóir",

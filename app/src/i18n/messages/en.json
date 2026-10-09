@@ -422,7 +422,9 @@
       "typingMany": "Several people are typing…",
       "hideForAll": "Hide for everyone",
       "deleteOwn": "Delete message",
-      "mentionedYou": "Mentioned you"
+      "mentionedYou": "Mentioned you",
+      "mentionEmpty": "Nobody to mention yet: people appear here once they write in the chat or join the room.",
+      "mentionNoMatch": "Nobody with this name."
     },
     "role": {
       "moderator": "Moderator",

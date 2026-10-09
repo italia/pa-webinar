@@ -422,7 +422,9 @@
       "typingMany": "Flere personer skriver…",
       "hideForAll": "Skjul for alle",
       "deleteOwn": "Slet beskeden",
-      "mentionedYou": "Nævnte dig"
+      "mentionedYou": "Nævnte dig",
+      "mentionEmpty": "Ingen at nævne endnu: her vises dem, der skriver i chatten eller er i rummet.",
+      "mentionNoMatch": "Ingen med dette navn."
     },
     "role": {
       "moderator": "Moderator",

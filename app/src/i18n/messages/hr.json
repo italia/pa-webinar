@@ -422,7 +422,9 @@
       "typingMany": "Nekoliko osoba piše…",
       "hideForAll": "Sakrij za sve",
       "deleteOwn": "Izbriši poruku",
-      "mentionedYou": "Spomenuo/la vas je"
+      "mentionedYou": "Spomenuo/la vas je",
+      "mentionEmpty": "Još nema koga spomenuti: ovdje se pojavljuju oni koji pišu u chatu ili su u sobi.",
+      "mentionNoMatch": "Nema nikoga s tim imenom."
     },
     "role": {
       "moderator": "Moderator",
