@@ -742,7 +742,7 @@
       "updateEvent": "Update event",
       "step1": {
         "heading": "Basic information",
-        "intro": "Title, description, cover image and schedule.",
+        "intro": "The event's title, description and image.",
         "coverImage": "Cover image",
         "coverImageHelp": "Shown on the public site and in the emails to registrants.",
         "scheduleHeading": "Schedule",
@@ -751,8 +751,6 @@
         "tagsHeading": "Tags",
         "waitingRoomAudio": "Waiting-room audio (optional)",
         "waitingRoomAudioHelp": "Played before the live call starts.",
-        "parseTitleKickerLabel": "Use kicker in title (| separator)",
-        "parseTitleKickerHelp": "When on, a title like 'CONFERENCE | Digital innovation' renders CONFERENCE as a small kicker line above the main title.",
         "maxParticipantsHelp": "An estimate of the people expected: it sizes the video server and is not a limit on registrations.",
         "validation": {
           "startsAt": "Invalid start date.",
@@ -782,7 +780,11 @@
           "HIGH": "High (720p, recommended)",
           "BALANCED": "Balanced (540p)",
           "SAVE_DATA": "Save data (360p)"
-        }
+        },
+        "requiredLegend": "Fields marked * are needed to save the event: while they are empty, each one says so.",
+        "kickerHint": "For a kicker above the title, write it first and separate them with |, for example “Meeting series | The first meeting”.",
+        "kickerUse": "Show “{kicker}” as a kicker above the title",
+        "kickerPreview": "How it looks on the event page"
       },
       "step2": {
         "heading": "Who can do what",
@@ -841,7 +843,8 @@
             "name": "Participant",
             "desc": "Follows the event and interacts as you decide in the table below."
           }
-        }
+        },
+        "recordingManualNote": "Recording never starts by itself: a host starts it with the REC button."
       },
       "step3": {
         "heading": "People and invites",
@@ -873,7 +876,7 @@
         "personName": "Name",
         "personEmail": "Email",
         "peopleHeading": "Event people",
-        "peopleHelp": "Organizers, moderators and speakers. Each receives their own link to enter with their role; what each role can do is shown in the “Permissions” step.",
+        "peopleHelp": "Organizers, moderators and speakers. Each receives their own link to enter with their role; what each role can do is shown in “Advanced settings”.",
         "personRole": "Role",
         "roleOrganizer": "Organizer",
         "roleModerator": "Moderator",
@@ -893,7 +896,17 @@
         "invitationsHelpOpen": "Optional: the list of people you invite. Registration is open, so after publication anyone can register, invited or not. The platform sends no invitations: share the event link yourself.",
         "invitationsHelpRestricted": "Registration is restricted: only the addresses in this list can register. The platform sends no invitations: share the event link yourself; the link to enter arrives by email after registering.",
         "logoExternal": "The public page shows only logos uploaded to this platform: a logo from another website will not be shown.",
-        "primaryProfileInvalid": "Check the organization and the logo address."
+        "primaryProfileInvalid": "Check the organization and the logo address.",
+        "primaryMore": "Organization, logo and public page",
+        "accessHeading": "Who registers",
+        "accessSiteDefault": "Follows the site setting: if the administration changes it, it applies to this event too.",
+        "accessNoInvitees": "No invitees yet: while the list below is empty, nobody can register.",
+        "askHeading": "What we ask people who register",
+        "askAlways": "Name and email, always. In addition, if you need them:",
+        "askOrganization": "Organization (required to register)",
+        "askRole": "Role (optional)",
+        "askType": "Organization type (optional)",
+        "accessStaffOnly": "Who registers is decided by the event staff."
       },
       "step4": {
         "heading": "Content and materials",
@@ -941,7 +954,7 @@
       },
       "step5": {
         "heading": "Review and publish",
-        "intro": "Double-check and publish (or save as draft).",
+        "intro": "The event as others will see it: check it, then publish it or save it as a draft.",
         "summary": {
           "title": "Title",
           "schedule": "Schedule",
@@ -1000,7 +1013,70 @@
       "publishFailedDetail": "The event was created but not published: it is still a draft. The server replied: {reason}. Publish it from the event page.",
       "toFix": "To fix:",
       "toFixField": "Field {n}",
-      "stepsAriaLabel": "Event form steps"
+      "stepsAriaLabel": "Event form steps",
+      "flow": {
+        "steps": {
+          "base": "Event",
+          "schedule": "When",
+          "invites": "People",
+          "review": "Summary",
+          "advanced": "Advanced settings"
+        },
+        "templateInUse": "Template: <b>{name}</b>",
+        "noTemplate": "Event without a template",
+        "changeTemplate": "Change template",
+        "chooseTemplate": "Choose a template",
+        "backToReview": "Back to summary",
+        "participantsCan": "Participants: {list}",
+        "none": "none",
+        "recordingManual": "Available: it starts only when a host presses REC.",
+        "aiAfter": "After the recording: {list}.",
+        "scheduleHeading": "When it takes place",
+        "scheduleIntro": "Date, time and how many people you expect: they are used to prepare the room.",
+        "advancedIntro": "Values already chosen by the template: change only what you need.",
+        "advancedIntroTemplate": "Values already chosen by the template «{name}»: change only what you need.",
+        "requiredToSave": "Needed to save the event.",
+        "requiredToPublish": "Needed to publish the event.",
+        "toComplete": "To complete",
+        "missingHeading": "Still missing to publish:",
+        "fieldOrganizerName": "Lead organizer's name",
+        "fieldOrganizerEmail": "Lead organizer's email",
+        "capacityWarning": "Capacity to check in the technical details.",
+        "sections": {
+          "participation": "Participation and room features",
+          "recording": "Recording and AI",
+          "content": "Content: materials and questionnaires",
+          "room": "Waiting room and video",
+          "data": "Privacy, data and the page after the event",
+          "technical": "Technical details: capacity and resources"
+        },
+        "formatInUse": "Format: <b>{name}</b>",
+        "changeFormat": "Change format",
+        "voiceAll": "Everyone speaks and appears on video",
+        "voiceSpeakers": "Speakers and moderators speak and appear on video; the audience writes in the chat",
+        "features": "Features: {list}",
+        "liveToggleNote": "Every feature can also be turned on and off during the event.",
+        "customize": "Customize the settings",
+        "changeLanguages": "Change languages",
+        "translationLine": "Translation into: {list}",
+        "privacyTemplate": "Privacy notice: {name}",
+        "privacyCustom": "Privacy notice: text written for the event",
+        "privacyDocument": "Privacy notice: the event's document",
+        "privacySite": "Privacy notice: the site's",
+        "untitled": "Untitled event",
+        "carriedOver": "We kept what you had written for the event.",
+        "startOver": "Start over",
+        "accessOpen": "Anyone can register, from the event page.",
+        "accessInvitation": "Invitation only. Invitees: {count}.",
+        "addInvitees": "Add invitees",
+        "change": "Change",
+        "askLine": "At registration we ask for: {list}.",
+        "askName": "name",
+        "askEmail": "email",
+        "askOrganization": "organization",
+        "askRole": "role",
+        "askType": "organization type"
+      }
     },
     "nav": {
       "events": "Events",
@@ -1784,9 +1860,9 @@
         "statusPageEnabled": "Status page enabled",
         "statusPageEnabledHelp": "Publishes the service status page. When off, the page does not exist and its data is visible to administrators only.",
         "guestAccessEnabled": "Guest access enabled",
-        "guestAccessEnabledHelp": "People who have not registered can join live events with just their name. When off, scheduled events can only be joined by registering or with a moderator or speaker link; instant video calls stay open to anyone with the link.",
+        "guestAccessEnabledHelp": "People who have not registered can join live events with just their name. When off, scheduled events can only be joined by registering or with a moderator or speaker link; instant video calls stay open to anyone with the link. An invitation-only event never admits guests.",
         "publicRegistrationEnabled": "Public registration enabled",
-        "publicRegistrationEnabledHelp": "Anyone can register for events. When off, only people on the event's invitation list can register, and the personal link to enter is sent only by email; people already registered and moderator or speaker links keep working.",
+        "publicRegistrationEnabledHelp": "Anyone can register for events. When off, only people on the event's invitation list can register, and the personal link to enter is sent only by email; people already registered and moderator or speaker links keep working. It is the choice proposed for new events: each event can decide otherwise in the “People” step.",
         "calendarPublic": "Public calendar",
         "calendarPublicHelp": "Publish the event calendar. Visitors can see scheduled events.",
         "parseTitleKicker": "Editorial title kicker",
@@ -2406,7 +2482,8 @@
       "toggles": {
         "unmute": "Participants can unmute",
         "video": "Participants can start video",
-        "screenShare": "Participants can share screen"
+        "screenShare": "Participants can share screen",
+        "openRegistration": "Registration open to all"
       },
       "fields": {
         "dataRetention": "Data retention",
@@ -3012,6 +3089,54 @@
     "videoPlayer": {
       "unavailable": "Video unavailable",
       "openInNewTab": "Open in a new tab"
+    },
+    "guided": {
+      "title": "What is your event like?",
+      "intro": "Four questions to start with the right settings. Every feature can also be switched on or off during the event.",
+      "peopleQ": "How many people do you expect?",
+      "people": {
+        "piccolo": "Up to 20",
+        "medio": "Up to 100",
+        "grande": "More than 100"
+      },
+      "peopleHint": "It is an estimate to prepare the room, not a limit on registrations.",
+      "voiceQ": "Who can speak and appear on video?",
+      "voice": {
+        "all": "Everyone",
+        "allDesc": "Chat, microphone, video and screen for everyone",
+        "speakers": "Speakers and moderators",
+        "speakersDesc": "The audience writes in the chat and asks questions"
+      },
+      "recQ": "Do you want to be able to record?",
+      "rec": {
+        "yes": "Yes, when you press REC",
+        "yesDesc": "After the event: transcript, summary and translation",
+        "no": "No",
+        "noDesc": "No recording, no consent to ask for"
+      },
+      "preview": "Your event",
+      "previewPeople": "Expected participants: about {count}",
+      "continue": "Continue",
+      "useTemplate": "Or use a template",
+      "summary": {
+        "piccolo": "Up to 20 people",
+        "medio": "Up to 100 people",
+        "grande": "More than 100 people",
+        "tutti": "everyone on video",
+        "relatori": "speakers talk",
+        "si": "with recording",
+        "no": "without recording",
+        "openAccess": "open to all",
+        "inviteOnly": "invitation only"
+      },
+      "accessQ": "Who can take part?",
+      "access": {
+        "open": "Anyone who registers",
+        "openDesc": "Anyone can register from the event page",
+        "invitation": "Only people you invite",
+        "invitationDesc": "The page stays visible, but only invitees can register; without registering, nobody gets in"
+      },
+      "previewInvitation": "Only the people you invite can register; nobody gets in without registering."
     }
   },
   "email": {

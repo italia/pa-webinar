@@ -14,12 +14,12 @@ The live page (internal path `/events/[slug]/live`, localized through `app/src/i
 
 | Visitor | How they are recognized | Statuses that reach the waiting room |
 |---|---|---|
-| Registrant | Personal link `?token=<accessToken>`, or the signed per-event access cookie set at registration (or by an email entry link signed with `sig`, which the emails built while public registration is off carry) | Any status. If the link was forwarded and opened in another browser, the name field starts empty and per-participant consent is asked again |
+| Registrant | Personal link `?token=<accessToken>`, or the signed per-event access cookie set at registration (or by an email entry link signed with `sig`, which the emails built while the event's registration is by invitation only carry) | Any status. If the link was forwarded and opened in another browser, the name field starts empty and per-participant consent is asked again |
 | Moderator or speaker | Magic link `?token=` (the primary moderator link or a named grant) | Any status |
-| Guest, scheduled event | No token | `LIVE` only, and only while the site setting `guestAccessEnabled` is on. Otherwise the page redirects to the registration page, or to the event page when `ENDED` or `ARCHIVED` |
+| Guest, scheduled event | No token | `LIVE` only, only while the site setting `guestAccessEnabled` is on, and never when the event is invitation-only (`accessMode` `INVITATION`). Otherwise the page redirects to the registration page, or to the event page when `ENDED` or `ARCHIVED` |
 | Guest, instant call | No token | `LIVE`, `IDLE`, `PROVISIONING`. Any other status returns not found |
 
-A password-protected event sends a visitor without a token to its password page first. Registering close to the start time leads straight into the waiting room: when the event begins within `SiteSetting.waitingRoomLeadMinutes` (default in `app/prisma/schema.prisma`), the registration page redirects to the personal link. Someone who registers twice is offered **Resend my access link** on the registration page; while public registration is off, the form emails the link instead. Whether the Jitsi token is then issued for each status is covered in [the event lifecycle](event-lifecycle.md#which-joins-each-status-admits). Registration, invitations and access modes are covered in [the event journey](event-journey.md). Credentials are covered in [identity, access and tokens](identity-and-access.md).
+A password-protected event sends a visitor without a token to its password page first. Registering close to the start time leads straight into the waiting room: when the event begins within `SiteSetting.waitingRoomLeadMinutes` (default in `app/prisma/schema.prisma`), the registration page redirects to the personal link. Someone who registers twice is offered **Resend my access link** on the registration page; while the event's registration is by invitation only, the form emails the link instead. Whether the Jitsi token is then issued for each status is covered in [the event lifecycle](event-lifecycle.md#which-joins-each-status-admits). Registration, invitations and access modes are covered in [the event journey](event-journey.md). Credentials are covered in [identity, access and tokens](identity-and-access.md).
 
 ### How the page stays current
 
@@ -142,7 +142,7 @@ The preview shows the chosen background behind the person. `app/src/hooks/use-ba
 
 `app/src/components/live/audio-player.tsx` is a toggle, **Enable music** / **Disable music**. Nothing plays until the visitor presses it, because browsers block autoplay and the page never tries. Once started, the track loops and fades in to 30 percent volume. Pressing the toggle again fades it out.
 
-The toggle appears only while the event is `PUBLISHED` and only if the event has its own audio: **Waiting-room audio (optional)** in the event wizard's **Basics** step, as an upload or a URL (`Event.waitingRoomAudioUrl`). The bundled `app/public/audio/waiting-room-default.mp3` is the player's fallback, but the waiting room never renders the player without an event audio. So an event without its own audio has no music toggle.
+The toggle appears only while the event is `PUBLISHED` and only if the event has its own audio: **Waiting-room audio (optional)** in the event wizard's advanced settings (**Waiting room and video**), as an upload or a URL (`Event.waitingRoomAudioUrl`). The bundled `app/public/audio/waiting-room-default.mp3` is the player's fallback, but the waiting room never renders the player without an event audio. So an event without its own audio has no music toggle.
 
 ### Consent and transparency notices
 

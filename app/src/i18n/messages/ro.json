@@ -742,7 +742,7 @@
       "updateEvent": "Actualizați evenimentul",
       "step1": {
         "heading": "Informații de bază",
-        "intro": "Titlu, descriere, imagine și calendar al evenimentului.",
+        "intro": "Titlul, descrierea și imaginea evenimentului.",
         "coverImage": "Imagine de copertă",
         "coverImageHelp": "Afișată pe site-ul public și în e-mailurile către cei înscriși.",
         "scheduleHeading": "Calendar",
@@ -751,8 +751,6 @@
         "tagsHeading": "Categorii (etichete)",
         "waitingRoomAudio": "Audio sală de așteptare (opțional)",
         "waitingRoomAudioHelp": "Redat înainte de începerea apelului video.",
-        "parseTitleKickerLabel": "Titlu cu supratitlu (separator |)",
-        "parseTitleKickerHelp": "Când este activ, un titlu precum „CONFERINȚĂ | Inovație digitală” va afișa CONFERINȚĂ ca supratitlu.",
         "maxParticipantsHelp": "O estimare a persoanelor așteptate: servește la dimensionarea serverului video și nu limitează înscrierile.",
         "validation": {
           "startsAt": "Dată de început nevalidă.",
@@ -782,7 +780,11 @@
           "HIGH": "Înaltă (720p, recomandată)",
           "BALANCED": "Echilibrată (540p)",
           "SAVE_DATA": "Economie de date (360p)"
-        }
+        },
+        "requiredLegend": "Câmpurile marcate cu * sunt necesare pentru a salva evenimentul: cât timp sunt goale, fiecare o spune.",
+        "kickerHint": "Pentru un supratitlu, scrie-l înaintea titlului și separă-le cu |, de exemplu „Ciclu de întâlniri | Prima întâlnire”.",
+        "kickerUse": "Afișează „{kicker}” ca supratitlu",
+        "kickerPreview": "Așa apare pe pagina evenimentului"
       },
       "step2": {
         "heading": "Cine ce poate face",
@@ -841,7 +843,8 @@
             "name": "Participant",
             "desc": "Urmărește evenimentul și interacționează cum decizi în tabelul de mai jos."
           }
-        }
+        },
+        "recordingManualNote": "Înregistrarea nu pornește niciodată singură: un moderator o pornește cu butonul REC."
       },
       "step3": {
         "heading": "Persoane și invitații",
@@ -873,7 +876,7 @@
         "personName": "Nume",
         "personEmail": "E-mail",
         "peopleHeading": "Persoanele evenimentului",
-        "peopleHelp": "Organizatori, moderatori și vorbitori. Fiecare primește propriul link pentru a intra cu rolul său; ce poate face fiecare rol arată pasul „Permisiuni”.",
+        "peopleHelp": "Organizatori, moderatori și vorbitori. Fiecare primește propriul link pentru a intra cu rolul său; ce poate face fiecare rol arată secțiunea „Setări avansate”.",
         "personRole": "Rol",
         "roleOrganizer": "Organizator",
         "roleModerator": "Moderator",
@@ -893,7 +896,17 @@
         "invitationsHelpOpen": "Opțional: lista persoanelor pe care le inviți. Înscrierea este deschisă, deci după publicare se poate înscrie oricine, invitat sau nu. Platforma nu trimite invitații: distribuie tu linkul evenimentului.",
         "invitationsHelpRestricted": "Înscrierea este restricționată: se pot înscrie doar adresele din această listă. Platforma nu trimite invitații: distribuie tu linkul evenimentului; linkul de intrare vine pe e-mail după înscriere.",
         "logoExternal": "Pagina publică afișează doar siglele încărcate pe această platformă: o siglă de pe alt site nu va apărea.",
-        "primaryProfileInvalid": "Verifică organizația și adresa siglei."
+        "primaryProfileInvalid": "Verifică organizația și adresa siglei.",
+        "primaryMore": "Instituție, logo și pagină publică",
+        "accessHeading": "Cine se înscrie",
+        "accessSiteDefault": "Urmează setarea site-ului: dacă administrația o schimbă, se aplică și acestui eveniment.",
+        "accessNoInvitees": "Niciun invitat încă: cât timp lista de mai jos este goală, nimeni nu se poate înscrie.",
+        "askHeading": "Ce cerem celor care se înscriu",
+        "askAlways": "Nume și e-mail, întotdeauna. În plus, dacă ai nevoie:",
+        "askOrganization": "Organizație (obligatorie pentru înscriere)",
+        "askRole": "Funcție (opțional)",
+        "askType": "Tip de organizație (opțional)",
+        "accessStaffOnly": "Cine se poate înscrie decide echipa evenimentului."
       },
       "step4": {
         "heading": "Conținut și materiale",
@@ -941,7 +954,7 @@
       },
       "step5": {
         "heading": "Rezumat și publicare",
-        "intro": "Verificați informațiile și publicați evenimentul (sau salvați ca ciornă).",
+        "intro": "Evenimentul așa cum îl vor vedea ceilalți: verifică-l, apoi publică-l sau salvează-l ca ciornă.",
         "summary": {
           "title": "Titlu",
           "schedule": "Calendar",
@@ -1000,7 +1013,70 @@
       "publishFailedDetail": "Evenimentul a fost creat, dar nu a fost publicat: rămâne ciornă. Serverul a răspuns: {reason}. Publicați-l din pagina evenimentului.",
       "toFix": "De corectat:",
       "toFixField": "Câmpul {n}",
-      "stepsAriaLabel": "Pașii formularului evenimentului"
+      "stepsAriaLabel": "Pașii formularului evenimentului",
+      "flow": {
+        "steps": {
+          "base": "Eveniment",
+          "schedule": "Când",
+          "invites": "Persoane",
+          "review": "Rezumat",
+          "advanced": "Setări avansate"
+        },
+        "templateInUse": "Șablon: <b>{name}</b>",
+        "noTemplate": "Eveniment fără șablon",
+        "changeTemplate": "Schimbă șablonul",
+        "chooseTemplate": "Alege un șablon",
+        "backToReview": "Înapoi la rezumat",
+        "participantsCan": "Participanți: {list}",
+        "none": "niciuna",
+        "recordingManual": "Disponibilă: pornește doar când un moderator apasă REC.",
+        "aiAfter": "După înregistrare: {list}.",
+        "scheduleHeading": "Când are loc",
+        "scheduleIntro": "Data, ora și câte persoane așteptați: servesc la pregătirea sălii.",
+        "advancedIntro": "Valori deja alese de șablon: modificați doar ce este nevoie.",
+        "advancedIntroTemplate": "Valori deja alese de șablonul „{name}”: modificați doar ce este nevoie.",
+        "requiredToSave": "Necesar pentru a salva evenimentul.",
+        "requiredToPublish": "Necesar pentru a publica evenimentul.",
+        "toComplete": "De completat",
+        "missingHeading": "Pentru publicare mai lipsește:",
+        "fieldOrganizerName": "Numele organizatorului principal",
+        "fieldOrganizerEmail": "E-mailul organizatorului principal",
+        "capacityWarning": "Capacitate de verificat în detaliile tehnice.",
+        "sections": {
+          "participation": "Participare și funcțiile sălii",
+          "recording": "Înregistrare și IA",
+          "content": "Conținut: materiale și chestionare",
+          "room": "Sala de așteptare și video",
+          "data": "Confidențialitate, date și pagina după eveniment",
+          "technical": "Detalii tehnice: capacitate și resurse"
+        },
+        "formatInUse": "Format: <b>{name}</b>",
+        "changeFormat": "Schimbă formatul",
+        "voiceAll": "Toți vorbesc și apar pe video",
+        "voiceSpeakers": "Vorbesc și apar pe video vorbitorii și moderatorii; publicul scrie în chat",
+        "features": "Funcții: {list}",
+        "liveToggleNote": "Fiecare funcție se activează și se dezactivează și în timpul evenimentului.",
+        "customize": "Personalizează setările",
+        "changeLanguages": "Schimbă limbile",
+        "translationLine": "Traducere în: {list}",
+        "privacyTemplate": "Informare privind confidențialitatea: {name}",
+        "privacyCustom": "Informare privind confidențialitatea: text scris pentru eveniment",
+        "privacyDocument": "Informare privind confidențialitatea: documentul evenimentului",
+        "privacySite": "Informare privind confidențialitatea: cea a site-ului",
+        "untitled": "Eveniment fără titlu",
+        "carriedOver": "Am păstrat ce scriseseși pentru eveniment.",
+        "startOver": "Începe de la capăt",
+        "accessOpen": "Oricine se poate înscrie din pagina evenimentului.",
+        "accessInvitation": "Doar pe bază de invitație. Invitați: {count}.",
+        "addInvitees": "Adaugă invitați",
+        "change": "Modifică",
+        "askLine": "La înscriere cerem: {list}.",
+        "askName": "nume",
+        "askEmail": "e-mail",
+        "askOrganization": "organizație",
+        "askRole": "funcție",
+        "askType": "tip de organizație"
+      }
     },
     "nav": {
       "events": "Evenimente",
@@ -1784,9 +1860,9 @@
         "statusPageEnabled": "Pagina de stare activă",
         "statusPageEnabledHelp": "Publică pagina de stare a serviciului. Când este dezactivată, pagina nu există, iar datele ei sunt vizibile doar administratorilor.",
         "guestAccessEnabled": "Acces invitați activ",
-        "guestAccessEnabledHelp": "Persoanele neînregistrate pot intra la evenimentele în desfășurare indicând doar numele. Când este dezactivat, la evenimentele programate se intră doar cu înregistrare sau cu linkul de moderator ori de vorbitor; apelurile video instant rămân deschise oricui are linkul.",
+        "guestAccessEnabledHelp": "Persoanele neînregistrate pot intra la evenimentele în desfășurare indicând doar numele. Când este dezactivat, la evenimentele programate se intră doar cu înregistrare sau cu linkul de moderator ori de vorbitor; apelurile video instant rămân deschise oricui are linkul. Un eveniment doar pe bază de invitație nu admite niciodată oaspeți.",
         "publicRegistrationEnabled": "Înregistrare publică activă",
-        "publicRegistrationEnabledHelp": "Oricine se poate înregistra la evenimente. Când este dezactivată, se pot înregistra doar persoanele de pe lista invitaților la eveniment, iar linkul personal pentru a intra se trimite doar prin email; persoanele deja înregistrate și linkurile moderatorilor și vorbitorilor funcționează în continuare.",
+        "publicRegistrationEnabledHelp": "Oricine se poate înregistra la evenimente. Când este dezactivată, se pot înregistra doar persoanele de pe lista invitaților la eveniment, iar linkul personal pentru a intra se trimite doar prin email; persoanele deja înregistrate și linkurile moderatorilor și vorbitorilor funcționează în continuare. Este alegerea propusă noilor evenimente: fiecare poate decide altfel la pasul „Persoane”.",
         "calendarPublic": "Calendar public",
         "calendarPublicHelp": "Publicați calendarul evenimentelor. Vizitatorii pot vedea evenimentele programate.",
         "parseTitleKicker": "Titluri cu kicker editorial",
@@ -2406,7 +2482,8 @@
       "toggles": {
         "unmute": "Participanții pot vorbi",
         "video": "Participanții pot activa videoul",
-        "screenShare": "Participanții pot partaja ecranul"
+        "screenShare": "Participanții pot partaja ecranul",
+        "openRegistration": "Înscriere deschisă tuturor"
       },
       "fields": {
         "dataRetention": "Retenția datelor",
@@ -3012,6 +3089,54 @@
     "videoPlayer": {
       "unavailable": "Videoclip indisponibil",
       "openInNewTab": "Deschideți într-o filă nouă"
+    },
+    "guided": {
+      "title": "Cum este evenimentul tău?",
+      "intro": "Patru întrebări pentru a începe cu setările potrivite. Fiecare funcție poate fi activată sau dezactivată și în timpul evenimentului.",
+      "peopleQ": "Câte persoane aștepți?",
+      "people": {
+        "piccolo": "Până la 20",
+        "medio": "Până la 100",
+        "grande": "Peste 100"
+      },
+      "peopleHint": "Este o estimare pentru pregătirea sălii, nu o limită a înscrierilor.",
+      "voiceQ": "Cine poate vorbi și apărea pe video?",
+      "voice": {
+        "all": "Toți",
+        "allDesc": "Chat, microfon, video și ecran pentru toți",
+        "speakers": "Vorbitori și moderatori",
+        "speakersDesc": "Publicul scrie în chat și pune întrebări"
+      },
+      "recQ": "Vrei să poți înregistra?",
+      "rec": {
+        "yes": "Da, când apeși REC",
+        "yesDesc": "După eveniment: transcriere, rezumat și traducere",
+        "no": "Nu",
+        "noDesc": "Fără înregistrare, fără consimțământ de cerut"
+      },
+      "preview": "Evenimentul tău",
+      "previewPeople": "Participanți așteptați: circa {count}",
+      "continue": "Continuă",
+      "useTemplate": "Sau folosește un șablon",
+      "summary": {
+        "piccolo": "Până la 20 de persoane",
+        "medio": "Până la 100 de persoane",
+        "grande": "Peste 100 de persoane",
+        "tutti": "toți pe video",
+        "relatori": "vorbesc vorbitorii",
+        "si": "cu înregistrare",
+        "no": "fără înregistrare",
+        "openAccess": "deschis tuturor",
+        "inviteOnly": "doar pe bază de invitație"
+      },
+      "accessQ": "Cine poate participa?",
+      "access": {
+        "open": "Oricine se înscrie",
+        "openDesc": "Cine dorește se înscrie din pagina evenimentului",
+        "invitation": "Doar cei invitați de tine",
+        "invitationDesc": "Pagina rămâne vizibilă, dar se pot înscrie doar invitații; fără înscriere nu se intră"
+      },
+      "previewInvitation": "Se pot înscrie doar persoanele invitate de tine; nimeni nu intră fără înscriere."
     }
   },
   "email": {

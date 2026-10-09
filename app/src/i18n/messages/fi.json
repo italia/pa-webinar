@@ -742,7 +742,7 @@
       "updateEvent": "Päivitä tapahtuma",
       "step1": {
         "heading": "Perustiedot",
-        "intro": "Tapahtuman nimi, kuvaus, kuva ja aikataulu.",
+        "intro": "Tapahtuman otsikko, kuvaus ja kuva.",
         "coverImage": "Kansikuva",
         "coverImageHelp": "Näytetään julkisella sivustolla ja ilmoittautuneille lähetettävissä sähköposteissa.",
         "scheduleHeading": "Aikataulu",
@@ -751,8 +751,6 @@
         "tagsHeading": "Kategoriat (tagit)",
         "waitingRoomAudio": "Odotushuoneen ääni (valinnainen)",
         "waitingRoomAudioHelp": "Toistetaan ennen videopuhelun alkamista.",
-        "parseTitleKickerLabel": "Otsikko ja yläotsikko (erotin |)",
-        "parseTitleKickerHelp": "Käytössä esim. otsikko 'KONFERENSSI | Digitaalinen innovaatio' näyttää KONFERENSSI yläotsikkona.",
         "maxParticipantsHelp": "Arvio odotetuista osallistujista: sen mukaan mitoitetaan videopalvelin, eikä se rajoita ilmoittautumisia.",
         "validation": {
           "startsAt": "Virheellinen alkamispäivä.",
@@ -782,7 +780,11 @@
           "HIGH": "Korkea (720p, suositeltu)",
           "BALANCED": "Tasapainoinen (540p)",
           "SAVE_DATA": "Datansäästö (360p)"
-        }
+        },
+        "requiredLegend": "*-merkityt kentät tarvitaan tapahtuman tallentamiseen: niin kauan kuin ne ovat tyhjiä, se lukee jokaisen kohdalla.",
+        "kickerHint": "Kirjoita yläotsikko ennen otsikkoa ja erota ne merkillä |, esimerkiksi ”Tapaamissarja | Ensimmäinen tapaaminen”.",
+        "kickerUse": "Näytä ”{kicker}” yläotsikkona",
+        "kickerPreview": "Näin se näkyy tapahtuman sivulla"
       },
       "step2": {
         "heading": "Kuka voi tehdä mitäkin",
@@ -841,7 +843,8 @@
             "name": "Osallistuja",
             "desc": "Seuraa tapahtumaa ja osallistuu niin kuin alla olevassa taulukossa päätät."
           }
-        }
+        },
+        "recordingManualNote": "Tallennus ei koskaan ala itsestään: juontaja käynnistää sen REC-painikkeella."
       },
       "step3": {
         "heading": "Henkilöt ja kutsut",
@@ -873,7 +876,7 @@
         "personName": "Nimi",
         "personEmail": "Sähköposti",
         "peopleHeading": "Tapahtuman henkilöt",
-        "peopleHelp": "Järjestäjät, moderaattorit ja puhujat. Jokainen saa oman linkin osallistuakseen roolissaan; mitä kukin rooli voi tehdä, näkyy vaiheessa ”Oikeudet”.",
+        "peopleHelp": "Järjestäjät, moderaattorit ja puhujat. Jokainen saa oman linkin osallistuakseen roolissaan; mitä kukin rooli voi tehdä, näkyy kohdassa ”Lisäasetukset”.",
         "personRole": "Rooli",
         "roleOrganizer": "Järjestäjä",
         "roleModerator": "Moderaattori",
@@ -893,7 +896,17 @@
         "invitationsHelpOpen": "Valinnainen: luettelo kutsumistasi henkilöistä. Ilmoittautuminen on avoin, joten julkaisun jälkeen kuka tahansa voi ilmoittautua, kutsuttu tai ei. Alusta ei lähetä kutsuja: jaa tapahtuman linkki itse.",
         "invitationsHelpRestricted": "Ilmoittautuminen on rajattu: vain tämän luettelon osoitteet voivat ilmoittautua. Alusta ei lähetä kutsuja: jaa tapahtuman linkki itse; liittymislinkki tulee sähköpostilla ilmoittautumisen jälkeen.",
         "logoExternal": "Julkisella sivulla näkyvät vain tälle alustalle ladatut logot: toiselta sivustolta tuleva logo ei näy.",
-        "primaryProfileInvalid": "Tarkista organisaatio ja logon osoite."
+        "primaryProfileInvalid": "Tarkista organisaatio ja logon osoite.",
+        "primaryMore": "Organisaatio, logo ja julkinen sivu",
+        "accessHeading": "Kuka ilmoittautuu",
+        "accessSiteDefault": "Noudattaa sivuston asetusta: jos ylläpito muuttaa sitä, muutos koskee myös tätä tapahtumaa.",
+        "accessNoInvitees": "Ei vielä kutsuttuja: niin kauan kuin alla oleva luettelo on tyhjä, kukaan ei voi ilmoittautua.",
+        "askHeading": "Mitä kysymme ilmoittautuvilta",
+        "askAlways": "Nimi ja sähköposti aina. Lisäksi tarvittaessa:",
+        "askOrganization": "Organisaatio (pakollinen ilmoittautumiseen)",
+        "askRole": "Rooli (valinnainen)",
+        "askType": "Organisaation tyyppi (valinnainen)",
+        "accessStaffOnly": "Ilmoittautujista päättää tapahtuman henkilökunta."
       },
       "step4": {
         "heading": "Sisältö ja materiaalit",
@@ -941,7 +954,7 @@
       },
       "step5": {
         "heading": "Yhteenveto ja julkaisu",
-        "intro": "Tarkista tiedot ja julkaise tapahtuma (tai tallenna luonnoksena).",
+        "intro": "Tapahtuma sellaisena kuin muut sen näkevät: tarkista se ja julkaise tai tallenna luonnoksena.",
         "summary": {
           "title": "Otsikko",
           "schedule": "Aikataulu",
@@ -1000,7 +1013,70 @@
       "publishFailedDetail": "Tapahtuma luotiin, mutta sitä ei julkaistu: se on yhä luonnos. Palvelin vastasi: {reason}. Julkaise se tapahtuman sivulta.",
       "toFix": "Korjattavat:",
       "toFixField": "Kenttä {n}",
-      "stepsAriaLabel": "Tapahtumalomakkeen vaiheet"
+      "stepsAriaLabel": "Tapahtumalomakkeen vaiheet",
+      "flow": {
+        "steps": {
+          "base": "Tapahtuma",
+          "schedule": "Milloin",
+          "invites": "Henkilöt",
+          "review": "Yhteenveto",
+          "advanced": "Lisäasetukset"
+        },
+        "templateInUse": "Malli: <b>{name}</b>",
+        "noTemplate": "Tapahtuma ilman mallia",
+        "changeTemplate": "Vaihda mallia",
+        "chooseTemplate": "Valitse malli",
+        "backToReview": "Takaisin yhteenvetoon",
+        "participantsCan": "Osallistujat: {list}",
+        "none": "ei mitään",
+        "recordingManual": "Käytettävissä: alkaa vasta, kun juontaja painaa REC.",
+        "aiAfter": "Tallennuksen jälkeen: {list}.",
+        "scheduleHeading": "Milloin se järjestetään",
+        "scheduleIntro": "Päivä, kellonaika ja odotettu osallistujamäärä: niillä tila valmistellaan.",
+        "advancedIntro": "Mallin jo valitsemat arvot: muuta vain tarvittava.",
+        "advancedIntroTemplate": "Mallin ”{name}” jo valitsemat arvot: muuta vain tarvittava.",
+        "requiredToSave": "Tarvitaan tapahtuman tallentamiseen.",
+        "requiredToPublish": "Tarvitaan tapahtuman julkaisemiseen.",
+        "toComplete": "Täydennettävä",
+        "missingHeading": "Julkaisemisesta puuttuu vielä:",
+        "fieldOrganizerName": "Pääjärjestäjän nimi",
+        "fieldOrganizerEmail": "Pääjärjestäjän sähköposti",
+        "capacityWarning": "Kapasiteetti tarkistettava teknisistä tiedoista.",
+        "sections": {
+          "participation": "Osallistuminen ja tilan toiminnot",
+          "recording": "Tallenne ja tekoäly",
+          "content": "Sisältö: materiaalit ja kyselyt",
+          "room": "Odotustila ja video",
+          "data": "Tietosuoja, tiedot ja sivu tapahtuman jälkeen",
+          "technical": "Tekniset tiedot: kapasiteetti ja resurssit"
+        },
+        "formatInUse": "Muoto: <b>{name}</b>",
+        "changeFormat": "Vaihda muotoa",
+        "voiceAll": "Kaikki puhuvat ja näkyvät videolla",
+        "voiceSpeakers": "Puhujat ja juontajat puhuvat ja näkyvät videolla; yleisö kirjoittaa chattiin",
+        "features": "Toiminnot: {list}",
+        "liveToggleNote": "Jokaisen toiminnon voi kytkeä päälle ja pois myös tapahtuman aikana.",
+        "customize": "Mukauta asetuksia",
+        "changeLanguages": "Vaihda kieliä",
+        "translationLine": "Käännös kielille: {list}",
+        "privacyTemplate": "Tietosuojaseloste: {name}",
+        "privacyCustom": "Tietosuojaseloste: tapahtumaa varten kirjoitettu teksti",
+        "privacyDocument": "Tietosuojaseloste: tapahtuman asiakirja",
+        "privacySite": "Tietosuojaseloste: sivuston",
+        "untitled": "Nimetön tapahtuma",
+        "carriedOver": "Säilytimme sen, mitä olit kirjoittanut tapahtumasta.",
+        "startOver": "Aloita alusta",
+        "accessOpen": "Kuka tahansa voi ilmoittautua tapahtuman sivulla.",
+        "accessInvitation": "Vain kutsutuille. Kutsuttuja: {count}.",
+        "addInvitees": "Lisää kutsuttuja",
+        "change": "Muuta",
+        "askLine": "Ilmoittautuessa kysymme: {list}.",
+        "askName": "nimi",
+        "askEmail": "sähköposti",
+        "askOrganization": "organisaatio",
+        "askRole": "rooli",
+        "askType": "organisaation tyyppi"
+      }
     },
     "nav": {
       "events": "Tapahtumat",
@@ -1784,9 +1860,9 @@
         "statusPageEnabled": "Tilasivu käytössä",
         "statusPageEnabledHelp": "Julkaisee palvelun tilasivun. Kun asetus on pois käytöstä, sivua ei ole ja sen tiedot näkyvät vain ylläpitäjille.",
         "guestAccessEnabled": "Vieraspääsy käytössä",
-        "guestAccessEnabledHelp": "Ilmoittautumattomat voivat liittyä käynnissä oleviin tapahtumiin pelkällä nimellään. Kun asetus on pois käytöstä, suunniteltuihin tapahtumiin pääsee vain ilmoittautumalla tai moderaattorin tai puhujan linkillä; pikavideopuhelut pysyvät avoimina kaikille, joilla on linkki.",
+        "guestAccessEnabledHelp": "Ilmoittautumattomat voivat liittyä käynnissä oleviin tapahtumiin pelkällä nimellään. Kun asetus on pois käytöstä, suunniteltuihin tapahtumiin pääsee vain ilmoittautumalla tai moderaattorin tai puhujan linkillä; pikavideopuhelut pysyvät avoimina kaikille, joilla on linkki. Vain kutsutuille tarkoitettuun tapahtumaan ei koskaan päästetä vieraita.",
         "publicRegistrationEnabled": "Julkinen rekisteröityminen käytössä",
-        "publicRegistrationEnabledHelp": "Kuka tahansa voi ilmoittautua tapahtumiin. Kun asetus on pois käytöstä, vain tapahtuman kutsuttujen luettelossa olevat voivat ilmoittautua, ja henkilökohtainen linkki lähetetään vain sähköpostitse; jo ilmoittautuneet sekä moderaattorien ja puhujien linkit toimivat edelleen.",
+        "publicRegistrationEnabledHelp": "Kuka tahansa voi ilmoittautua tapahtumiin. Kun asetus on pois käytöstä, vain tapahtuman kutsuttujen luettelossa olevat voivat ilmoittautua, ja henkilökohtainen linkki lähetetään vain sähköpostitse; jo ilmoittautuneet sekä moderaattorien ja puhujien linkit toimivat edelleen. Tämä on uusille tapahtumille ehdotettu valinta: kukin tapahtuma voi valita toisin vaiheessa ”Henkilöt”.",
         "calendarPublic": "Julkinen kalenteri",
         "calendarPublicHelp": "Julkaise tapahtumakalenteri. Kävijät voivat nähdä suunnitellut tapahtumat.",
         "parseTitleKicker": "Toimitukselliset yläotsikot otsikossa",
@@ -2406,7 +2482,8 @@
       "toggles": {
         "unmute": "Osallistujat voivat avata mikrofonin",
         "video": "Osallistujat voivat avata videon",
-        "screenShare": "Osallistujat voivat jakaa näytön"
+        "screenShare": "Osallistujat voivat jakaa näytön",
+        "openRegistration": "Ilmoittautuminen avoin kaikille"
       },
       "fields": {
         "dataRetention": "Tietojen säilytys",
@@ -3012,6 +3089,54 @@
     "videoPlayer": {
       "unavailable": "Video ei ole saatavilla",
       "openInNewTab": "Avaa uudessa välilehdessä"
+    },
+    "guided": {
+      "title": "Millainen tapahtumasi on?",
+      "intro": "Neljä kysymystä, joilla aloitat oikeilla asetuksilla. Jokaisen toiminnon voi kytkeä päälle tai pois myös tapahtuman aikana.",
+      "peopleQ": "Kuinka monta osallistujaa odotat?",
+      "people": {
+        "piccolo": "Enintään 20",
+        "medio": "Enintään 100",
+        "grande": "Yli 100"
+      },
+      "peopleHint": "Arvio tilan valmistelua varten, ei ilmoittautumisten raja.",
+      "voiceQ": "Kuka saa puhua ja näkyä videolla?",
+      "voice": {
+        "all": "Kaikki",
+        "allDesc": "Chat, mikrofoni, video ja näyttö kaikille",
+        "speakers": "Puhujat ja juontajat",
+        "speakersDesc": "Yleisö kirjoittaa chattiin ja esittää kysymyksiä"
+      },
+      "recQ": "Haluatko voida tallentaa?",
+      "rec": {
+        "yes": "Kyllä, kun painat REC",
+        "yesDesc": "Tapahtuman jälkeen: litterointi, tiivistelmä ja käännös",
+        "no": "Ei",
+        "noDesc": "Ei tallennusta, ei pyydettävää suostumusta"
+      },
+      "preview": "Tapahtumasi",
+      "previewPeople": "Odotetut osallistujat: noin {count}",
+      "continue": "Jatka",
+      "useTemplate": "Tai käytä mallia",
+      "summary": {
+        "piccolo": "Enintään 20 henkilöä",
+        "medio": "Enintään 100 henkilöä",
+        "grande": "Yli 100 henkilöä",
+        "tutti": "kaikki videolla",
+        "relatori": "puhujat puhuvat",
+        "si": "tallenteella",
+        "no": "ilman tallennetta",
+        "openAccess": "avoin kaikille",
+        "inviteOnly": "vain kutsutuille"
+      },
+      "accessQ": "Kuka voi osallistua?",
+      "access": {
+        "open": "Kuka tahansa, joka ilmoittautuu",
+        "openDesc": "Kuka tahansa voi ilmoittautua tapahtuman sivulla",
+        "invitation": "Vain kutsumasi",
+        "invitationDesc": "Sivu pysyy näkyvissä, mutta vain kutsutut voivat ilmoittautua; ilman ilmoittautumista ei pääse sisään"
+      },
+      "previewInvitation": "Vain kutsumasi voivat ilmoittautua; kukaan ei pääse sisään ilmoittautumatta."
     }
   },
   "email": {

@@ -4,7 +4,15 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 
 import { useRouter, percorso } from '@/i18n/navigation';
+import GuidedFormat from '@/components/admin/guided-format';
 import TemplatePicker from '@/components/admin/template-picker';
+import {
+  FORMATO_PREDEFINITO,
+  codificaFormato,
+  decodificaFormato,
+  presetDaFormato,
+  type FormatoGuidato,
+} from '@/lib/events/guided-format';
 import EventWizard from '@/components/admin/event-wizard/wizard-shell';
 import type { PermissionMatrix } from '@/lib/utils/permission-matrix';
 import CreateInstantCall from '@/components/admin/create-instant-call';
@@ -79,6 +87,10 @@ interface Props {
   /** Apre direttamente il modulo della chiamata rapida (dal pulsante della
    *  lista eventi), senza passare dalla scelta del modello. */
   initialInstant?: boolean;
+  /** `?formato=`: le quattro risposte, che aprono il wizard con i loro valori. */
+  formatoParam?: string | null;
+  /** `?scegli=`: si torna alle quattro domande con queste risposte gia' date. */
+  scegliParam?: string | null;
 }
 
 export default function CreateEventWithTemplate({
@@ -101,12 +113,16 @@ export default function CreateEventWithTemplate({
   defaultModerator = null,
   publicRegistrationEnabled = true,
   initialInstant = false,
+  formatoParam = null,
+  scegliParam = null,
 }: Props) {
   const t = useTranslations('admin.templates');
+  const tg = useTranslations('admin.guided');
   const ti = useTranslations('admin.instantCall');
   const router = useRouter();
-  const [skipped, setSkipped] = useState(false);
   const [showInstant, setShowInstant] = useState(initialInstant);
+  // Le quattro risposte nell'indirizzo: aprono il wizard con i loro valori.
+  const formato: FormatoGuidato | null = selectedTemplate ? null : decodificaFormato(formatoParam);
 
   if (showInstant) {
     return (
@@ -123,16 +139,79 @@ export default function CreateEventWithTemplate({
     );
   }
 
-  const showPicker =
-    !selectedTemplate && !skipped && templates.length > 0;
+  const wizard = (props: {
+    template: React.ComponentProps<typeof EventWizard>['template'];
+    formatoLabel?: string;
+    onChangeTemplate: (stato: { invitati: boolean }) => void;
+  }) => (
+    <EventWizard
+      // Un formato o un modello diverso e' un modulo nuovo: i valori di
+      // partenza non restano quelli del precedente.
+      key={props.template?.id ?? 'vuoto'}
+      template={props.template}
+      formatoLabel={props.formatoLabel}
+      onChangeTemplate={props.onChangeTemplate}
+      siteTimezone={siteTimezone}
+      enabledLocales={enabledLocales}
+      defaultLocale={defaultLocale}
+      defaultSenderRatioPct={defaultSenderRatioPct}
+      defaultRetentionDays={defaultRetentionDays}
+      canUseRubrica={canUseRubrica}
+      jvbSizingConfig={jvbSizingConfig}
+      availableTags={availableTags}
+      gdprTemplates={gdprTemplates}
+      siteDefaultParseTitleKicker={siteDefaultParseTitleKicker}
+      siteDefaultVideoQuality={siteDefaultVideoQuality}
+      whiteboardInfraReady={whiteboardInfraReady}
+      defaultTargetLocales={defaultTargetLocales}
+      aiPipelineEnabled={aiPipelineEnabled}
+      defaultModerator={defaultModerator}
+      publicRegistrationEnabled={publicRegistrationEnabled}
+    />
+  );
 
-  if (showPicker) {
-    return (
-      <div>
-        <h4 className="fw-semibold mb-3" style={{ color: 'var(--app-text)' }}>
-          {t('pickerTitle')}
-        </h4>
+  // Un modello: si torna alle quattro domande per cambiarlo.
+  if (selectedTemplate) {
+    return wizard({
+      template: selectedTemplate,
+      // Le domande ripartono dai loro valori, ma con chi partecipa come lo si
+      // vede ora: una scelta «solo su invito» non si perde cambiando modello.
+      onChangeTemplate: ({ invitati }) =>
+        router.push(
+          percorso(
+            invitati
+              ? `/admin/events/new?scegli=${codificaFormato({ ...FORMATO_PREDEFINITO, accesso: 'invitati' })}`
+              : '/admin/events/new',
+          ),
+        ),
+    });
+  }
 
+  // Le quattro risposte: il wizard parte dai loro valori, e «Cambia formato»
+  // riporta alle domande con le risposte gia' date.
+  if (formato) {
+    const nome = [
+      tg(`summary.${formato.persone}`),
+      tg(`summary.${formato.voce}`),
+      tg(`summary.${formato.registra}`),
+      tg(formato.accesso === 'invitati' ? 'summary.inviteOnly' : 'summary.openAccess'),
+    ].join(' · ');
+    return wizard({
+      template: presetDaFormato(formato, nome, publicRegistrationEnabled),
+      formatoLabel: nome,
+      // Chi partecipa come lo si vede ora: cambiato nel passo «Persone», le
+      // domande lo mostrano cosi'.
+      onChangeTemplate: ({ invitati }) =>
+        router.push(
+          percorso(
+            `/admin/events/new?scegli=${codificaFormato({ ...formato, accesso: invitati ? 'invitati' : 'tutti' })}`,
+          ),
+        ),
+    });
+  }
+
+  return (
+    <div>
         <div className="mb-4">
           <button
             type="button"
@@ -177,36 +256,27 @@ export default function CreateEventWithTemplate({
           </button>
         </div>
 
-        <TemplatePicker
-          templates={templates}
-          onSelect={(tpl) => {
-            router.push(percorso(`/admin/events/new?template=${tpl.id}`));
-          }}
-          onSkip={() => setSkipped(true)}
-        />
-      </div>
-    );
-  }
-
-  return (
-    <EventWizard
-      template={selectedTemplate ?? undefined}
-      siteTimezone={siteTimezone}
-      enabledLocales={enabledLocales}
-      defaultLocale={defaultLocale}
-      defaultSenderRatioPct={defaultSenderRatioPct}
-      defaultRetentionDays={defaultRetentionDays}
-      canUseRubrica={canUseRubrica}
-      jvbSizingConfig={jvbSizingConfig}
-      availableTags={availableTags}
-      gdprTemplates={gdprTemplates}
-      siteDefaultParseTitleKicker={siteDefaultParseTitleKicker}
-      siteDefaultVideoQuality={siteDefaultVideoQuality}
-      whiteboardInfraReady={whiteboardInfraReady}
-      defaultTargetLocales={defaultTargetLocales}
-      aiPipelineEnabled={aiPipelineEnabled}
-      defaultModerator={defaultModerator}
-      publicRegistrationEnabled={publicRegistrationEnabled}
-    />
+        <GuidedFormat
+          initial={decodificaFormato(scegliParam)}
+          accessoPredefinito={publicRegistrationEnabled ? 'tutti' : 'invitati'}
+          aiPipelineEnabled={aiPipelineEnabled}
+          onContinue={(f) => router.push(percorso(`/admin/events/new?formato=${codificaFormato(f)}`))}
+        >
+          {templates.length > 0 && (
+            <details className="formato-modelli">
+              <summary>{tg('useTemplate')}</summary>
+              <div className="pt-3">
+                <TemplatePicker
+                  showSubtitle={false}
+                  templates={templates}
+                  onSelect={(tpl) => {
+                    router.push(percorso(`/admin/events/new?template=${tpl.id}`));
+                  }}
+                />
+              </div>
+            </details>
+          )}
+        </GuidedFormat>
+    </div>
   );
 }

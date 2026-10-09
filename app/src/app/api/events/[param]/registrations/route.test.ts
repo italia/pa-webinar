@@ -197,6 +197,60 @@ describe('POST registrations — iscrizione pubblica spenta', () => {
   });
 });
 
+describe('POST registrations — l ente quando l evento lo chiede', () => {
+  it('senza ente: 422, nessuna iscrizione', async () => {
+    vi.mocked(prisma.event.findUnique).mockResolvedValue({
+      id: EVENT_ID,
+      slug: SLUG,
+      status: 'PUBLISHED',
+      eventType: 'SCHEDULED',
+      endsAt: new Date(Date.now() + 3_600_000),
+      recordingEnabled: false,
+      multitrackRecordingEnabled: false,
+      requireOrganization: true,
+      accessMode: null,
+      _count: { registrations: 0 },
+    } as never);
+    const res = await iscriviti('anna@example.com');
+    expect(res.status).toBe(422);
+    expect(tx.registration.create).not.toHaveBeenCalled();
+  });
+});
+
+describe('POST registrations — la scelta dell evento vale sopra quella del sito', () => {
+  function evento(accessMode: 'OPEN' | 'INVITATION') {
+    vi.mocked(prisma.event.findUnique).mockResolvedValue({
+      id: EVENT_ID,
+      slug: SLUG,
+      status: 'PUBLISHED',
+      eventType: 'SCHEDULED',
+      endsAt: new Date(Date.now() + 3_600_000),
+      recordingEnabled: false,
+      multitrackRecordingEnabled: false,
+      accessMode,
+      _count: { registrations: 0 },
+    } as never);
+  }
+
+  it('solo su invito, con il sito aperto: chi non e invitato non si iscrive', async () => {
+    siteSettings.publicRegistrationEnabled = true;
+    evento('INVITATION');
+    const res = await iscriviti('anna@example.com');
+    expect(res.status).toBe(202);
+    expect(tx.registration.create).not.toHaveBeenCalled();
+    expect(sendConfirmationEmail).not.toHaveBeenCalled();
+  });
+
+  it('aperto, con il sito solo su invito: chiunque si iscrive', async () => {
+    siteSettings.publicRegistrationEnabled = false;
+    evento('OPEN');
+    const res = await iscriviti('anna@example.com');
+    expect(res.status).toBe(201);
+    expect(tx.registration.create).toHaveBeenCalledTimes(1);
+    expect(tx.eventInvitation.findFirst).not.toHaveBeenCalled();
+  });
+});
+
 describe('POST registrations — consensi secondo il formato dell\'evento', () => {
   function evento(over: Record<string, unknown>) {
     vi.mocked(prisma.event.findUnique).mockResolvedValue({

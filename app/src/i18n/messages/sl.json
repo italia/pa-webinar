@@ -742,7 +742,7 @@
       "updateEvent": "Posodobi dogodek",
       "step1": {
         "heading": "Osnovne informacije",
-        "intro": "Naslov, opis, slika in razpored dogodka.",
+        "intro": "Naslov, opis in slika dogodka.",
         "coverImage": "Naslovna slika",
         "coverImageHelp": "Prikazana na javni strani in v e-poštnih sporočilih prijavljenim.",
         "scheduleHeading": "Koledar",
@@ -751,8 +751,6 @@
         "tagsHeading": "Kategorije (oznake)",
         "waitingRoomAudio": "Zvok čakalnice (neobvezno)",
         "waitingRoomAudioHelp": "Predvajan pred začetkom video klica.",
-        "parseTitleKickerLabel": "Naslov z nadnaslovom (ločilo |)",
-        "parseTitleKickerHelp": "Ko je aktivno, bo naslov, kot je „KONFERENCA | Digitalna inovacija“, prikazal KONFERENCA kot nadnaslov.",
         "maxParticipantsHelp": "Ocena pričakovanega števila oseb: služi za dimenzioniranje video strežnika in ne omejuje prijav.",
         "validation": {
           "startsAt": "Neveljaven datum začetka.",
@@ -782,7 +780,11 @@
           "HIGH": "Visoka (720p, priporočeno)",
           "BALANCED": "Uravnotežena (540p)",
           "SAVE_DATA": "Varčevanje s podatki (360p)"
-        }
+        },
+        "requiredLegend": "Polja, označena z *, so potrebna za shranjevanje dogodka: dokler so prazna, je to navedeno pri vsakem.",
+        "kickerHint": "Za nadnaslov ga napišite pred naslov in ju ločite z |, na primer »Cikel srečanj | Prvo srečanje«.",
+        "kickerUse": "Prikaži »{kicker}« kot nadnaslov",
+        "kickerPreview": "Tako je videti na strani dogodka"
       },
       "step2": {
         "heading": "Kdo lahko kaj počne",
@@ -841,7 +843,8 @@
             "name": "Udeleženec",
             "desc": "Spremlja dogodek in sodeluje, kot določite v spodnji tabeli."
           }
-        }
+        },
+        "recordingManualNote": "Snemanje se nikoli ne začne samo: moderator ga zažene z gumbom REC."
       },
       "step3": {
         "heading": "Osebe in vabila",
@@ -873,7 +876,7 @@
         "personName": "Ime",
         "personEmail": "E-pošta",
         "peopleHeading": "Osebe dogodka",
-        "peopleHelp": "Organizatorji, moderatorji in govorniki. Vsak prejme svojo povezavo za vstop s svojo vlogo; kaj lahko počne vsaka vloga, prikazuje korak »Dovoljenja«.",
+        "peopleHelp": "Organizatorji, moderatorji in govorniki. Vsak prejme svojo povezavo za vstop s svojo vlogo; kaj lahko počne vsaka vloga, prikazuje razdelek »Napredne nastavitve«.",
         "personRole": "Vloga",
         "roleOrganizer": "Organizator",
         "roleModerator": "Moderator",
@@ -893,7 +896,17 @@
         "invitationsHelpOpen": "Neobvezno: seznam oseb, ki jih povabite. Prijava je odprta, zato se po objavi lahko prijavi kdorkoli, povabljen ali ne. Platforma ne pošilja vabil: povezavo do dogodka delite sami.",
         "invitationsHelpRestricted": "Prijava je omejena: prijavijo se lahko samo naslovi s tega seznama. Platforma ne pošilja vabil: povezavo do dogodka delite sami; povezava za vstop pride po e-pošti po prijavi.",
         "logoExternal": "Javna stran prikazuje samo logotipe, naložene na to platformo: logotip z drugega spletnega mesta ne bo prikazan.",
-        "primaryProfileInvalid": "Preverite organizacijo in naslov logotipa."
+        "primaryProfileInvalid": "Preverite organizacijo in naslov logotipa.",
+        "primaryMore": "Ustanova, logotip in javna stran",
+        "accessHeading": "Kdo se prijavi",
+        "accessSiteDefault": "Sledi nastavitvi spletnega mesta: če jo uprava spremeni, velja tudi za ta dogodek.",
+        "accessNoInvitees": "Še ni povabljenih: dokler je spodnji seznam prazen, se nihče ne more prijaviti.",
+        "askHeading": "Kaj vprašamo tiste, ki se prijavijo",
+        "askAlways": "Ime in e-pošto vedno. Poleg tega, če potrebujete:",
+        "askOrganization": "Organizacija (obvezno za prijavo)",
+        "askRole": "Vloga (neobvezno)",
+        "askType": "Vrsta organizacije (neobvezno)",
+        "accessStaffOnly": "Kdo se lahko prijavi, odloča ekipa dogodka."
       },
       "step4": {
         "heading": "Vsebine in gradiva",
@@ -941,7 +954,7 @@
       },
       "step5": {
         "heading": "Povzetek in objava",
-        "intro": "Preverite informacije in objavite dogodek (ali ga shranite kot osnutek).",
+        "intro": "Dogodek, kot ga bodo videli drugi: preverite ga, nato ga objavite ali shranite kot osnutek.",
         "summary": {
           "title": "Naslov",
           "schedule": "Koledar",
@@ -1000,7 +1013,70 @@
       "publishFailedDetail": "Dogodek je bil ustvarjen, vendar ni bil objavljen: ostaja osnutek. Strežnik je odgovoril: {reason}. Objavite ga na strani dogodka.",
       "toFix": "Za popravek:",
       "toFixField": "Polje {n}",
-      "stepsAriaLabel": "Koraki obrazca dogodka"
+      "stepsAriaLabel": "Koraki obrazca dogodka",
+      "flow": {
+        "steps": {
+          "base": "Dogodek",
+          "schedule": "Kdaj",
+          "invites": "Osebe",
+          "review": "Povzetek",
+          "advanced": "Napredne nastavitve"
+        },
+        "templateInUse": "Predloga: <b>{name}</b>",
+        "noTemplate": "Dogodek brez predloge",
+        "changeTemplate": "Zamenjaj predlogo",
+        "chooseTemplate": "Izberi predlogo",
+        "backToReview": "Nazaj na povzetek",
+        "participantsCan": "Udeleženci: {list}",
+        "none": "nobene",
+        "recordingManual": "Na voljo: začne se šele, ko moderator pritisne REC.",
+        "aiAfter": "Po snemanju: {list}.",
+        "scheduleHeading": "Kdaj poteka",
+        "scheduleIntro": "Datum, ura in koliko ljudi pričakujete: po tem se pripravi dvorana.",
+        "advancedIntro": "Vrednosti, ki jih je predloga že izbrala: spremenite le, kar je treba.",
+        "advancedIntroTemplate": "Vrednosti, ki jih je predloga »{name}« že izbrala: spremenite le, kar je treba.",
+        "requiredToSave": "Potrebno za shranjevanje dogodka.",
+        "requiredToPublish": "Potrebno za objavo dogodka.",
+        "toComplete": "Za dopolnitev",
+        "missingHeading": "Za objavo še manjka:",
+        "fieldOrganizerName": "Ime glavnega organizatorja",
+        "fieldOrganizerEmail": "E-pošta glavnega organizatorja",
+        "capacityWarning": "Zmogljivost preverite v tehničnih podrobnostih.",
+        "sections": {
+          "participation": "Udeležba in funkcije dvorane",
+          "recording": "Snemanje in UI",
+          "content": "Vsebine: gradiva in vprašalniki",
+          "room": "Čakalnica in video",
+          "data": "Zasebnost, podatki in stran po dogodku",
+          "technical": "Tehnične podrobnosti: zmogljivost in viri"
+        },
+        "formatInUse": "Oblika: <b>{name}</b>",
+        "changeFormat": "Spremeni obliko",
+        "voiceAll": "Vsi govorijo in se kažejo na videu",
+        "voiceSpeakers": "Govorijo in se kažejo na videu govorci in moderatorji; občinstvo piše v klepet",
+        "features": "Funkcije: {list}",
+        "liveToggleNote": "Vsako funkcijo lahko vklopite in izklopite tudi med dogodkom.",
+        "customize": "Prilagodi nastavitve",
+        "changeLanguages": "Spremeni jezike",
+        "translationLine": "Prevod v: {list}",
+        "privacyTemplate": "Obvestilo o zasebnosti: {name}",
+        "privacyCustom": "Obvestilo o zasebnosti: besedilo, napisano za dogodek",
+        "privacyDocument": "Obvestilo o zasebnosti: dokument dogodka",
+        "privacySite": "Obvestilo o zasebnosti: tisto s spletnega mesta",
+        "untitled": "Dogodek brez naslova",
+        "carriedOver": "Ohranili smo, kar ste napisali o dogodku.",
+        "startOver": "Začni znova",
+        "accessOpen": "Prijavi se lahko vsak na strani dogodka.",
+        "accessInvitation": "Samo na povabilo. Povabljenih: {count}.",
+        "addInvitees": "Dodaj povabljene",
+        "change": "Spremeni",
+        "askLine": "Ob prijavi vprašamo za: {list}.",
+        "askName": "ime",
+        "askEmail": "e-pošta",
+        "askOrganization": "organizacija",
+        "askRole": "vloga",
+        "askType": "vrsta organizacije"
+      }
     },
     "nav": {
       "events": "Dogodki",
@@ -1784,9 +1860,9 @@
         "statusPageEnabled": "Stran stanja aktivna",
         "statusPageEnabledHelp": "Objavi stran stanja storitve. Ko je izklopljena, stran ne obstaja, njene podatke pa vidijo samo skrbniki.",
         "guestAccessEnabled": "Dostop gostom aktiven",
-        "guestAccessEnabledHelp": "Neprijavljeni se lahko pridružijo dogodkom v teku samo s svojim imenom. Ko je izklopljeno, se na načrtovane dogodke vstopi samo s prijavo ali s povezavo za moderatorja ali govorca; takojšnji video klici ostanejo odprti za vse, ki imajo povezavo.",
+        "guestAccessEnabledHelp": "Neprijavljeni se lahko pridružijo dogodkom v teku samo s svojim imenom. Ko je izklopljeno, se na načrtovane dogodke vstopi samo s prijavo ali s povezavo za moderatorja ali govorca; takojšnji video klici ostanejo odprti za vse, ki imajo povezavo. Dogodek samo na povabilo nikoli ne sprejme gostov.",
         "publicRegistrationEnabled": "Javna registracija aktivna",
-        "publicRegistrationEnabledHelp": "Na dogodke se lahko prijavi kdorkoli. Ko je izklopljena, se lahko prijavijo samo osebe s seznama povabljenih na dogodek, osebna povezava za vstop pa se pošlje samo po e-pošti; že prijavljeni ter povezave moderatorjev in govorcev še naprej delujejo.",
+        "publicRegistrationEnabledHelp": "Na dogodke se lahko prijavi kdorkoli. Ko je izklopljena, se lahko prijavijo samo osebe s seznama povabljenih na dogodek, osebna povezava za vstop pa se pošlje samo po e-pošti; že prijavljeni ter povezave moderatorjev in govorcev še naprej delujejo. To je izbira, predlagana novim dogodkom: vsak dogodek se lahko v koraku »Osebe« odloči drugače.",
         "calendarPublic": "Javni koledar",
         "calendarPublicHelp": "Objavi koledar dogodkov. Obiskovalci lahko vidijo načrtovane dogodke.",
         "parseTitleKicker": "Naslovi z uredniškim podnaslovom",
@@ -2406,7 +2482,8 @@
       "toggles": {
         "unmute": "Udeleženci lahko govorijo",
         "video": "Udeleženci lahko vklopijo video",
-        "screenShare": "Udeleženci lahko delijo zaslon"
+        "screenShare": "Udeleženci lahko delijo zaslon",
+        "openRegistration": "Prijava odprta za vse"
       },
       "fields": {
         "dataRetention": "Hramba podatkov",
@@ -3012,6 +3089,54 @@
     "videoPlayer": {
       "unavailable": "Videoposnetek ni na voljo",
       "openInNewTab": "Odpri v novem zavihku"
+    },
+    "guided": {
+      "title": "Kakšen je vaš dogodek?",
+      "intro": "Štiri vprašanja za začetek s pravimi nastavitvami. Vsako funkcijo lahko vklopite ali izklopite tudi med dogodkom.",
+      "peopleQ": "Koliko ljudi pričakujete?",
+      "people": {
+        "piccolo": "Do 20",
+        "medio": "Do 100",
+        "grande": "Več kot 100"
+      },
+      "peopleHint": "To je ocena za pripravo dvorane, ne omejitev prijav.",
+      "voiceQ": "Kdo lahko govori in se pokaže na videu?",
+      "voice": {
+        "all": "Vsi",
+        "allDesc": "Klepet, mikrofon, video in zaslon za vse",
+        "speakers": "Govorci in moderatorji",
+        "speakersDesc": "Občinstvo piše v klepet in postavlja vprašanja"
+      },
+      "recQ": "Želite imeti možnost snemanja?",
+      "rec": {
+        "yes": "Da, ko pritisnete REC",
+        "yesDesc": "Po dogodku: prepis, povzetek in prevod",
+        "no": "Ne",
+        "noDesc": "Brez snemanja, brez soglasja"
+      },
+      "preview": "Vaš dogodek",
+      "previewPeople": "Pričakovani udeleženci: približno {count}",
+      "continue": "Nadaljuj",
+      "useTemplate": "Ali uporabite predlogo",
+      "summary": {
+        "piccolo": "Do 20 oseb",
+        "medio": "Do 100 oseb",
+        "grande": "Več kot 100 oseb",
+        "tutti": "vsi na videu",
+        "relatori": "govorijo govorci",
+        "si": "s snemanjem",
+        "no": "brez snemanja",
+        "openAccess": "odprto za vse",
+        "inviteOnly": "samo na povabilo"
+      },
+      "accessQ": "Kdo lahko sodeluje?",
+      "access": {
+        "open": "Vsak, ki se prijavi",
+        "openDesc": "Kdor želi, se prijavi na strani dogodka",
+        "invitation": "Samo povabljeni",
+        "invitationDesc": "Stran ostane vidna, a prijavijo se lahko samo povabljeni; brez prijave ni vstopa"
+      },
+      "previewInvitation": "Prijavijo se lahko samo tisti, ki jih povabite; brez prijave nihče ne vstopi."
     }
   },
   "email": {

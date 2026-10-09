@@ -138,10 +138,10 @@ export default async function EventDetailPage({
     cookieStore.get(eventAccessCookieName(event.id))?.value,
   ));
 
-  // Le due scelte dell'amministrazione che decidono i pulsanti della scheda:
-  // chi può iscriversi, e se in diretta si entra anche senza iscrizione.
+  // Le due scelte che decidono i pulsanti della scheda: chi può iscriversi,
+  // e se in diretta si entra anche senza iscrizione (dell'evento, o del sito).
   const registrationAccess = await registrationAccessFor(
-    event.id,
+    event,
     settings.publicRegistrationEnabled,
   );
   const guestEntryOpen = guestAccessAllowed(event, settings.guestAccessEnabled);

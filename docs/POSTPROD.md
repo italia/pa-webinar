@@ -1061,7 +1061,7 @@ points to this section.
     2. the site switch **Post-event pipeline active** (`aiPipelineEnabled`)
        in the site settings;
     3. per event, **Automatic transcription** and the other options in the
-       wizard's **Permissions** step.
+       wizard's advanced settings, section **Recording and AI**.
 11. **Check it.** Run a short test event with transcription on, or start one
     worker by hand with
     `kubectl create job -n pa-webinar --from=cronjob/pa-webinar-postprod-worker pa-webinar-postprod-worker-manual`
@@ -1280,8 +1280,11 @@ this table gives only their effect on the pipeline.
 
 ### Per-event settings
 
-In the event wizard, step **Permissions**, section **Automatic
-post-production**. An event template can pre-fill all of them.
+In the event wizard's advanced settings, section **Recording and AI**, under
+**Automatic post-production**. A format or an event template pre-fills them:
+recording an event turns on transcription, summary, translation (into the
+site's default languages, when there are some besides the transcription
+language) and per-participant recording.
 
 | Field | UI label | Effect |
 |---|---|---|

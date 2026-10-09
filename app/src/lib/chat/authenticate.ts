@@ -50,6 +50,7 @@ export async function authenticateChatSender(
       id: true,
       status: true,
       eventType: true,
+      accessMode: true,
       moderatorToken: true,
       moderatorName: true,
     },

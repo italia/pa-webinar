@@ -1,15 +1,21 @@
 'use client';
 
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useId, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
+import { Scelta } from '@/components/admin/guided-format';
 import RubricaPicker, {
   RubricaAccessContext,
   type RubricaPickedPerson,
 } from '@/components/admin/rubrica-picker';
 import FileOrUrlInput from '@/components/ui/file-or-url-input';
+import { Icon } from '@/components/ui/icon';
 import type { PersonRole } from '@/lib/events/grant-profile';
+import { accessModeDaSalvare, publicRegistrationFor } from '@/lib/events/access-mode';
 import { logoPubblico } from '@/lib/events/public-people';
+
+import { emailValida, nomeOrganizzatoreValido } from './validation';
+import type { EventAccessModeValue } from './wizard-shell';
 
 /** Un ente che organizza l'evento: compare nella pagina pubblica. */
 export interface OrganizerEntry {
@@ -85,34 +91,30 @@ interface Props {
   /** Con il solo link del moderatore gli inviti si vedono ma non si
    *  modificano: li gestisce lo staff. */
   invitationsLocked?: boolean;
-  /** L'organizzatore principale: riceve il link condiviso per condurre. */
+  /** L'organizzatore principale (lo compila PrimarySection, in cima al
+   *  passo): qui serve a non aggiungerlo una seconda volta fra le persone. */
   primary: LeadOrganizer;
-  onPrimaryChange: (patch: LeadOrganizerPatch) => void;
-  fieldErrors?: Record<string, string>;
-  /** Chi crea l'evento, precompilato: se lo conduce un'altra persona, il
-   *  link deve arrivare a lei. */
-  prefilledModeratorEmail?: string | null;
-  /** I link partono alla pubblicazione (evento nuovo o in bozza). */
-  showLinksOnPublish?: boolean;
   /** L'iscrizione pubblica dell'installazione (SiteSetting): decide che cosa
    *  vuol dire l'elenco degli invitati. */
   publicRegistrationEnabled?: boolean;
+  /** Cio' che sta in cima al passo, sotto il titolo: l'organizzatore
+   *  principale (PrimarySection). */
+  children?: React.ReactNode;
+  /** Prima degli inviti: chi si iscrive e cosa gli si chiede
+   *  (SezioneIscrizione). */
+  iscrizione?: React.ReactNode;
 }
 
-function isEmail(s: string): boolean {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
-}
+const isEmail = emailValida;
 
 export default function StepPeople({
   value,
   onChange,
   invitationsLocked = false,
   primary,
-  onPrimaryChange,
-  fieldErrors = {},
-  prefilledModeratorEmail = null,
-  showLinksOnPublish = false,
   publicRegistrationEnabled = true,
+  children,
+  iscrizione,
 }: Props) {
   const t = useTranslations('admin.wizard.step3');
   const principale = primary.email.trim() ? [primary.email.trim()] : [];
@@ -126,13 +128,7 @@ export default function StepPeople({
         {t('intro')}
       </p>
 
-      <PrimarySection
-        primary={primary}
-        onPrimaryChange={onPrimaryChange}
-        fieldErrors={fieldErrors}
-        prefilledModeratorEmail={prefilledModeratorEmail}
-        showLinksOnPublish={showLinksOnPublish}
-      />
+      {children}
 
       <OrganizersSection
         value={value.organizers}
@@ -146,6 +142,8 @@ export default function StepPeople({
         taken={principale}
       />
 
+      {iscrizione}
+
       <InvitationsSection
         value={value.invitations}
         onChange={(next) => onChange({ invitations: next })}
@@ -158,29 +156,80 @@ export default function StepPeople({
 
 /**
  * L'organizzatore principale: riceve per email il link condiviso per condurre
- * l'evento. Nome ed email servono per pubblicare, non per la bozza.
+ * l'evento. Nome ed email servono per pubblicare, non per la bozza: finche'
+ * mancano lo dicono (lampeggiano, con la riga «serve per pubblicare»), e
+ * dopo un tentativo insistono. Ente, logo e pagina pubblica restano ripiegati.
  */
-function PrimarySection({
+export function PrimarySection({
   primary,
   onPrimaryChange,
   fieldErrors,
   prefilledModeratorEmail,
   showLinksOnPublish,
+  perPubblicare = true,
 }: {
   primary: LeadOrganizer;
-  onPrimaryChange: Props['onPrimaryChange'];
+  onPrimaryChange: (patch: LeadOrganizerPatch) => void;
   fieldErrors: Record<string, string>;
   prefilledModeratorEmail: string | null;
   showLinksOnPublish: boolean;
+  /** Si pubblica da qui (creazione): nome ed email lo dicono finche' mancano. */
+  perPubblicare?: boolean;
 }) {
   const t = useTranslations('admin.wizard.step3');
+  const tf = useTranslations('admin.wizard.flow');
+  const profiloErrato = !!(
+    fieldErrors.moderatorOrganization || fieldErrors.moderatorOrganizationLogoUrl
+  );
+  // Aperto se all'apertura c'era gia' qualcosa: svuotare un campo non lo
+  // richiude sotto il cursore.
+  const [altroAperto, setAltroAperto] = useState(
+    profiloErrato ||
+      !!primary.organization ||
+      !!primary.organizationLogoUrl ||
+      primary.publicListed
+  );
+  // Un errore dentro il pannello lo apre (e lo lascia aperto).
+  useEffect(() => {
+    if (profiloErrato) setAltroAperto(true);
+  }, [profiloErrato]);
+  const nomeVuoto = perPubblicare && !nomeOrganizzatoreValido(primary.name);
+  const emailVuota = perPubblicare && !emailValida(primary.email);
+  const stato = (vuoto: boolean, errore: unknown) =>
+    errore ? ' wizard-campo--insisti' : vuoto ? ' wizard-campo--vuoto' : '';
+  const promemoria = (id: string) => (
+    <div id={id} className="wizard-campo__hint">
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M12 20h9" />
+        <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
+      </svg>
+      <span>{tf('requiredToPublish')}</span>
+    </div>
+  );
   const precompilato =
     !!prefilledModeratorEmail &&
     primary.email.trim().toLowerCase() === prefilledModeratorEmail.trim().toLowerCase();
   return (
-    <section className="wizard-group wizard-group--static mb-3" aria-labelledby="wiz-primary-title">
+    <section
+      className="wizard-group wizard-group--static mb-3"
+      aria-labelledby="wiz-primary-title"
+    >
       <div className="wizard-group__body">
-        <h3 id="wiz-primary-title" className="h6 fw-semibold mb-1" style={{ color: 'var(--app-text)' }}>
+        <h3
+          id="wiz-primary-title"
+          className="h6 fw-semibold mb-1"
+          style={{ color: 'var(--app-text)' }}
+        >
           {t('primaryHeading')}
         </h3>
         <p className="text-secondary mb-2" style={{ fontSize: '0.85rem' }}>
@@ -188,14 +237,16 @@ function PrimarySection({
           {showLinksOnPublish && <> {t('linksOnPublish')}</>}
         </p>
         {precompilato && (
-          <div className="alert alert-warning py-2 mb-3" role="note" style={{ fontSize: '0.85rem' }}>
+          <p className="text-secondary mb-3" role="note" style={{ fontSize: '0.85rem' }}>
             {t('primaryPrefilled')}
-          </div>
+          </p>
         )}
         <div className="row g-3">
-          <div className="col-md-6">
+          <div
+            className={`col-md-6 wizard-campo${stato(nomeVuoto, fieldErrors.moderatorName)}`}
+          >
             <label className="form-label" htmlFor="wiz-primary-name">
-              {t('personName')}
+              {t('personName')} *
             </label>
             <input
               id="wiz-primary-name"
@@ -203,14 +254,24 @@ function PrimarySection({
               className={`form-control${fieldErrors.moderatorName ? ' is-invalid' : ''}`}
               value={primary.name}
               onChange={(e) => onPrimaryChange({ moderatorName: e.target.value })}
+              aria-describedby={
+                nomeVuoto && !fieldErrors.moderatorName
+                  ? 'wiz-primary-name-promemoria'
+                  : undefined
+              }
             />
             {fieldErrors.moderatorName && (
               <div className="invalid-feedback d-block">{t('primaryNameRequired')}</div>
             )}
+            {nomeVuoto &&
+              !fieldErrors.moderatorName &&
+              promemoria('wiz-primary-name-promemoria')}
           </div>
-          <div className="col-md-6">
+          <div
+            className={`col-md-6 wizard-campo${stato(emailVuota, fieldErrors.moderatorEmail)}`}
+          >
             <label className="form-label" htmlFor="wiz-primary-email">
-              {t('personEmail')}
+              {t('personEmail')} *
             </label>
             <input
               id="wiz-primary-email"
@@ -218,57 +279,85 @@ function PrimarySection({
               className={`form-control${fieldErrors.moderatorEmail ? ' is-invalid' : ''}`}
               value={primary.email}
               onChange={(e) => onPrimaryChange({ moderatorEmail: e.target.value })}
+              aria-describedby={
+                emailVuota && !fieldErrors.moderatorEmail
+                  ? 'wiz-primary-email-promemoria'
+                  : undefined
+              }
             />
             {fieldErrors.moderatorEmail && (
               <div className="invalid-feedback d-block">{t('primaryEmailRequired')}</div>
             )}
-          </div>
-          <div className="col-md-6">
-            <label className="form-label" htmlFor="wiz-primary-org">
-              {t('personOrganization')}
-            </label>
-            <input
-              id="wiz-primary-org"
-              type="text"
-              maxLength={200}
-              className={`form-control${fieldErrors.moderatorOrganization ? ' is-invalid' : ''}`}
-              value={primary.organization ?? ''}
-              onChange={(e) => onPrimaryChange({ moderatorOrganization: e.target.value || null })}
-            />
-            {(fieldErrors.moderatorOrganization || fieldErrors.moderatorOrganizationLogoUrl) && (
-              <div className="invalid-feedback d-block">{t('primaryProfileInvalid')}</div>
-            )}
-          </div>
-          <div className="col-md-6 d-flex align-items-end">
-            <div className="form-check mb-2">
-              <input
-                id="wiz-primary-public"
-                type="checkbox"
-                className="form-check-input"
-                checked={primary.publicListed}
-                onChange={(e) => onPrimaryChange({ moderatorPublicListed: e.target.checked })}
-              />
-              <label className="form-check-label" htmlFor="wiz-primary-public">
-                {t('personPublic')}
-              </label>
-            </div>
+            {emailVuota &&
+              !fieldErrors.moderatorEmail &&
+              promemoria('wiz-primary-email-promemoria')}
           </div>
           <div className="col-12">
-            <details className="wizard-person__logo">
-              <summary className="small">
-                {primary.organizationLogoUrl ? t('personLogoChange') : t('personLogoAdd')}
-              </summary>
-              <div className="pt-2">
-                <FileOrUrlInput
-                  id="wiz-primary-logo"
-                  label={t('personLogo')}
-                  assetType="image"
-                  value={primary.organizationLogoUrl}
-                  onChange={(v) => onPrimaryChange({ moderatorOrganizationLogoUrl: v })}
-                />
+            {/* Ente, logo e pagina pubblica: non servono per pubblicare,
+                restano ripiegati (aperti se hanno gia' un valore o un errore). */}
+            <details className="wizard-primary__more" open={altroAperto || undefined}>
+              <summary className="small">{t('primaryMore')}</summary>
+              <div className="row g-3 pt-2">
+                <div className="col-md-6">
+                  <label className="form-label" htmlFor="wiz-primary-org">
+                    {t('personOrganization')}
+                  </label>
+                  <input
+                    id="wiz-primary-org"
+                    type="text"
+                    maxLength={200}
+                    className={`form-control${fieldErrors.moderatorOrganization ? ' is-invalid' : ''}`}
+                    value={primary.organization ?? ''}
+                    onChange={(e) =>
+                      onPrimaryChange({ moderatorOrganization: e.target.value || null })
+                    }
+                  />
+                  {(fieldErrors.moderatorOrganization ||
+                    fieldErrors.moderatorOrganizationLogoUrl) && (
+                    <div className="invalid-feedback d-block">
+                      {t('primaryProfileInvalid')}
+                    </div>
+                  )}
+                </div>
+                <div className="col-md-6 d-flex align-items-end">
+                  <div className="form-check mb-2">
+                    <input
+                      id="wiz-primary-public"
+                      type="checkbox"
+                      className="form-check-input"
+                      checked={primary.publicListed}
+                      onChange={(e) =>
+                        onPrimaryChange({ moderatorPublicListed: e.target.checked })
+                      }
+                    />
+                    <label className="form-check-label" htmlFor="wiz-primary-public">
+                      {t('personPublic')}
+                    </label>
+                  </div>
+                </div>
+                <div className="col-12">
+                  <details className="wizard-person__logo">
+                    <summary className="small">
+                      {primary.organizationLogoUrl
+                        ? t('personLogoChange')
+                        : t('personLogoAdd')}
+                    </summary>
+                    <div className="pt-2">
+                      <FileOrUrlInput
+                        id="wiz-primary-logo"
+                        label={t('personLogo')}
+                        assetType="image"
+                        value={primary.organizationLogoUrl}
+                        onChange={(v) =>
+                          onPrimaryChange({ moderatorOrganizationLogoUrl: v })
+                        }
+                      />
+                    </div>
+                  </details>
+                  <LogoEsterno url={primary.organizationLogoUrl} />
+                </div>
               </div>
             </details>
-            <LogoEsterno url={primary.organizationLogoUrl} />
           </div>
         </div>
       </div>
@@ -285,20 +374,25 @@ function Gruppo({
   title,
   help,
   count,
+  aperto = false,
   children,
 }: {
   title: string;
   help: string;
   count: number;
+  /** Aperto anche se vuoto: serve compilarlo. */
+  aperto?: boolean;
   children: React.ReactNode;
 }) {
   const [apertoAllInizio] = useState(count > 0);
   return (
-    <details className="wizard-group mb-3" open={apertoAllInizio || undefined}>
+    <details className="wizard-group mb-3" open={apertoAllInizio || aperto || undefined}>
       <summary>
         <span className="wizard-group__title">
           {title}
-          {count > 0 && <span className="badge rounded-pill ms-2 wizard-group__count">{count}</span>}
+          {count > 0 && (
+            <span className="badge rounded-pill ms-2 wizard-group__count">{count}</span>
+          )}
         </span>
         <span className="wizard-group__help">{help}</span>
       </summary>
@@ -355,7 +449,11 @@ function AddedList<T>({
 }
 
 /** La ricerca in rubrica, quando chi compila puo' usarla. */
-function RubricaRow({ onAddMany }: { onAddMany: (picks: RubricaPickedPerson[]) => void }) {
+function RubricaRow({
+  onAddMany,
+}: {
+  onAddMany: (picks: RubricaPickedPerson[]) => void;
+}) {
   const t = useTranslations('admin.wizard.step3');
   if (!useContext(RubricaAccessContext)) return null;
   return (
@@ -422,7 +520,11 @@ function OrganizersSection({
   };
 
   return (
-    <Gruppo title={t('organizersHeading')} help={t('organizersHelp')} count={value.length}>
+    <Gruppo
+      title={t('organizersHeading')}
+      help={t('organizersHelp')}
+      count={value.length}
+    >
       <AddedList
         items={value}
         keyOf={(o) => o.name}
@@ -494,7 +596,12 @@ function righe(moderators: ModeratorEntry[], speakers: SpeakerEntry[]): Riga[] {
       entry,
       role: (entry.organizer === true ? 'organizer' : 'moderator') as PersonRole,
     })),
-    ...speakers.map((entry, index) => ({ kind: 'speakers' as const, index, entry, role: 'speaker' as const })),
+    ...speakers.map((entry, index) => ({
+      kind: 'speakers' as const,
+      index,
+      entry,
+      role: 'speaker' as const,
+    })),
   ];
 }
 
@@ -522,10 +629,13 @@ function conRuolo(
   moderators: ModeratorEntry[],
   speakers: SpeakerEntry[],
   persona: SpeakerEntry,
-  role: PersonRole,
+  role: PersonRole
 ): Pick<StepPeopleValue, 'moderators' | 'speakers'> {
   if (role === 'speaker') return { moderators, speakers: [...speakers, persona] };
-  return { moderators: [...moderators, { ...persona, organizer: role === 'organizer' }], speakers };
+  return {
+    moderators: [...moderators, { ...persona, organizer: role === 'organizer' }],
+    speakers,
+  };
 }
 
 /**
@@ -552,7 +662,9 @@ function PeopleSection({
   const tutte = righe(moderators, speakers);
   // Una persona ha un ruolo solo: gli indirizzi, senza distinguere maiuscole
   // (quelli di un evento esistente possono averne).
-  const giaPresenti = new Set([...tutte.map((r) => r.entry.email), ...taken].map((e) => e.toLowerCase()));
+  const giaPresenti = new Set(
+    [...tutte.map((r) => r.entry.email), ...taken].map((e) => e.toLowerCase())
+  );
 
   const senza = (r: Riga): Pick<StepPeopleValue, 'moderators' | 'speakers'> =>
     r.kind === 'moderators'
@@ -561,9 +673,13 @@ function PeopleSection({
 
   const aggiorna = (r: Riga, patch: Partial<ModeratorEntry>) => {
     if (r.kind === 'moderators') {
-      onChange({ moderators: moderators.map((m, j) => (j === r.index ? { ...m, ...patch } : m)) });
+      onChange({
+        moderators: moderators.map((m, j) => (j === r.index ? { ...m, ...patch } : m)),
+      });
     } else {
-      onChange({ speakers: speakers.map((m, j) => (j === r.index ? { ...m, ...patch } : m)) });
+      onChange({
+        speakers: speakers.map((m, j) => (j === r.index ? { ...m, ...patch } : m)),
+      });
     }
   };
 
@@ -606,8 +722,8 @@ function PeopleSection({
           organizationLogoUrl: draft.organizationLogoUrl?.trim() || null,
           publicListed: draft.publicListed,
         },
-        draft.role,
-      ),
+        draft.role
+      )
     );
     // Il ruolo resta: di solito si aggiungono più persone con lo stesso.
     setDraft({ ...BOZZA_VUOTA, role: draft.role });
@@ -633,7 +749,7 @@ function PeopleSection({
           organizationLogoUrl: null,
           publicListed: false,
         },
-        draft.role,
+        draft.role
       );
     }
     // Chi era già presente (o senza un indirizzo valido) non si aggiunge, e
@@ -657,7 +773,10 @@ function PeopleSection({
           {tutte.map((r, i) => {
             const rid = `${id}-${i}`;
             return (
-              <li key={r.entry.grantId ?? `${r.kind}-${r.entry.email}`} className="list-group-item wizard-person">
+              <li
+                key={r.entry.grantId ?? `${r.kind}-${r.entry.email}`}
+                className="list-group-item wizard-person"
+              >
                 <div className="d-flex justify-content-between align-items-start gap-2">
                   <div className="text-break">
                     <div className="fw-semibold">{r.entry.name}</div>
@@ -696,7 +815,9 @@ function PeopleSection({
                       maxLength={200}
                       className="form-control form-control-sm"
                       value={r.entry.organization ?? ''}
-                      onChange={(e) => aggiorna(r, { organization: e.target.value || null })}
+                      onChange={(e) =>
+                        aggiorna(r, { organization: e.target.value || null })
+                      }
                     />
                   </div>
                   <div className="col-12 d-flex flex-wrap align-items-center gap-3">
@@ -714,7 +835,9 @@ function PeopleSection({
                     </div>
                     <details className="wizard-person__logo">
                       <summary className="small">
-                        {r.entry.organizationLogoUrl ? t('personLogoChange') : t('personLogoAdd')}
+                        {r.entry.organizationLogoUrl
+                          ? t('personLogoChange')
+                          : t('personLogoAdd')}
                       </summary>
                       <div className="pt-2">
                         <FileOrUrlInput
@@ -759,7 +882,9 @@ function PeopleSection({
             type="email"
             className="form-control"
             value={draft.email}
-            onChange={(e) => setDraft({ ...draft, email: e.target.value, personId: null })}
+            onChange={(e) =>
+              setDraft({ ...draft, email: e.target.value, personId: null })
+            }
           />
         </div>
         <div className="col-md-4">
@@ -846,7 +971,11 @@ function InvitationsSection({
 }) {
   const t = useTranslations('admin.wizard.step3');
   const id = 'inv';
-  const [draft, setDraft] = useState({ name: '', email: '', personId: null as string | null });
+  const [draft, setDraft] = useState({
+    name: '',
+    email: '',
+    personId: null as string | null,
+  });
   const [err, setErr] = useState<string | null>(null);
 
   const add = () => {
@@ -874,7 +1003,12 @@ function InvitationsSection({
       const email = (p.email ?? '').trim().toLowerCase();
       if (!email || !isEmail(email) || existing.has(email)) continue;
       existing.add(email);
-      toAdd.push({ name: p.displayName?.trim() || null, email, role: 'GUEST', personId: p.id });
+      toAdd.push({
+        name: p.displayName?.trim() || null,
+        email,
+        role: 'GUEST',
+        personId: p.id,
+      });
     }
     setErr(toAdd.length < picks.length ? t('pickSkipped') : null);
     if (toAdd.length > 0) onChange([...value, ...toAdd]);
@@ -883,8 +1017,12 @@ function InvitationsSection({
   return (
     <Gruppo
       title={t('invitationsHeading')}
-      help={t(publicRegistrationEnabled ? 'invitationsHelpOpen' : 'invitationsHelpRestricted')}
+      help={t(
+        publicRegistrationEnabled ? 'invitationsHelpOpen' : 'invitationsHelpRestricted'
+      )}
       count={value.length}
+      // Solo su invito l'elenco e' chi puo' iscriversi: lo si vede subito.
+      aperto={!publicRegistrationEnabled}
     >
       <AddedList
         items={value}
@@ -910,7 +1048,9 @@ function InvitationsSection({
                 type="text"
                 className="form-control"
                 value={draft.name}
-                onChange={(e) => setDraft({ ...draft, name: e.target.value, personId: null })}
+                onChange={(e) =>
+                  setDraft({ ...draft, name: e.target.value, personId: null })
+                }
               />
             </div>
             <div className="col-md-5">
@@ -922,7 +1062,9 @@ function InvitationsSection({
                 type="email"
                 className="form-control"
                 value={draft.email}
-                onChange={(e) => setDraft({ ...draft, email: e.target.value, personId: null })}
+                onChange={(e) =>
+                  setDraft({ ...draft, email: e.target.value, personId: null })
+                }
               />
             </div>
             <div className="col-md-2">
@@ -935,5 +1077,138 @@ function InvitationsSection({
         </>
       )}
     </Gruppo>
+  );
+}
+
+/**
+ * Chi si iscrive all'evento e cosa gli si chiede. Due scelte da fare prima di
+ * pubblicare: dopo, chi si e' gia' iscritto non si puo' richiudere fuori ne'
+ * interrogare di nuovo. Senza una scelta dell'evento vale quella del sito, e
+ * lo si dice.
+ */
+export function SezioneIscrizione({
+  accessMode,
+  requireOrganization,
+  requireOrganizationRole,
+  requireOrganizationType,
+  onChange,
+  siteOpen,
+  invitati,
+  bloccato = false,
+  iniziale = null,
+}: {
+  accessMode: EventAccessModeValue | null;
+  requireOrganization: boolean;
+  requireOrganizationRole: boolean;
+  requireOrganizationType: boolean;
+  onChange: (
+    patch: Partial<{
+      accessMode: EventAccessModeValue | null;
+      requireOrganization: boolean;
+      requireOrganizationRole: boolean;
+      requireOrganizationType: boolean;
+    }>
+  ) => void;
+  /** L'iscrizione aperta del sito: vale finche' l'evento non sceglie. */
+  siteOpen: boolean;
+  /** Quanti sono gli invitati. */
+  invitati: number;
+  /** Chi entra con un link di conduzione vede chi partecipa, ma non lo
+   *  cambia: lo decide lo staff dell'evento, come gli inviti. */
+  bloccato?: boolean;
+  /** La scelta con cui il modulo e' partito: tornarci la rimette com'era (una
+   *  scelta fissata resta fissata anche se coincide col sito). */
+  iniziale?: EventAccessModeValue | null;
+}) {
+  const t = useTranslations('admin.wizard.step3');
+  const tg = useTranslations('admin.guided');
+  const nome = useId();
+  const effettivo: EventAccessModeValue = publicRegistrationFor({ accessMode }, siteOpen)
+    ? 'OPEN'
+    : 'INVITATION';
+  // La scelta del sito, che vale finche' l'evento non ne fissa una.
+  const ereditato: EventAccessModeValue = publicRegistrationFor({ accessMode: null }, siteOpen)
+    ? 'OPEN'
+    : 'INVITATION';
+  const scegli = (v: EventAccessModeValue) => {
+    // Tornare alla scelta di partenza la rimette com'era: fissata resta
+    // fissata, ereditata dal sito torna a seguire il sito.
+    if (v === iniziale || (iniziale === null && accessMode !== null && v === ereditato)) {
+      onChange({ accessMode: iniziale });
+      return;
+    }
+    // Altrimenti (anche il clic che conferma la scelta ereditata) si salva.
+    onChange({ accessMode: accessModeDaSalvare(v, siteOpen) });
+  };
+  const chiede = (
+    campo: 'requireOrganization' | 'requireOrganizationRole' | 'requireOrganizationType',
+    valore: boolean,
+    etichetta: string
+  ) => (
+    <div className="form-check">
+      <input
+        id={`${nome}-${campo}`}
+        type="checkbox"
+        className="form-check-input"
+        checked={valore}
+        onChange={(e) => onChange({ [campo]: e.target.checked })}
+      />
+      <label className="form-check-label" htmlFor={`${nome}-${campo}`}>
+        {etichetta}
+      </label>
+    </div>
+  );
+
+  return (
+    <section className="wizard-iscrizione mb-4" aria-labelledby={`${nome}-titolo`}>
+      <h3 id={`${nome}-titolo`} className="wizard-iscrizione__titolo">
+        {t('accessHeading')}
+      </h3>
+      <fieldset aria-labelledby={`${nome}-titolo`}>
+        <div className="formato__scelte">
+          <Scelta
+            name={`${nome}-accesso`}
+            value="OPEN"
+            current={effettivo}
+            onChange={scegli}
+            disabled={bloccato}
+            title={tg('access.open')}
+            desc={tg('access.openDesc')}
+            icon={<Icon icon="it-unlocked" size="sm" />}
+          />
+          <Scelta
+            name={`${nome}-accesso`}
+            value="INVITATION"
+            current={effettivo}
+            onChange={scegli}
+            disabled={bloccato}
+            title={tg('access.invitation')}
+            desc={tg('access.invitationDesc')}
+            icon={<Icon icon="it-mail" size="sm" />}
+          />
+        </div>
+        {bloccato ? (
+          <p className="formato__nota mb-0">{t('accessStaffOnly')}</p>
+        ) : (
+          accessMode === null && (
+            <p className="formato__nota mb-0">{t('accessSiteDefault')}</p>
+          )
+        )}
+      </fieldset>
+      {effettivo === 'INVITATION' && invitati === 0 && (
+        <p className="wizard-iscrizione__avviso" role="status">
+          <Icon icon="it-warning-circle" size="sm" />
+          <span>{t('accessNoInvitees')}</span>
+        </p>
+      )}
+
+      <fieldset className="mt-3">
+        <legend className="wizard-iscrizione__domanda">{t('askHeading')}</legend>
+        <p className="formato__nota mt-0 mb-2">{t('askAlways')}</p>
+        {chiede('requireOrganization', requireOrganization, t('askOrganization'))}
+        {chiede('requireOrganizationRole', requireOrganizationRole, t('askRole'))}
+        {chiede('requireOrganizationType', requireOrganizationType, t('askType'))}
+      </fieldset>
+    </section>
   );
 }

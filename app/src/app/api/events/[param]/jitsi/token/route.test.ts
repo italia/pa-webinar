@@ -89,6 +89,7 @@ type EventOverrides = Partial<{
   participantsCanUnmute: boolean;
   participantsCanStartVideo: boolean;
   participantsCanShareScreen: boolean;
+  accessMode: 'OPEN' | 'INVITATION' | null;
 }>;
 
 function eventRow(overrides: EventOverrides = {}) {
@@ -106,6 +107,7 @@ function eventRow(overrides: EventOverrides = {}) {
     participantsCanUnmute: false,
     participantsCanStartVideo: false,
     participantsCanShareScreen: false,
+    accessMode: null,
     ...overrides,
   };
 }
@@ -122,7 +124,11 @@ function registrationRow(overrides: Record<string, unknown> = {}) {
   };
 }
 
-const DEFAULT_SETTINGS = { gravatarEnabled: false, guestAccessEnabled: true };
+const DEFAULT_SETTINGS = {
+  gravatarEnabled: false,
+  guestAccessEnabled: true,
+  publicRegistrationEnabled: true,
+};
 let siteSettings = { ...DEFAULT_SETTINGS };
 
 function applySettings(overrides: Partial<typeof DEFAULT_SETTINGS>) {
@@ -642,6 +648,37 @@ describe('POST jitsi/token — accesso ospiti spento', () => {
       displayNameOverride: 'Mario dal telefono',
     });
     expect(res.status).toBe(200);
+  });
+});
+
+describe('POST jitsi/token — evento solo su invito', () => {
+  beforeEach(() => {
+    vi.mocked(prisma.event.findUnique).mockResolvedValue(
+      eventRow({ accessMode: 'INVITATION' }) as never,
+    );
+    vi.mocked(prisma.registration.findUnique).mockResolvedValue(registrationRow() as never);
+  });
+
+  it('un link personale aperto altrove e un posto dell iscrizione: si entra col nome scritto', async () => {
+    // Il token identifica un posto, non una persona: chi inoltra il proprio
+    // link cede il suo posto, come da un altro dispositivo.
+    const res = await post({ accessToken: ACCESS_TOKEN, displayNameOverride: 'Dal telefono' });
+    expect(res.status).toBe(200);
+  });
+
+  it('dal browser legato all iscrizione (link dell email) si entra', async () => {
+    cookieJar.set(
+      eventAccessCookieName(EVENT_ID),
+      await signEventAccess(EVENT_ID, ACCESS_TOKEN, 3600),
+    );
+    const res = await post({ accessToken: ACCESS_TOKEN });
+    expect(res.status).toBe(200);
+  });
+
+  it('nessuno entra da ospite, anche con gli ospiti accesi dal sito', async () => {
+    const res = await post({ guestName: 'Ospite' });
+    expect(res.status).toBe(403);
+    expect((await res.json()).code).toBe('GUEST_ACCESS_DISABLED');
   });
 });
 

@@ -45,6 +45,9 @@ export const eventBaseSchema = z.object({
   participantsCanUnmute: z.boolean().default(false),
   participantsCanStartVideo: z.boolean().default(false),
   participantsCanShareScreen: z.boolean().default(false),
+  // Chi partecipa: chiunque si iscrive (OPEN) o solo gli invitati
+  // (INVITATION); null = come dice il sito (lib/events/registration-access).
+  accessMode: z.enum(['OPEN', 'INVITATION']).nullable().optional(),
   requireOrganization: z.boolean().default(false),
   requireOrganizationRole: z.boolean().default(false),
   requireOrganizationType: z.boolean().default(false),

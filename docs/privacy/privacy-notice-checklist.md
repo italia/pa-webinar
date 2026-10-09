@@ -177,7 +177,7 @@ flowchart LR
     ORG["Organization fields<br/><code>requireOrganization*</code>"]:::flag
     LIVE["Live contributions<br/><code>chatEnabled</code> · <code>qaEnabled</code><br/>polls · word cloud · questionnaires"]:::flag
     BOOK["Address-book box<br/>on every registration form"]:::flag
-    GUEST["Guests<br/><code>guestAccessEnabled</code><br/>always on instant calls"]:::flag
+    GUEST["Guests<br/><code>guestAccessEnabled</code><br/>never on invitation-only events<br/>always on instant calls"]:::flag
     REC["Recording<br/><code>recordingEnabled</code>"]:::flag
     PUB["Published video<br/><code>recordingPublished</code> · <code>libraryListed</code><br/>publications"]:::flag
     AI["AI post-production<br/><code>aiTranscriptEnabled</code> … <code>aiDubbingEnabled</code><br/>+ <code>aiPipelineEnabled</code>"]:::flag
@@ -226,8 +226,8 @@ feature on and what the notice should say about it.
 | Feature | Switched on by | What the notice should say |
 |---|---|---|
 | Registration | Always | Name and email, the consent choices, and join and leave times. The personal join link in emails is an access credential. In the call, the event's moderators see each registrant's registration name and email address next to the name shown in the room ([Who is behind each video tile](../architecture/identity-and-access.md#who-is-behind-each-video-tile)) |
-| Organization fields | `requireOrganization`, `requireOrganizationRole`, `requireOrganizationType`, per event and only through the events API; the wizard has no control for them. Off by default | When on, the organization name is required on the form; role and type of body are optional. State the statistical purpose |
-| Guests | **Guest access enabled** for scheduled events; always on instant calls | The display name typed in the waiting room, and, in chat messages, an identifier derived from the IP address and that name. The **Email (optional)** field there stays in the browser and is never sent |
+| Organization fields | `requireOrganization`, `requireOrganizationRole`, `requireOrganizationType`, per event: the wizard's **People** step, under **What we ask people who register**, or the events API. Off by default | When on, the organization name is required (by the form and by the registration API); role and type of body are optional. State the statistical purpose |
+| Guests | **Guest access enabled** for scheduled events, except those open only to invitees (**Only people you invite**), which never admit guests; always on instant calls | The display name typed in the waiting room, and, in chat messages, an identifier derived from the IP address and that name. The **Email (optional)** field there stays in the browser and is never sent |
 | Q&A, chat, polls, word cloud, reactions, agenda reactions | `qaEnabled`, `chatEnabled` and the other live-interaction flags of the event | Contributions carry the author's display name: chat sender names and texts are encrypted; Q&A author names and questions are stored in plain text. Everyone who can read the chat can download it, names included. At the event's retention the chat is deleted, while questions, votes and words stay with the event without names or identifiers |
 | Questionnaires and post-event feedback | Per event; every event created with feedback collection on gets the generic end-of-event rating | Pre-registration answers carry the respondent's name. The end-of-event rating stores no name and no email hash, only the registration (one response each) or a browser id, and the form tells respondents that organizers see the answers without their name. Administrators, the event's organizer and its moderators read every answer and can download them as CSV. Free-text answers can contain anything |
 | Materials | Staff and moderators add them per event | Whatever the documents contain. The visibility setting decides which public lists show a material, not who can open it: an uploaded file is served from its URL to anyone who has the URL, so a document with personal data should not be shared as a material. Openings and downloads are counted as one number per material, which only the event's moderators see; to count each person once every 10 minutes the server holds a hash of the room token, or else the IP address, in memory for that time, and stores neither |
@@ -237,7 +237,7 @@ feature on and what the notice should say about it.
 | Per-participant audio | `multitrackRecordingEnabled` | One isolated voice track per participant, labeled with a name |
 | AI outputs | `aiPipelineEnabled` and the event's AI flags | Transcript with speaker labels, summary, translations, subtitles, dubbed audio. Staff can map a speaker label to a name or an address-book entry |
 | Address book | The optional box on every registration form | See [Address book](#address-book) |
-| Invitations | Staff add them in the event wizard. The platform sends no invitation email | The invitee's name and email. With **Public registration enabled** off, the list decides who may register, and the personal join link reaches the registrant only by email |
+| Invitations | Staff add them in the event wizard. The platform sends no invitation email | The invitee's name and email. When an event is open only to invitees (**Only people you invite**, or **Public registration enabled** off for an event without a choice of its own), the list decides who may register, and the personal join link reaches the registrant only by email |
 | Moderators and speakers | Event wizard and named grants | The primary moderator's name and email, which registrants receive (see [Recipients and processors](#recipients-and-processors)); named grants; the public speaker list |
 | Staff accounts | **Staff and access** > **Staff accounts** | Name, email, role, last sign-in |
 | Administration audit log | Always | For privileged writes (administration area, event edits made with a moderator link) and staff sign-ins: the actor, the action, the target, the IP address and the user agent |
@@ -316,7 +316,7 @@ What each job deletes is in the
 | Publications | Created published with no deletion date for the video, and with a 3650-day event retention (`app/src/app/api/admin/publications/route.ts`) | **Retention** on the recording panel of the publication's event |
 | Earlier recordings of the same event | Not deleted by retention: each new recording replaces the one the event points to, and the older ones stay referenced by their call session | Delete them from **Video recordings** or from the event's sessions |
 | Temporary recording | `TEMP_RECORDING_TTL_MS` in `app/src/lib/gdpr/cleanup-selection.ts` | Not configurable |
-| Per-participant audio | Transcription, or the event's retention when tracks are kept | **Keep per-participant tracks**, wizard step **Permissions**; details in [Recordings, voice data and AI outputs](recordings-and-ai.md#retention-regimes) |
+| Per-participant audio | Transcription, or the event's retention when tracks are kept | **Keep per-participant tracks**, wizard advanced settings, **Recording and AI**; details in [Recordings, voice data and AI outputs](recordings-and-ai.md#retention-regimes) |
 | AI outputs | The recording's regime: the event's retention if the video is not published, kept while it is | **Artifact retention (days)** (`aiArtifactRetentionDays`) adds a deletion date; it cannot keep outputs beyond the event's retention |
 | Event record and recap | Nothing deletes them. After its retention the event keeps its title, description, dates, speaker list and the primary moderator's name and encrypted email; the recap keeps, without authors, the text of the top Q&A and chat questions, published poll results and the most-submitted word-cloud words (`app/src/lib/events/recap.ts`) | Edit or delete the event |
 | Address book | `retentionMonths` after the person's last registration (default in `app/prisma/schema.prisma`, not editable in the administration area); opted-out entries at the next run | Delete entries under **Address book** |
@@ -498,9 +498,11 @@ The same differences are tracked in [Known gaps](../GDPR.md#known-gaps).
    **Features**, `guestAccessEnabled`, on by default in
    `app/prisma/schema.prisma`) decides whether scheduled events admit guests
    while `LIVE`. Instant calls admit anyone with the link, whatever the setting,
-   including while `PROVISIONING` or `IDLE`. If guests are allowed, give them a
-   way to reach the notice, for example in the event description. Turn the
-   setting off or use a join password where guests are not acceptable.
+   including while `PROVISIONING` or `IDLE`. An event set to **Only people you
+   invite** admits no guests, whatever the setting. If guests are allowed, give
+   them a way to reach the notice, for example in the event description. Turn
+   the setting off, set the event to **Only people you invite**, or use a join
+   password where guests are not acceptable.
 9. **AI.** If AI post-production is on, write the **AI notice in the waiting
    room** in Italian, English and French, set **Artifact retention (days)**, and
    name the models you run.

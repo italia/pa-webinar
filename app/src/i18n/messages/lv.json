@@ -742,7 +742,7 @@
       "updateEvent": "Atjaunināt pasākumu",
       "step1": {
         "heading": "Pamatinformācija",
-        "intro": "Pasākuma nosaukums, apraksts, attēls un kalendārs.",
+        "intro": "Pasākuma nosaukums, apraksts un attēls.",
         "coverImage": "Vāka attēls",
         "coverImageHelp": "Tiek rādīts publiskajā vietnē un e-pastos reģistrētajiem dalībniekiem.",
         "scheduleHeading": "Kalendārs",
@@ -751,8 +751,6 @@
         "tagsHeading": "Kategorijas (tagi)",
         "waitingRoomAudio": "Gaidīšanas telpas audio (neobligāts)",
         "waitingRoomAudioHelp": "Tiek atskaņots pirms tiešraides sākuma.",
-        "parseTitleKickerLabel": "Nosaukums ar virsrakstu (atdalītājs |)",
-        "parseTitleKickerHelp": "Ja iespējots, nosaukums, piemēram, 'KONFERENCE | Digitālā inovācija', parādīs KONFERENCE kā virsrakstu.",
         "maxParticipantsHelp": "Paredzamo cilvēku skaita aplēse: pēc tās nosaka video servera jaudu, un tā neierobežo reģistrāciju.",
         "validation": {
           "startsAt": "Nederīgs sākuma datums.",
@@ -782,7 +780,11 @@
           "HIGH": "Augsta (720p, ieteicamā)",
           "BALANCED": "Līdzsvarota (540p)",
           "SAVE_DATA": "Datu taupīšana (360p)"
-        }
+        },
+        "requiredLegend": "Ar * atzīmētie lauki vajadzīgi pasākuma saglabāšanai: kamēr tie ir tukši, tas norādīts pie katra lauka.",
+        "kickerHint": "Lai pievienotu virsvirsrakstu, rakstiet to pirms virsraksta un atdaliet ar |, piemēram, “Tikšanās cikls | Pirmā tikšanās”.",
+        "kickerUse": "Rādīt “{kicker}” kā virsvirsrakstu",
+        "kickerPreview": "Tā tas izskatās pasākuma lapā"
       },
       "step2": {
         "heading": "Kurš ko var darīt",
@@ -841,7 +843,8 @@
             "name": "Dalībnieks",
             "desc": "Seko pasākumam un piedalās tā, kā nolemjat tabulā zemāk."
           }
-        }
+        },
+        "recordingManualNote": "Ieraksts nekad nesākas pats: vadītājs to sāk ar pogu REC."
       },
       "step3": {
         "heading": "Personas un ielūgumi",
@@ -873,7 +876,7 @@
         "personName": "Vārds",
         "personEmail": "E-pasts",
         "peopleHeading": "Pasākuma personas",
-        "peopleHelp": "Organizatori, moderatori un runātāji. Katrs saņem savu saiti, lai ienāktu ar savu lomu; ko katra loma var darīt, parāda solis “Atļaujas”.",
+        "peopleHelp": "Organizatori, moderatori un runātāji. Katrs saņem savu saiti, lai ienāktu ar savu lomu; ko katra loma var darīt, parāda sadaļa “Papildu iestatījumi”.",
         "personRole": "Loma",
         "roleOrganizer": "Organizators",
         "roleModerator": "Moderators",
@@ -893,7 +896,17 @@
         "invitationsHelpOpen": "Pēc izvēles: jūsu uzaicināto personu saraksts. Reģistrācija ir atvērta, tāpēc pēc publicēšanas var reģistrēties ikviens, uzaicināts vai nē. Platforma nesūta ielūgumus: kopīgojiet pasākuma saiti paši.",
         "invitationsHelpRestricted": "Reģistrācija ir ierobežota: reģistrēties var tikai šī saraksta adreses. Platforma nesūta ielūgumus: kopīgojiet pasākuma saiti paši; ieejas saite pienāk pa e-pastu pēc reģistrācijas.",
         "logoExternal": "Publiskajā lapā redzami tikai šajā platformā augšupielādēti logotipi: logotips no citas vietnes netiks rādīts.",
-        "primaryProfileInvalid": "Pārbaudiet organizāciju un logotipa adresi."
+        "primaryProfileInvalid": "Pārbaudiet organizāciju un logotipa adresi.",
+        "primaryMore": "Iestāde, logotips un publiskā lapa",
+        "accessHeading": "Kas reģistrējas",
+        "accessSiteDefault": "Seko vietnes iestatījumam: ja administrācija to maina, tas attiecas arī uz šo pasākumu.",
+        "accessNoInvitees": "Vēl nav uzaicināto: kamēr saraksts zemāk ir tukšs, neviens nevar reģistrēties.",
+        "askHeading": "Ko jautājam tiem, kas reģistrējas",
+        "askAlways": "Vārdu un e-pastu vienmēr. Papildus, ja vajag:",
+        "askOrganization": "Organizācija (obligāta reģistrācijai)",
+        "askRole": "Amats (neobligāts)",
+        "askType": "Organizācijas veids (neobligāts)",
+        "accessStaffOnly": "Kas var reģistrēties, izlemj pasākuma komanda."
       },
       "step4": {
         "heading": "Saturs un materiāli",
@@ -941,7 +954,7 @@
       },
       "step5": {
         "heading": "Kopsavilkums un publicēšana",
-        "intro": "Pārbaudiet informāciju un publicējiet pasākumu (vai saglabājiet kā melnrakstu).",
+        "intro": "Pasākums tā, kā to redzēs citi: pārbaudiet, tad publicējiet vai saglabājiet kā melnrakstu.",
         "summary": {
           "title": "Nosaukums",
           "schedule": "Kalendārs",
@@ -1000,7 +1013,70 @@
       "publishFailedDetail": "Pasākums ir izveidots, bet nav publicēts: tas joprojām ir melnraksts. Serveris atbildēja: {reason}. Publicējiet to pasākuma lapā.",
       "toFix": "Jālabo:",
       "toFixField": "Lauks {n}",
-      "stepsAriaLabel": "Pasākuma veidlapas soļi"
+      "stepsAriaLabel": "Pasākuma veidlapas soļi",
+      "flow": {
+        "steps": {
+          "base": "Pasākums",
+          "schedule": "Kad",
+          "invites": "Personas",
+          "review": "Kopsavilkums",
+          "advanced": "Papildu iestatījumi"
+        },
+        "templateInUse": "Veidne: <b>{name}</b>",
+        "noTemplate": "Pasākums bez veidnes",
+        "changeTemplate": "Mainīt veidni",
+        "chooseTemplate": "Izvēlēties veidni",
+        "backToReview": "Atpakaļ uz kopsavilkumu",
+        "participantsCan": "Dalībnieki: {list}",
+        "none": "nav",
+        "recordingManual": "Pieejams: sākas tikai tad, kad vadītājs nospiež REC.",
+        "aiAfter": "Pēc ieraksta: {list}.",
+        "scheduleHeading": "Kad tas notiek",
+        "scheduleIntro": "Datums, laiks un gaidāmais cilvēku skaits: pēc tiem sagatavo zāli.",
+        "advancedIntro": "Veidnes jau izvēlētās vērtības: mainiet tikai vajadzīgo.",
+        "advancedIntroTemplate": "Veidnes “{name}” jau izvēlētās vērtības: mainiet tikai vajadzīgo.",
+        "requiredToSave": "Vajadzīgs, lai saglabātu pasākumu.",
+        "requiredToPublish": "Vajadzīgs, lai publicētu pasākumu.",
+        "toComplete": "Jāaizpilda",
+        "missingHeading": "Publicēšanai vēl trūkst:",
+        "fieldOrganizerName": "Galvenā organizatora vārds",
+        "fieldOrganizerEmail": "Galvenā organizatora e-pasts",
+        "capacityWarning": "Jauda jāpārbauda tehniskajā informācijā.",
+        "sections": {
+          "participation": "Dalība un zāles funkcijas",
+          "recording": "Ieraksts un MI",
+          "content": "Saturs: materiāli un anketas",
+          "room": "Uzgaidāmā telpa un video",
+          "data": "Privātums, dati un lapa pēc pasākuma",
+          "technical": "Tehniskā informācija: jauda un resursi"
+        },
+        "formatInUse": "Formāts: <b>{name}</b>",
+        "changeFormat": "Mainīt formātu",
+        "voiceAll": "Visi runā un rādās video",
+        "voiceSpeakers": "Runā un rādās video runātāji un vadītāji; publika raksta tērzēšanā",
+        "features": "Funkcijas: {list}",
+        "liveToggleNote": "Katru funkciju var ieslēgt un izslēgt arī pasākuma laikā.",
+        "customize": "Pielāgot iestatījumus",
+        "changeLanguages": "Mainīt valodas",
+        "translationLine": "Tulkojums: {list}",
+        "privacyTemplate": "Privātuma paziņojums: {name}",
+        "privacyCustom": "Privātuma paziņojums: pasākumam rakstīts teksts",
+        "privacyDocument": "Privātuma paziņojums: pasākuma dokuments",
+        "privacySite": "Privātuma paziņojums: vietnes",
+        "untitled": "Pasākums bez nosaukuma",
+        "carriedOver": "Mēs saglabājām to, ko bijāt uzrakstījis par pasākumu.",
+        "startOver": "Sākt no jauna",
+        "accessOpen": "Ikviens var reģistrēties pasākuma lapā.",
+        "accessInvitation": "Tikai ar ielūgumu. Uzaicināto skaits: {count}.",
+        "addInvitees": "Pievienot uzaicinātos",
+        "change": "Mainīt",
+        "askLine": "Reģistrējoties mēs jautājam: {list}.",
+        "askName": "vārds",
+        "askEmail": "e-pasts",
+        "askOrganization": "organizācija",
+        "askRole": "amats",
+        "askType": "organizācijas veids"
+      }
     },
     "nav": {
       "events": "Pasākumi",
@@ -1784,9 +1860,9 @@
         "statusPageEnabled": "Statusa lapa iespējota",
         "statusPageEnabledHelp": "Publicē pakalpojuma statusa lapu. Ja tā ir izslēgta, lapa nepastāv un tās datus redz tikai administratori.",
         "guestAccessEnabled": "Viesu piekļuve iespējota",
-        "guestAccessEnabledHelp": "Nereģistrētas personas var pievienoties notiekošiem pasākumiem, norādot tikai savu vārdu. Ja tā ir izslēgta, plānotajiem pasākumiem var pievienoties tikai ar reģistrāciju vai ar moderatora vai runātāja saiti; tūlītējie video zvani paliek atvērti ikvienam, kam ir saite.",
+        "guestAccessEnabledHelp": "Nereģistrētas personas var pievienoties notiekošiem pasākumiem, norādot tikai savu vārdu. Ja tā ir izslēgta, plānotajiem pasākumiem var pievienoties tikai ar reģistrāciju vai ar moderatora vai runātāja saiti; tūlītējie video zvani paliek atvērti ikvienam, kam ir saite. Pasākumā tikai ar ielūgumu viesi netiek ielaisti nekad.",
         "publicRegistrationEnabled": "Publiskā reģistrācija iespējota",
-        "publicRegistrationEnabledHelp": "Ikviens var reģistrēties pasākumiem. Ja tā ir izslēgta, reģistrēties var tikai personas no pasākuma uzaicināto saraksta, un personīgā saite ieiešanai tiek nosūtīta tikai pa e-pastu; jau reģistrētie un moderatoru un runātāju saites turpina darboties.",
+        "publicRegistrationEnabledHelp": "Ikviens var reģistrēties pasākumiem. Ja tā ir izslēgta, reģistrēties var tikai personas no pasākuma uzaicināto saraksta, un personīgā saite ieiešanai tiek nosūtīta tikai pa e-pastu; jau reģistrētie un moderatoru un runātāju saites turpina darboties. Šī ir jauniem pasākumiem piedāvātā izvēle: katrs pasākums solī “Personas” var izlemt citādi.",
         "calendarPublic": "Publiskais kalendārs",
         "calendarPublicHelp": "Publicēt pasākumu kalendāru. Apmeklētāji var redzēt plānotos pasākumus.",
         "parseTitleKicker": "Nosaukumi ar redakcionālu virsrakstu",
@@ -2406,7 +2482,8 @@
       "toggles": {
         "unmute": "Dalībnieki var ieslēgt mikrofonu",
         "video": "Dalībnieki var ieslēgt video",
-        "screenShare": "Dalībnieki var koplietot ekrānu"
+        "screenShare": "Dalībnieki var koplietot ekrānu",
+        "openRegistration": "Reģistrācija atvērta visiem"
       },
       "fields": {
         "dataRetention": "Datu glabāšana",
@@ -3012,6 +3089,54 @@
     "videoPlayer": {
       "unavailable": "Video nav pieejams",
       "openInNewTab": "Atvērt jaunā cilnē"
+    },
+    "guided": {
+      "title": "Kāds ir jūsu pasākums?",
+      "intro": "Četri jautājumi, lai sāktu ar pareizajiem iestatījumiem. Katru funkciju var ieslēgt vai izslēgt arī pasākuma laikā.",
+      "peopleQ": "Cik cilvēkus jūs gaidāt?",
+      "people": {
+        "piccolo": "Līdz 20",
+        "medio": "Līdz 100",
+        "grande": "Vairāk nekā 100"
+      },
+      "peopleHint": "Tas ir aprēķins zāles sagatavošanai, nevis reģistrāciju ierobežojums.",
+      "voiceQ": "Kas drīkst runāt un rādīties video?",
+      "voice": {
+        "all": "Visi",
+        "allDesc": "Tērzēšana, mikrofons, video un ekrāns visiem",
+        "speakers": "Runātāji un vadītāji",
+        "speakersDesc": "Publika raksta tērzēšanā un uzdod jautājumus"
+      },
+      "recQ": "Vai vēlaties ierakstīt?",
+      "rec": {
+        "yes": "Jā, kad nospiežat REC",
+        "yesDesc": "Pēc pasākuma: transkripcija, kopsavilkums un tulkojums",
+        "no": "Nē",
+        "noDesc": "Nav ieraksta, nav jālūdz piekrišana"
+      },
+      "preview": "Jūsu pasākums",
+      "previewPeople": "Gaidāmie dalībnieki: aptuveni {count}",
+      "continue": "Turpināt",
+      "useTemplate": "Vai izmantojiet veidni",
+      "summary": {
+        "piccolo": "Līdz 20 cilvēkiem",
+        "medio": "Līdz 100 cilvēkiem",
+        "grande": "Vairāk nekā 100 cilvēku",
+        "tutti": "visi video",
+        "relatori": "runā runātāji",
+        "si": "ar ierakstu",
+        "no": "bez ieraksta",
+        "openAccess": "atvērts visiem",
+        "inviteOnly": "tikai ar ielūgumu"
+      },
+      "accessQ": "Kas var piedalīties?",
+      "access": {
+        "open": "Ikviens, kas reģistrējas",
+        "openDesc": "Kas vēlas, reģistrējas pasākuma lapā",
+        "invitation": "Tikai jūsu uzaicinātie",
+        "invitationDesc": "Lapa paliek redzama, bet reģistrēties var tikai uzaicinātie; bez reģistrācijas iekļūt nevar"
+      },
+      "previewInvitation": "Reģistrēties var tikai jūsu uzaicinātie; bez reģistrācijas neviens netiek iekšā."
     }
   },
   "email": {

@@ -84,13 +84,52 @@ function click(el: HTMLElement) {
   });
 }
 
+/**
+ * Al passo con questa etichetta. I quattro passi e le impostazioni avanzate
+ * sono nella barra; «Permessi» e «Contenuti» di una volta sono sezioni delle
+ * impostazioni avanzate, che qui si aprono.
+ */
 function goToStep(label: string) {
   const nav = container.querySelector<HTMLElement>(`nav[aria-label="${w.stepsAriaLabel}"]`)!;
-  const b = Array.from(nav.querySelectorAll<HTMLButtonElement>('button')).find((el) =>
-    el.textContent?.includes(label),
-  );
-  if (!b) throw new Error(`nessun passo «${label}»`);
-  click(b);
+  const vai = (testo: string) => {
+    const b = Array.from(nav.querySelectorAll<HTMLButtonElement>('button')).find((el) =>
+      el.textContent?.includes(testo),
+    );
+    if (!b) throw new Error(`nessun passo «${testo}»`);
+    click(b);
+  };
+  const sezione: Record<string, string> = {
+    [w.steps.permissions]: 'participation',
+    [w.steps.content]: 'content',
+  };
+  const passo: Record<string, string> = {
+    [w.steps.base]: w.flow.steps.base,
+    [w.steps.invites]: w.flow.steps.invites,
+    [w.steps.review]: w.flow.steps.review,
+  };
+  const s = sezione[label];
+  if (!s) {
+    vai(passo[label] ?? label);
+    return;
+  }
+  vai(w.flow.steps.advanced);
+  apriSezione(s);
+}
+
+/** Apre una sezione delle impostazioni avanzate. */
+function apriSezione(id: string) {
+  const d = container.querySelector<HTMLDetailsElement>(`#wiz-avanzate-${id}`);
+  if (!d) throw new Error(`nessuna sezione ${id}`);
+  act(() => {
+    d.open = true;
+  });
+}
+
+/** L'organizzatore principale, nel passo «Persone». */
+function organizzatore(nome = 'Mario Rossi', email = 'mario@example.org') {
+  goToStep(w.steps.invites);
+  type(byId<HTMLInputElement>('wiz-primary-name'), nome);
+  type(byId<HTMLInputElement>('wiz-primary-email'), email);
 }
 
 function type(el: HTMLInputElement | HTMLTextAreaElement, value: string) {
@@ -149,9 +188,7 @@ describe('creazione — descrizione mancante', () => {
     renderWizard();
     type(byId<HTMLInputElement>('ev-title'), 'Evento di prova');
 
-    goToStep(w.steps.invites);
-    type(byId<HTMLInputElement>('wiz-primary-name'), 'Mario Rossi');
-    type(byId<HTMLInputElement>('wiz-primary-email'), 'mario@example.org');
+    organizzatore();
     goToStep(w.steps.review);
     await press(button(w.publish));
 
@@ -191,9 +228,7 @@ describe('creazione — descrizione mancante', () => {
     type(byId<HTMLInputElement>('ev-title'), 'Evento di prova');
     type(byId<HTMLTextAreaElement>('ev-description-it'), 'Una descrizione valida per il wizard.');
 
-    goToStep(w.steps.invites);
-    type(byId<HTMLInputElement>('wiz-primary-name'), 'Mario Rossi');
-    type(byId<HTMLInputElement>('wiz-primary-email'), 'mario@example.org');
+    organizzatore();
     goToStep(w.steps.review);
     await press(button(w.publish));
 
@@ -246,6 +281,10 @@ describe('modifica — revoca di un co-moderatore', () => {
       moderatorOrganization: null,
       moderatorOrganizationLogoUrl: null,
       moderatorPublicListed: false,
+      accessMode: null,
+      requireOrganization: false,
+      requireOrganizationRole: false,
+      requireOrganizationType: false,
     },
     organizers: [],
     eventModerators: [
@@ -335,7 +374,9 @@ describe('modifica — salvataggio da un passo intermedio', () => {
     const attivo = container.querySelector(
       `nav[aria-label="${w.stepsAriaLabel}"] [aria-current="step"]`,
     );
-    expect(attivo?.textContent).toContain(w.steps.permissions);
+    // Le impostazioni avanzate, con la sezione chiesta aperta.
+    expect(attivo?.textContent).toContain(w.flow.steps.advanced);
+    expect(container.querySelector<HTMLDetailsElement>('#wiz-avanzate-participation')?.open).toBe(true);
     await press(button(w.updateEvent));
 
     const put = (fetchMock.mock.calls as Array<[string, RequestInit]>).find(
@@ -343,6 +384,138 @@ describe('modifica — salvataggio da un passo intermedio', () => {
     );
     expect(put).toBeTruthy();
     expect(push).toHaveBeenCalledTimes(1);
+  });
+
+  it('un evento che segue il sito per chi si iscrive continua a seguirlo, finche non si sceglie', async () => {
+    fetchMock.mockImplementation(async () => json(200, {}));
+    const evento = {
+      id: 'evt-4',
+      slug: 'evento-4',
+      moderatorToken: 'token-primario',
+      event: {
+        title: { it: 'Evento di prova' },
+        description: { it: 'Una descrizione valida per il wizard.' },
+        startsAt: '2030-01-10T09:00:00.000Z',
+        endsAt: '2030-01-10T10:00:00.000Z',
+        timezone: 'Europe/Rome',
+        maxParticipants: 50,
+        dataRetentionDays: 30,
+        postEventPublic: true,
+        status: 'PUBLISHED',
+        accessMode: null,
+        requireOrganization: false,
+        requireOrganizationRole: false,
+        requireOrganizationType: false,
+      },
+      organizers: [],
+      eventModerators: [],
+      invitations: [],
+      materials: [],
+      preEventQuestionnaire: null,
+      postEventQuestionnaire: null,
+    } as unknown as InitialEventShape;
+    renderWizard({ mode: 'edit', initialEvent: evento, initialStep: 'invites' });
+    const corpo = () => {
+      const put = (fetchMock.mock.calls as Array<[string, RequestInit]>).filter(
+        ([url, init]) => url === '/api/events/evt-4' && init?.method === 'PUT',
+      ).at(-1);
+      return JSON.parse(String(put?.[1].body)) as Record<string, unknown>;
+    };
+    await press(button(w.updateEvent));
+    expect(corpo()).not.toHaveProperty('accessMode');
+  });
+
+  it('una scelta fissata resta fissata tornandoci, anche se coincide con il sito', async () => {
+    fetchMock.mockImplementation(async () => json(200, {}));
+    const evento = {
+      id: 'evt-6',
+      slug: 'evento-6',
+      moderatorToken: 'token-primario',
+      event: {
+        title: { it: 'Evento di prova' },
+        description: { it: 'Una descrizione valida per il wizard.' },
+        startsAt: '2030-01-10T09:00:00.000Z',
+        endsAt: '2030-01-10T10:00:00.000Z',
+        timezone: 'Europe/Rome',
+        maxParticipants: 50,
+        dataRetentionDays: 30,
+        postEventPublic: true,
+        status: 'PUBLISHED',
+        accessMode: 'OPEN',
+        requireOrganization: false,
+        requireOrganizationRole: false,
+        requireOrganizationType: false,
+      },
+      organizers: [],
+      eventModerators: [],
+      invitations: [],
+      materials: [],
+      preEventQuestionnaire: null,
+      postEventQuestionnaire: null,
+    } as unknown as InitialEventShape;
+    renderWizard({ mode: 'edit', initialEvent: evento, initialStep: 'invites', publicRegistrationEnabled: true });
+    const g = messages.admin.guided;
+    const sezione = container.querySelector('.wizard-iscrizione')!;
+    const scelta = (testo: string) =>
+      Array.from(sezione.querySelectorAll('label')).find(
+        (l) => l.querySelector('.formato-scelta__titolo')?.textContent === testo,
+      )!;
+    click(scelta(g.access.invitation));
+    click(scelta(g.access.open));
+    await press(button(w.updateEvent));
+    const put = (fetchMock.mock.calls as Array<[string, RequestInit]>)
+      .filter(([url, init]) => url === '/api/events/evt-6' && init?.method === 'PUT')
+      .at(-1);
+    expect(JSON.parse(String(put?.[1].body))).not.toHaveProperty('accessMode');
+  });
+
+  it('con un link di conduzione chi partecipa si vede ma non si cambia; una chiamata istantanea non ne parla', () => {
+    const base = {
+      id: 'evt-5',
+      slug: 'evento-5',
+      moderatorToken: 'token-primario',
+      event: {
+        title: { it: 'Evento di prova' },
+        description: { it: 'Una descrizione valida per il wizard.' },
+        startsAt: '2030-01-10T09:00:00.000Z',
+        endsAt: '2030-01-10T10:00:00.000Z',
+        timezone: 'Europe/Rome',
+        maxParticipants: 50,
+        dataRetentionDays: 30,
+        postEventPublic: true,
+        status: 'PUBLISHED',
+        accessMode: 'INVITATION',
+        requireOrganization: false,
+        requireOrganizationRole: false,
+        requireOrganizationType: false,
+      },
+      organizers: [],
+      eventModerators: [],
+      invitations: [],
+      materials: [],
+      preEventQuestionnaire: null,
+      postEventQuestionnaire: null,
+    };
+    renderWizard({
+      mode: 'edit',
+      initialEvent: base as unknown as InitialEventShape,
+      initialStep: 'invites',
+      viaToken: 'token-primario',
+    });
+    const sezione = container.querySelector('.wizard-iscrizione')!;
+    expect(sezione.textContent).toContain(messages.admin.wizard.step3.accessStaffOnly);
+    const radio = Array.from(sezione.querySelectorAll<HTMLInputElement>('input[type=radio]'));
+    expect(radio.length).toBe(2);
+    expect(radio.every((r) => r.disabled)).toBe(true);
+
+    act(() => root.unmount());
+    root = createRoot(container);
+    renderWizard({
+      mode: 'edit',
+      initialEvent: { ...base, event: { ...base.event, eventType: 'INSTANT' } } as unknown as InitialEventShape,
+      initialStep: 'invites',
+    });
+    expect(container.querySelector('.wizard-iscrizione')).toBeNull();
   });
 
   it('con un errore in un altro passo non salva e porta a quel passo', async () => {
@@ -380,7 +553,7 @@ describe('modifica — salvataggio da un passo intermedio', () => {
     const attivo = container.querySelector(
       `nav[aria-label="${w.stepsAriaLabel}"] [aria-current="step"]`,
     );
-    expect(attivo?.textContent).toContain(w.steps.base);
+    expect(attivo?.textContent).toContain(w.flow.steps.base);
   });
 
   it('in creazione il passo di partenza si ignora', () => {
@@ -388,11 +561,17 @@ describe('modifica — salvataggio da un passo intermedio', () => {
     const attivo = container.querySelector(
       `nav[aria-label="${w.stepsAriaLabel}"] [aria-current="step"]`,
     );
-    expect(attivo?.textContent).toContain(w.steps.base);
+    expect(attivo?.textContent).toContain(w.flow.steps.base);
   });
 });
 
 describe('passo Permessi — lavagna', () => {
+  beforeEach(() => {
+    // Le impostazioni avanzate montano anche i contenuti, che leggono i
+    // modelli di domande.
+    fetchMock.mockImplementation(async () => json(200, { rows: [] }));
+  });
+
   function interruttoreLavagna(): HTMLInputElement {
     const el = container.querySelector<HTMLInputElement>(
       `input[aria-label="${messages.admin.form.whiteboardEnabled}"]`,
@@ -458,9 +637,7 @@ describe('creazione — pubblicazione non riuscita', () => {
     renderWizard();
     type(byId<HTMLInputElement>('ev-title'), 'Evento di prova');
     type(byId<HTMLTextAreaElement>('ev-description-it'), 'Una descrizione valida per il wizard.');
-    goToStep(w.steps.invites);
-    type(byId<HTMLInputElement>('wiz-primary-name'), 'Mario Rossi');
-    type(byId<HTMLInputElement>('wiz-primary-email'), 'mario@example.org');
+    organizzatore();
     goToStep(w.steps.review);
     return press(button(w.publish));
   }
@@ -524,9 +701,7 @@ describe('creazione — dove si arriva', () => {
     renderWizard();
     type(byId<HTMLInputElement>('ev-title'), 'Evento di prova');
     type(byId<HTMLTextAreaElement>('ev-description-it'), 'Una descrizione valida per il wizard.');
-    goToStep(w.steps.invites);
-    type(byId<HTMLInputElement>('wiz-primary-name'), 'Mario Rossi');
-    type(byId<HTMLInputElement>('wiz-primary-email'), 'mario@example.org');
+    organizzatore();
     goToStep(w.steps.review);
   }
 
@@ -576,8 +751,8 @@ describe('validazione — il fuoco va al campo da correggere', () => {
     expect(document.activeElement).toBe(titolo);
     expect(titolo.getAttribute('aria-invalid')).toBe('true');
     const descritto = titolo.getAttribute('aria-describedby') ?? '';
-    const messaggio = descritto.split(' ').map((id) => document.getElementById(id)).find(Boolean);
-    expect(messaggio?.classList.contains('invalid-feedback')).toBe(true);
+    const collegati = descritto.split(' ').map((id) => document.getElementById(id));
+    expect(collegati.some((el) => el?.classList.contains('invalid-feedback'))).toBe(true);
     // Il riepilogo accanto ai pulsanti nomina il campo.
     expect(container.textContent).toContain(w.toFix);
   });
@@ -628,15 +803,13 @@ describe('creazione — risorse non salvate', () => {
     renderWizard();
     type(byId<HTMLInputElement>('ev-title'), 'Evento di prova');
     type(byId<HTMLTextAreaElement>('ev-description-it'), 'Una descrizione valida per il wizard.');
-    goToStep(w.steps.invites);
+    organizzatore();
     // Il ruolo proposto per una persona nuova è «Relatore».
     type(byId<HTMLInputElement>('person-name'), 'Relatore 1');
     type(byId<HTMLInputElement>('person-email'), 'relatore@example.org');
     // «Aggiungi» del modulo delle persone: quello che segue il suo campo email.
     const bloccoPersone = byId('person-email').closest('.row') ?? container;
     await press(button(w.step3.add, bloccoPersone));
-    type(byId<HTMLInputElement>('wiz-primary-name'), 'Mario Rossi');
-    type(byId<HTMLInputElement>('wiz-primary-email'), 'mario@example.org');
     goToStep(w.steps.review);
     await press(button(w.saveDraft));
 
@@ -659,9 +832,7 @@ describe('creazione — risorse non salvate', () => {
     renderWizard();
     type(byId<HTMLInputElement>('ev-title'), 'Evento di prova');
     type(byId<HTMLTextAreaElement>('ev-description-it'), 'Una descrizione valida per il wizard.');
-    goToStep(w.steps.invites);
-    type(byId<HTMLInputElement>('wiz-primary-name'), 'Mario Rossi');
-    type(byId<HTMLInputElement>('wiz-primary-email'), 'mario@example.org');
+    organizzatore();
     goToStep(w.steps.review);
     await press(button(w.publish));
 
@@ -699,7 +870,7 @@ describe('creazione — risorse non salvate', () => {
   });
 });
 
-describe('passo 1 — la fine segue l inizio', () => {
+describe('passo «Quando» — la fine segue l inizio', () => {
   function fuoco(el: HTMLElement, dentro: boolean) {
     act(() => {
       if (dentro) el.focus();
@@ -709,6 +880,7 @@ describe('passo 1 — la fine segue l inizio', () => {
 
   it('scrivendo nel campo, la fine si sposta all uscita con la durata che aveva, ignorando i valori intermedi', () => {
     renderWizard();
+    goToStep(w.flow.steps.schedule);
     const inizio = byId<HTMLInputElement>('ev-starts');
     const fine = byId<HTMLInputElement>('ev-ends');
     fuoco(inizio, true);
@@ -728,6 +900,7 @@ describe('passo 1 — la fine segue l inizio', () => {
 
   it('un valore arrivato a campo non attivo (dal selettore di data) sposta subito la fine', () => {
     renderWizard();
+    goToStep(w.flow.steps.schedule);
     const inizio = byId<HTMLInputElement>('ev-starts');
     const fine = byId<HTMLInputElement>('ev-ends');
     fuoco(inizio, true);
@@ -741,11 +914,328 @@ describe('passo 1 — la fine segue l inizio', () => {
 
   it('se l inizio non cambia, la fine resta', () => {
     renderWizard();
+    goToStep(w.flow.steps.schedule);
     const inizio = byId<HTMLInputElement>('ev-starts');
     const fine = byId<HTMLInputElement>('ev-ends');
     type(fine, '2030-03-10T18:00');
     fuoco(inizio, true);
     fuoco(inizio, false);
     expect(fine.value).toBe('2030-03-10T18:00');
+  });
+});
+
+/**
+ * Il modello decide i default, e il wizard chiede solo l'evento: la
+ * registrazione non parte mai da sola, e chi registra ha trascrizione,
+ * sintesi, traduzione e tracce per partecipante; le lingue di traduzione si
+ * scelgono nel riepilogo.
+ */
+describe('creazione — i default del modello', () => {
+  const CREATO = { id: 'evt-tpl', slug: 'evento-modello', moderatorToken: 'token' };
+  const modello: NonNullable<WizardProps['template']> = {
+    id: 'tpl-webinar',
+    name: 'Webinar pubblico',
+    qaEnabled: true,
+    chatEnabled: true,
+    recordingEnabled: true,
+    // Un modello salvato prima: avviava da solo. Il wizard non lo segue.
+    autoStartRecording: true,
+    participantsCanUnmute: false,
+    participantsCanStartVideo: false,
+    participantsCanShareScreen: false,
+    maxParticipants: 300,
+    aiTranscriptEnabled: true,
+    aiSummaryEnabled: true,
+    aiTranslationEnabled: true,
+    multitrackRecordingEnabled: true,
+    aiTargetLocales: null,
+  };
+
+  beforeEach(() => {
+    fetchMock.mockImplementation(async (input: RequestInfo | URL, init: RequestInit = {}) => {
+      const url = String(input);
+      if (url === '/api/events' && init.method === 'POST') return json(201, CREATO);
+      return json(200, {});
+    });
+  });
+
+  function payloadInviato(): Record<string, unknown> {
+    const post = (fetchMock.mock.calls as Array<[string, RequestInit]>).find(
+      ([url, init]) => url === '/api/events' && init?.method === 'POST',
+    );
+    return JSON.parse(String(post?.[1].body)) as Record<string, unknown>;
+  }
+
+  function compila() {
+    type(byId<HTMLInputElement>('ev-title'), 'Evento di prova');
+    type(byId<HTMLTextAreaElement>('ev-description-it'), 'Una descrizione valida per il wizard.');
+    organizzatore();
+  }
+
+  it('dice quale modello e in uso e porta a cambiarlo', () => {
+    const cambia = vi.fn();
+    renderWizard({ template: modello, onChangeTemplate: cambia });
+    expect(container.querySelector('.wizard-modello')?.textContent).toContain('Webinar pubblico');
+    click(button(w.flow.changeTemplate));
+    expect(cambia).toHaveBeenCalledTimes(1);
+  });
+
+  it('nel riepilogo: registrazione col pulsante REC, mai automatica, e le funzioni AI accese', async () => {
+    renderWizard({ template: modello, aiPipelineEnabled: true, defaultTargetLocales: 'en,fr,es,de' });
+    compila();
+    goToStep(w.steps.review);
+    const anteprima = container.querySelector<HTMLElement>('.anteprima-evento')!;
+    expect(anteprima.textContent).toContain(w.flow.recordingManual);
+    expect(anteprima.textContent).toContain(messages.admin.form.aiSummaryEnabled);
+
+    await press(button(w.saveDraft));
+    const payload = payloadInviato();
+    expect(payload).toMatchObject({
+      recordingEnabled: true,
+      autoStartRecording: false,
+      aiTranscriptEnabled: true,
+      aiSummaryEnabled: true,
+      aiTranslationEnabled: true,
+      multitrackRecordingEnabled: true,
+      aiTargetLocales: 'en,fr,es,de',
+    });
+  });
+
+  it('il sopratitolo si spiega sotto il titolo, e con «|» si vede e si sceglie', async () => {
+    renderWizard({ template: modello });
+    const s1 = messages.admin.wizard.step1;
+    expect(container.textContent).toContain(s1.kickerHint);
+    expect(container.querySelector('#ev-parse-title-kicker')).toBeNull();
+    type(byId<HTMLInputElement>('ev-title'), 'Ciclo | Il primo incontro');
+    const casella = byId<HTMLInputElement>('ev-parse-title-kicker');
+    expect(casella.checked).toBe(false);
+    const anteprima = () => container.querySelector('.wizard-sopratitolo__titolo')!;
+    expect(anteprima().querySelector('.event-title-kicker')).toBeNull();
+    click(casella);
+    expect(anteprima().querySelector('.event-title-kicker')?.textContent).toBe('Ciclo');
+    expect(anteprima().querySelector('.event-title-main')?.textContent).toBe('Il primo incontro');
+    type(byId<HTMLTextAreaElement>('ev-description-it'), 'Una descrizione valida per il wizard.');
+    organizzatore();
+    goToStep(w.steps.review);
+    // Anche il riepilogo mostra il titolo come apparira'.
+    expect(container.querySelector('.anteprima-evento__titolo .event-title-kicker')?.textContent).toBe('Ciclo');
+    await press(button(w.saveDraft));
+    expect(payloadInviato()).toMatchObject({ parseTitleKicker: true });
+  });
+
+  it('chi si iscrive: segue il sito finche non si sceglie, e solo su invito lo dice ovunque', async () => {
+    const g = messages.admin.guided;
+    const s3 = messages.admin.wizard.step3;
+    renderWizard({ template: { ...modello, accessMode: null }, publicRegistrationEnabled: true });
+    compila();
+    goToStep(w.steps.invites);
+    const sezione = container.querySelector('.wizard-iscrizione')!;
+    expect(sezione.textContent).toContain(s3.accessSiteDefault);
+    const scelta = (testo: string) =>
+      Array.from(sezione.querySelectorAll('label')).find(
+        (l) => l.querySelector('.formato-scelta__titolo')?.textContent === testo,
+      )!;
+    expect(scelta(g.access.open).querySelector('input')!.checked).toBe(true);
+
+    click(scelta(g.access.invitation));
+    expect(sezione.textContent).not.toContain(s3.accessSiteDefault);
+    expect(sezione.textContent).toContain(s3.accessNoInvitees);
+    // Solo su invito l'elenco degli invitati e' aperto: e' chi puo' iscriversi.
+    const inviti = Array.from(container.querySelectorAll('details.wizard-group')).find((d) =>
+      d.textContent?.includes(s3.invitationsHeading),
+    ) as HTMLDetailsElement;
+    expect(inviti.open).toBe(true);
+
+    click(byId<HTMLInputElement>(sezione.querySelector('input[type=checkbox]')!.id));
+    goToStep(w.steps.review);
+    const anteprima = container.querySelector('.anteprima-evento')!;
+    expect(anteprima.textContent).toContain(w.flow.accessInvitation.replace('{count}', '0'));
+    expect(anteprima.textContent).toContain(w.flow.addInvitees);
+    expect(anteprima.textContent).toContain(w.flow.askOrganization);
+
+    await press(button(w.saveDraft));
+    expect(payloadInviato()).toMatchObject({ accessMode: 'INVITATION', requireOrganization: true });
+  });
+
+  it('una scelta ereditata dal sito si conferma con un clic, e «Cambia formato» la porta con se', async () => {
+    const g = messages.admin.guided;
+    const cambia = vi.fn();
+    renderWizard({
+      template: { ...modello, accessMode: null },
+      publicRegistrationEnabled: false,
+      onChangeTemplate: cambia,
+    });
+    compila();
+    goToStep(w.steps.invites);
+    const sezione = container.querySelector('.wizard-iscrizione')!;
+    const invito = Array.from(sezione.querySelectorAll('label')).find(
+      (l) => l.querySelector('.formato-scelta__titolo')?.textContent === g.access.invitation,
+    )!;
+    // Il sito e' solo su invito: la scelta appare gia' fatta, ma non e' salvata.
+    expect(invito.querySelector('input')!.checked).toBe(true);
+    click(invito);
+    expect(sezione.textContent).not.toContain(messages.admin.wizard.step3.accessSiteDefault);
+    // Provata l'altra scelta e tornati indietro, si torna a seguire il sito.
+    const aperto = Array.from(sezione.querySelectorAll('label')).find(
+      (l) => l.querySelector('.formato-scelta__titolo')?.textContent === g.access.open,
+    )!;
+    click(aperto);
+    click(invito);
+    expect(sezione.textContent).toContain(messages.admin.wizard.step3.accessSiteDefault);
+    click(button(w.flow.changeTemplate));
+    expect(cambia).toHaveBeenCalledWith({ invitati: true });
+  });
+
+  it('senza lingue in cui tradurre, la traduzione non si accende da sola', async () => {
+    renderWizard({ template: modello, aiPipelineEnabled: true, defaultTargetLocales: 'it' });
+    compila();
+    goToStep(w.steps.review);
+    expect(container.textContent).not.toContain(messages.admin.form.aiTargetLocales);
+    await press(button(w.saveDraft));
+    expect(payloadInviato()).toMatchObject({ aiTranscriptEnabled: true, aiTranslationEnabled: false });
+  });
+
+  it('le lingue di traduzione si cambiano nel riepilogo', async () => {
+    renderWizard({ template: modello, aiPipelineEnabled: true, defaultTargetLocales: 'en,fr' });
+    compila();
+    goToStep(w.steps.review);
+    // Le lingue si aprono a richiesta, nell'anteprima.
+    click(button(w.flow.changeLanguages));
+    const francese = Array.from(container.querySelectorAll<HTMLInputElement>('#aiTargetLocales input[type="checkbox"]')).find(
+      (el) => el.labels?.[0]?.getAttribute('lang') === 'fr',
+    )!;
+    click(francese);
+    await press(button(w.saveDraft));
+    expect(payloadInviato().aiTargetLocales).toBe('en');
+  });
+
+  it('senza modello, accendere la registrazione accende anche trascrizione, sintesi, traduzione e tracce', async () => {
+    renderWizard({ aiPipelineEnabled: true, defaultTargetLocales: 'en,de' });
+    compila();
+    goToStep(w.steps.permissions);
+    click(container.querySelector<HTMLElement>(`[aria-label="${messages.admin.form.recordingEnabled}"]`)!);
+    // L'avvio automatico non si offre piu'.
+    expect(container.querySelector(`[aria-label="${messages.admin.form.autoStartRecording}"]`)).toBeNull();
+    expect(container.textContent).toContain(w.step2.recordingManualNote);
+    goToStep(w.steps.review);
+    await press(button(w.saveDraft));
+    expect(payloadInviato()).toMatchObject({
+      recordingEnabled: true,
+      autoStartRecording: false,
+      aiTranscriptEnabled: true,
+      aiSummaryEnabled: true,
+      aiTranslationEnabled: true,
+      multitrackRecordingEnabled: true,
+      aiTargetLocales: 'en,de',
+    });
+  });
+
+  it('la bozza di un formato si offre tornando sullo stesso, non su un altro', () => {
+    localStorage.setItem('pa-wizard-draft:new:tpl-altro', JSON.stringify({ title: { it: 'Altro' } }));
+    renderWizard({ template: modello });
+    expect(container.textContent).not.toContain(w.draftFound);
+
+    act(() => root.unmount());
+    root = createRoot(container);
+    localStorage.setItem(`pa-wizard-draft:new:${modello.id}`, JSON.stringify({ title: { it: 'Stesso formato' } }));
+    renderWizard({ template: modello });
+    click(button(w.draftRestore));
+    expect(byId<HTMLInputElement>('ev-title').value).toBe('Stesso formato');
+  });
+
+  it('la bozza della versione precedente (una per tutti) si offre ancora, e ripresa passa al formato', () => {
+    localStorage.setItem('pa-wizard-draft:new', JSON.stringify({ title: { it: 'Di prima' } }));
+    renderWizard({ template: modello });
+    click(button(w.draftRestore));
+    expect(byId<HTMLInputElement>('ev-title').value).toBe('Di prima');
+    expect(localStorage.getItem('pa-wizard-draft:new')).toBeNull();
+  });
+
+  it('«Cambia formato» porta solo cio che si e scritto, e solo per poco', () => {
+    const cambia = vi.fn();
+    renderWizard({ template: modello, onChangeTemplate: cambia });
+    type(byId<HTMLInputElement>('ev-title'), 'Evento portato');
+    click(button(w.flow.changeTemplate));
+    expect(cambia).toHaveBeenCalledTimes(1);
+    const portati = JSON.parse(localStorage.getItem('pa-wizard-draft:trasloco')!) as {
+      at: number;
+      dati: Record<string, unknown>;
+    };
+    // Solo il titolo: descrizione e date erano quelle di partenza.
+    expect(Object.keys(portati.dati)).toEqual(['title']);
+
+    // Il formato nuovo li riprende.
+    act(() => root.unmount());
+    root = createRoot(container);
+    renderWizard({ template: { ...modello, id: 'tpl-nuovo', name: 'Nuovo' } });
+    expect(byId<HTMLInputElement>('ev-title').value).toBe('Evento portato');
+    expect(localStorage.getItem('pa-wizard-draft:trasloco')).toBeNull();
+    // Lo dice, e si puo' ripartire dai valori del formato.
+    expect(container.textContent).toContain(w.flow.carriedOver);
+    click(button(w.flow.startOver));
+    expect(byId<HTMLInputElement>('ev-title').value).toBe('');
+
+    // Scaduti, non si riprendono.
+    localStorage.setItem(
+      'pa-wizard-draft:trasloco',
+      JSON.stringify({ at: Date.now() - 60 * 60 * 1000, dati: { title: { it: 'Vecchio' } } }),
+    );
+    act(() => root.unmount());
+    root = createRoot(container);
+    renderWizard({ template: modello });
+    expect(byId<HTMLInputElement>('ev-title').value).toBe('');
+  });
+});
+
+/**
+ * Gli obbligatori si fanno notare prima di premere un pulsante: lampeggiano
+ * finche' sono vuoti, la barra dice quali passi sono da completare, e il
+ * riepilogo elenca cio' che manca con il link al campo.
+ */
+describe('obbligatori — si fanno notare', () => {
+  beforeEach(() => {
+    fetchMock.mockImplementation(async () => json(200, { rows: [] }));
+  });
+
+  it('il titolo vuoto lampeggia con la riga «serve per salvare», che sparisce scrivendo', () => {
+    renderWizard();
+    const campo = byId<HTMLInputElement>('ev-title').closest('.wizard-campo')!;
+    expect(campo).toHaveClass('wizard-campo--vuoto');
+    expect(campo.textContent).toContain(w.flow.requiredToSave);
+    expect(byId('ev-title').getAttribute('aria-describedby')?.split(' ')).toContain('ev-title-promemoria');
+    type(byId<HTMLInputElement>('ev-title'), 'Evento di prova');
+    expect(byId('ev-title').getAttribute('aria-describedby')?.split(' ')).not.toContain('ev-title-promemoria');
+    expect(campo).not.toHaveClass('wizard-campo--vuoto');
+    expect(campo.textContent).not.toContain(w.flow.requiredToSave);
+  });
+
+  it('la barra dei passi dice quali sono da completare', () => {
+    renderWizard();
+    const nav = container.querySelector<HTMLElement>(`nav[aria-label="${w.stepsAriaLabel}"]`)!;
+    const passo = (nome: string) =>
+      Array.from(nav.querySelectorAll('button')).find((b) => b.textContent?.includes(nome))!;
+    expect(passo(w.flow.steps.base).textContent).toContain(w.flow.toComplete);
+    // L'organizzatore principale serve per pubblicare: anche «Persone» e' da completare.
+    expect(passo(w.flow.steps.invites).textContent).toContain(w.flow.toComplete);
+    expect(passo(w.flow.steps.schedule).textContent).not.toContain(w.flow.toComplete);
+  });
+
+  it('il riepilogo elenca cio che manca, e ogni voce porta al suo campo', () => {
+    renderWizard();
+    type(byId<HTMLTextAreaElement>('ev-description-it'), 'Una descrizione valida per il wizard.');
+    goToStep(w.steps.review);
+    const elenco = container.querySelector('.wizard-mancanti')!;
+    expect(elenco.textContent).toContain(messages.admin.form.titleLabel);
+    expect(elenco.textContent).toContain(w.flow.fieldOrganizerEmail);
+    click(button(messages.admin.form.titleLabel, elenco));
+    expect(document.activeElement?.id).toBe('ev-title');
+  });
+
+  it('il nome dell organizzatore vuoto dice che serve per pubblicare', () => {
+    renderWizard();
+    goToStep(w.steps.invites);
+    const campo = byId<HTMLInputElement>('wiz-primary-name').closest('.wizard-campo')!;
+    expect(campo).toHaveClass('wizard-campo--vuoto');
+    expect(campo.textContent).toContain(w.flow.requiredToPublish);
   });
 });

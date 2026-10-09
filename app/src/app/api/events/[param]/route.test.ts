@@ -22,6 +22,9 @@ vi.mock('@/lib/auth/moderator', () => ({
   constantTimeEqual: vi.fn(() => true),
 }));
 
+const staff = vi.hoisted(() => ({ requireEventManager: vi.fn() }));
+vi.mock('next/headers', () => ({ cookies: vi.fn(async () => ({})) }));
+vi.mock('@/lib/auth/staff-session', () => staff);
 vi.mock('@/lib/audit/admin-audit', () => ({
   logAdminAction: vi.fn(async () => undefined),
 }));
@@ -62,7 +65,7 @@ vi.mock('@/lib/db', () => ({
 }));
 
 import { prisma } from '@/lib/db';
-import { AppError } from '@/lib/errors';
+import { AppError, UnauthorizedError } from '@/lib/errors';
 import { recordLiveAction, recordLiveActions } from '@/lib/live/actions';
 
 import { DELETE, PUT } from './route';
@@ -100,6 +103,7 @@ function eventoEsistente(status = 'PUBLISHED') {
     requireOrganization: true,
     requireOrganizationRole: true,
     requireOrganizationType: true,
+    accessMode: null,
     privacyPolicyText: 'Informativa scritta a mano',
     gdprTemplateId: null,
     permissionMatrix: null,
@@ -132,6 +136,7 @@ const MAI_SENZA_INVIO = [
   'requireOrganization',
   'requireOrganizationRole',
   'requireOrganizationType',
+  'accessMode',
   'privacyPolicyText',
   'gdprTemplateId',
 ] as const;
@@ -161,6 +166,15 @@ describe('PUT /api/events/[param] — le modifiche parziali restano parziali', (
     for (const campo of MAI_SENZA_INVIO) {
       expect(dati).not.toHaveProperty(campo);
     }
+  });
+
+  it("l'avvio automatico della registrazione si puo' spegnere, non accendere", async () => {
+    await PUT(richiesta({ autoStartRecording: true }), contesto as never);
+    expect(datiScritti()).not.toHaveProperty('autoStartRecording');
+
+    mocked.event.update.mockClear();
+    await PUT(richiesta({ autoStartRecording: false }), contesto as never);
+    expect(datiScritti().autoStartRecording).toBe(false);
   });
 
   it('risponde anche per un evento con una registrazione Jibri (dimensione BigInt)', async () => {
@@ -195,6 +209,28 @@ describe('PUT /api/events/[param] — le modifiche parziali restano parziali', (
     expect(dati.requireOrganizationRole).toBe(false);
     expect(dati.requireOrganizationType).toBe(false);
     expect(dati.gdprTemplateId).toBe(GDPR_ID);
+  });
+
+  it('chi partecipa lo cambia solo lo staff dell evento, non un link di conduzione', async () => {
+    staff.requireEventManager.mockRejectedValueOnce(new UnauthorizedError());
+    const res = await PUT(richiesta({ accessMode: 'OPEN' }), contesto as never);
+    expect(res.status).toBe(403);
+    expect(mocked.event.update).not.toHaveBeenCalled();
+
+    // Un guasto della banca dati non diventa «solo lo staff»: resta un errore.
+    staff.requireEventManager.mockRejectedValueOnce(new Error('db down'));
+    const guasto = await PUT(richiesta({ accessMode: 'OPEN' }), contesto as never);
+    expect(guasto.status).toBe(500);
+
+    staff.requireEventManager.mockResolvedValueOnce({ role: 'organizer' });
+    await PUT(richiesta({ accessMode: 'INVITATION' }), contesto as never);
+    expect(datiScritti().accessMode).toBe('INVITATION');
+  });
+
+  it('rimandare la scelta che c e gia non chiede lo staff', async () => {
+    await PUT(richiesta({ accessMode: null, requireOrganization: false }), contesto as never);
+    expect(staff.requireEventManager).not.toHaveBeenCalled();
+    expect(datiScritti().requireOrganization).toBe(false);
   });
 
   it('svuota il testo dell\'informativa quando arriva una stringa vuota', async () => {

@@ -136,7 +136,8 @@ export const POST = withErrorHandling(async (request) => {
       qaEnabled: effectiveToggles.qaEnabled,
       chatEnabled: effectiveToggles.chatEnabled,
       recordingEnabled: data.recordingEnabled,
-      autoStartRecording: data.autoStartRecording,
+      // La registrazione non parte mai da sola: la avvia chi conduce con REC.
+      autoStartRecording: false,
       participantsCanUnmute: effectiveToggles.participantsCanUnmute,
       participantsCanStartVideo: effectiveToggles.participantsCanStartVideo,
       participantsCanShareScreen: effectiveToggles.participantsCanShareScreen,
@@ -156,6 +157,7 @@ export const POST = withErrorHandling(async (request) => {
       // modo di valorizzare queste colonne era duplicare un evento che le
       // aveva già.
       gdprTemplateId: data.gdprTemplateId ?? null,
+      accessMode: data.accessMode ?? null,
       requireOrganization: data.requireOrganization,
       requireOrganizationRole: data.requireOrganizationRole,
       requireOrganizationType: data.requireOrganizationType,

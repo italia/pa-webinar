@@ -154,6 +154,16 @@ describe('POST /api/events — persistenza dei campi accettati', () => {
     expect(dati.wordCloudEnabled).toBe(true);
   });
 
+  it('la registrazione non parte mai da sola, anche se la richiesta lo chiede', async () => {
+    await POST(
+      richiesta(corpo({ recordingEnabled: true, autoStartRecording: true })),
+      { params: Promise.resolve({}) } as never,
+    );
+    const dati = datiScritti();
+    expect(dati.recordingEnabled).toBe(true);
+    expect(dati.autoStartRecording).toBe(false);
+  });
+
   it('rifiuta un modello di informativa inesistente senza creare nulla', async () => {
     // Senza la verifica, la chiave esterna fallirebbe con un codice che il
     // gestore degli errori non mappa: un 500 al posto di un errore sul campo.

@@ -742,7 +742,7 @@
       "updateEvent": "Uppdatera evenemang",
       "step1": {
         "heading": "Grundläggande information",
-        "intro": "Titel, beskrivning, omslagsbild och schema.",
+        "intro": "Evenemangets titel, beskrivning och bild.",
         "coverImage": "Omslagsbild",
         "coverImageHelp": "Visas på den offentliga webbplatsen och i e-post till anmälda.",
         "scheduleHeading": "Schema",
@@ -751,8 +751,6 @@
         "tagsHeading": "Kategorier (taggar)",
         "waitingRoomAudio": "Ljud i väntrummet (valfritt)",
         "waitingRoomAudioHelp": "Spelas upp innan livesändningen börjar.",
-        "parseTitleKickerLabel": "Titel med övertitel (separator |)",
-        "parseTitleKickerHelp": "När aktiverat visas en titel som 'KONFERENS | Digital innovation' med KONFERENS som liten övertitel.",
         "maxParticipantsHelp": "En uppskattning av hur många som väntas: den används för att dimensionera videoservern och begränsar inte anmälningarna.",
         "validation": {
           "startsAt": "Ogiltigt startdatum.",
@@ -782,7 +780,11 @@
           "HIGH": "Hög (720p, rekommenderas)",
           "BALANCED": "Balanserad (540p)",
           "SAVE_DATA": "Datasparläge (360p)"
-        }
+        },
+        "requiredLegend": "Fält markerade med * behövs för att spara evenemanget: så länge de är tomma står det vid varje fält.",
+        "kickerHint": "För en överrubrik skriver du den före titeln och skiljer dem åt med |, till exempel ”Mötesserie | Det första mötet”.",
+        "kickerUse": "Visa ”{kicker}” som överrubrik",
+        "kickerPreview": "Så här ser den ut på evenemangssidan"
       },
       "step2": {
         "heading": "Vem får göra vad",
@@ -841,7 +843,8 @@
             "name": "Deltagare",
             "desc": "Följer evenemanget och deltar så som du bestämmer i tabellen nedan."
           }
-        }
+        },
+        "recordingManualNote": "Inspelningen startar aldrig av sig själv: en moderator startar den med REC-knappen."
       },
       "step3": {
         "heading": "Personer och inbjudningar",
@@ -873,7 +876,7 @@
         "personName": "Namn",
         "personEmail": "E-post",
         "peopleHeading": "Evenemangets personer",
-        "peopleHelp": "Arrangörer, moderatorer och talare. Var och en får en egen länk för att delta med sin roll; vad varje roll får göra visas i steget ”Behörigheter”.",
+        "peopleHelp": "Arrangörer, moderatorer och talare. Var och en får en egen länk för att delta med sin roll; vad varje roll får göra visas under ”Avancerade inställningar”.",
         "personRole": "Roll",
         "roleOrganizer": "Arrangör",
         "roleModerator": "Moderator",
@@ -893,7 +896,17 @@
         "invitationsHelpOpen": "Valfritt: listan över de personer du bjuder in. Anmälan är öppen, så efter publicering kan vem som helst anmäla sig, inbjuden eller inte. Plattformen skickar inga inbjudningar: dela själv länken till evenemanget.",
         "invitationsHelpRestricted": "Anmälan är begränsad: endast adresserna i den här listan kan anmäla sig. Plattformen skickar inga inbjudningar: dela själv länken till evenemanget; länken för att delta kommer via e-post efter anmälan.",
         "logoExternal": "Den offentliga sidan visar bara logotyper som laddats upp till den här plattformen: en logotyp från en annan webbplats visas inte.",
-        "primaryProfileInvalid": "Kontrollera organisationen och logotypens adress."
+        "primaryProfileInvalid": "Kontrollera organisationen och logotypens adress.",
+        "primaryMore": "Organisation, logotyp och offentlig sida",
+        "accessHeading": "Vem som anmäler sig",
+        "accessSiteDefault": "Följer webbplatsens inställning: om administrationen ändrar den gäller det även det här evenemanget.",
+        "accessNoInvitees": "Inga inbjudna ännu: så länge listan nedan är tom kan ingen anmäla sig.",
+        "askHeading": "Vad vi frågar den som anmäler sig",
+        "askAlways": "Namn och e-post, alltid. Dessutom, om du behöver:",
+        "askOrganization": "Organisation (krävs för anmälan)",
+        "askRole": "Roll (valfritt)",
+        "askType": "Typ av organisation (valfritt)",
+        "accessStaffOnly": "Vem som anmäler sig bestämmer evenemangets team."
       },
       "step4": {
         "heading": "Innehåll och material",
@@ -941,7 +954,7 @@
       },
       "step5": {
         "heading": "Sammanfattning och publicering",
-        "intro": "Kontrollera informationen och publicera evenemanget (eller spara som utkast).",
+        "intro": "Evenemanget som andra kommer att se det: kontrollera det och publicera det eller spara det som utkast.",
         "summary": {
           "title": "Titel",
           "schedule": "Schema",
@@ -1000,7 +1013,70 @@
       "publishFailedDetail": "Evenemanget har skapats men inte publicerats: det är fortfarande ett utkast. Servern svarade: {reason}. Publicera det från evenemangets sida.",
       "toFix": "Att rätta:",
       "toFixField": "Fält {n}",
-      "stepsAriaLabel": "Steg i evenemangsformuläret"
+      "stepsAriaLabel": "Steg i evenemangsformuläret",
+      "flow": {
+        "steps": {
+          "base": "Evenemang",
+          "schedule": "När",
+          "invites": "Personer",
+          "review": "Sammanfattning",
+          "advanced": "Avancerade inställningar"
+        },
+        "templateInUse": "Mall: <b>{name}</b>",
+        "noTemplate": "Evenemang utan mall",
+        "changeTemplate": "Byt mall",
+        "chooseTemplate": "Välj en mall",
+        "backToReview": "Tillbaka till sammanfattningen",
+        "participantsCan": "Deltagare: {list}",
+        "none": "inga",
+        "recordingManual": "Tillgänglig: startar först när en moderator trycker på REC.",
+        "aiAfter": "Efter inspelningen: {list}.",
+        "scheduleHeading": "När det äger rum",
+        "scheduleIntro": "Datum, tid och hur många du väntar dig: används för att förbereda rummet.",
+        "advancedIntro": "Värden som mallen redan har valt: ändra bara det som behövs.",
+        "advancedIntroTemplate": "Värden som mallen ”{name}” redan har valt: ändra bara det som behövs.",
+        "requiredToSave": "Behövs för att spara evenemanget.",
+        "requiredToPublish": "Behövs för att publicera evenemanget.",
+        "toComplete": "Att fylla i",
+        "missingHeading": "För att publicera saknas fortfarande:",
+        "fieldOrganizerName": "Huvudarrangörens namn",
+        "fieldOrganizerEmail": "Huvudarrangörens e-post",
+        "capacityWarning": "Kapacitet att kontrollera i de tekniska detaljerna.",
+        "sections": {
+          "participation": "Deltagande och rummets funktioner",
+          "recording": "Inspelning och AI",
+          "content": "Innehåll: material och enkäter",
+          "room": "Väntrum och video",
+          "data": "Integritet, data och sidan efter evenemanget",
+          "technical": "Tekniska detaljer: kapacitet och resurser"
+        },
+        "formatInUse": "Format: <b>{name}</b>",
+        "changeFormat": "Byt format",
+        "voiceAll": "Alla talar och syns i video",
+        "voiceSpeakers": "Talare och moderatorer talar och syns i video; publiken skriver i chatten",
+        "features": "Funktioner: {list}",
+        "liveToggleNote": "Varje funktion kan också slås på och av under evenemanget.",
+        "customize": "Anpassa inställningarna",
+        "changeLanguages": "Byt språk",
+        "translationLine": "Översättning till: {list}",
+        "privacyTemplate": "Integritetsmeddelande: {name}",
+        "privacyCustom": "Integritetsmeddelande: text skriven för evenemanget",
+        "privacyDocument": "Integritetsmeddelande: evenemangets dokument",
+        "privacySite": "Integritetsmeddelande: webbplatsens",
+        "untitled": "Evenemang utan titel",
+        "carriedOver": "Vi har behållit det du hade skrivit om evenemanget.",
+        "startOver": "Börja om",
+        "accessOpen": "Alla kan anmäla sig från evenemangets sida.",
+        "accessInvitation": "Endast inbjudna. Inbjudna: {count}.",
+        "addInvitees": "Lägg till inbjudna",
+        "change": "Ändra",
+        "askLine": "Vid anmälan frågar vi efter: {list}.",
+        "askName": "namn",
+        "askEmail": "e-post",
+        "askOrganization": "organisation",
+        "askRole": "roll",
+        "askType": "typ av organisation"
+      }
     },
     "nav": {
       "events": "Evenemang",
@@ -1784,9 +1860,9 @@
         "statusPageEnabled": "Statussida aktiverad",
         "statusPageEnabledHelp": "Publicerar tjänstens statussida. När den är avstängd finns sidan inte och dess data visas bara för administratörer.",
         "guestAccessEnabled": "Gäståtkomst aktiverad",
-        "guestAccessEnabledHelp": "Personer som inte har anmält sig kan delta i pågående evenemang med bara sitt namn. När det är avstängt kan man bara delta i schemalagda evenemang med anmälan eller med en moderator- eller talarlänk; omedelbara videosamtal förblir öppna för alla som har länken.",
+        "guestAccessEnabledHelp": "Personer som inte har anmält sig kan delta i pågående evenemang med bara sitt namn. När det är avstängt kan man bara delta i schemalagda evenemang med anmälan eller med en moderator- eller talarlänk; omedelbara videosamtal förblir öppna för alla som har länken. Ett evenemang endast för inbjudna släpper aldrig in gäster.",
         "publicRegistrationEnabled": "Offentlig registrering aktiverad",
-        "publicRegistrationEnabledHelp": "Vem som helst kan anmäla sig till evenemang. När det är avstängt kan bara personer på evenemangets inbjudningslista anmäla sig, och den personliga länken för att delta skickas bara via e-post; redan anmälda och moderator- och talarlänkar fungerar fortfarande.",
+        "publicRegistrationEnabledHelp": "Vem som helst kan anmäla sig till evenemang. När det är avstängt kan bara personer på evenemangets inbjudningslista anmäla sig, och den personliga länken för att delta skickas bara via e-post; redan anmälda och moderator- och talarlänkar fungerar fortfarande. Det är valet som föreslås för nya evenemang: varje evenemang kan välja annorlunda i steget ”Personer”.",
         "calendarPublic": "Offentlig kalender",
         "calendarPublicHelp": "Publicera evenemangskalendern. Besökare kan se schemalagda evenemang.",
         "parseTitleKicker": "Titlar med redaktionell övertitel",
@@ -2406,7 +2482,8 @@
       "toggles": {
         "unmute": "Deltagare får tala",
         "video": "Deltagare får aktivera video",
-        "screenShare": "Deltagare får dela skärm"
+        "screenShare": "Deltagare får dela skärm",
+        "openRegistration": "Anmälan öppen för alla"
       },
       "fields": {
         "dataRetention": "Datalagring",
@@ -3012,6 +3089,54 @@
     "videoPlayer": {
       "unavailable": "Videon är inte tillgänglig",
       "openInNewTab": "Öppna i en ny flik"
+    },
+    "guided": {
+      "title": "Hur ser ditt evenemang ut?",
+      "intro": "Fyra frågor för att börja med rätt inställningar. Alla funktioner kan också slås på och av under evenemanget.",
+      "peopleQ": "Hur många personer väntar du dig?",
+      "people": {
+        "piccolo": "Upp till 20",
+        "medio": "Upp till 100",
+        "grande": "Fler än 100"
+      },
+      "peopleHint": "Det är en uppskattning för att förbereda rummet, inte en gräns för anmälningar.",
+      "voiceQ": "Vem får tala och synas i video?",
+      "voice": {
+        "all": "Alla",
+        "allDesc": "Chatt, mikrofon, video och skärm för alla",
+        "speakers": "Talare och moderatorer",
+        "speakersDesc": "Publiken skriver i chatten och ställer frågor"
+      },
+      "recQ": "Vill du kunna spela in?",
+      "rec": {
+        "yes": "Ja, när du trycker på REC",
+        "yesDesc": "Efter evenemanget: transkription, sammanfattning och översättning",
+        "no": "Nej",
+        "noDesc": "Ingen inspelning, inget samtycke att be om"
+      },
+      "preview": "Ditt evenemang",
+      "previewPeople": "Förväntade deltagare: cirka {count}",
+      "continue": "Fortsätt",
+      "useTemplate": "Eller använd en mall",
+      "summary": {
+        "piccolo": "Upp till 20 personer",
+        "medio": "Upp till 100 personer",
+        "grande": "Fler än 100 personer",
+        "tutti": "alla i video",
+        "relatori": "talarna talar",
+        "si": "med inspelning",
+        "no": "utan inspelning",
+        "openAccess": "öppet för alla",
+        "inviteOnly": "endast inbjudna"
+      },
+      "accessQ": "Vem kan delta?",
+      "access": {
+        "open": "Alla som anmäler sig",
+        "openDesc": "Den som vill anmäler sig från evenemangets sida",
+        "invitation": "Bara de du bjuder in",
+        "invitationDesc": "Sidan förblir synlig, men bara inbjudna kan anmäla sig; utan anmälan kommer man inte in"
+      },
+      "previewInvitation": "Bara de du bjuder in kan anmäla sig; ingen kommer in utan anmälan."
     }
   },
   "email": {

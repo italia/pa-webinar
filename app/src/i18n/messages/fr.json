@@ -742,7 +742,7 @@
       "updateEvent": "Mettre à jour l'événement",
       "step1": {
         "heading": "Informations de base",
-        "intro": "Titre, description, image et calendrier de l'événement.",
+        "intro": "Titre, description et image de l'événement.",
         "coverImage": "Image de couverture",
         "coverImageHelp": "Affichée sur le site public et dans les e-mails aux inscrits.",
         "scheduleHeading": "Calendrier",
@@ -751,8 +751,6 @@
         "tagsHeading": "Catégories (tags)",
         "waitingRoomAudio": "Audio de salle d'attente (facultatif)",
         "waitingRoomAudioHelp": "Diffusé avant le début de la visioconférence.",
-        "parseTitleKickerLabel": "Titre avec sur-titre (séparateur |)",
-        "parseTitleKickerHelp": "Lorsque cette option est active, un titre comme « CONFÉRENCE | Innovation numérique » affichera CONFÉRENCE comme sur-titre.",
         "maxParticipantsHelp": "Une estimation du nombre de personnes attendues : elle sert à dimensionner le serveur vidéo et ne limite pas les inscriptions.",
         "validation": {
           "startsAt": "Date de début non valide.",
@@ -782,7 +780,11 @@
           "HIGH": "Élevée (720p, recommandée)",
           "BALANCED": "Équilibrée (540p)",
           "SAVE_DATA": "Économie de données (360p)"
-        }
+        },
+        "requiredLegend": "Les champs marqués * sont nécessaires pour enregistrer l'événement : tant qu'ils sont vides, chacun l'indique.",
+        "kickerHint": "Pour un surtitre, écrivez-le avant le titre et séparez-les par |, par exemple « Cycle de rencontres | La première rencontre ».",
+        "kickerUse": "Afficher « {kicker} » comme surtitre",
+        "kickerPreview": "Aperçu sur la page de l'événement"
       },
       "step2": {
         "heading": "Qui peut faire quoi",
@@ -841,7 +843,8 @@
             "name": "Participant",
             "desc": "Suit l'événement et interagit comme vous le décidez dans le tableau ci-dessous."
           }
-        }
+        },
+        "recordingManualNote": "L'enregistrement ne démarre jamais tout seul : un animateur le lance avec le bouton REC."
       },
       "step3": {
         "heading": "Personnes et invitations",
@@ -873,7 +876,7 @@
         "personName": "Nom",
         "personEmail": "E-mail",
         "peopleHeading": "Personnes de l'événement",
-        "peopleHelp": "Organisateurs, modérateurs et intervenants. Chacun reçoit son propre lien pour entrer avec son rôle ; ce que peut faire chaque rôle est indiqué à l'étape « Autorisations ».",
+        "peopleHelp": "Organisateurs, modérateurs et intervenants. Chacun reçoit son propre lien pour entrer avec son rôle ; ce que peut faire chaque rôle est indiqué dans les « Paramètres avancés ».",
         "personRole": "Rôle",
         "roleOrganizer": "Organisateur",
         "roleModerator": "Modérateur",
@@ -893,7 +896,17 @@
         "invitationsHelpOpen": "Facultatif : la liste des personnes que vous invitez. L'inscription est ouverte : après la publication, tout le monde peut s'inscrire, invité ou non. La plateforme n'envoie pas d'invitations : partagez vous-même le lien de l'événement.",
         "invitationsHelpRestricted": "L'inscription est restreinte : seules les adresses de cette liste peuvent s'inscrire. La plateforme n'envoie pas d'invitations : partagez vous-même le lien de l'événement ; le lien pour entrer arrive par e-mail après l'inscription.",
         "logoExternal": "La page publique n'affiche que les logos téléversés sur cette plateforme : un logo provenant d'un autre site ne s'affichera pas.",
-        "primaryProfileInvalid": "Vérifiez l'organisation et l'adresse du logo."
+        "primaryProfileInvalid": "Vérifiez l'organisation et l'adresse du logo.",
+        "primaryMore": "Organisme, logo et page publique",
+        "accessHeading": "Qui s'inscrit",
+        "accessSiteDefault": "Suit le réglage du site : si l'administration le modifie, cela vaut aussi pour cet événement.",
+        "accessNoInvitees": "Aucun invité pour l'instant : tant que la liste ci-dessous est vide, personne ne peut s'inscrire.",
+        "askHeading": "Ce que nous demandons aux inscrits",
+        "askAlways": "Nom et e-mail, toujours. En plus, si nécessaire :",
+        "askOrganization": "Organisme (obligatoire pour s'inscrire)",
+        "askRole": "Fonction (facultatif)",
+        "askType": "Type d'organisme (facultatif)",
+        "accessStaffOnly": "C'est l'équipe de l'événement qui décide qui peut s'inscrire."
       },
       "step4": {
         "heading": "Contenus et ressources",
@@ -941,7 +954,7 @@
       },
       "step5": {
         "heading": "Récapitulatif et publication",
-        "intro": "Vérifiez les informations et publiez l'événement (ou enregistrez-le comme brouillon).",
+        "intro": "L'événement tel que les autres le verront : vérifiez-le, puis publiez-le ou enregistrez-le comme brouillon.",
         "summary": {
           "title": "Titre",
           "schedule": "Calendrier",
@@ -1000,7 +1013,70 @@
       "publishFailedDetail": "L'événement a été créé mais pas publié : il reste à l'état de brouillon. Le serveur a répondu : {reason}. Publiez-le depuis la page de l'événement.",
       "toFix": "À corriger :",
       "toFixField": "Champ {n}",
-      "stepsAriaLabel": "Étapes du formulaire de l'événement"
+      "stepsAriaLabel": "Étapes du formulaire de l'événement",
+      "flow": {
+        "steps": {
+          "base": "Événement",
+          "schedule": "Quand",
+          "invites": "Personnes",
+          "review": "Récapitulatif",
+          "advanced": "Paramètres avancés"
+        },
+        "templateInUse": "Modèle : <b>{name}</b>",
+        "noTemplate": "Événement sans modèle",
+        "changeTemplate": "Changer de modèle",
+        "chooseTemplate": "Choisir un modèle",
+        "backToReview": "Retour au récapitulatif",
+        "participantsCan": "Participants : {list}",
+        "none": "aucune",
+        "recordingManual": "Disponible : il démarre seulement quand un animateur appuie sur REC.",
+        "aiAfter": "Après l'enregistrement : {list}.",
+        "scheduleHeading": "Quand il a lieu",
+        "scheduleIntro": "Date, heure et nombre de personnes attendues : ils servent à préparer la salle.",
+        "advancedIntro": "Valeurs déjà choisies par le modèle : modifiez seulement ce qui est nécessaire.",
+        "advancedIntroTemplate": "Valeurs déjà choisies par le modèle « {name} » : modifiez seulement ce qui est nécessaire.",
+        "requiredToSave": "Nécessaire pour enregistrer l'événement.",
+        "requiredToPublish": "Nécessaire pour publier l'événement.",
+        "toComplete": "À compléter",
+        "missingHeading": "Pour publier, il manque encore :",
+        "fieldOrganizerName": "Nom de l'organisateur principal",
+        "fieldOrganizerEmail": "E-mail de l'organisateur principal",
+        "capacityWarning": "Capacité à vérifier dans les détails techniques.",
+        "sections": {
+          "participation": "Participation et fonctions de la salle",
+          "recording": "Enregistrement et IA",
+          "content": "Contenus : documents et questionnaires",
+          "room": "Salle d'attente et vidéo",
+          "data": "Confidentialité, données et page après l'événement",
+          "technical": "Détails techniques : capacité et ressources"
+        },
+        "formatInUse": "Format : <b>{name}</b>",
+        "changeFormat": "Changer de format",
+        "voiceAll": "Tout le monde parle et apparaît en vidéo",
+        "voiceSpeakers": "Les intervenants et animateurs parlent et apparaissent en vidéo ; le public écrit dans le chat",
+        "features": "Fonctions : {list}",
+        "liveToggleNote": "Chaque fonction peut aussi être activée et désactivée pendant l'événement.",
+        "customize": "Personnaliser les paramètres",
+        "changeLanguages": "Changer les langues",
+        "translationLine": "Traduction en : {list}",
+        "privacyTemplate": "Information : {name}",
+        "privacyCustom": "Information : texte rédigé pour l'événement",
+        "privacyDocument": "Information : document de l'événement",
+        "privacySite": "Information : celle du site",
+        "untitled": "Événement sans titre",
+        "carriedOver": "Nous avons repris ce que vous aviez écrit pour l'événement.",
+        "startOver": "Recommencer",
+        "accessOpen": "Tout le monde peut s'inscrire depuis la page de l'événement.",
+        "accessInvitation": "Sur invitation uniquement. Invités : {count}.",
+        "addInvitees": "Ajouter des invités",
+        "change": "Modifier",
+        "askLine": "À l'inscription, nous demandons : {list}.",
+        "askName": "nom",
+        "askEmail": "e-mail",
+        "askOrganization": "organisme",
+        "askRole": "fonction",
+        "askType": "type d'organisme"
+      }
     },
     "nav": {
       "events": "Événements",
@@ -1784,9 +1860,9 @@
         "statusPageEnabled": "Page de statut active",
         "statusPageEnabledHelp": "Publie la page de statut du service. Si elle est désactivée, la page n'existe pas et ses données ne sont visibles que par les administrateurs.",
         "guestAccessEnabled": "Accès invité actif",
-        "guestAccessEnabledHelp": "Les personnes non inscrites peuvent rejoindre les événements en cours en indiquant seulement leur nom. Si elle est désactivée, on n'entre dans les événements programmés qu'avec une inscription ou un lien de modérateur ou d'intervenant ; les appels vidéo instantanés restent ouverts à toute personne disposant du lien.",
+        "guestAccessEnabledHelp": "Les personnes non inscrites peuvent rejoindre les événements en cours en indiquant seulement leur nom. Si elle est désactivée, on n'entre dans les événements programmés qu'avec une inscription ou un lien de modérateur ou d'intervenant ; les appels vidéo instantanés restent ouverts à toute personne disposant du lien. Un événement sur invitation n'admet jamais d'invités sans inscription.",
         "publicRegistrationEnabled": "Inscription publique active",
-        "publicRegistrationEnabledHelp": "Tout le monde peut s'inscrire aux événements. Si elle est désactivée, seules les personnes figurant sur la liste des invités de l'événement peuvent s'inscrire, et le lien personnel pour entrer n'est envoyé que par e-mail ; les personnes déjà inscrites et les liens de modérateurs et d'intervenants continuent de fonctionner.",
+        "publicRegistrationEnabledHelp": "Tout le monde peut s'inscrire aux événements. Si elle est désactivée, seules les personnes figurant sur la liste des invités de l'événement peuvent s'inscrire, et le lien personnel pour entrer n'est envoyé que par e-mail ; les personnes déjà inscrites et les liens de modérateurs et d'intervenants continuent de fonctionner. C'est le choix proposé aux nouveaux événements : chacun peut en décider autrement à l'étape « Personnes ».",
         "calendarPublic": "Calendrier public",
         "calendarPublicHelp": "Publier le calendrier des événements. Les visiteurs peuvent voir les événements programmés.",
         "parseTitleKicker": "Sur-titres éditoriaux",
@@ -2406,7 +2482,8 @@
       "toggles": {
         "unmute": "Les participants peuvent prendre la parole",
         "video": "Les participants peuvent activer la vidéo",
-        "screenShare": "Les participants peuvent partager l'écran"
+        "screenShare": "Les participants peuvent partager l'écran",
+        "openRegistration": "Inscription ouverte à tous"
       },
       "fields": {
         "dataRetention": "Conservation des données",
@@ -3012,6 +3089,54 @@
     "videoPlayer": {
       "unavailable": "Vidéo indisponible",
       "openInNewTab": "Ouvrir dans un nouvel onglet"
+    },
+    "guided": {
+      "title": "Comment est votre événement ?",
+      "intro": "Quatre questions pour démarrer avec les bons réglages. Chaque fonction peut aussi être activée ou désactivée pendant l'événement.",
+      "peopleQ": "Combien de personnes attendez-vous ?",
+      "people": {
+        "piccolo": "Jusqu'à 20",
+        "medio": "Jusqu'à 100",
+        "grande": "Plus de 100"
+      },
+      "peopleHint": "C'est une estimation pour préparer la salle, pas une limite aux inscriptions.",
+      "voiceQ": "Qui peut parler et apparaître en vidéo ?",
+      "voice": {
+        "all": "Tout le monde",
+        "allDesc": "Chat, micro, vidéo et écran pour tous",
+        "speakers": "Intervenants et animateurs",
+        "speakersDesc": "Le public écrit dans le chat et pose des questions"
+      },
+      "recQ": "Voulez-vous pouvoir enregistrer ?",
+      "rec": {
+        "yes": "Oui, quand vous appuyez sur REC",
+        "yesDesc": "Après l'événement : transcription, synthèse et traduction",
+        "no": "Non",
+        "noDesc": "Aucun enregistrement, aucun consentement à demander"
+      },
+      "preview": "Votre événement",
+      "previewPeople": "Participants attendus : environ {count}",
+      "continue": "Continuer",
+      "useTemplate": "Ou utiliser un modèle",
+      "summary": {
+        "piccolo": "Jusqu'à 20 personnes",
+        "medio": "Jusqu'à 100 personnes",
+        "grande": "Plus de 100 personnes",
+        "tutti": "tout le monde en vidéo",
+        "relatori": "les intervenants parlent",
+        "si": "avec enregistrement",
+        "no": "sans enregistrement",
+        "openAccess": "ouvert à tous",
+        "inviteOnly": "sur invitation"
+      },
+      "accessQ": "Qui peut participer ?",
+      "access": {
+        "open": "Toute personne inscrite",
+        "openDesc": "Qui le souhaite s'inscrit depuis la page de l'événement",
+        "invitation": "Seulement vos invités",
+        "invitationDesc": "La page reste visible, mais seuls les invités peuvent s'inscrire ; sans inscription, on n'entre pas"
+      },
+      "previewInvitation": "Seules les personnes invitées peuvent s'inscrire ; personne n'entre sans inscription."
     }
   },
   "email": {

@@ -18,7 +18,7 @@ import { sendConfirmationEmail } from '@/lib/email/confirmation';
 import { getPublicEnv } from '@/lib/env';
 import { upsertPersonOnRegistration } from '@/lib/persons';
 import { isEventOpenForRegistration } from '@/lib/events/visibility';
-import { isInvited } from '@/lib/events/registration-access';
+import { isInvited, publicRegistrationFor } from '@/lib/events/registration-access';
 import { registrationJoinUrl } from '@/lib/events/registration-link';
 import { consensiRichiesti } from '@/lib/registration/consents';
 import { getSettings } from '@/lib/settings';
@@ -106,13 +106,20 @@ export const POST = withErrorHandling(async (request, context) => {
     throw new ValidationError('Validation failed', [{ path: ['consentMultitrack'], message: 'registration.errors.multitrackConsentRequired' }]);
   }
 
+  // L'ente, quando l'evento lo chiede: la regola del modulo vale anche per chi
+  // chiama la rotta direttamente. Ruolo e tipo di ente restano facoltativi.
+  if (event.requireOrganization && !organization?.trim()) {
+    throw new ValidationError('Validation failed', [{ path: ['organization'], message: 'registration.errors.organizationRequired' }]);
+  }
+
   const emailHash = hashEmail(email);
   const encryptedEmail = encryptPII(email);
   const accessToken = nanoid(24);
-  // Iscrizione pubblica spenta dall'amministrazione: si iscrive solo chi e'
-  // fra gli invitati dell'evento (lib/events/registration-access), e il link
-  // personale lo consegna solo l'email (lib/events/registration-link).
-  const soloInvitati = !(await getSettings()).publicRegistrationEnabled;
+  // Iscrizione non aperta (l'evento e' solo su invito, o lo dice il sito): si
+  // iscrive solo chi e' fra gli invitati dell'evento
+  // (lib/events/registration-access), e il link personale lo consegna solo
+  // l'email (lib/events/registration-link).
+  const soloInvitati = !publicRegistrationFor(event, (await getSettings()).publicRegistrationEnabled);
 
   const esito: EsitoIscrizione = await prisma.$transaction(async (tx) => {
     // Check for duplicates inside transaction

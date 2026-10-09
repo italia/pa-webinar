@@ -1,20 +1,23 @@
 'use client';
 
 /**
- * Il wizard dell'evento, in cinque passi:
+ * Il wizard dell'evento, in quattro passi semplici:
  *
- *   1. Base        — titolo, descrizione, copertina, date, ricorrenza,
- *                    categorie, audio della sala d'attesa
- *   2. Persone     — organizzatore principale, enti organizzatori, persone
- *                    con ruolo ed ente (concessioni), invitati
- *   3. Permessi    — i ruoli, la matrice ruolo × funzione, registrazione
- *   4. Contenuti   — materiali e questionari
- *   5. Riepilogo   — informativa e conservazione, capacità, bozza o
+ *   1. Evento      — titolo, descrizione, copertina, categorie
+ *   2. Quando      — date e fuso, partecipanti attesi, ricorrenza
+ *   3. Persone     — organizzatore principale, enti, persone con un ruolo,
+ *                    invitati
+ *   4. Riepilogo   — cio' che manca, l'evento e le scelte del modello in
+ *                    schede, le lingue di traduzione, l'informativa; bozza o
  *                    pubblicazione
  *
- * I passi condividono un solo stato (`WizardForm`), che alla conferma va a
- * /api/events. Dopo la creazione, enti, persone e invitati vanno alle loro
- * API (l'evento a quel punto ha un id).
+ * e, a parte, le impostazioni avanzate: tutto cio' che il modello ha gia'
+ * scelto (partecipazione, registrazione e AI, contenuti, sala d'attesa e
+ * video, dati, dettagli tecnici), in sezioni richiudibili. I campi
+ * obbligatori si fanno notare finche' sono vuoti, e la barra dei passi dice
+ * quali passi sono da completare. I passi condividono un solo stato
+ * (`WizardForm`), che alla conferma va a /api/events. Dopo la creazione, enti,
+ * persone e invitati vanno alle loro API (l'evento a quel punto ha un id).
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -33,27 +36,50 @@ import {
   type PermissionMatrix,
 } from '@/lib/utils/permission-matrix';
 import { toDatetimeLocalInTz, fromDatetimeLocalInTz } from '@/lib/utils/date-format';
-import { parseLocaleList, SOURCE_LANGUAGE_FALLBACK } from '@/lib/ai/target-locales';
+import {
+  lingueDiPartenzaTraduzione,
+  SOURCE_LANGUAGE_FALLBACK,
+} from '@/lib/ai/target-locales';
 import type { JvbSizingConfig } from '@/lib/jvb-sizing';
 import type { VideoQualityPreset } from '@/lib/jitsi/config';
+import {
+  WIZARD_MAIN_STEPS,
+  wizardStepFromParam,
+  type WizardAdvancedSection,
+} from '@/lib/events/wizard-steps';
+import { publicRegistrationFor } from '@/lib/events/access-mode';
 
 import { RubricaAccessContext } from '../rubrica-picker';
 
-import { fanoutEditDiff, materialPayload, newFanoutReport, submitQuestionnaire } from './edit-fanout';
+import {
+  fanoutEditDiff,
+  materialPayload,
+  newFanoutReport,
+  submitQuestionnaire,
+} from './edit-fanout';
 import { rememberCreation, type UnsavedResource } from './created-event';
+import { BOZZA_NUOVO_KEY, TRASLOCO_KEY, TRASLOCO_VALIDO_MS } from './drafts';
 import Step1Base, { type Step1Value } from './step-1-base';
 import StepPermissions, { type StepPermissionsValue } from './step-3-permissions';
-import StepPeople, { type StepPeopleValue } from './step-2-people';
-import Step4Content, {
-  type Step4Value,
-  type QuestionnaireBlock,
-} from './step-4-content';
+import StepPeople, {
+  PrimarySection,
+  SezioneIscrizione,
+  type StepPeopleValue,
+} from './step-2-people';
+import Step4Content, { type Step4Value, type QuestionnaireBlock } from './step-4-content';
 import Step5Review from './step-5-review';
+import AdvancedSettings, {
+  SezioneDati,
+  SezioneTecnica,
+  avvisoCapacita,
+} from './advanced-settings';
 import {
   STEP_KEYS,
+  campiMancanti,
   mapServerIssues,
   validatePublish,
   validateStep,
+  type CampoMancante,
   type StepKey,
 } from './validation';
 
@@ -87,7 +113,12 @@ export interface WizardTemplatePreset {
   defaultExpectedSpeakers?: number | null;
   /** La pagina dopo l'evento e' pubblica (false per una riunione di lavoro). */
   postEventPublic?: boolean;
+  /** Chi partecipa: chiunque si iscrive, o solo gli invitati. */
+  accessMode?: EventAccessModeValue | null;
 }
+
+/** Chi partecipa a un evento (Event.accessMode); null = come dice il sito. */
+export type EventAccessModeValue = 'OPEN' | 'INVITATION';
 
 export interface WizardProps {
   template?: WizardTemplatePreset | null;
@@ -102,7 +133,11 @@ export interface WizardProps {
    *  staff: solo allora il ritorno alla pagina dell'evento lo porta con se'. */
   viaToken?: string | null;
   jvbSizingConfig: JvbSizingConfig;
-  availableTags: Array<{ slug: string; name: Record<string, string>; color: string | null }>;
+  availableTags: Array<{
+    slug: string;
+    name: Record<string, string>;
+    color: string | null;
+  }>;
   gdprTemplates: Array<{ id: string; name: string; isDefault: boolean }>;
   /** Site-wide default for the title-kicker parse. Used to decide whether
    *  to surface the per-event override in step 1 (hidden when already on). */
@@ -121,7 +156,9 @@ export interface WizardProps {
   aiPipelineEnabled?: boolean;
   /** In modifica: il passo da cui partire (i link «Modifica» della pagina
    *  dell'evento portano dritti a quello che serve). */
-  initialStep?: StepKey;
+  initialStep?: StepKey | 'permissions' | 'content';
+  /** In modifica: la sezione delle impostazioni avanzate da aprire. */
+  initialSection?: WizardAdvancedSection;
   /** Il moderatore principale di partenza di un evento nuovo: chi lo crea,
    *  quando entra con un account nominale. */
   defaultModerator?: { name: string; email: string } | null;
@@ -136,6 +173,12 @@ export interface WizardProps {
   /** Required when `mode === 'edit'`. Fully-loaded event + related
    *  entities so the wizard can diff on submit. */
   initialEvent?: InitialEventShape;
+  /** In creazione: torna alla scelta del formato (o del modello), con chi
+   *  partecipa come lo si vede ora (cambiato magari nel passo «Persone»). */
+  onChangeTemplate?: (stato: { invitati: boolean }) => void;
+  /** I valori di partenza vengono dalle quattro domande del formato, riassunte
+   *  qui: la fascia in cima le dice al posto del nome di un modello. */
+  formatoLabel?: string;
 }
 
 /**
@@ -195,6 +238,12 @@ export interface InitialEventShape {
     moderatorOrganization: string | null;
     moderatorOrganizationLogoUrl: string | null;
     moderatorPublicListed: boolean;
+    /** Una chiamata istantanea non ha iscrizione. */
+    eventType?: string;
+    accessMode: EventAccessModeValue | null;
+    requireOrganization: boolean;
+    requireOrganizationRole: boolean;
+    requireOrganizationType: boolean;
   };
   /** Each organizer with its DB id so we can DELETE on removal. */
   organizers: Array<{
@@ -255,6 +304,12 @@ export interface Step5ReviewFields {
   moderatorOrganization: string | null;
   moderatorOrganizationLogoUrl: string | null;
   moderatorPublicListed: boolean;
+  /** Chi partecipa (passo «Persone»): null = come dice il sito. */
+  accessMode: EventAccessModeValue | null;
+  /** Cosa si chiede a chi si iscrive, oltre a nome ed email. */
+  requireOrganization: boolean;
+  requireOrganizationRole: boolean;
+  requireOrganizationType: boolean;
 }
 
 export type WizardForm = Step1Value &
@@ -292,7 +347,6 @@ export default function EventWizard(props: WizardProps) {
     snapshotRef.current = structuredClone(initialEvent);
   }
 
-
   // Initial form state seeded from template (when given) + sensible defaults,
   // or — in edit mode — from `initialEvent`.
   const initial: WizardForm = useMemo(() => {
@@ -306,23 +360,18 @@ export default function EventWizard(props: WizardProps) {
       .map(Number);
     const domani = new Date(Date.UTC(y!, m! - 1, d! + 1)).toISOString().slice(0, 10);
     const defaultStart = fromDatetimeLocalInTz(`${domani}T10:00`, props.siteTimezone);
-    // Durata predefinita dal template (semplificazione): l'utente meno esperto
-    // imposta solo l'inizio e la fine è calcolata. Un template senza durata
-    // tiene le due ore di sempre; senza template: un'ora, circa 300 persone
-    // attese (una stima per il dimensionamento, non un tetto).
-    const defaultDurationMin = props.template
-      ? (props.template.defaultDurationMinutes ?? 120)
-      : 60;
+    // Durata predefinita dal modello: chi crea l'evento imposta solo l'inizio
+    // e la fine e' calcolata. Un modello senza durata, o nessun modello:
+    // un'ora.
+    const defaultDurationMin = props.template?.defaultDurationMinutes ?? 60;
     const defaultEnd = new Date(defaultStart.getTime() + defaultDurationMin * 60_000);
     // Traduzione accesa senza lingue (un modello o un evento che ereditava le
     // lingue dell'istanza): si parte da quelle dell'istanza, gia' spuntate.
-    const lingueDiPartenza = (traduce: boolean | null | undefined, lingue: string | null | undefined) =>
-      lingue ??
-      (traduce
-        ? parseLocaleList(props.defaultTargetLocales)
-            .filter((c) => c !== SOURCE_LANGUAGE_FALLBACK)
-            .join(',') || null
-        : null);
+    const lingueDiPartenza = (
+      traduce: boolean | null | undefined,
+      lingue: string | null | undefined
+    ) =>
+      lingue ?? (traduce ? lingueDiPartenzaTraduzione(props.defaultTargetLocales) : null);
     if (mode === 'edit' && initialEvent) {
       const ev = initialEvent.event;
       // La matrice salvata; se manca (eventi più vecchi), la si ricava dai
@@ -422,16 +471,14 @@ export default function EventWizard(props: WizardProps) {
           type: m.type,
           visibility: m.visibility,
         })),
-        preEventQuestionnaire:
-          initialEvent.preEventQuestionnaire ?? {
-            templateIds: [],
-            adhocQuestions: [],
-          },
-        postEventQuestionnaire:
-          initialEvent.postEventQuestionnaire ?? {
-            templateIds: [],
-            adhocQuestions: [],
-          },
+        preEventQuestionnaire: initialEvent.preEventQuestionnaire ?? {
+          templateIds: [],
+          adhocQuestions: [],
+        },
+        postEventQuestionnaire: initialEvent.postEventQuestionnaire ?? {
+          templateIds: [],
+          adhocQuestions: [],
+        },
 
         // Step 5
         dataRetentionDays: ev.dataRetentionDays,
@@ -444,24 +491,35 @@ export default function EventWizard(props: WizardProps) {
         moderatorOrganization: ev.moderatorOrganization ?? null,
         moderatorOrganizationLogoUrl: ev.moderatorOrganizationLogoUrl ?? null,
         moderatorPublicListed: ev.moderatorPublicListed ?? false,
+        accessMode: ev.accessMode,
+        requireOrganization: ev.requireOrganization,
+        requireOrganizationRole: ev.requireOrganizationRole,
+        requireOrganizationType: ev.requireOrganizationType,
       } satisfies WizardForm;
     }
 
     const tpl = props.template;
     const conAi = (tpl?.recordingEnabled ?? false) && (props.aiPipelineEnabled ?? true);
+    // La traduzione parte solo se c'e' almeno una lingua in cui tradurre (del
+    // modello, o dell'istanza senza la lingua dell'evento): senza, il wizard
+    // chiederebbe di scegliere lingue che nessuno ha chiesto.
+    const lingueDelModello = lingueDiPartenza(
+      conAi && tpl?.aiTranslationEnabled,
+      tpl?.aiTargetLocales
+    );
     // La matrice dal modello: quella salvata, se c'è; altrimenti (il caso
     // comune: i modelli salvano i permessi singoli) la si ricava da quelli,
     // perché le scelte del modello arrivino al passo «Permessi». Ripiegare su
     // defaultMatrix() perderebbe in silenzio i permessi di ogni modello.
     const matrix: PermissionMatrix = tpl
       ? ((tpl.permissionMatrix && coerceMatrix(tpl.permissionMatrix)) ??
-          matrixFromToggles({
-            qaEnabled: tpl.qaEnabled,
-            chatEnabled: tpl.chatEnabled,
-            participantsCanUnmute: tpl.participantsCanUnmute,
-            participantsCanStartVideo: tpl.participantsCanStartVideo,
-            participantsCanShareScreen: tpl.participantsCanShareScreen,
-          }))
+        matrixFromToggles({
+          qaEnabled: tpl.qaEnabled,
+          chatEnabled: tpl.chatEnabled,
+          participantsCanUnmute: tpl.participantsCanUnmute,
+          participantsCanStartVideo: tpl.participantsCanStartVideo,
+          participantsCanShareScreen: tpl.participantsCanShareScreen,
+        }))
       : defaultMatrix();
     return {
       // Step 1
@@ -496,7 +554,9 @@ export default function EventWizard(props: WizardProps) {
       agendaEnabled: tpl?.agendaEnabled ?? false,
       wordCloudEnabled: tpl?.wordCloudEnabled ?? false,
       whiteboardEnabled: tpl?.whiteboardEnabled ?? false,
-      autoStartRecording: tpl?.autoStartRecording ?? false,
+      // La registrazione non parte mai da sola: la avvia chi conduce con il
+      // pulsante REC, qualunque cosa dica un modello salvato prima.
+      autoStartRecording: false,
       // Default AI dal template (semplificazione): un template "registrato"
       // può pre-attivare trascrizione/sintesi. La trascrizione richiede la
       // registrazione, quindi la attiviamo solo se recordingEnabled, e solo
@@ -505,13 +565,12 @@ export default function EventWizard(props: WizardProps) {
       // le tracce per partecipante, che servono alla trascrizione.
       aiTranscriptEnabled: conAi && (tpl?.aiTranscriptEnabled ?? false),
       aiSummaryEnabled:
-        conAi &&
-        (tpl?.aiTranscriptEnabled ?? false) &&
-        (tpl?.aiSummaryEnabled ?? false),
+        conAi && (tpl?.aiTranscriptEnabled ?? false) && (tpl?.aiSummaryEnabled ?? false),
       aiTranslationEnabled:
         conAi &&
         (tpl?.aiTranscriptEnabled ?? false) &&
-        (tpl?.aiTranslationEnabled ?? false),
+        (tpl?.aiTranslationEnabled ?? false) &&
+        !!lingueDelModello,
       // Presi dal template, non piu' cablati a false: e' qui che la
       // configurazione di una serie si perdeva. La registrazione per
       // partecipante resta subordinata alla registrazione video, come per la
@@ -519,17 +578,17 @@ export default function EventWizard(props: WizardProps) {
       // l'evento sia registrato non ha senso e sarebbe una raccolta di dati
       // personali senza scopo.
       aiDubbingEnabled:
+        conAi && (tpl?.aiTranscriptEnabled ?? false) && (tpl?.aiDubbingEnabled ?? false),
+      multitrackRecordingEnabled:
         conAi &&
         (tpl?.aiTranscriptEnabled ?? false) &&
-        (tpl?.aiDubbingEnabled ?? false),
-      multitrackRecordingEnabled:
-        conAi && (tpl?.aiTranscriptEnabled ?? false) && (tpl?.multitrackRecordingEnabled ?? false),
+        (tpl?.multitrackRecordingEnabled ?? false),
       retainParticipantTracks:
         conAi &&
         (tpl?.aiTranscriptEnabled ?? false) &&
         (tpl?.multitrackRecordingEnabled ?? false) &&
         (tpl?.retainParticipantTracks ?? false),
-      aiTargetLocales: lingueDiPartenza(conAi && tpl?.aiTranslationEnabled, tpl?.aiTargetLocales),
+      aiTargetLocales: lingueDelModello,
       expectedSpeakers: tpl?.defaultExpectedSpeakers ?? null,
 
       // Passo Persone
@@ -548,7 +607,7 @@ export default function EventWizard(props: WizardProps) {
       // alto: si riporta entro il massimo, altrimenti l'evento non si salva.
       dataRetentionDays: Math.min(
         tpl?.defaultRetentionDays ?? props.defaultRetentionDays,
-        MAX_RETENTION_DAYS,
+        MAX_RETENTION_DAYS
       ),
       postEventPublic: tpl?.postEventPublic ?? true,
       // Il modello marcato come predefinito esiste per essere pre-scelto sui
@@ -562,6 +621,10 @@ export default function EventWizard(props: WizardProps) {
       moderatorOrganization: null,
       moderatorOrganizationLogoUrl: null,
       moderatorPublicListed: false,
+      accessMode: tpl?.accessMode ?? null,
+      requireOrganization: false,
+      requireOrganizationRole: false,
+      requireOrganizationType: false,
     } satisfies WizardForm;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.template, mode, initialEvent]);
@@ -571,9 +634,10 @@ export default function EventWizard(props: WizardProps) {
   // dall'inizio.
   // Quale pulsante ha avviato il salvataggio: solo lui dice «Salvataggio…».
   const [azione, setAzione] = useState<'draft' | 'publish' | null>(null);
-  const [activeStep, setActiveStep] = useState<StepKey>(
-    (mode === 'edit' ? props.initialStep : undefined) ?? 'base',
-  );
+  // Il passo di partenza, anche nominato come una volta (`permissions`,
+  // `content`: ora sezioni delle impostazioni avanzate).
+  const partenza = mode === 'edit' ? wizardStepFromParam(props.initialStep) : null;
+  const [activeStep, setActiveStep] = useState<StepKey>(partenza?.step ?? 'base');
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -584,18 +648,58 @@ export default function EventWizard(props: WizardProps) {
   // Dopo un invio rifiutato il fuoco va al primo campo da correggere.
   const fuocoRichiestoRef = useRef(false);
 
+  // La sezione aperta delle impostazioni avanzate, e quante volte la si e'
+  // chiesta: chiederla di nuovo (un errore, un'altra scheda) la riapre anche
+  // se la si era chiusa a mano.
+  const [richiestaSezione, setRichiestaSezione] = useState(0);
+  const [sezione, setSezione] = useState<WizardAdvancedSection | null>(
+    mode === 'edit' ? (props.initialSection ?? partenza?.section ?? null) : null
+  );
+  const apriSezione = (sez: WizardAdvancedSection | null) => {
+    setSezione(sez);
+    setRichiestaSezione((n) => n + 1);
+  };
+
+  // La sezione letta all'arrivo nelle impostazioni avanzate: l'effetto del
+  // cambio di passo la legge da qui, cosi' riparte solo al cambio di passo.
+  const sezioneRef = useRef(sezione);
+  sezioneRef.current = sezione;
+
   // On step change move focus to the step region and scroll it into view so
   // keyboard/screen-reader users aren't left on the footer button (and a
   // validation jump to a failing step is perceivable). Skip the first render.
   const contentRef = useRef<HTMLDivElement>(null);
   const firstRender = useRef(true);
   useEffect(() => {
-    if (firstRender.current) {
-      firstRender.current = false;
-      return;
-    }
+    // Al primo giro il fuoco resta dov'e', salvo arrivando su una sezione
+    // delle impostazioni avanzate (un link «Modifica» della pagina
+    // dell'evento): la si porta in vista.
+    const primo = firstRender.current;
+    firstRender.current = false;
+    if (primo && !(activeStep === 'advanced' && sezioneRef.current)) return;
     const el = contentRef.current;
     if (!el) return;
+    // Se il passo ha gia' portato il fuoco su un suo elemento (il «Modifica»
+    // della scheda da cui si era usciti), lo si lascia li'.
+    if (
+      document.activeElement &&
+      document.activeElement !== el &&
+      el.contains(document.activeElement)
+    )
+      return;
+    // Nelle impostazioni avanzate aperte da una scheda: il fuoco e la vista
+    // vanno alla sezione chiesta, non in cima alla pagina.
+    const sezioneAperta = sezioneRef.current;
+    if (activeStep === 'advanced' && sezioneAperta) {
+      const titolo = el.querySelector<HTMLElement>(
+        `#wiz-avanzate-${sezioneAperta} > summary`
+      );
+      if (titolo) {
+        titolo.focus({ preventScroll: true });
+        titolo.scrollIntoView?.({ block: 'start' });
+        return;
+      }
+    }
     el.focus({ preventScroll: true });
     el.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, [activeStep]);
@@ -624,7 +728,8 @@ export default function EventWizard(props: WizardProps) {
     const chiavi = chiaviClientRef.current;
     if (chiavi.size === 0) return;
     const ancora: Record<string, string> = { ...validatePublish(form) };
-    for (const k of STEP_KEYS) Object.assign(ancora, validateStep(k, form, props.defaultLocale, retentionMax));
+    for (const k of STEP_KEYS)
+      Object.assign(ancora, validateStep(k, form, props.defaultLocale, retentionMax));
     const risolte = [...chiavi].filter((k) => !(k in ancora));
     if (risolte.length === 0) return;
     for (const k of risolte) chiavi.delete(k);
@@ -658,20 +763,30 @@ export default function EventWizard(props: WizardProps) {
         el.removeAttribute('data-wizard-describedby');
       });
       const campi = [
-        ...root.querySelectorAll<HTMLElement>('input.is-invalid, textarea.is-invalid, select.is-invalid'),
+        ...root.querySelectorAll<HTMLElement>(
+          'input.is-invalid, textarea.is-invalid, select.is-invalid'
+        ),
       ];
       const etichette: string[] = [];
       campi.forEach((el, i) => {
         if (!el.hasAttribute('data-wizard-invalid')) {
           el.setAttribute('data-wizard-invalid', '');
-          el.setAttribute('data-wizard-describedby', el.getAttribute('aria-describedby') ?? '');
+          el.setAttribute(
+            'data-wizard-describedby',
+            el.getAttribute('aria-describedby') ?? ''
+          );
         }
-        if (el.getAttribute('aria-invalid') !== 'true') el.setAttribute('aria-invalid', 'true');
-        const messaggio = el.parentElement?.querySelector<HTMLElement>('.invalid-feedback');
+        if (el.getAttribute('aria-invalid') !== 'true')
+          el.setAttribute('aria-invalid', 'true');
+        const messaggio =
+          el.parentElement?.querySelector<HTMLElement>('.invalid-feedback');
         if (messaggio) {
           if (!messaggio.id) messaggio.id = `wizard-errore-${activeStep}-${i}`;
-          const voluto = [el.getAttribute('data-wizard-describedby'), messaggio.id].filter(Boolean).join(' ');
-          if (el.getAttribute('aria-describedby') !== voluto) el.setAttribute('aria-describedby', voluto);
+          const voluto = [el.getAttribute('data-wizard-describedby'), messaggio.id]
+            .filter(Boolean)
+            .join(' ');
+          if (el.getAttribute('aria-describedby') !== voluto)
+            el.setAttribute('aria-describedby', voluto);
         }
         const etichetta =
           el.getAttribute('data-wizard-label') ||
@@ -683,7 +798,9 @@ export default function EventWizard(props: WizardProps) {
       });
       campiNonValidiRef.current = campi;
       setRiepilogo((prima) =>
-        prima.length === etichette.length && prima.every((e, i) => e === etichette[i]) ? prima : etichette,
+        prima.length === etichette.length && prima.every((e, i) => e === etichette[i])
+          ? prima
+          : etichette
       );
       return campi;
     };
@@ -706,7 +823,12 @@ export default function EventWizard(props: WizardProps) {
     // Le nostre modifiche toccano solo attributi aria e data, non la classe:
     // l'osservatore non si risveglia da se'.
     const osservatore = new MutationObserver(() => allinea());
-    osservatore.observe(root, { subtree: true, childList: true, attributes: true, attributeFilter: ['class'] });
+    osservatore.observe(root, {
+      subtree: true,
+      childList: true,
+      attributes: true,
+      attributeFilter: ['class'],
+    });
     return () => osservatore.disconnect();
   }, [fieldErrors, activeStep]);
 
@@ -714,20 +836,63 @@ export default function EventWizard(props: WizardProps) {
     setForm((prev) => ({ ...prev, ...patch }));
   }, []);
 
-  // ── Draft autosave ────────────────────────────────────────────────────────
-  // Persist the form to localStorage (debounced) so an accidental reload or
-  // navigation doesn't lose all 5 steps. Keyed by event id (edit) or 'new'.
-  // We skip the first render so a pristine form isn't stored as a "draft",
-  // capture any pre-existing draft before the autosave can overwrite it, and
-  // clear the key on a successful submit.
-  const draftKey = `pa-wizard-draft:${initialEvent?.id ?? 'new'}`;
+  // ── Bozza nel browser ─────────────────────────────────────────────────────
+  // Il modulo si salva nel browser (con un attimo di ritardo), cosi' un
+  // ricaricamento o un clic sbagliato non lo perde: in modifica una bozza per
+  // evento, in creazione una per formato o modello, che si offre tornando
+  // sullo stesso. La bozza di creazione di una versione precedente (una sola
+  // per tutti) si offre in ogni creazione, finche' la si riprende o la si
+  // scarta. Il primo giro non salva (un modulo intatto non e' una bozza); un
+  // invio riuscito toglie le bozze di creazione.
+  const draftKey = initialEvent?.id
+    ? `pa-wizard-draft:${initialEvent.id}`
+    : `${BOZZA_NUOVO_KEY}:${props.template?.id ?? 'vuoto'}`;
+  const autosaveRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Uscendo (cambio di formato, salvataggio riuscito) la bozza non si
+  // riscrive piu'.
+  const usciteRef = useRef(false);
+  const fermaAutosalvataggio = useCallback(() => {
+    usciteRef.current = true;
+    if (autosaveRef.current) clearTimeout(autosaveRef.current);
+  }, []);
   const clearDraft = useCallback(() => {
     try {
       localStorage.removeItem(draftKey);
+      if (mode === 'create') {
+        // L'evento nuovo e' salvato: niente di cio' che lo riguardava resta
+        // da riproporre (le bozze degli altri formati, quella della versione
+        // precedente, i dati portati da «Cambia formato»).
+        localStorage.removeItem(TRASLOCO_KEY);
+        for (const k of Object.keys(localStorage)) {
+          if (k.startsWith(BOZZA_NUOVO_KEY)) localStorage.removeItem(k);
+        }
+      }
     } catch {
       /* storage unavailable */
     }
-  }, [draftKey]);
+  }, [draftKey, mode]);
+
+  // Arrivando da «Cambia formato»: cio' che si era scritto sull'evento torna
+  // sopra i valori del formato nuovo, una volta sola, se recente; un avviso lo
+  // dice e permette di ricominciare da capo.
+  const [traslocoApplicato, setTraslocoApplicato] = useState(false);
+  const traslocoRef = useRef(false);
+  useEffect(() => {
+    if (mode !== 'create') return;
+    try {
+      const raw = localStorage.getItem(TRASLOCO_KEY);
+      if (!raw) return;
+      localStorage.removeItem(TRASLOCO_KEY);
+      const { at, dati } = JSON.parse(raw) as { at?: number; dati?: Partial<WizardForm> };
+      if (!dati || typeof at !== 'number' || Date.now() - at > TRASLOCO_VALIDO_MS) return;
+      traslocoRef.current = true;
+      setForm((prima) => conDatiDellEvento(prima, dati));
+      setTraslocoApplicato(true);
+    } catch {
+      /* corrupt or unavailable — ignore */
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const skipFirstAutosave = useRef(true);
   useEffect(() => {
@@ -735,23 +900,35 @@ export default function EventWizard(props: WizardProps) {
       skipFirstAutosave.current = false;
       return;
     }
-    const id = setTimeout(() => {
+    autosaveRef.current = setTimeout(() => {
+      if (usciteRef.current) return;
       try {
         localStorage.setItem(draftKey, JSON.stringify(form));
       } catch {
         /* quota / unavailable — best effort */
       }
     }, 800);
-    return () => clearTimeout(id);
+    return () => {
+      if (autosaveRef.current) clearTimeout(autosaveRef.current);
+    };
   }, [form, draftKey]);
 
-  const savedDraftRef = useRef<string | null>(null);
+  const savedDraftRef = useRef<{ key: string; form: Partial<WizardForm> } | null>(null);
   const [draftAvailable, setDraftAvailable] = useState(false);
   useEffect(() => {
+    // I dati appena portati da «Cambia formato» non si fanno coprire da una
+    // bozza piu' vecchia.
+    if (traslocoRef.current) return;
     try {
-      const raw = localStorage.getItem(draftKey);
-      if (raw) {
-        savedDraftRef.current = raw;
+      const chiave = [draftKey, ...(mode === 'create' ? [BOZZA_NUOVO_KEY] : [])].find(
+        (k) => localStorage.getItem(k) !== null
+      );
+      const raw = chiave ? localStorage.getItem(chiave) : null;
+      if (chiave && raw) {
+        savedDraftRef.current = {
+          key: chiave,
+          form: JSON.parse(raw) as Partial<WizardForm>,
+        };
         setDraftAvailable(true);
       }
     } catch {
@@ -762,38 +939,145 @@ export default function EventWizard(props: WizardProps) {
   }, []);
 
   const restoreDraft = useCallback(() => {
-    if (savedDraftRef.current) {
-      try {
-        // Sopra il modulo di partenza, non al suo posto: una bozza salvata
-        // prima che il modulo avesse un campo nuovo non lo lascerebbe vuoto.
-        const salvata = JSON.parse(savedDraftRef.current) as Partial<WizardForm>;
-        setForm((prima) => ({ ...prima, ...salvata }));
-      } catch {
-        /* corrupt draft — ignore */
-      }
+    const salvata = savedDraftRef.current;
+    // Sopra il modulo di partenza, non al suo posto: una bozza salvata prima
+    // che il modulo avesse un campo nuovo non lo lascerebbe vuoto.
+    // Chi entra con un link di conduzione non cambia chi partecipa (lo
+    // decide lo staff): una bozza che lo cambiava non lo riporta.
+    if (salvata)
+      setForm((prima) => ({
+        ...prima,
+        ...salvata.form,
+        ...(viaToken !== null ? { accessMode: prima.accessMode } : {}),
+      }));
+    // La bozza della versione precedente, ripresa, vive ora sotto la chiave
+    // di questo formato.
+    try {
+      if (salvata && salvata.key !== draftKey) localStorage.removeItem(salvata.key);
+    } catch {
+      /* ignore */
+    }
+    setDraftAvailable(false);
+  }, [draftKey, viaToken]);
+  const dismissDraft = useCallback(() => {
+    try {
+      const salvata = savedDraftRef.current;
+      if (salvata) localStorage.removeItem(salvata.key);
+    } catch {
+      /* ignore */
     }
     setDraftAvailable(false);
   }, []);
-  const dismissDraft = useCallback(() => {
-    clearDraft();
-    setDraftAvailable(false);
-  }, [clearDraft]);
 
-  const stepIndex = STEP_KEYS.indexOf(activeStep);
-  const goPrev = () => stepIndex > 0 && setActiveStep(STEP_KEYS[stepIndex - 1]!);
+  // Quattro passi nella barra e, a parte, le impostazioni avanzate (con la
+  // sezione aperta). Avanti e Indietro percorrono i quattro passi; dalle
+  // impostazioni avanzate si torna al riepilogo.
+  const indicePasso = (WIZARD_MAIN_STEPS as readonly StepKey[]).indexOf(activeStep);
+  const vai = (step: StepKey, sez?: WizardAdvancedSection | null) => {
+    if (step === 'advanced') apriSezione(sez ?? null);
+    setActiveStep(step);
+  };
+  const goPrev = () => {
+    if (activeStep === 'advanced') vai('review');
+    else if (indicePasso > 0) vai(WIZARD_MAIN_STEPS[indicePasso - 1]!);
+  };
+  /** Al passo dopo (dalle impostazioni avanzate: al riepilogo), solo con il
+   *  passo a posto. */
   const goNext = () => {
     const errs = validateStep(activeStep, form, props.defaultLocale, retentionMax);
     if (Object.keys(errs).length > 0) {
       chiaviClientRef.current = new Set(Object.keys(errs));
       fuocoRichiestoRef.current = true;
+      // Il campo da correggere sta in una sezione ripiegata: la si apre.
+      if (activeStep === 'advanced' && (errs.dataRetentionDays || errs.gdprTemplateId))
+        apriSezione('data');
       setFieldErrors(errs);
       showError(t('validationFailed'));
       return;
     }
     setFieldErrors({});
     setSubmitError(null);
-    if (stepIndex < STEP_KEYS.length - 1) setActiveStep(STEP_KEYS[stepIndex + 1]!);
+    if (activeStep === 'advanced' || indicePasso < 0) setActiveStep('review');
+    else if (indicePasso < WIZARD_MAIN_STEPS.length - 1)
+      setActiveStep(WIZARD_MAIN_STEPS[indicePasso + 1]!);
   };
+
+  // Chi si iscrive davvero: la scelta dell'evento, o quella del sito. Una
+  // chiamata istantanea non ha iscrizione: il link e' l'invito.
+  const istantanea = initialEvent?.event.eventType === 'INSTANT';
+  const iscrizioneAperta = publicRegistrationFor(
+    form,
+    props.publicRegistrationEnabled ?? true
+  );
+
+  // Cio' che manca ancora: la barra lo dice per passo, il riepilogo per campo.
+  const mancanti = useMemo(
+    () => campiMancanti(form, props.defaultLocale, retentionMax, mode === 'create'),
+    [form, props.defaultLocale, retentionMax, mode]
+  );
+  // Al campo che manca: si apre il suo passo e, appena e' sullo schermo, il
+  // fuoco va su di lui.
+  const campoDaRaggiungere = useRef<string | null>(null);
+  const vaiAlCampo = useCallback(
+    (m: CampoMancante) => {
+      const id = idDelCampo(m.key, props.defaultLocale);
+      if (m.step === 'advanced') apriSezione('data');
+      if (m.step === activeStep) {
+        // Gia' sul passo: il campo e' sullo schermo.
+        const el = id ? document.getElementById(id) : null;
+        const bersaglio =
+          el && /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName)
+            ? el
+            : el?.querySelector<HTMLElement>('input, textarea');
+        bersaglio?.focus({ preventScroll: true });
+        bersaglio?.scrollIntoView?.({ block: 'center' });
+        return;
+      }
+      campoDaRaggiungere.current = id;
+      setActiveStep(m.step);
+    },
+    [props.defaultLocale, activeStep]
+  );
+  useEffect(() => {
+    const id = campoDaRaggiungere.current;
+    if (!id) return;
+    campoDaRaggiungere.current = null;
+    const el = document.getElementById(id);
+    const bersaglio =
+      el && /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName)
+        ? el
+        : el?.querySelector<HTMLElement>('input, textarea');
+    bersaglio?.focus({ preventScroll: true });
+    bersaglio?.scrollIntoView?.({ block: 'center' });
+  }, [activeStep]);
+
+  // Il cambio di modello: cio' che si e' scritto sull'evento (titolo,
+  // descrizione, date, persone, contenuti) passa al modello nuovo, che porta
+  // le sue impostazioni; la bozza del modello lasciato se ne va.
+  const [cambiandoModello, setCambiandoModello] = useState(false);
+  const cambiaModello = useCallback(() => {
+    // La bozza in attesa di salvarsi non deve riscrivere quella appena tolta.
+    fermaAutosalvataggio();
+    try {
+      const dati = datiCambiati(form, initial);
+      if (Object.keys(dati).length > 0) {
+        localStorage.setItem(TRASLOCO_KEY, JSON.stringify({ at: Date.now(), dati }));
+      }
+      // Cio' che si e' scritto passa con il formato: la bozza di questo e
+      // quella della versione precedente non lo coprirebbero piu' tardi.
+      localStorage.removeItem(draftKey);
+      localStorage.removeItem(BOZZA_NUOVO_KEY);
+    } catch {
+      /* storage unavailable */
+    }
+    setCambiandoModello(true);
+    // Chi partecipa torna fra le risposte del formato: le domande la mostrano
+    // come la si vede ora, e il formato nuovo la riprende.
+    props.onChangeTemplate?.({
+      invitati: !publicRegistrationFor(form, props.publicRegistrationEnabled ?? true),
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [draftKey, form, initial, props.onChangeTemplate, props.publicRegistrationEnabled, fermaAutosalvataggio]);
 
   /**
    * Il messaggio per una risposta di errore del server.
@@ -805,7 +1089,10 @@ export default function EventWizard(props: WizardProps) {
    * che nessun campo del wizard sa mostrare.
    */
   const serverErrorMessage = useCallback(
-    (err: { error?: string; message?: string; details?: unknown }, status: number): string => {
+    (
+      err: { error?: string; message?: string; details?: unknown },
+      status: number
+    ): string => {
       if (!Array.isArray(err.details)) {
         return err.error ?? err.message ?? `HTTP ${status}`;
       }
@@ -813,6 +1100,7 @@ export default function EventWizard(props: WizardProps) {
       chiaviClientRef.current = new Set();
       fuocoRichiestoRef.current = true;
       setFieldErrors(mapped.fieldErrors);
+      if (mapped.step === 'advanced') apriSezione('data');
       if (mapped.step) setActiveStep(mapped.step);
       const parti: string[] = [];
       if (mapped.step) parti.push(t('validationFailed'));
@@ -820,12 +1108,12 @@ export default function EventWizard(props: WizardProps) {
         parti.push(
           t('validationFailedDetail', {
             reason: mapped.unmapped.join('; ') || err.error || `HTTP ${status}`,
-          }),
+          })
         );
       }
       return parti.join('\n');
     },
-    [props.defaultLocale, t],
+    [props.defaultLocale, t]
   );
 
   /**
@@ -843,7 +1131,10 @@ export default function EventWizard(props: WizardProps) {
       // Validate every step before submitting (especially on publish).
       const aggregated: Record<string, string> = {};
       for (const key of STEP_KEYS) {
-        Object.assign(aggregated, validateStep(key, form, props.defaultLocale, retentionMax));
+        Object.assign(
+          aggregated,
+          validateStep(key, form, props.defaultLocale, retentionMax)
+        );
       }
       if (submitMode === 'publish') {
         Object.assign(aggregated, validatePublish(form));
@@ -859,10 +1150,14 @@ export default function EventWizard(props: WizardProps) {
         // suoi (altrimenti il messaggio resta senza campo evidenziato).
         const firstFailing = STEP_KEYS.find(
           (k) =>
-            Object.keys(validateStep(k, form, props.defaultLocale, retentionMax)).length > 0 ||
-            (k === 'invites' && !!(aggregated.moderatorName || aggregated.moderatorEmail)),
+            Object.keys(validateStep(k, form, props.defaultLocale, retentionMax)).length >
+              0 ||
+            (k === 'invites' && !!(aggregated.moderatorName || aggregated.moderatorEmail))
         );
-        if (firstFailing) setActiveStep(firstFailing);
+        if (firstFailing) {
+          if (firstFailing === 'advanced') apriSezione('data');
+          setActiveStep(firstFailing);
+        }
         return;
       }
       setSubmitting(true);
@@ -874,7 +1169,10 @@ export default function EventWizard(props: WizardProps) {
         // measure.
         const toggles = togglesFromMatrix(form.permissionMatrix);
 
-        const startsAtUTC = fromDatetimeLocalInTz(form.startsAt, form.timezone).toISOString();
+        const startsAtUTC = fromDatetimeLocalInTz(
+          form.startsAt,
+          form.timezone
+        ).toISOString();
         const endsAtUTC = fromDatetimeLocalInTz(form.endsAt, form.timezone).toISOString();
 
         const payload: Record<string, unknown> = {
@@ -911,9 +1209,7 @@ export default function EventWizard(props: WizardProps) {
           // un'invariante: senza recordingEnabled non c'è transcript).
           aiTranscriptEnabled: form.recordingEnabled && form.aiTranscriptEnabled,
           aiSummaryEnabled:
-            form.recordingEnabled &&
-            form.aiTranscriptEnabled &&
-            form.aiSummaryEnabled,
+            form.recordingEnabled && form.aiTranscriptEnabled && form.aiSummaryEnabled,
           aiTranslationEnabled:
             form.recordingEnabled &&
             form.aiTranscriptEnabled &&
@@ -949,7 +1245,8 @@ export default function EventWizard(props: WizardProps) {
           // interruttore, e un salvataggio del wizard non deve rimettere un
           // valore letto prima.
           postEventPublic:
-            mode === 'edit' && form.postEventPublic === initialEvent?.event.postEventPublic
+            mode === 'edit' &&
+            form.postEventPublic === initialEvent?.event.postEventPublic
               ? undefined
               : form.postEventPublic,
           // La stringa vuota si spedisce, non si trasforma in `undefined`: il
@@ -962,13 +1259,23 @@ export default function EventWizard(props: WizardProps) {
           // In modifica, togliere il documento dell'informativa manda null:
           // altrimenti l'ultimo indirizzo resterebbe in vigore e avrebbe la
           // precedenza sull'informativa predefinita dell'installazione.
-          privacyPolicyUrl:
-            form.privacyPolicyUrl || (mode === 'edit' ? null : undefined),
+          privacyPolicyUrl: form.privacyPolicyUrl || (mode === 'edit' ? null : undefined),
           moderatorName: form.moderatorName?.trim() || undefined,
           moderatorEmail: form.moderatorEmail?.trim() || undefined,
           moderatorOrganization: form.moderatorOrganization?.trim() || null,
           moderatorOrganizationLogoUrl: form.moderatorOrganizationLogoUrl?.trim() || null,
           moderatorPublicListed: !!form.moderatorPublicListed,
+          // In modifica solo se cambiato: un evento che segue il sito (null)
+          // continua a seguirlo finche' qui non si sceglie.
+          // Con un link di conduzione non si manda mai: lo decide lo staff.
+          accessMode:
+            viaToken !== null ||
+            (mode === 'edit' && form.accessMode === initialEvent?.event.accessMode)
+              ? undefined
+              : form.accessMode,
+          requireOrganization: form.requireOrganization,
+          requireOrganizationRole: form.requireOrganizationRole,
+          requireOrganizationType: form.requireOrganizationType,
         };
 
         // ── Edit mode: PUT the event, diff-based fan-out, then redirect
@@ -979,17 +1286,14 @@ export default function EventWizard(props: WizardProps) {
           const moderatorToken = initialEvent.moderatorToken;
 
           // Il token solo nell'intestazione: nell'indirizzo finirebbe nei log.
-          const putRes = await fetch(
-            `/api/events/${eventId}`,
-            {
-              method: 'PUT',
-              headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${moderatorToken}`,
-              },
-              body: JSON.stringify(payload),
+          const putRes = await fetch(`/api/events/${eventId}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${moderatorToken}`,
             },
-          );
+            body: JSON.stringify(payload),
+          });
           if (!putRes.ok) {
             const err = await putRes.json().catch(() => ({}));
             throw new Error(serverErrorMessage(err, putRes.status));
@@ -1000,7 +1304,7 @@ export default function EventWizard(props: WizardProps) {
             moderatorToken,
             form,
             snapshotRef.current ?? initialEvent,
-            props.defaultLocale,
+            props.defaultLocale
           );
 
           // Non si cancella la bozza e non si naviga via: il testo digitato
@@ -1013,7 +1317,7 @@ export default function EventWizard(props: WizardProps) {
           // quella persona e' ancora valido, e un nuovo salvataggio la
           // riprova (lo scatto non l'ha tolta).
           const avvisi = report.revocationFailed.map((name) =>
-            t('revocationFailed', { name, tab: tDetail('tabs.people') }),
+            t('revocationFailed', { name, tab: tDetail('tabs.people') })
           );
           if (report.failed.length > 0) {
             const risorse = [...new Set(report.failed)]
@@ -1025,13 +1329,14 @@ export default function EventWizard(props: WizardProps) {
                     items: risorse,
                     reason: report.reason,
                   })
-                : t('partialFailureEdit', { items: risorse }),
+                : t('partialFailureEdit', { items: risorse })
             );
           }
           if (avvisi.length > 0) {
             throw new Error(avvisi.join('\n'));
           }
 
+          fermaAutosalvataggio();
           clearDraft();
           router.push(percorso(eventAdminPath(eventId, { viaToken })));
           return;
@@ -1157,14 +1462,14 @@ export default function EventWizard(props: WizardProps) {
           created.id,
           'PRE_REGISTRATION',
           form.preEventQuestionnaire,
-          props.defaultLocale,
+          props.defaultLocale
         );
         await submitQuestionnaire(
           reportQ,
           created.id,
           'POST_EVENT',
           form.postEventQuestionnaire,
-          props.defaultLocale,
+          props.defaultLocale
         );
         if (reportQ.failed.length > 0) failed.add('questionnaires');
 
@@ -1193,7 +1498,9 @@ export default function EventWizard(props: WizardProps) {
               error?: string;
               message?: string;
             };
-            publishProblem = { reason: err.error ?? err.message ?? `HTTP ${pubRes.status}` };
+            publishProblem = {
+              reason: err.error ?? err.message ?? `HTTP ${pubRes.status}`,
+            };
           }
         }
 
@@ -1203,20 +1510,26 @@ export default function EventWizard(props: WizardProps) {
         // conserva l'esito, un avviso, che sopravvive al cambio di pagina.
         const esitoConservato =
           !overrideRedirect &&
-          rememberCreation(created.id, { unsaved: [...failed], publishFailed: publishProblem !== null });
+          rememberCreation(created.id, {
+            unsaved: [...failed],
+            publishFailed: publishProblem !== null,
+          });
         if (failed.size > 0 && !esitoConservato) {
           toast.error(
-            t('partialFailure', { items: [...failed].map((k) => t(`resources.${k}`)).join(', ') }),
+            t('partialFailure', {
+              items: [...failed].map((k) => t(`resources.${k}`)).join(', '),
+            })
           );
         }
         if (publishProblem) {
           toast.error(
             publishProblem.reason
               ? t('publishFailedDetail', { reason: publishProblem.reason })
-              : t('publishFailed'),
+              : t('publishFailed')
           );
         }
 
+        fermaAutosalvataggio();
         clearDraft();
 
         // La pagina dell'evento, con la sessione dello staff che ha appena
@@ -1241,6 +1554,7 @@ export default function EventWizard(props: WizardProps) {
       router,
       toast,
       clearDraft,
+      fermaAutosalvataggio,
       viaToken,
       props.defaultLocale,
       t,
@@ -1252,14 +1566,33 @@ export default function EventWizard(props: WizardProps) {
       retentionMax,
       showError,
       serverErrorMessage,
-    ],
+    ]
   );
 
   const saveDraftAndNavigate = useCallback(
     async (destination: string) => {
       await handleSubmit('draft', destination);
     },
-    [handleSubmit],
+    [handleSubmit]
+  );
+
+  // L'organizzatore principale, come lo leggono il suo riquadro e l'elenco
+  // delle persone (per non aggiungerlo una seconda volta).
+  const primario = useMemo(
+    () => ({
+      name: form.moderatorName ?? '',
+      email: form.moderatorEmail ?? '',
+      organization: form.moderatorOrganization ?? null,
+      organizationLogoUrl: form.moderatorOrganizationLogoUrl ?? null,
+      publicListed: !!form.moderatorPublicListed,
+    }),
+    [
+      form.moderatorName,
+      form.moderatorEmail,
+      form.moderatorOrganization,
+      form.moderatorOrganizationLogoUrl,
+      form.moderatorPublicListed,
+    ]
   );
 
   return (
@@ -1289,11 +1622,72 @@ export default function EventWizard(props: WizardProps) {
         </div>
       )}
 
+      {/* I dati portati da «Cambia formato»: lo si dice, e si puo' ripartire
+          dai soli valori del formato. */}
+      {traslocoApplicato && (
+        <div
+          className="alert alert-info d-flex flex-wrap align-items-center justify-content-between gap-2"
+          role="status"
+        >
+          <span>{t('flow.carriedOver')}</span>
+          <button
+            type="button"
+            className="btn btn-sm btn-outline-secondary"
+            onClick={() => {
+              setForm(initial);
+              setTraslocoApplicato(false);
+            }}
+          >
+            {t('flow.startOver')}
+          </button>
+        </div>
+      )}
+
+      {/* Il modello in uso, e il modo di cambiarlo: i default vengono da lui. */}
+      {mode === 'create' && props.onChangeTemplate && (
+        <div className="wizard-modello d-flex flex-wrap align-items-center gap-2 mb-3">
+          <span>
+            {props.formatoLabel
+              ? t.rich('flow.formatInUse', {
+                  name: props.formatoLabel,
+                  b: (c) => <strong>{c}</strong>,
+                })
+              : props.template
+                ? t.rich('flow.templateInUse', {
+                    name: props.template.name,
+                    b: (c) => <strong>{c}</strong>,
+                  })
+                : t('flow.noTemplate')}
+          </span>
+          <button
+            type="button"
+            className="btn btn-sm btn-outline-primary"
+            onClick={cambiaModello}
+            disabled={cambiandoModello}
+          >
+            {props.formatoLabel
+              ? t('flow.changeFormat')
+              : props.template
+                ? t('flow.changeTemplate')
+                : t('flow.chooseTemplate')}
+          </button>
+        </div>
+      )}
+
       <StepNav
-        steps={STEP_KEYS.map((k) => ({ key: k, label: t(`steps.${k}`) }))}
+        steps={WIZARD_MAIN_STEPS.map((k) => ({
+          key: k,
+          label: t(`flow.steps.${k}`),
+          daCompletare: mancanti.some((m) => m.step === k),
+        }))}
+        advanced={{
+          label: t('flow.steps.advanced'),
+          daCompletare: mancanti.some((m) => m.step === 'advanced'),
+        }}
         activeStep={activeStep}
-        onJump={(k) => setActiveStep(k)}
+        onJump={(k) => vai(k)}
         ariaLabel={t('stepsAriaLabel')}
+        daCompletareLabel={t('flow.toComplete')}
       />
 
       {submitError && (
@@ -1309,15 +1703,25 @@ export default function EventWizard(props: WizardProps) {
       )}
 
       <div
-        className="mt-4"
+        className="mt-4 wizard-contenuto"
         ref={contentRef}
         tabIndex={-1}
         role="group"
-        aria-label={t(`steps.${activeStep}`)}
+        aria-label={t(`flow.steps.${activeStep}`)}
         style={{ outline: 'none' }}
       >
-        {activeStep === 'base' && (
+        {activeStep === 'advanced' && (
+          <button
+            type="button"
+            className="btn btn-link p-0 mb-3 wizard-torna"
+            onClick={goNext}
+          >
+            ← {t('flow.backToReview')}
+          </button>
+        )}
+        {(activeStep === 'base' || activeStep === 'schedule') && (
           <Step1Base
+            parte={activeStep === 'base' ? 'evento' : 'quando'}
             value={form}
             onChange={updateForm}
             enabledLocales={props.enabledLocales}
@@ -1325,20 +1729,7 @@ export default function EventWizard(props: WizardProps) {
             availableTags={props.availableTags}
             fieldErrors={fieldErrors}
             siteDefaultParseTitleKicker={props.siteDefaultParseTitleKicker}
-            defaultSenderRatioPct={props.defaultSenderRatioPct}
             siteDefaultVideoQuality={props.siteDefaultVideoQuality}
-          />
-        )}
-        {activeStep === 'permissions' && (
-          <StepPermissions
-            value={form}
-            onChange={updateForm}
-            fieldErrors={fieldErrors}
-            whiteboardInfraReady={props.whiteboardInfraReady}
-            defaultTargetLocales={props.defaultTargetLocales}
-            aiPipelineEnabled={props.aiPipelineEnabled ?? true}
-            eventLocale={SOURCE_LANGUAGE_FALLBACK}
-            editing={props.mode === 'edit'}
           />
         )}
         {activeStep === 'invites' && (
@@ -1347,41 +1738,144 @@ export default function EventWizard(props: WizardProps) {
               value={form}
               onChange={updateForm}
               invitationsLocked={viaToken !== null}
-              primary={{
-                name: form.moderatorName ?? '',
-                email: form.moderatorEmail ?? '',
-                organization: form.moderatorOrganization ?? null,
-                organizationLogoUrl: form.moderatorOrganizationLogoUrl ?? null,
-                publicListed: !!form.moderatorPublicListed,
-              }}
-              onPrimaryChange={updateForm}
-              fieldErrors={fieldErrors}
-              prefilledModeratorEmail={mode === 'edit' ? null : props.defaultModerator?.email ?? null}
-              showLinksOnPublish={mode === 'create' || initialEvent?.event.status === 'DRAFT'}
-              publicRegistrationEnabled={props.publicRegistrationEnabled ?? true}
-            />
+              primary={primario}
+              publicRegistrationEnabled={iscrizioneAperta}
+              iscrizione={
+                istantanea ? undefined : (
+                  <SezioneIscrizione
+                    accessMode={form.accessMode}
+                    requireOrganization={form.requireOrganization}
+                    requireOrganizationRole={form.requireOrganizationRole}
+                    requireOrganizationType={form.requireOrganizationType}
+                    onChange={updateForm}
+                    siteOpen={props.publicRegistrationEnabled ?? true}
+                    invitati={form.invitations.length}
+                    bloccato={viaToken !== null}
+                  iniziale={initial.accessMode}
+                  />
+                )
+              }
+            >
+              <PrimarySection
+                primary={primario}
+                onPrimaryChange={updateForm}
+                fieldErrors={fieldErrors}
+                prefilledModeratorEmail={
+                  mode === 'edit' ? null : (props.defaultModerator?.email ?? null)
+                }
+                showLinksOnPublish={
+                  mode === 'create' || initialEvent?.event.status === 'DRAFT'
+                }
+                perPubblicare={mode === 'create'}
+              />
+            </StepPeople>
           </RubricaAccessContext.Provider>
-        )}
-        {activeStep === 'content' && (
-          <Step4Content
-            value={form}
-            onChange={updateForm}
-            onSaveDraftAndNavigate={mode === 'create' ? saveDraftAndNavigate : undefined}
-            submitting={submitting}
-            staffLocked={viaToken !== null}
-            defaultFeedbackHint={mode === 'create'}
-          />
         )}
         {activeStep === 'review' && (
           <Step5Review
             form={form}
             onChange={updateForm}
-            jvbSizingConfig={props.jvbSizingConfig}
-            defaultSenderRatioPct={props.defaultSenderRatioPct}
             defaultLocale={props.defaultLocale}
             gdprTemplates={props.gdprTemplates}
             fieldErrors={fieldErrors}
-            retentionMax={retentionMax}
+            onCustomize={(sez) => vai('advanced', sez ?? null)}
+            onVaiAlCampo={vaiAlCampo}
+            mancanti={mancanti}
+            aiPipelineEnabled={props.aiPipelineEnabled ?? true}
+            eventLocale={SOURCE_LANGUAGE_FALLBACK}
+            iscrizioneAperta={istantanea ? undefined : iscrizioneAperta}
+            onVaiPersone={() => vai('invites')}
+            sopratitolo={form.parseTitleKicker ?? props.siteDefaultParseTitleKicker}
+            capacityWarning={avvisoCapacita(
+              form,
+              props.jvbSizingConfig,
+              props.defaultSenderRatioPct
+            )}
+          />
+        )}
+        {activeStep === 'advanced' && (
+          <AdvancedSettings
+            open={sezione}
+            richiesta={richiestaSezione}
+            templateName={
+              mode === 'create' && !props.formatoLabel
+                ? (props.template?.name ?? null)
+                : null
+            }
+            sections={{
+              participation: (
+                <StepPermissions
+                  parte="partecipazione"
+                  value={form}
+                  onChange={updateForm}
+                  fieldErrors={fieldErrors}
+                  whiteboardInfraReady={props.whiteboardInfraReady}
+                  defaultTargetLocales={props.defaultTargetLocales}
+                  aiPipelineEnabled={props.aiPipelineEnabled ?? true}
+                  eventLocale={SOURCE_LANGUAGE_FALLBACK}
+                  editing={mode === 'edit'}
+                />
+              ),
+              recording: (
+                <StepPermissions
+                  parte="registrazione"
+                  value={form}
+                  onChange={updateForm}
+                  fieldErrors={fieldErrors}
+                  whiteboardInfraReady={props.whiteboardInfraReady}
+                  defaultTargetLocales={props.defaultTargetLocales}
+                  aiPipelineEnabled={props.aiPipelineEnabled ?? true}
+                  eventLocale={SOURCE_LANGUAGE_FALLBACK}
+                  editing={mode === 'edit'}
+                  showAutoStart={
+                    mode === 'edit' && !!initialEvent?.event.autoStartRecording
+                  }
+                />
+              ),
+              content: (
+                <Step4Content
+                  incorporato
+                  value={form}
+                  onChange={updateForm}
+                  onSaveDraftAndNavigate={
+                    mode === 'create' ? saveDraftAndNavigate : undefined
+                  }
+                  submitting={submitting}
+                  staffLocked={viaToken !== null}
+                  defaultFeedbackHint={mode === 'create'}
+                />
+              ),
+              room: (
+                <Step1Base
+                  parte="avanzate"
+                  value={form}
+                  onChange={updateForm}
+                  enabledLocales={props.enabledLocales}
+                  defaultLocale={props.defaultLocale}
+                  availableTags={props.availableTags}
+                  fieldErrors={fieldErrors}
+                  siteDefaultParseTitleKicker={props.siteDefaultParseTitleKicker}
+                  siteDefaultVideoQuality={props.siteDefaultVideoQuality}
+                />
+              ),
+              data: (
+                <SezioneDati
+                  form={form}
+                  onChange={updateForm}
+                  gdprTemplates={props.gdprTemplates}
+                  fieldErrors={fieldErrors}
+                  retentionMax={retentionMax}
+                />
+              ),
+              technical: (
+                <SezioneTecnica
+                  form={form}
+                  onChange={updateForm}
+                  jvbSizingConfig={props.jvbSizingConfig}
+                  defaultSenderRatioPct={props.defaultSenderRatioPct}
+                />
+              ),
+            }}
           />
         )}
       </div>
@@ -1406,15 +1900,24 @@ export default function EventWizard(props: WizardProps) {
         </div>
       )}
 
-      <div className="d-flex justify-content-between mt-4 pt-3" style={{ borderTop: '1px solid #e8e8e8' }}>
-        <button
-          type="button"
-          className="btn btn-outline-primary"
-          onClick={goPrev}
-          disabled={stepIndex === 0 || submitting}
-        >
-          ← {tc('back')}
-        </button>
+      <div
+        className="d-flex justify-content-between mt-4 pt-3"
+        style={{ borderTop: '1px solid #e8e8e8' }}
+      >
+        {/* Dalle impostazioni avanzate si torna al riepilogo con il pulsante
+            a destra (e con il collegamento in cima): uno solo, non due. */}
+        {activeStep === 'advanced' ? (
+          <span />
+        ) : (
+          <button
+            type="button"
+            className="btn btn-outline-primary"
+            onClick={goPrev}
+            disabled={activeStep === 'base' || submitting}
+          >
+            ← {tc('back')}
+          </button>
+        )}
 
         {activeStep !== 'review' ? (
           <div className="d-flex gap-2 flex-wrap justify-content-end">
@@ -1436,7 +1939,7 @@ export default function EventWizard(props: WizardProps) {
               onClick={goNext}
               disabled={submitting}
             >
-              {tc('next')} →
+              {activeStep === 'advanced' ? t('flow.backToReview') : `${tc('next')} →`}
             </button>
           </div>
         ) : mode === 'edit' ? (
@@ -1475,28 +1978,130 @@ export default function EventWizard(props: WizardProps) {
 
 // ── Step navigation bar ─────────────────────────────────────────────────────
 //
-// Horizontal stepper with numbered circles and connecting lines. Each step
-// is a clickable button — admins can jump back to edit an earlier step
-// without losing later work (all steps share the same form state).
+// I quattro passi numerati e, a parte, le impostazioni avanzate. Ogni passo
+// si apre con un clic (lo stato e' uno solo, non si perde niente); un passo
+// con un campo obbligatorio vuoto lo dice sotto il nome.
+
+/** I campi che parlano dell'evento, e non dipendono dal formato o dal
+ *  modello: titolo e descrizione, date, persone, contenuti. */
+const CAMPI_DELL_EVENTO = [
+  'title',
+  'description',
+  'coverImageUrl',
+  'imageUrl',
+  'tagSlugs',
+  'startsAt',
+  'endsAt',
+  'timezone',
+  'recurrencePreset',
+  'recurrenceRule',
+  'recurrenceUntil',
+  'recurrenceCount',
+  'moderatorName',
+  'moderatorEmail',
+  'moderatorOrganization',
+  'moderatorOrganizationLogoUrl',
+  'moderatorPublicListed',
+  'parseTitleKicker',
+  'requireOrganization',
+  'requireOrganizationRole',
+  'requireOrganizationType',
+  'organizers',
+  'moderators',
+  'speakers',
+  'invitations',
+  'materials',
+  'preEventQuestionnaire',
+  'postEventQuestionnaire',
+] as const satisfies readonly (keyof WizardForm)[];
+
+/** Cio' che si e' scritto sull'evento: solo i campi cambiati rispetto ai
+ *  valori di partenza. La descrizione proposta da un modello, o le date di
+ *  partenza, non sono scelte di chi crea l'evento e non si portano altrove. */
+function datiCambiati(f: WizardForm, partenza: WizardForm): Partial<WizardForm> {
+  const out: Partial<WizardForm> = {};
+  for (const k of CAMPI_DELL_EVENTO) {
+    if (JSON.stringify(f[k]) !== JSON.stringify(partenza[k])) {
+      (out as Record<string, unknown>)[k] = f[k];
+    }
+  }
+  return out;
+}
+
+/** Il modulo con i dati dell'evento portati da altrove. Se arriva l'inizio
+ *  senza la fine, la fine la decide la durata di questo formato, nel fuso
+ *  dell'evento. */
+function conDatiDellEvento(modulo: WizardForm, dati: Partial<WizardForm>): WizardForm {
+  const nuovo = { ...modulo, ...dati } as WizardForm;
+  if (dati.startsAt && !dati.endsAt) {
+    try {
+      const durata =
+        fromDatetimeLocalInTz(modulo.endsAt, modulo.timezone).getTime() -
+        fromDatetimeLocalInTz(modulo.startsAt, modulo.timezone).getTime();
+      const inizio = fromDatetimeLocalInTz(nuovo.startsAt, nuovo.timezone).getTime();
+      if (Number.isFinite(durata) && durata > 0 && Number.isFinite(inizio)) {
+        nuovo.endsAt = toDatetimeLocalInTz(new Date(inizio + durata), nuovo.timezone);
+      }
+    } catch {
+      /* data incompleta: la fine resta quella del formato */
+    }
+  }
+  return nuovo;
+}
+
+/** L'elemento di un campo che manca, per portarci il fuoco. */
+function idDelCampo(key: string, defaultLocale: string): string | null {
+  const campo = key.split('.')[0];
+  switch (campo) {
+    case 'title':
+      return 'ev-title';
+    case 'description':
+      return `ev-description-${defaultLocale}`;
+    case 'startsAt':
+      return 'ev-starts';
+    case 'endsAt':
+      return 'ev-ends';
+    case 'maxParticipants':
+      return 'ev-max';
+    case 'moderatorName':
+      return 'wiz-primary-name';
+    case 'moderatorEmail':
+      return 'wiz-primary-email';
+    case 'aiTargetLocales':
+      return 'aiTargetLocales';
+    case 'dataRetentionDays':
+      return 'rev-retention';
+    default:
+      return null;
+  }
+}
 
 function StepNav({
   steps,
+  advanced,
   activeStep,
   onJump,
   ariaLabel,
+  daCompletareLabel,
 }: {
-  steps: Array<{ key: StepKey; label: string }>;
+  steps: Array<{ key: StepKey; label: string; daCompletare: boolean }>;
+  advanced: { label: string; daCompletare: boolean };
   activeStep: StepKey;
   onJump: (k: StepKey) => void;
   ariaLabel: string;
+  daCompletareLabel: string;
 }) {
   const activeIdx = steps.findIndex((s) => s.key === activeStep);
   return (
-    <nav aria-label={ariaLabel} className="mb-3">
-      <ol className="d-flex align-items-center justify-content-between list-unstyled mb-0 flex-wrap gap-2">
+    <nav aria-label={ariaLabel} className="mb-3 wizard-passi">
+      <ol className="d-flex align-items-start justify-content-between list-unstyled mb-0 flex-wrap gap-2">
         {steps.map((s, i) => {
           const isActive = i === activeIdx;
-          const isDone = i < activeIdx;
+          // Fatto: un passo prima di quello aperto, senza niente da
+          // completare; dalle impostazioni avanzate, ogni passo da compilare
+          // che non chiede piu' niente.
+          const isDone =
+            !s.daCompletare && (activeIdx >= 0 ? i < activeIdx : s.key !== 'review');
           // Il passo gia' fatto: cerchio bianco con bordo e segno blu (il bianco
           // su un azzurro chiaro non arrivava al contrasto minimo, e un fondo
           // chiaro si confonderebbe con i passi da fare).
@@ -1529,20 +2134,53 @@ function StepNav({
                 >
                   {isDone ? '✓' : i + 1}
                 </span>
-                <span
-                  className={isActive ? 'fw-bold' : ''}
-                  style={{
-                    color: isActive ? '#0066CC' : 'var(--app-text)',
-                    fontSize: '0.9rem',
-                    textAlign: 'left',
-                  }}
-                >
-                  {s.label}
+                <span className="d-flex flex-column text-start">
+                  <span
+                    className={isActive ? 'fw-bold' : ''}
+                    style={{
+                      color: isActive ? '#0066CC' : 'var(--app-text)',
+                      fontSize: '0.9rem',
+                    }}
+                  >
+                    {s.label}
+                  </span>
+                  {s.daCompletare && (
+                    <span className="wizard-passi__da-fare">{daCompletareLabel}</span>
+                  )}
                 </span>
               </button>
             </li>
           );
         })}
+        {/* Le impostazioni avanzate: non un passo da percorrere, le scelte del
+            modello raccolte in un posto. */}
+        <li className="wizard-passi__avanzate">
+          <button
+            type="button"
+            onClick={() => onJump('advanced')}
+            aria-current={activeStep === 'advanced' ? 'step' : undefined}
+            className={`btn btn-sm ${activeStep === 'advanced' ? 'btn-primary' : 'btn-outline-primary'} d-inline-flex align-items-center gap-2`}
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <circle cx="12" cy="12" r="3" />
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+            </svg>
+            {advanced.label}
+            {advanced.daCompletare && (
+              <span className="wizard-passi__da-fare">· {daCompletareLabel}</span>
+            )}
+          </button>
+        </li>
       </ol>
     </nav>
   );

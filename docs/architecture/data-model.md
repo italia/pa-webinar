@@ -394,6 +394,7 @@ The values below are copied from `schema.prisma`. The owner page explains what e
 |---|---|---|---|
 | `EventStatus` | `DRAFT`, `PUBLISHED`, `PROVISIONING`, `LIVE`, `IDLE`, `ENDED`, `ARCHIVED` | `Event.status`. The scaler or the lifecycle cron, the API and the cleanup job move it. | [event-lifecycle.md](event-lifecycle.md) |
 | `EventType` | `SCHEDULED`, `INSTANT`, `LEGACY` | A scheduled event, an instant call, or a historical entry with no room and no registrations (metadata and a `youtubeUrl` only). | [event-journey.md](event-journey.md) |
+| `EventAccessMode` | `OPEN`, `INVITATION` | `Event.accessMode`, nullable: who can take part. `NULL` follows the site settings. | [event-journey.md](event-journey.md#invitation-only-registration) |
 | `EventModeratorRole` | `MODERATOR`, `SPEAKER` | The role of a named grant. | [identity-and-access.md](identity-and-access.md) |
 | `StaffRole` | `ORGANIZER`, `ADMIN` | A staff account manages its own events, or the whole instance under a name. The instance API key is not an account. | [identity-and-access.md](identity-and-access.md), [ADR-014](../adr/014-organizer-role.md), [ADR-015](../adr/015-named-administrators.md) |
 | `WaitingRoomEngine` | `GARDEN` (**Garden (standard)**), `GAME` (**Videogame (Phaser lobby)**), `CLASSIC` (**Classic (static)**) | Site default on `SiteSetting` (`GARDEN` in the schema), with a nullable override on `Event` and `EventTemplate`. | [waiting-room.md](waiting-room.md) |

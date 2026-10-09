@@ -13,7 +13,7 @@ import { prisma } from '@/lib/db';
 import { jvbMaxReplicasFromEnv } from '@/lib/jvb-sizing';
 import { getSettings } from '@/lib/settings';
 import { Link, percorso } from '@/i18n/navigation';
-import { isWizardStep } from '@/lib/events/wizard-steps';
+import { WIZARD_ADVANCED_SECTIONS, wizardStepFromParam, type WizardAdvancedSection } from '@/lib/events/wizard-steps';
 import EventWizard, {
   type InitialEventShape,
 } from '@/components/admin/event-wizard/wizard-shell';
@@ -31,7 +31,7 @@ import { eventPageMetadata } from '@/components/admin/admin-page-title';
 
 interface PageProps {
   params: Promise<{ id: string; locale: string }>;
-  searchParams: Promise<{ token?: string; step?: string | string[] }>;
+  searchParams: Promise<{ token?: string; step?: string | string[]; section?: string | string[] }>;
 }
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -103,9 +103,15 @@ export async function generateMetadata({
 
 export default async function EditEventPage({ params, searchParams }: PageProps) {
   const { id, locale } = await params;
-  const { token, step } = await searchParams;
-  // Il passo da cui partire (dai link «Modifica» della pagina dell'evento).
-  const initialStep = isWizardStep(step) ? step : undefined;
+  const { token, step, section } = await searchParams;
+  // Il passo da cui partire (dai link «Modifica» della pagina dell'evento),
+  // anche nominato come una volta (`permissions`, `content`).
+  const daIndirizzo = wizardStepFromParam(step);
+  const initialStep = daIndirizzo?.step;
+  const initialSection: WizardAdvancedSection | undefined =
+    (WIZARD_ADVANCED_SECTIONS as readonly string[]).includes(String(section))
+      ? (section as WizardAdvancedSection)
+      : daIndirizzo?.section;
   const t = await getTranslations({ locale, namespace: 'admin' });
   const tNav = await getTranslations('admin.nav');
 
@@ -117,7 +123,7 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
   const session = await getStaffSession(await cookies());
   const staffCanManage = session ? await puoGestire(session, id) : false;
   if (token && staffCanManage) {
-    redirect(localizedPath(eventAdminPath(id, { edit: true, step: initialStep }), locale));
+    redirect(localizedPath(eventAdminPath(id, { edit: true, step: initialStep, section: initialSection }), locale));
   }
   if (!token) {
     if (!session) notFound();
@@ -242,6 +248,11 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
       moderatorOrganization: event.moderatorOrganization,
       moderatorOrganizationLogoUrl: event.moderatorOrganizationLogoUrl,
       moderatorPublicListed: event.moderatorPublicListed,
+      eventType: event.eventType,
+      accessMode: event.accessMode,
+      requireOrganization: event.requireOrganization,
+      requireOrganizationRole: event.requireOrganizationRole,
+      requireOrganizationType: event.requireOrganizationType,
     },
     organizers: event.organizers.map((o) => ({
       id: o.id,
@@ -301,6 +312,7 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
       <EventWizard
         mode="edit"
         initialStep={initialStep}
+        initialSection={initialSection}
         canUseRubrica={session?.role === 'admin'}
         publicRegistrationEnabled={siteSettings.publicRegistrationEnabled}
         viaToken={staffCanManage ? null : (token ?? null)}

@@ -13,6 +13,7 @@
 import { useTranslations } from 'next-intl';
 
 import LanguageChecklist, { parseLocaleList } from '@/components/admin/language-checklist';
+import { lingueDiPartenzaTraduzione } from '@/lib/ai/target-locales';
 import ToggleSwitch from '@/components/ui/toggle-switch';
 import {
   EVENT_ROLES,
@@ -73,6 +74,36 @@ interface Props {
    *  registrazione o la trascrizione non accende le tracce per partecipante,
    *  che chiederebbero il consenso a chi e' gia' iscritto. */
   editing?: boolean;
+  /** La registrazione non parte mai da sola: l'interruttore dell'avvio
+   *  automatico si mostra solo su un evento che ce l'ha gia' acceso, per
+   *  poterlo spegnere. */
+  showAutoStart?: boolean;
+  /** Quale parte mostrare, fra le impostazioni avanzate: chi puo' fare cosa e
+   *  le funzioni della sala, oppure registrazione e post-produzione AI. */
+  parte: 'partecipazione' | 'registrazione';
+}
+
+/** Le funzioni AI che si accendono con la registrazione: chi registra ha
+ *  trascrizione, sintesi e traduzione (nelle lingue dell'istanza, finche' non
+ *  se ne scelgono altre) e le tracce per partecipante, che dicono chi parla. */
+function aiConLaRegistrazione(
+  value: StepPermissionsValue,
+  defaultTargetLocales: string | null,
+  eventLocale: string | undefined,
+): Partial<StepPermissionsValue> {
+  // La traduzione si accende solo se c'e' almeno una lingua in cui tradurre:
+  // senza, il passo chiederebbe una scelta che nessuno ha chiesto di fare.
+  const lingue =
+    parseLocaleList(value.aiTargetLocales).length > 0
+      ? value.aiTargetLocales
+      : lingueDiPartenzaTraduzione(defaultTargetLocales, eventLocale);
+  return {
+    aiTranscriptEnabled: true,
+    aiSummaryEnabled: true,
+    aiTranslationEnabled: !!lingue,
+    multitrackRecordingEnabled: true,
+    aiTargetLocales: lingue ?? null,
+  };
 }
 
 /**
@@ -98,6 +129,8 @@ export default function StepPermissions({
   eventLocale,
   aiPipelineEnabled = true,
   editing = false,
+  showAutoStart = false,
+  parte,
 }: Props) {
   const t = useTranslations('admin.wizard.step2');
   const tAdmin = useTranslations('admin');
@@ -117,15 +150,11 @@ export default function StepPermissions({
     (f) => f !== 'recording_control' || value.recordingEnabled,
   );
 
-  return (
-    <div>
-      <h2 className="h4 fw-bold mb-3" style={{ color: 'var(--app-text)' }}>
-        {t('heading')}
-      </h2>
-      <p className="text-secondary mb-3" style={{ fontSize: '0.9rem' }}>
-        {t('intro')}
-      </p>
-
+  // Le due sezioni delle impostazioni avanzate: hanno il titolo nella
+  // sezione che le contiene.
+  if (parte === 'partecipazione') {
+    return (
+      <div>
       {/* I ruoli, dal più ampio: chi li ha lo decide il passo «Persone». */}
       <section className="wizard-roles mb-4" aria-labelledby="wiz-roles-title">
         <h3 id="wiz-roles-title" className="h6 fw-semibold mb-2" style={{ color: 'var(--app-text)' }}>
@@ -194,65 +223,6 @@ export default function StepPermissions({
         </table>
       </div>
 
-      {/* Recording toggles (global) */}
-      <section className="mb-3">
-        <h3 className="h6 fw-semibold mb-3" style={{ color: 'var(--app-text)' }}>
-          {t('recordingHeading')}
-        </h3>
-
-        <div className="py-2 d-flex justify-content-between align-items-start">
-          <div className="me-3">
-            <div className="fw-semibold" style={{ color: 'var(--app-text)' }}>
-              {tAdmin('form.recordingEnabled')}
-            </div>
-            <div className="text-secondary" style={{ fontSize: '0.85rem' }}>
-              {tAdmin('toggleRecordingDesc')}
-            </div>
-          </div>
-          <ToggleSwitch
-            label=""
-            ariaLabel={tAdmin('form.recordingEnabled')}
-            checked={value.recordingEnabled}
-            onChange={() =>
-              onChange({
-                recordingEnabled: !value.recordingEnabled,
-                autoStartRecording: !value.recordingEnabled ? value.autoStartRecording : false,
-                // Chi registra ha per default la trascrizione e le tracce per
-                // partecipante (servono a dire chi parla), se l'elaborazione
-                // AI e' attiva sull'istanza; si spengono qui sotto.
-                ...(!value.recordingEnabled && aiPipelineEnabled && !editing
-                  ? { aiTranscriptEnabled: true, multitrackRecordingEnabled: true }
-                  : {}),
-              })
-            }
-          />
-        </div>
-
-        {value.recordingEnabled && (
-          <div
-            className="py-2 d-flex justify-content-between align-items-start"
-            style={{ borderTop: '1px solid #e8e8e8' }}
-          >
-            <div className="me-3">
-              <div className="fw-semibold" style={{ color: 'var(--app-text)' }}>
-                {tAdmin('form.autoStartRecording')}
-              </div>
-              <div className="text-secondary" style={{ fontSize: '0.85rem' }}>
-                {tAdmin('form.autoStartRecordingDesc')}
-              </div>
-            </div>
-            <ToggleSwitch
-              label=""
-              ariaLabel={tAdmin('form.autoStartRecording')}
-              checked={value.autoStartRecording}
-              onChange={() =>
-                onChange({ autoStartRecording: !value.autoStartRecording })
-              }
-            />
-          </div>
-        )}
-      </section>
-
       {/* Interazione live — feature opzionali della stanza */}
       <section className="mb-3">
         <h3 className="h6 fw-semibold mb-3" style={{ color: 'var(--app-text)' }}>
@@ -317,6 +287,77 @@ export default function StepPermissions({
         </div>
       </section>
 
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      {/* Recording toggles (global) */}
+      <section className="mb-3">
+        <h3 className="h6 fw-semibold mb-3" style={{ color: 'var(--app-text)' }}>
+          {t('recordingHeading')}
+        </h3>
+
+        <div className="py-2 d-flex justify-content-between align-items-start">
+          <div className="me-3">
+            <div className="fw-semibold" style={{ color: 'var(--app-text)' }}>
+              {tAdmin('form.recordingEnabled')}
+            </div>
+            <div className="text-secondary" style={{ fontSize: '0.85rem' }}>
+              {tAdmin('toggleRecordingDesc')}
+            </div>
+          </div>
+          <ToggleSwitch
+            label=""
+            ariaLabel={tAdmin('form.recordingEnabled')}
+            checked={value.recordingEnabled}
+            onChange={() =>
+              onChange({
+                recordingEnabled: !value.recordingEnabled,
+                autoStartRecording: !value.recordingEnabled ? value.autoStartRecording : false,
+                // Chi registra ha per default trascrizione, sintesi,
+                // traduzione e tracce per partecipante, se l'elaborazione AI
+                // e' attiva sull'istanza; si spengono qui sotto.
+                ...(!value.recordingEnabled && aiPipelineEnabled && !editing
+                  ? aiConLaRegistrazione(value, defaultTargetLocales, eventLocale)
+                  : {}),
+              })
+            }
+          />
+        </div>
+
+        {value.recordingEnabled && !value.autoStartRecording && (
+          <p className="text-secondary mb-0 py-2" style={{ fontSize: '0.85rem', borderTop: '1px solid #e8e8e8' }}>
+            {t('recordingManualNote')}
+          </p>
+        )}
+
+        {value.recordingEnabled && showAutoStart && (
+          <div
+            className="py-2 d-flex justify-content-between align-items-start"
+            style={{ borderTop: '1px solid #e8e8e8' }}
+          >
+            <div className="me-3">
+              <div className="fw-semibold" style={{ color: 'var(--app-text)' }}>
+                {tAdmin('form.autoStartRecording')}
+              </div>
+              <div className="text-secondary" style={{ fontSize: '0.85rem' }}>
+                {tAdmin('form.autoStartRecordingDesc')}
+              </div>
+            </div>
+            <ToggleSwitch
+              label=""
+              ariaLabel={tAdmin('form.autoStartRecording')}
+              checked={value.autoStartRecording}
+              onChange={() =>
+                onChange({ autoStartRecording: !value.autoStartRecording })
+              }
+            />
+          </div>
+        )}
+      </section>
+
       {/* Post-produzione AI — solo se recording attiva. Renderizzata
           come sezione separata sotto la registrazione (la AI lavora
           sulla registrazione, ne è subordinata). */}
@@ -345,7 +386,9 @@ export default function StepPermissions({
               // input.
               onChange(
                 next
-                  ? { aiTranscriptEnabled: true, ...(editing ? {} : { multitrackRecordingEnabled: true }) }
+                  ? editing
+                    ? { aiTranscriptEnabled: true }
+                    : aiConLaRegistrazione(value, defaultTargetLocales, eventLocale)
                   : {
                       aiTranscriptEnabled: false,
                       aiSummaryEnabled: false,
@@ -413,12 +456,7 @@ export default function StepPermissions({
                           // Le lingue dell'istanza gia' spuntate: si toglie
                           // quella che non serve invece di scriverle.
                           ...(parseLocaleList(value.aiTargetLocales).length === 0
-                            ? {
-                                aiTargetLocales:
-                                  parseLocaleList(defaultTargetLocales)
-                                    .filter((c) => c !== eventLocale)
-                                    .join(',') || null,
-                              }
+                            ? { aiTargetLocales: lingueDiPartenzaTraduzione(defaultTargetLocales, eventLocale) }
                             : {}),
                         }
                       : {

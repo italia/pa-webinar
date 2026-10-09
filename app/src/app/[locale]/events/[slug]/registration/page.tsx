@@ -63,10 +63,11 @@ export default async function RegistrationPage({
 
   const title = getLocalized(event.title as LocalizedField, locale);
   const settings = await getSettings();
-  // Con l'iscrizione pubblica spenta la pagina resta raggiungibile — ci
-  // arriva anche chi viene rimandato dalla sala — ma spiega chi può iscriversi.
+  // Con l'iscrizione non aperta (solo su invito, per l'evento o per il sito)
+  // la pagina resta raggiungibile — ci arriva anche chi viene rimandato dalla
+  // sala — ma spiega chi può iscriversi.
   const registrationAccess = await registrationAccessFor(
-    event.id,
+    event,
     settings.publicRegistrationEnabled,
   );
 
