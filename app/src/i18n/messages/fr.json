@@ -4275,6 +4275,158 @@
         "clap": "Applaudir",
         "laugh": "Rire",
         "idea": "J'ai une idée"
+      },
+      "editor": {
+        "open": "Personnage",
+        "title": "Votre personnage",
+        "close": "Fermer",
+        "preview": "Aperçu du personnage",
+        "rotate": "Tourner",
+        "start": "Point de départ",
+        "styles": {
+          "neutro": "Non précisé",
+          "maschile": "Masculin",
+          "femminile": "Féminin"
+        },
+        "random": "Au hasard",
+        "skin": "Teint",
+        "skinTone": "Teinte {n}",
+        "hair": "Cheveux",
+        "hairColor": "Couleur des cheveux",
+        "top": "Haut",
+        "bottom": "Bas",
+        "topColor": "Couleur du haut",
+        "bottomColor": "Couleur du bas",
+        "shoes": "Chaussures",
+        "hat": "Chapeau",
+        "hatColor": "Couleur du chapeau",
+        "glasses": "Lunettes",
+        "hint": "Tout le monde le voit sur la place. Votre choix reste uniquement dans ce navigateur.",
+        "done": "Terminé",
+        "hairStyles": {
+          "corti": "Courts",
+          "rasati": "Rasés",
+          "lunghi": "Longs",
+          "coda": "Queue-de-cheval",
+          "ricci": "Bouclés",
+          "chignon": "Chignon",
+          "caschetto": "Carré",
+          "calvo": "Sans cheveux"
+        },
+        "tops": {
+          "maglietta": "T-shirt",
+          "felpa": "Sweat à capuche",
+          "camicia": "Chemise",
+          "giacca": "Veste",
+          "vestito": "Robe"
+        },
+        "bottoms": {
+          "pantaloni": "Pantalon",
+          "pantaloncini": "Short",
+          "gonna": "Jupe"
+        },
+        "hats": {
+          "nessuno": "Aucun",
+          "berretto": "Casquette",
+          "cuffia": "Bonnet",
+          "cappello": "Chapeau",
+          "caschetto": "Casque de chantier",
+          "cuffie": "Casque audio",
+          "corona": "Couronne"
+        },
+        "glassesStyles": {
+          "nessuno": "Aucunes",
+          "occhiali": "Lunettes de vue",
+          "sole": "Lunettes de soleil"
+        },
+        "colors": {
+          "nero": "Noir",
+          "castanoScuro": "Brun foncé",
+          "castano": "Châtain",
+          "ramato": "Auburn",
+          "rosso": "Rouge",
+          "biondo": "Blond",
+          "grigio": "Gris",
+          "blu": "Bleu",
+          "rosa": "Rose",
+          "verde": "Vert",
+          "viola": "Violet",
+          "giallo": "Jaune",
+          "bluNotte": "Bleu nuit",
+          "ardesia": "Ardoise",
+          "bluPolvere": "Bleu poudre",
+          "azzurro": "Bleu clair",
+          "bianco": "Blanc",
+          "arancione": "Orange",
+          "jeans": "Jean",
+          "sabbia": "Sable",
+          "marrone": "Marron",
+          "fulvo": "Roux"
+        }
+      },
+      "luoghi": {
+        "caffe": "Prendre un café",
+        "bacheca": "Lire le tableau d’affichage",
+        "galleria": "Voir les portraits",
+        "laboratorio": "Entrer dans l’atelier",
+        "fontana": "Lancer une pièce",
+        "pozzo": "Faire un vœu"
+      },
+      "annunci": {
+        "caffe": "Bon café ! Tout le monde sur la place voit votre tasse.",
+        "fontana": "Vous avez lancé une pièce dans la fontaine.",
+        "pozzo": "Vous avez fait un vœu au puits.",
+        "corona": "Vous avez trouvé un secret : la couronne est à vous. Vous la trouverez dans Personnage, rubrique Chapeau."
+      },
+      "bacheca": {
+        "title": "Le tableau d’affichage",
+        "about": "De quoi il s’agit",
+        "program": "Programme",
+        "now": "en cours",
+        "done": "terminé",
+        "minutes": "{n} min",
+        "materials": "Documents"
+      },
+      "galleria": {
+        "title": "Les portraits de la place",
+        "intro": "Qui est sur la place maintenant, et dans quelle tenue.",
+        "alone": "Pour l’instant, il n’y a que vous sur la place.",
+        "you": "vous",
+        "exhibition": "Exposé",
+        "portraits": "Qui est sur la place"
+      },
+      "laboratorio": {
+        "title": "L’atelier",
+        "moodTitle": "L’humeur de la place",
+        "moodIntro": "Comment arrivez-vous aujourd’hui ? Un panneau près de l’atelier compte combien de personnes pour chaque humeur.",
+        "moods": {
+          "felice": "Bonne humeur",
+          "curioso": "Curiosité",
+          "assonnato": "Sommeil",
+          "carico": "Énergie"
+        },
+        "count": "{n, plural, one {# personne} other {# personnes}}",
+        "moodNote": "Seuls les chiffres sont visibles, pas qui a choisi quoi. Cela dure tant que vous restez sur la place.",
+        "wardrobeTitle": "Le vestiaire",
+        "wardrobeIntro": "Changez les vêtements, la coiffure et les accessoires de votre personnage.",
+        "wardrobeOpen": "Changer de personnage"
+      },
+      "legenda": {
+        "open": "Commandes",
+        "title": "Commandes et secrets",
+        "commands": "Les commandes",
+        "move": "Marcher",
+        "space": "Espace",
+        "jump": "Sauter",
+        "gestures": "Les gestes : salut, cœur, applaudissements, rire, idée",
+        "enter": "Entrée",
+        "act": "Agir dans un lieu (café, tableau, fontaine…)",
+        "secrets": "Les secrets",
+        "secretsIntro": "À essayer : à taper au clavier sur la place.",
+        "secretParty": "Confettis",
+        "secretFireworks": "Feu d’artifice au-dessus du portail",
+        "secretSnow": "Une chute de neige",
+        "secretWell": "Trois vœux au puits : une surprise pour votre personnage"
       }
     }
   },

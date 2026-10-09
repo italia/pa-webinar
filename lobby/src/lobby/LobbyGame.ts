@@ -10,6 +10,8 @@ import { WorldScene } from './scenes/WorldScene';
 import { lobbyStorage } from './storage';
 import { AudioSystem } from './systems/AudioSystem';
 import { AVATAR_COLORS } from './systems/AvatarTextureFactory';
+import { contaUmori, type Umore } from './umori';
+import { CAPPELLI, lookCasuale, lookDaVecchio, normalizzaLook, stessoLook, type AvatarLook } from './avatar/look';
 import { ConfigPanel } from './ui/ConfigPanel';
 import { Joystick } from './ui/Joystick';
 import { Onboarding } from './ui/Onboarding';
@@ -69,7 +71,11 @@ export class LobbyGame {
     this.profile = this.buildInitialProfile(config.initialProfile);
     this.bus = createBus();
     // Prima di creare il gioco: la scena può partire in qualsiasi momento.
-    this.busUnsubs.push(busOn(this.bus, 'sceneReady', () => this.segnalaPronta()));
+    this.busUnsubs.push(
+      busOn(this.bus, 'sceneReady', () => this.segnalaPronta()),
+      busOn(this.bus, 'luogo', (id) => config.onLuogo?.(id)),
+      busOn(this.bus, 'interagisci', (id) => config.onInteragisci?.(id)),
+    );
     this.audio = new AudioSystem();
 
     // ── DOM scaffolding ──
@@ -182,12 +188,37 @@ export class LobbyGame {
       this.profile.accessories = { ...this.profile.accessories, ...p.accessories };
       delta.accessories = { ...this.profile.accessories };
     }
+    if (p.umore !== undefined && p.umore !== (this.profile.umore ?? null)) {
+      this.profile.umore = p.umore;
+      delta.umore = p.umore;
+    }
+    if (p.look !== undefined) {
+      const look = normalizzaLook(p.look);
+      if (!this.profile.look || !stessoLook(look, this.profile.look)) {
+        this.profile.look = look;
+        delta.look = look;
+      }
+    } else if (delta.color !== undefined || delta.accessories !== undefined) {
+      // La barra dei colori della piazza da sola cambia maglia, caschetto e
+      // occhiali: l'aspetto li segue.
+      const { helmet = false, glasses = false } = this.profile.accessories;
+      const base = this.profile.look ?? lookDaVecchio(this.profile.color, helmet, glasses);
+      const caschetto = CAPPELLI.indexOf('caschetto');
+      this.profile.look = {
+        ...base,
+        coloreMaglia: lookDaVecchio(this.profile.color, false, false).coloreMaglia,
+        cappello: helmet ? caschetto : base.cappello === caschetto ? 0 : base.cappello,
+        occhiali: glasses ? 1 : base.occhiali === 1 ? 0 : base.occhiali,
+      };
+      delta.look = this.profile.look;
+    }
     if (Object.keys(delta).length === 0) return;
 
     lobbyStorage.setProfile({
       name: this.profile.name,
       color: this.profile.color,
       accessories: this.profile.accessories,
+      ...(this.profile.look ? { look: this.profile.look } : {}),
     });
     this.deps.presence.setProfile(delta);
     this.bus.emit('profileChange', delta);
@@ -219,6 +250,29 @@ export class LobbyGame {
   emote(type: EmoteType): void {
     if (this.destroyed) return;
     this.bus.emit('emote', type);
+  }
+
+  azione(id: string): void {
+    if (this.destroyed) return;
+    this.bus.emit('azione', id);
+  }
+
+  festa(): void {
+    if (this.destroyed) return;
+    this.bus.emit('festa');
+  }
+
+  /** Quanti per ciascun umore, fra chi è in piazza (io compreso). */
+  umori(): Record<Umore, number> {
+    if (this.destroyed) return contaUmori([]);
+    const scena = this.game.scene.getScene('World') as WorldScene | null;
+    return scena?.sys.isActive() ? scena.umori() : contaUmori([this.profile.umore]);
+  }
+
+  presenti(): { nome: string; look: AvatarLook; io: boolean }[] {
+    if (this.destroyed) return [];
+    const scena = this.game.scene.getScene('World') as WorldScene | null;
+    return scena?.sys.isActive() ? scena.presenti() : [];
   }
 
   setAudio(on: boolean): boolean {
@@ -274,6 +328,8 @@ export class LobbyGame {
       name: this.profile.name,
       color: this.profile.color,
       accessories: { ...this.profile.accessories },
+      ...(this.profile.look ? { look: { ...this.profile.look } } : {}),
+      umore: this.profile.umore ?? null,
     };
   }
 
@@ -287,6 +343,9 @@ export class LobbyGame {
         helmet: seed?.accessories?.helmet ?? persisted?.accessories?.helmet ?? false,
         glasses: seed?.accessories?.glasses ?? persisted?.accessories?.glasses ?? false,
       },
+      // Senza un aspetto scelto, uno a caso: in piazza non si è mai tutti
+      // uguali.
+      look: seed?.look || persisted?.look ? normalizzaLook(seed?.look ?? persisted?.look) : lookCasuale(),
     };
   }
 }

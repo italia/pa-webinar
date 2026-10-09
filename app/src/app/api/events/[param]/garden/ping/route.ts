@@ -37,6 +37,7 @@ import {
 } from '@/lib/errors';
 import { prisma } from '@/lib/db';
 import { isGardenEmote } from '@/lib/garden/emotes';
+import { GARDEN_UMORI, isGardenUmore, type GardenUmore } from '@/lib/garden/umori';
 import {
   listGardenPeers,
   publishGardenPing,
@@ -80,6 +81,9 @@ const pingSchema = z.object({
       at: z.number().int().nonnegative(),
     })
     .optional(),
+  /** L'umore detto al laboratorio della piazza: un nome breve, scartato se
+   *  non è uno di quelli previsti (come i gesti). */
+  umore: z.string().max(16).optional(),
   /** When true the server removes the peer — used on "Leave garden". */
   leave: z.boolean().optional(),
 });
@@ -174,10 +178,11 @@ export const POST = withErrorHandling(async (request, context) => {
     if (altri === null) return NextResponse.json({ peers: [], active: true, degraded: true });
     return NextResponse.json({
       peers: altri.map((p) => ({
-        ...p,
+        ...senzaUmore(p),
         userId: identificativoOpaco(event.id, p.userId),
         displayName: '',
       })),
+      umori: contaUmori(altri),
       active: true,
       anonymous: true,
     });
@@ -198,6 +203,7 @@ export const POST = withErrorHandling(async (request, context) => {
     ...(parsed.data.emote && isGardenEmote(parsed.data.emote.type)
       ? { emote: { type: parsed.data.emote.type, at: parsed.data.emote.at } }
       : {}),
+    ...(parsed.data.umore && isGardenUmore(parsed.data.umore) ? { umore: parsed.data.umore } : {}),
   };
 
   await publishGardenPing(event.id, peer);
@@ -211,5 +217,18 @@ export const POST = withErrorHandling(async (request, context) => {
     return NextResponse.json({ peers: [], active: true, degraded: true });
   }
 
-  return NextResponse.json({ peers, active: true });
+  return NextResponse.json({ peers: peers.map(senzaUmore), umori: contaUmori(peers), active: true });
 });
+
+/** L'umore di ciascuno resta nel record di presenza (dieci secondi): nella
+ *  risposta vanno solo i conteggi, mai chi ha detto cosa. */
+function senzaUmore(p: GardenPeer): Omit<GardenPeer, 'umore'> {
+  const { umore: _umore, ...resto } = p;
+  return resto;
+}
+
+function contaUmori(peers: readonly GardenPeer[]): Record<GardenUmore, number> {
+  const conti = Object.fromEntries(GARDEN_UMORI.map((u) => [u, 0])) as Record<GardenUmore, number>;
+  for (const p of peers) if (p.umore && isGardenUmore(p.umore)) conti[p.umore] += 1;
+  return conti;
+}

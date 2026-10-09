@@ -2,6 +2,8 @@ import type { ConferenceState } from './ports/ConferenceState';
 import type { EventSchedule } from './ports/EventSchedule';
 import type { MediaDevices } from './ports/MediaDevices';
 import type { PresenceClient } from './ports/PresenceClient';
+import type { AvatarLook } from './avatar/look';
+import type { Umore } from './umori';
 import type { EmoteType, PlayerProfile } from './ports/types';
 
 /** Optional real assets that replace the programmatic placeholders. */
@@ -48,6 +50,12 @@ export interface LobbyConfig {
    * banco di prova. `{time}` in `startsIn` e' il conto alla rovescia.
    */
   labels?: Partial<GateLabels>;
+  /** Il personaggio è arrivato vicino a un luogo della piazza (caffe,
+   *  bacheca, galleria, laboratorio, fontana, pozzo), o se n'è allontanato:
+   *  null. La pagina mostra il pulsante dell'azione. */
+  onLuogo?: (id: string | null) => void;
+  /** Invio vicino a un luogo: la pagina fa l'azione. */
+  onInteragisci?: (id: string) => void;
 }
 
 export interface GateLabels {
@@ -108,6 +116,16 @@ export interface LobbyHandle {
   emote(type: EmoteType): void;
   /** Suoni accesi o spenti; restituisce lo stato. */
   setAudio(on: boolean): boolean;
+  /** L'effetto di un'azione in un luogo: la moneta nella fontana o nel
+   *  pozzo, il caffè (un gesto che vedono tutti). */
+  azione(id: string): void;
+  /** Coriandoli attorno al proprio personaggio: un segreto trovato. */
+  festa(): void;
+  /** Chi c'è in piazza adesso, con il suo aspetto (il primo sono io). */
+  presenti(): { nome: string; look: AvatarLook; io: boolean }[];
+  /** Quanti per ciascun umore, fra chi è in piazza. Il proprio si dice con
+   *  `setProfile({ umore })`. */
+  umori(): Record<Umore, number>;
   /** Full teardown: sprites, listeners, RAF, Phaser game, media streams. */
   destroy(): void;
 }

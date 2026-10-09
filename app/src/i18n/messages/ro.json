@@ -4275,6 +4275,158 @@
         "clap": "Aplaudă",
         "laugh": "Râzi",
         "idea": "Am o idee"
+      },
+      "editor": {
+        "open": "Personaj",
+        "title": "Personajul dumneavoastră",
+        "close": "Închide",
+        "preview": "Previzualizarea personajului",
+        "rotate": "Rotește",
+        "start": "Punct de plecare",
+        "styles": {
+          "neutro": "Nedeclarat",
+          "maschile": "Masculin",
+          "femminile": "Feminin"
+        },
+        "random": "Aleatoriu",
+        "skin": "Ten",
+        "skinTone": "Nuanța {n}",
+        "hair": "Păr",
+        "hairColor": "Culoarea părului",
+        "top": "Partea de sus",
+        "bottom": "Partea de jos",
+        "topColor": "Culoarea părții de sus",
+        "bottomColor": "Culoarea părții de jos",
+        "shoes": "Pantofi",
+        "hat": "Pălărie",
+        "hatColor": "Culoarea pălăriei",
+        "glasses": "Ochelari",
+        "hint": "Îl văd toți în piață. Alegerea dumneavoastră rămâne doar în acest browser.",
+        "done": "Gata",
+        "hairStyles": {
+          "corti": "Scurt",
+          "rasati": "Tuns scurt",
+          "lunghi": "Lung",
+          "coda": "Coadă",
+          "ricci": "Creț",
+          "chignon": "Coc",
+          "caschetto": "Bob",
+          "calvo": "Fără păr"
+        },
+        "tops": {
+          "maglietta": "Tricou",
+          "felpa": "Hanorac",
+          "camicia": "Cămașă",
+          "giacca": "Sacou",
+          "vestito": "Rochie"
+        },
+        "bottoms": {
+          "pantaloni": "Pantaloni",
+          "pantaloncini": "Pantaloni scurți",
+          "gonna": "Fustă"
+        },
+        "hats": {
+          "nessuno": "Niciuna",
+          "berretto": "Șapcă",
+          "cuffia": "Căciulă",
+          "cappello": "Pălărie",
+          "caschetto": "Cască de protecție",
+          "cuffie": "Căști",
+          "corona": "Coroană"
+        },
+        "glassesStyles": {
+          "nessuno": "Niciunii",
+          "occhiali": "De vedere",
+          "sole": "De soare"
+        },
+        "colors": {
+          "nero": "Negru",
+          "castanoScuro": "Șaten închis",
+          "castano": "Șaten",
+          "ramato": "Arămiu",
+          "rosso": "Roșu",
+          "biondo": "Blond",
+          "grigio": "Gri",
+          "blu": "Albastru",
+          "rosa": "Roz",
+          "verde": "Verde",
+          "viola": "Mov",
+          "giallo": "Galben",
+          "bluNotte": "Bleumarin",
+          "ardesia": "Ardezie",
+          "bluPolvere": "Albastru pal",
+          "azzurro": "Bleu",
+          "bianco": "Alb",
+          "arancione": "Portocaliu",
+          "jeans": "Denim",
+          "sabbia": "Nisip",
+          "marrone": "Maro",
+          "fulvo": "Roșcat"
+        }
+      },
+      "luoghi": {
+        "caffe": "Beți o cafea",
+        "bacheca": "Citiți avizierul",
+        "galleria": "Priviți portretele",
+        "laboratorio": "Intrați în atelier",
+        "fontana": "Aruncați o monedă",
+        "pozzo": "Puneți o dorință"
+      },
+      "annunci": {
+        "caffe": "Cafea bună! Toți cei din piață vă văd ceașca.",
+        "fontana": "Ați aruncat o monedă în fântână.",
+        "pozzo": "Ați pus o dorință la fântâna dorințelor.",
+        "corona": "Ați găsit un secret: coroana este a dumneavoastră. O găsiți la Personaj, la Pălărie."
+      },
+      "bacheca": {
+        "title": "Avizierul",
+        "about": "Despre ce este vorba",
+        "program": "Program",
+        "now": "în desfășurare",
+        "done": "gata",
+        "minutes": "{n} min",
+        "materials": "Materiale"
+      },
+      "galleria": {
+        "title": "Portretele pieței",
+        "intro": "Cine este acum în piață și cum s-a îmbrăcat.",
+        "alone": "Deocamdată în piață sunteți doar dumneavoastră.",
+        "you": "dumneavoastră",
+        "exhibition": "Expus",
+        "portraits": "Cine este în piață"
+      },
+      "laboratorio": {
+        "title": "Atelierul",
+        "moodTitle": "Starea de spirit a pieței",
+        "moodIntro": "Cu ce stare veniți azi? Un panou lângă atelier numără câți sunt pentru fiecare stare.",
+        "moods": {
+          "felice": "Bună dispoziție",
+          "curioso": "Curiozitate",
+          "assonnato": "Somn",
+          "carico": "Energie"
+        },
+        "count": "{n, plural, one {# persoană} few {# persoane} other {# de persoane}}",
+        "moodNote": "Se văd doar numerele, nu cine ce a ales. Este valabil cât timp rămâneți în piață.",
+        "wardrobeTitle": "Garderoba",
+        "wardrobeIntro": "Schimbați hainele, părul și accesoriile personajului.",
+        "wardrobeOpen": "Schimbați personajul"
+      },
+      "legenda": {
+        "open": "Comenzi",
+        "title": "Comenzi și secrete",
+        "commands": "Comenzile",
+        "move": "Mers",
+        "space": "Spațiu",
+        "jump": "Salt",
+        "gestures": "Gesturile: salut, inimă, aplauze, râs, idee",
+        "enter": "Enter",
+        "act": "Să faceți ceva într-un loc (cafenea, avizier, fântână…)",
+        "secrets": "Secretele",
+        "secretsIntro": "De încercat: se tastează în timp ce sunteți în piață.",
+        "secretParty": "Confetti",
+        "secretFireworks": "Artificii deasupra porții",
+        "secretSnow": "O ninsoare",
+        "secretWell": "Trei dorințe la fântână: o surpriză pentru personaj"
       }
     }
   },

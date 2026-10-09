@@ -1,3 +1,5 @@
+import type { AvatarLook } from '@pa-webinar/lobby/avatar';
+
 /**
  * Shared local-user state between the lobby adapters.
  *
@@ -11,6 +13,10 @@ export interface LobbyLocalState {
   color: string;
   helmet: boolean;
   glasses: boolean;
+  /** L'aspetto del personaggio, se scelto (viaggia in `avatarId`). */
+  look?: AvatarLook;
+  /** L'umore detto al laboratorio della piazza, o null. */
+  umore?: string | null;
 }
 
 /** Minimal typed event emitter (avoids pulling a dep into the app). */

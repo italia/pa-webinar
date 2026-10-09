@@ -21,6 +21,9 @@ export interface PresenceClient {
   emote(type: EmoteType): void;
   /** All known peers, excluding self. */
   getPeers(): PeerState[];
+  /** Quanti per ciascun umore fra chi è in piazza (io compreso), se il
+   *  servizio li conta lui: allora non dice l'umore dei singoli. */
+  getUmori?(): Partial<Record<string, number>> | null;
   on(
     ev: 'peerJoin' | 'peerLeave' | 'peerMove' | 'peerEmote' | 'peerProfile',
     cb: (peer: PeerState) => void,

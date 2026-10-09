@@ -154,6 +154,11 @@ export class AudioSystem {
         this.scheduleBlip(0, 784, 0.08, 'sine', 0.12);
         this.scheduleBlip(0.07, 1047, 0.16, 'sine', 0.12);
         break;
+      case 'caffe':
+        // La tazzina sul piattino: due tintinnii.
+        this.scheduleBlip(0, 1568, 0.06, 'sine', 0.1);
+        this.scheduleBlip(0.14, 1319, 0.1, 'sine', 0.09);
+        break;
       default:
         this.blip(523, 0.08, 'square', 0.12);
         this.scheduleBlip(0.09, 784, 0.1, 'square', 0.12);
@@ -167,6 +172,18 @@ export class AudioSystem {
     if (ora - this.ultimoPop < 250) return;
     this.ultimoPop = ora;
     this.sweep(380, 720, 0.07, 0.08);
+  }
+
+  /** Una moneta che cade nell'acqua: un tintinnio e lo «splash». */
+  moneta(): void {
+    this.scheduleBlip(0, 1760, 0.05, 'triangle', 0.1);
+    this.scheduleBlip(0.06, 2093, 0.07, 'triangle', 0.08);
+    this.rumore(0.62, 0.18, 900, 0.16);
+  }
+
+  /** Un segreto trovato: un arpeggio che sale. */
+  festa(): void {
+    [523, 659, 784, 1047, 1319].forEach((f, i) => this.scheduleBlip(i * 0.09, f, 0.16, 'square', 0.1));
   }
 
   /** Il cancello si apre: un piccolo jingle in salita. */

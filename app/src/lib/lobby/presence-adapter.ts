@@ -6,6 +6,15 @@ import type {
   PresenceClient,
   Unsub,
 } from '@pa-webinar/lobby';
+import {
+  codificaLook,
+  decodificaLook,
+  lookDaSeme,
+  lookDaVecchio,
+  stessoLook,
+  type AvatarLook,
+} from '@pa-webinar/lobby/avatar';
+import { eUmore } from '@pa-webinar/lobby/umori';
 
 import { Listeners, type LobbyLocalState } from './shared';
 
@@ -19,9 +28,13 @@ import { Listeners, type LobbyLocalState } from './shared';
  *    percent ↔ px over the FULL world (same convention as the existing SVG
  *    garden, which shares this Redis room — so the two interoperate and every
  *    walkable position round-trips without edge clamping).
- *  - the ping has no colour/accessories field, so we smuggle them through
- *    `avatarId` (6 hex colour + optional 'h'/'g' flags) — round-trips without a
- *    backend change. Legacy SVG-garden ids fall back to a default look.
+ *  - l'aspetto del personaggio viaggia in `avatarId` (`codificaLook`: la
+ *    versione e un carattere in base 36 per parte, al più 16 caratteri). La
+ *    codifica di prima (colore esadecimale e lettere h/g) si legge ancora:
+ *    colore della maglia e accessori restano, il resto del personaggio è a
+ *    caso ma sempre lo stesso per quella persona.
+ *  - l'umore detto al laboratorio parte col ping; indietro arrivano solo i
+ *    conteggi (`umori`), mai l'umore dei singoli.
  *  - the ping has no inCall channel: peers are always rendered as waiting (the
  *    amphitheatre shows only the local user after they join). Networking that
  *    needs a ping field (a follow-up).
@@ -81,6 +94,7 @@ const EMOTE_MIN_INTERVAL_MS = 600;
 
 export class GardenPresenceClient implements PresenceClient {
   private selfId = '';
+  private umori: Record<string, number> | null = null;
   private timer: ReturnType<typeof setInterval> | null = null;
   private connected = false;
   /** Un solo ping in volo per volta: vedi PING_TIMEOUT_MS. */
@@ -115,6 +129,8 @@ export class GardenPresenceClient implements PresenceClient {
     this.shared.color = profile.color;
     this.shared.helmet = profile.accessories.helmet ?? false;
     this.shared.glasses = profile.accessories.glasses ?? false;
+    if (profile.look) this.shared.look = profile.look;
+    this.shared.umore = eUmore(profile.umore) ? profile.umore : null;
     this.latest.x = this.world.w / 2;
     this.latest.y = this.world.h * 0.6;
     this.connected = true;
@@ -130,6 +146,14 @@ export class GardenPresenceClient implements PresenceClient {
       if (p.accessories.helmet !== undefined) this.shared.helmet = p.accessories.helmet;
       if (p.accessories.glasses !== undefined) this.shared.glasses = p.accessories.glasses;
     }
+    if (p.look) this.shared.look = p.look;
+    if (p.umore !== undefined) this.shared.umore = eUmore(p.umore) ? p.umore : null;
+  }
+
+  /** Gli umori della piazza, contati dal server (nessun umore dei singoli
+   *  arriva qui), o null finché non c'è stata una risposta. */
+  getUmori(): Record<string, number> | null {
+    return this.umori;
   }
 
   move(x: number, y: number, facing: Facing): void {
@@ -221,12 +245,15 @@ export class GardenPresenceClient implements PresenceClient {
       // The route stores at most 80 chars; cap here so a long registered name
       // never trips the zod max(80) and silently 400s every ping.
       displayName: this.shared.name.slice(0, 80),
-      avatarId: encodeAvatar(this.shared.color, this.shared.helmet, this.shared.glasses),
+      avatarId: this.shared.look
+        ? codificaLook(this.shared.look)
+        : encodeAvatar(this.shared.color, this.shared.helmet, this.shared.glasses),
       x: xPct,
       y: yPct,
       facing: this.latest.facing,
       walkPhase: 0,
       ...(emote ? { emote } : {}),
+      ...(this.shared.umore ? { umore: this.shared.umore } : {}),
     };
   }
 
@@ -261,8 +288,10 @@ export class GardenPresenceClient implements PresenceClient {
       const json = (await res.json()) as {
         peers?: GardenPeerWire[];
         degraded?: boolean;
+        umori?: Record<string, number>;
       };
       if (!this.connected) return;
+      if (json.umori && typeof json.umori === 'object') this.umori = json.umori;
       // Snapshot degradata: non è «sono usciti tutti», è «non lo sappiamo».
       // Passarla a ingest farebbe uscire dalla scena ogni avatar per poi
       // farli rientrare tutti al giro dopo.
@@ -310,12 +339,14 @@ export class GardenPresenceClient implements PresenceClient {
   }
 
   private toPeerState(w: GardenPeerWire): PeerState {
-    const look = decodeAvatar(w.avatarId);
+    const vecchio = decodeAvatar(w.avatarId);
+    const look = decodificaLook(w.avatarId) ?? lookDaCodificaVecchia(w.avatarId, w.userId);
     return {
       id: w.userId,
       name: w.displayName,
-      color: look.color,
-      accessories: { helmet: look.helmet, glasses: look.glasses },
+      color: vecchio.color,
+      accessories: { helmet: vecchio.helmet, glasses: vecchio.glasses },
+      look,
       x: (w.x / 100) * this.world.w,
       y: (w.y / 100) * this.world.h,
       facing: w.facing,
@@ -326,6 +357,7 @@ export class GardenPresenceClient implements PresenceClient {
 }
 
 function appearanceChanged(a: PeerState, b: PeerState): boolean {
+  if (a.look && b.look) return !stessoLook(a.look, b.look);
   return (
     a.color !== b.color ||
     !!a.accessories.helmet !== !!b.accessories.helmet ||
@@ -339,6 +371,22 @@ function clampPct(v: number): number {
 
 function encodeAvatar(color: string, helmet: boolean, glasses: boolean): string {
   return `${color.replace('#', '').slice(0, 6)}${helmet ? 'h' : ''}${glasses ? 'g' : ''}`;
+}
+
+/** Chi viene da una versione precedente: colore della maglia, caschetto e
+ *  occhiali come li aveva scelti, il resto a caso ma sempre lo stesso per lui;
+ *  un identificativo illeggibile, tutto a caso. */
+function lookDaCodificaVecchia(avatarId: string, userId: string): AvatarLook {
+  const base = lookDaSeme(userId);
+  if (!/^[0-9a-f]{6}[hg]*$/i.test(avatarId)) return base;
+  const v = decodeAvatar(avatarId);
+  const scelto = lookDaVecchio(v.color, v.helmet, v.glasses);
+  return {
+    ...base,
+    coloreMaglia: scelto.coloreMaglia,
+    ...(v.helmet ? { cappello: scelto.cappello } : {}),
+    ...(v.glasses ? { occhiali: scelto.occhiali } : {}),
+  };
 }
 
 function decodeAvatar(avatarId: string): { color: string; helmet: boolean; glasses: boolean } {

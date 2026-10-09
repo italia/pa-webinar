@@ -4275,6 +4275,158 @@
         "clap": "Applådera",
         "laugh": "Skratta",
         "idea": "Jag har en idé"
+      },
+      "editor": {
+        "open": "Figur",
+        "title": "Din figur",
+        "close": "Stäng",
+        "preview": "Förhandsvisning av figuren",
+        "rotate": "Vänd",
+        "start": "Utgångspunkt",
+        "styles": {
+          "neutro": "Ej angivet",
+          "maschile": "Maskulin",
+          "femminile": "Feminin"
+        },
+        "random": "Slumpmässig",
+        "skin": "Hudton",
+        "skinTone": "Nyans {n}",
+        "hair": "Hår",
+        "hairColor": "Hårfärg",
+        "top": "Överdel",
+        "bottom": "Underdel",
+        "topColor": "Överdelens färg",
+        "bottomColor": "Underdelens färg",
+        "shoes": "Skor",
+        "hat": "Huvudbonad",
+        "hatColor": "Huvudbonadens färg",
+        "glasses": "Glasögon",
+        "hint": "Alla på torget ser den. Ditt val sparas bara i den här webbläsaren.",
+        "done": "Klar",
+        "hairStyles": {
+          "corti": "Kort",
+          "rasati": "Snaggat",
+          "lunghi": "Långt",
+          "coda": "Hästsvans",
+          "ricci": "Lockigt",
+          "chignon": "Knut",
+          "caschetto": "Page",
+          "calvo": "Inget hår"
+        },
+        "tops": {
+          "maglietta": "T-shirt",
+          "felpa": "Huvtröja",
+          "camicia": "Skjorta",
+          "giacca": "Kavaj",
+          "vestito": "Klänning"
+        },
+        "bottoms": {
+          "pantaloni": "Byxor",
+          "pantaloncini": "Shorts",
+          "gonna": "Kjol"
+        },
+        "hats": {
+          "nessuno": "Ingen",
+          "berretto": "Keps",
+          "cuffia": "Mössa",
+          "cappello": "Hatt",
+          "caschetto": "Skyddshjälm",
+          "cuffie": "Hörlurar",
+          "corona": "Krona"
+        },
+        "glassesStyles": {
+          "nessuno": "Inga",
+          "occhiali": "Glasögon",
+          "sole": "Solglasögon"
+        },
+        "colors": {
+          "nero": "Svart",
+          "castanoScuro": "Mörkbrun",
+          "castano": "Brun",
+          "ramato": "Kopparbrun",
+          "rosso": "Röd",
+          "biondo": "Blond",
+          "grigio": "Grå",
+          "blu": "Blå",
+          "rosa": "Rosa",
+          "verde": "Grön",
+          "viola": "Lila",
+          "giallo": "Gul",
+          "bluNotte": "Marinblå",
+          "ardesia": "Skiffer",
+          "bluPolvere": "Duvblå",
+          "azzurro": "Ljusblå",
+          "bianco": "Vit",
+          "arancione": "Orange",
+          "jeans": "Denim",
+          "sabbia": "Sand",
+          "marrone": "Brun",
+          "fulvo": "Rödblond"
+        }
+      },
+      "luoghi": {
+        "caffe": "Ta en kaffe",
+        "bacheca": "Läs anslagstavlan",
+        "galleria": "Se porträtten",
+        "laboratorio": "Gå in i verkstaden",
+        "fontana": "Kasta ett mynt",
+        "pozzo": "Önska dig något"
+      },
+      "annunci": {
+        "caffe": "Smaklig kaffe! Alla på torget ser din kopp.",
+        "fontana": "Du kastade ett mynt i fontänen.",
+        "pozzo": "Du önskade dig något vid önskebrunnen.",
+        "corona": "Du hittade en hemlighet: kronan är din. Du hittar den under Figur, Huvudbonad."
+      },
+      "bacheca": {
+        "title": "Anslagstavlan",
+        "about": "Vad det handlar om",
+        "program": "Program",
+        "now": "pågår",
+        "done": "klart",
+        "minutes": "{n} min",
+        "materials": "Material"
+      },
+      "galleria": {
+        "title": "Torgets porträtt",
+        "intro": "Vilka som är på torget nu, och hur de är klädda.",
+        "alone": "Just nu är du den enda på torget.",
+        "you": "du",
+        "exhibition": "Utställt",
+        "portraits": "Vem som är på torget"
+      },
+      "laboratorio": {
+        "title": "Verkstaden",
+        "moodTitle": "Stämningen på torget",
+        "moodIntro": "Hur mår du i dag? En skylt vid verkstaden räknar hur många som har varje stämning.",
+        "moods": {
+          "felice": "Gott humör",
+          "curioso": "Nyfikenhet",
+          "assonnato": "Sömnighet",
+          "carico": "Energi"
+        },
+        "count": "{n, plural, one {# person} other {# personer}}",
+        "moodNote": "Bara siffrorna syns, inte vem som valde vad. Det gäller så länge du är kvar på torget.",
+        "wardrobeTitle": "Garderoben",
+        "wardrobeIntro": "Byt kläder, frisyr och tillbehör på din figur.",
+        "wardrobeOpen": "Byt figur"
+      },
+      "legenda": {
+        "open": "Styrning",
+        "title": "Styrning och hemligheter",
+        "commands": "Styrningen",
+        "move": "Gå",
+        "space": "Mellanslag",
+        "jump": "Hoppa",
+        "gestures": "Gester: vinka, hjärta, applåd, skratt, idé",
+        "enter": "Enter",
+        "act": "Gör något på en plats (kafé, anslagstavla, fontän …)",
+        "secrets": "Hemligheterna",
+        "secretsIntro": "Prova dem: skriv dem på tangentbordet medan du är på torget.",
+        "secretParty": "Konfetti",
+        "secretFireworks": "Fyrverkeri över porten",
+        "secretSnow": "Snöfall",
+        "secretWell": "Tre önskningar vid brunnen: en överraskning till din figur"
       }
     }
   },

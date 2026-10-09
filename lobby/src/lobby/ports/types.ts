@@ -7,6 +7,9 @@
  * types (MediaStream / MediaDeviceInfo live in MediaDevices.ts).
  */
 
+import type { AvatarLook } from '../avatar/look';
+import type { Umore } from '../umori';
+
 /** Unsubscribe handle returned by every `on(...)` subscription. */
 export type Unsub = () => void;
 
@@ -14,9 +17,9 @@ export type Facing = 'up' | 'down' | 'left' | 'right';
 
 /** I gesti della piazza. Chi riceve un tipo che non conosce (un client di
  *  una versione precedente) lo ignora. */
-export type EmoteType = 'wave' | 'heart' | 'clap' | 'laugh' | 'idea';
+export type EmoteType = 'wave' | 'heart' | 'clap' | 'laugh' | 'idea' | 'caffe';
 
-export const EMOTE_TYPES: readonly EmoteType[] = ['wave', 'heart', 'clap', 'laugh', 'idea'];
+export const EMOTE_TYPES: readonly EmoteType[] = ['wave', 'heart', 'clap', 'laugh', 'idea', 'caffe'];
 
 /** The identity + appearance of a participant in the garden. */
 export interface PlayerProfile {
@@ -25,6 +28,11 @@ export interface PlayerProfile {
   /** Hex shirt colour, e.g. "#185fa5". */
   color: string;
   accessories: { helmet?: boolean; glasses?: boolean };
+  /** L'aspetto del personaggio (vedi avatar/look). Se manca, uno a caso
+   *  ricavato dall'identificativo. */
+  look?: AvatarLook;
+  /** L'umore detto al laboratorio (vedi umori), o null. */
+  umore?: Umore | null;
 }
 
 /**

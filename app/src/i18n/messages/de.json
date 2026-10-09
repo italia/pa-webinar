@@ -4275,6 +4275,158 @@
         "clap": "Klatschen",
         "laugh": "Lachen",
         "idea": "Ich habe eine Idee"
+      },
+      "editor": {
+        "open": "Figur",
+        "title": "Ihre Figur",
+        "close": "Schließen",
+        "preview": "Vorschau der Figur",
+        "rotate": "Drehen",
+        "start": "Ausgangspunkt",
+        "styles": {
+          "neutro": "Keine Angabe",
+          "maschile": "Männlich",
+          "femminile": "Weiblich"
+        },
+        "random": "Zufällig",
+        "skin": "Hautton",
+        "skinTone": "Ton {n}",
+        "hair": "Haare",
+        "hairColor": "Haarfarbe",
+        "top": "Oberteil",
+        "bottom": "Unterteil",
+        "topColor": "Farbe des Oberteils",
+        "bottomColor": "Farbe des Unterteils",
+        "shoes": "Schuhe",
+        "hat": "Kopfbedeckung",
+        "hatColor": "Farbe der Kopfbedeckung",
+        "glasses": "Brille",
+        "hint": "Alle auf dem Platz sehen sie. Ihre Auswahl bleibt nur in diesem Browser gespeichert.",
+        "done": "Fertig",
+        "hairStyles": {
+          "corti": "Kurz",
+          "rasati": "Raspelkurz",
+          "lunghi": "Lang",
+          "coda": "Pferdeschwanz",
+          "ricci": "Lockig",
+          "chignon": "Dutt",
+          "caschetto": "Bob",
+          "calvo": "Keine Haare"
+        },
+        "tops": {
+          "maglietta": "T-Shirt",
+          "felpa": "Kapuzenpulli",
+          "camicia": "Hemd",
+          "giacca": "Jacke",
+          "vestito": "Kleid"
+        },
+        "bottoms": {
+          "pantaloni": "Hose",
+          "pantaloncini": "Kurze Hose",
+          "gonna": "Rock"
+        },
+        "hats": {
+          "nessuno": "Keine",
+          "berretto": "Schirmmütze",
+          "cuffia": "Strickmütze",
+          "cappello": "Hut",
+          "caschetto": "Schutzhelm",
+          "cuffie": "Kopfhörer",
+          "corona": "Krone"
+        },
+        "glassesStyles": {
+          "nessuno": "Keine",
+          "occhiali": "Brille",
+          "sole": "Sonnenbrille"
+        },
+        "colors": {
+          "nero": "Schwarz",
+          "castanoScuro": "Dunkelbraun",
+          "castano": "Braun",
+          "ramato": "Kupferbraun",
+          "rosso": "Rot",
+          "biondo": "Blond",
+          "grigio": "Grau",
+          "blu": "Blau",
+          "rosa": "Rosa",
+          "verde": "Grün",
+          "viola": "Lila",
+          "giallo": "Gelb",
+          "bluNotte": "Marineblau",
+          "ardesia": "Schiefergrau",
+          "bluPolvere": "Taubenblau",
+          "azzurro": "Hellblau",
+          "bianco": "Weiß",
+          "arancione": "Orange",
+          "jeans": "Jeansblau",
+          "sabbia": "Sand",
+          "marrone": "Braun",
+          "fulvo": "Rotblond"
+        }
+      },
+      "luoghi": {
+        "caffe": "Einen Kaffee trinken",
+        "bacheca": "Das Schwarze Brett lesen",
+        "galleria": "Die Porträts ansehen",
+        "laboratorio": "Die Werkstatt betreten",
+        "fontana": "Eine Münze werfen",
+        "pozzo": "Sich etwas wünschen"
+      },
+      "annunci": {
+        "caffe": "Guten Kaffee! Alle auf dem Platz sehen Ihre Tasse.",
+        "fontana": "Sie haben eine Münze in den Brunnen geworfen.",
+        "pozzo": "Sie haben sich am Wunschbrunnen etwas gewünscht.",
+        "corona": "Sie haben ein Geheimnis entdeckt: Die Krone gehört Ihnen. Sie finden sie unter Figur, Kopfbedeckung."
+      },
+      "bacheca": {
+        "title": "Schwarzes Brett",
+        "about": "Worum es geht",
+        "program": "Programm",
+        "now": "läuft",
+        "done": "erledigt",
+        "minutes": "{n} Min.",
+        "materials": "Materialien"
+      },
+      "galleria": {
+        "title": "Porträts des Platzes",
+        "intro": "Wer jetzt auf dem Platz ist und wie gekleidet.",
+        "alone": "Im Moment sind nur Sie auf dem Platz.",
+        "you": "Sie",
+        "exhibition": "Ausgestellt",
+        "portraits": "Wer auf dem Platz ist"
+      },
+      "laboratorio": {
+        "title": "Die Werkstatt",
+        "moodTitle": "Die Stimmung auf dem Platz",
+        "moodIntro": "Wie kommen Sie heute an? Ein Schild neben der Werkstatt zählt, wie viele es pro Stimmung sind.",
+        "moods": {
+          "felice": "Gute Laune",
+          "curioso": "Neugier",
+          "assonnato": "Müdigkeit",
+          "carico": "Energie"
+        },
+        "count": "{n, plural, one {# Person} other {# Personen}}",
+        "moodNote": "Zu sehen sind nur die Zahlen, nicht wer was gewählt hat. Es gilt, solange Sie auf dem Platz bleiben.",
+        "wardrobeTitle": "Garderobe",
+        "wardrobeIntro": "Ändern Sie Kleidung, Haare und Accessoires Ihrer Figur.",
+        "wardrobeOpen": "Figur ändern"
+      },
+      "legenda": {
+        "open": "Steuerung",
+        "title": "Steuerung und Geheimnisse",
+        "commands": "Steuerung",
+        "move": "Gehen",
+        "space": "Leertaste",
+        "jump": "Springen",
+        "gestures": "Gesten: Winken, Herz, Klatschen, Lachen, Idee",
+        "enter": "Eingabe",
+        "act": "An einem Ort etwas tun (Café, Schwarzes Brett, Brunnen …)",
+        "secrets": "Geheimnisse",
+        "secretsIntro": "Zum Ausprobieren: mit der Tastatur eingeben, während Sie auf dem Platz sind.",
+        "secretParty": "Konfetti",
+        "secretFireworks": "Feuerwerk über dem Tor",
+        "secretSnow": "Schneefall",
+        "secretWell": "Drei Wünsche am Brunnen: eine Überraschung für Ihre Figur"
       }
     }
   },

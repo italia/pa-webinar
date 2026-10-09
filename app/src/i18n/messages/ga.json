@@ -4275,6 +4275,158 @@
         "clap": "Bualadh bos",
         "laugh": "Gáire",
         "idea": "Tá smaoineamh agam"
+      },
+      "editor": {
+        "open": "Carachtar",
+        "title": "Do charachtar",
+        "close": "Dún",
+        "preview": "Réamhamharc ar an gcarachtar",
+        "rotate": "Cas",
+        "start": "Pointe tosaigh",
+        "styles": {
+          "neutro": "Gan sonrú",
+          "maschile": "Fireann",
+          "femminile": "Baineann"
+        },
+        "random": "Randamach",
+        "skin": "Dath craicinn",
+        "skinTone": "Scáth {n}",
+        "hair": "Gruaig",
+        "hairColor": "Dath na gruaige",
+        "top": "Barr",
+        "bottom": "Bun",
+        "topColor": "Dath an bhairr",
+        "bottomColor": "Dath an bhoinn",
+        "shoes": "Bróga",
+        "hat": "Ceannbheart",
+        "hatColor": "Dath an cheannbhirt",
+        "glasses": "Spéaclaí",
+        "hint": "Feiceann gach duine sa chearnóg é. Ní choinnítear do rogha ach sa bhrabhsálaí seo.",
+        "done": "Déanta",
+        "hairStyles": {
+          "corti": "Gearr",
+          "rasati": "Bearrtha",
+          "lunghi": "Fada",
+          "coda": "Eireaball capaill",
+          "ricci": "Catach",
+          "chignon": "Cocán",
+          "caschetto": "Bob",
+          "calvo": "Gan ghruaig"
+        },
+        "tops": {
+          "maglietta": "T-léine",
+          "felpa": "Geansaí cochaill",
+          "camicia": "Léine",
+          "giacca": "Seaicéad",
+          "vestito": "Gúna"
+        },
+        "bottoms": {
+          "pantaloni": "Bríste",
+          "pantaloncini": "Bríste gearr",
+          "gonna": "Sciorta"
+        },
+        "hats": {
+          "nessuno": "Dada",
+          "berretto": "Caipín",
+          "cuffia": "Hata olla",
+          "cappello": "Hata",
+          "caschetto": "Clogad sábháilteachta",
+          "cuffie": "Cluasáin",
+          "corona": "Coróin"
+        },
+        "glassesStyles": {
+          "nessuno": "Dada",
+          "occhiali": "Spéaclaí",
+          "sole": "Spéaclaí gréine"
+        },
+        "colors": {
+          "nero": "Dubh",
+          "castanoScuro": "Donn dorcha",
+          "castano": "Donn",
+          "ramato": "Rua-dhonn",
+          "rosso": "Dearg",
+          "biondo": "Fionn",
+          "grigio": "Liath",
+          "blu": "Gorm",
+          "rosa": "Bándearg",
+          "verde": "Glas",
+          "viola": "Corcra",
+          "giallo": "Buí",
+          "bluNotte": "Dúghorm",
+          "ardesia": "Sclátghorm",
+          "bluPolvere": "Gorm deannaigh",
+          "azzurro": "Bánghorm",
+          "bianco": "Bán",
+          "arancione": "Oráiste",
+          "jeans": "Deinim",
+          "sabbia": "Gainimh",
+          "marrone": "Donn",
+          "fulvo": "Rua"
+        }
+      },
+      "luoghi": {
+        "caffe": "Ól caife",
+        "bacheca": "Léigh an clár fógraí",
+        "galleria": "Féach ar na portráidí",
+        "laboratorio": "Téigh isteach sa cheardlann",
+        "fontana": "Caith bonn",
+        "pozzo": "Déan guí"
+      },
+      "annunci": {
+        "caffe": "Caife maith! Feiceann gach duine sa chearnóg do chupán.",
+        "fontana": "Chaith tú bonn isteach sa scairdeán.",
+        "pozzo": "Rinne tú guí ag tobar na mianta.",
+        "corona": "D’aimsigh tú rún: is leatsa an choróin. Gheobhaidh tú í faoi Carachtar, Ceannbheart."
+      },
+      "bacheca": {
+        "title": "An clár fógraí",
+        "about": "Cad atá i gceist",
+        "program": "Clár",
+        "now": "ar siúl",
+        "done": "déanta",
+        "minutes": "{n} nóim.",
+        "materials": "Ábhair"
+      },
+      "galleria": {
+        "title": "Portráidí na cearnóige",
+        "intro": "Cé atá sa chearnóg anois, agus conas atá siad gléasta.",
+        "alone": "Faoi láthair níl ach tusa sa chearnóg.",
+        "you": "tusa",
+        "exhibition": "Ar taispeáint",
+        "portraits": "Cé atá sa chearnóg"
+      },
+      "laboratorio": {
+        "title": "An cheardlann",
+        "moodTitle": "Meon na cearnóige",
+        "moodIntro": "Cén meon atá ort inniu? Comhaireann comhartha in aice leis an gceardlann cé mhéad duine atá i ngach meon.",
+        "moods": {
+          "felice": "Dea-ghiúmar",
+          "curioso": "Fiosracht",
+          "assonnato": "Codladh",
+          "carico": "Fuinneamh"
+        },
+        "count": "{n, plural, one {# duine} other {# duine}}",
+        "moodNote": "Ní fheictear ach na huimhreacha, ní cé a roghnaigh cad é. Maireann sé fad a fhanann tú sa chearnóg.",
+        "wardrobeTitle": "An vardrús",
+        "wardrobeIntro": "Athraigh éadaí, gruaig agus oiriúintí do charachtair.",
+        "wardrobeOpen": "Athraigh do charachtar"
+      },
+      "legenda": {
+        "open": "Rialuithe",
+        "title": "Rialuithe agus rúin",
+        "commands": "Na rialuithe",
+        "move": "Siúl",
+        "space": "Spás",
+        "jump": "Léim",
+        "gestures": "Comharthaí: croitheadh láimhe, croí, bualadh bos, gáire, smaoineamh",
+        "enter": "Enter",
+        "act": "Rud a dhéanamh in áit (caife, clár, scairdeán…)",
+        "secrets": "Na rúin",
+        "secretsIntro": "Bain triail astu: clóscríobh iad ar an méarchlár agus tú sa chearnóg.",
+        "secretParty": "Coinfití",
+        "secretFireworks": "Tinte ealaíne os cionn an gheata",
+        "secretSnow": "Titim sneachta",
+        "secretWell": "Trí ghuí ag an tobar: iontas do do charachtar"
       }
     }
   },

@@ -6,6 +6,8 @@ import type { Collider } from './WorldMap';
 export interface MovementCallbacks {
   onJump(): void;
   onEmote(type: EmoteType): void;
+  /** Invio: l'azione del luogo in cui ci si trova. */
+  onInteract?(): void;
 }
 
 export interface MoveResult {
@@ -112,6 +114,10 @@ export class Movement {
       k === 'arrowup' || k === 'arrowdown' || k === 'arrowleft' || k === 'arrowright';
     const isWasd = k === 'w' || k === 'a' || k === 's' || k === 'd';
     const target = e.target as HTMLElement | null;
+    // Con una finestra aperta sopra la piazza (l'editor del personaggio, la
+    // bacheca…) i tasti sono della finestra, anche quando il fuoco è
+    // ricaduto sul corpo della pagina.
+    if (document.querySelector('dialog[open]')) return;
     const typing = isTextEntry(target);
     const onControl = typing || isActivatable(target);
 
@@ -119,6 +125,14 @@ export class Movement {
       if (onControl) return;
       e.preventDefault();
       this.cbs.onJump();
+      return;
+    }
+    if (k === 'enter') {
+      if (onControl || e.repeat) return;
+      // L'azione può aprire una finestra con il fuoco su un pulsante: senza
+      // questo, lo stesso Invio lo premerebbe subito dopo.
+      e.preventDefault();
+      this.cbs.onInteract?.();
       return;
     }
     // I gesti: un tasto ciascuno (vedi emotes.ts). Con un modificatore il
@@ -157,7 +171,7 @@ export class Movement {
  * al gioco (vedi sotto).
  */
 function isTextEntry(el: HTMLElement | null): boolean {
-  if (!el) return false;
+  if (!(el instanceof HTMLElement)) return false;
   return /^(input|textarea|select)$/i.test(el.tagName) || el.isContentEditable;
 }
 
@@ -170,7 +184,7 @@ function isTextEntry(el: HTMLElement | null): boolean {
  * gioco finché non si clicca col mouse sul canvas.
  */
 function isActivatable(el: HTMLElement | null): boolean {
-  if (!el) return false;
+  if (!(el instanceof HTMLElement)) return false;
   return /^(button|a)$/i.test(el.tagName) || el.getAttribute('role') === 'button';
 }
 

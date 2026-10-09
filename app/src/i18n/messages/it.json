@@ -4275,6 +4275,158 @@
         "clap": "Applaudi",
         "laugh": "Ridi",
         "idea": "Ho un'idea"
+      },
+      "editor": {
+        "open": "Personaggio",
+        "title": "Il tuo personaggio",
+        "close": "Chiudi",
+        "preview": "Anteprima del personaggio",
+        "rotate": "Gira",
+        "start": "Punto di partenza",
+        "styles": {
+          "neutro": "Non dichiarato",
+          "maschile": "Maschile",
+          "femminile": "Femminile"
+        },
+        "random": "A caso",
+        "skin": "Carnagione",
+        "skinTone": "Tonalità {n}",
+        "hair": "Capelli",
+        "hairColor": "Colore dei capelli",
+        "top": "Sopra",
+        "bottom": "Sotto",
+        "topColor": "Colore di sopra",
+        "bottomColor": "Colore di sotto",
+        "shoes": "Scarpe",
+        "hat": "Cappello",
+        "hatColor": "Colore del cappello",
+        "glasses": "Occhiali",
+        "hint": "Lo vedono tutti nella piazza. La scelta resta solo in questo browser.",
+        "done": "Fatto",
+        "hairStyles": {
+          "corti": "Corti",
+          "rasati": "Rasati",
+          "lunghi": "Lunghi",
+          "coda": "Coda",
+          "ricci": "Ricci",
+          "chignon": "Chignon",
+          "caschetto": "Caschetto",
+          "calvo": "Senza capelli"
+        },
+        "tops": {
+          "maglietta": "Maglietta",
+          "felpa": "Felpa",
+          "camicia": "Camicia",
+          "giacca": "Giacca",
+          "vestito": "Vestito"
+        },
+        "bottoms": {
+          "pantaloni": "Pantaloni",
+          "pantaloncini": "Pantaloncini",
+          "gonna": "Gonna"
+        },
+        "hats": {
+          "nessuno": "Nessuno",
+          "berretto": "Berretto con visiera",
+          "cuffia": "Cuffia di lana",
+          "cappello": "Cappello",
+          "caschetto": "Elmetto",
+          "cuffie": "Cuffie",
+          "corona": "Corona"
+        },
+        "glassesStyles": {
+          "nessuno": "Nessuno",
+          "occhiali": "Da vista",
+          "sole": "Da sole"
+        },
+        "colors": {
+          "nero": "Nero",
+          "castanoScuro": "Castano scuro",
+          "castano": "Castano",
+          "ramato": "Ramato",
+          "rosso": "Rosso",
+          "biondo": "Biondo",
+          "grigio": "Grigio",
+          "blu": "Blu",
+          "rosa": "Rosa",
+          "verde": "Verde",
+          "viola": "Viola",
+          "giallo": "Giallo",
+          "bluNotte": "Blu notte",
+          "ardesia": "Ardesia",
+          "bluPolvere": "Blu polvere",
+          "azzurro": "Azzurro",
+          "bianco": "Bianco",
+          "arancione": "Arancione",
+          "jeans": "Jeans",
+          "sabbia": "Sabbia",
+          "marrone": "Marrone",
+          "fulvo": "Rosso"
+        }
+      },
+      "luoghi": {
+        "caffe": "Prendi un caffè",
+        "bacheca": "Leggi la bacheca",
+        "galleria": "Guarda i ritratti",
+        "laboratorio": "Entra nel laboratorio",
+        "fontana": "Lancia una moneta",
+        "pozzo": "Esprimi un desiderio"
+      },
+      "annunci": {
+        "caffe": "Buon caffè! Chi è in piazza vede la tua tazzina.",
+        "fontana": "Hai lanciato una moneta nella fontana.",
+        "pozzo": "Hai espresso un desiderio nel pozzo.",
+        "corona": "Hai trovato un segreto: la corona è tua. La trovi in Personaggio, alla voce Cappello."
+      },
+      "bacheca": {
+        "title": "La bacheca",
+        "about": "Di cosa si parla",
+        "program": "Il programma",
+        "now": "in corso",
+        "done": "fatto",
+        "minutes": "{n} min",
+        "materials": "Materiali"
+      },
+      "galleria": {
+        "title": "I ritratti della piazza",
+        "intro": "Chi è in piazza adesso, e come si è vestito.",
+        "alone": "Per ora in piazza ci sei solo tu.",
+        "you": "tu",
+        "exhibition": "In mostra",
+        "portraits": "Chi c’è in piazza"
+      },
+      "laboratorio": {
+        "title": "Il laboratorio",
+        "moodTitle": "L’umore della piazza",
+        "moodIntro": "Come arrivi oggi? Accanto al laboratorio un cartello conta quanti per ciascuno.",
+        "moods": {
+          "felice": "Buonumore",
+          "curioso": "Curiosità",
+          "assonnato": "Sonno",
+          "carico": "Energia"
+        },
+        "count": "{n, plural, one {# persona} other {# persone}}",
+        "moodNote": "Si vedono solo i numeri, non chi ha scelto. Vale finché resti in piazza.",
+        "wardrobeTitle": "Il guardaroba",
+        "wardrobeIntro": "Cambia vestiti, capelli e accessori del tuo personaggio.",
+        "wardrobeOpen": "Cambia il personaggio"
+      },
+      "legenda": {
+        "open": "Comandi",
+        "title": "Comandi e segreti",
+        "commands": "I comandi",
+        "move": "Camminare",
+        "space": "Spazio",
+        "jump": "Saltare",
+        "gestures": "I gesti: saluto, cuore, applauso, risata, idea",
+        "enter": "Invio",
+        "act": "Fare qualcosa in un luogo (caffè, bacheca, fontana…)",
+        "secrets": "I segreti",
+        "secretsIntro": "Da provare: si scrivono con la tastiera mentre si è in piazza.",
+        "secretParty": "Coriandoli",
+        "secretFireworks": "Fuochi d’artificio sopra il cancello",
+        "secretSnow": "Una nevicata",
+        "secretWell": "Tre desideri al pozzo: una sorpresa per il personaggio"
       }
     }
   },

@@ -5254,11 +5254,474 @@ button.live-time-strip__rec {
   justify-content: center;
 }
 
-@container (max-width: 420px) {
+@container (max-width: 520px) {
   .wr-piazza-btn { padding: 5px 11px; font-size: 0.8rem; }
-  .wr-piazza-azioni__suoni > span { display: none; }
-  .wr-piazza-azioni__suoni { padding: 0 10px; }
+  .wr-piazza-azioni__suoni > span,
+  .wr-piazza-azioni__personaggio > span { display: none; }
+  .wr-piazza-azioni__suoni,
+  .wr-piazza-azioni__personaggio { padding: 0 10px; }
   .wr-piazza-azioni__gesto { width: 36px; height: 36px; }
+}
+
+// Vicino a un luogo della piazza: il pulsante della sua azione, sopra la
+// barra dei gesti, e sopra ancora l'annuncio di quello che è successo.
+.wr-piazza-luogo {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  bottom: 74px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
+
+  > * { pointer-events: auto; }
+}
+
+.wr-piazza-luogo__annuncio {
+  margin: 0;
+  min-height: 0;
+
+  span {
+    display: inline-block;
+    max-width: min(520px, 100%);
+    padding: 8px 14px;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #17324d;
+    background: #fff;
+    box-shadow: 0 8px 22px rgba(23, 50, 77, 0.22);
+    animation: wr-annuncio 0.25s ease-out;
+  }
+}
+
+.wr-piazza-luogo__azione {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px 10px 18px;
+  border: 0;
+  border-radius: 999px;
+  font-weight: 700;
+  color: #fff;
+  background: #0066cc;
+  box-shadow: 0 8px 22px rgba(0, 102, 204, 0.35);
+  animation: wr-annuncio 0.25s ease-out;
+
+  &:hover,
+  &:focus-visible { background: #004d99; }
+
+  kbd {
+    padding: 2px 7px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    color: #0066cc;
+    background: #fff;
+  }
+}
+
+@keyframes wr-annuncio {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wr-piazza-luogo__annuncio span,
+  .wr-piazza-luogo__azione { animation: none; }
+}
+
+// Il pulsante del personaggio, nella barra dei gesti.
+.wr-piazza-azioni__personaggio {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 40px;
+  padding: 0 14px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #0066cc;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  transition: background-color 0.15s ease;
+
+  &:hover,
+  &:focus-visible { background: #eef4fb; }
+}
+
+// ── Le finestre della piazza (personaggio, bacheca, galleria) ───────────
+// Finestre native sopra la piazza, nello stile delle card della pagina.
+.wr-finestra {
+  width: min(760px, calc(100vw - 32px));
+  max-height: calc(100dvh - 32px);
+  padding: 0;
+  border: 0;
+  border-radius: 16px;
+  color: #17324d;
+  background: #fff;
+  box-shadow: 0 24px 60px rgba(23, 50, 77, 0.35);
+
+  &::backdrop { background: rgba(23, 50, 77, 0.45); }
+
+  &[open] { display: flex; flex-direction: column; }
+}
+
+.wr-finestra__testa,
+.wr-finestra__piede {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 20px;
+}
+
+.wr-finestra__testa { border-bottom: 1px solid #e3e9ef; }
+
+.wr-finestra__piede {
+  border-top: 1px solid #e3e9ef;
+  font-size: 0.85rem;
+  color: #5c6f82;
+
+  &--fine { justify-content: flex-end; }
+}
+
+.wr-finestra__corpo {
+  padding: 20px;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+// L'editor del personaggio: anteprima a sinistra, scelte a destra; su
+// schermo stretto una colonna sola.
+.wr-personaggio__corpo {
+  display: flex;
+  gap: 24px;
+}
+
+// La bacheca: il titolo dell'evento, le voci e la descrizione.
+.wr-finestra--bacheca { width: min(620px, calc(100vw - 32px)); }
+
+.wr-bacheca__titolo {
+  margin-bottom: 14px;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.wr-bacheca__voci {
+  display: grid;
+  gap: 12px;
+  margin: 0 0 16px;
+
+  > div {
+    padding: 10px 14px;
+    border-radius: 10px;
+    background: #f2f7fc;
+  }
+
+  dt {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: #5c6f82;
+  }
+
+  dd { margin: 2px 0 0; }
+}
+
+
+// La galleria dei ritratti: una griglia di personaggi con il nome.
+.wr-finestra--galleria { width: min(680px, calc(100vw - 32px)); }
+
+.wr-galleria {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 12px 8px 10px;
+    border-radius: 12px;
+    background:
+      radial-gradient(circle, #b7d2ea 1.2px, transparent 1.6px) 0 0 / 20px 20px,
+      #eaf3fb;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-align: center;
+    word-break: break-word;
+  }
+
+  li.is-io { box-shadow: inset 0 0 0 2px #0066cc; }
+}
+
+.wr-galleria__io { font-weight: 400; color: #5c6f82; }
+
+.wr-galleria__titolo,
+.wr-bacheca__sezione h3 {
+  margin: 0 0 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: #5c6f82;
+}
+
+.wr-bacheca__sezione { margin-bottom: 18px; }
+
+// Il programma: gli argomenti in ordine, quello in corso evidenziato.
+.wr-bacheca__programma {
+  margin: 0;
+  padding-left: 1.4em;
+
+  li { padding: 4px 0; }
+  li.is-done { color: #5c6f82; }
+  li.is-skipped { color: #8a99a8; text-decoration: line-through; }
+}
+
+.wr-bacheca__stato {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #fff;
+  background: #d9364f;
+
+  &.is-fatto { color: #17324d; background: #e3e9ef; }
+}
+
+.wr-bacheca__minuti { margin-left: 8px; font-size: 0.8rem; color: #5c6f82; }
+
+.wr-bacheca__materiali {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    flex-direction: column;
+    padding: 8px 12px;
+    margin-bottom: 6px;
+    border-radius: 10px;
+    background: #f2f7fc;
+  }
+
+  a { font-weight: 600; }
+  span { font-size: 0.85rem; color: #5c6f82; }
+}
+
+// La mostra della galleria: le immagini dell'evento e i loghi degli enti,
+// incorniciati.
+.wr-mostra {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    border: 6px solid #fff;
+    border-radius: 6px;
+    background: #f2f7fc;
+    box-shadow: 0 0 0 1px #c3d4e6, 0 6px 14px rgba(23, 50, 77, 0.12);
+    aspect-ratio: 4 / 3;
+  }
+
+  img { max-width: 100%; max-height: 100%; object-fit: contain; }
+  .wr-mostra__logo { background: #fff; }
+}
+
+// L'umore della piazza: quattro scelte, ognuna con quanti l'hanno detta.
+.wr-umori {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 8px;
+}
+
+.wr-umori__scelta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 10px 8px;
+  border: 2px solid #c3d4e6;
+  border-radius: 12px;
+  font-weight: 600;
+  color: #17324d;
+  background: #fff;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+
+  &:hover,
+  &:focus-visible { border-color: #0066cc; }
+
+  &.is-on { border-color: #0066cc; background: #eef5fc; }
+}
+
+.wr-umori__glifo { font-size: 1.6rem; line-height: 1.2; }
+.wr-umori__conto { font-size: 0.78rem; font-weight: 400; color: #5c6f82; }
+.wr-umori__nota { margin: 8px 0 0; font-size: 0.82rem; color: #5c6f82; }
+
+// La legenda: comandi e segreti, con i tasti disegnati.
+.wr-finestra--legenda,
+.wr-finestra--laboratorio { width: min(620px, calc(100vw - 32px)); }
+
+.wr-legenda {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+
+  > div {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr);
+    gap: 12px;
+    align-items: center;
+    padding: 8px 12px;
+    border-radius: 10px;
+    background: #f2f7fc;
+  }
+
+  dt { font-weight: 400; }
+  dd { margin: 0; }
+
+  kbd {
+    display: inline-block;
+    min-width: 1.7em;
+    margin: 1px;
+    padding: 2px 6px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-align: center;
+    color: #17324d;
+    background: #fff;
+    box-shadow: 0 0 0 1px #c3d4e6, 0 2px 0 #c3d4e6;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .wr-legenda > div { grid-template-columns: 1fr; gap: 4px; }
+}
+
+.wr-personaggio__anteprima {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  align-self: flex-start;
+  position: sticky;
+  top: 0;
+
+  canvas {
+    width: 160px;
+    height: 190px;
+    border-radius: 14px;
+    // Il pavimento della piazza: azzurro chiaro con la griglia puntinata.
+    background:
+      radial-gradient(circle, #b7d2ea 1.2px, transparent 1.6px) 0 0 / 20px 20px,
+      linear-gradient(#eaf3fb, #d6e8f7);
+    box-shadow: inset 0 0 0 1px rgba(23, 50, 77, 0.12);
+  }
+}
+
+.wr-personaggio__parti {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+
+  fieldset { margin: 0; padding: 0; border: 0; min-width: 0; }
+
+  legend,
+  label:not(.wr-personaggio__tinta) {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: #5c6f82;
+    float: none;
+    width: auto;
+  }
+}
+
+.wr-personaggio__stili-scelte {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.wr-personaggio__riga {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+}
+
+.wr-personaggio__tinte {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+// Un colore: un radio vero, nascosto alla vista ma non al lettore di schermo
+// né alla tastiera; si vede il cerchio, con l'anello quando è scelto.
+.wr-personaggio__tinta {
+  position: relative;
+  margin: 0;
+  cursor: pointer;
+
+  input {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  span {
+    display: block;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 1px rgba(23, 50, 77, 0.25);
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+  }
+
+  &:hover span { transform: scale(1.1); }
+
+  input:checked + span {
+    box-shadow: 0 0 0 2px #fff, 0 0 0 4px #0066cc;
+  }
+
+  input:focus-visible + span {
+    box-shadow: 0 0 0 2px #fff, 0 0 0 4px #17324d, 0 0 0 6px #ffb84d;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .wr-personaggio__corpo { flex-direction: column; align-items: stretch; }
+  .wr-personaggio__anteprima { position: static; align-self: center; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wr-personaggio__tinta span { transition: none; }
 }
 
 .wr-piazza-azioni__gesto {

@@ -4275,6 +4275,158 @@
         "clap": "Pljeskaj",
         "laugh": "Smij se",
         "idea": "Imam ideju"
+      },
+      "editor": {
+        "open": "Lik",
+        "title": "Vaš lik",
+        "close": "Zatvori",
+        "preview": "Pregled lika",
+        "rotate": "Okreni",
+        "start": "Polazište",
+        "styles": {
+          "neutro": "Nije navedeno",
+          "maschile": "Muški",
+          "femminile": "Ženski"
+        },
+        "random": "Nasumično",
+        "skin": "Ten",
+        "skinTone": "Nijansa {n}",
+        "hair": "Kosa",
+        "hairColor": "Boja kose",
+        "top": "Gornji dio",
+        "bottom": "Donji dio",
+        "topColor": "Boja gornjeg dijela",
+        "bottomColor": "Boja donjeg dijela",
+        "shoes": "Cipele",
+        "hat": "Pokrivalo za glavu",
+        "hatColor": "Boja pokrivala za glavu",
+        "glasses": "Naočale",
+        "hint": "Svi ga vide na trgu. Vaš izbor ostaje samo u ovom pregledniku.",
+        "done": "Gotovo",
+        "hairStyles": {
+          "corti": "Kratka",
+          "rasati": "Na ježa",
+          "lunghi": "Duga",
+          "coda": "Rep",
+          "ricci": "Kovrčava",
+          "chignon": "Punđa",
+          "caschetto": "Bob",
+          "calvo": "Bez kose"
+        },
+        "tops": {
+          "maglietta": "Majica",
+          "felpa": "Majica s kapuljačom",
+          "camicia": "Košulja",
+          "giacca": "Sako",
+          "vestito": "Haljina"
+        },
+        "bottoms": {
+          "pantaloni": "Hlače",
+          "pantaloncini": "Kratke hlače",
+          "gonna": "Suknja"
+        },
+        "hats": {
+          "nessuno": "Bez",
+          "berretto": "Šilterica",
+          "cuffia": "Vunena kapa",
+          "cappello": "Šešir",
+          "caschetto": "Zaštitna kaciga",
+          "cuffie": "Slušalice",
+          "corona": "Kruna"
+        },
+        "glassesStyles": {
+          "nessuno": "Bez",
+          "occhiali": "Dioptrijske",
+          "sole": "Sunčane"
+        },
+        "colors": {
+          "nero": "Crna",
+          "castanoScuro": "Tamnosmeđa",
+          "castano": "Smeđa",
+          "ramato": "Kestenjasta",
+          "rosso": "Crvena",
+          "biondo": "Blond",
+          "grigio": "Siva",
+          "blu": "Plava",
+          "rosa": "Ružičasta",
+          "verde": "Zelena",
+          "viola": "Ljubičasta",
+          "giallo": "Žuta",
+          "bluNotte": "Tamnoplava",
+          "ardesia": "Škriljevac",
+          "bluPolvere": "Golubljeplava",
+          "azzurro": "Svijetloplava",
+          "bianco": "Bijela",
+          "arancione": "Narančasta",
+          "jeans": "Traper",
+          "sabbia": "Pješčana",
+          "marrone": "Smeđa",
+          "fulvo": "Riđa"
+        }
+      },
+      "luoghi": {
+        "caffe": "Popijte kavu",
+        "bacheca": "Pročitajte oglasnu ploču",
+        "galleria": "Pogledajte portrete",
+        "laboratorio": "Uđite u radionicu",
+        "fontana": "Bacite novčić",
+        "pozzo": "Zaželite želju"
+      },
+      "annunci": {
+        "caffe": "Dobra kava! Svi na trgu vide vašu šalicu.",
+        "fontana": "Novčić je pao u fontanu.",
+        "pozzo": "Želja je izrečena kod bunara želja.",
+        "corona": "Pronašli ste tajnu: kruna je vaša. Naći ćete je pod Lik, Pokrivalo za glavu."
+      },
+      "bacheca": {
+        "title": "Oglasna ploča",
+        "about": "O čemu se radi",
+        "program": "Program",
+        "now": "u tijeku",
+        "done": "završeno",
+        "minutes": "{n} min",
+        "materials": "Materijali"
+      },
+      "galleria": {
+        "title": "Portreti trga",
+        "intro": "Tko je sada na trgu i kako je odjeven.",
+        "alone": "Zasad ste na trgu samo vi.",
+        "you": "vi",
+        "exhibition": "Izloženo",
+        "portraits": "Tko je na trgu"
+      },
+      "laboratorio": {
+        "title": "Radionica",
+        "moodTitle": "Raspoloženje trga",
+        "moodIntro": "S kakvim raspoloženjem danas dolazite? Ploča kraj radionice broji koliko ljudi ima koje raspoloženje.",
+        "moods": {
+          "felice": "Dobro raspoloženje",
+          "curioso": "Znatiželja",
+          "assonnato": "Pospanost",
+          "carico": "Energija"
+        },
+        "count": "{n, plural, one {# osoba} few {# osobe} other {# osoba}}",
+        "moodNote": "Vide se samo brojevi, ne tko je što odabrao. Vrijedi dok ste na trgu.",
+        "wardrobeTitle": "Garderoba",
+        "wardrobeIntro": "Promijenite odjeću, kosu i dodatke svojeg lika.",
+        "wardrobeOpen": "Promijenite lik"
+      },
+      "legenda": {
+        "open": "Upravljanje",
+        "title": "Upravljanje i tajne",
+        "commands": "Upravljanje",
+        "move": "Hodanje",
+        "space": "Razmaknica",
+        "jump": "Skok",
+        "gestures": "Geste: mahanje, srce, pljesak, smijeh, ideja",
+        "enter": "Enter",
+        "act": "Učiniti nešto na nekom mjestu (kafić, oglasna ploča, fontana…)",
+        "secrets": "Tajne",
+        "secretsIntro": "Isprobajte: utipkajte ih na tipkovnici dok ste na trgu.",
+        "secretParty": "Konfeti",
+        "secretFireworks": "Vatromet iznad vrata",
+        "secretSnow": "Snijeg",
+        "secretWell": "Tri želje kod bunara: iznenađenje za vaš lik"
       }
     }
   },

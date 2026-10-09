@@ -4275,6 +4275,158 @@
         "clap": "Ċapċap",
         "laugh": "Idħak",
         "idea": "Għandi idea"
+      },
+      "editor": {
+        "open": "Karattru",
+        "title": "Il-karattru tiegħek",
+        "close": "Agħlaq",
+        "preview": "Dehra tal-karattru",
+        "rotate": "Dawwar",
+        "start": "Punt tat-tluq",
+        "styles": {
+          "neutro": "Mhux iddikjarat",
+          "maschile": "Maskili",
+          "femminile": "Femminili"
+        },
+        "random": "Kif ġie ġie",
+        "skin": "Kulur tal-ġilda",
+        "skinTone": "Lewn {n}",
+        "hair": "Xagħar",
+        "hairColor": "Kulur tax-xagħar",
+        "top": "Fuq",
+        "bottom": "Isfel",
+        "topColor": "Kulur ta’ fuq",
+        "bottomColor": "Kulur ta’ isfel",
+        "shoes": "Żraben",
+        "hat": "Kappell",
+        "hatColor": "Kulur tal-kappell",
+        "glasses": "Nuċċalijiet",
+        "hint": "Kulħadd fil-pjazza jarah. L-għażla tiegħek tibqa’ biss f’dan il-browser.",
+        "done": "Lest",
+        "hairStyles": {
+          "corti": "Qasir",
+          "rasati": "Mqassar ħafna",
+          "lunghi": "Twil",
+          "coda": "Denb taż-żiemel",
+          "ricci": "Kaboċċi",
+          "chignon": "Ċoff",
+          "caschetto": "Bob",
+          "calvo": "Bla xagħar"
+        },
+        "tops": {
+          "maglietta": "Flokk",
+          "felpa": "Ġlekk bil-kapuċċ",
+          "camicia": "Qmis",
+          "giacca": "Ġakketta",
+          "vestito": "Libsa"
+        },
+        "bottoms": {
+          "pantaloni": "Qalziet",
+          "pantaloncini": "Qalziet qasir",
+          "gonna": "Dublett"
+        },
+        "hats": {
+          "nessuno": "Xejn",
+          "berretto": "Beritta bil-ponta",
+          "cuffia": "Beritta tas-suf",
+          "cappello": "Kappell",
+          "caschetto": "Elmu tax-xogħol",
+          "cuffie": "Kuffji",
+          "corona": "Kuruna"
+        },
+        "glassesStyles": {
+          "nessuno": "Xejn",
+          "occhiali": "Tal-vista",
+          "sole": "Tax-xemx"
+        },
+        "colors": {
+          "nero": "Iswed",
+          "castanoScuro": "Kannella skur",
+          "castano": "Kannella",
+          "ramato": "Ramm",
+          "rosso": "Aħmar",
+          "biondo": "Blond",
+          "grigio": "Griż",
+          "blu": "Blu",
+          "rosa": "Roża",
+          "verde": "Aħdar",
+          "viola": "Vjola",
+          "giallo": "Isfar",
+          "bluNotte": "Blu skur",
+          "ardesia": "Lavanja",
+          "bluPolvere": "Blu mitfi",
+          "azzurro": "Ċelesti",
+          "bianco": "Abjad",
+          "arancione": "Oranġjo",
+          "jeans": "Ġins",
+          "sabbia": "Ramel",
+          "marrone": "Kannella",
+          "fulvo": "Aħmar"
+        }
+      },
+      "luoghi": {
+        "caffe": "Ixrob kafè",
+        "bacheca": "Aqra l-bord tal-avviżi",
+        "galleria": "Ara r-ritratti",
+        "laboratorio": "Idħol fil-laboratorju",
+        "fontana": "Itfa’ munita",
+        "pozzo": "Agħmel xewqa"
+      },
+      "annunci": {
+        "caffe": "Kafè tajjeb! Kulħadd fil-pjazza jara l-kikkra tiegħek.",
+        "fontana": "Tfajt munita fil-funtana.",
+        "pozzo": "Għamilt xewqa fil-bir tax-xewqat.",
+        "corona": "Sibt sigriet: il-kuruna hija tiegħek. Issibha f’Karattru, taħt Kappell."
+      },
+      "bacheca": {
+        "title": "Il-bord tal-avviżi",
+        "about": "Dwar xiex inhu",
+        "program": "Programm",
+        "now": "għaddej",
+        "done": "lest",
+        "minutes": "{n} min",
+        "materials": "Materjali"
+      },
+      "galleria": {
+        "title": "Ir-ritratti tal-pjazza",
+        "intro": "Min hu fil-pjazza issa, u kif inhu liebes.",
+        "alone": "Għalissa fil-pjazza hemm int biss.",
+        "you": "int",
+        "exhibition": "Għall-wiri",
+        "portraits": "Min hu fil-pjazza"
+      },
+      "laboratorio": {
+        "title": "Il-laboratorju",
+        "moodTitle": "Il-burdata tal-pjazza",
+        "moodIntro": "B’liema burdata qed tasal illum? Tabella ħdejn il-laboratorju tgħodd kemm hawn minn kull burdata.",
+        "moods": {
+          "felice": "Burdata tajba",
+          "curioso": "Kurżità",
+          "assonnato": "Ngħas",
+          "carico": "Enerġija"
+        },
+        "count": "{n, plural, one {# persuna} other {# persuni}}",
+        "moodNote": "Jidhru biss in-numri, mhux min għażel xiex. Jibqa’ validu sakemm tibqa’ fil-pjazza.",
+        "wardrobeTitle": "Il-gwardarobba",
+        "wardrobeIntro": "Ibdel il-ħwejjeġ, ix-xagħar u l-aċċessorji tal-karattru tiegħek.",
+        "wardrobeOpen": "Ibdel il-karattru"
+      },
+      "legenda": {
+        "open": "Kontrolli",
+        "title": "Kontrolli u sigrieti",
+        "commands": "Il-kontrolli",
+        "move": "Mixi",
+        "space": "Spazju",
+        "jump": "Qabża",
+        "gestures": "Il-ġesti: tislima, qalb, ċapċip, daħka, idea",
+        "enter": "Enter",
+        "act": "Agħmel xi ħaġa f’post (kafè, bord, funtana…)",
+        "secrets": "Is-sigrieti",
+        "secretsIntro": "Ipprovahom: iktibhom fuq it-tastiera waqt li tkun fil-pjazza.",
+        "secretParty": "Konfetti",
+        "secretFireworks": "Logħob tan-nar fuq il-bieb",
+        "secretSnow": "Borra",
+        "secretWell": "Tliet xewqat fil-bir: sorpriża għall-karattru tiegħek"
       }
     }
   },

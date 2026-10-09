@@ -3,11 +3,15 @@ import * as Phaser from 'phaser';
 import { INTERP_RATE } from '../constants';
 import { EMOTE_GLYPH } from '../emotes';
 import type { EmoteType, Facing, PlayerProfile } from '../ports/types';
+import { lookDi } from '../avatar/look';
 import {
   AVATAR_H,
+  AVATAR_RISOLUZIONE,
   AVATAR_W,
   appearanceKey,
-  ensureAvatarTexture,
+  avatarFrame,
+  acquireAvatarTexture,
+  releaseAvatarTexture,
   type AvatarAppearance,
 } from './AvatarTextureFactory';
 
@@ -15,6 +19,9 @@ import {
  *  lunghi. Un messaggio nuovo della stessa persona sostituisce il precedente. */
 export const FUMETTO_MIN_MS = 20_000;
 const FUMETTO_MAX_MS = 30_000;
+/** Al caffè, fra chi è al tavolino, i fumetti restano di più: è una
+ *  conversazione. */
+const FUMETTO_CAFFE_MS = 50_000;
 const FUMETTO_MS_PER_CARATTERE = 100;
 /** Un messaggio arrivato da poco resta almeno questo, anche se è quasi scaduto. */
 const FUMETTO_RESIDUO_MIN_MS = 3000;
@@ -49,7 +56,7 @@ export class AvatarSprite {
   readonly container: Phaser.GameObjects.Container;
   private readonly scene: Phaser.Scene;
   private readonly shadow: Phaser.GameObjects.Ellipse;
-  private readonly body: Phaser.GameObjects.Image;
+  private readonly body: Phaser.GameObjects.Sprite;
   private readonly nametag: Phaser.GameObjects.Text;
   private readonly emote: Phaser.GameObjects.Text;
   private readonly ring: Phaser.GameObjects.Arc | null;
@@ -70,6 +77,8 @@ export class AvatarSprite {
   private readonly interpolate: boolean;
 
   private appearance: AvatarAppearance;
+  /** La texture in uso, contata (vedi AvatarTextureFactory). */
+  private texKey = '';
   private facing: Facing = 'down';
   private moving = false;
   private walkPhase = 0;
@@ -107,8 +116,12 @@ export class AvatarSprite {
     // Soft navy shadow (low alpha) to stay airy on the pastel piazza floor.
     this.shadow = scene.add.ellipse(0, 0, 28, 11, 0x17324d, 0.14);
 
-    const texKey = ensureAvatarTexture(scene, this.appearance);
-    this.body = scene.add.image(0, 1, texKey).setOrigin(0.5, 1);
+    const texKey = acquireAvatarTexture(scene, this.appearance);
+    this.texKey = texKey;
+    this.body = scene.add
+      .sprite(0, 1, texKey, avatarFrame('down', 0))
+      .setOrigin(0.5, 1)
+      .setScale(1 / AVATAR_RISOLUZIONE);
 
     this.ring = this.isSelf
       ? scene.add.circle(0, -1, 17).setStrokeStyle(2.5, 0x0066cc, 0.9)
@@ -165,8 +178,17 @@ export class AvatarSprite {
       return;
     }
     this.appearance = next;
-    const texKey = ensureAvatarTexture(this.scene, next);
-    this.body.setTexture(texKey);
+    this.cambiaTexture(acquireAvatarTexture(this.scene, next), avatarFrame(this.facing, 0));
+  }
+
+  /** Passa alla texture nuova, poi lascia la vecchia (che altrimenti
+   *  resterebbe in memoria per tutta la visita). */
+  private cambiaTexture(key: string, frame: number): void {
+    const vecchia = this.texKey;
+    this.body.setTexture(key, frame);
+    this.texKey = key;
+    if (vecchia !== key) releaseAvatarTexture(this.scene, vecchia);
+    else releaseAvatarTexture(this.scene, key);
   }
 
   /** Local authoritative position — applied immediately, no smoothing. */
@@ -221,11 +243,13 @@ export class AvatarSprite {
   /** Un messaggio della chat sopra la testa. `etaMs` è quanto è vecchio: un
    *  messaggio scritto prima di aprire la piazza resta per il tempo che gli
    *  rimane. */
-  say(testo: string, now: number, etaMs = 0, id: string | null = null): void {
+  say(testo: string, now: number, etaMs = 0, id: string | null = null, conversazione = false): void {
     const breve = accorcia(testo);
     if (!breve) return;
     this.disegnaFumetto(breve, false);
-    const piena = Math.min(FUMETTO_MAX_MS, FUMETTO_MIN_MS + breve.length * FUMETTO_MS_PER_CARATTERE);
+    const piena = conversazione
+      ? FUMETTO_CAFFE_MS
+      : Math.min(FUMETTO_MAX_MS, FUMETTO_MIN_MS + breve.length * FUMETTO_MS_PER_CARATTERE);
     this.fumettoDurata = Math.max(FUMETTO_RESIDUO_MIN_MS, piena - Math.max(0, etaMs));
     this.fumettoFino = now + this.fumettoDurata;
     this.fumettoId = id;
@@ -349,7 +373,7 @@ export class AvatarSprite {
     this.lastSampleAt = 0;
     this.targetX = x;
     this.targetY = y;
-    this.body.setTexture(ensureAvatarTexture(this.scene, this.appearance));
+    this.cambiaTexture(acquireAvatarTexture(this.scene, this.appearance), avatarFrame('down', 0));
     this.nametag.setText(displayName(profile, this.isSelf));
     this.emote.setVisible(false);
     this.bolla?.container.setVisible(false);
@@ -373,10 +397,16 @@ export class AvatarSprite {
       this.container.y += (ey - this.container.y) * k;
     }
 
-    // Walk bob + facing flip.
+    // La camminata: passo, fermo, l'altro passo, fermo, con un piccolo
+    // saltello. Di profilo il personaggio è disegnato verso sinistra: a destra
+    // si specchia.
     if (this.moving) this.walkPhase += dt * 9;
+    else this.walkPhase = 0;
+    const fase = Math.floor(this.walkPhase / (Math.PI / 2)) % 4;
+    const passo = this.moving ? ([1, 0, 2, 0][fase] ?? 0) : 0;
+    this.body.setFrame(avatarFrame(this.facing, passo));
+    this.body.setFlipX(this.facing === 'right');
     const bob = this.moving ? -Math.abs(Math.sin(this.walkPhase)) * 2.2 : 0;
-    this.body.setFlipX(this.facing === 'left');
 
     // Hop.
     let hop = 0;
@@ -433,6 +463,7 @@ export class AvatarSprite {
 
   destroy(): void {
     this.container.destroy(true); // destroys all children
+    releaseAvatarTexture(this.scene, this.texKey);
   }
 }
 
@@ -441,12 +472,10 @@ function displayName(p: PlayerProfile, isSelf: boolean): string {
 }
 
 function profileAppearance(p: PlayerProfile, inCall: boolean): AvatarAppearance {
-  return {
-    color: p.color,
-    helmet: p.accessories.helmet ?? false,
-    glasses: p.accessories.glasses ?? false,
-    inCall,
-  };
+  // Un profilo senza aspetto (una versione precedente, la piazza da sola con
+  // la sua barra dei colori) si traduce: colore della maglia, caschetto,
+  // occhiali.
+  return { look: lookDi(p), inCall };
 }
 
 function clamp(v: number, lo: number, hi: number): number {

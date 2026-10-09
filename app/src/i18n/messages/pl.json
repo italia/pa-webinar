@@ -4275,6 +4275,158 @@
         "clap": "Klaskaj",
         "laugh": "Śmiej się",
         "idea": "Mam pomysł"
+      },
+      "editor": {
+        "open": "Postać",
+        "title": "Twoja postać",
+        "close": "Zamknij",
+        "preview": "Podgląd postaci",
+        "rotate": "Obróć",
+        "start": "Punkt wyjścia",
+        "styles": {
+          "neutro": "Nie podano",
+          "maschile": "Męski",
+          "femminile": "Kobiecy"
+        },
+        "random": "Losowo",
+        "skin": "Odcień skóry",
+        "skinTone": "Odcień {n}",
+        "hair": "Włosy",
+        "hairColor": "Kolor włosów",
+        "top": "Góra",
+        "bottom": "Dół",
+        "topColor": "Kolor góry",
+        "bottomColor": "Kolor dołu",
+        "shoes": "Buty",
+        "hat": "Nakrycie głowy",
+        "hatColor": "Kolor nakrycia głowy",
+        "glasses": "Okulary",
+        "hint": "Widzą ją wszyscy na placu. Twój wybór zostaje tylko w tej przeglądarce.",
+        "done": "Gotowe",
+        "hairStyles": {
+          "corti": "Krótkie",
+          "rasati": "Na jeża",
+          "lunghi": "Długie",
+          "coda": "Kucyk",
+          "ricci": "Kręcone",
+          "chignon": "Kok",
+          "caschetto": "Bob",
+          "calvo": "Bez włosów"
+        },
+        "tops": {
+          "maglietta": "Koszulka",
+          "felpa": "Bluza z kapturem",
+          "camicia": "Koszula",
+          "giacca": "Marynarka",
+          "vestito": "Sukienka"
+        },
+        "bottoms": {
+          "pantaloni": "Spodnie",
+          "pantaloncini": "Szorty",
+          "gonna": "Spódnica"
+        },
+        "hats": {
+          "nessuno": "Brak",
+          "berretto": "Czapka z daszkiem",
+          "cuffia": "Czapka zimowa",
+          "cappello": "Kapelusz",
+          "caschetto": "Kask budowlany",
+          "cuffie": "Słuchawki",
+          "corona": "Korona"
+        },
+        "glassesStyles": {
+          "nessuno": "Brak",
+          "occhiali": "Korekcyjne",
+          "sole": "Przeciwsłoneczne"
+        },
+        "colors": {
+          "nero": "Czarny",
+          "castanoScuro": "Ciemnobrązowy",
+          "castano": "Brązowy",
+          "ramato": "Kasztanowy",
+          "rosso": "Czerwony",
+          "biondo": "Blond",
+          "grigio": "Szary",
+          "blu": "Niebieski",
+          "rosa": "Różowy",
+          "verde": "Zielony",
+          "viola": "Fioletowy",
+          "giallo": "Żółty",
+          "bluNotte": "Granatowy",
+          "ardesia": "Łupkowy",
+          "bluPolvere": "Gołębi",
+          "azzurro": "Błękitny",
+          "bianco": "Biały",
+          "arancione": "Pomarańczowy",
+          "jeans": "Dżinsowy",
+          "sabbia": "Piaskowy",
+          "marrone": "Brązowy",
+          "fulvo": "Rudy"
+        }
+      },
+      "luoghi": {
+        "caffe": "Wypij kawę",
+        "bacheca": "Przeczytaj tablicę ogłoszeń",
+        "galleria": "Zobacz portrety",
+        "laboratorio": "Wejdź do warsztatu",
+        "fontana": "Wrzuć monetę",
+        "pozzo": "Pomyśl życzenie"
+      },
+      "annunci": {
+        "caffe": "Smacznej kawy! Wszyscy na placu widzą twoją filiżankę.",
+        "fontana": "Moneta wpadła do fontanny.",
+        "pozzo": "Życzenie wypowiedziane przy studni życzeń.",
+        "corona": "Odkryto sekret: korona jest twoja. Znajdziesz ją w sekcji Postać, Nakrycie głowy."
+      },
+      "bacheca": {
+        "title": "Tablica ogłoszeń",
+        "about": "O czym jest wydarzenie",
+        "program": "Program",
+        "now": "trwa",
+        "done": "zakończone",
+        "minutes": "{n} min",
+        "materials": "Materiały"
+      },
+      "galleria": {
+        "title": "Portrety placu",
+        "intro": "Kto jest teraz na placu i jak jest ubrany.",
+        "alone": "Na razie na placu jesteś tylko ty.",
+        "you": "ty",
+        "exhibition": "Na wystawie",
+        "portraits": "Kto jest na placu"
+      },
+      "laboratorio": {
+        "title": "Warsztat",
+        "moodTitle": "Nastrój placu",
+        "moodIntro": "Z jakim nastrojem przychodzisz dziś? Tablica obok warsztatu liczy, ile osób ma każdy nastrój.",
+        "moods": {
+          "felice": "Dobry humor",
+          "curioso": "Ciekawość",
+          "assonnato": "Senność",
+          "carico": "Energia"
+        },
+        "count": "{n, plural, one {# osoba} few {# osoby} many {# osób} other {# osoby}}",
+        "moodNote": "Widać tylko liczby, nie kto co wybrał. Obowiązuje, dopóki jesteś na placu.",
+        "wardrobeTitle": "Garderoba",
+        "wardrobeIntro": "Zmień ubranie, fryzurę i dodatki swojej postaci.",
+        "wardrobeOpen": "Zmień postać"
+      },
+      "legenda": {
+        "open": "Sterowanie",
+        "title": "Sterowanie i sekrety",
+        "commands": "Sterowanie",
+        "move": "Chodzenie",
+        "space": "Spacja",
+        "jump": "Skok",
+        "gestures": "Gesty: machanie, serce, oklaski, śmiech, pomysł",
+        "enter": "Enter",
+        "act": "Zrobić coś w danym miejscu (kawiarnia, tablica, fontanna…)",
+        "secrets": "Sekrety",
+        "secretsIntro": "Do wypróbowania: wpisz je na klawiaturze, będąc na placu.",
+        "secretParty": "Konfetti",
+        "secretFireworks": "Fajerwerki nad bramą",
+        "secretSnow": "Opady śniegu",
+        "secretWell": "Trzy życzenia przy studni: niespodzianka dla twojej postaci"
       }
     }
   },

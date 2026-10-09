@@ -4275,6 +4275,158 @@
         "clap": "Applaudisseren",
         "laugh": "Lachen",
         "idea": "Ik heb een idee"
+      },
+      "editor": {
+        "open": "Personage",
+        "title": "Uw personage",
+        "close": "Sluiten",
+        "preview": "Voorbeeld van het personage",
+        "rotate": "Draaien",
+        "start": "Startpunt",
+        "styles": {
+          "neutro": "Niet opgegeven",
+          "maschile": "Mannelijk",
+          "femminile": "Vrouwelijk"
+        },
+        "random": "Willekeurig",
+        "skin": "Huidskleur",
+        "skinTone": "Tint {n}",
+        "hair": "Haar",
+        "hairColor": "Haarkleur",
+        "top": "Bovenkant",
+        "bottom": "Onderkant",
+        "topColor": "Kleur bovenkant",
+        "bottomColor": "Kleur onderkant",
+        "shoes": "Schoenen",
+        "hat": "Hoofddeksel",
+        "hatColor": "Kleur hoofddeksel",
+        "glasses": "Bril",
+        "hint": "Iedereen op het plein ziet het. Uw keuze blijft alleen in deze browser bewaard.",
+        "done": "Klaar",
+        "hairStyles": {
+          "corti": "Kort",
+          "rasati": "Gemillimeterd",
+          "lunghi": "Lang",
+          "coda": "Paardenstaart",
+          "ricci": "Krullend",
+          "chignon": "Knot",
+          "caschetto": "Bob",
+          "calvo": "Geen haar"
+        },
+        "tops": {
+          "maglietta": "T-shirt",
+          "felpa": "Hoodie",
+          "camicia": "Overhemd",
+          "giacca": "Jas",
+          "vestito": "Jurk"
+        },
+        "bottoms": {
+          "pantaloni": "Broek",
+          "pantaloncini": "Korte broek",
+          "gonna": "Rok"
+        },
+        "hats": {
+          "nessuno": "Geen",
+          "berretto": "Pet",
+          "cuffia": "Muts",
+          "cappello": "Hoed",
+          "caschetto": "Bouwhelm",
+          "cuffie": "Koptelefoon",
+          "corona": "Kroon"
+        },
+        "glassesStyles": {
+          "nessuno": "Geen",
+          "occhiali": "Bril",
+          "sole": "Zonnebril"
+        },
+        "colors": {
+          "nero": "Zwart",
+          "castanoScuro": "Donkerbruin",
+          "castano": "Bruin",
+          "ramato": "Koperbruin",
+          "rosso": "Rood",
+          "biondo": "Blond",
+          "grigio": "Grijs",
+          "blu": "Blauw",
+          "rosa": "Roze",
+          "verde": "Groen",
+          "viola": "Paars",
+          "giallo": "Geel",
+          "bluNotte": "Marineblauw",
+          "ardesia": "Leisteen",
+          "bluPolvere": "Duifblauw",
+          "azzurro": "Lichtblauw",
+          "bianco": "Wit",
+          "arancione": "Oranje",
+          "jeans": "Denim",
+          "sabbia": "Zand",
+          "marrone": "Bruin",
+          "fulvo": "Rossig"
+        }
+      },
+      "luoghi": {
+        "caffe": "Een koffie drinken",
+        "bacheca": "Het prikbord lezen",
+        "galleria": "De portretten bekijken",
+        "laboratorio": "De werkplaats binnengaan",
+        "fontana": "Een munt gooien",
+        "pozzo": "Een wens doen"
+      },
+      "annunci": {
+        "caffe": "Smakelijke koffie! Iedereen op het plein ziet uw kopje.",
+        "fontana": "U hebt een munt in de fontein gegooid.",
+        "pozzo": "U hebt bij de wensput een wens gedaan.",
+        "corona": "U hebt een geheim gevonden: de kroon is van u. U vindt hem bij Personage, onder Hoofddeksel."
+      },
+      "bacheca": {
+        "title": "Het prikbord",
+        "about": "Waar het over gaat",
+        "program": "Programma",
+        "now": "bezig",
+        "done": "klaar",
+        "minutes": "{n} min",
+        "materials": "Materialen"
+      },
+      "galleria": {
+        "title": "Portretten van het plein",
+        "intro": "Wie er nu op het plein is, en hoe gekleed.",
+        "alone": "Op dit moment bent u de enige op het plein.",
+        "you": "u",
+        "exhibition": "Tentoongesteld",
+        "portraits": "Wie er op het plein is"
+      },
+      "laboratorio": {
+        "title": "De werkplaats",
+        "moodTitle": "De stemming op het plein",
+        "moodIntro": "Hoe komt u vandaag binnen? Een bord naast de werkplaats telt hoeveel mensen elke stemming hebben.",
+        "moods": {
+          "felice": "Goed humeur",
+          "curioso": "Nieuwsgierigheid",
+          "assonnato": "Slaap",
+          "carico": "Energie"
+        },
+        "count": "{n, plural, one {# persoon} other {# personen}}",
+        "moodNote": "Alleen de aantallen zijn zichtbaar, niet wie wat koos. Het geldt zolang u op het plein blijft.",
+        "wardrobeTitle": "De garderobe",
+        "wardrobeIntro": "Wijzig de kleding, het haar en de accessoires van uw personage.",
+        "wardrobeOpen": "Personage wijzigen"
+      },
+      "legenda": {
+        "open": "Bediening",
+        "title": "Bediening en geheimen",
+        "commands": "De bediening",
+        "move": "Lopen",
+        "space": "Spatie",
+        "jump": "Springen",
+        "gestures": "De gebaren: zwaaien, hart, applaus, lachen, idee",
+        "enter": "Enter",
+        "act": "Iets doen op een plek (café, prikbord, fontein…)",
+        "secrets": "De geheimen",
+        "secretsIntro": "Om uit te proberen: typ ze op het toetsenbord terwijl u op het plein bent.",
+        "secretParty": "Confetti",
+        "secretFireworks": "Vuurwerk boven de poort",
+        "secretSnow": "Sneeuwval",
+        "secretWell": "Drie wensen bij de put: een verrassing voor uw personage"
       }
     }
   },

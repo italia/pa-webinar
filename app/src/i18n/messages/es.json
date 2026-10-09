@@ -4275,6 +4275,158 @@
         "clap": "Aplaudir",
         "laugh": "Reír",
         "idea": "Tengo una idea"
+      },
+      "editor": {
+        "open": "Personaje",
+        "title": "Su personaje",
+        "close": "Cerrar",
+        "preview": "Vista previa del personaje",
+        "rotate": "Girar",
+        "start": "Punto de partida",
+        "styles": {
+          "neutro": "Sin especificar",
+          "maschile": "Masculino",
+          "femminile": "Femenino"
+        },
+        "random": "Al azar",
+        "skin": "Tono de piel",
+        "skinTone": "Tono {n}",
+        "hair": "Pelo",
+        "hairColor": "Color del pelo",
+        "top": "Parte de arriba",
+        "bottom": "Parte de abajo",
+        "topColor": "Color de arriba",
+        "bottomColor": "Color de abajo",
+        "shoes": "Zapatos",
+        "hat": "Sombrero",
+        "hatColor": "Color del sombrero",
+        "glasses": "Gafas",
+        "hint": "Todos lo ven en la plaza. Su elección se guarda solo en este navegador.",
+        "done": "Listo",
+        "hairStyles": {
+          "corti": "Corto",
+          "rasati": "Rapado",
+          "lunghi": "Largo",
+          "coda": "Coleta",
+          "ricci": "Rizado",
+          "chignon": "Moño",
+          "caschetto": "Melena corta",
+          "calvo": "Sin pelo"
+        },
+        "tops": {
+          "maglietta": "Camiseta",
+          "felpa": "Sudadera",
+          "camicia": "Camisa",
+          "giacca": "Chaqueta",
+          "vestito": "Vestido"
+        },
+        "bottoms": {
+          "pantaloni": "Pantalones",
+          "pantaloncini": "Pantalones cortos",
+          "gonna": "Falda"
+        },
+        "hats": {
+          "nessuno": "Ninguno",
+          "berretto": "Gorra",
+          "cuffia": "Gorro de lana",
+          "cappello": "Sombrero",
+          "caschetto": "Casco de obra",
+          "cuffie": "Auriculares",
+          "corona": "Corona"
+        },
+        "glassesStyles": {
+          "nessuno": "Ninguna",
+          "occhiali": "Graduadas",
+          "sole": "De sol"
+        },
+        "colors": {
+          "nero": "Negro",
+          "castanoScuro": "Castaño oscuro",
+          "castano": "Castaño",
+          "ramato": "Caoba",
+          "rosso": "Rojo",
+          "biondo": "Rubio",
+          "grigio": "Gris",
+          "blu": "Azul",
+          "rosa": "Rosa",
+          "verde": "Verde",
+          "viola": "Morado",
+          "giallo": "Amarillo",
+          "bluNotte": "Azul marino",
+          "ardesia": "Pizarra",
+          "bluPolvere": "Azul empolvado",
+          "azzurro": "Celeste",
+          "bianco": "Blanco",
+          "arancione": "Naranja",
+          "jeans": "Vaquero",
+          "sabbia": "Arena",
+          "marrone": "Marrón",
+          "fulvo": "Pelirrojo"
+        }
+      },
+      "luoghi": {
+        "caffe": "Tomar un café",
+        "bacheca": "Leer el tablón",
+        "galleria": "Ver los retratos",
+        "laboratorio": "Entrar en el taller",
+        "fontana": "Lanzar una moneda",
+        "pozzo": "Pedir un deseo"
+      },
+      "annunci": {
+        "caffe": "¡Buen café! Todos en la plaza ven su taza.",
+        "fontana": "Ha lanzado una moneda a la fuente.",
+        "pozzo": "Ha pedido un deseo en el pozo.",
+        "corona": "Ha encontrado un secreto: la corona es suya. La encontrará en Personaje, en Sombrero."
+      },
+      "bacheca": {
+        "title": "El tablón",
+        "about": "De qué se trata",
+        "program": "Programa",
+        "now": "en curso",
+        "done": "hecho",
+        "minutes": "{n} min",
+        "materials": "Materiales"
+      },
+      "galleria": {
+        "title": "Los retratos de la plaza",
+        "intro": "Quién está ahora en la plaza y cómo va vestido.",
+        "alone": "Por ahora solo está usted en la plaza.",
+        "you": "usted",
+        "exhibition": "En exposición",
+        "portraits": "Quién está en la plaza"
+      },
+      "laboratorio": {
+        "title": "El taller",
+        "moodTitle": "El ánimo de la plaza",
+        "moodIntro": "¿Cómo llega hoy? Un cartel junto al taller cuenta cuántos hay de cada ánimo.",
+        "moods": {
+          "felice": "Buen humor",
+          "curioso": "Curiosidad",
+          "assonnato": "Sueño",
+          "carico": "Energía"
+        },
+        "count": "{n, plural, one {# persona} other {# personas}}",
+        "moodNote": "Solo se ven los números, no quién eligió qué. Dura mientras siga en la plaza.",
+        "wardrobeTitle": "El vestuario",
+        "wardrobeIntro": "Cambie la ropa, el pelo y los accesorios de su personaje.",
+        "wardrobeOpen": "Cambiar de personaje"
+      },
+      "legenda": {
+        "open": "Controles",
+        "title": "Controles y secretos",
+        "commands": "Los controles",
+        "move": "Caminar",
+        "space": "Espacio",
+        "jump": "Saltar",
+        "gestures": "Los gestos: saludo, corazón, aplauso, risa, idea",
+        "enter": "Intro",
+        "act": "Hacer algo en un lugar (café, tablón, fuente…)",
+        "secrets": "Los secretos",
+        "secretsIntro": "Para probar: se escriben con el teclado mientras está en la plaza.",
+        "secretParty": "Confeti",
+        "secretFireworks": "Fuegos artificiales sobre la puerta",
+        "secretSnow": "Una nevada",
+        "secretWell": "Tres deseos en el pozo: una sorpresa para su personaje"
       }
     }
   },

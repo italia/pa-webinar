@@ -20,8 +20,21 @@ export type Collider =
   | { kind: 'rect'; rect: Phaser.Geom.Rectangle }
   | { kind: 'circle'; x: number; y: number; r: number };
 
+/** Un luogo della piazza dove succede qualcosa avvicinandosi. */
+export interface Luogo {
+  id: 'caffe' | 'bacheca' | 'galleria' | 'laboratorio' | 'fontana' | 'pozzo';
+  x: number;
+  y: number;
+  raggio: number;
+  /** Dove compare il segnale «qui si può fare qualcosa»: sopra l'oggetto,
+   *  non sopra chi ci arriva. */
+  segno: { x: number; y: number };
+}
+
 export interface WorldLayout {
   world: { w: number; h: number };
+  /** I luoghi delle attività (solo nella piazza). */
+  luoghi?: Luogo[];
   garden: Phaser.Geom.Rectangle;
   amphitheatre: Phaser.Geom.Rectangle;
   gate: Phaser.Geom.Rectangle;

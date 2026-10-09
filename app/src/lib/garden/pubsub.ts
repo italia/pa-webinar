@@ -20,6 +20,7 @@
 import { getRedis, getRedisSubscriber, withDeadline } from '@/lib/redis';
 
 import type { GardenEmoteType } from './emotes';
+import type { GardenUmore } from './umori';
 
 export type { GardenEmoteType };
 
@@ -42,6 +43,8 @@ export interface GardenPeer {
    * riavvia l'animazione a ogni poll.
    */
   emote?: { type: GardenEmoteType; at: number };
+  /** L'umore detto al laboratorio della piazza, se c'è (vive col ping). */
+  umore?: GardenUmore;
 }
 
 function posKey(eventId: string): string {

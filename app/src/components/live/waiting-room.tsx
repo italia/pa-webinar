@@ -34,6 +34,7 @@ import { MarkdownRenderer } from '@/components/ui/markdown';
 import type { EntePubblico, PersonaPubblica } from '@/lib/events/public-people';
 import type { Presenze } from '@/lib/live/presence';
 import { PonteChatPiazza } from '@/lib/lobby/chat-bridge';
+import type { DatiBacheca, MostraGalleria } from '@/components/live/garden/piazza-luoghi';
 
 // Experimental Phaser lobby engine (opt-in via `?engine=phaser`). Loaded
 // client-only so Phaser never enters the main bundle or runs on the server.
@@ -761,6 +762,10 @@ export default function WaitingRoom({
       // "annulla quello che sto scrivendo", non "chiudi la piazza". Il pannello
       // dei controlli è pieno di campi, e sono gli stessi della pagina.
       const el = e.target as HTMLElement | null;
+      // Esc con una finestra aperta sopra la piazza (l'editor del
+      // personaggio, la bacheca…) chiude la finestra, non la piazza: anche
+      // quando il fuoco è ricaduto sul corpo della pagina.
+      if (document.querySelector('dialog[open]')) return;
       if (
         el &&
         (/^(input|textarea|select)$/i.test(el.tagName) || el.isContentEditable)
@@ -1328,6 +1333,50 @@ export default function WaitingRoom({
   // fisso — su 24 lingue —, con un nome che non torna mai nello stato React
   // (quindi l'ingresso si blocca in silenzio) e un ingresso che scavalca il
   // gate LIVE, facendo entrare un moderatore in una sala mai avviata.
+  // ── Il riepilogo: quando, chi organizza, chi conduce e chi interviene, la
+  // registrazione, di cosa si parla; e i link da condividere.
+  const durataMin = Math.max(0, Math.round((endsAtMs - startsAtMs) / 60_000));
+  const ore = Math.floor(durataMin / 60);
+  const minuti = durataMin % 60;
+  const durataTesto =
+    ore === 0
+      ? t('durationMinutes', { minutes: minuti })
+      : minuti === 0
+        ? t('durationHours', { hours: ore })
+        : t('durationHoursMinutes', { hours: ore, minutes: minuti });
+  const enti = event.riepilogo?.enti ?? [];
+  const persone = event.riepilogo?.persone ?? [];
+  const conduzione = persone.filter((p) => p.role !== 'speaker');
+  const relatori = persone.filter((p) => p.role === 'speaker');
+  const nomiPersone = (lista: PersonaPubblica[]) =>
+    lista.map((p) => (p.organization ? `${p.name} (${p.organization})` : p.name)).join(', ');
+  const descrizione = event.riepilogo?.descrizione?.trim() || null;
+  // La bacheca della piazza: le stesse informazioni del riepilogo.
+  const bacheca: DatiBacheca = {
+    titolo: event.title,
+    voci: [
+      { etichetta: t('summaryWhen'), valore: `${dateLabel} · ${startTimeLabel} – ${endTimeLabel} (${durataTesto})` },
+      ...(enti.length > 0 || event.organizerName
+        ? [{ etichetta: te('detail.organizedBy'), valore: enti.length > 0 ? enti.map((e) => e.name).join(', ') : (event.organizerName ?? '') }]
+        : []),
+      ...(conduzione.length > 0 ? [{ etichetta: te('detail.peopleModerators'), valore: nomiPersone(conduzione) }] : []),
+      ...(relatori.length > 0 || event.speakers
+        ? [{ etichetta: te('detail.speakers'), valore: relatori.length > 0 ? nomiPersone(relatori) : (event.speakers ?? '') }]
+        : []),
+    ],
+    descrizione,
+  };
+  // La galleria della piazza espone le immagini dell'evento e i loghi di chi
+  // lo organizza.
+  const mostra: MostraGalleria = {
+    immagini: [event.coverImageUrl, event.imageUrl]
+      .filter((src, i, tutte): src is string => !!src && tutte.indexOf(src) === i)
+      .map((src) => ({ src, alt: event.title })),
+    loghi: enti
+      .filter((e): e is EntePubblico & { logoUrl: string } => !!e.logoUrl)
+      .map((e) => ({ src: e.logoUrl, alt: e.name })),
+  };
+
   const piazzaStage = piazzaOpen ? (
     <PhaserLobbyBoundary onError={goClassic}>
       {/* La scena è raggiungibile col Tab, non solo col mouse: il gioco cede i
@@ -1350,6 +1399,8 @@ export default function WaitingRoom({
           isHost={isModerator}
           salaPronta={salaPronta}
           ponteChat={ponteChat}
+          bacheca={bacheca}
+          mostra={mostra}
           onEnterLive={handleGameEnter}
           onExitClassic={goClassic}
         />
@@ -1478,24 +1529,6 @@ export default function WaitingRoom({
     </div>
   ) : null;
 
-  // ── Il riepilogo: quando, chi organizza, chi conduce e chi interviene, la
-  // registrazione, di cosa si parla; e i link da condividere.
-  const durataMin = Math.max(0, Math.round((endsAtMs - startsAtMs) / 60_000));
-  const ore = Math.floor(durataMin / 60);
-  const minuti = durataMin % 60;
-  const durataTesto =
-    ore === 0
-      ? t('durationMinutes', { minutes: minuti })
-      : minuti === 0
-        ? t('durationHours', { hours: ore })
-        : t('durationHoursMinutes', { hours: ore, minutes: minuti });
-  const enti = event.riepilogo?.enti ?? [];
-  const persone = event.riepilogo?.persone ?? [];
-  const conduzione = persone.filter((p) => p.role !== 'speaker');
-  const relatori = persone.filter((p) => p.role === 'speaker');
-  const nomiPersone = (lista: PersonaPubblica[]) =>
-    lista.map((p) => (p.organization ? `${p.name} (${p.organization})` : p.name)).join(', ');
-  const descrizione = event.riepilogo?.descrizione?.trim() || null;
 
   const fatto = (chiave: string, icona: ReactNode, etichetta: string, valore: ReactNode, sotto?: ReactNode) => (
     <li className="wr-fact" key={chiave}>

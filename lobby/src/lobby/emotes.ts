@@ -9,9 +9,13 @@ export const EMOTE_GLYPH: Record<EmoteType, string> = {
   clap: '👏',
   laugh: '😄',
   idea: '💡',
+  caffe: '☕',
 };
 
-export const EMOTE_KEY: Record<EmoteType, string> = {
+/** I gesti della barra, con il loro tasto. Il caffè no: si prende al caffè. */
+export const EMOTE_BARRA = ['wave', 'heart', 'clap', 'laugh', 'idea'] as const satisfies readonly EmoteType[];
+
+export const EMOTE_KEY: Record<(typeof EMOTE_BARRA)[number], string> = {
   wave: 'e',
   heart: 'h',
   clap: 'c',

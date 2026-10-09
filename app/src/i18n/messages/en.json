@@ -4275,6 +4275,158 @@
         "clap": "Clap",
         "laugh": "Laugh",
         "idea": "I have an idea"
+      },
+      "editor": {
+        "open": "Character",
+        "title": "Your character",
+        "close": "Close",
+        "preview": "Character preview",
+        "rotate": "Turn around",
+        "start": "Starting point",
+        "styles": {
+          "neutro": "Not stated",
+          "maschile": "Masculine",
+          "femminile": "Feminine"
+        },
+        "random": "Random",
+        "skin": "Skin tone",
+        "skinTone": "Tone {n}",
+        "hair": "Hair",
+        "hairColor": "Hair colour",
+        "top": "Top",
+        "bottom": "Bottom",
+        "topColor": "Top colour",
+        "bottomColor": "Bottom colour",
+        "shoes": "Shoes",
+        "hat": "Hat",
+        "hatColor": "Hat colour",
+        "glasses": "Glasses",
+        "hint": "Everyone in the square sees it. Your choice is kept in this browser only.",
+        "done": "Done",
+        "hairStyles": {
+          "corti": "Short",
+          "rasati": "Buzz cut",
+          "lunghi": "Long",
+          "coda": "Ponytail",
+          "ricci": "Curly",
+          "chignon": "Bun",
+          "caschetto": "Bob",
+          "calvo": "No hair"
+        },
+        "tops": {
+          "maglietta": "T-shirt",
+          "felpa": "Hoodie",
+          "camicia": "Shirt",
+          "giacca": "Jacket",
+          "vestito": "Dress"
+        },
+        "bottoms": {
+          "pantaloni": "Trousers",
+          "pantaloncini": "Shorts",
+          "gonna": "Skirt"
+        },
+        "hats": {
+          "nessuno": "None",
+          "berretto": "Cap",
+          "cuffia": "Beanie",
+          "cappello": "Hat",
+          "caschetto": "Hard hat",
+          "cuffie": "Headphones",
+          "corona": "Crown"
+        },
+        "glassesStyles": {
+          "nessuno": "None",
+          "occhiali": "Glasses",
+          "sole": "Sunglasses"
+        },
+        "colors": {
+          "nero": "Black",
+          "castanoScuro": "Dark brown",
+          "castano": "Brown",
+          "ramato": "Auburn",
+          "rosso": "Red",
+          "biondo": "Blond",
+          "grigio": "Grey",
+          "blu": "Blue",
+          "rosa": "Pink",
+          "verde": "Green",
+          "viola": "Purple",
+          "giallo": "Yellow",
+          "bluNotte": "Navy",
+          "ardesia": "Slate",
+          "bluPolvere": "Dusty blue",
+          "azzurro": "Light blue",
+          "bianco": "White",
+          "arancione": "Orange",
+          "jeans": "Denim",
+          "sabbia": "Sand",
+          "marrone": "Brown",
+          "fulvo": "Red"
+        }
+      },
+      "luoghi": {
+        "caffe": "Have a coffee",
+        "bacheca": "Read the notice board",
+        "galleria": "See the portraits",
+        "laboratorio": "Enter the workshop",
+        "fontana": "Toss a coin",
+        "pozzo": "Make a wish"
+      },
+      "annunci": {
+        "caffe": "Enjoy your coffee! Everyone in the square sees your cup.",
+        "fontana": "You tossed a coin into the fountain.",
+        "pozzo": "You made a wish at the well.",
+        "corona": "You found a secret: the crown is yours. You'll find it under Character, Hat."
+      },
+      "bacheca": {
+        "title": "Notice board",
+        "about": "What it's about",
+        "program": "Programme",
+        "now": "now",
+        "done": "done",
+        "minutes": "{n} min",
+        "materials": "Materials"
+      },
+      "galleria": {
+        "title": "Portraits of the square",
+        "intro": "Who is in the square now, and how they're dressed.",
+        "alone": "For now you're the only one in the square.",
+        "you": "you",
+        "exhibition": "On display",
+        "portraits": "Who’s in the square"
+      },
+      "laboratorio": {
+        "title": "The workshop",
+        "moodTitle": "The square’s mood",
+        "moodIntro": "How are you arriving today? A sign next to the workshop counts how many feel each way.",
+        "moods": {
+          "felice": "Good mood",
+          "curioso": "Curiosity",
+          "assonnato": "Sleepy",
+          "carico": "Energy"
+        },
+        "count": "{n, plural, one {# person} other {# people}}",
+        "moodNote": "Only the numbers show, not who chose what. It lasts while you stay in the square.",
+        "wardrobeTitle": "Wardrobe",
+        "wardrobeIntro": "Change your character’s clothes, hair and accessories.",
+        "wardrobeOpen": "Change your character"
+      },
+      "legenda": {
+        "open": "Controls",
+        "title": "Controls and secrets",
+        "commands": "Controls",
+        "move": "Walk",
+        "space": "Space",
+        "jump": "Jump",
+        "gestures": "Gestures: wave, heart, clap, laugh, idea",
+        "enter": "Enter",
+        "act": "Do something at a place (café, notice board, fountain…)",
+        "secrets": "Secrets",
+        "secretsIntro": "Try them: type them on the keyboard while you’re in the square.",
+        "secretParty": "Confetti",
+        "secretFireworks": "Fireworks over the gate",
+        "secretSnow": "A snowfall",
+        "secretWell": "Three wishes at the well: a surprise for your character"
       }
     }
   },

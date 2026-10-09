@@ -4275,6 +4275,158 @@
         "clap": "Ploti",
         "laugh": "Juoktis",
         "idea": "Turiu idėją"
+      },
+      "editor": {
+        "open": "Veikėjas",
+        "title": "Jūsų veikėjas",
+        "close": "Uždaryti",
+        "preview": "Veikėjo peržiūra",
+        "rotate": "Pasukti",
+        "start": "Pradinis taškas",
+        "styles": {
+          "neutro": "Nenurodyta",
+          "maschile": "Vyriškas",
+          "femminile": "Moteriškas"
+        },
+        "random": "Atsitiktinai",
+        "skin": "Odos atspalvis",
+        "skinTone": "Atspalvis {n}",
+        "hair": "Plaukai",
+        "hairColor": "Plaukų spalva",
+        "top": "Viršus",
+        "bottom": "Apačia",
+        "topColor": "Viršaus spalva",
+        "bottomColor": "Apačios spalva",
+        "shoes": "Batai",
+        "hat": "Galvos apdangalas",
+        "hatColor": "Galvos apdangalo spalva",
+        "glasses": "Akiniai",
+        "hint": "Jį mato visi aikštėje. Jūsų pasirinkimas lieka tik šioje naršyklėje.",
+        "done": "Baigta",
+        "hairStyles": {
+          "corti": "Trumpi",
+          "rasati": "Labai trumpi",
+          "lunghi": "Ilgi",
+          "coda": "Arklio uodega",
+          "ricci": "Garbanoti",
+          "chignon": "Kuodas",
+          "caschetto": "Bobas",
+          "calvo": "Be plaukų"
+        },
+        "tops": {
+          "maglietta": "Marškinėliai",
+          "felpa": "Džemperis su gobtuvu",
+          "camicia": "Marškiniai",
+          "giacca": "Švarkas",
+          "vestito": "Suknelė"
+        },
+        "bottoms": {
+          "pantaloni": "Kelnės",
+          "pantaloncini": "Šortai",
+          "gonna": "Sijonas"
+        },
+        "hats": {
+          "nessuno": "Nėra",
+          "berretto": "Kepuraitė su snapeliu",
+          "cuffia": "Megzta kepurė",
+          "cappello": "Skrybėlė",
+          "caschetto": "Apsauginis šalmas",
+          "cuffie": "Ausinės",
+          "corona": "Karūna"
+        },
+        "glassesStyles": {
+          "nessuno": "Nėra",
+          "occhiali": "Optiniai",
+          "sole": "Nuo saulės"
+        },
+        "colors": {
+          "nero": "Juoda",
+          "castanoScuro": "Tamsiai ruda",
+          "castano": "Ruda",
+          "ramato": "Varinė",
+          "rosso": "Raudona",
+          "biondo": "Šviesi",
+          "grigio": "Pilka",
+          "blu": "Mėlyna",
+          "rosa": "Rožinė",
+          "verde": "Žalia",
+          "viola": "Violetinė",
+          "giallo": "Geltona",
+          "bluNotte": "Tamsiai mėlyna",
+          "ardesia": "Skalūno",
+          "bluPolvere": "Balandžių mėlyna",
+          "azzurro": "Žydra",
+          "bianco": "Balta",
+          "arancione": "Oranžinė",
+          "jeans": "Džinsinė",
+          "sabbia": "Smėlio",
+          "marrone": "Ruda",
+          "fulvo": "Rusva"
+        }
+      },
+      "luoghi": {
+        "caffe": "Išgerkite kavos",
+        "bacheca": "Perskaitykite skelbimų lentą",
+        "galleria": "Pažiūrėkite portretus",
+        "laboratorio": "Įeiti į dirbtuves",
+        "fontana": "Įmeskite monetą",
+        "pozzo": "Sugalvokite norą"
+      },
+      "annunci": {
+        "caffe": "Skanios kavos! Visi aikštėje mato jūsų puodelį.",
+        "fontana": "Įmetėte monetą į fontaną.",
+        "pozzo": "Sugalvojote norą prie norų šulinio.",
+        "corona": "Radote paslaptį: karūna jūsų. Ją rasite skiltyje Veikėjas, Galvos apdangalas."
+      },
+      "bacheca": {
+        "title": "Skelbimų lenta",
+        "about": "Apie ką kalbama",
+        "program": "Programa",
+        "now": "vyksta",
+        "done": "baigta",
+        "minutes": "{n} min.",
+        "materials": "Medžiaga"
+      },
+      "galleria": {
+        "title": "Aikštės portretai",
+        "intro": "Kas dabar yra aikštėje ir kaip apsirengę.",
+        "alone": "Kol kas aikštėje esate tik jūs.",
+        "you": "jūs",
+        "exhibition": "Eksponuojama",
+        "portraits": "Kas yra aikštėje"
+      },
+      "laboratorio": {
+        "title": "Dirbtuvės",
+        "moodTitle": "Aikštės nuotaika",
+        "moodIntro": "Su kokia nuotaika šiandien atvykstate? Lenta prie dirbtuvių skaičiuoja, kiek žmonių kokios nuotaikos.",
+        "moods": {
+          "felice": "Gera nuotaika",
+          "curioso": "Smalsumas",
+          "assonnato": "Mieguistumas",
+          "carico": "Energija"
+        },
+        "count": "{n, plural, one {# žmogus} few {# žmonės} other {# žmonių}}",
+        "moodNote": "Matomi tik skaičiai, ne tai, kas ką pasirinko. Galioja, kol esate aikštėje.",
+        "wardrobeTitle": "Drabužinė",
+        "wardrobeIntro": "Pakeiskite savo veikėjo drabužius, šukuoseną ir aksesuarus.",
+        "wardrobeOpen": "Pakeisti veikėją"
+      },
+      "legenda": {
+        "open": "Valdymas",
+        "title": "Valdymas ir paslaptys",
+        "commands": "Valdymas",
+        "move": "Ėjimas",
+        "space": "Tarpas",
+        "jump": "Šuolis",
+        "gestures": "Gestai: mojavimas, širdis, plojimai, juokas, idėja",
+        "enter": "Enter",
+        "act": "Ką nors padaryti tam tikroje vietoje (kavinė, skelbimų lenta, fontanas…)",
+        "secrets": "Paslaptys",
+        "secretsIntro": "Išbandykite: įveskite jas klaviatūra, kol esate aikštėje.",
+        "secretParty": "Konfeti",
+        "secretFireworks": "Fejerverkai virš vartų",
+        "secretSnow": "Snygis",
+        "secretWell": "Trys norai prie šulinio: staigmena jūsų veikėjui"
       }
     }
   },

@@ -6,7 +6,11 @@
   "license": "EUPL-1.2",
   "type": "module",
   "exports": {
-    ".": "./src/lobby/index.ts"
+    ".": "./src/lobby/index.ts",
+    "./avatar": "./src/lobby/avatar/index.ts",
+    "./umori": "./src/lobby/umori.ts",
+    "./segreti": "./src/lobby/segreti.ts",
+    "./emotes": "./src/lobby/emotes.ts"
   },
   "scripts": {
     "dev": "vite",

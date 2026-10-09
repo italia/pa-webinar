@@ -4275,6 +4275,158 @@
         "clap": "Klap",
         "laugh": "Grin",
         "idea": "Jeg har en idé"
+      },
+      "editor": {
+        "open": "Figur",
+        "title": "Din figur",
+        "close": "Luk",
+        "preview": "Forhåndsvisning af figuren",
+        "rotate": "Drej",
+        "start": "Udgangspunkt",
+        "styles": {
+          "neutro": "Ikke oplyst",
+          "maschile": "Maskulin",
+          "femminile": "Feminin"
+        },
+        "random": "Tilfældig",
+        "skin": "Hudfarve",
+        "skinTone": "Nuance {n}",
+        "hair": "Hår",
+        "hairColor": "Hårfarve",
+        "top": "Overdel",
+        "bottom": "Underdel",
+        "topColor": "Overdelens farve",
+        "bottomColor": "Underdelens farve",
+        "shoes": "Sko",
+        "hat": "Hovedbeklædning",
+        "hatColor": "Hovedbeklædningens farve",
+        "glasses": "Briller",
+        "hint": "Alle på pladsen kan se den. Dit valg gemmes kun i denne browser.",
+        "done": "Færdig",
+        "hairStyles": {
+          "corti": "Kort",
+          "rasati": "Helt kort",
+          "lunghi": "Langt",
+          "coda": "Hestehale",
+          "ricci": "Krøllet",
+          "chignon": "Knold",
+          "caschetto": "Page",
+          "calvo": "Intet hår"
+        },
+        "tops": {
+          "maglietta": "T-shirt",
+          "felpa": "Hættetrøje",
+          "camicia": "Skjorte",
+          "giacca": "Jakke",
+          "vestito": "Kjole"
+        },
+        "bottoms": {
+          "pantaloni": "Bukser",
+          "pantaloncini": "Shorts",
+          "gonna": "Nederdel"
+        },
+        "hats": {
+          "nessuno": "Ingen",
+          "berretto": "Kasket",
+          "cuffia": "Hue",
+          "cappello": "Hat",
+          "caschetto": "Sikkerhedshjelm",
+          "cuffie": "Hovedtelefoner",
+          "corona": "Krone"
+        },
+        "glassesStyles": {
+          "nessuno": "Ingen",
+          "occhiali": "Briller",
+          "sole": "Solbriller"
+        },
+        "colors": {
+          "nero": "Sort",
+          "castanoScuro": "Mørkebrun",
+          "castano": "Brun",
+          "ramato": "Kobberbrun",
+          "rosso": "Rød",
+          "biondo": "Blond",
+          "grigio": "Grå",
+          "blu": "Blå",
+          "rosa": "Lyserød",
+          "verde": "Grøn",
+          "viola": "Lilla",
+          "giallo": "Gul",
+          "bluNotte": "Marineblå",
+          "ardesia": "Skifer",
+          "bluPolvere": "Dueblå",
+          "azzurro": "Lyseblå",
+          "bianco": "Hvid",
+          "arancione": "Orange",
+          "jeans": "Denim",
+          "sabbia": "Sand",
+          "marrone": "Brun",
+          "fulvo": "Rødblond"
+        }
+      },
+      "luoghi": {
+        "caffe": "Tag en kop kaffe",
+        "bacheca": "Læs opslagstavlen",
+        "galleria": "Se portrætterne",
+        "laboratorio": "Gå ind i værkstedet",
+        "fontana": "Kast en mønt",
+        "pozzo": "Ønsk dig noget"
+      },
+      "annunci": {
+        "caffe": "Velbekomme! Alle på pladsen kan se din kop.",
+        "fontana": "Du kastede en mønt i springvandet.",
+        "pozzo": "Du ønskede dig noget ved ønskebrønden.",
+        "corona": "Du har fundet en hemmelighed: kronen er din. Du finder den under Figur, Hovedbeklædning."
+      },
+      "bacheca": {
+        "title": "Opslagstavlen",
+        "about": "Hvad det handler om",
+        "program": "Program",
+        "now": "i gang",
+        "done": "færdig",
+        "minutes": "{n} min.",
+        "materials": "Materialer"
+      },
+      "galleria": {
+        "title": "Pladsens portrætter",
+        "intro": "Hvem der er på pladsen nu, og hvordan de er klædt.",
+        "alone": "Lige nu er du den eneste på pladsen.",
+        "you": "dig",
+        "exhibition": "Udstillet",
+        "portraits": "Hvem er på pladsen"
+      },
+      "laboratorio": {
+        "title": "Værkstedet",
+        "moodTitle": "Stemningen på pladsen",
+        "moodIntro": "Hvordan har du det i dag? Et skilt ved værkstedet tæller, hvor mange der har hver stemning.",
+        "moods": {
+          "felice": "Godt humør",
+          "curioso": "Nysgerrighed",
+          "assonnato": "Søvnighed",
+          "carico": "Energi"
+        },
+        "count": "{n, plural, one {# person} other {# personer}}",
+        "moodNote": "Kun tallene vises, ikke hvem der valgte hvad. Det gælder, så længe du bliver på pladsen.",
+        "wardrobeTitle": "Garderoben",
+        "wardrobeIntro": "Skift tøj, hår og tilbehør på din figur.",
+        "wardrobeOpen": "Skift figur"
+      },
+      "legenda": {
+        "open": "Styring",
+        "title": "Styring og hemmeligheder",
+        "commands": "Styringen",
+        "move": "Gå",
+        "space": "Mellemrum",
+        "jump": "Hop",
+        "gestures": "Fagter: vink, hjerte, klap, latter, idé",
+        "enter": "Enter",
+        "act": "Gør noget et sted (café, opslagstavle, springvand …)",
+        "secrets": "Hemmelighederne",
+        "secretsIntro": "Prøv dem: skriv dem på tastaturet, mens du er på pladsen.",
+        "secretParty": "Konfetti",
+        "secretFireworks": "Fyrværkeri over porten",
+        "secretSnow": "Snefald",
+        "secretWell": "Tre ønsker ved brønden: en overraskelse til din figur"
       }
     }
   },

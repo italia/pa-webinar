@@ -30,6 +30,7 @@ export interface PersistedProfile {
   name?: string;
   color?: string;
   accessories?: PlayerProfile['accessories'];
+  look?: PlayerProfile['look'];
 }
 
 export const lobbyStorage = {

@@ -61,6 +61,14 @@ export type LobbyEvents = {
   chatTyping: string[];
   /** La scena è partita e ascolta il bus. */
   sceneReady: void;
+  /** Il personaggio è arrivato vicino a un luogo (o se n'è andato: null). */
+  luogo: string | null;
+  /** Invio vicino a un luogo: la pagina decide cosa fare. */
+  interagisci: string;
+  /** Un'azione con effetto nella scena (la moneta, il caffè), dalla pagina. */
+  azione: string;
+  /** Coriandoli: un segreto trovato. */
+  festa: void;
 };
 
 export type LobbyBus = Emitter<LobbyEvents>;

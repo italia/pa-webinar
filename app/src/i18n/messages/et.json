@@ -4275,6 +4275,158 @@
         "clap": "Aplodeeri",
         "laugh": "Naera",
         "idea": "Mul on idee"
+      },
+      "editor": {
+        "open": "Tegelane",
+        "title": "Sinu tegelane",
+        "close": "Sulge",
+        "preview": "Tegelase eelvaade",
+        "rotate": "Pööra",
+        "start": "Lähtepunkt",
+        "styles": {
+          "neutro": "Määramata",
+          "maschile": "Mehelik",
+          "femminile": "Naiselik"
+        },
+        "random": "Juhuslik",
+        "skin": "Nahatoon",
+        "skinTone": "Toon {n}",
+        "hair": "Juuksed",
+        "hairColor": "Juuste värv",
+        "top": "Pealmine",
+        "bottom": "Alumine",
+        "topColor": "Pealmise värv",
+        "bottomColor": "Alumise värv",
+        "shoes": "Jalanõud",
+        "hat": "Peakate",
+        "hatColor": "Peakatte värv",
+        "glasses": "Prillid",
+        "hint": "Kõik väljakul näevad seda. Sinu valik jääb ainult sellesse brauserisse.",
+        "done": "Valmis",
+        "hairStyles": {
+          "corti": "Lühikesed",
+          "rasati": "Siilisoeng",
+          "lunghi": "Pikad",
+          "coda": "Hobusesaba",
+          "ricci": "Lokkis",
+          "chignon": "Krunn",
+          "caschetto": "Bob-soeng",
+          "calvo": "Juusteta"
+        },
+        "tops": {
+          "maglietta": "T-särk",
+          "felpa": "Kapuutsiga pusa",
+          "camicia": "Särk",
+          "giacca": "Pintsak",
+          "vestito": "Kleit"
+        },
+        "bottoms": {
+          "pantaloni": "Püksid",
+          "pantaloncini": "Lühikesed püksid",
+          "gonna": "Seelik"
+        },
+        "hats": {
+          "nessuno": "Puudub",
+          "berretto": "Nokamüts",
+          "cuffia": "Kootud müts",
+          "cappello": "Kübar",
+          "caschetto": "Kaitsekiiver",
+          "cuffie": "Kõrvaklapid",
+          "corona": "Kroon"
+        },
+        "glassesStyles": {
+          "nessuno": "Puuduvad",
+          "occhiali": "Prillid",
+          "sole": "Päikeseprillid"
+        },
+        "colors": {
+          "nero": "Must",
+          "castanoScuro": "Tumepruun",
+          "castano": "Pruun",
+          "ramato": "Vaskpruun",
+          "rosso": "Punane",
+          "biondo": "Blond",
+          "grigio": "Hall",
+          "blu": "Sinine",
+          "rosa": "Roosa",
+          "verde": "Roheline",
+          "viola": "Lilla",
+          "giallo": "Kollane",
+          "bluNotte": "Tumesinine",
+          "ardesia": "Kiltkivi",
+          "bluPolvere": "Tuvisinine",
+          "azzurro": "Helesinine",
+          "bianco": "Valge",
+          "arancione": "Oranž",
+          "jeans": "Teksasinine",
+          "sabbia": "Liivane",
+          "marrone": "Pruun",
+          "fulvo": "Punakas"
+        }
+      },
+      "luoghi": {
+        "caffe": "Joo kohvi",
+        "bacheca": "Loe teadetetahvlit",
+        "galleria": "Vaata portreesid",
+        "laboratorio": "Astu töökotta",
+        "fontana": "Viska münt",
+        "pozzo": "Soovi midagi"
+      },
+      "annunci": {
+        "caffe": "Head kohvi! Kõik väljakul näevad su tassi.",
+        "fontana": "Viskasid mündi purskkaevu.",
+        "pozzo": "Soovisid midagi soovikaevu juures.",
+        "corona": "Leidsid saladuse: kroon on sinu. Leiad selle jaotisest Tegelane, Peakate."
+      },
+      "bacheca": {
+        "title": "Teadetetahvel",
+        "about": "Millest jutt käib",
+        "program": "Kava",
+        "now": "käimas",
+        "done": "tehtud",
+        "minutes": "{n} min",
+        "materials": "Materjalid"
+      },
+      "galleria": {
+        "title": "Väljaku portreed",
+        "intro": "Kes on praegu väljakul ja kuidas nad on riides.",
+        "alone": "Praegu oled väljakul ainult sina.",
+        "you": "sina",
+        "exhibition": "Väljapanekus",
+        "portraits": "Kes on väljakul"
+      },
+      "laboratorio": {
+        "title": "Töökoda",
+        "moodTitle": "Väljaku meeleolu",
+        "moodIntro": "Mis tujuga sa täna tuled? Töökoja kõrval olev silt loeb, mitu inimest millises meeleolus on.",
+        "moods": {
+          "felice": "Hea tuju",
+          "curioso": "Uudishimu",
+          "assonnato": "Unisus",
+          "carico": "Energia"
+        },
+        "count": "{n, plural, one {# inimene} other {# inimest}}",
+        "moodNote": "Näha on ainult arvud, mitte see, kes mida valis. Kehtib seni, kuni oled väljakul.",
+        "wardrobeTitle": "Garderoob",
+        "wardrobeIntro": "Muuda oma tegelase riideid, juukseid ja aksessuaare.",
+        "wardrobeOpen": "Muuda tegelast"
+      },
+      "legenda": {
+        "open": "Juhtimine",
+        "title": "Juhtimine ja saladused",
+        "commands": "Juhtimine",
+        "move": "Kõndimine",
+        "space": "Tühik",
+        "jump": "Hüpe",
+        "gestures": "Žestid: lehvitus, süda, plaks, naer, idee",
+        "enter": "Enter",
+        "act": "Tee midagi mingis kohas (kohvik, teadetetahvel, purskkaev …)",
+        "secrets": "Saladused",
+        "secretsIntro": "Proovi: sisesta need klaviatuuril, kui oled väljakul.",
+        "secretParty": "Konfetid",
+        "secretFireworks": "Ilutulestik värava kohal",
+        "secretSnow": "Lumesadu",
+        "secretWell": "Kolm soovi kaevu juures: üllatus su tegelasele"
       }
     }
   },

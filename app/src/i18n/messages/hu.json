@@ -4275,6 +4275,158 @@
         "clap": "Taps",
         "laugh": "Nevetés",
         "idea": "Van egy ötletem"
+      },
+      "editor": {
+        "open": "Figura",
+        "title": "Az Ön figurája",
+        "close": "Bezárás",
+        "preview": "A figura előnézete",
+        "rotate": "Forgatás",
+        "start": "Kiindulópont",
+        "styles": {
+          "neutro": "Nincs megadva",
+          "maschile": "Férfias",
+          "femminile": "Nőies"
+        },
+        "random": "Véletlenszerű",
+        "skin": "Bőrszín",
+        "skinTone": "Árnyalat {n}",
+        "hair": "Haj",
+        "hairColor": "Hajszín",
+        "top": "Felső",
+        "bottom": "Alsó",
+        "topColor": "Felső színe",
+        "bottomColor": "Alsó színe",
+        "shoes": "Cipő",
+        "hat": "Fejfedő",
+        "hatColor": "Fejfedő színe",
+        "glasses": "Szemüveg",
+        "hint": "A téren mindenki látja. A választása csak ebben a böngészőben marad meg.",
+        "done": "Kész",
+        "hairStyles": {
+          "corti": "Rövid",
+          "rasati": "Felnyírt",
+          "lunghi": "Hosszú",
+          "coda": "Lófarok",
+          "ricci": "Göndör",
+          "chignon": "Konty",
+          "caschetto": "Bubifrizura",
+          "calvo": "Haj nélkül"
+        },
+        "tops": {
+          "maglietta": "Póló",
+          "felpa": "Kapucnis pulóver",
+          "camicia": "Ing",
+          "giacca": "Zakó",
+          "vestito": "Ruha"
+        },
+        "bottoms": {
+          "pantaloni": "Nadrág",
+          "pantaloncini": "Rövidnadrág",
+          "gonna": "Szoknya"
+        },
+        "hats": {
+          "nessuno": "Nincs",
+          "berretto": "Baseballsapka",
+          "cuffia": "Kötött sapka",
+          "cappello": "Kalap",
+          "caschetto": "Védősisak",
+          "cuffie": "Fejhallgató",
+          "corona": "Korona"
+        },
+        "glassesStyles": {
+          "nessuno": "Nincs",
+          "occhiali": "Dioptriás",
+          "sole": "Napszemüveg"
+        },
+        "colors": {
+          "nero": "Fekete",
+          "castanoScuro": "Sötétbarna",
+          "castano": "Barna",
+          "ramato": "Gesztenyebarna",
+          "rosso": "Piros",
+          "biondo": "Szőke",
+          "grigio": "Szürke",
+          "blu": "Kék",
+          "rosa": "Rózsaszín",
+          "verde": "Zöld",
+          "viola": "Lila",
+          "giallo": "Sárga",
+          "bluNotte": "Sötétkék",
+          "ardesia": "Palaszürke",
+          "bluPolvere": "Galambkék",
+          "azzurro": "Világoskék",
+          "bianco": "Fehér",
+          "arancione": "Narancs",
+          "jeans": "Farmer",
+          "sabbia": "Homok",
+          "marrone": "Barna",
+          "fulvo": "Vörös"
+        }
+      },
+      "luoghi": {
+        "caffe": "Igyon egy kávét",
+        "bacheca": "Olvassa el a hirdetőtáblát",
+        "galleria": "Nézze meg a portrékat",
+        "laboratorio": "Belépés a műhelybe",
+        "fontana": "Dobjon be egy érmét",
+        "pozzo": "Kívánjon valamit"
+      },
+      "annunci": {
+        "caffe": "Jó kávézást! A téren mindenki látja a csészéjét.",
+        "fontana": "Bedobott egy érmét a szökőkútba.",
+        "pozzo": "Kívánt valamit a kívánságkútnál.",
+        "corona": "Talált egy titkot: az Öné a korona. A Figura menüben, a Fejfedő alatt találja."
+      },
+      "bacheca": {
+        "title": "Hirdetőtábla",
+        "about": "Miről szól",
+        "program": "Program",
+        "now": "folyamatban",
+        "done": "kész",
+        "minutes": "{n} perc",
+        "materials": "Anyagok"
+      },
+      "galleria": {
+        "title": "A tér portréi",
+        "intro": "Ki van most a téren, és hogyan öltözött.",
+        "alone": "Egyelőre csak Ön van a téren.",
+        "you": "Ön",
+        "exhibition": "Kiállítva",
+        "portraits": "Ki van a téren"
+      },
+      "laboratorio": {
+        "title": "A műhely",
+        "moodTitle": "A tér hangulata",
+        "moodIntro": "Milyen hangulatban érkezik ma? A műhely melletti tábla megszámolja, hányan vannak egy-egy hangulatban.",
+        "moods": {
+          "felice": "Jókedv",
+          "curioso": "Kíváncsiság",
+          "assonnato": "Álmosság",
+          "carico": "Energia"
+        },
+        "count": "{n, plural, one {# fő} other {# fő}}",
+        "moodNote": "Csak a számok látszanak, az nem, hogy ki mit választott. Addig érvényes, amíg a téren marad.",
+        "wardrobeTitle": "A ruhatár",
+        "wardrobeIntro": "Módosítsa figurája ruháját, haját és kiegészítőit.",
+        "wardrobeOpen": "Figura módosítása"
+      },
+      "legenda": {
+        "open": "Irányítás",
+        "title": "Irányítás és titkok",
+        "commands": "Irányítás",
+        "move": "Séta",
+        "space": "Szóköz",
+        "jump": "Ugrás",
+        "gestures": "Gesztusok: integetés, szív, taps, nevetés, ötlet",
+        "enter": "Enter",
+        "act": "Csinálni valamit egy helyen (kávézó, hirdetőtábla, szökőkút…)",
+        "secrets": "Titkok",
+        "secretsIntro": "Próbálja ki: gépelje be a billentyűzeten, amíg a téren van.",
+        "secretParty": "Konfetti",
+        "secretFireworks": "Tűzijáték a kapu felett",
+        "secretSnow": "Havazás",
+        "secretWell": "Három kívánság a kútnál: meglepetés a figurájának"
       }
     }
   },

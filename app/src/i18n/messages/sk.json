@@ -4275,6 +4275,158 @@
         "clap": "Tlieskať",
         "laugh": "Smiať sa",
         "idea": "Mám nápad"
+      },
+      "editor": {
+        "open": "Postava",
+        "title": "Vaša postava",
+        "close": "Zavrieť",
+        "preview": "Náhľad postavy",
+        "rotate": "Otočiť",
+        "start": "Východiskový bod",
+        "styles": {
+          "neutro": "Neuvedené",
+          "maschile": "Mužský",
+          "femminile": "Ženský"
+        },
+        "random": "Náhodne",
+        "skin": "Odtieň pleti",
+        "skinTone": "Odtieň {n}",
+        "hair": "Vlasy",
+        "hairColor": "Farba vlasov",
+        "top": "Vrch",
+        "bottom": "Spodok",
+        "topColor": "Farba vrchu",
+        "bottomColor": "Farba spodku",
+        "shoes": "Topánky",
+        "hat": "Pokrývka hlavy",
+        "hatColor": "Farba pokrývky hlavy",
+        "glasses": "Okuliare",
+        "hint": "Vidia ju všetci na námestí. Vaša voľba zostáva len v tomto prehliadači.",
+        "done": "Hotovo",
+        "hairStyles": {
+          "corti": "Krátke",
+          "rasati": "Na ježka",
+          "lunghi": "Dlhé",
+          "coda": "Chvost",
+          "ricci": "Kučeravé",
+          "chignon": "Drdol",
+          "caschetto": "Mikádo",
+          "calvo": "Bez vlasov"
+        },
+        "tops": {
+          "maglietta": "Tričko",
+          "felpa": "Mikina s kapucňou",
+          "camicia": "Košeľa",
+          "giacca": "Sako",
+          "vestito": "Šaty"
+        },
+        "bottoms": {
+          "pantaloni": "Nohavice",
+          "pantaloncini": "Šortky",
+          "gonna": "Sukňa"
+        },
+        "hats": {
+          "nessuno": "Žiadna",
+          "berretto": "Šiltovka",
+          "cuffia": "Čiapka",
+          "cappello": "Klobúk",
+          "caschetto": "Ochranná prilba",
+          "cuffie": "Slúchadlá",
+          "corona": "Koruna"
+        },
+        "glassesStyles": {
+          "nessuno": "Žiadne",
+          "occhiali": "Dioptrické",
+          "sole": "Slnečné"
+        },
+        "colors": {
+          "nero": "Čierna",
+          "castanoScuro": "Tmavohnedá",
+          "castano": "Hnedá",
+          "ramato": "Gaštanová",
+          "rosso": "Červená",
+          "biondo": "Blond",
+          "grigio": "Sivá",
+          "blu": "Modrá",
+          "rosa": "Ružová",
+          "verde": "Zelená",
+          "viola": "Fialová",
+          "giallo": "Žltá",
+          "bluNotte": "Námornícka modrá",
+          "ardesia": "Bridlicová",
+          "bluPolvere": "Holubia modrá",
+          "azzurro": "Svetlomodrá",
+          "bianco": "Biela",
+          "arancione": "Oranžová",
+          "jeans": "Džínsová",
+          "sabbia": "Piesková",
+          "marrone": "Hnedá",
+          "fulvo": "Ryšavá"
+        }
+      },
+      "luoghi": {
+        "caffe": "Dať si kávu",
+        "bacheca": "Prečítať nástenku",
+        "galleria": "Pozrieť portréty",
+        "laboratorio": "Vstúpiť do dielne",
+        "fontana": "Hodiť mincu",
+        "pozzo": "Niečo si priať"
+      },
+      "annunci": {
+        "caffe": "Dobrú kávu! Všetci na námestí vidia vašu šálku.",
+        "fontana": "Minca dopadla do fontány.",
+        "pozzo": "Želanie bolo vyslovené pri studni želaní.",
+        "corona": "Našli ste tajomstvo: koruna je vaša. Nájdete ju v časti Postava, Pokrývka hlavy."
+      },
+      "bacheca": {
+        "title": "Nástenka",
+        "about": "O čom to je",
+        "program": "Program",
+        "now": "prebieha",
+        "done": "hotovo",
+        "minutes": "{n} min",
+        "materials": "Materiály"
+      },
+      "galleria": {
+        "title": "Portréty námestia",
+        "intro": "Kto je teraz na námestí a ako je oblečený.",
+        "alone": "Zatiaľ ste na námestí len vy.",
+        "you": "vy",
+        "exhibition": "Vystavené",
+        "portraits": "Kto je na námestí"
+      },
+      "laboratorio": {
+        "title": "Dielňa",
+        "moodTitle": "Nálada námestia",
+        "moodIntro": "S akou náladou dnes prichádzate? Tabuľa pri dielni počíta, koľko ľudí má ktorú náladu.",
+        "moods": {
+          "felice": "Dobrá nálada",
+          "curioso": "Zvedavosť",
+          "assonnato": "Ospalosť",
+          "carico": "Energia"
+        },
+        "count": "{n, plural, one {# osoba} few {# osoby} many {# osoby} other {# osôb}}",
+        "moodNote": "Vidno len čísla, nie kto čo zvolil. Platí, kým zostanete na námestí.",
+        "wardrobeTitle": "Šatník",
+        "wardrobeIntro": "Zmeňte oblečenie, vlasy a doplnky svojej postavy.",
+        "wardrobeOpen": "Zmeniť postavu"
+      },
+      "legenda": {
+        "open": "Ovládanie",
+        "title": "Ovládanie a tajomstvá",
+        "commands": "Ovládanie",
+        "move": "Chôdza",
+        "space": "Medzerník",
+        "jump": "Skok",
+        "gestures": "Gestá: mávnutie, srdce, potlesk, smiech, nápad",
+        "enter": "Enter",
+        "act": "Urobiť niečo na nejakom mieste (kaviareň, nástenka, fontána…)",
+        "secrets": "Tajomstvá",
+        "secretsIntro": "Vyskúšajte: napíšte ich na klávesnici, keď ste na námestí.",
+        "secretParty": "Konfety",
+        "secretFireworks": "Ohňostroj nad bránou",
+        "secretSnow": "Sneženie",
+        "secretWell": "Tri želania pri studni: prekvapenie pre vašu postavu"
       }
     }
   },

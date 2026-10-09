@@ -247,3 +247,26 @@ describe('POST /api/events/[param]/garden/ping — canale emote', () => {
     expect(mockedPublish).not.toHaveBeenCalled();
   });
 });
+
+describe('POST /api/events/[param]/garden/ping — umore della piazza', () => {
+  it('ripete un umore dell’elenco', async () => {
+    const res = await POST(pingRequest({ ...legacyPing(), umore: 'curioso' }), ctx());
+    expect(res.status).toBe(200);
+    expect(publishedPeer().umore).toBe('curioso');
+  });
+
+  it('scarta un umore sconosciuto, ma tiene la posizione', async () => {
+    const res = await POST(pingRequest({ ...legacyPing(), umore: 'arrabbiato' }), ctx());
+    expect(res.status).toBe(200);
+    expect(publishedPeer()).not.toHaveProperty('umore');
+  });
+
+  it('risponde con i conteggi, mai con l’umore di qualcuno', async () => {
+    const con = (userId: string, umore?: string) => ({ ...legacyPing(), userId, displayName: userId, updatedAt: 1, ...(umore ? { umore } : {}) });
+    mockedList.mockResolvedValueOnce([con('a', 'felice'), con('b', 'felice'), con('c', 'carico'), con('d')]);
+    const res = await POST(pingRequest({ ...legacyPing(), umore: 'felice' }), ctx());
+    const body = (await res.json()) as { peers: Record<string, unknown>[]; umori: Record<string, number> };
+    expect(body.umori).toEqual({ felice: 2, curioso: 0, assonnato: 0, carico: 1 });
+    for (const p of body.peers) expect(p).not.toHaveProperty('umore');
+  });
+});

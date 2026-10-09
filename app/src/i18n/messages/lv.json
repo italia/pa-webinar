@@ -4275,6 +4275,158 @@
         "clap": "Aplaudēt",
         "laugh": "Smieties",
         "idea": "Man ir ideja"
+      },
+      "editor": {
+        "open": "Tēls",
+        "title": "Jūsu tēls",
+        "close": "Aizvērt",
+        "preview": "Tēla priekšskatījums",
+        "rotate": "Pagriezt",
+        "start": "Sākumpunkts",
+        "styles": {
+          "neutro": "Nav norādīts",
+          "maschile": "Vīrišķīgs",
+          "femminile": "Sievišķīgs"
+        },
+        "random": "Nejauši",
+        "skin": "Ādas tonis",
+        "skinTone": "Tonis {n}",
+        "hair": "Mati",
+        "hairColor": "Matu krāsa",
+        "top": "Augšdaļa",
+        "bottom": "Apakšdaļa",
+        "topColor": "Augšdaļas krāsa",
+        "bottomColor": "Apakšdaļas krāsa",
+        "shoes": "Apavi",
+        "hat": "Galvassega",
+        "hatColor": "Galvassegas krāsa",
+        "glasses": "Brilles",
+        "hint": "To redz visi laukumā. Jūsu izvēle saglabājas tikai šajā pārlūkā.",
+        "done": "Gatavs",
+        "hairStyles": {
+          "corti": "Īsi",
+          "rasati": "Ļoti īsi",
+          "lunghi": "Gari",
+          "coda": "Zirgaste",
+          "ricci": "Cirtaini",
+          "chignon": "Mezgls",
+          "caschetto": "Bobs",
+          "calvo": "Bez matiem"
+        },
+        "tops": {
+          "maglietta": "T krekls",
+          "felpa": "Džemperis ar kapuci",
+          "camicia": "Krekls",
+          "giacca": "Žakete",
+          "vestito": "Kleita"
+        },
+        "bottoms": {
+          "pantaloni": "Bikses",
+          "pantaloncini": "Šorti",
+          "gonna": "Svārki"
+        },
+        "hats": {
+          "nessuno": "Nav",
+          "berretto": "Naģene",
+          "cuffia": "Adīta cepure",
+          "cappello": "Platmale",
+          "caschetto": "Aizsargķivere",
+          "cuffie": "Austiņas",
+          "corona": "Kronis"
+        },
+        "glassesStyles": {
+          "nessuno": "Nav",
+          "occhiali": "Redzes",
+          "sole": "Saulesbrilles"
+        },
+        "colors": {
+          "nero": "Melna",
+          "castanoScuro": "Tumši brūna",
+          "castano": "Brūna",
+          "ramato": "Vara brūna",
+          "rosso": "Sarkana",
+          "biondo": "Blonda",
+          "grigio": "Pelēka",
+          "blu": "Zila",
+          "rosa": "Rozā",
+          "verde": "Zaļa",
+          "viola": "Violeta",
+          "giallo": "Dzeltena",
+          "bluNotte": "Tumši zila",
+          "ardesia": "Šīfera",
+          "bluPolvere": "Baložzila",
+          "azzurro": "Gaiši zila",
+          "bianco": "Balta",
+          "arancione": "Oranža",
+          "jeans": "Džinsa",
+          "sabbia": "Smilšu",
+          "marrone": "Brūna",
+          "fulvo": "Ruda"
+        }
+      },
+      "luoghi": {
+        "caffe": "Iedzeriet kafiju",
+        "bacheca": "Izlasiet ziņojumu dēli",
+        "galleria": "Apskatiet portretus",
+        "laboratorio": "Ieiet darbnīcā",
+        "fontana": "Iemetiet monētu",
+        "pozzo": "Iedomājieties vēlēšanos"
+      },
+      "annunci": {
+        "caffe": "Labu kafiju! Visi laukumā redz Jūsu tasīti.",
+        "fontana": "Jūs iemetāt monētu strūklakā.",
+        "pozzo": "Jūs iedomājāties vēlēšanos pie vēlēšanās akas.",
+        "corona": "Jūs atradāt noslēpumu: kronis ir Jūsu. To atradīsiet sadaļā Tēls, Galvassega."
+      },
+      "bacheca": {
+        "title": "Ziņojumu dēlis",
+        "about": "Par ko ir runa",
+        "program": "Programma",
+        "now": "notiek",
+        "done": "pabeigts",
+        "minutes": "{n} min",
+        "materials": "Materiāli"
+      },
+      "galleria": {
+        "title": "Laukuma portreti",
+        "intro": "Kas tagad ir laukumā un kā ir ģērbies.",
+        "alone": "Pagaidām laukumā esat tikai Jūs.",
+        "you": "Jūs",
+        "exhibition": "Izstādīts",
+        "portraits": "Kas ir laukumā"
+      },
+      "laboratorio": {
+        "title": "Darbnīca",
+        "moodTitle": "Laukuma noskaņojums",
+        "moodIntro": "Ar kādu noskaņojumu Jūs šodien ierodaties? Zīme pie darbnīcas saskaita, cik cilvēku ir katrā noskaņojumā.",
+        "moods": {
+          "felice": "Labs garastāvoklis",
+          "curioso": "Ziņkāre",
+          "assonnato": "Miegainība",
+          "carico": "Enerģija"
+        },
+        "count": "{n, plural, zero {# cilvēku} one {# cilvēks} other {# cilvēki}}",
+        "moodNote": "Redzami tikai skaitļi, nevis tas, kurš ko izvēlējās. Tas ir spēkā, kamēr esat laukumā.",
+        "wardrobeTitle": "Garderobe",
+        "wardrobeIntro": "Mainiet sava tēla apģērbu, matus un aksesuārus.",
+        "wardrobeOpen": "Mainīt tēlu"
+      },
+      "legenda": {
+        "open": "Vadība",
+        "title": "Vadība un noslēpumi",
+        "commands": "Vadība",
+        "move": "Iešana",
+        "space": "Atstarpe",
+        "jump": "Lēciens",
+        "gestures": "Žesti: māšana, sirds, aplausi, smiekli, ideja",
+        "enter": "Enter",
+        "act": "Darīt kaut ko kādā vietā (kafejnīca, ziņojumu dēlis, strūklaka…)",
+        "secrets": "Noslēpumi",
+        "secretsIntro": "Izmēģiniet: ierakstiet tos ar tastatūru, kamēr esat laukumā.",
+        "secretParty": "Konfeti",
+        "secretFireworks": "Salūts virs vārtiem",
+        "secretSnow": "Sniegs",
+        "secretWell": "Trīs vēlēšanās pie akas: pārsteigums Jūsu tēlam"
       }
     }
   },

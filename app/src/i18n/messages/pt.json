@@ -4275,6 +4275,158 @@
         "clap": "Aplaudir",
         "laugh": "Rir",
         "idea": "Tenho uma ideia"
+      },
+      "editor": {
+        "open": "Personagem",
+        "title": "O seu personagem",
+        "close": "Fechar",
+        "preview": "Pré-visualização do personagem",
+        "rotate": "Rodar",
+        "start": "Ponto de partida",
+        "styles": {
+          "neutro": "Não indicado",
+          "maschile": "Masculino",
+          "femminile": "Feminino"
+        },
+        "random": "Aleatório",
+        "skin": "Tom de pele",
+        "skinTone": "Tom {n}",
+        "hair": "Cabelo",
+        "hairColor": "Cor do cabelo",
+        "top": "Parte de cima",
+        "bottom": "Parte de baixo",
+        "topColor": "Cor de cima",
+        "bottomColor": "Cor de baixo",
+        "shoes": "Sapatos",
+        "hat": "Chapéu",
+        "hatColor": "Cor do chapéu",
+        "glasses": "Óculos",
+        "hint": "Todos o veem na praça. A sua escolha fica guardada apenas neste navegador.",
+        "done": "Concluído",
+        "hairStyles": {
+          "corti": "Curto",
+          "rasati": "Rapado",
+          "lunghi": "Comprido",
+          "coda": "Rabo de cavalo",
+          "ricci": "Encaracolado",
+          "chignon": "Carrapito",
+          "caschetto": "Corte bob",
+          "calvo": "Sem cabelo"
+        },
+        "tops": {
+          "maglietta": "T-shirt",
+          "felpa": "Camisola com capuz",
+          "camicia": "Camisa",
+          "giacca": "Casaco",
+          "vestito": "Vestido"
+        },
+        "bottoms": {
+          "pantaloni": "Calças",
+          "pantaloncini": "Calções",
+          "gonna": "Saia"
+        },
+        "hats": {
+          "nessuno": "Nenhum",
+          "berretto": "Boné",
+          "cuffia": "Gorro",
+          "cappello": "Chapéu",
+          "caschetto": "Capacete de obra",
+          "cuffie": "Auscultadores",
+          "corona": "Coroa"
+        },
+        "glassesStyles": {
+          "nessuno": "Nenhuns",
+          "occhiali": "Graduados",
+          "sole": "De sol"
+        },
+        "colors": {
+          "nero": "Preto",
+          "castanoScuro": "Castanho-escuro",
+          "castano": "Castanho",
+          "ramato": "Acobreado",
+          "rosso": "Vermelho",
+          "biondo": "Louro",
+          "grigio": "Cinzento",
+          "blu": "Azul",
+          "rosa": "Rosa",
+          "verde": "Verde",
+          "viola": "Roxo",
+          "giallo": "Amarelo",
+          "bluNotte": "Azul-marinho",
+          "ardesia": "Ardósia",
+          "bluPolvere": "Azul-acinzentado",
+          "azzurro": "Azul-claro",
+          "bianco": "Branco",
+          "arancione": "Laranja",
+          "jeans": "Ganga",
+          "sabbia": "Areia",
+          "marrone": "Castanho",
+          "fulvo": "Ruivo"
+        }
+      },
+      "luoghi": {
+        "caffe": "Tomar um café",
+        "bacheca": "Ler o quadro de avisos",
+        "galleria": "Ver os retratos",
+        "laboratorio": "Entrar na oficina",
+        "fontana": "Atirar uma moeda",
+        "pozzo": "Pedir um desejo"
+      },
+      "annunci": {
+        "caffe": "Bom café! Todos na praça veem a sua chávena.",
+        "fontana": "Atirou uma moeda à fonte.",
+        "pozzo": "Pediu um desejo no poço.",
+        "corona": "Encontrou um segredo: a coroa é sua. Encontra-a em Personagem, em Chapéu."
+      },
+      "bacheca": {
+        "title": "O quadro de avisos",
+        "about": "Do que se trata",
+        "program": "Programa",
+        "now": "a decorrer",
+        "done": "concluído",
+        "minutes": "{n} min",
+        "materials": "Materiais"
+      },
+      "galleria": {
+        "title": "Os retratos da praça",
+        "intro": "Quem está agora na praça e como se vestiu.",
+        "alone": "Por agora só está você na praça.",
+        "you": "você",
+        "exhibition": "Em exposição",
+        "portraits": "Quem está na praça"
+      },
+      "laboratorio": {
+        "title": "A oficina",
+        "moodTitle": "O humor da praça",
+        "moodIntro": "Como chega hoje? Um letreiro junto à oficina conta quantos há de cada humor.",
+        "moods": {
+          "felice": "Bom humor",
+          "curioso": "Curiosidade",
+          "assonnato": "Sono",
+          "carico": "Energia"
+        },
+        "count": "{n, plural, one {# pessoa} other {# pessoas}}",
+        "moodNote": "Só se veem os números, não quem escolheu o quê. Dura enquanto ficar na praça.",
+        "wardrobeTitle": "O guarda-roupa",
+        "wardrobeIntro": "Mude a roupa, o cabelo e os acessórios do seu personagem.",
+        "wardrobeOpen": "Mudar de personagem"
+      },
+      "legenda": {
+        "open": "Comandos",
+        "title": "Comandos e segredos",
+        "commands": "Os comandos",
+        "move": "Andar",
+        "space": "Espaço",
+        "jump": "Saltar",
+        "gestures": "Os gestos: aceno, coração, aplauso, riso, ideia",
+        "enter": "Enter",
+        "act": "Fazer algo num local (café, quadro, fonte…)",
+        "secrets": "Os segredos",
+        "secretsIntro": "Para experimentar: escrevem-se no teclado enquanto está na praça.",
+        "secretParty": "Confettis",
+        "secretFireworks": "Fogo de artifício sobre o portão",
+        "secretSnow": "Uma nevada",
+        "secretWell": "Três desejos no poço: uma surpresa para o seu personagem"
       }
     }
   },

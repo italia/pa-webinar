@@ -4275,6 +4275,158 @@
         "clap": "Taputa",
         "laugh": "Naura",
         "idea": "Minulla on idea"
+      },
+      "editor": {
+        "open": "Hahmo",
+        "title": "Hahmosi",
+        "close": "Sulje",
+        "preview": "Hahmon esikatselu",
+        "rotate": "Käännä",
+        "start": "Lähtökohta",
+        "styles": {
+          "neutro": "Ei ilmoitettu",
+          "maschile": "Maskuliininen",
+          "femminile": "Feminiininen"
+        },
+        "random": "Satunnainen",
+        "skin": "Ihonväri",
+        "skinTone": "Sävy {n}",
+        "hair": "Hiukset",
+        "hairColor": "Hiusten väri",
+        "top": "Yläosa",
+        "bottom": "Alaosa",
+        "topColor": "Yläosan väri",
+        "bottomColor": "Alaosan väri",
+        "shoes": "Kengät",
+        "hat": "Päähine",
+        "hatColor": "Päähineen väri",
+        "glasses": "Silmälasit",
+        "hint": "Kaikki aukiolla näkevät sen. Valintasi säilyy vain tässä selaimessa.",
+        "done": "Valmis",
+        "hairStyles": {
+          "corti": "Lyhyet",
+          "rasati": "Siilitukka",
+          "lunghi": "Pitkät",
+          "coda": "Poninhäntä",
+          "ricci": "Kiharat",
+          "chignon": "Nuttura",
+          "caschetto": "Polkka",
+          "calvo": "Ei hiuksia"
+        },
+        "tops": {
+          "maglietta": "T-paita",
+          "felpa": "Huppari",
+          "camicia": "Kauluspaita",
+          "giacca": "Takki",
+          "vestito": "Mekko"
+        },
+        "bottoms": {
+          "pantaloni": "Housut",
+          "pantaloncini": "Shortsit",
+          "gonna": "Hame"
+        },
+        "hats": {
+          "nessuno": "Ei mitään",
+          "berretto": "Lippalakki",
+          "cuffia": "Pipo",
+          "cappello": "Hattu",
+          "caschetto": "Suojakypärä",
+          "cuffie": "Kuulokkeet",
+          "corona": "Kruunu"
+        },
+        "glassesStyles": {
+          "nessuno": "Ei mitään",
+          "occhiali": "Silmälasit",
+          "sole": "Aurinkolasit"
+        },
+        "colors": {
+          "nero": "Musta",
+          "castanoScuro": "Tummanruskea",
+          "castano": "Ruskea",
+          "ramato": "Kuparinruskea",
+          "rosso": "Punainen",
+          "biondo": "Vaalea",
+          "grigio": "Harmaa",
+          "blu": "Sininen",
+          "rosa": "Vaaleanpunainen",
+          "verde": "Vihreä",
+          "viola": "Violetti",
+          "giallo": "Keltainen",
+          "bluNotte": "Laivastonsininen",
+          "ardesia": "Liuskeenharmaa",
+          "bluPolvere": "Kyyhkynsininen",
+          "azzurro": "Vaaleansininen",
+          "bianco": "Valkoinen",
+          "arancione": "Oranssi",
+          "jeans": "Farkku",
+          "sabbia": "Hiekka",
+          "marrone": "Ruskea",
+          "fulvo": "Punertava"
+        }
+      },
+      "luoghi": {
+        "caffe": "Ota kahvi",
+        "bacheca": "Lue ilmoitustaulu",
+        "galleria": "Katso muotokuvat",
+        "laboratorio": "Mene pajaan",
+        "fontana": "Heitä kolikko",
+        "pozzo": "Toivo jotakin"
+      },
+      "annunci": {
+        "caffe": "Hyvää kahvia! Kaikki aukiolla näkevät kuppisi.",
+        "fontana": "Heitit kolikon suihkulähteeseen.",
+        "pozzo": "Toivoit jotakin toivomuskaivolla.",
+        "corona": "Löysit salaisuuden: kruunu on sinun. Löydät sen kohdasta Hahmo, Päähine."
+      },
+      "bacheca": {
+        "title": "Ilmoitustaulu",
+        "about": "Mistä on kyse",
+        "program": "Ohjelma",
+        "now": "käynnissä",
+        "done": "valmis",
+        "minutes": "{n} min",
+        "materials": "Materiaalit"
+      },
+      "galleria": {
+        "title": "Aukion muotokuvat",
+        "intro": "Ketkä ovat nyt aukiolla ja miten he ovat pukeutuneet.",
+        "alone": "Toistaiseksi olet aukiolla yksin.",
+        "you": "sinä",
+        "exhibition": "Esillä",
+        "portraits": "Ketkä ovat aukiolla"
+      },
+      "laboratorio": {
+        "title": "Paja",
+        "moodTitle": "Aukion tunnelma",
+        "moodIntro": "Millä tuulella saavut tänään? Pajan vieressä oleva kyltti laskee, kuinka monella on mikäkin tunnelma.",
+        "moods": {
+          "felice": "Hyvä tuuli",
+          "curioso": "Uteliaisuus",
+          "assonnato": "Uneliaisuus",
+          "carico": "Energia"
+        },
+        "count": "{n, plural, one {# henkilö} other {# henkilöä}}",
+        "moodNote": "Vain luvut näkyvät, ei se, kuka valitsi mitäkin. Voimassa niin kauan kuin olet aukiolla.",
+        "wardrobeTitle": "Vaatekaappi",
+        "wardrobeIntro": "Vaihda hahmosi vaatteet, hiukset ja asusteet.",
+        "wardrobeOpen": "Vaihda hahmoa"
+      },
+      "legenda": {
+        "open": "Ohjaimet",
+        "title": "Ohjaimet ja salaisuudet",
+        "commands": "Ohjaimet",
+        "move": "Kävely",
+        "space": "Välilyönti",
+        "jump": "Hyppy",
+        "gestures": "Eleet: vilkutus, sydän, taputus, nauru, idea",
+        "enter": "Enter",
+        "act": "Tee jotain jossakin paikassa (kahvila, ilmoitustaulu, suihkulähde …)",
+        "secrets": "Salaisuudet",
+        "secretsIntro": "Kokeile: kirjoita ne näppäimistöllä ollessasi aukiolla.",
+        "secretParty": "Konfetti",
+        "secretFireworks": "Ilotulitus portin yllä",
+        "secretSnow": "Lumisade",
+        "secretWell": "Kolme toivetta kaivolla: yllätys hahmollesi"
       }
     }
   },
