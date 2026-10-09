@@ -29,8 +29,6 @@ interface ModeratorControlsProps {
    *  (lib/jitsi/bridge-readiness#leggiFaseRegistratore). `null` = non lo so:
    *  il pulsante resta usabile. */
   recorderPhase?: FaseRegistratore | null;
-  participantsCanUnmute?: boolean;
-  participantsCanStartVideo?: boolean;
   /** Event opted into the native Jitsi/Excalidraw whiteboard → show the
    *  "Apri lavagna" toggle (desktop only, matching Jitsi's own gating). */
   whiteboardEnabled?: boolean;
@@ -85,8 +83,6 @@ export default function ModeratorControls({
   moderatorToken,
   recordingEnabled,
   recorderPhase = null,
-  participantsCanUnmute = false,
-  participantsCanStartVideo = false,
   whiteboardEnabled = false,
   whiteboardInfraReady = false,
   localDisplayName = '',
@@ -170,7 +166,25 @@ export default function ModeratorControls({
       if (evt.mediaType === 'video') setVideoModerationActive(evt.enabled);
     };
     api.addListener('moderationStatusChanged', onModerationChanged);
+    // La sala può essere già moderata prima che questa barra ascolti: il
+    // blocco lo accende il primo ingresso (mod_pa_media_lock), e l'avviso
+    // arriva a chi entra prima del montaggio. Si chiede lo stato a Jitsi.
+    let attivo = true;
+    const leggi = (tipo: 'audio' | 'video', imposta: (v: boolean) => void) => {
+      const richiesta = api.isModerationOn?.(tipo);
+      if (!richiesta) return;
+      richiesta
+        .then((v) => {
+          if (attivo && typeof v === 'boolean') imposta(v);
+        })
+        .catch(() => {
+          /* la richiesta non è andata: resta l'evento */
+        });
+    };
+    leggi('audio', setAudioModerationActive);
+    leggi('video', setVideoModerationActive);
     return () => {
+      attivo = false;
       api.removeListener('moderationStatusChanged', onModerationChanged);
     };
   }, [api]);
@@ -342,35 +356,32 @@ export default function ModeratorControls({
         style={BAR_STYLE}
       >
         <div className="d-flex align-items-center gap-2 flex-wrap">
-          {/* Audio moderation — only when participants have mic access */}
-          {participantsCanUnmute && (
-            <Button
-              color={audioModerationActive ? 'warning' : 'secondary'}
-              size="sm"
-              className={BTN_BASE}
-              onClick={handleToggleAudioModeration}
-              disabled={!api}
-              style={audioModerationActive ? BTN_ACTIVE_WARN : BTN_DEFAULT}
-            >
-              <Icon icon="it-hearing" size="sm" color="white" />
-              {audioModerationActive ? t('micDisabled') : t('audioModeration')}
-            </Button>
-          )}
+          {/* Moderazione audio e video: sempre, anche quando l'evento non concede
+              microfono e videocamera. Lì la sala parte già moderata
+              (mod_pa_media_lock) e da qui chi conduce può aprire. */}
+          <Button
+            color={audioModerationActive ? 'warning' : 'secondary'}
+            size="sm"
+            className={BTN_BASE}
+            onClick={handleToggleAudioModeration}
+            disabled={!api}
+            style={audioModerationActive ? BTN_ACTIVE_WARN : BTN_DEFAULT}
+          >
+            <Icon icon="it-hearing" size="sm" color="white" />
+            {audioModerationActive ? t('micDisabled') : t('audioModeration')}
+          </Button>
 
-          {/* Video moderation — only when participants have camera access */}
-          {participantsCanStartVideo && (
-            <Button
-              color={videoModerationActive ? 'warning' : 'secondary'}
-              size="sm"
-              className={BTN_BASE}
-              onClick={handleToggleVideoModeration}
-              disabled={!api}
-              style={videoModerationActive ? BTN_ACTIVE_WARN : BTN_DEFAULT}
-            >
-              <Icon icon="it-video" size="sm" color="white" />
-              {videoModerationActive ? t('videoDisabled') : t('videoModeration')}
-            </Button>
-          )}
+          <Button
+            color={videoModerationActive ? 'warning' : 'secondary'}
+            size="sm"
+            className={BTN_BASE}
+            onClick={handleToggleVideoModeration}
+            disabled={!api}
+            style={videoModerationActive ? BTN_ACTIVE_WARN : BTN_DEFAULT}
+          >
+            <Icon icon="it-video" size="sm" color="white" />
+            {videoModerationActive ? t('videoDisabled') : t('videoModeration')}
+          </Button>
 
           {/* Raised hands */}
           <Button

@@ -167,7 +167,7 @@ services:
       - JWT_TOKEN_AUTH_MODULE=token_verification
       - ENABLE_GUESTS=0
       - GLOBAL_MODULES=token_verification
-      - XMPP_MUC_MODULES=token_affiliation,token_affiliation_custom
+      - XMPP_MUC_MODULES=token_affiliation,token_affiliation_custom,pa_media_lock
       - TZ=Europe/Rome
       - XMPP_DOMAIN=meet.jitsi
       - XMPP_AUTH_DOMAIN=auth.meet.jitsi

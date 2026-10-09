@@ -126,6 +126,8 @@ export interface JitsiMeetExternalAPI {
   /** Stanze e partecipanti con il loro ruolo nella conferenza. Forma non
    *  garantita fra versioni: va letta in modo difensivo. */
   getRoomsInfo?(): Promise<unknown>;
+  /** La moderazione audio/video è accesa nella sala (Jitsi recenti). */
+  isModerationOn?(mediaType: 'audio' | 'video'): Promise<boolean>;
   getNumberOfParticipants(): number;
   /** displayName del partecipante per endpoint id (ADR-013 Fase 0). */
   getDisplayName(participantId: string): string | undefined;

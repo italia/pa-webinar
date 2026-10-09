@@ -266,14 +266,14 @@ argomenti_profilo() {
   esac
 }
 
-# Il modulo Prosody che assegna i ruoli dal token esiste in due copie: quella
-# che monta lo stack Docker Compose e quella che il chart mette nel proprio
-# ConfigMap (un chart non legge file fuori dalla sua cartella). Devono restare
-# identiche.
-modulo="mod_token_affiliation_custom.lua"
-if ! cmp -s "infra/jitsi/prosody-plugins/$modulo" "$CHART/files/prosody-plugins/$modulo"; then
-  errore "infra/jitsi/prosody-plugins/$modulo e $CHART/files/prosody-plugins/$modulo sono diversi: aggiorna la copia del chart"
-fi
+# I moduli Prosody del progetto esistono in due copie: quella che monta lo
+# stack Docker Compose e quella che il chart mette nel proprio ConfigMap (un
+# chart non legge file fuori dalla sua cartella). Devono restare identiche.
+for modulo in mod_token_affiliation_custom.lua mod_pa_media_lock.lua; do
+  if ! cmp -s "infra/jitsi/prosody-plugins/$modulo" "$CHART/files/prosody-plugins/$modulo"; then
+    errore "infra/jitsi/prosody-plugins/$modulo e $CHART/files/prosody-plugins/$modulo sono diversi: aggiorna la copia del chart"
+  fi
+done
 
 echo "helm lint"
 # Con i soli valori predefiniti la resa si ferma alla guardia sul segreto JWT
@@ -897,10 +897,20 @@ if comune is not None and jicofo is not None and prosody is not None:
         moduli = [m.strip() for m in str(prosody.get("XMPP_MUC_MODULES", "")).split(",") if m.strip()]
         if "token_affiliation" not in moduli:
             print("Prosody non carica token_affiliation: i ruoli nella sala non verrebbero dal token")
+        if "pa_media_lock" not in moduli:
+            print("Prosody non carica pa_media_lock: i limiti dei partecipanti varrebbero solo nella barra della sala")
         if str(jicofo.get("ENABLE_AUTO_OWNER", "")).lower() != "false":
             print("Jicofo con ENABLE_AUTO_OWNER acceso: il primo a entrare diventerebbe moderatore")
-        if "token_affiliation_custom" in moduli:
-            sts = next((d for d in docs if d.get("kind") == "StatefulSet" and d["metadata"]["name"].endswith("-prosody")), None)
+        # Ogni modulo del progetto richiesto deve arrivare, con il suo aggancio,
+        # da un ConfigMap montato in /prosody-plugins-custom.
+        agganci = {
+            "token_affiliation_custom": "muc-occupant-pre-join",
+            "pa_media_lock": "muc-occupant-joined",
+        }
+        sts = next((d for d in docs if d.get("kind") == "StatefulSet" and d["metadata"]["name"].endswith("-prosody")), None)
+        for nome, aggancio in agganci.items():
+            if nome not in moduli:
+                continue
             ok = False
             if sts:
                 ps = sts["spec"]["template"]["spec"]
@@ -910,11 +920,11 @@ if comune is not None and jicofo is not None and prosody is not None:
                         if not str(vm.get("mountPath", "")).startswith("/prosody-plugins-custom"):
                             continue
                         cm = ((volumi.get(vm["name"]) or {}).get("configMap") or {}).get("name")
-                        if cm in mappe and "mod_token_affiliation_custom.lua" in mappe[cm] \
-                                and "muc-occupant-pre-join" in mappe[cm]["mod_token_affiliation_custom.lua"]:
+                        if cm in mappe and f"mod_{nome}.lua" in mappe[cm] \
+                                and aggancio in mappe[cm][f"mod_{nome}.lua"]:
                             ok = True
             if not ok:
-                print("Prosody carica token_affiliation_custom ma nessun ConfigMap reso lo monta in /prosody-plugins-custom")
+                print(f"Prosody carica {nome} ma nessun ConfigMap reso lo monta in /prosody-plugins-custom")
 
 # Autorità di certificazione in più: il file indicato a Node deve esistere nel
 # volume montato.
@@ -1349,6 +1359,8 @@ deve_fallire "Jicofo senza autenticazione e Prosody senza i ruoli dal token" "XM
   --set-string 'jitsi-meet.prosody.extraEnvs.XMPP_MUC_MODULES=muc_size'
 deve_fallire "modulo dei ruoli richiesto ma non montato" "/prosody-plugins-custom" \
   --set 'jitsi-meet.prosody.extraVolumeMounts=null'
+deve_fallire "modulo dei ruoli senza il blocco di microfono e video" "pa_media_lock" \
+  --set-string 'jitsi-meet.prosody.extraEnvs.XMPP_MUC_MODULES=token_affiliation\,token_affiliation_custom'
 deve_fallire "script di fine registrazione montato due volte" "_finalize_sh" \
   --set jitsi-meet.jibri.enabled=true --set-string 'jitsi-meet.jibri.custom.other._finalize_sh=#!/bin/sh'
 # Nomi pubblici: forma, coincidenza con le chiavi esplicite, valori del

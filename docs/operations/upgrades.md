@@ -436,7 +436,8 @@ option and `--recover-secrets`, which rebuilds the secrets file from the cluster
   - unpinned conference credentials, when `jitsi.requirePinnedCredentials` is `true`;
   - room roles that Prosody would not take from the token: Jicofo's authentication off while
     `XMPP_MUC_MODULES` loads neither `token_affiliation` nor `token_affiliation_custom`, or
-    `token_affiliation_custom` asked for with nothing mounted at `/prosody-plugins-custom`. The second
+    one of the project's modules (`token_affiliation_custom`, `pa_media_lock`) asked for with nothing
+    mounted at `/prosody-plugins-custom`. The second
     happens when your values set `jitsi-meet.prosody.extraVolumes` or `extraVolumeMounts`: they are
     lists, so they replace the chart's entries, and must repeat them
     ([Server-side role enforcement](../architecture/jitsi-integration.md#server-side-role-enforcement));
@@ -576,8 +577,11 @@ The room-role wiring is such a change: Prosody's module volume and `XMPP_MUC_MOD
 `JICOFO_ENABLE_AUTH` and `ENABLE_AUTO_OWNER`
 ([Server-side role enforcement](../architecture/jitsi-integration.md#server-side-role-enforcement)).
 The upgrade that first brings them to an installation restarts Prosody and Jicofo, and calls in
-progress drop: run it outside events. A later change to the module file alone does not restart
-Prosody; restart its StatefulSet when no call is running.
+progress drop: run it outside events. Adding a module to `XMPP_MUC_MODULES`, as the upgrade that
+brings `pa_media_lock` does, is the same kind of change. A later change to a module file alone does
+not restart Prosody; restart its StatefulSet when no call is running. A values file that sets its own
+`XMPP_MUC_MODULES` keeps its list: add `pa_media_lock` to it, or participant limits stay enforced only
+by the room's toolbar.
 
 Upgrading Jitsi itself follows the
 [Jitsi upgrade checklist](../architecture/jitsi-integration.md#jitsi-upgrade-checklist).

@@ -1695,8 +1695,6 @@ export default function LiveEventClient({
           moderatorToken={token}
           recordingEnabled={event.recordingEnabled}
           recorderPhase={recorderPhase}
-          participantsCanUnmute={event.participantsCanUnmute}
-          participantsCanStartVideo={event.participantsCanStartVideo}
           whiteboardEnabled={whiteboardOn}
           whiteboardInfraReady={whiteboardInfraReady}
           localDisplayName={credentials?.displayName ?? chosenName ?? ''}

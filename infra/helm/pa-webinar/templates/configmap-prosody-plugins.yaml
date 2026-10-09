@@ -1,12 +1,15 @@
 {{- /*
 Moduli Prosody del progetto, montati in /prosody-plugins-custom dal volume che
-`jitsi-meet.prosody.extraVolumes` dichiara in values.yaml. Oggi uno solo:
-mod_token_affiliation_custom, che assegna il ruolo nella sala dal token del
-portale prima dell'ingresso (infra/jitsi/README.md).
+`jitsi-meet.prosody.extraVolumes` dichiara in values.yaml
+(infra/jitsi/README.md):
+  - mod_token_affiliation_custom assegna il ruolo nella sala dal token del
+    portale prima dell'ingresso;
+  - mod_pa_media_lock accende la moderazione audio e video quando l'evento non
+    concede microfono, videocamera o schermo ai partecipanti.
 
-Il file è una copia di infra/jitsi/prosody-plugins/, lo stesso che monta lo
+I file sono copie di infra/jitsi/prosody-plugins/, la cartella che monta lo
 stack Docker Compose: un chart non legge file fuori dalla propria cartella.
-scripts/validate-chart.sh controlla che le due copie siano identiche.
+scripts/validate-chart.sh controlla che le copie siano identiche.
 
 Si rende solo quando un volume di Prosody lo nomina: chi sostituisce la lista
 senza questa voce non si ritrova un ConfigMap orfano, e la guardia
@@ -23,4 +26,6 @@ metadata:
 data:
   mod_token_affiliation_custom.lua: |
     {{- .Files.Get "files/prosody-plugins/mod_token_affiliation_custom.lua" | nindent 4 }}
+  mod_pa_media_lock.lua: |
+    {{- .Files.Get "files/prosody-plugins/mod_pa_media_lock.lua" | nindent 4 }}
 {{- end }}

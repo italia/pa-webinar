@@ -84,6 +84,9 @@ type EventOverrides = Partial<{
   eventType: string;
   joinPasswordHash: string | null;
   multitrackRecordingEnabled: boolean;
+  participantsCanUnmute: boolean;
+  participantsCanStartVideo: boolean;
+  participantsCanShareScreen: boolean;
 }>;
 
 function eventRow(overrides: EventOverrides = {}) {
@@ -97,6 +100,9 @@ function eventRow(overrides: EventOverrides = {}) {
     moderatorToken: PRIMARY_TOKEN,
     moderatorName: 'Moderatore',
     multitrackRecordingEnabled: false,
+    participantsCanUnmute: false,
+    participantsCanStartVideo: false,
+    participantsCanShareScreen: false,
     ...overrides,
   };
 }
@@ -171,6 +177,8 @@ interface JitsiUser {
   avatar: string;
   affiliation: string;
   moderator: string;
+  mediaLock?: { audio: boolean; video: boolean; desktop: boolean };
+  mediaExempt?: boolean;
 }
 
 async function minted(res: Response) {
@@ -532,6 +540,40 @@ describe('POST jitsi/token — ramo ospite', () => {
 });
 
 // ── Accesso ospiti spento: chi ha un token entra come prima ──
+
+describe('POST jitsi/token — limiti di microfono e video nel token', () => {
+  // mod_pa_media_lock accende la moderazione al primo ingresso: i limiti
+  // devono stare in OGNI token dell'evento, chiunque entri per primo.
+  const bloccato = { audio: true, video: true, desktop: true };
+
+  it('l\'ospite porta i limiti dell\'evento e non è esente', async () => {
+    const { user } = await minted(await post({ guestName: 'Ospite' }));
+    expect(user.mediaLock).toEqual(bloccato);
+    expect(user.mediaExempt).toBeUndefined();
+  });
+
+  it('il relatore porta i limiti ed è esente', async () => {
+    vi.mocked(prisma.eventModerator.findUnique).mockResolvedValue({
+      id: 'grant-2',
+      eventId: EVENT_ID,
+      revokedAt: null,
+      role: 'SPEAKER',
+      name: encryptPII('Luca Neri'),
+      email: null,
+    } as never);
+    const { user } = await minted(await post({ moderatorToken: GRANT_TOKEN }));
+    expect(user.mediaLock).toEqual(bloccato);
+    expect(user.mediaExempt).toBe(true);
+  });
+
+  it('un evento che concede microfono e schermo li toglie dal blocco', async () => {
+    vi.mocked(prisma.event.findUnique).mockResolvedValue(
+      eventRow({ participantsCanUnmute: true, participantsCanShareScreen: true }) as never,
+    );
+    const { user } = await minted(await post({ guestName: 'Ospite' }));
+    expect(user.mediaLock).toEqual({ audio: false, video: true, desktop: false });
+  });
+});
 
 describe('POST jitsi/token — accesso ospiti spento', () => {
   beforeEach(() => {

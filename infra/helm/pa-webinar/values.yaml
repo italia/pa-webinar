@@ -949,8 +949,11 @@ jitsi-meet:
       # dell'immagine; `token_affiliation_custom` è quello del progetto,
       # montato qui sotto da un ConfigMap del chart, che assegna il ruolo
       # prima dell'ingresso invece che dopo. Va in coppia con
-      # `jicofo.extraEnvs` più sotto. Per aggiungere moduli, tieni questi due.
-      XMPP_MUC_MODULES: token_affiliation,token_affiliation_custom
+      # `jicofo.extraEnvs` più sotto. `pa_media_lock`, anch'esso del progetto,
+      # blocca sul bridge microfono, videocamera e schermo dei partecipanti
+      # quando l'evento non li concede: senza, il limite vive solo nella barra
+      # della sala. Per aggiungere moduli, tieni questi tre.
+      XMPP_MUC_MODULES: token_affiliation,token_affiliation_custom,pa_media_lock
     # Il modulo del progetto (infra/jitsi/prosody-plugins), dal ConfigMap
     # `pa-webinar-prosody-plugins` che il chart rende quando questo volume lo
     # nomina. Il nome è fisso: una sola release per namespace. Sono liste: se

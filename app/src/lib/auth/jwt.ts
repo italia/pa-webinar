@@ -84,6 +84,36 @@ interface JitsiTokenPayload {
    * lib/profile-photo): vince su Gravatar e sulle iniziali.
    */
   photoUrl?: string | null;
+  /**
+   * Cosa l'evento NON concede ai partecipanti. Lo legge il modulo Prosody
+   * `mod_pa_media_lock`, che al primo ingresso accende la moderazione audio e
+   * video di Jitsi: il limite vale sul bridge, non solo nella barra della sala.
+   * Va nello stesso modo in ogni token dell'evento (chiunque entri per primo
+   * accende il blocco).
+   */
+  mediaLock?: MediaLock;
+  /** Audio e video pieni senza moderare: il relatore, ammesso subito. */
+  mediaExempt?: boolean;
+}
+
+/** Microfono, videocamera, condivisione dello schermo: true = bloccato. */
+export interface MediaLock {
+  audio: boolean;
+  video: boolean;
+  desktop: boolean;
+}
+
+/** I limiti dei partecipanti di un evento, nella forma del token di Jitsi. */
+export function mediaLockOf(event: {
+  participantsCanUnmute: boolean;
+  participantsCanStartVideo: boolean;
+  participantsCanShareScreen: boolean;
+}): MediaLock {
+  return {
+    audio: !event.participantsCanUnmute,
+    video: !event.participantsCanStartVideo,
+    desktop: !event.participantsCanShareScreen,
+  };
 }
 
 /** L'origin pubblico dell'app, o null se non è un URL http(s) assoluto (nel
@@ -169,6 +199,8 @@ export async function generateJitsiJwt(
         avatar: avatarUrl,
         affiliation: payload.isModerator ? 'owner' : 'member',
         moderator: payload.isModerator ? 'true' : 'false',
+        ...(payload.mediaLock ? { mediaLock: payload.mediaLock } : {}),
+        ...(payload.mediaExempt ? { mediaExempt: true } : {}),
       },
       features,
     },

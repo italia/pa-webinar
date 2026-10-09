@@ -306,10 +306,15 @@ Each event has three flags: `participantsCanUnmute`, `participantsCanStartVideo`
   microphone or camera button and forces that participant to join muted;
 - when `participantsCanShareScreen` is off, it removes the screen-share button.
 
-These flags shape the interface; they are not enforced by the server. Jitsi's audio and video
-moderation *is* enforced by the server, and a moderator switches it on from the control bar
-(**Participant mic**, **Participant video**). Each of those two toggles appears only when the matching
-flag, `participantsCanUnmute` or `participantsCanStartVideo`, is on.
+The server enforces them too. Every token of the event carries the flags that are off, and the Prosody
+module `mod_pa_media_lock` switches on Jitsi's audio, video and screen-share moderation on the first
+join to the room, before any moderator arrives. Jicofo then keeps every participant who is not allowed
+muted on the bridge, so a client that ignores the hidden buttons still cannot be heard or seen.
+Moderators are always allowed, and speakers are allowed as soon as they join
+([the media lock module](../../infra/jitsi/README.md#the-media-lock-module)).
+
+A moderator can lift or restore the moderation during the call from the control bar
+(**Participant mic**, **Participant video**). Both toggles are always shown to moderators.
 
 ### Video quality presets
 
@@ -559,7 +564,7 @@ owner is present. For roles to come from the token, three pieces work together:
 jitsi-meet:
   prosody:
     extraEnvs:
-      XMPP_MUC_MODULES: token_affiliation,token_affiliation_custom
+      XMPP_MUC_MODULES: token_affiliation,token_affiliation_custom,pa_media_lock
     extraVolumes:          # the ConfigMap pa-webinar-prosody-plugins, rendered by the chart
     extraVolumeMounts:     # mounted read-only at /prosody-plugins-custom
   jicofo:
@@ -570,16 +575,17 @@ jitsi-meet:
 
 Access stays protected with Jicofo's authentication off: Prosody refuses anyone without a valid token.
 The `pa-webinar.validateJitsiRoles` render guard stops the render when Jicofo's authentication is off
-and Prosody loads neither module, or when the custom module is asked for and nothing is mounted at
-`/prosody-plugins-custom`. `extraVolumes` and `extraVolumeMounts` are lists: a values file that sets
+and Prosody loads neither module, or when one of the project's modules is asked for and nothing is
+mounted at `/prosody-plugins-custom`. `extraVolumes` and `extraVolumeMounts` are lists: a values file that sets
 its own replaces the chart's entries and must repeat them. The ConfigMap name is fixed, so one release
 per namespace. The first upgrade to a chart with this wiring restarts Prosody and Jicofo
 ([Upgrades and rollback](../operations/upgrades.md)).
 
 **Docker Compose** mounts `infra/jitsi/prosody-plugins/` into the Prosody container at
-`/prosody-plugins-custom`, enables both modules and turns off Jicofo's auto-owner rule, but leaves
+`/prosody-plugins-custom`, enables the three modules and turns off Jicofo's auto-owner rule, but leaves
 Jicofo's authentication on. Roles there rely on `token_affiliation` setting the affiliation again after
 Jicofo's promotion, so a participant can hold the moderator role for a moment after joining.
+`mod_pa_media_lock` takes that moment back out of the audio and video allowed lists.
 
 The wiring, and what was checked on a lab cluster (moderator links as moderators, registrants and
 guests as participants whoever joins first, a participant's mute or kick of the moderator refused), are
@@ -830,7 +836,10 @@ order, and roll out through [upgrades and rollback](../operations/upgrades.md).
 4. **Re-verify the Prosody side.** Token authentication still accepts portal JWTs. `token_affiliation` is
    still in the image and `mod_token_affiliation_custom` still loads. Jicofo still reads
    `JICOFO_ENABLE_AUTH` and `ENABLE_AUTO_OWNER` from its environment. The recorder account on the hidden
-   domain is still allow-listed.
+   domain is still allow-listed. `mod_pa_media_lock` copies parts of the stock `av_moderation_component`
+   (the room's `av_moderation` state and the shape of its messages): in a room of an event that grants
+   participants nothing, check that a guest who forces the microphone on is not heard, that a speaker is
+   heard, and that Jicofo's log reads `Moderation for AUDIO ... was enabled by focus`.
 5. **Check the configuration keys and API surface the app relies on.** Toolbar button names, the nested
    `raisedHands.disableRemoveRaisedHandOnFocus`, `disableSelfView`, the IFrame API commands and events
    in the tables above, and the roster shape of `getParticipantsInfo()` (`app/src/lib/jitsi/participants.ts`

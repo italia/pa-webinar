@@ -1,7 +1,7 @@
-# Jitsi extras: Prosody module, Jibri finalize scripts, web overrides
+# Jitsi extras: Prosody modules, Jibri finalize scripts, web overrides
 
 This directory holds the pieces of PA Webinar that run inside Jitsi components instead of in the portal.
-Neither piece changes Jitsi's source code. The Prosody module loads from the image's plugin directory,
+Neither piece changes Jitsi's source code. The Prosody modules load from the image's plugin directory,
 and Jibri calls the finalize script as a hook after each recording. The page
 [How PA Webinar extends Jitsi Meet](../../docs/architecture/jitsi-integration.md) explains where these
 pieces sit on the Jitsi boundary.
@@ -9,10 +9,11 @@ pieces sit on the Jitsi boundary.
 | Path | What it is | What runs it |
 |---|---|---|
 | `prosody-plugins/mod_token_affiliation_custom.lua` | A Prosody MUC module that sets each occupant's room affiliation from the portal's JWT | The Docker Compose stack, from this folder, and the Helm chart, from an identical copy in `infra/helm/pa-webinar/files/prosody-plugins/` |
+| `prosody-plugins/mod_pa_media_lock.lua` | A Prosody MUC module that switches on Jitsi's audio, video and screen-share moderation when the event does not grant them to participants | The same two places, the same way |
 | `jibri-finalize.sh` | A standalone Jibri finalize script | Nothing in the repository. The chart ships a different script, `infra/helm/pa-webinar/files/jibri-finalize.sh` |
 | `web/custom-interface_config.js`, `web/custom-config.js` | Interface and config overrides that hide the Jitsi logo and links over the call | The Docker Compose stack, which mounts them into the `jitsi-web` container; the image appends them to the configuration it generates at startup. On Kubernetes the same settings go in the web component's custom configs of the deployment values |
 
-## The Prosody module
+## The role module
 
 ### What it does
 
@@ -50,22 +51,59 @@ The token alone decides who is moderator only when Jicofo assigns no roles of it
   refuses every connection without a valid token, so turning Jicofo's authentication off does not
   let anyone in without one.
 
+## The media lock module
+
+### What it does
+
+`mod_pa_media_lock` makes the event's participant limits hold on the bridge, not only in the room's
+toolbar. The portal writes two claims into every token of an event (`app/src/lib/auth/jwt.ts`):
+
+| Claim | Meaning |
+|---|---|
+| `context.user.mediaLock` | `{ audio, video, desktop }`: what the event does **not** grant participants (`participantsCanUnmute`, `participantsCanStartVideo`, `participantsCanShareScreen` off) |
+| `context.user.mediaExempt` | `true` for speakers, who have full audio and video without moderating |
+
+On the first join to a room that carries a lock, the module switches on Jitsi's audio/video moderation
+(the stock `av_moderation_component`) for each locked media type, before any moderator joins, and
+announces it on the component's behalf to every occupant and to Jicofo. Jicofo then keeps everyone who
+is not allowed muted on the bridge, whatever their client does. Moderators are always allowed. A
+speaker is added to the allowed list as soon as they join.
+
+Three details matter when you read its logs or change it:
+
+- the lock is switched on once per room. A moderator can lift it during the call from the control bar
+  (**Participant mic**, **Participant video**), and it stays lifted until the room empties and is
+  created again. In the same way, a change to the event's participant flags while the room is open
+  reaches the room only when it is created again; until then the moderator's toggles decide;
+- when a moderator switches moderation back on, the stock component starts again from an allowed list
+  of moderators only; the module adds back the speakers who are in the room;
+- Jicofo checks only the allowed list, not the room role: the module adds moderators to it as they
+  join;
+- the actor declared for the switch-on is Jicofo's own occupant (`/focus`), never the participant who
+  joined first, because Jicofo allows the actor to unmute;
+- the stock component adds to the allowed list anyone who becomes `owner` and never removes them. When
+  Jicofo briefly promotes a joining participant (Jicofo authentication on, as in Docker Compose) and
+  `token_affiliation` then restores the token's role, the module removes that participant from the
+  allowed list again, unless the token marks them exempt.
+
+The module logs every switch-on, admission and removal at `info` level.
+
 ### Where it is loaded
 
 **Docker Compose.** `docker-compose.yml` mounts `infra/jitsi/prosody-plugins/` read-only at
 `/prosody-plugins-custom` in the `prosody` service and sets
-`XMPP_MUC_MODULES=token_affiliation,token_affiliation_custom`. On the `jicofo` service it turns off the
+`XMPP_MUC_MODULES=token_affiliation,token_affiliation_custom,pa_media_lock`. On the `jicofo` service it turns off the
 auto-owner rule with `ENABLE_AUTO_OWNER=false`, but leaves Jicofo authentication on: roles there rely on
 `token_affiliation` setting the affiliation again after Jicofo's promotion, so a participant can hold
 the moderator role for a moment after joining.
 
 **Helm chart.** The chart's `values.yaml` sets the wiring by default, on every profile:
 
-- `jitsi-meet.prosody.extraEnvs.XMPP_MUC_MODULES: token_affiliation,token_affiliation_custom`;
+- `jitsi-meet.prosody.extraEnvs.XMPP_MUC_MODULES: token_affiliation,token_affiliation_custom,pa_media_lock`;
 - `jitsi-meet.prosody.extraVolumes` and `extraVolumeMounts`, which mount the ConfigMap
   `pa-webinar-prosody-plugins` at `/prosody-plugins-custom`. The chart renders that ConfigMap from its
-  copy of the module, `infra/helm/pa-webinar/files/prosody-plugins/mod_token_affiliation_custom.lua`;
-  `scripts/validate-chart.sh` fails when the two copies differ;
+  copies of the modules in `infra/helm/pa-webinar/files/prosody-plugins/`;
+  `scripts/validate-chart.sh` fails when a copy differs from this folder;
 - `jitsi-meet.jicofo.extraEnvs.JICOFO_ENABLE_AUTH: "false"` and `ENABLE_AUTO_OWNER: "false"`, so Jicofo
   assigns no roles.
 
@@ -73,7 +111,7 @@ What to know when you change it:
 
 - `extraEnvs` is a map, so your values merge with the chart's. `extraVolumes` and `extraVolumeMounts`
   are lists: a values file that sets them replaces the chart's entries, and must repeat them. The render
-  stops when `XMPP_MUC_MODULES` asks for `token_affiliation_custom` and nothing is mounted at
+  stops when `XMPP_MUC_MODULES` asks for one of the project's modules and nothing is mounted at
   `/prosody-plugins-custom`, and when Jicofo authentication is off but `XMPP_MUC_MODULES` has neither
   module.
 - The ConfigMap name is fixed, because the subchart's values cannot compute it: one release per

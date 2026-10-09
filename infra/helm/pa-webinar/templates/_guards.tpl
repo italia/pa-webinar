@@ -275,12 +275,13 @@ Due pezzi lavorano insieme. Jicofo senza autenticazione propria
 rende moderatore chiunque sia autenticato, cioè ogni partecipante con un token.
 E Prosody con i moduli che assegnano il ruolo dal token (`XMPP_MUC_MODULES`
 con `token_affiliation`, e il modulo del progetto `token_affiliation_custom`).
+Il terzo modulo del progetto, `pa_media_lock`, vive nello stesso volume.
 
 Due incoerenze si vedono solo in sala, e qui diventano errori di resa:
   - Jicofo senza autenticazione ma Prosody senza i moduli: nessuno sarebbe
     moderatore, e il moderatore del portale non potrebbe silenziare né
     espellere nessuno;
-  - il modulo del progetto richiesto ma non montato in /prosody-plugins-custom:
+  - un modulo del progetto richiesto ma non montato in /prosody-plugins-custom:
     Prosody non lo troverebbe, e lo direbbe solo nel proprio log. Succede a chi
     imposta `prosody.extraVolumes` o `extraVolumeMounts` in un proprio file di
     valori: sono liste, e sostituiscono quelle del chart.
@@ -300,7 +301,16 @@ Due incoerenze si vedono solo in sala, e qui diventano errori di resa:
 {{- if and (dig "enableAuth" false $jm) (has $authJicofo (list "false" "0")) (not (or (has "token_affiliation" $moduli) (has "token_affiliation_custom" $moduli))) -}}
 {{- fail "jitsi-meet.jicofo.extraEnvs.JICOFO_ENABLE_AUTH è \"false\" ma Prosody non assegna i ruoli dal token: jitsi-meet.prosody.extraEnvs.XMPP_MUC_MODULES non contiene token_affiliation. Nessuno sarebbe moderatore nella sala, e il moderatore del portale non potrebbe silenziare né espellere nessuno. Rimetti in XMPP_MUC_MODULES token_affiliation,token_affiliation_custom (più i tuoi moduli), come in values.yaml." -}}
 {{- end -}}
-{{- if has "token_affiliation_custom" $moduli -}}
+{{- $delProgetto := list -}}
+{{- range (list "token_affiliation_custom" "pa_media_lock") -}}
+{{- if has . $moduli -}}
+{{- $delProgetto = append $delProgetto . -}}
+{{- end -}}
+{{- end -}}
+{{- if and (has "token_affiliation_custom" $moduli) (not (has "pa_media_lock" $moduli)) -}}
+{{- fail "jitsi-meet.prosody.extraEnvs.XMPP_MUC_MODULES carica token_affiliation_custom ma non pa_media_lock: i limiti di microfono, videocamera e schermo che un evento imposta ai partecipanti varrebbero solo nella barra della sala, e chi apre la sala fuori dal portale li riaccenderebbe. Aggiungi pa_media_lock a XMPP_MUC_MODULES, come in values.yaml. Succede anche con helm upgrade --reuse-values da una versione precedente, che conserva la lista vecchia." -}}
+{{- end -}}
+{{- if $delProgetto -}}
 {{- $montato := false -}}
 {{- range (dig "extraVolumeMounts" list $prosody | default list) -}}
 {{- if and (kindIs "map" .) (hasPrefix "/prosody-plugins-custom" (toString (index . "mountPath" | default ""))) -}}
@@ -308,7 +318,7 @@ Due incoerenze si vedono solo in sala, e qui diventano errori di resa:
 {{- end -}}
 {{- end -}}
 {{- if not $montato -}}
-{{- fail (printf "jitsi-meet.prosody.extraEnvs.XMPP_MUC_MODULES chiede il modulo token_affiliation_custom, ma nessun volume di Prosody è montato in /prosody-plugins-custom: Prosody non lo troverebbe. Succede quando un file di valori imposta jitsi-meet.prosody.extraVolumes o extraVolumeMounts, che sono liste e sostituiscono quelle del chart: aggiungi alle tue le due voci di values.yaml (il volume dal ConfigMap %s e il suo montaggio in /prosody-plugins-custom), oppure togli token_affiliation_custom da XMPP_MUC_MODULES." (include "pa-webinar.prosodyPluginsConfigMap" .)) -}}
+{{- fail (printf "jitsi-meet.prosody.extraEnvs.XMPP_MUC_MODULES chiede i moduli del progetto %s, ma nessun volume di Prosody è montato in /prosody-plugins-custom: Prosody non li troverebbe. Succede quando un file di valori imposta jitsi-meet.prosody.extraVolumes o extraVolumeMounts, che sono liste e sostituiscono quelle del chart: aggiungi alle tue le due voci di values.yaml (il volume dal ConfigMap %s e il suo montaggio in /prosody-plugins-custom), oppure togli quei moduli da XMPP_MUC_MODULES." (join ", " $delProgetto) (include "pa-webinar.prosodyPluginsConfigMap" .)) -}}
 {{- end -}}
 {{- end -}}
 {{- end -}}

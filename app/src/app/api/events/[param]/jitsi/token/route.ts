@@ -13,6 +13,7 @@ import { jitsiTokenRequestSchema } from '@/lib/validation/schemas';
 import { EventModeratorRole, verifyGrantToken } from '@/lib/auth/moderator';
 import {
   generateJitsiJwt,
+  mediaLockOf,
   moderatorJitsiId,
   participantJitsiId,
   guestJitsiId,
@@ -89,6 +90,10 @@ export const POST = withErrorHandling(async (request, context) => {
     throw new ConflictError('Event is not active', { currentStatus: event.status });
   }
 
+  // In ogni token dell'evento: chi entra per primo accende il blocco nella
+  // sala (mod_pa_media_lock), e i limiti sono gli stessi per tutti.
+  const mediaLock = mediaLockOf(event);
+
   // ── Grant flow (primary moderator, co-moderator, or speaker) ──
   if (moderatorToken) {
     const grant = await verifyGrantToken(event.slug, moderatorToken);
@@ -128,6 +133,8 @@ export const POST = withErrorHandling(async (request, context) => {
       displayName: name,
       uniqueId: postoModeratore,
       isModerator: !isSpeaker,
+      mediaLock,
+      mediaExempt: isSpeaker,
       // Chi sta sullo schermo è soprattutto chi modera e chi parla: se l'avatar
       // Gravatar valesse solo per il pubblico, la funzione si vedrebbe dove
       // conta meno. `grant.email` è null per il link primario — condiviso da
@@ -187,6 +194,7 @@ export const POST = withErrorHandling(async (request, context) => {
         displayName: typedName,
         uniqueId: postoOspite,
         isModerator: false,
+        mediaLock,
         expiresInSeconds: 2 * 60 * 60,
       });
       return Response.json(
@@ -237,6 +245,7 @@ export const POST = withErrorHandling(async (request, context) => {
       displayName: name,
       uniqueId: postoIscritto,
       isModerator: false,
+      mediaLock,
       email,
       photoUrl: fotoIscritto ? profilePhotoUrl(fotoIscritto) : null,
       // La scelta è dell'amministratore, e la legge il chiamante: il minter del
@@ -297,6 +306,7 @@ export const POST = withErrorHandling(async (request, context) => {
       displayName: guestName,
       uniqueId: postoOspite,
       isModerator: false,
+      mediaLock,
       expiresInSeconds: 2 * 60 * 60,
     });
 

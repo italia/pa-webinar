@@ -1025,7 +1025,8 @@ open and whether you need TURN is in [Networking](INFRASTRUCTURE.md#networking).
 JWT; the secret is covered in [The Prosody JWT secret](#the-prosody-jwt-secret). The chart's values
 also make the token decide the room role: Prosody loads `token_affiliation` and the project's
 `token_affiliation_custom` module (mounted from the ConfigMap `pa-webinar-prosody-plugins`), and Jicofo
-runs without its own authentication and auto-owner rule. Keep those entries if you set your own
+runs without its own authentication and auto-owner rule. The same ConfigMap carries `pa_media_lock`,
+which enforces on the bridge the participant limits that an event sets. Keep those entries if you set your own
 `jitsi-meet.prosody.extraVolumes`, `extraVolumeMounts` or `XMPP_MUC_MODULES`: the
 `pa-webinar.validateJitsiRoles` guard stops the render otherwise. Details in
 [Server-side role enforcement](architecture/jitsi-integration.md#server-side-role-enforcement).
