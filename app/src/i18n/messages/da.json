@@ -572,8 +572,7 @@
       "unavailable": "Undertekster er ikke tilgængelige lige nu.",
       "show": "Vis undertekster",
       "hide": "Skjul undertekster",
-      "toggle": "Automatiske undertekster",
-      "button": "CC"
+      "toggle": "Automatiske undertekster"
     }
   },
   "qa": {

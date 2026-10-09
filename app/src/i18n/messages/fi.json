@@ -572,8 +572,7 @@
       "unavailable": "Tekstitys ei ole juuri nyt käytettävissä.",
       "show": "Näytä tekstitys",
       "hide": "Piilota tekstitys",
-      "toggle": "Automaattinen tekstitys",
-      "button": "CC"
+      "toggle": "Automaattinen tekstitys"
     }
   },
   "qa": {

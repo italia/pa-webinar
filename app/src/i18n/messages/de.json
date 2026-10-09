@@ -572,8 +572,7 @@
       "unavailable": "Untertitel sind derzeit nicht verfügbar.",
       "show": "Untertitel einblenden",
       "hide": "Untertitel ausblenden",
-      "toggle": "Automatische Untertitel",
-      "button": "CC"
+      "toggle": "Automatische Untertitel"
     }
   },
   "qa": {

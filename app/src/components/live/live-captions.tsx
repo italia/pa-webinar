@@ -5,28 +5,16 @@ import { useTranslations } from 'next-intl';
 import useSWR from 'swr';
 
 import { applyChunk, prune, type CaptionLine } from '@/lib/captions/caption-lines';
+import {
+  CAPTIONS_BUTTON_ID,
+  captionsToolbarButton,
+  readCaptionsVisible,
+  writeCaptionsVisible,
+} from '@/lib/captions/toolbar-button';
 import type { JitsiMeetExternalAPI, JitsiTranscriptionChunk } from '@/types/jitsi';
 
 /** Stato del servizio come lo riporta la pagina di stato (null = non noto). */
 export type CaptionsServiceState = 'operational' | 'degraded' | 'paused' | 'unavailable' | null;
-
-const STORAGE_KEY = 'pawebinar.captions.visible';
-
-function readVisible(): boolean {
-  try {
-    return window.localStorage.getItem(STORAGE_KEY) !== '0';
-  } catch {
-    return true;
-  }
-}
-
-function writeVisible(value: boolean): void {
-  try {
-    window.localStorage.setItem(STORAGE_KEY, value ? '1' : '0');
-  } catch {
-    // Archiviazione non disponibile (finestra privata): resta la scelta della sessione.
-  }
-}
 
 /**
  * I sottotitoli live sopra il video (ADR-018).
@@ -34,7 +22,8 @@ function writeVisible(value: boolean): void {
  * Il testo arriva dall'IFrame API (`transcriptionChunkReceived`), una frase
  * alla volta per chi parla; il nome di chi parla lo dà la sala stessa
  * dall'endpoint, perché il servizio di trascrizione non lo conosce. Ogni
- * spettatore può nasconderli per sé: la scelta resta nel suo browser.
+ * spettatore può nasconderli per sé con il pulsante dei sottotitoli nella
+ * barra di Jitsi: la scelta resta nel suo browser.
  *
  * Per i lettori di schermo si annunciano solo le frasi concluse, in una
  * regione `aria-live` a parte: annunciare ogni aggiornamento provvisorio
@@ -63,8 +52,36 @@ export default function LiveCaptions({
   const [announcement, setAnnouncement] = useState('');
 
   useEffect(() => {
-    setVisible(readVisible());
+    setVisible(readCaptionsVisible());
   }, []);
+
+  // Il pulsante nella barra di Jitsi: c'è solo con i sottotitoli accesi, e
+  // icona e testo dicono che cosa fa il clic.
+  const show = t('show');
+  const hide = t('hide');
+  useEffect(() => {
+    if (!api) return;
+    try {
+      api.executeCommand('overwriteConfig', {
+        customToolbarButtons: active ? [captionsToolbarButton(visible, { show, hide })] : [],
+      });
+    } catch {
+      // Una versione di Jitsi senza il comando: resta il pulsante della configurazione iniziale.
+    }
+  }, [api, active, visible, show, hide]);
+
+  useEffect(() => {
+    if (!api || !active) return;
+    const onClick = (event: { key: string }) => {
+      if (event?.key !== CAPTIONS_BUTTON_ID) return;
+      setVisible((v) => {
+        writeCaptionsVisible(!v);
+        return !v;
+      });
+    };
+    api.addListener('toolbarButtonClicked', onClick);
+    return () => api.removeListener('toolbarButtonClicked', onClick);
+  }, [api, active]);
 
   const speakerName = useCallback(
     (speakerId: string | null): string => {
@@ -109,13 +126,6 @@ export default function LiveCaptions({
 
   if (!active) return null;
 
-  const toggle = () => {
-    setVisible((v) => {
-      writeVisible(!v);
-      return !v;
-    });
-  };
-
   const notice =
     serviceState === 'paused' ? t('paused') : serviceState === 'unavailable' ? t('unavailable') : null;
 
@@ -141,16 +151,6 @@ export default function LiveCaptions({
       <span className="visually-hidden" aria-live="polite">
         {visible ? announcement : ''}
       </span>
-      <button
-        type="button"
-        className="live-captions__toggle"
-        aria-pressed={visible}
-        aria-label={visible ? t('hide') : t('show')}
-        title={visible ? t('hide') : t('show')}
-        onClick={toggle}
-      >
-        {t('button')}
-      </button>
     </div>
   );
 }

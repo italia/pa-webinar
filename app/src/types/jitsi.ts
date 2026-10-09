@@ -65,7 +65,11 @@ export interface JitsiEventMap {
   audioMuteStatusChanged: [{ muted: boolean }];
   videoMuteStatusChanged: [{ muted: boolean }];
   raiseHandUpdated: [{ id: string; handRaised: number }];
-  recordingStatusChanged: [{ on: boolean; mode: string }];
+  /** Lo manda anche l'avvio e l'arresto della trascrizione (`transcription`
+   *  valorizzato): `on` resta lo stato della registrazione vera. */
+  recordingStatusChanged: [{ on: boolean; mode: string; transcription?: boolean }];
+  /** Clic su un pulsante personalizzato della barra (`customToolbarButtons`). */
+  toolbarButtonClicked: [{ key: string; preventExecution?: boolean }];
   audioModerationChanged: [{ enabled: boolean }];
   videoModerationChanged: [{ enabled: boolean }];
   moderationStatusChanged: [{ enabled: boolean; mediaType: string }];
@@ -132,6 +136,8 @@ export interface JitsiMeetExternalAPI {
    *  feature `transcription` nel token). `displaySubtitles` mostra o nasconde
    *  i sottotitoli nativi di Jitsi: la sala usa i propri. */
   executeCommand(command: 'setSubtitles', enabled: boolean, displaySubtitles?: boolean, language?: string | null): void;
+  /** Cambia la configurazione della sala dal vivo: per la sala, i pulsanti personalizzati della barra. */
+  executeCommand(command: 'overwriteConfig', config: Record<string, unknown>): void;
   executeCommand(command: string, ...args: unknown[]): void;
 
   // Event listeners

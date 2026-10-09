@@ -1099,6 +1099,10 @@ export default function LiveEventClient({
       const prima = registrazioneVistaRef.current;
       registrazioneVistaRef.current = recording;
       if (prima === recording) return;
+      // «Ferma» senza aver mai visto «accesa» non è un cambio: Jitsi manda lo
+      // stato anche quando si accende o spegne la trascrizione dei
+      // sottotitoli, con la registrazione mai partita.
+      if (prima === null && !recording) return;
       // Il primo stato visto appena entrati e' com'era gia': non un cambio,
       // salvo che l'avvio l'abbia chiesto questo browser.
       const entrato = entratoAlleRef.current;
@@ -1886,6 +1890,7 @@ export default function LiveEventClient({
               whiteboardInfraReady={whiteboardInfraReady}
               videoQuality={event.videoQuality}
               reactionsMode={reactionsMode}
+              liveCaptions={Boolean(event.liveCaptionsAvailable)}
               rnnoiseEnforceOff={rnnoiseEnforceOff}
               startWithVideoMuted={!joinPrefs.cameraOn}
               startWithAudioMuted={!joinPrefs.micOn}

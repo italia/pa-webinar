@@ -97,18 +97,33 @@ describe('LiveCaptions', () => {
     expect(live()).toBe('Relatore 1: Buongiorno a tutti.');
   });
 
-  it('chi guarda li nasconde per sé, e la scelta resta nel browser', () => {
-    const { api, emit } = fakeApi();
+  it('chi guarda li nasconde per sé dal pulsante nella barra di Jitsi, e la scelta resta nel browser', () => {
+    const { api, raw, emit } = fakeApi();
     render(<LiveCaptions api={api} active />);
     act(() => emit('transcriptionChunkReceived', chunk({ messageID: 'm1', stable: 'Testo' })));
-    const toggle = container.querySelector('button') as HTMLButtonElement;
-    expect(toggle.getAttribute('aria-pressed')).toBe('true');
-    act(() => toggle.click());
+    const pulsante = () =>
+      (raw.executeCommand.mock.calls.filter((c) => c[0] === 'overwriteConfig').at(-1)?.[1] as {
+        customToolbarButtons: Array<{ id: string; text: string; icon: string }>;
+      }).customToolbarButtons;
+    expect(pulsante()).toEqual([expect.objectContaining({ id: 'pa-captions', text: 'Nascondi i sottotitoli' })]);
+
+    // Il clic su un altro pulsante personalizzato non li tocca.
+    act(() => emit('toolbarButtonClicked', { key: 'altro' }));
+    expect(container.querySelector('.live-captions__box')).not.toBeNull();
+
+    act(() => emit('toolbarButtonClicked', { key: 'pa-captions' }));
     expect(container.querySelector('.live-captions__box')).toBeNull();
     expect(window.localStorage.getItem('pawebinar.captions.visible')).toBe('0');
+    expect(pulsante()).toEqual([expect.objectContaining({ id: 'pa-captions', text: 'Mostra i sottotitoli' })]);
     // Senza nome noto, un'etichetta generica.
-    act(() => toggle.click());
+    act(() => emit('toolbarButtonClicked', { key: 'pa-captions' }));
     expect(container.querySelector('.live-captions__speaker')?.textContent).toBe('Partecipante');
+  });
+
+  it('spenti per l’evento, il pulsante esce dalla barra', () => {
+    const { api, raw } = fakeApi();
+    render(<LiveCaptions api={api} active={false} />);
+    expect(raw.executeCommand).toHaveBeenCalledWith('overwriteConfig', { customToolbarButtons: [] });
   });
 
   it('accetta anche il frammento senza involucro', () => {

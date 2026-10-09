@@ -359,3 +359,12 @@ describe('Video quality presets', () => {
     expect(a).toEqual(b);
   });
 });
+
+describe('barra principale di Jitsi', () => {
+  it('al massimo otto pulsanti, un elenco per soglia di larghezza, senza «security» (sta nel menu)', () => {
+    const elenchi = jitsiConfigOverwrite.mainToolbarButtons;
+    expect(elenchi.map((e) => e.length)).toEqual([8, 7, 6, 5, 4, 3, 2]);
+    expect(elenchi.flat()).not.toContain('security');
+    expect(elenchi[0]).toContain('pa-captions');
+  });
+});

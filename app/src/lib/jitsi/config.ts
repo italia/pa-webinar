@@ -16,6 +16,8 @@
  * config points at it (DYNAMIC_BRANDING_URL). See lib/jitsi/branding.
  */
 
+import { CAPTIONS_BUTTON_ID } from '@/lib/captions/toolbar-button';
+
 import { JITSI_STAGE_BACKGROUND } from './branding';
 
 /**
@@ -144,6 +146,25 @@ export const jitsiConfigOverwrite = {
 
   // Overridden per role at instantiation
   toolbarButtons: baseToolbarButtons as string[],
+
+  // La barra principale: al massimo otto pulsanti, in quest'ordine; il resto
+  // va nel menu «…» («security», gli sfondi, la lavagna). Jitsi sceglie
+  // l'elenco con tanti pulsanti quanti ne entrano nella larghezza della sala
+  // e lo abbina per lunghezza alle sue soglie (da 8 a 2: le lunghezze devono
+  // restare queste); senza elenchi da 9 e da 10, le due soglie più larghe
+  // non valgono e la barra non supera gli otto. Due regole di Jitsi da
+  // ricordare: i posti che restano liberi li riempie con altri pulsanti, e
+  // un menu «…» con un solo pulsante non lo apre, lo rimette nella barra.
+  // Un pulsante personalizzato che non compare qui finisce sempre nel menu.
+  mainToolbarButtons: [
+    ['microphone', 'camera', 'desktop', 'raisehand', 'reactions', CAPTIONS_BUTTON_ID, 'tileview', 'settings'],
+    ['microphone', 'camera', 'desktop', 'raisehand', 'reactions', CAPTIONS_BUTTON_ID, 'settings'],
+    ['microphone', 'camera', 'raisehand', 'reactions', CAPTIONS_BUTTON_ID, 'settings'],
+    ['microphone', 'camera', 'raisehand', CAPTIONS_BUTTON_ID, 'settings'],
+    ['microphone', 'camera', CAPTIONS_BUTTON_ID, 'raisehand'],
+    ['microphone', 'camera', CAPTIONS_BUTTON_ID],
+    ['microphone', 'camera'],
+  ] as string[][],
 
   notifications: [] as string[],
   disableReactions: true,

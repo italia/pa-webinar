@@ -17,6 +17,7 @@ import {
   type VideoQualityPreset,
 } from '@/lib/jitsi/config';
 import { humanParticipantCount } from '@/lib/jitsi/participants';
+import { captionsToolbarButton, readCaptionsVisible } from '@/lib/captions/toolbar-button';
 import {
   dataUriSfondo,
   leggiSfondo,
@@ -63,6 +64,10 @@ interface JitsiRoomProps {
    *  button in the toolbar (ephemeral, no app analytics); 'CUSTOM' → the app's
    *  ReactionBar overlay (persisted/aggregated). Default 'NATIVE'. */
   reactionsMode?: 'NATIVE' | 'CUSTOM';
+  /** Sottotitoli live disponibili (servizio installato, istanza accesa): il
+   *  pulsante dei sottotitoli entra nella barra, e Jitsi non annuncia più
+   *  la trascrizione come registrazione (vedi sotto). */
+  liveCaptions?: boolean;
   /** Se true (DEFAULT) l'app forza OFF la soppressione rumore avanzata
    *  (rnnoise) di Jitsi e la ri-spegne per tutta la call; se false la accende
    *  a ogni unmute. La soppressione WebRTC di base (AEC/NS/AGC) resta accesa
@@ -127,6 +132,7 @@ export default function JitsiRoom({
   whiteboardInfraReady = false,
   videoQuality,
   reactionsMode = 'NATIVE',
+  liveCaptions = false,
   // Default spento (= rnnoise forzata OFF): un chiamante che dimentica la prop
   // deve ricadere sul comportamento sicuro, non su quello da validare.
   rnnoiseEnforceOff = true,
@@ -317,6 +323,22 @@ export default function JitsiRoom({
       if (!participantsCanShareScreen) {
         toolbarButtons = toolbarButtons.filter(b => b !== 'desktop');
       }
+    }
+
+    // Sottotitoli live (ADR-018). Il pulsante sta nella barra di Jitsi, con i
+    // comandi della chiamata; lo aggiorna e ne ascolta il clic LiveCaptions.
+    //
+    // Jitsi tratta la trascrizione come una registrazione e, a ogni accensione
+    // e spegnimento, fa sentire a tutti l'annuncio vocale «Recording is
+    // on/off»: falso, perché nulla viene registrato. Gli annunci si tolgono
+    // solo nelle sale con i sottotitoli. Per una registrazione vera, mentre
+    // la trascrizione è accesa Jitsi li salta già da sé, e la sala mostra il
+    // proprio avviso di registrazione.
+    if (liveCaptions) {
+      extraConfig.customToolbarButtons = [
+        captionsToolbarButton(readCaptionsVisible(), { show: t('captions.show'), hide: t('captions.hide') }),
+      ];
+      extraConfig.disabledSounds = ['RECORDING_ON_SOUND', 'RECORDING_OFF_SOUND'];
     }
 
     const IFRAME_ALLOW = 'camera; microphone; display-capture; autoplay; clipboard-write; screen-wake-lock';
@@ -710,7 +732,7 @@ export default function JitsiRoom({
   // NOTE: locale is intentionally excluded from deps to prevent iframe
   // recreation (and user disconnection) when the user switches language.
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [domain, roomName, jwt, displayName, role, participantsCanUnmute, participantsCanStartVideo, participantsCanShareScreen, enableFileSharing, whiteboardEnabled, whiteboardInfraReady, videoQuality, reactionsMode, rnnoiseEnforceOff, startWithVideoMuted, startWithAudioMuted, attempt, insecure]);
+  }, [domain, roomName, jwt, displayName, role, participantsCanUnmute, participantsCanStartVideo, participantsCanShareScreen, enableFileSharing, whiteboardEnabled, whiteboardInfraReady, videoQuality, reactionsMode, liveCaptions, rnnoiseEnforceOff, startWithVideoMuted, startWithAudioMuted, attempt, insecure]);
 
   return (
     <div className="jitsi-wrapper position-relative">
