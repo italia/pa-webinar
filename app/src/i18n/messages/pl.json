@@ -196,6 +196,9 @@
     "email": "E-mail",
     "emailPlaceholder": "Otrzymasz link dostępu do wydarzenia",
     "gdprConsent": "Wyrażam zgodę na przetwarzanie moich danych osobowych (imię, e-mail) zgodnie z Rozporządzeniem UE 2016/679 (GDPR) w celu uczestnictwa w tym wydarzeniu.",
+    "consentsLegend": "Zgody",
+    "requiredMark": "wymagane",
+    "optionalMark": "opcjonalne",
     "gdprLink": "Przeczytaj pełną politykę prywatności",
     "submit": "Potwierdź rejestrację",
     "submitting": "Rejestracja w toku...",
@@ -3222,11 +3225,11 @@
     "consent": {
       "recording": "Wyrażam zgodę na nagrywanie audio/wideo wydarzenia",
       "recordingRequired": "Zgoda na nagrywanie jest wymagana do uczestnictwa w tym wydarzeniu",
+      "recordingNotice": "Wydarzenie jest nagrywane (dźwięk i obraz). Uczestniczysz bez mikrofonu i kamery: nagranie nie zawiera Twojego głosu ani wizerunku, chyba że prowadzący udzieli Ci głosu.",
       "multitrack": "Wyrażam zgodę na nagranie osobnej ścieżki dźwiękowej mojego głosu wyłącznie w celu prawidłowego przypisania transkrypcji do osób mówiących. Ścieżka jest tymczasowa i usuwana po transkrypcji; nie służy do identyfikacji ani odtwarzania mojego głosu.",
       "multitrackRequired": "Zgoda na nagrywanie Twojej ścieżki dźwiękowej jest wymagana, aby uczestniczyć w tym wydarzeniu",
-      "futureCommunications": "Chcę otrzymywać informacje o przyszłych wydarzeniach publikowanych na tej platformie",
-      "addressBook": "Chcę zostać wpisany do książki adresowej wydarzeń, aby otrzymywać zaproszenia na podobne wydarzenia",
-      "addressBookHelp": "Oddzielna zgoda (art. 6.1.a RODO). Możesz ją wycofać w dowolnej chwili za pomocą linku \"Usuń moje dane z książki adresowej\" w otrzymywanych e-mailach. Imię i organizacja zostaną pobrane z profilu rejestracyjnego."
+      "stayInTouch": "Chcę otrzymywać informacje o nadchodzących wydarzeniach i zostać dodany do książki adresowej, aby otrzymywać zaproszenia na podobne wydarzenia",
+      "stayInTouchHelp": "Zgoda opcjonalna (art. 6.1.a RODO). Możesz ją wycofać w dowolnym momencie linkiem „Usuń mnie z książki adresowej” w otrzymywanych e-mailach. Imię i organizacja pochodzą z tej rejestracji."
     },
     "export": {
       "title": "Moje dane",

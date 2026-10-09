@@ -196,6 +196,9 @@
     "email": "Correo electrónico",
     "emailPlaceholder": "Recibirá el enlace de acceso al evento",
     "gdprConsent": "Consiento el tratamiento de mis datos personales (nombre, correo electrónico) conforme al Reglamento UE 2016/679 (GDPR) para la participación en este evento.",
+    "consentsLegend": "Consentimientos",
+    "requiredMark": "obligatorio",
+    "optionalMark": "opcional",
     "gdprLink": "Leer la política de privacidad completa",
     "submit": "Confirmar inscripción",
     "submitting": "Inscripción en curso...",
@@ -3222,11 +3225,11 @@
     "consent": {
       "recording": "Consiento la grabación de audio/vídeo de este evento",
       "recordingRequired": "El consentimiento para la grabación es obligatorio para participar en este evento",
+      "recordingNotice": "El evento se graba (audio y vídeo). Participas sin micrófono ni cámara: la grabación no contiene tu voz ni tu imagen, salvo que quien modera te dé la palabra.",
       "multitrack": "Consiento la grabación de una pista de audio separada de mi voz, con el único fin de atribuir correctamente la transcripción a cada persona que habla. La pista es temporal y se elimina tras la transcripción; no se usa para identificar ni reproducir mi voz.",
       "multitrackRequired": "El consentimiento para grabar tu pista de audio es obligatorio para participar en este evento",
-      "futureCommunications": "Deseo recibir información sobre los próximos eventos publicados en esta plataforma",
-      "addressBook": "Quiero ser incluido en la Agenda de eventos para recibir invitaciones a eventos similares",
-      "addressBookHelp": "Consentimiento separado (art. 6.1.a RGPD). Podrá revocarlo en cualquier momento desde el enlace \"Eliminar mis datos de la agenda\" en los correos que reciba. El nombre y la organización se obtienen del perfil de registro."
+      "stayInTouch": "Quiero recibir información sobre los próximos eventos y entrar en la libreta de direcciones, para que me inviten a eventos similares",
+      "stayInTouchHelp": "Consentimiento opcional (art. 6.1.a RGPD). Puedes retirarlo en cualquier momento con el enlace «Quitarme de la libreta de direcciones» en los correos que recibas. El nombre y la organización son los de esta inscripción."
     },
     "export": {
       "title": "Mis datos",

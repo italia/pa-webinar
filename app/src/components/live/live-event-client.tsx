@@ -30,6 +30,7 @@ import JitsiRoom from '@/components/jitsi/jitsi-room';
 import { LivePushContext, useLivePush, useLiveState } from '@/hooks/use-live-state';
 import { useQaAlerts } from '@/hooks/use-qa-alerts';
 import RecordingConsent from '@/components/jitsi/recording-consent';
+import { consensiRichiesti } from '@/lib/registration/consents';
 import ModeratorControls from '@/components/jitsi/moderator-controls';
 import QAPanel from '@/components/qa/qa-panel';
 import PollPanel from '@/components/polls/poll-panel';
@@ -1607,6 +1608,17 @@ export default function LiveEventClient({
           onAccept={handleConsentAccept}
           onDecline={handleConsentDecline}
           customConsentText={event.recordingConsentText}
+          // Evento di solo ascolto: la stessa informativa dell'iscrizione,
+          // non un consenso che l'iscrizione aveva detto non servire.
+          listenOnly={
+            consensiRichiesti({
+              recordingEnabled: event.recordingEnabled,
+              multitrackRecordingEnabled: event.multitrackRecordingEnabled ?? false,
+              participantsCanUnmute: event.participantsCanUnmute,
+              participantsCanStartVideo: event.participantsCanStartVideo,
+              participantsCanShareScreen: event.participantsCanShareScreen,
+            }).avvisoRegistrazione
+          }
         />
       </>
     );

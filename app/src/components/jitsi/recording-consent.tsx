@@ -9,14 +9,19 @@ interface RecordingConsentProps {
   onAccept: () => void;
   onDecline: () => void;
   customConsentText?: string | null;
+  /** Chi entra non ha né microfono, né videocamera, né schermo: si informa
+   *  come all'iscrizione (lib/registration/consents). */
+  listenOnly?: boolean;
 }
 
 export default function RecordingConsent({
   onAccept,
   onDecline,
   customConsentText,
+  listenOnly = false,
 }: RecordingConsentProps) {
   const t = useTranslations('live');
+  const tg = useTranslations('gdpr');
 
   return (
     <div
@@ -34,7 +39,7 @@ export default function RecordingConsent({
         />
         <h2 className="h4 mb-3">{t('recordingConsentTitle')}</h2>
         <p className="mb-4" style={{ whiteSpace: 'pre-wrap' }}>
-          {customConsentText || t('recordingConsent')}
+          {listenOnly ? tg('consent.recordingNotice') : customConsentText || t('recordingConsent')}
         </p>
 
         <div className="d-flex justify-content-center gap-3">

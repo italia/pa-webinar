@@ -196,6 +196,9 @@
     "email": "E-post",
     "emailPlaceholder": "Du får en länk för att delta i evenemanget",
     "gdprConsent": "Jag samtycker till behandlingen av mina personuppgifter (namn, e-post) i enlighet med EU-förordning 2016/679 (GDPR) för deltagande i detta evenemang.",
+    "consentsLegend": "Samtycken",
+    "requiredMark": "obligatoriskt",
+    "optionalMark": "valfritt",
     "gdprLink": "Läs den fullständiga integritetspolicyn",
     "submit": "Bekräfta anmälan",
     "submitting": "Anmäler...",
@@ -3222,11 +3225,11 @@
     "consent": {
       "recording": "Jag samtycker till ljud-/videoinspelning av detta evenemang",
       "recordingRequired": "Samtycke till inspelning krävs för att delta i detta evenemang",
+      "recordingNotice": "Evenemanget spelas in (ljud och bild). Du deltar utan mikrofon och kamera: inspelningen innehåller inte din röst eller bild, om inte värden ger dig ordet.",
       "multitrack": "Jag samtycker till inspelning av ett separat ljudspår med min röst, enbart för att transkriptionen ska kunna tillskrivas rätt talare. Spåret är tillfälligt och raderas efter transkriptionen; det används inte för att identifiera eller återge min röst.",
       "multitrackRequired": "Samtycke till inspelning av ditt ljudspår krävs för att delta i detta evenemang",
-      "futureCommunications": "Jag vill ta emot information om kommande evenemang som publiceras på den här plattformen",
-      "addressBook": "Jag vill läggas till i evenemangsadressboken för att bli inbjuden till liknande evenemang",
-      "addressBookHelp": "Separat samtycke (GDPR art. 6.1.a). Du kan återkalla det när som helst via länken \"Ta bort mina uppgifter från adressboken\" i de mejl du får. Namn och organisation hämtas från din anmälningsprofil."
+      "stayInTouch": "Jag vill få information om kommande evenemang och läggas till i adressboken för att bjudas in till liknande evenemang",
+      "stayInTouchHelp": "Frivilligt samtycke (art. 6.1.a GDPR). Du kan när som helst återkalla det via länken ”Ta bort mig från adressboken” i de e-postmeddelanden du får. Namn och organisation är de från den här anmälan."
     },
     "export": {
       "title": "Mina uppgifter",

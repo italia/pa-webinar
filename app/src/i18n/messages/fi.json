@@ -196,6 +196,9 @@
     "email": "Sähköposti",
     "emailPlaceholder": "Saat linkin tapahtumaan osallistumista varten",
     "gdprConsent": "Suostun henkilötietojeni (nimi, sähköposti) käsittelyyn EU:n asetuksen 2016/679 (GDPR) mukaisesti tähän tapahtumaan osallistumista varten.",
+    "consentsLegend": "Suostumukset",
+    "requiredMark": "pakollinen",
+    "optionalMark": "vapaaehtoinen",
     "gdprLink": "Lue koko tietosuojaseloste",
     "submit": "Vahvista ilmoittautuminen",
     "submitting": "Ilmoittaudutaan...",
@@ -3222,11 +3225,11 @@
     "consent": {
       "recording": "Suostun tämän tapahtuman ääni-/videotallennukseen",
       "recordingRequired": "Suostumus tallennukseen on pakollinen tähän tapahtumaan osallistumiseksi",
+      "recordingNotice": "Tapahtuma tallennetaan (ääni ja kuva). Osallistut ilman mikrofonia ja kameraa: tallenne ei sisällä ääntäsi eikä kuvaasi, ellei juontaja anna sinulle puheenvuoroa.",
       "multitrack": "Suostun siihen, että ääneni tallennetaan erilliselle ääniraidalle yksinomaan siksi, että litterointi kohdistetaan oikein kullekin puhujalle. Raita on väliaikainen ja poistetaan litteroinnin jälkeen; sitä ei käytetä ääneni tunnistamiseen tai toistamiseen.",
       "multitrackRequired": "Suostumus ääniraitasi tallentamiseen on pakollinen tähän tapahtumaan osallistumiseksi",
-      "futureCommunications": "Haluan saada tietoa tällä alustalla julkaistavista tulevista tapahtumista",
-      "addressBook": "Haluan, että minut lisätään tapahtumien osoitekirjaan, jotta minut voidaan kutsua vastaaviin tapahtumiin",
-      "addressBookHelp": "Erillinen suostumus (GDPR art. 6.1.a). Voit peruuttaa sen milloin tahansa saamissasi sähköposteissa olevasta linkistä \"Poista tietoni osoitekirjasta\". Nimi ja organisaatio otetaan ilmoittautumisprofiilista."
+      "stayInTouch": "Haluan saada tietoa tulevista tapahtumista ja tulla lisätyksi osoitekirjaan, jotta minut kutsutaan vastaaviin tapahtumiin",
+      "stayInTouchHelp": "Vapaaehtoinen suostumus (tietosuoja-asetuksen 6.1.a artikla). Voit perua sen milloin tahansa saamiesi sähköpostien linkillä ”Poista minut osoitekirjasta”. Nimi ja organisaatio ovat tämän ilmoittautumisen mukaiset."
     },
     "export": {
       "title": "Omat tietoni",

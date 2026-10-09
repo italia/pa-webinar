@@ -196,6 +196,9 @@
     "email": "Email",
     "emailPlaceholder": "Riceverai il link per accedere all'evento",
     "gdprConsent": "Acconsento al trattamento dei miei dati personali (nome, email) ai sensi del Regolamento UE 2016/679 (GDPR) per la partecipazione a questo evento.",
+    "consentsLegend": "Consensi",
+    "requiredMark": "obbligatorio",
+    "optionalMark": "facoltativo",
     "gdprLink": "Leggi l'informativa completa sulla privacy",
     "submit": "Conferma iscrizione",
     "submitting": "Iscrizione in corso...",
@@ -3222,11 +3225,11 @@
     "consent": {
       "recording": "Acconsento alla videoregistrazione dell'evento (audio e video)",
       "recordingRequired": "Il consenso alla videoregistrazione è obbligatorio per partecipare a questo evento",
+      "recordingNotice": "L'evento viene registrato (audio e video). Partecipi senza microfono né videocamera: la registrazione non contiene la tua voce né la tua immagine, a meno che chi conduce non ti dia la parola.",
       "multitrack": "Acconsento alla registrazione di una traccia audio separata della mia voce, al solo scopo di attribuire correttamente la trascrizione a chi parla. La traccia è temporanea e cancellata dopo la trascrizione; non viene usata per identificare o riprodurre la mia voce.",
       "multitrackRequired": "Il consenso alla registrazione della tua traccia audio è obbligatorio per partecipare a questo evento",
-      "futureCommunications": "Desidero ricevere informazioni sui prossimi eventi pubblicati su questa piattaforma",
-      "addressBook": "Voglio essere inserito nella rubrica degli eventi per essere invitato a eventi simili",
-      "addressBookHelp": "Consenso separato (art. 6.1.a GDPR). Potrai revocarlo in qualsiasi momento dal link \"Rimuovi i miei dati dalla rubrica\" nelle email che riceverai. Il nome e l'organizzazione saranno ricavati dal profilo di registrazione."
+      "stayInTouch": "Voglio ricevere informazioni sui prossimi eventi ed essere inserito nella rubrica, per essere invitato a eventi simili",
+      "stayInTouchHelp": "Consenso facoltativo (art. 6.1.a GDPR). Puoi revocarlo in qualsiasi momento dal link «Rimuovi i miei dati dalla rubrica» nelle email che riceverai. Nome e organizzazione sono quelli di questa iscrizione."
     },
     "export": {
       "title": "I miei dati",

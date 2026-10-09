@@ -196,6 +196,9 @@
     "email": "E-mail",
     "emailPlaceholder": "Receberá a ligação de acesso ao evento",
     "gdprConsent": "Autorizo o tratamento dos meus dados pessoais (nome, email) nos termos do Regulamento UE 2016/679 (GDPR) para a participação neste evento.",
+    "consentsLegend": "Consentimentos",
+    "requiredMark": "obrigatório",
+    "optionalMark": "opcional",
     "gdprLink": "Ler a política de privacidade completa",
     "submit": "Confirmar inscrição",
     "submitting": "A inscrever...",
@@ -3222,11 +3225,11 @@
     "consent": {
       "recording": "Autorizo a gravação áudio/vídeo do evento",
       "recordingRequired": "O consentimento para a gravação é obrigatório para participar neste evento",
+      "recordingNotice": "O evento é gravado (áudio e vídeo). Participa sem microfone nem câmara: a gravação não contém a sua voz nem a sua imagem, salvo se quem modera lhe der a palavra.",
       "multitrack": "Consinto a gravação de uma faixa de áudio separada da minha voz, com o único objetivo de atribuir corretamente a transcrição a cada pessoa que fala. A faixa é temporária e eliminada após a transcrição; não é usada para identificar nem reproduzir a minha voz.",
       "multitrackRequired": "O consentimento para a gravação da sua faixa de áudio é obrigatório para participar neste evento",
-      "futureCommunications": "Desejo receber informações sobre os próximos eventos publicados nesta plataforma",
-      "addressBook": "Quero ser inserido na agenda de eventos para ser convidado para eventos semelhantes",
-      "addressBookHelp": "Consentimento separado (art. 6.1.a RGPD). Poderá revogá-lo a qualquer momento através da ligação \"Remover os meus dados da agenda\" presente nos e-mails que receber. O nome e a organização serão obtidos a partir do perfil de inscrição."
+      "stayInTouch": "Quero receber informações sobre os próximos eventos e ser incluído no livro de endereços, para ser convidado para eventos semelhantes",
+      "stayInTouchHelp": "Consentimento facultativo (art. 6.1.a RGPD). Pode retirá-lo a qualquer momento através da ligação «Remover-me do livro de endereços» nos e-mails que receber. O nome e a organização são os desta inscrição."
     },
     "export": {
       "title": "Os meus dados",

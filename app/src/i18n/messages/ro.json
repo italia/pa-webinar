@@ -196,6 +196,9 @@
     "email": "E-mail",
     "emailPlaceholder": "Veți primi linkul de acces la eveniment",
     "gdprConsent": "Consimt la prelucrarea datelor mele personale (nume, email) în conformitate cu Regulamentul UE 2016/679 (GDPR) pentru participarea la acest eveniment.",
+    "consentsLegend": "Consimțăminte",
+    "requiredMark": "obligatoriu",
+    "optionalMark": "opțional",
     "gdprLink": "Citiți politica de confidențialitate completă",
     "submit": "Confirmați înscrierea",
     "submitting": "Înscriere în curs...",
@@ -3222,11 +3225,11 @@
     "consent": {
       "recording": "Consimt la înregistrarea audio/video a evenimentului",
       "recordingRequired": "Consimțământul pentru înregistrare este obligatoriu pentru a participa la acest eveniment",
+      "recordingNotice": "Evenimentul este înregistrat (audio și video). Participi fără microfon și cameră: înregistrarea nu conține vocea sau imaginea ta, decât dacă moderatorul îți dă cuvântul.",
       "multitrack": "Consimt la înregistrarea unei piste audio separate a vocii mele, exclusiv în scopul atribuirii corecte a transcrierii fiecărui vorbitor. Pista este temporară și ștearsă după transcriere; nu este folosită pentru a identifica sau reproduce vocea mea.",
       "multitrackRequired": "Consimțământul pentru înregistrarea pistei tale audio este obligatoriu pentru a participa la acest eveniment",
-      "futureCommunications": "Doresc să primesc informații despre evenimentele viitoare publicate pe această platformă",
-      "addressBook": "Doresc să fiu inclus în agenda de evenimente pentru a fi invitat la evenimente similare",
-      "addressBookHelp": "Consimțământ separat (art. 6.1.a RGPD). Îl puteți retrage în orice moment prin linkul „Eliminați-mi datele din agendă” din e-mailurile pe care le veți primi. Numele și organizația vor fi preluate din profilul de înregistrare."
+      "stayInTouch": "Vreau să primesc informații despre evenimentele viitoare și să fiu adăugat în agenda de contacte, pentru a fi invitat la evenimente similare",
+      "stayInTouchHelp": "Consimțământ opțional (art. 6.1.a GDPR). Îl poți retrage oricând prin linkul „Elimină-mă din agenda de contacte” din e-mailurile pe care le primești. Numele și organizația sunt cele din această înscriere."
     },
     "export": {
       "title": "Datele mele",

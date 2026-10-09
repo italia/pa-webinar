@@ -132,6 +132,9 @@ export default async function RegistrationPage({
             privacyPolicyText={privacyText}
             recordingEnabled={event.recordingEnabled}
             multitrackRecordingEnabled={event.multitrackRecordingEnabled}
+            participantsCanUnmute={event.participantsCanUnmute}
+            participantsCanStartVideo={event.participantsCanStartVideo}
+            participantsCanShareScreen={event.participantsCanShareScreen}
             hasPreRegistrationQuestionnaire={!!preRegistrationQuestionnaire}
             startsAt={event.startsAt.toISOString()}
             waitingRoomLeadMinutes={settings.waitingRoomLeadMinutes}

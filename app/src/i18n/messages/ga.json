@@ -196,6 +196,9 @@
     "email": "Ríomhphost",
     "emailPlaceholder": "Gheobhaidh sibh an nasc chun rochtain a fháil ar an imeacht",
     "gdprConsent": "Toilím le próiseáil mo shonraí pearsanta (ainm, ríomhphost) de réir Rialachán AE 2016/679 (GDPR) chun páirt a ghlacadh san imeacht seo.",
+    "consentsLegend": "Toilithe",
+    "requiredMark": "riachtanach",
+    "optionalMark": "roghnach",
     "gdprLink": "Léigh an beartas príobháideachta iomlán",
     "submit": "Deimhnigh clárú",
     "submitting": "Ag clárú...",
@@ -3222,11 +3225,11 @@
     "consent": {
       "recording": "Toilím le taifeadadh fuaime/físe an imeachta seo",
       "recordingRequired": "Tá toiliú leis an taifeadadh riachtanach chun páirt a ghlacadh san imeacht seo",
+      "recordingNotice": "Taifeadtar an t-imeacht (fuaim agus físeán). Glacann tú páirt gan micreafón ná ceamara: níl do ghuth ná d'íomhá sa taifeadadh, ach amháin má thugann an t-óstach an t-urlár duit.",
       "multitrack": "Toilím le taifeadadh rian fuaime ar leith de mo ghuth, chun na críche amháin an tras-scríbhinn a chur i leith gach cainteora i gceart. Tá an rian sealadach agus scriostar é tar éis na tras-scríbhinne; ní úsáidtear é chun mo ghuth a aithint ná a atáirgeadh.",
       "multitrackRequired": "Tá toiliú le taifeadadh do riain fuaime riachtanach chun páirt a ghlacadh san imeacht seo",
-      "futureCommunications": "Ba mhaith liom eolas a fháil faoi imeachtaí atá le teacht a fhoilsítear ar an ardán seo",
-      "addressBook": "Ba mhaith liom a bheith curtha le leabhar seoltaí na n-imeachtaí chun cuireadh a fháil chuig imeachtaí cosúla",
-      "addressBookHelp": "Toiliú ar leith (airteagal 6.1.a GDPR). Is féidir é a tharraingt siar tráth ar bith tríd an nasc \"Bain mé den leabhar seoltaí\" sna ríomhphoist a gheobhaidh tú. Glactar an t-ainm agus an eagraíocht ón bpróifíl chlárúcháin."
+      "stayInTouch": "Ba mhaith liom eolas a fháil faoi imeachtaí atá le teacht agus a bheith curtha leis an leabhar seoltaí, le cuireadh a fháil chuig imeachtaí cosúla",
+      "stayInTouchHelp": "Toiliú roghnach (airt. 6.1.a RGCS). Is féidir leat é a tharraingt siar am ar bith leis an nasc \"Bain mé den leabhar seoltaí\" sna ríomhphoist a gheobhaidh tú. Is iad an t-ainm agus an eagraíocht iad siúd ón gclárú seo."
     },
     "export": {
       "title": "Mo chuid sonraí",

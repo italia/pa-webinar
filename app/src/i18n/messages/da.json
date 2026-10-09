@@ -196,6 +196,9 @@
     "email": "E-mail",
     "emailPlaceholder": "Du modtager adgangslinket til begivenheden",
     "gdprConsent": "Jeg giver samtykke til behandling af mine personoplysninger (navn, e-mail) i henhold til EU-forordning 2016/679 (GDPR) med henblik på deltagelse i denne begivenhed.",
+    "consentsLegend": "Samtykker",
+    "requiredMark": "påkrævet",
+    "optionalMark": "valgfrit",
     "gdprLink": "Læs den fulde privatlivspolitik",
     "submit": "Bekræft tilmelding",
     "submitting": "Tilmelder...",
@@ -3222,11 +3225,11 @@
     "consent": {
       "recording": "Jeg giver samtykke til lyd-/videooptagelse af denne begivenhed",
       "recordingRequired": "Samtykke til optagelse er påkrævet for at deltage i denne begivenhed",
+      "recordingNotice": "Arrangementet optages (lyd og video). Du deltager uden mikrofon og kamera: optagelsen indeholder ikke din stemme eller dit billede, medmindre værten giver dig ordet.",
       "multitrack": "Jeg samtykker til optagelse af et separat lydspor med min stemme, alene med det formål at tilskrive transskriptionen den rette taler. Sporet er midlertidigt og slettes efter transskriptionen; det bruges ikke til at identificere eller gengive min stemme.",
       "multitrackRequired": "Samtykke til optagelse af dit lydspor er påkrævet for at deltage i denne begivenhed",
-      "futureCommunications": "Jeg ønsker at modtage information om kommende arrangementer, der offentliggøres på denne platform",
-      "addressBook": "Jeg ønsker at blive optaget i arrangementsadressebogen for at blive inviteret til lignende arrangementer",
-      "addressBookHelp": "Separat samtykke (GDPR art. 6.1.a). Du kan til enhver tid trække det tilbage via linket \"Fjern mine data fra adressebogen\" i de e-mails, du modtager. Navn og organisation hentes fra din tilmeldingsprofil."
+      "stayInTouch": "Jeg vil gerne modtage information om kommende arrangementer og føjes til adressebogen for at blive inviteret til lignende arrangementer",
+      "stayInTouchHelp": "Valgfrit samtykke (GDPR art. 6.1.a). Du kan til enhver tid trække det tilbage via linket »Fjern mig fra adressebogen« i de e-mails, du modtager. Navn og organisation er dem fra denne tilmelding."
     },
     "export": {
       "title": "Mine data",

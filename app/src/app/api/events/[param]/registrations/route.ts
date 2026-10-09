@@ -20,6 +20,7 @@ import { upsertPersonOnRegistration } from '@/lib/persons';
 import { isEventOpenForRegistration } from '@/lib/events/visibility';
 import { isInvited } from '@/lib/events/registration-access';
 import { registrationJoinUrl } from '@/lib/events/registration-link';
+import { consensiRichiesti } from '@/lib/registration/consents';
 import { getSettings } from '@/lib/settings';
 import { localizedUrl } from '@/lib/utils/localized-url';
 import {
@@ -92,14 +93,16 @@ export const POST = withErrorHandling(async (request, context) => {
     linguaDaIntestazione(request.headers.get('Accept-Language')) ??
     defaultLocale;
 
-  // If recording is enabled, consentRecording must be true
-  if (event.recordingEnabled && consentRecording !== true) {
+  // I consensi obbligatori dipendono dal formato dell'evento: la stessa regola
+  // del modulo (lib/registration/consents).
+  const richiesti = consensiRichiesti(event);
+  if (richiesti.registrazione && consentRecording !== true) {
     throw new ValidationError('Validation failed', [{ path: ['consentRecording'], message: 'registration.errors.recordingConsentRequired' }]);
   }
 
-  // ADR-013 Fase 5 — se l'evento registra le tracce per-partecipante,
-  // serve il consenso esplicito separato (PII sensibile).
-  if (event.multitrackRecordingEnabled && consentMultitrack !== true) {
+  // ADR-013 Fase 5 — la traccia audio per persona chiede un consenso esplicito
+  // separato (PII sensibile), ogni volta che l'evento la registra.
+  if (richiesti.tracce && consentMultitrack !== true) {
     throw new ValidationError('Validation failed', [{ path: ['consentMultitrack'], message: 'registration.errors.multitrackConsentRequired' }]);
   }
 
@@ -149,8 +152,8 @@ export const POST = withErrorHandling(async (request, context) => {
         organizationType: organizationType || null,
         consentGiven,
         consentTimestamp: new Date(),
-        consentRecording: event.recordingEnabled ? (consentRecording ?? false) : null,
-        consentMultitrack: event.multitrackRecordingEnabled ? (consentMultitrack ?? false) : null,
+        consentRecording: richiesti.registrazione ? (consentRecording ?? false) : null,
+        consentMultitrack: richiesti.tracce ? (consentMultitrack ?? false) : null,
         consentFutureCommunications: consentFutureCommunications ?? false,
         locale: pageLocale,
         accessToken,
@@ -166,8 +169,11 @@ export const POST = withErrorHandling(async (request, context) => {
         recordCount: 1,
         details: JSON.stringify({
           consentGiven: true,
-          consentRecording: event.recordingEnabled ? (consentRecording ?? false) : null,
-          consentMultitrack: event.multitrackRecordingEnabled ? (consentMultitrack ?? false) : null,
+          consentRecording: richiesti.registrazione ? (consentRecording ?? false) : null,
+          // Il fatto lato server: la regola dell'evento chiedeva o no il
+          // consenso alla registrazione (altrimenti l'iscrizione informa).
+          recordingConsentRequired: richiesti.registrazione,
+          consentMultitrack: richiesti.tracce ? (consentMultitrack ?? false) : null,
           consentFutureCommunications: consentFutureCommunications ?? false,
           consentAddressBook: consentAddressBook === true,
         }),

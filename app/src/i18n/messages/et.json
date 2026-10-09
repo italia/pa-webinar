@@ -196,6 +196,9 @@
     "email": "E-post",
     "emailPlaceholder": "Saate üritusele ligipääsu lingi",
     "gdprConsent": "Nõustun oma isikuandmete (nimi, e-post) töötlemisega vastavalt ELi määrusele 2016/679 (GDPR) selles üritusel osalemiseks.",
+    "consentsLegend": "Nõusolekud",
+    "requiredMark": "kohustuslik",
+    "optionalMark": "valikuline",
     "gdprLink": "Lugege täielikku privaatsuspoliitikat",
     "submit": "Kinnita registreerumine",
     "submitting": "Registreerimine...",
@@ -3222,11 +3225,11 @@
     "consent": {
       "recording": "Nõustun selle ürituse heli-/videosalvestamisega",
       "recordingRequired": "Selles üritusel osalemiseks on nõutav salvestamise nõusolek",
+      "recordingNotice": "Üritus salvestatakse (heli ja video). Osalete ilma mikrofoni ja kaamerata: salvestis ei sisalda teie häält ega pilti, välja arvatud juhul, kui moderaator annab teile sõna.",
       "multitrack": "Nõustun oma hääle salvestamisega eraldi helirajale ainsa eesmärgiga omistada transkriptsioon õigesti igale kõnelejale. Rada on ajutine ja kustutatakse pärast transkribeerimist; seda ei kasutata minu hääle tuvastamiseks ega taasesitamiseks.",
       "multitrackRequired": "Nõusolek sinu heliraja salvestamiseks on sellel sündmusel osalemiseks kohustuslik",
-      "futureCommunications": "Soovin saada teavet sellel platvormil avaldatavate tulevaste ürituste kohta",
-      "addressBook": "Soovin olla ürituste aadressraamatus, et saada kutseid sarnastele sündmustele",
-      "addressBookHelp": "Eraldi nõusolek (IKÜM art. 6.1.a). Saate selle igal ajal tagasi võtta lingiga \"Eemalda mu andmed aadressraamatust\" saadud e-kirjades. Nimi ja organisatsioon võetakse registreerimisprofiilist."
+      "stayInTouch": "Soovin saada teavet eelseisvate ürituste kohta ja olla lisatud aadressiraamatusse, et mind kutsutaks sarnastele üritustele",
+      "stayInTouchHelp": "Vabatahtlik nõusolek (IKÜM art 6.1.a). Saate selle igal ajal tagasi võtta e-kirjades oleva lingiga „Eemalda mind aadressiraamatust“. Nimi ja organisatsioon on selle registreerimise omad."
     },
     "export": {
       "title": "Minu andmed",

@@ -141,10 +141,12 @@ language with **Settings** > **Languages** > **Custom translations**.
 | Box | Shown | Required | Key to reword |
 |---|---|---|---|
 | Participation | Always, with a statistical purpose appended when organization fields are on | Yes | `registration.gdprConsent`, `registration.gdprConsentProfiling` |
-| Audio and video recording | When `recordingEnabled` is on | Yes | `gdpr.consent.recording` |
-| Per-participant audio track | When `multitrackRecordingEnabled` is on | Yes | `gdpr.consent.multitrack` |
-| Future communications | Always | No | `gdpr.consent.futureCommunications` |
-| Address book | Always | No | `gdpr.consent.addressBook`, `gdpr.consent.addressBookHelp`; see [Address book](#address-book) |
+| Audio and video recording | When `recordingEnabled` is on and participants may use the microphone, camera or screen. Otherwise the form shows an information notice instead of a box, and so does the live room's dialog | Yes | `gdpr.consent.recording`; the notice is `gdpr.consent.recordingNotice` |
+| Per-participant audio track | When `multitrackRecordingEnabled` is on, also for listen-only events | Yes | `gdpr.consent.multitrack` |
+| Upcoming events and address book | Always, one box for being contacted about upcoming events: it sets both `consentFutureCommunications` and the address-book opt-in, and the address-book withdrawal link revokes both | No | `gdpr.consent.stayInTouch`, `gdpr.consent.stayInTouchHelp`; see [Address book](#address-book) |
+
+The form groups the boxes under **Consents** and marks each one **required** or **optional**. Rules in
+`app/src/lib/registration/consents.ts`.
 
 ## Checklist by notice section
 

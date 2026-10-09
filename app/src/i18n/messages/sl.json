@@ -196,6 +196,9 @@
     "email": "E-pošta",
     "emailPlaceholder": "Prejeli boste povezavo za dostop do dogodka",
     "gdprConsent": "Soglašam z obdelavo mojih osebnih podatkov (ime, e-pošta) v skladu z Uredbo EU 2016/679 (GDPR) za udeležbo na tem dogodku.",
+    "consentsLegend": "Soglasja",
+    "requiredMark": "obvezno",
+    "optionalMark": "neobvezno",
     "gdprLink": "Preberite celotno politiko zasebnosti",
     "submit": "Potrdite prijavo",
     "submitting": "Prijava poteka...",
@@ -3222,11 +3225,11 @@
     "consent": {
       "recording": "Soglašam z avdio/video snemanjem dogodka",
       "recordingRequired": "Soglasje s snemanjem je obvezno za udeležbo na tem dogodku",
+      "recordingNotice": "Dogodek se snema (zvok in slika). Sodeluješ brez mikrofona in kamere: posnetek ne vsebuje tvojega glasu ali podobe, razen če ti voditelj da besedo.",
       "multitrack": "Soglašam s snemanjem ločene zvočne sledi svojega glasu izključno za namen pravilnega pripisa prepisa posameznim govorcem. Sled je začasna in se po prepisu izbriše; ne uporablja se za prepoznavo ali predvajanje mojega glasu.",
       "multitrackRequired": "Soglasje za snemanje vaše zvočne sledi je za udeležbo na tem dogodku obvezno",
-      "futureCommunications": "Želim prejemati informacije o prihodnjih dogodkih, objavljenih na tej platformi",
-      "addressBook": "Želim biti vključen v imenik dogodkov za prejemanje vabil na podobne dogodke",
-      "addressBookHelp": "Ločeno soglasje (čl. 6.1.a GDPR). Prekličete ga lahko kadar koli prek povezave „Odstrani moje podatke iz imenika“ v prejetih e-poštnih sporočilih. Ime in organizacija se prevzameta iz profila prijave."
+      "stayInTouch": "Želim prejemati informacije o prihodnjih dogodkih in biti dodan v imenik, da me povabijo na podobne dogodke",
+      "stayInTouchHelp": "Neobvezno soglasje (člen 6.1.a GDPR). Kadar koli ga lahko prekličeš s povezavo »Odstrani me iz imenika« v e-poštnih sporočilih, ki jih prejmeš. Ime in organizacija sta iz te prijave."
     },
     "export": {
       "title": "Moji podatki",

@@ -16,6 +16,7 @@ import { Link, useRouter, percorso } from '@/i18n/navigation';
 import QuestionnaireForm from '@/components/questionnaires/questionnaire-form';
 import { createRegistrationSchema, ORGANIZATION_TYPES } from '@/lib/validation/schemas';
 import type { RegistrationAccess } from '@/lib/events/registration-access';
+import { consensiRichiesti } from '@/lib/registration/consents';
 
 interface ProfilingConfig {
   requireOrganization: boolean;
@@ -29,6 +30,11 @@ interface RegistrationFormClientProps {
   privacyPolicyText?: string;
   recordingEnabled?: boolean;
   multitrackRecordingEnabled?: boolean;
+  /** Cosa l'evento concede ai partecipanti: decide quali consensi chiedere
+   *  (lib/registration/consents). */
+  participantsCanUnmute?: boolean;
+  participantsCanStartVideo?: boolean;
+  participantsCanShareScreen?: boolean;
   /** When the event has a PRE_REGISTRATION questionnaire, the success
    *  screen must show it (and stay put) instead of auto-redirecting the
    *  user into the waiting room. */
@@ -55,8 +61,11 @@ export default function RegistrationFormClient({
   eventSlug,
   privacyPolicyUrl,
   privacyPolicyText,
-  recordingEnabled,
-  multitrackRecordingEnabled,
+  recordingEnabled = false,
+  multitrackRecordingEnabled = false,
+  participantsCanUnmute = false,
+  participantsCanStartVideo = false,
+  participantsCanShareScreen = false,
   hasPreRegistrationQuestionnaire,
   startsAt,
   waitingRoomLeadMinutes,
@@ -77,11 +86,17 @@ export default function RegistrationFormClient({
   const [consentGiven, setConsentGiven] = useState(false);
   const [consentRecording, setConsentRecording] = useState(false);
   const [consentMultitrack, setConsentMultitrack] = useState(false);
-  const [consentFutureCommunications, setConsentFutureCommunications] = useState(false);
-  // Rubrica (address book) opt-in — separate Art. 6.1.a consent from the
-  // event-registration Art. 6.1.b basis. Default unchecked, as GDPR
-  // requires an affirmative act.
-  const [consentAddressBook, setConsentAddressBook] = useState(false);
+  // Restare in contatto: informazioni sui prossimi eventi e rubrica, una sola
+  // casella per due scopi affini e dichiarati entrambi nel testo (art. 6.1.a,
+  // facoltativo, mai spuntata in partenza). Si salvano entrambi i consensi.
+  const [consentStayInTouch, setConsentStayInTouch] = useState(false);
+  const richiesti = consensiRichiesti({
+    recordingEnabled,
+    multitrackRecordingEnabled,
+    participantsCanUnmute,
+    participantsCanStartVideo,
+    participantsCanShareScreen,
+  });
   const [privacyExpanded, setPrivacyExpanded] = useState(false);
 
   const [orgSuggestions, setOrgSuggestions] = useState<string[]>([]);
@@ -140,11 +155,11 @@ export default function RegistrationFormClient({
       displayName,
       email,
       consentGiven,
-      consentFutureCommunications,
-      consentAddressBook,
+      consentFutureCommunications: consentStayInTouch,
+      consentAddressBook: consentStayInTouch,
     };
-    if (recordingEnabled) payload.consentRecording = consentRecording;
-    if (multitrackRecordingEnabled) payload.consentMultitrack = consentMultitrack;
+    if (richiesti.registrazione) payload.consentRecording = consentRecording;
+    if (richiesti.tracce) payload.consentMultitrack = consentMultitrack;
     if (showOrg) payload.organization = organization || undefined;
     if (showRole) payload.organizationRole = organizationRole || undefined;
     if (showType && organizationType) payload.organizationType = organizationType;
@@ -166,12 +181,11 @@ export default function RegistrationFormClient({
     if (showOrg && !organization.trim()) {
       fieldErrors.organization = 'registration.errors.organizationRequired';
     }
-    // Recording consent is mandatory when recording is enabled
-    if (recordingEnabled && !consentRecording) {
+    // Consensi obbligatori secondo il formato dell'evento.
+    if (richiesti.registrazione && !consentRecording) {
       fieldErrors.consentRecording = 'registration.errors.recordingConsentRequired';
     }
-    // Multitrack consent is mandatory when per-participant recording is enabled
-    if (multitrackRecordingEnabled && !consentMultitrack) {
+    if (richiesti.tracce && !consentMultitrack) {
       fieldErrors.consentMultitrack = 'registration.errors.multitrackConsentRequired';
     }
 
@@ -181,7 +195,7 @@ export default function RegistrationFormClient({
     }
     setErrors({});
     return true;
-  }, [displayName, email, consentGiven, consentRecording, consentMultitrack, consentFutureCommunications, consentAddressBook, organization, organizationRole, organizationType, showOrg, showRole, showType, recordingEnabled, multitrackRecordingEnabled]);
+  }, [displayName, email, consentGiven, consentRecording, consentMultitrack, consentStayInTouch, organization, organizationRole, organizationType, showOrg, showRole, showType, richiesti.registrazione, richiesti.tracce]);
 
   const handleSubmit = useCallback(
     async (e: FormEvent) => {
@@ -206,12 +220,12 @@ export default function RegistrationFormClient({
       try {
         const body: Record<string, unknown> = {
           displayName, email, consentGiven,
-          consentFutureCommunications,
-          consentAddressBook,
+          consentFutureCommunications: consentStayInTouch,
+          consentAddressBook: consentStayInTouch,
           locale,
         };
-        if (recordingEnabled) body.consentRecording = consentRecording;
-        if (multitrackRecordingEnabled) body.consentMultitrack = consentMultitrack;
+        if (richiesti.registrazione) body.consentRecording = consentRecording;
+        if (richiesti.tracce) body.consentMultitrack = consentMultitrack;
         if (showOrg && organization) body.organization = organization;
         if (showRole && organizationRole) body.organizationRole = organizationRole;
         if (showType && organizationType) body.organizationType = organizationType;
@@ -261,7 +275,7 @@ export default function RegistrationFormClient({
         setSubmitting(false);
       }
     },
-    [displayName, email, consentGiven, consentRecording, consentMultitrack, consentFutureCommunications, consentAddressBook, organization, organizationRole, organizationType, eventSlug, validate, t, showOrg, showRole, showType, recordingEnabled, multitrackRecordingEnabled, locale],
+    [displayName, email, consentGiven, consentRecording, consentMultitrack, consentStayInTouch, organization, organizationRole, organizationType, eventSlug, validate, t, showOrg, showRole, showType, richiesti.registrazione, richiesti.tracce, locale],
   );
 
   // Duplicate sign-up recovery: re-send the original confirmation email
@@ -722,115 +736,114 @@ export default function RegistrationFormClient({
         </div>
       )}
 
-      {/* ── Consent 1: Data processing (mandatory) ── */}
-      <FormGroup check className="mb-3">
-        <Input
-          type="checkbox"
-          id="consentGiven"
-          aria-invalid={errors.consentGiven ? true : undefined}
-          aria-required="true"
-          aria-describedby={errors.consentGiven ? 'consentGivenError' : undefined}
-          checked={consentGiven}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-            setConsentGiven(e.target.checked);
-            pulisciErrore('consentGiven');
-          }}
-        />
-        <Label for="consentGiven" check>
-          {t('gdprConsent')}
-          {(showOrg || showRole || showType) && (' ' + t('gdprConsentProfiling'))}
-        </Label>
-        {errors.consentGiven && (
-          <div id="consentGivenError" className="text-danger small mt-1">
-            {t('errors.consentRequired')}
-          </div>
+      {/* I consensi in un gruppo, ognuno con il suo stato scritto accanto:
+          obbligatorio o facoltativo si legge senza provare a inviare. */}
+      <fieldset className="registration-consents mb-4">
+        <legend className="registration-consents__legend">{t('consentsLegend')}</legend>
+
+        {/* ── Trattamento dei dati (obbligatorio) ── */}
+        <FormGroup check className="mb-3">
+          <Input
+            type="checkbox"
+            id="consentGiven"
+            aria-invalid={errors.consentGiven ? true : undefined}
+            aria-required="true"
+            aria-describedby={errors.consentGiven ? 'consentGivenError' : undefined}
+            checked={consentGiven}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+              setConsentGiven(e.target.checked);
+              pulisciErrore('consentGiven');
+            }}
+          />
+          <Label for="consentGiven" check>
+            {t('gdprConsent')}
+            {(showOrg || showRole || showType) && (' ' + t('gdprConsentProfiling'))}{' '}
+            <span className="consent-mark consent-mark--required">{t('requiredMark')}</span>
+          </Label>
+          {errors.consentGiven && (
+            <div id="consentGivenError" className="text-danger small mt-1">
+              {t('errors.consentRequired')}
+            </div>
+          )}
+        </FormGroup>
+
+        {/* ── Registrazione (obbligatorio se i partecipanti hanno voce o
+            immagine; altrimenti un'informativa) ── */}
+        {richiesti.registrazione && (
+          <FormGroup check className="mb-3">
+            <Input
+              type="checkbox"
+              id="consentRecording"
+              aria-invalid={errors.consentRecording ? true : undefined}
+              aria-required="true"
+              aria-describedby={errors.consentRecording ? 'consentRecordingError' : undefined}
+              checked={consentRecording}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                setConsentRecording(e.target.checked);
+                pulisciErrore('consentRecording');
+              }}
+            />
+            <Label for="consentRecording" check>
+              {tg('consent.recording')}{' '}
+              <span className="consent-mark consent-mark--required">{t('requiredMark')}</span>
+            </Label>
+            {errors.consentRecording && (
+              <div id="consentRecordingError" className="text-danger small mt-1">
+                {tg('consent.recordingRequired')}
+              </div>
+            )}
+          </FormGroup>
         )}
-      </FormGroup>
+        {richiesti.avvisoRegistrazione && (
+          <p className="registration-consents__notice mb-3">{tg('consent.recordingNotice')}</p>
+        )}
 
-      {/* ── Consent 2: Recording (shown only if event has recording) ── */}
-      {recordingEnabled && (
-        <FormGroup check className="mb-3">
+        {/* ── Traccia audio per persona (ADR-013): sempre, se l'evento la
+            registra, anche per chi parte senza microfono e riceve la parola ── */}
+        {richiesti.tracce && (
+          <FormGroup check className="mb-3">
+            <Input
+              type="checkbox"
+              id="consentMultitrack"
+              aria-invalid={errors.consentMultitrack ? true : undefined}
+              aria-required="true"
+              aria-describedby={errors.consentMultitrack ? 'consentMultitrackError' : undefined}
+              checked={consentMultitrack}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                setConsentMultitrack(e.target.checked);
+                pulisciErrore('consentMultitrack');
+              }}
+            />
+            <Label for="consentMultitrack" check>
+              {tg('consent.multitrack')}{' '}
+              <span className="consent-mark consent-mark--required">{t('requiredMark')}</span>
+            </Label>
+            {errors.consentMultitrack && (
+              <div id="consentMultitrackError" className="text-danger small mt-1">
+                {tg('consent.multitrackRequired')}
+              </div>
+            )}
+          </FormGroup>
+        )}
+
+        {/* ── Restare in contatto (facoltativo) ── */}
+        <FormGroup check className="mb-0">
           <Input
             type="checkbox"
-            id="consentRecording"
-            aria-invalid={errors.consentRecording ? true : undefined}
-            aria-required="true"
-            aria-describedby={errors.consentRecording ? 'consentRecordingError' : undefined}
-            checked={consentRecording}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-              setConsentRecording(e.target.checked);
-              pulisciErrore('consentRecording');
-            }}
+            id="consentStayInTouch"
+            aria-describedby="consentStayInTouchHelp"
+            checked={consentStayInTouch}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setConsentStayInTouch(e.target.checked)}
           />
-          <Label for="consentRecording" check>
-            {tg('consent.recording')}
+          <Label for="consentStayInTouch" check>
+            {tg('consent.stayInTouch')}{' '}
+            <span className="consent-mark">{t('optionalMark')}</span>
           </Label>
-          {errors.consentRecording && (
-            <div id="consentRecordingError" className="text-danger small mt-1">
-              {tg('consent.recordingRequired')}
-            </div>
-          )}
+          <div id="consentStayInTouchHelp" className="form-text text-muted small ms-1">
+            {tg('consent.stayInTouchHelp')}
+          </div>
         </FormGroup>
-      )}
-
-      {/* ── Consent 2b: Multitrack per-participant recording (ADR-013) ── */}
-      {multitrackRecordingEnabled && (
-        <FormGroup check className="mb-3">
-          <Input
-            type="checkbox"
-            id="consentMultitrack"
-            aria-invalid={errors.consentMultitrack ? true : undefined}
-            aria-required="true"
-            aria-describedby={errors.consentMultitrack ? 'consentMultitrackError' : undefined}
-            checked={consentMultitrack}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-              setConsentMultitrack(e.target.checked);
-              pulisciErrore('consentMultitrack');
-            }}
-          />
-          <Label for="consentMultitrack" check>
-            {tg('consent.multitrack')}
-          </Label>
-          {errors.consentMultitrack && (
-            <div id="consentMultitrackError" className="text-danger small mt-1">
-              {tg('consent.multitrackRequired')}
-            </div>
-          )}
-        </FormGroup>
-      )}
-
-      {/* ── Consent 3: Future communications (optional) ── */}
-      <FormGroup check className="mb-3">
-        <Input
-          type="checkbox"
-          id="consentFutureCommunications"
-          checked={consentFutureCommunications}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setConsentFutureCommunications(e.target.checked)
-          }
-        />
-        <Label for="consentFutureCommunications" check>
-          {tg('consent.futureCommunications')}
-        </Label>
-      </FormGroup>
-
-      {/* ── Consent 4: Rubrica (address book) — Art. 6.1.a opt-in ── */}
-      <FormGroup check className="mb-4">
-        <Input
-          type="checkbox"
-          id="consentAddressBook"
-          checked={consentAddressBook}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setConsentAddressBook(e.target.checked)
-          }
-        />
-        <Label for="consentAddressBook" check>
-          {tg('consent.addressBook')}
-        </Label>
-        <div className="form-text text-muted small ms-1">
-          {tg('consent.addressBookHelp')}
-        </div>
-      </FormGroup>
+      </fieldset>
 
       <Button
         color="primary"

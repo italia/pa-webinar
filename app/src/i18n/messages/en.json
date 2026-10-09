@@ -196,6 +196,9 @@
     "email": "Email",
     "emailPlaceholder": "You will receive the access link for the event",
     "gdprConsent": "I consent to the processing of my personal data (name, email) pursuant to EU Regulation 2016/679 (GDPR) for participation in this event.",
+    "consentsLegend": "Consents",
+    "requiredMark": "required",
+    "optionalMark": "optional",
     "gdprLink": "Read the full privacy policy",
     "submit": "Confirm registration",
     "submitting": "Registering...",
@@ -3222,11 +3225,11 @@
     "consent": {
       "recording": "I consent to the audio/video recording of this event",
       "recordingRequired": "Recording consent is required to participate in this event",
+      "recordingNotice": "This event is recorded (audio and video). You take part without microphone or camera: the recording does not contain your voice or your image, unless the host gives you the floor.",
       "multitrack": "I consent to recording a separate audio track of my voice, for the sole purpose of correctly attributing the transcript to each speaker. The track is temporary and deleted after transcription; it is not used to identify or reproduce my voice.",
       "multitrackRequired": "Consent to recording your audio track is required to participate in this event",
-      "futureCommunications": "I would like to receive information about upcoming events published on this platform",
-      "addressBook": "I want to be added to the events address book to be invited to similar events",
-      "addressBookHelp": "Separate consent (GDPR art. 6.1.a). You can withdraw it at any time using the \"Remove me from the address book\" link in emails. Your name and organization are taken from your registration profile."
+      "stayInTouch": "I want to receive information about upcoming events and be added to the address book, to be invited to similar events",
+      "stayInTouchHelp": "Optional consent (GDPR art. 6.1.a). You can withdraw it at any time with the \"Remove me from the address book\" link in the emails you receive. Your name and organization are the ones in this registration."
     },
     "export": {
       "title": "My data",

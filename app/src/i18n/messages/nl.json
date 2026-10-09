@@ -196,6 +196,9 @@
     "email": "E-mail",
     "emailPlaceholder": "U ontvangt de toegangslink voor het evenement",
     "gdprConsent": "Ik stem in met de verwerking van mijn persoonsgegevens (naam, e-mail) op grond van Verordening (EU) 2016/679 (GDPR) voor deelname aan dit evenement.",
+    "consentsLegend": "Toestemmingen",
+    "requiredMark": "verplicht",
+    "optionalMark": "optioneel",
     "gdprLink": "Lees het volledige privacybeleid",
     "submit": "Inschrijving bevestigen",
     "submitting": "Bezig met inschrijven...",
@@ -3222,11 +3225,11 @@
     "consent": {
       "recording": "Ik stem in met de audio-/video-opname van het evenement",
       "recordingRequired": "Toestemming voor opname is vereist om deel te nemen aan dit evenement",
+      "recordingNotice": "Het evenement wordt opgenomen (geluid en beeld). Je neemt deel zonder microfoon en camera: de opname bevat je stem en beeld niet, tenzij de host je het woord geeft.",
       "multitrack": "Ik stem in met het opnemen van een apart audiospoor van mijn stem, uitsluitend om het transcript correct aan elke spreker toe te wijzen. Het spoor is tijdelijk en wordt na de transcriptie verwijderd; het wordt niet gebruikt om mijn stem te identificeren of weer te geven.",
       "multitrackRequired": "Toestemming voor het opnemen van je audiospoor is verplicht om aan dit evenement deel te nemen",
-      "futureCommunications": "Ik wil informatie ontvangen over toekomstige evenementen die op dit platform worden gepubliceerd",
-      "addressBook": "Ik wil opgenomen worden in het evenementenadresboek om uitgenodigd te worden voor soortgelijke evenementen",
-      "addressBookHelp": "Aparte toestemming (art. 6.1.a AVG). U kunt deze op elk moment intrekken via de link \"Verwijder mijn gegevens uit het adresboek\" in de e-mails die u ontvangt. Naam en organisatie worden overgenomen uit uw aanmeldingsprofiel."
+      "stayInTouch": "Ik wil informatie ontvangen over komende evenementen en in het adresboek worden opgenomen, om voor vergelijkbare evenementen te worden uitgenodigd",
+      "stayInTouchHelp": "Vrijwillige toestemming (art. 6.1.a AVG). Je kunt die altijd intrekken via de link 'Verwijder mij uit het adresboek' in de e-mails die je ontvangt. Naam en organisatie zijn die van deze inschrijving."
     },
     "export": {
       "title": "Mijn gegevens",

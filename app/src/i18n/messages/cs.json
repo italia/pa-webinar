@@ -196,6 +196,9 @@
     "email": "E-mail",
     "emailPlaceholder": "Obdržíte odkaz pro přístup k události",
     "gdprConsent": "Souhlasím se zpracováním svých osobních údajů (jméno, e-mail) v souladu s nařízením EU 2016/679 (GDPR) za účelem účasti na této události.",
+    "consentsLegend": "Souhlasy",
+    "requiredMark": "povinné",
+    "optionalMark": "nepovinné",
     "gdprLink": "Přečtěte si úplné zásady ochrany osobních údajů",
     "submit": "Potvrdit registraci",
     "submitting": "Probíhá registrace...",
@@ -3222,11 +3225,11 @@
     "consent": {
       "recording": "Souhlasím s audio/video záznamem této události",
       "recordingRequired": "Pro účast na této události je nutný souhlas s nahráváním",
+      "recordingNotice": "Akce se nahrává (zvuk a video). Účastníte se bez mikrofonu a kamery: záznam neobsahuje váš hlas ani obraz, pokud vám moderátor neudělí slovo.",
       "multitrack": "Souhlasím s nahráváním samostatné zvukové stopy svého hlasu výhradně za účelem správného přiřazení přepisu jednotlivým mluvčím. Stopa je dočasná a po přepisu se maže; nepoužívá se k identifikaci ani k reprodukci mého hlasu.",
       "multitrackRequired": "Souhlas s nahráváním vaší zvukové stopy je pro účast na této události povinný",
-      "futureCommunications": "Přeji si dostávat informace o budoucích událostech zveřejněných na této platformě",
-      "addressBook": "Chci být zařazen do adresáře událostí, abych byl zván na podobné události",
-      "addressBookHelp": "Samostatný souhlas (čl. 6.1.a GDPR). Můžete jej kdykoli odvolat pomocí odkazu „Odstranit moje údaje z adresáře“ v e-mailech, které obdržíte. Jméno a organizace budou převzaty z registračního profilu."
+      "stayInTouch": "Chci dostávat informace o připravovaných akcích a být zařazen do adresáře, abych byl zván na podobné akce",
+      "stayInTouchHelp": "Nepovinný souhlas (čl. 6.1.a GDPR). Můžete ho kdykoli odvolat odkazem „Odebrat mě z adresáře“ v e-mailech, které obdržíte. Jméno a organizace jsou ty z této registrace."
     },
     "export": {
       "title": "Moje údaje",

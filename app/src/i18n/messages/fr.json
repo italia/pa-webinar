@@ -196,6 +196,9 @@
     "email": "E-mail",
     "emailPlaceholder": "Vous recevrez le lien d'accès à l'événement",
     "gdprConsent": "Je consens au traitement de mes données personnelles (nom, e-mail) conformément au Règlement UE 2016/679 (GDPR) pour la participation à cet événement.",
+    "consentsLegend": "Consentements",
+    "requiredMark": "obligatoire",
+    "optionalMark": "facultatif",
     "gdprLink": "Lire la politique de confidentialité complète",
     "submit": "Confirmer l'inscription",
     "submitting": "Inscription en cours...",
@@ -3222,11 +3225,11 @@
     "consent": {
       "recording": "Je consens à l'enregistrement audio/vidéo de cet événement",
       "recordingRequired": "Le consentement à l'enregistrement est obligatoire pour participer à cet événement",
+      "recordingNotice": "L'événement est enregistré (audio et vidéo). Vous participez sans micro ni caméra : l'enregistrement ne contient ni votre voix ni votre image, sauf si l'animateur vous donne la parole.",
       "multitrack": "Je consens à l'enregistrement d'une piste audio distincte de ma voix, à seule fin d'attribuer correctement la transcription à chaque intervenant. La piste est temporaire et supprimée après la transcription ; elle n'est pas utilisée pour identifier ni reproduire ma voix.",
       "multitrackRequired": "Le consentement à l'enregistrement de votre piste audio est obligatoire pour participer à cet événement",
-      "futureCommunications": "Je souhaite recevoir des informations sur les prochains événements publiés sur cette plateforme",
-      "addressBook": "Je souhaite être inscrit dans le carnet d'adresses des événements pour être invité à des événements similaires",
-      "addressBookHelp": "Consentement séparé (art. 6.1.a RGPD). Vous pourrez le retirer à tout moment via le lien « Supprimer mes données du carnet d'adresses » présent dans les e-mails que vous recevrez. Le nom et l'organisation seront repris du profil d'inscription."
+      "stayInTouch": "Je souhaite recevoir des informations sur les prochains événements et être ajouté au carnet d'adresses, pour être invité à des événements similaires",
+      "stayInTouchHelp": "Consentement facultatif (art. 6.1.a RGPD). Vous pouvez le retirer à tout moment avec le lien « Me retirer du carnet d'adresses » dans les e-mails que vous recevrez. Le nom et l'organisation sont ceux de cette inscription."
     },
     "export": {
       "title": "Mes données",

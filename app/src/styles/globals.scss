@@ -4461,6 +4461,46 @@ html.live-call-immersive body {
   }
 }
 
+// Consensi dell'iscrizione: un gruppo con il suo titolo, e accanto a ogni
+// casella se è obbligatoria o facoltativa.
+.registration-consents {
+  padding: 1rem 1rem 0.75rem;
+  border: 1px solid #d9dadb;
+  border-radius: 8px;
+}
+
+.registration-consents__legend {
+  float: none;
+  width: auto;
+  margin: 0 0 0.75rem;
+  padding: 0;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.registration-consents__notice {
+  padding: 0.6rem 0.75rem;
+  border-left: 4px solid #0066cc;
+  background: #f0f6fc;
+  font-size: 0.9rem;
+}
+
+.consent-mark {
+  display: inline-block;
+  padding: 0 0.4rem;
+  border-radius: 4px;
+  background: #eef1f4;
+  color: #455b71;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.consent-mark--required {
+  background: #fdecef;
+  color: #a1112e;
+}
+
 .registration-when {
   display: flex;
   align-items: center;

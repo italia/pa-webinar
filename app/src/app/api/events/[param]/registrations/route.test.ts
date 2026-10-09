@@ -196,3 +196,60 @@ describe('POST registrations — iscrizione pubblica spenta', () => {
     expect(linkEmail().searchParams.get('token')).toBe('tok-vecchio');
   });
 });
+
+describe('POST registrations — consensi secondo il formato dell\'evento', () => {
+  function evento(over: Record<string, unknown>) {
+    vi.mocked(prisma.event.findUnique).mockResolvedValue({
+      id: EVENT_ID,
+      slug: SLUG,
+      status: 'PUBLISHED',
+      eventType: 'SCHEDULED',
+      endsAt: new Date(Date.now() + 3_600_000),
+      recordingEnabled: true,
+      multitrackRecordingEnabled: true,
+      participantsCanUnmute: false,
+      participantsCanStartVideo: false,
+      participantsCanShareScreen: false,
+      _count: { registrations: 0 },
+      ...over,
+    } as never);
+  }
+
+  function iscrivitiCon(consensi: Record<string, unknown>): Promise<Response> {
+    ipCounter += 1;
+    const request = new Request(`http://localhost:3000/api/events/${SLUG}/registrations`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-forwarded-for': `10.2.0.${ipCounter}` },
+      body: JSON.stringify({ displayName: 'Anna Bianchi', email: 'anna@example.com', consentGiven: true, ...consensi }),
+    });
+    return POST(request as unknown as NextRequest, { params: Promise.resolve({ param: SLUG }) });
+  }
+
+  it('solo ascolto: niente consenso alla registrazione, la traccia audio resta obbligatoria', async () => {
+    evento({});
+    expect((await iscrivitiCon({})).status).toBe(422);
+    const res = await iscrivitiCon({ consentMultitrack: true });
+    expect(res.status).toBe(201);
+    const data = tx.registration.create.mock.calls[0]?.[0]?.data as Record<string, unknown>;
+    expect(data.consentRecording).toBeNull();
+    expect(data.consentMultitrack).toBe(true);
+    const audit = JSON.parse(
+      (tx.gdprAuditLog.create.mock.calls[0]?.[0] as { data: { details: string } }).data.details,
+    );
+    expect(audit.recordingConsentRequired).toBe(false);
+  });
+
+  it('con il microfono concesso entrambi i consensi sono obbligatori', async () => {
+    evento({ participantsCanUnmute: true });
+    expect((await iscrivitiCon({})).status).toBe(422);
+    expect((await iscrivitiCon({ consentRecording: true })).status).toBe(422);
+    const ok = await iscrivitiCon({ consentRecording: true, consentMultitrack: true });
+    expect(ok.status).toBe(201);
+  });
+
+  it('con il solo schermo condiviso si chiede il consenso alla registrazione', async () => {
+    evento({ participantsCanShareScreen: true, multitrackRecordingEnabled: false });
+    expect((await iscrivitiCon({})).status).toBe(422);
+    expect((await iscrivitiCon({ consentRecording: true })).status).toBe(201);
+  });
+});

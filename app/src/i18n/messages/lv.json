@@ -196,6 +196,9 @@
     "email": "E-pasts",
     "emailPlaceholder": "Jūs saņemsiet piekļuves saiti pasākumam",
     "gdprConsent": "Piekrītu savu personas datu (vārds, e-pasts) apstrādei saskaņā ar ES Regulu 2016/679 (GDPR) dalībai šajā pasākumā.",
+    "consentsLegend": "Piekrišanas",
+    "requiredMark": "obligāti",
+    "optionalMark": "pēc izvēles",
     "gdprLink": "Lasīt pilnu privātuma politiku",
     "submit": "Apstiprināt reģistrāciju",
     "submitting": "Reģistrēšana...",
@@ -3222,11 +3225,11 @@
     "consent": {
       "recording": "Piekrītu šī pasākuma audio/video ierakstīšanai",
       "recordingRequired": "Lai piedalītos šajā pasākumā, ir nepieciešama piekrišana ierakstīšanai",
+      "recordingNotice": "Pasākums tiek ierakstīts (audio un video). Jūs piedalāties bez mikrofona un kameras: ierakstā nav jūsu balss vai attēla, ja vien vadītājs jums nedod vārdu.",
       "multitrack": "Piekrītu, ka manas balss ieraksts tiek veikts atsevišķā audio celiņā vienīgi ar mērķi pareizi attiecināt atšifrējumu uz katru runātāju. Celiņš ir pagaidu un pēc atšifrēšanas tiek dzēsts; to neizmanto manas balss identificēšanai vai atskaņošanai.",
       "multitrackRequired": "Piekrišana jūsu audio celiņa ierakstīšanai ir obligāta, lai piedalītos šajā pasākumā",
-      "futureCommunications": "Vēlos saņemt informāciju par nākamajiem pasākumiem, kas tiek publicēti šajā platformā",
-      "addressBook": "Vēlos tikt iekļauts pasākumu kontaktu grāmatā, lai saņemtu uzaicinājumus uz līdzīgiem pasākumiem",
-      "addressBookHelp": "Atsevišķa piekrišana (VDAR 6.1.a pants). Jūs varat to atsaukt jebkurā laikā, izmantojot saiti \"Noņemt manus datus no kontaktu grāmatas\" saņemtajos e-pastos. Vārds un organizācija tiks iegūti no reģistrācijas profila."
+      "stayInTouch": "Vēlos saņemt informāciju par gaidāmajiem pasākumiem un tikt iekļauts adrešu grāmatā, lai mani aicinātu uz līdzīgiem pasākumiem",
+      "stayInTouchHelp": "Brīvprātīga piekrišana (VDAR 6.1.a pants). To var jebkurā laikā atsaukt ar saiti “Izņemt mani no adrešu grāmatas” saņemtajos e-pastos. Vārds un organizācija ir no šīs reģistrācijas."
     },
     "export": {
       "title": "Mani dati",

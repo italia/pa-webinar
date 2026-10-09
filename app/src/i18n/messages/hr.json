@@ -196,6 +196,9 @@
     "email": "E-pošta",
     "emailPlaceholder": "Primit ćete poveznicu za pristup događaju",
     "gdprConsent": "Pristajem na obradu svojih osobnih podataka (ime, email) u skladu s Uredbom EU 2016/679 (GDPR) za sudjelovanje u ovom događaju.",
+    "consentsLegend": "Privole",
+    "requiredMark": "obavezno",
+    "optionalMark": "neobavezno",
     "gdprLink": "Pročitajte cjelovitu politiku privatnosti",
     "submit": "Potvrdite prijavu",
     "submitting": "Prijava u tijeku...",
@@ -3222,11 +3225,11 @@
     "consent": {
       "recording": "Pristajem na audio/video snimanje događaja",
       "recordingRequired": "Pristanak na snimanje je obvezan za sudjelovanje u ovom događaju",
+      "recordingNotice": "Događaj se snima (zvuk i video). Sudjeluješ bez mikrofona i kamere: snimka ne sadrži tvoj glas ni tvoju sliku, osim ako ti voditelj ne da riječ.",
       "multitrack": "Pristajem na snimanje zasebne zvučne snimke svojega glasa isključivo radi ispravnog pripisivanja transkripta pojedinim govornicima. Snimka je privremena i briše se nakon transkripcije; ne koristi se za identifikaciju ni reprodukciju mojega glasa.",
       "multitrackRequired": "Pristanak na snimanje vaše zvučne snimke obvezan je za sudjelovanje na ovom događaju",
-      "futureCommunications": "Želim primati informacije o budućim događajima objavljenima na ovoj platformi",
-      "addressBook": "Želim biti uvršten u imenik događaja kako bih bio pozivan na slične događaje",
-      "addressBookHelp": "Zasebna privola (čl. 6.1.a GDPR). Možete je opozvati u bilo kojem trenutku putem poveznice \"Ukloni moje podatke iz imenika\" u e-porukama. Ime i organizacija preuzimaju se iz profila prijave."
+      "stayInTouch": "Želim primati informacije o budućim događajima i biti dodan u imenik kako bih bio pozvan na slične događaje",
+      "stayInTouchHelp": "Neobavezna privola (čl. 6.1.a GDPR-a). Možeš je povući u bilo kojem trenutku putem poveznice „Ukloni me iz imenika” u e-porukama koje primiš. Ime i organizacija su oni iz ove prijave."
     },
     "export": {
       "title": "Moji podaci",

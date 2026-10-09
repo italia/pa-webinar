@@ -63,12 +63,14 @@ ticked stay unlinked unless the same person later registers again.
 
 ### A separate, optional consent
 
-The registration form has its own address-book box. The box starts unticked and is never required. It
-reads **I want to be added to the events address book to be invited to similar events**. It is separate
-from the required participation consent. It is also separate from the optional future-communications box
-(`Registration.consentFutureCommunications`), which is a per-registration flag and creates nothing. The
-server receives the address-book box as `consentAddressBook`, which defaults to `false` in
-`createRegistrationSchema` (`app/src/lib/validation/schemas.ts`).
+The registration form has one optional box for being contacted about upcoming events. The box starts
+unticked and is never required. It reads **I want to receive information about upcoming events and be
+added to the address book, to be invited to similar events**. It is separate from the required
+participation consent. It covers one purpose and sets two flags: the address-book opt-in, received as
+`consentAddressBook` (default `false` in `createRegistrationSchema`, `app/src/lib/validation/schemas.ts`),
+and the per-registration `Registration.consentFutureCommunications`, which creates nothing. The
+address-book withdrawal link revokes both: it clears the opt-in and the flag on every registration of
+the person.
 
 Only a ticked box creates a person record. If the box is not ticked and no record exists, nothing is
 created.

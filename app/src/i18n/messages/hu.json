@@ -196,6 +196,9 @@
     "email": "E-mail",
     "emailPlaceholder": "Erre a címre kapja meg a hozzáférési linket",
     "gdprConsent": "Hozzájárulok személyes adataim (név, e-mail) kezeléséhez az EU 2016/679 rendelet (GDPR) alapján az eseményen való részvétel céljából.",
+    "consentsLegend": "Hozzájárulások",
+    "requiredMark": "kötelező",
+    "optionalMark": "nem kötelező",
     "gdprLink": "Olvassa el a teljes adatvédelmi tájékoztatót",
     "submit": "Regisztráció megerősítése",
     "submitting": "Regisztráció folyamatban...",
@@ -3222,11 +3225,11 @@
     "consent": {
       "recording": "Hozzájárulok az esemény audió/videó felvételéhez",
       "recordingRequired": "A felvételhez való hozzájárulás szükséges az eseményen való részvételhez",
+      "recordingNotice": "Az eseményről felvétel készül (hang és kép). Mikrofon és kamera nélkül veszel részt: a felvétel nem tartalmazza a hangodat és a képedet, kivéve, ha a házigazda szót ad neked.",
       "multitrack": "Hozzájárulok a hangom külön hangsávon történő rögzítéséhez, kizárólag abból a célból, hogy az átirat helyesen legyen az egyes beszélőkhöz rendelve. A sáv ideiglenes, és az átirat elkészülte után törlésre kerül; nem használják a hangom azonosítására vagy visszajátszására.",
       "multitrackRequired": "A hangsávod rögzítéséhez adott hozzájárulás kötelező az eseményen való részvételhez",
-      "futureCommunications": "Szeretnék tájékoztatást kapni az ezen a platformon közzétett jövőbeli eseményekről",
-      "addressBook": "Szeretnék felkerülni az események címjegyzékére, hogy hasonló eseményekre meghívást kapjak",
-      "addressBookHelp": "Külön hozzájárulás (GDPR 6. cikk (1) a) pont). Bármikor visszavonhatja a kapott e-mailekben található „Adataim eltávolítása a címjegyzékből” hivatkozással. A név és a szervezet a regisztrációs profilból származik."
+      "stayInTouch": "Szeretnék tájékoztatást kapni a következő eseményekről, és bekerülni a címjegyzékbe, hogy hasonló eseményekre meghívjanak",
+      "stayInTouchHelp": "Nem kötelező hozzájárulás (GDPR 6.1.a cikk). Bármikor visszavonhatod a kapott e-mailekben található „Törlés a címjegyzékből” hivatkozással. A név és a szervezet ebből a regisztrációból származik."
     },
     "export": {
       "title": "Az én adataim",

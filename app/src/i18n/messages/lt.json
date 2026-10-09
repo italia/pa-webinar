@@ -196,6 +196,9 @@
     "email": "El. paštas",
     "emailPlaceholder": "Gausite nuorodą prisijungti prie renginio",
     "gdprConsent": "Sutinku, kad mano asmens duomenys (vardas, el. paštas) būtų tvarkomi pagal ES reglamentą 2016/679 (GDPR) dalyvavimo šiame renginyje tikslais.",
+    "consentsLegend": "Sutikimai",
+    "requiredMark": "privaloma",
+    "optionalMark": "neprivaloma",
     "gdprLink": "Skaityti visą privatumo politiką",
     "submit": "Patvirtinti registraciją",
     "submitting": "Registruojama...",
@@ -3222,11 +3225,11 @@
     "consent": {
       "recording": "Sutinku su šio renginio garso/vaizdo įrašymu",
       "recordingRequired": "Norint dalyvauti šiame renginyje, būtinas sutikimas dėl įrašymo",
+      "recordingNotice": "Renginys įrašomas (garsas ir vaizdas). Dalyvaujate be mikrofono ir kameros: įraše nebus jūsų balso ar atvaizdo, nebent vedėjas suteiks jums žodį.",
       "multitrack": "Sutinku, kad mano balsas būtų įrašomas atskiru garso takeliu vien tam, kad transkripcija būtų teisingai priskirta kiekvienam kalbėtojui. Takelis yra laikinas ir po transkripcijos ištrinamas; jis nenaudojamas mano balsui atpažinti ar atkurti.",
       "multitrackRequired": "Sutikimas įrašyti jūsų garso takelį yra privalomas norint dalyvauti šiame renginyje",
-      "futureCommunications": "Noriu gauti informaciją apie būsimus šioje platformoje skelbiamus renginius",
-      "addressBook": "Noriu būti įtrauktas į renginių adresų knygą, kad būčiau kviečiamas į panašius renginius",
-      "addressBookHelp": "Atskiras sutikimas (GDPR/BDAR str. 6.1.a). Galite jį atšaukti bet kada per nuorodą „Pašalinkite mano duomenis iš adresų knygos“ gautuose el. laiškuose. Vardas ir organizacija bus paimti iš registracijos profilio."
+      "stayInTouch": "Noriu gauti informaciją apie būsimus renginius ir būti įtrauktas į adresų knygą, kad būčiau kviečiamas į panašius renginius",
+      "stayInTouchHelp": "Neprivalomas sutikimas (BDAR 6.1.a str.). Galite jį bet kada atšaukti gautuose el. laiškuose esančia nuoroda „Pašalinti mane iš adresų knygos“. Vardas ir organizacija – iš šios registracijos."
     },
     "export": {
       "title": "Mano duomenys",

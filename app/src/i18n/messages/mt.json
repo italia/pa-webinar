@@ -196,6 +196,9 @@
     "email": "Email",
     "emailPlaceholder": "Se tirċievi l-link biex taċċessa l-avveniment",
     "gdprConsent": "Nagħti l-kunsens tiegħi għall-ipproċessar tad-dejta personali tiegħi (isem, email) skont ir-Regolament UE 2016/679 (GDPR) biex nipparteċipa f'dan l-avveniment.",
+    "consentsLegend": "Kunsensi",
+    "requiredMark": "obbligatorju",
+    "optionalMark": "fakultattiv",
     "gdprLink": "Aqra l-avviż sħiħ dwar il-privatezza",
     "submit": "Ikkonferma r-reġistrazzjoni",
     "submitting": "Qed tirreġistra...",
@@ -3222,11 +3225,11 @@
     "consent": {
       "recording": "Nagħti l-kunsens tiegħi għar-reġistrazzjoni tal-awdjo/vidjo ta' dan l-avveniment",
       "recordingRequired": "Il-kunsens għar-reġistrazzjoni huwa obbligatorju biex tipparteċipa f'dan l-avveniment",
+      "recordingNotice": "L-avveniment qed jiġi rrekordjat (awdjo u vidjo). Qed tipparteċipa mingħajr mikrofonu jew kamera: ir-reġistrazzjoni ma fihiex il-vuċi jew l-immaġni tiegħek, sakemm min jikkonduċi ma jagħtikx il-kelma.",
       "multitrack": "Nagħti l-kunsens għar-reġistrazzjoni ta' traċċa awdjo separata tal-vuċi tiegħi, unikament biex it-traskrizzjoni tiġi attribwita korrettament lil kull kelliem. It-traċċa hija temporanja u titħassar wara t-traskrizzjoni; ma tintużax biex tidentifika jew tirriproduċi l-vuċi tiegħi.",
       "multitrackRequired": "Il-kunsens għar-reġistrazzjoni tat-traċċa awdjo tiegħek huwa obbligatorju biex tipparteċipa f'dan l-avveniment",
-      "futureCommunications": "Nixtieq nirċievi informazzjoni dwar avvenimenti li jmiss ippubblikati fuq din il-pjattaforma",
-      "addressBook": "Nixtieq niġi mdaħħal fid-direttorju tal-avvenimenti biex niġi mistieden għal avvenimenti simili",
-      "addressBookHelp": "Kunsens separato (art. 6.1.a GDPR). Potrlill- revocarlo fi qualsiasi momento mill-link \"Neħħi il-miei data mill-direttorju\" fl-email li jirċievirai. Il nomu u l'organizzazzjoni ikunu ricavati mill-profilo ta' reġistrazzjoni."
+      "stayInTouch": "Irrid nirċievi informazzjoni dwar l-avvenimenti li ġejjin u nkun miżjud fil-ktieb tal-indirizzi, biex inkun mistieden għal avvenimenti simili",
+      "stayInTouchHelp": "Kunsens fakultattiv (art. 6.1.a GDPR). Tista' tirtirah meta trid bil-link \"Neħħini mill-ktieb tal-indirizzi\" fl-emails li tirċievi. L-isem u l-organizzazzjoni huma dawk ta' din ir-reġistrazzjoni."
     },
     "export": {
       "title": "Id-dejta tiegħi",

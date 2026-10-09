@@ -196,6 +196,9 @@
     "email": "E-Mail",
     "emailPlaceholder": "Sie erhalten den Zugangslink für die Veranstaltung",
     "gdprConsent": "Ich stimme der Verarbeitung meiner personenbezogenen Daten (Name, E-Mail) gemäß der EU-Verordnung 2016/679 (GDPR) zur Teilnahme an dieser Veranstaltung zu.",
+    "consentsLegend": "Einwilligungen",
+    "requiredMark": "erforderlich",
+    "optionalMark": "freiwillig",
     "gdprLink": "Vollständige Datenschutzerklärung lesen",
     "submit": "Anmeldung bestätigen",
     "submitting": "Anmeldung läuft...",
@@ -3222,11 +3225,11 @@
     "consent": {
       "recording": "Ich stimme der Audio-/Videoaufzeichnung dieser Veranstaltung zu",
       "recordingRequired": "Die Einwilligung zur Aufzeichnung ist für die Teilnahme an dieser Veranstaltung erforderlich",
+      "recordingNotice": "Die Veranstaltung wird aufgezeichnet (Ton und Bild). Sie nehmen ohne Mikrofon und Kamera teil: Die Aufzeichnung enthält weder Ihre Stimme noch Ihr Bild, es sei denn, die Moderation erteilt Ihnen das Wort.",
       "multitrack": "Ich willige in die Aufzeichnung einer separaten Tonspur meiner Stimme ein, allein zu dem Zweck, das Transkript den Sprechenden korrekt zuzuordnen. Die Spur ist temporär und wird nach der Transkription gelöscht; sie wird nicht verwendet, um meine Stimme zu identifizieren oder wiederzugeben.",
       "multitrackRequired": "Die Einwilligung in die Aufzeichnung Ihrer Tonspur ist für die Teilnahme an dieser Veranstaltung erforderlich",
-      "futureCommunications": "Ich möchte Informationen über kommende Veranstaltungen erhalten, die auf dieser Plattform veröffentlicht werden",
-      "addressBook": "Ich möchte ins Veranstaltungs-Adressbuch aufgenommen werden, um zu ähnlichen Veranstaltungen eingeladen zu werden",
-      "addressBookHelp": "Separate Einwilligung (Art. 6.1.a GDPR). Sie können sie jederzeit über den Link \"Meine Daten aus dem Adressbuch entfernen\" in den E-Mails widerrufen. Name und Organisation werden aus dem Anmeldeprofil übernommen."
+      "stayInTouch": "Ich möchte Informationen zu kommenden Veranstaltungen erhalten und in das Adressbuch aufgenommen werden, um zu ähnlichen Veranstaltungen eingeladen zu werden",
+      "stayInTouchHelp": "Freiwillige Einwilligung (Art. 6.1.a DSGVO). Sie können sie jederzeit über den Link „Aus dem Adressbuch entfernen“ in den E-Mails widerrufen, die Sie erhalten. Name und Organisation sind die dieser Anmeldung."
     },
     "export": {
       "title": "Meine Daten",

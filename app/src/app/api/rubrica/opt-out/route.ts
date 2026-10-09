@@ -66,13 +66,22 @@ export const POST = withErrorHandling(async (request) => {
 
   const person = await resolveToken(token);
 
-  await prisma.person.update({
-    where: { id: person.id },
-    data: {
-      optedInToAddressBook: false,
-      optedOutAt: new Date(),
-    },
-  });
+  // Lo stesso consenso dell'iscrizione copre rubrica e informazioni sui
+  // prossimi eventi (una sola casella): revocarlo li toglie entrambi, su ogni
+  // iscrizione della persona.
+  await prisma.$transaction([
+    prisma.person.update({
+      where: { id: person.id },
+      data: {
+        optedInToAddressBook: false,
+        optedOutAt: new Date(),
+      },
+    }),
+    prisma.registration.updateMany({
+      where: { personId: person.id, consentFutureCommunications: true },
+      data: { consentFutureCommunications: false },
+    }),
+  ]);
 
   return Response.json({ ok: true }, { headers: { 'Cache-Control': 'no-store' } });
 });

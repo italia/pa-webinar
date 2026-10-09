@@ -196,6 +196,9 @@
     "email": "E-mail",
     "emailPlaceholder": "Dostanete odkaz na prístup k udalosti",
     "gdprConsent": "Súhlasím so spracovaním mojich osobných údajov (meno, e-mail) v súlade s nariadením EÚ 2016/679 (GDPR) za účelom účasti na tejto udalosti.",
+    "consentsLegend": "Súhlasy",
+    "requiredMark": "povinné",
+    "optionalMark": "nepovinné",
     "gdprLink": "Prečítajte si úplné zásady ochrany osobných údajov",
     "submit": "Potvrdiť registráciu",
     "submitting": "Prebieha registrácia...",
@@ -3222,11 +3225,11 @@
     "consent": {
       "recording": "Súhlasím s audio/video záznamom tejto udalosti",
       "recordingRequired": "Pre účasť na tejto udalosti je potrebný súhlas s nahrávaním",
+      "recordingNotice": "Podujatie sa nahráva (zvuk a video). Zúčastňujete sa bez mikrofónu a kamery: záznam neobsahuje váš hlas ani obraz, pokiaľ vám moderátor neudelí slovo.",
       "multitrack": "Súhlasím s nahrávaním samostatnej zvukovej stopy svojho hlasu výhradne na účel správneho priradenia prepisu jednotlivým hovoriacim. Stopa je dočasná a po prepise sa maže; nepoužíva sa na identifikáciu ani reprodukciu môjho hlasu.",
       "multitrackRequired": "Súhlas s nahrávaním vašej zvukovej stopy je na účasť na tomto podujatí povinný",
-      "futureCommunications": "Prajem si dostávať informácie o budúcich udalostiach zverejnených na tejto platforme",
-      "addressBook": "Chcem byť zaradený do adresára podujatí na pozývanie na podobné podujatia",
-      "addressBookHelp": "Samostatný súhlas (čl. 6.1.a GDPR). Môžete ho kedykoľvek odvolať pomocou odkazu \"Odstrániť moje údaje z adresára\" v e-mailoch, ktoré dostanete. Meno a organizácia budú prevzaté z registračného profilu."
+      "stayInTouch": "Chcem dostávať informácie o pripravovaných podujatiach a byť zaradený do adresára, aby som bol pozývaný na podobné podujatia",
+      "stayInTouchHelp": "Nepovinný súhlas (čl. 6.1.a GDPR). Môžete ho kedykoľvek odvolať odkazom „Odstrániť ma z adresára“ v e-mailoch, ktoré dostanete. Meno a organizácia sú z tejto registrácie."
     },
     "export": {
       "title": "Moje údaje",
