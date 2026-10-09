@@ -112,7 +112,7 @@ export default async function EditEventPage({ params, searchParams }: PageProps)
   if (!UUID_RE.test(id)) notFound();
 
   // Come la pagina di gestione: lo staff entra con la propria sessione (per
-  // l'organizzatore solo sui propri eventi, ADR-014) e il token
+  // l'organizzatore solo sugli eventi che gestisce, ADR-014) e il token
   // nell'indirizzo si toglie; chi ha solo il link del moderatore entra col token.
   const session = await getStaffSession(await cookies());
   const staffCanManage = session ? await puoGestire(session, id) : false;

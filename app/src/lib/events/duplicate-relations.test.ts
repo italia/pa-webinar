@@ -33,6 +33,7 @@ function fullSource(): DuplicateSource {
       {
         name: 'cifrato:nome',
         email: 'cifrato:email',
+        emailHash: 'impronta',
         role: 'MODERATOR',
         organizer: true,
         organization: 'Ente B',
@@ -41,6 +42,7 @@ function fullSource(): DuplicateSource {
       {
         name: 'cifrato:nome2',
         email: null,
+        emailHash: null,
         role: 'SPEAKER',
         organizer: false,
         organization: null,

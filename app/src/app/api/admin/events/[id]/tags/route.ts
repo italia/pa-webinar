@@ -37,7 +37,7 @@ async function loadEvent(id: string) {
 
 export const GET = withErrorHandling(async (_request, context) => {
   const { id } = await context.params;
-  // Dell'evento: l'admin, o l'organizzatore che l'ha creato (ADR-014).
+  // Di chi gestisce l'evento: l'admin, chi l'ha creato o un altro organizzatore (eventScope, ADR-014).
   await requireEventManager(await cookies(), id);
   await loadEvent(id);
 
@@ -51,7 +51,7 @@ export const GET = withErrorHandling(async (_request, context) => {
 
 export const PUT = withErrorHandling(async (request, context) => {
   const { id } = await context.params;
-  // Dell'evento: l'admin, o l'organizzatore che l'ha creato (ADR-014).
+  // Di chi gestisce l'evento: l'admin, chi l'ha creato o un altro organizzatore (eventScope, ADR-014).
   await requireEventManager(await cookies(), id);
   await loadEvent(id);
 

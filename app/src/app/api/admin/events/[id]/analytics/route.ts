@@ -56,7 +56,7 @@ function personKey(opts: { senderId?: string | null; registrationId?: string | n
 
 export const GET = withErrorHandling(async (_request, context) => {
   const { id } = await (context as { params: Promise<{ id: string }> }).params;
-  // Dell'evento: l'admin, o l'organizzatore che l'ha creato (ADR-014).
+  // Di chi gestisce l'evento: l'admin, chi l'ha creato o un altro organizzatore (eventScope, ADR-014).
   await requireEventManager(await cookies(), id);
 
   const event = await prisma.event.findUnique({

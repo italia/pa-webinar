@@ -76,7 +76,7 @@ function csvEscape(v: string | null | undefined): string {
 }
 
 export const GET = withErrorHandling(async (request) => {
-  // Le registrazioni dei propri eventi, per l'organizzatore (ADR-014).
+  // Le registrazioni degli eventi che gestisce, per l'organizzatore (ADR-014).
   const session = await requireStaff(await cookies());
 
   const url = new URL(request.url);

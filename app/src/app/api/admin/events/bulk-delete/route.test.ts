@@ -22,10 +22,11 @@ const { session, files } = vi.hoisted(() => ({
 vi.mock('next/headers', () => ({
   cookies: vi.fn(async () => ({ get: () => ({ value: 'staff-session' }) })),
 }));
-vi.mock('@/lib/auth/staff-session', () => ({
+// La regola vera (eventScope): i propri eventi e quelli in cui si è
+// organizzatori con lo stesso indirizzo.
+vi.mock('@/lib/auth/staff-session', async (importOriginal) => ({
+  ...(await importOriginal<Record<string, unknown>>()),
   requireStaff: vi.fn(async () => session.current),
-  eventScope: (s: { role: string; accountId?: string }) =>
-    s.role === 'admin' ? {} : { createdById: s.accountId },
 }));
 vi.mock('@/lib/audit/admin-audit', () => ({
   logAdminAction: vi.fn(async () => undefined),
@@ -95,11 +96,22 @@ describe('POST /api/admin/events/bulk-delete — i file degli eventi', () => {
     );
   });
 
-  it('l’organizzatore: si parte solo dai propri eventi', async () => {
-    session.current = { role: 'organizer', accountId: 'org-1' };
+  it('l’organizzatore: si parte dai propri eventi e da quelli che co-organizza', async () => {
+    session.current = { role: 'organizer', accountId: 'org-1', emailHash: 'hash-org-1' };
     await POST(post([A, B]), ctx);
     expect(tx.event.findMany).toHaveBeenCalledWith({
-      where: { id: { in: [A, B] }, createdById: 'org-1' },
+      where: { id: { in: [A, B] }, AND: [
+        {
+          OR: [
+            { createdById: 'org-1' },
+            {
+              additionalMods: {
+                some: { organizer: true, revokedAt: null, emailHash: 'hash-org-1' },
+              },
+            },
+          ],
+        },
+      ] },
       select: { id: true },
     });
   });

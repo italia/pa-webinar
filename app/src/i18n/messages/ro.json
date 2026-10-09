@@ -804,7 +804,7 @@
         "roleInfo": {
           "organizer": {
             "name": "Organizator",
-            "desc": "Conduce sala ca un moderator și apare printre organizatori. Organizatorul principal adaugă și elimină celelalte persoane."
+            "desc": "Conduce sala ca un moderator și apare printre organizatori. Organizatorul principal adaugă și elimină celelalte persoane. Cu un cont de personal pe același e-mail, gestionează și evenimentul."
           },
           "moderator": {
             "name": "Moderator",
@@ -856,7 +856,7 @@
         "roleModerator": "Moderator",
         "roleSpeaker": "Vorbitor",
         "roleHelp": {
-          "organizer": "Conduce sala ca un moderator și apare printre organizatori.",
+          "organizer": "Conduce sala ca un moderator și apare printre organizatori. Cu un cont de personal pe același e-mail, gestionează și evenimentul.",
           "moderator": "Conduce sala: dă cuvântul, gestionează întrebări, sondaje și înregistrarea.",
           "speaker": "Vorbește, folosește camera și partajează ecranul, fără puteri de moderare."
         },
@@ -1527,7 +1527,7 @@
       "prepareEmailBody": "Bună ziua, {name},\n\niată linkul dvs. personal pentru „{title}”:\n{link}\n\nLinkul este doar pentru dvs.: nu îl redirecționați și nu îl distribuiți.",
       "draftNote": "Evenimentul este o ciornă: linkurile se trimit prin e-mail când este publicat. Până atunci le puteți copia de aici.",
       "roleOrganizer": "Organizator",
-      "roleOrganizerHint": "Moderează ca un moderator și apare printre organizatorii evenimentului.",
+      "roleOrganizerHint": "Moderează ca un moderator și apare printre organizatorii evenimentului. Cu un cont de personal pe același e-mail, gestionează și evenimentul.",
       "organization": "Instituție sau organizație (opțional)",
       "publicListed": "Afișează pe pagina publică",
       "onPublicPage": "Pe pagina publică"
@@ -3318,7 +3318,15 @@
       "erasureCtaBody": "Puteți solicita ștergerea completă a datelor asociate adresei dumneavoastră de email (Art. 17 din GDPR).",
       "erasureCtaButton": "Solicitați ștergerea",
       "photoTitle": "Fotografie de profil",
-      "photoBody": "Încărcată pe {date}. Ceilalți participanți o văd în locul inițialelor tale. O poți elimina din sala de așteptare a unui eveniment sau ștergându-ți datele."
+      "photoBody": "Încărcată pe {date}. Ceilalți participanți o văd în locul inițialelor tale. O poți elimina din sala de așteptare a unui eveniment sau ștergându-ți datele.",
+      "grantsTitle": "Roluri în evenimente",
+      "grantsIntro": "Evenimentele în care această adresă are acces personal ca organizator, moderator sau vorbitor.",
+      "grantRoleOrganizer": "Organizator",
+      "grantRoleModerator": "Moderator",
+      "grantRoleSpeaker": "Vorbitor",
+      "grantSince": "Din {date}",
+      "grantPublic": "afișat pe pagina publică",
+      "grantRevoked": "acces revocat la {date}"
     },
     "erasure": {
       "title": "Ștergerea datelor dumneavoastră",
@@ -3339,7 +3347,8 @@
       "doneBody": "Înregistrări șterse: {count}, împreună cu datele asociate.",
       "error": "A apărut o eroare. Reîncercați mai târziu.",
       "rateLimited": "Prea multe solicitări. Reîncercați peste o oră.",
-      "back": "Înapoi la datele mele"
+      "back": "Înapoi la datele mele",
+      "doneGrants": "{count, plural, one {A fost eliminat și # acces ca organizator, moderator sau vorbitor.} few {Au fost eliminate și # accese ca organizator, moderator sau vorbitor.} other {Au fost eliminate și # de accese ca organizator, moderator sau vorbitor.}}"
     }
   },
   "legal": {

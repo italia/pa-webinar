@@ -42,7 +42,7 @@ export default async function EventManagePage({
 
   // Chi arriva dall'area di amministrazione (l'elenco, la libreria video)
   // non ha il token nell'indirizzo: vale la sessione dello staff, e per
-  // l'organizzatore solo sui propri eventi (ADR-014).
+  // l'organizzatore solo sugli eventi che gestisce (eventScope, ADR-014).
   const session = await getStaffSession(await cookies());
 
   // Con una sessione che puo' gestire l'evento il token nell'indirizzo non

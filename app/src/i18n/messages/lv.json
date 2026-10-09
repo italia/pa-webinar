@@ -804,7 +804,7 @@
         "roleInfo": {
           "organizer": {
             "name": "Organizators",
-            "desc": "Vada telpu kā moderators un ir norādīts starp organizatoriem. Galvenais organizators pievieno un noņem pārējās personas."
+            "desc": "Vada telpu kā moderators un ir norādīts starp organizatoriem. Galvenais organizators pievieno un noņem pārējās personas. Ar darbinieka kontu ar to pašu e-pastu viņš pārvalda arī pasākumu."
           },
           "moderator": {
             "name": "Moderators",
@@ -856,7 +856,7 @@
         "roleModerator": "Moderators",
         "roleSpeaker": "Runātājs",
         "roleHelp": {
-          "organizer": "Vada telpu kā moderators un ir norādīts starp organizatoriem.",
+          "organizer": "Vada telpu kā moderators un ir norādīts starp organizatoriem. Ar darbinieka kontu ar to pašu e-pastu viņš pārvalda arī pasākumu.",
           "moderator": "Vada telpu: dod vārdu, pārvalda jautājumus, aptaujas un ierakstīšanu.",
           "speaker": "Runā, izmanto kameru un kopīgo ekrānu bez moderēšanas tiesībām."
         },
@@ -1527,7 +1527,7 @@
       "prepareEmailBody": "Sveiki, {name}!\n\nŠeit ir jūsu personīgā saite uz “{title}”:\n{link}\n\nSaite ir tikai jums: nepārsūtiet un nekopīgojiet to.",
       "draftNote": "Pasākums ir melnraksts: saites tiek nosūtītas pa e-pastu, kad tas tiek publicēts. Pa to laiku varat tās nokopēt šeit.",
       "roleOrganizer": "Organizators",
-      "roleOrganizerHint": "Moderē kā moderators un ir norādīts starp pasākuma organizatoriem.",
+      "roleOrganizerHint": "Moderē kā moderators un ir norādīts starp pasākuma organizatoriem. Ar darbinieka kontu ar to pašu e-pastu viņš pārvalda arī pasākumu.",
       "organization": "Iestāde vai organizācija (pēc izvēles)",
       "publicListed": "Rādīt publiskajā lapā",
       "onPublicPage": "Publiskajā lapā"
@@ -3318,7 +3318,15 @@
       "erasureCtaBody": "Varat pieprasīt ar jūsu e-pasta adresi saistīto datu pilnīgu dzēšanu (GDPR 17. pants).",
       "erasureCtaButton": "Pieprasīt dzēšanu",
       "photoTitle": "Profila fotoattēls",
-      "photoBody": "Augšupielādēts {date}. Citi dalībnieki to redz tavu iniciāļu vietā. To var noņemt pasākuma uzgaidāmajā telpā vai dzēšot savus datus."
+      "photoBody": "Augšupielādēts {date}. Citi dalībnieki to redz tavu iniciāļu vietā. To var noņemt pasākuma uzgaidāmajā telpā vai dzēšot savus datus.",
+      "grantsTitle": "Lomas pasākumos",
+      "grantsIntro": "Pasākumi, kuros šai adresei ir personīga piekļuve kā organizatoram, moderatoram vai runātājam.",
+      "grantRoleOrganizer": "Organizators",
+      "grantRoleModerator": "Moderators",
+      "grantRoleSpeaker": "Runātājs",
+      "grantSince": "Kopš {date}",
+      "grantPublic": "redzams publiskajā lapā",
+      "grantRevoked": "piekļuve atsaukta {date}"
     },
     "erasure": {
       "title": "Jūsu datu dzēšana",
@@ -3339,7 +3347,8 @@
       "doneBody": "Dzēsto reģistrāciju skaits: {count}. Dzēsti arī saistītie dati.",
       "error": "Radās kļūda. Lūdzu, mēģiniet vēlāk.",
       "rateLimited": "Pārāk daudz pieprasījumu. Lūdzu, mēģiniet vēlreiz pēc stundas.",
-      "back": "Atpakaļ uz maniem datiem"
+      "back": "Atpakaļ uz maniem datiem",
+      "doneGrants": "{count, plural, zero {Noņemtas arī # piekļuves kā organizatoram, moderatoram vai runātājam.} one {Noņemta arī # piekļuve kā organizatoram, moderatoram vai runātājam.} other {Noņemtas arī # piekļuves kā organizatoram, moderatoram vai runātājam.}}"
     }
   },
   "legal": {

@@ -19,8 +19,9 @@ const bulkDeleteSchema = z.object({
 });
 
 export const POST = withErrorHandling(async (request) => {
-  // L'organizzatore agisce solo sui propri eventi: gli altri identificativi
-  // della selezione restano fuori dal filtro, e il conteggio lo dice (ADR-014).
+  // L'organizzatore agisce solo sugli eventi che gestisce (creati o
+  // co-organizzati, eventScope): gli altri identificativi della selezione
+  // restano fuori dal filtro, e il conteggio lo dice (ADR-014).
   const session = await requireStaff(await cookies());
 
   const body = await parseJsonBody(request);

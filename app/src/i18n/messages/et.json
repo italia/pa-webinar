@@ -804,7 +804,7 @@
         "roleInfo": {
           "organizer": {
             "name": "Korraldaja",
-            "desc": "Juhib ruumi nagu moderaator ja on esitatud korraldajate seas. Peakorraldaja lisab ja eemaldab teisi inimesi."
+            "desc": "Juhib ruumi nagu moderaator ja on esitatud korraldajate seas. Peakorraldaja lisab ja eemaldab teisi inimesi. Sama e-postiga töötajakontoga haldab ta ka üritust."
           },
           "moderator": {
             "name": "Moderaator",
@@ -856,7 +856,7 @@
         "roleModerator": "Moderaator",
         "roleSpeaker": "Esineja",
         "roleHelp": {
-          "organizer": "Juhib ruumi nagu moderaator ja on esitatud korraldajate seas.",
+          "organizer": "Juhib ruumi nagu moderaator ja on esitatud korraldajate seas. Sama e-postiga töötajakontoga haldab ta ka üritust.",
           "moderator": "Juhib ruumi: annab sõna, haldab küsimusi, küsitlusi ja salvestamist.",
           "speaker": "Räägib, kasutab kaamerat ja jagab ekraani, ilma moderaatori volitusteta."
         },
@@ -1527,7 +1527,7 @@
       "prepareEmailBody": "Tere, {name}!\n\nSiin on teie isiklik link sündmusele „{title}“:\n{link}\n\nLink on ainult teile: ärge edastage ega jagage seda.",
       "draftNote": "Üritus on mustand: lingid saadetakse e-postiga, kui see avaldatakse. Seni saate need siit kopeerida.",
       "roleOrganizer": "Korraldaja",
-      "roleOrganizerHint": "Modereerib nagu moderaator ja on esitatud ürituse korraldajate seas.",
+      "roleOrganizerHint": "Modereerib nagu moderaator ja on esitatud ürituse korraldajate seas. Sama e-postiga töötajakontoga haldab ta ka üritust.",
       "organization": "Asutus või organisatsioon (valikuline)",
       "publicListed": "Näita avalikul lehel",
       "onPublicPage": "Avalikul lehel"
@@ -3318,7 +3318,15 @@
       "erasureCtaBody": "Võite taotleda oma e-posti aadressiga seotud andmete täielikku kustutamist vastavalt GDPR artiklile 17.",
       "erasureCtaButton": "Taotle kustutamist",
       "photoTitle": "Profiilifoto",
-      "photoBody": "Üles laaditud {date}. Teised osalejad näevad seda sinu initsiaalide asemel. Saad selle eemaldada ürituse ooteruumis või oma andmed kustutades."
+      "photoBody": "Üles laaditud {date}. Teised osalejad näevad seda sinu initsiaalide asemel. Saad selle eemaldada ürituse ooteruumis või oma andmed kustutades.",
+      "grantsTitle": "Rollid üritustel",
+      "grantsIntro": "Üritused, kus sellel aadressil on isiklik juurdepääs korraldaja, moderaatori või esinejana.",
+      "grantRoleOrganizer": "Korraldaja",
+      "grantRoleModerator": "Moderaator",
+      "grantRoleSpeaker": "Esineja",
+      "grantSince": "Alates {date}",
+      "grantPublic": "kuvatud avalikul lehel",
+      "grantRevoked": "juurdepääs tühistati {date}"
     },
     "erasure": {
       "title": "Teie andmete kustutamine",
@@ -3339,7 +3347,8 @@
       "doneBody": "Kustutatud registreeringute arv: {count}. Ka nendega seotud andmed on kustutatud.",
       "error": "Tekkis viga. Palun proovige hiljem uuesti.",
       "rateLimited": "Liiga palju päringuid. Palun proovige tunni aja pärast uuesti.",
-      "back": "Tagasi minu andmete juurde"
+      "back": "Tagasi minu andmete juurde",
+      "doneGrants": "{count, plural, one {Eemaldati ka # juurdepääs korraldaja, moderaatori või esinejana.} other {Eemaldati ka # juurdepääsu korraldaja, moderaatori või esinejana.}}"
     }
   },
   "legal": {

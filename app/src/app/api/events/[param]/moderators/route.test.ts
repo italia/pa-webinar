@@ -15,6 +15,7 @@ vi.mock('@/lib/crypto/pii', () => ({
   encryptPII: (v: string) => v,
   encryptPIIOrNull: (v: string | null | undefined) => v ?? null,
   tryDecryptPII: (v: string | null) => v,
+  hashEmail: (v: string) => `hash:${v}`,
 }));
 vi.mock('@/lib/settings', () => ({
   getSettings: vi.fn(async () => ({ defaultLocale: 'it' })),
@@ -23,6 +24,16 @@ vi.mock('@/lib/email/moderator-link', async (importOriginal) => ({
   ...(await importOriginal<Record<string, unknown>>()),
   sendGrantModeratorLink: vi.fn(async () => true),
 }));
+
+const organizerMark = vi.hoisted(() => ({ allowed: true }));
+vi.mock('@/lib/auth/organizer-mark', async () => {
+  const { ForbiddenError } = await import('@/lib/errors');
+  return {
+    requireOrganizerMarkRight: vi.fn(async () => {
+      if (!organizerMark.allowed) throw new ForbiddenError('Only staff who manage the event can name an organizer');
+    }),
+  };
+});
 
 import { prisma } from '@/lib/db';
 import { sendGrantModeratorLink } from '@/lib/email/moderator-link';
@@ -55,6 +66,7 @@ const ctx = { params: Promise.resolve({ param: EVENT_ID }) };
 
 beforeEach(() => {
   vi.clearAllMocks();
+  organizerMark.allowed = true;
   db.event.findUnique.mockResolvedValue({ id: EVENT_ID, moderatorToken: PRIMARY });
   db.eventModerator.create.mockImplementation(async ({ data }: { data: Record<string, unknown> }) => ({
     id: 'grant-9',
@@ -99,14 +111,33 @@ describe('POST /api/events/[param]/moderators — profilo della persona', () => 
       ctx as never,
     );
     expect(res.status).toBe(201);
+    // L'impronta si salva ma non torna al browser.
+    expect(await res.json()).not.toHaveProperty('emailHash');
     const data = db.eventModerator.create.mock.calls[0]![0].data;
     expect(data).toMatchObject({
       role: 'MODERATOR',
+      emailHash: 'hash:org@example.test',
       organizer: true,
       organization: 'Ente di esempio',
       organizationLogoUrl: 'https://portale.example.test/api/assets/images/logo.png',
       publicListed: true,
     });
+  });
+
+  it('il solo link principale non basta per nominare un organizzatore', async () => {
+    organizerMark.allowed = false;
+    const res = await POST(
+      post({ name: 'Persona 1', email: 'p1@example.test', role: 'MODERATOR', organizer: true }) as never,
+      ctx as never,
+    );
+    expect(res.status).toBe(403);
+    expect(db.eventModerator.create).not.toHaveBeenCalled();
+  });
+
+  it('un moderatore senza segno si aggiunge con il solo link principale', async () => {
+    organizerMark.allowed = false;
+    const res = await POST(post({ name: 'Persona 1', role: 'MODERATOR' }) as never, ctx as never);
+    expect(res.status).toBe(201);
   });
 
   it('rifiuta un relatore segnato come organizzatore', async () => {

@@ -335,7 +335,7 @@ Configured in: [Identity, access and tokens](architecture/identity-and-access.md
 
 ## Organizers
 
-Organizers are staff accounts with the role `ORGANIZER`. They sign in with a one-time link sent by email, and they see and manage only the events they created. See [ADR-014](adr/014-organizer-role.md).
+Organizers are staff accounts with the role `ORGANIZER`. They sign in with a one-time link sent by email, and they see and manage the events they created and those where they are named as an organizer with the same email address. See [ADR-014](adr/014-organizer-role.md).
 
 ### The event wizard
 

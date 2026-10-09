@@ -804,7 +804,7 @@
         "roleInfo": {
           "organizer": {
             "name": "Organisator",
-            "desc": "Leidt de ruimte als een moderator en wordt bij de organisatoren vermeld. De hoofdorganisator voegt de andere personen toe en verwijdert ze."
+            "desc": "Leidt de ruimte als een moderator en wordt bij de organisatoren vermeld. De hoofdorganisator voegt de andere personen toe en verwijdert ze. Met een medewerkersaccount op hetzelfde e-mailadres beheert die persoon ook het evenement."
           },
           "moderator": {
             "name": "Moderator",
@@ -856,7 +856,7 @@
         "roleModerator": "Moderator",
         "roleSpeaker": "Spreker",
         "roleHelp": {
-          "organizer": "Leidt de ruimte als een moderator en wordt bij de organisatoren vermeld.",
+          "organizer": "Leidt de ruimte als een moderator en wordt bij de organisatoren vermeld. Met een medewerkersaccount op hetzelfde e-mailadres beheert die persoon ook het evenement.",
           "moderator": "Leidt de ruimte: geeft het woord, beheert vragen, peilingen en opname.",
           "speaker": "Spreekt, gebruikt de camera en deelt het scherm, zonder moderatierechten."
         },
@@ -1527,7 +1527,7 @@
       "prepareEmailBody": "Hallo {name},\n\nhier is uw persoonlijke link voor ‘{title}’:\n{link}\n\nDe link is alleen voor u: stuur hem niet door en deel hem niet.",
       "draftNote": "Het evenement is een concept: de links worden per e-mail verstuurd zodra het wordt gepubliceerd. Tot dan kunt u ze hier kopiëren.",
       "roleOrganizer": "Organisator",
-      "roleOrganizerHint": "Modereert als een moderator en wordt bij de organisatoren van het evenement vermeld.",
+      "roleOrganizerHint": "Modereert als een moderator en wordt bij de organisatoren van het evenement vermeld. Met een medewerkersaccount op hetzelfde e-mailadres beheert die persoon ook het evenement.",
       "organization": "Organisatie (optioneel)",
       "publicListed": "Tonen op de openbare pagina",
       "onPublicPage": "Op de openbare pagina"
@@ -3318,7 +3318,15 @@
       "erasureCtaBody": "U kunt de volledige verwijdering aanvragen van de gegevens die aan uw e-mailadres zijn gekoppeld (Art. 17 GDPR).",
       "erasureCtaButton": "Verwijdering aanvragen",
       "photoTitle": "Profielfoto",
-      "photoBody": "Geüpload op {date}. Andere deelnemers zien hem in plaats van je initialen. Je kunt hem verwijderen in de wachtruimte van een evenement of door je gegevens te wissen."
+      "photoBody": "Geüpload op {date}. Andere deelnemers zien hem in plaats van je initialen. Je kunt hem verwijderen in de wachtruimte van een evenement of door je gegevens te wissen.",
+      "grantsTitle": "Rollen in evenementen",
+      "grantsIntro": "De evenementen waarin dit adres persoonlijke toegang heeft als organisator, moderator of spreker.",
+      "grantRoleOrganizer": "Organisator",
+      "grantRoleModerator": "Moderator",
+      "grantRoleSpeaker": "Spreker",
+      "grantSince": "Sinds {date}",
+      "grantPublic": "getoond op de openbare pagina",
+      "grantRevoked": "toegang ingetrokken op {date}"
     },
     "erasure": {
       "title": "Verwijdering van uw gegevens",
@@ -3339,7 +3347,8 @@
       "doneBody": "Verwijderde inschrijvingen: {count}, samen met de gekoppelde gegevens.",
       "error": "Er is een fout opgetreden. Probeer het later opnieuw.",
       "rateLimited": "Te veel verzoeken. Probeer het over een uur opnieuw.",
-      "back": "Terug naar mijn gegevens"
+      "back": "Terug naar mijn gegevens",
+      "doneGrants": "{count, plural, one {Ook # toegang als organisator, moderator of spreker is verwijderd.} other {Ook # toegangen als organisator, moderator of spreker zijn verwijderd.}}"
     }
   },
   "legal": {

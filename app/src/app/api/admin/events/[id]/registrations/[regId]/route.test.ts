@@ -139,7 +139,7 @@ describe('PATCH registration', () => {
   });
 
   it('keeps an organizer\'s correction on the registration only', async () => {
-    vi.mocked(requireEventManager).mockResolvedValueOnce({ role: 'organizer', accountId: 'org-1' });
+    vi.mocked(requireEventManager).mockResolvedValueOnce({ role: 'organizer', accountId: 'org-1', emailHash: 'hash-org-1' });
     iscrizione(PERSON);
     const res = await PATCH(req('PATCH', { displayName: 'Anna Bianchi' }) as never, ctx as never);
     expect(res.status).toBe(200);

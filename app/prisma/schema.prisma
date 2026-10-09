@@ -352,6 +352,10 @@ model EventModerator {
 
   name  String
   email String?
+  // Impronta dell'indirizzo (hashEmail, come StaffAccount.emailHash): un
+  // account dello staff con lo stesso indirizzo, se la concessione è da
+  // organizzatore, gestisce l'evento come chi l'ha creato.
+  emailHash String? @map("email_hash") @db.VarChar(64)
 
   role EventModeratorRole @default(MODERATOR)
 
@@ -376,6 +380,7 @@ model EventModerator {
   event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
   @@index([eventId])
+  @@index([emailHash])
   @@map("event_moderators")
 }
 

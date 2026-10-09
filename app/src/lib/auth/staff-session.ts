@@ -1,4 +1,4 @@
-import type { StaffRole } from '@prisma/client';
+import type { Prisma, StaffRole } from '@prisma/client';
 import { cache } from 'react';
 import { jwtVerify, SignJWT } from 'jose';
 import type { ReadonlyRequestCookies } from 'next/dist/server/web/spec-extension/adapters/request-cookies';
@@ -17,8 +17,9 @@ const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
  * - `admin` — tutta l'istanza. Con un account nominale (`accountId`) o con
  *   la chiave dell'istanza (`accountId: null`), che resta come accesso di
  *   emergenza e per l'automazione.
- * - `organizer` — un account dello staff: i propri eventi e cio' che serve
- *   a crearli, niente configurazione dell'istanza ne' dati di tutti.
+ * - `organizer` — un account dello staff: gli eventi che ha creato o in cui
+ *   è organizzatore (eventScope) e cio' che serve a crearli, niente
+ *   configurazione dell'istanza ne' dati di tutti.
  *
  * Tutti viaggiano nello stesso cookie firmato (`admin_session`). Per gli
  * account il ruolo NON si prende dal token ma dall'account, riletto a ogni
@@ -28,7 +29,13 @@ const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
  */
 export type StaffSession =
   | { role: 'admin'; accountId: string | null }
-  | { role: 'organizer'; accountId: string };
+  | {
+      role: 'organizer';
+      accountId: string;
+      /** L'impronta dell'indirizzo dell'account: riconosce le concessioni da
+       *  organizzatore con lo stesso indirizzo (`eventScope`). */
+      emailHash: string;
+    };
 
 /**
  * La sessione corrente, o `null`. Per l'organizzatore rilegge l'account:
@@ -60,12 +67,12 @@ export const getStaffSession = cache(async function getStaffSession(
 
   const account = await prisma.staffAccount.findUnique({
     where: { id: payload.sub },
-    select: { id: true, active: true, role: true },
+    select: { id: true, active: true, role: true, emailHash: true },
   });
   if (!account?.active) return null;
   return account.role === 'ADMIN'
     ? { role: 'admin', accountId: account.id }
-    : { role: 'organizer', accountId: account.id };
+    : { role: 'organizer', accountId: account.id, emailHash: account.emailHash };
 });
 
 /**
@@ -101,18 +108,6 @@ export async function requireStaff(cookies: ReadonlyRequestCookies): Promise<Sta
 }
 
 /**
- * Chi puo' gestire un evento: l'admin sempre, l'organizzatore solo se l'ha
- * creato lui. Un evento senza proprietario e' dell'amministrazione.
- */
-export function canManageEvent(
-  session: StaffSession,
-  event: { createdById: string | null },
-): boolean {
-  if (session.role === 'admin') return true;
-  return event.createdById !== null && event.createdById === session.accountId;
-}
-
-/**
  * Staff con diritto sull'evento indicato; altrimenti 401 (nessuna sessione)
  * o 403. L'evento inesistente risponde come quello altrui: 403, cosi' non si
  * sonda quali identificativi esistono. Un identificativo malformato e' 400
@@ -128,21 +123,48 @@ export async function requireEventManager(
   return session;
 }
 
-/** Il filtro Prisma sugli eventi visibili a questa sessione. */
-export function eventScope(session: StaffSession): { createdById?: string } {
-  return session.role === 'admin' ? {} : { createdById: session.accountId };
+/**
+ * Il filtro Prisma sugli eventi che questa sessione gestisce: tutti per
+ * l'admin; per l'organizzatore quelli che ha creato e quelli in cui il suo
+ * indirizzo ha una concessione da organizzatore ancora valida. È la regola
+ * unica: `puoGestire` la applica al singolo evento.
+ *
+ * La condizione sta dentro `AND`, non in un `OR` di primo livello: chi la
+ * aggiunge a un filtro con un proprio `OR` (una ricerca) non la sovrascrive.
+ * Non assegnare `AND` dopo averla sparsa in un filtro.
+ */
+export function eventScope(session: StaffSession): Prisma.EventWhereInput {
+  if (session.role === 'admin') return {};
+  return {
+    AND: [
+      {
+        OR: [
+          { createdById: session.accountId },
+          {
+            additionalMods: {
+              some: { organizer: true, revokedAt: null, emailHash: session.emailHash },
+            },
+          },
+        ],
+      },
+    ],
+  };
 }
 
-/** Come `canManageEvent`, leggendo il proprietario dal database. */
-export async function puoGestire(session: StaffSession, eventId: string): Promise<boolean> {
+/**
+ * Se la sessione gestisce l'evento indicato (la regola di `eventScope`).
+ * Memorizzata per richiesta: metadati e pagina la chiedono per lo stesso
+ * evento con la stessa sessione.
+ */
+export const puoGestire = cache(async function puoGestire(
+  session: StaffSession,
+  eventId: string,
+): Promise<boolean> {
   if (session.role === 'admin') return true;
   if (!UUID_RE.test(eventId)) return false;
-  const event = await prisma.event.findUnique({
-    where: { id: eventId },
-    select: { createdById: true },
-  });
-  return !!event && canManageEvent(session, event);
-}
+  const trovati = await prisma.event.count({ where: { id: eventId, ...eventScope(session) } });
+  return trovati > 0;
+});
 
 /** Staff con diritto sull'evento della registrazione; altrimenti 401/403. */
 export async function requireRecordingManager(
@@ -154,9 +176,9 @@ export async function requireRecordingManager(
   if (!UUID_RE.test(recordingId)) throw new ForbiddenError();
   const recording = await prisma.recording.findUnique({
     where: { id: recordingId },
-    select: { event: { select: { createdById: true } } },
+    select: { eventId: true },
   });
-  if (!recording || !canManageEvent(session, recording.event)) throw new ForbiddenError();
+  if (!recording || !(await puoGestire(session, recording.eventId))) throw new ForbiddenError();
   return session;
 }
 
@@ -170,8 +192,8 @@ export async function requireSpeakerManager(
   if (!UUID_RE.test(speakerId)) throw new ForbiddenError();
   const speaker = await prisma.speaker.findUnique({
     where: { id: speakerId },
-    select: { recording: { select: { event: { select: { createdById: true } } } } },
+    select: { recording: { select: { eventId: true } } },
   });
-  if (!speaker || !canManageEvent(session, speaker.recording.event)) throw new ForbiddenError();
+  if (!speaker || !(await puoGestire(session, speaker.recording.eventId))) throw new ForbiddenError();
   return session;
 }

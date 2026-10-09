@@ -13,11 +13,22 @@ vi.mock('@/lib/db', () => ({
 }));
 vi.mock('@/lib/crypto/pii', () => ({
   tryDecryptPII: (v: string | null) => v,
+  hashEmail: (v: string) => `hash:${v}`,
 }));
 vi.mock('@/lib/auth/moderator', async (importOriginal) => ({
   ...(await importOriginal<Record<string, unknown>>()),
   invalidateModeratorCache: vi.fn(),
 }));
+
+const organizerMark = vi.hoisted(() => ({ allowed: true }));
+vi.mock('@/lib/auth/organizer-mark', async () => {
+  const { ForbiddenError } = await import('@/lib/errors');
+  return {
+    requireOrganizerMarkRight: vi.fn(async () => {
+      if (!organizerMark.allowed) throw new ForbiddenError('Only staff who manage the event can name an organizer');
+    }),
+  };
+});
 
 import { prisma } from '@/lib/db';
 
@@ -49,6 +60,7 @@ const ctx = { params: Promise.resolve({ param: EVENT_ID, modId: MOD_ID }) };
 
 beforeEach(() => {
   vi.clearAllMocks();
+  organizerMark.allowed = true;
   db.event.findUnique.mockResolvedValue({ id: EVENT_ID, moderatorToken: PRIMARY });
   db.eventModerator.findUnique.mockResolvedValue({ id: MOD_ID, eventId: EVENT_ID, role: 'SPEAKER' });
   db.eventModerator.update.mockImplementation(async ({ data }: { data: Record<string, unknown> }) => ({
@@ -82,6 +94,73 @@ describe('PATCH /api/events/[param]/moderators/[modId]', () => {
   it("un ente vuoto si toglie", async () => {
     await PATCH(patch({ organization: '' }) as never, ctx as never);
     expect(db.eventModerator.update.mock.calls[0]![0].data).toEqual({ organization: null });
+  });
+
+  it("una concessione senza impronta la riceve, per riconoscere l'account dello staff", async () => {
+    db.eventModerator.findUnique.mockResolvedValue({
+      id: MOD_ID,
+      eventId: EVENT_ID,
+      role: 'MODERATOR',
+      email: 'org@example.test',
+      emailHash: null,
+    });
+    await PATCH(patch({ organizer: true }) as never, ctx as never);
+    expect(db.eventModerator.update.mock.calls[0]![0].data).toEqual({
+      organizer: true,
+      emailHash: 'hash:org@example.test',
+    });
+  });
+
+  it('una concessione già da organizzatore non riceve l’impronta senza il controllo', async () => {
+    db.eventModerator.findUnique.mockResolvedValue({
+      id: MOD_ID,
+      eventId: EVENT_ID,
+      role: 'MODERATOR',
+      organizer: true,
+      email: 'org@example.test',
+      emailHash: null,
+    });
+    await PATCH(patch({ publicListed: true }) as never, ctx as never);
+    expect(db.eventModerator.update.mock.calls[0]![0].data).toEqual({ publicListed: true });
+  });
+
+  it('una concessione senza segno riceve l’impronta anche con il solo link', async () => {
+    organizerMark.allowed = false;
+    db.eventModerator.findUnique.mockResolvedValue({
+      id: MOD_ID,
+      eventId: EVENT_ID,
+      role: 'SPEAKER',
+      organizer: false,
+      email: 'rel@example.test',
+      emailHash: null,
+    });
+    await PATCH(patch({ publicListed: true }) as never, ctx as never);
+    expect(db.eventModerator.update.mock.calls[0]![0].data).toEqual({
+      publicListed: true,
+      emailHash: 'hash:rel@example.test',
+    });
+  });
+
+  it('dare il segno di organizzatore chiede chi gestisce già l’evento; toglierlo no', async () => {
+    organizerMark.allowed = false;
+    db.eventModerator.findUnique.mockResolvedValue({
+      id: MOD_ID,
+      eventId: EVENT_ID,
+      role: 'MODERATOR',
+      organizer: false,
+      emailHash: 'h',
+    });
+    expect((await PATCH(patch({ organizer: true }) as never, ctx as never)).status).toBe(403);
+    expect(db.eventModerator.update).not.toHaveBeenCalled();
+
+    db.eventModerator.findUnique.mockResolvedValue({
+      id: MOD_ID,
+      eventId: EVENT_ID,
+      role: 'MODERATOR',
+      organizer: true,
+      emailHash: 'h',
+    });
+    expect((await PATCH(patch({ organizer: false }) as never, ctx as never)).status).toBe(200);
   });
 
   it('un relatore non diventa organizzatore', async () => {

@@ -1,4 +1,5 @@
 import { getLocale, getTranslations } from 'next-intl/server';
+import type { Prisma } from '@prisma/client';
 
 import { staffOLogin } from '@/lib/auth/staff-page';
 import { eventScope } from '@/lib/auth/staff-session';
@@ -13,7 +14,7 @@ interface EventsListPageProps {
   searchParams: Promise<{ token?: string }>;
 }
 
-async function loadEvents(scope: { createdById?: string }, token?: string) {
+async function loadEvents(scope: Prisma.EventWhereInput, token?: string) {
   // Col token si vede l'evento di quel token, chi lo possiede lo modera
   // comunque; senza, quelli che la sessione puo' gestire (ADR-014).
   const where = token ? { moderatorToken: token } : scope;

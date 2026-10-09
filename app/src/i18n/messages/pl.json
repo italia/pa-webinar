@@ -804,7 +804,7 @@
         "roleInfo": {
           "organizer": {
             "name": "Organizator",
-            "desc": "Prowadzi salę jak moderator i jest przedstawiany wśród organizatorów. Główny organizator dodaje i usuwa pozostałe osoby."
+            "desc": "Prowadzi salę jak moderator i jest przedstawiany wśród organizatorów. Główny organizator dodaje i usuwa pozostałe osoby. Z kontem personelu na ten sam e-mail zarządza także wydarzeniem."
           },
           "moderator": {
             "name": "Moderator",
@@ -856,7 +856,7 @@
         "roleModerator": "Moderator",
         "roleSpeaker": "Prelegent",
         "roleHelp": {
-          "organizer": "Prowadzi salę jak moderator i jest przedstawiany wśród organizatorów.",
+          "organizer": "Prowadzi salę jak moderator i jest przedstawiany wśród organizatorów. Z kontem personelu na ten sam e-mail zarządza także wydarzeniem.",
           "moderator": "Prowadzi salę: udziela głosu, zarządza pytaniami, ankietami i nagrywaniem.",
           "speaker": "Mówi, używa kamery i udostępnia ekran, bez uprawnień moderatora."
         },
@@ -1527,7 +1527,7 @@
       "prepareEmailBody": "Witaj {name},\n\noto Twój osobisty link do „{title}”:\n{link}\n\nLink jest tylko dla Ciebie: nie przekazuj go ani nie udostępniaj.",
       "draftNote": "Wydarzenie jest wersją roboczą: linki zostaną wysłane e-mailem po jego opublikowaniu. Do tego czasu możesz je skopiować stąd.",
       "roleOrganizer": "Organizator",
-      "roleOrganizerHint": "Moderuje jak moderator i jest przedstawiany wśród organizatorów wydarzenia.",
+      "roleOrganizerHint": "Moderuje jak moderator i jest przedstawiany wśród organizatorów wydarzenia. Z kontem personelu na ten sam e-mail zarządza także wydarzeniem.",
       "organization": "Instytucja lub organizacja (opcjonalnie)",
       "publicListed": "Pokaż na stronie publicznej",
       "onPublicPage": "Na stronie publicznej"
@@ -3318,7 +3318,15 @@
       "erasureCtaBody": "Możesz złożyć wniosek o całkowite usunięcie danych powiązanych z Twoim adresem e-mail (art. 17 GDPR).",
       "erasureCtaButton": "Zażądaj usunięcia",
       "photoTitle": "Zdjęcie profilowe",
-      "photoBody": "Przesłano {date}. Inni uczestnicy widzą je zamiast Twoich inicjałów. Możesz je usunąć w poczekalni wydarzenia lub usuwając swoje dane."
+      "photoBody": "Przesłano {date}. Inni uczestnicy widzą je zamiast Twoich inicjałów. Możesz je usunąć w poczekalni wydarzenia lub usuwając swoje dane.",
+      "grantsTitle": "Role w wydarzeniach",
+      "grantsIntro": "Wydarzenia, w których ten adres ma osobisty dostęp jako organizator, moderator lub prelegent.",
+      "grantRoleOrganizer": "Organizator",
+      "grantRoleModerator": "Moderator",
+      "grantRoleSpeaker": "Prelegent",
+      "grantSince": "Od {date}",
+      "grantPublic": "widoczny na stronie publicznej",
+      "grantRevoked": "dostęp cofnięty {date}"
     },
     "erasure": {
       "title": "Usunięcie Twoich danych",
@@ -3339,7 +3347,8 @@
       "doneBody": "Usunięte rejestracje: {count}, wraz z powiązanymi danymi.",
       "error": "Wystąpił błąd. Spróbuj ponownie później.",
       "rateLimited": "Zbyt wiele żądań. Spróbuj ponownie za godzinę.",
-      "back": "Wróć do moich danych"
+      "back": "Wróć do moich danych",
+      "doneGrants": "{count, plural, one {Usunięto także # dostęp jako organizator, moderator lub prelegent.} few {Usunięto także # dostępy jako organizator, moderator lub prelegent.} many {Usunięto także # dostępów jako organizator, moderator lub prelegent.} other {Usunięto także # dostępu jako organizator, moderator lub prelegent.}}"
     }
   },
   "legal": {

@@ -804,7 +804,7 @@
         "roleInfo": {
           "organizer": {
             "name": "Organizzatur",
-            "desc": "Imexxi l-kamra bħal moderatur u jidher fost l-organizzaturi. L-organizzatur ewlieni jżid u jneħħi lill-persuni l-oħra."
+            "desc": "Imexxi l-kamra bħal moderatur u jidher fost l-organizzaturi. L-organizzatur ewlieni jżid u jneħħi lill-persuni l-oħra. B'kont tal-persunal bl-istess email, jimmaniġġja wkoll l-avveniment."
           },
           "moderator": {
             "name": "Moderatur",
@@ -856,7 +856,7 @@
         "roleModerator": "Moderatur",
         "roleSpeaker": "Kelliem",
         "roleHelp": {
-          "organizer": "Imexxi l-kamra bħal moderatur u jidher fost l-organizzaturi.",
+          "organizer": "Imexxi l-kamra bħal moderatur u jidher fost l-organizzaturi. B'kont tal-persunal bl-istess email, jimmaniġġja wkoll l-avveniment.",
           "moderator": "Imexxi l-kamra: jagħti l-kelma, jimmaniġġja mistoqsijiet, stħarriġ u reġistrazzjoni.",
           "speaker": "Jitkellem, juża l-kamera u jaqsam l-iskrin, mingħajr setgħat ta' moderazzjoni."
         },
@@ -1527,7 +1527,7 @@
       "prepareEmailBody": "Bonġu {name},\n\nhawn hu l-link personali tiegħek għal “{title}”:\n{link}\n\nIl-link huwa għalik biss: tgħaddihx u taqsmux.",
       "draftNote": "L-avveniment huwa abbozz: il-links jintbagħtu bl-email meta jiġi ppubblikat. Sadanittant tista' tikkopjahom minn hawn.",
       "roleOrganizer": "Organizzatur",
-      "roleOrganizerHint": "Jimmodera bħal moderatur u jidher fost l-organizzaturi tal-avveniment.",
+      "roleOrganizerHint": "Jimmodera bħal moderatur u jidher fost l-organizzaturi tal-avveniment. B'kont tal-persunal bl-istess email, jimmaniġġja wkoll l-avveniment.",
       "organization": "Entità jew organizzazzjoni (fakultattiv)",
       "publicListed": "Uri fil-paġna pubblika",
       "onPublicPage": "Fil-paġna pubblika"
@@ -3318,7 +3318,15 @@
       "erasureCtaBody": "Tista' titlob it-tħassir sħiħ tad-dejta assoċjata mal-indirizz email tiegħek (Art. 17 tal-GDPR).",
       "erasureCtaButton": "Itlob it-tħassir",
       "photoTitle": "Ritratt tal-profil",
-      "photoBody": "Imtella’ fil-{date}. Il-parteċipanti l-oħra jarawh minflok l-inizjali tiegħek. Tista’ tneħħih mis-sala tal-istennija ta’ avveniment jew billi tħassar id-data tiegħek."
+      "photoBody": "Imtella’ fil-{date}. Il-parteċipanti l-oħra jarawh minflok l-inizjali tiegħek. Tista’ tneħħih mis-sala tal-istennija ta’ avveniment jew billi tħassar id-data tiegħek.",
+      "grantsTitle": "Rwoli f'avvenimenti",
+      "grantsIntro": "L-avvenimenti fejn dan l-indirizz għandu aċċess personali bħala organizzatur, moderatur jew kelliem.",
+      "grantRoleOrganizer": "Organizzatur",
+      "grantRoleModerator": "Moderatur",
+      "grantRoleSpeaker": "Kelliem",
+      "grantSince": "Minn {date}",
+      "grantPublic": "jidher fil-paġna pubblika",
+      "grantRevoked": "aċċess revokat fil-{date}"
     },
     "erasure": {
       "title": "Tħassir tad-dejta tiegħek",
@@ -3339,7 +3347,8 @@
       "doneBody": "Reġistrazzjonijiet imħassra: {count}. Tħassret ukoll id-dejta relatata.",
       "error": "Ġara żball. Jekk jogħġbok erġa' pprova aktar tard.",
       "rateLimited": "Wisq talbiet. Jekk jogħġbok erġa' pprova wara siegħa.",
-      "back": "Lura għad-dejta tiegħi"
+      "back": "Lura għad-dejta tiegħi",
+      "doneGrants": "{count, plural, one {Tneħħa wkoll # aċċess bħala organizzatur, moderatur jew kelliem.} few {Tneħħew ukoll # aċċessi bħala organizzatur, moderatur jew kelliem.} many {Tneħħew ukoll # aċċessi bħala organizzatur, moderatur jew kelliem.} other {Tneħħew ukoll # aċċessi bħala organizzatur, moderatur jew kelliem.}}"
     }
   },
   "legal": {

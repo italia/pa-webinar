@@ -86,6 +86,7 @@ export const DUPLICATE_SOURCE_INCLUDE = {
     select: {
       name: true,
       email: true,
+      emailHash: true,
       role: true,
       organizer: true,
       organization: true,
@@ -197,6 +198,7 @@ export function duplicatedRelations(source: DuplicateSource): DuplicatedRelation
         // li cancella insieme al resto (vedi /api/cron/cleanup).
         name: m.name,
         email: m.email,
+        emailHash: m.emailHash,
         role: m.role,
         // Ruolo ed ente seguono la persona; la pubblicazione no: presentare
         // qualcuno nella pagina pubblica è una scelta per ogni evento, e la

@@ -377,7 +377,7 @@ bodies on one installation is not supported. See
   holder. It opens a new installation, and it serves emergencies and
   automation.
 - **Named administrators** (staff role `ADMIN`) and **organizers** (staff role
-  `ORGANIZER`, who manage only their own events): personal accounts that sign
+  `ORGANIZER`, who manage their own and co-organized events): personal accounts that sign
   in through one-time links sent by email, so SMTP is required. Deactivating
   an account takes effect on its next request, and the audit trail records who
   acted.

@@ -7,7 +7,7 @@ import { getLocale, getTranslations } from 'next-intl/server';
 import { nomePagina } from '@/components/admin/admin-nav-model';
 import type { PercorsoInterno } from '@/i18n/percorsi';
 import { constantTimeEqual } from '@/lib/auth/moderator';
-import { canManageEvent, getStaffSession } from '@/lib/auth/staff-session';
+import { puoGestire, getStaffSession } from '@/lib/auth/staff-session';
 import { prisma } from '@/lib/db';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 
@@ -48,13 +48,13 @@ export async function eventPageMetadata(
   if (!UUID_RE.test(eventId)) return generico;
   const event = await prisma.event.findUnique({
     where: { id: eventId },
-    select: { title: true, slug: true, createdById: true, moderatorToken: true },
+    select: { title: true, slug: true, moderatorToken: true },
   });
   if (!event) return generico;
   const session = await getStaffSession(await cookies());
   const token = typeof opts.token === 'string' ? opts.token : '';
   const ammesso =
-    (session !== null && canManageEvent(session, event)) ||
+    (session !== null && (await puoGestire(session, eventId))) ||
     (opts.conToken === true && token !== '' && constantTimeEqual(event.moderatorToken, token));
   if (!ammesso) return generico;
   const titolo = getLocalized(event.title as LocalizedField, await getLocale()) || event.slug;

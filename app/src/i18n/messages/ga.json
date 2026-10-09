@@ -804,7 +804,7 @@
         "roleInfo": {
           "organizer": {
             "name": "Eagraí",
-            "desc": "Óstálann sé an seomra mar mhodhnóir agus léirítear é i measc na n-eagraithe. Cuireann an príomh-eagraí na daoine eile leis agus baineann sé iad."
+            "desc": "Óstálann sé an seomra mar mhodhnóir agus léirítear é i measc na n-eagraithe. Cuireann an príomh-eagraí na daoine eile leis agus baineann sé iad. Le cuntas foirne faoin ríomhphost céanna, bainistíonn sé an imeacht freisin."
           },
           "moderator": {
             "name": "Modhnóir",
@@ -856,7 +856,7 @@
         "roleModerator": "Modhnóir",
         "roleSpeaker": "Cainteoir",
         "roleHelp": {
-          "organizer": "Óstálann sé an seomra mar mhodhnóir agus léirítear é i measc na n-eagraithe.",
+          "organizer": "Óstálann sé an seomra mar mhodhnóir agus léirítear é i measc na n-eagraithe. Le cuntas foirne faoin ríomhphost céanna, bainistíonn sé an imeacht freisin.",
           "moderator": "Óstálann sé an seomra: tugann sé an t-urlár, bainistíonn sé ceisteanna, pobalbhreitheanna agus taifeadadh.",
           "speaker": "Labhraíonn sé, úsáideann sé an ceamara agus roinneann sé an scáileán, gan cumhachtaí modhnóireachta."
         },
@@ -1527,7 +1527,7 @@
       "prepareEmailBody": "Dia duit {name},\n\nseo do nasc pearsanta do “{title}”:\n{link}\n\nIs duitse amháin an nasc seo: ná seol ar aghaidh é agus ná roinn é.",
       "draftNote": "Is dréacht é an t-imeacht: seoltar na naisc trí ríomhphost nuair a fhoilseofar é. Idir an dá linn is féidir libh iad a chóipeáil anseo.",
       "roleOrganizer": "Eagraí",
-      "roleOrganizerHint": "Modhnaíonn sé mar mhodhnóir agus léirítear é i measc eagraithe an imeachta.",
+      "roleOrganizerHint": "Modhnaíonn sé mar mhodhnóir agus léirítear é i measc eagraithe an imeachta. Le cuntas foirne faoin ríomhphost céanna, bainistíonn sé an imeacht freisin.",
       "organization": "Eagraíocht (roghnach)",
       "publicListed": "Taispeáin ar an leathanach poiblí",
       "onPublicPage": "Ar an leathanach poiblí"
@@ -3318,7 +3318,15 @@
       "erasureCtaBody": "Is féidir libh scriosadh iomlán na sonraí a bhaineann le bhur seoladh ríomhphoist a iarraidh (Airteagal 17 de GDPR).",
       "erasureCtaButton": "Iarr scriosadh",
       "photoTitle": "Grianghraf próifíle",
-      "photoBody": "Uaslódáilte ar {date}. Feiceann rannpháirtithe eile é in áit do cheannlitreacha. Is féidir leat é a bhaint i seomra feithimh imeachta nó trí do shonraí a scriosadh."
+      "photoBody": "Uaslódáilte ar {date}. Feiceann rannpháirtithe eile é in áit do cheannlitreacha. Is féidir leat é a bhaint i seomra feithimh imeachta nó trí do shonraí a scriosadh.",
+      "grantsTitle": "Róil in imeachtaí",
+      "grantsIntro": "Na himeachtaí ina bhfuil rochtain phearsanta ag an seoladh seo mar eagraí, modhnóir nó cainteoir.",
+      "grantRoleOrganizer": "Eagraí",
+      "grantRoleModerator": "Modhnóir",
+      "grantRoleSpeaker": "Cainteoir",
+      "grantSince": "Ó {date}",
+      "grantPublic": "taispeánta ar an leathanach poiblí",
+      "grantRevoked": "rochtain cúlghairthe ar {date}"
     },
     "erasure": {
       "title": "Scriosadh bhur gcuid sonraí",
@@ -3339,7 +3347,8 @@
       "doneBody": "Clárúcháin scriosta: {count}. Scriosadh na sonraí gaolmhara freisin.",
       "error": "Tharla earráid. Bain triail eile as ar ball, le bhur dtoil.",
       "rateLimited": "An iomarca iarratas. Bain triail eile as i gceann uaire.",
-      "back": "Ar ais chuig mo chuid sonraí"
+      "back": "Ar ais chuig mo chuid sonraí",
+      "doneGrants": "{count, plural, one {Baineadh # rochtain mar eagraí, modhnóir nó cainteoir freisin.} two {Baineadh # rochtain mar eagraí, modhnóir nó cainteoir freisin.} few {Baineadh # rochtain mar eagraí, modhnóir nó cainteoir freisin.} many {Baineadh # rochtain mar eagraí, modhnóir nó cainteoir freisin.} other {Baineadh # rochtain mar eagraí, modhnóir nó cainteoir freisin.}}"
     }
   },
   "legal": {

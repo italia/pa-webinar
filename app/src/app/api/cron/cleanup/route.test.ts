@@ -56,6 +56,8 @@ vi.mock('@/lib/settings', () => ({
   getSettings: vi.fn(async () => ({ eventGracePeriodMinutes: 15 })),
 }));
 vi.mock('@/lib/storage/recordings', () => ({ deleteRecordingBlob: vi.fn() }));
+// L'impronta delle concessioni ha il suo test (lib/events/grant-email-hash).
+vi.mock('@/lib/events/grant-email-hash', () => ({ completaImprontaConcessioni: vi.fn(async () => 0) }));
 vi.mock('@/lib/azure/blob-storage', () => ({
   deleteBlob: vi.fn(),
   isAzureConfigured: vi.fn(),
@@ -990,6 +992,7 @@ describe('GET /api/cron/cleanup', () => {
     expect(deleteBlobMock).not.toHaveBeenCalled();
     expect(body).toEqual({
       ok: true,
+      grantFingerprintsFilled: 0,
       staffLoginLinksDeleted: 0,
       staffAccountsDeactivated: 0,
       emailOutboxDeleted: 0,

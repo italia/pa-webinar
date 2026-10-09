@@ -16,10 +16,13 @@ const tx = {
   registration: { deleteMany: vi.fn() },
   $executeRaw: vi.fn(),
 };
+const invalidate = vi.hoisted(() => vi.fn());
+vi.mock('@/lib/auth/moderator', () => ({ invalidateModeratorCache: invalidate }));
 vi.mock('@/lib/db', () => ({
   prisma: {
     person: { deleteMany: vi.fn() },
     eventInvitation: { deleteMany: vi.fn() },
+    eventModerator: { deleteMany: vi.fn(), findMany: vi.fn() },
     profilePhoto: { deleteMany: vi.fn() },
     registration: { findMany: vi.fn() },
     chatMessage: { findMany: vi.fn() },
@@ -44,6 +47,7 @@ type Fn = ReturnType<typeof vi.fn>;
 const db = prisma as unknown as {
   person: { deleteMany: Fn };
   eventInvitation: { deleteMany: Fn };
+  eventModerator: { deleteMany: Fn; findMany: Fn };
   profilePhoto: { deleteMany: Fn };
   registration: { findMany: Fn };
   chatMessage: { findMany: Fn };
@@ -65,6 +69,8 @@ beforeEach(() => {
   vi.clearAllMocks();
   db.person.deleteMany.mockResolvedValue({ count: 1 });
   db.eventInvitation.deleteMany.mockResolvedValue({ count: 2 });
+  db.eventModerator.deleteMany.mockResolvedValue({ count: 1 });
+  db.eventModerator.findMany.mockResolvedValue([{ eventId: 'evt-1', token: 'tok-1' }]);
   db.profilePhoto.deleteMany.mockResolvedValue({ count: 1 });
   db.chatMessage.findMany.mockResolvedValue([]);
   db.gdprAuditLog.create.mockResolvedValue({});
@@ -89,6 +95,7 @@ describe('POST /api/gdpr/erasure', () => {
       deleted: 1,
       addressBookDeleted: true,
       invitationsDeleted: 2,
+      grantsDeleted: 1,
       profilePhotoDeleted: true,
       feedbackDeleted: 1,
       questionnaireResponsesDeleted: 1,
@@ -153,8 +160,13 @@ describe('POST /api/gdpr/erasure', () => {
       deleted: 0,
       addressBookDeleted: true,
       invitationsDeleted: 2,
+      grantsDeleted: 1,
       profilePhotoDeleted: true,
     });
+    // Le concessioni nominali con lo stesso indirizzo vanno via anche loro, e
+    // il loro link smette subito di valere.
+    expect(db.eventModerator.deleteMany).toHaveBeenCalledWith({ where: { emailHash: 'h'.repeat(64) } });
+    expect(invalidate).toHaveBeenCalledWith('evt-1', 'tok-1');
     // La foto e' legata all'email: va via anche senza iscrizioni.
     expect(db.profilePhoto.deleteMany).toHaveBeenCalledWith({ where: { emailHash: 'h'.repeat(64) } });
   });
@@ -164,6 +176,7 @@ describe('POST /api/gdpr/erasure', () => {
     expect(res.status).toBe(401);
     expect(db.person.deleteMany).not.toHaveBeenCalled();
     expect(db.eventInvitation.deleteMany).not.toHaveBeenCalled();
+    expect(db.eventModerator.deleteMany).not.toHaveBeenCalled();
     expect(db.$transaction).not.toHaveBeenCalled();
   });
 });

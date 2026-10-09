@@ -42,7 +42,7 @@ async function loadEvent(id: string) {
 
 export const GET = withErrorHandling(async (_request, context) => {
   const { id } = await context.params;
-  // Dell'evento: l'admin, o l'organizzatore che l'ha creato (ADR-014).
+  // Di chi gestisce l'evento: l'admin, chi l'ha creato o un altro organizzatore (eventScope, ADR-014).
   const session = await requireEventManager(await cookies(), id);
   // La rubrica e' dell'amministrazione (ADR-014): l'organizzatore vede e
   // scrive l'invito, non il profilo della persona collegata.
@@ -75,7 +75,7 @@ export const GET = withErrorHandling(async (_request, context) => {
 
 export const POST = withErrorHandling(async (request, context) => {
   const { id } = await context.params;
-  // Dell'evento: l'admin, o l'organizzatore che l'ha creato (ADR-014).
+  // Di chi gestisce l'evento: l'admin, chi l'ha creato o un altro organizzatore (eventScope, ADR-014).
   const session = await requireEventManager(await cookies(), id);
   // La rubrica e' dell'amministrazione (ADR-014): l'organizzatore vede e
   // scrive l'invito, non il profilo della persona collegata.

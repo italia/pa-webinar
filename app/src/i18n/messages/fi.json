@@ -804,7 +804,7 @@
         "roleInfo": {
           "organizer": {
             "name": "Järjestäjä",
-            "desc": "Johtaa huonetta kuten moderaattori ja esitetään järjestäjien joukossa. Pääjärjestäjä lisää ja poistaa muita henkilöitä."
+            "desc": "Johtaa huonetta kuten moderaattori ja esitetään järjestäjien joukossa. Pääjärjestäjä lisää ja poistaa muita henkilöitä. Saman sähköpostin henkilökuntatilillä hän hallinnoi myös tapahtumaa."
           },
           "moderator": {
             "name": "Moderaattori",
@@ -856,7 +856,7 @@
         "roleModerator": "Moderaattori",
         "roleSpeaker": "Puhuja",
         "roleHelp": {
-          "organizer": "Johtaa huonetta kuten moderaattori ja esitetään järjestäjien joukossa.",
+          "organizer": "Johtaa huonetta kuten moderaattori ja esitetään järjestäjien joukossa. Saman sähköpostin henkilökuntatilillä hän hallinnoi myös tapahtumaa.",
           "moderator": "Johtaa huonetta: antaa puheenvuoron, hallitsee kysymyksiä, kyselyjä ja tallennusta.",
           "speaker": "Puhuu, käyttää kameraa ja jakaa näyttöä ilman moderointioikeuksia."
         },
@@ -1527,7 +1527,7 @@
       "prepareEmailBody": "Hei {name},\n\ntässä on henkilökohtainen linkkisi tapahtumaan ”{title}”:\n{link}\n\nLinkki on vain sinulle: älä välitä tai jaa sitä.",
       "draftNote": "Tapahtuma on luonnos: linkit lähetetään sähköpostitse, kun se julkaistaan. Sitä ennen voit kopioida ne täältä.",
       "roleOrganizer": "Järjestäjä",
-      "roleOrganizerHint": "Moderoi kuten moderaattori ja esitetään tapahtuman järjestäjien joukossa.",
+      "roleOrganizerHint": "Moderoi kuten moderaattori ja esitetään tapahtuman järjestäjien joukossa. Saman sähköpostin henkilökuntatilillä hän hallinnoi myös tapahtumaa.",
       "organization": "Organisaatio (valinnainen)",
       "publicListed": "Näytä julkisella sivulla",
       "onPublicPage": "Julkisella sivulla"
@@ -3318,7 +3318,15 @@
       "erasureCtaBody": "Voit pyytää kaikkien sähköpostiosoitteeseesi liittyvien tietojen poistamista (GDPR:n 17 artikla).",
       "erasureCtaButton": "Pyydä poistoa",
       "photoTitle": "Profiilikuva",
-      "photoBody": "Ladattu {date}. Muut osallistujat näkevät sen nimikirjaintesi sijaan. Voit poistaa sen tapahtuman odotushuoneessa tai poistamalla tietosi."
+      "photoBody": "Ladattu {date}. Muut osallistujat näkevät sen nimikirjaintesi sijaan. Voit poistaa sen tapahtuman odotushuoneessa tai poistamalla tietosi.",
+      "grantsTitle": "Roolit tapahtumissa",
+      "grantsIntro": "Tapahtumat, joissa tällä osoitteella on henkilökohtainen pääsy järjestäjänä, moderaattorina tai puhujana.",
+      "grantRoleOrganizer": "Järjestäjä",
+      "grantRoleModerator": "Moderaattori",
+      "grantRoleSpeaker": "Puhuja",
+      "grantSince": "{date} alkaen",
+      "grantPublic": "näytetään julkisella sivulla",
+      "grantRevoked": "pääsy peruttu {date}"
     },
     "erasure": {
       "title": "Tietojesi poistaminen",
@@ -3339,7 +3347,8 @@
       "doneBody": "Poistettuja ilmoittautumisia: {count}. Myös niihin liittyvät tiedot on poistettu.",
       "error": "Tapahtui virhe. Yritä myöhemmin uudelleen.",
       "rateLimited": "Liian monta pyyntöä. Yritä uudelleen tunnin kuluttua.",
-      "back": "Takaisin omiin tietoihin"
+      "back": "Takaisin omiin tietoihin",
+      "doneGrants": "{count, plural, one {Myös # pääsy järjestäjänä, moderaattorina tai puhujana poistettiin.} other {Myös # pääsyä järjestäjänä, moderaattorina tai puhujana poistettiin.}}"
     }
   },
   "legal": {

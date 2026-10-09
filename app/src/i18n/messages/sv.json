@@ -804,7 +804,7 @@
         "roleInfo": {
           "organizer": {
             "name": "Arrangör",
-            "desc": "Leder rummet som en moderator och presenteras bland arrangörerna. Huvudarrangören lägger till och tar bort de andra personerna."
+            "desc": "Leder rummet som en moderator och presenteras bland arrangörerna. Huvudarrangören lägger till och tar bort de andra personerna. Med ett personalkonto med samma e-post hanterar personen även evenemanget."
           },
           "moderator": {
             "name": "Moderator",
@@ -856,7 +856,7 @@
         "roleModerator": "Moderator",
         "roleSpeaker": "Talare",
         "roleHelp": {
-          "organizer": "Leder rummet som en moderator och presenteras bland arrangörerna.",
+          "organizer": "Leder rummet som en moderator och presenteras bland arrangörerna. Med ett personalkonto med samma e-post hanterar personen även evenemanget.",
           "moderator": "Leder rummet: ger ordet, hanterar frågor, omröstningar och inspelning.",
           "speaker": "Talar, använder kameran och delar skärmen, utan modereringsbehörighet."
         },
@@ -1527,7 +1527,7 @@
       "prepareEmailBody": "Hej {name},\n\nhär är din personliga länk till ”{title}”:\n{link}\n\nLänken är bara för dig: vidarebefordra eller dela den inte.",
       "draftNote": "Evenemanget är ett utkast: länkarna skickas via e-post när det publiceras. Under tiden kan du kopiera dem härifrån.",
       "roleOrganizer": "Arrangör",
-      "roleOrganizerHint": "Modererar som en moderator och presenteras bland evenemangets arrangörer.",
+      "roleOrganizerHint": "Modererar som en moderator och presenteras bland evenemangets arrangörer. Med ett personalkonto med samma e-post hanterar personen även evenemanget.",
       "organization": "Organisation (valfritt)",
       "publicListed": "Visa på den offentliga sidan",
       "onPublicPage": "På den offentliga sidan"
@@ -3318,7 +3318,15 @@
       "erasureCtaBody": "Du kan begära fullständig radering av de uppgifter som är kopplade till din e-postadress (GDPR art. 17).",
       "erasureCtaButton": "Begär radering",
       "photoTitle": "Profilbild",
-      "photoBody": "Uppladdad {date}. Andra deltagare ser den i stället för dina initialer. Du kan ta bort den i ett evenemangs väntrum eller genom att radera dina uppgifter."
+      "photoBody": "Uppladdad {date}. Andra deltagare ser den i stället för dina initialer. Du kan ta bort den i ett evenemangs väntrum eller genom att radera dina uppgifter.",
+      "grantsTitle": "Roller i evenemang",
+      "grantsIntro": "Evenemangen där den här adressen har personlig åtkomst som arrangör, moderator eller talare.",
+      "grantRoleOrganizer": "Arrangör",
+      "grantRoleModerator": "Moderator",
+      "grantRoleSpeaker": "Talare",
+      "grantSince": "Sedan {date}",
+      "grantPublic": "visas på den offentliga sidan",
+      "grantRevoked": "åtkomst återkallad {date}"
     },
     "erasure": {
       "title": "Radering av dina uppgifter",
@@ -3339,7 +3347,8 @@
       "doneBody": "Raderade anmälningar: {count}, tillsammans med tillhörande uppgifter.",
       "error": "Ett fel uppstod. Försök igen senare.",
       "rateLimited": "För många förfrågningar. Försök igen om en timme.",
-      "back": "Tillbaka till mina uppgifter"
+      "back": "Tillbaka till mina uppgifter",
+      "doneGrants": "{count, plural, one {Även # åtkomst som arrangör, moderator eller talare togs bort.} other {Även # åtkomster som arrangör, moderator eller talare togs bort.}}"
     }
   },
   "legal": {

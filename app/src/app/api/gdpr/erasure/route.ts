@@ -25,6 +25,7 @@ import { prisma } from '@/lib/db';
 import { getClientIp, rateLimit } from '@/lib/rate-limit';
 import { eraseRegistrations } from '@/lib/gdpr/erase-registrations';
 import { verifyGdprToken } from '@/lib/gdpr/request-token';
+import { invalidateModeratorCache } from '@/lib/auth/moderator';
 
 export const dynamic = 'force-dynamic';
 
@@ -64,6 +65,16 @@ export const POST = withErrorHandling(async (request) => {
   // iscritta, quindi vanno via come la voce di rubrica.
   const invitations = await prisma.eventInvitation.deleteMany({ where: { emailHash } });
 
+  // Le concessioni nominali con lo stesso indirizzo (nome, email, ente):
+  // cancellarle toglie anche il link personale per entrare nella sala, subito,
+  // senza aspettare la cache delle verifiche dei moderatori.
+  const daTogliere = await prisma.eventModerator.findMany({
+    where: { emailHash },
+    select: { eventId: true, token: true },
+  });
+  const grants = await prisma.eventModerator.deleteMany({ where: { emailHash } });
+  for (const g of daTogliere) invalidateModeratorCache(g.eventId, g.token);
+
   // La foto profilo e' legata all'email, non a un evento: va via qui anche
   // quando non resta nessuna iscrizione.
   const photo = await prisma.profilePhoto.deleteMany({ where: { emailHash } });
@@ -80,6 +91,7 @@ export const POST = withErrorHandling(async (request) => {
       deleted: 0,
       addressBookDeleted,
       invitationsDeleted: invitations.count,
+      grantsDeleted: grants.count,
       profilePhotoDeleted,
     });
   }
@@ -110,6 +122,7 @@ export const POST = withErrorHandling(async (request) => {
     deleted: counts.registrations,
     addressBookDeleted,
     invitationsDeleted: invitations.count,
+    grantsDeleted: grants.count,
     profilePhotoDeleted,
     feedbackDeleted: counts.feedback,
     questionnaireResponsesDeleted: counts.questionnaireResponses,

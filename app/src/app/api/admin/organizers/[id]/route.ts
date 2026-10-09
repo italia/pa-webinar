@@ -13,7 +13,7 @@ import { z } from 'zod';
 
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { logAdminAction } from '@/lib/audit/admin-audit';
-import { requireAdmin } from '@/lib/auth/staff-session';
+import { eventScope, requireAdmin } from '@/lib/auth/staff-session';
 import { encryptPII } from '@/lib/crypto/pii';
 import { prisma } from '@/lib/db';
 import { ForbiddenError, NotFoundError, ValidationError } from '@/lib/errors';
@@ -31,12 +31,28 @@ const patchSchema = z
   .strict();
 
 /**
- * Nuovo link da moderatore per ogni evento dell'organizzatore. Il link
- * principale e' condiviso: chi lo usava legittimamente lo ritrova, nuovo,
- * nella pagina dell'evento.
+ * Nuovo link principale per ogni evento che l'account gestiva: quelli che ha
+ * creato e quelli in cui era organizzatore (la regola di eventScope). Li ha
+ * visti tutti nella pagina dell'evento. Il link principale e' condiviso: chi
+ * lo usava legittimamente lo ritrova, nuovo, nella pagina dell'evento.
+ *
+ * Il link personale della persona (la sua concessione) resta: non è una
+ * credenziale dello staff, l'ha dato chi conduce l'evento e si revoca da lì.
  */
 async function ruotaTokenEventi(tx: Prisma.TransactionClient, accountId: string): Promise<void> {
-  const eventi = await tx.event.findMany({ where: { createdById: accountId }, select: { id: true } });
+  const account = await tx.staffAccount.findUnique({
+    where: { id: accountId },
+    select: { emailHash: true },
+  });
+  // Gli eventi che l'account gestiva come organizzatore, con la stessa regola
+  // dell'accesso (eventScope): anche un amministratore ha i suoi, creati o
+  // co-organizzati, e il resto lo vedeva comunque.
+  const eventi = await tx.event.findMany({
+    where: account
+      ? eventScope({ role: 'organizer', accountId, emailHash: account.emailHash })
+      : { createdById: accountId },
+    select: { id: true },
+  });
   for (const e of eventi) {
     await tx.event.update({ where: { id: e.id }, data: { moderatorToken: randomUUID() } });
   }

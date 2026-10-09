@@ -804,7 +804,7 @@
         "roleInfo": {
           "organizer": {
             "name": "Organizatorius",
-            "desc": "Veda kambarį kaip moderatorius ir pristatomas tarp organizatorių. Pagrindinis organizatorius prideda ir pašalina kitus asmenis."
+            "desc": "Veda kambarį kaip moderatorius ir pristatomas tarp organizatorių. Pagrindinis organizatorius prideda ir pašalina kitus asmenis. Turėdamas darbuotojo paskyrą tuo pačiu el. paštu, jis taip pat valdo renginį."
           },
           "moderator": {
             "name": "Moderatorius",
@@ -856,7 +856,7 @@
         "roleModerator": "Moderatorius",
         "roleSpeaker": "Pranešėjas",
         "roleHelp": {
-          "organizer": "Veda kambarį kaip moderatorius ir pristatomas tarp organizatorių.",
+          "organizer": "Veda kambarį kaip moderatorius ir pristatomas tarp organizatorių. Turėdamas darbuotojo paskyrą tuo pačiu el. paštu, jis taip pat valdo renginį.",
           "moderator": "Veda kambarį: suteikia žodį, valdo klausimus, apklausas ir įrašymą.",
           "speaker": "Kalba, naudoja kamerą ir bendrina ekraną, be moderavimo teisių."
         },
@@ -1527,7 +1527,7 @@
       "prepareEmailBody": "Sveiki, {name},\n\nštai jūsų asmeninė nuoroda į „{title}“:\n{link}\n\nNuoroda skirta tik jums: jos nepersiųskite ir nesidalykite.",
       "draftNote": "Renginys yra juodraštis: nuorodos išsiunčiamos el. paštu, kai jis paskelbiamas. Tuo tarpu galite jas nukopijuoti iš čia.",
       "roleOrganizer": "Organizatorius",
-      "roleOrganizerHint": "Moderuoja kaip moderatorius ir pristatomas tarp renginio organizatorių.",
+      "roleOrganizerHint": "Moderuoja kaip moderatorius ir pristatomas tarp renginio organizatorių. Turėdamas darbuotojo paskyrą tuo pačiu el. paštu, jis taip pat valdo renginį.",
       "organization": "Institucija ar organizacija (neprivaloma)",
       "publicListed": "Rodyti viešame puslapyje",
       "onPublicPage": "Viešame puslapyje"
@@ -3318,7 +3318,15 @@
       "erasureCtaBody": "Galite paprašyti visiškai ištrinti su jūsų el. pašto adresu susietus duomenis (GDPR 17 straipsnis).",
       "erasureCtaButton": "Prašyti ištrinti",
       "photoTitle": "Profilio nuotrauka",
-      "photoBody": "Įkelta {date}. Kiti dalyviai ją mato vietoj jūsų inicialų. Ją galite pašalinti renginio laukiamajame arba ištrindami savo duomenis."
+      "photoBody": "Įkelta {date}. Kiti dalyviai ją mato vietoj jūsų inicialų. Ją galite pašalinti renginio laukiamajame arba ištrindami savo duomenis.",
+      "grantsTitle": "Vaidmenys renginiuose",
+      "grantsIntro": "Renginiai, kuriuose šis adresas turi asmeninę prieigą kaip organizatorius, moderatorius ar pranešėjas.",
+      "grantRoleOrganizer": "Organizatorius",
+      "grantRoleModerator": "Moderatorius",
+      "grantRoleSpeaker": "Pranešėjas",
+      "grantSince": "Nuo {date}",
+      "grantPublic": "rodomas viešame puslapyje",
+      "grantRevoked": "prieiga atšaukta {date}"
     },
     "erasure": {
       "title": "Jūsų duomenų ištrynimas",
@@ -3339,7 +3347,8 @@
       "doneBody": "Ištrinta registracijų: {count}. Ištrinti ir susiję duomenys.",
       "error": "Įvyko klaida. Bandykite vėliau.",
       "rateLimited": "Per daug užklausų. Bandykite dar kartą po valandos.",
-      "back": "Grįžti į mano duomenis"
+      "back": "Grįžti į mano duomenis",
+      "doneGrants": "{count, plural, one {Taip pat pašalinta # prieiga kaip organizatoriaus, moderatoriaus ar pranešėjo.} few {Taip pat pašalintos # prieigos kaip organizatoriaus, moderatoriaus ar pranešėjo.} many {Taip pat pašalinta # prieigos kaip organizatoriaus, moderatoriaus ar pranešėjo.} other {Taip pat pašalinta # prieigų kaip organizatoriaus, moderatoriaus ar pranešėjo.}}"
     }
   },
   "legal": {

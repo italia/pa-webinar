@@ -26,8 +26,9 @@ this person".
 ## Decision
 
 **A third way into the administration area: a named staff account with the role `ORGANIZER`.** An
-organizer creates events and manages only the events they created. Anything that concerns the whole
-installation stays with administrators.
+organizer creates events and manages the events they created, plus those where a staff member who
+manages the event has named them as an organizer with the same email address. Anything that concerns
+the whole installation stays with administrators.
 
 ### Identity
 
@@ -95,8 +96,10 @@ installation stays with administrators.
   label. For an organizer, an unknown id answers 403, the same as someone else's event, so the answer
   does not reveal which ids exist. A malformed event id answers 400 for every role. Administrators
   pass these guards without an ownership check, and the handler answers.
-- **Lists are filtered.** `eventScope(session)` gives `{}` for administrators and
-  `{ createdById: <account> }` for organizers.
+- **Lists are filtered.** `eventScope(session)` gives `{}` for administrators and, for organizers,
+  the events they created or co-organize: a valid organizer grant on the event with the account's
+  email fingerprint ([identity-and-access.md](../architecture/identity-and-access.md)). The same
+  rule decides access to a single event (`puoGestire`).
 - **Pages declare their audience.** Each page calls `soloAdmin` or `staffOLogin` from
   `app/src/lib/auth/staff-page.ts`. The event management page instead calls `getStaffSession` and
   checks ownership itself with `puoGestire`; it also opens with the event's primary moderator token.
@@ -132,7 +135,8 @@ Administrators manage accounts under **Staff and access → Staff accounts** (`/
 
 **Deactivating** an account (`PATCH /api/admin/organizers/{id}` with `active: false`) sets `active`
 to false and, in the same transaction, deletes the account's unused sign-in links and **rotates the
-primary moderator link of every event the account owns** to a new random token. Because the session
+primary moderator link of every event the account manages** (created or co-organized) to a new
+random token. Because the session
 re-reads the account, it stops working on its next request.
 
 The organizer has seen all of those primary links. Without the rotation, they would stay out of the

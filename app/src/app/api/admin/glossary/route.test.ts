@@ -73,7 +73,7 @@ describe('/api/admin/glossary', () => {
   });
 
   it('chi organizza aggiunge voci a proprio nome e modifica solo le sue', async () => {
-    vi.mocked(requireStaff).mockResolvedValue({ role: 'organizer', accountId: 'acc-1' });
+    vi.mocked(requireStaff).mockResolvedValue({ role: 'organizer', accountId: 'acc-1', emailHash: 'hash-acc-1' });
     const lista = await (await GET(req('GET'), ctx())).json();
     expect(lista.terms.map((t: { id: string; canEdit: boolean }) => [t.id, t.canEdit])).toEqual([
       ['a', true],

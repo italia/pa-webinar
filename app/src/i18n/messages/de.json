@@ -804,7 +804,7 @@
         "roleInfo": {
           "organizer": {
             "name": "Veranstalter",
-            "desc": "Leitet den Raum wie ein Moderator und wird unter den Veranstaltern aufgeführt. Der Hauptveranstalter fügt die anderen Personen hinzu oder entfernt sie."
+            "desc": "Leitet den Raum wie ein Moderator und wird unter den Veranstaltern aufgeführt. Der Hauptveranstalter fügt die anderen Personen hinzu oder entfernt sie. Mit einem Mitarbeiterkonto unter derselben E-Mail verwaltet die Person auch die Veranstaltung."
           },
           "moderator": {
             "name": "Moderator",
@@ -856,7 +856,7 @@
         "roleModerator": "Moderator",
         "roleSpeaker": "Referent",
         "roleHelp": {
-          "organizer": "Leitet den Raum wie ein Moderator und wird unter den Veranstaltern aufgeführt.",
+          "organizer": "Leitet den Raum wie ein Moderator und wird unter den Veranstaltern aufgeführt. Mit einem Mitarbeiterkonto unter derselben E-Mail verwaltet die Person auch die Veranstaltung.",
           "moderator": "Leitet den Raum: erteilt das Wort, verwaltet Fragen, Umfragen und Aufzeichnung.",
           "speaker": "Spricht, nutzt die Kamera und teilt den Bildschirm, ohne Moderationsrechte."
         },
@@ -1527,7 +1527,7 @@
       "prepareEmailBody": "Hallo {name},\n\nhier ist Ihr persönlicher Link für „{title}“:\n{link}\n\nDer Link ist nur für Sie: Bitte nicht weiterleiten oder teilen.",
       "draftNote": "Die Veranstaltung ist ein Entwurf: Die Links werden per E-Mail verschickt, sobald sie veröffentlicht wird. Bis dahin können Sie sie hier kopieren.",
       "roleOrganizer": "Veranstalter",
-      "roleOrganizerHint": "Moderiert wie ein Moderator und wird unter den Veranstaltern aufgeführt.",
+      "roleOrganizerHint": "Moderiert wie ein Moderator und wird unter den Veranstaltern aufgeführt. Mit einem Mitarbeiterkonto unter derselben E-Mail verwaltet die Person auch die Veranstaltung.",
       "organization": "Organisation (optional)",
       "publicListed": "Auf der öffentlichen Seite zeigen",
       "onPublicPage": "Auf der öffentlichen Seite"
@@ -3318,7 +3318,15 @@
       "erasureCtaBody": "Sie können die vollständige Löschung der mit Ihrer E-Mail-Adresse verknüpften Daten beantragen (Art. 17 GDPR).",
       "erasureCtaButton": "Löschung beantragen",
       "photoTitle": "Profilfoto",
-      "photoBody": "Hochgeladen am {date}. Andere Teilnehmende sehen es statt deiner Initialen. Du kannst es im Warteraum einer Veranstaltung oder durch Löschen deiner Daten entfernen."
+      "photoBody": "Hochgeladen am {date}. Andere Teilnehmende sehen es statt deiner Initialen. Du kannst es im Warteraum einer Veranstaltung oder durch Löschen deiner Daten entfernen.",
+      "grantsTitle": "Rollen in Veranstaltungen",
+      "grantsIntro": "Die Veranstaltungen, in denen diese Adresse einen persönlichen Zugang als Veranstalter, Moderator oder Referent hat.",
+      "grantRoleOrganizer": "Veranstalter",
+      "grantRoleModerator": "Moderator",
+      "grantRoleSpeaker": "Referent",
+      "grantSince": "Seit {date}",
+      "grantPublic": "auf der öffentlichen Seite gezeigt",
+      "grantRevoked": "Zugang am {date} widerrufen"
     },
     "erasure": {
       "title": "Löschung Ihrer Daten",
@@ -3339,7 +3347,8 @@
       "doneBody": "{count} Anmeldungen und die zugehörigen Daten wurden gelöscht.",
       "error": "Es ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut.",
       "rateLimited": "Zu viele Anfragen. Bitte versuchen Sie es in einer Stunde erneut.",
-      "back": "Zurück zu meinen Daten"
+      "back": "Zurück zu meinen Daten",
+      "doneGrants": "{count, plural, one {Außerdem wurde # Zugang als Veranstalter, Moderator oder Referent entfernt.} other {Außerdem wurden # Zugänge als Veranstalter, Moderator oder Referent entfernt.}}"
     }
   },
   "legal": {

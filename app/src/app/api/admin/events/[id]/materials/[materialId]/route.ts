@@ -64,7 +64,7 @@ async function ensureAdminAndIds(
   context: { params: Promise<{ id: string; materialId: string }> },
 ) {
   const { id, materialId } = await context.params;
-  // Dell'evento: l'admin, o l'organizzatore che l'ha creato (ADR-014).
+  // Di chi gestisce l'evento: l'admin, chi l'ha creato o un altro organizzatore (eventScope, ADR-014).
   await requireEventManager(await cookies(), id);
   if (!UUID_RE.test(id) || !UUID_RE.test(materialId)) {
     throw new AppError('Event and material IDs must be UUIDs', 400, 'BAD_REQUEST');

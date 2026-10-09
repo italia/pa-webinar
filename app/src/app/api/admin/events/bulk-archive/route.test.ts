@@ -20,10 +20,11 @@ const { session, sessioni } = vi.hoisted(() => ({
 vi.mock('next/headers', () => ({
   cookies: vi.fn(async () => ({ get: () => ({ value: 'staff-session' }) })),
 }));
-vi.mock('@/lib/auth/staff-session', () => ({
+// La regola vera (eventScope): i propri eventi e quelli in cui si è
+// organizzatori con lo stesso indirizzo.
+vi.mock('@/lib/auth/staff-session', async (importOriginal) => ({
+  ...(await importOriginal<Record<string, unknown>>()),
   requireStaff: vi.fn(async () => session.current),
-  eventScope: (s: { role: string; accountId?: string }) =>
-    s.role === 'admin' ? {} : { createdById: s.accountId },
 }));
 vi.mock('@/lib/audit/admin-audit', () => ({
   logAdminAction: vi.fn(async () => undefined),
@@ -83,12 +84,23 @@ describe('POST /api/admin/events/bulk-archive — sessioni di chiamata', () => {
     expect(sessioni.closeOpenSessions).toHaveBeenCalledWith(prisma, [A, C], expect.any(Date));
   });
 
-  it('l\'organizzatore resta nel perimetro dei propri eventi, anche per le sessioni', async () => {
-    session.current = { role: 'organizer', accountId: 'acc-1' };
+  it('l\'organizzatore resta nel perimetro dei suoi eventi (propri e co-organizzati)', async () => {
+    session.current = { role: 'organizer', accountId: 'acc-1', emailHash: 'hash-acc-1' };
 
     await POST(post([A]), ctx);
 
-    const where = { id: { in: [A] }, createdById: 'acc-1' };
+    const where = { id: { in: [A] }, AND: [
+        {
+          OR: [
+            { createdById: 'acc-1' },
+            {
+              additionalMods: {
+                some: { organizer: true, revokedAt: null, emailHash: 'hash-acc-1' },
+              },
+            },
+          ],
+        },
+      ] };
     expect(db.event.findMany).toHaveBeenCalledWith({ where, select: { id: true, status: true } });
     expect(db.event.updateMany).toHaveBeenCalledWith({ where, data: { status: 'ARCHIVED' } });
   });

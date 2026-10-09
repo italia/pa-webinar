@@ -18,7 +18,7 @@ vi.mock('next/headers', () => ({
   cookies: vi.fn(async () => ({ get: () => ({ value: 'staff-session' }) })),
 }));
 vi.mock('@/lib/auth/staff-session', () => ({
-  requireEventManager: vi.fn(async () => ({ role: 'organizer', accountId: 'org-1' })),
+  requireEventManager: vi.fn(async () => ({ role: 'organizer', accountId: 'org-1', emailHash: 'hash-org-1' })),
 }));
 vi.mock('@/lib/audit/admin-audit', () => ({
   logAdminAction: vi.fn(async () => undefined),

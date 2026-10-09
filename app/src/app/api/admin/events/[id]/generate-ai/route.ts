@@ -30,7 +30,7 @@ export const dynamic = 'force-dynamic';
 
 export const POST = withErrorHandling(async (request, context) => {
   const { id } = await (context as { params: Promise<{ id: string }> }).params;
-  // Dell'evento: l'admin, o l'organizzatore che l'ha creato (ADR-014).
+  // Di chi gestisce l'evento: l'admin, chi l'ha creato o un altro organizzatore (eventScope, ADR-014).
   await requireEventManager(await cookies(), id);
 
   // Master kill-switch first, so we never flip flags then leave nothing enqueued.

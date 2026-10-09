@@ -804,7 +804,7 @@
         "roleInfo": {
           "organizer": {
             "name": "Organisateur",
-            "desc": "Anime la salle comme un modérateur et figure parmi les organisateurs. L'organisateur principal ajoute et retire les autres personnes."
+            "desc": "Anime la salle comme un modérateur et figure parmi les organisateurs. L'organisateur principal ajoute et retire les autres personnes. Avec un compte du personnel sous le même e-mail, il gère aussi l'événement."
           },
           "moderator": {
             "name": "Modérateur",
@@ -856,7 +856,7 @@
         "roleModerator": "Modérateur",
         "roleSpeaker": "Intervenant",
         "roleHelp": {
-          "organizer": "Anime la salle comme un modérateur et figure parmi les organisateurs.",
+          "organizer": "Anime la salle comme un modérateur et figure parmi les organisateurs. Avec un compte du personnel sous le même e-mail, il gère aussi l'événement.",
           "moderator": "Anime la salle : donne la parole, gère questions, sondages et enregistrement.",
           "speaker": "Parle, utilise la caméra et partage l'écran, sans pouvoirs de modération."
         },
@@ -1527,7 +1527,7 @@
       "prepareEmailBody": "Bonjour {name},\n\nvoici votre lien personnel pour « {title} » :\n{link}\n\nCe lien est pour vous seul : ne le transférez pas et ne le partagez pas.",
       "draftNote": "L'événement est un brouillon : les liens sont envoyés par e-mail lors de sa publication. En attendant, vous pouvez les copier ici.",
       "roleOrganizer": "Organisateur",
-      "roleOrganizerHint": "Modère comme un modérateur et figure parmi les organisateurs de l'événement.",
+      "roleOrganizerHint": "Modère comme un modérateur et figure parmi les organisateurs de l'événement. Avec un compte du personnel sous le même e-mail, il gère aussi l'événement.",
       "organization": "Organisme ou organisation (facultatif)",
       "publicListed": "Afficher sur la page publique",
       "onPublicPage": "Sur la page publique"
@@ -3318,7 +3318,15 @@
       "erasureCtaBody": "Vous pouvez demander l'effacement complet des données associées à votre adresse e-mail (Art. 17 du GDPR).",
       "erasureCtaButton": "Demander l'effacement",
       "photoTitle": "Photo de profil",
-      "photoBody": "Téléversée le {date}. Les autres participants la voient à la place de vos initiales. Vous pouvez la retirer depuis la salle d’attente d’un événement ou en effaçant vos données."
+      "photoBody": "Téléversée le {date}. Les autres participants la voient à la place de vos initiales. Vous pouvez la retirer depuis la salle d’attente d’un événement ou en effaçant vos données.",
+      "grantsTitle": "Rôles dans les événements",
+      "grantsIntro": "Les événements où cette adresse a un accès personnel comme organisateur, modérateur ou intervenant.",
+      "grantRoleOrganizer": "Organisateur",
+      "grantRoleModerator": "Modérateur",
+      "grantRoleSpeaker": "Intervenant",
+      "grantSince": "Depuis le {date}",
+      "grantPublic": "affiché sur la page publique",
+      "grantRevoked": "accès révoqué le {date}"
     },
     "erasure": {
       "title": "Effacement de vos données",
@@ -3339,7 +3347,8 @@
       "doneBody": "{count} inscriptions et les données associées ont été supprimées.",
       "error": "Une erreur s'est produite. Veuillez réessayer plus tard.",
       "rateLimited": "Trop de demandes. Veuillez réessayer dans une heure.",
-      "back": "Retour à mes données"
+      "back": "Retour à mes données",
+      "doneGrants": "{count, plural, one {# accès comme organisateur, modérateur ou intervenant a aussi été retiré.} other {# accès comme organisateur, modérateur ou intervenant ont aussi été retirés.}}"
     }
   },
   "legal": {

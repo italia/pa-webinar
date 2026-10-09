@@ -45,7 +45,7 @@ const findEvent = prisma.event.findUnique as unknown as ReturnType<typeof vi.fn>
 beforeEach(() => {
   vi.clearAllMocks();
   findEvent.mockResolvedValue({ id: EVENT_ID, moderatorToken: 'TOKEN' });
-  vi.mocked(requireEventManager).mockResolvedValue({ role: 'organizer', accountId: 'a' } as never);
+  vi.mocked(requireEventManager).mockResolvedValue({ role: 'organizer', accountId: 'a', emailHash: 'hash-a' } as never);
 });
 
 describe('/api/admin/events/[id]/glossary', () => {

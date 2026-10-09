@@ -804,7 +804,7 @@
         "roleInfo": {
           "organizer": {
             "name": "Organizer",
-            "desc": "Hosts the room like a moderator and is presented among the organizers. The lead organizer adds and removes the other people."
+            "desc": "Hosts the room like a moderator and is presented among the organizers. The lead organizer adds and removes the other people. With a staff account under the same email, they also manage the event."
           },
           "moderator": {
             "name": "Moderator",
@@ -856,7 +856,7 @@
         "roleModerator": "Moderator",
         "roleSpeaker": "Speaker",
         "roleHelp": {
-          "organizer": "Hosts the room like a moderator and is presented among the organizers.",
+          "organizer": "Hosts the room like a moderator and is presented among the organizers. With a staff account under the same email, they also manage the event.",
           "moderator": "Hosts the room: gives the floor, manages questions, polls and recording.",
           "speaker": "Speaks, uses the camera and shares the screen, without moderation powers."
         },
@@ -1527,7 +1527,7 @@
       "prepareEmailBody": "Hello {name},\n\nhere is your personal link for “{title}”:\n{link}\n\nThe link is for you only: do not forward or share it.",
       "draftNote": "The event is a draft: links are emailed when it is published. Meanwhile you can copy them from here.",
       "roleOrganizer": "Organizer",
-      "roleOrganizerHint": "Moderates like a moderator and is presented among the event's organizers.",
+      "roleOrganizerHint": "Moderates like a moderator and is presented among the event's organizers. With a staff account under the same email, they also manage the event.",
       "organization": "Organization (optional)",
       "publicListed": "Show on the public page",
       "onPublicPage": "On the public page"
@@ -3318,7 +3318,15 @@
       "erasureCtaBody": "You can request full erasure of the data tied to your email (GDPR Art. 17).",
       "erasureCtaButton": "Request erasure",
       "photoTitle": "Profile photo",
-      "photoBody": "Uploaded on {date}. Other attendees see it instead of your initials. You can remove it from an event’s waiting room or by erasing your data."
+      "photoBody": "Uploaded on {date}. Other attendees see it instead of your initials. You can remove it from an event’s waiting room or by erasing your data.",
+      "grantsTitle": "Roles in events",
+      "grantsIntro": "The events where this address has a personal access as organizer, moderator or speaker.",
+      "grantRoleOrganizer": "Organizer",
+      "grantRoleModerator": "Moderator",
+      "grantRoleSpeaker": "Speaker",
+      "grantSince": "Since {date}",
+      "grantPublic": "shown on the public page",
+      "grantRevoked": "access revoked on {date}"
     },
     "erasure": {
       "title": "Erase your data",
@@ -3339,7 +3347,8 @@
       "doneBody": "{count} registrations and the linked data have been deleted.",
       "error": "An error occurred. Please try again later.",
       "rateLimited": "Too many requests. Please try again in one hour.",
-      "back": "Back to my data"
+      "back": "Back to my data",
+      "doneGrants": "{count, plural, one {# access as organizer, moderator or speaker was also removed.} other {# accesses as organizer, moderator or speaker were also removed.}}"
     }
   },
   "legal": {

@@ -18,8 +18,9 @@ import { EventModeratorRole } from '@prisma/client';
 import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { prisma } from '@/lib/db';
 import { AppError, ForbiddenError, UnauthorizedError, ValidationError } from '@/lib/errors';
-import { tryDecryptPII } from '@/lib/crypto/pii';
+import { hashEmail, tryDecryptPII } from '@/lib/crypto/pii';
 import { grantProfileData, grantProfileSchema } from '@/lib/events/grant-profile';
+import { requireOrganizerMarkRight } from '@/lib/auth/organizer-mark';
 import {
   constantTimeEqual,
   extractModeratorToken,
@@ -72,10 +73,24 @@ export const PATCH = withErrorHandling(async (request, context) => {
       { path: ['organizer'], message: 'Only a moderator can be an organizer' },
     ]);
   }
+  // Togliere il segno si può con il link principale; darlo, solo a chi
+  // gestisce già l'evento (lib/auth/organizer-mark). Lo stesso vale per
+  // confermarlo su una concessione da organizzatore ancora senza impronta.
+  const daIlSegno = parsed.data.organizer === true && (!mod.organizer || !mod.emailHash);
+  if (daIlSegno) await requireOrganizerMarkRight(mod.eventId);
 
+  // Le concessioni nate prima dell'impronta la ricevono qui, ma su una
+  // concessione da organizzatore solo dopo il controllo: l'impronta è ciò che
+  // dà la gestione all'account dello staff con lo stesso indirizzo.
+  const saraOrganizzatore = parsed.data.organizer ?? mod.organizer;
+  const puoImprontare = !saraOrganizzatore || daIlSegno;
+  const email = mod.emailHash || !puoImprontare ? null : tryDecryptPII(mod.email);
   const updated = await prisma.eventModerator.update({
     where: { id: mod.id },
-    data: grantProfileData(parsed.data),
+    data: {
+      ...grantProfileData(parsed.data),
+      ...(email && { emailHash: hashEmail(email) }),
+    },
     select: {
       id: true,
       name: true,

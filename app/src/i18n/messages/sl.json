@@ -804,7 +804,7 @@
         "roleInfo": {
           "organizer": {
             "name": "Organizator",
-            "desc": "Vodi sobo kot moderator in je predstavljen med organizatorji. Glavni organizator dodaja in odstranjuje druge osebe."
+            "desc": "Vodi sobo kot moderator in je predstavljen med organizatorji. Glavni organizator dodaja in odstranjuje druge osebe. Z računom osebja z istim e-poštnim naslovom upravlja tudi dogodek."
           },
           "moderator": {
             "name": "Moderator",
@@ -856,7 +856,7 @@
         "roleModerator": "Moderator",
         "roleSpeaker": "Govornik",
         "roleHelp": {
-          "organizer": "Vodi sobo kot moderator in je predstavljen med organizatorji.",
+          "organizer": "Vodi sobo kot moderator in je predstavljen med organizatorji. Z računom osebja z istim e-poštnim naslovom upravlja tudi dogodek.",
           "moderator": "Vodi sobo: daje besedo, upravlja vprašanja, ankete in snemanje.",
           "speaker": "Govori, uporablja kamero in deli zaslon, brez pooblastil moderatorja."
         },
@@ -1527,7 +1527,7 @@
       "prepareEmailBody": "Pozdravljeni, {name},\n\ntu je vaša osebna povezava za »{title}«:\n{link}\n\nPovezava je samo za vas: ne posredujte je in je ne delite.",
       "draftNote": "Dogodek je osnutek: povezave se pošljejo po e-pošti, ko je objavljen. Medtem jih lahko kopirate od tukaj.",
       "roleOrganizer": "Organizator",
-      "roleOrganizerHint": "Moderira kot moderator in je predstavljen med organizatorji dogodka.",
+      "roleOrganizerHint": "Moderira kot moderator in je predstavljen med organizatorji dogodka. Z računom osebja z istim e-poštnim naslovom upravlja tudi dogodek.",
       "organization": "Ustanova ali organizacija (neobvezno)",
       "publicListed": "Prikaži na javni strani",
       "onPublicPage": "Na javni strani"
@@ -3318,7 +3318,15 @@
       "erasureCtaBody": "Zahtevate lahko popoln izbris podatkov, povezanih z vašim e-poštnim naslovom (čl. 17 GDPR).",
       "erasureCtaButton": "Zahtevaj izbris",
       "photoTitle": "Profilna fotografija",
-      "photoBody": "Naloženo {date}. Drugi udeleženci jo vidijo namesto vaših začetnic. Odstranite jo lahko v čakalnici dogodka ali z izbrisom svojih podatkov."
+      "photoBody": "Naloženo {date}. Drugi udeleženci jo vidijo namesto vaših začetnic. Odstranite jo lahko v čakalnici dogodka ali z izbrisom svojih podatkov.",
+      "grantsTitle": "Vloge na dogodkih",
+      "grantsIntro": "Dogodki, v katerih ima ta naslov osebni dostop kot organizator, moderator ali govornik.",
+      "grantRoleOrganizer": "Organizator",
+      "grantRoleModerator": "Moderator",
+      "grantRoleSpeaker": "Govornik",
+      "grantSince": "Od {date}",
+      "grantPublic": "prikazan na javni strani",
+      "grantRevoked": "dostop preklican {date}"
     },
     "erasure": {
       "title": "Izbris vaših podatkov",
@@ -3339,7 +3347,8 @@
       "doneBody": "Izbrisane prijave: {count}, skupaj s povezanimi podatki.",
       "error": "Prišlo je do napake. Poskusite znova pozneje.",
       "rateLimited": "Preveč zahtev. Poskusite znova čez eno uro.",
-      "back": "Nazaj na moje podatke"
+      "back": "Nazaj na moje podatke",
+      "doneGrants": "{count, plural, one {Odstranjen je bil tudi # dostop kot organizator, moderator ali govornik.} two {Odstranjena sta bila tudi # dostopa kot organizator, moderator ali govornik.} few {Odstranjeni so bili tudi # dostopi kot organizator, moderator ali govornik.} other {Odstranjenih je bilo tudi # dostopov kot organizator, moderator ali govornik.}}"
     }
   },
   "legal": {

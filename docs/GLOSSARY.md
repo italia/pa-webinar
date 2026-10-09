@@ -95,7 +95,8 @@ to enter the administration area (`StaffLoginToken`).
 [ADR-014](adr/014-organizer-role.md)
 
 **Organizer** (staff role `ORGANIZER`, UI **Organiser**): a staff account that
-creates events and manages only its own (`Event.createdById`), with no access
+creates events and manages its own (`Event.createdById`) and those where an
+organizer grant carries its email address, with no access
 to installation settings, the address book or other events' data. Do not
 confuse it with the *co-organizing organizations* listed on an event page
 (`EventOrganizer`, wizard step **People**, section **Organizing entities**), or

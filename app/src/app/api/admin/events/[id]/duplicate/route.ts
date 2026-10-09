@@ -198,9 +198,20 @@ function resolveSchedule(
   return { startsAt: source.startsAt, endsAt: source.endsAt, projected: false };
 }
 
+/** Se l'account che ha creato l'originale è ancora attivo: altrimenti la
+ *  copia andrebbe a un account che nessuno usa più. */
+async function creatoreAttivo(accountId: string): Promise<boolean> {
+  const account = await prisma.staffAccount.findUnique({
+    where: { id: accountId },
+    select: { active: true },
+  });
+  return account?.active === true;
+}
+
 export const POST = withErrorHandling(async (request, context) => {
   const { id } = await context.params;
-  // Dell'evento: l'admin, o l'organizzatore che l'ha creato (ADR-014).
+  // Chi gestisce l'evento: l'admin, chi l'ha creato o un altro organizzatore
+  // con account (eventScope, ADR-014).
   const session = await requireEventManager(await cookies(), id);
   if (typeof id !== 'string' || !UUID_RE.test(id)) {
     throw new AppError('id must be a UUID', 400, 'BAD_REQUEST');
@@ -227,9 +238,18 @@ export const POST = withErrorHandling(async (request, context) => {
 
   const duplicate = await prisma.event.create({
     data: {
-      // La copia e' di chi la crea: l'organizzatore che duplica il proprio
-      // evento deve poterla gestire (ADR-014).
-      createdById: session.accountId,
+      // La copia e' di chi la crea, perché possa gestirla (ADR-014); ma se a
+      // duplicare è un co-organizzatore, la copia resta di chi ha creato
+      // l'originale: il co-organizzatore la gestisce comunque, perché la sua
+      // concessione da organizzatore passa alla copia, e chi ha creato la
+      // serie non la perde.
+      createdById:
+        session.role === 'organizer' &&
+        source.createdById &&
+        source.createdById !== session.accountId &&
+        (await creatoreAttivo(source.createdById))
+          ? source.createdById
+          : session.accountId,
       // Everything the copy inherits, from the single classified list — see
       // lib/events/duplicate-fields.ts for why this is not spelled out inline.
       ...duplicatedConfig(source),

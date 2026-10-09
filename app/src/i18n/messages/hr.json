@@ -804,7 +804,7 @@
         "roleInfo": {
           "organizer": {
             "name": "Organizator",
-            "desc": "Vodi sobu kao moderator i prikazan je među organizatorima. Glavni organizator dodaje i uklanja ostale osobe."
+            "desc": "Vodi sobu kao moderator i prikazan je među organizatorima. Glavni organizator dodaje i uklanja ostale osobe. S računom osoblja s istom e-poštom upravlja i događajem."
           },
           "moderator": {
             "name": "Moderator",
@@ -856,7 +856,7 @@
         "roleModerator": "Moderator",
         "roleSpeaker": "Govornik",
         "roleHelp": {
-          "organizer": "Vodi sobu kao moderator i prikazan je među organizatorima.",
+          "organizer": "Vodi sobu kao moderator i prikazan je među organizatorima. S računom osoblja s istom e-poštom upravlja i događajem.",
           "moderator": "Vodi sobu: daje riječ, upravlja pitanjima, anketama i snimanjem.",
           "speaker": "Govori, koristi kameru i dijeli zaslon, bez ovlasti moderiranja."
         },
@@ -1527,7 +1527,7 @@
       "prepareEmailBody": "Pozdrav, {name},\n\nevo vaše osobne poveznice za „{title}”:\n{link}\n\nPoveznica je samo za vas: nemojte je prosljeđivati ni dijeliti.",
       "draftNote": "Događaj je skica: poveznice se šalju e-poštom kada se objavi. U međuvremenu ih možete kopirati odavde.",
       "roleOrganizer": "Organizator",
-      "roleOrganizerHint": "Moderira kao moderator i prikazan je među organizatorima događaja.",
+      "roleOrganizerHint": "Moderira kao moderator i prikazan je među organizatorima događaja. S računom osoblja s istom e-poštom upravlja i događajem.",
       "organization": "Ustanova ili organizacija (neobavezno)",
       "publicListed": "Prikaži na javnoj stranici",
       "onPublicPage": "Na javnoj stranici"
@@ -3318,7 +3318,15 @@
       "erasureCtaBody": "Možete zatražiti potpuno brisanje podataka povezanih s vašom email adresom (čl. 17 GDPR-a).",
       "erasureCtaButton": "Zatraži brisanje",
       "photoTitle": "Profilna fotografija",
-      "photoBody": "Učitano {date}. Ostali sudionici vide je umjesto vaših inicijala. Možete je ukloniti u čekaonici događaja ili brisanjem svojih podataka."
+      "photoBody": "Učitano {date}. Ostali sudionici vide je umjesto vaših inicijala. Možete je ukloniti u čekaonici događaja ili brisanjem svojih podataka.",
+      "grantsTitle": "Uloge u događajima",
+      "grantsIntro": "Događaji u kojima ova adresa ima osobni pristup kao organizator, moderator ili govornik.",
+      "grantRoleOrganizer": "Organizator",
+      "grantRoleModerator": "Moderator",
+      "grantRoleSpeaker": "Govornik",
+      "grantSince": "Od {date}",
+      "grantPublic": "prikazan na javnoj stranici",
+      "grantRevoked": "pristup opozvan {date}"
     },
     "erasure": {
       "title": "Brisanje vaših podataka",
@@ -3339,7 +3347,8 @@
       "doneBody": "Broj izbrisanih prijava: {count}. Izbrisani su i povezani podaci.",
       "error": "Došlo je do pogreške. Molimo pokušajte ponovno kasnije.",
       "rateLimited": "Previše zahtjeva. Molimo pokušajte ponovno za sat vremena.",
-      "back": "Natrag na moje podatke"
+      "back": "Natrag na moje podatke",
+      "doneGrants": "{count, plural, one {Uklonjen je i # pristup kao organizator, moderator ili govornik.} few {Uklonjena su i # pristupa kao organizator, moderator ili govornik.} other {Uklonjeno je i # pristupa kao organizator, moderator ili govornik.}}"
     }
   },
   "legal": {

@@ -804,7 +804,7 @@
         "roleInfo": {
           "organizer": {
             "name": "Arrangør",
-            "desc": "Leder rummet som en moderator og præsenteres blandt arrangørerne. Hovedarrangøren tilføjer og fjerner de andre personer."
+            "desc": "Leder rummet som en moderator og præsenteres blandt arrangørerne. Hovedarrangøren tilføjer og fjerner de andre personer. Med en personalekonto med samme e-mail administrerer vedkommende også arrangementet."
           },
           "moderator": {
             "name": "Moderator",
@@ -856,7 +856,7 @@
         "roleModerator": "Moderator",
         "roleSpeaker": "Taler",
         "roleHelp": {
-          "organizer": "Leder rummet som en moderator og præsenteres blandt arrangørerne.",
+          "organizer": "Leder rummet som en moderator og præsenteres blandt arrangørerne. Med en personalekonto med samme e-mail administrerer vedkommende også arrangementet.",
           "moderator": "Leder rummet: giver ordet, styrer spørgsmål, afstemninger og optagelse.",
           "speaker": "Taler, bruger kameraet og deler skærmen uden moderatorrettigheder."
         },
@@ -1527,7 +1527,7 @@
       "prepareEmailBody": "Hej {name},\n\nher er dit personlige link til »{title}«:\n{link}\n\nLinket er kun til dig: videresend eller del det ikke.",
       "draftNote": "Begivenheden er en kladde: links sendes pr. e-mail, når den offentliggøres. Indtil da kan du kopiere dem herfra.",
       "roleOrganizer": "Arrangør",
-      "roleOrganizerHint": "Modererer som en moderator og præsenteres blandt arrangementets arrangører.",
+      "roleOrganizerHint": "Modererer som en moderator og præsenteres blandt arrangementets arrangører. Med en personalekonto med samme e-mail administrerer vedkommende også arrangementet.",
       "organization": "Organisation (valgfrit)",
       "publicListed": "Vis på den offentlige side",
       "onPublicPage": "På den offentlige side"
@@ -3318,7 +3318,15 @@
       "erasureCtaBody": "Du kan anmode om fuld sletning af de data, der er tilknyttet din e-mailadresse (GDPR art. 17).",
       "erasureCtaButton": "Anmod om sletning",
       "photoTitle": "Profilbillede",
-      "photoBody": "Uploadet {date}. Andre deltagere ser det i stedet for dine initialer. Du kan fjerne det i et arrangements venteværelse eller ved at slette dine data."
+      "photoBody": "Uploadet {date}. Andre deltagere ser det i stedet for dine initialer. Du kan fjerne det i et arrangements venteværelse eller ved at slette dine data.",
+      "grantsTitle": "Roller i arrangementer",
+      "grantsIntro": "Arrangementer, hvor denne adresse har personlig adgang som arrangør, moderator eller taler.",
+      "grantRoleOrganizer": "Arrangør",
+      "grantRoleModerator": "Moderator",
+      "grantRoleSpeaker": "Taler",
+      "grantSince": "Siden {date}",
+      "grantPublic": "vist på den offentlige side",
+      "grantRevoked": "adgang tilbagekaldt den {date}"
     },
     "erasure": {
       "title": "Sletning af dine data",
@@ -3339,7 +3347,8 @@
       "doneBody": "{count} tilmeldinger og de tilknyttede data er blevet slettet.",
       "error": "Der opstod en fejl. Prøv igen senere.",
       "rateLimited": "For mange anmodninger. Prøv igen om en time.",
-      "back": "Tilbage til mine data"
+      "back": "Tilbage til mine data",
+      "doneGrants": "{count, plural, one {# adgang som arrangør, moderator eller taler blev også fjernet.} other {# adgange som arrangør, moderator eller taler blev også fjernet.}}"
     }
   },
   "legal": {

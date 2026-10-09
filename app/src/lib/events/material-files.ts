@@ -14,7 +14,7 @@
  * nulla che lo elenchi né lo cancelli.
  *
  * `blobPath` nell'area admin arriva dal client, e l'area è aperta anche
- * all'organizzatore sui propri eventi. Tre regole impediscono che togliere un
+ * all'organizzatore sugli eventi che gestisce. Tre regole impediscono che togliere un
  * proprio materiale cancelli il file di qualcun altro:
  *   - la chiave è quella di un documento caricato, ed è il file che l'URL del
  *     materiale serve (`materialBlobPathProblem`);

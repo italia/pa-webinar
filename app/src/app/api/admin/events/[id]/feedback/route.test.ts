@@ -148,7 +148,7 @@ describe('GET /api/admin/events/[id]/feedback — chi vede le valutazioni', () =
   });
 
   it('lo staff che gestisce l’evento: il rapporto in JSON, non in cache', async () => {
-    mockedManager.mockResolvedValue({ role: 'organizer', accountId: 'org-1' });
+    mockedManager.mockResolvedValue({ role: 'organizer', accountId: 'org-1', emailHash: 'hash-org-1' });
 
     const res = await GET(...get());
 

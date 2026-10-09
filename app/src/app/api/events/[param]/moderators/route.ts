@@ -19,11 +19,12 @@ import { withErrorHandling, parseJsonBody } from '@/lib/api-handler';
 import { prisma } from '@/lib/db';
 import { AppError, ForbiddenError, RateLimitError, UnauthorizedError, ValidationError } from '@/lib/errors';
 import { constantTimeEqual, extractModeratorToken } from '@/lib/auth/moderator';
-import { encryptPII, encryptPIIOrNull, tryDecryptPII } from '@/lib/crypto/pii';
+import { encryptPII, encryptPIIOrNull, hashEmail, tryDecryptPII } from '@/lib/crypto/pii';
 import { rateLimit, getClientIp } from '@/lib/rate-limit';
 import { adminRequestLocale, sendGrantModeratorLink } from '@/lib/email/moderator-link';
 import { getSettings } from '@/lib/settings';
 import { grantProfileData, grantProfileSchema } from '@/lib/events/grant-profile';
+import { requireOrganizerMarkRight } from '@/lib/auth/organizer-mark';
 import { z } from 'zod';
 
 export const dynamic = 'force-dynamic';
@@ -116,11 +117,16 @@ export const POST = withErrorHandling(async (request, context) => {
     );
   }
 
+  if (parsed.data.organizer) await requireOrganizerMarkRight(event.id);
+
   const created = await prisma.eventModerator.create({
     data: {
       eventId: event.id,
       name: encryptPII(parsed.data.name),
       email: encryptPIIOrNull(parsed.data.email),
+      // L'impronta riconosce l'account dello staff con lo stesso indirizzo
+      // (lib/auth/staff-session, eventScope).
+      emailHash: parsed.data.email ? hashEmail(parsed.data.email) : null,
       role: parsed.data.role ?? EventModeratorRole.MODERATOR,
       ...grantProfileData(parsed.data),
       token: randomUUID(),
@@ -137,9 +143,12 @@ export const POST = withErrorHandling(async (request, context) => {
     });
   }
 
+  // L'impronta dell'indirizzo resta sul server: è l'identificativo che lega
+  // la persona fra eventi, richieste GDPR e account dello staff.
+  const { emailHash: _impronta, ...riga } = created;
   return Response.json(
     {
-      ...created,
+      ...riga,
       name: tryDecryptPII(created.name),
       email: tryDecryptPII(created.email),
     },

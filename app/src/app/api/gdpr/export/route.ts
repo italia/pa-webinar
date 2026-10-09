@@ -99,8 +99,35 @@ export const GET = withErrorHandling(async (request) => {
       }
     : null;
 
+  // Le concessioni nominali (organizzatore, moderatore, relatore) con lo
+  // stesso indirizzo. A quelle nate prima dell'impronta la pulizia
+  // giornaliera la aggiunge (lib/events/grant-email-hash).
+  const concessioni = await prisma.eventModerator.findMany({
+    where: { emailHash },
+    select: {
+      name: true,
+      role: true,
+      organizer: true,
+      organization: true,
+      publicListed: true,
+      createdAt: true,
+      revokedAt: true,
+      event: { select: { title: true, startsAt: true } },
+    },
+    orderBy: { createdAt: 'asc' },
+  });
+  const grants = concessioni.map((g) => ({
+    name: tryDecryptPII(g.name) ?? g.name,
+    role: g.role === 'SPEAKER' ? 'speaker' : g.organizer ? 'organizer' : 'moderator',
+    organization: g.organization,
+    shownOnPublicPage: g.publicListed,
+    createdAt: g.createdAt.toISOString(),
+    revokedAt: g.revokedAt?.toISOString() ?? null,
+    event: { title: g.event.title, startsAt: g.event.startsAt.toISOString() },
+  }));
+
   if (registrations.length === 0) {
-    return Response.json({ data: [], profilePhoto });
+    return Response.json({ data: [], profilePhoto, grants });
   }
 
   // Audit one row per distinct event, recording only an emailHash prefix
@@ -165,5 +192,5 @@ export const GET = withErrorHandling(async (request) => {
     };
   });
 
-  return Response.json({ data: result, profilePhoto });
+  return Response.json({ data: result, profilePhoto, grants });
 });

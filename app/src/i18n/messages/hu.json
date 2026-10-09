@@ -804,7 +804,7 @@
         "roleInfo": {
           "organizer": {
             "name": "Szervező",
-            "desc": "Moderátorként vezeti a termet, és a szervezők között szerepel. A fő szervező hozzáadja és eltávolítja a többi személyt."
+            "desc": "Moderátorként vezeti a termet, és a szervezők között szerepel. A fő szervező hozzáadja és eltávolítja a többi személyt. Azonos e-mail-című munkatársi fiókkal az eseményt is kezeli."
           },
           "moderator": {
             "name": "Moderátor",
@@ -856,7 +856,7 @@
         "roleModerator": "Moderátor",
         "roleSpeaker": "Előadó",
         "roleHelp": {
-          "organizer": "Moderátorként vezeti a termet, és a szervezők között szerepel.",
+          "organizer": "Moderátorként vezeti a termet, és a szervezők között szerepel. Azonos e-mail-című munkatársi fiókkal az eseményt is kezeli.",
           "moderator": "Vezeti a termet: szót ad, kezeli a kérdéseket, szavazásokat és a felvételt.",
           "speaker": "Beszél, használja a kamerát és megosztja a képernyőt, moderálási jogok nélkül."
         },
@@ -1527,7 +1527,7 @@
       "prepareEmailBody": "Kedves {name}!\n\nItt a személyes linkje ehhez: „{title}”:\n{link}\n\nA link csak Önnek szól: ne továbbítsa és ne ossza meg.",
       "draftNote": "Az esemény piszkozat: a linkeket e-mailben küldjük el, amikor megjelenik. Addig innen másolhatja ki őket.",
       "roleOrganizer": "Szervező",
-      "roleOrganizerHint": "Moderátorként moderál, és az esemény szervezői között szerepel.",
+      "roleOrganizerHint": "Moderátorként moderál, és az esemény szervezői között szerepel. Azonos e-mail-című munkatársi fiókkal az eseményt is kezeli.",
       "organization": "Intézmény vagy szervezet (nem kötelező)",
       "publicListed": "Megjelenítés a nyilvános oldalon",
       "onPublicPage": "A nyilvános oldalon"
@@ -3318,7 +3318,15 @@
       "erasureCtaBody": "Kérheti az e-mail címéhez társított adatok teljes törlését (GDPR 17. cikk).",
       "erasureCtaButton": "Törlés kérése",
       "photoTitle": "Profilkép",
-      "photoBody": "Feltöltve: {date}. A többi résztvevő a monogramod helyett ezt látja. Egy esemény várótermében vagy az adataid törlésével távolíthatod el."
+      "photoBody": "Feltöltve: {date}. A többi résztvevő a monogramod helyett ezt látja. Egy esemény várótermében vagy az adataid törlésével távolíthatod el.",
+      "grantsTitle": "Szerepek eseményeken",
+      "grantsIntro": "Azok az események, ahol ennek a címnek személyes hozzáférése van szervezőként, moderátorként vagy előadóként.",
+      "grantRoleOrganizer": "Szervező",
+      "grantRoleModerator": "Moderátor",
+      "grantRoleSpeaker": "Előadó",
+      "grantSince": "{date} óta",
+      "grantPublic": "megjelenik a nyilvános oldalon",
+      "grantRevoked": "hozzáférés visszavonva: {date}"
     },
     "erasure": {
       "title": "Az Ön adatainak törlése",
@@ -3339,7 +3347,8 @@
       "doneBody": "{count} regisztráció és a kapcsolódó adatok törölve lettek.",
       "error": "Hiba történt. Kérjük, próbálja újra később.",
       "rateLimited": "Túl sok kérés. Próbálja újra egy óra múlva.",
-      "back": "Vissza az adataimhoz"
+      "back": "Vissza az adataimhoz",
+      "doneGrants": "{count, plural, one {# szervezői, moderátori vagy előadói hozzáférés is törlődött.} other {# szervezői, moderátori vagy előadói hozzáférés is törlődött.}}"
     }
   },
   "legal": {

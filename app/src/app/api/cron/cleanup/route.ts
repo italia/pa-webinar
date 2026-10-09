@@ -23,6 +23,7 @@ import {
   emailOutboxRetentionDays,
   staffInactiveDeactivateDays,
 } from '@/lib/gdpr/log-retention';
+import { completaImprontaConcessioni } from '@/lib/events/grant-email-hash';
 
 /** Giorni senza iscrizioni dopo cui una foto profilo si cancella. */
 const PROFILE_PHOTO_GRACE_DAYS = 30;
@@ -601,11 +602,22 @@ export const GET = withErrorHandling(async (request) => {
     failures.push('audit-log');
   }
 
+  // L'impronta dell'indirizzo sulle concessioni nate prima che esistesse:
+  // l'export e la cancellazione GDPR in autonomia cercano per impronta.
+  let grantFingerprintsFilled = 0;
+  try {
+    grantFingerprintsFilled = await completaImprontaConcessioni();
+  } catch (err) {
+    console.error('[cron/cleanup] Failed to fill grant fingerprints:', err);
+    failures.push('grant-fingerprints');
+  }
+
   const ok = failures.length === 0;
   return Response.json(
     {
       ok,
       ...(!ok && { failures }),
+      grantFingerprintsFilled,
       staffLoginLinksDeleted: staffLinks.count,
       staffAccountsDeactivated: staffDeactivated,
       emailOutboxDeleted: outboxDeleted,

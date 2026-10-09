@@ -804,7 +804,7 @@
         "roleInfo": {
           "organizer": {
             "name": "Organizátor",
-            "desc": "Vedie miestnosť ako moderátor a je uvedený medzi organizátormi. Hlavný organizátor pridáva a odoberá ostatné osoby."
+            "desc": "Vedie miestnosť ako moderátor a je uvedený medzi organizátormi. Hlavný organizátor pridáva a odoberá ostatné osoby. S účtom personálu s rovnakým e-mailom podujatie aj spravuje."
           },
           "moderator": {
             "name": "Moderátor",
@@ -856,7 +856,7 @@
         "roleModerator": "Moderátor",
         "roleSpeaker": "Rečník",
         "roleHelp": {
-          "organizer": "Vedie miestnosť ako moderátor a je uvedený medzi organizátormi.",
+          "organizer": "Vedie miestnosť ako moderátor a je uvedený medzi organizátormi. S účtom personálu s rovnakým e-mailom podujatie aj spravuje.",
           "moderator": "Vedie miestnosť: udeľuje slovo, spravuje otázky, ankety a nahrávanie.",
           "speaker": "Hovorí, používa kameru a zdieľa obrazovku, bez moderátorských právomocí."
         },
@@ -1527,7 +1527,7 @@
       "prepareEmailBody": "Dobrý deň, {name},\n\ntu je váš osobný odkaz na „{title}“:\n{link}\n\nOdkaz je len pre vás: nepreposielajte ho ani ho nezdieľajte.",
       "draftNote": "Udalosť je koncept: odkazy sa odošlú e-mailom, keď sa zverejní. Dovtedy ich môžete skopírovať odtiaľto.",
       "roleOrganizer": "Organizátor",
-      "roleOrganizerHint": "Moderuje ako moderátor a je uvedený medzi organizátormi podujatia.",
+      "roleOrganizerHint": "Moderuje ako moderátor a je uvedený medzi organizátormi podujatia. S účtom personálu s rovnakým e-mailom podujatie aj spravuje.",
       "organization": "Inštitúcia alebo organizácia (voliteľné)",
       "publicListed": "Zobraziť na verejnej stránke",
       "onPublicPage": "Na verejnej stránke"
@@ -3318,7 +3318,15 @@
       "erasureCtaBody": "Môžete požiadať o úplné vymazanie údajov spojených s vašou e-mailovou adresou (čl. 17 GDPR).",
       "erasureCtaButton": "Požiadať o vymazanie",
       "photoTitle": "Profilová fotka",
-      "photoBody": "Nahraté {date}. Ostatní účastníci ju vidia namiesto vašich iniciál. Odstrániť ju môžete v čakárni podujatia alebo vymazaním svojich údajov."
+      "photoBody": "Nahraté {date}. Ostatní účastníci ju vidia namiesto vašich iniciál. Odstrániť ju môžete v čakárni podujatia alebo vymazaním svojich údajov.",
+      "grantsTitle": "Roly na podujatiach",
+      "grantsIntro": "Podujatia, kde má táto adresa osobný prístup ako organizátor, moderátor alebo rečník.",
+      "grantRoleOrganizer": "Organizátor",
+      "grantRoleModerator": "Moderátor",
+      "grantRoleSpeaker": "Rečník",
+      "grantSince": "Od {date}",
+      "grantPublic": "zobrazený na verejnej stránke",
+      "grantRevoked": "prístup zrušený {date}"
     },
     "erasure": {
       "title": "Vymazanie vašich údajov",
@@ -3339,7 +3347,8 @@
       "doneBody": "Vymazané registrácie: {count}, spolu so súvisiacimi údajmi.",
       "error": "Vyskytla sa chyba. Skúste to znova neskôr.",
       "rateLimited": "Príliš veľa žiadostí. Skúste to znova o hodinu.",
-      "back": "Späť na moje údaje"
+      "back": "Späť na moje údaje",
+      "doneGrants": "{count, plural, one {Odstránený bol aj # prístup organizátora, moderátora alebo rečníka.} few {Odstránené boli aj # prístupy organizátora, moderátora alebo rečníka.} many {Odstránených bolo aj # prístupu organizátora, moderátora alebo rečníka.} other {Odstránených bolo aj # prístupov organizátora, moderátora alebo rečníka.}}"
     }
   },
   "legal": {

@@ -27,6 +27,7 @@ export default function ErasurePage() {
   const [phase, setPhase] = useState<Phase>('idle');
   const [error, setError] = useState('');
   const [deletedCount, setDeletedCount] = useState(0);
+  const [grantsDeleted, setGrantsDeleted] = useState(0);
 
   const handleRequest = useCallback(
     async (e: FormEvent) => {
@@ -85,6 +86,7 @@ export default function ErasurePage() {
       }
       const json = await res.json();
       setDeletedCount(typeof json.deleted === 'number' ? json.deleted : 0);
+      setGrantsDeleted(typeof json.grantsDeleted === 'number' ? json.grantsDeleted : 0);
       setPhase('confirmed');
     } catch {
       setError(t('error'));
@@ -169,6 +171,9 @@ export default function ErasurePage() {
             <Alert color="success">
               <h2 className="h5 mb-2">{t('doneTitle')}</h2>
               <p className="mb-0">{t('doneBody', { count: deletedCount })}</p>
+              {grantsDeleted > 0 && (
+                <p className="mb-0 mt-2">{t('doneGrants', { count: grantsDeleted })}</p>
+              )}
             </Alert>
           )}
 

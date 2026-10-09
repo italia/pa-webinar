@@ -40,7 +40,7 @@ async function requireBelongs(eventId: string, invId: string) {
 
 export const PATCH = withErrorHandling(async (request, context) => {
   const { id, invId } = await context.params;
-  // Dell'evento: l'admin, o l'organizzatore che l'ha creato (ADR-014).
+  // Di chi gestisce l'evento: l'admin, chi l'ha creato o un altro organizzatore (eventScope, ADR-014).
   const session = await requireEventManager(await cookies(), id);
   await requireBelongs(id, invId);
 
@@ -94,7 +94,7 @@ export const PATCH = withErrorHandling(async (request, context) => {
 
 export const DELETE = withErrorHandling(async (request, context) => {
   const { id, invId } = await context.params;
-  // Dell'evento: l'admin, o l'organizzatore che l'ha creato (ADR-014).
+  // Di chi gestisce l'evento: l'admin, chi l'ha creato o un altro organizzatore (eventScope, ADR-014).
   await requireEventManager(await cookies(), id);
   await requireBelongs(id, invId);
 

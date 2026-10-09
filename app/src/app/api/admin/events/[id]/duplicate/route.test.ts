@@ -35,6 +35,7 @@ vi.mock('@/lib/db', () => ({
   prisma: {
     event: { findUnique: vi.fn(), create: vi.fn() },
     eventReminder: { findMany: vi.fn() },
+    staffAccount: { findUnique: vi.fn(async () => ({ active: true })) },
   },
 }));
 
@@ -169,6 +170,32 @@ describe('POST /api/admin/events/[id]/duplicate', () => {
     expect(body.id).toBe('6f1b2c3d-4e5f-4a6b-8c9d-0e1f2a3b4c5d');
     expect(typeof body.moderatorToken).toBe('string');
     expect(body.moderatorToken).toBeTruthy();
+  });
+
+  it('la copia è di chi duplica; un co-organizzatore lascia la copia a chi ha creato l’originale', async () => {
+    const { requireEventManager } = await import('@/lib/auth/staff-session');
+    const manager = vi.mocked(requireEventManager);
+
+    mocked.event.findUnique.mockResolvedValue({ ...sourceEvent(), createdById: 'creatore' });
+    manager.mockResolvedValueOnce({ role: 'organizer', accountId: 'creatore', emailHash: 'h1' });
+    await POST(request(), context as never);
+    expect(mocked.event.create.mock.calls[0]![0].data.createdById).toBe('creatore');
+
+    manager.mockResolvedValueOnce({ role: 'organizer', accountId: 'co-org', emailHash: 'h2' });
+    await POST(request(), context as never);
+    expect(mocked.event.create.mock.calls[1]![0].data.createdById).toBe('creatore');
+
+    manager.mockResolvedValueOnce({ role: 'admin', accountId: 'amministratore' });
+    await POST(request(), context as never);
+    expect(mocked.event.create.mock.calls[2]![0].data.createdById).toBe('amministratore');
+
+    // Con il creatore disattivato la copia va a chi duplica, non a un account
+    // che nessuno usa più.
+    const { prisma: db } = await import('@/lib/db');
+    vi.mocked(db.staffAccount.findUnique).mockResolvedValueOnce({ active: false } as never);
+    manager.mockResolvedValueOnce({ role: 'organizer', accountId: 'co-org', emailHash: 'h2' });
+    await POST(request(), context as never);
+    expect(mocked.event.create.mock.calls[3]![0].data.createdById).toBe('co-org');
   });
 
   it('la copia NON eredita il token dell’originale: è una credenziale, non configurazione', async () => {

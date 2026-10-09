@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 import { getLocale } from 'next-intl/server';
 
 import { staffOLogin } from '@/lib/auth/staff-page';
-import { canManageEvent } from '@/lib/auth/staff-session';
+import { puoGestire } from '@/lib/auth/staff-session';
 import AccessDenied from '@/components/admin/access-denied';
 import { prisma } from '@/lib/db';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
@@ -38,12 +38,12 @@ export default async function RecordingManagePage({ params }: PageProps) {
       sourceLanguage: true,
       createdAt: true,
       eventId: true,
-      event: { select: { title: true, slug: true, createdById: true } },
+      event: { select: { title: true, slug: true } },
     },
   });
   if (!recording) notFound();
   // La registrazione e' dell'evento: la gestisce chi gestisce l'evento.
-  if (!canManageEvent(session, { createdById: recording.event?.createdById ?? null })) {
+  if (!(await puoGestire(session, recording.eventId))) {
     return <AccessDenied />;
   }
 

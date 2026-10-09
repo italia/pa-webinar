@@ -31,7 +31,7 @@ flowchart LR
 
   subgraph STAFF["In the administration area"]
     direction TB
-    OR(["Organizer<br/>own events only"]):::person
+    OR(["Organizer<br/>own and co-organized events"]):::person
     AD(["Administrator<br/>whole instance"]):::person
   end
   style STAFF fill:#F7F9FB,stroke:#5C6F82,color:#17324D

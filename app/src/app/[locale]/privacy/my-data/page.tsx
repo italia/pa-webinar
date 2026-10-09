@@ -62,6 +62,23 @@ interface ExportEntry {
   pollVotes: ExportPollVote[];
 }
 
+/** Un ruolo nominale in un evento (organizzatore, moderatore, relatore). */
+interface ExportGrant {
+  name: string;
+  role: 'organizer' | 'moderator' | 'speaker';
+  organization: string | null;
+  shownOnPublicPage: boolean;
+  createdAt: string;
+  revokedAt: string | null;
+  event: { title: Record<string, string>; startsAt: string };
+}
+
+const GRANT_ROLE_KEY = {
+  organizer: 'grantRoleOrganizer',
+  moderator: 'grantRoleModerator',
+  speaker: 'grantRoleSpeaker',
+} as const;
+
 export default function MyDataPage() {
   const t = useTranslations('gdpr.export');
   const locale = useLocale();
@@ -74,6 +91,8 @@ export default function MyDataPage() {
   const [results, setResults] = useState<ExportEntry[] | null>(null);
   // La foto profilo e' dell'indirizzo, non di un'iscrizione: arriva a parte.
   const [photo, setPhoto] = useState<{ uploadedAt: string; dataUrl: string } | null>(null);
+  // I ruoli negli eventi: anche chi non si è mai iscritto può averne.
+  const [grants, setGrants] = useState<ExportGrant[]>([]);
   const format = useFormatter();
 
   // When the user lands here via the signed link emailed to them, the
@@ -107,6 +126,7 @@ export default function MyDataPage() {
         const json = await res.json();
         setResults(json.data);
         setPhoto(json.profilePhoto ?? null);
+        setGrants(Array.isArray(json.grants) ? json.grants : []);
       } catch {
         if (!cancelled) setError(t('error'));
       } finally {
@@ -260,7 +280,45 @@ export default function MyDataPage() {
             </Card>
           )}
 
-          {results !== null && results.length === 0 && !photo && (
+          {grants.length > 0 && (
+            <Card className="shadow-sm border-0 mb-4" style={{ borderRadius: 8, border: '1px solid #e8e8e8' }}>
+              <CardBody className="p-4">
+                <h2 className="h5 mb-1">{t('grantsTitle')}</h2>
+                <p className="text-muted mb-3" style={{ fontSize: '0.9rem' }}>
+                  {t('grantsIntro')}
+                </p>
+                <ul className="list-unstyled mb-0">
+                  {grants.map((g, i) => (
+                    <li key={i} className="mb-3" style={{ fontSize: '0.9rem' }}>
+                      <div className="fw-semibold">
+                        {getLocalized(g.event.title as LocalizedField, locale)}
+                      </div>
+                      <div>
+                        {t(GRANT_ROLE_KEY[g.role])} · {g.name}
+                        {g.organization ? ` · ${g.organization}` : ''}
+                      </div>
+                      <div className="text-muted">
+                        {t('grantSince', {
+                          date: format.dateTime(new Date(g.createdAt), { dateStyle: 'long' }),
+                        })}
+                        {g.shownOnPublicPage && <> · {t('grantPublic')}</>}
+                        {g.revokedAt && (
+                          <>
+                            {' · '}
+                            {t('grantRevoked', {
+                              date: format.dateTime(new Date(g.revokedAt), { dateStyle: 'long' }),
+                            })}
+                          </>
+                        )}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </CardBody>
+            </Card>
+          )}
+
+          {results !== null && results.length === 0 && !photo && grants.length === 0 && (
             <Alert color="info">
               <Icon icon="it-info-circle" className="me-2" />
               {t('noData')}
