@@ -4358,7 +4358,7 @@
     "speakerTest": "Test audio",
     "backgroundLabel": "Virtual background",
     "backgroundNoneShort": "No",
-    "backgroundHint": "Applied when you enter the room. To blur your background use the backgrounds button once inside: the preview above shows the camera without effects.",
+    "backgroundHint": "It is applied when you enter the room. To blur your background, use the backgrounds button once inside.",
     "background": {
       "nessuno": "No background",
       "ufficio-chiaro": "Light office",
@@ -4369,7 +4369,10 @@
       "onde-blu": "Blue waves",
       "aurora": "Aurora",
       "luci-soffuse": "Soft lights"
-    }
+    },
+    "backgroundPreviewLoading": "Preparing the background preview…",
+    "backgroundPreviewUnavailable": "The background preview isn't available in this browser: the background is still applied when you enter the room.",
+    "backgroundHintPreview": "You can already see it in the preview, and it stays on when you enter the room. To blur your background, use the backgrounds button once inside."
   },
   "garden": {
     "enable": "Show the garden",

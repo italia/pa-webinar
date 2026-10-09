@@ -4358,7 +4358,7 @@
     "speakerTest": "Test zvuku",
     "backgroundLabel": "Virtuálne pozadie",
     "backgroundNoneShort": "No",
-    "backgroundHint": "Použije sa po vstupe do miestnosti. Na rozmazanie pozadia použite po vstupe tlačidlo pozadí: náhľad vyššie zobrazuje kameru bez efektu.",
+    "backgroundHint": "Použije sa pri vstupe do miestnosti. Na rozmazanie pozadia použite vnútri tlačidlo pozadí.",
     "background": {
       "nessuno": "Bez pozadia",
       "ufficio-chiaro": "Svetlá kancelária",
@@ -4369,7 +4369,10 @@
       "onde-blu": "Modré vlny",
       "aurora": "Polárna žiara",
       "luci-soffuse": "Jemné svetlá"
-    }
+    },
+    "backgroundPreviewLoading": "Pripravujem náhľad pozadia…",
+    "backgroundPreviewUnavailable": "Náhľad pozadia nie je v tomto prehliadači dostupný: pozadie sa aj tak použije pri vstupe do miestnosti.",
+    "backgroundHintPreview": "Vidíte ho už v náhľade a zostane aj po vstupe do miestnosti. Na rozmazanie pozadia použite vnútri tlačidlo pozadí."
   },
   "garden": {
     "enable": "Zobraziť záhradu",

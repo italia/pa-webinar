@@ -4358,7 +4358,7 @@
     "speakerTest": "Audio testen",
     "backgroundLabel": "Virtueller Hintergrund",
     "backgroundNoneShort": "No",
-    "backgroundHint": "Wird beim Betreten des Raums angewendet. Um den Hintergrund weichzuzeichnen, verwenden Sie im Raum die Schaltfläche für Hintergründe: Die Vorschau oben zeigt die Kamera ohne Effekte.",
+    "backgroundHint": "Er wird beim Betreten des Raums angewendet. Zum Weichzeichnen nutzen Sie im Raum die Schaltfläche für Hintergründe.",
     "background": {
       "nessuno": "Kein Hintergrund",
       "ufficio-chiaro": "Helles Büro",
@@ -4369,7 +4369,10 @@
       "onde-blu": "Blaue Wellen",
       "aurora": "Polarlicht",
       "luci-soffuse": "Sanfte Lichter"
-    }
+    },
+    "backgroundPreviewLoading": "Hintergrundvorschau wird vorbereitet…",
+    "backgroundPreviewUnavailable": "Die Hintergrundvorschau ist in diesem Browser nicht verfügbar: Der Hintergrund wird beim Betreten des Raums trotzdem angewendet.",
+    "backgroundHintPreview": "Sie sehen ihn bereits in der Vorschau, und er bleibt erhalten, wenn Sie den Raum betreten. Zum Weichzeichnen nutzen Sie im Raum die Schaltfläche für Hintergründe."
   },
   "garden": {
     "enable": "Garten anzeigen",

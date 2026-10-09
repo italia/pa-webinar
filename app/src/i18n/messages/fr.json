@@ -4358,7 +4358,7 @@
     "speakerTest": "Test audio",
     "backgroundLabel": "Arrière-plan virtuel",
     "backgroundNoneShort": "No",
-    "backgroundHint": "S'applique lorsque vous entrez dans la salle. Pour flouter l'arrière-plan, utilisez le bouton des arrière-plans une fois à l'intérieur : l'aperçu ci-dessus montre la caméra sans effet.",
+    "backgroundHint": "Il s'applique quand vous entrez dans la salle. Pour flouter l'arrière-plan, utilisez le bouton des arrière-plans une fois à l'intérieur.",
     "background": {
       "nessuno": "Aucun arrière-plan",
       "ufficio-chiaro": "Bureau clair",
@@ -4369,7 +4369,10 @@
       "onde-blu": "Vagues bleues",
       "aurora": "Aurore",
       "luci-soffuse": "Lumières douces"
-    }
+    },
+    "backgroundPreviewLoading": "Préparation de l'aperçu de l'arrière-plan…",
+    "backgroundPreviewUnavailable": "L'aperçu de l'arrière-plan n'est pas disponible dans ce navigateur : l'arrière-plan est tout de même appliqué quand vous entrez dans la salle.",
+    "backgroundHintPreview": "Vous le voyez déjà dans l'aperçu, et il reste actif quand vous entrez dans la salle. Pour flouter l'arrière-plan, utilisez le bouton des arrière-plans une fois à l'intérieur."
   },
   "garden": {
     "enable": "Afficher le jardin",

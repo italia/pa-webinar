@@ -4358,7 +4358,7 @@
     "speakerTest": "Testa ljud",
     "backgroundLabel": "Virtuell bakgrund",
     "backgroundNoneShort": "No",
-    "backgroundHint": "Tillämpas när du går in i rummet. För att göra bakgrunden suddig använder du bakgrundsknappen när du är inne: förhandsvisningen ovan visar kameran utan effekt.",
+    "backgroundHint": "Den används när du går in i rummet. Använd knappen för bakgrunder inne i rummet för att göra bakgrunden suddig.",
     "background": {
       "nessuno": "Ingen bakgrund",
       "ufficio-chiaro": "Ljust kontor",
@@ -4369,7 +4369,10 @@
       "onde-blu": "Blå vågor",
       "aurora": "Norrsken",
       "luci-soffuse": "Mjuka ljus"
-    }
+    },
+    "backgroundPreviewLoading": "Förbereder förhandsvisning av bakgrunden…",
+    "backgroundPreviewUnavailable": "Förhandsvisning av bakgrunden är inte tillgänglig i den här webbläsaren: bakgrunden används ändå när du går in i rummet.",
+    "backgroundHintPreview": "Du ser den redan i förhandsvisningen, och den finns kvar när du går in i rummet. Använd knappen för bakgrunder inne i rummet för att göra bakgrunden suddig."
   },
   "garden": {
     "enable": "Visa trädgården",

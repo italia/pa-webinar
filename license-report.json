@@ -607,6 +607,10 @@
     "publisher": "Justin Ridgewell",
     "email": "justin@ridgewell.name"
   },
+  "@mediapipe/tasks-vision@0.10.35": {
+    "licenses": "Apache-2.0",
+    "publisher": "mediapipe@google.com"
+  },
   "@next/env@15.5.25": {
     "licenses": "MIT",
     "repository": "https://github.com/vercel/next.js",

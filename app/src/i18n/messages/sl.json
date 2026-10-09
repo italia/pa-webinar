@@ -4358,7 +4358,7 @@
     "speakerTest": "Test zvoka",
     "backgroundLabel": "Navidezno ozadje",
     "backgroundNoneShort": "No",
-    "backgroundHint": "Uveljavi se, ko vstopite v dvorano. Za zameglitev ozadja po vstopu uporabite gumb za ozadja: zgornji predogled prikazuje kamero brez učinka.",
+    "backgroundHint": "Uporabi se, ko vstopite v sobo. Za zameglitev ozadja v sobi uporabite gumb za ozadja.",
     "background": {
       "nessuno": "Brez ozadja",
       "ufficio-chiaro": "Svetla pisarna",
@@ -4369,7 +4369,10 @@
       "onde-blu": "Modri valovi",
       "aurora": "Polarni sij",
       "luci-soffuse": "Mehke luči"
-    }
+    },
+    "backgroundPreviewLoading": "Pripravljam predogled ozadja…",
+    "backgroundPreviewUnavailable": "Predogled ozadja v tem brskalniku ni na voljo: ozadje se vseeno uporabi, ko vstopite v sobo.",
+    "backgroundHintPreview": "Vidite ga že v predogledu in ostane, ko vstopite v sobo. Za zameglitev ozadja v sobi uporabite gumb za ozadja."
   },
   "garden": {
     "enable": "Pokaži vrt",

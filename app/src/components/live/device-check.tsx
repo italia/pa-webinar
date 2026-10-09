@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { Alert, Button } from 'design-react-kit';
 
 import { Icon } from '@/components/ui/icon';
+import { useAnteprimaSfondo } from '@/hooks/use-background-preview';
 import {
   SFONDI_VIRTUALI,
   SFONDO_PREDEFINITO,
@@ -93,8 +94,8 @@ export default function DeviceCheck({
   const disposedRef = useRef(false);
 
   // Sfondo virtuale: la scelta vive nelle preferenze del browser e la applica
-  // la sala all'ingresso. Qui non si prova ad applicarlo all'anteprima —
-  // servirebbe un secondo motore di segmentazione accanto a quello di Jitsi.
+  // la sala all'ingresso. Qui l'anteprima lo mostra già dietro la persona,
+  // ritagliata nel browser (hooks/use-background-preview).
   //
   // Si parte dal predefinito e si legge la preferenza DOPO il montaggio: il
   // server non ha quelle preferenze, e disegnare subito la scelta memorizzata
@@ -104,6 +105,8 @@ export default function DeviceCheck({
   useEffect(() => {
     setSfondo(leggiSfondo());
   }, []);
+
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   const [permissionState, setPermissionState] = useState<PermissionState>('idle');
   const [videoDevices, setVideoDevices] = useState<MediaDeviceInfo[]>([]);
@@ -307,6 +310,14 @@ export default function DeviceCheck({
     void requestMedia();
   }, [requestMedia]);
 
+  const sfondoUrl = SFONDI_VIRTUALI.find((s) => s.id === sfondo)?.url ?? null;
+  const anteprima = useAnteprimaSfondo({
+    videoRef,
+    canvasRef,
+    sfondoUrl,
+    attiva: permissionState === 'granted' && cameraOn,
+  });
+
   const previewBox = (
     <div
       className="position-relative bg-dark rounded overflow-hidden device-check-preview"
@@ -329,6 +340,20 @@ export default function DeviceCheck({
           display: cameraOn ? 'block' : 'none',
         }}
       />
+      {/* La stessa inquadratura con lo sfondo scelto: copre il video quando il
+          primo fotogramma è pronto. */}
+      <canvas
+        ref={canvasRef}
+        aria-hidden="true"
+        className="position-absolute top-0 start-0 w-100 h-100 device-check-preview__composite"
+        style={{ display: cameraOn && sfondoUrl && anteprima === 'pronta' ? 'block' : 'none' }}
+      />
+      {cameraOn && sfondoUrl && anteprima === 'caricamento' && permissionState === 'granted' && (
+        <div className="device-check-preview__status" role="status">
+          <span className="device-check-preview__spinner" aria-hidden="true" />
+          {t('backgroundPreviewLoading')}
+        </div>
+      )}
       {permissionState !== 'granted' && (
         <div
           className="position-absolute top-50 start-50 translate-middle text-white-50 small text-center px-2"
@@ -592,7 +617,13 @@ export default function DeviceCheck({
             );
           })}
         </div>
-        <small className="text-muted d-block mt-1">{t('backgroundHint')}</small>
+        <small className="text-muted d-block mt-1">
+          {anteprima === 'errore'
+            ? t('backgroundPreviewUnavailable')
+            : anteprima === 'pronta' || anteprima === 'caricamento'
+              ? t('backgroundHintPreview')
+              : t('backgroundHint')}
+        </small>
       </fieldset>
     </div>
   );

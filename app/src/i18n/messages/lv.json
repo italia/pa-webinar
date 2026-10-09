@@ -4358,7 +4358,7 @@
     "speakerTest": "Audio tests",
     "backgroundLabel": "Virtuālais fons",
     "backgroundNoneShort": "No",
-    "backgroundHint": "Tiek piemērots, kad ieejat telpā. Lai aizmiglotu fonu, telpā izmantojiet fonu pogu: augstāk redzamais priekšskatījums rāda kameru bez efekta.",
+    "backgroundHint": "Tiek lietots, ieejot telpā. Lai izpludinātu fonu, telpā izmantojiet fonu pogu.",
     "background": {
       "nessuno": "Bez fona",
       "ufficio-chiaro": "Gaišs birojs",
@@ -4369,7 +4369,10 @@
       "onde-blu": "Zilie viļņi",
       "aurora": "Ziemeļblāzma",
       "luci-soffuse": "Maigas gaismas"
-    }
+    },
+    "backgroundPreviewLoading": "Gatavo fona priekšskatījumu…",
+    "backgroundPreviewUnavailable": "Fona priekšskatījums šajā pārlūkā nav pieejams: fons tik un tā tiek lietots, ieejot telpā.",
+    "backgroundHintPreview": "Jūs to jau redzat priekšskatījumā, un tas paliek, ieejot telpā. Lai izpludinātu fonu, telpā izmantojiet fonu pogu."
   },
   "garden": {
     "enable": "Rādīt dārzu",

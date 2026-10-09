@@ -4358,7 +4358,7 @@
     "speakerTest": "Äänen testi",
     "backgroundLabel": "Virtuaalitausta",
     "backgroundNoneShort": "No",
-    "backgroundHint": "Otetaan käyttöön, kun tulet saliin. Voit sumentaa taustan salissa taustapainikkeella: yllä oleva esikatselu näyttää kameran kuvan ilman tehosteita.",
+    "backgroundHint": "Se otetaan käyttöön, kun tulet huoneeseen. Sumenna tausta huoneessa taustapainikkeella.",
     "background": {
       "nessuno": "Ei taustaa",
       "ufficio-chiaro": "Vaalea toimisto",
@@ -4369,7 +4369,10 @@
       "onde-blu": "Siniset aallot",
       "aurora": "Revontulet",
       "luci-soffuse": "Pehmeät valot"
-    }
+    },
+    "backgroundPreviewLoading": "Valmistellaan taustan esikatselua…",
+    "backgroundPreviewUnavailable": "Taustan esikatselu ei ole käytettävissä tässä selaimessa: tausta otetaan silti käyttöön, kun tulet huoneeseen.",
+    "backgroundHintPreview": "Näet sen jo esikatselussa, ja se pysyy, kun tulet huoneeseen. Sumenna tausta huoneessa taustapainikkeella."
   },
   "garden": {
     "enable": "Näytä puutarha",

@@ -4358,7 +4358,7 @@
     "speakerTest": "Test zvuka",
     "backgroundLabel": "Virtualna pozadina",
     "backgroundNoneShort": "No",
-    "backgroundHint": "Primjenjuje se kad uđete u sobu. Za zamućenje pozadine nakon ulaska koristite gumb za pozadine: gornji pregled prikazuje kameru bez efekta.",
+    "backgroundHint": "Primjenjuje se kad uđete u sobu. Za zamućivanje pozadine upotrijebite gumb za pozadine unutra.",
     "background": {
       "nessuno": "Bez pozadine",
       "ufficio-chiaro": "Svijetli ured",
@@ -4369,7 +4369,10 @@
       "onde-blu": "Plavi valovi",
       "aurora": "Polarna svjetlost",
       "luci-soffuse": "Meka svjetla"
-    }
+    },
+    "backgroundPreviewLoading": "Pripremam pregled pozadine…",
+    "backgroundPreviewUnavailable": "Pregled pozadine nije dostupan u ovom pregledniku: pozadina se svejedno primjenjuje kad uđete u sobu.",
+    "backgroundHintPreview": "Već ga vidite u pregledu i ostaje kad uđete u sobu. Za zamućivanje pozadine upotrijebite gumb za pozadine unutra."
   },
   "garden": {
     "enable": "Prikaži vrt",

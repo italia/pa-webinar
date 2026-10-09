@@ -4358,7 +4358,7 @@
     "speakerTest": "Heli test",
     "backgroundLabel": "Virtuaalne taust",
     "backgroundNoneShort": "No",
-    "backgroundHint": "Rakendub ruumi sisenemisel. Tausta hägustamiseks kasutage ruumis olles taustade nuppu: ülal olev eelvaade näitab kaamerat ilma efektideta.",
+    "backgroundHint": "See rakendub, kui sisened ruumi. Tausta hägustamiseks kasuta ruumis taustade nuppu.",
     "background": {
       "nessuno": "Taust puudub",
       "ufficio-chiaro": "Hele kontor",
@@ -4369,7 +4369,10 @@
       "onde-blu": "Sinised lained",
       "aurora": "Virmalised",
       "luci-soffuse": "Pehmed tuled"
-    }
+    },
+    "backgroundPreviewLoading": "Tausta eelvaate ettevalmistamine…",
+    "backgroundPreviewUnavailable": "Tausta eelvaade pole selles brauseris saadaval: taust rakendatakse siiski ruumi sisenemisel.",
+    "backgroundHintPreview": "Näed seda juba eelvaates ja see jääb alles, kui sisened ruumi. Tausta hägustamiseks kasuta ruumis taustade nuppu."
   },
   "garden": {
     "enable": "Näita aeda",

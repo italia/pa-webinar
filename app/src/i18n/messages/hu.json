@@ -4358,7 +4358,7 @@
     "speakerTest": "Hangteszt",
     "backgroundLabel": "Virtuális háttér",
     "backgroundNoneShort": "No",
-    "backgroundHint": "A terembe lépéskor lép érvénybe. A háttér elmosásához a teremben használja a hátterek gombot: a fenti előnézet effektus nélkül mutatja a kamerát.",
+    "backgroundHint": "Akkor lép életbe, amikor belép a terembe. A háttér elmosásához bent használja a hátterek gombot.",
     "background": {
       "nessuno": "Nincs háttér",
       "ufficio-chiaro": "Világos iroda",
@@ -4369,7 +4369,10 @@
       "onde-blu": "Kék hullámok",
       "aurora": "Sarki fény",
       "luci-soffuse": "Lágy fények"
-    }
+    },
+    "backgroundPreviewLoading": "A háttér előnézetének előkészítése…",
+    "backgroundPreviewUnavailable": "A háttér előnézete ebben a böngészőben nem érhető el: a háttér ettől még érvényesül, amikor belép a terembe.",
+    "backgroundHintPreview": "Már látja az előnézetben, és megmarad, amikor belép a terembe. A háttér elmosásához bent használja a hátterek gombot."
   },
   "garden": {
     "enable": "Kert megjelenítése",

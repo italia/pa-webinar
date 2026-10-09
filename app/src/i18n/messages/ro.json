@@ -4358,7 +4358,7 @@
     "speakerTest": "Test audio",
     "backgroundLabel": "Fundal virtual",
     "backgroundNoneShort": "No",
-    "backgroundHint": "Se aplică atunci când intrați în sală. Pentru a estompa fundalul, folosiți butonul pentru fundaluri odată intrat: previzualizarea de mai sus arată camera fără efect.",
+    "backgroundHint": "Se aplică atunci când intrați în sală. Pentru a estompa fundalul, folosiți butonul de fundaluri din sală.",
     "background": {
       "nessuno": "Fără fundal",
       "ufficio-chiaro": "Birou luminos",
@@ -4369,7 +4369,10 @@
       "onde-blu": "Valuri albastre",
       "aurora": "Auroră",
       "luci-soffuse": "Lumini difuze"
-    }
+    },
+    "backgroundPreviewLoading": "Se pregătește previzualizarea fundalului…",
+    "backgroundPreviewUnavailable": "Previzualizarea fundalului nu este disponibilă în acest browser: fundalul se aplică oricum când intrați în sală.",
+    "backgroundHintPreview": "Îl vedeți deja în previzualizare și rămâne când intrați în sală. Pentru a estompa fundalul, folosiți butonul de fundaluri din sală."
   },
   "garden": {
     "enable": "Afișați grădina",

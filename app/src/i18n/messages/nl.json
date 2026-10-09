@@ -4358,7 +4358,7 @@
     "speakerTest": "Audiotest",
     "backgroundLabel": "Virtuele achtergrond",
     "backgroundNoneShort": "No",
-    "backgroundHint": "Wordt toegepast wanneer u de zaal betreedt. Gebruik om uw achtergrond te vervagen de achtergrondknop zodra u binnen bent: het voorbeeld hierboven toont de camera zonder effect.",
+    "backgroundHint": "Hij wordt toegepast als je de zaal binnengaat. Gebruik binnen de knop voor achtergronden om je achtergrond te vervagen.",
     "background": {
       "nessuno": "Geen achtergrond",
       "ufficio-chiaro": "Licht kantoor",
@@ -4369,7 +4369,10 @@
       "onde-blu": "Blauwe golven",
       "aurora": "Poollicht",
       "luci-soffuse": "Zachte lichtjes"
-    }
+    },
+    "backgroundPreviewLoading": "Voorvertoning van de achtergrond voorbereiden…",
+    "backgroundPreviewUnavailable": "De voorvertoning van de achtergrond is niet beschikbaar in deze browser: de achtergrond wordt toch toegepast als je de zaal binnengaat.",
+    "backgroundHintPreview": "Je ziet hem al in de voorvertoning, en hij blijft als je de zaal binnengaat. Gebruik binnen de knop voor achtergronden om je achtergrond te vervagen."
   },
   "garden": {
     "enable": "Toon de tuin",

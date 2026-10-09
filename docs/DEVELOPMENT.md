@@ -285,7 +285,7 @@ docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
 
 Everything else is baked into the image at build time: `node_modules`, the Prisma client, and configuration outside the mounts such as `app/next.config.ts` and the `package.json` files. After you change dependencies, `schema.prisma` or those files, run the command again with `--build`.
 
-Because `app/public` comes from your checkout, the icon sprite must exist there. `app/public/svg/sprites.svg` is not in Git: `npm install` (or `npm ci`) on the host copies it from `bootstrap-italia` in the app's `postinstall` step. If icons are missing in this mode, run that once on the host.
+Because `app/public` comes from your checkout, the icon sprite must exist there. `app/public/svg/sprites.svg` is not in Git: `npm install` (or `npm ci`) on the host copies it from `bootstrap-italia` in the app's `postinstall` step. If icons are missing in this mode, run that once on the host. The same step copies the background-preview engine to `app/public/vendor/mediapipe/` (`npm run copy-vision --workspace=app` does only that copy); without it the waiting room says the background preview is not available.
 
 The development server applies no production guards, so the placeholders are accepted as they are. The `cron` service keeps calling `http://app:3000`, so email works as in the first mode.
 

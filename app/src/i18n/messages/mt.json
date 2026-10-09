@@ -4358,7 +4358,7 @@
     "speakerTest": "Test awdjo",
     "backgroundLabel": "Sfond virtwali",
     "backgroundNoneShort": "No",
-    "backgroundHint": "Japplika meta tidħol fis-sala. Biex iċċajpar l-isfond, uża l-buttuna tal-isfondi ladarba tkun ġewwa: il-preview hawn fuq turi l-kamera mingħajr effett.",
+    "backgroundHint": "Jiġi applikat meta tidħol fil-kamra. Biex iċċajpar l-isfond, uża l-buttuna tal-isfondi ġewwa.",
     "background": {
       "nessuno": "L-ebda sfond",
       "ufficio-chiaro": "Uffiċċju ċar",
@@ -4369,7 +4369,10 @@
       "onde-blu": "Mewġ blu",
       "aurora": "Awrora",
       "luci-soffuse": "Dwal artab"
-    }
+    },
+    "backgroundPreviewLoading": "Qed nipprepara l-previżjoni tal-isfond…",
+    "backgroundPreviewUnavailable": "Il-previżjoni tal-isfond mhix disponibbli f'dan il-browser: l-isfond jiġi applikat xorta meta tidħol fil-kamra.",
+    "backgroundHintPreview": "Diġà tarah fil-previżjoni, u jibqa' meta tidħol fil-kamra. Biex iċċajpar l-isfond, uża l-buttuna tal-isfondi ġewwa."
   },
   "garden": {
     "enable": "Mostra il-giardino",

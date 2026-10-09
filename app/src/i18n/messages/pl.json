@@ -4358,7 +4358,7 @@
     "speakerTest": "Test audio",
     "backgroundLabel": "Wirtualne tło",
     "backgroundNoneShort": "No",
-    "backgroundHint": "Zostanie zastosowane po wejściu do sali. Aby rozmyć tło, użyj przycisku teł po wejściu: powyższy podgląd pokazuje kamerę bez efektów.",
+    "backgroundHint": "Zostanie zastosowane po wejściu do sali. Aby rozmyć tło, użyj w środku przycisku teł.",
     "background": {
       "nessuno": "Brak tła",
       "ufficio-chiaro": "Jasne biuro",
@@ -4369,7 +4369,10 @@
       "onde-blu": "Niebieskie fale",
       "aurora": "Zorza",
       "luci-soffuse": "Miękkie światła"
-    }
+    },
+    "backgroundPreviewLoading": "Przygotowuję podgląd tła…",
+    "backgroundPreviewUnavailable": "Podgląd tła nie jest dostępny w tej przeglądarce: tło i tak zostanie zastosowane po wejściu do sali.",
+    "backgroundHintPreview": "Widzisz je już w podglądzie i zostanie po wejściu do sali. Aby rozmyć tło, użyj w środku przycisku teł."
   },
   "garden": {
     "enable": "Pokaż ogród",

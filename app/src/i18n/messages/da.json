@@ -4358,7 +4358,7 @@
     "speakerTest": "Lydtest",
     "backgroundLabel": "Virtuel baggrund",
     "backgroundNoneShort": "No",
-    "backgroundHint": "Anvendes, når du går ind i rummet. Brug knappen til baggrunde, når du er inde, hvis du vil sløre din baggrund: forhåndsvisningen ovenfor viser kameraet uden effekter.",
+    "backgroundHint": "Den anvendes, når du går ind i rummet. Brug baggrundsknappen inde i rummet for at sløre baggrunden.",
     "background": {
       "nessuno": "Ingen baggrund",
       "ufficio-chiaro": "Lyst kontor",
@@ -4369,7 +4369,10 @@
       "onde-blu": "Blå bølger",
       "aurora": "Nordlys",
       "luci-soffuse": "Bløde lys"
-    }
+    },
+    "backgroundPreviewLoading": "Forbereder forhåndsvisning af baggrunden…",
+    "backgroundPreviewUnavailable": "Forhåndsvisning af baggrunden er ikke tilgængelig i denne browser: baggrunden anvendes stadig, når du går ind i rummet.",
+    "backgroundHintPreview": "Du kan allerede se den i forhåndsvisningen, og den bliver ved, når du går ind i rummet. Brug baggrundsknappen inde i rummet for at sløre baggrunden."
   },
   "garden": {
     "enable": "Vis haven",

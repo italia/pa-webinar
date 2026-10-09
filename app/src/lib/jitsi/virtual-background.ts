@@ -10,10 +10,9 @@
  * COSA SI PUO' E COSA NO: l'API a distanza di Jitsi imposta soltanto uno
  * sfondo IMMAGINE (il tipo e' fissato nel gestore del comando). La SFOCATURA da
  * fuori non e' raggiungibile e resta appannaggio del pulsante nativo, dentro la
- * sala. L'anteprima della videocamera qui accanto mostra la miniatura scelta,
- * non l'effetto sul proprio volto: applicarlo davvero vorrebbe dire rifare la
- * segmentazione del video nel portale, cioe' un secondo motore di sfondi
- * accanto a quello che Jitsi ha gia'.
+ * sala. L'anteprima della sala d'attesa mostra lo sfondo dietro la persona con
+ * un motore proprio, nel browser (lib/live/background-preview): in sala
+ * l'effetto resta quello di Jitsi.
  *
  * L'immagine viaggia come data URI e non come indirizzo: Jitsi la carica in un
  * `<img crossOrigin="anonymous">` e poi la disegna su una tela: un indirizzo di

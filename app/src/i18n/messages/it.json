@@ -4358,7 +4358,7 @@
     "speakerTest": "Test audio",
     "backgroundLabel": "Sfondo virtuale",
     "backgroundNoneShort": "No",
-    "backgroundHint": "Si applica quando entri in sala. Per sfocare lo sfondo usa il pulsante degli sfondi una volta dentro: l'anteprima qui sopra mostra la videocamera senza effetto.",
+    "backgroundHint": "Si applica quando entri in sala. Per sfocare lo sfondo usa il pulsante degli sfondi una volta dentro.",
     "background": {
       "nessuno": "Nessuno sfondo",
       "ufficio-chiaro": "Ufficio chiaro",
@@ -4369,7 +4369,10 @@
       "onde-blu": "Onde blu",
       "aurora": "Aurora",
       "luci-soffuse": "Luci soffuse"
-    }
+    },
+    "backgroundPreviewLoading": "Preparo l'anteprima dello sfondo…",
+    "backgroundPreviewUnavailable": "Anteprima dello sfondo non disponibile in questo browser: lo sfondo si applica comunque quando entri in sala.",
+    "backgroundHintPreview": "Lo vedi già nell'anteprima e resta quando entri in sala. Per sfocare lo sfondo usa il pulsante degli sfondi una volta dentro."
   },
   "garden": {
     "enable": "Mostra il giardino",

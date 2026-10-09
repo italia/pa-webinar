@@ -21,7 +21,8 @@
     "db:studio": "prisma studio",
     "db:seed": "tsx prisma/seed.ts",
     "copy-sprites": "mkdir -p public/svg && cp $(node -e \"console.log(require.resolve('bootstrap-italia/dist/svg/sprites.svg'))\") public/svg/sprites.svg",
-    "postinstall": "prisma generate && npm run copy-sprites",
+    "copy-vision": "node -e \"const p=require('path'),f=require('fs');const d=p.join(p.dirname(require.resolve('@mediapipe/tasks-vision')),'wasm'),o='public/vendor/mediapipe';f.mkdirSync(o,{recursive:true});for(const n of f.readdirSync(d))if(/^vision_wasm(_nosimd)?_internal[.]/.test(n))f.copyFileSync(p.join(d,n),p.join(o,n))\"",
+    "postinstall": "prisma generate && npm run copy-sprites && npm run copy-vision",
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
@@ -36,6 +37,7 @@
     "@fullcalendar/multimonth": "^6.1.21",
     "@fullcalendar/react": "^6.1.20",
     "@fullcalendar/timegrid": "^6.1.21",
+    "@mediapipe/tasks-vision": "0.10.35",
     "@pa-webinar/lobby": "*",
     "@prisma/client": "^6.0.0",
     "@splidejs/splide": "^4.1.4",

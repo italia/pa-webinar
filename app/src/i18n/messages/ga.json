@@ -4358,7 +4358,7 @@
     "speakerTest": "Tástáil fuaime",
     "backgroundLabel": "Cúlra fíorúil",
     "backgroundNoneShort": "No",
-    "backgroundHint": "Cuirtear i bhfeidhm é nuair a théann sibh isteach sa seomra. Chun an cúlra a dhoiléiriú, úsáidigí an cnaipe cúlraí nuair atá sibh istigh: taispeánann an réamhamharc thuas an ceamara gan éifeacht.",
+    "backgroundHint": "Cuirtear i bhfeidhm é nuair a théann tú isteach sa seomra. Chun an cúlra a dhoiléiriú, úsáid an cnaipe cúlraí istigh.",
     "background": {
       "nessuno": "Gan chúlra",
       "ufficio-chiaro": "Oifig gheal",
@@ -4369,7 +4369,10 @@
       "onde-blu": "Tonnta gorma",
       "aurora": "Aurora",
       "luci-soffuse": "Soilse boga"
-    }
+    },
+    "backgroundPreviewLoading": "Réamhamharc an chúlra á ullmhú…",
+    "backgroundPreviewUnavailable": "Níl réamhamharc an chúlra ar fáil sa bhrabhsálaí seo: cuirtear an cúlra i bhfeidhm fós nuair a théann tú isteach sa seomra.",
+    "backgroundHintPreview": "Feiceann tú cheana féin é sa réamhamharc, agus fanann sé ann nuair a théann tú isteach sa seomra. Chun an cúlra a dhoiléiriú, úsáid an cnaipe cúlraí istigh."
   },
   "garden": {
     "enable": "Taispeáin an gairdín",

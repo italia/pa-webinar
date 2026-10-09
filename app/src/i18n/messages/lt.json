@@ -4358,7 +4358,7 @@
     "speakerTest": "Garso testas",
     "backgroundLabel": "Virtualus fonas",
     "backgroundNoneShort": "No",
-    "backgroundHint": "Taikoma įėjus į salę. Norėdami sulieti foną, viduje naudokite fonų mygtuką: aukščiau esanti peržiūra rodo kamerą be efekto.",
+    "backgroundHint": "Pritaikomas įėjus į kambarį. Norėdami sulieti foną, viduje naudokite fonų mygtuką.",
     "background": {
       "nessuno": "Be fono",
       "ufficio-chiaro": "Šviesus biuras",
@@ -4369,7 +4369,10 @@
       "onde-blu": "Mėlynos bangos",
       "aurora": "Pašvaistė",
       "luci-soffuse": "Švelnios šviesos"
-    }
+    },
+    "backgroundPreviewLoading": "Ruošiama fono peržiūra…",
+    "backgroundPreviewUnavailable": "Fono peržiūra šioje naršyklėje nepasiekiama: fonas vis tiek pritaikomas įėjus į kambarį.",
+    "backgroundHintPreview": "Jau matote jį peržiūroje, ir jis išliks įėjus į kambarį. Norėdami sulieti foną, viduje naudokite fonų mygtuką."
   },
   "garden": {
     "enable": "Rodyti sodą",

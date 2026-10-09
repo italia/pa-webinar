@@ -11,7 +11,9 @@ same catalog replaces Jitsi's stock photos in Jitsi's own backgrounds dialog.
   **No background** option. It has no image, and it is the default.
 - **The picker.** The device check (`app/src/components/live/device-check.tsx`) shows the list as
   thumbnails under **Virtual background**, in catalog order. The display name of each background is
-  its tooltip and its screen-reader label.
+  its tooltip and its screen-reader label. The camera preview shows the chosen background behind the
+  person, cut out in the browser (see
+  [Device check and virtual backgrounds](../../../../docs/architecture/waiting-room.md#device-check-and-virtual-backgrounds)).
 - **The stored choice.** The browser keeps the chosen entry's `id` in local storage, under
   `paw_sfondo_virtuale`. That stored value is why an `id` must stay stable (see
   [Removing or renaming a background](#removing-or-renaming-a-background)). When the browser blocks

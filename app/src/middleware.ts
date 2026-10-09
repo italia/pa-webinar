@@ -7,6 +7,7 @@ import { routing } from '@/i18n/routing';
 import { tryGetAppSecret } from '@/lib/auth/app-secret';
 import { getPublicEnv } from '@/lib/env';
 import { storageCspHosts } from '@/lib/storage/provider-type';
+import { compilaWebAssembly, direttivaScript } from '@/lib/security/script-src';
 import { localizedPath } from '@/lib/utils/localized-url';
 
 const LOCALE_SEGMENT = locales.join('|');
@@ -49,6 +50,7 @@ function generateNonce(): string {
 function applySecurityHeaders(
   response: NextResponse,
   nonce: string,
+  wasm = false,
 ): NextResponse {
   const jitsiDomain = getPublicEnv('NEXT_PUBLIC_JITSI_DOMAIN');
   // Host dello storage risolti a ogni richiesta con la stessa regola della
@@ -94,9 +96,14 @@ function applySecurityHeaders(
       // every page renders as static HTML with no interactivity. We add
       // 'unsafe-eval' exclusively when NODE_ENV !== 'production' so the
       // production policy stays strict (nonce + strict-dynamic, no eval).
-      process.env.NODE_ENV === 'production'
-        ? `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https: https://${jitsiDomain}`
-        : `script-src 'self' 'unsafe-eval' 'nonce-${nonce}' 'strict-dynamic' https: https://${jitsiDomain}`,
+      // La direttiva (con 'wasm-unsafe-eval' solo nella sala) sta in
+      // lib/security/script-src, dove è testata.
+      direttivaScript({
+        nonce,
+        jitsiDomain,
+        produzione: process.env.NODE_ENV === 'production',
+        webAssembly: wasm,
+      }),
       // style-src keeps 'unsafe-inline' as an architectural trade-off:
       // React renders `style={{...}}` props as DOM `style="..."`
       // attributes, which CSP treats as inline styles. The codebase
@@ -206,7 +213,7 @@ export default async function middleware(request: NextRequest) {
   response.headers.set('x-nonce', nonce);
 
   if (!ADMIN_PATH_RE.test(pathname) || ADMIN_LOGIN_RE.test(pathname)) {
-    return applySecurityHeaders(response, nonce);
+    return applySecurityHeaders(response, nonce, compilaWebAssembly(pathname));
   }
 
   // Admin-area gate. A VALID admin session (JWT signature + non-expired) lets

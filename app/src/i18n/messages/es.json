@@ -4358,7 +4358,7 @@
     "speakerTest": "Prueba de audio",
     "backgroundLabel": "Fondo virtual",
     "backgroundNoneShort": "No",
-    "backgroundHint": "Se aplica al entrar en la sala. Para desenfocar el fondo, usa el botón de fondos una vez dentro: la vista previa de arriba muestra la cámara sin efectos.",
+    "backgroundHint": "Se aplica al entrar en la sala. Para desenfocar el fondo, usa el botón de fondos una vez dentro.",
     "background": {
       "nessuno": "Sin fondo",
       "ufficio-chiaro": "Oficina clara",
@@ -4369,7 +4369,10 @@
       "onde-blu": "Ondas azules",
       "aurora": "Aurora",
       "luci-soffuse": "Luces suaves"
-    }
+    },
+    "backgroundPreviewLoading": "Preparando la vista previa del fondo…",
+    "backgroundPreviewUnavailable": "La vista previa del fondo no está disponible en este navegador: el fondo se aplica igualmente al entrar en la sala.",
+    "backgroundHintPreview": "Ya lo ves en la vista previa y se mantiene al entrar en la sala. Para desenfocar el fondo, usa el botón de fondos una vez dentro."
   },
   "garden": {
     "enable": "Mostrar el jardín",
