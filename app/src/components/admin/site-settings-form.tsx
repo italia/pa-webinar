@@ -24,6 +24,7 @@ import FileOrUrlInput from '@/components/ui/file-or-url-input';
 import LanguageChecklist from '@/components/admin/language-checklist';
 import { DEFAULT_TARGET_LOCALES } from '@/lib/ai/target-locales';
 import { videoQualityMaxHeight } from '@/lib/jitsi/config';
+import { OVERTIME_CAP_DEFAULT_MINUTES, OVERTIME_EMPTY_DEFAULT_MINUTES } from '@/lib/events/overtime-defaults';
 
 import { settingsFieldError, type SettingsFieldError } from './settings-field-error';
 
@@ -1797,7 +1798,7 @@ function ScalingTab({ settings, updateField }: TabProps) {
               type="number"
               min={-1}
               max={240}
-              value={settings.eventGracePeriodMinutes ?? 15}
+              value={settings.eventGracePeriodMinutes ?? OVERTIME_CAP_DEFAULT_MINUTES}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 updateField(
                   'eventGracePeriodMinutes',
@@ -1806,6 +1807,23 @@ function ScalingTab({ settings, updateField }: TabProps) {
               }
             />
             <small className="text-muted d-block mt-1">{t('eventGracePeriodMinutesHelp')}</small>
+          </FormGroup>
+        </Col>
+        <Col md={6}>
+          <FormGroup>
+            <Label htmlFor="eventOvertimeEmptyMinutes">{t('eventOvertimeEmptyMinutes')}</Label>
+            <Input
+              id="eventOvertimeEmptyMinutes"
+              type="number"
+              min={5}
+              max={240}
+              value={settings.eventOvertimeEmptyMinutes ?? OVERTIME_EMPTY_DEFAULT_MINUTES}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                const v = parseInt(e.target.value, 10);
+                if (!Number.isNaN(v)) updateField('eventOvertimeEmptyMinutes', v);
+              }}
+            />
+            <small className="text-muted d-block mt-1">{t('eventOvertimeEmptyMinutesHelp')}</small>
           </FormGroup>
         </Col>
       </Row>

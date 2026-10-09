@@ -20,6 +20,7 @@ import { guestAccessAllowed, guestWindowOpen } from '@/lib/events/guest-window';
 import { resolveRnnoiseEnforceOff } from '@/lib/jitsi/rnnoise';
 import { resolveWhiteboardInfraReady } from '@/lib/jitsi/whiteboard';
 import { localizedPath } from '@/lib/utils/localized-url';
+import { OVERTIME_CAP_DEFAULT_MINUTES } from '@/lib/events/overtime-defaults';
 
 export const dynamic = 'force-dynamic';
 
@@ -186,7 +187,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
             timezone: event.timezone,
             registrationCount: event._count.registrations,
             effectiveGraceMinutes:
-              event.gracePeriodMinutes ?? settings.eventGracePeriodMinutes ?? 15,
+              event.gracePeriodMinutes ?? settings.eventGracePeriodMinutes ?? OVERTIME_CAP_DEFAULT_MINUTES,
             aiPostprodEnabled,
             aiConsentDisclosure,
             multitrackRecordingEnabled: isInstant
@@ -308,7 +309,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
         timezone: event.timezone,
         registrationCount: event._count.registrations,
         effectiveGraceMinutes:
-          event.gracePeriodMinutes ?? settings.eventGracePeriodMinutes ?? 15,
+          event.gracePeriodMinutes ?? settings.eventGracePeriodMinutes ?? OVERTIME_CAP_DEFAULT_MINUTES,
         aiPostprodEnabled,
         aiConsentDisclosure,
         multitrackRecordingEnabled: event.multitrackRecordingEnabled,

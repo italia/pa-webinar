@@ -34,11 +34,13 @@ model Event {
   // Percentage (0-100). Null inherits SiteSetting.defaultSenderRatioPct.
   expectedSenderRatioPct Int? @map("expected_sender_ratio_pct")
 
-  // Soft exit / grace period in minutes past endsAt before the scaler
-  // transitions LIVE → ENDED. Null inherits SiteSetting.eventGracePeriodMinutes.
-  //   0    → hard close at endsAt (legacy behaviour)
-  //   N>0  → show "event in overtime" banner, close at endsAt+N
-  //   -1   → never auto-close on endsAt; let the inactivity cleanup cron decide
+  // Tetto del fuori orario per una sala ancora occupata, in minuti dopo
+  // endsAt. Null eredita SiteSetting.eventGracePeriodMinutes.
+  //   0    → chiusura a endsAt
+  //   N>0  → chiusura a endsAt+N anche con persone dentro
+  //   -1   → nessun tetto: la chiude solo il vuoto (eventOvertimeEmptyMinutes)
+  // Una sala vuota oltre endsAt si chiude comunque dopo
+  // SiteSetting.eventOvertimeEmptyMinutes.
   gracePeriodMinutes Int? @map("grace_period_minutes")
 
   // Jitsi room configuration
@@ -1306,8 +1308,8 @@ model SiteSetting {
   // Empty-conference authoritative close. Minuti che una sala
   // LIVE che HA avuto traffico può restare vuota prima che lo scaler la porti
   // DIRETTAMENTE a ENDED (terminale), PRIMA di endsAt e separatamente dalla
-  // grace di scale-to-zero (jvbInactiveGraceMinutes/45m) e dalla grace di
-  // overtime post-endsAt (eventGracePeriodMinutes/15m).
+  // grace di scale-to-zero (jvbInactiveGraceMinutes/45m) e dalle regole del
+  // fuori orario post-endsAt (eventGracePeriodMinutes, eventOvertimeEmptyMinutes).
   //   -1  → disabilitato (default)
   //    0  → chiudi al primo tick a sala vuota (~cadenza cron)
   //   N>0 → chiudi dopo N minuti di sala COMPLETAMENTE vuota (moderatore incluso)
@@ -1368,12 +1370,16 @@ model SiteSetting {
   // call con tutti i partecipanti attivi, 10% per keynote).
   defaultSenderRatioPct Int @default(30) @map("default_sender_ratio_pct")
 
-  // Soft exit: minuti di "overtime" concessi dopo endsAt prima di chiudere
-  // la call. Mostrato come banner non invasivo ai partecipanti.
-  //   0    → chiusura dura a endsAt (vecchio comportamento)
-  //   N>0  → grace di N min, poi cleanup chiude la call
-  //   -1   → non chiudere automaticamente, lascia al cleanup di inattività
-  eventGracePeriodMinutes Int @default(15) @map("event_grace_period_minutes")
+  // Fuori orario: tetto in minuti dopo endsAt per una sala ancora OCCUPATA.
+  // Mostrato ai partecipanti come conto alla rovescia.
+  //   0    → chiusura a endsAt
+  //   N>0  → chiusura a endsAt+N anche con persone dentro
+  //   -1   → nessun tetto: la sala si chiude solo quando si svuota
+  eventGracePeriodMinutes Int @default(60) @map("event_grace_period_minutes")
+  // Fuori orario: minuti di sala VUOTA dopo cui una sala oltre endsAt si
+  // chiude, qualunque sia il tetto. Serve un conteggio affidabile del bridge;
+  // senza, vale solo il tetto.
+  eventOvertimeEmptyMinutes Int @default(20) @map("event_overtime_empty_minutes")
 
   // ── Postprod AI pipeline ──────────────────────────────────────
   // Master kill-switch: when false, the orchestrator skips creating

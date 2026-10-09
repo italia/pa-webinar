@@ -41,6 +41,7 @@ vi.mock('@/lib/settings', () => ({
     jvbPreScaleMinutes: 15,
     jvbEmptyCloseMinutes: -1,
     eventGracePeriodMinutes: 15,
+    eventOvertimeEmptyMinutes: 20,
     jvbStressWarnPercent: 50,
     jvbStressCriticalPercent: 70,
   })),
@@ -95,7 +96,13 @@ describe('GET /api/internal/jvb-desired-replicas', () => {
         participants: 7,
         scalerAggregated: true,
         currentReplicas: 2,
-        windows: { inactiveGraceMin: 45, preScaleMin: 15, emptyCloseMin: -1, siteGrace: 15 },
+        windows: {
+          inactiveGraceMin: 45,
+          preScaleMin: 15,
+          emptyCloseMin: -1,
+          siteGrace: 15,
+          overtimeEmptyMin: 20,
+        },
       }),
     );
   });

@@ -5,7 +5,8 @@ import { prisma } from '@/lib/db';
 import { assertCronApiKey } from '@/lib/auth/cron';
 import { deleteRecordingBlob } from '@/lib/storage/recordings';
 import { deleteBlob, isAzureConfigured } from '@/lib/azure/blob-storage';
-import { closeStaleSessions } from '@/lib/events/call-sessions';
+import { closeStaleSessions, type OvertimeLimits } from '@/lib/events/call-sessions';
+import { OVERTIME_CAP_DEFAULT_MINUTES, OVERTIME_EMPTY_DEFAULT_MINUTES } from '@/lib/events/overtime-defaults';
 import {
   CLEANABLE_EVENT_STATUSES,
   UNFINISHED_EVENT_STATUSES,
@@ -189,11 +190,15 @@ export const GET = withErrorHandling(async (request) => {
   });
 
   const toClean = expiredEvents.filter((evt) => isEventEligibleForCleanup(evt, now));
-  // La grace di sito serve solo a stimare la fine delle sessioni rimaste
-  // aperte sugli eventi mai conclusi: la si legge solo se ce n'è uno.
+  // Le regole del fuori orario servono solo a stimare la fine delle sessioni
+  // rimaste aperte sugli eventi mai conclusi: si leggono solo se ce n'è uno.
   const unfinished = toClean.filter((evt) => !isFinishedEventStatus(evt.status));
-  const siteGrace =
-    unfinished.length > 0 ? ((await getSettings()).eventGracePeriodMinutes ?? 15) : 15;
+  const settingsOvertime = unfinished.length > 0 ? await getSettings() : null;
+  const overtimeLimits: OvertimeLimits = {
+    siteGraceMinutes: settingsOvertime?.eventGracePeriodMinutes ?? OVERTIME_CAP_DEFAULT_MINUTES,
+    overtimeEmptyMinutes:
+      settingsOvertime?.eventOvertimeEmptyMinutes ?? OVERTIME_EMPTY_DEFAULT_MINUTES,
+  };
   let unfinishedArchived = 0;
 
   let totalRegistrationsDeleted = 0;
@@ -383,7 +388,7 @@ export const GET = withErrorHandling(async (request) => {
         // lascia il servizio adesso: le sue sessioni di chiamata si chiudono
         // con l'orario stimato sulla fine della sala, non su oggi.
         if (!isFinishedEventStatus(evt.status)) {
-          await closeStaleSessions(tx, [evt.id], now, siteGrace);
+          await closeStaleSessions(tx, [evt.id], now, overtimeLimits);
         }
 
         // Un evento concluso resta com'e': la sua pagina e cio' che mostra

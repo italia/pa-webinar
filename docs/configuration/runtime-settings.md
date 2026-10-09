@@ -246,9 +246,11 @@ by the lifecycle cron that replaces it everywhere else, Docker Compose included
 ([running without the scaler](../architecture/event-lifecycle.md#running-without-the-scaler)).
 Without a scaler:
 
-- `eventGracePeriodMinutes` ends `LIVE` rooms at `endsAt` plus grace, and drives the overtime banner;
-- `jvbInactiveGraceMinutes` ends open-ended rooms past `endsAt`, and instant calls, after that long
-  without activity; there is no `IDLE`;
+- `eventGracePeriodMinutes` ends occupied `LIVE` rooms at `endsAt` plus that limit, and drives the
+  overtime countdown;
+- `eventOvertimeEmptyMinutes` ends rooms past `endsAt` that have been empty that long, when the
+  silence is reliable;
+- `jvbInactiveGraceMinutes` ends abandoned instant calls before their `endsAt`; there is no `IDLE`;
 - `jvbEmptyCloseMinutes` applies only while `JVB_HEALTH_URL` answers;
 - `jvbPreScaleMinutes` bounds nothing, because `/wake` leaves a `PUBLISHED` event unchanged;
 - `jvbProvisioningTimeoutMinutes` marks no bridge as stale; it still applies to Jibri.
@@ -260,8 +262,9 @@ in [event lifecycle](../architecture/event-lifecycle.md#lifecycle-settings).
 | Setting | Label and tab | Default | Accepted | Meaning |
 |---|---|---|---|---|
 | `jvbPreScaleMinutes` | **Pre-scale lead time (minutes)**, **Features** | `15` | 1 to 60 | How long before `startsAt` the scaler starts the bridge ([pre-scale window](../architecture/event-lifecycle.md#pre-scale-window)); the larger of this and `waitingRoomLeadMinutes` bounds how early a visitor can [wake](../architecture/event-lifecycle.md#wake) a room |
-| `jvbInactiveGraceMinutes` | **Inactivity minutes before shutdown**, **Features** | `45` | 5 to 240 | Empty time before a `LIVE` room goes `IDLE`, and before an open-ended room past `endsAt` is ended; without the scaler, also before an abandoned instant call is ended ([inactivity grace](../architecture/event-lifecycle.md#inactivity-grace-live-to-idle)) |
-| `eventGracePeriodMinutes` | **Default grace minutes past endsAt**, **Infra sizing** | `15` | -1 to 240 | Overtime after `endsAt`, where `-1` never ends the room on the clock; an event can override it ([grace period and overtime](../architecture/event-lifecycle.md#grace-period-and-overtime)) |
+| `jvbInactiveGraceMinutes` | **Inactivity minutes before shutdown**, **Features** | `45` | 5 to 240 | Empty time before a `LIVE` room goes `IDLE`; without the scaler, before an abandoned instant call is ended ([inactivity grace](../architecture/event-lifecycle.md#inactivity-grace-live-to-idle)) |
+| `eventGracePeriodMinutes` | **Overtime limit while people are in the room (minutes)**, **Infra sizing** | `60` | -1 to 240 | Longest a room still occupied stays open after `endsAt`, where `-1` never ends it on the clock; an event can override it ([grace period and overtime](../architecture/event-lifecycle.md#grace-period-and-overtime)) |
+| `eventOvertimeEmptyMinutes` | **Close an empty room after the end (minutes)**, **Infra sizing** | `20` | 5 to 240 | Empty time after which a room past `endsAt` is ended, when the bridge count is reliable ([grace period and overtime](../architecture/event-lifecycle.md#grace-period-and-overtime)) |
 | `jvbEmptyCloseMinutes` | **Empty-room minutes before definitive close**, **Features** | `-1` (off) | -1 to 240 | Opt-in: empty time after which a room that had participants is ended before `endsAt` ([opt-in empty close](../architecture/event-lifecycle.md#opt-in-empty-close)) |
 | `jvbProvisioningTimeoutMinutes` | **Provisioning timeout (minutes)**, **Features** | `15` | 1 to 120 | Wait for a bridge after which the status pages report it as stale. The same wait applies to Jibri: past it, `/api/status` reports the recorder as `failed` and the moderator's recording button stops reading **Recording starting…** ([moderator control bar](../architecture/jitsi-integration.md#app-owned-controls-around-the-iframe)). It never changes the event's status ([only a signal](../architecture/event-lifecycle.md#the-provisioning-timeout-is-only-a-signal)) |
 | `statusPollIntervalSeconds` | **Status page poll interval (seconds)**, **Features** | `30` | 5 to 600 | How often the public status page refreshes in the browser |

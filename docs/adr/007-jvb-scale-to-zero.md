@@ -130,8 +130,8 @@ closing a room that has people in it ([known limitations](../architecture/scalin
 The scaler tick drives the live statuses only where it runs, and it adds the two statuses that exist
 for scale-to-zero: the pre-scale to `PROVISIONING` and the demotion of an empty room to `IDLE`. Every
 other installation, including bridges scaled by another tool such as KEDA, runs the lifecycle cron
-instead: it opens a room at `startsAt`, ends it at `endsAt` plus its grace period, and ends inactive
-open-ended rooms and abandoned instant calls, with the same time rules and without the two
+instead: it opens a room at `startsAt`, ends it past `endsAt` once it has emptied or at its overtime
+limit, and ends abandoned instant calls, with the same time rules and without the two
 scale-to-zero statuses. The two drivers never run together: the scaler writes a heartbeat to Redis on
 every tick, and the lifecycle cron stands down while it is fresh. Without the scaler, a visitor's wake
 does not move a `PUBLISHED` event to `PROVISIONING`, because nothing would warm it

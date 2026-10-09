@@ -19,18 +19,16 @@ export interface GraceCheckInput {
 }
 
 /**
- * Decide whether a LIVE event past its `endsAt` should be auto-closed
- * to ENDED now, given the grace window. This is the TIME-based close only.
+ * Una sala LIVE oltre il suo `endsAt` va chiusa per orario? È il tetto del
+ * fuori orario di una sala ancora OCCUPATA: la sala vuota si chiude prima, con
+ * {@link shouldReclaimEmptyOvertime}.
  *
- *   - grace < 0 (e.g. -1) → never TIME-close: an occupied overtime call is
- *                           never kicked off the clock. NOTE this no longer
- *                           means "never close ever" — an EMPTY overtime room
- *                           is still reclaimed by {@link shouldReclaimEmptyOvertime}
- *                           after the inactivity grace, to free its JVB.
- *   - grace = 0          → close the instant endsAt is crossed.
- *   - grace > 0          → close when now >= endsAt + grace minutes.
+ *   - tetto < 0 (-1) → nessuna chiusura per orario: la sala resta aperta
+ *                      finché c'è qualcuno, e si chiude quando si svuota;
+ *   - tetto = 0      → chiusura al passaggio di `endsAt`;
+ *   - tetto > 0      → chiusura a `endsAt` + tetto, anche con persone dentro.
  *
- * A `null` override inherits the site-level default.
+ * Il tetto è `Event.gracePeriodMinutes`, o quello del sito se è null.
  */
 export function shouldEndLiveEvent(input: GraceCheckInput): boolean {
   const grace = input.gracePeriodMinutes ?? input.siteGraceMinutes;
@@ -40,85 +38,50 @@ export function shouldEndLiveEvent(input: GraceCheckInput): boolean {
 }
 
 export interface OvertimeReclaimInput {
-  /** Per-event grace override; null = inherit site default. Reclaim applies
-   *  ONLY to open-ended rooms (effective grace < 0). */
-  gracePeriodMinutes: number | null;
-  /** Site default grace from SiteSetting.eventGracePeriodMinutes. */
-  siteGraceMinutes: number;
-  /** Last tick the bridge reported traffic for this room (null = nobody ever
-   *  joined). Advanced by the scaler only while the bridge is reachable. */
+  /** Ultimo giro in cui il bridge ha segnalato traffico, o ultimo resoconto
+   *  dei client della sala (null = nessuno è mai entrato). */
   lastActiveAt: Date | null;
-  /** When the room was last (re)provisioned. Also an "alive" signal: a room
-   *  brought up seconds ago is NOT stale even if lastActiveAt is old (e.g. a
-   *  /wake→re-LIVE cycle doesn't reset lastActiveAt). */
+  /** Ultima (ri)apertura della sala. È anche un segno di vita: una sala
+   *  riaperta da pochi secondi non è vuota da tempo, anche se `lastActiveAt` è
+   *  vecchio (il ciclo /wake → LIVE non lo azzera). */
   provisioningStartedAt: Date | null;
-  /** The room's endsAt (always in the past for an overtime call). Last-resort
-   *  "alive until" when we have NO activity signal at all (both timestamps
-   *  null) — a phantom LIVE row is notionally done since its scheduled end, so
-   *  it still gets reclaimed instead of leaking forever. */
+  /** Fine programmata, già passata. Il vuoto si conta al più presto da qui:
+   *  una sala in pausa al momento della fine ha comunque la sua finestra. */
   endsAt: Date;
-  /** now - inactivityGrace: a room whose "alive until" is older than this has
-   *  sat empty for the whole inactivity window. */
-  inactiveCutoff: Date;
-  /** Bridge reachable AND the participant count is reliable (single replica or
-   *  cross-pod aggregated). MUST be true to reclaim: emptiness is inferred from
-   *  lastActiveAt, which stalls when the bridge is unreachable, so a blip must
-   *  never be read as "empty" and end a still-active overtime call. */
+  /** now − minuti di sala vuota ammessi oltre la fine
+   *  (`SiteSetting.eventOvertimeEmptyMinutes`). */
+  emptyCutoff: Date;
+  /** Il bridge risponde E il conteggio è affidabile (una sola replica, o
+   *  aggregato su tutti i pod). Senza questa prova la sala NON si dà per
+   *  vuota: `lastActiveAt` si ferma anche quando il bridge non risponde, e un
+   *  inciampo non deve chiudere una sala piena. Resta il tetto per orario. */
   canReclaimEmpty: boolean;
 }
 
 /**
- * Decide whether a LIVE room ALREADY PAST its `endsAt` has sat empty long
- * enough to be closed to reclaim its JVB. This ONLY applies to OPEN-ENDED
- * rooms (effective grace < 0). This is the companion to {@link shouldEndLiveEvent}:
- * grace protects an ACTIVE overtime call from being kicked off the clock, while
- * this reclaims the bridge once EVERYONE has left — so an open-ended (grace=-1)
- * event that people simply forget to end doesn't pin a JVB node forever.
+ * Una sala LIVE oltre il suo `endsAt` è vuota da abbastanza tempo per
+ * chiuderla? Vale per ogni sala, qualunque sia il suo tetto: il fuori orario
+ * serve a chi è ancora dentro, e una sala che nessuno usa più tiene acceso un
+ * bridge per niente.
  *
- * A FINITE grace (>= 0) is deliberately NOT reclaimed here: it is already
- * time-bounded by {@link shouldEndLiveEvent} (closes at endsAt+grace), and
- * reclaiming an empty finite-grace room after the inactivity window would
- * silently SHORTEN an explicit overtime window an admin promised — e.g. a
- * grace=90 workshop with a 45-min inactivity cutoff would wrongly close at
- * endsAt+45 and lock out participants returning within their promised 90 min.
+ * «Viva fino a» è il più recente tra `lastActiveAt`, `provisioningStartedAt` e
+ * `endsAt` (il massimo, non il primo disponibile: dopo un /wake `lastActiveAt`
+ * conserva il valore vecchio e chiuderebbe una sala in cui le persone sono
+ * appena rientrate). `endsAt` fa partire il conto non prima della fine: una
+ * sala vuota per una pausa cominciata prima della fine non si chiude al primo
+ * giro dopo, e una riga LIVE senza nessun segno di vita si chiude comunque.
  *
- * "Alive until" is the MOST RECENT moment we have evidence the room was up: the
- * later of `lastActiveAt` (last bridge traffic) and `provisioningStartedAt`
- * (last (re)provision). Taking the max — not `lastActiveAt ?? provisioning…` —
- * is what keeps a freshly reprovisioned room safe: after a /wake→re-LIVE cycle
- * `lastActiveAt` still holds its OLD pre-IDLE value (wake doesn't reset it), so
- * preferring it would let the first post-endsAt tick terminally close a room
- * people JUST rejoined; the fresh `provisioningStartedAt` wins the max and
- * protects it for the full grace. With no signal at all we fall back to
- * `endsAt` so a phantom LIVE row still gets reclaimed.
- *
- * `canReclaimEmpty` gates the whole check — when the bridge is unreachable or
- * the count is unreliable (multi-replica, no aggregation) we return false and
- * leave the call running, never risking ejecting live people. Callers OR this
- * with {@link shouldEndLiveEvent}: a time-based grace close still fires
- * regardless of reachability (it doesn't depend on the participant count),
- * while this empty-reclaim close is strictly gated on it.
- *
- * Granularity caveat: the scaler's participant count is bridge-wide, and it
- * refreshes lastActiveAt for EVERY live event whenever the bridge has any
- * traffic — so an emptied overtime room co-hosted with another ACTIVE event on
- * the same bridge won't be seen as empty until the WHOLE bridge drains. That is
- * acceptable: while another event holds the bridge up there is no JVB to
- * reclaim anyway; once the bridge truly empties this fires within one grace.
+ * Granularità: il conteggio dello scaler è per bridge, e con traffico rinfresca
+ * `lastActiveAt` di TUTTE le sale LIVE. Una sala svuotata che divide il bridge
+ * con un altro evento attivo non risulta vuota finché il bridge non si svuota:
+ * in quel caso la chiude il tetto per orario.
  */
-
 export function shouldReclaimEmptyOvertime(input: OvertimeReclaimInput): boolean {
   if (!input.canReclaimEmpty) return false;
-  // Open-ended rooms only. A finite grace (>= 0) is already bounded in time by
-  // shouldEndLiveEvent; reclaiming it early would shorten the promised window.
-  const grace = input.gracePeriodMinutes ?? input.siteGraceMinutes;
-  if (grace >= 0) return false;
-  const signals: number[] = [];
+  const signals = [input.endsAt.getTime()];
   if (input.lastActiveAt) signals.push(input.lastActiveAt.getTime());
   if (input.provisioningStartedAt) signals.push(input.provisioningStartedAt.getTime());
-  const aliveUntil =
-    signals.length > 0 ? Math.max(...signals) : input.endsAt.getTime();
-  return aliveUntil < input.inactiveCutoff.getTime();
+  return Math.max(...signals) < input.emptyCutoff.getTime();
 }
 
 /**

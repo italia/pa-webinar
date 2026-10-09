@@ -313,7 +313,7 @@ does to the scaler:
 | `jvbCpuCoresPerPod`, `jvbReceiversPerCore`, `jvbSendersPerCore` | **Infra sizing** tab, **vCPU per JVB pod**, **Passive viewers per core**, **Active senders per core** | How many bridges an event needs. Align them with your bridges (see [Capacity and caps](#capacity-and-caps)) |
 | `jvbMaxReplicas` | **Infra sizing**, **Max JVB replicas** | Per-event cap; it does not limit the total |
 | `defaultSenderRatioPct` | **Infra sizing**, **Default sender ratio** | Sender share for events that set none |
-| `eventGracePeriodMinutes` | **Infra sizing**, **Default grace minutes past endsAt** | Overtime before a `LIVE` room past its end is closed |
+| `eventGracePeriodMinutes`, `eventOvertimeEmptyMinutes` | **Infra sizing**, **Overtime limit while people are in the room (minutes)**, **Close an empty room after the end (minutes)** | When a `LIVE` room past its end is closed: at the limit while occupied, or earlier once it has emptied |
 
 The route has environment fallbacks for some of these (`JVB_PRE_SCALE_MINUTES`,
 `JVB_INACTIVE_GRACE_MIN`, `JVB_EMPTY_CLOSE_MIN`), but the columns always hold
@@ -416,7 +416,7 @@ organizer declared, not from who has joined:
 | `maxParticipants` | Event form, **Expected participants (estimate)**; event templates | Sizing input. Default `300` in `schema.prisma` |
 | `expectedSenderRatioPct` | Event form, **Expected sender ratio** | Sizing input. Falls back to **Default sender ratio** |
 | `participantsCanStartVideo` | Event form, **Participants can start video**; event templates | Sizing input. Default `false`: every participant counts as a receiver |
-| `gracePeriodMinutes` | Event form, **Event end (soft exit)** | Not a sizing input: it decides when a room past its end is closed. Falls back to **Default grace minutes past endsAt** |
+| `gracePeriodMinutes` | Events API only; the wizard has no field | Not a sizing input: the overtime limit of an occupied room past its end. Falls back to **Overtime limit while people are in the room (minutes)** |
 | `recordingEnabled` | Event settings; event templates | Not a sizing input: it decides whether Jibri is scaled up, and kept up while busy after the event ends. Default `false` in `schema.prisma` |
 
 Instant calls use 50 expected participants unless the request gives a

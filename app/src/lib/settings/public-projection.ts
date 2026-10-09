@@ -58,7 +58,7 @@ export const PUBLIC_SETTING_FIELDS = [
   'orphanRecordingGraceDays',
   'jvbCpuCoresPerPod', 'jvbReceiversPerCore', 'jvbSendersPerCore',
   'jvbMaxReplicas', 'jibriCpuCoresPerPod', 'defaultSenderRatioPct',
-  'eventGracePeriodMinutes',
+  'eventGracePeriodMinutes', 'eventOvertimeEmptyMinutes',
   'aiPipelineEnabled', 'aiDefaultTargetLocales', 'aiLlmProvider',
   'aiAsrProvider', 'aiTtsEngine', 'aiMaxConcurrentJobs', 'aiJobMaxAttempts',
   'aiArtifactRetentionDays', 'aiConsentDisclosure',

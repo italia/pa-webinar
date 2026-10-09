@@ -315,7 +315,7 @@ sequenceDiagram
   Note over JIT,OBJ: Step 8: record
   CAP->>JIT: capture the conference
   CAP->>OBJ: upload through a presigned URL
-  Note over PT,JIT: Step 9: End for everyone, or the scaler or lifecycle job after the grace period
+  Note over PT,JIT: Step 9: End for everyone, or the scaler or lifecycle job after the end time
   Note over APP,WRK: Step 10: post-produce
   CAP->>APP: webhook or track manifest
   APP->>DB: Recording, tracks, PostprodJob rows
@@ -337,7 +337,7 @@ sequenceDiagram
 6. **Join.** The page asks the portal for a Jitsi JWT for this seat, and `JitsiRoom` opens the conference with it. See [Identity, access and tokens](architecture/identity-and-access.md) and [Jitsi integration](architecture/jitsi-integration.md).
 7. **Interact.** Q&A, chat, polls, the word cloud, reactions from the app's bar, the raised-hand queue and live-toggleable features are REST calls. Server-Sent Events fan out through Redis. See [Live interaction and realtime](architecture/live-interaction.md).
 8. **Record.** Jibri records a composite video when a moderator starts it, or automatically if the event is set to. The recorder controller starts the recorder bot for `LIVE` events that have recording, AI transcription and per-participant recording all enabled. On those events, participants must give explicit consent to it before they enter, either at registration or in the waiting room. See [Recording](architecture/recording.md) and [Recordings, voice data and AI outputs](privacy/recordings-and-ai.md).
-9. **End.** **End for everyone** closes the room. The moderator chooses where the event goes next (archived, a public post-event page, or also the video library) and can request AI outputs. Otherwise the scaler, or the lifecycle job where there is no scaler, ends the event after its end time plus the grace period. See [Event lifecycle](architecture/event-lifecycle.md).
+9. **End.** **End for everyone** closes the room. The moderator chooses where the event goes next (archived, a public post-event page, or also the video library) and can request AI outputs. Otherwise the scaler, or the lifecycle job where there is no scaler, ends the event after its end time: once the room has emptied, or at the overtime limit while people are still in it. See [Event lifecycle](architecture/event-lifecycle.md).
 10. **Post-produce.** The Jibri webhook creates a `Recording` row and queues post-production jobs in PostgreSQL. For per-participant recording, the row already exists from the moment the recorder was dispatched: the Jibri webhook only adds the composite video to it, and the track manifest adds the tracks and queues the jobs. Jobs are queued only when the event has AI transcription on and post-production is enabled for the installation. The orchestrator starts GPU worker Jobs. They claim work, transcribe, summarize, translate, subtitle and dub, then register every output as an artifact. See [AI post-production](POSTPROD.md).
 11. **Publish.** Staff review and edit the outputs, then publish. The recording appears on the event's post-event page and, when listed, in the public **Video library**. See [the event journey](architecture/event-journey.md).
 12. **Forget.** Retention jobs delete personal data and recordings when their retention periods expire. See [Privacy and data protection](GDPR.md).

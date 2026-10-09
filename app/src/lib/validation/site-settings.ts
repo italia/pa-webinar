@@ -107,8 +107,10 @@ export const updateSettingsSchema = z.object({
   jvbMaxReplicas: z.number().int().min(1).max(50).optional(),
   jibriCpuCoresPerPod: z.number().int().min(1).max(32).optional(),
   defaultSenderRatioPct: z.number().int().min(0).max(100).optional(),
-  // Soft-exit grace window applied to LIVE events past endsAt.
+  // Fuori orario: tetto per una sala occupata (-1 = nessun tetto) e minuti
+  // di sala vuota dopo cui una sala oltre la fine si chiude.
   eventGracePeriodMinutes: z.number().int().min(-1).max(240).optional(),
+  eventOvertimeEmptyMinutes: z.number().int().min(5).max(240).optional(),
   orphanRecordingGraceDays: z.number().int().min(0).max(365).optional(),
   // ── Postprod AI pipeline ──────────────────────────────────────
   // Kill-switch + provider routing. I provider sono limitati al

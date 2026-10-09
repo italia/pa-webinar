@@ -62,6 +62,7 @@ import { avatarColor, avatarInitials } from '@/lib/chat/avatar';
 import { isHumanParticipant } from '@/lib/jitsi/participants';
 import { splitTitleKicker } from '@/lib/utils/title-kicker';
 import { useSettings } from '@/lib/settings-context';
+import { OVERTIME_CAP_DEFAULT_MINUTES } from '@/lib/events/overtime-defaults';
 
 interface EventInfo {
   id: string;
@@ -1661,7 +1662,7 @@ export default function LiveEventClient({
       <RecordingBanner visible={isRecording} />
       <OvertimeBanner
         endsAt={event.endsAt}
-        graceMinutes={event.effectiveGraceMinutes ?? 15}
+        graceMinutes={event.effectiveGraceMinutes ?? OVERTIME_CAP_DEFAULT_MINUTES}
       />
 
       <LiveTopBar

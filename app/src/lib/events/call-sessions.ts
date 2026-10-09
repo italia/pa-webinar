@@ -94,10 +94,18 @@ export interface StaleSessionCloseInput {
   endsAt: Date;
   /** Ultimo segnale di attività della sala (può mancare). */
   lastActiveAt: Date | null;
-  /** Grace dell'evento; null eredita quella del sito. */
+  /** Tetto del fuori orario dell'evento; null eredita quello del sito. */
   gracePeriodMinutes: number | null;
-  siteGraceMinutes: number;
+  limits: OvertimeLimits;
   now: Date;
+}
+
+/** Le regole del fuori orario del sito (SiteSetting). */
+export interface OvertimeLimits {
+  /** Tetto per una sala occupata (`eventGracePeriodMinutes`). */
+  siteGraceMinutes: number;
+  /** Sala vuota oltre la fine (`eventOvertimeEmptyMinutes`). */
+  overtimeEmptyMinutes: number;
 }
 
 /**
@@ -107,9 +115,10 @@ export interface StaleSessionCloseInput {
  * moderatore coincide con la chiusura. Ma `updatedAt` si sposta anche con le
  * modifiche successive (pubblicazione della registrazione, pagina post-evento,
  * archiviazione), quindi da solo gonfierebbe la durata. Lo si limita con la
- * fine più tarda plausibile della sala: `endsAt` più la grace (per le sale a
- * tempo indefinito, grace negativa, `endsAt` stesso), o l'ultima attività se
- * è più recente.
+ * fine più tarda plausibile della sala: l'ultima attività, oppure `endsAt` più
+ * il minore tra il tetto del fuori orario e la finestra della sala vuota (per
+ * le sale senza tetto, `endsAt` stesso). Una sala occupata oltre quel punto ha
+ * un'ultima attività più recente, che vince.
  *
  * Il limite non vale per una sessione cominciata DOPO di esso — una sala
  * rimasta aperta oltre il previsto e poi chiusa a mano — che altrimenti
@@ -118,8 +127,9 @@ export interface StaleSessionCloseInput {
  */
 export function staleSessionCloseTime(input: StaleSessionCloseInput): Date {
   const base = Math.min(input.updatedAt.getTime(), input.now.getTime());
-  const grace = input.gracePeriodMinutes ?? input.siteGraceMinutes;
-  const scheduledEnd = input.endsAt.getTime() + Math.max(grace, 0) * 60_000;
+  const grace = input.gracePeriodMinutes ?? input.limits.siteGraceMinutes;
+  const overtime = grace < 0 ? 0 : Math.min(grace, input.limits.overtimeEmptyMinutes);
+  const scheduledEnd = input.endsAt.getTime() + overtime * 60_000;
   const bound = Math.max(scheduledEnd, input.lastActiveAt?.getTime() ?? 0);
   const start = input.startedAt.getTime();
   const end = bound >= start ? Math.min(base, bound) : base;
@@ -142,7 +152,7 @@ const REPAIR_BATCH = 100;
 export async function closeSessionsOfEndedEvents(
   tx: SessionTx,
   now: Date,
-  siteGraceMinutes: number,
+  limits: OvertimeLimits,
 ): Promise<number> {
   const open = await tx.callSession.findMany({
     where: { endedAt: null, event: { status: { in: ['ENDED', 'ARCHIVED'] } } },
@@ -154,7 +164,7 @@ export async function closeSessionsOfEndedEvents(
     tx,
     open.map((s) => s.eventId),
     now,
-    siteGraceMinutes,
+    limits,
   );
 }
 
@@ -168,7 +178,7 @@ export async function closeStaleSessions(
   tx: SessionTx,
   eventIds: string[],
   now: Date,
-  siteGraceMinutes: number,
+  limits: OvertimeLimits,
 ): Promise<number> {
   if (eventIds.length === 0) return 0;
   const events = await tx.event.findMany({
@@ -195,7 +205,7 @@ export async function closeStaleSessions(
         endsAt: ev.endsAt,
         lastActiveAt: ev.lastActiveAt,
         gracePeriodMinutes: ev.gracePeriodMinutes,
-        siteGraceMinutes,
+        limits,
         now,
       });
     },

@@ -33,6 +33,7 @@ vi.mock('@/lib/settings', () => ({
     jvbPreScaleMinutes: 15,
     jvbEmptyCloseMinutes: -1,
     eventGracePeriodMinutes: 15,
+    eventOvertimeEmptyMinutes: 20,
   })),
 }));
 
@@ -93,6 +94,7 @@ describe('GET /api/cron/lifecycle', () => {
       preScaleMin: 15,
       emptyCloseMin: -1,
       siteGrace: 15,
+      overtimeEmptyMin: 20,
     });
     expect(body).toMatchObject({ mode: 'fixed', bridgeProbed: false, transitions: zero });
   });

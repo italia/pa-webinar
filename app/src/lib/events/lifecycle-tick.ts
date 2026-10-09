@@ -33,9 +33,14 @@ import {
   shouldReclaimEmptyOvertime,
   emptyCloseCutoff,
 } from '@/lib/events/lifecycle';
-import { closeOpenSessions, closeSessionsOfEndedEvents } from '@/lib/events/call-sessions';
+import {
+  closeOpenSessions,
+  closeSessionsOfEndedEvents,
+  type OvertimeLimits,
+} from '@/lib/events/call-sessions';
 import { publishEventStatus } from '@/lib/live-state/publish';
 import { fetchColibriStats } from '@/lib/status/bridge';
+import { OVERTIME_CAP_DEFAULT_MINUTES, OVERTIME_EMPTY_DEFAULT_MINUTES } from '@/lib/events/overtime-defaults';
 
 export type LifecycleMode = 'scaler' | 'fixed';
 
@@ -47,8 +52,10 @@ export interface LifecycleWindows {
   preScaleMin: number;
   /** Chiusura anticipata di una sala vuota; negativo = spenta. */
   emptyCloseMin: number;
-  /** Grace di sito dopo `endsAt`. */
+  /** Tetto di sito del fuori orario di una sala occupata, dopo `endsAt`. */
   siteGrace: number;
+  /** Minuti di sala vuota dopo cui una sala oltre `endsAt` si chiude. */
+  overtimeEmptyMin: number;
 }
 
 export function lifecycleWindows(
@@ -58,6 +65,7 @@ export function lifecycleWindows(
     | 'jvbPreScaleMinutes'
     | 'jvbEmptyCloseMinutes'
     | 'eventGracePeriodMinutes'
+    | 'eventOvertimeEmptyMinutes'
   >,
   env: Record<string, string | undefined> = process.env,
 ): LifecycleWindows {
@@ -75,7 +83,8 @@ export function lifecycleWindows(
     // guards a hypothetical null (unreachable on a provisioned singleton).
     emptyCloseMin:
       settings.jvbEmptyCloseMinutes ?? parseInt(env.JVB_EMPTY_CLOSE_MIN || '-1', 10),
-    siteGrace: settings.eventGracePeriodMinutes ?? 15,
+    siteGrace: settings.eventGracePeriodMinutes ?? OVERTIME_CAP_DEFAULT_MINUTES,
+    overtimeEmptyMin: settings.eventOvertimeEmptyMinutes ?? OVERTIME_EMPTY_DEFAULT_MINUTES,
   };
 }
 
@@ -183,7 +192,10 @@ export async function runLifecycleTick(
   // senza attenderla (lib/live-state/publish).
   for (const c of changes) publishEventStatus(c.id, c.status);
 
-  const sessionsRepaired = await repairSessions(input.now, input.windows.siteGrace);
+  const sessionsRepaired = await repairSessions(input.now, {
+    siteGraceMinutes: input.windows.siteGrace,
+    overtimeEmptyMinutes: input.windows.overtimeEmptyMin,
+  });
   return { transitions, changes, sessionsRepaired };
 }
 
@@ -191,9 +203,9 @@ export async function runLifecycleTick(
  * Chiude le sessioni rimaste aperte su eventi già conclusi. Transazione a
  * parte e mai un errore: è una riparazione, il giro è già fatto.
  */
-async function repairSessions(now: Date, siteGrace: number): Promise<number> {
+async function repairSessions(now: Date, limits: OvertimeLimits): Promise<number> {
   try {
-    return await prisma.$transaction((tx) => closeSessionsOfEndedEvents(tx, now, siteGrace));
+    return await prisma.$transaction((tx) => closeSessionsOfEndedEvents(tx, now, limits));
   } catch (err) {
     console.warn('[lifecycle] chiusura delle sessioni rimaste aperte non riuscita:', err);
     return 0;
@@ -225,6 +237,7 @@ async function scalerTransitions(
   const { now, windows, jvbReachable, participants, scalerAggregated, currentReplicas } = input;
   const preScaleWindow = new Date(now.getTime() + windows.preScaleMin * 60_000);
   const inactiveCutoff = new Date(now.getTime() - windows.inactiveGraceMin * 60_000);
+  const overtimeEmptyCutoff = new Date(now.getTime() - windows.overtimeEmptyMin * 60_000);
   const emptyCloseCut = emptyCloseCutoff(now, windows.emptyCloseMin);
   const changes: StatusChange[] = [];
 
@@ -357,10 +370,10 @@ async function scalerTransitions(
   // 3) Past endsAt:
   //    - PUBLISHED / PROVISIONING / IDLE past endsAt → ENDED (they
   //      never really served anyone; nothing to grace).
-  //    - LIVE past endsAt respects the grace period: the event gets
-  //      a soft "overtime" window, then we flip to ENDED. Grace
-  //      of -1 means "never auto-close" — the inactivity cleanup in
-  //      step (2) will eventually catch it.
+  //    - LIVE past endsAt: si chiude quando è vuota da
+  //      `overtimeEmptyMin` minuti, e comunque al tetto del fuori orario
+  //      (`endsAt` + grace). Grace -1 = nessun tetto: la chiude solo il
+  //      vuoto.
   const endedByTimeoutCandidates = await tx.event.findMany({
     where: {
       status: { in: ['PUBLISHED', 'PROVISIONING', 'IDLE'] },
@@ -392,12 +405,10 @@ async function scalerTransitions(
       _count: { select: { registrations: true } },
     },
   });
-  // A past-endsAt LIVE room ends on EITHER the time-based grace close
-  // (shouldEndLiveEvent, ungated — it never looks at the count) OR, for
-  // OPEN-ENDED rooms only, once it has sat empty for the inactivity grace
-  // (shouldReclaimEmptyOvertime — see its JSDoc for the full rationale:
-  // grace<0-only scope, MAX-of-signals /wake-race safety, co-hosted-bridge
-  // caveat, and why terminal ENDED is safe past endsAt).
+  // Una sala LIVE oltre endsAt si chiude per il PRIMO dei due motivi: è
+  // vuota da `overtimeEmptyMin` minuti (shouldReclaimEmptyOvertime), oppure
+  // ha raggiunto il tetto del fuori orario (shouldEndLiveEvent, che non
+  // guarda il conteggio: è il limite massimo anche con persone dentro).
   //
   // canReclaimEmpty gates the empty path: before we TERMINALLY close on
   // participants=0 the reading must be POSITIVELY known reliable — cross-pod
@@ -420,12 +431,10 @@ async function scalerTransitions(
       now,
     });
     const emptyReclaim = shouldReclaimEmptyOvertime({
-      gracePeriodMinutes: ev.gracePeriodMinutes,
-      siteGraceMinutes: windows.siteGrace,
       lastActiveAt: ev.lastActiveAt,
       provisioningStartedAt: ev.provisioningStartedAt,
       endsAt: ev.endsAt,
-      inactiveCutoff,
+      emptyCutoff: overtimeEmptyCutoff,
       canReclaimEmpty,
     });
     if (graceClose || emptyReclaim) {
@@ -514,6 +523,7 @@ async function fixedTransitions(
 ): Promise<{ transitions: FixedTransitions; changes: StatusChange[] }> {
   const { now, windows, bridge } = input;
   const inactiveCutoff = new Date(now.getTime() - windows.inactiveGraceMin * 60_000);
+  const overtimeEmptyCutoff = new Date(now.getTime() - windows.overtimeEmptyMin * 60_000);
   const emptyCloseCut = emptyCloseCutoff(now, windows.emptyCloseMin);
   // Senza sonda (un Jitsi esterno, senza JVB_HEALTH_URL) il bridge
   // si dà per presente: non c'è modo di saperlo, e aspettarlo vorrebbe dire
@@ -595,8 +605,8 @@ async function fixedTransitions(
   counts.toEnded += await end(abandoned, ['LIVE']);
 
   // 4) Oltre `endsAt`: chi non è mai stato aperto termina subito; una sala
-  //    LIVE alla fine della grace, o, se è a tempo indefinito, dopo la
-  //    finestra di inattività senza segni di vita.
+  //    LIVE quando è vuota da `overtimeEmptyMin` minuti, e comunque al tetto
+  //    del fuori orario (`endsAt` + grace, se non è -1).
   const neverOpened = await tx.event.findMany({
     where: { status: { in: OPENABLE_STATUSES }, endsAt: { lt: now } },
     select: { id: true },
@@ -628,12 +638,10 @@ async function fixedTransitions(
           now,
         }) ||
         shouldReclaimEmptyOvertime({
-          gracePeriodMinutes: ev.gracePeriodMinutes,
-          siteGraceMinutes: windows.siteGrace,
           lastActiveAt: ev.lastActiveAt,
           provisioningStartedAt: ev.provisioningStartedAt,
           endsAt: ev.endsAt,
-          inactiveCutoff,
+          emptyCutoff: overtimeEmptyCutoff,
           canReclaimEmpty: inactivityIsReliable(bridge, ev),
         }),
     )

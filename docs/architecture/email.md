@@ -201,7 +201,7 @@ The access model behind this is in [Identity, access and tokens](identity-and-ac
 
 ### After the event
 
-When an event has **Send recap email when the event ends** turned on (`Event.postEventEmailEnabled`), the reminders job finalizes it once it is `ENDED`. Events reach `ENDED` by themselves at the end of their grace period, through the JVB scaler or the lifecycle job, so the follow-up needs no manual end ([Event lifecycle](event-lifecycle.md#running-without-the-scaler)). The logic is in `app/src/lib/events/post-event-finalize.ts`:
+When an event has **Send recap email when the event ends** turned on (`Event.postEventEmailEnabled`), the reminders job finalizes it once it is `ENDED`. Events reach `ENDED` by themselves after their end time, once the room has emptied or at the overtime limit, through the JVB scaler or the lifecycle job, so the follow-up needs no manual end ([Event lifecycle](event-lifecycle.md#running-without-the-scaler)). The logic is in `app/src/lib/events/post-event-finalize.ts`:
 
 - only events that ended within the last seven days (`MAX_AGE_DAYS`) are considered, so turning the option on for an old event sends nothing;
 - historical events created from **Publications** (type `LEGACY`) are skipped;

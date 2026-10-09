@@ -161,10 +161,11 @@ published without any live room, either an uploaded video or a YouTube link
 [From creation to recap](architecture/event-journey.md)
 
 **Grace period** (`gracePeriodMinutes` per event, site default
-`eventGracePeriodMinutes`): the minutes after `endsAt` during which a live
-event stays open before it is closed to `ENDED`. `-1` means no time-based
-close. The close is applied by the JVB scaler; without it, the event stays
-`LIVE` until a moderator ends it.
+`eventGracePeriodMinutes`): the overtime limit, the longest a live event that
+still has people in it stays open after `endsAt` before it is closed to
+`ENDED`. `-1` means no time-based close. A room that has emptied past `endsAt`
+closes earlier, after `eventOvertimeEmptyMinutes`. The close is applied by the
+JVB scaler, or by the lifecycle cron where there is no scaler.
 [Event lifecycle](architecture/event-lifecycle.md#grace-period-and-overtime)
 
 **Inactivity grace** (`jvbInactiveGraceMinutes`): how long a `LIVE` room may
@@ -180,10 +181,12 @@ without it, when a moderator ends it.
 [From creation to recap](architecture/event-journey.md),
 [Event lifecycle](architecture/event-lifecycle.md#instant-calls)
 
-**Overtime**: the part of a live event that runs past `endsAt`, inside the
-grace period. Participants see a notice with the time left, or a note that the
-room stays open while people are connected; only the JVB scaler actually
-closes the room. [Event lifecycle](architecture/event-lifecycle.md#overtime-leaving-and-revival)
+**Overtime**: the part of a live event that runs past `endsAt`. It ends when
+the room has been empty for `eventOvertimeEmptyMinutes`, or at the overtime
+limit (the grace period) while people are still connected. Participants see the
+time left, or a note that the room stays open while people are connected. The
+close is applied by the JVB scaler, or by the lifecycle cron where there is no
+scaler. [Event lifecycle](architecture/event-lifecycle.md#overtime-leaving-and-revival)
 
 **Pre-scaling** (`jvbPreScaleMinutes`): the lead time before `startsAt` at
 which the JVB scaler moves a `PUBLISHED` event to `PROVISIONING` and starts

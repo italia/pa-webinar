@@ -42,7 +42,8 @@ const WINDOWS: LifecycleWindows = {
   inactiveGraceMin: 45,
   preScaleMin: 15,
   emptyCloseMin: -1,
-  siteGrace: 15,
+  siteGrace: 60,
+  overtimeEmptyMin: 20,
 };
 
 let db: FakeLifecycleDb;
@@ -147,15 +148,22 @@ describe('giro a bridge fisso — chiusura', () => {
     expect(publish.publishEventStatus).toHaveBeenCalledWith('pub', 'ENDED');
   });
 
-  it('una sala LIVE termina alla fine della grace, e ne chiude la sessione', async () => {
-    db.addEvent({ id: 'oltre', status: 'LIVE', startsAt: at(-90), endsAt: at(-16), peakParticipants: 7 });
-    db.addEvent({ id: 'dentro', status: 'LIVE', startsAt: at(-90), endsAt: at(-14) });
+  it('una sala LIVE occupata termina al tetto del fuori orario, e ne chiude la sessione', async () => {
+    db.addEvent({
+      id: 'oltre',
+      status: 'LIVE',
+      startsAt: at(-90),
+      endsAt: at(-61),
+      lastActiveAt: at(-1),
+      peakParticipants: 7,
+    });
+    db.addEvent({ id: 'dentro', status: 'LIVE', startsAt: at(-90), endsAt: at(-59), lastActiveAt: at(-1) });
     db.addSession({ id: 's-oltre', eventId: 'oltre', startedAt: at(-80) });
 
     await fixed();
 
     expect(db.status('oltre')).toBe('ENDED');
-    // Nella grace (15 minuti) la sala resta aperta.
+    // Entro il tetto (60 minuti) una sala occupata resta aperta.
     expect(db.status('dentro')).toBe('LIVE');
     const s = db.session('s-oltre')!;
     expect(s.endedAt).toEqual(NOW);
@@ -172,7 +180,7 @@ describe('giro a bridge fisso — chiusura', () => {
     expect(db.status('g0')).toBe('ENDED');
   });
 
-  it('una sala a tempo indefinito oltre la fine termina solo dopo la finestra di inattività', async () => {
+  it('una sala a tempo indefinito oltre la fine termina quando è vuota da 20 minuti', async () => {
     db.addEvent({
       id: 'vuota',
       status: 'LIVE',
@@ -414,8 +422,8 @@ describe('modo scaler — le regole storiche', () => {
     expect(db.status('live')).toBe('LIVE');
   });
 
-  it('termina alla fine della grace e i mai aperti oltre la fine', async () => {
-    db.addEvent({ id: 'oltre', status: 'LIVE', endsAt: at(-16) });
+  it('termina al tetto del fuori orario e i mai aperti oltre la fine', async () => {
+    db.addEvent({ id: 'oltre', status: 'LIVE', endsAt: at(-61), lastActiveAt: at(-1) });
     db.addEvent({ id: 'idle', status: 'IDLE', endsAt: at(-1) });
 
     const r = await scaler();
@@ -442,6 +450,39 @@ describe('modo scaler — le regole storiche', () => {
   });
 });
 
+describe('modo scaler — fuori orario', () => {
+  it('una sala occupata entro il tetto resta aperta', async () => {
+    // Tetto di sito, bridge raggiungibile, partecipanti presenti: il fuori
+    // orario non chiude una sala in uso prima del tetto.
+    db.addEvent({ id: 'piena', status: 'LIVE', startsAt: at(-76), endsAt: at(-16), lastActiveAt: at(-2) });
+
+    const r = await scaler({ participants: 8 });
+
+    expect(db.status('piena')).toBe('LIVE');
+    expect(r.transitions.toEnded).toBe(0);
+  });
+
+  it('una sala vuota oltre la fine termina dopo 20 minuti, prima del tetto', async () => {
+    db.addEvent({ id: 'vuota', status: 'LIVE', startsAt: at(-90), endsAt: at(-30), lastActiveAt: at(-25) });
+    db.addEvent({ id: 'appena', status: 'LIVE', startsAt: at(-90), endsAt: at(-30), lastActiveAt: at(-15) });
+
+    await scaler();
+
+    expect(db.status('vuota')).toBe('ENDED');
+    expect(db.status('appena')).toBe('LIVE');
+  });
+
+  it('con un conteggio inaffidabile una sala oltre la fine resta aperta fino al tetto', async () => {
+    db.addEvent({ id: 'dubbia', status: 'LIVE', startsAt: at(-90), endsAt: at(-30), lastActiveAt: at(-25) });
+
+    await scaler({ scalerAggregated: false, currentReplicas: 2 });
+    expect(db.status('dubbia')).toBe('LIVE');
+
+    await scaler({ jvbReachable: false });
+    expect(db.status('dubbia')).toBe('LIVE');
+  });
+});
+
 describe('lifecycleWindows', () => {
   it('legge le impostazioni del sito', () => {
     expect(
@@ -450,8 +491,15 @@ describe('lifecycleWindows', () => {
         jvbPreScaleMinutes: 5,
         jvbEmptyCloseMinutes: 10,
         eventGracePeriodMinutes: 0,
+        eventOvertimeEmptyMinutes: 25,
       }),
-    ).toEqual({ inactiveGraceMin: 30, preScaleMin: 5, emptyCloseMin: 10, siteGrace: 0 });
+    ).toEqual({
+      inactiveGraceMin: 30,
+      preScaleMin: 5,
+      emptyCloseMin: 10,
+      siteGrace: 0,
+      overtimeEmptyMin: 25,
+    });
   });
 });
 

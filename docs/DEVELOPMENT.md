@@ -97,7 +97,7 @@ sequenceDiagram
   APP-->>You: session under your own name and role
 ```
 
-To act as a moderator of a demo event, open one of the moderator links that the seed printed. The `cron` service opens a published event at its start time and ends it after its end time and grace period; a moderator can open it earlier with **Start event** (see [Local stack vs cluster](#local-stack-vs-cluster)).
+To act as a moderator of a demo event, open one of the moderator links that the seed printed. The `cron` service opens a published event at its start time and ends it after its end time, once the room has emptied or at the overtime limit; a moderator can open it earlier with **Start event** (see [Local stack vs cluster](#local-stack-vs-cluster)).
 
 ## Local services
 

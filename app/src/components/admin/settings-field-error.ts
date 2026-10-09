@@ -86,6 +86,7 @@ const POSTO: Record<string, [SettingsTab, string]> = {
   jibriCpuCoresPerPod: ['scaling', 'jibriCpuCoresPerPod'],
   defaultSenderRatioPct: ['scaling', 'defaultSenderRatioPct'],
   eventGracePeriodMinutes: ['scaling', 'eventGracePeriodMinutes'],
+  eventOvertimeEmptyMinutes: ['scaling', 'eventOvertimeEmptyMinutes'],
   aiAsrProvider: ['postprod', 'aiAsrProvider'],
   aiLlmProvider: ['postprod', 'aiLlmProvider'],
   aiTtsEngine: ['postprod', 'aiTtsEngine'],
