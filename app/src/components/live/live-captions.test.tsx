@@ -111,9 +111,14 @@ describe('LiveCaptions', () => {
     act(() => emit('toolbarButtonClicked', { key: 'altro' }));
     expect(container.querySelector('.live-captions__box')).not.toBeNull();
 
+    vi.useFakeTimers();
     act(() => emit('toolbarButtonClicked', { key: 'pa-captions' }));
     expect(container.querySelector('.live-captions__box')).toBeNull();
     expect(window.localStorage.getItem('pawebinar.captions.visible')).toBe('0');
+    // Jitsi ridisegna il pulsante solo se lo si toglie e lo si rimette.
+    expect(pulsante()).toEqual([]);
+    act(() => vi.advanceTimersByTime(100));
+    vi.useRealTimers();
     expect(pulsante()).toEqual([expect.objectContaining({ id: 'pa-captions', text: 'Mostra i sottotitoli' })]);
     // Senza nome noto, un'etichetta generica.
     act(() => emit('toolbarButtonClicked', { key: 'pa-captions' }));

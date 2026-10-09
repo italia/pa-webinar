@@ -45,6 +45,7 @@ import PresentationTimerBar from '@/components/live/presentation-timer';
 import LiveTimeStrip from '@/components/live/live-time-strip';
 import ClosingNotice from '@/components/live/closing-notice';
 import LiveCaptions from '@/components/live/live-captions';
+import StageName from '@/components/live/stage-name';
 import ControlRoomPanel, { type FunzioneSala } from '@/components/live/control-room-panel';
 import { useCaptionsControl } from '@/hooks/use-captions-control';
 import { useRecordingControl, type ControlloRegistrazione } from '@/hooks/use-recording-control';
@@ -1903,7 +1904,12 @@ export default function LiveEventClient({
               onApiReady={handleApiReady}
             />
             {!showJvbOverlay && (
-              <LiveCaptions api={jitsiApi} active={sottotitoliAccesi} />
+              // Sottotitoli e nome di chi è sul palco in un'unica colonna sopra
+              // la barra di Jitsi: impilati, non si coprono mai.
+              <div className="live-stage-bottom">
+                <LiveCaptions api={jitsiApi} active={sottotitoliAccesi} />
+                <StageName api={jitsiApi} />
+              </div>
             )}
             {/* Custom reactions bar only in CUSTOM mode; NATIVE mode uses
                 Jitsi's own reactions button in the toolbar instead. */}

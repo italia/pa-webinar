@@ -167,6 +167,11 @@ export const jitsiConfigOverwrite = {
   ] as string[][],
 
   notifications: [] as string[],
+
+  // Il nome di chi è sul palco lo disegna la sala (components/live/stage-name),
+  // con il suo stile e nella stessa colonna dei sottotitoli: quello di Jitsi
+  // finiva sotto di loro.
+  hideDominantSpeakerBadge: true,
   disableReactions: true,
 
   // Keep a raised hand UP until the user lowers it or a moderator handles

@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import useSWR from 'swr';
 
@@ -12,6 +12,9 @@ import {
   writeCaptionsVisible,
 } from '@/lib/captions/toolbar-button';
 import type { JitsiMeetExternalAPI, JitsiTranscriptionChunk } from '@/types/jitsi';
+
+/** Tra togliere il pulsante dalla barra e rimetterlo: Jitsi deve aver ridisegnato la barra senza. */
+const REMOUNT_DELAY_MS = 60;
 
 /** Stato del servizio come lo riporta la pagina di stato (null = non noto). */
 export type CaptionsServiceState = 'operational' | 'degraded' | 'paused' | 'unavailable' | null;
@@ -56,18 +59,36 @@ export default function LiveCaptions({
   }, []);
 
   // Il pulsante nella barra di Jitsi: c'è solo con i sottotitoli accesi, e
-  // icona e testo dicono che cosa fa il clic.
+  // icona e testo dicono che cosa fa il clic. Jitsi (stable-10741) aggiorna la
+  // configurazione ma continua a disegnare il pulsante già montato: per
+  // cambiarne l'icona lo si toglie e lo si rimette, e Jitsi lo ridisegna. Il
+  // prezzo: chi lo usa da tastiera perde il fuoco sul pulsante dopo il clic.
   const show = t('show');
   const hide = t('hide');
+  const montato = useRef(false);
   useEffect(() => {
     if (!api) return;
-    try {
-      api.executeCommand('overwriteConfig', {
-        customToolbarButtons: active ? [captionsToolbarButton(visible, { show, hide })] : [],
-      });
-    } catch {
-      // Una versione di Jitsi senza il comando: resta il pulsante della configurazione iniziale.
+    const imposta = (buttons: unknown[]) => {
+      try {
+        api.executeCommand('overwriteConfig', { customToolbarButtons: buttons });
+      } catch {
+        // Una versione di Jitsi senza il comando: resta il pulsante della configurazione iniziale.
+      }
+    };
+    if (!active) {
+      imposta([]);
+      montato.current = false;
+      return;
     }
+    const button = captionsToolbarButton(visible, { show, hide });
+    if (!montato.current) {
+      imposta([button]);
+      montato.current = true;
+      return;
+    }
+    imposta([]);
+    const timer = window.setTimeout(() => imposta([button]), REMOUNT_DELAY_MS);
+    return () => window.clearTimeout(timer);
   }, [api, active, visible, show, hide]);
 
   useEffect(() => {

@@ -68,6 +68,9 @@ export interface JitsiEventMap {
   /** Lo manda anche l'avvio e l'arresto della trascrizione (`transcription`
    *  valorizzato): `on` resta lo stato della registrazione vera. */
   recordingStatusChanged: [{ on: boolean; mode: string; transcription?: boolean }];
+  /** Chi è sul palco (il video grande), o la sua visibilità, è cambiato.
+   *  Senza argomenti: chi c'è lo dice `_getOnStageParticipant()`. */
+  largeVideoChanged: [];
   /** Clic su un pulsante personalizzato della barra (`customToolbarButtons`). */
   toolbarButtonClicked: [{ key: string; preventExecution?: boolean }];
   audioModerationChanged: [{ enabled: boolean }];
@@ -139,6 +142,10 @@ export interface JitsiMeetExternalAPI {
   /** Cambia la configurazione della sala dal vivo: per la sala, i pulsanti personalizzati della barra. */
   executeCommand(command: 'overwriteConfig', config: Record<string, unknown>): void;
   executeCommand(command: string, ...args: unknown[]): void;
+
+  /** Chi è sul palco (il video grande). Metodo dell'IFrame API senza
+   *  documentazione pubblica, usato dalle app di Jitsi: può mancare. */
+  _getOnStageParticipant?(): string | undefined;
 
   // Event listeners
   addListener<E extends JitsiEventName>(
