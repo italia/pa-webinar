@@ -59,3 +59,70 @@ export function ordinaPersone(persone: PersonaPubblica[]): PersonaPubblica[] {
     (a, b) => peso[a.role] - peso[b.role] || a.name.localeCompare(b.name, 'it'),
   );
 }
+
+/** Le relazioni da leggere per `entiEPersonePubblici` (da unire
+ *  all'`include` di Prisma): gli enti in ordine, e solo le concessioni
+ *  pubblicate e ancora valide. I campi del moderatore principale sono colonne
+ *  dell'evento, già nella riga. */
+export const PERSONE_PUBBLICHE_INCLUDE = {
+  organizers: {
+    orderBy: { sortOrder: 'asc' },
+    select: { name: true, logoUrl: true, websiteUrl: true },
+  },
+  additionalMods: {
+    where: { publicListed: true, revokedAt: null },
+    select: { name: true, role: true, organizer: true, organization: true, organizationLogoUrl: true },
+  },
+} as const;
+
+interface EventoConPersone {
+  organizers: Array<{ name: string; logoUrl: string | null; websiteUrl: string | null }>;
+  additionalMods: Array<{
+    name: string;
+    role: 'MODERATOR' | 'SPEAKER';
+    organizer: boolean;
+    organization: string | null;
+    organizationLogoUrl: string | null;
+  }>;
+  moderatorName: string | null;
+  moderatorPublicListed: boolean;
+  moderatorOrganization: string | null;
+  moderatorOrganizationLogoUrl: string | null;
+}
+
+/**
+ * Gli enti e le persone che si mostrano di un evento: la pagina pubblica e
+ * il riepilogo della sala d'attesa li prendono da qui, così una regola nuova
+ * vale per entrambi. Il nome di una concessione è cifrato: lo decifra chi
+ * chiama (questo modulo si usa anche nel browser, per i tipi).
+ */
+export function entiEPersonePubblici(
+  event: EventoConPersone,
+  decifra: (cifrato: string) => string | null,
+): { enti: EntePubblico[]; persone: PersonaPubblica[] } {
+  const enti = event.organizers.map((o) => ({
+    name: o.name,
+    logoUrl: logoPubblico(o.logoUrl),
+    websiteUrl: sitoPubblico(o.websiteUrl),
+  }));
+  const persone = ordinaPersone([
+    // L'organizzatore principale, se chi compila ha scelto di presentarlo.
+    ...(event.moderatorPublicListed && event.moderatorName
+      ? [
+          {
+            name: event.moderatorName,
+            role: 'organizer' as const,
+            organization: event.moderatorOrganization,
+            logoUrl: logoPubblico(event.moderatorOrganizationLogoUrl),
+          },
+        ]
+      : []),
+    ...event.additionalMods.map((m) => ({
+      name: decifra(m.name) ?? m.name,
+      role: ruoloPubblico(m),
+      organization: m.organization,
+      logoUrl: logoPubblico(m.organizationLogoUrl),
+    })),
+  ]);
+  return { enti, persone };
+}

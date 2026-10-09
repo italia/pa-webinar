@@ -45,6 +45,7 @@ import ClosingNotice from '@/components/live/closing-notice';
 import ControlRoomPanel, { type FunzioneSala } from '@/components/live/control-room-panel';
 import { useRecordingControl, type ControlloRegistrazione } from '@/hooks/use-recording-control';
 import { TimerInterventiSync, useScartoOrologio } from '@/hooks/use-presentation-timer';
+import { usePresenze } from '@/hooks/use-presence';
 import ReactionBar from '@/components/live/reaction-bar';
 import ChatPanel, { type ChatPreview } from '@/components/live/chat-panel';
 import WordCloud from '@/components/live/word-cloud';
@@ -56,6 +57,7 @@ import {
 import AgendaTicker from '@/components/live/agenda-ticker';
 import LiveShareButton from '@/components/live/live-share-button';
 import WaitingRoom, {
+  type RiepilogoSala,
   type WaitingRoomJoinPrefs,
   type WaitingRoomWarmup,
 } from '@/components/live/waiting-room';
@@ -99,6 +101,8 @@ interface EventInfo {
   speakers?: string | null;
   organizerName?: string | null;
   moderatorName?: string | null;
+  /** Descrizione, enti e persone per il riepilogo della sala d'attesa. */
+  riepilogo?: RiepilogoSala;
   imageUrl?: string | null;
   coverImageUrl?: string | null;
   maxParticipants?: number;
@@ -306,6 +310,16 @@ export default function LiveEventClient({
   const [jitsiJoined, setJitsiJoined] = useState(false);
 
   const [eventStatus, setEventStatus] = useState(event.status);
+  // Chi è in diretta e chi aspetta: la pagina lo segnala per tutta la visita,
+  // spostandosi da «attesa» a «diretta» quando entra nella chiamata. Non a
+  // evento concluso, né fuori dalla sala (uscita, errore, fine).
+  const inChiamata = phase === 'ready' || phase === 'reconnecting';
+  const presenze = usePresenze(
+    event.slug,
+    inChiamata ? 'diretta' : 'attesa',
+    eventStatus !== 'ENDED' && phase !== 'ended' && phase !== 'error' && phase !== 'left',
+    token || undefined,
+  );
   // Letto dai gestori di uscita, che non devono ricrearsi a ogni cambio di
   // stato: decide fra «Evento concluso» e «Sei uscito dalla sala».
   const eventStatusRef = useRef(event.status);
@@ -400,13 +414,14 @@ export default function LiveEventClient({
   // Pre-join camera/mic choice captured by the waiting room's DeviceCheck.
   // Forwarded to JitsiRoom as `startWithVideoMuted`/`startWithAudioMuted`
   // so the user actually lands in the room with the state they picked.
-  // Fotocamera e microfono all'ingresso: accesi per chi conduce o interviene
-  // e nelle chiamate istantanee, che sono riunioni fra pari; spenti per chi
-  // assiste a un evento, che li accende quando vuole intervenire.
-  const devicesOnByDefault = isModerator || isSpeaker || event.eventType === 'INSTANT';
+  // Fotocamera e microfono partono spenti per tutti: li accende in sala
+  // d'attesa chi vuole provarli, e la scelta si ricorda a parte per chi
+  // conduce o interviene (anche nelle chiamate istantanee, riunioni fra pari)
+  // e per chi assiste.
+  const conduceOInterviene = isModerator || isSpeaker || event.eventType === 'INSTANT';
   const [joinPrefs, setJoinPrefs] = useState<WaitingRoomJoinPrefs>({
-    cameraOn: devicesOnByDefault,
-    micOn: devicesOnByDefault,
+    cameraOn: false,
+    micOn: false,
   });
 
   // ── Network-resilience: distinguish intentional hangup (user clicked
@@ -1479,10 +1494,18 @@ export default function LiveEventClient({
             aiPostprodEnabled: event.aiPostprodEnabled,
             aiConsentDisclosure: event.aiConsentDisclosure,
             multitrackRecordingEnabled: event.multitrackRecordingEnabled,
+            riepilogo: event.riepilogo,
           }}
-          participantCount={participantCount}
+          presenze={presenze}
           role={isModerator ? 'moderator' : isGuest ? 'guest' : 'participant'}
-          devicesOnByDefault={devicesOnByDefault}
+          conduce={conduceOInterviene}
+          condivisione={{
+            locale,
+            // Il link da moderatore solo a chi modera (non ai relatori).
+            moderatorToken: isModerator && !isSpeaker ? token : undefined,
+            hasPublicPage: event.eventType !== 'INSTANT',
+            hasCallLink: event.guestEntryOpen !== false,
+          }}
           jvbReady={jvbReady}
           warmup={warmup}
           // Uscita esplicita dalla sala d'attesa: le instant call non hanno una

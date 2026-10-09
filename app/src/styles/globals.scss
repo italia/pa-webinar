@@ -1291,59 +1291,6 @@ button.live-time-strip__rec {
   }
 }
 
-// DeviceCheck toggle (custom, cross-browser). Bootstrap/Italia's own
-// form-switch styles interact badly with Firefox's default checkbox
-// rendering when stacked with `role="switch"` + our small text layout.
-// This is a minimal switch styled the same on every browser.
-.device-check-toggle {
-  cursor: pointer;
-  user-select: none;
-  margin: 0;
-
-  &__input {
-    position: absolute;
-    opacity: 0;
-    pointer-events: none;
-    width: 0;
-    height: 0;
-  }
-
-  &__track {
-    position: relative;
-    display: inline-block;
-    width: 36px;
-    height: 20px;
-    background: #CED4DA;
-    border-radius: 10px;
-    transition: background 0.15s ease;
-    flex-shrink: 0;
-  }
-
-  &__thumb {
-    position: absolute;
-    top: 2px;
-    left: 2px;
-    width: 16px;
-    height: 16px;
-    background: #fff;
-    border-radius: 50%;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-    transition: left 0.15s ease;
-  }
-
-  &__input:checked + &__track {
-    background: #0066CC;
-  }
-
-  &__input:checked + &__track &__thumb {
-    left: 18px;
-  }
-
-  &__input:focus-visible + &__track {
-    outline: 2px solid #0066CC;
-    outline-offset: 2px;
-  }
-}
 
 // Legacy aliases from before the Meet-style refactor. The QAPanel /
 // PollPanel / etc. render inside the drawer body now, so they must NOT
@@ -1723,7 +1670,8 @@ button.live-time-strip__rec {
 
 // Telefono: il fumetto occupa la larghezza dello schermo, sotto la barra.
 @media (max-width: 575.98px) {
-  .live-share__pop {
+  .live-share__pop,
+  .wr-share .live-share__pop {
     position: fixed;
     top: calc(var(--share-sotto, 56px) + 10px);
     right: max(12px, env(safe-area-inset-right));
@@ -4839,47 +4787,7 @@ button.live-time-strip__rec {
   background: linear-gradient(180deg, #f4f8fc 0%, #e9f1f9 100%);
 }
 
-.wr-aside {
-  border-radius: 16px;
-  overflow: hidden;
 
-  @media (min-width: 992px) {
-    position: sticky;
-    top: 1rem;
-  }
-}
-
-.wr-aside__head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-  padding: 0.6rem 1rem;
-  background: linear-gradient(90deg, #004d99 0%, #0066cc 100%);
-  color: #fff;
-}
-
-.wr-aside__toggle {
-  border: 0;
-  background: rgba(255, 255, 255, 0.16);
-  color: #fff;
-  font-size: 0.76rem;
-  font-weight: 600;
-  border-radius: 999px;
-  padding: 4px 10px;
-  white-space: nowrap;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.28);
-  }
-}
-
-.wr-aside__body {
-  padding: 0.75rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
 
 .waiting-card {
   position: relative;
@@ -5227,57 +5135,6 @@ button.live-time-strip__rec {
   font-weight: 600;
 }
 
-// Sala d'attesa: la piazza si apre su invito, non addosso a chi arriva (C1).
-.wr-game-invite {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  width: 100%;
-  padding: 14px 16px;
-  border: 1px dashed #cfd8e3;
-  border-radius: 12px;
-  background: linear-gradient(180deg, #f8fbff 0%, #f2f7fb 100%);
-  text-align: left;
-  cursor: pointer;
-  transition: border-color 0.2s ease, transform 0.2s ease;
-
-  &:hover,
-  &:focus-visible {
-    border-color: var(--app-primary, #06c);
-    transform: translateY(-1px);
-  }
-}
-
-.wr-game-invite__art {
-  font-size: 1.6rem;
-  line-height: 1;
-  // Un respiro appena percettibile: è l'"infografica che si muove" chiesta,
-  // non un elemento che reclama attenzione.
-  animation: wr-invite-breathe 3.2s ease-in-out infinite;
-}
-
-.wr-game-invite__title {
-  display: block;
-  font-weight: 600;
-  color: var(--app-text, #17324d);
-}
-
-.wr-game-invite__hint {
-  display: block;
-  font-size: 0.82rem;
-  color: var(--app-muted, #5c6f82);
-}
-
-@keyframes wr-invite-breathe {
-  0%, 100% { transform: scale(1); }
-  50%      { transform: scale(1.12); }
-}
-
-// Chi ha chiesto meno movimento non lo subisce.
-@media (prefers-reduced-motion: reduce) {
-  .wr-game-invite__art { animation: none; }
-  .wr-game-invite { transition: none; }
-}
 
 // Il gioco a piena pagina, con l'uscita che riporta alla sala d'attesa (C1).
 // La piazza: la scena a sinistra, e la SALA D'ATTESA STESSA come pannello a
@@ -5592,10 +5449,842 @@ button.live-time-strip__rec {
   border-top: 4px solid var(--app-primary) !important;
 }
 
-// Il campo del nome porta l'etichetta sopra di se' una volta compilato: senza
-// questo margine finiva sopra la riga della data.
+
+// ── Sala d'attesa ridisegnata: scheda principale, riepilogo, presenze,
+// audio e video, colonna laterale con chat e piazza. Ogni movimento si spegne
+// con prefers-reduced-motion (in fondo al blocco).
+
+.wr-card {
+  border-radius: 20px !important;
+}
+
+.waiting-hero {
+  position: relative;
+  height: 170px;
+  // La scheda non taglia più ciò che ne esce (il fumetto di Condividi): gli
+  // angoli dell'immagine li arrotonda lei.
+  border-radius: 20px 20px 0 0;
+}
+
+.waiting-hero__badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+}
+
+// Le parti della scheda entrano una dopo l'altra, appena.
+.wr-reveal {
+  animation: wr-reveal 0.45s ease-out both;
+}
+
+.wr-reveal:nth-of-type(2) { animation-delay: 0.05s; }
+.wr-reveal:nth-of-type(3) { animation-delay: 0.1s; }
+.wr-reveal:nth-of-type(4) { animation-delay: 0.15s; }
+
+@keyframes wr-reveal {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
+.wr-section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 0 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--app-muted, #5c6f82);
+}
+
+// Chi c'è: in diretta e in attesa.
+.wr-presence {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.wr-presence__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.35rem 0.8rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #17324d;
+  background: #eef4fb;
+  border: 1px solid #d6e5f5;
+  border-radius: 999px;
+  // Un piccolo salto quando il numero cambia (la chiave del nodo cambia).
+  animation: wr-pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  svg { color: #0066cc; }
+}
+
+.wr-presence__item--live {
+  color: #8a1c2e;
+  background: #fdeef1;
+  border-color: #f4c5ce;
+}
+
+.wr-presence__dot {
+  position: relative;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #d9364f;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    border: 2px solid rgba(217, 54, 79, 0.45);
+    animation: wr-ripple 1.8s ease-out infinite;
+  }
+}
+
+@keyframes wr-pop {
+  from { transform: scale(0.92); opacity: 0.6; }
+  to { transform: none; opacity: 1; }
+}
+
+@keyframes wr-ripple {
+  from { transform: scale(0.6); opacity: 1; }
+  to { transform: scale(1.8); opacity: 0; }
+}
+
+.wr-soon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.9rem 1rem;
+  border-radius: 12px;
+  background: #eef4fb;
+  color: var(--app-text);
+}
+
+// Il riepilogo: fatti con un'icona ciascuno, in griglia.
+.wr-summary {
+  padding: 1.1rem 1.2rem;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #f7fafd 0%, #f2f7fc 100%);
+  border: 1px solid #e1ebf5;
+}
+
+.wr-facts {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.85rem 1.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  @media (min-width: 576px) {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.wr-fact {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  min-width: 0;
+}
+
+.wr-fact__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  color: #0066cc;
+  background: linear-gradient(135deg, #ffffff 0%, #e3eef9 100%);
+  box-shadow: 0 0 0 1px #d6e5f5, 0 4px 10px -6px rgba(0, 102, 204, 0.5);
+}
+
+.wr-fact__body {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.wr-fact__label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--app-muted, #5c6f82);
+}
+
+.wr-fact__value {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #17324d;
+  overflow-wrap: anywhere;
+}
+
+.wr-fact__sub {
+  font-size: 0.8rem;
+  color: #5c6f82;
+}
+
+// La registrazione: un pallino rosso calmo, informazione e non allarme.
+.wr-fact__rec {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #d9364f;
+  box-shadow: 0 0 0 3px rgba(217, 54, 79, 0.18);
+}
+
+.wr-about {
+  margin-top: 1rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid #e1ebf5;
+  font-size: 0.9rem;
+  color: #2c4560;
+}
+
+.wr-about__text {
+  position: relative;
+
+  > :last-child { margin-bottom: 0; }
+
+  &.is-clamped {
+    max-height: 4.8em;
+    overflow: hidden;
+
+    // Più corta dello spazio: niente sfumatura.
+    &.is-short::after { display: none; }
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset: auto 0 0 0;
+      height: 2.2em;
+      background: linear-gradient(180deg, rgba(242, 247, 252, 0) 0%, #f2f7fc 100%);
+    }
+  }
+}
+
+.wr-about__toggle {
+  margin-top: 0.35rem;
+  padding: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #0066cc;
+  background: none;
+  border: 0;
+
+  &:hover { text-decoration: underline; }
+}
+
+.wr-summary__links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem 1rem;
+  margin-top: 1rem;
+}
+
+.wr-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #0066cc;
+  text-decoration: none;
+
+  &:hover { text-decoration: underline; }
+}
+
+// «Condividi» nella sala d'attesa: il fumetto si apre verso destra, dentro la
+// scheda, con la punta sul pulsante.
+.wr-share .live-share__pop {
+  right: auto;
+  left: 0;
+  transform-origin: 36px -8px;
+
+  &::before {
+    right: auto;
+    left: 30px;
+  }
+}
+
+// «Condividi» nella sala d'attesa: su sfondo chiaro, contorno blu.
+.wr-share .live-share-btn {
+  min-height: 34px;
+  padding: 0 0.9rem;
+  font-weight: 600;
+  border: 1px solid #0066cc !important;
+  border-radius: 999px;
+  background: #fff;
+  color: #0066cc;
+
+  &:hover,
+  &:focus,
+  &.is-open {
+    background: #0066cc;
+    color: #fff;
+  }
+}
+
+// Il nome: se manca lampeggia di blu (non di rosso), e dopo un tentativo
+// insiste in ambra.
 .wr-name-field {
   margin-top: 1.75rem;
+  border-radius: 12px;
+}
+
+// Bootstrap Italia lascia 48 px sotto ogni campo: qui l'aiuto sta subito sotto.
+.wr-name-field,
+.wr-email-field {
+  .form-group { margin-bottom: 0.4rem; }
+}
+
+.wr-name-field--empty {
+  animation: wr-name-glow 1.8s ease-in-out infinite;
+}
+
+.wr-name-field--insist {
+  animation: wr-name-nudge 0.4s ease-in-out, wr-name-glow-amber 1.2s ease-in-out 0.4s infinite;
+}
+
+@keyframes wr-name-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(0, 102, 204, 0); }
+  50% { box-shadow: 0 0 0 6px rgba(0, 102, 204, 0.18); }
+}
+
+@keyframes wr-name-glow-amber {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(194, 119, 0, 0); }
+  50% { box-shadow: 0 0 0 6px rgba(194, 119, 0, 0.22); }
+}
+
+@keyframes wr-name-nudge {
+  0%, 100% { transform: none; }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
+.wr-name-input--attention {
+  border-bottom-color: #c27700 !important;
+  box-shadow: none !important;
+}
+
+.wr-name-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  color: #004d99;
+
+  svg { flex-shrink: 0; }
+}
+
+.wr-name-hint--insist {
+  color: #6b4400;
+  font-weight: 600;
+}
+
+// Audio e video: due interruttori a scheda; accesi, si apre la prova.
+.av-check__title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 0 0.75rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #17324d;
+
+  svg { color: #0066cc; }
+}
+
+.av-check__toggles {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+
+  @media (min-width: 576px) {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.av-toggle {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin: 0;
+  padding: 0.75rem 0.85rem;
+  border: 1px solid #d6dee6;
+  border-radius: 14px;
+  background: #fff;
+  cursor: pointer;
+  user-select: none;
+  transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover { border-color: #9fc3e8; }
+
+  &:focus-within {
+    outline: 2px solid #ffb400;
+    outline-offset: 2px;
+  }
+
+  &.is-on {
+    border-color: #0066cc;
+    background: #f0f6fd;
+    box-shadow: 0 6px 16px -10px rgba(0, 102, 204, 0.6);
+  }
+}
+
+.av-toggle__input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+}
+
+.av-toggle__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  color: #5c6f82;
+  background: #f2f4f6;
+  transition: color 0.2s ease, background-color 0.2s ease;
+
+  .is-on & {
+    color: #fff;
+    background: #0066cc;
+  }
+}
+
+.av-toggle__slash {
+  stroke: #d9364f;
+}
+
+.av-toggle__text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.av-toggle__name {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #17324d;
+}
+
+.av-toggle__state {
+  font-size: 0.75rem;
+  color: #5c6f82;
+}
+
+.av-toggle__switch {
+  position: relative;
+  flex-shrink: 0;
+  width: 36px;
+  height: 20px;
+  border-radius: 999px;
+  background: #ced4da;
+  transition: background-color 0.2s ease;
+
+  .is-on & { background: #0066cc; }
+}
+
+.av-toggle__thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  .is-on & { transform: translateX(16px); }
+}
+
+.av-check__hint {
+  margin: 0.6rem 0 0;
+  font-size: 0.82rem;
+  color: #5c6f82;
+}
+
+// La prova si apre e si chiude in altezza (righe della griglia da 0 a 1fr).
+.av-check__panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition: grid-template-rows 0.35s ease, opacity 0.3s ease, margin-top 0.35s ease;
+
+  &.is-open {
+    grid-template-rows: 1fr;
+    opacity: 1;
+    margin-top: 1rem;
+  }
+}
+
+.av-check__panel-inner {
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.av-check__denied {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.85rem;
+  color: #5c3c00;
+  background: #fff6d6;
+  border: 1px solid #e5c558;
+  border-radius: 10px;
+}
+
+.av-check__preview {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 14px;
+  background: #17324d;
+
+  &.is-hidden { display: none; }
+}
+
+.av-check__video,
+.av-check__composite {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.av-check__overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.av-check__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+
+  @media (min-width: 576px) {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+}
+
+.av-check__meter {
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e9ecef;
+}
+
+.av-check__meter-fill {
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(90deg, #008758 0%, #c27700 70%, #d9364f 100%);
+  transition: width 60ms linear;
+}
+
+.av-check__backgrounds {
+  margin: 0;
+}
+
+.av-check__bg-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.av-check__bg {
+  padding: 0;
+  border: 0;
+  background: none;
+  border-radius: 10px;
+}
+
+.av-check__bg-thumb {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 66px;
+  height: 38px;
+  font-size: 0.68rem;
+  color: #5a6772;
+  background-color: #e9ecef;
+  background-size: cover;
+  background-position: center;
+  border: 3px solid #ced4da;
+  border-radius: 10px;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+
+  .av-check__bg:hover & { transform: translateY(-2px); }
+
+  .is-selected & {
+    border-color: #0066cc;
+    box-shadow: 0 4px 10px -4px rgba(0, 102, 204, 0.6);
+  }
+}
+
+// Informative (registrazione, post-produzione): azzurre, non avvisi.
+.wr-info {
+  display: flex;
+  gap: 0.7rem;
+  padding: 0.8rem 0.9rem;
+  font-size: 0.84rem;
+  line-height: 1.45;
+  color: #2c4560;
+  background: #eef4fb;
+  border: 1px solid #d6e5f5;
+  border-radius: 12px;
+}
+
+.wr-info__icon {
+  flex-shrink: 0;
+  color: #0066cc;
+}
+
+.wr-info__title {
+  display: block;
+  font-weight: 700;
+  color: #17324d;
+}
+
+// Buone pratiche: si aprono a richiesta.
+.wr-netiquette {
+  border: 1px solid #e1ebf5;
+  border-radius: 12px;
+  background: #f7fafd;
+
+  summary {
+    display: flex;
+    align-items: center;
+    padding: 0.7rem 0.9rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #17324d;
+    cursor: pointer;
+    list-style: none;
+
+    &::-webkit-details-marker { display: none; }
+
+    &::after {
+      content: '';
+      width: 8px;
+      height: 8px;
+      margin-left: auto;
+      border-right: 2px solid #5c6f82;
+      border-bottom: 2px solid #5c6f82;
+      transform: rotate(45deg);
+      transition: transform 0.2s ease;
+    }
+  }
+
+  &[open] summary::after { transform: rotate(-135deg); }
+
+  ul {
+    margin: 0;
+    padding: 0 1rem 0.8rem 2.1rem;
+    font-size: 0.85rem;
+    color: #455b71;
+
+    li { line-height: 1.45; margin-bottom: 0.3rem; }
+  }
+}
+
+// La colonna laterale: titolo, chat a tutta altezza, piazza.
+.wr-aside {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  @media (min-width: 992px) {
+    position: sticky;
+    top: 1rem;
+  }
+}
+
+.wr-aside__title {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--app-muted, #5c6f82);
+}
+
+.wr-chat {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 14px 38px rgba(23, 50, 77, 0.14);
+}
+
+.wr-chat__head {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.85rem 1rem;
+  color: #fff;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(255, 255, 255, 0.18), transparent 55%),
+    linear-gradient(120deg, #0066cc 0%, #004d99 100%);
+
+  .icon { fill: #fff; }
+}
+
+.wr-chat__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.wr-chat__title {
+  display: block;
+  font-weight: 700;
+}
+
+.wr-chat__hint {
+  display: block;
+  font-size: 0.78rem;
+  opacity: 0.85;
+}
+
+.wr-chat__body {
+  display: flex;
+  flex-direction: column;
+  height: clamp(420px, 62vh, 680px);
+}
+
+.wr-chat__locked {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1.5rem;
+  min-height: 260px;
+  font-size: 0.88rem;
+  text-align: center;
+  color: var(--app-muted);
+  background: #f7fafd;
+}
+
+// La piazza: un posto alternativo dove aspettare.
+.wr-piazza-card {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  width: 100%;
+  padding: 0.9rem 1rem;
+  text-align: left;
+  border: 1px solid #d6e5f5;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #ffffff 0%, #eef6ff 60%, #e6f5ee 100%);
+  box-shadow: 0 10px 26px -18px rgba(0, 102, 204, 0.7);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+
+  &:hover,
+  &:focus-visible {
+    transform: translateY(-2px);
+    border-color: #0066cc;
+    box-shadow: 0 16px 30px -18px rgba(0, 102, 204, 0.8);
+  }
+
+  &:hover .wr-piazza-card__go { transform: translateX(3px); }
+}
+
+.wr-piazza-card__art {
+  flex-shrink: 0;
+  animation: wr-art-float 4s ease-in-out infinite;
+}
+
+.wr-piazza-card__text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.wr-piazza-card__kicker {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #008758;
+}
+
+.wr-piazza-card__title {
+  font-weight: 700;
+  color: #17324d;
+}
+
+.wr-piazza-card__hint {
+  font-size: 0.8rem;
+  color: #5c6f82;
+}
+
+.wr-piazza-card__go {
+  flex-shrink: 0;
+  color: #0066cc;
+  transition: transform 0.2s ease;
+}
+
+@keyframes wr-art-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wr-reveal,
+  .wr-presence__item,
+  .wr-presence__dot::after,
+  .wr-name-field--empty,
+  .wr-name-field--insist,
+  .wr-piazza-card__art {
+    animation: none !important;
+  }
+
+  .av-check__panel,
+  .av-toggle,
+  .av-toggle__thumb,
+  .av-check__bg-thumb,
+  .wr-piazza-card,
+  .wr-piazza-card__go,
+  .wr-netiquette summary::after {
+    transition: none !important;
+  }
 }
 
 // Stato dell'evento (in corso / terminato) nella scheda della sala d'attesa.
@@ -5668,26 +6357,6 @@ button.live-time-strip__rec {
   .wr-status__dot { animation: none; }
 }
 
-// Buone pratiche: un elenco da scorrere, non un paragrafo arioso.
-.waiting-netiquette li {
-  line-height: 1.45;
-  margin-bottom: 0.3rem;
-
-  &:last-child { margin-bottom: 0; }
-}
-
-// L'invito alla piazza: l'icona in un cerchio, come le altre informazioni
-// della sala, al posto dell'emoji.
-.wr-game-invite__art {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: rgba(0, 102, 204, 0.1);
-}
 
 // Barra della sala: i comandi a destra hanno la stessa altezza e lo stesso
 // raggio, cosi' si leggono come un gruppo e non come quattro bottoni diversi.

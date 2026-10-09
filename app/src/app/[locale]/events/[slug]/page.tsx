@@ -5,14 +5,7 @@ import { getLocale } from 'next-intl/server';
 
 import { prisma } from '@/lib/db';
 import { tryDecryptPII } from '@/lib/crypto/pii';
-import {
-  logoPubblico,
-  ordinaPersone,
-  ruoloPubblico,
-  sitoPubblico,
-  type EntePubblico,
-  type PersonaPubblica,
-} from '@/lib/events/public-people';
+import { entiEPersonePubblici, PERSONE_PUBBLICHE_INCLUDE } from '@/lib/events/public-people';
 import { eventAccessCookieName, verifyEventAccess } from '@/lib/event-session';
 import { isEventOpenForRegistration, isEventPageVisible } from '@/lib/events/visibility';
 import { guestAccessAllowed } from '@/lib/events/guest-window';
@@ -120,22 +113,9 @@ export default async function EventDetailPage({
     include: {
       _count: { select: { registrations: true } },
       tagLinks: { include: { tag: true } },
-      organizers: {
-        orderBy: { sortOrder: 'asc' },
-        select: { name: true, logoUrl: true, websiteUrl: true },
-      },
-      // Solo chi è stato scelto per la pagina pubblica, e con un accesso ancora
-      // valido.
-      additionalMods: {
-        where: { publicListed: true, revokedAt: null },
-        select: {
-          name: true,
-          role: true,
-          organizer: true,
-          organization: true,
-          organizationLogoUrl: true,
-        },
-      },
+      // Gli enti, e solo chi è stato scelto per la pagina pubblica con un
+      // accesso ancora valido.
+      ...PERSONE_PUBBLICHE_INCLUDE,
     },
   });
 
@@ -176,30 +156,7 @@ export default async function EventDetailPage({
   const baseUrl = getPublicEnv('NEXT_PUBLIC_APP_URL');
 
   // Chi organizza e chi interviene (lib/events/public-people).
-  const enti: EntePubblico[] = event.organizers.map((o) => ({
-    name: o.name,
-    logoUrl: logoPubblico(o.logoUrl),
-    websiteUrl: sitoPubblico(o.websiteUrl),
-  }));
-  const persone: PersonaPubblica[] = ordinaPersone([
-    // L'organizzatore principale, se chi compila ha scelto di presentarlo.
-    ...(event.moderatorPublicListed && event.moderatorName
-      ? [
-          {
-            name: event.moderatorName,
-            role: 'organizer' as const,
-            organization: event.moderatorOrganization,
-            logoUrl: logoPubblico(event.moderatorOrganizationLogoUrl),
-          },
-        ]
-      : []),
-    ...event.additionalMods.map((m) => ({
-      name: tryDecryptPII(m.name) ?? m.name,
-      role: ruoloPubblico(m),
-      organization: m.organization,
-      logoUrl: logoPubblico(m.organizationLogoUrl),
-    })),
-  ]);
+  const { enti, persone } = entiEPersonePubblici(event, tryDecryptPII);
 
   const jsonLd = {
     '@context': 'https://schema.org',

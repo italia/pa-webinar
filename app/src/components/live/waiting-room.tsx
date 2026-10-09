@@ -29,6 +29,10 @@ import DeviceCheck from '@/components/live/device-check';
 import { InsecureContextNotice } from '@/components/live/insecure-context';
 import VideoPlayer from '@/components/events/video-player';
 import EventTitle from '@/components/events/event-title';
+import LiveShareButton from '@/components/live/live-share-button';
+import { MarkdownRenderer } from '@/components/ui/markdown';
+import type { EntePubblico, PersonaPubblica } from '@/lib/events/public-people';
+import type { Presenze } from '@/lib/live/presence';
 
 // Experimental Phaser lobby engine (opt-in via `?engine=phaser`). Loaded
 // client-only so Phaser never enters the main bundle or runs on the server.
@@ -121,6 +125,16 @@ interface WaitingRoomEvent {
   /** L'evento registra una traccia audio separata per partecipante:
    *  richiede consenso esplicito (hard-gate) prima di entrare. */
   multitrackRecordingEnabled?: boolean;
+  /** Descrizione, enti e persone, come sulla pagina pubblica. */
+  riepilogo?: RiepilogoSala;
+}
+
+/** Il riepilogo della chiamata: descrizione (Markdown), enti e persone
+ *  pubblicate (lib/events/public-people). */
+export interface RiepilogoSala {
+  descrizione: string | null;
+  enti: EntePubblico[];
+  persone: PersonaPubblica[];
 }
 
 export interface WaitingRoomJoinPrefs {
@@ -149,11 +163,19 @@ export interface WaitingRoomWarmup {
 
 interface WaitingRoomProps {
   event: WaitingRoomEvent;
-  participantCount: number;
+  /** Quanti sono in diretta e quanti in sala d'attesa (null = non si sa). */
+  presenze?: Presenze | null;
+  /** I link da condividere (pulsante «Condividi»). */
+  condivisione?: {
+    locale: string;
+    moderatorToken?: string;
+    hasPublicPage: boolean;
+    hasCallLink: boolean;
+  };
   role: 'moderator' | 'participant' | 'guest';
-  /** Fotocamera e microfono accesi all'ingresso (moderatori e relatori);
-   *  chi partecipa entra spento e li accende quando vuole intervenire. */
-  devicesOnByDefault?: boolean;
+  /** Chi conduce o interviene: la scelta di fotocamera e microfono si ricorda
+   *  a parte da quella di chi assiste. Per tutti partono spenti. */
+  conduce?: boolean;
   jvbReady?: boolean | null;
   defaultName: string;
   /** Called when the user confirms "Entra ora" / "Guarda registrazione".
@@ -208,9 +230,10 @@ const MESSAGGIO_DEL_BLOCCO: Record<BloccoModulo, string> = {
 
 export default function WaitingRoom({
   event,
-  participantCount,
+  presenze = null,
+  condivisione,
   role,
-  devicesOnByDefault = false,
+  conduce = false,
   jvbReady,
   defaultName,
   onEnterLive,
@@ -223,6 +246,7 @@ export default function WaitingRoom({
   eventType = 'SCHEDULED',
 }: WaitingRoomProps) {
   const t = useTranslations('waiting');
+  const te = useTranslations('events');
   const tc = useTranslations('common');
   const tGdpr = useTranslations('gdpr.consent');
   const format = useFormatter();
@@ -250,12 +274,32 @@ export default function WaitingRoom({
   // Full-screen park (default) vs. static classic card (accessibility
   // fallback). Initialised false to match SSR, then synced from storage.
   const [classicView, setClassicView] = useState(false);
-  // La piazza/giardino si apre su richiesta: vedi il commento su gameInvite.
+  // La piazza si apre su richiesta: vedi il commento su piazzaCard.
   const [gameOpen, setGameOpen] = useState(false);
+  // Fotocamera e microfono partono spenti: li accende chi vuole provarli (o
+  // li ritrova come li aveva lasciati), e lo dice DeviceCheck.
   const [devicePrefs, setDevicePrefs] = useState<WaitingRoomJoinPrefs>({
-    cameraOn: devicesOnByDefault,
-    micOn: devicesOnByDefault,
+    cameraOn: false,
+    micOn: false,
   });
+  // La descrizione si apre per intero solo se richiesto, e il comando c'è
+  // solo se il testo è davvero più lungo dello spazio.
+  const [descrizioneAperta, setDescrizioneAperta] = useState(false);
+  const [descrizioneLunga, setDescrizioneLunga] = useState(false);
+  const descrizioneRef = useRef<HTMLDivElement>(null);
+  const descrizioneContenutoRef = useRef<HTMLDivElement>(null);
+  // Si osserva il CONTENUTO, non il riquadro tagliato: un'immagine o un
+  // carattere che arriva dopo allunga il testo senza cambiare il riquadro.
+  useEffect(() => {
+    const riquadro = descrizioneRef.current;
+    const contenuto = descrizioneContenutoRef.current;
+    if (!riquadro || !contenuto || descrizioneAperta) return;
+    const misura = () => setDescrizioneLunga(contenuto.offsetHeight > riquadro.clientHeight + 2);
+    misura();
+    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(misura) : null;
+    ro?.observe(contenuto);
+    return () => ro?.disconnect();
+  }, [descrizioneAperta, event.riepilogo?.descrizione]);
   const [startError, setStartError] = useState('');
   // Consenso esplicito alla registrazione per-partecipante (multitrack).
   const [multitrackConsent, setMultitrackConsent] = useState(false);
@@ -680,9 +724,6 @@ export default function WaitingRoom({
   const gameDialogRef = useRef<HTMLDivElement>(null);
   const inviteRef = useRef<HTMLButtonElement>(null);
   const classicToggleRef = useRef<HTMLButtonElement>(null);
-  /** L'invito alla piazza mostrato mentre la sala si prepara: quando si entra
-   *  di li', e' li' che il fuoco deve tornare uscendo. */
-  const piazzaAttesaRef = useRef<HTMLButtonElement>(null);
   const returnFocusRef = useRef(false);
   useEffect(() => {
     if (!gameOpen) {
@@ -690,7 +731,7 @@ export default function WaitingRoom({
         returnFocusRef.current = false;
         // L'invito, se c'è ancora; passando alla versione classica sparisce, e
         // allora il posto giusto è il pulsante che riporta indietro.
-        (inviteRef.current ?? piazzaAttesaRef.current ?? classicToggleRef.current)?.focus();
+        (inviteRef.current ?? classicToggleRef.current)?.focus();
       }
       return;
     }
@@ -765,9 +806,6 @@ export default function WaitingRoom({
   }
 
   // ── Unified waiting-room layout ───────────────────────────────────
-  const organizerLine = [event.speakers, event.organizerName]
-    .filter((v): v is string => !!v && v.length > 0)
-    .join(' · ');
 
   const startTimeLabel = format.dateTime(new Date(event.startsAt), {
     hour: '2-digit',
@@ -836,7 +874,10 @@ export default function WaitingRoom({
         minLength={2}
         maxLength={100}
         autoComplete="name"
-        valid={nomeSegnalato ? false : undefined}
+        // Niente rosso: un nome che manca è una cosa da fare, non un errore.
+        // Il campo lampeggia (vedi .wr-name-field--empty), e dopo un
+        // tentativo lo dice anche ai lettori di schermo.
+        className={nomeSegnalato ? 'wr-name-input--attention' : undefined}
         aria-invalid={nomeSegnalato || undefined}
         aria-describedby={nameDescribedBy}
       />
@@ -848,14 +889,13 @@ export default function WaitingRoom({
       {nomeDaChiedere && (
         <div
           id={MESSAGGIO_DEL_BLOCCO.name}
-          className="d-flex align-items-start rounded-2 px-2 py-1 mt-2"
-          style={
-            nomeSegnalato
-              ? { fontSize: '0.85rem', color: '#A1112E', background: '#FDF0F2', border: '1px solid #E8A3B0' }
-              : { fontSize: '0.85rem', color: '#6B4400', background: '#FFF8E6', border: '1px solid #E0C97A' }
-          }
+          className={`wr-name-hint${nomeSegnalato ? ' wr-name-hint--insist' : ''}`}
         >
-          <Icon icon="it-warning-circle" size="xs" className="me-1 mt-1 flex-shrink-0" style={{ fill: 'currentColor' }} />
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+               strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M12 20h9" />
+            <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
+          </svg>
           <span>{t('nameRequiredToEnter')}</span>
         </div>
       )}
@@ -891,36 +931,24 @@ export default function WaitingRoom({
   );
 
   const deviceCheckField = (
-    <DeviceCheck
-      compact
-      defaultOn={devicesOnByDefault}
-      onStateChange={handleDeviceStateChange}
-    />
+    <DeviceCheck conduce={conduce} onStateChange={handleDeviceStateChange} />
   );
 
+  // Le buone pratiche si aprono a richiesta: chi le conosce non le rilegge.
   const netiquetteBlock = (
-    <div className="waiting-netiquette rounded-3 p-3" style={{ backgroundColor: '#F5F7FA' }}>
-      <div className="fw-semibold mb-2" style={{ color: 'var(--app-text)', fontSize: '0.9rem' }}>
-        <Icon icon="it-info-circle" size="xs" className="me-1" />
+    <details className="wr-netiquette">
+      <summary>
+        <Icon icon="it-info-circle" size="xs" className="me-2" />
         {t('netiquetteTitle')}
-      </div>
-      <ul className="mb-0 ps-3" style={{ fontSize: '0.85rem', color: '#455B71' }}>
+      </summary>
+      <ul>
         <li>{t('netiquetteBullet1')}</li>
         <li>{t('netiquetteBullet2')}</li>
         <li>{t('netiquetteBullet3')}</li>
         <li>{t('netiquetteBullet4')}</li>
       </ul>
-    </div>
+    </details>
   );
-
-  // NIENTE <Icon> dentro <Alert>: Bootstrap Italia disegna già un'icona via
-  // ::before (padding-left:4em riservato) e un Icon inline si sovrappone.
-  // Solo testo, come aiNoticeBlock.
-  const recordingNoticeBlock = event.recordingEnabled && !isEnded ? (
-    <Alert color="warning" className="text-start mb-0" style={{ fontSize: '0.82rem' }}>
-      {t('recordingNotice')}
-    </Alert>
-  ) : null;
 
   // Informativa AI in sala d'attesa: mostrata quando l'evento usa la
   // pipeline AI post-evento. Testo custom dell'admin (per-locale) con
@@ -931,10 +959,19 @@ export default function WaitingRoom({
       ? event.aiConsentDisclosure
       : t('aiNotice');
   const aiNoticeBlock = event.aiPostprodEnabled && !isEnded ? (
-    <Alert color="info" className="text-start mb-0" style={{ fontSize: '0.82rem' }}>
-      <span className="fw-semibold d-block mb-1">{t('aiNoticeTitle')}</span>
-      {aiConsentText}
-    </Alert>
+    <div className="wr-info">
+      <span className="wr-info__icon" aria-hidden="true">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+             strokeLinecap="round" strokeLinejoin="round">
+          <path d="M12 3l1.9 5.6 5.6 1.9-5.6 1.9L12 18l-1.9-5.6-5.6-1.9 5.6-1.9z" />
+          <path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z" />
+        </svg>
+      </span>
+      <span>
+        <span className="wr-info__title">{t('aiNoticeTitle')}</span>
+        {aiConsentText}
+      </span>
+    </div>
   ) : null;
 
   // Consenso esplicito alla registrazione per-partecipante (multitrack):
@@ -982,20 +1019,18 @@ export default function WaitingRoom({
   ) : null;
 
   const chatPreviewBlock = showChatPreview ? (
-    <div className="waiting-chat-preview rounded-3 overflow-hidden" style={{ border: '1px solid #E2E8F0' }}>
-      <div className="px-3 py-2" style={{ backgroundColor: '#F5F7FA' }}>
-        <div className="fw-semibold" style={{ color: 'var(--app-text)', fontSize: '0.85rem' }}>
-          <Icon icon="it-comment" size="xs" className="me-1" />
-          {t('chatPreviewTitle')}
-        </div>
-        <div className="text-muted" style={{ fontSize: '0.75rem' }}>
-          {t('chatPreviewHint')}
-        </div>
+    <div className="wr-chat">
+      <div className="wr-chat__head">
+        <span className="wr-chat__icon" aria-hidden="true">
+          <Icon icon="it-comment" size="sm" />
+        </span>
+        <span>
+          <span className="wr-chat__title">{t('chatPreviewTitle')}</span>
+          <span className="wr-chat__hint">{t('chatPreviewHint')}</span>
+        </span>
       </div>
       {nameValid ? (
-        // Abbastanza alta per leggere qualche messaggio sopra il riquadro di
-        // scrittura, che ora cresce con il testo.
-        <div style={{ height: 360, display: 'flex', flexDirection: 'column' }}>
+        <div className="wr-chat__body">
           <ChatPanel
             eventSlug={event.slug}
             token={chatToken}
@@ -1004,12 +1039,9 @@ export default function WaitingRoom({
           />
         </div>
       ) : (
-        <div
-          className="d-flex flex-column align-items-center justify-content-center text-center p-4"
-          style={{ height: 220, backgroundColor: '#F5F7FA', color: 'var(--app-muted)' }}
-        >
+        <div className="wr-chat__locked">
           <Icon icon="it-lock" size="sm" className="mb-2" />
-          <div style={{ fontSize: '0.85rem' }}>{t('chatLockedMessage')}</div>
+          <div>{t('chatLockedMessage')}</div>
         </div>
       )}
     </div>
@@ -1160,18 +1192,6 @@ export default function WaitingRoom({
             <Spinner active small className="me-2" />
             {t('roomNotReadyButton')}
           </Button>
-          {canPlay && !gameOpen && (
-            <Button
-              color="primary"
-              outline
-              className="fw-semibold"
-              innerRef={piazzaAttesaRef}
-              onClick={() => setGameOpen(true)}
-            >
-              <Icon icon="it-map-marker-circle" size="sm" color="primary" className="me-2" />
-              {t('roomNotReadyPiazza')}
-            </Button>
-          )}
         </>
       ) : canEnterLive ? (
         <>
@@ -1356,38 +1376,46 @@ export default function WaitingRoom({
     </PhaserLobbyBoundary>
   ) : null;
 
-  // Il riquadro laterale ora ospita solo la chat: aspettare insieme agli altri
-  // non era la parte che stava in mezzo.
-  const asideBox = chatPreviewBlock ? (
-    <Card className="wr-aside shadow-sm border-0">
-      <div className="wr-aside__head">
-        <span className="fw-semibold">{t('whileYouWait')}</span>
-      </div>
-      <div className="wr-aside__body">{chatPreviewBlock}</div>
-    </Card>
-  ) : null;
-
-  // L'invito al gioco: un riquadro nella colonna principale, sotto i controlli.
-  // È il "pulsante o infografica" chiesto — un gesto esplicito, non una scena
-  // che parte addosso a chi è arrivato per prepararsi.
-  // L'invito alla piazza: uno solo per schermata. Finche' si resta in attesa la
-  // proposta sta gia' sotto al pulsante d'ingresso, dove serve — qui sarebbe la
-  // stessa cosa detta due volte.
-  const gameInvite = canPlay && !gameOpen && ingressoConsentito ? (
-    <button
-      type="button"
-      className="wr-game-invite"
-      ref={inviteRef}
-      onClick={() => setGameOpen(true)}
-    >
-      <span className="wr-game-invite__art" aria-hidden="true">
-        <Icon icon="it-map-marker-circle" color="primary" />
+  // La colonna laterale: la chat dell'evento a tutta altezza e, sotto, la
+  // piazza come POSTO ALTERNATIVO dove aspettare (quando l'evento la prevede):
+  // non un passaggio da fare prima di entrare.
+  const piazzaCard = canPlay && !gameOpen ? (
+    <button type="button" className="wr-piazza-card" ref={inviteRef} onClick={() => setGameOpen(true)}>
+      <span className="wr-piazza-card__art" aria-hidden="true">
+        <svg viewBox="0 0 64 64" width="56" height="56">
+          <rect x="2" y="2" width="60" height="60" rx="16" fill="#e3f0fc" />
+          <path d="M8 46c10-6 18-6 24 0s16 6 24 0v12H8z" fill="#bfe3d0" />
+          <circle cx="18" cy="24" r="7" fill="#66b98f" />
+          <rect x="17" y="30" width="2" height="8" fill="#5a7d6a" />
+          <circle cx="46" cy="22" r="6" fill="#66b98f" />
+          <rect x="45" y="27" width="2" height="8" fill="#5a7d6a" />
+          <circle cx="32" cy="38" r="5" fill="#0066cc" />
+          <circle cx="32" cy="31" r="3.2" fill="#ffcc80" />
+          <circle cx="40" cy="44" r="4" fill="#d9364f" />
+          <circle cx="40" cy="38.5" r="2.6" fill="#ffcc80" />
+        </svg>
       </span>
-      <span>
-        <span className="wr-game-invite__title">{t('enterGardenTitle')}</span>
-        <span className="wr-game-invite__hint">{t('enterGardenHint')}</span>
+      <span className="wr-piazza-card__text">
+        <span className="wr-piazza-card__kicker">{t('piazzaAltKicker')}</span>
+        <span className="wr-piazza-card__title">{t('enterGardenTitle')}</span>
+        <span className="wr-piazza-card__hint">{t('enterGardenHint')}</span>
+      </span>
+      <span className="wr-piazza-card__go" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"
+             strokeLinecap="round" strokeLinejoin="round">
+          <line x1="5" y1="12" x2="19" y2="12" />
+          <polyline points="12 5 19 12 12 19" />
+        </svg>
       </span>
     </button>
+  ) : null;
+
+  const asideBox = chatPreviewBlock || piazzaCard ? (
+    <aside className="wr-aside" aria-labelledby="wr-aside-title">
+      <h2 className="wr-aside__title" id="wr-aside-title">{t('whileYouWait')}</h2>
+      {chatPreviewBlock}
+      {piazzaCard}
+    </aside>
   ) : null;
 
   const statusBadge = isLive ? (
@@ -1401,6 +1429,172 @@ export default function WaitingRoom({
     </span>
   ) : null;
 
+  // Chi c'è: in diretta (solo a evento avviato) e in sala d'attesa. Non è una
+  // regione che si annuncia: cambierebbe ogni quindici secondi.
+  const presenzeBlock = !isEnded && presenze ? (
+    <div className="wr-presence" aria-label={t('presenceTitle')} role="group">
+      {isLive && (
+        <span className="wr-presence__item wr-presence__item--live" key={`d-${presenze.inDiretta}`}>
+          <span className="wr-presence__dot" aria-hidden="true" />
+          {t('presenceLive', { count: presenze.inDiretta })}
+        </span>
+      )}
+      <span className="wr-presence__item" key={`a-${presenze.inAttesa}`}>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+             strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+          <circle cx="9" cy="7" r="4" />
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+          <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+        </svg>
+        {t('presenceWaiting', { count: presenze.inAttesa })}
+      </span>
+    </div>
+  ) : null;
+
+  // ── Il riepilogo: quando, chi organizza, chi conduce e chi interviene, la
+  // registrazione, di cosa si parla; e i link da condividere.
+  const durataMin = Math.max(0, Math.round((endsAtMs - startsAtMs) / 60_000));
+  const ore = Math.floor(durataMin / 60);
+  const minuti = durataMin % 60;
+  const durataTesto =
+    ore === 0
+      ? t('durationMinutes', { minutes: minuti })
+      : minuti === 0
+        ? t('durationHours', { hours: ore })
+        : t('durationHoursMinutes', { hours: ore, minutes: minuti });
+  const enti = event.riepilogo?.enti ?? [];
+  const persone = event.riepilogo?.persone ?? [];
+  const conduzione = persone.filter((p) => p.role !== 'speaker');
+  const relatori = persone.filter((p) => p.role === 'speaker');
+  const nomiPersone = (lista: PersonaPubblica[]) =>
+    lista.map((p) => (p.organization ? `${p.name} (${p.organization})` : p.name)).join(', ');
+  const descrizione = event.riepilogo?.descrizione?.trim() || null;
+
+  const fatto = (chiave: string, icona: ReactNode, etichetta: string, valore: ReactNode, sotto?: ReactNode) => (
+    <li className="wr-fact" key={chiave}>
+      <span className="wr-fact__icon" aria-hidden="true">{icona}</span>
+      <span className="wr-fact__body">
+        <span className="wr-fact__label">{etichetta}</span>
+        <span className="wr-fact__value">{valore}</span>
+        {sotto && <span className="wr-fact__sub">{sotto}</span>}
+      </span>
+    </li>
+  );
+  const svg = (children: ReactNode) => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+         strokeLinecap="round" strokeLinejoin="round">
+      {children}
+    </svg>
+  );
+  const fatti: ReactNode[] = [
+    fatto(
+      'quando',
+      svg(<><rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></>),
+      t('summaryWhen'),
+      `${dateLabel} · ${startTimeLabel} – ${endTimeLabel}`,
+      durataTesto,
+    ),
+  ];
+  if (enti.length > 0 || event.organizerName) {
+    fatti.push(
+      fatto(
+        'enti',
+        svg(<><path d="M3 21h18" /><path d="M5 21V8l7-5 7 5v13" /><path d="M9 21v-6h6v6" /></>),
+        te('detail.organizedBy'),
+        enti.length > 0 ? enti.map((e) => e.name).join(', ') : event.organizerName,
+      ),
+    );
+  }
+  // Solo chi l'organizzazione ha scelto di pubblicare, come sulla pagina
+  // dell'evento: il nome del moderatore non pubblicato resta riservato.
+  if (conduzione.length > 0) {
+    fatti.push(
+      fatto(
+        'conduzione',
+        svg(<><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></>),
+        te('detail.peopleModerators'),
+        nomiPersone(conduzione),
+      ),
+    );
+  }
+  if (relatori.length > 0 || event.speakers) {
+    fatti.push(
+      fatto(
+        'relatori',
+        svg(<><rect x="9" y="2" width="6" height="12" rx="3" /><path d="M5 10a7 7 0 0 0 14 0" /><line x1="12" y1="17" x2="12" y2="22" /></>),
+        te('detail.speakers'),
+        relatori.length > 0 ? nomiPersone(relatori) : event.speakers,
+      ),
+    );
+  }
+  // La registrazione è un'informazione, non un allarme.
+  if (event.recordingEnabled && !isEnded) {
+    fatti.push(
+      fatto(
+        'registrazione',
+        <span className="wr-fact__rec" />,
+        t('summaryRecording'),
+        t('recordingNotice'),
+      ),
+    );
+  }
+
+  const linkPaginaEvento =
+    condivisione?.hasPublicPage && eventType !== 'INSTANT' ? (
+      <Link href={percorso(`/events/${event.slug}`)} className="wr-link">
+        {svg(<><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" /><polyline points="15 3 21 3 21 9" /><line x1="10" y1="14" x2="21" y2="3" /></>)}
+        {t('eventPageLink')}
+      </Link>
+    ) : null;
+
+  const riepilogoBlock = (
+    <section className="wr-summary" aria-labelledby="wr-summary-title">
+      <h2 className="wr-section-title" id="wr-summary-title">{t('summaryTitle')}</h2>
+      <ul className="wr-facts">{fatti}</ul>
+      {descrizione && (
+        <div className="wr-about">
+          <div
+            ref={descrizioneRef}
+            className={`wr-about__text${descrizioneAperta ? '' : ' is-clamped'}${descrizioneLunga ? '' : ' is-short'}`}
+            id="wr-about-text"
+          >
+            <div ref={descrizioneContenutoRef}>
+              <MarkdownRenderer content={descrizione} />
+            </div>
+          </div>
+          {(descrizioneLunga || descrizioneAperta) && (
+          <button
+            type="button"
+            className="wr-about__toggle"
+            aria-expanded={descrizioneAperta}
+            aria-controls="wr-about-text"
+            onClick={() => setDescrizioneAperta((v) => !v)}
+          >
+            {descrizioneAperta ? t('readLess') : t('readMore')}
+          </button>
+          )}
+        </div>
+      )}
+      {(linkPaginaEvento || condivisione) && (
+        <div className="wr-summary__links">
+          {linkPaginaEvento}
+          {condivisione && !isEnded && (
+            <span className="wr-share">
+              <LiveShareButton
+                slug={event.slug}
+                locale={condivisione.locale}
+                moderatorToken={condivisione.moderatorToken}
+                hasPublicPage={condivisione.hasPublicPage}
+                hasCallLink={condivisione.hasCallLink}
+              />
+            </span>
+          )}
+        </div>
+      )}
+    </section>
+  );
+
   return (
     <div
       className={piazzaOpen ? 'waiting-shell waiting-shell--piazza' : 'waiting-shell'}
@@ -1410,10 +1604,8 @@ export default function WaitingRoom({
       // fuori gioco. Qui non lo è: il guscio copre la finestra, ma
       // l'intestazione e il piè di pagina del sito restano raggiungibili col
       // Tab, e stanno FUORI da questo componente — da qui non si possono
-      // rendere inerti. Una trappola del fuoco l'avrebbe reso vero; la mia
-      // sbagliava in tre modi, e una trappola rotta intrappola davvero. Meglio
-      // annunciare quello che questa cosa è: una parte di pagina, con un nome.
-      // Esc la chiude comunque.
+      // rendere inerti. Annunciamo quello che questa cosa è: una parte di
+      // pagina, con un nome. Esc la chiude comunque.
       {...(piazzaOpen
         ? { role: 'region' as const, 'aria-label': t('gardenDialogLabel') }
         : {})}
@@ -1423,68 +1615,33 @@ export default function WaitingRoom({
           aprendo e chiudendo la piazza — niente smontaggi, niente fotocamera
           riacquisita, niente bozze perse. */}
       {piazzaStage}
-      <div className="container py-4 py-md-5">
+      <div className="container py-4 py-md-5 wr-page">
         <div className="row g-4 justify-content-center">
-          <div className={asideBox ? 'col-lg-7 col-xl-6' : 'col-lg-8 col-xl-7'}>
+          <div className={asideBox ? 'col-lg-7' : 'col-lg-8 col-xl-7'}>
             <Card
-              className={`waiting-card shadow-sm border-0 overflow-hidden${heroUrl ? '' : ' waiting-card--plain'}`}
-              style={{ borderRadius: 16 }}
+              className={`waiting-card wr-card shadow-sm border-0${heroUrl ? '' : ' waiting-card--plain'}`}
             >
-              {/* La fascia c'e' solo se c'e' un'immagine da mostrare: vuota era
-                  un rettangolo blu alto 160 px che spingeva tutto in basso. */}
+              {/* La fascia c'e' solo se c'e' un'immagine da mostrare. */}
               {heroUrl && (
                 <div
                   className="waiting-hero"
-                  style={{
-                    height: 160,
-                    background: `url("${heroUrl}") center/cover no-repeat`,
-                    position: 'relative',
-                  }}
+                  style={{ background: `url("${heroUrl}") center/cover no-repeat` }}
                 >
-                  {statusBadge && (
-                    <div className="position-absolute" style={{ top: 12, right: 12 }}>
-                      {statusBadge}
-                    </div>
-                  )}
+                  {statusBadge && <div className="waiting-hero__badge">{statusBadge}</div>}
                 </div>
               )}
 
               <CardBody className="p-4 p-md-5">
-                {!heroUrl && statusBadge && <div className="mb-3">{statusBadge}</div>}
+                {!heroUrl && statusBadge && <div className="mb-3 wr-reveal">{statusBadge}</div>}
                 <EventTitle
                   title={event.title}
                   kickerEnabled={event.parseTitleKicker ?? false}
                   as="h1"
-                  className="h4 fw-bold mb-2"
+                  className="h3 fw-bold mb-3 wr-reveal"
                   style={{ color: 'var(--app-text)' }}
                 />
 
-                {organizerLine && (
-                  <p className="text-muted mb-2" style={{ fontSize: '0.9rem' }}>{organizerLine}</p>
-                )}
-
-                {event.moderatorName && (
-                  <p className="text-muted mb-2" style={{ fontSize: '0.85rem' }}>
-                    <Icon icon="it-user" size="xs" className="me-1" />
-                    {t('moderatedBy', { name: event.moderatorName })}
-                  </p>
-                )}
-
-                <div className="text-muted mb-3" style={{ fontSize: '0.9rem' }}>
-                  <Icon icon="it-calendar" size="xs" className="me-1" />
-                  {dateLabel}
-                  {' · '}
-                  {startTimeLabel} – {endTimeLabel}
-                </div>
-
-                {participantCount > 0 && (
-                  <div className="text-muted mb-3" style={{ fontSize: '0.9rem' }}>
-                    <Icon icon="it-user" size="xs" className="me-1" />
-                    {isLive
-                      ? t('connectedParticipants', { count: participantCount })
-                      : t('peopleWaiting', { count: participantCount })}
-                  </div>
-                )}
+                {presenzeBlock && <div className="mb-3 wr-reveal">{presenzeBlock}</div>}
 
                 {isPublished && countdown && (
                   <div className={`waiting-countdown mb-4${pulseCountdown ? ' waiting-countdown--pulse' : ''}`}>
@@ -1496,12 +1653,7 @@ export default function WaitingRoom({
                 {/* "Sta per iniziare, attendi l'organizzatore": non al moderatore —
                     l'organizzatore è lui, e ha accanto il bottone "Avvia evento". */}
                 {isPublished && startingSoon && !isModerator && (
-                  <div
-                    className="rounded-3 p-3 mb-4 text-center d-flex align-items-center justify-content-center"
-                    role="status"
-                    aria-live="polite"
-                    style={{ background: 'var(--app-emphasis-bg, #eef4fb)', color: 'var(--app-text)' }}
-                  >
+                  <div className="wr-soon mb-4" role="status" aria-live="polite">
                     <Spinner active small className="me-2" />
                     <span className="fw-semibold">{t('startingSoon')}</span>
                   </div>
@@ -1511,24 +1663,32 @@ export default function WaitingRoom({
                   <div className="mb-4">{statusBanners}</div>
                 )}
 
+                <div className="mb-4 wr-reveal">{riepilogoBlock}</div>
+
                 {/* Da http:// il browser nega microfono e videocamera: lo si dice
                     qui, con l'indirizzo sicuro, invece di una prova dei
                     dispositivi che chiede un permesso impossibile. */}
                 {!isEnded && <InsecureContextNotice className="mb-3" />}
-                {!isEnded && <div className="wr-name-field mb-3">{nameField}</div>}
+                {!isEnded && (
+                  <div
+                    className={`wr-name-field mb-3${
+                      nomeNoto && !nameValid ? ' wr-name-field--empty' : ''
+                    }${nomeSegnalato ? ' wr-name-field--insist' : ''}`}
+                  >
+                    {nameField}
+                  </div>
+                )}
                 {/* La foto al posto delle iniziali: solo per chi ha un'email
                     dietro al token (lo dice il server). */}
                 {!isEnded && chatToken && (
                   <ProfilePhotoField eventSlug={event.slug} token={chatToken} name={name} />
                 )}
                 {/* Email: solo per gli ospiti (i registrati l'hanno già data,
-                    per moderatori/speaker è irrilevante). Il valore non è ancora
-                    inviato al server: campo di cortesia locale finché non c'è un
-                    consumer reale del follow-up. */}
+                    per moderatori/speaker è irrilevante). */}
                 {!isEnded && isGuest && (
-                  <div className="mb-3">{emailField}</div>
+                  <div className="mb-4 wr-email-field">{emailField}</div>
                 )}
-                {!isEnded && <div className="mb-3">{deviceCheckField}</div>}
+                {!isEnded && <div className="mb-4">{deviceCheckField}</div>}
 
                 {isPublished && !notHeld && event.waitingRoomAudioUrl && (
                   <div className="mb-4 d-flex justify-content-center">
@@ -1601,10 +1761,8 @@ export default function WaitingRoom({
                   </div>
                 )}
 
-                {gameInvite && <div className="mb-3">{gameInvite}</div>}
-                <div className="mb-3">{netiquetteBlock}</div>
-                {recordingNoticeBlock && <div className="mb-3">{recordingNoticeBlock}</div>}
                 {aiNoticeBlock && <div className="mb-3">{aiNoticeBlock}</div>}
+                <div className="mb-3">{netiquetteBlock}</div>
                 {backLinkBlock && <div className="text-center">{backLinkBlock}</div>}
 
                 {isPublished && !notHeld && !isModerator && (
@@ -1617,7 +1775,7 @@ export default function WaitingRoom({
             </Card>
           </div>
 
-          {asideBox && <div className="col-lg-5 col-xl-5">{asideBox}</div>}
+          {asideBox && <div className="col-lg-5">{asideBox}</div>}
         </div>
       </div>
     </div>

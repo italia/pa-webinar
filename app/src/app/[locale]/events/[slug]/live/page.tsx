@@ -21,6 +21,7 @@ import { resolveRnnoiseEnforceOff } from '@/lib/jitsi/rnnoise';
 import { resolveWhiteboardInfraReady } from '@/lib/jitsi/whiteboard';
 import { localizedPath } from '@/lib/utils/localized-url';
 import { OVERTIME_CAP_DEFAULT_MINUTES } from '@/lib/events/overtime-defaults';
+import { entiEPersonePubblici, PERSONE_PUBBLICHE_INCLUDE } from '@/lib/events/public-people';
 
 export const dynamic = 'force-dynamic';
 
@@ -44,12 +45,23 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
 
   const event = await prisma.event.findUnique({
     where: { slug },
-    include: { _count: { select: { registrations: true } } },
+    include: {
+      _count: { select: { registrations: true } },
+      // Per il riepilogo della sala d'attesa: gli stessi enti e le stesse
+      // persone che mostra la pagina pubblica (lib/events/public-people).
+      ...PERSONE_PUBBLICHE_INCLUDE,
+    },
   });
 
   if (!event) {
     notFound();
   }
+
+  // Il riepilogo della sala d'attesa: descrizione, enti e persone.
+  const riepilogo = {
+    descrizione: getLocalized(event.description as LocalizedField, locale) || null,
+    ...entiEPersonePubblici(event, tryDecryptPII),
+  };
 
   // IDLE / PROVISIONING used to redirect users to a dedicated
   // "Sala in allestimento" spinner. Demo feedback: by the time the
@@ -177,6 +189,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
             participantsCanShareScreen: event.participantsCanShareScreen,
             organizerName: event.organizerName,
             moderatorName: event.moderatorName,
+            riepilogo,
             imageUrl: event.imageUrl,
             coverImageUrl: event.coverImageUrl,
             maxParticipants: event.maxParticipants,
@@ -299,6 +312,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
         participantsCanShareScreen: event.participantsCanShareScreen,
         organizerName: event.organizerName,
         moderatorName: event.moderatorName,
+        riepilogo,
         imageUrl: event.imageUrl,
         coverImageUrl: event.coverImageUrl,
         maxParticipants: event.maxParticipants,
