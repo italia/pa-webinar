@@ -282,11 +282,6 @@
     "activeVsRegistered": "{active} aktivnih · {registered} prijavljenih",
     "enterFullscreen": "Celozaslonski način",
     "exitFullscreen": "Izhod iz celozaslonskega načina",
-    "overtime": {
-      "withCountdown": "Predvideni čas zaključka je potekel. Dogodek se bo samodejno zaključil čez {minutes, plural, one {# minuto} two {# minuti} few {# minute} other {# minut}}.",
-      "closingNow": "Čas zaključka je dosežen. Dogodek se bo kmalu zaključil.",
-      "indefinite": "Predvideni čas zaključka je potekel. Dogodek bo aktiven, dokler so povezani udeleženci."
-    },
     "recordingActive": "Snemanje poteka",
     "recordingShort": "REC",
     "recordingConsent": "Ta dogodek se snema. Z vstopom soglašate z avdio/video snemanjem.",
@@ -357,7 +352,6 @@
     "qaSidebarPlaceholder": "Plošča Q&A bo na voljo, ko se dogodek začne.",
     "invalidToken": "Neveljavna povezava. Preverite povezavo, ki ste jo prejeli po e-pošti.",
     "sidebarTabQa": "Q&A",
-    "liveFeaturesLabel": "Funkcije:",
     "whiteboardNotSavedHint": "Tabla se ne shranjuje samodejno. Če jo uporabljate, jo izvozite (meni table) in jo pripnite h gradivom dogodka, preden ga končate.",
     "sidebarTabChat": "Klepet",
     "sidebarTabPolls": "Ankete",
@@ -527,12 +521,6 @@
       "moderatorLink": "Moderatorska povezava",
       "moderatorLinkHint": "Kdor odpre to povezavo, se pridruži kot moderator s polnim nadzorom nad sobo."
     },
-    "timer": {
-      "show": "Pokaži števec",
-      "hide": "Skrij števec",
-      "remainingLabel": "Preostali čas (kliknite za pretečeni čas)",
-      "elapsedLabel": "Pretečeni čas (kliknite za preostali čas)"
-    },
     "videoCallFrameTitle": "Videoklic dogodka",
     "insecureContextTitle": "Nevarni naslov",
     "insecureContextBody": "Ta stran je odprta prek http://: brskalnik ne dovoli uporabe mikrofona in kamere, zato se videoklic ne more začeti. Odprite isto stran na varnem naslovu.",
@@ -550,7 +538,36 @@
     "resizeSidebar": "Spremeni velikost stranske plošče",
     "collapseSidebar": "Strni ploščo",
     "expandSidebar": "Razširi ploščo",
-    "sidebarTabWordcloudNew": "Novo vprašanje »Z eno besedo«"
+    "sidebarTabWordcloudNew": "Novo vprašanje »Z eno besedo«",
+    "strip": {
+      "label": "Čas dogodka",
+      "onAir": "V živo",
+      "progressLabel": "Potek dogodka glede na predvideni čas",
+      "endsAt": "konec ob {time} · {minutes, plural, =0 {zadnja minuta} one {še # minuta} two {še # minuti} few {še # minute} other {še # minut}}",
+      "overtimeOpen": "prekoračeno za {minutes, plural, =0 {manj kot minuto} one {# minuto} two {# minuti} few {# minute} other {# minut}} · ostane odprto, dokler je kdo tu",
+      "overtimeClosing": "prekoračeno za {minutes, plural, =0 {manj kot minuto} one {# minuto} two {# minuti} few {# minute} other {# minut}} · zaprtje čez {closing, plural, one {# minuto} two {# minuti} few {# minute} other {# minut}}",
+      "timerChip": "Govor",
+      "timerChipLabel": "Časovnik govora: {time}. Odpri režijo",
+      "recOnLabel": "Snemanje traja {time}. Odpri režijo",
+      "recOff": "Ne snema",
+      "recOffLabel": "Ne snema. Odprite režijo za začetek",
+      "startsAt": "začetek ob {time} · čez {minutes, plural, =0 {manj kot minuto} one {# minuto} two {# minuti} few {# minute} other {# minut}}",
+      "closingNow": "prekoračeno za {minutes, plural, =0 {manj kot minuto} one {# minuto} two {# minuti} few {# minute} other {# minut}} · soba se zapira",
+      "timerPaused": "zaustavljeno"
+    },
+    "controlRoom": {
+      "tab": "Režija",
+      "recordingHeading": "Snemanje",
+      "recordingOff": "Ne snema",
+      "stopConfirm": "Ustavim snemanje zdaj?",
+      "featuresHeading": "Funkcije sobe",
+      "featuresHelp": "Vklopijo in izklopijo se za vse, takoj.",
+      "timerHelp": "Odštevanje za govorca: lahko ga pokažete vsej sobi.",
+      "eventHeading": "Dogodek",
+      "endHelp": "Zapre sobo za vse in označi dogodek kot končan. Tega ni mogoče razveljaviti.",
+      "timerHeading": "Časovnik govorov"
+    },
+    "closingNotice": "{minutes, plural, =0 {Soba se zapira.} one {Soba se samodejno zapre čez # minuto.} two {Soba se samodejno zapre čez # minuti.} few {Soba se samodejno zapre čez # minute.} other {Soba se samodejno zapre čez # minut.}}"
   },
   "qa": {
     "title": "Vprašanja in odgovori",

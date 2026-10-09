@@ -282,11 +282,6 @@
     "activeVsRegistered": "{active} aktyvūs · {registered} registruoti",
     "enterFullscreen": "Visas ekranas",
     "exitFullscreen": "Išjungti viso ekrano režimą",
-    "overtime": {
-      "withCountdown": "Numatytas pabaigos laikas praėjo. Renginys bus automatiškai uždarytas po {minutes, plural, one {# minutės} other {# minučių}}.",
-      "closingNow": "Pabaigos laikas pasiektas. Renginys netrukus bus uždarytas.",
-      "indefinite": "Numatytas pabaigos laikas praėjo. Renginys liks aktyvus, kol bus prisijungusių dalyvių."
-    },
     "recordingActive": "Vyksta įrašymas",
     "recordingShort": "REC",
     "recordingConsent": "Šis renginys yra įrašomas. Įeidami sutinkate su garso/vaizdo įrašymu.",
@@ -357,7 +352,6 @@
     "qaSidebarPlaceholder": "Q&A skydelis bus prieinamas, kai renginys prasidės.",
     "invalidToken": "Negaliojanti nuoroda. Patikrinkite nuorodą, gautą el. paštu.",
     "sidebarTabQa": "Q&A",
-    "liveFeaturesLabel": "Funkcijos:",
     "whiteboardNotSavedHint": "Lenta automatiškai neišsaugoma. Jei ja naudojatės, prieš užbaigdami eksportuokite ją (lentos meniu) ir pridėkite prie renginio medžiagos.",
     "sidebarTabChat": "Pokalbis",
     "sidebarTabPolls": "Apklausos",
@@ -527,12 +521,6 @@
       "moderatorLink": "Moderatoriaus nuoroda",
       "moderatorLinkHint": "Kas atidaro šią nuorodą, prisijungia kaip moderatorius su visomis valdymo teisėmis."
     },
-    "timer": {
-      "show": "Rodyti laikmatį",
-      "hide": "Slėpti laikmatį",
-      "remainingLabel": "Likęs laikas (spustelėkite, kad matytumėte praėjusį)",
-      "elapsedLabel": "Praėjęs laikas (spustelėkite, kad matytumėte likusį)"
-    },
     "videoCallFrameTitle": "Renginio vaizdo skambutis",
     "insecureContextTitle": "Nesaugus adresas",
     "insecureContextBody": "Šis puslapis atidarytas per http://: naršyklė neleidžia naudoti mikrofono ir kameros, todėl vaizdo skambutis negali prasidėti. Atidarykite tą patį puslapį saugiu adresu.",
@@ -550,7 +538,36 @@
     "resizeSidebar": "Keisti šoninio skydelio dydį",
     "collapseSidebar": "Suskleisti skydelį",
     "expandSidebar": "Išskleisti skydelį",
-    "sidebarTabWordcloudNew": "Naujas klausimas „Vienu žodžiu“"
+    "sidebarTabWordcloudNew": "Naujas klausimas „Vienu žodžiu“",
+    "strip": {
+      "label": "Renginio laikas",
+      "onAir": "Eteryje",
+      "progressLabel": "Renginio eiga, palyginti su numatytu laiku",
+      "endsAt": "pabaiga {time} · {minutes, plural, =0 {paskutinė minutė} one {liko # minutė} few {liko # minutės} many {liko # minutės} other {liko # minučių}}",
+      "overtimeOpen": "viršyta {minutes, plural, =0 {mažiau nei minute} one {# minute} few {# minutėmis} many {# minutės} other {# minučių}} · liks atvira, kol kas nors yra",
+      "overtimeClosing": "viršyta {minutes, plural, =0 {mažiau nei minute} one {# minute} few {# minutėmis} many {# minutės} other {# minučių}} · užsidarys po {closing, plural, one {# minutės} few {# minučių} many {# minutės} other {# minučių}}",
+      "timerChip": "Pranešimas",
+      "timerChipLabel": "Pranešimo laikmatis: {time}. Atidaryti valdymo pultą",
+      "recOnLabel": "Įrašoma {time}. Atidaryti valdymo pultą",
+      "recOff": "Neįrašoma",
+      "recOffLabel": "Neįrašoma. Atidarykite valdymo pultą, kad pradėtumėte",
+      "startsAt": "pradžia {time} · po {minutes, plural, =0 {mažiau nei minutės} one {# minutės} few {# minučių} many {# minutės} other {# minučių}}",
+      "closingNow": "viršyta {minutes, plural, =0 {mažiau nei minute} one {# minute} few {# minutėmis} many {# minutės} other {# minučių}} · kambarys užsidaro",
+      "timerPaused": "pristabdyta"
+    },
+    "controlRoom": {
+      "tab": "Valdymas",
+      "recordingHeading": "Įrašymas",
+      "recordingOff": "Neįrašoma",
+      "stopConfirm": "Sustabdyti įrašymą dabar?",
+      "featuresHeading": "Kambario funkcijos",
+      "featuresHelp": "Jos įjungiamos ir išjungiamos visiems iš karto.",
+      "timerHelp": "Atgalinis skaičiavimas kalbančiajam: galite jį parodyti visam kambariui.",
+      "eventHeading": "Renginys",
+      "endHelp": "Uždaro kambarį visiems ir pažymi renginį kaip baigtą. Atšaukti negalima.",
+      "timerHeading": "Pranešimų laikmatis"
+    },
+    "closingNotice": "{minutes, plural, =0 {Kambarys užsidaro.} one {Kambarys automatiškai užsidarys po # minutės.} few {Kambarys automatiškai užsidarys po # minučių.} many {Kambarys automatiškai užsidarys po # minutės.} other {Kambarys automatiškai užsidarys po # minučių.}}"
   },
   "qa": {
     "title": "Klausimai ir atsakymai",

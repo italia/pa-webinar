@@ -282,11 +282,6 @@
     "activeVsRegistered": "{active} aktivnih · {registered} prijavljenih",
     "enterFullscreen": "Cijeli zaslon",
     "exitFullscreen": "Izađi iz cijelog zaslona",
-    "overtime": {
-      "withCountdown": "Predviđeno vrijeme završetka je proteklo. Događaj će se automatski zatvoriti za {minutes, plural, one {# minutu} few {# minute} other {# minuta}}.",
-      "closingNow": "Vrijeme završetka je dosegnuto. Događaj se zatvara.",
-      "indefinite": "Predviđeno vrijeme završetka je proteklo. Događaj ostaje aktivan dok su sudionici povezani."
-    },
     "recordingActive": "Snimanje u tijeku",
     "recordingShort": "REC",
     "recordingConsent": "Ovaj događaj se snima. Ulaskom pristajete na audio/video snimanje.",
@@ -357,7 +352,6 @@
     "qaSidebarPlaceholder": "Ploča Q&A bit će dostupna kada događaj počne.",
     "invalidToken": "Nevaljana poveznica. Provjerite poveznicu primljenu emailom.",
     "sidebarTabQa": "Q&A",
-    "liveFeaturesLabel": "Funkcije:",
     "whiteboardNotSavedHint": "Ploča se ne sprema automatski. Ako je koristiš, izvezi je (izbornik ploče) i priloži je materijalima događaja prije završetka.",
     "sidebarTabChat": "Razgovor",
     "sidebarTabPolls": "Ankete",
@@ -527,12 +521,6 @@
       "moderatorLink": "Moderatorska poveznica",
       "moderatorLinkHint": "Tko otvori ovu poveznicu ulazi kao moderator s punim ovlastima upravljanja sobom."
     },
-    "timer": {
-      "show": "Prikaži brojač",
-      "hide": "Sakrij brojač",
-      "remainingLabel": "Preostalo vrijeme (klikni za proteklo vrijeme)",
-      "elapsedLabel": "Proteklo vrijeme (klikni za preostalo vrijeme)"
-    },
     "videoCallFrameTitle": "Videopoziv događaja",
     "insecureContextTitle": "Nesigurna adresa",
     "insecureContextBody": "Ova je stranica otvorena putem http://: preglednik ne dopušta upotrebu mikrofona i kamere, pa videopoziv ne može započeti. Otvorite istu stranicu na sigurnoj adresi.",
@@ -550,7 +538,36 @@
     "resizeSidebar": "Promijeni veličinu bočne ploče",
     "collapseSidebar": "Sažmi ploču",
     "expandSidebar": "Proširi ploču",
-    "sidebarTabWordcloudNew": "Novo pitanje „Jednom riječju”"
+    "sidebarTabWordcloudNew": "Novo pitanje „Jednom riječju”",
+    "strip": {
+      "label": "Vrijeme događaja",
+      "onAir": "U eteru",
+      "progressLabel": "Napredak događaja u odnosu na predviđeno vrijeme",
+      "endsAt": "završetak u {time} · {minutes, plural, =0 {posljednja minuta} one {preostaje # minuta} few {preostaju # minute} other {preostaje # minuta}}",
+      "overtimeOpen": "prekoračenje {minutes, plural, =0 {manje od minute} one {# minutu} few {# minute} other {# minuta}} · ostaje otvoreno dok je netko tu",
+      "overtimeClosing": "prekoračenje {minutes, plural, =0 {manje od minute} one {# minutu} few {# minute} other {# minuta}} · zatvara se za {closing, plural, one {# minutu} few {# minute} other {# minuta}}",
+      "timerChip": "Izlaganje",
+      "timerChipLabel": "Mjerač izlaganja: {time}. Otvori režiju",
+      "recOnLabel": "Snimanje traje {time}. Otvori režiju",
+      "recOff": "Ne snima se",
+      "recOffLabel": "Ne snima se. Otvori režiju za pokretanje",
+      "startsAt": "početak u {time} · za {minutes, plural, =0 {manje od minute} one {# minutu} few {# minute} other {# minuta}}",
+      "closingNow": "prekoračenje {minutes, plural, =0 {manje od minute} one {# minutu} few {# minute} other {# minuta}} · soba se zatvara",
+      "timerPaused": "pauzirano"
+    },
+    "controlRoom": {
+      "tab": "Režija",
+      "recordingHeading": "Snimanje",
+      "recordingOff": "Ne snima se",
+      "stopConfirm": "Zaustaviti snimanje sada?",
+      "featuresHeading": "Funkcije sobe",
+      "featuresHelp": "Uključuju se i isključuju za sve, odmah.",
+      "timerHelp": "Odbrojavanje za govornika: možete ga prikazati cijeloj sobi.",
+      "eventHeading": "Događaj",
+      "endHelp": "Zatvara sobu za sve i označava događaj završenim. Ne može se poništiti.",
+      "timerHeading": "Mjerač izlaganja"
+    },
+    "closingNotice": "{minutes, plural, =0 {Soba se zatvara.} one {Soba se automatski zatvara za # minutu.} few {Soba se automatski zatvara za # minute.} other {Soba se automatski zatvara za # minuta.}}"
   },
   "qa": {
     "title": "Pitanja i odgovori",

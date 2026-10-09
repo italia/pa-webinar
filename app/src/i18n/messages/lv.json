@@ -282,11 +282,6 @@
     "activeVsRegistered": "{active} aktīvi · {registered} reģistrēti",
     "enterFullscreen": "Pilnekrāna režīms",
     "exitFullscreen": "Iziet no pilnekrāna režīma",
-    "overtime": {
-      "withCountdown": "Plānotais beigu laiks ir pagājis. Pasākums automātiski beigsies pēc {minutes, plural, one {# minūtes} other {# minūtēm}}.",
-      "closingNow": "Beigu laiks ir sasniegts. Pasākums tūlīt tiks slēgts.",
-      "indefinite": "Plānotais beigu laiks ir pagājis. Pasākums paliks atvērts, kamēr būs pievienoti dalībnieki."
-    },
     "recordingActive": "Notiek ierakstīšana",
     "recordingShort": "REC",
     "recordingConsent": "Šis pasākums tiek ierakstīts. Ieejot jūs piekrītat audio/video ierakstīšanai.",
@@ -357,7 +352,6 @@
     "qaSidebarPlaceholder": "Q&A panelis būs pieejams, kad pasākums sāksies.",
     "invalidToken": "Nederīga saite. Lūdzu, pārbaudiet saiti, ko saņēmāt e-pastā.",
     "sidebarTabQa": "Q&A",
-    "liveFeaturesLabel": "Funkcijas:",
     "whiteboardNotSavedHint": "Tāfele netiek saglabāta automātiski. Ja to izmantojat, eksportējiet to (tāfeles izvēlnē) un pirms pasākuma beigšanas pievienojiet pasākuma materiāliem.",
     "sidebarTabChat": "Tērzēšana",
     "sidebarTabPolls": "Aptaujas",
@@ -527,12 +521,6 @@
       "moderatorLink": "Moderatora saite",
       "moderatorLinkHint": "Ikviens, kas atver šo saiti, pievienojas kā moderators ar pilnām telpas vadības tiesībām."
     },
-    "timer": {
-      "show": "Rādīt taimeri",
-      "hide": "Slēpt taimeri",
-      "remainingLabel": "Atlikušais laiks (noklikšķiniet, lai redzētu pagājušo laiku)",
-      "elapsedLabel": "Pagājušais laiks (noklikšķiniet, lai redzētu atlikušo laiku)"
-    },
     "videoCallFrameTitle": "Pasākuma videozvans",
     "insecureContextTitle": "Nedroša adrese",
     "insecureContextBody": "Šī lapa ir atvērta, izmantojot http://: pārlūkprogramma neļauj izmantot mikrofonu un kameru, tāpēc videozvans nevar sākties. Atveriet to pašu lapu drošajā adresē.",
@@ -550,7 +538,36 @@
     "resizeSidebar": "Mainīt sānu paneļa izmēru",
     "collapseSidebar": "Sakļaut paneli",
     "expandSidebar": "Izvērst paneli",
-    "sidebarTabWordcloudNew": "Jauns jautājums “Vienā vārdā”"
+    "sidebarTabWordcloudNew": "Jauns jautājums “Vienā vārdā”",
+    "strip": {
+      "label": "Pasākuma laiks",
+      "onAir": "Ēterā",
+      "progressLabel": "Pasākuma norise salīdzinājumā ar plānoto laiku",
+      "endsAt": "beigas {time} · {minutes, plural, =0 {pēdējā minūte} one {atlikusi # minūte} other {atlikušas # minūtes}}",
+      "overtimeOpen": "pārsniegts par {minutes, plural, =0 {mazāk nekā minūti} zero {# minūtēm} one {# minūti} other {# minūtēm}} · paliek atvērta, kamēr kāds ir klāt",
+      "overtimeClosing": "pārsniegts par {minutes, plural, =0 {mazāk nekā minūti} zero {# minūtēm} one {# minūti} other {# minūtēm}} · aizvērsies pēc {closing, plural, zero {# minūtēm} one {# minūtes} other {# minūtēm}}",
+      "timerChip": "Uzstāšanās",
+      "timerChipLabel": "Uzstāšanās taimeris: {time}. Atvērt vadības pulti",
+      "recOnLabel": "Ieraksta {time}. Atvērt vadības pulti",
+      "recOff": "Netiek ierakstīts",
+      "recOffLabel": "Netiek ierakstīts. Atveriet vadības pulti, lai sāktu",
+      "startsAt": "sākums {time} · pēc {minutes, plural, =0 {mazāk nekā minūtes} zero {# minūtēm} one {# minūtes} other {# minūtēm}}",
+      "closingNow": "pārsniegts par {minutes, plural, =0 {mazāk nekā minūti} zero {# minūtēm} one {# minūti} other {# minūtēm}} · telpa tiek aizvērta",
+      "timerPaused": "apturēts"
+    },
+    "controlRoom": {
+      "tab": "Vadība",
+      "recordingHeading": "Ierakstīšana",
+      "recordingOff": "Netiek ierakstīts",
+      "stopConfirm": "Apturēt ierakstīšanu tagad?",
+      "featuresHeading": "Telpas funkcijas",
+      "featuresHelp": "Tās ieslēdzas un izslēdzas visiem uzreiz.",
+      "timerHelp": "Atpakaļskaitīšana runātājam: varat to parādīt visai telpai.",
+      "eventHeading": "Pasākums",
+      "endHelp": "Aizver telpu visiem un atzīmē pasākumu kā beigušos. To nevar atsaukt.",
+      "timerHeading": "Uzstāšanos taimeris"
+    },
+    "closingNotice": "{minutes, plural, =0 {Telpa tiek aizvērta.} zero {Telpa automātiski aizvērsies pēc # minūtēm.} one {Telpa automātiski aizvērsies pēc # minūtes.} other {Telpa automātiski aizvērsies pēc # minūtēm.}}"
   },
   "qa": {
     "title": "Jautājumi un atbildes",

@@ -282,11 +282,6 @@
     "activeVsRegistered": "{active} activos · {registered} registrados",
     "enterFullscreen": "Pantalla completa",
     "exitFullscreen": "Salir de la pantalla completa",
-    "overtime": {
-      "withCountdown": "La hora de finalización prevista ya ha pasado. El evento se cerrará automáticamente en {minutes, plural, one {# minuto} other {# minutos}}.",
-      "closingNow": "Se ha alcanzado la hora de finalización. El evento está a punto de cerrarse.",
-      "indefinite": "La hora de finalización prevista ya ha pasado. El evento permanecerá activo mientras haya participantes conectados."
-    },
     "recordingActive": "Grabación en curso",
     "recordingShort": "REC",
     "recordingConsent": "Este evento se está grabando. Al entrar, consiente la grabación de audio/vídeo.",
@@ -357,7 +352,6 @@
     "qaSidebarPlaceholder": "El panel de Q&A estará disponible cuando comience el evento.",
     "invalidToken": "Enlace no válido. Compruebe el enlace recibido por correo electrónico.",
     "sidebarTabQa": "Q&A",
-    "liveFeaturesLabel": "Funciones:",
     "whiteboardNotSavedHint": "La pizarra no se guarda automáticamente. Si la usas, expórtala (menú de la pizarra) y adjúntala a los Materiales del evento antes de terminar.",
     "sidebarTabChat": "Chat",
     "sidebarTabPolls": "Encuestas",
@@ -527,12 +521,6 @@
       "moderatorLink": "Enlace de moderador",
       "moderatorLinkHint": "Quien abra este enlace entra como moderador con pleno control de la sala."
     },
-    "timer": {
-      "show": "Mostrar el contador",
-      "hide": "Ocultar el contador",
-      "remainingLabel": "Tiempo restante (haz clic para ver el tiempo transcurrido)",
-      "elapsedLabel": "Tiempo transcurrido (haz clic para ver el tiempo restante)"
-    },
     "videoCallFrameTitle": "Videollamada del evento",
     "insecureContextTitle": "Dirección no segura",
     "insecureContextBody": "Esta página se ha abierto con http://: el navegador no permite usar el micrófono ni la cámara, y la videollamada no puede iniciarse. Abra la misma página en la dirección segura.",
@@ -550,7 +538,36 @@
     "resizeSidebar": "Cambiar el tamaño del panel lateral",
     "collapseSidebar": "Contraer el panel",
     "expandSidebar": "Expandir el panel",
-    "sidebarTabWordcloudNew": "Nueva pregunta «En una palabra»"
+    "sidebarTabWordcloudNew": "Nueva pregunta «En una palabra»",
+    "strip": {
+      "label": "Tiempo del evento",
+      "onAir": "En directo",
+      "progressLabel": "Avance del evento respecto al horario previsto",
+      "endsAt": "fin a las {time} · {minutes, plural, =0 {último minuto} one {queda # minuto} other {quedan # minutos}}",
+      "overtimeOpen": "fuera de horario desde hace {minutes, plural, =0 {menos de un minuto} one {# minuto} other {# minutos}} · sigue abierta mientras haya alguien",
+      "overtimeClosing": "fuera de horario desde hace {minutes, plural, =0 {menos de un minuto} one {# minuto} other {# minutos}} · cierra en {closing, plural, one {# minuto} other {# minutos}}",
+      "timerChip": "Intervención",
+      "timerChipLabel": "Temporizador de la intervención: {time}. Abrir la regiduría",
+      "recOnLabel": "Grabando desde hace {time}. Abrir la regiduría",
+      "recOff": "Sin grabar",
+      "recOffLabel": "Sin grabar. Abre la regiduría para empezar",
+      "startsAt": "empieza a las {time} · dentro de {minutes, plural, =0 {menos de un minuto} one {# minuto} other {# minutos}}",
+      "closingNow": "fuera de horario desde hace {minutes, plural, =0 {menos de un minuto} one {# minuto} other {# minutos}} · la sala se está cerrando",
+      "timerPaused": "en pausa"
+    },
+    "controlRoom": {
+      "tab": "Regiduría",
+      "recordingHeading": "Grabación",
+      "recordingOff": "Sin grabar",
+      "stopConfirm": "¿Detener la grabación ahora?",
+      "featuresHeading": "Funciones de la sala",
+      "featuresHelp": "Se activan y desactivan para todos, al instante.",
+      "timerHelp": "Una cuenta atrás para quien habla: puedes mostrarla a toda la sala.",
+      "eventHeading": "Evento",
+      "endHelp": "Cierra la sala para todos y marca el evento como finalizado. No se puede deshacer.",
+      "timerHeading": "Temporizador de intervenciones"
+    },
+    "closingNotice": "{minutes, plural, =0 {La sala se está cerrando.} one {La sala se cierra automáticamente dentro de # minuto.} other {La sala se cierra automáticamente dentro de # minutos.}}"
   },
   "qa": {
     "title": "Preguntas y Respuestas",

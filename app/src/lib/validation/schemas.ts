@@ -469,7 +469,9 @@ export const timerActionSchema = z.object({
   // 'visibility' toggles only the show-to-all flag WITHOUT restarting the
   // countdown — start/pause/reset rebuild the timer state, so the eye toggle
   // must use this instead (was using 'start' and silently restarting).
-  action: z.enum(['start', 'pause', 'reset', 'visibility']),
+  // 'resume' riparte dalla pausa tenendo la durata impostata: con 'start' il
+  // tempo rimasto diventava la nuova durata (e sotto i 10 secondi era rifiutato).
+  action: z.enum(['start', 'pause', 'resume', 'reset', 'visibility']),
   duration: z.number().int().min(10).max(7200).optional(),
   visible: z.boolean().optional(),
 });

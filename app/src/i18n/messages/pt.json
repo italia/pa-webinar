@@ -282,11 +282,6 @@
     "activeVsRegistered": "{active} ativos · {registered} inscritos",
     "enterFullscreen": "Ecrã inteiro",
     "exitFullscreen": "Sair do ecrã inteiro",
-    "overtime": {
-      "withCountdown": "A hora de fim prevista já passou. O evento será encerrado automaticamente dentro de {minutes, plural, one {# minuto} other {# minutos}}.",
-      "closingNow": "Hora de fim atingida. O evento está prestes a ser encerrado.",
-      "indefinite": "A hora de fim prevista já passou. O evento permanecerá ativo enquanto houver participantes ligados."
-    },
     "recordingActive": "Gravação em curso",
     "recordingShort": "REC",
     "recordingConsent": "Este evento está a ser gravado. Ao entrar, consente a gravação áudio/vídeo.",
@@ -357,7 +352,6 @@
     "qaSidebarPlaceholder": "O painel Q&A estará disponível quando o evento começar.",
     "invalidToken": "Ligação inválida. Verifique a ligação recebida por email.",
     "sidebarTabQa": "Q&A",
-    "liveFeaturesLabel": "Funcionalidades:",
     "whiteboardNotSavedHint": "O quadro branco não é guardado automaticamente. Se o utilizar, exporte-o (menu do quadro) e anexe-o aos Materiais do evento antes de terminar.",
     "sidebarTabChat": "Chat",
     "sidebarTabPolls": "Sondagens",
@@ -527,12 +521,6 @@
       "moderatorLink": "Ligação de moderador",
       "moderatorLinkHint": "Quem abrir esta ligação entra como moderador, com pleno controlo da sala."
     },
-    "timer": {
-      "show": "Mostrar o cronómetro",
-      "hide": "Ocultar o cronómetro",
-      "remainingLabel": "Tempo restante (clique para ver o tempo decorrido)",
-      "elapsedLabel": "Tempo decorrido (clique para ver o tempo restante)"
-    },
     "videoCallFrameTitle": "Videochamada do evento",
     "insecureContextTitle": "Endereço não seguro",
     "insecureContextBody": "Esta página foi aberta com http://: o navegador não permite usar o microfone nem a câmara, e a videochamada não pode começar. Abra a mesma página no endereço seguro.",
@@ -550,7 +538,36 @@
     "resizeSidebar": "Redimensionar o painel lateral",
     "collapseSidebar": "Recolher o painel",
     "expandSidebar": "Expandir o painel",
-    "sidebarTabWordcloudNew": "Nova pergunta «Numa palavra»"
+    "sidebarTabWordcloudNew": "Nova pergunta «Numa palavra»",
+    "strip": {
+      "label": "Tempo do evento",
+      "onAir": "No ar",
+      "progressLabel": "Progresso do evento face ao horário previsto",
+      "endsAt": "fim às {time} · {minutes, plural, =0 {último minuto} one {falta # minuto} other {faltam # minutos}}",
+      "overtimeOpen": "fora de horário há {minutes, plural, =0 {menos de um minuto} one {# minuto} other {# minutos}} · fica aberta enquanto houver alguém",
+      "overtimeClosing": "fora de horário há {minutes, plural, =0 {menos de um minuto} one {# minuto} other {# minutos}} · fecha dentro de {closing, plural, one {# minuto} other {# minutos}}",
+      "timerChip": "Intervenção",
+      "timerChipLabel": "Temporizador da intervenção: {time}. Abrir a régie",
+      "recOnLabel": "A gravar há {time}. Abrir a régie",
+      "recOff": "Sem gravação",
+      "recOffLabel": "Sem gravação. Abra a régie para iniciar",
+      "startsAt": "início às {time} · dentro de {minutes, plural, =0 {menos de um minuto} one {# minuto} other {# minutos}}",
+      "closingNow": "fora de horário há {minutes, plural, =0 {menos de um minuto} one {# minuto} other {# minutos}} · a sala está a fechar",
+      "timerPaused": "em pausa"
+    },
+    "controlRoom": {
+      "tab": "Régie",
+      "recordingHeading": "Gravação",
+      "recordingOff": "Sem gravação",
+      "stopConfirm": "Parar a gravação agora?",
+      "featuresHeading": "Funções da sala",
+      "featuresHelp": "Ligam-se e desligam-se para todos, de imediato.",
+      "timerHelp": "Uma contagem decrescente para quem fala: pode mostrá-la a toda a sala.",
+      "eventHeading": "Evento",
+      "endHelp": "Fecha a sala para todos e marca o evento como concluído. Não pode ser anulado.",
+      "timerHeading": "Temporizador das intervenções"
+    },
+    "closingNotice": "{minutes, plural, =0 {A sala está a fechar.} one {A sala fecha automaticamente dentro de # minuto.} other {A sala fecha automaticamente dentro de # minutos.}}"
   },
   "qa": {
     "title": "Perguntas e Respostas",

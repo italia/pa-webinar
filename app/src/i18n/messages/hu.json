@@ -282,11 +282,6 @@
     "activeVsRegistered": "{active} aktív · {registered} regisztrált",
     "enterFullscreen": "Teljes képernyő",
     "exitFullscreen": "Kilépés a teljes képernyőből",
-    "overtime": {
-      "withCountdown": "A tervezett befejezési időpont elmúlt. Az esemény {minutes, plural, one {# perc} other {# perc}} múlva automatikusan lezárul.",
-      "closingNow": "A befejezési időpont elérkezett. Az esemény hamarosan lezárul.",
-      "indefinite": "A tervezett befejezési időpont elmúlt. Az esemény mindaddig aktív marad, amíg vannak csatlakozott résztvevők."
-    },
     "recordingActive": "Felvétel folyamatban",
     "recordingShort": "REC",
     "recordingConsent": "Ez az esemény rögzítésre kerül. A belépéssel hozzájárul az audió/videó felvételhez.",
@@ -357,7 +352,6 @@
     "qaSidebarPlaceholder": "A Q&A panel az esemény indulása után lesz elérhető.",
     "invalidToken": "Érvénytelen link. Ellenőrizze az e-mailben kapott linket.",
     "sidebarTabQa": "Q&A",
-    "liveFeaturesLabel": "Funkciók:",
     "whiteboardNotSavedHint": "A tábla tartalma nem mentődik automatikusan. Ha használja, exportálja (a tábla menüjéből), és a lezárás előtt csatolja az esemény Anyagaihoz.",
     "sidebarTabChat": "Chat",
     "sidebarTabPolls": "Szavazások",
@@ -527,12 +521,6 @@
       "moderatorLink": "Moderátori link",
       "moderatorLinkHint": "Aki megnyitja ezt a linket, moderátorként lép be, a terem teljes irányításával."
     },
-    "timer": {
-      "show": "Számláló megjelenítése",
-      "hide": "Számláló elrejtése",
-      "remainingLabel": "Hátralévő idő (kattintson az eltelt időért)",
-      "elapsedLabel": "Eltelt idő (kattintson a hátralévő időért)"
-    },
     "videoCallFrameTitle": "Az esemény videohívása",
     "insecureContextTitle": "Nem biztonságos cím",
     "insecureContextBody": "Ez az oldal http:// címen nyílt meg: a böngésző nem engedi a mikrofon és a kamera használatát, így a videohívás nem indulhat el. Nyissa meg ugyanezt az oldalt a biztonságos címen.",
@@ -550,7 +538,36 @@
     "resizeSidebar": "Az oldalsáv átméretezése",
     "collapseSidebar": "Panel összecsukása",
     "expandSidebar": "Panel kibontása",
-    "sidebarTabWordcloudNew": "Új „Egy szóval” kérdés"
+    "sidebarTabWordcloudNew": "Új „Egy szóval” kérdés",
+    "strip": {
+      "label": "Az esemény ideje",
+      "onAir": "Adásban",
+      "progressLabel": "Az esemény előrehaladása a tervezett időhöz képest",
+      "endsAt": "vége {time}-kor · {minutes, plural, =0 {utolsó perc} one {# perc van hátra} other {# perc van hátra}}",
+      "overtimeOpen": "{minutes, plural, =0 {kevesebb mint egy perccel} one {# perccel} other {# perccel}} túllépve · nyitva marad, amíg van valaki",
+      "overtimeClosing": "{minutes, plural, =0 {kevesebb mint egy perccel} one {# perccel} other {# perccel}} túllépve · {closing, plural, one {# perc} other {# perc}} múlva bezár",
+      "timerChip": "Felszólalás",
+      "timerChipLabel": "Felszólalás időzítője: {time}. Rendezői pult megnyitása",
+      "recOnLabel": "Felvétel {time} óta. Rendezői pult megnyitása",
+      "recOff": "Nincs felvétel",
+      "recOffLabel": "Nincs felvétel. Indításhoz nyissa meg a rendezői pultot",
+      "startsAt": "kezdés {time}-kor · {minutes, plural, =0 {kevesebb mint egy perc múlva} one {# perc múlva} other {# perc múlva}}",
+      "closingNow": "{minutes, plural, =0 {kevesebb mint egy perccel} one {# perccel} other {# perccel}} túllépve · a terem bezár",
+      "timerPaused": "szüneteltetve"
+    },
+    "controlRoom": {
+      "tab": "Rendezés",
+      "recordingHeading": "Felvétel",
+      "recordingOff": "Nincs felvétel",
+      "stopConfirm": "Leállítja most a felvételt?",
+      "featuresHeading": "A terem funkciói",
+      "featuresHelp": "Mindenkinek azonnal be- és kikapcsolnak.",
+      "timerHelp": "Visszaszámlálás az előadónak: az egész teremnek megmutathatja.",
+      "eventHeading": "Esemény",
+      "endHelp": "Mindenkinek bezárja a termet, és befejezettnek jelöli az eseményt. Nem vonható vissza.",
+      "timerHeading": "Felszólalások időzítője"
+    },
+    "closingNotice": "{minutes, plural, =0 {A terem bezár.} one {A terem # perc múlva automatikusan bezár.} other {A terem # perc múlva automatikusan bezár.}}"
   },
   "qa": {
     "title": "Kérdések és válaszok",

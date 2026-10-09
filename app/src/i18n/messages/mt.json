@@ -282,11 +282,6 @@
     "activeVsRegistered": "{active} attivi · {registered} reġistrati",
     "enterFullscreen": "Skrin sħiħ",
     "exitFullscreen": "Oħroġ mill-iskrin sħiħ",
-    "overtime": {
-      "withCountdown": "Il-ħin tat-tmiem previst għadda. L-avveniment se jingħalaq awtomatikament fi {minutes, plural, one {# minuta} other {# minuti}}.",
-      "closingNow": "Intlaħaq il-ħin tat-tmiem. L-avveniment wasal biex jingħalaq.",
-      "indefinite": "Il-ħin tat-tmiem previst għadda. L-avveniment jibqa' attiv sakemm ikun hemm parteċipanti konnessi."
-    },
     "recordingActive": "Reġistrazzjoni għaddejja",
     "recordingShort": "REC",
     "recordingConsent": "Dan l-avveniment qed jiġi rreġistrat. Meta tidħol, inti tagħti l-kunsens tiegħek għar-reġistrazzjoni tal-awdjo/vidjo.",
@@ -357,7 +352,6 @@
     "qaSidebarPlaceholder": "Il-pannell Q&A se jkun disponibbli meta jibda l-avveniment.",
     "invalidToken": "Link mhux validu. Jekk jogħġbok ivverifika l-link li rċivejt bl-email.",
     "sidebarTabQa": "Q&A",
-    "liveFeaturesLabel": "Funzjonijiet:",
     "whiteboardNotSavedHint": "Il-whiteboard ma tiġix salvata awtomatikament. Jekk tużaha, esportaha (mill-menu tal-whiteboard) u waħħalha mal-Materjali tal-avveniment qabel ma ttemm.",
     "sidebarTabChat": "Chat",
     "sidebarTabPolls": "Stħarriġ",
@@ -527,12 +521,6 @@
       "moderatorLink": "Link tal-moderatur",
       "moderatorLinkHint": "Min jiftaħ dan il-link jidħol bħala moderatur b'kontroll sħiħ tal-kamra."
     },
-    "timer": {
-      "show": "Uri l-kronometru",
-      "hide": "Aħbi l-kronometru",
-      "remainingLabel": "Ħin li fadal (ikklikkja għall-ħin li għadda)",
-      "elapsedLabel": "Ħin li għadda (ikklikkja għall-ħin li fadal)"
-    },
     "videoCallFrameTitle": "Sejħa bil-vidjo tal-avveniment",
     "insecureContextTitle": "Indirizz mhux sigur",
     "insecureContextBody": "Din il-paġna nfetħet b'http://: il-browser ma jħallix jintużaw il-mikrofonu u l-kamera, u s-sejħa bil-vidjo ma tistax tibda. Iftaħ l-istess paġna fuq l-indirizz sigur.",
@@ -550,7 +538,36 @@
     "resizeSidebar": "Ibdel id-daqs tal-pannell tal-ġenb",
     "collapseSidebar": "Ċekken il-panew",
     "expandSidebar": "Kabbar il-panew",
-    "sidebarTabWordcloudNew": "Mistoqsija ġdida “F'kelma waħda”"
+    "sidebarTabWordcloudNew": "Mistoqsija ġdida “F'kelma waħda”",
+    "strip": {
+      "label": "Ħin tal-avveniment",
+      "onAir": "Fuq l-arja",
+      "progressLabel": "Il-progress tal-avveniment meta mqabbel mal-ħin ippjanat",
+      "endsAt": "tmiem fil-{time} · {minutes, plural, =0 {l-aħħar minuta} one {fadal # minuta} few {fadal # minuti} many {fadal # minuti} other {fadal # minuti}}",
+      "overtimeOpen": "lil hinn mill-ħin b'{minutes, plural, =0 {inqas minn minuta} one {# minuta} few {# minuti} many {# minuti} other {# minuti}} · tibqa' miftuħa sakemm ikun hemm xi ħadd",
+      "overtimeClosing": "lil hinn mill-ħin b'{minutes, plural, =0 {inqas minn minuta} one {# minuta} few {# minuti} many {# minuti} other {# minuti}} · tagħlaq fi {closing, plural, one {# minuta} few {# minuti} many {# minuti} other {# minuti}}",
+      "timerChip": "Intervent",
+      "timerChipLabel": "Timer tal-intervent: {time}. Iftaħ il-kontroll",
+      "recOnLabel": "Qed jirreġistra minn {time}. Iftaħ il-kontroll",
+      "recOff": "Mhux qed jirreġistra",
+      "recOffLabel": "Mhux qed jirreġistra. Iftaħ il-kontroll biex tibda",
+      "startsAt": "jibda fil-{time} · fi {minutes, plural, =0 {inqas minn minuta} one {# minuta} few {# minuti} many {# minuti} other {# minuti}}",
+      "closingNow": "lil hinn mill-ħin b'{minutes, plural, =0 {inqas minn minuta} one {# minuta} few {# minuti} many {# minuti} other {# minuti}} · il-kamra qed tingħalaq",
+      "timerPaused": "pawsa"
+    },
+    "controlRoom": {
+      "tab": "Kontroll",
+      "recordingHeading": "Reġistrazzjoni",
+      "recordingOff": "Mhux qed jirreġistra",
+      "stopConfirm": "Twaqqaf ir-reġistrazzjoni issa?",
+      "featuresHeading": "Funzjonijiet tal-kamra",
+      "featuresHelp": "Jinxtegħlu u jintfew għal kulħadd, minnufih.",
+      "timerHelp": "Għadd lura għal min qed jitkellem: tista' turih lill-kamra kollha.",
+      "eventHeading": "Avveniment",
+      "endHelp": "Tagħlaq il-kamra għal kulħadd u timmarka l-avveniment bħala lest. Ma tistax titreġġa' lura.",
+      "timerHeading": "Timer tal-interventi"
+    },
+    "closingNotice": "{minutes, plural, =0 {Il-kamra qed tingħalaq.} one {Il-kamra tingħalaq awtomatikament fi # minuta.} few {Il-kamra tingħalaq awtomatikament fi # minuti.} many {Il-kamra tingħalaq awtomatikament fi # minuti.} other {Il-kamra tingħalaq awtomatikament fi # minuti.}}"
   },
   "qa": {
     "title": "Mistoqsijiet u Tweġibiet",

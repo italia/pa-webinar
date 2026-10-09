@@ -192,10 +192,493 @@ html.live-call-immersive body {
   flex-shrink: 0;
 }
 
-.moderator-bar {
-  margin-bottom: 0;
-  border-radius: 0;
+// ── Striscia del tempo (chi conduce): in onda, avanzamento, fuori orario,
+// registrazione e timer degli interventi.
+.live-time-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  padding: 0.45rem 1rem;
   flex-shrink: 0;
+  color: #dce6f0;
+  background: #17324d;
+  border-bottom: 2px solid #0066cc;
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+
+  --strip-fill: #4da3ff;
+}
+
+.live-time-strip__clock {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1 1 360px;
+  min-width: 0;
+}
+
+.live-time-strip__onair {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  white-space: nowrap;
+  color: #fff;
+
+  strong {
+    font-size: 1rem;
+  }
+}
+
+// «In onda»: il punto e le onde che si accendono in sequenza, come una
+// trasmissione.
+.live-time-strip__live-icon {
+  color: #ff5c73;
+  flex-shrink: 0;
+}
+
+.live-time-strip__live-core {
+  animation: live-core 2s ease-in-out infinite;
+  transform-origin: 12px 12px;
+}
+
+.live-time-strip__live-wave {
+  opacity: 0.25;
+  animation: live-wave 2s ease-in-out infinite;
+}
+
+.live-time-strip__live-wave--2 {
+  animation-delay: 0.35s;
+}
+
+@keyframes live-core {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.25); }
+}
+
+@keyframes live-wave {
+  0%, 100% { opacity: 0.2; }
+  40% { opacity: 1; }
+}
+
+.live-time-strip__bar {
+  position: relative;
+  flex: 1 1 140px;
+  max-width: 320px;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.16);
+  overflow: hidden;
+}
+
+.live-time-strip__fill {
+  position: relative;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--strip-fill);
+  box-shadow: 0 0 8px var(--strip-fill);
+  transition: width 1s linear, background-color 0.4s ease;
+  overflow: hidden;
+
+  // Un riflesso che scorre lento: la barra è viva, non ferma.
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.45) 50%, transparent 100%);
+    transform: translateX(-100%);
+    animation: strip-sheen 3.2s ease-in-out infinite;
+  }
+}
+
+@keyframes strip-sheen {
+  0% { transform: translateX(-100%); }
+  60%, 100% { transform: translateX(100%); }
+}
+
+.live-time-strip__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  white-space: nowrap;
+  overflow: hidden;
+  min-width: 0;
+
+  > span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  svg {
+    flex-shrink: 0;
+    opacity: 0.85;
+  }
+}
+
+// Oltre la fine la clessidra si gira, ogni tanto.
+.live-time-strip__hourglass {
+  animation: hourglass-turn 4s ease-in-out infinite;
+}
+
+@keyframes hourglass-turn {
+  0%, 80% { transform: rotate(0deg); }
+  90%, 100% { transform: rotate(180deg); }
+}
+
+// Ultimi minuti: ambra. Oltre la fine: la barra piena prende il colore del
+// fuori orario, con una trama che si muove piano.
+.live-time-strip--soon {
+  --strip-fill: #f2b84b;
+
+  .live-time-strip__status { color: #ffd88a; }
+}
+
+.live-time-strip--over,
+.live-time-strip--closing {
+  .live-time-strip__fill {
+    background-image: repeating-linear-gradient(
+      -45deg,
+      rgba(255, 255, 255, 0.25) 0 6px,
+      transparent 6px 12px
+    );
+    background-size: 34px 34px;
+    animation: strip-overtime 1.6s linear infinite;
+  }
+}
+
+.live-time-strip--over {
+  --strip-fill: #d98a00;
+
+  .live-time-strip__status { color: #ffd88a; }
+}
+
+.live-time-strip--closing {
+  --strip-fill: #e0405a;
+
+  .live-time-strip__status { color: #ffb3c0; font-weight: 600; }
+}
+
+@keyframes strip-overtime {
+  from { background-position: 0 0; }
+  to { background-position: 34px 0; }
+}
+
+.live-time-strip__side {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+
+.live-time-strip__chip,
+.live-time-strip__rec {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 32px;
+  padding: 0 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+// Il timer degli interventi: colore secondo il tempo rimasto (come la fascia
+// per il pubblico) e un anello che si svuota.
+.live-time-strip__chip {
+  transition: background-color 0.5s ease, border-color 0.5s ease;
+}
+
+.live-time-strip__chip--ok {
+  border-color: rgba(77, 196, 140, 0.8);
+  background: rgba(0, 135, 88, 0.45);
+}
+
+.live-time-strip__chip--warn {
+  border-color: rgba(242, 184, 75, 0.85);
+  background: rgba(194, 119, 0, 0.5);
+}
+
+.live-time-strip__chip--danger {
+  border-color: rgba(255, 128, 148, 0.85);
+  background: rgba(217, 54, 79, 0.55);
+}
+
+.live-time-strip__chip--paused {
+  opacity: 0.75;
+}
+
+.live-time-strip__chip--last {
+  animation: chip-last 1s ease-in-out infinite;
+}
+
+@keyframes chip-last {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(217, 54, 79, 0.6); }
+  50% { box-shadow: 0 0 0 5px rgba(217, 54, 79, 0); }
+}
+
+.live-time-strip__ring {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: conic-gradient(#fff var(--quota, 0deg), rgba(255, 255, 255, 0.25) 0);
+  -webkit-mask: radial-gradient(circle, transparent 3px, #000 3.5px);
+  mask: radial-gradient(circle, transparent 3px, #000 3.5px);
+}
+
+.live-time-strip__chip-note {
+  font-weight: 500;
+  opacity: 0.85;
+}
+
+button.live-time-strip__chip,
+button.live-time-strip__rec {
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible {
+    background: rgba(255, 255, 255, 0.18);
+  }
+
+  &:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+  }
+}
+
+.live-time-strip__rec-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.55);
+}
+
+// In registrazione: la pastiglia rossa, con il pallino che pulsa.
+.live-time-strip__rec--on {
+  border-color: transparent;
+  background: #d9364f;
+  box-shadow: 0 0 0 0 rgba(217, 54, 79, 0.55);
+  animation: rec-glow 2.4s ease-out infinite;
+
+  .live-time-strip__rec-dot {
+    background: #fff;
+    animation: pulse-dot 1.5s ease-in-out infinite;
+  }
+
+  &:hover,
+  &:focus-visible {
+    background: #c22a42 !important;
+  }
+
+  strong {
+    font-size: 0.9rem;
+  }
+}
+
+@keyframes rec-glow {
+  0% { box-shadow: 0 0 0 0 rgba(217, 54, 79, 0.55); }
+  70% { box-shadow: 0 0 0 8px rgba(217, 54, 79, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(217, 54, 79, 0); }
+}
+
+.live-time-strip__rec--off {
+  color: #c9d4de;
+  font-weight: 500;
+}
+
+.live-time-strip__rec--wait {
+  color: #c9d4de;
+  font-weight: 500;
+  border-style: dashed;
+}
+
+.live-time-strip__alert {
+  flex: 1 0 100%;
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+  background: #fff4e0;
+  color: #5c3800;
+  font-weight: 600;
+}
+
+.live-time-strip__rec--warn {
+  border-color: #f2b84b;
+  color: #ffd88a;
+}
+
+@media (max-width: 767.98px) {
+  .live-time-strip {
+    padding: 0.4rem 0.75rem;
+  }
+
+  .live-time-strip__status {
+    display: none;
+  }
+
+  // Sul telefono si tiene solo ciò che chiede attenzione: gli ultimi minuti,
+  // il fuori orario e la chiusura, su una riga propria.
+  .live-time-strip__clock {
+    flex-wrap: wrap;
+  }
+
+  .live-time-strip--soon,
+  .live-time-strip--over,
+  .live-time-strip--closing {
+    .live-time-strip__status {
+      display: inline-flex;
+      flex: 1 0 100%;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .live-time-strip__fill,
+  .live-time-strip__fill::after,
+  .live-time-strip__rec--on,
+  .live-time-strip__rec--on .live-time-strip__rec-dot,
+  .live-time-strip__live-core,
+  .live-time-strip__live-wave,
+  .live-time-strip__hourglass,
+  .live-time-strip__chip--last,
+  .presentation-timer-bar--last {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .live-time-strip__live-wave {
+    opacity: 1;
+  }
+
+  .live-time-strip__fill::after {
+    display: none;
+  }
+}
+
+// Per chi non conduce: la sala sta per chiudersi da sola.
+.live-closing-notice {
+  flex-shrink: 0;
+  padding: 0.45rem 1rem;
+  text-align: center;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #5c1020;
+  background: #fde8ec;
+  border-bottom: 1px solid #f3b6c2;
+}
+
+// La fascia del timer degli interventi per tutta la sala: nell'ultimo minuto
+// lampeggia piano.
+.presentation-timer-bar {
+  transition: background-color 0.5s;
+}
+
+.presentation-timer-bar--last {
+  animation: timer-last-minute 1s ease-in-out infinite;
+}
+
+@keyframes timer-last-minute {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.75; }
+}
+
+// ── Scheda Regia
+.control-room {
+  display: flex;
+  flex-direction: column;
+}
+
+.control-room__section {
+  padding: 0.9rem 1rem;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.control-room__section--danger {
+  margin-top: auto;
+  border-top: 1px solid #f3c4cc;
+  border-bottom: 0;
+  background: #fdf3f5;
+}
+
+.control-room__heading {
+  margin: 0 0 0.5rem;
+  color: #17324d;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.control-room__help {
+  margin: 0 0 0.6rem;
+  color: #5a6772;
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+.control-room__warning {
+  margin: 0.6rem 0 0;
+  padding: 0.4rem 0.6rem;
+  border-radius: 6px;
+  background: #fff4e0;
+  color: #6b4100;
+  font-size: 0.8rem;
+}
+
+.control-room__switches {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.control-room .toggles label {
+  margin-bottom: 0.25rem;
+  font-size: 0.9rem;
+}
+
+.control-room__rec-state {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: #3d4955;
+  font-size: 0.85rem;
+}
+
+.control-room__rec-state--on {
+  color: #b3263c;
+  font-weight: 600;
+}
+
+.control-room__rec-dot {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #d9364f;
+  animation: pulse-dot 1.5s ease-in-out infinite;
+}
+
+.control-room__rec-dot--light {
+  background: #fff;
+  animation: none;
+}
+
+.control-room__confirm {
+  padding: 0.6rem;
+  border: 1px solid #f3c4cc;
+  border-radius: 6px;
+  background: #fff;
+  font-size: 0.85rem;
+}
+
+.control-room__timer-value {
+  font-size: 1.05rem;
+  color: #17324d;
 }
 
 // Proposta di avviare la registrazione: un avviso sotto la barra di chi
@@ -593,6 +1076,68 @@ html.live-call-immersive body {
   &:hover {
     background: rgba(255, 255, 255, 0.25);
     color: #fff;
+  }
+}
+
+// Comprimere e riaprire la colonna: la larghezza scorre, la striscia delle
+// schede riappare con una dissolvenza e il contenuto entra dopo che la colonna
+// si è aperta. Niente animazione mentre si trascina il bordo, né per chi
+// chiede meno movimento al sistema.
+@media (min-width: 992px) {
+  .live-sidebar {
+    transition:
+      width 280ms cubic-bezier(0.2, 0.8, 0.2, 1),
+      flex-basis 280ms cubic-bezier(0.2, 0.8, 0.2, 1),
+      min-width 280ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .live-sidebar-tabs {
+    animation: sidebar-tabs-expanded 260ms ease both;
+  }
+
+  .live-sidebar--collapsed .live-sidebar-tabs {
+    animation: sidebar-tabs-collapsed 260ms ease both;
+  }
+
+  .live-sidebar-body {
+    animation: sidebar-body-in 240ms ease 140ms both;
+  }
+
+  .live-sidebar-collapse svg {
+    transition: transform 280ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .live-sidebar--collapsed .live-sidebar-collapse svg {
+    transform: rotate(180deg);
+  }
+}
+
+.live-resizing .live-sidebar {
+  transition: none !important;
+}
+
+@keyframes sidebar-tabs-expanded {
+  from { opacity: 0; transform: translateX(10px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes sidebar-tabs-collapsed {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes sidebar-body-in {
+  from { opacity: 0; transform: translateX(12px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .live-sidebar,
+  .live-sidebar-tabs,
+  .live-sidebar-body,
+  .live-sidebar-collapse svg {
+    transition: none !important;
+    animation: none !important;
   }
 }
 
@@ -4244,53 +4789,6 @@ html.live-call-immersive body {
   }
 }
 
-// Contatore dell'evento in barra (B4).
-.live-timer {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 2px 6px;
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.14);
-  color: #fff;
-  font-variant-numeric: tabular-nums; // niente sfarfallio a ogni secondo
-  font-size: 0.82rem;
-
-  button {
-    border: 0;
-    background: transparent;
-    color: inherit;
-    padding: 0 2px;
-    font: inherit;
-    line-height: 1.2;
-    cursor: pointer;
-
-    &:hover,
-    &:focus-visible { text-decoration: underline; }
-  }
-}
-
-.live-timer--off {
-  padding: 3px 5px;
-  opacity: 0.75;
-
-  &:hover,
-  &:focus-visible { opacity: 1; }
-}
-
-// Oltre l'orario: la sala resta aperta, ma il numero deve dirlo. Anche a
-// contatore spento l'icona prende il colore: è l'unico segnale del fuori orario.
-.live-timer--over {
-  background: rgba(166, 99, 0, 0.9);
-  opacity: 1;
-}
-
-// Ultimi minuti prima della chiusura.
-.live-timer--closing {
-  background: rgba(217, 54, 79, 0.9);
-  opacity: 1;
-}
-
 // La mia reazione, distinta dal conteggio altrui.
 .chat-panel__reaction-chip--mine {
   border-color: var(--app-primary, #06c);
@@ -4765,8 +5263,7 @@ html.live-call-immersive body {
 .live-top-bar__actions {
   .fullscreen-toggle-btn,
   .live-share-btn,
-  .leave-room-btn,
-  .live-timer {
+  .leave-room-btn {
     min-height: 34px;
     border-radius: 6px;
   }
@@ -4795,16 +5292,6 @@ html.live-call-immersive body {
     box-shadow: none;
   }
 
-  .live-timer {
-    padding: 0 0.6rem;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-  }
-
-  .live-timer--off {
-    width: 34px;
-    padding: 0;
-    justify-content: center;
-  }
 }
 
 // Schermate d'uscita (evento terminato, uscita volontaria): una scheda al

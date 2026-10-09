@@ -282,11 +282,6 @@
     "activeVsRegistered": "{active} actifs · {registered} inscrits",
     "enterFullscreen": "Plein écran",
     "exitFullscreen": "Quitter le plein écran",
-    "overtime": {
-      "withCountdown": "L'horaire de fin prévu est dépassé. L'événement se fermera automatiquement dans {minutes, plural, one {# minute} other {# minutes}}.",
-      "closingNow": "L'horaire de fin est atteint. L'événement va se fermer.",
-      "indefinite": "L'horaire de fin prévu est dépassé. L'événement restera actif tant que des participants seront connectés."
-    },
     "recordingActive": "Enregistrement en cours",
     "recordingShort": "REC",
     "recordingConsent": "Cet événement est enregistré. En entrant, vous consentez à l'enregistrement audio/vidéo.",
@@ -357,7 +352,6 @@
     "qaSidebarPlaceholder": "Le panneau Q&A sera disponible lorsque l'événement débutera.",
     "invalidToken": "Lien non valide. Veuillez vérifier le lien reçu par e-mail.",
     "sidebarTabQa": "Q&R",
-    "liveFeaturesLabel": "Fonctions :",
     "whiteboardNotSavedHint": "Le tableau blanc n'est pas enregistré automatiquement. Si vous l'utilisez, exportez-le (menu du tableau blanc) et joignez-le aux Documents de l'événement avant de terminer.",
     "sidebarTabChat": "Chat",
     "sidebarTabPolls": "Sondages",
@@ -527,12 +521,6 @@
       "moderatorLink": "Lien modérateur",
       "moderatorLinkHint": "Toute personne qui ouvre ce lien entre comme modérateur, avec la pleine maîtrise de la régie."
     },
-    "timer": {
-      "show": "Afficher le minuteur",
-      "hide": "Masquer le minuteur",
-      "remainingLabel": "Temps restant (cliquez pour le temps écoulé)",
-      "elapsedLabel": "Temps écoulé (cliquez pour le temps restant)"
-    },
     "videoCallFrameTitle": "Visioconférence de l'événement",
     "insecureContextTitle": "Adresse non sécurisée",
     "insecureContextBody": "Cette page est ouverte en http:// : le navigateur n'autorise ni le micro ni la caméra, et l'appel vidéo ne peut pas démarrer. Ouvrez la même page à l'adresse sécurisée.",
@@ -550,7 +538,36 @@
     "resizeSidebar": "Redimensionner le panneau latéral",
     "collapseSidebar": "Réduire le panneau",
     "expandSidebar": "Développer le panneau",
-    "sidebarTabWordcloudNew": "Nouvelle question « En un mot »"
+    "sidebarTabWordcloudNew": "Nouvelle question « En un mot »",
+    "strip": {
+      "label": "Temps de l'événement",
+      "onAir": "À l'antenne",
+      "progressLabel": "Avancement de l'événement par rapport à l'horaire prévu",
+      "endsAt": "fin à {time} · {minutes, plural, =0 {dernière minute} one {reste # minute} other {restent # minutes}}",
+      "overtimeOpen": "hors horaire depuis {minutes, plural, =0 {moins d'une minute} one {# minute} other {# minutes}} · reste ouverte tant qu'il y a quelqu'un",
+      "overtimeClosing": "hors horaire depuis {minutes, plural, =0 {moins d'une minute} one {# minute} other {# minutes}} · fermeture dans {closing, plural, one {# minute} other {# minutes}}",
+      "timerChip": "Intervention",
+      "timerChipLabel": "Minuteur de l'intervention : {time}. Ouvrir la régie",
+      "recOnLabel": "Enregistrement depuis {time}. Ouvrir la régie",
+      "recOff": "Pas d'enregistrement",
+      "recOffLabel": "Pas d'enregistrement. Ouvrez la régie pour le lancer",
+      "startsAt": "début à {time} · dans {minutes, plural, =0 {moins d'une minute} one {# minute} other {# minutes}}",
+      "closingNow": "hors horaire depuis {minutes, plural, =0 {moins d'une minute} one {# minute} other {# minutes}} · la salle se ferme",
+      "timerPaused": "en pause"
+    },
+    "controlRoom": {
+      "tab": "Régie",
+      "recordingHeading": "Enregistrement",
+      "recordingOff": "Pas d'enregistrement",
+      "stopConfirm": "Arrêter l'enregistrement maintenant ?",
+      "featuresHeading": "Fonctions de la salle",
+      "featuresHelp": "Elles s'activent et se désactivent pour tous, tout de suite.",
+      "timerHelp": "Un compte à rebours pour la personne qui parle : vous pouvez l'afficher à toute la salle.",
+      "eventHeading": "Événement",
+      "endHelp": "Ferme la salle pour tous et marque l'événement comme terminé. Action irréversible.",
+      "timerHeading": "Minuteur des interventions"
+    },
+    "closingNotice": "{minutes, plural, =0 {La salle se ferme.} one {La salle se ferme automatiquement dans # minute.} other {La salle se ferme automatiquement dans # minutes.}}"
   },
   "qa": {
     "title": "Questions et Réponses",

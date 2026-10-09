@@ -38,7 +38,7 @@ event:
 
 - no native hangup for any role: every exit goes through a portal control. **Leave room** serves every
   role and asks a moderator whether to **Just leave** or **End for everyone**; **End event** in the
-  moderator control bar ends the event for all;
+  room's **Control** panel ends the event for all;
 - no native chat button: the portal's chat panel is the chat;
 - no native fullscreen: it would cover only the iframe and hide the drawer, so the portal offers its own
   **Fullscreen** for the whole live area;
@@ -52,8 +52,9 @@ the chosen background is applied on join.
 ### The portal builds the wrapper
 
 Around the iframe the portal draws what an event needs and a meeting tool does not have: the top bar,
-the moderator control bar (mute all, audio and video moderation, recording, the raised-hand queue,
-the presentation timer), the drawer with the live panels, and the participants panel. The live panels
+the moderators' time strip and **Control** panel (recording, the room features, the talk timer, ending
+the event), the drawer with the live panels, and the participants panel (mute all, audio and video
+moderation, the raised-hand queue). The live panels
 keep their data in the portal, not in Jitsi (see
 [ADR-005](005-live-interaction-in-portal.md)).
 
@@ -64,7 +65,7 @@ keep their data in the portal, not in Jitsi (see
 per-device and per-event values, creates the iframe with the portal-signed JWT, and calls `dispose()` on
 unmount.
 
-It then hands the API object to the live room. The moderator control bar, the raised-hand queue and the
+It then hands the API object to the live room. The recording controls, the **Control** panel and the
 participants panel send their commands on that same object and register their own listeners on it. None
 of them creates a second one. There is one conference per page and one owner of its lifecycle.
 
@@ -164,12 +165,12 @@ appended to the stylesheet. The image build fails when any of their targets is m
   screens, forces `startWithAudioMuted` and `startWithVideoMuted`. It applies the waiting-room
   background with the `setVirtualBackground` command on `videoConferenceJoined`, and retries when the
   camera is turned on if the image could not be delivered yet.
-- **Consumers of the API object.** The moderator control bar
-  (`app/src/components/jitsi/moderator-controls.tsx`), the participants panel
-  (`app/src/components/participants/participant-panel.tsx`) and the live room
-  (`app/src/components/live/live-event-client.tsx`) call `addListener` on the object they receive. The
-  shared hook `app/src/hooks/use-jitsi-events.ts` exposes the participant count, recording state and
-  mute state.
+- **Consumers of the API object.** The recording controls
+  (`app/src/hooks/use-recording-control.ts`, used by the moderators' time strip and **Control** panel),
+  the participants panel (`app/src/components/participants/participant-panel.tsx`) and the live room
+  (`app/src/components/live/live-event-client.tsx`) call `addListener` or `executeCommand` on the
+  object they receive. `JitsiRoom` reports the participant count and the recording state to the room
+  as callbacks.
 - **Configuration and guard tests.** The toolbar sets (`baseToolbarButtons`, `moderatorToolbarButtons`,
   `mobileBaseToolbarButtons`, `mobileModeratorToolbarButtons`) and the static overrides, including
   `prejoinConfig: { enabled: false }`, live in `app/src/lib/jitsi/config.ts`. The guard tests in

@@ -296,11 +296,6 @@
     "activeVsRegistered": "{active} attivi · {registered} registrati",
     "enterFullscreen": "Schermo intero",
     "exitFullscreen": "Esci da schermo intero",
-    "overtime": {
-      "withCountdown": "L'orario di fine previsto è passato. L'evento si chiuderà automaticamente fra {minutes, plural, one {# minuto} other {# minuti}}.",
-      "closingNow": "L'orario di fine è stato raggiunto. L'evento sta per chiudersi.",
-      "indefinite": "L'orario di fine previsto è passato. L'evento resterà attivo finché ci sono partecipanti collegati."
-    },
     "recordingActive": "Registrazione in corso",
     "recordingShort": "REC",
     "recordingConsent": "Questo evento viene registrato. Entrando, acconsenti alla registrazione audio/video.",
@@ -371,7 +366,6 @@
     "qaSidebarPlaceholder": "Il pannello Q&A sarà disponibile quando l'evento inizia.",
     "invalidToken": "Link non valido. Verifica il link ricevuto via email.",
     "sidebarTabQa": "Q&A",
-    "liveFeaturesLabel": "Funzioni:",
     "whiteboardNotSavedHint": "La lavagna non viene salvata automaticamente. Se la usi, esportala (menu della lavagna) e allegala ai Materiali dell'evento prima di terminare.",
     "sidebarTabChat": "Chat",
     "sidebarTabPolls": "Sondaggi",
@@ -527,12 +521,6 @@
     "floatingControlsLabel": "Controlli evento",
     "screenshareActive": "🖥️ {name} sta condividendo lo schermo",
     "screenshareFallbackName": "Un partecipante",
-    "timer": {
-      "show": "Mostra il contatore",
-      "hide": "Nascondi il contatore",
-      "remainingLabel": "Tempo rimanente (clicca per il tempo trascorso)",
-      "elapsedLabel": "Tempo trascorso (clicca per il tempo rimanente)"
-    },
     "videoCallFrameTitle": "Videochiamata dell’evento",
     "insecureContextTitle": "Indirizzo non sicuro",
     "insecureContextBody": "Questa pagina è aperta con http://: il browser non consente di usare microfono e videocamera, e la videochiamata non può partire. Apri la stessa pagina all'indirizzo sicuro.",
@@ -550,7 +538,36 @@
     "resizeSidebar": "Ridimensiona il pannello laterale",
     "collapseSidebar": "Comprimi il pannello",
     "expandSidebar": "Apri il pannello",
-    "sidebarTabWordcloudNew": "Nuova domanda «In una parola»"
+    "sidebarTabWordcloudNew": "Nuova domanda «In una parola»",
+    "strip": {
+      "label": "Tempo dell'evento",
+      "onAir": "In onda",
+      "progressLabel": "Avanzamento dell'evento rispetto all'orario previsto",
+      "endsAt": "fine alle {time} · {minutes, plural, =0 {ultimo minuto} one {manca # minuto} other {mancano # minuti}}",
+      "overtimeOpen": "fuori orario da {minutes, plural, =0 {meno di un minuto} one {# minuto} other {# minuti}} · resta aperta finché c'è qualcuno",
+      "overtimeClosing": "fuori orario da {minutes, plural, =0 {meno di un minuto} one {# minuto} other {# minuti}} · chiusura fra {closing, plural, one {# minuto} other {# minuti}}",
+      "timerChip": "Intervento",
+      "timerChipLabel": "Timer dell'intervento: {time}. Apri la Regia",
+      "recOnLabel": "Registrazione in corso da {time}. Apri la Regia",
+      "recOff": "Non in registrazione",
+      "recOffLabel": "Non in registrazione. Apri la Regia per avviarla",
+      "startsAt": "inizio alle {time} · fra {minutes, plural, =0 {meno di un minuto} one {# minuto} other {# minuti}}",
+      "closingNow": "fuori orario da {minutes, plural, =0 {meno di un minuto} one {# minuto} other {# minuti}} · la sala si sta chiudendo",
+      "timerPaused": "in pausa"
+    },
+    "controlRoom": {
+      "tab": "Regia",
+      "recordingHeading": "Registrazione",
+      "recordingOff": "Non in registrazione",
+      "stopConfirm": "Fermare la registrazione adesso?",
+      "featuresHeading": "Funzioni della sala",
+      "featuresHelp": "Si accendono e si spengono per tutti, subito.",
+      "timerHelp": "Un conto alla rovescia per chi parla: puoi mostrarlo a tutta la sala.",
+      "eventHeading": "Evento",
+      "endHelp": "Chiude la sala per tutti e porta l'evento a concluso. Non si torna indietro.",
+      "timerHeading": "Timer degli interventi"
+    },
+    "closingNotice": "{minutes, plural, =0 {La sala si sta chiudendo.} one {La sala si chiude automaticamente fra # minuto.} other {La sala si chiude automaticamente fra # minuti.}}"
   },
   "qa": {
     "title": "Domande e Risposte",

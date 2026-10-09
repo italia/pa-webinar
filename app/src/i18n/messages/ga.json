@@ -282,11 +282,6 @@
     "activeVsRegistered": "{active} gníomhach · {registered} cláraithe",
     "enterFullscreen": "Lánscáileán",
     "exitFullscreen": "Scoir den lánscáileán",
-    "overtime": {
-      "withCountdown": "Tá an t-am críochnaithe sceidealta caite. Dúnfar an t-imeacht go huathoibríoch i gceann {minutes, plural, one {# nóiméad} other {# nóiméad}}.",
-      "closingNow": "Sroicheadh an t-am críochnaithe. Tá an t-imeacht ar tí dúnadh.",
-      "indefinite": "Tá an t-am críochnaithe sceidealta caite. Fanfaidh an t-imeacht oscailte fad atá rannpháirtithe ceangailte."
-    },
     "recordingActive": "Taifeadadh ar siúl",
     "recordingShort": "REC",
     "recordingConsent": "Tá an t-imeacht seo á thaifeadadh. Trí theacht isteach, toilíonn sibh leis an taifeadadh fuaime/físe.",
@@ -357,7 +352,6 @@
     "qaSidebarPlaceholder": "Beidh an painéal Q&A ar fáil nuair a thosóidh an t-imeacht.",
     "invalidToken": "Nasc neamhbhailí. Seiceáil an nasc a fuair sibh ar ríomhphost, le bhur dtoil.",
     "sidebarTabQa": "Q&A",
-    "liveFeaturesLabel": "Gnéithe:",
     "whiteboardNotSavedHint": "Ní shábháiltear an clár bán go huathoibríoch. Má úsáideann tú é, easpórtáil é (roghchlár an chláir bháin) agus ceangail le hÁbhair an imeachta é sula gcuirfidh tú deireadh leis.",
     "sidebarTabChat": "Comhrá",
     "sidebarTabPolls": "Pobalbhreitheanna",
@@ -527,12 +521,6 @@
       "moderatorLink": "Nasc modhnóra",
       "moderatorLinkHint": "Rachaidh duine ar bith a osclaíonn an nasc seo isteach mar mhodhnóir le lánsmacht ar an seomra."
     },
-    "timer": {
-      "show": "Taispeáin an t-amadóir",
-      "hide": "Folaigh an t-amadóir",
-      "remainingLabel": "An t-am atá fágtha (cliceáil chun an t-am caite a fheiceáil)",
-      "elapsedLabel": "An t-am caite (cliceáil chun an t-am atá fágtha a fheiceáil)"
-    },
     "videoCallFrameTitle": "Físghlao an imeachta",
     "insecureContextTitle": "Seoladh neamhshlán",
     "insecureContextBody": "Osclaíodh an leathanach seo le http://: ní cheadaíonn an brabhsálaí an micreafón ná an ceamara, agus ní féidir leis an bhfísghlao tosú. Oscail an leathanach céanna ag an seoladh slán.",
@@ -550,7 +538,36 @@
     "resizeSidebar": "Athraigh méid an phainéil taoibh",
     "collapseSidebar": "Laghdaigh an painéal",
     "expandSidebar": "Leathnaigh an painéal",
-    "sidebarTabWordcloudNew": "Ceist nua “In aon fhocal amháin”"
+    "sidebarTabWordcloudNew": "Ceist nua “In aon fhocal amháin”",
+    "strip": {
+      "label": "Am an imeachta",
+      "onAir": "Ar an aer",
+      "progressLabel": "Dul chun cinn an imeachta i gcomparáid leis an am sceidealta",
+      "endsAt": "críoch ag {time} · {minutes, plural, =0 {an nóiméad deireanach} one {# nóiméad fágtha} two {# nóiméad fágtha} few {# nóiméad fágtha} many {# nóiméad fágtha} other {# nóiméad fágtha}}",
+      "overtimeOpen": "thar am le {minutes, plural, =0 {níos lú ná nóiméad} one {# nóiméad} two {# nóiméad} few {# nóiméad} many {# nóiméad} other {# nóiméad}} · fanann sé oscailte fad atá duine éigin ann",
+      "overtimeClosing": "thar am le {minutes, plural, =0 {níos lú ná nóiméad} one {# nóiméad} two {# nóiméad} few {# nóiméad} many {# nóiméad} other {# nóiméad}} · dúnfar i gceann {closing, plural, one {# nóiméad} two {# nóiméad} few {# nóiméad} many {# nóiméad} other {# nóiméad}}",
+      "timerChip": "Caint",
+      "timerChipLabel": "Amadóir na cainte: {time}. Oscail an seomra rialaithe",
+      "recOnLabel": "Á thaifeadadh le {time}. Oscail an seomra rialaithe",
+      "recOff": "Gan taifeadadh",
+      "recOffLabel": "Gan taifeadadh. Oscail an seomra rialaithe chun tosú",
+      "startsAt": "tosú ag {time} · i gceann {minutes, plural, =0 {níos lú ná nóiméad} one {# nóiméad} two {# nóiméad} few {# nóiméad} many {# nóiméad} other {# nóiméad}}",
+      "closingNow": "thar am le {minutes, plural, =0 {níos lú ná nóiméad} one {# nóiméad} two {# nóiméad} few {# nóiméad} many {# nóiméad} other {# nóiméad}} · tá an seomra ag dúnadh",
+      "timerPaused": "ar sos"
+    },
+    "controlRoom": {
+      "tab": "Rialú",
+      "recordingHeading": "Taifeadadh",
+      "recordingOff": "Gan taifeadadh",
+      "stopConfirm": "Stop an taifeadadh anois?",
+      "featuresHeading": "Gnéithe an tseomra",
+      "featuresHelp": "Casann siad air agus as do chách, láithreach.",
+      "timerHelp": "Comhaireamh síos don chainteoir: is féidir é a thaispeáint don seomra ar fad.",
+      "eventHeading": "Imeacht",
+      "endHelp": "Dúnann sé an seomra do chách agus marcálann sé an imeacht mar críochnaithe. Ní féidir é a chealú.",
+      "timerHeading": "Amadóir na gcaintí"
+    },
+    "closingNotice": "{minutes, plural, =0 {Tá an seomra ag dúnadh.} one {Dúnfaidh an seomra go huathoibríoch i gceann # nóiméad.} two {Dúnfaidh an seomra go huathoibríoch i gceann # nóiméad.} few {Dúnfaidh an seomra go huathoibríoch i gceann # nóiméad.} many {Dúnfaidh an seomra go huathoibríoch i gceann # nóiméad.} other {Dúnfaidh an seomra go huathoibríoch i gceann # nóiméad.}}"
   },
   "qa": {
     "title": "Ceisteanna agus Freagraí",

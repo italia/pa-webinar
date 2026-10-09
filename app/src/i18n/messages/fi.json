@@ -282,11 +282,6 @@
     "activeVsRegistered": "{active} aktiivista · {registered} ilmoittautunutta",
     "enterFullscreen": "Koko näyttö",
     "exitFullscreen": "Poistu koko näytöstä",
-    "overtime": {
-      "withCountdown": "Suunniteltu päättymisaika on ohi. Tapahtuma sulkeutuu automaattisesti {minutes, plural, one {# minuutin} other {# minuutin}} kuluttua.",
-      "closingNow": "Päättymisaika on saavutettu. Tapahtuma on sulkeutumassa.",
-      "indefinite": "Suunniteltu päättymisaika on ohi. Tapahtuma pysyy auki, kunnes osallistujia on yhteydessä."
-    },
     "recordingActive": "Tallennus käynnissä",
     "recordingShort": "REC",
     "recordingConsent": "Tämä tapahtuma tallennetaan. Osallistumalla suostut ääni-/videotallennukseen.",
@@ -357,7 +352,6 @@
     "qaSidebarPlaceholder": "Q&A-paneeli tulee saataville tapahtuman alkaessa.",
     "invalidToken": "Virheellinen linkki. Tarkista sähköpostissa saamasi linkki.",
     "sidebarTabQa": "Q&A",
-    "liveFeaturesLabel": "Toiminnot:",
     "whiteboardNotSavedHint": "Piirtotaulua ei tallenneta automaattisesti. Jos käytät sitä, vie se tiedostoon (piirtotaulun valikko) ja liitä se tapahtuman materiaaleihin ennen päättämistä.",
     "sidebarTabChat": "Keskustelu",
     "sidebarTabPolls": "Kyselyt",
@@ -527,12 +521,6 @@
       "moderatorLink": "Moderaattorilinkki",
       "moderatorLinkHint": "Linkin avaaja liittyy moderaattorina ja saa huoneen täydet ohjausoikeudet."
     },
-    "timer": {
-      "show": "Näytä ajastin",
-      "hide": "Piilota ajastin",
-      "remainingLabel": "Aikaa jäljellä (napsauta nähdäksesi kuluneen ajan)",
-      "elapsedLabel": "Kulunut aika (napsauta nähdäksesi jäljellä olevan ajan)"
-    },
     "videoCallFrameTitle": "Tapahtuman videopuhelu",
     "insecureContextTitle": "Suojaamaton osoite",
     "insecureContextBody": "Tämä sivu on avattu http://-osoitteella: selain ei salli mikrofonin ja kameran käyttöä, eikä videopuhelu voi alkaa. Avaa sama sivu suojatussa osoitteessa.",
@@ -550,7 +538,36 @@
     "resizeSidebar": "Muuta sivupaneelin kokoa",
     "collapseSidebar": "Pienennä paneeli",
     "expandSidebar": "Laajenna paneeli",
-    "sidebarTabWordcloudNew": "Uusi ”Yhdellä sanalla” -kysymys"
+    "sidebarTabWordcloudNew": "Uusi ”Yhdellä sanalla” -kysymys",
+    "strip": {
+      "label": "Tapahtuman aika",
+      "onAir": "Lähetyksessä",
+      "progressLabel": "Tapahtuman eteneminen suhteessa suunniteltuun aikaan",
+      "endsAt": "päättyy klo {time} · {minutes, plural, =0 {viimeinen minuutti} one {# minuutti jäljellä} other {# minuuttia jäljellä}}",
+      "overtimeOpen": "{minutes, plural, =0 {alle minuutin} one {# minuutti} other {# minuuttia}} yliaikaa · pysyy auki, niin kauan kuin joku on paikalla",
+      "overtimeClosing": "{minutes, plural, =0 {alle minuutin} one {# minuutti} other {# minuuttia}} yliaikaa · sulkeutuu {closing, plural, one {# minuutin} other {# minuutin}} kuluttua",
+      "timerChip": "Puheenvuoro",
+      "timerChipLabel": "Puheenvuoron ajastin: {time}. Avaa ohjaamo",
+      "recOnLabel": "Tallentaa {time}. Avaa ohjaamo",
+      "recOff": "Ei tallenna",
+      "recOffLabel": "Ei tallenna. Aloita avaamalla ohjaamo",
+      "startsAt": "alkaa klo {time} · {minutes, plural, =0 {alle minuutin päästä} one {# minuutin päästä} other {# minuutin päästä}}",
+      "closingNow": "{minutes, plural, =0 {alle minuutin} one {# minuutti} other {# minuuttia}} yliaikaa · huone sulkeutuu",
+      "timerPaused": "tauolla"
+    },
+    "controlRoom": {
+      "tab": "Ohjaamo",
+      "recordingHeading": "Tallennus",
+      "recordingOff": "Ei tallenna",
+      "stopConfirm": "Lopetetaanko tallennus nyt?",
+      "featuresHeading": "Huoneen toiminnot",
+      "featuresHelp": "Ne kytkeytyvät päälle ja pois kaikille heti.",
+      "timerHelp": "Lähtölaskenta puhujalle: voit näyttää sen koko huoneelle.",
+      "eventHeading": "Tapahtuma",
+      "endHelp": "Sulkee huoneen kaikilta ja merkitsee tapahtuman päättyneeksi. Ei voi perua.",
+      "timerHeading": "Puheenvuorojen ajastin"
+    },
+    "closingNotice": "{minutes, plural, =0 {Huone sulkeutuu.} one {Huone sulkeutuu automaattisesti # minuutin kuluttua.} other {Huone sulkeutuu automaattisesti # minuutin kuluttua.}}"
   },
   "qa": {
     "title": "Kysymykset ja vastaukset",

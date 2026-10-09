@@ -282,11 +282,6 @@
     "activeVsRegistered": "{active} actief · {registered} aangemeld",
     "enterFullscreen": "Volledig scherm",
     "exitFullscreen": "Volledig scherm verlaten",
-    "overtime": {
-      "withCountdown": "De geplande eindtijd is verstreken. Het evenement wordt automatisch beëindigd over {minutes, plural, one {# minuut} other {# minuten}}.",
-      "closingNow": "De eindtijd is bereikt. Het evenement wordt afgesloten.",
-      "indefinite": "De geplande eindtijd is verstreken. Het evenement blijft actief zolang er deelnemers verbonden zijn."
-    },
     "recordingActive": "Opname bezig",
     "recordingShort": "REC",
     "recordingConsent": "Dit evenement wordt opgenomen. Door deel te nemen stemt u in met de audio-/video-opname.",
@@ -357,7 +352,6 @@
     "qaSidebarPlaceholder": "Het Q&A-paneel wordt beschikbaar wanneer het evenement begint.",
     "invalidToken": "Ongeldige link. Controleer de link die u per e-mail hebt ontvangen.",
     "sidebarTabQa": "Q&A",
-    "liveFeaturesLabel": "Functies:",
     "whiteboardNotSavedHint": "Het whiteboard wordt niet automatisch opgeslagen. Als u het gebruikt, exporteer het dan (menu van het whiteboard) en voeg het toe aan het Materiaal van het evenement voordat u afsluit.",
     "sidebarTabChat": "Chat",
     "sidebarTabPolls": "Peilingen",
@@ -527,12 +521,6 @@
       "moderatorLink": "Moderatorlink",
       "moderatorLinkHint": "Wie deze link opent, komt binnen als moderator met volledige regie over de zaal."
     },
-    "timer": {
-      "show": "De timer tonen",
-      "hide": "De timer verbergen",
-      "remainingLabel": "Resterende tijd (klik voor de verstreken tijd)",
-      "elapsedLabel": "Verstreken tijd (klik voor de resterende tijd)"
-    },
     "videoCallFrameTitle": "Videogesprek van het evenement",
     "insecureContextTitle": "Onveilig adres",
     "insecureContextBody": "Deze pagina is geopend via http://: de browser staat microfoon en camera niet toe, en het videogesprek kan niet starten. Open dezelfde pagina op het beveiligde adres.",
@@ -550,7 +538,36 @@
     "resizeSidebar": "Formaat van het zijpaneel wijzigen",
     "collapseSidebar": "Paneel inklappen",
     "expandSidebar": "Paneel uitklappen",
-    "sidebarTabWordcloudNew": "Nieuwe vraag ‘In één woord’"
+    "sidebarTabWordcloudNew": "Nieuwe vraag ‘In één woord’",
+    "strip": {
+      "label": "Tijd van het evenement",
+      "onAir": "In de lucht",
+      "progressLabel": "Voortgang van het evenement ten opzichte van de geplande tijd",
+      "endsAt": "einde om {time} · {minutes, plural, =0 {laatste minuut} one {nog # minuut} other {nog # minuten}}",
+      "overtimeOpen": "{minutes, plural, =0 {minder dan een minuut} one {# minuut} other {# minuten}} uitgelopen · blijft open zolang er iemand is",
+      "overtimeClosing": "{minutes, plural, =0 {minder dan een minuut} one {# minuut} other {# minuten}} uitgelopen · sluit over {closing, plural, one {# minuut} other {# minuten}}",
+      "timerChip": "Bijdrage",
+      "timerChipLabel": "Timer van de bijdrage: {time}. Regie openen",
+      "recOnLabel": "Opname loopt {time}. Regie openen",
+      "recOff": "Geen opname",
+      "recOffLabel": "Geen opname. Open de regie om te starten",
+      "startsAt": "begint om {time} · over {minutes, plural, =0 {minder dan een minuut} one {# minuut} other {# minuten}}",
+      "closingNow": "{minutes, plural, =0 {minder dan een minuut} one {# minuut} other {# minuten}} uitgelopen · de ruimte wordt gesloten",
+      "timerPaused": "gepauzeerd"
+    },
+    "controlRoom": {
+      "tab": "Regie",
+      "recordingHeading": "Opname",
+      "recordingOff": "Geen opname",
+      "stopConfirm": "De opname nu stoppen?",
+      "featuresHeading": "Functies van de ruimte",
+      "featuresHelp": "Ze gaan voor iedereen meteen aan en uit.",
+      "timerHelp": "Een aftelling voor wie spreekt: je kunt hem aan de hele ruimte tonen.",
+      "eventHeading": "Evenement",
+      "endHelp": "Sluit de ruimte voor iedereen en markeert het evenement als afgelopen. Kan niet ongedaan worden gemaakt.",
+      "timerHeading": "Timer voor bijdragen"
+    },
+    "closingNotice": "{minutes, plural, =0 {De ruimte wordt gesloten.} one {De ruimte sluit automatisch over # minuut.} other {De ruimte sluit automatisch over # minuten.}}"
   },
   "qa": {
     "title": "Vragen en Antwoorden",

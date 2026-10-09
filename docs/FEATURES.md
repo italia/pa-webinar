@@ -247,15 +247,17 @@ Configured in: [Runtime settings](configuration/runtime-settings.md) · [From cr
 - **Stage colors.** The area behind the videos is the room's blue instead of black. Where the conference server reads the portal's branding document, Jitsi's toolbar, menus and dialogs, the tiles of people without a camera and the initials avatars use matching blues too. See [Branding limits](architecture/jitsi-integration.md#branding-limits).
 - **Advanced noise suppression.** *Optional.* It needs the patched Jitsi web image. See [How PA Webinar extends Jitsi Meet](architecture/jitsi-integration.md).
 - **Reconnection.** After a network drop the app tries to rejoin automatically and shows each attempt.
-- **Top bar.** It shows the number of people present, the time left or the time elapsed (the audience can switch this on), the current agenda topic while the agenda is on (it opens the whole agenda), **Share** (the **Link to join** and the **Event page**; moderators can also show the moderator link), and **Leave room**. When guest access is off, scheduled events offer only the event page, because the link to join would send the recipient to registration.
-- **Banners.** One banner announces who is sharing their screen. Another appears after the scheduled end, stating when the room will close.
+- **Top bar.** It shows the number of people present (to moderators), the current agenda topic while the agenda is on (it opens the whole agenda), **Share** (the **Link to join** and the **Event page**; moderators can also show the moderator link), and **Leave room**. When guest access is off, scheduled events offer only the event page, because the link to join would send the recipient to registration.
+- **Time strip** (moderators only). Under the top bar: how long the event has been on air, a progress bar against the scheduled time, and the scheduled end with the minutes left. The bar turns amber in the last ten minutes; past the end it shows the overtime and when the room closes on its own, with a moving texture, and turns red in the last ten minutes before the close. On the right, the recording state (a red **REC** pill with the recording's duration while it runs) and the talk timer while it is on; clicking either opens the **Control** panel. Participants and speakers see none of this: only the **REC** icon while recording and, in the last ten minutes before the room closes on its own, a notice saying when. Before the start, the strip says when the event begins; an instant call shows only the time on air.
+- **Banners.** One banner announces who is sharing their screen.
 
 ### Panels in the drawer
 
-The drawer is a column on the right on desktop, which can be widened by dragging its edge or collapsed to a strip of icons, and a sheet from the bottom on smaller screens. It holds these panels:
+The drawer is a column on the right on desktop, which can be widened by dragging its edge or collapsed to a strip of icons (with a short animation, none when the system asks for reduced motion), and a sheet from the bottom on smaller screens. It holds these panels:
 
 | Panel | What it does | Default |
 |---|---|---|
+| **Control** | Moderators only, first in the strip: recording (start, stop with confirmation, recorder warnings), the room features switched on and off for everyone (Q&A, chat, agenda, **In one word**, whiteboard), the talk timer, and, set apart at the bottom, **End event**. Speakers and the audience do not see it | Always, for moderators |
 | **Chat** | Messages grouped by sender, each group headed by name, role and time, with replies, @mentions (typing `@` suggests the people in the call and those who wrote in the chat), an emoji picker with search and recently used emoji, emoji reactions, image and PDF attachments up to 10 MB where the installation has files storage, and edits within 15 minutes. A line under the messages says who is typing. Moderators can hide messages. Anyone who can read the chat can **Download the chat**. The bell sets the alerts, remembered by the browser: **All messages** (the default for moderators), **Mentions and replies** (the default for everyone else) or **Silent**, each with a sound and, once the browser allows it, a browser notification while the page is in the background or behind another window. While the chat is not in view, its tab counts the unread messages and each message that alerts also appears as a preview over the room; a message that mentions or replies to you is highlighted, its preview stays longer and the counter shows **@**. Nothing alerts for a message already on screen; a **new messages** button appears when the list is scrolled up. | On |
 | **Q&A** | Questions of up to 500 characters with upvotes. Registrants, guests and speakers can upvote. Moderators **Highlight**, **Mark as answered** or **Dismiss**, and can **Answer** in writing (up to 2000 characters): the answer appears under the question for everyone, and a pending or highlighted question becomes answered. The person who asked sees **Your question** on it. A dot on the tab tells who is on another panel that there are new questions or answers; a moderator also hears the chat sound for a new question, and whoever asked hears it when their question is answered, with a browser notification while the page is in the background or behind another window, as in the chat. The chat's bell settings apply, and **Silent** turns sound and notifications off here too. | Off |
 | **Polls** | Moderators create a poll, then **Close voting**, **Publish results** or **Reopen**. Each person votes once. | Always shown |
@@ -271,8 +273,7 @@ Moderators can switch Q&A, chat, **Agenda** and **In one word** on and off durin
 - **Reactions.** The site chooses the mode:
   - `NATIVE` (the default): Jitsi's own reactions button. It is ephemeral and nothing is counted.
   - `CUSTOM`: the app's reaction bar. Reactions are counted and appear in event analytics.
-- **Presentation timer.** A moderator starts a countdown (presets **5 min** to **30 min**, or custom). With **Show to all**, everyone sees it. It ends with **Time's up!**
-- **Event timer.** It shows the time to the scheduled end and keeps counting past it. It is on by default for moderators. Everyone else can switch it on, and the choice is remembered in the browser. Past the end, its icon turns amber, and red in the last ten minutes before the room closes, also while the timer is switched off; its tooltip says when the room closes.
+- **Talk timer.** From the **Control** panel a moderator starts a countdown (presets **5 min** to **30 min**), pauses and resets it. With **Show to all**, everyone sees it in a bar above the call; moderators always see it in the time strip. It ends with **Time's up!**
 - **Raised hands.** They are listed in the **Participants** panel, in order, visible to everyone. A hand stays up while its owner speaks, until they lower it or a moderator deals with it.
 
 ### Recording in the room
@@ -280,8 +281,8 @@ Moderators can switch Q&A, chat, **Agenda** and **In one word** on and off durin
 *Optional*, and only when the event enables recording.
 
 - Participants and guests see a **Recording consent** dialog before they enter, when the installation can record (Jibri, or the per-participant recorder). They can choose **Do not participate**. The waiting room's recording notice follows the same rule.
-- While recording is running, a red **REC** icon stays in the top bar for everyone.
-- Moderators start and stop the recording. With **Start recording automatically**, it starts on its own.
+- While recording is running, a red **REC** icon stays in the top bar for participants and speakers; moderators see it, with the recording's duration, in the time strip. The duration comes from the start the room reported to the server, so every moderator sees the same figure, also after joining late.
+- Moderators start and stop the recording from the **Control** panel; stopping asks for confirmation. With **Start recording automatically**, it starts on its own.
 
 The two capture paths (a composite video from Jibri, and per-participant audio from the recorder bot) are described in [Recording: composite video and per-speaker audio](architecture/recording.md).
 
@@ -321,11 +322,11 @@ What a moderator can do in the room:
 
 | Area | Controls |
 |---|---|
-| Start and end | **Start event** in the waiting room. **End event** in the moderator bar, or **End for everyone** from **Leave room**. |
+| Start and end | **Start event** in the waiting room. **End event** at the bottom of the **Control** panel, set apart and with a confirmation, or **End for everyone** from **Leave room**. |
 | Audio and video | In the **Participants** panel: **Mute everyone**, **Turn off all video**, the **Microphones locked** and **Video locked** switches, and per person **Mute**, **Turn off video**, **Take back the floor** and **Remove**. Jitsi's own security button. When an event does not grant participants the microphone, camera or screen, the room starts locked on the bridge. |
 | Raised hands | In the **Participants** panel: **Give the floor** (audio and video), **Audio only**, **Lower hand**. |
-| Recording | **Start recording** and **Stop recording**, when the event enables recording. While the recorder starts, the button reads **Recording starting…**; if it has not started within the provisioning timeout, **Recording unavailable**; without a declared recordings storage (`RECORDING_STORAGE_TYPE`), **Recording not configured in infrastructure**. A running recording can always be stopped. |
-| Interaction | Toggle Q&A, chat, **Agenda** and **In one word**. Run polls, word-cloud rounds, the agenda and the presentation timer. Moderate Q&A, hide chat messages and remove words from the word cloud. Add, edit and delete materials, and see how often each was opened. |
+| Recording | In the **Control** panel, **Start recording** and **Stop recording** (with a confirmation), when the event enables recording. While the recorder starts, the button reads **Recording starting…**; if it has not started within the provisioning timeout, **Recording unavailable**; without a declared recordings storage (`RECORDING_STORAGE_TYPE`), **Recording not configured in infrastructure**. A running recording can always be stopped. |
+| Interaction | In the **Control** panel, switch Q&A, chat, **Agenda** and **In one word** on and off for everyone, open the whiteboard, and run the talk timer. Run polls, word-cloud rounds and the agenda. Moderate Q&A, hide chat messages and remove words from the word cloud. Add, edit and delete materials, and see how often each was opened. |
 
 Speakers always have full audio, video and screen sharing. They have no moderation powers and no recording control, and they skip the participant recording-consent dialog.
 

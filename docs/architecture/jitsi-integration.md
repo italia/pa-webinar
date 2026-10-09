@@ -59,7 +59,7 @@ flowchart LR
 
 | Rung | Where it lives | Section |
 |---|---|---|
-| IFrame API | `app/src/components/jitsi/jitsi-room.tsx`, `app/src/hooks/use-jitsi-events.ts` | [Embedding through the IFrame API](#embedding-through-the-iframe-api) |
+| IFrame API | `app/src/components/jitsi/jitsi-room.tsx` (the only consumer of IFrame API events, passed to the room as callbacks) | [Embedding through the IFrame API](#embedding-through-the-iframe-api) |
 | Config overrides | `app/src/lib/jitsi/config.ts` | [Configuration applied to every room](#configuration-applied-to-every-room) |
 | JWT authentication | `app/src/lib/auth/jwt.ts` (signing), Prosody environment (verification) | [Authentication bridge](#authentication-bridge-the-prosody-side) |
 | Prosody module | `infra/jitsi/prosody-plugins/mod_token_affiliation_custom.lua` | [Prosody extensions](#prosody-extensions) |
@@ -166,14 +166,14 @@ wait is covered in [the waiting room](waiting-room.md); the status machine itsel
 | `setVideoQuality` | `JitsiRoom` | Enforce the quality preset's maximum height on join and whenever the camera is turned on |
 | `setNoiseSuppressionEnabled` | `JitsiRoom` | Keep advanced noise suppression off, or turn it on; see [noise suppression](#noise-suppression-and-the-patched-image) |
 | `setVirtualBackground` | `JitsiRoom` | Apply the background chosen in the waiting room |
-| `hangup` | Live room (**Leave room**, the leave prompt); moderator control bar (**End event**) | Every exit path, for every role |
-| `startRecording`, `stopRecording` (`mode: 'file'`) | Moderator control bar; the live room's recording prompt, or automatically on join when `autoStartRecording` is set | Composite recording through Jibri; see [recording](recording.md) |
-| `muteEveryone` + `toggleModeration` | Moderator control bar | **Participant mic** mutes everyone and turns on Jitsi's audio moderation; **Participant video** toggles video moderation |
+| `hangup` | Live room (**Leave room**, the leave prompt); **Control** panel (**End event**) | Every exit path, for every role |
+| `startRecording`, `stopRecording` (`mode: 'file'`) | **Control** panel (`app/src/hooks/use-recording-control.ts`); the live room's recording prompt, or automatically on join when `autoStartRecording` is set | Composite recording through Jibri; see [recording](recording.md) |
+| `muteRemoteParticipant` + `toggleModeration` | Participants panel | **Mute everyone** and **Turn off all video** mute each person but oneself; the **Microphones locked** and **Video locked** switches turn Jitsi's audio and video moderation on and off |
 | `askToUnmute`, `approveVideo` | Raised-hand queue | **Give the floor** (audio and video) or **Audio only** for someone with a raised hand |
 | `kickParticipant` | Participants panel | Remove a participant (portal moderators, anyone except themselves) |
 | `setParticipantVolume` | Participants panel | Change how loud one participant sounds in this browser only |
 | `toggleRaiseHand` | Live room | Lower your own hand when a moderator asks for it (see below) |
-| `toggleWhiteboard` | Moderator control bar | Open Jitsi's whiteboard, when enabled (see [below](#reactions-whiteboard-and-instant-calls)) |
+| `toggleWhiteboard` | **Control** panel | Open Jitsi's whiteboard, when enabled (see [below](#reactions-whiteboard-and-instant-calls)) |
 
 To find every call site, run `grep -rn "executeCommand(" app/src --include=*.tsx` (a few comments match
 too); for listeners, `grep -rn "addListener(" app/src/components app/src/hooks`. The typed overloads in
@@ -392,8 +392,8 @@ Blur is not available from outside the iframe (see [Limits of the boundary](#lim
   `config.whiteboard` with a collaboration backend. Neither the chart's values nor Docker Compose
   enables one; the pinned subchart offers `jitsi-meet.excalidraw.enabled` (off by default), which is
   not tested with PA Webinar.
-- **The portal's whiteboard controls.** The **Whiteboard** button in the moderator control bar (desktop
-  widths) and the drawer's reminder to export the board before the event ends follow the same two
+- **The portal's whiteboard controls.** The **Whiteboard** button in the **Control** panel (desktop
+  widths) and its reminder to export the board before the event ends follow the same two
   app-side conditions. `NEXT_PUBLIC_WHITEBOARD_ENABLED` is read at runtime with `getPublicEnv()` in the
   live page's Server Component (`app/src/lib/jitsi/whiteboard.ts`) and passed down to the toolbar, the
   control bar and the drawer, so changing it needs a pod restart, not a rebuild. Set it only when the
@@ -409,17 +409,18 @@ Blur is not available from outside the iframe (see [Limits of the boundary](#lim
 The portal draws its own controls around the iframe (`app/src/components/live/live-event-client.tsx`
 and `app/src/components/jitsi/`):
 
-- **Top bar.** Event title, participant count, the current agenda topic, the recording indicator
-  (a red **REC** icon while Jibri records, announced to screen readers when it appears), the event
-  timer, sharing links, **Fullscreen** (desktop) and **Leave room**. The timer turns amber past the
-  scheduled end and red in the last ten minutes before the overtime limit, also while it is switched
-  off and only its icon shows; its tooltip says when the room closes
-  ([the overtime countdown](event-lifecycle.md#the-overtime-countdown)). No banner sits above the video
-  for either. The app's
-  fullscreen covers the whole live area, so the drawer stays visible. Dialogs render inside the
-  fullscreen element, so they do not disappear behind it.
-- **Moderator control bar** (`ModeratorControls`, `app/src/components/jitsi/moderator-controls.tsx`):
-  - **Start recording** and **Stop recording**, when the event has composite recording
+- **Top bar.** Event title, participant count (moderators), the current agenda topic, the recording
+  indicator for participants and speakers (a red **REC** icon while Jibri records, announced to screen
+  readers when it appears), sharing links, **Fullscreen** (desktop) and **Leave room**. No clock: the
+  audience sees no time. The app's fullscreen covers the whole live area, so the drawer stays visible.
+  Dialogs render inside the fullscreen element, so they do not disappear behind it.
+- **Time strip** (moderators, `app/src/components/live/live-time-strip.tsx`). Time on air against the
+  schedule, the overtime and the close ([the overtime countdown](event-lifecycle.md#the-overtime-countdown)),
+  the recording state with its duration and the talk timer while it is on. It holds no risky command:
+  a click on the recording or the timer opens the **Control** panel.
+- **Control panel** (`app/src/components/live/control-room-panel.tsx`, the first drawer tab for
+  moderators; the recording logic is in `app/src/hooks/use-recording-control.ts`):
+  - **Start recording** and **Stop recording** (with a confirmation), when the event has composite recording
     (`recordingEnabled`). The control follows the recorder state that `/api/status` reports in
     `metrics.jibriStatus`, which the room polls every 3 seconds while the event is `LIVE`
     (`leggiFaseRegistratore()` in `app/src/lib/jitsi/bridge-readiness.ts`):
@@ -440,15 +441,16 @@ and `app/src/components/jitsi/`):
       and the button is a disabled **Recording not configured in infrastructure**.
 
     A recording in progress can always be stopped, whatever the state says.
-  - **Whiteboard**, under the conditions in [Reactions, whiteboard and instant calls](#reactions-whiteboard-and-instant-calls).
-  - The presentation timer's control, and **End event** (see
+  - The room features switched on and off for everyone (Q&A, chat, agenda, **In one word**) and the
+    **Whiteboard**, under the conditions in [Reactions, whiteboard and instant calls](#reactions-whiteboard-and-instant-calls).
+  - The talk timer's controls, and, set apart at the bottom, **End event** (see
     [Leaving the room](#leaving-the-room-and-readytoclose)).
 
   When the recorder becomes ready and the event does not start recording on its own, a notice below
-  the bar offers **Start now** and **Later**. It is not a dialog and takes no focus, so a moderator who
+  the time strip offers **Start now** and **Later**. It is not a dialog and takes no focus, so a moderator who
   is speaking or typing is not interrupted.
-- **Drawer** (`LiveSidebar`). The live panels: Q&A, chat, polls, word cloud, agenda, materials and
-  participants. It is a side drawer from 992 px up and a bottom sheet with a tab strip below that. The
+- **Drawer** (`LiveSidebar`). The live panels: **Control** (moderators), Q&A, chat, polls, word cloud,
+  agenda, materials and participants. It is a side drawer from 992 px up and a bottom sheet with a tab strip below that. The
   panels themselves are documented in [live interaction](live-interaction.md).
 - **Participants panel** (`app/src/components/participants/participant-panel.tsx`). The roster from
   `getParticipantsInfo()` with the recorder bot filtered out, refreshed on join, leave and name changes
@@ -856,7 +858,7 @@ order, and roll out through [upgrades and rollback](../operations/upgrades.md).
 5. **Check the configuration keys and API surface the app relies on.** Toolbar button names, the nested
    `raisedHands.disableRemoveRaisedHandOnFocus`, `disableSelfView`, the IFrame API commands and events
    in the tables above, and the roster shape of `getParticipantsInfo()` (`app/src/lib/jitsi/participants.ts`
-   and `app/src/hooks/use-jitsi-events.ts` explain what depends on it). Run
+   explains what depends on it). Run
    `npm run test --workspace=app`, which includes the Jitsi configuration guard tests.
 6. **Make a real call.** Use several devices and at least one microphone that does not run at 48 kHz.
    Check that audio works with noise suppression in its configured state, that participants cannot act

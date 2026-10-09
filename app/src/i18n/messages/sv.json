@@ -282,11 +282,6 @@
     "activeVsRegistered": "{active} aktiva · {registered} anmälda",
     "enterFullscreen": "Helskärm",
     "exitFullscreen": "Avsluta helskärm",
-    "overtime": {
-      "withCountdown": "Den planerade sluttiden har passerats. Evenemanget avslutas automatiskt om {minutes, plural, one {# minut} other {# minuter}}.",
-      "closingNow": "Sluttiden har nåtts. Evenemanget håller på att avslutas.",
-      "indefinite": "Den planerade sluttiden har passerats. Evenemanget förblir aktivt så länge deltagare är anslutna."
-    },
     "recordingActive": "Inspelning pågår",
     "recordingShort": "REC",
     "recordingConsent": "Detta evenemang spelas in. Genom att delta samtycker du till ljud-/videoinspelning.",
@@ -357,7 +352,6 @@
     "qaSidebarPlaceholder": "Q&A-panelen blir tillgänglig när evenemanget startar.",
     "invalidToken": "Ogiltig länk. Kontrollera länken du fick via e-post.",
     "sidebarTabQa": "Q&A",
-    "liveFeaturesLabel": "Funktioner:",
     "whiteboardNotSavedHint": "Whiteboarden sparas inte automatiskt. Om du använder den, exportera den (whiteboardens meny) och bifoga den till evenemangets material innan du avslutar.",
     "sidebarTabChat": "Chatt",
     "sidebarTabPolls": "Omröstningar",
@@ -527,12 +521,6 @@
       "moderatorLink": "Moderatorlänk",
       "moderatorLinkHint": "Den som öppnar den här länken kommer in som moderator med full kontroll över rummet."
     },
-    "timer": {
-      "show": "Visa timern",
-      "hide": "Dölj timern",
-      "remainingLabel": "Återstående tid (klicka för förfluten tid)",
-      "elapsedLabel": "Förfluten tid (klicka för återstående tid)"
-    },
     "videoCallFrameTitle": "Evenemangets videosamtal",
     "insecureContextTitle": "Osäker adress",
     "insecureContextBody": "Den här sidan har öppnats via http://: webbläsaren tillåter inte mikrofon och kamera, och videosamtalet kan inte starta. Öppna samma sida på den säkra adressen.",
@@ -550,7 +538,36 @@
     "resizeSidebar": "Ändra storlek på sidopanelen",
     "collapseSidebar": "Fäll ihop panelen",
     "expandSidebar": "Fäll ut panelen",
-    "sidebarTabWordcloudNew": "Ny fråga ”Med ett ord”"
+    "sidebarTabWordcloudNew": "Ny fråga ”Med ett ord”",
+    "strip": {
+      "label": "Evenemangets tid",
+      "onAir": "I sändning",
+      "progressLabel": "Evenemangets förlopp jämfört med den planerade tiden",
+      "endsAt": "slut kl. {time} · {minutes, plural, =0 {sista minuten} one {# minut kvar} other {# minuter kvar}}",
+      "overtimeOpen": "{minutes, plural, =0 {mindre än en minut} one {# minut} other {# minuter}} över tiden · förblir öppen så länge någon är kvar",
+      "overtimeClosing": "{minutes, plural, =0 {mindre än en minut} one {# minut} other {# minuter}} över tiden · stänger om {closing, plural, one {# minut} other {# minuter}}",
+      "timerChip": "Inlägg",
+      "timerChipLabel": "Inläggets timer: {time}. Öppna kontrollrummet",
+      "recOnLabel": "Spelar in sedan {time}. Öppna kontrollrummet",
+      "recOff": "Spelar inte in",
+      "recOffLabel": "Spelar inte in. Öppna kontrollrummet för att starta",
+      "startsAt": "börjar kl. {time} · om {minutes, plural, =0 {mindre än en minut} one {# minut} other {# minuter}}",
+      "closingNow": "{minutes, plural, =0 {mindre än en minut} one {# minut} other {# minuter}} över tiden · rummet stängs",
+      "timerPaused": "pausad"
+    },
+    "controlRoom": {
+      "tab": "Kontroll",
+      "recordingHeading": "Inspelning",
+      "recordingOff": "Spelar inte in",
+      "stopConfirm": "Stoppa inspelningen nu?",
+      "featuresHeading": "Rummets funktioner",
+      "featuresHelp": "De slås på och av för alla, direkt.",
+      "timerHelp": "En nedräkning för den som talar: du kan visa den för hela rummet.",
+      "eventHeading": "Evenemang",
+      "endHelp": "Stänger rummet för alla och markerar evenemanget som avslutat. Kan inte ångras.",
+      "timerHeading": "Timer för inlägg"
+    },
+    "closingNotice": "{minutes, plural, =0 {Rummet stängs.} one {Rummet stängs automatiskt om # minut.} other {Rummet stängs automatiskt om # minuter.}}"
   },
   "qa": {
     "title": "Frågor och svar",

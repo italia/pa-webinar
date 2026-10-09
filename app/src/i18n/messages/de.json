@@ -282,11 +282,6 @@
     "activeVsRegistered": "{active} aktiv · {registered} angemeldet",
     "enterFullscreen": "Vollbild",
     "exitFullscreen": "Vollbild beenden",
-    "overtime": {
-      "withCountdown": "Die geplante Endzeit ist erreicht. Das Event wird in {minutes, plural, one {# Minute} other {# Minuten}} automatisch beendet.",
-      "closingNow": "Endzeit erreicht. Das Event wird gleich beendet.",
-      "indefinite": "Die geplante Endzeit ist erreicht. Das Event bleibt aktiv, solange Teilnehmende verbunden sind."
-    },
     "recordingActive": "Aufzeichnung läuft",
     "recordingShort": "REC",
     "recordingConsent": "Diese Veranstaltung wird aufgezeichnet. Mit dem Betreten stimmen Sie der Audio-/Videoaufzeichnung zu.",
@@ -357,7 +352,6 @@
     "qaSidebarPlaceholder": "Das Q&A-Panel wird verfügbar, sobald die Veranstaltung beginnt.",
     "invalidToken": "Ungültiger Link. Bitte überprüfen Sie den Link, den Sie per E-Mail erhalten haben.",
     "sidebarTabQa": "Q&A",
-    "liveFeaturesLabel": "Funktionen:",
     "whiteboardNotSavedHint": "Das Whiteboard wird nicht automatisch gespeichert. Wenn Sie es nutzen, exportieren Sie es (Whiteboard-Menü) und hängen Sie es vor dem Beenden an die Materialien der Veranstaltung an.",
     "sidebarTabChat": "Chat",
     "sidebarTabPolls": "Umfragen",
@@ -527,12 +521,6 @@
       "moderatorLink": "Moderator-Link",
       "moderatorLinkHint": "Wer diesen Link öffnet, betritt den Raum als Moderator mit voller Regiekontrolle."
     },
-    "timer": {
-      "show": "Timer anzeigen",
-      "hide": "Timer ausblenden",
-      "remainingLabel": "Verbleibende Zeit (klicken für die verstrichene Zeit)",
-      "elapsedLabel": "Verstrichene Zeit (klicken für die verbleibende Zeit)"
-    },
     "videoCallFrameTitle": "Videokonferenz der Veranstaltung",
     "insecureContextTitle": "Unsichere Adresse",
     "insecureContextBody": "Diese Seite wurde über http:// geöffnet: Der Browser erlaubt weder Mikrofon noch Kamera, und der Videoanruf kann nicht starten. Öffnen Sie dieselbe Seite unter der sicheren Adresse.",
@@ -550,7 +538,36 @@
     "resizeSidebar": "Größe der Seitenleiste ändern",
     "collapseSidebar": "Bereich einklappen",
     "expandSidebar": "Bereich ausklappen",
-    "sidebarTabWordcloudNew": "Neue Frage „In einem Wort“"
+    "sidebarTabWordcloudNew": "Neue Frage „In einem Wort“",
+    "strip": {
+      "label": "Zeit der Veranstaltung",
+      "onAir": "Auf Sendung",
+      "progressLabel": "Fortschritt der Veranstaltung gegenüber der geplanten Zeit",
+      "endsAt": "Ende um {time} · {minutes, plural, =0 {letzte Minute} one {noch # Minute} other {noch # Minuten}}",
+      "overtimeOpen": "{minutes, plural, =0 {weniger als eine Minute} one {# Minute} other {# Minuten}} überzogen · bleibt offen, solange jemand da ist",
+      "overtimeClosing": "{minutes, plural, =0 {weniger als eine Minute} one {# Minute} other {# Minuten}} überzogen · schließt in {closing, plural, one {# Minute} other {# Minuten}}",
+      "timerChip": "Beitrag",
+      "timerChipLabel": "Timer des Beitrags: {time}. Regie öffnen",
+      "recOnLabel": "Aufnahme läuft seit {time}. Regie öffnen",
+      "recOff": "Keine Aufnahme",
+      "recOffLabel": "Keine Aufnahme. Regie öffnen, um sie zu starten",
+      "startsAt": "Beginn um {time} · in {minutes, plural, =0 {weniger als einer Minute} one {# Minute} other {# Minuten}}",
+      "closingNow": "{minutes, plural, =0 {weniger als eine Minute} one {# Minute} other {# Minuten}} überzogen · der Raum wird geschlossen",
+      "timerPaused": "pausiert"
+    },
+    "controlRoom": {
+      "tab": "Regie",
+      "recordingHeading": "Aufnahme",
+      "recordingOff": "Keine Aufnahme",
+      "stopConfirm": "Aufnahme jetzt beenden?",
+      "featuresHeading": "Funktionen des Raums",
+      "featuresHelp": "Sie werden für alle sofort ein- und ausgeschaltet.",
+      "timerHelp": "Ein Countdown für die sprechende Person: Sie können ihn dem ganzen Raum zeigen.",
+      "eventHeading": "Veranstaltung",
+      "endHelp": "Schließt den Raum für alle und markiert die Veranstaltung als beendet. Nicht rückgängig zu machen.",
+      "timerHeading": "Timer für Beiträge"
+    },
+    "closingNotice": "{minutes, plural, =0 {Der Raum wird geschlossen.} one {Der Raum schließt automatisch in # Minute.} other {Der Raum schließt automatisch in # Minuten.}}"
   },
   "qa": {
     "title": "Fragen und Antworten",

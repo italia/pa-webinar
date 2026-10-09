@@ -282,11 +282,6 @@
     "activeVsRegistered": "{active} active · {registered} registered",
     "enterFullscreen": "Fullscreen",
     "exitFullscreen": "Exit fullscreen",
-    "overtime": {
-      "withCountdown": "The scheduled end time has passed. The event will close automatically in {minutes, plural, one {# minute} other {# minutes}}.",
-      "closingNow": "End time reached. The event is about to close.",
-      "indefinite": "The scheduled end time has passed. The event will stay open while participants are connected."
-    },
     "recordingActive": "Recording in progress",
     "recordingShort": "REC",
     "recordingConsent": "This event is being recorded. By entering, you consent to audio/video recording.",
@@ -357,7 +352,6 @@
     "qaSidebarPlaceholder": "The Q&A panel will be available when the event starts.",
     "invalidToken": "Invalid link. Please check the link you received by email.",
     "sidebarTabQa": "Q&A",
-    "liveFeaturesLabel": "Features:",
     "whiteboardNotSavedHint": "The whiteboard isn't saved automatically. If you use it, export it (whiteboard menu) and attach it to the event Materials before ending.",
     "sidebarTabChat": "Chat",
     "sidebarTabPolls": "Polls",
@@ -527,12 +521,6 @@
       "moderatorLink": "Moderator link",
       "moderatorLinkHint": "Anyone opening this link joins as a moderator with full control of the room."
     },
-    "timer": {
-      "show": "Show the timer",
-      "hide": "Hide the timer",
-      "remainingLabel": "Time remaining (click for time elapsed)",
-      "elapsedLabel": "Time elapsed (click for time remaining)"
-    },
     "videoCallFrameTitle": "Event video call",
     "insecureContextTitle": "Insecure address",
     "insecureContextBody": "This page was opened over http://: the browser does not allow the microphone and camera, and the video call cannot start. Open the same page at the secure address.",
@@ -550,7 +538,36 @@
     "resizeSidebar": "Resize the side panel",
     "collapseSidebar": "Collapse the panel",
     "expandSidebar": "Expand the panel",
-    "sidebarTabWordcloudNew": "New “In one word” question"
+    "sidebarTabWordcloudNew": "New “In one word” question",
+    "strip": {
+      "label": "Event time",
+      "onAir": "On air",
+      "progressLabel": "Event progress against the scheduled time",
+      "endsAt": "ends at {time} · {minutes, plural, =0 {last minute} one {# minute left} other {# minutes left}}",
+      "overtimeOpen": "over time by {minutes, plural, =0 {less than a minute} one {# minute} other {# minutes}} · stays open while someone is here",
+      "overtimeClosing": "over time by {minutes, plural, =0 {less than a minute} one {# minute} other {# minutes}} · closes in {closing, plural, one {# minute} other {# minutes}}",
+      "timerChip": "Talk",
+      "timerChipLabel": "Talk timer: {time}. Open the control room",
+      "recOnLabel": "Recording for {time}. Open the control room",
+      "recOff": "Not recording",
+      "recOffLabel": "Not recording. Open the control room to start",
+      "startsAt": "starts at {time} · in {minutes, plural, =0 {less than a minute} one {# minute} other {# minutes}}",
+      "closingNow": "over time by {minutes, plural, =0 {less than a minute} one {# minute} other {# minutes}} · the room is closing",
+      "timerPaused": "paused"
+    },
+    "controlRoom": {
+      "tab": "Control",
+      "recordingHeading": "Recording",
+      "recordingOff": "Not recording",
+      "stopConfirm": "Stop the recording now?",
+      "featuresHeading": "Room features",
+      "featuresHelp": "They turn on and off for everyone, right away.",
+      "timerHelp": "A countdown for whoever is speaking: you can show it to the whole room.",
+      "eventHeading": "Event",
+      "endHelp": "Closes the room for everyone and marks the event as ended. This cannot be undone.",
+      "timerHeading": "Talk timer"
+    },
+    "closingNotice": "{minutes, plural, =0 {The room is closing.} one {The room closes automatically in # minute.} other {The room closes automatically in # minutes.}}"
   },
   "qa": {
     "title": "Questions & Answers",

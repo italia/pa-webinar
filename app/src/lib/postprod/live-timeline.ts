@@ -217,6 +217,7 @@ export function describeAction(
     case 'recording.stopped':
       return 'Registrazione fermata';
     case 'timer.started': {
+      if (data.resumed) return 'Timer ripreso';
       const min = Math.round(Number(data.durationSec ?? 0) / 60);
       return min > 0 ? `Timer di ${min} minuti avviato` : 'Timer avviato';
     }

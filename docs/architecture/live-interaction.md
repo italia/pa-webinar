@@ -82,7 +82,7 @@ The **guest window** is defined once in `app/src/lib/events/guest-window.ts` and
 
 The room token is not a voting identity. Poll votes, word-cloud words and agenda reactions are keyed either by a registration (`accessToken`) or by the browser id. The server looks up `accessToken` only among registrations. A moderator or speaker link sent as `accessToken` is therefore refused, which is why the poll and word-cloud panels send a browser id for those callers. A browser-id vote or word is also gated by `authorizePanelRead` with the caller's bearer token. Deduplication by browser id assumes an honest browser: a room poll is not an election.
 
-The other panels have lighter gates. Agenda, timer, the reaction counters and `GET /flags` answer anyone who knows the event slug. Materials and the `live:` stream require the event to be publicly visible (`isEventPubliclyVisible`). The `control:` stream requires only that the event exists, because it carries opaque Jitsi endpoint ids and nothing else.
+The other panels have lighter gates. Agenda, timer, the reaction counters and `GET /flags` answer anyone who knows the event slug. Called with `?orologio=registrazione`, `GET /flags` also returns `recordingStartedAt`, the start of the running recording from the room's action journal (`recording.started`, null after a `recording.stopped`). The moderators' time strip reads it under its own SWR key, because the live channel rewrites the plain `/flags` entry with the flags alone; without the parameter the route skips that extra query. `GET /timer` returns `serverNow`, the server's clock: the room derives the offset of the browser's clock from it, so the time strip, the recording duration and the closing notice follow the server's time for every viewer. Materials and the `live:` stream require the event to be publicly visible (`isEventPubliclyVisible`). The `control:` stream requires only that the event exists, because it carries opaque Jitsi endpoint ids and nothing else.
 
 ### Chat
 
@@ -425,7 +425,7 @@ The chat has its own fallback because its stream carries the messages themselves
 
 ## Live-toggleable flags
 
-Five `Event` columns travel on the live channel. They are listed once in `LIVE_FLAG_FIELDS` (`app/src/lib/live-state/pubsub.ts`): `qaEnabled`, `chatEnabled`, `agendaEnabled`, `wordCloudEnabled` and `recordingEnabled`. Moderators toggle the first four from the **Features:** row at the top of the drawer. `recordingEnabled` is carried and served but has no toggle there.
+Five `Event` columns travel on the live channel. They are listed once in `LIVE_FLAG_FIELDS` (`app/src/lib/live-state/pubsub.ts`): `qaEnabled`, `chatEnabled`, `agendaEnabled`, `wordCloudEnabled` and `recordingEnabled`. Moderators toggle the first four from the switches of the **Control** panel. `recordingEnabled` is carried and served but has no switch there.
 
 A toggle updates the SWR cache optimistically, then sends `PUT /api/events/{eventId}` with the moderator token, then re-syncs from the server. A failed `PUT` therefore rolls the button back. The route accepts only the event UUID: a slug gets 400 before the database is touched. After a successful update, the route publishes the flags snapshot, and every room re-renders its tabs.
 
@@ -437,7 +437,7 @@ The flags are passed to the room as props at mount. After that, the room reads t
 | 2 | The `select` of `GET /api/events/[param]/flags` | The polling fallback never sees the flag, so a room that loses push falls back to the value it got at mount |
 | 3 | `LIVE_FLAG_FIELDS` in `app/src/lib/live-state/pubsub.ts` (the live stream's `select` must list the same fields; TypeScript enforces it) | No snapshot carries the change. With push on, flags polling is off, so the room never sees the change until reload |
 | 4 | The SWR type and the `eff*` value in `app/src/components/live/live-event-client.tsx` | The room keeps using the prop it got at mount |
-| 5 | The `toggleFeature` key union and the **Features:** button list in the same file | Moderators cannot toggle it from the room |
+| 5 | The `toggleFeature` key union and the `funzioniSala` list (the switches of the **Control** panel) in the same file | Moderators cannot toggle it from the room |
 
 Rows 1, 2, 4 and 5 are the four places of the rule. Row 3 is the push channel's copy of row 2, and a comment in `pubsub.ts` requires the two lists to stay identical. The step-by-step recipe is in [development/extending.md](../development/extending.md).
 

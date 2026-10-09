@@ -31,7 +31,6 @@ import { LivePushContext, useLivePush, useLiveState } from '@/hooks/use-live-sta
 import { useQaAlerts } from '@/hooks/use-qa-alerts';
 import RecordingConsent from '@/components/jitsi/recording-consent';
 import { consensiRichiesti } from '@/lib/registration/consents';
-import ModeratorControls from '@/components/jitsi/moderator-controls';
 import QAPanel from '@/components/qa/qa-panel';
 import PollPanel from '@/components/polls/poll-panel';
 import AgendaPanel from '@/components/live/agenda-panel';
@@ -40,7 +39,12 @@ import { fetchMaterials, materialsListKey } from '@/components/materials/materia
 import ParticipantPanel from '@/components/participants/participant-panel';
 import PreJoinScreen from '@/components/live/pre-join-screen';
 import PostEventFeedback from '@/components/live/post-event-feedback';
-import PresentationTimer from '@/components/live/presentation-timer';
+import PresentationTimerBar from '@/components/live/presentation-timer';
+import LiveTimeStrip from '@/components/live/live-time-strip';
+import ClosingNotice from '@/components/live/closing-notice';
+import ControlRoomPanel, { type FunzioneSala } from '@/components/live/control-room-panel';
+import { useRecordingControl, type ControlloRegistrazione } from '@/hooks/use-recording-control';
+import { TimerInterventiSync, useScartoOrologio } from '@/hooks/use-presentation-timer';
 import ReactionBar from '@/components/live/reaction-bar';
 import ChatPanel, { type ChatPreview } from '@/components/live/chat-panel';
 import WordCloud from '@/components/live/word-cloud';
@@ -50,7 +54,6 @@ import {
   voterIdStorageKey,
 } from '@/components/live/voter-identity';
 import AgendaTicker from '@/components/live/agenda-ticker';
-import EventTimer from '@/components/live/event-timer';
 import LiveShareButton from '@/components/live/live-share-button';
 import WaitingRoom, {
   type WaitingRoomJoinPrefs,
@@ -822,6 +825,14 @@ export default function LiveEventClient({
   const entratoAlleRef = useRef<number | null>(null);
   const registrazioneVistaRef = useRef<boolean | null>(null);
   const avvioChiestoQuiRef = useRef(false);
+  // Quando questo browser ha visto partire la registrazione (un cambio vero,
+  // non lo stato trovato entrando): fa da riferimento per la durata quando il
+  // server non sa, o sa male, quando è iniziata.
+  const [avvioOsservato, setAvvioOsservato] = useState<number | null>(null);
+  // Quante volte questo browser è entrato nella chiamata: dopo una
+  // riconnessione l'ora d'avvio si richiede, non si riusa quella in cache.
+  const [ingressi, setIngressi] = useState(0);
+  const scartoOrologio = useScartoOrologio(event.slug);
 
   // Shared "fire startRecording on Jitsi, with retry" — used both by the
   // moderator-confirmed prompt and by the autoStartRecording path which
@@ -856,6 +867,10 @@ export default function LiveEventClient({
   const handleJitsiReady = useCallback(() => {
     entratoAlleRef.current = Date.now();
     registrazioneVistaRef.current = null;
+    // Quello che si è visto prima di cadere non vale più: la registrazione
+    // può essere stata fermata e riavviata nel frattempo.
+    setAvvioOsservato(null);
+    setIngressi((n) => n + 1);
     // Open a CallSession server-side so every live event has a row in
     // `call_sessions` with start/end timestamps even when no recording
     // is ever triggered. The route is idempotent — repeated calls (mod
@@ -1049,7 +1064,11 @@ export default function LiveEventClient({
       const entrato = entratoAlleRef.current;
       const chiestoQui = recording && avvioChiestoQuiRef.current;
       if (recording) avvioChiestoQuiRef.current = false;
-      if (prima === null && !chiestoQui && entrato !== null && Date.now() - entrato < 10_000) return;
+      // Trenta secondi: Jitsi può consegnare lo stato iniziale con ritardo, e
+      // un avvio vero di un altro moderatore in quella finestra lo riferisce
+      // il suo browser.
+      if (prima === null && !chiestoQui && entrato !== null && Date.now() - entrato < 30_000) return;
+      setAvvioOsservato(recording ? Date.now() : null);
       if (!isModerator || !token) return;
       void fetch(`/api/events/${event.slug}/live-actions`, {
         method: 'POST',
@@ -1283,12 +1302,63 @@ export default function LiveEventClient({
     leaveSelf();
   }, [leaveSelf]);
 
-  // «Termina evento» dalla barra del moderatore: stessa fine di «Termina per
-  // tutti», segnata prima che l'hangup faccia arrivare `readyToClose`.
+  // «Termina evento» dalla scheda Regia: stessa fine di «Termina per
+  // tutti», segnata prima che l'hangup faccia arrivare `readyToClose`. Chi ha
+  // il link principale passa poi alla gestione dell'evento: il timer sta qui,
+  // nella sala, che resta montata mentre la Regia sparisce con la chiamata.
+  const vaiAllaGestioneRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(
+    () => () => {
+      if (vaiAllaGestioneRef.current) clearTimeout(vaiAllaGestioneRef.current);
+    },
+    [],
+  );
   const handleEndedFromControls = useCallback(() => {
     userHangupRef.current = true;
     markEnded();
-  }, [markEnded]);
+    if (isPrimaryModerator) {
+      vaiAllaGestioneRef.current = setTimeout(() => {
+        router.push(percorso(`/admin/events/${event.id}?token=${token}`));
+      }, 2000);
+    }
+  }, [markEnded, isPrimaryModerator, router, event.id, token]);
+
+  // I comandi della registrazione e il timer degli interventi, montati una
+  // volta: la striscia del tempo, la scheda Regia e la fascia del timer per il
+  // pubblico leggono lo stesso stato.
+  const conduce = credentials?.role === 'moderator';
+  const segnaAvvioChiesto = useCallback(() => {
+    avvioChiestoQuiRef.current = true;
+  }, []);
+  const registrazione = useRecordingControl({
+    api: jitsiApi,
+    attivo: conduce && event.recordingEnabled,
+    isRecording,
+    faseRegistratore: recorderPhase,
+    onAvvioRichiesto: segnaAvvioChiesto,
+  });
+  // L'ora d'avvio della registrazione secondo il server (la cronologia della
+  // sala), per un tempo uguale per tutti i moderatori, anche entrati dopo.
+  // Si chiede finché la registrazione è in corso e il server non la sa. Una
+  // chiave sua: la voce `/flags` la riscrive il canale live con i soli flag,
+  // e l'ora d'avvio sparirebbe a ogni aggiornamento.
+  const { data: flagsRegistrazione } = useSWR<{ recordingStartedAt?: string | null }>(
+    // L'avvio osservato e l'ingresso nella chiave: dopo uno stop e un riavvio,
+    // o dopo una riconnessione, non si riusa l'ora rimasta in cache.
+    conduce && isRecording
+      ? `/api/events/${event.slug}/flags?orologio=registrazione&dal=${avvioOsservato ?? 'entrata'}&ingresso=${ingressi}`
+      : null,
+    (url: string) => fetch(url).then((r) => r.json()),
+    // Senza un avvio noto si richiede ogni dieci secondi; con l'avvio, ogni
+    // minuto, per accorgersi di un riavvio fatto da altri.
+    { refreshInterval: (dati) => (dati?.recordingStartedAt ? 60_000 : 10_000) },
+  );
+  // Aprire una scheda della barra laterale da fuori (la striscia del tempo):
+  // il contatore fa ripetere la stessa richiesta.
+  const [richiestaScheda, setRichiestaScheda] = useState<{ tab: SidebarTab; n: number } | null>(null);
+  const apriRegia = useCallback(() => {
+    setRichiestaScheda((r) => ({ tab: 'regia', n: (r?.n ?? 0) + 1 }));
+  }, []);
 
   // "Termina per tutti": flip the event to ENDED (waiting participants and
   // those in the room detect it via their status poll and are taken to the
@@ -1695,24 +1765,24 @@ export default function LiveEventClient({
         onLeaveRoom={handleLeaveRoom}
         isFullscreen={isFullscreen}
         modalContainer={modalContainer}
-        startsAt={event.startsAt}
-        endsAt={event.endsAt}
-        graceMinutes={event.effectiveGraceMinutes ?? OVERTIME_CAP_DEFAULT_MINUTES}
         onToggleFullscreen={toggleFullscreen}
       />
 
       {isActualModerator && !showJvbOverlay && (
-        <ModeratorControls
-          api={jitsiApi}
-          eventId={event.id}
-          moderatorToken={token}
+        <LiveTimeStrip
+          startsAt={event.startsAt}
+          endsAt={event.endsAt}
+          graceMinutes={event.effectiveGraceMinutes ?? OVERTIME_CAP_DEFAULT_MINUTES}
           recordingEnabled={event.recordingEnabled}
-          recorderPhase={recorderPhase}
-          whiteboardEnabled={whiteboardOn}
-          whiteboardInfraReady={whiteboardInfraReady}
-          isPrimaryModerator={isPrimaryModerator}
-          onEnded={handleEndedFromControls}
-          modalContainer={modalContainer}
+          isRecording={isRecording}
+          recordingStartedAt={flagsRegistrazione?.recordingStartedAt ?? null}
+          scartoOrologio={scartoOrologio}
+          avvioOsservato={avvioOsservato}
+          istantanea={isInstantCall}
+          faseRegistratore={recorderPhase}
+          registrazione={registrazione}
+          eventSlug={event.slug}
+          onApriRegia={apriRegia}
         />
       )}
 
@@ -1734,13 +1804,21 @@ export default function LiveEventClient({
         </div>
       )}
 
-      {!showJvbOverlay && (
-        <PresentationTimer
-          eventSlug={event.slug}
-          token={token}
-          isModerator={isActualModerator}
+      {/* Chi non conduce non vede l'orologio: solo, negli ultimi minuti, che
+          la sala sta per chiudersi da sola. */}
+      {!isActualModerator && !showJvbOverlay && !isInstantCall && (
+        <ClosingNotice
+          startsAt={event.startsAt}
+          endsAt={event.endsAt}
+          graceMinutes={event.effectiveGraceMinutes ?? OVERTIME_CAP_DEFAULT_MINUTES}
+          scartoOrologio={scartoOrologio}
         />
       )}
+      {/* Il timer degli interventi si legge solo in sala. */}
+      <TimerInterventiSync eventSlug={event.slug} />
+      {/* La fascia del timer per chi non conduce: chi conduce lo ha nella
+          striscia del tempo. */}
+      {!showJvbOverlay && !isActualModerator && <PresentationTimerBar eventSlug={event.slug} />}
 
       {/* Screenshare banner — attention cue whenever someone in the
           room starts sharing. Jitsi auto-pins the share but a visible
@@ -1827,6 +1905,19 @@ export default function LiveEventClient({
           canReactAgenda={!isModerator && !isSpeaker}
           guestId={isGuest ? guestId : undefined}
           {...voterIdentity(registeredAccessToken, guestId)}
+          richiestaScheda={richiestaScheda}
+          regia={
+            isActualModerator
+              ? {
+                  onEnded: handleEndedFromControls,
+                  modalContainer,
+                  recordingEnabled: event.recordingEnabled,
+                  isRecording,
+                  faseRegistratore: recorderPhase,
+                  registrazione,
+                }
+              : undefined
+          }
         />
       </div>
 
@@ -1963,6 +2054,7 @@ export default function LiveEventClient({
 // ── Sidebar with tabs ──
 
 type SidebarTab =
+  | 'regia'
   | 'qa'
   | 'chat'
   | 'polls'
@@ -2006,6 +2098,18 @@ interface LiveSidebarProps {
   /** …oppure l'identificativo stabile del browser, per chi una registrazione
    *  non ce l'ha (ospiti, relatori, moderatori). Esattamente uno dei due. */
   voterGuestId?: string;
+  /** Una scheda da aprire chiesta da fuori (la striscia del tempo apre la
+   *  Regia); il contatore fa ripetere la stessa richiesta. */
+  richiestaScheda?: { tab: SidebarTab; n: number } | null;
+  /** La scheda Regia, per chi conduce (non per i relatori). */
+  regia?: {
+    onEnded: () => void;
+    modalContainer?: HTMLElement;
+    recordingEnabled: boolean;
+    isRecording: boolean;
+    faseRegistratore: FaseRegistratore | null;
+    registrazione: ControlloRegistrazione;
+  };
 }
 
 function LiveSidebar({
@@ -2026,6 +2130,8 @@ function LiveSidebar({
   guestId,
   voterAccessToken,
   voterGuestId,
+  richiestaScheda,
+  regia,
 }: LiveSidebarProps) {
   const tCommon = useTranslations('common');
   const t = useTranslations('live');
@@ -2091,6 +2197,13 @@ function LiveSidebar({
     [eventId, token, mutateFlags]
   );
   const accendiParole = useCallback(() => toggleFeature('wordCloudEnabled', false), [toggleFeature]);
+  // Le funzioni che chi conduce accende e spegne per tutti dalla Regia.
+  const funzioniSala: FunzioneSala[] = [
+    { key: 'qaEnabled', label: t('sidebarTabQa'), on: effQa },
+    { key: 'chatEnabled', label: t('sidebarTabChat'), on: effChat },
+    { key: 'agendaEnabled', label: t('liveToggleAgenda'), on: effAgenda },
+    { key: 'wordCloudEnabled', label: t('sidebarTabWordcloud'), on: effWordCloud },
+  ];
   const [activeTab, setActiveTab] = useState<SidebarTab>(
     // Chat is the primary channel: prefer it as the initial
     // tab, falling back to Q&A then polls only when chat is disabled.
@@ -2234,6 +2347,12 @@ function LiveSidebar({
     },
     [isDesktop, impostaCompressa],
   );
+  // Una scheda chiesta da fuori (la striscia del tempo apre la Regia).
+  useEffect(() => {
+    if (richiestaScheda) apriScheda(richiestaScheda.tab);
+    // Solo alla nuova richiesta: apriScheda cambia con il layout.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [richiestaScheda?.n]);
 
   // Entrati nella chiamata, si dice al server quale riquadro e' questo
   // browser (lib/live/seats): chi modera vede accanto al nome l'iscrizione
@@ -2365,6 +2484,39 @@ function LiveSidebar({
     dotLabel?: string;
     show: boolean;
   }> = [
+    // La Regia per chi conduce, prima di tutto: è il suo lavoro. Il pubblico
+    // non la vede.
+    {
+      key: 'regia',
+      label: t('controlRoom.tab'),
+      svg: (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <line x1="4" y1="21" x2="4" y2="14" />
+          <line x1="4" y1="10" x2="4" y2="3" />
+          <line x1="12" y1="21" x2="12" y2="12" />
+          <line x1="12" y1="8" x2="12" y2="3" />
+          <line x1="20" y1="21" x2="20" y2="16" />
+          <line x1="20" y1="12" x2="20" y2="3" />
+          <line x1="1" y1="14" x2="7" y2="14" />
+          <line x1="9" y1="8" x2="15" y2="8" />
+          <line x1="17" y1="16" x2="23" y2="16" />
+        </svg>
+      ),
+      dot: !!regia?.isRecording,
+      dotLabel: t('recordingActive'),
+      show: !!regia,
+    },
     // Chat first: it is the primary audience channel, so it
     // renders as the leftmost sidebar tab, ahead of Q&A.
     {
@@ -2745,7 +2897,9 @@ function LiveSidebar({
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                  strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              {compressa ? <polyline points="15 18 9 12 15 6" /> : <polyline points="9 18 15 12 9 6" />}
+              {/* Una freccia sola, che ruota (globals.scss): verso destra
+                  comprime, verso sinistra riapre. */}
+              <polyline points="9 18 15 12 9 6" />
             </svg>
           </button>
         )}
@@ -2853,49 +3007,22 @@ function LiveSidebar({
           className={`flex-grow-1 ${compressa ? 'd-none' : 'd-flex'} flex-column live-sidebar-body`}
           style={{ minHeight: 0, overflowY: 'auto' }}
         >
-          {/* Attivazione funzioni durante l'evento (solo moderatore). Le
-              modifiche si propagano agli altri client via polling dei flag. */}
-          {isModerator && (
-            <div
-              className="d-flex flex-wrap gap-2 px-3 py-2 align-items-center"
-              style={{ borderBottom: '1px solid #e8e8e8', fontSize: '0.8rem' }}
-            >
-              <span className="text-secondary fw-semibold me-1">
-                {t('liveFeaturesLabel')}
-              </span>
-              {(
-                [
-                  ['qaEnabled', t('sidebarTabQa'), effQa],
-                  ['chatEnabled', t('sidebarTabChat'), effChat],
-                  ['agendaEnabled', t('liveToggleAgenda'), effAgenda],
-                  ['wordCloudEnabled', t('sidebarTabWordcloud'), effWordCloud],
-                ] as const
-              ).map(([key, label, on]) => (
-                <button
-                  key={key}
-                  type="button"
-                  className={`btn btn-sm ${on ? 'btn-primary' : 'btn-outline-secondary'} py-0 px-2`}
-                  style={{ fontSize: '0.78rem' }}
-                  onClick={() => void toggleFeature(key, on)}
-                  aria-pressed={on}
-                >
-                  {on ? '✓ ' : ''}
-                  {label}
-                </button>
-              ))}
-            </div>
-          )}
-          {/* Whiteboard isn't persisted (native Jitsi/Excalidraw is ephemeral and
-              end-to-end encrypted — there's no capture hook). Remind moderators
-              to export + attach it as a material before the call ends. */}
-          {isModerator && whiteboardEnabled && whiteboardInfraReady && (
-            <div
-              className="px-3 py-2"
-              style={{ borderBottom: '1px solid #e8e8e8', fontSize: '0.78rem' }}
-              role="note"
-            >
-              <span className="text-secondary">💡 {t('whiteboardNotSavedHint')}</span>
-            </div>
+          {activeTab === 'regia' && regia && (
+            <ControlRoomPanel
+              api={jitsiApi}
+              eventId={eventId}
+              token={token}
+              onEnded={regia.onEnded}
+              modalContainer={regia.modalContainer}
+              recordingEnabled={regia.recordingEnabled}
+              isRecording={regia.isRecording}
+              faseRegistratore={regia.faseRegistratore}
+              registrazione={regia.registrazione}
+              funzioni={funzioniSala}
+              onToggleFunzione={(key, on) => void toggleFeature(key, on)}
+              lavagna={whiteboardEnabled && whiteboardInfraReady}
+              eventSlug={eventSlug}
+            />
           )}
           {activeTab === 'qa' && effQa && (
             <QAPanel
@@ -3057,11 +3184,6 @@ interface LiveTopBarProps {
   onToggleFullscreen?: () => void;
   /** Fullscreen element to portal the share modal into while fullscreen is on. */
   modalContainer?: HTMLElement;
-  /** Orario dell'evento per il contatore in barra (B4). */
-  startsAt?: string;
-  endsAt?: string;
-  /** Tetto del fuori orario (minuti dopo endsAt; negativo = nessuno). */
-  graceMinutes?: number;
 }
 
 function LiveTopBar({
@@ -3083,9 +3205,6 @@ function LiveTopBar({
   isFullscreen,
   onToggleFullscreen,
   modalContainer,
-  startsAt,
-  endsAt,
-  graceMinutes,
 }: LiveTopBarProps) {
   const t = useTranslations('live');
   const tr = useTranslations('live.role');
@@ -3183,8 +3302,9 @@ function LiveTopBar({
       <div className="live-top-bar__actions d-flex align-items-center gap-2">
         {/* Un'icona, non una fascia: chi è in sala sa che si registra senza
             perdere una riga di video. Il ruolo status la annuncia quando
-            compare. */}
-        {isRecording && (
+            compare. Chi conduce la trova, con la durata, nella striscia del
+            tempo. */}
+        {isRecording && role !== 'moderator' && (
           <span className="live-rec-indicator" title={t('recordingActive')} aria-hidden="true">
             <span className="live-rec-indicator__dot" />
             {t('recordingShort')}
@@ -3225,18 +3345,6 @@ function LiveTopBar({
                 it-fullscreen is the four-corners glyph people expect here. */}
             <Icon icon={isFullscreen ? 'it-collapse' : 'it-fullscreen'} size="xs" color="white" />
           </Button>
-        )}
-        {startsAt && endsAt && (
-          <EventTimer
-            startsAt={startsAt}
-            endsAt={endsAt}
-            graceMinutes={graceMinutes ?? OVERTIME_CAP_DEFAULT_MINUTES}
-            // Acceso di default per chi conduce la sala: la richiesta arriva da
-            // lì ("regolare al meglio i vari interventi"), e un orologio che
-            // scorre addosso al pubblico è pressione che nessuno ha chiesto.
-            // Chiunque può accenderlo dall'icona, e la scelta resta salvata.
-            defaultVisible={role === 'moderator'}
-          />
         )}
         <LiveShareButton
           slug={slug}

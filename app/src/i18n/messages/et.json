@@ -282,11 +282,6 @@
     "activeVsRegistered": "{active} aktiivset · {registered} registreerunut",
     "enterFullscreen": "Täisekraan",
     "exitFullscreen": "Välju täisekraanilt",
-    "overtime": {
-      "withCountdown": "Planeeritud lõpuaeg on möödas. Sündmus suletakse automaatselt {minutes, plural, one {# minuti} other {# minuti}} pärast.",
-      "closingNow": "Lõpuaeg on saabunud. Sündmus on sulgumas.",
-      "indefinite": "Planeeritud lõpuaeg on möödas. Sündmus jääb avatuks, kuni osalejad on ühendatud."
-    },
     "recordingActive": "Salvestamine käib",
     "recordingShort": "REC",
     "recordingConsent": "Seda üritust salvestatakse. Sisenedes nõustute heli-/videosalvestamisega.",
@@ -357,7 +352,6 @@
     "qaSidebarPlaceholder": "Q&A paneel on saadaval, kui üritus algab.",
     "invalidToken": "Vigane link. Palun kontrollige e-postiga saadud linki.",
     "sidebarTabQa": "Q&A",
-    "liveFeaturesLabel": "Funktsioonid:",
     "whiteboardNotSavedHint": "Tahvlit ei salvestata automaatselt. Kui seda kasutad, ekspordi see (tahvli menüüst) ja lisa enne lõpetamist sündmuse materjalide juurde.",
     "sidebarTabChat": "Vestlus",
     "sidebarTabPolls": "Küsitlused",
@@ -527,12 +521,6 @@
       "moderatorLink": "Moderaatori link",
       "moderatorLinkHint": "Kes selle lingi avab, siseneb moderaatorina ja saab ruumi täielikult juhtida."
     },
-    "timer": {
-      "show": "Näita taimerit",
-      "hide": "Peida taimer",
-      "remainingLabel": "Järelejäänud aeg (klõpsa, et näha kulunud aega)",
-      "elapsedLabel": "Kulunud aeg (klõpsa, et näha järelejäänud aega)"
-    },
     "videoCallFrameTitle": "Sündmuse videokõne",
     "insecureContextTitle": "Turvamata aadress",
     "insecureContextBody": "See leht on avatud http:// kaudu: brauser ei luba mikrofoni ja kaamerat kasutada ning videokõne ei saa alata. Avage sama leht turvalisel aadressil.",
@@ -550,7 +538,36 @@
     "resizeSidebar": "Muuda külgpaneeli suurust",
     "collapseSidebar": "Ahenda paneel",
     "expandSidebar": "Laienda paneel",
-    "sidebarTabWordcloudNew": "Uus „Ühe sõnaga“ küsimus"
+    "sidebarTabWordcloudNew": "Uus „Ühe sõnaga“ küsimus",
+    "strip": {
+      "label": "Ürituse aeg",
+      "onAir": "Eetris",
+      "progressLabel": "Ürituse edenemine võrreldes kavandatud ajaga",
+      "endsAt": "lõpp kell {time} · {minutes, plural, =0 {viimane minut} one {jäänud # minut} other {jäänud # minutit}}",
+      "overtimeOpen": "ajast üle {minutes, plural, =0 {vähem kui minut} one {# minut} other {# minutit}} · jääb avatuks, kuni keegi on kohal",
+      "overtimeClosing": "ajast üle {minutes, plural, =0 {vähem kui minut} one {# minut} other {# minutit}} · sulgub {closing, plural, one {# minuti} other {# minuti}} pärast",
+      "timerChip": "Ettekanne",
+      "timerChipLabel": "Ettekande taimer: {time}. Ava juhtpult",
+      "recOnLabel": "Salvestab {time}. Ava juhtpult",
+      "recOff": "Ei salvesta",
+      "recOffLabel": "Ei salvesta. Ava juhtpult, et alustada",
+      "startsAt": "algus kell {time} · {minutes, plural, =0 {vähem kui minuti pärast} one {# minuti pärast} other {# minuti pärast}}",
+      "closingNow": "ajast üle {minutes, plural, =0 {vähem kui minut} one {# minut} other {# minutit}} · ruum sulgub",
+      "timerPaused": "peatatud"
+    },
+    "controlRoom": {
+      "tab": "Juhtpult",
+      "recordingHeading": "Salvestamine",
+      "recordingOff": "Ei salvesta",
+      "stopConfirm": "Kas lõpetada salvestamine kohe?",
+      "featuresHeading": "Ruumi funktsioonid",
+      "featuresHelp": "Need lülituvad sisse ja välja kõigile kohe.",
+      "timerHelp": "Pöördloendus esinejale: saad seda näidata kogu ruumile.",
+      "eventHeading": "Üritus",
+      "endHelp": "Sulgeb ruumi kõigile ja märgib ürituse lõppenuks. Seda ei saa tagasi võtta.",
+      "timerHeading": "Ettekannete taimer"
+    },
+    "closingNotice": "{minutes, plural, =0 {Ruum sulgub.} one {Ruum sulgub automaatselt # minuti pärast.} other {Ruum sulgub automaatselt # minuti pärast.}}"
   },
   "qa": {
     "title": "Küsimused ja vastused",

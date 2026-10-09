@@ -99,7 +99,7 @@ gaps under [Known limitations](#known-limitations).
 
 ### Starting and stopping
 
-The moderator control bar shows a recording button when the event has
+The **Control** panel of the live room shows a recording button when the event has
 recording enabled. The room enables it only while `GET /api/status`, polled
 every few seconds while the event is `LIVE`, reports `jibriStatus: 'ready'`.
 That takes recordings storage configured (`RECORDING_STORAGE_TYPE` set and not

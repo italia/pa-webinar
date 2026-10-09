@@ -282,11 +282,6 @@
     "activeVsRegistered": "{active} aktywnych · {registered} zarejestrowanych",
     "enterFullscreen": "Pełny ekran",
     "exitFullscreen": "Wyjdź z pełnego ekranu",
-    "overtime": {
-      "withCountdown": "Zaplanowany czas zakończenia minął. Wydarzenie zostanie automatycznie zamknięte za {minutes, plural, one {# minutę} few {# minuty} many {# minut} other {# minut}}.",
-      "closingNow": "Czas zakończenia został osiągnięty. Wydarzenie zostanie zamknięte.",
-      "indefinite": "Zaplanowany czas zakończenia minął. Wydarzenie pozostanie aktywne, dopóki połączeni są uczestnicy."
-    },
     "recordingActive": "Nagrywanie w toku",
     "recordingShort": "REC",
     "recordingConsent": "To wydarzenie jest nagrywane. Wchodząc, wyrażasz zgodę na nagrywanie audio/wideo.",
@@ -357,7 +352,6 @@
     "qaSidebarPlaceholder": "Panel Q&A będzie dostępny po rozpoczęciu wydarzenia.",
     "invalidToken": "Nieprawidłowy link. Proszę sprawdzić link otrzymany e-mailem.",
     "sidebarTabQa": "Q&A",
-    "liveFeaturesLabel": "Funkcje:",
     "whiteboardNotSavedHint": "Tablica nie jest zapisywana automatycznie. Jeśli z niej korzystasz, wyeksportuj ją (menu tablicy) i dołącz do Materiałów wydarzenia przed zakończeniem.",
     "sidebarTabChat": "Czat",
     "sidebarTabPolls": "Ankiety",
@@ -527,12 +521,6 @@
       "moderatorLink": "Link moderatora",
       "moderatorLinkHint": "Kto otworzy ten link, dołącza jako moderator z pełną kontrolą nad salą."
     },
-    "timer": {
-      "show": "Pokaż licznik",
-      "hide": "Ukryj licznik",
-      "remainingLabel": "Pozostały czas (kliknij, aby zobaczyć czas, który upłynął)",
-      "elapsedLabel": "Czas, który upłynął (kliknij, aby zobaczyć pozostały czas)"
-    },
     "videoCallFrameTitle": "Wideorozmowa wydarzenia",
     "insecureContextTitle": "Niezabezpieczony adres",
     "insecureContextBody": "Ta strona została otwarta przez http://: przeglądarka nie pozwala na użycie mikrofonu i kamery, więc rozmowa wideo nie może się rozpocząć. Proszę otworzyć tę samą stronę pod bezpiecznym adresem.",
@@ -550,7 +538,36 @@
     "resizeSidebar": "Zmień rozmiar panelu bocznego",
     "collapseSidebar": "Zwiń panel",
     "expandSidebar": "Rozwiń panel",
-    "sidebarTabWordcloudNew": "Nowe pytanie „Jednym słowem”"
+    "sidebarTabWordcloudNew": "Nowe pytanie „Jednym słowem”",
+    "strip": {
+      "label": "Czas wydarzenia",
+      "onAir": "Na antenie",
+      "progressLabel": "Postęp wydarzenia względem zaplanowanego czasu",
+      "endsAt": "koniec o {time} · {minutes, plural, =0 {ostatnia minuta} one {została # minuta} few {zostały # minuty} many {zostało # minut} other {zostało # minuty}}",
+      "overtimeOpen": "przekroczono o {minutes, plural, =0 {mniej niż minutę} one {# minutę} few {# minuty} many {# minut} other {# minuty}} · pozostaje otwarte, dopóki ktoś jest",
+      "overtimeClosing": "przekroczono o {minutes, plural, =0 {mniej niż minutę} one {# minutę} few {# minuty} many {# minut} other {# minuty}} · zamknięcie za {closing, plural, one {# minutę} few {# minuty} many {# minut} other {# minuty}}",
+      "timerChip": "Wystąpienie",
+      "timerChipLabel": "Minutnik wystąpienia: {time}. Otwórz reżyserkę",
+      "recOnLabel": "Nagrywanie od {time}. Otwórz reżyserkę",
+      "recOff": "Bez nagrywania",
+      "recOffLabel": "Bez nagrywania. Otwórz reżyserkę, aby zacząć",
+      "startsAt": "początek o {time} · za {minutes, plural, =0 {mniej niż minutę} one {# minutę} few {# minuty} many {# minut} other {# minuty}}",
+      "closingNow": "przekroczono o {minutes, plural, =0 {mniej niż minutę} one {# minutę} few {# minuty} many {# minut} other {# minuty}} · sala się zamyka",
+      "timerPaused": "wstrzymane"
+    },
+    "controlRoom": {
+      "tab": "Reżyserka",
+      "recordingHeading": "Nagrywanie",
+      "recordingOff": "Bez nagrywania",
+      "stopConfirm": "Zatrzymać nagrywanie teraz?",
+      "featuresHeading": "Funkcje sali",
+      "featuresHelp": "Włączają się i wyłączają dla wszystkich, od razu.",
+      "timerHelp": "Odliczanie dla mówcy: możesz pokazać je całej sali.",
+      "eventHeading": "Wydarzenie",
+      "endHelp": "Zamyka salę dla wszystkich i oznacza wydarzenie jako zakończone. Nie można cofnąć.",
+      "timerHeading": "Minutnik wystąpień"
+    },
+    "closingNotice": "{minutes, plural, =0 {Sala się zamyka.} one {Sala zamknie się automatycznie za # minutę.} few {Sala zamknie się automatycznie za # minuty.} many {Sala zamknie się automatycznie za # minut.} other {Sala zamknie się automatycznie za # minuty.}}"
   },
   "qa": {
     "title": "Pytania i odpowiedzi",

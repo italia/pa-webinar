@@ -282,11 +282,6 @@
     "activeVsRegistered": "{active} aktive · {registered} tilmeldte",
     "enterFullscreen": "Fuld skærm",
     "exitFullscreen": "Afslut fuld skærm",
-    "overtime": {
-      "withCountdown": "Den planlagte sluttid er overskredet. Arrangementet lukker automatisk om {minutes, plural, one {# minut} other {# minutter}}.",
-      "closingNow": "Sluttiden er nået. Arrangementet er ved at blive lukket.",
-      "indefinite": "Den planlagte sluttid er overskredet. Arrangementet forbliver åbent, så længe der er tilsluttede deltagere."
-    },
     "recordingActive": "Optagelse i gang",
     "recordingShort": "REC",
     "recordingConsent": "Denne begivenhed optages. Ved at deltage giver du samtykke til lyd-/videooptagelse.",
@@ -357,7 +352,6 @@
     "qaSidebarPlaceholder": "Q&A-panelet bliver tilgængeligt, når begivenheden starter.",
     "invalidToken": "Ugyldigt link. Kontroller venligst linket, du modtog via e-mail.",
     "sidebarTabQa": "Q&A",
-    "liveFeaturesLabel": "Funktioner:",
     "whiteboardNotSavedHint": "Whiteboardet gemmes ikke automatisk. Hvis du bruger det, skal du eksportere det (whiteboardets menu) og vedhæfte det til arrangementets materialer, før du afslutter.",
     "sidebarTabChat": "Chat",
     "sidebarTabPolls": "Afstemninger",
@@ -527,12 +521,6 @@
       "moderatorLink": "Moderatorlink",
       "moderatorLinkHint": "Alle, der åbner dette link, kommer ind som moderator med fuld kontrol over mødelokalet."
     },
-    "timer": {
-      "show": "Vis timeren",
-      "hide": "Skjul timeren",
-      "remainingLabel": "Resterende tid (klik for forbrugt tid)",
-      "elapsedLabel": "Forbrugt tid (klik for resterende tid)"
-    },
     "videoCallFrameTitle": "Arrangementets videoopkald",
     "insecureContextTitle": "Usikker adresse",
     "insecureContextBody": "Denne side er åbnet via http://: browseren tillader ikke brug af mikrofon og kamera, og videoopkaldet kan ikke starte. Åbn den samme side på den sikre adresse.",
@@ -550,7 +538,36 @@
     "resizeSidebar": "Tilpas størrelsen på sidepanelet",
     "collapseSidebar": "Fold panelet sammen",
     "expandSidebar": "Fold panelet ud",
-    "sidebarTabWordcloudNew": "Nyt “Med ét ord”-spørgsmål"
+    "sidebarTabWordcloudNew": "Nyt “Med ét ord”-spørgsmål",
+    "strip": {
+      "label": "Arrangementets tid",
+      "onAir": "I luften",
+      "progressLabel": "Arrangementets forløb i forhold til den planlagte tid",
+      "endsAt": "slut kl. {time} · {minutes, plural, =0 {sidste minut} one {# minut tilbage} other {# minutter tilbage}}",
+      "overtimeOpen": "{minutes, plural, =0 {under et minut} one {# minut} other {# minutter}} over tid · forbliver åben, så længe nogen er her",
+      "overtimeClosing": "{minutes, plural, =0 {under et minut} one {# minut} other {# minutter}} over tid · lukker om {closing, plural, one {# minut} other {# minutter}}",
+      "timerChip": "Indlæg",
+      "timerChipLabel": "Indlægstimer: {time}. Åbn kontrolrummet",
+      "recOnLabel": "Optager i {time}. Åbn kontrolrummet",
+      "recOff": "Optager ikke",
+      "recOffLabel": "Optager ikke. Åbn kontrolrummet for at starte",
+      "startsAt": "starter kl. {time} · om {minutes, plural, =0 {under et minut} one {# minut} other {# minutter}}",
+      "closingNow": "{minutes, plural, =0 {under et minut} one {# minut} other {# minutter}} over tid · rummet lukker",
+      "timerPaused": "sat på pause"
+    },
+    "controlRoom": {
+      "tab": "Styring",
+      "recordingHeading": "Optagelse",
+      "recordingOff": "Optager ikke",
+      "stopConfirm": "Stop optagelsen nu?",
+      "featuresHeading": "Rummets funktioner",
+      "featuresHelp": "De slås til og fra for alle, med det samme.",
+      "timerHelp": "En nedtælling til den, der taler: du kan vise den for hele rummet.",
+      "eventHeading": "Arrangement",
+      "endHelp": "Lukker rummet for alle og markerer arrangementet som afsluttet. Kan ikke fortrydes.",
+      "timerHeading": "Timer for indlæg"
+    },
+    "closingNotice": "{minutes, plural, =0 {Rummet lukker.} one {Rummet lukker automatisk om # minut.} other {Rummet lukker automatisk om # minutter.}}"
   },
   "qa": {
     "title": "Spørgsmål og svar",

@@ -247,7 +247,7 @@ by the lifecycle cron that replaces it everywhere else, Docker Compose included
 Without a scaler:
 
 - `eventGracePeriodMinutes` ends occupied `LIVE` rooms at `endsAt` plus that limit, and drives the
-  overtime countdown;
+  close time shown in the moderators' time strip;
 - `eventOvertimeEmptyMinutes` ends rooms past `endsAt` that have been empty that long, when the
   silence is reliable;
 - `jvbInactiveGraceMinutes` ends abandoned instant calls before their `endsAt`; there is no `IDLE`;
@@ -266,7 +266,7 @@ in [event lifecycle](../architecture/event-lifecycle.md#lifecycle-settings).
 | `eventGracePeriodMinutes` | **Overtime limit while people are in the room (minutes)**, **Infra sizing** | `60` | -1 to 240 | Longest a room still occupied stays open after `endsAt`, where `-1` never ends it on the clock; an event can override it ([grace period and overtime](../architecture/event-lifecycle.md#grace-period-and-overtime)) |
 | `eventOvertimeEmptyMinutes` | **Close an empty room after the end (minutes)**, **Infra sizing** | `20` | 5 to 240 | Empty time after which a room past `endsAt` is ended, when the bridge count is reliable ([grace period and overtime](../architecture/event-lifecycle.md#grace-period-and-overtime)) |
 | `jvbEmptyCloseMinutes` | **Empty-room minutes before definitive close**, **Features** | `-1` (off) | -1 to 240 | Opt-in: empty time after which a room that had participants is ended before `endsAt` ([opt-in empty close](../architecture/event-lifecycle.md#opt-in-empty-close)) |
-| `jvbProvisioningTimeoutMinutes` | **Provisioning timeout (minutes)**, **Features** | `15` | 1 to 120 | Wait for a bridge after which the status pages report it as stale. The same wait applies to Jibri: past it, `/api/status` reports the recorder as `failed` and the moderator's recording button stops reading **Recording starting…** ([moderator control bar](../architecture/jitsi-integration.md#app-owned-controls-around-the-iframe)). It never changes the event's status ([only a signal](../architecture/event-lifecycle.md#the-provisioning-timeout-is-only-a-signal)) |
+| `jvbProvisioningTimeoutMinutes` | **Provisioning timeout (minutes)**, **Features** | `15` | 1 to 120 | Wait for a bridge after which the status pages report it as stale. The same wait applies to Jibri: past it, `/api/status` reports the recorder as `failed` and the moderator's recording button stops reading **Recording starting…** ([Control panel](../architecture/jitsi-integration.md#app-owned-controls-around-the-iframe)). It never changes the event's status ([only a signal](../architecture/event-lifecycle.md#the-provisioning-timeout-is-only-a-signal)) |
 | `statusPollIntervalSeconds` | **Status page poll interval (seconds)**, **Features** | `30` | 5 to 600 | How often the public status page refreshes in the browser |
 | `orphanRecordingGraceDays` | Not in the panel ([set it through the API](#writing-a-field-the-panel-does-not-show)) | `30` | 0 to 365 | Days an unreferenced blob in recording storage waits before the `recordings-reconcile` CronJob deletes it. The job exists only in the chart. `0` turns automatic deletion off; blobs an administrator marks for immediate deletion are still removed ([recordings-reconcile](../architecture/background-jobs.md#recordings-reconcile)) |
 

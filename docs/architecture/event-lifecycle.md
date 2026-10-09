@@ -120,7 +120,7 @@ Blue statuses are set by people, teal ones only by automation, green is the open
 | `PUBLISHED` → `DRAFT` | **Unpublish** | Moderator credential | Yes | Yes | Yes |
 | `PROVISIONING`, `IDLE`, `ARCHIVED` → `PUBLISHED` | **Publish** on the management page | Moderator credential | Yes (`ARCHIVED` only) | Yes (`ARCHIVED` only) | Yes |
 | `PUBLISHED`, `PROVISIONING`, `IDLE` → `LIVE` | **Start event** on the management page or in the waiting room | Moderator credential | Yes (`PUBLISHED` only) | Yes (`PUBLISHED` only) | Yes |
-| `LIVE` → `ENDED` | **End for everyone** (after **Leave room**) or **End event** in the moderator bar | Moderator credential | Yes | Yes | Yes |
+| `LIVE` → `ENDED` | **End for everyone** (after **Leave room**) or **End event** in the room's **Control** panel | Moderator credential | Yes | Yes | Yes |
 | `ENDED` → `PUBLISHED` or `LIVE` | Saving the event with a future `endsAt` (revival) | Moderator credential | Yes | Yes | Yes |
 | any → `ARCHIVED` | Bulk **Archive** in the event list | Administrator, or organizer for their own events | Yes | Yes | Yes |
 | `PUBLISHED` → `PROVISIONING` | Scaler pre-scale at `startsAt` minus `jvbPreScaleMinutes` | Scaler | No | No | Yes |
@@ -142,7 +142,7 @@ All manual changes to an existing event's status, except bulk archive, go throug
 
 - **Publish.** The wizard always creates the event as `DRAFT` (`POST /api/events`). If the organizer chose **Publish event**, the wizard then sends a second request that sets `PUBLISHED`. The event card menu offers **Publish** or **Unpublish** only for scheduled events in `DRAFT` or `PUBLISHED`, and toggles between the two. The management page button reads **Unpublish** on a `PUBLISHED` event, which it sends back to `DRAFT`, and **Publish** on any other status, which it sets to `PUBLISHED`. It is disabled only while the event is `LIVE` or `ENDED`, so it also moves `PROVISIONING`, `IDLE` and `ARCHIVED` events to `PUBLISHED`.
 - **Start event.** Shown on the management page and, to moderators only, in the waiting room, while the event is `PUBLISHED`, `PROVISIONING` or `IDLE` (`canStartManually()` in `app/src/lib/events/lifecycle.ts`), in every installation. It sets `LIVE` immediately. When the start is more than 30 minutes away (`app/src/components/admin/event-management-client.tsx`), the management page adds a warning that the video servers may take a couple of minutes to come up. In the `full` profile the scaler moves the event to `PROVISIONING` `jvbPreScaleMinutes` before the start and to `LIVE` by itself at `startsAt`; the button stays available meanwhile. The waiting room shows no **Start event** on a `PUBLISHED` event past its `endsAt`.
-- **End.** A moderator who clicks **Leave room** chooses between **Just leave** (the call continues for everyone else) and **End for everyone**. The latter asks what should happen to the event page afterwards (**Keep it public**, **Publish to the library** or **Archive (private)**, plus an option to generate an AI transcript and summary once the recording is processed) and then sets `ENDED` together with those choices. **Archive (private)** only hides the post-event page: the status is `ENDED`, not `ARCHIVED`. The moderator bar also has an **End event** button that sets `ENDED` after a confirmation, without the follow-up questions.
+- **End.** A moderator who clicks **Leave room** chooses between **Just leave** (the call continues for everyone else) and **End for everyone**. The latter asks what should happen to the event page afterwards (**Keep it public**, **Publish to the library** or **Archive (private)**, plus an option to generate an AI transcript and summary once the recording is processed) and then sets `ENDED` together with those choices. **Archive (private)** only hides the post-event page: the status is `ENDED`, not `ARCHIVED`. The room's **Control** panel also has an **End event** button, set apart at the bottom, that sets `ENDED` after a confirmation, without the follow-up questions.
 - **Revival.** See [Revival](#revival).
 - **Bulk archive.** `POST /api/admin/events/bulk-archive` sets `ARCHIVED` on the selected events whatever their status, restricted to the organizer's own events when the caller is an organizer, and closes the open call sessions of those that were not already `ENDED` or `ARCHIVED`, in the same transaction. It deletes nothing; see [After the event](#after-the-event-hand-off-archiving-and-retention).
 
@@ -381,12 +381,14 @@ There is no automatic return from `PROVISIONING` to `PUBLISHED`. A `PROVISIONING
 
 ### The overtime countdown
 
-In the live room, once `endsAt` has passed, the event timer in the top bar shows the overtime (`app/src/components/live/event-timer.tsx`). It is computed in the browser from `endsAt` and the effective overtime limit:
+In the live room the moderators' time strip shows the time on air against the schedule (`app/src/components/live/live-time-strip.tsx`, with the arithmetic in `app/src/lib/live/event-clock.ts`). It is computed in the browser from `startsAt`, `endsAt` and the effective overtime limit:
 
-- the timer counts on with `+` and turns amber, also when it is switched off and only its icon shows;
-- its tooltip says "The scheduled end time has passed. The event will close automatically in N minutes", then "End time reached. The event is about to close."; with a limit of `-1`, "The scheduled end time has passed. The event will stay open while participants are connected.";
+- before the end, the progress bar fills and the text reads the scheduled end and the minutes left; in the last ten minutes it turns amber;
+- past `endsAt`, the bar is full and moves, and the text reads how long the event has run over and, with a limit, when the room closes on its own ("over time by 12 minutes · closes in 48 minutes"); with a limit of `-1` it says the room stays open while someone is there;
 - in the last ten minutes before the limit it turns red;
-- a screen-reader announcement is made when the overtime begins and when the last ten minutes start, not at every change of the count.
+- a screen-reader announcement is made when the phase changes (last minutes, overtime, closing), not at every change of the count.
+
+Participants and speakers see no clock: only the **REC** icon while recording, and, in the last ten minutes before the room closes on its own, a notice under the top bar ("The room closes automatically in N minutes", `app/src/components/live/closing-notice.tsx`), announced to screen readers. Instant calls have no scheduled end, so they show neither the progress bar nor the notice.
 
 The countdown does not ask the server, and it shows the overtime limit: a room that empties closes earlier. The close itself is made by the scaler or the lifecycle cron on its next tick.
 

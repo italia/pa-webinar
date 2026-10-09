@@ -282,11 +282,6 @@
     "activeVsRegistered": "{active} activi · {registered} înregistrați",
     "enterFullscreen": "Ecran complet",
     "exitFullscreen": "Ieși din ecran complet",
-    "overtime": {
-      "withCountdown": "Ora de încheiere prevăzută a trecut. Evenimentul se va închide automat în {minutes, plural, one {# minut} other {# minute}}.",
-      "closingNow": "Ora de încheiere a fost atinsă. Evenimentul este pe punctul de a se închide.",
-      "indefinite": "Ora de încheiere prevăzută a trecut. Evenimentul va rămâne activ atât timp cât există participanți conectați."
-    },
     "recordingActive": "Înregistrare în curs",
     "recordingShort": "REC",
     "recordingConsent": "Acest eveniment este înregistrat. Prin intrare, consimțiți la înregistrarea audio/video.",
@@ -357,7 +352,6 @@
     "qaSidebarPlaceholder": "Panoul Q&A va fi disponibil după începerea evenimentului.",
     "invalidToken": "Link invalid. Verificați linkul primit prin email.",
     "sidebarTabQa": "Q&A",
-    "liveFeaturesLabel": "Funcții:",
     "whiteboardNotSavedHint": "Tabla nu se salvează automat. Dacă o folosiți, exportați-o (meniul tablei) și atașați-o la Materialele evenimentului înainte de încheiere.",
     "sidebarTabChat": "Chat",
     "sidebarTabPolls": "Sondaje",
@@ -527,12 +521,6 @@
       "moderatorLink": "Link de moderator",
       "moderatorLinkHint": "Cine deschide acest link intră ca moderator, cu control deplin asupra sălii."
     },
-    "timer": {
-      "show": "Afișează cronometrul",
-      "hide": "Ascunde cronometrul",
-      "remainingLabel": "Timp rămas (faceți clic pentru timpul scurs)",
-      "elapsedLabel": "Timp scurs (faceți clic pentru timpul rămas)"
-    },
     "videoCallFrameTitle": "Apelul video al evenimentului",
     "insecureContextTitle": "Adresă nesigură",
     "insecureContextBody": "Această pagină a fost deschisă prin http://: browserul nu permite folosirea microfonului și a camerei, iar apelul video nu poate începe. Deschideți aceeași pagină la adresa securizată.",
@@ -550,7 +538,36 @@
     "resizeSidebar": "Redimensionează panoul lateral",
     "collapseSidebar": "Restrânge panoul",
     "expandSidebar": "Extinde panoul",
-    "sidebarTabWordcloudNew": "Întrebare nouă „Într-un cuvânt”"
+    "sidebarTabWordcloudNew": "Întrebare nouă „Într-un cuvânt”",
+    "strip": {
+      "label": "Timpul evenimentului",
+      "onAir": "În direct",
+      "progressLabel": "Progresul evenimentului față de ora prevăzută",
+      "endsAt": "sfârșit la {time} · {minutes, plural, =0 {ultimul minut} one {a mai rămas # minut} few {au mai rămas # minute} other {au mai rămas # de minute}}",
+      "overtimeOpen": "depășit cu {minutes, plural, =0 {mai puțin de un minut} one {# minut} few {# minute} other {# de minute}} · rămâne deschis cât timp e cineva",
+      "overtimeClosing": "depășit cu {minutes, plural, =0 {mai puțin de un minut} one {# minut} few {# minute} other {# de minute}} · se închide în {closing, plural, one {# minut} few {# minute} other {# de minute}}",
+      "timerChip": "Intervenție",
+      "timerChipLabel": "Cronometrul intervenției: {time}. Deschide regia",
+      "recOnLabel": "Se înregistrează de {time}. Deschide regia",
+      "recOff": "Nu se înregistrează",
+      "recOffLabel": "Nu se înregistrează. Deschide regia pentru a porni",
+      "startsAt": "începe la {time} · peste {minutes, plural, =0 {mai puțin de un minut} one {# minut} few {# minute} other {# de minute}}",
+      "closingNow": "depășit cu {minutes, plural, =0 {mai puțin de un minut} one {# minut} few {# minute} other {# de minute}} · sala se închide",
+      "timerPaused": "în pauză"
+    },
+    "controlRoom": {
+      "tab": "Regie",
+      "recordingHeading": "Înregistrare",
+      "recordingOff": "Nu se înregistrează",
+      "stopConfirm": "Oprești înregistrarea acum?",
+      "featuresHeading": "Funcțiile sălii",
+      "featuresHelp": "Se pornesc și se opresc pentru toți, imediat.",
+      "timerHelp": "O numărătoare inversă pentru vorbitor: o poți arăta întregii săli.",
+      "eventHeading": "Eveniment",
+      "endHelp": "Închide sala pentru toți și marchează evenimentul ca încheiat. Nu se poate anula.",
+      "timerHeading": "Cronometrul intervențiilor"
+    },
+    "closingNotice": "{minutes, plural, =0 {Sala se închide.} one {Sala se închide automat în # minut.} few {Sala se închide automat în # minute.} other {Sala se închide automat în # de minute.}}"
   },
   "qa": {
     "title": "Întrebări și Răspunsuri",

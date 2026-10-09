@@ -282,11 +282,6 @@
     "activeVsRegistered": "{active} aktivních · {registered} registrovaných",
     "enterFullscreen": "Celá obrazovka",
     "exitFullscreen": "Ukončit celou obrazovku",
-    "overtime": {
-      "withCountdown": "Plánovaný čas ukončení uplynul. Událost se automaticky uzavře za {minutes, plural, one {# minutu} few {# minuty} other {# minut}}.",
-      "closingNow": "Čas ukončení byl dosažen. Událost se chystá uzavřít.",
-      "indefinite": "Plánovaný čas ukončení uplynul. Událost zůstane otevřená, dokud jsou připojeni účastníci."
-    },
     "recordingActive": "Probíhá nahrávání",
     "recordingShort": "REC",
     "recordingConsent": "Tato událost je nahrávána. Vstupem souhlasíte s audio/video záznamem.",
@@ -357,7 +352,6 @@
     "qaSidebarPlaceholder": "Panel Q&A bude dostupný po zahájení události.",
     "invalidToken": "Neplatný odkaz. Zkontrolujte odkaz, který jste obdrželi e-mailem.",
     "sidebarTabQa": "Q&A",
-    "liveFeaturesLabel": "Funkce:",
     "whiteboardNotSavedHint": "Tabule se neukládá automaticky. Pokud ji použijete, exportujte ji (nabídka tabule) a před ukončením ji přiložte k materiálům události.",
     "sidebarTabChat": "Chat",
     "sidebarTabPolls": "Ankety",
@@ -527,12 +521,6 @@
       "moderatorLink": "Odkaz pro moderátora",
       "moderatorLinkHint": "Kdo otevře tento odkaz, připojí se jako moderátor s plnými právy k řízení místnosti."
     },
-    "timer": {
-      "show": "Zobrazit časomíru",
-      "hide": "Skrýt časomíru",
-      "remainingLabel": "Zbývající čas (kliknutím zobrazíte uplynulý čas)",
-      "elapsedLabel": "Uplynulý čas (kliknutím zobrazíte zbývající čas)"
-    },
     "videoCallFrameTitle": "Videohovor události",
     "insecureContextTitle": "Nezabezpečená adresa",
     "insecureContextBody": "Tato stránka je otevřena přes http://: prohlížeč nepovolí použití mikrofonu a kamery a videohovor nemůže začít. Otevřete stejnou stránku na zabezpečené adrese.",
@@ -550,7 +538,36 @@
     "resizeSidebar": "Změnit velikost bočního panelu",
     "collapseSidebar": "Sbalit panel",
     "expandSidebar": "Rozbalit panel",
-    "sidebarTabWordcloudNew": "Nová otázka „Jedním slovem“"
+    "sidebarTabWordcloudNew": "Nová otázka „Jedním slovem“",
+    "strip": {
+      "label": "Čas akce",
+      "onAir": "Ve vysílání",
+      "progressLabel": "Průběh akce vůči plánovanému času",
+      "endsAt": "konec v {time} · {minutes, plural, =0 {poslední minuta} one {zbývá # minuta} few {zbývají # minuty} many {zbývá # minuty} other {zbývá # minut}}",
+      "overtimeOpen": "přetaženo o {minutes, plural, =0 {méně než minutu} one {# minutu} few {# minuty} many {# minuty} other {# minut}} · zůstane otevřeno, dokud tu někdo je",
+      "overtimeClosing": "přetaženo o {minutes, plural, =0 {méně než minutu} one {# minutu} few {# minuty} many {# minuty} other {# minut}} · zavře se za {closing, plural, one {# minutu} few {# minuty} many {# minuty} other {# minut}}",
+      "timerChip": "Vystoupení",
+      "timerChipLabel": "Časovač vystoupení: {time}. Otevřít režii",
+      "recOnLabel": "Nahrává se {time}. Otevřít režii",
+      "recOff": "Nenahrává se",
+      "recOffLabel": "Nenahrává se. Otevřete režii a spusťte nahrávání",
+      "startsAt": "začátek v {time} · za {minutes, plural, =0 {méně než minutu} one {# minutu} few {# minuty} many {# minuty} other {# minut}}",
+      "closingNow": "přetaženo o {minutes, plural, =0 {méně než minutu} one {# minutu} few {# minuty} many {# minuty} other {# minut}} · místnost se zavírá",
+      "timerPaused": "pozastaveno"
+    },
+    "controlRoom": {
+      "tab": "Režie",
+      "recordingHeading": "Nahrávání",
+      "recordingOff": "Nenahrává se",
+      "stopConfirm": "Zastavit nahrávání teď?",
+      "featuresHeading": "Funkce místnosti",
+      "featuresHelp": "Zapínají se a vypínají pro všechny, okamžitě.",
+      "timerHelp": "Odpočet pro řečníka: můžete ho ukázat celé místnosti.",
+      "eventHeading": "Akce",
+      "endHelp": "Zavře místnost pro všechny a označí akci jako ukončenou. Nelze vrátit zpět.",
+      "timerHeading": "Časovač vystoupení"
+    },
+    "closingNotice": "{minutes, plural, =0 {Místnost se zavírá.} one {Místnost se automaticky zavře za # minutu.} few {Místnost se automaticky zavře za # minuty.} many {Místnost se automaticky zavře za # minuty.} other {Místnost se automaticky zavře za # minut.}}"
   },
   "qa": {
     "title": "Otázky a odpovědi",
