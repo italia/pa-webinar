@@ -1360,15 +1360,20 @@ button.live-time-strip__rec {
   text-align: left;
   background: #fff;
   border-radius: 16px;
-  box-shadow:
+  --share-ombra:
     0 24px 48px -12px rgba(23, 50, 77, 0.35),
     0 8px 16px -8px rgba(23, 50, 77, 0.2),
     0 0 0 1px rgba(23, 50, 77, 0.06);
+  box-shadow: var(--share-ombra);
   transform-origin: calc(100% - 36px) -8px;
   animation: share-pop-in 0.26s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 
-  &:focus {
-    outline: none;
+  // Il fuoco va al fumetto solo perché da lì parta il Tab: niente anello
+  // del design system attorno, e l'ombra resta la sua.
+  &:focus,
+  &:focus-visible {
+    outline: none !important;
+    box-shadow: var(--share-ombra) !important;
   }
 
   // La punta, verso il pulsante.
@@ -1379,8 +1384,9 @@ button.live-time-strip__rec {
     right: 30px;
     width: 14px;
     height: 14px;
-    background: #0066cc;
+    background: #fff;
     border-radius: 3px 0 0 0;
+    box-shadow: -1px -1px 0 rgba(23, 50, 77, 0.08);
     transform: rotate(45deg);
   }
 
@@ -1408,54 +1414,49 @@ button.live-time-strip__rec {
 }
 
 .live-share__head {
-  position: relative;
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-  padding: 0.85rem 0.85rem 0.85rem 1rem;
-  color: #fff;
-  border-radius: 16px 16px 0 0;
-  background:
-    radial-gradient(circle at 100% 0%, rgba(255, 255, 255, 0.18), transparent 55%),
-    linear-gradient(120deg, #0066cc 0%, #004d99 100%);
-  overflow: hidden;
+  gap: 0.5rem;
+  padding: 0.8rem 0.6rem 0.2rem 1rem;
 }
 
 .live-share__head-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.18);
+  width: 26px;
+  height: 26px;
   flex-shrink: 0;
+  color: #0066cc;
+  background: #eef4fb;
+  border-radius: 50%;
 }
 
 .live-share__title {
   flex: 1;
   margin: 0;
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 700;
-  color: #fff;
+  color: #17324d;
 }
 
 .live-share__close {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   padding: 0;
-  color: #fff;
+  color: #5c6f82;
   background: transparent;
   border: 0;
   border-radius: 50%;
-  transition: background-color 0.15s ease, transform 0.2s ease;
+  transition: background-color 0.15s ease, color 0.15s ease, transform 0.2s ease;
 
   &:hover,
   &:focus-visible {
-    background: rgba(255, 255, 255, 0.2);
+    color: #17324d;
+    background: #eef4fb;
     transform: rotate(90deg);
   }
 }
@@ -1464,7 +1465,7 @@ button.live-time-strip__rec {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  padding: 1rem;
+  padding: 0.6rem 1rem 1rem;
   // Il fumetto non esce dallo schermo (la sala non scorre): l'altezza è
   // quella che resta sotto il pulsante, meno la testata.
   max-height: min(560px, calc(100dvh - var(--share-sotto, 64px) - 96px));
@@ -5247,30 +5248,70 @@ button.live-time-strip__rec {
    rumore e, per chi ha disturbi dell'attenzione, un ostacolo. Con il moto
    ridotto richiesto dal sistema resta il contorno, che dice la stessa cosa
    senza muoversi. */
-@keyframes wr-cta-pronta-battito {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(0, 135, 88, 0.55); }
-  50% { box-shadow: 0 0 0 12px rgba(0, 135, 88, 0); }
+
+// «Entra ora» quando si può entrare: verde, con un alone che respira attorno
+// (uno strato suo: `outline` e `box-shadow` del pulsante restano all'anello di
+// focus da tastiera), un riflesso che lo attraversa e la freccia che indica.
+.wr-cta {
+  position: relative;
+  display: grid;
 }
 
-// Il richiamo vive su uno strato suo. Se prendesse `outline` e `box-shadow` del
-// pulsante si mangerebbe l'anello di focus da tastiera, che deve restare
-// visibile proprio mentre il pulsante chiede di essere premuto.
-.wr-cta-pronta {
-  position: relative;
+.wr-cta--go::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 8px;
+  pointer-events: none;
+  animation: wr-cta-ring 1.8s ease-out infinite;
+}
 
-  &::after {
+.wr-cta--go .wr-cta__btn {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(120deg, #007a4f 0%, #00a36c 100%) !important;
+  border-color: #007a4f !important;
+  color: #fff !important;
+  animation: wr-cta-breathe 1.8s ease-in-out infinite;
+
+  &::before {
     content: '';
     position: absolute;
-    inset: -3px;
-    border: 3px solid #008758;
-    border-radius: inherit;
-    animation: wr-cta-pronta-battito 1.6s ease-out 6;
+    top: 0;
+    bottom: 0;
+    left: -60%;
+    width: 40%;
+    background: linear-gradient(100deg, transparent 0%, rgba(255, 255, 255, 0.35) 50%, transparent 100%);
     pointer-events: none;
+    animation: wr-cta-shine 2.8s ease-in-out infinite;
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .wr-cta-pronta::after { animation: none; }
+.wr-cta__arrow {
+  display: inline-flex;
+  margin-left: 0.6rem;
+  animation: wr-cta-arrow 1.2s ease-in-out infinite;
+}
+
+@keyframes wr-cta-ring {
+  0% { box-shadow: 0 0 0 0 rgba(0, 135, 88, 0.55); }
+  70% { box-shadow: 0 0 0 14px rgba(0, 135, 88, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(0, 135, 88, 0); }
+}
+
+@keyframes wr-cta-breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.015); }
+}
+
+@keyframes wr-cta-shine {
+  0% { left: -60%; }
+  60%, 100% { left: 120%; }
+}
+
+@keyframes wr-cta-arrow {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(4px); }
 }
 
 // Bersagli dei link di salto: ricevono il fuoco (tabIndex -1) perche' Invio
@@ -5474,7 +5515,16 @@ button.live-time-strip__rec {
 
 // Le parti della scheda entrano una dopo l'altra, appena.
 .wr-reveal {
-  animation: wr-reveal 0.45s ease-out both;
+  // `backwards`, non `both`: finita l'entrata l'elemento non resta su un
+  // livello suo, che taglierebbe fuori i fumetti che ne escono.
+  animation: wr-reveal 0.45s ease-out backwards;
+}
+
+// Il riepilogo sta sopra ciò che lo segue: il fumetto di «Condividi» si
+// apre sopra il nome e l'email, non sotto.
+.wr-summary-wrap {
+  position: relative;
+  z-index: 5;
 }
 
 .wr-reveal:nth-of-type(2) { animation-delay: 0.05s; }
@@ -5710,6 +5760,9 @@ button.live-time-strip__rec {
   left: 0;
   transform-origin: 36px -8px;
 
+  // In sala d'attesa la pagina scorre: il fumetto si mostra intero.
+  .live-share__body { max-height: none; }
+
   &::before {
     right: auto;
     left: 30px;
@@ -5738,7 +5791,6 @@ button.live-time-strip__rec {
 // insiste in ambra.
 .wr-name-field {
   margin-top: 1.75rem;
-  border-radius: 12px;
 }
 
 // Bootstrap Italia lascia 48 px sotto ogni campo: qui l'aiuto sta subito sotto.
@@ -5747,22 +5799,37 @@ button.live-time-strip__rec {
   .form-group { margin-bottom: 0.4rem; }
 }
 
-.wr-name-field--empty {
-  animation: wr-name-glow 1.8s ease-in-out infinite;
+// Il richiamo sta sulla linea del campo (Bootstrap Italia disegna solo il
+// bordo inferiore): si ispessisce e si colora, senza riquadri attorno.
+.wr-name-field--empty .form-control {
+  animation: wr-name-line 1.8s ease-in-out infinite;
+}
+
+.wr-name-field--empty label {
+  animation: wr-name-label 1.8s ease-in-out infinite;
 }
 
 .wr-name-field--insist {
-  animation: wr-name-nudge 0.4s ease-in-out, wr-name-glow-amber 1.2s ease-in-out 0.4s infinite;
+  animation: wr-name-nudge 0.4s ease-in-out;
+
+  .form-control {
+    animation: wr-name-line-amber 1.2s ease-in-out infinite;
+  }
 }
 
-@keyframes wr-name-glow {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(0, 102, 204, 0); }
-  50% { box-shadow: 0 0 0 6px rgba(0, 102, 204, 0.18); }
+@keyframes wr-name-line {
+  0%, 100% { box-shadow: inset 0 -1px 0 rgba(0, 102, 204, 0); }
+  50% { box-shadow: inset 0 -3px 0 #0066cc; }
 }
 
-@keyframes wr-name-glow-amber {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(194, 119, 0, 0); }
-  50% { box-shadow: 0 0 0 6px rgba(194, 119, 0, 0.22); }
+@keyframes wr-name-label {
+  0%, 100% { color: inherit; }
+  50% { color: #0066cc; }
+}
+
+@keyframes wr-name-line-amber {
+  0%, 100% { box-shadow: inset 0 -2px 0 rgba(194, 119, 0, 0.4); }
+  50% { box-shadow: inset 0 -3px 0 #c27700; }
 }
 
 @keyframes wr-name-nudge {
@@ -5773,7 +5840,6 @@ button.live-time-strip__rec {
 
 .wr-name-input--attention {
   border-bottom-color: #c27700 !important;
-  box-shadow: none !important;
 }
 
 .wr-name-hint {
@@ -6270,8 +6336,14 @@ button.live-time-strip__rec {
   .wr-reveal,
   .wr-presence__item,
   .wr-presence__dot::after,
-  .wr-name-field--empty,
+  .wr-name-field--empty .form-control,
+  .wr-name-field--empty label,
   .wr-name-field--insist,
+  .wr-name-field--insist .form-control,
+  .wr-cta--go::after,
+  .wr-cta--go .wr-cta__btn,
+  .wr-cta--go .wr-cta__btn::before,
+  .wr-cta__arrow,
   .wr-piazza-card__art {
     animation: none !important;
   }

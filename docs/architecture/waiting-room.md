@@ -155,7 +155,8 @@ The toggle appears only while the event is `PUBLISHED` and only if the event has
 The move from waiting to entering often happens while the visitor is looking at something else: the square, the chat, or their own preview. Two cues mark it. Neither one ever enters the room automatically, because the click is still needed for browser media permissions and for consent.
 
 - When the status changes to `LIVE` while a participant or guest is waiting, a 3-2-1 panel labeled **The room is open** is shown. It is announced assertively.
-- When the room opens (`LIVE` and the bridge not reported as starting), the button reads **The room is ready — come in** for the next 10 seconds, but only while it is enabled. It pulses a limited number of times, and not at all under `prefers-reduced-motion`. A visually hidden status message announces the same thing. Entry allowed by the 60-second fallback is not announced.
+- When the room opens (`LIVE` and the bridge not reported as starting), the button reads **The room is ready — come in** for the next 10 seconds. A visually hidden status message announces the same thing. Entry allowed by the 60-second fallback is not announced.
+- For as long as pressing it would really let the person in (room open, name and consent in place), **Enter now** is green, with a halo that breathes around it, a light sweep across it and an arrow that points; while something is missing it stays blue and says what. The halo is a layer of its own, so the keyboard focus ring stays visible. All of this stops under `prefers-reduced-motion`.
 
 ### What stays in the browser
 

@@ -1209,7 +1209,9 @@ export default function WaitingRoom({
           {(bloccoSpiegato === 'name' || bloccoSpiegato === 'email') && (
             <p
               className="d-flex align-items-start justify-content-center text-center mb-0"
-              style={{ fontSize: '0.85rem', color: bloccoSpiegato === 'name' && !nomeSegnalato ? '#6B4400' : '#A1112E' }}
+              // Il nome mancante è una cosa da fare (ambra), l'email sbagliata
+              // un errore (rosso).
+              style={{ fontSize: '0.85rem', color: bloccoSpiegato === 'name' ? '#6B4400' : '#A1112E' }}
               aria-hidden="true"
             >
               <Icon icon="it-warning-circle" size="xs" className="me-1 mt-1 flex-shrink-0" style={{ fill: 'currentColor' }} />
@@ -1219,16 +1221,32 @@ export default function WaitingRoom({
           {/* Premibile anche a modulo incompleto: premerlo dice cosa manca e
               porta sul campo. Resta spento solo cio' che non dipende dalla
               persona — la sala che si prepara, l'ora d'apertura. */}
-          <Button
-            color={evidenziaCta ? 'success' : 'primary'}
-            size="lg"
-            className={`fw-semibold${evidenziaCta ? ' wr-cta-pronta' : ''}`}
-            onClick={handleEnterLive}
-            aria-describedby={bloccoSpiegato ? MESSAGGIO_DEL_BLOCCO[bloccoSpiegato] : undefined}
-          >
-            <Icon icon="it-video" size="sm" color="white" className="me-2" />
-            {evidenziaCta ? t('roomJustOpened') : t('joinNowBtn')}
-          </Button>
+          {/* Quando si può entrare davvero (sala aperta, modulo a posto) il
+              pulsante lo dice da solo: verde, con un alone che respira, un
+              riflesso che passa e la freccia che indica. Il richiamo sta su
+              uno strato suo (.wr-cta::after), così l'anello di focus da
+              tastiera resta visibile. */}
+          <div className={`wr-cta${canEnter ? ' wr-cta--go' : ''}`}>
+            <Button
+              color={canEnter ? 'success' : 'primary'}
+              size="lg"
+              className="fw-semibold wr-cta__btn"
+              onClick={handleEnterLive}
+              aria-describedby={bloccoSpiegato ? MESSAGGIO_DEL_BLOCCO[bloccoSpiegato] : undefined}
+            >
+              <Icon icon="it-video" size="sm" color="white" className="me-2" />
+              {evidenziaCta ? t('roomJustOpened') : t('joinNowBtn')}
+              {canEnter && (
+                <span className="wr-cta__arrow" aria-hidden="true">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                       strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                    <polyline points="12 5 19 12 12 19" />
+                  </svg>
+                </span>
+              )}
+            </Button>
+          </div>
         </>
       ) : isWarmingUp ? (
         <Button color="primary" size="lg" className="fw-semibold" disabled>
@@ -1663,7 +1681,7 @@ export default function WaitingRoom({
                   <div className="mb-4">{statusBanners}</div>
                 )}
 
-                <div className="mb-4 wr-reveal">{riepilogoBlock}</div>
+                <div className="mb-4 wr-reveal wr-summary-wrap">{riepilogoBlock}</div>
 
                 {/* Da http:// il browser nega microfono e videocamera: lo si dice
                     qui, con l'indirizzo sicuro, invece di una prova dei
