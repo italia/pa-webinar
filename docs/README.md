@@ -158,6 +158,7 @@ For architects, reviewers and developers who need to know how the parts fit. Sta
 | [Identity, access and tokens](architecture/identity-and-access.md) | Every credential the platform issues or accepts, how it travels, how long it lasts and how it is revoked; staff sign-in; where authorization is enforced; the Jitsi JWT claims; the cookie inventory. |
 | [From creation to recap: the event journey](architecture/event-journey.md) | Everything outside the live room: the event wizard, templates, duplication and series, registration and access modes, invitations, questionnaires, materials, the recap, the video library, event analytics and instant calls. |
 | [The waiting room and the square](architecture/waiting-room.md) | The single front door to every live page: what each state shows, the device check, music, consent notices, the optional 2D square and the accessibility contract. |
+| [Live captions](architecture/live-captions.md) | Captions over the video while the event runs: the bridge-to-gateway-to-engine path, how they are turned on and off, load governance and status, sizing on CPU and privacy. |
 | [Recording: composite video and per-speaker audio](architecture/recording.md) | The two capture paths, Jibri and the multitrack recorder bot: how each is triggered, the ingest contracts, the hidden Prosody domain, the runners and the recording lifecycle. |
 | [Data model](architecture/data-model.md) | Schema conventions, the domain map, ER diagrams of the core and live-interaction models, invariants and the migration policy. |
 | [Email and calendar](architecture/email.md) | The email outbox, every email the platform sends, email languages, reminders, calendar files, sender identity, and how to trace a missing email. |
@@ -189,6 +190,7 @@ The [ADR index](adr/README.md) gives each record's status and relations, the sta
 | [015](adr/015-named-administrators.md) | Named administrators alongside the instance key |
 | [016](adr/016-in-cluster-ai-postproduction.md) | In-cluster AI post-production |
 | [017](adr/017-patched-jitsi-web-image.md) | Patch the jitsi/web bundle by shape for fixes with no configuration point |
+| [018](adr/018-live-captions.md) | Live captions from an in-cluster streaming recognizer, fed by Jitsi's bridge |
 
 ## Develop and contribute
 

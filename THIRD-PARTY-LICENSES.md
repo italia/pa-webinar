@@ -82,7 +82,7 @@ git diff --exit-code license-report.json
 
 When you change dependencies, run `npm run license:report` and commit `license-report.json` in the same commit as `package-lock.json`. Before you push, run the second step locally to confirm that the report is current. Local CI parity is described in [docs/development/methodology.md](docs/development/methodology.md), and the workflows in [docs/development/ci-and-release.md](docs/development/ci-and-release.md).
 
-**Dependabot pull requests.** Dependabot opens its pull requests against `main`. Its npm updates change `package-lock.json` but not the report, and the report keys include package versions, so **License Compliance** fails on them until a maintainer runs `npm run license:report` on the branch and commits the result. Dependabot updates under `infra/recorder/` and `infra/recorder-controller/`, and to the AI worker's Python requirements, are not covered by any license check. The Dependabot configuration is described in [SECURITY.md](SECURITY.md#dependency-updates).
+**Dependabot pull requests.** Dependabot opens its pull requests against `main`. Its npm updates change `package-lock.json` but not the report, and the report keys include package versions, so **License Compliance** fails on them until a maintainer runs `npm run license:report` on the branch and commits the result. Dependabot updates under `infra/recorder/`, `infra/recorder-controller/` and `infra/captions/gateway/`, and to the AI worker's Python requirements, are not covered by any license check. The Dependabot configuration is described in [SECURITY.md](SECURITY.md#dependency-updates).
 
 ### Limits of the automated check
 
@@ -189,6 +189,8 @@ Publishing or redistributing an image distributes everything inside it. Base ima
 | kubectl | `bitnami/kubectl`, pinned by digest in `kubectlImage` in `values.yaml`, the default for `jvbScaler.image`, `postprod.orchestrator.image` and `configReloadHook.image` | Kubernetes: Apache-2.0 | |
 | curl | `curlimages/curl`: the CronJob images in `values.yaml` and the `cron` service in `docker-compose.yml` | curl license (MIT-style) | |
 | Recorder bot | `ghcr.io/italia/pa-webinar-recorder`, on `node:22-bookworm-slim` | Puppeteer: Apache-2.0. Chrome for Testing, downloaded by Puppeteer at build time: **to verify**. | The bot's own npm tree, with its own lockfile, is not in the report. |
+| Live captions gateway | `ghcr.io/italia/pa-webinar-captions-gateway`, on `node:22-bookworm-slim` | npm dependencies: `ws` (MIT) and `opus-decoder` (MIT, a WebAssembly build of libopus, BSD-3-Clause, with `@wasm-audio-decoders/common`, MIT). | Own lockfile, not in the report. |
+| Live captions engine | `ghcr.io/italia/pa-webinar-captions-engine`, on `debian:bookworm-slim`, with the NeMo-Speech.cpp CPU release downloaded at build time and checked by SHA-256 | NeMo-Speech.cpp: Apache-2.0 for NVIDIA-authored code; its bundled third-party components (llama.cpp and ggml: MIT; the GNU OpenMP and C++ runtime libraries: GPL with the GCC Runtime Library Exception) keep their own terms. | The model is not in the image. See [AI stack and model weights](#ai-stack-and-model-weights). |
 | Recorder controller | `ghcr.io/italia/pa-webinar-recorder-controller`, on `node:22-bookworm-slim` | npm dependencies are permissive, for example `@kubernetes/client-node` and `dockerode` (both Apache-2.0). | Own lockfile, not in the report. |
 | AI post-production worker | `ghcr.io/italia/pa-webinar-postprod-worker`, on `nvcr.io/nvidia/pytorch` (NVIDIA NGC), with cuDNN 8 from `nvidia-cudnn-cu12` | NVIDIA container and cuDNN terms: **to verify** for redistribution. ffmpeg: Ubuntu package. | See [AI stack and model weights](#ai-stack-and-model-weights). |
 | AI post-production worker without a GPU | `ghcr.io/italia/pa-webinar-postprod-worker-cpu`, on `python:3.12-alpine` | Python packages: `httpx` (BSD-3-Clause), `pydantic` (MIT), `numpy` (BSD-3-Clause). ffmpeg: Alpine package, built with GPL components (for example x264), so the image carries GPL-licensed binaries. | Same code as the GPU worker; `infra/ai/worker/requirements-cpu.txt`. |
@@ -234,6 +236,15 @@ No Python counterpart of `license-report.json` exists. `infra/ai/worker/requirem
 | `gender-guesser` | First-name gender hint for choosing a dubbing voice (`infra/ai/worker/name_gender.py`) | GPLv3 (PyPI metadata) | **To verify.** This puts GPL code in the worker image. |
 | `audioseal` and the `audioseal_wm_16bits` weights | Inaudible watermark on dubbed audio | MIT (PyPI metadata, `facebook/audioseal` model card) | The weights are not read from `/models`: `torch.hub` fetches them from huggingface.co unless they are seeded under `AUDIOSEAL_CACHE_DIR` (see above). |
 | torch, torchaudio, torchvision, transformers, numpy, httpx, pydantic, webvtt-py, onnxruntime | Runtime libraries | Permissive (BSD-style, Apache-2.0, MIT) | Confirm them with a listing from the built image. |
+
+### Live captions model
+
+The [live captions](docs/architecture/live-captions.md) engine runs `nvidia/nemotron-3.5-asr-streaming-0.6b` in its Q8_0 GGUF form, at the revision and SHA-256 set in `captions.model` in `infra/helm/pa-webinar/values.yaml`. The weights are not in any image the project publishes: an init container downloads them when the pod starts, from Hugging Face or from a mirror the operator sets, and whoever installs the service accepts the model terms.
+
+| Component | Role | License and source | Notes |
+|---|---|---|---|
+| `nvidia/nemotron-3.5-asr-streaming-0.6b` | Streaming speech recognition for live captions | OpenMDW-1.1 (model card), stated as ready for commercial use | Trained on NVIDIA proprietary data and public sets (Granary, Multilingual LibriSpeech, Common Voice, FLEURS, VoxPopuli, Europarl-ASR), per the model card. |
+| FLEURS, Italian test split | Speech used by the benchmark in `infra/captions/bench/` only, downloaded at run time | CC-BY-4.0 (dataset card) | Not part of any image or installation. |
 
 ### Piper voices
 

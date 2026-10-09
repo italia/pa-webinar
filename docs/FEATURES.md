@@ -288,6 +288,19 @@ Moderators can switch Q&A, chat, **Agenda** and **In one word** on and off durin
 
 The two capture paths (a composite video from Jibri, and per-participant audio from the recorder bot) are described in [Recording: composite video and per-speaker audio](architecture/recording.md).
 
+### Live captions
+
+*On by default* where the installation runs the captions service.
+
+- While the event runs, what each person says appears as captions over the video, with the speaker's name, a few tenths of a second after the words. Speech is transcribed by a recognizer inside the installation, on CPU: no audio or text leaves it, and nothing is kept.
+- Each viewer hides or shows the captions for themselves with the **CC** button; screen readers hear the finished sentences.
+- The waiting room tells participants that captions are on.
+- Moderators turn them off and on for everyone from the **Control** panel, with **Automatic captions**; administrators turn them off for the whole instance in the site settings.
+- The event's vocabulary (glossary, organizers, moderators and speakers) helps the recognizer write names and acronyms right.
+- If the service falls behind, it captions fewer speakers at once, then pauses and resumes on its own; the room and the status page say so.
+
+How it works, how to size it and its limits are in [Live captions](architecture/live-captions.md).
+
 ### Whiteboard
 
 *Optional.* This is the native Jitsi whiteboard (Excalidraw). It is opt-in per event and on in instant calls where the installation has the whiteboard service, and only moderators on desktop can open it.

@@ -97,7 +97,7 @@ The only GitHub Actions artifact any workflow uploads is the Playwright report o
 |---|---|---|---|
 | Lint & Typecheck | `npm run lint --workspace=app` and `npx tsc --noEmit --project app/tsconfig.json` | | Yes |
 | Unit Tests | `npm run test:coverage --workspace=app` against a PostgreSQL service container. It fails when coverage falls below the thresholds in `app/vitest.config.ts`, which work as a ratchet | | Yes |
-| Unit Tests (recorder, controller) | For `infra/recorder` and `infra/recorder-controller`, which sit outside the npm workspaces: `npm ci`, `npx tsc --noEmit -p tsconfig.json`, `npm test` | | Yes |
+| Unit Tests (recorder, controller) | For `infra/recorder`, `infra/recorder-controller` and `infra/captions/gateway`, which sit outside the npm workspaces: `npm ci`, `npx tsc --noEmit -p tsconfig.json`, `npm test` | | Yes |
 | Typecheck (lobby) | `npx tsc --noEmit -p lobby/tsconfig.json` | | Yes |
 | Helm Chart | Builds the subcharts at the versions pinned in `Chart.lock`, runs `./scripts/validate-chart.sh`, then renders the `simple`, `standard` and `full` example values and applies each result with `kubectl apply --dry-run=server` to a throwaway kind cluster | | Yes |
 | Unit Tests (worker AI) | In `infra/ai/worker`: `pip install -r requirements-test.txt`, then `pytest -q`. No GPU is involved: tests that need models skip themselves | | Yes |
@@ -127,6 +127,8 @@ The local command for each job, and when a job may be skipped, are in [CI parity
 | Build & Push Postprod CPU Worker Image | The same conditions, in a job of its own so that a slow or failed CUDA build does not hold it back | `pa-webinar-postprod-worker-cpu:dev` and `:dev-<sha>` |
 | Build & Push Recorder Image | The push changed `infra/recorder/`, or the dispatch set `force_recorder_build` | `pa-webinar-recorder:dev` and `:dev-<sha>` |
 | Build & Push Recorder Controller Image | The push changed `infra/recorder-controller/`, or the dispatch set `force_recorder_controller_build` | `pa-webinar-recorder-controller:dev` and `:dev-<sha>` |
+| Build & Push Captions Gateway Image | The push changed `infra/captions/gateway/`, or the dispatch set `force_captions_gateway_build` | `pa-webinar-captions-gateway:dev` and `:dev-<sha>` |
+| Build & Push Captions Engine Image | The push changed `infra/captions/engine/`, or the dispatch set `force_captions_engine_build` | `pa-webinar-captions-engine:dev` and `:dev-<sha>` |
 
 `<sha>` is the first seven characters of the commit SHA.
 
@@ -211,6 +213,7 @@ All images live in GitHub Container Registry under `ghcr.io/italia/`. They requi
 | `pa-webinar-recorder` | `release.yml`, `dev.yml` | `X.Y.Z` | `dev`, `dev-<sha>` |
 | `pa-webinar-recorder-controller` | `release.yml`, `dev.yml` | `X.Y.Z` | `dev`, `dev-<sha>` |
 | `pa-webinar-postprod-worker` | `release.yml`, `dev.yml` | `X.Y.Z` | `dev`, `dev-<sha>` |
+| `pa-webinar-captions-gateway`, `pa-webinar-captions-engine` | `release.yml` (from the first release that includes them), `dev.yml` | `X.Y.Z` | `dev`, `dev-<sha>` |
 | `pa-webinar-postprod-worker-cpu` (the worker without a GPU, `infra/ai/Dockerfile.worker-cpu`) | `release.yml` (from the first release that includes it), `dev.yml` | `X.Y.Z` | `dev`, `dev-<sha>` |
 | `pa-webinar-jitsi-web` | `jitsi-web.yml` | Not tied to releases: `stable-<jitsi-build>-rnnoise`, the value of `IMAGE_TAG` | None |
 
@@ -379,7 +382,7 @@ Make one commit on `dev` with the subject `chore(release): vX.Y.Z` and a body th
    | `infra/helm/pa-webinar/Chart.yaml` | `version` | No change needed: `release.yml` replaces it with `X.Y.Z` when it packages the chart. Only a chart installed from a source checkout reports the committed value |
    | `publiccode.yml` | `softwareVersion`, `releaseDate` | Read by the Developers Italia catalog |
 
-   `lobby/package.json`, `infra/recorder/package.json` and `infra/recorder-controller/package.json` are not versioned with releases.
+   `lobby/package.json`, `infra/recorder/package.json`, `infra/recorder-controller/package.json` and `infra/captions/gateway/package.json` are not versioned with releases.
 
 ### 2. Check, then open the pull request to `main`
 

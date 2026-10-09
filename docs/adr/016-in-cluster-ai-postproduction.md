@@ -148,8 +148,8 @@ the [job graph](../POSTPROD.md#job-graph), the [job states](../POSTPROD.md#job-s
   (`aiPipelineEnabled`, default `false` in `app/prisma/schema.prisma`).
 - Each event opts in with **Automatic transcription** (`aiTranscriptEnabled`) and the options that
   build on it. `consentSnapshot` records what each run was allowed to do.
-- The pipeline works on finished recordings only. Live captions are out of scope for this decision
-  ([Roadmap](../ROADMAP.md#further-out)).
+- The pipeline works on finished recordings only. Live captions are out of scope for this decision;
+  [ADR-018](018-live-captions.md) covers them.
 
 ## Consequences
 
