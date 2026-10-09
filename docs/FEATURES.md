@@ -282,7 +282,7 @@ Moderators can switch Q&A, chat, **Agenda** and **In one word** on and off durin
 
 *Optional*, and only when the event enables recording.
 
-- Participants and guests see a **Recording consent** dialog before they enter, when the installation can record (Jibri, or the per-participant recorder). They can choose **Do not participate**. The waiting room's recording notice follows the same rule.
+- The waiting room says that the event is recorded, when the installation can record (Jibri, or the per-participant recorder). Whoever has not given the recording consent at registration (a guest from the room link, a registrant on another browser) ticks it there, next to the event's privacy notice, before entering; a registrant who gave it enters with one click. On a listen-only event the waiting room only informs.
 - While recording is running, a red **REC** icon stays in the top bar for participants and speakers; moderators see it, with the recording's duration, in the time strip. The duration comes from the start the room reported to the server, so every moderator sees the same figure, also after joining late.
 - Moderators start and stop the recording from the **Control** panel; stopping asks for confirmation. With **Start recording automatically**, it starts on its own.
 
@@ -330,7 +330,7 @@ What a moderator can do in the room:
 | Recording | In the **Control** panel, **Start recording** and **Stop recording** (with a confirmation), when the event enables recording. While the recorder starts, the button reads **Recording starting…**; if it has not started within the provisioning timeout, **Recording unavailable**; without a declared recordings storage (`RECORDING_STORAGE_TYPE`), **Recording not configured in infrastructure**. A running recording can always be stopped. |
 | Interaction | In the **Control** panel, switch Q&A, chat, **Agenda** and **In one word** on and off for everyone, open the whiteboard, and run the talk timer. Run polls, word-cloud rounds and the agenda. Moderate Q&A, hide chat messages and remove words from the word cloud. Add, edit and delete materials, and see how often each was opened. |
 
-Speakers always have full audio, video and screen sharing. They have no moderation powers and no recording control, and they skip the participant recording-consent dialog.
+Speakers always have full audio, video and screen sharing. They have no moderation powers and no recording control, and the waiting room does not ask them for the recording consent.
 
 A token that is shared or forwarded cannot act as another person: editing a chat message, for example, needs a personal identity. See [Identity, access and tokens](architecture/identity-and-access.md).
 

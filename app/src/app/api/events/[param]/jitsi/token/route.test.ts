@@ -40,6 +40,7 @@ vi.mock('@/lib/db', () => ({
     eventModerator: { findUnique: vi.fn() },
     siteSetting: { findUnique: vi.fn() },
     multitrackConsent: { create: vi.fn(), findFirst: vi.fn() },
+    recordingConsent: { createMany: vi.fn() },
     profilePhoto: { findUnique: vi.fn(async () => null) },
   },
 }));
@@ -83,6 +84,7 @@ type EventOverrides = Partial<{
   status: string;
   eventType: string;
   joinPasswordHash: string | null;
+  recordingEnabled: boolean;
   multitrackRecordingEnabled: boolean;
   participantsCanUnmute: boolean;
   participantsCanStartVideo: boolean;
@@ -99,6 +101,7 @@ function eventRow(overrides: EventOverrides = {}) {
     joinPasswordHash: null,
     moderatorToken: PRIMARY_TOKEN,
     moderatorName: 'Moderatore',
+    recordingEnabled: false,
     multitrackRecordingEnabled: false,
     participantsCanUnmute: false,
     participantsCanStartVideo: false,
@@ -182,7 +185,12 @@ interface JitsiUser {
 }
 
 async function minted(res: Response) {
-  const body = (await res.json()) as { jwt: string; displayName: string; role: string };
+  const body = (await res.json()) as {
+    jwt: string;
+    displayName: string;
+    role: string;
+    consentsRecorded?: { recording: boolean; multitrack: boolean };
+  };
   // Firma verificata davvero: un JWT che Prosody rifiuterebbe non fa entrare
   // nessuno, per quanto corretto sia il resto del payload.
   const { payload } = await jwtVerify(
@@ -787,5 +795,89 @@ describe('POST jitsi/token — consenso alla registrazione per partecipante', ()
     );
     await post({ guestName: 'Ospite Anonimo' });
     expect(prisma.multitrackConsent.create).not.toHaveBeenCalled();
+  });
+});
+
+describe('POST jitsi/token — consenso alla registrazione dato in sala d\'attesa', () => {
+  beforeEach(() => {
+    applySettings({ guestAccessEnabled: true, gravatarEnabled: false });
+    vi.mocked(prisma.recordingConsent.createMany).mockResolvedValue({ count: 1 } as never);
+  });
+
+  it('records the consent of a guest from the room link, with the seat and the language', async () => {
+    vi.mocked(prisma.event.findUnique).mockResolvedValue(
+      eventRow({ recordingEnabled: true }) as never,
+    );
+    const res = await post({ guestName: 'Ospite Anonimo', recordingConsent: true, locale: 'it' });
+    expect(res.status).toBe(200);
+    const { body, user } = await minted(res);
+    // La sala sa quali prove sono state salvate.
+    expect(body.consentsRecorded).toEqual({ recording: true, multitrack: false });
+    const call = vi.mocked(prisma.recordingConsent.createMany).mock.calls[0]![0] as {
+      data: { eventId: string; jitsiUserId: string; displayName: string; locale: string; registrationId: string | null }[];
+      skipDuplicates: boolean;
+    };
+    const [riga] = call.data;
+    expect(riga!.eventId).toBe(EVENT_ID);
+    expect(riga!.jitsiUserId).toBe(user.id);
+    expect(riga!.locale).toBe('it');
+    expect(riga!.registrationId).toBeNull();
+    // Il nome e' cifrato a riposo.
+    expect(riga!.displayName).not.toBe('Ospite Anonimo');
+    expect(prisma.multitrackConsent.create).not.toHaveBeenCalled();
+  });
+
+  it('ties the consent of a registrant to the registration, once even with concurrent requests', async () => {
+    vi.mocked(prisma.event.findUnique).mockResolvedValue(
+      eventRow({ recordingEnabled: true }) as never,
+    );
+    vi.mocked(prisma.registration.findUnique).mockResolvedValue(registrationRow() as never);
+    cookieJar.set(eventAccessCookieName(EVENT_ID), await signEventAccess(EVENT_ID, ACCESS_TOKEN, 3600));
+
+    const res = await post({ accessToken: ACCESS_TOKEN, recordingConsent: true });
+    expect(res.status).toBe(200);
+    const call = vi.mocked(prisma.recordingConsent.createMany).mock.calls[0]![0] as {
+      data: { registrationId: string | null }[];
+      skipDuplicates: boolean;
+    };
+    expect(call.data[0]!.registrationId).toBe(REGISTRATION_ID);
+    // Il vincolo unico (evento, iscrizione) scarta la seconda prova.
+    expect(call.skipDuplicates).toBe(true);
+  });
+
+  it('records both consents when the event also records per participant', async () => {
+    vi.mocked(prisma.event.findUnique).mockResolvedValue(
+      eventRow({ recordingEnabled: true, multitrackRecordingEnabled: true }) as never,
+    );
+    vi.mocked(prisma.multitrackConsent.create).mockResolvedValue({} as never);
+    await post({ guestName: 'Ospite Anonimo', recordingConsent: true, multitrackConsent: true });
+    expect(prisma.recordingConsent.createMany).toHaveBeenCalledTimes(1);
+    expect(prisma.multitrackConsent.create).toHaveBeenCalledTimes(1);
+  });
+
+  it('a failed write of one consent neither blocks the token nor the other consent', async () => {
+    vi.mocked(prisma.event.findUnique).mockResolvedValue(
+      eventRow({ recordingEnabled: true, multitrackRecordingEnabled: true }) as never,
+    );
+    vi.mocked(prisma.recordingConsent.createMany).mockRejectedValueOnce(new Error('db down'));
+    vi.mocked(prisma.multitrackConsent.create).mockResolvedValue({} as never);
+    const errore = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const res = await post({ guestName: 'Ospite Anonimo', recordingConsent: true, multitrackConsent: true });
+    expect(res.status).toBe(200);
+    expect(prisma.multitrackConsent.create).toHaveBeenCalledTimes(1);
+    // La prova non salvata non si da' per salvata: la sala la richiedera'.
+    const { body } = await minted(res);
+    expect(body.consentsRecorded).toEqual({ recording: false, multitrack: true });
+    errore.mockRestore();
+  });
+
+  it('records nothing when the event is not recorded, or without the consent', async () => {
+    vi.mocked(prisma.event.findUnique).mockResolvedValue(eventRow() as never);
+    await post({ guestName: 'Ospite Anonimo', recordingConsent: true });
+    vi.mocked(prisma.event.findUnique).mockResolvedValue(
+      eventRow({ recordingEnabled: true }) as never,
+    );
+    await post({ guestName: 'Ospite Anonimo' });
+    expect(prisma.recordingConsent.createMany).not.toHaveBeenCalled();
   });
 });

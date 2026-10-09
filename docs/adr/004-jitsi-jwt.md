@@ -145,8 +145,8 @@ The rules on who gets a token and when are in
   network addresses are outside the scope of this decision.
 - **Conference access is decided in the portal.** The token endpoint enforces the status checks, the
   registration-link binding, the guest-access setting for scheduled events and, for guests without a
-  registration link, the join password. The recording-consent step is part of the live page, which
-  shows it before it requests the token; the endpoint itself does not check consent. The per-seat rules
+  registration link, the join password. The recording consents are asked by the waiting room, before
+  the page requests the token; the endpoint stores the ones it receives as proof but does not check them. The per-seat rules
   are in
   [When a Jitsi token is issued](../architecture/identity-and-access.md#when-a-jitsi-token-is-issued).
 - **The rule is tested.** `app/src/lib/auth/jwt.test.ts` asserts that the avatar never carries the

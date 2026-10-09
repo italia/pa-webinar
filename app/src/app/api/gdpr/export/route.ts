@@ -82,6 +82,12 @@ export const GET = withErrorHandling(async (request) => {
         select: { consentedAt: true, locale: true },
         orderBy: { consentedAt: 'asc' },
       },
+      // Lo stesso per il consenso alla registrazione dell'evento dato in sala
+      // d'attesa da chi non l'aveva dato all'iscrizione.
+      recordingConsents: {
+        select: { consentedAt: true, locale: true },
+        orderBy: { consentedAt: 'asc' },
+      },
     },
   });
 
@@ -169,6 +175,10 @@ export const GET = withErrorHandling(async (request) => {
         registeredAt: r.createdAt.toISOString(),
         joinedAt: r.joinedAt?.toISOString() ?? null,
         multitrackConsentsInRoom: (r.multitrackConsents ?? []).map((c) => ({
+          consentedAt: c.consentedAt.toISOString(),
+          locale: c.locale,
+        })),
+        recordingConsentsInRoom: (r.recordingConsents ?? []).map((c) => ({
           consentedAt: c.consentedAt.toISOString(),
           locale: c.locale,
         })),

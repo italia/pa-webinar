@@ -104,6 +104,9 @@ export const GET = withErrorHandling(async (request) => {
       skip: format === 'csv' ? 0 : offset,
       include: {
         event: { select: { slug: true, title: true, startsAt: true } },
+        // I consensi dati in sala d'attesa da chi non li aveva dati
+        // all'iscrizione (iscritto prima che l'evento registrasse).
+        _count: { select: { recordingConsents: true, multitrackConsents: true } },
       },
     }),
     prisma.registration.count({ where }),
@@ -125,8 +128,8 @@ export const GET = withErrorHandling(async (request) => {
     organization: r.organization,
     organizationRole: r.organizationRole,
     organizationType: r.organizationType,
-    consentRecording: r.consentRecording,
-    consentMultitrack: r.consentMultitrack,
+    consentRecording: r._count.recordingConsents > 0 ? true : r.consentRecording,
+    consentMultitrack: r._count.multitrackConsents > 0 ? true : r.consentMultitrack,
     consentFutureCommunications: r.consentFutureCommunications,
     joinedAt: r.joinedAt?.toISOString() ?? null,
     leftAt: r.leftAt?.toISOString() ?? null,

@@ -12,6 +12,7 @@ import { resolveKickerEnabled } from '@/lib/utils/title-kicker';
 import { getSettings } from '@/lib/settings';
 import { isEventOpenForRegistration } from '@/lib/events/visibility';
 import { registrationAccessFor } from '@/lib/events/registration-access';
+import { informativaEvento } from '@/lib/events/privacy-notice';
 import { titoloEventoPubblico } from '@/lib/events/meta-title';
 
 interface RegistrationPageProps {
@@ -69,22 +70,9 @@ export default async function RegistrationPage({
     settings.publicRegistrationEnabled,
   );
 
-  const privacyUrl =
-    event.privacyPolicyUrl ??
-    process.env.DEFAULT_PRIVACY_POLICY_URL ??
-    '/privacy';
-
-  // Privacy text resolution order: ad-hoc text wins (an event can always
-  // override with bespoke wording), then the linked GDPR template's body
-  // for the current locale (falling back to IT), and finally nothing — in
-  // which case the registration form falls back to the privacyUrl link.
-  const templateBody = event.gdprTemplate?.body as Record<string, string> | undefined;
-  // Un testo vuoto salvato da versioni precedenti vale come assente.
-  const privacyText =
-    event.privacyPolicyText?.trim()
-    || templateBody?.[locale]?.trim()
-    || templateBody?.it?.trim()
-    || undefined;
+  // La stessa informativa che legge in sala d'attesa chi entra senza
+  // iscriversi (lib/events/privacy-notice).
+  const { url: privacyUrl, testo: privacyText } = informativaEvento(event, locale);
 
   return (
     <div className="container py-5">

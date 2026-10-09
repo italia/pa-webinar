@@ -325,6 +325,108 @@ describe('sala d\'attesa — avviso di registrazione', () => {
     render({ event: { ...eventoLive, recordingEnabled: false } });
     expect(container.textContent).not.toContain(t.recordingNotice);
   });
+
+  it('di solo ascolto informa e non chiede niente', () => {
+    render({ event: { ...eventoLive, recordingEnabled: true }, recordingListenOnly: true });
+    expect(container.textContent).toContain(messages.gdpr.consent.recordingNotice);
+    expect($('#waiting-recording-consent')).toBeNull();
+  });
+});
+
+describe('sala d\'attesa — consenso alla registrazione', () => {
+  const evento: Evento = { ...eventoLive, recordingEnabled: true };
+
+  it('chi non l\'ha dato all\'iscrizione lo da\' qui: senza la spunta non si entra', () => {
+    render({ event: evento, defaultName: 'Relatore 1', recordingConsentRequired: true });
+    expect(container.textContent).toContain(t.recordingConsentIntro);
+    const entra = pulsante(t.joinNowBtn);
+    expect(entra.getAttribute('aria-describedby')).toBe('waiting-recording-consent-required');
+
+    premi(entra);
+    expect(onEnterLive).not.toHaveBeenCalled();
+    const consenso = $<HTMLInputElement>('#waiting-recording-consent')!;
+    expect(document.activeElement).toBe(consenso);
+
+    premi(consenso);
+    premi(pulsante(t.joinNowBtn));
+    // Il consenso viaggia con l'ingresso: il server ne conserva la prova.
+    expect(onEnterLive).toHaveBeenCalledWith('Relatore 1', {
+      cameraOn: false,
+      micOn: false,
+      recordingConsent: true,
+    });
+  });
+
+  it('chi l\'ha gia\' dato entra con un clic, senza casella', () => {
+    render({ event: evento, defaultName: 'Relatore 1', recordingConsentRequired: false });
+    expect($('#waiting-recording-consent')).toBeNull();
+    premi(pulsante(t.joinNowBtn));
+    expect(onEnterLive).toHaveBeenCalledWith('Relatore 1', { cameraOn: false, micOn: false });
+  });
+
+  it('il testo scelto per l\'evento prende il posto di quello predefinito', () => {
+    render({
+      event: evento,
+      recordingConsentRequired: true,
+      recordingConsentText: 'Testo dell\'ente sulla registrazione.',
+    });
+    expect(container.textContent).toContain('Testo dell\'ente sulla registrazione.');
+    expect(container.textContent).not.toContain(t.recordingConsentIntro);
+  });
+
+  it('accanto al consenso c\'e\' l\'informativa: il testo dell\'evento si apre sul posto', () => {
+    render({
+      event: evento,
+      recordingConsentRequired: true,
+      privacy: { url: '/it/privacy', testo: 'Informativa dell\'evento.' },
+    });
+    expect(container.textContent).not.toContain('Informativa dell\'evento.');
+    premi(pulsante(messages.registration.gdprLink));
+    expect(container.textContent).toContain('Informativa dell\'evento.');
+  });
+
+  it('senza testo dell\'evento l\'informativa e\' un link', () => {
+    render({ event: evento, recordingConsentRequired: true, privacy: { url: '/it/privacy' } });
+    const link = Array.from(container.querySelectorAll<HTMLAnchorElement>('a')).find(
+      (a) => a.textContent === messages.registration.gdprLink,
+    );
+    expect(link?.getAttribute('href')).toBe('/it/privacy');
+  });
+
+  it('con la registrazione per partecipante si chiedono entrambi, nell\'ordine', () => {
+    render({
+      event: { ...evento, multitrackRecordingEnabled: true },
+      defaultName: 'Relatore 1',
+      recordingConsentRequired: true,
+    });
+    premi(pulsante(t.joinNowBtn));
+    expect(document.activeElement).toBe($('#waiting-recording-consent'));
+    premi($<HTMLInputElement>('#waiting-recording-consent')!);
+    premi(pulsante(t.joinNowBtn));
+    expect(document.activeElement).toBe($('#waiting-multitrack-consent'));
+    premi($<HTMLInputElement>('#waiting-multitrack-consent')!);
+    premi(pulsante(t.joinNowBtn));
+    expect(onEnterLive).toHaveBeenCalledWith('Relatore 1', {
+      cameraOn: false,
+      micOn: false,
+      recordingConsent: true,
+      multitrackConsent: true,
+    });
+  });
+
+  it('il consenso non chiude la piazza: il cancello porta alla casella', () => {
+    render({
+      event: { ...evento, waitingRoomEngine: 'GAME' },
+      defaultName: 'Relatore 1',
+      recordingConsentRequired: true,
+    });
+    premi(pulsante(t.enterGardenTitle));
+    act(() => {
+      expect(() => piazza.onEnterLive?.('', { cameraOn: false, micOn: false })).toThrow();
+    });
+    expect(onEnterLive).not.toHaveBeenCalled();
+    expect(document.activeElement).toBe($('#waiting-recording-consent'));
+  });
 });
 
 /**

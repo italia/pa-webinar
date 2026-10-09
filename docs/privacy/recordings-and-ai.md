@@ -56,7 +56,7 @@ assessment belongs to the controller of each installation.
 
 | Capture | Turned on by | Consent collected | What it contains | Where it is stored |
 |---|---|---|---|---|
-| Composite video (Jibri) | **Enable video recording** (`recordingEnabled`). A moderator starts it, or it starts on its own with `autoStartRecording` | `consentRecording` at registration, and the full-screen **Recording consent** dialog before the room loads | One MP4 file with the conference video and the mixed audio of everyone | `recordings/` in the recordings storage domain |
+| Composite video (Jibri) | **Enable video recording** (`recordingEnabled`). A moderator starts it, or it starts on its own with `autoStartRecording` | `consentRecording` at registration; in the waiting room, a blocking checkbox for whoever has not given it, stored as proof (`RecordingConsent`) | One MP4 file with the conference video and the mixed audio of everyone | `recordings/` in the recordings storage domain |
 | Per-participant audio (recorder bot) | **Per-participant recording (high accuracy)** (`multitrackRecordingEnabled`). The toggle appears only with recording and **Automatic transcription** on. The bot starts when the event goes `LIVE` | `consentMultitrack` at registration, and a blocking checkbox in the waiting room | One audio file per participant and per track session, plus a manifest that names the participant of each file | `recordings/multitrack/<eventId>/<recordingId>/` in the recordings storage domain |
 | Speaking timeline | Always, in every live room that a moderator attends, recorded or not | No dedicated consent | Who was the dominant speaker and when: the Jitsi endpoint ID and the display name | `CallSession.dominantSpeakerLog` in PostgreSQL |
 

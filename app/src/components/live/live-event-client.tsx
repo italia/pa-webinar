@@ -29,15 +29,17 @@ import {
 import JitsiRoom from '@/components/jitsi/jitsi-room';
 import { LivePushContext, useLivePush, useLiveState } from '@/hooks/use-live-state';
 import { useQaAlerts } from '@/hooks/use-qa-alerts';
-import RecordingConsent from '@/components/jitsi/recording-consent';
-import { consensiRichiesti } from '@/lib/registration/consents';
+import {
+  consensoRegistrazioneIngresso,
+  consensiDaInviare,
+  type ProveConsenso,
+} from '@/lib/live/entry-consents';
 import QAPanel from '@/components/qa/qa-panel';
 import PollPanel from '@/components/polls/poll-panel';
 import AgendaPanel from '@/components/live/agenda-panel';
 import MaterialPanel from '@/components/materials/material-panel';
 import { fetchMaterials, materialsListKey } from '@/components/materials/material-request';
 import ParticipantPanel from '@/components/participants/participant-panel';
-import PreJoinScreen from '@/components/live/pre-join-screen';
 import PostEventFeedback from '@/components/live/post-event-feedback';
 import PresentationTimerBar from '@/components/live/presentation-timer';
 import LiveTimeStrip from '@/components/live/live-time-strip';
@@ -121,6 +123,9 @@ interface EventInfo {
   feedbackEnabled?: boolean;
   /** Testo di consenso alla registrazione scelto per l'evento; null = quello predefinito. */
   recordingConsentText?: string | null;
+  /** L'informativa privacy dell'evento (lib/events/privacy-notice), accanto
+   *  al consenso chiesto in sala d'attesa. */
+  privacy?: { url: string; testo?: string };
   timezone?: string;
   /** True quando il master switch AI è attivo e l'evento usa almeno una
    *  feature di post-produzione AI — abilita l'informativa in sala d'attesa. */
@@ -154,6 +159,9 @@ interface LiveEventClientProps {
   /** Il partecipante registrato ha già prestato il consenso multitrack alla
    *  registrazione → non lo si richiede di nuovo in sala d'attesa. */
   hasMultitrackConsent?: boolean;
+  /** Lo stesso per il consenso alla registrazione dell'evento: dato
+   *  all'iscrizione, o in sala d'attesa a un ingresso precedente. */
+  hasRecordingConsent?: boolean;
   displayName: string;
   locale: string;
   jitsiDomain: string;
@@ -185,8 +193,6 @@ interface LiveEventClientProps {
 
 type LivePhase =
   | 'waiting'
-  | 'consent_pending'
-  | 'pre_join'
   | 'fetching_jwt'
   | 'ready'
   | 'reconnecting'
@@ -254,6 +260,8 @@ interface JitsiCredentials {
   roomName: string;
   displayName: string;
   role: string;
+  /** Le prove di consenso che il server ha salvato per questo posto. */
+  consentsRecorded?: { recording: boolean; multitrack: boolean };
 }
 
 export default function LiveEventClient({
@@ -264,6 +272,7 @@ export default function LiveEventClient({
   isSpeaker = false,
   isGuest = false,
   hasMultitrackConsent = false,
+  hasRecordingConsent = false,
   displayName: initialDisplayName,
   locale,
   jitsiDomain,
@@ -419,6 +428,30 @@ export default function LiveEventClient({
   // conduce o interviene (anche nelle chiamate istantanee, riunioni fra pari)
   // e per chi assiste.
   const conduceOInterviene = isModerator || isSpeaker || event.eventType === 'INSTANT';
+  // I consensi dati in sala d'attesa di cui il server ha salvato la prova, in
+  // questa visita della pagina: a un ritorno in sala (evento tornato in
+  // attesa, uscita e rientro) non si chiedono di nuovo, e ogni ingresso
+  // successivo ne porta la prova per il suo posto (lib/live/entry-consents).
+  // Contano solo se il server dice di averli salvati: se l'ingresso fallisce,
+  // o la scrittura non riesce, la casella torna.
+  const [consensiRegistrati, setConsensiRegistrati] = useState<ProveConsenso>({
+    registrazione: false,
+    tracce: false,
+  });
+  // La registrazione dell'evento, per chi entra dalla sala d'attesa: se
+  // chiederne il consenso, o se basta informare.
+  const consensoRegistrazione = consensoRegistrazioneIngresso({
+    formato: {
+      recordingEnabled: event.recordingEnabled,
+      multitrackRecordingEnabled: event.multitrackRecordingEnabled ?? false,
+      participantsCanUnmute: event.participantsCanUnmute,
+      participantsCanStartVideo: event.participantsCanStartVideo,
+      participantsCanShareScreen: event.participantsCanShareScreen,
+    },
+    registrazioneDisponibile: recordingAvailable,
+    conduce: isModerator || isSpeaker,
+    giaDato: hasRecordingConsent || consensiRegistrati.registrazione,
+  });
   const [joinPrefs, setJoinPrefs] = useState<WaitingRoomJoinPrefs>({
     cameraOn: false,
     micOn: false,
@@ -584,12 +617,13 @@ export default function LiveEventClient({
           body.displayNameOverride = chosenName;
         }
       }
-      // Il consenso alla registrazione per partecipante dato in sala d'attesa:
-      // il server ne conserva la prova insieme al posto nella conferenza.
-      if (joinPrefs.multitrackConsent) {
-        body.multitrackConsent = true;
-        body.locale = locale;
-      }
+      // I consensi dati in sala d'attesa (alla registrazione dell'evento, alla
+      // traccia per partecipante): il server ne conserva la prova insieme al
+      // posto nella conferenza, uno nuovo a ogni ingresso.
+      const prove = consensiDaInviare(joinPrefs, consensiRegistrati);
+      if (prove.registrazione) body.recordingConsent = true;
+      if (prove.tracce) body.multitrackConsent = true;
+      if (prove.registrazione || prove.tracce) body.locale = locale;
 
       const res = await fetch(`/api/events/${event.slug}/jitsi/token`, {
         method: 'POST',
@@ -643,6 +677,13 @@ export default function LiveEventClient({
       }
 
       const data: JitsiCredentials = await res.json();
+      const salvati = data.consentsRecorded;
+      if (salvati && (salvati.recording || salvati.multitrack)) {
+        setConsensiRegistrati((c) => ({
+          registrazione: c.registrazione || salvati.recording,
+          tracce: c.tracce || salvati.multitrack,
+        }));
+      }
       setCredentials(data);
       setPhase('ready');
     } catch {
@@ -660,7 +701,8 @@ export default function LiveEventClient({
     router,
     t,
     markEnded,
-    joinPrefs.multitrackConsent,
+    joinPrefs,
+    consensiRegistrati,
     locale,
   ]);
 
@@ -670,43 +712,15 @@ export default function LiveEventClient({
     }
   }, [phase, fetchJwt]);
 
-  const handleConsentAccept = useCallback(() => {
-    // Name already collected in the waiting room; skip the (legacy)
-    // pre-join name form and fetch the JWT directly. Keeping `pre_join`
-    // as a reachable phase for the device-check experience Task 2 will
-    // add — for now consent → JWT is the shortest path.
-    setPhase('fetching_jwt');
-  }, []);
-
-  const handleConsentDecline = useCallback(() => {
-    router.push(percorso(`/events/${event.slug}`));
-  }, [router, event.slug]);
-
-  const handlePreJoin = useCallback((name: string) => {
-    setChosenName(name);
-    setPhase('fetching_jwt');
-  }, []);
-
-  // Unified entry from the waiting room. Dispatches through the
-  // consent → pre_join → fetching_jwt pipeline depending on role and
-  // whether recording consent is required for this event.
+  // Ingresso dalla sala d'attesa: nome, dispositivi e consensi li ha gia'
+  // raccolti lei, quindi si chiede subito il JWT.
   const handleEnterFromWaiting = useCallback(
     (name: string, prefs: WaitingRoomJoinPrefs) => {
       setChosenName(name);
       setJoinPrefs(prefs);
-      // Moderator + speaker magic-links skip the participant recording-
-      // consent modal (they're the ones driving recording). Guests and
-      // registered participants see it when recording is enabled AND the
-      // installation has something that can record.
-      if (event.recordingEnabled && recordingAvailable && !isModerator && !isSpeaker) {
-        setPhase('consent_pending');
-      } else {
-        // The waiting room has already collected the name + device
-        // preferences, so jump straight to the JWT fetch.
-        setPhase('fetching_jwt');
-      }
+      setPhase('fetching_jwt');
     },
-    [event.recordingEnabled, recordingAvailable, isModerator, isSpeaker]
+    [],
   );
 
   // Poll event status during ready phase to detect ENDED
@@ -1523,7 +1537,11 @@ export default function LiveEventClient({
           // registrazione e la loro traccia audio isolata è esattamente il dato
           // (quasi-biometrico, ADR-013) che il gate protegge — devono spuntare
           // il consenso come ogni altro partecipante.
-          multitrackConsentExempt={isModerator || hasMultitrackConsent}
+          multitrackConsentExempt={isModerator || hasMultitrackConsent || consensiRegistrati.tracce}
+          recordingConsentRequired={consensoRegistrazione.richiesto}
+          recordingListenOnly={consensoRegistrazione.soloAscolto}
+          recordingConsentText={event.recordingConsentText}
+          privacy={event.privacy}
         />
         {feedbackModal}
       </>
@@ -1678,55 +1696,6 @@ export default function LiveEventClient({
           </div>
         </div>
       </div>
-    );
-  }
-
-  // ── Recording consent ──
-  if (phase === 'consent_pending') {
-    return (
-      <>
-        <LiveTopBar
-          hasPublicPage={event.eventType !== 'INSTANT'}
-          hasCallLink={event.guestEntryOpen !== false}
-          title={event.title}
-          parseTitleKicker={event.parseTitleKicker}
-          imageUrl={event.imageUrl}
-          coverImageUrl={event.coverImageUrl}
-          participantCount={0}
-          isRecording={false}
-          role={isModerator ? 'moderator' : isGuest ? 'guest' : 'participant'}
-          slug={event.slug}
-          locale={locale}
-          moderatorToken={isModerator ? token : undefined}
-        />
-        <RecordingConsent
-          onAccept={handleConsentAccept}
-          onDecline={handleConsentDecline}
-          customConsentText={event.recordingConsentText}
-          // Evento di solo ascolto: la stessa informativa dell'iscrizione,
-          // non un consenso che l'iscrizione aveva detto non servire.
-          listenOnly={
-            consensiRichiesti({
-              recordingEnabled: event.recordingEnabled,
-              multitrackRecordingEnabled: event.multitrackRecordingEnabled ?? false,
-              participantsCanUnmute: event.participantsCanUnmute,
-              participantsCanStartVideo: event.participantsCanStartVideo,
-              participantsCanShareScreen: event.participantsCanShareScreen,
-            }).avvisoRegistrazione
-          }
-        />
-      </>
-    );
-  }
-
-  // ── Pre-join screen ──
-  if (phase === 'pre_join') {
-    return (
-      <PreJoinScreen
-        eventTitle={event.title}
-        defaultName={chosenName || initialDisplayName}
-        onJoin={handlePreJoin}
-      />
     );
   }
 

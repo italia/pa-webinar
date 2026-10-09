@@ -73,9 +73,8 @@ class PhaserLobbyBoundary extends Component<
  * Unified waiting-room / front-door for the live event page.
  *
  * This is the ONE screen every first-time arrival sees (guest, registered
- * participant, moderator, speaker) no matter the event status. It replaces
- * the previous fork between `GuestJoinForm`, `PreJoinScreen` and the
- * scenario-specific waiting room, consolidating:
+ * participant, moderator, speaker) no matter the event status. It
+ * consolidates:
  *   - cover image / hero
  *   - name input (always editable, prefilled where we know it)
  *   - netiquette reminder
@@ -83,12 +82,12 @@ class PhaserLobbyBoundary extends Component<
  *   - countdown (PUBLISHED only)
  *   - catch-up recording (whenever tempRecordingUrl is set — no 5min gate)
  *   - chat preview while LIVE
+ *   - the recording consents still to give, with the event's privacy notice
  *   - primary CTA: enter, start (moderator), watch recording, feedback
  *
- * All the heavy lifting (JWT fetch, consent flow, pre-join transitions)
- * stays in the parent `LiveEventClient` — the waiting room is a pure
- * presentation surface that calls two callbacks: `onEnterLive(name)` and
- * `onStartEvent()`.
+ * The JWT fetch, and the choice of which consents to ask, stay in the parent
+ * `LiveEventClient`: the waiting room presents, and reports back through
+ * `onEnterLive(name, prefs)` and `onStartEvent()`.
  */
 
 interface WaitingRoomEvent {
@@ -144,6 +143,9 @@ export interface WaitingRoomJoinPrefs {
   cameraOn: boolean;
   /** Whether the user wants their microphone on when they land in Jitsi. */
   micOn: boolean;
+  /** Consenso alla registrazione dell'evento dato qui: il server lo registra
+   *  come prova quando rilascia il JWT. */
+  recordingConsent?: boolean;
   /** Consenso alla registrazione per partecipante dato qui: il server lo
    *  registra come prova quando rilascia il JWT. */
   multitrackConsent?: boolean;
@@ -199,6 +201,18 @@ interface WaitingRoomProps {
    *  dato che il gate protegge. Evita il doppio consenso e riabilita il
    *  minigioco. */
   multitrackConsentExempt?: boolean;
+  /** Va chiesto qui il consenso alla registrazione dell'evento: chi partecipa
+   *  puo' accendere microfono, videocamera o schermo e non l'ha dato
+   *  all'iscrizione (ospite dal link della sala, iscritto da un altro
+   *  browser, iscritto prima che la registrazione fosse attivata). */
+  recordingConsentRequired?: boolean;
+  /** Si registra, ma chi partecipa non ha ne' microfono, ne' videocamera, ne'
+   *  schermo: il riepilogo lo dice, e non c'e' nulla da acconsentire. */
+  recordingListenOnly?: boolean;
+  /** Il testo sulla registrazione scelto per l'evento; null = quello predefinito. */
+  recordingConsentText?: string | null;
+  /** L'informativa privacy dell'evento, accanto al consenso. */
+  privacy?: { url: string; testo?: string };
   /** Token dell'utente (moderatore/iscritto) da usare per leggere e scrivere in
    *  chat durante l'attesa. Vuoto per un ospite senza credenziali. */
   chatToken?: string;
@@ -221,12 +235,14 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const CAMPO_DEL_BLOCCO: Record<BloccoModulo, string> = {
   name: 'waiting-name',
   email: 'waiting-email',
+  recording: 'waiting-recording-consent',
   consent: 'waiting-multitrack-consent',
 };
 /** Il messaggio che spiega ciascun blocco: descrive il campo e il pulsante. */
 const MESSAGGIO_DEL_BLOCCO: Record<BloccoModulo, string> = {
   name: 'waiting-name-required',
   email: 'waiting-email-invalid',
+  recording: 'waiting-recording-consent-required',
   consent: 'waiting-multitrack-consent-required',
 };
 
@@ -250,6 +266,10 @@ export default function WaitingRoom({
   warmup = null,
   exitHref,
   multitrackConsentExempt = false,
+  recordingConsentRequired = false,
+  recordingListenOnly = false,
+  recordingConsentText = null,
+  privacy,
   chatToken = '',
   eventType = 'SCHEDULED',
 }: WaitingRoomProps) {
@@ -257,6 +277,7 @@ export default function WaitingRoom({
   const te = useTranslations('events');
   const tc = useTranslations('common');
   const tGdpr = useTranslations('gdpr.consent');
+  const tReg = useTranslations('registration');
   const format = useFormatter();
 
   const [countdown, setCountdown] = useState('');
@@ -312,6 +333,10 @@ export default function WaitingRoom({
     return () => ro?.disconnect();
   }, [descrizioneAperta, event.riepilogo?.descrizione]);
   const [startError, setStartError] = useState('');
+  // Consenso alla registrazione dell'evento, per chi non l'ha dato
+  // all'iscrizione.
+  const [recordingConsent, setRecordingConsent] = useState(false);
+  const [informativaAperta, setInformativaAperta] = useState(false);
   // Consenso esplicito alla registrazione per-partecipante (multitrack).
   const [multitrackConsent, setMultitrackConsent] = useState(false);
   // "La sala è aperta" cue: a short 3→2→1 countdown shown to a waiting
@@ -425,6 +450,10 @@ export default function WaitingRoom({
   // gated da un consenso esplicito. Niente consenso → niente ingresso.
   const multitrackRequired =
     !!event.multitrackRecordingEnabled && !isEnded && !multitrackConsentExempt;
+  // Il consenso alla registrazione dell'evento, se va chiesto qui. Non ferma
+  // la piazza: il cancello passa dallo stesso controllo del pulsante, che
+  // porta alla casella.
+  const recordingRequired = recordingConsentRequired && !isEnded;
   // La piazza e' disponibile quando c'e' qualcosa da fare e nessun cancello
   // davanti: a evento finito non serve, in vista classica e' stata rifiutata,
   // e senza consenso multitraccia non si va da nessuna parte.
@@ -495,6 +524,8 @@ export default function WaitingRoom({
       ingressoConsentito,
       nameValid,
       emailValid,
+      recordingRequired,
+      recordingConsent,
       multitrackRequired,
       multitrackConsent,
       ingressoTentato,
@@ -687,6 +718,7 @@ export default function WaitingRoom({
     }
     onEnterLive(trimmedName, {
       ...devicePrefs,
+      ...(recordingRequired && recordingConsent ? { recordingConsent: true } : {}),
       ...(multitrackRequired && multitrackConsent ? { multitrackConsent: true } : {}),
     });
   }, [
@@ -696,6 +728,8 @@ export default function WaitingRoom({
     trimmedName,
     trimmedEmail,
     devicePrefs,
+    recordingRequired,
+    recordingConsent,
     multitrackRequired,
     multitrackConsent,
   ]);
@@ -994,48 +1028,97 @@ export default function WaitingRoom({
     </div>
   ) : null;
 
-  // Consenso esplicito alla registrazione per-partecipante (multitrack):
-  // hard-gate. Senza la spunta, `canEnter` è false e il CTA non fa entrare —
-  // premerlo porta il fuoco sulla casella. Non è un <Alert> (serve un input +
-  // evita l'icona ::before).
-  const multitrackConsentBlock = multitrackRequired ? (
-    <div
-      className="rounded-3 p-3 text-start"
-      style={{ background: '#FFF8E6', border: '1px solid #E0C97A' }}
-    >
-      <div
-        className="fw-semibold mb-2"
-        style={{ color: 'var(--app-text)', fontSize: '0.9rem' }}
-      >
-        {t('multitrackConsentTitle')}
-      </div>
-      <div className="form-check mb-0">
-        <input
-          className="form-check-input"
-          type="checkbox"
-          id="waiting-multitrack-consent"
-          checked={multitrackConsent}
-          onChange={(e) => setMultitrackConsent(e.target.checked)}
-          aria-describedby={!multitrackConsent ? MESSAGGIO_DEL_BLOCCO.consent : undefined}
-        />
-        <label
-          className="form-check-label"
-          htmlFor="waiting-multitrack-consent"
-          style={{ fontSize: '0.84rem', color: '#455B71' }}
-        >
-          {tGdpr('multitrack')}
-        </label>
-      </div>
-      {!multitrackConsent && (
-        <div
-          id={MESSAGGIO_DEL_BLOCCO.consent}
-          className="small text-muted mt-2"
-          style={{ fontSize: '0.78rem' }}
-        >
-          {t('multitrackConsentRequired')}
-        </div>
+  // I consensi da dare prima di entrare: alla registrazione dell'evento, per
+  // chi non l'ha dato all'iscrizione, e alla traccia audio per partecipante.
+  // Senza la spunta `canEnter` è false e il pulsante «Entra» porta il fuoco
+  // sulla casella. Non è un <Alert>: serve un input, e l'icona ::before
+  // finirebbe sopra il testo.
+  const informativa = privacy ? (
+    <div className="wr-consensi__privacy">
+      {privacy.testo ? (
+        <>
+          <button
+            type="button"
+            className="btn btn-link p-0 wr-consensi__link"
+            aria-expanded={informativaAperta}
+            aria-controls="wr-consensi-informativa"
+            onClick={() => setInformativaAperta((v) => !v)}
+          >
+            {tReg('gdprLink')}
+          </button>
+          {informativaAperta && (
+            <div className="wr-consensi__informativa" id="wr-consensi-informativa">
+              {privacy.testo}
+            </div>
+          )}
+        </>
+      ) : (
+        <a className="wr-consensi__link" href={privacy.url} target="_blank" rel="noopener noreferrer">
+          {tReg('gdprLink')}
+        </a>
       )}
     </div>
+  ) : null;
+
+  const consensiBlock = recordingRequired || multitrackRequired ? (
+    <section className="wr-consensi" aria-labelledby="wr-consensi-title">
+      <h2 className="wr-consensi__title" id="wr-consensi-title">
+        {recordingRequired ? t('recordingConsentTitle') : t('multitrackConsentTitle')}
+      </h2>
+      {recordingRequired && (
+        <>
+          <p className="wr-consensi__intro">
+            {recordingConsentText?.trim() || t('recordingConsentIntro')}
+          </p>
+          <div className="form-check mb-0">
+            <input
+              className="form-check-input"
+              type="checkbox"
+              id={CAMPO_DEL_BLOCCO.recording}
+              checked={recordingConsent}
+              onChange={(e) => setRecordingConsent(e.target.checked)}
+              aria-describedby={!recordingConsent ? MESSAGGIO_DEL_BLOCCO.recording : undefined}
+            />
+            <label className="form-check-label" htmlFor={CAMPO_DEL_BLOCCO.recording}>
+              {tGdpr('recording')}
+            </label>
+          </div>
+          {!recordingConsent && (
+            <div id={MESSAGGIO_DEL_BLOCCO.recording} className="wr-consensi__nota">
+              {t('recordingConsentRequired')}
+            </div>
+          )}
+        </>
+      )}
+      {multitrackRequired && (
+        <div className={recordingRequired ? 'mt-3' : undefined}>
+          {/* Con entrambi i consensi, quello alla traccia audio ha il suo
+              titolo: e' un consenso a parte, non un dettaglio dell'altro. */}
+          {recordingRequired && (
+            <h3 className="wr-consensi__title">{t('multitrackConsentTitle')}</h3>
+          )}
+          <div className="form-check mb-0">
+            <input
+              className="form-check-input"
+              type="checkbox"
+              id={CAMPO_DEL_BLOCCO.consent}
+              checked={multitrackConsent}
+              onChange={(e) => setMultitrackConsent(e.target.checked)}
+              aria-describedby={!multitrackConsent ? MESSAGGIO_DEL_BLOCCO.consent : undefined}
+            />
+            <label className="form-check-label" htmlFor={CAMPO_DEL_BLOCCO.consent}>
+              {tGdpr('multitrack')}
+            </label>
+          </div>
+          {!multitrackConsent && (
+            <div id={MESSAGGIO_DEL_BLOCCO.consent} className="wr-consensi__nota">
+              {t('multitrackConsentRequired')}
+            </div>
+          )}
+        </div>
+      )}
+      {informativa}
+    </section>
   ) : null;
 
   const chatPreviewBlock = showChatPreview ? (
@@ -1086,7 +1169,7 @@ export default function WaitingRoom({
   // styled divs — NOT <Alert> — because Bootstrap Italia's .alert draws an
   // icon via ::before (reserved padding-left:4em) and the leading <Spinner>
   // would collide with it. The div
-  // owns its own spinner+border layout, like multitrackConsentBlock.
+  // owns its own spinner+border layout, like consensiBlock.
   const statusBanners = (
     <>
       {isLive && jvbReady === false && (
@@ -1594,7 +1677,7 @@ export default function WaitingRoom({
         'registrazione',
         <span className="wr-fact__rec" />,
         t('summaryRecording'),
-        t('recordingNotice'),
+        recordingListenOnly ? tGdpr('recordingNotice') : t('recordingNotice'),
       ),
     );
   }
@@ -1794,9 +1877,7 @@ export default function WaitingRoom({
                   </div>
                 ) : (
                   <>
-                    {multitrackConsentBlock && (
-                      <div className="mb-3">{multitrackConsentBlock}</div>
-                    )}
+                    {consensiBlock && <div className="mb-3">{consensiBlock}</div>}
                     <div className="mb-3">{primaryCta}</div>
                   </>
                 )}

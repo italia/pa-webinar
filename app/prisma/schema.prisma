@@ -194,7 +194,9 @@ model Event {
   postEventEmailEnabled Boolean   @default(false) @map("post_event_email_enabled")
   postEventEmailSentAt  DateTime? @map("post_event_email_sent_at")
 
-  // GDPR recording consent
+  // La spiegazione sopra la casella del consenso alla registrazione, in sala
+  // d'attesa, al posto di quella predefinita: dice cosa si registra e perche'.
+  // Il consenso lo da' la casella, non l'ingresso.
   recordingConsentText String? @map("recording_consent_text") @db.Text
 
   // Analytics
@@ -314,6 +316,7 @@ model Event {
   // SetNull on template delete.
 
   multitrackConsents MultitrackConsent[]
+  recordingConsents  RecordingConsent[]
   @@index([gdprTemplateId], map: "events_gdpr_template_id_idx")
   // FK lookup index: "find all events in this recurring series".
   @@index([recurrenceSeriesId], map: "events_recurrence_series_id_idx")
@@ -796,6 +799,7 @@ model Registration {
   feedback               EventFeedback[]
   questionnaireResponses QuestionnaireResponse[]
   multitrackConsents     MultitrackConsent[]
+  recordingConsents      RecordingConsent[]
 
   @@unique([eventId, emailHash])
   @@index([personId])
@@ -2456,6 +2460,34 @@ model MultitrackConsent {
   @@index([eventId])
   @@index([registrationId])
   @@map("multitrack_consents")
+}
+
+// Il consenso alla registrazione dell'evento dato in sala d'attesa da chi non
+// lo ha dato all'iscrizione: chi entra dal link della sala senza iscriversi,
+// chi apre il proprio link da un altro browser, chi si e' iscritto prima che
+// la registrazione fosse attivata. E' la prova del consenso (art. 7.1 GDPR);
+// quello dato all'iscrizione sta in `Registration.consentRecording`.
+model RecordingConsent {
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  eventId        String   @map("event_id") @db.Uuid
+  // Il `context.user.id` del JWT della conferenza: il posto a cui il
+  // consenso si riferisce.
+  jitsiUserId    String   @map("jitsi_user_id") @db.VarChar(80)
+  // Nome mostrato in sala, cifrato (encryptPII).
+  displayName    String   @map("display_name")
+  registrationId String?  @map("registration_id") @db.Uuid
+  locale         String?  @db.VarChar(8)
+  consentedAt    DateTime @default(now()) @map("consented_at")
+
+  event        Event         @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  registration Registration? @relation(fields: [registrationId], references: [id], onDelete: Cascade)
+
+  // Una prova per iscrizione: due richieste insieme (due schede, un
+  // rientro mentre la prima e' in volo) non la raddoppiano. Gli ospiti non
+  // hanno iscrizione (NULL), e il vincolo non li tocca.
+  @@unique([eventId, registrationId])
+  @@index([registrationId])
+  @@map("recording_consents")
 }
 
 // La cronologia della sala: un'azione dal vivo per riga (un argomento della

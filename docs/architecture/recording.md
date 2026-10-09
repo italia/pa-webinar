@@ -87,9 +87,10 @@ Both capture paths rely on consent that the portal collects before a person
 reaches the conference; neither filters what it records. `Event.recordingEnabled`
 adds a recording consent to registration and, when the installation can record
 (Jibri is expected, or `RECORDER_CONTROLLER_URL` is set:
-`app/src/lib/recording/availability.ts`), a consent dialog before the room loads
-and a notice in the waiting room; `Event.multitrackRecordingEnabled` adds
-`consentMultitrack` and a waiting-room gate. Holders of moderator and speaker links skip the dialog, yet
+`app/src/lib/recording/availability.ts`), a notice in the waiting room and,
+for whoever has not consented at registration, a waiting-room gate;
+`Event.multitrackRecordingEnabled` adds `consentMultitrack` and a waiting-room
+gate of its own. Holders of moderator and speaker links skip the recording gate, yet
 the recorder captures every remote audio track, theirs included. The consent
 model and exact texts are in [GDPR](../GDPR.md#consent-model), the gate in
 [The waiting room](waiting-room.md#consent-and-transparency-notices), and the
@@ -769,12 +770,11 @@ link or publicly. From here on, the pipeline is described in
 
 ## Known limitations
 
-- **Consent text.** The in-room consent dialog ignores
-  `Event.recordingConsentText`. The per-participant consent text states that
-  the track is deleted after transcription, and does not change when
-  **Keep per-participant tracks** is on.
-- **Instant calls.** Guests joining an instant call are not shown the recording
-  consent dialog, although the moderator can record.
+- **Consent text.** The per-participant consent text states that the track is
+  deleted after transcription, and does not change when **Keep
+  per-participant tracks** is on.
+- **Instant calls.** Guests joining an instant call are not asked for the
+  recording consent, although the moderator can record.
 - **Recording indicator.** Only Jibri raises the in-room **Recording in
   progress** banner.
 - **One composite recording at a time.** The JVB scaler asks for at most one

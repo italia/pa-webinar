@@ -314,6 +314,12 @@ export const GET = withErrorHandling(async (request) => {
           where: { eventId: evt.id },
         });
 
+        // Lo stesso per le prove del consenso alla registrazione dell'evento
+        // date in sala d'attesa da chi non l'aveva dato all'iscrizione.
+        const recordingConsentsDeleted = await tx.recordingConsent.deleteMany({
+          where: { eventId: evt.id },
+        });
+
         const registrationsDeleted = await tx.registration.deleteMany({
           where: { eventId: evt.id },
         });
@@ -412,6 +418,7 @@ export const GET = withErrorHandling(async (request) => {
           reminders: remindersDeleted.count,
           registrations: registrationsDeleted.count,
           multitrackConsents: multitrackConsentsDeleted.count,
+          recordingConsents: recordingConsentsDeleted.count,
           chatMessages: chatMessagesDeleted.count,
           reactions: reactionsDeleted.count,
           agendaReactions: agendaReactionsDeleted.count,

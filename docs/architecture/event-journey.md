@@ -515,7 +515,7 @@ Both call `POST /api/events/instant`, which requires a staff session and allows 
 - start time now and a nominal end four hours later. The end is cosmetic: it does not close the room;
 - `gracePeriodMinutes` set to `-1`, so the room closes on inactivity instead of at its nominal end ([event-lifecycle.md](event-lifecycle.md#instant-calls));
 - chat and whiteboard on, Q&A off, and microphone, camera and screen sharing open to everyone;
-- recording on (`recordingEnabled: true`), so the creator and the other moderators can record. The guest view of an instant call forces the recording flags off, so guests are not shown the recording-consent step before joining ([known limitations](#known-limitations));
+- recording on (`recordingEnabled: true`), so the creator and the other moderators can record. The guest view of an instant call forces the recording flags off, so guests are not asked for the recording consent before joining ([known limitations](#known-limitations));
 - a retention of 7 days and the post-event page off;
 - the platform's generic post-event feedback questionnaire, so the end of the call asks for a rating. If it cannot be attached, the call is created without it;
 - the name as the title, and the fixed Italian description `Videocall istantanea`. The API requires the `it` key, so the card stores the name there whatever language it was typed in; the list's quick form stores it under both `it` and `en`.
@@ -537,7 +537,7 @@ These describe the current code. Planned work is tracked in [ROADMAP.md](../ROAD
 - **Unchecked publication.** On **Publish event**, the wizard does not check the result of the publishing request: if it fails, the event stays a `DRAFT` without any message.
 - **Organization names.** Step 3 asks for a contact name and an organization for each co-organizing organization, but only the contact name, the logo and the website are stored.
 - **Calendar file of hidden events.** `GET /api/events/{slug}/calendar.ics` answers for every event that is not a `DRAFT`, with no visibility check. Anyone who knows the slug of an `ARCHIVED` event, of a concluded event whose post-event page is off or expired, or of an instant call can still download its title, description, dates and moderator name.
-- **Recording consent in instant calls.** Instant calls have recording on, but their guest view skips the recording-consent step that participants of a recorded scheduled event see, so people who join through the share link are not asked before a moderator records.
+- **Recording consent in instant calls.** Instant calls have recording on, but their guest view skips the recording consent that the waiting room asks of participants of a recorded scheduled event, so people who join through the share link are not asked before a moderator records.
 - **Feedback can be counted twice.** A registrant or a speaker who answered the post-event questionnaire in the room can answer again on the public post-event page, which submits with the browser's guest id.
 - **No series.** A recurrence rule only proposes the next date on duplication; occurrences are not created automatically and have no shared configuration ([ROADMAP.md](../ROADMAP.md#recurring-events-and-series)).
 

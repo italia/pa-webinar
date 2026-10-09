@@ -6213,6 +6213,64 @@ button.live-time-strip__rec {
   color: var(--app-text);
 }
 
+/* I consensi prima di entrare: un'informazione con una casella, non un
+   allarme. Niente .alert: l'icona ::before finirebbe sopra la casella. */
+.wr-consensi {
+  background: #f2f7fc;
+  border: 1px solid #cfe0f2;
+  border-radius: 12px;
+  padding: 1rem 1.1rem;
+  text-align: left;
+}
+/* Bootstrap Italia da' ai titoli e ai paragrafi un'interlinea in pixel,
+   pensata per il corpo del testo: qui va riportata alla misura del riquadro. */
+.wr-consensi__title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--app-text);
+  margin: 0 0 0.4rem;
+}
+.wr-consensi__intro {
+  font-size: 0.84rem;
+  line-height: 1.5;
+  color: #455b71;
+  margin: 0 0 0.6rem;
+  white-space: pre-wrap;
+}
+.wr-consensi .form-check [type='checkbox'] + label {
+  font-size: 0.84rem;
+  line-height: 1.45;
+  font-weight: 400;
+  color: #455b71;
+}
+.wr-consensi__nota {
+  font-size: 0.78rem;
+  color: #5a768a;
+  margin-top: 0.4rem;
+}
+.wr-consensi__privacy {
+  margin-top: 0.7rem;
+  font-size: 0.84rem;
+}
+.wr-consensi__link {
+  font-size: 0.84rem;
+  font-weight: 600;
+  vertical-align: baseline;
+}
+.wr-consensi__informativa {
+  margin-top: 0.5rem;
+  max-height: 220px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  background: #fff;
+  border: 1px solid #dfe8f1;
+  border-radius: 8px;
+  padding: 0.75rem;
+  font-size: 0.8rem;
+  color: #455b71;
+}
+
 // Il riepilogo: fatti con un'icona ciascuno, in griglia.
 .wr-summary {
   padding: 1.1rem 1.2rem;

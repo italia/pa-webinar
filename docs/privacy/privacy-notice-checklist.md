@@ -41,21 +41,22 @@ owner:
 |---|---|---|
 | Registration form of an event | The event's notice, inline or as a link, above the consent boxes | Event wizard, step **Review**, section **Privacy and data retention**; see [Which notice the registration form shows](#which-notice-the-registration-form-shows) |
 | Site privacy page, `/<locale>/privacy`, linked from the footer as **Privacy policy** | Your site-wide text, or the built-in generic text | **Settings** > **General** > **Pages** > **Privacy policy** |
-| Waiting room | **This event is being recorded.** when recording is enabled and the installation can record (Jibri, or the per-participant recorder); an **AI processing after the event** notice when AI post-production applies | Event flags; **Settings** > **General** > **Post-event AI pipeline** > **AI notice in the waiting room** |
-| Before entering the live room | A full-screen **Recording consent** screen with **Enter room** and **Do not participate**, for registrants and guests of events with recording enabled, when the installation can record | Built-in text (`live.recordingConsent`) |
+| Waiting room | **This event is being recorded.** when recording is enabled and the installation can record (Jibri, or the per-participant recorder), or the registration form's information notice for a listen-only event; an **AI processing after the event** notice when AI post-production applies | Event flags; **Settings** > **General** > **Post-event AI pipeline** > **AI notice in the waiting room** |
+| Waiting room, before entering | For whoever has not given it at registration (guests, registrants on another browser), the recording consent box under **Event recording**, with the event's notice next to it: the same text or link as the registration form | Built-in text (`waiting.recordingConsentIntro`), or the event's `recordingConsentText` |
 | During the call | A **Recording in progress** banner for everyone while a recording runs | Automatic |
 
-The event page and the waiting room do not link the event's notice. Guests,
-where they are admitted (see item 8 of
+The event page does not link the event's notice. Guests, where they are
+admitted (see item 8 of
 [Settings to review](#settings-to-review-before-the-first-public-event)),
-never see the registration form, so the only notice link they meet is the
-footer's **Privacy policy**, which leads to the site page, not to the event's
-notice.
+never see the registration form: they meet the event's notice in the waiting
+room, next to the consents it asks for. On an event that asks for no consent
+(no recording, or listen-only), the only notice link they meet is the footer's
+**Privacy policy**, which leads to the site page, not to the event's notice.
 
 ### Which notice the registration form shows
 
 The registration form shows one notice, chosen in this order
-(`app/src/app/[locale]/events/[slug]/registration/page.tsx`). An event's text
+(`app/src/lib/events/privacy-notice.ts`, shared with the waiting room). An event's text
 field saved empty counts as no text (the server stores it as `NULL`), and
 choosing a privacy notice template in the wizard empties it, so the template is
 what the form shows.
@@ -123,11 +124,20 @@ What follows from that order:
 
 Events have a `recordingConsentText` field. It can be set only through the
 events API (`POST /api/events`, `PUT /api/events/<slug>`) and appears on the
-event page of the administration area. When it is set, the **Recording consent**
-screen in the live room shows it in place of the built-in text
-(`live.recordingConsent`), as written and in every language, because the field
-is not translated. When it is empty, the built-in text is shown; change it for
-the whole installation with that custom translation key.
+event page of the administration area. When it is set, the waiting room shows
+it above the recording consent box in place of the built-in explanation
+(`waiting.recordingConsentIntro`), as written and in every language, because
+the field is not translated. When it is empty, the built-in text is shown;
+change it for the whole installation with that custom translation key. A
+custom translation saved under `live.recordingConsent` or
+`live.recordingConsentTitle`, the keys of the full-screen dialog this box
+replaced, still applies to `waiting.recordingConsentIntro` and
+`waiting.recordingConsentTitle` until those keys get their own
+(`app/src/i18n/renamed-keys.ts`). The box itself carries the registration
+form's label (`gdpr.consent.recording`). Consent is given by ticking the box,
+not by entering: review an event text or a custom translation written for the
+dialog, and rewrite a sentence such as "by entering, you consent" as an
+explanation of what is recorded and why.
 
 ### The consent boxes on the registration form
 
@@ -473,7 +483,7 @@ The same differences are tracked in [Known gaps](../GDPR.md#known-gaps).
    Leave `DEFAULT_PRIVACY_POLICY_URL` unset unless your notice lives elsewhere.
 4. **Consent wording.** Align the labels in
    [The consent boxes on the registration form](#the-consent-boxes-on-the-registration-form)
-   and `live.recordingConsent` with your legal bases.
+   and `waiting.recordingConsentIntro` with your legal bases.
 5. **Retention defaults.** Set **Default data retention (days)** on the event
    templates staff use, and agree on the **Retention** of published recordings
    and publications.

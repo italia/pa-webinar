@@ -11,6 +11,8 @@ const base: StatoIngressoInput = {
   ingressoConsentito: true,
   nameValid: true,
   emailValid: true,
+  recordingRequired: false,
+  recordingConsent: false,
   multitrackRequired: false,
   multitrackConsent: false,
   ingressoTentato: false,
@@ -112,6 +114,24 @@ describe('statoIngresso — email e consenso', () => {
 
   it('consenso dato: si entra', () => {
     expect(stato({ multitrackRequired: true, multitrackConsent: true }).canEnter).toBe(true);
+  });
+
+  it('consenso alla registrazione dell\'evento mancante: blocca, e il pulsante lo spiega', () => {
+    const s = stato({ recordingRequired: true, recordingConsent: false });
+    expect(s.canEnter).toBe(false);
+    expect(s.bloccoModulo).toBe('recording');
+    expect(s.bloccoSpiegato).toBe('recording');
+  });
+
+  it('i due consensi nell\'ordine della pagina: prima la registrazione, poi la traccia', () => {
+    const entrambi = { recordingRequired: true, multitrackRequired: true, multitrackConsent: false };
+    expect(stato({ ...entrambi, recordingConsent: false }).bloccoModulo).toBe('recording');
+    expect(stato({ ...entrambi, recordingConsent: true }).bloccoModulo).toBe('consent');
+    expect(stato({ ...entrambi, recordingConsent: true, multitrackConsent: true }).canEnter).toBe(true);
+  });
+
+  it('consenso alla registrazione non richiesto (gia\' dato all\'iscrizione): si entra senza spunta', () => {
+    expect(stato({ recordingRequired: false, recordingConsent: false }).canEnter).toBe(true);
   });
 });
 

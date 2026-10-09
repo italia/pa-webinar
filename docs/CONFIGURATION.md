@@ -93,7 +93,7 @@ When two layers set the same thing, a per-event value wins over the site setting
 |---|---|
 | Email sender display name | `SiteSetting.emailFromName`, then `SMTP_FROM_NAME`, then `SiteSetting.siteName`, then `PA Webinar` (`app/src/lib/email/send.ts`) |
 | Email sender address | `SMTP_FROM` only. The administration area cannot change it, because the relay authorizes a specific sender |
-| Privacy link on the registration form | `Event.privacyPolicyUrl`, then `DEFAULT_PRIVACY_POLICY_URL`, then `/privacy` |
+| Privacy link on the registration form and next to the waiting-room consents | `Event.privacyPolicyUrl`, then `DEFAULT_PRIVACY_POLICY_URL`, then the site privacy page in the page language (`/it/privacy`). The event's own notice text, when there is one, opens in place instead (`app/src/lib/events/privacy-notice.ts`) |
 | Video quality | `Event.videoQuality`, then `SiteSetting.videoQuality` |
 | Grace period after the scheduled end | `Event.gracePeriodMinutes`, then `SiteSetting.eventGracePeriodMinutes` |
 | Expected share of video senders, for sizing | `Event.expectedSenderRatioPct`, then `SiteSetting.defaultSenderRatioPct` |
@@ -135,7 +135,7 @@ Defaults: `app/src/lib/env.ts`. At startup, `app/src/instrumentation.ts` logs an
 |---|---|---|---|---|---|
 | `NEXT_PUBLIC_APP_URL` | Yes | `http://localhost:3000` | No | Chart: `https://` and `site.portalHost`; or `app.env`, which must then agree | Public base URL of the portal, with the scheme: `https://webinar.example.com`. Used for links in emails and calendar files, moderator links, avatars, preview images, the sitemap and SEO metadata. A value without `http://` or `https://` counts as missing (`appBaseUrl()`). The conference's `DYNAMIC_BRANDING_URL` (`jitsi-meet.web.extraEnvs`) is not derived from it: set it to this URL followed by `/api/jitsi-branding.json` ([Where each hostname goes](DEPLOYMENT.md#where-each-hostname-goes)) |
 | `NEXT_PUBLIC_JITSI_DOMAIN` | Yes | `localhost:8443` | No | Chart: `site.conferenceHost`; or `app.env`, which must then agree | Host of the conference front end, without the scheme: `meet.webinar.example.com`. Used by the IFrame API, the Content Security Policy, the `Permissions-Policy` header, the administration's **Infrastructure** page, and the status probes when the in-cluster addresses of the conference are not set ([Conference status probes](#conference-status-probes)) |
-| `DEFAULT_PRIVACY_POLICY_URL` | No | `/privacy` (`app/src/app/[locale]/events/[slug]/registration/page.tsx`) | No | `app.env` | Privacy link on the registration form when the event has none. Set it only to point at a privacy notice published elsewhere. `values.yaml` leaves it unset |
+| `DEFAULT_PRIVACY_POLICY_URL` | No | The site privacy page in the page language, `/<locale>/privacy` (`app/src/lib/events/privacy-notice.ts`) | No | `app.env` | Privacy link on the registration form and next to the waiting-room consents when the event has none. Set it only to point at a privacy notice published elsewhere. `values.yaml` leaves it unset |
 
 ### Authentication and tokens
 

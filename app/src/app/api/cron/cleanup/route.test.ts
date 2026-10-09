@@ -41,6 +41,7 @@ vi.mock('@/lib/db', () => ({
     reminderSent: { deleteMany: vi.fn() },
     eventReminder: { deleteMany: vi.fn() },
     multitrackConsent: { deleteMany: vi.fn() },
+    recordingConsent: { deleteMany: vi.fn() },
     reaction: { deleteMany: vi.fn() },
     agendaItemReaction: { deleteMany: vi.fn() },
     eventAgendaItem: { deleteMany: vi.fn() },
@@ -111,6 +112,7 @@ const db = prisma as unknown as {
   registration: { deleteMany: Mock; findMany: Mock };
   $executeRaw: Mock;
   multitrackConsent: { deleteMany: Mock };
+  recordingConsent: { deleteMany: Mock };
   reaction: { deleteMany: Mock };
   agendaItemReaction: { deleteMany: Mock };
   eventAgendaItem: { deleteMany: Mock };
@@ -515,6 +517,7 @@ describe('GET /api/cron/cleanup', () => {
     });
     expect(db.eventReminder.deleteMany).toHaveBeenCalledWith(byEvent);
     expect(db.multitrackConsent.deleteMany).toHaveBeenCalledWith(byEvent);
+    expect(db.recordingConsent.deleteMany).toHaveBeenCalledWith(byEvent);
     // Le reazioni live e quelle agli argomenti dell'agenda sono di una
     // persona, e la loro cascade non scatta (vedi il test sulla chat).
     expect(db.reaction.deleteMany).toHaveBeenCalledWith(byEvent);

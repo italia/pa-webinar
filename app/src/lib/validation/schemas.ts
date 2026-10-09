@@ -98,6 +98,8 @@ export const eventBaseSchema = z.object({
   // Avviso agli iscritti quando la registrazione diventa visibile.
   recordingNotifyEnabled: z.boolean().default(true),
   feedbackEnabled: z.boolean().default(true),
+  /** La spiegazione sopra la casella del consenso alla registrazione in sala
+   *  d'attesa, al posto di quella predefinita. */
   recordingConsentText: z.string().max(5000).optional(),
 
   // Recurrence (RFC 5545 RRULE). Null = one-off.
@@ -349,6 +351,9 @@ export const jitsiTokenRequestSchema = z.object({
   moderatorToken: z.string().uuid().optional(),
   guestName: z.string().min(2).max(100).optional(),
   displayNameOverride: z.string().min(2).max(100).optional(),
+  /** Consenso alla registrazione dell'evento dato in sala d'attesa, da chi
+   *  non l'aveva dato all'iscrizione. */
+  recordingConsent: z.boolean().optional(),
   /** Consenso alla registrazione per partecipante dato in sala d'attesa. */
   multitrackConsent: z.boolean().optional(),
   /** Lingua della pagina in cui il consenso e' stato dato. */

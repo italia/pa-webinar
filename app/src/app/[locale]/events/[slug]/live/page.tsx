@@ -8,6 +8,7 @@ import { titoloEventoPubblico } from '@/lib/events/meta-title';
 import { getPublicEnv } from '@/lib/env';
 import { getSettings } from '@/lib/settings';
 import { recordingAvailable } from '@/lib/recording/availability';
+import { informativaEvento } from '@/lib/events/privacy-notice';
 import LiveEventClient from '@/components/live/live-event-client';
 import { getLocalized, type LocalizedField } from '@/lib/utils/locale';
 import { resolveKickerEnabled } from '@/lib/utils/title-kicker';
@@ -47,6 +48,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
     where: { slug },
     include: {
       _count: { select: { registrations: true } },
+      gdprTemplate: { select: { body: true } },
       // Per il riepilogo della sala d'attesa: gli stessi enti e le stesse
       // persone che mostra la pagina pubblica (lib/events/public-people).
       ...PERSONE_PUBBLICHE_INCLUDE,
@@ -56,6 +58,10 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
   if (!event) {
     notFound();
   }
+
+  // L'informativa privacy accanto al consenso chiesto in sala d'attesa: la
+  // stessa del modulo di iscrizione.
+  const privacy = informativaEvento(event, locale);
 
   // Il riepilogo della sala d'attesa: descrizione, enti e persone.
   const riepilogo = {
@@ -197,6 +203,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
             tempRecordingUrl: event.tempRecordingUrl,
             feedbackEnabled: event.feedbackEnabled,
             recordingConsentText: isInstant ? null : event.recordingConsentText,
+            privacy,
             timezone: event.timezone,
             registrationCount: event._count.registrations,
             effectiveGraceMinutes:
@@ -246,10 +253,12 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
   // Consenso multitrack già prestato alla registrazione → non lo si richiede di
   // nuovo in sala d'attesa (evita il doppio consenso). Vedi WaitingRoom.
   let hasMultitrackConsent = false;
+  // Lo stesso per il consenso alla registrazione dell'evento.
+  let hasRecordingConsent = false;
   if (!isModerator && !isSpeaker) {
     const registration = await prisma.registration.findUnique({
       where: { accessToken: token },
-      select: { displayName: true, eventId: true, consentMultitrack: true },
+      select: { id: true, displayName: true, eventId: true, consentRecording: true, consentMultitrack: true },
     });
 
     if (!registration || registration.eventId !== event.id) {
@@ -280,7 +289,24 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
         ? (tryDecryptPII(registration.displayName) ?? registration.displayName)
         : '',
     };
-    hasMultitrackConsent = ownsToken ? (registration.consentMultitrack ?? false) : false;
+    // Dati all'iscrizione, o in sala d'attesa a un ingresso precedente (chi si
+    // e' iscritto prima che l'evento registrasse): la prova sta legata
+    // all'iscrizione solo nel browser che si e' iscritto.
+    const prove = { eventId: event.id, registrationId: registration.id };
+    const [proveTracce, proveRegistrazione] = ownsToken
+      ? await Promise.all([
+          registration.consentMultitrack !== true && event.multitrackRecordingEnabled
+            ? prisma.multitrackConsent.count({ where: prove })
+            : 0,
+          registration.consentRecording !== true && event.recordingEnabled
+            ? prisma.recordingConsent.count({ where: prove })
+            : 0,
+        ])
+      : [0, 0];
+    hasMultitrackConsent =
+      ownsToken && (registration.consentMultitrack === true || proveTracce > 0);
+    hasRecordingConsent =
+      ownsToken && (registration.consentRecording === true || proveRegistrazione > 0);
   }
 
   const title = getLocalized(event.title as LocalizedField, locale);
@@ -320,6 +346,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
         tempRecordingUrl: event.tempRecordingUrl,
         feedbackEnabled: event.feedbackEnabled,
         recordingConsentText: event.recordingConsentText,
+        privacy,
         timezone: event.timezone,
         registrationCount: event._count.registrations,
         effectiveGraceMinutes:
@@ -334,6 +361,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
       isSpeaker={isSpeaker}
       isGuest={false}
       hasMultitrackConsent={hasMultitrackConsent}
+      hasRecordingConsent={hasRecordingConsent}
       displayName={
         grant && !grant.isPrimaryShared
           ? // Named co-moderator or speaker via EventModerator row —
