@@ -244,9 +244,12 @@ Moderators get a larger set of buttons than other participants.
 | Toolbar | Buttons | Used for |
 |---|---|---|
 | `baseToolbarButtons` | `microphone`, `camera`, `select-background`, `desktop`, `filmstrip`, `tileview`, `settings`, `raisehand` | Participants, guests and speakers on desktop |
-| `moderatorToolbarButtons` | the base set plus `mute-everyone`, `security`, `participants-pane` | Moderators on desktop |
+| `moderatorToolbarButtons` | the base set plus `security` | Moderators on desktop |
 | `mobileBaseToolbarButtons` | `microphone`, `camera`, `raisehand`, `settings` | Participants below 768 px |
-| `mobileModeratorToolbarButtons` | the mobile set plus `participants-pane` | Moderators below 768 px |
+| `mobileModeratorToolbarButtons` | the mobile set | Moderators below 768 px |
+
+Jitsi's own participants pane and mute-everyone are left out on purpose: the roster, muting, the
+audio and video locks and the raised hands live in one place, the drawer's **Participants** panel.
 
 On top of these, `JitsiRoom` adds `reactions` when the reactions mode is native, and `whiteboard` for
 moderators on desktop when the event has opted in and the installation declares the whiteboard
@@ -406,17 +409,16 @@ Blur is not available from outside the iframe (see [Limits of the boundary](#lim
 The portal draws its own controls around the iframe (`app/src/components/live/live-event-client.tsx`
 and `app/src/components/jitsi/`):
 
-- **Top bar.** Event title, participant count, the current agenda topic, recording indicator,
-  sharing links, **Fullscreen** (desktop) and **Leave room**. The app's
+- **Top bar.** Event title, participant count, the current agenda topic, the recording indicator
+  (a red **REC** icon while Jibri records, announced to screen readers when it appears), the event
+  timer, sharing links, **Fullscreen** (desktop) and **Leave room**. The timer turns amber past the
+  scheduled end and red in the last ten minutes before the overtime limit, also while it is switched
+  off and only its icon shows; its tooltip says when the room closes
+  ([the overtime countdown](event-lifecycle.md#the-overtime-countdown)). No banner sits above the video
+  for either. The app's
   fullscreen covers the whole live area, so the drawer stays visible. Dialogs render inside the
   fullscreen element, so they do not disappear behind it.
 - **Moderator control bar** (`ModeratorControls`, `app/src/components/jitsi/moderator-controls.tsx`):
-  - **Participant mic** and **Participant video**, the audio and video moderation toggles. Turning on
-    audio moderation also mutes everyone. While moderation is on, the labels read **Mic disabled** and
-    **Video disabled**. Each toggle appears only when the event lets participants unmute
-    (`participantsCanUnmute`) or start video (`participantsCanStartVideo`).
-  - **Raised hands**, with a counter badge, which opens the raised-hand queue. Each entry offers
-    **Give the floor** (audio and video), **Audio only** and **Lower hand**.
   - **Start recording** and **Stop recording**, when the event has composite recording
     (`recordingEnabled`). The control follows the recorder state that `/api/status` reports in
     `metrics.jibriStatus`, which the room polls every 3 seconds while the event is `LIVE`
@@ -441,6 +443,10 @@ and `app/src/components/jitsi/`):
   - **Whiteboard**, under the conditions in [Reactions, whiteboard and instant calls](#reactions-whiteboard-and-instant-calls).
   - The presentation timer's control, and **End event** (see
     [Leaving the room](#leaving-the-room-and-readytoclose)).
+
+  When the recorder becomes ready and the event does not start recording on its own, a notice below
+  the bar offers **Start now** and **Later**. It is not a dialog and takes no focus, so a moderator who
+  is speaking or typing is not interrupted.
 - **Drawer** (`LiveSidebar`). The live panels: Q&A, chat, polls, word cloud, agenda, materials and
   participants. It is a side drawer from 992 px up and a bottom sheet with a tab strip below that. The
   panels themselves are documented in [live interaction](live-interaction.md).
@@ -476,12 +482,21 @@ and `app/src/components/jitsi/`):
     the number of connections is shown beside it. Every connection keeps its row, so a moderator can
     remove it. Above 8 connections, a search filters the rows by name; for moderators it also matches
     the registration name and the email address shown under each name.
-  - **Controls.** A per-listener volume slider on every row except one's own, and removal. The remove
-    button follows the portal: people who are moderators in the portal see it on every row except their
-    own, and it carries the person's name as its accessible label. The first click arms it and the
-    second, within 4 seconds, removes the person. Moderators also see their own connection quality.
-- **Raised-hand queue.** A read-only queue in order of raising, shown to every non-moderator so the
-  room can see who is next. It stays hidden while no hand is up.
+  - **Controls.** A per-listener volume slider on every row except one's own. Moderators also see
+    their own connection quality, and the panel is where they run the room (moderator controls follow
+    the portal role, never on one's own row):
+    - for the whole room, **Mute everyone**, **Turn off all video**, and the two locks, **Microphones
+      locked** / **Microphones open** and **Video locked** / **Video open**. Locking turns on Jitsi's
+      audio or video moderation and switches off whoever is on; opening lets everyone switch on again.
+      The locks read the room's state when the panel mounts (`isModerationOn`), because the room can be
+      locked before the panel listens ([the media lock module](../../infra/jitsi/README.md#the-media-lock-module));
+    - on a row with a raised hand, **Give the floor** (audio and video), **Audio only** and **Lower
+      hand**. The tab shows the number of raised hands to moderators instead of the people count;
+    - behind the row's actions button, **Mute**, **Turn off video**, **Give the floor** and **Take back
+      the floor** while the room is locked, and **Remove**. The first click on **Remove** arms it and the
+      second, within 4 seconds, removes the person.
+
+  Raised hands appear only here: there is no separate queue above the video.
 - **Screen-share banner.** A banner that announces who started sharing; the presenter does not see it.
 - **Device check.** Camera and microphone checks in the waiting room. Their result becomes the start
   state described above ([the waiting room](waiting-room.md)).
@@ -582,10 +597,8 @@ per namespace. The first upgrade to a chart with this wiring restarts Prosody an
 ([Upgrades and rollback](../operations/upgrades.md)).
 
 **Docker Compose** mounts `infra/jitsi/prosody-plugins/` into the Prosody container at
-`/prosody-plugins-custom`, enables the three modules and turns off Jicofo's auto-owner rule, but leaves
-Jicofo's authentication on. Roles there rely on `token_affiliation` setting the affiliation again after
-Jicofo's promotion, so a participant can hold the moderator role for a moment after joining.
-`mod_pa_media_lock` takes that moment back out of the audio and video allowed lists.
+`/prosody-plugins-custom`, enables the three modules, and turns off Jicofo's authentication and its
+auto-owner rule, as the chart does.
 
 The wiring, and what was checked on a lab cluster (moderator links as moderators, registrants and
 guests as participants whoever joins first, a participant's mute or kick of the moderator refused), are

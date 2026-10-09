@@ -245,7 +245,7 @@ export default function JitsiRoom({
     // override the static defaults in `jitsiConfigOverwrite`.
     Object.assign(extraConfig, resolveVideoQualityConfig(videoQuality, { isMobile: isMobileRef.current }));
 
-    // Moderators need the participants-pane "rimuovi utente" (kick) to
+    // Moderators need the tile menu's "rimuovi utente" (kick) to
     // actually fire — the global default has `disableKick: true` to hide
     // the button from participants, so we flip it back on per-instance.
     // `disableGrantModerator` stays true: grant is driven by JWT, not UI.

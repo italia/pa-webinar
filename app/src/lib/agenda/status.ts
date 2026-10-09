@@ -1,5 +1,5 @@
 /**
- * Gli stati di un argomento della scaletta e cosa scrivere per passarci.
+ * Gli stati di un argomento dell'agenda e cosa scrivere per passarci.
  *
  * PENDING (da discutere) → CURRENT (in corso) → DONE (discusso), oppure
  * SKIPPED (saltato). Uno solo alla volta e' in corso: avviarne uno chiude il
@@ -16,7 +16,7 @@ export const AGENDA_STATUSES = ['PENDING', 'CURRENT', 'DONE', 'SKIPPED'] as cons
 /** Minuti previsti per un argomento: da 1 a 10 ore. */
 export const plannedMinutesSchema = z.number().int().min(1).max(600);
 
-/** Argomenti al massimo in una scaletta: il riordino manda l'elenco intero. */
+/** Argomenti al massimo in un'agenda: il riordino manda l'elenco intero. */
 export const MAX_AGENDA_ITEMS = 200;
 export type AgendaStatus = (typeof AGENDA_STATUSES)[number];
 
@@ -64,7 +64,7 @@ export function minutesBetween(from: string | null, to: string | null): number |
 
 /**
  * Il testo del campo «nuovo argomento» diviso in argomenti, uno per riga.
- * Chi incolla una scaletta da un documento la incolla con i suoi elenchi
+ * Chi incolla un'agenda da un documento la incolla con i suoi elenchi
  * puntati o numerati: «1. Apertura», «- Apertura», «• Apertura» diventano
  * «Apertura». Le righe vuote si saltano.
  */

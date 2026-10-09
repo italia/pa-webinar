@@ -3,17 +3,17 @@
 /**
  * L'argomento in corso, nella barra della sala.
  *
- * Chi segue la chiamata e scrive in chat non apre la scaletta: qui vede a che
+ * Chi segue la chiamata e scrive in chat non apre l'agenda: qui vede a che
  * punto si e' senza cambiare pannello. Una pastiglia con l'argomento in corso
  * e l'avanzamento; passandoci sopra, o con un clic, si apre l'elenco completo
  * con lo stato di ogni argomento.
  *
- * Legge la versione leggera della scaletta (`?lite=1`: titoli e stati, uguale
+ * Legge la versione leggera dell'agenda (`?lite=1`: titoli e stati, uguale
  * per tutti e tenuta in caldo qualche secondo sul server). La chiave comincia
- * con l'indirizzo della scaletta, cosi' gli avvisi del canale la fanno
+ * con l'indirizzo dell'agenda, cosi' gli avvisi del canale la fanno
  * rileggere subito: anche quelli dei 👍, che qui costano una lettura in caldo.
  * Il giro lento resta per quando il canale non c'e' e per accorgersi della
- * scaletta accesa durante l'evento.
+ * agenda accesa durante l'evento.
  */
 
 import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from 'react';

@@ -165,8 +165,7 @@ appended to the stylesheet. The image build fails when any of their targets is m
   background with the `setVirtualBackground` command on `videoConferenceJoined`, and retries when the
   camera is turned on if the image could not be delivered yet.
 - **Consumers of the API object.** The moderator control bar
-  (`app/src/components/jitsi/moderator-controls.tsx`), the raised-hand queue
-  (`app/src/components/jitsi/raised-hands-panel.tsx`), the participants panel
+  (`app/src/components/jitsi/moderator-controls.tsx`), the participants panel
   (`app/src/components/participants/participant-panel.tsx`) and the live room
   (`app/src/components/live/live-event-client.tsx`) call `addListener` on the object they receive. The
   shared hook `app/src/hooks/use-jitsi-events.ts` exposes the participant count, recording state and

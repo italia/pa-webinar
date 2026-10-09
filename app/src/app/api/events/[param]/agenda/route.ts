@@ -1,10 +1,10 @@
 /**
- * La scaletta dell'incontro. Funzione opt-in (Event.agendaEnabled). Pattern
+ * L'agenda dell'incontro. Funzione opt-in (Event.agendaEnabled). Pattern
  * allineato a Q&A/poll:
  *   GET  → gli argomenti in ordine, con stato e reazioni (chiunque sia in
  *          stanza). `?lite=1`: solo titoli e stati, per la barra della sala.
  *   POST → il moderatore aggiunge un argomento, o un elenco incollato.
- *   PUT  → il moderatore riordina la scaletta.
+ *   PUT  → il moderatore riordina l'agenda.
  * Mutazioni protette da token moderatore (Bearer o ?token).
  */
 
@@ -34,7 +34,7 @@ const createSchema = z.union([
   z.object({ labels: z.array(labelSchema).min(1).max(50) }),
 ]);
 
-/** Il nuovo ordine: tutti gli argomenti della scaletta, ciascuno una volta. */
+/** Il nuovo ordine: tutti gli argomenti dell'agenda, ciascuno una volta. */
 const reorderSchema = z.object({
   order: z.array(z.string().uuid()).min(1).max(MAX_AGENDA_ITEMS),
 });
@@ -175,7 +175,7 @@ export const POST = withErrorHandling(async (request, context) => {
       : [{ label: body.label, plannedMinutes: body.plannedMinutes ?? null }];
 
   const creati = await prisma.$transaction(async (tx) => {
-    // In fila con le altre scritture della scaletta: due aggiunte insieme
+    // In fila con le altre scritture dell'agenda: due aggiunte insieme
     // supererebbero il tetto e prenderebbero le stesse posizioni.
     await tx.$executeRaw`SELECT id FROM events WHERE id = ${event.id}::uuid FOR NO KEY UPDATE`;
     const max = await tx.eventAgendaItem.aggregate({

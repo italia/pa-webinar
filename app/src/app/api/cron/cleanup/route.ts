@@ -239,7 +239,7 @@ export const GET = withErrorHandling(async (request) => {
 
         // ── Contenuti della sala: restano con l'evento, senza identita' ──
         // Domande e risposte, sondaggi, parole, valutazioni, materiali,
-        // scaletta e cronologia restano finche' esiste l'evento, perche' chi
+        // agenda e cronologia restano finche' esiste l'evento, perche' chi
         // organizza possa decidere se pubblicarli. Perdono pero' ogni legame
         // con una persona: nome dell'autore, iscrizione, identificativo del
         // browser. Si fa PRIMA di cancellare le iscrizioni: domande e voti
@@ -333,7 +333,7 @@ export const GET = withErrorHandling(async (request) => {
           where: { eventId: evt.id },
         });
 
-        // Le reazioni agli argomenti della scaletta sono di una persona: via.
+        // Le reazioni agli argomenti dell'agenda sono di una persona: via.
         // Gli argomenti restano, come la cronologia della sala (nessun nome:
         // titoli, risultati, ore), contenuti dell'evento.
         const agendaReactionsDeleted = await tx.agendaItemReaction.deleteMany({

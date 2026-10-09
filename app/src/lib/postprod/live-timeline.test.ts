@@ -48,7 +48,7 @@ beforeEach(() => {
 describe('describeAction', () => {
   const nessuna = new Map<string, { text: string; answerText: string | null }>();
 
-  it('scaletta: avviato, concluso, saltato, riaperto', () => {
+  it('agenda: avviato, concluso, saltato, riaperto', () => {
     expect(describeAction('agenda.topic', { label: 'Apertura', status: 'CURRENT' }, nessuna)).toBe(
       'Argomento avviato: «Apertura»',
     );
@@ -165,7 +165,7 @@ describe('buildLiveTimeline', () => {
     expect(Object.keys(dove.select)).toEqual(['text', 'createdAt']);
   });
 
-  it('i capitoli: la scaletta si legge dall’inizio dell’evento, fino alla fine della registrazione', async () => {
+  it('i capitoli: l’agenda si legge dall’inizio dell’evento, fino alla fine della registrazione', async () => {
     // L'argomento in corso allo zero e' stato avviato 45 minuti prima: fuori
     // dalla finestra delle azioni, ma apre la registrazione.
     m('liveAction').mockImplementation(async (args: { where: { kind?: unknown } }) =>
@@ -181,12 +181,12 @@ describe('buildLiveTimeline', () => {
       { offsetSec: 0, title: 'Saluti' },
       { offsetSec: 1200, title: 'Il servizio' },
     ]);
-    const scaletta = m('liveAction').mock.calls
+    const agenda = m('liveAction').mock.calls
       .map((c) => c[0] as { where: Record<string, unknown>; take?: number })
       .find((a) => a.where.kind === 'agenda.topic');
     // Nessun limite inferiore: solo la fine della registrazione.
-    expect(scaletta?.where).toEqual({ eventId: 'e1', kind: 'agenda.topic', at: { lte: at(60) } });
-    expect(scaletta?.take).toBeGreaterThan(0);
+    expect(agenda?.where).toEqual({ eventId: 'e1', kind: 'agenda.topic', at: { lte: at(60) } });
+    expect(agenda?.take).toBeGreaterThan(0);
   });
 
   it('un argomento avviato dopo la fine della registrazione non e’ un suo capitolo', async () => {
@@ -320,7 +320,7 @@ describe('chaptersFromActions', () => {
     ]);
   });
 
-  it('senza scaletta: nessun capitolo', () => {
+  it('senza agenda: nessun capitolo', () => {
     expect(chaptersFromActions([{ at: at(1), kind: 'poll.opened', data: {} }], t0)).toEqual([]);
   });
 });

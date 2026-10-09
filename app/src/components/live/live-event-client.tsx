@@ -29,9 +29,8 @@ import {
 import JitsiRoom from '@/components/jitsi/jitsi-room';
 import { LivePushContext, useLivePush, useLiveState } from '@/hooks/use-live-state';
 import { useQaAlerts } from '@/hooks/use-qa-alerts';
-import RecordingConsent, { RecordingBanner } from '@/components/jitsi/recording-consent';
+import RecordingConsent from '@/components/jitsi/recording-consent';
 import ModeratorControls from '@/components/jitsi/moderator-controls';
-import RaisedHandsPanel from '@/components/jitsi/raised-hands-panel';
 import QAPanel from '@/components/qa/qa-panel';
 import PollPanel from '@/components/polls/poll-panel';
 import AgendaPanel from '@/components/live/agenda-panel';
@@ -102,7 +101,7 @@ interface EventInfo {
   registrationCount?: number;
   /** Soft-exit grace in minutes past endsAt. Null → site default. */
   gracePeriodMinutes?: number | null;
-  /** Resolved grace value (settings default applied). Used for the overtime banner. */
+  /** Tetto del fuori orario risolto (default di sito applicato): lo usa il contatore. */
   effectiveGraceMinutes?: number;
   tempRecordingUrl?: string | null;
   recordingUrl?: string | null;
@@ -796,6 +795,11 @@ export default function LiveEventClient({
   const [endGenAi, setEndGenAi] = useState(false);
 
   const [showRecPrompt, setShowRecPrompt] = useState(false);
+  // La proposta di registrare non ha più senso quando la registrazione è
+  // partita, da qui o da chiunque altro.
+  useEffect(() => {
+    if (isRecording) setShowRecPrompt(false);
+  }, [isRecording]);
   const recPromptShownRef = useRef(false);
   const recPromptRetryRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -1659,12 +1663,6 @@ export default function LiveEventClient({
   return (
     <LivePushContext.Provider value={pushLive}>
     <div ref={liveRootRef} className="d-flex flex-column live-page-bg">
-      <RecordingBanner visible={isRecording} />
-      <OvertimeBanner
-        endsAt={event.endsAt}
-        graceMinutes={event.effectiveGraceMinutes ?? OVERTIME_CAP_DEFAULT_MINUTES}
-      />
-
       <LiveTopBar
         hasPublicPage={!isInstantCall}
         hasCallLink={event.guestEntryOpen !== false}
@@ -1685,6 +1683,7 @@ export default function LiveEventClient({
         modalContainer={modalContainer}
         startsAt={event.startsAt}
         endsAt={event.endsAt}
+        graceMinutes={event.effectiveGraceMinutes ?? OVERTIME_CAP_DEFAULT_MINUTES}
         onToggleFullscreen={toggleFullscreen}
       />
 
@@ -1697,11 +1696,28 @@ export default function LiveEventClient({
           recorderPhase={recorderPhase}
           whiteboardEnabled={whiteboardOn}
           whiteboardInfraReady={whiteboardInfraReady}
-          localDisplayName={credentials?.displayName ?? chosenName ?? ''}
           isPrimaryModerator={isPrimaryModerator}
           onEnded={handleEndedFromControls}
           modalContainer={modalContainer}
         />
+      )}
+
+      {/* Proposta di avviare la registrazione, quando il registratore è pronto.
+          Un avviso nella striscia di chi conduce, non una finestra: arriva da
+          solo, anche minuti dopo l'ingresso, e una finestra modale prendeva il
+          focus a chi stava parlando o scrivendo. */}
+      {isActualModerator && showRecPrompt && !showJvbOverlay && (
+        <div className="live-rec-prompt" role="status">
+          <span>{t('recordingPromptBody')}</span>
+          <span className="live-rec-prompt__actions">
+            <Button color="primary" size="xs" onClick={handleRecPromptStart}>
+              {t('recordingPromptStart')}
+            </Button>
+            <Button color="light" outline size="xs" onClick={handleRecPromptLater}>
+              {t('recordingPromptLater')}
+            </Button>
+          </span>
+        </div>
       )}
 
       {!showJvbOverlay && (
@@ -1709,19 +1725,6 @@ export default function LiveEventClient({
           eventSlug={event.slug}
           token={token}
           isModerator={isActualModerator}
-        />
-      )}
-
-      {/* Read-only raised-hands queue visible to ALL attendees so
-          everyone sees who's in line to speak and in what order. The
-          moderator still gets the full panel with "approve mic/video"
-          buttons inside ModeratorControls above — this one stays
-          compact and silent when no hand is up. */}
-      {!showJvbOverlay && !isActualModerator && jitsiApi && (
-        <RaisedHandsPanel
-          api={jitsiApi}
-          localDisplayName={credentials?.displayName ?? chosenName ?? ''}
-          readOnly
         />
       )}
 
@@ -1812,29 +1815,6 @@ export default function LiveEventClient({
           {...voterIdentity(registeredAccessToken, guestId)}
         />
       </div>
-
-      {/* Recording pre-activation prompt for moderator */}
-      <Modal
-        isOpen={showRecPrompt}
-        toggle={handleRecPromptLater}
-        centered
-        container={modalContainer}
-      >
-        <ModalHeader closeAriaLabel={tc('close')} toggle={handleRecPromptLater}>
-          {t('recordingPromptTitle')}
-        </ModalHeader>
-        <ModalBody>
-          <p>{t('recordingPromptBody')}</p>
-        </ModalBody>
-        <ModalFooter>
-          <Button color="secondary" outline onClick={handleRecPromptLater}>
-            {t('recordingPromptLater')}
-          </Button>
-          <Button color="primary" onClick={handleRecPromptStart}>
-            {t('recordingPromptStart')}
-          </Button>
-        </ModalFooter>
-      </Modal>
 
       {/* Moderator leave prompt: leave for yourself vs end for everyone. */}
       <Modal
@@ -2035,6 +2015,7 @@ function LiveSidebar({
 }: LiveSidebarProps) {
   const tCommon = useTranslations('common');
   const t = useTranslations('live');
+  const tp = useTranslations('live.participants');
   // Live feature flags: i flag arrivano come props al mount, ma un moderatore
   // può attivarli/disattivarli DURANTE l'evento → li ripolliamo così i tab
   // reagiscono per tutti. I valori "eff*" sono quelli effettivi correnti.
@@ -2102,6 +2083,8 @@ function LiveSidebar({
     showChat ? 'chat' : qaEnabled ? 'qa' : 'polls'
   );
   const [participantCount, setParticipantCount] = useState(0);
+  // Mani alzate nella sala, dal pannello dei partecipanti (sempre montato).
+  const [handsCount, setHandsCount] = useState(0);
   // Drawer-open state only matters on mobile (<992px); on desktop the
   // .live-sidebar is always visible via CSS regardless of this flag.
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -2518,10 +2501,18 @@ function LiveSidebar({
           <path d="M16 3.13a4 4 0 0 1 0 7.75" />
         </svg>
       ),
-      // Il conteggio della sala quando c'e': quello del pannello si ferma
-      // quando il pannello si chiude.
-      badge: roomCount && roomCount > 0 ? roomCount : participantCount,
-      badgeTone: 'neutral',
+      // Le mani alzate vincono sul conteggio, per chi modera: sono la coda da
+      // gestire, e la scheda è il posto unico dove gestirla. Altrimenti il
+      // conteggio della sala quando c'e': quello del pannello si ferma quando
+      // il pannello si chiude.
+      badge:
+        isModerator && handsCount > 0
+          ? handsCount
+          : roomCount && roomCount > 0
+            ? roomCount
+            : participantCount,
+      badgeTone: isModerator && handsCount > 0 ? 'alert' : 'neutral',
+      dotLabel: isModerator && handsCount > 0 ? tp('handsRaised', { count: handsCount }) : undefined,
       show: true,
     },
   ];
@@ -2606,6 +2597,11 @@ function LiveSidebar({
                 {tab.badgeTone === 'mention' && '@'}
                 {tab.badge > 99 ? '99+' : tab.badge}
               </span>
+            )}
+            {/* Un contatore da leggere (non i presenti) arriva anche ai lettori
+                di schermo: il numero disegnato è nascosto. */}
+            {tab.badge !== undefined && tab.badge > 0 && tab.badgeTone !== 'neutral' && tab.dotLabel && (
+              <span className="visually-hidden"> {tab.dotLabel}</span>
             )}
             {tab.dot && (
               <span
@@ -2933,6 +2929,7 @@ function LiveSidebar({
               isModerator={isModerator}
               localParticipantId={localParticipantId}
               onCountChange={setParticipantCount}
+              onHandsChange={setHandsCount}
               visible={onScreen('participants')}
               eventSlug={eventSlug}
               token={token}
@@ -2954,59 +2951,6 @@ const ROLE_BADGE_COLORS: Record<UserRole, { badge: string; badgeFg: string }> = 
   participant: { badge: '#D4EDDA', badgeFg: '#155724' },
   guest: { badge: '#E9ECEF', badgeFg: 'var(--app-muted)' },
 };
-
-/**
- * Non-intrusive banner shown when the event has gone past its scheduled
- * endsAt but is within the grace window. Warns attendees the call will
- * close automatically; polls the wall clock every 30s so the countdown
- * is never more than half a minute stale.
- */
-function OvertimeBanner({
-  endsAt,
-  graceMinutes,
-}: {
-  endsAt: string;
-  graceMinutes: number;
-}) {
-  const t = useTranslations('live');
-  const [now, setNow] = useState(() => Date.now());
-
-  useEffect(() => {
-    const id = setInterval(() => setNow(Date.now()), 30_000);
-    return () => clearInterval(id);
-  }, []);
-
-  const endsAtMs = new Date(endsAt).getTime();
-  if (now < endsAtMs) return null;
-
-  // graceMinutes === -1 → never auto-close; graceMinutes === 0 → hard
-  // close (banner wouldn't be visible anyway since the scaler flips
-  // to ENDED instantly and the user gets redirected).
-  if (graceMinutes === 0) return null;
-
-  const closeAt = graceMinutes > 0 ? new Date(endsAtMs + graceMinutes * 60_000) : null;
-  const minutesLeft = closeAt
-    ? Math.max(0, Math.ceil((closeAt.getTime() - now) / 60_000))
-    : null;
-
-  const message =
-    closeAt && minutesLeft !== null
-      ? minutesLeft > 0
-        ? t('overtime.withCountdown', { minutes: minutesLeft })
-        : t('overtime.closingNow')
-      : t('overtime.indefinite');
-
-  return (
-    <div
-      className="px-3 py-2 d-flex align-items-center gap-2 text-white small"
-      style={{ background: '#A66300' }}
-      role="status"
-    >
-      <span aria-hidden="true">⏱</span>
-      {message}
-    </div>
-  );
-}
 
 interface LiveTopBarProps {
   title: string;
@@ -3054,6 +2998,8 @@ interface LiveTopBarProps {
   /** Orario dell'evento per il contatore in barra (B4). */
   startsAt?: string;
   endsAt?: string;
+  /** Tetto del fuori orario (minuti dopo endsAt; negativo = nessuno). */
+  graceMinutes?: number;
 }
 
 function LiveTopBar({
@@ -3077,6 +3023,7 @@ function LiveTopBar({
   modalContainer,
   startsAt,
   endsAt,
+  graceMinutes,
 }: LiveTopBarProps) {
   const t = useTranslations('live');
   const tr = useTranslations('live.role');
@@ -3167,17 +3114,25 @@ function LiveTopBar({
          *  under-reported. The sidebar remains the single
          *  source of truth for the present-participant count. */}
       </div>
-      {/* L'argomento in corso della scaletta, per chi segue chiamata e chat
+      {/* L'argomento in corso dell'agenda, per chi segue chiamata e chat
           senza aprire il pannello: si apre sull'elenco completo. Sul telefono
           va su una riga sua, sotto titolo e comandi. */}
       <AgendaTicker eventSlug={slug} isModerator={role === 'moderator'} />
       <div className="live-top-bar__actions d-flex align-items-center gap-2">
+        {/* Un'icona, non una fascia: chi è in sala sa che si registra senza
+            perdere una riga di video. Il ruolo status la annuncia quando
+            compare. */}
         {isRecording && (
-          <Badge color="danger" pill className="px-2 py-1">
-            <span className="me-1">●</span>
-            {t('recordingActive')}
-          </Badge>
+          <span className="live-rec-indicator" title={t('recordingActive')} aria-hidden="true">
+            <span className="live-rec-indicator__dot" />
+            {t('recordingShort')}
+          </span>
         )}
+        {/* La regione resta montata e cambia testo: un contenitore che nasce
+            già pieno molti lettori di schermo non lo annunciano. */}
+        <span className="visually-hidden" role="status">
+          {isRecording ? t('recordingActive') : ''}
+        </span>
         {/* The "active vs registered" figure is moderator-only:
             participants shouldn't see attendance numbers. The live people-count
             now lives only in the participants sidebar, so non-moderators get
@@ -3213,6 +3168,7 @@ function LiveTopBar({
           <EventTimer
             startsAt={startsAt}
             endsAt={endsAt}
+            graceMinutes={graceMinutes ?? OVERTIME_CAP_DEFAULT_MINUTES}
             // Acceso di default per chi conduce la sala: la richiesta arriva da
             // lì ("regolare al meglio i vari interventi"), e un orologio che
             // scorre addosso al pubblico è pressione che nessuno ha chiesto.

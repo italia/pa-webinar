@@ -513,7 +513,7 @@ describe('GET /api/cron/cleanup', () => {
     });
     expect(db.eventReminder.deleteMany).toHaveBeenCalledWith(byEvent);
     expect(db.multitrackConsent.deleteMany).toHaveBeenCalledWith(byEvent);
-    // Le reazioni live e quelle agli argomenti della scaletta sono di una
+    // Le reazioni live e quelle agli argomenti dell'agenda sono di una
     // persona, e la loro cascade non scatta (vedi il test sulla chat).
     expect(db.reaction.deleteMany).toHaveBeenCalledWith(byEvent);
     expect(db.agendaItemReaction.deleteMany).toHaveBeenCalledWith({
@@ -522,7 +522,7 @@ describe('GET /api/cron/cleanup', () => {
   });
 
   it('fase 3: i contenuti della sala restano con l’evento', async () => {
-    // Domande, sondaggi, parole, valutazioni, materiali, scaletta e
+    // Domande, sondaggi, parole, valutazioni, materiali, agenda e
     // cronologia restano finché esiste l'evento, perché chi organizza possa
     // decidere se pubblicarli: la pulizia toglie le identità, non i contenuti.
     stubEventQueries({ ended: [endedEvent({ id: 'evt-vecchio' })] });

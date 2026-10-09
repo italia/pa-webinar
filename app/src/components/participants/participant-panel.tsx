@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback, useId, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import useSWR from 'swr';
 
-import { Icon } from '@/components/ui/icon';
 import { avatarColor, avatarInitials } from '@/lib/chat/avatar';
 import type { JitsiMeetExternalAPI, JitsiParticipant } from '@/types/jitsi';
 import { useJitsiStats, qualityLabel, qualityColor } from '@/hooks/use-jitsi-stats';
@@ -56,6 +55,16 @@ interface ParticipantPanelProps {
    *  della sala (solo chi modera lo legge). */
   eventSlug?: string;
   token?: string;
+  /** Quante mani sono alzate: la scheda lo mostra a chi modera. */
+  onHandsChange?: (count: number) => void;
+}
+
+/** Una mano alzata: quando (in questo browser, per l'ordine) e l'istante di
+ *  Jitsi, che si rimanda per abbassare proprio quella mano e non una rialzata
+ *  dopo. */
+interface ManoAlzata {
+  at: number;
+  raiseId: number;
 }
 
 export default function ParticipantPanel({
@@ -66,8 +75,10 @@ export default function ParticipantPanel({
   visible = true,
   eventSlug,
   token,
+  onHandsChange,
 }: ParticipantPanelProps) {
   const t = useTranslations('live.participants');
+  const tm = useTranslations('live.moderator');
   const tc = useTranslations('common');
   const [participants, setParticipants] = useState<JitsiParticipant[]>([]);
   // Per-participant LOCAL playback volume (0..1, default 1 = 100%) and
@@ -81,12 +92,25 @@ export default function ParticipantPanel({
   // Mani alzate (endpoint → ora dell'alzata, per l'ordine) e chi sta
   // parlando: il pannello resta montato anche a scheda chiusa, quindi li
   // segue per tutto l'evento.
-  const [raised, setRaised] = useState<Record<string, number>>({});
+  const [raised, setRaised] = useState<Record<string, ManoAlzata>>({});
+  // Le azioni di chi modera sulla singola riga, aperte una alla volta.
+  const [openActionsId, setOpenActionsId] = useState<string | null>(null);
+  // Moderazione di audio e video nella sala: lo stato si legge da Jitsi, perché
+  // la sala può essere moderata prima che il pannello ascolti.
+  const [modAudio, setModAudio] = useState(false);
+  const [modVideo, setModVideo] = useState(false);
   const [speakingId, setSpeakingId] = useState<string | null>(null);
   const [query, setQuery] = useState('');
   const [persone, setPersone] = useState(0);
   // Per chi usa un lettore di schermo e modera: chi alza la mano.
   const [annuncio, setAnnuncio] = useState('');
+  // Un comando di chi modera che non è andato: si vede, e sparisce da solo.
+  const [errore, setErrore] = useState('');
+  useEffect(() => {
+    if (!errore) return;
+    const timer = setTimeout(() => setErrore(''), 6000);
+    return () => clearTimeout(timer);
+  }, [errore]);
   const gruppoId = useId();
   // Espellere non si annulla: il primo clic chiede conferma.
   const [armedKick, setArmedKick] = useState<string | null>(null);
@@ -182,9 +206,14 @@ export default function ParticipantPanel({
         if (nome) setAnnuncio(t('handRaisedAnnounce', { name: nome }));
       }
       setRaised((prev) => {
-        // L'ordine e' quello d'arrivo in questo browser, come nella coda delle
-        // mani di chi modera (raised-hands-panel): le due liste non discordano.
-        if (evt.handRaised > 0) return prev[evt.id] ? prev : { ...prev, [evt.id]: Date.now() };
+        // L'ordine e' quello d'arrivo in questo browser.
+        if (evt.handRaised > 0) {
+          const gia = prev[evt.id];
+          // Una nuova alzata senza l'abbassamento in mezzo (un evento perso):
+          // l'ordine resta, ma «abbassa» deve mandare l'istante dell'ultima.
+          if (gia) return gia.raiseId === evt.handRaised ? prev : { ...prev, [evt.id]: { ...gia, raiseId: evt.handRaised } };
+          return { ...prev, [evt.id]: { at: Date.now(), raiseId: evt.handRaised } };
+        }
         if (!(evt.id in prev)) return prev;
         const next = { ...prev };
         delete next[evt.id];
@@ -219,6 +248,37 @@ export default function ParticipantPanel({
     };
   }, [api, refresh, refreshSoon, isModerator, t]);
 
+  useEffect(() => {
+    onHandsChange?.(Object.keys(raised).length);
+  }, [raised, onHandsChange]);
+
+  useEffect(() => {
+    if (!api || !isModerator) return;
+    const onModeration = (evt: { enabled: boolean; mediaType: string }) => {
+      if (evt.mediaType === 'audio') setModAudio(evt.enabled);
+      if (evt.mediaType === 'video') setModVideo(evt.enabled);
+    };
+    api.addListener('moderationStatusChanged', onModeration);
+    let attivo = true;
+    const leggi = (tipo: 'audio' | 'video', imposta: (v: boolean) => void) => {
+      const richiesta = api.isModerationOn?.(tipo);
+      if (!richiesta) return;
+      richiesta
+        .then((v) => {
+          if (attivo && typeof v === 'boolean') imposta(v);
+        })
+        .catch(() => {
+          /* la richiesta non è andata: resta l'evento */
+        });
+    };
+    leggi('audio', setModAudio);
+    leggi('video', setModVideo);
+    return () => {
+      attivo = false;
+      api.removeListener('moderationStatusChanged', onModeration);
+    };
+  }, [api, isModerator]);
+
   // Chi c'e' dietro i riquadri: solo per chi modera, a scheda aperta. Si
   // rilegge quando cambia l'elenco, e ogni tanto per chi dichiara in ritardo.
   const seatsUrl = isModerator && visible && eventSlug && token ? `/api/events/${eventSlug}/seats` : null;
@@ -239,6 +299,77 @@ export default function ParticipantPanel({
       api.executeCommand('kickParticipant', participantId);
     },
     [api],
+  );
+
+  // ── Comandi di chi modera ──
+  // Spegne tutti tranne sé, una persona alla volta: il «silenzia tutti» di
+  // Jitsi, con la moderazione accesa, toglie anche la parola, e lo farebbe ai
+  // relatori, che il token ammette sempre. Spegnere non toglie la parola: chi
+  // è ammesso può riaccendere.
+  const muteAll = useCallback(
+    (tipo: 'audio' | 'video') => {
+      if (!api) return;
+      for (const p of api.getParticipantsInfo().filter(isHumanParticipant)) {
+        if (p.participantId !== localParticipantId) {
+          api.executeCommand('muteRemoteParticipant', p.participantId, tipo);
+        }
+      }
+    },
+    [api, localParticipantId],
+  );
+  // Bloccare accende la moderazione di Jitsi (il bridge tiene spento chi non
+  // ha la parola) e spegne chi è acceso; sbloccare lascia ognuno libero di
+  // riaccendere, senza accendere nessuno.
+  const toggleLock = useCallback(
+    (tipo: 'audio' | 'video', attiva: boolean) => {
+      if (!api) return;
+      if (attiva) {
+        api.executeCommand('toggleModeration', false, tipo);
+      } else {
+        muteAll(tipo);
+        api.executeCommand('toggleModeration', true, tipo);
+      }
+    },
+    [api, muteAll],
+  );
+  const muteOne = useCallback(
+    (id: string, tipo: 'audio' | 'video') => api?.executeCommand('muteRemoteParticipant', id, tipo),
+    [api],
+  );
+  const giveFloor = useCallback(
+    (id: string, conVideo: boolean) => {
+      if (!api) return;
+      api.executeCommand('askToUnmute', id);
+      if (conVideo) api.executeCommand('approveVideo', id);
+    },
+    [api],
+  );
+  const revokeFloor = useCallback(
+    (id: string) => {
+      if (!api) return;
+      api.executeCommand('rejectParticipant', id, 'audio');
+      api.executeCommand('rejectParticipant', id, 'video');
+    },
+    [api],
+  );
+  // La mano la abbassa il client di chi l'ha alzata, avvisato dal canale di
+  // controllo: l'IFrame API non abbassa le mani degli altri. Nessuna rimozione
+  // ottimistica: se l'avviso non arriva la mano resta, ed è corretto.
+  const lowerHand = useCallback(
+    async (id: string, raiseId: number) => {
+      if (!eventSlug || !token) return;
+      try {
+        const res = await fetch(`/api/events/${eventSlug}/hand-raises/lower`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ targetEndpointId: id, raiseId }),
+        });
+        if (!res.ok) setErrore(t('lowerHandFailed'));
+      } catch {
+        setErrore(t('lowerHandFailed'));
+      }
+    },
+    [eventSlug, token, t],
   );
 
   // setParticipantVolume adjusts a remote participant's audio *for this
@@ -286,8 +417,8 @@ export default function ParticipantPanel({
     .filter(corrisponde)
     .sort((a, b) => {
       // Prima le mani alzate, nell'ordine in cui si sono alzate; poi per nome.
-      const ra = raised[a.participantId];
-      const rb = raised[b.participantId];
+      const ra = raised[a.participantId]?.at;
+      const rb = raised[b.participantId]?.at;
       if (ra && rb) return ra - rb;
       if (ra || rb) return ra ? -1 : 1;
       return (a.displayName ?? '').localeCompare(b.displayName ?? '');
@@ -295,7 +426,7 @@ export default function ParticipantPanel({
   const conduzione = showRoles ? ordinati.filter((p) => roles[p.participantId] === 'moderator') : [];
   const pubblico = showRoles ? ordinati.filter((p) => roles[p.participantId] !== 'moderator') : ordinati;
   const ordineMani = Object.entries(raised)
-    .sort((x, y) => x[1] - y[1])
+    .sort((x, y) => x[1].at - y[1].at)
     .map(([id]) => id);
 
   const riga = (p: JitsiParticipant) => {
@@ -308,6 +439,10 @@ export default function ParticipantPanel({
     const parla = speakingId === p.participantId;
     const foto = safeAvatarSrc(p.avatarURL, origin);
     const armata = armedKick === p.participantId;
+    const mod = canKick(isModerator, p.participantId, localParticipantId);
+    const manoAlzata = raised[p.participantId];
+    const azioniAperte = openActionsId === p.participantId;
+    const azioniId = `${gruppoId}-azioni-${p.participantId}`;
     const seat = isModerator ? seats[p.participantId] : undefined;
     const nomeDiverso =
       seat?.kind === 'registration' && !!seat.name && !stessoNome(seat.name, shownName);
@@ -385,27 +520,76 @@ export default function ParticipantPanel({
             )}
             {/* Lo decide il ruolo nel PORTALE, non quello in Jitsi (che senza
                 ruoli dal token fa moderatori tutti), e mai sulla propria riga. */}
-            {canKick(isModerator, p.participantId, localParticipantId) && (
+            {mod && (
               <button
                 type="button"
-                className={`qa-action qa-action--dismiss${armata ? ' is-armed' : ''}`}
-                title={t('kick')}
-                aria-label={armata ? `${t('kickName', { name: shownName })} — ${tc('confirm')}` : t('kickName', { name: shownName })}
-                onClick={() => {
-                  if (!armata) {
-                    setArmedKick(p.participantId);
-                    return;
-                  }
-                  setArmedKick(null);
-                  handleKick(p.participantId);
-                }}
+                className={`qa-action${azioniAperte ? ' is-on' : ''}`}
+                onClick={() => setOpenActionsId(azioniAperte ? null : p.participantId)}
+                title={t('actionsFor', { name: shownName })}
+                aria-label={t('actionsFor', { name: shownName })}
+                aria-expanded={azioniAperte}
+                aria-controls={azioniId}
               >
-                <Icon icon="it-close-circle" size="sm" />
-                {armata && <span>{t('kick')}</span>}
+                <MoreGlyph />
               </button>
             )}
           </span>
         </div>
+        {/* La coda delle mani è qui, una sola: chi modera dà la parola o
+            abbassa la mano dalla riga di chi l'ha alzata. */}
+        {mod && manoAlzata && (
+          <div className="people-row__hand-actions">
+            <button type="button" className="people-row__act is-primary" onClick={() => giveFloor(p.participantId, true)}>
+              {tm('approveAll')}
+            </button>
+            <button type="button" className="people-row__act" onClick={() => giveFloor(p.participantId, false)}>
+              {tm('audioOnly')}
+            </button>
+            <button
+              type="button"
+              className="people-row__act"
+              onClick={() => lowerHand(p.participantId, manoAlzata.raiseId)}
+            >
+              {tm('lowerHand')}
+            </button>
+          </div>
+        )}
+        {mod && azioniAperte && (
+          <div className="people-row__menu" id={azioniId}>
+            <button type="button" className="people-row__act" onClick={() => muteOne(p.participantId, 'audio')}>
+              {t('mute')}
+            </button>
+            <button type="button" className="people-row__act" onClick={() => muteOne(p.participantId, 'video')}>
+              {t('stopVideo')}
+            </button>
+            {(modAudio || modVideo) && !manoAlzata && (
+              <button type="button" className="people-row__act" onClick={() => giveFloor(p.participantId, true)}>
+                {tm('approveAll')}
+              </button>
+            )}
+            {(modAudio || modVideo) && (
+              <button type="button" className="people-row__act" onClick={() => revokeFloor(p.participantId)}>
+                {t('revokeFloor')}
+              </button>
+            )}
+            <button
+              type="button"
+              className={`people-row__act is-danger${armata ? ' is-armed' : ''}`}
+              aria-label={armata ? `${t('kickName', { name: shownName })} — ${tc('confirm')}` : t('kickName', { name: shownName })}
+              onClick={() => {
+                if (!armata) {
+                  setArmedKick(p.participantId);
+                  return;
+                }
+                setArmedKick(null);
+                setOpenActionsId(null);
+                handleKick(p.participantId);
+              }}
+            >
+              {armata ? `${t('kick')} — ${tc('confirm')}` : t('kick')}
+            </button>
+          </div>
+        )}
         {isVolumeOpen && (
           <div className="people-row__volume">
             <input
@@ -451,6 +635,42 @@ export default function ParticipantPanel({
       </div>
 
       <div className="people__body">
+        {errore && (
+          <p className="people__error" role="alert">
+            {errore}
+          </p>
+        )}
+        {/* I comandi di chi modera per tutta la sala: un posto solo, accanto
+            all'elenco a cui si applicano. */}
+        {isModerator && api && (
+          <div className="people__tools" role="group" aria-label={t('allTools')}>
+            <button type="button" className="people__tool" onClick={() => muteAll('audio')}>
+              {tm('muteAll')}
+            </button>
+            <button type="button" className="people__tool" onClick={() => muteAll('video')}>
+              {t('stopAllVideo')}
+            </button>
+            <button
+              type="button"
+              className={`people__tool${modAudio ? ' is-locked' : ''}`}
+              aria-pressed={modAudio}
+              title={modAudio ? t('micLockedHelp') : t('micUnlockedHelp')}
+              onClick={() => toggleLock('audio', modAudio)}
+            >
+              {modAudio ? t('micLocked') : t('micUnlocked')}
+            </button>
+            <button
+              type="button"
+              className={`people__tool${modVideo ? ' is-locked' : ''}`}
+              aria-pressed={modVideo}
+              title={modVideo ? t('videoLockedHelp') : t('videoUnlockedHelp')}
+              onClick={() => toggleLock('video', modVideo)}
+            >
+              {modVideo ? t('videoLocked') : t('videoUnlocked')}
+            </button>
+          </div>
+        )}
+
         {/* Connection quality indicator */}
         {isModerator && stats.connectionQuality !== null && (
           <div className="people__quality">
@@ -517,6 +737,17 @@ export default function ParticipantPanel({
         )}
       </div>
     </div>
+  );
+}
+
+/** Tre puntini: le azioni sulla riga. */
+function MoreGlyph() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <circle cx="5" cy="12" r="2" />
+      <circle cx="12" cy="12" r="2" />
+      <circle cx="19" cy="12" r="2" />
+    </svg>
   );
 }
 

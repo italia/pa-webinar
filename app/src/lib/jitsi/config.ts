@@ -48,9 +48,10 @@ export const moderatorToolbarButtons = [
   ...baseToolbarButtons,
   // NO 'hangup' — see baseToolbarButtons: exit is our app button so the
   // moderator gets the "Esci solo tu / Termina per tutti" prompt.
-  'mute-everyone',
+  // Né 'mute-everyone' né 'participants-pane': elenco, «silenzia tutti», blocco
+  // di microfoni e video e mani alzate stanno nella scheda Partecipanti della
+  // sala, un posto solo invece di due.
   'security',
-  'participants-pane',
   // NB: 'whiteboard' NON è qui: JitsiRoom lo aggiunge solo per chi modera, da
   // desktop, quando l'evento l'ha scelta (Event.whiteboardEnabled) E
   // l'installazione ha il backend della lavagna (lib/jitsi/whiteboard.ts).
@@ -75,15 +76,12 @@ export const mobileBaseToolbarButtons = [
 ];
 
 /**
- * Moderator mobile toolbar: same trim as participants plus the
- * participants-pane button (needed to manage the room on small screens).
+ * Moderator mobile toolbar: same trim as participants. The room is managed
+ * from the Participants tab of the sidebar, also on small screens.
  * No native 'hangup' — exit goes through the app button (see
  * baseToolbarButtons) so the moderator gets the leave/end-for-all prompt.
  */
-export const mobileModeratorToolbarButtons = [
-  ...mobileBaseToolbarButtons,
-  'participants-pane',
-];
+export const mobileModeratorToolbarButtons = [...mobileBaseToolbarButtons];
 
 /**
  * Config overrides passed as `configOverwrite`.
@@ -124,7 +122,7 @@ export const jitsiConfigOverwrite = {
   // NOTE: `disableKick: true` is the safe default — prevents participants
   // from even attempting a kick (Jitsi would reject it server-side, but
   // showing the button confuses users). JitsiRoom flips this to `false`
-  // at instantiation when `role === 'moderator'` so the participants-pane
+  // at instantiation when `role === 'moderator'` so the tile menu's
   // "rimuovi utente" action actually dispatches. `disableGrantModerator`
   // stays `true` globally: only the primary moderator (via JWT) should
   // grant, never via UI.

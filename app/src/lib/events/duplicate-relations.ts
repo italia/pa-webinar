@@ -87,7 +87,7 @@ export const DUPLICATE_SOURCE_INCLUDE = {
   },
   agendaItems: {
     // `completed`/`completedAt` NON si leggono: sono lo stato di esecuzione
-    // della riunione che si è svolta, non la scaletta.
+    // della riunione che si è svolta, non l'agenda.
     select: { label: true, sortOrder: true, plannedMinutes: true },
   },
   reminders: { select: { offsetMinutes: true, label: true } },

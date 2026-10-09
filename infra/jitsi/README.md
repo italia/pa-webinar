@@ -92,10 +92,9 @@ The module logs every switch-on, admission and removal at `info` level.
 
 **Docker Compose.** `docker-compose.yml` mounts `infra/jitsi/prosody-plugins/` read-only at
 `/prosody-plugins-custom` in the `prosody` service and sets
-`XMPP_MUC_MODULES=token_affiliation,token_affiliation_custom,pa_media_lock`. On the `jicofo` service it turns off the
-auto-owner rule with `ENABLE_AUTO_OWNER=false`, but leaves Jicofo authentication on: roles there rely on
-`token_affiliation` setting the affiliation again after Jicofo's promotion, so a participant can hold
-the moderator role for a moment after joining.
+`XMPP_MUC_MODULES=token_affiliation,token_affiliation_custom,pa_media_lock`. On the `jicofo` service it
+turns off Jicofo's authentication (`JICOFO_ENABLE_AUTH=false`) and the auto-owner rule
+(`ENABLE_AUTO_OWNER=false`), as the chart does.
 
 **Helm chart.** The chart's `values.yaml` sets the wiring by default, on every profile:
 

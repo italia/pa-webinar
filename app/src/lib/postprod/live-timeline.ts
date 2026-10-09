@@ -6,7 +6,7 @@
  *
  * Mette insieme due fonti, entrambe con l'ora del server:
  *  - il registro delle azioni dal vivo (live_actions, lib/live/actions.ts):
- *    scaletta, sondaggi, «In una parola», stati delle domande, funzioni,
+ *    agenda, sondaggi, «In una parola», stati delle domande, funzioni,
  *    registrazione, timer, mani alzate, fine evento;
  *  - le righe che un'ora ce l'hanno gia': domande del Q&A e domande in chat
  *    (il testo, mai chi le ha scritte), materiali condivisi, e l'attivita'
@@ -31,7 +31,7 @@ export interface TimelineEntry {
   text: string;
 }
 
-/** Un capitolo della registrazione: un argomento della scaletta avviato. */
+/** Un capitolo della registrazione: un argomento dell'agenda avviato. */
 export interface TimelineChapter {
   /** Secondi dall'inizio della registrazione (0 se avviato prima). */
   offsetSec: number;
@@ -45,16 +45,16 @@ export interface LiveTimeline {
   exact: boolean;
   entries: TimelineEntry[];
   /**
-   * Gli argomenti della scaletta nell'ordine in cui chi conduce li ha avviati:
+   * Gli argomenti dell'agenda nell'ordine in cui chi conduce li ha avviati:
    * i capitoli della registrazione, con l'ora dichiarata in sala. Quello in
    * corso quando la registrazione e' partita apre a zero. Vuoto se la
-   * scaletta non e' stata usata.
+   * agenda non e' stata usata.
    */
   chapters: TimelineChapter[];
 }
 
 /**
- * I capitoli dagli argomenti della scaletta (`agenda.topic`), in ordine di
+ * I capitoli dagli argomenti dell'agenda (`agenda.topic`), in ordine di
  * tempo.
  *
  * Prima dello zero conta solo l'argomento in corso quando la registrazione
@@ -118,7 +118,7 @@ const BEFORE_MS = 30 * 60_000;
 const AFTER_MS = 5 * 60_000;
 /** Finestra di conteggio di chat, reazioni e mani alzate. */
 const BUCKET_MS = 5 * 60_000;
-/** Righe della scaletta lette per i capitoli: ben oltre ogni scaletta vera,
+/** Righe dell'agenda lette per i capitoli: ben oltre ogni agenda vera,
  *  solo un tetto alla lettura. */
 const MAX_AGENDA_ACTIONS = 1_000;
 /** Voci al massimo: oltre, il prompt non le regge. */
@@ -133,7 +133,7 @@ const FEATURE_NAMES: Record<LiveFlagField, string> = {
   qaEnabled: 'Q&A',
   chatEnabled: 'chat',
   wordCloudEnabled: '«In una parola»',
-  agendaEnabled: 'scaletta',
+  agendaEnabled: 'agenda',
   recordingEnabled: 'registrazione',
 };
 
@@ -297,13 +297,13 @@ export async function buildLiveTimeline(opts: {
   const a = new Date(opts.until.getTime() + AFTER_MS);
   const nellaFinestra = { gte: da, lte: a };
 
-  const [azioni, scaletta, domande, domandeChat, materiali, chat, reazioni, mani] = await Promise.all([
+  const [azioni, agenda, domande, domandeChat, materiali, chat, reazioni, mani] = await Promise.all([
     prisma.liveAction.findMany({
       where: { eventId, at: nellaFinestra, kind: { notIn: ['hand.raised', 'hand.lowered'] } },
       orderBy: { at: 'asc' },
       select: { at: true, kind: true, data: true },
     }),
-    // Per i capitoli la scaletta si legge dall'inizio dell'evento, non dalla
+    // Per i capitoli l'agenda si legge dall'inizio dell'evento, non dalla
     // finestra: l'argomento in corso quando parte la registrazione puo' essere
     // stato avviato ben prima dei trenta minuti di contesto.
     prisma.liveAction.findMany({
@@ -432,7 +432,7 @@ export async function buildLiveTimeline(opts: {
   return {
     t0: t0.toISOString(),
     exact: opts.exact,
-    chapters: chaptersFromActions(scaletta, t0, opts.until),
+    chapters: chaptersFromActions(agenda, t0, opts.until),
     entries: scelti.map((f) => ({
       offsetSec: Math.round((f.at.getTime() - t0.getTime()) / 1000),
       kind: f.kind,

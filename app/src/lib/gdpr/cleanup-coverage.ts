@@ -40,7 +40,7 @@ export const NOT_PURGED_BY_CLEANUP: Record<string, string> = {
   Poll: 'contenuto dell’evento: domanda, opzioni e voti restano; i voti perdono iscrizione e identificativo del browser (UPDATE di poll_votes nella transazione)',
   EventFeedback: 'valutazioni a stelle e commenti restano senza identità: iscrizione e identificativo del browser si tolgono (UPDATE di event_feedback nella transazione)',
   WordCloudRound: 'contenuto dell’evento: le parole restano, senza iscrizione né identificativo del browser (UPDATE di word_cloud_submissions nella transazione)',
-  EventAgendaItem: 'la scaletta è contenuto dell’evento, senza dati personali; le reazioni delle persone agli argomenti si cancellano',
+  EventAgendaItem: 'l’agenda è contenuto dell’evento, senza dati personali; le reazioni delle persone agli argomenti si cancellano',
   LiveAction: 'cronologia della sala senza nomi (titoli, risultati, ore delle azioni): contenuto dell’evento, serve anche alla post-produzione',
   EventOrganizer: 'enti organizzatori: dati istituzionali pubblici, non personali, e restano leggibili sull’evento anche dopo la conservazione dei dati',
   EventTagLink: 'legame con una parola chiave: nessun dato personale',

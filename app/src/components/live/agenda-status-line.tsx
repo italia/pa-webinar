@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * La riga sotto il titolo di un argomento della scaletta: lo stato scritto e
+ * La riga sotto il titolo di un argomento dell'agenda: lo stato scritto e
  * i suoi tempi. La usano il pannello e l'elenco nella barra della sala.
  *
  * Da discutere: quanto e' previsto. In corso: da quanto dura; chi conduce lo

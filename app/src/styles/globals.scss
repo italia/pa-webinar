@@ -198,13 +198,61 @@ html.live-call-immersive body {
   flex-shrink: 0;
 }
 
+// Proposta di avviare la registrazione: un avviso sotto la barra di chi
+// conduce, che non prende il focus.
+.live-rec-prompt {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  padding: 0.5rem 1rem;
+  flex-shrink: 0;
+  font-size: 0.875rem;
+  color: #17324d;
+  background: #e6f0fa;
+  border-bottom: 1px solid #b3cde8;
+}
+
+.live-rec-prompt__actions {
+  display: inline-flex;
+  gap: 0.5rem;
+}
+
 // Ancillary flex-children stacked above the main video area. Without
 // `flex-shrink: 0` a tight `100svh` column on mobile would squeeze
 // these banners and eat into their legibility.
-.live-hint-banner,
-.live-recording-banner,
-.live-overtime-banner {
+.live-hint-banner {
   flex-shrink: 0;
+}
+
+// Registrazione in corso: un'icona nella barra in alto, non una fascia.
+.live-rec-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 34px;
+  padding: 0 0.6rem;
+  border-radius: 6px;
+  background: #c4122f;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.live-rec-indicator__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #fff;
+  animation: pulse-dot 1.5s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .live-rec-indicator__dot {
+    animation: none;
+  }
 }
 
 // Main video flex-child. `min-width: 0` is the classic flexbox fix that
@@ -4174,9 +4222,17 @@ html.live-call-immersive body {
   &:focus-visible { opacity: 1; }
 }
 
-// Oltre l'orario: la sala resta aperta, ma il numero deve dirlo.
+// Oltre l'orario: la sala resta aperta, ma il numero deve dirlo. Anche a
+// contatore spento l'icona prende il colore: è l'unico segnale del fuori orario.
 .live-timer--over {
-  background: rgba(217, 54, 79, 0.85);
+  background: rgba(166, 99, 0, 0.9);
+  opacity: 1;
+}
+
+// Ultimi minuti prima della chiusura.
+.live-timer--closing {
+  background: rgba(217, 54, 79, 0.9);
+  opacity: 1;
 }
 
 // La mia reazione, distinta dal conteggio altrui.
@@ -5599,7 +5655,7 @@ html.live-resizing .live-sidebar-resizer::after {
   &:hover { scrollbar-color: rgba(23, 50, 77, 0.28) transparent; }
 }
 
-// ── Scaletta ──
+// ── Agenda ──
 //
 // Gli argomenti dell'incontro e il loro stato: da discutere (numero), in corso
 // (punto blu che pulsa), discusso (spunta verde), saltato (freccia, testo
@@ -6389,6 +6445,83 @@ html.live-resizing .live-sidebar-resizer::after {
     color: #A1112E;
     font-size: 0.75rem;
     font-weight: 700;
+  }
+}
+
+.people__error {
+  margin: 0 0 10px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: #fdecef;
+  color: #a1112e;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+// Comandi di chi modera per tutta la sala, in testa all'elenco.
+.people__tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.people__tool {
+  min-height: 32px;
+  padding: 0 0.65rem;
+  border: 1px solid #C5D0DA;
+  border-radius: 6px;
+  background: #fff;
+  color: #17324D;
+  font-size: 0.78rem;
+  font-weight: 600;
+
+  &:hover { background: #F0F4F8; }
+  &:focus-visible { outline: 2px solid #0066CC; outline-offset: 1px; }
+
+  // Microfoni o video bloccati: lo stato si legge senza aprire niente.
+  &.is-locked {
+    border-color: #A66300;
+    background: #FFF4E5;
+    color: #5C3D00;
+  }
+}
+
+// Mano alzata e azioni di chi modera sulla riga, sotto il nome.
+.people-row__hand-actions,
+.people-row__menu {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 6px 0 2px 42px;
+}
+
+.people-row__act {
+  min-height: 28px;
+  padding: 0 0.55rem;
+  border: 1px solid #C5D0DA;
+  border-radius: 6px;
+  background: #fff;
+  color: #17324D;
+  font-size: 0.75rem;
+  font-weight: 600;
+
+  &:hover { background: #F0F4F8; }
+  &:focus-visible { outline: 2px solid #0066CC; outline-offset: 1px; }
+
+  &.is-primary {
+    border-color: #0066CC;
+    background: #0066CC;
+    color: #fff;
+
+    &:hover { background: #004D99; }
+  }
+
+  &.is-danger { color: #A1112E; }
+
+  &.is-armed {
+    border-color: #A1112E;
+    background: #FDECEF;
   }
 }
 

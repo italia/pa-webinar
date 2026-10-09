@@ -1,7 +1,7 @@
 {
   "agenda": {
-    "title": "Scaletta",
-    "empty": "La scaletta non è ancora stata preparata.",
+    "title": "Agenda",
+    "empty": "L'agenda non è ancora stata preparata.",
     "add": "Aggiungi",
     "addPlaceholder": "Nuovo argomento…",
     "remove": "Elimina argomento",
@@ -44,7 +44,7 @@
     "minutesPlaceholder": "min",
     "minutesLabel": "Durata prevista in minuti (facoltativa)",
     "editLabel": "Titolo dell'argomento",
-    "agendaChanged": "La scaletta è appena cambiata: riprova.",
+    "agendaChanged": "L'agenda è appena cambiata: riprova.",
     "minutesInvalid": "La durata va scritta in minuti, da 1 a 600."
   },
   "common": {
@@ -295,6 +295,7 @@
       "indefinite": "L'orario di fine previsto è passato. L'evento resterà attivo finché ci sono partecipanti collegati."
     },
     "recordingActive": "Registrazione in corso",
+    "recordingShort": "REC",
     "recordingConsent": "Questo evento viene registrato. Entrando, acconsenti alla registrazione audio/video.",
     "recordingConsentTitle": "Consenso alla registrazione",
     "declineRecording": "Non partecipare",
@@ -349,7 +350,6 @@
     "recorderStartFailed": "La registrazione non si è avviata. Riprova tra qualche minuto; se il problema continua, avvisa chi gestisce la piattaforma.",
     "roomPreparing": "Sala in preparazione…",
     "roomPreparingDetail": "I server video si stanno avviando. L'operazione richiede circa 2 minuti. La sala si attiverà automaticamente.",
-    "recordingPromptTitle": "Avviare la registrazione?",
     "recordingPromptBody": "La registrazione è abilitata per questo evento. Vuoi avviarla ora?",
     "recordingPromptStart": "Avvia ora",
     "recordingPromptLater": "Dopo",
@@ -369,8 +369,8 @@
     "sidebarTabChat": "Chat",
     "sidebarTabPolls": "Sondaggi",
     "sidebarTabWordcloud": "In una parola",
-    "sidebarTabAgenda": "Scaletta",
-    "liveToggleAgenda": "Scaletta",
+    "sidebarTabAgenda": "Agenda",
+    "liveToggleAgenda": "Agenda",
     "sidebarTabMaterials": "Materiali",
     "sidebarTabParticipants": "Partecipanti",
     "chat": {
@@ -471,11 +471,26 @@
       "forwardedLink": "Link d’iscrizione di {email}",
       "sharedModeratorLink": "Link condiviso dei moderatori",
       "handRaisedAnnounce": "{name} ha alzato la mano",
-      "identityContested": "Identità non verificabile"
+      "identityContested": "Identità non verificabile",
+      "allTools": "Comandi per tutta la sala",
+      "stopAllVideo": "Spegni tutti i video",
+      "micLocked": "Microfoni bloccati",
+      "micUnlocked": "Microfoni liberi",
+      "micLockedHelp": "I partecipanti accendono il microfono solo quando dai loro la parola. Clic per lasciarli liberi.",
+      "micUnlockedHelp": "I partecipanti possono accendere il microfono. Clic per bloccarli: chi è acceso viene silenziato.",
+      "videoLocked": "Video bloccati",
+      "videoUnlocked": "Video liberi",
+      "videoLockedHelp": "I partecipanti accendono la videocamera solo quando dai loro la parola. Clic per lasciarli liberi.",
+      "videoUnlockedHelp": "I partecipanti possono accendere la videocamera. Clic per bloccarla: i video accesi si spengono.",
+      "actionsFor": "Azioni per {name}",
+      "mute": "Silenzia",
+      "stopVideo": "Spegni video",
+      "revokeFloor": "Togli la parola",
+      "lowerHandFailed": "Non è stato possibile abbassare la mano: riprova.",
+      "handsRaised": "{count, plural, one {# mano alzata} other {# mani alzate}}"
     },
     "moderator": {
       "muteAll": "Silenzia tutti",
-      "unmuteAll": "Riattiva audio",
       "startRecording": "Avvia registrazione",
       "stopRecording": "Ferma registrazione",
       "recPreparing": "Preparazione…",
@@ -483,20 +498,10 @@
       "endEvent": "Termina evento",
       "whiteboard": "Lavagna",
       "endEventConfirm": "Sei sicuro di voler terminare l'evento per tutti i partecipanti?",
-      "participantCount": "{count, plural, one {# partecipante} other {# partecipanti}}",
-      "raisedHands": "Mani alzate",
-      "noRaisedHands": "Nessuna mano alzata",
-      "giveFloor": "Dai la parola",
-      "approveAudio": "Dai la parola (audio)",
       "approveVideo": "Dai la parola (video)",
       "approveAll": "Dai la parola",
       "audioOnly": "Solo audio",
       "lowerHand": "Abbassa mano",
-      "participantFallback": "Partecipante",
-      "audioModeration": "Mic partecipanti",
-      "micDisabled": "Mic disattivato",
-      "videoModeration": "Video partecipanti",
-      "videoDisabled": "Video disattivato",
       "eventEndedSuccess": "Evento terminato con successo. Reindirizzamento..."
     },
     "closeDrawer": "Chiudi",
@@ -1441,7 +1446,7 @@
       "qaEnabled": "Abilita Q&A",
       "chatEnabled": "Abilita chat",
       "recordingEnabled": "Abilita registrazione video",
-      "agendaEnabled": "Scaletta dell'incontro",
+      "agendaEnabled": "Agenda dell'incontro",
       "agendaEnabledDesc": "La lista degli argomenti dell'incontro: durante l'evento il moderatore segna quello in corso, i discussi e i saltati, e la sala vede sempre a che punto si è, anche nella barra in alto. Confluisce nella sintesi automatica. Opzionale e attivabile anche durante l'evento.",
       "wordCloudEnabled": "Domande «In una parola»",
       "wordCloudEnabledDesc": "Il moderatore fa una domanda e ognuno risponde con una parola sola: le risposte formano una nuvola che si aggiorna in diretta, e le parole più scritte diventano più grandi. Utile per rompere il ghiaccio o raccogliere un'impressione in pochi secondi.",
@@ -3125,8 +3130,8 @@
         "desc": "Scrivi nella chat dell'evento e segui la conversazione con gli altri partecipanti."
       },
       "agenda": {
-        "title": "Scaletta",
-        "desc": "Segui l'argomento in corso e la scaletta dell'incontro."
+        "title": "Agenda",
+        "desc": "Segui l'argomento in corso e l'agenda dell'incontro."
       }
     },
     "projectTeaser": {

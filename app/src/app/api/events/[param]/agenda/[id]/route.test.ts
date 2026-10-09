@@ -1,5 +1,5 @@
 /**
- * Stato degli argomenti della scaletta: uno solo in corso, e la spunta dei
+ * Stato degli argomenti dell'agenda: uno solo in corso, e la spunta dei
  * client precedenti che continua a funzionare.
  */
 import type { NextRequest } from 'next/server';
@@ -79,7 +79,7 @@ describe('PATCH /api/events/[slug]/agenda/[id]', () => {
     expect(pokeLivePanel).toHaveBeenCalledWith(EVENT_ID, 'agenda');
   });
 
-  it('avviare blocca la scaletta dell’evento per tutta la transazione', async () => {
+  it('avviare blocca l’agenda dell’evento per tutta la transazione', async () => {
     await PATCH(patch({ status: 'CURRENT' }), ctx());
     expect(tx.$executeRaw).toHaveBeenCalledTimes(1);
     const sql = (tx.$executeRaw.mock.calls[0]?.[0] as TemplateStringsArray).join('?');

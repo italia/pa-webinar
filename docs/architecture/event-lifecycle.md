@@ -379,15 +379,16 @@ There is no automatic return from `PROVISIONING` to `PUBLISHED`. A `PROVISIONING
 
 ## Overtime, leaving and revival
 
-### The overtime banner
+### The overtime countdown
 
-In the live room, once `endsAt` has passed, participants see a banner computed in the browser from `endsAt` and the effective grace, refreshed every 30 seconds (`app/src/components/live/live-event-client.tsx`):
+In the live room, once `endsAt` has passed, the event timer in the top bar shows the overtime (`app/src/components/live/event-timer.tsx`). It is computed in the browser from `endsAt` and the effective overtime limit:
 
-- with a finite grace: "The scheduled end time has passed. The event will close automatically in N minutes", then "End time reached. The event is about to close.";
-- with grace `-1`: "The scheduled end time has passed. The event will stay open while participants are connected.";
-- with grace `0`: no banner.
+- the timer counts on with `+` and turns amber, also when it is switched off and only its icon shows;
+- its tooltip says "The scheduled end time has passed. The event will close automatically in N minutes", then "End time reached. The event is about to close."; with a limit of `-1`, "The scheduled end time has passed. The event will stay open while participants are connected.";
+- in the last ten minutes before the limit it turns red;
+- a screen-reader announcement is made when the overtime begins and when the last ten minutes start, not at every change of the count.
 
-The banner does not ask the server. The close itself is made by the scaler or the lifecycle cron on its next tick.
+The countdown does not ask the server, and it shows the overtime limit: a room that empties closes earlier. The close itself is made by the scaler or the lifecycle cron on its next tick.
 
 ### Leaving and ending
 

@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * La scaletta dell'incontro (funzione opzionale agendaEnabled).
+ * L'agenda dell'incontro (funzione opzionale agendaEnabled).
  *
  * Il moderatore prepara gli argomenti (anche incollando un elenco, uno per
  * riga), con una durata prevista se vuole, li riordina e ne guida lo stato: da

@@ -42,7 +42,7 @@ export const CLEANABLE_EVENT_STATUSES = ['ENDED', 'ARCHIVED'] as const;
  * ripulisce nello stesso giro.
  *
  * DRAFT è escluso di proposito: una bozza non ha mai raccolto iscrizioni, e la
- * sua configurazione (scaletta, relatori, promemoria) è ciò che una copia
+ * sua configurazione (agenda, relatori, promemoria) è ciò che una copia
  * eredita — ripulirla la svuoterebbe per chi la tiene come modello.
  */
 export const UNFINISHED_EVENT_STATUSES = ['PUBLISHED', 'PROVISIONING', 'IDLE', 'LIVE'] as const;

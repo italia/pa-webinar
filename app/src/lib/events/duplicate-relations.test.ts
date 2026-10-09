@@ -112,7 +112,7 @@ describe('classificazione delle relazioni di Event', () => {
     expect(DUPLICATE_SOURCE_INCLUDE.additionalMods.where).toEqual({ revokedAt: null });
   });
 
-  it('non legge lo stato di esecuzione della scaletta', () => {
+  it('non legge lo stato di esecuzione dell’agenda', () => {
     const selected = Object.keys(DUPLICATE_SOURCE_INCLUDE.agendaItems.select);
     expect(selected).not.toContain('completed');
     expect(selected).not.toContain('completedAt');
@@ -134,7 +134,7 @@ describe('duplicatedRelations', () => {
     expect(new Set(tokens).size).toBe(2);
   });
 
-  it('copia la scaletta ma non il suo stato di esecuzione', () => {
+  it('copia l’agenda ma non il suo stato di esecuzione', () => {
     const out = duplicatedRelations(fullSource());
     const items = out.agendaItems?.create as Record<string, unknown>[];
     expect(items[0]).toEqual({ label: 'Apertura', sortOrder: 0, plannedMinutes: 10 });

@@ -196,6 +196,12 @@ services:
       - JICOFO_AUTH_PASSWORD=jicofo_pass
       - AUTH_TYPE=jwt
       - ENABLE_AUTH=1
+      # Come nel chart: Jicofo senza autenticazione propria non promuove a
+      # moderatore chi entra, e il ruolo resta quello del token (Prosody
+      # rifiuta comunque chi non ha un token valido). Con l'autenticazione
+      # accesa ogni ospite diventava moderatore, e con il ruolo l'ammissione
+      # al microfono nelle sale moderate.
+      - JICOFO_ENABLE_AUTH=false
       - ENABLE_AUTO_OWNER=false
       - JICOFO_ENABLE_AUTO_OWNER=false
       - JICOFO_AUTHENTICATION_TYPE=jwt

@@ -244,7 +244,7 @@ export const POST = withErrorHandling(async (request, context) => {
       endsAt,
 
       // Le relazioni ereditate, dallo stesso elenco classificato: tag,
-      // organizzatori, co-moderatori (con token NUOVI), scaletta, questionari e
+      // organizzatori, co-moderatori (con token NUOVI), agenda, questionari e
       // promemoria. Prima qui c'erano solo i promemoria, scritti a mano — ed è
       // per questo che tutto il resto si perdeva a ogni duplicazione.
       ...duplicatedRelations(source),

@@ -50,26 +50,3 @@ export default function RecordingConsent({
     </div>
   );
 }
-
-interface RecordingBannerProps {
-  visible: boolean;
-}
-
-export function RecordingBanner({ visible }: RecordingBannerProps) {
-  const t = useTranslations('live');
-
-  if (!visible) return null;
-
-  // Una fascia sottile, non un .alert: l'icona dell'alert di Bootstrap Italia
-  // e' alta quanto un alert pieno e su una riga sola usciva tagliata in alto.
-  return (
-    <div
-      role="status"
-      className="d-flex align-items-center justify-content-center gap-2 py-1 small fw-semibold"
-      style={{ background: '#FFF4E5', color: '#5C3D00', borderBottom: '1px solid #F0C36D' }}
-    >
-      <span aria-hidden="true" style={{ color: '#C4122F' }}>●</span>
-      {t('recordingActive')}
-    </div>
-  );
-}

@@ -47,10 +47,19 @@ async function render(api: JitsiMeetExternalAPI, isModerator = true) {
   });
 }
 
+const tm = messages.live.moderator;
+
+const pulsanti = () => Array.from(container.querySelectorAll<HTMLButtonElement>('button'));
+const prefisso = (testo: string) => testo.split('{name}')[0]!;
+/** Il pulsante che apre le azioni di chi modera su una riga. */
+const actionButtons = () =>
+  pulsanti().filter((b) => (b.getAttribute('aria-label') ?? '').startsWith(prefisso(tp.actionsFor)));
 const kickButtons = () =>
-  Array.from(container.querySelectorAll<HTMLButtonElement>('button')).filter(
-    (b) => b.title === tp.kick,
-  );
+  pulsanti().filter((b) => (b.getAttribute('aria-label') ?? '').startsWith(prefisso(tp.kickName)));
+const byText = (testo: string) => pulsanti().find((b) => b.textContent?.trim() === testo);
+async function apriAzioni() {
+  await act(async () => actionButtons()[0]!.click());
+}
 
 beforeEach(() => {
   (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
@@ -67,6 +76,10 @@ afterEach(() => {
 describe('ParticipantPanel — espellere', () => {
   it('chi modera nel portale può espellere gli altri, non se stesso', async () => {
     await render(fakeApi(undefined));
+    const azioni = actionButtons();
+    expect(azioni).toHaveLength(1);
+    expect(azioni[0]!.getAttribute('aria-label')).toBe(tp.actionsFor.replace('{name}', 'Ospite'));
+    await apriAzioni();
     const buttons = kickButtons();
     expect(buttons).toHaveLength(1);
     expect(buttons[0]!.getAttribute('aria-label')).toBe(
@@ -88,11 +101,12 @@ describe('ParticipantPanel — espellere', () => {
         ],
       }),
     );
-    expect(kickButtons()).toHaveLength(1);
+    expect(actionButtons()).toHaveLength(1);
   });
 
   it('chi non modera nel portale non vede il pulsante', async () => {
     await render(fakeApi(undefined), false);
+    expect(actionButtons()).toHaveLength(0);
     expect(kickButtons()).toHaveLength(0);
   });
 });
@@ -144,10 +158,56 @@ describe('ParticipantPanel — espellere con conferma', () => {
     const executeCommand = vi.fn();
     (api as unknown as { executeCommand: typeof executeCommand }).executeCommand = executeCommand;
     await render(api);
+    await apriAzioni();
     await act(async () => kickButtons()[0]!.click());
     expect(executeCommand).not.toHaveBeenCalled();
     await act(async () => kickButtons()[0]!.click());
     expect(executeCommand).toHaveBeenCalledWith('kickParticipant', 'p2');
+  });
+});
+
+describe('ParticipantPanel — comandi di chi modera', () => {
+  async function conComandi(isModerator = true) {
+    const api = fakeApi(undefined);
+    const executeCommand = vi.fn();
+    (api as unknown as { executeCommand: typeof executeCommand }).executeCommand = executeCommand;
+    await render(api, isModerator);
+    return executeCommand;
+  }
+
+  it('silenzia tutti e spegne tutti i video, una persona alla volta e mai sé', async () => {
+    const cmd = await conComandi();
+    await act(async () => byText(tm.muteAll)!.click());
+    expect(cmd).toHaveBeenCalledWith('muteRemoteParticipant', 'p2', 'audio');
+    await act(async () => byText(tp.stopAllVideo)!.click());
+    expect(cmd).toHaveBeenCalledWith('muteRemoteParticipant', 'p2', 'video');
+    // Il «silenzia tutti» di Jitsi toglierebbe la parola anche ai relatori.
+    expect(cmd).not.toHaveBeenCalledWith('muteEveryone', expect.anything());
+    expect(cmd).not.toHaveBeenCalledWith('muteRemoteParticipant', 'io', expect.anything());
+  });
+
+  it('bloccare i microfoni spegne chi è acceso e accende la moderazione', async () => {
+    const cmd = await conComandi();
+    const blocco = byText(tp.micUnlocked)!;
+    expect(blocco.getAttribute('aria-pressed')).toBe('false');
+    await act(async () => blocco.click());
+    expect(cmd).toHaveBeenCalledWith('muteRemoteParticipant', 'p2', 'audio');
+    expect(cmd).toHaveBeenCalledWith('toggleModeration', true, 'audio');
+  });
+
+  it('sulla riga: silenzia e spegne il video di una persona', async () => {
+    const cmd = await conComandi();
+    await apriAzioni();
+    await act(async () => byText(tp.mute)!.click());
+    expect(cmd).toHaveBeenCalledWith('muteRemoteParticipant', 'p2', 'audio');
+    await act(async () => byText(tp.stopVideo)!.click());
+    expect(cmd).toHaveBeenCalledWith('muteRemoteParticipant', 'p2', 'video');
+  });
+
+  it('chi non modera non ha i comandi', async () => {
+    await conComandi(false);
+    expect(byText(tm.muteAll)).toBeUndefined();
+    expect(byText(tp.micUnlocked)).toBeUndefined();
   });
 });
 
@@ -174,6 +234,25 @@ describe('ParticipantPanel — mani alzate e chi parla', () => {
 
     await act(async () => emetti('raiseHandUpdated', { id: 'io', handRaised: 0 }));
     expect(container.textContent).not.toContain('✋');
+  });
+
+  it('chi modera dà la parola dalla riga di chi ha alzato la mano', async () => {
+    const { api, emetti } = apiConEventi();
+    const executeCommand = vi.fn();
+    (api as unknown as { executeCommand: typeof executeCommand }).executeCommand = executeCommand;
+    const onHands = vi.fn();
+    await act(async () => {
+      root.render(
+        <NextIntlClientProvider locale="it" messages={messages} timeZone="Europe/Rome">
+          <ParticipantPanel api={api} isModerator localParticipantId="io" onHandsChange={onHands} />
+        </NextIntlClientProvider>,
+      );
+    });
+    await act(async () => emetti('raiseHandUpdated', { id: 'p2', handRaised: 2000 }));
+    expect(onHands).toHaveBeenLastCalledWith(1);
+    await act(async () => byText(tm.approveAll)!.click());
+    expect(executeCommand).toHaveBeenCalledWith('askToUnmute', 'p2');
+    expect(executeCommand).toHaveBeenCalledWith('approveVideo', 'p2');
   });
 
   it('la propria riga dice «tu» e non offre il volume', async () => {

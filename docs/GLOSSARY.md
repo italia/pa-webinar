@@ -381,8 +381,9 @@ questions and upvote them; moderators highlight, answer or dismiss them. It is
 controlled by `qaEnabled` and is distinct from a chat message marked as a
 question. [Live interaction and realtime](architecture/live-interaction.md)
 
-**Raised hand** (UI **Raised hands**): Jitsi's native raise-hand. Moderators
-see the queue of raised hands in the app.
+**Raised hand** (UI **Raised hands**): Jitsi's native raise-hand. Raised hands
+come first in the **Participants** panel, where moderators give the floor or
+lower them.
 [Live interaction and realtime](architecture/live-interaction.md)
 
 **Reactions** (`reactionsMode`): emoji reactions, either Jitsi's native button
@@ -1002,7 +1003,7 @@ these docs and the code use *organizer*.
 | In una parola | **In one word** | word cloud (`WordCloudRound`) |
 | Reazioni | **Reactions** | reactions |
 | Mani alzate | **Raised hands** | raised-hand queue |
-| Scaletta | **Agenda** | agenda (`agendaEnabled`) |
+| Agenda | **Agenda** | agenda (`agendaEnabled`) |
 | Lavagna | **Whiteboard** | whiteboard (`whiteboardEnabled`) |
 | Registrazione in corso | **Recording in progress** | recording (never "registration") |
 | Guarda dall'inizio | **Watch from the start** | temporary recording (catch-up) |

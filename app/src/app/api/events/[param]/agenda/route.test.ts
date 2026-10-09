@@ -1,5 +1,5 @@
 /**
- * La scaletta: aggiungere un argomento o un elenco, riordinare, e la lettura
+ * L'agenda: aggiungere un argomento o un elenco, riordinare, e la lettura
  * leggera per la barra della sala.
  */
 import type { NextRequest } from 'next/server';
@@ -71,7 +71,7 @@ beforeEach(() => {
 });
 
 describe('POST /api/events/[slug]/agenda', () => {
-  it('un argomento con la durata prevista: in coda alla scaletta', async () => {
+  it('un argomento con la durata prevista: in coda all’agenda', async () => {
     const res = await POST(req('POST', { label: '  Apertura  ', plannedMinutes: 10 }), ctx());
     expect(res.status).toBe(201);
     const creato = (await res.json()) as Record<string, unknown>;

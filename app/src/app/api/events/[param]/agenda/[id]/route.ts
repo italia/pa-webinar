@@ -1,5 +1,5 @@
 /**
- * Un argomento della scaletta (solo moderatore).
+ * Un argomento dell'agenda (solo moderatore).
  *   PATCH { status?, label?, plannedMinutes? } → stato, titolo, durata
  *         prevista. `completed` resta accettato per i client precedenti.
  *   DELETE → toglie l'argomento.
@@ -54,11 +54,11 @@ export const PATCH = withErrorHandling(async (request, context) => {
     let giaInCorso = false;
     let chiusi: { id: string; label: string }[] = [];
     if (status === 'CURRENT') {
-      // I cambi di stato della stessa scaletta in fila: sotto READ COMMITTED
+      // I cambi di stato della stessa agenda in fila: sotto READ COMMITTED
       // due «prossimo argomento» contemporanei (due moderatori, o un doppio
       // clic) non vedrebbero l'uno l'argomento dell'altro, e ne resterebbero
       // due in corso. NO KEY UPDATE: mette in fila le scritture della
-      // scaletta senza fermare chat, domande e iscrizioni dello stesso evento,
+      // agenda senza fermare chat, domande e iscrizioni dello stesso evento,
       // che sulla riga prendono solo il KEY SHARE della chiave esterna.
       await tx.$executeRaw`SELECT id FROM events WHERE id = ${eventId}::uuid FOR NO KEY UPDATE`;
       const attuale = await tx.eventAgendaItem.findUnique({ where: { id }, select: { status: true } });

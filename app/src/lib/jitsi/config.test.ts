@@ -100,12 +100,18 @@ describe('Jitsi config exports', () => {
     expect(mobileBaseToolbarButtons).not.toContain('hangup');
   });
 
-  it('mobileModeratorToolbarButtons extends mobile base with participants-pane, no hangup', () => {
+  it('mobileModeratorToolbarButtons è la barra mobile di base, senza hangup', () => {
     for (const btn of mobileBaseToolbarButtons) {
       expect(mobileModeratorToolbarButtons).toContain(btn);
     }
     expect(mobileModeratorToolbarButtons).not.toContain('hangup');
-    expect(mobileModeratorToolbarButtons).toContain('participants-pane');
+  });
+
+  it('chi modera gestisce la sala dalla scheda Partecipanti, non dalla barra di Jitsi', () => {
+    for (const barra of [moderatorToolbarButtons, mobileModeratorToolbarButtons]) {
+      expect(barra).not.toContain('participants-pane');
+      expect(barra).not.toContain('mute-everyone');
+    }
   });
 });
 

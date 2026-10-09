@@ -18,8 +18,6 @@ import type { JitsiMeetExternalAPI } from '@/types/jitsi';
 import { useJitsiEvents } from '@/hooks/use-jitsi-events';
 import { useRouter, percorso } from '@/i18n/navigation';
 
-import RaisedHandsPanel from './raised-hands-panel';
-
 interface ModeratorControlsProps {
   api: JitsiMeetExternalAPI | null;
   eventId: string;
@@ -38,9 +36,6 @@ interface ModeratorControlsProps {
    *  Server Component (lib/jitsi/whiteboard.ts), never read from
    *  `process.env` here: webpack would freeze it into the image at build. */
   whiteboardInfraReady?: boolean;
-  /** Local moderator's display name, forwarded to the raised-hands panel
-   *  so it can resolve the current user's own raise-hand event. */
-  localDisplayName?: string;
   /** Only the PRIMARY moderator can reach /admin/events/[id]. Co-moderators
    *  and speakers hold a magic-link token without admin rights, so redirecting
    *  them there after "Termina evento" lands on a 404 — they just close. */
@@ -67,12 +62,6 @@ const BTN_DEFAULT: React.CSSProperties = {
   color: '#C9D4DE',
 };
 
-const BTN_ACTIVE_WARN: React.CSSProperties = {
-  fontSize: '0.82rem',
-  background: 'var(--app-primary)',
-  color: '#fff',
-};
-
 const BTN_DANGER: React.CSSProperties = {
   fontSize: '0.82rem',
 };
@@ -85,7 +74,6 @@ export default function ModeratorControls({
   recorderPhase = null,
   whiteboardEnabled = false,
   whiteboardInfraReady = false,
-  localDisplayName = '',
   isPrimaryModerator = false,
   onEnded,
   modalContainer,
@@ -95,15 +83,11 @@ export default function ModeratorControls({
   const tc = useTranslations('common');
   const router = useRouter();
 
-  const { participantCount, isRecording } = useJitsiEvents(api);
+  const { isRecording } = useJitsiEvents(api);
 
   const [endModalOpen, setEndModalOpen] = useState(false);
   const [ending, setEnding] = useState(false);
-  const [handsOpen, setHandsOpen] = useState(false);
-  const [handsCount, setHandsCount] = useState(0);
   const [recToast, setRecToast] = useState('');
-  const [audioModerationActive, setAudioModerationActive] = useState(false);
-  const [videoModerationActive, setVideoModerationActive] = useState(false);
 
   const [recSeconds, setRecSeconds] = useState(0);
   const [recCooldown, setRecCooldown] = useState(false);
@@ -160,62 +144,6 @@ export default function ModeratorControls({
     recorderPhase === 'non-configurato';
 
   useEffect(() => {
-    if (!api) return;
-    const onModerationChanged = (evt: { enabled: boolean; mediaType: string }) => {
-      if (evt.mediaType === 'audio') setAudioModerationActive(evt.enabled);
-      if (evt.mediaType === 'video') setVideoModerationActive(evt.enabled);
-    };
-    api.addListener('moderationStatusChanged', onModerationChanged);
-    // La sala può essere già moderata prima che questa barra ascolti: il
-    // blocco lo accende il primo ingresso (mod_pa_media_lock), e l'avviso
-    // arriva a chi entra prima del montaggio. Si chiede lo stato a Jitsi.
-    let attivo = true;
-    const leggi = (tipo: 'audio' | 'video', imposta: (v: boolean) => void) => {
-      const richiesta = api.isModerationOn?.(tipo);
-      if (!richiesta) return;
-      richiesta
-        .then((v) => {
-          if (attivo && typeof v === 'boolean') imposta(v);
-        })
-        .catch(() => {
-          /* la richiesta non è andata: resta l'evento */
-        });
-    };
-    leggi('audio', setAudioModerationActive);
-    leggi('video', setVideoModerationActive);
-    return () => {
-      attivo = false;
-      api.removeListener('moderationStatusChanged', onModerationChanged);
-    };
-  }, [api]);
-
-  // Track raised hands even when panel is closed
-  useEffect(() => {
-    if (!api) return;
-    const raisedIds = new Set<string>();
-
-    const onRaiseHand = (evt: { id: string; handRaised: number }) => {
-      if (evt.handRaised > 0) {
-        raisedIds.add(evt.id);
-      } else {
-        raisedIds.delete(evt.id);
-      }
-      setHandsCount(raisedIds.size);
-    };
-    const onLeft = (evt: { id: string }) => {
-      raisedIds.delete(evt.id);
-      setHandsCount(raisedIds.size);
-    };
-
-    api.addListener('raiseHandUpdated', onRaiseHand);
-    api.addListener('participantLeft', onLeft);
-    return () => {
-      api.removeListener('raiseHandUpdated', onRaiseHand);
-      api.removeListener('participantLeft', onLeft);
-    };
-  }, [api]);
-
-  useEffect(() => {
     if (isRecording) {
       setRecSeconds(0);
       recTimerRef.current = setInterval(() => {
@@ -235,21 +163,6 @@ export default function ModeratorControls({
     const s = String(secs % 60).padStart(2, '0');
     return `${m}:${s}`;
   };
-
-  const handleToggleAudioModeration = useCallback(() => {
-    if (!api) return;
-    if (audioModerationActive) {
-      api.executeCommand('toggleModeration', false, 'audio');
-    } else {
-      api.executeCommand('muteEveryone');
-      api.executeCommand('toggleModeration', true, 'audio');
-    }
-  }, [api, audioModerationActive]);
-
-  const handleToggleVideoModeration = useCallback(() => {
-    if (!api) return;
-    api.executeCommand('toggleModeration', !videoModerationActive, 'video');
-  }, [api, videoModerationActive]);
 
   const recRetryRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const recAttemptsRef = useRef(0);
@@ -356,56 +269,6 @@ export default function ModeratorControls({
         style={BAR_STYLE}
       >
         <div className="d-flex align-items-center gap-2 flex-wrap">
-          {/* Moderazione audio e video: sempre, anche quando l'evento non concede
-              microfono e videocamera. Lì la sala parte già moderata
-              (mod_pa_media_lock) e da qui chi conduce può aprire. */}
-          <Button
-            color={audioModerationActive ? 'warning' : 'secondary'}
-            size="sm"
-            className={BTN_BASE}
-            onClick={handleToggleAudioModeration}
-            disabled={!api}
-            style={audioModerationActive ? BTN_ACTIVE_WARN : BTN_DEFAULT}
-          >
-            <Icon icon="it-hearing" size="sm" color="white" />
-            {audioModerationActive ? t('micDisabled') : t('audioModeration')}
-          </Button>
-
-          <Button
-            color={videoModerationActive ? 'warning' : 'secondary'}
-            size="sm"
-            className={BTN_BASE}
-            onClick={handleToggleVideoModeration}
-            disabled={!api}
-            style={videoModerationActive ? BTN_ACTIVE_WARN : BTN_DEFAULT}
-          >
-            <Icon icon="it-video" size="sm" color="white" />
-            {videoModerationActive ? t('videoDisabled') : t('videoModeration')}
-          </Button>
-
-          {/* Raised hands */}
-          <Button
-            color={handsCount > 0 ? 'warning' : 'secondary'}
-            size="sm"
-            className={`${BTN_BASE} position-relative`}
-            onClick={() => setHandsOpen(!handsOpen)}
-            disabled={!api}
-            style={handsCount > 0 ? BTN_ACTIVE_WARN : BTN_DEFAULT}
-          >
-            <span style={{ fontSize: '1rem' }}>&#9995;</span>
-            {t('raisedHands')}
-            {handsCount > 0 && (
-              <Badge
-                color="danger"
-                pill
-                className="ms-1"
-                style={{ fontSize: '0.7rem' }}
-              >
-                {handsCount}
-              </Badge>
-            )}
-          </Button>
-
           {/* Recording — il pulsante normale ogni volta che si può agire:
               registrazione in corso (va sempre potuta fermare, qualunque cosa
               dica la sonda), pausa dopo lo stop, registratore pronto o stato
@@ -523,17 +386,6 @@ export default function ModeratorControls({
             {t('endEvent')}
           </Button>
         </div>
-
-        {/* Participant count */}
-        <Badge
-          color=""
-          pill
-          className="px-3 py-1"
-          style={{ backgroundColor: 'rgba(255,255,255,0.12)', color: '#fff', fontSize: '0.82rem' }}
-        >
-          <Icon icon="it-user" size="xs" className="me-1" />
-          {t('participantCount', { count: participantCount })}
-        </Badge>
       </div>
 
       {/* Jibri toast */}
@@ -545,22 +397,6 @@ export default function ModeratorControls({
           {recToast}
         </div>
       )}
-
-      {/* Raised hands panel — ALWAYS mounted (we toggle visibility, not the
-          mount) so its `raiseHandUpdated` listener subscribes the moment the
-          API is ready and captures hands raised BEFORE the moderator opens the
-          panel. Lazy-mounting on `handsOpen` missed that event and left the
-          list empty — while the badge counter (its own permanent listener)
-          showed the right number, the smoking gun of the mount/listener race.
-          Mirrors the always-mounted read-only panel on the participant side. */}
-      <div className={handsOpen ? '' : 'd-none'}>
-        <RaisedHandsPanel
-          api={api}
-          localDisplayName={localDisplayName}
-          eventId={eventId}
-          moderatorToken={moderatorToken}
-        />
-      </div>
 
       {/* End event confirmation modal */}
       <Modal
