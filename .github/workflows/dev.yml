@@ -41,6 +41,14 @@ on:
         description: "Forza il build del recorder-controller anche se infra/recorder-controller/ non è cambiato"
         type: boolean
         default: false
+      force_captions_gateway_build:
+        description: "Forza il build del gateway dei sottotitoli anche se infra/captions/gateway/ non è cambiato"
+        type: boolean
+        default: false
+      force_captions_engine_build:
+        description: "Forza il build del motore dei sottotitoli anche se infra/captions/engine/ non è cambiato"
+        type: boolean
+        default: false
 
 env:
   REGISTRY: ghcr.io
@@ -49,6 +57,8 @@ env:
   WORKER_CPU_IMAGE_NAME: italia/pa-webinar-postprod-worker-cpu
   RECORDER_IMAGE_NAME: italia/pa-webinar-recorder
   RECORDER_CONTROLLER_IMAGE_NAME: italia/pa-webinar-recorder-controller
+  CAPTIONS_GATEWAY_IMAGE_NAME: italia/pa-webinar-captions-gateway
+  CAPTIONS_ENGINE_IMAGE_NAME: italia/pa-webinar-captions-engine
 
 concurrency:
   # Cancel in-flight dev builds when a new push lands — we only care about
@@ -525,3 +535,194 @@ jobs:
           echo '| image | tag |' >> "$GITHUB_STEP_SUMMARY"
           echo '|---|---|' >> "$GITHUB_STEP_SUMMARY"
           echo '| recorder-controller | `dev`, `dev-${{ steps.tags.outputs.sha_short }}` |' >> "$GITHUB_STEP_SUMMARY"
+
+  # ── Captions Gateway ──
+  # Gateway dei sottotitoli live (Node, niente modelli): builda solo se
+  # `infra/captions/gateway/` è cambiato, o force_captions_gateway_build=true.
+  detect-captions-gateway-changes:
+    name: Detect captions-gateway changes
+    runs-on: arc-runner-pa-webinar
+    outputs:
+      changed: ${{ steps.filter.outputs.changed }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          # Serve la storia, non gli ultimi due commit: il confronto qui sotto
+          # copre l'intero intervallo del push.
+          fetch-depth: 0
+      - name: Filter changed files
+        id: filter
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && \
+             [ "${{ inputs.force_captions_gateway_build }}" = "true" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # Intervallo del PUSH, non ultimo commit (vedi i job del recorder).
+          PRIMA="${{ github.event.before }}"
+          if [ -z "$PRIMA" ] || [ "$PRIMA" = "0000000000000000000000000000000000000000" ] \
+             || ! git cat-file -e "$PRIMA^{commit}" 2>/dev/null; then
+            PRIMA="HEAD~1"
+          fi
+          CHANGED=$(git diff --name-only "$PRIMA" HEAD || git ls-files)
+          if echo "$CHANGED" | grep -qE '^infra/captions/gateway/'; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  build-captions-gateway:
+    # Niente artefatti di build: la quota di Actions e' dell'organizzazione
+    # (vedi build-and-push).
+    env:
+      DOCKER_BUILD_SUMMARY: "false"
+      DOCKER_BUILD_RECORD_UPLOAD: "false"
+    name: Build & Push Captions Gateway Image
+    needs: detect-captions-gateway-changes
+    if: needs.detect-captions-gateway-changes.outputs.changed == 'true'
+    runs-on: arc-runner-pa-webinar
+    permissions:
+      contents: read
+      packages: write
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
+
+      - name: Login to GHCR
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Compute tags
+        id: tags
+        run: |
+          SHA_SHORT="${GITHUB_SHA::7}"
+          {
+            echo "sha_short=$SHA_SHORT"
+            echo "tags=${{ env.REGISTRY }}/${{ env.CAPTIONS_GATEWAY_IMAGE_NAME }}:dev,${{ env.REGISTRY }}/${{ env.CAPTIONS_GATEWAY_IMAGE_NAME }}:dev-$SHA_SHORT"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Build and push captions-gateway image
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
+        with:
+          context: ./infra/captions/gateway
+          file: ./infra/captions/gateway/Dockerfile
+          push: true
+          tags: ${{ steps.tags.outputs.tags }}
+          platforms: linux/amd64
+          cache-from: ${{ inputs.no_cache && '' || 'type=gha,scope=dev-captions-gateway' }}
+          cache-to: ${{ inputs.no_cache && '' || 'type=gha,mode=max,scope=dev-captions-gateway' }}
+          labels: |
+            org.opencontainers.image.title=pa-webinar-captions-gateway
+            org.opencontainers.image.description=Live captions gateway (Jitsi bridge audio to local speech engine) for pa-webinar
+            org.opencontainers.image.source=https://github.com/italia/pa-webinar
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.ref.name=dev
+
+      - name: Summary
+        run: |
+          echo "### Captions Gateway image pushed" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo '| image | tag |' >> "$GITHUB_STEP_SUMMARY"
+          echo '|---|---|' >> "$GITHUB_STEP_SUMMARY"
+          echo '| captions-gateway | `dev`, `dev-${{ steps.tags.outputs.sha_short }}` |' >> "$GITHUB_STEP_SUMMARY"
+
+  # ── Captions Engine ──
+  # Motore dei sottotitoli live (NeMo-Speech.cpp per CPU): l'immagine porta
+  # il binario, non il modello, che il pod scarica all'avvio. Builda solo se
+  # `infra/captions/engine/` è cambiato, o force_captions_engine_build=true.
+  detect-captions-engine-changes:
+    name: Detect captions-engine changes
+    runs-on: arc-runner-pa-webinar
+    outputs:
+      changed: ${{ steps.filter.outputs.changed }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          # Serve la storia, non gli ultimi due commit: il confronto qui sotto
+          # copre l'intero intervallo del push.
+          fetch-depth: 0
+      - name: Filter changed files
+        id: filter
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && \
+             [ "${{ inputs.force_captions_engine_build }}" = "true" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # Intervallo del PUSH, non ultimo commit (vedi i job del recorder).
+          PRIMA="${{ github.event.before }}"
+          if [ -z "$PRIMA" ] || [ "$PRIMA" = "0000000000000000000000000000000000000000" ] \
+             || ! git cat-file -e "$PRIMA^{commit}" 2>/dev/null; then
+            PRIMA="HEAD~1"
+          fi
+          CHANGED=$(git diff --name-only "$PRIMA" HEAD || git ls-files)
+          if echo "$CHANGED" | grep -qE '^infra/captions/engine/'; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  build-captions-engine:
+    # Niente artefatti di build: la quota di Actions e' dell'organizzazione
+    # (vedi build-and-push).
+    env:
+      DOCKER_BUILD_SUMMARY: "false"
+      DOCKER_BUILD_RECORD_UPLOAD: "false"
+    name: Build & Push Captions Engine Image
+    needs: detect-captions-engine-changes
+    if: needs.detect-captions-engine-changes.outputs.changed == 'true'
+    runs-on: arc-runner-pa-webinar
+    permissions:
+      contents: read
+      packages: write
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
+
+      - name: Login to GHCR
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Compute tags
+        id: tags
+        run: |
+          SHA_SHORT="${GITHUB_SHA::7}"
+          {
+            echo "sha_short=$SHA_SHORT"
+            echo "tags=${{ env.REGISTRY }}/${{ env.CAPTIONS_ENGINE_IMAGE_NAME }}:dev,${{ env.REGISTRY }}/${{ env.CAPTIONS_ENGINE_IMAGE_NAME }}:dev-$SHA_SHORT"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Build and push captions-engine image
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
+        with:
+          context: ./infra/captions/engine
+          file: ./infra/captions/engine/Dockerfile
+          push: true
+          tags: ${{ steps.tags.outputs.tags }}
+          platforms: linux/amd64
+          cache-from: ${{ inputs.no_cache && '' || 'type=gha,scope=dev-captions-engine' }}
+          cache-to: ${{ inputs.no_cache && '' || 'type=gha,mode=max,scope=dev-captions-engine' }}
+          labels: |
+            org.opencontainers.image.title=pa-webinar-captions-engine
+            org.opencontainers.image.description=Live captions speech engine (NeMo-Speech.cpp, CPU); the model is downloaded at pod start
+            org.opencontainers.image.source=https://github.com/italia/pa-webinar
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.ref.name=dev
+
+      - name: Summary
+        run: |
+          echo "### Captions Engine image pushed" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo '| image | tag |' >> "$GITHUB_STEP_SUMMARY"
+          echo '|---|---|' >> "$GITHUB_STEP_SUMMARY"
+          echo '| captions-engine | `dev`, `dev-${{ steps.tags.outputs.sha_short }}` |' >> "$GITHUB_STEP_SUMMARY"

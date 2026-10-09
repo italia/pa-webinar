@@ -64,7 +64,7 @@ Run from the repository root. All three must pass.
 Tick what you ran. For the others, write "not applicable: <area> not touched" or "not run, because ..." next to the item.
 
 - [ ] `lobby/`: `npm run lobby:typecheck`
-- [ ] `infra/recorder/` or `infra/recorder-controller/`: in that folder, `npm ci`, then `npx tsc --noEmit -p tsconfig.json && npm test`
+- [ ] `infra/recorder/`, `infra/recorder-controller/` or `infra/captions/gateway/`: in that folder, `npm ci`, then `npx tsc --noEmit -p tsconfig.json && npm test`
 - [ ] `infra/ai/worker/`: in that folder, `pip install -r requirements-test.txt`, then `python -m pytest -q`
 - [ ] `infra/helm/`: `./scripts/validate-chart.sh`
 - [ ] Live-room flows: the E2E smoke tests, `npx playwright test --project=chromium` from `app/` against the local stack
